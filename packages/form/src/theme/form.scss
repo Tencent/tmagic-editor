@@ -1,0 +1,30 @@
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+
+.m-form,
+.m-form-panel.el-card .el-card__body {
+  color: #333;
+  background-color: #fff;
+}
+
+.m-form .m-form-tip {
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 12px;
+  transition: color 0.3s cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+.m-form .m-form-schematic {
+  max-width: 50%;
+  height: 100%;
+}
+
+.el-table {
+  .cell > div.m-form-container {
+    display: block;
+  }
+}

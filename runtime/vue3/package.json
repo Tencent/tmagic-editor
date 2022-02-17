@@ -1,0 +1,27 @@
+{
+  "name": "runtime-vue3",
+  "version": "1.0.0-beta.1",
+  "private": true,
+  "scripts": {
+    "dev": "npm run build && npm run serve",
+    "start": "node scripts/dev.js && vite",
+    "build": "node scripts/build.js && vite build",
+    "serve": "vite preview --port 8078"
+  },
+  "dependencies": {
+    "axios": "^0.25.0",
+    "vue": "^3.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^15.12.4",
+    "@vitejs/plugin-vue": "^1.2.3",
+    "@vue/compiler-sfc": "^3.2.0",
+    "@vue/test-utils": "^2.0.0-rc.12",
+    "recast": "^0.20.4",
+    "rollup-plugin-external-globals": "^0.6.1",
+    "sass": "^1.35.1",
+    "typescript": "^4.3.4",
+    "vite": "^2.3.7",
+    "vue-tsc": "^0.0.24"
+  }
+}

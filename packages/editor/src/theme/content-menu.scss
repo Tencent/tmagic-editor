@@ -1,0 +1,39 @@
+.magic-editor-content-menu {
+  position: fixed;
+  font-size: 12px;
+  background: #fff;
+  color: #333;
+  box-shadow: 0 2px 8px 2px rgba(68, 73, 77, 0.16);
+  z-index: 9999;
+  transform-origin: 0% 0%;
+  font-weight: 600;
+  padding: 4px 0px;
+
+  .separation {
+    width: 100%;
+    height: 0;
+    border-color: rgba(155, 155, 155, 0.1);
+  }
+
+  .subMenu {
+    position: absolute;
+    right: 0;
+    transform: translate(100%, 0);
+    background-color: #fff;
+    color: #333;
+    box-shadow: 0 2px 8px 2px rgba(68, 73, 77, 0.16);
+    top: 0;
+    height: 223px;
+  }
+}
+
+.magic-editor-content-menu-item {
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  cursor: pointer;
+  min-width: 140px;
+  transition: all 0.2s ease 0s;
+  padding: 10px 14px;
+  border-left: 2px solid transparent;
+}

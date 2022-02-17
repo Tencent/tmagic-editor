@@ -1,0 +1,38 @@
+#ruler-container {
+  width: calc(100% + 40px);
+  position: absolute;
+  top: -40px;
+  left: -40px;
+  height: 40px;
+  z-index: 100000;
+
+  .moveable-line {
+    display: none;
+  }
+
+  .moveable-control.moveable-origin {
+    display: none;
+  }
+}
+
+#ruler-container::after {
+  content: "";
+  position: absolute;
+  left: 100%;
+  top: 0;
+  width: calc(2000px - 100%);
+  height: 100%;
+  background-color: white;
+}
+
+#horizontal {
+  width: 2000px;
+  max-width: fit-content;
+}
+
+#vertical {
+  position: absolute;
+  height: 1000px;
+  top: 0;
+  left: 0;
+}

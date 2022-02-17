@@ -1,0 +1,71 @@
+{
+  "version": "1.0.0-beta.1",
+  "name": "tmagic",
+  "private": true,
+  "scripts": {
+    "bootstrap": "lerna bootstrap && npm run prepare",
+    "clean:lock": "npx shx rm -rf package-lock.json **/package-lock.json **/**/package-lock.json",
+    "clean:top": "npx rm -rf */**/dist */dist coverage dwt*",
+    "clean:all": "npm run clean:top && npx shx rm -rf node_modules **/node_modules **/**/node_modules",
+    "lint": "eslint . --ext .js,.vue,.ts,.tsx",
+    "lint-fix": "eslint . --fix --ext .vue,.js,.ts,.tsx",
+    "playground": "npx lerna run dev --scope tmagic-playground --scope runtime-vue3 --parallel",
+    "build": "npx lerna run build --parallel",
+    "postbuild": "npx mkdir playground/dist/runtime && npx cp -r runtime/vue2/dist ./playground/dist/runtime/vue2 && npx cp -r runtime/vue3/dist ./playground/dist/runtime/vue3 && npx cp -r runtime/react/dist ./playground/dist/runtime/react",
+    "docs": "cd docs && npm run doc:dev",
+    "page": "cd page && vite",
+    "page-vue2": "cd page-vue2 && vite",
+    "page-react": "cd page-react && vite",
+    "reinstall": "npm run clean:all && npm run bootstrap",
+    "test": "jest --maxWorkers=8",
+    "test:coverage": "jest --maxWorkers=16 --coverage",
+    "prepare": "husky install"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "workspaces": [
+    "packages/code-editor",
+    "packages/editor",
+    "packages/form",
+    "packages/stage",
+    "packages/utils"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tencent/tmagic-editor.git"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.14.2",
+    "@commitlint/cli": "^12.1.4",
+    "@commitlint/config-conventional": "^12.1.4",
+    "@types/jest": "^26.0.23",
+    "@typescript-eslint/eslint-plugin": "^4.28.0",
+    "@typescript-eslint/parser": "^4.28.0",
+    "@vue/cli-plugin-babel": "^4.5.13",
+    "@vue/cli-plugin-unit-jest": "^4.5.13",
+    "babel-eslint": "^10.1.0",
+    "cz-conventional-changelog": "^3.3.0",
+    "eslint": "^7.29.0",
+    "eslint-config-tencent": "^1.0.1",
+    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-simple-import-sort": "^7.0.0",
+    "eslint-plugin-vue": "^7.11.1",
+    "husky": "^7.0.0",
+    "lerna": "^4.0.0",
+    "lint-staged": "^11.0.1",
+    "prettier": "^2.3.1",
+    "typescript": "^4.3.4",
+    "vue-jest": "^5.0.0-alpha.10"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "lint-staged": {
+    "*.{js,ts,vue}": "eslint --fix",
+    "*.scss": "prettier --write"
+  }
+}

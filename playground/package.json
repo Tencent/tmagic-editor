@@ -1,0 +1,32 @@
+{
+  "name": "tmagic-playground",
+  "version": "1.0.0-beta.1",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "dependencies": {
+    "@element-plus/icons": "0.0.11",
+    "@tmagic/editor": "^1.0.0-beta.1",
+    "@tmagic/form": "^1.0.0-beta.1",
+    "@tmagic/schema": "^1.0.0-beta.1",
+    "@tmagic/stage": "^1.0.0-beta.1",
+    "@tmagic/utils": "^1.0.0-beta.1",
+    "element-plus": "^2.0.2",
+    "serialize-javascript": "^6.0.0",
+    "vue": "^3.2.0",
+    "vue-router": "^4.0.10"
+  },
+  "devDependencies": {
+    "@types/node": "^15.12.4",
+    "@vitejs/plugin-vue": "^1.2.3",
+    "@vitejs/plugin-vue-jsx": "^1.1.6",
+    "@vue/compiler-sfc": "^3.2.0",
+    "sass": "^1.35.1",
+    "typescript": "^4.3.4",
+    "vite": "^2.3.7",
+    "vue-tsc": "^0.0.24"
+  }
+}

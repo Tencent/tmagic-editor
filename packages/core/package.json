@@ -1,0 +1,38 @@
+{
+  "version": "1.0.0-beta.1",
+  "name": "@tmagic/core",
+  "main": "dist/magic-core.umd.js",
+  "module": "dist/magic-core.es.js",
+  "types": "dist/types/src/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/magic-core.es.js",
+      "require": "./dist/magic-core.umd.js"
+    },
+    "./dist/style.css": {
+      "import": "./dist/style.css",
+      "require": "./dist/style.css"
+    }
+  },
+  "scripts": {
+    "build": "vite build"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tencent/tmagic-editor.git"
+  },
+  "dependencies": {
+    "@tmagic/schema": "^1.0.0-beta.1",
+    "events": "^3.3.0"
+  },
+  "devDependencies": {
+    "@types/events": "^3.0.0",
+    "@types/node": "^15.12.4",
+    "typescript": "^4.3.4",
+    "vite": "^2.3.7",
+    "vite-plugin-dts": "^0.9.6"
+  }
+}

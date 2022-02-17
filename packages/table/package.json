@@ -1,0 +1,46 @@
+{
+  "version": "1.0.0-beta.1",
+  "name": "@tmagic/table",
+  "main": "dist/magic-table.umd.js",
+  "module": "dist/magic-table.es.js",
+  "types": "dist/types/src/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/magic-table.es.js",
+      "require": "./dist/magic-table.umd.js"
+    },
+    "./dist/style.css": {
+      "import": "./dist/style.css",
+      "require": "./dist/style.css"
+    }
+  },
+  "scripts": {
+    "build": "vite build"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tencent/tmagic-editor.git"
+  },
+  "dependencies": {
+    "@tmagic/form": "^1.0.0-beta.1",
+    "element-plus": "^2.0.2",
+    "lodash-es": "^4.17.21",
+    "vue": "^3.2.0"
+  },
+  "devDependencies": {
+    "@types/color": "^3.0.1",
+    "@types/lodash-es": "^4.17.4",
+    "@types/node": "^15.12.4",
+    "@vitejs/plugin-vue": "^1.2.3",
+    "@vue/compiler-sfc": "^3.2.0",
+    "@vue/test-utils": "^2.0.0-rc.12",
+    "sass": "^1.35.1",
+    "typescript": "^4.3.4",
+    "vite": "^2.3.7",
+    "vite-plugin-dts": "^0.9.6",
+    "vue-tsc": "^0.0.24"
+  }
+}

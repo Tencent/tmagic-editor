@@ -1,0 +1,8 @@
+#root {
+  width: fit-content;
+  position: relative;
+  margin: 0 auto;
+}
+::-webkit-scrollbar {
+  width: 0;
+}

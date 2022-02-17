@@ -1,0 +1,15 @@
+#root {
+  width: fit-content;
+  position: relative;
+  margin: 0 auto;
+}
+::-webkit-scrollbar {
+  width: 0;
+}
+.magic-ui-container {
+  background-color: rgba(136, 136, 136, 0.5);
+}
+
+.action-area {
+  background-color: rgba(51, 153, 255, 0.5) !important;
+}

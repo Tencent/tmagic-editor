@@ -1,0 +1,40 @@
+{
+  "version": "1.0.0-beta.1",
+  "name": "@tmagic/stage",
+  "main": "dist/magic-stage.umd.js",
+  "module": "dist/magic-stage.es.js",
+  "types": "dist/types/src/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/magic-stage.es.js",
+      "require": "./dist/magic-stage.umd.js"
+    }
+  },
+  "scripts": {
+    "build": "vite build"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tencent/tmagic-editor.git"
+  },
+  "dependencies": {
+    "@scena/guides": "^0.17.0",
+    "@tmagic/schema": "^1.0.0-beta.1",
+    "@tmagic/utils": "^1.0.0-beta.1",
+    "events": "^3.3.0",
+    "lodash-es": "^4.17.21",
+    "moveable": "^0.25.3"
+  },
+  "devDependencies": {
+    "@types/events": "^3.0.0",
+    "@types/lodash-es": "^4.17.4",
+    "@types/node": "^15.12.4",
+    "sass": "^1.35.1",
+    "typescript": "^4.3.4",
+    "vite": "^2.3.7",
+    "vite-plugin-dts": "^0.9.6"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "version": "1.0.0-beta.1",
+  "npmClient": "npm",
+  "packages": [
+    "packages/*",
+    "playground",
+    "runtime/*"
+  ],
+  "command": {
+    "bootstrap": {
+      "hoist": true,
+      "strict": true,
+      "nohoist": [
+        "vue",
+        "react",
+        "react-dom",
+        "@vue/test-utils",
+        "element-plus",
+        "@element-plus/icons",
+        "@testing-library/vue"
+      ]
+    }
+  }
+}

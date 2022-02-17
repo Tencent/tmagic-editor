@@ -1,0 +1,72 @@
+.m-editor {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  &-content {
+    width: 100%;
+    height: calc(100% - #{$--nav-height});
+    display: flex;
+    justify-self: space-between;
+  }
+
+  &-framework-center {
+    position: relative;
+    transform: translateZ(0);
+    flex: 1;
+  }
+
+  &-framework-left {
+    background-color: $--sidebar-content-background-color;
+  }
+
+  &-framework-center .el-scrollbar__view {
+    height: 100%;
+    min-height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &-empty {
+    &-panel {
+      display: flex;
+      flex: 1;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: calc(100% - $--page-bar-height);
+    }
+
+    &-content {
+      display: flex;
+      justify-content: space-evenly;
+      flex-direction: row;
+      width: 100%;
+    }
+
+    &-button {
+      border: 3px solid rgba(0, 0, 0, 0.2);
+      padding: 10px 40px;
+      color: rgba(0, 0, 0, 0.6);
+      cursor: pointer;
+
+      i {
+        height: 180px;
+        line-height: 180px;
+        font-size: 100px;
+      }
+
+      p {
+        text-align: center;
+        font-size: 20px;
+        margin-top: 5px;
+      }
+
+      &:hover {
+        border-color: $--theme-color;
+        color: $--theme-color;
+      }
+    }
+  }
+}

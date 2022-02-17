@@ -1,0 +1,51 @@
+{
+  "version": "1.0.0-beta.1",
+  "name": "@tmagic/form",
+  "main": "dist/magic-form.umd.js",
+  "module": "dist/magic-form.es.js",
+  "style": "dist/style.css",
+  "types": "dist/types/src/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/magic-form.es.js",
+      "require": "./dist/magic-form.umd.js"
+    },
+    "./dist/style.css": {
+      "import": "./dist/style.css",
+      "require": "./dist/style.css"
+    }
+  },
+  "scripts": {
+    "build": "vite build"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tencent/tmagic-editor.git"
+  },
+  "dependencies": {
+    "@element-plus/icons": "0.0.11",
+    "@tmagic/utils": "^1.0.0-beta.1",
+    "element-plus": "^2.0.2",
+    "lodash-es": "^4.17.21",
+    "moment": "^2.29.1",
+    "sortablejs": "^1.14.0",
+    "vue": "^3.2.0"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.4",
+    "@types/node": "^15.12.4",
+    "@types/sortablejs": "^1.10.7",
+    "@vitejs/plugin-vue": "^1.2.3",
+    "@vitejs/plugin-vue-jsx": "^1.1.6",
+    "@vue/compiler-sfc": "^3.2.0",
+    "@vue/test-utils": "^2.0.0-rc.12",
+    "sass": "^1.35.1",
+    "typescript": "^4.3.4",
+    "vite": "^2.3.7",
+    "vite-plugin-dts": "^0.9.6",
+    "vue-tsc": "^0.0.24"
+  }
+}

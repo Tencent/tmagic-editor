@@ -1,0 +1,22 @@
+{
+  "version": "1.0.0-beta.1",
+  "name": "@tmagic/ui",
+  "main": "src/index.ts",
+  "engines": {
+    "node": ">=14"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tencent/tmagic-editor.git"
+  },
+  "dependencies": {
+    "@tmagic/schema": "^1.0.0-beta.1",
+    "delegate": "^3.2.0",
+    "tiny-emitter": "^2.1.0",
+    "vue": "^3.2.0"
+  },
+  "devDependencies": {
+    "@testing-library/vue": "^6.4.2",
+    "@vue/test-utils": "^2.0.0-rc.12"
+  }
+}

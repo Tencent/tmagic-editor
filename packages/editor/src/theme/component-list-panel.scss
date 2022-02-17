@@ -1,0 +1,102 @@
+.ui-component-panel {
+  height: 100%;
+  border-top: 0 !important;
+  margin-top: 50px;
+  background-color: $--sidebar-content-background-color;
+
+  .search-input {
+    background: #f8fbff;
+    color: #bbbbbb;
+    padding: 10px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+
+    .el-input__prefix {
+      padding: 10px;
+    }
+
+    .el-input__suffix {
+      padding: 10px 5px;
+    }
+  }
+
+  .el-collapse-item {
+    > div:first-of-type {
+      border-bottom: 1px solid $--border-color;
+      margin-bottom: 10px;
+    }
+  }
+
+  .el-collapse-item__header {
+    background: $--sidebar-content-background-color;
+    color: $--font-color;
+    height: 25px;
+    line-height: 25px;
+    padding-left: 10px;
+    font-size: 12px;
+
+    i {
+      margin-right: 5px;
+      font-size: 14px;
+    }
+  }
+
+  .el-collapse-item__wrap {
+    background: $--sidebar-content-background-color;
+    border-bottom: 0;
+
+    .el-collapse-item__content {
+      padding: 10px;
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .component-item {
+      display: flex;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin: 5px 10px;
+      box-sizing: border-box;
+      color: $--font-color;
+      flex-direction: column;
+      width: 42px;
+
+      i {
+        font-size: 20px;
+        background: #fff;
+        height: 40px;
+        width: 40px;
+        line-height: 40px;
+        border-radius: 5px;
+        color: #909090;
+        border: 1px solid $--border-color;
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        margin-bottom: 5px;
+
+        &:hover {
+          background: #2882e0;
+          color: #fff;
+          border-color: #4e8be1;
+        }
+      }
+
+      span {
+        font-size: 12px;
+        text-align: center;
+      }
+
+      .el-tooltip {
+        width: 50px;
+        height: 30px;
+        line-height: 15px;
+        display: block;
+        white-space: normal;
+        margin: 0;
+      }
+    }
+  }
+}

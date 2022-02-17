@@ -1,0 +1,97 @@
+.m-editor-sidebar {
+  height: 100%;
+
+  &.el-tabs--left .el-tabs__header {
+    background: $--sidebar-heder-background-color;
+    border: 0;
+
+    &.is-left {
+      width: 40px;
+      margin-right: 0;
+    }
+
+    .el-tabs__nav-wrap {
+      margin: 0;
+    }
+
+    .el-tabs__nav {
+      border: 0;
+      border-radius: 0;
+    }
+
+    .tab-label {
+      margin-left: 2px;
+    }
+
+    .el-tabs__item.is-left {
+      line-height: 15px;
+      border: 0;
+      height: auto;
+      padding: 8px;
+      color: rgb(255, 255, 255);
+      box-sizing: border-box;
+
+      &.is-left {
+        &.is-active {
+          background: $--sidebar-content-background-color;
+          border: 0;
+
+          i {
+            color: #353140;
+          }
+
+          .magic-editor-tab-panel-title {
+            color: #353140;
+          }
+        }
+
+        &:first-child {
+          border-right: 0;
+        }
+      }
+    }
+
+    i {
+      font-size: 25px;
+      color: rgba(255, 255, 255, 0.6);
+
+      &:hover {
+        color: rgb(255, 255, 255);
+      }
+    }
+
+    .magic-editor-tab-panel-title {
+      font-size: 12px;
+      white-space: normal;
+    }
+  }
+
+  .el-scrollbar {
+    height: 100%;
+  }
+
+  .el-tree {
+    min-height: 100%;
+  }
+
+  .fold-icon {
+    position: absolute;
+    bottom: 8px;
+    left: 0px;
+    width: 45px;
+    padding-left: 8px;
+    color: #fff;
+    font-size: 32px;
+    opacity: 0.8;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  .el-tabs__content,
+  .el-tab-pane {
+    height: 100%;
+  }
+}

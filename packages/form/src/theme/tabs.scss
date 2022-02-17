@@ -1,0 +1,25 @@
+.magic-form-dynamic-tab {
+  .el-tabs__header.is-top {
+    display: flex;
+    flex-direction: row-reverse;
+    padding-right: 8px;
+    .el-tabs__new-tab {
+      margin-right: auto;
+      min-width: 36px;
+      outline: none;
+      border-color: #409eff;
+      color: #409eff;
+      width: 36px;
+      &::before {
+        content: "添加";
+      }
+      .el-icon-plus {
+        display: none;
+      }
+    }
+  }
+}
+
+.magic-form-tab {
+  margin-bottom: 10px;
+}

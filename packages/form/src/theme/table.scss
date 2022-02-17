@@ -1,0 +1,69 @@
+.m-fields-table {
+  width: 100%;
+  &.fixed {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 100;
+    &::before {
+      content: " ";
+      display: block;
+      background: rgba(0, 0, 0, 0.5);
+      position: fixed;
+      top: 0;
+      right: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 100;
+    }
+    & > .el-form-item__content {
+      z-index: 101;
+      position: relative;
+      margin: 10vh auto;
+      max-width: fit-content;
+    }
+    table {
+      width: 95vw !important;
+    }
+  }
+
+  th {
+    background-color: #f2f2f2 !important;
+    color: #333 !important;
+  }
+
+  .el-table {
+    td,
+    th {
+      padding: 0 !important;
+    }
+  }
+
+  .el-table__column--dropable {
+    cursor: move;
+  }
+
+  .el-form-item__content {
+    .el-input-group {
+      vertical-align: middle;
+    }
+  }
+
+  &.m-fields-table-item-extra {
+    tr.expanded td {
+      border-bottom: 0;
+    }
+  }
+
+  .el-table__expanded-cell {
+    .m-form-tip {
+      margin-left: 80px;
+    }
+  }
+
+  .el-form-item {
+    margin-bottom: 0;
+  }
+}

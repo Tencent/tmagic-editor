@@ -1,0 +1,18 @@
+.m-form-panel {
+  .el-card__header {
+    &:hover {
+      background: #f2f6fc;
+    }
+    a {
+      color: #409eff;
+    }
+  }
+
+  .el-card__body {
+    padding: 10px;
+  }
+
+  .m-form-tip {
+    margin-left: 5px;
+  }
+}

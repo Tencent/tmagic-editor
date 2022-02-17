@@ -1,0 +1,22 @@
+.m-editor-stage {
+  position: relative;
+  width: 100%;
+  height: calc(100% - $--page-bar-height);
+  overflow: auto;
+}
+
+.m-editor-stage-container {
+  transition: transform 0.3s;
+  transform-origin: center -50%;
+  z-index: 0;
+  top: 50%;
+  margin: 0 auto;
+  position: relative;
+  width: 375px;
+  height: 80%;
+  border: 1px solid $--border-color;
+
+  &::-webkit-scrollbar {
+    width: 0 !important;
+  }
+}

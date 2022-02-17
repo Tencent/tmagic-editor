@@ -1,0 +1,24 @@
+{
+  "version": "1.0.0-beta.1",
+  "name": "@tmagic/ui-vue2",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "vite build"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tencent/tmagic-editor.git"
+  },
+  "dependencies": {
+    "@vue/composition-api": "1.0.5",
+    "vue": "^2.6.14"
+  },
+  "devDependencies": {
+    "vite": "^2.3.7",
+    "vite-plugin-vue2": "^1.7.3",
+    "vue-template-compiler": "^2.6.14"
+  }
+}

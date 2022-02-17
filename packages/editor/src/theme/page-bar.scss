@@ -1,0 +1,31 @@
+.m-editor-page-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  width: 100%;
+  height: $--page-bar-height;
+  line-height: $--page-bar-height;
+  background-color: #f3f3f3;
+  color: $--font-color;
+  border-top: 1px solid $--border-color;
+  z-index: 2;
+
+  .m-editor-page-bar-item {
+    padding: 0 10px;
+    cursor: pointer;
+    border-right: 1px solid $--border-color;
+    display: flex;
+    justify-items: center;
+    align-items: center;
+
+    &.active {
+      background-color: #fff;
+      cursor: text;
+
+      .m-editor-page-bar-menu-icon {
+        cursor: pointer;
+      }
+    }
+  }
+}

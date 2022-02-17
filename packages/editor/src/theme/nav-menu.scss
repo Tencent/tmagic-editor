@@ -1,0 +1,69 @@
+.m-editor-nav-menu {
+  display: flex;
+  z-index: 5;
+  -webkit-box-pack: justify;
+  justify-content: space-between;
+  -webkit-box-align: center;
+  align-items: center;
+  background-color: $--nav--background-color;
+  font-size: 19.2px;
+  color: $--nav-color;
+  font-weight: 400;
+  box-sizing: border-box;
+  margin: 0px;
+  flex: 0 0 $--nav-height;
+  border-bottom: 1px solid #d8dee8;
+
+  > div {
+    display: flex;
+    height: 100%;
+    z-index: 1;
+    align-items: center;
+  }
+
+  .menu-left {
+    padding-left: 16px;
+  }
+
+  .menu-right {
+    padding-right: 16px;
+  }
+
+  .menu-item {
+    flex-direction: row;
+    -webkit-box-align: center;
+    align-items: center;
+    vertical-align: middle;
+    font-size: 14px;
+    line-height: 1;
+    height: 100%;
+    color: rgba(255, 255, 255, 0.7);
+    box-sizing: inherit;
+    z-index: 1;
+    display: flex !important;
+    transition: all 0.3s ease 0s;
+    border-bottom: 2px solid transparent;
+    margin: 0 5px;
+
+    .is-disabled {
+      opacity: 0.5;
+    }
+
+    .el-button--text,
+    i {
+      color: $--font-color;
+    }
+
+    .icon {
+      display: flex;
+      -webkit-box-align: center;
+      align-items: center;
+      height: 100%;
+      padding: 0px 8px;
+    }
+
+    .menu-item-text {
+      color: $--nav-color;
+    }
+  }
+}

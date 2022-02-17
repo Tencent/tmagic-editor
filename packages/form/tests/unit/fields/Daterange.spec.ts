@@ -1,0 +1,89 @@
+/*
+ * Tencent is pleased to support the open source community by making TMagicEditor available.
+ *
+ * Copyright (C) 2021 THL A29 Limited, a Tencent company.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import { mount } from '@vue/test-utils';
+import ElementPlus, { ElDatePicker } from 'element-plus';
+
+import MagicForm, { MDaterange, MForm } from '../../../src';
+
+const getWrapper = (
+  config: any = [
+    {
+      type: 'daterange',
+      text: 'daterange',
+      names: ['start', 'end'],
+    },
+  ],
+  initValues: any = {},
+) =>
+  mount(MForm, {
+    global: {
+      plugins: [ElementPlus as any, MagicForm as any],
+    },
+    props: {
+      initValues,
+      config,
+    },
+  });
+
+describe('Daterange', () => {
+  it('基础', (done) => {
+    const wrapper = getWrapper();
+
+    setTimeout(async () => {
+      const daterange = wrapper.findComponent(MDaterange);
+      expect(daterange.exists()).toBe(true);
+
+      const value = await (wrapper.vm as any).submitForm();
+      expect(value.start).toMatch('');
+      expect(value.end).toMatch('');
+      done();
+    });
+  });
+
+  it('基础初始化', (done) => {
+    const wrapper = getWrapper([{ type: 'daterange', text: 'daterange' }], {
+      daterange: [new Date('2021-7-30 00:00:00'), new Date('2021-7-30 12:00:00')],
+    });
+
+    setTimeout(async () => {
+      const daterange = wrapper.findComponent(MDaterange);
+      expect(daterange.exists()).toBe(true);
+
+      done();
+    }, 0);
+  });
+
+  it('设置时间', (done) => {
+    const wrapper = getWrapper();
+
+    setTimeout(async () => {
+      const daterange = wrapper.findComponent(ElDatePicker);
+      const inputs = wrapper.findAll('.el-range-input');
+      expect(inputs.length).toBe(2);
+
+      const v = [new Date('2021-7-30 00:00:00'), new Date('2021-7-31 12:00:00')];
+      await daterange.vm.$emit('change', v);
+
+      const value = await (wrapper.vm as any).submitForm();
+      expect(value.start).toMatch('2021-07-30 00:00:00');
+      expect(value.end).toMatch('2021-07-31 12:00:00');
+      done();
+    }, 0);
+  });
+});

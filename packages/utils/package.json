@@ -1,0 +1,29 @@
+{
+  "version": "1.0.0-beta.1",
+  "name": "@tmagic/utils",
+  "main": "dist/magic-utils.umd.js",
+  "module": "dist/magic-utils.es.js",
+  "types": "dist/types/src/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/magic-utils.es.js",
+      "require": "./dist/magic-utils.umd.js"
+    }
+  },
+  "scripts": {
+    "build": "vite build"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tencent/tmagic-editor.git"
+  },
+  "devDependencies": {
+    "@types/node": "^15.12.4",
+    "typescript": "^4.3.4",
+    "vite": "^2.3.7",
+    "vite-plugin-dts": "^0.9.6"
+  }
+}

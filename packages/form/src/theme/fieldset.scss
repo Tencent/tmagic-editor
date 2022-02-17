@@ -1,0 +1,24 @@
+fieldset.m-fieldset {
+  position: relative;
+  border: 1px solid rgb(229, 229, 229);
+  margin-top: 10px;
+  margin-bottom: 10px;
+  min-inline-size: auto;
+
+  legend {
+    font-size: 14px;
+    position: absolute;
+    border: 0;
+    top: -10px;
+    left: 20px;
+    background: rgb(255, 255, 255);
+    width: auto;
+    padding: 0px 3px;
+    font-weight: bold;
+    line-height: 20px;
+  }
+
+  .m-form-tip {
+    margin-left: 5px;
+  }
+}

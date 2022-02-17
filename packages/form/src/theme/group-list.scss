@@ -1,0 +1,23 @@
+.m-fields-group-list {
+  .el-button--text {
+    padding: 0;
+    margin-bottom: 7px;
+  }
+
+  .el-tree-node__expand-icon {
+    padding: 0;
+    margin-bottom: 7px;
+    &.expand {
+      transform: rotate(90deg);
+    }
+  }
+
+  .m-fields-group-list-item {
+    border-bottom: 1px solid #ebeef5;
+    margin-bottom: 7px;
+
+    &:last-of-type {
+      border-bottom: 0;
+    }
+  }
+}
