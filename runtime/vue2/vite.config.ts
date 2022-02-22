@@ -24,7 +24,7 @@ import { createVuePlugin } from 'vite-plugin-vue2';
 import externalGlobals from 'rollup-plugin-external-globals';
 
 export default defineConfig({
-  base: '',
+  base: '/tmagic-editor/playground/runtime/vue2',
   plugins: [createVuePlugin(), externalGlobals({ vue: 'Vue' }, { exclude: ['page.html', 'playground.html'] })],
 
   resolve: {

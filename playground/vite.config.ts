@@ -26,6 +26,8 @@ import vueJsx from '@vitejs/plugin-vue-jsx';
 export default defineConfig({
   plugins: [vue(), vueJsx()],
 
+  base: '/tmagic-editor/playground',
+
   resolve: {
     alias: [
       { find: /@editor/, replacement: path.join(__dirname, '../packages/editor/src') },
@@ -52,23 +54,20 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 8098,
     proxy: {
-      '^/runtime/react': {
+      '^/tmagic-editor/playground/runtime/react': {
         target: 'http://127.0.0.1:8076',
         changeOrigin: true,
         prependPath: false,
-        rewrite: (path: string) => path.replace(/^\/runtime\/react/, ''),
       },
-      '^/runtime/vue2': {
+      '^/tmagic-editor/playground/runtime/vue2': {
         target: 'http://127.0.0.1:8077',
         changeOrigin: true,
         prependPath: false,
-        rewrite: (path: string) => path.replace(/^\/runtime\/vue2/, ''),
       },
-      '^/runtime/vue3': {
+      '^/tmagic-editor/playground/runtime/vue3': {
         target: 'http://127.0.0.1:8078',
         changeOrigin: true,
         prependPath: false,
-        rewrite: (path: string) => path.replace(/^\/runtime\/vue3/, ''),
       },
     },
   },

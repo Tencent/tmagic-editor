@@ -10,7 +10,7 @@
     "lint": "eslint . --ext .js,.vue,.ts,.tsx",
     "lint-fix": "eslint . --fix --ext .vue,.js,.ts,.tsx",
     "playground": "npx lerna run dev --scope tmagic-playground --scope runtime-vue3 --parallel",
-    "build": "npx lerna run build --parallel",
+    "build": "npx lerna run build --scope tmagic-playground --scope runtime-vue3 --scope runtime-vue2 --scope runtime-react --scope @tmagic/* --parallel",
     "postbuild": "npx mkdir playground/dist/runtime && npx cp -r runtime/vue2/dist ./playground/dist/runtime/vue2 && npx cp -r runtime/vue3/dist ./playground/dist/runtime/vue3 && npx cp -r runtime/react/dist ./playground/dist/runtime/react",
     "docs": "cd docs && npm run doc:dev",
     "page": "cd page && vite",

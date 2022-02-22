@@ -23,7 +23,7 @@ import reactRefresh from '@vitejs/plugin-react-refresh';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '',
+  base: '/tmagic-editor/playground/runtime/react',
   plugins: [reactRefresh()],
 
   resolve: {

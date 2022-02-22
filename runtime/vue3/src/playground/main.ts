@@ -20,7 +20,7 @@ import { createApp } from 'vue';
 
 import App from './App.vue';
 
-const componentUrl = '/runtime/vue3/assets/components.js';
+const componentUrl = '/tmagic-editor/playground/runtime/vue3/assets/components.js';
 
 import(componentUrl).then(() => {
   const magicApp = createApp(App);

@@ -27,7 +27,7 @@ import { getUrlParam } from '@tmagic/utils';
 
 import App from './App';
 
-const componentUrl = '/runtime/react/assets/components.js';
+const componentUrl = '/tamgic-editor/playground/runtime/react/assets/components.js';
 
 import(componentUrl).then(() => {
   const { components } = window.magicPresetComponents;

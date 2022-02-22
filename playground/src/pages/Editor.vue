@@ -30,19 +30,19 @@ import { Coin, Connection, Document, FolderOpened, SwitchButton, Tickets } from 
 import { ElMessage } from 'element-plus';
 import serialize from 'serialize-javascript';
 
-import type { MagicEditor, MenuBarData, MoveableOptions } from '@tmagic/editor';
+import type { MenuBarData, MoveableOptions, TMagicEditor } from '@tmagic/editor';
 import StageCore from '@tmagic/stage';
 import { asyncLoadJs } from '@tmagic/utils';
 
 import config from '../config';
 
-const RUNTIME_PATH = '/runtime/vue3';
+const RUNTIME_PATH = '/tmagic-editor/playground/runtime/vue3';
 
 export default defineComponent({
   name: 'EditorApp',
 
   setup() {
-    const editor = ref<InstanceType<typeof MagicEditor>>();
+    const editor = ref<InstanceType<typeof TMagicEditor>>();
     const previewVisible = ref(false);
     const value = ref(config);
     const defaultSelected = ref(config.items[0].id);

@@ -6,9 +6,13 @@ TMagic 可视化搭建平台。
 
 # 文档
 
-文档请移步 
+文档请移步 https://tencent.github.io/tmagic-editor/docs/index.html
 
 目前文档仍在逐步完善中，如有疑问欢迎给我们提 issue。
+
+# Playground 体验
+
+https://tencent.github.io/tmagic-editor/playground/index.html
 
 ## 环境准备
 

@@ -25,7 +25,7 @@ import vueJsx from '@vitejs/plugin-vue-jsx';
 import externalGlobals from 'rollup-plugin-external-globals';
 
 export default defineConfig({
-  base: '',
+  base: '/tmagic-editor/playground/runtime/vue3',
   plugins: [vue(), vueJsx(), externalGlobals({ vue: 'Vue' }, { exclude: ['page.html', 'playground.html'] })],
 
   resolve: {

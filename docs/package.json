@@ -1,0 +1,17 @@
+{
+  "name": "docs",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vuepress dev src",
+    "build": "vuepress build src -d dist"
+  },
+  "dependencies": {
+    "element-plus": "^2.0.2",
+    "highlight.js": "^11.2.0"
+  },
+  "devDependencies": {
+    "@vuepress/cli": "^2.0.0-beta.26",
+    "vuepress": "^2.0.0-beta.26"
+  }
+}

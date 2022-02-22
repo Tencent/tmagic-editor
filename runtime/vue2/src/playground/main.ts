@@ -20,7 +20,7 @@ import Vue from 'vue';
 
 import App from './App.vue';
 
-const componentUrl = '/runtime/vue2/assets/components.js';
+const componentUrl = '/tamgic-editor/playground/runtime/vue2/assets/components.js';
 
 import(componentUrl).then(() => {
   const { components, plugins } = window.magicPresetComponents;
