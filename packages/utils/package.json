@@ -1,13 +1,13 @@
 {
   "version": "1.0.0-beta.1",
   "name": "@tmagic/utils",
-  "main": "dist/magic-utils.umd.js",
-  "module": "dist/magic-utils.es.js",
+  "main": "dist/tmagic-utils.umd.js",
+  "module": "dist/tmagic-utils.es.js",
   "types": "dist/types/src/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/magic-utils.es.js",
-      "require": "./dist/magic-utils.umd.js"
+      "import": "./dist/tmagic-utils.es.js",
+      "require": "./dist/tmagic-utils.umd.js"
     }
   },
   "scripts": {

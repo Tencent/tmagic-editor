@@ -1,13 +1,13 @@
 {
   "version": "1.0.0-beta.1",
   "name": "@tmagic/core",
-  "main": "dist/magic-core.umd.js",
-  "module": "dist/magic-core.es.js",
+  "main": "dist/tmagic-core.umd.js",
+  "module": "dist/tmagic-core.es.js",
   "types": "dist/types/src/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/magic-core.es.js",
-      "require": "./dist/magic-core.umd.js"
+      "import": "./dist/tmagic-core.es.js",
+      "require": "./dist/tmagic-core.umd.js"
     },
     "./dist/style.css": {
       "import": "./dist/style.css",

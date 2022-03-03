@@ -1,14 +1,14 @@
 {
   "version": "1.0.0-beta.1",
   "name": "@tmagic/form",
-  "main": "dist/magic-form.umd.js",
-  "module": "dist/magic-form.es.js",
+  "main": "dist/tmagic-form.umd.js",
+  "module": "dist/tmagic-form.es.js",
   "style": "dist/style.css",
   "types": "dist/types/src/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/magic-form.es.js",
-      "require": "./dist/magic-form.umd.js"
+      "import": "./dist/tmagic-form.es.js",
+      "require": "./dist/tmagic-form.umd.js"
     },
     "./dist/style.css": {
       "import": "./dist/style.css",
