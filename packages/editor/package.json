@@ -1,14 +1,14 @@
 {
   "version": "1.0.0-beta.1",
   "name": "@tmagic/editor",
-  "main": "dist/magic-editor.umd.js",
-  "module": "dist/magic-editor.es.js",
+  "main": "dist/tmagic-editor.umd.js",
+  "module": "dist/tmagic-editor.es.js",
   "style": "dist/style.css",
   "types": "dist/types/src/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/magic-editor.es.js",
-      "require": "./dist/magic-editor.umd.js"
+      "import": "./dist/tmagic-editor.es.js",
+      "require": "./dist/tmagic-editor.umd.js"
     },
     "./dist/style.css": {
       "import": "./dist/style.css",
