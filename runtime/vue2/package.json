@@ -1,6 +1,6 @@
 {
   "name": "runtime-vue2",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "private": true,
   "scripts": {
     "dev": "npm run build && npm run serve",
