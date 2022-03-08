@@ -289,8 +289,6 @@ class Editor extends BaseService {
     if (!info.node) throw new Error(`获取不到id为${config.id}的节点`);
 
     const node = cloneDeep(toRaw(info.node));
-    const { parent } = info;
-    if (!parent) throw new Error('获取不到父级节点');
 
     let newConfig = await this.toggleFixedPosition(toRaw(config), node, this.get<MApp>('root'));
 
@@ -302,6 +300,9 @@ class Editor extends BaseService {
       this.set('root', newConfig);
       return newConfig;
     }
+
+    const { parent } = info;
+    if (!parent) throw new Error('获取不到父级节点');
 
     const parentNodeItems = parent.items;
     const index = getNodeIndex(newConfig, parent);
