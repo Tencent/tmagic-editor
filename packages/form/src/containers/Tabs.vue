@@ -54,6 +54,10 @@ const getActive = (mForm: FormState | undefined, props: any, activeTabName: stri
 
 const tabClickHandler = (mForm: FormState | undefined, tab: any, props: any) => {
   const { config, model, prop } = props;
+
+  // 兼容vue2的element-ui
+  tab.name = tab.paneName;
+
   if (typeof config.onTabClick === 'function') {
     config.onTabClick(mForm, tab, { model, formValue: mForm?.values, prop });
   }
