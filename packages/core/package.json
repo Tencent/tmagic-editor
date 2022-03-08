@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "name": "@tmagic/core",
   "main": "dist/tmagic-core.umd.js",
   "module": "dist/tmagic-core.es.js",
@@ -25,7 +25,7 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "@tmagic/schema": "^1.0.0-beta.1",
+    "@tmagic/schema": "^1.0.0-beta.2",
     "events": "^3.3.0"
   },
   "devDependencies": {

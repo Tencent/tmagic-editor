@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "name": "@tmagic/editor",
   "main": "dist/tmagic-editor.umd.js",
   "module": "dist/tmagic-editor.es.js",
@@ -27,11 +27,11 @@
   },
   "dependencies": {
     "@element-plus/icons": "0.0.11",
-    "@tmagic/core": "^1.0.0-beta.1",
-    "@tmagic/form": "^1.0.0-beta.1",
-    "@tmagic/schema": "^1.0.0-beta.1",
-    "@tmagic/stage": "^1.0.0-beta.1",
-    "@tmagic/utils": "^1.0.0-beta.1",
+    "@tmagic/core": "^1.0.0-beta.2",
+    "@tmagic/form": "^1.0.0-beta.2",
+    "@tmagic/schema": "^1.0.0-beta.2",
+    "@tmagic/stage": "^1.0.0-beta.2",
+    "@tmagic/utils": "^1.0.0-beta.2",
     "color": "^3.1.3",
     "element-plus": "^2.0.2",
     "events": "^3.3.0",
