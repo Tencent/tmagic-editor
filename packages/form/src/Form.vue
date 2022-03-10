@@ -1,6 +1,5 @@
 <template>
-  <ElForm
-    v-if="initialized && Array.isArray(config)"
+  <el-form
     class="m-form"
     ref="elForm"
     :model="values"
@@ -10,25 +9,26 @@
     :inline="inline"
     :label-position="labelPosition"
   >
-    <MContainer
-      v-for="(item, index) in config"
-      :key="item[keyProp] ?? index"
-      :config="item"
-      :model="values"
-      :label-width="item.labelWidth || labelWidth"
-      :step-active="stepActive"
-      :size="size"
-      @change="changeHandler"
-    ></MContainer>
-  </ElForm>
+    <template v-if="initialized && Array.isArray(config)">
+      <m-form-container
+        v-for="(item, index) in config"
+        :key="item[keyProp] ?? index"
+        :config="item"
+        :model="values"
+        :label-width="item.labelWidth || labelWidth"
+        :step-active="stepActive"
+        :size="size"
+        @change="changeHandler"
+      ></m-form-container>
+    </template>
+  </el-form>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, provide, reactive, ref, watchEffect } from 'vue';
+import { defineComponent, PropType, provide, reactive, ref, toRaw, watch } from 'vue';
 import { ElForm } from 'element-plus';
-import { cloneDeep } from 'lodash-es';
+import { cloneDeep, isEqual } from 'lodash-es';
 
-import MContainer from './containers/Container.vue';
 import { getConfig } from './utils/config';
 import { initValue } from './utils/form';
 import { FormConfig, FormState, FormValue } from './schema';
@@ -44,8 +44,6 @@ export interface FieldErrorList {
 
 export default defineComponent({
   name: 'm-form',
-
-  components: { ElForm, MContainer },
 
   props: {
     // 表单初始化值
@@ -89,7 +87,6 @@ export default defineComponent({
 
     size: {
       type: String,
-      default: 'small',
     },
 
     inline: {
@@ -141,16 +138,23 @@ export default defineComponent({
 
     provide('mForm', formState);
 
-    watchEffect(() => {
-      initialized.value = false;
-      initValue(formState, {
-        initValues: props.initValues,
-        config: props.config,
-      }).then((value) => {
-        values.value = value;
-        initialized.value = true;
-      });
-    });
+    watch(
+      [() => props.config, () => props.initValues],
+      ([config], [preConfig]) => {
+        if (!isEqual(toRaw(config), toRaw(preConfig))) {
+          initialized.value = false;
+        }
+
+        initValue(formState, {
+          initValues: props.initValues,
+          config: props.config,
+        }).then((value) => {
+          values.value = value;
+          initialized.value = true;
+        });
+      },
+      { immediate: true },
+    );
 
     return {
       initialized,

@@ -1,13 +1,13 @@
 {
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "name": "@tmagic/table",
-  "main": "dist/magic-table.umd.js",
-  "module": "dist/magic-table.es.js",
+  "main": "dist/tmagic-table.umd.js",
+  "module": "dist/tmagic-table.es.js",
   "types": "dist/types/src/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/magic-table.es.js",
-      "require": "./dist/magic-table.umd.js"
+      "import": "./dist/tmagic-table.es.js",
+      "require": "./dist/tmagic-table.umd.js"
     },
     "./dist/style.css": {
       "import": "./dist/style.css",
@@ -25,7 +25,7 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "@tmagic/form": "^1.0.0-beta.1",
+    "@tmagic/form": "^1.0.0-beta.2",
     "element-plus": "^2.0.2",
     "lodash-es": "^4.17.21",
     "vue": "^3.2.0"

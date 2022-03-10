@@ -1,13 +1,13 @@
 {
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "name": "@tmagic/stage",
-  "main": "dist/magic-stage.umd.js",
-  "module": "dist/magic-stage.es.js",
+  "main": "dist/tmagic-stage.umd.js",
+  "module": "dist/tmagic-stage.es.js",
   "types": "dist/types/src/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/magic-stage.es.js",
-      "require": "./dist/magic-stage.umd.js"
+      "import": "./dist/tmagic-stage.es.js",
+      "require": "./dist/tmagic-stage.umd.js"
     }
   },
   "scripts": {
@@ -22,8 +22,8 @@
   },
   "dependencies": {
     "@scena/guides": "^0.17.0",
-    "@tmagic/schema": "^1.0.0-beta.1",
-    "@tmagic/utils": "^1.0.0-beta.1",
+    "@tmagic/schema": "^1.0.0-beta.2",
+    "@tmagic/utils": "^1.0.0-beta.2",
     "events": "^3.3.0",
     "lodash-es": "^4.17.21",
     "moveable": "^0.25.3"

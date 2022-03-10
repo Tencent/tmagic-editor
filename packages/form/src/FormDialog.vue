@@ -15,6 +15,7 @@
         <m-form
           v-model="stepActive"
           ref="form"
+          :size="size"
           :config="config"
           :init-values="values"
           :label-width="labelWidth"
@@ -76,6 +77,8 @@ export default defineComponent({
     },
 
     labelWidth: [Number, String],
+
+    size: String as PropType<'mini' | 'small' | 'medium'>,
 
     confirmText: {
       type: String,
