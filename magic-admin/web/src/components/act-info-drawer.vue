@@ -11,7 +11,7 @@
       size="600px"
     >
       <m-form
-        size="mini"
+        size="small"
         ref="configForm"
         :init-values="values"
         :config="config"

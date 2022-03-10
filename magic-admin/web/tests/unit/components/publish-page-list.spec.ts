@@ -1,20 +1,26 @@
-/**
- * Tencent is pleased to support the open source community by making MagicAdmin available.
- * Copyright (C) 2022 THL A29 Limited, a Tencent company. All rights reserved.
+/*
+ * Tencent is pleased to support the open source community by making MagicEditor available.
  *
- * Licensed under the MIT License (the "License");
- * you may not use this file except in compliance with the License. You may obtain a copy of the License at
- * http://opensource.org/licenses/MIT
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an "AS IS" BASIS,
+ * Copyright (C) 2021 THL A29 Limited, a Tencent company.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and limitations under the License.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
-import { ref } from 'vue';
+import { nextTick, ref } from 'vue';
 import { editorService } from '@tmagic/editor';
 import { mount } from '@vue/test-utils';
 
+import publishApi from '@src/api/publish';
 import PublishPageList from '@src/components/publish-page-list.vue';
 import magicStore from '@src/store/index';
 
@@ -189,6 +195,26 @@ describe('PublishPageList', () => {
     // 取消按钮
     const btn = buttons.find((btn) => btn.text() === '取消');
     await btn?.trigger('click');
+    expect(wrapper.vm.publishPageListVisible).toBe(false);
+  });
+  it('点击发布', async () => {
+    const wrapper = mount(PublishPageList, {
+      global: {
+        provide: {
+          publishPageListVisible: ref(true),
+        },
+      },
+    });
+    const res = {
+      ret: 0,
+      msg: '发布成功',
+    };
+    publishApi.publishPage = jest.fn(() => Promise.resolve(res));
+    const buttons = wrapper.findAll('el-button');
+    // 确认按钮
+    const btn = buttons.find((btn) => btn.text() === '确认');
+    await btn?.trigger('click');
+    await nextTick();
     expect(wrapper.vm.publishPageListVisible).toBe(false);
   });
 });

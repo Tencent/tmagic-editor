@@ -1,6 +1,6 @@
 <!-- 活动发布确认弹窗 -->
 <template>
-  <el-button size="mini" type="text" :icon="View" @click="buttonHandler()">发布</el-button>
+  <el-button size="small" type="text" :icon="View" @click="buttonHandler()">发布</el-button>
   <el-dialog append-to-body title="确认以下发布信息" v-model="publishPageListVisible">
     <div class="publish-page-container">
       <el-row>请勾选需要发布的页面：</el-row>
@@ -34,9 +34,8 @@
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { View } from '@element-plus/icons';
-import { ElMessage } from 'element-plus';
-
 import { editorService } from '@tmagic/editor';
+import { ElMessage } from 'element-plus';
 
 import publishApi from '@src/api/publish';
 import magicStore from '@src/store/index';

@@ -15,7 +15,6 @@
 import { computed, defineComponent, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { ComponentGroup } from '@tmagic/editor';
-
 import { asyncLoadJs } from '@tmagic/utils';
 
 import editorApi from '@src/api/editor';

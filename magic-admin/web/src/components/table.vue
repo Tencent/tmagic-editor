@@ -52,7 +52,14 @@
             {{ formatter(item, row) }}
           </el-tag>
           <!-- 扩展表格（子表） -->
-          <el-table v-else-if="item.table" :data="row.pages" empty-text="暂无数据" border size="mini" class="sub-table">
+          <el-table
+            v-else-if="item.table"
+            :data="row.pages"
+            empty-text="暂无数据"
+            border
+            size="small"
+            class="sub-table"
+          >
             <!-- 解析子表 -->
             <el-table-column
               v-for="(column, columnIndex) in item.table"
