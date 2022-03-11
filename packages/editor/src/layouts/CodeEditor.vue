@@ -4,28 +4,10 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, onUnmounted, ref, watch } from 'vue';
+import * as monaco from 'monaco-editor';
 import serialize from 'serialize-javascript';
 
-import { asyncLoadJs } from '@tmagic/utils';
-
-const initEditor = () => {
-  if ((globalThis as any).monaco) {
-    Promise.resolve((globalThis as any).monaco);
-  }
-
-  return asyncLoadJs(`https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/loader.min.js`).then(() => {
-    (globalThis as any).require.config({
-      paths: { vs: `https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs` },
-    });
-    return new Promise((resolve) => {
-      (globalThis as any).require(['vs/editor/editor.main'], () => {
-        resolve((globalThis as any).monaco);
-      });
-    });
-  });
-};
-
-const toString = (v: any, language: string): string => {
+const toString = (v: string | any, language: string): string => {
   let value = '';
   if (typeof v !== 'string') {
     value = serialize(v, {
@@ -64,60 +46,63 @@ export default defineComponent({
     },
   },
 
-  emits: ['inited', 'save'],
+  emits: ['initd', 'save'],
 
   setup(props, { emit }) {
-    let vsEditor: any = null;
+    let vsEditor: monaco.editor.IStandaloneCodeEditor | null = null;
+    let vsDiffEditor: monaco.editor.IStandaloneDiffEditor | null = null;
     const values = ref('');
     const loading = ref(false);
     const codeEditor = ref<HTMLDivElement>();
 
-    const setEditorValue = (v: any, m: any) => {
+    const setEditorValue = (v: string | any, m: string | any) => {
       values.value = toString(v, props.language);
 
       if (props.type === 'diff') {
-        const originalModel = (globalThis as any).monaco.editor.createModel(values.value, 'text/javascript');
-        const modifiedModel = (globalThis as any).monaco.editor.createModel(
-          toString(m, props.language),
-          'text/javascript',
-        );
+        const originalModel = monaco.editor.createModel(values.value, 'text/javascript');
+        const modifiedModel = monaco.editor.createModel(toString(m, props.language), 'text/javascript');
 
-        return vsEditor.setModel({
+        return vsDiffEditor?.setModel({
           original: originalModel,
           modified: modifiedModel,
         });
       }
 
-      return vsEditor.setValue?.(values.value);
+      return vsEditor?.setValue(values.value);
     };
 
     const resizeHandler = () => {
       vsEditor?.layout();
+      vsDiffEditor?.layout();
     };
 
-    const getEditorValue = () => vsEditor.getValue?.() || '';
+    const getEditorValue = () =>
+      props.type === 'diff' ? vsDiffEditor?.getModifiedEditor().getValue() : vsEditor?.getValue();
 
     const init = async () => {
       if (!codeEditor.value) return;
 
-      vsEditor = (globalThis as any).monaco.editor[props.type === 'diff' ? 'createDiffEditor' : 'create'](
-        codeEditor.value,
-        {
-          value: values.value,
-          language: props.language,
-          tabSize: 2,
-          theme: 'vs-dark',
-          fontFamily: 'dm, Menlo, Monaco, "Courier New", monospace',
-          fontSize: 15,
-          formatOnPaste: true,
-        },
-      );
+      const options = {
+        value: values.value,
+        language: props.language,
+        tabSize: 2,
+        theme: 'vs-dark',
+        fontFamily: 'dm, Menlo, Monaco, "Courier New", monospace',
+        fontSize: 15,
+        formatOnPaste: true,
+      };
+
+      if (props.type === 'diff') {
+        vsDiffEditor = monaco.editor.createDiffEditor(codeEditor.value, options);
+      } else {
+        vsEditor = monaco.editor.create(codeEditor.value, options);
+      }
 
       setEditorValue(props.initValues, props.modifiedValues);
 
       loading.value = false;
 
-      emit('inited', vsEditor);
+      emit('initd', vsEditor);
 
       codeEditor.value.addEventListener('keydown', (e) => {
         if (e.keyCode === 83 && (navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey)) {
@@ -127,7 +112,7 @@ export default defineComponent({
       });
 
       if (props.type !== 'diff') {
-        vsEditor.onDidBlurEditorWidget(() => {
+        vsEditor?.onDidBlurEditorWidget(() => {
           emit('save', getEditorValue());
         });
       }
@@ -138,7 +123,7 @@ export default defineComponent({
     watch(
       () => props.initValues,
       (v, preV) => {
-        if (vsEditor && v !== preV) {
+        if (v !== preV) {
           setEditorValue(props.initValues, props.modifiedValues);
         }
       },
@@ -151,17 +136,7 @@ export default defineComponent({
     onMounted(async () => {
       loading.value = true;
 
-      await initEditor();
-      if (!(globalThis as any).monaco) {
-        const interval = setInterval(() => {
-          if ((globalThis as any).monaco) {
-            clearInterval(interval);
-            init();
-          }
-        }, 300);
-      } else {
-        init();
-      }
+      init();
     });
 
     onUnmounted(() => {
@@ -174,13 +149,14 @@ export default defineComponent({
       codeEditor,
 
       getEditor() {
-        return vsEditor;
+        return vsEditor || vsDiffEditor;
       },
 
       setEditorValue,
 
       focus() {
-        vsEditor.focus();
+        vsEditor?.focus();
+        vsDiffEditor?.focus();
       },
     };
   },

@@ -1,6 +1,7 @@
 {
   "version": "1.0.0-beta.2",
   "name": "@tmagic/editor",
+  "sideEffects": false,
   "main": "dist/tmagic-editor.umd.js",
   "module": "dist/tmagic-editor.es.js",
   "style": "dist/style.css",
@@ -36,6 +37,7 @@
     "element-plus": "^2.0.2",
     "events": "^3.3.0",
     "lodash-es": "^4.17.21",
+    "monaco-editor": "^0.32.1",
     "serialize-javascript": "^6.0.0",
     "vue": "^3.2.0"
   },

@@ -20,6 +20,8 @@ editor中组件自定义属性配置由[magic-form](../form/introduction.md)提�
 $ npm install @tmagic/form@next element-plus -S
 ```
 
+editor中还包含了[monaco-editor](https://github.com/microsoft/monaco-editor)，可以参考monaco-editor的[配置指引](https://github.com/microsoft/monaco-editor/blob/main/docs/integrate-esm.md)。
+
 ## 快速上手
 
 ### 引入 @tmagic/editor
