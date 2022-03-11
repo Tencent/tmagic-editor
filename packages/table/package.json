@@ -1,6 +1,7 @@
 {
   "version": "1.0.0-beta.2",
   "name": "@tmagic/table",
+  "sideEffects": false,
   "main": "dist/tmagic-table.umd.js",
   "module": "dist/tmagic-table.es.js",
   "types": "dist/types/src/index.d.ts",

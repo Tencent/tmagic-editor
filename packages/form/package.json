@@ -1,6 +1,7 @@
 {
   "version": "1.0.0-beta.2",
   "name": "@tmagic/form",
+  "sideEffects": false,
   "main": "dist/tmagic-form.umd.js",
   "module": "dist/tmagic-form.es.js",
   "style": "dist/style.css",
