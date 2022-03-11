@@ -21,7 +21,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="操作" width="50" :fixed="config.fixed === false ? undefined : 'left'">
+          <el-table-column label="操作" width="60" :fixed="config.fixed === false ? undefined : 'left'">
             <template v-slot="scope">
               <el-button
                 v-show="showDelete(scope.$index + 1 + pagecontext * pagesize - 1)"
@@ -33,7 +33,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column v-if="sort && model[modelName] && model[modelName].length > 1" label="排序" width="70">
+          <el-table-column v-if="sort && model[modelName] && model[modelName].length > 1" label="排序" width="60">
             <template v-slot="scope">
               <el-tooltip
                 content="点击上移，双击置顶"
@@ -74,7 +74,7 @@
             width="45"
           ></el-table-column>
 
-          <el-table-column width="50" label="序号">
+          <el-table-column width="60" label="序号">
             <template v-slot="scope">{{ scope.$index + 1 + pagecontext * pagesize }}</template>
           </el-table-column>
 
@@ -107,10 +107,10 @@
       </el-tooltip>
       <slot></slot>
       <el-button v-if="addable" size="small" type="primary" plain @click="newHandler()">添加</el-button> &nbsp;
-      <el-button icon="el-icon-s-grid" size="small" @click="toggleMode" v-if="enableToggleMode && !isFullscreen"
+      <el-button :icon="Grid" size="small" @click="toggleMode" v-if="enableToggleMode && !isFullscreen"
         >展开配置</el-button
       >
-      <el-button icon="el-icon-s-grid" size="small" @click="toggleFullscreen" v-if="config.enableFullscreen !== false">
+      <el-button :icon="FullScreen" size="small" @click="toggleFullscreen" v-if="config.enableFullscreen !== false">
         {{ isFullscreen ? '退出全屏' : '全屏编辑' }}
       </el-button>
       <el-upload
@@ -145,7 +145,7 @@
 <script lang="ts">
 /* eslint-disable no-param-reassign */
 import { computed, defineComponent, inject, onMounted, PropType, ref, toRefs } from 'vue';
-import { ArrowDown, ArrowUp, Delete } from '@element-plus/icons';
+import { ArrowDown, ArrowUp, Delete, FullScreen, Grid } from '@element-plus/icons';
 import { ElMessage, ElTable, ElUpload } from 'element-plus';
 import { cloneDeep } from 'lodash-es';
 import Sortable, { SortableEvent } from 'sortablejs';
@@ -396,6 +396,8 @@ export default defineComponent({
       ArrowDown,
       ArrowUp,
       Delete,
+      FullScreen,
+      Grid,
 
       data: computed(() =>
         props.model[modelName.value].filter(
