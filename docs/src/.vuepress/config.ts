@@ -34,6 +34,14 @@ const sidebar = {
       ]
     }
   ],
+  admin: [
+    {
+      text: '管理端Demo',
+      children: [
+        '/admin/introduction',
+      ]
+    }
+  ],
   component: [
     {
       text: '组件开发',
@@ -87,6 +95,10 @@ export default defineUserConfig<DefaultThemeOptions>({
           {
             text: '页面发布',
             link: '/page/introduction'
+          },
+          {
+            text: '管理端Demo',
+            link: '/admin/introduction'
           },
         ]
       },
