@@ -1,0 +1,9 @@
+node_modules
+dist
+yarn.lock
+package.json.lock
+coverage
+.vscode
+assets
+src/config/database.ts
+src/config/key.ts
