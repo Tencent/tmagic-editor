@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0-beta.4",
   "name": "@tmagic/table",
   "sideEffects": false,
   "main": "dist/tmagic-table.umd.js",
@@ -26,7 +26,7 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "@tmagic/form": "^1.0.0-beta.3",
+    "@tmagic/form": "^1.0.0-beta.4",
     "element-plus": "^2.0.2",
     "lodash-es": "^4.17.21",
     "vue": "^3.2.0"
