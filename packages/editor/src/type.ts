@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-import { Component } from 'vue';
+import type { Component } from 'vue';
 
-import { FormConfig } from '@tmagic/form';
-import { Id, MApp, MContainer, MNode, MPage } from '@tmagic/schema';
-import StageCore from '@tmagic/stage';
+import type { FormConfig } from '@tmagic/form';
+import type { Id, MApp, MContainer, MNode, MPage } from '@tmagic/schema';
+import type StageCore from '@tmagic/stage';
 
 import type { ComponentListService } from '@editor/services/componentList';
 import type { EditorService } from '@editor/services/editor';
@@ -75,6 +75,11 @@ export interface GetColumnWidth {
   right: number;
 }
 
+export interface StageRect {
+  width: number;
+  height: number;
+}
+
 export interface UiState {
   /** 当前点击画布是否触发选中，true: 不触发，false: 触发，默认为false */
   uiSelectMode: boolean;
@@ -82,8 +87,10 @@ export interface UiState {
   showSrc: boolean;
   /** 画布显示放大倍数，默认为 1 */
   zoom: number;
-  /** 画布顶层div的样式，可用于改变画布的大小 */
-  stageStyle: Record<string, string | number>;
+  /** 画布容器的宽高 */
+  stageContainerRect: StageRect;
+  /** 画布顶层div的宽高，可用于改变画布的大小 */
+  stageRect: StageRect;
   /** 编辑器列布局每一列的宽度，分为左中右三列 */
   columnWidth: GetColumnWidth;
   /** 是否显示画布参考线，true: 显示，false: 不显示，默认为true */
