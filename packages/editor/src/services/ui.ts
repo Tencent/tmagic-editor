@@ -21,7 +21,7 @@ import { reactive, toRaw } from 'vue';
 import type StageCore from '@tmagic/stage';
 
 import editorService from '@editor/services/editor';
-import { GetColumnWidth, SetColumnWidth, UiState } from '@editor/type';
+import type { GetColumnWidth, SetColumnWidth, StageRect, UiState } from '@editor/type';
 
 import BaseService from './BaseService';
 
@@ -29,7 +29,14 @@ const state = reactive<UiState>({
   uiSelectMode: false,
   showSrc: false,
   zoom: 1,
-  stageStyle: {},
+  stageContainerRect: {
+    width: 0,
+    height: 0,
+  },
+  stageRect: {
+    width: 375,
+    height: 817,
+  },
   columnWidth: {
     left: 310,
     center: globalThis.document.body.clientWidth - 310 - 400,
@@ -57,6 +64,11 @@ class Ui extends BaseService {
       return;
     }
 
+    if (name === 'stageRect') {
+      this.setStageRect(value as unknown as StageRect);
+      return;
+    }
+
     if (name === 'showGuides') {
       mask?.showGuides(value as unknown as boolean);
     }
@@ -66,6 +78,10 @@ class Ui extends BaseService {
     }
 
     (state as any)[name] = value;
+
+    if (name === 'stageContainerRect') {
+      state.zoom = this.calcZoom();
+    }
   }
 
   public get<T>(name: keyof typeof state): T {
@@ -93,6 +109,24 @@ class Ui extends BaseService {
     }
 
     state.columnWidth = columnWidth;
+  }
+
+  private setStageRect(value: StageRect) {
+    state.stageRect = {
+      ...state.stageRect,
+      ...value,
+    };
+    state.zoom = this.calcZoom();
+  }
+
+  private calcZoom() {
+    const { stageRect, stageContainerRect } = state;
+    const { height, width } = stageContainerRect;
+    if (!width || !height) return 1;
+    if (width > stageRect.width && height > stageRect.height) {
+      return 1;
+    }
+    return Math.min((width - 100) / stageRect.width || 1, (height - 100) / stageRect.height || 1);
   }
 }
 

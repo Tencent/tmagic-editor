@@ -20,6 +20,14 @@ import { mount } from '@vue/test-utils';
 
 import Stage from '@editor/layouts/workspace/Stage.vue';
 
+globalThis.ResizeObserver =
+  globalThis.ResizeObserver ||
+  jest.fn().mockImplementation(() => ({
+    disconnect: jest.fn(),
+    observe: jest.fn(),
+    unobserve: jest.fn(),
+  }));
+
 describe('Stage.vue', () => {
   (global as any).fetch = jest.fn(() =>
     Promise.resolve({

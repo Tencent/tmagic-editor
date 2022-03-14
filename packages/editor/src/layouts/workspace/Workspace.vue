@@ -4,11 +4,6 @@
       :key="page?.id"
       :runtime-url="runtimeUrl"
       :render="render"
-      :ui-select-mode="uiSelectMode"
-      :root="root"
-      :page="page"
-      :node="node"
-      :zoom="zoom"
       :moveable-options="moveableOptions"
       :can-select="canSelect"
       @select="selectHandler"
@@ -26,9 +21,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, inject, nextTick, PropType, watch } from 'vue';
+import { computed, defineComponent, inject, PropType } from 'vue';
 
-import type { MApp, MComponent, MContainer, MNode, MPage } from '@tmagic/schema';
+import type { MComponent, MContainer, MPage } from '@tmagic/schema';
 import type { MoveableOptions, SortEventData } from '@tmagic/stage';
 import StageCore from '@tmagic/stage';
 
@@ -63,23 +58,9 @@ export default defineComponent({
 
   setup() {
     const services = inject<Services>('services');
-    const node = computed(() => services?.editorService.get<MNode>('node'));
-    const stage = computed(() => services?.editorService.get<StageCore>('stage'));
-
-    watch([() => node.value?.id, stage], ([id, stage]) => {
-      nextTick(() => {
-        // 等待相关dom变更完成后，再select，适用大多数场景
-        id && stage?.select(id);
-      });
-    });
 
     return {
-      uiSelectMode: computed(() => services?.uiService.get<boolean>('uiSelectMode')),
-      root: computed(() => services?.editorService.get<MApp>('root')),
       page: computed(() => services?.editorService.get<MPage>('page')),
-      zoom: computed(() => services?.uiService.get<number>('zoom')),
-
-      node,
 
       selectHandler(el: HTMLElement) {
         services?.editorService.select(el.id);

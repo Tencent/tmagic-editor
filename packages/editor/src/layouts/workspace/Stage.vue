@@ -1,5 +1,5 @@
 <template>
-  <div class="m-editor-stage">
+  <div class="m-editor-stage" ref="stageWrap">
     <div
       class="m-editor-stage-container"
       ref="stageContainer"
@@ -17,6 +17,7 @@ import {
   computed,
   defineComponent,
   inject,
+  nextTick,
   onMounted,
   onUnmounted,
   PropType,
@@ -31,7 +32,7 @@ import type { MApp, MNode, MPage } from '@tmagic/schema';
 import type { MoveableOptions, Runtime, SortEventData, UpdateEventData } from '@tmagic/stage';
 import StageCore from '@tmagic/stage';
 
-import type { Services } from '@editor/type';
+import type { Services, StageRect } from '@editor/type';
 
 import ViewerMenu from './ViewerMenu.vue';
 
@@ -88,26 +89,6 @@ export default defineComponent({
 
     runtimeUrl: String,
 
-    root: {
-      type: Object as PropType<MApp>,
-    },
-
-    page: {
-      type: Object as PropType<MPage>,
-    },
-
-    node: {
-      type: Object as PropType<MNode>,
-    },
-
-    uiSelectMode: {
-      type: Boolean,
-    },
-
-    zoom: {
-      type: Number,
-    },
-
     canSelect: {
       type: Function as PropType<(el: HTMLElement) => boolean | Promise<boolean>>,
       default: (el: HTMLElement) => Boolean(el.id),
@@ -125,11 +106,20 @@ export default defineComponent({
 
   setup(props, { emit }) {
     const services = inject<Services>('services');
+
+    const stageWrap = ref<HTMLDivElement>();
     const stageContainer = ref<HTMLDivElement>();
 
+    const stageRect = computed(() => services?.uiService.get<StageRect>('stageRect'));
+    const uiSelectMode = computed(() => services?.uiService.get<boolean>('uiSelectMode'));
+    const root = computed(() => services?.editorService.get<MApp>('root'));
+    const page = computed(() => services?.editorService.get<MPage>('page'));
+    const zoom = computed(() => services?.uiService.get<number>('zoom'));
+    const node = computed(() => services?.editorService.get<MNode>('node'));
     const stageStyle = computed(() => ({
-      ...services?.uiService.get<Record<string, string | number>>('stageStyle'),
-      transform: `scale(${props.zoom}) translate3d(0, -50%, 0)`,
+      width: `${stageRect.value?.width}px`,
+      height: `${stageRect.value?.height}px`,
+      transform: `scale(${zoom.value})`,
     }));
 
     let stage: StageCore | null = null;
@@ -139,16 +129,16 @@ export default defineComponent({
       if (stage) return;
 
       if (!stageContainer.value) return;
-      if (!(props.runtimeUrl || props.render) || !props.root) return;
+      if (!(props.runtimeUrl || props.render) || !root.value) return;
 
       stage = new StageCore({
         render: props.render,
         runtimeUrl: props.runtimeUrl,
-        zoom: props.zoom,
+        zoom: zoom.value,
         canSelect: (el, stop) => {
           const elCanSelect = props.canSelect(el);
           // 在组件联动过程中不能再往下选择，返回并触发 ui-select
-          if (props.uiSelectMode && elCanSelect) {
+          if (uiSelectMode.value && elCanSelect) {
             document.dispatchEvent(new CustomEvent('ui-select', { detail: el }));
             return stop();
           }
@@ -176,45 +166,63 @@ export default defineComponent({
         services?.uiService.set('showGuides', true);
       });
 
-      if (!props.node?.id) return;
+      if (!node.value?.id) return;
       stage?.on('runtime-ready', (rt) => {
         runtime = rt;
         // toRaw返回的值是一个引用而非快照，需要cloneDeep
-        props.root && runtime?.updateRootConfig(cloneDeep(toRaw(props.root)));
-        props.page?.id && runtime?.updatePageId?.(props.page.id);
+        root.value && runtime?.updateRootConfig(cloneDeep(toRaw(root.value)));
+        page.value?.id && runtime?.updatePageId?.(page.value.id);
         setTimeout(() => {
-          props.node && stage?.select(toRaw(props.node.id));
+          node.value && stage?.select(toRaw(node.value.id));
         });
       });
     });
 
+    watch(zoom, (zoom) => {
+      if (!stage || !zoom) return;
+      stage.setZoom(zoom);
+    });
+
+    watch(root, (root) => {
+      if (runtime && root) {
+        runtime.updateRootConfig(cloneDeep(toRaw(root)));
+      }
+    });
+
     watch(
-      () => props.zoom,
-      (zoom) => {
-        if (!stage || !zoom) return;
-        stage?.setZoom(zoom);
+      () => node.value?.id,
+      (id) => {
+        nextTick(() => {
+          // 等待相关dom变更完成后，再select，适用大多数场景
+          id && stage?.select(id);
+        });
       },
     );
 
-    watch(
-      () => props.root,
-      (root) => {
-        if (runtime && root) {
-          runtime.updateRootConfig(cloneDeep(toRaw(root)));
-        }
-      },
-    );
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const { contentRect } of entries) {
+        services?.uiService.set('stageContainerRect', {
+          width: contentRect.width,
+          height: contentRect.height,
+        });
+      }
+    });
+
+    onMounted(() => {
+      stageWrap.value && resizeObserver.observe(stageWrap.value);
+    });
 
     onUnmounted(() => {
       stage?.destroy();
+      resizeObserver.disconnect();
       services?.editorService.set('stage', null);
     });
 
     return {
+      stageWrap,
+      stageContainer,
       stageStyle,
       ...useMenu(),
-
-      stageContainer,
     };
   },
 });

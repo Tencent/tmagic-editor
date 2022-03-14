@@ -55,7 +55,7 @@ import eventsService from '@editor/services/events';
 import historyService from '@editor/services/history';
 import propsService from '@editor/services/props';
 import uiService from '@editor/services/ui';
-import type { ComponentGroup, MenuBarData, Services, SideBarData } from '@editor/type';
+import type { ComponentGroup, MenuBarData, Services, SideBarData, StageRect } from '@editor/type';
 
 export default defineComponent({
   name: 'm-editor',
@@ -133,8 +133,8 @@ export default defineComponent({
       type: Function as PropType<(el: HTMLElement) => boolean | Promise<boolean>>,
     },
 
-    stageStyle: {
-      type: [String, Object] as PropType<Record<string, string | number>>,
+    stageRect: {
+      type: [String, Object] as PropType<StageRect>,
     },
   },
 
@@ -208,8 +208,8 @@ export default defineComponent({
     );
 
     watch(
-      () => props.stageStyle,
-      (stageStyle) => uiService.set('stageStyle', stageStyle),
+      () => props.stageRect,
+      (stageRect) => stageRect && uiService.set('stageRect', stageRect),
       {
         immediate: true,
       },
