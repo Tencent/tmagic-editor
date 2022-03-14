@@ -1,15 +1,21 @@
 <template>
-  <div class="m-editor-stage" ref="stageWrap">
+  <scroll-viewer
+    class="m-editor-stage"
+    ref="stageWrap"
+    :width="stageRect?.width"
+    :height="stageRect?.height"
+    :zoom="zoom"
+  >
     <div
       class="m-editor-stage-container"
       ref="stageContainer"
-      :style="stageStyle"
       @contextmenu="contextmenuHandler"
+      :style="`transform: scale(${zoom})`"
     ></div>
     <teleport to="body">
       <viewer-menu ref="menu" :style="menuStyle"></viewer-menu>
     </teleport>
-  </div>
+  </scroll-viewer>
 </template>
 
 <script lang="ts">
@@ -32,6 +38,7 @@ import type { MApp, MNode, MPage } from '@tmagic/schema';
 import type { MoveableOptions, Runtime, SortEventData, UpdateEventData } from '@tmagic/stage';
 import StageCore from '@tmagic/stage';
 
+import ScrollViewer from '@editor/components/ScrollViewer.vue';
 import type { Services, StageRect } from '@editor/type';
 
 import ViewerMenu from './ViewerMenu.vue';
@@ -80,6 +87,7 @@ export default defineComponent({
 
   components: {
     ViewerMenu,
+    ScrollViewer,
   },
 
   props: {
@@ -107,7 +115,7 @@ export default defineComponent({
   setup(props, { emit }) {
     const services = inject<Services>('services');
 
-    const stageWrap = ref<HTMLDivElement>();
+    const stageWrap = ref<InstanceType<typeof ScrollViewer>>();
     const stageContainer = ref<HTMLDivElement>();
 
     const stageRect = computed(() => services?.uiService.get<StageRect>('stageRect'));
@@ -116,11 +124,6 @@ export default defineComponent({
     const page = computed(() => services?.editorService.get<MPage>('page'));
     const zoom = computed(() => services?.uiService.get<number>('zoom'));
     const node = computed(() => services?.editorService.get<MNode>('node'));
-    const stageStyle = computed(() => ({
-      width: `${stageRect.value?.width}px`,
-      height: `${stageRect.value?.height}px`,
-      transform: `scale(${zoom.value})`,
-    }));
 
     let stage: StageCore | null = null;
     let runtime: Runtime | null = null;
@@ -209,7 +212,7 @@ export default defineComponent({
     });
 
     onMounted(() => {
-      stageWrap.value && resizeObserver.observe(stageWrap.value);
+      stageWrap.value?.container && resizeObserver.observe(stageWrap.value.container);
     });
 
     onUnmounted(() => {
@@ -221,7 +224,8 @@ export default defineComponent({
     return {
       stageWrap,
       stageContainer,
-      stageStyle,
+      stageRect,
+      zoom,
       ...useMenu(),
     };
   },

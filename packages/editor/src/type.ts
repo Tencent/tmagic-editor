@@ -241,3 +241,7 @@ export enum Layout {
   RELATIVE = 'relative',
   ABSOLUTE = 'absolute',
 }
+
+export enum Keys {
+  ESCAPE = 'Space',
+}
