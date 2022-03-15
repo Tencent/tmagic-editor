@@ -25,7 +25,8 @@ export class ScrollViewer {
       const { width, height } = contentRect;
       const targetRect = this.target.getBoundingClientRect();
       const targetWidth = targetRect.width * this.zoom;
-      const targetHeight = targetRect.height * this.zoom;
+      const targetMarginTop = Number(this.target.style.marginTop) || 0;
+      const targetHeight = (targetRect.height + targetMarginTop) * this.zoom;
 
       if (targetWidth < width) {
         (this.target as any)._left = 0;

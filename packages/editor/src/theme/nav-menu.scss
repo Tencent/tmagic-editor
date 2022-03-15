@@ -21,12 +21,12 @@
     align-items: center;
   }
 
-  .menu-left {
-    padding-left: 16px;
+  .menu-center {
+    justify-content: center;
   }
 
   .menu-right {
-    padding-right: 16px;
+    justify-content: flex-end;
   }
 
   .menu-item {
