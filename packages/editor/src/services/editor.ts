@@ -17,7 +17,7 @@
  */
 
 import { reactive, toRaw } from 'vue';
-import { cloneDeep } from 'lodash-es';
+import { cloneDeep, mergeWith } from 'lodash-es';
 import serialize from 'serialize-javascript';
 
 import type { Id, MApp, MComponent, MContainer, MNode, MPage } from '@tmagic/schema';
@@ -31,7 +31,6 @@ import { LayerOffset, Layout } from '@editor/type';
 import {
   change2Fixed,
   COPY_STORAGE_KEY,
-  defaults,
   Fixed2Other,
   getNodeIndex,
   initPosition,
@@ -292,7 +291,11 @@ class Editor extends BaseService {
 
     let newConfig = await this.toggleFixedPosition(toRaw(config), node, this.get<MApp>('root'));
 
-    defaults(newConfig, node);
+    newConfig = mergeWith(node, newConfig, (objValue, srcValue) => {
+      if (Array.isArray(srcValue)) {
+        return srcValue;
+      }
+    });
 
     if (!newConfig.type) throw new Error('配置缺少type值');
 
