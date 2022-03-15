@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { cloneDeep, random } from 'lodash-es';
+import { random } from 'lodash-es';
 
 import { Id, MApp, MContainer, MNode, MPage } from '@tmagic/schema';
 import { getNodePath, isPop } from '@tmagic/utils';
@@ -222,23 +222,4 @@ export const Fixed2Other = async (node: MNode, root: MApp, getLayout: (node: MNo
   }
 
   return toRelative(node);
-};
-
-export const defaults = (object: any, source: any) => {
-  let o = source;
-  if (Array.isArray(object)) {
-    o = object;
-  }
-
-  Object.entries(o).forEach(([key, value]: [string, any]) => {
-    if (typeof object[key] === 'undefined') {
-      object[key] = value;
-      return;
-    }
-
-    if (value && typeof value !== 'string' && Object.keys(value).length) {
-      object[key] = defaults(cloneDeep(object[key]), value);
-    }
-  });
-  return object;
 };

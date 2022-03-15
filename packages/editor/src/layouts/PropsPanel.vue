@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, getCurrentInstance, inject, onMounted, ref, watchEffect } from 'vue';
+import { computed, defineComponent, getCurrentInstance, inject, onMounted, ref, watchEffect } from 'vue';
 import { ElMessage } from 'element-plus';
 
 import type { FormValue, MForm } from '@tmagic/form';
@@ -30,21 +30,16 @@ export default defineComponent({
     // ts类型应该是FormConfig， 但是打包时会出错，所以暂时用any
     const curFormConfig = ref<any>([]);
     const services = inject<Services>('services');
+    const node = computed(() => services?.editorService.get<MNode | null>('node'));
 
     const init = async () => {
-      const node = services?.editorService.get<MNode | null>('node');
-
-      if (!node) {
+      if (!node.value) {
         curFormConfig.value = [];
         return;
       }
 
-      if (node.devconfig && node.style && !isNaN(+node.style.height) && !isNaN(+node.style.width)) {
-        node.devconfig.ratio = node.style.height / node.style.width || 1;
-      }
-
-      values.value = node;
-      const type = node.type || (node.items ? 'container' : 'text');
+      values.value = node.value;
+      const type = node.value.type || (node.value.items ? 'container' : 'text');
       curFormConfig.value = (await services?.propsService.getPropsConfig(type)) || [];
     };
 
