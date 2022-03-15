@@ -1,16 +1,16 @@
 <template>
   <div class="m-editor-nav-menu" :style="{ height: `${height}px` }">
-    <div v-for="key in keys" :class="`menu-${key}`" :key="key">
+    <div v-for="key in keys" :class="`menu-${key}`" :key="key" :style="`width: ${columnWidth?.[key]}px`">
       <tool-button :data="item" v-for="(item, index) in data[key]" :key="index"></tool-button>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+import { computed, defineComponent, inject, PropType } from 'vue';
 
 import ToolButton from '@editor/components/ToolButton.vue';
-import { MenuBarData } from '@editor/type';
+import { GetColumnWidth, MenuBarData, Services } from '@editor/type';
 
 export default defineComponent({
   name: 'nav-menu',
@@ -29,8 +29,12 @@ export default defineComponent({
   },
 
   setup(props) {
+    const services = inject<Services>('services');
+
     return {
       keys: computed(() => Object.keys(props.data) as Array<keyof MenuBarData>),
+
+      columnWidth: computed(() => services?.uiService.get<GetColumnWidth>('columnWidth')),
     };
   },
 });
