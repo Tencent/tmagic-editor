@@ -57,6 +57,7 @@ export default defineComponent({
         width: ${props.width}px;
         height: ${props.height}px;
         position: absolute;
+        margin-top: 30px;
       `,
       ),
     };
