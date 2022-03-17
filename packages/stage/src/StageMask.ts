@@ -91,8 +91,8 @@ export default class StageMask extends EventEmitter {
     const { config: coreConfig } = config.core;
 
     this.canSelect = coreConfig.canSelect || ((el: HTMLElement) => !!el.id);
-    this.content.addEventListener('mousedown', this.mouseDownHandler, true);
-    this.content.addEventListener('contextmenu', this.contextmenuHandler, true);
+    this.content.addEventListener('mousedown', this.mouseDownHandler);
+    this.content.addEventListener('contextmenu', this.contextmenuHandler);
     this.wrapper.appendChild(this.content);
 
     this.hGuides = this.createGuides('horizontal');
@@ -189,17 +189,26 @@ export default class StageMask extends EventEmitter {
    * @param show 是否显示
    */
   public showRule(show = true) {
-    this.hGuides.setState({
-      rulerStyle: {
-        visibility: show ? '' : 'hidden',
-      },
-    });
+    // 当尺子隐藏时发现大小变化，显示后会变形，所以这里做重新初始化处理
+    if (show) {
+      this.hGuides.destroy();
+      this.hGuides = this.createGuides('horizontal', this.core.dr.horizontalGuidelines);
 
-    this.vGuides.setState({
-      rulerStyle: {
-        visibility: show ? '' : 'hidden',
-      },
-    });
+      this.vGuides.destroy();
+      this.vGuides = this.createGuides('vertical', this.core.dr.verticalGuidelines);
+    } else {
+      this.hGuides.setState({
+        rulerStyle: {
+          visibility: 'hidden',
+        },
+      });
+
+      this.vGuides.setState({
+        rulerStyle: {
+          visibility: 'hidden',
+        },
+      });
+    }
   }
 
   /**
@@ -242,13 +251,24 @@ export default class StageMask extends EventEmitter {
       return;
     }
 
+    this.content.addEventListener('mousemove', this.mouseMoveHandler);
+
     this.select(event);
   };
 
   private mouseUpHandler = (): void => {
-    this.content?.removeEventListener('mouseup', this.mouseUpHandler, true);
+    this.content.removeEventListener('mousemove', this.mouseMoveHandler);
+    this.content.removeEventListener('mouseup', this.mouseUpHandler);
     this.emit('selected', this.target);
     this.target = null;
+  };
+
+  private mouseMoveHandler = (event: MouseEvent): void => {
+    // 避免触摸板轻触移动拖动组件
+    if (event.buttons) {
+      this.core.dr.moveable?.dragStart(event);
+    }
+    this.content.removeEventListener('mousemove', this.mouseMoveHandler);
   };
 
   private contextmenuHandler = async (event: MouseEvent): Promise<void> => {
@@ -282,7 +302,7 @@ export default class StageMask extends EventEmitter {
         this.emit('select', el, event);
         this.target = el;
         // 如果是右键点击，这里的mouseup事件监听没有效果
-        this.content?.addEventListener('mouseup', this.mouseUpHandler, true);
+        this.content.addEventListener('mouseup', this.mouseUpHandler);
         break;
       }
     }
@@ -296,9 +316,10 @@ export default class StageMask extends EventEmitter {
     height: type === 'horizontal' ? '30px' : '100%',
   });
 
-  private createGuides = (type: 'horizontal' | 'vertical'): Guides =>
+  private createGuides = (type: 'horizontal' | 'vertical', defaultGuides: number[] = []): Guides =>
     new Guides(this.wrapper, {
       type,
+      defaultGuides,
       displayDragPos: true,
       backgroundColor: '#fff',
       lineColor: '#000',

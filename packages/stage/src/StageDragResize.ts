@@ -41,12 +41,12 @@ export default class StageDragResize extends EventEmitter {
   public container: HTMLElement;
   public target?: HTMLElement;
   public moveable?: Moveable;
+  public horizontalGuidelines: number[] = [];
+  public verticalGuidelines: number[] = [];
 
   private dragStatus: ActionStatus = ActionStatus.END;
   private elObserver?: ResizeObserver;
   private ghostEl: HTMLElement | undefined;
-  private horizontalGuidelines: number[] = [];
-  private verticalGuidelines: number[] = [];
   private mode: Mode = Mode.ABSOLUTE;
 
   constructor(config: StageDragResizeConfig) {
@@ -341,9 +341,6 @@ export default class StageDragResize extends EventEmitter {
       resizable: true,
       snappable: !isSortable,
       snapGap: !isSortable,
-      snapElement: !isSortable,
-      snapVertical: !isSortable,
-      snapHorizontal: !isSortable,
       snapCenter: !isSortable,
       container: renderer.contentWindow?.document.body,
 

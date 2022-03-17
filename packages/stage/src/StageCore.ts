@@ -52,9 +52,8 @@ export default class StageCore extends EventEmitter {
     this.renderer.on('runtime-ready', (runtime: Runtime) => this.emit('runtime-ready', runtime));
     this.renderer.on('page-el-update', (el: HTMLElement) => this.mask?.observe(el));
 
-    this.mask.on('select', async (el: Element, event: MouseEvent) => {
+    this.mask.on('select', async (el: Element) => {
       await this.dr?.select(el as HTMLElement);
-      setTimeout(() => this.dr?.moveable?.dragStart(event));
     });
     this.mask.on('selected', (el: Element) => {
       this.select(el as HTMLElement);
