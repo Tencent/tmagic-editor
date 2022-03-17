@@ -184,6 +184,10 @@ class Editor extends BaseService {
     const { node, parent, page } = this.getNodeInfo(id);
     if (!node) throw new Error('获取不到组件信息');
 
+    if (node.id === this.state.root?.id) {
+      throw new Error('不能选根节点');
+    }
+
     this.set('node', node);
     this.set('page', page || null);
     this.set('parent', parent || null);
