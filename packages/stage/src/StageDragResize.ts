@@ -246,12 +246,10 @@ export default class StageDragResize extends EventEmitter {
       (await renderer.getRuntime())?.getSnapElements ||
       (() => {
         const doc = renderer.contentWindow?.document;
-        const elementGuidelines = (doc ? Array.from(doc.querySelectorAll('[id]')) : [])
-          // 排除掉当前组件本身
-          .filter((element) => element !== this.target && !this.target?.contains(element));
-        return elementGuidelines as HTMLElement[];
+        return (doc ? Array.from(doc.querySelectorAll('[id]')) : []) as HTMLElement[];
       });
-    return getSnapElements(el);
+    // 排除掉当前组件本身
+    return getSnapElements(el).filter((element) => element !== this.target && !this.target?.contains(element));
   }
 
   private sort(): void {
@@ -341,8 +339,8 @@ export default class StageDragResize extends EventEmitter {
       resizable: true,
       snappable: !isSortable,
       snapGap: !isSortable,
-      snapCenter: !isSortable,
-      container: renderer.contentWindow?.document.body,
+      snapDirections: { center: !isSortable, middle: !isSortable },
+      elementSnapDirections: { center: !isSortable, middle: !isSortable },
 
       elementGuidelines: isSortable ? [] : await this.getSnapElements(this.target),
       horizontalGuidelines: this.horizontalGuidelines,
