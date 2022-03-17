@@ -155,11 +155,13 @@ export class ScrollViewer {
       event.preventDefault();
       event.stopImmediatePropagation();
       event.stopPropagation();
-    } else if (this.keydown) return;
+    }
+
+    if (event.code !== Keys.ESCAPE || !this.enter || this.keydown) {
+      return;
+    }
 
     this.keydown = true;
-
-    event.preventDefault();
 
     this.target.style.cursor = 'grab';
     this.container.addEventListener('mousedown', this.mousedownHandler);
