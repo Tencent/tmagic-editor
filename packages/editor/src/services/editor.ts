@@ -295,7 +295,7 @@ class Editor extends BaseService {
 
     let newConfig = await this.toggleFixedPosition(toRaw(config), node, this.get<MApp>('root'));
 
-    newConfig = mergeWith(node, newConfig, (objValue, srcValue) => {
+    newConfig = mergeWith(cloneDeep(node), newConfig, (objValue, srcValue) => {
       if (Array.isArray(srcValue)) {
         return srcValue;
       }
