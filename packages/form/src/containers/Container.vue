@@ -224,10 +224,15 @@ export default defineComponent({
 
     const onChangeHandler = async function (v: FormValue, key?: string) {
       const { filter, onChange, trim, name, dynamicKey } = props.config as any;
-      let value: FormValue | number | string = filterHandler(filter, v);
+      let value: FormValue | number | string = v;
 
-      value = (await changeHandler(onChange, value)) ?? value;
-      value = trimHandler(trim, value) ?? value;
+      try {
+        value = filterHandler(filter, v);
+        value = (await changeHandler(onChange, value)) ?? value;
+        value = trimHandler(trim, value) ?? value;
+      } catch (e) {
+        console.error(e);
+      }
 
       // field内容下包含field-link时，model===value, 这里避免循环引用
       if ((name || name === 0) && props.model !== value && (v !== value || props.model[name] !== value)) {
