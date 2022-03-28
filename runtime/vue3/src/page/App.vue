@@ -22,12 +22,15 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+html,
+body,
 #app {
-  width: fit-content;
-  position: relative;
-  margin: 0 auto;
+  width: 100%;
+  height: 100%;
 }
-::-webkit-scrollbar {
-  width: 0;
+
+#app {
+  position: relative;
+  overflow: auto;
 }
 </style>

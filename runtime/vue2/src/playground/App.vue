@@ -133,6 +133,22 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+}
+
+#app {
+  position: relative;
+  overflow: auto;
+
+  &::-webkit-scrollbar {
+    width: 0;
+  }
+}
+
 .magic-ui-container {
   background-color: rgba(136, 136, 136, 0.5);
 }
