@@ -359,6 +359,8 @@ class Editor extends BaseService {
     await this.update(parent);
     await this.select(node);
 
+    this.get<StageCore>('stage')?.update({ config: cloneDeep(node), root: this.get('root') });
+
     this.addModifiedNodeId(parent.id);
     this.pushHistoryState();
   }
