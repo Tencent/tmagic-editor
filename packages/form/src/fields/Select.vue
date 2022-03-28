@@ -7,6 +7,7 @@
     ref="select"
     clearable
     filterable
+    :popper-class="`m-select-popper ${popperClass}`"
     :size="size"
     :remote="remote"
     :placeholder="config.placeholder"
@@ -346,6 +347,7 @@ export default defineComponent({
       remote,
       options,
       moreLoadingVisible,
+      popperClass: mForm?.popperClass,
 
       getRequestFuc() {
         return getConfig('request');

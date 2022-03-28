@@ -21,6 +21,7 @@
  */
 export type FormState = {
   config: FormConfig;
+  popperClass?: string;
   initValues: FormValue;
   values: FormValue;
   $emit: (event: string, ...args: any[]) => void;
