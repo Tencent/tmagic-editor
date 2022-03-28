@@ -18,16 +18,22 @@
 
 import { EventEmitter } from 'events';
 
-import { GuidesEvents } from '@scena/guides';
-
 import { Id } from '@tmagic/schema';
 
-import { DEFAULT_ZOOM } from './const';
+import { DEFAULT_ZOOM, GHOST_EL_ID_PREFIX } from './const';
 import StageDragResize from './StageDragResize';
 import StageMask from './StageMask';
 import StageRender from './StageRender';
-import { RemoveData, Runtime, SortEventData, StageCoreConfig, UpdateData, UpdateEventData } from './types';
-import { isFixed } from './util';
+import {
+  CanSelect,
+  GuidesEventData,
+  RemoveData,
+  Runtime,
+  SortEventData,
+  StageCoreConfig,
+  UpdateData,
+  UpdateEventData,
+} from './types';
 
 export default class StageCore extends EventEmitter {
   public selectedDom: Element | undefined;
@@ -37,6 +43,7 @@ export default class StageCore extends EventEmitter {
   public dr: StageDragResize;
   public config: StageCoreConfig;
   public zoom = DEFAULT_ZOOM;
+  private canSelect: CanSelect;
 
   constructor(config: StageCoreConfig) {
     super();
@@ -44,6 +51,7 @@ export default class StageCore extends EventEmitter {
     this.config = config;
 
     this.setZoom(config.zoom);
+    this.canSelect = config.canSelect || ((el: HTMLElement) => !!el.id);
 
     this.renderer = new StageRender({ core: this });
     this.mask = new StageMask({ core: this });
@@ -52,23 +60,61 @@ export default class StageCore extends EventEmitter {
     this.renderer.on('runtime-ready', (runtime: Runtime) => this.emit('runtime-ready', runtime));
     this.renderer.on('page-el-update', (el: HTMLElement) => this.mask?.observe(el));
 
-    this.mask.on('select', async (el: Element) => {
-      await this.dr?.select(el as HTMLElement);
-    });
-    this.mask.on('selected', (el: Element) => {
-      this.select(el as HTMLElement);
-      this.emit('select', el);
-    });
+    this.mask
+      .on('beforeSelect', (event: MouseEvent) => {
+        this.setElementFromPoint(event);
+      })
+      .on('select', () => {
+        this.emit('select', this.selectedDom);
+      })
+      .on('changeGuides', (data: GuidesEventData) => {
+        this.dr.setGuidelines(data.type, data.guides);
+        this.emit('changeGuides', data);
+      });
 
-    this.dr.on('update', (data: UpdateEventData) => this.emit('update', data));
-    this.dr.on('sort', (data: UpdateEventData) => this.emit('sort', data));
+    // 要先触发select，在触发update
+    this.dr
+      .on('update', (data: UpdateEventData) => {
+        setTimeout(() => this.emit('update', data));
+      })
+      .on('sort', (data: UpdateEventData) => {
+        setTimeout(() => this.emit('sort', data));
+      });
+  }
+
+  public async setElementFromPoint(event: MouseEvent) {
+    const { renderer, zoom } = this;
+
+    const doc = renderer.contentWindow?.document;
+    let x = event.clientX;
+    let y = event.clientY;
+
+    if (renderer.iframe) {
+      const rect = renderer.iframe.getClientRects()[0];
+      if (rect) {
+        x = x - rect.left;
+        y = y - rect.top;
+      }
+    }
+
+    const els = doc?.elementsFromPoint(x / zoom, y / zoom) as HTMLElement[];
+
+    let stopped = false;
+    const stop = () => (stopped = true);
+    for (const el of els) {
+      if (!el.id.startsWith(GHOST_EL_ID_PREFIX) && (await this.canSelect(el, stop))) {
+        if (stopped) break;
+        this.select(el, event);
+        break;
+      }
+    }
   }
 
   /**
    * 选中组件
    * @param idOrEl 组件Dom节点的id属性，或者Dom节点
    */
-  public async select(idOrEl: Id | HTMLElement): Promise<void> {
+  public async select(idOrEl: Id | HTMLElement, event?: MouseEvent): Promise<void> {
     let el;
     if (typeof idOrEl === 'string' || typeof idOrEl === 'number') {
       const runtime = await this.renderer?.getRuntime();
@@ -78,15 +124,22 @@ export default class StageCore extends EventEmitter {
       el = idOrEl;
     }
 
-    if (this.selectedDom === el) return;
+    if (el === this.selectedDom) return;
 
-    await this.beforeSelect(el);
+    const runtime = await this.renderer?.getRuntime();
+    if (runtime?.beforeSelect) {
+      await runtime.beforeSelect(el);
+    }
 
+    this.mask.setLayout(el);
+    this.dr?.select(el, event);
     this.selectedDom = el;
-    this.setMaskLayout(el);
-    this.dr?.select(el);
   }
 
+  /**
+   * 更新选中的节点
+   * @param data 更新的数据
+   */
   public update(data: UpdateData): void {
     const { config } = data;
 
@@ -97,9 +150,9 @@ export default class StageCore extends EventEmitter {
         const el = this.renderer.contentWindow?.document.getElementById(`${config.id}`);
         if (el) {
           // 更新了组件的布局，需要重新设置mask是否可以滚动
-          this.setMaskLayout(el);
+          this.mask.setLayout(el);
+          this.dr?.select(el);
         }
-        this.dr?.refresh();
       }, 0);
     });
   }
@@ -130,12 +183,6 @@ export default class StageCore extends EventEmitter {
     renderer.mount(el);
     mask.mount(el);
 
-    const { wrapper: maskWrapper, hGuides, vGuides } = mask;
-
-    maskWrapper.addEventListener('scroll', this.maskScrollHandler);
-    hGuides.on('changeGuides', this.hGuidesChangeGuidesHandler);
-    vGuides.on('changeGuides', this.vGuidesChangeGuidesHandler);
-
     this.emit('mounted');
   }
 
@@ -144,8 +191,7 @@ export default class StageCore extends EventEmitter {
    */
   public clearGuides() {
     this.mask.clearGuides();
-    this.dr.setHGuidelines([]);
-    this.dr.setVGuidelines([]);
+    this.dr.clearGuides();
   }
 
   /**
@@ -153,69 +199,11 @@ export default class StageCore extends EventEmitter {
    */
   public destroy(): void {
     const { mask, renderer, dr } = this;
-    const { wrapper: maskWrapper, hGuides, vGuides } = mask;
 
     renderer.destroy();
     mask.destroy();
     dr.destroy();
-    maskWrapper.removeEventListener('scroll', this.maskScrollHandler);
-    hGuides.off('changeGuides', this.hGuidesChangeGuidesHandler);
-    vGuides.off('changeGuides', this.vGuidesChangeGuidesHandler);
+
     this.removeAllListeners();
-  }
-
-  private maskScrollHandler = (event: Event) => {
-    const { mask, renderer } = this;
-    const { wrapper: maskWrapper, hGuides, vGuides } = mask;
-    const { scrollTop } = maskWrapper;
-
-    renderer?.contentWindow?.document.documentElement.scrollTo({ top: scrollTop });
-
-    hGuides.scrollGuides(scrollTop);
-    hGuides.scroll(0);
-
-    vGuides.scrollGuides(0);
-    vGuides.scroll(scrollTop);
-
-    this.emit('scroll', event);
-  };
-
-  private hGuidesChangeGuidesHandler = (e: GuidesEvents['changeGuides']) => {
-    this.dr.setHGuidelines(e.guides);
-    this.emit('changeGuides');
-  };
-
-  private vGuidesChangeGuidesHandler = (e: GuidesEvents['changeGuides']) => {
-    this.dr.setVGuidelines(e.guides);
-    this.emit('changeGuides');
-  };
-
-  private setMaskLayout(el: HTMLElement): void {
-    let fixed = false;
-    let dom = el;
-    while (dom) {
-      fixed = isFixed(dom);
-      if (fixed) {
-        break;
-      }
-      const { parentElement } = dom;
-      if (!parentElement || parentElement.tagName === 'BODY') {
-        break;
-      }
-      dom = parentElement;
-    }
-
-    if (fixed) {
-      this.mask?.setFixed();
-    } else {
-      this.mask?.setAbsolute();
-    }
-  }
-
-  private async beforeSelect(el: HTMLElement): Promise<void> {
-    const runtime = await this.renderer?.getRuntime();
-    if (runtime?.beforeSelect) {
-      await runtime.beforeSelect(el);
-    }
   }
 }
