@@ -103,6 +103,10 @@ export default defineComponent({
       type: String,
       default: '__key',
     },
+
+    popperClass: {
+      type: String,
+    },
   },
 
   emits: ['change', 'field-input', 'field-change'],
@@ -117,6 +121,7 @@ export default defineComponent({
 
     const formState: FormState = reactive<FormState>({
       keyProp: props.keyProp,
+      popperClass: props.popperClass,
       config: props.config,
       initValues: props.initValues,
       parentValues: props.parentValues,

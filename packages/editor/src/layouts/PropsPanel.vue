@@ -1,6 +1,7 @@
 <template>
   <m-form
     class="m-editor-props-panel"
+    popper-class="m-editor-props-panel-popper"
     ref="configForm"
     size="small"
     :init-values="values"
