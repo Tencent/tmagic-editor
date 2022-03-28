@@ -178,7 +178,7 @@ export default class StageDragResize extends EventEmitter {
       })
       .on('resizeEnd', () => {
         this.dragStatus = ActionStatus.END;
-        this.drag();
+        this.update(true);
       });
   }
 
@@ -222,7 +222,7 @@ export default class StageDragResize extends EventEmitter {
               this.sort();
               break;
             default:
-              this.drag();
+              this.update();
           }
         }
 
@@ -265,19 +265,19 @@ export default class StageDragResize extends EventEmitter {
     }
   }
 
-  private drag(): void {
+  private update(isResize = false): void {
     const rect = this.moveable!.getRect();
     const offset =
       this.mode === Mode.SORTABLE ? { left: 0, top: 0 } : getAbsolutePosition(this.target as HTMLElement, rect);
 
+    const left = this.calcValueByFontsize(offset.left);
+    const top = this.calcValueByFontsize(offset.top);
+    const width = this.calcValueByFontsize(rect.width);
+    const height = this.calcValueByFontsize(rect.height);
+
     this.emit('update', {
       el: this.target,
-      style: {
-        left: this.calcValueByFontsize(offset.left),
-        top: this.calcValueByFontsize(offset.top),
-        width: this.calcValueByFontsize(rect.width),
-        height: this.calcValueByFontsize(rect.height),
-      },
+      style: isResize ? { left, top, width, height } : { left, top },
     });
   }
 
@@ -338,14 +338,6 @@ export default class StageDragResize extends EventEmitter {
       moveableOptions = moveableOptions(this.core);
     }
 
-    const boundsOptions = {
-      top: 0,
-      left: 0,
-      right: this.container.clientWidth,
-      bottom: this.container.clientHeight,
-      ...(moveableOptions.bounds || {}),
-    };
-
     return {
       scrollable: true,
       origin: true,
@@ -362,7 +354,13 @@ export default class StageDragResize extends EventEmitter {
       horizontalGuidelines: this.horizontalGuidelines,
       verticalGuidelines: this.verticalGuidelines,
 
-      bounds: boundsOptions,
+      bounds: {
+        top: 0,
+        left: 0,
+        right: this.container.clientWidth,
+        bottom: this.container.clientHeight,
+        ...(moveableOptions.bounds || {}),
+      },
       ...options,
       ...moveableOptions,
     };
