@@ -116,7 +116,7 @@ export default class StageMask extends Rule {
     if (!page) return;
 
     this.page = page;
-    this.pageScrollParent = getScrollParent(page);
+    this.pageScrollParent = getScrollParent(page) || this.core.renderer.contentWindow?.document.documentElement || null;
     this.pageResizeObserver?.disconnect();
 
     if (typeof ResizeObserver !== 'undefined') {
