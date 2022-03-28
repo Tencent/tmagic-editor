@@ -20,7 +20,7 @@ import { Mode, MouseButton, ZIndex } from './const';
 import Rule from './Rule';
 import type StageCore from './StageCore';
 import type { StageMaskConfig } from './types';
-import { createDiv, getScrollParent, isFixed } from './util';
+import { createDiv, getScrollParent, isFixedParent } from './util';
 
 const wrapperClassName = 'editor-mask-wrapper';
 
@@ -150,21 +150,7 @@ export default class StageMask extends Rule {
   }
 
   public setLayout(el: HTMLElement): void {
-    let fixed = false;
-    let dom = el;
-    while (dom) {
-      fixed = isFixed(dom);
-      if (fixed) {
-        break;
-      }
-      const { parentElement } = dom;
-      if (!parentElement || parentElement.tagName === 'BODY') {
-        break;
-      }
-      dom = parentElement;
-    }
-
-    this.setMode(fixed ? Mode.FIXED : Mode.ABSOLUTE);
+    this.setMode(isFixedParent(el) ? Mode.FIXED : Mode.ABSOLUTE);
   }
 
   /**

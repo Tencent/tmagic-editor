@@ -65,13 +65,12 @@ export default class StageDragResize extends EventEmitter {
    */
   public async select(el: HTMLElement, event?: MouseEvent): Promise<void> {
     this.target = el;
+    this.target.style.overflow = 'hidden';
     this.mode = getMode(el);
     this.destroyDragEl();
     this.destroyGhostEl();
 
-    if (this.mode !== Mode.ABSOLUTE) {
-      this.dragEl = this.generateDragEl(el);
-    }
+    this.dragEl = this.generateDragEl(el);
 
     this.moveableOptions = await this.getOptions({
       target: this.dragEl || this.target,
@@ -151,31 +150,31 @@ export default class StageDragResize extends EventEmitter {
         }
       })
       .on('resize', ({ width, height, drag }) => {
-        if (!this.moveable || !this.target) return;
+        if (!this.moveable || !this.target || !this.dragEl) return;
+
         const { beforeTranslate } = drag;
         frame.translate = beforeTranslate;
         this.dragStatus = ActionStatus.ING;
 
         this.target.style.width = `${width}px`;
         this.target.style.height = `${height}px`;
+        this.dragEl.style.width = `${width}px`;
+        this.dragEl.style.height = `${height}px`;
 
         // 流式布局
-        if (this.mode === Mode.SORTABLE && this.ghostEl) {
-          this.target.style.top = '0';
+        if (this.mode === Mode.SORTABLE) {
+          this.dragEl.style.top = `${beforeTranslate[1]}px`;
+          this.target.style.top = `0px`;
           return;
         }
 
-        this.target.style.left = `${beforeTranslate[0]}px`;
-        this.target.style.top = `${beforeTranslate[1]}px`;
+        this.dragEl.style.left = `${beforeTranslate[0]}px`;
+        this.dragEl.style.top = `${beforeTranslate[1]}px`;
 
-        if (this.dragEl) {
-          this.dragEl.style.width = `${width}px`;
-          this.dragEl.style.height = `${height}px`;
+        const offset = getAbsolutePosition(this.target, { left: beforeTranslate[0], top: beforeTranslate[1] });
 
-          const offset = getAbsolutePosition(this.target, { left: beforeTranslate[0], top: beforeTranslate[1] });
-          this.dragEl.style.left = `${offset.left}px`;
-          this.dragEl.style.top = `${offset.top}px`;
-        }
+        this.target.style.left = `${offset.left}px`;
+        this.target.style.top = `${offset.top}px`;
       })
       .on('resizeEnd', () => {
         this.dragStatus = ActionStatus.END;
@@ -197,26 +196,23 @@ export default class StageDragResize extends EventEmitter {
         }
       })
       .on('drag', ({ left, top }) => {
-        if (!this.target) return;
+        if (!this.target || !this.dragEl) return;
         this.dragStatus = ActionStatus.ING;
 
         const offset = getAbsolutePosition(this.target, { left, top });
 
         // 流式布局
-        if (this.ghostEl && this.dragEl) {
+        if (this.ghostEl) {
           this.dragEl.style.top = `${top}px`;
           this.ghostEl.style.top = `${offset.top}px`;
           return;
         }
 
-        // 固定布局
-        if (this.dragEl) {
-          this.dragEl.style.left = `${left}px`;
-          this.dragEl.style.top = `${top}px`;
-        }
+        this.dragEl.style.left = `${left}px`;
+        this.dragEl.style.top = `${top}px`;
 
-        this.target.style.left = `${left}px`;
-        this.target.style.top = `${top}px`;
+        this.target.style.left = `${offset.left}px`;
+        this.target.style.top = `${offset.top}px`;
       })
       .on('dragEnd', () => {
         // 点击不拖动时会触发dragStart和dragEnd，但是不会有drag事件
@@ -312,12 +308,13 @@ export default class StageDragResize extends EventEmitter {
       this.destroyDragEl();
     }
 
-    const { left, top, width, height } = el.getBoundingClientRect();
+    const { width, height } = el.getBoundingClientRect();
+    const offset = getOffset(el);
     const dragEl = globalThis.document.createElement('div');
     dragEl.style.cssText = `
       position: absolute;
-      left: ${left}px;
-      top: ${top}px;
+      left: ${offset.left}px;
+      top: ${offset.top}px;
       width: ${width}px;
       height: ${height}px;
     `;
@@ -377,7 +374,7 @@ export default class StageDragResize extends EventEmitter {
 
     if (fontSize) {
       const times = globalThis.parseFloat(fontSize) / 100;
-      return value / times;
+      return (value / times).toFixed(2);
     }
 
     return value;
