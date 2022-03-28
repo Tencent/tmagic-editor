@@ -108,8 +108,25 @@ export const isFixed = (el?: HTMLElement): boolean => {
   return getComputedStyle(el).position === 'fixed';
 };
 
+export const isFixedParent = (el: HTMLElement) => {
+  let fixed = false;
+  let dom = el;
+  while (dom) {
+    fixed = isFixed(dom);
+    if (fixed) {
+      break;
+    }
+    const { parentElement } = dom;
+    if (!parentElement || parentElement.tagName === 'BODY') {
+      break;
+    }
+    dom = parentElement;
+  }
+  return fixed;
+};
+
 export const getMode = (el: HTMLElement): Mode => {
-  if (isFixed(el)) return Mode.FIXED;
+  if (isFixedParent(el)) return Mode.FIXED;
   if (isStatic(el) || isRelative(el)) return Mode.SORTABLE;
   return Mode.ABSOLUTE;
 };
