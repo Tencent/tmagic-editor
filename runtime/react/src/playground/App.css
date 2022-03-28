@@ -1,11 +1,19 @@
-#root {
-  width: fit-content;
-  position: relative;
-  margin: 0 auto;
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
 }
-::-webkit-scrollbar {
+
+#app {
+  position: relative;
+  overflow: auto;
+}
+
+#app::-webkit-scrollbar {
   width: 0;
 }
+
 .magic-ui-container {
   background-color: rgba(136, 136, 136, 0.5);
 }
