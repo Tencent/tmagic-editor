@@ -16,13 +16,8 @@
  * limitations under the License.
  */
 
+import { Mode } from './const';
 import type { Offset } from './types';
-
-export enum Mode {
-  ABSOLUTE = 'absolute',
-  FIXED = 'fixed',
-  SORTABLE = 'sortable',
-}
 
 export const getOffset = (el: HTMLElement): Offset => {
   const { transform } = getComputedStyle(el);
@@ -117,4 +112,28 @@ export const getMode = (el: HTMLElement): Mode => {
   if (isFixed(el)) return Mode.FIXED;
   if (isStatic(el) || isRelative(el)) return Mode.SORTABLE;
   return Mode.ABSOLUTE;
+};
+
+export const getScrollParent = (element: HTMLElement, includeHidden = false): HTMLElement | null => {
+  let style = getComputedStyle(element);
+  const overflowRegex = includeHidden ? /(auto|scroll|hidden)/ : /(auto|scroll)/;
+
+  if (isFixed(element)) return null;
+  for (let parent = element; parent.parentElement; ) {
+    parent = parent.parentElement;
+    style = getComputedStyle(parent);
+    if (isAbsolute(element) && isStatic(element)) {
+      continue;
+    }
+    if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) return parent;
+  }
+
+  return null;
+};
+
+export const createDiv = ({ className, cssText }: { className: string; cssText: string }) => {
+  const el = globalThis.document.createElement('div');
+  el.className = className;
+  el.style.cssText = cssText;
+  return el;
 };

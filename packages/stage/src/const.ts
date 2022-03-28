@@ -21,3 +21,24 @@ export const GHOST_EL_ID_PREFIX = 'ghost_el_';
 
 // 默认放到缩小倍数
 export const DEFAULT_ZOOM = 1;
+
+export enum GuidesType {
+  HORIZONTAL = 'horizontal',
+  VERTICAL = 'vertical',
+}
+
+export enum ZIndex {
+  MASK = '99999',
+}
+
+export enum MouseButton {
+  LEFT = 0,
+  MIDDLE = 1,
+  RIGHT = 2,
+}
+
+export enum Mode {
+  ABSOLUTE = 'absolute',
+  FIXED = 'fixed',
+  SORTABLE = 'sortable',
+}
