@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@tmagic/form": "^1.0.0-beta.6",
-    "element-plus": "^2.0.2",
+    "element-plus": "^2.1.7",
     "lodash-es": "^4.17.21",
     "vue": "^3.2.0"
   },

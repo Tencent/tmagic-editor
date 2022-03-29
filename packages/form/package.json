@@ -29,7 +29,7 @@
   "dependencies": {
     "@element-plus/icons": "0.0.11",
     "@tmagic/utils": "^1.0.0-beta.6",
-    "element-plus": "^2.0.2",
+    "element-plus": "^2.1.7",
     "lodash-es": "^4.17.21",
     "moment": "^2.29.1",
     "sortablejs": "^1.14.0",
