@@ -7,7 +7,7 @@
     "build": "vuepress build src -d dist"
   },
   "dependencies": {
-    "element-plus": "^2.0.2",
+    "element-plus": "^2.1.7",
     "highlight.js": "^11.2.0"
   },
   "devDependencies": {
