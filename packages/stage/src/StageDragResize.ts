@@ -65,7 +65,10 @@ export default class StageDragResize extends EventEmitter {
    */
   public async select(el: HTMLElement, event?: MouseEvent): Promise<void> {
     this.target = el;
-    this.target.style.overflow = 'hidden';
+    // 如果有滚动条会导致resize时获取到width，height不准确
+    if (/(auto|scroll)/.test(this.target.style.overflow)) {
+      this.target.style.overflow = 'hidden';
+    }
     this.mode = getMode(el);
     this.destroyDragEl();
     this.destroyGhostEl();
