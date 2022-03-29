@@ -52,15 +52,7 @@ export default class StageRender extends EventEmitter {
       height: 100%;
     `;
 
-    this.iframe.onload = async () => {
-      this.emit('onload');
-      if (this.render) {
-        const el = await this.render(this.core);
-        if (el) {
-          this.iframe?.contentDocument?.body?.appendChild(el);
-        }
-      }
-    };
+    this.iframe.addEventListener('load', this.loadHandler);
   }
 
   public getMagicApi = () => ({
@@ -113,9 +105,20 @@ export default class StageRender extends EventEmitter {
    * 销毁实例
    */
   public destroy(): void {
+    this.iframe?.removeEventListener('load', this.loadHandler);
     this.contentWindow = null;
     this.iframe?.remove();
     this.iframe = undefined;
     this.removeAllListeners();
   }
+
+  private loadHandler = async () => {
+    this.emit('onload');
+    if (this.render) {
+      const el = await this.render(this.core);
+      if (el) {
+        this.iframe?.contentDocument?.body?.appendChild(el);
+      }
+    }
+  };
 }
