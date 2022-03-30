@@ -21,6 +21,7 @@ import { cloneDeep, mergeWith } from 'lodash-es';
 import serialize from 'serialize-javascript';
 
 import type { Id, MApp, MComponent, MContainer, MNode, MPage } from '@tmagic/schema';
+import { NodeType } from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
 import { getNodePath, isPop } from '@tmagic/utils';
 
@@ -121,7 +122,7 @@ class Editor extends BaseService {
     info.parent = path[path.length - 2] as MContainer;
 
     path.forEach((item) => {
-      if (item.type === 'page') {
+      if (item.type === NodeType.PAGE) {
         info.page = item as MPage;
         return;
       }
@@ -209,7 +210,7 @@ class Editor extends BaseService {
 
     let parentNode: MNode | undefined;
 
-    if (type === 'page') {
+    if (type === NodeType.PAGE) {
       parentNode = this.get<MApp>('root');
       // 由于支持中间件扩展，在parent参数为undefined时，parent会变成next函数
     } else if (parent && typeof parent !== 'function') {
@@ -225,7 +226,7 @@ class Editor extends BaseService {
     const layout = await this.getLayout(parentNode);
     const newNode = initPosition({ ...toRaw(await propsService.getPropsValue(type)), ...config }, layout);
 
-    if ((parentNode?.type === 'app' || curNode.type === 'app') && newNode.type !== 'page') {
+    if ((parentNode?.type === NodeType.ROOT || curNode.type === NodeType.ROOT) && newNode.type !== NodeType.PAGE) {
       throw new Error('app下不能添加组件');
     }
 
@@ -264,7 +265,7 @@ class Editor extends BaseService {
     parent.items?.splice(index, 1);
     this.get<StageCore>('stage')?.remove({ id: node.id, root: this.get('root') });
 
-    if (node.type === 'page') {
+    if (node.type === NodeType.PAGE) {
       await this.select(root.items[0] || root);
     } else {
       await this.select(parent);
@@ -300,7 +301,7 @@ class Editor extends BaseService {
 
     if (!newConfig.type) throw new Error('配置缺少type值');
 
-    if (newConfig.type === 'app') {
+    if (newConfig.type === NodeType.ROOT) {
       this.set('root', newConfig);
       return newConfig;
     }
@@ -327,7 +328,7 @@ class Editor extends BaseService {
 
     this.get<StageCore>('stage')?.update({ config: cloneDeep(newConfig), root: this.get('root') });
 
-    if (newConfig.type === 'page') {
+    if (newConfig.type === NodeType.PAGE) {
       this.set('page', newConfig);
     }
 

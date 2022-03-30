@@ -19,13 +19,15 @@
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
 
+import { NodeType } from '@tmagic/schema';
+
 import PageBar from '@editor/layouts/workspace/PageBar.vue';
 
 const editorState: Record<string, any> = {
   root: {
-    items: [{ key: 0, id: 1, name: 'testName', type: 'page' }],
+    items: [{ key: 0, id: 1, name: 'testName', type: NodeType.PAGE }],
   },
-  page: { id: 1, type: 'page' },
+  page: { id: 1, type: NodeType.PAGE },
 };
 
 const editorService = {
@@ -54,7 +56,7 @@ describe('PageBar', () => {
       await wrapper.find('i[class="el-icon m-editor-page-bar-menu-add-icon"]').trigger('click');
 
       expect(editorService.add.mock.calls[0][0]).toEqual({
-        type: 'page',
+        type: NodeType.PAGE,
         name: 'page_1',
       });
       done();

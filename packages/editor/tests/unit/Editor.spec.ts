@@ -20,6 +20,7 @@ import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
 
 import MagicForm from '@tmagic/form';
+import { NodeType } from '@tmagic/schema';
 
 import Editor from '@editor/Editor.vue';
 
@@ -47,14 +48,14 @@ describe('编辑器', () => {
       },
       props: {
         modelValue: {
-          type: 'app',
+          type: NodeType.ROOT,
           id: 1,
           name: 'app',
           items: [
             {
-              type: 'page',
+              type: NodeType.PAGE,
               id: 2,
-              name: 'page',
+              name: NodeType.PAGE,
               items: [],
             },
           ],

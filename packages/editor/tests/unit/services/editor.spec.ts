@@ -18,7 +18,8 @@
 
 import { cloneDeep } from 'lodash-es';
 
-import { MApp, MContainer, MNode, MPage } from '@tmagic/schema';
+import type { MApp, MContainer, MNode, MPage } from '@tmagic/schema';
+import { NodeType } from '@tmagic/schema';
 
 import editorService from '@editor/services/editor';
 import { COPY_STORAGE_KEY } from '@editor/utils';
@@ -72,12 +73,12 @@ enum NodeId {
 // mock 页面数据，包含一个页面，两个组件
 const root: MNode = {
   id: NodeId.ROOT_ID,
-  type: 'app',
+  type: NodeType.ROOT,
   items: [
     {
       id: NodeId.PAGE_ID,
       layout: 'absolute',
-      type: 'page',
+      type: NodeType.PAGE,
       style: {
         width: 375,
       },
@@ -237,7 +238,7 @@ describe('add', () => {
     const rootNode = editorService.get<MApp>('root');
     const newNode = await editorService.add(
       {
-        type: 'page',
+        type: NodeType.PAGE,
       },
       rootNode,
     );
@@ -279,7 +280,7 @@ describe('remove', () => {
     // 先加一个页面
     const newPage = await editorService.add(
       {
-        type: 'page',
+        type: NodeType.PAGE,
       },
       rootNode,
     );
@@ -395,7 +396,7 @@ describe('alignCenter', () => {
   it('正常', async () => {
     // 设置当前编辑的页面
     await editorService.select(NodeId.PAGE_ID);
-    await editorService.update({ id: NodeId.PAGE_ID, isAbsoluteLayout: true, type: 'page' });
+    await editorService.update({ id: NodeId.PAGE_ID, isAbsoluteLayout: true, type: NodeType.PAGE });
     await editorService.select(NodeId.NODE_ID);
     const node = editorService.get<MNode>('node');
     await editorService.alignCenter(node);

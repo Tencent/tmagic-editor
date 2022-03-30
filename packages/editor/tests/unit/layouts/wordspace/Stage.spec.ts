@@ -18,6 +18,8 @@
 
 import { mount } from '@vue/test-utils';
 
+import { NodeType } from '@tmagic/schema';
+
 import Stage from '@editor/layouts/workspace/Stage.vue';
 
 globalThis.ResizeObserver =
@@ -40,7 +42,7 @@ describe('Stage.vue', () => {
   );
 
   const page = {
-    type: 'page',
+    type: NodeType.PAGE,
     id: '2',
     items: [
       {
@@ -55,7 +57,7 @@ describe('Stage.vue', () => {
       runtimeUrl: '',
       root: {
         id: '1',
-        type: 'app',
+        type: NodeType.ROOT,
         items: [page],
       },
 

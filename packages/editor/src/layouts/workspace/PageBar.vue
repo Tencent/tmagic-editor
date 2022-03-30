@@ -38,6 +38,7 @@ import { computed, defineComponent, inject, toRaw } from 'vue';
 import { CaretBottom, Plus } from '@element-plus/icons';
 
 import type { MPage } from '@tmagic/schema';
+import { NodeType } from '@tmagic/schema';
 
 import type { Services } from '@editor/type';
 import { generatePageNameByApp } from '@editor/utils/editor';
@@ -60,7 +61,7 @@ export default defineComponent({
       addPage() {
         if (!editorService) return;
         const pageConfig = {
-          type: 'page',
+          type: NodeType.PAGE,
           name: generatePageNameByApp(toRaw(editorService.get('root'))),
         };
         editorService.add(pageConfig);

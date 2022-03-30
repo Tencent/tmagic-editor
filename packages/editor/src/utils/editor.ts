@@ -18,7 +18,8 @@
 
 import { random } from 'lodash-es';
 
-import { Id, MApp, MContainer, MNode, MPage } from '@tmagic/schema';
+import type { Id, MApp, MContainer, MNode, MPage } from '@tmagic/schema';
+import { NodeType } from '@tmagic/schema';
 import { getNodePath, isPop } from '@tmagic/utils';
 
 import { Layout } from '@editor/type';
@@ -34,7 +35,7 @@ export const generateId = (type: string | number): string => `${type}_${random(1
  */
 export const getPageList = (app: MApp): MPage[] => {
   if (app.items && Array.isArray(app.items)) {
-    return app.items.filter((item: MPage) => item.type === 'page');
+    return app.items.filter((item: MPage) => item.type === NodeType.PAGE);
   }
   return [];
 };
@@ -108,7 +109,7 @@ export const setNewItemId = (config: MNode, parent?: MPage) => {
   config.name = `${config.name?.replace(/_(\d+)$/, '')}_${config.id}`;
 
   // 只有弹窗在页面下的一级子元素才有效
-  if (isPop(config) && parent?.type === 'page') {
+  if (isPop(config) && parent?.type === NodeType.PAGE) {
     updatePopId(oldId, config.id, parent);
   }
 

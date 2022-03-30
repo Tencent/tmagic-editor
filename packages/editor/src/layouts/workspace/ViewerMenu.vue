@@ -24,6 +24,7 @@
 <script lang="ts">
 import { computed, defineComponent, inject, onMounted, ref, watch } from 'vue';
 
+import { NodeType } from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
 
 import { LayerOffset, Layout, Services } from '@editor/type';
@@ -53,7 +54,8 @@ export default defineComponent({
         if (!parent.value || !editorService) return (canCenter.value = false);
         const layout = await editorService.getLayout(parent.value);
         canCenter.value =
-          [Layout.ABSOLUTE, Layout.FIXED].includes(layout) && !['app', 'page', 'pop'].includes(`${node.value?.type}`);
+          [Layout.ABSOLUTE, Layout.FIXED].includes(layout) &&
+          ![NodeType.ROOT, NodeType.PAGE, 'pop'].includes(`${node.value?.type}`);
       },
       { immediate: true },
     );
@@ -62,8 +64,8 @@ export default defineComponent({
       menu,
       canPaste,
 
-      canDelete: computed(() => node.value?.type !== 'page'),
-      canMoveZPos: computed(() => node.value?.type !== 'page'),
+      canDelete: computed(() => node.value?.type !== NodeType.PAGE),
+      canMoveZPos: computed(() => node.value?.type !== NodeType.PAGE),
       canCenter,
 
       center() {
