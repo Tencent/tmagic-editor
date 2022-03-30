@@ -21,6 +21,7 @@ import { EventEmitter } from 'events';
 
 import type { MoveableOptions } from 'moveable';
 import Moveable from 'moveable';
+import MoveableHelper from 'moveable-helper';
 
 import { GHOST_EL_ID_PREFIX, GuidesType, Mode } from './const';
 import StageCore from './StageCore';
@@ -49,6 +50,7 @@ export default class StageDragResize extends EventEmitter {
   private dragStatus: ActionStatus = ActionStatus.END;
   private ghostEl: HTMLElement | undefined;
   private mode: Mode = Mode.ABSOLUTE;
+  private moveableHelper?: MoveableHelper;
 
   constructor(config: StageDragResizeConfig) {
     super();
@@ -77,6 +79,12 @@ export default class StageDragResize extends EventEmitter {
 
     this.moveableOptions = await this.getOptions({
       target: this.dragEl || this.target,
+    });
+
+    this.moveableHelper = MoveableHelper.create({
+      useBeforeRender: true,
+      useRender: false,
+      createAuto: true,
     });
 
     this.initMoveable();
@@ -188,34 +196,42 @@ export default class StageDragResize extends EventEmitter {
   private bindDragEvent(): void {
     if (!this.moveable) throw new Error('moveable 为初始化');
 
+    let offset = {
+      left: 0,
+      top: 0,
+    };
+
     this.moveable
-      .on('dragStart', () => {
+      .on('dragStart', (e) => {
         if (!this.target) throw new Error('未选中组件');
 
         this.dragStatus = ActionStatus.START;
+
+        this.moveableHelper?.onDragStart(e);
+
+        offset = getAbsolutePosition(this.target, { left: 0, top: 0 });
 
         if (this.mode === Mode.SORTABLE) {
           this.ghostEl = this.generateGhostEl(this.target);
         }
       })
-      .on('drag', ({ left, top }) => {
+      .on('drag', (e) => {
         if (!this.target || !this.dragEl) return;
         this.dragStatus = ActionStatus.ING;
 
-        const offset = getAbsolutePosition(this.target, { left, top });
+        const { left, top } = e;
 
         // 流式布局
         if (this.ghostEl) {
           this.dragEl.style.top = `${top}px`;
-          this.ghostEl.style.top = `${offset.top}px`;
+          this.ghostEl.style.top = `${top + offset.top}px`;
           return;
         }
 
-        this.dragEl.style.left = `${left}px`;
-        this.dragEl.style.top = `${top}px`;
+        this.moveableHelper?.onDrag(e);
 
-        this.target.style.left = `${offset.left}px`;
-        this.target.style.top = `${offset.top}px`;
+        this.target.style.left = `${left + offset.left}px`;
+        this.target.style.top = `${top + offset.top}px`;
       })
       .on('dragEnd', () => {
         // 点击不拖动时会触发dragStart和dragEnd，但是不会有drag事件
