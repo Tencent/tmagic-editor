@@ -15,6 +15,8 @@
 import { defineComponent, inject, toRaw } from 'vue';
 import { Plus } from '@element-plus/icons';
 
+import { NodeType } from '@tmagic/schema';
+
 import { Services } from '@editor/type';
 import { generatePageNameByApp } from '@editor/utils';
 
@@ -31,7 +33,7 @@ export default defineComponent({
         if (!editorService) return;
 
         editorService.add({
-          type: 'page',
+          type: NodeType.PAGE,
           name: generatePageNameByApp(toRaw(editorService.get('root'))),
         });
       },

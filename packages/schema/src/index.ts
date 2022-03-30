@@ -16,6 +16,12 @@
  * limitations under the License.
  */
 
+export enum NodeType {
+  CONTAINER = 'container',
+  PAGE = 'page',
+  ROOT = 'app',
+}
+
 export type Id = string | number;
 
 export interface EventItemConfig {
@@ -47,19 +53,19 @@ export interface MComponent {
 
 export interface MContainer extends MComponent {
   /** 容器类型，默认为'container' */
-  type: 'container' | string;
+  type: NodeType.CONTAINER | string;
   /** 容器子元素 */
   items: (MComponent | MContainer)[];
 }
 
 export interface MPage extends MContainer {
   /** 页面类型 */
-  type: 'page';
+  type: NodeType.PAGE;
 }
 
 export interface MApp extends MComponent {
   /** App页面类型，app作为整个结构的根节点；有且只有一个 */
-  type: 'app';
+  type: NodeType.ROOT;
   /** */
   items: MPage[];
 }

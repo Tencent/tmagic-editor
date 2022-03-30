@@ -58,6 +58,7 @@ import type { ElTree } from 'element-plus';
 import { throttle } from 'lodash-es';
 
 import type { MNode, MPage } from '@tmagic/schema';
+import { NodeType } from '@tmagic/schema';
 
 import type { EditorService } from '@editor/services/editor';
 import type { Services } from '@editor/type';
@@ -88,8 +89,8 @@ const useDrop = (tree: Ref<InstanceType<typeof ElTree> | undefined>, editorServi
 
     const { type: ingType } = ingData;
 
-    if (ingType !== 'page' && data.type === 'page') return false;
-    if (ingType === 'page' && data.type !== 'page') return false;
+    if (ingType !== NodeType.PAGE && data.type === NodeType.PAGE) return false;
+    if (ingType === NodeType.PAGE && data.type !== NodeType.PAGE) return false;
     if (!data || !data.type) return false;
     if (['prev', 'next'].includes(type)) return true;
     if (data.items || data.type === 'container') return true;

@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 
-import { MNode } from '@tmagic/schema';
+import type { MNode } from '@tmagic/schema';
+import { NodeType } from '@tmagic/schema';
 
 import * as editor from '@editor/utils/editor';
 
@@ -30,12 +31,12 @@ describe('util form', () => {
   it('getPageList', () => {
     const pageList = editor.getPageList({
       id: 'app_1',
-      type: 'app',
+      type: NodeType.ROOT,
       items: [
         {
           id: 'page_1',
           name: 'index',
-          type: 'page',
+          type: NodeType.PAGE,
           items: [],
         },
       ],
@@ -49,7 +50,7 @@ describe('util form', () => {
       {
         id: 'page_1',
         name: 'index',
-        type: 'page',
+        type: NodeType.PAGE,
         items: [],
       },
     ]);
@@ -79,7 +80,7 @@ describe('setNewItemId', () => {
   it('items', () => {
     const config = {
       id: 1,
-      type: 'page',
+      type: NodeType.PAGE,
       items: [
         {
           type: 'text',
@@ -95,7 +96,7 @@ describe('setNewItemId', () => {
   it('pop', () => {
     const config = {
       id: 1,
-      type: 'page',
+      type: NodeType.PAGE,
       items: [
         {
           type: 'button',
@@ -158,7 +159,7 @@ describe('getNodeIndex', () => {
       },
       {
         id: 2,
-        type: 'page',
+        type: NodeType.PAGE,
         items: [
           {
             type: 'text',
@@ -179,7 +180,7 @@ describe('getNodeIndex', () => {
       },
       {
         id: 2,
-        type: 'page',
+        type: NodeType.PAGE,
         items: [
           {
             type: 'text',

@@ -31,6 +31,7 @@ import { ElMessage } from 'element-plus';
 import serialize from 'serialize-javascript';
 
 import type { MenuBarData, MoveableOptions, TMagicEditor } from '@tmagic/editor';
+import { NodeType } from '@tmagic/schema';
 import StageCore from '@tmagic/stage';
 import { asyncLoadJs } from '@tmagic/utils';
 
@@ -155,7 +156,7 @@ export default defineComponent({
 
         if (!node) return options;
 
-        const isPage = node.type === 'page';
+        const isPage = node.type === NodeType.PAGE;
 
         options.draggable = !isPage;
         options.resizable = !isPage;

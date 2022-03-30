@@ -41,6 +41,8 @@
 import { computed, defineComponent, inject, PropType } from 'vue';
 import { ArrowDown, Back, Delete, Grid, Right, ScaleToOriginal, ZoomIn, ZoomOut } from '@element-plus/icons';
 
+import { NodeType } from '@tmagic/schema';
+
 import MIcon from '@editor/components/Icon.vue';
 import type { MenuButton, MenuComponent, MenuItem, Services } from '@editor/type';
 
@@ -87,7 +89,7 @@ export default defineComponent({
             type: 'button',
             icon: Delete,
             tooltip: '刪除',
-            disabled: () => services?.editorService.get('node')?.type === 'page',
+            disabled: () => services?.editorService.get('node')?.type === NodeType.PAGE,
             handler: () => services?.editorService.remove(services?.editorService.get('node')),
           };
         case 'undo':
