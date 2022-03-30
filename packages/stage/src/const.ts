@@ -29,6 +29,7 @@ export enum GuidesType {
 
 export enum ZIndex {
   MASK = '99999',
+  SELECTED_EL = '666',
 }
 
 export enum MouseButton {
@@ -42,3 +43,5 @@ export enum Mode {
   FIXED = 'fixed',
   SORTABLE = 'sortable',
 }
+
+export const SELECTED_CLASS = 'tmagic-stage-selected-area';

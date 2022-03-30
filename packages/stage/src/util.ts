@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { Mode } from './const';
+import { Mode, SELECTED_CLASS } from './const';
 import type { Offset } from './types';
 
 export const getOffset = (el: HTMLElement): Offset => {
@@ -153,4 +153,18 @@ export const createDiv = ({ className, cssText }: { className: string; cssText: 
   el.className = className;
   el.style.cssText = cssText;
   return el;
+};
+
+export const removeSelectedClassName = (doc: Document) => {
+  const oldEl = doc.querySelector(`.${SELECTED_CLASS}`);
+
+  if (oldEl) {
+    oldEl.classList.remove(SELECTED_CLASS);
+    (oldEl.parentNode as HTMLDivElement)?.classList.remove(`${SELECTED_CLASS}-parent`);
+  }
+};
+
+export const addSelectedClassName = (el: Element) => {
+  el.classList.add(SELECTED_CLASS);
+  (el.parentNode as Element)?.classList.add(`${SELECTED_CLASS}-parent`);
 };

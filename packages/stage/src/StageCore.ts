@@ -35,6 +35,7 @@ import {
   UpdateData,
   UpdateEventData,
 } from './types';
+import { addSelectedClassName, removeSelectedClassName } from './util';
 
 export default class StageCore extends EventEmitter {
   public selectedDom: Element | undefined;
@@ -135,7 +136,8 @@ export default class StageCore extends EventEmitter {
 
     if (el === this.selectedDom) return;
 
-    const runtime = await this.renderer?.getRuntime();
+    const runtime = await this.renderer.getRuntime();
+
     if (runtime?.beforeSelect) {
       await runtime.beforeSelect(el);
     }
@@ -143,6 +145,13 @@ export default class StageCore extends EventEmitter {
     this.mask.setLayout(el);
     this.dr?.select(el, event);
     this.selectedDom = el;
+
+    if (this.renderer.contentWindow) {
+      removeSelectedClassName(this.renderer.contentWindow.document);
+      if (this.selectedDom) {
+        addSelectedClassName(this.selectedDom);
+      }
+    }
   }
 
   /**
