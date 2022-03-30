@@ -237,7 +237,9 @@ class Editor extends BaseService {
     await this.select(newNode);
 
     this.addModifiedNodeId(newNode.id);
-    this.pushHistoryState();
+    if (type !== NodeType.PAGE) {
+      this.pushHistoryState();
+    }
 
     return newNode;
   }
