@@ -18,6 +18,7 @@
 
 import { EventEmitter } from 'events';
 
+import { SELECTED_CLASS, ZIndex } from './const';
 import StageCore from './StageCore';
 import type { Runtime, RuntimeWindow, StageRenderConfig } from './types';
 import { getHost, isSameDomain } from './util';
@@ -114,11 +115,23 @@ export default class StageRender extends EventEmitter {
 
   private loadHandler = async () => {
     this.emit('onload');
+
     if (this.render) {
       const el = await this.render(this.core);
       if (el) {
         this.iframe?.contentDocument?.body?.appendChild(el);
       }
+    }
+
+    if (this.contentWindow) {
+      const style = this.contentWindow.document.createElement('style');
+      style.id = 'tmagic-stage-render';
+      style.innerHTML = `
+        .${SELECTED_CLASS}, .${SELECTED_CLASS}-parent {
+          z-index: ${ZIndex.SELECTED_EL};
+        }
+      `;
+      this.contentWindow.document.head.appendChild(style);
     }
   };
 }
