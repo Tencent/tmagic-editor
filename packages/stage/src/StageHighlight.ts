@@ -47,14 +47,7 @@ export default class StageHighlight extends EventEmitter {
     this.moveable = new Moveable(this.container, {
       target: this.target,
       scrollable: true,
-      origin: true,
-      zoom: 1,
-      bounds: {
-        top: 0,
-        left: 0,
-        right: this.container.clientWidth,
-        bottom: this.container.clientHeight,
-      },
+      origin: false,
     });
   }
 
