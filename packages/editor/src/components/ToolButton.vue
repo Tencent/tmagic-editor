@@ -4,9 +4,9 @@
     <div v-else-if="item.type === 'text'" class="menu-item-text">{{ item.text }}</div>
 
     <template v-else-if="item.type === 'zoom'">
-      <m-icon :icon="ZoomIn" @click="zoomInHandler"></m-icon>
+      <el-button size="small" type="text"><m-icon :icon="ZoomIn" @click="zoomInHandler"></m-icon></el-button>
       <span class="menu-item-text" style="margin: 0 5px">{{ parseInt(`${zoom * 100}`, 10) }}%</span>
-      <m-icon :icon="ZoomOut" @click="zoomOutHandler"></m-icon>
+      <el-button size="small" type="text"><m-icon :icon="ZoomOut" @click="zoomOutHandler"></m-icon></el-button>
     </template>
 
     <el-tooltip
