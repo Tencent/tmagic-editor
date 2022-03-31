@@ -358,18 +358,25 @@ export default class StageDragResize extends EventEmitter {
     }
 
     return {
-      scrollable: true,
       origin: true,
       zoom: 1,
-      dragArea: true,
+      dragArea: false,
       draggable: true,
       resizable: true,
       snappable: isAbsolute,
       snapGap: isAbsolute,
-      snapDirections: { center: isAbsolute, middle: isAbsolute },
-      elementSnapDirections: { center: isAbsolute, middle: isAbsolute },
-
-      elementGuidelines: isAbsolute ? await this.getSnapElements(this.target) : [],
+      snapThreshold: 5,
+      snapDigit: 0,
+      throttleDrag: 0,
+      isDisplaySnapDigit: isAbsolute,
+      snapDirections: {
+        top: isAbsolute,
+        right: isAbsolute,
+        bottom: isAbsolute,
+        left: isAbsolute,
+        center: isAbsolute,
+        middle: isAbsolute,
+      },
       horizontalGuidelines: this.horizontalGuidelines,
       verticalGuidelines: this.verticalGuidelines,
 
