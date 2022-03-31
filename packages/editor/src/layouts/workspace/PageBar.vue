@@ -11,9 +11,13 @@
         :class="{ active: page?.id === item.id }"
         @click="switchPage(item)"
       >
-        <slot name="page-bar-title" :page="item">
-          <span>{{ item.name }}</span>
-        </slot>
+        <div class="m-editor-page-bar-title">
+          <slot name="page-bar-title" :page="item">
+            <el-tooltip effect="dark" placement="top-start" :content="item.name">
+              <span>{{ item.name }}</span>
+            </el-tooltip>
+          </slot>
+        </div>
 
         <el-popover placement="top" :width="160" trigger="hover">
           <div>

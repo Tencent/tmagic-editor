@@ -10,6 +10,7 @@
   color: $--font-color;
   border-top: 1px solid $--border-color;
   z-index: 2;
+  overflow: hidden;
 
   .m-editor-page-bar-item {
     padding: 0 10px;
@@ -26,6 +27,13 @@
       .m-editor-page-bar-menu-icon {
         cursor: pointer;
       }
+    }
+
+    .m-editor-page-bar-title {
+      max-width: 150px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
     }
   }
 }
