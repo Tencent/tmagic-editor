@@ -240,6 +240,7 @@ export default class StageMask extends Rule {
   };
 
   private mouseWheelHandler = (event: WheelEvent) => {
+    this.emit('clearHighlight');
     if (!this.page) throw new Error('page 未初始化');
 
     const { deltaY, deltaX } = event;
