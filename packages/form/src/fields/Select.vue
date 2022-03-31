@@ -289,6 +289,7 @@ export default defineComponent({
             Promise.resolve(
               props.config.options(mForm, {
                 model: props.model,
+                prop: props.prop,
                 formValues: mForm?.values,
                 formValue: mForm?.values,
               }),
