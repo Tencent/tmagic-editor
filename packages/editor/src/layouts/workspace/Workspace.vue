@@ -7,6 +7,7 @@
       :moveable-options="moveableOptions"
       :can-select="canSelect"
       @select="selectHandler"
+      @highlight="highlightHandler"
       @update="updateNodeHandler"
       @sort="sortNodeHandler"
     ></magic-stage>
@@ -72,6 +73,10 @@ export default defineComponent({
 
       sortNodeHandler(ev: SortEventData) {
         services?.editorService.sort(ev.src, ev.dist);
+      },
+
+      highlightHandler(el: HTMLElement) {
+        services?.editorService.highlight(el.id);
       },
     };
   },

@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+import { throttle } from 'lodash-es';
+
 import { Mode, MouseButton, ZIndex } from './const';
 import Rule from './Rule';
 import type StageCore from './StageCore';
@@ -23,6 +25,7 @@ import type { StageMaskConfig } from './types';
 import { createDiv, getScrollParent, isFixedParent } from './util';
 
 const wrapperClassName = 'editor-mask-wrapper';
+const throttleTime = 100;
 
 const hideScrollbar = () => {
   const style = globalThis.document.createElement('style');
@@ -82,6 +85,13 @@ export default class StageMask extends Rule {
   private mode: Mode = Mode.ABSOLUTE;
   private pageResizeObserver: ResizeObserver | null = null;
   private wrapperResizeObserver: ResizeObserver | null = null;
+  /**
+   * 高亮事件处理函数
+   * @param event 事件对象
+   */
+  private highlightHandler = throttle((event: MouseEvent): void => {
+    this.emit('highlight', event);
+  }, throttleTime);
 
   constructor(config: StageMaskConfig) {
     const wrapper = createWrapper();
@@ -93,6 +103,7 @@ export default class StageMask extends Rule {
     this.content.addEventListener('mousedown', this.mouseDownHandler);
     this.wrapper.appendChild(this.content);
     this.content.addEventListener('wheel', this.mouseWheelHandler);
+    this.content.addEventListener('mousemove', this.highlightHandler);
   }
 
   public setMode(mode: Mode) {
@@ -203,7 +214,7 @@ export default class StageMask extends Rule {
    * 点击事件处理函数
    * @param event 事件对象
    */
-  private mouseDownHandler = async (event: MouseEvent): Promise<void> => {
+  private mouseDownHandler = (event: MouseEvent): void => {
     event.stopImmediatePropagation();
     event.stopPropagation();
 
@@ -218,10 +229,13 @@ export default class StageMask extends Rule {
 
     // 如果是右键点击，这里的mouseup事件监听没有效果
     globalThis.document.addEventListener('mouseup', this.mouseUpHandler);
+    this.content.removeEventListener('mousemove', this.highlightHandler);
+    this.emit('clearHighlight');
   };
 
   private mouseUpHandler = (): void => {
     globalThis.document.removeEventListener('mouseup', this.mouseUpHandler);
+    this.content.addEventListener('mousemove', this.highlightHandler);
     this.emit('select');
   };
 
