@@ -47,6 +47,7 @@ export default class StageCore extends EventEmitter {
   public highlightLayer: StageHighlight;
   public config: StageCoreConfig;
   public zoom = DEFAULT_ZOOM;
+  public container?: HTMLDivElement;
   private canSelect: CanSelect;
 
   constructor(config: StageCoreConfig) {
@@ -207,6 +208,7 @@ export default class StageCore extends EventEmitter {
    * @param el 将stage挂载到该Dom节点上
    */
   public mount(el: HTMLDivElement): void {
+    this.container = el;
     const { mask, renderer } = this;
 
     renderer.mount(el);
@@ -235,6 +237,8 @@ export default class StageCore extends EventEmitter {
     highlightLayer.destroy();
 
     this.removeAllListeners();
+
+    this.container = undefined;
   }
 
   private async getTargetElement(idOrEl: Id | HTMLElement): Promise<HTMLElement> {
