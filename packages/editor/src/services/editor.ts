@@ -51,6 +51,7 @@ class Editor extends BaseService {
     parent: null,
     node: null,
     stage: null,
+    highlightNode: null,
     modifiedNodeIds: new Map(),
   });
 
@@ -68,12 +69,13 @@ class Editor extends BaseService {
       'moveLayer',
       'undo',
       'redo',
+      'highlight',
     ]);
   }
 
   /**
    * 设置当前指点节点配置
-   * @param name 'root' | 'page' | 'parent' | 'node'
+   * @param name 'root' | 'page' | 'parent' | 'node' | 'highlightNode'
    * @param value MNode
    * @returns MNode
    */
@@ -166,28 +168,12 @@ class Editor extends BaseService {
   }
 
   /**
-   * 选中指点节点（将指点节点设置成当前选中状态）
-   * @param config 指点节点配置或者ID
+   * 选中指定节点（将指定节点设置成当前选中状态）
+   * @param config 指定节点配置或者ID
    * @returns 当前选中的节点配置
    */
-  public async select(config: MNode | Id): Promise<MNode> {
-    let id: Id;
-    if (typeof config === 'string' || typeof config === 'number') {
-      id = config;
-    } else {
-      id = config.id;
-    }
-    if (!id) {
-      throw new Error('没有ID，无法选中');
-    }
-
-    const { node, parent, page } = this.getNodeInfo(id);
-    if (!node) throw new Error('获取不到组件信息');
-
-    if (node.id === this.state.root?.id) {
-      throw new Error('不能选根节点');
-    }
-
+  public async select(config: MNode | Id): Promise<MNode> | never {
+    const { node, page, parent } = this.selectedConfigExceptionHandler(config);
     this.set('node', node);
     this.set('page', page || null);
     this.set('parent', parent || null);
@@ -197,8 +183,19 @@ class Editor extends BaseService {
     } else {
       historyService.empty();
     }
+    return node!;
+  }
 
-    return node;
+  /**
+   * 高亮指定节点
+   * @param config 指定节点配置或者ID
+   * @returns 当前高亮的节点配置
+   */
+  public highlight(config: MNode | Id): void {
+    const { node } = this.selectedConfigExceptionHandler(config);
+    const currentHighligtNode = this.get('highlightNode');
+    if (currentHighligtNode === node) return;
+    this.set('highlightNode', node);
   }
 
   /**
@@ -523,6 +520,30 @@ class Editor extends BaseService {
     }
 
     return newConfig;
+  }
+
+  private selectedConfigExceptionHandler(config: MNode | Id): EditorNodeInfo {
+    let id: Id;
+    if (typeof config === 'string' || typeof config === 'number') {
+      id = config;
+    } else {
+      id = config.id;
+    }
+    if (!id) {
+      throw new Error('没有ID，无法选中');
+    }
+
+    const { node, parent, page } = this.getNodeInfo(id);
+    if (!node) throw new Error('获取不到组件信息');
+
+    if (node.id === this.state.root?.id) {
+      throw new Error('不能选根节点');
+    }
+    return {
+      node,
+      parent,
+      page,
+    };
   }
 }
 

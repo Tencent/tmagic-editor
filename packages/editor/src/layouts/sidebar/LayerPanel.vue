@@ -29,11 +29,20 @@
       empty-text="页面空荡荡的"
     >
       <template #default="{ node, data }">
-        <slot name="layer-node-content" :node="node" :data="data">
-          <span>
-            {{ `${data.name} (${data.id})` }}
-          </span>
-        </slot>
+        <div
+          :id="data.id"
+          class="cus-tree-node"
+          @mousedown="toogleClickFlag"
+          @mouseup="toogleClickFlag"
+          @mouseenter="highlightHandler(data)"
+          :class="{ 'cus-tree-node-hover': canHighlight && data.id === highlightNode?.id }"
+        >
+          <slot name="layer-node-content" :node="node" :data="data">
+            <span>
+              {{ `${data.name} (${data.id})` }}
+            </span>
+          </slot>
+        </div>
       </template>
     </el-tree>
 
@@ -46,6 +55,7 @@
 <script lang="ts">
 import { computed, defineComponent, inject, onMounted, Ref, ref, watchEffect } from 'vue';
 import type { ElTree } from 'element-plus';
+import { throttle } from 'lodash-es';
 
 import type { MNode, MPage } from '@tmagic/schema';
 
@@ -54,12 +64,21 @@ import type { Services } from '@editor/type';
 
 import LayerMenu from './LayerMenu.vue';
 
+const throttleTime = 150;
+
 const select = (data: MNode, editorService?: EditorService) => {
   if (!data.id) {
     throw new Error('没有id');
   }
 
   editorService?.select(data);
+};
+
+const highlight = (data: MNode, editorService?: EditorService) => {
+  if (!data?.id) {
+    throw new Error('没有id');
+  }
+  editorService?.highlight(data);
 };
 
 const useDrop = (tree: Ref<InstanceType<typeof ElTree> | undefined>, editorService?: EditorService) => ({
@@ -87,19 +106,22 @@ const useDrop = (tree: Ref<InstanceType<typeof ElTree> | undefined>, editorServi
 });
 
 const useStatus = (tree: Ref<InstanceType<typeof ElTree> | undefined>, editorService?: EditorService) => {
+  const highlightNode = ref<MNode>();
+  const node = ref<MNode>();
   const page = computed(() => editorService?.get('page'));
 
   watchEffect(() => {
     if (!tree.value) return;
-
-    const node = editorService?.get('node');
-    node && tree.value.setCurrentKey(node.id, true);
+    node.value = editorService?.get('node');
+    node.value && tree.value.setCurrentKey(node.value.id, true);
 
     const parent = editorService?.get('parent');
     if (!parent?.id) return;
 
     const treeNode = tree.value.getNode(parent.id);
     treeNode?.updateChildren();
+
+    highlightNode.value = editorService?.get('highlightNode');
   });
 
   return {
@@ -114,6 +136,9 @@ const useStatus = (tree: Ref<InstanceType<typeof ElTree> | undefined>, editorSer
       }
       resolve([]);
     },
+
+    highlightNode,
+    clickNode: node,
   };
 };
 
@@ -188,11 +213,25 @@ export default defineComponent({
   setup() {
     const services = inject<Services>('services');
     const tree = ref<InstanceType<typeof ElTree>>();
+    const clicked = ref(false);
     const editorService = services?.editorService;
+    const highlightHandler = throttle((data: MNode) => {
+      highlight(data, editorService);
+    }, throttleTime);
+
+    const toogleClickFlag = () => {
+      clicked.value = !clicked.value;
+    };
+
+    const statusData = useStatus(tree, editorService);
+    const canHighlight = computed(
+      () => statusData.highlightNode.value?.id !== statusData.clickNode.value?.id && !clicked.value,
+    );
+
     return {
       tree,
+      ...statusData,
       ...useDrop(tree, editorService),
-      ...useStatus(tree, editorService),
       ...useFilter(tree),
       ...useContentMenu(editorService),
 
@@ -201,8 +240,12 @@ export default defineComponent({
           document.dispatchEvent(new CustomEvent('ui-select', { detail: data }));
           return;
         }
+        tree.value?.setCurrentKey(data.id);
         select(data, editorService);
       },
+      highlightHandler,
+      toogleClickFlag,
+      canHighlight,
     };
   },
 });
