@@ -358,7 +358,7 @@ export default class StageDragResize extends EventEmitter {
     }
 
     return {
-      origin: true,
+      origin: false,
       rootContainer: this.core.container,
       zoom: 1,
       dragArea: false,
