@@ -114,3 +114,8 @@ export interface Magic {
 export interface RuntimeWindow extends Window {
   magic: Magic;
 }
+
+export interface StageHighlightConfig {
+  core: StageCore;
+  container: HTMLElement;
+}

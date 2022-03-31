@@ -110,7 +110,7 @@ export default defineComponent({
     },
   },
 
-  emits: ['select', 'update', 'sort'],
+  emits: ['select', 'update', 'sort', 'highlight'],
 
   setup(props, { emit }) {
     const services = inject<Services>('services');
@@ -124,6 +124,7 @@ export default defineComponent({
     const page = computed(() => services?.editorService.get<MPage>('page'));
     const zoom = computed(() => services?.uiService.get<number>('zoom'));
     const node = computed(() => services?.editorService.get<MNode>('node'));
+    const highlightNode = computed(() => services?.editorService.get<MNode>('highlightNode'));
 
     let stage: StageCore | null = null;
     let runtime: Runtime | null = null;
@@ -155,7 +156,13 @@ export default defineComponent({
 
       stage?.mount(stageContainer.value);
 
-      stage?.on('select', (el: HTMLElement) => emit('select', el));
+      stage?.on('select', (el: HTMLElement) => {
+        emit('select', el);
+      });
+
+      stage?.on('highlight', (el: HTMLElement) => {
+        emit('highlight', el);
+      });
 
       stage?.on('update', (ev: UpdateEventData) => {
         emit('update', { id: ev.el.id, style: ev.style });
@@ -198,6 +205,15 @@ export default defineComponent({
         nextTick(() => {
           // 等待相关dom变更完成后，再select，适用大多数场景
           id && stage?.select(id);
+        });
+      },
+    );
+
+    watch(
+      () => highlightNode.value?.id,
+      (id) => {
+        nextTick(() => {
+          id && stage?.highlight(id);
         });
       },
     );

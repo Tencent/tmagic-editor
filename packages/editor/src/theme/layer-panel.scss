@@ -50,6 +50,15 @@
   color: #fff;
 }
 
+.magic-editor-layer-panel .cus-tree-node {
+  width: 100%;
+}
+
+.magic-editor-layer-panel .cus-tree-node-hover {
+  background-color: #f3f5f9;
+  width: 100%;
+}
+
 .magic-editor-layer-panel .el-tree-node:focus > .el-tree-node__content {
   background-color: $--sidebar-heder-background-color;
   color: #fff;

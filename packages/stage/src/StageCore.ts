@@ -22,6 +22,7 @@ import { Id } from '@tmagic/schema';
 
 import { DEFAULT_ZOOM, GHOST_EL_ID_PREFIX } from './const';
 import StageDragResize from './StageDragResize';
+import StageHighlight from './StageHighlight';
 import StageMask from './StageMask';
 import StageRender from './StageRender';
 import {
@@ -37,10 +38,12 @@ import {
 
 export default class StageCore extends EventEmitter {
   public selectedDom: Element | undefined;
+  public highlightedDom: Element | undefined;
 
   public renderer: StageRender;
   public mask: StageMask;
   public dr: StageDragResize;
+  public highlightLayer: StageHighlight;
   public config: StageCoreConfig;
   public zoom = DEFAULT_ZOOM;
   private canSelect: CanSelect;
@@ -56,6 +59,7 @@ export default class StageCore extends EventEmitter {
     this.renderer = new StageRender({ core: this });
     this.mask = new StageMask({ core: this });
     this.dr = new StageDragResize({ core: this, container: this.mask.content });
+    this.highlightLayer = new StageHighlight({ core: this, container: this.mask.content });
 
     this.renderer.on('runtime-ready', (runtime: Runtime) => this.emit('runtime-ready', runtime));
     this.renderer.on('page-el-update', (el: HTMLElement) => this.mask?.observe(el));
@@ -70,6 +74,14 @@ export default class StageCore extends EventEmitter {
       .on('changeGuides', (data: GuidesEventData) => {
         this.dr.setGuidelines(data.type, data.guides);
         this.emit('changeGuides', data);
+      })
+      .on('highlight', async (event: MouseEvent) => {
+        await this.setElementFromPoint(event);
+        this.highlightLayer.highlight(this.highlightedDom as HTMLElement);
+        this.emit('highlight', this.highlightedDom);
+      })
+      .on('clearHighlight', async () => {
+        this.highlightLayer.clearHighlight();
       });
 
     // 要先触发select，在触发update
@@ -104,6 +116,10 @@ export default class StageCore extends EventEmitter {
     for (const el of els) {
       if (!el.id.startsWith(GHOST_EL_ID_PREFIX) && (await this.canSelect(el, stop))) {
         if (stopped) break;
+        if (event.type === 'mousemove') {
+          this.highlight(el);
+          break;
+        }
         this.select(el, event);
         break;
       }
@@ -115,14 +131,7 @@ export default class StageCore extends EventEmitter {
    * @param idOrEl 组件Dom节点的id属性，或者Dom节点
    */
   public async select(idOrEl: Id | HTMLElement, event?: MouseEvent): Promise<void> {
-    let el;
-    if (typeof idOrEl === 'string' || typeof idOrEl === 'number') {
-      const runtime = await this.renderer?.getRuntime();
-      el = await runtime?.select?.(`${idOrEl}`);
-      if (!el) throw new Error(`不存在ID为${idOrEl}的元素`);
-    } else {
-      el = idOrEl;
-    }
+    const el = await this.getTargetElement(idOrEl);
 
     if (el === this.selectedDom) return;
 
@@ -155,6 +164,17 @@ export default class StageCore extends EventEmitter {
         }
       }, 0);
     });
+  }
+
+  /**
+   * 高亮选中组件
+   * @param el 页面Dom节点
+   */
+  public async highlight(idOrEl: HTMLElement | Id): Promise<void> {
+    const el = await this.getTargetElement(idOrEl);
+    if (el === this.highlightedDom) return;
+    this.highlightLayer.highlight(el);
+    this.highlightedDom = el;
   }
 
   public sortNode(data: SortEventData): void {
@@ -198,12 +218,25 @@ export default class StageCore extends EventEmitter {
    * 销毁实例
    */
   public destroy(): void {
-    const { mask, renderer, dr } = this;
+    const { mask, renderer, dr, highlightLayer } = this;
 
     renderer.destroy();
     mask.destroy();
     dr.destroy();
+    highlightLayer.destroy();
 
     this.removeAllListeners();
+  }
+
+  private async getTargetElement(idOrEl: Id | HTMLElement): Promise<HTMLElement> {
+    let el;
+    if (typeof idOrEl === 'string' || typeof idOrEl === 'number') {
+      const runtime = await this.renderer?.getRuntime();
+      el = await runtime?.select?.(`${idOrEl}`);
+      if (!el) throw new Error(`不存在ID为${idOrEl}的元素`);
+    } else {
+      el = idOrEl;
+    }
+    return el;
   }
 }
