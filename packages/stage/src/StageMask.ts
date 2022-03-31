@@ -85,6 +85,13 @@ export default class StageMask extends Rule {
   private mode: Mode = Mode.ABSOLUTE;
   private pageResizeObserver: ResizeObserver | null = null;
   private wrapperResizeObserver: ResizeObserver | null = null;
+  /**
+   * 高亮事件处理函数
+   * @param event 事件对象
+   */
+  private highlightHandler = throttle((event: MouseEvent): void => {
+    this.emit('highlight', event);
+  }, throttleTime);
 
   constructor(config: StageMaskConfig) {
     const wrapper = createWrapper();
@@ -96,7 +103,7 @@ export default class StageMask extends Rule {
     this.content.addEventListener('mousedown', this.mouseDownHandler);
     this.wrapper.appendChild(this.content);
     this.content.addEventListener('wheel', this.mouseWheelHandler);
-    this.content.addEventListener('mousemove', throttle(this.highlightHandler, throttleTime));
+    this.content.addEventListener('mousemove', this.highlightHandler);
   }
 
   public setMode(mode: Mode) {
@@ -228,7 +235,7 @@ export default class StageMask extends Rule {
 
   private mouseUpHandler = (): void => {
     globalThis.document.removeEventListener('mouseup', this.mouseUpHandler);
-    this.content.addEventListener('mousemove', throttle(this.highlightHandler, throttleTime));
+    this.content.addEventListener('mousemove', this.highlightHandler);
     this.emit('select');
   };
 
@@ -270,13 +277,5 @@ export default class StageMask extends Rule {
     this.scroll();
 
     this.emit('scroll', event);
-  };
-
-  /**
-   * 高亮事件处理函数
-   * @param event 事件对象
-   */
-  private highlightHandler = (event: MouseEvent): void => {
-    this.emit('highlight', event);
   };
 }
