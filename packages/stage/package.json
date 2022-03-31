@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-beta.8",
+  "version": "1.0.0-beta.9",
   "name": "@tmagic/stage",
   "sideEffects": false,
   "main": "dist/tmagic-stage.umd.js",
@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@scena/guides": "^0.17.0",
-    "@tmagic/schema": "^1.0.0-beta.8",
+    "@tmagic/schema": "^1.0.0-beta.9",
     "@tmagic/utils": "^1.0.0-beta.8",
     "events": "^3.3.0",
     "lodash-es": "^4.17.21",
