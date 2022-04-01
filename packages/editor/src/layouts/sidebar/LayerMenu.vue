@@ -3,8 +3,8 @@
     <div
       v-if="node.items"
       class="magic-editor-content-menu-item"
-      @mouseenter="setSubVisiable(true)"
-      @mouseleave="setSubVisiable(false)"
+      @mouseenter="setSubVisitable(true)"
+      @mouseleave="setSubVisitable(false)"
     >
       新增
     </div>
@@ -16,7 +16,7 @@
     >
       删除
     </div>
-    <div class="subMenu" v-show="subVisible" @mouseenter="setSubVisiable(true)" @mouseleave="setSubVisiable(false)">
+    <div class="subMenu" v-show="subVisible" @mouseenter="setSubVisitable(true)" @mouseleave="setSubVisitable(false)">
       <el-scrollbar>
         <template v-if="node.type === 'tabs'">
           <div
@@ -31,20 +31,8 @@
             标签
           </div>
         </template>
-
-        <template v-else-if="node.type === 'app'">
-          <div
-            class="magic-editor-content-menu-item"
-            v-for="item in menu.app"
-            :key="item.type"
-            @click="() => append(item)"
-          >
-            {{ item.text }}
-          </div>
-        </template>
-
         <template v-else-if="node.items">
-          <div v-for="list in menu.component" :key="list.title">
+          <div v-for="list in componentGroupList" :key="list.title">
             <template v-for="item in list.items">
               <div class="magic-editor-content-menu-item" v-if="item" :key="item.type" @click="() => append(item)">
                 {{ item.text }}
@@ -59,21 +47,16 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, inject, PropType, ref } from 'vue';
+import { computed, defineComponent, inject, ref } from 'vue';
 
-import type { ComponentGroup, Services } from '@editor/type';
+import type { MNode } from '@tmagic/schema';
+
+import type { AddMNode, Services } from '@editor/type';
 
 export default defineComponent({
   name: 'magic-editor-content-menu',
 
-  props: {
-    componentGroupList: {
-      type: Array as PropType<ComponentGroup[]>,
-      default: () => [],
-    },
-  },
-
-  setup(props) {
+  setup() {
     const services = inject<Services>('services');
     const subVisible = ref(false);
     const node = computed(() => services?.editorService.get('node'));
@@ -83,17 +66,9 @@ export default defineComponent({
 
       node,
 
-      menu: computed(() => ({
-        app: [
-          {
-            type: 'page',
-            text: '页面',
-          },
-        ],
-        component: props.componentGroupList,
-      })),
+      componentGroupList: computed(() => services?.componentListService.getList()),
 
-      append(config: any) {
+      append(config: AddMNode) {
         services?.editorService.add({
           name: config.text,
           type: config.type,
@@ -104,11 +79,11 @@ export default defineComponent({
         node.value && services?.editorService.remove(node.value);
       },
 
-      copy(node: any) {
-        services?.editorService.copy(node);
+      copy(node?: MNode) {
+        node && services?.editorService.copy(node);
       },
 
-      setSubVisiable(v: any) {
+      setSubVisitable(v: boolean) {
         subVisible.value = v;
       },
     };
