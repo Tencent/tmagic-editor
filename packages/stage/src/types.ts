@@ -94,7 +94,7 @@ export interface RemoveData {
 
 export interface Runtime {
   beforeSelect?: (el: HTMLElement) => Promise<boolean> | boolean;
-  getSnapElements?: (el: HTMLElement) => HTMLElement[];
+  getSnapElements?: (el?: HTMLElement) => HTMLElement[];
   updateRootConfig: (config: MApp) => void;
   updatePageId?: (id: Id) => void;
   select?: (id: Id) => Promise<HTMLElement> | HTMLElement;

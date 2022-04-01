@@ -23,9 +23,9 @@ import type { MoveableOptions } from 'moveable';
 import Moveable from 'moveable';
 import MoveableHelper from 'moveable-helper';
 
-import { GHOST_EL_ID_PREFIX, GuidesType, Mode } from './const';
+import { DRAG_EL_ID_PREFIX, GHOST_EL_ID_PREFIX, GuidesType, Mode } from './const';
 import StageCore from './StageCore';
-import type { SortEventData, StageDragResizeConfig } from './types';
+import type { Offset, Runtime, SortEventData, StageDragResizeConfig } from './types';
 import { getAbsolutePosition, getMode, getOffset } from './util';
 
 enum ActionStatus {
@@ -45,6 +45,7 @@ export default class StageDragResize extends EventEmitter {
   public moveable?: Moveable;
   public horizontalGuidelines: number[] = [];
   public verticalGuidelines: number[] = [];
+  public elementGuidelines: HTMLElement[] = [];
 
   private moveableOptions: MoveableOptions = {};
   private dragStatus: ActionStatus = ActionStatus.END;
@@ -65,29 +66,36 @@ export default class StageDragResize extends EventEmitter {
    * @param el 选中组件的Dom节点元素
    * @param event 鼠标事件
    */
-  public async select(el: HTMLElement, event?: MouseEvent): Promise<void> {
+  public select(el: HTMLElement, event?: MouseEvent): void {
     this.target = el;
     // 如果有滚动条会导致resize时获取到width，height不准确
     if (/(auto|scroll)/.test(this.target.style.overflow)) {
       this.target.style.overflow = 'hidden';
     }
     this.mode = getMode(el);
-    this.destroyDragEl();
+
     this.destroyGhostEl();
 
-    this.dragEl = this.generateDragEl(el);
+    this.generateDragEl(el);
 
-    this.moveableOptions = await this.getOptions({
-      target: this.dragEl || this.target,
+    const originDraggable = this.moveableOptions.draggable;
+
+    this.moveableOptions = this.getOptions({
+      target: this.dragEl,
     });
 
-    this.moveableHelper = MoveableHelper.create({
-      useBeforeRender: true,
-      useRender: false,
-      createAuto: true,
-    });
+    // 从不能拖动到能拖动的节点之间切换，要重新创建moveable，不然dragStart不生效
+    if (!this.moveable || originDraggable !== this.moveableOptions.draggable) {
+      this.moveableHelper = MoveableHelper.create({
+        useBeforeRender: true,
+        useRender: false,
+        createAuto: true,
+      });
 
-    this.initMoveable();
+      this.initMoveable();
+    } else {
+      this.refresh();
+    }
 
     if (event) {
       this.moveable?.dragStart(event);
@@ -97,11 +105,10 @@ export default class StageDragResize extends EventEmitter {
   /**
    * 初始化选中框并渲染出来
    */
-  public async refresh() {
+  public refresh() {
     if (!this.moveable) throw new Error('未初始化moveable');
 
-    const options = await this.getOptions();
-    Object.entries(options).forEach(([key, value]) => {
+    Object.entries(this.moveableOptions).forEach(([key, value]) => {
       (this.moveable as any)[key] = value;
     });
     this.moveable.updateTarget();
@@ -110,16 +117,20 @@ export default class StageDragResize extends EventEmitter {
   public setGuidelines(type: GuidesType, guidelines: number[]): void {
     if (type === GuidesType.HORIZONTAL) {
       this.horizontalGuidelines = guidelines;
+      this.moveableOptions.horizontalGuidelines = guidelines;
     } else if (type === GuidesType.VERTICAL) {
       this.verticalGuidelines = guidelines;
+      this.moveableOptions.verticalGuidelines = guidelines;
     }
 
     this.refresh();
   }
 
   public clearGuides() {
-    this.verticalGuidelines = [];
     this.horizontalGuidelines = [];
+    this.verticalGuidelines = [];
+    this.moveableOptions.horizontalGuidelines = [];
+    this.moveableOptions.verticalGuidelines = [];
     this.refresh();
   }
 
@@ -196,10 +207,7 @@ export default class StageDragResize extends EventEmitter {
   private bindDragEvent(): void {
     if (!this.moveable) throw new Error('moveable 为初始化');
 
-    let offset = {
-      left: 0,
-      top: 0,
-    };
+    let offset: Offset | null = null;
 
     this.moveable
       .on('dragStart', (e) => {
@@ -209,14 +217,17 @@ export default class StageDragResize extends EventEmitter {
 
         this.moveableHelper?.onDragStart(e);
 
-        offset = getAbsolutePosition(this.target, { left: 0, top: 0 });
-
         if (this.mode === Mode.SORTABLE) {
           this.ghostEl = this.generateGhostEl(this.target);
         }
       })
       .on('drag', (e) => {
         if (!this.target || !this.dragEl) return;
+
+        if (!offset) {
+          offset = getAbsolutePosition(this.target, { left: 0, top: 0 });
+        }
+
         this.dragStatus = ActionStatus.ING;
 
         const { left, top } = e;
@@ -244,24 +255,23 @@ export default class StageDragResize extends EventEmitter {
               this.update();
           }
         }
+        offset = null;
 
         this.dragStatus = ActionStatus.END;
         this.destroyGhostEl();
       });
   }
 
-  private async getSnapElements(el: HTMLElement): Promise<HTMLElement[]> {
-    const { renderer } = this.core;
+  private getSnapElements(runtime: Runtime, el?: HTMLElement): HTMLElement[] {
+    const { renderer, mask } = this.core;
     const getSnapElements =
-      (await renderer.getRuntime())?.getSnapElements ||
+      runtime?.getSnapElements ||
       (() => {
         const doc = renderer.contentWindow?.document;
         return doc ? Array.from(doc.querySelectorAll('[id]')) : [];
       });
-    return (
-      getSnapElements(el)
-        // 排除掉当前组件本身
-        .filter((element) => element !== this.target && !this.target?.contains(element))
+    return getSnapElements(el).filter(
+      (element) => element !== this.target && !this.target?.contains(element) && element !== mask.page,
     );
   }
 
@@ -307,7 +317,7 @@ export default class StageDragResize extends EventEmitter {
 
     const ghostEl = el.cloneNode(true) as HTMLElement;
     const { top, left } = getAbsolutePosition(el, getOffset(el));
-    ghostEl.id = `${GHOST_EL_ID_PREFIX}${ghostEl.id}`;
+    ghostEl.id = `${GHOST_EL_ID_PREFIX}${el.id}`;
     ghostEl.style.zIndex = '5';
     ghostEl.style.opacity = '.5';
     ghostEl.style.position = 'absolute';
@@ -322,23 +332,24 @@ export default class StageDragResize extends EventEmitter {
     this.ghostEl = undefined;
   }
 
-  private generateDragEl(el: HTMLElement): HTMLElement {
-    if (this.dragEl) {
-      this.destroyDragEl();
-    }
-
+  private generateDragEl(el: HTMLElement) {
     const { width, height } = el.getBoundingClientRect();
     const offset = getOffset(el);
-    const dragEl = globalThis.document.createElement('div');
-    dragEl.style.cssText = `
+
+    if (!this.dragEl) {
+      this.dragEl = globalThis.document.createElement('div');
+      this.container.append(this.dragEl);
+    }
+
+    this.dragEl.style.cssText = `
       position: absolute;
       left: ${offset.left}px;
       top: ${offset.top}px;
       width: ${width}px;
       height: ${height}px;
     `;
-    this.container.append(dragEl);
-    return dragEl;
+
+    this.dragEl.id = `${DRAG_EL_ID_PREFIX}${el.id}`;
   }
 
   private destroyDragEl(): void {
@@ -346,7 +357,7 @@ export default class StageDragResize extends EventEmitter {
     this.dragEl = undefined;
   }
 
-  private async getOptions(options: MoveableOptions = {}): Promise<MoveableOptions> {
+  private getOptions(options: MoveableOptions = {}): MoveableOptions {
     if (!this.target) return {};
 
     const isAbsolute = this.mode === Mode.ABSOLUTE;
@@ -378,8 +389,16 @@ export default class StageDragResize extends EventEmitter {
         center: isAbsolute,
         middle: isAbsolute,
       },
+      elementSnapDirections: {
+        top: isAbsolute,
+        right: isAbsolute,
+        bottom: isAbsolute,
+        left: isAbsolute,
+      },
+      isDisplayInnerSnapDigit: true,
       horizontalGuidelines: this.horizontalGuidelines,
       verticalGuidelines: this.verticalGuidelines,
+      elementGuidelines: this.elementGuidelines,
 
       bounds: {
         top: 0,

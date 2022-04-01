@@ -63,8 +63,12 @@ export default class StageCore extends EventEmitter {
     this.dr = new StageDragResize({ core: this, container: this.mask.content });
     this.highlightLayer = new StageHighlight({ core: this, container: this.mask.wrapper });
 
-    this.renderer.on('runtime-ready', (runtime: Runtime) => this.emit('runtime-ready', runtime));
-    this.renderer.on('page-el-update', (el: HTMLElement) => this.mask?.observe(el));
+    this.renderer.on('runtime-ready', (runtime: Runtime) => {
+      this.emit('runtime-ready', runtime);
+    });
+    this.renderer.on('page-el-update', (el: HTMLElement) => {
+      this.mask?.observe(el);
+    });
 
     this.mask
       .on('beforeSelect', (event: MouseEvent) => {
@@ -139,12 +143,14 @@ export default class StageCore extends EventEmitter {
 
     const runtime = await this.renderer.getRuntime();
 
+    await runtime?.select?.(el.id);
+
     if (runtime?.beforeSelect) {
       await runtime.beforeSelect(el);
     }
 
     this.mask.setLayout(el);
-    this.dr?.select(el, event);
+    this.dr.select(el, event);
     this.selectedDom = el;
 
     if (this.renderer.contentWindow) {
@@ -170,7 +176,7 @@ export default class StageCore extends EventEmitter {
         if (el) {
           // 更新了组件的布局，需要重新设置mask是否可以滚动
           this.mask.setLayout(el);
-          this.dr?.select(el);
+          this.dr.select(el);
         }
       }, 0);
     });
@@ -242,14 +248,11 @@ export default class StageCore extends EventEmitter {
   }
 
   private async getTargetElement(idOrEl: Id | HTMLElement): Promise<HTMLElement> {
-    let el;
     if (typeof idOrEl === 'string' || typeof idOrEl === 'number') {
-      const runtime = await this.renderer?.getRuntime();
-      el = await runtime?.select?.(`${idOrEl}`);
+      const el = this.renderer.contentWindow?.document.getElementById(`${idOrEl}`);
       if (!el) throw new Error(`不存在ID为${idOrEl}的元素`);
-    } else {
-      el = idOrEl;
+      return el;
     }
-    return el;
+    return idOrEl;
   }
 }
