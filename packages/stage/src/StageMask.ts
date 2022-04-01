@@ -225,12 +225,13 @@ export default class StageMask extends Rule {
       return;
     }
 
+    this.content.removeEventListener('mousemove', this.highlightHandler);
+    this.emit('clearHighlight');
+
     this.emit('beforeSelect', event);
 
     // 如果是右键点击，这里的mouseup事件监听没有效果
     globalThis.document.addEventListener('mouseup', this.mouseUpHandler);
-    this.content.removeEventListener('mousemove', this.highlightHandler);
-    this.emit('clearHighlight');
   };
 
   private mouseUpHandler = (): void => {

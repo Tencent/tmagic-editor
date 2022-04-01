@@ -59,6 +59,7 @@ import { throttle } from 'lodash-es';
 
 import type { MNode, MPage } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
+import StageCore from '@tmagic/stage';
 
 import type { EditorService } from '@editor/services/editor';
 import type { Services } from '@editor/type';
@@ -73,6 +74,7 @@ const select = (data: MNode, editorService?: EditorService) => {
   }
 
   editorService?.select(data);
+  editorService?.get<StageCore>('stage')?.select(data.id);
 };
 
 const highlight = (data: MNode, editorService?: EditorService) => {
@@ -80,6 +82,7 @@ const highlight = (data: MNode, editorService?: EditorService) => {
     throw new Error('没有id');
   }
   editorService?.highlight(data);
+  editorService?.get<StageCore>('stage')?.highlight(data.id);
 };
 
 const useDrop = (tree: Ref<InstanceType<typeof ElTree> | undefined>, editorService?: EditorService) => ({
