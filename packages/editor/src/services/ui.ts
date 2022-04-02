@@ -25,6 +25,9 @@ import type { GetColumnWidth, SetColumnWidth, StageRect, UiState } from '@editor
 
 import BaseService from './BaseService';
 
+const DEFAULT_LEFT_COLUMN_WIDTH = 310;
+const DEFAULT_RIGHT_COLUMN_WIDTH = 480;
+
 const state = reactive<UiState>({
   uiSelectMode: false,
   showSrc: false,
@@ -38,9 +41,9 @@ const state = reactive<UiState>({
     height: 817,
   },
   columnWidth: {
-    left: 310,
-    center: globalThis.document.body.clientWidth - 310 - 400,
-    right: 400,
+    left: DEFAULT_LEFT_COLUMN_WIDTH,
+    center: globalThis.document.body.clientWidth - DEFAULT_LEFT_COLUMN_WIDTH - DEFAULT_RIGHT_COLUMN_WIDTH,
+    right: DEFAULT_RIGHT_COLUMN_WIDTH,
   },
   showGuides: true,
   showRule: true,
