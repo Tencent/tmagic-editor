@@ -120,7 +120,7 @@ export default class StageCore extends EventEmitter {
     let stopped = false;
     const stop = () => (stopped = true);
     for (const el of els) {
-      if (!el.id.startsWith(GHOST_EL_ID_PREFIX) && (await this.canSelect(el, stop))) {
+      if (!el.id.startsWith(GHOST_EL_ID_PREFIX) && (await this.canSelect(el, event, stop))) {
         if (stopped) break;
         if (event.type === 'mousemove') {
           this.highlight(el);

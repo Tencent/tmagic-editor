@@ -23,7 +23,7 @@ import { Id, MApp, MNode } from '@tmagic/schema';
 import { GuidesType } from './const';
 import StageCore from './StageCore';
 
-export type CanSelect = (el: HTMLElement, stop: () => boolean) => boolean | Promise<boolean>;
+export type CanSelect = (el: HTMLElement, event: MouseEvent, stop: () => boolean) => boolean | Promise<boolean>;
 
 export type StageCoreConfig = {
   /** 需要对齐的dom节点的CSS选择器字符串 */

@@ -138,10 +138,10 @@ export default defineComponent({
         render: props.render,
         runtimeUrl: props.runtimeUrl,
         zoom: zoom.value,
-        canSelect: (el, stop) => {
+        canSelect: (el, event, stop) => {
           const elCanSelect = props.canSelect(el);
           // 在组件联动过程中不能再往下选择，返回并触发 ui-select
-          if (uiSelectMode.value && elCanSelect) {
+          if (uiSelectMode.value && elCanSelect && event.type === 'mousedown') {
             document.dispatchEvent(new CustomEvent('ui-select', { detail: el }));
             return stop();
           }
