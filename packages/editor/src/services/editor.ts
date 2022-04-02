@@ -232,7 +232,9 @@ class Editor extends BaseService {
 
     parentNode?.items?.push(newNode);
 
-    await this.get<StageCore>('stage')?.add({ config: cloneDeep(newNode), root: cloneDeep(this.get('root')) });
+    const stage = this.get<StageCore>('stage');
+
+    await stage?.add({ config: cloneDeep(newNode), root: cloneDeep(this.get('root')) });
 
     await this.select(newNode);
 
@@ -240,6 +242,8 @@ class Editor extends BaseService {
     if (type !== NodeType.PAGE) {
       this.pushHistoryState();
     }
+
+    stage?.select(newNode.id);
 
     return newNode;
   }
@@ -265,12 +269,17 @@ class Editor extends BaseService {
     if (typeof index !== 'number' || index === -1) throw new Error('找不要删除的节点');
 
     parent.items?.splice(index, 1);
-    this.get<StageCore>('stage')?.remove({ id: node.id, root: this.get('root') });
+    const stage = this.get<StageCore>('stage');
+    stage?.remove({ id: node.id, root: this.get('root') });
 
     if (node.type === NodeType.PAGE) {
-      await this.select(root.items[0] || root);
+      if (root.items[0]) {
+        await this.select(root.items[0]);
+        stage.select(root.items[0].id);
+      }
     } else {
       await this.select(parent);
+      stage.select(parent.id);
     }
 
     this.addModifiedNodeId(parent.id);
@@ -324,7 +333,7 @@ class Editor extends BaseService {
 
     parentNodeItems[index] = newConfig;
 
-    if (newConfig.id === this.get('node').id) {
+    if (`${newConfig.id}` === `${this.get('node').id}`) {
       this.set('node', newConfig);
     }
 
