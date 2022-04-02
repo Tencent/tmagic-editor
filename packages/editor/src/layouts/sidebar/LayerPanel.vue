@@ -156,12 +156,10 @@ const useFilter = (tree: Ref<InstanceType<typeof ElTree> | undefined>) => ({
     let name = '';
     if (data.name) {
       name = data.name;
-    } else if (data.type) {
-      name = data.type;
     } else if (data.items) {
       name = 'container';
     }
-    return name.indexOf(value) !== -1;
+    return `${data.id}${name}${data.type}`.indexOf(value) !== -1;
   },
 
   filterTextChangeHandler(val: string) {
