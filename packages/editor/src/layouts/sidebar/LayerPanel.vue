@@ -68,12 +68,12 @@ import LayerMenu from './LayerMenu.vue';
 
 const throttleTime = 150;
 
-const select = (data: MNode, editorService?: EditorService) => {
+const select = async (data: MNode, editorService?: EditorService) => {
   if (!data.id) {
     throw new Error('没有id');
   }
 
-  editorService?.select(data);
+  await editorService?.select(data);
   editorService?.get<StageCore>('stage')?.select(data.id);
 };
 
