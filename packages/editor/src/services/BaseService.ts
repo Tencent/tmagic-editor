@@ -24,6 +24,46 @@ const methodName = (prefix: string, name: string) => `${prefix}${name[0].toUpper
 
 const isError = (error: any): boolean => Object.prototype.toString.call(error) === '[object Error]';
 
+const doAction = async (
+  args: any[],
+  scope: any,
+  sourceMethod: any,
+  beforeMethodName: string,
+  afterMethodName: string,
+  fn: (args: any[], next?: Function | undefined) => Promise<void>,
+) => {
+  try {
+    let beforeArgs = args;
+
+    for (const beforeMethod of scope.pluginOptionsList[beforeMethodName]) {
+      let beforeReturnValue = (await beforeMethod(...beforeArgs)) || [];
+
+      if (isError(beforeReturnValue)) throw beforeReturnValue;
+
+      if (!Array.isArray(beforeReturnValue)) {
+        beforeReturnValue = [beforeReturnValue];
+      }
+
+      beforeArgs = beforeArgs.map((v: any, index: number) => {
+        if (typeof beforeReturnValue[index] === 'undefined') return v;
+        return beforeReturnValue[index];
+      });
+    }
+
+    let returnValue: any = await fn(beforeArgs, sourceMethod.bind(scope));
+
+    for (const afterMethod of scope.pluginOptionsList[afterMethodName]) {
+      returnValue = await afterMethod(...beforeArgs, returnValue);
+
+      if (isError(returnValue)) throw returnValue;
+    }
+
+    return returnValue;
+  } catch (error) {
+    throw error;
+  }
+};
+
 /**
  * 提供两种方式对Class进行扩展
  * 方法1：
@@ -74,8 +114,10 @@ const isError = (error: any): boolean => Object.prototype.toString.call(error) =
 export default class extends EventEmitter {
   private pluginOptionsList: Record<string, Function[]> = {};
   private middleware: Record<string, Function[]> = {};
+  private taskList: (() => Promise<void>)[] = [];
+  private doingTask = false;
 
-  constructor(methods: string[]) {
+  constructor(methods: string[] = [], serialMethods: string[] = []) {
     super();
 
     methods.forEach((propertyName: string) => {
@@ -93,32 +135,28 @@ export default class extends EventEmitter {
       const fn = compose(this.middleware[propertyName]);
       Object.defineProperty(scope, propertyName, {
         value: async (...args: any[]) => {
-          let beforeArgs = args;
+          if (!serialMethods.includes(propertyName)) {
+            return doAction(args, scope, sourceMethod, beforeMethodName, afterMethodName, fn);
+          }
 
-          for (const beforeMethod of this.pluginOptionsList[beforeMethodName]) {
-            let beforeReturnValue = (await beforeMethod(...beforeArgs)) || [];
-
-            if (isError(beforeReturnValue)) throw beforeReturnValue;
-
-            if (!Array.isArray(beforeReturnValue)) {
-              beforeReturnValue = [beforeReturnValue];
-            }
-
-            beforeArgs = beforeArgs.map((v: any, index: number) => {
-              if (typeof beforeReturnValue[index] === 'undefined') return v;
-              return beforeReturnValue[index];
+          // 由于async await，所以会出现函数执行到await时让出线程，导致执行顺序出错，例如调用了select(1) -> update -> select(2)，这个时候就有可能出现update了2；
+          // 这里保证函数调用严格按顺序执行；
+          const promise = new Promise<any>((resolve, reject) => {
+            this.taskList.push(async () => {
+              try {
+                const value = await doAction(args, scope, sourceMethod, beforeMethodName, afterMethodName, fn);
+                resolve(value);
+              } catch (e) {
+                reject(e);
+              }
             });
+          });
+
+          if (!this.doingTask) {
+            this.doTask();
           }
 
-          let returnValue = await fn(beforeArgs, sourceMethod.bind(scope));
-
-          for (const afterMethod of this.pluginOptionsList[afterMethodName]) {
-            returnValue = await afterMethod(...beforeArgs, returnValue);
-
-            if (isError(returnValue)) throw returnValue;
-          }
-
-          return returnValue;
+          return promise;
         },
       });
     });
@@ -134,5 +172,15 @@ export default class extends EventEmitter {
     Object.entries(options).forEach(([methodName, method]: [string, Function]) => {
       if (typeof method === 'function') this.pluginOptionsList[methodName].push(method);
     });
+  }
+
+  private async doTask() {
+    this.doingTask = true;
+    let task = this.taskList.shift();
+    while (task) {
+      await task();
+      task = this.taskList.shift();
+    }
+    this.doingTask = false;
   }
 }

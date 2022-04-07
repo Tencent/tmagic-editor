@@ -57,21 +57,25 @@ class Editor extends BaseService {
   });
 
   constructor() {
-    super([
-      'getLayout',
-      'select',
-      'add',
-      'remove',
-      'update',
-      'sort',
-      'copy',
-      'paste',
-      'alignCenter',
-      'moveLayer',
-      'undo',
-      'redo',
-      'highlight',
-    ]);
+    super(
+      [
+        'getLayout',
+        'select',
+        'add',
+        'remove',
+        'update',
+        'sort',
+        'copy',
+        'paste',
+        'alignCenter',
+        'moveLayer',
+        'undo',
+        'redo',
+        'highlight',
+      ],
+      // 需要注意循环依赖问题，如果函数间有相互调用的话，不能设置为串行调用
+      ['select', 'update', 'moveLayer'],
+    );
   }
 
   /**
@@ -194,8 +198,8 @@ class Editor extends BaseService {
    */
   public highlight(config: MNode | Id): void {
     const { node } = this.selectedConfigExceptionHandler(config);
-    const currentHighligtNode = this.get('highlightNode');
-    if (currentHighligtNode === node) return;
+    const currentHighlightNode = this.get('highlightNode');
+    if (currentHighlightNode === node) return;
     this.set('highlightNode', node);
   }
 
@@ -335,9 +339,8 @@ class Editor extends BaseService {
 
     if (`${newConfig.id}` === `${this.get('node').id}`) {
       this.set('node', newConfig);
+      this.get<StageCore>('stage')?.update({ config: cloneDeep(newConfig), root: this.get('root') });
     }
-
-    this.get<StageCore>('stage')?.update({ config: cloneDeep(newConfig), root: this.get('root') });
 
     if (newConfig.type === NodeType.PAGE) {
       this.set('page', newConfig);
