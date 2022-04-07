@@ -37,6 +37,10 @@ const storeState: any = {
   },
 };
 
+const componentListService = {
+  getList: jest.fn(),
+};
+
 const editorService = {
   get: jest.fn((key: string) => storeState[key]),
   add: jest.fn(),
@@ -51,6 +55,7 @@ const getWrapper = () =>
       provide: {
         services: {
           editorService,
+          componentListService,
         },
       },
     },
