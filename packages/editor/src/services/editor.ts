@@ -339,8 +339,9 @@ class Editor extends BaseService {
 
     if (`${newConfig.id}` === `${this.get('node').id}`) {
       this.set('node', newConfig);
-      this.get<StageCore | null>('stage')?.update({ config: cloneDeep(newConfig), root: this.get('root') });
     }
+
+    this.get<StageCore | null>('stage')?.update({ config: cloneDeep(newConfig), root: this.get('root') });
 
     if (newConfig.type === NodeType.PAGE) {
       this.set('page', newConfig);
@@ -520,7 +521,11 @@ class Editor extends BaseService {
     this.isHistoryStateChange = true;
     await this.update(value.data);
     this.set('modifiedNodeIds', value.modifiedNodeIds);
-    setTimeout(() => value.nodeId && this.select(value.nodeId), 0);
+    setTimeout(async () => {
+      if (!value.nodeId) return;
+      await this.select(value.nodeId);
+      this.get<StageCore | null>('stage')?.select(value.nodeId);
+    }, 0);
   }
 
   private async toggleFixedPosition(dist: MNode, src: MNode, root: MApp) {
