@@ -22,7 +22,7 @@
         <expand-column :config="item" :key="columnIndex"></expand-column>
       </template>
 
-      <template v-if="item.selection">
+      <template v-else-if="item.selection">
         <el-table-column type="selection" :key="columnIndex" width="40" :selectable="item.selectable"></el-table-column>
       </template>
 
@@ -95,6 +95,7 @@ export default defineComponent({
     /** 是否显示表头 */
     showHeader: {
       type: Boolean,
+      default: true,
     },
 
     /** 空数据时显示的文本内容 */
