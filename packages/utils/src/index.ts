@@ -97,22 +97,44 @@ export const asyncLoadJs = (() => {
   };
 })();
 
-export const asyncLoadCss = function (url: string) {
-  return new Promise((resolve, reject) => {
-    const hasLoaded = globalThis.document.querySelector(`link[href="${url}"]`);
-    if (hasLoaded) {
-      resolve(undefined);
-      return;
+export const asyncLoadCss = (() => {
+  // 正在加载或加载成功的存入此Map中
+  const documentMap = new Map();
+
+  return (url: string, document = globalThis.document) => {
+    let loaded = documentMap.get(document);
+    if (!loaded) {
+      loaded = new Map();
+      documentMap.set(document, loaded);
     }
 
-    const node = document.createElement('link');
-    node.rel = 'stylesheet';
-    node.href = url;
-    document.getElementsByTagName('head')[0].appendChild(node);
-    node.onload = resolve;
-    node.onerror = reject;
-  });
-};
+    // 正在加载或已经加载成功的，直接返回
+    if (loaded.get(url)) return loaded.get(url);
+
+    const load = new Promise<void>((resolve, reject) => {
+      const node = document.createElement('link');
+      node.rel = 'stylesheet';
+      node.href = url;
+      document.head.appendChild(node);
+      node.onload = () => {
+        resolve();
+      };
+      node.onerror = () => {
+        reject(new Error('加载失败'));
+      };
+      setTimeout(() => {
+        reject(new Error('timeout'));
+      }, 60 * 1000);
+    }).catch((err) => {
+      // 加载失败的，从map中移除，第二次加载时，可以再次执行加载
+      loaded.delete(url);
+      throw err;
+    });
+
+    loaded.set(url, load);
+    return loaded.get(url);
+  };
+})();
 
 // 驼峰转换横线
 export const toLine = (name = '') => name.replace(/\B([A-Z])/g, '-$1').toLowerCase();
@@ -181,4 +203,4 @@ export const getUrlParam = (param: string, url?: string) => {
   return '';
 };
 
-export const isPop = (node: MNode): boolean => node.type.toLowerCase().endsWith('pop');
+export const isPop = (node: MNode): boolean => Boolean(node.type?.toLowerCase().endsWith('pop'));
