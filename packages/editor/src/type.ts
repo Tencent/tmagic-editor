@@ -230,6 +230,11 @@ export interface ComponentGroup {
   items: ComponentItem[];
 }
 
+export interface UpdateData {
+  id: Id;
+  [key: string]: any;
+}
+
 export enum LayerOffset {
   TOP = 'top',
   BOTTOM = 'bottom',

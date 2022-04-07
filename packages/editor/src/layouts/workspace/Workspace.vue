@@ -6,10 +6,6 @@
       :render="render"
       :moveable-options="moveableOptions"
       :can-select="canSelect"
-      @select="selectHandler"
-      @highlight="highlightHandler"
-      @update="updateNodeHandler"
-      @sort="sortNodeHandler"
     ></magic-stage>
 
     <slot name="workspace-content"></slot>
@@ -24,8 +20,8 @@
 <script lang="ts">
 import { computed, defineComponent, inject, PropType } from 'vue';
 
-import type { MComponent, MContainer, MPage } from '@tmagic/schema';
-import type { MoveableOptions, SortEventData } from '@tmagic/stage';
+import type { MPage } from '@tmagic/schema';
+import type { MoveableOptions } from '@tmagic/stage';
 import StageCore from '@tmagic/stage';
 
 import type { Services } from '@editor/type';
@@ -62,22 +58,6 @@ export default defineComponent({
 
     return {
       page: computed(() => services?.editorService.get<MPage>('page')),
-
-      selectHandler(el: HTMLElement) {
-        services?.editorService.select(el.id);
-      },
-
-      updateNodeHandler(node: MComponent | MContainer | MPage) {
-        services?.editorService.update(node);
-      },
-
-      sortNodeHandler(ev: SortEventData) {
-        services?.editorService.sort(ev.src, ev.dist);
-      },
-
-      highlightHandler(el: HTMLElement) {
-        services?.editorService.highlight(el.id);
-      },
     };
   },
 });

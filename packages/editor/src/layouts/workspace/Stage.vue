@@ -110,9 +110,7 @@ export default defineComponent({
     },
   },
 
-  emits: ['select', 'update', 'sort', 'highlight'],
-
-  setup(props, { emit }) {
+  setup(props) {
     const services = inject<Services>('services');
 
     const stageWrap = ref<InstanceType<typeof ScrollViewer>>();
@@ -156,19 +154,19 @@ export default defineComponent({
       stage?.mount(stageContainer.value);
 
       stage?.on('select', (el: HTMLElement) => {
-        emit('select', el);
+        services?.editorService.select(el.id);
       });
 
       stage?.on('highlight', (el: HTMLElement) => {
-        emit('highlight', el);
+        services?.editorService.highlight(el.id);
       });
 
       stage?.on('update', (ev: UpdateEventData) => {
-        emit('update', { id: ev.el.id, style: ev.style });
+        services?.editorService.update({ id: ev.el.id, style: ev.style });
       });
 
       stage?.on('sort', (ev: SortEventData) => {
-        emit('sort', ev);
+        services?.editorService.sort(ev.src, ev.dist);
       });
 
       stage?.on('changeGuides', () => {
