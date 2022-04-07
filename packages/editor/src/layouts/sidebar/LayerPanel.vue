@@ -14,6 +14,7 @@
       ref="tree"
       node-key="id"
       draggable
+      :default-expanded-keys="expandedKeys"
       :load="loadItems"
       :data="values"
       :expand-on-click-node="false"
@@ -143,6 +144,7 @@ const useStatus = (tree: Ref<InstanceType<typeof ElTree> | undefined>, editorSer
 
     highlightNode,
     clickNode: node,
+    expandedKeys: computed(() => (node.value ? [node.value.id] : [])),
   };
 };
 
