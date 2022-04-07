@@ -37,7 +37,7 @@ export interface MComponent {
   /** 组件ID，默认为${type}_${number}}形式, 如：page_123 */
   id: Id;
   /** 组件类型 */
-  type: string;
+  type?: string;
   /** 组件显示名称 */
   name?: string;
   /** 组件根Dom上的class */
@@ -53,7 +53,7 @@ export interface MComponent {
 
 export interface MContainer extends MComponent {
   /** 容器类型，默认为'container' */
-  type: NodeType.CONTAINER | string;
+  type?: NodeType.CONTAINER | string;
   /** 容器子元素 */
   items: (MComponent | MContainer)[];
 }
