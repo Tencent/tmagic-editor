@@ -1,5 +1,10 @@
 <template>
-  <div v-if="config" :style="config.tip ? 'display: flex' : ''" :class="config.className" class="m-form-container">
+  <div
+    v-if="config"
+    :style="config.tip ? 'display: flex;align-items: baseline;' : ''"
+    :class="config.className"
+    class="m-form-container"
+  >
     <m-fields-hidden
       v-if="type === 'hidden'"
       :model="model"
@@ -65,8 +70,8 @@
         <div v-if="extra" v-html="extra" class="m-form-tip"></div>
       </el-form-item>
 
-      <el-tooltip v-if="config.tip" placement="top" style="line-height: 40px; margin-left: 5px">
-        <i class="el-icon-warning"></i>
+      <el-tooltip v-if="config.tip" placement="top">
+        <el-icon style="line-height: 40px; margin-left: 5px"><warning-filled /></el-icon>
         <template #content>
           <div v-html="config.tip"></div>
         </template>
@@ -98,12 +103,15 @@
 
 <script lang="ts">
 import { computed, defineComponent, inject, PropType, ref, resolveComponent, watchEffect } from 'vue';
+import { WarningFilled } from '@element-plus/icons';
 
 import { ChildConfig, ContainerCommonConfig, FormState, FormValue } from '../schema';
 import { display as displayFunction, filterFunction, getRules } from '../utils/form';
 
 export default defineComponent({
   name: 'm-form-container',
+
+  components: { WarningFilled },
 
   props: {
     labelWidth: String,

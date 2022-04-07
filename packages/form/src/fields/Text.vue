@@ -14,7 +14,7 @@
       <el-button
         v-if="typeof config.append === 'object' && config.append.type === 'button'"
         style="color: #409eff"
-        @click="buttonClickHandler"
+        @click.prevent="buttonClickHandler"
       >
         {{ config.append.text }}
       </el-button>
