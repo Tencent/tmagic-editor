@@ -20,6 +20,8 @@ import { EventEmitter } from 'events';
 
 import { Id } from '@tmagic/schema';
 
+import { log } from '@editor/utils/logger';
+
 import { DEFAULT_ZOOM, GHOST_EL_ID_PREFIX } from './const';
 import StageDragResize from './StageDragResize';
 import StageHighlight from './StageHighlight';
@@ -193,7 +195,14 @@ export default class StageCore extends EventEmitter {
    * @param el 页面Dom节点
    */
   public async highlight(idOrEl: HTMLElement | Id): Promise<void> {
-    const el = await this.getTargetElement(idOrEl);
+    let el;
+    try {
+      el = await this.getTargetElement(idOrEl);
+    } catch (error) {
+      log(error);
+      this.highlightLayer.clearHighlight();
+      return;
+    }
     if (el === this.highlightedDom) return;
     this.highlightLayer.highlight(el);
     this.highlightedDom = el;
