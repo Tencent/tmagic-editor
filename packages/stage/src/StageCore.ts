@@ -173,10 +173,12 @@ export default class StageCore extends EventEmitter {
       // 更新配置后，需要等组件渲染更新
       setTimeout(() => {
         const el = this.renderer.contentWindow?.document.getElementById(`${config.id}`);
-        if (el) {
+        // 有可能dom已经重新渲染，不再是原来的dom了，所以这里判断id，而不是判断el === this.selectedDom
+        if (el && el.id === this.selectedDom?.id) {
+          this.selectedDom = el;
           // 更新了组件的布局，需要重新设置mask是否可以滚动
           this.mask.setLayout(el);
-          this.dr.select(el);
+          this.dr.updateMoveable(el);
         }
       }, 0);
     });
