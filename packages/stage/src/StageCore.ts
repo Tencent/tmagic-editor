@@ -83,6 +83,10 @@ export default class StageCore extends EventEmitter {
       })
       .on('highlight', async (event: MouseEvent) => {
         await this.setElementFromPoint(event);
+        if (this.highlightedDom === this.selectedDom) {
+          this.highlightLayer.clearHighlight();
+          return;
+        }
         this.highlightLayer.highlight(this.highlightedDom as HTMLElement);
         this.emit('highlight', this.highlightedDom);
       })
