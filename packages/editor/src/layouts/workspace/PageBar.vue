@@ -1,6 +1,6 @@
 <template>
   <div class="m-editor-page-bar" ref="pageBar">
-    <div class="m-editor-page-bar-item m-editor-page-bar-item-icon" @click="addPage">
+    <div id="m-editor-page-bar-add-icon" class="m-editor-page-bar-item m-editor-page-bar-item-icon" @click="addPage">
       <el-icon><plus></plus></el-icon>
     </div>
     <div v-if="canScroll" class="m-editor-page-bar-item m-editor-page-bar-item-icon" @click="scroll('left')">

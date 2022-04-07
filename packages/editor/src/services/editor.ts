@@ -236,7 +236,7 @@ class Editor extends BaseService {
 
     parentNode?.items?.push(newNode);
 
-    const stage = this.get<StageCore>('stage');
+    const stage = this.get<StageCore | null>('stage');
 
     await stage?.add({ config: cloneDeep(newNode), root: cloneDeep(this.get('root')) });
 
@@ -273,17 +273,17 @@ class Editor extends BaseService {
     if (typeof index !== 'number' || index === -1) throw new Error('找不要删除的节点');
 
     parent.items?.splice(index, 1);
-    const stage = this.get<StageCore>('stage');
+    const stage = this.get<StageCore | null>('stage');
     stage?.remove({ id: node.id, root: this.get('root') });
 
     if (node.type === NodeType.PAGE) {
       if (root.items[0]) {
         await this.select(root.items[0]);
-        stage.select(root.items[0].id);
+        stage?.select(root.items[0].id);
       }
     } else {
       await this.select(parent);
-      stage.select(parent.id);
+      stage?.select(parent.id);
     }
 
     this.addModifiedNodeId(parent.id);
@@ -339,7 +339,7 @@ class Editor extends BaseService {
 
     if (`${newConfig.id}` === `${this.get('node').id}`) {
       this.set('node', newConfig);
-      this.get<StageCore>('stage')?.update({ config: cloneDeep(newConfig), root: this.get('root') });
+      this.get<StageCore | null>('stage')?.update({ config: cloneDeep(newConfig), root: this.get('root') });
     }
 
     if (newConfig.type === NodeType.PAGE) {
@@ -371,7 +371,7 @@ class Editor extends BaseService {
     await this.update(parent);
     await this.select(node);
 
-    this.get<StageCore>('stage')?.update({ config: cloneDeep(node), root: this.get('root') });
+    this.get<StageCore | null>('stage')?.update({ config: cloneDeep(node), root: this.get('root') });
 
     this.addModifiedNodeId(parent.id);
     this.pushHistoryState();
@@ -436,7 +436,7 @@ class Editor extends BaseService {
     }
 
     await this.update(node);
-    this.get<StageCore>('stage')?.update({ config: cloneDeep(toRaw(node)), root: this.get('root') });
+    this.get<StageCore | null>('stage')?.update({ config: cloneDeep(toRaw(node)), root: this.get('root') });
     this.addModifiedNodeId(config.id);
     this.pushHistoryState();
 
@@ -461,7 +461,7 @@ class Editor extends BaseService {
       brothers.splice(index + parseInt(`${offset}`, 10), 0, brothers.splice(index, 1)[0]);
     }
 
-    this.get<StageCore>('stage')?.update({ config: cloneDeep(toRaw(parent)), root: this.get('root') });
+    this.get<StageCore | null>('stage')?.update({ config: cloneDeep(toRaw(parent)), root: this.get('root') });
   }
 
   /**

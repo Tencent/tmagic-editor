@@ -23,6 +23,14 @@ import { NodeType } from '@tmagic/schema';
 
 import PageBar from '@editor/layouts/workspace/PageBar.vue';
 
+globalThis.ResizeObserver =
+  globalThis.ResizeObserver ||
+  jest.fn().mockImplementation(() => ({
+    disconnect: jest.fn(),
+    observe: jest.fn(),
+    unobserve: jest.fn(),
+  }));
+
 const editorState: Record<string, any> = {
   root: {
     items: [{ key: 0, id: 1, name: 'testName', type: NodeType.PAGE }],
@@ -53,7 +61,7 @@ describe('PageBar', () => {
   it('新增page', (done) => {
     const wrapper = getWrapper();
     setTimeout(async () => {
-      await wrapper.find('i[class="el-icon m-editor-page-bar-menu-add-icon"]').trigger('click');
+      await wrapper.find('#m-editor-page-bar-add-icon').trigger('click');
 
       expect(editorService.add.mock.calls[0][0]).toEqual({
         type: NodeType.PAGE,
