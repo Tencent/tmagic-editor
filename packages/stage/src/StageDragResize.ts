@@ -41,7 +41,7 @@ export default class StageDragResize extends EventEmitter {
   public core: StageCore;
   public container: HTMLElement;
   public target?: HTMLElement;
-  public dragEl?: HTMLElement;
+  public dragEl: HTMLElement;
   public moveable?: Moveable;
   public horizontalGuidelines: number[] = [];
   public verticalGuidelines: number[] = [];
@@ -58,6 +58,9 @@ export default class StageDragResize extends EventEmitter {
 
     this.core = config.core;
     this.container = config.container;
+
+    this.dragEl = globalThis.document.createElement('div');
+    this.container.append(this.dragEl);
   }
 
   /**
@@ -67,25 +70,13 @@ export default class StageDragResize extends EventEmitter {
    * @param event 鼠标事件
    */
   public select(el: HTMLElement, event?: MouseEvent): void {
+    const oldTarget = this.target;
     this.target = el;
-    // 如果有滚动条会导致resize时获取到width，height不准确
-    if (/(auto|scroll)/.test(this.target.style.overflow)) {
-      this.target.style.overflow = 'hidden';
-    }
-    this.mode = getMode(el);
 
-    this.destroyGhostEl();
-
-    this.generateDragEl(el);
-
-    const originDraggable = this.moveableOptions.draggable;
-
-    this.moveableOptions = this.getOptions({
-      target: this.dragEl,
-    });
+    this.init(el);
 
     // 从不能拖动到能拖动的节点之间切换，要重新创建moveable，不然dragStart不生效
-    if (!this.moveable || originDraggable !== this.moveableOptions.draggable) {
+    if (!this.moveable || this.target !== oldTarget) {
       this.moveableHelper = MoveableHelper.create({
         useBeforeRender: true,
         useRender: false,
@@ -94,7 +85,7 @@ export default class StageDragResize extends EventEmitter {
 
       this.initMoveable();
     } else {
-      this.refresh();
+      this.updateMoveable();
     }
 
     if (event) {
@@ -105,8 +96,13 @@ export default class StageDragResize extends EventEmitter {
   /**
    * 初始化选中框并渲染出来
    */
-  public refresh() {
+  public updateMoveable(el = this.target): void {
     if (!this.moveable) throw new Error('未初始化moveable');
+    if (!el) throw new Error('为选中任何节点');
+
+    this.target = el;
+
+    this.init(el);
 
     Object.entries(this.moveableOptions).forEach(([key, value]) => {
       (this.moveable as any)[key] = value;
@@ -123,7 +119,7 @@ export default class StageDragResize extends EventEmitter {
       this.moveableOptions.verticalGuidelines = guidelines;
     }
 
-    this.refresh();
+    this.updateMoveable();
   }
 
   public clearGuides() {
@@ -131,7 +127,7 @@ export default class StageDragResize extends EventEmitter {
     this.verticalGuidelines = [];
     this.moveableOptions.horizontalGuidelines = [];
     this.moveableOptions.verticalGuidelines = [];
-    this.refresh();
+    this.updateMoveable();
   }
 
   /**
@@ -143,6 +139,22 @@ export default class StageDragResize extends EventEmitter {
     this.destroyDragEl();
     this.dragStatus = ActionStatus.END;
     this.removeAllListeners();
+  }
+
+  private init(el: HTMLElement): void {
+    // 如果有滚动条会导致resize时获取到width，height不准确
+    if (/(auto|scroll)/.test(el.style.overflow)) {
+      el.style.overflow = 'hidden';
+    }
+    this.mode = getMode(el);
+
+    this.destroyGhostEl();
+
+    this.updateDragEl(el);
+
+    this.moveableOptions = this.getOptions({
+      target: this.dragEl,
+    });
   }
 
   private initMoveable() {
@@ -332,14 +344,9 @@ export default class StageDragResize extends EventEmitter {
     this.ghostEl = undefined;
   }
 
-  private generateDragEl(el: HTMLElement) {
+  private updateDragEl(el: HTMLElement) {
     const { width, height } = el.getBoundingClientRect();
     const offset = getOffset(el);
-
-    if (!this.dragEl) {
-      this.dragEl = globalThis.document.createElement('div');
-      this.container.append(this.dragEl);
-    }
 
     this.dragEl.style.cssText = `
       position: absolute;
@@ -354,7 +361,6 @@ export default class StageDragResize extends EventEmitter {
 
   private destroyDragEl(): void {
     this.dragEl?.remove();
-    this.dragEl = undefined;
   }
 
   private getOptions(options: MoveableOptions = {}): MoveableOptions {

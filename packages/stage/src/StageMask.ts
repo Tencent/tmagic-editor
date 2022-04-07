@@ -25,7 +25,7 @@ import type { StageMaskConfig } from './types';
 import { createDiv, getScrollParent, isFixedParent } from './util';
 
 const wrapperClassName = 'editor-mask-wrapper';
-const throttleTime = 100;
+const throttleTime = 300;
 
 const hideScrollbar = () => {
   const style = globalThis.document.createElement('style');
@@ -215,6 +215,8 @@ export default class StageMask extends Rule {
    * @param event 事件对象
    */
   private mouseDownHandler = (event: MouseEvent): void => {
+    this.emit('clearHighlight');
+
     event.stopImmediatePropagation();
     event.stopPropagation();
 
@@ -226,7 +228,6 @@ export default class StageMask extends Rule {
     }
 
     this.content.removeEventListener('mousemove', this.highlightHandler);
-    this.emit('clearHighlight');
 
     this.emit('beforeSelect', event);
 
