@@ -20,8 +20,6 @@ import { EventEmitter } from 'events';
 
 import { Id } from '@tmagic/schema';
 
-import { log } from '@editor/utils/logger';
-
 import { DEFAULT_ZOOM, GHOST_EL_ID_PREFIX } from './const';
 import StageDragResize from './StageDragResize';
 import StageHighlight from './StageHighlight';
@@ -199,7 +197,6 @@ export default class StageCore extends EventEmitter {
     try {
       el = await this.getTargetElement(idOrEl);
     } catch (error) {
-      log(error);
       this.highlightLayer.clearHighlight();
       return;
     }
