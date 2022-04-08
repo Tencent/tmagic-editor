@@ -15,7 +15,7 @@
     :value-key="config.valueKey || 'value'"
     :allow-create="config.allowCreate"
     :disabled="disabled"
-    :remote-method="remoteMethod"
+    :remote-method="config.remote && remoteMethod"
     @change="changeHandler"
     @visible-change="visibleHandler"
   >
@@ -353,8 +353,6 @@ export default defineComponent({
       getRequestFuc() {
         return getConfig('request');
       },
-
-      async getInitOption() {},
 
       changeHandler(value: any) {
         emit('change', value);
