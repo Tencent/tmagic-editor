@@ -122,7 +122,11 @@ const initValueItem = function (
   // 这种情况比较多，提前结束
   if (name && !items && typeof initValue[name] !== 'undefined') {
     if (typeof value[name] === 'undefined') {
-      value[name] = typeof initValue[name] === 'object' ? cloneDeep(initValue[name]) : initValue[name];
+      if (type === 'number') {
+        value[name] = Number(initValue[name]);
+      } else {
+        value[name] = typeof initValue[name] === 'object' ? cloneDeep(initValue[name]) : initValue[name];
+      }
     }
 
     return value;
