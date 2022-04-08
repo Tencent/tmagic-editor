@@ -22,7 +22,7 @@ import serialize from 'serialize-javascript';
 
 import type { Id, MApp, MComponent, MContainer, MNode, MPage } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
-import type StageCore from '@tmagic/stage';
+import StageCore from '@tmagic/stage';
 import { getNodePath, isPop } from '@tmagic/utils';
 
 import historyService, { StepValue } from '@editor/services/history';
@@ -228,7 +228,12 @@ class Editor extends BaseService {
     if (!parentNode) throw new Error('未找到父元素');
 
     const layout = await this.getLayout(parentNode);
-    const newNode = initPosition({ ...toRaw(await propsService.getPropsValue(type)), ...config }, layout);
+    const newNode = initPosition(
+      { ...toRaw(await propsService.getPropsValue(type)), ...config },
+      layout,
+      parentNode,
+      this.get<StageCore>('stage'),
+    );
 
     if ((parentNode?.type === NodeType.ROOT || curNode.type === NodeType.ROOT) && newNode.type !== NodeType.PAGE) {
       throw new Error('app下不能添加组件');

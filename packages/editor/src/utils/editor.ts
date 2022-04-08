@@ -20,7 +20,8 @@ import { random } from 'lodash-es';
 
 import type { Id, MApp, MContainer, MNode, MPage } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
-import { getNodePath, isPop } from '@tmagic/utils';
+import type StageCore from '@tmagic/stage';
+import { getNodePath, isNumber, isPage, isPop } from '@tmagic/utils';
 
 import { Layout } from '@editor/type';
 
@@ -105,7 +106,7 @@ const updatePopId = (oldId: Id, popId: Id, pageConfig: MPage) => {
 export const setNewItemId = (config: MNode, parent?: MPage) => {
   const oldId = config.id;
 
-  config.id = generateId(config.type);
+  config.id = generateId(config.type || 'component');
   config.name = `${config.name?.replace(/_(\d+)$/, '')}_${config.id}`;
 
   // 只有弹窗在页面下的一级子元素才有效
@@ -139,11 +140,29 @@ export const toRelative = (node: MNode) => {
   return node;
 };
 
-export const initPosition = (node: MNode, layout: Layout) => {
+const setTop2Middle = (node: MNode, parentNode: MNode, stage: StageCore) => {
+  const style = node.style || {};
+  const height = style.height || 0;
+
+  if (!stage || style.top || !parentNode.style || !isNumber(height)) return style;
+
+  const { height: parentHeight } = parentNode.style;
+
+  if (isPage(parentNode)) {
+    const { scrollTop = 0, wrapperHeight } = stage.mask;
+    style.top = (wrapperHeight - height) / 2 + scrollTop;
+  } else {
+    style.top = (parentHeight - height) / 2;
+  }
+
+  return style;
+};
+
+export const initPosition = (node: MNode, layout: Layout, parentNode: MNode, stage: StageCore) => {
   if (layout === Layout.ABSOLUTE) {
     node.style = {
       position: 'absolute',
-      ...(node.style || {}),
+      ...setTop2Middle(node, parentNode, stage),
     };
     return node;
   }
@@ -200,6 +219,8 @@ export const Fixed2Other = async (node: MNode, root: MApp, getLayout: (node: MNo
   const offset = {
     left: cur?.style?.left || 0,
     top: cur?.style?.top || 0,
+    right: '',
+    bottom: '',
   };
 
   path.forEach((value) => {
