@@ -367,6 +367,7 @@ export default class StageDragResize extends EventEmitter {
     if (!this.target) return {};
 
     const isAbsolute = this.mode === Mode.ABSOLUTE;
+    const isFixed = this.mode === Mode.FIXED;
 
     let { moveableOptions = {} } = this.core.config;
 
@@ -381,8 +382,8 @@ export default class StageDragResize extends EventEmitter {
       dragArea: false,
       draggable: true,
       resizable: true,
-      snappable: isAbsolute,
-      snapGap: isAbsolute,
+      snappable: isAbsolute || isFixed,
+      snapGap: isAbsolute || isFixed,
       snapThreshold: 5,
       snapDigit: 0,
       throttleDrag: 0,
