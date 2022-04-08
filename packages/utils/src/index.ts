@@ -18,7 +18,7 @@
 
 import moment from 'moment';
 
-import { MNode } from '@tmagic/schema';
+import { MNode, NodeType } from '@tmagic/schema';
 
 export const sleep = (ms: number): Promise<void> =>
   new Promise((resolve) => {
@@ -204,3 +204,7 @@ export const getUrlParam = (param: string, url?: string) => {
 };
 
 export const isPop = (node: MNode): boolean => Boolean(node.type?.toLowerCase().endsWith('pop'));
+
+export const isPage = (node: MNode): boolean => Boolean(node.type?.toLowerCase() === NodeType.PAGE);
+
+export const isNumber = (value: string) => /^(\d|\.)+$/.test(value);
