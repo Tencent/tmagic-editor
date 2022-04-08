@@ -39,9 +39,9 @@ export default defineComponent({
         return;
       }
 
-      values.value = node.value;
       const type = node.value.type || (node.value.items ? 'container' : 'text');
       curFormConfig.value = (await services?.propsService.getPropsConfig(type)) || [];
+      values.value = node.value;
     };
 
     watchEffect(init);
