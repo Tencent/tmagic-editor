@@ -14,6 +14,7 @@
       <el-button
         v-if="typeof config.append === 'object' && config.append.type === 'button'"
         style="color: #409eff"
+        :size="size"
         @click.prevent="buttonClickHandler"
       >
         {{ config.append.text }}
@@ -43,6 +44,8 @@ export default defineComponent({
   emits: ['change', 'input'],
 
   setup(props, { emit }) {
+    const mForm = inject<FormState | undefined>('mForm');
+
     useAddField(props.prop);
 
     const modelName = computed(() => props.name || props.config.name || '');
@@ -54,14 +57,11 @@ export default defineComponent({
       },
 
       inputHandler(v: string | number) {
-        const mForm = inject<FormState | undefined>('mForm');
         emit('input', v);
         mForm?.$emit('field-input', props.prop, v);
       },
 
       buttonClickHandler() {
-        const mForm = inject<FormState | undefined>('mForm');
-
         if (typeof props.config.append === 'string') return;
 
         if (props.config.append?.handler) {
