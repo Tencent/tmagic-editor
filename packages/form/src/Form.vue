@@ -86,7 +86,7 @@ export default defineComponent({
     },
 
     size: {
-      type: String,
+      type: String as PropType<'small' | 'default' | 'large'>,
     },
 
     inline: {

@@ -78,7 +78,7 @@ export default defineComponent({
 
     labelWidth: [Number, String],
 
-    size: String as PropType<'mini' | 'small' | 'medium'>,
+    size: String as PropType<'small' | 'default' | 'large'>,
 
     confirmText: {
       type: String,
