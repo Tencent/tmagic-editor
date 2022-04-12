@@ -87,7 +87,7 @@ class Props extends BaseService {
    * @param type 组件类型
    * @returns 组件初始值
    */
-  public async getPropsValue(type: string) {
+  public async getPropsValue(type: string, defaultValue = {}) {
     if (type === 'area') {
       const value = (await this.getPropsValue('button')) as MComponent;
       value.className = 'action-area';
@@ -100,6 +100,7 @@ class Props extends BaseService {
 
     return cloneDeep({
       ...getDefaultPropsValue(type),
+      ...defaultValue,
       ...(this.state.propsValueMap[type] || {}),
     });
   }

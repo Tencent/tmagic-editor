@@ -229,7 +229,7 @@ class Editor extends BaseService {
 
     const layout = await this.getLayout(parentNode);
     const newNode = initPosition(
-      { ...toRaw(await propsService.getPropsValue(type)), ...config },
+      { ...toRaw(await propsService.getPropsValue(type, config)) },
       layout,
       parentNode,
       this.get<StageCore>('stage'),

@@ -56,11 +56,11 @@ export default defineComponent({
       collapseValue,
       list,
 
-      appendComponent({ text, type, ...config }: ComponentItem): void {
+      appendComponent({ text, type, data = {} }: ComponentItem): void {
         services?.editorService.add({
           name: text,
           type,
-          ...config,
+          ...data,
         });
       },
     };
