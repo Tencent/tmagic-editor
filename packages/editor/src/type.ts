@@ -220,7 +220,9 @@ export interface ComponentItem {
   type: string;
   /** element-plus icon class */
   icon?: string | Component;
-  [key: string]: any;
+  data?: {
+    [key: string]: any;
+  };
 }
 
 export interface ComponentGroup {

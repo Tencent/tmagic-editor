@@ -72,6 +72,7 @@ export default defineComponent({
         services?.editorService.add({
           name: config.text,
           type: config.type,
+          ...(config.data || {}),
         });
       },
 
