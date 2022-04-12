@@ -26,6 +26,15 @@
     "type": "git",
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
+  "homepage": "https://tencent.github.io/tmagic-editor/docs/",
+  "keywords": [
+    "editor",
+    "drag",
+    "resize",
+    "vue",
+    "vue3",
+    "typescript"
+  ],
   "dependencies": {
     "@element-plus/icons": "0.0.11",
     "@tmagic/core": "^1.0.0-beta.11",
