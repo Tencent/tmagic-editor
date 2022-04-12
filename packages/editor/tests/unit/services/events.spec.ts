@@ -28,17 +28,21 @@ describe('events', () => {
         items: [
           {
             icon: 'el-icon-folder-opened',
-            id: 0,
-            reportType: 'module',
             text: '组',
             type: 'container',
+            data: {
+              id: 0,
+              reportType: 'module',
+            },
           },
           {
             icon: 'el-icon-files',
-            id: 0,
-            reportType: 'module',
             text: '标签页(tab)',
             type: 'tabs',
+            data: {
+              id: 0,
+              reportType: 'module',
+            },
           },
         ],
       },

@@ -174,7 +174,7 @@ export const fillConfig = (config: FormConfig = []) => [
                 type: 'select',
                 options: (mForm: FormState, { model }: any) => {
                   const node = editorService.getNodeById(model.to);
-                  if (!node) return [];
+                  if (!node?.type) return [];
 
                   return eventsService.getMethod(node.type).map((option) => ({
                     text: option.label,
