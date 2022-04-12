@@ -1,5 +1,5 @@
 <template>
-  <div class="m-editor-workspace">
+  <div class="m-editor-workspace" tabindex="1" ref="workspace">
     <magic-stage
       :key="page?.id"
       :runtime-url="runtimeUrl"
@@ -18,9 +18,10 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, inject, PropType } from 'vue';
+import { computed, defineComponent, inject, onMounted, onUnmounted, PropType, ref } from 'vue';
+import KeyController from 'keycon';
 
-import type { MPage } from '@tmagic/schema';
+import type { MNode, MPage } from '@tmagic/schema';
 import type { MoveableOptions } from '@tmagic/stage';
 import StageCore from '@tmagic/stage';
 
@@ -55,8 +56,52 @@ export default defineComponent({
 
   setup() {
     const services = inject<Services>('services');
+    const workspace = ref<HTMLDivElement>();
+    const node = computed(() => services?.editorService.get<MNode>('node'));
+    let keycon: KeyController;
+
+    const mouseenterHandler = () => {
+      workspace.value?.focus();
+    };
+
+    const mouseleaveHandler = () => {
+      workspace.value?.blur();
+    };
+
+    onMounted(() => {
+      workspace.value?.addEventListener('mouseenter', mouseenterHandler);
+
+      workspace.value?.addEventListener('mouseleave', mouseleaveHandler);
+
+      keycon = new KeyController(workspace.value);
+
+      keycon
+        .keyup('delete', () => {
+          node.value && services?.editorService.remove(node.value);
+        })
+        .keyup(['ctrl', 'c'], () => {
+          node.value && services?.editorService.copy(node.value);
+        })
+        .keyup(['ctrl', 'v'], () => {
+          node.value && services?.editorService.paste();
+        })
+        .keyup(['ctrl', 'x'], () => {
+          if (node.value && services) {
+            services.editorService.copy(node.value);
+            services.editorService.remove(node.value);
+          }
+        });
+    });
+
+    onUnmounted(() => {
+      workspace.value?.removeEventListener('mouseenter', mouseenterHandler);
+      workspace.value?.removeEventListener('mouseleave', mouseleaveHandler);
+      keycon.destroy();
+    });
 
     return {
+      workspace,
+
       page: computed(() => services?.editorService.get<MPage>('page')),
     };
   },
