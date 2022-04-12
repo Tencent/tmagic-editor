@@ -20,6 +20,10 @@
     "type": "git",
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
+  "dependencies": {
+    "@tmagic/schema": "^1.0.0-beta.11",
+    "moment": "^2.29.1"
+  },
   "devDependencies": {
     "@types/node": "^15.12.4",
     "typescript": "^4.3.4",
