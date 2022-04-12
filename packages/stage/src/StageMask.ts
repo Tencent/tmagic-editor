@@ -25,7 +25,7 @@ import type { StageMaskConfig } from './types';
 import { createDiv, getScrollParent, isFixedParent } from './util';
 
 const wrapperClassName = 'editor-mask-wrapper';
-const throttleTime = 300;
+const throttleTime = 100;
 
 const hideScrollbar = () => {
   const style = globalThis.document.createElement('style');
