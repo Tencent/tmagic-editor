@@ -106,6 +106,7 @@ export default class StageMask extends Rule {
     this.wrapper.appendChild(this.content);
     this.content.addEventListener('wheel', this.mouseWheelHandler);
     this.content.addEventListener('mousemove', this.highlightHandler);
+    this.content.addEventListener('mouseleave', this.mouseLeaveHandler);
   }
 
   public setMode(mode: Mode) {
@@ -141,6 +142,7 @@ export default class StageMask extends Rule {
 
         this.fixScrollValue();
         this.scroll();
+        this.core.dr.updateMoveable();
       });
 
       this.pageResizeObserver.observe(page);
@@ -180,6 +182,8 @@ export default class StageMask extends Rule {
     this.pageScrollParent = null;
     this.pageResizeObserver?.disconnect();
     this.wrapperResizeObserver?.disconnect();
+
+    this.content.removeEventListener('mouseleave', this.mouseLeaveHandler);
     super.destroy();
   }
 
@@ -300,5 +304,9 @@ export default class StageMask extends Rule {
     this.scroll();
 
     this.emit('scroll', event);
+  };
+
+  private mouseLeaveHandler = () => {
+    setTimeout(() => this.emit('clearHighlight'), throttleTime);
   };
 }
