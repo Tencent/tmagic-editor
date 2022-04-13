@@ -56,6 +56,7 @@ export default class StageHighlight extends EventEmitter {
    */
   public clearHighlight(): void {
     if (!this.moveable) return;
+    this.target = undefined;
     this.moveable.target = null;
     this.moveable.updateTarget();
   }
