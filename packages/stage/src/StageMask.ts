@@ -81,6 +81,8 @@ export default class StageMask extends Rule {
   public height = 0;
   public wrapperHeight = 0;
   public wrapperWidth = 0;
+  public maxScrollTop = 0;
+  public maxScrollLeft = 0;
 
   private mode: Mode = Mode.ABSOLUTE;
   private pageResizeObserver: ResizeObserver | null = null;
@@ -136,6 +138,9 @@ export default class StageMask extends Rule {
         const { clientHeight, clientWidth } = entry.target;
         this.setHeight(clientHeight);
         this.setWidth(clientWidth);
+
+        this.fixScrollValue();
+        this.scroll();
       });
 
       this.pageResizeObserver.observe(page);
@@ -145,6 +150,8 @@ export default class StageMask extends Rule {
         const { clientHeight, clientWidth } = entry.target;
         this.wrapperHeight = clientHeight;
         this.wrapperWidth = clientWidth;
+        this.setMaxScrollLeft();
+        this.setMaxScrollTop();
       });
       this.wrapperResizeObserver.observe(this.wrapper);
     }
@@ -179,6 +186,13 @@ export default class StageMask extends Rule {
   private scroll() {
     let { scrollLeft, scrollTop } = this;
 
+    if (this.pageScrollParent) {
+      this.pageScrollParent.scrollTo({
+        top: scrollTop,
+        left: scrollLeft,
+      });
+    }
+
     if (this.mode === Mode.FIXED) {
       scrollLeft = 0;
       scrollTop = 0;
@@ -198,6 +212,7 @@ export default class StageMask extends Rule {
    */
   private setHeight(height: number): void {
     this.height = height;
+    this.setMaxScrollTop();
     this.content.style.height = `${height}px`;
   }
 
@@ -207,7 +222,33 @@ export default class StageMask extends Rule {
    */
   private setWidth(width: number): void {
     this.width = width;
+    this.setMaxScrollLeft();
     this.content.style.width = `${width}px`;
+  }
+
+  /**
+   * 计算并设置最大滚动宽度
+   */
+  private setMaxScrollLeft(): void {
+    this.maxScrollLeft = this.width - this.wrapperWidth;
+  }
+
+  /**
+   * 计算并设置最大滚动高度
+   */
+  private setMaxScrollTop(): void {
+    this.maxScrollTop = this.height - this.wrapperHeight;
+  }
+
+  /**
+   * 修复滚动距离
+   * 由于滚动容器变化等因素，会导致当前滚动的距离不正确
+   */
+  private fixScrollValue(): void {
+    if (this.scrollTop < 0) this.scrollTop = 0;
+    if (this.scrollLeft < 0) this.scrollLeft = 0;
+    if (this.maxScrollTop < this.scrollTop) this.scrollTop = this.maxScrollTop;
+    if (this.maxScrollLeft < this.scrollLeft) this.scrollLeft = this.maxScrollLeft;
   }
 
   /**
@@ -246,37 +287,16 @@ export default class StageMask extends Rule {
     if (!this.page) throw new Error('page 未初始化');
 
     const { deltaY, deltaX } = event;
-    const { height, wrapperHeight, width, wrapperWidth } = this;
-
-    const maxScrollTop = height - wrapperHeight;
-    const maxScrollLeft = width - wrapperWidth;
-
-    if (maxScrollTop > 0) {
-      if (deltaY > 0) {
-        this.scrollTop = this.scrollTop + Math.min(maxScrollTop - this.scrollTop, deltaY);
-      } else {
-        this.scrollTop = Math.max(this.scrollTop + deltaY, 0);
-      }
+    if (this.maxScrollTop > 0) {
+      this.scrollTop = this.scrollTop + deltaY;
     }
 
-    if (width > wrapperWidth) {
-      if (deltaX > 0) {
-        this.scrollLeft = this.scrollLeft + Math.min(maxScrollLeft - this.scrollLeft, deltaX);
-      } else {
-        this.scrollLeft = Math.max(this.scrollLeft + deltaX, 0);
-      }
+    if (this.maxScrollLeft > 0) {
+      this.scrollLeft = this.scrollLeft + deltaX;
     }
 
-    if (this.mode !== Mode.FIXED) {
-      this.scrollTo(this.scrollLeft, this.scrollTop);
-    }
+    this.fixScrollValue();
 
-    if (this.pageScrollParent) {
-      this.pageScrollParent.scrollTo({
-        top: this.scrollTop,
-        left: this.scrollLeft,
-      });
-    }
     this.scroll();
 
     this.emit('scroll', event);
