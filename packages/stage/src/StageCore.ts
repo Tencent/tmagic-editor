@@ -169,10 +169,10 @@ export default class StageCore extends EventEmitter {
    * 更新选中的节点
    * @param data 更新的数据
    */
-  public update(data: UpdateData): void {
+  public update(data: UpdateData): Promise<void> {
     const { config } = data;
 
-    this.renderer?.getRuntime().then((runtime) => {
+    return this.renderer?.getRuntime().then((runtime) => {
       runtime?.update?.(data);
       // 更新配置后，需要等组件渲染更新
       setTimeout(() => {
@@ -205,16 +205,16 @@ export default class StageCore extends EventEmitter {
     this.highlightedDom = el;
   }
 
-  public sortNode(data: SortEventData): void {
-    this.renderer?.getRuntime().then((runtime) => runtime?.sortNode?.(data));
+  public sortNode(data: SortEventData): Promise<void> {
+    return this.renderer?.getRuntime().then((runtime) => runtime?.sortNode?.(data));
   }
 
-  public add(data: UpdateData): void {
-    this.renderer?.getRuntime().then((runtime) => runtime?.add?.(data));
+  public add(data: UpdateData): Promise<void> {
+    return this.renderer?.getRuntime().then((runtime) => runtime?.add?.(data));
   }
 
-  public remove(data: RemoveData): void {
-    this.renderer?.getRuntime().then((runtime) => runtime?.remove?.(data));
+  public remove(data: RemoveData): Promise<void> {
+    return this.renderer?.getRuntime().then((runtime) => runtime?.remove?.(data));
   }
 
   public setZoom(zoom: number = DEFAULT_ZOOM): void {
