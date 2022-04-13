@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-beta.11",
+  "version": "1.0.0-beta.12",
   "name": "@tmagic/core",
   "sideEffects": false,
   "main": "dist/tmagic-core.umd.js",
@@ -29,7 +29,7 @@
     "vue"
   ],
   "dependencies": {
-    "@tmagic/schema": "^1.0.0-beta.11",
+    "@tmagic/schema": "^1.0.0-beta.12",
     "events": "^3.3.0"
   },
   "devDependencies": {
