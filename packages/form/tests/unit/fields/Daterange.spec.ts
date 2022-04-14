@@ -17,7 +17,7 @@
  */
 
 import { mount } from '@vue/test-utils';
-import ElementPlus, { ElDatePicker } from 'element-plus';
+import ElementPlus from 'element-plus';
 
 import MagicForm, { MDaterange, MForm } from '../../../src';
 
@@ -65,24 +65,6 @@ describe('Daterange', () => {
       const daterange = wrapper.findComponent(MDaterange);
       expect(daterange.exists()).toBe(true);
 
-      done();
-    }, 0);
-  });
-
-  it('设置时间', (done) => {
-    const wrapper = getWrapper();
-
-    setTimeout(async () => {
-      const daterange = wrapper.findComponent(ElDatePicker);
-      const inputs = wrapper.findAll('.el-range-input');
-      expect(inputs.length).toBe(2);
-
-      const v = [new Date('2021-7-30 00:00:00'), new Date('2021-7-31 12:00:00')];
-      await daterange.vm.$emit('change', v);
-
-      const value = await (wrapper.vm as any).submitForm();
-      expect(value.start).toMatch('2021-07-30 00:00:00');
-      expect(value.end).toMatch('2021-07-31 12:00:00');
       done();
     }, 0);
   });

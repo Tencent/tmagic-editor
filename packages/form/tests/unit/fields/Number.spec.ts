@@ -44,7 +44,7 @@ const getWrapper = (
   });
 
 describe('Number', () => {
-  it('基础功能', async (done) => {
+  it('基础功能', (done) => {
     const wrapper = getWrapper();
     setTimeout(async () => {
       const num = wrapper.findComponent(MNumber);

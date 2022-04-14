@@ -95,40 +95,4 @@ describe('RadioGroup', () => {
       done();
     }, 0);
   });
-
-  it('点击选中', (done) => {
-    const wrapper = getWrapper(
-      [
-        {
-          text: 'radioGroup',
-          type: 'radio-group',
-          name: 'radioGroup',
-          options: [
-            {
-              value: 1,
-              text: 'one',
-            },
-            {
-              value: 2,
-              text: 'two',
-            },
-          ],
-        },
-      ],
-      {
-        radioGroup: 1,
-      },
-    );
-
-    setTimeout(async () => {
-      const options = wrapper.findAll('.el-radio__original');
-      expect(options.length).toBe(2);
-
-      await options[1].trigger('click');
-
-      const value = await (wrapper.vm as any).submitForm();
-      expect(value.radioGroup).toBe(2);
-      done();
-    }, 0);
-  });
 });

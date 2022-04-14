@@ -16,7 +16,7 @@
     "@types/node": "^15.12.4",
     "@vitejs/plugin-vue": "^1.2.3",
     "@vue/compiler-sfc": "^3.2.0",
-    "@vue/test-utils": "^2.0.0-rc.12",
+    "@vue/test-utils": "^2.0.0-rc.20",
     "recast": "^0.20.4",
     "rollup-plugin-external-globals": "^0.6.1",
     "sass": "^1.35.1",

@@ -16,8 +16,11 @@
       "require": "./dist/style.css"
     }
   },
+  "license": "Apache-2.0",
   "scripts": {
-    "build": "vite build"
+    "build": "vite build",
+    "test": "jest --maxWorkers=8",
+    "test:coverage": "jest --maxWorkers=16 --coverage"
   },
   "engines": {
     "node": ">=14"
@@ -31,19 +34,25 @@
     "@tmagic/utils": "^1.0.0-beta.12",
     "element-plus": "^2.1.7",
     "lodash-es": "^4.17.21",
-    "moment": "^2.29.1",
+    "moment": "^2.29.2",
     "sortablejs": "^1.14.0",
     "vue": "^3.2.0"
   },
   "devDependencies": {
+    "@types/jest": "^26.0.23",
     "@types/lodash-es": "^4.17.4",
     "@types/node": "^15.12.4",
     "@types/sortablejs": "^1.10.7",
     "@vitejs/plugin-vue": "^1.2.3",
     "@vitejs/plugin-vue-jsx": "^1.1.6",
     "@vue/compiler-sfc": "^3.2.0",
-    "@vue/test-utils": "^2.0.0-rc.12",
+    "@vue/test-utils": "^2.0.0-rc.20",
+    "@vue/vue3-jest": "^27.0.0-alpha.4",
+    "jest": "^27.5.1",
+    "jest-serializer-vue": "^2.0.2",
+    "jest-transform-stub": "^2.0.0",
     "sass": "^1.35.1",
+    "ts-jest": "^27.1.4",
     "typescript": "^4.3.4",
     "vite": "^2.3.7",
     "vite-plugin-dts": "^0.9.6",

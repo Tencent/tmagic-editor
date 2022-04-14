@@ -75,8 +75,6 @@ playground 的示例项目，就是为开发者提供的基础应用示例。开
 
 如果你有好的意见或建议，欢迎给我们提 Issues 或 Pull Requests，为提升魔方可视化编辑器开发体验贡献力量。<br>详见：[CONTRIBUTING.md](./CONTRIBUTING.md)
 
-[腾讯开源激励计划](https://opensource.tencent.com/contribution) 鼓励开发者的参与和贡献，期待你的加入。
-
 ### 欢迎入群交流
 
 <img src="https://vfiles.gtimg.cn/vupload/20220412/b85d331649748582992.jpg" width=375>

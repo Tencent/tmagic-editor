@@ -15,6 +15,7 @@
       "require": "./dist/style.css"
     }
   },
+  "license": "Apache-2.0",
   "scripts": {
     "build": "vite build"
   },
@@ -37,7 +38,7 @@
     "@types/node": "^15.12.4",
     "@vitejs/plugin-vue": "^1.2.3",
     "@vue/compiler-sfc": "^3.2.0",
-    "@vue/test-utils": "^2.0.0-rc.12",
+    "@vue/test-utils": "^2.0.0-rc.20",
     "sass": "^1.35.1",
     "typescript": "^4.3.4",
     "vite": "^2.3.7",

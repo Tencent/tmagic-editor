@@ -34,6 +34,12 @@ module.exports = {
     'vue/no-mutating-props': 'off',
     'no-param-reassign': 'off',
     '@typescript-eslint/no-require-imports': 'off',
+    "@typescript-eslint/no-misused-promises": [
+      "error",
+      {
+        "checksVoidReturn": false
+      }
+    ],
     'simple-import-sort/imports': [
       "error", {
         groups: [
