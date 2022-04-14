@@ -10,8 +10,11 @@
       "require": "./dist/tmagic-utils.umd.js"
     }
   },
+  "license": "Apache-2.0",
   "scripts": {
-    "build": "vite build"
+    "build": "vite build",
+    "test": "jest --maxWorkers=8",
+    "test:coverage": "jest --maxWorkers=16 --coverage"
   },
   "engines": {
     "node": ">=14"
@@ -22,10 +25,15 @@
   },
   "dependencies": {
     "@tmagic/schema": "^1.0.0-beta.12",
-    "moment": "^2.29.1"
+    "moment": "^2.29.2"
   },
   "devDependencies": {
+    "@types/jest": "^26.0.23",
     "@types/node": "^15.12.4",
+    "jest": "^27.5.1",
+    "jest-serializer-vue": "^2.0.2",
+    "jest-transform-stub": "^2.0.0",
+    "ts-jest": "^27.1.4",
     "typescript": "^4.3.4",
     "vite": "^2.3.7",
     "vite-plugin-dts": "^0.9.6"

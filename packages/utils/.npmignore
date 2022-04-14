@@ -8,6 +8,8 @@ tests
 .code.yml
 reports
 jest.config.js
+tsconfig.json
+vite.config.ts
 
 # local env files
 .env.local

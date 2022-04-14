@@ -63,9 +63,6 @@ describe('util', () => {
         done();
       });
 
-    // 这个时候 setTimeout 应该已经执行
-    expect(setTimeout).toHaveBeenCalledTimes(1);
-
     // 快进500毫秒，callback应该已执行
     jest.advanceTimersByTime(500);
   });

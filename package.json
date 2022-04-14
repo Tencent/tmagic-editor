@@ -17,8 +17,8 @@
     "page-vue2": "cd page-vue2 && vite",
     "page-react": "cd page-react && vite",
     "reinstall": "npm run clean:all && npm run bootstrap",
-    "test": "jest --maxWorkers=8",
-    "test:coverage": "jest --maxWorkers=16 --coverage",
+    "test": "npx lerna run test --scope @tmagic/* --parallel",
+    "test:coverage": "npx lerna run test:coverage --scope @tmagic/* --parallel",
     "prepare": "husky install"
   },
   "engines": {
@@ -37,13 +37,11 @@
   },
   "devDependencies": {
     "@babel/preset-env": "^7.14.2",
-    "@commitlint/cli": "^12.1.4",
-    "@commitlint/config-conventional": "^12.1.4",
-    "@types/jest": "^26.0.23",
+    "@commitlint/cli": "^16.2.3",
+    "@commitlint/config-conventional": "^16.2.1",
     "@typescript-eslint/eslint-plugin": "^4.28.0",
     "@typescript-eslint/parser": "^4.28.0",
-    "@vue/cli-plugin-babel": "^4.5.13",
-    "@vue/cli-plugin-unit-jest": "^4.5.13",
+    "@vue/cli-plugin-babel": "^5.0.4",
     "babel-eslint": "^10.1.0",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^7.29.0",
@@ -56,8 +54,7 @@
     "lerna": "^4.0.0",
     "lint-staged": "^11.0.1",
     "prettier": "^2.3.1",
-    "typescript": "^4.3.4",
-    "vue-jest": "^5.0.0-alpha.10"
+    "typescript": "^4.3.4"
   },
   "config": {
     "commitizen": {

@@ -20,7 +20,7 @@ import path from 'path';
 
 import { defineConfig } from 'vite';
 
-import { getBaseConfig } from '../vite-config';
+import { getBaseConfig } from '../../vite-config';
 
 import pkg from './package.json';
 

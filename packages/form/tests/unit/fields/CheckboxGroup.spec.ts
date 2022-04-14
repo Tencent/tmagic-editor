@@ -95,45 +95,4 @@ describe('CheckboxGroup', () => {
       done();
     }, 0);
   });
-
-  it('点击选中', (done) => {
-    const wrapper = getWrapper(
-      [
-        {
-          text: 'checkboxGroup',
-          type: 'checkbox-group',
-          name: 'checkboxGroup',
-          options: [
-            {
-              value: 1,
-              text: 'one',
-            },
-            {
-              value: 2,
-              text: 'two',
-            },
-          ],
-        },
-      ],
-      {
-        checkboxGroup: [1],
-      },
-    );
-
-    setTimeout(async () => {
-      const options = wrapper.findAll('.el-checkbox__original');
-      expect(options.length).toBe(2);
-
-      await options[0].trigger('click');
-      await options[1].trigger('click');
-
-      expect((wrapper.vm as any).values.checkboxGroup).toEqual([2]);
-
-      await options[0].trigger('click');
-
-      const value = await (wrapper.vm as any).submitForm();
-      expect(value.checkboxGroup).toEqual([2, 1]);
-      done();
-    }, 0);
-  });
 });

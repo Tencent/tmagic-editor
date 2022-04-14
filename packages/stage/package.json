@@ -11,6 +11,7 @@
       "require": "./dist/tmagic-stage.umd.js"
     }
   },
+  "license": "Apache-2.0",
   "scripts": {
     "build": "vite build"
   },
