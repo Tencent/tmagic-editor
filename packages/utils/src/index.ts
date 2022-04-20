@@ -207,4 +207,4 @@ export const isPop = (node: MNode): boolean => Boolean(node.type?.toLowerCase().
 
 export const isPage = (node: MNode): boolean => Boolean(node.type?.toLowerCase() === NodeType.PAGE);
 
-export const isNumber = (value: string) => /^(\d|\.)+$/.test(value);
+export const isNumber = (value: string) => /^(-?\d+)(\.\d+)?$/.test(value);
