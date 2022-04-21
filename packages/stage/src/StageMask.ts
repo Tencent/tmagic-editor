@@ -291,6 +291,10 @@ export default class StageMask extends Rule {
     if (!this.page) throw new Error('page 未初始化');
 
     const { deltaY, deltaX } = event;
+
+    if (this.page.clientHeight < this.wrapperHeight && deltaY) return;
+    if (this.page.clientWidth < this.wrapperWidth && deltaX) return;
+
     if (this.maxScrollTop > 0) {
       this.scrollTop = this.scrollTop + deltaY;
     }
