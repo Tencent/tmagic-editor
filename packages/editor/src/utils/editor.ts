@@ -213,7 +213,11 @@ export const change2Fixed = (node: MNode, root: MApp) => {
   return node;
 };
 
-export const Fixed2Other = async (node: MNode, root: MApp, getLayout: (node: MNode) => Promise<Layout>) => {
+export const Fixed2Other = async (
+  node: MNode,
+  root: MApp,
+  getLayout: (parent: MNode, node?: MNode) => Promise<Layout>,
+) => {
   const path = getNodePath(node.id, root.items);
   const cur = path.pop();
   const offset = {
