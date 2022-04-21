@@ -53,7 +53,7 @@ const doAction = async (
     let returnValue: any = await fn(beforeArgs, sourceMethod.bind(scope));
 
     for (const afterMethod of scope.pluginOptionsList[afterMethodName]) {
-      returnValue = await afterMethod(...beforeArgs, returnValue);
+      returnValue = await afterMethod(returnValue, ...beforeArgs);
 
       if (isError(returnValue)) throw returnValue;
     }
