@@ -24,6 +24,7 @@ import KeyController from 'keycon';
 import type { MNode, MPage } from '@tmagic/schema';
 import type { MoveableOptions } from '@tmagic/stage';
 import StageCore from '@tmagic/stage';
+import { isPage } from '@tmagic/utils';
 
 import type { Services } from '@editor/type';
 
@@ -77,7 +78,8 @@ export default defineComponent({
 
       keycon
         .keyup('delete', () => {
-          node.value && services?.editorService.remove(node.value);
+          if (!node.value || isPage(node.value)) return;
+          services?.editorService.remove(node.value);
         })
         .keyup(['ctrl', 'c'], () => {
           node.value && services?.editorService.copy(node.value);
