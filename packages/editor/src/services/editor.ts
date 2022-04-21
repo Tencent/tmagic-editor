@@ -108,7 +108,7 @@ class Editor extends BaseService {
    * @returns {EditorNodeInfo}
    */
   public getNodeInfo(id: Id): EditorNodeInfo {
-    const root = this.get<MApp | null>('root');
+    const root = toRaw(this.get<MApp | null>('root'));
     if (!root) return {};
 
     if (id === root.id) {
@@ -159,13 +159,15 @@ class Editor extends BaseService {
   /**
    * 只有容器拥有布局
    */
-  public async getLayout(node: MNode): Promise<Layout> {
-    if (node.layout) {
-      return node.layout;
+  public async getLayout(parent: MNode, node?: MNode): Promise<Layout> {
+    if (node && typeof node !== 'function' && isFixed(node)) return Layout.FIXED;
+
+    if (parent.layout) {
+      return parent.layout;
     }
 
     // 如果该节点没有设置position，则认为是流式布局，例如获取root的布局时
-    if (!node.style?.position) {
+    if (!parent.style?.position) {
       return Layout.RELATIVE;
     }
 
@@ -209,7 +211,8 @@ class Editor extends BaseService {
    * @param parent 要添加到的容器组件节点配置，如果不设置，默认为当前选中的组件的父节点
    * @returns 添加后的节点
    */
-  public async add({ type, ...config }: AddMNode, parent?: MContainer | null): Promise<MNode> {
+  public async add(addNode: AddMNode, parent?: MContainer | null): Promise<MNode> {
+    const { type, ...config } = addNode;
     const curNode = this.get<MContainer>('node');
 
     let parentNode: MNode | undefined;
@@ -227,7 +230,7 @@ class Editor extends BaseService {
 
     if (!parentNode) throw new Error('未找到父元素');
 
-    const layout = await this.getLayout(parentNode);
+    const layout = await this.getLayout(toRaw(parentNode), addNode as MNode);
     const newNode = initPosition(
       { ...toRaw(await propsService.getPropsValue(type, config)) },
       layout,
@@ -432,7 +435,7 @@ class Editor extends BaseService {
   public async alignCenter(config: MNode): Promise<MNode | void> {
     const parent = this.get<MContainer>('parent');
     const node = this.get<MNode>('node');
-    const layout = await this.getLayout(parent);
+    const layout = await this.getLayout(toRaw(parent), toRaw(node));
     if (layout === Layout.RELATIVE) {
       return;
     }
