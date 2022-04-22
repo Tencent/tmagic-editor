@@ -64,12 +64,12 @@ export default defineComponent({
     const services = inject<Services>('services');
     const uiService = services?.uiService;
 
-    const zoomInHandler = () => uiService?.set('zoom', zoom.value + 0.1);
-    const zoomOutHandler = () => uiService?.set('zoom', zoom.value - 0.1);
-
     const zoom = computed((): number => uiService?.get<number>('zoom') ?? 1);
     const showGuides = computed((): boolean => uiService?.get<boolean>('showGuides') ?? true);
     const showRule = computed((): boolean => uiService?.get<boolean>('showRule') ?? true);
+
+    const zoomInHandler = () => uiService?.zoom(0.1);
+    const zoomOutHandler = () => uiService?.zoom(-0.1);
 
     const item = computed((): MenuButton | MenuComponent => {
       if (typeof props.data !== 'string') {

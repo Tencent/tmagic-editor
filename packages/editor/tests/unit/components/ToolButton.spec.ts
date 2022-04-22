@@ -20,6 +20,7 @@ import { mount } from '@vue/test-utils';
 import ElementPlus, { ElDropdown } from 'element-plus';
 
 import ToolButton from '@editor/components/ToolButton.vue';
+import uiService from '@editor/services/ui';
 
 // ResizeObserver mock
 globalThis.ResizeObserver =
@@ -48,12 +49,6 @@ const historyService = {
     canUndo: true,
     canRedo: true,
   },
-};
-
-// mock
-const uiService = {
-  set: jest.fn(),
-  get: jest.fn(() => 0.5),
 };
 
 const getWrapper = (
@@ -110,24 +105,25 @@ describe('ToolButton', () => {
   });
 
   it('放大', (done) => {
+    uiService.set('zoom', 1);
     const wrapper = getWrapper({ data: 'zoom-in' });
 
     setTimeout(async () => {
       const icon = wrapper.find('.el-button');
       await icon.trigger('click');
-      expect(uiService.get).toBeCalled();
-      expect(uiService.set.mock.calls[0]).toEqual(['zoom', 0.6]);
+      expect(uiService.get('zoom')).toBe(1.1);
       done();
     }, 0);
   });
 
   it('缩小', (done) => {
+    uiService.set('zoom', 1);
     const wrapper = getWrapper({ data: 'zoom-out' });
 
     setTimeout(async () => {
       const icon = wrapper.find('.el-button');
       await icon.trigger('click');
-      expect(uiService.set.mock.calls[1]).toEqual(['zoom', 0.4]);
+      expect(uiService.get('zoom')).toBe(0.9);
       done();
     }, 0);
   });
