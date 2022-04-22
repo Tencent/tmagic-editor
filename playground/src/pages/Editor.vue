@@ -27,11 +27,11 @@
 <script lang="ts">
 import { defineComponent, ref, toRaw } from 'vue';
 import { Coin, Connection, Document, FolderOpened, SwitchButton, Tickets } from '@element-plus/icons';
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import serialize from 'serialize-javascript';
 
 import type { MenuBarData, MoveableOptions, TMagicEditor } from '@tmagic/editor';
-import { NodeType } from '@tmagic/schema';
+import { Id, NodeType } from '@tmagic/schema';
 import StageCore from '@tmagic/stage';
 import { asyncLoadJs } from '@tmagic/utils';
 
@@ -50,6 +50,18 @@ export default defineComponent({
     const propsValues = ref<Record<string, any>>({});
     const propsConfigs = ref<Record<string, any>>({});
     const eventMethodList = ref<Record<string, any>>({});
+
+    const save = () => {
+      localStorage.setItem(
+        'magicUiConfig',
+        serialize(toRaw(value.value), {
+          space: 2,
+          unsafe: true,
+        }).replace(/"(\w+)":\s/g, '$1: '),
+      );
+      editor.value?.editorService.resetModifiedNodeId();
+    };
+
     const menu: MenuBarData = {
       left: [
         {
@@ -63,7 +75,20 @@ export default defineComponent({
           type: 'button',
           text: '预览',
           icon: Connection,
-          handler: () => {
+          handler: async () => {
+            if (editor.value && editor.value.editorService.get<Map<Id, Id>>('modifiedNodeIds').size > 0) {
+              try {
+                await ElMessageBox.confirm('有修改未保存，是否先保存再预览', '提示', {
+                  confirmButtonText: '保存并预览',
+                  cancelButtonText: '预览',
+                  type: 'warning',
+                });
+                save();
+                ElMessage.success('保存成功');
+              } catch (e) {
+                console.error(e);
+              }
+            }
             previewVisible.value = true;
           },
         },
@@ -71,15 +96,8 @@ export default defineComponent({
           type: 'button',
           text: '保存',
           icon: Coin,
-          handler: (service) => {
-            localStorage.setItem(
-              'magicUiConfig',
-              serialize(toRaw(value.value), {
-                space: 2,
-                unsafe: true,
-              }).replace(/"(\w+)":\s/g, '$1: '),
-            );
-            service?.editorService.resetModifiedNodeId();
+          handler: () => {
+            save();
             ElMessage.success('保存成功');
           },
         },
@@ -102,6 +120,8 @@ export default defineComponent({
     asyncLoadJs(`${RUNTIME_PATH}/assets/event.js`).then(() => {
       eventMethodList.value = (globalThis as any).magicPresetEvents;
     });
+
+    save();
 
     return {
       RUNTIME_PATH,
@@ -169,6 +189,9 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+html {
+  overflow: hidden;
+}
 #app {
   width: 100%;
   height: 100%;
