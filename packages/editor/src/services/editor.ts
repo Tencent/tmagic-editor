@@ -23,7 +23,7 @@ import serialize from 'serialize-javascript';
 import type { Id, MApp, MComponent, MContainer, MNode, MPage } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 import StageCore from '@tmagic/stage';
-import { getNodePath, isPop } from '@tmagic/utils';
+import { getNodePath, isNumber, isPage, isPop } from '@tmagic/utils';
 
 import historyService, { StepValue } from '@editor/services/history';
 import propsService from '@editor/services/props';
@@ -191,6 +191,39 @@ class Editor extends BaseService {
       historyService.empty();
     }
     return node!;
+  }
+
+  public async selectNextNode(): Promise<MNode> | never {
+    const node = toRaw(this.get('node'));
+
+    if (!node || isPage(node) || node.type === NodeType.ROOT) return node;
+
+    const parent = toRaw(this.getParentById(node.id));
+
+    if (!parent) return node;
+
+    const index = getNodeIndex(node, parent);
+
+    const nextNode = parent.items[index + 1] || parent.items[0];
+
+    await this.select(nextNode);
+    this.get<StageCore>('stage')?.select(nextNode.id);
+
+    return nextNode;
+  }
+
+  public async selectNextPage(): Promise<MNode> | never {
+    const root = toRaw(this.get<MApp>('root'));
+    const page = toRaw(this.get('page'));
+
+    const index = getNodeIndex(page, root);
+
+    const nextPage = root.items[index + 1] || root.items[0];
+
+    await this.select(nextPage);
+    this.get<StageCore>('stage')?.select(nextPage.id);
+
+    return nextPage;
   }
 
   /**
@@ -491,6 +524,26 @@ class Editor extends BaseService {
     const value = historyService.redo();
     await this.changeHistoryState(value);
     return value;
+  }
+
+  public async move(left: number, top: number) {
+    const node = toRaw(this.get('node'));
+    if (!node || isPage(node)) return;
+
+    const { style, id } = node;
+    if (!style || style.position !== 'absolute') return;
+
+    if (top && !isNumber(style.top)) return;
+    if (left && !isNumber(style.left)) return;
+
+    this.update({
+      id,
+      style: {
+        ...style,
+        left: Number(style.left) + left,
+        top: Number(style.top) + top,
+      },
+    });
   }
 
   public destroy() {

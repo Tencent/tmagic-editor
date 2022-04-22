@@ -125,7 +125,7 @@ export const setNewItemId = (config: MNode, parent?: MPage) => {
  */
 export const isFixed = (node: MNode): boolean => node.style?.position === 'fixed';
 
-export const getNodeIndex = (node: MNode, parent: MContainer): number => {
+export const getNodeIndex = (node: MNode, parent: MContainer | MApp): number => {
   const items = parent?.items || [];
   return items.findIndex((item: MNode) => `${item.id}` === `${node.id}`);
 };

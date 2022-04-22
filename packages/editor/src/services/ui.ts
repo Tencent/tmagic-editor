@@ -91,6 +91,11 @@ class Ui extends BaseService {
     return (state as any)[name];
   }
 
+  public zoom(zoom: number) {
+    this.set('zoom', (this.get<number>('zoom') * 100 + zoom * 100) / 100);
+    if (this.get<number>('zoom') < 0.1) this.set('zoom', 0.1);
+  }
+
   private setColumnWidth({ left, center, right }: SetColumnWidth) {
     const columnWidth = {
       ...toRaw(this.get<GetColumnWidth>('columnWidth')),
