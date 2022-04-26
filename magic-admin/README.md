@@ -132,13 +132,13 @@ server 文件夹下面这些敏感文件，需要开发者参考示例进行替�
 │   │   ├── keyExample.ts（加密秘钥配置）
 ```
 
-- 关于登陆态：
-  magic-admin 在库表中为开发者预留了用户信息字段（活动负责人），开发者可以根据自身业务需要，实现用户登陆态
+- 关于登录态：
+  magic-admin 在库表中为开发者预留了用户信息字段（活动负责人），开发者可以根据自身业务需要，实现用户登录态
 
 ```js
 // web/src/App.vue
 watchEffect(async () => {
-  // 登陆态获取交由开发者实现
+  // 登录态获取交由开发者实现
   const userName = process.env.VUE_APP_USER_NAME || "defaultName";
   Cookies.set("userName", userName);
 });
@@ -158,7 +158,7 @@ watchEffect(async () => {
 
 - **在管理端引入 runtime**
 
-在管理端中我们提供了一个可视化的模拟画布，他需要依赖 runtime 核心库，因此我们需要先在 magic 根目录下运行
+在管理端中我们提供了一个可视化的模拟器，他需要依赖 runtime 核心库，因此我们需要先在 magic 根目录下运行
 
 ```js
 cd magic
