@@ -196,7 +196,8 @@ const generateEntryFile = function ({ entries, entryFile, type, componentFileAff
 
   fs.writeFileSync(
     path.resolve(entryPath(), entryFile),
-    prettyPrint(parse(jsString, { parser: require('recast/parsers/typescript') }), {
+    // window下需要将路径中\转换成/
+    prettyPrint(parse(jsString.replace(/\\/g, '/'), { parser: require('recast/parsers/typescript') }), {
       tabWidth: 2,
       trailingComma: true,
       quote: 'single',
@@ -207,9 +208,10 @@ const generateEntryFile = function ({ entries, entryFile, type, componentFileAff
 
 const installPackage = function (package) {
   try {
-    execSync(`node -e "require.resolve('${package}')"`, { stdio: 'ignore' });
+    // window下需要将路径中\转换成/
+    execSync(`node -e "require.resolve('${package.replace(/\\/g, '/')}')"`, { stdio: 'ignore' });
   } catch (e) {
-    execSync(`npm install ${package} --registry https://mirrors.tencent.com/npm/`, {
+    execSync(`npm install ${package}`, {
       stdio: 'inherit',
       cwd: pageRoot(),
     });

@@ -9,6 +9,8 @@
     "serve": "vite preview --port 8077"
   },
   "dependencies": {
+    "@tmagic/schema": "^1.0.0-beta.13",
+    "@tmagic/stage": "^1.0.0-beta.13",
     "@vue/composition-api": "1.0.5",
     "vue": "^2.6.14"
   },
