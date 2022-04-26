@@ -38,7 +38,7 @@ $ npm run bootstrap
 $ npm run playground
 ```
 
-最后再浏览器中打开
+最后在浏览器中打开
 
 http://localhost:8098/
 
