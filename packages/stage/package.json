@@ -28,7 +28,7 @@
     "@tmagic/utils": "^1.0.0-beta.13",
     "events": "^3.3.0",
     "lodash-es": "^4.17.21",
-    "moveable": "^0.28.0",
+    "moveable": "^0.29.4",
     "moveable-helper": "^0.4.0"
   },
   "devDependencies": {
