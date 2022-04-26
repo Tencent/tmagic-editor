@@ -19,7 +19,8 @@
     "reinstall": "npm run clean:all && npm run bootstrap",
     "test": "npx lerna run test --scope @tmagic/* --parallel",
     "test:coverage": "npx lerna run test:coverage --scope @tmagic/* --parallel",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "commit": "git-cz"
   },
   "engines": {
     "node": ">=14"
