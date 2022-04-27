@@ -17,7 +17,8 @@
         "@vue/test-utils",
         "element-plus",
         "@element-plus/icons",
-        "@testing-library/vue"
+        "@testing-library/vue",
+        "@vue/composition-api"
       ]
     }
   }
