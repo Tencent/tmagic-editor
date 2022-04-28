@@ -177,7 +177,7 @@ export default defineComponent({
       submitForm: async (native?: boolean): Promise<any> => {
         try {
           await elForm.value?.validate();
-          return native ? values.value : cloneDeep(values.value);
+          return native ? values.value : cloneDeep(toRaw(values.value));
         } catch (invalidFields: any) {
           const error: string[] = [];
 
