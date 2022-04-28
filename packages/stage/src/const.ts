@@ -21,6 +21,8 @@ export const GHOST_EL_ID_PREFIX = 'ghost_el_';
 
 export const DRAG_EL_ID_PREFIX = 'drag_el_';
 
+export const HIGHLIGHT_EL_ID_PREFIX = 'highlight_el_';
+
 // 默认放到缩小倍数
 export const DEFAULT_ZOOM = 1;
 

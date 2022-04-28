@@ -22,6 +22,8 @@ import { Id, MApp, MNode } from '@tmagic/schema';
 
 import { GuidesType } from './const';
 import StageCore from './StageCore';
+import StageDragResize from './StageDragResize';
+import StageMask from './StageMask';
 
 export type CanSelect = (el: HTMLElement, event: MouseEvent, stop: () => boolean) => boolean | Promise<boolean>;
 
@@ -54,7 +56,6 @@ export type Rect = {
   width: number;
   height: number;
 } & Offset;
-
 export interface Offset {
   left: number;
   top: number;
@@ -118,4 +119,10 @@ export interface RuntimeWindow extends Window {
 export interface StageHighlightConfig {
   core: StageCore;
   container: HTMLElement;
+}
+
+export interface TargetCalibrateConfig {
+  parent: HTMLElement;
+  mask: StageMask;
+  dr: StageDragResize;
 }

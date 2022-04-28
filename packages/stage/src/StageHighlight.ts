@@ -21,19 +21,27 @@ import { EventEmitter } from 'events';
 
 import Moveable from 'moveable';
 
+import { HIGHLIGHT_EL_ID_PREFIX } from './const';
 import StageCore from './StageCore';
+import TargetCalibrate from './TargetCalibrate';
 import type { StageHighlightConfig } from './types';
 export default class StageHighlight extends EventEmitter {
   public core: StageCore;
   public container: HTMLElement;
   public target?: HTMLElement;
   public moveable?: Moveable;
+  public calibrationTarget: TargetCalibrate;
 
   constructor(config: StageHighlightConfig) {
     super();
 
     this.core = config.core;
     this.container = config.container;
+    this.calibrationTarget = new TargetCalibrate({
+      parent: this.core.mask.content,
+      mask: this.core.mask,
+      dr: this.core.dr,
+    });
   }
 
   /**
@@ -44,10 +52,12 @@ export default class StageHighlight extends EventEmitter {
     if (!el || el === this.target) return;
     this.target = el;
     this.moveable?.destroy();
+
     this.moveable = new Moveable(this.container, {
-      target: this.target,
-      scrollable: true,
+      target: this.calibrationTarget.update(el, HIGHLIGHT_EL_ID_PREFIX),
       origin: false,
+      rootContainer: this.core.container,
+      zoom: 1,
     });
   }
 
@@ -66,5 +76,6 @@ export default class StageHighlight extends EventEmitter {
    */
   public destroy(): void {
     this.moveable?.destroy();
+    this.calibrationTarget.destroy();
   }
 }

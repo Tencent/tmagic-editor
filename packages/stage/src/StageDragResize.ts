@@ -46,11 +46,11 @@ export default class StageDragResize extends EventEmitter {
   public horizontalGuidelines: number[] = [];
   public verticalGuidelines: number[] = [];
   public elementGuidelines: HTMLElement[] = [];
+  public mode: Mode = Mode.ABSOLUTE;
 
   private moveableOptions: MoveableOptions = {};
   private dragStatus: ActionStatus = ActionStatus.END;
   private ghostEl: HTMLElement | undefined;
-  private mode: Mode = Mode.ABSOLUTE;
   private moveableHelper?: MoveableHelper;
 
   constructor(config: StageDragResizeConfig) {
@@ -354,6 +354,7 @@ export default class StageDragResize extends EventEmitter {
       top: ${offset.top}px;
       width: ${width}px;
       height: ${height}px;
+      z-index: 9;
     `;
 
     this.dragEl.id = `${DRAG_EL_ID_PREFIX}${el.id}`;
