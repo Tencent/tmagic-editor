@@ -24,7 +24,8 @@ export interface ColumnActionConfig {
   text: string;
   name: string;
   handler?: (row: any) => Promise<any> | any;
-  after?: () => void;
+  before?: (row: any) => void;
+  after?: (row: any) => void;
   action?: (data: { data: any }) => void;
 }
 
