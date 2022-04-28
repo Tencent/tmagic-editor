@@ -116,6 +116,7 @@ const copyHandler = async (action: ColumnActionConfig, row: any) => {
 };
 
 const actionHandler = async (action: ColumnActionConfig, row: any, index: number) => {
+  await action.before?.(row);
   if (action.type === 'delete') {
     await deleteAction(action, row);
   } else if (action.type === 'copy') {
@@ -124,8 +125,8 @@ const actionHandler = async (action: ColumnActionConfig, row: any, index: number
     props.editState[index] = row;
   } else {
     await action.handler?.(row);
-    action.after?.();
   }
+  action.after?.(row);
 };
 
 const save = async (index: number, config: ColumnConfig) => {
