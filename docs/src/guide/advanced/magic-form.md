@@ -1,8 +1,8 @@
-# Magic-Form
+# @tmagic/form
 
-魔方的表单配置，核心就是使用了 magic-form 来作为渲染器。magic-form 是一个 npm 包，可以安装它，在你想使用的地方单独使用。
+tmagic-editor的表单配置，核心就是使用了 @tmagic/form 来作为渲染器。@tmagic/form 是一个 npm 包，可以安装它，在你想使用的地方单独使用。
 
-Magic-Form 接受一个表单配置，详细配置可参考[表单 api](/docs/api/form.md)。
+@tmagic/form 接受一个表单配置，详细配置可参考[表单 api](../../api/form.md)。
 
 ## 安装
 
@@ -17,9 +17,9 @@ $ npm install element-plus
 
 ## 快速上手
 
-本节将介绍如何在项目中使用 MagicForm。
+本节将介绍如何在项目中使用 @tmagic/form
 
-### 引入 Magic-Form
+### 引入 @tmagic/form
 
 MagicForm 使用了 element-ui 库
 
@@ -29,7 +29,9 @@ MagicForm 使用了 element-ui 库
 import { createApp } from "vue";
 import ElementPlus from "element-plus";
 import MagicForm from "@tmagic/form";
-import "element-plus/lib/theme-chalk/index.css";
+
+import "element-plus/dist/index.css";
+
 import App from "./App.vue";
 
 const app = createApp(App);
@@ -102,11 +104,11 @@ app.mount("#app");
 </script>
 ```
 
-以上代码便完成了 MagicForm 的引入。需要注意的是，ElementUI 的样式文件需要单独引入。
+以上代码便完成了 @tmagic/form 的引入。需要注意的是，ElementUI 的样式文件需要单独引入。
 
 ### 开始使用
 
-至此，一个基于 Vue 和 MagicForm 的开发环境已经搭建完毕，现在就可以编写代码了。
+至此，一个基于 Vue 和 @tmagic/form 的开发环境已经搭建完毕，现在就可以编写代码了。
 
 ### 示例
 

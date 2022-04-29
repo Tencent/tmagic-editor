@@ -279,18 +279,18 @@
 |---------- |-------- |---------- |-------------  |-------- |
 | name | 绑定值 | string | — | — |
 | text     | 表单标签   | string |       —        |      —   |
-| disabled  | 是否禁用    | boolean / [Function](#/form/component/common#/disabled)    | — | false   |
+| disabled  | 是否禁用    | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)    | — | false   |
 | activeValue  | 选中时的值	    | string / number / Function   | — | 1   |
 | inactiveValue  | 没有选中时的值  | string / number / Function   | — | 0   |
-| onChange  | 值变化时触发的函数  | [Function](#/form/component/common#/onChange)   | — | -   |
+| onChange  | 值变化时触发的函数  | [OnChangeHandler ](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | -   |
 
 ### CheckboxGroup Attributes
 | 参数      | 说明    | 类型      | 可选值       | 默认值   |
 |---------- |-------- |---------- |-------------  |-------- |
 | name | 绑定值 | string | — | — |
 | text     | 表单标签   | string |       —        |      —   |
-| disabled  | 是否禁用    | boolean / [Function](#/form/component/common#/disabled)   | — | false   |
-| onChange  | 值变化时触发的函数  | [Function](#/form/component/common#/onChange)   | — | -   |
+| disabled  | 是否禁用    | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | false   |
+| onChange  | 值变化时触发的函数  | [OnChangeHandler](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | -   |
 | options  | 选项  | Array   | — | -   |
 
 ## ColorPicker 颜色选择器
@@ -392,9 +392,9 @@
 |---------- |-------------- |---------- |--------------------------------  |-------- |
 | name | 绑定值 | string | — | — |
 | text     | 表单标签   | string |       —        |      —   |
-| disabled  | 是否禁用    | boolean / [Function](#/form/component/common#/disabled)    | — | false   |
+| disabled  | 是否禁用    | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)    | — | false   |
 | value-format | 可选，绑定值的格式。不指定则绑定值为 Date 对象 | string | 见[日期格式](#/zh-CN/component/date-picker#ri-qi-ge-shi) | — |
-| onChange  | 值变化时触发的函数  | [Function](#/form/component/common#/onChange)   | — | -   |
+| onChange  | 值变化时触发的函数  | [OnChangeHandler](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | -   |
 
 
 
@@ -483,10 +483,10 @@
 |---------- |-------------- |---------- |--------------------------------  |-------- |
 | name | 绑定值 | string | — | — |
 | text     | 表单标签   | string |       —        |      —   |
-| disabled  | 是否禁用    | boolean / [Function](#/form/component/common#/disabled)    | — | false   |
+| disabled  | 是否禁用    | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)    | — | false   |
 | format | 显示在输入框中的格式 | string | 见[日期格式](#/zh-CN/component/date-picker#ri-qi-ge-shi) | yyyy-MM-dd HH:mm:ss |
 | value-format | 可选，绑定值的格式。不指定则绑定值为 Date 对象 | string | 见[日期格式](#/zh-CN/component/date-picker#ri-qi-ge-shi) | — |
-| onChange  | 值变化时触发的函数  | [Function](#/form/component/common#/onChange)   | — | -   |
+| onChange  | 值变化时触发的函数  | [OnChangeHandler](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | -   |
 
 ## Display 只读文本
 
@@ -500,7 +500,7 @@ interface Display extends FormItem {
 }
 ```
 
-点击查看[FormItem](#/form/component/common#/FormItem)的定义
+点击查看[FormItem](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)的定义
 
 ### 基础用法
 
@@ -536,7 +536,7 @@ interface Hidden extends FormItem {
 }
 ```
 
-点击查看[FormItem](#/form/component/common#/FormItem)的定义
+点击查看[FormItem](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)的定义
 
 ### 基础用法
 
@@ -614,11 +614,11 @@ interface Hidden extends FormItem {
 | name | 绑定值 | string | — | — |
 | placeholder  | 输入框占位文本   | string |       —        |      —   |
 | text     | 表单标签   | string |       —        |      —   |
-| disabled  | 是否禁用    | boolean / [Function](#/form/component/common#/disabled)   | — | false   |
+| disabled  | 是否禁用    | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | false   |
 | min      | 设置计数器允许的最小值 | number | — | -Infinity |
 | max      | 设置计数器允许的最大值 | number | — | Infinity |
 | step     | 计数器步长           | number   | — | 1 |
-| onChange  | 值变化时触发的函数  | [Function](#/form/component/common#/onChange)   | — | -   |
+| onChange  | 值变化时触发的函数  | [OnChangeHandler](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | -   |
 
 ## Input 输入框
 
@@ -734,12 +734,12 @@ interface Hidden extends FormItem {
 | name | 绑定值 | string | — | — |
 | placeholder  | 输入框占位文本   | string |       —        |      —   |
 | text     | 表单标签   | string |       —        |      —   |
-| disabled  | 是否禁用    | boolean / [Function](#/form/component/common#/disabled)   | — | false   |
+| disabled  | 是否禁用    | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | false   |
 | tooltip  | 输入时显示内容    | boolean   | — | false   |
 | placeholder   | 输入框占位文本   | string          | — | — |
 | trim  | 是否去掉首尾空格  | boolean   | — | false  |
 | filter  | 过滤值  | string / Function   | number | -  |
-| onChange  | 值变化时触发的函数  | [Function](#/form/component/common#/onChange)   | — | -   |
+| onChange  | 值变化时触发的函数  | [OnChangeHandler ](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | -   |
 | append  | 后置内容  | string / Object   | — | -   |
 
 ### append Attributes
@@ -772,7 +772,7 @@ interface Link extends FormItem {
 }
 ```
 
-点击查看[FormItem](#/form/component/common#/FormItem)的定义
+点击查看[FormItem](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)的定义
 
 ### 基础用法
 
@@ -830,7 +830,7 @@ interface RedioGroup extends FormItem {
 }
 ```
 
-点击查看[FormItem](#/form/component/common#/FormItem)的定义
+点击查看[FormItem](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)的定义
 
 ### 基础用法
 
@@ -878,9 +878,9 @@ interface RedioGroup extends FormItem {
 |---------- |-------- |---------- |-------------  |-------- |
 | name | 绑定值 | string | — | — |
 | text     | 表单标签   | string |       —        |      —   |
-| disabled  | 是否禁用    | boolean / [Function](#/form/component/common#/disabled)    | — | false   |
+| disabled  | 是否禁用    | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)    | — | false   |
 | options  | 选项  | Array   | — | -   |
-| onChange  | 值变化时触发的函数  | [Function](#/form/component/common#/onChange)    | — | -   |
+| onChange  | 值变化时触发的函数  | [OnChangeHandler ](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)    | — | -   |
 
 ## Select 选择器
 
@@ -1056,13 +1056,13 @@ interface RedioGroup extends FormItem {
 | name | 绑定值 | string | — | — |
 | placeholder  | 输入框占位文本   | string |       —        |      —   |
 | text     | 表单标签   | string |       —        |      —   |
-| disabled  | 是否禁用    | boolean / [Function](#/form/component/common#/disabled)   | — | false   |
+| disabled  | 是否禁用    | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | false   |
 | multiple | 是否多选 | boolean | — | false |
 | valueKey | 作为 value 唯一标识的键名，绑定值为对象类型时必填 | string | — | value |
 | allowCreate | 是否允许用户创建新条目 | boolean | — | false |
 | remote | 是否为远程搜索 | boolean | — | false |
 | group | 是否选择分组 | boolean | — | false |
-| onChange  | 值变化时触发的函数  | [Function](#/form/component/common#/onChange)   | — | -   |
+| onChange  | 值变化时触发的函数  | [OnChangeHandler ](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | -   |
 | options  | 选项  | Array   | — | -   |
 | option  | 选项  | Object   | — | -   |
 
@@ -1132,7 +1132,7 @@ interface RedioGroup extends FormItem {
 | 参数      | 说明    | 类型      | 可选值       | 默认值   |
 |---------- |-------- |---------- |-------------  |-------- |
 | name | 绑定值 | string | — | — |
-| disabled  | 是否禁用    | boolean / [Function](#/form/component/common#/disabled)   | — | false   |
+| disabled  | 是否禁用    | boolean / [Function](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | false   |
 | active-value  | switch 打开时的值    | boolean / string / number | — | true |
 | inactive-value  | switch 关闭时的值    | boolean / string / number | — | false |
 
@@ -1173,11 +1173,11 @@ interface RedioGroup extends FormItem {
 | name | 绑定值 | string | — | — |
 | placeholder  | 输入框占位文本   | string |       —        |      —   |
 | text     | 表单标签   | string |       —        |      —   |
-| disabled  | 是否禁用    | boolean / [Function](#/form/component/common#/disabled)   | — | false   |
+| disabled  | 是否禁用    | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | false   |
 | placeholder   | 输入框占位文本   | string          | — | — |
 | trim  | 是否去掉首尾空格  | boolean   | — | false  |
 | filter  | 过滤值  | string / Function   | number | -  |
-| onChange  | 值变化时触发的函数  | [Function](#/form/component/common#/onChange)   | — | -   |
+| onChange  | 值变化时触发的函数  | [OnChangeHandler ](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | -   |
 
 ## TimePicker 时间选择器
 
@@ -1219,4 +1219,4 @@ interface RedioGroup extends FormItem {
 | name | 绑定值 | string | — | — |
 | placeholder  | 输入框占位文本   | string |       —        |      —   |
 | text     | 表单标签   | string |       —        |      —   |
-| disabled  | 是否禁用    | boolean / [Function](#/form/component/common#/disabled)   | — | false   |
+| disabled  | 是否禁用    | boolean / [Function](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | false   |

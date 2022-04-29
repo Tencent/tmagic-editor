@@ -4,7 +4,7 @@
 
 ### data
 
-- **类型：** MApp(https://github.com/Tencent/tmagic-editor/blob/master/packages/schema/src/index.ts)[]
+- **类型：** [MApp](https://github.com/Tencent/tmagic-editor/blob/master/packages/schema/src/index.ts)[]
   
 - **默认值：** {}
   
@@ -47,19 +47,16 @@
 - **示例：**
 
 ```js
+import { FolderOpened, SwitchButton, Tickets } from '@element-plus/icons';
+
 [
   {
     title: '容器',
     items: [
       {
-        icon: 'folder-opened',
+        icon: FolderOpened,
         text: '组',
         type: 'container',
-      },
-      {
-        icon: 'el-icon-files',
-        text: '标签页(tab)',
-        type: 'tabs',
       },
     ],
   },
@@ -67,12 +64,12 @@
     title: '基础组件',
     items: [
       {
-        icon: 'tickets',
+        icon: Tickets,
         text: '文本',
         type: 'text',
       },
       {
-        icon: 'switch-button',
+        icon: SwitchButton,
         text: '按钮',
         type: 'button',
       },
@@ -104,6 +101,7 @@ icon使用的是[element-plus icon](https://element-plus.org/zh-CN/component/ico
 - **示例：**
   
 ```js
+import { List } from '@element-plus/icons';
 import ModListPanel from '../components/sidebars/ModListPanel.vue';
 
 {
@@ -114,7 +112,7 @@ import ModListPanel from '../components/sidebars/ModListPanel.vue';
     'layer',
     {
       type: 'component',
-      icon: 'el-icon-s-order',
+      icon: List,
       component: ModListPanel,
       text: '模块',
     },
@@ -131,7 +129,7 @@ import ModListPanel from '../components/sidebars/ModListPanel.vue';
   
   顶部工具栏
 
-  系统提供了几个常用功能： '/' | 'delete' | 'undo' | 'redo' | 'zoom-in' | 'zoom-out'
+  系统提供了几个常用功能： '/' | 'delete' | 'undo' | 'redo' | 'zoom-in' | 'zoom-out' | 'zoom'
 
   '/': 分隔符
 
@@ -145,30 +143,35 @@ import ModListPanel from '../components/sidebars/ModListPanel.vue';
   
   'zoom-out': 缩小按钮
 
+  'zoom': 缩放
+
 - **示例：**
 
 ```js
+import { toRaw } from 'vue';
+import { ArrowLeft, Coin } from '@element-plus/icons';
+
 {
   left: [
     {
       type: 'button',
-      icon: 'el-icon-arrow-left',
+      icon: ArrowLeft,
       tooltip: '返回',
     },
     '/',
     {
       type: 'text',
-      text: '魔方',
+      text: '.temp',
     },
   ],
-  center: ['delete', 'undo', 'redo', 'zoom-in', 'zoom-out'],
+  center: ['delete', 'undo', 'redo', 'zoom'],
   right: [
     {
       type: 'button',
       text: '保存',
-      icon: 'el-icon-coin',
+      icon: Coin,
       disabled: true,
-      handler: ({ store }) => console.log(toRaw(store.get('root'))),
+      handler: ({ editorService }) => console.log(toRaw(editorService.get('root'))),
     },
   ],
 }

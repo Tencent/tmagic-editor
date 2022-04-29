@@ -57,14 +57,14 @@ http://localhost:8098/
 <img src="https://image.video.qpic.cn/oa_88b7d-32_509802977_1635842258505918" alt="魔方demo图">
 
 ### 页面渲染
-runtime 是魔方提供的页面渲染环境。通过加载在编辑器中产出的 uiconfig，即可得到魔方编辑器希望拥有的最终产物，一个活动页面。我们提供了 vue2/vue3/react 几个版本的 runtime。
+runtime 是魔方提供的页面渲染环境。通过加载在编辑器中产出的 DSL，即可得到魔方编辑器希望拥有的最终产物，一个活动页面。我们提供了 vue2/vue3/react 几个版本的 runtime。
 
 通过魔方编辑器和 runtime 渲染，以及通过自定义的复杂组件开发，可以在魔方项目上，搭建出复杂而精美的页面。
 
 <img src="https://image.video.qpic.cn/oa_7cf5e6-5_466783002_1637935497991411" width="375">
 
 ### 表单渲染
-魔方的表单配置项，使用了我们开发的基于 element-ui 的 @tmagic/form，magic-form 也可以在其他地方单独使用。支持渲染 JS Schema 提供的表单描述。
+魔方的表单配置项，使用了我们开发的基于 element-ui 的 @tmagic/form，@tmagic/form 也可以在其他地方单独使用。支持渲染 JS Schema 提供的表单描述。
 
 <img src="https://image.video.qpic.cn/oa_28dbde-2_1333081854_1637935825410557" >
 

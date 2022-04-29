@@ -1,7 +1,7 @@
 ---
 home: true
 heroImage: https://vfiles.gtimg.cn/vupload/20210811/388ed01628667545737.png
-heroText: 魔方页面可视化平台
+heroText: tmagic-editor页面可视化平台
 tagline: null
 
 features:
@@ -10,7 +10,7 @@ features:
   - title: 丰富的拓展能力
     details: 支持业务方自定义组件、插件。
   - title: 支持多种布局方式
-    details: 魔方的容器概念，支持配置活动时，自由组合嵌套业务组件，提供超强的组件布局方式。
+    details: tmagic-editor的容器概念，支持配置项目时，自由组合嵌套业务组件，提供超强的组件布局方式。
   - title: 强大的配置
     details: 支持表单联动等配置能力。
   - title: 组件联动
