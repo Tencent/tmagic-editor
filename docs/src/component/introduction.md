@@ -1,12 +1,12 @@
 # 如何开发一个组件
-魔方支持业务方进行自定义组件开发。在魔方中，组件是以 npm 包形式存在的，组件和插件只要按照规范开发，就可以在魔方的 runtime 中被加入并正确渲染组件。
+tmagic-editor支持业务方进行自定义组件开发。在tmagic-editor中，组件是以 npm 包形式存在的，组件和插件只要按照规范开发，就可以在tmagic-editor的 runtime 中被加入并正确渲染组件。
 
 ## 组件注册
 在 [playground](https://tencent.github.io/tmagic-editor/playground/index.html#/) 中，我们可以尝试点击添加一个组件，在模拟器区域里，就会出现这个组件。其中就涉及到组件注册。
 
-这一步需要开发者基于魔方搭建了平台后，实现组件列表的注册、获取机制，魔方组件注册其实就是保存好组件 `type` 的映射关系。`type` 可以参考[组件介绍](/docs/guide/conception.html#组件)。
+这一步需要开发者基于tmagic-editor搭建了平台后，实现组件列表的注册、获取机制，tmagic-editor组件注册其实就是保存好组件 `type` 的映射关系。`type` 可以参考[组件介绍](../guide/conception.html#组件)。
 
-可以参考 vue3 版本的 Magic-UI 中，[组件渲染](/docs/guide/advanced/page.html#组件渲染)逻辑里，type 会作为组件名进入渲染。所以在 vue3 的组件开发中，我们也需要在为 vue 组件声明 name 字段时，和 type 值对应起来，才能正确渲染组件。
+可以参考 vue3 版本的 @tmagic/ui 中，[组件渲染](../guide/advanced/page.html#组件渲染)逻辑里，type 会作为组件名进入渲染。所以在 vue3 的组件开发中，我们也需要在为 vue 组件声明 name 字段时，和 type 值对应起来，才能正确渲染组件。
 
 ## 组件开发
 以 vue3 的组件开发为例。目前项目中的 playground 代码，会自动加载 vue3 相关的组件库。
@@ -16,10 +16,10 @@
 - index 入口文件，引入下面几个文件
 - formConfig 表单配置描述
 - initValue 表单初始值
-- event 定义联动事件，具体可以参考[组件联动](docs/guide/advanced/coupling.html#组件联动)
+- event 定义联动事件，具体可以参考[组件联动](../guide/advanced/coupling.html#组件联动)
 - component.{vue,jsx} 组件样式、逻辑代码
 
-Magic-UI 中的 button/text 就是基础的组件示例。我们要求声明 index 入口，因为我们希望在后续的配套打包工具实现上，可以有一个统一规范入口。
+@tmagic/ui 中的 button/text 就是基础的组件示例。我们要求声明 index 入口，因为我们希望在后续的配套打包工具实现上，可以有一个统一规范入口。
 
 ### 1. 创建组件
 在项目中，如 runtime vue3 目录中，创建一个名为 test-comopnent 的组件目录，其中包含上面四个规范文件。
@@ -100,8 +100,8 @@ react 版本组件代码示例
 // Test.tsx
 import React, { useContext } from 'react';
 
-import Core from '@tencent/magic-core';
-import { AppContent } from '@tencent/magic-ui-react';
+import Core from '@tmagic/core';
+import { AppContent } from '@tmagic/ui-react';
 
 function Test({ config }: { config: any }) {
   const app = useContext<Core | undefined>(AppContent);
@@ -164,11 +164,11 @@ npm run playground
 <img src="https://image.video.qpic.cn/oa_fd3c9c-3_548108267_1636719045199471">
 
 ### 4. 启动 runtime
-在完成开发中组件在编辑器中的实现后，我们将编辑器中的 uiconfig 源码📄 打开，复制 uiconfig。并在 runtime/vue3/src/page 下。创建一个 page-config.js 文件。将 uiconfig 作为配置导出。
+在完成开发中组件在编辑器中的实现后，我们将编辑器中的 DSL 源码📄 打开，复制 DSL。并在 runtime/vue3/src/page 下。创建一个 page-config.js 文件。将 DSL 作为配置导出。
 
 ```javascript
-window.magicUiConfig = [
-  // uiconfig
+window.magicDSL = [
+  // DSL
 ]
 ```
 
@@ -204,6 +204,6 @@ export default {
 1. 组件/插件初始化
 2. 编辑器中的组件调试
 3. 真实页面的组件调试
-4. 编辑器中的 uiconfig 同步至本地调试页面
+4. 编辑器中的 DSL 同步至本地调试页面
 
 等许多步骤，都可以交由业务方进行定制，开发业务自定义的脚手架工具，或者如示例中一样，使用打包脚本来处理。

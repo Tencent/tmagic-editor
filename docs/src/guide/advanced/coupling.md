@@ -1,10 +1,10 @@
 # 联动原理
-魔方的联动，指这两种情况：
+tmagic-editor的联动，指这两种情况：
 - 在编辑器中，组件的表单配置项之间需要联动。
 - 页面中的组件之间，需要联动触发行为。
 
 ## 表单联动
-表单的详细内容，可以参考[Magic-Form](/docs/guide/advanced/magic-form)。我们通过 [JS Schema](/docs/guide/advanced/js-schema) 描述的表单配置，实现联动的方式，就是写一个简单 js 函数。
+表单的详细内容，可以参考[@tmagic/form](../advanced/magic-form)。我们通过 [JS Schema](../advanced/js-schema) 描述的表单配置，实现联动的方式，就是写一个简单 js 函数。
 
 比如下面的例子，我们希望改变选项时，同时改变文本框的内容。
 
@@ -25,17 +25,17 @@
 }]`">
 </demo-block>
 
-在经过表单渲染器时，所有指出函数 API 都会传入当前渲染的**表单组件实例(vm)**，**当前项目(value)**，**当前表单model**，**表单值formValue**，model 即 vue 的[表单输入绑定](https://cn.vuejs.org/v2/guide/forms.html#%E5%9C%A8%E7%BB%84%E4%BB%B6%E4%B8%8A%E4%BD%BF%E7%94%A8-v-model)，可以通过修改他来实现值联动。
+在经过表单渲染器时，所有指出函数 API 都会传入当前渲染的**表单组件实例(vm)**，**当前项目(value)**，**当前表单model**，**表单值formValue**，model 即 vue 的[表单输入绑定](https://v3.cn.vuejs.org/guide/forms.html#%E5%9F%BA%E7%A1%80%E7%94%A8%E6%B3%95)，可以通过修改他来实现值联动。
 
-当然我们也可以通过上述的参数传入，以及其他函数 API 实现更多灵活的表单联动，具体参考[表单 API](/docs/api/base-config)。
+当然我们也可以通过上述的参数传入，以及其他函数 API 实现更多灵活的表单联动，具体参考[表单 API](../../api/base-config)。
 
 ## 组件联动
-魔方在 @tencent/magic-core 中，实现了组件的事件绑定/分发机制。在组件渲染时，每个组件在 Magic-UI 中经过基础组件渲染时，会被基础组件注入公共方法的实现。如下对按钮配置了**点击使文本隐藏**的联动事件，那么在对应按钮被点击时，将会触发对应绑定文本的隐藏。
+tmagic-editor在 @tmagic/core 中，实现了组件的事件绑定/分发机制。在组件渲染时，每个组件在 @tmagic/ui 中经过基础组件渲染时，会被基础组件注入公共方法的实现。如下对按钮配置了**点击使文本隐藏**的联动事件，那么在对应按钮被点击时，将会触发对应绑定文本的隐藏。
 
 <img src="https://image.video.qpic.cn/oa_88b7d-10_2117738923_1637238863127559">
 
 ### 添加组件自定义事件
-如何开发一个完整组件可以参考[组件开发](/docs/component/introduction)，这一节我们主要讲述如何配置定义事件。
+如何开发一个完整组件可以参考[组件开发](../../component/introduction)，这一节我们主要讲述如何配置定义事件。
 
 在组件开发过程中，我们可以通过声明组件中的 event 文件，在文件中描述当前组件可以配置的事件名，和可以被触发的动作。
 ```javascript
@@ -93,7 +93,7 @@ export default defineComponent({
     const hoc = inject('hoc');
 
     // 此处实现事件动作
-    // 由于组件在 Magic-UI 中通过基础组件 Component 来封装，即每个组件其实都被 Component 包裹
+    // 由于组件在 @tmagic/ui 中通过基础组件 Component 来封装，即每个组件其实都被 Component 包裹
     // 实际触发时，会触发到当前组件的直属父组件 Component 上，我们会 provide 这个父组件为高阶组件 hoc
     // 所以将 toast 方法挂载到当前组件的父组件上
     hoc.toast = (/*接收触发事件组件传进来的参数*/) => {
@@ -113,26 +113,26 @@ export default defineComponent({
 ```
 
 ::: tip 
-在用 vue 实现的 组件中，我们通过 inject 方式来提供核心 app 和高阶组件 hoc。调用联动事件方法时，魔方是通过组件的 ref，并直接调用当前组件的方法。
+在用 vue 实现的 组件中，我们通过 inject 方式来提供核心 app 和高阶组件 hoc。调用联动事件方法时，tmagic-editor是通过组件的 ref，并直接调用当前组件的方法。
 :::
 
 #### react 版本实现
-在 react 的实现中，由于魔方提供的 Magic-UI react 版本是用 hook 实现的。所以组件开发我们也相应的需要使用 hook 方式。
+在 react 的实现中，由于tmagic-editor提供的 @tmagic/ui-react 版本是用 hook 实现的。所以组件开发我们也相应的需要使用 hook 方式。
 
 ```jsx
 import React from 'react';
 
-import { useApp } from '@tencent/magic-ui-react';
+import { useApp } from '@tmagic/ui-react';
 
 function Test({ config }) {
   // react 和 vue 实现不同，我们通过 useApp 这个 hook 来提供 app, ref 等核心内容
   // 其中 ref 需要绑定到你的组件上作为 ref。因为一些公共事件会需要使用到你的组件 dom
-  // 同时这个 ref 也会在魔方的高级函数钩子中，将你的组件 dom 作为参数提供给自定义钩子
+  // 同时这个 ref 也会在tmagic-editor的高级函数钩子中，将你的组件 dom 作为参数提供给自定义钩子
   const { app, ref } = useApp({
     config,
     // 此处实现事件动作
     // 通过向 useApp 这个 hook 提供 methods 方法
-    // 魔方会将该事件注册到事件机制中，在对应事件响应被触发时调用对应方法
+    // tmagic-editor会将该事件注册到事件机制中，在对应事件响应被触发时调用对应方法
     methods: {
       toast: (/*接收触发事件组件传进来的参数*/) => {
         toast('测试 react');

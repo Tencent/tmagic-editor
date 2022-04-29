@@ -75,7 +75,7 @@ const sidebar = {
 };
 
 export default defineUserConfig<DefaultThemeOptions>({
-  title: '魔方',
+  title: 'tmagic-editor',
   description: 'magic',
   clientAppEnhanceFiles: path.resolve(__dirname, './clientAppEnhance.ts'),
   themeConfig: {
@@ -147,8 +147,8 @@ export default defineUserConfig<DefaultThemeOptions>({
       resolve: {
         alias:[
           { find: /^@tmagic\/form/, replacement: path.join(__dirname, '../../../packages/form/src/index.ts') },
-          { find: /^@tmagic\/form/, replacement: path.join(__dirname, '../../../packages/form/src/index.ts') },
           { find: /^@tmagic\/utils/, replacement: path.join(__dirname, '../../../packages/utils/src/index.ts') },
+          { find: /^lodash-es$/, replacement: 'lodash' },
         ]
       },
     },

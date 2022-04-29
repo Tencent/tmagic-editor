@@ -406,7 +406,7 @@ editorService.redo();
 
   对于每一个方法，都可以为其添加before/after两个扩展方法，分别在该方法运行前与运行后调用
 
-  调用时的参数会透传到before方法的参数中, 然后before的return 会作为原方法的参数和after的参数，after最后一个参数则是原方法的return值
+  调用时的参数会透传到before方法的参数中, 然后before的return 会作为原方法的参数和after的参数，after第一个参数则是原方法的return值
 
 - **示例：**
 
@@ -421,7 +421,7 @@ editorService.usePlugin({
       type: 'button',
     }];
   },
-  afterAdd(value, result) {
+  afterAdd(result, value) {
     console.log(value) // { type: 'button' }
     console.log('after add');
   },

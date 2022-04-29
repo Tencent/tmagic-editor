@@ -1,19 +1,19 @@
 # JS Schema
-魔方的业务组件需要有表单配置能力，我们通过一份配置来描述表单，我们采用的描述方案是 JS schema。当我们在编辑器中配置一个页面时，页面的基本信息和页面包含的组件信息，也是采用 JS schema 描述的。JS schema 描述方案，，也是我们提供[高级函数](/docs/guide/advanced/high-level-function)功能的基础。
+tmagic-editor的业务组件需要有表单配置能力，我们通过一份配置来描述表单，我们采用的描述方案是 JS schema。当我们在编辑器中配置一个页面时，页面的基本信息和页面包含的组件信息，也是采用 JS schema 描述的。JS schema 描述方案，，也是我们提供[高级函数](../advanced/high-level-function)功能的基础。
 
-组件的**配置描述**，参考[示例](/docs/guide/advanced/magic-form.html#示例)，是由开发者在开发组件时，通过 [Magic-Form](/docs/guide/advanced/magic-form) 支持的表单项来提供的。
+组件的**配置描述**，参考[示例](../advanced/magic-form.html#示例)，是由开发者在开发组件时，通过 [@tmagic/form](../advanced/magic-form) 支持的表单项来提供的。
 
-在编辑器中对页面进行编辑，保存得到的是一份关于页面基本信息、页面所包含组件以及组件配置信息的配置，我们称为 **uiconfig**，这份配置是最终页面渲染需要的描述信息。
+在编辑器中对页面进行编辑，保存得到的是一份关于页面基本信息、页面所包含组件以及组件配置信息的配置，我们称为 **DSL**，这份配置是最终页面渲染需要的描述信息。
 
 JS schema 本质即是一个 js 对象，这个形式可以支持我们在组件的表单配置描述中，直接进行函数编写，功能灵活，对于前端开发来说更符合直觉，几乎没有理解成本。
 
 ## 表单配置
-组件中的表单配置描述，在经过 Magic-Form 表单渲染器后，可以生成表单栏的配置项。在表单栏中对表单进行配置，配置数据将动态写入 uiconfig 中。
+组件中的表单配置描述，在经过 @tmagic/form 表单渲染器后，可以生成表单栏的配置项。在表单栏中对表单进行配置，配置数据将动态写入 DSL 中。
 
 <img src="https://image.video.qpic.cn/oa_88b7d-36_673631168_1636343947880034?imageView2/q/70">
 
-## uiconfig
-编辑器中生成的 uiconfig 序列化存储后，在发布时，将其作为 js 文件发布出去，供生成页使用。一个生成页最终保存的 uiconfig 配置示例如下：
+## DSL
+编辑器中生成的 DSL 序列化存储后，在发布时，将其作为 js 文件发布出去，供生成页使用。一个生成页最终保存的 DSL 配置示例如下：
 
 ```javascript
 {
@@ -27,7 +27,7 @@ JS schema 本质即是一个 js 对象，这个形式可以支持我们在组件
       type: "page",
       name: "index",
       title: "1",
-      isAbsoluteLayout: true,
+      layout: "absolute",
       style: {
         width: "375",
         height: "1728",
@@ -36,27 +36,9 @@ JS schema 本质即是一个 js 对象，这个形式可以支持我们在组件
       id: "39381280",
       items: [
         {
-          dtEid: "container",
           type: "container",
           name: "组",
           id: "98549062",
-          renderType: 0,
-          reportType: "module",
-          time: 1623850856402,
-          report: {
-            module: {
-              _module: "组_98549062",
-              eid: "container"
-            }
-          },
-          devconfig: {
-            lock: false,
-            pack: false,
-            resizable: true,
-            aspectRatio: false,
-            ratio: 1,
-            modify: false
-          },
           items: [
             {
               type: "button",
@@ -86,7 +68,6 @@ JS schema 本质即是一个 js 对象，这个形式可以支持我们在组件
                 }
               ],
               created: ()=>{},
-              renderType: 1,
               text: "请输入文本内容",
             },
             {
@@ -103,7 +84,6 @@ JS schema 本质即是一个 js 对象，这个形式可以支持我们在组件
               name: "文本",
               text: "请输入文本内容",
               multiple: true,
-              renderType: 1
             },
             {
               type: "button",
@@ -119,7 +99,6 @@ JS schema 本质即是一个 js 对象，这个形式可以支持我们在组件
               name: "按钮",
               text: "请输入文本内容",
               multiple: true,
-              renderType: 1
             }
           ],
           style: {
