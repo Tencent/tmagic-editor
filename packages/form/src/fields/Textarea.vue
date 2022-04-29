@@ -1,17 +1,15 @@
 <template>
-  <div v-if="model">
-    <el-input
-      v-model="model[name]"
-      type="textarea"
-      :size="size"
-      clearable
-      :placeholder="config.placeholder"
-      :disabled="disabled"
-      @change="changeHandler"
-      @input="inputHandler"
-    >
-    </el-input>
-  </div>
+  <el-input
+    v-model="model[name]"
+    type="textarea"
+    :size="size"
+    clearable
+    :placeholder="config.placeholder"
+    :disabled="disabled"
+    @change="changeHandler"
+    @input="inputHandler"
+  >
+  </el-input>
 </template>
 
 <script lang="ts">
