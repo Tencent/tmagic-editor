@@ -69,6 +69,7 @@ class Editor extends BaseService {
         'paste',
         'alignCenter',
         'moveLayer',
+        'move',
         'undo',
         'redo',
         'highlight',
