@@ -13,7 +13,7 @@
       :style="`transform: scale(${zoom})`"
     ></div>
     <teleport to="body">
-      <viewer-menu ref="menu" :style="menuStyle"></viewer-menu>
+      <viewer-menu ref="menu"></viewer-menu>
     </teleport>
   </scroll-viewer>
 </template>
@@ -42,45 +42,6 @@ import ScrollViewer from '@editor/components/ScrollViewer.vue';
 import type { Services, StageRect } from '@editor/type';
 
 import ViewerMenu from './ViewerMenu.vue';
-
-const useMenu = () => {
-  const menu = ref<InstanceType<typeof ViewerMenu>>();
-  const menuStyle = ref({
-    display: 'none',
-    left: '0',
-    top: '0',
-  });
-
-  onMounted(() => {
-    document.addEventListener(
-      'click',
-      () => {
-        menuStyle.value.display = 'none';
-      },
-      true,
-    );
-  });
-
-  return {
-    menu,
-    menuStyle,
-
-    contextmenuHandler(e: MouseEvent) {
-      e.preventDefault();
-
-      const menuHeight = menu.value?.$el.clientHeight;
-      let top = e.clientY;
-      if (menuHeight + e.clientY > document.body.clientHeight) {
-        top = document.body.clientHeight - menuHeight;
-      }
-      menuStyle.value = {
-        display: 'block',
-        top: `${top}px`,
-        left: `${e.clientX}px`,
-      };
-    },
-  };
-};
 
 export default defineComponent({
   name: 'magic-stage',
@@ -115,12 +76,13 @@ export default defineComponent({
 
     const stageWrap = ref<InstanceType<typeof ScrollViewer>>();
     const stageContainer = ref<HTMLDivElement>();
+    const menu = ref<InstanceType<typeof ViewerMenu>>();
 
     const stageRect = computed(() => services?.uiService.get<StageRect>('stageRect'));
     const uiSelectMode = computed(() => services?.uiService.get<boolean>('uiSelectMode'));
     const root = computed(() => services?.editorService.get<MApp>('root'));
     const page = computed(() => services?.editorService.get<MPage>('page'));
-    const zoom = computed(() => services?.uiService.get<number>('zoom'));
+    const zoom = computed(() => services?.uiService.get<number>('zoom') || 1);
     const node = computed(() => services?.editorService.get<MNode>('node'));
 
     let stage: StageCore | null = null;
@@ -218,9 +180,14 @@ export default defineComponent({
     return {
       stageWrap,
       stageContainer,
+      menu,
       stageRect,
       zoom,
-      ...useMenu(),
+
+      contextmenuHandler(e: MouseEvent) {
+        e.preventDefault();
+        menu.value?.show(e);
+      },
     };
   },
 });

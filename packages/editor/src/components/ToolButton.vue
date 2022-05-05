@@ -1,24 +1,37 @@
 <template>
-  <div v-if="display" class="menu-item">
-    <el-divider v-if="item.type === 'divider'" direction="vertical"></el-divider>
+  <div
+    v-if="display"
+    class="menu-item"
+    :class="item.type"
+    @click="clickHandler(item, $event)"
+    @mousedown="mousedownHandler(item, $event)"
+    @mouseup="mouseupHandler(item, $event)"
+  >
+    <el-divider v-if="item.type === 'divider'" :direction="item.direction || 'vertical'"></el-divider>
     <div v-else-if="item.type === 'text'" class="menu-item-text">{{ item.text }}</div>
 
     <template v-else-if="item.type === 'zoom'">
-      <el-button size="small" type="text"><m-icon :icon="ZoomIn" @click="zoomInHandler"></m-icon></el-button>
+      <tool-button
+        :data="{ type: 'button', icon: ZoomIn, handler: zoomInHandler, tooltip: '放大' }"
+        :event-type="eventType"
+      ></tool-button>
       <span class="menu-item-text" style="margin: 0 5px">{{ parseInt(`${zoom * 100}`, 10) }}%</span>
-      <el-button size="small" type="text"><m-icon :icon="ZoomOut" @click="zoomOutHandler"></m-icon></el-button>
+      <tool-button
+        :data="{ type: 'button', icon: ZoomOut, handler: zoomOutHandler, tooltip: '缩小' }"
+        :event-type="eventType"
+      ></tool-button>
     </template>
 
-    <el-tooltip
-      v-else-if="item.type === 'button'"
-      effect="dark"
-      placement="bottom-start"
-      :content="item.tooltip || item.text"
-    >
-      <el-button size="small" type="text" :disabled="disabled" @click="buttonHandler(item)"
-        ><m-icon :icon="item.icon"></m-icon><span>{{ item.text }}</span></el-button
+    <template v-else-if="item.type === 'button'">
+      <el-tooltip v-if="item.tooltip" effect="dark" placement="bottom-start" :content="item.tooltip">
+        <el-button size="small" type="text" :disabled="disabled"
+          ><m-icon v-if="item.icon" :icon="item.icon"></m-icon><span>{{ item.text }}</span></el-button
+        >
+      </el-tooltip>
+      <el-button v-else size="small" type="text" :disabled="disabled"
+        ><m-icon v-if="item.icon" :icon="item.icon"></m-icon><span>{{ item.text }}</span></el-button
       >
-    </el-tooltip>
+    </template>
 
     <el-dropdown v-else-if="item.type === 'dropdown'" trigger="click" :disabled="disabled" @command="dropdownHandler">
       <span class="el-dropdown-link menubar-menu-button">
@@ -38,7 +51,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, inject, PropType } from 'vue';
+import { computed, defineComponent, inject, markRaw, PropType } from 'vue';
 import { ArrowDown, Back, Delete, Grid, Right, ScaleToOriginal, ZoomIn, ZoomOut } from '@element-plus/icons';
 
 import { NodeType } from '@tmagic/schema';
@@ -57,6 +70,11 @@ export default defineComponent({
         type: 'text',
         display: false,
       }),
+    },
+
+    eventType: {
+      type: String as PropType<'mousedown' | 'mouseup' | 'click'>,
+      default: 'click',
     },
   },
 
@@ -87,7 +105,7 @@ export default defineComponent({
         case 'delete':
           return {
             type: 'button',
-            icon: Delete,
+            icon: markRaw(Delete),
             tooltip: '刪除',
             disabled: () => services?.editorService.get('node')?.type === NodeType.PAGE,
             handler: () => services?.editorService.remove(services?.editorService.get('node')),
@@ -95,7 +113,7 @@ export default defineComponent({
         case 'undo':
           return {
             type: 'button',
-            icon: Back,
+            icon: markRaw(Back),
             tooltip: '后退',
             disabled: () => !services?.historyService.state.canUndo,
             handler: () => services?.editorService.undo(),
@@ -103,7 +121,7 @@ export default defineComponent({
         case 'redo':
           return {
             type: 'button',
-            icon: Right,
+            icon: markRaw(Right),
             tooltip: '前进',
             disabled: () => !services?.historyService.state.canRedo,
             handler: () => services?.editorService.redo(),
@@ -111,28 +129,28 @@ export default defineComponent({
         case 'zoom-in':
           return {
             type: 'button',
-            icon: ZoomIn,
+            icon: markRaw(ZoomIn),
             tooltip: '放大',
             handler: zoomInHandler,
           };
         case 'zoom-out':
           return {
             type: 'button',
-            icon: ZoomOut,
+            icon: markRaw(ZoomOut),
             tooltip: '縮小',
             handler: zoomOutHandler,
           };
         case 'rule':
           return {
             type: 'button',
-            icon: ScaleToOriginal,
+            icon: markRaw(ScaleToOriginal),
             tooltip: showRule.value ? '隐藏标尺' : '显示标尺',
             handler: () => uiService?.set('showRule', !showRule.value),
           };
         case 'guides':
           return {
             type: 'button',
-            icon: Grid,
+            icon: markRaw(Grid),
             tooltip: showGuides.value ? '隐藏参考线' : '显示参考线',
             handler: () => uiService?.set('showGuides', !showGuides.value),
           };
@@ -153,9 +171,16 @@ export default defineComponent({
       return item.value.disabled;
     });
 
+    const buttonHandler = (item: MenuButton | MenuComponent, event: MouseEvent) => {
+      if (disabled.value) return;
+      if (typeof (item as MenuButton).handler === 'function' && services) {
+        (item as MenuButton).handler?.(services, event);
+      }
+    };
+
     return {
-      ZoomIn,
-      ZoomOut,
+      ZoomIn: markRaw(ZoomIn),
+      ZoomOut: markRaw(ZoomOut),
 
       item,
       zoom,
@@ -178,10 +203,24 @@ export default defineComponent({
         }
       },
 
-      buttonHandler(item: MenuButton | MenuComponent) {
-        if (disabled.value) return;
-        if (typeof (item as MenuButton).handler === 'function') {
-          (item as MenuButton).handler?.(services);
+      clickHandler(item: MenuButton | MenuComponent, event: MouseEvent) {
+        if (props.eventType !== 'click') return;
+        if (item.type === 'button') {
+          buttonHandler(item, event);
+        }
+      },
+
+      mousedownHandler(item: MenuButton | MenuComponent, event: MouseEvent) {
+        if (props.eventType !== 'mousedown') return;
+        if (item.type === 'button') {
+          buttonHandler(item, event);
+        }
+      },
+
+      mouseupHandler(item: MenuButton | MenuComponent, event: MouseEvent) {
+        if (props.eventType !== 'mouseup') return;
+        if (item.type === 'button') {
+          buttonHandler(item, event);
         }
       },
     };

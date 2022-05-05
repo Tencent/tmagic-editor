@@ -125,6 +125,8 @@ export interface MenuButton {
    * zoom: 放大缩小
    */
   type: 'button' | 'dropdown' | 'text' | 'divider' | 'zoom';
+  /** 当type为divider时有效，分割线方向, 默认vertical */
+  direction?: 'horizontal' | 'vertical';
   /** 展示的文案 */
   text?: string;
   /** 鼠标悬浮是显示的气泡中的文案 */
@@ -136,14 +138,9 @@ export interface MenuButton {
   /** 是否显示，默认为true */
   display?: boolean | ((data?: Services) => boolean);
   /** type为button/dropdown时点击运行的方法 */
-  handler?: (data?: Services) => Promise<any> | any;
-  /** type为dropdown时，下拉的菜单列表 */
-  items?: {
-    /** 展示的文案 */
-    text: string;
-    /** 点击运行的方法 */
-    handler(data: Services): any;
-  }[];
+  handler?: (data: Services, event: MouseEvent) => Promise<any> | any;
+  /** type为dropdown时，下拉的菜单列表， 或者有子菜单时 */
+  items?: MenuButton[];
 }
 
 export interface MenuComponent {

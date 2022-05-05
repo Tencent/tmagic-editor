@@ -1,91 +1,104 @@
 <template>
-  <div v-if="node" class="magic-editor-content-menu">
-    <div
-      v-if="node.items"
-      class="magic-editor-content-menu-item"
-      @mouseenter="setSubVisitable(true)"
-      @mouseleave="setSubVisitable(false)"
-    >
-      新增
-    </div>
-    <div v-if="node.type !== 'app'" class="magic-editor-content-menu-item" @click="() => copy(node)">复制</div>
-    <div
-      v-if="node.type !== 'app' && node.type !== 'page'"
-      class="magic-editor-content-menu-item"
-      @click="() => remove()"
-    >
-      删除
-    </div>
-    <div class="subMenu" v-show="subVisible" @mouseenter="setSubVisitable(true)" @mouseleave="setSubVisitable(false)">
-      <el-scrollbar>
-        <template v-if="node.type === 'tabs'">
-          <div
-            class="magic-editor-content-menu-item"
-            @click="
-              () =>
-                append({
-                  type: 'tab-pane',
-                })
-            "
-          >
-            标签
-          </div>
-        </template>
-        <template v-else-if="node.items">
-          <div v-for="list in componentGroupList" :key="list.title">
-            <template v-for="item in list.items">
-              <div class="magic-editor-content-menu-item" v-if="item" :key="item.type" @click="() => append(item)">
-                {{ item.text }}
-              </div>
-            </template>
-            <div class="separation"></div>
-          </div>
-        </template>
-      </el-scrollbar>
-    </div>
-  </div>
+  <content-menu :menu-data="menuData" ref="menu" style="overflow: initial"></content-menu>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, inject, ref } from 'vue';
 
-import type { MNode } from '@tmagic/schema';
+import { NodeType } from '@tmagic/schema';
 
-import type { AddMNode, Services } from '@editor/type';
+import ContentMenu from '@editor/components/ContentMenu.vue';
+import type { ComponentGroup, MenuButton, MenuItem, Services } from '@editor/type';
 
 export default defineComponent({
-  name: 'magic-editor-content-menu',
+  components: { ContentMenu },
 
   setup() {
     const services = inject<Services>('services');
-    const subVisible = ref(false);
+    const menu = ref<InstanceType<typeof ContentMenu>>();
     const node = computed(() => services?.editorService.get('node'));
+    const isRoot = computed(() => node.value?.type === NodeType.ROOT);
+    const isPage = computed(() => node.value?.type === NodeType.PAGE);
+    const componentList = computed(() => services?.componentListService.getList() || []);
+
+    const createMenuItems = (group: ComponentGroup): MenuButton[] =>
+      group.items.map((component) => ({
+        text: component.text,
+        type: 'button',
+        handler: () => {
+          services?.editorService.add({
+            name: component.text,
+            type: component.type,
+            ...(component.data || {}),
+          });
+        },
+      }));
+
+    const getSubMenuData = computed<MenuButton[]>(() => {
+      if (node.value?.type === 'tabs') {
+        return [
+          {
+            text: '标签页',
+            type: 'button',
+            handler: () => {
+              services?.editorService.add({
+                type: 'tab-pane',
+              });
+            },
+          },
+        ];
+      }
+      if (node.value?.items) {
+        return (
+          componentList.value.reduce(
+            (subMenuData: MenuButton[], group: ComponentGroup, index) =>
+              subMenuData.concat(
+                createMenuItems(group),
+                index < componentList.value.length - 1
+                  ? [
+                      {
+                        type: 'divider',
+                        direction: 'horizontal',
+                      },
+                    ]
+                  : [],
+              ),
+            [],
+          ) || []
+        );
+      }
+      return [];
+    });
 
     return {
-      subVisible,
+      menu,
+      menuData: computed<MenuItem[]>(() => [
+        {
+          type: 'button',
+          text: '新增',
+          display: () => node.value?.items?.length > 0,
+          items: getSubMenuData.value,
+        },
+        {
+          type: 'button',
+          text: '复制',
+          display: () => !isRoot.value,
+          handler: () => {
+            node.value && services?.editorService.copy(node.value);
+          },
+        },
+        {
+          type: 'button',
+          text: '删除',
+          display: () => !isRoot.value && !isPage.value,
+          handler: () => {
+            node.value && services?.editorService.remove(node.value);
+          },
+        },
+      ]),
 
-      node,
-
-      componentGroupList: computed(() => services?.componentListService.getList()),
-
-      append(config: AddMNode) {
-        services?.editorService.add({
-          name: config.text,
-          type: config.type,
-          ...(config.data || {}),
-        });
-      },
-
-      remove() {
-        node.value && services?.editorService.remove(node.value);
-      },
-
-      copy(node?: MNode) {
-        node && services?.editorService.copy(node);
-      },
-
-      setSubVisitable(v: boolean) {
-        subVisible.value = v;
+      show(e: MouseEvent) {
+        menu.value?.show(e);
       },
     };
   },

@@ -1,47 +1,31 @@
 <template>
-  <div class="magic-editor-content-menu" ref="menu">
-    <div>
-      <div class="magic-editor-content-menu-item" @click="() => center()" v-if="canCenter">水平居中</div>
-      <div class="magic-editor-content-menu-item" @click="() => copy()">复制</div>
-      <div class="magic-editor-content-menu-item" @click="paste" v-if="canPaste">粘贴</div>
-      <template v-if="canMoveZPos">
-        <div class="separation"></div>
-        <div class="magic-editor-content-menu-item" @click="topItem">上移一层</div>
-        <div class="magic-editor-content-menu-item" @click="bottomItem">下移一层</div>
-        <div class="magic-editor-content-menu-item" @click="top">置顶</div>
-        <div class="magic-editor-content-menu-item" @click="bottom">置底</div>
-      </template>
-      <template v-if="canDelete">
-        <div class="separation"></div>
-        <div class="magic-editor-content-menu-item" @click="() => remove()">删除</div>
-      </template>
-      <div class="separation"></div>
-      <div class="magic-editor-content-menu-item" @click="clearGuides">清空参考线</div>
-    </div>
-  </div>
+  <content-menu :menu-data="menuData" ref="menu"></content-menu>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, inject, onMounted, ref, watch } from 'vue';
+import { computed, defineComponent, inject, markRaw, onMounted, reactive, ref, watch } from 'vue';
+import { Bottom, Delete, DocumentCopy, Top } from '@element-plus/icons';
 
 import { NodeType } from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
 
-import { LayerOffset, Layout, Services } from '@editor/type';
+import ContentMenu from '@editor/components/ContentMenu.vue';
+import { LayerOffset, Layout, MenuItem, Services } from '@editor/type';
 import { COPY_STORAGE_KEY } from '@editor/utils/editor';
 
 export default defineComponent({
-  name: 'magic-editor-ui-viewer-menu',
+  components: { ContentMenu },
 
   setup() {
     const services = inject<Services>('services');
     const editorService = services?.editorService;
-    const menu = ref<HTMLDivElement>();
+    const menu = ref<InstanceType<typeof ContentMenu>>();
     const canPaste = ref(false);
     const canCenter = ref(false);
 
     const node = computed(() => editorService?.get('node'));
     const parent = computed(() => editorService?.get('parent'));
+    const isPage = computed(() => node.value?.type === NodeType.PAGE);
 
     onMounted(() => {
       const data = globalThis.localStorage.getItem(COPY_STORAGE_KEY);
@@ -62,49 +46,102 @@ export default defineComponent({
 
     return {
       menu,
-      canPaste,
+      menuData: reactive<MenuItem[]>([
+        {
+          type: 'button',
+          text: '水平居中',
+          display: () => canCenter.value,
+          handler: () => {
+            node.value && editorService?.alignCenter(node.value);
+          },
+        },
+        {
+          type: 'button',
+          text: '复制',
+          icon: markRaw(DocumentCopy),
+          handler: () => {
+            node.value && editorService?.copy(node.value);
+            canPaste.value = true;
+          },
+        },
+        {
+          type: 'button',
+          text: '粘贴',
+          display: () => canPaste.value,
+          handler: () => {
+            const top = menu.value?.$el.offsetTop || 0;
+            const left = menu.value?.$el.offsetLeft || 0;
+            editorService?.paste({ left, top });
+          },
+        },
+        {
+          type: 'divider',
+          direction: 'horizontal',
+          display: () => !isPage.value,
+        },
+        {
+          type: 'button',
+          text: '上移一层',
+          icon: markRaw(Top),
+          display: () => !isPage.value,
+          handler: () => {
+            editorService?.moveLayer(1);
+          },
+        },
+        {
+          type: 'button',
+          text: '下移一层',
+          icon: markRaw(Bottom),
+          display: () => !isPage.value,
+          handler: () => {
+            editorService?.moveLayer(-1);
+          },
+        },
+        {
+          type: 'button',
+          text: '置顶',
+          display: () => !isPage.value,
+          handler: () => {
+            editorService?.moveLayer(LayerOffset.TOP);
+          },
+        },
+        {
+          type: 'button',
+          text: '置底',
+          display: () => !isPage.value,
+          handler: () => {
+            editorService?.moveLayer(LayerOffset.BOTTOM);
+          },
+        },
+        {
+          type: 'divider',
+          direction: 'horizontal',
+          display: () => !isPage.value,
+        },
+        {
+          type: 'button',
+          text: '删除',
+          icon: Delete,
+          display: () => !isPage.value,
+          handler: () => {
+            node.value && editorService?.remove(node.value);
+          },
+        },
+        {
+          type: 'divider',
+          direction: 'horizontal',
+        },
+        {
+          type: 'button',
+          text: '清空参考线',
+          handler: () => {
+            editorService?.get<StageCore>('stage').clearGuides();
+          },
+        },
+      ]),
 
-      canDelete: computed(() => node.value?.type !== NodeType.PAGE),
-      canMoveZPos: computed(() => node.value?.type !== NodeType.PAGE),
-      canCenter,
-
-      center() {
-        node.value && editorService?.alignCenter(node.value);
-      },
-
-      copy() {
-        node.value && editorService?.copy(node.value);
-        canPaste.value = true;
-      },
-
-      paste() {
-        const top = menu.value?.offsetTop || 0;
-        const left = menu.value?.offsetLeft || 0;
-        editorService?.paste({ left, top });
-      },
-
-      remove() {
-        node.value && editorService?.remove(node.value);
-      },
-
-      top() {
-        editorService?.moveLayer(LayerOffset.TOP);
-      },
-
-      bottom() {
-        editorService?.moveLayer(LayerOffset.BOTTOM);
-      },
-
-      topItem() {
-        editorService?.moveLayer(1);
-      },
-
-      bottomItem() {
-        editorService?.moveLayer(-1);
-      },
-
-      clearGuides() {
-        editorService?.get<StageCore>('stage').clearGuides();
+      show(e: MouseEvent) {
+        menu.value?.show(e);
       },
     };
   },
