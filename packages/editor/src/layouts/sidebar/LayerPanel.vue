@@ -33,8 +33,8 @@
         <div
           :id="data.id"
           class="cus-tree-node"
-          @mousedown="toogleClickFlag"
-          @mouseup="toogleClickFlag"
+          @mousedown="toggleClickFlag"
+          @mouseup="toggleClickFlag"
           @mouseenter="highlightHandler(data)"
           :class="{ 'cus-tree-node-hover': canHighlight && data.id === highlightNode?.id }"
         >
@@ -48,13 +48,13 @@
     </el-tree>
 
     <teleport to="body">
-      <layer-menu :style="menuStyle"></layer-menu>
+      <layer-menu ref="menu"></layer-menu>
     </teleport>
   </el-scrollbar>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, inject, onMounted, Ref, ref, watchEffect } from 'vue';
+import { computed, defineComponent, inject, Ref, ref, watchEffect } from 'vue';
 import type { ElTree } from 'element-plus';
 import { throttle } from 'lodash-es';
 
@@ -169,46 +169,6 @@ const useFilter = (tree: Ref<InstanceType<typeof ElTree> | undefined>) => ({
   },
 });
 
-const useContentMenu = (editorService?: EditorService) => {
-  const menuStyle = ref({
-    position: 'absolute',
-    left: '0',
-    top: '0',
-    display: 'none',
-  });
-
-  onMounted(() => {
-    document.addEventListener(
-      'click',
-      () => {
-        menuStyle.value.display = 'none';
-      },
-      true,
-    );
-  });
-
-  return {
-    menuStyle,
-
-    contextmenu(event: MouseEvent, data: MNode) {
-      const bodyHeight = globalThis.document.body.clientHeight;
-
-      const left = `${event.clientX + 20}px`;
-      let top = `${event.clientY - 10}px`;
-
-      if (event.clientY + 300 > bodyHeight) {
-        top = `${bodyHeight - 300}px`;
-      }
-
-      menuStyle.value.left = left;
-      menuStyle.value.top = top;
-      menuStyle.value.display = '';
-
-      select(data, editorService);
-    },
-  };
-};
-
 export default defineComponent({
   name: 'magic-editor-layer-panel',
 
@@ -217,13 +177,14 @@ export default defineComponent({
   setup() {
     const services = inject<Services>('services');
     const tree = ref<InstanceType<typeof ElTree>>();
+    const menu = ref<InstanceType<typeof LayerMenu>>();
     const clicked = ref(false);
     const editorService = services?.editorService;
     const highlightHandler = throttle((data: MNode) => {
       highlight(data, editorService);
     }, throttleTime);
 
-    const toogleClickFlag = () => {
+    const toggleClickFlag = () => {
       clicked.value = !clicked.value;
     };
 
@@ -234,10 +195,14 @@ export default defineComponent({
 
     return {
       tree,
+      menu,
       ...statusData,
       ...useDrop(tree, editorService),
       ...useFilter(tree),
-      ...useContentMenu(editorService),
+
+      highlightHandler,
+      toggleClickFlag,
+      canHighlight,
 
       clickHandler(data: MNode): void {
         if (services?.uiService.get<boolean>('uiSelectMode')) {
@@ -247,9 +212,12 @@ export default defineComponent({
         tree.value?.setCurrentKey(data.id);
         select(data, editorService);
       },
-      highlightHandler,
-      toogleClickFlag,
-      canHighlight,
+
+      async contextmenu(event: MouseEvent, data: MNode) {
+        event.preventDefault();
+        await select(data, editorService);
+        menu.value?.show(event);
+      },
     };
   },
 });
