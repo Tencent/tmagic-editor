@@ -142,6 +142,25 @@ export const fillConfig = (config: FormConfig = []) => [
                   },
                 ],
               },
+              {
+                type: 'fieldset',
+                legend: '字体',
+                items: [
+                  {
+                    name: 'color',
+                    text: '颜色',
+                    type: 'colorPicker',
+                  },
+                  {
+                    name: 'fontSize',
+                    text: '大小',
+                  },
+                  {
+                    name: 'fontWeight',
+                    text: '粗细',
+                  },
+                ],
+              },
             ],
           },
         ],
