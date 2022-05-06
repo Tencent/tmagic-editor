@@ -21,8 +21,6 @@ export default {
   text: '请输入文本内容',
   multiple: true,
   style: {
-    position: 'absolute',
-    left: '57',
     width: '100',
     height: 'auto',
   },
