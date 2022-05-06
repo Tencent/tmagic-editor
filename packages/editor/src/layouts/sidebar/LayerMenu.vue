@@ -3,7 +3,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, inject, ref } from 'vue';
+import { computed, defineComponent, inject, markRaw, ref } from 'vue';
+import { Delete, DocumentCopy, Files, Plus } from '@element-plus/icons';
 
 import { NodeType } from '@tmagic/schema';
 
@@ -25,6 +26,7 @@ export default defineComponent({
       group.items.map((component) => ({
         text: component.text,
         type: 'button',
+        icon: component.icon,
         handler: () => {
           services?.editorService.add({
             name: component.text,
@@ -40,6 +42,7 @@ export default defineComponent({
           {
             text: '标签页',
             type: 'button',
+            icon: Files,
             handler: () => {
               services?.editorService.add({
                 type: 'tab-pane',
@@ -76,12 +79,14 @@ export default defineComponent({
         {
           type: 'button',
           text: '新增',
+          icon: markRaw(Plus),
           display: () => node.value?.items,
           items: getSubMenuData.value,
         },
         {
           type: 'button',
           text: '复制',
+          icon: markRaw(DocumentCopy),
           display: () => !isRoot.value,
           handler: () => {
             node.value && services?.editorService.copy(node.value);
@@ -90,6 +95,7 @@ export default defineComponent({
         {
           type: 'button',
           text: '删除',
+          icon: markRaw(Delete),
           display: () => !isRoot.value && !isPage.value,
           handler: () => {
             node.value && services?.editorService.remove(node.value);

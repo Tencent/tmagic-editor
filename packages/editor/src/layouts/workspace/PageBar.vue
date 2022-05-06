@@ -22,11 +22,25 @@
           </slot>
         </div>
 
-        <el-popover placement="top" :width="160" trigger="hover">
+        <el-popover popper-class="page-bar-popover" placement="top" :width="160" trigger="hover">
           <div>
             <slot name="page-bar-popover" :page="item">
-              <div class="magic-editor-content-menu-item" @click="() => copy(item)">复制</div>
-              <div class="magic-editor-content-menu-item" @click="() => remove(item)">删除</div>
+              <tool-button
+                :data="{
+                  type: 'button',
+                  text: '复制',
+                  icon: DocumentCopy,
+                  handler: () => copy(item),
+                }"
+              ></tool-button>
+              <tool-button
+                :data="{
+                  type: 'button',
+                  text: '删除',
+                  icon: Delete,
+                  handler: () => remove(item),
+                }"
+              ></tool-button>
             </slot>
           </div>
           <template #reference>
@@ -44,12 +58,24 @@
 </template>
 
 <script lang="ts">
-import { computed, ComputedRef, defineComponent, inject, onMounted, onUnmounted, ref, toRaw, watch } from 'vue';
-import { ArrowLeftBold, ArrowRightBold, CaretBottom, Plus } from '@element-plus/icons';
+import {
+  computed,
+  ComputedRef,
+  defineComponent,
+  inject,
+  markRaw,
+  onMounted,
+  onUnmounted,
+  ref,
+  toRaw,
+  watch,
+} from 'vue';
+import { ArrowLeftBold, ArrowRightBold, CaretBottom, Delete, DocumentCopy, Plus } from '@element-plus/icons';
 
 import type { MApp, MPage } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 
+import ToolButton from '@editor/components/ToolButton.vue';
 import type { Services } from '@editor/type';
 import { generatePageNameByApp } from '@editor/utils/editor';
 
@@ -138,7 +164,7 @@ const useScroll = (root: ComputedRef<MApp | undefined>) => {
 };
 
 export default defineComponent({
-  components: { ArrowLeftBold, ArrowRightBold, CaretBottom, Plus },
+  components: { ArrowLeftBold, ArrowRightBold, CaretBottom, Plus, ToolButton },
 
   setup() {
     const services = inject<Services>('services');
@@ -147,6 +173,9 @@ export default defineComponent({
     const root = computed(() => editorService?.get<MApp>('root'));
 
     return {
+      Delete: markRaw(Delete),
+      DocumentCopy: markRaw(DocumentCopy),
+
       ...useScroll(root),
 
       root,

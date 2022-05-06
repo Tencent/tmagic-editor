@@ -40,11 +40,32 @@
       z-index: 1;
     }
 
-    .m-editor-page-bar-title {
+    &-title {
       max-width: 150px;
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
+    }
+  }
+}
+
+.page-bar-popover {
+  &.el-popper.el-popover {
+    padding: 10px 0;
+  }
+
+  .menu-item {
+    cursor: pointer;
+    transition: all 0.2s ease 0s;
+    padding: 5px 14px;
+
+    .el-button--text,
+    i {
+      color: $--font-color;
+    }
+
+    &:hover {
+      background-color: $--hover-color;
     }
   }
 }
