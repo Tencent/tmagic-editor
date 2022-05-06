@@ -84,11 +84,11 @@ export default defineComponent({
           e.inputEvent.preventDefault();
           node.value && services?.editorService.copy(node.value);
         })
-        .keyup([ctrl, 'v'], (e) => {
+        .keydown([ctrl, 'v'], (e) => {
           e.inputEvent.preventDefault();
           node.value && services?.editorService.paste();
         })
-        .keyup([ctrl, 'x'], (e) => {
+        .keydown([ctrl, 'x'], (e) => {
           e.inputEvent.preventDefault();
           if (!node.value || isPage(node.value)) return;
           services?.editorService.copy(node.value);
