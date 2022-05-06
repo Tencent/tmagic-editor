@@ -17,7 +17,7 @@
  */
 
 import { reactive } from 'vue';
-import { cloneDeep } from 'lodash-es';
+import { cloneDeep, mergeWith } from 'lodash-es';
 
 import type { FormConfig } from '@tmagic/form';
 import type { MComponent, MNode } from '@tmagic/schema';
@@ -100,8 +100,7 @@ class Props extends BaseService {
 
     return cloneDeep({
       ...getDefaultPropsValue(type),
-      ...defaultValue,
-      ...(this.state.propsValueMap[type] || {}),
+      ...mergeWith(this.state.propsValueMap[type] || {}, defaultValue),
     });
   }
 }

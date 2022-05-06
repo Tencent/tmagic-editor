@@ -9,8 +9,10 @@
     <div
       class="m-editor-stage-container"
       ref="stageContainer"
-      @contextmenu="contextmenuHandler"
       :style="`transform: scale(${zoom})`"
+      @contextmenu="contextmenuHandler"
+      @drop="dropHandler"
+      @dragover="dragoverHandler"
     ></div>
     <teleport to="body">
       <viewer-menu ref="menu"></viewer-menu>
@@ -39,7 +41,7 @@ import type { MoveableOptions, Runtime, SortEventData, UpdateEventData } from '@
 import StageCore from '@tmagic/stage';
 
 import ScrollViewer from '@editor/components/ScrollViewer.vue';
-import type { Services, StageRect } from '@editor/type';
+import { Layout, Services, StageRect } from '@editor/type';
 
 import ViewerMenu from './ViewerMenu.vue';
 
@@ -187,6 +189,34 @@ export default defineComponent({
       contextmenuHandler(e: MouseEvent) {
         e.preventDefault();
         menu.value?.show(e);
+      },
+
+      dragoverHandler(e: DragEvent) {
+        e.preventDefault();
+        if (e.dataTransfer) {
+          e.dataTransfer.dropEffect = 'move';
+        }
+      },
+
+      async dropHandler(e: DragEvent) {
+        e.preventDefault();
+        if (e.dataTransfer && page.value && stageContainer.value && stage) {
+          // eslint-disable-next-line no-eval
+          const config = eval(`(${e.dataTransfer.getData('data')})`);
+          const layout = await services?.editorService.getLayout(page.value);
+
+          const containerRect = stageContainer.value.getBoundingClientRect();
+          const { scrollTop, scrollLeft } = stage.mask;
+          if (layout === Layout.ABSOLUTE) {
+            config.style = {
+              position: 'absolute',
+              top: e.clientY - containerRect.top + scrollTop,
+              left: e.clientX - containerRect.left + scrollLeft,
+            };
+          }
+
+          services?.editorService.add(config, page.value);
+        }
       },
     };
   },
