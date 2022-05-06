@@ -193,6 +193,12 @@ export default defineComponent({
       () => statusData.highlightNode.value?.id !== statusData.clickNode.value?.id && !clicked.value,
     );
 
+    editorService?.on('remove', () => {
+      setTimeout(() => {
+        tree.value?.getNode(editorService.get('node').id)?.updateChildren();
+      }, 0);
+    });
+
     return {
       tree,
       menu,

@@ -191,6 +191,9 @@ class Editor extends BaseService {
     } else {
       historyService.empty();
     }
+
+    this.emit('select', node);
+
     return node!;
   }
 
@@ -291,6 +294,8 @@ class Editor extends BaseService {
 
     stage?.select(newNode.id);
 
+    this.emit('add', newNode);
+
     return newNode;
   }
 
@@ -330,6 +335,8 @@ class Editor extends BaseService {
 
     this.addModifiedNodeId(parent.id);
     this.pushHistoryState();
+
+    this.emit('remove', node);
 
     return node;
   }
@@ -391,6 +398,8 @@ class Editor extends BaseService {
 
     this.addModifiedNodeId(newConfig.id);
     this.pushHistoryState();
+
+    this.emit('update', newConfig);
 
     return newConfig;
   }
