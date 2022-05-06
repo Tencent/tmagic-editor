@@ -76,7 +76,7 @@ export default defineComponent({
         {
           type: 'button',
           text: '新增',
-          display: () => node.value?.items?.length > 0,
+          display: () => node.value?.items,
           items: getSubMenuData.value,
         },
         {
