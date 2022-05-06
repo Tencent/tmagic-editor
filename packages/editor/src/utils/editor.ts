@@ -144,7 +144,7 @@ const setTop2Middle = (node: MNode, parentNode: MNode, stage: StageCore) => {
   const style = node.style || {};
   const height = style.height || 0;
 
-  if (!stage || style.top || !parentNode.style || !isNumber(height)) return style;
+  if (!stage || typeof style.top !== 'undefined' || !parentNode.style || !isNumber(height)) return style;
 
   const { height: parentHeight } = parentNode.style;
 

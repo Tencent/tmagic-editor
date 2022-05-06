@@ -12,7 +12,14 @@
       <template v-for="(group, index) in list">
         <el-collapse-item v-if="group.items && group.items.length" :key="index" :name="index">
           <template #title><i class="el-icon-s-grid"></i>{{ group.title }}</template>
-          <div class="component-item" v-for="item in group.items" :key="item.type" @click="appendComponent(item)">
+          <div
+            class="component-item"
+            v-for="item in group.items"
+            draggable="true"
+            :key="item.type"
+            @click="appendComponent(item)"
+            @dragstart="dragstartHandler(item, $event)"
+          >
             <m-icon :icon="item.icon"></m-icon>
 
             <el-tooltip effect="dark" placement="bottom" :content="item.text">
@@ -27,6 +34,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, inject, ref } from 'vue';
+import serialize from 'serialize-javascript';
 
 import MIcon from '@editor/components/Icon.vue';
 import type { ComponentGroup, ComponentItem, Services } from '@editor/type';
@@ -62,6 +70,20 @@ export default defineComponent({
           type,
           ...data,
         });
+      },
+
+      dragstartHandler({ text, type, data = {} }: ComponentItem, e: DragEvent) {
+        if (e.dataTransfer) {
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData(
+            'data',
+            serialize({
+              name: text,
+              type,
+              ...data,
+            }).replace(/"(\w+)":\s/g, '$1: '),
+          );
+        }
       },
     };
   },
