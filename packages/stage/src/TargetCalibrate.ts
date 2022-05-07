@@ -22,7 +22,7 @@ import { EventEmitter } from 'events';
 import { Mode } from './const';
 import StageDragResize from './StageDragResize';
 import StageMask from './StageMask';
-import type { Offset, Rect, TargetCalibrateConfig } from './types';
+import type { Offset, TargetCalibrateConfig } from './types';
 import { getMode } from './util';
 
 /**
@@ -58,18 +58,6 @@ export default class TargetCalibrate extends EventEmitter {
 
     this.operationEl.id = `${prefix}${el.id}`;
     return this.operationEl;
-  }
-
-  /**
-   * 设置样式属性
-   * @param rect 样式属性
-   */
-  public resetRect(rect: Rect): void {
-    this.operationEl.style.width = `${rect.width}px`;
-    this.operationEl.style.height = `${rect.height}px`;
-    Object.keys(rect).forEach((key: string) => {
-      this.operationEl.style[key] = `${rect[key]}px`;
-    });
   }
 
   public destroy(): void {
