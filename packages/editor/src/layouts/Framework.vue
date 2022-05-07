@@ -49,20 +49,20 @@ export default defineComponent({
   },
 
   setup() {
-    const services = inject<Services>('services');
+    const { editorService, uiService } = inject<Services>('services') || {};
 
-    const root = computed(() => services?.editorService.get<MApp>('root'));
+    const root = computed(() => editorService?.get<MApp>('root'));
 
     return {
       root,
-      pageLength: computed(() => root.value?.items?.length || 0),
-      showSrc: computed(() => services?.uiService.get<boolean>('showSrc')),
-      columnWidth: computed(() => services?.uiService.get<GetColumnWidth>('columnWidth')),
+      pageLength: computed(() => editorService?.get<number>('pageLength') || 0),
+      showSrc: computed(() => uiService?.get<boolean>('showSrc')),
+      columnWidth: computed(() => uiService?.get<GetColumnWidth>('columnWidth')),
 
       saveCode(value: string) {
         try {
           // eslint-disable-next-line no-eval
-          services?.editorService.set('root', eval(value));
+          editorService?.set('root', eval(value));
         } catch (e: any) {
           console.error(e);
         }

@@ -53,6 +53,7 @@ export interface StoreState {
   highlightNode: MNode | null;
   stage: StageCore | null;
   modifiedNodeIds: Map<Id, Id>;
+  pageLength: number;
 }
 
 export interface PropsState {

@@ -51,6 +51,13 @@ class History extends BaseService {
     this.on('change', this.setCanUndoRedo);
   }
 
+  public reset() {
+    this.state.pageSteps = {};
+    this.state.pageId = undefined;
+    this.state.canRedo = false;
+    this.state.canUndo = false;
+  }
+
   public changePage(page: MPage): void {
     if (!page) return;
 
