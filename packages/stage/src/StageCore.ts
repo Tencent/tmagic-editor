@@ -154,6 +154,9 @@ export default class StageCore extends EventEmitter {
     }
 
     this.mask.setLayout(el);
+
+    el.scrollIntoView();
+
     this.dr.select(el, event);
     this.selectedDom = el;
 
