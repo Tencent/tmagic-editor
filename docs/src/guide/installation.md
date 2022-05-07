@@ -10,6 +10,8 @@ node.js > 14
 
 推荐使用 npm 的方式安装，它能更好地和 [webpack](https://webpack.js.org/) 打包工具配合使用。
 
+> 使用Vue CLI生成的项目需要在vue.config.js中加上配置：transpileDependencies: [/@tmagic/]
+
 ```bash
 # 最新稳定版
 $ npm install @tmagic/editor@latest -S

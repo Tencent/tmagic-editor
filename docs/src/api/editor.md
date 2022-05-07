@@ -270,6 +270,17 @@ import { ArrowLeft, Coin } from '@element-plus/icons';
 - **详情：**
   
   画布中的选中框配置选项，使用的是[moveable](https://github.com/daybrush/moveable)第三方库
+
+### stageRect
+
+- **类型：** { width: number; height: number }
+
+- **默认值：** { width: 375, height: 817 }
+  
+- **详情：**
+  
+  画布的大小配置
+
 ## slots
 
 ### nav

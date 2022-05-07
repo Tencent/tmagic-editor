@@ -337,11 +337,11 @@ const node = editorService.get('node');
 editorService.alignCenter(node);
 ```
 
-- ### swap
+- ### moveLayer
 
 - **参数：**
 
-  - `{number | 'latest' | 'first'` offset
+  - `{number | 'top' | 'bottom'` offset
 
 - **用法：**
 
@@ -352,10 +352,10 @@ editorService.alignCenter(node);
 ```js
 import { editorService } from '@tmagic/editor';
 
-editorService.swap('bottom'); // 置底
-editorService.swap('first'); // 置顶
-editorService.swap(1); // 上移一层 
-editorService.swap(-1); // 下移一层 
+editorService.moveLayer('top'); // 置底
+editorService.moveLayer('bottom'); // 置顶
+editorService.moveLayer(1); // 上移一层 
+editorService.moveLayer(-1); // 下移一层 
 ```
 
 - ### undo
@@ -392,6 +392,26 @@ editorService.undo();
 import { editorService } from '@tmagic/editor';
 
 editorService.redo();
+```
+
+- ### move
+
+- **参数：**
+
+  - `{number}` left
+  - `{number}` top
+
+
+- **用法：**
+
+  绝对定位布局下，移动组件位置
+
+- **示例：**
+
+```js
+import { editorService } from '@tmagic/editor';
+
+editorService.move(1, 1);
 ```
 
 ### usePlugin
