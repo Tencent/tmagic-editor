@@ -91,7 +91,7 @@ class Editor extends BaseService {
     log('store set ', name, ' ', value);
 
     if (name === 'root') {
-      this.state.pageLength = (value as unknown as MApp).items.length;
+      this.state.pageLength = (value as unknown as MApp)?.items?.length || 0;
       this.emit('root-change', value);
     }
   }
