@@ -33,6 +33,7 @@ export default defineConfig({
       { find: /^@tmagic\/ui-vue2/, replacement: path.join(__dirname, '../../packages/ui-vue2/src/index.ts') },
       { find: /^@tmagic\/utils/, replacement: path.join(__dirname, '../../packages/utils/src/index.ts') },
       { find: /^@tmagic\/core/, replacement: path.join(__dirname, '../../packages/core/src/index.ts') },
+      { find: /^@tmagic\/schema/, replacement: path.join(__dirname, '../../packages/schema/src/index.ts') },
     ],
   },
 
