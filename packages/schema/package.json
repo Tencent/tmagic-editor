@@ -2,7 +2,12 @@
   "version": "1.0.0-beta.13",
   "name": "@tmagic/schema",
   "sideEffects": false,
-  "main": "src/index.ts",
+  "main": "dist/tmagic-schema.umd.js",
+  "module": "dist/tmagic-schema.es.js",
+  "types": "dist/types/src/index.d.ts",
+  "scripts": {
+    "build": "vite build"
+  },
   "engines": {
     "node": ">=14"
   },
@@ -10,5 +15,11 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Tencent/tmagic-editor.git"
+  },
+  "devDependencies": {
+    "@types/node": "^15.12.4",
+    "typescript": "^4.3.4",
+    "vite": "^2.3.7",
+    "vite-plugin-dts": "^0.9.6"
   }
 }
