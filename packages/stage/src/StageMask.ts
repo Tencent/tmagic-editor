@@ -130,13 +130,8 @@ export default class StageMask extends Rule {
     if (!page) return;
 
     this.page = page;
-
-    this.pageScrollParent?.removeEventListener('scroll', this.pageScrollParentScrollHandler);
-
     this.pageScrollParent = getScrollParent(page) || this.core.renderer.contentWindow?.document.documentElement || null;
     this.pageResizeObserver?.disconnect();
-
-    this.pageScrollParent?.addEventListener('scroll', this.pageScrollParentScrollHandler);
 
     if (typeof ResizeObserver !== 'undefined') {
       this.pageResizeObserver = new ResizeObserver((entries) => {
@@ -317,12 +312,5 @@ export default class StageMask extends Rule {
 
   private mouseLeaveHandler = () => {
     setTimeout(() => this.emit('clearHighlight'), throttleTime);
-  };
-
-  private pageScrollParentScrollHandler = () => {
-    if (!this.pageScrollParent) return;
-    this.scrollLeft = this.pageScrollParent.scrollLeft;
-    this.scrollTop = this.pageScrollParent.scrollTop;
-    this.scroll();
   };
 }
