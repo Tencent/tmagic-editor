@@ -54,6 +54,7 @@ class Editor extends BaseService {
     stage: null,
     highlightNode: null,
     modifiedNodeIds: new Map(),
+    pageLength: 0,
   });
 
   constructor() {
@@ -90,6 +91,7 @@ class Editor extends BaseService {
     log('store set ', name, ' ', value);
 
     if (name === 'root') {
+      this.state.pageLength = (value as unknown as MApp).items.length;
       this.emit('root-change', value);
     }
   }
@@ -253,8 +255,9 @@ class Editor extends BaseService {
     const curNode = this.get<MContainer>('node');
 
     let parentNode: MNode | undefined;
+    const isPage = type === NodeType.PAGE;
 
-    if (type === NodeType.PAGE) {
+    if (isPage) {
       parentNode = this.get<MApp>('root');
       // 由于支持中间件扩展，在parent参数为undefined时，parent会变成next函数
     } else if (parent && typeof parent !== 'function') {
@@ -294,6 +297,10 @@ class Editor extends BaseService {
 
     stage?.select(newNode.id);
 
+    if (isPage) {
+      this.state.pageLength += 1;
+    }
+
     this.emit('add', newNode);
 
     return newNode;
@@ -324,9 +331,23 @@ class Editor extends BaseService {
     stage?.remove({ id: node.id, root: this.get('root') });
 
     if (node.type === NodeType.PAGE) {
+      this.state.pageLength -= 1;
+
       if (root.items[0]) {
         await this.select(root.items[0]);
         stage?.select(root.items[0].id);
+      } else {
+        this.set('node', null);
+        this.set('parent', null);
+        this.set('page', null);
+        this.set('stage', null);
+        this.set('highlightNode', null);
+        this.resetModifiedNodeId();
+        historyService.reset();
+
+        this.emit('remove', node);
+
+        return node;
       }
     } else {
       await this.select(parent);
