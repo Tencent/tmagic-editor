@@ -1,21 +1,17 @@
 <template>
   <el-row :gutter="10">
-    <el-col
+    <Col
       v-for="(col, index) in config.items"
-      :style="!display(col) || col.type === 'hidden' ? 'display: none' : ''"
       :key="col[mForm?.keyProp || '__key'] ?? index"
-      :span="col.span || config.span || 24 / config.items.length"
-    >
-      <m-form-container
-        :model="name ? model[name] : model"
-        :config="col"
-        :prop="prop"
-        :label-width="config.labelWidth || labelWidth"
-        :expand-more="expandMore"
-        :size="size"
-        @change="changeHandler"
-      ></m-form-container>
-    </el-col>
+      :span="config.span || config.span || 24 / config.items.length"
+      :config="col"
+      :labelWidth="config.labelWidth || labelWidth"
+      :expandMore="expandMore"
+      :model="name ? model[name] : model"
+      :prop="prop"
+      :size="size"
+      @change="changeHandler"
+    />
   </el-row>
 </template>
 
@@ -23,10 +19,13 @@
 import { defineComponent, inject, PropType } from 'vue';
 
 import { FormState, RowConfig } from '../schema';
-import { display as displayFunction } from '../utils/form';
+
+import Col from './Col.vue';
 
 export default defineComponent({
   name: 'm-form-row',
+
+  components: { Col },
 
   props: {
     labelWidth: String,
@@ -58,9 +57,6 @@ export default defineComponent({
 
     return {
       mForm,
-      display(config: any) {
-        return displayFunction(mForm, config.display, props);
-      },
       changeHandler,
     };
   },

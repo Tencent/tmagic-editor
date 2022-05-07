@@ -43,7 +43,7 @@ export default defineComponent({
           return props.config.activeValue;
         }
 
-        return 'true';
+        return undefined;
       }),
 
       inactiveValue: computed(() => {
@@ -55,7 +55,7 @@ export default defineComponent({
           return props.config.inactiveValue;
         }
 
-        return 'false';
+        return undefined;
       }),
 
       changeHandler(value: number | boolean) {
