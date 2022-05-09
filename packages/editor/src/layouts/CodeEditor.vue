@@ -44,6 +44,11 @@ export default defineComponent({
       type: [String],
       default: () => 'javascript',
     },
+
+    extraLib: {
+      type: String,
+      default: '',
+    },
   },
 
   emits: ['initd', 'save'],
@@ -54,6 +59,8 @@ export default defineComponent({
     const values = ref('');
     const loading = ref(false);
     const codeEditor = ref<HTMLDivElement>();
+
+    let resizeObserver: ResizeObserver;
 
     const setEditorValue = (v: string | any, m: string | any) => {
       values.value = toString(v, props.language);
@@ -117,7 +124,8 @@ export default defineComponent({
         });
       }
 
-      globalThis.addEventListener('resize', resizeHandler);
+      resizeObserver = new ResizeObserver(resizeHandler);
+      resizeObserver.observe(codeEditor.value);
     };
 
     watch(
@@ -133,14 +141,30 @@ export default defineComponent({
       },
     );
 
+    const updateExtraLib = (extraLib: string) => {
+      if (!extraLib) return;
+      monaco.languages.typescript.javascriptDefaults.setExtraLibs([]);
+      monaco.languages.typescript.javascriptDefaults.addExtraLib(extraLib);
+    };
+
+    watch(
+      () => props.extraLib,
+      (v) => {
+        console.log('extraLib', v);
+        updateExtraLib(v);
+      },
+    );
+
     onMounted(async () => {
       loading.value = true;
 
       init();
+      updateExtraLib(props.extraLib);
     });
 
     onUnmounted(() => {
-      globalThis.removeEventListener('resize', resizeHandler);
+      resizeObserver.disconnect();
+      monaco.languages.typescript.javascriptDefaults.setExtraLibs([]);
     });
 
     return {
