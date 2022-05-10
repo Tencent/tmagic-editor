@@ -23,11 +23,11 @@
 2、执行如下命令运行管理端
 
 ```bash
-$ cd magic
+$ cd magic-admin
 $ npm run admin:run
 ```
 
-3、访问 http://localhost:80
+3、访问 http://localhost:80 (端口以实际启动的为准)
 
 ## 开发调试
 
