@@ -5,23 +5,28 @@ WORKSPACE=$(dirname "$PWD")
 echo ${WORKSPACE}
 
 # 全局安装lerna
-tnpm i lerna -g
+npm i lerna -g
 
 # magic依赖安装和构建
 cd ${WORKSPACE}
-tnpm run reinstall
-tnpm run build
+npm run reinstall
+npm run build
 
 echo "magic依赖安装完毕 & 打包完毕"
 
 # 移动runtime打包产物到web
+rm -rf ${WORKSPACE}/magic-admin/web/public/runtime
 mv -f ${WORKSPACE}/playground/dist/runtime/ ${WORKSPACE}/magic-admin/web/public
 
 echo "移动runtime打包产物到web完毕"
 
+# magic-admin依赖安装
+cd ${WORKSPACE}/magic-admin
+npm run init
+
 # web构建
 cd ${WORKSPACE}/magic-admin/web
-tnpm run build
+npm run build
 
 echo "web依赖安装完毕"
 
@@ -33,7 +38,6 @@ echo "移动web文件到server完毕"
 
 # 运行server
 cd ${WORKSPACE}/magic-admin/server
-tnpm i pm2 -g
-pm2-runtime start pm2.config.js --env production
+npm run dev
 
 
