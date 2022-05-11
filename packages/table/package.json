@@ -1,7 +1,9 @@
 {
   "version": "1.0.0-beta.14",
   "name": "@tmagic/table",
-  "sideEffects": false,
+  "sideEffects": [
+    "dist/*"
+  ],
   "main": "dist/tmagic-table.umd.js",
   "module": "dist/tmagic-table.es.js",
   "types": "dist/types/src/index.d.ts",
@@ -13,7 +15,8 @@
     "./dist/style.css": {
       "import": "./dist/style.css",
       "require": "./dist/style.css"
-    }
+    },
+    "./*": "./*"
   },
   "license": "Apache-2.0",
   "scripts": {
@@ -28,7 +31,7 @@
   },
   "dependencies": {
     "@tmagic/form": "^1.0.0-beta.14",
-    "element-plus": "^2.1.7",
+    "element-plus": "^2.2.0",
     "lodash-es": "^4.17.21",
     "vue": "^3.2.0"
   },

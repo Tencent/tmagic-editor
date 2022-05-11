@@ -1,7 +1,10 @@
 {
   "version": "1.0.0-beta.14",
   "name": "@tmagic/editor",
-  "sideEffects": false,
+  "sideEffects": [
+    "dist/*",
+    "src/theme/*"
+  ],
   "main": "dist/tmagic-editor.umd.js",
   "module": "dist/tmagic-editor.es.js",
   "style": "dist/style.css",
@@ -14,7 +17,8 @@
     "./dist/style.css": {
       "import": "./dist/style.css",
       "require": "./dist/style.css"
-    }
+    },
+    "./*": "./*"
   },
   "license": "Apache-2.0",
   "scripts": {
@@ -47,7 +51,7 @@
     "@tmagic/utils": "^1.0.0-beta.14",
     "buffer": "^6.0.3",
     "color": "^3.1.3",
-    "element-plus": "^2.1.7",
+    "element-plus": "^2.2.0",
     "events": "^3.3.0",
     "keycon": "^1.1.2",
     "lodash-es": "^4.17.21",
