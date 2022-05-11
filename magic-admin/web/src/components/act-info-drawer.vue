@@ -1,6 +1,6 @@
 <!-- 活动配置抽屉页 -->
 <template>
-  <el-button ref="showActInfo" size="small" type="text" :icon="Setting" @click="buttonHandler()">活动配置</el-button>
+  <el-button ref="showActInfo" size="small" text :icon="Setting" @click="buttonHandler()">活动配置</el-button>
   <teleport to="body">
     <el-drawer
       ref="actDrawer"

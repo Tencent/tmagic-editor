@@ -43,13 +43,17 @@
     display: flex !important;
     transition: all 0.3s ease 0s;
     border-bottom: 2px solid transparent;
-    margin: 0 5px;
+    margin: 0;
 
     .is-disabled {
       opacity: 0.5;
     }
 
-    .el-button--text,
+    .is-text {
+      padding: 5px;
+    }
+
+    .is-text,
     i {
       color: $--font-color;
     }

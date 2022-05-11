@@ -25,8 +25,8 @@
             <template v-slot="scope">
               <el-button
                 v-show="showDelete(scope.$index + 1 + pagecontext * pagesize - 1)"
-                style="color: #f56c6c"
-                type="text"
+                type="danger"
+                text
                 :icon="Delete"
                 @click="removeHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
               ></el-button>
@@ -44,7 +44,7 @@
                   plain
                   size="small"
                   :icon="ArrowUp"
-                  type="text"
+                  text
                   @click="upHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
                   @dblclick="topHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
                 ></el-button>
@@ -58,7 +58,7 @@
                   plain
                   size="small"
                   :icon="ArrowDown"
-                  type="text"
+                  text
                   @click="downHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
                   @dblclick="bottomHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
                 ></el-button>

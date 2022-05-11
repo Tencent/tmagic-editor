@@ -24,7 +24,7 @@
             v-for="(action, actionIndex) in item.actions"
             :key="actionIndex"
             @click="actionHandler(action, row, $index)"
-            type="text"
+            text
             size="small"
             v-html="action.text"
           ></el-button>
@@ -44,7 +44,7 @@
       >
         <template #default="{ row }">
           <!-- 展示为文字链接 -->
-          <el-button v-if="item.action === 'actionLink'" type="text" @click="item.handler(row)">
+          <el-button v-if="item.action === 'actionLink'" text @click="item.handler(row)">
             {{ formatter(item, row) }}
           </el-button>
           <!-- 展示为标签 -->

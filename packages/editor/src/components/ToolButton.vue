@@ -24,11 +24,11 @@
 
     <template v-else-if="item.type === 'button'">
       <el-tooltip v-if="item.tooltip" effect="dark" placement="bottom-start" :content="item.tooltip">
-        <el-button size="small" type="text" :disabled="disabled"
+        <el-button size="small" text :disabled="disabled"
           ><m-icon v-if="item.icon" :icon="item.icon"></m-icon><span>{{ item.text }}</span></el-button
         >
       </el-tooltip>
-      <el-button v-else size="small" type="text" :disabled="disabled"
+      <el-button v-else size="small" text :disabled="disabled"
         ><m-icon v-if="item.icon" :icon="item.icon"></m-icon><span>{{ item.text }}</span></el-button
       >
     </template>

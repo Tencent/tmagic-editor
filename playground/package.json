@@ -14,7 +14,7 @@
     "@tmagic/schema": "^1.0.0-beta.14",
     "@tmagic/stage": "^1.0.0-beta.14",
     "@tmagic/utils": "^1.0.0-beta.14",
-    "element-plus": "^2.1.7",
+    "element-plus": "^2.2.0",
     "serialize-javascript": "^6.0.0",
     "vue": "^3.2.0",
     "vue-router": "^4.0.10"

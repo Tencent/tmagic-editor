@@ -6,7 +6,7 @@
         v-show="display(action.display, scope.row) && !editState[scope.$index]"
         v-html="action.text"
         class="action-btn"
-        type="text"
+        text
         size="small"
         :key="actionIndex"
         @click="actionHandler(action, scope.row, scope.$index)"
@@ -14,7 +14,7 @@
       <el-button
         class="action-btn"
         v-show="editState[scope.$index]"
-        type="text"
+        text
         size="small"
         @click="save(scope.$index, config)"
         >保存</el-button
@@ -22,7 +22,7 @@
       <el-button
         class="action-btn"
         v-show="editState[scope.$index]"
-        type="text"
+        text
         size="small"
         @click="editState[scope.$index] = undefined"
         >取消</el-button

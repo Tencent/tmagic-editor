@@ -169,7 +169,7 @@ describe('ToolButton', () => {
 
     setTimeout(async () => {
       // disabled 后会有 is-disabled class
-      const iconBtn = wrapper.find('.el-button.el-button--text.is-disabled');
+      const iconBtn = wrapper.find('.el-button.is-text.is-disabled');
       await iconBtn.trigger('click');
       done();
     }, 0);

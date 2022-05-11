@@ -2,7 +2,7 @@
   <a v-if="config.href && !disabled" target="_blank" :href="href" :style="config.css || {}">{{ displayText }}</a>
   <span v-else-if="config.href && disabled" :style="config.disabledCss || {}">{{ displayText }}</span>
   <div v-else class="m-fields-link">
-    <el-button type="text" @click="editHandler">点击编辑</el-button>
+    <el-button text @click="editHandler">点击编辑</el-button>
     <m-form-dialog
       ref="editor"
       :title="config.formTitle || '编辑扩展配置'"

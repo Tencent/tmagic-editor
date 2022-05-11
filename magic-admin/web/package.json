@@ -17,7 +17,7 @@
     "axios": "^0.25.0",
     "axios-jsonp": "^1.0.4",
     "core-js": "^3.20.0",
-    "element-plus": "^2.1.7",
+    "element-plus": "^2.2.0",
     "js-cookie": "^3.0.0",
     "moment": "^2.29.1",
     "vue": "^3.2.26",
