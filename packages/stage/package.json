@@ -1,7 +1,9 @@
 {
   "version": "1.0.0-beta.14",
   "name": "@tmagic/stage",
-  "sideEffects": false,
+  "sideEffects": [
+    "dist/*"
+  ],
   "main": "dist/tmagic-stage.umd.js",
   "module": "dist/tmagic-stage.es.js",
   "types": "dist/types/src/index.d.ts",
@@ -9,7 +11,8 @@
     ".": {
       "import": "./dist/tmagic-stage.es.js",
       "require": "./dist/tmagic-stage.umd.js"
-    }
+    },
+    "./*": "./*"
   },
   "license": "Apache-2.0",
   "scripts": {
