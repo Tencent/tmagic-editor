@@ -5,21 +5,21 @@
         ><caret-bottom v-if="expand" /><caret-right v-else
       /></el-icon>
 
-      <el-button type="text" @click="expandHandler">{{ title }}</el-button>
+      <el-button text @click="expandHandler">{{ title }}</el-button>
 
       <el-button
         v-show="showDelete(parseInt(String(index)))"
-        type="text"
+        text
         :icon="Delete"
         style="color: #f56c6c"
         @click="removeHandler"
       ></el-button>
 
       <template v-if="movable()">
-        <el-button v-show="index !== 0" type="text" size="small" @click="changeOrder(-1)"
+        <el-button v-show="index !== 0" text size="small" @click="changeOrder(-1)"
           >上移<el-icon><CaretRight /></el-icon
         ></el-button>
-        <el-button v-show="index !== length - 1" type="text" size="small" @click="changeOrder(1)"
+        <el-button v-show="index !== length - 1" text size="small" @click="changeOrder(1)"
           >下移<el-icon><CaretBottom /></el-icon
         ></el-button>
       </template>

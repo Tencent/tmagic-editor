@@ -9,7 +9,7 @@
           :data="scope.row[config.prop]"
         ></m-table>
         <template #reference>
-          <el-button type="text"> {{ config.text || formatter(config, scope.row) }}</el-button>
+          <el-button text> {{ config.text || formatter(config, scope.row) }}</el-button>
         </template>
       </el-popover>
     </template>

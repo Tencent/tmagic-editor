@@ -70,7 +70,7 @@
         <div v-if="extra" v-html="extra" class="m-form-tip"></div>
       </el-form-item>
 
-      <el-tooltip v-if="config.tip" placement="top">
+      <el-tooltip v-if="config.tip" placement="left">
         <el-icon style="line-height: 40px; margin-left: 5px"><warning-filled /></el-icon>
         <template #content>
           <div v-html="config.tip"></div>
@@ -96,7 +96,7 @@
     </template>
 
     <div style="text-align: center" v-if="config.expand && type !== 'fieldset'">
-      <el-button type="text" @click="expandHandler">{{ expand ? '收起配置' : '展开更多配置' }}</el-button>
+      <el-button text @click="expandHandler">{{ expand ? '收起配置' : '展开更多配置' }}</el-button>
     </div>
   </div>
 </template>

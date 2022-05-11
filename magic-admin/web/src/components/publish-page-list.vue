@@ -1,6 +1,6 @@
 <!-- 活动发布确认弹窗 -->
 <template>
-  <el-button size="small" type="text" :icon="View" @click="buttonHandler()">发布</el-button>
+  <el-button size="small" text :icon="View" @click="buttonHandler()">发布</el-button>
   <el-dialog append-to-body title="确认以下发布信息" v-model="publishPageListVisible">
     <div class="publish-page-container">
       <el-row>请勾选需要发布的页面：</el-row>
