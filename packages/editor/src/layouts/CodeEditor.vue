@@ -4,6 +4,7 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, onUnmounted, ref, watch } from 'vue';
+import { throttle } from 'lodash-es';
 import * as monaco from 'monaco-editor';
 import serialize from 'serialize-javascript';
 
@@ -36,13 +37,18 @@ export default defineComponent({
     },
 
     type: {
-      type: [String],
+      type: String,
       default: () => '',
     },
 
     language: {
-      type: [String],
+      type: String,
       default: () => 'javascript',
+    },
+
+    options: {
+      type: Object,
+      default: () => ({}),
     },
   },
 
@@ -51,9 +57,17 @@ export default defineComponent({
   setup(props, { emit }) {
     let vsEditor: monaco.editor.IStandaloneCodeEditor | null = null;
     let vsDiffEditor: monaco.editor.IStandaloneDiffEditor | null = null;
+
     const values = ref('');
     const loading = ref(false);
     const codeEditor = ref<HTMLDivElement>();
+
+    const resizeObserver = new globalThis.ResizeObserver(
+      throttle((): void => {
+        vsEditor?.layout();
+        vsDiffEditor?.layout();
+      }, 300),
+    );
 
     const setEditorValue = (v: string | any, m: string | any) => {
       values.value = toString(v, props.language);
@@ -71,11 +85,6 @@ export default defineComponent({
       return vsEditor?.setValue(values.value);
     };
 
-    const resizeHandler = () => {
-      vsEditor?.layout();
-      vsDiffEditor?.layout();
-    };
-
     const getEditorValue = () =>
       props.type === 'diff' ? vsDiffEditor?.getModifiedEditor().getValue() : vsEditor?.getValue();
 
@@ -88,8 +97,9 @@ export default defineComponent({
         tabSize: 2,
         theme: 'vs-dark',
         fontFamily: 'dm, Menlo, Monaco, "Courier New", monospace',
-        fontSize: 15,
+        fontSize: 14,
         formatOnPaste: true,
+        ...props.options,
       };
 
       if (props.type === 'diff') {
@@ -117,7 +127,7 @@ export default defineComponent({
         });
       }
 
-      globalThis.addEventListener('resize', resizeHandler);
+      resizeObserver.observe(codeEditor.value);
     };
 
     watch(
@@ -140,7 +150,7 @@ export default defineComponent({
     });
 
     onUnmounted(() => {
-      globalThis.removeEventListener('resize', resizeHandler);
+      resizeObserver.disconnect();
     });
 
     return {
