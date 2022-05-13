@@ -25,15 +25,16 @@
       :prop="itemProp"
       :step-active="stepActive"
       :expand-more="expand"
-      :label-width="config.labelWidth || labelWidth"
+      :label-width="itemLabelWidth"
       @change="onChangeHandler"
     ></component>
 
     <template v-else-if="type && display">
       <el-form-item
         :style="config.tip ? 'flex: 1' : ''"
+        :class="{ hidden: itemLabelWidth === 0 || !config.text }"
         :prop="itemProp"
-        :label-width="config.text ? config.labelWidth || labelWidth : '0'"
+        :label-width="itemLabelWidth"
         :rules="rule"
       >
         <template #label><span v-html="type === 'checkbox' ? '' : config.text"></span></template>
@@ -88,7 +89,7 @@
           :size="size"
           :step-active="stepActive"
           :expand-more="expand"
-          :label-width="config.labelWidth || labelWidth"
+          :label-width="itemLabelWidth"
           :prop="itemProp"
           @change="onChangeHandler"
         ></m-form-container>
@@ -188,6 +189,8 @@ export default defineComponent({
       return displayFunction(mForm, props.config.display, props);
     });
 
+    const itemLabelWidth = computed(() => props.config.labelWidth || props.labelWidth);
+
     watchEffect(() => {
       expand.value = props.expandMore;
     });
@@ -263,6 +266,7 @@ export default defineComponent({
       itemProp,
       items,
       display,
+      itemLabelWidth,
       tagName,
       rule,
       tooltip,
