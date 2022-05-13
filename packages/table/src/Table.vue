@@ -205,9 +205,6 @@ export default defineComponent({
 
 <style lang="scss">
 .m-table {
-  .el-button.action-btn {
-    margin-right: 10px;
-  }
   .el-button.action-btn + .el-button.action-btn {
     margin-left: 0;
   }

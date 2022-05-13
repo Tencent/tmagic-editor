@@ -18,7 +18,7 @@
         ></m-form-container>
       </el-form>
 
-      <el-button v-else-if="config.action === 'actionLink'" text @click="config.handler(scope.row)">
+      <el-button v-else-if="config.action === 'actionLink'" text type="primary" @click="config.handler(scope.row)">
         {{ formatter(config, scope.row) }}
       </el-button>
 
@@ -34,7 +34,7 @@
         <template #content>
           <div>{{ formatter(config, scope.row) }}</div>
         </template>
-        <el-button text>扩展配置</el-button>
+        <el-button text type="primary">扩展配置</el-button>
       </el-tooltip>
 
       <el-tag
