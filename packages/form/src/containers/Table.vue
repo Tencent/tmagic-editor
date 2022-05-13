@@ -43,6 +43,7 @@
                 <el-button
                   plain
                   size="small"
+                  type="primary"
                   :icon="ArrowUp"
                   text
                   @click="upHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
@@ -57,6 +58,7 @@
                 <el-button
                   plain
                   size="small"
+                  type="primary"
                   :icon="ArrowDown"
                   text
                   @click="downHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
@@ -107,10 +109,16 @@
       </el-tooltip>
       <slot></slot>
       <el-button v-if="addable" size="small" type="primary" plain @click="newHandler()">添加</el-button> &nbsp;
-      <el-button :icon="Grid" size="small" @click="toggleMode" v-if="enableToggleMode && !isFullscreen"
+      <el-button :icon="Grid" size="small" type="primary" @click="toggleMode" v-if="enableToggleMode && !isFullscreen"
         >展开配置</el-button
       >
-      <el-button :icon="FullScreen" size="small" @click="toggleFullscreen" v-if="config.enableFullscreen !== false">
+      <el-button
+        :icon="FullScreen"
+        size="small"
+        type="primary"
+        @click="toggleFullscreen"
+        v-if="config.enableFullscreen !== false"
+      >
         {{ isFullscreen ? '退出全屏' : '全屏编辑' }}
       </el-button>
       <el-upload

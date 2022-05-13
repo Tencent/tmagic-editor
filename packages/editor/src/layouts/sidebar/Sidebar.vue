@@ -2,10 +2,10 @@
   <el-tabs v-if="data.type === 'tabs'" class="m-editor-sidebar" v-model="activeTabName" type="card" tab-position="left">
     <el-tab-pane v-for="item in items" :key="item.text" :name="item.text">
       <template #label>
-        <span>
+        <div :key="item.text">
           <m-icon v-if="item.icon" :icon="item.icon"></m-icon>
           <div v-if="item.text" class="magic-editor-tab-panel-title">{{ item.text }}</div>
-        </span>
+        </div>
       </template>
 
       <component :is="item.component" v-bind="item.props || {}" v-on="item.listeners || {}">

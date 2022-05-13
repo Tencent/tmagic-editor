@@ -7,6 +7,7 @@
         v-html="action.text"
         class="action-btn"
         text
+        type="primary"
         size="small"
         :key="actionIndex"
         @click="actionHandler(action, scope.row, scope.$index)"
@@ -15,6 +16,7 @@
         class="action-btn"
         v-show="editState[scope.$index]"
         text
+        type="primary"
         size="small"
         @click="save(scope.$index, config)"
         >保存</el-button
@@ -23,6 +25,7 @@
         class="action-btn"
         v-show="editState[scope.$index]"
         text
+        type="primary"
         size="small"
         @click="editState[scope.$index] = undefined"
         >取消</el-button
@@ -72,9 +75,9 @@ const display = (fuc: boolean | Function | undefined, row: any) => {
   return true;
 };
 
-const success = (msg: string, action: ColumnActionConfig) => {
+const success = (msg: string, action: ColumnActionConfig, row: any) => {
   ElMessage.success(msg);
-  action.after?.();
+  action.after?.(row);
 };
 
 const error = (msg: string) => ElMessage.error(msg);
@@ -89,7 +92,7 @@ const deleteAction = async (action: ColumnActionConfig, row: any) => {
   const res = await action.handler?.(row);
 
   if (res.ret === 0) {
-    success('删除成功!', action);
+    success('删除成功!', action, row);
   } else {
     error(res.msg || '删除失败');
   }
@@ -106,7 +109,7 @@ const copyHandler = async (action: ColumnActionConfig, row: any) => {
     const res = await action.handler?.(row);
 
     if (res.ret === 0) {
-      success('复制成功!', action);
+      success('复制成功!', action, row);
     } else {
       error(`复制失败!${res.msg}`);
     }
