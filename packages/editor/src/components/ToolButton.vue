@@ -12,12 +12,12 @@
 
     <template v-else-if="item.type === 'zoom'">
       <tool-button
-        :data="{ type: 'button', icon: ZoomIn, handler: zoomInHandler, tooltip: '放大' }"
+        :data="{ type: 'button', icon: ZoomOut, handler: zoomOutHandler, tooltip: '缩小' }"
         :event-type="eventType"
       ></tool-button>
       <span class="menu-item-text" style="margin: 0 5px">{{ parseInt(`${zoom * 100}`, 10) }}%</span>
       <tool-button
-        :data="{ type: 'button', icon: ZoomOut, handler: zoomOutHandler, tooltip: '缩小' }"
+        :data="{ type: 'button', icon: ZoomIn, handler: zoomInHandler, tooltip: '放大' }"
         :event-type="eventType"
       ></tool-button>
     </template>
