@@ -1,0 +1,1 @@
+{"version":3,"file":"event.js","sources":["../../src/event-entry.ts"],"sourcesContent":["(function() {\n  const events: Record<string, any> = {};\n  window.magicPresetEvents = events;\n})();"],"names":[],"mappings":"AAAC,AAAW,YAAA;AACV,QAAM,SAA8B,CAAA;AACpC,SAAO,oBAAoB;AAC7B,GAAG;"}

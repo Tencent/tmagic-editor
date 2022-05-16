@@ -6,3 +6,5 @@ dest
 comp-entry.ts
 config-entry.ts
 value-entry.ts
+
+magic-admin/web/public/runtime

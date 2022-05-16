@@ -15,10 +15,11 @@ npm run build
 echo "magic依赖安装完毕 & 打包完毕"
 
 # 移动runtime打包产物到web
-rm -rf ${WORKSPACE}/magic-admin/web/public/runtime
-mv -f ${WORKSPACE}/playground/dist/runtime/ ${WORKSPACE}/magic-admin/web/public
+# 管理端demo已包含打包产物，开发者自建流水线打包时可参考产物
+#rm -rf ${WORKSPACE}/magic-admin/web/public/runtime
+#mv -f ${WORKSPACE}/playground/dist/runtime/ ${WORKSPACE}/magic-admin/web/public
 
-echo "移动runtime打包产物到web完毕"
+#echo "移动runtime打包产物到web完毕"
 
 # magic-admin依赖安装
 cd ${WORKSPACE}/magic-admin
