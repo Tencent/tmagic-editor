@@ -20,21 +20,20 @@
     <div
       class="demo-block-control"
       ref="control"
-      :class="{ 'is-fixed': fixedControl }"
       @click="isExpanded = !isExpanded"
     >
       <transition name="arrow-slide">
-        <i :class="[iconClass, { hovering: hovering }]"></i>
+        <i :class="[iconClass, hovering]"></i>
       </transition>
       <transition name="text-slide">
-        <span v-show="hovering">{{ controlText }}</span>
+        <span>{{ controlText }}</span>
       </transition>
       <el-tooltip effect="dark" :content="'前往 codepen.io 运行此示例'" placement="right">
         <transition name="text-slide">
           <el-button
-            v-show="hovering || isExpanded"
             size="small"
-            type="text"
+            type="primary"
+            text
             class="control-button"
             @click.stop="goCodepen"
           >
@@ -187,7 +186,7 @@
     .control-button {
       line-height: 26px;
       position: absolute;
-      top: 0;
+      top: 10px;
       right: 0;
       font-size: 14px;
       padding-left: 5px;

@@ -8,6 +8,27 @@ import DemoBlock from './demo-block.vue';
 
 export default defineClientAppEnhance(({ app }) => {
   app.use(ElementPlus);
-  app.use(MagicForm);
+  app.use(MagicForm, {
+    request: (options: any) => new Promise((resolve) => {
+      if (options.url === 'select/remote') {
+        setTimeout(() => {
+          resolve({
+            data: [
+              {
+                name: 'select-1',
+                id: 1
+              },
+              {
+                name: 'select-2',
+                id: 2
+              },
+            ],
+          });
+        }, 1000);
+      } else {
+        resolve({});
+      }
+    }),
+  });
   app.component('demo-block', DemoBlock);
 });

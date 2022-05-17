@@ -50,27 +50,56 @@ const sidebar = {
       ]
     }
   ],
-  api: [
+  editorApi: [
     {
       text: '编辑器',
       children: [
-        '/api/editor',
-        '/api/model',
+        '/api/editor/editor',
+        '/api/editor/services',
       ]
     },
+  ],
+  formApi: [
     {
       text: '表单',
       children: [
-        '/api/form',
+        '/api/form/form',
+      ]
+    },
+  ],
+  formConfig: [
+    {
+      text: '表单配置',
+      children: [
+        '/api/form-config/layout',
       ]
     },
     {
-      text: '表单配置协议',
+      text: 'field配置',
       children: [
-        '/api/base-config',
-        '/api/field-config',
+        '/api/form-config/fields/cascader',
+        '/api/form-config/fields/checkbox',
+        '/api/form-config/fields/color-picker',
+        '/api/form-config/fields/date-picker',
+        '/api/form-config/fields/datetime-picker',
+        '/api/form-config/fields/display',
+        '/api/form-config/fields/hidden',
+        '/api/form-config/fields/number',
+        '/api/form-config/fields/input',
+        '/api/form-config/fields/link',
+        '/api/form-config/fields/redio',
+        '/api/form-config/fields/select',
+        '/api/form-config/fields/switch',
+        '/api/form-config/fields/textarea',
+        '/api/form-config/fields/time-picker',
       ]
-    }
+    },
+    {
+      text: '联动配置',
+      children: [
+        '/api/form-config/relate',
+      ]
+    },
   ]
 };
 
@@ -104,7 +133,20 @@ export default defineUserConfig<DefaultThemeOptions>({
       },
       {
         text: 'API参考',
-        link: '/api/editor'
+        children: [
+          {
+            text: '编辑器',
+            link: '/api/editor/editor'
+          },
+          {
+            text: '表单',
+            link: '/api/form/form'
+          },
+          {
+            text: '表单配置',
+            link: '/api/form-config/layout'
+          },
+        ],
       }, {
         text: '查看源码',
         link: 'https://github.com/Tencent/tmagic-editor'
@@ -119,7 +161,9 @@ export default defineUserConfig<DefaultThemeOptions>({
       '/guide/': sidebar.guide,
       '/page/': sidebar.page,
       '/component/': sidebar.component,
-      '/api/': sidebar.api,
+      '/api/editor': sidebar.editorApi,
+      '/api/form': sidebar.formApi,
+      '/api/form-config': sidebar.formConfig,
     },
     smoothScroll: false,
     lastUpdated: false,
