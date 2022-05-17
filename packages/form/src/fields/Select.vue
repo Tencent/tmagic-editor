@@ -20,15 +20,10 @@
     @visible-change="visibleHandler"
   >
     <template v-if="config.group">
-      <el-option-group
-        v-for="(group, index) in options"
-        :key="group.label + index"
-        :label="group.label"
-        :disabled="group.disabled"
-      >
+      <el-option-group v-for="(group, index) in options" :key="index" :label="group.label" :disabled="group.disabled">
         <el-option
           v-for="(item, index) in group.options"
-          :key="item.label + index"
+          :key="index"
           :label="item.label"
           :value="item.value"
           :disabled="item.disabled"
