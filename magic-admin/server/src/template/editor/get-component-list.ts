@@ -31,12 +31,12 @@ export default [
     title: '示例组件',
     items: [
       {
-        icon: 'iconfont icon-wenben',
+        icon: 'tickets',
         text: '文本',
         type: 'text',
       },
       {
-        icon: 'iconfont icon-anniu',
+        icon: 'switch-button',
         text: '按钮',
         type: 'button',
       },

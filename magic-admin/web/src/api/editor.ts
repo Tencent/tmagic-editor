@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+import { ComponentGroup } from '@tmagic/editor';
+
 import fetch, { Res } from '@src/util/request';
 // 编辑器左侧组件分类
 export interface CompClassifyForEditor {
@@ -38,7 +40,7 @@ export default {
    * 获取组件列表
    * @returns {Promise<Res>} 查询结果
    */
-  getComponentList(): Promise<Res> {
+  getComponentList(): Promise<Res<ComponentGroup[]>> {
     return fetch.get({
       _c: 'editor',
       _a: 'getComponentList',

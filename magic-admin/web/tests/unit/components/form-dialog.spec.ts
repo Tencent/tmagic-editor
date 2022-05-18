@@ -58,7 +58,7 @@ describe('FormDialog', () => {
       resetForm: jest.fn(),
       submitForm: jest.fn(() => 'test'),
     };
-    wrapper.vm.form = mockForm;
+    (wrapper.vm as any).form = mockForm;
     wrapper.vm.save();
     await flushPromises();
     expect(wrapper.emitted()).toHaveProperty('close');
@@ -81,7 +81,7 @@ describe('FormDialog', () => {
       resetForm: jest.fn(),
       submitForm: jest.fn(() => 'test'),
     };
-    wrapper.vm.form = mockForm;
+    (wrapper.vm as any).form = mockForm;
     wrapper.vm.save();
   });
 
@@ -100,7 +100,7 @@ describe('FormDialog', () => {
       resetForm: jest.fn(),
       submitForm: jest.fn(() => 'test'),
     };
-    wrapper.vm.form = mockForm;
+    (wrapper.vm as any).form = mockForm;
     wrapper.vm.save();
     await flushPromises();
     expect(wrapper.emitted()).toHaveProperty('close');
@@ -112,7 +112,7 @@ describe('FormDialog', () => {
       resetForm: jest.fn(),
       submitForm: jest.fn(() => {}),
     };
-    wrapper.vm.form = mockForm;
+    (wrapper.vm as any).form = mockForm;
     wrapper.vm.save();
     await flushPromises();
     expect(wrapper.emitted()).toHaveProperty('close');

@@ -17,6 +17,7 @@
  */
 
 // 新建活动表单配置
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const BlankActFormConfig = [
   { name: 'actName', text: '活动名称', rules: [{ required: true, message: '请输入活动名称', trigger: 'blur' }] },
   {
