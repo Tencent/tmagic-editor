@@ -40,5 +40,3 @@ echo "移动web文件到server完毕"
 # 运行server
 cd ${WORKSPACE}/magic-admin/server
 npm run dev
-
-

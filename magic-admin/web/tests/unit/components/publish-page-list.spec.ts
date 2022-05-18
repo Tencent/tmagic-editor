@@ -159,7 +159,7 @@ describe('PublishPageList', () => {
   });
   it('全选异常情况', () => {
     const wrapper = mount(PublishPageList);
-    wrapper.vm.handleCheckAllChange();
+    (wrapper.vm as any).handleCheckAllChange();
     expect(wrapper.vm.checkedPages).toHaveLength(0);
   });
   it('未选择发布页面，发布按钮不可点击', async () => {

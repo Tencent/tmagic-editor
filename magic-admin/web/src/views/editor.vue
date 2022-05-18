@@ -12,8 +12,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref } from 'vue';
+import { Component, computed, defineComponent, markRaw, ref } from 'vue';
 import { useRoute } from 'vue-router';
+import { Edit, FolderOpened, SwitchButton, Tickets } from '@element-plus/icons';
 
 import { ComponentGroup } from '@tmagic/editor';
 import { asyncLoadJs } from '@tmagic/utils';
@@ -23,6 +24,12 @@ import magicStore from '@src/store/index';
 import { topMenu } from '@src/use/use-menu';
 import { initConfigByActId } from '@src/use/use-publish';
 
+const icons: Record<string, Component> = {
+  'folder-opened': markRaw(FolderOpened),
+  tickets: markRaw(Tickets),
+  'switch-button': markRaw(SwitchButton),
+};
+
 export default defineComponent({
   name: 'App',
 
@@ -31,7 +38,7 @@ export default defineComponent({
 
     const uiConfigs = computed(() => magicStore.get('uiConfigs'));
     const editorDefaultSelected = computed(() => magicStore.get('editorDefaultSelected'));
-    const componentList = reactive<ComponentGroup[]>([]);
+    const componentList = ref<ComponentGroup[]>([]);
 
     const magicPresetValues = ref<Record<string, any>>({});
     const magicPresetConfigs = ref<Record<string, any>>({});
@@ -39,7 +46,14 @@ export default defineComponent({
     // 获取编辑器左侧组件树
     const getComponentList = async () => {
       const { data: list } = await editorApi.getComponentList();
-      componentList.push(...list);
+      if (!list) return;
+      componentList.value = list.map((item) => ({
+        ...item,
+        items: item.items.map((item) => ({
+          ...item,
+          icon: (typeof item.icon === 'string' ? icons[item.icon] : item.icon) || Edit,
+        })),
+      }));
     };
     // 根据活动id获取活动配置
     const getActById = async () => {

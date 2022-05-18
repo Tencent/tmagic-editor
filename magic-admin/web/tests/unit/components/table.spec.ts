@@ -77,7 +77,7 @@ window.ResizeObserver =
   }));
 
 const getWrapper = (mockData = data, mockColumns = columns) =>
-  mount(Table, {
+  mount(Table as any, {
     props: {
       data: mockData,
       config: mockColumns,

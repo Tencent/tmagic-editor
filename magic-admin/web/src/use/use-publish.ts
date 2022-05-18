@@ -87,7 +87,9 @@ export const commitHandler = async () => {
     ElMessage.success({
       message: res.msg,
       type: 'success',
-      onClose: () => initConfigByActId({ actId: actInfo.value.actId }),
+      onClose: () => {
+        initConfigByActId({ actId: actInfo.value.actId });
+      },
     });
   } else {
     ElMessage.error(res.msg);

@@ -1,6 +1,11 @@
 const path = require('path');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
-module.exports = {
+const { defineConfig } = require('@vue/cli-service');
+
+module.exports = defineConfig({
+  transpileDependencies: true,
+
   lintOnSave: true,
 
   indexPath: 'index.html',
@@ -8,31 +13,15 @@ module.exports = {
   outputDir: path.resolve(__dirname, './dist'),
 
   devServer: {
-    overlay: {
-      warnings: false,
-      errors: false,
-    },
     port: 8181,
-    disableHostCheck: true,
     proxy: {
       '/api': {
         target: 'http://localhost:3001/',
         ws: true,
         changOrigin: true,
       },
-      '^/runtime/vue2': {
-        target: 'http://127.0.0.1:80/runtime/vue2',
-        changeOrigin: true,
-        prependPath: false,
-      },
-      '^/runtime/vue3': {
-        target: 'http://127.0.0.1:80/runtime/vue3',
-        changeOrigin: true,
-        prependPath: false,
-      },
     },
   },
-  transpileDependencies: [/@tmagic/],
 
   configureWebpack: {
     devtool: 'source-map',
@@ -44,5 +33,7 @@ module.exports = {
         '@src': path.resolve(__dirname, './src'),
       },
     },
+
+    plugins: [new MonacoWebpackPlugin()],
   },
-};
+});
