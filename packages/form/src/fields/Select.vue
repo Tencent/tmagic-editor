@@ -345,6 +345,8 @@ export default defineComponent({
       moreLoadingVisible,
       popperClass: mForm?.popperClass,
 
+      getOptions,
+
       getRequestFuc() {
         return getConfig('request');
       },
@@ -364,11 +366,6 @@ export default defineComponent({
         } else if (options.value.length <= (props.config.multiple ? props.model?.[props.name].length : 1)) {
           options.value = await getOptions();
         }
-      },
-
-      async editAfterAction() {
-        pgIndex.value = 0;
-        options.value = await getOptions();
       },
 
       async remoteMethod(q: string) {
