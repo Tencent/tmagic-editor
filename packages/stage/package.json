@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-beta.16",
+  "version": "1.0.0-rc.1",
   "name": "@tmagic/stage",
   "sideEffects": [
     "dist/*"
@@ -27,8 +27,8 @@
   },
   "dependencies": {
     "@scena/guides": "^0.17.0",
-    "@tmagic/schema": "^1.0.0-beta.16",
-    "@tmagic/utils": "^1.0.0-beta.16",
+    "@tmagic/schema": "^1.0.0-rc.1",
+    "@tmagic/utils": "^1.0.0-rc.1",
     "events": "^3.3.0",
     "lodash-es": "^4.17.21",
     "moveable": "^0.29.4",
