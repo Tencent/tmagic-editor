@@ -99,6 +99,8 @@ export interface UiState {
   showGuides: boolean;
   /** 是否显示标尺，true: 显示，false: 不显示，默认为true */
   showRule: boolean;
+  /** 用于控制该属性配置表单内组件的尺寸 */
+  propsPanelSize: 'large' | 'default' | 'small';
 }
 
 export interface EditorNodeInfo {
