@@ -28,6 +28,14 @@ import BaseService from './BaseService';
 const DEFAULT_LEFT_COLUMN_WIDTH = 310;
 const DEFAULT_RIGHT_COLUMN_WIDTH = 480;
 
+const COLUMN_WIDTH_STORAGE_KEY = '$MagicEditorColumnWidthData';
+
+const defaultColumnWidth = {
+  left: DEFAULT_LEFT_COLUMN_WIDTH,
+  center: globalThis.document.body.clientWidth - DEFAULT_LEFT_COLUMN_WIDTH - DEFAULT_RIGHT_COLUMN_WIDTH,
+  right: DEFAULT_RIGHT_COLUMN_WIDTH,
+};
+
 const state = reactive<UiState>({
   uiSelectMode: false,
   showSrc: false,
@@ -40,13 +48,10 @@ const state = reactive<UiState>({
     width: 375,
     height: 817,
   },
-  columnWidth: {
-    left: DEFAULT_LEFT_COLUMN_WIDTH,
-    center: globalThis.document.body.clientWidth - DEFAULT_LEFT_COLUMN_WIDTH - DEFAULT_RIGHT_COLUMN_WIDTH,
-    right: DEFAULT_RIGHT_COLUMN_WIDTH,
-  },
+  columnWidth: defaultColumnWidth,
   showGuides: true,
   showRule: true,
+  propsPanelSize: 'small',
 });
 
 class Ui extends BaseService {
@@ -57,6 +62,16 @@ class Ui extends BaseService {
         center: 'auto',
       });
     });
+
+    const columnWidthCacheData = globalThis.localStorage.getItem(COLUMN_WIDTH_STORAGE_KEY);
+    if (columnWidthCacheData) {
+      try {
+        const columnWidthCache = JSON.parse(columnWidthCacheData);
+        this.setColumnWidth(columnWidthCache);
+      } catch (e) {
+        console.error(e);
+      }
+    }
   }
 
   public set<T = any>(name: keyof UiState, value: T) {
@@ -112,9 +127,16 @@ class Ui extends BaseService {
     if (!center || center === 'auto') {
       const bodyWidth = globalThis.document.body.clientWidth;
       columnWidth.center = bodyWidth - (columnWidth?.left || 0) - (columnWidth?.right || 0);
+      if (columnWidth.center <= 0) {
+        columnWidth.left = defaultColumnWidth.left;
+        columnWidth.center = defaultColumnWidth.center;
+        columnWidth.right = defaultColumnWidth.right;
+      }
     } else {
       columnWidth.center = center;
     }
+
+    globalThis.localStorage.setItem(COLUMN_WIDTH_STORAGE_KEY, JSON.stringify(columnWidth));
 
     state.columnWidth = columnWidth;
   }

@@ -1,9 +1,9 @@
 <template>
   <m-form
-    class="m-editor-props-panel"
+    :class="`m-editor-props-panel ${propsPanelSize}`"
     popper-class="m-editor-props-panel-popper"
     ref="configForm"
-    size="small"
+    :size="propsPanelSize"
     :init-values="values"
     :config="curFormConfig"
     @change="submit"
@@ -55,6 +55,7 @@ export default defineComponent({
       values,
       configForm,
       curFormConfig,
+      propsPanelSize: computed(() => services?.uiService.get('propsPanelSize') || 'small'),
 
       async submit() {
         try {
