@@ -1,7 +1,7 @@
 <template>
   <m-form
     :class="`m-editor-props-panel ${propsPanelSize}`"
-    popper-class="m-editor-props-panel-popper"
+    :popper-class="`m-editor-props-panel-popper ${propsPanelSize}`"
     ref="configForm"
     :size="propsPanelSize"
     :init-values="values"

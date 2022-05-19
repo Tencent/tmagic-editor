@@ -23,9 +23,11 @@
 }
 
 .m-editor-props-panel-popper {
-  span,
-  a,
-  p {
-    font-size: 12px;
+  &.small {
+    span,
+    a,
+    p {
+      font-size: 12px;
+    }
   }
 }
