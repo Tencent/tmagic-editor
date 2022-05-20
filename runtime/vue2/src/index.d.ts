@@ -20,7 +20,7 @@ import { MApp } from '@tmagic/schema';
 
 declare global {
   interface Window {
-    magicUiConfig: MApp[];
+    magicDSL: MApp[];
     magicPresetComponents: any;
     magicPresetConfigs: any;
     magicPresetValues: any;
