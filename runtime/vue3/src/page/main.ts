@@ -40,7 +40,7 @@ Object.values(entry.plugins).forEach((plugin: any) => {
 });
 
 const app = new Core({
-  config: ((getUrlParam('localPreview') ? getLocalConfig() : window.magicUiConfig) || [])[0] || {},
+  config: ((getUrlParam('localPreview') ? getLocalConfig() : window.magicDSL) || [])[0] || {},
   curPage: getUrlParam('page'),
 });
 

@@ -1104,7 +1104,7 @@ Object.values(entry.plugins).forEach((plugin) => {
   magicApp.use(plugin);
 });
 const app = new App({
-  config: ((getUrlParam("localPreview") ? getLocalConfig() : window.magicUiConfig) || [])[0] || {},
+  config: ((getUrlParam("localPreview") ? getLocalConfig() : window.magicDSL) || [])[0] || {},
   curPage: getUrlParam("page")
 });
 magicApp.config.globalProperties.app = app;
