@@ -1,5 +1,6 @@
 <template>
   <m-editor
+    ref="editor"
     :menu="menu"
     :runtime-url="runtimeUrl"
     :component-group-list="componentList"
@@ -8,6 +9,7 @@
     :props-configs="magicPresetConfigs"
     :event-method-list="magicPresetEvents"
     :default-selected="editorDefaultSelected"
+    :moveable-options="moveableOptions"
   ></m-editor>
 </template>
 
@@ -16,7 +18,10 @@ import { Component, computed, defineComponent, markRaw, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { Edit, FolderOpened, SwitchButton, Tickets } from '@element-plus/icons';
 
+import type { MoveableOptions } from '@tmagic/editor';
 import { ComponentGroup } from '@tmagic/editor';
+import { NodeType } from '@tmagic/schema';
+import StageCore from '@tmagic/stage';
 import { asyncLoadJs } from '@tmagic/utils';
 
 import editorApi from '@src/api/editor';
@@ -35,6 +40,7 @@ export default defineComponent({
 
   setup() {
     const route = useRoute();
+    const editor = ref();
 
     const uiConfigs = computed(() => magicStore.get('uiConfigs'));
     const editorDefaultSelected = computed(() => magicStore.get('editorDefaultSelected'));
@@ -74,6 +80,7 @@ export default defineComponent({
     getActById();
 
     return {
+      editor,
       componentList,
       menu: topMenu(),
       uiConfigs,
@@ -82,6 +89,23 @@ export default defineComponent({
       magicPresetConfigs,
       magicPresetEvents,
       editorDefaultSelected,
+      moveableOptions: (core?: StageCore): MoveableOptions => {
+        const options: MoveableOptions = {};
+        const id = core?.dr?.target?.id;
+
+        if (!id || !editor.value) return options;
+
+        const node = editor.value.editorService.getNodeById(id);
+
+        if (!node) return options;
+
+        const isPage = node.type === NodeType.PAGE;
+
+        options.draggable = !isPage;
+        options.resizable = !isPage;
+
+        return options;
+      },
     };
   },
 });

@@ -51,8 +51,12 @@ export const initConfigByActId = async ({ actId }: { actId: number }) => {
         name: page.pageTitle,
         title: page.pageTitle,
         style: {
-          height: 728,
-          width: 375,
+          height: '728',
+          width: '375',
+          position: 'relative',
+          layout: 'absolute',
+          left: 0,
+          top: 0,
         },
         items: [],
       });

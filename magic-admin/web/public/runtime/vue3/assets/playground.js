@@ -3,7 +3,7 @@ import { a as getNodePath, _ as _export_sfc } from "./plugin-vue_export-helper.a
 var playground_html_htmlProxy_index_0 = "";
 const scriptRel = "modulepreload";
 const seen = {};
-const base = "/tmagic-editor/playground/runtime/vue3/";
+const base = "/runtime/vue3/";
 const __vitePreload = function preload(baseModule, deps) {
   if (!deps || deps.length === 0) {
     return baseModule();
@@ -136,7 +136,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   }, null, 8, ["config"])) : Vue.createCommentVNode("", true);
 }
 var App = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render]]);
-const componentUrl = "/tmagic-editor/playground/runtime/vue3/assets/components.js";
+const componentUrl = "/runtime/vue3/assets/components.js";
 __vitePreload(() => import(componentUrl), true ? [] : void 0).then(() => {
   const magicApp = Vue.createApp(App);
   const { components, plugins } = window.magicPresetComponents;
