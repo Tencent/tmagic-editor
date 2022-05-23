@@ -12,23 +12,6 @@
 
 <img src="https://vfiles.gtimg.cn/vupload/20211129/81d34a1638168945248.png">
 
-## 快速开始
-
-::: tip
-前提条件：node 环境>=14.15
-:::
-
-1、首先 clone 开源仓库代码到本地
-
-2、执行如下命令运行管理端
-
-```bash
-$ cd magic-admin
-$ npm run admin:run
-```
-
-3、访问 http://localhost:80 (端口以实际启动的为准)
-
 ## 开发调试
 
 magic-admin 管理端分为 web 端和 server 端，目录结构如下：
@@ -225,3 +208,11 @@ magic_ui_config 表
   管理端的项目发布是对[页面发布](https://tencent.github.io/tmagic-editor/docs/page/introduction.html#%E9%A1%B5%E9%9D%A2%E5%8F%91%E5%B8%83) 的实践。
   原始的页面框架 page.html 需要通过 runtime 打包生成，注入的 DSL 保存在 magic_ui_config 表 c_dist_code 字段中。
   发布时将 DSL 文件注入到 page.html 中，写入 server/assets/publish 目录下，访问路径： http://localhost/publish/${page_name}.html
+
+## 部署
+
+::: tip
+前提条件：node 环境>=14.15
+:::
+
+如需使用流水线部署，请参考 /magic-admin/setup.sh
