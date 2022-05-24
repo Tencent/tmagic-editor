@@ -209,6 +209,7 @@ export default defineComponent({
           const { scrollTop, scrollLeft } = stage.mask;
           if (layout === Layout.ABSOLUTE) {
             config.style = {
+              ...(config.style || {}),
               position: 'absolute',
               top: e.clientY - containerRect.top + scrollTop,
               left: e.clientX - containerRect.left + scrollLeft,
