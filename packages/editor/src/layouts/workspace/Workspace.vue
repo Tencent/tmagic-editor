@@ -65,8 +65,13 @@ export default defineComponent({
       workspace.value?.focus();
     };
 
+    const mouseleaveHandler = () => {
+      workspace.value?.blur();
+    };
+
     onMounted(() => {
       workspace.value?.addEventListener('mouseenter', mouseenterHandler);
+      workspace.value?.addEventListener('mouseleave', mouseleaveHandler);
 
       keycon = new KeyController(workspace.value);
 
@@ -75,85 +80,84 @@ export default defineComponent({
       const ctrl = isMac ? 'meta' : 'ctrl';
 
       keycon
+        .keydown((e) => {
+          console.log(e);
+          e.inputEvent.preventDefault();
+        })
         .keyup('delete', (e) => {
           e.inputEvent.preventDefault();
           if (!node.value || isPage(node.value)) return;
           services?.editorService.remove(node.value);
         })
-        .keydown([ctrl, 'c'], (e) => {
+        .keyup('backspace', (e) => {
           e.inputEvent.preventDefault();
+          if (!node.value || isPage(node.value)) return;
+          services?.editorService.remove(node.value);
+        })
+        .keydown([ctrl, 'c'], () => {
           node.value && services?.editorService.copy(node.value);
         })
-        .keydown([ctrl, 'v'], (e) => {
-          e.inputEvent.preventDefault();
+        .keydown([ctrl, 'v'], () => {
           node.value && services?.editorService.paste();
         })
-        .keydown([ctrl, 'x'], (e) => {
-          e.inputEvent.preventDefault();
+        .keydown([ctrl, 'x'], () => {
           if (!node.value || isPage(node.value)) return;
           services?.editorService.copy(node.value);
           services?.editorService.remove(node.value);
         })
-        .keydown([ctrl, 'z'], (e) => {
-          e.inputEvent.preventDefault();
+        .keydown([ctrl, 'z'], () => {
           services?.editorService.undo();
         })
-        .keydown([ctrl, 'shift', 'z'], (e) => {
-          e.inputEvent.preventDefault();
+        .keydown([ctrl, 'shift', 'z'], () => {
           services?.editorService.redo();
         })
-        .keydown('up', (e) => {
-          e.inputEvent.preventDefault();
+        .keydown('up', () => {
           services?.editorService.move(0, -1);
         })
-        .keydown('down', (e) => {
-          e.inputEvent.preventDefault();
+        .keydown('down', () => {
           services?.editorService.move(0, 1);
         })
-        .keydown('left', (e) => {
-          e.inputEvent.preventDefault();
+        .keydown('left', () => {
           services?.editorService.move(-1, 0);
         })
-        .keydown('right', (e) => {
-          e.inputEvent.preventDefault();
+        .keydown('right', () => {
           services?.editorService.move(1, 0);
         })
-        .keydown([ctrl, 'up'], (e) => {
-          e.inputEvent.preventDefault();
+        .keydown([ctrl, 'up'], () => {
           services?.editorService.move(0, -10);
         })
-        .keydown([ctrl, 'down'], (e) => {
-          e.inputEvent.preventDefault();
+        .keydown([ctrl, 'down'], () => {
           services?.editorService.move(0, 10);
         })
-        .keydown([ctrl, 'left'], (e) => {
-          e.inputEvent.preventDefault();
+        .keydown([ctrl, 'left'], () => {
           services?.editorService.move(-10, 0);
         })
-        .keydown([ctrl, 'right'], (e) => {
-          e.inputEvent.preventDefault();
+        .keydown([ctrl, 'right'], () => {
           services?.editorService.move(10, 0);
         })
-        .keydown('tab', (e) => {
-          e.inputEvent.preventDefault();
+        .keydown('tab', () => {
           services?.editorService.selectNextNode();
         })
-        .keydown([ctrl, 'tab'], (e) => {
-          e.inputEvent.preventDefault();
+        .keydown([ctrl, 'tab'], () => {
           services?.editorService.selectNextPage();
         })
-        .keydown([ctrl, '='], (e) => {
-          e.inputEvent.preventDefault();
+        .keydown([ctrl, '='], () => {
           services?.uiService.zoom(0.1);
         })
-        .keydown([ctrl, '-'], (e) => {
-          e.inputEvent.preventDefault();
+        .keydown([ctrl, 'numpadplus'], () => {
+          services?.uiService.zoom(0.1);
+        })
+        .keydown([ctrl, '-'], () => {
+          services?.uiService.zoom(-0.1);
+        })
+        .keydown([ctrl, 'numpad-'], () => {
           services?.uiService.zoom(-0.1);
         });
     });
 
     onUnmounted(() => {
       workspace.value?.removeEventListener('mouseenter', mouseenterHandler);
+      workspace.value?.removeEventListener('mouseleave', mouseleaveHandler);
       keycon.destroy();
     });
 
