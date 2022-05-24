@@ -173,6 +173,16 @@ export default class StageMask extends Rule {
     this.setMode(isFixedParent(el) ? Mode.FIXED : Mode.ABSOLUTE);
   }
 
+  public scrollIntoView(el: HTMLElement): void {
+    if (this.mode === Mode.FIXED) return;
+
+    el.scrollIntoView();
+    if (!this.pageScrollParent) return;
+    this.scrollLeft = this.pageScrollParent.scrollLeft;
+    this.scrollTop = this.pageScrollParent.scrollTop;
+    this.scroll();
+  }
+
   /**
    * 销毁实例
    */
