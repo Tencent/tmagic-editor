@@ -42,8 +42,13 @@
     "sortablejs": "^1.14.0",
     "vue": "^3.2.0"
   },
+  "peerDependencies": {
+    "element-plus": "^2.2.0",
+    "vue": "^3.2.0"
+  },
   "devDependencies": {
-    "@types/jest": "^26.0.23",
+    "@babel/core": "^7.18.0",
+    "@types/jest": "^27.5.1",
     "@types/lodash-es": "^4.17.4",
     "@types/node": "^15.12.4",
     "@types/sortablejs": "^1.10.7",
@@ -52,6 +57,7 @@
     "@vue/compiler-sfc": "^3.2.0",
     "@vue/test-utils": "^2.0.0-rc.20",
     "@vue/vue3-jest": "^27.0.0-alpha.4",
+    "babel-jest": "^27.0.6",
     "jest": "^27.5.1",
     "jest-serializer-vue": "^2.0.2",
     "jest-transform-stub": "^2.0.0",

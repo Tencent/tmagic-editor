@@ -28,7 +28,7 @@
     "moment": "^2.29.2"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.23",
+    "@types/jest": "^27.5.1",
     "@types/node": "^15.12.4",
     "jest": "^27.5.1",
     "jest-serializer-vue": "^2.0.2",

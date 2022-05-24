@@ -35,6 +35,11 @@
     "lodash-es": "^4.17.21",
     "vue": "^3.2.0"
   },
+  "peerDependencies": {
+    "@tmagic/form": "^1.0.0-rc.1",
+    "element-plus": "^2.2.0",
+    "vue": "^3.2.0"
+  },
   "devDependencies": {
     "@types/color": "^3.0.1",
     "@types/lodash-es": "^4.17.4",
