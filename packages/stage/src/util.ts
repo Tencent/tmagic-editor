@@ -19,6 +19,16 @@
 import { Mode, SELECTED_CLASS } from './const';
 import type { Offset } from './types';
 
+const getParents = (el: Element, relative: Element) => {
+  let cur: Element | null = el.parentElement;
+  const parents: Element[] = [];
+  while (cur && cur !== relative) {
+    parents.push(cur);
+    cur = cur.parentElement;
+  }
+  return parents;
+};
+
 export const getOffset = (el: HTMLElement): Offset => {
   const { transform } = getComputedStyle(el);
   const { offsetParent } = el;
@@ -161,10 +171,16 @@ export const removeSelectedClassName = (doc: Document) => {
   if (oldEl) {
     oldEl.classList.remove(SELECTED_CLASS);
     (oldEl.parentNode as HTMLDivElement)?.classList.remove(`${SELECTED_CLASS}-parent`);
+    doc.querySelectorAll(`.${SELECTED_CLASS}-parents`).forEach((item) => {
+      item.classList.remove(`${SELECTED_CLASS}-parents`);
+    });
   }
 };
 
-export const addSelectedClassName = (el: Element) => {
+export const addSelectedClassName = (el: Element, doc: Document) => {
   el.classList.add(SELECTED_CLASS);
   (el.parentNode as Element)?.classList.add(`${SELECTED_CLASS}-parent`);
+  getParents(el, doc.body).forEach((item) => {
+    item.classList.add(`${SELECTED_CLASS}-parents`);
+  });
 };
