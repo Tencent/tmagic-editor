@@ -1,5 +1,5 @@
 <template>
-  <framework>
+  <framework :code-options="codeOptions">
     <template #nav>
       <slot name="nav" :editorService="editorService"><nav-menu :data="menu"></nav-menu></slot>
     </template>
@@ -135,6 +135,11 @@ export default defineComponent({
 
     stageRect: {
       type: [String, Object] as PropType<StageRect>,
+    },
+
+    codeOptions: {
+      type: Object,
+      default: () => ({}),
     },
   },
 

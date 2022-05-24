@@ -94,11 +94,7 @@ export default defineComponent({
       const options = {
         value: values.value,
         language: props.language,
-        tabSize: 2,
         theme: 'vs-dark',
-        fontFamily: 'dm, Menlo, Monaco, "Courier New", monospace',
-        fontSize: 14,
-        formatOnPaste: true,
         ...props.options,
       };
 

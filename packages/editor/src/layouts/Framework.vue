@@ -2,7 +2,13 @@
   <div class="m-editor">
     <slot name="nav" class="m-editor-nav-menu"></slot>
 
-    <magic-code-editor v-if="showSrc" class="m-editor-content" :init-values="root" @save="saveCode"></magic-code-editor>
+    <magic-code-editor
+      v-if="showSrc"
+      class="m-editor-content"
+      :init-values="root"
+      :options="codeOptions"
+      @save="saveCode"
+    ></magic-code-editor>
 
     <div class="m-editor-content" v-else>
       <div class="m-editor-framework-left" :style="`width: ${columnWidth?.left}px`">
@@ -46,6 +52,13 @@ export default defineComponent({
   components: {
     AddPageBox,
     Resizer,
+  },
+
+  props: {
+    codeOptions: {
+      type: Object,
+      default: () => ({}),
+    },
   },
 
   setup() {
