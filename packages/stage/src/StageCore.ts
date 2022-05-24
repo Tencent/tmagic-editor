@@ -160,7 +160,7 @@ export default class StageCore extends EventEmitter {
     if (this.renderer.contentWindow) {
       removeSelectedClassName(this.renderer.contentWindow.document);
       if (this.selectedDom) {
-        addSelectedClassName(this.selectedDom);
+        addSelectedClassName(this.selectedDom, this.renderer.contentWindow.document);
       }
     }
   }
