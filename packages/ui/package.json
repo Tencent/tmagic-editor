@@ -18,6 +18,7 @@
   },
   "devDependencies": {
     "@testing-library/vue": "^6.4.2",
+    "@vue/compiler-sfc": "^3.2.0",
     "@vue/test-utils": "^2.0.0-rc.12"
   }
 }

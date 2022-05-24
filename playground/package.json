@@ -15,6 +15,7 @@
     "@tmagic/stage": "^1.0.0-rc.1",
     "@tmagic/utils": "^1.0.0-rc.1",
     "element-plus": "^2.2.0",
+    "monaco-editor": "^0.32.1",
     "serialize-javascript": "^6.0.0",
     "vue": "^3.2.0",
     "vue-router": "^4.0.10"
