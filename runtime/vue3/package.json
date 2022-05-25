@@ -1,6 +1,6 @@
 {
   "name": "runtime-vue3",
-  "version": "1.0.0-rc.2",
+  "version": "1.0.0-rc.3",
   "private": true,
   "scripts": {
     "dev": "npm run build && npm run serve",
@@ -9,8 +9,8 @@
     "serve": "vite preview --port 8078"
   },
   "dependencies": {
-    "@tmagic/schema": "^1.0.0-rc.2",
-    "@tmagic/stage": "^1.0.0-rc.2",
+    "@tmagic/schema": "^1.0.0-rc.3",
+    "@tmagic/stage": "^1.0.0-rc.3",
     "axios": "^0.25.0",
     "vue": "^3.2.0"
   },
