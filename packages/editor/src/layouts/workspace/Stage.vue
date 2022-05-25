@@ -59,6 +59,7 @@ export default defineComponent({
     },
 
     runtimeUrl: String,
+    autoScrollIntoView: Boolean,
 
     canSelect: {
       type: Function as PropType<(el: HTMLElement) => boolean | Promise<boolean>>,
@@ -100,6 +101,7 @@ export default defineComponent({
         render: props.render,
         runtimeUrl: props.runtimeUrl,
         zoom: zoom.value,
+        autoScrollIntoView: props.autoScrollIntoView,
         canSelect: (el, event, stop) => {
           const elCanSelect = props.canSelect(el);
           // 在组件联动过程中不能再往下选择，返回并触发 ui-select
