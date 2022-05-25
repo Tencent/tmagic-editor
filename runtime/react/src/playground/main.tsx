@@ -27,7 +27,7 @@ import { getUrlParam } from '@tmagic/utils';
 
 import App from './App';
 
-const componentUrl = '/tamgic-editor/playground/runtime/react/assets/components.js';
+const componentUrl = '/tmagic-editor/playground/runtime/react/assets/components.js';
 
 import(componentUrl).then(() => {
   const { components } = window.magicPresetComponents;
@@ -42,9 +42,6 @@ import(componentUrl).then(() => {
   const updateConfig = (root: MApp) => {
     app?.setConfig(root);
     renderDom();
-
-    // @ts-ignore
-    window.magic.onPageElUpdate(document.querySelector('.magic-ui-page'));
   };
 
   const renderDom = () => {
@@ -56,6 +53,11 @@ import(componentUrl).then(() => {
       </React.StrictMode>,
       document.getElementById('root'),
     );
+
+    setTimeout(() => {
+      // @ts-ignore
+      window.magic.onPageElUpdate(document.querySelector('.magic-ui-page'));
+    });
   };
 
   const operations = {
