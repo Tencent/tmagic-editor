@@ -3,7 +3,7 @@
   "version": "1.0.0-rc.3",
   "private": true,
   "scripts": {
-    "dev": "npm run build && npm run serve",
+    "dev:vue2": "npm run build && npm run serve",
     "start": "node scripts/dev.js && vite",
     "build": "node scripts/build.js && vite build",
     "serve": "vite preview --port 8077"

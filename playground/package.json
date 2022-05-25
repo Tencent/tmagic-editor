@@ -3,8 +3,10 @@
   "version": "1.0.0-rc.3",
   "private": true,
   "scripts": {
-    "dev": "vite",
-    "build": "node --max_old_space_size=8192 node_modules/.bin/vite build",
+    "dev": "vite --mode vue3",
+    "dev:vue2": "vite --mode vue2",
+    "dev:react": "vite --mode react",
+    "build": "node --max_old_space_size=8192 node_modules/.bin/vite build --mode vue3",
     "serve": "vite preview"
   },
   "dependencies": {

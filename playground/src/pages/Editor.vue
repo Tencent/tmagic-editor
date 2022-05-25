@@ -19,7 +19,7 @@
         v-if="previewVisible"
         width="100%"
         height="817"
-        :src="`${RUNTIME_PATH}/page.html?localPreview=1&page=${editor?.editorService.get('page').id}`"
+        :src="`${VITE_RUNTIME_PATH}/page.html?localPreview=1&page=${editor?.editorService.get('page').id}`"
       ></iframe>
     </el-dialog>
   </div>
@@ -47,7 +47,7 @@ import { asyncLoadJs } from '@tmagic/utils';
 
 import config from '../config';
 
-const RUNTIME_PATH = '/tmagic-editor/playground/runtime/vue3';
+const { VITE_RUNTIME_PATH } = import.meta.env;
 
 export default defineComponent({
   name: 'EditorApp',
@@ -121,20 +121,20 @@ export default defineComponent({
       ],
     };
 
-    asyncLoadJs(`${RUNTIME_PATH}/assets/config.js`).then(() => {
+    asyncLoadJs(`${VITE_RUNTIME_PATH}/assets/config.js`).then(() => {
       propsConfigs.value = (globalThis as any).magicPresetConfigs;
     });
-    asyncLoadJs(`${RUNTIME_PATH}/assets/value.js`).then(() => {
+    asyncLoadJs(`${VITE_RUNTIME_PATH}/assets/value.js`).then(() => {
       propsValues.value = (globalThis as any).magicPresetValues;
     });
-    asyncLoadJs(`${RUNTIME_PATH}/assets/event.js`).then(() => {
+    asyncLoadJs(`${VITE_RUNTIME_PATH}/assets/event.js`).then(() => {
       eventMethodList.value = (globalThis as any).magicPresetEvents;
     });
 
     save();
 
     return {
-      RUNTIME_PATH,
+      VITE_RUNTIME_PATH,
 
       editor,
       menu,
@@ -146,7 +146,7 @@ export default defineComponent({
 
       previewVisible,
 
-      runtimeUrl: `${RUNTIME_PATH}/playground.html`,
+      runtimeUrl: `${VITE_RUNTIME_PATH}/playground.html`,
 
       componentGroupList: ref([
         {

@@ -30,6 +30,7 @@ export default defineConfig({
   resolve: {
     alias: [
       { find: /^vue$/, replacement: path.join(__dirname, 'node_modules/vue/dist/vue.esm.js') },
+      { find: /^@vue\/composition-api$/, replacement: path.join(__dirname, 'node_modules/@vue/composition-api') },
       { find: /^@tmagic\/ui-vue2/, replacement: path.join(__dirname, '../../packages/ui-vue2/src/index.ts') },
       { find: /^@tmagic\/utils/, replacement: path.join(__dirname, '../../packages/utils/src/index.ts') },
       { find: /^@tmagic\/core/, replacement: path.join(__dirname, '../../packages/core/src/index.ts') },
@@ -49,6 +50,7 @@ export default defineConfig({
         components: './src/comp-entry.ts',
         config: './src/config-entry.ts',
         value: './src/value-entry.ts',
+        event: './src/event-entry.ts',
       },
       output: {
         entryFileNames: 'assets/[name].js',
