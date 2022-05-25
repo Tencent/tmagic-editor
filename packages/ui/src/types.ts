@@ -230,3 +230,18 @@ export type MButtonInstance =
   | undefined;
 
 export type ArrayOneOrMore = { 0: string } & string[];
+
+export interface MImg {
+  src: string;
+  url: string;
+}
+
+export interface MQrcode {
+  url: string;
+}
+
+export interface MPop extends MComponent {
+  items?: MComponent[] | MContainer[];
+  closeButtonStyle?: any;
+  closeButton?: boolean;
+}

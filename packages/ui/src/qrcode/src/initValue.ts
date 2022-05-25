@@ -16,20 +16,12 @@
  * limitations under the License.
  */
 
-import Button from './button';
-import Container from './container';
-import Img from './img';
-import Page from './page';
-import Qrcode from './qrcode';
-import Text from './text';
-
-const ui: Record<string, any> = {
-  page: Page,
-  container: Container,
-  button: Button,
-  text: Text,
-  img: Img,
-  qrcode: Qrcode,
+export default {
+  url: 'https://m.film.qq.com',
+  style: {
+    position: 'absolute',
+    left: '57',
+    width: '176',
+    height: '176',
+  },
 };
-
-export default ui;

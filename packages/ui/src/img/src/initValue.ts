@@ -16,20 +16,13 @@
  * limitations under the License.
  */
 
-import Button from './button';
-import Container from './container';
-import Img from './img';
-import Page from './page';
-import Qrcode from './qrcode';
-import Text from './text';
-
-const ui: Record<string, any> = {
-  page: Page,
-  container: Container,
-  button: Button,
-  text: Text,
-  img: Img,
-  qrcode: Qrcode,
+export default {
+  src: 'https://puui.qpic.cn/vupload/0/1573555382625_bhp0wud8l6w.png/0',
+  url: '',
+  style: {
+    position: 'absolute',
+    left: '57',
+    width: '176',
+    height: '176',
+  },
 };
-
-export default ui;

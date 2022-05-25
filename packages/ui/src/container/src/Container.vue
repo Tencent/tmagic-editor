@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="display()"
-    :id="config.id"
+    :id="`${config.id || ''}`"
     :class="`magic-ui-container${config.className ? ` ${config.className}` : ''}`"
     :style="style"
   >

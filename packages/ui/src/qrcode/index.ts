@@ -16,20 +16,9 @@
  * limitations under the License.
  */
 
-import Button from './button';
-import Container from './container';
-import Img from './img';
-import Page from './page';
-import Qrcode from './qrcode';
-import Text from './text';
+import Qrcode from './src/index.vue';
 
-const ui: Record<string, any> = {
-  page: Page,
-  container: Container,
-  button: Button,
-  text: Text,
-  img: Img,
-  qrcode: Qrcode,
-};
+export { default as config } from './src/formConfig';
+export { default as value } from './src/initValue';
 
-export default ui;
+export default Qrcode;
