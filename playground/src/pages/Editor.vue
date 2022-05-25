@@ -11,6 +11,7 @@
       :component-group-list="componentGroupList"
       :default-selected="defaultSelected"
       :moveable-options="moveableOptions"
+      :auto-scroll-into-view="true"
     ></m-editor>
 
     <el-dialog v-model="previewVisible" destroy-on-close :width="375" custom-class="pre-viewer" title="预览">
@@ -26,7 +27,16 @@
 
 <script lang="ts">
 import { defineComponent, ref, toRaw } from 'vue';
-import { Coin, Connection, Document, FolderOpened, SwitchButton, Tickets } from '@element-plus/icons';
+import {
+  Coin,
+  Connection,
+  Document,
+  FolderOpened,
+  Grid,
+  PictureFilled,
+  SwitchButton,
+  Tickets,
+} from '@element-plus/icons';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import serialize from 'serialize-javascript';
 
@@ -161,6 +171,16 @@ export default defineComponent({
               icon: SwitchButton,
               text: '按钮',
               type: 'button',
+            },
+            {
+              icon: PictureFilled,
+              text: '图片',
+              type: 'img',
+            },
+            {
+              icon: Grid,
+              text: '二维码',
+              type: 'qrcode',
             },
           ],
         },
