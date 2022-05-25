@@ -3,6 +3,7 @@
     <magic-stage
       :key="page?.id"
       :runtime-url="runtimeUrl"
+      :auto-scroll-into-view="autoScrollIntoView"
       :render="render"
       :moveable-options="moveableOptions"
       :can-select="canSelect"
@@ -41,6 +42,7 @@ export default defineComponent({
 
   props: {
     runtimeUrl: String,
+    autoScrollIntoView: Boolean,
 
     render: {
       type: Function as PropType<() => HTMLDivElement>,

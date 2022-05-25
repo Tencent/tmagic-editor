@@ -83,6 +83,7 @@ export default class StageMask extends Rule {
   public wrapperWidth = 0;
   public maxScrollTop = 0;
   public maxScrollLeft = 0;
+  public intersectionObserver: IntersectionObserver | null = null;
 
   private mode: Mode = Mode.ABSOLUTE;
   private pageResizeObserver: ResizeObserver | null = null;
@@ -132,6 +133,27 @@ export default class StageMask extends Rule {
     this.page = page;
     this.pageScrollParent = getScrollParent(page) || this.core.renderer.contentWindow?.document.documentElement || null;
     this.pageResizeObserver?.disconnect();
+    this.wrapperResizeObserver?.disconnect();
+    this.intersectionObserver?.disconnect();
+
+    if (typeof IntersectionObserver !== 'undefined') {
+      this.intersectionObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            const { target, intersectionRatio } = entry;
+            if (intersectionRatio <= 0) {
+              this.scrollIntoView(target);
+            }
+            this.intersectionObserver?.unobserve(target);
+          });
+        },
+        {
+          root: this.pageScrollParent,
+          rootMargin: '0px',
+          threshold: 1.0,
+        },
+      );
+    }
 
     if (typeof ResizeObserver !== 'undefined') {
       this.pageResizeObserver = new ResizeObserver((entries) => {
@@ -173,9 +195,7 @@ export default class StageMask extends Rule {
     this.setMode(isFixedParent(el) ? Mode.FIXED : Mode.ABSOLUTE);
   }
 
-  public scrollIntoView(el: HTMLElement): void {
-    if (this.mode === Mode.FIXED) return;
-
+  public scrollIntoView(el: Element): void {
     el.scrollIntoView();
     if (!this.pageScrollParent) return;
     this.scrollLeft = this.pageScrollParent.scrollLeft;

@@ -14,6 +14,7 @@
       <slot name="workspace">
         <workspace
           :runtime-url="runtimeUrl"
+          :auto-scroll-into-view="autoScrollIntoView"
           :render="render"
           :moveable-options="moveableOptions"
           :can-select="canSelect"
@@ -100,6 +101,9 @@ export default defineComponent({
 
     /** 中间工作区域中画布通过iframe渲染时的页面url */
     runtimeUrl: String,
+
+    /** 选中时是否自动滚动到可视区域 */
+    autoScrollIntoView: Boolean,
 
     /** 组件的属性配置表单的dsl */
     propsConfigs: {
