@@ -30,7 +30,7 @@ export default defineComponent({
 
   props: {
     data: {
-      type: Object as PropType<SideItem>,
+      type: [Object, String] as PropType<SideItem>,
     },
   },
 
