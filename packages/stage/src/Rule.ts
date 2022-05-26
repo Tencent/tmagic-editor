@@ -2,13 +2,14 @@ import EventEmitter from 'events';
 
 import Guides, { GuidesEvents } from '@scena/guides';
 
-import { GuidesType } from './const';
+import { GuidesType, H_GUIDE_LINE_STORAGE_KEY, V_GUIDE_LINE_STORAGE_KEY } from './const';
+import { getGuideLineFromCache } from './util';
 
 export default class Rule extends EventEmitter {
   public hGuides: Guides;
   public vGuides: Guides;
-  public horizontalGuidelines: number[] = [];
-  public verticalGuidelines: number[] = [];
+  public horizontalGuidelines: number[] = getGuideLineFromCache(GuidesType.HORIZONTAL);
+  public verticalGuidelines: number[] = getGuideLineFromCache(GuidesType.VERTICAL);
 
   private container: HTMLDivElement;
   private containerResizeObserver: ResizeObserver;
@@ -17,8 +18,8 @@ export default class Rule extends EventEmitter {
     super();
 
     this.container = container;
-    this.hGuides = this.createGuides(GuidesType.HORIZONTAL);
-    this.vGuides = this.createGuides(GuidesType.VERTICAL);
+    this.hGuides = this.createGuides(GuidesType.HORIZONTAL, this.horizontalGuidelines);
+    this.vGuides = this.createGuides(GuidesType.VERTICAL, this.verticalGuidelines);
 
     this.hGuides.on('changeGuides', this.hGuidesChangeGuidesHandler);
     this.vGuides.on('changeGuides', this.vGuidesChangeGuidesHandler);
@@ -68,6 +69,9 @@ export default class Rule extends EventEmitter {
       type: GuidesType.HORIZONTAL,
       guides: [],
     });
+
+    globalThis.localStorage.setItem(V_GUIDE_LINE_STORAGE_KEY, '[]');
+    globalThis.localStorage.setItem(H_GUIDE_LINE_STORAGE_KEY, '[]');
   }
 
   /**
@@ -138,6 +142,8 @@ export default class Rule extends EventEmitter {
       type: GuidesType.HORIZONTAL,
       guides: this.horizontalGuidelines,
     });
+
+    globalThis.localStorage.setItem(H_GUIDE_LINE_STORAGE_KEY, JSON.stringify(e.guides));
   };
 
   private vGuidesChangeGuidesHandler = (e: GuidesEvents['changeGuides']) => {
@@ -146,5 +152,7 @@ export default class Rule extends EventEmitter {
       type: GuidesType.VERTICAL,
       guides: this.verticalGuidelines,
     });
+
+    globalThis.localStorage.setItem(V_GUIDE_LINE_STORAGE_KEY, JSON.stringify(e.guides));
   };
 }

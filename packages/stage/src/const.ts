@@ -66,3 +66,6 @@ export enum Mode {
 
 /** 选中节点的class name */
 export const SELECTED_CLASS = 'tmagic-stage-selected-area';
+
+export const H_GUIDE_LINE_STORAGE_KEY = '$MagicStageHorizontalGuidelinesData';
+export const V_GUIDE_LINE_STORAGE_KEY = '$MagicStageVerticalGuidelinesData';

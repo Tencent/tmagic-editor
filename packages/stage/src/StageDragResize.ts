@@ -26,7 +26,7 @@ import MoveableHelper from 'moveable-helper';
 import { DRAG_EL_ID_PREFIX, GHOST_EL_ID_PREFIX, GuidesType, Mode } from './const';
 import StageCore from './StageCore';
 import type { Offset, Runtime, SortEventData, StageDragResizeConfig } from './types';
-import { getAbsolutePosition, getMode, getOffset } from './util';
+import { getAbsolutePosition, getGuideLineFromCache, getMode, getOffset } from './util';
 
 /** 拖动状态 */
 enum ActionStatus {
@@ -52,9 +52,9 @@ export default class StageDragResize extends EventEmitter {
   /** Moveable拖拽类实例 */
   public moveable?: Moveable;
   /** 水平参考线 */
-  public horizontalGuidelines: number[] = [];
+  public horizontalGuidelines: number[] = getGuideLineFromCache(GuidesType.HORIZONTAL);
   /** 垂直参考线 */
-  public verticalGuidelines: number[] = [];
+  public verticalGuidelines: number[] = getGuideLineFromCache(GuidesType.VERTICAL);
   /** 对齐元素集合 */
   public elementGuidelines: HTMLElement[] = [];
   /** 布局方式：流式布局、绝对定位、固定定位 */
