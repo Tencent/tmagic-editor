@@ -28,9 +28,13 @@ import StageCore from './StageCore';
 import type { Offset, Runtime, SortEventData, StageDragResizeConfig } from './types';
 import { getAbsolutePosition, getMode, getOffset } from './util';
 
+/** 拖动状态 */
 enum ActionStatus {
+  /** 开始拖动 */
   START = 'start',
+  /** 拖动中 */
   ING = 'ing',
+  /** 拖动结束 */
   END = 'end',
 }
 
@@ -39,17 +43,27 @@ enum ActionStatus {
  */
 export default class StageDragResize extends EventEmitter {
   public core: StageCore;
+  /** 画布容器 */
   public container: HTMLElement;
+  /** 目标节点 */
   public target?: HTMLElement;
+  /** 目标节点在蒙层中的占位节点 */
   public dragEl: HTMLElement;
+  /** Moveable拖拽类实例 */
   public moveable?: Moveable;
+  /** 水平参考线 */
   public horizontalGuidelines: number[] = [];
+  /** 垂直参考线 */
   public verticalGuidelines: number[] = [];
+  /** 对齐元素集合 */
   public elementGuidelines: HTMLElement[] = [];
+  /** 布局方式：流式布局、绝对定位、固定定位 */
   public mode: Mode = Mode.ABSOLUTE;
 
   private moveableOptions: MoveableOptions = {};
+  /** 拖动状态 */
   private dragStatus: ActionStatus = ActionStatus.END;
+  /** 流式布局下，目标节点的镜像节点 */
   private ghostEl: HTMLElement | undefined;
   private moveableHelper?: MoveableHelper;
 
