@@ -162,9 +162,10 @@ export default class StageMask extends Rule {
         this.setHeight(clientHeight);
         this.setWidth(clientWidth);
 
-        this.fixScrollValue();
         this.scroll();
-        this.core.dr.updateMoveable();
+        if (this.core.dr.moveable) {
+          this.core.dr.updateMoveable();
+        }
       });
 
       this.pageResizeObserver.observe(page);
@@ -218,6 +219,8 @@ export default class StageMask extends Rule {
   }
 
   private scroll() {
+    this.fixScrollValue();
+
     let { scrollLeft, scrollTop } = this;
 
     if (this.pageScrollParent) {
@@ -264,14 +267,14 @@ export default class StageMask extends Rule {
    * 计算并设置最大滚动宽度
    */
   private setMaxScrollLeft(): void {
-    this.maxScrollLeft = this.width - this.wrapperWidth;
+    this.maxScrollLeft = Math.max(this.width - this.wrapperWidth, 0);
   }
 
   /**
    * 计算并设置最大滚动高度
    */
   private setMaxScrollTop(): void {
-    this.maxScrollTop = this.height - this.wrapperHeight;
+    this.maxScrollTop = Math.max(this.height - this.wrapperHeight, 0);
   }
 
   /**
@@ -332,8 +335,6 @@ export default class StageMask extends Rule {
     if (this.maxScrollLeft > 0) {
       this.scrollLeft = this.scrollLeft + deltaX;
     }
-
-    this.fixScrollValue();
 
     this.scroll();
 
