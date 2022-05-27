@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@scena/guides": "^0.17.0",
+    "@tmagic/core": "^1.0.0-rc.3",
     "@tmagic/schema": "^1.0.0-rc.3",
     "@tmagic/utils": "^1.0.0-rc.3",
     "events": "^3.3.0",
