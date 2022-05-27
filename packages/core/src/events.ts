@@ -39,12 +39,7 @@ const CommonMethod = {
 
 export const DEFAULT_EVENTS: EventOption[] = [{ label: '点击', value: `${COMMON_EVENT_PREFIX}click` }];
 
-export const DEFAULT_METHODS: EventOption[] = [
-  { label: '显示', value: `${COMMON_METHOD_PREFIX}${CommonMethod.SHOW}` },
-  { label: '隐藏', value: `${COMMON_METHOD_PREFIX}${CommonMethod.HIDE}` },
-  { label: '滚动到该组件', value: `${COMMON_METHOD_PREFIX}${CommonMethod.SCROLL_TO_VIEW}` },
-  { label: '回到顶部', value: `${COMMON_METHOD_PREFIX}${CommonMethod.SCROLL_TO_TOP}` },
-];
+export const DEFAULT_METHODS: EventOption[] = [];
 
 export const getCommonEventName = (commonEventName: string, nodeId: string | number) => {
   const returnName = `${commonEventName}:${nodeId}`;
