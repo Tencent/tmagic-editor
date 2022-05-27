@@ -3,6 +3,8 @@ import { computed, defineComponent, getCurrentInstance, h, inject, PropType } fr
 
 import { MComponent } from '@tmagic/schema';
 
+import useApp from '../useApp';
+
 export default defineComponent({
   name: 'magic-ui-text',
 
@@ -24,6 +26,7 @@ export default defineComponent({
   },
 
   setup(props) {
+    useApp(props);
     const vm = getCurrentInstance()?.proxy;
     const hoc: any = inject('hoc');
     const displayText = computed(() => {

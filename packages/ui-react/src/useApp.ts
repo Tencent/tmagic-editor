@@ -16,13 +16,12 @@
  * limitations under the License.
  */
 
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import Core from '@tmagic/core';
 import { MComponent } from '@tmagic/schema';
 
 import AppContent from './AppContent';
-import useCommonMethod from './useCommonMethod';
 
 interface UseAppOptions {
   config: MComponent;
@@ -36,8 +35,6 @@ export default ({ config, methods }: UseAppOptions) => {
   const node = app?.page?.getNode(config.id);
   const [created, setCreated] = useState(false);
 
-  const ref = useRef(null);
-
   if (!created) {
     // 只需要触发一次 created
     setCreated(true);
@@ -45,11 +42,8 @@ export default ({ config, methods }: UseAppOptions) => {
   }
 
   useEffect(() => {
-    const domEl = ref.current;
     const emitData = {
-      ...useCommonMethod(domEl),
       ...methods,
-      $el: domEl,
     };
 
     node?.emit('mounted', emitData);
@@ -59,5 +53,5 @@ export default ({ config, methods }: UseAppOptions) => {
     };
   }, []);
 
-  return { app, ref };
+  return { app };
 };

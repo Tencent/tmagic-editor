@@ -10,6 +10,8 @@ import { computed, defineComponent, getCurrentInstance, PropType, reactive } fro
 
 import { MComponent } from '@tmagic/schema';
 
+import useApp from '../useApp';
+
 export default defineComponent({
   name: 'magic-ui-button',
   props: {
@@ -24,6 +26,7 @@ export default defineComponent({
     },
   },
   setup(props) {
+    useApp(props);
     const vm = getCurrentInstance()?.proxy;
     const actions = reactive<Function[]>([]);
     const actualActions = computed(() => [

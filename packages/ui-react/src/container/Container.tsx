@@ -29,15 +29,14 @@ interface ContainerProps {
   id: string;
 }
 
-const Container: React.FC<ContainerProps> = ({ config }) => {
-  const { app, ref } = useApp({ config });
+const Container: React.FC<ContainerProps> = ({ config, id }) => {
+  const { app } = useApp({ config });
 
   if (!app) return null;
 
   return (
     <div
-      ref={ref}
-      id={`${config.id}`}
+      id={`${id || config.id || ''}`}
       className={`magic-ui-container${config.className ? ` ${config.className}` : ''}`}
       style={app.transformStyle(config.style || {})}
     >
@@ -48,7 +47,7 @@ const Container: React.FC<ContainerProps> = ({ config }) => {
 
         return (
           <MagicUiComp
-            id={`${item.id}`}
+            id={`${item.id || ''}`}
             key={item.id}
             config={item}
             className={`magic-ui-component${config.className ? ` ${config.className}` : ''}`}

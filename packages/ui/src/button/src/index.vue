@@ -9,6 +9,7 @@
 import { computed, defineComponent, getCurrentInstance, PropType, reactive } from 'vue';
 
 import { MButton, MButtonInstance, MText } from '../../../src/types';
+import useApp from '../../useApp';
 
 export default defineComponent({
   name: 'magic-ui-button',
@@ -24,6 +25,7 @@ export default defineComponent({
     },
   },
   setup(props) {
+    useApp(props);
     const vm: MButtonInstance = getCurrentInstance()?.proxy as MButtonInstance;
     const actions = reactive<Function[]>([]);
     const actualActions = computed(() => [

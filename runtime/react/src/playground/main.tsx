@@ -61,7 +61,10 @@ import(componentUrl).then(() => {
   };
 
   const operations = {
-    app,
+    getApp() {
+      return app;
+    },
+
     updateRootConfig(root: MApp) {
       console.log('update root config', root);
       app?.setConfig(root);

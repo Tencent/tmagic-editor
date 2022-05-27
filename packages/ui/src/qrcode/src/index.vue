@@ -7,6 +7,7 @@ import { defineComponent, PropType, ref, watch } from 'vue';
 import QRCode from 'qrcode';
 
 import { MQrcode } from '../../types';
+import useApp from '../../useApp';
 
 export default defineComponent({
   name: 'magic-ui-qrcode',
@@ -24,6 +25,7 @@ export default defineComponent({
   },
 
   setup(props) {
+    useApp(props);
     const imgUrl = ref();
 
     watch(

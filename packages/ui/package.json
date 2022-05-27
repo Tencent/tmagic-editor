@@ -17,6 +17,9 @@
     "tiny-emitter": "^2.1.0",
     "vue": "^3.2.0"
   },
+  "peerDependencies": {
+    "vue": "^3.2.0"
+  },
   "devDependencies": {
     "@testing-library/vue": "^6.4.2",
     "@types/qrcode": "^1.4.2",

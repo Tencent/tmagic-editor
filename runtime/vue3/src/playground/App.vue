@@ -41,6 +41,10 @@ export default defineComponent({
 
     onMounted(() => {
       window.magic?.onRuntimeReady({
+        getApp() {
+          return app;
+        },
+
         updateRootConfig(config: MApp) {
           console.log('update config', config);
           root.value = config;
