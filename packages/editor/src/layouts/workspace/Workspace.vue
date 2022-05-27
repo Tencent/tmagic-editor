@@ -82,10 +82,6 @@ export default defineComponent({
       const ctrl = isMac ? 'meta' : 'ctrl';
 
       keycon
-        .keydown((e) => {
-          console.log(e);
-          e.inputEvent.preventDefault();
-        })
         .keyup('delete', (e) => {
           e.inputEvent.preventDefault();
           if (!node.value || isPage(node.value)) return;
@@ -96,63 +92,82 @@ export default defineComponent({
           if (!node.value || isPage(node.value)) return;
           services?.editorService.remove(node.value);
         })
-        .keydown([ctrl, 'c'], () => {
+        .keydown([ctrl, 'c'], (e) => {
+          e.inputEvent.preventDefault();
           node.value && services?.editorService.copy(node.value);
         })
-        .keydown([ctrl, 'v'], () => {
+        .keydown([ctrl, 'v'], (e) => {
+          e.inputEvent.preventDefault();
           node.value && services?.editorService.paste();
         })
-        .keydown([ctrl, 'x'], () => {
+        .keydown([ctrl, 'x'], (e) => {
+          e.inputEvent.preventDefault();
           if (!node.value || isPage(node.value)) return;
           services?.editorService.copy(node.value);
           services?.editorService.remove(node.value);
         })
-        .keydown([ctrl, 'z'], () => {
+        .keydown([ctrl, 'z'], (e) => {
+          e.inputEvent.preventDefault();
           services?.editorService.undo();
         })
-        .keydown([ctrl, 'shift', 'z'], () => {
+        .keydown([ctrl, 'shift', 'z'], (e) => {
+          e.inputEvent.preventDefault();
           services?.editorService.redo();
         })
-        .keydown('up', () => {
+        .keydown('up', (e) => {
+          e.inputEvent.preventDefault();
           services?.editorService.move(0, -1);
         })
-        .keydown('down', () => {
+        .keydown('down', (e) => {
+          e.inputEvent.preventDefault();
           services?.editorService.move(0, 1);
         })
-        .keydown('left', () => {
+        .keydown('left', (e) => {
+          e.inputEvent.preventDefault();
           services?.editorService.move(-1, 0);
         })
-        .keydown('right', () => {
+        .keydown('right', (e) => {
+          e.inputEvent.preventDefault();
           services?.editorService.move(1, 0);
         })
-        .keydown([ctrl, 'up'], () => {
+        .keydown([ctrl, 'up'], (e) => {
+          e.inputEvent.preventDefault();
           services?.editorService.move(0, -10);
         })
-        .keydown([ctrl, 'down'], () => {
+        .keydown([ctrl, 'down'], (e) => {
+          e.inputEvent.preventDefault();
           services?.editorService.move(0, 10);
         })
-        .keydown([ctrl, 'left'], () => {
+        .keydown([ctrl, 'left'], (e) => {
+          e.inputEvent.preventDefault();
           services?.editorService.move(-10, 0);
         })
-        .keydown([ctrl, 'right'], () => {
+        .keydown([ctrl, 'right'], (e) => {
+          e.inputEvent.preventDefault();
           services?.editorService.move(10, 0);
         })
-        .keydown('tab', () => {
+        .keydown('tab', (e) => {
+          e.inputEvent.preventDefault();
           services?.editorService.selectNextNode();
         })
-        .keydown([ctrl, 'tab'], () => {
+        .keydown([ctrl, 'tab'], (e) => {
+          e.inputEvent.preventDefault();
           services?.editorService.selectNextPage();
         })
-        .keydown([ctrl, '='], () => {
+        .keydown([ctrl, '='], (e) => {
+          e.inputEvent.preventDefault();
           services?.uiService.zoom(0.1);
         })
-        .keydown([ctrl, 'numpadplus'], () => {
+        .keydown([ctrl, 'numpadplus'], (e) => {
+          e.inputEvent.preventDefault();
           services?.uiService.zoom(0.1);
         })
-        .keydown([ctrl, '-'], () => {
+        .keydown([ctrl, '-'], (e) => {
+          e.inputEvent.preventDefault();
           services?.uiService.zoom(-0.1);
         })
-        .keydown([ctrl, 'numpad-'], () => {
+        .keydown([ctrl, 'numpad-'], (e) => {
+          e.inputEvent.preventDefault();
           services?.uiService.zoom(-0.1);
         });
     });
