@@ -18,6 +18,7 @@
 
 import { MoveableOptions } from 'react-moveable/declaration/types';
 
+import Core from '@tmagic/core';
 import { Id, MApp, MNode } from '@tmagic/schema';
 
 import { GuidesType } from './const';
@@ -95,6 +96,7 @@ export interface RemoveData {
 }
 
 export interface Runtime {
+  getApp?: () => Core;
   beforeSelect?: (el: HTMLElement) => Promise<boolean> | boolean;
   getSnapElements?: (el?: HTMLElement) => HTMLElement[];
   updateRootConfig: (config: MApp) => void;
