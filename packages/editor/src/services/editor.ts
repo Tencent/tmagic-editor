@@ -194,6 +194,20 @@ class Editor extends BaseService {
       historyService.empty();
     }
 
+    if (node?.id) {
+      this.get<StageCore>('stage')
+        ?.renderer.runtime?.getApp?.()
+        ?.emit(
+          'editor:select',
+          {
+            node,
+            page,
+            parent,
+          },
+          getNodePath(node.id, this.get<MApp>('root').items),
+        );
+    }
+
     this.emit('select', node);
 
     return node!;
@@ -504,7 +518,18 @@ class Editor extends BaseService {
       return;
     }
 
-    if (parent.style?.width && node.style?.width) {
+    if (!node.style) return;
+
+    const stage = this.get<StageCore>('stage');
+    const doc = stage?.renderer.contentWindow?.document;
+
+    if (doc) {
+      const parentEl = doc.getElementById(`${parent.id}`);
+      const el = doc.getElementById(`${node.id}`);
+      if (parentEl && el) {
+        node.style.left = (parentEl.clientWidth - el.clientWidth) / 2;
+      }
+    } else if (parent.style && isNumber(parent.style?.width) && isNumber(node.style?.width)) {
       node.style.left = (parent.style.width - node.style.width) / 2;
     }
 
