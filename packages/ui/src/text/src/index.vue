@@ -2,6 +2,7 @@
 import { computed, defineComponent, getCurrentInstance, h, inject, PropType } from 'vue';
 
 import { MComponentInstance, MText, MTextInstance } from '../../../src/types';
+import useApp from '../../useApp';
 
 export default defineComponent({
   name: 'magic-ui-text',
@@ -22,6 +23,7 @@ export default defineComponent({
     },
   },
   setup(props) {
+    useApp(props);
     const vm: MTextInstance = getCurrentInstance()?.proxy as MTextInstance;
     const hoc: MComponentInstance = inject('hoc');
     const displayText = computed(() => {

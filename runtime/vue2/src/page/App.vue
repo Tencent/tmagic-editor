@@ -33,4 +33,9 @@ body,
   position: relative;
   overflow: auto;
 }
+
+#app::-webkit-scrollbar {
+  width: 0 !important;
+  display: none;
+}
 </style>

@@ -17,9 +17,11 @@
  */
 
 import Button from './button';
-import Component from './Component.vue';
 import Container from './container';
+import Img from './img';
+import Overlay from './overlay';
 import Page from './page';
+import Qrcode from './qrcode';
 import Text from './text';
 
 const ui: Record<string, any> = {
@@ -27,7 +29,9 @@ const ui: Record<string, any> = {
   container: Container,
   button: Button,
   text: Text,
-  component: Component,
+  img: Img,
+  qrcode: Qrcode,
+  overlay: Overlay,
 };
 
 export default ui;

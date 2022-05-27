@@ -157,6 +157,11 @@ export default defineComponent({
               text: '组',
               type: 'container',
             },
+            {
+              icon: FolderOpened,
+              text: '蒙层',
+              type: 'overlay',
+            },
           ],
         },
         {

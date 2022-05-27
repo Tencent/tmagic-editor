@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React, { useRef } from 'react';
 
 import { MComponent } from '@tmagic/schema';
 
@@ -27,7 +27,7 @@ interface ButtonProps {
 }
 
 const Page: React.FC<ButtonProps> = ({ config }) => {
-  const { app, ref } = useApp({ config });
+  const { app } = useApp({ config });
 
   if (!app) return null;
 
@@ -35,10 +35,9 @@ const Page: React.FC<ButtonProps> = ({ config }) => {
 
   return (
     <button
-      ref={ref}
       className="magic-ui-button"
       style={app.transformStyle(config.style || {})}
-      id={config.id as string}
+      id={`${config.id || ''}`}
     >
       <MagicUiText
         config={{
@@ -49,6 +48,6 @@ const Page: React.FC<ButtonProps> = ({ config }) => {
   );
 };
 
-Page.displayName = 'maigc-ui-button';
+Page.displayName = 'magic-ui-button';
 
 export default Page;

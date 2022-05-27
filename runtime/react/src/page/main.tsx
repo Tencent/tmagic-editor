@@ -47,6 +47,8 @@ const getLocalConfig = (): MApp[] => {
   }
 };
 
+window.magicDSL = []
+
 const app = new Core({
   config: ((getUrlParam('localPreview') ? getLocalConfig() : window.magicDSL) || [])[0] || {},
   curPage: getUrlParam('page'),

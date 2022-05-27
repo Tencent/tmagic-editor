@@ -10,12 +10,10 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, getCurrentInstance, provide } from 'vue';
+import { computed, defineComponent, getCurrentInstance, inject, provide } from 'vue';
 
+import Core from '@tmagic/core';
 import { toLine } from '@tmagic/utils';
-
-import useApp from './useApp';
-import useCommonMethod from './useCommonMethod';
 
 export default defineComponent({
   name: 'magic-ui-component',
@@ -29,7 +27,7 @@ export default defineComponent({
 
   setup(props) {
     const vm = getCurrentInstance()?.proxy;
-    const app = useApp(props);
+    const app: Core | undefined = inject('app');
 
     provide('hoc', vm);
 
@@ -45,7 +43,6 @@ export default defineComponent({
         }
         return displayCfg !== false;
       },
-      ...useCommonMethod(props),
     };
   },
 });

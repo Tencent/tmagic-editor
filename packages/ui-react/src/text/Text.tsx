@@ -34,7 +34,7 @@ const Text: React.FC<TextProps> = ({ config }) => {
   const [displayText] = useState(config.text);
 
   return (
-    <p ref={ref} className="magic-ui-text" style={app.transformStyle(config.style || {})} id={config.id as string}>
+    <p ref={ref} className="magic-ui-text" style={app.transformStyle(config.style || {})} id={`${config.id || ''}`}>
       {displayText}
     </p>
   );

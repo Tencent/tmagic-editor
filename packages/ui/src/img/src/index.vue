@@ -5,6 +5,7 @@
 import { defineComponent, PropType } from 'vue';
 
 import { MImg } from '../../types';
+import useApp from '../../useApp';
 
 export default defineComponent({
   name: 'magic-ui-img',
@@ -20,6 +21,8 @@ export default defineComponent({
     },
   },
   setup(props) {
+    useApp(props);
+
     return {
       clickHandler() {
         window.location.href = props.config.url;
