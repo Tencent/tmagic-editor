@@ -91,7 +91,7 @@ const doAction = async (
  *    editorService.afterAdd();
  *   }
  *
- * 调用时的参数会透传到before方法的参数中, 然后before的return 会作为原方法的参数和after的参数，after最后一个参数则是原方法的return值;
+ * 调用时的参数会透传到before方法的参数中, 然后before的return 会作为原方法的参数和after的参数，after第一个参数则是原方法的return值;
  * 如需终止后续方法调用可以return new Error();
  *
  * 方法2：

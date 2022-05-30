@@ -33,6 +33,7 @@ import {
   change2Fixed,
   COPY_STORAGE_KEY,
   Fixed2Other,
+  generatePageNameByApp,
   getNodeIndex,
   initPosition,
   isFixed,
@@ -500,6 +501,10 @@ class Editor extends BaseService {
         ...config.style,
         ...position,
       };
+    }
+
+    if (isPage(config)) {
+      config.name = generatePageNameByApp(this.get('root'));
     }
 
     return await this.add(config);
