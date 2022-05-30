@@ -69,8 +69,20 @@ export default defineComponent({
           text: '粘贴',
           display: () => canPaste.value,
           handler: () => {
-            const top = menu.value?.$el.offsetTop || 0;
-            const left = menu.value?.$el.offsetLeft || 0;
+            const stage = editorService?.get<StageCore>('stage');
+
+            const rect = menu.value?.$el.getBoundingClientRect();
+            const parentRect = stage?.container?.getBoundingClientRect();
+            let left = (rect?.left || 0) - (parentRect?.left || 0);
+            let top = (rect?.top || 0) - (parentRect?.top || 0);
+
+            if (node.value?.items && stage) {
+              const parentEl = stage.renderer.contentWindow?.document.getElementById(`${node.value.id}`);
+              const parentElRect = parentEl?.getBoundingClientRect();
+              left = left - (parentElRect?.left || 0);
+              top = top - (parentElRect?.top || 0);
+            }
+
             editorService?.paste({ left, top });
           },
         },
