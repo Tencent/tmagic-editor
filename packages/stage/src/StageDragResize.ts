@@ -25,7 +25,7 @@ import MoveableHelper from 'moveable-helper';
 
 import { DRAG_EL_ID_PREFIX, GHOST_EL_ID_PREFIX, GuidesType, Mode } from './const';
 import StageCore from './StageCore';
-import type { Offset, Runtime, SortEventData, StageDragResizeConfig } from './types';
+import type { Offset, SortEventData, StageDragResizeConfig } from './types';
 import { getAbsolutePosition, getGuideLineFromCache, getMode, getOffset } from './util';
 
 /** 拖动状态 */
@@ -166,9 +166,36 @@ export default class StageDragResize extends EventEmitter {
 
     this.updateDragEl(el);
 
+    this.setElementGuidelines(el);
+
     this.moveableOptions = this.getOptions({
       target: this.dragEl,
     });
+  }
+
+  private setElementGuidelines(el: HTMLElement) {
+    const nodes = el.parentElement?.children || [];
+
+    this.elementGuidelines.forEach((node) => {
+      node.remove();
+    });
+    this.elementGuidelines = [];
+
+    if (this.mode === Mode.ABSOLUTE) {
+      const frame = document.createDocumentFragment();
+
+      for (const node of nodes) {
+        const { width, height } = node.getBoundingClientRect();
+        if (node === el) continue;
+        const { left, top } = getOffset(node as HTMLElement);
+        const elementGuideline = document.createElement('div');
+        elementGuideline.style.cssText = `position: absolute;width: ${width}px;height: ${height}px;top: ${top}px;left: ${left}px`;
+        this.elementGuidelines.push(elementGuideline);
+        frame.append(elementGuideline);
+      }
+
+      this.container.append(frame);
+    }
   }
 
   private initMoveable() {
@@ -286,19 +313,6 @@ export default class StageDragResize extends EventEmitter {
         this.dragStatus = ActionStatus.END;
         this.destroyGhostEl();
       });
-  }
-
-  private getSnapElements(runtime: Runtime, el?: HTMLElement): HTMLElement[] {
-    const { renderer, mask } = this.core;
-    const getSnapElements =
-      runtime?.getSnapElements ||
-      (() => {
-        const doc = renderer.contentWindow?.document;
-        return doc ? Array.from(doc.querySelectorAll('[id]')) : [];
-      });
-    return getSnapElements(el).filter(
-      (element) => element !== this.target && !this.target?.contains(element) && element !== mask.page,
-    );
   }
 
   private sort(): void {
