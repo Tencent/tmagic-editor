@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-rc.3",
+  "version": "1.0.0-rc.4",
   "name": "@tmagic/ui-vue2",
   "main": "src/index.ts",
   "scripts": {
@@ -13,10 +13,10 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "@tmagic/schema": "^1.0.0-rc.3",
+    "@tmagic/schema": "^1.0.0-rc.4",
     "@vue/composition-api": "1.0.5",
-    "vue": "^2.6.14",
-    "qrcode": "^1.5.0"
+    "qrcode": "^1.5.0",
+    "vue": "^2.6.14"
   },
   "peerDependencies": {
     "@vue/composition-api": "1.0.5",
