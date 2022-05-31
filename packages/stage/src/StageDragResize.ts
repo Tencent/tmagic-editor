@@ -166,16 +166,12 @@ export default class StageDragResize extends EventEmitter {
 
     this.updateDragEl(el);
 
-    this.setElementGuidelines(el);
-
     this.moveableOptions = this.getOptions({
       target: this.dragEl,
     });
   }
 
-  private setElementGuidelines(el: HTMLElement) {
-    const nodes = el.parentElement?.children || [];
-
+  private setElementGuidelines(nodes: HTMLElement[]) {
     this.elementGuidelines.forEach((node) => {
       node.remove();
     });
@@ -186,7 +182,7 @@ export default class StageDragResize extends EventEmitter {
 
       for (const node of nodes) {
         const { width, height } = node.getBoundingClientRect();
-        if (node === el) continue;
+        if (node === this.target) continue;
         const { left, top } = getOffset(node as HTMLElement);
         const elementGuideline = document.createElement('div');
         elementGuideline.style.cssText = `position: absolute;width: ${width}px;height: ${height}px;top: ${top}px;left: ${left}px`;
@@ -402,6 +398,14 @@ export default class StageDragResize extends EventEmitter {
 
     if (typeof moveableOptions === 'function') {
       moveableOptions = moveableOptions(this.core);
+    }
+
+    const elementGuidelines: any = moveableOptions.elementGuidelines || this.target.parentElement?.children || [];
+
+    this.setElementGuidelines(elementGuidelines);
+
+    if (moveableOptions.elementGuidelines) {
+      delete moveableOptions.elementGuidelines;
     }
 
     return {
