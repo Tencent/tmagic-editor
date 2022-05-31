@@ -1,5 +1,5 @@
 # JS Schema
-tmagic-editor的业务组件需要有表单配置能力，我们通过一份配置来描述表单，我们采用的描述方案是 JS schema。当我们在编辑器中配置一个页面时，页面的基本信息和页面包含的组件信息，也是采用 JS schema 描述的。JS schema 描述方案，，也是我们提供[高级函数](../advanced/high-level-function)功能的基础。
+tmagic-editor的业务组件需要有表单配置能力，我们通过一份配置来描述表单，我们采用的描述方案是 JS schema。当我们在编辑器中配置一个页面时，页面的基本信息和页面包含的组件信息，也是采用 JS schema 描述的。JS schema 描述方案，也是我们提供[高级函数](../advanced/high-level-function)功能的基础。
 
 组件的**配置描述**，参考[示例](../advanced/magic-form.html#示例)，是由开发者在开发组件时，通过 [@tmagic/form](../advanced/magic-form) 支持的表单项来提供的。
 

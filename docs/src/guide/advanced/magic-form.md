@@ -40,6 +40,8 @@ app.use(MagicForm);
 app.mount("#app");
 ```
 
+以上代码便完成了 @tmagic/form 的引入。需要注意的是，ElementUI 的样式文件需要单独引入。
+
 在 App.Vue 中写入以下内容：
 
 ```html
@@ -103,8 +105,6 @@ app.mount("#app");
   };
 </script>
 ```
-
-以上代码便完成了 @tmagic/form 的引入。需要注意的是，ElementUI 的样式文件需要单独引入。
 
 ### 开始使用
 

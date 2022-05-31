@@ -1,15 +1,15 @@
 # 如何开发一个组件
 tmagic-editor支持业务方进行自定义组件开发。在tmagic-editor中，组件是以 npm 包形式存在的，组件和插件只要按照规范开发，就可以在tmagic-editor的 runtime 中被加入并正确渲染组件。
 
+## 组件开发
+以 vue3 的组件开发为例。运行项目中的 playground 示例，会自动加载 vue3 的 runtime。runtime会加载[@tmagic/ui](https://github.com/Tencent/tmagic-editor/tree/master/packages/ui)
+
 ## 组件注册
 在 [playground](https://tencent.github.io/tmagic-editor/playground/index.html#/) 中，我们可以尝试点击添加一个组件，在模拟器区域里，就会出现这个组件。其中就涉及到组件注册。
 
 这一步需要开发者基于tmagic-editor搭建了平台后，实现组件列表的注册、获取机制，tmagic-editor组件注册其实就是保存好组件 `type` 的映射关系。`type` 可以参考[组件介绍](../guide/conception.html#组件)。
 
 可以参考 vue3 版本的 @tmagic/ui 中，[组件渲染](../guide/advanced/page.html#组件渲染)逻辑里，type 会作为组件名进入渲染。所以在 vue3 的组件开发中，我们也需要在为 vue 组件声明 name 字段时，和 type 值对应起来，才能正确渲染组件。
-
-## 组件开发
-以 vue3 的组件开发为例。目前项目中的 playground 代码，会自动加载 vue3 相关的组件库。
 
 ### 组件规范
 组件的基础形式，需要有四个文件
