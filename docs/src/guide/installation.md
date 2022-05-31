@@ -17,7 +17,7 @@ node.js > 14
 $ npm install @tmagic/editor@latest -S
 ```
 
-editor 中组件自定义属性配置由[@tmagic/form](advanced/magic-form.html)提供，需要添加@tmagic/form 依赖；editor 与 form 中使用到的 UI 组件都由 [element-plus](https://element-plus.org/)提供，需要添加 element-plus 依赖。
+editor 中组件自定义属性配置由[@tmagic/form](./advanced/magic-form.md)提供，需要添加@tmagic/form 依赖；editor 与 form 中使用到的 UI 组件都由 [element-plus](https://element-plus.org/)提供，需要添加 element-plus 依赖。
 
 ```bash
 $ npm install @tmagic/form@latest element-plus -S
@@ -127,7 +127,7 @@ app.mount("#app");
 </style>
 ```
 
-关于 [@tmagic/editor](https://www.npmjs.com/package/@tmagic/editor) 组件，更多的属性配置详情请参考[编辑器 API](../api/editor.md)。
+关于 [@tmagic/editor](https://www.npmjs.com/package/@tmagic/editor) 组件，更多的属性配置详情请参考[编辑器 API](../api/editor/editor.md)。
 
 其中，**有四个需要注意的属性配置项**：`runtimeUrl` `values` `configs` `componentGroupList`。这是能让我们的编辑器正常运行的关键。
 
@@ -141,7 +141,7 @@ app.mount("#app");
 
 ### componentGroupList
 
-`componentGroupList` 是指定左侧组件库内容的配置。此处定义了在编辑器组件库中有什么组件。在添加的时候通过组件 `type` 来确定 runtime 中要渲染什么组件。可以参考 [componentGroupList 配置](../api/editor.html#componentgrouplist)。
+`componentGroupList` 是指定左侧组件库内容的配置。此处定义了在编辑器组件库中有什么组件。在添加的时候通过组件 `type` 来确定 runtime 中要渲染什么组件。可以参考 [componentGroupList 配置](../api/editor/editor.html#componentgrouplist)。
 
 ### propsConfigs/propsValues
 
