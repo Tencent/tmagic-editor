@@ -142,9 +142,13 @@ export const toRelative = (node: MNode) => {
 
 const setTop2Middle = (node: MNode, parentNode: MNode, stage: StageCore) => {
   const style = node.style || {};
-  const height = style.height || 0;
+  let height = style.height || 0;
 
-  if (!stage || typeof style.top !== 'undefined' || !parentNode.style || !isNumber(height)) return style;
+  if (!stage || typeof style.top !== 'undefined' || !parentNode.style) return style;
+
+  if (!isNumber(height)) {
+    height = 0;
+  }
 
   const { height: parentHeight } = parentNode.style;
 
