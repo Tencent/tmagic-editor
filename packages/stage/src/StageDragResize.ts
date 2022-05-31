@@ -23,7 +23,7 @@ import type { MoveableOptions } from 'moveable';
 import Moveable from 'moveable';
 import MoveableHelper from 'moveable-helper';
 
-import { DRAG_EL_ID_PREFIX, GHOST_EL_ID_PREFIX, GuidesType, Mode } from './const';
+import { DRAG_EL_ID_PREFIX, GHOST_EL_ID_PREFIX, GuidesType, Mode, ZIndex } from './const';
 import StageCore from './StageCore';
 import type { Offset, SortEventData, StageDragResizeConfig } from './types';
 import { getAbsolutePosition, getGuideLineFromCache, getMode, getOffset } from './util';
@@ -354,7 +354,7 @@ export default class StageDragResize extends EventEmitter {
     const ghostEl = el.cloneNode(true) as HTMLElement;
     const { top, left } = getAbsolutePosition(el, getOffset(el));
     ghostEl.id = `${GHOST_EL_ID_PREFIX}${el.id}`;
-    ghostEl.style.zIndex = '5';
+    ghostEl.style.zIndex = ZIndex.GHOST_EL;
     ghostEl.style.opacity = '.5';
     ghostEl.style.position = 'absolute';
     ghostEl.style.left = `${left}px`;
@@ -378,7 +378,7 @@ export default class StageDragResize extends EventEmitter {
       top: ${offset.top}px;
       width: ${width}px;
       height: ${height}px;
-      z-index: 9;
+      z-index: ${ZIndex.DRAG_EL};
     `;
 
     this.dragEl.id = `${DRAG_EL_ID_PREFIX}${el.id}`;
