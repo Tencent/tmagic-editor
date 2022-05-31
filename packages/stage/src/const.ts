@@ -42,6 +42,8 @@ export enum ZIndex {
   MASK = '99999',
   /** 选中的节点 */
   SELECTED_EL = '666',
+  GHOST_EL = '700',
+  DRAG_EL = '9',
 }
 
 /** 鼠标按键 */
