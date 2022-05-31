@@ -49,7 +49,7 @@ export default defineComponent({
 
     onMounted(() => {
       globalThis.addEventListener(
-        'mousedown',
+        'mouseup',
         (e: MouseEvent) => {
           if (!visible.value || (e.target && menu.value?.contains(e.target as HTMLElement))) {
             return;
