@@ -1,6 +1,6 @@
 {
   "name": "tmagic-playground",
-  "version": "1.0.0-rc.4",
+  "version": "1.0.0-rc.5",
   "private": true,
   "scripts": {
     "dev": "vite --mode vue3",
@@ -11,11 +11,11 @@
   },
   "dependencies": {
     "@element-plus/icons": "0.0.11",
-    "@tmagic/editor": "^1.0.0-rc.4",
-    "@tmagic/form": "^1.0.0-rc.4",
-    "@tmagic/schema": "^1.0.0-rc.4",
-    "@tmagic/stage": "^1.0.0-rc.4",
-    "@tmagic/utils": "^1.0.0-rc.4",
+    "@tmagic/editor": "^1.0.0-rc.5",
+    "@tmagic/form": "^1.0.0-rc.5",
+    "@tmagic/schema": "^1.0.0-rc.5",
+    "@tmagic/stage": "^1.0.0-rc.5",
+    "@tmagic/utils": "^1.0.0-rc.5",
     "element-plus": "^2.2.0",
     "monaco-editor": "^0.32.1",
     "serialize-javascript": "^6.0.0",
