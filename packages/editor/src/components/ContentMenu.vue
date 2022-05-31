@@ -82,7 +82,7 @@ export default defineComponent({
 
           menuStyle.value = {
             top: `${top}px`,
-            left: `${e.clientX}px`,
+            left: `${e.clientX + 2}px`,
           };
         });
       },
