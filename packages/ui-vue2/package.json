@@ -2,9 +2,6 @@
   "version": "1.0.0-rc.5",
   "name": "@tmagic/ui-vue2",
   "main": "src/index.ts",
-  "scripts": {
-    "build": "vite build"
-  },
   "engines": {
     "node": ">=14"
   },
