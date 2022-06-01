@@ -10,7 +10,7 @@ npm i lerna -g
 # magic依赖安装和构建
 cd ${WORKSPACE}
 npm run reinstall
-npm run build
+# npm run build
 
 echo "magic依赖安装完毕 & 打包完毕"
 
