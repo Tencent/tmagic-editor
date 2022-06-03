@@ -16,7 +16,7 @@ export default defineComponent({
   props: {
     config: {
       type: Object as PropType<MPage>,
-      defautl: () => ({}),
+      default: () => ({}),
     },
   },
 
