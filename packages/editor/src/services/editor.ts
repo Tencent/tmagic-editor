@@ -556,9 +556,9 @@ class Editor extends BaseService {
     const brothers: MNode[] = parent?.items || [];
     const index = brothers.findIndex((item) => `${item.id}` === `${node?.id}`);
 
-    if (offset === LayerOffset.BOTTOM) {
+    if (offset === LayerOffset.TOP) {
       brothers.splice(brothers.length - 1, 0, brothers.splice(index, 1)[0]);
-    } else if (offset === LayerOffset.TOP) {
+    } else if (offset === LayerOffset.BOTTOM) {
       brothers.splice(0, 0, brothers.splice(index, 1)[0]);
     } else {
       brothers.splice(index + parseInt(`${offset}`, 10), 0, brothers.splice(index, 1)[0]);
