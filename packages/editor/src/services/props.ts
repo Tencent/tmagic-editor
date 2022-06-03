@@ -98,10 +98,10 @@ class Props extends BaseService {
       return value;
     }
 
-    return cloneDeep({
+    return {
       ...getDefaultPropsValue(type),
-      ...mergeWith(this.state.propsValueMap[type] || {}, defaultValue),
-    });
+      ...mergeWith(cloneDeep(this.state.propsValueMap[type] || {}), cloneDeep(defaultValue)),
+    };
   }
 }
 
