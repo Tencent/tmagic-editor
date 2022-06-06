@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-rc.5",
+  "version": "1.0.0-rc.6",
   "name": "@tmagic/table",
   "sideEffects": [
     "dist/*"
@@ -30,7 +30,7 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "@tmagic/form": "^1.0.0-rc.5",
+    "@tmagic/form": "^1.0.0-rc.6",
     "element-plus": "^2.2.0",
     "lodash-es": "^4.17.21",
     "vue": "^3.2.0"
