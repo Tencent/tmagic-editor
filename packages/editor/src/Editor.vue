@@ -56,7 +56,7 @@ import eventsService from '@editor/services/events';
 import historyService from '@editor/services/history';
 import propsService from '@editor/services/props';
 import uiService from '@editor/services/ui';
-import type { ComponentGroup, MenuBarData, Services, SideBarData, StageRect } from '@editor/type';
+import type { ComponentGroup, MenuBarData, MenuItem, Services, SideBarData, StageRect } from '@editor/type';
 
 export default defineComponent({
   name: 'm-editor',
@@ -86,6 +86,16 @@ export default defineComponent({
     /** 左侧面板配置 */
     sidebar: {
       type: Object as PropType<SideBarData>,
+    },
+
+    layerContentMenu: {
+      type: Array as PropType<MenuItem[]>,
+      default: () => [],
+    },
+
+    stageContentMenu: {
+      type: Array as PropType<MenuItem[]>,
+      default: () => [],
     },
 
     /** 顶部工具栏配置 */
@@ -236,6 +246,9 @@ export default defineComponent({
     };
 
     provide('services', services);
+
+    provide('layerContentMenu', props.layerContentMenu);
+    provide('stageContentMenu', props.stageContentMenu);
 
     return services;
   },
