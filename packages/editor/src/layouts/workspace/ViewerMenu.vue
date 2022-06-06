@@ -27,6 +27,8 @@ export default defineComponent({
     const parent = computed(() => editorService?.get('parent'));
     const isPage = computed(() => node.value?.type === NodeType.PAGE);
 
+    const stageContentMenu = inject<MenuItem[]>('stageContentMenu', []);
+
     onMounted(() => {
       const data = globalThis.localStorage.getItem(COPY_STORAGE_KEY);
       canPaste.value = data !== 'undefined' && !!data;
@@ -150,6 +152,7 @@ export default defineComponent({
             editorService?.get<StageCore>('stage').clearGuides();
           },
         },
+        ...stageContentMenu,
       ]),
 
       show(e: MouseEvent) {

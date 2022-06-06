@@ -22,6 +22,8 @@ export default defineComponent({
     const isPage = computed(() => node.value?.type === NodeType.PAGE);
     const componentList = computed(() => services?.componentListService.getList() || []);
 
+    const layerContentMenu = inject<MenuItem[]>('layerContentMenu', []);
+
     const createMenuItems = (group: ComponentGroup): MenuButton[] =>
       group.items.map((component) => ({
         text: component.text,
@@ -101,6 +103,7 @@ export default defineComponent({
             node.value && services?.editorService.remove(node.value);
           },
         },
+        ...layerContentMenu,
       ]),
 
       show(e: MouseEvent) {
