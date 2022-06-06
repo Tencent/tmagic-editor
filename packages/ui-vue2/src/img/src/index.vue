@@ -23,7 +23,7 @@ export default defineComponent({
     useApp(props);
     return {
       clickHandler() {
-        window.location.href = props.config.url;
+        if (props.config.url) window.location.href = props.config.url;
       },
     };
   },
