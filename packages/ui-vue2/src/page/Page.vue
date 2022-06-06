@@ -1,18 +1,24 @@
 <template>
-  <magic-ui-container class="magic-ui-page" :config="config">
+  <div :id="config.id" :class="`magic-ui-page${config.className ? ` ${config.className}` : ''}`" :style="style">
     <slot></slot>
-  </magic-ui-container>
+    <magic-ui-component v-for="item in config.items" :key="item.id" :config="item"></magic-ui-component>
+  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from '@vue/composition-api';
+import { computed, defineComponent, PropType } from '@vue/composition-api';
 
 import { MPage } from '@tmagic/schema';
 
+import Component from '../Component.vue';
 import useApp from '../useApp';
 
 export default defineComponent({
   name: 'magic-ui-page',
+
+  components: {
+    'magic-ui-component': Component,
+  },
 
   props: {
     config: {
@@ -22,9 +28,15 @@ export default defineComponent({
   },
 
   setup(props) {
-    if (props.config) {
-      useApp(props);
-    }
+    const app = useApp(props);
+
+    return {
+      style: computed(() => app?.transformStyle(props.config.style || {})),
+
+      refresh() {
+        window.location.reload();
+      },
+    };
   },
 });
 </script>

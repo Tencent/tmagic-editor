@@ -18,7 +18,7 @@
 
 import React from 'react';
 
-import { MPage } from '@tmagic/schema';
+import { MComponent, MContainer, MPage } from '@tmagic/schema';
 
 import useApp from '../useApp';
 
@@ -27,15 +27,38 @@ interface PageProps {
 }
 
 const Page: React.FC<PageProps> = ({ config }) => {
-  const { app } = useApp({ config });
+  const { app } = useApp({
+    config,
+    methods: {
+      refresh: () => window.location.reload()
+    }
+  });
 
   if (!app) return null;
 
-  const MagiUiContainer = app.resolveComponent('container');
+  return  <div
+    id={`${config.id || ''}`}
+    className={`magic-ui-page${config.className ? ` ${config.className}` : ''}`}
+    style={app.transformStyle(config.style || {})}
+  >
+    {config.items?.map((item: MComponent | MContainer) => {
+      const MagicUiComp = app.resolveComponent(item.type || 'container');
 
-  return <MagiUiContainer config={{ className: 'magic-ui-page', ...config }}></MagiUiContainer>;
+      if (!MagicUiComp) return null;
+
+      return (
+        <MagicUiComp
+          id={`${item.id || ''}`}
+          key={item.id}
+          config={item}
+          className={`magic-ui-component${config.className ? ` ${config.className}` : ''}`}
+          style={app.transformStyle(item.style || {})}
+        ></MagicUiComp>
+      );
+    })}
+  </div>;
 };
 
-Page.displayName = 'maigc-ui-page';
+Page.displayName = 'magic-ui-page';
 
 export default Page;
