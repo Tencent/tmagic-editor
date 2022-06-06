@@ -35,7 +35,7 @@ const Img: React.FC<ImgProps> = ({ config }) => {
   if (!app) return null;
 
   const clickHandler = () => {
-    window.location.href = config.url;
+    if (config.url) window.location.href = config.url;
   }
 
   return (
