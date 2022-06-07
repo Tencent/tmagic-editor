@@ -26,7 +26,6 @@
       "@editor/*": ["packages/editor/src/*"],
     },
     "types": [
-      "jest",
       "node",
     ],
   },

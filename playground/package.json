@@ -6,7 +6,7 @@
     "dev": "vite --mode vue3",
     "dev:vue2": "vite --mode vue2",
     "dev:react": "vite --mode react",
-    "build": "node --max_old_space_size=8192 node_modules/.bin/vite build --mode vue3",
+    "build": "node --max_old_space_size=8192 node_modules/vite/bin/vite.js build --mode vue3",
     "serve": "vite preview"
   },
   "dependencies": {

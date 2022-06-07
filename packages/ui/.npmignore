@@ -7,7 +7,6 @@ examples
 tests
 .code.yml
 reports
-jest.config.js
 tsconfig.json
 vite.config.ts
 
@@ -17,6 +16,7 @@ vite.config.ts
 
 # Log files
 npm-debug.log*
+pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
