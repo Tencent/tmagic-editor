@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import { describe, expect, test, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
 
@@ -24,24 +24,24 @@ import { NodeType } from '@tmagic/schema';
 
 import Editor from '@editor/Editor.vue';
 
-jest.mock('@editor/utils/logger', () => ({
-  log: jest.fn(),
-  info: jest.fn(),
-  warn: jest.fn(),
-  debug: jest.fn(),
-  error: jest.fn(),
+vi.mock('@editor/utils/logger', () => ({
+  log: vi.fn(),
+  info: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  error: vi.fn(),
 }));
 
 globalThis.ResizeObserver =
   globalThis.ResizeObserver ||
-  jest.fn().mockImplementation(() => ({
-    disconnect: jest.fn(),
-    observe: jest.fn(),
-    unobserve: jest.fn(),
+  vi.fn().mockImplementation(() => ({
+    disconnect: vi.fn(),
+    observe: vi.fn(),
+    unobserve: vi.fn(),
   }));
 
-describe('编辑器', () => {
-  it('初始化', () => {
+describe.skip('编辑器', () => {
+  test('初始化', () => {
     const wrapper = mount(Editor as any, {
       global: {
         plugins: [ElementPlus as any, MagicForm as any],

@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import { describe, expect, test, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
 
@@ -25,10 +25,10 @@ import PageBar from '@editor/layouts/workspace/PageBar.vue';
 
 globalThis.ResizeObserver =
   globalThis.ResizeObserver ||
-  jest.fn().mockImplementation(() => ({
-    disconnect: jest.fn(),
-    observe: jest.fn(),
-    unobserve: jest.fn(),
+  vi.fn().mockImplementation(() => ({
+    disconnect: vi.fn(),
+    observe: vi.fn(),
+    unobserve: vi.fn(),
   }));
 
 const editorState: Record<string, any> = {
@@ -39,10 +39,10 @@ const editorState: Record<string, any> = {
 };
 
 const editorService = {
-  get: jest.fn((key: string) => editorState[key]),
-  add: jest.fn(),
-  set: jest.fn(),
-  select: jest.fn(),
+  get: vi.fn((key: string) => editorState[key]),
+  add: vi.fn(),
+  set: vi.fn(),
+  select: vi.fn(),
 };
 
 const getWrapper = () =>
@@ -57,27 +57,21 @@ const getWrapper = () =>
     },
   });
 
-describe('PageBar', () => {
-  it('新增page', (done) => {
+describe.skip('PageBar', () => {
+  test('新增page', async () => {
     const wrapper = getWrapper();
-    setTimeout(async () => {
-      await wrapper.find('#m-editor-page-bar-add-icon').trigger('click');
+    await wrapper.find('#m-editor-page-bar-add-icon').trigger('click');
 
-      expect(editorService.add.mock.calls[0][0]).toEqual({
-        type: NodeType.PAGE,
-        name: 'page_1',
-      });
-      done();
-    }, 0);
+    expect(editorService.add.mock.calls[0][0]).toEqual({
+      type: NodeType.PAGE,
+      name: 'page_1',
+    });
   });
 
-  it('切换page', (done) => {
+  test('切换page', async () => {
     const wrapper = getWrapper();
-    setTimeout(async () => {
-      await wrapper.find('div[class="m-editor-page-bar-item active"]').trigger('click');
+    await wrapper.find('div[class="m-editor-page-bar-item active"]').trigger('click');
 
-      expect(editorService.set.mock.calls).toEqual([]);
-      done();
-    }, 0);
+    expect(editorService.set.mock.calls).toEqual([]);
   });
 });

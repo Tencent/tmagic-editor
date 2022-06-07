@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { beforeEach, describe, expect, test } from 'vitest';
 
 import { UndoRedo } from '@editor/utils/undo-redo';
 
@@ -27,12 +28,12 @@ describe('undo', () => {
     undoRedo.pushElement(element);
   });
 
-  it('can no undo: empty list', () => {
+  test('can no undo: empty list', () => {
     expect(undoRedo.canUndo()).toBe(false);
     expect(undoRedo.undo()).toEqual(null);
   });
 
-  it('can undo', () => {
+  test('can undo', () => {
     undoRedo.pushElement({ a: 2 });
     expect(undoRedo.canUndo()).toBe(true);
     expect(undoRedo.undo()).toEqual(element);
@@ -48,12 +49,12 @@ describe('redo', () => {
     undoRedo.pushElement(element);
   });
 
-  it('can no redo: empty list', () => {
+  test('can no redo: empty list', () => {
     expect(undoRedo.canRedo()).toBe(false);
     expect(undoRedo.redo()).toBe(null);
   });
 
-  it('can no redo: no undo', () => {
+  test('can no redo: no undo', () => {
     for (let i = 0; i < 5; i++) {
       undoRedo.pushElement(element);
       expect(undoRedo.canRedo()).toBe(false);
@@ -61,7 +62,7 @@ describe('redo', () => {
     }
   });
 
-  it('can no redo: undo and push', () => {
+  test('can no redo: undo and push', () => {
     undoRedo.pushElement(element);
     undoRedo.undo();
     undoRedo.pushElement(element);
@@ -69,7 +70,7 @@ describe('redo', () => {
     expect(undoRedo.redo()).toEqual(null);
   });
 
-  it('can no redo: redo end', () => {
+  test('can no redo: redo end', () => {
     const element1 = { a: 1 };
     const element2 = { a: 2 };
     undoRedo.pushElement(element1);
@@ -83,7 +84,7 @@ describe('redo', () => {
     expect(undoRedo.redo()).toEqual(null);
   });
 
-  it('can redo', () => {
+  test('can redo', () => {
     const element1 = { a: 1 };
     const element2 = { a: 2 };
     undoRedo.pushElement(element1);
@@ -106,11 +107,11 @@ describe('get current element', () => {
     undoRedo = new UndoRedo();
   });
 
-  it('no element', () => {
+  test('no element', () => {
     expect(undoRedo.getCurrentElement()).toEqual(null);
   });
 
-  it('has element', () => {
+  test('has element', () => {
     undoRedo.pushElement(element);
     expect(undoRedo.getCurrentElement()).toEqual(element);
   });
@@ -126,7 +127,7 @@ describe('list max size', () => {
     undoRedo.pushElement(element);
   });
 
-  it('reach max size', () => {
+  test('reach max size', () => {
     for (let i = 0; i < listMaxSize; i++) {
       undoRedo.pushElement({ a: i });
     }
@@ -137,7 +138,7 @@ describe('list max size', () => {
     expect(undoRedo.canUndo()).toBe(true);
   });
 
-  it('reach max size, then undo', () => {
+  test('reach max size, then undo', () => {
     for (let i = 0; i < listMaxSize + 1; i++) {
       undoRedo.pushElement({ a: i });
     }

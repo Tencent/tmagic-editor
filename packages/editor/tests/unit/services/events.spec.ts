@@ -16,12 +16,14 @@
  * limitations under the License.
  */
 
+import { describe, expect, test } from 'vitest';
+
 import { DEFAULT_EVENTS, DEFAULT_METHODS } from '@tmagic/core';
 
 import events from '@editor/services/events';
 
 describe('events', () => {
-  it('init', () => {
+  test('init', () => {
     events.init([
       {
         title: '容器',
@@ -51,13 +53,13 @@ describe('events', () => {
     expect(events.getMethod('container')).toHaveLength(DEFAULT_METHODS.length);
   });
 
-  it('setEvent', () => {
+  test('setEvent', () => {
     const event = [{ label: '点击', value: 'magic:common:events:click' }];
     events.setEvent('button', event);
     expect(events.getEvent('button')).toHaveLength(DEFAULT_EVENTS.length + 1);
   });
 
-  it('setMethod', () => {
+  test('setMethod', () => {
     const method = [{ label: '点击', value: 'magic:common:events:click' }];
     events.setMethod('button', method);
     expect(events.getMethod('button')).toHaveLength(DEFAULT_METHODS.length + 1);
