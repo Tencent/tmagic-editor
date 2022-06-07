@@ -19,8 +19,9 @@
 import React, { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 
-import useApp from '../useApp';
 import { MComponent } from '@tmagic/schema';
+
+import useApp from '../useApp';
 
 interface QrcodeProps {
   config: {
@@ -38,10 +39,9 @@ const Qrcode: React.FC<QrcodeProps> = ({ config }) => {
   useEffect(() => {
     QRCode.toDataURL(config.url, (e: any, url: string) => {
       if (e) console.error(e);
-      setImgSrc(url)
+      setImgSrc(url);
     });
-  }, [config.url])
-
+  }, [config.url]);
 
   return (
     <img className="magic-ui-qrcode" style={app.transformStyle(config.style || {})} id={`${config.id}`} src={imgSrc} />

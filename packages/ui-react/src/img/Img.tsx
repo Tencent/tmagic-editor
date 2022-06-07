@@ -36,10 +36,16 @@ const Img: React.FC<ImgProps> = ({ config }) => {
 
   const clickHandler = () => {
     if (config.url) window.location.href = config.url;
-  }
+  };
 
   return (
-    <img className="magic-ui-img" style={app.transformStyle(config.style || {})} id={`${config.id}`} src={config.src} onClick={clickHandler} />
+    <img
+      className="magic-ui-img"
+      style={app.transformStyle(config.style || {})}
+      id={`${config.id}`}
+      src={config.src}
+      onClick={clickHandler}
+    />
   );
 };
 

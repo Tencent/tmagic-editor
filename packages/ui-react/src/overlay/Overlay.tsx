@@ -16,13 +16,13 @@
  * limitations under the License.
  */
 
-import React, { useContext, useEffect , useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import Core from '@tmagic/core';
 import { MComponent, MNode } from '@tmagic/schema';
 
-import useApp from '../useApp';
 import AppContent from '../AppContent';
+import useApp from '../useApp';
 
 interface OverlayProps {
   config: MComponent;
@@ -55,7 +55,7 @@ const Overlay: React.FC<OverlayProps> = ({ config }) => {
     methods: {
       openOverlay,
       closeOverlay,
-    }
+    },
   });
 
   app?.on('editor:select', (info: any, path: MNode[]) => {
@@ -66,13 +66,16 @@ const Overlay: React.FC<OverlayProps> = ({ config }) => {
     }
   });
 
-  
   if (!visible) return null;
 
   const MagicUiComp = app.resolveComponent('container');
 
   return (
-    <MagicUiComp id={config.id} className="magic-ui-overlay" config={ { style: config.style, items: config.items } }></MagicUiComp>
+    <MagicUiComp
+      id={config.id}
+      className="magic-ui-overlay"
+      config={{ style: config.style, items: config.items }}
+    ></MagicUiComp>
   );
 };
 
