@@ -16,18 +16,18 @@ https://tencent.github.io/tmagic-editor/playground/index.html
 
 ## 环境准备
 
-node.js > 14
+node.js >= 16
 
-先安装lerna
+先安装 pnpm
 
 ```bash
-$ npm install -g lerna
+$ npm install -g pnpm
 ```
 
 然后安装依赖
 
 ```bash
-$ npm run bootstrap
+$ pnpm bootstrap
 ```
 
 ## 运行项目
@@ -35,7 +35,7 @@ $ npm run bootstrap
 执行命令
 
 ```bash
-$ npm run playground
+$ pnpm playground
 ```
 
 最后在浏览器中打开

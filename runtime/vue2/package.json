@@ -16,9 +16,11 @@
   },
   "devDependencies": {
     "@types/events": "^3.0.0",
+    "axios": "^0.27.2",
     "recast": "^0.20.4",
     "rollup": "^2.25.0",
     "rollup-plugin-external-globals": "^0.6.1",
+    "sass": "^1.35.1",
     "vite": "^2.3.7",
     "vite-plugin-vue2": "^2.0.1",
     "vue-template-compiler": "^2.6.14"
