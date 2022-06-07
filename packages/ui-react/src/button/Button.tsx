@@ -34,11 +34,7 @@ const Page: React.FC<ButtonProps> = ({ config }) => {
   const MagicUiText = app.resolveComponent('text');
 
   return (
-    <button
-      className="magic-ui-button"
-      style={app.transformStyle(config.style || {})}
-      id={`${config.id || ''}`}
-    >
+    <button className="magic-ui-button" style={app.transformStyle(config.style || {})} id={`${config.id || ''}`}>
       <MagicUiText
         config={{
           text: config.text,
