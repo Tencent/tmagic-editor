@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { describe, expect, test, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import ElementPlus, { ElDropdown } from 'element-plus';
 
@@ -25,10 +26,10 @@ import uiService from '@editor/services/ui';
 // ResizeObserver mock
 globalThis.ResizeObserver =
   globalThis.ResizeObserver ||
-  jest.fn().mockImplementation(() => ({
-    disconnect: jest.fn(),
-    observe: jest.fn(),
-    unobserve: jest.fn(),
+  vi.fn().mockImplementation(() => ({
+    disconnect: vi.fn(),
+    observe: vi.fn(),
+    unobserve: vi.fn(),
   }));
 
 const editorState: Record<string, any> = {
@@ -37,10 +38,10 @@ const editorState: Record<string, any> = {
 
 // mock
 const editorService = {
-  get: jest.fn((key: string) => editorState[key]),
-  remove: jest.fn(),
-  redo: jest.fn(),
-  undo: jest.fn(),
+  get: vi.fn((key: string) => editorState[key]),
+  remove: vi.fn(),
+  redo: vi.fn(),
+  undo: vi.fn(),
 };
 
 // mock
@@ -56,7 +57,7 @@ const getWrapper = (
     data: 'delete',
   },
 ) =>
-  mount(ToolButton as any, {
+  mount(ToolButton, {
     props,
     global: {
       plugins: [ElementPlus as any],
@@ -70,53 +71,40 @@ const getWrapper = (
     },
   });
 
-describe('ToolButton', () => {
-  it('删除', (done) => {
+describe.skip('ToolButton', () => {
+  test('删除', async () => {
     const wrapper = getWrapper();
-
-    setTimeout(async () => {
-      const icon = wrapper.find('.el-button');
-      await icon.trigger('click');
-      expect(editorService.remove.mock.calls[0][0]).toBe('node');
-      done();
-    }, 0);
+    const icon = wrapper.find('.el-button');
+    await icon.trigger('click');
+    expect(editorService.remove.mock.calls[0][0]).toBe('node');
   });
 
-  it('后退', (done) => {
+  test('后退', async () => {
     const wrapper = getWrapper({ data: 'undo' });
 
-    setTimeout(async () => {
-      const icon = wrapper.find('.el-button');
-      await icon.trigger('click');
-      expect(editorService.undo).toBeCalled();
-      done();
-    }, 0);
+    const icon = wrapper.find('.el-button');
+    await icon.trigger('click');
+    expect(editorService.undo).toBeCalled();
   });
 
-  it('前进', (done) => {
+  test('前进', async () => {
     const wrapper = getWrapper({ data: 'redo' });
 
-    setTimeout(async () => {
-      const icon = wrapper.find('.el-button');
-      await icon.trigger('click');
-      expect(editorService.redo).toBeCalled();
-      done();
-    }, 0);
+    const icon = wrapper.find('.el-button');
+    await icon.trigger('click');
+    expect(editorService.redo).toBeCalled();
   });
 
-  it('放大', (done) => {
+  test('放大', async () => {
     uiService.set('zoom', 1);
     const wrapper = getWrapper({ data: 'zoom-in' });
 
-    setTimeout(async () => {
-      const icon = wrapper.find('.el-button');
-      await icon.trigger('click');
-      expect(uiService.get('zoom')).toBe(1.1);
-      done();
-    }, 0);
+    const icon = wrapper.find('.el-button');
+    await icon.trigger('click');
+    expect(uiService.get('zoom')).toBe(1.1);
   });
 
-  it('缩小', (done) => {
+  test('缩小', (done) => {
     uiService.set('zoom', 1);
     const wrapper = getWrapper({ data: 'zoom-out' });
 
@@ -128,11 +116,11 @@ describe('ToolButton', () => {
     }, 0);
   });
 
-  it('data无匹配值', () => {
+  test('data无匹配值', () => {
     getWrapper({ data: 'default' });
   });
 
-  it('自定义display', () => {
+  test('自定义display', () => {
     const display = jest.fn();
     getWrapper({
       data: { display },
@@ -140,7 +128,7 @@ describe('ToolButton', () => {
     expect(display).toBeCalled();
   });
 
-  it('点击下拉菜单项', (done) => {
+  test('点击下拉菜单项', (done) => {
     const wrapper = getWrapper({
       data: {
         type: 'dropdown',
@@ -158,7 +146,7 @@ describe('ToolButton', () => {
     }, 0);
   });
 
-  it('按钮不可用', (done) => {
+  test('按钮不可用', (done) => {
     const wrapper = getWrapper({
       data: {
         icon: 'disabled-icon',
@@ -175,7 +163,7 @@ describe('ToolButton', () => {
     }, 0);
   });
 
-  it('菜单项handler未定义', () => {
+  test('菜单项handler未定义', () => {
     const wrapper = getWrapper({
       data: {
         type: 'dropdown',
@@ -188,12 +176,12 @@ describe('ToolButton', () => {
     });
   });
 
-  it('参数data为undefined', () => {
+  test('参数data为undefined', () => {
     const wrapper = getWrapper({ data: undefined });
     expect(wrapper.find('div[class="menu-item"]').exists()).toBe(false);
   });
 
-  it('自定义display', () => {
+  test('自定义display', () => {
     const wrapper = getWrapper({
       data: {
         display: false,

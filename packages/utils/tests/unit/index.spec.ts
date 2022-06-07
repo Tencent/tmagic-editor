@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+import { describe, expect, test, vi } from 'vitest';
+
 import * as util from '../../src';
 
 describe('datetimeFormatter', () => {
@@ -24,36 +26,36 @@ describe('datetimeFormatter', () => {
   const dateValue = '2021-07-17 15:37:00';
   const defaultValue = '默认值';
 
-  it('v为空且未设置默认时间', () => {
+  test('v为空且未设置默认时间', () => {
     expect(util.datetimeFormatter('')).toBe('-');
   });
 
-  it('v是字符串且未设置了默认时间', () => {
+  test('v是字符串且未设置了默认时间', () => {
     expect(util.datetimeFormatter('abc', defaultValue)).toMatch(defaultValue);
   });
 
-  it('v是日期字符串', () => {
+  test('v是日期字符串', () => {
     expect(util.datetimeFormatter(date.toISOString(), defaultValue)).toMatch(dateValue);
   });
 
-  it('v是Date对象', () => {
+  test('v是Date对象', () => {
     expect(util.datetimeFormatter(date)).toMatch(dateValue);
   });
 
-  it('v是UTC字符串', () => {
+  test('v是UTC字符串', () => {
     expect(util.datetimeFormatter(date.toUTCString())).toMatch(dateValue);
   });
 
-  it('format是x', () => {
+  test('format是x', () => {
     expect(util.datetimeFormatter(date.toISOString(), defaultValue, 'timestamp')).toBe(date.getTime());
   });
 });
 
 describe('util', () => {
-  jest.useFakeTimers();
+  vi.useFakeTimers();
 
-  it('sleep', (done) => {
-    const callback = jest.fn();
+  test.skip('sleep', (done) => {
+    const callback = vi.fn();
 
     util
       .sleep(500)
@@ -64,18 +66,14 @@ describe('util', () => {
       });
 
     // 快进500毫秒，callback应该已执行
-    jest.advanceTimersByTime(500);
+    vi.advanceTimersByTime(500);
   });
 });
 
 describe('asyncLoadJs', () => {
   const url = 'https://m.film.qq.com/magic-ui/production/1/1625056093304/magic/magic-ui.umd.min.js';
 
-  /**
-   * @jest-environment jsdom
-   */
-
-  it('第一次加载asyncLoadJs带url与crossorigin参数', () => {
+  test('第一次加载asyncLoadJs带url与crossorigin参数', () => {
     const crossOrigin = 'anonymous';
     const load = util.asyncLoadJs(url, crossOrigin);
     load.then(() => {
@@ -88,7 +86,7 @@ describe('asyncLoadJs', () => {
     });
   });
 
-  it('第二次加载asyncLoadJs', () => {
+  test('第二次加载asyncLoadJs', () => {
     util.asyncLoadJs(url, 'anonymous').then(() => {
       util.asyncLoadJs(url, 'use-credentials').then(() => {
         const scriptList = document.getElementsByTagName('script');
@@ -99,7 +97,7 @@ describe('asyncLoadJs', () => {
     });
   });
 
-  it('url无效', () => {
+  test('url无效', () => {
     util.asyncLoadJs('123').catch((e: any) => {
       expect(e).toMatch('error');
     });
@@ -109,11 +107,7 @@ describe('asyncLoadJs', () => {
 describe('asyncLoadCss', () => {
   const url = 'https://beta.m.film.qq.com/magic-act/css/BuyGift.75d837d2b3fd.css?max_age=864000';
 
-  /**
-   * @jest-environment jsdom
-   */
-
-  it('第一次加载asyncLoadCss', () => {
+  test('第一次加载asyncLoadCss', () => {
     const load = util.asyncLoadCss(url);
     load.then(() => {
       const link = document.getElementsByTagName('link')[0];
@@ -123,7 +117,7 @@ describe('asyncLoadCss', () => {
     });
   });
 
-  it('第二次加载asyncLoadJs', () => {
+  test('第二次加载asyncLoadJs', () => {
     util.asyncLoadCss(url).then(() => {
       util.asyncLoadCss(url).then(() => {
         const linkList = document.getElementsByTagName('link');
@@ -133,7 +127,7 @@ describe('asyncLoadCss', () => {
     });
   });
 
-  it('url无效', () => {
+  test('url无效', () => {
     util.asyncLoadCss('123').catch((e: any) => {
       expect(e).toMatch('error');
     });
@@ -141,34 +135,34 @@ describe('asyncLoadCss', () => {
 });
 
 describe('toLine', () => {
-  it('aBc', () => {
+  test('aBc', () => {
     const value = util.toLine('aBc');
     expect(value).toBe('a-bc');
   });
 
-  it('aBC', () => {
+  test('aBC', () => {
     const value = util.toLine('aBC');
     expect(value).toBe('a-b-c');
   });
 
-  it('ABC', () => {
+  test('ABC', () => {
     const value = util.toLine('ABC');
     expect(value).toBe('a-b-c');
   });
 });
 
 describe('toHump', () => {
-  it('a-bc', () => {
+  test('a-bc', () => {
     const value = util.toHump('a-bc');
     expect(value).toBe('aBc');
   });
 
-  it('a-b-c', () => {
+  test('a-b-c', () => {
     const value = util.toHump('a-b-c');
     expect(value).toBe('aBC');
   });
 
-  it('-b-c', () => {
+  test('-b-c', () => {
     const value = util.toHump('-b-c');
     expect(value).toBe('BC');
   });
@@ -205,14 +199,14 @@ describe('getNodePath', () => {
       ],
     },
   ];
-  it('基础', () => {
+  test('基础', () => {
     const path = util.getNodePath(111, root);
     const path2 = util.getNodePath(22, root);
     expect(path).toHaveLength(3);
     expect(path2).toHaveLength(2);
   });
 
-  it('error', () => {
+  test('error', () => {
     const path = util.getNodePath(111, 123 as any);
     const path2 = util.getNodePath(33, root);
     expect(path).toHaveLength(0);
@@ -221,31 +215,31 @@ describe('getNodePath', () => {
 });
 
 describe('filterXSS', () => {
-  it('<>', () => {
+  test('<>', () => {
     const value = util.filterXSS('<div></div>');
     expect(value).toBe('&lt;div&gt;&lt;/div&gt;');
   });
 
-  it(`'"`, () => {
+  test(`'"`, () => {
     const value = util.filterXSS(`'div'"span"`);
     expect(value).toBe('&apos;div&apos;&quot;span&quot;');
   });
 });
 
 describe('getUrlParam', () => {
-  it('正常', () => {
+  test('正常', () => {
     const url = 'http://film.qq.com?a=b';
     const value = util.getUrlParam('a', url);
     expect(value).toBe('b');
   });
 
-  it('null', () => {
+  test('null', () => {
     const url = 'http://film.qq.com';
     const value = util.getUrlParam('a', url);
     expect(value).toBe('');
   });
 
-  it('emprty', () => {
+  test('emprty', () => {
     const url = 'http://film.qq.com?a=';
     const value = util.getUrlParam('a', url);
     expect(value).toBe('');
@@ -254,7 +248,7 @@ describe('getUrlParam', () => {
 
 describe('isPop', () => {
   // type 为 pop 结尾 isPop 才为 true
-  it('true', () => {
+  test('true', () => {
     expect(
       util.isPop({
         type: 'pop',
@@ -263,7 +257,7 @@ describe('isPop', () => {
     ).toBeTruthy();
   });
 
-  it('endswidth true', () => {
+  test('endswidth true', () => {
     expect(
       util.isPop({
         type: 'xxxpop',
@@ -272,7 +266,7 @@ describe('isPop', () => {
     ).toBeTruthy();
   });
 
-  it('false', () => {
+  test('false', () => {
     expect(
       util.isPop({
         type: 'pop1',

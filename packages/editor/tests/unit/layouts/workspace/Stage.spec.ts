@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import { describe, expect, test, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 
 import { NodeType } from '@tmagic/schema';
@@ -24,14 +24,14 @@ import Stage from '@editor/layouts/workspace/Stage.vue';
 
 globalThis.ResizeObserver =
   globalThis.ResizeObserver ||
-  jest.fn().mockImplementation(() => ({
-    disconnect: jest.fn(),
-    observe: jest.fn(),
-    unobserve: jest.fn(),
+  vi.fn().mockImplementation(() => ({
+    disconnect: vi.fn(),
+    observe: vi.fn(),
+    unobserve: vi.fn(),
   }));
 
 describe('Stage.vue', () => {
-  (global as any).fetch = jest.fn(() =>
+  (global as any).fetch = vi.fn(() =>
     Promise.resolve({
       text: () => `<!DOCTYPE html>
           <html lang="en" style="font-size: 100px">
@@ -67,7 +67,7 @@ describe('Stage.vue', () => {
     },
   });
 
-  it('基础', () => {
+  test('基础', () => {
     const stage = wrapper.findComponent(Stage);
     expect(stage.exists()).toBe(true);
   });

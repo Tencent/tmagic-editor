@@ -16,10 +16,12 @@
  * limitations under the License.
  */
 
+import { describe, expect, test } from 'vitest';
+
 import ui from '@editor/services/ui';
 
 describe('events', () => {
-  it('init', () => {
+  test('init', () => {
     ui.set('uiSelectMode', true);
     expect(ui.get('uiSelectMode')).toBeTruthy();
     expect(ui.get('showSrc')).toBeFalsy();

@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { describe, expect, test } from 'vitest';
 
 import type { MNode } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
@@ -22,13 +23,13 @@ import { NodeType } from '@tmagic/schema';
 import * as editor from '@editor/utils/editor';
 
 describe('util form', () => {
-  it('generateId', () => {
+  test('generateId', () => {
     const id = editor.generateId('text');
 
     expect(id.startsWith('text')).toBeTruthy();
   });
 
-  it('getPageList', () => {
+  test('getPageList', () => {
     const pageList = editor.getPageList({
       id: 'app_1',
       type: NodeType.ROOT,
@@ -45,7 +46,7 @@ describe('util form', () => {
     expect(pageList[0].name).toBe('index');
   });
 
-  it('getPageNameList', () => {
+  test('getPageNameList', () => {
     const pageList = editor.getPageNameList([
       {
         id: 'page_1',
@@ -58,7 +59,7 @@ describe('util form', () => {
     expect(pageList[0]).toBe('index');
   });
 
-  it('generatePageName', () => {
+  test('generatePageName', () => {
     // 已有一个页面了，再生成出来的name格式为page_${index}
     const name = editor.generatePageName(['index', 'page_2']);
     // 第二个页面
@@ -67,7 +68,7 @@ describe('util form', () => {
 });
 
 describe('setNewItemId', () => {
-  it('普通', () => {
+  test('普通', () => {
     const config = {
       id: 1,
       type: 'text',
@@ -77,7 +78,7 @@ describe('setNewItemId', () => {
     expect(config.id === 1).toBeFalsy();
   });
 
-  it('items', () => {
+  test('items', () => {
     const config = {
       id: 1,
       type: NodeType.PAGE,
@@ -93,7 +94,7 @@ describe('setNewItemId', () => {
     expect(config.items[0].id === 2).toBeFalsy();
   });
 
-  it('pop', () => {
+  test('pop', () => {
     const config = {
       id: 1,
       type: NodeType.PAGE,
@@ -117,7 +118,7 @@ describe('setNewItemId', () => {
 });
 
 describe('isFixed', () => {
-  it('true', () => {
+  test('true', () => {
     expect(
       editor.isFixed({
         type: 'text',
@@ -129,7 +130,7 @@ describe('isFixed', () => {
     ).toBeTruthy();
   });
 
-  it('false', () => {
+  test('false', () => {
     expect(
       editor.isFixed({
         type: 'text',
@@ -151,7 +152,7 @@ describe('isFixed', () => {
 });
 
 describe('getNodeIndex', () => {
-  it('能获取到', () => {
+  test('能获取到', () => {
     const index = editor.getNodeIndex(
       {
         type: 'text',
@@ -171,7 +172,7 @@ describe('getNodeIndex', () => {
     expect(index).toBe(0);
   });
 
-  it('不能能获取到', () => {
+  test('不能能获取到', () => {
     // id为1不在查找数据中
     const index = editor.getNodeIndex(
       {
@@ -194,7 +195,7 @@ describe('getNodeIndex', () => {
 });
 
 describe('toRelative', () => {
-  it('正常', () => {
+  test('正常', () => {
     const config: MNode = {
       type: 'text',
       id: 1,
