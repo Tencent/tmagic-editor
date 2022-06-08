@@ -43,6 +43,10 @@ export default defineConfig({
     port: 8089,
   },
   build: {
+    sourcemap: true,
+
+    cssCodeSplit: false,
+
     rollupOptions: {
       input: {
         page: './page.html',
