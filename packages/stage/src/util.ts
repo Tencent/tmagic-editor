@@ -30,35 +30,10 @@ const getParents = (el: Element, relative: Element) => {
 };
 
 export const getOffset = (el: HTMLElement): Offset => {
-  const { transform } = getComputedStyle(el);
   const { offsetParent } = el;
 
-  let left = el.offsetLeft;
-  let top = el.offsetTop;
-
-  if (transform.indexOf('matrix') > -1) {
-    let a = 1;
-    let b = 1;
-    let c = 1;
-    let d = 1;
-    let e = 0;
-    let f = 0;
-    transform.replace(
-      /matrix\((.+), (.+), (.+), (.+), (.+), (.+)\)/,
-      ($0: string, $1: string, $2: string, $3: string, $4: string, $5: string, $6: string): string => {
-        a = +$1;
-        b = +$2;
-        c = +$3;
-        d = +$4;
-        e = +$5;
-        f = +$6;
-        return transform;
-      },
-    );
-
-    left = a * left + c * top + e;
-    top = b * left + d * top + f;
-  }
+  const left = el.offsetLeft;
+  const top = el.offsetTop;
 
   if (offsetParent) {
     const parentOffset = getOffset(offsetParent as HTMLElement);

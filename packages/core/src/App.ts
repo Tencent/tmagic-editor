@@ -107,6 +107,16 @@ class App extends EventEmitter {
     Object.entries(styleObj).forEach(([key, value]) => {
       if (key === 'backgroundImage') {
         value && (results[key] = fillBackgroundImage(value));
+      } else if (key === 'transform' && typeof value !== 'string') {
+        results[key] = Object.entries(value as Record<string, string>)
+          .map(([transformKey, transformValue]) => {
+            let defaultValue = 0;
+            if (transformKey === 'scale') {
+              defaultValue = 1;
+            }
+            return `${transformKey}(${transformValue || defaultValue})`;
+          })
+          .join(' ');
       } else if (!whiteList.includes(key) && value && /^[-]?[0-9]*[.]?[0-9]*$/.test(value)) {
         results[key] = `${value / 100}rem`;
       } else {

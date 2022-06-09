@@ -203,49 +203,41 @@ export default class StageDragResize extends EventEmitter {
 
     this.bindResizeEvent();
     this.bindDragEvent();
+    this.bindRotateEvent();
+    this.bindScaleEvent();
   }
 
   private bindResizeEvent(): void {
     if (!this.moveable) throw new Error('moveable 为初始化');
 
     const frame = {
-      translate: [0, 0],
+      left: 0,
+      top: 0,
     };
 
     this.moveable
       .on('resizeStart', (e) => {
-        if (e.dragStart) {
-          const rect = this.moveable!.getRect();
-          const offset = getAbsolutePosition(e.target as HTMLElement, rect);
-          e.dragStart.set([offset.left, offset.top]);
-        }
+        if (!this.target) return;
+
+        this.dragStatus = ActionStatus.START;
+        this.moveableHelper?.onResizeStart(e);
+
+        frame.top = this.target.offsetTop;
+        frame.left = this.target.offsetLeft;
       })
-      .on('resize', ({ width, height, drag }) => {
+      .on('resize', (e) => {
+        const { width, height, drag } = e;
         if (!this.moveable || !this.target || !this.dragEl) return;
 
         const { beforeTranslate } = drag;
-        frame.translate = beforeTranslate;
         this.dragStatus = ActionStatus.ING;
+
+        this.moveableHelper?.onResize(e);
 
         this.target.style.width = `${width}px`;
         this.target.style.height = `${height}px`;
-        this.dragEl.style.width = `${width}px`;
-        this.dragEl.style.height = `${height}px`;
-
-        // 流式布局
-        if (this.mode === Mode.SORTABLE) {
-          this.dragEl.style.top = `${beforeTranslate[1]}px`;
-          this.target.style.top = `0px`;
-          return;
-        }
-
-        this.dragEl.style.left = `${beforeTranslate[0]}px`;
-        this.dragEl.style.top = `${beforeTranslate[1]}px`;
-
-        const offset = getAbsolutePosition(this.target, { left: beforeTranslate[0], top: beforeTranslate[1] });
-
-        this.target.style.left = `${offset.left}px`;
-        this.target.style.top = `${offset.top}px`;
+        this.target.style.left = `${frame.left + beforeTranslate[0]}px`;
+        this.target.style.top = `${frame.top + beforeTranslate[1]}px`;
       })
       .on('resizeEnd', () => {
         this.dragStatus = ActionStatus.END;
@@ -311,6 +303,60 @@ export default class StageDragResize extends EventEmitter {
       });
   }
 
+  private bindRotateEvent(): void {
+    if (!this.moveable) throw new Error('moveable 为初始化');
+
+    this.moveable
+      .on('rotateStart', (e) => {
+        this.dragStatus = ActionStatus.START;
+        this.moveableHelper?.onRotateStart(e);
+      })
+      .on('rotate', (e) => {
+        if (!this.target || !this.dragEl) return;
+        this.dragStatus = ActionStatus.ING;
+        this.moveableHelper?.onRotate(e);
+        const frame = this.moveableHelper?.getFrame(e.target);
+        this.target.style.transform = frame?.toCSSObject().transform || '';
+      })
+      .on('rotateEnd', (e) => {
+        this.dragStatus = ActionStatus.END;
+        const frame = this.moveableHelper?.getFrame(e.target);
+        this.emit('update', {
+          el: this.target,
+          style: {
+            transform: frame?.get('transform'),
+          },
+        });
+      });
+  }
+
+  private bindScaleEvent(): void {
+    if (!this.moveable) throw new Error('moveable 为初始化');
+
+    this.moveable
+      .on('scaleStart', (e) => {
+        this.dragStatus = ActionStatus.START;
+        this.moveableHelper?.onScaleStart(e);
+      })
+      .on('scale', (e) => {
+        if (!this.target || !this.dragEl) return;
+        this.dragStatus = ActionStatus.ING;
+        this.moveableHelper?.onScale(e);
+        const frame = this.moveableHelper?.getFrame(e.target);
+        this.target.style.transform = frame?.toCSSObject().transform || '';
+      })
+      .on('scaleEnd', (e) => {
+        this.dragStatus = ActionStatus.END;
+        const frame = this.moveableHelper?.getFrame(e.target);
+        this.emit('update', {
+          el: this.target,
+          style: {
+            transform: frame?.get('transform'),
+          },
+        });
+      });
+  }
+
   private sort(): void {
     if (!this.target || !this.ghostEl) throw new Error('未知错误');
     const { top } = this.ghostEl.getBoundingClientRect();
@@ -331,14 +377,15 @@ export default class StageDragResize extends EventEmitter {
   }
 
   private update(isResize = false): void {
-    const rect = this.moveable!.getRect();
+    if (!this.target) return;
+
     const offset =
-      this.mode === Mode.SORTABLE ? { left: 0, top: 0 } : getAbsolutePosition(this.target as HTMLElement, rect);
+      this.mode === Mode.SORTABLE ? { left: 0, top: 0 } : { left: this.target.offsetLeft, top: this.target.offsetTop };
 
     const left = this.calcValueByFontsize(offset.left);
     const top = this.calcValueByFontsize(offset.top);
-    const width = this.calcValueByFontsize(rect.width);
-    const height = this.calcValueByFontsize(rect.height);
+    const width = this.calcValueByFontsize(this.target.clientWidth);
+    const height = this.calcValueByFontsize(this.target.clientHeight);
 
     this.emit('update', {
       el: this.target,
@@ -369,15 +416,16 @@ export default class StageDragResize extends EventEmitter {
   }
 
   private updateDragEl(el: HTMLElement) {
-    const { width, height } = el.getBoundingClientRect();
     const offset = getOffset(el);
+    const { transform } = getComputedStyle(el);
 
     this.dragEl.style.cssText = `
       position: absolute;
+      transform: ${transform};
       left: ${offset.left}px;
       top: ${offset.top}px;
-      width: ${width}px;
-      height: ${height}px;
+      width: ${el.clientWidth}px;
+      height: ${el.clientHeight}px;
       z-index: ${ZIndex.DRAG_EL};
     `;
 
@@ -415,6 +463,8 @@ export default class StageDragResize extends EventEmitter {
       dragArea: false,
       draggable: true,
       resizable: true,
+      scalable: false,
+      rotatable: false,
       snappable: isAbsolute || isFixed,
       snapGap: isAbsolute || isFixed,
       snapThreshold: 5,

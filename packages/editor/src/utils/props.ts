@@ -161,6 +161,21 @@ export const fillConfig = (config: FormConfig = []) => [
                   },
                 ],
               },
+              {
+                type: 'fieldset',
+                legend: '变形',
+                name: 'transform',
+                items: [
+                  {
+                    name: 'rotate',
+                    text: '旋转角度',
+                  },
+                  {
+                    name: 'scale',
+                    text: '缩放',
+                  },
+                ],
+              },
             ],
           },
         ],
