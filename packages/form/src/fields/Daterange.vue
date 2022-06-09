@@ -60,6 +60,14 @@ export default defineComponent({
         });
       } else if (props.model && props.name && v instanceof Date) {
         props.model[props.name] = datetimeFormatter(v.toString(), '');
+      } else if (names?.length) {
+        names.forEach((item) => {
+          if (props.model) {
+            props.model[item] = undefined;
+          }
+        });
+      } else if (props.name) {
+        props.model[props.name] = undefined;
       }
     };
 
