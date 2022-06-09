@@ -205,6 +205,7 @@ export default defineComponent({
 
         options.draggable = !isPage;
         options.resizable = !isPage;
+        options.rotatable = !isPage;
 
         return options;
       },
