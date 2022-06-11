@@ -28,6 +28,11 @@ export default defineConfig({
     alias: {
       '@editor': r('./packages/editor/src'),
       '@form': r('./packages/form/src'),
+      '@tmagic/core': r('./packages/core/src'),
+      '@tmagic/utils': r('./packages/utils/src'),
+      '@tmagic/editor': r('./packages/editor/src'),
+      '@tmagic/stage': r('./packages/stage/src'),
+      '@tmagic/schema': r('./packages/schema/src'),
     },
   },
 });

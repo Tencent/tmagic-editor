@@ -32,7 +32,7 @@
     <template v-else-if="type && display">
       <el-form-item
         :style="config.tip ? 'flex: 1' : ''"
-        :class="{ hidden: itemLabelWidth === 0 || !config.text }"
+        :class="{ hidden: `${itemLabelWidth}` === '0' || !config.text }"
         :prop="itemProp"
         :label-width="itemLabelWidth"
         :rules="rule"
@@ -154,7 +154,18 @@ export default defineComponent({
 
     const items = computed(() => (props.config as ContainerCommonConfig).items);
 
-    const itemProp = computed(() => (name.value ? `${props.prop}${props.prop ? '.' : ''}${name.value}` : props.prop));
+    const itemProp = computed(() => {
+      let n: string | number = '';
+      const { names } = props.config as any;
+      if (names?.[0]) {
+        [n] = names;
+      } else if (name.value) {
+        n = name.value;
+      } else {
+        return props.prop;
+      }
+      return `${props.prop}${props.prop ? '.' : ''}${n}`;
+    });
 
     const tagName = computed(() => {
       const component = resolveComponent(`m-${items.value ? 'form' : 'fields'}-${type.value}`);

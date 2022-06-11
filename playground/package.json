@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@types/node": "^15.12.4",
+    "@types/serialize-javascript": "^5.0.1",
     "@vitejs/plugin-legacy": "^1.8.2",
     "@vitejs/plugin-vue": "^1.2.3",
     "@vitejs/plugin-vue-jsx": "^1.1.6",

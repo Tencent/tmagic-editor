@@ -43,6 +43,10 @@ export default defineConfig({
   },
 
   build: {
+    sourcemap: true,
+
+    cssCodeSplit: false,
+
     rollupOptions: {
       input: {
         page: './page.html',

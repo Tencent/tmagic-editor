@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { MoveableOptions } from 'react-moveable/declaration/types';
+import { MoveableOptions } from 'moveable';
 
 import Core from '@tmagic/core';
 import { Id, MApp, MNode } from '@tmagic/schema';
@@ -58,6 +58,7 @@ export type Rect = {
   width: number;
   height: number;
 } & Offset;
+
 export interface Offset {
   left: number;
   top: number;
@@ -72,10 +73,14 @@ export interface UpdateEventData {
   el: HTMLElement;
   ghostEl: HTMLElement;
   style: {
-    width: number;
-    height: number;
+    width?: number;
+    height?: number;
     left?: number;
     top?: number;
+    transform?: {
+      rotate?: string;
+      scale?: string;
+    };
   };
 }
 
