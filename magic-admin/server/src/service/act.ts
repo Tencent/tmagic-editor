@@ -173,6 +173,7 @@ export default class ActService {
       actModifyTime: getFormatTime(),
       actCreateTime: getFormatTime(),
       actStatus: ActStatus.MODIFYING,
+      actCryptoId: '', // 数据库不能为空，先做个占位符
       ...actInfo,
     };
     const act = await ActInfo.create<ActInfo>(newAct as ActInfo);
@@ -187,7 +188,9 @@ export default class ActService {
     );
 
     // 添加默认活动页
-    const defaultPage = await this.pageService.create();
+    const defaultPage = await this.pageService.create({
+      actId: act.actId,
+    });
     await act.$add<Page>('Pages', defaultPage);
 
     return act.actId;

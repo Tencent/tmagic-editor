@@ -35,7 +35,8 @@
     "mysql2": "^2.3.3",
     "reflect-metadata": "^0.1.13",
     "sequelize": "^6.6.2",
-    "sequelize-typescript": "^2.1.0"
+    "sequelize-typescript": "^2.1.0",
+    "tslib": "^2.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",
