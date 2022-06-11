@@ -31,17 +31,14 @@ export default class PageService {
    * @param {Page} page 页面参数
    * @returns {Page} 新建页面
    */
-  create = (page?: Page) => {
-    const oldPage = page;
+  create = (page?: Partial<Page>) => {
     const newPage = {
       pageCreateTime: getFormatTime(),
       pageModifyTime: getFormatTime(),
       pagePublishStatus: PageStatus.MODIFYING,
-      distCode: oldPage?.distCode,
-      srcCode: oldPage?.srcCode,
-      pagePublishUiVersion: oldPage?.pagePublishUiVersion,
-      pageTitle: oldPage?.pageTitle || 'index',
-      pageName: oldPage?.pageName || 'index',
+      pageTitle: 'index',
+      pageName: 'index',
+      ...page,
     };
     return Page.create(newPage as Page);
   };

@@ -9,12 +9,13 @@ CREATE TABLE `magic_act_info` (
   `act_create_time` varchar(128) NOT NULL COMMENT '活动创建时间',
   `operator` varchar(512) DEFAULT NULL COMMENT '负责人',
   `locker` varchar(128) DEFAULT NULL COMMENT '当前正在编辑的人',
-  `lock_time` datetime DEFAULT '0000-00-00 00:00:00' COMMENT '锁定时间',
+  `lock_time` datetime DEFAULT NULL COMMENT '锁定时间',
   `act_status` int(11) DEFAULT NULL COMMENT '活动状态：0-修改中，1-部分已发布，2-已发布',
   `abtest_raw` mediumtext COMMENT 'serialize后的abtest',
   PRIMARY KEY (`act_id`),
   KEY `act_name` (`act_name`)
-) ENGINE = InnoDB AUTO_INCREMENT = 1 DEFAULT CHARSET = utf8mb4 COMMENT = '魔方开源-活动信息表'
+) ENGINE = InnoDB AUTO_INCREMENT = 1 DEFAULT CHARSET = utf8mb4 COMMENT = '魔方开源-活动信息表';
+
 -- 页面配置表
 CREATE TABLE `magic_ui_config` (
   `id` int(8) unsigned NOT NULL AUTO_INCREMENT COMMENT '页面id',
@@ -31,4 +32,4 @@ CREATE TABLE `magic_ui_config` (
   `web_plugin` varchar(255) DEFAULT NULL COMMENT 'web插件',
   `page_name` varchar(128) DEFAULT NULL COMMENT '页面名称（编辑器页面唯一标识）',
   PRIMARY KEY (`id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 5 DEFAULT CHARSET = utf8mb4 COMMENT = '魔方开源-uiconfig表'
+) ENGINE = InnoDB AUTO_INCREMENT = 1 DEFAULT CHARSET = utf8mb4 COMMENT = '魔方开源-uiconfig表';
