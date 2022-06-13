@@ -86,7 +86,7 @@ export default defineComponent({
           text: '预览',
           icon: Connection,
           handler: async () => {
-            if (editor.value && editor.value.editorService.get<Map<Id, Id>>('modifiedNodeIds').size > 0) {
+            if (editor.value?.editorService.get<Map<Id, Id>>('modifiedNodeIds').size > 0) {
               try {
                 await ElMessageBox.confirm('有修改未保存，是否先保存再预览', '提示', {
                   confirmButtonText: '保存并预览',
@@ -186,6 +186,45 @@ export default defineComponent({
               icon: Grid,
               text: '二维码',
               type: 'qrcode',
+            },
+          ],
+        },
+        {
+          title: '组合',
+          items: [
+            {
+              icon: Tickets,
+              text: '弹窗',
+              data: {
+                type: 'overlay',
+                style: {
+                  position: 'fixed',
+                  width: '100%',
+                  height: '100%',
+                  top: 0,
+                  left: 0,
+                  backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                },
+                name: '弹窗',
+                items: [
+                  {
+                    type: 'container',
+                    style: {
+                      position: 'absolute',
+                      width: '80%',
+                      height: '400',
+                      top: '143.87',
+                      left: 37.5,
+                      backgroundColor: 'rgba(255, 255, 255, 1)',
+                      backgroundRepeat: 'no-repeat',
+                      backgroundSize: '100% 100%',
+                    },
+                    name: '组',
+                    items: [],
+                    layout: 'absolute',
+                  },
+                ],
+              },
             },
           ],
         },
