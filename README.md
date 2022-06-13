@@ -40,7 +40,7 @@ $ pnpm playground
 
 最后在浏览器中打开
 
-http://localhost:8098/
+http://localhost:8098/tmagic-editor/playground/
 
 即可得到一个魔方编辑器示例项目
 

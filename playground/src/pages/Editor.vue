@@ -27,16 +27,8 @@
 
 <script lang="ts">
 import { defineComponent, ref, toRaw } from 'vue';
-import {
-  Coin,
-  Connection,
-  Document,
-  FolderOpened,
-  Grid,
-  PictureFilled,
-  SwitchButton,
-  Tickets,
-} from '@element-plus/icons';
+import { useRouter } from 'vue-router';
+import { Coin, Connection, Document } from '@element-plus/icons';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import serialize from 'serialize-javascript';
 
@@ -45,7 +37,8 @@ import { Id, NodeType } from '@tmagic/schema';
 import StageCore from '@tmagic/stage';
 import { asyncLoadJs } from '@tmagic/utils';
 
-import config from '../config';
+import componentGroupList from '../configs/componentGroupList';
+import dsl from '../configs/dsl';
 
 const { VITE_RUNTIME_PATH } = import.meta.env;
 
@@ -53,10 +46,11 @@ export default defineComponent({
   name: 'EditorApp',
 
   setup() {
+    const router = useRouter();
     const editor = ref<InstanceType<typeof TMagicEditor>>();
     const previewVisible = ref(false);
-    const value = ref(config);
-    const defaultSelected = ref(config.items[0].id);
+    const value = ref(dsl);
+    const defaultSelected = ref(dsl.items[0].id);
     const propsValues = ref<Record<string, any>>({});
     const propsConfigs = ref<Record<string, any>>({});
     const eventMethodList = ref<Record<string, any>>({});
@@ -83,10 +77,21 @@ export default defineComponent({
       right: [
         {
           type: 'button',
+          text: 'Form Playground',
+          handler: () => router.push('form'),
+        },
+        {
+          type: 'button',
+          text: 'Table Playground',
+          handler: () => router.push('table'),
+        },
+        '/',
+        {
+          type: 'button',
           text: '预览',
           icon: Connection,
-          handler: async () => {
-            if (editor.value?.editorService.get<Map<Id, Id>>('modifiedNodeIds').size > 0) {
+          handler: async (services) => {
+            if (services?.editorService.get<Map<Id, Id>>('modifiedNodeIds').size > 0) {
               try {
                 await ElMessageBox.confirm('有修改未保存，是否先保存再预览', '提示', {
                   confirmButtonText: '保存并预览',
@@ -148,87 +153,7 @@ export default defineComponent({
 
       runtimeUrl: `${VITE_RUNTIME_PATH}/playground.html`,
 
-      componentGroupList: ref([
-        {
-          title: '示例容器',
-          items: [
-            {
-              icon: FolderOpened,
-              text: '组',
-              type: 'container',
-            },
-            {
-              icon: FolderOpened,
-              text: '蒙层',
-              type: 'overlay',
-            },
-          ],
-        },
-        {
-          title: '示例组件',
-          items: [
-            {
-              icon: Tickets,
-              text: '文本',
-              type: 'text',
-            },
-            {
-              icon: SwitchButton,
-              text: '按钮',
-              type: 'button',
-            },
-            {
-              icon: PictureFilled,
-              text: '图片',
-              type: 'img',
-            },
-            {
-              icon: Grid,
-              text: '二维码',
-              type: 'qrcode',
-            },
-          ],
-        },
-        {
-          title: '组合',
-          items: [
-            {
-              icon: Tickets,
-              text: '弹窗',
-              data: {
-                type: 'overlay',
-                style: {
-                  position: 'fixed',
-                  width: '100%',
-                  height: '100%',
-                  top: 0,
-                  left: 0,
-                  backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                },
-                name: '弹窗',
-                items: [
-                  {
-                    type: 'container',
-                    style: {
-                      position: 'absolute',
-                      width: '80%',
-                      height: '400',
-                      top: '143.87',
-                      left: 37.5,
-                      backgroundColor: 'rgba(255, 255, 255, 1)',
-                      backgroundRepeat: 'no-repeat',
-                      backgroundSize: '100% 100%',
-                    },
-                    name: '组',
-                    items: [],
-                    layout: 'absolute',
-                  },
-                ],
-              },
-            },
-          ],
-        },
-      ]),
+      componentGroupList,
 
       moveableOptions: (core?: StageCore): MoveableOptions => {
         const options: MoveableOptions = {};
@@ -281,6 +206,12 @@ html {
 
     .el-dialog__body {
       padding: 0;
+    }
+  }
+
+  .menu-left {
+    .menu-item-text {
+      margin-left: 10px;
     }
   }
 }
