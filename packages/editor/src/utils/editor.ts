@@ -16,9 +16,7 @@
  * limitations under the License.
  */
 
-import { random } from 'lodash-es';
-
-import type { Id, MApp, MContainer, MNode, MPage } from '@tmagic/schema';
+import type { MApp, MContainer, MNode, MPage } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
 import { getNodePath, isNumber, isPage, isPop } from '@tmagic/utils';
@@ -26,8 +24,6 @@ import { getNodePath, isNumber, isPage, isPop } from '@tmagic/utils';
 import { Layout } from '@editor/type';
 
 export const COPY_STORAGE_KEY = '$MagicEditorCopyData';
-
-export const generateId = (type: string | number): string => `${type}_${random(10000, false)}`;
 
 /**
  * 获取所有页面配置
@@ -73,51 +69,6 @@ export const generatePageName = (pageNameList: string[]): string => {
  * @returns {string}
  */
 export const generatePageNameByApp = (app: MApp): string => generatePageName(getPageNameList(getPageList(app)));
-
-/**
- * 复制页面时，需要把组件下关联的弹窗id换测复制出来的弹窗的id
- * @param {number} oldId 复制的源弹窗id
- * @param {number} popId 新的弹窗id
- * @param {Object} pageConfig 页面配置
- */
-const updatePopId = (oldId: Id, popId: Id, pageConfig: MPage) => {
-  pageConfig.items?.forEach((config) => {
-    if (config.pop === oldId) {
-      config.pop = popId;
-      return;
-    }
-
-    if (config.popId === oldId) {
-      config.popId = popId;
-      return;
-    }
-
-    if (Array.isArray(config.items)) {
-      updatePopId(oldId, popId, config as MPage);
-    }
-  });
-};
-
-/**
- * 将组件与组件的子元素配置中的id都设置成一个新的ID
- * @param {Object} config 组件配置
- */
-/* eslint no-param-reassign: ["error", { "props": false }] */
-export const setNewItemId = (config: MNode, parent?: MPage) => {
-  const oldId = config.id;
-
-  config.id = generateId(config.type || 'component');
-  config.name = `${config.name?.replace(/_(\d+)$/, '')}_${config.id}`;
-
-  // 只有弹窗在页面下的一级子元素才有效
-  if (isPop(config) && parent?.type === NodeType.PAGE) {
-    updatePopId(oldId, config.id, parent);
-  }
-
-  if (config.items && Array.isArray(config.items)) {
-    config.items.forEach((item) => setNewItemId(item, config as MPage));
-  }
-};
 
 /**
  * @param {Object} node

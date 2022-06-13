@@ -23,12 +23,6 @@ import { NodeType } from '@tmagic/schema';
 import * as editor from '@editor/utils/editor';
 
 describe('util form', () => {
-  test('generateId', () => {
-    const id = editor.generateId('text');
-
-    expect(id.startsWith('text')).toBeTruthy();
-  });
-
   test('getPageList', () => {
     const pageList = editor.getPageList({
       id: 'app_1',
@@ -64,56 +58,6 @@ describe('util form', () => {
     const name = editor.generatePageName(['index', 'page_2']);
     // 第二个页面
     expect(name).toBe('page_3');
-  });
-});
-
-describe('setNewItemId', () => {
-  test('普通', () => {
-    const config = {
-      id: 1,
-      type: 'text',
-    };
-    // 将组件与组件的子元素配置中的id都设置成一个新的ID
-    editor.setNewItemId(config);
-    expect(config.id === 1).toBeFalsy();
-  });
-
-  test('items', () => {
-    const config = {
-      id: 1,
-      type: NodeType.PAGE,
-      items: [
-        {
-          type: 'text',
-          id: 2,
-        },
-      ],
-    };
-    editor.setNewItemId(config);
-    expect(config.id === 1).toBeFalsy();
-    expect(config.items[0].id === 2).toBeFalsy();
-  });
-
-  test('pop', () => {
-    const config = {
-      id: 1,
-      type: NodeType.PAGE,
-      items: [
-        {
-          type: 'button',
-          id: 2,
-          pop: 3,
-        },
-        {
-          type: 'pop',
-          id: 3,
-        },
-      ],
-    };
-    editor.setNewItemId(config);
-    expect(config.items[0].pop === 3).toBeFalsy();
-    expect(config.items[1].id === 3).toBeFalsy();
-    expect(config.items[1].id === config.items[0].pop).toBeTruthy();
   });
 });
 

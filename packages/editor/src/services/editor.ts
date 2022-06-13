@@ -38,7 +38,6 @@ import {
   initPosition,
   isFixed,
   setLayout,
-  setNewItemId,
 } from '@editor/utils/editor';
 import { log } from '@editor/utils/logger';
 
@@ -495,7 +494,7 @@ class Editor extends BaseService {
       return;
     }
 
-    setNewItemId(config, this.get('root'));
+    await propsService.setNewItemId(config, this.get('root'));
     if (config.style) {
       config.style = {
         ...config.style,

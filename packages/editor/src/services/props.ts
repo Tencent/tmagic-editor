@@ -17,11 +17,12 @@
  */
 
 import { reactive } from 'vue';
-import { cloneDeep, mergeWith } from 'lodash-es';
+import { cloneDeep, mergeWith, random } from 'lodash-es';
 
 import type { FormConfig } from '@tmagic/form';
-import type { MComponent, MNode } from '@tmagic/schema';
-import { toLine } from '@tmagic/utils';
+import type { Id, MComponent, MNode, MPage } from '@tmagic/schema';
+import { NodeType } from '@tmagic/schema';
+import { isPop, toLine } from '@tmagic/utils';
 
 import type { PropsState } from '@editor/type';
 import { DEFAULT_CONFIG, fillConfig, getDefaultPropsValue } from '@editor/utils/props';
@@ -35,7 +36,7 @@ class Props extends BaseService {
   });
 
   constructor() {
-    super(['setPropsConfig', 'getPropsConfig', 'setPropsValue', 'getPropsValue']);
+    super(['setPropsConfig', 'getPropsConfig', 'setPropsValue', 'getPropsValue', 'createId', 'setNewItemId']);
   }
 
   public setPropsConfigs(configs: Record<string, FormConfig>) {
@@ -87,7 +88,7 @@ class Props extends BaseService {
    * @param type 组件类型
    * @returns 组件初始值
    */
-  public async getPropsValue(type: string, defaultValue = {}) {
+  public async getPropsValue(type: string, defaultValue: Record<string, any> = {}) {
     if (type === 'area') {
       const value = (await this.getPropsValue('button')) as MComponent;
       value.className = 'action-area';
@@ -98,12 +99,66 @@ class Props extends BaseService {
       return value;
     }
 
+    const data = cloneDeep(defaultValue as any);
+
+    await this.setNewItemId(data);
+
     return {
-      ...getDefaultPropsValue(type),
-      ...mergeWith(cloneDeep(this.state.propsValueMap[type] || {}), cloneDeep(defaultValue)),
+      ...getDefaultPropsValue(type, await this.createId(type)),
+      ...mergeWith(cloneDeep(this.state.propsValueMap[type] || {}), data),
     };
   }
+
+  public async createId(type: string | number): Promise<string> {
+    return `${type}_${random(10000, false)}`;
+  }
+
+  /**
+   * 将组件与组件的子元素配置中的id都设置成一个新的ID
+   * @param {Object} config 组件配置
+   */
+  /* eslint no-param-reassign: ["error", { "props": false }] */
+  public async setNewItemId(config: MNode, parent?: MPage) {
+    const oldId = config.id;
+
+    config.id = await this.createId(config.type || 'component');
+
+    // 只有弹窗在页面下的一级子元素才有效
+    if (isPop(config) && parent?.type === NodeType.PAGE) {
+      updatePopId(oldId, config.id, parent);
+    }
+
+    if (config.items && Array.isArray(config.items)) {
+      for (const item of config.items) {
+        await this.setNewItemId(item, config as MPage);
+      }
+    }
+  }
 }
+
+/**
+ * 复制页面时，需要把组件下关联的弹窗id换测复制出来的弹窗的id
+ * @param {number} oldId 复制的源弹窗id
+ * @param {number} popId 新的弹窗id
+ * @param {Object} pageConfig 页面配置
+ */
+const updatePopId = (oldId: Id, popId: Id, pageConfig: MPage) => {
+  pageConfig.items?.forEach((config) => {
+    if (config.pop === oldId) {
+      config.pop = popId;
+      return;
+    }
+
+    if (config.popId === oldId) {
+      config.popId = popId;
+      return;
+    }
+
+    if (Array.isArray(config.items)) {
+      updatePopId(oldId, popId, config as MPage);
+    }
+  });
+};
 
 export type PropsService = Props;
 

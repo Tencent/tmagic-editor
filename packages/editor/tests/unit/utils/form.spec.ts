@@ -44,7 +44,8 @@ describe('util form', () => {
   });
 
   test('getDefaultValue', () => {
-    const value = props.getDefaultPropsValue('text');
-    expect(value.id.startsWith('text')).toBeTruthy();
+    const value = props.getDefaultPropsValue('text', '1');
+    expect(value.id).toBe('1');
+    expect(value.type).toBe('text');
   });
 });
