@@ -20,7 +20,6 @@ import { FormConfig, FormState } from '@tmagic/form';
 
 import editorService from '@editor/services/editor';
 import eventsService from '@editor/services/events';
-import { generateId } from '@editor/utils/editor';
 
 /**
  * 统一为组件属性表单加上事件、高级、样式配置
@@ -244,9 +243,9 @@ export const DEFAULT_CONFIG: FormConfig = fillConfig([]);
  * @param type 组件类型
  * @returns Object
  */
-export const getDefaultPropsValue = (type: string) => ({
+export const getDefaultPropsValue = (type: string, id: string) => ({
   type,
-  id: generateId(type),
+  id,
   style: {},
   name: type,
 });
