@@ -29,6 +29,8 @@ const run = (bin, args, opts = {}) => execa(bin, args, { stdio: 'inherit', ...op
 const dryRun = (bin, args, opts = {}) => console.log(chalk.blue(`[dryrun] ${bin} ${args.join(' ')}`), opts);
 const runIfNotDry = isDryRun ? dryRun : run;
 const getPkgRoot = (pkg) => path.resolve(__dirname, `../packages/${pkg}`);
+const getRunTimeRoot = (pkg) => path.resolve(__dirname, `../runtime/${pkg}`);
+const getPlayground = () => path.resolve(__dirname, `../playground`);
 const step = (msg) => console.log(chalk.cyan(msg));
 
 async function main() {
@@ -97,13 +99,13 @@ async function main() {
 
   // update pnpm-lock.yaml
   step('\nUpdating lockfile...');
-  await run(`pnpm`, ['install', '--prefer-offline']);
+  await run(`pnpm`, ['reinstall']);
 
   const { stdout } = await run('git', ['diff'], { stdio: 'pipe' });
   if (stdout) {
     step('\nCommitting changes...');
     await runIfNotDry('git', ['add', '-A']);
-    // await runIfNotDry('git', ['commit', '-m', `chore: release v${targetVersion}`]);
+    await runIfNotDry('git', ['commit', '-m', `chore: release v${targetVersion}`]);
   } else {
     console.log('No changes to commit.');
   }
@@ -136,6 +138,8 @@ function updateVersions(version) {
   updatePackage(path.resolve(__dirname, '..'), version);
   // 2. update all packages
   packages.forEach((p) => updatePackage(getPkgRoot(p), version));
+  ['vue3', 'react', 'vue2'].forEach((p) => updatePackage(getRunTimeRoot(p), version));
+  updatePackage(getPlayground(), version);
 }
 
 function updatePackage(pkgRoot, version) {
