@@ -12,7 +12,12 @@
       :default-selected="defaultSelected"
       :moveable-options="moveableOptions"
       :auto-scroll-into-view="true"
-    ></m-editor>
+      :stage-rect="stageRect"
+    >
+      <template #workspace-content>
+        <device-group v-model="stageRect"></device-group>
+      </template>
+    </m-editor>
 
     <el-dialog v-model="previewVisible" destroy-on-close :width="375" custom-class="pre-viewer" title="预览">
       <iframe
@@ -37,6 +42,7 @@ import { Id, NodeType } from '@tmagic/schema';
 import StageCore from '@tmagic/stage';
 import { asyncLoadJs } from '@tmagic/utils';
 
+import DeviceGroup from '../components/DeviceGroup.vue';
 import componentGroupList from '../configs/componentGroupList';
 import dsl from '../configs/dsl';
 
@@ -44,6 +50,8 @@ const { VITE_RUNTIME_PATH } = import.meta.env;
 
 export default defineComponent({
   name: 'EditorApp',
+
+  components: { DeviceGroup },
 
   setup() {
     const router = useRouter();
@@ -148,6 +156,7 @@ export default defineComponent({
       propsValues,
       propsConfigs,
       eventMethodList,
+      stageRect: ref(),
 
       previewVisible,
 
