@@ -1,6 +1,7 @@
-import { viteBundler } from '@vuepress/bundler-vite'
-import { defineUserConfig } from '@vuepress/cli'
-import { defaultTheme } from '@vuepress/theme-default'
+import { viteBundler } from '@vuepress/bundler-vite';
+import { defineUserConfig } from '@vuepress/cli';
+import { defaultTheme } from '@vuepress/theme-default';
+const { searchPlugin } = require('@vuepress/plugin-search');
 
 import path from 'path';
 
@@ -172,6 +173,9 @@ export default defineUserConfig({
     contributors: false,
 
   }),
+  plugins: [
+    searchPlugin(),
+  ],
   bundler: viteBundler({
     vuePluginOptions: {
       template: {
