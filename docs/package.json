@@ -3,8 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
+    "clean:top": "rimraf dist",
     "dev": "vuepress dev src",
-    "build": "vuepress build src -d dist"
+    "build": "npm run clean:top && vuepress build src -d dist"
   },
   "dependencies": {
     "@element-plus/icons": "0.0.11",
