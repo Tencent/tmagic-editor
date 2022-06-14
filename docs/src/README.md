@@ -1,6 +1,6 @@
 ---
 home: true
-heroImage: https://vfiles.gtimg.cn/vupload/20210811/388ed01628667545737.png
+heroImage: ./favicon.png
 heroText: tmagic-editor页面可视化平台
 tagline: null
 
