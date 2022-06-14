@@ -1,5 +1,7 @@
+import { viteBundler } from '@vuepress/bundler-vite'
 import { defineUserConfig } from '@vuepress/cli'
-import type { DefaultThemeOptions } from '@vuepress/theme-default'
+import { defaultTheme } from '@vuepress/theme-default'
+
 import path from 'path';
 
 const sidebar = {
@@ -103,12 +105,13 @@ const sidebar = {
   ]
 };
 
-export default defineUserConfig<DefaultThemeOptions>({
+export default defineUserConfig({
   title: 'tmagic-editor',
-  description: 'magic',
-  clientAppEnhanceFiles: path.resolve(__dirname, './clientAppEnhance.ts'),
-  themeConfig: {
-    logo: 'https://vfiles.gtimg.cn/vupload/20210811/388ed01628667545737.png',
+  description: 'tmagic',
+  lang: 'zh-CN',
+  base: '/tmagic-editor/docs/',
+  theme: defaultTheme({
+    logo: './favicon.png',
     navbar: [
       {
         text: '文档',
@@ -165,13 +168,11 @@ export default defineUserConfig<DefaultThemeOptions>({
       '/api/form': sidebar.formApi,
       '/api/form-config': sidebar.formConfig,
     },
-    smoothScroll: false,
     lastUpdated: false,
     contributors: false,
 
-  },
-  base: '/tmagic-editor/docs/',
-  bundlerConfig: {
+  }),
+  bundler: viteBundler({
     vuePluginOptions: {
       template: {
         ssr: true,
@@ -192,9 +193,13 @@ export default defineUserConfig<DefaultThemeOptions>({
         alias:[
           { find: /^@tmagic\/form/, replacement: path.join(__dirname, '../../../packages/form/src/index.ts') },
           { find: /^@tmagic\/utils/, replacement: path.join(__dirname, '../../../packages/utils/src/index.ts') },
-          { find: /^lodash-es$/, replacement: 'lodash' },
+          { find: /^@tmagic\/schema/, replacement: path.join(__dirname, '../../../packages/schema/src/index.ts') },
         ]
       },
+       // @ts-expect-error: vite 还没有给 ssr 配置项提供类型
+      ssr: {
+        noExternal: ['lodash-es'],
+      }
     },
-  },
+  }),
 });
