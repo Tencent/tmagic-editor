@@ -1,0 +1,49 @@
+name: pages
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  pages:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+
+      - name: Set node version to 16
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          cache: 'pnpm'
+
+      - run: pnpm bootstrap
+
+      - name: Build VuePress site
+        run: npm run build:docs
+
+      - name: Build Playground site
+        run: npm run build:playground
+
+      - name: clean dist
+        run: rm -rf dist
+
+      - name: mkdir dist
+        run: mkdir dist && mkdir dist/docs && mkdir dist/playground
+
+      - name: move to dist
+        run: mv docs/dist/* dist/docs && mv playground/dist/* dist/playground
+
+      - name: Deploy to GitHub Pages
+        uses: crazy-max/ghaction-github-pages@v2
+        with:
+          target_branch: gh-pages
+          build_dir: dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

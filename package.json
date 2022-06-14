@@ -2,6 +2,7 @@
   "version": "1.0.0-rc.7",
   "name": "tmagic",
   "private": true,
+  "packageManager": "pnpm@7.1.9",
   "scripts": {
     "bootstrap": "pnpm i && pnpm prepare && cd runtime/vue2 && npm i",
     "clean:top": "rimraf */**/dist */dist coverage dwt*",
