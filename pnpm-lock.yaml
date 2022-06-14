@@ -77,6 +77,7 @@ importers:
       '@vuepress/bundler-vite': ^2.0.0-beta.48
       '@vuepress/cli': ^2.0.0-beta.48
       '@vuepress/client': ^2.0.0-beta.48
+      '@vuepress/plugin-search': ^2.0.0-beta.48
       '@vuepress/theme-default': ^2.0.0-beta.48
       element-plus: ^2.2.0
       highlight.js: ^11.2.0
@@ -98,6 +99,7 @@ importers:
       '@vuepress/bundler-vite': 2.0.0-beta.48
       '@vuepress/cli': 2.0.0-beta.48
       '@vuepress/client': 2.0.0-beta.48
+      '@vuepress/plugin-search': 2.0.0-beta.48
       '@vuepress/theme-default': 2.0.0-beta.48
       vuepress: 2.0.0-beta.48_cvdz5rjhltiqfsopd7oft5nvg4
 
@@ -2284,6 +2286,20 @@ packages:
     dependencies:
       '@vuepress/core': 2.0.0-beta.48
       prismjs: 1.28.0
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
+  /@vuepress/plugin-search/2.0.0-beta.48:
+    resolution: {integrity: sha512-1ADG3Zw6CBwERiW5l3spoONrHT6pcOGzlEiOhjAEYcOv7edzaoGQTahpgGvCXiXY5b11Z9bsr13NgCgr0YMGIQ==}
+    dependencies:
+      '@vuepress/client': 2.0.0-beta.48
+      '@vuepress/core': 2.0.0-beta.48
+      '@vuepress/shared': 2.0.0-beta.48
+      '@vuepress/utils': 2.0.0-beta.48
+      chokidar: 3.5.3
+      vue: 3.2.37
+      vue-router: 4.0.15_vue@3.2.37
     transitivePeerDependencies:
       - supports-color
     dev: true
