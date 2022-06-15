@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-rc.7",
+  "version": "1.0.0-rc.8",
   "name": "@tmagic/table",
   "sideEffects": [
     "dist/*"
@@ -30,13 +30,13 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "@tmagic/form": "1.0.0-rc.7",
+    "@tmagic/form": "1.0.0-rc.8",
     "element-plus": "^2.2.0",
     "lodash-es": "^4.17.21",
     "vue": "^3.2.0"
   },
   "peerDependencies": {
-    "@tmagic/form": "1.0.0-rc.7",
+    "@tmagic/form": "1.0.0-rc.8",
     "element-plus": "^2.2.0",
     "vue": "^3.2.0"
   },

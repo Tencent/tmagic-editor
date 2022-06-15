@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-rc.7",
+  "version": "1.0.0-rc.8",
   "name": "@tmagic/form",
   "sideEffects": [
     "dist/*",
@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@element-plus/icons": "0.0.11",
-    "@tmagic/utils": "1.0.0-rc.7",
+    "@tmagic/utils": "1.0.0-rc.8",
     "element-plus": "^2.2.0",
     "lodash-es": "^4.17.21",
     "moment": "^2.29.2",
