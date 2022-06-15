@@ -59,12 +59,12 @@ const tabClickHandler = (mForm: FormState | undefined, tab: any, props: any) => 
   tab.name = tab.paneName;
 
   if (typeof config.onTabClick === 'function') {
-    config.onTabClick(mForm, tab, { model, formValue: mForm?.values, prop });
+    config.onTabClick(mForm, tab, { model, formValue: mForm?.values, prop, config });
   }
 
   const tabConfig = config.items.find((item: TabPaneConfig) => tab.name === item.status);
   if (tabConfig && typeof tabConfig.onTabClick === 'function') {
-    tabConfig.onTabClick(mForm, tab, { model, formValue: mForm?.values, prop });
+    tabConfig.onTabClick(mForm, tab, { model, formValue: mForm?.values, prop, config });
   }
 };
 

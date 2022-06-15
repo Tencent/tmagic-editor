@@ -476,7 +476,7 @@ export default defineComponent({
         }
         emit('select', selection, row);
         if (typeof props.config.onSelect === 'function') {
-          props.config.onSelect(mForm, { selection, row });
+          props.config.onSelect(mForm, { selection, row, config: props.config });
         }
       },
 

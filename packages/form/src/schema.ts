@@ -547,6 +547,7 @@ export interface ColumnConfig extends FormItem, ContainerCommonConfig {
   label: string;
   width: string | number;
   sortable: boolean;
+  [key: string]: any;
 }
 
 /**
