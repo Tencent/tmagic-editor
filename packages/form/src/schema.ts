@@ -120,6 +120,7 @@ export interface Rule {
       /** 整个表单的值 */
       formValue: FormValue;
       prop: string;
+      config: any;
     },
     mForm: FormState | undefined,
   ) => void;
@@ -145,6 +146,7 @@ type FilterFunction = (
     parent?: Record<any, any>;
     formValue: Record<any, any>;
     prop: string;
+    config: any;
   },
 ) => boolean;
 
@@ -156,6 +158,7 @@ type OnChangeHandler = (
     values: Record<any, any>;
     parent?: Record<any, any>;
     formValue: Record<any, any>;
+    config: any;
   },
 ) => any;
 
@@ -191,6 +194,7 @@ type SelectOptionFunction = (
     prop?: string;
     formValues: any;
     formValue: any;
+    config: any;
   },
 ) => SelectOption[] | SelectGroupOption[];
 
@@ -200,6 +204,7 @@ type RemoteSelectOptionBodyFunction = (
     model: any;
     formValue: any;
     formValues: any;
+    config: any;
   },
 ) => Record<string, any>;
 
@@ -210,6 +215,7 @@ type RemoteSelectOptionRequestFunction = (
     model: any;
     formValue: any;
     formValues: any;
+    config: any;
   },
 ) => any;
 
@@ -500,6 +506,7 @@ export interface TabPaneConfig {
   lazy?: boolean;
   labelWidth?: string;
   items: FormConfig;
+  [key: string]: any;
 }
 export interface TabConfig extends FormItem, ContainerCommonConfig {
   type: 'tab' | 'dynamic-tab';

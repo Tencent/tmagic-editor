@@ -217,6 +217,7 @@ export default defineComponent({
           values: mForm?.initValues,
           formValue: mForm?.values,
           prop: itemProp.value,
+          config: props.config,
         });
       }
 
@@ -234,6 +235,7 @@ export default defineComponent({
           values: mForm?.initValues,
           formValue: mForm?.values,
           prop: itemProp.value,
+          config: props.config,
         });
       }
     };
