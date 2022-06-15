@@ -243,9 +243,18 @@ export const DEFAULT_CONFIG: FormConfig = fillConfig([]);
  * @param type 组件类型
  * @returns Object
  */
-export const getDefaultPropsValue = (type: string, id: string) => ({
-  type,
-  id,
-  style: {},
-  name: type,
-});
+export const getDefaultPropsValue = (type: string, id: string) =>
+  ['page', 'container'].includes(type)
+    ? {
+        type,
+        id,
+        style: {},
+        name: type,
+        items: [],
+      }
+    : {
+        type,
+        id,
+        style: {},
+        name: type,
+      };
