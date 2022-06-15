@@ -12,13 +12,7 @@
 
     <template #workspace :editorService="editorService">
       <slot name="workspace">
-        <workspace
-          :runtime-url="runtimeUrl"
-          :auto-scroll-into-view="autoScrollIntoView"
-          :render="render"
-          :moveable-options="moveableOptions"
-          :can-select="canSelect"
-        >
+        <workspace>
           <template #workspace-content><slot name="workspace-content" :editorService="editorService"></slot></template>
           <template #page-bar-title="{ page }"><slot name="page-bar-title" :page="page"></slot></template>
           <template #page-bar-popover="{ page }"><slot name="page-bar-popover" :page="page"></slot></template>
@@ -37,7 +31,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onUnmounted, PropType, provide, toRaw, watch } from 'vue';
+import { defineComponent, onUnmounted, PropType, provide, reactive, toRaw, watch } from 'vue';
 
 import { EventOption } from '@tmagic/core';
 import type { FormConfig } from '@tmagic/form';
@@ -136,6 +130,9 @@ export default defineComponent({
     /** 画布中组件选中框的移动范围 */
     moveableOptions: {
       type: [Object, Function] as PropType<MoveableOptions | ((core?: StageCore) => MoveableOptions)>,
+      default: () => (core?: StageCore) => ({
+        container: core?.renderer?.contentWindow?.document.getElementById('app'),
+      }),
     },
 
     /** 编辑器初始化时默认选中的组件ID */
@@ -145,6 +142,7 @@ export default defineComponent({
 
     canSelect: {
       type: Function as PropType<(el: HTMLElement) => boolean | Promise<boolean>>,
+      default: (el: HTMLElement) => Boolean(el.id),
     },
 
     stageRect: {
@@ -154,6 +152,10 @@ export default defineComponent({
     codeOptions: {
       type: Object,
       default: () => ({}),
+    },
+
+    updateDragEl: {
+      type: Function as PropType<(el: HTMLDivElement, target: HTMLElement) => void>,
     },
   },
 
@@ -249,6 +251,17 @@ export default defineComponent({
 
     provide('layerContentMenu', props.layerContentMenu);
     provide('stageContentMenu', props.stageContentMenu);
+    provide(
+      'stageOptions',
+      reactive({
+        runtimeUrl: props.runtimeUrl,
+        autoScrollIntoView: props.autoScrollIntoView,
+        render: props.render,
+        moveableOptions: props.moveableOptions,
+        canSelect: props.canSelect,
+        updateDragEl: props.updateDragEl,
+      }),
+    );
 
     return services;
   },

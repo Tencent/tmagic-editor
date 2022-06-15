@@ -48,7 +48,7 @@ export default class StageDragResize extends EventEmitter {
   /** 目标节点 */
   public target?: HTMLElement;
   /** 目标节点在蒙层中的占位节点 */
-  public dragEl: HTMLElement;
+  public dragEl: HTMLDivElement;
   /** Moveable拖拽类实例 */
   public moveable?: Moveable;
   /** 水平参考线 */
@@ -87,10 +87,9 @@ export default class StageDragResize extends EventEmitter {
     const oldTarget = this.target;
     this.target = el;
 
-    this.init(el);
-
     // 从不能拖动到能拖动的节点之间切换，要重新创建moveable，不然dragStart不生效
     if (!this.moveable || this.target !== oldTarget) {
+      this.init(el);
       this.moveableHelper = MoveableHelper.create({
         useBeforeRender: true,
         useRender: false,
@@ -430,6 +429,10 @@ export default class StageDragResize extends EventEmitter {
     `;
 
     this.dragEl.id = `${DRAG_EL_ID_PREFIX}${el.id}`;
+
+    if (typeof this.core.config.updateDragEl === 'function') {
+      this.core.config.updateDragEl(this.dragEl, el);
+    }
   }
 
   private destroyDragEl(): void {

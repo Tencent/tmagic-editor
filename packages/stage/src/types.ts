@@ -39,6 +39,7 @@ export type StageCoreConfig = {
   runtimeUrl?: string;
   render?: (renderer: StageCore) => Promise<HTMLElement> | HTMLElement;
   autoScrollIntoView?: boolean;
+  updateDragEl?: (el: HTMLDivElement, target: HTMLElement) => void;
 };
 
 export interface StageRenderConfig {
@@ -133,4 +134,5 @@ export interface TargetCalibrateConfig {
   parent: HTMLElement;
   mask: StageMask;
   dr: StageDragResize;
+  core: StageCore;
 }

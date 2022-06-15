@@ -1,13 +1,6 @@
 <template>
   <div class="m-editor-workspace" tabindex="1" ref="workspace">
-    <magic-stage
-      :key="page?.id"
-      :runtime-url="runtimeUrl"
-      :auto-scroll-into-view="autoScrollIntoView"
-      :render="render"
-      :moveable-options="moveableOptions"
-      :can-select="canSelect"
-    ></magic-stage>
+    <magic-stage :key="page?.id"></magic-stage>
 
     <slot name="workspace-content"></slot>
 
@@ -19,12 +12,10 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, inject, onMounted, onUnmounted, PropType, ref } from 'vue';
+import { computed, defineComponent, inject, onMounted, onUnmounted, ref } from 'vue';
 import KeyController from 'keycon';
 
 import type { MNode, MPage } from '@tmagic/schema';
-import type { MoveableOptions } from '@tmagic/stage';
-import StageCore from '@tmagic/stage';
 import { isPage } from '@tmagic/utils';
 
 import type { Services } from '@editor/type';
@@ -38,23 +29,6 @@ export default defineComponent({
   components: {
     PageBar,
     MagicStage,
-  },
-
-  props: {
-    runtimeUrl: String,
-    autoScrollIntoView: Boolean,
-
-    render: {
-      type: Function as PropType<() => HTMLDivElement>,
-    },
-
-    moveableOptions: {
-      type: [Object, Function] as PropType<MoveableOptions | ((core?: StageCore) => MoveableOptions)>,
-    },
-
-    canSelect: {
-      type: Function as PropType<(el: HTMLElement) => boolean | Promise<boolean>>,
-    },
   },
 
   setup() {
