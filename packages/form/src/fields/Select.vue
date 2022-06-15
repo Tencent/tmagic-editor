@@ -134,6 +134,7 @@ export default defineComponent({
             model: props.model,
             formValue: mForm?.values,
             formValues: mForm?.values,
+            config: props.config,
           }) as Record<string, any>;
         }
 
@@ -163,6 +164,7 @@ export default defineComponent({
           model: props.model,
           formValue: mForm?.values,
           formValues: mForm?.values,
+          config: props.config,
         });
       }
 
@@ -287,6 +289,7 @@ export default defineComponent({
                 prop: props.prop,
                 formValues: mForm?.values,
                 formValue: mForm?.values,
+                config: props.config,
               }),
             ).then((data) => {
               options.value = data;

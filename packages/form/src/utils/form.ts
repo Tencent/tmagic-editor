@@ -201,6 +201,7 @@ export const filterFunction = (mForm: FormState | undefined, config: any, props:
     parent: mForm?.parentValues || {},
     formValue: mForm?.values || props.model,
     prop: props.prop,
+    config: props.config,
   });
 };
 
@@ -242,6 +243,7 @@ export const getRules = function (mForm: FormState | undefined, rules: Rule[] | 
             parent: mForm?.parentValues || {},
             formValue: mForm?.values || props.model,
             prop: props.prop,
+            config: props.config,
           },
           mForm,
         );

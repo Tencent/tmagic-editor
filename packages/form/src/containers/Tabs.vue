@@ -136,7 +136,11 @@ const Tab = defineComponent({
         if (!props.config.name) throw new Error('dynamic tab 必须配置name');
 
         if (typeof props.config.onTabAdd === 'function') {
-          props.config.onTabAdd(mForm, { model: props.model });
+          props.config.onTabAdd(mForm, {
+            model: props.model,
+            prop: props.prop,
+            config: props.config,
+          });
         } else if (tabs.value.length > 0) {
           const newObj = cloneDeep(tabs.value[0]);
           newObj.title = `标签${tabs.value.length + 1}`;
@@ -150,7 +154,11 @@ const Tab = defineComponent({
         if (!props.config.name) throw new Error('dynamic tab 必须配置name');
 
         if (typeof props.config.onTabRemove === 'function') {
-          props.config.onTabRemove(mForm, tabName, { model: props.model });
+          props.config.onTabRemove(mForm, tabName, {
+            model: props.model,
+            prop: props.prop,
+            config: props.config,
+          });
         } else {
           props.model[props.config.name].splice(+tabName, 1);
 
@@ -169,7 +177,7 @@ const Tab = defineComponent({
       changeHandler: () => {
         emit('change', props.model);
         if (typeof props.config.onChange === 'function') {
-          props.config.onChange(mForm, { model: props.model });
+          props.config.onChange(mForm, { model: props.model, prop: props.prop, config: props.config });
         }
       },
     };
