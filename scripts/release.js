@@ -88,7 +88,7 @@ async function main() {
   // build all packages with types
   step('\nBuilding all packages...');
   if (!skipBuild && !isDryRun) {
-    // await run('pnpm', ['run', 'build']);
+    await run('pnpm', ['run', 'build']);
   } else {
     console.log(`(skipped)`);
   }
@@ -99,7 +99,7 @@ async function main() {
 
   // update pnpm-lock.yaml
   step('\nUpdating lockfile...');
-  await run(`pnpm`, ['reinstall']);
+  await run(`pnpm`, ['install', '--prefer-offline']);
 
   const { stdout } = await run('git', ['diff'], { stdio: 'pipe' });
   if (stdout) {
