@@ -25,7 +25,7 @@ import MoveableHelper from 'moveable-helper';
 
 import { DRAG_EL_ID_PREFIX, GHOST_EL_ID_PREFIX, GuidesType, Mode, ZIndex } from './const';
 import StageCore from './StageCore';
-import type { Offset, SortEventData, StageDragResizeConfig } from './types';
+import type { SortEventData, StageDragResizeConfig } from './types';
 import { getAbsolutePosition, getGuideLineFromCache, getMode, getOffset } from './util';
 
 /** 拖动状态 */
@@ -233,10 +233,16 @@ export default class StageDragResize extends EventEmitter {
 
         this.moveableHelper?.onResize(e);
 
+        // 流式布局
+        if (this.mode === Mode.SORTABLE) {
+          this.target.style.top = '0px';
+        } else {
+          this.target.style.left = `${frame.left + beforeTranslate[0]}px`;
+          this.target.style.top = `${frame.top + beforeTranslate[1]}px`;
+        }
+
         this.target.style.width = `${width}px`;
         this.target.style.height = `${height}px`;
-        this.target.style.left = `${frame.left + beforeTranslate[0]}px`;
-        this.target.style.top = `${frame.top + beforeTranslate[1]}px`;
       })
       .on('resizeEnd', () => {
         this.dragStatus = ActionStatus.END;
@@ -247,7 +253,10 @@ export default class StageDragResize extends EventEmitter {
   private bindDragEvent(): void {
     if (!this.moveable) throw new Error('moveable 为初始化');
 
-    let offset: Offset | null = null;
+    const frame = {
+      left: 0,
+      top: 0,
+    };
 
     this.moveable
       .on('dragStart', (e) => {
@@ -260,29 +269,25 @@ export default class StageDragResize extends EventEmitter {
         if (this.mode === Mode.SORTABLE) {
           this.ghostEl = this.generateGhostEl(this.target);
         }
+
+        frame.top = this.target.offsetTop;
+        frame.left = this.target.offsetLeft;
       })
       .on('drag', (e) => {
         if (!this.target || !this.dragEl) return;
 
-        if (!offset) {
-          offset = getAbsolutePosition(this.target, { left: 0, top: 0 });
-        }
-
         this.dragStatus = ActionStatus.ING;
-
-        const { left, top } = e;
 
         // 流式布局
         if (this.ghostEl) {
-          this.dragEl.style.top = `${top}px`;
-          this.ghostEl.style.top = `${top + offset.top}px`;
+          this.ghostEl.style.top = `${frame.top + e.beforeTranslate[1]}px`;
           return;
         }
 
         this.moveableHelper?.onDrag(e);
 
-        this.target.style.left = `${left + offset.left}px`;
-        this.target.style.top = `${top + offset.top}px`;
+        this.target.style.left = `${frame.left + e.beforeTranslate[0]}px`;
+        this.target.style.top = `${frame.top + e.beforeTranslate[1]}px`;
       })
       .on('dragEnd', () => {
         // 点击不拖动时会触发dragStart和dragEnd，但是不会有drag事件
@@ -295,7 +300,6 @@ export default class StageDragResize extends EventEmitter {
               this.update();
           }
         }
-        offset = null;
 
         this.dragStatus = ActionStatus.END;
         this.destroyGhostEl();
