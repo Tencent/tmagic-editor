@@ -20,6 +20,7 @@
 import { EventEmitter } from 'events';
 
 import { Mode } from './const';
+import StageCore from './StageCore';
 import StageDragResize from './StageDragResize';
 import StageMask from './StageMask';
 import type { Offset, TargetCalibrateConfig } from './types';
@@ -32,7 +33,8 @@ export default class TargetCalibrate extends EventEmitter {
   public parent: HTMLElement;
   public mask: StageMask;
   public dr: StageDragResize;
-  public operationEl: HTMLElement;
+  public core: StageCore;
+  public operationEl: HTMLDivElement;
 
   constructor(config: TargetCalibrateConfig) {
     super();
@@ -40,6 +42,7 @@ export default class TargetCalibrate extends EventEmitter {
     this.parent = config.parent;
     this.mask = config.mask;
     this.dr = config.dr;
+    this.core = config.core;
 
     this.operationEl = globalThis.document.createElement('div');
     this.parent.append(this.operationEl);
@@ -58,6 +61,11 @@ export default class TargetCalibrate extends EventEmitter {
     `;
 
     this.operationEl.id = `${prefix}${el.id}`;
+
+    if (typeof this.core.config.updateDragEl === 'function') {
+      this.core.config.updateDragEl(this.operationEl, el);
+    }
+
     return this.operationEl;
   }
 

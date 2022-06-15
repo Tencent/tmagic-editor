@@ -21,6 +21,7 @@ import type { Component } from 'vue';
 import type { FormConfig } from '@tmagic/form';
 import type { Id, MApp, MContainer, MNode, MPage } from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
+import type { MoveableOptions } from '@tmagic/stage';
 
 import type { ComponentListService } from '@editor/services/componentList';
 import type { EditorService } from '@editor/services/editor';
@@ -43,6 +44,15 @@ export interface Services {
   propsService: PropsService;
   componentListService: ComponentListService;
   uiService: UiService;
+}
+
+export interface StageOptions {
+  runtimeUrl: string;
+  autoScrollIntoView: boolean;
+  render: () => HTMLDivElement;
+  moveableOptions: MoveableOptions | ((core?: StageCore) => MoveableOptions);
+  canSelect: (el: HTMLElement) => boolean | Promise<boolean>;
+  updateDragEl: (el: HTMLDivElement) => void;
 }
 
 export interface StoreState {

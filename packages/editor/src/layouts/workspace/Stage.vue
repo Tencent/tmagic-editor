@@ -28,7 +28,6 @@ import {
   markRaw,
   onMounted,
   onUnmounted,
-  PropType,
   ref,
   toRaw,
   watch,
@@ -37,11 +36,11 @@ import {
 import { cloneDeep } from 'lodash-es';
 
 import type { MApp, MNode, MPage } from '@tmagic/schema';
-import type { MoveableOptions, Runtime, SortEventData, UpdateEventData } from '@tmagic/stage';
+import type { Runtime, SortEventData, UpdateEventData } from '@tmagic/stage';
 import StageCore from '@tmagic/stage';
 
 import ScrollViewer from '@editor/components/ScrollViewer.vue';
-import { Layout, Services, StageRect } from '@editor/type';
+import { Layout, Services, StageOptions, StageRect } from '@editor/type';
 
 import ViewerMenu from './ViewerMenu.vue';
 
@@ -53,29 +52,9 @@ export default defineComponent({
     ScrollViewer,
   },
 
-  props: {
-    render: {
-      type: Function as PropType<() => HTMLDivElement>,
-    },
-
-    runtimeUrl: String,
-    autoScrollIntoView: Boolean,
-
-    canSelect: {
-      type: Function as PropType<(el: HTMLElement) => boolean | Promise<boolean>>,
-      default: (el: HTMLElement) => Boolean(el.id),
-    },
-
-    moveableOptions: {
-      type: [Object, Function] as PropType<MoveableOptions | ((core?: StageCore) => MoveableOptions)>,
-      default: () => (core?: StageCore) => ({
-        container: core?.renderer?.contentWindow?.document.getElementById('app'),
-      }),
-    },
-  },
-
-  setup(props) {
+  setup() {
     const services = inject<Services>('services');
+    const stageOptions = inject<StageOptions>('stageOptions');
 
     const stageWrap = ref<InstanceType<typeof ScrollViewer>>();
     const stageContainer = ref<HTMLDivElement>();
@@ -95,15 +74,15 @@ export default defineComponent({
       if (stage) return;
 
       if (!stageContainer.value) return;
-      if (!(props.runtimeUrl || props.render) || !root.value) return;
+      if (!(stageOptions?.runtimeUrl || stageOptions?.render) || !root.value) return;
 
       stage = new StageCore({
-        render: props.render,
-        runtimeUrl: props.runtimeUrl,
+        render: stageOptions.render,
+        runtimeUrl: stageOptions.runtimeUrl,
         zoom: zoom.value,
-        autoScrollIntoView: props.autoScrollIntoView,
+        autoScrollIntoView: stageOptions.autoScrollIntoView,
         canSelect: (el, event, stop) => {
-          const elCanSelect = props.canSelect(el);
+          const elCanSelect = stageOptions.canSelect(el);
           // 在组件联动过程中不能再往下选择，返回并触发 ui-select
           if (uiSelectMode.value && elCanSelect && event.type === 'mousedown') {
             document.dispatchEvent(new CustomEvent('ui-select', { detail: el }));
@@ -112,7 +91,8 @@ export default defineComponent({
 
           return elCanSelect;
         },
-        moveableOptions: props.moveableOptions,
+        moveableOptions: stageOptions.moveableOptions,
+        updateDragEl: stageOptions.updateDragEl,
       });
 
       services?.editorService.set('stage', markRaw(stage));

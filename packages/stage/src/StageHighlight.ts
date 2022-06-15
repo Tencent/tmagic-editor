@@ -41,6 +41,7 @@ export default class StageHighlight extends EventEmitter {
       parent: this.core.mask.content,
       mask: this.core.mask,
       dr: this.core.dr,
+      core: this.core,
     });
   }
 
