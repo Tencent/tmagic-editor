@@ -55,7 +55,7 @@ const sidebar = {
   ],
   editorApi: [
     {
-      text: '编辑器',
+      text: '编辑器(@tmagic/editor)',
       children: [
         '/api/editor/editor',
         '/api/editor/services',
@@ -64,7 +64,7 @@ const sidebar = {
   ],
   formApi: [
     {
-      text: '表单',
+      text: '表单(@tmagic/form)',
       children: [
         '/api/form/form',
       ]
@@ -101,6 +101,26 @@ const sidebar = {
       text: '联动配置',
       children: [
         '/api/form-config/relate',
+      ]
+    },
+  ],
+  stageApi: [
+    {
+      text: '画布(@tmagic/stage)',
+      children: [
+        '/api/stage/core',
+        '/api/stage/mask',
+        '/api/stage/render',
+        '/api/stage/drag-resize',
+      ]
+    },
+  ],
+  tutorial: [
+    {
+      text: '教程',
+      children: [
+        '/tutorial/hello-world',
+        '/tutorial/runtime',
       ]
     },
   ]
@@ -150,7 +170,14 @@ export default defineUserConfig({
             text: '表单配置',
             link: '/api/form-config/layout'
           },
+          {
+            text: '画布(Stage)',
+            link: '/api/stage/core'
+          },
         ],
+      }, {
+        text: '教程',
+        link: '/tutorial/hello-world',
       }, {
         text: '查看源码',
         link: 'https://github.com/Tencent/tmagic-editor'
@@ -168,6 +195,8 @@ export default defineUserConfig({
       '/api/editor': sidebar.editorApi,
       '/api/form': sidebar.formApi,
       '/api/form-config': sidebar.formConfig,
+      '/api/stage': sidebar.stageApi,
+      '/tutorial': sidebar.tutorial,
     },
     lastUpdated: false,
     contributors: false,

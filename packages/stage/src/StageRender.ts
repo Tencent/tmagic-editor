@@ -81,10 +81,6 @@ export default class StageRender extends EventEmitter {
       }
 
       el.appendChild<HTMLIFrameElement>(this.iframe);
-
-      this.contentWindow = this.iframe?.contentWindow as RuntimeWindow;
-
-      this.contentWindow.magic = this.getMagicApi();
     } else {
       throw Error('mount 失败');
     }
@@ -113,7 +109,9 @@ export default class StageRender extends EventEmitter {
   }
 
   private loadHandler = async () => {
-    this.emit('onload');
+    this.contentWindow = this.iframe?.contentWindow as RuntimeWindow;
+
+    this.contentWindow.magic = this.getMagicApi();
 
     if (this.render) {
       const el = await this.render(this.core);
@@ -121,5 +119,7 @@ export default class StageRender extends EventEmitter {
         this.iframe?.contentDocument?.body?.appendChild(el);
       }
     }
+
+    this.emit('onload');
   };
 }

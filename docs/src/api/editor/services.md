@@ -43,7 +43,7 @@ editorService.set('node', node);
 
 - **参数：**
 
-  - `{'root' | 'page' | 'parent' | 'node'} name`
+  - `{'root' | 'page' | 'parent' | 'node' | 'stage' | 'highlightNode' | 'pageLength'} name`
 
 - **返回：**
 
@@ -60,6 +60,14 @@ editorService.set('node', node);
   'parent': 当前选中的节点的父节点
 
   'node': 当前选中的节点
+
+  'stage': [StageCore](../../api/stage/core.md)实例
+
+  'highlightNode': 当前高亮的Dom
+
+  'modifiedNodeIds': 当前已修改未保存的组件id
+
+  'pageLength': 当前的页面数量
 
 - **示例：**
 
