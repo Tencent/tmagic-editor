@@ -108,10 +108,14 @@ class Editor extends BaseService {
   /**
    * 根据id获取组件、组件的父组件以及组件所属的页面节点
    * @param {number | string} id 组件id
+   * @param {boolean} raw 是否使用toRaw
    * @returns {EditorNodeInfo}
    */
-  public getNodeInfo(id: Id): EditorNodeInfo {
-    const root = toRaw(this.get<MApp | null>('root'));
+  public getNodeInfo(id: Id, raw = true): EditorNodeInfo {
+    let root = this.get<MApp | null>('root');
+    if (raw) {
+      root = toRaw(root);
+    }
     if (!root) return {};
 
     if (id === root.id) {
@@ -141,21 +145,23 @@ class Editor extends BaseService {
   /**
    * 根据ID获取指点节点配置
    * @param id 组件ID
+   * @param {boolean} raw 是否使用toRaw
    * @returns 组件节点配置
    */
-  public getNodeById(id: Id): MNode | undefined {
-    const { node } = this.getNodeInfo(id);
+  public getNodeById(id: Id, raw = true): MNode | undefined {
+    const { node } = this.getNodeInfo(id, raw);
     return node;
   }
 
   /**
    * 根据ID获取指点节点的父节点配置
    * @param id 组件ID
+   * @param {boolean} raw 是否使用toRaw
    * @returns 指点组件的父节点配置
    */
-  public getParentById(id: Id): MContainer | undefined {
+  public getParentById(id: Id, raw = true): MContainer | undefined {
     if (!this.get<MApp | null>('root')) return;
-    const { parent } = this.getNodeInfo(id);
+    const { parent } = this.getNodeInfo(id, raw);
     return parent;
   }
 
@@ -279,7 +285,7 @@ class Editor extends BaseService {
     } else if (curNode.items) {
       parentNode = curNode;
     } else {
-      parentNode = this.getParentById(curNode.id);
+      parentNode = this.getParentById(curNode.id, false);
     }
 
     if (!parentNode) throw new Error('未找到父元素');
@@ -332,7 +338,7 @@ class Editor extends BaseService {
 
     if (!root) throw new Error('没有root');
 
-    const { parent, node: curNode } = this.getNodeInfo(node.id);
+    const { parent, node: curNode } = this.getNodeInfo(node.id, false);
 
     if (!parent || !curNode) throw new Error('找不要删除的节点');
 
@@ -384,7 +390,7 @@ class Editor extends BaseService {
   public async update(config: MNode): Promise<MNode> {
     if (!config?.id) throw new Error('没有配置或者配置缺少id值');
 
-    const info = this.getNodeInfo(config.id);
+    const info = this.getNodeInfo(config.id, false);
 
     if (!info.node) throw new Error(`获取不到id为${config.id}的节点`);
 
