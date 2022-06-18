@@ -111,7 +111,7 @@ export default class StageDragResize extends EventEmitter {
    */
   public updateMoveable(el = this.target): void {
     if (!this.moveable) throw new Error('未初始化moveable');
-    if (!el) throw new Error('为选中任何节点');
+    if (!el) throw new Error('未选中任何节点');
 
     this.target = el;
 
@@ -207,7 +207,7 @@ export default class StageDragResize extends EventEmitter {
   }
 
   private bindResizeEvent(): void {
-    if (!this.moveable) throw new Error('moveable 为初始化');
+    if (!this.moveable) throw new Error('moveable 未初始化');
 
     const frame = {
       left: 0,
@@ -251,7 +251,7 @@ export default class StageDragResize extends EventEmitter {
   }
 
   private bindDragEvent(): void {
-    if (!this.moveable) throw new Error('moveable 为初始化');
+    if (!this.moveable) throw new Error('moveable 未初始化');
 
     const frame = {
       left: 0,
@@ -307,7 +307,7 @@ export default class StageDragResize extends EventEmitter {
   }
 
   private bindRotateEvent(): void {
-    if (!this.moveable) throw new Error('moveable 为初始化');
+    if (!this.moveable) throw new Error('moveable 未初始化');
 
     this.moveable
       .on('rotateStart', (e) => {
@@ -334,7 +334,7 @@ export default class StageDragResize extends EventEmitter {
   }
 
   private bindScaleEvent(): void {
-    if (!this.moveable) throw new Error('moveable 为初始化');
+    if (!this.moveable) throw new Error('moveable 未初始化');
 
     this.moveable
       .on('scaleStart', (e) => {
