@@ -1,6 +1,6 @@
 {
   "name": "tmagic-playground",
-  "version": "1.0.0-rc.10",
+  "version": "1.0.0-rc.11",
   "private": true,
   "scripts": {
     "clean:top": "rimraf dist",
@@ -12,11 +12,11 @@
   },
   "dependencies": {
     "@element-plus/icons": "0.0.11",
-    "@tmagic/editor": "1.0.0-rc.10",
-    "@tmagic/form": "1.0.0-rc.10",
-    "@tmagic/schema": "1.0.0-rc.10",
-    "@tmagic/stage": "1.0.0-rc.10",
-    "@tmagic/utils": "1.0.0-rc.10",
+    "@tmagic/editor": "1.0.0-rc.11",
+    "@tmagic/form": "1.0.0-rc.11",
+    "@tmagic/schema": "1.0.0-rc.11",
+    "@tmagic/stage": "1.0.0-rc.11",
+    "@tmagic/utils": "1.0.0-rc.11",
     "element-plus": "^2.2.0",
     "monaco-editor": "^0.32.1",
     "serialize-javascript": "^6.0.0",

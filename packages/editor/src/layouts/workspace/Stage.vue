@@ -123,7 +123,7 @@ export default defineComponent({
       stage?.on('runtime-ready', (rt) => {
         runtime = rt;
         // toRaw返回的值是一个引用而非快照，需要cloneDeep
-        root.value && runtime?.updateRootConfig(cloneDeep(toRaw(root.value)));
+        root.value && runtime?.updateRootConfig?.(cloneDeep(toRaw(root.value)));
         page.value?.id && runtime?.updatePageId?.(page.value.id);
         setTimeout(() => {
           node.value && stage?.select(toRaw(node.value.id));
@@ -138,7 +138,7 @@ export default defineComponent({
 
     watch(root, (root) => {
       if (runtime && root) {
-        runtime.updateRootConfig(cloneDeep(toRaw(root)));
+        runtime.updateRootConfig?.(cloneDeep(toRaw(root)));
       }
     });
 

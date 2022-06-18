@@ -248,6 +248,7 @@ export const getDefaultPropsValue = (type: string, id: string) =>
     ? {
         type,
         id,
+        layout: 'absolute',
         style: {},
         name: type,
         items: [],

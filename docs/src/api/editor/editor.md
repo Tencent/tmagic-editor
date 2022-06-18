@@ -2,7 +2,7 @@
 
 ## props
 
-### data
+### modelValue
 
 - **类型：** [MApp](https://github.com/Tencent/tmagic-editor/blob/master/packages/schema/src/index.ts)[]
   
@@ -185,7 +185,7 @@ import { ArrowLeft, Coin } from '@element-plus/icons';
   
 - **详情：**
   
-  中间工作区域中画布渲染的内容
+  中间工作区域中画布渲染的内容，通常是通过解析[modelValue](#modelValue)来渲染出DOM，return的DOM结构需要有一个根节点。
 
 - **示例：**
 
@@ -201,7 +201,7 @@ import { ArrowLeft, Coin } from '@element-plus/icons';
   
 - **详情：**
   
-  中间工作区域中画布通过iframe渲染时的页面url
+  runtime 的HTML地址，可以是一个HTTP地址，如果和编辑器不同域，需要设置跨域，也可以是一个相对或绝对路径
 
 ### propsConfigs
 
@@ -280,6 +280,27 @@ import { ArrowLeft, Coin } from '@element-plus/icons';
 - **详情：**
   
   画布的大小配置
+
+### autoScrollIntoView
+
+- **类型：** boolean
+  
+- **默认值：** undefined
+  
+- **详情：**
+  
+选中组件时，知否自动滚动改组件到可视区域
+
+### updateDragEl
+
+- **类型：** (el: HTMLDivElement, target: HTMLElement) => void;
+  
+- **默认值：** undefined
+  
+- **详情：**
+  
+当选中框与组件不贴合时，可以通过此方法进行调整
+
 
 ## slots
 
