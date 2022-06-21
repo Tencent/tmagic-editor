@@ -4,7 +4,7 @@
 
 使用[@vue/cli](https://cli.vuejs.org/zh/guide/installation.html)初始化项目
 
-```
+```bash
 npm install -g @vue/cli
 ```
 
@@ -24,7 +24,7 @@ npm install -g @vue/cli
 
 [关于@vue/cli的详细教程可以查看官方文档](https://cli.vuejs.org/zh/guide/installation.html)
 
-```
+```bash
 vue create hello-world
 
 cd hello-world
@@ -50,7 +50,7 @@ cd hello-world
 
 ## 添加依赖
 
-```
+```bash
 npm install --save @tmagic/editor @tmagic/form element-plus
 ```
 
@@ -119,7 +119,7 @@ body {
 
 ## 运行项目
 
-```
+```bash
 npm run serve
 ```
 
