@@ -10,6 +10,8 @@ TMagic 可视化搭建平台。
 
 目前文档仍在逐步完善中，如有疑问欢迎给我们提 issue。
 
+[教程](https://tencent.github.io/tmagic-editor/docs/tutorial/hello-world.html)
+
 # Playground 体验
 
 https://tencent.github.io/tmagic-editor/playground/index.html
