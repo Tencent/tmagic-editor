@@ -143,7 +143,7 @@ devServer: {
 
 这是因为在runtime中无法直接获取到editor中的dsl，所以需要通过editor注入到window的magic api来交互
 
-在App.vue中通过监听message，来准备知道magic注入时机，然后调用magic.onRuntimeReady，示例代码如下
+在App.vue中通过监听message，来准备获取magic注入时机，然后调用magic.onRuntimeReady，示例代码如下
 
 ```ts
 const root = ref();
@@ -201,3 +201,5 @@ watch(page, async () => {
 以上就是一个简单runtime实现，以及与编辑的交互，这是一个不完善的实现，但是其中已经几乎覆盖所有需要关心的内容
 
 当前教程中实现了一个简单的page，tmagic提供了一个比较完善的实现，将在下一节介绍
+
+[源码](https://github.com/jia000/tmagic-tutorial/tree/master/course2)

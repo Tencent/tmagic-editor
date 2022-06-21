@@ -22,7 +22,7 @@ tmagic-editor支持业务方进行自定义组件开发。在tmagic-editor中，
 @tmagic/ui 中的 button/text 就是基础的组件示例。我们要求声明 index 入口，因为我们希望在后续的配套打包工具实现上，可以有一个统一规范入口。
 
 ### 1. 创建组件
-在项目中，如 runtime vue3 目录中，创建一个名为 test-comopnent 的组件目录，其中包含上面四个规范文件。
+在项目中，如 runtime vue3 目录中，创建一个名为 test-component 的组件目录，其中包含上面四个规范文件。
 ```javascript
 // index.js
 // vue
