@@ -230,11 +230,11 @@ export default class StageCore extends EventEmitter {
    * 挂载Dom节点
    * @param el 将stage挂载到该Dom节点上
    */
-  public mount(el: HTMLDivElement): void {
+  public async mount(el: HTMLDivElement) {
     this.container = el;
     const { mask, renderer } = this;
 
-    renderer.mount(el);
+    await renderer.mount(el);
     mask.mount(el);
 
     this.emit('mounted');
