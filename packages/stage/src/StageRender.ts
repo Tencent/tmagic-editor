@@ -121,5 +121,12 @@ export default class StageRender extends EventEmitter {
     }
 
     this.emit('onload');
+
+    this.contentWindow.postMessage(
+      {
+        tmagicRuntimeReady: true,
+      },
+      '*',
+    );
   };
 }
