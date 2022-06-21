@@ -130,9 +130,6 @@ export default defineComponent({
     /** 画布中组件选中框的移动范围 */
     moveableOptions: {
       type: [Object, Function] as PropType<MoveableOptions | ((core?: StageCore) => MoveableOptions)>,
-      default: () => (core?: StageCore) => ({
-        container: core?.renderer?.contentWindow?.document.getElementById('app'),
-      }),
     },
 
     /** 编辑器初始化时默认选中的组件ID */
