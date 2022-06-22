@@ -26,7 +26,9 @@ import type { GetColumnWidth, SetColumnWidth, StageRect, UiState } from '@editor
 import BaseService from './BaseService';
 
 const DEFAULT_LEFT_COLUMN_WIDTH = 310;
+const MIN_LEFT_COLUMN_WIDTH = 45;
 const DEFAULT_RIGHT_COLUMN_WIDTH = 480;
+const MIN_RIGHT_COLUMN_WIDTH = 1;
 
 const COLUMN_WIDTH_STORAGE_KEY = '$MagicEditorColumnWidthData';
 
@@ -117,11 +119,11 @@ class Ui extends BaseService {
     };
 
     if (left) {
-      columnWidth.left = left;
+      columnWidth.left = Math.max(left, MIN_LEFT_COLUMN_WIDTH);
     }
 
     if (right) {
-      columnWidth.right = right;
+      columnWidth.right = Math.max(right, MIN_RIGHT_COLUMN_WIDTH);
     }
 
     if (!center || center === 'auto') {
