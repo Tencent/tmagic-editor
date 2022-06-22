@@ -204,3 +204,18 @@ export const Fixed2Other = async (
 
   return toRelative(node);
 };
+
+export const getGuideLineFromCache = (key: string): number[] => {
+  if (!key) return [];
+
+  const guideLineCacheData = globalThis.localStorage.getItem(key);
+  if (guideLineCacheData) {
+    try {
+      return JSON.parse(guideLineCacheData) || [];
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  return [];
+};

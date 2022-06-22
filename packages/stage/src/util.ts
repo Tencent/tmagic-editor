@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { GuidesType, H_GUIDE_LINE_STORAGE_KEY, Mode, SELECTED_CLASS, V_GUIDE_LINE_STORAGE_KEY } from './const';
+import { Mode, SELECTED_CLASS } from './const';
 import type { Offset } from './types';
 
 const getParents = (el: Element, relative: Element) => {
@@ -148,24 +148,4 @@ export const addSelectedClassName = (el: Element, doc: Document) => {
   getParents(el, doc.body).forEach((item) => {
     item.classList.add(`${SELECTED_CLASS}-parents`);
   });
-};
-
-export const getGuideLineFromCache = (type: GuidesType): number[] => {
-  const key = {
-    [GuidesType.HORIZONTAL]: H_GUIDE_LINE_STORAGE_KEY,
-    [GuidesType.VERTICAL]: V_GUIDE_LINE_STORAGE_KEY,
-  }[type];
-
-  if (!key) return [];
-
-  const guideLineCacheData = globalThis.localStorage.getItem(key);
-  if (guideLineCacheData) {
-    try {
-      return JSON.parse(guideLineCacheData) || [];
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  return [];
 };

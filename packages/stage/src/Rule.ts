@@ -2,14 +2,13 @@ import EventEmitter from 'events';
 
 import Guides, { GuidesEvents } from '@scena/guides';
 
-import { GuidesType, H_GUIDE_LINE_STORAGE_KEY, V_GUIDE_LINE_STORAGE_KEY } from './const';
-import { getGuideLineFromCache } from './util';
+import { GuidesType } from './const';
 
 export default class Rule extends EventEmitter {
   public hGuides: Guides;
   public vGuides: Guides;
-  public horizontalGuidelines: number[] = getGuideLineFromCache(GuidesType.HORIZONTAL);
-  public verticalGuidelines: number[] = getGuideLineFromCache(GuidesType.VERTICAL);
+  public horizontalGuidelines: number[] = [];
+  public verticalGuidelines: number[] = [];
 
   private container: HTMLDivElement;
   private containerResizeObserver: ResizeObserver;
@@ -28,6 +27,7 @@ export default class Rule extends EventEmitter {
       this.vGuides.resize();
       this.hGuides.resize();
     });
+
     this.containerResizeObserver.observe(this.container);
   }
 
@@ -45,33 +45,34 @@ export default class Rule extends EventEmitter {
     });
   }
 
-  /**
-   * 清空所有参考线
-   */
-  public clearGuides() {
-    this.horizontalGuidelines = [];
-    this.verticalGuidelines = [];
-
-    this.vGuides.setState({
-      defaultGuides: [],
-    });
+  public setGuides([hLines, vLines]: [number[], number[]]) {
+    this.horizontalGuidelines = hLines;
+    this.verticalGuidelines = vLines;
 
     this.hGuides.setState({
-      defaultGuides: [],
+      defaultGuides: hLines,
     });
 
-    this.emit('changeGuides', {
-      type: GuidesType.VERTICAL,
-      guides: [],
+    this.vGuides.setState({
+      defaultGuides: vLines,
     });
 
     this.emit('changeGuides', {
       type: GuidesType.HORIZONTAL,
-      guides: [],
+      guides: hLines,
     });
 
-    globalThis.localStorage.setItem(V_GUIDE_LINE_STORAGE_KEY, '[]');
-    globalThis.localStorage.setItem(H_GUIDE_LINE_STORAGE_KEY, '[]');
+    this.emit('changeGuides', {
+      type: GuidesType.VERTICAL,
+      guides: vLines,
+    });
+  }
+
+  /**
+   * 清空所有参考线
+   */
+  public clearGuides() {
+    this.setGuides([[], []]);
   }
 
   /**
@@ -101,7 +102,7 @@ export default class Rule extends EventEmitter {
     }
   }
 
-  scrollRule(scrollTop: number) {
+  public scrollRule(scrollTop: number) {
     this.hGuides.scrollGuides(scrollTop);
     this.hGuides.scroll(0);
 
@@ -142,8 +143,6 @@ export default class Rule extends EventEmitter {
       type: GuidesType.HORIZONTAL,
       guides: this.horizontalGuidelines,
     });
-
-    globalThis.localStorage.setItem(H_GUIDE_LINE_STORAGE_KEY, JSON.stringify(e.guides));
   };
 
   private vGuidesChangeGuidesHandler = (e: GuidesEvents['changeGuides']) => {
@@ -152,7 +151,5 @@ export default class Rule extends EventEmitter {
       type: GuidesType.VERTICAL,
       guides: this.verticalGuidelines,
     });
-
-    globalThis.localStorage.setItem(V_GUIDE_LINE_STORAGE_KEY, JSON.stringify(e.guides));
   };
 }
