@@ -73,31 +73,19 @@ export const isSameDomain = (targetUrl = '', source = globalThis.location.host) 
   return getHost(targetUrl) === source;
 };
 
-export const isAbsolute = (el?: HTMLElement): boolean => {
-  if (!el) return false;
-  return getComputedStyle(el).position === 'absolute';
-};
+export const isAbsolute = (style: CSSStyleDeclaration): boolean => style.position === 'absolute';
 
-export const isRelative = (el?: HTMLElement): boolean => {
-  if (!el) return false;
-  return getComputedStyle(el).position === 'relative';
-};
+export const isRelative = (style: CSSStyleDeclaration): boolean => style.position === 'relative';
 
-export const isStatic = (el?: HTMLElement): boolean => {
-  if (!el) return false;
-  return getComputedStyle(el).position === 'static';
-};
+export const isStatic = (style: CSSStyleDeclaration): boolean => style.position === 'static';
 
-export const isFixed = (el?: HTMLElement): boolean => {
-  if (!el) return false;
-  return getComputedStyle(el).position === 'fixed';
-};
+export const isFixed = (style: CSSStyleDeclaration): boolean => style.position === 'fixed';
 
 export const isFixedParent = (el: HTMLElement) => {
   let fixed = false;
   let dom = el;
   while (dom) {
-    fixed = isFixed(dom);
+    fixed = isFixed(getComputedStyle(dom));
     if (fixed) {
       break;
     }
@@ -112,22 +100,22 @@ export const isFixedParent = (el: HTMLElement) => {
 
 export const getMode = (el: HTMLElement): Mode => {
   if (isFixedParent(el)) return Mode.FIXED;
-  if (isStatic(el) || isRelative(el)) return Mode.SORTABLE;
+  const style = getComputedStyle(el);
+  if (isStatic(style) || isRelative(style)) return Mode.SORTABLE;
   return Mode.ABSOLUTE;
 };
 
 export const getScrollParent = (element: HTMLElement, includeHidden = false): HTMLElement | null => {
   let style = getComputedStyle(element);
-  const excludeStaticParent = style.position === 'absolute';
   const overflowRegex = includeHidden ? /(auto|scroll|hidden)/ : /(auto|scroll)/;
 
-  if (style.position === 'fixed') return null;
+  if (isFixed(style)) return null;
 
   for (let parent = element; parent.parentElement; ) {
     parent = parent.parentElement;
     style = getComputedStyle(parent);
 
-    if (excludeStaticParent && style.position === 'static') continue;
+    if (isAbsolute(style) && isStatic(style)) continue;
 
     if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) return parent;
   }
