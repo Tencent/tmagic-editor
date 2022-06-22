@@ -263,3 +263,6 @@ export enum Layout {
 export enum Keys {
   ESCAPE = 'Space',
 }
+
+export const H_GUIDE_LINE_STORAGE_KEY = '$MagicStageHorizontalGuidelinesData';
+export const V_GUIDE_LINE_STORAGE_KEY = '$MagicStageVerticalGuidelinesData';

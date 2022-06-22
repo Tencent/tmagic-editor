@@ -36,11 +36,18 @@ import {
 import { cloneDeep } from 'lodash-es';
 
 import type { MApp, MNode, MPage } from '@tmagic/schema';
-import type { Runtime, SortEventData, UpdateEventData } from '@tmagic/stage';
-import StageCore from '@tmagic/stage';
+import StageCore, { GuidesType, Runtime, SortEventData, UpdateEventData } from '@tmagic/stage';
 
 import ScrollViewer from '@editor/components/ScrollViewer.vue';
-import { Layout, Services, StageOptions, StageRect } from '@editor/type';
+import {
+  H_GUIDE_LINE_STORAGE_KEY,
+  Layout,
+  Services,
+  StageOptions,
+  StageRect,
+  V_GUIDE_LINE_STORAGE_KEY,
+} from '@editor/type';
+import { getGuideLineFromCache } from '@editor/utils';
 
 import ViewerMenu from './ViewerMenu.vue';
 
@@ -69,6 +76,8 @@ export default defineComponent({
 
     let stage: StageCore | null = null;
     let runtime: Runtime | null = null;
+
+    const getGuideLineKey = (key: string) => `${key}_${root.value?.id}_${page.value?.id}`;
 
     watchEffect(() => {
       if (stage) return;
@@ -99,6 +108,11 @@ export default defineComponent({
 
       stage?.mount(stageContainer.value);
 
+      stage.mask.setGuides([
+        getGuideLineFromCache(getGuideLineKey(H_GUIDE_LINE_STORAGE_KEY)),
+        getGuideLineFromCache(getGuideLineKey(V_GUIDE_LINE_STORAGE_KEY)),
+      ]);
+
       stage?.on('select', (el: HTMLElement) => {
         services?.editorService.select(el.id);
       });
@@ -115,8 +129,19 @@ export default defineComponent({
         services?.editorService.sort(ev.src, ev.dist);
       });
 
-      stage?.on('changeGuides', () => {
+      stage?.on('changeGuides', (e) => {
         services?.uiService.set('showGuides', true);
+
+        if (!root.value || !page.value) return;
+
+        const storageKey = getGuideLineKey(
+          e.type === GuidesType.HORIZONTAL ? H_GUIDE_LINE_STORAGE_KEY : V_GUIDE_LINE_STORAGE_KEY,
+        );
+        if (e.guides.length) {
+          globalThis.localStorage.setItem(storageKey, JSON.stringify(e.guides));
+        } else {
+          globalThis.localStorage.removeItem(storageKey);
+        }
       });
 
       if (!node.value?.id) return;
