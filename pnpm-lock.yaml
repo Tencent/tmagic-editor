@@ -255,7 +255,7 @@ importers:
       '@types/node': ^15.12.4
       events: ^3.3.0
       lodash-es: ^4.17.21
-      moveable: ^0.29.4
+      moveable: ^0.30.0
       moveable-helper: ^0.4.0
       sass: ^1.35.1
       typescript: ^4.3.4
@@ -268,7 +268,7 @@ importers:
       '@tmagic/utils': link:../utils
       events: 3.3.0
       lodash-es: 4.17.21
-      moveable: 0.29.8
+      moveable: 0.30.0
       moveable-helper: 0.4.0
     devDependencies:
       '@types/events': 3.0.0
@@ -1267,6 +1267,10 @@ packages:
     resolution: {integrity: sha512-9MjMoOLl1U+l8lXByN3BbLZXf+mktoLyeb6t78Jz2WZ7LRldK0FNg8oW//9giO2hHCUyxS7LX6jS1hToGIfRWA==}
     dev: false
 
+  /@daybrush/utils/1.7.1:
+    resolution: {integrity: sha512-ruVDIfXeVAF4s0RxJoNx5hTjxlIRMnKoJ7N5e2m9eDyluIXB12EvhMPQdoq4a/ohJ+cPgj2MiWS5Lvmpsrx8Gg==}
+    dev: false
+
   /@egjs/agent/2.4.2:
     resolution: {integrity: sha512-UZQzdpPl0g0M1wDAiq4EY2vUzUI6P5SKGOAPkf0yxSnlcwrU8/zuoyUWbYj11ROFeHV8iW0IetGsmia83z1Hbw==}
     dev: false
@@ -1437,7 +1441,7 @@ packages:
   /@scena/matrix/1.1.1:
     resolution: {integrity: sha512-JVKBhN0tm2Srl+Yt+Ywqu0oLgLcdemDQlD1OxmN9jaCTwaFPZ7tY8n6dhVgMEaR9qcR7r+kAlMXnSfNyYdE+Vg==}
     dependencies:
-      '@daybrush/utils': 1.6.0
+      '@daybrush/utils': 1.7.1
     dev: false
 
   /@scena/react-guides/0.16.0:
@@ -3593,7 +3597,7 @@ packages:
   /css-to-mat/1.0.3:
     resolution: {integrity: sha512-HADRhVqPc8wFqEp6ClK+uuPYg+FMBinNo2ReLyI/KQCncmHPJ60o5zldyJG7NjsTqXWbdfGJO51jnoxfMvWJiA==}
     dependencies:
-      '@daybrush/utils': 1.6.0
+      '@daybrush/utils': 1.7.1
       '@scena/matrix': 1.1.1
     dev: false
 
@@ -4752,6 +4756,13 @@ packages:
     resolution: {integrity: sha512-FwZ3e4C9cJ3DN1PgeOf9tFQIYzBk5RzavtT2bDzGG51Wbp6+JEGzX4A8VqbgkHVTBlJGaRLdsNKRnH0fIVFsmA==}
     dependencies:
       '@daybrush/utils': 1.6.0
+      '@scena/event-emitter': 1.0.5
+    dev: false
+
+  /gesto/1.9.0:
+    resolution: {integrity: sha512-WxzswA0zAHK+hM5WyR8G6PdIMt2d/TEY1lFfkfhC8YHHLO5pM5k8AyGu8lhwyBnrPntomWgLy3xl+iBzLHelew==}
+    dependencies:
+      '@daybrush/utils': 1.7.1
       '@scena/event-emitter': 1.0.5
     dev: false
 
@@ -5927,11 +5938,12 @@ packages:
       scenejs: 1.6.0
     dev: false
 
-  /moveable/0.29.8:
-    resolution: {integrity: sha512-FgaTZLS20JcKiXOm7XRSADCDI6jKCzEkKouBEBzIFLGeTUVhigd1NNjx/ObyBih7jDhm4zg3ULCMj3Bb0gFAIQ==}
+  /moveable/0.30.0:
+    resolution: {integrity: sha512-WkIccP2vs7oi7Vtf7c8xmduyF7Kb6+lkJwxSOp+Yx3gFFHUdVTQDO8UhJWwuIrlX5eLymk99bIRi+RPttAK2Yg==}
     dependencies:
       '@scena/event-emitter': 1.0.5
-      react-compat-moveable: 0.17.8
+      react-compat-moveable: 0.18.0
+      react-moveable: 0.33.0
       react-simple-compat: 1.2.2
     dev: false
 
@@ -6116,7 +6128,7 @@ packages:
   /overlap-area/1.0.0:
     resolution: {integrity: sha512-Oi3hxRf6Flvv1upldnjOtV7euFkc75G/wsxYfS/ssNKEZ3Z+HbIoPHkFfLH3hgwqLJKpq9wdFo7I6xcdS6k8yg==}
     dependencies:
-      '@daybrush/utils': 1.6.0
+      '@daybrush/utils': 1.7.1
     dev: false
 
   /p-limit/1.3.0:
@@ -6434,21 +6446,21 @@ packages:
       react-simple-compat: 1.2.2
     dev: false
 
-  /react-compat-moveable/0.17.8:
-    resolution: {integrity: sha512-AJczdTosQekfdrueSChOE+YzjPl2vmtGOmRI0QWWji9GdlaryFmnXCqp3WTWvlJD8LIEA6M/v91XZKffZSa0kw==}
+  /react-compat-moveable/0.18.0:
+    resolution: {integrity: sha512-ACEFE/GKtyqzJBSQ1cosZtD6cD2uuwFBsyNF/zIeM/JvF4zGae3cUUVchOpfHBjPBnjqiHjKMAaucMXPOTDosQ==}
     dependencies:
-      '@daybrush/utils': 1.6.0
+      '@daybrush/utils': 1.7.1
       '@egjs/agent': 2.4.2
       '@egjs/children-differ': 1.0.1
       '@scena/dragscroll': 1.1.1
       '@scena/matrix': 1.1.1
       css-to-mat: 1.0.3
       framework-utils: 1.1.0
-      gesto: 1.8.1
+      gesto: 1.9.0
       overlap-area: 1.0.0
       react-compat-css-styled: 1.0.8
       react-css-styled: 1.0.3
-      react-moveable: 0.32.7
+      react-moveable: 0.33.0
     dev: false
 
   /react-compat-ruler/0.7.1:
@@ -6480,10 +6492,10 @@ packages:
     resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
     dev: true
 
-  /react-moveable/0.32.7:
-    resolution: {integrity: sha512-6fvqNU7NtKsE4pbwPbHEP/0Y486nDkvk0FgIV0fxOnuueF5fs0jRatDFGxg4fkyyYamlfqvR5Lrao2ukhzZTVg==}
+  /react-moveable/0.33.0:
+    resolution: {integrity: sha512-ro8dojnbyxHFpfpDCvYwZFF050bHoaVOKTKk3Kvc1Pz863dF7Ejrd3zjdg4ix4xNbZfNsfRKdz0BHgeZzyyzOg==}
     dependencies:
-      '@daybrush/utils': 1.6.0
+      '@daybrush/utils': 1.7.1
       '@egjs/agent': 2.4.2
       '@egjs/children-differ': 1.0.1
       '@scena/dragscroll': 1.1.1
@@ -6491,7 +6503,7 @@ packages:
       '@scena/matrix': 1.1.1
       css-to-mat: 1.0.3
       framework-utils: 1.1.0
-      gesto: 1.8.1
+      gesto: 1.9.0
       overlap-area: 1.0.0
       react-css-styled: 1.0.3
     dev: false
