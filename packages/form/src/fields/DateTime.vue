@@ -1,17 +1,16 @@
 <template>
-  <div v-if="model">
-    <el-date-picker
-      v-model="model[name]"
-      popper-class="magic-datetime-picker-popper"
-      type="datetime"
-      :size="size"
-      :placeholder="config.placeholder"
-      :disabled="disabled"
-      :format="config.format || 'YYYY-MM-DD HH:mm:ss'"
-      :value-format="config.valueFormat || 'YYYY-MM-DD HH:mm:ss'"
-      @change="changeHandler"
-    ></el-date-picker>
-  </div>
+  <el-date-picker
+    v-model="model[name]"
+    popper-class="magic-datetime-picker-popper"
+    type="datetime"
+    :size="size"
+    :placeholder="config.placeholder"
+    :disabled="disabled"
+    :format="config.format || 'YYYY-MM-DD HH:mm:ss'"
+    :value-format="config.valueFormat || 'YYYY-MM-DD HH:mm:ss'"
+    :default-time="config.defaultTime || [new Date(2000, 1, 1, 23, 59, 59)]"
+    @change="changeHandler"
+  ></el-date-picker>
 </template>
 
 <script lang="ts">

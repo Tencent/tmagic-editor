@@ -1,17 +1,16 @@
 <template>
-  <div>
-    <el-date-picker
-      v-model="value"
-      type="datetimerange"
-      range-separator="-"
-      start-placeholder="开始日期"
-      end-placeholder="结束日期"
-      :size="size"
-      :unlink-panels="true"
-      :disabled="disabled"
-      @change="changeHandler"
-    ></el-date-picker>
-  </div>
+  <el-date-picker
+    v-model="value"
+    type="datetimerange"
+    range-separator="-"
+    start-placeholder="开始日期"
+    end-placeholder="结束日期"
+    :size="size"
+    :unlink-panels="true"
+    :disabled="disabled"
+    :default-time="config.defaultTime || [new Date(2000, 1, 1, 23, 59, 59)]"
+    @change="changeHandler"
+  ></el-date-picker>
 </template>
 
 <script lang="ts">

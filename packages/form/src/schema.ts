@@ -237,6 +237,7 @@ interface CascaderOption {
  */
 export interface DaterangeConfig extends FormItem {
   type: 'daterange';
+  defaultTime?: Date[];
   names?: string[];
 }
 
@@ -317,6 +318,7 @@ export interface DateConfig extends FormItem, Input {
  */
 export interface DateTimeConfig extends FormItem, Input {
   type: 'datetime';
+  defaultTime?: Date[];
   format?: 'YYYY-MM-dd HH:mm:ss' | string;
   valueFormat?: 'YYYY-MM-dd HH:mm:ss' | string;
 }
