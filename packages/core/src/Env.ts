@@ -21,7 +21,7 @@ class Env {
   isIphone = false;
   isIpad = false;
   isAndroid = false;
-  isAnroidPad = false;
+  isAndroidPad = false;
   isMac = false;
   isWin = false;
   isMqq = false;
@@ -37,7 +37,7 @@ class Env {
 
     this.isAndroid = ua.indexOf('Android') >= 0;
 
-    this.isAnroidPad = this.isAndroid && ua.indexOf('Mobile') < 0;
+    this.isAndroidPad = this.isAndroid && ua.indexOf('Mobile') < 0;
 
     this.isMac = ua.indexOf('Macintosh') >= 0;
 
