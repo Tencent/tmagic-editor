@@ -10,8 +10,8 @@
       </slot>
     </template>
 
-    <template #workspace :editorService="editorService">
-      <slot name="workspace">
+    <template #workspace>
+      <slot name="workspace" :editorService="editorService">
         <workspace>
           <template #workspace-content><slot name="workspace-content" :editorService="editorService"></slot></template>
           <template #page-bar-title="{ page }"><slot name="page-bar-title" :page="page"></slot></template>
