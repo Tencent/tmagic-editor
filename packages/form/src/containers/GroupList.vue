@@ -80,6 +80,8 @@ export default defineComponent({
         return props.config.addable(mForm, {
           model: props.model[props.name],
           formValue: mForm?.values,
+          prop: props.prop,
+          config: props.config,
         });
       }
 
@@ -101,6 +103,8 @@ export default defineComponent({
         initValues = await props.config.defaultAdd(mForm, {
           model: props.model[props.name],
           formValue: mForm?.values,
+          prop: props.prop,
+          config: props.config,
         });
       } else if (props.config.defaultAdd) {
         initValues = props.config.defaultAdd;
