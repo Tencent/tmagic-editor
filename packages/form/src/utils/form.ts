@@ -71,7 +71,7 @@ const initItemsValue = (
   { items, name, extensible }: any,
 ) => {
   if (Array.isArray(initValue[name])) {
-    value[name] = initValue[name].map((v: any) => init(mForm, items, v));
+    value[name] = initValue[name].map((v: any, index: number) => init(mForm, items, v, value[name]?.[index]));
   } else {
     value[name] = init(mForm, items, initValue[name], value[name]);
     if (extensible) {
