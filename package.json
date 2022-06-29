@@ -1,5 +1,5 @@
 {
-  "version": "1.0.1",
+  "version": "1.0.2",
   "name": "tmagic",
   "private": true,
   "packageManager": "pnpm@7.1.9",

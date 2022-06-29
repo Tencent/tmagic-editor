@@ -1,3 +1,13 @@
+## [1.0.2](https://github.com/Tencent/tmagic-editor/compare/v1.0.1...v1.0.2) (2022-06-29)
+
+
+### Bug Fixes
+
+* **form:** el-upload类型读取失败导致Table.vue.d.ts丢失 ([41a2cf9](https://github.com/Tencent/tmagic-editor/commit/41a2cf93cf71216e9a89d27892b08e073c7d404c))
+* **form:** 初始化values时，数组中的对象出现key丢失 ([f856b1b](https://github.com/Tencent/tmagic-editor/commit/f856b1bc06b48f2d11e57ee1d11712ee82d9ac3f))
+
+
+
 ## [1.0.1](https://github.com/Tencent/tmagic-editor/compare/v1.0.0-rc.7...v1.0.1) (2022-06-27)
 
 
