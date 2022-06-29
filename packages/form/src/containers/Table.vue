@@ -154,7 +154,7 @@
 /* eslint-disable no-param-reassign */
 import { computed, defineComponent, inject, onMounted, PropType, ref, toRefs } from 'vue';
 import { ArrowDown, ArrowUp, Delete, FullScreen, Grid } from '@element-plus/icons';
-import { ElMessage, ElTable, ElUpload } from 'element-plus';
+import { ElMessage, ElTable, UploadFile } from 'element-plus';
 import { cloneDeep } from 'lodash-es';
 import Sortable, { SortableEvent } from 'sortablejs';
 
@@ -162,23 +162,6 @@ import { asyncLoadJs, sleep } from '@tmagic/utils';
 
 import { ColumnConfig, FormState, SortProp, TableConfig } from '../schema';
 import { display, initValue } from '../utils/form';
-
-export type UploadStatus = 'ready' | 'uploading' | 'success' | 'fail';
-
-export interface ElFile extends File {
-  uid: number;
-}
-
-export type UploadFile = {
-  name: string;
-  percentage?: number;
-  status: UploadStatus;
-  size: number;
-  response?: unknown;
-  uid: number;
-  url?: string;
-  raw: ElFile;
-};
 
 let loadedAMapJS = false; // 是否加载完js
 let firstLoadingAMapJS = true; // 否是第一次请求
@@ -241,7 +224,7 @@ export default defineComponent({
     const mForm = inject<FormState | undefined>('mForm');
 
     const elTable = ref<InstanceType<typeof ElTable>>();
-    const excelBtn = ref<InstanceType<typeof ElUpload>>();
+    const excelBtn = ref<any>();
     const mTable = ref<HTMLDivElement>();
 
     const pagesize = ref(10);
