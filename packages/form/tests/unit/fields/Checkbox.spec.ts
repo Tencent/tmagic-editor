@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { describe, expect, test } from 'vitest';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
 
@@ -42,7 +43,7 @@ const getWrapper = (
   });
 
 describe('Checkbox', () => {
-  it('基础', (done) => {
+  test('基础', (done) => {
     const wrapper = getWrapper();
 
     setTimeout(async () => {

@@ -121,7 +121,7 @@ describe.skip('ToolButton', () => {
   });
 
   test('自定义display', () => {
-    const display = jest.fn();
+    const display = vi.fn();
     getWrapper({
       data: { display },
     });
@@ -137,7 +137,7 @@ describe.skip('ToolButton', () => {
 
     setTimeout(async () => {
       const dropDown = wrapper.findComponent(ElDropdown);
-      const handler = jest.fn();
+      const handler = vi.fn();
       dropDown.vm.$emit('command', {
         item: { handler },
       });

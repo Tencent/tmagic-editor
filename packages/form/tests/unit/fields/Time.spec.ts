@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import { describe, expect, test } from 'vitest';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
 
@@ -44,7 +44,7 @@ const getWrapper = (
   });
 
 describe('Time', () => {
-  it('基础', (done) => {
+  test('基础', (done) => {
     const wrapper = getWrapper();
 
     setTimeout(async () => {
@@ -55,7 +55,7 @@ describe('Time', () => {
       expect(input.exists()).toBe(true);
       await input.setValue('12:00:00');
 
-      time.vm.$emit('change', '12:00:00');
+      time.vm.$emit('change', new Date('12:00:00'));
       const value = await (wrapper.vm as any).submitForm();
       expect(value.time).toMatch('12:00:00');
       done();

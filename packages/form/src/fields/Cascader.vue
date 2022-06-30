@@ -79,8 +79,9 @@ export default defineComponent({
         if (typeof body === 'function' && props.model && mForm) {
           body = body(mForm, {
             model: props.model,
-            formValue: null,
+            formValue: mForm.values,
             formValues: mForm.values,
+            config: props.config,
           });
         }
         postOptions.data = body;

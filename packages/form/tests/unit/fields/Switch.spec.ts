@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import { describe, expect, test } from 'vitest';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
 
@@ -44,7 +44,7 @@ const getWrapper = (
   });
 
 describe('Switch', () => {
-  it('基础', (done) => {
+  test('基础', (done) => {
     const wrapper = getWrapper();
 
     setTimeout(async () => {
@@ -57,7 +57,7 @@ describe('Switch', () => {
     }, 0);
   });
 
-  it('数字默认值', (done) => {
+  test('数字默认值', (done) => {
     const wrapper = getWrapper([
       {
         type: 'switch',
@@ -77,7 +77,7 @@ describe('Switch', () => {
     }, 0);
   });
 
-  it('点击开关', (done) => {
+  test('点击开关', (done) => {
     const wrapper = getWrapper([
       {
         type: 'switch',

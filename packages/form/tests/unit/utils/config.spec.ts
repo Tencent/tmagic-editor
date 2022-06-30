@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 describe('config.ts', () => {
   let mockModule: any;
@@ -26,28 +27,28 @@ describe('config.ts', () => {
 
   // 在测试后都重置mock模块
   afterEach(() => {
-    jest.resetModules();
+    vi.resetModules();
   });
 
-  it('设置获取属性', () => {
+  test('设置获取属性', () => {
     mockModule.setConfig({ text: 'form', model: { config: { text: 'test' } } });
     expect(mockModule.getConfig('model')).toEqual({ config: { text: 'test' } });
   });
 
-  it('获取不存在的属性', () => {
+  test('获取不存在的属性', () => {
     expect(mockModule.getConfig('model')).toBeUndefined();
     mockModule.setConfig({ text: 'form', model: { config: { text: 'test' } } });
     expect(mockModule.getConfig('config')).toBeUndefined();
   });
 
-  it('修改已经存在的form', () => {
+  test('修改已经存在的form', () => {
     mockModule.setConfig({ text: 'form', model: { config: { text: 'test' } } });
     expect(mockModule.getConfig('text')).toMatch('form');
     mockModule.setConfig({ text: 'new-form', model: { config: { text: 'test' } } });
     expect(mockModule.getConfig('text')).toMatch('new-form');
   });
 
-  it('在未设置时获取Config', () => {
+  test('在未设置时获取Config', () => {
     expect(mockModule.getConfig('model')).toBeUndefined();
   });
 });
