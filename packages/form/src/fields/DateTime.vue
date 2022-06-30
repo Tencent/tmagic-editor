@@ -8,7 +8,7 @@
     :disabled="disabled"
     :format="config.format || 'YYYY-MM-DD HH:mm:ss'"
     :value-format="config.valueFormat || 'YYYY-MM-DD HH:mm:ss'"
-    :default-time="config.defaultTime || [new Date(2000, 1, 1, 23, 59, 59)]"
+    :default-time="config.defaultTime"
     @change="changeHandler"
   ></el-date-picker>
 </template>

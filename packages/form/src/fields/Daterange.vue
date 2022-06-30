@@ -8,7 +8,7 @@
     :size="size"
     :unlink-panels="true"
     :disabled="disabled"
-    :default-time="config.defaultTime || [new Date(2000, 1, 1, 23, 59, 59)]"
+    :default-time="config.defaultTime"
     @change="changeHandler"
   ></el-date-picker>
 </template>
