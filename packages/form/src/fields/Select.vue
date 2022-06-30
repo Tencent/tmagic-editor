@@ -19,33 +19,14 @@
     @change="changeHandler"
     @visible-change="visibleHandler"
   >
-    <template v-if="config.group">
-      <el-option-group v-for="(group, index) in options" :key="index" :label="group.label" :disabled="group.disabled">
-        <el-option
-          v-for="(item, index) in group.options"
-          :key="index"
-          :label="item.label"
-          :value="item.value"
-          :disabled="item.disabled"
-        >
-        </el-option>
-      </el-option-group>
-    </template>
-    <template v-else>
-      <el-option
-        v-for="option in options"
-        :label="option.text"
-        :value="option.value"
-        :key="config.valueKey ? option.value[config.valueKey] : option.value"
-        :disabled="option.disabled"
-      ></el-option>
-    </template>
+    <template v-if="config.group"><select-option-groups :options="groupOptions"></select-option-groups></template>
+    <template v-else><select-options :options="options"></select-options></template>
     <div v-loading="true" v-if="moreLoadingVisible"></div>
   </el-select>
 </template>
 
 <script lang="ts">
-import { defineComponent, inject, onBeforeMount, onMounted, PropType, ref, watch } from 'vue';
+import { defineComponent, inject, onBeforeMount, onMounted, PropType, Ref, ref, watch } from 'vue';
 import { ElSelect } from 'element-plus';
 
 import { FormState, SelectConfig, SelectGroupOption, SelectOption } from '../schema';
@@ -53,8 +34,13 @@ import { getConfig } from '../utils/config';
 import fieldProps from '../utils/fieldProps';
 import { useAddField } from '../utils/useAddField';
 
+import SelectOptionGroups from './SelectOptionGroups.vue';
+import SelectOptions from './SelectOptions.vue';
+
 export default defineComponent({
   name: 'm-fields-select',
+
+  components: { SelectOptions, SelectOptionGroups },
 
   props: {
     ...fieldProps,
@@ -344,7 +330,8 @@ export default defineComponent({
       select,
       loading,
       remote,
-      options,
+      options: options as Ref<SelectOption[]>,
+      groupOptions: options as Ref<SelectGroupOption[]>,
       moreLoadingVisible,
       popperClass: mForm?.popperClass,
 

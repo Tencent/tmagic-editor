@@ -184,7 +184,14 @@ export interface SelectGroupOption {
   label: string;
   /** 是否禁用该选项组 */
   disabled: boolean;
-  options: SelectOption[];
+  options: {
+    /** 选项的标签 */
+    label: string | SelectOptionTextFunction;
+    /** 选项的值 */
+    value: any | SelectOptionValueFunction;
+    /** 是否禁用该选项 */
+    disabled?: boolean;
+  }[];
 }
 
 type SelectOptionFunction = (

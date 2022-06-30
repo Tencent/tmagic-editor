@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import { describe, expect, test } from 'vitest';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
 
@@ -52,7 +52,7 @@ const getWrapper = (
   });
 
 describe('RadioGroup', () => {
-  it('基础', (done) => {
+  test('基础', (done) => {
     const wrapper = getWrapper();
 
     setTimeout(async () => {
@@ -65,7 +65,7 @@ describe('RadioGroup', () => {
     }, 0);
   });
 
-  it('默认选中', (done) => {
+  test('默认选中', (done) => {
     const wrapper = getWrapper(
       [
         {

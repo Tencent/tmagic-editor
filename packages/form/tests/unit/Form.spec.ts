@@ -15,14 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import { describe, expect, test } from 'vitest';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
 
 import MagicForm, { MForm } from '../../src';
 
 describe('表单', () => {
-  it('初始化', (done) => {
+  test('初始化', (done) => {
     const initValues = {};
     const config = [
       {

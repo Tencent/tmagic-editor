@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import { describe, expect, test } from 'vitest';
 import { mount } from '@vue/test-utils';
 import ElementPlus, { ElButton } from 'element-plus';
 
@@ -50,7 +50,7 @@ const getWrapper = (
   });
 
 describe('Text', () => {
-  it('基础', (done) => {
+  test('基础', (done) => {
     const wrapper = getWrapper();
 
     setTimeout(async () => {
@@ -63,7 +63,7 @@ describe('Text', () => {
     }, 0);
   });
 
-  it('append string', (done) => {
+  test('append string', (done) => {
     const wrapper = getWrapper([
       {
         text: 'text',
@@ -79,7 +79,7 @@ describe('Text', () => {
     }, 0);
   });
 
-  it('append button', (done) => {
+  test('append button', (done) => {
     // 用来标识append按钮是否有点击
     let clickFlag = false;
     const wrapper = getWrapper([
@@ -105,7 +105,7 @@ describe('Text', () => {
     }, 0);
   });
 
-  it('key ArrowUp', (done) => {
+  test('key ArrowUp', (done) => {
     const wrapper = getWrapper(
       [
         {
@@ -131,7 +131,7 @@ describe('Text', () => {
     }, 0);
   });
 
-  it('key ArrowDown', (done) => {
+  test('key ArrowDown', (done) => {
     const wrapper = getWrapper(
       [
         {
@@ -157,7 +157,7 @@ describe('Text', () => {
     }, 0);
   });
 
-  it('key ctrlKey ArrowUp', (done) => {
+  test('key ctrlKey ArrowUp', (done) => {
     const wrapper = getWrapper(
       [
         {
@@ -184,7 +184,7 @@ describe('Text', () => {
     }, 0);
   });
 
-  it('key ctrlKey ArrowDown', (done) => {
+  test('key ctrlKey ArrowDown', (done) => {
     const wrapper = getWrapper(
       [
         {
@@ -211,7 +211,7 @@ describe('Text', () => {
     }, 0);
   });
 
-  it('key shiftKey ArrowUp', (done) => {
+  test('key shiftKey ArrowUp', (done) => {
     const wrapper = getWrapper(
       [
         {
@@ -238,7 +238,7 @@ describe('Text', () => {
     }, 0);
   });
 
-  it('key shiftKey ArrowDown', (done) => {
+  test('key shiftKey ArrowDown', (done) => {
     const wrapper = getWrapper(
       [
         {
@@ -265,7 +265,7 @@ describe('Text', () => {
     }, 0);
   });
 
-  it('key altKey ArrowUp', (done) => {
+  test('key altKey ArrowUp', (done) => {
     const wrapper = getWrapper(
       [
         {
@@ -292,7 +292,7 @@ describe('Text', () => {
     }, 0);
   });
 
-  it('key altKey ArrowDown', (done) => {
+  test('key altKey ArrowDown', (done) => {
     const wrapper = getWrapper(
       [
         {

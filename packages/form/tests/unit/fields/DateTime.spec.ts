@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import { describe, expect, test } from 'vitest';
 import { mount } from '@vue/test-utils';
 import ElementPlus, { ElInput } from 'element-plus';
 
@@ -44,7 +44,7 @@ const getWrapper = (
   });
 
 describe('DateTime', () => {
-  it('基础', (done) => {
+  test('基础', (done) => {
     const wrapper = getWrapper();
 
     setTimeout(async () => {
@@ -57,7 +57,7 @@ describe('DateTime', () => {
     }, 0);
   });
 
-  it('错误类型初始化初始化', (done) => {
+  test('错误类型初始化初始化', (done) => {
     const wrapper = getWrapper(
       [
         {
@@ -79,7 +79,7 @@ describe('DateTime', () => {
     }, 0);
   });
 
-  it('无效值初始化', (done) => {
+  test('无效值初始化', (done) => {
     const wrapper = getWrapper(
       [
         {
@@ -100,7 +100,7 @@ describe('DateTime', () => {
       done();
     }, 0);
   });
-  it('输入日期', (done) => {
+  test('输入日期', (done) => {
     const wrapper = getWrapper();
 
     setTimeout(async () => {
@@ -113,7 +113,7 @@ describe('DateTime', () => {
     });
   });
 
-  it('清空', (done) => {
+  test('清空', (done) => {
     const wrapper = getWrapper();
 
     setTimeout(async () => {

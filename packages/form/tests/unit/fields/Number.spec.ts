@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import { describe, expect, test } from 'vitest';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
 
@@ -44,7 +44,7 @@ const getWrapper = (
   });
 
 describe('Number', () => {
-  it('基础功能', (done) => {
+  test('基础功能', (done) => {
     const wrapper = getWrapper();
     setTimeout(async () => {
       const num = wrapper.findComponent(MNumber);
@@ -55,7 +55,7 @@ describe('Number', () => {
     }, 0);
   });
 
-  it('默认值', (done) => {
+  test('默认值', (done) => {
     const wrapper = getWrapper([
       {
         text: 'number',
@@ -72,7 +72,7 @@ describe('Number', () => {
     }, 0);
   });
 
-  it('增加减少', (done) => {
+  test('增加减少', (done) => {
     const wrapper = getWrapper([
       {
         text: 'number',
@@ -103,7 +103,7 @@ describe('Number', () => {
     });
   });
 
-  it('最大最小值', (done) => {
+  test('最大最小值', (done) => {
     const wrapper = getWrapper([
       {
         text: 'number',

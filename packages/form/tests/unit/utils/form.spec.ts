@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+import { describe, expect, test } from 'vitest';
+
 import { FormState } from '@tmagic/form';
 
 import { display, filterFunction, getRules, initValue } from '../../../src/utils/form';
@@ -33,24 +35,24 @@ const mForm: FormState = {
 };
 
 describe('filterFunction', () => {
-  it('config 不为函数', () => {
+  test('config 不为函数', () => {
     expect(filterFunction(mForm, 1, {})).toBe(1);
   });
 
-  it('config 为函数', () => {
+  test('config 为函数', () => {
     expect(filterFunction(mForm, () => 2, {})).toBe(2);
   });
 });
 
 describe('display', () => {
-  it('config 不为函数', () => {
+  test('config 不为函数', () => {
     expect(display(mForm, false, {})).toBe(false);
     expect(display(mForm, undefined, {})).toBe(true);
     expect(display(mForm, 0, {})).toBe(true);
     expect(display(mForm, true, {})).toBe(true);
   });
 
-  it('config 为函数', () => {
+  test('config 为函数', () => {
     expect(display(mForm, () => true, {})).toBe(true);
     expect(display(mForm, () => false, {})).toBe(false);
     expect(display(mForm, () => 1, {})).toBe(1);
@@ -58,7 +60,7 @@ describe('display', () => {
 });
 
 describe('getRules', () => {
-  it('函数功能', () => {
+  test('函数功能', () => {
     // 表单检验规则
     const rules: any = {
       validator: () => 1,
@@ -70,7 +72,7 @@ describe('getRules', () => {
 });
 
 describe('initValue', () => {
-  it('没有onInitValue', async () => {
+  test('没有onInitValue', async () => {
     const initValues = {
       a: 1,
       void: [],
@@ -167,7 +169,7 @@ describe('initValue', () => {
     expect(values.object.o).toBe('o');
   });
 
-  it('有onInitValue', async () => {
+  test('有onInitValue', async () => {
     const initValues = {
       a: 1,
     };
@@ -186,7 +188,7 @@ describe('initValue', () => {
     expect(values).toHaveLength(0);
   });
 
-  it('defaultValue', async () => {
+  test('defaultValue', async () => {
     const initValues = {
       a: 1,
     };
@@ -258,7 +260,7 @@ describe('initValue', () => {
     expect(values.d.multiple).toHaveLength(0);
   });
 
-  it('fieldset checkbox', async () => {
+  test('fieldset checkbox', async () => {
     const config = [
       {
         type: 'fieldset',
@@ -279,7 +281,7 @@ describe('initValue', () => {
     expect(values.fieldset.a).toBe('');
   });
 
-  it('table', async () => {
+  test('table', async () => {
     const config = [
       {
         type: 'table',

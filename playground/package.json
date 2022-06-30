@@ -17,7 +17,7 @@
     "@tmagic/schema": "1.0.2",
     "@tmagic/stage": "1.0.2",
     "@tmagic/utils": "1.0.2",
-    "element-plus": "^2.2.0",
+    "element-plus": "^2.2.6",
     "monaco-editor": "^0.32.1",
     "serialize-javascript": "^6.0.0",
     "vue": "^3.2.0",
@@ -33,6 +33,6 @@
     "sass": "^1.35.1",
     "typescript": "^4.3.4",
     "vite": "^2.3.7",
-    "vue-tsc": "^0.0.24"
+    "vue-tsc": "^0.38.2"
   }
 }

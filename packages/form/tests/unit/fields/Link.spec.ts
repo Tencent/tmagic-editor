@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import { describe, expect, test } from 'vitest';
 import { mount } from '@vue/test-utils';
 import ElementPlus, { ElButton } from 'element-plus';
 
@@ -46,7 +46,7 @@ const getWrapper = (
   });
 
 describe('Link', () => {
-  it('基础', (done) => {
+  test('基础', (done) => {
     const wrapper = getWrapper();
 
     setTimeout(() => {
@@ -63,7 +63,7 @@ describe('Link', () => {
     }, 0);
   });
 
-  it('默认文字', (done) => {
+  test('默认文字', (done) => {
     const wrapper = getWrapper(
       [
         {
@@ -92,7 +92,7 @@ describe('Link', () => {
     }, 0);
   });
 
-  it('displayText为函数', (done) => {
+  test('displayText为函数', (done) => {
     const wrapper = getWrapper([
       {
         type: 'link',
@@ -130,7 +130,7 @@ describe('Link', () => {
     }, 0);
   });
 
-  it('不可编辑', (done) => {
+  test('不可编辑', (done) => {
     const wrapper = getWrapper(
       [
         {
@@ -155,7 +155,7 @@ describe('Link', () => {
     }, 0);
   });
 
-  it('编辑链接', (done) => {
+  test('编辑链接', (done) => {
     const wrapper = getWrapper([
       {
         type: 'link',
