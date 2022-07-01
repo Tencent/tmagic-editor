@@ -6,7 +6,7 @@
 import { computed, defineComponent, nextTick, onMounted, provide, reactive, ref, watch } from '@vue/composition-api';
 
 import Core from '@tmagic/core';
-import { Id, MApp, MNode } from '@tmagic/schema';
+import type { Id, MApp, MNode } from '@tmagic/schema';
 import { Magic, RemoveData, UpdateData } from '@tmagic/stage';
 import { getNodePath } from '@tmagic/utils';
 

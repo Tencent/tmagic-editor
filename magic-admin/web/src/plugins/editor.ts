@@ -18,7 +18,7 @@
 
 import { ElMessage, ElMessageBox } from 'element-plus';
 
-import { MNode } from '@tmagic/schema';
+import type { MNode } from '@tmagic/schema';
 
 import actApi from '@src/api/act';
 

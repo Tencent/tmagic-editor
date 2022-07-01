@@ -18,7 +18,7 @@
 
 import React from 'react';
 
-import { MComponent } from '@tmagic/schema';
+import type { MComponent } from '@tmagic/schema';
 
 import useApp from '../useApp';
 

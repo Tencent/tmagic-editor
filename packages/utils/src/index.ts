@@ -18,7 +18,8 @@
 
 import moment from 'moment';
 
-import { MNode, NodeType } from '@tmagic/schema';
+import type { MNode } from '@tmagic/schema';
+import { NodeType } from '@tmagic/schema';
 
 export const sleep = (ms: number): Promise<void> =>
   new Promise((resolve) => {

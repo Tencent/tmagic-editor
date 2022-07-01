@@ -18,7 +18,7 @@
 
 import { EventEmitter } from 'events';
 
-import { EventItemConfig, MComponent, MContainer, MPage } from '@tmagic/schema';
+import type { EventItemConfig, MComponent, MContainer, MPage } from '@tmagic/schema';
 
 class Node extends EventEmitter {
   data: MComponent | MContainer | MPage;

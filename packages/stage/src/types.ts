@@ -19,7 +19,7 @@
 import { MoveableOptions } from 'moveable';
 
 import Core from '@tmagic/core';
-import { Id, MApp, MNode } from '@tmagic/schema';
+import type { Id, MApp, MNode } from '@tmagic/schema';
 
 import { GuidesType } from './const';
 import StageCore from './StageCore';

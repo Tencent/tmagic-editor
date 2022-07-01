@@ -12,7 +12,7 @@
 <script lang="ts">
 import { computed, defineComponent, PropType } from 'vue';
 
-import { MPage } from '@tmagic/schema';
+import type { MPage } from '@tmagic/schema';
 
 import Component from '../../Component.vue';
 import useApp from '../../useApp';

@@ -7,7 +7,7 @@
 import { defineComponent, ref } from 'vue';
 
 import Core from '@tmagic/core';
-import { MNode } from '@tmagic/schema';
+import type { MNode } from '@tmagic/schema';
 
 import useApp from '../../useApp';
 

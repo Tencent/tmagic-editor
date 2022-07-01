@@ -13,7 +13,7 @@
 <script lang="ts">
 import { computed, defineComponent, PropType } from 'vue';
 
-import { MContainer } from '@tmagic/schema';
+import type { MContainer } from '@tmagic/schema';
 
 import Component from '../../Component.vue';
 import useApp from '../../useApp';

@@ -19,7 +19,7 @@
 import React, { useContext } from 'react';
 
 import Core from '@tmagic/core';
-import { Page } from '@tmagic/schema';
+import type { Page } from '@tmagic/schema';
 import { AppContent } from '@tmagic/ui-react';
 
 import './App.css';

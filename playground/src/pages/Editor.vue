@@ -38,7 +38,8 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import serialize from 'serialize-javascript';
 
 import type { MenuBarData, MoveableOptions, TMagicEditor } from '@tmagic/editor';
-import { Id, NodeType } from '@tmagic/schema';
+import type { Id } from '@tmagic/schema';
+import { NodeType } from '@tmagic/schema';
 import StageCore from '@tmagic/stage';
 import { asyncLoadJs } from '@tmagic/utils';
 

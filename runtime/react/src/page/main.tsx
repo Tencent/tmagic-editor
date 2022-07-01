@@ -20,7 +20,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import Core from '@tmagic/core';
-import { MApp } from '@tmagic/schema';
+import type { MApp } from '@tmagic/schema';
 import { AppContent } from '@tmagic/ui-react';
 import { getUrlParam } from '@tmagic/utils';
 

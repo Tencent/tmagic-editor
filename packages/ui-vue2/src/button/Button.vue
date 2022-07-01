@@ -8,7 +8,7 @@
 <script lang="ts">
 import { computed, defineComponent, getCurrentInstance, PropType, reactive } from '@vue/composition-api';
 
-import { MComponent } from '@tmagic/schema';
+import type { MComponent } from '@tmagic/schema';
 
 import useApp from '../useApp';
 

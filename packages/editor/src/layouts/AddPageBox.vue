@@ -17,7 +17,7 @@ import { Plus } from '@element-plus/icons';
 
 import { NodeType } from '@tmagic/schema';
 
-import { Services } from '@editor/type';
+import type { Services } from '@editor/type';
 import { generatePageNameByApp } from '@editor/utils';
 
 export default defineComponent({
