@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { MApp } from '@tmagic/schema';
+import type { MApp } from '@tmagic/schema';
 
 export const getLocalConfig = (): MApp[] => {
   const configStr = localStorage.getItem('magicUiConfig');

@@ -18,7 +18,7 @@
 
 import { EventEmitter } from 'events';
 
-import { Id, MApp } from '@tmagic/schema';
+import type { Id, MApp } from '@tmagic/schema';
 
 import Env from './Env';
 import {

@@ -18,7 +18,7 @@
 
 import { reactive } from 'vue';
 
-import { Id, MPage } from '@tmagic/schema';
+import type { Id, MPage } from '@tmagic/schema';
 
 import { UndoRedo } from '@editor/utils/undo-redo';
 

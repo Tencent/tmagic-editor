@@ -19,7 +19,7 @@
 import { useContext, useEffect, useState } from 'react';
 
 import Core from '@tmagic/core';
-import { MComponent } from '@tmagic/schema';
+import type { MComponent } from '@tmagic/schema';
 
 import AppContent from './AppContent';
 

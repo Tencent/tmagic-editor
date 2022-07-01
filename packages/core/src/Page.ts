@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { Id, MComponent, MContainer, MPage } from '@tmagic/schema';
+import type { Id, MComponent, MContainer, MPage } from '@tmagic/schema';
 
 import Node from './Node';
 interface ConfigOptions {

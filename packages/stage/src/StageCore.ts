@@ -18,7 +18,7 @@
 
 import { EventEmitter } from 'events';
 
-import { Id } from '@tmagic/schema';
+import type { Id } from '@tmagic/schema';
 
 import { DEFAULT_ZOOM, GHOST_EL_ID_PREFIX } from './const';
 import StageDragResize from './StageDragResize';
