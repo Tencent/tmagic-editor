@@ -18,47 +18,76 @@
 
 import path from 'path';
 
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import reactRefresh from '@vitejs/plugin-react-refresh';
 
-// https://vitejs.dev/config/
-export default defineConfig({
-  base: '/tmagic-editor/playground/runtime/react',
-  plugins: [reactRefresh()],
+export default defineConfig(({ command, mode }) => {
+  const { WATCH_INCLUDE = '' } = loadEnv(mode, process.cwd(), '');
+  const libInput = {
+    config: './src/config-entry.ts',
+    value: './src/value-entry.ts',
+    event: './src/event-entry.ts',
+  };
 
-  resolve: {
-    alias: [
-      { find: /^react$/, replacement: path.join(__dirname, 'node_modules/react/index.js') },
-      { find: /^react-dom$/, replacement: path.join(__dirname, 'node_modules/react-dom/index.js') },
-      { find: /^@tmagic\/ui-react/, replacement: path.join(__dirname, '../../packages/ui-react/src/index.ts') },
-      { find: /^@tmagic\/utils/, replacement: path.join(__dirname, '../../packages/utils/src/index.ts') },
-      { find: /^@tmagic\/core/, replacement: path.join(__dirname, '../../packages/core/src/index.ts') },
-      { find: /^@tmagic\/schema/, replacement: path.join(__dirname, '../../packages/schema/src/index.ts') },
-    ],
-  },
+  const htmlInput = {
+    page: './page.html',
+    playground: './playground.html',
+  };
 
-  server: {
-    host: '0.0.0.0',
-    port: 8090,
-  },
+  const devInput = mode === 'lib' ? libInput : htmlInput;
 
-  build: {
+  const buildConfig = {
     sourcemap: true,
 
     cssCodeSplit: false,
 
     rollupOptions: {
-      input: {
-        page: './page.html',
-        playground: './playground.html',
-        components: './src/comp-entry.ts',
-        config: './src/config-entry.ts',
-        value: './src/value-entry.ts',
-        event: './src/event-entry.ts',
-      },
+      input:
+        command === 'build' && mode !== 'lib'
+          ? {
+              ...htmlInput,
+              ...libInput,
+            }
+          : devInput,
       output: {
         entryFileNames: 'assets/[name].js',
       },
     },
-  },
+  };
+
+  if (mode === 'lib') {
+    return {
+      build: {
+        ...buildConfig,
+        watch: {
+          include: WATCH_INCLUDE.split(','),
+        },
+      },
+    };
+  }
+
+  return {
+    base: '/tmagic-editor/playground/runtime/react',
+
+    plugins: [reactRefresh()],
+
+    resolve: {
+      alias: [
+        { find: /^react$/, replacement: path.join(__dirname, 'node_modules/react/index.js') },
+        { find: /^react-dom$/, replacement: path.join(__dirname, 'node_modules/react-dom/index.js') },
+        { find: /^@tmagic\/ui-react/, replacement: path.join(__dirname, '../../packages/ui-react/src/index.ts') },
+        { find: /^@tmagic\/utils/, replacement: path.join(__dirname, '../../packages/utils/src/index.ts') },
+        { find: /^@tmagic\/core/, replacement: path.join(__dirname, '../../packages/core/src/index.ts') },
+        { find: /^@tmagic\/schema/, replacement: path.join(__dirname, '../../packages/schema/src/index.ts') },
+      ],
+    },
+
+    publicDir: command === 'serve' ? 'dist' : 'public',
+
+    server: {
+      host: '0.0.0.0',
+    },
+
+    build: buildConfig,
+  };
 });
