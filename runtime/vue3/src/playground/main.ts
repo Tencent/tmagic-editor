@@ -20,11 +20,9 @@ import { createApp } from 'vue';
 
 import App from './App.vue';
 
-const componentUrl = '/tmagic-editor/playground/runtime/vue3/assets/components.js';
-
-import(componentUrl).then(() => {
+import('../comp-entry').then((entry) => {
+  const { components, plugins } = entry.default;
   const magicApp = createApp(App);
-  const { components, plugins } = window.magicPresetComponents;
 
   Object.values(components).forEach((component: any) => {
     magicApp.component(component.name, component);

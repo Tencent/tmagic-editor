@@ -61,17 +61,7 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 8098,
     proxy: {
-      '^/tmagic-editor/playground/runtime/react': {
-        target: 'http://127.0.0.1:8076',
-        changeOrigin: true,
-        prependPath: false,
-      },
-      '^/tmagic-editor/playground/runtime/vue2': {
-        target: 'http://127.0.0.1:8077',
-        changeOrigin: true,
-        prependPath: false,
-      },
-      '^/tmagic-editor/playground/runtime/vue3': {
+      '^/tmagic-editor/playground/runtime': {
         target: 'http://127.0.0.1:8078',
         changeOrigin: true,
         prependPath: false,

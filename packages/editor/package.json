@@ -70,13 +70,12 @@
     "@types/lodash-es": "^4.17.4",
     "@types/node": "^15.12.4",
     "@types/serialize-javascript": "^5.0.1",
-    "@vitejs/plugin-vue": "^1.2.3",
-    "@vitejs/plugin-vue-jsx": "^1.1.6",
+    "@vitejs/plugin-vue": "^2.3.3",
     "@vue/compiler-sfc": "^3.2.0",
     "@vue/test-utils": "^2.0.0",
     "sass": "^1.35.1",
     "typescript": "^4.3.4",
-    "vite": "^2.3.7",
+    "vite": "^ 2.9.13",
     "vite-plugin-dts": "^0.9.6",
     "vue-tsc": "^0.38.2"
   }

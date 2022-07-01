@@ -3,10 +3,12 @@
   "version": "1.0.2",
   "private": true,
   "scripts": {
-    "dev:react": "npm run build && npm run serve",
-    "start": "node scripts/dev.js && vite",
-    "build": "node scripts/build.js && vite build",
-    "serve": "vite preview --port 8076"
+    "dev:react": "npm run entry && npm run build:lib & npm run dev:html",
+    "build": "npm run entry && vite build",
+    "serve": "vite preview",
+    "entry": "node scripts/build.js",
+    "build:lib": "vite build --mode lib",
+    "dev:html": "vite --port 8078"
   },
   "dependencies": {
     "@tmagic/schema": "1.0.2",
@@ -24,6 +26,6 @@
     "@vitejs/plugin-react-refresh": "^1.3.1",
     "recast": "^0.20.4",
     "typescript": "^4.3.4",
-    "vite": "^2.3.7"
+    "vite": "^ 2.9.13"
   }
 }

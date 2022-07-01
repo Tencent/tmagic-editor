@@ -20,16 +20,14 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import Core from '@tmagic/core';
-import { MApp } from '@tmagic/schema';
-import { RemoveData, SortEventData, UpdateData } from '@tmagic/stage';
+import type { MApp } from '@tmagic/schema';
+import type { RemoveData, SortEventData, UpdateData } from '@tmagic/stage';
 import { AppContent } from '@tmagic/ui-react';
 import { getUrlParam } from '@tmagic/utils';
 
 import App from './App';
 
-const componentUrl = '/tmagic-editor/playground/runtime/react/assets/components.js';
-
-import(componentUrl).then(() => {
+import('../comp-entry').then(() => {
   const { components } = window.magicPresetComponents;
 
   const app = new Core({

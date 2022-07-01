@@ -3,10 +3,12 @@
   "version": "1.0.2",
   "private": true,
   "scripts": {
-    "dev": "npm run build && npm run serve",
-    "start": "node scripts/dev.js && vite",
-    "build": "node scripts/build.js && vite build",
-    "serve": "vite preview --port 8078"
+    "dev": "npm run entry && npm run build:lib & npm run dev:html",
+    "build": "npm run entry && vite build",
+    "serve": "vite preview",
+    "entry": "node scripts/build.js",
+    "build:lib": "vite build --mode lib",
+    "dev:html": "vite --port 8078"
   },
   "dependencies": {
     "@tmagic/schema": "1.0.2",
@@ -16,7 +18,7 @@
   },
   "devDependencies": {
     "@types/node": "^15.12.4",
-    "@vitejs/plugin-vue": "^1.2.3",
+    "@vitejs/plugin-vue": "^2.3.3",
     "@vue/compiler-sfc": "^3.2.0",
     "@vue/test-utils": "^2.0.0",
     "recast": "^0.20.4",
@@ -24,7 +26,7 @@
     "rollup-plugin-external-globals": "^0.6.1",
     "sass": "^1.35.1",
     "typescript": "^4.3.4",
-    "vite": "^2.3.7",
+    "vite": "^ 2.9.13",
     "vue-tsc": "^0.38.2"
   }
 }

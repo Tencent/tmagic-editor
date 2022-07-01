@@ -18,46 +18,78 @@
 
 import path from 'path';
 
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import vue from '@vitejs/plugin-vue';
+// @ts-ignore
 import vueJsx from '@vitejs/plugin-vue-jsx';
 // @ts-ignore
 import externalGlobals from 'rollup-plugin-external-globals';
 
-export default defineConfig({
-  base: '/tmagic-editor/playground/runtime/vue3',
-  plugins: [vue(), vueJsx(), externalGlobals({ vue: 'Vue' }, { exclude: ['page.html', 'playground.html'] })],
+export default defineConfig(({ command, mode }) => {
+  const { WATCH_INCLUDE = '' } = loadEnv(mode, process.cwd(), '');
+  const libInput = {
+    config: './src/config-entry.ts',
+    value: './src/value-entry.ts',
+    event: './src/event-entry.ts',
+  };
 
-  resolve: {
-    alias: [
-      { find: /^vue$/, replacement: path.join(__dirname, 'node_modules/vue/dist/vue.esm-bundler.js') },
-      { find: /^@tmagic\/utils/, replacement: path.join(__dirname, '../../packages/utils/src/index.ts') },
-      { find: /^@tmagic\/core/, replacement: path.join(__dirname, '../../packages/core/src/index.ts') },
-      { find: /^@tmagic\/schema/, replacement: path.join(__dirname, '../../packages/schema/src/index.ts') },
-    ],
-  },
+  const htmlInput = {
+    page: './page.html',
+    playground: './playground.html',
+  };
 
-  server: {
-    host: '0.0.0.0',
-    port: 8089,
-  },
-  build: {
+  const devInput = mode === 'lib' ? libInput : htmlInput;
+
+  const buildConfig = {
     sourcemap: true,
 
     cssCodeSplit: false,
 
     rollupOptions: {
-      input: {
-        page: './page.html',
-        playground: './playground.html',
-        components: './src/comp-entry.ts',
-        config: './src/config-entry.ts',
-        value: './src/value-entry.ts',
-        event: './src/event-entry.ts',
-      },
+      input:
+        command === 'build' && mode !== 'lib'
+          ? {
+              ...htmlInput,
+              ...libInput,
+            }
+          : devInput,
       output: {
         entryFileNames: 'assets/[name].js',
       },
     },
-  },
+  };
+
+  if (mode === 'lib') {
+    return {
+      build: {
+        ...buildConfig,
+        watch: {
+          include: WATCH_INCLUDE.split(','),
+        },
+      },
+    };
+  }
+
+  return {
+    base: '/tmagic-editor/playground/runtime/vue3',
+
+    plugins: [vue(), vueJsx(), externalGlobals({ vue: 'Vue' }, { exclude: ['page.html', 'playground.html'] })],
+
+    resolve: {
+      alias: [
+        { find: /^vue$/, replacement: path.join(__dirname, 'node_modules/vue/dist/vue.esm-bundler.js') },
+        { find: /^@tmagic\/utils/, replacement: path.join(__dirname, '../../packages/utils/src/index.ts') },
+        { find: /^@tmagic\/core/, replacement: path.join(__dirname, '../../packages/core/src/index.ts') },
+        { find: /^@tmagic\/schema/, replacement: path.join(__dirname, '../../packages/schema/src/index.ts') },
+      ],
+    },
+
+    publicDir: command === 'serve' ? 'dist' : 'public',
+
+    server: {
+      host: '0.0.0.0',
+    },
+
+    build: buildConfig,
+  };
 });
