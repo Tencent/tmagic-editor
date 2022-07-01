@@ -4,7 +4,7 @@
   "private": true,
   "packageManager": "pnpm@7.1.9",
   "scripts": {
-    "bootstrap": "pnpm i && pnpm prepare && cd runtime/vue2 && npm i",
+    "bootstrap": "pnpm i && npm run build && npm run install-vue2  && pnpm prepare",
     "clean:top": "rimraf */**/dist */dist coverage dwt*",
     "clean:modules": "rimraf node_modules **/node_modules **/**/node_modules",
     "clean:all": "pnpm clean:top && pnpm clean:modules",
@@ -21,6 +21,7 @@
     "page": "cd page && vite",
     "page-vue2": "cd page-vue2 && vite",
     "page-react": "cd page-react && vite",
+    "install-vue2": "cd runtime/vue2 && npm i",
     "reinstall": "pnpm clean:all && pnpm bootstrap",
     "test": "vitest run",
     "coverage": "vitest run --coverage",
@@ -73,7 +74,7 @@
     "semver": "^7.3.7",
     "shx": "^0.3.4",
     "typescript": "^4.3.4",
-    "vite": "^2.3.7",
+    "vite": "^2.9.13",
     "vitest": "^0.14.1"
   },
   "config": {
