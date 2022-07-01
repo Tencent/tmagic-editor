@@ -71,9 +71,9 @@ importers:
   docs:
     specifiers:
       '@element-plus/icons': 0.0.11
-      '@tmagic/form': ^1.0.0-rc.7
-      '@tmagic/schema': ^1.0.0-rc.7
-      '@tmagic/utils': ^1.0.0-rc.7
+      '@tmagic/form': ^1.0.2
+      '@tmagic/schema': ^1.0.2
+      '@tmagic/utils': ^1.0.2
       '@vuepress/bundler-vite': ^2.0.0-beta.48
       '@vuepress/cli': ^2.0.0-beta.48
       '@vuepress/client': ^2.0.0-beta.48
