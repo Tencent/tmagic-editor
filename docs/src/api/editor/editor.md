@@ -289,7 +289,7 @@ import { ArrowLeft, Coin } from '@element-plus/icons';
   
 - **详情：**
   
-选中组件时，知否自动滚动改组件到可视区域
+选中组件时，是否自动滚动该组件到可视区域
 
 ### updateDragEl
 
