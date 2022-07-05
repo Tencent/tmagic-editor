@@ -5,6 +5,10 @@ fieldset.m-fieldset {
   margin-bottom: 10px;
   min-inline-size: auto;
 
+  .el-checkbox {
+    height: 22px;
+  }
+
   legend {
     font-size: 14px;
     position: absolute;

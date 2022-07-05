@@ -95,7 +95,7 @@ const install = (app: App, opt: any) => {
   app.component(Form.name, Form);
   app.component(FormDialog.name, FormDialog);
   app.component(Container.name, Container);
-  app.component(Fieldset.name, Fieldset);
+  app.component('m-form-fieldset', Fieldset);
   app.component(GroupList.name, GroupList);
   app.component(Panel.name, Panel);
   app.component(Row.name, Row);
