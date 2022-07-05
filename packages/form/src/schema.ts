@@ -515,6 +515,7 @@ export interface TabPaneConfig {
   lazy?: boolean;
   labelWidth?: string;
   items: FormConfig;
+  onTabClick?: (mForm: FormState | undefined, tab: any, data: any) => void;
   [key: string]: any;
 }
 export interface TabConfig extends FormItem, ContainerCommonConfig {
@@ -527,6 +528,7 @@ export interface TabConfig extends FormItem, ContainerCommonConfig {
   onChange?: (mForm: FormState | undefined, data: any) => void;
   onTabAdd?: (mForm: FormState | undefined, data: any) => void;
   onTabRemove?: (mForm: FormState | undefined, tabName: string, data: any) => void;
+  onTabClick?: (mForm: FormState | undefined, tab: any, data: any) => void;
   activeChange?: (mForm: FormState | undefined, tabName: string, data: any) => void;
 }
 

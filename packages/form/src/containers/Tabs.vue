@@ -21,7 +21,15 @@
           v-for="item in tabItems(tab)"
           :key="item[mForm?.keyProp || '__key']"
           :config="item"
-          :model="config.dynamic ? model[config.name || ''][tabIndex] : tab.name ? model[tab.name] : model"
+          :model="
+            config.dynamic
+              ? (name ? model[name] : model)[tabIndex]
+              : tab.name
+              ? (name ? model[name] : model)[tab.name]
+              : name
+              ? model[name]
+              : model
+          "
           :prop="config.dynamic ? `${prop}${prop ? '.' : ''}${String(tabIndex)}` : prop"
           :size="size"
           :label-width="tab.labelWidth || labelWidth"
@@ -34,7 +42,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable vue/no-mutating-props */
 import { computed, defineComponent, inject, PropType, ref, watchEffect } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
@@ -86,6 +93,8 @@ const Tab = defineComponent({
     },
 
     prop: String,
+
+    name: String,
 
     size: String,
   },
