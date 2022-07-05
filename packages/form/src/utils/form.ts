@@ -223,7 +223,7 @@ export const getRules = function (mForm: FormState | undefined, rules: Rule[] | 
         fnc(
           {
             rule,
-            value,
+            value: props.config.names ? props.model : value,
             callback,
             source,
             options,
