@@ -102,7 +102,6 @@ if (props.config.checkbox && name.value) {
   watch(
     () => props.model[name.value]?.value,
     () => {
-      console.log(props.model);
       emit('change', props.model);
     },
   );
