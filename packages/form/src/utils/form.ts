@@ -53,16 +53,7 @@ const asyncLoadConfig = (value: FormValue, initValue: FormValue, { asyncLoad, na
 
 const isMultipleValue = (type?: string | TypeFunction) =>
   typeof type === 'string' &&
-  [
-    'checkbox-group',
-    'checkboxGroup',
-    'table',
-    'cascader',
-    'group-list',
-    'groupList',
-    'dynamic-tab',
-    'dynamicTab',
-  ].includes(type);
+  ['checkbox-group', 'checkboxGroup', 'table', 'cascader', 'group-list', 'groupList'].includes(type);
 
 const initItemsValue = (
   mForm: FormState | undefined,
@@ -83,7 +74,7 @@ const initItemsValue = (
 const setValue = (mForm: FormState | undefined, value: FormValue, initValue: FormValue, item: any) => {
   const { items, name, type, checkbox } = item;
   // 值是数组， 有可能也有items配置，所以不能放到getDefaultValue里赋值
-  if (isMultipleValue(type)) {
+  if (isMultipleValue(type) || (type === 'tab' && item.dynamic)) {
     value[name] = initValue[name] || [];
   }
 
