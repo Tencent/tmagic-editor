@@ -80,6 +80,13 @@ import { FolderOpened, SwitchButton, Tickets } from '@element-plus/icons';
 
 ::: tip
 icon使用的是[element-plus icon](https://element-plus.org/zh-CN/component/icon.html)
+
+也可直接使用url，例如
+```js
+{
+  icon: 'https://vfiles.gtimg.cn/vupload/20220614/9cc3091655207317835.png'
+}
+```
 :::
 
 ::: warning
@@ -118,6 +125,17 @@ import ModListPanel from '../components/sidebars/ModListPanel.vue';
     },
 }
 ```
+
+::: tip
+icon使用的是[element-plus icon](https://element-plus.org/zh-CN/component/icon.html)
+
+也可直接使用url，例如
+```js
+{
+  icon: 'https://vfiles.gtimg.cn/vupload/20220614/9cc3091655207317835.png'
+}
+```
+:::
 
 ### menu
 
@@ -176,6 +194,17 @@ import { ArrowLeft, Coin } from '@element-plus/icons';
   ],
 }
 ```
+
+::: tip
+icon使用的是[element-plus icon](https://element-plus.org/zh-CN/component/icon.html)
+
+也可直接使用url，例如
+```js
+{
+  icon: 'https://vfiles.gtimg.cn/vupload/20220614/9cc3091655207317835.png'
+}
+```
+:::
 
 ### render
 

@@ -121,6 +121,7 @@ const sidebar = {
       children: [
         '/tutorial/hello-world',
         '/tutorial/runtime',
+        '/tutorial/render',
       ]
     },
   ]

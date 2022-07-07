@@ -39,7 +39,7 @@ tmagic-editor可视化开源项目是从魔方平台演化而来的开源项目�
 - **runtime** 实现在编辑器中对使用不同框架的组件的渲染。
 - **page** 项目提供最终页面发布的执行环境与组件构建。
 
-可以查阅 Magic 的[源代码](https://github.com/Tencent/tmagic-editor)，与文档描述内容可以逐一对应上，希望文档内容可以为开发者带来比较好的开发体验。
+可以查阅 tmagic 的[源代码](https://github.com/Tencent/tmagic-editor)，与文档描述内容可以逐一对应上，希望文档内容可以为开发者带来比较好的开发体验。
 
 ## 谁在使用
 

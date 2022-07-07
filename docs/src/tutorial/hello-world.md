@@ -51,7 +51,7 @@ cd hello-world
 ## 添加依赖
 
 ```bash
-npm install --save @tmagic/editor @tmagic/form element-plus
+npm install --save @tmagic/editor @tmagic/form @tmagic/stage element-plus
 ```
 
 ## 注册组件
@@ -227,6 +227,8 @@ renderer.iframe.contentWindow.magic?.onPageElUpdate(root);
 最终完整的render函数实现
 
 ```ts
+import type StageCore from '@tmagic/stage';
+
 const render = async ({ renderer }: StageCore) => {
   const root = window.document.createElement('div');
 
@@ -268,10 +270,10 @@ const render = async ({ renderer }: StageCore) => {
       }
     `;
 
-    renderer.iframe.contentDocument.head.appendChild(style);
+    renderer.iframe?.contentDocument?.head.appendChild(style);
 
-    renderer.iframe.contentWindow.magic?.onPageElUpdate(root);
-    renderer.iframe.contentWindow.magic?.onRuntimeReady({});
+    renderer.contentWindow?.magic?.onPageElUpdate(root);
+    renderer.contentWindow?.magic?.onRuntimeReady({});
   });
 
   return root;
