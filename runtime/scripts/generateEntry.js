@@ -28,6 +28,12 @@ const pluginList = {};
 let cwd = __dirname;
 const pageRoot = () => path.resolve(cwd, '..');
 const entryPath = () => path.resolve(pageRoot(), './src');
+const defineTypes = {
+  component: 'component',
+  config: 'config',
+  value: 'value',
+  event: 'event',
+};
 
 const makeCamelCase = function (name) {
   if (typeof name !== 'string') {
@@ -47,16 +53,16 @@ const parseEntry = function ({ ast, package, indexPath }) {
   const { importComponentSource, importComponentToken } = tokens;
 
   if (!config) {
-    console.log(`${package} config 文件声明不合法`);
+    console.log(`${package} ${defineTypes.config} 文件声明不合法`);
     return exit(1);
   }
   if (!value) {
-    console.log(`${package} value 文件声明不合法`);
+    console.log(`${package} ${defineTypes.value} 文件声明不合法`);
     return exit(1);
   }
   if (!event) {
     // event 非必须，不需要 exit
-    console.log(`${package} event 文件声明缺失`);
+    console.log(`${package} ${defineTypes.event} 文件声明缺失`);
   }
 
   const findIndex = importComponentToken.indexOf(exportDefaultToken);
@@ -66,7 +72,7 @@ const parseEntry = function ({ ast, package, indexPath }) {
   }
 
   if (!component) {
-    console.log(`${package} component 文件声明不合法`);
+    console.log(`${package} ${defineTypes.component} 文件声明不合法`);
     return exit(1);
   }
 
@@ -106,11 +112,11 @@ const getASTTokenByTraverse = ({ ast, indexPath }) => {
       const { specifiers, source } = node;
       const name = specifiers[0].exported.name.toLowerCase();
 
-      if (name === 'value') {
+      if (name === defineTypes.value) {
         value = path.resolve(path.dirname(indexPath), source.value);
-      } else if (name === 'config') {
+      } else if (name === defineTypes.config) {
         config = path.resolve(path.dirname(indexPath), source.value);
-      } else if (name === 'event') {
+      } else if (name === defineTypes.event) {
         event = path.resolve(path.dirname(indexPath), source.value);
       }
 
@@ -136,11 +142,11 @@ const getASTTokenByTraverse = ({ ast, indexPath }) => {
 const generateEntry = function ({ entries, type = 'build', componentFileAffix }) {
   const commonArgs = { entries, componentFileAffix };
 
-  generateEntryFile({ entryFile: 'comp-entry.ts', type: 'component', ...commonArgs });
+  generateEntryFile({ entryFile: 'comp-entry.ts', type: defineTypes.component, ...commonArgs });
   if (type === 'build') {
-    generateEntryFile({ entryFile: 'config-entry.ts', type: 'config', ...commonArgs });
-    generateEntryFile({ entryFile: 'value-entry.ts', type: 'value', ...commonArgs });
-    generateEntryFile({ entryFile: 'event-entry.ts', type: 'event', ...commonArgs });
+    generateEntryFile({ entryFile: 'config-entry.ts', type: defineTypes.config, ...commonArgs });
+    generateEntryFile({ entryFile: 'value-entry.ts', type: defineTypes.value, ...commonArgs });
+    generateEntryFile({ entryFile: 'event-entry.ts', type: defineTypes.event, ...commonArgs });
   }
 };
 
@@ -154,7 +160,7 @@ const generateEntryFile = function ({ entries, entryFile, type, componentFileAff
     const name = makeCamelCase(entry.type);
     importDeclarations.push(
       `import ${name} from '${entry.entry[type]}${
-        type === 'component' && !entry.entry[type].includes(componentFileAffix) ? componentFileAffix : ''
+        type === defineTypes.component && !entry.entry[type].includes(componentFileAffix) ? componentFileAffix : ''
       }'`,
     );
     list.push(`'${entry.type}': ${name}`);
@@ -165,7 +171,7 @@ const generateEntryFile = function ({ entries, entryFile, type, componentFileAff
   let jsString = '';
   let exportData = `window.magicPreset${capitalToken} = ${exportToken};`;
 
-  if (type === 'component') {
+  if (type === defineTypes.component) {
     const pList = [];
 
     Object.keys(pluginList).forEach((pluginType) => {
@@ -271,7 +277,7 @@ const isPlugin = function (properties) {
 };
 
 /**
- *  1 判断是否组件包
+ *  1 判断是否组件&插件包
  *  2 判断是组件还是插件
  *  3 组件插件分开写入 comp-entry.ts
  * @param {*} ast
@@ -393,22 +399,28 @@ const start = function ({ type, componentFileAffix, units, workingDir }) {
       // 组件
       const entry = parseEntry({ ast, package, indexPath });
       entries.push({ type: componentType, entry });
+    } else if (result.type === typePlugin) {
+      // 插件
+      pluginList[componentType] = package;
     } else if (result.type === typeComponentPackage) {
-      // 组件包
+      // 组件&插件包
       result.imports.forEach((i) => {
         const affixReg = new RegExp(`${componentFileAffix}$`);
         if (affixReg.test(i.indexPath)) {
           entries.push({ type: i.type, entry: { component: i.indexPath } });
+          return;
+        }
+        const indexCode = fs.readFileSync(i.indexPath, { encoding: 'utf-8', flag: 'r' });
+        const ast = parse(indexCode);
+        if (typeAssertion({ ast, indexPath }).type === typePlugin) {
+          // 插件
+          pluginList[i.type] = i.indexPath;
         } else {
-          const indexCode = fs.readFileSync(i.indexPath, { encoding: 'utf-8', flag: 'r' });
-          const ast = parse(indexCode);
+          // 组件
           const entry = parseEntry({ ast, package: `${package} | ${i.name}`, indexPath: i.indexPath });
           entries.push({ type: i.type, entry });
         }
       });
-    } else if (result.type === typePlugin) {
-      // 插件
-      pluginList[componentType] = package;
     }
   });
 
