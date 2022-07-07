@@ -6,7 +6,15 @@
 
     <template #sidebar>
       <slot name="sidebar" :editorService="editorService">
-        <sidebar :data="sidebar"></sidebar>
+        <sidebar :data="sidebar">
+          <template #layer-panel>
+            <slot name="layer-panel"></slot>
+          </template>
+
+          <template #component-list-panel>
+            <slot name="component-list-panel"></slot>
+          </template>
+        </sidebar>
       </slot>
     </template>
 
@@ -20,8 +28,8 @@
       </slot>
     </template>
 
-    <template #propsPanel>
-      <slot name="propsPanel">
+    <template #props-panel>
+      <slot name="props-panel">
         <props-panel ref="propsPanel" @mounted="(instance) => $emit('props-panel-mounted', instance)"></props-panel>
       </slot>
     </template>

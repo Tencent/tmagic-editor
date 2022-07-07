@@ -26,7 +26,7 @@
 
         <div class="m-editor-framework-right" :style="`width: ${columnWidth?.right}px`">
           <el-scrollbar>
-            <slot name="propsPanel"></slot>
+            <slot name="props-panel"></slot>
           </el-scrollbar>
         </div>
       </template>
