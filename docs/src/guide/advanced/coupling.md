@@ -82,39 +82,25 @@ export default {
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import { defineComponent, inject } from 'vue';
 
-export default defineComponent({
-  name: 'magic-ui-test',
+const app: Core | undefined = inject('app');
 
-  setup(props) {
-    const app: Core | undefined = inject('app');
-    const hoc = inject('hoc');
+const onClick = () => {
+  // app.emit 第一个参数为事件名，其余参数为你要传给接受事件组件的参数
+  app?.emit("yourComponent:finishSomething", /*可以传参给接收方*/);
+};
 
-    // 此处实现事件动作
-    // 由于组件在 @tmagic/ui 中通过基础组件 Component 来封装，即每个组件其实都被 Component 包裹
-    // 实际触发时，会触发到当前组件的直属父组件 Component 上，我们会 provide 这个父组件为高阶组件 hoc
-    // 所以将 toast 方法挂载到当前组件的父组件上
-    hoc.toast = (/*接收触发事件组件传进来的参数*/) => {
-      toast('测试 vue3')
-    };
-
-    return {
-      // 此处实现触发事件
-      onClick: () => {
-        // app.emit 第一个参数为事件名，其余参数为你要传给接受事件组件的参数
-        app?.emit("yourComponent:finishSomething", /*可以传参给接收方*/);
-      },
-    };
-  },
+defineExport({
+  // 此处实现事件动作
+  // 实际触发时是调用vue实例上的方法，所以需要将改方法暴露到实例上
+  toast: (/*接收触发事件组件传进来的参数*/) => {
+    toast('测试 vue3')
+  }
 });
 </script>
 ```
-
-::: tip 
-在用 vue 实现的 组件中，我们通过 inject 方式来提供核心 app 和高阶组件 hoc。调用联动事件方法时，tmagic-editor是通过组件的 ref，并直接调用当前组件的方法。
-:::
 
 #### react 版本实现
 在 react 的实现中，由于tmagic-editor提供的 @tmagic/ui-react 版本是用 hook 实现的。所以组件开发我们也相应的需要使用 hook 方式。
@@ -125,10 +111,8 @@ import React from 'react';
 import { useApp } from '@tmagic/ui-react';
 
 function Test({ config }) {
-  // react 和 vue 实现不同，我们通过 useApp 这个 hook 来提供 app, ref 等核心内容
-  // 其中 ref 需要绑定到你的组件上作为 ref。因为一些公共事件会需要使用到你的组件 dom
-  // 同时这个 ref 也会在tmagic-editor的高级函数钩子中，将你的组件 dom 作为参数提供给自定义钩子
-  const { app, ref } = useApp({
+  // react 和 vue 实现不同，我们通过 useApp 这个 hook 来提供 app 等核心内容
+  const { app } = useApp({
     config,
     // 此处实现事件动作
     // 通过向 useApp 这个 hook 提供 methods 方法
@@ -147,7 +131,6 @@ function Test({ config }) {
 
   return (
     <div 
-      ref={ref}
       id={config.id}
       style={app.transformStyle(config.style || {})}
       onClick={onClick}

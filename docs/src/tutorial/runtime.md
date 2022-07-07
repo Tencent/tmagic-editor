@@ -19,6 +19,12 @@ cd editor-runtime
 
 删除src/components/HelloWorld.vue
 
+按钮需要用的ts types依赖
+
+```bash
+npm install --save @tmagic/schema @tmagic/stage
+```
+
 ## 实现runtime
 
 将hello-editor中的render函数实现移植到runtime项目中
@@ -145,40 +151,58 @@ devServer: {
 
 在App.vue中通过监听message，来准备获取magic注入时机，然后调用magic.onRuntimeReady，示例代码如下
 
+> 这里可能会出现editor抛出message的时候，runtime还没有执行到监听message的情况
+> 编辑器只在iframe onload事件中抛出message
+> 如果出现runtime中接收不到message的情况，可以尝试在onMounted的时候调用magic.onRuntimeReady
+
 ```ts
-const root = ref();
+import type { Magic } from '@tmagic/stage';
+
+declare global {
+  interface Window {
+    magic?: Magic;
+  }
+}
+```
+
+
+```ts
+import type { RemoveData, UpdateData } from '@tmagic/stage';
+import type { Id, MApp, MNode } from '@tmagic/schema';
+
+const root = ref<MApp>();
 
 window.addEventListener('message', ({ data }) => {
   if (!data.tmagicRuntimeReady) {
     return;
   }
 
-  (window as any).magic?.onRuntimeReady({
+  window.magic?.onRuntimeReady({
     /** 当编辑器的dsl对象变化时会调用 */
-    updateRootConfig(config: any) {
+    updateRootConfig(config: MApp) {
       root.value = config;
     },
 
     /** 当编辑器的切换页面时会调用 */
-    updatePageId(id: string) {
-      page.value = root.value?.items?.find((item: any) => item.id === id);
+    updatePageId(id: Id) {
+      page.value = root.value?.items?.find((item) => item.id === id);
     },
 
     /** 新增组件时调用 */
-    add({ config }: any) {
+    add({ config }: UpdateData) {
       const parent = config.type === 'page' ? root.value : page.value;
       parent.items?.push(config);
     },
 
     /** 更新组件时调用 */
-    update({ config }: any) {
-      const index = page.value.items?.findIndex((child: any) => child.id === config.id);
+    update({ config }: UpdateData) {
+      const index = page.value.items?.findIndex((child: MNode) => child.id === config.id);
       page.value.items.splice(index, 1, reactive(config));
     },
 
     /** 删除组件时调用 */
-    remove({ id }: any) {
-      const index = page.value.items?.findIndex((child: any) => child.id === id);
+    remove({ id }: RemoveData) {
+      const index = page.value.items?.findIndex((child: MNode) => child.id === id);
       page.value.items.splice(index, 1);
     },
   });
@@ -194,11 +218,11 @@ window.addEventListener('message', ({ data }) => {
 watch(page, async () => {
   // page配置变化后，需要等dom更新
   await nextTick();
-  (window as any).magic.onPageElUpdate(pageComp.value?.$el);
+  window?.magic.onPageElUpdate(pageComp.value?.$el);
 });
 ```
 
-以上就是一个简单runtime实现，以及与编辑的交互，这是一个不完善的实现，但是其中已经几乎覆盖所有需要关心的内容
+以上就是一个简单runtime实现，以及与编辑的交互，这是一个不完善的实现(会发现组件再画布中无法自由拖动，是因为没有完整的解析style)，但是其中已经几乎覆盖所有需要关心的内容
 
 当前教程中实现了一个简单的page，tmagic提供了一个比较完善的实现，将在下一节介绍
 
