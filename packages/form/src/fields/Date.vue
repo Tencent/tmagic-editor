@@ -1,20 +1,18 @@
 <template>
-  <div v-if="model">
-    <el-date-picker
-      v-model="model[modelName]"
-      type="date"
-      :size="size"
-      :placeholder="config.placeholder"
-      :disabled="disabled"
-      :format="config.format"
-      :value-format="config.format || 'YYYY-MM-DD HH:mm:ss'"
-      @change="changeHandler"
-    ></el-date-picker>
-  </div>
+  <el-date-picker
+    v-model="model[name]"
+    type="date"
+    :size="size"
+    :placeholder="config.placeholder"
+    :disabled="disabled"
+    :format="config.format"
+    :value-format="config.format || 'YYYY-MM-DD HH:mm:ss'"
+    @change="changeHandler"
+  ></el-date-picker>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+import { defineComponent, PropType } from 'vue';
 
 import { datetimeFormatter } from '@tmagic/utils';
 
@@ -38,10 +36,8 @@ export default defineComponent({
   setup(props, { emit }) {
     useAddField(props.prop);
 
-    const modelName = computed(() => props.prop || props.config.name || '');
-    props.model[modelName.value] = datetimeFormatter(props.model[modelName.value], '');
+    props.model[props.name] = datetimeFormatter(props.model[props.name], '');
     return {
-      modelName,
       changeHandler(v: string) {
         emit('change', v);
       },

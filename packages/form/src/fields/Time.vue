@@ -1,14 +1,12 @@
 <template>
-  <div>
-    <el-time-picker
-      v-model="model[name]"
-      :size="size"
-      value-format="HH:mm:ss"
-      :placeholder="config.placeholder"
-      :disabled="disabled"
-      @change="changeHandler"
-    ></el-time-picker>
-  </div>
+  <el-time-picker
+    v-model="model[name]"
+    :size="size"
+    value-format="HH:mm:ss"
+    :placeholder="config.placeholder"
+    :disabled="disabled"
+    @change="changeHandler"
+  ></el-time-picker>
 </template>
 
 <script lang="ts">
