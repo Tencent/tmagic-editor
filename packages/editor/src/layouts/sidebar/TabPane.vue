@@ -8,12 +8,14 @@
     </template>
 
     <component :is="config.component" v-bind="config.props || {}" v-on="config?.listeners || {}">
-      <template #layer-panel v-if="data === 'layer'">
-        <slot name="layer-panel"></slot>
+      <template #component-list-panel-header v-if="data === 'component-list' || config.slots?.componentListPanelHeader">
+        <slot v-if="data === 'component-list'" name="component-list-panel-header"></slot>
+        <component v-else-if="config.slots?.componentListPanelHeader" :is="config.slots.componentListPanelHeader" />
       </template>
 
-      <template #component-list-panel v-if="data === 'component-list'">
-        <slot name="component-list-panel"></slot>
+      <template #layer-panel-header v-if="data === 'layer' || config.slots?.layerPanelHeader">
+        <slot v-if="data === 'layer'" name="layer-panel-header"></slot>
+        <component v-else-if="config.slots?.layerPanelHeader" :is="config.slots.layerPanelHeader" />
       </template>
 
       <template #layer-node-content="{ data, node }" v-if="config.slots?.layerNodeContent">

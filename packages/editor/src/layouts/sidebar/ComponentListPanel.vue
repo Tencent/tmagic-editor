@@ -1,6 +1,7 @@
 <template>
   <el-scrollbar>
-    <slot name="component-list-panel"></slot>
+    <slot name="component-list-panel-header"></slot>
+
     <el-collapse class="ui-component-panel" :model-value="collapseValue">
       <el-input
         prefix-icon="el-icon-search"

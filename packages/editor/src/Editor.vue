@@ -7,12 +7,12 @@
     <template #sidebar>
       <slot name="sidebar" :editorService="editorService">
         <sidebar :data="sidebar">
-          <template #layer-panel>
-            <slot name="layer-panel"></slot>
+          <template #layer-panel-header>
+            <slot name="layer-panel-header"></slot>
           </template>
 
-          <template #component-list-panel>
-            <slot name="component-list-panel"></slot>
+          <template #component-list-panel-header>
+            <slot name="component-list-panel-header"></slot>
           </template>
         </sidebar>
       </slot>
@@ -30,7 +30,11 @@
 
     <template #props-panel>
       <slot name="props-panel">
-        <props-panel ref="propsPanel" @mounted="(instance) => $emit('props-panel-mounted', instance)"></props-panel>
+        <props-panel ref="propsPanel" @mounted="(instance) => $emit('props-panel-mounted', instance)">
+          <template #props-panel-header>
+            <slot name="props-panel-header"></slot>
+          </template>
+        </props-panel>
       </slot>
     </template>
 
