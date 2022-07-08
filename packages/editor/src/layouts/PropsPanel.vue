@@ -1,13 +1,16 @@
 <template>
-  <m-form
-    :class="`m-editor-props-panel ${propsPanelSize}`"
-    :popper-class="`m-editor-props-panel-popper ${propsPanelSize}`"
-    ref="configForm"
-    :size="propsPanelSize"
-    :init-values="values"
-    :config="curFormConfig"
-    @change="submit"
-  ></m-form>
+  <div class="`m-editor-props-panel">
+    <slot name="props-panel-header"></slot>
+    <m-form
+      :class="`m-editor-props-panel ${propsPanelSize}`"
+      :popper-class="`m-editor-props-panel-popper ${propsPanelSize}`"
+      ref="configForm"
+      :size="propsPanelSize"
+      :init-values="values"
+      :config="curFormConfig"
+      @change="submit"
+    ></m-form>
+  </div>
 </template>
 
 <script lang="ts">

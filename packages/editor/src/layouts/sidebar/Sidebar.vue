@@ -7,12 +7,12 @@
     tab-position="left"
   >
     <tab-pane v-for="(item, index) in data.items" :key="index" :data="item">
-      <template #layer-panel v-if="item === 'layer'">
-        <slot name="layer-panel"></slot>
+      <template #layer-panel-header v-if="item === 'layer'">
+        <slot name="layer-panel-header"></slot>
       </template>
 
-      <template #component-list-panel v-if="item === 'component-list'">
-        <slot name="component-list-panel"></slot>
+      <template #component-list-panel-header v-if="item === 'component-list'">
+        <slot name="component-list-panel-header"></slot>
       </template>
     </tab-pane>
   </el-tabs>

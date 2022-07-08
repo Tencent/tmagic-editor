@@ -1,6 +1,6 @@
 <template>
   <el-scrollbar class="magic-editor-layer-panel">
-    <slot name="layer-panel"></slot>
+    <slot name="layer-panel-header"></slot>
 
     <el-input
       class="filterInput"
