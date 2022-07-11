@@ -19,7 +19,7 @@
 import path from 'path';
 
 import { defineConfig, loadEnv } from 'vite';
-import { createVuePlugin } from 'vite-plugin-vue2';
+import vue from '@vitejs/plugin-vue2';
 // @ts-ignore
 import externalGlobals from 'rollup-plugin-external-globals';
 
@@ -71,12 +71,11 @@ export default defineConfig(({ command, mode }) => {
   return {
     base: '/tmagic-editor/playground/runtime/vue2',
 
-    plugins: [createVuePlugin(), externalGlobals({ vue: 'Vue' }, { exclude: ['page.html', 'playground.html'] })],
+    plugins: [vue(), externalGlobals({ vue: 'Vue' }, { exclude: ['page.html', 'playground.html'] })],
 
     resolve: {
       alias: [
         { find: /^vue$/, replacement: path.join(__dirname, 'node_modules/vue/dist/vue.esm.js') },
-        { find: /^@vue\/composition-api$/, replacement: path.join(__dirname, 'node_modules/@vue/composition-api') },
         { find: /^@tmagic\/ui-vue2/, replacement: path.join(__dirname, '../../packages/ui-vue2/src/index.ts') },
         { find: /^@tmagic\/utils/, replacement: path.join(__dirname, '../../packages/utils/src/index.ts') },
         { find: /^@tmagic\/core/, replacement: path.join(__dirname, '../../packages/core/src/index.ts') },

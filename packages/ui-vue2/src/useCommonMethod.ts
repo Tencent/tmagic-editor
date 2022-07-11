@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { getCurrentInstance } from '@vue/composition-api';
+import { getCurrentInstance } from 'vue';
 
 export default () => {
   const vm = getCurrentInstance()?.proxy;

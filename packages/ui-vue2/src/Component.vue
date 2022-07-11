@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, getCurrentInstance, inject, PropType, provide } from '@vue/composition-api';
+import { computed, defineComponent, getCurrentInstance, inject, PropType, provide } from 'vue';
 
 import Core from '@tmagic/core';
 import { MComponent } from '@tmagic/schema';
