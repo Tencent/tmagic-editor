@@ -17,6 +17,7 @@
     "playground:react": "pnpm --filter \"runtime-react\" --filter \"tmagic-playground\" dev:react",
     "pg:react": "pnpm playground:react",
     "build": "pnpm --filter \"@tmagic/*\" build",
+    "build:runtime:admin": "pnpm --filter \"runtime-*\" build:admin",
     "build:playground": "pnpm --filter \"runtime-*\" --filter \"tmagic-playground\" build",
     "postbuild:playground": "shx mkdir playground/dist/runtime && shx cp -r runtime/vue2/dist ./playground/dist/runtime/vue2 && shx cp -r runtime/vue3/dist ./playground/dist/runtime/vue3 && cp -r runtime/react/dist ./playground/dist/runtime/react",
     "docs": "pnpm --filter \"docs\" dev",

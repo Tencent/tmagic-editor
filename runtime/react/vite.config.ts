@@ -22,7 +22,7 @@ import { defineConfig, loadEnv } from 'vite';
 import reactRefresh from '@vitejs/plugin-react-refresh';
 
 export default defineConfig(({ command, mode }) => {
-  const { WATCH_INCLUDE = '' } = loadEnv(mode, process.cwd(), '');
+  const { WATCH_INCLUDE = '', BASE, OUT_DIR } = loadEnv(mode, process.cwd(), '');
   const libInput = {
     config: './src/config-entry.ts',
     value: './src/value-entry.ts',
@@ -37,6 +37,8 @@ export default defineConfig(({ command, mode }) => {
   const devInput = mode === 'lib' ? libInput : htmlInput;
 
   const buildConfig = {
+    outDir: OUT_DIR || 'dist',
+
     sourcemap: true,
 
     cssCodeSplit: false,
@@ -67,7 +69,7 @@ export default defineConfig(({ command, mode }) => {
   }
 
   return {
-    base: '/tmagic-editor/playground/runtime/react',
+    base: BASE || '/tmagic-editor/playground/runtime/react',
 
     plugins: [reactRefresh()],
 

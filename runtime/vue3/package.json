@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "npm run entry && npm run build:lib & npm run dev:html",
     "build": "npm run entry && vite build",
+    "build:admin": "npm run entry && vite build --mode admin",
     "serve": "vite preview",
     "entry": "node scripts/build.js",
     "build:lib": "vite build --mode lib",

@@ -143,11 +143,11 @@ watchEffect(async () => {
 在管理端中我们提供了一个可视化的模拟画布，他需要依赖 runtime 核心库，因此我们需要先在 magic 根目录下运行
 
 ```js
-cd magic
-npm run build
+cd tmatic-editor
+npm run build:runtime:admin
 ```
 
-将 /playground/dist/runtime 文件夹复制到 /magic-admin/web/public 和 /magic-admin/server/assets 目录下。web 下的 runtime 提供给模拟画布使用，server 下的 runtime 提供给发布后的页面来使用。
+将/runtime/{vue3 | vue2 | react}/admin-dist 中所有文件以及文件夹复制到 /magic/runtime 目录下
 
 上面的操作我们提供了/magic-admin/setup.sh 脚本文件来实现，开发者可以参考该脚本文件来搭建流水线。
 
