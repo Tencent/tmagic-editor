@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, onMounted, provide, reactive, ref, watch } from '@vue/composition-api';
+import { computed, defineComponent, nextTick, onMounted, provide, reactive, ref, watch } from 'vue';
 
 import Core from '@tmagic/core';
 import type { Id, MApp, MNode } from '@tmagic/schema';

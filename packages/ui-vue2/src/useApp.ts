@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { getCurrentInstance, inject, onMounted, onUnmounted } from '@vue/composition-api';
+import { getCurrentInstance, inject, onMounted, onUnmounted } from 'vue';
 
 import Core from '@tmagic/core';
 

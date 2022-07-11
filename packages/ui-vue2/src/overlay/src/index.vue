@@ -4,7 +4,7 @@
   </magic-ui-container>
 </template>
 <script lang="ts">
-import { defineComponent, ref } from '@vue/composition-api';
+import { defineComponent, ref } from 'vue';
 
 import Core from '@tmagic/core';
 import type { MNode } from '@tmagic/schema';

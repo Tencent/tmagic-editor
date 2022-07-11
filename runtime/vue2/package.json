@@ -13,8 +13,7 @@
   "dependencies": {
     "@tmagic/schema": "1.0.5",
     "@tmagic/stage": "1.0.5",
-    "@vue/composition-api": "1.0.5",
-    "vue": "^2.6.14"
+    "vue": "^2.7.4"
   },
   "devDependencies": {
     "@types/events": "^3.0.0",
@@ -24,7 +23,7 @@
     "rollup-plugin-external-globals": "^0.6.1",
     "sass": "^1.35.1",
     "vite": "^2.9.13",
-    "vite-plugin-vue2": "^2.0.1",
-    "vue-template-compiler": "^2.6.14"
+    "@vitejs/plugin-vue2": "^1.1.2",
+    "vue-template-compiler": "^2.7.4"
   }
 }

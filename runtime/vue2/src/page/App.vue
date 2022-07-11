@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, inject, reactive } from '@vue/composition-api';
+import { defineComponent, inject, reactive } from 'vue';
 
 import Core from '@tmagic/core';
 

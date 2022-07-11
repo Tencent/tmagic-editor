@@ -17,7 +17,6 @@
  */
 
 import Vue from 'vue';
-import CompositionApi from '@vue/composition-api';
 
 import Core from '@tmagic/core';
 import { getUrlParam } from '@tmagic/utils';
@@ -28,7 +27,6 @@ import request from '../utils/request';
 
 import AppComponent from './App.vue';
 
-Vue.use(CompositionApi);
 Vue.use(request);
 
 const app = new Core({

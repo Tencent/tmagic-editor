@@ -11,17 +11,15 @@
   },
   "dependencies": {
     "@tmagic/schema": "1.0.5",
-    "@vue/composition-api": "1.0.5",
     "qrcode": "^1.5.0",
-    "vue": "^2.6.14"
+    "vue": "^2.7.4"
   },
   "peerDependencies": {
-    "@vue/composition-api": "1.0.5",
-    "vue": "^2.6.14"
+    "vue": "^2.7.4"
   },
   "devDependencies": {
     "vite": "^2.9.13",
     "vite-plugin-vue2": "^2.0.1",
-    "vue-template-compiler": "^2.6.14"
+    "vue-template-compiler": "^2.7.4"
   }
 }

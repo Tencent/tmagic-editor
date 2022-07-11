@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, defineComponent, getCurrentInstance, h, inject, PropType } from '@vue/composition-api';
+import { computed, defineComponent, getCurrentInstance, h, inject, PropType } from 'vue';
 
 import type { MComponent } from '@tmagic/schema';
 
