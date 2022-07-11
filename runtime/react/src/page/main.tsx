@@ -37,7 +37,7 @@ declare global {
 }
 
 const getLocalConfig = (): MApp[] => {
-  const configStr = localStorage.getItem('magicUiConfig');
+  const configStr = localStorage.getItem('magicDSL');
   if (!configStr) return [];
   try {
     // eslint-disable-next-line no-eval

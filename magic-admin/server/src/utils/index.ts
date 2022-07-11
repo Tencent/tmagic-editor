@@ -56,7 +56,7 @@ const configTransformDist = (srcCode: string): string => {
  * @returns {string} 处理结果
  */
 const processTransConfig = (transConfig) => {
-  const code = `window.magicUiconfig = [${transConfig}]`;
+  const code = `window.magicDSL = [${transConfig}]`;
   return uglifyJS.minify(`${code}`).code;
 };
 

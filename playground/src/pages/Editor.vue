@@ -66,7 +66,7 @@ export default defineComponent({
 
     const save = () => {
       localStorage.setItem(
-        'magicUiConfig',
+        'magicDSL',
         serialize(toRaw(value.value), {
           space: 2,
           unsafe: true,

@@ -9,9 +9,6 @@
         <router-view :style="$route.meta.hideAside ? '' : 'padding: 20px'"></router-view>
       </el-main>
     </el-container>
-    <div class="fixed-layer" v-if="$route.name === 'ui-editor' && !isChrome">
-      <b style="font-size: 28px">魔方仅支持chrome浏览器编辑使用哦~</b>
-    </div>
   </el-container>
   <router-view v-else class="app" :class="{ 'hide-nav': hideNav }"></router-view>
 </template>
@@ -47,7 +44,6 @@ export default defineComponent({
     });
 
     return {
-      isChrome: navigator.userAgent.toLowerCase().includes('chrome'),
       hideFrame,
       hideNav: !!new URL(location.href).searchParams.get('hideNav'),
       asideTrigger,
