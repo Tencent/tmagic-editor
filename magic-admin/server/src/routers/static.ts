@@ -29,6 +29,13 @@ router.get('/', async (ctx) => {
   await send(ctx, `${StaticPath.ASSETS}/index.html`, options);
 });
 
+router.get('/runtime/*', async (ctx) => {
+  const file = `${StaticPath.RUNTIME}/${ctx.params[0]}`;
+  if (pathExistsSync(file)) {
+    await send(ctx, file, options);
+  }
+});
+
 router.get('/*', async (ctx) => {
   const file = `${StaticPath.ASSETS}/${ctx.params[0]}`;
   if (pathExistsSync(file)) {
