@@ -4,8 +4,8 @@
 WORKSPACE=$(dirname "$PWD")
 echo ${WORKSPACE}
 
-# 全局安装lerna
-npm i lerna -g
+# 全局安装pnpm
+npm i pnpm -g
 
 # magic依赖安装和构建
 cd ${WORKSPACE}
