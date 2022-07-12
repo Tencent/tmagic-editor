@@ -67,6 +67,7 @@ export default defineConfig({
         prependPath: false,
       },
     },
+    open: '/tmagic-editor/playground/',
   },
 
   build: {
