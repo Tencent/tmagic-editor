@@ -1,5 +1,9 @@
 <template>
-  <div :id="config.id" :class="`magic-ui-page${config.className ? ` ${config.className}` : ''}`" :style="style">
+  <div
+    :id="config.id"
+    :class="`magic-ui-page magic-ui-container${config.className ? ` ${config.className}` : ''}`"
+    :style="style"
+  >
     <slot></slot>
     <magic-ui-component v-for="item in config.items" :key="item.id" :config="item"></magic-ui-component>
   </div>
