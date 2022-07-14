@@ -18,7 +18,7 @@
 
 // 编辑器顶部菜单栏
 
-import { ArrowLeft, Document, Finished } from '@element-plus/icons';
+import { ArrowLeft, Document, Finished } from '@element-plus/icons-vue';
 
 import { MenuBarData } from '@tmagic/editor';
 

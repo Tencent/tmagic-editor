@@ -20,6 +20,11 @@ module.exports = defineConfig({
         ws: true,
         changOrigin: true,
       },
+      '/runtime': {
+        target: 'http://localhost:3001/',
+        ws: true,
+        changOrigin: true,
+      },
     },
   },
 

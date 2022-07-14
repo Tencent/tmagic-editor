@@ -16,7 +16,7 @@
 <script lang="ts">
 import { Component, computed, defineComponent, markRaw, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { Edit, FolderOpened, SwitchButton, Tickets } from '@element-plus/icons';
+import { Edit, FolderOpened, SwitchButton, Tickets } from '@element-plus/icons-vue';
 
 import type { MoveableOptions } from '@tmagic/editor';
 import { ComponentGroup } from '@tmagic/editor';
@@ -66,13 +66,13 @@ export default defineComponent({
       await initConfigByActId({ actId: Number(route.params.actId) });
     };
 
-    asyncLoadJs('/runtime/vue3/assets/config.js').then(() => {
+    asyncLoadJs('/runtime/assets/config.js').then(() => {
       magicPresetConfigs.value = (window as any).magicPresetConfigs;
     });
-    asyncLoadJs('/runtime/vue3/assets/value.js').then(() => {
+    asyncLoadJs('/runtime/assets/value.js').then(() => {
       magicPresetValues.value = (window as any).magicPresetValues;
     });
-    asyncLoadJs('/runtime/vue3/assets/event.js').then(() => {
+    asyncLoadJs('/runtime/assets/event.js').then(() => {
       magicPresetEvents.value = (window as any).magicPresetEvents;
     });
 
@@ -84,7 +84,7 @@ export default defineComponent({
       componentList,
       menu: topMenu(),
       uiConfigs,
-      runtimeUrl: '/runtime/vue3/playground.html',
+      runtimeUrl: '/runtime/playground.html',
       magicPresetValues,
       magicPresetConfigs,
       magicPresetEvents,
