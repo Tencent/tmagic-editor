@@ -31,6 +31,7 @@ const runIfNotDry = isDryRun ? dryRun : run;
 const getPkgRoot = (pkg) => path.resolve(__dirname, `../packages/${pkg}`);
 const getRunTimeRoot = (pkg) => path.resolve(__dirname, `../runtime/${pkg}`);
 const getPlayground = () => path.resolve(__dirname, `../playground`);
+const getDocs = () => path.resolve(__dirname, `../docs`);
 const step = (msg) => console.log(chalk.cyan(msg));
 
 async function main() {
@@ -140,6 +141,7 @@ function updateVersions(version) {
   packages.forEach((p) => updatePackage(getPkgRoot(p), version));
   ['vue3', 'react', 'vue2'].forEach((p) => updatePackage(getRunTimeRoot(p), version));
   updatePackage(getPlayground(), version);
+  updatePackage(getDocs(), version);
 }
 
 function updatePackage(pkgRoot, version) {
