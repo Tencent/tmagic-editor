@@ -1,6 +1,7 @@
 import 'element-plus/dist/index.css';
 import 'highlight.js/styles/github.css';
 
+import './polyfills';
 import { defineClientConfig  } from '@vuepress/client';
 import ElementPlus from 'element-plus';
 import MagicForm from '@tmagic/form';
