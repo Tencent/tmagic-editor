@@ -196,8 +196,9 @@
 }
 </style>
 
-<script type="text/babel" lang="ts">
+<script lang="ts">
 import hljs from 'highlight.js';
+import serialize from 'serialize-javascript';
 
 export function stripScript(content) {
   const result = content.match(/<(script)>([\s\S]+)<\/\1>/);
@@ -294,7 +295,10 @@ export default {
     text() {
       return this.isStringConfig ?
         hljs.highlight('js', this.config).value :
-        hljs.highlight('json', JSON.stringify(this.config, null, 2)).value;
+        hljs.highlight('js', serialize(this.config, {
+          space: 2,
+          unsafe: true,
+        }).replace(/"(\w+)":\s/g, '$1: ')).value;
     },
 
     formConfig() {

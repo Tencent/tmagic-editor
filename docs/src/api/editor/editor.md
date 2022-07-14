@@ -330,6 +330,36 @@ icon使用的是[element-plus icon](https://element-plus.org/zh-CN/component/ico
   
 当选中框与组件不贴合时，可以通过此方法进行调整
 
+### isContainer
+
+- **类型：** (el: HTMLDivElement) => boolean | Promise<boolean>;
+  
+- **默认值：** (el: HTMLElement) => el.classList.contains('magic-ui-container')
+  
+- **详情：**
+  
+当组件拖动过程中停留在画布上超过 [containerHighlightDuration](#containerHighlightDuration) 时长时，识别当前是否有容器
+
+### containerHighlightDuration
+
+- **类型：** number;
+  
+- **默认值：** 800（单位为ms）
+  
+- **详情：**
+  
+当组件拖动过程中停留在画布上超过 [containerHighlightDuration](#containerHighlightDuration) 时长时，识别当前是否有容器
+
+### containerHighlightClassName
+
+- **类型：** string;
+  
+- **默认值：** 'tmagic-stage-container-highlight'
+  
+- **详情：**
+  
+识别到容器后，会给其dom上添加的class
+
 
 ## slots
 
