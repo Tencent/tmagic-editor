@@ -332,7 +332,7 @@ icon使用的是[element-plus icon](https://element-plus.org/zh-CN/component/ico
 
 ### isContainer
 
-- **类型：** (el: HTMLDivElement) => boolean | Promise<boolean>;
+- **类型：** (el: HTMLDivElement) => boolean | Promise\<boolean\>;
   
 - **默认值：** (el: HTMLElement) => el.classList.contains('magic-ui-container')
   
