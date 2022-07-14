@@ -42,7 +42,7 @@
   ],
   "dependencies": {
     "@babel/core": "^7.18.0",
-    "@element-plus/icons": "0.0.11",
+    "@element-plus/icons-vue": "^2.0.6",
     "@tmagic/core": "1.1.0-beta.0",
     "@tmagic/form": "1.1.0-beta.0",
     "@tmagic/schema": "1.1.0-beta.0",

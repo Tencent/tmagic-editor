@@ -8,7 +8,7 @@
     "build": "npm run clean:top && vuepress build src -d dist"
   },
   "dependencies": {
-    "@element-plus/icons": "0.0.11",
+    "@element-plus/icons-vue": "^2.0.6",
     "@tmagic/form": "^1.0.2",
     "@tmagic/schema": "^1.0.2",
     "@tmagic/utils": "^1.0.2",

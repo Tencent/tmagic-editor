@@ -27,7 +27,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, PropType } from 'vue';
-import { Coin, Files } from '@element-plus/icons';
+import { Coin, Files } from '@element-plus/icons-vue';
 
 import MIcon from '@editor/components/Icon.vue';
 import { SideComponent, SideItem } from '@editor/type';

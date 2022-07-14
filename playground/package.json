@@ -11,7 +11,7 @@
     "serve": "vite preview"
   },
   "dependencies": {
-    "@element-plus/icons": "0.0.11",
+    "@element-plus/icons-vue": "^2.0.6",
     "@tmagic/editor": "1.1.0-beta.0",
     "@tmagic/form": "1.1.0-beta.0",
     "@tmagic/schema": "1.1.0-beta.0",

@@ -51,7 +51,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, inject, PropType, ref } from 'vue';
-import { CaretBottom, CaretRight } from '@element-plus/icons';
+import { CaretBottom, CaretRight } from '@element-plus/icons-vue';
 
 import { FormState, PanelConfig } from '../schema';
 import { filterFunction } from '../utils/form';

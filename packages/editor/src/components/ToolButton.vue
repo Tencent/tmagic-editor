@@ -52,7 +52,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, inject, markRaw, PropType } from 'vue';
-import { ArrowDown, Back, Delete, Grid, Right, ScaleToOriginal, ZoomIn, ZoomOut } from '@element-plus/icons';
+import { ArrowDown, Back, Delete, Grid, Right, ScaleToOriginal, ZoomIn, ZoomOut } from '@element-plus/icons-vue';
 
 import { NodeType } from '@tmagic/schema';
 

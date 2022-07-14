@@ -153,7 +153,7 @@
 <script lang="ts">
 /* eslint-disable no-param-reassign */
 import { computed, defineComponent, inject, onMounted, PropType, ref, toRefs } from 'vue';
-import { ArrowDown, ArrowUp, Delete, FullScreen, Grid } from '@element-plus/icons';
+import { ArrowDown, ArrowUp, Delete, FullScreen, Grid } from '@element-plus/icons-vue';
 import { ElMessage, ElTable, UploadFile } from 'element-plus';
 import { cloneDeep } from 'lodash-es';
 import Sortable, { SortableEvent } from 'sortablejs';

@@ -47,7 +47,7 @@
 - **示例：**
 
 ```js
-import { FolderOpened, SwitchButton, Tickets } from '@element-plus/icons';
+import { FolderOpened, SwitchButton, Tickets } from '@element-plus/icons-vue';
 
 [
   {
@@ -108,7 +108,7 @@ icon使用的是[element-plus icon](https://element-plus.org/zh-CN/component/ico
 - **示例：**
   
 ```js
-import { List } from '@element-plus/icons';
+import { List } from '@element-plus/icons-vue';
 import ModListPanel from '../components/sidebars/ModListPanel.vue';
 
 {
@@ -167,7 +167,7 @@ icon使用的是[element-plus icon](https://element-plus.org/zh-CN/component/ico
 
 ```js
 import { toRaw } from 'vue';
-import { ArrowLeft, Coin } from '@element-plus/icons';
+import { ArrowLeft, Coin } from '@element-plus/icons-vue';
 
 {
   left: [
