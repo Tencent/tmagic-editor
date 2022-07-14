@@ -70,7 +70,7 @@ import {
   toRaw,
   watch,
 } from 'vue';
-import { ArrowLeftBold, ArrowRightBold, CaretBottom, Delete, DocumentCopy, Plus } from '@element-plus/icons';
+import { ArrowLeftBold, ArrowRightBold, CaretBottom, Delete, DocumentCopy, Plus } from '@element-plus/icons-vue';
 
 import type { MApp, MPage } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';

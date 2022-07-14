@@ -104,7 +104,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, inject, PropType, ref, resolveComponent, watchEffect } from 'vue';
-import { WarningFilled } from '@element-plus/icons';
+import { WarningFilled } from '@element-plus/icons-vue';
 
 import { ChildConfig, ContainerCommonConfig, FormState, FormValue } from '../schema';
 import { display as displayFunction, filterFunction, getRules } from '../utils/form';

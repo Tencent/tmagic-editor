@@ -16,7 +16,7 @@
 <script lang="ts" setup>
 import { markRaw, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { Coin } from '@element-plus/icons';
+import { Coin } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 
 import { MenuButton } from '@tmagic/editor';

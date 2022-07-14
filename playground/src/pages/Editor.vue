@@ -33,7 +33,7 @@
 <script lang="ts">
 import { defineComponent, ref, toRaw } from 'vue';
 import { useRouter } from 'vue-router';
-import { Coin, Connection, Document } from '@element-plus/icons';
+import { Coin, Connection, Document } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import serialize from 'serialize-javascript';
 

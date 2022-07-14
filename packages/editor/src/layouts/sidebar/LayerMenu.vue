@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, inject, markRaw, ref } from 'vue';
-import { Delete, DocumentCopy, Files, Plus } from '@element-plus/icons';
+import { Delete, DocumentCopy, Files, Plus } from '@element-plus/icons-vue';
 
 import { NodeType } from '@tmagic/schema';
 

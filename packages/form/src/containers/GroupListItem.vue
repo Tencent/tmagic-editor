@@ -2,7 +2,7 @@
   <div class="m-fields-group-list-item">
     <div>
       <el-icon style="margin-right: 7px" @click="expandHandler"
-        ><caret-bottom v-if="expand" /><caret-right v-else
+        ><CaretBottom v-if="expand" /><CaretRight v-else
       /></el-icon>
 
       <el-button text @click="expandHandler">{{ title }}</el-button>
@@ -17,7 +17,7 @@
 
       <template v-if="movable()">
         <el-button v-show="index !== 0" text size="small" @click="changeOrder(-1)"
-          >上移<el-icon><CaretRight /></el-icon
+          >上移<el-icon><CaretTop /></el-icon
         ></el-button>
         <el-button v-show="index !== length - 1" text size="small" @click="changeOrder(1)"
           >下移<el-icon><CaretBottom /></el-icon
@@ -41,7 +41,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, inject, PropType, ref, watchEffect } from 'vue';
-import { CaretBottom, CaretRight, Delete } from '@element-plus/icons';
+import { CaretBottom, CaretRight, CaretTop, Delete } from '@element-plus/icons-vue';
 
 import { FormState, GroupListConfig } from '../schema';
 import { filterFunction } from '../utils/form';
@@ -49,7 +49,7 @@ import { filterFunction } from '../utils/form';
 export default defineComponent({
   name: 'm-form-group-list-item',
 
-  components: { CaretRight, CaretBottom },
+  components: { CaretBottom, CaretRight, CaretTop },
 
   props: {
     labelWidth: String,

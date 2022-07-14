@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import { Component, defineComponent, PropType, toRaw } from 'vue';
-import { Edit } from '@element-plus/icons';
+import { Edit } from '@element-plus/icons-vue';
 
 export default defineComponent({
   name: 'm-icon',

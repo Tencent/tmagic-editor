@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import { defineComponent, inject, toRaw } from 'vue';
-import { Plus } from '@element-plus/icons';
+import { Plus } from '@element-plus/icons-vue';
 
 import { NodeType } from '@tmagic/schema';
 

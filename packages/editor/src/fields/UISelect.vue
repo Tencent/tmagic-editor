@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, inject, markRaw, ref } from 'vue';
-import { Close, Delete, Pointer } from '@element-plus/icons';
+import { Close, Delete, Pointer } from '@element-plus/icons-vue';
 
 import { FormState } from '@tmagic/form';
 

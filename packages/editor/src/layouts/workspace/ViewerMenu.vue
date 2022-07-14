@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, inject, markRaw, onMounted, reactive, ref, watch } from 'vue';
-import { Bottom, Delete, DocumentCopy, Top } from '@element-plus/icons';
+import { Bottom, Delete, DocumentCopy, Top } from '@element-plus/icons-vue';
 
 import { NodeType } from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
