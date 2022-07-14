@@ -28,6 +28,7 @@ import StageRender from './StageRender';
 import {
   CanSelect,
   GuidesEventData,
+  IsContainer,
   RemoveData,
   Runtime,
   SortEventData,
@@ -38,16 +39,20 @@ import {
 import { addSelectedClassName, removeSelectedClassName } from './util';
 
 export default class StageCore extends EventEmitter {
+  public container?: HTMLDivElement;
+
   public selectedDom: Element | undefined;
   public highlightedDom: Element | undefined;
-
   public renderer: StageRender;
   public mask: StageMask;
   public dr: StageDragResize;
   public highlightLayer: StageHighlight;
   public config: StageCoreConfig;
   public zoom = DEFAULT_ZOOM;
-  public container?: HTMLDivElement;
+  public containerHighlightClassName: string;
+  public containerHighlightDuration: number;
+  public isContainer: IsContainer;
+
   private canSelect: CanSelect;
 
   constructor(config: StageCoreConfig) {
@@ -57,6 +62,9 @@ export default class StageCore extends EventEmitter {
 
     this.setZoom(config.zoom);
     this.canSelect = config.canSelect || ((el: HTMLElement) => !!el.id);
+    this.isContainer = config.isContainer;
+    this.containerHighlightClassName = config.containerHighlightClassName;
+    this.containerHighlightDuration = config.containerHighlightDuration;
 
     this.renderer = new StageRender({ core: this });
     this.mask = new StageMask({ core: this });
@@ -104,7 +112,7 @@ export default class StageCore extends EventEmitter {
       });
   }
 
-  public async setElementFromPoint(event: MouseEvent) {
+  public getElementsFromPoint(event: MouseEvent) {
     const { renderer, zoom } = this;
 
     const doc = renderer.contentWindow?.document;
@@ -119,7 +127,11 @@ export default class StageCore extends EventEmitter {
       }
     }
 
-    const els = doc?.elementsFromPoint(x / zoom, y / zoom) as HTMLElement[];
+    return doc?.elementsFromPoint(x / zoom, y / zoom) as HTMLElement[];
+  }
+
+  public async setElementFromPoint(event: MouseEvent) {
+    const els = this.getElementsFromPoint(event);
 
     let stopped = false;
     const stop = () => (stopped = true);

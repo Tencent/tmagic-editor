@@ -49,7 +49,7 @@ import { EventOption } from '@tmagic/core';
 import type { FormConfig } from '@tmagic/form';
 import type { MApp, MNode } from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
-import type { MoveableOptions } from '@tmagic/stage';
+import { CONTAINER_HIGHLIGHT_CLASS, MoveableOptions } from '@tmagic/stage';
 
 import Framework from '@editor/layouts/Framework.vue';
 import NavMenu from '@editor/layouts/NavMenu.vue';
@@ -152,6 +152,21 @@ export default defineComponent({
     canSelect: {
       type: Function as PropType<(el: HTMLElement) => boolean | Promise<boolean>>,
       default: (el: HTMLElement) => Boolean(el.id),
+    },
+
+    isContainer: {
+      type: Function as PropType<(el: HTMLElement) => boolean | Promise<boolean>>,
+      default: (el: HTMLElement) => el.classList.contains('magic-ui-container'),
+    },
+
+    containerHighlightClassName: {
+      type: String,
+      default: CONTAINER_HIGHLIGHT_CLASS,
+    },
+
+    containerHighlightDuration: {
+      type: Number,
+      default: 800,
     },
 
     stageRect: {
@@ -269,6 +284,9 @@ export default defineComponent({
         moveableOptions: props.moveableOptions,
         canSelect: props.canSelect,
         updateDragEl: props.updateDragEl,
+        isContainer: props.isContainer,
+        containerHighlightClassName: props.containerHighlightClassName,
+        containerHighlightDuration: props.containerHighlightDuration,
       }),
     );
 

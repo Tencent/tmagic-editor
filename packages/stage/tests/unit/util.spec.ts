@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { beforeEach, describe, expect, test } from 'vitest';
 
 import * as util from '../../src/util';
 
@@ -76,7 +77,7 @@ describe('getOffset', () => {
     globalThis.document.body.appendChild(root);
   });
 
-  it('没有offsetParent， 没有left、top', () => {
+  test('没有offsetParent， 没有left、top', () => {
     div.style.cssText = `width: 100px; height: 100px`;
     root.appendChild(div);
     const offset = util.getOffset(div);
@@ -84,7 +85,7 @@ describe('getOffset', () => {
     expect(offset.top).toBe(0);
   });
 
-  it('没有offsetParent， 有left、top', () => {
+  test('没有offsetParent， 有left、top', () => {
     const el = createElement();
     root.appendChild(el);
     const offset = util.getOffset(el);
@@ -92,7 +93,7 @@ describe('getOffset', () => {
     expect(offset.top).toBe(100);
   });
 
-  it('有offsetParent， 没有left、top', () => {
+  test('有offsetParent， 没有left、top', () => {
     const parent = createElement();
     div.style.cssText = `width: 100px; height: 100px`;
     parent.appendChild(div);
@@ -116,7 +117,7 @@ describe('getAbsolutePosition', () => {
     globalThis.document.body.appendChild(root);
   });
 
-  it('有offsetParent', () => {
+  test('有offsetParent', () => {
     const parent = createElement();
     div.style.cssText = `width: 100px; height: 100px`;
     parent.appendChild(div);
@@ -126,35 +127,11 @@ describe('getAbsolutePosition', () => {
     expect(offset.top).toBe(0);
   });
 
-  it('没有offsetParent', () => {
+  test('没有offsetParent', () => {
     const el = createElement();
     root.appendChild(el);
     const offset = util.getAbsolutePosition(el, { left: 100, top: 100 });
     expect(offset.left).toBe(100);
     expect(offset.top).toBe(100);
-  });
-});
-
-describe('getHost', () => {
-  it('正常', () => {
-    const host = util.getHost('https://film.qq.com/index.html');
-    expect(host).toBe('film.qq.com');
-  });
-});
-
-describe('isSameDomain', () => {
-  it('正常', () => {
-    const flag = util.isSameDomain('https://film.qq.com/index.html', 'film.qq.com');
-    expect(flag).toBeTruthy();
-  });
-
-  it('不正常', () => {
-    const flag = util.isSameDomain('https://film.qq.com/index.html', 'test.film.qq.com');
-    expect(flag).toBeFalsy();
-  });
-
-  it('不是http', () => {
-    const flag = util.isSameDomain('ftp://film.qq.com/index.html', 'test.film.qq.com');
-    expect(flag).toBeTruthy();
   });
 });

@@ -81,21 +81,17 @@ export const getNodeIndex = (node: MNode, parent: MContainer | MApp): number => 
   return items.findIndex((item: MNode) => `${item.id}` === `${node.id}`);
 };
 
-export const toRelative = (node: MNode) => {
-  node.style = {
-    ...(node.style || {}),
-    position: 'relative',
-    top: 0,
-    left: 0,
-  };
-  return node;
-};
+export const getRelativeStyle = (style: Record<string, any> = {}): Record<string, any> => ({
+  ...style,
+  position: 'relative',
+  top: 0,
+  left: 0,
+});
 
-const setTop2Middle = (node: MNode, parentNode: MNode, stage: StageCore) => {
-  const style = node.style || {};
+const getMiddleTop = (style: Record<string, any> = {}, parentNode: MNode, stage: StageCore) => {
   let height = style.height || 0;
 
-  if (!stage || typeof style.top !== 'undefined' || !parentNode.style) return style;
+  if (!stage || typeof style.top !== 'undefined' || !parentNode.style) return style.top;
 
   if (!isNumber(height)) {
     height = 0;
@@ -105,43 +101,45 @@ const setTop2Middle = (node: MNode, parentNode: MNode, stage: StageCore) => {
 
   if (isPage(parentNode)) {
     const { scrollTop = 0, wrapperHeight } = stage.mask;
-    style.top = (wrapperHeight - height) / 2 + scrollTop;
-  } else {
-    style.top = (parentHeight - height) / 2;
+    return (wrapperHeight - height) / 2 + scrollTop;
   }
-
-  return style;
+  return (parentHeight - height) / 2;
 };
 
-export const initPosition = (node: MNode, layout: Layout, parentNode: MNode, stage: StageCore) => {
+export const getInitPositionStyle = (
+  style: Record<string, any> = {},
+  layout: Layout,
+  parentNode: MNode,
+  stage: StageCore,
+) => {
   if (layout === Layout.ABSOLUTE) {
-    node.style = {
+    return {
+      ...style,
       position: 'absolute',
-      ...setTop2Middle(node, parentNode, stage),
+      top: getMiddleTop(style, parentNode, stage),
     };
-    return node;
   }
 
   if (layout === Layout.RELATIVE) {
-    return toRelative(node);
+    return getRelativeStyle(style);
   }
 
-  return node;
+  return style;
 };
 
 export const setLayout = (node: MNode, layout: Layout) => {
   node.items?.forEach((child: MNode) => {
     if (isPop(child)) return;
 
-    child.style = child.style || {};
+    const style = child.style || {};
 
     // 是 fixed 不做处理
-    if (child.style.position === 'fixed') return;
+    if (style.position === 'fixed') return;
 
     if (layout !== Layout.RELATIVE) {
-      child.style.position = 'absolute';
+      style.position = 'absolute';
     } else {
-      toRelative(child);
+      child.style = getRelativeStyle(style);
       child.style.right = 'auto';
       child.style.bottom = 'auto';
     }
@@ -161,11 +159,10 @@ export const change2Fixed = (node: MNode, root: MApp) => {
     offset.top = offset.top + globalThis.parseFloat(value.style?.top || 0);
   });
 
-  node.style = {
+  return {
     ...(node.style || {}),
     ...offset,
   };
-  return node;
 };
 
 export const Fixed2Other = async (
@@ -186,23 +183,23 @@ export const Fixed2Other = async (
     offset.left = offset.left - globalThis.parseFloat(value.style?.left || 0);
     offset.top = offset.top - globalThis.parseFloat(value.style?.top || 0);
   });
+  const style = node.style || {};
 
   const parent = path.pop();
   if (!parent) {
-    return toRelative(node);
+    return getRelativeStyle(style);
   }
 
   const layout = await getLayout(parent);
   if (layout !== Layout.RELATIVE) {
-    node.style = {
-      ...(node.style || {}),
+    return {
+      ...style,
       ...offset,
       position: 'absolute',
     };
-    return node;
   }
 
-  return toRelative(node);
+  return getRelativeStyle(style);
 };
 
 export const getGuideLineFromCache = (key: string): number[] => {
@@ -218,4 +215,17 @@ export const getGuideLineFromCache = (key: string): number[] => {
   }
 
   return [];
+};
+
+export const fixNodeLeft = (config: MNode, parent: MContainer, doc?: Document) => {
+  if (!doc || !config.style || !isNumber(config.style.left)) return config.style?.left;
+
+  const el = doc.getElementById(`${config.id}`);
+  const parentEl = doc.getElementById(`${parent.id}`);
+
+  if (el && parentEl && el.offsetWidth + config.style?.left > parentEl.offsetWidth) {
+    return parentEl.offsetWidth - el.offsetWidth;
+  }
+
+  return config.style.left;
 };

@@ -17,7 +17,6 @@
  */
 import { describe, expect, test } from 'vitest';
 
-import type { MNode } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 
 import * as editor from '@editor/utils/editor';
@@ -138,19 +137,14 @@ describe('getNodeIndex', () => {
   });
 });
 
-describe('toRelative', () => {
+describe('getRelativeStyle', () => {
   test('正常', () => {
-    const config: MNode = {
-      type: 'text',
-      id: 1,
-      style: {
-        color: 'red',
-      },
-    };
-    editor.toRelative(config);
-    expect(config.style?.position).toBe('relative');
-    expect(config.style?.top).toBe(0);
-    expect(config.style?.left).toBe(0);
-    expect(config.style?.color).toBe('red');
+    const style = editor.getRelativeStyle({
+      color: 'red',
+    });
+    expect(style?.position).toBe('relative');
+    expect(style?.top).toBe(0);
+    expect(style?.left).toBe(0);
+    expect(style?.color).toBe('red');
   });
 });

@@ -19,6 +19,7 @@ export default defineConfig({
     include: [
       './packages/editor/tests/unit/utils/**',
       './packages/editor/tests/unit/services/**',
+      './packages/stage/tests/**',
       './packages/utils/tests/**',
     ],
     environment: 'jsdom',

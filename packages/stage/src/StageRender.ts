@@ -18,9 +18,11 @@
 
 import { EventEmitter } from 'events';
 
+import { getHost, injectStyle, isSameDomain } from '@tmagic/utils';
+
 import StageCore from './StageCore';
+import style from './style.css?raw';
 import type { Runtime, RuntimeWindow, StageRenderConfig } from './types';
-import { getHost, isSameDomain } from './util';
 
 export default class StageRender extends EventEmitter {
   /** 组件的js、css执行的环境，直接渲染为当前window，iframe渲染则为iframe.contentWindow */
@@ -128,5 +130,7 @@ export default class StageRender extends EventEmitter {
       },
       '*',
     );
+
+    injectStyle(this.contentWindow.document, style);
   };
 }

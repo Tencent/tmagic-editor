@@ -18,21 +18,19 @@
 
 import { throttle } from 'lodash-es';
 
+import { createDiv, injectStyle } from '@tmagic/utils';
+
 import { Mode, MouseButton, ZIndex } from './const';
 import Rule from './Rule';
 import type StageCore from './StageCore';
 import type { StageMaskConfig } from './types';
-import { createDiv, getScrollParent, isFixedParent } from './util';
+import { getScrollParent, isFixedParent } from './util';
 
 const wrapperClassName = 'editor-mask-wrapper';
 const throttleTime = 100;
 
 const hideScrollbar = () => {
-  const style = globalThis.document.createElement('style');
-  style.innerHTML = `
-    .${wrapperClassName}::-webkit-scrollbar { width: 0 !important; display: none }
-  `;
-  globalThis.document.head.appendChild(style);
+  injectStyle(globalThis.document, `.${wrapperClassName}::-webkit-scrollbar { width: 0 !important; display: none }`);
 };
 
 const createContent = (): HTMLDivElement =>

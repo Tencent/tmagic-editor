@@ -35,8 +35,15 @@ import {
 } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
-import type { MApp, MNode, MPage } from '@tmagic/schema';
-import StageCore, { GuidesType, Runtime, SortEventData, UpdateEventData } from '@tmagic/stage';
+import type { MApp, MContainer, MNode, MPage } from '@tmagic/schema';
+import StageCore, {
+  calcValueByFontsize,
+  getOffset,
+  GuidesType,
+  Runtime,
+  SortEventData,
+  UpdateEventData,
+} from '@tmagic/stage';
 
 import ScrollViewer from '@editor/components/ScrollViewer.vue';
 import {
@@ -90,6 +97,9 @@ export default defineComponent({
         runtimeUrl: stageOptions.runtimeUrl,
         zoom: zoom.value,
         autoScrollIntoView: stageOptions.autoScrollIntoView,
+        isContainer: stageOptions.isContainer,
+        containerHighlightClassName: stageOptions.containerHighlightClassName,
+        containerHighlightDuration: stageOptions.containerHighlightDuration,
         canSelect: (el, event, stop) => {
           const elCanSelect = stageOptions.canSelect(el);
           // 在组件联动过程中不能再往下选择，返回并触发 ui-select
@@ -122,6 +132,10 @@ export default defineComponent({
       });
 
       stage?.on('update', (ev: UpdateEventData) => {
+        if (ev.parentEl) {
+          services?.editorService.moveToContainer({ id: ev.el.id, style: ev.style }, ev.parentEl.id);
+          return;
+        }
         services?.editorService.update({ id: ev.el.id, style: ev.style });
       });
 
@@ -207,23 +221,50 @@ export default defineComponent({
 
       async dropHandler(e: DragEvent) {
         e.preventDefault();
-        if (e.dataTransfer && page.value && stageContainer.value && stage) {
+
+        const doc = stage?.renderer.contentWindow?.document;
+        const parentEl: HTMLElement | null | undefined = doc?.querySelector(
+          `.${stageOptions?.containerHighlightClassName}`,
+        );
+
+        let parent: MContainer | undefined = page.value;
+        if (parentEl) {
+          parent = services?.editorService.getNodeById(parentEl.id, false) as MContainer;
+        }
+
+        if (e.dataTransfer && parent && stageContainer.value && stage) {
           // eslint-disable-next-line no-eval
           const config = eval(`(${e.dataTransfer.getData('data')})`);
-          const layout = await services?.editorService.getLayout(page.value);
+          const layout = await services?.editorService.getLayout(parent);
 
           const containerRect = stageContainer.value.getBoundingClientRect();
           const { scrollTop, scrollLeft } = stage.mask;
+          const { style = {} } = config;
+
+          let top = 0;
+          let left = 0;
+          let position = 'relative';
+
           if (layout === Layout.ABSOLUTE) {
-            config.style = {
-              ...(config.style || {}),
-              position: 'absolute',
-              top: e.clientY - containerRect.top + scrollTop,
-              left: e.clientX - containerRect.left + scrollLeft,
-            };
+            position = 'absolute';
+            top = e.clientY - containerRect.top + scrollTop;
+            left = e.clientX - containerRect.left + scrollLeft;
+
+            if (parentEl && doc) {
+              const { left: parentLeft, top: parentTop } = getOffset(parentEl);
+              left = left - calcValueByFontsize(doc, parentLeft);
+              top = top - calcValueByFontsize(doc, parentTop);
+            }
           }
 
-          services?.editorService.add(config, page.value);
+          config.style = {
+            ...style,
+            position,
+            top,
+            left,
+          };
+
+          services?.editorService.add(config, parent);
         }
       },
     };

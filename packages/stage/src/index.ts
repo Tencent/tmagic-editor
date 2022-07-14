@@ -24,4 +24,5 @@ export { default as StageMask } from './StageMask';
 export { default as StageDragResize } from './StageDragResize';
 export * from './types';
 export * from './const';
+export * from './util';
 export default StageCore;

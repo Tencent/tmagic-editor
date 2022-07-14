@@ -21,6 +21,8 @@
             :key="item.type"
             @click="appendComponent(item)"
             @dragstart="dragstartHandler(item, $event)"
+            @dragend="dragendHandler"
+            @drag="dragHandler"
           >
             <m-icon :icon="item.icon"></m-icon>
 
@@ -38,8 +40,12 @@
 import { computed, defineComponent, inject, ref } from 'vue';
 import serialize from 'serialize-javascript';
 
+import type StageCore from '@tmagic/stage';
+import { GHOST_EL_ID_PREFIX } from '@tmagic/stage';
+import { addClassName, removeClassNameByClassName } from '@tmagic/utils';
+
 import MIcon from '@editor/components/Icon.vue';
-import type { ComponentGroup, ComponentItem, Services } from '@editor/type';
+import type { ComponentGroup, ComponentItem, Services, StageOptions } from '@editor/type';
 
 export default defineComponent({
   name: 'ui-component-panel',
@@ -49,6 +55,9 @@ export default defineComponent({
   setup() {
     const searchText = ref('');
     const services = inject<Services>('services');
+    const stageOptions = inject<StageOptions>('stageOptions');
+
+    const stage = computed(() => services?.editorService.get<StageCore>('stage'));
     const list = computed(() =>
       services?.componentListService.getList().map((group: ComponentGroup) => ({
         ...group,
@@ -60,6 +69,10 @@ export default defineComponent({
         .fill(1)
         .map((x, i) => i),
     );
+
+    let timeout: NodeJS.Timeout | undefined;
+    let clientX: number;
+    let clientY: number;
 
     return {
       searchText,
@@ -86,6 +99,45 @@ export default defineComponent({
             }).replace(/"(\w+)":\s/g, '$1: '),
           );
         }
+      },
+
+      dragendHandler() {
+        if (timeout) {
+          globalThis.clearTimeout(timeout);
+          timeout = undefined;
+        }
+        const doc = stage.value?.renderer.contentWindow?.document;
+        if (doc && stageOptions) {
+          removeClassNameByClassName(doc, stageOptions.containerHighlightClassName);
+        }
+        clientX = 0;
+        clientY = 0;
+      },
+
+      dragHandler(e: DragEvent) {
+        if (e.clientX !== clientX || e.clientY !== clientY) {
+          clientX = e.clientX;
+          clientY = e.clientY;
+          if (timeout) {
+            globalThis.clearTimeout(timeout);
+            timeout = undefined;
+          }
+          return;
+        }
+
+        if (timeout) return;
+
+        timeout = globalThis.setTimeout(async () => {
+          if (!stageOptions || !stage.value) return;
+          const doc = stage.value.renderer.contentWindow?.document;
+          const els = stage.value.getElementsFromPoint(e);
+          for (const el of els) {
+            if (doc && !el.id.startsWith(GHOST_EL_ID_PREFIX) && (await stageOptions.isContainer(el))) {
+              addClassName(el, doc, stageOptions?.containerHighlightClassName);
+              break;
+            }
+          }
+        }, stageOptions?.containerHighlightDuration);
       },
     };
   },
