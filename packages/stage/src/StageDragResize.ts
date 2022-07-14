@@ -23,10 +23,12 @@ import type { MoveableOptions } from 'moveable';
 import Moveable from 'moveable';
 import MoveableHelper from 'moveable-helper';
 
+import { addClassName, removeClassNameByClassName } from '@tmagic/utils';
+
 import { DRAG_EL_ID_PREFIX, GHOST_EL_ID_PREFIX, GuidesType, Mode, ZIndex } from './const';
 import StageCore from './StageCore';
 import type { SortEventData, StageDragResizeConfig } from './types';
-import { getAbsolutePosition, getMode, getOffset } from './util';
+import { calcValueByFontsize, getAbsolutePosition, getMode, getOffset } from './util';
 
 /** 拖动状态 */
 enum ActionStatus {
@@ -179,20 +181,24 @@ export default class StageDragResize extends EventEmitter {
     this.elementGuidelines = [];
 
     if (this.mode === Mode.ABSOLUTE) {
-      const frame = document.createDocumentFragment();
-
-      for (const node of nodes) {
-        const { width, height } = node.getBoundingClientRect();
-        if (node === this.target) continue;
-        const { left, top } = getOffset(node as HTMLElement);
-        const elementGuideline = document.createElement('div');
-        elementGuideline.style.cssText = `position: absolute;width: ${width}px;height: ${height}px;top: ${top}px;left: ${left}px`;
-        this.elementGuidelines.push(elementGuideline);
-        frame.append(elementGuideline);
-      }
-
-      this.container.append(frame);
+      this.container.append(this.createGuidelineElements(nodes));
     }
+  }
+
+  private createGuidelineElements(nodes: HTMLElement[]) {
+    const frame = globalThis.document.createDocumentFragment();
+
+    for (const node of nodes) {
+      const { width, height } = node.getBoundingClientRect();
+      if (node === this.target) continue;
+      const { left, top } = getOffset(node as HTMLElement);
+      const elementGuideline = globalThis.document.createElement('div');
+      elementGuideline.style.cssText = `position: absolute;width: ${width}px;height: ${height}px;top: ${top}px;left: ${left}px`;
+      this.elementGuidelines.push(elementGuideline);
+      frame.append(elementGuideline);
+    }
+
+    return frame;
   }
 
   private initMoveable() {
@@ -260,6 +266,11 @@ export default class StageDragResize extends EventEmitter {
       top: 0,
     };
 
+    let timeout: NodeJS.Timeout | undefined;
+
+    const { contentWindow } = this.core.renderer;
+    const doc = contentWindow?.document;
+
     this.moveable
       .on('dragStart', (e) => {
         if (!this.target) throw new Error('未选中组件');
@@ -278,6 +289,26 @@ export default class StageDragResize extends EventEmitter {
       .on('drag', (e) => {
         if (!this.target || !this.dragEl) return;
 
+        if (timeout) {
+          globalThis.clearTimeout(timeout);
+          timeout = undefined;
+        }
+
+        timeout = globalThis.setTimeout(async () => {
+          const els = this.core.getElementsFromPoint(e.inputEvent);
+          for (const el of els) {
+            if (
+              doc &&
+              !el.id.startsWith(GHOST_EL_ID_PREFIX) &&
+              el !== this.target &&
+              (await this.core.isContainer(el))
+            ) {
+              addClassName(el, doc, this.core.containerHighlightClassName);
+              break;
+            }
+          }
+        }, this.core.containerHighlightDuration);
+
         this.dragStatus = ActionStatus.ING;
 
         // 流式布局
@@ -292,14 +323,29 @@ export default class StageDragResize extends EventEmitter {
         this.target.style.top = `${frame.top + e.beforeTranslate[1]}px`;
       })
       .on('dragEnd', () => {
+        if (timeout) {
+          globalThis.clearTimeout(timeout);
+          timeout = undefined;
+        }
+
+        let parentEl: HTMLElement | null = null;
+
+        if (doc) {
+          parentEl = removeClassNameByClassName(doc, this.core.containerHighlightClassName);
+        }
+
         // 点击不拖动时会触发dragStart和dragEnd，但是不会有drag事件
         if (this.dragStatus === ActionStatus.ING) {
-          switch (this.mode) {
-            case Mode.SORTABLE:
-              this.sort();
-              break;
-            default:
-              this.update();
+          if (parentEl) {
+            this.update(false, parentEl);
+          } else {
+            switch (this.mode) {
+              case Mode.SORTABLE:
+                this.sort();
+                break;
+              default:
+                this.update();
+            }
           }
         }
 
@@ -381,19 +427,36 @@ export default class StageDragResize extends EventEmitter {
     }
   }
 
-  private update(isResize = false): void {
+  private update(isResize = false, parentEl: HTMLElement | null = null): void {
     if (!this.target) return;
+
+    const { contentWindow } = this.core.renderer;
+    const doc = contentWindow?.document;
+
+    if (!doc) return;
 
     const offset =
       this.mode === Mode.SORTABLE ? { left: 0, top: 0 } : { left: this.target.offsetLeft, top: this.target.offsetTop };
 
-    const left = this.calcValueByFontsize(offset.left);
-    const top = this.calcValueByFontsize(offset.top);
-    const width = this.calcValueByFontsize(this.target.clientWidth);
-    const height = this.calcValueByFontsize(this.target.clientHeight);
+    let left = calcValueByFontsize(doc, offset.left);
+    let top = calcValueByFontsize(doc, offset.top);
+    const width = calcValueByFontsize(doc, this.target.clientWidth);
+    const height = calcValueByFontsize(doc, this.target.clientHeight);
+
+    if (parentEl && this.mode === Mode.ABSOLUTE && this.dragEl) {
+      const [translateX, translateY] = this.moveableHelper?.getFrame(this.dragEl).properties.transform.translate.value;
+      const { left: parentLeft, top: parentTop } = getOffset(parentEl);
+      left =
+        calcValueByFontsize(doc, this.dragEl.offsetLeft) +
+        parseFloat(translateX) -
+        calcValueByFontsize(doc, parentLeft);
+      top =
+        calcValueByFontsize(doc, this.dragEl.offsetTop) + parseFloat(translateY) - calcValueByFontsize(doc, parentTop);
+    }
 
     this.emit('update', {
       el: this.target,
+      parentEl,
       style: isResize ? { left, top, width, height } : { left, top },
     });
   }
@@ -510,18 +573,6 @@ export default class StageDragResize extends EventEmitter {
       ...options,
       ...moveableOptions,
     };
-  }
-
-  private calcValueByFontsize(value: number) {
-    const { contentWindow } = this.core.renderer;
-    const fontSize = contentWindow?.document.documentElement.style.fontSize;
-
-    if (fontSize) {
-      const times = globalThis.parseFloat(fontSize) / 100;
-      return (value / times).toFixed(2);
-    }
-
-    return value;
   }
 }
 

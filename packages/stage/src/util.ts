@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { removeClassName } from '@tmagic/utils';
 
 import { Mode, SELECTED_CLASS } from './const';
 import type { Offset } from './types';
@@ -61,16 +62,6 @@ export const getAbsolutePosition = (el: HTMLElement, { top, left }: Offset) => {
   }
 
   return { left, top };
-};
-
-export const getHost = (targetUrl: string) => targetUrl.match(/\/\/([^/]+)/)?.[1];
-
-export const isSameDomain = (targetUrl = '', source = globalThis.location.host) => {
-  const isHttpUrl = /^(http[s]?:)?\/\//.test(targetUrl);
-
-  if (!isHttpUrl) return true;
-
-  return getHost(targetUrl) === source;
 };
 
 export const isAbsolute = (style: CSSStyleDeclaration): boolean => style.position === 'absolute';
@@ -123,21 +114,14 @@ export const getScrollParent = (element: HTMLElement, includeHidden = false): HT
   return null;
 };
 
-export const createDiv = ({ className, cssText }: { className: string; cssText: string }) => {
-  const el = globalThis.document.createElement('div');
-  el.className = className;
-  el.style.cssText = cssText;
-  return el;
-};
-
 export const removeSelectedClassName = (doc: Document) => {
   const oldEl = doc.querySelector(`.${SELECTED_CLASS}`);
 
   if (oldEl) {
-    oldEl.classList.remove(SELECTED_CLASS);
-    (oldEl.parentNode as HTMLDivElement)?.classList.remove(`${SELECTED_CLASS}-parent`);
+    removeClassName(oldEl, SELECTED_CLASS);
+    if (oldEl.parentNode) removeClassName(oldEl.parentNode as Element, `${SELECTED_CLASS}-parent`);
     doc.querySelectorAll(`.${SELECTED_CLASS}-parents`).forEach((item) => {
-      item.classList.remove(`${SELECTED_CLASS}-parents`);
+      removeClassName(item, `${SELECTED_CLASS}-parents`);
     });
   }
 };
@@ -148,4 +132,15 @@ export const addSelectedClassName = (el: Element, doc: Document) => {
   getParents(el, doc.body).forEach((item) => {
     item.classList.add(`${SELECTED_CLASS}-parents`);
   });
+};
+
+export const calcValueByFontsize = (doc: Document, value: number) => {
+  const { fontSize } = doc.documentElement.style;
+
+  if (fontSize) {
+    const times = globalThis.parseFloat(fontSize) / 100;
+    return Number((value / times).toFixed(2));
+  }
+
+  return value;
 };

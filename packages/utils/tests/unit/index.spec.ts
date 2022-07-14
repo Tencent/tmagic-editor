@@ -275,3 +275,27 @@ describe('isPop', () => {
     ).toBeFalsy();
   });
 });
+
+describe('getHost', () => {
+  test('正常', () => {
+    const host = util.getHost('https://film.qq.com/index.html');
+    expect(host).toBe('film.qq.com');
+  });
+});
+
+describe('isSameDomain', () => {
+  test('正常', () => {
+    const flag = util.isSameDomain('https://film.qq.com/index.html', 'film.qq.com');
+    expect(flag).toBeTruthy();
+  });
+
+  test('不正常', () => {
+    const flag = util.isSameDomain('https://film.qq.com/index.html', 'test.film.qq.com');
+    expect(flag).toBeFalsy();
+  });
+
+  test('不是http', () => {
+    const flag = util.isSameDomain('ftp://film.qq.com/index.html', 'test.film.qq.com');
+    expect(flag).toBeTruthy();
+  });
+});

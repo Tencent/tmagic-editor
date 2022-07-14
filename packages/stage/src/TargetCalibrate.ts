@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-/* eslint-disable no-param-reassign */
 import { EventEmitter } from 'events';
 
 import { Mode } from './const';

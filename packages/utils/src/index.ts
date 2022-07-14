@@ -21,6 +21,8 @@ import moment from 'moment';
 import type { MNode } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 
+export * from './dom';
+
 export const sleep = (ms: number): Promise<void> =>
   new Promise((resolve) => {
     const timer = setTimeout(() => {
@@ -55,87 +57,6 @@ export const datetimeFormatter = (v: string | Date, defaultValue = '-', f = 'YYY
   }
   return defaultValue;
 };
-
-export const asyncLoadJs = (() => {
-  // 正在加载或加载成功的存入此Map中
-  const documentMap = new Map();
-
-  return (url: string, crossOrigin?: string, document = globalThis.document) => {
-    let loaded = documentMap.get(document);
-    if (!loaded) {
-      loaded = new Map();
-      documentMap.set(document, loaded);
-    }
-
-    // 正在加载或已经加载成功的，直接返回
-    if (loaded.get(url)) return loaded.get(url);
-
-    const load = new Promise<void>((resolve, reject) => {
-      const script = document.createElement('script');
-      script.type = 'text/javascript';
-      if (crossOrigin) {
-        script.crossOrigin = crossOrigin;
-      }
-      script.src = url;
-      document.body.appendChild(script);
-      script.onload = () => {
-        resolve();
-      };
-      script.onerror = () => {
-        reject(new Error('加载失败'));
-      };
-      setTimeout(() => {
-        reject(new Error('timeout'));
-      }, 60 * 1000);
-    }).catch((err) => {
-      // 加载失败的，从map中移除，第二次加载时，可以再次执行加载
-      loaded.delete(url);
-      throw err;
-    });
-
-    loaded.set(url, load);
-    return loaded.get(url);
-  };
-})();
-
-export const asyncLoadCss = (() => {
-  // 正在加载或加载成功的存入此Map中
-  const documentMap = new Map();
-
-  return (url: string, document = globalThis.document) => {
-    let loaded = documentMap.get(document);
-    if (!loaded) {
-      loaded = new Map();
-      documentMap.set(document, loaded);
-    }
-
-    // 正在加载或已经加载成功的，直接返回
-    if (loaded.get(url)) return loaded.get(url);
-
-    const load = new Promise<void>((resolve, reject) => {
-      const node = document.createElement('link');
-      node.rel = 'stylesheet';
-      node.href = url;
-      document.head.appendChild(node);
-      node.onload = () => {
-        resolve();
-      };
-      node.onerror = () => {
-        reject(new Error('加载失败'));
-      };
-      setTimeout(() => {
-        reject(new Error('timeout'));
-      }, 60 * 1000);
-    }).catch((err) => {
-      // 加载失败的，从map中移除，第二次加载时，可以再次执行加载
-      loaded.delete(url);
-      throw err;
-    });
-
-    loaded.set(url, load);
-    return loaded.get(url);
-  };
-})();
 
 // 驼峰转换横线
 export const toLine = (name = '') => name.replace(/\B([A-Z])/g, '-$1').toLowerCase();
@@ -209,3 +130,13 @@ export const isPop = (node: MNode): boolean => Boolean(node.type?.toLowerCase().
 export const isPage = (node: MNode): boolean => Boolean(node.type?.toLowerCase() === NodeType.PAGE);
 
 export const isNumber = (value: string) => /^(-?\d+)(\.\d+)?$/.test(value);
+
+export const getHost = (targetUrl: string) => targetUrl.match(/\/\/([^/]+)/)?.[1];
+
+export const isSameDomain = (targetUrl = '', source = globalThis.location.host) => {
+  const isHttpUrl = /^(http[s]?:)?\/\//.test(targetUrl);
+
+  if (!isHttpUrl) return true;
+
+  return getHost(targetUrl) === source;
+};

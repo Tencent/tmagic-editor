@@ -33,9 +33,10 @@ import {
   change2Fixed,
   COPY_STORAGE_KEY,
   Fixed2Other,
+  fixNodeLeft,
   generatePageNameByApp,
+  getInitPositionStyle,
   getNodeIndex,
-  initPosition,
   isFixed,
   setLayout,
 } from '@editor/utils/editor';
@@ -70,6 +71,7 @@ class Editor extends BaseService {
         'paste',
         'alignCenter',
         'moveLayer',
+        'moveToContainer',
         'move',
         'undo',
         'redo',
@@ -274,7 +276,7 @@ class Editor extends BaseService {
     const { type, ...config } = addNode;
     const curNode = this.get<MContainer>('node');
 
-    let parentNode: MNode | undefined;
+    let parentNode: MContainer | undefined;
     const isPage = type === NodeType.PAGE;
 
     if (isPage) {
@@ -291,12 +293,8 @@ class Editor extends BaseService {
     if (!parentNode) throw new Error('未找到父元素');
 
     const layout = await this.getLayout(toRaw(parentNode), addNode as MNode);
-    const newNode = initPosition(
-      { ...toRaw(await propsService.getPropsValue(type, config)) },
-      layout,
-      parentNode,
-      this.get<StageCore>('stage'),
-    );
+    const newNode = { ...toRaw(await propsService.getPropsValue(type, config)) };
+    newNode.style = getInitPositionStyle(newNode.style, layout, parentNode, this.get<StageCore>('stage'));
 
     if ((parentNode?.type === NodeType.ROOT || curNode.type === NodeType.ROOT) && newNode.type !== NodeType.PAGE) {
       throw new Error('app下不能添加组件');
@@ -305,8 +303,17 @@ class Editor extends BaseService {
     parentNode?.items?.push(newNode);
 
     const stage = this.get<StageCore | null>('stage');
+    const root = this.get<MApp>('root');
 
-    await stage?.add({ config: cloneDeep(newNode), root: cloneDeep(this.get('root')) });
+    await stage?.add({ config: cloneDeep(newNode), root: cloneDeep(root) });
+
+    if (layout === Layout.ABSOLUTE) {
+      const fixedLeft = fixNodeLeft(newNode, parentNode, stage?.renderer.contentWindow?.document);
+      if (typeof fixedLeft !== 'undefined') {
+        newNode.style.left = fixedLeft;
+        await stage?.update({ config: cloneDeep(newNode), root: cloneDeep(root) });
+      }
+    }
 
     await this.select(newNode);
 
@@ -348,7 +355,7 @@ class Editor extends BaseService {
 
     parent.items?.splice(index, 1);
     const stage = this.get<StageCore | null>('stage');
-    stage?.remove({ id: node.id, root: this.get('root') });
+    stage?.remove({ id: node.id, root: cloneDeep(this.get('root')) });
 
     if (node.type === NodeType.PAGE) {
       this.state.pageLength -= 1;
@@ -431,7 +438,7 @@ class Editor extends BaseService {
       this.set('node', newConfig);
     }
 
-    this.get<StageCore | null>('stage')?.update({ config: cloneDeep(newConfig), root: this.get('root') });
+    this.get<StageCore | null>('stage')?.update({ config: cloneDeep(newConfig), root: cloneDeep(this.get('root')) });
 
     if (newConfig.type === NodeType.PAGE) {
       this.set('page', newConfig);
@@ -464,7 +471,7 @@ class Editor extends BaseService {
     await this.update(parent);
     await this.select(node);
 
-    this.get<StageCore | null>('stage')?.update({ config: cloneDeep(node), root: this.get('root') });
+    this.get<StageCore | null>('stage')?.update({ config: cloneDeep(node), root: cloneDeep(this.get('root')) });
 
     this.addModifiedNodeId(parent.id);
     this.pushHistoryState();
@@ -544,7 +551,10 @@ class Editor extends BaseService {
     }
 
     await this.update(node);
-    this.get<StageCore | null>('stage')?.update({ config: cloneDeep(toRaw(node)), root: this.get('root') });
+    this.get<StageCore | null>('stage')?.update({
+      config: cloneDeep(toRaw(node)),
+      root: cloneDeep(this.get<MApp>('root')),
+    });
     this.addModifiedNodeId(config.id);
     this.pushHistoryState();
 
@@ -569,7 +579,54 @@ class Editor extends BaseService {
       brothers.splice(index + parseInt(`${offset}`, 10), 0, brothers.splice(index, 1)[0]);
     }
 
-    this.get<StageCore | null>('stage')?.update({ config: cloneDeep(toRaw(parent)), root: this.get('root') });
+    this.get<StageCore | null>('stage')?.update({
+      config: cloneDeep(toRaw(parent)),
+      root: cloneDeep(this.get<MApp>('root')),
+    });
+  }
+
+  /**
+   * 移动到指定容器中
+   * @param config 需要移动的节点
+   * @param targetId 容器ID
+   */
+  public async moveToContainer(config: MNode, targetId: Id): Promise<MNode | undefined> {
+    const { node, parent } = this.getNodeInfo(config.id, false);
+    const target = this.getNodeById(targetId, false) as MContainer;
+
+    const stage = this.get<StageCore | null>('stage');
+
+    if (node && parent && stage) {
+      const root = cloneDeep(this.get<MApp>('root'));
+      const index = getNodeIndex(node, parent);
+      parent.items?.splice(index, 1);
+
+      await stage.remove({ id: node.id, root });
+
+      const layout = await this.getLayout(target);
+
+      const newConfig = mergeWith(cloneDeep(node), config, (objValue, srcValue) => {
+        if (Array.isArray(srcValue)) {
+          return srcValue;
+        }
+      });
+      newConfig.style = getInitPositionStyle(newConfig.style, layout, target, stage);
+
+      target.items.push(newConfig);
+
+      await stage.select(targetId);
+
+      await stage.update({ config: cloneDeep(target), root });
+
+      await this.select(newConfig);
+      stage.select(newConfig.id);
+
+      this.addModifiedNodeId(target.id);
+      this.addModifiedNodeId(parent.id);
+      this.pushHistoryState();
+
+      return newConfig;
+    }
   }
 
   /**
@@ -656,13 +713,13 @@ class Editor extends BaseService {
   }
 
   private async toggleFixedPosition(dist: MNode, src: MNode, root: MApp) {
-    let newConfig = cloneDeep(dist);
+    const newConfig = cloneDeep(dist);
 
     if (!isPop(src) && newConfig.style?.position) {
       if (isFixed(newConfig) && !isFixed(src)) {
-        newConfig = change2Fixed(newConfig, root);
+        newConfig.style = change2Fixed(newConfig, root);
       } else if (!isFixed(newConfig) && isFixed(src)) {
-        newConfig = await Fixed2Other(newConfig, root, this.getLayout);
+        newConfig.style = await Fixed2Other(newConfig, root, this.getLayout);
       }
     }
 
