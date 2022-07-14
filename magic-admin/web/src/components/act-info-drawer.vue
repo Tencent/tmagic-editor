@@ -23,7 +23,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, nextTick, ref, watch } from 'vue';
-import { Setting } from '@element-plus/icons';
+import { Setting } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 
 import { drawerFormConfig } from '@src/config/drawer-config';

@@ -33,7 +33,7 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import { View } from '@element-plus/icons';
+import { View } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 
 import { editorService } from '@tmagic/editor';
