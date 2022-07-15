@@ -154,7 +154,7 @@
 /* eslint-disable no-param-reassign */
 import { computed, defineComponent, inject, onMounted, PropType, ref, toRefs } from 'vue';
 import { ArrowDown, ArrowUp, Delete, FullScreen, Grid } from '@element-plus/icons';
-import { ElMessage, ElTable, UploadFile } from 'element-plus';
+import { ElMessage, UploadFile } from 'element-plus';
 import { cloneDeep } from 'lodash-es';
 import Sortable, { SortableEvent } from 'sortablejs';
 
@@ -223,7 +223,7 @@ export default defineComponent({
     let timer: NodeJS.Timeout | null = null;
     const mForm = inject<FormState | undefined>('mForm');
 
-    const elTable = ref<InstanceType<typeof ElTable>>();
+    const elTable = ref<any>();
     const excelBtn = ref<any>();
     const mTable = ref<HTMLDivElement>();
 
