@@ -75,19 +75,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@media screen and (max-width: 1440px) {
-  .m-editor-workspace {
-    .el-radio-group {
-      transform: rotate(90deg) translateY(-255px);
-      transform-origin: left top;
-
-      &.tv {
-        transform: none;
-      }
-    }
-  }
-}
-
 .m-editor-workspace {
   * {
     user-select: none;
