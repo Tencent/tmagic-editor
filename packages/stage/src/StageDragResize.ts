@@ -76,6 +76,7 @@ export default class StageDragResize extends EventEmitter {
   /** 流式布局下，目标节点的镜像节点 */
   private ghostEl: HTMLElement | undefined;
   private moveableHelper?: MoveableHelper;
+  private multiMoveableHelper?: MoveableHelper;
 
   constructor(config: StageDragResizeConfig) {
     super();
@@ -124,9 +125,15 @@ export default class StageDragResize extends EventEmitter {
       this.container.append(dragElDiv);
       dragElDiv.style.cssText = this.updateDragEl(elItem);
       dragElDiv.id = `${DRAG_EL_ID_PREFIX}${elItem.id}`;
+      // 业务方校准
+      if (typeof this.core.config.updateDragEl === 'function') {
+        this.core.config.updateDragEl(dragElDiv, elItem);
+      }
       return dragElDiv;
     });
     this.moveableForMulti?.destroy();
+    this.multiMoveableHelper?.clear();
+
     this.moveableForMulti = new Moveable(this.container, {
       target: this.dragElList,
       defaultGroupRotate: 0,
@@ -140,15 +147,22 @@ export default class StageDragResize extends EventEmitter {
       origin: true,
       padding: { left: 0, top: 0, right: 0, bottom: 0 },
     });
+    this.multiMoveableHelper = MoveableHelper.create({
+      useBeforeRender: true,
+      useRender: false,
+      createAuto: true,
+    });
     const frames: { left: number; top: number; dragLeft: number; dragTop: number; id: string }[] = [];
     this.moveableForMulti
-      .on('dragGroupStart', ({ events }) => {
+      .on('dragGroupStart', (params) => {
+        const { events } = params;
+        this.moveableHelper?.onDragGroupStart(params);
         // 记录拖动前快照
         events.forEach((ev) => {
           // 实际目标元素
           const matchEventTarget = this.targetList.find((targetItem) => targetItem.id === ev.target.id.split('_')[2]);
           // 蒙层虚拟元素（对于在组内的元素拖动时的相对位置不同，因此需要分别记录）
-          const dragEventTarget = this.dragElList.find((dragElItem) => dragElItem.id === ev.target.id);
+          const dragEventTarget = ev.target as HTMLDivElement;
           if (!matchEventTarget || !dragEventTarget) return;
           frames.push({
             left: matchEventTarget.offsetLeft,
@@ -159,7 +173,8 @@ export default class StageDragResize extends EventEmitter {
           });
         });
       })
-      .on('dragGroup', ({ events }) => {
+      .on('dragGroup', (params) => {
+        const { events } = params;
         // 拖动过程更新
         events.forEach((ev) => {
           const frameSnapShot = frames.find((frameItem) => frameItem.id === ev.target.id.split('_')[2]);
@@ -173,10 +188,8 @@ export default class StageDragResize extends EventEmitter {
             targeEl.style.left = `${frameSnapShot.left + ev.beforeTranslate[0]}px`;
             targeEl.style.top = `${frameSnapShot.top + ev.beforeTranslate[1]}px`;
           }
-          // 更新蒙层虚拟元素位置
-          ev.target.style.left = `${frameSnapShot.dragLeft + ev.beforeTranslate[0]}px`;
-          ev.target.style.top = `${frameSnapShot.dragTop + ev.beforeTranslate[1]}px`;
         });
+        this.moveableHelper?.onDragGroup(params);
       });
   }
 
