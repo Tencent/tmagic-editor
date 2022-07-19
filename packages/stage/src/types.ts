@@ -57,6 +57,7 @@ export interface StageMaskConfig {
 export interface StageDragResizeConfig {
   core: StageCore;
   container: HTMLElement;
+  mask: StageMask;
 }
 
 export type Rect = {
