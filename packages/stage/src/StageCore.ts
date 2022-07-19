@@ -126,7 +126,7 @@ export default class StageCore extends EventEmitter {
         } else {
           this.selectedDomList.push(el);
         }
-        this.dr.multiSelect(this.selectedDomList, event);
+        this.dr.multiSelect(this.selectedDomList);
         this.emit('multiSelect', this.selectedDomList);
       });
 
