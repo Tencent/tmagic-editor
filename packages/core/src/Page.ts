@@ -18,38 +18,47 @@
 
 import type { Id, MComponent, MContainer, MPage } from '@tmagic/schema';
 
+import type App from './App';
 import Node from './Node';
 interface ConfigOptions {
   config: MPage;
+  app: App;
 }
 
 class Page extends Node {
-  nodes = new Map<Id, Node>();
+  public nodes = new Map<Id, Node>();
 
   constructor(options: ConfigOptions) {
-    super(options.config);
+    super(options);
 
     this.setNode(options.config.id, this);
-    this.initNode(options.config);
+    this.initNode(options.config, this);
   }
 
-  initNode(config: MComponent | MContainer) {
-    this.setNode(config.id, new Node(config));
+  public initNode(config: MComponent | MContainer, parent: Node) {
+    const node = new Node({
+      config,
+      parent,
+      page: this,
+      app: this.app,
+    });
+
+    this.setNode(config.id, node);
 
     config.items?.forEach((element: MComponent | MContainer) => {
-      this.initNode(element);
+      this.initNode(element, node);
     });
   }
 
-  getNode(id: Id) {
+  public getNode(id: Id) {
     return this.nodes.get(id);
   }
 
-  setNode(id: Id, node: Node) {
+  public setNode(id: Id, node: Node) {
     this.nodes.set(id, node);
   }
 
-  deleteNode(id: Id) {
+  public deleteNode(id: Id) {
     this.nodes.delete(id);
   }
 }
