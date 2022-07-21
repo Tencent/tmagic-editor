@@ -27,6 +27,8 @@ export const HIGHLIGHT_EL_ID_PREFIX = 'highlight_el_';
 
 export const CONTAINER_HIGHLIGHT_CLASS = 'tmagic-stage-container-highlight';
 
+export const PAGE_CLASS = 'magic-ui-page';
+
 /** 默认放到缩小倍数 */
 export const DEFAULT_ZOOM = 1;
 

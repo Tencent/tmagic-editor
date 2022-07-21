@@ -254,6 +254,7 @@ importers:
       '@types/lodash-es': ^4.17.4
       '@types/node': ^15.12.4
       events: ^3.3.0
+      keycon: ^1.1.2
       lodash-es: ^4.17.21
       moveable: ^0.30.0
       moveable-helper: ^0.4.0
@@ -267,6 +268,7 @@ importers:
       '@tmagic/schema': link:../schema
       '@tmagic/utils': link:../utils
       events: 3.3.0
+      keycon: 1.1.2
       lodash-es: 4.17.21
       moveable: 0.30.0
       moveable-helper: 0.4.0
@@ -3075,7 +3077,7 @@ packages:
       lodash: ^4.17.20
       marko: ^3.14.4
       mote: ^0.2.0
-      mustache: ^3.0.0
+      mustache: ^4.0.1
       nunjucks: ^3.2.2
       plates: ~0.4.11
       pug: ^3.0.0
@@ -5519,7 +5521,7 @@ packages:
   /keycon/1.1.2:
     resolution: {integrity: sha512-yCoUAfwqmQUWrtOFuZhicxasF/4ae+M0aH8yV1wEKKZCZql8v6jWhlVF9dT5i1TfuHSmgt/GNuCaWIHT8wk6eQ==}
     dependencies:
-      '@daybrush/utils': 1.6.0
+      '@daybrush/utils': 1.7.1
       '@scena/event-emitter': 1.0.5
       keycode: 2.2.1
     dev: false

@@ -40,7 +40,6 @@ import {
   isFixed,
   setLayout,
 } from '@editor/utils/editor';
-import { log } from '@editor/utils/logger';
 
 import BaseService from './BaseService';
 
@@ -90,7 +89,6 @@ class Editor extends BaseService {
    */
   public set<T = MNode>(name: keyof StoreState, value: T) {
     this.state[name] = value as any;
-    log('store set ', name, ' ', value);
 
     if (name === 'root') {
       this.state.pageLength = (value as unknown as MApp)?.items?.length || 0;

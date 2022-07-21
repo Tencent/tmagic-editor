@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import KeyController from 'keycon';
 import { throttle } from 'lodash-es';
 
 import { createDiv, injectStyle } from '@tmagic/utils';
@@ -82,6 +83,7 @@ export default class StageMask extends Rule {
   public maxScrollTop = 0;
   public maxScrollLeft = 0;
   public intersectionObserver: IntersectionObserver | null = null;
+  public shiftKeyDown: Boolean = false;
 
   private mode: Mode = Mode.ABSOLUTE;
   private pageResizeObserver: ResizeObserver | null = null;
@@ -106,6 +108,14 @@ export default class StageMask extends Rule {
     this.content.addEventListener('wheel', this.mouseWheelHandler);
     this.content.addEventListener('mousemove', this.highlightHandler);
     this.content.addEventListener('mouseleave', this.mouseLeaveHandler);
+    KeyController.global.keydown('shift', (e) => {
+      e.inputEvent.preventDefault();
+      this.shiftKeyDown = true;
+    });
+    KeyController.global.keyup('shift', (e) => {
+      e.inputEvent.preventDefault();
+      this.shiftKeyDown = false;
+    });
   }
 
   public setMode(mode: Mode) {
@@ -292,23 +302,30 @@ export default class StageMask extends Rule {
    */
   private mouseDownHandler = (event: MouseEvent): void => {
     this.emit('clearHighlight');
-
     event.stopImmediatePropagation();
     event.stopPropagation();
 
     if (event.button !== MouseButton.LEFT && event.button !== MouseButton.RIGHT) return;
 
-    // 点击的对象如果是选中框，则不需要再触发选中了，而可能是拖动行为
+    // 如果单击多选选中区域，则不需要再触发选中了，而可能是拖动行为
+    if (!this.shiftKeyDown && (event.target as HTMLDivElement).className.indexOf('moveable-area') !== -1) {
+      return;
+    }
+    // 点击对象如果是边框锚点，则可能是resize
     if ((event.target as HTMLDivElement).className.indexOf('moveable-control') !== -1) {
       return;
     }
 
     this.content.removeEventListener('mousemove', this.highlightHandler);
 
-    this.emit('beforeSelect', event);
-
-    // 如果是右键点击，这里的mouseup事件监听没有效果
-    globalThis.document.addEventListener('mouseup', this.mouseUpHandler);
+    // 判断触发多选还是单选
+    if (this.shiftKeyDown) {
+      this.emit('beforeMultiSelect', event);
+    } else {
+      this.emit('beforeSelect', event);
+      // 如果是右键点击，这里的mouseup事件监听没有效果
+      globalThis.document.addEventListener('mouseup', this.mouseUpHandler);
+    }
   };
 
   private mouseUpHandler = (): void => {
