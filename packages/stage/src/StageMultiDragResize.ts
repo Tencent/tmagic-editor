@@ -25,7 +25,7 @@ import { DRAG_EL_ID_PREFIX } from './const';
 import StageCore from './StageCore';
 import StageMask from './StageMask';
 import { StageDragResizeConfig } from './types';
-import { getTargetElStyle } from './util';
+import { calcValueByFontsize, getTargetElStyle } from './util';
 export default class StageMultiDragResize extends EventEmitter {
   public core: StageCore;
   public mask: StageMask;
@@ -128,6 +128,9 @@ export default class StageMultiDragResize extends EventEmitter {
           }
         });
         this.multiMoveableHelper?.onDragGroup(params);
+      })
+      .on('dragGroupEnd', () => {
+        this.update();
       });
   }
 
@@ -154,5 +157,29 @@ export default class StageMultiDragResize extends EventEmitter {
    */
   public destroyDragElList(): void {
     this.dragElList.forEach((dragElItem) => dragElItem?.remove());
+  }
+
+  /**
+   * 拖拽完成后将更新的位置信息暴露给上层业务方，业务方可以接收事件进行保存
+   * @param isResize 是否进行大小缩放
+   */
+  private update(isResize = false): void {
+    if (this.targetList.length === 0) return;
+
+    const { contentWindow } = this.core.renderer;
+    const doc = contentWindow?.document;
+    if (!doc) return;
+
+    this.targetList.forEach((targetItem) => {
+      const offset = { left: targetItem.offsetLeft, top: targetItem.offsetTop };
+      const left = calcValueByFontsize(doc, offset.left);
+      const top = calcValueByFontsize(doc, offset.top);
+      const width = calcValueByFontsize(doc, targetItem.clientWidth);
+      const height = calcValueByFontsize(doc, targetItem.clientHeight);
+      this.emit('update', {
+        el: targetItem,
+        style: isResize ? { left, top, width, height } : { left, top },
+      });
+    });
   }
 }
