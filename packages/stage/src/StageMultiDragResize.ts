@@ -25,7 +25,7 @@ import { DRAG_EL_ID_PREFIX } from './const';
 import StageCore from './StageCore';
 import StageMask from './StageMask';
 import { StageDragResizeConfig } from './types';
-import { updateDragEl } from './util';
+import { getTargetElStyle } from './util';
 export default class StageMultiDragResize extends EventEmitter {
   public core: StageCore;
   public mask: StageMask;
@@ -59,7 +59,7 @@ export default class StageMultiDragResize extends EventEmitter {
     this.dragElList = els.map((elItem) => {
       const dragElDiv = globalThis.document.createElement('div');
       this.container.append(dragElDiv);
-      dragElDiv.style.cssText = updateDragEl(elItem);
+      dragElDiv.style.cssText = getTargetElStyle(elItem);
       dragElDiv.id = `${DRAG_EL_ID_PREFIX}${elItem.id}`;
       // 业务方校准
       if (typeof this.core.config.updateDragEl === 'function') {

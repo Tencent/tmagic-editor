@@ -29,7 +29,7 @@ import { DRAG_EL_ID_PREFIX, GHOST_EL_ID_PREFIX, GuidesType, Mode, ZIndex } from 
 import StageCore from './StageCore';
 import StageMask from './StageMask';
 import type { SortEventData, StageDragResizeConfig } from './types';
-import { calcValueByFontsize, getAbsolutePosition, getMode, getOffset, updateDragEl } from './util';
+import { calcValueByFontsize, getAbsolutePosition, getMode, getOffset, getTargetElStyle } from './util';
 
 /** 拖动状态 */
 enum ActionStatus {
@@ -183,11 +183,10 @@ export default class StageDragResize extends EventEmitter {
     this.mode = getMode(el);
 
     this.destroyGhostEl();
-    this.core.multiDr.destroyDragElList();
     this.destroyDragEl();
     this.dragEl = globalThis.document.createElement('div');
     this.container.append(this.dragEl);
-    this.dragEl.style.cssText = updateDragEl(el);
+    this.dragEl.style.cssText = getTargetElStyle(el);
     this.dragEl.id = `${DRAG_EL_ID_PREFIX}${el.id}`;
 
     if (typeof this.core.config.updateDragEl === 'function') {

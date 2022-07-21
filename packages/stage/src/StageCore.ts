@@ -194,6 +194,7 @@ export default class StageCore extends EventEmitter {
     }
 
     this.mask.setLayout(el);
+    this.multiDr.destroyDragElList();
     this.dr.select(el, event);
 
     if (this.config.autoScrollIntoView || el.dataset.autoScrollIntoView) {

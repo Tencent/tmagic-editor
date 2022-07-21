@@ -51,7 +51,7 @@ export const getOffset = (el: HTMLElement): Offset => {
 };
 
 // 将蒙层占位节点覆盖在原节点上方
-export const updateDragEl = (el: HTMLElement) => {
+export const getTargetElStyle = (el: HTMLElement) => {
   const offset = getOffset(el);
   const { transform } = getComputedStyle(el);
   return `
