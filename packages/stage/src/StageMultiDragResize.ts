@@ -88,7 +88,7 @@ export default class StageMultiDragResize extends EventEmitter {
       useRender: false,
       createAuto: true,
     });
-    const frames: { left: number; top: number; dragLeft: number; dragTop: number; id: string }[] = [];
+    const frames: { left: number; top: number; id: string }[] = [];
     this.moveableForMulti
       .on('dragGroupStart', (params) => {
         const { events } = params;
@@ -96,15 +96,13 @@ export default class StageMultiDragResize extends EventEmitter {
         // 记录拖动前快照
         events.forEach((ev) => {
           // 实际目标元素
-          const matchEventTarget = this.targetList.find((targetItem) => targetItem.id === ev.target.id.split('_')[2]);
-          // 蒙层虚拟元素（对于在组内的元素拖动时的相对位置不同，因此需要分别记录）
-          const dragEventTarget = ev.target as HTMLDivElement;
-          if (!matchEventTarget || !dragEventTarget) return;
+          const matchEventTarget = this.targetList.find(
+            (targetItem) => targetItem.id === ev.target.id.replace(DRAG_EL_ID_PREFIX, ''),
+          );
+          if (!matchEventTarget) return;
           frames.push({
             left: matchEventTarget.offsetLeft,
             top: matchEventTarget.offsetTop,
-            dragLeft: dragEventTarget.offsetLeft,
-            dragTop: dragEventTarget.offsetTop,
             id: matchEventTarget.id,
           });
         });
@@ -113,9 +111,13 @@ export default class StageMultiDragResize extends EventEmitter {
         const { events } = params;
         // 拖动过程更新
         events.forEach((ev) => {
-          const frameSnapShot = frames.find((frameItem) => frameItem.id === ev.target.id.split('_')[2]);
+          const frameSnapShot = frames.find(
+            (frameItem) => frameItem.id === ev.target.id.replace(DRAG_EL_ID_PREFIX, ''),
+          );
           if (!frameSnapShot) return;
-          const targeEl = this.targetList.find((targetItem) => targetItem.id === ev.target.id.split('_')[2]);
+          const targeEl = this.targetList.find(
+            (targetItem) => targetItem.id === ev.target.id.replace(DRAG_EL_ID_PREFIX, ''),
+          );
           if (!targeEl) return;
           // 元素与其所属组同时加入多选列表时，只更新父元素
           const isParentIncluded = this.targetList.find((targetItem) => targetItem.id === targeEl.parentElement?.id);
