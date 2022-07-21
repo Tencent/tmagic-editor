@@ -17,7 +17,7 @@
  */
 import { removeClassName } from '@tmagic/utils';
 
-import { Mode, SELECTED_CLASS } from './const';
+import { Mode, SELECTED_CLASS, ZIndex } from './const';
 import type { Offset } from './types';
 
 const getParents = (el: Element, relative: Element) => {
@@ -48,6 +48,21 @@ export const getOffset = (el: HTMLElement): Offset => {
     left,
     top,
   };
+};
+
+// 将蒙层占位节点覆盖在原节点上方
+export const updateDragEl = (el: HTMLElement) => {
+  const offset = getOffset(el);
+  const { transform } = getComputedStyle(el);
+  return `
+    position: absolute;
+    transform: ${transform};
+    left: ${offset.left}px;
+    top: ${offset.top}px;
+    width: ${el.clientWidth}px;
+    height: ${el.clientHeight}px;
+    z-index: ${ZIndex.DRAG_EL};
+  `;
 };
 
 export const getAbsolutePosition = (el: HTMLElement, { top, left }: Offset) => {

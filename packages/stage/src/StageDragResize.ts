@@ -29,7 +29,7 @@ import { DRAG_EL_ID_PREFIX, GHOST_EL_ID_PREFIX, GuidesType, Mode, ZIndex } from 
 import StageCore from './StageCore';
 import StageMask from './StageMask';
 import type { SortEventData, StageDragResizeConfig } from './types';
-import { calcValueByFontsize, getAbsolutePosition, getMode, getOffset } from './util';
+import { calcValueByFontsize, getAbsolutePosition, getMode, getOffset, updateDragEl } from './util';
 
 /** 拖动状态 */
 enum ActionStatus {
@@ -76,7 +76,6 @@ export default class StageDragResize extends EventEmitter {
   /** 流式布局下，目标节点的镜像节点 */
   private ghostEl: HTMLElement | undefined;
   private moveableHelper?: MoveableHelper;
-  private multiMoveableHelper?: MoveableHelper;
 
   constructor(config: StageDragResizeConfig) {
     super();
@@ -113,84 +112,6 @@ export default class StageDragResize extends EventEmitter {
     if (event) {
       this.moveable?.dragStart(event);
     }
-  }
-
-  public multiSelect(els: HTMLElement[]): void {
-    this.targetList = els;
-    this.destroyDragEl();
-    this.destroyDragElList();
-    // 生成虚拟多选节点
-    this.dragElList = els.map((elItem) => {
-      const dragElDiv = globalThis.document.createElement('div');
-      this.container.append(dragElDiv);
-      dragElDiv.style.cssText = this.updateDragEl(elItem);
-      dragElDiv.id = `${DRAG_EL_ID_PREFIX}${elItem.id}`;
-      // 业务方校准
-      if (typeof this.core.config.updateDragEl === 'function') {
-        this.core.config.updateDragEl(dragElDiv, elItem);
-      }
-      return dragElDiv;
-    });
-    this.moveableForMulti?.destroy();
-    this.multiMoveableHelper?.clear();
-
-    this.moveableForMulti = new Moveable(this.container, {
-      target: this.dragElList,
-      defaultGroupRotate: 0,
-      defaultGroupOrigin: '50% 50%',
-      draggable: true,
-      resizable: true,
-      throttleDrag: 0,
-      startDragRotate: 0,
-      throttleDragRotate: 0,
-      zoom: 1,
-      origin: true,
-      padding: { left: 0, top: 0, right: 0, bottom: 0 },
-    });
-    this.multiMoveableHelper = MoveableHelper.create({
-      useBeforeRender: true,
-      useRender: false,
-      createAuto: true,
-    });
-    const frames: { left: number; top: number; dragLeft: number; dragTop: number; id: string }[] = [];
-    this.moveableForMulti
-      .on('dragGroupStart', (params) => {
-        const { events } = params;
-        this.moveableHelper?.onDragGroupStart(params);
-        // 记录拖动前快照
-        events.forEach((ev) => {
-          // 实际目标元素
-          const matchEventTarget = this.targetList.find((targetItem) => targetItem.id === ev.target.id.split('_')[2]);
-          // 蒙层虚拟元素（对于在组内的元素拖动时的相对位置不同，因此需要分别记录）
-          const dragEventTarget = ev.target as HTMLDivElement;
-          if (!matchEventTarget || !dragEventTarget) return;
-          frames.push({
-            left: matchEventTarget.offsetLeft,
-            top: matchEventTarget.offsetTop,
-            dragLeft: dragEventTarget.offsetLeft,
-            dragTop: dragEventTarget.offsetTop,
-            id: matchEventTarget.id,
-          });
-        });
-      })
-      .on('dragGroup', (params) => {
-        const { events } = params;
-        // 拖动过程更新
-        events.forEach((ev) => {
-          const frameSnapShot = frames.find((frameItem) => frameItem.id === ev.target.id.split('_')[2]);
-          if (!frameSnapShot) return;
-          const targeEl = this.targetList.find((targetItem) => targetItem.id === ev.target.id.split('_')[2]);
-          if (!targeEl) return;
-          // 元素与其所属组同时加入多选列表时，只更新父元素
-          const isParentIncluded = this.targetList.find((targetItem) => targetItem.id === targeEl.parentElement?.id);
-          if (!isParentIncluded) {
-            // 更新页面元素位置
-            targeEl.style.left = `${frameSnapShot.left + ev.beforeTranslate[0]}px`;
-            targeEl.style.top = `${frameSnapShot.top + ev.beforeTranslate[1]}px`;
-          }
-        });
-        this.moveableHelper?.onDragGroup(params);
-      });
   }
 
   /**
@@ -232,35 +153,26 @@ export default class StageDragResize extends EventEmitter {
     this.updateMoveable();
   }
 
+  public clearSelectStatus(): void {
+    if (!this.moveable) return;
+    this.destroyDragEl();
+    this.moveable.target = null;
+    this.moveable.updateTarget();
+  }
+
+  public destroyDragEl(): void {
+    this.dragEl?.remove();
+  }
+
   /**
    * 销毁实例
    */
   public destroy(): void {
     this.moveable?.destroy();
-    this.moveableForMulti?.destroy();
     this.destroyGhostEl();
     this.destroyDragEl();
-    this.destroyDragElList();
     this.dragStatus = ActionStatus.END;
     this.removeAllListeners();
-  }
-
-  /**
-   * 用于在切换选择模式时清除上一次的状态
-   * @param selectType 需要清理的选择模式 多选：multiSelect，单选：select
-   */
-  public clearSelectStatus(selectType: String) {
-    if (selectType === 'multiSelect') {
-      if (!this.moveableForMulti) return;
-      this.destroyDragElList();
-      this.moveableForMulti.target = null;
-      this.moveableForMulti.updateTarget();
-    } else {
-      if (!this.moveable) return;
-      this.destroyDragEl();
-      this.moveable.target = null;
-      this.moveable.updateTarget();
-    }
   }
 
   private init(el: HTMLElement): void {
@@ -271,11 +183,11 @@ export default class StageDragResize extends EventEmitter {
     this.mode = getMode(el);
 
     this.destroyGhostEl();
-    this.destroyDragElList();
+    this.core.multiDr.destroyDragElList();
     this.destroyDragEl();
     this.dragEl = globalThis.document.createElement('div');
     this.container.append(this.dragEl);
-    this.dragEl.style.cssText = this.updateDragEl(el);
+    this.dragEl.style.cssText = updateDragEl(el);
     this.dragEl.id = `${DRAG_EL_ID_PREFIX}${el.id}`;
 
     if (typeof this.core.config.updateDragEl === 'function') {
@@ -592,28 +504,6 @@ export default class StageDragResize extends EventEmitter {
   private destroyGhostEl(): void {
     this.ghostEl?.remove();
     this.ghostEl = undefined;
-  }
-
-  private updateDragEl(el: HTMLElement) {
-    const offset = getOffset(el);
-    const { transform } = getComputedStyle(el);
-    return `
-      position: absolute;
-      transform: ${transform};
-      left: ${offset.left}px;
-      top: ${offset.top}px;
-      width: ${el.clientWidth}px;
-      height: ${el.clientHeight}px;
-      z-index: ${ZIndex.DRAG_EL};
-    `;
-  }
-
-  private destroyDragEl(): void {
-    this.dragEl?.remove();
-  }
-
-  private destroyDragElList(): void {
-    this.dragElList.forEach((dragElItem) => dragElItem?.remove());
   }
 
   private getOptions(options: MoveableOptions = {}): MoveableOptions {

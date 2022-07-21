@@ -24,6 +24,7 @@ import { DEFAULT_ZOOM, GHOST_EL_ID_PREFIX, PAGE_CLASS } from './const';
 import StageDragResize from './StageDragResize';
 import StageHighlight from './StageHighlight';
 import StageMask from './StageMask';
+import StageMultiDragResize from './StageMultiDragResize';
 import StageRender from './StageRender';
 import {
   CanSelect,
@@ -48,6 +49,7 @@ export default class StageCore extends EventEmitter {
   public renderer: StageRender;
   public mask: StageMask;
   public dr: StageDragResize;
+  public multiDr: StageMultiDragResize;
   public highlightLayer: StageHighlight;
   public config: StageCoreConfig;
   public zoom = DEFAULT_ZOOM;
@@ -71,6 +73,7 @@ export default class StageCore extends EventEmitter {
     this.renderer = new StageRender({ core: this });
     this.mask = new StageMask({ core: this });
     this.dr = new StageDragResize({ core: this, container: this.mask.content, mask: this.mask });
+    this.multiDr = new StageMultiDragResize({ core: this, container: this.mask.content, mask: this.mask });
     this.highlightLayer = new StageHighlight({ core: this, container: this.mask.wrapper });
 
     this.renderer.on('runtime-ready', (runtime: Runtime) => {
@@ -82,7 +85,7 @@ export default class StageCore extends EventEmitter {
 
     this.mask
       .on('beforeSelect', async (event: MouseEvent) => {
-        this.clearMultiSelectStatus();
+        this.clearSelectStatus('multiSelect');
         const el = await this.setElementFromPoint(event);
         if (!el) return;
         this.select(el, event);
@@ -112,7 +115,7 @@ export default class StageCore extends EventEmitter {
         if (!el) return;
         // 多选不可以选中magic-ui-page
         if (el.className.includes(PAGE_CLASS)) return;
-        this.dr.clearSelectStatus('select');
+        this.clearSelectStatus('select');
         // 如果已有单选选中元素，不是magic-ui-page就可以加入多选列表
         if (this.selectedDom && !this.selectedDom.className.includes(PAGE_CLASS)) {
           this.selectedDomList.push(this.selectedDom as HTMLElement);
@@ -126,7 +129,7 @@ export default class StageCore extends EventEmitter {
         } else {
           this.selectedDomList.push(el);
         }
-        this.dr.multiSelect(this.selectedDomList);
+        this.multiDr.multiSelect(this.selectedDomList);
         this.emit('multiSelect', this.selectedDomList);
       });
 
@@ -264,11 +267,16 @@ export default class StageCore extends EventEmitter {
   }
 
   /**
-   * 清除多选状态
+   * 用于在切换选择模式时清除上一次的状态
+   * @param selectType 需要清理的选择模式 多选：multiSelect，单选：select
    */
-  public clearMultiSelectStatus() {
-    this.dr.clearSelectStatus('multiSelect');
-    this.selectedDomList = [];
+  public clearSelectStatus(selectType: String) {
+    if (selectType === 'multiSelect') {
+      this.multiDr.clearSelectStatus();
+      this.selectedDomList = [];
+    } else {
+      this.dr.clearSelectStatus();
+    }
   }
 
   /**
