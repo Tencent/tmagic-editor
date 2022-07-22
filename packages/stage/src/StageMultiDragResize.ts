@@ -25,7 +25,7 @@ import { DRAG_EL_ID_PREFIX } from './const';
 import StageCore from './StageCore';
 import StageMask from './StageMask';
 import { StageDragResizeConfig } from './types';
-import { getTargetElStyle } from './util';
+import { calcValueByFontsize, getTargetElStyle } from './util';
 export default class StageMultiDragResize extends EventEmitter {
   public core: StageCore;
   public mask: StageMask;
@@ -88,7 +88,7 @@ export default class StageMultiDragResize extends EventEmitter {
       useRender: false,
       createAuto: true,
     });
-    const frames: { left: number; top: number; dragLeft: number; dragTop: number; id: string }[] = [];
+    const frames: { left: number; top: number; id: string }[] = [];
     this.moveableForMulti
       .on('dragGroupStart', (params) => {
         const { events } = params;
@@ -96,15 +96,13 @@ export default class StageMultiDragResize extends EventEmitter {
         // 记录拖动前快照
         events.forEach((ev) => {
           // 实际目标元素
-          const matchEventTarget = this.targetList.find((targetItem) => targetItem.id === ev.target.id.split('_')[2]);
-          // 蒙层虚拟元素（对于在组内的元素拖动时的相对位置不同，因此需要分别记录）
-          const dragEventTarget = ev.target as HTMLDivElement;
-          if (!matchEventTarget || !dragEventTarget) return;
+          const matchEventTarget = this.targetList.find(
+            (targetItem) => targetItem.id === ev.target.id.replace(DRAG_EL_ID_PREFIX, ''),
+          );
+          if (!matchEventTarget) return;
           frames.push({
             left: matchEventTarget.offsetLeft,
             top: matchEventTarget.offsetTop,
-            dragLeft: dragEventTarget.offsetLeft,
-            dragTop: dragEventTarget.offsetTop,
             id: matchEventTarget.id,
           });
         });
@@ -113,9 +111,13 @@ export default class StageMultiDragResize extends EventEmitter {
         const { events } = params;
         // 拖动过程更新
         events.forEach((ev) => {
-          const frameSnapShot = frames.find((frameItem) => frameItem.id === ev.target.id.split('_')[2]);
+          const frameSnapShot = frames.find(
+            (frameItem) => frameItem.id === ev.target.id.replace(DRAG_EL_ID_PREFIX, ''),
+          );
           if (!frameSnapShot) return;
-          const targeEl = this.targetList.find((targetItem) => targetItem.id === ev.target.id.split('_')[2]);
+          const targeEl = this.targetList.find(
+            (targetItem) => targetItem.id === ev.target.id.replace(DRAG_EL_ID_PREFIX, ''),
+          );
           if (!targeEl) return;
           // 元素与其所属组同时加入多选列表时，只更新父元素
           const isParentIncluded = this.targetList.find((targetItem) => targetItem.id === targeEl.parentElement?.id);
@@ -126,6 +128,9 @@ export default class StageMultiDragResize extends EventEmitter {
           }
         });
         this.multiMoveableHelper?.onDragGroup(params);
+      })
+      .on('dragGroupEnd', () => {
+        this.update();
       });
   }
 
@@ -152,5 +157,29 @@ export default class StageMultiDragResize extends EventEmitter {
    */
   public destroyDragElList(): void {
     this.dragElList.forEach((dragElItem) => dragElItem?.remove());
+  }
+
+  /**
+   * 拖拽完成后将更新的位置信息暴露给上层业务方，业务方可以接收事件进行保存
+   * @param isResize 是否进行大小缩放
+   */
+  private update(isResize = false): void {
+    if (this.targetList.length === 0) return;
+
+    const { contentWindow } = this.core.renderer;
+    const doc = contentWindow?.document;
+    if (!doc) return;
+
+    this.targetList.forEach((targetItem) => {
+      const offset = { left: targetItem.offsetLeft, top: targetItem.offsetTop };
+      const left = calcValueByFontsize(doc, offset.left);
+      const top = calcValueByFontsize(doc, offset.top);
+      const width = calcValueByFontsize(doc, targetItem.clientWidth);
+      const height = calcValueByFontsize(doc, targetItem.clientHeight);
+      this.emit('update', {
+        el: targetItem,
+        style: isResize ? { left, top, width, height } : { left, top },
+      });
+    });
   }
 }

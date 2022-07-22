@@ -141,6 +141,10 @@ export default class StageCore extends EventEmitter {
       .on('sort', (data: UpdateEventData) => {
         setTimeout(() => this.emit('sort', data));
       });
+
+    this.multiDr.on('update', (data: UpdateEventData) => {
+      setTimeout(() => this.emit('update', data));
+    });
   }
 
   public getElementsFromPoint(event: MouseEvent) {

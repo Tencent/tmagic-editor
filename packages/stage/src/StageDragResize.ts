@@ -53,14 +53,8 @@ export default class StageDragResize extends EventEmitter {
   public target?: HTMLElement;
   /** 目标节点在蒙层中的占位节点 */
   public dragEl?: HTMLDivElement;
-  /** 多选:目标节点组 */
-  public targetList: HTMLElement[] = [];
-  /** 多选:目标节点在蒙层中的占位节点组 */
-  public dragElList: HTMLDivElement[] = [];
   /** Moveable拖拽类实例 */
   public moveable?: Moveable;
-  /** Moveable多选拖拽类实例 */
-  public moveableForMulti?: Moveable;
   /** 水平参考线 */
   public horizontalGuidelines: number[] = [];
   /** 垂直参考线 */
