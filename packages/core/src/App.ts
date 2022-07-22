@@ -36,6 +36,7 @@ interface AppOptionsConfig {
   config?: MApp;
   platform?: 'editor' | 'mobile' | 'tv' | 'pc';
   jsEngine?: 'browser' | 'hippy';
+  designWidth?: number;
   curPage?: Id;
   transformStyle?: (style: Record<string, any>) => Record<string, any>;
 }
@@ -55,6 +56,7 @@ class App extends EventEmitter {
 
   public platform = 'mobile';
   public jsEngine = 'browser';
+  public designWidth = 375;
 
   public components = new Map();
 
@@ -66,13 +68,14 @@ class App extends EventEmitter {
     this.env = new Env(options.ua);
     options.platform && (this.platform = options.platform);
     options.jsEngine && (this.jsEngine = options.jsEngine);
+    options.designWidth && (this.designWidth = options.designWidth);
 
     // 根据屏幕大小计算出跟节点的font-size，用于rem样式的适配
     if (this.platform === 'mobile' || this.platform === 'editor') {
       const calcFontsize = () => {
         let { width } = document.documentElement.getBoundingClientRect();
         width = Math.min(800, width);
-        const fontSize = width / 3.75;
+        const fontSize = width / (this.designWidth / 100);
         document.documentElement.style.fontSize = `${fontSize}px`;
       };
 
