@@ -99,7 +99,7 @@ export default class StageCore extends EventEmitter {
         this.emit('changeGuides', data);
       })
       .on('highlight', async (event: MouseEvent) => {
-        const el = await this.getElementFromPoint(event, 'mousemove');
+        const el = await this.getElementFromPoint(event);
         if (!el) return;
         await this.highlight(el);
         if (this.highlightedDom === this.selectedDom) {
@@ -114,8 +114,6 @@ export default class StageCore extends EventEmitter {
       .on('beforeMultiSelect', async (event: MouseEvent) => {
         const el = await this.getElementFromPoint(event);
         if (!el) return;
-        // 多选不可以选中magic-ui-page
-        if (el.className.includes(PAGE_CLASS)) return;
         this.clearSelectStatus('select');
         // 如果已有单选选中元素，不是magic-ui-page就可以加入多选列表
         if (this.selectedDom && !this.selectedDom.className.includes(PAGE_CLASS)) {
@@ -166,19 +164,27 @@ export default class StageCore extends EventEmitter {
     return doc?.elementsFromPoint(x / zoom, y / zoom) as HTMLElement[];
   }
 
-  public async getElementFromPoint(event: MouseEvent, type?: String) {
+  public async getElementFromPoint(event: MouseEvent) {
     const els = this.getElementsFromPoint(event);
     let stopped = false;
     const stop = () => (stopped = true);
     for (const el of els) {
-      if (!el.id.startsWith(GHOST_EL_ID_PREFIX) && (await this.canSelect(el, event, stop))) {
+      if (!el.id.startsWith(GHOST_EL_ID_PREFIX) && (await this.isElCanSelect(el, event, stop))) {
         if (stopped) break;
-        if (event.type === type) {
-          return el;
-        }
         return el;
       }
     }
+  }
+
+  public async isElCanSelect(el: HTMLElement, event: MouseEvent, stop: () => boolean): Promise<Boolean> {
+    // 执行业务方传入的判断逻辑
+    const canSelectByProp = await this.canSelect(el, event, stop);
+    if (!canSelectByProp) return false;
+    // 多选规则
+    if (this.mask.isMultiSelectStatus) {
+      return this.multiDr.canSelect(el);
+    }
+    return true;
   }
 
   /**

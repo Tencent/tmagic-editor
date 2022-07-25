@@ -57,7 +57,7 @@ export default class StageHighlight extends EventEmitter {
       target: this.calibrationTarget.update(el, HIGHLIGHT_EL_ID_PREFIX),
       origin: false,
       rootContainer: this.core.container,
-      zoom: 1,
+      zoom: 2,
     });
   }
 
