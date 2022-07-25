@@ -19,6 +19,7 @@
 import { EventEmitter } from 'events';
 
 import type { Id } from '@tmagic/schema';
+import { addClassName } from '@tmagic/utils';
 
 import { DEFAULT_ZOOM, GHOST_EL_ID_PREFIX, PAGE_CLASS } from './const';
 import StageDragResize from './StageDragResize';
@@ -86,7 +87,7 @@ export default class StageCore extends EventEmitter {
     this.mask
       .on('beforeSelect', async (event: MouseEvent) => {
         this.clearSelectStatus('multiSelect');
-        const el = await this.setElementFromPoint(event);
+        const el = await this.getElementFromPoint(event);
         if (!el) return;
         this.select(el, event);
       })
@@ -98,7 +99,7 @@ export default class StageCore extends EventEmitter {
         this.emit('changeGuides', data);
       })
       .on('highlight', async (event: MouseEvent) => {
-        const el = await this.setElementFromPoint(event, 'mousemove');
+        const el = await this.getElementFromPoint(event, 'mousemove');
         if (!el) return;
         await this.highlight(el);
         if (this.highlightedDom === this.selectedDom) {
@@ -111,7 +112,7 @@ export default class StageCore extends EventEmitter {
         this.highlightLayer.clearHighlight();
       })
       .on('beforeMultiSelect', async (event: MouseEvent) => {
-        const el = await this.setElementFromPoint(event);
+        const el = await this.getElementFromPoint(event);
         if (!el) return;
         // 多选不可以选中magic-ui-page
         if (el.className.includes(PAGE_CLASS)) return;
@@ -165,7 +166,7 @@ export default class StageCore extends EventEmitter {
     return doc?.elementsFromPoint(x / zoom, y / zoom) as HTMLElement[];
   }
 
-  public async setElementFromPoint(event: MouseEvent, type?: String) {
+  public async getElementFromPoint(event: MouseEvent, type?: String) {
     const els = this.getElementsFromPoint(event);
     let stopped = false;
     const stop = () => (stopped = true);
@@ -304,6 +305,27 @@ export default class StageCore extends EventEmitter {
   public clearGuides() {
     this.mask.clearGuides();
     this.dr.clearGuides();
+  }
+
+  public async addContainerHighlightClassName(event: MouseEvent, exclude: Element[]) {
+    const els = this.getElementsFromPoint(event);
+    const { renderer } = this;
+    const doc = renderer.contentWindow?.document;
+
+    if (!doc) return;
+
+    for (const el of els) {
+      if (!el.id.startsWith(GHOST_EL_ID_PREFIX) && (await this.isContainer(el)) && !exclude.includes(el)) {
+        addClassName(el, doc, this.containerHighlightClassName);
+        break;
+      }
+    }
+  }
+
+  public getAddContainerHighlightClassNameTimeout(event: MouseEvent, exclude: Element[] = []) {
+    return globalThis.setTimeout(() => {
+      this.addContainerHighlightClassName(event, exclude);
+    }, this.containerHighlightDuration);
   }
 
   /**
