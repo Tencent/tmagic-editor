@@ -223,7 +223,8 @@ export const fixNodeLeft = (config: MNode, parent: MContainer, doc?: Document) =
   const el = doc.getElementById(`${config.id}`);
   const parentEl = doc.getElementById(`${parent.id}`);
 
-  if (el && parentEl && el.offsetWidth + config.style?.left > parentEl.offsetWidth) {
+  const left = Number(config.style?.left) || 0;
+  if (el && parentEl && el.offsetWidth + left > parentEl.offsetWidth) {
     return parentEl.offsetWidth - el.offsetWidth;
   }
 

@@ -303,7 +303,7 @@ class Editor extends BaseService {
     const stage = this.get<StageCore | null>('stage');
     const root = this.get<MApp>('root');
 
-    await stage?.add({ config: cloneDeep(newNode), root: cloneDeep(root) });
+    await stage?.add({ config: cloneDeep(newNode), parent: cloneDeep(parentNode), root: cloneDeep(root) });
 
     if (layout === Layout.ABSOLUTE) {
       const fixedLeft = fixNodeLeft(newNode, parentNode, stage?.renderer.contentWindow?.document);
