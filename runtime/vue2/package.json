@@ -1,6 +1,6 @@
 {
   "name": "runtime-vue2",
-  "version": "1.1.0-beta.2",
+  "version": "1.1.0-beta.3",
   "private": true,
   "scripts": {
     "dev:vue2": "npm run entry && npm run build:lib & npm run dev:html",
@@ -12,8 +12,8 @@
     "dev:html": "vite --port 8078"
   },
   "dependencies": {
-    "@tmagic/schema": "1.1.0-beta.2",
-    "@tmagic/stage": "1.1.0-beta.2",
+    "@tmagic/schema": "1.1.0-beta.3",
+    "@tmagic/stage": "1.1.0-beta.3",
     "vue": "^2.7.4"
   },
   "devDependencies": {
