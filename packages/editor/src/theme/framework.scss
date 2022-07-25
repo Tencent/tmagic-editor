@@ -35,7 +35,7 @@
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      height: calc(100% - $--page-bar-height);
+      height: calc(100% - #{$--page-bar-height});
     }
 
     &-content {
