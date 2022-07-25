@@ -18,7 +18,7 @@
 
 import { EventEmitter } from 'events';
 
-import { Mode } from './const';
+import { Mode, ZIndex } from './const';
 import StageCore from './StageCore';
 import StageDragResize from './StageDragResize';
 import StageMask from './StageMask';
@@ -57,6 +57,7 @@ export default class TargetCalibrate extends EventEmitter {
       top: ${top}px;
       width: ${el.clientWidth}px;
       height: ${el.clientHeight}px;
+      z-index: ${ZIndex.DRAG_EL};
     `;
 
     this.operationEl.id = `${prefix}${el.id}`;

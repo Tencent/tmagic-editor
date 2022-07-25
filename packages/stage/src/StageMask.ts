@@ -83,7 +83,7 @@ export default class StageMask extends Rule {
   public maxScrollTop = 0;
   public maxScrollLeft = 0;
   public intersectionObserver: IntersectionObserver | null = null;
-  public shiftKeyDown: Boolean = false;
+  public isMultiSelectStatus: Boolean = false;
 
   private mode: Mode = Mode.ABSOLUTE;
   private pageResizeObserver: ResizeObserver | null = null;
@@ -110,11 +110,11 @@ export default class StageMask extends Rule {
     this.content.addEventListener('mouseleave', this.mouseLeaveHandler);
     KeyController.global.keydown('shift', (e) => {
       e.inputEvent.preventDefault();
-      this.shiftKeyDown = true;
+      this.isMultiSelectStatus = true;
     });
     KeyController.global.keyup('shift', (e) => {
       e.inputEvent.preventDefault();
-      this.shiftKeyDown = false;
+      this.isMultiSelectStatus = false;
     });
   }
 
@@ -308,7 +308,7 @@ export default class StageMask extends Rule {
     if (event.button !== MouseButton.LEFT && event.button !== MouseButton.RIGHT) return;
 
     // 如果单击多选选中区域，则不需要再触发选中了，而可能是拖动行为
-    if (!this.shiftKeyDown && (event.target as HTMLDivElement).className.indexOf('moveable-area') !== -1) {
+    if (!this.isMultiSelectStatus && (event.target as HTMLDivElement).className.indexOf('moveable-area') !== -1) {
       return;
     }
     // 点击对象如果是边框锚点，则可能是resize
@@ -319,13 +319,13 @@ export default class StageMask extends Rule {
     this.content.removeEventListener('mousemove', this.highlightHandler);
 
     // 判断触发多选还是单选
-    if (this.shiftKeyDown) {
+    if (this.isMultiSelectStatus) {
       this.emit('beforeMultiSelect', event);
     } else {
       this.emit('beforeSelect', event);
-      // 如果是右键点击，这里的mouseup事件监听没有效果
-      globalThis.document.addEventListener('mouseup', this.mouseUpHandler);
     }
+    // 如果是右键点击，这里的mouseup事件监听没有效果
+    globalThis.document.addEventListener('mouseup', this.mouseUpHandler);
   };
 
   private mouseUpHandler = (): void => {

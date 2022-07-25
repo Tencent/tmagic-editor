@@ -18,14 +18,15 @@
 
 import { EventEmitter } from 'events';
 
+import type { MoveableOptions } from 'moveable';
 import Moveable from 'moveable';
 import MoveableHelper from 'moveable-helper';
 
-import { DRAG_EL_ID_PREFIX } from './const';
+import { DRAG_EL_ID_PREFIX, PAGE_CLASS } from './const';
 import StageCore from './StageCore';
 import StageMask from './StageMask';
 import { StageDragResizeConfig } from './types';
-import { calcValueByFontsize, getTargetElStyle } from './util';
+import { calcValueByFontsize, getMode, getTargetElStyle } from './util';
 export default class StageMultiDragResize extends EventEmitter {
   public core: StageCore;
   public mask: StageMask;
@@ -70,19 +71,12 @@ export default class StageMultiDragResize extends EventEmitter {
     this.moveableForMulti?.destroy();
     this.multiMoveableHelper?.clear();
 
-    this.moveableForMulti = new Moveable(this.container, {
-      target: this.dragElList,
-      defaultGroupRotate: 0,
-      defaultGroupOrigin: '50% 50%',
-      draggable: true,
-      resizable: true,
-      throttleDrag: 0,
-      startDragRotate: 0,
-      throttleDragRotate: 0,
-      zoom: 1,
-      origin: true,
-      padding: { left: 0, top: 0, right: 0, bottom: 0 },
-    });
+    this.moveableForMulti = new Moveable(
+      this.container,
+      this.getOptions({
+        target: this.dragElList,
+      }),
+    );
     this.multiMoveableHelper = MoveableHelper.create({
       useBeforeRender: true,
       useRender: false,
@@ -134,6 +128,30 @@ export default class StageMultiDragResize extends EventEmitter {
       });
   }
 
+  public canSelect(el: HTMLElement): Boolean {
+    // 多选不可以选中magic-ui-page
+    if (el.className.includes(PAGE_CLASS)) {
+      this.core.highlightedDom = undefined;
+      this.core.highlightLayer.clearHighlight();
+      return false;
+    }
+    const currentTargetMode = getMode(el);
+    let selectedDomMode = '';
+
+    if (this.targetList.length === 0 && this.core.selectedDom) {
+      // 单选后添加到多选的情况
+      selectedDomMode = getMode(this.core.selectedDom);
+    } else if (this.targetList.length > 0) {
+      // 已加入多选列表的布局模式是一样的，取第一个判断
+      selectedDomMode = getMode(this.targetList[0]);
+    }
+    // 定位模式不同，不可混选
+    if (currentTargetMode !== selectedDomMode) {
+      return false;
+    }
+    return true;
+  }
+
   /**
    * 清除多选状态
    */
@@ -142,6 +160,7 @@ export default class StageMultiDragResize extends EventEmitter {
     this.destroyDragElList();
     this.moveableForMulti.target = null;
     this.moveableForMulti.updateTarget();
+    this.targetList = [];
   }
 
   /**
@@ -181,5 +200,32 @@ export default class StageMultiDragResize extends EventEmitter {
         style: isResize ? { left, top, width, height } : { left, top },
       });
     });
+  }
+
+  /**
+   * 获取moveable options参数
+   * @param {MoveableOptions} options
+   * @return {MoveableOptions} moveable options参数
+   */
+  private getOptions(options: MoveableOptions = {}): MoveableOptions {
+    let { moveableOptions = {} } = this.core.config;
+
+    if (typeof moveableOptions === 'function') {
+      moveableOptions = moveableOptions(this.core);
+    }
+    return {
+      defaultGroupRotate: 0,
+      defaultGroupOrigin: '50% 50%',
+      draggable: true,
+      resizable: true,
+      throttleDrag: 0,
+      startDragRotate: 0,
+      throttleDragRotate: 0,
+      zoom: 1,
+      origin: true,
+      padding: { left: 0, top: 0, right: 0, bottom: 0 },
+      ...options,
+      ...moveableOptions,
+    };
   }
 }
