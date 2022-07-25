@@ -160,7 +160,7 @@ StageDragResize实例
   销毁实例
 
 
-### setElementFromPoint
+### getElementFromPoint
 
 - **参数：**
 

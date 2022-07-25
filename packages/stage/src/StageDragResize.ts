@@ -23,7 +23,7 @@ import type { MoveableOptions } from 'moveable';
 import Moveable from 'moveable';
 import MoveableHelper from 'moveable-helper';
 
-import { addClassName, removeClassNameByClassName } from '@tmagic/utils';
+import { removeClassNameByClassName } from '@tmagic/utils';
 
 import { DRAG_EL_ID_PREFIX, GHOST_EL_ID_PREFIX, GuidesType, Mode, ZIndex } from './const';
 import StageCore from './StageCore';
@@ -299,6 +299,7 @@ export default class StageDragResize extends EventEmitter {
         if (this.mode === Mode.SORTABLE) {
           this.ghostEl = this.generateGhostEl(this.target);
         }
+
         frame.top = this.target.offsetTop;
         frame.left = this.target.offsetLeft;
       })
@@ -310,20 +311,7 @@ export default class StageDragResize extends EventEmitter {
           timeout = undefined;
         }
 
-        timeout = globalThis.setTimeout(async () => {
-          const els = this.core.getElementsFromPoint(e.inputEvent);
-          for (const el of els) {
-            if (
-              doc &&
-              !el.id.startsWith(GHOST_EL_ID_PREFIX) &&
-              el !== this.target &&
-              (await this.core.isContainer(el))
-            ) {
-              addClassName(el, doc, this.core.containerHighlightClassName);
-              break;
-            }
-          }
-        }, this.core.containerHighlightDuration);
+        timeout = this.core.getAddContainerHighlightClassNameTimeout(e.inputEvent, [this.target]);
 
         this.dragStatus = ActionStatus.ING;
 
@@ -483,6 +471,7 @@ export default class StageDragResize extends EventEmitter {
     }
 
     const ghostEl = el.cloneNode(true) as HTMLElement;
+    this.setGhostElChildrenId(ghostEl);
     const { top, left } = getAbsolutePosition(el, getOffset(el));
     ghostEl.id = `${GHOST_EL_ID_PREFIX}${el.id}`;
     ghostEl.style.zIndex = ZIndex.GHOST_EL;
@@ -492,6 +481,18 @@ export default class StageDragResize extends EventEmitter {
     ghostEl.style.top = `${top}px`;
     el.after(ghostEl);
     return ghostEl;
+  }
+
+  private setGhostElChildrenId(el: Element) {
+    for (const child of el.children) {
+      if (child.id) {
+        child.id = `${GHOST_EL_ID_PREFIX}${child.id}`;
+      }
+
+      if (child.children.length) {
+        this.setGhostElChildrenId(child);
+      }
+    }
   }
 
   private destroyGhostEl(): void {

@@ -41,8 +41,7 @@ import { computed, defineComponent, inject, ref } from 'vue';
 import serialize from 'serialize-javascript';
 
 import type StageCore from '@tmagic/stage';
-import { GHOST_EL_ID_PREFIX } from '@tmagic/stage';
-import { addClassName, removeClassNameByClassName } from '@tmagic/utils';
+import { removeClassNameByClassName } from '@tmagic/utils';
 
 import MIcon from '@editor/components/Icon.vue';
 import type { ComponentGroup, ComponentItem, Services, StageOptions } from '@editor/type';
@@ -125,19 +124,9 @@ export default defineComponent({
           return;
         }
 
-        if (timeout) return;
+        if (timeout || !stage.value) return;
 
-        timeout = globalThis.setTimeout(async () => {
-          if (!stageOptions || !stage.value) return;
-          const doc = stage.value.renderer.contentWindow?.document;
-          const els = stage.value.getElementsFromPoint(e);
-          for (const el of els) {
-            if (doc && !el.id.startsWith(GHOST_EL_ID_PREFIX) && (await stageOptions.isContainer(el))) {
-              addClassName(el, doc, stageOptions?.containerHighlightClassName);
-              break;
-            }
-          }
-        }, stageOptions?.containerHighlightDuration);
+        timeout = stage.value.getAddContainerHighlightClassNameTimeout(e);
       },
     };
   },
