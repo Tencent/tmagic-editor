@@ -36,18 +36,13 @@ const doAction = async (
     let beforeArgs = args;
 
     for (const beforeMethod of scope.pluginOptionsList[beforeMethodName]) {
-      let beforeReturnValue = (await beforeMethod(...beforeArgs)) || [];
+      beforeArgs = (await beforeMethod(...beforeArgs)) || [];
 
-      if (isError(beforeReturnValue)) throw beforeReturnValue;
+      if (isError(beforeArgs)) throw beforeArgs;
 
-      if (!Array.isArray(beforeReturnValue)) {
-        beforeReturnValue = [beforeReturnValue];
+      if (!Array.isArray(beforeArgs)) {
+        beforeArgs = [beforeArgs];
       }
-
-      beforeArgs = beforeArgs.map((v: any, index: number) => {
-        if (typeof beforeReturnValue[index] === 'undefined') return v;
-        return beforeReturnValue[index];
-      });
     }
 
     let returnValue: any = await fn(beforeArgs, sourceMethod.bind(scope));
