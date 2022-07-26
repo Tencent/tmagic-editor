@@ -13,9 +13,9 @@
   height: 100%;
   z-index: 0;
   position: relative;
-  border: 1px solid $--border-color;
   transition: transform 0.3s;
   box-sizing: content-box;
+  box-shadow: rgba(0, 0, 0, 0.04) 0px 3px 5px;
 
   &::-webkit-scrollbar {
     width: 0 !important;
