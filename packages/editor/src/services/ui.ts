@@ -155,10 +155,16 @@ class Ui extends BaseService {
     const { stageRect, stageContainerRect } = state;
     const { height, width } = stageContainerRect;
     if (!width || !height) return 1;
-    if (width > stageRect.width && height > stageRect.height) {
+
+    // 30为标尺的大小
+    const stageWidth = stageRect.width + 30;
+    const stageHeight = stageRect.height + 30;
+
+    if (width > stageWidth && height > stageHeight) {
       return 1;
     }
-    return Math.min((width - 100) / stageRect.width || 1, (height - 100) / stageRect.height || 1);
+    // 60/80是为了不要让画布太过去贴住四周（这样好看些）
+    return Math.min((width - 60) / stageWidth || 1, (height - 80) / stageHeight || 1);
   }
 }
 
