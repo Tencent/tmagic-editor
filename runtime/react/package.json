@@ -1,6 +1,6 @@
 {
   "name": "runtime-react",
-  "version": "1.1.0-beta.3",
+  "version": "1.1.0-beta.4",
   "private": true,
   "scripts": {
     "dev:react": "npm run entry && npm run build:lib & npm run dev:html",
@@ -12,8 +12,8 @@
     "dev:html": "vite --port 8078"
   },
   "dependencies": {
-    "@tmagic/schema": "1.1.0-beta.3",
-    "@tmagic/stage": "1.1.0-beta.3",
+    "@tmagic/schema": "1.1.0-beta.4",
+    "@tmagic/stage": "1.1.0-beta.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
   },
