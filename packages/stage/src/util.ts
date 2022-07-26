@@ -17,8 +17,8 @@
  */
 import { removeClassName } from '@tmagic/utils';
 
-import { Mode, SELECTED_CLASS, ZIndex } from './const';
-import type { Offset } from './types';
+import { GHOST_EL_ID_PREFIX, Mode, SELECTED_CLASS, ZIndex } from './const';
+import type { Offset, SortEventData } from './types';
 
 const getParents = (el: Element, relative: Element) => {
   let cur: Element | null = el.parentElement;
@@ -158,4 +158,74 @@ export const calcValueByFontsize = (doc: Document, value: number) => {
   }
 
   return value;
+};
+
+/**
+ * 下移组件位置
+ * @param {number} deltaTop 偏移量
+ * @param {Object} detail 当前选中的组件配置
+ */
+export const down = (deltaTop: number, target: HTMLElement | SVGElement): SortEventData | void => {
+  let swapIndex = 0;
+  let addUpH = target.clientHeight;
+  const brothers = Array.from(target.parentNode?.children || []).filter(
+    (node) => !node.id.startsWith(GHOST_EL_ID_PREFIX),
+  );
+  const index = brothers.indexOf(target);
+  // 往下移动
+  const downEls = brothers.slice(index + 1) as HTMLElement[];
+
+  for (let i = 0; i < downEls.length; i++) {
+    const ele = downEls[i];
+    // 是 fixed 不做处理
+    if (ele.style?.position === 'fixed') {
+      continue;
+    }
+    addUpH += ele.clientHeight / 2;
+    if (deltaTop <= addUpH) {
+      break;
+    }
+    addUpH += ele.clientHeight / 2;
+    swapIndex = i;
+  }
+  return {
+    src: target.id,
+    dist: downEls.length && swapIndex > -1 ? downEls[swapIndex].id : target.id,
+  };
+};
+
+/**
+ * 上移组件位置
+ * @param {Array} brothers 处于同一容器下的所有子组件配置
+ * @param {number} index 当前组件所处的位置
+ * @param {number} deltaTop 偏移量
+ * @param {Object} detail 当前选中的组件配置
+ */
+export const up = (deltaTop: number, target: HTMLElement | SVGElement): SortEventData | void => {
+  const brothers = Array.from(target.parentNode?.children || []).filter(
+    (node) => !node.id.startsWith(GHOST_EL_ID_PREFIX),
+  );
+  const index = brothers.indexOf(target);
+  // 往上移动
+  const upEls = brothers.slice(0, index) as HTMLElement[];
+
+  let addUpH = target.clientHeight;
+  let swapIndex = upEls.length - 1;
+
+  for (let i = upEls.length - 1; i >= 0; i--) {
+    const ele = upEls[i];
+    if (!ele) continue;
+    // 是 fixed 不做处理
+    if (ele.style.position === 'fixed') continue;
+
+    addUpH += ele.clientHeight / 2;
+    if (-deltaTop <= addUpH) break;
+    addUpH += ele.clientHeight / 2;
+
+    swapIndex = i;
+  }
+  return {
+    src: target.id,
+    dist: upEls.length && swapIndex > -1 ? upEls[swapIndex].id : target.id,
+  };
 };
