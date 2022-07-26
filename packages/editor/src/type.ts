@@ -125,6 +125,7 @@ export interface EditorNodeInfo {
 export interface AddMNode {
   type: string;
   name?: string;
+  inputEvent?: DragEvent;
   [key: string]: any;
 }
 
