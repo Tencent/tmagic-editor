@@ -271,7 +271,8 @@ class Editor extends BaseService {
    * @returns 添加后的节点
    */
   public async add(addNode: AddMNode, parent?: MContainer | null): Promise<MNode> {
-    const { type, ...config } = addNode;
+    // 加入inputEvent是为给业务扩展时可以获取到更多的信息，只有在使用拖拽添加组件时才有改对象
+    const { type, inputEvent, ...config } = addNode;
     const curNode = this.get<MContainer>('node');
 
     let parentNode: MContainer | undefined;

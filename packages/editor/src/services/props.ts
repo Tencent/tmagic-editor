@@ -88,7 +88,7 @@ class Props extends BaseService {
    * @param type 组件类型
    * @returns 组件初始值
    */
-  public async getPropsValue(type: string, defaultValue: Record<string, any> = {}) {
+  public async getPropsValue(type: string, { inputEvent, ...defaultValue }: Record<string, any> = {}) {
     if (type === 'area') {
       const value = (await this.getPropsValue('button')) as MComponent;
       value.className = 'action-area';

@@ -264,6 +264,8 @@ export default defineComponent({
             left,
           };
 
+          config.inputEvent = e;
+
           services?.editorService.add(config, parent);
         }
       },
