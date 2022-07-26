@@ -558,7 +558,7 @@ export default class StageDragResize extends EventEmitter {
         top: 0,
         // 设置0的话无法移动到left为0，所以只能设置为-1
         left: -1,
-        right: this.container.clientWidth,
+        right: this.container.clientWidth - 1,
         bottom: this.container.clientHeight,
         ...(moveableOptions.bounds || {}),
       },
