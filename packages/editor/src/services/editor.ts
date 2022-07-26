@@ -539,8 +539,8 @@ class Editor extends BaseService {
     const doc = stage?.renderer.contentWindow?.document;
 
     if (doc) {
-      const parentEl = doc.getElementById(`${parent.id}`);
       const el = doc.getElementById(`${node.id}`);
+      const parentEl = el?.offsetParent;
       if (parentEl && el) {
         node.style.left = (parentEl.clientWidth - el.clientWidth) / 2;
       }
