@@ -42,10 +42,4 @@ describe('util form', () => {
 
     expect(config[0].items[0].items.length - defaultConfig[0].items[0].items.length).toBe(1);
   });
-
-  test('getDefaultValue', () => {
-    const value = props.getDefaultPropsValue('text', '1');
-    expect(value.id).toBe('1');
-    expect(value.type).toBe('text');
-  });
 });

@@ -506,7 +506,7 @@ class Editor extends BaseService {
       return;
     }
 
-    await propsService.setNewItemId(config, this.get('root'));
+    config = await propsService.setNewItemId(config, this.get('root'));
     if (config.style) {
       config.style = {
         ...config.style,

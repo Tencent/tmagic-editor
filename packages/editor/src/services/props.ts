@@ -25,7 +25,7 @@ import { NodeType } from '@tmagic/schema';
 import { isPop, toLine } from '@tmagic/utils';
 
 import type { PropsState } from '@editor/type';
-import { DEFAULT_CONFIG, fillConfig, getDefaultPropsValue } from '@editor/utils/props';
+import { DEFAULT_CONFIG, fillConfig } from '@editor/utils/props';
 
 import BaseService from './BaseService';
 
@@ -36,7 +36,15 @@ class Props extends BaseService {
   });
 
   constructor() {
-    super(['setPropsConfig', 'getPropsConfig', 'setPropsValue', 'getPropsValue', 'createId', 'setNewItemId']);
+    super([
+      'setPropsConfig',
+      'getPropsConfig',
+      'setPropsValue',
+      'getPropsValue',
+      'createId',
+      'setNewItemId',
+      'getDefaultPropsValue',
+    ]);
   }
 
   public setPropsConfigs(configs: Record<string, FormConfig>) {
@@ -99,12 +107,20 @@ class Props extends BaseService {
       return value;
     }
 
-    const data = cloneDeep(defaultValue as any);
-
-    await this.setNewItemId(data);
+    const [id, defaultPropsValue, data] = await Promise.all([
+      this.createId(type),
+      this.getDefaultPropsValue(type),
+      this.setNewItemId(
+        cloneDeep({
+          type,
+          ...defaultValue,
+        } as any),
+      ),
+    ]);
 
     return {
-      ...getDefaultPropsValue(type, await this.createId(type)),
+      id,
+      ...defaultPropsValue,
       ...mergeWith(cloneDeep(this.state.propsValueMap[type] || {}), data),
     };
   }
@@ -133,6 +149,29 @@ class Props extends BaseService {
         await this.setNewItemId(item, config as MPage);
       }
     }
+
+    return config;
+  }
+
+  /**
+   * 获取默认属性配置
+   * @param type 组件类型
+   * @returns Object
+   */
+  public async getDefaultPropsValue(type: string) {
+    return ['page', 'container'].includes(type)
+      ? {
+          type,
+          layout: 'absolute',
+          style: {},
+          name: type,
+          items: [],
+        }
+      : {
+          type,
+          style: {},
+          name: type,
+        };
   }
 }
 

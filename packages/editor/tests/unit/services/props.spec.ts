@@ -61,3 +61,8 @@ describe('setNewItemId', () => {
     expect(config.items[1].id === config.items[0].pop).toBeTruthy();
   });
 });
+
+test('getDefaultValue', async () => {
+  const value = await props.getDefaultPropsValue('text');
+  expect(value.type).toBe('text');
+});
