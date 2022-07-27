@@ -67,6 +67,8 @@ import StageCore from '@tmagic/stage';
 import type { EditorService } from '@editor/services/editor';
 import type { Services } from '@editor/type';
 import { Layout } from '@editor/type';
+
+import LayerMenu from './LayerMenu.vue';
 import LayerMenu from './LayerMenu.vue';
 
 const throttleTime = 150;
