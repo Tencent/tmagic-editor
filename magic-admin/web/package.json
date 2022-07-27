@@ -3,17 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "serve": "node --max_old_space_size=4096 node_modules/@vue/cli-service/bin/vue-cli-service.js serve --open",
     "build": "vue-cli-service build",
     "test": "vue-cli-service test:unit --maxWorkers=8 --coverage",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@tmagic/editor": "^1.1.0-beta.1",
-    "@tmagic/form": "^1.1.0-beta.1",
-    "@tmagic/schema": "^1.1.0-beta.1",
-    "@tmagic/stage": "^1.1.0-beta.1",
-    "@tmagic/utils": "^1.1.0-beta.1",
+    "@tmagic/editor": "1.1.0-beta.4",
+    "@tmagic/form": "1.1.0-beta.4",
+    "@tmagic/schema": "1.1.0-beta.4",
+    "@tmagic/stage": "1.1.0-beta.4",
+    "@tmagic/utils": "1.1.0-beta.4",
     "axios": "^0.27.2",
     "axios-jsonp": "^1.0.4",
     "core-js": "^3.20.0",
