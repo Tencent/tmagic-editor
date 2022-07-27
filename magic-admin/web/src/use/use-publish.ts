@@ -64,7 +64,7 @@ export const initConfigByActId = async ({ actId }: { actId: number }) => {
   });
   const uiConfigs = {
     type: 'app',
-    id: actInfo.actId,
+    id: actInfo.actCryptoId,
     items: pageItems,
     abTest: actInfo.abTest || [],
   };
