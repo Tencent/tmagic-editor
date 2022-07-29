@@ -43,6 +43,7 @@ export default ({ config, methods }: UseAppOptions) => {
 
   useEffect(() => {
     const emitData = {
+      config,
       ...methods,
     };
 

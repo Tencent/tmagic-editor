@@ -10,7 +10,7 @@ body,
   overflow: auto;
 }
 
-#app::-webkit-scrollbar {
+::-webkit-scrollbar {
   width: 0;
 }
 

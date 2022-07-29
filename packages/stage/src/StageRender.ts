@@ -72,20 +72,22 @@ export default class StageRender extends EventEmitter {
    * @param el 将页面挂载到该Dom节点上
    */
   public async mount(el: HTMLDivElement) {
-    if (this.iframe) {
-      if (!isSameDomain(this.runtimeUrl) && this.runtimeUrl) {
-        // 不同域，使用srcdoc发起异步请求，需要目标地址支持跨域
-        let html = await fetch(this.runtimeUrl).then((res) => res.text());
-        // 使用base, 解决相对路径或绝对路径的问题
-        const base = `${location.protocol}//${getHost(this.runtimeUrl)}`;
-        html = html.replace('<head>', `<head>\n<base href="${base}">`);
-        this.iframe.srcdoc = html;
-      }
-
-      el.appendChild<HTMLIFrameElement>(this.iframe);
-    } else {
+    if (!this.iframe) {
       throw Error('mount 失败');
     }
+
+    if (!isSameDomain(this.runtimeUrl) && this.runtimeUrl) {
+      // 不同域，使用srcdoc发起异步请求，需要目标地址支持跨域
+      let html = await fetch(this.runtimeUrl).then((res) => res.text());
+      // 使用base, 解决相对路径或绝对路径的问题
+      const base = `${location.protocol}//${getHost(this.runtimeUrl)}`;
+      html = html.replace('<head>', `<head>\n<base href="${base}">`);
+      this.iframe.srcdoc = html;
+    }
+
+    el.appendChild<HTMLIFrameElement>(this.iframe);
+
+    this.postTmagicRuntimeReady();
   }
 
   public getRuntime = (): Promise<Runtime> => {
@@ -111,18 +113,28 @@ export default class StageRender extends EventEmitter {
   }
 
   private loadHandler = async () => {
-    this.contentWindow = this.iframe?.contentWindow as RuntimeWindow;
+    if (!this.contentWindow?.magic) {
+      this.postTmagicRuntimeReady();
+    }
 
-    this.contentWindow.magic = this.getMagicApi();
+    if (!this.contentWindow) return;
 
     if (this.render) {
       const el = await this.render(this.core);
       if (el) {
-        this.iframe?.contentDocument?.body?.appendChild(el);
+        this.contentWindow.document?.body?.appendChild(el);
       }
     }
 
     this.emit('onload');
+
+    injectStyle(this.contentWindow.document, style);
+  };
+
+  private postTmagicRuntimeReady() {
+    this.contentWindow = this.iframe?.contentWindow as RuntimeWindow;
+
+    this.contentWindow.magic = this.getMagicApi();
 
     this.contentWindow.postMessage(
       {
@@ -130,7 +142,5 @@ export default class StageRender extends EventEmitter {
       },
       '*',
     );
-
-    injectStyle(this.contentWindow.document, style);
-  };
+  }
 }
