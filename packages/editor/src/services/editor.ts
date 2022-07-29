@@ -83,7 +83,7 @@ class Editor extends BaseService {
 
   /**
    * 设置当前指点节点配置
-   * @param name 'root' | 'page' | 'parent' | 'node' | 'highlightNode'
+   * @param name 'root' | 'page' | 'parent' | 'node' | 'highlightNode' | 'selectedNodes'
    * @param value MNode
    * @returns MNode
    */
@@ -98,7 +98,7 @@ class Editor extends BaseService {
 
   /**
    * 获取当前指点节点配置
-   * @param name  'root' | 'page' | 'parent' | 'node'
+   * @param name  'root' | 'page' | 'parent' | 'node' | 'highlightNode'
    * @returns MNode
    */
   public get<T = MNode>(name: keyof StoreState): T {
@@ -262,6 +262,23 @@ class Editor extends BaseService {
     const currentHighlightNode = this.get('highlightNode');
     if (currentHighlightNode === node) return;
     this.set('highlightNode', node);
+  }
+
+  /**
+   * 多选
+   * @param config 指定节点配置或者ID
+   * @returns 加入多选的节点配置
+   */
+  public multiSelect(config: HTMLElement[]): void {
+    const selectedNodes: MNode[] = [];
+    config.forEach((element) => {
+      const { node } = this.selectedConfigExceptionHandler(element.id);
+      if (!node) return;
+      const isExist = selectedNodes.find((selectedNode) => selectedNode.id === node.id);
+      if (isExist) return;
+      selectedNodes.push(node);
+    });
+    this.set('selectedNodes', selectedNodes);
   }
 
   /**
@@ -482,44 +499,41 @@ class Editor extends BaseService {
    * @param config 组件节点配置
    * @returns 组件节点配置
    */
-  public async copy(config: MNode): Promise<void> {
-    globalThis.localStorage.setItem(COPY_STORAGE_KEY, serialize(config));
+  public async copy(config: MNode | MNode[]): Promise<void> {
+    if (Array.isArray(config)) {
+      // 多选节点
+      globalThis.localStorage.setItem(COPY_STORAGE_KEY, serialize(config));
+    } else {
+      globalThis.localStorage.setItem(COPY_STORAGE_KEY, serialize(config));
+    }
   }
 
   /**
    * 从localStorage中获取节点，然后添加到当前容器中
    * @param position 如果设置，指定组件位置
+   * @param config 粘贴组件的配置(可选),没有传就从storage中取
    * @returns 添加后的组件节点配置
    */
-  public async paste(position: { left?: number; top?: number } = {}): Promise<MNode | void> {
-    const configStr = globalThis.localStorage.getItem(COPY_STORAGE_KEY);
-    // eslint-disable-next-line prefer-const
+  public async paste(position: { left?: number; top?: number } = {}, pasteConfig?: MNode): Promise<MNode | void> {
     let config: any = {};
-    if (!configStr) {
-      return;
+    if (!pasteConfig) {
+      const configStr = globalThis.localStorage.getItem(COPY_STORAGE_KEY);
+      // eslint-disable-next-line prefer-const
+      if (!configStr) {
+        return;
+      }
+      try {
+        // eslint-disable-next-line no-eval
+        eval(`config = ${configStr}`);
+      } catch (e) {
+        console.error(e);
+        return;
+      }
+    } else {
+      config = pasteConfig;
     }
 
-    try {
-      // eslint-disable-next-line no-eval
-      eval(`config = ${configStr}`);
-    } catch (e) {
-      console.error(e);
-      return;
-    }
-
-    config = await propsService.setNewItemId(config, this.get('root'));
-    if (config.style) {
-      config.style = {
-        ...config.style,
-        ...position,
-      };
-    }
-
-    if (isPage(config)) {
-      config.name = generatePageNameByApp(this.get('root'));
-    }
-
-    return await this.add(config);
+    return await this.doPaste(position, config);
   }
 
   /**
@@ -748,6 +762,20 @@ class Editor extends BaseService {
       parent,
       page,
     };
+  }
+
+  private async doPaste(position: { left?: number; top?: number }, config: MNode) {
+    const pasteConfig = await propsService.setNewItemId(config, this.get('root'));
+    if (pasteConfig.style) {
+      pasteConfig.style = {
+        ...pasteConfig.style,
+        ...position,
+      };
+    }
+    if (isPage(pasteConfig)) {
+      pasteConfig.name = generatePageNameByApp(this.get('root'));
+    }
+    return await this.add(pasteConfig as AddMNode);
   }
 }
 

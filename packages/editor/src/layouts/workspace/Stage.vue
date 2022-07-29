@@ -15,7 +15,7 @@
       @dragover="dragoverHandler"
     ></div>
     <teleport to="body">
-      <viewer-menu ref="menu"></viewer-menu>
+      <viewer-menu ref="menu" :is-multi-select="isMultiSelect"></viewer-menu>
     </teleport>
   </scroll-viewer>
 </template>
@@ -67,12 +67,16 @@ export default defineComponent({
   },
 
   setup() {
+    let stage: StageCore | null = null;
+    let runtime: Runtime | null = null;
+
     const services = inject<Services>('services');
     const stageOptions = inject<StageOptions>('stageOptions');
 
     const stageWrap = ref<InstanceType<typeof ScrollViewer>>();
     const stageContainer = ref<HTMLDivElement>();
     const menu = ref<InstanceType<typeof ViewerMenu>>();
+    const isMultiSelect = ref<Boolean>(false);
 
     const stageRect = computed(() => services?.uiService.get<StageRect>('stageRect'));
     const uiSelectMode = computed(() => services?.uiService.get<boolean>('uiSelectMode'));
@@ -80,9 +84,6 @@ export default defineComponent({
     const page = computed(() => services?.editorService.get<MPage>('page'));
     const zoom = computed(() => services?.uiService.get<number>('zoom') || 1);
     const node = computed(() => services?.editorService.get<MNode>('node'));
-
-    let stage: StageCore | null = null;
-    let runtime: Runtime | null = null;
 
     const getGuideLineKey = (key: string) => `${key}_${root.value?.id}_${page.value?.id}`;
 
@@ -129,6 +130,10 @@ export default defineComponent({
 
       stage?.on('highlight', (el: HTMLElement) => {
         services?.editorService.highlight(el.id);
+      });
+
+      stage?.on('multiSelect', (els: HTMLElement[]) => {
+        services?.editorService.multiSelect(els);
       });
 
       stage?.on('update', (ev: UpdateEventData) => {
@@ -206,9 +211,11 @@ export default defineComponent({
       menu,
       stageRect,
       zoom,
+      isMultiSelect,
 
       contextmenuHandler(e: MouseEvent) {
         e.preventDefault();
+        isMultiSelect.value = stage?.selectedDomList?.length ? stage.selectedDomList.length > 1 : false;
         menu.value?.show(e);
       },
 

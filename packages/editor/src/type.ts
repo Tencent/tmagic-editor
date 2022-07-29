@@ -64,6 +64,7 @@ export interface StoreState {
   parent: MContainer | null;
   node: MNode | null;
   highlightNode: MNode | null;
+  selectedNodes: MNode[] | null;
   stage: StageCore | null;
   modifiedNodeIds: Map<Id, Id>;
   pageLength: number;
