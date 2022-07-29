@@ -7,4 +7,5 @@
   left: 0;
   background-color: #000;
   opacity: .1;
+  pointer-events: none;
 }
