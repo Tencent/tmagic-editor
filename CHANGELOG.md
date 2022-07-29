@@ -1,3 +1,24 @@
+# [1.1.0-beta.5](https://github.com/Tencent/tmagic-editor/compare/v1.1.0-beta.4...v1.1.0-beta.5) (2022-07-29)
+
+
+### Bug Fixes
+
+* **admin:** 升级tmagic版本,修复第一个活动第一个页面uiconfig中id和page id重复的问题 ([ec1bf1d](https://github.com/Tencent/tmagic-editor/commit/ec1bf1dcb725a2312368023f8b50535dd484ca38))
+* **editor:** 已选组件树形拖放时, layout 根据父窗口动态变化 ([#210](https://github.com/Tencent/tmagic-editor/issues/210)) ([340eeb3](https://github.com/Tencent/tmagic-editor/commit/340eeb32d7620fcb58e2aa7b1ca9d8345630319b))
+* **editor:** 新增组件id不对 ([fff587d](https://github.com/Tencent/tmagic-editor/commit/fff587d9eb1d614a0a936146b8c101b6aff8c08e))
+* **editor:** 新增页面时会有一个error ([aa20c74](https://github.com/Tencent/tmagic-editor/commit/aa20c741313421b22f366c96cef52550b5817a10))
+* **editor:** 重复import ([4ff07ea](https://github.com/Tencent/tmagic-editor/commit/4ff07ea5a93a56e278c921ae4b19b6365d5fdf74))
+* **stage,runtime,ui-react:** tmagicRuntimeReady时机修改 ([9858327](https://github.com/Tencent/tmagic-editor/commit/9858327eb8ba5ca24ecb2cb60f42625b03612c5e)), closes [#198](https://github.com/Tencent/tmagic-editor/issues/198)
+* **stage:** 在 stage 拖拽改变父容器的BUG ([0a1cf06](https://github.com/Tencent/tmagic-editor/commit/0a1cf060a5580ab56dd34abc0d2ad88e09c2ba91))
+* 修复多选组件时新增组件的体验问题 ([a4884c5](https://github.com/Tencent/tmagic-editor/commit/a4884c504f4f8289150f3845054f0eeaf73c901e))
+
+
+### Features
+
+* **stage:** 1) 高亮边框样式加粗 ([a2fb92d](https://github.com/Tencent/tmagic-editor/commit/a2fb92d9880bc852cd630b8354a40f3378f96902))
+
+
+
 # [1.1.0-beta.4](https://github.com/Tencent/tmagic-editor/compare/v1.1.0-beta.3...v1.1.0-beta.4) (2022-07-26)
 
 
@@ -68,436 +89,7 @@
 
 
 
-# [1.1.0-beta.2](https://github.com/Tencent/tmagic-editor/compare/v1.0.0-rc.7...v1.1.0-beta.2) (2022-07-15)
-
-
-### Bug Fixes
-
-* **core:** 拼写错误 ([c83d83b](https://github.com/Tencent/tmagic-editor/commit/c83d83b1a15103ce94dd7e224d6c71cec9a8a27b))
-* **editor:** moveableOptions默认值中的container有误 ([2377629](https://github.com/Tencent/tmagic-editor/commit/23776299a730d3c440d41be4f1101e4fb909dcf9))
-* **editor:** page和container默认value加上items ([10577ae](https://github.com/Tencent/tmagic-editor/commit/10577aea68a63323bc1312faced84bcd5c616d1f))
-* **editor:** 修正Editor slot 变量位置 ([ecd80cb](https://github.com/Tencent/tmagic-editor/commit/ecd80cb4a4c83ada6076a09da6a36bda6491ef47))
-* **editor:** 编辑器分栏左右各设置最小宽度  fix [#145](https://github.com/Tencent/tmagic-editor/issues/145) ([363330e](https://github.com/Tencent/tmagic-editor/commit/363330e07aea220e0a1efc76823ceeb810005865))
-* **form:** date组件初始值 不显示 ([8d5eab0](https://github.com/Tencent/tmagic-editor/commit/8d5eab0ef821b57bc7145e9ccd2dc4db36a6f6d3))
-* **form:** el-upload类型读取失败导致Table.vue.d.ts丢失 ([fab8717](https://github.com/Tencent/tmagic-editor/commit/fab8717fcf889ed8c6a4b2ee1569a5760c4ff231))
-* **form:** fieldset checkbox chang事件不会触发 ([26c60c3](https://github.com/Tencent/tmagic-editor/commit/26c60c316ae688c41b9b0093ea5ee7d85fcb98af))
-* **form:** tabs配置name后出错 ([9454bb3](https://github.com/Tencent/tmagic-editor/commit/9454bb3679881e7a4617ae782a17e6c51d1f12bc))
-* **form:** 函数配置中添加config参数 ([7ad80e8](https://github.com/Tencent/tmagic-editor/commit/7ad80e848f81d3a96622540cce44f1fa10d9dc57))
-* **form:** 函数配置中添加config参数 ([eae9725](https://github.com/Tencent/tmagic-editor/commit/eae9725ccbbdbe8ffc9ded5af42993cff21bec77))
-* **form:** 初始化values时，数组中的对象出现key丢失 ([32e86d8](https://github.com/Tencent/tmagic-editor/commit/32e86d8167f85a77306d5236dc4f885fc4b7b050))
-* **form:** 配置了names，validator中的value应为model ([3090bc7](https://github.com/Tencent/tmagic-editor/commit/3090bc77631e1be3974120adf48df938fd546a5e))
-* **magic-admin:** 修复发布页面资源路径错误，导致页面无法打开问题 ([7dc0b4e](https://github.com/Tencent/tmagic-editor/commit/7dc0b4e26127d3b53e44465b96d2edf5c71738af))
-* **magic-admin:** 画布显示出错 ([7c42f75](https://github.com/Tencent/tmagic-editor/commit/7c42f751a4042e68ad9071fed88fcfb9a13f4ef0))
-* **runtime:** 解决启动脚本不识别组件包内的插件 ([8b70ede](https://github.com/Tencent/tmagic-editor/commit/8b70edeaf21b9029c9cddf8df9b2845b2a6aba05))
-* **stage:** 所有父节点中如果有translate，导致选中框定位出错 ([feff617](https://github.com/Tencent/tmagic-editor/commit/feff6177c97851dbe5457d4d59222c3f045ce864))
-* **stage:** 无法拖到left为0 ([069aec6](https://github.com/Tencent/tmagic-editor/commit/069aec64c152eca2a6b0508b787343aa9ceebcf6))
-* 修正getScrollParent逻辑 ([#141](https://github.com/Tencent/tmagic-editor/issues/141)) ([f72b8c7](https://github.com/Tencent/tmagic-editor/commit/f72b8c7614135382bea9899a86b2ab1cb0db761b))
-* 创建活动时 ([ac2aef9](https://github.com/Tencent/tmagic-editor/commit/ac2aef980c1bcc5a197b616df2480ad0b1964c93))
-
-
-### Features
-
-* **docs:** 添加搜索 ([4e812c3](https://github.com/Tencent/tmagic-editor/commit/4e812c396de05286a990cfe8831b7cb20531b2e3))
-* **editor:** 参考线缓存与页面绑定 ([fb612ea](https://github.com/Tencent/tmagic-editor/commit/fb612eaddc982ce885bfaaee4fc32e30f609d6c2))
-* **editor:** 添加layer-panel/component-list-panel slot ([49c9e87](https://github.com/Tencent/tmagic-editor/commit/49c9e87d6e1c1491d71ce7c804c0d7ccdfad5b4b))
-* **editor:** 添加props-panel-header slot;修改layer-panel,component-list-panel slot名称，加上-header ([e901ad4](https://github.com/Tencent/tmagic-editor/commit/e901ad4dd00d5e93b42721e4fed6f5ccdee5f8f9))
-* **form:** datetime移出默认defaultTime，支持defaultTime配置 ([e1705c3](https://github.com/Tencent/tmagic-editor/commit/e1705c350e8fcd2b51ff35ec573ce08a6a307d3b))
-* **form:** datetime默认的具体时刻设置为23：59:59 ([83cd101](https://github.com/Tencent/tmagic-editor/commit/83cd10159d87893d167f53f3a2218e0d18323df5))
-* **form:** groundlist 函数配置增加prop/config两个变量 ([3de29e0](https://github.com/Tencent/tmagic-editor/commit/3de29e0316aa09db2e6876b0969af84b5b6c30ea))
-* **playground:** 优化form/table playground ([c570370](https://github.com/Tencent/tmagic-editor/commit/c57037030d652ff160a108d632ff79b9bac97e2a))
-* **playground:** 添加form、table playground入口 ([f808253](https://github.com/Tencent/tmagic-editor/commit/f80825331e373047d467bb189cc4e5857dac6dfa))
-* **playground:** 添加不同设备切换 ([9f23cd6](https://github.com/Tencent/tmagic-editor/commit/9f23cd6361cce60c10178f39e133e13aa71a62ca))
-* **runtime:** 支持构建magic-admin的runtime产物 ([014859f](https://github.com/Tencent/tmagic-editor/commit/014859fd2f590f63d0f52bbe95f06932ce0177b9))
-* **stage:** 提供tmagicRuntimeReady message事件通知 ([def0e3e](https://github.com/Tencent/tmagic-editor/commit/def0e3ef8d3d3357d71be55dc3ca104b24fa527a))
-* **ui-vue2:** 升级至vue2.7.4 ([f289388](https://github.com/Tencent/tmagic-editor/commit/f2893880b1859b7fa371220451ce5905391ba26d))
-* **ui:** page 添加magic-ui-container class ([f3e2d9c](https://github.com/Tencent/tmagic-editor/commit/f3e2d9ca394d794183bccef26820020ea56da672))
-* 支持将组件拖动到指定容器 ([de0c695](https://github.com/Tencent/tmagic-editor/commit/de0c6952c77fe8675c062f8237cd938531f22a82))
-* 支持配置updateDragEl方法来调制选中框 ([154860c](https://github.com/Tencent/tmagic-editor/commit/154860c66c149b72537029b351401a0e90179e9c))
-
-
-
-# [1.1.0-beta.1](https://github.com/Tencent/tmagic-editor/compare/v1.0.0-rc.7...v1.1.0-beta.1) (2022-07-14)
-
-
-### Bug Fixes
-
-* **core:** 拼写错误 ([c83d83b](https://github.com/Tencent/tmagic-editor/commit/c83d83b1a15103ce94dd7e224d6c71cec9a8a27b))
-* **editor:** moveableOptions默认值中的container有误 ([2377629](https://github.com/Tencent/tmagic-editor/commit/23776299a730d3c440d41be4f1101e4fb909dcf9))
-* **editor:** page和container默认value加上items ([10577ae](https://github.com/Tencent/tmagic-editor/commit/10577aea68a63323bc1312faced84bcd5c616d1f))
-* **editor:** 修正Editor slot 变量位置 ([ecd80cb](https://github.com/Tencent/tmagic-editor/commit/ecd80cb4a4c83ada6076a09da6a36bda6491ef47))
-* **editor:** 编辑器分栏左右各设置最小宽度  fix [#145](https://github.com/Tencent/tmagic-editor/issues/145) ([363330e](https://github.com/Tencent/tmagic-editor/commit/363330e07aea220e0a1efc76823ceeb810005865))
-* **form:** date组件初始值 不显示 ([8d5eab0](https://github.com/Tencent/tmagic-editor/commit/8d5eab0ef821b57bc7145e9ccd2dc4db36a6f6d3))
-* **form:** el-upload类型读取失败导致Table.vue.d.ts丢失 ([fab8717](https://github.com/Tencent/tmagic-editor/commit/fab8717fcf889ed8c6a4b2ee1569a5760c4ff231))
-* **form:** fieldset checkbox chang事件不会触发 ([26c60c3](https://github.com/Tencent/tmagic-editor/commit/26c60c316ae688c41b9b0093ea5ee7d85fcb98af))
-* **form:** tabs配置name后出错 ([9454bb3](https://github.com/Tencent/tmagic-editor/commit/9454bb3679881e7a4617ae782a17e6c51d1f12bc))
-* **form:** 函数配置中添加config参数 ([7ad80e8](https://github.com/Tencent/tmagic-editor/commit/7ad80e848f81d3a96622540cce44f1fa10d9dc57))
-* **form:** 函数配置中添加config参数 ([eae9725](https://github.com/Tencent/tmagic-editor/commit/eae9725ccbbdbe8ffc9ded5af42993cff21bec77))
-* **form:** 初始化values时，数组中的对象出现key丢失 ([32e86d8](https://github.com/Tencent/tmagic-editor/commit/32e86d8167f85a77306d5236dc4f885fc4b7b050))
-* **form:** 配置了names，validator中的value应为model ([3090bc7](https://github.com/Tencent/tmagic-editor/commit/3090bc77631e1be3974120adf48df938fd546a5e))
-* **magic-admin:** 修复发布页面资源路径错误，导致页面无法打开问题 ([7dc0b4e](https://github.com/Tencent/tmagic-editor/commit/7dc0b4e26127d3b53e44465b96d2edf5c71738af))
-* **runtime:** 解决启动脚本不识别组件包内的插件 ([8b70ede](https://github.com/Tencent/tmagic-editor/commit/8b70edeaf21b9029c9cddf8df9b2845b2a6aba05))
-* **stage:** 所有父节点中如果有translate，导致选中框定位出错 ([feff617](https://github.com/Tencent/tmagic-editor/commit/feff6177c97851dbe5457d4d59222c3f045ce864))
-* **stage:** 无法拖到left为0 ([069aec6](https://github.com/Tencent/tmagic-editor/commit/069aec64c152eca2a6b0508b787343aa9ceebcf6))
-* 修正getScrollParent逻辑 ([#141](https://github.com/Tencent/tmagic-editor/issues/141)) ([f72b8c7](https://github.com/Tencent/tmagic-editor/commit/f72b8c7614135382bea9899a86b2ab1cb0db761b))
-* 创建活动时 ([ac2aef9](https://github.com/Tencent/tmagic-editor/commit/ac2aef980c1bcc5a197b616df2480ad0b1964c93))
-
-
-### Features
-
-* **docs:** 添加搜索 ([4e812c3](https://github.com/Tencent/tmagic-editor/commit/4e812c396de05286a990cfe8831b7cb20531b2e3))
-* **editor:** 参考线缓存与页面绑定 ([fb612ea](https://github.com/Tencent/tmagic-editor/commit/fb612eaddc982ce885bfaaee4fc32e30f609d6c2))
-* **editor:** 添加layer-panel/component-list-panel slot ([49c9e87](https://github.com/Tencent/tmagic-editor/commit/49c9e87d6e1c1491d71ce7c804c0d7ccdfad5b4b))
-* **editor:** 添加props-panel-header slot;修改layer-panel,component-list-panel slot名称，加上-header ([e901ad4](https://github.com/Tencent/tmagic-editor/commit/e901ad4dd00d5e93b42721e4fed6f5ccdee5f8f9))
-* **form:** datetime移出默认defaultTime，支持defaultTime配置 ([e1705c3](https://github.com/Tencent/tmagic-editor/commit/e1705c350e8fcd2b51ff35ec573ce08a6a307d3b))
-* **form:** datetime默认的具体时刻设置为23：59:59 ([83cd101](https://github.com/Tencent/tmagic-editor/commit/83cd10159d87893d167f53f3a2218e0d18323df5))
-* **form:** groundlist 函数配置增加prop/config两个变量 ([3de29e0](https://github.com/Tencent/tmagic-editor/commit/3de29e0316aa09db2e6876b0969af84b5b6c30ea))
-* **playground:** 优化form/table playground ([c570370](https://github.com/Tencent/tmagic-editor/commit/c57037030d652ff160a108d632ff79b9bac97e2a))
-* **playground:** 添加form、table playground入口 ([f808253](https://github.com/Tencent/tmagic-editor/commit/f80825331e373047d467bb189cc4e5857dac6dfa))
-* **playground:** 添加不同设备切换 ([9f23cd6](https://github.com/Tencent/tmagic-editor/commit/9f23cd6361cce60c10178f39e133e13aa71a62ca))
-* **runtime:** 支持构建magic-admin的runtime产物 ([014859f](https://github.com/Tencent/tmagic-editor/commit/014859fd2f590f63d0f52bbe95f06932ce0177b9))
-* **stage:** 提供tmagicRuntimeReady message事件通知 ([def0e3e](https://github.com/Tencent/tmagic-editor/commit/def0e3ef8d3d3357d71be55dc3ca104b24fa527a))
-* **ui-vue2:** 升级至vue2.7.4 ([f289388](https://github.com/Tencent/tmagic-editor/commit/f2893880b1859b7fa371220451ce5905391ba26d))
-* **ui:** page 添加magic-ui-container class ([f3e2d9c](https://github.com/Tencent/tmagic-editor/commit/f3e2d9ca394d794183bccef26820020ea56da672))
-* 支持将组件拖动到指定容器 ([de0c695](https://github.com/Tencent/tmagic-editor/commit/de0c6952c77fe8675c062f8237cd938531f22a82))
-* 支持配置updateDragEl方法来调制选中框 ([154860c](https://github.com/Tencent/tmagic-editor/commit/154860c66c149b72537029b351401a0e90179e9c))
-
-
-
-# [1.1.0-beta.0](https://github.com/Tencent/tmagic-editor/compare/v1.0.0-rc.7...v1.1.0-beta.0) (2022-07-14)
-
-
-### Bug Fixes
-
-* **core:** 拼写错误 ([c83d83b](https://github.com/Tencent/tmagic-editor/commit/c83d83b1a15103ce94dd7e224d6c71cec9a8a27b))
-* **editor:** moveableOptions默认值中的container有误 ([2377629](https://github.com/Tencent/tmagic-editor/commit/23776299a730d3c440d41be4f1101e4fb909dcf9))
-* **editor:** page和container默认value加上items ([10577ae](https://github.com/Tencent/tmagic-editor/commit/10577aea68a63323bc1312faced84bcd5c616d1f))
-* **editor:** 修正Editor slot 变量位置 ([ecd80cb](https://github.com/Tencent/tmagic-editor/commit/ecd80cb4a4c83ada6076a09da6a36bda6491ef47))
-* **editor:** 编辑器分栏左右各设置最小宽度  fix [#145](https://github.com/Tencent/tmagic-editor/issues/145) ([363330e](https://github.com/Tencent/tmagic-editor/commit/363330e07aea220e0a1efc76823ceeb810005865))
-* **form:** date组件初始值 不显示 ([8d5eab0](https://github.com/Tencent/tmagic-editor/commit/8d5eab0ef821b57bc7145e9ccd2dc4db36a6f6d3))
-* **form:** el-upload类型读取失败导致Table.vue.d.ts丢失 ([fab8717](https://github.com/Tencent/tmagic-editor/commit/fab8717fcf889ed8c6a4b2ee1569a5760c4ff231))
-* **form:** fieldset checkbox chang事件不会触发 ([26c60c3](https://github.com/Tencent/tmagic-editor/commit/26c60c316ae688c41b9b0093ea5ee7d85fcb98af))
-* **form:** tabs配置name后出错 ([9454bb3](https://github.com/Tencent/tmagic-editor/commit/9454bb3679881e7a4617ae782a17e6c51d1f12bc))
-* **form:** 函数配置中添加config参数 ([7ad80e8](https://github.com/Tencent/tmagic-editor/commit/7ad80e848f81d3a96622540cce44f1fa10d9dc57))
-* **form:** 函数配置中添加config参数 ([eae9725](https://github.com/Tencent/tmagic-editor/commit/eae9725ccbbdbe8ffc9ded5af42993cff21bec77))
-* **form:** 初始化values时，数组中的对象出现key丢失 ([32e86d8](https://github.com/Tencent/tmagic-editor/commit/32e86d8167f85a77306d5236dc4f885fc4b7b050))
-* **form:** 配置了names，validator中的value应为model ([3090bc7](https://github.com/Tencent/tmagic-editor/commit/3090bc77631e1be3974120adf48df938fd546a5e))
-* **magic-admin:** 修复发布页面资源路径错误，导致页面无法打开问题 ([7dc0b4e](https://github.com/Tencent/tmagic-editor/commit/7dc0b4e26127d3b53e44465b96d2edf5c71738af))
-* **runtime:** 解决启动脚本不识别组件包内的插件 ([8b70ede](https://github.com/Tencent/tmagic-editor/commit/8b70edeaf21b9029c9cddf8df9b2845b2a6aba05))
-* **stage:** 所有父节点中如果有translate，导致选中框定位出错 ([feff617](https://github.com/Tencent/tmagic-editor/commit/feff6177c97851dbe5457d4d59222c3f045ce864))
-* **stage:** 无法拖到left为0 ([069aec6](https://github.com/Tencent/tmagic-editor/commit/069aec64c152eca2a6b0508b787343aa9ceebcf6))
-* 修正getScrollParent逻辑 ([#141](https://github.com/Tencent/tmagic-editor/issues/141)) ([f72b8c7](https://github.com/Tencent/tmagic-editor/commit/f72b8c7614135382bea9899a86b2ab1cb0db761b))
-* 创建活动时 ([ac2aef9](https://github.com/Tencent/tmagic-editor/commit/ac2aef980c1bcc5a197b616df2480ad0b1964c93))
-
-
-### Features
-
-* **docs:** 添加搜索 ([4e812c3](https://github.com/Tencent/tmagic-editor/commit/4e812c396de05286a990cfe8831b7cb20531b2e3))
-* **editor:** 参考线缓存与页面绑定 ([fb612ea](https://github.com/Tencent/tmagic-editor/commit/fb612eaddc982ce885bfaaee4fc32e30f609d6c2))
-* **editor:** 添加layer-panel/component-list-panel slot ([49c9e87](https://github.com/Tencent/tmagic-editor/commit/49c9e87d6e1c1491d71ce7c804c0d7ccdfad5b4b))
-* **editor:** 添加props-panel-header slot;修改layer-panel,component-list-panel slot名称，加上-header ([e901ad4](https://github.com/Tencent/tmagic-editor/commit/e901ad4dd00d5e93b42721e4fed6f5ccdee5f8f9))
-* **form:** datetime移出默认defaultTime，支持defaultTime配置 ([e1705c3](https://github.com/Tencent/tmagic-editor/commit/e1705c350e8fcd2b51ff35ec573ce08a6a307d3b))
-* **form:** datetime默认的具体时刻设置为23：59:59 ([83cd101](https://github.com/Tencent/tmagic-editor/commit/83cd10159d87893d167f53f3a2218e0d18323df5))
-* **form:** groundlist 函数配置增加prop/config两个变量 ([3de29e0](https://github.com/Tencent/tmagic-editor/commit/3de29e0316aa09db2e6876b0969af84b5b6c30ea))
-* **playground:** 优化form/table playground ([c570370](https://github.com/Tencent/tmagic-editor/commit/c57037030d652ff160a108d632ff79b9bac97e2a))
-* **playground:** 添加form、table playground入口 ([f808253](https://github.com/Tencent/tmagic-editor/commit/f80825331e373047d467bb189cc4e5857dac6dfa))
-* **playground:** 添加不同设备切换 ([9f23cd6](https://github.com/Tencent/tmagic-editor/commit/9f23cd6361cce60c10178f39e133e13aa71a62ca))
-* **runtime:** 支持构建magic-admin的runtime产物 ([014859f](https://github.com/Tencent/tmagic-editor/commit/014859fd2f590f63d0f52bbe95f06932ce0177b9))
-* **stage:** 提供tmagicRuntimeReady message事件通知 ([def0e3e](https://github.com/Tencent/tmagic-editor/commit/def0e3ef8d3d3357d71be55dc3ca104b24fa527a))
-* **ui-vue2:** 升级至vue2.7.4 ([f289388](https://github.com/Tencent/tmagic-editor/commit/f2893880b1859b7fa371220451ce5905391ba26d))
-* **ui:** page 添加magic-ui-container class ([f3e2d9c](https://github.com/Tencent/tmagic-editor/commit/f3e2d9ca394d794183bccef26820020ea56da672))
-* 支持将组件拖动到指定容器 ([de0c695](https://github.com/Tencent/tmagic-editor/commit/de0c6952c77fe8675c062f8237cd938531f22a82))
-* 支持配置updateDragEl方法来调制选中框 ([154860c](https://github.com/Tencent/tmagic-editor/commit/154860c66c149b72537029b351401a0e90179e9c))
-
-
-
-## [1.0.5](https://github.com/Tencent/tmagic-editor/compare/v1.0.0-rc.7...v1.0.5) (2022-07-08)
-
-
-### Bug Fixes
-
-* **core:** 拼写错误 ([c83d83b](https://github.com/Tencent/tmagic-editor/commit/c83d83b1a15103ce94dd7e224d6c71cec9a8a27b))
-* **editor:** moveableOptions默认值中的container有误 ([2377629](https://github.com/Tencent/tmagic-editor/commit/23776299a730d3c440d41be4f1101e4fb909dcf9))
-* **editor:** page和container默认value加上items ([10577ae](https://github.com/Tencent/tmagic-editor/commit/10577aea68a63323bc1312faced84bcd5c616d1f))
-* **editor:** 修正Editor slot 变量位置 ([ecd80cb](https://github.com/Tencent/tmagic-editor/commit/ecd80cb4a4c83ada6076a09da6a36bda6491ef47))
-* **editor:** 编辑器分栏左右各设置最小宽度  fix [#145](https://github.com/Tencent/tmagic-editor/issues/145) ([363330e](https://github.com/Tencent/tmagic-editor/commit/363330e07aea220e0a1efc76823ceeb810005865))
-* **form:** date组件初始值 不显示 ([8d5eab0](https://github.com/Tencent/tmagic-editor/commit/8d5eab0ef821b57bc7145e9ccd2dc4db36a6f6d3))
-* **form:** el-upload类型读取失败导致Table.vue.d.ts丢失 ([fab8717](https://github.com/Tencent/tmagic-editor/commit/fab8717fcf889ed8c6a4b2ee1569a5760c4ff231))
-* **form:** fieldset checkbox chang事件不会触发 ([26c60c3](https://github.com/Tencent/tmagic-editor/commit/26c60c316ae688c41b9b0093ea5ee7d85fcb98af))
-* **form:** tabs配置name后出错 ([9454bb3](https://github.com/Tencent/tmagic-editor/commit/9454bb3679881e7a4617ae782a17e6c51d1f12bc))
-* **form:** 函数配置中添加config参数 ([7ad80e8](https://github.com/Tencent/tmagic-editor/commit/7ad80e848f81d3a96622540cce44f1fa10d9dc57))
-* **form:** 函数配置中添加config参数 ([eae9725](https://github.com/Tencent/tmagic-editor/commit/eae9725ccbbdbe8ffc9ded5af42993cff21bec77))
-* **form:** 初始化values时，数组中的对象出现key丢失 ([32e86d8](https://github.com/Tencent/tmagic-editor/commit/32e86d8167f85a77306d5236dc4f885fc4b7b050))
-* **form:** 配置了names，validator中的value应为model ([3090bc7](https://github.com/Tencent/tmagic-editor/commit/3090bc77631e1be3974120adf48df938fd546a5e))
-* **runtime:** 解决启动脚本不识别组件包内的插件 ([8b70ede](https://github.com/Tencent/tmagic-editor/commit/8b70edeaf21b9029c9cddf8df9b2845b2a6aba05))
-* **stage:** 所有父节点中如果有translate，导致选中框定位出错 ([feff617](https://github.com/Tencent/tmagic-editor/commit/feff6177c97851dbe5457d4d59222c3f045ce864))
-* **stage:** 无法拖到left为0 ([069aec6](https://github.com/Tencent/tmagic-editor/commit/069aec64c152eca2a6b0508b787343aa9ceebcf6))
-* 修正getScrollParent逻辑 ([#141](https://github.com/Tencent/tmagic-editor/issues/141)) ([f72b8c7](https://github.com/Tencent/tmagic-editor/commit/f72b8c7614135382bea9899a86b2ab1cb0db761b))
-* 创建活动时 ([ac2aef9](https://github.com/Tencent/tmagic-editor/commit/ac2aef980c1bcc5a197b616df2480ad0b1964c93))
-
-
-### Features
-
-* **docs:** 添加搜索 ([4e812c3](https://github.com/Tencent/tmagic-editor/commit/4e812c396de05286a990cfe8831b7cb20531b2e3))
-* **editor:** 参考线缓存与页面绑定 ([fb612ea](https://github.com/Tencent/tmagic-editor/commit/fb612eaddc982ce885bfaaee4fc32e30f609d6c2))
-* **editor:** 添加layer-panel/component-list-panel slot ([49c9e87](https://github.com/Tencent/tmagic-editor/commit/49c9e87d6e1c1491d71ce7c804c0d7ccdfad5b4b))
-* **editor:** 添加props-panel-header slot;修改layer-panel,component-list-panel slot名称，加上-header ([e901ad4](https://github.com/Tencent/tmagic-editor/commit/e901ad4dd00d5e93b42721e4fed6f5ccdee5f8f9))
-* **form:** datetime移出默认defaultTime，支持defaultTime配置 ([e1705c3](https://github.com/Tencent/tmagic-editor/commit/e1705c350e8fcd2b51ff35ec573ce08a6a307d3b))
-* **form:** datetime默认的具体时刻设置为23：59:59 ([83cd101](https://github.com/Tencent/tmagic-editor/commit/83cd10159d87893d167f53f3a2218e0d18323df5))
-* **form:** groundlist 函数配置增加prop/config两个变量 ([3de29e0](https://github.com/Tencent/tmagic-editor/commit/3de29e0316aa09db2e6876b0969af84b5b6c30ea))
-* **playground:** 优化form/table playground ([c570370](https://github.com/Tencent/tmagic-editor/commit/c57037030d652ff160a108d632ff79b9bac97e2a))
-* **playground:** 添加form、table playground入口 ([f808253](https://github.com/Tencent/tmagic-editor/commit/f80825331e373047d467bb189cc4e5857dac6dfa))
-* **playground:** 添加不同设备切换 ([9f23cd6](https://github.com/Tencent/tmagic-editor/commit/9f23cd6361cce60c10178f39e133e13aa71a62ca))
-* **stage:** 提供tmagicRuntimeReady message事件通知 ([def0e3e](https://github.com/Tencent/tmagic-editor/commit/def0e3ef8d3d3357d71be55dc3ca104b24fa527a))
-* 支持配置updateDragEl方法来调制选中框 ([154860c](https://github.com/Tencent/tmagic-editor/commit/154860c66c149b72537029b351401a0e90179e9c))
-
-
-
-## [1.0.4](https://github.com/Tencent/tmagic-editor/compare/v1.0.0-rc.7...v1.0.4) (2022-07-07)
-
-
-### Bug Fixes
-
-* **core:** 拼写错误 ([c83d83b](https://github.com/Tencent/tmagic-editor/commit/c83d83b1a15103ce94dd7e224d6c71cec9a8a27b))
-* **editor:** moveableOptions默认值中的container有误 ([2377629](https://github.com/Tencent/tmagic-editor/commit/23776299a730d3c440d41be4f1101e4fb909dcf9))
-* **editor:** page和container默认value加上items ([10577ae](https://github.com/Tencent/tmagic-editor/commit/10577aea68a63323bc1312faced84bcd5c616d1f))
-* **editor:** 修正Editor slot 变量位置 ([ecd80cb](https://github.com/Tencent/tmagic-editor/commit/ecd80cb4a4c83ada6076a09da6a36bda6491ef47))
-* **editor:** 编辑器分栏左右各设置最小宽度  fix [#145](https://github.com/Tencent/tmagic-editor/issues/145) ([363330e](https://github.com/Tencent/tmagic-editor/commit/363330e07aea220e0a1efc76823ceeb810005865))
-* **form:** date组件初始值 不显示 ([5dcb063](https://github.com/Tencent/tmagic-editor/commit/5dcb06342d22dcd30e7f0e45253dbd664f4afe74))
-* **form:** el-upload类型读取失败导致Table.vue.d.ts丢失 ([fab8717](https://github.com/Tencent/tmagic-editor/commit/fab8717fcf889ed8c6a4b2ee1569a5760c4ff231))
-* **form:** fieldset checkbox chang事件不会触发 ([26c60c3](https://github.com/Tencent/tmagic-editor/commit/26c60c316ae688c41b9b0093ea5ee7d85fcb98af))
-* **form:** tabs配置name后出错 ([9454bb3](https://github.com/Tencent/tmagic-editor/commit/9454bb3679881e7a4617ae782a17e6c51d1f12bc))
-* **form:** 函数配置中添加config参数 ([7ad80e8](https://github.com/Tencent/tmagic-editor/commit/7ad80e848f81d3a96622540cce44f1fa10d9dc57))
-* **form:** 函数配置中添加config参数 ([eae9725](https://github.com/Tencent/tmagic-editor/commit/eae9725ccbbdbe8ffc9ded5af42993cff21bec77))
-* **form:** 初始化values时，数组中的对象出现key丢失 ([32e86d8](https://github.com/Tencent/tmagic-editor/commit/32e86d8167f85a77306d5236dc4f885fc4b7b050))
-* **form:** 配置了names，validator中的value应为model ([3090bc7](https://github.com/Tencent/tmagic-editor/commit/3090bc77631e1be3974120adf48df938fd546a5e))
-* **runtime:** 解决启动脚本不识别组件包内的插件 ([8b70ede](https://github.com/Tencent/tmagic-editor/commit/8b70edeaf21b9029c9cddf8df9b2845b2a6aba05))
-* **stage:** 所有父节点中如果有translate，导致选中框定位出错 ([feff617](https://github.com/Tencent/tmagic-editor/commit/feff6177c97851dbe5457d4d59222c3f045ce864))
-* **stage:** 无法拖到left为0 ([069aec6](https://github.com/Tencent/tmagic-editor/commit/069aec64c152eca2a6b0508b787343aa9ceebcf6))
-* 修正getScrollParent逻辑 ([#141](https://github.com/Tencent/tmagic-editor/issues/141)) ([f72b8c7](https://github.com/Tencent/tmagic-editor/commit/f72b8c7614135382bea9899a86b2ab1cb0db761b))
-* 创建活动时 ([ac2aef9](https://github.com/Tencent/tmagic-editor/commit/ac2aef980c1bcc5a197b616df2480ad0b1964c93))
-
-
-### Features
-
-* **docs:** 添加搜索 ([4e812c3](https://github.com/Tencent/tmagic-editor/commit/4e812c396de05286a990cfe8831b7cb20531b2e3))
-* **editor:** 参考线缓存与页面绑定 ([fb612ea](https://github.com/Tencent/tmagic-editor/commit/fb612eaddc982ce885bfaaee4fc32e30f609d6c2))
-* **editor:** 添加layer-panel/component-list-panel slot ([c8c0e24](https://github.com/Tencent/tmagic-editor/commit/c8c0e24f4917d84f434362d4a5610f5873c6af22))
-* **form:** datetime移出默认defaultTime，支持defaultTime配置 ([e1705c3](https://github.com/Tencent/tmagic-editor/commit/e1705c350e8fcd2b51ff35ec573ce08a6a307d3b))
-* **form:** datetime默认的具体时刻设置为23：59:59 ([83cd101](https://github.com/Tencent/tmagic-editor/commit/83cd10159d87893d167f53f3a2218e0d18323df5))
-* **form:** groundlist 函数配置增加prop/config两个变量 ([3de29e0](https://github.com/Tencent/tmagic-editor/commit/3de29e0316aa09db2e6876b0969af84b5b6c30ea))
-* **playground:** 优化form/table playground ([c570370](https://github.com/Tencent/tmagic-editor/commit/c57037030d652ff160a108d632ff79b9bac97e2a))
-* **playground:** 添加form、table playground入口 ([f808253](https://github.com/Tencent/tmagic-editor/commit/f80825331e373047d467bb189cc4e5857dac6dfa))
-* **playground:** 添加不同设备切换 ([9f23cd6](https://github.com/Tencent/tmagic-editor/commit/9f23cd6361cce60c10178f39e133e13aa71a62ca))
-* **stage:** 提供tmagicRuntimeReady message事件通知 ([def0e3e](https://github.com/Tencent/tmagic-editor/commit/def0e3ef8d3d3357d71be55dc3ca104b24fa527a))
-* 支持配置updateDragEl方法来调制选中框 ([154860c](https://github.com/Tencent/tmagic-editor/commit/154860c66c149b72537029b351401a0e90179e9c))
-
-
-
-## [1.0.3](https://github.com/Tencent/tmagic-editor/compare/v1.0.0-rc.7...v1.0.3) (2022-07-05)
-
-
-### Bug Fixes
-
-* **core:** 拼写错误 ([c83d83b](https://github.com/Tencent/tmagic-editor/commit/c83d83b1a15103ce94dd7e224d6c71cec9a8a27b))
-* **editor:** moveableOptions默认值中的container有误 ([2377629](https://github.com/Tencent/tmagic-editor/commit/23776299a730d3c440d41be4f1101e4fb909dcf9))
-* **editor:** page和container默认value加上items ([10577ae](https://github.com/Tencent/tmagic-editor/commit/10577aea68a63323bc1312faced84bcd5c616d1f))
-* **editor:** 修正Editor slot 变量位置 ([ecd80cb](https://github.com/Tencent/tmagic-editor/commit/ecd80cb4a4c83ada6076a09da6a36bda6491ef47))
-* **editor:** 编辑器分栏左右各设置最小宽度  fix [#145](https://github.com/Tencent/tmagic-editor/issues/145) ([363330e](https://github.com/Tencent/tmagic-editor/commit/363330e07aea220e0a1efc76823ceeb810005865))
-* **form:** el-upload类型读取失败导致Table.vue.d.ts丢失 ([fab8717](https://github.com/Tencent/tmagic-editor/commit/fab8717fcf889ed8c6a4b2ee1569a5760c4ff231))
-* **form:** fieldset checkbox chang事件不会触发 ([26c60c3](https://github.com/Tencent/tmagic-editor/commit/26c60c316ae688c41b9b0093ea5ee7d85fcb98af))
-* **form:** tabs配置name后出错 ([9454bb3](https://github.com/Tencent/tmagic-editor/commit/9454bb3679881e7a4617ae782a17e6c51d1f12bc))
-* **form:** 函数配置中添加config参数 ([7ad80e8](https://github.com/Tencent/tmagic-editor/commit/7ad80e848f81d3a96622540cce44f1fa10d9dc57))
-* **form:** 函数配置中添加config参数 ([eae9725](https://github.com/Tencent/tmagic-editor/commit/eae9725ccbbdbe8ffc9ded5af42993cff21bec77))
-* **form:** 初始化values时，数组中的对象出现key丢失 ([32e86d8](https://github.com/Tencent/tmagic-editor/commit/32e86d8167f85a77306d5236dc4f885fc4b7b050))
-* **form:** 配置了names，validator中的value应为model ([3090bc7](https://github.com/Tencent/tmagic-editor/commit/3090bc77631e1be3974120adf48df938fd546a5e))
-* **stage:** 所有父节点中如果有translate，导致选中框定位出错 ([feff617](https://github.com/Tencent/tmagic-editor/commit/feff6177c97851dbe5457d4d59222c3f045ce864))
-* **stage:** 无法拖到left为0 ([069aec6](https://github.com/Tencent/tmagic-editor/commit/069aec64c152eca2a6b0508b787343aa9ceebcf6))
-* 修正getScrollParent逻辑 ([#141](https://github.com/Tencent/tmagic-editor/issues/141)) ([f72b8c7](https://github.com/Tencent/tmagic-editor/commit/f72b8c7614135382bea9899a86b2ab1cb0db761b))
-* 创建活动时 ([ac2aef9](https://github.com/Tencent/tmagic-editor/commit/ac2aef980c1bcc5a197b616df2480ad0b1964c93))
-
-
-### Features
-
-* **docs:** 添加搜索 ([4e812c3](https://github.com/Tencent/tmagic-editor/commit/4e812c396de05286a990cfe8831b7cb20531b2e3))
-* **editor:** 参考线缓存与页面绑定 ([fb612ea](https://github.com/Tencent/tmagic-editor/commit/fb612eaddc982ce885bfaaee4fc32e30f609d6c2))
-* **form:** datetime移出默认defaultTime，支持defaultTime配置 ([e1705c3](https://github.com/Tencent/tmagic-editor/commit/e1705c350e8fcd2b51ff35ec573ce08a6a307d3b))
-* **form:** datetime默认的具体时刻设置为23：59:59 ([83cd101](https://github.com/Tencent/tmagic-editor/commit/83cd10159d87893d167f53f3a2218e0d18323df5))
-* **form:** groundlist 函数配置增加prop/config两个变量 ([3de29e0](https://github.com/Tencent/tmagic-editor/commit/3de29e0316aa09db2e6876b0969af84b5b6c30ea))
-* **playground:** 优化form/table playground ([c570370](https://github.com/Tencent/tmagic-editor/commit/c57037030d652ff160a108d632ff79b9bac97e2a))
-* **playground:** 添加form、table playground入口 ([f808253](https://github.com/Tencent/tmagic-editor/commit/f80825331e373047d467bb189cc4e5857dac6dfa))
-* **playground:** 添加不同设备切换 ([9f23cd6](https://github.com/Tencent/tmagic-editor/commit/9f23cd6361cce60c10178f39e133e13aa71a62ca))
-* **stage:** 提供tmagicRuntimeReady message事件通知 ([def0e3e](https://github.com/Tencent/tmagic-editor/commit/def0e3ef8d3d3357d71be55dc3ca104b24fa527a))
-* 支持配置updateDragEl方法来调制选中框 ([154860c](https://github.com/Tencent/tmagic-editor/commit/154860c66c149b72537029b351401a0e90179e9c))
-
-
-
-## [1.0.2](https://github.com/Tencent/tmagic-editor/compare/v1.0.1...v1.0.2) (2022-06-29)
-
-
-### Bug Fixes
-
-* **form:** el-upload类型读取失败导致Table.vue.d.ts丢失 ([41a2cf9](https://github.com/Tencent/tmagic-editor/commit/41a2cf93cf71216e9a89d27892b08e073c7d404c))
-* **form:** 初始化values时，数组中的对象出现key丢失 ([f856b1b](https://github.com/Tencent/tmagic-editor/commit/f856b1bc06b48f2d11e57ee1d11712ee82d9ac3f))
-
-
-
-## [1.0.1](https://github.com/Tencent/tmagic-editor/compare/v1.0.0-rc.7...v1.0.1) (2022-06-27)
-
-
-### Bug Fixes
-
-* **core:** 拼写错误 ([c83d83b](https://github.com/Tencent/tmagic-editor/commit/c83d83b1a15103ce94dd7e224d6c71cec9a8a27b))
-* **editor:** moveableOptions默认值中的container有误 ([2377629](https://github.com/Tencent/tmagic-editor/commit/23776299a730d3c440d41be4f1101e4fb909dcf9))
-* **editor:** page和container默认value加上items ([10577ae](https://github.com/Tencent/tmagic-editor/commit/10577aea68a63323bc1312faced84bcd5c616d1f))
-* **editor:** 修正Editor slot 变量位置 ([ecd80cb](https://github.com/Tencent/tmagic-editor/commit/ecd80cb4a4c83ada6076a09da6a36bda6491ef47))
-* **editor:** 编辑器分栏左右各设置最小宽度  fix [#145](https://github.com/Tencent/tmagic-editor/issues/145) ([363330e](https://github.com/Tencent/tmagic-editor/commit/363330e07aea220e0a1efc76823ceeb810005865))
-* **form:** 函数配置中添加config参数 ([7ad80e8](https://github.com/Tencent/tmagic-editor/commit/7ad80e848f81d3a96622540cce44f1fa10d9dc57))
-* **form:** 函数配置中添加config参数 ([eae9725](https://github.com/Tencent/tmagic-editor/commit/eae9725ccbbdbe8ffc9ded5af42993cff21bec77))
-* **stage:** 所有父节点中如果有translate，导致选中框定位出错 ([feff617](https://github.com/Tencent/tmagic-editor/commit/feff6177c97851dbe5457d4d59222c3f045ce864))
-* **stage:** 无法拖到left为0 ([069aec6](https://github.com/Tencent/tmagic-editor/commit/069aec64c152eca2a6b0508b787343aa9ceebcf6))
-* 修正getScrollParent逻辑 ([#141](https://github.com/Tencent/tmagic-editor/issues/141)) ([f72b8c7](https://github.com/Tencent/tmagic-editor/commit/f72b8c7614135382bea9899a86b2ab1cb0db761b))
-* 创建活动时 ([ac2aef9](https://github.com/Tencent/tmagic-editor/commit/ac2aef980c1bcc5a197b616df2480ad0b1964c93))
-
-
-### Features
-
-* **docs:** 添加搜索 ([4e812c3](https://github.com/Tencent/tmagic-editor/commit/4e812c396de05286a990cfe8831b7cb20531b2e3))
-* **editor:** 参考线缓存与页面绑定 ([fb612ea](https://github.com/Tencent/tmagic-editor/commit/fb612eaddc982ce885bfaaee4fc32e30f609d6c2))
-* **form:** datetime默认的具体时刻设置为23：59:59 ([83cd101](https://github.com/Tencent/tmagic-editor/commit/83cd10159d87893d167f53f3a2218e0d18323df5))
-* **form:** groundlist 函数配置增加prop/config两个变量 ([3de29e0](https://github.com/Tencent/tmagic-editor/commit/3de29e0316aa09db2e6876b0969af84b5b6c30ea))
-* **playground:** 优化form/table playground ([c570370](https://github.com/Tencent/tmagic-editor/commit/c57037030d652ff160a108d632ff79b9bac97e2a))
-* **playground:** 添加form、table playground入口 ([f808253](https://github.com/Tencent/tmagic-editor/commit/f80825331e373047d467bb189cc4e5857dac6dfa))
-* **playground:** 添加不同设备切换 ([9f23cd6](https://github.com/Tencent/tmagic-editor/commit/9f23cd6361cce60c10178f39e133e13aa71a62ca))
-* **stage:** 提供tmagicRuntimeReady message事件通知 ([def0e3e](https://github.com/Tencent/tmagic-editor/commit/def0e3ef8d3d3357d71be55dc3ca104b24fa527a))
-* 支持配置updateDragEl方法来调制选中框 ([154860c](https://github.com/Tencent/tmagic-editor/commit/154860c66c149b72537029b351401a0e90179e9c))
-
-
-
-# [1.0.0](https://github.com/Tencent/tmagic-editor/compare/v1.0.0-rc.7...v1.0.0) (2022-06-24)
-
-
-### Bug Fixes
-
-* **core:** 拼写错误 ([c83d83b](https://github.com/Tencent/tmagic-editor/commit/c83d83b1a15103ce94dd7e224d6c71cec9a8a27b))
-* **editor:** moveableOptions默认值中的container有误 ([2377629](https://github.com/Tencent/tmagic-editor/commit/23776299a730d3c440d41be4f1101e4fb909dcf9))
-* **editor:** page和container默认value加上items ([10577ae](https://github.com/Tencent/tmagic-editor/commit/10577aea68a63323bc1312faced84bcd5c616d1f))
-* **editor:** 编辑器分栏左右各设置最小宽度  fix [#145](https://github.com/Tencent/tmagic-editor/issues/145) ([363330e](https://github.com/Tencent/tmagic-editor/commit/363330e07aea220e0a1efc76823ceeb810005865))
-* **form:** 函数配置中添加config参数 ([7ad80e8](https://github.com/Tencent/tmagic-editor/commit/7ad80e848f81d3a96622540cce44f1fa10d9dc57))
-* **form:** 函数配置中添加config参数 ([eae9725](https://github.com/Tencent/tmagic-editor/commit/eae9725ccbbdbe8ffc9ded5af42993cff21bec77))
-* **stage:** 所有父节点中如果有translate，导致选中框定位出错 ([feff617](https://github.com/Tencent/tmagic-editor/commit/feff6177c97851dbe5457d4d59222c3f045ce864))
-* **stage:** 无法拖到left为0 ([069aec6](https://github.com/Tencent/tmagic-editor/commit/069aec64c152eca2a6b0508b787343aa9ceebcf6))
-* 修正getScrollParent逻辑 ([#141](https://github.com/Tencent/tmagic-editor/issues/141)) ([f72b8c7](https://github.com/Tencent/tmagic-editor/commit/f72b8c7614135382bea9899a86b2ab1cb0db761b))
-* 创建活动时 ([ac2aef9](https://github.com/Tencent/tmagic-editor/commit/ac2aef980c1bcc5a197b616df2480ad0b1964c93))
-
-
-### Features
-
-* **docs:** 添加搜索 ([4e812c3](https://github.com/Tencent/tmagic-editor/commit/4e812c396de05286a990cfe8831b7cb20531b2e3))
-* **editor:** 参考线缓存与页面绑定 ([fb612ea](https://github.com/Tencent/tmagic-editor/commit/fb612eaddc982ce885bfaaee4fc32e30f609d6c2))
-* **form:** datetime默认的具体时刻设置为23：59:59 ([83cd101](https://github.com/Tencent/tmagic-editor/commit/83cd10159d87893d167f53f3a2218e0d18323df5))
-* **playground:** 优化form/table playground ([c570370](https://github.com/Tencent/tmagic-editor/commit/c57037030d652ff160a108d632ff79b9bac97e2a))
-* **playground:** 添加form、table playground入口 ([f808253](https://github.com/Tencent/tmagic-editor/commit/f80825331e373047d467bb189cc4e5857dac6dfa))
-* **playground:** 添加不同设备切换 ([9f23cd6](https://github.com/Tencent/tmagic-editor/commit/9f23cd6361cce60c10178f39e133e13aa71a62ca))
-* **stage:** 提供tmagicRuntimeReady message事件通知 ([def0e3e](https://github.com/Tencent/tmagic-editor/commit/def0e3ef8d3d3357d71be55dc3ca104b24fa527a))
-* 支持配置updateDragEl方法来调制选中框 ([154860c](https://github.com/Tencent/tmagic-editor/commit/154860c66c149b72537029b351401a0e90179e9c))
-
-
-
-# [1.0.0-rc.13](https://github.com/Tencent/tmagic-editor/compare/v1.0.0-rc.7...v1.0.0-rc.13) (2022-06-22)
-
-
-### Bug Fixes
-
-* **editor:** moveableOptions默认值中的container有误 ([2377629](https://github.com/Tencent/tmagic-editor/commit/23776299a730d3c440d41be4f1101e4fb909dcf9))
-* **editor:** page和container默认value加上items ([10577ae](https://github.com/Tencent/tmagic-editor/commit/10577aea68a63323bc1312faced84bcd5c616d1f))
-* **editor:** 编辑器分栏左右各设置最小宽度  fix [#145](https://github.com/Tencent/tmagic-editor/issues/145) ([363330e](https://github.com/Tencent/tmagic-editor/commit/363330e07aea220e0a1efc76823ceeb810005865))
-* **form:** 函数配置中添加config参数 ([7ad80e8](https://github.com/Tencent/tmagic-editor/commit/7ad80e848f81d3a96622540cce44f1fa10d9dc57))
-* **form:** 函数配置中添加config参数 ([eae9725](https://github.com/Tencent/tmagic-editor/commit/eae9725ccbbdbe8ffc9ded5af42993cff21bec77))
-* **stage:** 所有父节点中如果有translate，导致选中框定位出错 ([feff617](https://github.com/Tencent/tmagic-editor/commit/feff6177c97851dbe5457d4d59222c3f045ce864))
-* **stage:** 无法拖到left为0 ([069aec6](https://github.com/Tencent/tmagic-editor/commit/069aec64c152eca2a6b0508b787343aa9ceebcf6))
-* 修正getScrollParent逻辑 ([#141](https://github.com/Tencent/tmagic-editor/issues/141)) ([f72b8c7](https://github.com/Tencent/tmagic-editor/commit/f72b8c7614135382bea9899a86b2ab1cb0db761b))
-
-
-### Features
-
-* **docs:** 添加搜索 ([4e812c3](https://github.com/Tencent/tmagic-editor/commit/4e812c396de05286a990cfe8831b7cb20531b2e3))
-* **editor:** 参考线缓存与页面绑定 ([fb612ea](https://github.com/Tencent/tmagic-editor/commit/fb612eaddc982ce885bfaaee4fc32e30f609d6c2))
-* **playground:** 优化form/table playground ([c570370](https://github.com/Tencent/tmagic-editor/commit/c57037030d652ff160a108d632ff79b9bac97e2a))
-* **playground:** 添加form、table playground入口 ([f808253](https://github.com/Tencent/tmagic-editor/commit/f80825331e373047d467bb189cc4e5857dac6dfa))
-* **playground:** 添加不同设备切换 ([9f23cd6](https://github.com/Tencent/tmagic-editor/commit/9f23cd6361cce60c10178f39e133e13aa71a62ca))
-* **stage:** 提供tmagicRuntimeReady message事件通知 ([def0e3e](https://github.com/Tencent/tmagic-editor/commit/def0e3ef8d3d3357d71be55dc3ca104b24fa527a))
-* 支持配置updateDragEl方法来调制选中框 ([154860c](https://github.com/Tencent/tmagic-editor/commit/154860c66c149b72537029b351401a0e90179e9c))
-
-
-
-# [1.0.0-rc.12](https://github.com/Tencent/tmagic-editor/compare/v1.0.0-rc.7...v1.0.0-rc.12) (2022-06-21)
-
-
-### Bug Fixes
-
-* **editor:** moveableOptions默认值中的container有误 ([2377629](https://github.com/Tencent/tmagic-editor/commit/23776299a730d3c440d41be4f1101e4fb909dcf9))
-* **editor:** page和container默认value加上items ([10577ae](https://github.com/Tencent/tmagic-editor/commit/10577aea68a63323bc1312faced84bcd5c616d1f))
-* **form:** 函数配置中添加config参数 ([7ad80e8](https://github.com/Tencent/tmagic-editor/commit/7ad80e848f81d3a96622540cce44f1fa10d9dc57))
-* **form:** 函数配置中添加config参数 ([eae9725](https://github.com/Tencent/tmagic-editor/commit/eae9725ccbbdbe8ffc9ded5af42993cff21bec77))
-* **stage:** 所有父节点中如果有translate，导致选中框定位出错 ([feff617](https://github.com/Tencent/tmagic-editor/commit/feff6177c97851dbe5457d4d59222c3f045ce864))
-* 修正getScrollParent逻辑 ([#141](https://github.com/Tencent/tmagic-editor/issues/141)) ([f72b8c7](https://github.com/Tencent/tmagic-editor/commit/f72b8c7614135382bea9899a86b2ab1cb0db761b))
-
-
-### Features
-
-* **docs:** 添加搜索 ([4e812c3](https://github.com/Tencent/tmagic-editor/commit/4e812c396de05286a990cfe8831b7cb20531b2e3))
-* **playground:** 优化form/table playground ([c570370](https://github.com/Tencent/tmagic-editor/commit/c57037030d652ff160a108d632ff79b9bac97e2a))
-* **playground:** 添加form、table playground入口 ([f808253](https://github.com/Tencent/tmagic-editor/commit/f80825331e373047d467bb189cc4e5857dac6dfa))
-* **playground:** 添加不同设备切换 ([9f23cd6](https://github.com/Tencent/tmagic-editor/commit/9f23cd6361cce60c10178f39e133e13aa71a62ca))
-* **stage:** 提供tmagicRuntimeReady message事件通知 ([def0e3e](https://github.com/Tencent/tmagic-editor/commit/def0e3ef8d3d3357d71be55dc3ca104b24fa527a))
-* 支持配置updateDragEl方法来调制选中框 ([154860c](https://github.com/Tencent/tmagic-editor/commit/154860c66c149b72537029b351401a0e90179e9c))
-
-
-
-# [1.0.0-rc.11](https://github.com/Tencent/tmagic-editor/compare/v1.0.0-rc.10...v1.0.0-rc.11) (2022-06-17)
-
-
-### Bug Fixes
-
-* **editor:** runtime.updateRootConfig可以为空 ([9ade1ab](https://github.com/Tencent/tmagic-editor/commit/9ade1ab64aee3d09231fd9693d60f74b3a25f8f3))
-* **editor:** 编辑组件是获取parent需要获取到Proxy ([6db8e07](https://github.com/Tencent/tmagic-editor/commit/6db8e07005ceacaef0a5520e9da97b784715d4c7))
-* **editor:** 页面标题不要换行 ([1bdafee](https://github.com/Tencent/tmagic-editor/commit/1bdafee2528312a8f9fa6b71310e43c4becb6688))
-* **editor:** 默认page属性值加上layout ([11c0190](https://github.com/Tencent/tmagic-editor/commit/11c01908d4f5ae69c997a3e094cc20d22818ec4d))
-* **stage:** magic注入时机应当在iframe onload之后 ([31a7748](https://github.com/Tencent/tmagic-editor/commit/31a7748ac835141549114f0646a5a913a5b114d0))
-
-# [1.0.0-rc.10](https://github.com/Tencent/tmagic-editor/compare/v1.0.0-rc.9...v1.0.0-rc.10) (2022-06-15)
-
-
-### Bug Fixes
-
-* **form:** 函数配置中添加config参数 ([7ad80e8](https://github.com/Tencent/tmagic-editor/commit/7ad80e848f81d3a96622540cce44f1fa10d9dc57))
-
-# [1.0.0-rc.9](https://github.com/Tencent/tmagic-editor/compare/v1.0.0-rc.8...v1.0.0-rc.9) (2022-06-15)
-
-
-### Bug Fixes
-
-* **stage:** 所有父节点中如果有translate，导致选中框定位出错 ([c6c4461](https://github.com/Tencent/tmagic-editor/commit/c6c44618f4eea197bbbe0f7d9ebcb07c2be03912))
-
-# [1.0.0-rc.8](https://github.com/Tencent/tmagic-editor/compare/v1.0.0-rc.7...v1.0.0-rc.8) (2022-06-15)
-
-
-### Bug Fixes
-
-* **editor:** page和container默认value加上items ([10577ae](https://github.com/Tencent/tmagic-editor/commit/10577aea68a63323bc1312faced84bcd5c616d1f))
-
-
-### Features
-
-* **docs:** 添加搜索 ([4e812c3](https://github.com/Tencent/tmagic-editor/commit/4e812c396de05286a990cfe8831b7cb20531b2e3))
-* **playground:** 优化form/table playground ([c570370](https://github.com/Tencent/tmagic-editor/commit/c57037030d652ff160a108d632ff79b9bac97e2a))
-* **playground:** 添加form、table playground入口 ([f808253](https://github.com/Tencent/tmagic-editor/commit/f80825331e373047d467bb189cc4e5857dac6dfa))
-* **playground:** 添加不同设备切换 ([9f23cd6](https://github.com/Tencent/tmagic-editor/commit/9f23cd6361cce60c10178f39e133e13aa71a62ca))
-* 支持配置updateDragEl方法来调制选中框 ([154860c](https://github.com/Tencent/tmagic-editor/commit/154860c66c149b72537029b351401a0e90179e9c))
-
-
-
-# [1.0.0-rc.7](https://github.com/Tencent/tmagic-editor/compare/1.0.0-beta.8...1.0.0-rc.7) (2022-06-13)
+# [1.0.0-rc.7](https://github.com/Tencent/tmagic-editor/compare/1.0.0-beta.8...v1.0.0-rc.7) (2022-06-13)
 
 
 ### Bug Fixes
@@ -624,6 +216,79 @@
 * 新增蒙层组件 ([44aa56b](https://github.com/Tencent/tmagic-editor/commit/44aa56bd52c3ecc3b88f9b2e5b2283cb0a932fa1))
 * 添加组件支持添加组合 ([5e31257](https://github.com/Tencent/tmagic-editor/commit/5e3125706c2919e0baf457141f69a9c70656ffcd))
 * 编辑器支持鼠标悬停高亮组件 ([feb9ac9](https://github.com/Tencent/tmagic-editor/commit/feb9ac9a81a6805599da1d63697961c5dfbba953))
+
+
+
+# [1.0.0-beta.8](https://github.com/Tencent/tmagic-editor/compare/1.0.0-beta.7...1.0.0-beta.8) (2022-03-29)
+
+
+### Bug Fixes
+
+* **editor:** 流式布局下，拖动后选中错误 ([393889b](https://github.com/Tencent/tmagic-editor/commit/393889b27a63bf0dd557e4d5b638de74545b1d43))
+* **form:** onChange、filter、trim函数调用异常处理 ([504adcb](https://github.com/Tencent/tmagic-editor/commit/504adcb01793cb58d23a5d3cfb56da12a509de7f))
+* **playground:** 新增页面默认width height 100% ([c3f4e41](https://github.com/Tencent/tmagic-editor/commit/c3f4e41cc864cd1e5c6486d34da79e4b684546c5))
+* **stage:** drag的时候不update width height ([30ad850](https://github.com/Tencent/tmagic-editor/commit/30ad8502c4a1e2925afc22297e7c5ac3a8e03378))
+* **stage:** render destroy后移除load事件 ([f03281a](https://github.com/Tencent/tmagic-editor/commit/f03281ac6cddd6742841f67d484eb5fca0871c4a))
+* **stage:** 混合布局下拖动错乱 ([8e2d83f](https://github.com/Tencent/tmagic-editor/commit/8e2d83fec9e8b4871cee066b641e3441eddb619a))
+* **stage:** 这有overflow为auto或scroll才在选中的时候设置为hidden ([8619af9](https://github.com/Tencent/tmagic-editor/commit/8619af91db25aef36e65f9c0ab8df307e7b101f4))
+* **stage:** 页面默认滚动容器设置为documentElement ([4560562](https://github.com/Tencent/tmagic-editor/commit/45605625535c1aa648eae275639b8a642ff4ec3b))
+
+
+### Features
+
+* 新增select下的popper class ([8e192e7](https://github.com/Tencent/tmagic-editor/commit/8e192e7cd42df56b94f8f1093a00b6f72b41505e))
+
+
+### Reverts
+
+* Revert "Revert "refactor(stage): 升级moveable"" ([6becbda](https://github.com/Tencent/tmagic-editor/commit/6becbdaa6b6dacc453207a2bc11ce33a5190d313))
+
+
+
+# [1.0.0-beta.7](https://github.com/Tencent/tmagic-editor/compare/1.0.0-beta.6...1.0.0-beta.7) (2022-03-18)
+
+
+### Bug Fixes
+
+* **editor:** 切换布局失效 ([42f1789](https://github.com/Tencent/tmagic-editor/commit/42f1789c1059d9e400dc327bcbfabb5807ebed97))
+
+
+### Reverts
+
+* Revert "refactor(stage): 升级moveable" ([10ed55d](https://github.com/Tencent/tmagic-editor/commit/10ed55deea0c3dc7a97ac136a4065c447aaaf52a))
+
+
+
+# [1.0.0-beta.6](https://github.com/Tencent/tmagic-editor/compare/v1.0.0-beta.4...1.0.0-beta.6) (2022-03-17)
+
+
+### Bug Fixes
+
+* **editor:** 不允许选中跟节点 ([ca84c8f](https://github.com/Tencent/tmagic-editor/commit/ca84c8f852a69839ddcba0d92700f36b07f76be7))
+* **editor:** 样式优化调整 ([12de0f5](https://github.com/Tencent/tmagic-editor/commit/12de0f541442cde8651d71982df26d39727cbd56))
+* **editor:** 画布拖动容易误触 ([541a279](https://github.com/Tencent/tmagic-editor/commit/541a279fe7eda0f11c2e71a2eaf66ca19b27c66f))
+* **editor:** 首次选中组件后拖动,更新节点无效 ([dee685f](https://github.com/Tencent/tmagic-editor/commit/dee685f0b33b0c44fdcfac5514a944be6731771d))
+* **stage:** 修复触摸板轻触移动时拖动左键;隐藏标尺后,改变画布大小,再显示标尺,标尺变形 ([edbb552](https://github.com/Tencent/tmagic-editor/commit/edbb5521b321bc28c0504af8f86046bed893588f))
+
+
+
+# [1.0.0-beta.4](https://github.com/Tencent/tmagic-editor/compare/3419f800ef0865a2c6d6a453143c48df5d250a24...v1.0.0-beta.4) (2022-03-14)
+
+
+### Bug Fixes
+
+* **editor:** 更新根节点出错 ([412c781](https://github.com/Tencent/tmagic-editor/commit/412c78153cc640f0c46a06314e47f66055516106))
+* **form:** 优化table样式 ([3c7d756](https://github.com/Tencent/tmagic-editor/commit/3c7d756d19eff774fec5a96c1177f7c1c9095554))
+* **form:** 表单配置没有变化,初始值变化时,表单发生重绘 ([979336c](https://github.com/Tencent/tmagic-editor/commit/979336c05254783225f4fc5681ef407489c41e67))
+* 更新elemnt-plus2.0.2后,size的值变了,去掉Form下size prop的默认值,增加Formdialog size prop ([3419f80](https://github.com/Tencent/tmagic-editor/commit/3419f800ef0865a2c6d6a453143c48df5d250a24))
+* 构建的文件名与package.json中的不匹配 ([4f4e81f](https://github.com/Tencent/tmagic-editor/commit/4f4e81f27cd48099106ca0baa15109cc22941122))
+
+
+### Features
+
+* **editor:** 画布拖动 ([de9d7d3](https://github.com/Tencent/tmagic-editor/commit/de9d7d340a62ae94f852a68f6400b5f2a690c8da))
+* **editor:** 画布自适应大小 ([ab3e113](https://github.com/Tencent/tmagic-editor/commit/ab3e113904b5d0601b7a382011cbdbb8f027f6c3))
+* 新增管理端demo代码 ([2bfb85b](https://github.com/Tencent/tmagic-editor/commit/2bfb85bdbfc7870b0caaf03f5aa3644a2c95b9aa))
 
 
 
