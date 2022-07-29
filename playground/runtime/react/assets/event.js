@@ -1,0 +1,2 @@
+var u={methods:[{label:"\u6253\u5F00\u8499\u5C42",value:"openOverlay"},{label:"\u5173\u95ED\u8499\u5C42",value:"closeOverlay"}],events:[{label:"\u6253\u5F00\u8499\u5C42",value:"overlay:open"},{label:"\u5173\u95ED\u8499\u5C42",value:"overlay:close"}]},l={methods:[{label:"\u5237\u65B0\u9875\u9762",value:"refresh"}]};(function(){const e={page:l,overlay:u};window.magicPresetEvents=e})();
+//# sourceMappingURL=event.js.map
