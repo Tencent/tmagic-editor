@@ -6,7 +6,7 @@
         <el-row :gutter="20">
           <el-col :span="2"><span>活动列表</span></el-col>
           <el-col :span="1">
-            <el-button id="create" type="primary" @click="newHandler" size="mini"> 新建活动 </el-button>
+            <el-button id="create" type="primary" @click="newHandler" size="small"> 新建活动 </el-button>
           </el-col>
           <el-col :span="3" :offset="9">
             <!-- 活动状态选项框 -->
@@ -58,13 +58,13 @@
     </el-card>
 
     <form-dialog
+      title="新建活动"
       :visible="formDialogVisible"
       :values="actValues"
       :action="action"
+      :config="formConfig"
       @afterAction="afterAction"
       @close="closeFormDialogHandler"
-      :config="formConfig"
-      title="新建活动"
     ></form-dialog>
   </div>
 </template>

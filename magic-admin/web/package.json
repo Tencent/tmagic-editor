@@ -9,15 +9,15 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@tmagic/editor": "1.1.0-beta.4",
-    "@tmagic/form": "1.1.0-beta.4",
-    "@tmagic/schema": "1.1.0-beta.4",
-    "@tmagic/stage": "1.1.0-beta.4",
-    "@tmagic/utils": "1.1.0-beta.4",
+    "@tmagic/editor": "1.1.0-beta.5",
+    "@tmagic/form": "1.1.0-beta.5",
+    "@tmagic/schema": "1.1.0-beta.5",
+    "@tmagic/stage": "1.1.0-beta.5",
+    "@tmagic/utils": "1.1.0-beta.5",
     "axios": "^0.27.2",
     "axios-jsonp": "^1.0.4",
     "core-js": "^3.20.0",
-    "element-plus": "^2.2.6",
+    "element-plus": "^2.2.12",
     "js-cookie": "^3.0.0",
     "moment": "^2.29.3",
     "moment-timezone": "^0.5.34",
@@ -54,7 +54,6 @@
     "sass": "^1.32.7",
     "sass-loader": "^12.0.0",
     "ts-jest": "^27.0.4",
-    "typescript": "~4.5.5",
-    "vue-jest": "^3.0.7"
+    "typescript": "~4.5.5"
   }
 }
