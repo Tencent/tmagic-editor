@@ -292,7 +292,7 @@ class Editor extends BaseService {
   public async add(addNode: AddMNode, parent?: MContainer | null): Promise<MNode> {
     // 加入inputEvent是为给业务扩展时可以获取到更多的信息，只有在使用拖拽添加组件时才有改对象
     const { type, inputEvent, ...config } = addNode;
-    const curNode = this.get<MContainer>('nodes')[0];
+    const curNode = this.get<MContainer>('node');
 
     let parentNode: MContainer | undefined;
     const isPage = type === NodeType.PAGE;
@@ -469,7 +469,7 @@ class Editor extends BaseService {
   public async paste(position: PastePosition = {}): Promise<MNode | void> {
     let pastePosition = position;
     const configStr = globalThis.localStorage.getItem(COPY_STORAGE_KEY);
-    const curNode = this.get<MContainer>('nodes')[0];
+    const curNode = this.get<MContainer>('node');
     // eslint-disable-next-line prefer-const
     let config: any = {};
     if (!configStr) {
@@ -498,7 +498,7 @@ class Editor extends BaseService {
    */
   public async alignCenter(config: MNode): Promise<MNode | void> {
     const parent = this.get<MContainer>('parent');
-    const node = this.get<MNode>('nodes')[0];
+    const node = this.get<MNode>('node');
     const layout = await this.getLayout(toRaw(parent), toRaw(node));
     if (layout === Layout.RELATIVE) {
       return;

@@ -31,6 +31,7 @@ export default defineComponent({
     const canPaste = ref(false);
     const canCenter = ref(false);
 
+    const node = computed(() => editorService?.get<MNode>('node'));
     const nodes = computed(() => editorService?.get<MNode[]>('nodes'));
     const parent = computed(() => editorService?.get('parent'));
     const stage = computed(() => editorService?.get<StageCore>('stage'));
@@ -43,8 +44,8 @@ export default defineComponent({
         text: '水平居中',
         display: () => canCenter.value && !props.isMultiSelect,
         handler: () => {
-          if (!nodes.value) return;
-          editorService?.alignCenter(nodes.value[0]);
+          if (!node.value) return;
+          editorService?.alignCenter(node.value);
         },
       },
       {
@@ -74,18 +75,15 @@ export default defineComponent({
         type: 'divider',
         direction: 'horizontal',
         display: () => {
-          if (!nodes.value) return false;
-          return !isPage(nodes.value[0]);
+          if (!node.value) return false;
+          return !isPage(node.value);
         },
       },
       {
         type: 'button',
         text: '上移一层',
         icon: markRaw(Top),
-        display: () => {
-          if (!nodes.value) return false;
-          return !isPage(nodes.value[0]) && !props.isMultiSelect;
-        },
+        display: () => !isPage(node.value) && !props.isMultiSelect,
         handler: () => {
           editorService?.moveLayer(1);
         },
@@ -94,10 +92,7 @@ export default defineComponent({
         type: 'button',
         text: '下移一层',
         icon: markRaw(Bottom),
-        display: () => {
-          if (!nodes.value) return false;
-          return !isPage(nodes.value[0]) && !props.isMultiSelect;
-        },
+        display: () => !isPage(node.value) && !props.isMultiSelect,
         handler: () => {
           editorService?.moveLayer(-1);
         },
@@ -105,10 +100,7 @@ export default defineComponent({
       {
         type: 'button',
         text: '置顶',
-        display: () => {
-          if (!nodes.value) return false;
-          return !isPage(nodes.value[0]) && !props.isMultiSelect;
-        },
+        display: () => !isPage(node.value) && !props.isMultiSelect,
         handler: () => {
           editorService?.moveLayer(LayerOffset.TOP);
         },
@@ -116,10 +108,7 @@ export default defineComponent({
       {
         type: 'button',
         text: '置底',
-        display: () => {
-          if (!nodes.value) return false;
-          return !nodes.value || (!isPage(nodes.value[0]) && !props.isMultiSelect);
-        },
+        display: () => !isPage(node.value) && !props.isMultiSelect,
         handler: () => {
           editorService?.moveLayer(LayerOffset.BOTTOM);
         },
@@ -127,19 +116,13 @@ export default defineComponent({
       {
         type: 'divider',
         direction: 'horizontal',
-        display: () => {
-          if (!nodes.value) return false;
-          return !isPage(nodes.value[0]) && !props.isMultiSelect;
-        },
+        display: () => !isPage(node.value) && !props.isMultiSelect,
       },
       {
         type: 'button',
         text: '删除',
         icon: Delete,
-        display: () => {
-          if (!nodes.value) return false;
-          return !isPage(nodes.value[0]);
-        },
+        display: () => !isPage(node.value),
         handler: () => {
           nodes.value && editorService?.remove(nodes.value);
         },
