@@ -6,8 +6,9 @@
 import { computed, defineComponent, inject, markRaw, onMounted, reactive, ref, watch } from 'vue';
 import { Bottom, Delete, DocumentCopy, Top } from '@element-plus/icons-vue';
 
-import { Id, MNode, NodeType } from '@tmagic/schema';
+import { MNode, NodeType } from '@tmagic/schema';
 import StageCore from '@tmagic/stage';
+import { isPage } from '@tmagic/utils';
 
 import ContentMenu from '@editor/components/ContentMenu.vue';
 import { LayerOffset, Layout, MenuItem, Services } from '@editor/type';
@@ -30,25 +31,11 @@ export default defineComponent({
     const canPaste = ref(false);
     const canCenter = ref(false);
 
-    const node = computed(() => editorService?.get('node'));
-    const selectedNodes = computed(() => editorService?.get('selectedNodes') || []);
+    const nodes = computed(() => editorService?.get<MNode[]>('nodes'));
     const parent = computed(() => editorService?.get('parent'));
-    const isPage = computed(() => node.value?.type === NodeType.PAGE);
-    const stage = editorService?.get<StageCore>('stage');
+    const stage = computed(() => editorService?.get<StageCore>('stage'));
 
     const stageContentMenu = inject<MenuItem[]>('stageContentMenu', []);
-
-    const getPositionInContainer = (position: { left?: number; top?: number } = {}, id: Id) => {
-      let { left = 0, top = 0 } = position;
-      const parentEl = stage?.renderer?.contentWindow?.document.getElementById(`${id}`);
-      const parentElRect = parentEl?.getBoundingClientRect();
-      left = left - (parentElRect?.left || 0);
-      top = top - (parentElRect?.top || 0);
-      return {
-        left,
-        top,
-      };
-    };
 
     const menuData = reactive<MenuItem[]>([
       {
@@ -56,7 +43,8 @@ export default defineComponent({
         text: '水平居中',
         display: () => canCenter.value && !props.isMultiSelect,
         handler: () => {
-          node.value && editorService?.alignCenter(node.value);
+          if (!nodes.value) return;
+          editorService?.alignCenter(nodes.value[0]);
         },
       },
       {
@@ -64,12 +52,7 @@ export default defineComponent({
         text: '复制',
         icon: markRaw(DocumentCopy),
         handler: () => {
-          if (props.isMultiSelect) {
-            // 多选
-            editorService?.copy(selectedNodes.value);
-            return;
-          }
-          node.value && editorService?.copy(node.value);
+          nodes.value && editorService?.copy(nodes.value);
           canPaste.value = true;
         },
       },
@@ -79,56 +62,30 @@ export default defineComponent({
         display: () => canPaste.value,
         handler: () => {
           const rect = menu.value?.$el.getBoundingClientRect();
-          const parentRect = stage?.container?.getBoundingClientRect();
-          let initialLeft = (rect?.left || 0) - (parentRect?.left || 0);
-          let initialTop = (rect?.top || 0) - (parentRect?.top || 0);
-          const configStr = globalThis.localStorage.getItem(COPY_STORAGE_KEY);
-          // eslint-disable-next-line prefer-const
-          let config: any = {};
-          if (!configStr) {
-            return;
-          }
-          try {
-            // eslint-disable-next-line no-eval
-            eval(`config = ${configStr}`);
-          } catch (e) {
-            console.error(e);
-            return;
-          }
-          // 粘贴时可能并未进入多选状态，因此不能用isMultiSelect来判断
-          if (Array.isArray(config)) {
-            // 粘贴多选
-            if (selectedNodes.value.length === 0) return;
-            selectedNodes.value.forEach((selectedNode: MNode) => {
-              const pasteTargetConfig = config.find((item) => item.id === selectedNode.id);
-              if (selectedNode?.items && stage) {
-                const { left, top } = getPositionInContainer({ left: initialLeft, top: initialTop }, selectedNode.id);
-                initialLeft = left;
-                initialTop = top;
-              }
-              editorService?.paste({ left: initialLeft, top: initialTop }, pasteTargetConfig);
-            });
-          } else {
-            if (node.value?.items && stage) {
-              // 是否容器
-              const { left, top } = getPositionInContainer({ left: initialLeft, top: initialTop }, node.value.id);
-              initialLeft = left;
-              initialTop = top;
-            }
-            editorService?.paste({ left: initialLeft, top: initialTop }, config);
-          }
+          const parentRect = stage.value?.container?.getBoundingClientRect();
+          const initialLeft = (rect?.left || 0) - (parentRect?.left || 0);
+          const initialTop = (rect?.top || 0) - (parentRect?.top || 0);
+
+          if (!nodes.value || nodes.value.length === 0) return;
+          editorService?.paste({ left: initialLeft, top: initialTop });
         },
       },
       {
         type: 'divider',
         direction: 'horizontal',
-        display: () => !isPage.value,
+        display: () => {
+          if (!nodes.value) return false;
+          return !isPage(nodes.value[0]);
+        },
       },
       {
         type: 'button',
         text: '上移一层',
         icon: markRaw(Top),
-        display: () => !isPage.value && !props.isMultiSelect,
+        display: () => {
+          if (!nodes.value) return false;
+          return !isPage(nodes.value[0]) && !props.isMultiSelect;
+        },
         handler: () => {
           editorService?.moveLayer(1);
         },
@@ -137,7 +94,10 @@ export default defineComponent({
         type: 'button',
         text: '下移一层',
         icon: markRaw(Bottom),
-        display: () => !isPage.value && !props.isMultiSelect,
+        display: () => {
+          if (!nodes.value) return false;
+          return !isPage(nodes.value[0]) && !props.isMultiSelect;
+        },
         handler: () => {
           editorService?.moveLayer(-1);
         },
@@ -145,7 +105,10 @@ export default defineComponent({
       {
         type: 'button',
         text: '置顶',
-        display: () => !isPage.value && !props.isMultiSelect,
+        display: () => {
+          if (!nodes.value) return false;
+          return !isPage(nodes.value[0]) && !props.isMultiSelect;
+        },
         handler: () => {
           editorService?.moveLayer(LayerOffset.TOP);
         },
@@ -153,7 +116,10 @@ export default defineComponent({
       {
         type: 'button',
         text: '置底',
-        display: () => !isPage.value && !props.isMultiSelect,
+        display: () => {
+          if (!nodes.value) return false;
+          return !nodes.value || (!isPage(nodes.value[0]) && !props.isMultiSelect);
+        },
         handler: () => {
           editorService?.moveLayer(LayerOffset.BOTTOM);
         },
@@ -161,22 +127,21 @@ export default defineComponent({
       {
         type: 'divider',
         direction: 'horizontal',
-        display: () => !isPage.value && !props.isMultiSelect,
+        display: () => {
+          if (!nodes.value) return false;
+          return !isPage(nodes.value[0]) && !props.isMultiSelect;
+        },
       },
       {
         type: 'button',
         text: '删除',
         icon: Delete,
-        display: () => !isPage.value,
+        display: () => {
+          if (!nodes.value) return false;
+          return !isPage(nodes.value[0]);
+        },
         handler: () => {
-          if (props.isMultiSelect) {
-            // 多选
-            selectedNodes.value.forEach((selectedNode: MNode) => {
-              editorService?.remove(selectedNode);
-            });
-            return;
-          }
-          node.value && editorService?.remove(node.value);
+          nodes.value && editorService?.remove(nodes.value);
         },
       },
       {
@@ -203,9 +168,11 @@ export default defineComponent({
       async () => {
         if (!parent.value || !editorService) return (canCenter.value = false);
         const layout = await editorService.getLayout(parent.value);
-        canCenter.value =
-          [Layout.ABSOLUTE, Layout.FIXED].includes(layout) &&
-          ![NodeType.ROOT, NodeType.PAGE, 'pop'].includes(`${node.value?.type}`);
+        const isLayoutConform = [Layout.ABSOLUTE, Layout.FIXED].includes(layout);
+        const isTypeConform = nodes.value?.every(
+          (selectedNode) => ![NodeType.ROOT, NodeType.PAGE, 'pop'].includes(`${selectedNode?.type}`),
+        );
+        canCenter.value = isLayoutConform && !!isTypeConform;
       },
       { immediate: true },
     );

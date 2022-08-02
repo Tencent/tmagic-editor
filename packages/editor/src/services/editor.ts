@@ -17,7 +17,7 @@
  */
 
 import { reactive, toRaw } from 'vue';
-import { cloneDeep, mergeWith } from 'lodash-es';
+import { cloneDeep, mergeWith, uniq } from 'lodash-es';
 import serialize from 'serialize-javascript';
 
 import type { Id, MApp, MComponent, MContainer, MNode, MPage } from '@tmagic/schema';
@@ -27,7 +27,7 @@ import { getNodePath, isNumber, isPage, isPop } from '@tmagic/utils';
 
 import historyService, { StepValue } from '@editor/services/history';
 import propsService from '@editor/services/props';
-import type { AddMNode, EditorNodeInfo, StoreState } from '@editor/type';
+import type { AddMNode, EditorNodeInfo, PastePosition, StoreState } from '@editor/type';
 import { LayerOffset, Layout } from '@editor/type';
 import {
   change2Fixed,
@@ -51,6 +51,7 @@ class Editor extends BaseService {
     page: null,
     parent: null,
     node: null,
+    nodes: [],
     stage: null,
     highlightNode: null,
     modifiedNodeIds: new Map(),
@@ -83,13 +84,16 @@ class Editor extends BaseService {
 
   /**
    * 设置当前指点节点配置
-   * @param name 'root' | 'page' | 'parent' | 'node' | 'highlightNode' | 'selectedNodes'
+   * @param name 'root' | 'page' | 'parent' | 'node' | 'highlightNode' | 'nodes'
    * @param value MNode
    * @returns MNode
    */
   public set<T = MNode>(name: keyof StoreState, value: T) {
     this.state[name] = value as any;
-
+    // set nodes时将node设置为nodes第一个元素
+    if (name === 'nodes') {
+      this.set('node', (value as unknown as MNode[])[0]);
+    }
     if (name === 'root') {
       this.state.pageLength = (value as unknown as MApp)?.items?.length || 0;
       this.emit('root-change', value);
@@ -98,7 +102,7 @@ class Editor extends BaseService {
 
   /**
    * 获取当前指点节点配置
-   * @param name  'root' | 'page' | 'parent' | 'node' | 'highlightNode'
+   * @param name  'root' | 'page' | 'parent' | 'node' | 'highlightNode' | 'nodes'
    * @returns MNode
    */
   public get<T = MNode>(name: keyof StoreState): T {
@@ -190,7 +194,7 @@ class Editor extends BaseService {
    */
   public async select(config: MNode | Id): Promise<MNode> | never {
     const { node, page, parent } = this.selectedConfigExceptionHandler(config);
-    this.set('node', node);
+    this.set('nodes', [node]);
     this.set('page', page || null);
     this.set('parent', parent || null);
 
@@ -269,16 +273,14 @@ class Editor extends BaseService {
    * @param config 指定节点配置或者ID
    * @returns 加入多选的节点配置
    */
-  public multiSelect(config: HTMLElement[]): void {
-    const selectedNodes: MNode[] = [];
-    config.forEach((element) => {
-      const { node } = this.selectedConfigExceptionHandler(element.id);
+  public multiSelect(config: Id[]): void {
+    const nodes: MNode[] = [];
+    config.forEach((id) => {
+      const { node } = this.getNodeInfo(id);
       if (!node) return;
-      const isExist = selectedNodes.find((selectedNode) => selectedNode.id === node.id);
-      if (isExist) return;
-      selectedNodes.push(node);
+      nodes.push(node);
     });
-    this.set('selectedNodes', selectedNodes);
+    this.set('nodes', uniq(nodes));
   }
 
   /**
@@ -290,7 +292,7 @@ class Editor extends BaseService {
   public async add(addNode: AddMNode, parent?: MContainer | null): Promise<MNode> {
     // 加入inputEvent是为给业务扩展时可以获取到更多的信息，只有在使用拖拽添加组件时才有改对象
     const { type, inputEvent, ...config } = addNode;
-    const curNode = this.get<MContainer>('node');
+    const curNode = this.get<MContainer>('nodes')[0];
 
     let parentNode: MContainer | undefined;
     const isPage = type === NodeType.PAGE;
@@ -355,55 +357,9 @@ class Editor extends BaseService {
    * @param {Object} node
    * @return {Object} 删除的组件配置
    */
-  public async remove(node: MNode): Promise<MNode | void> {
-    if (!node?.id) return;
-
-    const root = this.get<MApp | null>('root');
-
-    if (!root) throw new Error('没有root');
-
-    const { parent, node: curNode } = this.getNodeInfo(node.id, false);
-
-    if (!parent || !curNode) throw new Error('找不要删除的节点');
-
-    const index = getNodeIndex(curNode, parent);
-
-    if (typeof index !== 'number' || index === -1) throw new Error('找不要删除的节点');
-
-    parent.items?.splice(index, 1);
-    const stage = this.get<StageCore | null>('stage');
-    stage?.remove({ id: node.id, root: cloneDeep(this.get('root')) });
-
-    if (node.type === NodeType.PAGE) {
-      this.state.pageLength -= 1;
-
-      if (root.items[0]) {
-        await this.select(root.items[0]);
-        stage?.select(root.items[0].id);
-      } else {
-        this.set('node', null);
-        this.set('parent', null);
-        this.set('page', null);
-        this.set('stage', null);
-        this.set('highlightNode', null);
-        this.resetModifiedNodeId();
-        historyService.reset();
-
-        this.emit('remove', node);
-
-        return node;
-      }
-    } else {
-      await this.select(parent);
-      stage?.select(parent.id);
-    }
-
-    this.addModifiedNodeId(parent.id);
-    this.pushHistoryState();
-
-    this.emit('remove', node);
-
-    return node;
+  public async remove(nodes: MNode | MNode[]): Promise<(MNode | void)[]> {
+    const removeNodes = Array.isArray(nodes) ? nodes : [nodes];
+    return Promise.all(removeNodes.map(async (node) => await this.doRemove(node)));
   }
 
   /**
@@ -451,9 +407,11 @@ class Editor extends BaseService {
 
     parentNodeItems[index] = newConfig;
 
-    if (`${newConfig.id}` === `${this.get('node').id}`) {
-      this.set('node', newConfig);
-    }
+    // 将update后的配置更新到nodes中
+    const nodes = this.get('nodes');
+    const targetIndex = nodes.findIndex((nodeItem: MNode) => `${nodeItem.id}` === `${newConfig.id}`);
+    nodes.splice(targetIndex, 1, newConfig);
+    this.set('nodes', nodes);
 
     this.get<StageCore | null>('stage')?.update({ config: cloneDeep(newConfig), root: cloneDeep(this.get('root')) });
 
@@ -500,40 +458,37 @@ class Editor extends BaseService {
    * @returns 组件节点配置
    */
   public async copy(config: MNode | MNode[]): Promise<void> {
-    if (Array.isArray(config)) {
-      // 多选节点
-      globalThis.localStorage.setItem(COPY_STORAGE_KEY, serialize(config));
-    } else {
-      globalThis.localStorage.setItem(COPY_STORAGE_KEY, serialize(config));
-    }
+    globalThis.localStorage.setItem(COPY_STORAGE_KEY, serialize(Array.isArray(config) ? config : [config]));
   }
 
   /**
    * 从localStorage中获取节点，然后添加到当前容器中
-   * @param position 如果设置，指定组件位置
-   * @param config 粘贴组件的配置(可选),没有传就从storage中取
+   * @param position 粘贴的坐标
    * @returns 添加后的组件节点配置
    */
-  public async paste(position: { left?: number; top?: number } = {}, pasteConfig?: MNode): Promise<MNode | void> {
+  public async paste(position: PastePosition = {}): Promise<MNode | void> {
+    let pastePosition = position;
+    const configStr = globalThis.localStorage.getItem(COPY_STORAGE_KEY);
+    const curNode = this.get<MContainer>('nodes')[0];
+    // eslint-disable-next-line prefer-const
     let config: any = {};
-    if (!pasteConfig) {
-      const configStr = globalThis.localStorage.getItem(COPY_STORAGE_KEY);
-      // eslint-disable-next-line prefer-const
-      if (!configStr) {
-        return;
-      }
-      try {
-        // eslint-disable-next-line no-eval
-        eval(`config = ${configStr}`);
-      } catch (e) {
-        console.error(e);
-        return;
-      }
-    } else {
-      config = pasteConfig;
+    if (!configStr) {
+      return;
     }
-
-    return await this.doPaste(position, config);
+    try {
+      // eslint-disable-next-line no-eval
+      eval(`config = ${configStr}`);
+    } catch (e) {
+      console.error(e);
+      return;
+    }
+    return config.map(async (configItem: MNode) => {
+      if (curNode.items) {
+        // 如果粘贴时选中了容器，则将元素粘贴到容器内
+        pastePosition = this.getPositionInContainer(position, curNode.id);
+      }
+      return await this.doPaste(pastePosition, configItem);
+    });
   }
 
   /**
@@ -543,7 +498,7 @@ class Editor extends BaseService {
    */
   public async alignCenter(config: MNode): Promise<MNode | void> {
     const parent = this.get<MContainer>('parent');
-    const node = this.get<MNode>('node');
+    const node = this.get<MNode>('nodes')[0];
     const layout = await this.getLayout(toRaw(parent), toRaw(node));
     if (layout === Layout.RELATIVE) {
       return;
@@ -687,6 +642,7 @@ class Editor extends BaseService {
     this.removeAllListeners();
     this.set('root', null);
     this.set('node', null);
+    this.set('nodes', []);
     this.set('page', null);
     this.set('parent', null);
   }
@@ -776,6 +732,76 @@ class Editor extends BaseService {
       pasteConfig.name = generatePageNameByApp(this.get('root'));
     }
     return await this.add(pasteConfig as AddMNode);
+  }
+
+  private async doRemove(node: MNode): Promise<MNode | void> {
+    if (!node?.id) return;
+
+    const root = this.get<MApp | null>('root');
+
+    if (!root) throw new Error('没有root');
+
+    const { parent, node: curNode } = this.getNodeInfo(node.id, false);
+
+    if (!parent || !curNode) throw new Error('找不要删除的节点');
+
+    const index = getNodeIndex(curNode, parent);
+
+    if (typeof index !== 'number' || index === -1) throw new Error('找不要删除的节点');
+
+    parent.items?.splice(index, 1);
+    const stage = this.get<StageCore | null>('stage');
+    stage?.remove({ id: node.id, root: cloneDeep(this.get('root')) });
+
+    if (node.type === NodeType.PAGE) {
+      this.state.pageLength -= 1;
+
+      if (root.items[0]) {
+        await this.select(root.items[0]);
+        stage?.select(root.items[0].id);
+      } else {
+        this.set('node', null);
+        this.set('nodes', []);
+        this.set('parent', null);
+        this.set('page', null);
+        this.set('stage', null);
+        this.set('highlightNode', null);
+        this.resetModifiedNodeId();
+        historyService.reset();
+
+        this.emit('remove', node);
+
+        return node;
+      }
+    } else {
+      await this.select(parent);
+      stage?.select(parent.id);
+    }
+
+    this.addModifiedNodeId(parent.id);
+    this.pushHistoryState();
+
+    this.emit('remove', node);
+
+    return node;
+  }
+
+  /**
+   * 将元素粘贴到容器内时，将相对于画布坐标转换为相对于容器的坐标
+   * @param position PastePosition 粘贴时相对于画布的坐标
+   * @param id 元素id
+   * @returns PastePosition 转换后的坐标
+   */
+  private getPositionInContainer(position: PastePosition = {}, id: Id) {
+    let { left = 0, top = 0 } = position;
+    const parentEl = this.get<StageCore>('stage')?.renderer?.contentWindow?.document.getElementById(`${id}`);
+    const parentElRect = parentEl?.getBoundingClientRect();
+    left = left - (parentElRect?.left || 0);
+    top = top - (parentElRect?.top || 0);
+    return {
+      left,
+      top,
+    };
   }
 }
 

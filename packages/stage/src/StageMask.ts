@@ -331,7 +331,6 @@ export default class StageMask extends Rule {
   private mouseUpHandler = (): void => {
     globalThis.document.removeEventListener('mouseup', this.mouseUpHandler);
     this.content.addEventListener('mousemove', this.highlightHandler);
-    this.emit('select');
   };
 
   private mouseWheelHandler = (event: WheelEvent) => {

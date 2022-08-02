@@ -76,8 +76,8 @@ export default defineComponent({
     const stageWrap = ref<InstanceType<typeof ScrollViewer>>();
     const stageContainer = ref<HTMLDivElement>();
     const menu = ref<InstanceType<typeof ViewerMenu>>();
-    const isMultiSelect = ref<Boolean>(false);
 
+    const isMultiSelect = computed(() => services?.editorService.get('nodes')?.length > 1);
     const stageRect = computed(() => services?.uiService.get<StageRect>('stageRect'));
     const uiSelectMode = computed(() => services?.uiService.get<boolean>('uiSelectMode'));
     const root = computed(() => services?.editorService.get<MApp>('root'));
@@ -133,7 +133,7 @@ export default defineComponent({
       });
 
       stage?.on('multiSelect', (els: HTMLElement[]) => {
-        services?.editorService.multiSelect(els);
+        services?.editorService.multiSelect(els.map((el) => el.id));
       });
 
       stage?.on('update', (ev: UpdateEventData) => {
@@ -215,7 +215,6 @@ export default defineComponent({
 
       contextmenuHandler(e: MouseEvent) {
         e.preventDefault();
-        isMultiSelect.value = stage?.selectedDomList?.length ? stage.selectedDomList.length > 1 : false;
         menu.value?.show(e);
       },
 

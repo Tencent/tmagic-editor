@@ -34,7 +34,7 @@ export default defineComponent({
   setup() {
     const services = inject<Services>('services');
     const workspace = ref<HTMLDivElement>();
-    const node = computed(() => services?.editorService.get<MNode>('node'));
+    const nodes = computed(() => services?.editorService.get<MNode[]>('nodes'));
     let keycon: KeyController;
 
     const mouseenterHandler = () => {
@@ -58,27 +58,27 @@ export default defineComponent({
       keycon
         .keyup('delete', (e) => {
           e.inputEvent.preventDefault();
-          if (!node.value || isPage(node.value)) return;
-          services?.editorService.remove(node.value);
+          if (!nodes.value || isPage(nodes.value[0])) return;
+          services?.editorService.remove(nodes.value);
         })
         .keyup('backspace', (e) => {
           e.inputEvent.preventDefault();
-          if (!node.value || isPage(node.value)) return;
-          services?.editorService.remove(node.value);
+          if (!nodes.value || isPage(nodes.value[0])) return;
+          services?.editorService.remove(nodes.value);
         })
         .keydown([ctrl, 'c'], (e) => {
           e.inputEvent.preventDefault();
-          node.value && services?.editorService.copy(node.value);
+          nodes.value && services?.editorService.copy(nodes.value);
         })
         .keydown([ctrl, 'v'], (e) => {
           e.inputEvent.preventDefault();
-          node.value && services?.editorService.paste();
+          nodes.value && services?.editorService.paste();
         })
         .keydown([ctrl, 'x'], (e) => {
           e.inputEvent.preventDefault();
-          if (!node.value || isPage(node.value)) return;
-          services?.editorService.copy(node.value);
-          services?.editorService.remove(node.value);
+          if (!nodes.value || isPage(nodes.value[0])) return;
+          services?.editorService.copy(nodes.value);
+          services?.editorService.remove(nodes.value);
         })
         .keydown([ctrl, 'z'], (e) => {
           e.inputEvent.preventDefault();
