@@ -1,18 +1,19 @@
 import { toRaw } from 'vue';
-import { cloneDeep } from 'lodash-es';
+import { cloneDeep, isEmpty } from 'lodash-es';
 
 import { Id, MApp, MContainer, MNode, NodeType } from '@tmagic/schema';
 import StageCore from '@tmagic/stage';
 import { isPage } from '@tmagic/utils';
 
 import editorService from '@editor/services/editor';
+import historyService from '@editor/services/history';
 import propsService from '@editor/services/props';
 import { AddMNode, Layout, PastePosition } from '@editor/type';
 import { fixNodeLeft, generatePageNameByApp, getInitPositionStyle, getNodeIndex } from '@editor/utils/editor';
 
 /**
  * 粘贴前置操作：返回分配了新id以及校准了坐标的配置
- * @param position 粘贴的坐标,如果为空则默认在元素坐标基础上偏移10px
+ * @param position 粘贴的坐标
  * @param config 待粘贴的元素配置(复制时保存的那份配置)
  * @returns
  */
@@ -25,7 +26,8 @@ export const beforePaste = async (position: PastePosition, config: MNode[]) => {
   const pasteConfigs: MNode[] = await Promise.all(
     config.map(async (configItem: MNode): Promise<MNode> => {
       let pastePosition = position;
-      if (curNode.items) {
+      if (!isEmpty(pastePosition) && curNode.items) {
+        // 如果没有传入粘贴坐标则可能为键盘操作，不再转换
         // 如果粘贴时选中了容器，则将元素粘贴到容器内，坐标需要转换为相对于容器的坐标
         pastePosition = getPositionInContainer(pastePosition, curNode.id);
       }
@@ -146,9 +148,10 @@ export const notifyAddToStage = async (parentNode: MContainer, newNode: MNode, l
  * @param node 待删除的节点
  * @returns 父级元素，root根元素
  */
-export const beforeRemove = (node: MNode): { parent: MContainer; root: MApp } | void => {
+export const beforeRemove = async (node: MNode): Promise<MContainer | void> => {
   if (!node?.id) return;
 
+  const stage = editorService.get<StageCore | null>('stage');
   const root = editorService.get<MApp | null>('root');
 
   if (!root) throw new Error('没有root');
@@ -162,8 +165,33 @@ export const beforeRemove = (node: MNode): { parent: MContainer; root: MApp } | 
   if (typeof index !== 'number' || index === -1) throw new Error('找不要删除的节点');
   // 从配置中删除元素
   parent.items?.splice(index, 1);
-  return {
-    parent,
-    root,
-  };
+
+  // 通知stage更新
+  stage?.remove({ id: node.id, root: cloneDeep(root) });
+
+  if (node.type === NodeType.PAGE) {
+    editorService.state.pageLength -= 1;
+
+    if (root.items[0]) {
+      await editorService.select(root.items[0]);
+      stage?.select(root.items[0].id);
+    } else {
+      editorService.set('node', null);
+      editorService.set('nodes', []);
+      editorService.set('parent', null);
+      editorService.set('page', null);
+      editorService.set('stage', null);
+      editorService.set('highlightNode', null);
+      editorService.resetModifiedNodeId();
+      historyService.reset();
+
+      editorService.emit('remove', node);
+
+      return;
+    }
+  } else {
+    await editorService.select(parent);
+    stage?.select(parent.id);
+  }
+  return parent;
 };
