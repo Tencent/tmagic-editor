@@ -365,8 +365,8 @@ describe('paste', () => {
     await editorService.select(NodeId.PAGE_ID);
     const page = editorService.get<MPage>('page');
     expect(page.items).toHaveLength(2);
-    const newNode = await editorService.paste({ left: 0, top: 0 });
-    expect(newNode?.id === NodeId.NODE_ID2).toBeFalsy();
+    const newNodes = (await editorService.paste({ left: 0, top: 0 })) as MNode[];
+    expect(newNodes[0]?.id === NodeId.NODE_ID2).toBeFalsy();
     expect(page.items).toHaveLength(3);
   });
 
