@@ -7,4 +7,5 @@ cli({
   packages: {},
   componentFileAffix: '',
   cleanTemp: true,
+  temp: '.tmagic',
 });

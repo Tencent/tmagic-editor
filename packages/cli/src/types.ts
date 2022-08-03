@@ -33,7 +33,7 @@ export interface EntryFile {
 
 export interface UserConfig {
   source: string;
-  scripts: Record<string, string>;
+  temp: string;
   packages: Record<string, any>;
   componentFileAffix: string;
   cleanTemp: boolean;
