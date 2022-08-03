@@ -20,11 +20,11 @@
     "vue": "^3.2.0"
   },
   "devDependencies": {
-    "@vuepress/bundler-vite": "^2.0.0-beta.48",
-    "@vuepress/cli": "^2.0.0-beta.48",
-    "@vuepress/client": "^2.0.0-beta.48",
-    "@vuepress/plugin-search": "^2.0.0-beta.48",
-    "@vuepress/theme-default": "^2.0.0-beta.48",
-    "vuepress": "^2.0.0-beta.48"
+    "@vuepress/bundler-vite": "^2.0.0-beta.49",
+    "@vuepress/cli": "^2.0.0-beta.49",
+    "@vuepress/client": "^2.0.0-beta.49",
+    "@vuepress/plugin-search": "^2.0.0-beta.49",
+    "@vuepress/theme-default": "^2.0.0-beta.49",
+    "vuepress": "^2.0.0-beta.49"
   }
 }
