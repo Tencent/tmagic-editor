@@ -42,9 +42,7 @@ import { beforeAdd, beforePaste, beforeRemove, notifyAddToStage } from '@editor/
 import BaseService from './BaseService';
 
 class Editor extends BaseService {
-  private isHistoryStateChange = false;
-
-  private state = reactive<StoreState>({
+  public state = reactive<StoreState>({
     root: null,
     page: null,
     parent: null,
@@ -55,6 +53,7 @@ class Editor extends BaseService {
     modifiedNodeIds: new Map(),
     pageLength: 0,
   });
+  private isHistoryStateChange = false;
 
   constructor() {
     super(
@@ -288,7 +287,28 @@ class Editor extends BaseService {
    * @returns 添加后的节点
    */
   public async multiAdd(configs: MNode[]): Promise<MNode[]> {
-    return await Promise.all(configs.map((configItem) => this.add(configItem as AddMNode)));
+    const stage = this.get<StageCore | null>('stage');
+    const newNodes: MNode[] = await Promise.all(
+      configs.map(async (configItem: MNode): Promise<MNode> => {
+        // 新增元素到配置
+        const { parentNode, newNode, layout } = await beforeAdd(configItem as AddMNode);
+        // 将新增元素事件通知到stage以更新渲染
+        await notifyAddToStage(parentNode, newNode, layout);
+        return newNode;
+      }),
+    );
+    const newNodeIds: Id[] = newNodes.map((node) => node.id);
+
+    // 增加历史记录 多选不可能选中page
+    this.addModifiedNodeId(newNodeIds.join('-'));
+    this.pushHistoryState();
+
+    // 触发选中样式
+    stage?.multiSelect(newNodeIds);
+
+    this.emit('multiAdd', newNodes);
+
+    return newNodes;
   }
 
   /**
@@ -299,10 +319,11 @@ class Editor extends BaseService {
    */
   public async add(addNode: AddMNode, parent?: MContainer | null): Promise<MNode> {
     const stage = this.get<StageCore | null>('stage');
+    // 新增元素到配置
     const { parentNode, newNode, layout, isPage } = await beforeAdd(addNode, parent);
     // 将新增元素事件通知到stage以更新渲染
     await notifyAddToStage(parentNode, newNode, layout);
-    // 触发选中样式
+    // 更新编辑器选中元素
     await this.select(newNode);
     // 增加历史记录
     this.addModifiedNodeId(newNode.id);
@@ -327,9 +348,42 @@ class Editor extends BaseService {
    * @param {Object} node
    * @return {Object} 删除的组件配置
    */
-  public async remove(nodes: MNode | MNode[]): Promise<(MNode | void)[]> {
-    const removeNodes = Array.isArray(nodes) ? nodes : [nodes];
-    return await Promise.all(removeNodes.map(async (node) => await this.doRemove(node)));
+  public async remove(nodeOrNodeList: MNode | MNode[]): Promise<MNode | MNode[]> {
+    if (Array.isArray(nodeOrNodeList)) {
+      // 多选批量删除
+      const nodes = nodeOrNodeList;
+      return this.multiRemove(nodes);
+    }
+    const node = nodeOrNodeList;
+    const removeParent = await beforeRemove(node);
+    // 删除的是页面
+    if (!removeParent) return node;
+    // 更新历史记录
+    this.addModifiedNodeId(removeParent.id);
+    this.pushHistoryState();
+
+    this.emit('remove', node);
+
+    return node;
+  }
+
+  /**
+   * 批量删除
+   * @param nodes 批量删除的节点
+   * @returns 批量删除的节点
+   */
+  public async multiRemove(nodes: MNode[]): Promise<MNode[]> {
+    await Promise.all(
+      nodes.map(async (removeNode) => {
+        await beforeRemove(removeNode);
+      }),
+    );
+    const nodeIds = nodes.map((node) => node.id);
+    this.addModifiedNodeId(nodeIds.join('-'));
+    this.pushHistoryState();
+
+    this.emit('multiRemove', nodes);
+    return nodes;
   }
 
   /**
@@ -682,47 +736,6 @@ class Editor extends BaseService {
       parent,
       page,
     };
-  }
-
-  private async doRemove(node: MNode): Promise<MNode | void> {
-    const beforeRemoveRes = beforeRemove(node);
-    if (!beforeRemoveRes) return;
-    const { parent, root } = beforeRemoveRes;
-
-    const stage = this.get<StageCore | null>('stage');
-    stage?.remove({ id: node.id, root: cloneDeep(this.get('root')) });
-
-    if (node.type === NodeType.PAGE) {
-      this.state.pageLength -= 1;
-
-      if (root.items[0]) {
-        await this.select(root.items[0]);
-        stage?.select(root.items[0].id);
-      } else {
-        this.set('node', null);
-        this.set('nodes', []);
-        this.set('parent', null);
-        this.set('page', null);
-        this.set('stage', null);
-        this.set('highlightNode', null);
-        this.resetModifiedNodeId();
-        historyService.reset();
-
-        this.emit('remove', node);
-
-        return node;
-      }
-    } else {
-      await this.select(parent);
-      stage?.select(parent.id);
-    }
-
-    this.addModifiedNodeId(parent.id);
-    this.pushHistoryState();
-
-    this.emit('remove', node);
-
-    return node;
   }
 }
 
