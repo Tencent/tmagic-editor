@@ -268,17 +268,18 @@ class Editor extends BaseService {
 
   /**
    * 多选
-   * @param config 指定节点配置或者ID
+   * @param ids 指定节点ID
    * @returns 加入多选的节点配置
    */
-  public multiSelect(config: Id[]): void {
+  public multiSelect(ids: Id[]): void {
     const nodes: MNode[] = [];
-    config.forEach((id) => {
+    const idsUnique = uniq(ids);
+    idsUnique.forEach((id) => {
       const { node } = this.getNodeInfo(id);
       if (!node) return;
       nodes.push(node);
     });
-    this.set('nodes', uniq(nodes));
+    this.set('nodes', nodes);
   }
 
   /**
