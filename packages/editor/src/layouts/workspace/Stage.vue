@@ -15,7 +15,7 @@
       @dragover="dragoverHandler"
     ></div>
     <teleport to="body">
-      <viewer-menu ref="menu"></viewer-menu>
+      <viewer-menu ref="menu" :is-multi-select="isMultiSelect"></viewer-menu>
     </teleport>
   </scroll-viewer>
 </template>
@@ -67,6 +67,9 @@ export default defineComponent({
   },
 
   setup() {
+    let stage: StageCore | null = null;
+    let runtime: Runtime | null = null;
+
     const services = inject<Services>('services');
     const stageOptions = inject<StageOptions>('stageOptions');
 
@@ -74,15 +77,13 @@ export default defineComponent({
     const stageContainer = ref<HTMLDivElement>();
     const menu = ref<InstanceType<typeof ViewerMenu>>();
 
+    const isMultiSelect = computed(() => services?.editorService.get('nodes')?.length > 1);
     const stageRect = computed(() => services?.uiService.get<StageRect>('stageRect'));
     const uiSelectMode = computed(() => services?.uiService.get<boolean>('uiSelectMode'));
     const root = computed(() => services?.editorService.get<MApp>('root'));
     const page = computed(() => services?.editorService.get<MPage>('page'));
     const zoom = computed(() => services?.uiService.get<number>('zoom') || 1);
     const node = computed(() => services?.editorService.get<MNode>('node'));
-
-    let stage: StageCore | null = null;
-    let runtime: Runtime | null = null;
 
     const getGuideLineKey = (key: string) => `${key}_${root.value?.id}_${page.value?.id}`;
 
@@ -129,6 +130,10 @@ export default defineComponent({
 
       stage?.on('highlight', (el: HTMLElement) => {
         services?.editorService.highlight(el.id);
+      });
+
+      stage?.on('multiSelect', (els: HTMLElement[]) => {
+        services?.editorService.multiSelect(els.map((el) => el.id));
       });
 
       stage?.on('update', (ev: UpdateEventData) => {
@@ -206,6 +211,7 @@ export default defineComponent({
       menu,
       stageRect,
       zoom,
+      isMultiSelect,
 
       contextmenuHandler(e: MouseEvent) {
         e.preventDefault();

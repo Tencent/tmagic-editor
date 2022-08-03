@@ -70,4 +70,9 @@ export interface MApp extends MComponent {
   items: MPage[];
 }
 
+export interface PastePosition {
+  left?: number;
+  top?: number;
+}
+
 export type MNode = MComponent | MContainer | MPage | MApp;

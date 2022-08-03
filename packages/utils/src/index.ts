@@ -127,7 +127,10 @@ export const getUrlParam = (param: string, url?: string) => {
 
 export const isPop = (node: MNode): boolean => Boolean(node.type?.toLowerCase().endsWith('pop'));
 
-export const isPage = (node: MNode): boolean => Boolean(node.type?.toLowerCase() === NodeType.PAGE);
+export const isPage = (node: MNode | undefined): boolean => {
+  if (!node) return false;
+  return Boolean(node.type?.toLowerCase() === NodeType.PAGE);
+};
 
 export const isNumber = (value: string) => /^(-?\d+)(\.\d+)?$/.test(value);
 

@@ -353,7 +353,7 @@ describe('copy', () => {
     const node = editorService.getNodeById(NodeId.NODE_ID2);
     await editorService.copy(node!);
     const str = globalThis.localStorage.getItem(COPY_STORAGE_KEY);
-    expect(str).toBe(JSON.stringify(node));
+    expect(str).toBe(JSON.stringify([node]));
   });
 });
 

@@ -64,6 +64,7 @@ export interface StoreState {
   parent: MContainer | null;
   node: MNode | null;
   highlightNode: MNode | null;
+  nodes: MNode[];
   stage: StageCore | null;
   modifiedNodeIds: Map<Id, Id>;
   pageLength: number;
@@ -127,6 +128,11 @@ export interface AddMNode {
   name?: string;
   inputEvent?: DragEvent;
   [key: string]: any;
+}
+
+export interface PastePosition {
+  left?: number;
+  top?: number;
 }
 
 /**
