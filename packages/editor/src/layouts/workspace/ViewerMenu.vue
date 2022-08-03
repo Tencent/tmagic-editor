@@ -141,8 +141,9 @@ export default defineComponent({
       ...stageContentMenu,
     ]);
 
-    onMounted(() => {
-      const data = globalThis.localStorage.getItem(COPY_STORAGE_KEY);
+    onMounted(async () => {
+      const storage = await editorService?.getStorage();
+      const data = storage?.getItem(COPY_STORAGE_KEY);
       canPaste.value = data !== 'undefined' && !!data;
     });
 

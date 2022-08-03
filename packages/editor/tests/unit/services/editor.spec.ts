@@ -352,7 +352,8 @@ describe('copy', () => {
   test('正常', async () => {
     const node = editorService.getNodeById(NodeId.NODE_ID2);
     await editorService.copy(node!);
-    const str = globalThis.localStorage.getItem(COPY_STORAGE_KEY);
+    const storage = await editorService.getStorage();
+    const str = storage.getItem(COPY_STORAGE_KEY);
     expect(str).toBe(JSON.stringify([node]));
   });
 });

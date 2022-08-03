@@ -60,6 +60,7 @@ class Editor extends BaseService {
     super(
       [
         'getLayout',
+        'getStorage',
         'select',
         'add',
         'remove',
@@ -423,12 +424,21 @@ class Editor extends BaseService {
   }
 
   /**
+   * 获取数据存储对象
+   * @returns Storage
+   */
+  public async getStorage(): Promise<Storage> {
+    return globalThis.localStorage;
+  }
+
+  /**
    * 将组将节点配置转化成string，然后存储到localStorage中
    * @param config 组件节点配置
    * @returns 组件节点配置
    */
   public async copy(config: MNode | MNode[]): Promise<void> {
-    globalThis.localStorage.setItem(COPY_STORAGE_KEY, serialize(Array.isArray(config) ? config : [config]));
+    const storage = await this.getStorage();
+    storage.setItem(COPY_STORAGE_KEY, serialize(Array.isArray(config) ? config : [config]));
   }
 
   /**
@@ -437,7 +447,8 @@ class Editor extends BaseService {
    * @returns 添加后的组件节点配置
    */
   public async paste(position: PastePosition = {}): Promise<MNode[] | void> {
-    const configStr = globalThis.localStorage.getItem(COPY_STORAGE_KEY);
+    const storage = await this.getStorage();
+    const configStr = storage.getItem(COPY_STORAGE_KEY);
     // eslint-disable-next-line prefer-const
     let config: any = {};
     if (!configStr) {
