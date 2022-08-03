@@ -27,6 +27,7 @@
     },
     "types": [
       "node",
+      "vite/client",
     ],
   },
   "exclude": [
