@@ -3,8 +3,15 @@
   "name": "@tmagic/schema",
   "sideEffects": false,
   "main": "dist/tmagic-schema.umd.js",
-  "module": "dist/tmagic-schema.es.js",
+  "module": "dist/tmagic-schema.mjs",
   "types": "dist/types/src/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/tmagic-schema.mjs",
+      "require": "./dist/tmagic-schema.umd.js"
+    },
+    "./*": "./*"
+  },
   "scripts": {
     "build": "vite build"
   },
@@ -19,7 +26,7 @@
   "devDependencies": {
     "@types/node": "^15.12.4",
     "typescript": "^4.7.4",
-    "vite": "^2.9.13",
+    "vite": "^3.0.4",
     "vite-plugin-dts": "^0.9.6"
   }
 }

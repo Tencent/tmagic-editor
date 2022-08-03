@@ -23,7 +23,7 @@
     "rollup": "^2.25.0",
     "rollup-plugin-external-globals": "^0.6.1",
     "sass": "^1.35.1",
-    "vite": "^2.9.13",
+    "vite": "^3.0.4",
     "@vitejs/plugin-vue2": "^1.1.2",
     "vue-template-compiler": "^2.7.4"
   }

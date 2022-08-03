@@ -5,11 +5,11 @@
     "dist/*"
   ],
   "main": "dist/tmagic-stage.umd.js",
-  "module": "dist/tmagic-stage.es.js",
+  "module": "dist/tmagic-stage.mjs",
   "types": "dist/types/src/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/tmagic-stage.es.js",
+      "import": "./dist/tmagic-stage.mjs",
       "require": "./dist/tmagic-stage.umd.js"
     },
     "./*": "./*"
@@ -42,7 +42,7 @@
     "@types/node": "^15.12.4",
     "sass": "^1.35.1",
     "typescript": "^4.7.4",
-    "vite": "^2.9.13",
+    "vite": "^3.0.4",
     "vite-plugin-dts": "^0.9.6"
   }
 }

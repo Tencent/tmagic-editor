@@ -55,7 +55,7 @@
     "@types/node": "^15.12.4",
     "@typescript-eslint/eslint-plugin": "^4.28.0",
     "@typescript-eslint/parser": "^4.28.0",
-    "@vitejs/plugin-vue": "^1.2.3",
+    "@vitejs/plugin-vue": "^3.0.1",
     "c8": "^7.11.3",
     "chalk": "^4.1.0",
     "commitizen": "^4.2.4",
@@ -79,8 +79,9 @@
     "semver": "^7.3.7",
     "shx": "^0.3.4",
     "typescript": "^4.7.4",
-    "vite": "^2.9.13",
-    "vitest": "^0.14.1"
+    "vite": "^3.0.4",
+    "vitest": "^0.14.1",
+    "vue": "^3.2.37"
   },
   "config": {
     "commitizen": {

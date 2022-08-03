@@ -5,11 +5,11 @@
     "dist/*"
   ],
   "main": "dist/tmagic-table.umd.js",
-  "module": "dist/tmagic-table.es.js",
+  "module": "dist/tmagic-table.mjs",
   "types": "dist/types/src/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/tmagic-table.es.js",
+      "import": "./dist/tmagic-table.mjs",
       "require": "./dist/tmagic-table.umd.js"
     },
     "./dist/style.css": {
@@ -33,23 +33,23 @@
     "@tmagic/form": "1.1.0-beta.5",
     "element-plus": "^2.2.6",
     "lodash-es": "^4.17.21",
-    "vue": "^3.2.0"
+    "vue": "^3.2.37"
   },
   "peerDependencies": {
     "@tmagic/form": "1.1.0-beta.5",
     "element-plus": "^2.2.6",
-    "vue": "^3.2.0"
+    "vue": "^3.2.37"
   },
   "devDependencies": {
     "@types/color": "^3.0.1",
     "@types/lodash-es": "^4.17.4",
     "@types/node": "^15.12.4",
-    "@vitejs/plugin-vue": "^2.3.3",
-    "@vue/compiler-sfc": "^3.2.0",
+    "@vitejs/plugin-vue": "^3.0.1",
+    "@vue/compiler-sfc": "^3.2.37",
     "@vue/test-utils": "^2.0.0",
     "sass": "^1.35.1",
     "typescript": "^4.7.4",
-    "vite": "^2.9.13",
+    "vite": "^3.0.4",
     "vite-plugin-dts": "^0.9.6",
     "vue-tsc": "^0.38.2"
   }
