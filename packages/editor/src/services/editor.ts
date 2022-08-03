@@ -26,20 +26,18 @@ import StageCore from '@tmagic/stage';
 import { getNodePath, isNumber, isPage, isPop } from '@tmagic/utils';
 
 import historyService, { StepValue } from '@editor/services/history';
-import propsService from '@editor/services/props';
 import type { AddMNode, EditorNodeInfo, PastePosition, StoreState } from '@editor/type';
 import { LayerOffset, Layout } from '@editor/type';
 import {
   change2Fixed,
   COPY_STORAGE_KEY,
   Fixed2Other,
-  fixNodeLeft,
-  generatePageNameByApp,
   getInitPositionStyle,
   getNodeIndex,
   isFixed,
   setLayout,
 } from '@editor/utils/editor';
+import { beforeAdd, beforePaste, beforeRemove, notifyAddToStage } from '@editor/utils/operator';
 
 import BaseService from './BaseService';
 
@@ -284,57 +282,28 @@ class Editor extends BaseService {
   }
 
   /**
+   * 批量向容器添加节点
+   * @param configs 将要添加的节点数组
+   * @returns 添加后的节点
+   */
+  public async multiAdd(configs: MNode[]): Promise<MNode[]> {
+    return await Promise.all(configs.map((configItem) => this.add(configItem as AddMNode)));
+  }
+
+  /**
    * 向指点容器添加组件节点
    * @param addConfig 将要添加的组件节点配置
    * @param parent 要添加到的容器组件节点配置，如果不设置，默认为当前选中的组件的父节点
    * @returns 添加后的节点
    */
   public async add(addNode: AddMNode, parent?: MContainer | null): Promise<MNode> {
-    // 加入inputEvent是为给业务扩展时可以获取到更多的信息，只有在使用拖拽添加组件时才有改对象
-    const { type, inputEvent, ...config } = addNode;
-    const curNode = this.get<MContainer>('node');
-
-    let parentNode: MContainer | undefined;
-    const isPage = type === NodeType.PAGE;
-
-    if (isPage) {
-      parentNode = this.get<MApp>('root');
-      // 由于支持中间件扩展，在parent参数为undefined时，parent会变成next函数
-    } else if (parent && typeof parent !== 'function') {
-      parentNode = parent;
-    } else if (curNode.items) {
-      parentNode = curNode;
-    } else {
-      parentNode = this.getParentById(curNode.id, false);
-    }
-
-    if (!parentNode) throw new Error('未找到父元素');
-
-    const layout = await this.getLayout(toRaw(parentNode), addNode as MNode);
-    const newNode = { ...toRaw(await propsService.getPropsValue(type, config)) };
-    newNode.style = getInitPositionStyle(newNode.style, layout, parentNode, this.get<StageCore>('stage'));
-
-    if ((parentNode?.type === NodeType.ROOT || curNode.type === NodeType.ROOT) && newNode.type !== NodeType.PAGE) {
-      throw new Error('app下不能添加组件');
-    }
-
-    parentNode?.items?.push(newNode);
-
     const stage = this.get<StageCore | null>('stage');
-    const root = this.get<MApp>('root');
-
-    await stage?.add({ config: cloneDeep(newNode), parent: cloneDeep(parentNode), root: cloneDeep(root) });
-
-    if (layout === Layout.ABSOLUTE) {
-      const fixedLeft = fixNodeLeft(newNode, parentNode, stage?.renderer.contentWindow?.document);
-      if (typeof fixedLeft !== 'undefined') {
-        newNode.style.left = fixedLeft;
-        await stage?.update({ config: cloneDeep(newNode), root: cloneDeep(root) });
-      }
-    }
-
+    const { parentNode, newNode, layout, isPage } = await beforeAdd(addNode, parent);
+    // 将新增元素事件通知到stage以更新渲染
+    await notifyAddToStage(parentNode, newNode, layout);
+    // 触发选中样式
     await this.select(newNode);
-
+    // 增加历史记录
     this.addModifiedNodeId(newNode.id);
     if (!isPage) {
       this.pushHistoryState();
@@ -359,7 +328,7 @@ class Editor extends BaseService {
    */
   public async remove(nodes: MNode | MNode[]): Promise<(MNode | void)[]> {
     const removeNodes = Array.isArray(nodes) ? nodes : [nodes];
-    return Promise.all(removeNodes.map(async (node) => await this.doRemove(node)));
+    return await Promise.all(removeNodes.map(async (node) => await this.doRemove(node)));
   }
 
   /**
@@ -466,10 +435,8 @@ class Editor extends BaseService {
    * @param position 粘贴的坐标
    * @returns 添加后的组件节点配置
    */
-  public async paste(position: PastePosition = {}): Promise<MNode | void> {
-    let pastePosition = position;
+  public async paste(position: PastePosition = {}): Promise<MNode[] | void> {
     const configStr = globalThis.localStorage.getItem(COPY_STORAGE_KEY);
-    const curNode = this.get<MContainer>('node');
     // eslint-disable-next-line prefer-const
     let config: any = {};
     if (!configStr) {
@@ -482,13 +449,9 @@ class Editor extends BaseService {
       console.error(e);
       return;
     }
-    return config.map(async (configItem: MNode) => {
-      if (curNode.items) {
-        // 如果粘贴时选中了容器，则将元素粘贴到容器内
-        pastePosition = this.getPositionInContainer(position, curNode.id);
-      }
-      return await this.doPaste(pastePosition, configItem);
-    });
+    const pasteConfigs = await beforePaste(position, config);
+
+    return await this.multiAdd(pasteConfigs);
   }
 
   /**
@@ -720,36 +683,11 @@ class Editor extends BaseService {
     };
   }
 
-  private async doPaste(position: { left?: number; top?: number }, config: MNode) {
-    const pasteConfig = await propsService.setNewItemId(config, this.get('root'));
-    if (pasteConfig.style) {
-      pasteConfig.style = {
-        ...pasteConfig.style,
-        ...position,
-      };
-    }
-    if (isPage(pasteConfig)) {
-      pasteConfig.name = generatePageNameByApp(this.get('root'));
-    }
-    return await this.add(pasteConfig as AddMNode);
-  }
-
   private async doRemove(node: MNode): Promise<MNode | void> {
-    if (!node?.id) return;
+    const beforeRemoveRes = beforeRemove(node);
+    if (!beforeRemoveRes) return;
+    const { parent, root } = beforeRemoveRes;
 
-    const root = this.get<MApp | null>('root');
-
-    if (!root) throw new Error('没有root');
-
-    const { parent, node: curNode } = this.getNodeInfo(node.id, false);
-
-    if (!parent || !curNode) throw new Error('找不要删除的节点');
-
-    const index = getNodeIndex(curNode, parent);
-
-    if (typeof index !== 'number' || index === -1) throw new Error('找不要删除的节点');
-
-    parent.items?.splice(index, 1);
     const stage = this.get<StageCore | null>('stage');
     stage?.remove({ id: node.id, root: cloneDeep(this.get('root')) });
 
@@ -784,24 +722,6 @@ class Editor extends BaseService {
     this.emit('remove', node);
 
     return node;
-  }
-
-  /**
-   * 将元素粘贴到容器内时，将相对于画布坐标转换为相对于容器的坐标
-   * @param position PastePosition 粘贴时相对于画布的坐标
-   * @param id 元素id
-   * @returns PastePosition 转换后的坐标
-   */
-  private getPositionInContainer(position: PastePosition = {}, id: Id) {
-    let { left = 0, top = 0 } = position;
-    const parentEl = this.get<StageCore>('stage')?.renderer?.contentWindow?.document.getElementById(`${id}`);
-    const parentElRect = parentEl?.getBoundingClientRect();
-    left = left - (parentElRect?.left || 0);
-    top = top - (parentElRect?.top || 0);
-    return {
-      left,
-      top,
-    };
   }
 }
 
