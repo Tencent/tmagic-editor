@@ -10,7 +10,9 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
+    "@tmagic/core": "1.1.0-beta.5",
     "@tmagic/schema": "1.1.0-beta.5",
+    "@tmagic/utils": "1.1.0-beta.5",
     "qrcode": "^1.5.0",
     "vue": "^2.7.4"
   },
