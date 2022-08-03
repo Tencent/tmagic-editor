@@ -27,13 +27,11 @@ const generateContent = (type: EntryType, map: Record<string, string>, component
   });
 
   const exportToken = `${type}s`;
-  const capitalToken = exportToken.charAt(0).toUpperCase() + exportToken.slice(1);
 
   return prettyCode(`${importDeclarations.join(';')}
     const ${exportToken}: Record<string, any> = {
       ${list.join(',')}
     }
-    window.magicPreset${capitalToken} = ${exportToken};
     export default ${exportToken};
   `);
 };
