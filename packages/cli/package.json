@@ -1,0 +1,37 @@
+{
+  "version": "1.1.0-beta.5",
+  "name": "@tmagic/cli",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json",
+    "clean": "rimraf lib *.tsbuildinfo"
+  },
+  "bin": {
+    "tmagic": "bin/tmagic.js"
+  },
+  "files": [
+    "bin",
+    "lib"
+  ],
+  "engines": {
+    "node": ">=14"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tencent/tmagic-editor.git"
+  },
+  "dependencies": {
+    "@vuepress/cli": "^2.0.0-beta.49",
+    "cac": "^6.7.12",
+    "chalk": "^4.1.0",
+    "chokidar": "^3.5.3",
+    "fs-extra": "^10.1.0",
+    "recast": "^0.21.1",
+    "tslib": "^2.4.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^9.0.13"
+  }
+}
