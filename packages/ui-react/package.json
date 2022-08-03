@@ -13,6 +13,7 @@
     "react:build": "tsc && vite build"
   },
   "dependencies": {
+    "@tmagic/core": "1.1.0-beta.5",
     "@tmagic/schema": "1.1.0-beta.5",
     "qrcode": "^1.5.0",
     "react": "^17.0.0",
