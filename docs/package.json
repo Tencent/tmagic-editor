@@ -17,7 +17,7 @@
     "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
     "serialize-javascript": "^6.0.0",
-    "vue": "^3.2.0"
+    "vue": "^3.2.37"
   },
   "devDependencies": {
     "@vuepress/bundler-vite": "^2.0.0-beta.49",

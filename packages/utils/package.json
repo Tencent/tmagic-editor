@@ -2,11 +2,11 @@
   "version": "1.1.0-beta.5",
   "name": "@tmagic/utils",
   "main": "dist/tmagic-utils.umd.js",
-  "module": "dist/tmagic-utils.es.js",
+  "module": "dist/tmagic-utils.mjs",
   "types": "dist/types/src/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/tmagic-utils.es.js",
+      "import": "./dist/tmagic-utils.mjs",
       "require": "./dist/tmagic-utils.umd.js"
     }
   },
@@ -28,7 +28,7 @@
   "devDependencies": {
     "@types/node": "^15.12.4",
     "typescript": "^4.7.4",
-    "vite": "^2.9.13",
+    "vite": "^3.0.4",
     "vite-plugin-dts": "^0.9.6"
   }
 }
