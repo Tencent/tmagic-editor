@@ -5,7 +5,7 @@
   "packageManager": "pnpm@7.1.9",
   "scripts": {
     "bootstrap": "pnpm i && pnpm build",
-    "clean:top": "rimraf */**/dist */dist coverage dwt*",
+    "clean:top": "rimraf */**/dist */**/admin-dist */**/entry-dist */dist coverage dwt*",
     "clean:modules": "rimraf node_modules **/node_modules **/**/node_modules",
     "clean:all": "pnpm clean:top && pnpm clean:modules",
     "lint": "eslint . --ext .js,.vue,.ts,.tsx",

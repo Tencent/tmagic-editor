@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "npm run build:libs && vite --config dev.vite.config.ts",
-    "build": "npm run build:libs & npm run build:page && npm run build:playground",
-    "build:admin": "npm run build:libs & npm run build:page:admin && npm run build:playground:admin",
+    "build": "npm run build:libs && npm run build:page && npm run build:playground",
+    "build:admin": "npm run build:libs && npm run build:page:admin && npm run build:playground:admin",
     "build:page": "vite build --config build.vite.config.ts --mode page",
     "build:playground": "vite build --config build.vite.config.ts --mode playground",
     "build:page:admin": "vite build --config build.vite.config.ts --mode page:admin",
