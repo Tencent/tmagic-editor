@@ -20,22 +20,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss">
-html,
-body,
-#app {
-  width: 100%;
-  height: 100%;
-}
-
-#app {
-  position: relative;
-  overflow: auto;
-}
-
-#app::-webkit-scrollbar {
-  width: 0 !important;
-  display: none;
-}
-</style>

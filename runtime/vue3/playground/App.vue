@@ -106,29 +106,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss">
-::-webkit-scrollbar {
-  width: 0;
-}
-
-html,
-body,
-#app {
-  width: 100%;
-  height: 100%;
-}
-
-#app {
-  position: relative;
-  overflow: auto;
-}
-
-.magic-ui-container {
-  background-color: rgba(136, 136, 136, 0.5);
-}
-
-.action-area {
-  background-color: rgba(51, 153, 255, 0.5) !important;
-}
-</style>
