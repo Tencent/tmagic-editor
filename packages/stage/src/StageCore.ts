@@ -114,7 +114,6 @@ export default class StageCore extends EventEmitter {
       .on('beforeMultiSelect', async (event: MouseEvent) => {
         const el = await this.getElementFromPoint(event);
         if (!el) return;
-        this.clearSelectStatus('select');
         // 如果已有单选选中元素，不是magic-ui-page就可以加入多选列表
         if (this.selectedDom && !this.selectedDom.className.includes(PAGE_CLASS)) {
           this.selectedDomList.push(this.selectedDom as HTMLElement);
@@ -226,6 +225,7 @@ export default class StageCore extends EventEmitter {
    * @param domList 多选节点
    */
   public async multiSelect(idOrElList: HTMLElement[] | Id[]): Promise<void> {
+    this.clearSelectStatus('select');
     const elList = await Promise.all(idOrElList.map(async (idOrEl) => await this.getTargetElement(idOrEl)));
     this.multiDr.multiSelect(elList);
     this.emit('multiSelect', elList);
