@@ -28,6 +28,7 @@ import type { EditorService } from '@editor/services/editor';
 import type { EventsService } from '@editor/services/events';
 import type { HistoryService } from '@editor/services/history';
 import type { PropsService } from '@editor/services/props';
+import type { StorageService } from '@editor/services/storage';
 import type { UiService } from '@editor/services/ui';
 
 export type BeforeAdd = (config: MNode, parent: MContainer) => Promise<MNode> | MNode;
@@ -40,6 +41,7 @@ export interface InstallOptions {
 export interface Services {
   editorService: EditorService;
   historyService: HistoryService;
+  storageService: StorageService;
   eventsService: EventsService;
   propsService: PropsService;
   componentListService: ComponentListService;
