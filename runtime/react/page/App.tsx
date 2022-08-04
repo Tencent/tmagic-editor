@@ -16,10 +16,22 @@
  * limitations under the License.
  */
 
-const path = require('path');
+import React, { useContext } from 'react';
 
-const units = {
-  ui: path.join(__dirname, '../../../packages/ui-react/src/index.ts'),
-};
+import Core from '@tmagic/core';
+import type { Page } from '@tmagic/schema';
+import { AppContent } from '@tmagic/ui-react';
 
-module.exports = units;
+function App() {
+  const app = useContext<Core | undefined>(AppContent);
+
+  if (!app?.page?.data) {
+    return null;
+  }
+
+  const MagicUiPage = app.resolveComponent('page');
+
+  return <MagicUiPage config={app?.page?.data as Page}></MagicUiPage>;
+}
+
+export default App;

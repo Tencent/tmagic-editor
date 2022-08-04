@@ -24,7 +24,8 @@ import type { MApp } from '@tmagic/schema';
 import { AppContent } from '@tmagic/ui-react';
 import { getUrlParam } from '@tmagic/utils';
 
-import entry from '../comp-entry';
+import components from '../.tmagic/comp-entry';
+import plugins from '../.tmagic/plugin-entry';
 
 import App from './App';
 declare global {
@@ -54,7 +55,10 @@ const app = new Core({
   curPage: getUrlParam('page'),
 });
 
-Object.keys(entry.components).forEach((type: string) => app.registerComponent(type, entry.components[type]));
+Object.keys(components).forEach((type: string) => app.registerComponent(type, components[type]));
+Object.values(plugins).forEach((plugin: any) => {
+  plugin.install(app);
+});
 
 ReactDOM.render(
   <React.StrictMode>

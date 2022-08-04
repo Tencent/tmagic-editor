@@ -16,7 +16,22 @@
  * limitations under the License.
  */
 
-const generateEntry = require('../../scripts/generateEntry');
-const units = require('./units');
+import Vue from 'vue';
 
-generateEntry({ type: 'build', componentFileAffix: '.tsx', units, workingDir: __dirname });
+import App from './App.vue';
+
+Promise.all([import('../.tmagic/comp-entry'), import('../.tmagic/plugin-entry')]).then(([components, plugins]) => {
+  Object.values(components.default).forEach((component: any) => {
+    Vue.component(component.name, component);
+  });
+
+  Object.values(plugins.default).forEach((plugin: any) => {
+    Vue.use(plugin);
+  });
+
+  new Vue({
+    // @ts-ignore
+    render: (h) => h(App),
+    el: '#app',
+  });
+});

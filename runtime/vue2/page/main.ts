@@ -21,11 +21,12 @@ import Vue from 'vue';
 import Core from '@tmagic/core';
 import { getUrlParam } from '@tmagic/utils';
 
-import entry from '../comp-entry';
-import { getLocalConfig } from '../utils';
-import request from '../utils/request';
+import components from '../.tmagic/comp-entry';
+import plugins from '../.tmagic/plugin-entry';
 
+import request from './utils/request';
 import AppComponent from './App.vue';
+import { getLocalConfig } from './utils';
 
 Vue.use(request);
 
@@ -34,13 +35,13 @@ const app = new Core({
   curPage: getUrlParam('page'),
 });
 
-Object.keys(entry.components).forEach((type: string) => {
-  const component = entry.components[type];
+Object.keys(components).forEach((type: string) => {
+  const component = components[type];
   Vue.component(component.name, component);
   app.registerComponent(type, component);
 });
 
-Object.values(entry.plugins).forEach((plugin: any) => {
+Object.values(plugins).forEach((plugin: any) => {
   Vue.use(plugin);
 });
 

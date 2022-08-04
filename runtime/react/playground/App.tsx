@@ -16,24 +16,22 @@
  * limitations under the License.
  */
 
-import Vue from 'vue';
+import React, { useContext } from 'react';
 
-import App from './App.vue';
+import Core from '@tmagic/core';
+import type { MPage } from '@tmagic/schema';
+import { AppContent } from '@tmagic/ui-react';
 
-import('../comp-entry').then(() => {
-  const { components, plugins } = window.magicPresetComponents;
+function App() {
+  const app = useContext<Core | undefined>(AppContent);
 
-  Object.values(components).forEach((component: any) => {
-    Vue.component(component.name, component);
-  });
+  if (!app?.page?.data) {
+    return null;
+  }
 
-  Object.values(plugins).forEach((plugin: any) => {
-    Vue.use(plugin);
-  });
+  const MagicUiPage = app.resolveComponent('page');
 
-  new Vue({
-    // @ts-ignore
-    render: (h) => h(App),
-    el: '#app',
-  });
-});
+  return <MagicUiPage config={app?.page?.data as MPage}></MagicUiPage>;
+}
+
+export default App;

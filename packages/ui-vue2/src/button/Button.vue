@@ -6,7 +6,7 @@
   </button>
 </template>
 <script lang="ts">
-import { computed, defineComponent, getCurrentInstance, PropType, reactive } from 'vue';
+import { computed, defineComponent, getCurrentInstance, PropType, ref } from 'vue';
 
 import type { MComponent } from '@tmagic/schema';
 
@@ -28,14 +28,14 @@ export default defineComponent({
   setup(props) {
     useApp(props);
     const vm = getCurrentInstance()?.proxy;
-    const actions = reactive<Function[]>([]);
+    const actions = ref<Function[]>([]);
     const actualActions = computed(() => [
       typeof props.config.preAction === 'function' ? props.config.preAction : () => true,
-      ...actions,
+      ...actions.value,
       typeof props.config.postAction === 'function' ? props.config.postAction : () => true,
     ]);
     function pushAction(action: Function): void {
-      actions.push(action);
+      actions.value.push(action);
     }
     async function clickHandler(): Promise<void> {
       for (const fn of actualActions.value) {
