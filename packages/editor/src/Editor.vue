@@ -61,6 +61,7 @@ import editorService from '@editor/services/editor';
 import eventsService from '@editor/services/events';
 import historyService from '@editor/services/history';
 import propsService from '@editor/services/props';
+import storageService from '@editor/services/storage';
 import uiService from '@editor/services/ui';
 import type { ComponentGroup, MenuBarData, MenuItem, Services, SideBarData, StageRect } from '@editor/type';
 
@@ -269,6 +270,7 @@ export default defineComponent({
       propsService,
       editorService,
       uiService,
+      storageService,
     };
 
     provide('services', services);
