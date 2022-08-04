@@ -3,7 +3,7 @@ import BaseService from './BaseService';
 /**
  * 数据存储服务
  */
-export class StorageService extends BaseService {
+export class WebStorage extends BaseService {
   constructor() {
     super(['getStorage', 'clear', 'getItem', 'removeItem', 'setItem']);
   }
@@ -57,5 +57,5 @@ export class StorageService extends BaseService {
     storage.setItem(key, value);
   }
 }
-
-export default new StorageService();
+export type StorageService = WebStorage;
+export default new WebStorage();
