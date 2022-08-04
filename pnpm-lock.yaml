@@ -88,6 +88,7 @@ importers:
       lodash: ^4.17.21
       lodash-es: ^4.17.21
       serialize-javascript: ^6.0.0
+      vite: ~2.9.14
       vue: ^3.2.37
       vuepress: ^2.0.0-beta.49
     dependencies:
@@ -107,6 +108,7 @@ importers:
       '@vuepress/client': 2.0.0-beta.49
       '@vuepress/plugin-search': 2.0.0-beta.49
       '@vuepress/theme-default': 2.0.0-beta.49
+      vite: 2.9.14
       vuepress: 2.0.0-beta.49_2swkti5cn42xfigpmsn6ifcgpu
 
   packages/cli:
