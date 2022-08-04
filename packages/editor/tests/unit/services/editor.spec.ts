@@ -354,7 +354,7 @@ describe('copy', () => {
     const node = editorService.getNodeById(NodeId.NODE_ID2);
     await editorService.copy(node!);
     const str = await storageService.getItem(COPY_STORAGE_KEY);
-    expect(str).toBe(JSON.stringify([node]));
+    expect(str).toHaveLength(1);
   });
 });
 
@@ -372,7 +372,7 @@ describe('paste', () => {
   });
 
   test('空', async () => {
-    globalThis.localStorage.clear();
+    await storageService.clear();
     const newNode = await editorService.paste({ left: 0, top: 0 });
     expect(newNode).toBeUndefined();
   });
