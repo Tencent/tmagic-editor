@@ -16,10 +16,20 @@
  * limitations under the License.
  */
 
-const path = require('path');
+import { createApp } from 'vue';
 
-const units = {
-  ui: path.join(__dirname, '../../../packages/ui/src/index.ts'),
-};
+import App from './App.vue';
 
-module.exports = units;
+Promise.all([import('../.tmagic/comp-entry'), import('../.tmagic/plugin-entry')]).then(([components, plugins]) => {
+  const magicApp = createApp(App);
+
+  Object.values(components.default).forEach((component: any) => {
+    magicApp.component(component.name, component);
+  });
+
+  Object.values(plugins.default).forEach((plugin: any) => {
+    magicApp.use(plugin);
+  });
+
+  magicApp.mount('#app');
+});

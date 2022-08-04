@@ -24,7 +24,7 @@
         v-if="previewVisible"
         width="100%"
         height="817"
-        :src="`${VITE_RUNTIME_PATH}/page.html?localPreview=1&page=${editor?.editorService.get('page').id}`"
+        :src="`${VITE_RUNTIME_PATH}/page/index.html?localPreview=1&page=${editor?.editorService.get('page').id}`"
       ></iframe>
     </el-dialog>
   </div>
@@ -135,13 +135,13 @@ export default defineComponent({
       ],
     };
 
-    asyncLoadJs(`${VITE_RUNTIME_PATH}/assets/config.js`).then(() => {
+    asyncLoadJs(`${VITE_RUNTIME_PATH}/config-entry/index.umd.js`).then(() => {
       propsConfigs.value = (globalThis as any).magicPresetConfigs;
     });
-    asyncLoadJs(`${VITE_RUNTIME_PATH}/assets/value.js`).then(() => {
+    asyncLoadJs(`${VITE_RUNTIME_PATH}/value-entry/index.umd.js`).then(() => {
       propsValues.value = (globalThis as any).magicPresetValues;
     });
-    asyncLoadJs(`${VITE_RUNTIME_PATH}/assets/event.js`).then(() => {
+    asyncLoadJs(`${VITE_RUNTIME_PATH}/event-entry/index.umd.js`).then(() => {
       eventMethodList.value = (globalThis as any).magicPresetEvents;
     });
 
@@ -161,7 +161,7 @@ export default defineComponent({
 
       previewVisible,
 
-      runtimeUrl: `${VITE_RUNTIME_PATH}/playground.html`,
+      runtimeUrl: `${VITE_RUNTIME_PATH}/playground/index.html`,
 
       componentGroupList,
 

@@ -21,21 +21,22 @@ import { createApp } from 'vue';
 import Core from '@tmagic/core';
 import { getUrlParam } from '@tmagic/utils';
 
-import entry from '../comp-entry';
-import { getLocalConfig } from '../utils';
-import request from '../utils/request';
+import components from '../.tmagic/comp-entry';
+import plugins from '../.tmagic/plugin-entry';
 
+import request from './utils/request';
 import AppComponent from './App.vue';
+import { getLocalConfig } from './utils';
 
 const magicApp = createApp(AppComponent);
 
 magicApp.use(request);
 
-Object.values(entry.components).forEach((component: any) => {
+Object.values(components).forEach((component: any) => {
   magicApp.component(component.name, component);
 });
 
-Object.values(entry.plugins).forEach((plugin: any) => {
+Object.values(plugins).forEach((plugin: any) => {
   magicApp.use(plugin);
 });
 
