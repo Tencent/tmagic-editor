@@ -11,6 +11,7 @@ import StageCore from '@tmagic/stage';
 import { isPage } from '@tmagic/utils';
 
 import ContentMenu from '@editor/components/ContentMenu.vue';
+import storageService from '@editor/services/storage';
 import { LayerOffset, Layout, MenuItem, Services } from '@editor/type';
 import { COPY_STORAGE_KEY } from '@editor/utils/editor';
 
@@ -141,8 +142,8 @@ export default defineComponent({
       ...stageContentMenu,
     ]);
 
-    onMounted(() => {
-      const data = globalThis.localStorage.getItem(COPY_STORAGE_KEY);
+    onMounted(async () => {
+      const data = await storageService.getItem(COPY_STORAGE_KEY);
       canPaste.value = data !== 'undefined' && !!data;
     });
 

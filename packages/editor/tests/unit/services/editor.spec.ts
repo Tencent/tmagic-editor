@@ -23,6 +23,7 @@ import type { MApp, MContainer, MNode, MPage } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 
 import editorService from '@editor/services/editor';
+import storageService from '@editor/services/storage';
 import { COPY_STORAGE_KEY } from '@editor/utils';
 
 // mock window.localStage
@@ -352,7 +353,7 @@ describe('copy', () => {
   test('正常', async () => {
     const node = editorService.getNodeById(NodeId.NODE_ID2);
     await editorService.copy(node!);
-    const str = globalThis.localStorage.getItem(COPY_STORAGE_KEY);
+    const str = await storageService.getItem(COPY_STORAGE_KEY);
     expect(str).toBe(JSON.stringify([node]));
   });
 });

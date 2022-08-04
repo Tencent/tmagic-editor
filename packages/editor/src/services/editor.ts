@@ -26,6 +26,7 @@ import StageCore from '@tmagic/stage';
 import { getNodePath, isNumber, isPage, isPop } from '@tmagic/utils';
 
 import historyService, { StepValue } from '@editor/services/history';
+import storageService from '@editor/services/storage';
 import type { AddMNode, EditorNodeInfo, PastePosition, StoreState } from '@editor/type';
 import { LayerOffset, Layout } from '@editor/type';
 import {
@@ -428,7 +429,7 @@ class Editor extends BaseService {
    * @returns 组件节点配置
    */
   public async copy(config: MNode | MNode[]): Promise<void> {
-    globalThis.localStorage.setItem(COPY_STORAGE_KEY, serialize(Array.isArray(config) ? config : [config]));
+    await storageService.setItem(COPY_STORAGE_KEY, serialize(Array.isArray(config) ? config : [config]));
   }
 
   /**
@@ -437,7 +438,7 @@ class Editor extends BaseService {
    * @returns 添加后的组件节点配置
    */
   public async paste(position: PastePosition = {}): Promise<MNode[] | void> {
-    const configStr = globalThis.localStorage.getItem(COPY_STORAGE_KEY);
+    const configStr = await storageService.getItem(COPY_STORAGE_KEY);
     // eslint-disable-next-line prefer-const
     let config: any = {};
     if (!configStr) {
