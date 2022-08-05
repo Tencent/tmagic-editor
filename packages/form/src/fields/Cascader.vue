@@ -24,11 +24,9 @@ import {
   getCurrentInstance,
   inject,
   PropType,
-  Ref,
   ref,
   watchEffect,
 } from 'vue';
-import { ElCascader, ElDialog } from 'element-plus';
 
 import { CascaderConfig, FormState } from '../schema';
 import { getConfig } from '../utils/config';
@@ -56,11 +54,11 @@ export default defineComponent({
 
     const requestFunc = getConfig('request') as Function;
 
-    const cascader: Ref<null | typeof ElCascader> = ref(null);
-    const dialog: Ref<null | typeof ElDialog> = ref(null);
+    const cascader = ref<any>();
+    const dialog = ref<any>();
 
     const options = Array.isArray(props.config.options) ? ref(props.config.options) : ref([]);
-    const remoteData: Ref<any> = ref(null);
+    const remoteData = ref<any>(null);
 
     const setRemoteOptions = async function () {
       const { config } = props;

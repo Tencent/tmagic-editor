@@ -31,7 +31,7 @@ export const sleep = (ms: number): Promise<void> =>
     }, ms);
   });
 
-export const datetimeFormatter = (v: string | Date, defaultValue = '-', f = 'YYYY-MM-DD HH:mm:ss') => {
+export const datetimeFormatter = (v: string | Date, defaultValue = '-', f = 'YYYY-MM-DD HH:mm:ss'): any => {
   let format = f;
   if (format === 'timestamp') {
     format = 'x';

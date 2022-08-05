@@ -4,6 +4,7 @@ entry-dist
 coverage
 node_modules
 dest
+types
 
 comp-entry.ts
 config-entry.ts

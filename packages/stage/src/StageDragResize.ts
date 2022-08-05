@@ -484,7 +484,7 @@ export default class StageDragResize extends EventEmitter {
   }
 
   private setGhostElChildrenId(el: Element) {
-    for (const child of el.children) {
+    for (const child of Array.from(el.children)) {
       if (child.id) {
         child.id = `${GHOST_EL_ID_PREFIX}${child.id}`;
       }

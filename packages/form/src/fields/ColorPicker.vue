@@ -1,36 +1,29 @@
 <template>
-  <div v-if="model">
-    <el-color-picker
-      v-model="model[name]"
-      :size="size"
-      :disabled="disabled"
-      :showAlpha="true"
-      @change="changeHandler"
-    ></el-color-picker>
-  </div>
+  <el-color-picker
+    v-model="model[name]"
+    :size="size"
+    :disabled="disabled"
+    :showAlpha="true"
+    @change="changeHandler"
+  ></el-color-picker>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from 'vue';
-
-import { ColorPickConfig } from '../schema';
-import fieldProps from '../utils/fieldProps';
-import { useAddField } from '../utils/useAddField';
-export default defineComponent({
-  name: 'm-fields-color-picker',
-});
-</script>
-
 <script lang="ts" setup>
-const emit = defineEmits(['change']);
+import { ColorPickConfig } from '../schema';
+import { useAddField } from '../utils/useAddField';
 
-const props = defineProps({
-  ...fieldProps,
-  config: {
-    type: Object as PropType<ColorPickConfig>,
-    required: true,
-  },
-});
+const props = defineProps<{
+  config: ColorPickConfig;
+  model: any;
+  initValues?: any;
+  values?: any;
+  name: string;
+  prop: string;
+  disabled?: boolean;
+  size: 'mini' | 'small' | 'medium';
+}>();
+
+const emit = defineEmits(['change']);
 
 useAddField(props.prop);
 

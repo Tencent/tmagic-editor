@@ -3,7 +3,4 @@
   "compilerOptions": {
     "baseUrl": "../..",
   },
-  "exclude": [
-    "**/dist/**/*"
-  ],
 }

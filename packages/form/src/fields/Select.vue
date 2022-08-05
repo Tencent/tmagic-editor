@@ -27,7 +27,6 @@
 
 <script lang="ts">
 import { defineComponent, inject, onBeforeMount, onMounted, PropType, Ref, ref, watch } from 'vue';
-import { ElSelect } from 'element-plus';
 
 import { FormState, SelectConfig, SelectGroupOption, SelectOption } from '../schema';
 import { getConfig } from '../utils/config';
@@ -56,7 +55,7 @@ export default defineComponent({
     if (!props.model) throw new Error('不能没有model');
     useAddField(props.prop);
 
-    const select = ref<typeof ElSelect>();
+    const select = ref<any>();
     const mForm = inject<FormState | undefined>('mForm');
     const options = ref<SelectOption[] | SelectGroupOption[]>([]);
     const localOptions = ref<SelectOption[] | SelectGroupOption[]>([]);
