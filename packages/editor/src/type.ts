@@ -135,6 +135,14 @@ export interface AddMNode {
 export interface PastePosition {
   left?: number;
   top?: number;
+  /**
+   * 粘贴位置X方向偏移量
+   */
+  offsetX?: number;
+  /**
+   * 粘贴位置Y方向偏移量
+   */
+  offsetY?: number;
 }
 
 /**
