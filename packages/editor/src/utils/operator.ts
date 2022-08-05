@@ -25,7 +25,10 @@ export const beforePaste = async (position: PastePosition, config: MNode[]) => {
   // 坐标校准后的粘贴数据
   const pasteConfigs: MNode[] = await Promise.all(
     config.map(async (configItem: MNode): Promise<MNode> => {
-      let pastePosition = position;
+      // 解构 position 对象，从 position 删除 offsetX、offsetY字段
+      const { offsetX = 0, offsetY = 0, ...positionClone } = position;
+      let pastePosition = positionClone;
+
       if (!isEmpty(pastePosition) && curNode.items) {
         // 如果没有传入粘贴坐标则可能为键盘操作，不再转换
         // 如果粘贴时选中了容器，则将元素粘贴到容器内，坐标需要转换为相对于容器的坐标
@@ -34,14 +37,24 @@ export const beforePaste = async (position: PastePosition, config: MNode[]) => {
 
       // 将所有待粘贴元素坐标相对于多选第一个元素坐标重新计算，以保证多选粘贴后元素间距不变
       if (pastePosition.left && configItem.style?.left) {
-        pastePosition.left = configItem.style.left - referenceLeft + pastePosition.left;
+        pastePosition.left = configItem.style.left - referenceLeft + pastePosition.left + offsetX;
       }
       if (pastePosition.top && configItem.style?.top) {
-        pastePosition.top = configItem.style?.top - referenceTop + pastePosition.top;
+        pastePosition.top = configItem.style?.top - referenceTop + pastePosition.top + offsetY;
       }
 
       const pasteConfig = await propsService.setNewItemId(configItem, editorService.get('root'));
+
       if (pasteConfig.style) {
+        const { left, top } = pasteConfig.style;
+        // 判断能转换为数字时，做粘贴偏移量计算
+        if (typeof left === 'number' || (!!left && !isNaN(Number(left)))) {
+          pasteConfig.style.left = Number(left) + offsetX;
+        }
+        if (typeof top === 'number' || (!!top && !isNaN(Number(top)))) {
+          pasteConfig.style.top = Number(top) + offsetY;
+        }
+
         pasteConfig.style = {
           ...pasteConfig.style,
           ...pastePosition,
