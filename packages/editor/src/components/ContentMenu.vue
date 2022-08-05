@@ -25,7 +25,7 @@
 <script lang="ts" setup>
 import { nextTick, onMounted, onUnmounted, ref } from 'vue';
 
-import { MenuButton, MenuItem } from '@editor/type';
+import { MenuButton, MenuItem } from '../type';
 
 import ToolButton from './ToolButton.vue';
 

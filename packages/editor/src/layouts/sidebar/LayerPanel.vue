@@ -64,9 +64,9 @@ import type { MNode, MPage } from '@tmagic/schema';
 import { MContainer, NodeType } from '@tmagic/schema';
 import StageCore from '@tmagic/stage';
 
-import type { EditorService } from '@editor/services/editor';
-import type { Services } from '@editor/type';
-import { Layout } from '@editor/type';
+import type { EditorService } from '../../services/editor';
+import type { Services } from '../../type';
+import { Layout } from '../../type';
 
 import LayerMenu from './LayerMenu.vue';
 

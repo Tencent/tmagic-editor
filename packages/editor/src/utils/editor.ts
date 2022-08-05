@@ -21,7 +21,7 @@ import { NodeType } from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
 import { getNodePath, isNumber, isPage, isPop } from '@tmagic/utils';
 
-import { Layout } from '@editor/type';
+import { Layout } from '../type';
 
 export const COPY_STORAGE_KEY = '$MagicEditorCopyData';
 

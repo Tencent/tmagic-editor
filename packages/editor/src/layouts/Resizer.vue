@@ -8,7 +8,7 @@
 import { defineComponent, inject, onMounted, onUnmounted, ref, toRaw } from 'vue';
 import Gesto from 'gesto';
 
-import { Services } from '@editor/type';
+import { Services } from '../type';
 
 export default defineComponent({
   name: 'm-editor-resize',

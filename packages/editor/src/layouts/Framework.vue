@@ -43,7 +43,7 @@ import { computed, defineComponent, inject } from 'vue';
 
 import type { MApp } from '@tmagic/schema';
 
-import { GetColumnWidth, Services } from '@editor/type';
+import { GetColumnWidth, Services } from '../type';
 
 import AddPageBox from './AddPageBox.vue';
 import Resizer from './Resizer.vue';

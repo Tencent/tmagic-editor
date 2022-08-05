@@ -21,7 +21,7 @@
 <script lang="ts">
 import { defineComponent, PropType, ref, watch } from 'vue';
 
-import { SideBarData } from '@editor/type';
+import { SideBarData } from '../../type';
 
 import TabPane from './TabPane.vue';
 

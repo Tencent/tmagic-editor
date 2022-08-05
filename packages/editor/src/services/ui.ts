@@ -20,8 +20,8 @@ import { reactive, toRaw } from 'vue';
 
 import type StageCore from '@tmagic/stage';
 
-import editorService from '@editor/services/editor';
-import type { GetColumnWidth, SetColumnWidth, StageRect, UiState } from '@editor/type';
+import editorService from '../services/editor';
+import type { GetColumnWidth, SetColumnWidth, StageRect, UiState } from '../type';
 
 import BaseService from './BaseService';
 

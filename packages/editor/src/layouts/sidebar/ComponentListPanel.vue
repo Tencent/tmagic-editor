@@ -43,8 +43,8 @@ import serialize from 'serialize-javascript';
 import type StageCore from '@tmagic/stage';
 import { removeClassNameByClassName } from '@tmagic/utils';
 
-import MIcon from '@editor/components/Icon.vue';
-import type { ComponentGroup, ComponentItem, Services, StageOptions } from '@editor/type';
+import MIcon from '../../components/Icon.vue';
+import type { ComponentGroup, ComponentItem, Services, StageOptions } from '../../type';
 
 export default defineComponent({
   name: 'ui-component-panel',

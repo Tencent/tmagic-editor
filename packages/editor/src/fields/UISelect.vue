@@ -18,7 +18,7 @@ import { Close, Delete } from '@element-plus/icons-vue';
 
 import { FormState } from '@tmagic/form';
 
-import { Services } from '@editor/type';
+import { Services } from '../type';
 
 const props = defineProps<{
   labelWidth: string;

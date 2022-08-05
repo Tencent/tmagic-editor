@@ -5,9 +5,7 @@
     "declaration": true,
     "declarationDir": "types",
     "forceConsistentCasingInFileNames": true,
-    "paths": {
-      "@editor/*": ["src/*"],
-    },
+    "paths": {},
   },
   "include": [
 		"src"

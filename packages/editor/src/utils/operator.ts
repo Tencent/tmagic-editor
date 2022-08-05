@@ -5,11 +5,11 @@ import { Id, MApp, MContainer, MNode, NodeType } from '@tmagic/schema';
 import StageCore from '@tmagic/stage';
 import { isPage } from '@tmagic/utils';
 
-import editorService from '@editor/services/editor';
-import historyService from '@editor/services/history';
-import propsService from '@editor/services/props';
-import { AddMNode, Layout, PastePosition } from '@editor/type';
-import { fixNodeLeft, generatePageNameByApp, getInitPositionStyle, getNodeIndex } from '@editor/utils/editor';
+import editorService from '../services/editor';
+import historyService from '../services/history';
+import propsService from '../services/props';
+import { AddMNode, Layout, PastePosition } from '../type';
+import { fixNodeLeft, generatePageNameByApp, getInitPositionStyle, getNodeIndex } from '../utils/editor';
 
 /**
  * 粘贴前置操作：返回分配了新id以及校准了坐标的配置

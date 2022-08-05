@@ -24,8 +24,8 @@ import type { Id, MComponent, MNode, MPage } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 import { isPop, toLine } from '@tmagic/utils';
 
-import type { PropsState } from '@editor/type';
-import { DEFAULT_CONFIG, fillConfig } from '@editor/utils/props';
+import type { PropsState } from '../type';
+import { DEFAULT_CONFIG, fillConfig } from '../utils/props';
 
 import BaseService from './BaseService';
 
