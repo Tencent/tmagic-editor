@@ -37,10 +37,10 @@ export const beforePaste = async (position: PastePosition, config: MNode[]) => {
 
       // 将所有待粘贴元素坐标相对于多选第一个元素坐标重新计算，以保证多选粘贴后元素间距不变
       if (pastePosition.left && configItem.style?.left) {
-        pastePosition.left = configItem.style.left - referenceLeft + pastePosition.left + offsetX;
+        pastePosition.left = configItem.style.left - referenceLeft + pastePosition.left;
       }
       if (pastePosition.top && configItem.style?.top) {
-        pastePosition.top = configItem.style?.top - referenceTop + pastePosition.top + offsetY;
+        pastePosition.top = configItem.style?.top - referenceTop + pastePosition.top;
       }
 
       const pasteConfig = await propsService.setNewItemId(configItem, editorService.get('root'));
