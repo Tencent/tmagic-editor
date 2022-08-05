@@ -37,7 +37,6 @@ export default defineConfig({
 
   resolve: {
     alias: [
-      { find: /@editor/, replacement: path.join(__dirname, '../packages/editor/src') },
       {
         find: /^@tmagic\/editor\/src\/theme\/index.scss/,
         replacement: path.join(__dirname, '../packages/editor/src/theme/index.scss'),

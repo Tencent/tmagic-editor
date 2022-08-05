@@ -9,8 +9,8 @@
 <script lang="ts">
 import { computed, defineComponent, inject, PropType } from 'vue';
 
-import ToolButton from '@editor/components/ToolButton.vue';
-import { GetColumnWidth, MenuBarData, Services } from '@editor/type';
+import ToolButton from '../components/ToolButton.vue';
+import { GetColumnWidth, MenuBarData, Services } from '../type';
 
 export default defineComponent({
   name: 'nav-menu',

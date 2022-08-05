@@ -8,8 +8,8 @@ import { Delete, DocumentCopy, Files, Plus } from '@element-plus/icons-vue';
 
 import { NodeType } from '@tmagic/schema';
 
-import ContentMenu from '@editor/components/ContentMenu.vue';
-import type { ComponentGroup, MenuButton, MenuItem, Services } from '@editor/type';
+import ContentMenu from '../../components/ContentMenu.vue';
+import type { ComponentGroup, MenuButton, MenuItem, Services } from '../../type';
 
 export default defineComponent({
   components: { ContentMenu },

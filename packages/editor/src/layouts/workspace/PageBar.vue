@@ -77,9 +77,9 @@ import { ArrowLeftBold, ArrowRightBold, CaretBottom, Delete, DocumentCopy, Plus 
 import type { MApp, MPage } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 
-import ToolButton from '@editor/components/ToolButton.vue';
-import type { Services } from '@editor/type';
-import { generatePageNameByApp } from '@editor/utils/editor';
+import ToolButton from '../../components/ToolButton.vue';
+import type { Services } from '../../type';
+import { generatePageNameByApp } from '../../utils/editor';
 
 const useScroll = (root: ComputedRef<MApp | undefined>) => {
   const pageBar = ref<HTMLDivElement>();

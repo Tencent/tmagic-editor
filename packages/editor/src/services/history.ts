@@ -20,7 +20,7 @@ import { reactive } from 'vue';
 
 import type { Id, MPage } from '@tmagic/schema';
 
-import { UndoRedo } from '@editor/utils/undo-redo';
+import { UndoRedo } from '../utils/undo-redo';
 
 import BaseService from './BaseService';
 

@@ -56,8 +56,8 @@ import { ArrowDown, Back, Delete, Grid, Right, ScaleToOriginal, ZoomIn, ZoomOut 
 
 import { NodeType } from '@tmagic/schema';
 
-import MIcon from '@editor/components/Icon.vue';
-import type { MenuButton, MenuComponent, MenuItem, Services } from '@editor/type';
+import MIcon from '../components/Icon.vue';
+import type { MenuButton, MenuComponent, MenuItem, Services } from '../type';
 
 const props = defineProps({
   data: {

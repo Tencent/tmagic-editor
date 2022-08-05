@@ -9,7 +9,7 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, onUnmounted, ref, watch } from 'vue';
 
-import { ScrollViewer } from '@editor/utils/scroll-viewer';
+import { ScrollViewer } from '../utils/scroll-viewer';
 
 export default defineComponent({
   name: 'm-editor-scroll-viewer',

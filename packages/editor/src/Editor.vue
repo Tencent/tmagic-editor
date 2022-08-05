@@ -51,19 +51,19 @@ import type { MApp, MNode } from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
 import { CONTAINER_HIGHLIGHT_CLASS, MoveableOptions } from '@tmagic/stage';
 
-import Framework from '@editor/layouts/Framework.vue';
-import NavMenu from '@editor/layouts/NavMenu.vue';
-import PropsPanel from '@editor/layouts/PropsPanel.vue';
-import Sidebar from '@editor/layouts/sidebar/Sidebar.vue';
-import Workspace from '@editor/layouts/workspace/Workspace.vue';
-import componentListService from '@editor/services/componentList';
-import editorService from '@editor/services/editor';
-import eventsService from '@editor/services/events';
-import historyService from '@editor/services/history';
-import propsService from '@editor/services/props';
-import storageService from '@editor/services/storage';
-import uiService from '@editor/services/ui';
-import type { ComponentGroup, MenuBarData, MenuItem, Services, SideBarData, StageRect } from '@editor/type';
+import Framework from './layouts/Framework.vue';
+import NavMenu from './layouts/NavMenu.vue';
+import PropsPanel from './layouts/PropsPanel.vue';
+import Sidebar from './layouts/sidebar/Sidebar.vue';
+import Workspace from './layouts/workspace/Workspace.vue';
+import componentListService from './services/componentList';
+import editorService from './services/editor';
+import eventsService from './services/events';
+import historyService from './services/history';
+import propsService from './services/props';
+import storageService from './services/storage';
+import uiService from './services/ui';
+import type { ComponentGroup, MenuBarData, MenuItem, Services, SideBarData, StageRect } from './type';
 
 export default defineComponent({
   name: 'm-editor',

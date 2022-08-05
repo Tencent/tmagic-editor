@@ -22,7 +22,7 @@ import { cloneDeep } from 'lodash-es';
 import { DEFAULT_EVENTS, DEFAULT_METHODS, EventOption } from '@tmagic/core';
 import { toLine } from '@tmagic/utils';
 
-import type { ComponentGroup } from '@editor/type';
+import type { ComponentGroup } from '../type';
 
 import BaseService from './BaseService';
 

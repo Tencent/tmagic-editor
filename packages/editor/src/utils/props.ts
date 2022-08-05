@@ -18,8 +18,8 @@
 
 import { FormConfig, FormState } from '@tmagic/form';
 
-import editorService from '@editor/services/editor';
-import eventsService from '@editor/services/events';
+import editorService from '../services/editor';
+import eventsService from '../services/events';
 
 /**
  * 统一为组件属性表单加上事件、高级、样式配置

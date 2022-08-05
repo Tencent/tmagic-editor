@@ -10,10 +10,10 @@ import { MNode, NodeType } from '@tmagic/schema';
 import StageCore from '@tmagic/stage';
 import { isPage } from '@tmagic/utils';
 
-import ContentMenu from '@editor/components/ContentMenu.vue';
-import storageService from '@editor/services/storage';
-import { LayerOffset, Layout, MenuItem, Services } from '@editor/type';
-import { COPY_STORAGE_KEY } from '@editor/utils/editor';
+import ContentMenu from '../../components/ContentMenu.vue';
+import storageService from '../../services/storage';
+import { LayerOffset, Layout, MenuItem, Services } from '../../type';
+import { COPY_STORAGE_KEY } from '../../utils/editor';
 
 const props = withDefaults(defineProps<{ isMultiSelect?: boolean }>(), { isMultiSelect: false });
 

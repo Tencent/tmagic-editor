@@ -18,7 +18,7 @@ import KeyController from 'keycon';
 import type { MNode, MPage } from '@tmagic/schema';
 import { isPage } from '@tmagic/utils';
 
-import type { Services } from '@editor/type';
+import type { Services } from '../../type';
 
 import PageBar from './PageBar.vue';
 import MagicStage from './Stage.vue';

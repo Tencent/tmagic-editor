@@ -23,17 +23,14 @@ import vue from '@vitejs/plugin-vue';
 
 import pkg from './package.json';
 
-const alias = [{ find: /@editor/, replacement: path.join(__dirname, './src') }];
-
 export default defineConfig({
   plugins: [vue()],
 
   resolve: {
     alias:
       process.env.NODE_ENV === 'production'
-        ? alias
+        ? []
         : [
-            ...alias,
             { find: /^@tmagic\/schema/, replacement: path.join(__dirname, '../schema/src/index.ts') },
             { find: /^@tmagic\/utils/, replacement: path.join(__dirname, '../utils/src/index.ts') },
             { find: /^@tmagic\/core/, replacement: path.join(__dirname, '../core/src/index.ts') },

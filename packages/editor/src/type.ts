@@ -23,13 +23,13 @@ import type { Id, MApp, MContainer, MNode, MPage } from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
 import type { MoveableOptions } from '@tmagic/stage';
 
-import type { ComponentListService } from '@editor/services/componentList';
-import type { EditorService } from '@editor/services/editor';
-import type { EventsService } from '@editor/services/events';
-import type { HistoryService } from '@editor/services/history';
-import type { PropsService } from '@editor/services/props';
-import type { StorageService } from '@editor/services/storage';
-import type { UiService } from '@editor/services/ui';
+import type { ComponentListService } from './services/componentList';
+import type { EditorService } from './services/editor';
+import type { EventsService } from './services/events';
+import type { HistoryService } from './services/history';
+import type { PropsService } from './services/props';
+import type { StorageService } from './services/storage';
+import type { UiService } from './services/ui';
 
 export type BeforeAdd = (config: MNode, parent: MContainer) => Promise<MNode> | MNode;
 export type GetConfig = (config: FormConfig) => Promise<FormConfig> | FormConfig;

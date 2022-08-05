@@ -34,7 +34,7 @@ import StageCore, {
   UpdateEventData,
 } from '@tmagic/stage';
 
-import ScrollViewer from '@editor/components/ScrollViewer.vue';
+import ScrollViewer from '../../components/ScrollViewer.vue';
 import {
   H_GUIDE_LINE_STORAGE_KEY,
   Layout,
@@ -42,8 +42,8 @@ import {
   StageOptions,
   StageRect,
   V_GUIDE_LINE_STORAGE_KEY,
-} from '@editor/type';
-import { getGuideLineFromCache } from '@editor/utils';
+} from '../../type';
+import { getGuideLineFromCache } from '../../utils';
 
 import ViewerMenu from './ViewerMenu.vue';
 

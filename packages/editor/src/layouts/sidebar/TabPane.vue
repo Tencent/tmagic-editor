@@ -29,8 +29,8 @@
 import { computed, defineComponent, PropType } from 'vue';
 import { Coin, Files } from '@element-plus/icons-vue';
 
-import MIcon from '@editor/components/Icon.vue';
-import { SideComponent, SideItem } from '@editor/type';
+import MIcon from '../../components/Icon.vue';
+import { SideComponent, SideItem } from '../../type';
 
 import ComponentListPanel from './ComponentListPanel.vue';
 import LayerPanel from './LayerPanel.vue';

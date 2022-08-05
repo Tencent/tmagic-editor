@@ -17,8 +17,8 @@ import { Plus } from '@element-plus/icons-vue';
 
 import { NodeType } from '@tmagic/schema';
 
-import type { Services } from '@editor/type';
-import { generatePageNameByApp } from '@editor/utils';
+import type { Services } from '../type';
+import { generatePageNameByApp } from '../utils';
 
 export default defineComponent({
   components: { Plus },

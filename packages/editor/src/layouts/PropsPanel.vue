@@ -20,7 +20,7 @@ import { ElMessage } from 'element-plus';
 import type { FormValue, MForm } from '@tmagic/form';
 import type { MNode } from '@tmagic/schema';
 
-import type { Services } from '@editor/type';
+import type { Services } from '../type';
 
 export default defineComponent({
   name: 'm-editor-props-panel',
