@@ -1,3 +1,31 @@
+# [1.1.0-beta.6](https://github.com/Tencent/tmagic-editor/compare/v1.1.0-beta.5...v1.1.0-beta.6) (2022-08-05)
+
+
+### Bug Fixes
+
+* **admin:** npm install 出错 ([259a5aa](https://github.com/Tencent/tmagic-editor/commit/259a5aa5305929a5436d2f573456976128c565a0)), closes [#207](https://github.com/Tencent/tmagic-editor/issues/207)
+* **docs:** vuepress暂不支持vite3.0 ([6e19989](https://github.com/Tencent/tmagic-editor/commit/6e199897ac41695f6268a3fd3819f9d1a021521c))
+* **editor:** id可能重复 ([#221](https://github.com/Tencent/tmagic-editor/issues/221)) ([a02fd2c](https://github.com/Tencent/tmagic-editor/commit/a02fd2c695ac2cd07c8025f58a31a010f2a8004b))
+* **editor:** 修复添加StorageService定义导出带来的构建错误 ([2008bc7](https://github.com/Tencent/tmagic-editor/commit/2008bc7da1e24530b208840173f062c0f6f1a61f))
+* **editor:** 添加组件粘贴操作支持偏移量 ([9ffecf6](https://github.com/Tencent/tmagic-editor/commit/9ffecf62f751397548da3181084c2a59b1111170))
+* **stage:** 单选后，粘贴多个组件，原来的单选状态没有取消 ([a4e91fa](https://github.com/Tencent/tmagic-editor/commit/a4e91fa66daf202fbe257d7a4174e7e625a241c6))
+
+
+### Features
+
+* **cli:** 支持配置temp文件夹，默认.tmagic ([624da4c](https://github.com/Tencent/tmagic-editor/commit/624da4c29a8f11b9d40a4a20c0d38c5a8a76f33d))
+* **cli:** 新增tamgic-cli,用于runtime 依赖生成 ([f18e7b2](https://github.com/Tencent/tmagic-editor/commit/f18e7b275db98d84d6eabc3291b9e7045adae44d))
+* **cli:** 生成的entry文件不再在window挂对象，通过构建自动挂载 ([32fdf05](https://github.com/Tencent/tmagic-editor/commit/32fdf05eb185a3d0ffd6bba5791763ba5f3a5681))
+* **editor:** 多选粘贴后同步选中粘贴的多个元素,并支持拖拽,粘贴删除支持多个元素同时撤销到上一步 ([8c64ea7](https://github.com/Tencent/tmagic-editor/commit/8c64ea798ab005a1e7e1ac97b4ef4c00602d6794))
+* **editor:** 多选菜单支持复制粘贴删除 ([#217](https://github.com/Tencent/tmagic-editor/issues/217)) ([b702857](https://github.com/Tencent/tmagic-editor/commit/b702857aad4efdb7635a6ce468478c04567ebce6))
+* **editor:** 完善storageService功能 ([574e03f](https://github.com/Tencent/tmagic-editor/commit/574e03f685e44d08fb43207723af79a08ee0a22f)), closes [#224](https://github.com/Tencent/tmagic-editor/issues/224)
+* **editor:** 添加storageService服务 ([#225](https://github.com/Tencent/tmagic-editor/issues/225)) ([da0cb7d](https://github.com/Tencent/tmagic-editor/commit/da0cb7d6143a0a021340caa06386d212fb3ca276))
+* **runtime,playground:** vue3使用tmagic-cli生成组件依赖入口 ([a57fef4](https://github.com/Tencent/tmagic-editor/commit/a57fef4947888d081c6cdbaa7b0c7b502f5e9e8f))
+* **runtime:** vue2/react使用tamgic-cli生成组件依赖入口 ([e8b8d35](https://github.com/Tencent/tmagic-editor/commit/e8b8d35cbd5b37a52ae2bc17ea8e6dafb019b670))
+* **stage,runtime:** 去掉runtime getSnapElements 定义 ([e5f0506](https://github.com/Tencent/tmagic-editor/commit/e5f0506a00656eaa96a91525d01b9b918780ee80))
+
+
+
 # [1.1.0-beta.5](https://github.com/Tencent/tmagic-editor/compare/v1.1.0-beta.4...v1.1.0-beta.5) (2022-07-29)
 
 
