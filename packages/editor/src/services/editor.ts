@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { reactive, toRaw } from 'vue';
+import { reactive, toRaw, UnwrapNestedRefs } from 'vue';
 import { cloneDeep, mergeWith, uniq } from 'lodash-es';
 
 import type { Id, MApp, MComponent, MContainer, MNode, MPage } from '@tmagic/schema';
@@ -42,7 +42,7 @@ import { beforeAdd, beforePaste, beforeRemove, notifyAddToStage } from '@editor/
 import BaseService from './BaseService';
 
 class Editor extends BaseService {
-  public state = reactive<StoreState>({
+  public state: UnwrapNestedRefs<StoreState> = reactive<StoreState>({
     root: null,
     page: null,
     parent: null,
