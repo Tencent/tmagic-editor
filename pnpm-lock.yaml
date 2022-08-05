@@ -75,9 +75,9 @@ importers:
   docs:
     specifiers:
       '@element-plus/icons-vue': ^2.0.6
-      '@tmagic/form': 1.1.0-beta.5
-      '@tmagic/schema': 1.1.0-beta.5
-      '@tmagic/utils': 1.1.0-beta.5
+      '@tmagic/form': 1.1.0-beta.6
+      '@tmagic/schema': 1.1.0-beta.6
+      '@tmagic/utils': 1.1.0-beta.6
       '@vuepress/bundler-vite': ^2.0.0-beta.49
       '@vuepress/cli': ^2.0.0-beta.49
       '@vuepress/client': ^2.0.0-beta.49
@@ -134,7 +134,7 @@ importers:
 
   packages/core:
     specifiers:
-      '@tmagic/schema': 1.1.0-beta.5
+      '@tmagic/schema': 1.1.0-beta.6
       '@types/events': ^3.0.0
       '@types/node': ^15.12.4
       events: ^3.3.0
@@ -155,11 +155,11 @@ importers:
     specifiers:
       '@babel/core': ^7.18.0
       '@element-plus/icons-vue': ^2.0.6
-      '@tmagic/core': 1.1.0-beta.5
-      '@tmagic/form': 1.1.0-beta.5
-      '@tmagic/schema': 1.1.0-beta.5
-      '@tmagic/stage': 1.1.0-beta.5
-      '@tmagic/utils': 1.1.0-beta.5
+      '@tmagic/core': 1.1.0-beta.6
+      '@tmagic/form': 1.1.0-beta.6
+      '@tmagic/schema': 1.1.0-beta.6
+      '@tmagic/stage': 1.1.0-beta.6
+      '@tmagic/utils': 1.1.0-beta.6
       '@types/events': ^3.0.0
       '@types/lodash-es': ^4.17.4
       '@types/node': ^15.12.4
@@ -218,7 +218,7 @@ importers:
     specifiers:
       '@babel/core': ^7.18.0
       '@element-plus/icons-vue': ^2.0.6
-      '@tmagic/utils': 1.1.0-beta.5
+      '@tmagic/utils': 1.1.0-beta.6
       '@types/lodash-es': ^4.17.4
       '@types/node': ^15.12.4
       '@types/sortablejs': ^1.10.7
@@ -272,9 +272,9 @@ importers:
   packages/stage:
     specifiers:
       '@scena/guides': ^0.17.0
-      '@tmagic/core': 1.1.0-beta.5
-      '@tmagic/schema': 1.1.0-beta.5
-      '@tmagic/utils': 1.1.0-beta.5
+      '@tmagic/core': 1.1.0-beta.6
+      '@tmagic/schema': 1.1.0-beta.6
+      '@tmagic/utils': 1.1.0-beta.6
       '@types/events': ^3.0.0
       '@types/lodash-es': ^4.17.4
       '@types/node': ^15.12.4
@@ -308,8 +308,8 @@ importers:
 
   packages/table:
     specifiers:
-      '@tmagic/form': 1.1.0-beta.5
-      '@tmagic/utils': 1.1.0-beta.5
+      '@tmagic/form': 1.1.0-beta.6
+      '@tmagic/utils': 1.1.0-beta.6
       '@types/color': ^3.0.1
       '@types/lodash-es': ^4.17.4
       '@types/node': ^15.12.4
@@ -346,9 +346,9 @@ importers:
   packages/ui:
     specifiers:
       '@testing-library/vue': ^6.4.2
-      '@tmagic/core': 1.1.0-beta.5
-      '@tmagic/schema': 1.1.0-beta.5
-      '@tmagic/utils': 1.1.0-beta.5
+      '@tmagic/core': 1.1.0-beta.6
+      '@tmagic/schema': 1.1.0-beta.6
+      '@tmagic/utils': 1.1.0-beta.6
       '@types/qrcode': ^1.4.2
       '@vue/compiler-sfc': ^3.2.37
       '@vue/test-utils': ^2.0.0
@@ -372,8 +372,8 @@ importers:
 
   packages/ui-react:
     specifiers:
-      '@tmagic/core': 1.1.0-beta.5
-      '@tmagic/schema': 1.1.0-beta.5
+      '@tmagic/core': 1.1.0-beta.6
+      '@tmagic/schema': 1.1.0-beta.6
       '@types/react': ^17.0.37
       '@types/react-dom': ^17.0.11
       qrcode: ^1.5.0
@@ -393,9 +393,9 @@ importers:
 
   packages/ui-vue2:
     specifiers:
-      '@tmagic/core': 1.1.0-beta.5
-      '@tmagic/schema': 1.1.0-beta.5
-      '@tmagic/utils': 1.1.0-beta.5
+      '@tmagic/core': 1.1.0-beta.6
+      '@tmagic/schema': 1.1.0-beta.6
+      '@tmagic/utils': 1.1.0-beta.6
       qrcode: ^1.5.0
       vite: ^3.0.4
       vue: ^2.7.4
@@ -412,7 +412,7 @@ importers:
 
   packages/utils:
     specifiers:
-      '@tmagic/schema': 1.1.0-beta.5
+      '@tmagic/schema': 1.1.0-beta.6
       '@types/node': ^15.12.4
       moment: ^2.29.2
       rimraf: ^3.0.2
@@ -430,11 +430,11 @@ importers:
   playground:
     specifiers:
       '@element-plus/icons-vue': ^2.0.6
-      '@tmagic/editor': 1.1.0-beta.5
-      '@tmagic/form': 1.1.0-beta.5
-      '@tmagic/schema': 1.1.0-beta.5
-      '@tmagic/stage': 1.1.0-beta.5
-      '@tmagic/utils': 1.1.0-beta.5
+      '@tmagic/editor': 1.1.0-beta.6
+      '@tmagic/form': 1.1.0-beta.6
+      '@tmagic/schema': 1.1.0-beta.6
+      '@tmagic/stage': 1.1.0-beta.6
+      '@tmagic/utils': 1.1.0-beta.6
       '@types/node': ^15.12.4
       '@types/serialize-javascript': ^5.0.1
       '@vitejs/plugin-legacy': ^2.0.0
@@ -478,12 +478,12 @@ importers:
 
   runtime/react:
     specifiers:
-      '@tmagic/cli': workspace:*
-      '@tmagic/core': 1.1.0-beta.5
-      '@tmagic/schema': 1.1.0-beta.5
-      '@tmagic/stage': 1.1.0-beta.5
-      '@tmagic/ui-react': 1.1.0-beta.5
-      '@tmagic/utils': 1.1.0-beta.5
+      '@tmagic/cli': 1.1.0-beta.6
+      '@tmagic/core': 1.1.0-beta.6
+      '@tmagic/schema': 1.1.0-beta.6
+      '@tmagic/stage': 1.1.0-beta.6
+      '@tmagic/ui-react': 1.1.0-beta.6
+      '@tmagic/utils': 1.1.0-beta.6
       '@types/react': ^17.0.37
       '@types/react-dom': ^17.0.11
       '@vitejs/plugin-legacy': ^2.0.0
@@ -517,12 +517,12 @@ importers:
 
   runtime/vue2:
     specifiers:
-      '@tmagic/cli': workspace:*
-      '@tmagic/core': 1.1.0-beta.5
-      '@tmagic/schema': 1.1.0-beta.5
-      '@tmagic/stage': 1.1.0-beta.5
-      '@tmagic/ui-vue2': 1.1.0-beta.5
-      '@tmagic/utils': 1.1.0-beta.5
+      '@tmagic/cli': 1.1.0-beta.6
+      '@tmagic/core': 1.1.0-beta.6
+      '@tmagic/schema': 1.1.0-beta.6
+      '@tmagic/stage': 1.1.0-beta.6
+      '@tmagic/ui-vue2': 1.1.0-beta.6
+      '@tmagic/utils': 1.1.0-beta.6
       '@types/events': ^3.0.0
       '@vitejs/plugin-legacy': ^2.0.0
       '@vitejs/plugin-vue2': ^1.1.2
@@ -558,12 +558,12 @@ importers:
 
   runtime/vue3:
     specifiers:
-      '@tmagic/cli': workspace:*
-      '@tmagic/core': 1.1.0-beta.5
-      '@tmagic/schema': 1.1.0-beta.5
-      '@tmagic/stage': 1.1.0-beta.5
-      '@tmagic/ui': 1.1.0-beta.5
-      '@tmagic/utils': 1.1.0-beta.5
+      '@tmagic/cli': 1.1.0-beta.6
+      '@tmagic/core': 1.1.0-beta.6
+      '@tmagic/schema': 1.1.0-beta.6
+      '@tmagic/stage': 1.1.0-beta.6
+      '@tmagic/ui': 1.1.0-beta.6
+      '@tmagic/utils': 1.1.0-beta.6
       '@types/node': ^15.12.4
       '@vitejs/plugin-legacy': ^2.0.0
       '@vitejs/plugin-vue': ^3.0.1
