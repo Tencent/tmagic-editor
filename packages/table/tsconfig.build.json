@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "declaration": true,
+    "declarationDir": "types",
+    "forceConsistentCasingInFileNames": true,
+    "paths": {},
+  },
+  "include": [
+		"src"
+	],
+}

@@ -6,7 +6,7 @@
   ],
   "main": "dist/tmagic-core.umd.js",
   "module": "dist/tmagic-core.mjs",
-  "types": "dist/types/src/index.d.ts",
+  "types": "types/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/tmagic-core.mjs",
@@ -20,7 +20,9 @@
   },
   "license": "Apache-2.0",
   "scripts": {
-    "build": "vite build"
+    "build": "npm run build:type && vite build",
+    "build:type": "npm run clear:type && tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
+    "clear:type": "rimraf ./types"
   },
   "engines": {
     "node": ">=14"
@@ -39,8 +41,8 @@
   "devDependencies": {
     "@types/events": "^3.0.0",
     "@types/node": "^15.12.4",
+    "rimraf": "^3.0.2",
     "typescript": "^4.7.4",
-    "vite": "^3.0.4",
-    "vite-plugin-dts": "^0.9.6"
+    "vite": "^3.0.4"
   }
 }

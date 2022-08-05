@@ -3,10 +3,19 @@
     <div id="m-editor-page-bar-add-icon" class="m-editor-page-bar-item m-editor-page-bar-item-icon" @click="addPage">
       <el-icon><plus></plus></el-icon>
     </div>
-    <div v-if="canScroll" class="m-editor-page-bar-item m-editor-page-bar-item-icon" @click="scroll('left')">
+    <div
+      v-if="scrollState.canScroll"
+      class="m-editor-page-bar-item m-editor-page-bar-item-icon"
+      @click="scrollState.scroll('left')"
+    >
       <el-icon><arrow-left-bold></arrow-left-bold></el-icon>
     </div>
-    <div v-if="root" class="m-editor-page-bar-items" ref="itemsContainer" :style="`width: ${itemsContainerWidth}px`">
+    <div
+      v-if="root"
+      class="m-editor-page-bar-items"
+      ref="itemsContainer"
+      :style="`width: ${scrollState.itemsContainerWidth}px`"
+    >
       <div
         v-for="item in root.items"
         :key="item.key"
@@ -51,25 +60,18 @@
         </el-popover>
       </div>
     </div>
-    <div v-if="canScroll" class="m-editor-page-bar-item m-editor-page-bar-item-icon" @click="scroll('right')">
+    <div
+      v-if="scrollState.canScroll"
+      class="m-editor-page-bar-item m-editor-page-bar-item-icon"
+      @click="scrollState.scroll('right')"
+    >
       <el-icon><arrow-right-bold></arrow-right-bold></el-icon>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import {
-  computed,
-  ComputedRef,
-  defineComponent,
-  inject,
-  markRaw,
-  onMounted,
-  onUnmounted,
-  ref,
-  toRaw,
-  watch,
-} from 'vue';
+<script lang="ts" setup>
+import { computed, ComputedRef, inject, onMounted, onUnmounted, ref, toRaw, watch } from 'vue';
 import { ArrowLeftBold, ArrowRightBold, CaretBottom, Delete, DocumentCopy, Plus } from '@element-plus/icons-vue';
 
 import type { MApp, MPage } from '@tmagic/schema';
@@ -163,49 +165,36 @@ const useScroll = (root: ComputedRef<MApp | undefined>) => {
   };
 };
 
-export default defineComponent({
-  components: { ArrowLeftBold, ArrowRightBold, CaretBottom, Plus, ToolButton },
+const services = inject<Services>('services');
+const editorService = services?.editorService;
 
-  setup() {
-    const services = inject<Services>('services');
-    const editorService = services?.editorService;
+const root = computed(() => editorService?.get<MApp>('root'));
 
-    const root = computed(() => editorService?.get<MApp>('root'));
+const scrollState = useScroll(root);
+const page = computed(() => editorService?.get('page'));
 
-    return {
-      Delete: markRaw(Delete),
-      DocumentCopy: markRaw(DocumentCopy),
+const switchPage = (page: MPage) => {
+  editorService?.select(page);
+};
 
-      ...useScroll(root),
+const addPage = () => {
+  if (!editorService) return;
+  const pageConfig = {
+    type: NodeType.PAGE,
+    name: generatePageNameByApp(toRaw(editorService.get('root'))),
+  };
+  editorService.add(pageConfig);
+};
 
-      root,
-      page: computed(() => editorService?.get('page')),
+const copy = (node: MPage) => {
+  node && editorService?.copy(node);
+  editorService?.paste({
+    left: 0,
+    top: 0,
+  });
+};
 
-      switchPage(page: MPage) {
-        editorService?.select(page);
-      },
-
-      addPage() {
-        if (!editorService) return;
-        const pageConfig = {
-          type: NodeType.PAGE,
-          name: generatePageNameByApp(toRaw(editorService.get('root'))),
-        };
-        editorService.add(pageConfig);
-      },
-
-      copy(node: MPage) {
-        node && editorService?.copy(node);
-        editorService?.paste({
-          left: 0,
-          top: 0,
-        });
-      },
-
-      remove(node: MPage) {
-        editorService?.remove(node);
-      },
-    };
-  },
-});
+const remove = (node: MPage) => {
+  editorService?.remove(node);
+};
 </script>

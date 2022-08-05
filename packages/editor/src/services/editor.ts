@@ -42,7 +42,7 @@ import { beforeAdd, beforePaste, beforeRemove, notifyAddToStage } from '@editor/
 import BaseService from './BaseService';
 
 class Editor extends BaseService {
-  public state = reactive<StoreState>({
+  public state: StoreState = reactive({
     root: null,
     page: null,
     parent: null,

@@ -138,18 +138,18 @@ importers:
       '@types/events': ^3.0.0
       '@types/node': ^15.12.4
       events: ^3.3.0
+      rimraf: ^3.0.2
       typescript: ^4.7.4
       vite: ^3.0.4
-      vite-plugin-dts: ^0.9.6
     dependencies:
       '@tmagic/schema': link:../schema
       events: 3.3.0
     devDependencies:
       '@types/events': 3.0.0
       '@types/node': 15.14.9
+      rimraf: 3.0.2
       typescript: 4.7.4
       vite: 3.0.4
-      vite-plugin-dts: 0.9.10_vite@3.0.4
 
   packages/editor:
     specifiers:
@@ -175,13 +175,13 @@ importers:
       keycon: ^1.1.2
       lodash-es: ^4.17.21
       monaco-editor: ^0.32.1
+      rimraf: ^3.0.2
       sass: ^1.35.1
       serialize-javascript: ^6.0.0
       typescript: ^4.7.4
       vite: ^3.0.4
-      vite-plugin-dts: ^0.9.6
       vue: ^3.2.37
-      vue-tsc: ^0.38.2
+      vue-tsc: ^0.39.4
     dependencies:
       '@babel/core': 7.18.2
       '@element-plus/icons-vue': 2.0.6_vue@3.2.37
@@ -208,11 +208,11 @@ importers:
       '@vitejs/plugin-vue': 3.0.1_vite@3.0.4+vue@3.2.37
       '@vue/compiler-sfc': 3.2.37
       '@vue/test-utils': 2.0.0_vue@3.2.37
+      rimraf: 3.0.2
       sass: 1.52.2
       typescript: 4.7.4
       vite: 3.0.4_sass@1.52.2
-      vite-plugin-dts: 0.9.10_vite@3.0.4
-      vue-tsc: 0.38.2_typescript@4.7.4
+      vue-tsc: 0.39.4_typescript@4.7.4
 
   packages/form:
     specifiers:
@@ -228,13 +228,13 @@ importers:
       element-plus: ^2.2.6
       lodash-es: ^4.17.21
       moment: ^2.29.2
+      rimraf: ^3.0.2
       sass: ^1.35.1
       sortablejs: ^1.14.0
       typescript: ^4.7.4
       vite: ^3.0.4
-      vite-plugin-dts: ^0.9.6
       vue: ^3.2.37
-      vue-tsc: ^0.38.2
+      vue-tsc: ^0.39.4
     dependencies:
       '@element-plus/icons-vue': 2.0.6_vue@3.2.37
       '@tmagic/utils': link:../utils
@@ -251,23 +251,23 @@ importers:
       '@vitejs/plugin-vue': 3.0.1_vite@3.0.4+vue@3.2.37
       '@vue/compiler-sfc': 3.2.37
       '@vue/test-utils': 2.0.0_vue@3.2.37
+      rimraf: 3.0.2
       sass: 1.52.2
       typescript: 4.7.4
       vite: 3.0.4_sass@1.52.2
-      vite-plugin-dts: 0.9.10_vite@3.0.4
-      vue-tsc: 0.38.2_typescript@4.7.4
+      vue-tsc: 0.39.4_typescript@4.7.4
 
   packages/schema:
     specifiers:
       '@types/node': ^15.12.4
+      rimraf: ^3.0.2
       typescript: ^4.7.4
       vite: ^3.0.4
-      vite-plugin-dts: ^0.9.6
     devDependencies:
       '@types/node': 15.14.9
+      rimraf: 3.0.2
       typescript: 4.7.4
       vite: 3.0.4
-      vite-plugin-dts: 0.9.10_vite@3.0.4
 
   packages/stage:
     specifiers:
@@ -283,10 +283,10 @@ importers:
       lodash-es: ^4.17.21
       moveable: ^0.30.0
       moveable-helper: ^0.4.0
+      rimraf: ^3.0.2
       sass: ^1.35.1
       typescript: ^4.7.4
       vite: ^3.0.4
-      vite-plugin-dts: ^0.9.6
     dependencies:
       '@scena/guides': 0.17.0
       '@tmagic/core': link:../core
@@ -301,14 +301,15 @@ importers:
       '@types/events': 3.0.0
       '@types/lodash-es': 4.17.6
       '@types/node': 15.14.9
+      rimraf: 3.0.2
       sass: 1.52.2
       typescript: 4.7.4
       vite: 3.0.4_sass@1.52.2
-      vite-plugin-dts: 0.9.10_vite@3.0.4
 
   packages/table:
     specifiers:
       '@tmagic/form': 1.1.0-beta.5
+      '@tmagic/utils': 1.1.0-beta.5
       '@types/color': ^3.0.1
       '@types/lodash-es': ^4.17.4
       '@types/node': ^15.12.4
@@ -317,14 +318,15 @@ importers:
       '@vue/test-utils': ^2.0.0
       element-plus: ^2.2.6
       lodash-es: ^4.17.21
+      rimraf: ^3.0.2
       sass: ^1.35.1
       typescript: ^4.7.4
       vite: ^3.0.4
-      vite-plugin-dts: ^0.9.6
       vue: ^3.2.37
-      vue-tsc: ^0.38.2
+      vue-tsc: ^0.39.4
     dependencies:
       '@tmagic/form': link:../form
+      '@tmagic/utils': link:../utils
       element-plus: 2.2.6_vue@3.2.37
       lodash-es: 4.17.21
       vue: 3.2.37
@@ -335,11 +337,11 @@ importers:
       '@vitejs/plugin-vue': 3.0.1_vite@3.0.4+vue@3.2.37
       '@vue/compiler-sfc': 3.2.37
       '@vue/test-utils': 2.0.0_vue@3.2.37
+      rimraf: 3.0.2
       sass: 1.52.2
       typescript: 4.7.4
       vite: 3.0.4_sass@1.52.2
-      vite-plugin-dts: 0.9.10_vite@3.0.4
-      vue-tsc: 0.38.2_typescript@4.7.4
+      vue-tsc: 0.39.4_typescript@4.7.4
 
   packages/ui:
     specifiers:
@@ -413,17 +415,17 @@ importers:
       '@tmagic/schema': 1.1.0-beta.5
       '@types/node': ^15.12.4
       moment: ^2.29.2
+      rimraf: ^3.0.2
       typescript: ^4.7.4
       vite: ^3.0.4
-      vite-plugin-dts: ^0.9.6
     dependencies:
       '@tmagic/schema': link:../schema
       moment: 2.29.3
     devDependencies:
       '@types/node': 15.14.9
+      rimraf: 3.0.2
       typescript: 4.7.4
       vite: 3.0.4
-      vite-plugin-dts: 0.9.10_vite@3.0.4
 
   playground:
     specifiers:
@@ -448,7 +450,7 @@ importers:
       vite: ^3.0.4
       vue: ^3.2.37
       vue-router: ^4.0.10
-      vue-tsc: ^0.38.2
+      vue-tsc: ^0.39.4
     dependencies:
       '@element-plus/icons-vue': 2.0.6_vue@3.2.37
       '@tmagic/editor': link:../packages/editor
@@ -472,7 +474,7 @@ importers:
       sass: 1.52.2
       typescript: 4.7.4
       vite: 3.0.4_sass@1.52.2+terser@5.14.2
-      vue-tsc: 0.38.2_typescript@4.7.4
+      vue-tsc: 0.39.4_typescript@4.7.4
 
   runtime/react:
     specifiers:
@@ -577,7 +579,7 @@ importers:
       typescript: ^4.3.4
       vite: ^3.0.4
       vue: ^3.2.37
-      vue-tsc: ^0.38.2
+      vue-tsc: ^0.39.4
     dependencies:
       '@tmagic/cli': link:../../packages/cli
       '@tmagic/core': link:../../packages/core
@@ -601,7 +603,7 @@ importers:
       sass: 1.52.2
       typescript: 4.7.4
       vite: 3.0.4_sass@1.52.2+terser@5.14.2
-      vue-tsc: 0.38.2_typescript@4.7.4
+      vue-tsc: 0.39.4_typescript@4.7.4
 
 packages:
 
@@ -1441,15 +1443,6 @@ packages:
     engines: {node: '>= 10'}
     dev: true
 
-  /@ts-morph/common/0.12.3:
-    resolution: {integrity: sha512-4tUmeLyXJnJWvTFOKtcNJ1yh0a3SsTLi2MUoyj8iUNznFRN1ZquaNe7Oukqrnki2FzZkm0J9adCNLDZxUzvj+w==}
-    dependencies:
-      fast-glob: 3.2.11
-      minimatch: 3.1.2
-      mkdirp: 1.0.4
-      path-browserify: 1.0.1
-    dev: true
-
   /@tsconfig/node10/1.0.8:
     resolution: {integrity: sha512-6XFfSQmMgq0CFLY1MslA/CPUfhIL919M1rMsa5lP2P097N2Wd1sSX0tx1u4olM16fLNhtHZpRhedZJphNJqmZg==}
     dev: true
@@ -1794,34 +1787,48 @@ packages:
       vue: 2.7.4
     dev: true
 
-  /@volar/code-gen/0.38.2:
-    resolution: {integrity: sha512-H81I6d7rZB7teqL+zhK/Xz1v0/kKkUwkB0Aq6b4+BTCqcJeiZkoWxd0gFhrhWTnUoqiM83lhoTGo2vkvx5YagQ==}
+  /@volar/code-gen/0.39.4:
+    resolution: {integrity: sha512-2RoDdktnN5ovhJoL1NgxKwKhfgP2TzcKVWp8+1Lb67sZ+hvWRL5GjHGkvlPkS91cElpwuURUHnbNNDT+uEqXuA==}
     dependencies:
-      '@volar/source-map': 0.38.2
+      '@volar/source-map': 0.39.4
     dev: true
 
-  /@volar/source-map/0.38.2:
-    resolution: {integrity: sha512-DWcYbYt9SPwk0r4VmXk1F0v4X5+hCqH1JRkAWSeJymQyXCQ2OQDEbY2PF12a7y2qn4FUBD2gOba2TynAqI8ZFQ==}
+  /@volar/source-map/0.39.4:
+    resolution: {integrity: sha512-0zp7v0Ta1rZ2nKC4RcsU94Q/wJVVDWD0AJIqRGFU8rlEs2QO+RpBgotTL6wnKyJjyTzXxhcz/7AHUcwFs2oRnw==}
     dev: true
 
-  /@volar/vue-code-gen/0.38.2:
-    resolution: {integrity: sha512-whLunD6phSGWBUHZKdTxeglrpzQu26ii8CRVapFdjfyMaVhQ7ESNeIAhkTVyg2ovOPc0PiDYPQEPzfWAADIWog==}
+  /@volar/typescript-faster/0.39.4:
+    resolution: {integrity: sha512-nVwTr1MSeUOjm+piJge3WW8PE+JyYbkfpEsf54P0e4P+8PUPHbGRIgr2TSpAh3802JSqg2SHCoDionECT5aXYw==}
     dependencies:
-      '@volar/code-gen': 0.38.2
-      '@volar/source-map': 0.38.2
+      semver: 7.3.7
+    dev: true
+
+  /@volar/vue-code-gen/0.39.4:
+    resolution: {integrity: sha512-jQwweKAgtKhX7kDvsVcBRieyNtEywoxZFN+XTyPRvtY57Z2B7Ei9zQb/01n1l2lI+FPuskxaXdZKCn4txSKojQ==}
+    dependencies:
+      '@volar/code-gen': 0.39.4
+      '@volar/source-map': 0.39.4
       '@vue/compiler-core': 3.2.37
       '@vue/compiler-dom': 3.2.37
       '@vue/shared': 3.2.37
     dev: true
 
-  /@volar/vue-typescript/0.38.2:
-    resolution: {integrity: sha512-5IKvSK2m5yUmH6iu/tNScVlvJGuiHawTfSmjxaMs+/tod25WeK37LEdf+pdKtlJ30bYTQmmkAuEfG01QvvBRGQ==}
+  /@volar/vue-language-core/0.39.4:
+    resolution: {integrity: sha512-ua4HAT8VYSf3EgY4Fl/mfpOQcUWz3gokJ8qsGIGfgKq3MxORnpp+RzKOEpMo1q+Ic550i+x0fh6Ylde76zOLww==}
     dependencies:
-      '@volar/code-gen': 0.38.2
-      '@volar/source-map': 0.38.2
-      '@volar/vue-code-gen': 0.38.2
+      '@volar/code-gen': 0.39.4
+      '@volar/source-map': 0.39.4
+      '@volar/vue-code-gen': 0.39.4
       '@vue/compiler-sfc': 3.2.37
       '@vue/reactivity': 3.2.37
+    dev: true
+
+  /@volar/vue-typescript/0.39.4:
+    resolution: {integrity: sha512-ZIWg8EvTq53+P4DQVlrW5y+bo5v9VTOASBTrojBo0yK2frNbv/Gs7Ml4V+NmlsvIggtrPtDC/hIQChFiS5B3SA==}
+    dependencies:
+      '@volar/code-gen': 0.39.4
+      '@volar/typescript-faster': 0.39.4
+      '@volar/vue-language-core': 0.39.4
     dev: true
 
   /@vue/babel-helper-vue-transform-on/1.0.2:
@@ -2745,12 +2752,6 @@ packages:
   /clone/1.0.4:
     resolution: {integrity: sha512-JQHZ2QMW6l3aH/j6xCqQThY/9OH4D/9ls34cgkUBiEeocRTU04tHfKPBsUK1PqZCUQM7GiA0IIXJSuXHI64Kbg==}
     engines: {node: '>=0.8'}
-
-  /code-block-writer/11.0.0:
-    resolution: {integrity: sha512-GEqWvEWWsOvER+g9keO4ohFoD3ymwyCnqY3hoTr7GZipYFwEhMHJw+TtV0rfgRhNImM6QWZGO2XYjlJVyYT62w==}
-    dependencies:
-      tslib: 2.3.1
-    dev: true
 
   /color-convert/1.9.3:
     resolution: {integrity: sha512-QfAUtd+vFdAtFQcC8CCyYt1fYWxSqAiK2cSD6zDB8N3cpsEBAvRxp9zOGg6G/SHHJYAT88/az/IuDGALsNVbGg==}
@@ -5258,12 +5259,6 @@ packages:
     resolution: {integrity: sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q==}
     dev: true
 
-  /mkdirp/1.0.4:
-    resolution: {integrity: sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==}
-    engines: {node: '>=10'}
-    hasBin: true
-    dev: true
-
   /modify-values/1.0.1:
     resolution: {integrity: sha512-xV2bxeN6F7oYjZWTe/YPAy6MN2M+sL4u/Rlm2AHCIVGfo2p1yGmBHQ6vHehl4bRTZBdHu3TSkWdYgkwpYzAGSw==}
     engines: {node: '>=0.10.0'}
@@ -5562,10 +5557,6 @@ packages:
 
   /parse5/6.0.1:
     resolution: {integrity: sha512-Ofn/CTFzRGTTxwpNEs9PP93gXShHcTq255nzRYSKe8AkVpZY7e1fpmTfOyoIvjP5HG7Z2ZM7VS9PPhQGW2pOpw==}
-    dev: true
-
-  /path-browserify/1.0.1:
-    resolution: {integrity: sha512-b7uo2UCUOYZcnF/3ID0lulOJi/bafxa1xPe7ZPsammBSpjSWQkjNxlt635YGS2MiR9GjvuXCtz2emr3jbsz98g==}
     dev: true
 
   /path-exists/3.0.0:
@@ -6580,13 +6571,6 @@ packages:
     resolution: {integrity: sha512-+1iDGY6NmOGidq7i7xZGA4cm8DAa6fqdYcvO5Z6yBevH++Bdo9Qt/mN0TzHUgcCcKv1gmh9+W5dHqz8pMWbCbg==}
     dev: true
 
-  /ts-morph/13.0.3:
-    resolution: {integrity: sha512-pSOfUMx8Ld/WUreoSzvMFQG5i9uEiWIsBYjpU9+TTASOeUa89j5HykomeqVULm1oqWtBdleI3KEFRLrlA3zGIw==}
-    dependencies:
-      '@ts-morph/common': 0.12.3
-      code-block-writer: 11.0.0
-    dev: true
-
   /ts-node/10.8.1_7oqjshy4scgohh2k2lzivplbau:
     resolution: {integrity: sha512-Wwsnao4DQoJsN034wePSg5nZiw4YKXf56mPIAeD6wVmiv+RytNSWqc2f3fKvcUoV+Yn2+yocD71VOfQHbmVX4g==}
     hasBin: true
@@ -6629,10 +6613,6 @@ packages:
 
   /tslib/1.14.1:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
-    dev: true
-
-  /tslib/2.3.1:
-    resolution: {integrity: sha512-77EbyPPpMz+FRFRuAFlWMtmgUWGe9UOG2Z25NqCwiIjRhOf5iKGuzSe5P2w1laq+FkRy4p+PCuVkJSGkzTEKVw==}
     dev: true
 
   /tslib/2.4.0:
@@ -6768,18 +6748,6 @@ packages:
     dependencies:
       spdx-correct: 3.1.1
       spdx-expression-parse: 3.0.1
-    dev: true
-
-  /vite-plugin-dts/0.9.10_vite@3.0.4:
-    resolution: {integrity: sha512-dNfFJXRsm3YW8k+Wm8SesSaEGOaicKdgFz5PoUpT9zUh6URr5cwu5NMOBhJgiofrzcuYtOU2Ez7JQtg68RII8g==}
-    engines: {node: '>=12.0.0'}
-    peerDependencies:
-      vite: '>=2.4.4'
-    dependencies:
-      fast-glob: 3.2.11
-      fs-extra: 10.1.0
-      ts-morph: 13.0.3
-      vite: 3.0.4
     dev: true
 
   /vite/2.9.14:
@@ -7009,13 +6977,14 @@ packages:
       he: 1.2.0
     dev: true
 
-  /vue-tsc/0.38.2_typescript@4.7.4:
-    resolution: {integrity: sha512-+OMmpw9BZC9khul3I1HGtWchv7BCiaM7NvfdilVAiOFkjnivIoaW6jJm6YPQJaEPouePtpkDUWovyzgNxWdDsw==}
+  /vue-tsc/0.39.4_typescript@4.7.4:
+    resolution: {integrity: sha512-oGFuAdSt8Q1NatnyyJheW0P/8Sk9RDMWPNzeMHXl1OOnoXrbjz2miMcccujySCpA48+AhzdtyFY1PL0XTPsOSg==}
     hasBin: true
     peerDependencies:
       typescript: '*'
     dependencies:
-      '@volar/vue-typescript': 0.38.2
+      '@volar/vue-language-core': 0.39.4
+      '@volar/vue-typescript': 0.39.4
       typescript: 4.7.4
     dev: true
 

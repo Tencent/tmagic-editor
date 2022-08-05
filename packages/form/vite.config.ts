@@ -19,22 +19,12 @@
 import path from 'path';
 
 import { defineConfig } from 'vite';
-import dts from 'vite-plugin-dts';
 import vue from '@vitejs/plugin-vue';
 
 import pkg from './package.json';
 
 export default defineConfig({
-  plugins: [
-    dts({
-      outputDir: 'dist/types',
-      include: ['src/**/*'],
-      staticImport: true,
-      insertTypesEntry: true,
-      logDiagnostics: true,
-    }),
-    vue(),
-  ],
+  plugins: [vue()],
 
   resolve: {
     alias:

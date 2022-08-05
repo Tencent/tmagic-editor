@@ -26,20 +26,15 @@
 
 <script lang="ts">
 import { defineComponent, PropType, provide, reactive, ref, toRaw, watch } from 'vue';
-import { ElForm } from 'element-plus';
 import { cloneDeep, isEqual } from 'lodash-es';
 
 import { getConfig } from './utils/config';
 import { initValue } from './utils/form';
 import { FormConfig, FormState, FormValue } from './schema';
 
-export interface ValidateError {
+interface ValidateError {
   message: string;
   field: string;
-}
-
-export interface FieldErrorList {
-  [field: string]: ValidateError[];
 }
 
 export default defineComponent({
@@ -112,7 +107,8 @@ export default defineComponent({
   emits: ['change', 'field-input', 'field-change'],
 
   setup(props, { emit }) {
-    const elForm = ref<InstanceType<typeof ElForm>>();
+    // InstanceType<typeof ElForm>，构建types的时候会出错
+    const elForm = ref<any>();
     const initialized = ref(false);
     const values = ref<FormValue>({});
     const fields = new Map<string, any>();
