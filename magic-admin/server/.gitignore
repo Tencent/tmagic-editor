@@ -5,6 +5,6 @@ package.json.lock
 coverage
 .vscode
 assets
-!runtime/assets
+!static/**/assets
 src/config/database.ts
 src/config/key.ts

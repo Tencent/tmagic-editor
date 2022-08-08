@@ -35,7 +35,7 @@ export enum PageStatus {
 export const StaticPath = {
   ASSETS: path.resolve(__dirname, '../../assets'),
   TEMPLATE: path.resolve(__dirname, '../template'),
-  RUNTIME: path.resolve(__dirname, '../../runtime'),
+  STATIC: path.resolve(__dirname, '../../static'),
   PUBLISH: path.resolve(__dirname, '../../assets/publish'),
 };
 

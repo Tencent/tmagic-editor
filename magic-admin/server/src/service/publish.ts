@@ -243,7 +243,7 @@ const publishHtml = (pageConfig: DivideConfigTrans) => {
   try {
     // 复制html模板
     const distHtml = `${StaticPath.PUBLISH}/${pageName}.html`;
-    const tmpHtml = `${StaticPath.RUNTIME}/page.html`;
+    const tmpHtml = `${StaticPath.STATIC}/vue3/runtime/page/index.html`;
     copySync(tmpHtml, distHtml);
     // 注入活动配置文件
     const configScript = `<script type='module' src='./uiconfig_${pageName}.js'></script>\n\t${UiRuntimeJS}`;

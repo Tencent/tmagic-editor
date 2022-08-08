@@ -36,7 +36,7 @@ export default defineConfig(({ mode }) => {
         sourcemap: true,
         minify: false,
         target: 'esnext',
-        outDir: isAdmin ? `./dist/entry/vue3/${type}` : `../../playground/public/entry/vue3/${type}`,
+        outDir: isAdmin ? `./dist/entry/${type}` : `../../playground/public/entry/vue3/${type}`,
 
         lib: {
           entry: `.tmagic/${type}-entry.ts`,
@@ -50,9 +50,9 @@ export default defineConfig(({ mode }) => {
 
   if (['page', 'playground', 'page:admin', 'playground:admin'].includes(mode)) {
     const [type, isAdmin] = mode.split(':');
-    const base = isAdmin ? `/runtime/${type}/` : `/tmagic-editor/playground/runtime/vue3/${type}`;
+    const base = isAdmin ? `/static/vue3/runtime/${type}/` : `/tmagic-editor/playground/runtime/vue3/${type}`;
     const outDir = isAdmin
-      ? path.resolve(process.cwd(), `./dist/${type}`)
+      ? path.resolve(process.cwd(), `./dist/runtime/${type}`)
       : path.resolve(process.cwd(), `../../playground/public/runtime/vue3/${type}`);
     return {
       plugins: [

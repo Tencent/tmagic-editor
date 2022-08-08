@@ -33,7 +33,7 @@ export default defineConfig(({ mode }) => {
         sourcemap: true,
         minify: false,
         target: 'esnext',
-        outDir: isAdmin ? `./dist/entry/react/${type}` : `../../playground/public/entry/react/${type}`,
+        outDir: isAdmin ? `./dist/entry/${type}` : `../../playground/public/entry/react/${type}`,
 
         lib: {
           entry: `.tmagic/${type}-entry.ts`,
@@ -47,9 +47,9 @@ export default defineConfig(({ mode }) => {
 
   if (['page', 'playground', 'page:admin', 'playground:admin'].includes(mode)) {
     const [type, isAdmin] = mode.split(':');
-    const base = isAdmin ? `/runtime/${type}/` : `/tmagic-editor/playground/runtime/react/${type}`;
+    const base = isAdmin ? `/static/react/runtime/${type}/` : `/tmagic-editor/playground/runtime/react/${type}`;
     const outDir = isAdmin
-      ? path.resolve(process.cwd(), `./dist/${type}`)
+      ? path.resolve(process.cwd(), `./dist/runtime/${type}`)
       : path.resolve(process.cwd(), `../../playground/public/runtime/react/${type}`);
     return {
       plugins: [
