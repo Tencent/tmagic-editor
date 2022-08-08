@@ -37,7 +37,7 @@ export default defineConfig({
 
   base: '/tmagic-editor/playground/runtime/vue2/',
 
-  publicDir: 'entry-dist',
+  publicDir: 'public',
 
   server: {
     host: '0.0.0.0',

@@ -23,18 +23,20 @@ import legacy from '@vitejs/plugin-legacy';
 import reactRefresh from '@vitejs/plugin-react-refresh';
 
 export default defineConfig(({ mode }) => {
-  if (['value', 'config', 'event'].includes(mode)) {
-    const capitalToken = mode.charAt(0).toUpperCase() + mode.slice(1);
+  if (['value', 'config', 'event', 'value:admin', 'config:admin', 'event:admin'].includes(mode)) {
+    const [type, isAdmin] = mode.split(':');
+    const capitalToken = type.charAt(0).toUpperCase() + type.slice(1);
     return {
+      publicDir: './.tmagic/public',
       build: {
         cssCodeSplit: false,
         sourcemap: true,
         minify: false,
         target: 'esnext',
-        outDir: `entry-dist/${mode}-entry`,
+        outDir: isAdmin ? `./dist/entry/react/${type}` : `../../playground/public/entry/react/${type}`,
 
         lib: {
-          entry: `.tmagic/${mode}-entry.ts`,
+          entry: `.tmagic/${type}-entry.ts`,
           name: `magicPreset${capitalToken}s`,
           fileName: 'index',
           formats: ['umd'],
@@ -47,8 +49,8 @@ export default defineConfig(({ mode }) => {
     const [type, isAdmin] = mode.split(':');
     const base = isAdmin ? `/runtime/${type}/` : `/tmagic-editor/playground/runtime/react/${type}`;
     const outDir = isAdmin
-      ? path.resolve(process.cwd(), `./admin-dist/${type}`)
-      : path.resolve(process.cwd(), `./dist/${type}`);
+      ? path.resolve(process.cwd(), `./dist/${type}`)
+      : path.resolve(process.cwd(), `../../playground/public/runtime/react/${type}`);
     return {
       plugins: [
         reactRefresh(),
@@ -58,6 +60,8 @@ export default defineConfig(({ mode }) => {
       ],
 
       root: `./${type}/`,
+
+      publicDir: '../public',
 
       base,
 

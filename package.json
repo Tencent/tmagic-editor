@@ -5,7 +5,7 @@
   "packageManager": "pnpm@7.1.9",
   "scripts": {
     "bootstrap": "pnpm i && pnpm build",
-    "clean:top": "rimraf */**/dist */**/types */**/admin-dist */**/entry-dist */dist coverage dwt*",
+    "clean:top": "rimraf */**/dist */**/types */dist coverage dwt*",
     "clean:modules": "rimraf node_modules **/node_modules **/**/node_modules",
     "clean:all": "pnpm clean:top && pnpm clean:modules",
     "lint": "eslint . --ext .js,.vue,.ts,.tsx",
@@ -18,8 +18,7 @@
     "pg:react": "pnpm playground:react",
     "build": "pnpm --filter \"@tmagic/*\" build",
     "build:runtime:admin": "pnpm --filter \"runtime-*\" build:admin",
-    "build:playground": "pnpm --filter \"runtime-vue3\" --filter \"tmagic-playground\" build",
-    "postbuild:playground": "shx mkdir playground/dist/runtime && shx cp -r runtime/vue3/dist ./playground/dist/runtime/vue3 && cp -r runtime/vue3/entry-dist/* ./playground/dist/runtime/vue3",
+    "build:playground": "pnpm --filter \"runtime-vue3\" build && pnpm --filter \"tmagic-playground\" build",
     "docs": "pnpm --filter \"docs\" dev",
     "build:docs": "pnpm --filter \"docs\" build",
     "reinstall": "pnpm clean:all && pnpm bootstrap",

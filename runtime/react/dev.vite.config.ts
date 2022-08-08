@@ -38,7 +38,7 @@ export default defineConfig({
 
   base: '/tmagic-editor/playground/runtime/react/',
 
-  publicDir: 'entry-dist',
+  publicDir: 'public',
 
   server: {
     host: '0.0.0.0',

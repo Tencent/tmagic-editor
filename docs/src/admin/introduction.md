@@ -147,7 +147,7 @@ cd tmatic-editor
 npm run build:runtime:admin
 ```
 
-将/runtime/{vue3 | vue2 | react}/admin-dist 中所有文件以及文件夹复制到 /magic/runtime 目录下
+将/runtime/{vue3 | vue2 | react}/dist 中所有文件以及文件夹复制到 /magic/runtime 目录下
 
 上面的操作我们提供了/magic-admin/setup.sh 脚本文件来实现，开发者可以参考该脚本文件来搭建流水线。
 
