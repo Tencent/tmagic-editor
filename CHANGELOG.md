@@ -1,3 +1,23 @@
+# [1.1.0-beta.7](https://github.com/Tencent/tmagic-editor/compare/v1.1.0-beta.6...v1.1.0-beta.7) (2022-08-08)
+
+
+### Bug Fixes
+
+* **editor:** uiselect没有注册 ([7de649d](https://github.com/Tencent/tmagic-editor/commit/7de649d8c4f4bd61f72f835f0431a1250850da47))
+* **editor:** 修复先单击选中页面,再进行多选无法选中的问题 ([46e0e23](https://github.com/Tencent/tmagic-editor/commit/46e0e2378588d980eb2ed9b52d35c884f7cf9998))
+* **editor:** 页面列表显示问题 ([a4dd4ea](https://github.com/Tencent/tmagic-editor/commit/a4dd4eac02b1656e4945d5ec5acad36881c9fc4f))
+* **form:** daterange不会自动更新 ([a7057d2](https://github.com/Tencent/tmagic-editor/commit/a7057d2568f58825a92f7f2abde2763114d1d180))
+
+
+### Features
+
+* **admin:** 更新runtime ([eba6cbc](https://github.com/Tencent/tmagic-editor/commit/eba6cbccde077a98ed4cc064ca4410ae571367df))
+* **core:** 新增store ([5f78bbd](https://github.com/Tencent/tmagic-editor/commit/5f78bbd7b727f320d390034f9cfce19efdf2bcb0))
+* **stage:** 多选快捷键改成ctrl/cmd ([3d1a803](https://github.com/Tencent/tmagic-editor/commit/3d1a803ec9e56debc7aa1209271af6fd2753fecc))
+* **utils:** moment换成dayjs ([9ac3e12](https://github.com/Tencent/tmagic-editor/commit/9ac3e12487b4a6acd49b20731b824779eac248d5))
+
+
+
 # [1.1.0-beta.6](https://github.com/Tencent/tmagic-editor/compare/v1.1.0-beta.5...v1.1.0-beta.6) (2022-08-05)
 
 
