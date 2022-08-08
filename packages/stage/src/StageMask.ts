@@ -24,7 +24,7 @@ import { createDiv, injectStyle } from '@tmagic/utils';
 import { Mode, MouseButton, ZIndex } from './const';
 import Rule from './Rule';
 import type StageCore from './StageCore';
-import type { StageMaskConfig } from './types';
+import type { StageMaskConfig, StageMaskOptions } from './types';
 import { getScrollParent, isFixedParent } from './util';
 
 const wrapperClassName = 'editor-mask-wrapper';
@@ -103,16 +103,22 @@ export default class StageMask extends Rule {
     this.wrapper = wrapper;
     this.core = config.core;
 
+    const { maskOptions } = config.core.config;
+    const options: StageMaskOptions = {
+      multiSelectShortcutKey: 'shift',
+      ...maskOptions,
+    };
+
     this.content.addEventListener('mousedown', this.mouseDownHandler);
     this.wrapper.appendChild(this.content);
     this.content.addEventListener('wheel', this.mouseWheelHandler);
     this.content.addEventListener('mousemove', this.highlightHandler);
     this.content.addEventListener('mouseleave', this.mouseLeaveHandler);
-    KeyController.global.keydown('shift', (e) => {
+    KeyController.global.keydown(options.multiSelectShortcutKey, (e) => {
       e.inputEvent.preventDefault();
       this.isMultiSelectStatus = true;
     });
-    KeyController.global.keyup('shift', (e) => {
+    KeyController.global.keyup(options.multiSelectShortcutKey, (e) => {
       e.inputEvent.preventDefault();
       this.isMultiSelectStatus = false;
     });

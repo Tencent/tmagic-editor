@@ -29,6 +29,14 @@ import StageMask from './StageMask';
 export type CanSelect = (el: HTMLElement, event: MouseEvent, stop: () => boolean) => boolean | Promise<boolean>;
 export type IsContainer = (el: HTMLElement) => boolean | Promise<boolean>;
 
+export type StageMaskOptions = {
+  /**
+   * 多选快捷键
+   * @defualt 'shift'
+   */
+  multiSelectShortcutKey: string | string[];
+};
+
 export type StageCoreConfig = {
   /** 需要对齐的dom节点的CSS选择器字符串 */
   snapElementQuerySelector?: string;
@@ -45,6 +53,10 @@ export type StageCoreConfig = {
   render?: (renderer: StageCore) => Promise<HTMLElement> | HTMLElement;
   autoScrollIntoView?: boolean;
   updateDragEl?: (el: HTMLDivElement, target: HTMLElement) => void;
+  /**
+   * 初始化 StageMask 额外选项
+   */
+  maskOptions?: StageMaskOptions;
 };
 
 export interface StageRenderConfig {
