@@ -5,15 +5,19 @@
   "scripts": {
     "dev:vue2": "npm run build:libs && vite --config dev.vite.config.ts",
     "build": "npm run build:libs && npm run build:page && npm run build:playground",
-    "build:admin": "npm run build:libs && npm run build:page:admin && npm run build:playground:admin",
+    "build:admin": "npm run build:libs:admin && npm run build:page:admin && npm run build:playground:admin",
     "build:page": "vite build --config build.vite.config.ts --mode page",
     "build:playground": "vite build --config build.vite.config.ts --mode playground",
     "build:page:admin": "vite build --config build.vite.config.ts --mode page:admin",
     "build:playground:admin": "vite build --config build.vite.config.ts --mode playground:admin",
     "build:libs": "tmagic entry && npm run build:config & npm run build:value & npm run build:event",
+    "build:libs:admin": "tmagic entry && npm run build:config:admin && npm run build:value:admin && npm run build:event:admin",
     "build:config": "vite build --config build.vite.config.ts --mode config",
     "build:value": "vite build --config build.vite.config.ts --mode value",
-    "build:event": "vite build --config build.vite.config.ts --mode event"
+    "build:event": "vite build --config build.vite.config.ts --mode event",
+    "build:config:admin": "vite build --config build.vite.config.ts --mode config:admin",
+    "build:value:admin": "vite build --config build.vite.config.ts --mode value:admin",
+    "build:event:admin": "vite build --config build.vite.config.ts --mode event:admin"
   },
   "dependencies": {
     "@tmagic/cli": "1.1.0-beta.6",
