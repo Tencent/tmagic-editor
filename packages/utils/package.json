@@ -25,12 +25,12 @@
   },
   "dependencies": {
     "@tmagic/schema": "1.1.0-beta.6",
-    "moment": "^2.29.2"
+    "dayjs": "^1.11.4"
   },
   "devDependencies": {
     "@types/node": "^15.12.4",
-    "typescript": "^4.7.4",
     "rimraf": "^3.0.2",
+    "typescript": "^4.7.4",
     "vite": "^3.0.4"
   }
 }
