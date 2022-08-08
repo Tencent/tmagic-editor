@@ -66,13 +66,13 @@ export default defineComponent({
       await initConfigByActId({ actId: Number(route.params.actId) });
     };
 
-    asyncLoadJs('/runtime/assets/config.js').then(() => {
+    asyncLoadJs('/static/vue3/entry/config/index.umd.js').then(() => {
       magicPresetConfigs.value = (window as any).magicPresetConfigs;
     });
-    asyncLoadJs('/runtime/assets/value.js').then(() => {
+    asyncLoadJs('/static/vue3/entry/value/index.umd.js').then(() => {
       magicPresetValues.value = (window as any).magicPresetValues;
     });
-    asyncLoadJs('/runtime/assets/event.js').then(() => {
+    asyncLoadJs('/static/vue3/entry/event/index.umd.js').then(() => {
       magicPresetEvents.value = (window as any).magicPresetEvents;
     });
 
@@ -84,7 +84,7 @@ export default defineComponent({
       componentList,
       menu: topMenu(),
       uiConfigs,
-      runtimeUrl: '/runtime/playground.html',
+      runtimeUrl: '/static/vue3/runtime/playground/index.html',
       magicPresetValues,
       magicPresetConfigs,
       magicPresetEvents,

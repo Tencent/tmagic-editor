@@ -1,0 +1,1 @@
+{"version":3,"file":"plugin-entry-legacy.7d9da6d6.js","sources":["../../../../.tmagic/plugin-entry.ts"],"sourcesContent":["const plugins: Record<string, any> = {};\nexport default plugins;"],"names":["exports"],"mappings":"uEAAqCA,EAAA,UAAA,CAAA"}

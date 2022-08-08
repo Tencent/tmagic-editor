@@ -13,14 +13,15 @@ module.exports = defineConfig({
   outputDir: path.resolve(__dirname, './dist'),
 
   devServer: {
-    port: 8181,
+    port: 80,
+    host: '0.0.0.0',
     proxy: {
       '/api': {
         target: 'http://localhost:3001/',
         ws: true,
         changOrigin: true,
       },
-      '/runtime': {
+      '/static': {
         target: 'http://localhost:3001/',
         ws: true,
         changOrigin: true,
