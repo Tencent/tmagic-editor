@@ -1,12 +1,14 @@
 dist
-entry-dist
 coverage
 node_modules
 dest
 types
+public/entry
+public/runtime
 
 comp-entry.ts
 config-entry.ts
 value-entry.ts
 
 magic-admin/web/public/runtime
+magic-admin/server/static
