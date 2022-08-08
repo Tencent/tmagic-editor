@@ -34,7 +34,11 @@ export const sleep = (ms: number): Promise<void> =>
     }, ms);
   });
 
-export const datetimeFormatter = (v: string | Date, defaultValue = '-', format = 'YYYY-MM-DD HH:mm:ss'): any => {
+export const datetimeFormatter = (
+  v: string | Date,
+  defaultValue = '-',
+  format = 'YYYY-MM-DD HH:mm:ss',
+): string | number => {
   if (v) {
     let time = null;
     if (['x', 'timestamp'].includes(format)) {

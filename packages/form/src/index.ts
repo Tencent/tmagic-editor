@@ -111,7 +111,7 @@ const install = (app: App, opt: any) => {
   app.component(Time.name, Time);
   app.component(Checkbox.name, Checkbox);
   app.component(Switch.name, Switch);
-  app.component(Daterange.name, Daterange);
+  app.component('m-fields-daterange', Daterange);
   app.component('m-fields-color-picker', ColorPicker);
   app.component(CheckboxGroup.name, CheckboxGroup);
   app.component(RadioGroup.name, RadioGroup);
