@@ -16,12 +16,15 @@
  * limitations under the License.
  */
 
-import moment from 'moment';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 
 import type { MNode } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 
 export * from './dom';
+
+dayjs.extend(utc);
 
 export const sleep = (ms: number): Promise<void> =>
   new Promise((resolve) => {
@@ -31,26 +34,20 @@ export const sleep = (ms: number): Promise<void> =>
     }, ms);
   });
 
-export const datetimeFormatter = (v: string | Date, defaultValue = '-', f = 'YYYY-MM-DD HH:mm:ss'): any => {
-  let format = f;
-  if (format === 'timestamp') {
-    format = 'x';
-  }
-
+export const datetimeFormatter = (v: string | Date, defaultValue = '-', format = 'YYYY-MM-DD HH:mm:ss'): any => {
   if (v) {
     let time = null;
-    if ((typeof v === 'string' && v.includes('Z')) || v.constructor === Date) {
+    if (['x', 'timestamp'].includes(format)) {
+      time = dayjs(v).valueOf();
+    } else if ((typeof v === 'string' && v.includes('Z')) || v.constructor === Date) {
       // UTC字符串时间或Date对象格式化为北京时间
-      time = moment(v).utcOffset('+08:00').format(format);
+      time = dayjs(v).utcOffset(8).format(format);
     } else {
-      time = moment(v).format(format);
+      time = dayjs(v).format(format);
     }
 
-    if (format === 'x') {
-      return +time;
-    }
     // 格式化为北京时间
-    if (time !== 'Invalid date') {
+    if (time !== 'Invalid Date') {
       return time;
     }
     return defaultValue;
