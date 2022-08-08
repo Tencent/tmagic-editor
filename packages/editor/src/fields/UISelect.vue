@@ -21,7 +21,6 @@ import { FormState } from '@tmagic/form';
 import { Services } from '../type';
 
 const props = defineProps<{
-  labelWidth: string;
   config: any;
   model: any;
   prop: string;
