@@ -127,16 +127,20 @@ export default class StageMultiDragResize extends EventEmitter {
       });
   }
 
-  public canSelect(el: HTMLElement): Boolean {
-    // 多选不可以选中magic-ui-page
+  public canSelect(el: HTMLElement, stop: () => boolean): Boolean {
+    // 多选状态下不可以选中magic-ui-page，并停止继续向上层选中
     if (el.className.includes(PAGE_CLASS)) {
       this.core.highlightedDom = undefined;
       this.core.highlightLayer.clearHighlight();
+      stop();
       return false;
     }
     const currentTargetMode = getMode(el);
     let selectedDomMode = '';
-
+    if (this.core.selectedDom?.className.includes(PAGE_CLASS)) {
+      // 先单击选中了页面(magic-ui-page)，再按住多选键多选时，任一元素均可选中
+      return true;
+    }
     if (this.targetList.length === 0 && this.core.selectedDom) {
       // 单选后添加到多选的情况
       selectedDomMode = getMode(this.core.selectedDom);
