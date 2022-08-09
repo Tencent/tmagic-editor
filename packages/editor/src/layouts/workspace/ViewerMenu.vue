@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, markRaw, onMounted, reactive, ref, watch } from 'vue';
+import { computed, inject, markRaw, reactive, ref, watch } from 'vue';
 import { Bottom, Delete, DocumentCopy, Top } from '@element-plus/icons-vue';
 
 import { MNode, NodeType } from '@tmagic/schema';
@@ -133,11 +133,6 @@ const menuData = reactive<MenuItem[]>([
   ...stageContentMenu,
 ]);
 
-onMounted(async () => {
-  const data = await storageService.getItem(COPY_STORAGE_KEY);
-  canPaste.value = data !== 'undefined' && !!data;
-});
-
 watch(
   parent,
   async () => {
@@ -152,8 +147,10 @@ watch(
   { immediate: true },
 );
 
-const show = (e: MouseEvent) => {
+const show = async (e: MouseEvent) => {
   menu.value?.show(e);
+  const data = await storageService.getItem(COPY_STORAGE_KEY);
+  canPaste.value = data !== 'undefined' && !!data;
 };
 
 defineExpose({ show });
