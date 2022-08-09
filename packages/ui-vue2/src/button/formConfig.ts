@@ -16,4 +16,9 @@
  * limitations under the License.
  */
 
-export default [];
+export default [
+  {
+    text: '文本',
+    name: 'text',
+  },
+];
