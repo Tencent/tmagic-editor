@@ -39,9 +39,9 @@ import {
   setLayout,
 } from '../utils/editor';
 import { beforePaste, beforeRemove, getAddParent } from '../utils/operator';
-import { propsService } from '..';
 
 import BaseService from './BaseService';
+import propsService from './props';
 
 class Editor extends BaseService {
   public state: StoreState = reactive({
@@ -508,10 +508,10 @@ class Editor extends BaseService {
    * @param position 粘贴的坐标
    * @returns 添加后的组件节点配置
    */
-  public async paste(position: PastePosition = {}): Promise<MNode | MNode[]> {
+  public async paste(position: PastePosition = {}): Promise<MNode | MNode[] | void> {
     const config: MNode[] = await storageService.getItem(COPY_STORAGE_KEY);
 
-    if (!Array.isArray(config)) return [];
+    if (!Array.isArray(config)) return;
 
     const pasteConfigs = await beforePaste(position, config);
 
