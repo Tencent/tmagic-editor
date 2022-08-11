@@ -1,3 +1,19 @@
+# [1.1.0-beta.8](https://github.com/Tencent/tmagic-editor/compare/v1.1.0-beta.7...v1.1.0-beta.8) (2022-08-11)
+
+
+### Bug Fixes
+
+* **editor:** icon 图片模式样式修改 ([23617a6](https://github.com/Tencent/tmagic-editor/commit/23617a63e9185e39269bacdc80186b05e1bd6709))
+* **editor:** 画布右键菜单中粘贴按钮显示条件修改 ([beee67b](https://github.com/Tencent/tmagic-editor/commit/beee67b3eb99b33584e5b7df42f6f4d69b3ee8e7))
+* **ui-vue2:** button,container,text formconfig补充完整 ([5ccb5f1](https://github.com/Tencent/tmagic-editor/commit/5ccb5f1ec9a1e746ca320d64b08c8024fe761e9b))
+
+
+### Features
+
+* **editor:** editorService.add支持添加多个组件 ([b6fa064](https://github.com/Tencent/tmagic-editor/commit/b6fa064b0bc11fcaa289650d932bab22b8638f04))
+
+
+
 # [1.1.0-beta.7](https://github.com/Tencent/tmagic-editor/compare/v1.1.0-beta.6...v1.1.0-beta.7) (2022-08-08)
 
 
