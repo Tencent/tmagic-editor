@@ -38,6 +38,8 @@ export default class StageMultiDragResize extends EventEmitter {
   public dragElList: HTMLDivElement[] = [];
   /** Moveable多选拖拽类实例 */
   public moveableForMulti?: Moveable;
+  /** 是否处于多选拖拽状态 */
+  public isMultiDragStatus: Boolean = false;
   private multiMoveableHelper?: MoveableHelper;
 
   constructor(config: StageDragResizeConfig) {
@@ -99,6 +101,7 @@ export default class StageMultiDragResize extends EventEmitter {
             id: matchEventTarget.id,
           });
         });
+        this.isMultiDragStatus = true;
       })
       .on('dragGroup', (params) => {
         const { events } = params;
@@ -124,6 +127,7 @@ export default class StageMultiDragResize extends EventEmitter {
       })
       .on('dragGroupEnd', () => {
         this.update();
+        this.isMultiDragStatus = false;
       });
   }
 
