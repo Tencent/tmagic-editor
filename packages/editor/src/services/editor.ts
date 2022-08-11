@@ -523,15 +523,15 @@ class Editor extends BaseService {
    * @param config 组件节点配置
    * @returns 当前组件节点配置
    */
-  public async alignCenter(config: MNode): Promise<MNode | void> {
+  public async alignCenter(config: MNode): Promise<MNode> {
     const parent = this.get<MContainer>('parent');
-    const node = this.get<MNode>('node');
-    const layout = await this.getLayout(toRaw(parent), toRaw(node));
+    const node = cloneDeep(toRaw(config));
+    const layout = await this.getLayout(toRaw(parent), node);
     if (layout === Layout.RELATIVE) {
-      return;
+      return config;
     }
 
-    if (!node.style) return;
+    if (!node.style) return config;
 
     const stage = this.get<StageCore>('stage');
     const doc = stage?.renderer.contentWindow?.document;
@@ -546,15 +546,14 @@ class Editor extends BaseService {
       node.style.left = (parent.style.width - node.style.width) / 2;
     }
 
-    await this.update(node);
+    const newNode = await this.update(node);
+
     this.get<StageCore | null>('stage')?.update({
-      config: cloneDeep(toRaw(node)),
+      config: cloneDeep(toRaw(newNode)),
       root: cloneDeep(this.get<MApp>('root')),
     });
-    this.addModifiedNodeId(config.id);
-    this.pushHistoryState();
 
-    return config;
+    return newNode;
   }
 
   /**
