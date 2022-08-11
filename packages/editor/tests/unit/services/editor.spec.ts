@@ -208,7 +208,9 @@ describe('add', () => {
     // 添加后会选中这个节点
     const node = editorService.get('node');
     const parent = editorService.get('parent');
-    expect(node.id).toBe(newNode.id);
+    if (!Array.isArray(newNode)) {
+      expect(node.id).toBe(newNode.id);
+    }
     expect(parent.items).toHaveLength(3);
   });
 
@@ -222,7 +224,9 @@ describe('add', () => {
     });
     const node = editorService.get('node');
     const parent = editorService.get('parent');
-    expect(node.id).toBe(newNode.id);
+    if (!Array.isArray(newNode)) {
+      expect(node.id).toBe(newNode.id);
+    }
     expect(parent.items).toHaveLength(3);
   });
 
@@ -237,7 +241,9 @@ describe('add', () => {
       rootNode,
     );
     const node = editorService.get('node');
-    expect(node.id).toBe(newNode.id);
+    if (!Array.isArray(newNode)) {
+      expect(node.id).toBe(newNode.id);
+    }
     expect(rootNode.items.length).toBe(2);
   });
 

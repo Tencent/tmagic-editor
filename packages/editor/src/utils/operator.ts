@@ -8,8 +8,8 @@ import { isPage } from '@tmagic/utils';
 import editorService from '../services/editor';
 import historyService from '../services/history';
 import propsService from '../services/props';
-import { AddMNode, Layout, PastePosition } from '../type';
-import { fixNodeLeft, generatePageNameByApp, getInitPositionStyle, getNodeIndex } from '../utils/editor';
+import { AddMNode, PastePosition } from '../type';
+import { generatePageNameByApp, getInitPositionStyle, getNodeIndex } from '../utils/editor';
 
 /**
  * 粘贴前置操作：返回分配了新id以及校准了坐标的配置
@@ -17,7 +17,7 @@ import { fixNodeLeft, generatePageNameByApp, getInitPositionStyle, getNodeIndex 
  * @param config 待粘贴的元素配置(复制时保存的那份配置)
  * @returns
  */
-export const beforePaste = async (position: PastePosition, config: MNode[]) => {
+export const beforePaste = async (position: PastePosition, config: MNode[]): Promise<MNode[]> => {
   if (!config[0]?.style) return config;
   const curNode = editorService.get<MContainer>('node');
   // 将数组中第一个元素的坐标作为参照点
@@ -70,54 +70,6 @@ export const beforePaste = async (position: PastePosition, config: MNode[]) => {
 };
 
 /**
- * 新增元素前置操作，实现了在编辑器中新增元素节点，并返回新增元素信息以供stage更新
- * @param addNode 待添加元素的配置
- * @param parent 父级容器（可选）
- * @returns 新增的元素，父级元素，布局方式，是否为根页面
- */
-export const beforeAdd = async (
-  addNode: AddMNode,
-  parent?: MContainer | null,
-): Promise<{ parentNode: MContainer; newNode: MNode; layout: Layout; isPage: boolean }> => {
-  // 加入inputEvent是为给业务扩展时可以获取到更多的信息，只有在使用拖拽添加组件时才有改对象
-  const { type, inputEvent, ...config } = addNode;
-  const curNode = editorService.get<MContainer>('node');
-
-  let parentNode: MContainer | undefined;
-  const isPage = type === NodeType.PAGE;
-
-  if (isPage) {
-    parentNode = editorService.get<MApp>('root');
-    // 由于支持中间件扩展，在parent参数为undefined时，parent会变成next函数
-  } else if (parent && typeof parent !== 'function') {
-    parentNode = parent;
-  } else if (curNode.items) {
-    parentNode = curNode;
-  } else {
-    parentNode = editorService.getParentById(curNode.id, false);
-  }
-
-  if (!parentNode) throw new Error('未找到父元素');
-
-  const layout = await editorService.getLayout(toRaw(parentNode), addNode as MNode);
-  const newNode = { ...toRaw(await propsService.getPropsValue(type, config)) };
-  newNode.style = getInitPositionStyle(newNode.style, layout, parentNode, editorService.get<StageCore>('stage'));
-
-  if ((parentNode?.type === NodeType.ROOT || curNode.type === NodeType.ROOT) && newNode.type !== NodeType.PAGE) {
-    throw new Error('app下不能添加组件');
-  }
-  // 新增节点添加到配置中
-  parentNode?.items?.push(newNode);
-  // 返回新增信息以供stage更新
-  return {
-    parentNode,
-    newNode,
-    layout,
-    isPage,
-  };
-};
-
-/**
  * 将元素粘贴到容器内时，将相对于画布坐标转换为相对于容器的坐标
  * @param position PastePosition 粘贴时相对于画布的坐标
  * @param id 元素id
@@ -133,27 +85,6 @@ export const getPositionInContainer = (position: PastePosition = {}, id: Id) => 
     left,
     top,
   };
-};
-
-/**
- * 将新增元素事件通知到stage以更新渲染
- * @param parentNode 父元素
- * @param newNode 当前新增元素
- * @param layout 布局方式
- */
-export const notifyAddToStage = async (parentNode: MContainer, newNode: MNode, layout: Layout) => {
-  const stage = editorService.get<StageCore | null>('stage');
-  const root = editorService.get<MApp>('root');
-
-  await stage?.add({ config: cloneDeep(newNode), parent: cloneDeep(parentNode), root: cloneDeep(root) });
-
-  if (layout === Layout.ABSOLUTE) {
-    const fixedLeft = fixNodeLeft(newNode, parentNode, stage?.renderer.contentWindow?.document);
-    if (typeof fixedLeft !== 'undefined' && newNode.style) {
-      newNode.style.left = fixedLeft;
-      await stage?.update({ config: cloneDeep(newNode), root: cloneDeep(root) });
-    }
-  }
 };
 
 /**
@@ -207,4 +138,26 @@ export const beforeRemove = async (node: MNode): Promise<MContainer | void> => {
     stage?.select(parent.id);
   }
   return parent;
+};
+
+export const getAddParent = (addNode: AddMNode | MNode[]) => {
+  const curNode = editorService.get<MContainer>('node');
+
+  let parentNode;
+  if (!Array.isArray(addNode) && isPage(addNode as MNode)) {
+    parentNode = editorService.get<MApp>('root');
+  } else if (curNode.items) {
+    parentNode = curNode;
+  } else {
+    parentNode = editorService.getParentById(curNode.id, false);
+  }
+  return parentNode;
+};
+
+export const getDefaultConfig = async (addNode: AddMNode, parentNode: MContainer) => {
+  const { type, inputEvent, ...config } = addNode;
+  const layout = await editorService.getLayout(toRaw(parentNode), addNode as MNode);
+  const newNode = { ...toRaw(await propsService.getPropsValue(type, config)) };
+  newNode.style = getInitPositionStyle(newNode.style, layout);
+  return newNode;
 };
