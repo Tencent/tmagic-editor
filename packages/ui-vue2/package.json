@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0-beta.7",
+  "version": "1.1.0-beta.8",
   "name": "@tmagic/ui-vue2",
   "main": "src/index.ts",
   "engines": {
@@ -10,9 +10,9 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "@tmagic/core": "1.1.0-beta.7",
-    "@tmagic/schema": "1.1.0-beta.7",
-    "@tmagic/utils": "1.1.0-beta.7",
+    "@tmagic/core": "1.1.0-beta.8",
+    "@tmagic/schema": "1.1.0-beta.8",
+    "@tmagic/utils": "1.1.0-beta.8",
     "qrcode": "^1.5.0",
     "vue": "^2.7.4"
   },

@@ -1,6 +1,6 @@
 {
   "name": "@tmagic/ui-react",
-  "version": "1.1.0-beta.7",
+  "version": "1.1.0-beta.8",
   "main": "src/index.ts",
   "engines": {
     "node": ">=14"
@@ -13,8 +13,8 @@
     "react:build": "tsc && vite build"
   },
   "dependencies": {
-    "@tmagic/core": "1.1.0-beta.7",
-    "@tmagic/schema": "1.1.0-beta.7",
+    "@tmagic/core": "1.1.0-beta.8",
+    "@tmagic/schema": "1.1.0-beta.8",
     "qrcode": "^1.5.0",
     "react": "^17.0.0",
     "react-dom": "^17.0.0"

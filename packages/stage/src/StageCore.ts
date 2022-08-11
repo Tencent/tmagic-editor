@@ -343,7 +343,7 @@ export default class StageCore extends EventEmitter {
     }
   }
 
-  public getAddContainerHighlightClassNameTimeout(event: MouseEvent, exclude: Element[] = []) {
+  public getAddContainerHighlightClassNameTimeout(event: MouseEvent, exclude: Element[] = []): NodeJS.Timeout {
     return globalThis.setTimeout(() => {
       this.addContainerHighlightClassName(event, exclude);
     }, this.containerHighlightDuration);
