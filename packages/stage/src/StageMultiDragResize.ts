@@ -124,6 +124,13 @@ export default class StageMultiDragResize extends EventEmitter {
       })
       .on('dragGroupEnd', () => {
         this.update();
+      })
+      .on('clickGroup', (params) => {
+        const { inputTarget, targets } = params;
+        // 如果此时mask不处于多选状态下，且有多个元素被选中，同时点击的元素在选中元素中的其中一项，代表多选态切换为该元素的单选态
+        if (!this.mask.isMultiSelectStatus && targets.length > 1 && targets.includes(inputTarget)) {
+          this.emit('select', inputTarget.id.replace(DRAG_EL_ID_PREFIX, ''));
+        }
       });
   }
 
@@ -218,7 +225,6 @@ export default class StageMultiDragResize extends EventEmitter {
     }
 
     return {
-      clickable: false,
       defaultGroupRotate: 0,
       defaultGroupOrigin: '50% 50%',
       draggable: true,

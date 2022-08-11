@@ -108,7 +108,6 @@ export default class StageMask extends Rule {
     this.content.addEventListener('wheel', this.mouseWheelHandler);
     this.content.addEventListener('mousemove', this.highlightHandler);
     this.content.addEventListener('mouseleave', this.mouseLeaveHandler);
-    this.content.addEventListener('click', this.clickHandler);
 
     const isMac = /mac os x/.test(navigator.userAgent.toLowerCase());
 
@@ -366,24 +365,5 @@ export default class StageMask extends Rule {
 
   private mouseLeaveHandler = () => {
     setTimeout(() => this.emit('clearHighlight'), throttleTime);
-  };
-
-  // 点击事件
-  private clickHandler = (event: MouseEvent) => {
-    event.stopImmediatePropagation();
-    event.stopPropagation();
-    if (event.button !== MouseButton.LEFT && event.button !== MouseButton.RIGHT) return;
-
-    // 单击时不处于多选状态且有多个选中元素，进行取消多选变更为单选
-    if (!this.isMultiSelectStatus && this.core.selectedDomList.length > 1) {
-      // 获取单击时点击的元素
-      this.core.getElementFromPoint(event).then((el) => {
-        // 如果点击的元素在多选列表中，则将多选状态变更为单选
-        if (el && this.core.selectedDomList.includes(el)) {
-          this.core.select(el); // 元素选中
-          setTimeout(() => this.emit('select')); // set node
-        }
-      });
-    }
   };
 }
