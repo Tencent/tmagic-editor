@@ -72,7 +72,7 @@ export default defineComponent({
         })
         .keydown([ctrl, 'v'], (e) => {
           e.inputEvent.preventDefault();
-          nodes.value && services?.editorService.paste();
+          nodes.value && services?.editorService.paste({ offsetX: 10, offsetY: 10 });
         })
         .keydown([ctrl, 'x'], (e) => {
           e.inputEvent.preventDefault();
