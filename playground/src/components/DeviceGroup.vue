@@ -39,7 +39,8 @@ export default defineComponent({
     modelValue: {
       type: Object,
       default: () => ({
-        width: '375',
+        width: 375,
+        height: 817,
       }),
     },
   },

@@ -19,8 +19,14 @@
       </template>
     </m-editor>
 
-    <el-dialog v-model="previewVisible" destroy-on-close :width="375" custom-class="pre-viewer" title="预览">
-      <iframe v-if="previewVisible" width="100%" height="817" :src="previewUrl"></iframe>
+    <el-dialog
+      v-model="previewVisible"
+      destroy-on-close
+      custom-class="pre-viewer"
+      title="预览"
+      :width="stageRect && stageRect.width"
+    >
+      <iframe v-if="previewVisible" width="100%" :height="stageRect && stageRect.height" :src="previewUrl"></iframe>
     </el-dialog>
   </div>
 </template>
@@ -53,7 +59,10 @@ const defaultSelected = ref(dsl.items[0].id);
 const propsValues = ref<Record<string, any>>({});
 const propsConfigs = ref<Record<string, any>>({});
 const eventMethodList = ref<Record<string, any>>({});
-const stageRect = ref();
+const stageRect = ref({
+  width: 375,
+  height: 817,
+});
 
 const previewUrl = computed(
   () => `${VITE_RUNTIME_PATH}/page/index.html?localPreview=1&page=${editor.value?.editorService.get('page').id}`,
