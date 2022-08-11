@@ -33,7 +33,7 @@ export default {
         top: 0,
         right: '',
         bottom: '',
-        width: '375',
+        width: '100%',
         height: '1728',
         backgroundImage: '',
         backgroundColor: 'rgba(248, 218, 218, 1)',
