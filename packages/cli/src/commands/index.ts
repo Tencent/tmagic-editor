@@ -14,9 +14,12 @@ export const scripts = (defaultAppConfig: UserConfig) => {
 
     // resolve user config file
     const userConfigPath = [
-      path.resolve(process.cwd(), 'tmagic.config.ts'),
-      path.resolve(process.cwd(), 'tmagic.config.js'),
-      path.resolve(process.cwd(), 'tmagic.config.cjs'),
+      path.resolve(defaultAppConfig.source, 'tmagic.config.ts'),
+      path.resolve(defaultAppConfig.source, 'tmagic.config.js'),
+      path.resolve(defaultAppConfig.source, 'tmagic.config.cjs'),
+      path.resolve(defaultAppConfig.temp, 'config.ts'),
+      path.resolve(defaultAppConfig.temp, 'config.js'),
+      path.resolve(defaultAppConfig.temp, 'config.cjs'),
     ].find((item) => fs.pathExistsSync(item));
 
     const userConfig = await loadUserConfig(userConfigPath);
