@@ -39,7 +39,7 @@ cd hello-world
    └─ test
    └─ src
       ├─ APP.vue
-      ├─ main.vue
+      ├─ main.ts
       └─ components
          └─ HelloWorld.vue
    └─ vue.config.js
@@ -56,7 +56,7 @@ npm install --save @tmagic/editor @tmagic/form @tmagic/stage element-plus
 
 ## 注册组件
 
-将以下代码覆盖到src/magic.ts中
+将以下代码覆盖到src/main.ts中
 
 ```ts
 import 'element-plus/dist/index.css';
