@@ -142,9 +142,15 @@ export default class StageCore extends EventEmitter {
         setTimeout(() => this.emit('sort', data));
       });
 
-    this.multiDr.on('update', (data: UpdateEventData) => {
-      setTimeout(() => this.emit('update', data));
-    });
+    this.multiDr
+      .on('update', (data: UpdateEventData) => {
+        setTimeout(() => this.emit('update', data));
+      })
+      .on('select', async (id: Id) => {
+        const el = await this.getTargetElement(id);
+        this.select(el); // 选中
+        setTimeout(() => this.emit('select', el)); // set node
+      });
   }
 
   public getElementsFromPoint(event: MouseEvent) {
