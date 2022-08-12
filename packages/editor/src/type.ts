@@ -21,7 +21,7 @@ import type { Component } from 'vue';
 import type { FormConfig } from '@tmagic/form';
 import type { Id, MApp, MContainer, MNode, MPage } from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
-import type { MoveableOptions } from '@tmagic/stage';
+import type { ContainerHighlightType, MoveableOptions } from '@tmagic/stage';
 
 import type { ComponentListService } from './services/componentList';
 import type { EditorService } from './services/editor';
@@ -53,6 +53,7 @@ export interface StageOptions {
   autoScrollIntoView: boolean;
   containerHighlightClassName: string;
   containerHighlightDuration: number;
+  containerHighlightType: ContainerHighlightType;
   render: () => HTMLDivElement;
   moveableOptions: MoveableOptions | ((core?: StageCore) => MoveableOptions);
   canSelect: (el: HTMLElement) => boolean | Promise<boolean>;

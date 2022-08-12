@@ -19,6 +19,7 @@
 /* eslint-disable no-param-reassign */
 import { EventEmitter } from 'events';
 
+import KeyController from 'keycon';
 import type { MoveableOptions } from 'moveable';
 import Moveable from 'moveable';
 import MoveableHelper from 'moveable-helper';
@@ -29,7 +30,7 @@ import { DRAG_EL_ID_PREFIX, GHOST_EL_ID_PREFIX, GuidesType, Mode, ZIndex } from 
 import StageCore from './StageCore';
 import StageMask from './StageMask';
 import type { StageDragResizeConfig } from './types';
-import { StageDragStatus } from './types';
+import { ContainerHighlightType, StageDragStatus } from './types';
 import { calcValueByFontsize, down, getAbsolutePosition, getMode, getOffset, getTargetElStyle, up } from './util';
 
 /**
@@ -61,6 +62,7 @@ export default class StageDragResize extends EventEmitter {
   /** 流式布局下，目标节点的镜像节点 */
   private ghostEl: HTMLElement | undefined;
   private moveableHelper?: MoveableHelper;
+  private isContainerHighlight: Boolean = false;
 
   constructor(config: StageDragResizeConfig) {
     super();
@@ -68,6 +70,20 @@ export default class StageDragResize extends EventEmitter {
     this.core = config.core;
     this.container = config.container;
     this.mask = config.mask;
+
+    KeyController.global.keydown('alt', (e) => {
+      e.inputEvent.preventDefault();
+      this.isContainerHighlight = true;
+    });
+    KeyController.global.keyup('alt', (e) => {
+      e.inputEvent.preventDefault();
+
+      const doc = this.core.renderer.contentWindow?.document;
+      if (doc && this.canContainerHighlight()) {
+        removeClassNameByClassName(doc, this.core.containerHighlightClassName);
+      }
+      this.isContainerHighlight = false;
+    });
   }
 
   /**
@@ -302,7 +318,9 @@ export default class StageDragResize extends EventEmitter {
           timeout = undefined;
         }
 
-        timeout = this.core.getAddContainerHighlightClassNameTimeout(e.inputEvent, [this.target]);
+        if (this.canContainerHighlight()) {
+          timeout = this.core.getAddContainerHighlightClassNameTimeout(e.inputEvent, [this.target]);
+        }
 
         this.dragStatus = StageDragStatus.ING;
 
@@ -325,7 +343,7 @@ export default class StageDragResize extends EventEmitter {
 
         let parentEl: HTMLElement | null = null;
 
-        if (doc) {
+        if (doc && this.canContainerHighlight()) {
           parentEl = removeClassNameByClassName(doc, this.core.containerHighlightClassName);
         }
 
@@ -560,5 +578,12 @@ export default class StageDragResize extends EventEmitter {
       ...options,
       ...moveableOptions,
     };
+  }
+
+  private canContainerHighlight() {
+    return (
+      this.core.containerHighlightType === ContainerHighlightType.DEFAULT ||
+      (this.core.containerHighlightType === ContainerHighlightType.ALT && this.isContainerHighlight)
+    );
   }
 }

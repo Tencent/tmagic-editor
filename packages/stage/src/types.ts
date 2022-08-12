@@ -29,6 +29,11 @@ import StageMask from './StageMask';
 export type CanSelect = (el: HTMLElement, event: MouseEvent, stop: () => boolean) => boolean | Promise<boolean>;
 export type IsContainer = (el: HTMLElement) => boolean | Promise<boolean>;
 
+export enum ContainerHighlightType {
+  DEFAULT = 'default',
+  ALT = 'alt',
+}
+
 export type StageCoreConfig = {
   /** 需要对齐的dom节点的CSS选择器字符串 */
   snapElementQuerySelector?: string;
@@ -36,8 +41,9 @@ export type StageCoreConfig = {
   zoom?: number;
   canSelect?: CanSelect;
   isContainer: IsContainer;
-  containerHighlightClassName: string;
-  containerHighlightDuration: number;
+  containerHighlightClassName?: string;
+  containerHighlightDuration?: number;
+  containerHighlightType?: ContainerHighlightType;
   moveableOptions?: ((core?: StageCore) => MoveableOptions) | MoveableOptions;
   multiMoveableOptions?: ((core?: StageCore) => MoveableOptions) | MoveableOptions;
   /** runtime 的HTML地址，可以是一个HTTP地址，如果和编辑器不同域，需要设置跨域，也可以是一个相对或绝对路径 */

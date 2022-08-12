@@ -30,7 +30,7 @@
 
     <template #props-panel>
       <slot name="props-panel">
-        <props-panel ref="propsPanel" @mounted="(instance) => $emit('props-panel-mounted', instance)">
+        <props-panel ref="propsPanel" @mounted="(instance: any) => $emit('props-panel-mounted', instance)">
           <template #props-panel-header>
             <slot name="props-panel-header"></slot>
           </template>
@@ -49,7 +49,7 @@ import { EventOption } from '@tmagic/core';
 import type { FormConfig } from '@tmagic/form';
 import type { MApp, MNode } from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
-import { CONTAINER_HIGHLIGHT_CLASS, MoveableOptions } from '@tmagic/stage';
+import { CONTAINER_HIGHLIGHT_CLASS, ContainerHighlightType, MoveableOptions } from '@tmagic/stage';
 
 import Framework from './layouts/Framework.vue';
 import NavMenu from './layouts/NavMenu.vue';
@@ -168,6 +168,11 @@ export default defineComponent({
     containerHighlightDuration: {
       type: Number,
       default: 800,
+    },
+
+    containerHighlightType: {
+      type: String as PropType<ContainerHighlightType>,
+      default: ContainerHighlightType.DEFAULT,
     },
 
     stageRect: {
@@ -289,6 +294,7 @@ export default defineComponent({
         isContainer: props.isContainer,
         containerHighlightClassName: props.containerHighlightClassName,
         containerHighlightDuration: props.containerHighlightDuration,
+        containerHighlightType: props.containerHighlightType,
       }),
     );
 
