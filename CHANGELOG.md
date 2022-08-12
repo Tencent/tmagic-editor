@@ -1,3 +1,25 @@
+# [1.1.0-beta.9](https://github.com/Tencent/tmagic-editor/compare/v1.1.0-beta.8...v1.1.0-beta.9) (2022-08-12)
+
+
+### Bug Fixes
+
+* **editor:** 删除节点后，标记父节点为修改状态 ([0e82f65](https://github.com/Tencent/tmagic-editor/commit/0e82f652a9c72acbd9fae4e96d709e3fa594e411))
+* **editor:** 水平居中添加了两个历史堆栈 ([8827743](https://github.com/Tencent/tmagic-editor/commit/882774311a8245769de92d68d3d43b523e85e571))
+* **playground:** pc预览适配 ([31d60eb](https://github.com/Tencent/tmagic-editor/commit/31d60eb1bac7efb215fe9a613b6c7d3d0a2e66de))
+* **stage:** 修复多选组件处于拖拽状态时画布组件命中高亮的问题，优化多选拖拽体验 ([#265](https://github.com/Tencent/tmagic-editor/issues/265)) ([8f5acff](https://github.com/Tencent/tmagic-editor/commit/8f5acff0a64925dff8913e50c067543128130d27))
+* **stage:** 修复非多选状态下，点击选中组件切换为普通选中状态 ([#254](https://github.com/Tencent/tmagic-editor/issues/254)) ([cf9768b](https://github.com/Tencent/tmagic-editor/commit/cf9768ba96e043f9923a7c899218567dc6646167))
+* **stage:** 多选时禁止拖出边界 ([edf66cc](https://github.com/Tencent/tmagic-editor/commit/edf66cc0768149387dca0993c901b2a7489727dd))
+
+
+### Features
+
+* **cli:** 支持temp下的config.ts配置文件，该模式下的配置文件会默认被删掉 ([52973d2](https://github.com/Tencent/tmagic-editor/commit/52973d2a34237e36042da2130e7296b609f7fc0f))
+* **editor,stage:** 多选支持居中操作 ([c949590](https://github.com/Tencent/tmagic-editor/commit/c949590f805b6778f4f02e873f58bde1011cbefe))
+* **stage,editor:** 拖入指定容器支持配置成按住alt才开启 ([4f8ea94](https://github.com/Tencent/tmagic-editor/commit/4f8ea94ee8ed5dcf719457d243f40314e11b599b))
+* **stage:** 暂时禁用多选resizable ([b1ce0be](https://github.com/Tencent/tmagic-editor/commit/b1ce0be682ef5ddfce9b71e36864bfc0c79c969f))
+
+
+
 # [1.1.0-beta.8](https://github.com/Tencent/tmagic-editor/compare/v1.1.0-beta.7...v1.1.0-beta.8) (2022-08-11)
 
 
