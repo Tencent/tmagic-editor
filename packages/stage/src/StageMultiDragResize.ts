@@ -25,18 +25,9 @@ import MoveableHelper from 'moveable-helper';
 import { DRAG_EL_ID_PREFIX, PAGE_CLASS } from './const';
 import StageCore from './StageCore';
 import StageMask from './StageMask';
-import { StageDragResizeConfig } from './types';
+import { StageDragResizeConfig, StageDragStatus } from './types';
 import { calcValueByFontsize, getMode, getTargetElStyle } from './util';
 
-/** 拖动状态 */
-enum ActionStatus {
-  /** 开始拖动 */
-  START = 'start',
-  /** 拖动中 */
-  ING = 'ing',
-  /** 拖动结束 */
-  END = 'end',
-}
 export default class StageMultiDragResize extends EventEmitter {
   public core: StageCore;
   public mask: StageMask;
@@ -49,7 +40,7 @@ export default class StageMultiDragResize extends EventEmitter {
   /** Moveable多选拖拽类实例 */
   public moveableForMulti?: Moveable;
   /** 拖动状态 */
-  public dragStatus: ActionStatus = ActionStatus.END;
+  public dragStatus: StageDragStatus = StageDragStatus.END;
   private multiMoveableHelper?: MoveableHelper;
 
   constructor(config: StageDragResizeConfig) {
@@ -111,7 +102,7 @@ export default class StageMultiDragResize extends EventEmitter {
             id: matchEventTarget.id,
           });
         });
-        this.dragStatus = ActionStatus.START;
+        this.dragStatus = StageDragStatus.START;
       })
       .on('dragGroup', (params) => {
         const { events } = params;
@@ -134,11 +125,11 @@ export default class StageMultiDragResize extends EventEmitter {
           }
         });
         this.multiMoveableHelper?.onDragGroup(params);
-        this.dragStatus = ActionStatus.ING;
+        this.dragStatus = StageDragStatus.ING;
       })
       .on('dragGroupEnd', () => {
         this.update();
-        this.dragStatus = ActionStatus.END;
+        this.dragStatus = StageDragStatus.END;
       });
   }
 
