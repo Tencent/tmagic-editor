@@ -205,16 +205,19 @@ export default class StageMultiDragResize extends EventEmitter {
     const doc = contentWindow?.document;
     if (!doc) return;
 
-    this.targetList.forEach((targetItem) => {
-      const offset = { left: targetItem.offsetLeft, top: targetItem.offsetTop };
-      const left = calcValueByFontsize(doc, offset.left);
-      const top = calcValueByFontsize(doc, offset.top);
-      const width = calcValueByFontsize(doc, targetItem.clientWidth);
-      const height = calcValueByFontsize(doc, targetItem.clientHeight);
-      this.emit('update', {
-        el: targetItem,
-        style: isResize ? { left, top, width, height } : { left, top },
-      });
+    this.emit('update', {
+      data: this.targetList.map((targetItem) => {
+        const offset = { left: targetItem.offsetLeft, top: targetItem.offsetTop };
+        const left = calcValueByFontsize(doc, offset.left);
+        const top = calcValueByFontsize(doc, offset.top);
+        const width = calcValueByFontsize(doc, targetItem.clientWidth);
+        const height = calcValueByFontsize(doc, targetItem.clientHeight);
+        return {
+          el: targetItem,
+          style: isResize ? { left, top, width, height } : { left, top },
+        };
+      }),
+      parentEl: null,
     });
   }
 

@@ -450,9 +450,13 @@ export default class StageDragResize extends EventEmitter {
     }
 
     this.emit('update', {
-      el: this.target,
+      data: [
+        {
+          el: this.target,
+          style: isResize ? { left, top, width, height } : { left, top },
+        },
+      ],
       parentEl,
-      style: isResize ? { left, top, width, height } : { left, top },
     });
   }
 

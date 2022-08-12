@@ -64,11 +64,14 @@ class Editor extends BaseService {
         'select',
         'doAdd',
         'add',
+        'doRemove',
         'remove',
+        'doUpdate',
         'update',
         'sort',
         'copy',
         'paste',
+        'duAlignCenter',
         'alignCenter',
         'moveLayer',
         'moveToContainer',
@@ -417,12 +420,7 @@ class Editor extends BaseService {
     this.emit('remove');
   }
 
-  /**
-   * 更新节点
-   * @param config 新的节点配置，配置中需要有id信息
-   * @returns 更新后的节点配置
-   */
-  public async update(config: MNode): Promise<MNode> {
+  public async doUpdate(config: MNode) {
     if (!config?.id) throw new Error('没有配置或者配置缺少id值');
 
     const info = this.getNodeInfo(config.id, false);
@@ -475,11 +473,25 @@ class Editor extends BaseService {
     }
 
     this.addModifiedNodeId(newConfig.id);
-    this.pushHistoryState();
-
-    this.emit('update', newConfig);
 
     return newConfig;
+  }
+
+  /**
+   * 更新节点
+   * @param config 新的节点配置，配置中需要有id信息
+   * @returns 更新后的节点配置
+   */
+  public async update(config: MNode | MNode[]): Promise<MNode | MNode[]> {
+    const nodes = Array.isArray(config) ? config : [config];
+
+    const newNodes = await Promise.all(nodes.map((node) => this.doUpdate(node)));
+
+    this.pushHistoryState();
+
+    this.emit('update', newNodes);
+
+    return newNodes.length > 1 ? newNodes[0] : newNodes;
   }
 
   /**
@@ -533,15 +545,13 @@ class Editor extends BaseService {
     return this.add(pasteConfigs);
   }
 
-  /**
-   * 将指点节点设置居中
-   * @param config 组件节点配置
-   * @returns 当前组件节点配置
-   */
-  public async alignCenter(config: MNode): Promise<MNode> {
-    const parent = this.get<MContainer>('parent');
+  public async doAlignCenter(config: MNode): Promise<MNode> {
+    const parent = this.getParentById(config.id);
+
+    if (!parent) throw new Error('找不到父节点');
+
     const node = cloneDeep(toRaw(config));
-    const layout = await this.getLayout(toRaw(parent), node);
+    const layout = await this.getLayout(parent, node);
     if (layout === Layout.RELATIVE) {
       return config;
     }
@@ -561,12 +571,23 @@ class Editor extends BaseService {
       node.style.left = (parent.style.width - node.style.width) / 2;
     }
 
-    const newNode = await this.update(node);
+    return node;
+  }
 
-    this.get<StageCore | null>('stage')?.update({
-      config: cloneDeep(toRaw(newNode)),
-      root: cloneDeep(this.get<MApp>('root')),
-    });
+  /**
+   * 将指点节点设置居中
+   * @param config 组件节点配置
+   * @returns 当前组件节点配置
+   */
+  public async alignCenter(config: MNode | MNode[]): Promise<MNode | MNode[]> {
+    const nodes = Array.isArray(config) ? config : [config];
+    const stage = this.get<StageCore | null>('stage');
+
+    const newNodes = await Promise.all(nodes.map((node) => this.doAlignCenter(node)));
+
+    const newNode = await this.update(newNodes);
+
+    await stage?.multiSelect(newNodes.map((node) => node.id));
 
     return newNode;
   }
