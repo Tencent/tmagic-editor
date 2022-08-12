@@ -34,10 +34,10 @@ const menuData = reactive<MenuItem[]>([
   {
     type: 'button',
     text: '水平居中',
-    display: () => canCenter.value && !props.isMultiSelect,
+    display: () => canCenter.value,
     handler: () => {
-      if (!node.value) return;
-      editorService?.alignCenter(node.value);
+      if (!nodes.value) return;
+      editorService?.alignCenter(nodes.value);
     },
   },
   {

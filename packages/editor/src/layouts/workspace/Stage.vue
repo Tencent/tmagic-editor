@@ -118,10 +118,13 @@ watchEffect(() => {
 
   stage?.on('update', (ev: UpdateEventData) => {
     if (ev.parentEl) {
-      services?.editorService.moveToContainer({ id: ev.el.id, style: ev.style }, ev.parentEl.id);
+      for (const data of ev.data) {
+        services?.editorService.moveToContainer({ id: data.el.id, style: data.style }, ev.parentEl.id);
+      }
       return;
     }
-    services?.editorService.update({ id: ev.el.id, style: ev.style });
+
+    services?.editorService.update(ev.data.map((data) => ({ id: data.el.id, style: data.style })));
   });
 
   stage?.on('sort', (ev: SortEventData) => {

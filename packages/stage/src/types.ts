@@ -87,19 +87,21 @@ export interface GuidesEventData {
 }
 
 export interface UpdateEventData {
-  el: HTMLElement;
-  parentEl: HTMLElement | null;
-  ghostEl: HTMLElement;
-  style: {
-    width?: number;
-    height?: number;
-    left?: number;
-    top?: number;
-    transform?: {
-      rotate?: string;
-      scale?: string;
+  data: {
+    el: HTMLElement;
+    style: {
+      width?: number;
+      height?: number;
+      left?: number;
+      top?: number;
+      transform?: {
+        rotate?: string;
+        scale?: string;
+      };
     };
-  };
+    ghostEl?: HTMLElement;
+  }[];
+  parentEl: HTMLElement | null;
 }
 
 export interface SortEventData {
