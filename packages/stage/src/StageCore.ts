@@ -102,7 +102,7 @@ export default class StageCore extends EventEmitter {
         const el = await this.getElementFromPoint(event);
         if (!el) return;
         // 如果多选组件处于拖拽状态时不进行组件高亮
-        if (this.multiDr.isMultiDragStatus) return;
+        if (this.multiDr.dragStatus === 'ing') return;
         await this.highlight(el);
         if (this.highlightedDom === this.selectedDom) {
           this.highlightLayer.clearHighlight();
