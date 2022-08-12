@@ -35,6 +35,7 @@ import {
   Runtime,
   SortEventData,
   StageCoreConfig,
+  StageDragStatus,
   UpdateData,
   UpdateEventData,
 } from './types';
@@ -101,6 +102,8 @@ export default class StageCore extends EventEmitter {
       .on('highlight', async (event: MouseEvent) => {
         const el = await this.getElementFromPoint(event);
         if (!el) return;
+        // 如果多选组件处于拖拽状态时不进行组件高亮
+        if (this.multiDr.dragStatus === StageDragStatus.ING) return;
         await this.highlight(el);
         if (this.highlightedDom === this.selectedDom) {
           this.highlightLayer.clearHighlight();

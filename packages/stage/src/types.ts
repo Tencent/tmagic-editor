@@ -61,6 +61,16 @@ export interface StageDragResizeConfig {
   mask: StageMask;
 }
 
+/** 拖动状态 */
+export enum StageDragStatus {
+  /** 开始拖动 */
+  START = 'start',
+  /** 拖动中 */
+  ING = 'ing',
+  /** 拖动结束 */
+  END = 'end',
+}
+
 export type Rect = {
   width: number;
   height: number;
