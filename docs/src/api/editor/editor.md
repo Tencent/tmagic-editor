@@ -360,6 +360,22 @@ icon使用的是[element-plus icon](https://element-plus.org/zh-CN/component/ico
   
 识别到容器后，会给其dom上添加的class
 
+### containerHighlightType
+
+- **类型：** 'default' | 'alt' | '';
+  
+- **默认值：** 'default'
+  
+- **详情：**
+  
+启动方式
+
+default: 停留在画布上启动识别
+
+alt: 按住alt键启动识别
+
+其他值：不启动
+
 
 ## slots
 

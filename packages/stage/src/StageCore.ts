@@ -21,7 +21,7 @@ import { EventEmitter } from 'events';
 import type { Id } from '@tmagic/schema';
 import { addClassName } from '@tmagic/utils';
 
-import { DEFAULT_ZOOM, GHOST_EL_ID_PREFIX, PAGE_CLASS } from './const';
+import { CONTAINER_HIGHLIGHT_CLASS, DEFAULT_ZOOM, GHOST_EL_ID_PREFIX, PAGE_CLASS } from './const';
 import StageDragResize from './StageDragResize';
 import StageHighlight from './StageHighlight';
 import StageMask from './StageMask';
@@ -29,6 +29,7 @@ import StageMultiDragResize from './StageMultiDragResize';
 import StageRender from './StageRender';
 import {
   CanSelect,
+  ContainerHighlightType,
   GuidesEventData,
   IsContainer,
   RemoveData,
@@ -57,6 +58,7 @@ export default class StageCore extends EventEmitter {
   public zoom = DEFAULT_ZOOM;
   public containerHighlightClassName: string;
   public containerHighlightDuration: number;
+  public containerHighlightType?: ContainerHighlightType;
   public isContainer: IsContainer;
 
   private canSelect: CanSelect;
@@ -69,8 +71,9 @@ export default class StageCore extends EventEmitter {
     this.setZoom(config.zoom);
     this.canSelect = config.canSelect || ((el: HTMLElement) => !!el.id);
     this.isContainer = config.isContainer;
-    this.containerHighlightClassName = config.containerHighlightClassName;
-    this.containerHighlightDuration = config.containerHighlightDuration;
+    this.containerHighlightClassName = config.containerHighlightClassName || CONTAINER_HIGHLIGHT_CLASS;
+    this.containerHighlightDuration = config.containerHighlightDuration || 800;
+    this.containerHighlightType = config.containerHighlightType;
 
     this.renderer = new StageRender({ core: this });
     this.mask = new StageMask({ core: this });
