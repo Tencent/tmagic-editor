@@ -244,6 +244,15 @@ export default class StageMultiDragResize extends EventEmitter {
       zoom: 1,
       origin: true,
       padding: { left: 0, top: 0, right: 0, bottom: 0 },
+      snappable: true,
+      bounds: {
+        top: 0,
+        // 设置0的话无法移动到left为0，所以只能设置为-1
+        left: -1,
+        right: this.container.clientWidth - 1,
+        bottom: this.container.clientHeight,
+        ...(multiMoveableOptions.bounds || {}),
+      },
       ...options,
       ...multiMoveableOptions,
     };
