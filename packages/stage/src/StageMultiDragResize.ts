@@ -237,7 +237,7 @@ export default class StageMultiDragResize extends EventEmitter {
       defaultGroupRotate: 0,
       defaultGroupOrigin: '50% 50%',
       draggable: true,
-      resizable: true,
+      resizable: false,
       throttleDrag: 0,
       startDragRotate: 0,
       throttleDragRotate: 0,
