@@ -302,11 +302,11 @@ class Editor extends BaseService {
     const layout = await this.getLayout(toRaw(parent), node as MNode);
     node.style = getInitPositionStyle(node.style, layout);
 
-    await stage?.add({ config: cloneDeep(node), parent: cloneDeep(parent), root: cloneDeep(root) });
+    await stage?.add({ config: cloneDeep(node), parentId: parent.id, root: cloneDeep(root) });
 
     node.style = fixNodePosition(node, parent, stage);
 
-    await stage?.update({ config: cloneDeep(node), root: cloneDeep(root) });
+    await stage?.update({ config: cloneDeep(node), parentId: parent.id, root: cloneDeep(root) });
 
     this.addModifiedNodeId(node.id);
 
@@ -377,7 +377,7 @@ class Editor extends BaseService {
 
     parent.items?.splice(index, 1);
     const stage = this.get<StageCore | null>('stage');
-    stage?.remove({ id: node.id, root: this.get('root') });
+    stage?.remove({ id: node.id, parentId: parent.id, root: cloneDeep(root) });
 
     if (node.type === NodeType.PAGE) {
       this.state.pageLength -= 1;
@@ -466,7 +466,11 @@ class Editor extends BaseService {
     nodes.splice(targetIndex, 1, newConfig);
     this.set('nodes', nodes);
 
-    this.get<StageCore | null>('stage')?.update({ config: cloneDeep(newConfig), root: cloneDeep(this.get('root')) });
+    this.get<StageCore | null>('stage')?.update({
+      config: cloneDeep(newConfig),
+      parentId: parent.id,
+      root: cloneDeep(this.get('root')),
+    });
 
     if (newConfig.type === NodeType.PAGE) {
       this.set('page', newConfig);
@@ -513,7 +517,11 @@ class Editor extends BaseService {
     await this.update(parent);
     await this.select(node);
 
-    this.get<StageCore | null>('stage')?.update({ config: cloneDeep(node), root: cloneDeep(this.get('root')) });
+    this.get<StageCore | null>('stage')?.update({
+      config: cloneDeep(node),
+      parentId: parent.id,
+      root: cloneDeep(this.get('root')),
+    });
 
     this.addModifiedNodeId(parent.id);
     this.pushHistoryState();
@@ -612,6 +620,7 @@ class Editor extends BaseService {
 
     this.get<StageCore | null>('stage')?.update({
       config: cloneDeep(toRaw(parent)),
+      parentId: parent.id,
       root: cloneDeep(this.get<MApp>('root')),
     });
   }
@@ -632,7 +641,7 @@ class Editor extends BaseService {
       const index = getNodeIndex(node, parent);
       parent.items?.splice(index, 1);
 
-      await stage.remove({ id: node.id, root });
+      await stage.remove({ id: node.id, parentId: parent.id, root });
 
       const layout = await this.getLayout(target);
 
@@ -647,7 +656,7 @@ class Editor extends BaseService {
 
       await stage.select(targetId);
 
-      await stage.update({ config: cloneDeep(target), root });
+      await stage.update({ config: cloneDeep(target), parentId: parent.id, root });
 
       await this.select(newConfig);
       stage.select(newConfig.id);

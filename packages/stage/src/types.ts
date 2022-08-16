@@ -19,7 +19,7 @@
 import { MoveableOptions } from 'moveable';
 
 import Core from '@tmagic/core';
-import type { Id, MApp, MContainer, MNode } from '@tmagic/schema';
+import type { Id, MApp, MNode } from '@tmagic/schema';
 
 import { GuidesType } from './const';
 import StageCore from './StageCore';
@@ -118,12 +118,13 @@ export interface SortEventData {
 
 export interface UpdateData {
   config: MNode;
-  parent?: MContainer;
+  parentId: Id;
   root: MApp;
 }
 
 export interface RemoveData {
   id: Id;
+  parentId: Id;
   root: MApp;
 }
 
