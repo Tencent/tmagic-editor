@@ -302,7 +302,12 @@ class Editor extends BaseService {
     const layout = await this.getLayout(toRaw(parent), node as MNode);
     node.style = getInitPositionStyle(node.style, layout);
 
-    await stage?.add({ config: cloneDeep(node), parentId: parent.id, root: cloneDeep(root) });
+    await stage?.add({
+      config: cloneDeep(node),
+      parent: cloneDeep(parent),
+      parentId: parent.id,
+      root: cloneDeep(root),
+    });
 
     node.style = fixNodePosition(node, parent, stage);
 
