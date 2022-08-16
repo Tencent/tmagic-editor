@@ -53,3 +53,5 @@ export const fillBackgroundImage = (value: string) => {
   }
   return value;
 };
+
+export const isNumber = (value: string) => /^(-?\d+)(\.\d+)?$/.test(value);

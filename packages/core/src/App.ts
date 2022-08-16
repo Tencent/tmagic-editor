@@ -29,7 +29,7 @@ import {
   triggerCommonMethod,
 } from './events';
 import Page from './Page';
-import { fillBackgroundImage, style2Obj } from './utils';
+import { fillBackgroundImage, isNumber, style2Obj } from './utils';
 
 interface AppOptionsConfig {
   ua?: string;
@@ -124,6 +124,9 @@ class App extends EventEmitter {
             let defaultValue = 0;
             if (transformKey === 'scale') {
               defaultValue = 1;
+            }
+            if (transformKey === 'rotate' && isNumber(transformValue)) {
+              transformValue = `${transformValue}deg`;
             }
             return `${transformKey}(${transformValue || defaultValue})`;
           })
