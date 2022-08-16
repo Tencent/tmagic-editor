@@ -296,6 +296,9 @@ class Editor extends BaseService {
       throw new Error('app下不能添加组件');
     }
 
+    // 新增节点添加到配置中
+    parent?.items?.push(node);
+
     const layout = await this.getLayout(toRaw(parent), node as MNode);
     node.style = getInitPositionStyle(node.style, layout);
 
@@ -304,9 +307,6 @@ class Editor extends BaseService {
     node.style = fixNodePosition(node, parent, stage);
 
     await stage?.update({ config: cloneDeep(node), root: cloneDeep(root) });
-
-    // 新增节点添加到配置中
-    parent?.items?.push(node);
 
     this.addModifiedNodeId(node.id);
 
