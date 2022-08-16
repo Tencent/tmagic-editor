@@ -38,8 +38,8 @@ import { Coin, Connection, Document } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import serialize from 'serialize-javascript';
 
-import type { MenuBarData, MoveableOptions, TMagicEditor } from '@tmagic/editor';
-import type { Id } from '@tmagic/schema';
+import { editorService, MenuBarData, MoveableOptions, TMagicEditor } from '@tmagic/editor';
+import type { Id, MContainer, MNode } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 import StageCore from '@tmagic/stage';
 import { asyncLoadJs } from '@tmagic/utils';
@@ -169,6 +169,22 @@ asyncLoadJs(`${VITE_ENTRY_PATH}/event/index.umd.js`).then(() => {
 });
 
 save();
+
+editorService.usePlugin({
+  beforeDoAdd: (config: MNode, parent?: MContainer | null) => {
+    if (config.type === 'overlay') {
+      config.style = {
+        ...config.style,
+        left: 0,
+        top: 0,
+      };
+
+      return [config, editorService.get('page')];
+    }
+
+    return [config, parent];
+  },
+});
 </script>
 
 <style lang="scss">
