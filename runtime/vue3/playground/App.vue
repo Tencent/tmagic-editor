@@ -65,35 +65,31 @@ export default defineComponent({
         return nextTick().then(() => document.getElementById(`${id}`) as HTMLElement);
       },
 
-      add({ config }: UpdateData) {
+      add({ config, parentId }: UpdateData) {
         console.log('add config', config);
         if (!root.value) throw new Error('error');
         if (!selectedId.value) throw new Error('error');
-        const path = getNodePath(selectedId.value, [root.value]);
-        const node = path.pop();
-        const parent = node?.items ? node : path.pop();
+        const parent = getNodePath(parentId, [root.value]).pop();
         if (!parent) throw new Error('未找到父节点');
         parent.items?.push(config);
       },
 
-      update({ config }: UpdateData) {
+      update({ config, parentId }: UpdateData) {
         console.log('update config', config);
         if (!root.value) throw new Error('error');
-        const path = getNodePath(config.id, [root.value]);
-        const node = path.pop();
-        const parent = path.pop();
+        const node = getNodePath(config.id, [root.value]).pop();
+        const parent = getNodePath(parentId, [root.value]).pop();
         if (!node) throw new Error('未找到目标节点');
         if (!parent) throw new Error('未找到父节点');
         const index = parent.items?.findIndex((child: MNode) => child.id === node.id);
         parent.items.splice(index, 1, reactive(config));
       },
 
-      remove({ id }: RemoveData) {
+      remove({ id, parentId }: RemoveData) {
         if (!root.value) throw new Error('error');
-        const path = getNodePath(id, [root.value]);
-        const node = path.pop();
+        const node = getNodePath(id, [root.value]).pop();
         if (!node) throw new Error('未找到目标元素');
-        const parent = path.pop();
+        const parent = getNodePath(parentId, [root.value]).pop();
         if (!parent) throw new Error('未找到父元素');
         const index = parent.items?.findIndex((child: MNode) => child.id === node.id);
         parent.items.splice(index, 1);
