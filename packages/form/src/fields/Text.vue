@@ -26,6 +26,8 @@
 <script lang="ts">
 import { computed, defineComponent, inject, PropType } from 'vue';
 
+import { isNumber } from '@tmagic/utils';
+
 import { FormState, TextConfig } from '../schema';
 import fieldProps from '../utils/fieldProps';
 import { useAddField } from '../utils/useAddField';
@@ -86,7 +88,7 @@ export default defineComponent({
         const value = props.model[modelName.value];
         let num;
         let unit;
-        if (/^([0-9.]+)$/.test(value)) {
+        if (isNumber(value)) {
           num = +value;
         } else {
           value.replace(/^([0-9.]+)([a-z%]+)$/, ($0: string, $1: string, $2: string) => {
@@ -100,7 +102,7 @@ export default defineComponent({
         }
 
         const ctrl = navigator.platform.match('Mac') ? $event.metaKey : $event.ctrlKey;
-        const shif = $event.shiftKey;
+        const shift = $event.shiftKey;
         const alt = $event.altKey;
 
         if (arrowUp) {
@@ -108,7 +110,7 @@ export default defineComponent({
             num += 100;
           } else if (alt) {
             num = (num * 10000 + 1000) / 10000;
-          } else if (shif) {
+          } else if (shift) {
             num = num + 10;
           } else {
             num += 1;
@@ -118,7 +120,7 @@ export default defineComponent({
             num -= 100;
           } else if (alt) {
             num = (num * 10000 - 1000) / 10000;
-          } else if (shif) {
+          } else if (shift) {
             num -= 10;
           } else {
             num -= 1;
