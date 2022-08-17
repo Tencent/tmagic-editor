@@ -86,11 +86,11 @@ export const getPositionInContainer = (position: PastePosition = {}, id: Id) => 
   };
 };
 
-export const getAddParent = (addNode: AddMNode | MNode[]) => {
+export const getAddParent = (node: MNode) => {
   const curNode = editorService.get<MContainer>('node');
 
   let parentNode;
-  if (!Array.isArray(addNode) && isPage(addNode as MNode)) {
+  if (isPage(node)) {
     parentNode = editorService.get<MApp>('root');
   } else if (curNode.items) {
     parentNode = curNode;
