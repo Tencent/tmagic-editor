@@ -1,3 +1,23 @@
+# [1.1.0-beta.10](https://github.com/Tencent/tmagic-editor/compare/v1.1.0-beta.9...v1.1.0-beta.10) (2022-08-17)
+
+
+### Bug Fixes
+
+* **editor:** react runtime中添加没有即使渲染 ([9d2e221](https://github.com/Tencent/tmagic-editor/commit/9d2e2210d1dc8398a301df74bd9360c60c216317))
+* **editor:** 复制页面错误 ([5f0e421](https://github.com/Tencent/tmagic-editor/commit/5f0e421550717eb8709cf3a11aeb8ce4396eb2ca))
+* **form:** text按方向键减到负数后，继续按方向键无效 ([e1c0614](https://github.com/Tencent/tmagic-editor/commit/e1c061426533473f9911e56b2c64b08a6f52f57e)), closes [#261](https://github.com/Tencent/tmagic-editor/issues/261)
+* **playground,runtime:** 拖动添加弹窗时初始位置不对 ([41a8400](https://github.com/Tencent/tmagic-editor/commit/41a84000956fea8d73fdf171df4a232cec4ca99c))
+
+
+### Features
+
+* **cli:** 自动install组件包，支持pnpm,npm,yarn ([c19afda](https://github.com/Tencent/tmagic-editor/commit/c19afda58c0cc34312a4eb5950382f9e3e092c6f))
+* **core:** 旋转角度支持配置不带单位的数值 ([b1bd7a8](https://github.com/Tencent/tmagic-editor/commit/b1bd7a870e748890c176339460176cd7deb2d2e6)), closes [#260](https://github.com/Tencent/tmagic-editor/issues/260)
+* **editor,stage:** runtime-api中的add/update/remove中的参数加上parentId ([59e6aff](https://github.com/Tencent/tmagic-editor/commit/59e6aff70a288c69197a85f08373abd1400f78a2))
+* **editor:** runtime add api中parent参数加回去 ([2cde4bb](https://github.com/Tencent/tmagic-editor/commit/2cde4bb5a016d22ac184014d7b45b55cd0e75631))
+
+
+
 # [1.1.0-beta.9](https://github.com/Tencent/tmagic-editor/compare/v1.1.0-beta.8...v1.1.0-beta.9) (2022-08-12)
 
 
