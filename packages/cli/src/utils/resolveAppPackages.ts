@@ -2,11 +2,12 @@ import { execSync } from 'child_process';
 import path from 'path';
 import { exit } from 'process';
 
+import chalk from 'chalk';
 import fs from 'fs-extra';
 import * as recast from 'recast';
 
 import type App from '../Core';
-import { Entry, EntryType, PackageType } from '../types';
+import { Entry, EntryType, NpmConfig, PackageType } from '../types';
 
 interface TypeAssertion {
   type: string;
@@ -26,10 +27,16 @@ export const resolveAppPackages = (app: App) => {
   const valueMap: Record<string, string> = {};
   const pluginMap: Record<string, string> = {};
 
-  Object.entries(app.options.packages).forEach(([key, packagePath]) => {
-    installPackage(packagePath, app.options.source);
+  const dependencies: Record<string, string> = {};
 
-    const indexPath = require.resolve(packagePath);
+  const setPackages = (cwd: string, packagePath: string, key?: string) => {
+    const { name: moduleName } = splitNameVersion(packagePath);
+
+    if (!moduleName) throw Error('packages中包含非法配置');
+
+    const indexPath = execSync(`node -e "console.log(require.resolve('${moduleName}'))"`, { cwd })
+      .toString()
+      .replace('\n', '');
     const indexCode = fs.readFileSync(indexPath, { encoding: 'utf-8', flag: 'r' });
     const ast = recast.parse(indexCode, { parser: require('recast/parsers/typescript') });
     const result = typeAssertion({ ast, indexPath });
@@ -41,12 +48,12 @@ export const resolveAppPackages = (app: App) => {
       if (entry.value) valueMap[key] = entry.value;
     };
 
-    if (result.type === PackageType.COMPONENT) {
+    if (result.type === PackageType.COMPONENT && key) {
       // 组件
-      setItem(key, parseEntry({ ast, package: packagePath, indexPath }));
-    } else if (result.type === PackageType.PLUGIN) {
+      setItem(key, parseEntry({ ast, package: moduleName, indexPath }));
+    } else if (result.type === PackageType.PLUGIN && key) {
       // 插件
-      pluginMap[key] = packagePath;
+      pluginMap[key] = moduleName;
     } else if (result.type === PackageType.COMPONENT_PACKAGE) {
       // 组件&插件包
       result.imports.forEach((i) => {
@@ -66,6 +73,52 @@ export const resolveAppPackages = (app: App) => {
         }
       });
     }
+  };
+
+  const getDependencies = (packagePath: string) => {
+    if (fs.existsSync(packagePath)) return;
+    const { name: moduleName, version } = splitNameVersion(packagePath);
+    if (!moduleName) return;
+    dependencies[moduleName] = version;
+  };
+
+  app.options.packages.forEach((item) => {
+    if (typeof item === 'object') {
+      Object.entries(item).forEach(([, packagePath]) => {
+        getDependencies(packagePath);
+      });
+    } else {
+      getDependencies(item);
+    }
+  });
+
+  if (Object.keys(dependencies).length) {
+    const packageFile = path.join(app.options.source, 'package.json');
+    const packageBakFile = path.join(app.options.source, 'package.json.bak');
+    if (fs.existsSync(packageFile)) {
+      fs.copyFileSync(packageFile, packageBakFile);
+    }
+
+    try {
+      npmInstall(dependencies, app.options.source, app.options.npmConfig);
+    } catch (e) {
+      console.error(e);
+    }
+
+    if (fs.existsSync(packageBakFile)) {
+      fs.unlinkSync(packageFile);
+      fs.renameSync(packageBakFile, packageFile);
+    }
+  }
+
+  app.options.packages.forEach((item) => {
+    if (typeof item === 'object') {
+      Object.entries(item).forEach(([key, packagePath]) => {
+        setPackages(app.options.source, packagePath, key);
+      });
+    } else {
+      setPackages(app.options.source, item);
+    }
   });
 
   return {
@@ -77,16 +130,27 @@ export const resolveAppPackages = (app: App) => {
   };
 };
 
-const installPackage = function (module: string, cwd: string) {
-  try {
-    // window下需要将路径中\转换成/
-    execSync(`node -e "require.resolve('${module.replace(/\\/g, '/')}')"`, { stdio: 'ignore' });
-  } catch (e) {
-    execSync(`npm install ${module}`, {
-      stdio: 'inherit',
-      cwd,
-    });
-  }
+const npmInstall = function (dependencies: Record<string, string>, cwd: string, npmConfig: NpmConfig = {}) {
+  const { client = 'npm', registry = 'https://registry.npmjs.org/' } = npmConfig;
+  const install = {
+    npm: 'install',
+    yarn: 'add',
+    pnpm: 'add',
+  }[client];
+
+  const packages = Object.entries(dependencies)
+    .map(([name, version]) => `${name}@${version}`)
+    .join(' ');
+
+  const command = `${client} ${install} ${packages} --registry ${registry}`;
+
+  console.log(chalk.blue(cwd));
+  console.log(chalk.blue(command));
+
+  execSync(command, {
+    stdio: 'inherit',
+    cwd,
+  });
 };
 
 /**
@@ -360,5 +424,22 @@ const getASTTokenByTraverse = ({ ast, indexPath }: { ast: any; indexPath: string
     importComponentToken,
     importComponentSource,
     exportDefaultToken,
+  };
+};
+
+const splitNameVersion = function (str: string) {
+  if (typeof str !== 'string') {
+    return {};
+  }
+  const packStr = String.prototype.trim.call(str);
+  const ret = packStr.match(/((^|@).+)@(.+)/);
+  let name = packStr;
+  let version = 'latest';
+  if (ret && ret[3] !== '') {
+    ({ 1: name, 3: version } = ret);
+  }
+  return {
+    name,
+    version,
   };
 };
