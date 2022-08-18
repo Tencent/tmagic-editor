@@ -7,7 +7,7 @@ import fs from 'fs-extra';
 import * as recast from 'recast';
 
 import type App from '../Core';
-import { Entry, EntryType, NpmConfig, PackageType } from '../types';
+import { Entry, EntryType, ModuleMainFilePath, NpmConfig, PackageType } from '../types';
 
 interface TypeAssertion {
   type: string;
@@ -20,7 +20,7 @@ interface ParseEntryOption {
   indexPath: string;
 }
 
-export const resolveAppPackages = (app: App) => {
+export const resolveAppPackages = (app: App): ModuleMainFilePath => {
   const componentMap: Record<string, string> = {};
   const configMap: Record<string, string> = {};
   const eventMap: Record<string, string> = {};
