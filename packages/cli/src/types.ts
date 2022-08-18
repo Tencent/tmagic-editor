@@ -1,3 +1,5 @@
+import type Core from './Core';
+
 export enum EntryType {
   CONFIG = 'config',
   VALUE = 'value',
@@ -36,6 +38,14 @@ export interface NpmConfig {
   client?: 'npm' | 'yarn' | 'pnpm';
 }
 
+export interface ModuleMainFilePath {
+  componentMap: Record<string, string>;
+  pluginMap: Record<string, string>;
+  configMap: Record<string, string>;
+  valueMap: Record<string, string>;
+  eventMap: Record<string, string>;
+}
+
 export interface UserConfig {
   source: string;
   temp: string;
@@ -43,4 +53,6 @@ export interface UserConfig {
   componentFileAffix: string;
   cleanTemp: boolean;
   npmConfig?: NpmConfig;
+  onInit?: (app: Core) => ModuleMainFilePath | Promise<ModuleMainFilePath>;
+  onPrepare?: (app: Core) => void;
 }
