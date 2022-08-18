@@ -21,13 +21,16 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import type { MNode } from '@tmagic/schema';
 
 import actApi from '@src/api/act';
+import { isPage } from '@tmagic/utils';
 
 export default {
   /**
    * 编辑器删除插件(删除前hook)
    * @returns void
    */
-  beforeRemove: async () => {
+  beforeRemove: async (node: MNode) => {
+    if (!isPage(node)) return [node];
+
     try {
       await ElMessageBox.confirm('确认删除该页面吗？', '提示', {
         confirmButtonText: '删除',
@@ -38,6 +41,8 @@ export default {
     } catch (error) {
       throw new Error('delete canceled');
     }
+
+    return [node];
   },
   /**
    * 编辑器删除插件(删除后hook)
