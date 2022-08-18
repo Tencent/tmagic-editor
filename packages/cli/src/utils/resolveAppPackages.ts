@@ -34,7 +34,7 @@ export const resolveAppPackages = (app: App) => {
 
     if (!moduleName) throw Error('packages中包含非法配置');
 
-    const indexPath = execSync(`node -e "console.log(require.resolve('${moduleName}'))"`, { cwd })
+    const indexPath = execSync(`node -e "console.log(require.resolve('${moduleName.replace(/\\/g, '/')}'))"`, { cwd })
       .toString()
       .replace('\n', '');
     const indexCode = fs.readFileSync(indexPath, { encoding: 'utf-8', flag: 'r' });
