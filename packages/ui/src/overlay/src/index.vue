@@ -12,7 +12,6 @@ import type { MNode } from '@tmagic/schema';
 import useApp from '../../useApp';
 
 export default defineComponent({
-  name: 'magic-ui-overlay',
   props: {
     config: {
       type: Object,

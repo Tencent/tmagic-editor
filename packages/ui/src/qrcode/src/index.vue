@@ -10,8 +10,6 @@ import { MQrcode } from '../../types';
 import useApp from '../../useApp';
 
 export default defineComponent({
-  name: 'magic-ui-qrcode',
-
   props: {
     config: {
       type: Object as PropType<MQrcode>,

@@ -5,7 +5,6 @@ import { MComponentInstance, MText, MTextInstance } from '../../../src/types';
 import useApp from '../../useApp';
 
 export default defineComponent({
-  name: 'magic-ui-text',
   props: {
     config: {
       type: Object as PropType<MText>,

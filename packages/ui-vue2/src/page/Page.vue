@@ -18,8 +18,6 @@ import Component from '../Component.vue';
 import useApp from '../useApp';
 
 export default defineComponent({
-  name: 'magic-ui-page',
-
   components: {
     'magic-ui-component': Component,
   },

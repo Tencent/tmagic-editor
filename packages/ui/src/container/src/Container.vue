@@ -20,8 +20,6 @@ import useApp from '../../useApp';
 import useCommonMethod from '../../useCommonMethod';
 
 export default defineComponent({
-  name: 'magic-ui-container',
-
   components: {
     'magic-ui-component': Component,
   },

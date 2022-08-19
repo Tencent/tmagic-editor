@@ -32,8 +32,8 @@ const magicApp = createApp(AppComponent);
 
 magicApp.use(request);
 
-Object.values(components).forEach((component: any) => {
-  magicApp.component(component.name, component);
+Object.entries(components).forEach(([type, component]: [string, any]) => {
+  magicApp.component(`magic-ui-${type}`, component);
 });
 
 Object.values(plugins).forEach((plugin: any) => {
