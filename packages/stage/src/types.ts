@@ -119,7 +119,7 @@ export interface SortEventData {
 export interface UpdateData {
   config: MNode;
   parent?: MContainer;
-  parentId: Id;
+  parentId: Id | undefined;
   root: MApp;
 }
 
