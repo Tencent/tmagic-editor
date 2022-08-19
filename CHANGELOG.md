@@ -1,3 +1,21 @@
+# [1.1.0-beta.11](https://github.com/Tencent/tmagic-editor/compare/v1.1.0-beta.10...v1.1.0-beta.11) (2022-08-19)
+
+
+### Bug Fixes
+
+* **cli:** window下路径分隔符\转换为/ ([4e4cae4](https://github.com/Tencent/tmagic-editor/commit/4e4cae4a7773b0916c9ed3cfd5549ce6b0077c8e)), closes [#286](https://github.com/Tencent/tmagic-editor/issues/286)
+* **editor:** 解决UISelect控制台警告 ([#289](https://github.com/Tencent/tmagic-editor/issues/289)) ([0536ac2](https://github.com/Tencent/tmagic-editor/commit/0536ac29ae21b06fd8bbe1c31d6c9f1bf464efb8))
+* **ui,runtime:** 组件注册默认以magic-ui-xx的形式，不再需要在组件中设置name ([de38035](https://github.com/Tencent/tmagic-editor/commit/de380357ee45f74e35465bb48e5447720116fd42)), closes [#291](https://github.com/Tencent/tmagic-editor/issues/291)
+
+
+### Features
+
+* **admin:** 更新runtime ([aed4b42](https://github.com/Tencent/tmagic-editor/commit/aed4b42191a9b5c2d856cb850eaf100cce55ce9f))
+* **cli:** 添加onInit/onPrepare配置 ([87f1bfb](https://github.com/Tencent/tmagic-editor/commit/87f1bfbdd659172ec493cda9111bad049bc4bc73))
+* **editor:** 记住组件树节点展开的状态 ([143bded](https://github.com/Tencent/tmagic-editor/commit/143bded648ddf07d3ab8ab78c7108f4a8f545f7d)), closes [#283](https://github.com/Tencent/tmagic-editor/issues/283)
+
+
+
 # [1.1.0-beta.10](https://github.com/Tencent/tmagic-editor/compare/v1.1.0-beta.9...v1.1.0-beta.10) (2022-08-17)
 
 

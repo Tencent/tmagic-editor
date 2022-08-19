@@ -1,6 +1,6 @@
 {
   "name": "runtime-vue2",
-  "version": "1.1.0-beta.10",
+  "version": "1.1.0-beta.11",
   "private": true,
   "scripts": {
     "dev:vue2": "npm run build:libs && vite --config dev.vite.config.ts",
@@ -20,12 +20,12 @@
     "build:event:admin": "vite build --config build.vite.config.ts --mode event:admin"
   },
   "dependencies": {
-    "@tmagic/cli": "1.1.0-beta.10",
-    "@tmagic/core": "1.1.0-beta.10",
-    "@tmagic/ui-vue2": "1.1.0-beta.10",
-    "@tmagic/schema": "1.1.0-beta.10",
-    "@tmagic/stage": "1.1.0-beta.10",
-    "@tmagic/utils": "1.1.0-beta.10",
+    "@tmagic/cli": "1.1.0-beta.11",
+    "@tmagic/core": "1.1.0-beta.11",
+    "@tmagic/ui-vue2": "1.1.0-beta.11",
+    "@tmagic/schema": "1.1.0-beta.11",
+    "@tmagic/stage": "1.1.0-beta.11",
+    "@tmagic/utils": "1.1.0-beta.11",
     "axios": "^0.25.0",
     "terser": "^5.14.2",
     "vue": "^2.7.4"
