@@ -15,6 +15,7 @@
       v-if="values.length"
       ref="tree"
       node-key="id"
+      empty-text="页面空荡荡的"
       draggable
       :default-expanded-keys="expandedKeys"
       :load="loadItems"
@@ -29,7 +30,8 @@
       @node-click="clickHandler"
       @node-contextmenu="contextmenu"
       @node-drag-end="handleDragEnd"
-      empty-text="页面空荡荡的"
+      @node-collapse="handleCollapse"
+      @node-expand="handleExpand"
     >
       <template #default="{ node, data }">
         <div
@@ -60,7 +62,7 @@ import { computed, defineComponent, inject, Ref, ref, watchEffect } from 'vue';
 import type { ElTree } from 'element-plus';
 import { throttle } from 'lodash-es';
 
-import type { MNode, MPage } from '@tmagic/schema';
+import type { Id, MNode, MPage } from '@tmagic/schema';
 import { MContainer, NodeType } from '@tmagic/schema';
 import StageCore from '@tmagic/stage';
 
@@ -122,22 +124,41 @@ const useDrop = (tree: Ref<InstanceType<typeof ElTree> | undefined>, editorServi
 });
 
 const useStatus = (tree: Ref<InstanceType<typeof ElTree> | undefined>, editorService?: EditorService) => {
-  const highlightNode = ref<MNode>();
   const node = ref<MNode>();
   const page = computed(() => editorService?.get('page'));
+  const expandedKeys = new Map<Id, Id>();
+
+  const expandNodes = () => {
+    expandedKeys.forEach((key) => {
+      if (!tree.value) return;
+      tree.value.getNode(key)?.expand();
+    });
+  };
 
   watchEffect(() => {
     if (!tree.value) return;
-    node.value = editorService?.get('node');
-    node.value && tree.value.setCurrentKey(node.value.id, true);
+    if (!editorService) return;
+    node.value = editorService.get('node');
 
-    const parent = editorService?.get('parent');
+    if (!node.value) return;
+
+    tree.value.setCurrentKey(node.value.id, true);
+
+    const parent = editorService.get('parent');
     if (!parent?.id) return;
 
     const treeNode = tree.value.getNode(parent.id);
     treeNode?.updateChildren();
 
-    highlightNode.value = editorService?.get('highlightNode');
+    setTimeout(() => {
+      tree.value &&
+        Object.entries(tree.value.store.nodesMap).forEach(([id, node]) => {
+          if (node.expanded && node.data.items) {
+            expandedKeys.set(id, id);
+          }
+        });
+      expandNodes();
+    });
   });
 
   return {
@@ -153,9 +174,19 @@ const useStatus = (tree: Ref<InstanceType<typeof ElTree> | undefined>, editorSer
       resolve([]);
     },
 
-    highlightNode,
+    highlightNode: computed(() => editorService?.get('highlightNode')),
     clickNode: node,
     expandedKeys: computed(() => (node.value ? [node.value.id] : [])),
+
+    handleCollapse: (data: MNode) => {
+      expandedKeys.delete(data.id);
+    },
+
+    handleExpand: (data: MNode) => {
+      const parent = editorService?.getParentById(data.id);
+      if (!parent?.id) return;
+      expandedKeys.set(parent.id, parent.id);
+    },
   };
 };
 
