@@ -16,8 +16,6 @@ import Core from '@tmagic/core';
 import { toLine } from '@tmagic/utils';
 
 export default defineComponent({
-  name: 'magic-ui-component',
-
   props: {
     config: {
       type: Object,

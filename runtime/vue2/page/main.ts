@@ -37,7 +37,7 @@ const app = new Core({
 
 Object.keys(components).forEach((type: string) => {
   const component = components[type];
-  Vue.component(component.name, component);
+  Vue.component(`magic-ui-${type}`, component);
   app.registerComponent(type, component);
 });
 

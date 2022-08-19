@@ -8,7 +8,6 @@ import { MImg } from '../../types';
 import useApp from '../../useApp';
 
 export default defineComponent({
-  name: 'magic-ui-img',
   props: {
     config: {
       type: Object as PropType<MImg>,

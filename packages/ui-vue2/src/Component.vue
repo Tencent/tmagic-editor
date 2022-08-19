@@ -17,8 +17,6 @@ import { MComponent } from '@tmagic/schema';
 import { toLine } from '@tmagic/utils';
 
 export default defineComponent({
-  name: 'magic-ui-component',
-
   props: {
     config: {
       type: Object as PropType<MComponent>,
