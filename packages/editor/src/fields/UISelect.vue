@@ -3,14 +3,8 @@
     <el-button type="danger" :icon="Delete" text style="padding: 0">取消</el-button>
   </div>
   <div class="m-fields-ui-select" v-else @click="startSelect" style="display: flex">
-    <el-tooltip  v-if="val" content="清除">
-        <el-button
-          style="padding: 0"
-          type="danger"
-          :icon="Close"
-          text
-          @click.stop="deleteHandler"
-        ></el-button>
+    <el-tooltip v-if="val" content="清除">
+      <el-button style="padding: 0" type="danger" :icon="Close" text @click.stop="deleteHandler"></el-button>
     </el-tooltip>
     <el-tooltip :content="val ? toName + '_' + val : '点击此处选择'">
       <el-button text style="padding: 0; margin: 0">{{ val ? toName + '_' + val : '点击此处选择' }}</el-button>
