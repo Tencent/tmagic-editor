@@ -37,16 +37,68 @@ tmagic-editor提供了三个版本的 runtime 示例，可以参考：
 响应用户配置修改的操作代码并不需要在用户打开的页面被使用到，这是两个 runtime 的主要差异。
 <img src="https://image.video.qpic.cn/oa_88b7d-32_528694230_1633762153731370" width="100%" alt="tmagic-editor runtime playground 示意图">
 
-## 打包脚本
-在tmagic-editor各个框架的 runtime 目录中，有对应的 scripts 打包脚本目录。由于各个框架的 runtime 间有可能有不同的打包方式，所以为了架构职责明确，我们将示例打包代码分别放入对应 runtime 的 scripts 目录中。
+## @tmagic/cli
 
-详细的打包脚本，可以参考调用[tmagic-editor打包脚本 generateEntry](https://github.com/Tencent/tmagic-editor/blob/master/runtime/scripts/generateEntry.js)。
+在[组件开发](../component/introduction.md)中可以知道，一个组件是由组件(component)、表单配置(formConfig)、初始值(initValue)三个部分组成，其中表单配置跟初始值是提供给@tmagic/editor使用的，组件则是提供给runtime使用的。所以提供了@tmagic/cli来生成这几个部分的入口文件，处理以上提到的三个部分，还有组件的事件配置列表(@tmagic/editor中使用)，插件列表(runtime中使用)，总共5个入口文件。
+
+### 使用方法
+
+1、在runtime中安装@tmagic/cli
+```bash
+npm install @magic/cli@beta -D
+```
+
+2、在package.json 中的scripts中加入 tmagic entry 
+```json
+{
+  "scripts": {
+    "entry": "tmagic entry"
+  }
+}
+```
+
+3、在runtime目录下添加tmagic.config.ts
+
+```ts
+import path from 'path';
+
+import { defineConfig } from '@tmagic/cli';
+
+export default defineConfig({
+  /** 组件目录或者npm包名 */
+  packages: [path.join(__dirname, '../../packages/ui')],
+  /** 组件文件后缀名，例如vue文件为.vue，tsx文件为.tsx，普通js文件则为.js */
+  componentFileAffix: '.vue',
+  /** npm 配置，用于当packages配置有npm包名时，可以自动安装npm包 */
+  npmConfig: {
+    /** pnpm | npm | yarn */
+    client: 'npm',
+    /** npm镜像代理 */
+    registry: 'https://registry.npmjs.org/'
+  }
+});
+```
+
+4、结果
+
+执行
+
+```bash
+npm run entry
+```
+
+会在根目录下生成.tmagic文件夹
+
+```
+└─.tmagic
+   └─ comp-entry.ts // 组件
+   └─ config-entry.ts // 组件属性表单配置
+   └─ event-entry.ts // 组件事件列表
+   └─ plugin-entry.ts // 插件
+   └─ value-entry.ts // 组件初始值
+```
 
 在 runtime 中，我们通过 vite.config.ts 定义了打包入口文件，在 package.json 中声明了打包命令。你可以进入对应的 runtime 目录中尝试执行
-```bash
-npm i
-npm run build
-```
 
 我们就可以得到打包产物 dist 目录。其中有我们在线上项目页面使用的 page.html 和编辑器模拟器使用的 playground.html 两个 runtime 页面框架。
 
