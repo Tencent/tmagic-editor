@@ -18,7 +18,7 @@
     "@tmagic/stage": "1.1.0-beta.11",
     "@tmagic/utils": "1.1.0-beta.11",
     "element-plus": "^2.2.6",
-    "monaco-editor": "^0.32.1",
+    "monaco-editor": "^0.34.0",
     "serialize-javascript": "^6.0.0",
     "terser": "^5.14.2",
     "vue": "^3.2.37",
