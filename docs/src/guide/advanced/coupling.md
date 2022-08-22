@@ -143,12 +143,9 @@ function Test({ config }) {
 export default Test;
 ```
 
-::: tip 
-react 的实现方式需要开发者通过 useApp 来获得我们提供的核心 app 和一个 ref，这个 ref 是需要开发者绑定到组件上的。和 vue 不同，react 的 dom 实例需要用户指定。
-
-而需要这个 ref 的原因，是在公共事件执行时，可能会需要 dom 实例来进行操作；或者用户使用高级函数时，我们会向用户传入组件的 dom 实例给开发者使用。
-:::
-
 按照上述实现触发事件和事件动作，就可以完成组件的联动事件分发响应。
 
+:::tip
+组件事件的联动是借助了@tmagic/core，需要在组件实例化的时候将需要暴露的方法提供给@tmagic/core，在上述例子中useApp方法的调用就是完成这个操作，useApp返回的app对象就是@tmagic/core的实例。在vue的实现中useApp是将整个vue实例都提供给了app，所以需要defineExport来定义vue instance上的方法，react则是将需要暴露的方法作为useApp的参数传入
+:::
 
