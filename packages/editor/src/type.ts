@@ -147,16 +147,6 @@ export interface PastePosition {
 }
 
 /**
- * 粘贴配置项
- */
-export interface PasteOptions {
-  /**
-   * 粘贴数据格式转换器
-   */
-  formatter?: (oldNode: MNode, newNode: MNode) => MNode;
-}
-
-/**
  * 菜单按钮
  */
 export interface MenuButton {
