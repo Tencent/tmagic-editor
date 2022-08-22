@@ -174,7 +174,7 @@ importers:
       gesto: ^1.7.0
       keycon: ^1.1.2
       lodash-es: ^4.17.21
-      monaco-editor: ^0.32.1
+      monaco-editor: ^0.34.0
       rimraf: ^3.0.2
       sass: ^1.35.1
       serialize-javascript: ^6.0.0
@@ -197,7 +197,7 @@ importers:
       gesto: 1.8.1
       keycon: 1.1.2
       lodash-es: 4.17.21
-      monaco-editor: 0.32.1
+      monaco-editor: 0.34.0
       serialize-javascript: 6.0.0
       vue: 3.2.37
     devDependencies:
@@ -440,7 +440,7 @@ importers:
       '@vitejs/plugin-vue-jsx': ^1.3.10
       '@vue/compiler-sfc': ^3.2.37
       element-plus: ^2.2.6
-      monaco-editor: ^0.32.1
+      monaco-editor: ^0.34.0
       sass: ^1.35.1
       serialize-javascript: ^6.0.0
       terser: ^5.14.2
@@ -457,7 +457,7 @@ importers:
       '@tmagic/stage': link:../packages/stage
       '@tmagic/utils': link:../packages/utils
       element-plus: 2.2.6_vue@3.2.37
-      monaco-editor: 0.32.1
+      monaco-editor: 0.34.0
       serialize-javascript: 6.0.0
       terser: 5.14.2
       vue: 3.2.37
@@ -5266,8 +5266,8 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /monaco-editor/0.32.1:
-    resolution: {integrity: sha512-LUt2wsUvQmEi2tfTOK+tjAPvt7eQ+K5C4rZPr6SeuyzjAuAHrIvlUloTcOiGjZW3fn3a/jFQCONrEJbNOaCqbA==}
+  /monaco-editor/0.34.0:
+    resolution: {integrity: sha512-VF+S5zG8wxfinLKLrWcl4WUizMx+LeJrG4PM/M78OhcwocpV0jiyhX/pG6Q9jIOhrb/ckYi6nHnaR5OojlOZCQ==}
     dev: false
 
   /moveable-helper/0.4.0:
