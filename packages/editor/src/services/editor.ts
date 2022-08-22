@@ -71,6 +71,7 @@ class Editor extends BaseService {
         'sort',
         'copy',
         'paste',
+        'doPaste',
         'duAlignCenter',
         'alignCenter',
         'moveLayer',
@@ -556,9 +557,14 @@ class Editor extends BaseService {
 
     if (!Array.isArray(config)) return;
 
-    const pasteConfigs = await beforePaste(position, config);
+    const pasteConfigs = await this.doPaste(config, position);
 
     return this.add(pasteConfigs);
+  }
+
+  public async doPaste(config: MNode[], position: PastePosition = {}): Promise<MNode[]> {
+    const pasteConfigs = await beforePaste(position, cloneDeep(config));
+    return pasteConfigs;
   }
 
   public async doAlignCenter(config: MNode): Promise<MNode> {
