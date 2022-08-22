@@ -38,28 +38,6 @@ describe('setNewItemId', () => {
     expect(config.id === 1).toBeFalsy();
     expect(config.items[0].id === 2).toBeFalsy();
   });
-
-  test('pop', async () => {
-    const config = {
-      id: 1,
-      type: NodeType.PAGE,
-      items: [
-        {
-          type: 'button',
-          id: 2,
-          pop: 3,
-        },
-        {
-          type: 'pop',
-          id: 3,
-        },
-      ],
-    };
-    await props.setNewItemId(config);
-    expect(config.items[0].pop === 3).toBeFalsy();
-    expect(config.items[1].id === 3).toBeFalsy();
-    expect(config.items[1].id === config.items[0].pop).toBeTruthy();
-  });
 });
 
 test('getDefaultValue', async () => {

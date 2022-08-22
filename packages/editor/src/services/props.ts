@@ -20,9 +20,8 @@ import { reactive } from 'vue';
 import { cloneDeep, mergeWith } from 'lodash-es';
 
 import type { FormConfig } from '@tmagic/form';
-import type { Id, MComponent, MNode, MPage } from '@tmagic/schema';
-import { NodeType } from '@tmagic/schema';
-import { isPop, toLine } from '@tmagic/utils';
+import type { MComponent, MNode } from '@tmagic/schema';
+import { toLine } from '@tmagic/utils';
 
 import type { PropsState } from '../type';
 import { DEFAULT_CONFIG, fillConfig } from '../utils/props';
@@ -125,19 +124,6 @@ class Props extends BaseService {
     };
   }
 
-  /**
-   * 生成指定位数的GUID，无【-】格式
-   * @param digit 位数，默认值8
-   * @returns
-   */
-  guid(digit = 8): string {
-    return 'x'.repeat(digit).replace(/[xy]/g, (c) => {
-      const r = (Math.random() * 16) | 0;
-      const v = c == 'x' ? r : (r & 0x3) | 0x8;
-      return v.toString(16);
-    });
-  }
-
   public async createId(type: string | number): Promise<string> {
     return `${type}_${this.guid()}`;
   }
@@ -147,19 +133,12 @@ class Props extends BaseService {
    * @param {Object} config 组件配置
    */
   /* eslint no-param-reassign: ["error", { "props": false }] */
-  public async setNewItemId(config: MNode, parent?: MPage) {
-    const oldId = config.id;
-
+  public async setNewItemId(config: MNode) {
     config.id = await this.createId(config.type || 'component');
-
-    // 只有弹窗在页面下的一级子元素才有效
-    if (isPop(config) && parent?.type === NodeType.PAGE) {
-      updatePopId(oldId, config.id, parent);
-    }
 
     if (config.items && Array.isArray(config.items)) {
       for (const item of config.items) {
-        await this.setNewItemId(item, config as MPage);
+        await this.setNewItemId(item);
       }
     }
 
@@ -186,31 +165,20 @@ class Props extends BaseService {
           name: type,
         };
   }
+
+  /**
+   * 生成指定位数的GUID，无【-】格式
+   * @param digit 位数，默认值8
+   * @returns
+   */
+  private guid(digit = 8): string {
+    return 'x'.repeat(digit).replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0;
+      const v = c === 'x' ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+  }
 }
-
-/**
- * 复制页面时，需要把组件下关联的弹窗id换测复制出来的弹窗的id
- * @param {number} oldId 复制的源弹窗id
- * @param {number} popId 新的弹窗id
- * @param {Object} pageConfig 页面配置
- */
-const updatePopId = (oldId: Id, popId: Id, pageConfig: MPage) => {
-  pageConfig.items?.forEach((config) => {
-    if (config.pop === oldId) {
-      config.pop = popId;
-      return;
-    }
-
-    if (config.popId === oldId) {
-      config.popId = popId;
-      return;
-    }
-
-    if (Array.isArray(config.items)) {
-      updatePopId(oldId, popId, config as MPage);
-    }
-  });
-};
 
 export type PropsService = Props;
 
