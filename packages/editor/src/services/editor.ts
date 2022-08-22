@@ -368,7 +368,7 @@ class Editor extends BaseService {
 
     this.emit('add', newNodes);
 
-    return newNodes.length > 1 ? newNodes[0] : newNodes;
+    return newNodes.length > 1 ? newNodes : newNodes[0];
   }
 
   public async doRemove(node: MNode): Promise<void> {
