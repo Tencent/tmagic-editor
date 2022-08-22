@@ -26,7 +26,7 @@ import { getNodePath, isNumber, isPage, isPop } from '@tmagic/utils';
 
 import historyService, { StepValue } from '../services/history';
 import storageService, { Protocol } from '../services/storage';
-import type { AddMNode, EditorNodeInfo, PastePosition, StoreState } from '../type';
+import type { AddMNode, EditorNodeInfo, PasteOptions, PastePosition, StoreState } from '../type';
 import { LayerOffset, Layout } from '../type';
 import {
   change2Fixed,
@@ -551,12 +551,21 @@ class Editor extends BaseService {
    * @param position 粘贴的坐标
    * @returns 添加后的组件节点配置
    */
-  public async paste(position: PastePosition = {}): Promise<MNode | MNode[] | void> {
+  public async paste(position: PastePosition & PasteOptions = {}): Promise<MNode | MNode[] | void> {
     const config: MNode[] = await storageService.getItem(COPY_STORAGE_KEY);
 
     if (!Array.isArray(config)) return;
 
-    const pasteConfigs = await beforePaste(position, config);
+    const pasteConfigs = await beforePaste(position, cloneDeep(config));
+    const { formatter } = position;
+    if (formatter) {
+      for (let i = 0; i < pasteConfigs.length; i++) {
+        const oldNode = config[i];
+        const newNode = pasteConfigs[i];
+        // 格式化粘贴后数据
+        pasteConfigs.splice(i, 1, formatter(oldNode, newNode));
+      }
+    }
 
     return this.add(pasteConfigs);
   }
