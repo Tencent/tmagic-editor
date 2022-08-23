@@ -24,7 +24,7 @@ import type { MComponent, MNode } from '@tmagic/schema';
 import { toLine } from '@tmagic/utils';
 
 import type { PropsState } from '../type';
-import { DEFAULT_CONFIG, fillConfig } from '../utils/props';
+import { fillConfig } from '../utils/props';
 
 import BaseService from './BaseService';
 
@@ -42,6 +42,7 @@ class Props extends BaseService {
       'getPropsValue',
       'createId',
       'setNewItemId',
+      'fillConfig',
       'getDefaultPropsValue',
     ]);
   }
@@ -53,13 +54,17 @@ class Props extends BaseService {
     this.emit('props-configs-change');
   }
 
+  public async fillConfig(config: FormConfig) {
+    return fillConfig(config);
+  }
+
   /**
    * 为指定类型组件设置组件属性表单配置
    * @param type 组件类型
    * @param config 组件属性表单配置
    */
-  public setPropsConfig(type: string, config: FormConfig) {
-    this.state.propsConfigMap[type] = fillConfig(Array.isArray(config) ? config : [config]);
+  public async setPropsConfig(type: string, config: FormConfig) {
+    this.state.propsConfigMap[type] = await this.fillConfig(Array.isArray(config) ? config : [config]);
   }
 
   /**
@@ -72,7 +77,7 @@ class Props extends BaseService {
       return await this.getPropsConfig('button');
     }
 
-    return cloneDeep(this.state.propsConfigMap[type] || DEFAULT_CONFIG);
+    return cloneDeep(this.state.propsConfigMap[type] || this.fillConfig([]));
   }
 
   public setPropsValues(values: Record<string, MNode>) {
