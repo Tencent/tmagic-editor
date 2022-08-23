@@ -368,7 +368,7 @@ class Editor extends BaseService {
 
     this.emit('add', newNodes);
 
-    return newNodes.length > 1 ? newNodes : newNodes[0];
+    return Array.isArray(addNode) ? newNodes : newNodes[0];
   }
 
   public async doRemove(node: MNode): Promise<void> {
@@ -504,7 +504,7 @@ class Editor extends BaseService {
 
     this.emit('update', newNodes);
 
-    return newNodes.length > 1 ? newNodes[0] : newNodes;
+    return Array.isArray(config) ? newNodes : newNodes[0];
   }
 
   /**
