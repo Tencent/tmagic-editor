@@ -234,6 +234,3 @@ export const fillConfig = (config: FormConfig = []) => [
     ],
   },
 ];
-
-// 默认组件属性表单配置
-export const DEFAULT_CONFIG: FormConfig = fillConfig([]);
