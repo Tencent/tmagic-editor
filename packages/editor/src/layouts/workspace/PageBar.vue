@@ -10,7 +10,7 @@
       <div class="m-editor-page-bar-title">
         <slot name="page-bar-title" :page="item">
           <el-tooltip effect="dark" placement="top-start" :content="item.name">
-            <span>{{ item.name }}</span>
+            <span>{{ item.name || item.id }}</span>
           </el-tooltip>
         </slot>
       </div>

@@ -1,6 +1,8 @@
 <template>
   <div class="m-editor-workspace" tabindex="1" ref="workspace">
-    <magic-stage :key="page?.id"></magic-stage>
+    <slot name="stage">
+      <magic-stage :key="page?.id"></magic-stage>
+    </slot>
 
     <slot name="workspace-content"></slot>
 
