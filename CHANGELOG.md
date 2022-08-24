@@ -1,3 +1,22 @@
+# [1.1.0-beta.12](https://github.com/Tencent/tmagic-editor/compare/v1.1.0-beta.11...v1.1.0-beta.12) (2022-08-24)
+
+
+### Bug Fixes
+
+* **editor:** 上移一层通知runtime更新参数出错 ([9b9c9db](https://github.com/Tencent/tmagic-editor/commit/9b9c9db683596958803b02e11cc055b2660127a0)), closes [#282](https://github.com/Tencent/tmagic-editor/issues/282)
+* **editor:** 修复 update 返回值三目运算符判断错误的问题，同时优化输入与输入类型一致。 ([9b0db4a](https://github.com/Tencent/tmagic-editor/commit/9b0db4a8071ec511f03131a604157584be3b7f55))
+* **editor:** 修复Add返回数组还是对象的逻辑 ([547e733](https://github.com/Tencent/tmagic-editor/commit/547e733c655872e6039dda9958f628fce799b187))
+* **editor:** 拖拽改变父容器时错乱现象 ([#296](https://github.com/Tencent/tmagic-editor/issues/296)) ([f3c9ba4](https://github.com/Tencent/tmagic-editor/commit/f3c9ba475ff5484ecbf69b533d04bb6129a7629f))
+* **editor:** 组件属性表单配置默认值 ([5529bbc](https://github.com/Tencent/tmagic-editor/commit/5529bbc6e162def24fbdfcbf89936318c0f9e945))
+
+
+### Features
+
+* **editor:** propsService添加fillConfig方法，支持扩展 ([31029bc](https://github.com/Tencent/tmagic-editor/commit/31029bc8f1178e3eb1450c779253ed17bcc93bf0))
+* **editor:** 添加stage slot ([98bc4e2](https://github.com/Tencent/tmagic-editor/commit/98bc4e2dbb6082dfc66f5248b079a521fb1f7725))
+
+
+
 # [1.1.0-beta.11](https://github.com/Tencent/tmagic-editor/compare/v1.1.0-beta.10...v1.1.0-beta.11) (2022-08-19)
 
 
