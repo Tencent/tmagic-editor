@@ -79,7 +79,7 @@ describe('isFixed', () => {
         type: 'text',
         id: 1,
         style: {
-          absulote: 'absulote',
+          position: 'absolute',
         },
       }),
     ).toBeFalsy();

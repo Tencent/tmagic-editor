@@ -620,7 +620,7 @@ class Editor extends BaseService {
    */
   public async moveLayer(offset: number | LayerOffset): Promise<void> {
     const parent = this.get<MContainer>('parent');
-    const node = this.get('node');
+    const node = this.get<MNode>('node');
     const brothers: MNode[] = parent?.items || [];
     const index = brothers.findIndex((item) => `${item.id}` === `${node?.id}`);
 
@@ -632,11 +632,15 @@ class Editor extends BaseService {
       brothers.splice(index + parseInt(`${offset}`, 10), 0, brothers.splice(index, 1)[0]);
     }
 
+    const grandparent = this.getParentById(parent.id);
     this.get<StageCore | null>('stage')?.update({
       config: cloneDeep(toRaw(parent)),
-      parentId: parent.id,
+      parentId: grandparent?.id,
       root: cloneDeep(this.get<MApp>('root')),
     });
+
+    this.addModifiedNodeId(parent.id);
+    this.pushHistoryState();
   }
 
   /**

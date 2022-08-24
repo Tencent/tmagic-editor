@@ -23,6 +23,7 @@ import type { MApp, MContainer, MNode, MPage } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 
 import editorService from '@editor/services/editor';
+import historyService from '@editor/services/history';
 import storageService from '@editor/services/storage';
 import { COPY_STORAGE_KEY } from '@editor/utils';
 
@@ -414,6 +415,7 @@ describe('undo redo', () => {
   beforeAll(() => editorService.set('root', cloneDeep(root)));
 
   test('正常', async () => {
+    historyService.reset();
     // 设置当前编辑的组件
     await editorService.select(NodeId.NODE_ID);
     const node = editorService.get('node');
