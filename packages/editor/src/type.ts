@@ -82,16 +82,22 @@ export interface ComponentGroupState {
   list: ComponentGroup[];
 }
 
+export enum ColumnLayout {
+  LEFT = 'left',
+  CENTER = 'center',
+  RIGHT = 'right',
+}
+
 export interface SetColumnWidth {
-  left?: number;
-  center?: number | 'auto';
-  right?: number;
+  [ColumnLayout.LEFT]?: number;
+  [ColumnLayout.CENTER]?: number | 'auto';
+  [ColumnLayout.RIGHT]?: number;
 }
 
 export interface GetColumnWidth {
-  left: number;
-  center: number;
-  right: number;
+  [ColumnLayout.LEFT]: number;
+  [ColumnLayout.CENTER]: number;
+  [ColumnLayout.RIGHT]: number;
 }
 
 export interface StageRect {
@@ -174,6 +180,7 @@ export interface MenuButton {
   /** type为button/dropdown时点击运行的方法 */
   handler?: (data: Services, event: MouseEvent) => Promise<any> | any;
   /** type为dropdown时，下拉的菜单列表， 或者有子菜单时 */
+  className?: string;
   items?: MenuButton[];
 }
 
@@ -187,6 +194,7 @@ export interface MenuComponent {
   listeners?: Record<string, Function>;
   slots?: Record<string, any>;
   /** 是否显示，默认为true */
+  className?: string;
   display?: boolean | ((data?: Services) => Promise<boolean> | boolean);
 }
 
@@ -209,16 +217,17 @@ export type MenuItem =
   | 'guides'
   | 'rule'
   | MenuButton
-  | MenuComponent;
+  | MenuComponent
+  | string;
 
 /** 工具栏 */
 export interface MenuBarData {
   /** 顶部工具栏左边项 */
-  left?: MenuItem[];
+  [ColumnLayout.LEFT]?: MenuItem[];
   /** 顶部工具栏中间项 */
-  center?: MenuItem[];
+  [ColumnLayout.CENTER]?: MenuItem[];
   /** 顶部工具栏右边项 */
-  right?: MenuItem[];
+  [ColumnLayout.RIGHT]?: MenuItem[];
 }
 
 export interface SideComponent extends MenuComponent {

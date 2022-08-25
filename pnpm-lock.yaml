@@ -74,7 +74,7 @@ importers:
 
   docs:
     specifiers:
-      '@element-plus/icons-vue': ^2.0.6
+      '@element-plus/icons-vue': ^2.0.9
       '@tmagic/form': 1.1.0-beta.12
       '@tmagic/schema': 1.1.0-beta.12
       '@tmagic/utils': 1.1.0-beta.12
@@ -92,7 +92,7 @@ importers:
       vue: ^3.2.37
       vuepress: ^2.0.0-beta.49
     dependencies:
-      '@element-plus/icons-vue': 2.0.6_vue@3.2.37
+      '@element-plus/icons-vue': 2.0.9_vue@3.2.37
       '@tmagic/form': link:../packages/form
       '@tmagic/schema': link:../packages/schema
       '@tmagic/utils': link:../packages/utils
@@ -154,7 +154,7 @@ importers:
   packages/editor:
     specifiers:
       '@babel/core': ^7.18.0
-      '@element-plus/icons-vue': ^2.0.6
+      '@element-plus/icons-vue': ^2.0.9
       '@tmagic/core': 1.1.0-beta.12
       '@tmagic/form': 1.1.0-beta.12
       '@tmagic/schema': 1.1.0-beta.12
@@ -184,7 +184,7 @@ importers:
       vue-tsc: ^0.39.4
     dependencies:
       '@babel/core': 7.18.2
-      '@element-plus/icons-vue': 2.0.6_vue@3.2.37
+      '@element-plus/icons-vue': 2.0.9_vue@3.2.37
       '@tmagic/core': link:../core
       '@tmagic/form': link:../form
       '@tmagic/schema': link:../schema
@@ -217,7 +217,7 @@ importers:
   packages/form:
     specifiers:
       '@babel/core': ^7.18.0
-      '@element-plus/icons-vue': ^2.0.6
+      '@element-plus/icons-vue': ^2.0.9
       '@tmagic/utils': 1.1.0-beta.12
       '@types/lodash-es': ^4.17.4
       '@types/node': ^15.12.4
@@ -235,7 +235,7 @@ importers:
       vue: ^3.2.37
       vue-tsc: ^0.39.4
     dependencies:
-      '@element-plus/icons-vue': 2.0.6_vue@3.2.37
+      '@element-plus/icons-vue': 2.0.9_vue@3.2.37
       '@tmagic/utils': link:../utils
       element-plus: 2.2.6_vue@3.2.37
       lodash-es: 4.17.21
@@ -427,7 +427,7 @@ importers:
 
   playground:
     specifiers:
-      '@element-plus/icons-vue': ^2.0.6
+      '@element-plus/icons-vue': ^2.0.9
       '@tmagic/editor': 1.1.0-beta.12
       '@tmagic/form': 1.1.0-beta.12
       '@tmagic/schema': 1.1.0-beta.12
@@ -450,7 +450,7 @@ importers:
       vue-router: ^4.0.10
       vue-tsc: ^0.39.4
     dependencies:
-      '@element-plus/icons-vue': 2.0.6_vue@3.2.37
+      '@element-plus/icons-vue': 2.0.9_vue@3.2.37
       '@tmagic/editor': link:../packages/editor
       '@tmagic/form': link:../packages/form
       '@tmagic/schema': link:../packages/schema
@@ -1175,8 +1175,8 @@ packages:
     resolution: {integrity: sha512-HsbMKc0ZAQH+EUeCmI/2PvTYSybmkaWwakU8QGDYYgMVIg9BQ5sM0A0Nnombjxo2+JzXHxmH+jw//yGX+y6GYw==}
     dev: false
 
-  /@element-plus/icons-vue/2.0.6_vue@3.2.37:
-    resolution: {integrity: sha512-lPpG8hYkjL/Z97DH5Ei6w6o22Z4YdNglWCNYOPcB33JCF2A4wye6HFgSI7hEt9zdLyxlSpiqtgf9XcYU+m5mew==}
+  /@element-plus/icons-vue/2.0.9_vue@3.2.37:
+    resolution: {integrity: sha512-okdrwiVeKBmW41Hkl0eMrXDjzJwhQMuKiBOu17rOszqM+LS/yBYpNQNV5Jvoh06Wc+89fMmb/uhzf8NZuDuUaQ==}
     peerDependencies:
       vue: ^3.2.0
     dependencies:
@@ -3324,7 +3324,7 @@ packages:
       vue: ^3.2.0
     dependencies:
       '@ctrl/tinycolor': 3.4.1
-      '@element-plus/icons-vue': 2.0.6_vue@3.2.37
+      '@element-plus/icons-vue': 2.0.9_vue@3.2.37
       '@floating-ui/dom': 0.5.4
       '@popperjs/core': /@sxzz/popperjs-es/2.11.7
       '@types/lodash': 4.14.182
