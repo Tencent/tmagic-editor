@@ -98,10 +98,6 @@ class Ui extends BaseService {
     }
 
     (state as any)[name] = value;
-
-    if (name === 'stageContainerRect') {
-      state.zoom = this.calcZoom();
-    }
   }
 
   public get<T>(name: keyof typeof state): T {
@@ -111,6 +107,22 @@ class Ui extends BaseService {
   public zoom(zoom: number) {
     this.set('zoom', (this.get<number>('zoom') * 100 + zoom * 100) / 100);
     if (this.get<number>('zoom') < 0.1) this.set('zoom', 0.1);
+  }
+
+  public calcZoom() {
+    const { stageRect, stageContainerRect } = state;
+    const { height, width } = stageContainerRect;
+    if (!width || !height) return 1;
+
+    // 30为标尺的大小
+    const stageWidth = stageRect.width + 30;
+    const stageHeight = stageRect.height + 30;
+
+    if (width > stageWidth && height > stageHeight) {
+      return 1;
+    }
+    // 60/80是为了不要让画布太过去贴住四周（这样好看些）
+    return Math.min((width - 60) / stageWidth || 1, (height - 80) / stageHeight || 1);
   }
 
   private setColumnWidth({ left, center, right }: SetColumnWidth) {
@@ -149,22 +161,6 @@ class Ui extends BaseService {
       ...value,
     };
     state.zoom = this.calcZoom();
-  }
-
-  private calcZoom() {
-    const { stageRect, stageContainerRect } = state;
-    const { height, width } = stageContainerRect;
-    if (!width || !height) return 1;
-
-    // 30为标尺的大小
-    const stageWidth = stageRect.width + 30;
-    const stageHeight = stageRect.height + 30;
-
-    if (width > stageWidth && height > stageHeight) {
-      return 1;
-    }
-    // 60/80是为了不要让画布太过去贴住四周（这样好看些）
-    return Math.min((width - 60) / stageWidth || 1, (height - 80) / stageHeight || 1);
   }
 }
 

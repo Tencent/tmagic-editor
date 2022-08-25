@@ -8,7 +8,7 @@
 
 <script lang="ts" setup>
 import { computed, inject, markRaw } from 'vue';
-import { Back, Delete, Grid, Memo, Right, ZoomIn, ZoomOut } from '@element-plus/icons-vue';
+import { Back, Delete, FullScreen, Grid, Memo, Right, ScaleToOriginal, ZoomIn, ZoomOut } from '@element-plus/icons-vue';
 
 import { NodeType } from '@tmagic/schema';
 
@@ -36,6 +36,9 @@ const showGuides = computed((): boolean => uiService?.get<boolean>('showGuides')
 const showRule = computed((): boolean => uiService?.get<boolean>('showRule') ?? true);
 const zoom = computed((): number => uiService?.get<number>('zoom') ?? 1);
 
+const isMac = /mac os x/.test(navigator.userAgent.toLowerCase());
+const ctrl = isMac ? 'Command' : 'Ctrl';
+
 const getConfig = (item: MenuItem): (MenuButton | MenuComponent)[] => {
   if (typeof item !== 'string') {
     return [item];
@@ -53,6 +56,8 @@ const getConfig = (item: MenuItem): (MenuButton | MenuComponent)[] => {
         ...getConfig('zoom-out'),
         ...getConfig(`${parseInt(`${zoom.value * 100}`, 10)}%`),
         ...getConfig('zoom-in'),
+        ...getConfig('scale-to-original'),
+        ...getConfig('scale-to-fit'),
       );
       break;
     case 'delete':
@@ -60,7 +65,7 @@ const getConfig = (item: MenuItem): (MenuButton | MenuComponent)[] => {
         type: 'button',
         className: 'delete',
         icon: markRaw(Delete),
-        tooltip: '刪除',
+        tooltip: `刪除(Delete)`,
         disabled: () => services?.editorService.get('node')?.type === NodeType.PAGE,
         handler: () => services?.editorService.remove(services?.editorService.get('node')),
       });
@@ -70,7 +75,7 @@ const getConfig = (item: MenuItem): (MenuButton | MenuComponent)[] => {
         type: 'button',
         className: 'undo',
         icon: markRaw(Back),
-        tooltip: '后退',
+        tooltip: `后退(${ctrl}+z)`,
         disabled: () => !services?.historyService.state.canUndo,
         handler: () => services?.editorService.undo(),
       });
@@ -80,7 +85,7 @@ const getConfig = (item: MenuItem): (MenuButton | MenuComponent)[] => {
         type: 'button',
         className: 'redo',
         icon: markRaw(Right),
-        tooltip: '前进',
+        tooltip: `前进(${ctrl}+Shift+z)`,
         disabled: () => !services?.historyService.state.canRedo,
         handler: () => services?.editorService.redo(),
       });
@@ -90,7 +95,7 @@ const getConfig = (item: MenuItem): (MenuButton | MenuComponent)[] => {
         type: 'button',
         className: 'zoom-in',
         icon: markRaw(ZoomIn),
-        tooltip: '放大',
+        tooltip: `放大(${ctrl}+=)`,
         handler: () => uiService?.zoom(0.1),
       });
       break;
@@ -99,8 +104,26 @@ const getConfig = (item: MenuItem): (MenuButton | MenuComponent)[] => {
         type: 'button',
         className: 'zoom-out',
         icon: markRaw(ZoomOut),
-        tooltip: '縮小',
+        tooltip: `縮小(${ctrl}+-)`,
         handler: () => uiService?.zoom(-0.1),
+      });
+      break;
+    case 'scale-to-original':
+      config.push({
+        type: 'button',
+        className: 'scale-to-original',
+        icon: markRaw(ScaleToOriginal),
+        tooltip: `缩放到实际大小(${ctrl}+1)`,
+        handler: () => uiService?.set('zoom', 1),
+      });
+      break;
+    case 'scale-to-fit':
+      config.push({
+        type: 'button',
+        className: 'scale-to-fit',
+        icon: markRaw(FullScreen),
+        tooltip: `缩放以适应(${ctrl}+0)`,
+        handler: () => uiService?.set('zoom', uiService.calcZoom()),
       });
       break;
     case 'rule':
