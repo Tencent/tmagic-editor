@@ -9,7 +9,7 @@ import { Delete, DocumentCopy, Files, Plus } from '@element-plus/icons-vue';
 import { NodeType } from '@tmagic/schema';
 
 import ContentMenu from '../../components/ContentMenu.vue';
-import type { ComponentGroup, MenuButton, MenuItem, Services } from '../../type';
+import type { ComponentGroup, MenuButton, MenuComponent, Services } from '../../type';
 
 export default defineComponent({
   components: { ContentMenu },
@@ -22,7 +22,7 @@ export default defineComponent({
     const isPage = computed(() => node.value?.type === NodeType.PAGE);
     const componentList = computed(() => services?.componentListService.getList() || []);
 
-    const layerContentMenu = inject<MenuItem[]>('layerContentMenu', []);
+    const layerContentMenu = inject<(MenuComponent | MenuButton)[]>('layerContentMenu', []);
 
     const createMenuItems = (group: ComponentGroup): MenuButton[] =>
       group.items.map((component) => ({
@@ -77,7 +77,7 @@ export default defineComponent({
 
     return {
       menu,
-      menuData: computed<MenuItem[]>(() => [
+      menuData: computed<(MenuButton | MenuComponent)[]>(() => [
         {
           type: 'button',
           text: '新增',

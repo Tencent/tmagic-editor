@@ -25,13 +25,13 @@
 <script lang="ts" setup>
 import { nextTick, onMounted, onUnmounted, ref } from 'vue';
 
-import { MenuButton, MenuItem } from '../type';
+import { MenuButton, MenuComponent } from '../type';
 
 import ToolButton from './ToolButton.vue';
 
 const props = withDefaults(
   defineProps<{
-    menuData?: MenuItem[];
+    menuData?: (MenuButton | MenuComponent)[];
     isSubMenu?: boolean;
   }>(),
   {
@@ -45,7 +45,7 @@ const emit = defineEmits(['hide', 'show']);
 const menu = ref<HTMLDivElement>();
 const subMenu = ref<any>();
 const visible = ref(false);
-const subMenuData = ref<MenuItem[]>([]);
+const subMenuData = ref<(MenuButton | MenuComponent)[]>([]);
 const menuStyle = ref({
   left: '0',
   top: '0',
@@ -94,7 +94,7 @@ const show = (e: MouseEvent) => {
   }, 300);
 };
 
-const showSubMenu = (item: MenuItem) => {
+const showSubMenu = (item: MenuButton | MenuComponent) => {
   const menuItem = item as MenuButton;
   if (typeof item !== 'object' || !menuItem.items?.length) {
     return;

@@ -12,7 +12,7 @@ import { isPage } from '@tmagic/utils';
 
 import ContentMenu from '../../components/ContentMenu.vue';
 import storageService from '../../services/storage';
-import { LayerOffset, Layout, MenuItem, Services } from '../../type';
+import { LayerOffset, Layout, MenuButton, MenuComponent, Services } from '../../type';
 import { COPY_STORAGE_KEY } from '../../utils/editor';
 
 const props = withDefaults(defineProps<{ isMultiSelect?: boolean }>(), { isMultiSelect: false });
@@ -28,9 +28,9 @@ const nodes = computed(() => editorService?.get<MNode[]>('nodes'));
 const parent = computed(() => editorService?.get('parent'));
 const stage = computed(() => editorService?.get<StageCore>('stage'));
 
-const stageContentMenu = inject<MenuItem[]>('stageContentMenu', []);
+const stageContentMenu = inject<(MenuButton | MenuComponent)[]>('stageContentMenu', []);
 
-const menuData = reactive<MenuItem[]>([
+const menuData = reactive<(MenuButton | MenuComponent)[]>([
   {
     type: 'button',
     text: '水平居中',

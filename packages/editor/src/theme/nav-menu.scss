@@ -69,5 +69,11 @@
     .menu-item-text {
       color: $--nav-color;
     }
+
+    &.rule {
+      .el-icon {
+        transform: rotate(-90deg);
+      }
+    }
   }
 }

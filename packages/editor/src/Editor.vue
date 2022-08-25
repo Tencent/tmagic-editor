@@ -64,7 +64,7 @@ import historyService from './services/history';
 import propsService from './services/props';
 import storageService from './services/storage';
 import uiService from './services/ui';
-import type { ComponentGroup, MenuBarData, MenuItem, Services, SideBarData, StageRect } from './type';
+import type { ComponentGroup, MenuBarData, MenuButton, MenuComponent, Services, SideBarData, StageRect } from './type';
 
 export default defineComponent({
   name: 'm-editor',
@@ -97,12 +97,12 @@ export default defineComponent({
     },
 
     layerContentMenu: {
-      type: Array as PropType<MenuItem[]>,
+      type: Array as PropType<(MenuButton | MenuComponent)[]>,
       default: () => [],
     },
 
     stageContentMenu: {
-      type: Array as PropType<MenuItem[]>,
+      type: Array as PropType<(MenuButton | MenuComponent)[]>,
       default: () => [],
     },
 
