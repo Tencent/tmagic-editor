@@ -44,6 +44,7 @@ export { default as ComponentListPanel } from './layouts/sidebar/ComponentListPa
 export { default as LayerPanel } from './layouts/sidebar/LayerPanel.vue';
 export { default as PropsPanel } from './layouts/PropsPanel.vue';
 export { default as ToolButton } from './components/ToolButton.vue';
+export { default as ContentMenu } from './components/ContentMenu.vue';
 
 const defaultInstallOpt: InstallOptions = {
   // @todo, 自定义图片上传方法等编辑器依赖的外部选项
