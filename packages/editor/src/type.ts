@@ -296,3 +296,10 @@ export enum Keys {
 
 export const H_GUIDE_LINE_STORAGE_KEY = '$MagicStageHorizontalGuidelinesData';
 export const V_GUIDE_LINE_STORAGE_KEY = '$MagicStageVerticalGuidelinesData';
+
+export interface ScrollViewerEvent {
+  scrollLeft: number;
+  scrollTop: number;
+  scrollHeight: number;
+  scrollWidth: number;
+}

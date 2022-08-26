@@ -4,12 +4,14 @@
     ref="stageWrap"
     :width="stageRect?.width"
     :height="stageRect?.height"
+    :wrap-width="stageContainerRect?.width"
+    :wrap-height="stageContainerRect?.height"
     :zoom="zoom"
   >
     <div
       class="m-editor-stage-container"
       ref="stageContainer"
-      :style="`transform: scale(${zoom})`"
+      :style="`transform: scale(${zoom});`"
       @contextmenu="contextmenuHandler"
       @drop="dropHandler"
       @dragover="dragoverHandler"
@@ -25,25 +27,11 @@ import { computed, inject, markRaw, onMounted, onUnmounted, ref, toRaw, watch, w
 import { cloneDeep } from 'lodash-es';
 
 import type { MApp, MContainer, MNode, MPage } from '@tmagic/schema';
-import StageCore, {
-  calcValueByFontsize,
-  getOffset,
-  GuidesType,
-  Runtime,
-  SortEventData,
-  UpdateEventData,
-} from '@tmagic/stage';
+import StageCore, { calcValueByFontsize, getOffset, Runtime } from '@tmagic/stage';
 
 import ScrollViewer from '../../components/ScrollViewer.vue';
-import {
-  H_GUIDE_LINE_STORAGE_KEY,
-  Layout,
-  Services,
-  StageOptions,
-  StageRect,
-  V_GUIDE_LINE_STORAGE_KEY,
-} from '../../type';
-import { getGuideLineFromCache } from '../../utils';
+import { Layout, Services, StageOptions, StageRect } from '../../type';
+import { useStage } from '../../utils/stage';
 
 import ViewerMenu from './ViewerMenu.vue';
 
@@ -59,13 +47,11 @@ const menu = ref<InstanceType<typeof ViewerMenu>>();
 
 const isMultiSelect = computed(() => services?.editorService.get('nodes')?.length > 1);
 const stageRect = computed(() => services?.uiService.get<StageRect>('stageRect'));
-const uiSelectMode = computed(() => services?.uiService.get<boolean>('uiSelectMode'));
+const stageContainerRect = computed(() => services?.uiService.get<StageRect>('stageContainerRect'));
 const root = computed(() => services?.editorService.get<MApp>('root'));
 const page = computed(() => services?.editorService.get<MPage>('page'));
 const zoom = computed(() => services?.uiService.get<number>('zoom') || 1);
 const node = computed(() => services?.editorService.get<MNode>('node'));
-
-const getGuideLineKey = (key: string) => `${key}_${root.value?.id}_${page.value?.id}`;
 
 watchEffect(() => {
   if (stage) return;
@@ -73,79 +59,11 @@ watchEffect(() => {
   if (!stageContainer.value) return;
   if (!(stageOptions?.runtimeUrl || stageOptions?.render) || !root.value) return;
 
-  stage = new StageCore({
-    render: stageOptions.render,
-    runtimeUrl: stageOptions.runtimeUrl,
-    zoom: zoom.value,
-    autoScrollIntoView: stageOptions.autoScrollIntoView,
-    isContainer: stageOptions.isContainer,
-    containerHighlightClassName: stageOptions.containerHighlightClassName,
-    containerHighlightDuration: stageOptions.containerHighlightDuration,
-    containerHighlightType: stageOptions.containerHighlightType,
-    canSelect: (el, event, stop) => {
-      const elCanSelect = stageOptions.canSelect(el);
-      // 在组件联动过程中不能再往下选择，返回并触发 ui-select
-      if (uiSelectMode.value && elCanSelect && event.type === 'mousedown') {
-        document.dispatchEvent(new CustomEvent('ui-select', { detail: el }));
-        return stop();
-      }
-
-      return elCanSelect;
-    },
-    moveableOptions: stageOptions.moveableOptions,
-    updateDragEl: stageOptions.updateDragEl,
-  });
+  stage = useStage(stageOptions);
 
   services?.editorService.set('stage', markRaw(stage));
 
   stage?.mount(stageContainer.value);
-
-  stage.mask.setGuides([
-    getGuideLineFromCache(getGuideLineKey(H_GUIDE_LINE_STORAGE_KEY)),
-    getGuideLineFromCache(getGuideLineKey(V_GUIDE_LINE_STORAGE_KEY)),
-  ]);
-
-  stage?.on('select', (el: HTMLElement) => {
-    services?.editorService.select(el.id);
-  });
-
-  stage?.on('highlight', (el: HTMLElement) => {
-    services?.editorService.highlight(el.id);
-  });
-
-  stage?.on('multiSelect', (els: HTMLElement[]) => {
-    services?.editorService.multiSelect(els.map((el) => el.id));
-  });
-
-  stage?.on('update', (ev: UpdateEventData) => {
-    if (ev.parentEl) {
-      for (const data of ev.data) {
-        services?.editorService.moveToContainer({ id: data.el.id, style: data.style }, ev.parentEl.id);
-      }
-      return;
-    }
-
-    services?.editorService.update(ev.data.map((data) => ({ id: data.el.id, style: data.style })));
-  });
-
-  stage?.on('sort', (ev: SortEventData) => {
-    services?.editorService.sort(ev.src, ev.dist);
-  });
-
-  stage?.on('changeGuides', (e) => {
-    services?.uiService.set('showGuides', true);
-
-    if (!root.value || !page.value) return;
-
-    const storageKey = getGuideLineKey(
-      e.type === GuidesType.HORIZONTAL ? H_GUIDE_LINE_STORAGE_KEY : V_GUIDE_LINE_STORAGE_KEY,
-    );
-    if (e.guides.length) {
-      globalThis.localStorage.setItem(storageKey, JSON.stringify(e.guides));
-    } else {
-      globalThis.localStorage.removeItem(storageKey);
-    }
-  });
 
   if (!node.value?.id) return;
   stage?.on('runtime-ready', (rt) => {
