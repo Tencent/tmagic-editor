@@ -1,7 +1,7 @@
-import { allowTs, info } from '@vuepress/cli';
 import { cac } from 'cac';
 import chalk from 'chalk';
 
+import { allowTs } from './utils/allowTs';
 import { scripts } from './commands';
 import { UserConfig } from './types';
 
@@ -36,9 +36,6 @@ export const cli = (defaultAppConfig: UserConfig): void => {
 
   // register `dev` command
   program.command('entry', 'Start development server').action(wrapCommand(scripts(defaultAppConfig)));
-
-  // register `info` command
-  program.command('info', 'Display environment information').action(wrapCommand(info));
 
   program.parse(process.argv);
 };
