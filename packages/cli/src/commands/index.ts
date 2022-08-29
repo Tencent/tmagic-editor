@@ -1,10 +1,10 @@
 import path from 'path';
 
-import { loadUserConfig } from '@vuepress/cli';
 import fs from 'fs-extra';
 
 import App from '../Core';
 import { UserConfig } from '../types';
+import { loadUserConfig } from '../utils/loadUserConfig';
 
 export const scripts = (defaultAppConfig: UserConfig) => {
   const entry = async (): Promise<void> => {

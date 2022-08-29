@@ -23,10 +23,10 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "@vuepress/cli": "^2.0.0-beta.49",
     "cac": "^6.7.12",
     "chalk": "^4.1.0",
     "chokidar": "^3.5.3",
+    "esbuild": "^0.15.5",
     "fs-extra": "^10.1.0",
     "recast": "^0.21.1",
     "tslib": "^2.4.0"
