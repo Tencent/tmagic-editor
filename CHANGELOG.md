@@ -1,3 +1,13 @@
+# [1.1.0-beta.13](https://github.com/Tencent/tmagic-editor/compare/v1.1.0-beta.12...v1.1.0-beta.13) (2022-08-29)
+
+
+### Features
+
+* **editor:** 去掉画布根据视窗大小自动调整缩放比例，加上缩放到实际大小/缩放以适应菜单按钮 ([dd3075b](https://github.com/Tencent/tmagic-editor/commit/dd3075be56a08c1e10b20f48260546d2ad438510))
+* **editor:** 画布添加滚动条 ([de8ef8d](https://github.com/Tencent/tmagic-editor/commit/de8ef8dc58d686adfd940f5be2de5b4285339606)), closes [#262](https://github.com/Tencent/tmagic-editor/issues/262)
+
+
+
 # [1.1.0-beta.12](https://github.com/Tencent/tmagic-editor/compare/v1.1.0-beta.11...v1.1.0-beta.12) (2022-08-24)
 
 
