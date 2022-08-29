@@ -267,7 +267,16 @@ export default defineComponent({
       },
     );
 
-    onUnmounted(() => editorService.destroy());
+    uiService.initColumnWidth();
+
+    onUnmounted(() => {
+      editorService.destroy();
+      historyService.destroy();
+      propsService.destroy();
+      uiService.destroy();
+      componentListService.destroy();
+      storageService.destroy();
+    });
 
     const services: Services = {
       componentListService,

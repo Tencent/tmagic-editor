@@ -64,16 +64,6 @@ class Ui extends BaseService {
         center: 'auto',
       });
     });
-
-    const columnWidthCacheData = globalThis.localStorage.getItem(COLUMN_WIDTH_STORAGE_KEY);
-    if (columnWidthCacheData) {
-      try {
-        const columnWidthCache = JSON.parse(columnWidthCacheData);
-        this.setColumnWidth(columnWidthCache);
-      } catch (e) {
-        console.error(e);
-      }
-    }
   }
 
   public set<T = any>(name: keyof UiState, value: T) {
@@ -104,6 +94,18 @@ class Ui extends BaseService {
     return (state as any)[name];
   }
 
+  public initColumnWidth() {
+    const columnWidthCacheData = globalThis.localStorage.getItem(COLUMN_WIDTH_STORAGE_KEY);
+    if (columnWidthCacheData) {
+      try {
+        const columnWidthCache = JSON.parse(columnWidthCacheData);
+        this.setColumnWidth(columnWidthCache);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }
+
   public zoom(zoom: number) {
     this.set('zoom', (this.get<number>('zoom') * 100 + zoom * 100) / 100);
     if (this.get<number>('zoom') < 0.1) this.set('zoom', 0.1);
@@ -123,6 +125,10 @@ class Ui extends BaseService {
     }
     // 60/80是为了不要让画布太过去贴住四周（这样好看些）
     return Math.min((width - 60) / stageWidth || 1, (height - 80) / stageHeight || 1);
+  }
+
+  public destroy() {
+    this.removeAllListeners();
   }
 
   private setColumnWidth({ left, center, right }: SetColumnWidth) {

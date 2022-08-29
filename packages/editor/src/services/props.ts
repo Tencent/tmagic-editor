@@ -171,6 +171,12 @@ class Props extends BaseService {
         };
   }
 
+  public destroy() {
+    this.state.propsConfigMap = {};
+    this.state.propsValueMap = {};
+    this.removeAllListeners();
+  }
+
   /**
    * 生成指定位数的GUID，无【-】格式
    * @param digit 位数，默认值8
