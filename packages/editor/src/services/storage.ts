@@ -107,6 +107,10 @@ export class WebStorage extends BaseService {
     storage.setItem(`${options.namespace || namespace}:${key}`, item);
   }
 
+  public destroy() {
+    this.removeAllListeners();
+  }
+
   private getValueAndProtocol(value: string | null) {
     let protocol = '';
 

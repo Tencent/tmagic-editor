@@ -26,8 +26,8 @@ import type { ComponentGroup } from '../type';
 
 import BaseService from './BaseService';
 
-const eventMap: Record<string, EventOption[]> = reactive({});
-const methodMap: Record<string, EventOption[]> = reactive({});
+let eventMap: Record<string, EventOption[]> = reactive({});
+let methodMap: Record<string, EventOption[]> = reactive({});
 
 class Events extends BaseService {
   constructor() {
@@ -74,6 +74,12 @@ class Events extends BaseService {
 
   public getMethod(type: string) {
     return cloneDeep(methodMap[type] || DEFAULT_METHODS);
+  }
+
+  public destroy() {
+    eventMap = reactive({});
+    methodMap = reactive({});
+    this.removeAllListeners();
   }
 }
 
