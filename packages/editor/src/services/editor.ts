@@ -297,8 +297,13 @@ class Editor extends BaseService {
       throw new Error('app下不能添加组件');
     }
 
-    // 新增节点添加到配置中
-    parent?.items?.push(node);
+    if (parent.id !== curNode.id) {
+      const index = parent.items.indexOf(curNode);
+      parent?.items?.splice(index + 1, 0, node);
+    } else {
+      // 新增节点添加到配置中
+      parent?.items?.push(node);
+    }
 
     const layout = await this.getLayout(toRaw(parent), node as MNode);
     node.style = getInitPositionStyle(node.style, layout);
