@@ -18,7 +18,7 @@
 
 import { EventEmitter } from 'events';
 
-import type { MoveableOptions } from 'moveable';
+import type { MoveableOptions, OnDragStart, OnResizeStart } from 'moveable';
 import Moveable from 'moveable';
 import MoveableHelper from 'moveable-helper';
 
@@ -85,23 +85,67 @@ export default class StageMultiDragResize extends EventEmitter {
       createAuto: true,
     });
     const frames: { left: number; top: number; id: string }[] = [];
+
+    const setFrames = (events: OnDragStart[] | OnResizeStart[]) => {
+      // 记录拖动前快照
+      events.forEach((ev) => {
+        // 实际目标元素
+        const matchEventTarget = this.targetList.find(
+          (targetItem) => targetItem.id === ev.target.id.replace(DRAG_EL_ID_PREFIX, ''),
+        );
+        if (!matchEventTarget) return;
+        frames.push({
+          left: matchEventTarget.offsetLeft,
+          top: matchEventTarget.offsetTop,
+          id: matchEventTarget.id,
+        });
+      });
+    };
+
     this.moveableForMulti
+      .on('resizeGroupStart', (params) => {
+        const { events } = params;
+        this.multiMoveableHelper?.onResizeGroupStart(params);
+        setFrames(events);
+        this.dragStatus = StageDragStatus.START;
+      })
+      .on('resizeGroup', (params) => {
+        const { events } = params;
+        // 拖动过程更新
+        events.forEach((ev) => {
+          const { width, height, beforeTranslate } = ev.drag;
+          const frameSnapShot = frames.find(
+            (frameItem) => frameItem.id === ev.target.id.replace(DRAG_EL_ID_PREFIX, ''),
+          );
+          if (!frameSnapShot) return;
+          const targeEl = this.targetList.find(
+            (targetItem) => targetItem.id === ev.target.id.replace(DRAG_EL_ID_PREFIX, ''),
+          );
+          if (!targeEl) return;
+          // 元素与其所属组同时加入多选列表时，只更新父元素
+          const isParentIncluded = this.targetList.find((targetItem) => targetItem.id === targeEl.parentElement?.id);
+          if (!isParentIncluded) {
+            // 更新页面元素位置
+            targeEl.style.left = `${frameSnapShot.left + beforeTranslate[0]}px`;
+            targeEl.style.top = `${frameSnapShot.top + beforeTranslate[1]}px`;
+          }
+
+          // 更新页面元素位置
+          targeEl.style.width = `${width}px`;
+          targeEl.style.height = `${height}px`;
+        });
+        this.multiMoveableHelper?.onResizeGroup(params);
+        this.dragStatus = StageDragStatus.ING;
+      })
+      .on('resizeGroupEnd', () => {
+        this.update(true);
+        this.dragStatus = StageDragStatus.END;
+      })
       .on('dragGroupStart', (params) => {
         const { events } = params;
         this.multiMoveableHelper?.onDragGroupStart(params);
         // 记录拖动前快照
-        events.forEach((ev) => {
-          // 实际目标元素
-          const matchEventTarget = this.targetList.find(
-            (targetItem) => targetItem.id === ev.target.id.replace(DRAG_EL_ID_PREFIX, ''),
-          );
-          if (!matchEventTarget) return;
-          frames.push({
-            left: matchEventTarget.offsetLeft,
-            top: matchEventTarget.offsetTop,
-            id: matchEventTarget.id,
-          });
-        });
+        setFrames(events);
         this.dragStatus = StageDragStatus.START;
       })
       .on('dragGroup', (params) => {
@@ -237,7 +281,7 @@ export default class StageMultiDragResize extends EventEmitter {
       defaultGroupRotate: 0,
       defaultGroupOrigin: '50% 50%',
       draggable: true,
-      resizable: false,
+      resizable: true,
       throttleDrag: 0,
       startDragRotate: 0,
       throttleDragRotate: 0,
