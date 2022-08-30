@@ -1,3 +1,21 @@
+# [1.1.0](https://github.com/Tencent/tmagic-editor/compare/v1.1.0-beta.13...v1.1.0) (2022-08-30)
+
+
+### Bug Fixes
+
+* **editor,stage,ui,runtime:** 流式布局下，height自动设置成auto ([2201fbe](https://github.com/Tencent/tmagic-editor/commit/2201fbe80c5e14254c4f5746f1b82209711aef5e)), closes [#298](https://github.com/Tencent/tmagic-editor/issues/298)
+* **editor:** 添加remove事件时的参数 ([3af6f11](https://github.com/Tencent/tmagic-editor/commit/3af6f11f9f851accd396e917ecb4f03dd7bb2162))
+* **stage:** 流式布局resize从上或者左边调整，选中框出现错位 ([9e16747](https://github.com/Tencent/tmagic-editor/commit/9e167474a2ff2f937e1e0c3861bf8451f19cbc48)), closes [#297](https://github.com/Tencent/tmagic-editor/issues/297)
+
+
+### Features
+
+* **editor:** 创建新组件时的顺序 ([#316](https://github.com/Tencent/tmagic-editor/issues/316)) ([6c0b92e](https://github.com/Tencent/tmagic-editor/commit/6c0b92e80887f10c92ee9ecf450ebca4a0bc2fec))
+* **editor:** 编辑器销毁后销毁services ([4a59b4b](https://github.com/Tencent/tmagic-editor/commit/4a59b4b0f49a6e608361980723429b1f362a82c1))
+* **stage:** 多选支持resize ([793d02a](https://github.com/Tencent/tmagic-editor/commit/793d02a7067f59806655938aaa35a34e23dcbb75)), closes [#302](https://github.com/Tencent/tmagic-editor/issues/302)
+
+
+
 # [1.1.0-beta.13](https://github.com/Tencent/tmagic-editor/compare/v1.1.0-beta.12...v1.1.0-beta.13) (2022-08-29)
 
 
