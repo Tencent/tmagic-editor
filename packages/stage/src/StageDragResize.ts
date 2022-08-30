@@ -263,12 +263,13 @@ export default class StageDragResize extends EventEmitter {
         const { beforeTranslate } = drag;
         this.dragStatus = StageDragStatus.ING;
 
-        this.moveableHelper?.onResize(e);
-
         // 流式布局
         if (this.mode === Mode.SORTABLE) {
           this.target.style.top = '0px';
+          this.dragEl.style.width = `${width}px`;
+          this.dragEl.style.height = `${height}px`;
         } else {
+          this.moveableHelper?.onResize(e);
           this.target.style.left = `${frame.left + beforeTranslate[0]}px`;
           this.target.style.top = `${frame.top + beforeTranslate[1]}px`;
         }
