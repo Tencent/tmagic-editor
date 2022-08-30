@@ -39,7 +39,9 @@ const Page: React.FC<PageProps> = ({ config }) => {
   return (
     <div
       id={`${config.id || ''}`}
-      className={`magic-ui-page magic-ui-container${config.className ? ` ${config.className}` : ''}`}
+      className={`magic-ui-page magic-ui-container magic-layout-${config.layout}${
+        config.className ? ` ${config.className}` : ''
+      }`}
       style={app.transformStyle(config.style || {})}
     >
       {config.items?.map((item: MComponent | MContainer) => {

@@ -37,7 +37,7 @@ const Container: React.FC<ContainerProps> = ({ config, id }) => {
   return (
     <div
       id={`${id || config.id || ''}`}
-      className={`magic-ui-container${config.className ? ` ${config.className}` : ''}`}
+      className={`magic-ui-container magic-layout-${config.layout}${config.className ? ` ${config.className}` : ''}`}
       style={app.transformStyle(config.style || {})}
     >
       {config.items?.map((item: MComponent | MContainer) => {
