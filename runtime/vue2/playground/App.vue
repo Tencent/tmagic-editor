@@ -67,10 +67,14 @@ export default defineComponent({
 
       add({ config, parentId }: UpdateData) {
         console.log('add config', config);
+
         if (!root.value) throw new Error('error');
         if (!selectedId.value) throw new Error('error');
+        if (!parentId) throw new Error('error');
+
         const parent = getNodePath(parentId, [root.value]).pop();
         if (!parent) throw new Error('未找到父节点');
+
         if (parent.id !== selectedId.value) {
           const index = parent.items?.findIndex((child: MNode) => child.id === selectedId.value);
           parent.items?.splice(index + 1, 0, config);
@@ -82,11 +86,16 @@ export default defineComponent({
 
       update({ config, parentId }: UpdateData) {
         console.log('update config', config);
+
         if (!root.value) throw new Error('error');
+
         const node = getNodePath(config.id, [root.value]).pop();
-        const parent = getNodePath(parentId, [root.value]).pop();
         if (!node) throw new Error('未找到目标节点');
+
+        if (!parentId) throw new Error('error');
+        const parent = getNodePath(parentId, [root.value]).pop();
         if (!parent) throw new Error('未找到父节点');
+
         const index = parent.items?.findIndex((child: MNode) => child.id === node.id);
         parent.items.splice(index, 1, reactive(config));
       },

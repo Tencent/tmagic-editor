@@ -9,3 +9,7 @@
   opacity: .1;
   pointer-events: none;
 }
+
+.magic-ui-container.magic-layout-relative {
+  min-height: 50px;
+}

@@ -16,4 +16,10 @@
  * limitations under the License.
  */
 
-export default {};
+export default {
+  items: [],
+  style: {
+    width: '375',
+    height: '100',
+  },
+};

@@ -1,7 +1,9 @@
 <template>
   <div
     :id="`${config.id || ''}`"
-    :class="`magic-ui-page magic-ui-container${config.className ? ` ${config.className}` : ''}`"
+    :class="`magic-ui-page magic-ui-container magic-layout-${config.layout}${
+      config.className ? ` ${config.className}` : ''
+    }`"
     :style="style"
   >
     <slot></slot>

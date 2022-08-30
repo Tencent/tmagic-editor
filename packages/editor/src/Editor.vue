@@ -31,7 +31,7 @@
 
     <template #props-panel>
       <slot name="props-panel">
-        <props-panel ref="propsPanel" @mounted="(instance: any) => $emit('props-panel-mounted', instance)">
+        <props-panel @mounted="(instance: any) => $emit('props-panel-mounted', instance)">
           <template #props-panel-header>
             <slot name="props-panel-header"></slot>
           </template>
