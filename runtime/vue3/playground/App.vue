@@ -71,7 +71,13 @@ export default defineComponent({
         if (!selectedId.value) throw new Error('error');
         const parent = getNodePath(parentId, [root.value]).pop();
         if (!parent) throw new Error('未找到父节点');
-        parent.items?.push(config);
+        if (parent.id !== selectedId.value) {
+          const index = parent.items?.findIndex((child: MNode) => child.id === selectedId.value);
+          parent.items?.splice(index + 1, 0, config);
+        } else {
+          // 新增节点添加到配置中
+          parent.items?.push(config);
+        }
       },
 
       update({ config, parentId }: UpdateData) {
