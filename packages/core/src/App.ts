@@ -119,18 +119,16 @@ class App extends EventEmitter {
       if (key === 'backgroundImage') {
         value && (results[key] = fillBackgroundImage(value));
       } else if (key === 'transform' && typeof value !== 'string') {
-        results[key] = Object.entries(value as Record<string, string>)
+        const values = Object.entries(value as Record<string, string>)
           .map(([transformKey, transformValue]) => {
-            let defaultValue = 0;
-            if (transformKey === 'scale') {
-              defaultValue = 1;
-            }
+            if (!transformValue.trim()) return '';
             if (transformKey === 'rotate' && isNumber(transformValue)) {
               transformValue = `${transformValue}deg`;
             }
-            return `${transformKey}(${transformValue || defaultValue})`;
+            return `${transformKey}(${transformValue})`;
           })
           .join(' ');
+        results[key] = !values.trim() ? 'none' : values;
       } else if (!whiteList.includes(key) && value && /^[-]?[0-9]*[.]?[0-9]*$/.test(value)) {
         results[key] = `${value / 100}rem`;
       } else {
