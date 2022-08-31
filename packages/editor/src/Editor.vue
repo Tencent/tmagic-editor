@@ -193,9 +193,15 @@ export default defineComponent({
   emits: ['props-panel-mounted', 'update:modelValue'],
 
   setup(props, { emit }) {
-    editorService.on('root-change', () => {
-      const node = editorService.get<MNode | null>('node') || props.defaultSelected;
-      node && editorService.select(node);
+    editorService.on('root-change', (value) => {
+      const node = editorService.get<MNode | null>('node');
+      const nodeId = node?.id || props.defaultSelected;
+      if (nodeId && node !== value) {
+        editorService.select(nodeId);
+      } else {
+        editorService.set('nodes', [value]);
+      }
+
       emit('update:modelValue', toRaw(editorService.get('root')));
     });
 

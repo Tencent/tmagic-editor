@@ -400,7 +400,7 @@ class Editor extends BaseService {
         await this.select(root.items[0]);
         stage?.select(root.items[0].id);
       } else {
-        this.set('node', null);
+        this.set('nodes', [root]);
         this.set('parent', null);
         this.set('page', null);
         this.set('stage', null);
