@@ -118,17 +118,8 @@ export default Test;
 
 ```
 
-### 2. 打包脚本
-在 runtime vue3 中，我们已经提供好一份打包脚本示例。在 script 目录中。只需要在 unit.js 中加入你创建的组件到导出的 units 对象中，属性名即上面我们提到的组件 type，属性值为组件路径（如果是个 npm 包，则将路径替换为包名即可），打包脚本就会自动识别到你的组件。
-
-```
-const units = {
-  test: path.join(__dirname, '../src/components/test-component/index.js'),
-};
-```
-::: tip 自定义打包脚本
-scripts目录中的打包脚本仅是一份示例。业务方可以自行处理打包方式。这份示例的目的，在于告诉开发者，我们是如何生成组件入口、表单配置描述、表单初始值三个入口文件，并提供出去的供 runtime 使用的。
-:::
+### 2. 使用tmagic-cli
+在 runtime vue3 中，我们已经提供好一份示例。在 tmagic.config.ts 文件中。只需要在 packages 加入你创建的组件的路径（如果是个 npm 包，则将路径替换为包名即可），打包脚本就会自动识别到你的组件。[tmagic-cli](../page/introduction.md#tmagic-cli)
 
 ### 3. 启动 playground
 在上面的步骤完成后，在 playground/src/page/Editor.vue 中。找到组件栏的基础组件列表，在其中加入你的开发组件
