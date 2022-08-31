@@ -1,3 +1,13 @@
+## [1.1.1](https://github.com/Tencent/tmagic-editor/compare/v1.1.0...v1.1.1) (2022-08-31)
+
+
+### Bug Fixes
+
+* **core:** 解决固定元素失效问题 ([8db7821](https://github.com/Tencent/tmagic-editor/commit/8db7821032080cdcc74a5e8412d05bc978793932))
+* **editor:** 没有页面时，添加页面出错 ([e67cbce](https://github.com/Tencent/tmagic-editor/commit/e67cbceb7d4d1a047e9849a171045e85661ae71f))
+
+
+
 # [1.1.0](https://github.com/Tencent/tmagic-editor/compare/v1.1.0-beta.13...v1.1.0) (2022-08-30)
 
 
