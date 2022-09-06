@@ -47,9 +47,6 @@
           <template #props-panel-header>
             <slot name="props-panel-header"></slot>
           </template>
-          <template #props-panel-code-block>
-            <slot name="props-panel-code-block"></slot>
-          </template>
         </props-panel>
       </slot>
     </template>
