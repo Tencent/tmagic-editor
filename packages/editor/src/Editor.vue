@@ -14,6 +14,10 @@
           <template #component-list-panel-header>
             <slot name="component-list-panel-header"></slot>
           </template>
+
+          <template #component-list-item="{ component }">
+            <slot name="component-list-item" :component="component"></slot>
+          </template>
         </sidebar>
       </slot>
     </template>

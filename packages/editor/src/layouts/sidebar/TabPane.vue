@@ -13,6 +13,18 @@
         <component v-else-if="config.slots?.componentListPanelHeader" :is="config.slots.componentListPanelHeader" />
       </template>
 
+      <template
+        #component-list-item="{ component }"
+        v-if="data === 'component-list' || config.slots?.componentListItem"
+      >
+        <slot v-if="data === 'component-list'" name="component-list-item" :component="component"></slot>
+        <component
+          v-else-if="config.slots?.componentListItem"
+          :is="config.slots.componentListItem"
+          :component="component"
+        />
+      </template>
+
       <template #layer-panel-header v-if="data === 'layer' || config.slots?.layerPanelHeader">
         <slot v-if="data === 'layer'" name="layer-panel-header"></slot>
         <component v-else-if="config.slots?.layerPanelHeader" :is="config.slots.layerPanelHeader" />

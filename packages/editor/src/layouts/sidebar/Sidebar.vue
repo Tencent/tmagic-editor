@@ -14,6 +14,10 @@
       <template #component-list-panel-header v-if="item === 'component-list'">
         <slot name="component-list-panel-header"></slot>
       </template>
+
+      <template #component-list-item="{ component }" v-if="item === 'component-list'">
+        <slot name="component-list-item" :component="component"></slot>
+      </template>
     </tab-pane>
   </el-tabs>
 </template>

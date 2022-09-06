@@ -24,11 +24,13 @@
             @dragend="dragendHandler"
             @drag="dragHandler"
           >
-            <m-icon :icon="item.icon"></m-icon>
+            <slot name="component-list-item" :component="item">
+              <MIcon :icon="item.icon"></MIcon>
 
-            <el-tooltip effect="dark" placement="bottom" :content="item.text">
-              <span>{{ item.text }}</span>
-            </el-tooltip>
+              <el-tooltip effect="dark" placement="bottom" :content="item.text">
+                <span>{{ item.text }}</span>
+              </el-tooltip>
+            </slot>
           </div>
         </el-collapse-item>
       </template>
@@ -36,8 +38,8 @@
   </el-scrollbar>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, inject, ref } from 'vue';
+<script lang="ts" setup>
+import { computed, inject, ref } from 'vue';
 import serialize from 'serialize-javascript';
 
 import type StageCore from '@tmagic/stage';
@@ -46,89 +48,75 @@ import { removeClassNameByClassName } from '@tmagic/utils';
 import MIcon from '../../components/Icon.vue';
 import type { ComponentGroup, ComponentItem, Services, StageOptions } from '../../type';
 
-export default defineComponent({
-  name: 'ui-component-panel',
+const searchText = ref('');
+const services = inject<Services>('services');
+const stageOptions = inject<StageOptions>('stageOptions');
 
-  components: { MIcon },
+const stage = computed(() => services?.editorService.get<StageCore>('stage'));
+const list = computed(() =>
+  services?.componentListService.getList().map((group: ComponentGroup) => ({
+    ...group,
+    items: group.items.filter((item: ComponentItem) => item.text.includes(searchText.value)),
+  })),
+);
+const collapseValue = computed(() =>
+  Array(list.value?.length)
+    .fill(1)
+    .map((x, i) => i),
+);
 
-  setup() {
-    const searchText = ref('');
-    const services = inject<Services>('services');
-    const stageOptions = inject<StageOptions>('stageOptions');
+let timeout: NodeJS.Timeout | undefined;
+let clientX: number;
+let clientY: number;
 
-    const stage = computed(() => services?.editorService.get<StageCore>('stage'));
-    const list = computed(() =>
-      services?.componentListService.getList().map((group: ComponentGroup) => ({
-        ...group,
-        items: group.items.filter((item: ComponentItem) => item.text.includes(searchText.value)),
-      })),
+const appendComponent = ({ text, type, data = {} }: ComponentItem): void => {
+  services?.editorService.add({
+    name: text,
+    type,
+    ...data,
+  });
+};
+
+const dragstartHandler = ({ text, type, data = {} }: ComponentItem, e: DragEvent) => {
+  if (e.dataTransfer) {
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData(
+      'data',
+      serialize({
+        name: text,
+        type,
+        ...data,
+      }).replace(/"(\w+)":\s/g, '$1: '),
     );
-    const collapseValue = computed(() =>
-      Array(list.value?.length)
-        .fill(1)
-        .map((x, i) => i),
-    );
+  }
+};
 
-    let timeout: NodeJS.Timeout | undefined;
-    let clientX: number;
-    let clientY: number;
+const dragendHandler = () => {
+  if (timeout) {
+    globalThis.clearTimeout(timeout);
+    timeout = undefined;
+  }
+  const doc = stage.value?.renderer.contentWindow?.document;
+  if (doc && stageOptions) {
+    removeClassNameByClassName(doc, stageOptions.containerHighlightClassName);
+  }
+  clientX = 0;
+  clientY = 0;
+};
 
-    return {
-      searchText,
-      collapseValue,
-      list,
+const dragHandler = (e: DragEvent) => {
+  if (e.clientX !== clientX || e.clientY !== clientY) {
+    clientX = e.clientX;
+    clientY = e.clientY;
+    if (timeout) {
+      globalThis.clearTimeout(timeout);
+      timeout = undefined;
+    }
+    return;
+  }
 
-      appendComponent({ text, type, data = {} }: ComponentItem): void {
-        services?.editorService.add({
-          name: text,
-          type,
-          ...data,
-        });
-      },
+  if (timeout || !stage.value) return;
 
-      dragstartHandler({ text, type, data = {} }: ComponentItem, e: DragEvent) {
-        if (e.dataTransfer) {
-          e.dataTransfer.effectAllowed = 'move';
-          e.dataTransfer.setData(
-            'data',
-            serialize({
-              name: text,
-              type,
-              ...data,
-            }).replace(/"(\w+)":\s/g, '$1: '),
-          );
-        }
-      },
-
-      dragendHandler() {
-        if (timeout) {
-          globalThis.clearTimeout(timeout);
-          timeout = undefined;
-        }
-        const doc = stage.value?.renderer.contentWindow?.document;
-        if (doc && stageOptions) {
-          removeClassNameByClassName(doc, stageOptions.containerHighlightClassName);
-        }
-        clientX = 0;
-        clientY = 0;
-      },
-
-      dragHandler(e: DragEvent) {
-        if (e.clientX !== clientX || e.clientY !== clientY) {
-          clientX = e.clientX;
-          clientY = e.clientY;
-          if (timeout) {
-            globalThis.clearTimeout(timeout);
-            timeout = undefined;
-          }
-          return;
-        }
-
-        if (timeout || !stage.value) return;
-
-        timeout = stage.value.getAddContainerHighlightClassNameTimeout(e);
-      },
-    };
-  },
-});
+  timeout = stage.value.getAddContainerHighlightClassNameTimeout(e);
+};
 </script>
