@@ -124,6 +124,8 @@ export interface UiState {
   showRule: boolean;
   /** 用于控制该属性配置表单内组件的尺寸 */
   propsPanelSize: 'large' | 'default' | 'small';
+  /** 是否显示新增页面按钮 */
+  showAddPageButton: boolean;
 }
 
 export interface EditorNodeInfo {

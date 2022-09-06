@@ -1,8 +1,14 @@
 <template>
   <div class="m-editor-page-bar" ref="pageBar">
-    <div id="m-editor-page-bar-add-icon" class="m-editor-page-bar-item m-editor-page-bar-item-icon" @click="addPage">
+    <div
+      v-if="showAddPageButton"
+      id="m-editor-page-bar-add-icon"
+      class="m-editor-page-bar-item m-editor-page-bar-item-icon"
+      @click="addPage"
+    >
       <el-icon><plus></plus></el-icon>
     </div>
+    <div v-else style="width: 21px"></div>
     <div v-if="canScroll" class="m-editor-page-bar-item m-editor-page-bar-item-icon" @click="scroll('left')">
       <el-icon><arrow-left-bold></arrow-left-bold></el-icon>
     </div>
@@ -26,13 +32,17 @@ import { generatePageNameByApp } from '../../utils/editor';
 
 const services = inject<Services>('services');
 const editorService = services?.editorService;
+const uiService = services?.uiService;
 
 const pageBar = ref<HTMLDivElement>();
 const itemsContainer = ref<HTMLDivElement>();
 const pageBarWidth = ref(0);
 const canScroll = ref(false);
 
-const itemsContainerWidth = computed(() => pageBarWidth.value - 105);
+const showAddPageButton = computed(() => uiService?.get('showAddPageButton'));
+
+// 减去新增、左移、右移三个按钮的宽度
+const itemsContainerWidth = computed(() => pageBarWidth.value - 35 * 2 - (showAddPageButton.value ? 35 : 21));
 
 let translateLeft = 0;
 const resizeObserver = new ResizeObserver((entries) => {
@@ -46,7 +56,7 @@ const resizeObserver = new ResizeObserver((entries) => {
 
 const setCanScroll = () => {
   if (itemsContainer.value) {
-    canScroll.value = itemsContainer.value.scrollWidth > pageBarWidth.value - 105;
+    canScroll.value = itemsContainer.value.scrollWidth > itemsContainerWidth.value;
   }
 };
 

@@ -38,7 +38,7 @@
         </div>
         <template #reference>
           <el-icon class="m-editor-page-bar-menu-icon">
-            <caret-bottom></caret-bottom>
+            <CaretBottom></CaretBottom>
           </el-icon>
         </template>
       </el-popover>
