@@ -1,0 +1,67 @@
+.m-editor-code-block-list {
+  padding-top: 20px;
+  .create-code-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .divider {
+    margin: 20px 0;
+  }
+}
+.m-editor-code-block-editor-panel {
+  position: absolute;
+  top: 0;
+  left: 4px;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  background: #fff;
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 20px;
+    h3.title {
+      font-size: 16px;
+      font-weight: bold;
+    }
+  }
+  .close-btn {
+    background: rgb(213, 71, 71);
+    color: #fff;
+  }
+  .code-name-wrapper {
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+  }
+  .m-editor-content {
+    &.fullScreen {
+      height: 100%;
+      width: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 100;
+    }
+  }
+  .m-editor-content-bottom {
+    text-align: right;
+    padding-right: 20px;
+    height: 40px;
+    position: absolute;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    bottom: 0;
+    right: 0;
+    background: #fff;
+    > button {
+      height: 30px;
+      margin-top: 4px;
+    }
+  }
+}
