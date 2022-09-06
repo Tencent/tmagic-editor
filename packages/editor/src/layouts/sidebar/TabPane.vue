@@ -48,11 +48,12 @@
 
 <script lang="ts">
 import { computed, defineComponent, PropType } from 'vue';
-import { Coin, Files } from '@element-plus/icons-vue';
+import { Coin, EditPen, Files } from '@element-plus/icons-vue';
 
 import MIcon from '../../components/Icon.vue';
 import { SideComponent, SideItem } from '../../type';
 
+import CodeBlockList from './code-block/CodeBlockList.vue';
 import ComponentListPanel from './ComponentListPanel.vue';
 import LayerPanel from './LayerPanel.vue';
 
@@ -87,6 +88,14 @@ export default defineComponent({
               icon: Files,
               text: '已选组件',
               component: LayerPanel,
+              slots: {},
+            };
+          case 'code-block':
+            return {
+              type: 'component',
+              icon: EditPen,
+              text: '代码编辑',
+              component: CodeBlockList,
               slots: {},
             };
           default:

@@ -22,6 +22,10 @@
           <template #component-list-item="{ component }">
             <slot name="component-list-item" :component="component"></slot>
           </template>
+
+          <template #code-block-panel-header>
+            <slot name="code-block-panel-header"></slot>
+          </template>
         </sidebar>
       </slot>
     </template>
@@ -42,6 +46,9 @@
         <props-panel @mounted="(instance: any) => $emit('props-panel-mounted', instance)">
           <template #props-panel-header>
             <slot name="props-panel-header"></slot>
+          </template>
+          <template #props-panel-code-block>
+            <slot name="props-panel-code-block"></slot>
           </template>
         </props-panel>
       </slot>

@@ -1,6 +1,9 @@
 <template>
-  <div class="`m-editor-props-panel">
+  <div class="m-editor-props-panel">
     <slot name="props-panel-header"></slot>
+    <slot name="props-panel-code-block">
+      <code-block-editor />
+    </slot>
     <m-form
       ref="configForm"
       :class="`m-editor-props-panel ${propsPanelSize}`"
@@ -22,6 +25,8 @@ import type { MNode } from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
 
 import type { Services } from '../type';
+
+import CodeBlockEditor from './sidebar/code-block/CodeBlockEditor.vue';
 
 const emit = defineEmits(['mounted']);
 

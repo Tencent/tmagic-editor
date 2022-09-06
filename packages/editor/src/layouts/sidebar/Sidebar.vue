@@ -22,6 +22,10 @@
       <template #component-list-item="{ component }" v-if="item === 'component-list'">
         <slot name="component-list-item" :component="component"></slot>
       </template>
+
+      <template #code-block-panel-header v-if="item === 'code-block'">
+        <slot name="code-block-panel-header"></slot>
+      </template>
     </tab-pane>
   </el-tabs>
 </template>
@@ -41,7 +45,7 @@ export default defineComponent({
   props: {
     data: {
       type: Object as PropType<SideBarData>,
-      default: () => ({ type: 'tabs', status: '组件', items: ['component-list', 'layer'] }),
+      default: () => ({ type: 'tabs', status: '组件', items: ['component-list', 'layer', 'code-block'] }),
     },
   },
 
