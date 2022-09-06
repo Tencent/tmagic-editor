@@ -15,8 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import './utils/polyfills';
-
 import { App } from 'vue';
 
 import Code from './fields/Code.vue';

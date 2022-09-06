@@ -33,7 +33,7 @@ export default defineConfig({
     }),
   ],
 
-  base: '/tmagic-editor/playground',
+  base: '/tmagic-editor/playground/',
 
   resolve: {
     alias: [
@@ -51,6 +51,14 @@ export default defineConfig({
       { find: /^vue$/, replacement: path.join(__dirname, 'node_modules/vue/dist/vue.esm-bundler.js') },
       { find: /^element-plus$/, replacement: path.join(__dirname, 'node_modules/element-plus/es/index.mjs') },
     ],
+  },
+
+  optimizeDeps: {
+    esbuildOptions: {
+      define: {
+        global: 'globalThis',
+      },
+    },
   },
 
   server: {
