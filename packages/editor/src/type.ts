@@ -243,7 +243,7 @@ export interface SideComponent extends MenuComponent {
  * component-list: 组件列表
  * layer: 已选组件树
  */
-export type SideItem = 'component-list' | 'layer' | SideComponent;
+export type SideItem = 'component-list' | 'layer' | 'code-block' | SideComponent;
 
 /** 工具栏 */
 export interface SideBarData {
@@ -304,4 +304,13 @@ export interface ScrollViewerEvent {
   scrollTop: number;
   scrollHeight: number;
   scrollWidth: number;
+}
+
+export interface CodeBlockConfig {
+  /** 代码块唯一id */
+  id: string;
+  /** 代码块名称 */
+  name: string;
+  /** 代码块内容 */
+  content: string;
 }
