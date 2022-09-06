@@ -30,6 +30,11 @@
         <component v-else-if="config.slots?.layerPanelHeader" :is="config.slots.layerPanelHeader" />
       </template>
 
+      <template #code-block-panel-header v-if="data === 'code-block' || config.slots?.codeBlockPanelHeader">
+        <slot v-if="data === 'code-block'" name="code-block-panel-header"></slot>
+        <component v-else-if="config.slots?.codeBlockPanelHeader" :is="config.slots.codeBlockPanelHeader" />
+      </template>
+
       <template
         #layer-node-content="{ data: nodeData, node }"
         v-if="data === 'layer' || config.slots?.layerNodeContent"
