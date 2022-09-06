@@ -54,6 +54,7 @@ const state = reactive<UiState>({
   showGuides: true,
   showRule: true,
   propsPanelSize: 'small',
+  showAddPageButton: true,
 });
 
 class Ui extends BaseService {
