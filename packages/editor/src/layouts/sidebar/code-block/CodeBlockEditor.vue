@@ -1,6 +1,6 @@
 <template>
   <el-dialog v-model="state.isShowCodeBlockEditor" title="代码块编辑面板" :fullscreen="true">
-    <div ref="codeBlockEditor" class="m-editor-code-block-editor-panel">
+    <div class="m-editor-code-block-editor-panel">
       <el-row class="code-name-wrapper" justify="start">
         <el-col :span="2">
           <span>代码块名称</span>
@@ -31,63 +31,56 @@
 </template>
 
 <script lang="ts" setup>
-import { inject, ref, watchEffect } from 'vue';
+import { defineEmits, defineProps, inject, ref } from 'vue';
 import { ElMessage } from 'element-plus';
 
-import type { Services } from '../../../type';
+import type { Services, State } from '../../../type';
 
-import useCodeBlock from './useCodeBlock';
-
-const { state, closePanel } = useCodeBlock();
-const codeBlockEditor = ref<HTMLElement | null>(null);
 const codeEditor = ref<any | null>(null);
 const services = inject<Services>('services');
+const props = defineProps<{
+  state: State;
+}>();
 
-watchEffect(() => {
-  if (state.isShowCodeBlockEditor) {
-    if (!codeBlockEditor.value) {
-      return;
-    }
-  }
-});
+const emit = defineEmits(['close']);
 
 // 保存并关闭
 const saveAndClose = () => {
   saveCode();
-  closePanel();
+  emit('close');
 };
 
 // 保存代码
 const saveCode = () => {
-  if (!codeEditor.value || !state.codeConfig) return;
+  if (!codeEditor.value || !props.state.codeConfig) return;
 
   try {
     const codeContent = codeEditor.value.getEditor().getValue();
     /* eslint no-eval: "off" */
-    state.codeConfig.content = eval(codeContent);
-    const { id, ...codeConfig } = state.codeConfig;
-    const { editorService } = services || {};
-    if (!editorService) return;
-    const root = editorService.get('root');
-
-    // 代码块id作为key
-    let codeBlockList = root?.method || {};
-    codeBlockList = {
-      ...codeBlockList,
-      ...{
-        [state.codeConfig.id]: codeConfig,
-      },
-    };
-
-    // 写入dsl
-    editorService.set('root', {
-      ...root,
-      method: codeBlockList,
-    });
-
-    ElMessage.success('代码保存成功');
+    props.state.codeConfig.content = eval(codeContent);
   } catch (e: any) {
     ElMessage.error(e.stack);
   }
+  const { id, ...codeConfig } = props.state.codeConfig;
+  const { editorService } = services || {};
+  if (!editorService) return;
+  const root = editorService.get('root');
+
+  // 代码块id作为key
+  let codeBlockMap = root?.method || {};
+  codeBlockMap = {
+    ...codeBlockMap,
+    ...{
+      [props.state.codeConfig.id]: codeConfig,
+    },
+  };
+
+  // 写入dsl
+  editorService.set('root', {
+    ...root,
+    method: codeBlockMap,
+  });
+
+  ElMessage.success('代码保存成功');
 };
 </script>

@@ -314,3 +314,22 @@ export interface CodeBlockConfig {
   /** 代码块内容 */
   content: string;
 }
+
+export interface CodeBlockMap {
+  [id: string]: CodeBlockContent;
+}
+
+export interface CodeBlockContent {
+  /** 代码块名称 */
+  name: string;
+  /** 代码块内容 */
+  content: string;
+}
+export type State = {
+  /** 是否展示代码块编辑区 */
+  isShowCodeBlockEditor: boolean;
+  /** 代码块配置 */
+  codeConfig: CodeBlockConfig | null;
+  /** 代码块列表 */
+  codeBlockMap: CodeBlockMap | null;
+};
