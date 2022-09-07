@@ -26,6 +26,10 @@
       <template #code-block-panel-header v-if="item === 'code-block'">
         <slot name="code-block-panel-header"></slot>
       </template>
+
+      <template #code-block-panel-tool v-if="item === 'code-block'">
+        <slot name="code-block-panel-tool"></slot>
+      </template>
     </tab-pane>
   </el-tabs>
 </template>

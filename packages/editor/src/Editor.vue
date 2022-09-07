@@ -26,6 +26,10 @@
           <template #code-block-panel-header>
             <slot name="code-block-panel-header"></slot>
           </template>
+
+          <template #code-block-panel-tool>
+            <slot name="code-block-panel-tool"></slot>
+          </template>
         </sidebar>
       </slot>
     </template>

@@ -35,6 +35,11 @@
         <component v-else-if="config.slots?.codeBlockPanelHeader" :is="config.slots.codeBlockPanelHeader" />
       </template>
 
+      <template #code-block-panel-tool v-if="data === 'code-block' || config.slots?.codeBlockPanelTool">
+        <slot v-if="data === 'code-block'" name="code-block-panel-tool"></slot>
+        <component v-else-if="config.slots?.codeBlockPanelTool" :is="config.slots.codeBlockPanelTool" />
+      </template>
+
       <template
         #layer-node-content="{ data: nodeData, node }"
         v-if="data === 'layer' || config.slots?.layerNodeContent"
