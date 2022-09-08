@@ -27,8 +27,12 @@
             <slot name="code-block-panel-header"></slot>
           </template>
 
-          <template #code-block-panel-tool>
-            <slot name="code-block-panel-tool"></slot>
+          <template #code-block-panel-tool="{ id }">
+            <slot name="code-block-panel-tool" :id="id"></slot>
+          </template>
+
+          <template #code-block-edit-panel-header="{ id }">
+            <slot name="code-block-edit-panel-header" :id="id"></slot>
           </template>
         </sidebar>
       </slot>
@@ -73,6 +77,7 @@ import NavMenu from './layouts/NavMenu.vue';
 import PropsPanel from './layouts/PropsPanel.vue';
 import Sidebar from './layouts/sidebar/Sidebar.vue';
 import Workspace from './layouts/workspace/Workspace.vue';
+import codeBlockService from './services/codeBlock';
 import componentListService from './services/componentList';
 import editorService from './services/editor';
 import eventsService from './services/events';
@@ -296,6 +301,7 @@ export default defineComponent({
       uiService.destroy();
       componentListService.destroy();
       storageService.destroy();
+      codeBlockService.destroy();
     });
 
     const services: Services = {
@@ -306,6 +312,7 @@ export default defineComponent({
       editorService,
       uiService,
       storageService,
+      codeBlockService,
     };
 
     provide('services', services);
