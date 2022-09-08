@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, inject, onBeforeMount, onMounted, PropType, Ref, ref, watch } from 'vue';
+import { defineComponent, inject, onBeforeMount, onMounted, PropType, Ref, ref, watchEffect } from 'vue';
 
 import { FormState, SelectConfig, SelectGroupOption, SelectOption } from '../schema';
 import { getConfig } from '../utils/config';
@@ -264,35 +264,24 @@ export default defineComponent({
     };
 
     if (typeof props.config.options === 'function') {
-      watch(
-        () => mForm?.values,
-        () => {
-          typeof props.config.options === 'function' &&
-            Promise.resolve(
-              props.config.options(mForm, {
-                model: props.model,
-                prop: props.prop,
-                formValues: mForm?.values,
-                formValue: mForm?.values,
-                config: props.config,
-              }),
-            ).then((data) => {
-              options.value = data;
-            });
-        },
-        {
-          deep: true,
-          immediate: true,
-        },
-      );
+      watchEffect(() => {
+        typeof props.config.options === 'function' &&
+          Promise.resolve(
+            props.config.options(mForm, {
+              model: props.model,
+              prop: props.prop,
+              formValues: mForm?.values,
+              formValue: mForm?.values,
+              config: props.config,
+            }),
+          ).then((data) => {
+            options.value = data;
+          });
+      });
     } else if (Array.isArray(props.config.options)) {
-      watch(
-        () => props.config.options,
-        () => {
-          options.value = props.config.options as SelectOption[] | SelectGroupOption[];
-        },
-        { immediate: true },
-      );
+      watchEffect(() => {
+        options.value = props.config.options as SelectOption[] | SelectGroupOption[];
+      });
     } else if (props.config.option) {
       onBeforeMount(() => {
         if (!props.model) return;
