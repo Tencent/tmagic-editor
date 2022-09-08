@@ -23,6 +23,7 @@ import type { Id, MApp, MContainer, MNode, MPage } from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
 import type { ContainerHighlightType, MoveableOptions } from '@tmagic/stage';
 
+import type { CodeBlockService } from './services/codeBlock';
 import type { ComponentListService } from './services/componentList';
 import type { EditorService } from './services/editor';
 import type { EventsService } from './services/events';
@@ -46,6 +47,7 @@ export interface Services {
   propsService: PropsService;
   componentListService: ComponentListService;
   uiService: UiService;
+  codeBlockService: CodeBlockService;
 }
 
 export interface StageOptions {
@@ -306,16 +308,7 @@ export interface ScrollViewerEvent {
   scrollWidth: number;
 }
 
-export interface CodeBlockConfig {
-  /** 代码块唯一id */
-  id: string;
-  /** 代码块名称 */
-  name: string;
-  /** 代码块内容 */
-  content: string;
-}
-
-export interface CodeBlockMap {
+export interface CodeBlockDSL {
   [id: string]: CodeBlockContent;
 }
 
@@ -325,11 +318,10 @@ export interface CodeBlockContent {
   /** 代码块内容 */
   content: string;
 }
-export type State = {
+
+export type CodeState = {
   /** 是否展示代码块编辑区 */
-  isShowCodeBlockEditor: boolean;
-  /** 代码块配置 */
-  codeConfig: CodeBlockConfig | null;
-  /** 代码块列表 */
-  codeBlockMap: CodeBlockMap | null;
+  isShowCodeEditor: boolean;
+  /** 代码块DSL */
+  codeDsl: CodeBlockDSL | null;
 };
