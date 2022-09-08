@@ -16,8 +16,11 @@
  * limitations under the License.
  */
 
+import { map } from 'lodash-es';
+
 import { FormConfig, FormState } from '@tmagic/form';
 
+import codeBlockService from '../services/codeBlock';
 import editorService from '../services/editor';
 import eventsService from '../services/events';
 
@@ -221,13 +224,36 @@ export const fillConfig = (config: FormConfig = []) => [
       },
       {
         title: '高级',
-        labelWidth: '80px',
+        lazy: true,
         items: [
           {
-            type: 'code-link',
-            name: 'created',
-            text: 'created',
-            formTitle: 'created',
+            type: 'tab',
+            active: '0',
+            items: [
+              {
+                title: 'created',
+                lazy: true,
+                items: [
+                  {
+                    labelWidth: '100px',
+                    name: 'created',
+                    text: '关联代码块',
+                    type: 'select',
+                    multiple: true,
+                    options: () => {
+                      const codeDsl = codeBlockService.getCodeDsl();
+                      if (codeDsl) {
+                        return map(codeDsl, (value, key) => ({
+                          text: value.name,
+                          value: key,
+                        }));
+                      }
+                      return [];
+                    },
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
