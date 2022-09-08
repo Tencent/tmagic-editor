@@ -1,5 +1,5 @@
 {
-  "version": "1.1.1",
+  "version": "1.1.2",
   "name": "@tmagic/core",
   "sideEffects": [
     "dist/*"
@@ -35,7 +35,7 @@
     "vue"
   ],
   "dependencies": {
-    "@tmagic/schema": "1.1.1",
+    "@tmagic/schema": "1.1.2",
     "events": "^3.3.0"
   },
   "devDependencies": {

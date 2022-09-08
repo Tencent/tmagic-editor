@@ -1,3 +1,18 @@
+## [1.1.2](https://github.com/Tencent/tmagic-editor/compare/v1.1.1...v1.1.2) (2022-09-08)
+
+
+### Bug Fixes
+
+* **editor:** 画布缩放后，拖入组件位置错位 ([bdd544e](https://github.com/Tencent/tmagic-editor/commit/bdd544e87e7c4f4b227d65f3afd4de14af826e17))
+
+
+### Features
+
+* **editor:** 支持控制pagebar中新增按钮显隐 ([3e024d2](https://github.com/Tencent/tmagic-editor/commit/3e024d21edca7dc3bcc00b8aae23b231ee8e1a54))
+* **editor:** 添加compoent-list-item slot ([c307386](https://github.com/Tencent/tmagic-editor/commit/c3073861907abb01b57b9632bb9c2c9108203379))
+
+
+
 ## [1.1.1](https://github.com/Tencent/tmagic-editor/compare/v1.1.0...v1.1.1) (2022-08-31)
 
 
