@@ -17,8 +17,10 @@
  */
 
 import { reactive } from 'vue';
+import { keys, pick } from 'lodash-es';
 
 import type { CodeBlockContent, CodeBlockDSL, CodeState } from '../type';
+import { EditorMode } from '../type';
 import { info } from '../utils/logger';
 
 import BaseService from './BaseService';
@@ -27,6 +29,10 @@ class CodeBlock extends BaseService {
   private state = reactive<CodeState>({
     isShowCodeEditor: false,
     codeDsl: null,
+    id: '',
+    editable: true,
+    mode: EditorMode.EDITOR,
+    combineIds: [],
   });
 
   constructor() {
@@ -57,14 +63,15 @@ class CodeBlock extends BaseService {
    * @param {string} id 代码块id
    * @returns {CodeBlockContent | null}
    */
-  public getCodeDslById(id: string): CodeBlockContent | null {
+  public getCodeContentById(id: string): CodeBlockContent | null {
+    if (!id) return null;
     const totalCodeDsl = this.getCodeDsl();
     if (!totalCodeDsl) return null;
     return totalCodeDsl[id] ?? null;
   }
 
   /**
-   * 根据代码块id设置代码块内容
+   * 设置代码块ID和代码内容到源dsl
    * @param {string} id 代码块id
    * @param {CodeBlockContent} codeConfig 代码块内容配置信息
    * @returns {void}
@@ -76,6 +83,16 @@ class CodeBlock extends BaseService {
       [id]: codeConfig,
     };
     this.setCodeDsl(codeDsl);
+  }
+
+  /**
+   * 根据代码块id数组获取代码dsl
+   * @param {string[]} ids 代码块id数组
+   * @returns {CodeBlockDSL}
+   */
+  public getCodeDslByIds(ids: string[]): CodeBlockDSL {
+    const codeDsl = this.getCodeDsl();
+    return pick(codeDsl, ids) as CodeBlockDSL;
   }
 
   /**
@@ -96,11 +113,105 @@ class CodeBlock extends BaseService {
   }
 
   /**
+   * 设置代码编辑面板展示状态及展示内容
+   * @param {boolean} status 是否展示代码编辑面板
+   * @param {string} id 代码块id
+   * @returns {void}
+   */
+  public setCodeEditorContent(status: boolean, id: string): void {
+    if (!id) return;
+    this.setId(id);
+    this.state.isShowCodeEditor = status;
+  }
+
+  /**
+   * 获取当前选中的代码块内容
+   * @returns {CodeBlockContent | null}
+   */
+  public getCurrentDsl() {
+    return this.getCodeContentById(this.state.id);
+  }
+
+  /**
+   * 获取编辑状态
+   * @returns {boolean} 是否可编辑
+   */
+  public getEditStatus(): boolean {
+    return this.state.editable;
+  }
+
+  /**
+   * 设置编辑状态
+   * @param {boolean} 是否可编辑
+   * @returns {void}
+   */
+  public setEditStatus(status: boolean): void {
+    this.state.editable = status;
+  }
+
+  /**
+   * 设置当前选中的代码块ID
+   * @param {string} id 代码块id
+   * @returns {void}
+   */
+  public setId(id: string) {
+    if (!id) return;
+    this.state.id = id;
+  }
+
+  /**
+   * 获取当前选中的代码块ID
+   * @returns {string} id 代码块id
+   */
+  public getId(): string {
+    return this.state.id;
+  }
+
+  /**
+   * 获取当前模式
+   * @returns {EditorMode}
+   */
+  public getMode(): EditorMode {
+    return this.state.mode;
+  }
+
+  /**
+   * 设置当前模式
+   * @param {EditorMode} mode 模式
+   * @returns {void}
+   */
+  public setMode(mode: EditorMode): void {
+    this.state.mode = mode;
+  }
+
+  /**
+   * 设置当前已关联绑定的代码块id数组
+   * @param {string[]} ids 代码块id数组
+   * @returns {void}
+   */
+  public setCombineIds(ids: string[]): void {
+    this.state.combineIds = ids;
+  }
+
+  /**
+   * 获取当前已关联绑定的代码块id数组
+   * @returns {string[]}
+   */
+  public getCombineIds(): string[] {
+    return this.state.combineIds;
+  }
+
+  /**
    * 生成代码块唯一id
    * @returns {string} 代码块唯一id
    */
   public getUniqueId(): string {
-    return (Date.now().toString(36) + Math.random().toString(36).substring(2)).padEnd(19, '0');
+    const newId = (Date.now().toString(36) + Math.random().toString(36).substring(2)).padEnd(19, '0');
+    // 判断是否重复
+    const dsl = this.getCodeDsl();
+    const existedIds = keys(dsl);
+    if (!existedIds.includes(newId)) return newId;
+    return this.getUniqueId();
   }
 
   public destroy() {
