@@ -227,33 +227,24 @@ export const fillConfig = (config: FormConfig = []) => [
         lazy: true,
         items: [
           {
-            type: 'tab',
-            active: '0',
-            items: [
-              {
-                title: 'created',
-                lazy: true,
-                items: [
-                  {
-                    labelWidth: '100px',
-                    name: 'created',
-                    text: '关联代码块',
-                    type: 'select',
-                    multiple: true,
-                    options: () => {
-                      const codeDsl = codeBlockService.getCodeDsl();
-                      if (codeDsl) {
-                        return map(codeDsl, (value, key) => ({
-                          text: value.name,
-                          value: key,
-                        }));
-                      }
-                      return [];
-                    },
-                  },
-                ],
+            name: 'created',
+            text: 'created',
+            type: 'code-select',
+            labelWidth: '100px',
+            selectConfig: {
+              multiple: true,
+              options: () => {
+                const codeDsl = codeBlockService.getCodeDsl();
+                if (codeDsl) {
+                  return map(codeDsl, (value, key) => ({
+                    text: `${value.name}（${key}）`,
+                    label: `${value.name}（${key}）`,
+                    value: key,
+                  }));
+                }
+                return [];
               },
-            ],
+            },
           },
         ],
       },

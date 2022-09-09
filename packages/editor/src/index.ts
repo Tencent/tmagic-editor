@@ -19,6 +19,7 @@ import { App } from 'vue';
 
 import Code from './fields/Code.vue';
 import CodeLink from './fields/CodeLink.vue';
+import CodeSelect from './fields/CodeSelect.vue';
 import uiSelect from './fields/UISelect.vue';
 import CodeEditor from './layouts/CodeEditor.vue';
 import { setConfig } from './utils/config';
@@ -56,11 +57,11 @@ export default {
     // eslint-disable-next-line no-param-reassign
     app.config.globalProperties.$TMAGIC_EDITOR = option;
     setConfig(option);
-
     app.component(Editor.name, Editor);
     app.component('m-fields-ui-select', uiSelect);
     app.component('m-fields-code-link', CodeLink);
     app.component('m-fields-vs-code', Code);
     app.component(CodeEditor.name, CodeEditor);
+    app.component('m-fields-code-select', CodeSelect);
   },
 };
