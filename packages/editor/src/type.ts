@@ -322,6 +322,17 @@ export interface CodeBlockContent {
 export type CodeState = {
   /** 是否展示代码块编辑区 */
   isShowCodeEditor: boolean;
-  /** 代码块DSL */
+  /** 代码块DSL数据源 */
   codeDsl: CodeBlockDSL | null;
+  /** 当前选中的代码块id */
+  id: string;
+  /** 代码块是否可编辑 */
+  editable: boolean;
+  mode: EditorMode;
+  combineIds: string[];
 };
+
+export enum EditorMode {
+  LIST = 'list',
+  EDITOR = 'editor',
+}

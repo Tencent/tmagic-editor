@@ -70,3 +70,18 @@
     }
   }
 }
+.m-fields-code-select {
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+.code-editor-side-menu {
+  width: 20%;
+}
+.m-editor-code-block-editor-panel-list-mode {
+  width: 80%;
+  position: absolute;
+  height: 90%;
+  left: 20%;
+  top: 60px;
+}
