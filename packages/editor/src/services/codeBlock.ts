@@ -69,7 +69,7 @@ class CodeBlock extends BaseService {
   }
 
   /**
-   * 获取活动的代码块dsl数据源（默认从dsl中的method字段读取）
+   * 获取活动的代码块dsl数据源（默认从dsl中的methods字段读取）
    * @returns {CodeBlockDSL | null}
    */
   public async getCodeDsl(): Promise<CodeBlockDSL | null> {

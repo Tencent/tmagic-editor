@@ -763,23 +763,23 @@ class Editor extends BaseService {
   }
 
   /**
-   * 从dsl中的method字段读取活动的代码块
+   * 从dsl中的methods字段读取活动的代码块
    * @returns {CodeBlockDSL | null}
    */
   public async getCodeDsl(): Promise<CodeBlockDSL | null> {
     const root = this.get<MApp | null>('root');
     if (!root) return null;
-    return root.method || null;
+    return root.methods || null;
   }
 
   /**
-   * 设置代码块到dsl的method字段
+   * 设置代码块到dsl的methods字段
    * @param {CodeBlockDSL} codeDsl 代码DSL
    * @returns {void}
    */
   public async setCodeDsl(codeDsl: CodeBlockDSL): Promise<void> {
     if (!this.state.root) return;
-    this.state.root.method = codeDsl;
+    this.state.root.methods = codeDsl;
   }
 
   private addModifiedNodeId(id: Id) {
