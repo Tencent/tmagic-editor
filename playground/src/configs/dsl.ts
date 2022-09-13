@@ -20,7 +20,7 @@ export default {
   id: '75f0extui9d7yksklx27hff8xg',
   name: 'test',
   type: 'app',
-  method: {
+  methods: {
     l7znj1q24wilb357ay6: {
       name: 'getData',
       content: () => {
