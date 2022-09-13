@@ -328,11 +328,23 @@ export type CodeState = {
   id: string;
   /** 代码块是否可编辑 */
   editable: boolean;
+  /** 代码编辑面板的展示模式 */
   mode: EditorMode;
+  /** list模式下左侧展示的代码列表 */
   combineIds: string[];
+  /** 组件和代码块的绑定关系 */
+  compRelation: CompRelation;
+  /** 为业务逻辑预留的不可删除的代码块列表，由业务逻辑维护（如代码块上线后不可删除） */
+  undeletableList: string[];
 };
 
 export enum EditorMode {
+  /** 左侧菜单，右侧代码 */
   LIST = 'list',
+  /** 全屏代码 */
   EDITOR = 'editor',
 }
+
+export type CompRelation = {
+  [compId: string | number]: string[];
+};

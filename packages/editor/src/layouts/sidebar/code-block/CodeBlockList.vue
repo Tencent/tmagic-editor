@@ -8,13 +8,16 @@
     </slot>
 
     <!-- 代码块列表 -->
-    <div class="list-container" v-if="codeList">
+    <div class="list-container" v-if="!isEmpty(codeList)">
       <div v-for="(value, key) in codeList" :key="key">
         <div class="list-item">
           <div class="code-name">{{ value.name }}（{{ key }}）</div>
           <div class="right-tool">
-            <el-tooltip effect="dark" content="编辑代码" placement="top">
+            <el-tooltip effect="dark" content="编辑" placement="top">
               <el-icon class="edit-icon" @click="editCode(key)"><Edit /></el-icon>
+            </el-tooltip>
+            <el-tooltip effect="dark" content="删除" placement="top">
+              <el-icon class="edit-icon" @click="deleteCode(key)"><Close /></el-icon>
             </el-tooltip>
             <slot name="code-block-panel-tool" :id="key"></slot>
           </div>
@@ -33,8 +36,9 @@
 
 <script lang="ts" setup>
 import { computed, inject } from 'vue';
-import { Edit } from '@element-plus/icons-vue';
+import { Close, Edit } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
+import { flattenDeep, isEmpty, values } from 'lodash-es';
 
 import type { CodeBlockContent, Services } from '../../../type';
 import { EditorMode } from '../../../type';
@@ -58,7 +62,7 @@ const createCodeBlock = () => {
     name: '代码块',
     content: `() => {\n  // place your code here\n}`,
   };
-  services?.codeBlockService.setMode(EditorMode.EDITOR);
+  codeBlockService.setMode(EditorMode.EDITOR);
   const id = codeBlockService.getUniqueId();
   codeBlockService.setCodeDslById(id, codeConfig);
   codeBlockService.setCodeEditorContent(true, id);
@@ -68,5 +72,18 @@ const createCodeBlock = () => {
 const editCode = (key: string) => {
   services?.codeBlockService.setMode(EditorMode.EDITOR);
   services?.codeBlockService.setCodeEditorContent(true, key);
+};
+
+// 删除代码块
+const deleteCode = (key: string) => {
+  const compRelation = services?.codeBlockService.getCompRelation();
+  const codeIds = flattenDeep(values(compRelation));
+  const undeleteableList = services?.codeBlockService.getUndeletableList() || [];
+  if (!codeIds.includes(key) && !undeleteableList.includes(key)) {
+    // 无绑定关系，且不在不可删除列表中
+    services?.codeBlockService.deleteCodeDslByIds([key]);
+  } else {
+    ElMessage.error('代码块删除失败');
+  }
 };
 </script>

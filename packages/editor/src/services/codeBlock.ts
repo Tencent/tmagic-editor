@@ -17,9 +17,9 @@
  */
 
 import { reactive } from 'vue';
-import { keys, pick } from 'lodash-es';
+import { keys, omit, pick } from 'lodash-es';
 
-import type { CodeBlockContent, CodeBlockDSL, CodeState } from '../type';
+import type { CodeBlockContent, CodeBlockDSL, CodeState, CompRelation } from '../type';
 import { EditorMode } from '../type';
 import { info } from '../utils/logger';
 
@@ -33,6 +33,8 @@ class CodeBlock extends BaseService {
     editable: true,
     mode: EditorMode.EDITOR,
     combineIds: [],
+    compRelation: {},
+    undeletableList: [],
   });
 
   constructor() {
@@ -185,7 +187,7 @@ class CodeBlock extends BaseService {
   }
 
   /**
-   * 设置当前已关联绑定的代码块id数组
+   * 设置当前选中组件已关联绑定的代码块id数组
    * @param {string[]} ids 代码块id数组
    * @returns {void}
    */
@@ -194,11 +196,61 @@ class CodeBlock extends BaseService {
   }
 
   /**
-   * 获取当前已关联绑定的代码块id数组
+   * 获取当前选中组件已关联绑定的代码块id数组
    * @returns {string[]}
    */
   public getCombineIds(): string[] {
     return this.state.combineIds;
+  }
+
+  /**
+   * 设置组件与代码块的绑定关系
+   * @param {number | string} compId 组件id
+   * @param {string[]} codeIds 代码块id数组
+   * @returns {void}
+   */
+  public setCompRelation(compId: number | string, codeIds: string[]) {
+    if (!compId) return;
+    this.state.compRelation = {
+      [compId]: codeIds,
+    };
+  }
+
+  /**
+   * 获取组件与代码块的绑定关系
+   * @returns {CompRelation}
+   */
+  public getCompRelation(): CompRelation {
+    return this.state.compRelation;
+  }
+
+  /**
+   * 获取不可删除列表
+   * @returns {string[]}
+   */
+  public getUndeletableList(): string[] {
+    return this.state.undeletableList;
+  }
+
+  /**
+   * 设置不可删除列表：为业务逻辑预留的不可删除的代码块列表，由业务逻辑维护（如代码块上线后不可删除）
+   * @param {string[]} codeIds 代码块id数组
+   * @returns {void}
+   */
+  public setUndeleteableList(codeIds: string[]): void {
+    this.state.undeletableList = codeIds;
+  }
+
+  /**
+   * 在dsl数据源中删除指定id的代码块
+   * @param {string[]} codeIds 需要删除的代码块id数组
+   * @returns {CodeBlockDSL} 删除后的code dsl
+   */
+  public deleteCodeDslByIds(codeIds: string[]): CodeBlockDSL {
+    const currentDsl = this.getCodeDsl();
+    const newDsl = omit(currentDsl, codeIds);
+    this.setCodeDsl(newDsl);
+    return newDsl;
   }
 
   /**
