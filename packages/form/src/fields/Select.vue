@@ -297,7 +297,7 @@ export default defineComponent({
       onBeforeMount(() => {
         if (!props.model) return;
         const v = props.model[props.name];
-        if (Array.isArray(v) ? v.length : v) {
+        if (Array.isArray(v) ? v.length : typeof v !== 'undefined') {
           getInitOption().then((data) => {
             options.value = data;
           });
