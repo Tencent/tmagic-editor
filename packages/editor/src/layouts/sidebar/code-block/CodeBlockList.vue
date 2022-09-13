@@ -13,11 +13,11 @@
         <div class="list-item">
           <div class="code-name">{{ value.name }}（{{ key }}）</div>
           <div class="right-tool">
-            <el-tooltip effect="dark" content="编辑" placement="top">
-              <el-icon class="edit-icon" @click="editCode(key)"><Edit /></el-icon>
+            <el-tooltip effect="dark" :content="editable ? '编辑' : '查看'" placement="top">
+              <Icon :icon="editable ? Edit : View" class="edit-icon" @click="editCode(key)"></Icon>
             </el-tooltip>
-            <el-tooltip effect="dark" content="删除" placement="top">
-              <el-icon class="edit-icon" @click="deleteCode(key)"><Close /></el-icon>
+            <el-tooltip effect="dark" content="删除" placement="top" v-if="editable">
+              <Icon :icon="Close" class="edit-icon" @click="deleteCode(key)"></Icon>
             </el-tooltip>
             <slot name="code-block-panel-tool" :id="key"></slot>
           </div>
@@ -36,10 +36,11 @@
 
 <script lang="ts" setup>
 import { computed, inject, ref, watchEffect } from 'vue';
-import { Close, Edit } from '@element-plus/icons-vue';
+import { Close, Edit, View } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 import { flattenDeep, isEmpty, values } from 'lodash-es';
 
+import Icon from '../../../components/Icon.vue';
 import type { CodeBlockContent, Services } from '../../../type';
 import { CodeBlockDSL, EditorMode } from '../../../type';
 
