@@ -39,6 +39,7 @@ export { default as historyService } from './services/history';
 export { default as storageService } from './services/storage';
 export { default as eventsService } from './services/events';
 export { default as uiService } from './services/ui';
+export { default as codeBlockService } from './services/codeBlock';
 export { default as ComponentListPanel } from './layouts/sidebar/ComponentListPanel.vue';
 export { default as LayerPanel } from './layouts/sidebar/LayerPanel.vue';
 export { default as PropsPanel } from './layouts/PropsPanel.vue';
