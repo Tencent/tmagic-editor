@@ -20,6 +20,14 @@ export default {
   id: '75f0extui9d7yksklx27hff8xg',
   name: 'test',
   type: 'app',
+  method: {
+    l7znj1q24wilb357ay6: {
+      name: 'getData',
+      content: () => {
+        console.log('this is getData function');
+      },
+    },
+  },
   items: [
     {
       type: 'page',
