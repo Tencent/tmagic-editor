@@ -123,7 +123,7 @@ const getConfig = (item: MenuItem): (MenuButton | MenuComponent)[] => {
         className: 'scale-to-fit',
         icon: markRaw(FullScreen),
         tooltip: `缩放以适应(${ctrl}+0)`,
-        handler: () => uiService?.set('zoom', uiService.calcZoom()),
+        handler: async () => uiService?.set('zoom', await uiService.calcZoom()),
       });
       break;
     case 'rule':

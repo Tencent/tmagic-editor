@@ -139,9 +139,9 @@ onMounted(() => {
       e.inputEvent.preventDefault();
       services?.uiService.zoom(-0.1);
     })
-    .keydown([ctrl, '0'], (e) => {
+    .keydown([ctrl, '0'], async (e) => {
       e.inputEvent.preventDefault();
-      services?.uiService.set('zoom', services.uiService.calcZoom());
+      services?.uiService.set('zoom', await services.uiService.calcZoom());
     })
     .keydown([ctrl, '1'], (e) => {
       e.inputEvent.preventDefault();

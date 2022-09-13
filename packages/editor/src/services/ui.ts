@@ -59,7 +59,7 @@ const state = reactive<UiState>({
 
 class Ui extends BaseService {
   constructor() {
-    super([]);
+    super(['initColumnWidth', 'zoom', 'calcZoom']);
     globalThis.addEventListener('resize', () => {
       this.setColumnWidth({
         center: 'auto',
@@ -95,7 +95,7 @@ class Ui extends BaseService {
     return (state as any)[name];
   }
 
-  public initColumnWidth() {
+  public async initColumnWidth() {
     const columnWidthCacheData = globalThis.localStorage.getItem(COLUMN_WIDTH_STORAGE_KEY);
     if (columnWidthCacheData) {
       try {
@@ -107,12 +107,12 @@ class Ui extends BaseService {
     }
   }
 
-  public zoom(zoom: number) {
+  public async zoom(zoom: number) {
     this.set('zoom', (this.get<number>('zoom') * 100 + zoom * 100) / 100);
     if (this.get<number>('zoom') < 0.1) this.set('zoom', 0.1);
   }
 
-  public calcZoom() {
+  public async calcZoom() {
     const { stageRect, stageContainerRect } = state;
     const { height, width } = stageContainerRect;
     if (!width || !height) return 1;
@@ -162,12 +162,12 @@ class Ui extends BaseService {
     state.columnWidth = columnWidth;
   }
 
-  private setStageRect(value: StageRect) {
+  private async setStageRect(value: StageRect) {
     state.stageRect = {
       ...state.stageRect,
       ...value,
     };
-    state.zoom = this.calcZoom();
+    state.zoom = await this.calcZoom();
   }
 }
 
