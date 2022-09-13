@@ -1,3 +1,13 @@
+## [1.1.3](https://github.com/Tencent/tmagic-editor/compare/v1.1.2...v1.1.3) (2022-09-13)
+
+
+### Bug Fixes
+
+* **editor:** 修复流式布局下移动图层操作相反问题 ([e0a16bc](https://github.com/Tencent/tmagic-editor/commit/e0a16bcf0a1b87932137567e711beb7f0e463848))
+* **form:** 当默认值为0时，select 远程选项初始化不正确 ([e855072](https://github.com/Tencent/tmagic-editor/commit/e8550728d1f58c55deb9d5c26bd5942a9adf9720))
+
+
+
 ## [1.1.2](https://github.com/Tencent/tmagic-editor/compare/v1.1.1...v1.1.2) (2022-09-08)
 
 
