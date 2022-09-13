@@ -629,12 +629,18 @@ class Editor extends BaseService {
     const brothers: MNode[] = parent?.items || [];
     const index = brothers.findIndex((item) => `${item.id}` === `${node?.id}`);
 
+    // 流式布局与绝对定位布局操作的相反的
+    const layout = await this.getLayout(parent, node);
+    const isRelative = layout === Layout.RELATIVE;
+
+    brothers.splice(index, 1);
+
     if (offset === LayerOffset.TOP) {
-      brothers.splice(brothers.length - 1, 0, brothers.splice(index, 1)[0]);
+      brothers.splice(isRelative ? 0 : brothers.length - 1, 0, node);
     } else if (offset === LayerOffset.BOTTOM) {
-      brothers.splice(0, 0, brothers.splice(index, 1)[0]);
+      brothers.splice(isRelative ? brothers.length - 1 : 0, 0, node);
     } else {
-      brothers.splice(index + parseInt(`${offset}`, 10), 0, brothers.splice(index, 1)[0]);
+      brothers.splice(index + (isRelative ? -offset : offset), 0, node);
     }
 
     const grandparent = this.getParentById(parent.id);
