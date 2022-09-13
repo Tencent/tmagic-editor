@@ -7,13 +7,14 @@
     :append-to-body="true"
   >
     <template v-if="mode === EditorMode.LIST">
-      <el-menu default-active="0" class="el-menu-vertical-demo code-editor-side-menu">
+      <el-menu :default-active="selectedIds[0]" class="el-menu-vertical-demo code-editor-side-menu">
         <el-menu-item v-for="(value, key) in selectedValue" :index="key" :key="key" @click="menuSelectHandler">
           <template #title>{{ value.name }}（{{ key }}）</template>
         </el-menu-item>
       </el-menu>
     </template>
     <div
+      v-if="!isEmpty(codeConfig)"
       :class="[
         mode === EditorMode.LIST ? 'm-editor-code-block-editor-panel-list-mode' : '',
         'm-editor-code-block-editor-panel',
@@ -55,6 +56,7 @@
 <script lang="ts" setup>
 import { computed, inject, ref, watchEffect } from 'vue';
 import { ElMessage } from 'element-plus';
+import { isEmpty } from 'lodash-es';
 
 import type { CodeBlockContent, Services } from '../../../type';
 import { EditorMode } from '../../../type';
@@ -70,11 +72,10 @@ const isShowCodeBlockEditor = computed(() => codeConfig.value && services?.codeB
 const mode = computed(() => services?.codeBlockService.getMode());
 const id = computed(() => services?.codeBlockService.getId() || '');
 const editable = computed(() => services?.codeBlockService.getEditStatus());
+// 当前选中组件绑定的代码块id数组
+const selectedIds = computed(() => services?.codeBlockService.getCombineIds() || []);
 // select选择的内容(CodeBlockDSL)
-const selectedValue = computed(() => {
-  const selectedIds = services?.codeBlockService.getCombineIds() || [];
-  return services?.codeBlockService.getCodeDslByIds(selectedIds);
-});
+const selectedValue = computed(() => services?.codeBlockService.getCodeDslByIds(selectedIds.value));
 
 watchEffect(() => {
   codeConfig.value = services?.codeBlockService.getCodeContentById(id.value) ?? null;

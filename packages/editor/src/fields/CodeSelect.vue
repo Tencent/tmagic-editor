@@ -8,7 +8,14 @@
       :size="size"
       @change="changeHandler"
     ></m-fields-select>
-    <el-button type="primary" :icon="View" :size="size" @click="viewHandler">查看</el-button>
+    <el-button
+      type="primary"
+      :icon="View"
+      :size="size"
+      @click="viewHandler"
+      :disabled="props.model[props.name].length === 0"
+      >查看</el-button
+    >
   </div>
 </template>
 
@@ -35,6 +42,9 @@ const props = defineProps<{
 }>();
 
 const changeHandler = (value: any) => {
+  // 记录组件与代码块的绑定关系
+  const { id = '' } = services?.editorService.get('node') || {};
+  services?.codeBlockService.setCompRelation(id, value);
   emit('change', value);
 };
 
