@@ -41,16 +41,16 @@ const props = defineProps<{
   size: string;
 }>();
 
-const changeHandler = (value: any) => {
+const changeHandler = async (value: any) => {
   // 记录组件与代码块的绑定关系
   const { id = '' } = services?.editorService.get('node') || {};
-  services?.codeBlockService.setCompRelation(id, value);
+  await services?.codeBlockService.setCompRelation(id, value);
   emit('change', value);
 };
 
-const viewHandler = () => {
-  services?.codeBlockService.setMode(EditorMode.LIST);
-  services?.codeBlockService.setCombineIds(props.model[props.name]);
+const viewHandler = async () => {
+  await services?.codeBlockService.setMode(EditorMode.LIST);
+  await services?.codeBlockService.setCombineIds(props.model[props.name]);
   services?.codeBlockService.setCodeEditorContent(true, props.model[props.name][0]);
 };
 </script>

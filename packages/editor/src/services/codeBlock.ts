@@ -19,6 +19,7 @@
 import { reactive } from 'vue';
 import { keys, omit, pick } from 'lodash-es';
 
+import editorService from '../services/editor';
 import type { CodeBlockContent, CodeBlockDSL, CodeState, CompRelation } from '../type';
 import { EditorMode } from '../type';
 import { info } from '../utils/logger';
@@ -38,7 +39,21 @@ class CodeBlock extends BaseService {
   });
 
   constructor() {
-    super([]);
+    super([
+      'setCodeDsl',
+      'getCodeDsl',
+      'getCodeContentById',
+      'getCodeDslByIds',
+      'getCurrentDsl',
+      'setCodeDslById',
+      'setCodeEditorShowStatus',
+      'setEditStatus',
+      'setMode',
+      'setCombineIds',
+      'setCompRelation',
+      'setUndeleteableList',
+      'deleteCodeDslByIds',
+    ]);
   }
 
   /**
@@ -46,17 +61,21 @@ class CodeBlock extends BaseService {
    * @param {CodeBlockDSL} codeDsl 代码DSL
    * @returns {void}
    */
-  public setCodeDsl(codeDsl: CodeBlockDSL): void {
+  public async setCodeDsl(codeDsl: CodeBlockDSL): Promise<void> {
     this.state.codeDsl = codeDsl;
+    await editorService.setCodeDsl(this.state.codeDsl);
     info('[code-block]:code-dsl-change', this.state.codeDsl);
     this.emit('code-dsl-change', this.state.codeDsl);
   }
 
   /**
-   * 获取活动的代码块dsl数据源
+   * 获取活动的代码块dsl数据源（默认从dsl中的method字段读取）
    * @returns {CodeBlockDSL | null}
    */
-  public getCodeDsl(): CodeBlockDSL | null {
+  public async getCodeDsl(): Promise<CodeBlockDSL | null> {
+    if (!this.state.codeDsl) {
+      this.state.codeDsl = await editorService.getCodeDsl();
+    }
     return this.state.codeDsl;
   }
 
@@ -65,9 +84,9 @@ class CodeBlock extends BaseService {
    * @param {string} id 代码块id
    * @returns {CodeBlockContent | null}
    */
-  public getCodeContentById(id: string): CodeBlockContent | null {
+  public async getCodeContentById(id: string): Promise<CodeBlockContent | null> {
     if (!id) return null;
-    const totalCodeDsl = this.getCodeDsl();
+    const totalCodeDsl = await this.getCodeDsl();
     if (!totalCodeDsl) return null;
     return totalCodeDsl[id] ?? null;
   }
@@ -78,13 +97,13 @@ class CodeBlock extends BaseService {
    * @param {CodeBlockContent} codeConfig 代码块内容配置信息
    * @returns {void}
    */
-  public setCodeDslById(id: string, codeConfig: CodeBlockContent): void {
-    let codeDsl = this.getCodeDsl();
+  public async setCodeDslById(id: string, codeConfig: CodeBlockContent): Promise<void> {
+    let codeDsl = await this.getCodeDsl();
     codeDsl = {
       ...codeDsl,
       [id]: codeConfig,
     };
-    this.setCodeDsl(codeDsl);
+    await this.setCodeDsl(codeDsl);
   }
 
   /**
@@ -92,8 +111,8 @@ class CodeBlock extends BaseService {
    * @param {string[]} ids 代码块id数组
    * @returns {CodeBlockDSL}
    */
-  public getCodeDslByIds(ids: string[]): CodeBlockDSL {
-    const codeDsl = this.getCodeDsl();
+  public async getCodeDslByIds(ids: string[]): Promise<CodeBlockDSL> {
+    const codeDsl = await this.getCodeDsl();
     return pick(codeDsl, ids) as CodeBlockDSL;
   }
 
@@ -102,7 +121,7 @@ class CodeBlock extends BaseService {
    * @param {boolean} status 是否展示代码编辑面板
    * @returns {void}
    */
-  public setCodeEditorShowStatus(status: boolean): void {
+  public async setCodeEditorShowStatus(status: boolean): Promise<void> {
     this.state.isShowCodeEditor = status;
   }
 
@@ -130,8 +149,8 @@ class CodeBlock extends BaseService {
    * 获取当前选中的代码块内容
    * @returns {CodeBlockContent | null}
    */
-  public getCurrentDsl() {
-    return this.getCodeContentById(this.state.id);
+  public async getCurrentDsl() {
+    return await this.getCodeContentById(this.state.id);
   }
 
   /**
@@ -147,7 +166,7 @@ class CodeBlock extends BaseService {
    * @param {boolean} 是否可编辑
    * @returns {void}
    */
-  public setEditStatus(status: boolean): void {
+  public async setEditStatus(status: boolean): Promise<void> {
     this.state.editable = status;
   }
 
@@ -182,7 +201,7 @@ class CodeBlock extends BaseService {
    * @param {EditorMode} mode 模式
    * @returns {void}
    */
-  public setMode(mode: EditorMode): void {
+  public async setMode(mode: EditorMode): Promise<void> {
     this.state.mode = mode;
   }
 
@@ -191,7 +210,7 @@ class CodeBlock extends BaseService {
    * @param {string[]} ids 代码块id数组
    * @returns {void}
    */
-  public setCombineIds(ids: string[]): void {
+  public async setCombineIds(ids: string[]): Promise<void> {
     this.state.combineIds = ids;
   }
 
@@ -209,7 +228,7 @@ class CodeBlock extends BaseService {
    * @param {string[]} codeIds 代码块id数组
    * @returns {void}
    */
-  public setCompRelation(compId: number | string, codeIds: string[]) {
+  public async setCompRelation(compId: number | string, codeIds: string[]) {
     if (!compId) return;
     this.state.compRelation = {
       [compId]: codeIds,
@@ -237,7 +256,7 @@ class CodeBlock extends BaseService {
    * @param {string[]} codeIds 代码块id数组
    * @returns {void}
    */
-  public setUndeleteableList(codeIds: string[]): void {
+  public async setUndeleteableList(codeIds: string[]): Promise<void> {
     this.state.undeletableList = codeIds;
   }
 
@@ -246,10 +265,10 @@ class CodeBlock extends BaseService {
    * @param {string[]} codeIds 需要删除的代码块id数组
    * @returns {CodeBlockDSL} 删除后的code dsl
    */
-  public deleteCodeDslByIds(codeIds: string[]): CodeBlockDSL {
-    const currentDsl = this.getCodeDsl();
+  public async deleteCodeDslByIds(codeIds: string[]): Promise<CodeBlockDSL> {
+    const currentDsl = await this.getCodeDsl();
     const newDsl = omit(currentDsl, codeIds);
-    this.setCodeDsl(newDsl);
+    await this.setCodeDsl(newDsl);
     return newDsl;
   }
 
@@ -257,13 +276,13 @@ class CodeBlock extends BaseService {
    * 生成代码块唯一id
    * @returns {string} 代码块唯一id
    */
-  public getUniqueId(): string {
+  public async getUniqueId(): Promise<string> {
     const newId = (Date.now().toString(36) + Math.random().toString(36).substring(2)).padEnd(19, '0');
     // 判断是否重复
-    const dsl = this.getCodeDsl();
+    const dsl = await this.getCodeDsl();
     const existedIds = keys(dsl);
     if (!existedIds.includes(newId)) return newId;
-    return this.getUniqueId();
+    return await this.getUniqueId();
   }
 
   public destroy() {
