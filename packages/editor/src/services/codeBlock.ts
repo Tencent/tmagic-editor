@@ -70,10 +70,11 @@ class CodeBlock extends BaseService {
 
   /**
    * 获取活动的代码块dsl数据源（默认从dsl中的methods字段读取）
+   * @param {boolean} forceRefresh 是否强制从活动dsl拉取刷新
    * @returns {CodeBlockDSL | null}
    */
-  public async getCodeDsl(): Promise<CodeBlockDSL | null> {
-    if (!this.state.codeDsl) {
+  public async getCodeDsl(forceRefresh = false): Promise<CodeBlockDSL | null> {
+    if (!this.state.codeDsl || forceRefresh) {
       this.state.codeDsl = await editorService.getCodeDsl();
     }
     return this.state.codeDsl;
@@ -288,6 +289,12 @@ class CodeBlock extends BaseService {
   public destroy() {
     this.state.isShowCodeEditor = false;
     this.state.codeDsl = null;
+    this.state.id = '';
+    this.state.editable = true;
+    this.state.mode = EditorMode.EDITOR;
+    this.state.combineIds = [];
+    this.state.compRelation = {};
+    this.state.undeletableList = [];
   }
 }
 
