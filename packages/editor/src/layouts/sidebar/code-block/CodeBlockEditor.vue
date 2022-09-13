@@ -58,7 +58,7 @@ import { computed, inject, ref, watchEffect } from 'vue';
 import { ElMessage } from 'element-plus';
 import { isEmpty } from 'lodash-es';
 
-import type { CodeBlockContent, Services } from '../../../type';
+import type { CodeBlockContent, CodeBlockDSL, Services } from '../../../type';
 import { EditorMode } from '../../../type';
 
 const services = inject<Services>('services');
@@ -66,6 +66,8 @@ const services = inject<Services>('services');
 const codeEditor = ref<any | null>(null);
 // 编辑器当前需展示的代码块内容
 const codeConfig = ref<CodeBlockContent | null>(null);
+// select选择的内容(CodeBlockDSL)
+const selectedValue = ref<CodeBlockDSL | null>(null);
 
 // 是否展示代码编辑区
 const isShowCodeBlockEditor = computed(() => codeConfig.value && services?.codeBlockService.getCodeEditorShowStatus());
@@ -74,15 +76,17 @@ const id = computed(() => services?.codeBlockService.getId() || '');
 const editable = computed(() => services?.codeBlockService.getEditStatus());
 // 当前选中组件绑定的代码块id数组
 const selectedIds = computed(() => services?.codeBlockService.getCombineIds() || []);
-// select选择的内容(CodeBlockDSL)
-const selectedValue = computed(() => services?.codeBlockService.getCodeDslByIds(selectedIds.value));
 
-watchEffect(() => {
-  codeConfig.value = services?.codeBlockService.getCodeContentById(id.value) ?? null;
+watchEffect(async () => {
+  codeConfig.value = (await services?.codeBlockService.getCodeContentById(id.value)) ?? null;
+});
+
+watchEffect(async () => {
+  selectedValue.value = (await services?.codeBlockService.getCodeDslByIds(selectedIds.value)) || null;
 });
 
 // 保存代码
-const saveCode = () => {
+const saveCode = async () => {
   if (!codeEditor.value || !codeConfig.value || !editable.value) return;
 
   try {
@@ -95,7 +99,7 @@ const saveCode = () => {
     return;
   }
   // 存入dsl
-  services?.codeBlockService.setCodeDslById(id.value, {
+  await services?.codeBlockService.setCodeDslById(id.value, {
     name: codeConfig.value.name,
     content: codeConfig.value.content,
   });
@@ -103,9 +107,9 @@ const saveCode = () => {
 };
 
 // 保存并关闭
-const saveAndClose = () => {
-  saveCode();
-  services?.codeBlockService.setCodeEditorShowStatus(false);
+const saveAndClose = async () => {
+  await saveCode();
+  await services?.codeBlockService.setCodeEditorShowStatus(false);
 };
 
 const menuSelectHandler = (item: any) => {

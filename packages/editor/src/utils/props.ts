@@ -233,8 +233,8 @@ export const fillConfig = (config: FormConfig = []) => [
             labelWidth: '100px',
             selectConfig: {
               multiple: true,
-              options: () => {
-                const codeDsl = codeBlockService.getCodeDsl();
+              options: async () => {
+                const codeDsl = await codeBlockService.getCodeDsl();
                 if (codeDsl) {
                   return map(codeDsl, (value, key) => ({
                     text: `${value.name}（${key}）`,

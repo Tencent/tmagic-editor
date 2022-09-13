@@ -35,24 +35,28 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject } from 'vue';
+import { computed, inject, ref, watchEffect } from 'vue';
 import { Close, Edit } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 import { flattenDeep, isEmpty, values } from 'lodash-es';
 
 import type { CodeBlockContent, Services } from '../../../type';
-import { EditorMode } from '../../../type';
+import { CodeBlockDSL, EditorMode } from '../../../type';
 
 import codeBlockEditor from './CodeBlockEditor.vue';
 
 const services = inject<Services>('services');
-
 // 代码块列表
-const codeList = computed(() => services?.codeBlockService.getCodeDsl());
+const codeList = ref<CodeBlockDSL | null>(null);
+
 const editable = computed(() => services?.codeBlockService.getEditStatus());
 
+watchEffect(async () => {
+  codeList.value = (await services?.codeBlockService.getCodeDsl()) || null;
+});
+
 // 新增代码块
-const createCodeBlock = () => {
+const createCodeBlock = async () => {
   const { codeBlockService } = services || {};
   if (!codeBlockService) {
     ElMessage.error('新增代码块失败');
@@ -62,15 +66,15 @@ const createCodeBlock = () => {
     name: '代码块',
     content: `() => {\n  // place your code here\n}`,
   };
-  codeBlockService.setMode(EditorMode.EDITOR);
-  const id = codeBlockService.getUniqueId();
-  codeBlockService.setCodeDslById(id, codeConfig);
+  await codeBlockService.setMode(EditorMode.EDITOR);
+  const id = await codeBlockService.getUniqueId();
+  await codeBlockService.setCodeDslById(id, codeConfig);
   codeBlockService.setCodeEditorContent(true, id);
 };
 
 // 编辑代码块
-const editCode = (key: string) => {
-  services?.codeBlockService.setMode(EditorMode.EDITOR);
+const editCode = async (key: string) => {
+  await services?.codeBlockService.setMode(EditorMode.EDITOR);
   services?.codeBlockService.setCodeEditorContent(true, key);
 };
 
