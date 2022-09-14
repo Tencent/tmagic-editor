@@ -1,5 +1,5 @@
 <template>
-  <div class="m-editor-workspace" tabindex="1" ref="workspace">
+  <div class="m-editor-workspace" tabindex="-1" ref="workspace">
     <slot name="stage">
       <MagicStage :key="page?.id"></MagicStage>
     </slot>

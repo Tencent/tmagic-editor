@@ -6,27 +6,33 @@
       class="m-editor-page-bar-item m-editor-page-bar-item-icon"
       @click="addPage"
     >
-      <el-icon><plus></plus></el-icon>
+      <Icon :icon="Plus"></Icon>
     </div>
     <div v-else style="width: 21px"></div>
     <div v-if="canScroll" class="m-editor-page-bar-item m-editor-page-bar-item-icon" @click="scroll('left')">
-      <el-icon><arrow-left-bold></arrow-left-bold></el-icon>
+      <Icon :icon="ArrowLeftBold"></Icon>
     </div>
-    <div v-if="root" class="m-editor-page-bar-items" ref="itemsContainer" :style="`width: ${itemsContainerWidth}px`">
+    <div
+      v-if="pageLength"
+      class="m-editor-page-bar-items"
+      ref="itemsContainer"
+      :style="`width: ${itemsContainerWidth}px`"
+    >
       <slot></slot>
     </div>
     <div v-if="canScroll" class="m-editor-page-bar-item m-editor-page-bar-item-icon" @click="scroll('right')">
-      <el-icon><arrow-right-bold></arrow-right-bold></el-icon>
+      <Icon :icon="ArrowRightBold"></Icon>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, inject, onMounted, onUnmounted, ref, toRaw, watch } from 'vue';
+import { computed, inject, nextTick, onMounted, onUnmounted, ref, toRaw, watch } from 'vue';
 import { ArrowLeftBold, ArrowRightBold, Plus } from '@element-plus/icons-vue';
 
-import { MApp, NodeType } from '@tmagic/schema';
+import { NodeType } from '@tmagic/schema';
 
+import Icon from '../../components/Icon.vue';
 import type { Services } from '../../type';
 import { generatePageNameByApp } from '../../utils/editor';
 
@@ -34,31 +40,39 @@ const services = inject<Services>('services');
 const editorService = services?.editorService;
 const uiService = services?.uiService;
 
-const pageBar = ref<HTMLDivElement>();
 const itemsContainer = ref<HTMLDivElement>();
-const pageBarWidth = ref(0);
 const canScroll = ref(false);
 
 const showAddPageButton = computed(() => uiService?.get('showAddPageButton'));
 
-// 减去新增、左移、右移三个按钮的宽度
-const itemsContainerWidth = computed(() => pageBarWidth.value - 35 * 2 - (showAddPageButton.value ? 35 : 21));
-
-let translateLeft = 0;
-const resizeObserver = new ResizeObserver((entries) => {
-  for (const { contentRect } of entries) {
-    const { width } = contentRect;
-    pageBarWidth.value = width || 0;
-
-    setCanScroll();
-  }
-});
+const itemsContainerWidth = ref(0);
 
 const setCanScroll = () => {
-  if (itemsContainer.value) {
-    canScroll.value = itemsContainer.value.scrollWidth > itemsContainerWidth.value;
-  }
+  // 减去新增、左移、右移三个按钮的宽度
+  // 37 = icon width 16 + padding 10 * 2 + border-right 1
+  itemsContainerWidth.value = (pageBar.value?.clientWidth || 0) - 37 * 2 - (showAddPageButton.value ? 37 : 21);
+
+  nextTick(() => {
+    if (itemsContainer.value) {
+      canScroll.value = itemsContainer.value.scrollWidth - itemsContainerWidth.value > 1;
+    }
+  });
 };
+
+const resizeObserver = new ResizeObserver(() => {
+  setCanScroll();
+});
+
+const pageBar = ref<HTMLDivElement>();
+onMounted(() => {
+  pageBar.value && resizeObserver.observe(pageBar.value);
+});
+
+onUnmounted(() => {
+  resizeObserver.disconnect();
+});
+
+let translateLeft = 0;
 
 const scroll = (type: 'left' | 'right' | 'start' | 'end') => {
   if (!itemsContainer.value) return;
@@ -86,29 +100,18 @@ const scroll = (type: 'left' | 'right' | 'start' | 'end') => {
   itemsContainer.value.style.transform = `translate(${translateLeft}px, 0px)`;
 };
 
-onMounted(() => {
-  pageBar.value && resizeObserver.observe(pageBar.value);
+const pageLength = computed(() => editorService?.get<number>('pageLength'));
+
+watch(pageLength, (length = 0, preLength = 0) => {
+  setTimeout(() => {
+    setCanScroll();
+    if (length < preLength) {
+      scroll('start');
+    } else {
+      scroll('end');
+    }
+  });
 });
-
-onUnmounted(() => {
-  resizeObserver.disconnect();
-});
-
-const root = computed(() => editorService?.get<MApp>('root'));
-
-watch(
-  () => root.value?.items.length,
-  (length = 0, preLength = 0) => {
-    setTimeout(() => {
-      setCanScroll();
-      if (length < preLength) {
-        scroll('start');
-      } else {
-        scroll('end');
-      }
-    });
-  },
-);
 
 const addPage = () => {
   if (!editorService) return;
