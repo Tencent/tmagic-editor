@@ -44,7 +44,7 @@ interface EventCache {
 
 class App extends EventEmitter {
   public env;
-  public codeDsl: CodeBlockDSL | undefined;
+  public codeDsl: CodeBlockDSL;
   public pages = new Map<Id, Page>();
 
   public page: Page | undefined;
@@ -61,6 +61,7 @@ class App extends EventEmitter {
     super();
 
     this.env = new Env(options.ua);
+    this.codeDsl = options.config?.methods;
     options.platform && (this.platform = options.platform);
     options.jsEngine && (this.jsEngine = options.jsEngine);
     options.designWidth && (this.designWidth = options.designWidth);

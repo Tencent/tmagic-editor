@@ -66,10 +66,10 @@ class Node extends EventEmitter {
   private listenLifeSafe() {
     this.once('created', async (instance: any) => {
       this.instance = instance;
-      if (Array.isArray(this.data.created)) {
+      if (Array.isArray(this.data.created) && this.app?.codeDsl) {
         await Promise.all(
           this.data.created.map(async (codeId) => {
-            if (this.app?.codeDsl[codeId] && typeof this.app?.codeDsl[codeId]?.content === 'function') {
+            if (this.app.codeDsl[codeId] && typeof this.app?.codeDsl[codeId]?.content === 'function') {
               await this.app.codeDsl[codeId].content(this);
             }
           }),
