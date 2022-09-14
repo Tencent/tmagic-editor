@@ -18,7 +18,7 @@
 
 import { EventEmitter } from 'events';
 
-import type { EventItemConfig, Id, MApp } from '@tmagic/schema';
+import type { CodeBlockDSL, EventItemConfig, Id, MApp } from '@tmagic/schema';
 
 import Env from './Env';
 import { bindCommonEventListener, isCommonMethod, triggerCommonMethod } from './events';
@@ -44,7 +44,7 @@ interface EventCache {
 
 class App extends EventEmitter {
   public env;
-
+  public codeDsl: CodeBlockDSL | undefined;
   public pages = new Map<Id, Page>();
 
   public page: Page | undefined;
@@ -140,8 +140,8 @@ class App extends EventEmitter {
    * @param curPage 当前页面id
    */
   public setConfig(config: MApp, curPage?: Id) {
+    this.codeDsl = config.methods;
     this.pages = new Map();
-
     config.items?.forEach((page) => {
       this.pages.set(
         page.id,
