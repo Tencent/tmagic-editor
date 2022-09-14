@@ -96,6 +96,11 @@ export default class StageDragResize extends EventEmitter {
     const oldTarget = this.target;
     this.target = el;
 
+    if (!this.dragEl) {
+      this.dragEl = globalThis.document.createElement('div');
+      this.container.append(this.dragEl);
+    }
+
     // 从不能拖动到能拖动的节点之间切换，要重新创建moveable，不然dragStart不生效
     if (!this.moveable || this.target !== oldTarget) {
       this.init(el);
@@ -157,6 +162,7 @@ export default class StageDragResize extends EventEmitter {
   public clearSelectStatus(): void {
     if (!this.moveable) return;
     this.destroyDragEl();
+    this.dragEl = undefined;
     this.moveable.target = null;
     this.moveable.updateTarget();
   }
@@ -184,9 +190,11 @@ export default class StageDragResize extends EventEmitter {
     this.mode = getMode(el);
 
     this.destroyGhostEl();
-    this.destroyDragEl();
-    this.dragEl = globalThis.document.createElement('div');
-    this.container.append(this.dragEl);
+
+    if (!this.dragEl) {
+      return;
+    }
+
     this.dragEl.style.cssText = getTargetElStyle(el);
     this.dragEl.id = `${DRAG_EL_ID_PREFIX}${el.id}`;
 

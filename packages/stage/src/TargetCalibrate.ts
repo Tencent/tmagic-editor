@@ -57,7 +57,7 @@ export default class TargetCalibrate extends EventEmitter {
       top: ${top}px;
       width: ${el.clientWidth}px;
       height: ${el.clientHeight}px;
-      z-index: ${ZIndex.DRAG_EL};
+      z-index: ${ZIndex.HIGHLIGHT_EL};
     `;
 
     this.operationEl.id = `${prefix}${el.id}`;
