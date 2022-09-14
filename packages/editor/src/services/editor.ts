@@ -297,7 +297,7 @@ class Editor extends BaseService {
       throw new Error('app下不能添加组件');
     }
 
-    if (parent.id !== curNode.id) {
+    if (parent.id !== curNode.id && node.type !== NodeType.PAGE) {
       const index = parent.items.indexOf(curNode);
       parent?.items?.splice(index + 1, 0, node);
     } else {
