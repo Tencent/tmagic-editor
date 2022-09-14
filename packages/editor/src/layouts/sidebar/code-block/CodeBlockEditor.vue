@@ -5,9 +5,10 @@
     :fullscreen="true"
     :before-close="saveAndClose"
     :append-to-body="true"
+    custom-class="code-editor-dialog"
   >
     <template v-if="mode === EditorMode.LIST">
-      <el-menu :default-active="selectedIds[0]" class="el-menu-vertical-demo code-editor-side-menu">
+      <el-menu :default-active="selectedIds[0]" class="code-editor-side-menu">
         <el-menu-item v-for="(value, key) in selectedValue" :index="key" :key="key" @click="menuSelectHandler">
           <template #title>{{ value.name }}（{{ key }}）</template>
         </el-menu-item>
@@ -22,7 +23,7 @@
     >
       <slot name="code-block-edit-panel-header" :id="id"></slot>
       <el-row class="code-name-wrapper" justify="start">
-        <el-col :span="2">
+        <el-col :span="3">
           <span>代码块名称</span>
         </el-col>
         <el-col :span="6">
