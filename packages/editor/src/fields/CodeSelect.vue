@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, defineEmits, defineProps, inject } from 'vue';
+import { computed, defineEmits, defineProps, inject, ref } from 'vue';
 import { View } from '@element-plus/icons-vue';
 import { map } from 'lodash-es';
 
@@ -63,6 +63,8 @@ const selectConfig = computed(() => {
   };
 });
 
+const combineIds = ref();
+
 const changeHandler = async (value: any) => {
   // 记录组件与代码块的绑定关系
   const { id = '' } = services?.editorService.get('node') || {};
@@ -72,7 +74,11 @@ const changeHandler = async (value: any) => {
 
 const viewHandler = async () => {
   await services?.codeBlockService.setMode(EditorMode.LIST);
-  await services?.codeBlockService.setCombineIds(props.model[props.name]);
-  services?.codeBlockService.setCodeEditorContent(true, props.model[props.name][0]);
+  combineIds.value = props.model[props.name];
+  if (typeof props.model[props.name] === 'string') {
+    combineIds.value = [props.model[props.name]];
+  }
+  await services?.codeBlockService.setCombineIds(combineIds.value);
+  services?.codeBlockService.setCodeEditorContent(true, combineIds.value[0]);
 };
 </script>
