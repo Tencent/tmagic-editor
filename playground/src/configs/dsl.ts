@@ -23,9 +23,7 @@ export default {
   methods: {
     l7znj1q24wilb357ay6: {
       name: 'getData',
-      content: () => {
-        console.log('this is getData function');
-      },
+      content: `() => {\n  console.log("this is getData function")\n}`,
     },
   },
   items: [
