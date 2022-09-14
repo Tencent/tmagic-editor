@@ -52,9 +52,9 @@ export default defineComponent({
   render() {
     const className = this.config?.multiple ? 'magic-ui-text' : 'magic-ui-text magic-ui-text--single-line';
     if (typeof this.$slots?.default === 'function') {
-      return h('span', { class: className }, [this.$slots?.default?.() || '']);
+      return h('div', { class: className }, [this.$slots?.default?.() || '']);
     }
-    return h('span', {
+    return h('div', {
       class: className,
       ...(this.displayText ? { innerHTML: this.displayText } : {}),
     });
