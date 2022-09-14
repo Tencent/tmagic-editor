@@ -15,8 +15,8 @@
         <el-collapse-item v-if="group.items && group.items.length" :key="index" :name="index">
           <template #title><i class="el-icon-s-grid"></i>{{ group.title }}</template>
           <div
-            class="component-item"
             v-for="item in group.items"
+            class="component-item"
             draggable="true"
             :key="item.type"
             @click="appendComponent(item)"
