@@ -1,7 +1,9 @@
 <template>
-  <magic-ui-container v-if="visible" class="magic-ui-overlay" :config="{ items: config.items }">
-    <slot></slot>
-  </magic-ui-container>
+  <keep-alive>
+    <magic-ui-container v-if="visible" class="magic-ui-overlay" :config="{ items: config.items }">
+      <slot></slot>
+    </magic-ui-container>
+  </keep-alive>
 </template>
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
