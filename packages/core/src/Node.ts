@@ -51,7 +51,6 @@ class Node extends EventEmitter {
     const { events } = options.config;
     this.data = options.config;
     this.events = events;
-
     this.listenLifeSafe();
 
     this.once('destroy', () => {
@@ -65,15 +64,20 @@ class Node extends EventEmitter {
   }
 
   private listenLifeSafe() {
-    this.once('created', (instance: any) => {
+    this.once('created', async (instance: any) => {
       this.instance = instance;
-
-      if (typeof this.data.created === 'function') {
-        this.data.created(this);
+      if (Array.isArray(this.data.created)) {
+        await Promise.all(
+          this.data.created.map(async (codeId) => {
+            if (this.app?.codeDsl[codeId] && typeof this.app?.codeDsl[codeId]?.content === 'function') {
+              await this.app.codeDsl[codeId].content(this);
+            }
+          }),
+        );
       }
     });
 
-    this.once('mounted', (instance: any) => {
+    this.once('mounted', async (instance: any) => {
       this.instance = instance;
 
       const eventConfigQueue = this.app.eventQueueMap[instance.config.id] || [];
@@ -82,8 +86,14 @@ class Node extends EventEmitter {
         this.app.eventHandler(eventConfig.eventConfig, eventConfig.fromCpt, eventConfig.args);
       }
 
-      if (typeof this.data.mounted === 'function') {
-        this.data.mounted(this);
+      if (Array.isArray(this.data.mounted)) {
+        await Promise.all(
+          this.data.mounted.map(async (codeId) => {
+            if (this.app?.codeDsl[codeId] && typeof this.app?.codeDsl[codeId]?.content === 'function') {
+              await this.app.codeDsl[codeId].content(this);
+            }
+          }),
+        );
       }
     });
   }

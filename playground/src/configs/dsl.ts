@@ -23,7 +23,8 @@ export default {
   methods: {
     l7znj1q24wilb357ay6: {
       name: 'getData',
-      content: `() => {\n  console.log("this is getData function")\n}`,
+      // eslint-disable-next-line no-eval
+      content: eval(`(vm) => {\n  console.log("this is getData function")\n}`),
     },
   },
   items: [
@@ -50,7 +51,7 @@ export default {
         fontWeight: '',
       },
       events: [],
-      created: '',
+      created: ['l7znj1q24wilb357ay6'],
       items: [
         {
           type: 'text',
@@ -75,7 +76,7 @@ export default {
           text: 'Tmagic editor 营销活动编辑器',
           multiple: true,
           events: [],
-          created: '',
+          created: [],
         },
         {
           type: 'qrcode',
@@ -99,7 +100,7 @@ export default {
           name: '二维码',
           url: 'https://github.com/Tencent/tmagic-editor',
           events: [],
-          created: '',
+          created: [],
         },
         {
           type: 'img',
@@ -124,7 +125,7 @@ export default {
           src: 'https://vfiles.gtimg.cn/vupload/20210811/388ed01628667545737.png',
           url: '',
           events: [],
-          created: '',
+          created: [],
         },
         {
           type: 'button',
@@ -156,7 +157,7 @@ export default {
               method: 'openOverlay',
             },
           ],
-          created: '',
+          created: [],
         },
         {
           type: 'overlay',
@@ -222,7 +223,7 @@ export default {
                       method: 'closeOverlay',
                     },
                   ],
-                  created: '',
+                  created: [],
                 },
                 {
                   type: 'img',
@@ -261,12 +262,12 @@ export default {
                   text: 'Tmagic',
                   multiple: false,
                   events: [],
-                  created: '',
+                  created: [],
                 },
               ],
               layout: 'absolute',
               events: [],
-              created: '',
+              created: [],
             },
           ],
         },
