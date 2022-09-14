@@ -80,7 +80,7 @@ export interface CodeBlockContent {
   /** 代码块名称 */
   name: string;
   /** 代码块内容 */
-  content: string;
+  content: any;
 }
 export interface PastePosition {
   left?: number;
