@@ -48,6 +48,7 @@ export enum ZIndex {
   SELECTED_EL = '666',
   GHOST_EL = '700',
   DRAG_EL = '9',
+  HIGHLIGHT_EL = '8',
 }
 
 /** 鼠标按键 */
