@@ -1,7 +1,7 @@
 <template>
   <div class="m-fields-code-select">
     <m-fields-select
-      :config="config.selectConfig"
+      :config="selectConfig"
       :model="model"
       :prop="prop"
       :name="name"
@@ -20,8 +20,9 @@
 </template>
 
 <script lang="ts" setup>
-import { defineEmits, defineProps, inject } from 'vue';
+import { computed, defineEmits, defineProps, inject } from 'vue';
 import { View } from '@element-plus/icons-vue';
+import { map } from 'lodash-es';
 
 import { SelectConfig } from '@tmagic/form';
 
@@ -40,6 +41,27 @@ const props = defineProps<{
   name: string;
   size: string;
 }>();
+
+const selectConfig = computed(() => {
+  const defaultConfig = {
+    multiple: true,
+    options: async () => {
+      const codeDsl = await services?.codeBlockService.getCodeDsl();
+      if (codeDsl) {
+        return map(codeDsl, (value, key) => ({
+          text: `${value.name}（${key}）`,
+          label: `${value.name}（${key}）`,
+          value: key,
+        }));
+      }
+      return [];
+    },
+  };
+  return {
+    ...defaultConfig,
+    ...props.config.selectConfig,
+  };
+});
 
 const changeHandler = async (value: any) => {
   // 记录组件与代码块的绑定关系

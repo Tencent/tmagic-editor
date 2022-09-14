@@ -16,11 +16,8 @@
  * limitations under the License.
  */
 
-import { map } from 'lodash-es';
-
 import { FormConfig, FormState } from '@tmagic/form';
 
-import codeBlockService from '../services/codeBlock';
 import editorService from '../services/editor';
 import eventsService from '../services/events';
 
@@ -231,20 +228,6 @@ export const fillConfig = (config: FormConfig = []) => [
             text: 'created',
             type: 'code-select',
             labelWidth: '100px',
-            selectConfig: {
-              multiple: true,
-              options: async () => {
-                const codeDsl = await codeBlockService.getCodeDsl();
-                if (codeDsl) {
-                  return map(codeDsl, (value, key) => ({
-                    text: `${value.name}（${key}）`,
-                    label: `${value.name}（${key}）`,
-                    value: key,
-                  }));
-                }
-                return [];
-              },
-            },
           },
         ],
       },
