@@ -46,6 +46,15 @@ import { CodeBlockDSL, EditorMode } from '../../../type';
 
 import codeBlockEditor from './CodeBlockEditor.vue';
 
+enum ErrorType {
+  UNDELETEABLE = 'undeleteable',
+  BIND = 'bind',
+}
+
+const props = defineProps<{
+  customError: (id: string, errorType: ErrorType) => any;
+}>();
+
 const services = inject<Services>('services');
 // 代码块列表
 const codeList = ref<CodeBlockDSL | null>(null);
@@ -88,7 +97,11 @@ const deleteCode = (key: string) => {
     // 无绑定关系，且不在不可删除列表中
     services?.codeBlockService.deleteCodeDslByIds([key]);
   } else {
-    ElMessage.error('代码块删除失败');
+    if (typeof props.customError === 'function') {
+      props.customError(key, codeIds.includes(key) ? ErrorType.BIND : ErrorType.UNDELETEABLE);
+    } else {
+      ElMessage.error('代码块删除失败');
+    }
   }
 };
 </script>
