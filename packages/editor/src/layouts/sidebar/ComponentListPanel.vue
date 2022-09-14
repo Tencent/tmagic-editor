@@ -19,7 +19,7 @@
             v-for="item in group.items"
             draggable="true"
             :key="item.type"
-            @click="appendComponent(item)"
+            @mousedown="appendComponent(item)"
             @dragstart="dragstartHandler(item, $event)"
             @dragend="dragendHandler"
             @drag="dragHandler"
