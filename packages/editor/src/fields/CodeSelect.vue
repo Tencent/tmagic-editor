@@ -20,9 +20,9 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, defineEmits, defineProps, inject, ref, watchEffect } from 'vue';
+import { computed, defineEmits, defineProps, inject, ref, watch, watchEffect } from 'vue';
 import { View } from '@element-plus/icons-vue';
-import { map } from 'lodash-es';
+import { isEmpty, map } from 'lodash-es';
 
 import { SelectConfig } from '@tmagic/form';
 
@@ -66,7 +66,6 @@ const fieldKey = ref('');
 const combineIds = ref<string[]>([]);
 
 watchEffect(async () => {
-  console.log('--combineIds.value--', combineIds.value);
   if (!combineIds.value) return;
   const combineNames = await Promise.all(
     combineIds.value.map(async (id) => {
@@ -76,34 +75,41 @@ watchEffect(async () => {
   );
   fieldKey.value = combineNames.join('-');
 });
-// watch(
-//   () => services?.codeBlockService.getCodeEditorShowStatus(),
-//   (value, oldValue) => {
-//     if (oldValue && !value) {
-//       // 由打开到关闭
-//       fieldKey.value = '222'
-//       // const selectedValue = props.model[props.name];
-//       // props.model[props.name] = null;
-//       // props.model[props.name] = selectedValue;
-//     }
-//   },
-//   { immediate: true },
-// );
 
 const changeHandler = async (value: any) => {
-  // 记录组件与代码块的绑定关系
-  const { id = '' } = services?.editorService.get('node') || {};
-  await services?.codeBlockService.setCompRelation(id, value);
-  combineIds.value = props.model[props.name];
-  if (typeof props.model[props.name] === 'string') {
-    combineIds.value = [props.model[props.name]];
-  }
+  await setCombineRelation(value);
   emit('change', value);
+};
+
+// 同步绑定关系
+const setCombineRelation = async (selectedIds: string[] | string) => {
+  if (typeof selectedIds === 'string') {
+    // 兼容select单选
+    combineIds.value = [selectedIds];
+  } else {
+    combineIds.value = selectedIds;
+  }
+  // 组件id
+  const { id = '' } = services?.editorService.get('node') || {};
+  // 记录组件与代码块的绑定关系
+  await services?.codeBlockService.setCompRelation(id, combineIds.value);
+  // 记录当前已被绑定的代码块，为查看弹窗的展示内容
+  await services?.codeBlockService.setCombineIds(combineIds.value);
 };
 
 const viewHandler = async () => {
   await services?.codeBlockService.setMode(EditorMode.LIST);
-  await services?.codeBlockService.setCombineIds(combineIds.value);
   services?.codeBlockService.setCodeEditorContent(true, combineIds.value[0]);
 };
+
+watch(
+  () => props.model[props.name],
+  async (value) => {
+    if (isEmpty(value)) return;
+    await setCombineRelation(value);
+  },
+  {
+    immediate: true,
+  },
+);
 </script>
