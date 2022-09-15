@@ -1,11 +1,12 @@
 <template>
   <el-table
-    :data="tableData"
-    :show-header="showHeader"
-    :max-height="bodyHeight"
     tooltip-effect="dark"
     class="m-table"
     ref="table"
+    v-loading="loading"
+    :data="tableData"
+    :show-header="showHeader"
+    :max-height="bodyHeight"
     :default-expand-all="defaultExpandAll"
     :border="hasBorder"
     :row-key="rowkeyName || 'c_id'"
@@ -82,7 +83,7 @@ export default defineComponent({
       >,
     },
 
-    fetch: {
+    loading: {
       type: Boolean,
       default: false,
     },
