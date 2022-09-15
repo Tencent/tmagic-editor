@@ -2,7 +2,7 @@
   <div>
     <el-dialog
       v-model="dialogVisible"
-      custom-class="m-form-dialog"
+      class="m-form-dialog"
       top="20px"
       :title="title"
       :appendToBody="true"
