@@ -98,6 +98,7 @@ const setCombineRelation = async (selectedIds: string[] | string) => {
 };
 
 const viewHandler = async () => {
+  await setCombineRelation(props.model[props.name]);
   await services?.codeBlockService.setMode(EditorMode.LIST);
   services?.codeBlockService.setCodeEditorContent(true, combineIds.value[0]);
 };
