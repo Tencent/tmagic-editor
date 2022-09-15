@@ -1,3 +1,23 @@
+## [1.1.4](https://github.com/Tencent/tmagic-editor/compare/v1.1.3...v1.1.4) (2022-09-15)
+
+
+### Bug Fixes
+
+* **editor:** 添加页面，应该添加到最后 ([10d2b3c](https://github.com/Tencent/tmagic-editor/commit/10d2b3cc9b5460ee4c406ca731520ffc2d1906ef))
+* **editor:** 画布大小变化，滚动条重置 ([bee9f92](https://github.com/Tencent/tmagic-editor/commit/bee9f92abbb6a673bf5185c79431cb7ad2fbd81f))
+* **editor:** 页面列表是否可以滚动判断不准确 ([3ff823a](https://github.com/Tencent/tmagic-editor/commit/3ff823a59fd5c4afb6c36d4a9e150365a7801258))
+* **stage:** 当选中的组件与上一次选中的组件有重叠时，选中后的下一个click事件丢失 ([33a09cc](https://github.com/Tencent/tmagic-editor/commit/33a09cccc7548a1264daaec9b77c3ff924b2969b))
+* **ui:** 修复text组件在流式容器内无宽高问题 ([695efc0](https://github.com/Tencent/tmagic-editor/commit/695efc00a8c5c4dfc88dbcb3ce71db6dbc1656f7))
+* **ui:** 追加 vue2 和 react 的修改 ([45be838](https://github.com/Tencent/tmagic-editor/commit/45be838f20c784e946a6e5cd3ea0bfc3a3741b67))
+
+
+### Features
+
+* **editor:** uiService支持插件扩展 ([b915acc](https://github.com/Tencent/tmagic-editor/commit/b915accb7155ce3155ee3076d2d848ea1dd65f3e))
+* **table:** 添加loading参数 ([ee36127](https://github.com/Tencent/tmagic-editor/commit/ee361271e70565a413985388da501dac2e769c4b))
+
+
+
 ## [1.1.3](https://github.com/Tencent/tmagic-editor/compare/v1.1.2...v1.1.3) (2022-09-13)
 
 
