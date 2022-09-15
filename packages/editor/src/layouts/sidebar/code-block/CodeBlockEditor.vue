@@ -34,7 +34,7 @@
         <magic-code-editor
           ref="codeEditor"
           class="m-editor-content"
-          :init-values="codeConfig.content"
+          :init-values="`${codeConfig.content}`"
           @save="saveCode"
           :options="{
             tabSize: 2,
@@ -71,7 +71,9 @@ const codeConfig = ref<CodeBlockContent | null>(null);
 const selectedValue = ref<CodeBlockDSL | null>(null);
 
 // 是否展示代码编辑区
-const isShowCodeBlockEditor = computed(() => codeConfig.value && services?.codeBlockService.getCodeEditorShowStatus());
+const isShowCodeBlockEditor = computed(
+  () => (codeConfig.value && services?.codeBlockService.getCodeEditorShowStatus()) || false,
+);
 const mode = computed(() => services?.codeBlockService.getMode());
 const id = computed(() => services?.codeBlockService.getId() || '');
 const editable = computed(() => services?.codeBlockService.getEditStatus());
@@ -87,8 +89,8 @@ watchEffect(async () => {
 });
 
 // 保存代码
-const saveCode = async () => {
-  if (!codeEditor.value || !codeConfig.value || !editable.value) return;
+const saveCode = async (): Promise<boolean> => {
+  if (!codeEditor.value || !codeConfig.value || !editable.value) return false;
 
   try {
     // 代码内容
@@ -97,7 +99,7 @@ const saveCode = async () => {
     codeConfig.value.content = eval(codeContent);
   } catch (e: any) {
     ElMessage.error(e.stack);
-    return;
+    return false;
   }
   // 存入dsl
   await services?.codeBlockService.setCodeDslById(id.value, {
@@ -105,12 +107,15 @@ const saveCode = async () => {
     content: codeConfig.value.content,
   });
   ElMessage.success('代码保存成功');
+  return true;
 };
 
 // 保存并关闭
 const saveAndClose = async () => {
-  await saveCode();
-  await services?.codeBlockService.setCodeEditorShowStatus(false);
+  const saveRes = await saveCode();
+  if (saveRes) {
+    await services?.codeBlockService.setCodeEditorShowStatus(false);
+  }
 };
 
 const menuSelectHandler = (item: any) => {
