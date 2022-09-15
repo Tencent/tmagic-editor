@@ -52,7 +52,7 @@ enum ErrorType {
 }
 
 const props = defineProps<{
-  customError: (id: string, errorType: ErrorType) => any;
+  customError?: (id: string, errorType: ErrorType) => any;
 }>();
 
 const services = inject<Services>('services');

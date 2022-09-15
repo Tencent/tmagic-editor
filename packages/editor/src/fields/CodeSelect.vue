@@ -20,9 +20,9 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, defineEmits, defineProps, inject, ref, watch, watchEffect } from 'vue';
+import { computed, defineEmits, defineProps, inject, ref, watchEffect } from 'vue';
 import { View } from '@element-plus/icons-vue';
-import { isEmpty, map } from 'lodash-es';
+import { map } from 'lodash-es';
 
 import { SelectConfig } from '@tmagic/form';
 
@@ -34,7 +34,7 @@ const emit = defineEmits(['change']);
 
 const props = defineProps<{
   config: {
-    selectConfig: SelectConfig;
+    selectConfig?: SelectConfig;
   };
   model: any;
   prop: string;
@@ -101,15 +101,4 @@ const viewHandler = async () => {
   await services?.codeBlockService.setMode(EditorMode.LIST);
   services?.codeBlockService.setCodeEditorContent(true, combineIds.value[0]);
 };
-
-watch(
-  () => props.model[props.name],
-  async (value) => {
-    if (isEmpty(value)) return;
-    await setCombineRelation(value);
-  },
-  {
-    immediate: true,
-  },
-);
 </script>
