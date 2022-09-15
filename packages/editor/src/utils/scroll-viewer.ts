@@ -40,6 +40,7 @@ export class ScrollViewer extends EventEmitter {
     this.setSize();
     this.setScrollSize();
     this.resizeObserver.observe(this.container);
+    this.resizeObserver.observe(this.target);
   }
 
   public destroy() {
