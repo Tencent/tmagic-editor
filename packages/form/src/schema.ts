@@ -97,7 +97,7 @@ export interface ContainerCommonConfig {
 export interface Rule {
   message?: string;
   /** 系统提供的验证器类型。有：string,number,boolean,method,regexp,integer,float,array,object,enum,date,url,hex,email,any */
-  type: string;
+  type?: string;
   /** 是否必填 */
   required?: boolean;
   /** 自定义验证器 */
