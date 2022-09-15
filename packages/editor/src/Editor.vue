@@ -65,6 +65,7 @@
 
 <script lang="ts">
 import { defineComponent, onUnmounted, PropType, provide, reactive, toRaw, watch } from 'vue';
+import { isEmpty } from 'lodash-es';
 
 import { EventOption } from '@tmagic/core';
 import type { FormConfig } from '@tmagic/form';
@@ -226,10 +227,26 @@ export default defineComponent({
       emit('update:modelValue', toRaw(editorService.get('root')));
     });
 
+    const initCodeRelation = (rootValue: MNode) => {
+      if (isEmpty(rootValue.items)) return;
+      rootValue.items.forEach((nodeValue: MNode) => {
+        if (!isEmpty(nodeValue.created)) {
+          codeBlockService.setCompRelation(nodeValue.id, nodeValue.created);
+        }
+        if (!isEmpty(nodeValue.items)) {
+          initCodeRelation(nodeValue);
+        }
+      });
+    };
+
     // 初始值变化，重新设置节点信息
     watch(
       () => props.modelValue,
-      (modelValue) => editorService.set('root', modelValue),
+      (modelValue) => {
+        editorService.set('root', modelValue);
+        // 初始化代码块与组件的绑定关系
+        initCodeRelation(modelValue);
+      },
       {
         immediate: true,
       },
