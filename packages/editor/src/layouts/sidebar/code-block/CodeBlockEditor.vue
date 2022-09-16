@@ -1,70 +1,72 @@
 <template>
   <el-dialog
     v-model="isShowCodeBlockEditor"
-    title="代码块编辑面板"
     :fullscreen="true"
     :before-close="saveAndClose"
     :append-to-body="true"
     custom-class="code-editor-dialog"
   >
+    <!-- 左侧列表 -->
     <template v-if="mode === EditorMode.LIST">
-      <el-tree
-        v-if="!isEmpty(state.codeList)"
-        ref="tree"
-        node-key="id"
-        empty-text="暂无代码块"
-        :data="state.codeList"
-        :highlight-current="true"
-        @node-click="selectHandler"
-        class="code-editor-side-menu"
-        :current-node-key="state.codeList[0].id"
-      >
-        <template #default="{ data }">
-          <div :id="data.id">
-            <div class="list-item">
-              <div class="code-name">{{ data.name }}（{{ data.id }}）</div>
+      <el-card class="code-editor-side-menu">
+        <el-tree
+          v-if="!isEmpty(state.codeList)"
+          ref="tree"
+          node-key="id"
+          empty-text="暂无代码块"
+          :data="state.codeList"
+          :highlight-current="true"
+          @node-click="selectHandler"
+          :current-node-key="state.codeList[0].id"
+          class="side-tree"
+        >
+          <template #default="{ data }">
+            <div :id="data.id" class="list-container">
+              <div class="list-item">
+                <div class="code-name">{{ data.name }}（{{ data.id }}）</div>
+              </div>
             </div>
-          </div>
-        </template>
-      </el-tree>
+          </template>
+        </el-tree>
+      </el-card>
     </template>
+    <!-- 右侧区域 -->
     <div
       v-if="!isEmpty(codeConfig)"
       :class="[
-        mode === EditorMode.LIST ? 'm-editor-code-block-editor-panel-list-mode' : '',
-        'm-editor-code-block-editor-panel',
+        mode === EditorMode.LIST ? 'm-editor-code-block-editor-panel-list-mode' : 'm-editor-code-block-editor-panel',
       ]"
     >
       <slot name="code-block-edit-panel-header" :id="id"></slot>
-      <el-row class="code-name-wrapper" justify="start">
-        <el-col :span="3">
-          <span>代码块名称</span>
-        </el-col>
-        <el-col :span="6">
-          <el-input size="small" v-model="codeConfig.name" :disabled="!editable" />
-        </el-col>
-      </el-row>
-      <div class="m-editor-content">
-        <magic-code-editor
-          ref="codeEditor"
-          class="m-editor-content"
-          :init-values="`${codeConfig.content}`"
-          @save="saveCode"
-          :options="{
-            tabSize: 2,
-            fontSize: 16,
-            formatOnPaste: true,
-            readOnly: !editable,
-          }"
-        ></magic-code-editor>
-        <div class="m-editor-content-bottom clearfix" v-if="editable">
-          <el-button type="primary" class="button" @click="saveCode">保存</el-button>
-          <el-button type="primary" class="button" @click="saveAndClose">保存并关闭</el-button>
+      <el-card shadow="never">
+        <template #header>
+          <div class="code-name-wrapper">
+            <div class="code-name-label">代码块名称</div>
+            <el-input class="code-name-input" size="small" v-model="codeConfig.name" :disabled="!editable" />
+          </div>
+        </template>
+        <div class="m-editor-wrapper">
+          <magic-code-editor
+            ref="codeEditor"
+            class="m-editor-container"
+            :init-values="`${codeConfig.content}`"
+            @save="saveCode"
+            :options="{
+              tabSize: 2,
+              fontSize: 16,
+              formatOnPaste: true,
+              readOnly: !editable,
+            }"
+          ></magic-code-editor>
+          <div class="m-editor-content-bottom" v-if="editable">
+            <el-button type="primary" class="button" @click="saveCode">保存</el-button>
+            <el-button type="primary" class="button" @click="saveAndClose">关闭</el-button>
+          </div>
+          <div class="m-editor-content-bottom" v-else>
+            <el-button type="primary" class="button" @click="saveAndClose">关闭</el-button>
+          </div>
         </div>
-        <div class="m-editor-content-bottom clearfix" v-else>
-          <el-button type="primary" class="button" @click="saveAndClose">关闭</el-button>
-        </div>
-      </div>
+      </el-card>
     </div>
   </el-dialog>
 </template>

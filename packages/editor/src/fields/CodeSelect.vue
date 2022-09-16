@@ -1,21 +1,27 @@
 <template>
   <div class="m-fields-code-select" :key="fieldKey">
-    <m-fields-select
-      :config="selectConfig"
-      :model="model"
-      :prop="prop"
-      :name="name"
-      :size="size"
-      @change="changeHandler"
-    ></m-fields-select>
-    <el-button
-      type="primary"
-      :icon="View"
-      :size="size"
-      @click="viewHandler"
-      :disabled="props.model[props.name].length === 0"
-      >查看</el-button
-    >
+    <el-card>
+      <template #header>
+        <m-fields-select
+          :config="selectConfig"
+          :model="model"
+          :prop="prop"
+          :name="name"
+          :size="size"
+          @change="changeHandler"
+        ></m-fields-select>
+      </template>
+      <div class="tool-bar">
+        <el-button
+          type="primary"
+          :icon="View"
+          :size="size"
+          @click="viewHandler"
+          :disabled="props.model[props.name].length === 0"
+          >查看</el-button
+        >
+      </div>
+    </el-card>
   </div>
 </template>
 

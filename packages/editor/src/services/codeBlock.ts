@@ -278,7 +278,7 @@ class CodeBlock extends BaseService {
    * @returns {string} 代码块唯一id
    */
   public async getUniqueId(): Promise<string> {
-    const newId = (Date.now().toString(36) + Math.random().toString(36).substring(2)).padEnd(19, '0');
+    const newId = `code_${Math.random().toString(10).substring(2).substring(0, 4)}`;
     // 判断是否重复
     const dsl = await this.getCodeDsl();
     const existedIds = keys(dsl);

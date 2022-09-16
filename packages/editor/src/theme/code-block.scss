@@ -50,67 +50,112 @@
     }
   }
 }
-.m-editor-code-block-editor-panel {
-  position: absolute;
-  top: 0;
-  left: 4px;
-  width: 100%;
-  height: 100%;
-  z-index: 10;
-  background: #fff;
 
-  .code-name-wrapper {
-    padding: 10px 20px;
+.m-fields-code-select {
+  width: 100%;
+  .el-card__body {
+    padding: 10px;
+  }
+  .tool-bar {
     display: flex;
     align-items: center;
+    justify-content: end;
   }
-
-  .m-editor-content-bottom {
-    text-align: right;
-    padding-right: 20px;
-    height: 40px;
-    position: absolute;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    bottom: 0;
-    right: 0;
-    background: #fff;
-    > button {
-      height: 30px;
-      margin-top: 4px;
-    }
-  }
-}
-.m-fields-code-select {
-  display: flex;
-  width: 100%;
-  align-items: center;
 }
 .code-editor-dialog {
   .el-dialog__body {
     height: 90%;
   }
-  .code-editor-side-menu {
-    width: 18%;
-    height: 90%;
-    overflow: auto;
-    margin-left: -25px;
+  .el-card {
+    height: 100%;
+    background: #fff;
+    .el-card__body {
+      height: 80%;
+      background: #fff;
+    }
+  }
 
-    .list-item {
-      width: 100%;
-      margin: 10px 0;
-      .code-name {
+  .code-editor-side-menu {
+    width: 20%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: #fff;
+
+    .side-tree {
+      margin-top: 10px;
+      .list-container {
         width: 100%;
-        font-size: 14px;
+        overflow: hidden;
+        margin-left: -20px;
+        .list-item {
+          width: 100%;
+          margin: 10px 0;
+          line-height: 30px;
+          .code-name {
+            width: 100%;
+            font-size: 14px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+          }
+        }
       }
     }
   }
+
+  .code-name-wrapper {
+    margin: 10px 0 10px 10px;
+    display: flex;
+    align-items: center;
+    .code-name-label {
+      width: 80px;
+    }
+    .code-name-input {
+      width: 300px;
+    }
+  }
+
   .m-editor-code-block-editor-panel-list-mode {
-    width: 80%;
     position: absolute;
-    height: 90%;
+    top: 0;
     left: 20%;
-    top: 60px;
+    width: 80%;
+    height: 100%;
+    z-index: 10;
+    background: #fff;
+  }
+
+  .m-editor-code-block-editor-panel {
+    position: absolute;
+    top: 0;
+    left: 4px;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    background: #fff;
+  }
+
+  .m-editor-wrapper {
+    height: 100%;
+    .m-editor-container {
+      height: 100%;
+    }
+    .m-editor-content-bottom {
+      text-align: right;
+      height: 40px;
+      padding-right: 20px;
+      position: absolute;
+      width: calc(100% - 30px);
+      display: flex;
+      justify-content: end;
+      bottom: 20px;
+      right: 0;
+      background: #fff;
+      > button {
+        height: 30px;
+        margin-top: 5px;
+      }
+    }
   }
 }
