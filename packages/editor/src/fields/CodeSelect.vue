@@ -12,14 +12,21 @@
         ></m-fields-select>
       </template>
       <div class="tool-bar">
-        <el-button
-          type="primary"
-          :icon="View"
-          :size="size"
-          @click="viewHandler"
-          :disabled="props.model[props.name].length === 0"
-          >查看</el-button
-        >
+        <el-tooltip class="tool-item" effect="dark" content="查看源代码" placement="top">
+          <svg
+            @click="viewHandler"
+            preserveAspectRatio="xMidYMid meet"
+            viewBox="0 0 24 24"
+            width="15px"
+            height="15px"
+            data-v-65a7fb6c=""
+          >
+            <path
+              fill="currentColor"
+              d="m23 12l-7.071 7.071l-1.414-1.414L20.172 12l-5.657-5.657l1.414-1.414L23 12zM3.828 12l5.657 5.657l-1.414 1.414L1 12l7.071-7.071l1.414 1.414L3.828 12z"
+            ></path>
+          </svg>
+        </el-tooltip>
       </div>
     </el-card>
   </div>
@@ -27,7 +34,7 @@
 
 <script lang="ts" setup>
 import { computed, defineEmits, defineProps, inject, ref, watchEffect } from 'vue';
-import { View } from '@element-plus/icons-vue';
+import { ElMessage } from 'element-plus';
 import { map } from 'lodash-es';
 
 import { SelectConfig } from '@tmagic/form';
@@ -104,6 +111,10 @@ const setCombineRelation = async (selectedIds: string[] | string) => {
 };
 
 const viewHandler = async () => {
+  if (props.model[props.name].length === 0) {
+    ElMessage.error('请先绑定代码块');
+    return;
+  }
   await setCombineRelation(props.model[props.name]);
   await services?.codeBlockService.setMode(EditorMode.LIST);
   services?.codeBlockService.setCodeEditorContent(true, combineIds.value[0]);
