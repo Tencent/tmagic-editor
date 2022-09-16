@@ -1,10 +1,19 @@
 <template>
   <div class="m-editor-code-block-list">
     <slot name="code-block-panel-header">
-      <div class="create-code-button">
-        <el-button type="primary" size="small" @click="createCodeBlock" :disabled="!editable">新增代码块</el-button>
+      <div class="code-header-wrapper">
+        <el-input
+          :class="[editable ? 'code-filter-input' : 'code-filter-input-no-btn']"
+          size="small"
+          placeholder="输入关键字进行过滤"
+          clearable
+          v-model="filterText"
+          @change="filterTextChangeHandler"
+        ></el-input>
+        <el-button class="create-code-button" type="primary" size="small" @click="createCodeBlock" v-if="editable"
+          >新增</el-button
+        >
       </div>
-      <el-divider class="divider" />
     </slot>
 
     <!-- 代码块列表 -->
@@ -15,6 +24,7 @@
       empty-text="暂无代码块"
       :data="state.codeList"
       :highlight-current="true"
+      :filter-node-method="filterNode"
     >
       <template #default="{ data }">
         <div :id="data.id" class="list-container">
@@ -44,14 +54,14 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, reactive, watchEffect } from 'vue';
+import { computed, inject, reactive, ref, watchEffect } from 'vue';
 import { Close, Edit, View } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 import { flattenDeep, forIn, isEmpty, values } from 'lodash-es';
 
 import Icon from '../../../components/Icon.vue';
 import type { CodeBlockContent, Services } from '../../../type';
-import { EditorMode, ListState } from '../../../type';
+import { CodeDslList, EditorMode, ListState } from '../../../type';
 
 import codeBlockEditor from './CodeBlockEditor.vue';
 
@@ -123,5 +133,19 @@ const deleteCode = (key: string) => {
       ElMessage.error('代码块删除失败');
     }
   }
+};
+
+const filterText = ref('');
+const tree = ref();
+
+const filterNode = (value: string, data: CodeDslList): boolean => {
+  if (!value) {
+    return true;
+  }
+  return `${data.name}${data.id}`.indexOf(value) !== -1;
+};
+
+const filterTextChangeHandler = (val: string) => {
+  tree.value?.filter(val);
 };
 </script>
