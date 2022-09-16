@@ -315,9 +315,12 @@ class Editor extends BaseService {
       root: cloneDeep(root),
     });
 
-    node.style = fixNodePosition(node, parent, stage);
+    const newStyle = fixNodePosition(node, parent, stage);
 
-    await stage?.update({ config: cloneDeep(node), parentId: parent.id, root: cloneDeep(root) });
+    if (newStyle && (newStyle.top !== node.style.top || newStyle.left !== node.style.left)) {
+      node.style = newStyle;
+      await stage?.update({ config: cloneDeep(node), parentId: parent.id, root: cloneDeep(root) });
+    }
 
     this.addModifiedNodeId(node.id);
 
