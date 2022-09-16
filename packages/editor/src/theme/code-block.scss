@@ -32,7 +32,6 @@
         position: absolute;
         right: 15px;
         padding-left: 5px;
-        background-color: #fff;
         display: flex;
         align-items: center;
         .edit-icon {
@@ -54,12 +53,17 @@
 .m-fields-code-select {
   width: 100%;
   .el-card__body {
-    padding: 10px;
+    padding: 5px;
   }
   .tool-bar {
     display: flex;
     align-items: center;
     justify-content: end;
+    height: 20px;
+    .tool-item {
+      display: flex;
+      align-items: center;
+    }
   }
 }
 .code-editor-dialog {
@@ -105,11 +109,11 @@
   }
 
   .code-name-wrapper {
-    margin: 10px 0 10px 10px;
     display: flex;
     align-items: center;
+    font-size: 16px;
     .code-name-label {
-      width: 80px;
+      margin-right: 10px;
     }
     .code-name-input {
       width: 300px;
