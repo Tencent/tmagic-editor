@@ -277,8 +277,6 @@ export default defineComponent({
       },
     );
 
-    uiService.initColumnWidth();
-
     onUnmounted(() => {
       editorService.destroy();
       historyService.destroy();

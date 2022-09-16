@@ -16,27 +16,14 @@
  * limitations under the License.
  */
 
-import { reactive, toRaw } from 'vue';
+import { reactive } from 'vue';
 
 import type StageCore from '@tmagic/stage';
 
 import editorService from '../services/editor';
-import type { GetColumnWidth, SetColumnWidth, StageRect, UiState } from '../type';
+import type { StageRect, UiState } from '../type';
 
 import BaseService from './BaseService';
-
-const DEFAULT_LEFT_COLUMN_WIDTH = 310;
-const MIN_LEFT_COLUMN_WIDTH = 45;
-const DEFAULT_RIGHT_COLUMN_WIDTH = 480;
-const MIN_RIGHT_COLUMN_WIDTH = 1;
-
-const COLUMN_WIDTH_STORAGE_KEY = '$MagicEditorColumnWidthData';
-
-const defaultColumnWidth = {
-  left: DEFAULT_LEFT_COLUMN_WIDTH,
-  center: globalThis.document.body.clientWidth - DEFAULT_LEFT_COLUMN_WIDTH - DEFAULT_RIGHT_COLUMN_WIDTH,
-  right: DEFAULT_RIGHT_COLUMN_WIDTH,
-};
 
 const state = reactive<UiState>({
   uiSelectMode: false,
@@ -50,7 +37,7 @@ const state = reactive<UiState>({
     width: 375,
     height: 817,
   },
-  columnWidth: defaultColumnWidth,
+  columnWidth: {},
   showGuides: true,
   showRule: true,
   propsPanelSize: 'small',
@@ -59,7 +46,7 @@ const state = reactive<UiState>({
 
 class Ui extends BaseService {
   constructor() {
-    super(['initColumnWidth', 'zoom', 'calcZoom']);
+    super(['zoom', 'calcZoom']);
     globalThis.addEventListener('resize', () => {
       this.setColumnWidth({
         center: 'auto',
@@ -69,11 +56,6 @@ class Ui extends BaseService {
 
   public set<T = any>(name: keyof UiState, value: T) {
     const mask = editorService.get<StageCore>('stage')?.mask;
-
-    if (name === 'columnWidth') {
-      this.setColumnWidth(value as unknown as SetColumnWidth);
-      return;
-    }
 
     if (name === 'stageRect') {
       this.setStageRect(value as unknown as StageRect);
@@ -93,18 +75,6 @@ class Ui extends BaseService {
 
   public get<T>(name: keyof typeof state): T {
     return (state as any)[name];
-  }
-
-  public async initColumnWidth() {
-    const columnWidthCacheData = globalThis.localStorage.getItem(COLUMN_WIDTH_STORAGE_KEY);
-    if (columnWidthCacheData) {
-      try {
-        const columnWidthCache = JSON.parse(columnWidthCacheData);
-        this.setColumnWidth(columnWidthCache);
-      } catch (e) {
-        console.error(e);
-      }
-    }
   }
 
   public async zoom(zoom: number) {
@@ -130,36 +100,6 @@ class Ui extends BaseService {
 
   public destroy() {
     this.removeAllListeners();
-  }
-
-  private setColumnWidth({ left, center, right }: SetColumnWidth) {
-    const columnWidth = {
-      ...toRaw(this.get<GetColumnWidth>('columnWidth')),
-    };
-
-    if (left) {
-      columnWidth.left = Math.max(left, MIN_LEFT_COLUMN_WIDTH);
-    }
-
-    if (right) {
-      columnWidth.right = Math.max(right, MIN_RIGHT_COLUMN_WIDTH);
-    }
-
-    if (!center || center === 'auto') {
-      const bodyWidth = globalThis.document.body.clientWidth;
-      columnWidth.center = bodyWidth - (columnWidth?.left || 0) - (columnWidth?.right || 0);
-      if (columnWidth.center <= 0) {
-        columnWidth.left = defaultColumnWidth.left;
-        columnWidth.center = defaultColumnWidth.center;
-        columnWidth.right = defaultColumnWidth.right;
-      }
-    } else {
-      columnWidth.center = center;
-    }
-
-    globalThis.localStorage.setItem(COLUMN_WIDTH_STORAGE_KEY, JSON.stringify(columnWidth));
-
-    state.columnWidth = columnWidth;
   }
 
   private async setStageRect(value: StageRect) {
