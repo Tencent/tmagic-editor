@@ -21,7 +21,7 @@ export default {
   name: 'test',
   type: 'app',
   methods: {
-    l7znj1q24wilb357ay6: {
+    code_5336: {
       name: 'getData',
       // eslint-disable-next-line no-eval
       content: eval(`(vm) => {\n  console.log("this is getData function")\n}`),
@@ -51,7 +51,7 @@ export default {
         fontWeight: '',
       },
       events: [],
-      created: ['l7znj1q24wilb357ay6'],
+      created: ['code_5336'],
       items: [
         {
           type: 'text',
