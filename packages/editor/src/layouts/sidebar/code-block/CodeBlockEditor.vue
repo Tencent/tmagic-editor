@@ -54,6 +54,7 @@
             tabSize: 2,
             fontSize: 16,
             formatOnPaste: true,
+            readOnly: !editable,
           }"
         ></magic-code-editor>
         <div class="m-editor-content-bottom clearfix" v-if="editable">
@@ -115,7 +116,7 @@ watchEffect(async () => {
 
 // 保存代码
 const saveCode = async (): Promise<boolean> => {
-  if (!codeEditor.value || !codeConfig.value || !editable.value) return false;
+  if (!codeEditor.value || !codeConfig.value || !editable.value) return true;
 
   try {
     // 代码内容

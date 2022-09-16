@@ -1,9 +1,20 @@
 .m-editor-code-block-list {
-  padding-top: 20px;
-  .create-code-button {
+  margin-top: 5px;
+  .code-header-wrapper {
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+    .code-filter-input {
+      margin: 0 5px;
+    }
+    .code-filter-input-no-btn {
+      margin-left: 5px;
+      margin-right: 10px;
+    }
+    .create-code-button {
+      margin-left: 2px;
+      margin-right: 10px;
+    }
   }
 
   .divider {
