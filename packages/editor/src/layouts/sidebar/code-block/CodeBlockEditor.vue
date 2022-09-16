@@ -8,11 +8,25 @@
     custom-class="code-editor-dialog"
   >
     <template v-if="mode === EditorMode.LIST">
-      <el-menu :default-active="selectedIds[0]" class="code-editor-side-menu">
-        <el-menu-item v-for="(value, key) in selectedValue" :index="key" :key="key" @click="menuSelectHandler">
-          <template #title>{{ value.name }}（{{ key }}）</template>
-        </el-menu-item>
-      </el-menu>
+      <el-tree
+        v-if="!isEmpty(state.codeList)"
+        ref="tree"
+        node-key="id"
+        empty-text="暂无代码块"
+        :data="state.codeList"
+        :highlight-current="true"
+        @node-click="selectHandler"
+        class="code-editor-side-menu"
+        :current-node-key="state.codeList[0].id"
+      >
+        <template #default="{ data }">
+          <div :id="data.id">
+            <div class="list-item">
+              <div class="code-name">{{ data.name }}（{{ data.id }}）</div>
+            </div>
+          </div>
+        </template>
+      </el-tree>
     </template>
     <div
       v-if="!isEmpty(codeConfig)"
@@ -55,11 +69,11 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, ref, watchEffect } from 'vue';
+import { computed, inject, reactive, ref, watchEffect } from 'vue';
 import { ElMessage } from 'element-plus';
-import { isEmpty } from 'lodash-es';
+import { forIn, isEmpty } from 'lodash-es';
 
-import type { CodeBlockContent, CodeBlockDSL, Services } from '../../../type';
+import type { CodeBlockContent, CodeDslList, ListState, Services } from '../../../type';
 import { EditorMode } from '../../../type';
 
 const services = inject<Services>('services');
@@ -67,8 +81,10 @@ const services = inject<Services>('services');
 const codeEditor = ref<any | null>(null);
 // 编辑器当前需展示的代码块内容
 const codeConfig = ref<CodeBlockContent | null>(null);
-// select选择的内容(CodeBlockDSL)
-const selectedValue = ref<CodeBlockDSL | null>(null);
+// select选择的内容(ListState)
+const state = reactive<ListState>({
+  codeList: [],
+});
 
 // 是否展示代码编辑区
 const isShowCodeBlockEditor = computed(
@@ -85,7 +101,16 @@ watchEffect(async () => {
 });
 
 watchEffect(async () => {
-  selectedValue.value = (await services?.codeBlockService.getCodeDslByIds(selectedIds.value)) || null;
+  const codeDsl = (await services?.codeBlockService.getCodeDslByIds(selectedIds.value)) || null;
+  if (!codeDsl) return;
+  state.codeList = [];
+  forIn(codeDsl, (value: CodeBlockContent, key: string) => {
+    state.codeList.push({
+      id: key,
+      name: value.name,
+      content: value.content,
+    });
+  });
 });
 
 // 保存代码
@@ -118,7 +143,7 @@ const saveAndClose = async () => {
   }
 };
 
-const menuSelectHandler = (item: any) => {
-  services?.codeBlockService.setId(item.index);
+const selectHandler = (data: CodeDslList) => {
+  services?.codeBlockService.setId(data.id);
 };
 </script>
