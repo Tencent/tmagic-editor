@@ -42,7 +42,7 @@
         <template #header>
           <div class="code-name-wrapper">
             <div class="code-name-label">代码块名称</div>
-            <el-input class="code-name-input" size="small" v-model="codeConfig.name" :disabled="!editable" />
+            <el-input class="code-name-input" v-model="codeConfig.name" :disabled="!editable" />
           </div>
         </template>
         <div class="m-editor-wrapper">
