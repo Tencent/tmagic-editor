@@ -8,22 +8,31 @@
     </slot>
 
     <!-- 代码块列表 -->
-    <div class="list-container" v-if="!isEmpty(codeList)">
-      <div v-for="(value, key) in codeList" :key="key">
-        <div class="list-item">
-          <div class="code-name">{{ value.name }}（{{ key }}）</div>
-          <div class="right-tool">
-            <el-tooltip effect="dark" :content="editable ? '编辑' : '查看'" placement="top">
-              <Icon :icon="editable ? Edit : View" class="edit-icon" @click="editCode(`${key}`)"></Icon>
-            </el-tooltip>
-            <el-tooltip effect="dark" content="删除" placement="top" v-if="editable">
-              <Icon :icon="Close" class="edit-icon" @click="deleteCode(`${key}`)"></Icon>
-            </el-tooltip>
-            <slot name="code-block-panel-tool" :id="key"></slot>
+    <el-tree
+      v-if="!isEmpty(state.codeList)"
+      ref="tree"
+      node-key="id"
+      empty-text="暂无代码块"
+      :data="state.codeList"
+      :highlight-current="true"
+    >
+      <template #default="{ data }">
+        <div :id="data.id" class="list-container">
+          <div class="list-item">
+            <div class="code-name">{{ data.name }}（{{ data.id }}）</div>
+            <div class="right-tool">
+              <el-tooltip effect="dark" :content="editable ? '编辑' : '查看'" placement="top">
+                <Icon :icon="editable ? Edit : View" class="edit-icon" @click="editCode(`${data.id}`)"></Icon>
+              </el-tooltip>
+              <el-tooltip effect="dark" content="删除" placement="top" v-if="editable">
+                <Icon :icon="Close" class="edit-icon" @click="deleteCode(`${data.id}`)"></Icon>
+              </el-tooltip>
+              <slot name="code-block-panel-tool" :id="data.id"></slot>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+      </template>
+    </el-tree>
 
     <!-- 代码块编辑区 -->
     <code-block-editor>
@@ -35,14 +44,14 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, ref, watchEffect } from 'vue';
+import { computed, inject, reactive, watchEffect } from 'vue';
 import { Close, Edit, View } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
-import { flattenDeep, isEmpty, values } from 'lodash-es';
+import { flattenDeep, forIn, isEmpty, values } from 'lodash-es';
 
 import Icon from '../../../components/Icon.vue';
 import type { CodeBlockContent, Services } from '../../../type';
-import { CodeBlockDSL, EditorMode } from '../../../type';
+import { EditorMode, ListState } from '../../../type';
 
 import codeBlockEditor from './CodeBlockEditor.vue';
 
@@ -57,12 +66,23 @@ const props = defineProps<{
 
 const services = inject<Services>('services');
 // 代码块列表
-const codeList = ref<CodeBlockDSL | null>(null);
+const state = reactive<ListState>({
+  codeList: [],
+});
 
 const editable = computed(() => services?.codeBlockService.getEditStatus());
 
 watchEffect(async () => {
-  codeList.value = (await services?.codeBlockService.getCodeDsl()) || null;
+  const codeDsl = (await services?.codeBlockService.getCodeDsl()) || null;
+  if (!codeDsl) return;
+  state.codeList = [];
+  forIn(codeDsl, (value: CodeBlockContent, key: string) => {
+    state.codeList.push({
+      id: key,
+      name: value.name,
+      content: value.content,
+    });
+  });
 });
 
 // 新增代码块

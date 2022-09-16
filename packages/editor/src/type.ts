@@ -348,3 +348,12 @@ export enum EditorMode {
 export type CompRelation = {
   [compId: string | number]: string[];
 };
+
+export interface CodeDslList {
+  id: string;
+  name: string;
+  content: any;
+}
+export interface ListState {
+  codeList: CodeDslList[];
+}
