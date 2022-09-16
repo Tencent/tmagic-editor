@@ -37,7 +37,11 @@ const state = reactive<UiState>({
     width: 375,
     height: 817,
   },
-  columnWidth: {},
+  columnWidth: {
+    left: 0,
+    right: 0,
+    center: 0,
+  },
   showGuides: true,
   showRule: true,
   propsPanelSize: 'small',
@@ -47,11 +51,6 @@ const state = reactive<UiState>({
 class Ui extends BaseService {
   constructor() {
     super(['zoom', 'calcZoom']);
-    globalThis.addEventListener('resize', () => {
-      this.setColumnWidth({
-        center: 'auto',
-      });
-    });
   }
 
   public set<T = any>(name: keyof UiState, value: T) {
