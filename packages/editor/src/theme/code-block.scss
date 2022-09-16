@@ -13,6 +13,7 @@
   .list-container {
     width: 100%;
     overflow: hidden;
+    margin-left: -25px;
     .list-item {
       display: flex;
       align-items: center;
@@ -80,9 +81,19 @@
     height: 90%;
   }
   .code-editor-side-menu {
-    width: 20%;
+    width: 18%;
     height: 90%;
     overflow: auto;
+    margin-left: -25px;
+
+    .list-item {
+      width: 100%;
+      margin: 10px 0;
+      .code-name {
+        width: 100%;
+        font-size: 14px;
+      }
+    }
   }
   .m-editor-code-block-editor-panel-list-mode {
     width: 80%;
