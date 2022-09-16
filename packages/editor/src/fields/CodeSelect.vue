@@ -1,6 +1,6 @@
 <template>
   <div class="m-fields-code-select" :key="fieldKey">
-    <el-card>
+    <el-card shadow="never">
       <template #header>
         <m-fields-select
           :config="selectConfig"
