@@ -43,7 +43,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, ref } from 'vue';
+import { computed, inject, ref, watchEffect } from 'vue';
 
 import type { MApp } from '@tmagic/schema';
 
@@ -70,12 +70,23 @@ const root = computed(() => editorService?.get<MApp>('root'));
 
 const pageLength = computed(() => editorService?.get<number>('pageLength') || 0);
 const showSrc = computed(() => uiService?.get<boolean>('showSrc'));
-const columnWidth = ref({
+const columnWidth = ref<Partial<GetColumnWidth>>({
   left: DEFAULT_LEFT_COLUMN_WIDTH,
-  center: globalThis.document.body.clientWidth - DEFAULT_LEFT_COLUMN_WIDTH - DEFAULT_RIGHT_COLUMN_WIDTH,
-  right: DEFAULT_RIGHT_COLUMN_WIDTH,
+  center: 0,
+  right: 0,
 });
 uiService?.set('columnWidth', columnWidth.value);
+
+watchEffect(() => {
+  if (pageLength.value <= 0) {
+    columnWidth.value.right = undefined;
+    columnWidth.value.center = globalThis.document.body.clientWidth - DEFAULT_LEFT_COLUMN_WIDTH;
+  } else {
+    columnWidth.value.right = columnWidth.value.right || DEFAULT_RIGHT_COLUMN_WIDTH;
+    columnWidth.value.center =
+      globalThis.document.body.clientWidth - DEFAULT_LEFT_COLUMN_WIDTH - DEFAULT_RIGHT_COLUMN_WIDTH;
+  }
+});
 
 const saveCode = (value: string) => {
   try {
