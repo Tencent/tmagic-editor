@@ -1,14 +1,15 @@
 <template>
   <el-dialog
     v-model="isShowCodeBlockEditor"
+    :title="currentTitle"
     :fullscreen="true"
     :before-close="saveAndClose"
     :append-to-body="true"
     custom-class="code-editor-dialog"
   >
-    <!-- 左侧列表 -->
-    <template v-if="mode === EditorMode.LIST">
-      <el-card class="code-editor-side-menu">
+    <layout v-model:left="left" :min-left="45" class="code-editor-layout">
+      <!-- 左侧列表 -->
+      <template #left v-if="mode === EditorMode.LIST">
         <el-tree
           v-if="!isEmpty(state.codeList)"
           ref="tree"
@@ -28,46 +29,50 @@
             </div>
           </template>
         </el-tree>
-      </el-card>
-    </template>
-    <!-- 右侧区域 -->
-    <div
-      v-if="!isEmpty(codeConfig)"
-      :class="[
-        mode === EditorMode.LIST ? 'm-editor-code-block-editor-panel-list-mode' : 'm-editor-code-block-editor-panel',
-      ]"
-    >
-      <slot name="code-block-edit-panel-header" :id="id"></slot>
-      <el-card shadow="never">
-        <template #header>
-          <div class="code-name-wrapper">
-            <div class="code-name-label">代码块名称</div>
-            <el-input class="code-name-input" v-model="codeConfig.name" :disabled="!editable" />
-          </div>
-        </template>
-        <div class="m-editor-wrapper">
-          <magic-code-editor
-            ref="codeEditor"
-            class="m-editor-container"
-            :init-values="`${codeConfig.content}`"
-            @save="saveCode"
-            :options="{
-              tabSize: 2,
-              fontSize: 16,
-              formatOnPaste: true,
-              readOnly: !editable,
-            }"
-          ></magic-code-editor>
-          <div class="m-editor-content-bottom" v-if="editable">
-            <el-button type="primary" class="button" @click="saveCode">保存</el-button>
-            <el-button type="primary" class="button" @click="saveAndClose">关闭</el-button>
-          </div>
-          <div class="m-editor-content-bottom" v-else>
-            <el-button type="primary" class="button" @click="saveAndClose">关闭</el-button>
-          </div>
+      </template>
+      <!-- 右侧区域 -->
+      <template #center>
+        <div
+          v-if="!isEmpty(codeConfig)"
+          :class="[
+            mode === EditorMode.LIST
+              ? 'm-editor-code-block-editor-panel-list-mode'
+              : 'm-editor-code-block-editor-panel',
+          ]"
+        >
+          <slot name="code-block-edit-panel-header" :id="id"></slot>
+          <el-card shadow="never">
+            <template #header>
+              <div class="code-name-wrapper">
+                <div class="code-name-label">代码块名称</div>
+                <el-input class="code-name-input" v-model="codeConfig.name" :disabled="!editable" />
+              </div>
+            </template>
+            <div class="m-editor-wrapper">
+              <magic-code-editor
+                ref="codeEditor"
+                class="m-editor-container"
+                :init-values="`${codeConfig.content}`"
+                @save="saveCode"
+                :options="{
+                  tabSize: 2,
+                  fontSize: 16,
+                  formatOnPaste: true,
+                  readOnly: !editable,
+                }"
+              ></magic-code-editor>
+              <div class="m-editor-content-bottom" v-if="editable">
+                <el-button type="primary" class="button" @click="saveCode">保存</el-button>
+                <el-button type="primary" class="button" @click="saveAndClose">关闭</el-button>
+              </div>
+              <div class="m-editor-content-bottom" v-else>
+                <el-button type="primary" class="button" @click="saveAndClose">关闭</el-button>
+              </div>
+            </div>
+          </el-card>
         </div>
-      </el-card>
-    </div>
+      </template>
+    </layout>
   </el-dialog>
 </template>
 
@@ -78,10 +83,13 @@ import { forIn, isEmpty } from 'lodash-es';
 
 import type { CodeBlockContent, CodeDslList, ListState, Services } from '../../../type';
 import { EditorMode } from '../../../type';
+import Layout from '../../Layout.vue';
 
 const services = inject<Services>('services');
 
 const codeEditor = ref<any | null>(null);
+const left = ref(200);
+const currentTitle = ref('');
 // 编辑器当前需展示的代码块内容
 const codeConfig = ref<CodeBlockContent | null>(null);
 // select选择的内容(ListState)
@@ -114,6 +122,7 @@ watchEffect(async () => {
       content: value.content,
     });
   });
+  currentTitle.value = state.codeList[0]?.name || '';
 });
 
 // 保存代码
@@ -148,5 +157,6 @@ const saveAndClose = async () => {
 
 const selectHandler = (data: CodeDslList) => {
   services?.codeBlockService.setId(data.id);
+  currentTitle.value = data.name;
 };
 </script>
