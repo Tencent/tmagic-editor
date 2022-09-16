@@ -8,7 +8,7 @@
           placeholder="输入关键字进行过滤"
           clearable
           v-model="filterText"
-          @change="filterTextChangeHandler"
+          @input="filterTextChangeHandler"
         ></el-input>
         <el-button class="create-code-button" type="primary" size="small" @click="createCodeBlock" v-if="editable"
           >新增</el-button
