@@ -1,5 +1,5 @@
 <template>
-  <div ref="el">
+  <div ref="el" class="m-editor-layout">
     <template v-if="typeof props.left !== 'undefined'">
       <div class="m-editor-layout-left" :class="leftClass" :style="`width: ${left}px`">
         <slot name="left"></slot>
