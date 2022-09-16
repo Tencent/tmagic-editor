@@ -17,6 +17,7 @@
             :size="size"
             :config="config"
             :init-values="values"
+            :parent-values="parentValues"
             :label-width="labelWidth"
             @change="changeHandler"
           ></m-form>
@@ -62,6 +63,10 @@ export default defineComponent({
     values: {
       type: Object,
       default: () => ({}),
+    },
+
+    parentValues: {
+      type: Object,
     },
 
     width: [Number, String],
