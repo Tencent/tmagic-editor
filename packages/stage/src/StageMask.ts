@@ -117,6 +117,10 @@ export default class StageMask extends Rule {
       e.inputEvent.preventDefault();
       this.isMultiSelectStatus = true;
     });
+    // ctrl+tab切到其他窗口，需要将多选状态置为false
+    KeyController.global.on('blur', () => {
+      this.isMultiSelectStatus = false;
+    });
     KeyController.global.keyup(ctrl, (e) => {
       e.inputEvent.preventDefault();
       this.isMultiSelectStatus = false;
