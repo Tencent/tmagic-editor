@@ -83,11 +83,12 @@ import { forIn, isEmpty } from 'lodash-es';
 
 import type { CodeBlockContent, CodeDslList, ListState, Services } from '../../../type';
 import { EditorMode } from '../../../type';
+import MagicCodeEditor from '../../CodeEditor.vue';
 import Layout from '../../Layout.vue';
 
 const services = inject<Services>('services');
 
-const codeEditor = ref<any | null>(null);
+const codeEditor = ref<InstanceType<typeof MagicCodeEditor>>();
 const left = ref(200);
 const currentTitle = ref('');
 // 编辑器当前需展示的代码块内容
@@ -108,7 +109,7 @@ const editable = computed(() => services?.codeBlockService.getEditStatus());
 const selectedIds = computed(() => services?.codeBlockService.getCombineIds() || []);
 
 watchEffect(async () => {
-  codeConfig.value = (await services?.codeBlockService.getCodeContentById(id.value)) ?? null;
+  codeConfig.value = (await services?.codeBlockService.getCodeContentById(id.value)) || null;
 });
 
 watchEffect(async () => {
