@@ -346,14 +346,26 @@ export enum EditorMode {
 }
 
 export type CompRelation = {
+  /** 代码块绑定关系：组件id-代码块id数组 */
   [compId: string | number]: string[];
 };
 
 export interface CodeDslList {
+  /** 代码块id */
   id: string;
+  /** 代码块名称 */
   name: string;
+  /** 代码块函数内容 */
   content: any;
 }
 export interface ListState {
+  /** 代码块列表 */
   codeList: CodeDslList[];
+}
+
+export enum ErrorType {
+  /** 代码块存在于不可删除列表中 */
+  UNDELETEABLE = 'undeleteable',
+  /** 代码块存在绑定关系 */
+  BIND = 'bind',
 }
