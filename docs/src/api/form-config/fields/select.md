@@ -144,7 +144,7 @@
   placeholder: '请选择',
   remote: true,
   option: {
-    url: 'xxx',
+    url: 'select/remote',
     root: 'data',
     method: 'post',
     mode: 'cors',
