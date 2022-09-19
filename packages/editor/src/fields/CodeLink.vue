@@ -41,7 +41,6 @@ const modelValue = reactive<{ form: Record<string, string> }>({
 watch(
   () => props.model[props.name],
   (value) => {
-    console.log(props.model[props.name]);
     modelValue.form = {
       [props.name]: serialize(value, {
         space: 2,
