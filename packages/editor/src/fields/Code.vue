@@ -7,29 +7,25 @@
   ></magic-code-editor>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent } from 'vue';
+<script lang="ts" setup>
+import { computed } from 'vue';
 
-export default defineComponent({
-  name: 'm-fields-vs-code',
+const emit = defineEmits(['change']);
 
-  props: ['model', 'name', 'config', 'prop'],
+const props = defineProps<{
+  model: any;
+  name: string;
+  config: {
+    language?: string;
+  };
+  prop: string;
+}>();
 
-  emits: ['change'],
+const language = computed(() => props.config.language || 'javascript');
+const height = computed(() => `${document.body.clientHeight - 168}px`);
 
-  setup(props, { emit }) {
-    const language = computed(() => props.config.language || 'javascript');
-    const height = computed(() => `${document.body.clientHeight - 168}px`);
-
-    return {
-      height,
-      language,
-
-      save(v: string) {
-        props.model[props.name] = v;
-        emit('change', v);
-      },
-    };
-  },
-});
+const save = (v: string) => {
+  props.model[props.name] = v;
+  emit('change', v);
+};
 </script>

@@ -2,80 +2,67 @@
   <m-fields-link :config="formConfig" :model="modelValue" name="form" @change="changeHandler"></m-fields-link>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, PropType, ref, watchEffect } from 'vue';
+<script lang="ts" setup>
+import { computed, reactive, watch } from 'vue';
 import serialize from 'serialize-javascript';
 
-interface CodeLinkConfig {
-  type: 'code-link';
+const props = defineProps<{
+  config: {
+    type: 'code-link';
+    name: string;
+    text?: string;
+    formTitle?: string;
+  };
+  model: any;
   name: string;
-  text?: string;
-  formTitle?: string;
-}
+  prop: string;
+}>();
 
-export default defineComponent({
-  name: 'm-fields-code-link',
+const emit = defineEmits(['change']);
 
-  props: {
-    config: {
-      type: Object as PropType<CodeLinkConfig>,
+const formConfig = computed(() => ({
+  ...props.config,
+  text: '',
+  type: 'link',
+  form: [
+    {
+      name: props.name,
+      type: 'vs-code',
     },
+  ],
+}));
 
-    model: {
-      type: Object,
-    },
-
-    name: {
-      type: String,
-    },
-
-    prop: {
-      type: String,
-    },
-  },
-
-  emits: ['change'],
-
-  setup(props, { emit }) {
-    const modelValue = ref<{ form: Record<string, any> }>({
-      form: {},
-    });
-
-    watchEffect(() => {
-      if (!props.model || !props.name) return;
-      modelValue.value.form[props.name] = serialize(props.model[props.name], {
-        space: 2,
-        unsafe: true,
-      }).replace(/"(\w+)":\s/g, '$1: ');
-    });
-
-    return {
-      modelValue,
-
-      formConfig: computed(() => ({
-        ...props.config,
-        text: '',
-        type: 'link',
-        form: [
-          {
-            name: props.name,
-            type: 'vs-code',
-          },
-        ],
-      })),
-
-      changeHandler(v: Record<string, any>) {
-        if (!props.name || !props.model) return;
-
-        try {
-          // eslint-disable-next-line no-eval
-          props.model[props.name] = eval(`${v[props.name]}`);
-          emit('change', props.model[props.name]);
-        } catch (e) {
-          console.error(e);
-        }
-      },
-    };
+const modelValue = reactive<{ form: Record<string, string> }>({
+  form: {
+    [props.name]: '',
   },
 });
+
+watch(
+  () => props.model[props.name],
+  (value) => {
+    console.log(props.model[props.name]);
+    modelValue.form = {
+      [props.name]: serialize(value, {
+        space: 2,
+        unsafe: true,
+      }).replace(/"(\w+)":\s/g, '$1: '),
+    };
+  },
+  {
+    immediate: true,
+  },
+);
+
+const changeHandler = (v: Record<string, any>) => {
+  if (!props.name || !props.model) return;
+
+  try {
+    // eslint-disable-next-line no-eval
+    props.model[props.name] = eval(`(${v[props.name]})`);
+    emit('change', props.model[props.name]);
+  } catch (e) {
+    console.error(e);
+  }
+};
 </script>
