@@ -75,7 +75,7 @@
     height: 100%;
     background: #fff;
     .el-card__body {
-      height: 80%;
+      height: calc(100% - 80px);
       background: #fff;
     }
   }
@@ -133,16 +133,19 @@
     position: absolute;
     top: 0;
     left: 4px;
-    width: 100%;
+    width: calc(100% - 9px);
     height: 100%;
     z-index: 10;
     background: #fff;
+    .el-card {
+      border: 0;
+    }
   }
 
   .m-editor-wrapper {
     height: 100%;
     .m-editor-container {
-      height: 100%;
+      height: calc(100% - 70px);
     }
     .m-editor-content-bottom {
       height: 40px;
@@ -152,7 +155,7 @@
       background: #fff;
       > button {
         height: 30px;
-        margin-top: 5px;
+        margin-top: 15px;
       }
     }
   }

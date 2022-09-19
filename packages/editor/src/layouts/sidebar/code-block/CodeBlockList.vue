@@ -31,10 +31,10 @@
           <div class="list-item">
             <div class="code-name">{{ data.name }}（{{ data.id }}）</div>
             <div class="right-tool">
-              <el-tooltip effect="dark" :content="editable ? '编辑' : '查看'" placement="top">
+              <el-tooltip effect="dark" :content="editable ? '编辑' : '查看'" placement="bottom">
                 <Icon :icon="editable ? Edit : View" class="edit-icon" @click="editCode(`${data.id}`)"></Icon>
               </el-tooltip>
-              <el-tooltip effect="dark" content="删除" placement="top" v-if="editable">
+              <el-tooltip effect="dark" content="删除" placement="bottom" v-if="editable">
                 <Icon :icon="Close" class="edit-icon" @click="deleteCode(`${data.id}`)"></Icon>
               </el-tooltip>
               <slot name="code-block-panel-tool" :id="data.id"></slot>

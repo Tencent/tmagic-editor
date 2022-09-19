@@ -12,7 +12,7 @@
         ></m-fields-select>
       </template>
       <div class="tool-bar">
-        <el-tooltip class="tool-item" effect="dark" content="查看源代码" placement="top">
+        <el-tooltip class="tool-item" effect="dark" content="查看代码块" placement="top">
           <svg
             @click="viewHandler"
             preserveAspectRatio="xMidYMid meet"
