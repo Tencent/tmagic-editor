@@ -59,8 +59,8 @@ export default {
 
     app.component(Editor.name, Editor);
     app.component('m-fields-ui-select', uiSelect);
-    app.component(CodeLink.name, CodeLink);
-    app.component(Code.name, Code);
+    app.component('m-fields-code-link', CodeLink);
+    app.component('m-fields-vs-code', Code);
     app.component(CodeEditor.name, CodeEditor);
   },
 };
