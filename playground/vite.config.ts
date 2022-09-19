@@ -23,8 +23,7 @@ import legacy from '@vitejs/plugin-legacy';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
 
-// https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   plugins: [
     vue(),
     vueJsx(),
@@ -67,17 +66,19 @@ export default defineConfig({
     },
     host: '0.0.0.0',
     port: 8098,
-    proxy: {
-      '^/tmagic-editor/playground/runtime': {
-        target: 'http://127.0.0.1:8078',
-        changeOrigin: true,
-        prependPath: false,
-      },
-    },
+    proxy: command
+      ? undefined
+      : {
+          '^/tmagic-editor/playground/runtime': {
+            target: 'http://127.0.0.1:8078',
+            changeOrigin: true,
+            prependPath: false,
+          },
+        },
     open: '/tmagic-editor/playground/',
   },
 
   build: {
     sourcemap: true,
   },
-});
+}));
