@@ -61,14 +61,9 @@ import { flattenDeep, forIn, isEmpty, values } from 'lodash-es';
 
 import Icon from '../../../components/Icon.vue';
 import type { CodeBlockContent, Services } from '../../../type';
-import { CodeDslList, EditorMode, ListState } from '../../../type';
+import { CodeDslList, EditorMode, ErrorType, ListState } from '../../../type';
 
 import codeBlockEditor from './CodeBlockEditor.vue';
-
-enum ErrorType {
-  UNDELETEABLE = 'undeleteable',
-  BIND = 'bind',
-}
 
 const props = defineProps<{
   customError?: (id: string, errorType: ErrorType) => any;
