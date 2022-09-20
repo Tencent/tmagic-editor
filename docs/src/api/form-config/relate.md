@@ -17,12 +17,16 @@
 <demo-block type="form" :config="[{
   name: 'firstName',
   text: '名',
-  onChange: (state, v, { model }) => model.fullName = `${model.lastName}${model.firstName}`,
+  onChange: (state, v, { model }) => {
+      model.fullName = `${model.lastName}${model.firstName}`
+    },
   defaultValue: '三'
 }, {
   name: 'lastName',
   text: '姓',
-  onChange: (state, v, { model }) => model.fullName = `${model.lastName}${model.firstName}`,
+  onChange: (state, v, { model }) => {
+      model.fullName = `${model.lastName}${model.firstName}`
+    },
   defaultValue: '张'
 }, {
   name: 'fullName',

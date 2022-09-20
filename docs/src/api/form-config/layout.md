@@ -20,6 +20,7 @@
 <demo-block type="form" :config="[{
   type: 'row',
   labelWidth: 100,
+  span: 8,
   items: [{
     name: 'text',
     text: '配置1',
