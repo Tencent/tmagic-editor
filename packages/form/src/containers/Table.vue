@@ -76,7 +76,7 @@
             width="45"
           ></el-table-column>
 
-          <el-table-column width="60" label="序号">
+          <el-table-column width="60" label="序号" v-if="showIndex">
             <template v-slot="scope">{{ scope.$index + 1 + pagecontext * pagesize }}</template>
           </el-table-column>
 
@@ -163,12 +163,7 @@ import { asyncLoadJs, sleep } from '@tmagic/utils';
 import { ColumnConfig, FormState, SortProp, TableConfig } from '../schema';
 import { display, initValue } from '../utils/form';
 
-let loadedAMapJS = false; // 是否加载完js
-let firstLoadingAMapJS = true; // 否是第一次请求
-
 export default defineComponent({
-  name: 'm-form-table',
-
   props: {
     name: {
       type: String,
@@ -215,12 +210,17 @@ export default defineComponent({
       type: Boolean,
       default: true,
     },
+
+    showIndex: {
+      type: Boolean,
+      default: true,
+    },
   },
 
   emits: ['change', 'select'],
 
   setup(props, { emit }) {
-    let timer: NodeJS.Timeout | null = null;
+    let timer: number | null = null;
     const mForm = inject<FormState | undefined>('mForm');
 
     const elTable = ref<any>();
@@ -348,20 +348,15 @@ export default defineComponent({
       emit('change', props.model[modelName.value]);
     };
 
-    if (!loadedAMapJS && firstLoadingAMapJS && !(globalThis as any).XLSX) {
-      firstLoadingAMapJS = false; // 马上置为false 只让第一个created组件去请求js
-      asyncLoadJs('https://cdn.bootcdn.net/ajax/libs/xlsx/0.17.0/xlsx.full.min.js')
-        .then(() => {
-          loadedAMapJS = true;
-        })
-        .catch(() => {
-          firstLoadingAMapJS = true; // 出错置为true 下次进来还是能重新请求js
-        });
+    if (!(globalThis as any).XLSX) {
+      asyncLoadJs('https://cdn.bootcdn.net/ajax/libs/xlsx/0.17.0/xlsx.full.min.js');
     }
 
     onMounted(() => {
       if (props.config.defautSort) {
         sortChange(props.config.defautSort);
+      } else if (props.config.defaultSort) {
+        sortChange(props.config.defaultSort);
       }
 
       if (props.sort && props.sortKey) {

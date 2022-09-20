@@ -573,6 +573,7 @@ export interface TableConfig extends FormItem {
   max?: number;
   maxHeight?: number | string;
   border?: boolean;
+  showIndex?: boolean;
   enum?: any[];
   addable?: (mForm: FormState | undefined, data: any) => boolean | 'undefined' | boolean;
   delete?: (model: any, index: number, values: any) => boolean | boolean;
@@ -581,6 +582,7 @@ export interface TableConfig extends FormItem {
   defaultAdd?: (mForm: FormState | undefined, data: any) => any;
   onSelect?: (mForm: FormState | undefined, data: any) => any;
   defautSort?: SortProp;
+  defaultSort?: SortProp;
   dropSort?: boolean;
   enableFullscreen?: boolean;
   fixed?: boolean;
