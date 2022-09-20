@@ -1,3 +1,23 @@
+## [1.1.5](https://github.com/Tencent/tmagic-editor/compare/v1.1.4...v1.1.5) (2022-09-20)
+
+
+### Bug Fixes
+
+* **core:** 多个组件配置同一事件会导致此事件多次监听 ([b835bb2](https://github.com/Tencent/tmagic-editor/commit/b835bb24888db3ee150192ef10726de8f7c5ec3b)), closes [#356](https://github.com/Tencent/tmagic-editor/issues/356)
+* **editor:** code-link组件内容不更新 ([e069783](https://github.com/Tencent/tmagic-editor/commit/e0697833dab7b2b3850b955312ca1e71379cf848))
+* **editor:** layout ([30bb39d](https://github.com/Tencent/tmagic-editor/commit/30bb39d71ae481cc55c3c98824e74f502f48a23d))
+* **editor:** 添加组件后，只有在位置有调整的情况才再次更新组件 ([22c57f4](https://github.com/Tencent/tmagic-editor/commit/22c57f444fdf760bfcfa1d5a72303109609bbb2c))
+* **form:** link组件parentValues没有传递下去 ([d76c753](https://github.com/Tencent/tmagic-editor/commit/d76c753483c085afc7b062a240fa0e89450ba910))
+* **playgound:** npm run serve后runtime无法打开 ([ddf0fcd](https://github.com/Tencent/tmagic-editor/commit/ddf0fcdecce14a924ffbd3690a36fff467ca98bc)), closes [#352](https://github.com/Tencent/tmagic-editor/issues/352)
+* **playground:** npm run dev后proxy失效 ([6d6490a](https://github.com/Tencent/tmagic-editor/commit/6d6490ab311696e1b525f73d994837a04bd08d10))
+
+
+### Features
+
+* **editor:** 新增Layout ([835189a](https://github.com/Tencent/tmagic-editor/commit/835189adc9c0047bdedc31ae0367c08c1cf6024d))
+
+
+
 ## [1.1.4](https://github.com/Tencent/tmagic-editor/compare/v1.1.3...v1.1.4) (2022-09-15)
 
 
