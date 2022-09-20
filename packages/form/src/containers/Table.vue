@@ -220,7 +220,7 @@ export default defineComponent({
   emits: ['change', 'select'],
 
   setup(props, { emit }) {
-    let timer: number | null = null;
+    let timer: any | null = null;
     const mForm = inject<FormState | undefined>('mForm');
 
     const elTable = ref<any>();
