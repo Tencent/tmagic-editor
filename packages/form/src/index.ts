@@ -100,7 +100,7 @@ const install = (app: App, opt: any) => {
   app.component(Panel.name, Panel);
   app.component(Row.name, Row);
   app.component(MStep.name, MStep);
-  app.component(Table.name, Table);
+  app.component('m-form-table', Table);
   app.component(Tabs.name, Tabs);
   app.component(Text.name, Text);
   app.component(Number.name, Number);
