@@ -28,6 +28,7 @@ import {
   isCommonMethod,
   triggerCommonMethod,
 } from './events';
+import type Node from './Node';
 import Page from './Page';
 import { fillBackgroundImage, isNumber, style2Obj } from './utils';
 
@@ -207,9 +208,16 @@ class App extends EventEmitter {
       eventName = getCommonEventName(eventName, id);
     }
 
-    this.on(eventName, (fromCpt, ...args) => {
+    this.on(`${eventName}_${id}`, (fromCpt: Node, ...args) => {
       this.eventHandler(event, fromCpt, args);
     });
+  }
+
+  public emit(name: string | symbol, node: any, ...args: any[]): boolean {
+    if (typeof node.data === 'undefined') {
+      return super.emit(name, node, ...args);
+    }
+    return super.emit(`${String(name)}_${node.data.id}`, ...args);
   }
 
   public eventHandler(eventConfig: EventItemConfig, fromCpt: any, args: any[]) {
