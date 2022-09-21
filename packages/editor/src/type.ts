@@ -329,7 +329,7 @@ export type CodeState = {
   /** 代码块是否可编辑 */
   editable: boolean;
   /** 代码编辑面板的展示模式 */
-  mode: EditorMode;
+  mode: CodeEditorMode;
   /** list模式下左侧展示的代码列表 */
   combineIds: string[];
   /** 组件和代码块的绑定关系 */
@@ -338,7 +338,7 @@ export type CodeState = {
   undeletableList: string[];
 };
 
-export enum EditorMode {
+export enum CodeEditorMode {
   /** 左侧菜单，右侧代码 */
   LIST = 'list',
   /** 全屏代码 */
@@ -347,7 +347,7 @@ export enum EditorMode {
 
 export type CompRelation = {
   /** 代码块绑定关系：组件id-代码块id数组 */
-  [compId: string | number]: string[];
+  [compId: Id]: string[];
 };
 
 export interface CodeDslList {
@@ -357,13 +357,21 @@ export interface CodeDslList {
   name: string;
   /** 代码块函数内容 */
   content: any;
+  /** 是否展示代码绑定关系 */
+  showRelation?: boolean;
 }
+
 export interface ListState {
   /** 代码块列表 */
   codeList: CodeDslList[];
+  /** 与代码块绑定的组件id信息 */
+  bindComps: {
+    /** 代码块id : 组件信息 */
+    [id: string]: MNode[];
+  };
 }
 
-export enum ErrorType {
+export enum CodeDeleteErrorType {
   /** 代码块存在于不可删除列表中 */
   UNDELETEABLE = 'undeleteable',
   /** 代码块存在绑定关系 */

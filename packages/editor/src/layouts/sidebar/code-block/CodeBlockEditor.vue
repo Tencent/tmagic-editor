@@ -9,7 +9,7 @@
   >
     <layout v-model:left="left" :min-left="45" class="code-editor-layout">
       <!-- 左侧列表 -->
-      <template #left v-if="mode === EditorMode.LIST">
+      <template #left v-if="mode === CodeEditorMode.LIST">
         <el-tree
           v-if="!isEmpty(state.codeList)"
           ref="tree"
@@ -35,7 +35,7 @@
         <div
           v-if="!isEmpty(codeConfig)"
           :class="[
-            mode === EditorMode.LIST
+            mode === CodeEditorMode.LIST
               ? 'm-editor-code-block-editor-panel-list-mode'
               : 'm-editor-code-block-editor-panel',
           ]"
@@ -82,7 +82,7 @@ import { ElMessage } from 'element-plus';
 import { forIn, isEmpty } from 'lodash-es';
 
 import type { CodeBlockContent, CodeDslList, ListState, Services } from '../../../type';
-import { EditorMode } from '../../../type';
+import { CodeEditorMode } from '../../../type';
 import MagicCodeEditor from '../../CodeEditor.vue';
 import Layout from '../../Layout.vue';
 
@@ -132,7 +132,7 @@ const saveCode = async (): Promise<boolean> => {
 
   try {
     // 代码内容
-    const codeContent = codeEditor.value.getEditor().getValue();
+    const codeContent = codeEditor.value.getEditor()?.getValue();
     /* eslint no-eval: "off" */
     codeConfig.value.content = eval(codeContent);
   } catch (e: any) {
