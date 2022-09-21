@@ -229,6 +229,12 @@ export const fillConfig = (config: FormConfig = []) => [
             type: 'code-select',
             labelWidth: '100px',
           },
+          {
+            name: 'mounted',
+            text: 'mounted',
+            type: 'code-select',
+            labelWidth: '100px',
+          },
         ],
       },
     ],

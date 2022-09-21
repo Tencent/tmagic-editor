@@ -17,11 +17,13 @@
  */
 
 import { reactive } from 'vue';
-import { keys, omit, pick } from 'lodash-es';
+import { forIn, isEmpty, keys, omit, pick } from 'lodash-es';
+
+import { Id } from '@tmagic/schema';
 
 import editorService from '../services/editor';
 import type { CodeBlockContent, CodeBlockDSL, CodeState, CompRelation } from '../type';
-import { EditorMode } from '../type';
+import { CodeEditorMode } from '../type';
 import { info } from '../utils/logger';
 
 import BaseService from './BaseService';
@@ -32,7 +34,7 @@ class CodeBlock extends BaseService {
     codeDsl: null,
     id: '',
     editable: true,
-    mode: EditorMode.EDITOR,
+    mode: CodeEditorMode.EDITOR,
     combineIds: [],
     compRelation: {},
     undeletableList: [],
@@ -191,18 +193,18 @@ class CodeBlock extends BaseService {
 
   /**
    * 获取当前模式
-   * @returns {EditorMode}
+   * @returns {CodeEditorMode}
    */
-  public getMode(): EditorMode {
+  public getMode(): CodeEditorMode {
     return this.state.mode;
   }
 
   /**
    * 设置当前模式
-   * @param {EditorMode} mode 模式
+   * @param {CodeEditorMode} mode 模式
    * @returns {void}
    */
-  public async setMode(mode: EditorMode): Promise<void> {
+  public async setMode(mode: CodeEditorMode): Promise<void> {
     this.state.mode = mode;
   }
 
@@ -232,6 +234,7 @@ class CodeBlock extends BaseService {
   public async setCompRelation(compId: number | string, codeIds: string[]) {
     if (!compId) return;
     this.state.compRelation = {
+      ...this.state.compRelation,
       [compId]: codeIds,
     };
   }
@@ -242,6 +245,22 @@ class CodeBlock extends BaseService {
    */
   public getCompRelation(): CompRelation {
     return this.state.compRelation;
+  }
+
+  /**
+   * 获取代码块与组件的绑定关系
+   * @param {string} codeId 代码块id
+   * @returns {Id[]} 该代码块绑定的组件id数组
+   */
+  public getCodeRelationById(codeId: string): Id[] {
+    const codeRelation = reactive<Id[]>([]);
+    const compRelation = this.getCompRelation();
+    forIn(compRelation, (value, key) => {
+      if (value.includes(codeId)) {
+        codeRelation.push(key);
+      }
+    });
+    return codeRelation;
   }
 
   /**
@@ -286,12 +305,39 @@ class CodeBlock extends BaseService {
     return await this.getUniqueId();
   }
 
+  /**
+   * 一对一解除绑定关系
+   * @param {string} compId 组件id
+   * @param {string} codeId 代码块id
+   * @param {string[]} codeHooks 代码块挂载hook名称
+   * @returns {boolean} 结果
+   */
+  public async unbind(compId: Id, codeId: string, codeHooks: string[]): Promise<boolean> {
+    const nodeInfo = editorService.getNodeById(compId);
+    if (!nodeInfo) return false;
+    // 更新node节点信息
+    codeHooks.forEach((hook) => {
+      if (!isEmpty(nodeInfo[hook])) {
+        const newHookInfo = nodeInfo[hook].filter((item: string) => item !== codeId);
+        nodeInfo[hook] = newHookInfo;
+        editorService.update(nodeInfo);
+      }
+    });
+    // 更新绑定关系
+    const oldRelation = await this.getCompRelation();
+    const oldCodeIds = oldRelation[compId];
+    // 不能直接splice修改原数组,会导致绑定关系更新错乱
+    const newCodeIds = oldCodeIds.filter((item) => item !== codeId);
+    this.setCompRelation(compId, newCodeIds);
+    return true;
+  }
+
   public destroy() {
     this.state.isShowCodeEditor = false;
     this.state.codeDsl = null;
     this.state.id = '';
     this.state.editable = true;
-    this.state.mode = EditorMode.EDITOR;
+    this.state.mode = CodeEditorMode.EDITOR;
     this.state.combineIds = [];
     this.state.compRelation = {};
     this.state.undeletableList = [];
