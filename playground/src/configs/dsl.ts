@@ -26,6 +26,11 @@ export default {
       // eslint-disable-next-line no-eval
       content: eval(`(vm) => {\n  console.log("this is getData function")\n}`),
     },
+    code_5316: {
+      name: 'getList',
+      // eslint-disable-next-line no-eval
+      content: eval(`(vm) => {\n  console.log("this is getList function")\n}`),
+    },
   },
   items: [
     {
@@ -51,7 +56,8 @@ export default {
         fontWeight: '',
       },
       events: [],
-      created: ['code_5336'],
+      created: ['code_5316'],
+      mounted: ['code_5336'],
       items: [
         {
           type: 'text',
@@ -76,7 +82,7 @@ export default {
           text: 'Tmagic editor 营销活动编辑器',
           multiple: true,
           events: [],
-          created: [],
+          created: ['code_5316'],
         },
         {
           type: 'qrcode',

@@ -35,13 +35,14 @@
 <script lang="ts" setup>
 import { computed, defineEmits, defineProps, inject, ref, watchEffect } from 'vue';
 import { ElMessage } from 'element-plus';
-import { map } from 'lodash-es';
+import { map, union } from 'lodash-es';
 
 import { SelectConfig } from '@tmagic/form';
 
 import type { Services } from '../type';
-import { EditorMode } from '../type';
+import { CodeEditorMode } from '../type';
 const services = inject<Services>('services');
+const codeHooks = inject<string[]>('codeHooks');
 
 const emit = defineEmits(['change']);
 
@@ -79,7 +80,6 @@ const fieldKey = ref('');
 const combineIds = ref<string[]>([]);
 
 watchEffect(async () => {
-  if (!combineIds.value) return;
   const combineNames = await Promise.all(
     combineIds.value.map(async (id) => {
       const { name = '' } = (await services?.codeBlockService.getCodeContentById(id)) || {};
@@ -90,20 +90,25 @@ watchEffect(async () => {
 });
 
 const changeHandler = async (value: any) => {
-  await setCombineRelation(value);
+  await setCombineRelation();
   emit('change', value);
 };
 
 // 同步绑定关系
-const setCombineRelation = async (selectedIds: string[] | string) => {
-  if (typeof selectedIds === 'string') {
-    // 兼容select单选
-    combineIds.value = [selectedIds];
-  } else {
-    combineIds.value = selectedIds;
-  }
+const setCombineRelation = async () => {
+  //  绑定数组先置空
+  combineIds.value = [];
   // 组件id
   const { id = '' } = services?.editorService.get('node') || {};
+  codeHooks?.forEach((hook) => {
+    // continue
+    if (!props.model[hook]) return true;
+    if (typeof props.model[hook] === 'string' && props.model[hook]) {
+      combineIds.value = union(combineIds.value, [props.model[hook]]);
+    } else if (Array.isArray(props.model[hook])) {
+      combineIds.value = union(combineIds.value, props.model[hook]);
+    }
+  });
   // 记录组件与代码块的绑定关系
   await services?.codeBlockService.setCompRelation(id, combineIds.value);
   // 记录当前已被绑定的代码块，为查看弹窗的展示内容
@@ -115,8 +120,8 @@ const viewHandler = async () => {
     ElMessage.error('请先绑定代码块');
     return;
   }
-  await setCombineRelation(props.model[props.name]);
-  await services?.codeBlockService.setMode(EditorMode.LIST);
+  await setCombineRelation();
+  await services?.codeBlockService.setMode(CodeEditorMode.LIST);
   services?.codeBlockService.setCodeEditorContent(true, combineIds.value[0]);
 };
 </script>
