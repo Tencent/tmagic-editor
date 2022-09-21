@@ -206,7 +206,7 @@ class App extends EventEmitter {
     if (typeof node.data === 'undefined') {
       return super.emit(name, node, ...args);
     }
-    return super.emit(`${String(name)}_${node.data.id}`, ...args);
+    return super.emit(`${String(name)}_${node.data.id}`, node, ...args);
   }
 
   public eventHandler(eventConfig: EventItemConfig, fromCpt: any, args: any[]) {
