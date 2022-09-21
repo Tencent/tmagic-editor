@@ -61,14 +61,24 @@
                 d="M609.408 149.376 277.76 489.6a32 32 0 0 0 0 44.672l331.648 340.352a29.12 29.12 0 0 0 41.728 0 30.592 30.592 0 0 0 0-42.752L339.264 511.936l311.872-319.872a30.592 30.592 0 0 0 0-42.688 29.12 29.12 0 0 0-41.728 0z"
               ></path>
             </svg>
-            <el-button
+            <!-- todo 功能暂时隐藏 -->
+            <!-- <el-button
               v-for="(comp, index) in state.bindComps[data.id]"
               :key="index"
               class="code-comp"
               size="small"
               :plain="true"
               >{{ comp.name }}<Icon :icon="Close" class="comp-delete-icon" @click.stop="unbind(comp.id, data.id)"></Icon
-            ></el-button>
+            ></el-button> -->
+            <el-button
+              v-for="(comp, index) in state.bindComps[data.id]"
+              :key="index"
+              class="code-comp"
+              size="small"
+              :plain="true"
+              @click.stop="selectComp(comp.id)"
+              >{{ comp.name }}</el-button
+            >
           </div>
         </div>
       </template>
@@ -90,6 +100,7 @@ import { ElMessage } from 'element-plus';
 import { flattenDeep, forIn, isEmpty, values, xor } from 'lodash-es';
 
 import { Id } from '@tmagic/schema';
+import StageCore from '@tmagic/stage';
 
 import Icon from '../../../components/Icon.vue';
 import type { CodeBlockContent, Services } from '../../../type';
@@ -102,7 +113,7 @@ const props = defineProps<{
 }>();
 
 const services = inject<Services>('services');
-const codeHooks = inject<string[]>('codeHooks') || [];
+// const codeHooks = inject<string[]>('codeHooks') || [];
 
 // 代码块列表
 const state = reactive<ListState>({
@@ -251,13 +262,21 @@ const getCompName = (compId: Id): string => {
   return node?.name || String(compId);
 };
 
+// todo 功能暂时隐藏
 // 解除绑定
-const unbind = async (compId: Id, codeId: string) => {
-  const res = await services?.codeBlockService.unbind(compId, codeId, codeHooks);
-  if (res) {
-    ElMessage.success('绑定关系解除成功');
-  } else {
-    ElMessage.error('绑定关系解除失败');
-  }
+// const unbind = async (compId: Id, codeId: string) => {
+//   const res = await services?.codeBlockService.unbind(compId, codeId, codeHooks);
+//   if (res) {
+//     ElMessage.success('绑定关系解除成功');
+//   } else {
+//     ElMessage.error('绑定关系解除失败');
+//   }
+// };
+
+// 选中组件
+const selectComp = (compId: Id) => {
+  const stage = services?.editorService.get<StageCore | null>('stage');
+  services?.editorService.select(compId);
+  stage?.select(compId);
 };
 </script>
