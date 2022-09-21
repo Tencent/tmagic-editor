@@ -21,13 +21,7 @@ import { EventEmitter } from 'events';
 import type { EventItemConfig, Id, MApp } from '@tmagic/schema';
 
 import Env from './Env';
-import {
-  bindCommonEventListener,
-  DEFAULT_EVENTS,
-  getCommonEventName,
-  isCommonMethod,
-  triggerCommonMethod,
-} from './events';
+import { bindCommonEventListener, isCommonMethod, triggerCommonMethod } from './events';
 import type Node from './Node';
 import Page from './Page';
 import { fillBackgroundImage, isNumber, style2Obj } from './utils';
@@ -202,13 +196,8 @@ class App extends EventEmitter {
   }
 
   public bindEvent(event: EventItemConfig, id: string) {
-    let { name: eventName } = event;
-    if (DEFAULT_EVENTS.findIndex((defaultEvent) => defaultEvent.value === eventName) > -1) {
-      // common 事件名通过 node id 避免重复触发
-      eventName = getCommonEventName(eventName, id);
-    }
-
-    this.on(`${eventName}_${id}`, (fromCpt: Node, ...args) => {
+    const { name } = event;
+    this.on(`${name}_${id}`, (fromCpt: Node, ...args) => {
       this.eventHandler(event, fromCpt, args);
     });
   }

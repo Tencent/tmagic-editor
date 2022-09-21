@@ -41,12 +41,9 @@ export const DEFAULT_EVENTS: EventOption[] = [{ label: '点击', value: `${COMMO
 
 export const DEFAULT_METHODS: EventOption[] = [];
 
-export const getCommonEventName = (commonEventName: string, nodeId: string | number) => {
-  const returnName = `${commonEventName}:${nodeId}`;
-
-  if (commonEventName.startsWith(COMMON_EVENT_PREFIX)) return returnName;
-
-  return `${COMMON_EVENT_PREFIX}${returnName}`;
+export const getCommonEventName = (commonEventName: string) => {
+  if (commonEventName.startsWith(COMMON_EVENT_PREFIX)) return commonEventName;
+  return `${COMMON_EVENT_PREFIX}${commonEventName}`;
 };
 
 export const isCommonMethod = (methodName: string) => methodName.startsWith(COMMON_METHOD_PREFIX);
@@ -73,8 +70,7 @@ const commonClickEventHandler = (app: App, eventName: string, e: any) => {
   const node = getDirectComponent(e.target, app);
 
   if (node) {
-    const { instance, data } = node as Node;
-    app.emit(getCommonEventName(eventName, data.id), instance);
+    app.emit(getCommonEventName(eventName), node);
   }
 };
 
