@@ -317,6 +317,10 @@ export interface CodeBlockContent {
   name: string;
   /** 代码块内容 */
   content: string;
+  /** 代码块与组件的绑定关系 */
+  comps?: CodeRelation;
+  /** 扩展字段 */
+  [propName: string]: any;
 }
 
 export type CodeState = {
@@ -332,10 +336,13 @@ export type CodeState = {
   mode: CodeEditorMode;
   /** list模式下左侧展示的代码列表 */
   combineIds: string[];
-  /** 组件和代码块的绑定关系 */
-  compRelation: CompRelation;
   /** 为业务逻辑预留的不可删除的代码块列表，由业务逻辑维护（如代码块上线后不可删除） */
   undeletableList: string[];
+};
+
+export type CodeRelation = {
+  /** 组件id:['created'] */
+  [compId: string | number]: string[];
 };
 
 export enum CodeEditorMode {
@@ -344,11 +351,6 @@ export enum CodeEditorMode {
   /** 全屏代码 */
   EDITOR = 'editor',
 }
-
-export type CompRelation = {
-  /** 代码块绑定关系：组件id-代码块id数组 */
-  [compId: Id]: string[];
-};
 
 export interface CodeDslList {
   /** 代码块id */
@@ -364,6 +366,9 @@ export interface CodeDslList {
 export interface ListState {
   /** 代码块列表 */
   codeList: CodeDslList[];
+}
+
+export interface ListRelationState extends ListState {
   /** 与代码块绑定的组件id信息 */
   bindComps: {
     /** 代码块id : 组件信息 */
@@ -376,4 +381,13 @@ export enum CodeDeleteErrorType {
   UNDELETEABLE = 'undeleteable',
   /** 代码块存在绑定关系 */
   BIND = 'bind',
+}
+
+export enum CodeSelectOp {
+  /** 增加 */
+  ADD = 'add',
+  /** 删除 */
+  DELETE = 'delete',
+  /** 单选修改 */
+  CHANGE = 'change',
 }

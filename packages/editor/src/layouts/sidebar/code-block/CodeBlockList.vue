@@ -97,14 +97,14 @@
 import { computed, inject, reactive, ref, watch } from 'vue';
 import { Close, Edit, Link, View } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
-import { flattenDeep, forIn, isEmpty, values, xor } from 'lodash-es';
+import { forIn, isEmpty } from 'lodash-es';
 
 import { Id } from '@tmagic/schema';
 import StageCore from '@tmagic/stage';
 
 import Icon from '../../../components/Icon.vue';
-import type { CodeBlockContent, Services } from '../../../type';
-import { CodeDeleteErrorType, CodeDslList, CodeEditorMode, ListState } from '../../../type';
+import type { CodeBlockContent, CodeRelation, Services } from '../../../type';
+import { CodeDeleteErrorType, CodeDslList, CodeEditorMode, ListRelationState } from '../../../type';
 
 import codeBlockEditor from './CodeBlockEditor.vue';
 
@@ -113,10 +113,9 @@ const props = defineProps<{
 }>();
 
 const services = inject<Services>('services');
-// const codeHooks = inject<string[]>('codeHooks') || [];
 
 // 代码块列表
-const state = reactive<ListState>({
+const state = reactive<ListRelationState>({
   codeList: [],
   bindComps: {},
 });
@@ -124,13 +123,15 @@ const state = reactive<ListState>({
 const editable = computed(() => services?.codeBlockService.getEditStatus());
 
 // 根据代码块ID获取其绑定的组件信息
-const getBindCompsByCodeId = (codeId: string) => {
-  const bindCompIds = services?.codeBlockService.getCodeRelationById(codeId) || [];
-  if (isEmpty(bindCompIds)) {
+const getBindCompsByCodeId = (codeId: string, codeBlockContent: CodeBlockContent) => {
+  if (isEmpty(codeBlockContent) || isEmpty(codeBlockContent.comps)) {
     state.bindComps[codeId] = [];
     return;
   }
-  const compsInfo = bindCompIds.map((compId) => ({
+  const compsField = codeBlockContent.comps as CodeRelation;
+  const bindCompIds = Object.keys(compsField);
+  const bindCompsFiltered = bindCompIds.filter((compId) => !isEmpty(compsField[compId]));
+  const compsInfo = bindCompsFiltered.map((compId) => ({
     id: compId,
     name: getCompName(compId),
   }));
@@ -143,7 +144,7 @@ const initList = async () => {
   if (!codeDsl) return;
   state.codeList = [];
   forIn(codeDsl, (value: CodeBlockContent, codeId: string) => {
-    getBindCompsByCodeId(codeId);
+    getBindCompsByCodeId(codeId, value);
     state.codeList.push({
       id: codeId,
       name: value.name,
@@ -160,22 +161,7 @@ watch(
   },
   {
     immediate: true,
-  },
-);
-
-// 监听绑定关系修改，更新到代码块列表
-watch(
-  () => services?.codeBlockService.getCompRelation(),
-  (curRelation, oldRelation) => {
-    forIn(curRelation, (codeArr, compId) => {
-      let oldCodeArr: string[] = [];
-      if (oldRelation) {
-        oldCodeArr = oldRelation[compId];
-      }
-      // 可能一次清空全部绑定关系，对比结果为数组
-      const diffCodeIds = xor(codeArr, oldCodeArr);
-      diffCodeIds.forEach((codeId) => getBindCompsByCodeId(codeId));
-    });
+    deep: true,
   },
 );
 
@@ -219,15 +205,14 @@ const editCode = async (key: string) => {
 
 // 删除代码块
 const deleteCode = (key: string) => {
-  const compRelation = services?.codeBlockService.getCompRelation();
-  const codeIds = flattenDeep(values(compRelation));
+  const existBinds = !!(state.bindComps[key]?.length > 0);
   const undeleteableList = services?.codeBlockService.getUndeletableList() || [];
-  if (!codeIds.includes(key) && !undeleteableList.includes(key)) {
+  if (!existBinds && !undeleteableList.includes(key)) {
     // 无绑定关系，且不在不可删除列表中
     services?.codeBlockService.deleteCodeDslByIds([key]);
   } else {
     if (typeof props.customError === 'function') {
-      props.customError(key, codeIds.includes(key) ? CodeDeleteErrorType.BIND : CodeDeleteErrorType.UNDELETEABLE);
+      props.customError(key, existBinds ? CodeDeleteErrorType.BIND : CodeDeleteErrorType.UNDELETEABLE);
     } else {
       ElMessage.error('代码块删除失败');
     }
