@@ -45,11 +45,12 @@
             <template #header>
               <div class="code-name-wrapper">
                 <div class="code-name-label">代码块名称</div>
-                <el-input class="code-name-input" v-model="codeConfig.name" :disabled="!editable" />
+                <el-input v-if="codeConfig" class="code-name-input" v-model="codeConfig.name" :disabled="!editable" />
               </div>
             </template>
             <div class="m-editor-wrapper">
               <magic-code-editor
+                v-if="codeConfig"
                 ref="codeEditor"
                 class="m-editor-container"
                 :init-values="`${codeConfig.content}`"
@@ -80,6 +81,7 @@
 import { computed, inject, reactive, ref, watchEffect } from 'vue';
 import { ElMessage } from 'element-plus';
 import { forIn, isEmpty } from 'lodash-es';
+import type * as monaco from 'monaco-editor';
 
 import type { CodeBlockContent, CodeDslList, ListState, Services } from '../../../type';
 import { CodeEditorMode } from '../../../type';
@@ -132,7 +134,7 @@ const saveCode = async (): Promise<boolean> => {
 
   try {
     // 代码内容
-    const codeContent = codeEditor.value.getEditor()?.getValue();
+    const codeContent = (codeEditor.value.getEditor() as monaco.editor.IStandaloneCodeEditor)?.getValue();
     /* eslint no-eval: "off" */
     codeConfig.value.content = eval(codeContent);
   } catch (e: any) {

@@ -243,9 +243,9 @@ class CodeBlock extends BaseService {
       try {
         diffCodeIds.forEach((codeId) => {
           const compsContent = codeDsl[codeId].comps;
-          const index = compsContent[compId].findIndex((item) => item === hook);
-          if (index !== -1) {
-            compsContent[compId].splice(index, 1);
+          const index = compsContent?.[compId].findIndex((item) => item === hook);
+          if (typeof index !== 'undefined' && index !== -1) {
+            compsContent?.[compId].splice(index, 1);
           }
         });
       } catch (e) {
@@ -265,7 +265,7 @@ class CodeBlock extends BaseService {
             };
           } else {
             // 往已有的关系中添加hook
-            existHooks.push(hook);
+            existHooks?.push(hook);
           }
         });
       } catch (e) {
