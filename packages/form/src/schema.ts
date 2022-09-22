@@ -570,20 +570,29 @@ export interface TableConfig extends FormItem {
   tableItems?: ColumnConfig[];
   groupItems?: ColumnConfig[];
   enableToggleMode?: boolean;
+  /** 最大行数 */
   max?: number;
+  /** 最大高度 */
   maxHeight?: number | string;
   border?: boolean;
+  /** 显示行号 */
   showIndex?: boolean;
   enum?: any[];
+  /** 是否显示添加按钮 */
   addable?: (mForm: FormState | undefined, data: any) => boolean | 'undefined' | boolean;
+  /** 是否显示删除按钮 */
   delete?: (model: any, index: number, values: any) => boolean | boolean;
+  /** 是否显示导入按钮 */
   importable?: (mForm: FormState | undefined, data: any) => boolean | 'undefined' | boolean;
+  /** 是否显示checkbox */
   selection?: (mForm: FormState | undefined, data: any) => boolean | boolean | 'single';
+  /** 新增的默认行 */
   defaultAdd?: (mForm: FormState | undefined, data: any) => any;
   onSelect?: (mForm: FormState | undefined, data: any) => any;
   defautSort?: SortProp;
   defaultSort?: SortProp;
   dropSort?: boolean;
+  /** 是否显示全屏按钮 */
   enableFullscreen?: boolean;
   fixed?: boolean;
   itemExtra?: string | FilterFunction;

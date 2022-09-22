@@ -76,7 +76,7 @@
             width="45"
           ></el-table-column>
 
-          <el-table-column width="60" label="序号" v-if="showIndex">
+          <el-table-column width="60" label="序号" v-if="showIndex && config.showIndex">
             <template v-slot="scope">{{ scope.$index + 1 + pagecontext * pagesize }}</template>
           </el-table-column>
 
