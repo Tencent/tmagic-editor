@@ -61,7 +61,8 @@ class App extends EventEmitter {
     super();
 
     this.env = new Env(options.ua);
-    this.codeDsl = options.config?.methods;
+    // 代码块描述内容在dsl codeBlock字段
+    this.codeDsl = options.config?.codeBlock;
     options.platform && (this.platform = options.platform);
     options.jsEngine && (this.jsEngine = options.jsEngine);
     options.designWidth && (this.designWidth = options.designWidth);
@@ -141,7 +142,7 @@ class App extends EventEmitter {
    * @param curPage 当前页面id
    */
   public setConfig(config: MApp, curPage?: Id) {
-    this.codeDsl = config.methods;
+    this.codeDsl = config.codeBlock;
     this.pages = new Map();
     config.items?.forEach((page) => {
       this.pages.set(
