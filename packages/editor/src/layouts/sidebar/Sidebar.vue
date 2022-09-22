@@ -11,6 +11,10 @@
         <slot name="layer-panel-header"></slot>
       </template>
 
+      <template #layer-node-content="{ node, data }" v-if="item === 'layer'">
+        <slot name="layer-node-content" :data="data" :node="node"></slot>
+      </template>
+
       <template #component-list-panel-header v-if="item === 'component-list'">
         <slot name="component-list-panel-header"></slot>
       </template>

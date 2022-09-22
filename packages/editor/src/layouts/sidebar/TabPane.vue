@@ -30,8 +30,17 @@
         <component v-else-if="config.slots?.layerPanelHeader" :is="config.slots.layerPanelHeader" />
       </template>
 
-      <template #layer-node-content="{ data, node }" v-if="config.slots?.layerNodeContent">
-        <component :is="config.slots?.layerNodeContent" :data="data" :node="node" />
+      <template
+        #layer-node-content="{ data: nodeData, node }"
+        v-if="data === 'layer' || config.slots?.layerNodeContent"
+      >
+        <slot v-if="data === 'layer'" name="layer-node-content" :data="nodeData" :node="node"></slot>
+        <component
+          v-else-if="config.slots?.layerNodeContent"
+          :is="config.slots.layerNodeContent"
+          :data="data"
+          :node="node"
+        />
       </template>
     </component>
   </el-tab-pane>
