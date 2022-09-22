@@ -1,3 +1,49 @@
+# [1.2.0-beta.1](https://github.com/Tencent/tmagic-editor/compare/v1.1.6...v1.2.0-beta.1) (2022-09-22)
+
+
+### Bug Fixes
+
+* **core:** 修复执行代码块的顺序问题 ([c3b5022](https://github.com/Tencent/tmagic-editor/commit/c3b502254b4cfac5f14af9173a6e1737732c1745))
+* **editor:** dsl存储代码块的字段改为methods ([fa01497](https://github.com/Tencent/tmagic-editor/commit/fa0149773fb8435c099bb98eb91657c70e7599e3))
+* **editor:** icon使用editor封装的icon组件 ([441a412](https://github.com/Tencent/tmagic-editor/commit/441a412817f01a1847b48dc4423c0d740a77f749))
+* **editor:** 代码块删除支持传参处理失败逻辑,ts类型修复 ([896f92b](https://github.com/Tencent/tmagic-editor/commit/896f92b5a88729f3178c3556932e761a9fcd37c0))
+* **editor:** 修复从dsl初始化时代码块绑定关系未同步的问题 ([2356ff5](https://github.com/Tencent/tmagic-editor/commit/2356ff514d0a8019cac8b2b57fdbac29495200e0))
+* **editor:** 修复从dsl初始化时代码块绑定关系未同步的问题,修复一些warning,优化语法报错时保存并关闭的交互逻辑 ([134efbf](https://github.com/Tencent/tmagic-editor/commit/134efbfb0f2eed8e536cc17ed6d1add260e5bd43))
+* **editor:** 修复语法报错 ([8b9ac82](https://github.com/Tencent/tmagic-editor/commit/8b9ac826fcf624f65c30197f5b6757e74d45dbd6))
+* **editor:** 修复通过dsl初始化代码块时,点击查看获取不到绑定的代码块的问题 ([4e6fbab](https://github.com/Tencent/tmagic-editor/commit/4e6fbab26de062a3784bf3c89c24850ef910f109))
+* **editor:** 修改样式,修改代码块ID生成逻辑 ([a452cec](https://github.com/Tencent/tmagic-editor/commit/a452cecc444a155efa1a7a25391125b03677ffe7))
+* **editor:** 导出CodeBlockList组件 ([8a9971a](https://github.com/Tencent/tmagic-editor/commit/8a9971ab7b4dc1e43a407af0a5ce0b47bed7c6ec))
+* **editor:** 样式优化 ([27d8640](https://github.com/Tencent/tmagic-editor/commit/27d8640fbc48184e4f73aac180f4f35638f92a1a))
+* **editor:** 样式修改,editor pannel使用resize组件 ([c2637b1](https://github.com/Tencent/tmagic-editor/commit/c2637b1b0cb10dd2f6ee2199916d3881a9d0f071))
+* **editor:** 绑定关系组件增加option来源的默认逻辑 ([ddd22ff](https://github.com/Tencent/tmagic-editor/commit/ddd22ff486c28bbc55d86190f263648ebf32f94f))
+* **editor:** 绑定关系组件支持单选配置 ([7b961f1](https://github.com/Tencent/tmagic-editor/commit/7b961f128424c95ca20a9c4fbe3290f114ab865b))
+* **editor:** 解决修改代码名称后已选择的select tag不更新的问题,优化一些样式 ([bc000e9](https://github.com/Tencent/tmagic-editor/commit/bc000e9ca606ea744a2ecf4da58b2aa71681c38b))
+* **editor:** 默认展开组件列表 ([37181d3](https://github.com/Tencent/tmagic-editor/commit/37181d3084a9735e7a54d50b00632cd99e3da288))
+* **stage:** 修复ctrl+tab切到其他窗口引起多选状态混乱的问题 ([09c9af8](https://github.com/Tencent/tmagic-editor/commit/09c9af8454babbebe7cb5e076d62025527eeff80))
+
+
+### Features
+
+* **core:** 修改core生命周期钩子处理逻辑,执行对应的代码块 ([310ee32](https://github.com/Tencent/tmagic-editor/commit/310ee32d75bc9d87c8558be3c35be971716aec9a))
+* **editor):** 组件绑定代码块form表单配置 ([7020ab4](https://github.com/Tencent/tmagic-editor/commit/7020ab4a1fcc50a9ad90c7688545c5292c505918))
+* **editor:** codeBlockService.getCodeDsl支持增加是否强制刷新参数 ([fc749b7](https://github.com/Tencent/tmagic-editor/commit/fc749b7375af33a1c7cf8d4323e2f220164917d9))
+* **editor:** codeBlockService暴露一些方法支持hook,默认设置代码块到dsl的method字段 ([5b220a0](https://github.com/Tencent/tmagic-editor/commit/5b220a0e061e2a54ff87703eccb33954276844a4))
+* **editor:** 代码块service封装完成 ([7640c06](https://github.com/Tencent/tmagic-editor/commit/7640c06ccb554b3ff28b65ee551cebfccc1c5f53))
+* **editor:** 代码块功能增加删除,完善一些边界情况的交互 ([2f803c9](https://github.com/Tencent/tmagic-editor/commit/2f803c963a8c02b1244387c435e6e01ccdee183a))
+* **editor:** 代码块功能新增slot ([452c80d](https://github.com/Tencent/tmagic-editor/commit/452c80d829e3e127a51ac9c5cb1356bc4eafba61))
+* **editor:** 代码块新增,编辑器保存至dsl ([0c2c33f](https://github.com/Tencent/tmagic-editor/commit/0c2c33f85431e29e0857ed1d755772acb7deaa6c))
+* **editor:** 代码块绑定功能完成 ([0c25cf7](https://github.com/Tencent/tmagic-editor/commit/0c25cf795fa44e97bc98b75aa37c11e3505789e8))
+* **editor:** 代码块编辑区改为使用弹窗,代码块slot完善 ([f1242ee](https://github.com/Tencent/tmagic-editor/commit/f1242ee3f46ca2ba7df2c88033772680f74aaf9e))
+* **editor:** 增加代码块搜索,代码编辑器同步设置是否可编辑属性,修复不可编辑状态下弹窗无法关闭的问题 ([9e1fb42](https://github.com/Tencent/tmagic-editor/commit/9e1fb42783afa05849bde8a9e27082a02d9ff69a))
+* **editor:** 导出codeBlockService ([25d9de1](https://github.com/Tencent/tmagic-editor/commit/25d9de10e26e71c1e7ca73ab128bf829245a0c56))
+* **editor:** 支持代码块维度查看与组件的绑定关系,并支持从代码块列表解除绑定 ([bfaa831](https://github.com/Tencent/tmagic-editor/commit/bfaa8317e36db9c0387e041820f075a98a3887b5))
+* **editor:** 新增,编辑代码块完成 ([2a8cfe5](https://github.com/Tencent/tmagic-editor/commit/2a8cfe58c4c0b86d48b759f92665bb4705cd1530))
+* **editor:** 暂时隐藏代码块列表删除组件功能,支持点击组件tag定位到组件 ([0b3585c](https://github.com/Tencent/tmagic-editor/commit/0b3585c150505dfa93c86d5421b392f2551e2579))
+* **editor:** 组件代码块的绑定关系记录到dsl中,修复删除组件解除关系的问题,代码块dsl支持扩展字段 ([92f3696](https://github.com/Tencent/tmagic-editor/commit/92f3696e4432b70bdd2d9ab5de36f9f3df0238c3))
+* **form:** select动态监听事件优化 ([040d5d0](https://github.com/Tencent/tmagic-editor/commit/040d5d0d2c7f5a857c7d57e56dd6050940f62e4a))
+
+
+
 ## [1.1.6](https://github.com/Tencent/tmagic-editor/compare/v1.1.5...v1.1.6) (2022-09-22)
 
 
