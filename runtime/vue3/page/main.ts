@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-import { createApp } from 'vue';
+import { createApp, defineAsyncComponent } from 'vue';
 
 import Core from '@tmagic/core';
 import { getUrlParam } from '@tmagic/utils';
 
-import components from '../.tmagic/comp-entry';
+import components from '../.tmagic/async-comp-entry';
 import plugins from '../.tmagic/plugin-entry';
 
 import request from './utils/request';
@@ -33,7 +33,10 @@ const magicApp = createApp(AppComponent);
 magicApp.use(request);
 
 Object.entries(components).forEach(([type, component]: [string, any]) => {
-  magicApp.component(`magic-ui-${type}`, component);
+  magicApp.component(
+    `magic-ui-${type}`,
+    defineAsyncComponent(() => component),
+  );
 });
 
 Object.values(plugins).forEach((plugin: any) => {
