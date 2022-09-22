@@ -149,7 +149,7 @@ const initList = async () => {
       id: codeId,
       name: value.name,
       content: value.content,
-      showRelation: false,
+      showRelation: true,
     });
   });
 };
