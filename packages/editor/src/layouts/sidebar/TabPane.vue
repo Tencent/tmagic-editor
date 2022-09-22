@@ -38,7 +38,7 @@
         <component
           v-else-if="config.slots?.layerNodeContent"
           :is="config.slots.layerNodeContent"
-          :data="data"
+          :data="nodeData"
           :node="node"
         />
       </template>
