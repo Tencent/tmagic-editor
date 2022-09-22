@@ -17,14 +17,14 @@
  */
 
 import { reactive } from 'vue';
-import { forIn, isEmpty, keys, omit, pick } from 'lodash-es';
+import { cloneDeep, forIn, isEmpty, keys, omit, pick } from 'lodash-es';
 
-import { Id } from '@tmagic/schema';
+import { Id, MNode } from '@tmagic/schema';
 
 import editorService from '../services/editor';
-import type { CodeBlockContent, CodeBlockDSL, CodeState, CompRelation } from '../type';
-import { CodeEditorMode } from '../type';
-import { info } from '../utils/logger';
+import type { CodeBlockContent, CodeBlockDSL, CodeState } from '../type';
+import { CodeEditorMode, CodeSelectOp } from '../type';
+import { error, info } from '../utils/logger';
 
 import BaseService from './BaseService';
 
@@ -36,7 +36,6 @@ class CodeBlock extends BaseService {
     editable: true,
     mode: CodeEditorMode.EDITOR,
     combineIds: [],
-    compRelation: {},
     undeletableList: [],
   });
 
@@ -52,7 +51,6 @@ class CodeBlock extends BaseService {
       'setEditStatus',
       'setMode',
       'setCombineIds',
-      'setCompRelation',
       'setUndeleteableList',
       'deleteCodeDslByIds',
     ]);
@@ -102,9 +100,14 @@ class CodeBlock extends BaseService {
    */
   public async setCodeDslById(id: string, codeConfig: CodeBlockContent): Promise<void> {
     let codeDsl = await this.getCodeDsl();
+    if (!codeDsl) return;
+    const existContent = codeDsl[id] || {};
     codeDsl = {
       ...codeDsl,
-      [id]: codeConfig,
+      [id]: {
+        ...existContent,
+        ...codeConfig,
+      },
     };
     await this.setCodeDsl(codeDsl);
   }
@@ -226,41 +229,73 @@ class CodeBlock extends BaseService {
   }
 
   /**
-   * 设置组件与代码块的绑定关系
-   * @param {number | string} compId 组件id
-   * @param {string[]} codeIds 代码块id数组
+   * 设置绑定关系
+   * @param {Id} 组件id
+   * @param {string[]} diffCodeIds 代码块id数组
+   * @param {CodeSelectOp} opFlag 操作类型
+   * @param {string} hook 代码块挂载hook名称
    * @returns {void}
    */
-  public async setCompRelation(compId: number | string, codeIds: string[]) {
-    if (!compId) return;
-    this.state.compRelation = {
-      ...this.state.compRelation,
-      [compId]: codeIds,
-    };
-  }
-
-  /**
-   * 获取组件与代码块的绑定关系
-   * @returns {CompRelation}
-   */
-  public getCompRelation(): CompRelation {
-    return this.state.compRelation;
-  }
-
-  /**
-   * 获取代码块与组件的绑定关系
-   * @param {string} codeId 代码块id
-   * @returns {Id[]} 该代码块绑定的组件id数组
-   */
-  public getCodeRelationById(codeId: string): Id[] {
-    const codeRelation = reactive<Id[]>([]);
-    const compRelation = this.getCompRelation();
-    forIn(compRelation, (value, key) => {
-      if (value.includes(codeId)) {
-        codeRelation.push(key);
+  public async setCombineRelation(compId: Id, diffCodeIds: string[], opFlag: CodeSelectOp, hook: string) {
+    const codeDsl = cloneDeep(await this.getCodeDsl());
+    if (!codeDsl) return;
+    if (opFlag === CodeSelectOp.DELETE) {
+      try {
+        diffCodeIds.forEach((codeId) => {
+          const compsContent = codeDsl[codeId].comps;
+          const index = compsContent[compId].findIndex((item) => item === hook);
+          if (index !== -1) {
+            compsContent[compId].splice(index, 1);
+          }
+        });
+      } catch (e) {
+        error(e);
+        throw new Error('解绑代码块失败');
       }
-    });
-    return codeRelation;
+    } else if (opFlag === CodeSelectOp.ADD) {
+      try {
+        diffCodeIds.forEach((codeId) => {
+          const compsContent = codeDsl[codeId].comps;
+          const existHooks = compsContent?.[compId];
+          if (isEmpty(existHooks)) {
+            // comps属性不存在，或者comps为空：新增
+            codeDsl[codeId].comps = {
+              ...(codeDsl[codeId].comps || {}),
+              [compId]: [hook],
+            };
+          } else {
+            // 往已有的关系中添加hook
+            existHooks.push(hook);
+          }
+        });
+      } catch (e) {
+        error(e);
+        throw new Error('绑定代码块失败');
+      }
+    } else if (opFlag === CodeSelectOp.CHANGE) {
+      // 单选修改
+      forIn(codeDsl, (codeBlockContent, codeId) => {
+        if (codeId === diffCodeIds[0]) {
+          // 增加
+          codeBlockContent.comps = {
+            ...(codeBlockContent?.comps || {}),
+            [compId]: [hook],
+          };
+        } else if (isEmpty(diffCodeIds) || codeId !== diffCodeIds[0]) {
+          // 清空或者移除之前的选项
+          const compHooks = codeBlockContent?.comps?.[compId];
+          // continue
+          if (!compHooks) return true;
+          const index = compHooks.findIndex((hookName) => hookName === hook);
+          if (index !== -1) {
+            compHooks.splice(index, 1);
+            // break
+            return false;
+          }
+        }
+      });
+    }
+    this.setCodeDsl(codeDsl);
   }
 
   /**
@@ -306,30 +341,42 @@ class CodeBlock extends BaseService {
   }
 
   /**
-   * 一对一解除绑定关系
+   * 一对一解除绑定关系  功能隐藏，暂时注释
    * @param {string} compId 组件id
    * @param {string} codeId 代码块id
    * @param {string[]} codeHooks 代码块挂载hook名称
    * @returns {boolean} 结果
    */
-  public async unbind(compId: Id, codeId: string, codeHooks: string[]): Promise<boolean> {
-    const nodeInfo = editorService.getNodeById(compId);
-    if (!nodeInfo) return false;
-    // 更新node节点信息
-    codeHooks.forEach((hook) => {
-      if (!isEmpty(nodeInfo[hook])) {
-        const newHookInfo = nodeInfo[hook].filter((item: string) => item !== codeId);
-        nodeInfo[hook] = newHookInfo;
-        editorService.update(nodeInfo);
-      }
-    });
-    // 更新绑定关系
-    const oldRelation = await this.getCompRelation();
-    const oldCodeIds = oldRelation[compId];
-    // 不能直接splice修改原数组,会导致绑定关系更新错乱
-    const newCodeIds = oldCodeIds.filter((item) => item !== codeId);
-    this.setCompRelation(compId, newCodeIds);
-    return true;
+  // public async unbind(compId: Id, codeId: string, codeHooks: string[]): Promise<boolean> {
+  //   const nodeInfo = editorService.getNodeById(compId);
+  //   if (!nodeInfo) return false;
+  //   // 更新node节点信息
+  //   codeHooks.forEach((hook) => {
+  //     if (!isEmpty(nodeInfo[hook])) {
+  //       const newHookInfo = nodeInfo[hook].filter((item: string) => item !== codeId);
+  //       nodeInfo[hook] = newHookInfo;
+  //       editorService.update(nodeInfo);
+  //     }
+  //   });
+  //   // 更新绑定关系
+  //   const oldRelation = await this.getCompRelation();
+  //   const oldCodeIds = oldRelation[compId];
+  //   // 不能直接splice修改原数组,会导致绑定关系更新错乱
+  //   const newCodeIds = oldCodeIds.filter((item) => item !== codeId);
+  //   this.setCompRelation(compId, newCodeIds);
+  //   return true;
+  // }
+
+  /**
+   * 通过组件id解除绑定关系（删除组件）
+   * @param {MNode} compId 组件节点
+   * @returns void
+   */
+  public async deleteCompsInRelation(node: MNode) {
+    const codeDsl = cloneDeep(await this.getCodeDsl());
+    if (!codeDsl) return;
+    this.recurseNodes(node, codeDsl);
+    this.setCodeDsl(codeDsl);
   }
 
   public destroy() {
@@ -339,8 +386,21 @@ class CodeBlock extends BaseService {
     this.state.editable = true;
     this.state.mode = CodeEditorMode.EDITOR;
     this.state.combineIds = [];
-    this.state.compRelation = {};
     this.state.undeletableList = [];
+  }
+
+  // 删除组件时 如果是容器 需要遍历删除其包含节点的绑定信息
+  private recurseNodes(node: MNode, codeDsl: CodeBlockDSL) {
+    if (!node.id) return;
+    forIn(codeDsl, (codeBlockContent) => {
+      const compsContent = codeBlockContent.comps || {};
+      codeBlockContent.comps = omit(compsContent, node.id);
+    });
+    if (!isEmpty(node.items)) {
+      node.items.forEach((item: MNode) => {
+        this.recurseNodes(item, codeDsl);
+      });
+    }
   }
 }
 

@@ -25,11 +25,18 @@ export default {
       name: 'getData',
       // eslint-disable-next-line no-eval
       content: eval(`(vm) => {\n  console.log("this is getData function")\n}`),
+      comps: {
+        page_299: ['mounted', 'created'],
+      },
     },
     code_5316: {
       name: 'getList',
       // eslint-disable-next-line no-eval
       content: eval(`(vm) => {\n  console.log("this is getList function")\n}`),
+      comps: {
+        text_9027: ['created'],
+        page_299: ['created'],
+      },
     },
   },
   items: [
@@ -56,7 +63,7 @@ export default {
         fontWeight: '',
       },
       events: [],
-      created: ['code_5316'],
+      created: ['code_5316', 'code_5336'],
       mounted: ['code_5336'],
       items: [
         {
