@@ -69,7 +69,7 @@ class CodeBlock extends BaseService {
   }
 
   /**
-   * 获取活动的代码块dsl数据源（默认从dsl中的methods字段读取）
+   * 获取活动的代码块dsl数据源（默认从dsl中的codeBlock字段读取）
    * @param {boolean} forceRefresh 是否强制从活动dsl拉取刷新
    * @returns {CodeBlockDSL | null}
    */
