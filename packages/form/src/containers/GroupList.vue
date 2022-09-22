@@ -23,14 +23,13 @@
 
     <el-button @click="addHandler" size="small" v-if="addable">添加组</el-button>
 
-    <el-button icon="el-icon-s-grid" size="small" @click="toggleMode" v-if="config.enableToggleMode"
-      >切换为表格</el-button
-    >
+    <el-button :icon="Grid" size="small" @click="toggleMode" v-if="config.enableToggleMode">切换为表格</el-button>
   </div>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, inject, PropType } from 'vue';
+import { Grid } from '@element-plus/icons-vue';
 
 import { FormState, GroupListConfig } from '../schema';
 import { initValue } from '../utils/form';
@@ -144,6 +143,7 @@ export default defineComponent({
         }))) as any;
     };
     return {
+      Grid,
       addable,
       toggleMode,
       removeHandler,

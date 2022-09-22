@@ -21,15 +21,14 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="操作" width="60" :fixed="config.fixed === false ? undefined : 'left'">
+          <el-table-column label="操作" width="55" align="center" :fixed="config.fixed === false ? undefined : 'left'">
             <template v-slot="scope">
-              <el-button
+              <el-icon
                 v-show="showDelete(scope.$index + 1 + pagecontext * pagesize - 1)"
-                type="danger"
-                text
-                :icon="Delete"
+                class="m-table-delete-icon"
                 @click="removeHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
-              ></el-button>
+                ><Delete
+              /></el-icon>
             </template>
           </el-table-column>
 
@@ -218,6 +217,8 @@ export default defineComponent({
   },
 
   emits: ['change', 'select'],
+
+  components: { Delete },
 
   setup(props, { emit }) {
     let timer: any | null = null;
