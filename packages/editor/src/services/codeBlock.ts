@@ -69,7 +69,7 @@ class CodeBlock extends BaseService {
   }
 
   /**
-   * 获取活动的代码块dsl数据源（默认从dsl中的codeBlock字段读取）
+   * 获取活动的代码块dsl数据源（默认从dsl中的codeBlocks字段读取）
    * @param {boolean} forceRefresh 是否强制从活动dsl拉取刷新
    * @returns {CodeBlockDSL | null}
    */
@@ -100,15 +100,21 @@ class CodeBlock extends BaseService {
    */
   public async setCodeDslById(id: string, codeConfig: CodeBlockContent): Promise<void> {
     let codeDsl = await this.getCodeDsl();
-    if (!codeDsl) return;
-    const existContent = codeDsl[id] || {};
-    codeDsl = {
-      ...codeDsl,
-      [id]: {
-        ...existContent,
-        ...codeConfig,
-      },
-    };
+    if (!codeDsl) {
+      // dsl中无代码块字段
+      codeDsl = {
+        [id]: codeConfig,
+      };
+    } else {
+      const existContent = codeDsl[id] || {};
+      codeDsl = {
+        ...codeDsl,
+        [id]: {
+          ...existContent,
+          ...codeConfig,
+        },
+      };
+    }
     await this.setCodeDsl(codeDsl);
   }
 
