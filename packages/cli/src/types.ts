@@ -58,6 +58,8 @@ export interface UserConfig {
   cleanTemp: boolean;
   /** npm 配置，用于当packages配置有npm包名时，可以自动安装npm包 */
   npmConfig?: NpmConfig;
+  /** 是否使用import()加载组件 */
+  dynamicImport?: boolean;
   onInit?: (app: Core) => ModuleMainFilePath | Promise<ModuleMainFilePath>;
   onPrepare?: (app: Core) => void;
 }
