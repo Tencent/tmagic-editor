@@ -42,7 +42,7 @@ export { default as uiService } from './services/ui';
 export { default as codeBlockService } from './services/codeBlock';
 export { default as ComponentListPanel } from './layouts/sidebar/ComponentListPanel.vue';
 export { default as LayerPanel } from './layouts/sidebar/LayerPanel.vue';
-export { default as CodeBlockList } from './layouts/sidebar/code-block/CodeBlockList.vue';
+export { default as CodeSelect } from './fields/CodeSelect.vue';
 export { default as PropsPanel } from './layouts/PropsPanel.vue';
 export { default as ToolButton } from './components/ToolButton.vue';
 export { default as ContentMenu } from './components/ContentMenu.vue';
