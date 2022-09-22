@@ -34,13 +34,13 @@
   "dependencies": {
     "@tmagic/form": "1.1.5",
     "@tmagic/utils": "1.1.5",
-    "element-plus": "^2.2.6",
+    "element-plus": "^2.2.17",
     "lodash-es": "^4.17.21",
     "vue": "^3.2.37"
   },
   "peerDependencies": {
     "@tmagic/form": "1.1.5",
-    "element-plus": "^2.2.6",
+    "element-plus": "^2.2.17",
     "vue": "^3.2.37"
   },
   "devDependencies": {
