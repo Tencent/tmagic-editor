@@ -1,3 +1,24 @@
+## [1.1.6](https://github.com/Tencent/tmagic-editor/compare/v1.1.5...v1.1.6) (2022-09-22)
+
+
+### Bug Fixes
+
+* **core:** 保证传参行为一致 ([b0419cd](https://github.com/Tencent/tmagic-editor/commit/b0419cdbaf8fab2ea17edd650fb10155913e69f7))
+* **core:** 修复emit 无node时的情况 ([34b628c](https://github.com/Tencent/tmagic-editor/commit/34b628cc07100b33dab462d19b299fbb4ad11676))
+* **core:** 修复多组件同一事件监听问题修改后导致的共通点击失效问题 ([a96d547](https://github.com/Tencent/tmagic-editor/commit/a96d547c20b1c808d5399dcb0435b56513b759ac))
+* **editor:** layer-node-content slot参数出错 ([4643acb](https://github.com/Tencent/tmagic-editor/commit/4643acb0f8c67c0bdb0fabecd5bf10e262a81aa1))
+
+
+### Features
+
+* **cli:** 添加dynamicImport配置参数，用于设置是否使用import()来加载组件 ([c817ad6](https://github.com/Tencent/tmagic-editor/commit/c817ad6bb680a84453ef3d99de14c8d8a36b1f58)), closes [#366](https://github.com/Tencent/tmagic-editor/issues/366)
+* **editor:** 新增layer-node-content slot,用于定制组件树节点 ([cda0c41](https://github.com/Tencent/tmagic-editor/commit/cda0c41ad499e5e8ec7b66ddaae607ad96633c5a)), closes [#368](https://github.com/Tencent/tmagic-editor/issues/368)
+* **form:** table新增showIndex配置，用于控制是否显示行索引 ([560a3ac](https://github.com/Tencent/tmagic-editor/commit/560a3acfae2e467faa894ed16067ebeb941c6fef))
+* **form:** table配置支持showIndex用于控制行号 ([eb03ce3](https://github.com/Tencent/tmagic-editor/commit/eb03ce358fd1ccaeb1b2f82285804d1c24349262))
+* **runtime:** vue3使用dynamicImport ([a16a7e6](https://github.com/Tencent/tmagic-editor/commit/a16a7e6a4d8a072ca94f5c2c50a17bfbf70279af))
+
+
+
 ## [1.1.5](https://github.com/Tencent/tmagic-editor/compare/v1.1.4...v1.1.5) (2022-09-20)
 
 
