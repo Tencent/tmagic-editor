@@ -203,10 +203,10 @@ class App extends EventEmitter {
   }
 
   public emit(name: string | symbol, node: any, ...args: any[]): boolean {
-    if (typeof node.data === 'undefined') {
-      return super.emit(name, node, ...args);
+    if (node?.data?.id) {
+      return super.emit(`${String(name)}_${node.data.id}`, node, ...args);
     }
-    return super.emit(`${String(name)}_${node.data.id}`, node, ...args);
+    return super.emit(name, node, ...args);
   }
 
   public eventHandler(eventConfig: EventItemConfig, fromCpt: any, args: any[]) {
