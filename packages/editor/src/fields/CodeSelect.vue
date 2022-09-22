@@ -35,14 +35,13 @@
 <script lang="ts" setup>
 import { computed, defineEmits, defineProps, inject, ref, watchEffect } from 'vue';
 import { ElMessage } from 'element-plus';
-import { map, union } from 'lodash-es';
+import { cloneDeep, map, xor } from 'lodash-es';
 
 import { SelectConfig } from '@tmagic/form';
 
 import type { Services } from '../type';
-import { CodeEditorMode } from '../type';
+import { CodeEditorMode, CodeSelectOp } from '../type';
 const services = inject<Services>('services');
-const codeHooks = inject<string[]>('codeHooks');
 
 const emit = defineEmits(['change']);
 
@@ -77,7 +76,9 @@ const selectConfig = computed(() => {
   };
 });
 const fieldKey = ref('');
+const multiple = ref(true);
 const combineIds = ref<string[]>([]);
+let lastTagSnapshot = cloneDeep(props.model[props.name]) || [];
 
 watchEffect(async () => {
   const combineNames = await Promise.all(
@@ -90,29 +91,39 @@ watchEffect(async () => {
 });
 
 const changeHandler = async (value: any) => {
-  await setCombineRelation();
+  let codeIds = value;
+  if (typeof value === 'string') {
+    multiple.value = false;
+    lastTagSnapshot = [lastTagSnapshot];
+    codeIds = value ? [value] : [];
+  }
+  await setCombineRelation(codeIds);
   emit('change', value);
 };
 
 // 同步绑定关系
-const setCombineRelation = async () => {
-  //  绑定数组先置空
-  combineIds.value = [];
+const setCombineRelation = async (codeIds: string[]) => {
   // 组件id
   const { id = '' } = services?.editorService.get('node') || {};
-  codeHooks?.forEach((hook) => {
-    // continue
-    if (!props.model[hook]) return true;
-    if (typeof props.model[hook] === 'string' && props.model[hook]) {
-      combineIds.value = union(combineIds.value, [props.model[hook]]);
-    } else if (Array.isArray(props.model[hook])) {
-      combineIds.value = union(combineIds.value, props.model[hook]);
-    }
-  });
-  // 记录组件与代码块的绑定关系
-  await services?.codeBlockService.setCompRelation(id, combineIds.value);
-  // 记录当前已被绑定的代码块，为查看弹窗的展示内容
-  await services?.codeBlockService.setCombineIds(combineIds.value);
+
+  // 兼容单选
+  let opFlag = CodeSelectOp.CHANGE;
+  let diffValues = codeIds;
+  if (multiple.value) {
+    opFlag = codeIds.length < lastTagSnapshot.length ? CodeSelectOp.DELETE : CodeSelectOp.ADD;
+    diffValues = xor(codeIds, lastTagSnapshot) as string[];
+  }
+
+  // 记录绑定关系
+  await services?.codeBlockService.setCombineRelation(id, diffValues, opFlag, props.prop);
+  lastTagSnapshot = codeIds;
+  await setCombineIds(codeIds);
+};
+
+// 记录当前已被绑定的代码块，为查看弹窗的展示内容
+const setCombineIds = async (codeIds: string[]) => {
+  combineIds.value = codeIds;
+  await services?.codeBlockService.setCombineIds(codeIds);
 };
 
 const viewHandler = async () => {
@@ -120,7 +131,8 @@ const viewHandler = async () => {
     ElMessage.error('请先绑定代码块');
     return;
   }
-  await setCombineRelation();
+  // 记录当前已被绑定的代码块，为查看弹窗的展示内容
+  await setCombineIds(props.model[props.name]);
   await services?.codeBlockService.setMode(CodeEditorMode.LIST);
   services?.codeBlockService.setCodeEditorContent(true, combineIds.value[0]);
 };

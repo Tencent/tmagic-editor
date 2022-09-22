@@ -65,7 +65,6 @@
 
 <script lang="ts">
 import { defineComponent, onUnmounted, PropType, provide, reactive, toRaw, watch } from 'vue';
-import { isEmpty,union } from 'lodash-es';
 
 import { EventOption } from '@tmagic/core';
 import type { FormConfig } from '@tmagic/form';
@@ -210,12 +209,6 @@ export default defineComponent({
     updateDragEl: {
       type: Function as PropType<(el: HTMLDivElement, target: HTMLElement) => void>,
     },
-
-    /** 可挂载代码块的生命周期 */
-    codeHooks: {
-      type: Array<string>,
-      default: () => ['created', 'mounted'],
-    },
   },
 
   emits: ['props-panel-mounted', 'update:modelValue'],
@@ -233,38 +226,11 @@ export default defineComponent({
       emit('update:modelValue', toRaw(editorService.get('root')));
     });
 
-    const initCodeRelation = (rootValue: MNode) => {
-      if (isEmpty(rootValue.items)) return;
-      rootValue.items.forEach((nodeValue: MNode) => {
-        let curNodeCombineIds:string[] = []
-        // 合并各钩子绑定的代码块Id
-        props.codeHooks.forEach((hook) => {
-          // continue
-          if (isEmpty(nodeValue[hook])) return true
-          // 兼容单选绑定场景
-          if(typeof nodeValue[hook] === 'string' && nodeValue[hook]) {
-            curNodeCombineIds = union(curNodeCombineIds,[nodeValue[hook]])
-          }else if(Array.isArray(nodeValue[hook])) {
-            curNodeCombineIds = union(curNodeCombineIds,nodeValue[hook])
-          }
-        });
-        // 设置组件与代码块的绑定关系
-        if(!isEmpty(curNodeCombineIds)) {
-          codeBlockService.setCompRelation(nodeValue.id, curNodeCombineIds);
-        }
-        if (!isEmpty(nodeValue.items)) {
-          initCodeRelation(nodeValue);
-        }
-      });
-    };
-
     // 初始值变化，重新设置节点信息
     watch(
       () => props.modelValue,
       (modelValue) => {
         editorService.set('root', modelValue);
-        // 初始化代码块与组件的绑定关系
-        initCodeRelation(modelValue);
       },
       {
         immediate: true,
@@ -370,7 +336,6 @@ export default defineComponent({
         containerHighlightType: props.containerHighlightType,
       }),
     );
-    provide('codeHooks',props.codeHooks)
 
     return services;
   },
