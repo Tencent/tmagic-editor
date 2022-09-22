@@ -1,5 +1,5 @@
 {
-  "version": "1.1.5",
+  "version": "1.1.6",
   "name": "@tmagic/ui",
   "main": "src/index.ts",
   "engines": {
@@ -11,9 +11,9 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "@tmagic/core": "1.1.5",
-    "@tmagic/schema": "1.1.5",
-    "@tmagic/utils": "1.1.5",
+    "@tmagic/core": "1.1.6",
+    "@tmagic/schema": "1.1.6",
+    "@tmagic/utils": "1.1.6",
     "delegate": "^3.2.0",
     "qrcode": "^1.5.0",
     "tiny-emitter": "^2.1.0",
