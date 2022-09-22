@@ -22,7 +22,7 @@
     <el-dialog
       v-model="previewVisible"
       destroy-on-close
-      custom-class="pre-viewer"
+      class="pre-viewer"
       title="预览"
       :width="stageRect && stageRect.width"
     >

@@ -12,7 +12,7 @@
     "@tmagic/form": "1.1.5",
     "@tmagic/schema": "1.1.5",
     "@tmagic/utils": "1.1.5",
-    "element-plus": "^2.2.6",
+    "element-plus": "^2.2.17",
     "highlight.js": "^11.2.0",
     "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",

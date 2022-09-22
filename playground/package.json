@@ -17,7 +17,7 @@
     "@tmagic/schema": "1.1.5",
     "@tmagic/stage": "1.1.5",
     "@tmagic/utils": "1.1.5",
-    "element-plus": "^2.2.6",
+    "element-plus": "^2.2.17",
     "monaco-editor": "^0.34.0",
     "serialize-javascript": "^6.0.0",
     "terser": "^5.14.2",
