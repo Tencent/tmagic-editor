@@ -3,6 +3,7 @@
     :style="`height: ${height}`"
     :init-values="model[name]"
     :language="language"
+    :options="config.options"
     @save="save"
   ></magic-code-editor>
 </template>
@@ -17,6 +18,7 @@ const props = defineProps<{
   name: string;
   config: {
     language?: string;
+    options?: Object;
   };
   prop: string;
 }>();

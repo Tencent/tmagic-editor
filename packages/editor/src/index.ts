@@ -63,7 +63,7 @@ export default {
     app.component('m-fields-ui-select', uiSelect);
     app.component('m-fields-code-link', CodeLink);
     app.component('m-fields-vs-code', Code);
-    app.component(CodeEditor.name, CodeEditor);
+    app.component('magic-code-editor', CodeEditor);
     app.component('m-fields-code-select', CodeSelect);
   },
 };

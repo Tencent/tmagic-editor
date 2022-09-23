@@ -12,6 +12,7 @@ const props = defineProps<{
     name: string;
     text?: string;
     formTitle?: string;
+    codeOptions?: Object;
   };
   model: any;
   name: string;
@@ -20,17 +21,24 @@ const props = defineProps<{
 
 const emit = defineEmits(['change']);
 
-const formConfig = computed(() => ({
-  ...props.config,
-  text: '',
-  type: 'link',
-  form: [
-    {
-      name: props.name,
-      type: 'vs-code',
-    },
-  ],
-}));
+const formConfig = computed(() => {
+  const { codeOptions, ...config } = props.config;
+  return {
+    ...config,
+    text: '',
+    type: 'link',
+    form: [
+      {
+        name: props.name,
+        type: 'vs-code',
+        options: {
+          tabSize: 2,
+          ...(codeOptions || {}),
+        },
+      },
+    ],
+  };
+});
 
 const modelValue = reactive<{ form: Record<string, string> }>({
   form: {
