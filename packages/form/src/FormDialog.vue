@@ -1,53 +1,55 @@
 <template>
-  <teleport to="body">
-    <div class="m-form-dialog" v-show="dialogVisible">
-      <el-dialog
-        v-model="dialogVisible"
-        top="20px"
-        :title="title"
-        :width="width"
-        :fullscreen="fullscreen"
-        :close-on-click-modal="false"
-        @close="closeHandler"
-      >
-        <div class="m-dialog-body" :style="`max-height: ${bodyHeight}; overflow-y: auto; overflow-x: hidden;`">
-          <m-form
-            v-model="stepActive"
-            ref="form"
-            :size="size"
-            :config="config"
-            :init-values="values"
-            :parent-values="parentValues"
-            :label-width="labelWidth"
-            @change="changeHandler"
-          ></m-form>
-          <slot></slot>
-        </div>
-
-        <template #footer>
-          <el-row class="dialog-footer">
-            <el-col :span="12" style="text-align: left">
-              <div style="min-height: 1px">
-                <slot name="left"></slot>
-              </div>
-            </el-col>
-            <el-col :span="12">
-              <slot name="footer">
-                <el-button @click="cancel" size="small">取 消</el-button>
-                <el-button v-if="hasStep && stepActive > 1" type="info" size="small" @click="preStep">上一步</el-button>
-                <el-button v-if="hasStep && stepCount > stepActive" type="info" size="small" @click="nextStep"
-                  >下一步</el-button
-                >
-                <el-button v-else type="primary" size="small" :loading="saveFetch" @click="save">{{
-                  confirmText
-                }}</el-button>
-              </slot>
-            </el-col>
-          </el-row>
-        </template>
-      </el-dialog>
+  <el-dialog
+    v-model="dialogVisible"
+    class="m-form-dialog"
+    top="20px"
+    append-to-body
+    :title="title"
+    :width="width"
+    :fullscreen="fullscreen"
+    :close-on-click-modal="false"
+    @close="closeHandler"
+  >
+    <div
+      v-if="dialogVisible"
+      class="m-dialog-body"
+      :style="`max-height: ${bodyHeight}; overflow-y: auto; overflow-x: hidden;`"
+    >
+      <m-form
+        v-model="stepActive"
+        ref="form"
+        :size="size"
+        :config="config"
+        :init-values="values"
+        :parent-values="parentValues"
+        :label-width="labelWidth"
+        @change="changeHandler"
+      ></m-form>
+      <slot></slot>
     </div>
-  </teleport>
+
+    <template #footer>
+      <el-row class="dialog-footer">
+        <el-col :span="12" style="text-align: left">
+          <div style="min-height: 1px">
+            <slot name="left"></slot>
+          </div>
+        </el-col>
+        <el-col :span="12">
+          <slot name="footer">
+            <el-button @click="cancel" size="small">取 消</el-button>
+            <el-button v-if="hasStep && stepActive > 1" type="info" size="small" @click="preStep">上一步</el-button>
+            <el-button v-if="hasStep && stepCount > stepActive" type="info" size="small" @click="nextStep"
+              >下一步</el-button
+            >
+            <el-button v-else type="primary" size="small" :loading="saveFetch" @click="save">{{
+              confirmText
+            }}</el-button>
+          </slot>
+        </el-col>
+      </el-row>
+    </template>
+  </el-dialog>
 </template>
 
 <script lang="ts">
