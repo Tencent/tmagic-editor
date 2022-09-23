@@ -1,11 +1,11 @@
 <template>
   <el-dialog
     v-model="isShowCodeBlockEditor"
+    class="code-editor-dialog"
     :title="currentTitle"
     :fullscreen="true"
     :before-close="saveAndClose"
     :append-to-body="true"
-    custom-class="code-editor-dialog"
   >
     <layout v-model:left="left" :min-left="45" class="code-editor-layout">
       <!-- 左侧列表 -->
