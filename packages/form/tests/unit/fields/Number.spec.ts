@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 import { describe, expect, test } from 'vitest';
+import { nextTick } from 'vue';
+import MagicForm, { MForm, MNumber } from '@form/index';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
-
-import MagicForm, { MForm, MNumber } from '../../../src';
 
 const getWrapper = (
   config: any = [
@@ -44,18 +44,18 @@ const getWrapper = (
   });
 
 describe('Number', () => {
-  test('基础功能', (done) => {
+  test('基础功能', async () => {
     const wrapper = getWrapper();
-    setTimeout(async () => {
-      const num = wrapper.findComponent(MNumber);
-      expect(num.exists()).toBe(true);
-      const value = await (wrapper.vm as any).submitForm();
-      expect(value.number).toBe(0);
-      done();
-    }, 0);
+
+    await nextTick();
+
+    const num = wrapper.findComponent(MNumber);
+    expect(num.exists()).toBe(true);
+    const value = await (wrapper.vm as any).submitForm();
+    expect(value.number).toBe(0);
   });
 
-  test('默认值', (done) => {
+  test('默认值', async () => {
     const wrapper = getWrapper([
       {
         text: 'number',
@@ -65,14 +65,13 @@ describe('Number', () => {
       },
     ]);
 
-    setTimeout(async () => {
-      const value = await (wrapper.vm as any).submitForm();
-      expect(value.number).toBe(5);
-      done();
-    }, 0);
+    await nextTick();
+
+    const value = await (wrapper.vm as any).submitForm();
+    expect(value.number).toBe(5);
   });
 
-  test('增加减少', (done) => {
+  test('增加减少', async () => {
     const wrapper = getWrapper([
       {
         text: 'number',
@@ -82,28 +81,27 @@ describe('Number', () => {
       },
     ]);
 
-    setTimeout(async () => {
-      const increase = wrapper.find('.el-input-number__increase');
-      const decrease = wrapper.find('.el-input-number__decrease');
-      expect(increase.exists()).toBe(true);
-      expect(decrease.exists()).toBe(true);
+    await nextTick();
 
-      await increase.trigger('keydown', {
-        key: 'enter',
-      });
+    const increase = wrapper.find('.el-input-number__increase');
+    const decrease = wrapper.find('.el-input-number__decrease');
+    expect(increase.exists()).toBe(true);
+    expect(decrease.exists()).toBe(true);
 
-      expect((wrapper.vm as any).values.number).toBe(2);
-
-      await decrease.trigger('keydown', {
-        key: 'enter',
-      });
-
-      expect((wrapper.vm as any).values.number).toBe(0);
-      done();
+    await increase.trigger('keydown', {
+      key: 'enter',
     });
+
+    expect((wrapper.vm as any).values.number).toBe(2);
+
+    await decrease.trigger('keydown', {
+      key: 'enter',
+    });
+
+    expect((wrapper.vm as any).values.number).toBe(0);
   });
 
-  test('最大最小值', (done) => {
+  test('最大最小值', async () => {
     const wrapper = getWrapper([
       {
         text: 'number',
@@ -114,14 +112,13 @@ describe('Number', () => {
       },
     ]);
 
-    setTimeout(async () => {
-      const num = wrapper.findComponent(MNumber);
-      const input = num.find('input');
-      await input.setValue(100);
-      expect((wrapper.vm as any).values.number).toBe(10);
-      await input.setValue(-10);
-      expect((wrapper.vm as any).values.number).toBe(0);
-      done();
-    }, 0);
+    await nextTick();
+
+    const num = wrapper.findComponent(MNumber);
+    const input = num.find('input');
+    await input.setValue(100);
+    expect((wrapper.vm as any).values.number).toBe(10);
+    await input.setValue(-10);
+    expect((wrapper.vm as any).values.number).toBe(0);
   });
 });

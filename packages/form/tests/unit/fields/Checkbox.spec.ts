@@ -17,10 +17,10 @@
  */
 
 import { describe, expect, test } from 'vitest';
+import { nextTick } from 'vue';
+import MagicForm, { MCheckbox, MForm } from '@form/index';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
-
-import MagicForm, { MCheckbox, MForm } from '../../../src';
 
 const getWrapper = (
   config: any = [
@@ -43,16 +43,15 @@ const getWrapper = (
   });
 
 describe('Checkbox', () => {
-  test('基础', (done) => {
+  test('基础', async () => {
     const wrapper = getWrapper();
 
-    setTimeout(async () => {
-      const checkbox = wrapper.findComponent(MCheckbox);
-      expect(checkbox.exists()).toBe(true);
+    await nextTick();
 
-      const value = await (wrapper.vm as any).submitForm();
-      expect(value.checkbox).toBe(false);
-      done();
-    }, 0);
+    const checkbox = wrapper.findComponent(MCheckbox);
+    expect(checkbox.exists()).toBe(true);
+
+    const value = await (wrapper.vm as any).submitForm();
+    expect(value.checkbox).toBe(false);
   });
 });

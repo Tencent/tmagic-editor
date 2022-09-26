@@ -7,8 +7,6 @@ import props from '@editor/services/props';
 test('createId', async () => {
   const id = await props.createId('text');
 
-  console.log(id);
-
   expect(id.startsWith('text')).toBeTruthy();
 });
 

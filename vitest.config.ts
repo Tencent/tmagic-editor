@@ -17,8 +17,8 @@ export default defineConfig({
       'magic-admin/**',
     ],
     include: [
-      './packages/editor/tests/unit/utils/**',
-      './packages/editor/tests/unit/services/**',
+      './packages/editor/tests/**',
+      './packages/form/tests/**',
       './packages/stage/tests/**',
       './packages/utils/tests/**',
     ],

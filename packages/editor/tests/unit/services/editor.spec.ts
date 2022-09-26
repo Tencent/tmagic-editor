@@ -19,7 +19,7 @@
 import { beforeAll, describe, expect, test } from 'vitest';
 import { cloneDeep } from 'lodash-es';
 
-import type { MApp, MContainer, MNode, MPage } from '@tmagic/schema';
+import type { MApp, MContainer, MNode } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 
 import editorService from '@editor/services/editor';
@@ -365,40 +365,6 @@ describe('copy', () => {
   });
 });
 
-describe('paste', () => {
-  beforeAll(() => editorService.set('root', cloneDeep(root)));
-  test.skip('正常', async () => {
-    editorService.set('root', cloneDeep(root));
-    // 设置当前编辑的页面
-    await editorService.select(NodeId.PAGE_ID);
-    const page = editorService.get<MPage>('page');
-    expect(page.items).toHaveLength(2);
-    const newNodes = (await editorService.paste({ left: 0, top: 0 })) as MNode[];
-    expect(newNodes[0]?.id === NodeId.NODE_ID2).toBeFalsy();
-    expect(page.items).toHaveLength(3);
-  });
-
-  test('空', async () => {
-    await storageService.clear();
-    const newNode = await editorService.paste({ left: 0, top: 0 });
-    expect(newNode).toBeUndefined();
-  });
-});
-
-describe('alignCenter', () => {
-  beforeAll(() => editorService.set('root', cloneDeep(root)));
-
-  test.skip('正常', async () => {
-    // 设置当前编辑的页面
-    await editorService.select(NodeId.PAGE_ID);
-    await editorService.update({ id: NodeId.PAGE_ID, isAbsoluteLayout: true, type: NodeType.PAGE });
-    await editorService.select(NodeId.NODE_ID);
-    const node = editorService.get<MNode>('node');
-    await editorService.alignCenter(node);
-    expect(node.style?.left).toBeGreaterThan(0);
-  });
-});
-
 describe('moveLayer', () => {
   beforeAll(() => editorService.set('root', cloneDeep(root)));
 
@@ -428,17 +394,5 @@ describe('undo redo', () => {
     await editorService.redo();
     const redoNode = editorService.getNodeById(NodeId.NODE_ID);
     expect(redoNode?.id).toBeUndefined();
-  });
-});
-
-describe('use', () => {
-  beforeAll(() => editorService.set('root', cloneDeep(root)));
-
-  test.skip('before', () => {
-    editorService.usePlugin({
-      beforeRemove: () => new Error('不能删除'),
-    });
-
-    expect(() => editorService.remove({ id: NodeId.NODE_ID, type: 'text' })).toThrow();
   });
 });

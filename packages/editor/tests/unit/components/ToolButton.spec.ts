@@ -17,6 +17,7 @@
  */
 
 import { describe, expect, test, vi } from 'vitest';
+import { nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
 import ElementPlus, { ElDropdown } from 'element-plus';
 
@@ -71,51 +72,7 @@ const getWrapper = (
     },
   });
 
-describe.skip('ToolButton', () => {
-  test('删除', async () => {
-    const wrapper = getWrapper();
-    const icon = wrapper.find('.el-button');
-    await icon.trigger('click');
-    expect(editorService.remove.mock.calls[0][0]).toBe('node');
-  });
-
-  test('后退', async () => {
-    const wrapper = getWrapper({ data: 'undo' });
-
-    const icon = wrapper.find('.el-button');
-    await icon.trigger('click');
-    expect(editorService.undo).toBeCalled();
-  });
-
-  test('前进', async () => {
-    const wrapper = getWrapper({ data: 'redo' });
-
-    const icon = wrapper.find('.el-button');
-    await icon.trigger('click');
-    expect(editorService.redo).toBeCalled();
-  });
-
-  test('放大', async () => {
-    uiService.set('zoom', 1);
-    const wrapper = getWrapper({ data: 'zoom-in' });
-
-    const icon = wrapper.find('.el-button');
-    await icon.trigger('click');
-    expect(uiService.get('zoom')).toBe(1.1);
-  });
-
-  test('缩小', (done) => {
-    uiService.set('zoom', 1);
-    const wrapper = getWrapper({ data: 'zoom-out' });
-
-    setTimeout(async () => {
-      const icon = wrapper.find('.el-button');
-      await icon.trigger('click');
-      expect(uiService.get('zoom')).toBe(0.9);
-      done();
-    }, 0);
-  });
-
+describe('ToolButton', () => {
   test('data无匹配值', () => {
     getWrapper({ data: 'default' });
   });
@@ -128,25 +85,24 @@ describe.skip('ToolButton', () => {
     expect(display).toBeCalled();
   });
 
-  test('点击下拉菜单项', (done) => {
+  test('点击下拉菜单项', async () => {
     const wrapper = getWrapper({
       data: {
         type: 'dropdown',
       },
     });
 
-    setTimeout(async () => {
-      const dropDown = wrapper.findComponent(ElDropdown);
-      const handler = vi.fn();
-      dropDown.vm.$emit('command', {
-        item: { handler },
-      });
-      expect(handler).toBeCalled();
-      done();
-    }, 0);
+    await nextTick();
+
+    const dropDown = wrapper.findComponent(ElDropdown);
+    const handler = vi.fn();
+    dropDown.vm.$emit('command', {
+      item: { handler },
+    });
+    expect(handler).toBeCalled();
   });
 
-  test('按钮不可用', (done) => {
+  test('按钮不可用', async () => {
     const wrapper = getWrapper({
       data: {
         icon: 'disabled-icon',
@@ -155,12 +111,11 @@ describe.skip('ToolButton', () => {
       },
     });
 
-    setTimeout(async () => {
-      // disabled 后会有 is-disabled class
-      const iconBtn = wrapper.find('.el-button.is-text.is-disabled');
-      await iconBtn.trigger('click');
-      done();
-    }, 0);
+    await nextTick();
+
+    // disabled 后会有 is-disabled class
+    const iconBtn = wrapper.find('.el-button.is-text.is-disabled');
+    expect(iconBtn).toBeDefined();
   });
 
   test('菜单项handler未定义', () => {

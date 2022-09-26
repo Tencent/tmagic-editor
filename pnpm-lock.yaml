@@ -11,6 +11,7 @@ importers:
       '@typescript-eslint/eslint-plugin': ^4.28.0
       '@typescript-eslint/parser': ^4.28.0
       '@vitejs/plugin-vue': ^3.1.0
+      '@vitest/coverage-c8': ^0.23.4
       c8: ^7.11.3
       chalk: ^4.1.0
       commitizen: ^4.2.4
@@ -45,6 +46,7 @@ importers:
       '@typescript-eslint/eslint-plugin': 4.33.0_3ekaj7j3owlolnuhj3ykrb7u7i
       '@typescript-eslint/parser': 4.33.0_hxadhbs2xogijvk7vq4t2azzbu
       '@vitejs/plugin-vue': 3.1.0_vite@3.1.3+vue@3.2.37
+      '@vitest/coverage-c8': 0.23.4_jsdom@19.0.0
       c8: 7.11.3
       chalk: 4.1.2
       commitizen: 4.2.4
@@ -1838,6 +1840,24 @@ packages:
       vue: 2.7.4
     dev: true
 
+  /@vitest/coverage-c8/0.23.4_jsdom@19.0.0:
+    resolution: {integrity: sha512-jmD00a5DQH9gu9K+YdvVhcMuv2CzHvU4gCnySS40Ec5hKlXtlCzRfNHl00VnhfuBeaQUmaQYe60BLT413HyDdg==}
+    dependencies:
+      c8: 7.12.0
+      vitest: 0.23.4_jsdom@19.0.0
+    transitivePeerDependencies:
+      - '@edge-runtime/vm'
+      - '@vitest/browser'
+      - '@vitest/ui'
+      - happy-dom
+      - jsdom
+      - less
+      - sass
+      - stylus
+      - supports-color
+      - terser
+    dev: true
+
   /@volar/code-gen/0.39.4:
     resolution: {integrity: sha512-2RoDdktnN5ovhJoL1NgxKwKhfgP2TzcKVWp8+1Lb67sZ+hvWRL5GjHGkvlPkS91cElpwuURUHnbNNDT+uEqXuA==}
     dependencies:
@@ -2620,6 +2640,25 @@ packages:
 
   /c8/7.11.3:
     resolution: {integrity: sha512-6YBmsaNmqRm9OS3ZbIiL2EZgi1+Xc4O24jL3vMYGE6idixYuGdy76rIfIdltSKDj9DpLNrcXSonUTR1miBD0wA==}
+    engines: {node: '>=10.12.0'}
+    hasBin: true
+    dependencies:
+      '@bcoe/v8-coverage': 0.2.3
+      '@istanbuljs/schema': 0.1.3
+      find-up: 5.0.0
+      foreground-child: 2.0.0
+      istanbul-lib-coverage: 3.2.0
+      istanbul-lib-report: 3.0.0
+      istanbul-reports: 3.1.4
+      rimraf: 3.0.2
+      test-exclude: 6.0.0
+      v8-to-istanbul: 9.0.0
+      yargs: 16.2.0
+      yargs-parser: 20.2.9
+    dev: true
+
+  /c8/7.12.0:
+    resolution: {integrity: sha512-CtgQrHOkyxr5koX1wEUmN/5cfDa2ckbHRA4Gy5LAL0zaCFtVWJS5++n+w4/sr2GWGerBxgTjpKeDclk/Qk6W/A==}
     engines: {node: '>=10.12.0'}
     hasBin: true
     dependencies:

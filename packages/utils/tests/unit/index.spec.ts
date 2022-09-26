@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
 import * as util from '../../src';
 
@@ -48,25 +48,6 @@ describe('datetimeFormatter', () => {
 
   test('format是x', () => {
     expect(util.datetimeFormatter(date.toISOString(), defaultValue, 'timestamp')).toBe(date.getTime());
-  });
-});
-
-describe('util', () => {
-  vi.useFakeTimers();
-
-  test.skip('sleep', (done) => {
-    const callback = vi.fn();
-
-    util
-      .sleep(500)
-      .then(callback)
-      .then(() => {
-        expect(callback).toBeCalled();
-        done();
-      });
-
-    // 快进500毫秒，callback应该已执行
-    vi.advanceTimersByTime(500);
   });
 });
 

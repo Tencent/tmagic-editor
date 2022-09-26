@@ -51,6 +51,7 @@
     "@typescript-eslint/eslint-plugin": "^4.28.0",
     "@typescript-eslint/parser": "^4.28.0",
     "@vitejs/plugin-vue": "^3.1.0",
+    "@vitest/coverage-c8": "^0.23.4",
     "c8": "^7.11.3",
     "chalk": "^4.1.0",
     "commitizen": "^4.2.4",
