@@ -40,7 +40,7 @@
               : 'm-editor-code-block-editor-panel',
           ]"
         >
-          <slot name="code-block-edit-panel-header" :id="id"></slot>
+          <slot name="code-block-edit-panel-header" :data="codeConfig"></slot>
           <el-card shadow="never">
             <template #header>
               <div class="code-name-wrapper">

@@ -27,12 +27,12 @@
         <slot name="code-block-panel-header"></slot>
       </template>
 
-      <template #code-block-panel-tool="{ id }" v-if="item === 'code-block'">
-        <slot name="code-block-panel-tool" :id="id"></slot>
+      <template #code-block-panel-tool="{ data }" v-if="item === 'code-block'">
+        <slot name="code-block-panel-tool" :data="data"></slot>
       </template>
 
-      <template #code-block-edit-panel-header="{ id }" v-if="item === 'code-block'">
-        <slot name="code-block-edit-panel-header" :id="id"></slot>
+      <template #code-block-edit-panel-header="{ data }" v-if="item === 'code-block'">
+        <slot name="code-block-edit-panel-header" :data="data"></slot>
       </template>
     </tab-pane>
   </el-tabs>
