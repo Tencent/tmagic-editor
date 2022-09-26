@@ -47,7 +47,7 @@
               <el-tooltip effect="dark" content="删除" placement="bottom" v-if="editable">
                 <Icon :icon="Close" class="edit-icon" @click.stop="deleteCode(`${data.id}`)"></Icon>
               </el-tooltip>
-              <slot name="code-block-panel-tool" :id="data.id"></slot>
+              <slot name="code-block-panel-tool" :data="data"></slot>
             </div>
           </div>
           <!-- 展示代码块下绑定的组件 -->
@@ -86,8 +86,8 @@
 
     <!-- 代码块编辑区 -->
     <code-block-editor>
-      <template #code-block-edit-panel-header="{ id }">
-        <slot name="code-block-edit-panel-header" :id="id"></slot>
+      <template #code-block-edit-panel-header="{ data }">
+        <slot name="code-block-edit-panel-header" :data="data"></slot>
       </template>
     </code-block-editor>
   </div>
