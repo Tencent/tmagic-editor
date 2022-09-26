@@ -38,38 +38,32 @@
   </el-tabs>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType, ref, watch } from 'vue';
+<script lang="ts" setup>
+import { ref, watch } from 'vue';
 
 import { SideBarData } from '../../type';
 
 import TabPane from './TabPane.vue';
 
-export default defineComponent({
-  components: { TabPane },
-
-  name: 'm-sidebar',
-
-  props: {
-    data: {
-      type: Object as PropType<SideBarData>,
-      default: () => ({ type: 'tabs', status: '组件', items: ['component-list', 'layer', 'code-block'] }),
-    },
+const props = withDefaults(
+  defineProps<{
+    data?: SideBarData;
+  }>(),
+  {
+    data: () => ({ type: 'tabs', status: '组件', items: ['component-list', 'layer', 'code-block'] }),
   },
+);
 
-  setup(props) {
-    const activeTabName = ref(props.data?.status);
+const activeTabName = ref(props.data?.status);
 
-    watch(
-      () => props.data?.status,
-      (status) => {
-        activeTabName.value = status || '0';
-      },
-    );
-
-    return {
-      activeTabName,
-    };
+watch(
+  () => props.data.status,
+  (status) => {
+    activeTabName.value = status || '0';
   },
+);
+
+defineExpose({
+  activeTabName,
 });
 </script>

@@ -64,8 +64,8 @@
   </el-tab-pane>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+<script lang="ts" setup>
+import { computed } from 'vue';
 import { Coin, EditPen, Files } from '@element-plus/icons-vue';
 
 import MIcon from '../../components/Icon.vue';
@@ -75,52 +75,42 @@ import CodeBlockList from './code-block/CodeBlockList.vue';
 import ComponentListPanel from './ComponentListPanel.vue';
 import LayerPanel from './LayerPanel.vue';
 
-export default defineComponent({
-  components: { MIcon },
+const props = defineProps<{
+  data?: SideItem;
+}>();
 
-  props: {
-    data: {
-      type: [Object, String] as PropType<SideItem>,
-    },
-  },
+const config = computed<SideComponent | undefined>(() => {
+  if (typeof props.data !== 'string') {
+    return props.data;
+  }
 
-  setup(props) {
-    return {
-      config: computed<SideComponent | undefined>(() => {
-        if (typeof props.data !== 'string') {
-          return props.data;
-        }
-
-        switch (props.data) {
-          case 'component-list':
-            return {
-              type: 'component',
-              icon: Coin,
-              text: '组件',
-              component: ComponentListPanel,
-              slots: {},
-            };
-          case 'layer':
-            return {
-              type: 'component',
-              icon: Files,
-              text: '已选组件',
-              component: LayerPanel,
-              slots: {},
-            };
-          case 'code-block':
-            return {
-              type: 'component',
-              icon: EditPen,
-              text: '代码编辑',
-              component: CodeBlockList,
-              slots: {},
-            };
-          default:
-            return undefined;
-        }
-      }),
-    };
-  },
+  switch (props.data) {
+    case 'component-list':
+      return {
+        type: 'component',
+        icon: Coin,
+        text: '组件',
+        component: ComponentListPanel,
+        slots: {},
+      };
+    case 'layer':
+      return {
+        type: 'component',
+        icon: Files,
+        text: '已选组件',
+        component: LayerPanel,
+        slots: {},
+      };
+    case 'code-block':
+      return {
+        type: 'component',
+        icon: EditPen,
+        text: '代码编辑',
+        component: CodeBlockList,
+        slots: {},
+      };
+    default:
+      return undefined;
+  }
 });
 </script>
