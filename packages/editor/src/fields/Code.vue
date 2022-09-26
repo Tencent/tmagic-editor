@@ -19,12 +19,13 @@ const props = defineProps<{
   config: {
     language?: string;
     options?: Object;
+    height?: string;
   };
   prop: string;
 }>();
 
 const language = computed(() => props.config.language || 'javascript');
-const height = computed(() => `${document.body.clientHeight - 168}px`);
+const height = computed(() => props.config.height || `${document.body.clientHeight - 168}px`);
 
 const save = (v: string) => {
   props.model[props.name] = v;
