@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 import { describe, expect, test } from 'vitest';
+import { nextTick } from 'vue';
+import MagicForm, { FormState, MForm, MFormDialog, MLink } from '@form/index';
 import { mount } from '@vue/test-utils';
 import ElementPlus, { ElButton } from 'element-plus';
-
-import MagicForm, { FormState, MForm, MFormDialog, MLink } from '../../../src';
 
 const getWrapper = (
   config: any = [
@@ -46,24 +46,23 @@ const getWrapper = (
   });
 
 describe('Link', () => {
-  test('基础', (done) => {
+  test('基础', async () => {
     const wrapper = getWrapper();
 
-    setTimeout(() => {
-      const link = wrapper.findComponent(MLink);
-      expect(link.exists()).toBe(true);
-      // displayText 字段配置
-      expect(link.text()).toContain('链接');
+    await nextTick();
 
-      const a = wrapper.find('a');
-      expect(a.exists()).toBe(true);
-      // href 字段配置
-      expect(a.element.href).toMatch('www.google.com');
-      done();
-    }, 0);
+    const link = wrapper.findComponent(MLink);
+    expect(link.exists()).toBe(true);
+    // displayText 字段配置
+    expect(link.text()).toContain('链接');
+
+    const a = wrapper.find('a');
+    expect(a.exists()).toBe(true);
+    // href 字段配置
+    expect(a.element.href).toMatch('www.google.com');
   });
 
-  test('默认文字', (done) => {
+  test('默认文字', async () => {
     const wrapper = getWrapper(
       [
         {
@@ -78,21 +77,20 @@ describe('Link', () => {
       },
     );
 
-    setTimeout(() => {
-      const link = wrapper.findComponent(MLink);
-      expect(link.exists()).toBe(true);
-      // 默认displayText
-      expect(link.text()).toContain('跳转');
+    await nextTick();
 
-      const a = wrapper.find('a');
-      expect(a.exists()).toBe(true);
-      // 渲染出来的 a 元素的 href 属性
-      expect(a.element.href).toMatch('www.baidu.com');
-      done();
-    }, 0);
+    const link = wrapper.findComponent(MLink);
+    expect(link.exists()).toBe(true);
+    // 默认displayText
+    expect(link.text()).toContain('跳转');
+
+    const a = wrapper.find('a');
+    expect(a.exists()).toBe(true);
+    // 渲染出来的 a 元素的 href 属性
+    expect(a.element.href).toMatch('www.baidu.com');
   });
 
-  test('displayText为函数', (done) => {
+  test('displayText为函数', async () => {
     const wrapper = getWrapper([
       {
         type: 'link',
@@ -118,19 +116,18 @@ describe('Link', () => {
       },
     ]);
 
-    setTimeout(() => {
-      const link = wrapper.findComponent(MLink);
-      expect(link.exists()).toBe(true);
-      expect(link.text()).toContain('谷歌');
+    await nextTick();
 
-      const a = wrapper.find('a');
-      expect(a.exists()).toBe(true);
-      expect(a.element.href).toMatch('www.google.com');
-      done();
-    }, 0);
+    const link = wrapper.findComponent(MLink);
+    expect(link.exists()).toBe(true);
+    expect(link.text()).toContain('谷歌');
+
+    const a = wrapper.find('a');
+    expect(a.exists()).toBe(true);
+    expect(a.element.href).toMatch('www.google.com');
   });
 
-  test('不可编辑', (done) => {
+  test('不可编辑', async () => {
     const wrapper = getWrapper(
       [
         {
@@ -146,16 +143,15 @@ describe('Link', () => {
       },
     );
 
-    setTimeout(() => {
-      const link = wrapper.findComponent(MLink);
-      expect((link.vm as any).disabled).toBe(true);
-      const span = wrapper.find('span');
-      expect(span.exists()).toBe(true);
-      done();
-    }, 0);
+    await nextTick();
+
+    const link = wrapper.findComponent(MLink);
+    expect((link.vm as any).disabled).toBe(true);
+    const span = wrapper.find('span');
+    expect(span.exists()).toBe(true);
   });
 
-  test('编辑链接', (done) => {
+  test('编辑链接', async () => {
     const wrapper = getWrapper([
       {
         type: 'link',
@@ -166,15 +162,14 @@ describe('Link', () => {
       },
     ]);
 
-    setTimeout(async () => {
-      const button = wrapper.findComponent(ElButton);
-      expect(button.exists()).toBe(true);
-      await button.trigger('click');
+    await nextTick();
 
-      const dialog = wrapper.findComponent(MFormDialog);
-      expect(dialog.exists()).toBe(true);
-      dialog.vm.$emit('submit');
-      done();
-    }, 0);
+    const button = wrapper.findComponent(ElButton);
+    expect(button.exists()).toBe(true);
+    await button.trigger('click');
+
+    const dialog = wrapper.findComponent(MFormDialog);
+    expect(dialog.exists()).toBe(true);
+    dialog.vm.$emit('submit');
   });
 });

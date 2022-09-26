@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 import { describe, expect, test } from 'vitest';
+import { nextTick } from 'vue';
+import MagicForm, { MDisplay, MForm } from '@form/index';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
-
-import MagicForm, { MDisplay, MForm } from '../../../src';
 
 const getWrapper = (
   config: any = [
@@ -44,20 +44,19 @@ const getWrapper = (
   });
 
 describe('Display', () => {
-  test('基础', (done) => {
+  test('基础', async () => {
     const wrapper = getWrapper();
 
-    setTimeout(async () => {
-      const display = wrapper.findComponent(MDisplay);
-      expect(display.exists()).toBe(true);
+    await nextTick();
 
-      const value = await (wrapper.vm as any).submitForm();
-      expect(value.display).toMatch('hello');
-      done();
-    }, 0);
+    const display = wrapper.findComponent(MDisplay);
+    expect(display.exists()).toBe(true);
+
+    const value = await (wrapper.vm as any).submitForm();
+    expect(value.display).toMatch('hello');
   });
 
-  test('初始化', (done) => {
+  test('初始化', async () => {
     const wrapper = getWrapper(
       [
         {
@@ -72,13 +71,12 @@ describe('Display', () => {
       },
     );
 
-    setTimeout(async () => {
-      const display = wrapper.findComponent(MDisplay);
-      expect(display.exists()).toBe(true);
+    await nextTick();
 
-      const value = await (wrapper.vm as any).submitForm();
-      expect(value.display).toMatch('test');
-      done();
-    }, 0);
+    const display = wrapper.findComponent(MDisplay);
+    expect(display.exists()).toBe(true);
+
+    const value = await (wrapper.vm as any).submitForm();
+    expect(value.display).toMatch('test');
   });
 });

@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 import { describe, expect, test } from 'vitest';
+import { nextTick } from 'vue';
+import MagicForm, { MDate, MForm } from '@form/index';
 import { mount } from '@vue/test-utils';
 import ElementPlus, { ElInput } from 'element-plus';
-
-import MagicForm, { MDate, MForm } from '../../../src';
 
 const getWrapper = (
   config: any = [
@@ -44,48 +44,45 @@ const getWrapper = (
   });
 
 describe('Date', () => {
-  test('基础', (done) => {
+  test('基础', async () => {
     const wrapper = getWrapper();
 
-    setTimeout(async () => {
-      const date = wrapper.findComponent(MDate);
-      expect(date.exists()).toBe(true);
+    await nextTick();
 
-      const value = await (wrapper.vm as any).submitForm();
-      expect(value.date).toMatch('2021-01-01 00:00:00');
-      done();
-    }, 0);
+    const date = wrapper.findComponent(MDate);
+    expect(date.exists()).toBe(true);
+
+    const value = await (wrapper.vm as any).submitForm();
+    expect(value.date).toMatch('2021-01-01 00:00:00');
   });
 
-  test('输入', (done) => {
+  test('输入', async () => {
     const wrapper = getWrapper();
 
-    setTimeout(async () => {
-      const input = wrapper.find('input');
+    await nextTick();
 
-      await input.setValue('2021/07/28');
-      await input.trigger('blur');
+    const input = wrapper.find('input');
 
-      const value = await (wrapper.vm as any).submitForm();
-      expect(input.element.value).toMatch('2021-07-28');
-      expect(value.date).toMatch('2021-07-28');
-      done();
-    }, 0);
+    await input.setValue('2021/07/28');
+    await input.trigger('blur');
+
+    const value = await (wrapper.vm as any).submitForm();
+    expect(input.element.value).toMatch('2021-07-28');
+    expect(value.date).toMatch('2021-07-28');
   });
 
-  test('清空', (done) => {
+  test('清空', async () => {
     const wrapper = getWrapper();
 
-    setTimeout(async () => {
-      const elInput = wrapper.findComponent(ElInput);
-      await elInput.trigger('mouseenter');
+    await nextTick();
 
-      const clear = wrapper.find('.clear-icon');
+    const elInput = wrapper.findComponent(ElInput);
+    await elInput.trigger('mouseenter');
 
-      expect(clear.exists()).toBe(true);
-      await clear.trigger('click');
-      expect((wrapper.vm as any).values.date).toBeNull();
-      done();
-    }, 0);
+    const clear = wrapper.find('.clear-icon');
+
+    expect(clear.exists()).toBe(true);
+    await clear.trigger('click');
+    expect((wrapper.vm as any).values.date).toBeNull();
   });
 });

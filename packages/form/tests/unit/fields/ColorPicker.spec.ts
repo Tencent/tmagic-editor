@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 import { describe, expect, test } from 'vitest';
+import { nextTick } from 'vue';
+import MagicForm, { MColorPicker, MForm } from '@form/index';
 import { mount } from '@vue/test-utils';
 import ElementPlus, { ElColorPicker } from 'element-plus';
-
-import MagicForm, { MColorPicker, MForm } from '../../../src';
 
 const getWrapper = (
   config: any = [
@@ -42,20 +42,19 @@ const getWrapper = (
   });
 
 describe('ColorPicker', () => {
-  test('基础', (done) => {
+  test('基础', async () => {
     const wrapper = getWrapper();
 
-    setTimeout(async () => {
-      const picker = wrapper.findComponent(MColorPicker);
-      expect(picker.exists()).toBe(true);
+    await nextTick();
 
-      const value = await (wrapper.vm as any).submitForm();
-      expect(value.picker).toMatch('');
-      done();
-    }, 0);
+    const picker = wrapper.findComponent(MColorPicker);
+    expect(picker.exists()).toBe(true);
+
+    const value = await (wrapper.vm as any).submitForm();
+    expect(value.picker).toMatch('');
   });
 
-  test('选择颜色', (done) => {
+  test('选择颜色', async () => {
     const wrapper = getWrapper([
       {
         type: 'color-picker',
@@ -65,18 +64,17 @@ describe('ColorPicker', () => {
       },
     ]);
 
-    setTimeout(async () => {
-      const value = await (wrapper.vm as any).submitForm();
-      expect(value.picker).toMatch('rgba(255, 255, 255, 1)');
+    await nextTick();
 
-      const picker = wrapper.findComponent(ElColorPicker);
-      expect(picker.exists()).toBe(true);
-      await picker.setValue('rgba(0, 255, 255, 1)');
-      picker.vm.$emit('change', 'rgba(0, 255, 255, 1)');
+    const value = await (wrapper.vm as any).submitForm();
+    expect(value.picker).toMatch('rgba(255, 255, 255, 1)');
 
-      const value2 = await (wrapper.vm as any).submitForm();
-      expect(value2.picker).toMatch('rgba(0, 255, 255, 1)');
-      done();
-    }, 0);
+    const picker = wrapper.findComponent(ElColorPicker);
+    expect(picker.exists()).toBe(true);
+    await picker.setValue('rgba(0, 255, 255, 1)');
+    picker.vm.$emit('change', 'rgba(0, 255, 255, 1)');
+
+    const value2 = await (wrapper.vm as any).submitForm();
+    expect(value2.picker).toMatch('rgba(0, 255, 255, 1)');
   });
 });

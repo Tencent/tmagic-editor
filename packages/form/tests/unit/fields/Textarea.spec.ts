@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 import { describe, expect, test } from 'vitest';
+import { nextTick } from 'vue';
+import MagicForm, { MForm, MTextarea } from '@form/index';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
-
-import MagicForm, { MForm, MTextarea } from '../../../src';
 
 const getWrapper = (
   config: any = [
@@ -44,22 +44,21 @@ const getWrapper = (
   });
 
 describe('Textarea', () => {
-  test('基础', (done) => {
+  test('基础', async () => {
     const wrapper = getWrapper();
 
-    setTimeout(async () => {
-      const textarea = wrapper.findComponent(MTextarea);
-      expect(textarea.exists()).toBe(true);
+    await nextTick();
 
-      const input = wrapper.find('textarea');
-      await input.setValue('hello');
+    const textarea = wrapper.findComponent(MTextarea);
+    expect(textarea.exists()).toBe(true);
 
-      await textarea.trigger('input');
-      await textarea.trigger('change');
+    const input = wrapper.find('textarea');
+    await input.setValue('hello');
 
-      const value = await (wrapper.vm as any).submitForm();
-      expect(value.textarea).toMatch('hello');
-      done();
-    }, 0);
+    await textarea.trigger('input');
+    await textarea.trigger('change');
+
+    const value = await (wrapper.vm as any).submitForm();
+    expect(value.textarea).toMatch('hello');
   });
 });

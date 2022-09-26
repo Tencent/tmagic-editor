@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 import { describe, expect, test } from 'vitest';
+import { nextTick } from 'vue';
+import MagicForm, { MForm, MHidden } from '@form/index';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
-
-import MagicForm, { MForm, MHidden } from '../../../src';
 
 const getWrapper = (
   config: any = [
@@ -44,20 +44,19 @@ const getWrapper = (
   });
 
 describe('Hidden', () => {
-  test('基础', (done) => {
+  test('基础', async () => {
     const wrapper = getWrapper();
 
-    setTimeout(async () => {
-      const hidden = wrapper.findComponent(MHidden);
-      expect(hidden.exists()).toBe(true);
+    await nextTick();
 
-      const value = await (wrapper.vm as any).submitForm();
-      expect(value.hidden).toMatch('hidden');
-      done();
-    }, 0);
+    const hidden = wrapper.findComponent(MHidden);
+    expect(hidden.exists()).toBe(true);
+
+    const value = await (wrapper.vm as any).submitForm();
+    expect(value.hidden).toMatch('hidden');
   });
 
-  test('未设置name', (done) => {
+  test('未设置name', async () => {
     const wrapper = getWrapper([
       {
         type: 'hidden',
@@ -66,13 +65,12 @@ describe('Hidden', () => {
       },
     ]);
 
-    setTimeout(async () => {
-      const hidden = wrapper.findComponent(MHidden);
-      expect(hidden.exists()).toBe(true);
+    await nextTick();
 
-      const value = await (wrapper.vm as any).submitForm();
-      expect(value.hidden).toBeUndefined();
-      done();
-    }, 0);
+    const hidden = wrapper.findComponent(MHidden);
+    expect(hidden.exists()).toBe(true);
+
+    const value = await (wrapper.vm as any).submitForm();
+    expect(value.hidden).toBeUndefined();
   });
 });

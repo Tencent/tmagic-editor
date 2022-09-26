@@ -17,10 +17,8 @@
  */
 
 import { describe, expect, test } from 'vitest';
-
-import { FormState } from '@tmagic/form';
-
-import { display, filterFunction, getRules, initValue } from '../../../src/utils/form';
+import { FormState } from '@form/index';
+import { display, filterFunction, getRules, initValue } from '@form/utils/form';
 
 // form state mock 数据
 const mForm: FormState = {
@@ -65,7 +63,9 @@ describe('getRules', () => {
     const rules: any = {
       validator: () => 1,
     };
-    const props = {};
+    const props = {
+      config: {},
+    };
     const newRules: any = getRules(mForm, rules, props);
     expect(newRules[0].validator({} as any, {} as any, {})).toBe(1);
   });

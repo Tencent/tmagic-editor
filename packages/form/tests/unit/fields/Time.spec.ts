@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 import { describe, expect, test } from 'vitest';
+import { nextTick } from 'vue';
+import MagicForm, { MForm, MTime } from '@form/index';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
-
-import MagicForm, { MForm, MTime } from '../../../src';
 
 const getWrapper = (
   config: any = [
@@ -44,21 +44,20 @@ const getWrapper = (
   });
 
 describe('Time', () => {
-  test('基础', (done) => {
+  test('基础', async () => {
     const wrapper = getWrapper();
 
-    setTimeout(async () => {
-      const time = wrapper.findComponent(MTime);
-      expect(time.exists()).toBe(true);
+    await nextTick();
 
-      const input = wrapper.find('input');
-      expect(input.exists()).toBe(true);
-      await input.setValue('12:00:00');
+    const time = wrapper.findComponent(MTime);
+    expect(time.exists()).toBe(true);
 
-      time.vm.$emit('change', new Date('12:00:00'));
-      const value = await (wrapper.vm as any).submitForm();
-      expect(value.time).toMatch('12:00:00');
-      done();
-    }, 0);
+    const input = wrapper.find('input');
+    expect(input.exists()).toBe(true);
+    await input.setValue('12:00:00');
+
+    const value = await (wrapper.vm as any).submitForm();
+    console.log(value.time);
+    expect(value.time).toMatch('12:00:00');
   });
 });

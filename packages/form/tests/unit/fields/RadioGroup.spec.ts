@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 import { describe, expect, test } from 'vitest';
+import { nextTick } from 'vue';
+import MagicForm, { MForm, MRadioGroup } from '@form/index';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
-
-import MagicForm, { MForm, MRadioGroup } from '../../../src';
 
 const getWrapper = (
   config: any = [
@@ -52,20 +52,19 @@ const getWrapper = (
   });
 
 describe('RadioGroup', () => {
-  test('基础', (done) => {
+  test('基础', async () => {
     const wrapper = getWrapper();
 
-    setTimeout(async () => {
-      const radioGroup = wrapper.findComponent(MRadioGroup);
-      expect(radioGroup.exists()).toBe(true);
+    await nextTick();
 
-      const value = await (wrapper.vm as any).submitForm();
-      expect(value.radioGroup).toMatch('');
-      done();
-    }, 0);
+    const radioGroup = wrapper.findComponent(MRadioGroup);
+    expect(radioGroup.exists()).toBe(true);
+
+    const value = await (wrapper.vm as any).submitForm();
+    expect(value.radioGroup).toMatch('');
   });
 
-  test('默认选中', (done) => {
+  test('默认选中', async () => {
     const wrapper = getWrapper(
       [
         {
@@ -89,10 +88,9 @@ describe('RadioGroup', () => {
       },
     );
 
-    setTimeout(async () => {
-      const value = await (wrapper.vm as any).submitForm();
-      expect(value.radioGroup).toEqual(1);
-      done();
-    }, 0);
+    await nextTick();
+
+    const value = await (wrapper.vm as any).submitForm();
+    expect(value.radioGroup).toEqual(1);
   });
 });

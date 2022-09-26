@@ -16,13 +16,13 @@
  * limitations under the License.
  */
 import { describe, expect, test } from 'vitest';
+import { nextTick } from 'vue';
+import MagicForm, { MForm } from '@form/index';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
 
-import MagicForm, { MForm } from '../../src';
-
 describe('表单', () => {
-  test('初始化', (done) => {
+  test('初始化', async () => {
     const initValues = {};
     const config = [
       {
@@ -41,9 +41,8 @@ describe('表单', () => {
       },
     });
 
-    setTimeout(() => {
-      expect(wrapper.text()).toBe('text');
-      done();
-    });
+    await nextTick();
+
+    expect(wrapper.text()).toBe('text');
   });
 });

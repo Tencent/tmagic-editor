@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 import { describe, expect, test } from 'vitest';
+import { nextTick } from 'vue';
+import MagicForm, { MForm, MSwitch } from '@form/index';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
-
-import MagicForm, { MForm, MSwitch } from '../../../src';
 
 const getWrapper = (
   config: any = [
@@ -44,20 +44,19 @@ const getWrapper = (
   });
 
 describe('Switch', () => {
-  test('基础', (done) => {
+  test('基础', async () => {
     const wrapper = getWrapper();
 
-    setTimeout(async () => {
-      const sw = wrapper.findComponent(MSwitch);
-      expect(sw.exists()).toBe(true);
+    await nextTick();
 
-      const value = await (wrapper.vm as any).submitForm();
-      expect(value.switch).toBe(false);
-      done();
-    }, 0);
+    const sw = wrapper.findComponent(MSwitch);
+    expect(sw.exists()).toBe(true);
+
+    const value = await (wrapper.vm as any).submitForm();
+    expect(value.switch).toBe(false);
   });
 
-  test('数字默认值', (done) => {
+  test('数字默认值', async () => {
     const wrapper = getWrapper([
       {
         type: 'switch',
@@ -67,17 +66,16 @@ describe('Switch', () => {
       },
     ]);
 
-    setTimeout(async () => {
-      const sw = wrapper.findComponent(MSwitch);
-      expect(sw.exists()).toBe(true);
+    await nextTick();
 
-      const value = await (wrapper.vm as any).submitForm();
-      expect(value.switch).toBe(0);
-      done();
-    }, 0);
+    const sw = wrapper.findComponent(MSwitch);
+    expect(sw.exists()).toBe(true);
+
+    const value = await (wrapper.vm as any).submitForm();
+    expect(value.switch).toBe(0);
   });
 
-  test('点击开关', (done) => {
+  test('点击开关', async () => {
     const wrapper = getWrapper([
       {
         type: 'switch',
@@ -88,17 +86,16 @@ describe('Switch', () => {
       },
     ]);
 
-    setTimeout(async () => {
-      const value = await (wrapper.vm as any).submitForm();
-      expect(value.switch).toMatch('inactive');
+    await nextTick();
 
-      const input = wrapper.find('input');
-      expect(input.exists()).toBe(true);
-      await input.trigger('click');
+    const value = await (wrapper.vm as any).submitForm();
+    expect(value.switch).toMatch('inactive');
 
-      const value2 = await (wrapper.vm as any).submitForm();
-      expect(value2.switch).toMatch('active');
-      done();
-    }, 0);
+    const input = wrapper.find('input');
+    expect(input.exists()).toBe(true);
+    await input.trigger('click');
+
+    const value2 = await (wrapper.vm as any).submitForm();
+    expect(value2.switch).toMatch('active');
   });
 });

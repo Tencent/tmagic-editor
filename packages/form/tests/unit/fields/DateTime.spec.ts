@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 import { describe, expect, test } from 'vitest';
+import { nextTick } from 'vue';
+import MagicForm, { MDateTime, MForm } from '@form/index';
 import { mount } from '@vue/test-utils';
 import ElementPlus, { ElInput } from 'element-plus';
-
-import MagicForm, { MDateTime, MForm } from '../../../src';
 
 const getWrapper = (
   config: any = [
@@ -44,20 +44,19 @@ const getWrapper = (
   });
 
 describe('DateTime', () => {
-  test('基础', (done) => {
+  test('基础', async () => {
     const wrapper = getWrapper();
 
-    setTimeout(async () => {
-      const datetime = wrapper.findComponent(MDateTime);
-      expect(datetime.exists()).toBe(true);
+    await nextTick();
 
-      const value = await (wrapper.vm as any).submitForm();
-      expect(value.datetime).toMatch('2021-01-01 12:00:00');
-      done();
-    }, 0);
+    const datetime = wrapper.findComponent(MDateTime);
+    expect(datetime.exists()).toBe(true);
+
+    const value = await (wrapper.vm as any).submitForm();
+    expect(value.datetime).toMatch('2021-01-01 12:00:00');
   });
 
-  test('错误类型初始化初始化', (done) => {
+  test('错误类型初始化初始化', async () => {
     const wrapper = getWrapper(
       [
         {
@@ -69,17 +68,16 @@ describe('DateTime', () => {
       { datetime: 123 },
     );
 
-    setTimeout(async () => {
-      const datetime = wrapper.findComponent(MDateTime);
-      expect(datetime.exists()).toBe(true);
+    await nextTick();
 
-      const value = await (wrapper.vm as any).submitForm();
-      expect(value.datetime).toMatch('');
-      done();
-    }, 0);
+    const datetime = wrapper.findComponent(MDateTime);
+    expect(datetime.exists()).toBe(true);
+
+    const value = await (wrapper.vm as any).submitForm();
+    expect(value.datetime).toMatch('');
   });
 
-  test('无效值初始化', (done) => {
+  test('无效值初始化', async () => {
     const wrapper = getWrapper(
       [
         {
@@ -91,41 +89,38 @@ describe('DateTime', () => {
       { datetime: 'Invalid Date' },
     );
 
-    setTimeout(async () => {
-      const datetime = wrapper.findComponent(MDateTime);
-      expect(datetime.exists()).toBe(true);
+    await nextTick();
 
-      const value = await (wrapper.vm as any).submitForm();
-      expect(value.datetime).toMatch('');
-      done();
-    }, 0);
+    const datetime = wrapper.findComponent(MDateTime);
+    expect(datetime.exists()).toBe(true);
+
+    const value = await (wrapper.vm as any).submitForm();
+    expect(value.datetime).toMatch('');
   });
-  test('输入日期', (done) => {
+  test('输入日期', async () => {
     const wrapper = getWrapper();
 
-    setTimeout(async () => {
-      const input = wrapper.find('input');
-      await input.setValue('2021/07/28 00:00:00');
+    await nextTick();
 
-      const value = await (wrapper.vm as any).submitForm();
-      expect(value.datetime).toMatch('2021-07-28 00:00:00');
-      done();
-    });
+    const input = wrapper.find('input');
+    await input.setValue('2021/07/28 00:00:00');
+
+    const value = await (wrapper.vm as any).submitForm();
+    expect(value.datetime).toMatch('2021-07-28 00:00:00');
   });
 
-  test('清空', (done) => {
+  test('清空', async () => {
     const wrapper = getWrapper();
 
-    setTimeout(async () => {
-      const elInput = wrapper.findComponent(ElInput);
-      await elInput.trigger('mouseenter');
+    await nextTick();
 
-      const clear = wrapper.find('.clear-icon');
+    const elInput = wrapper.findComponent(ElInput);
+    await elInput.trigger('mouseenter');
 
-      expect(clear.exists()).toBe(true);
-      await clear.trigger('click');
-      expect((wrapper.vm as any).values.datetime).toBeNull();
-      done();
-    }, 0);
+    const clear = wrapper.find('.clear-icon');
+
+    expect(clear.exists()).toBe(true);
+    await clear.trigger('click');
+    expect((wrapper.vm as any).values.datetime).toBeNull();
   });
 });
