@@ -26,10 +26,14 @@ export default defineComponent({
       () => root.value?.items?.find((item: MNode) => item.id === curPageId.value) || root.value?.items?.[0],
     );
 
+    const designWidth = document.documentElement.getBoundingClientRect().width;
     const app = new Core({
+      designWidth,
       config: root.value,
       platform: 'editor',
     });
+
+    globalThis.appInstance = app;
 
     provide('app', app);
 

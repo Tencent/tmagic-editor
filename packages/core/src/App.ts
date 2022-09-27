@@ -70,8 +70,7 @@ class App extends EventEmitter {
     // 根据屏幕大小计算出跟节点的font-size，用于rem样式的适配
     if (this.platform === 'mobile' || this.platform === 'editor') {
       const calcFontsize = () => {
-        let { width } = document.documentElement.getBoundingClientRect();
-        width = Math.min(800, width);
+        const { width } = document.documentElement.getBoundingClientRect();
         const fontSize = width / (this.designWidth / 100);
         document.documentElement.style.fontSize = `${fontSize}px`;
       };

@@ -30,7 +30,10 @@ import { getLocalConfig } from './utils';
 
 Vue.use(request);
 
+const designWidth = document.documentElement.getBoundingClientRect().width;
+
 const app = new Core({
+  designWidth,
   config: ((getUrlParam('localPreview') ? getLocalConfig() : window.magicDSL) || [])[0] || {},
   curPage: getUrlParam('page'),
 });
