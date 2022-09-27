@@ -27,8 +27,8 @@
             <slot name="code-block-panel-header"></slot>
           </template>
 
-          <template #code-block-panel-tool="{ id }">
-            <slot name="code-block-panel-tool" :id="id"></slot>
+          <template #code-block-panel-tool="{ id, data }">
+            <slot name="code-block-panel-tool" :id="id" :data="data"></slot>
           </template>
 
           <template #code-block-edit-panel-header="{ id }">

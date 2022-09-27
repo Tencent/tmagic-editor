@@ -47,7 +47,7 @@
               <el-tooltip effect="dark" content="删除" placement="bottom" v-if="editable">
                 <Icon :icon="Close" class="edit-icon" @click.stop="deleteCode(`${data.id}`)"></Icon>
               </el-tooltip>
-              <slot name="code-block-panel-tool" :id="data.id"></slot>
+              <slot name="code-block-panel-tool" :id="data.id" :data="data.codeBlockContent"></slot>
             </div>
           </div>
           <!-- 展示代码块下绑定的组件 -->
@@ -148,7 +148,7 @@ const initList = async () => {
     state.codeList.push({
       id: codeId,
       name: value.name,
-      content: value.content,
+      codeBlockContent: value,
       showRelation: true,
     });
   });
