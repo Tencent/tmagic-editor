@@ -35,8 +35,8 @@
         <component v-else-if="config.slots?.codeBlockPanelHeader" :is="config.slots.codeBlockPanelHeader" />
       </template>
 
-      <template #code-block-panel-tool="{ id }" v-if="data === 'code-block' || config.slots?.codeBlockPanelTool">
-        <slot v-if="data === 'code-block'" name="code-block-panel-tool" :id="id"></slot>
+      <template #code-block-panel-tool="{ id, data }" v-if="data === 'code-block' || config.slots?.codeBlockPanelTool">
+        <slot v-if="data === 'code-block'" name="code-block-panel-tool" :id="id" :data="data"></slot>
         <component v-else-if="config.slots?.codeBlockPanelTool" :is="config.slots.codeBlockPanelTool" />
       </template>
 
