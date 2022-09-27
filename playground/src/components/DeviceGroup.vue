@@ -49,10 +49,9 @@ export default defineComponent({
 
   setup(props, { emit }) {
     const calcFontsize = (width: number) => {
-      const fontSize = width / 3.75;
       const { iframe } = editorService.get<StageCore>('stage').renderer;
       if (!iframe?.contentWindow) return;
-      iframe.contentWindow.document.documentElement.style.fontSize = `${fontSize}px`;
+      iframe.contentWindow.appInstance.designWidth = width;
     };
 
     const viewerDevice = ref(DeviceType.Phone);

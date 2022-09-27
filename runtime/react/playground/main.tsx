@@ -29,10 +29,15 @@ import plugins from '../.tmagic/plugin-entry';
 
 import App from './App';
 
+const designWidth = document.documentElement.getBoundingClientRect().width;
+
 const app = new Core({
+  designWidth,
   config: {},
   platform: 'editor',
 });
+
+window.appInstance = app;
 
 let curPageId = '';
 
