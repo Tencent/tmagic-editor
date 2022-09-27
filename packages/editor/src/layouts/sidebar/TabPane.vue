@@ -35,16 +35,16 @@
         <component v-else-if="config.slots?.codeBlockPanelHeader" :is="config.slots.codeBlockPanelHeader" />
       </template>
 
-      <template #code-block-panel-tool="{ data }" v-if="data === 'code-block' || config.slots?.codeBlockPanelTool">
-        <slot v-if="data === 'code-block'" name="code-block-panel-tool" :data="data"></slot>
+      <template #code-block-panel-tool="{ id }" v-if="data === 'code-block' || config.slots?.codeBlockPanelTool">
+        <slot v-if="data === 'code-block'" name="code-block-panel-tool" :id="id"></slot>
         <component v-else-if="config.slots?.codeBlockPanelTool" :is="config.slots.codeBlockPanelTool" />
       </template>
 
       <template
-        #code-block-edit-panel-header="{ data }"
+        #code-block-edit-panel-header="{ id }"
         v-if="data === 'code-block' || config.slots?.codeBlockEditPanelHeader"
       >
-        <slot v-if="data === 'code-block'" name="code-block-edit-panel-header" :data="data"></slot>
+        <slot v-if="data === 'code-block'" name="code-block-edit-panel-header" :id="id"></slot>
         <component v-else-if="config.slots?.codeBlockEditPanelHeader" :is="config.slots.codeBlockEditPanelHeader" />
       </template>
 
