@@ -395,10 +395,14 @@ export default class StageDragResize extends EventEmitter {
         this.dragStatus = StageDragStatus.END;
         const frame = this.moveableHelper?.getFrame(e.target);
         this.emit('update', {
-          el: this.target,
-          style: {
-            transform: frame?.get('transform'),
-          },
+          data: [
+            {
+              el: this.target,
+              style: {
+                transform: frame?.get('transform'),
+              },
+            },
+          ],
         });
       });
   }
@@ -422,10 +426,14 @@ export default class StageDragResize extends EventEmitter {
         this.dragStatus = StageDragStatus.END;
         const frame = this.moveableHelper?.getFrame(e.target);
         this.emit('update', {
-          el: this.target,
-          style: {
-            transform: frame?.get('transform'),
-          },
+          data: [
+            {
+              el: this.target,
+              style: {
+                transform: frame?.get('transform'),
+              },
+            },
+          ],
         });
       });
   }
