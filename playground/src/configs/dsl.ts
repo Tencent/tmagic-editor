@@ -20,7 +20,7 @@ export default {
   id: '75f0extui9d7yksklx27hff8xg',
   name: 'test',
   type: 'app',
-  codeBlock: {
+  codeBlocks: {
     code_5336: {
       name: 'getData',
       // eslint-disable-next-line no-eval
