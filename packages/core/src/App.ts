@@ -44,7 +44,7 @@ interface EventCache {
 
 class App extends EventEmitter {
   public env;
-  public codeDsl: CodeBlockDSL;
+  public codeDsl: CodeBlockDSL | undefined;
   public pages = new Map<Id, Page>();
 
   public page: Page | undefined;

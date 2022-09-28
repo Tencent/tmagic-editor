@@ -85,9 +85,9 @@ class Node extends EventEmitter {
   }
 
   private async runCodeBlock(hook: string) {
-    if (!Array.isArray(this.data[hook]) || isEmpty(this.app?.codeDsl)) return;
+    if (!Array.isArray(this.data[hook]) || !this.app.codeDsl || isEmpty(this.app?.codeDsl)) return;
     for (const codeId of this.data[hook]) {
-      if (this.app?.codeDsl[codeId] && typeof this.app?.codeDsl[codeId]?.content === 'function') {
+      if (this.app.codeDsl[codeId] && typeof this.app?.codeDsl[codeId]?.content === 'function') {
         await this.app.codeDsl[codeId].content(this);
       }
     }
