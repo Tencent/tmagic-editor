@@ -70,7 +70,7 @@ const emit = defineEmits(['afterAction']);
 
 const display = (fuc: boolean | Function | undefined, row: any) => {
   if (typeof fuc === 'function') {
-    return fuc.call(this, this, row);
+    return fuc(row);
   }
   return true;
 };
