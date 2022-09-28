@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="isShowCodeBlockEditor"
-    custom-class="code-editor-dialog"
+    class="code-editor-dialog"
     :title="currentTitle"
     :fullscreen="true"
     :before-close="saveAndClose"
