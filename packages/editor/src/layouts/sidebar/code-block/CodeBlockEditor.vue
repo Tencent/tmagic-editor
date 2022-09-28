@@ -122,7 +122,6 @@ watchEffect(async () => {
     state.codeList.push({
       id: key,
       name: value.name,
-      content: value.content,
     });
   });
   currentTitle.value = state.codeList[0]?.name || '';

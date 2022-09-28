@@ -358,7 +358,7 @@ export interface CodeDslList {
   /** 代码块名称 */
   name: string;
   /** 代码块函数内容 */
-  codeBlockContent: CodeBlockContent;
+  codeBlockContent?: CodeBlockContent;
   /** 是否展示代码绑定关系 */
   showRelation?: boolean;
 }
@@ -374,8 +374,6 @@ export interface ListRelationState extends ListState {
     /** 代码块id : 组件信息 */
     [id: string]: MNode[];
   };
-  /** codeDsl内容用于暴露给业务方 */
-  // codeDsl: CodeBlockDSL | null;
 }
 
 export enum CodeDeleteErrorType {
