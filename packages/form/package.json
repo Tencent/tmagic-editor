@@ -1,5 +1,5 @@
 {
-  "version": "1.2.0-beta.1",
+  "version": "1.2.0-beta.2",
   "name": "@tmagic/form",
   "sideEffects": [
     "dist/*",
@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.0.9",
-    "@tmagic/utils": "1.2.0-beta.1",
+    "@tmagic/utils": "1.2.0-beta.2",
     "element-plus": "^2.2.17",
     "lodash-es": "^4.17.21",
     "sortablejs": "^1.14.0",

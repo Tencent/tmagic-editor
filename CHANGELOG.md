@@ -1,3 +1,33 @@
+# [1.2.0-beta.2](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.1...v1.2.0-beta.2) (2022-09-28)
+
+
+### Bug Fixes
+
+* **editor:** codeblock slot参数修改 ([2ac3645](https://github.com/Tencent/tmagic-editor/commit/2ac3645bb028335bd4354e1b3e57be42ff1311d4))
+* **editor:** slot修改,schema声明修改 ([0baec3e](https://github.com/Tencent/tmagic-editor/commit/0baec3e532011b6ae8d019e311d471d4be76ef51))
+* **editor:** 修复warning,修改playground dsl codeBlocks字段 ([85951de](https://github.com/Tencent/tmagic-editor/commit/85951de24d88957c89483525ed49b5263cb31a8b))
+* **editor:** 修复初始dsl无codeBlocks字段时无法新增的问题 ([3bb8ecc](https://github.com/Tencent/tmagic-editor/commit/3bb8ecc97547e9a7838b97b1a182c371efb01a6c))
+* **eidtor:** cr问题修改 ([551da1a](https://github.com/Tencent/tmagic-editor/commit/551da1a64b3402cec3ce89e304cae905f702a250))
+* **runtime:** 切换设计窗体大小时，同时修改app ([b3bae36](https://github.com/Tencent/tmagic-editor/commit/b3bae36d942f00f9039c5bb6b7124668fd8278d7))
+* **stage:** 旋转、缩放组件后没有更新dsl ([bbb5927](https://github.com/Tencent/tmagic-editor/commit/bbb5927e0c78c482a602d15fda8e8cd6ba0a1058))
+* **table:** action display ([6a65ab8](https://github.com/Tencent/tmagic-editor/commit/6a65ab812b16deda5e7dcb59f7af8400866978eb))
+
+
+### Features
+
+* **editor:** code组件新增height配置 ([c87e3b2](https://github.com/Tencent/tmagic-editor/commit/c87e3b2164d7520df1d14d997e94e411d176b89c))
+* **editor:** code组件新增options props ([1c35650](https://github.com/Tencent/tmagic-editor/commit/1c3565035c854bf6259077840a5557b9bae8b70d))
+* **editor:** 导出CodeBlockList组件 ([caa4782](https://github.com/Tencent/tmagic-editor/commit/caa47823be599ba33679412085b6b35b41c43b29))
+* **editor:** 导出CodeSelect组件 ([869b9f2](https://github.com/Tencent/tmagic-editor/commit/869b9f23cb959826eab3d7b1577a26fbb611d45e))
+* **form:** form-dialog重新打开是form重新渲染 ([6cf1f86](https://github.com/Tencent/tmagic-editor/commit/6cf1f8636c2ecdad926883f80544d164c4c26bd0))
+
+
+### Reverts
+
+* Revert "fix(editor): codeblock slot参数修改" ([84b24f1](https://github.com/Tencent/tmagic-editor/commit/84b24f11b84a220966a36ed553192560710db711))
+
+
+
 # [1.2.0-beta.1](https://github.com/Tencent/tmagic-editor/compare/v1.1.6...v1.2.0-beta.1) (2022-09-22)
 
 
