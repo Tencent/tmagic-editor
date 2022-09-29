@@ -1,5 +1,9 @@
 <template>
-  <el-scrollbar class="magic-editor-layer-panel">
+  <el-scrollbar
+    class="magic-editor-layer-panel"
+    @mouseenter="addSelectModeListener"
+    @mouseleave="removeSelectModeListener"
+  >
     <slot name="layer-panel-header"></slot>
 
     <el-input
@@ -27,20 +31,22 @@
       }"
       :filter-node-method="filterNode"
       :allow-drop="allowDrop"
+      :show-checkbox="isMultiSelectStatus || selectedIds.length > 1"
       @node-click="clickHandler"
       @node-contextmenu="contextmenu"
       @node-drag-end="handleDragEnd"
       @node-collapse="handleCollapse"
       @node-expand="handleExpand"
+      @check="multiClickHandler"
+      @mousedown="toggleClickFlag"
+      @mouseup="toggleClickFlag"
     >
       <template #default="{ node, data }">
         <div
           :id="data.id"
           class="cus-tree-node"
-          @mousedown="toggleClickFlag"
-          @mouseup="toggleClickFlag"
           @mouseenter="highlightHandler(data)"
-          :class="{ 'cus-tree-node-hover': canHighlight && data.id === highlightNode?.id }"
+          :class="{ 'cus-tree-node-hover': canHighlight(data) }"
         >
           <slot name="layer-node-content" :node="node" :data="data">
             <span>
@@ -60,6 +66,7 @@
 <script lang="ts">
 import { computed, defineComponent, inject, Ref, ref, watchEffect } from 'vue';
 import type { ElTree } from 'element-plus';
+import KeyController from 'keycon';
 import { throttle } from 'lodash-es';
 
 import type { Id, MNode, MPage } from '@tmagic/schema';
@@ -81,6 +88,11 @@ const select = async (data: MNode, editorService?: EditorService) => {
 
   await editorService?.select(data);
   editorService?.get<StageCore>('stage')?.select(data.id);
+};
+
+const multiSelect = async (data: Id[], editorService?: EditorService) => {
+  await editorService?.multiSelect(data);
+  editorService?.get<StageCore>('stage')?.multiSelect(data);
 };
 
 const highlight = (data: MNode, editorService?: EditorService) => {
@@ -124,9 +136,15 @@ const useDrop = (tree: Ref<InstanceType<typeof ElTree> | undefined>, editorServi
 });
 
 const useStatus = (tree: Ref<InstanceType<typeof ElTree> | undefined>, editorService?: EditorService) => {
-  const node = ref<MNode>();
   const page = computed(() => editorService?.get('page'));
   const expandedKeys = new Map<Id, Id>();
+  // 多选选中的节点数组
+  const selectedNodes = ref<MNode[]>([]);
+  // 多选选中的组件id数组
+  const selectedIds = computed(() => selectedNodes.value.map((node: MNode) => node.id));
+  // 是否多选
+  const isMultiSelectStatus = ref(false);
+  const keycon = ref<KeyController>();
 
   const expandNodes = () => {
     expandedKeys.forEach((key) => {
@@ -135,14 +153,62 @@ const useStatus = (tree: Ref<InstanceType<typeof ElTree> | undefined>, editorSer
     });
   };
 
+  // 监听模式选择
+  const addSelectModeListener = () => {
+    const isMac = /mac os x/.test(navigator.userAgent.toLowerCase());
+    const ctrl = isMac ? 'meta' : 'ctrl';
+    keycon.value = new KeyController();
+    keycon.value.keydown(ctrl, (e) => {
+      e.inputEvent.preventDefault();
+      isMultiSelectStatus.value = true;
+    });
+    // ctrl+tab切到其他窗口，需要将多选状态置为false
+    keycon.value.on('blur', () => {
+      isMultiSelectStatus.value = false;
+    });
+    keycon.value.keyup(ctrl, (e) => {
+      e.inputEvent.preventDefault();
+      isMultiSelectStatus.value = false;
+    });
+  };
+
+  // 移除监听
+  const removeSelectModeListener = () => {
+    keycon?.value?.destroy();
+  };
+
+  // 设置树节点选中状态
+  const setTreeKeyStatus = (tree: Ref<InstanceType<typeof ElTree> | undefined>) => {
+    if (!tree.value) return;
+    if (selectedIds.value.length === 0) {
+      tree.value.setCheckedKeys([]);
+      tree.value.setCurrentKey();
+    } else if (selectedIds.value.length === 1 && !isMultiSelectStatus.value) {
+      // 选中1个
+      tree.value.setCurrentKey(selectedIds.value[0], true);
+      tree.value.setCheckedKeys([]);
+    } else {
+      // 多选框选中多个
+      tree.value.setCheckedKeys(selectedIds.value);
+      tree.value.setCurrentKey();
+    }
+  };
+
   watchEffect(() => {
     if (!tree.value) return;
     if (!editorService) return;
-    node.value = editorService.get('node');
 
-    if (!node.value) return;
+    selectedNodes.value = editorService.get('nodes');
+    // 多选模式如果已存在第一个选中的元素是页面(magic-ui-page) 剔除页面选中状态
+    if (
+      isMultiSelectStatus.value &&
+      selectedNodes.value.length === 1 &&
+      selectedNodes.value[0].type === NodeType.PAGE
+    ) {
+      selectedNodes.value = [];
+    }
 
-    tree.value.setCurrentKey(node.value.id, true);
+    setTreeKeyStatus(tree);
 
     const parent = editorService.get('parent');
     if (!parent?.id) return;
@@ -160,7 +226,6 @@ const useStatus = (tree: Ref<InstanceType<typeof ElTree> | undefined>, editorSer
       expandNodes();
     });
   });
-
   return {
     values: computed(() => (page.value ? [page.value] : [])),
 
@@ -175,8 +240,10 @@ const useStatus = (tree: Ref<InstanceType<typeof ElTree> | undefined>, editorSer
     },
 
     highlightNode: computed(() => editorService?.get('highlightNode')),
-    clickNode: node,
-    expandedKeys: computed(() => (node.value ? [node.value.id] : [])),
+    expandedKeys: computed(() => (selectedIds.value.length > 0 ? selectedIds.value : [])),
+    selectedIds,
+    selectedNodes,
+    isMultiSelectStatus,
 
     handleCollapse: (data: MNode) => {
       expandedKeys.delete(data.id);
@@ -187,6 +254,9 @@ const useStatus = (tree: Ref<InstanceType<typeof ElTree> | undefined>, editorSer
       if (!parent?.id) return;
       expandedKeys.set(parent.id, parent.id);
     },
+
+    addSelectModeListener,
+    removeSelectModeListener,
   };
 };
 
@@ -220,8 +290,9 @@ export default defineComponent({
     const services = inject<Services>('services');
     const tree = ref<InstanceType<typeof ElTree>>();
     const menu = ref<InstanceType<typeof LayerMenu>>();
-    const clicked = ref(false);
     const editorService = services?.editorService;
+    const clicked = ref(false);
+
     const highlightHandler = throttle((data: MNode) => {
       highlight(data, editorService);
     }, throttleTime);
@@ -231,15 +302,60 @@ export default defineComponent({
     };
 
     const statusData = useStatus(tree, editorService);
-    const canHighlight = computed(
-      () => statusData.highlightNode.value?.id !== statusData.clickNode.value?.id && !clicked.value,
-    );
+    const canHighlight = (data: MNode) => {
+      if (clicked.value) return false;
+      if (statusData.selectedIds.value.length === 1) {
+        return !statusData.selectedIds.value.includes(data.id) && data.id === statusData.highlightNode?.value?.id;
+      }
+      return data.id === statusData.highlightNode?.value?.id;
+    };
 
     editorService?.on('remove', () => {
       setTimeout(() => {
         tree.value?.getNode(editorService.get('node').id)?.updateChildren();
       }, 0);
     });
+
+    // 选择节点多选框
+    const multiClickHandler = (data: MNode): void => {
+      if (!data?.id) {
+        throw new Error('没有id');
+      }
+
+      // 页面(magic-ui-page)不可选中
+      if (data.type === NodeType.PAGE) return;
+
+      const index = statusData.selectedNodes.value.findIndex((node) => node.id === data.id);
+      if (index !== -1) {
+        // 已经包含就移除掉
+        statusData.selectedNodes.value.splice(index, 1);
+      } else {
+        statusData.selectedNodes.value = [...statusData.selectedNodes.value, data];
+      }
+      tree.value?.setCheckedKeys(statusData.selectedIds.value);
+      multiSelect(statusData.selectedIds.value, editorService);
+    };
+
+    // 点击节点
+    const clickHandler = (data: MNode): void => {
+      if (!statusData.isMultiSelectStatus.value) {
+        if (services?.uiService.get<boolean>('uiSelectMode')) {
+          document.dispatchEvent(new CustomEvent('ui-select', { detail: data }));
+          return;
+        }
+        tree.value?.setCurrentKey(data.id);
+        select(data, editorService);
+      } else {
+        multiClickHandler(data);
+      }
+    };
+
+    // 右键菜单
+    const contextmenu = async (event: MouseEvent, data: MNode): Promise<void> => {
+      event.preventDefault();
+      await select(data, editorService);
+      menu.value?.show(event);
+    };
 
     return {
       tree,
@@ -249,23 +365,11 @@ export default defineComponent({
       ...useFilter(tree),
 
       highlightHandler,
-      toggleClickFlag,
       canHighlight,
-
-      clickHandler(data: MNode): void {
-        if (services?.uiService.get<boolean>('uiSelectMode')) {
-          document.dispatchEvent(new CustomEvent('ui-select', { detail: data }));
-          return;
-        }
-        tree.value?.setCurrentKey(data.id);
-        select(data, editorService);
-      },
-
-      async contextmenu(event: MouseEvent, data: MNode) {
-        event.preventDefault();
-        await select(data, editorService);
-        menu.value?.show(event);
-      },
+      clickHandler,
+      multiClickHandler,
+      contextmenu,
+      toggleClickFlag,
     };
   },
 });
