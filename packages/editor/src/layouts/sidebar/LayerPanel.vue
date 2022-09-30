@@ -298,10 +298,7 @@ const toggleClickFlag = () => {
 // 是否满足展示高亮
 const canHighlight = (data: MNode) => {
   if (clicked.value) return false;
-  if (selectedIds.value.length === 1) {
-    return !selectedIds.value.includes(data.id) && data.id === highlightNode?.value?.id;
-  }
-  return data.id === highlightNode?.value?.id;
+  return data.id === highlightNode?.value?.id && !selectedIds.value.includes(data.id);
 };
 
 // 监听选择模式，针对多选情况做一些处理
