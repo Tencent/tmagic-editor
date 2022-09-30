@@ -279,6 +279,8 @@ const addSelectModeListener = () => {
 // 移除监听
 const removeSelectModeListener = () => {
   keycon.value?.destroy();
+  // 如果鼠标移出监听范围，且当前只选中了一个，置为单选模式(修复按住ctrl不放但鼠标移出的情况)
+  if (selectedIds.value.length === 1) isMultiSelectStatus.value = false;
 };
 
 // 鼠标是否按下标志，用于高亮状态互斥
@@ -316,7 +318,10 @@ const multiClickHandler = (data: MNode): void => {
   }
 
   // 页面(magic-ui-page)不可选中
-  if (data.type === NodeType.PAGE) return;
+  if (data.type === NodeType.PAGE) {
+    tree.value?.setCheckedKeys([]);
+    return;
+  }
 
   const index = selectedNodes.value.findIndex((node) => node.id === data.id);
   if (index !== -1) {
