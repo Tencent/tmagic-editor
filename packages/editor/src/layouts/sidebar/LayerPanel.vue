@@ -91,6 +91,8 @@ const selectedNodes = ref<MNode[]>([]);
 const selectedIds = computed(() => selectedNodes.value.map((node: MNode) => node.id));
 // 是否多选
 const isMultiSelectStatus = ref(false);
+// 多选场景 取消选中的那个节点id
+const spliceNodeKey = ref<Id>();
 const filterText = ref('');
 // 默认展开节点
 const defaultExpandedKeys = computed(() => (selectedIds.value.length > 0 ? selectedIds.value : []));
@@ -300,7 +302,9 @@ const toggleClickFlag = () => {
 // 是否满足展示高亮
 const canHighlight = (data: MNode) => {
   if (clicked.value) return false;
-  return data.id === highlightNode?.value?.id && !selectedIds.value.includes(data.id);
+  return (
+    data.id === highlightNode?.value?.id && !selectedIds.value.includes(data.id) && spliceNodeKey.value !== data.id
+  );
 };
 
 // 监听选择模式，针对多选情况做一些处理
@@ -327,6 +331,7 @@ const multiClickHandler = (data: MNode): void => {
   if (index !== -1) {
     // 已经包含就移除掉
     selectedNodes.value.splice(index, 1);
+    spliceNodeKey.value = data.id;
   } else {
     selectedNodes.value = [...selectedNodes.value, data];
   }
