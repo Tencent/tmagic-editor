@@ -134,6 +134,7 @@ export default class StageCore extends EventEmitter {
           this.selectedDomList.push(el);
         }
         this.multiSelect(this.selectedDomList);
+        this.emit('multiSelect', this.selectedDomList);
       });
 
     // 要先触发select，在触发update
@@ -238,9 +239,8 @@ export default class StageCore extends EventEmitter {
    */
   public async multiSelect(idOrElList: HTMLElement[] | Id[]): Promise<void> {
     this.clearSelectStatus('select');
-    const elList = await Promise.all(idOrElList.map(async (idOrEl) => await this.getTargetElement(idOrEl)));
-    this.multiDr.multiSelect(elList);
-    this.emit('multiSelect', elList);
+    this.selectedDomList = await Promise.all(idOrElList.map(async (idOrEl) => await this.getTargetElement(idOrEl)));
+    this.multiDr.multiSelect(this.selectedDomList);
   }
 
   /**
