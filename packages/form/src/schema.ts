@@ -408,11 +408,13 @@ export interface ColorPickConfig extends FormItem {
  */
 export interface CheckboxGroupConfig extends FormItem {
   type: 'checkbox-group';
-  options: {
-    value: any;
-    text: string;
-    disabled?: boolean;
-  }[];
+  options:
+    | {
+        value: any;
+        text: string;
+        disabled?: boolean;
+      }[]
+    | Function;
 }
 
 /**
