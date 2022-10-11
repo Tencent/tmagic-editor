@@ -5,9 +5,15 @@ import {
   ElCheckbox,
   ElCheckboxGroup,
   ElCol,
+  ElCollapse,
+  ElCollapseItem,
   ElColorPicker,
   ElDatePicker,
   ElDialog,
+  ElDivider,
+  ElDropdown,
+  ElDropdownItem,
+  ElDropdownMenu,
   ElForm,
   ElFormItem,
   ElIcon,
@@ -18,9 +24,11 @@ import {
   ElOption,
   ElOptionGroup,
   ElPagination,
+  ElPopover,
   ElRadio,
   ElRadioGroup,
   ElRow,
+  ElScrollbar,
   ElSelect,
   ElStep,
   ElSteps,
@@ -31,6 +39,7 @@ import {
   ElTabs,
   ElTimePicker,
   ElTooltip,
+  ElTree,
   ElUpload,
 } from 'element-plus';
 
@@ -68,6 +77,16 @@ const adapter: any = {
       props: (props: any) => props,
     },
 
+    collapse: {
+      component: ElCollapse,
+      props: (props: any) => props,
+    },
+
+    collapseItem: {
+      component: ElCollapseItem,
+      props: (props: any) => props,
+    },
+
     colorPicker: {
       component: ElColorPicker,
       props: (props: any) => props,
@@ -80,6 +99,26 @@ const adapter: any = {
 
     dialog: {
       component: ElDialog,
+      props: (props: any) => props,
+    },
+
+    divider: {
+      component: ElDivider,
+      props: (props: any) => props,
+    },
+
+    dropdown: {
+      component: ElDropdown,
+      props: (props: any) => props,
+    },
+
+    dropdownItem: {
+      component: ElDropdownItem,
+      props: (props: any) => props,
+    },
+
+    dropdownMenu: {
+      component: ElDropdownMenu,
       props: (props: any) => props,
     },
 
@@ -123,6 +162,11 @@ const adapter: any = {
       props: (props: any) => props,
     },
 
+    popover: {
+      component: ElPopover,
+      props: (props: any) => props,
+    },
+
     radio: {
       component: ElRadio,
       props: (props: any) => props,
@@ -135,6 +179,11 @@ const adapter: any = {
 
     row: {
       component: ElRow,
+      props: (props: any) => props,
+    },
+
+    scrollbar: {
+      component: ElScrollbar,
       props: (props: any) => props,
     },
 
@@ -190,6 +239,11 @@ const adapter: any = {
 
     tooltip: {
       component: ElTooltip,
+      props: (props: any) => props,
+    },
+
+    tree: {
+      component: ElTree,
       props: (props: any) => props,
     },
 

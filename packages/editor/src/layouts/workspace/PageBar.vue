@@ -9,39 +9,39 @@
     >
       <div class="m-editor-page-bar-title">
         <slot name="page-bar-title" :page="item">
-          <el-tooltip effect="dark" placement="top-start" :content="item.name">
+          <TMagicTooltip effect="dark" placement="top-start" :content="item.name">
             <span>{{ item.name || item.id }}</span>
-          </el-tooltip>
+          </TMagicTooltip>
         </slot>
       </div>
 
-      <el-popover popper-class="page-bar-popover" placement="top" :width="160" trigger="hover">
+      <TMagicPopover popper-class="page-bar-popover" placement="top" :width="160" trigger="hover">
         <div>
           <slot name="page-bar-popover" :page="item">
-            <tool-button
+            <ToolButton
               :data="{
                 type: 'button',
                 text: '复制',
                 icon: DocumentCopy,
                 handler: () => copy(item),
               }"
-            ></tool-button>
-            <tool-button
+            ></ToolButton>
+            <ToolButton
               :data="{
                 type: 'button',
                 text: '删除',
                 icon: Delete,
                 handler: () => remove(item),
               }"
-            ></tool-button>
+            ></ToolButton>
           </slot>
         </div>
         <template #reference>
-          <el-icon class="m-editor-page-bar-menu-icon">
+          <TMagicIcon class="m-editor-page-bar-menu-icon">
             <CaretBottom></CaretBottom>
-          </el-icon>
+          </TMagicIcon>
         </template>
-      </el-popover>
+      </TMagicPopover>
     </div>
   </PageBarScrollContainer>
 </template>
@@ -50,6 +50,7 @@
 import { computed, inject } from 'vue';
 import { CaretBottom, Delete, DocumentCopy } from '@element-plus/icons-vue';
 
+import { TMagicIcon, TMagicPopover, TMagicTooltip } from '@tmagic/design';
 import type { MApp, MPage } from '@tmagic/schema';
 
 import ToolButton from '../../components/ToolButton.vue';

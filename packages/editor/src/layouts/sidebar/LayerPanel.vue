@@ -1,21 +1,21 @@
 <template>
-  <el-scrollbar
+  <TMagicScrollbar
     class="magic-editor-layer-panel"
     @mouseenter="addSelectModeListener"
     @mouseleave="removeSelectModeListener"
   >
     <slot name="layer-panel-header"></slot>
 
-    <el-input
+    <TMagicInput
       class="filterInput"
       size="small"
       placeholder="输入关键字进行过滤"
       clearable
       v-model="filterText"
       @change="filterTextChangeHandler"
-    ></el-input>
+    ></TMagicInput>
 
-    <el-tree
+    <TMagicTree
       v-if="values.length"
       ref="tree"
       node-key="id"
@@ -55,20 +55,20 @@
           </slot>
         </div>
       </template>
-    </el-tree>
+    </TMagicTree>
 
     <teleport to="body">
       <layer-menu ref="menu"></layer-menu>
     </teleport>
-  </el-scrollbar>
+  </TMagicScrollbar>
 </template>
 
 <script lang="ts" setup>
 import { computed, inject, ref, watch } from 'vue';
-import type { ElTree } from 'element-plus';
 import KeyController from 'keycon';
 import { throttle } from 'lodash-es';
 
+import { TMagicInput, TMagicScrollbar, TMagicTree } from '@tmagic/design';
 import type { Id, MNode, MPage } from '@tmagic/schema';
 import { MContainer, NodeType } from '@tmagic/schema';
 import StageCore from '@tmagic/stage';
@@ -80,7 +80,7 @@ import LayerMenu from './LayerMenu.vue';
 
 const throttleTime = 150;
 const services = inject<Services>('services');
-const tree = ref<InstanceType<typeof ElTree>>();
+const tree = ref<InstanceType<typeof TMagicTree>>();
 const menu = ref<InstanceType<typeof LayerMenu>>();
 const editorService = services?.editorService;
 const page = computed(() => editorService?.get('page'));
@@ -157,7 +157,7 @@ const handleDragEnd = async (e: any) => {
     node.style.top = 0;
     node.style.left = 0;
   }
-  const { data } = tree.value;
+  const data = tree.value.getData();
   const [page] = data as [MPage];
   editorService?.update(page);
 };
@@ -228,7 +228,7 @@ watch(
 
     setTimeout(() => {
       tree.value &&
-        Object.entries(tree.value.store.nodesMap).forEach(([id, node]) => {
+        Object.entries(tree.value.getStore().nodesMap).forEach(([id, node]: [string, any]) => {
           if (node.expanded && node.data.items) {
             expandedKeys.set(id, id);
           }

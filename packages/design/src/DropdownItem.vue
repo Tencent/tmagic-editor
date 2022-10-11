@@ -1,8 +1,5 @@
 <template>
   <component :is="uiComponent.component" v-bind="uiProps">
-    <template #content>
-      <slot name="content"></slot>
-    </template>
     <slot></slot>
   </component>
 </template>
@@ -13,15 +10,13 @@ import { computed } from 'vue';
 import { getConfig } from './config';
 
 const props = defineProps<{
-  placement?: string;
+  command?: any;
   disabled?: boolean;
-  content?: string;
-  effect?: string;
-  transition?: string;
-  offset?: number;
+  divided?: boolean;
+  icon?: any;
 }>();
 
-const uiComponent = getConfig('components').tooltip;
+const uiComponent = getConfig('components').dropdownItem;
 
 const uiProps = computed(() => uiComponent.props(props));
 </script>

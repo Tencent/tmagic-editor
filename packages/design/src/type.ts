@@ -12,6 +12,7 @@ export interface TMagicMessage {
   warning: (msg: string) => void;
   info: (msg: string) => void;
   error: (msg: string) => void;
+  closeAll: () => void;
 }
 
 export type ElMessageBoxShortcutMethod = ((

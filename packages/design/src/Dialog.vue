@@ -16,6 +16,7 @@ import { getConfig } from './config';
 const props = defineProps<{
   modelValue?: boolean;
   appendToBody?: boolean;
+  beforeClose?: any;
   title?: string;
   width?: string | number;
   fullscreen?: boolean;

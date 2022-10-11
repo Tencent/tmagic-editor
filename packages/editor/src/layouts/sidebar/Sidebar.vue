@@ -1,5 +1,5 @@
 <template>
-  <el-tabs
+  <TMagicTabs
     v-if="data.type === 'tabs' && data.items.length"
     class="m-editor-sidebar"
     v-model="activeTabName"
@@ -35,11 +35,13 @@
         <slot name="code-block-edit-panel-header" :id="id"></slot>
       </template>
     </tab-pane>
-  </el-tabs>
+  </TMagicTabs>
 </template>
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
+
+import { TMagicTabs } from '@tmagic/design';
 
 import { SideBarData } from '../../type';
 

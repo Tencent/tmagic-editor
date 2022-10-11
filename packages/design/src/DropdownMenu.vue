@@ -1,9 +1,5 @@
 <template>
   <component :is="uiComponent.component" v-bind="uiProps">
-    <template #header>
-      <slot name="header"></slot>
-    </template>
-
     <slot></slot>
   </component>
 </template>
@@ -13,13 +9,9 @@ import { computed } from 'vue';
 
 import { getConfig } from './config';
 
-const props = defineProps<{
-  bodyStyle?: Record<string, any>;
-  shadow?: string;
-  header?: string;
-}>();
+const props = defineProps();
 
-const uiComponent = getConfig('components').card;
+const uiComponent = getConfig('components').dropdownMenu;
 
 const uiProps = computed(() => uiComponent.props(props));
 </script>

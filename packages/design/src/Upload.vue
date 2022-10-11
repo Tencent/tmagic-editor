@@ -25,7 +25,7 @@ const upload = ref<any>();
 
 defineExpose({
   clearFiles(...args: any[]) {
-    upload.value?.clearFiles(...args);
+    return upload.value?.clearFiles(...args);
   },
 });
 </script>

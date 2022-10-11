@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, ref } from 'vue';
 
 import { getConfig } from './config';
 
@@ -19,8 +19,4 @@ const uiComponent = getConfig('components').optionGroup;
 const uiProps = computed(() => uiComponent.props(props));
 
 const optionGroup = ref<any>();
-
-onMounted(() => {
-  optionGroup.value.visible = true;
-});
 </script>

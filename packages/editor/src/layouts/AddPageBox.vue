@@ -3,7 +3,7 @@
     <div class="m-editor-empty-content">
       <div class="m-editor-empty-button" @click="clickHandler">
         <div>
-          <el-icon><plus /></el-icon>
+          <MIcon :icon="Plus"></MIcon>
         </div>
         <p>新增页面</p>
       </div>
@@ -17,6 +17,7 @@ import { Plus } from '@element-plus/icons-vue';
 
 import { NodeType } from '@tmagic/schema';
 
+import MIcon from '../components/Icon.vue';
 import type { Services } from '../type';
 import { generatePageNameByApp } from '../utils';
 

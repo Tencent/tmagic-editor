@@ -1,14 +1,14 @@
 <template>
   <div v-if="menuData.length && visible" class="magic-editor-content-menu" ref="menu" :style="menuStyle">
     <div>
-      <tool-button
+      <ToolButton
         v-for="(item, index) in menuData"
         event-type="mouseup"
         :data="item"
         :key="index"
         @mouseup="hide"
         @mouseenter="showSubMenu(item)"
-      ></tool-button>
+      ></ToolButton>
     </div>
     <teleport to="body">
       <content-menu

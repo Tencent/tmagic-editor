@@ -1,5 +1,5 @@
 <template>
-  <el-dialog
+  <TMagicDialog
     v-model="isShowCodeBlockEditor"
     class="code-editor-dialog"
     :title="currentTitle"
@@ -10,16 +10,15 @@
     <layout v-model:left="left" :min-left="45" class="code-editor-layout">
       <!-- 左侧列表 -->
       <template #left v-if="mode === CodeEditorMode.LIST">
-        <el-tree
+        <TMagicTree
           v-if="!isEmpty(state.codeList)"
-          ref="tree"
+          class="side-tree"
           node-key="id"
           empty-text="暂无代码块"
           :data="state.codeList"
           :highlight-current="true"
-          @node-click="selectHandler"
           :current-node-key="state.codeList[0].id"
-          class="side-tree"
+          @node-click="selectHandler"
         >
           <template #default="{ data }">
             <div :id="data.id" class="list-container">
@@ -28,7 +27,7 @@
               </div>
             </div>
           </template>
-        </el-tree>
+        </TMagicTree>
       </template>
       <!-- 右侧区域 -->
       <template #center>
@@ -41,11 +40,16 @@
           ]"
         >
           <slot name="code-block-edit-panel-header" :id="id"></slot>
-          <el-card shadow="never">
+          <TMagicCard shadow="never">
             <template #header>
               <div class="code-name-wrapper">
                 <div class="code-name-label">代码块名称</div>
-                <el-input v-if="codeConfig" class="code-name-input" v-model="codeConfig.name" :disabled="!editable" />
+                <TMagicInput
+                  v-if="codeConfig"
+                  class="code-name-input"
+                  v-model="codeConfig.name"
+                  :disabled="!editable"
+                />
               </div>
             </template>
             <div class="m-editor-wrapper">
@@ -63,25 +67,26 @@
                 }"
               ></magic-code-editor>
               <div class="m-editor-content-bottom" v-if="editable">
-                <el-button type="primary" class="button" @click="saveCode">保存</el-button>
-                <el-button type="primary" class="button" @click="saveAndClose">关闭</el-button>
+                <TMagicButton type="primary" class="button" @click="saveCode">保存</TMagicButton>
+                <TMagicButton type="primary" class="button" @click="saveAndClose">关闭</TMagicButton>
               </div>
               <div class="m-editor-content-bottom" v-else>
-                <el-button type="primary" class="button" @click="saveAndClose">关闭</el-button>
+                <TMagicButton type="primary" class="button" @click="saveAndClose">关闭</TMagicButton>
               </div>
             </div>
-          </el-card>
+          </TMagicCard>
         </div>
       </template>
     </layout>
-  </el-dialog>
+  </TMagicDialog>
 </template>
 
 <script lang="ts" setup>
 import { computed, inject, reactive, ref, watchEffect } from 'vue';
-import { ElMessage } from 'element-plus';
 import { forIn, isEmpty } from 'lodash-es';
 import type * as monaco from 'monaco-editor';
+
+import { TMagicButton, TMagicCard, TMagicDialog, TMagicInput, tMagicMessage, TMagicTree } from '@tmagic/design';
 
 import type { CodeBlockContent, CodeDslList, ListState, Services } from '../../../type';
 import { CodeEditorMode } from '../../../type';
@@ -137,7 +142,7 @@ const saveCode = async (): Promise<boolean> => {
     /* eslint no-eval: "off" */
     codeConfig.value.content = eval(codeContent);
   } catch (e: any) {
-    ElMessage.error(e.stack);
+    tMagicMessage.error(e.stack);
     return false;
   }
   // 存入dsl
@@ -145,7 +150,7 @@ const saveCode = async (): Promise<boolean> => {
     name: codeConfig.value.name,
     content: codeConfig.value.content,
   });
-  ElMessage.success('代码保存成功');
+  tMagicMessage.success('代码保存成功');
   return true;
 };
 

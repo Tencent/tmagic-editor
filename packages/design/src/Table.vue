@@ -47,15 +47,15 @@ defineExpose({
   $el: table.value?.$el,
 
   clearSelection(...args: any[]) {
-    table.value?.clearSelection(...args);
+    return table.value?.clearSelection(...args);
   },
 
   toggleRowSelection(...args: any[]) {
-    table.value?.toggleRowSelection(...args);
+    return table.value?.toggleRowSelection(...args);
   },
 
   toggleRowExpansion(...args: any[]) {
-    table.value?.toggleRowExpansion(...args);
+    return table.value?.toggleRowExpansion(...args);
   },
 });
 </script>

@@ -2,22 +2,22 @@
   <div class="m-editor-code-block-list">
     <slot name="code-block-panel-header">
       <div class="code-header-wrapper">
-        <el-input
+        <TMagicInput
           :class="[editable ? 'code-filter-input' : 'code-filter-input-no-btn']"
           size="small"
           placeholder="输入关键字进行过滤"
           clearable
           v-model="filterText"
           @input="filterTextChangeHandler"
-        ></el-input>
-        <el-button class="create-code-button" type="primary" size="small" @click="createCodeBlock" v-if="editable"
-          >新增</el-button
+        ></TMagicInput>
+        <TMagicButton class="create-code-button" type="primary" size="small" @click="createCodeBlock" v-if="editable"
+          >新增</TMagicButton
         >
       </div>
     </slot>
 
     <!-- 代码块列表 -->
-    <el-tree
+    <TMagicTree
       v-if="!isEmpty(state.codeList)"
       ref="tree"
       node-key="id"
@@ -33,20 +33,20 @@
             <div class="code-name">{{ data.name }}（{{ data.id }}）</div>
             <!-- 右侧工具栏 -->
             <div class="right-tool">
-              <el-tooltip effect="dark" :content="editable ? '编辑' : '查看'" placement="bottom">
+              <TMagicTooltip effect="dark" :content="editable ? '编辑' : '查看'" placement="bottom">
                 <Icon :icon="editable ? Edit : View" class="edit-icon" @click.stop="editCode(`${data.id}`)"></Icon>
-              </el-tooltip>
-              <el-tooltip
+              </TMagicTooltip>
+              <TMagicTooltip
                 effect="dark"
                 content="查看绑定关系"
                 placement="bottom"
                 v-if="state.bindComps[data.id] && state.bindComps[data.id].length > 0"
               >
                 <Icon :icon="Link" class="edit-icon" @click.stop="toggleCombineRelation(data)"></Icon>
-              </el-tooltip>
-              <el-tooltip effect="dark" content="删除" placement="bottom" v-if="editable">
+              </TMagicTooltip>
+              <TMagicTooltip effect="dark" content="删除" placement="bottom" v-if="editable">
                 <Icon :icon="Close" class="edit-icon" @click.stop="deleteCode(`${data.id}`)"></Icon>
-              </el-tooltip>
+              </TMagicTooltip>
               <slot name="code-block-panel-tool" :id="data.id" :data="data.codeBlockContent"></slot>
             </div>
           </div>
@@ -62,27 +62,27 @@
               ></path>
             </svg>
             <!-- todo 功能暂时隐藏 -->
-            <!-- <el-button
+            <!-- <TMagicButton
               v-for="(comp, index) in state.bindComps[data.id]"
               :key="index"
               class="code-comp"
               size="small"
               :plain="true"
               >{{ comp.name }}<Icon :icon="Close" class="comp-delete-icon" @click.stop="unbind(comp.id, data.id)"></Icon
-            ></el-button> -->
-            <el-button
+            ></TMagicButton> -->
+            <TMagicButton
               v-for="(comp, index) in state.bindComps[data.id]"
               :key="index"
               class="code-comp"
               size="small"
               :plain="true"
               @click.stop="selectComp(comp.id)"
-              >{{ comp.name }}</el-button
+              >{{ comp.name }}</TMagicButton
             >
           </div>
         </div>
       </template>
-    </el-tree>
+    </TMagicTree>
 
     <!-- 代码块编辑区 -->
     <code-block-editor>
@@ -96,9 +96,9 @@
 <script lang="ts" setup>
 import { computed, inject, reactive, ref, watch } from 'vue';
 import { Close, Edit, Link, View } from '@element-plus/icons-vue';
-import { ElMessage } from 'element-plus';
 import { forIn, isEmpty } from 'lodash-es';
 
+import { TMagicButton, TMagicInput, tMagicMessage, TMagicTooltip, TMagicTree } from '@tmagic/design';
 import { Id } from '@tmagic/schema';
 import StageCore from '@tmagic/stage';
 
@@ -184,7 +184,7 @@ watch(
 const createCodeBlock = async () => {
   const { codeBlockService } = services || {};
   if (!codeBlockService) {
-    ElMessage.error('新增代码块失败');
+    tMagicMessage.error('新增代码块失败');
     return;
   }
   const codeConfig: CodeBlockContent = {
@@ -214,7 +214,7 @@ const deleteCode = (key: string) => {
     if (typeof props.customError === 'function') {
       props.customError(key, existBinds ? CodeDeleteErrorType.BIND : CodeDeleteErrorType.UNDELETEABLE);
     } else {
-      ElMessage.error('代码块删除失败');
+      tMagicMessage.error('代码块删除失败');
     }
   }
 };
