@@ -42,7 +42,7 @@ export const tMagicMessage: TMagicMessage = getConfig('message') as TMagicMessag
 
 export default {
   install(app: App, options: PluginOptions) {
-    app.config.globalProperties.$MAGIC_FORM = options;
+    app.config.globalProperties.$MAGIC_DESIGN = options;
     setConfig(options);
   },
 };
