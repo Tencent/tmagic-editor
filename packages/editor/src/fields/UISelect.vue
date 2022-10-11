@@ -1,14 +1,14 @@
 <template>
   <div class="m-fields-ui-select" v-if="uiSelectMode" @click="cancelHandler">
-    <el-button type="danger" :icon="Delete" text style="padding: 0">取消</el-button>
+    <TMagicButton type="danger" :icon="Delete" text style="padding: 0">取消</TMagicButton>
   </div>
   <div class="m-fields-ui-select" v-else @click="startSelect" style="display: flex">
-    <el-tooltip v-if="val" content="清除">
-      <el-button style="padding: 0" type="danger" :icon="Close" text @click.stop="deleteHandler"></el-button>
-    </el-tooltip>
-    <el-tooltip :content="val ? toName + '_' + val : '点击此处选择'">
-      <el-button text style="padding: 0; margin: 0">{{ val ? toName + '_' + val : '点击此处选择' }}</el-button>
-    </el-tooltip>
+    <TMagicTooltip v-if="val" content="清除">
+      <TMagicButton style="padding: 0" type="danger" :icon="Close" text @click.stop="deleteHandler"></TMagicButton>
+    </TMagicTooltip>
+    <TMagicTooltip :content="val ? toName + '_' + val : '点击此处选择'">
+      <TMagicButton text style="padding: 0; margin: 0">{{ val ? toName + '_' + val : '点击此处选择' }}</TMagicButton>
+    </TMagicTooltip>
   </div>
 </template>
 
@@ -16,6 +16,7 @@
 import { computed, inject, ref } from 'vue';
 import { Close, Delete } from '@element-plus/icons-vue';
 
+import { TMagicButton, TMagicTooltip } from '@tmagic/design';
 import { FormState } from '@tmagic/form';
 
 import { Services } from '../type';

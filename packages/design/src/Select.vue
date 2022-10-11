@@ -77,7 +77,7 @@ defineExpose({
 
   setSelected() {
     if (!select.value) return;
-    select.value.setSelected();
+    return select.value.setSelected();
   },
 });
 </script>

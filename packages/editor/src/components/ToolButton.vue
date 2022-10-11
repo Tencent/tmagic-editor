@@ -7,32 +7,37 @@
     @mousedown="mousedownHandler(data, $event)"
     @mouseup="mouseupHandler(data, $event)"
   >
-    <el-divider v-if="data.type === 'divider'" :direction="data.direction || 'vertical'"></el-divider>
+    <TMagicDivider v-if="data.type === 'divider'" :direction="data.direction || 'vertical'"></TMagicDivider>
     <div v-else-if="data.type === 'text'" class="menu-item-text">{{ data.text }}</div>
 
     <template v-else-if="data.type === 'button'">
-      <el-tooltip v-if="data.tooltip" effect="dark" placement="bottom-start" :content="data.tooltip">
-        <el-button size="small" text :disabled="disabled"
-          ><MIcon v-if="data.icon" :icon="data.icon"></MIcon><span>{{ data.text }}</span></el-button
+      <TMagicTooltip v-if="data.tooltip" effect="dark" placement="bottom-start" :content="data.tooltip">
+        <TMagicButton size="small" text :disabled="disabled"
+          ><MIcon v-if="data.icon" :icon="data.icon"></MIcon><span>{{ data.text }}</span></TMagicButton
         >
-      </el-tooltip>
-      <el-button v-else size="small" text :disabled="disabled"
-        ><MIcon v-if="data.icon" :icon="data.icon"></MIcon><span>{{ data.text }}</span></el-button
+      </TMagicTooltip>
+      <TMagicButton v-else size="small" text :disabled="disabled"
+        ><MIcon v-if="data.icon" :icon="data.icon"></MIcon><span>{{ data.text }}</span></TMagicButton
       >
     </template>
 
-    <el-dropdown v-else-if="data.type === 'dropdown'" trigger="click" :disabled="disabled" @command="dropdownHandler">
+    <TMagicDropdown
+      v-else-if="data.type === 'dropdown'"
+      trigger="click"
+      :disabled="disabled"
+      @command="dropdownHandler"
+    >
       <span class="el-dropdown-link menubar-menu-button">
-        {{ data.text }}<el-icon class="el-icon--right"><ArrowDown></ArrowDown></el-icon>
+        {{ data.text }}<TMagicIcon class="el-icon--right"><ArrowDown></ArrowDown></TMagicIcon>
       </span>
       <template #dropdown>
-        <el-dropdown-menu v-if="data.items && data.items.length">
-          <el-dropdown-item v-for="(subItem, index) in data.items" :key="index" :command="{ data, subItem }">{{
+        <TMagicDropdownMenu v-if="data.items && data.items.length">
+          <TMagicDropdownItem v-for="(subItem, index) in data.items" :key="index" :command="{ data, subItem }">{{
             subItem.text
-          }}</el-dropdown-item>
-        </el-dropdown-menu>
+          }}</TMagicDropdownItem>
+        </TMagicDropdownMenu>
       </template>
-    </el-dropdown>
+    </TMagicDropdown>
 
     <component v-else-if="data.type === 'component'" v-bind="data.props || {}" :is="data.component"></component>
   </div>
@@ -41,6 +46,16 @@
 <script lang="ts" setup>
 import { computed, inject } from 'vue';
 import { ArrowDown } from '@element-plus/icons-vue';
+
+import {
+  TMagicButton,
+  TMagicDivider,
+  TMagicDropdown,
+  TMagicDropdownItem,
+  TMagicDropdownMenu,
+  TMagicIcon,
+  TMagicTooltip,
+} from '@tmagic/design';
 
 import MIcon from '../components/Icon.vue';
 import type { MenuButton, MenuComponent, Services } from '../type';

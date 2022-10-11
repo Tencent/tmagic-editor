@@ -1,6 +1,6 @@
 <template>
   <div class="m-fields-code-select" :key="fieldKey">
-    <el-card shadow="never">
+    <TMagicCard shadow="never">
       <template #header>
         <m-fields-select
           :config="selectConfig"
@@ -12,7 +12,7 @@
         ></m-fields-select>
       </template>
       <div class="tool-bar">
-        <el-tooltip class="tool-item" effect="dark" content="查看代码块" placement="top">
+        <TMagicTooltip class="tool-item" effect="dark" content="查看代码块" placement="top">
           <svg
             @click="viewHandler"
             preserveAspectRatio="xMidYMid meet"
@@ -26,17 +26,17 @@
               d="m23 12l-7.071 7.071l-1.414-1.414L20.172 12l-5.657-5.657l1.414-1.414L23 12zM3.828 12l5.657 5.657l-1.414 1.414L1 12l7.071-7.071l1.414 1.414L3.828 12z"
             ></path>
           </svg>
-        </el-tooltip>
+        </TMagicTooltip>
       </div>
-    </el-card>
+    </TMagicCard>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { computed, defineEmits, defineProps, inject, ref, watchEffect } from 'vue';
-import { ElMessage } from 'element-plus';
 import { cloneDeep, map, xor } from 'lodash-es';
 
+import { TMagicCard, tMagicMessage, TMagicTooltip } from '@tmagic/design';
 import { SelectConfig } from '@tmagic/form';
 
 import type { Services } from '../type';
@@ -128,7 +128,7 @@ const setCombineIds = async (codeIds: string[]) => {
 
 const viewHandler = async () => {
   if (props.model[props.name].length === 0) {
-    ElMessage.error('请先绑定代码块');
+    tMagicMessage.error('请先绑定代码块');
     return;
   }
   // 记录当前已被绑定的代码块，为查看弹窗的展示内容

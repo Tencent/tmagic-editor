@@ -34,9 +34,9 @@
       </template>
 
       <template v-if="pageLength > 0" #right>
-        <el-scrollbar>
+        <TMagicScrollbar>
           <slot name="props-panel"></slot>
-        </el-scrollbar>
+        </TMagicScrollbar>
       </template>
     </layout>
   </div>
@@ -45,6 +45,7 @@
 <script lang="ts" setup>
 import { computed, inject, ref, watchEffect } from 'vue';
 
+import { TMagicScrollbar } from '@tmagic/design';
 import type { MApp } from '@tmagic/schema';
 
 import { GetColumnWidth, Services } from '../type';

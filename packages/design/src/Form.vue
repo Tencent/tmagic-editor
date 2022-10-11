@@ -25,11 +25,11 @@ const uiProps = computed(() => uiComponent.props(props));
 
 defineExpose({
   validate() {
-    form.value?.validate();
+    return form.value?.validate();
   },
 
   resetFields() {
-    form.value?.resetFields();
+    return form.value?.resetFields();
   },
 });
 </script>

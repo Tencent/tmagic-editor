@@ -3,6 +3,10 @@
     <template #default>
       <slot></slot>
     </template>
+
+    <template #label v-if="$slots.label">
+      <slot name="label"></slot>
+    </template>
   </component>
 </template>
 

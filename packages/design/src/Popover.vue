@@ -15,8 +15,13 @@ import { getConfig } from './config';
 
 const props = defineProps<{
   placement?: string;
-  width?: string;
+  width?: string | number;
+  title?: string;
   trigger?: string;
+  effect?: string;
+  content?: string;
+  disabled?: boolean;
+  popperClass?: string;
 }>();
 
 const uiComponent = getConfig('components').popover;

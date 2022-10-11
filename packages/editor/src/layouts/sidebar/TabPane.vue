@@ -1,5 +1,5 @@
 <template>
-  <el-tab-pane v-if="config" :name="config.text">
+  <TMagicTabPane v-if="config" :name="config.text">
     <template #label>
       <div :key="config.text">
         <m-icon v-if="config.icon" :icon="config.icon"></m-icon>
@@ -61,12 +61,14 @@
         />
       </template>
     </component>
-  </el-tab-pane>
+  </TMagicTabPane>
 </template>
 
 <script lang="ts" setup>
 import { computed } from 'vue';
 import { Coin, EditPen, Files } from '@element-plus/icons-vue';
+
+import { TMagicTabPane } from '@tmagic/design';
 
 import MIcon from '../../components/Icon.vue';
 import { SideComponent, SideItem } from '../../type';

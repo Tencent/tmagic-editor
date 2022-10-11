@@ -1,9 +1,9 @@
 <template>
-  <el-scrollbar>
+  <TMagicScrollbar>
     <slot name="component-list-panel-header"></slot>
 
-    <el-collapse class="ui-component-panel" :model-value="collapseValue">
-      <el-input
+    <TMagicCollapse class="ui-component-panel" :model-value="collapseValue">
+      <TMagicInput
         prefix-icon="el-icon-search"
         placeholder="输入关键字进行过滤"
         class="search-input"
@@ -12,8 +12,8 @@
         v-model="searchText"
       />
       <template v-for="(group, index) in list">
-        <el-collapse-item v-if="group.items && group.items.length" :key="index" :name="index">
-          <template #title><i class="el-icon-s-grid"></i>{{ group.title }}</template>
+        <TMagicCollapseItem v-if="group.items && group.items.length" :key="index" :name="`${index}`">
+          <template #title><MIcon :icon="Grid"></MIcon>{{ group.title }}</template>
           <div
             v-for="item in group.items"
             class="component-item"
@@ -27,21 +27,23 @@
             <slot name="component-list-item" :component="item">
               <MIcon :icon="item.icon"></MIcon>
 
-              <el-tooltip effect="dark" placement="bottom" :content="item.text">
+              <TMagicTooltip effect="dark" placement="bottom" :content="item.text">
                 <span>{{ item.text }}</span>
-              </el-tooltip>
+              </TMagicTooltip>
             </slot>
           </div>
-        </el-collapse-item>
+        </TMagicCollapseItem>
       </template>
-    </el-collapse>
-  </el-scrollbar>
+    </TMagicCollapse>
+  </TMagicScrollbar>
 </template>
 
 <script lang="ts" setup>
 import { computed, inject, ref } from 'vue';
+import { Grid } from '@element-plus/icons-vue';
 import serialize from 'serialize-javascript';
 
+import { TMagicCollapse, TMagicCollapseItem, TMagicInput, TMagicScrollbar, TMagicTooltip } from '@tmagic/design';
 import type StageCore from '@tmagic/stage';
 import { removeClassNameByClassName } from '@tmagic/utils';
 
@@ -62,7 +64,7 @@ const list = computed(() =>
 const collapseValue = computed(() =>
   Array(list.value?.length)
     .fill(1)
-    .map((x, i) => i),
+    .map((x, i) => `${i}`),
 );
 
 let timeout: NodeJS.Timeout | undefined;

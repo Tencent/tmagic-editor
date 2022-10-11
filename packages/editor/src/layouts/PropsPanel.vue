@@ -15,8 +15,8 @@
 
 <script lang="ts" setup>
 import { computed, getCurrentInstance, inject, onMounted, ref, watchEffect } from 'vue';
-import { ElMessage } from 'element-plus';
 
+import { tMagicMessage } from '@tmagic/design';
 import type { FormValue, MForm } from '@tmagic/form';
 import type { MNode } from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
@@ -65,13 +65,8 @@ const submit = async () => {
     services?.editorService.update(values);
   } catch (e: any) {
     console.error(e);
-    ElMessage.closeAll();
-    ElMessage.error({
-      duration: 10000,
-      showClose: true,
-      message: e.message,
-      dangerouslyUseHTMLString: true,
-    });
+    tMagicMessage.closeAll();
+    tMagicMessage.error(e.message);
   }
 };
 
