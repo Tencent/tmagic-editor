@@ -1,0 +1,50 @@
+{
+  "version": "1.2.0-beta.2",
+  "name": "@tmagic/element-plus-adapter",
+  "sideEffects": [
+    "dist/*"
+  ],
+  "main": "dist/tmagic-element-plus-adapter.umd.js",
+  "module": "dist/tmagic-element-plus-adapter.mjs",
+  "types": "types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/tmagic-element-plus-adapter.mjs",
+      "require": "./dist/tmagic-element-plus-adapter.umd.js"
+    },
+    "./*": "./*"
+  },
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json",
+    "clear:type": "rimraf ./types"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tencent/tmagic-editor.git"
+  },
+  "homepage": "https://tencent.github.io/tmagic-editor/docs/",
+  "keywords": [
+    "design",
+    "vue",
+    "vue3",
+    "typescript"
+  ],
+  "dependencies": {
+    "element-plus": "^2.2.17",
+    "vue": "^3.2.37"
+  },
+  "peerDependencies": {
+    "element-plus": "^2.2.17",
+    "vue": "^3.2.37"
+  },
+  "devDependencies": {
+    "@types/node": "^15.12.4",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.7.4",
+    "vite": "^3.1.3"
+  }
+}
