@@ -1,46 +1,35 @@
 <template>
-  <el-time-picker
+  <TMagicTimePicker
     v-model="model[name]"
     :size="size"
-    value-format="HH:mm:ss"
     :placeholder="config.placeholder"
     :disabled="disabled"
     @change="changeHandler"
-  ></el-time-picker>
+  ></TMagicTimePicker>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from 'vue';
+<script lang="ts" setup>
+import { TMagicTimePicker } from '@tmagic/design';
 
 import { TimeConfig } from '../schema';
-import fieldProps from '../utils/fieldProps';
 import { useAddField } from '../utils/useAddField';
 
-export default defineComponent({
-  name: 'm-fields-time',
+const props = defineProps<{
+  config: TimeConfig;
+  model: any;
+  initValues?: any;
+  values?: any;
+  name: string;
+  prop: string;
+  disabled?: boolean;
+  size: 'mini' | 'small' | 'medium';
+}>();
 
-  props: {
-    ...fieldProps,
-    config: {
-      type: Object as PropType<TimeConfig>,
-      required: true,
-    },
-  },
+const emit = defineEmits(['change']);
 
-  emits: {
-    change(values: Date) {
-      return values;
-    },
-  },
+useAddField(props.prop);
 
-  setup(props, { emit }) {
-    useAddField(props.prop);
-
-    return {
-      changeHandler: (v: Date) => {
-        emit('change', v);
-      },
-    };
-  },
-});
+const changeHandler = (v: string) => {
+  emit('change', v);
+};
 </script>

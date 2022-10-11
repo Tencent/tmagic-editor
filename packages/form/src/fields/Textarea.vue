@@ -1,5 +1,5 @@
 <template>
-  <el-input
+  <TMagicInput
     v-model="model[name]"
     type="textarea"
     :size="size"
@@ -9,52 +9,40 @@
     @change="changeHandler"
     @input="inputHandler"
   >
-  </el-input>
+  </TMagicInput>
 </template>
 
-<script lang="ts">
-import { defineComponent, inject, PropType } from 'vue';
+<script lang="ts" setup>
+import { inject } from 'vue';
+
+import { TMagicInput } from '@tmagic/design';
 
 import { FormState, TextareaConfig } from '../schema';
-import fieldProps from '../utils/fieldProps';
 import { useAddField } from '../utils/useAddField';
-export default defineComponent({
-  name: 'm-fields-textarea',
 
-  props: {
-    ...fieldProps,
-    config: {
-      type: Object as PropType<TextareaConfig>,
-      required: true,
-    },
-  },
+const props = defineProps<{
+  config: TextareaConfig;
+  model: any;
+  initValues?: any;
+  values?: any;
+  name: string;
+  prop: string;
+  disabled?: boolean;
+  size: 'mini' | 'small' | 'medium';
+}>();
 
-  emits: {
-    change(values: string | number) {
-      return values;
-    },
+const emit = defineEmits(['change', 'input']);
 
-    input(values: string | number) {
-      return values;
-    },
-  },
+useAddField(props.prop);
 
-  setup(props, { emit }) {
-    useAddField(props.prop);
+const mForm = inject<FormState | null>('mForm');
 
-    const mForm = inject<FormState | null>('mForm');
+const changeHandler = (value: number) => {
+  emit('change', value);
+};
 
-    return {
-      mForm,
-      changeHandler: (v: string) => {
-        emit('change', v);
-      },
-
-      inputHandler: (v: string) => {
-        emit('input', v);
-        mForm?.$emit('field-input', props.prop, v);
-      },
-    };
-  },
-});
+const inputHandler = (v: string) => {
+  emit('input', v);
+  mForm?.$emit('field-input', props.prop, v);
+};
 </script>

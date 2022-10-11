@@ -1,5 +1,5 @@
 <template>
-  <el-date-picker
+  <TMagicDatePicker
     v-model="value"
     type="datetimerange"
     range-separator="-"
@@ -10,12 +10,13 @@
     :disabled="disabled"
     :default-time="config.defaultTime"
     @change="changeHandler"
-  ></el-date-picker>
+  ></TMagicDatePicker>
 </template>
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
 
+import { TMagicDatePicker } from '@tmagic/design';
 import { datetimeFormatter } from '@tmagic/utils';
 
 import { DaterangeConfig } from '../schema';

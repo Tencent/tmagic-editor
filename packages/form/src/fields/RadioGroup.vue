@@ -1,33 +1,33 @@
 <template>
-  <el-radio-group v-if="model" v-model="model[name]" :size="size" :disabled="disabled" @change="changeHandler">
-    <el-radio v-for="option in config.options" :label="option.value" :key="option.value">{{ option.text }}</el-radio>
-  </el-radio-group>
+  <TMagicRadioGroup v-if="model" v-model="model[name]" :size="size" :disabled="disabled" @change="changeHandler">
+    <TMagicRadio v-for="option in config.options" :label="option.value" :key="`${option.value}`">{{
+      option.text
+    }}</TMagicRadio>
+  </TMagicRadioGroup>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+import { TMagicRadio, TMagicRadioGroup } from '@tmagic/design';
 
-import fieldProps from '../utils/fieldProps';
+import { RadioGroupConfig } from '../schema';
 import { useAddField } from '../utils/useAddField';
 
-export default defineComponent({
-  name: 'm-fields-radio-group',
+const props = defineProps<{
+  config: RadioGroupConfig;
+  model: any;
+  initValues?: any;
+  values?: any;
+  name: string;
+  prop: string;
+  disabled?: boolean;
+  size: 'mini' | 'small' | 'medium';
+}>();
 
-  props: {
-    ...fieldProps,
-    config: {
-      type: Object,
-      required: true,
-    },
-  },
+const emit = defineEmits(['change']);
 
-  emits: ['change'],
+const changeHandler = (value: number) => {
+  emit('change', value);
+};
 
-  setup(props, { emit }) {
-    useAddField(props.prop);
-    return {
-      changeHandler: (v: string | number | boolean) => emit('change', v),
-    };
-  },
-});
+useAddField(props.prop);
 </script>

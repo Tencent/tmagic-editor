@@ -1,5 +1,5 @@
 <template>
-  <el-tabs
+  <TMagicTabs
     v-model="activeTabName"
     :class="config.dynamic ? 'magic-form-dynamic-tab' : 'magic-form-tab'"
     :type="config.tabType"
@@ -10,14 +10,14 @@
     @tab-remove="onTabRemove"
   >
     <template v-for="(tab, tabIndex) in tabs">
-      <el-tab-pane
+      <TMagicTabPane
         v-if="display(tab.display) && tabItems(tab).length"
         :key="tab[mForm?.keyProp || '__key'] ?? tabIndex"
         :name="filter(tab.status) || tabIndex.toString()"
         :label="filter(tab.title)"
         :lazy="tab.lazy || false"
       >
-        <m-form-container
+        <Container
           v-for="item in tabItems(tab)"
           :key="item[mForm?.keyProp || '__key']"
           :config="item"
@@ -35,18 +35,22 @@
           :label-width="tab.labelWidth || labelWidth"
           :expand-more="expandMore"
           @change="changeHandler"
-        ></m-form-container>
-      </el-tab-pane>
+        ></Container>
+      </TMagicTabPane>
     </template>
-  </el-tabs>
+  </TMagicTabs>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, inject, PropType, ref, watchEffect } from 'vue';
+<script setup lang="ts">
+import { computed, inject, ref, watchEffect } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
-import { FormState, FormValue, TabConfig, TabPaneConfig } from '../schema';
-import { display, filterFunction } from '../utils/form';
+import { TMagicTabPane, TMagicTabs } from '@tmagic/design';
+
+import { FormState, TabConfig, TabPaneConfig } from '../schema';
+import { display as displayFunc, filterFunction } from '../utils/form';
+
+import Container from './Container.vue';
 
 const getActive = (mForm: FormState | undefined, props: any, activeTabName: string) => {
   const { config, model, prop } = props;
@@ -59,7 +63,7 @@ const getActive = (mForm: FormState | undefined, props: any, activeTabName: stri
   return '0';
 };
 
-const tabClickHandler = (mForm: FormState | undefined, tab: any, props: any) => {
+const tabClick = (mForm: FormState | undefined, tab: any, props: any) => {
   const { config, model, prop } = props;
 
   // 兼容vue2的element-ui
@@ -75,123 +79,90 @@ const tabClickHandler = (mForm: FormState | undefined, tab: any, props: any) => 
   }
 };
 
-const Tab = defineComponent({
-  name: 'm-form-tab',
+const props = defineProps<{
+  model: any;
+  config: TabConfig;
+  name: string;
+  size?: string;
+  labelWidth?: string;
+  prop?: string;
+  expandMore?: boolean;
+}>();
 
-  props: {
-    labelWidth: String,
-    expandMore: Boolean,
+const emit = defineEmits(['change']);
 
-    model: {
-      type: Object,
-      default: () => ({}),
-    },
+const mForm = inject<FormState | undefined>('mForm');
+const activeTabName = ref(getActive(mForm, props, ''));
 
-    config: {
-      type: Object as PropType<TabConfig>,
-      default: () => ({}),
-    },
-
-    prop: String,
-
-    name: String,
-
-    size: String,
-  },
-
-  emits: {
-    change(values: FormValue) {
-      return values;
-    },
-  },
-
-  setup(props, { emit }) {
-    const mForm = inject<FormState | undefined>('mForm');
-    const activeTabName = ref(getActive(mForm, props, ''));
-
-    const tabs = computed(() => {
-      if (props.config.dynamic) {
-        if (!props.config.name) throw new Error('dynamic tab 必须配置name');
-        return props.model[props.config.name] || [];
-      }
-      return props.config.items;
-    });
-
-    const filter = (config: any) => filterFunction(mForm, config, props);
-
-    watchEffect(() => {
-      if (typeof props.config.activeChange === 'function') {
-        props.config.activeChange(mForm, activeTabName.value, {
-          model: props.model,
-          prop: props.prop,
-        });
-      }
-    });
-
-    return {
-      mForm,
-
-      activeTabName,
-
-      tabs,
-
-      filter,
-
-      tabItems: (tab: TabPaneConfig) => (props.config.dynamic ? props.config.items : tab.items),
-
-      tabClickHandler: (tab: any) => tabClickHandler(mForm, tab, props),
-
-      onTabAdd: () => {
-        if (!props.config.name) throw new Error('dynamic tab 必须配置name');
-
-        if (typeof props.config.onTabAdd === 'function') {
-          props.config.onTabAdd(mForm, {
-            model: props.model,
-            prop: props.prop,
-            config: props.config,
-          });
-        } else if (tabs.value.length > 0) {
-          const newObj = cloneDeep(tabs.value[0]);
-          newObj.title = `标签${tabs.value.length + 1}`;
-          props.model[props.config.name].push(newObj);
-        }
-        emit('change', props.model);
-        mForm?.$emit('field-change', props.prop, props.model[props.config.name]);
-      },
-
-      onTabRemove: (tabName: string) => {
-        if (!props.config.name) throw new Error('dynamic tab 必须配置name');
-
-        if (typeof props.config.onTabRemove === 'function') {
-          props.config.onTabRemove(mForm, tabName, {
-            model: props.model,
-            prop: props.prop,
-            config: props.config,
-          });
-        } else {
-          props.model[props.config.name].splice(+tabName, 1);
-
-          // 防止删除后没有选中的问题
-          if (tabName < activeTabName.value || activeTabName.value >= props.model[props.config.name].length) {
-            activeTabName.value = (+activeTabName.value - 1).toString();
-            tabClickHandler(mForm, { name: activeTabName.value }, props);
-          }
-        }
-        emit('change', props.model);
-        mForm?.$emit('field-change', props.prop, props.model[props.config.name]);
-      },
-
-      display: (displayConfig: any) => display(mForm, displayConfig, props),
-
-      changeHandler: () => {
-        emit('change', props.model);
-        if (typeof props.config.onChange === 'function') {
-          props.config.onChange(mForm, { model: props.model, prop: props.prop, config: props.config });
-        }
-      },
-    };
-  },
+const tabs = computed(() => {
+  if (props.config.dynamic) {
+    if (!props.config.name) throw new Error('dynamic tab 必须配置name');
+    return props.model[props.config.name] || [];
+  }
+  return props.config.items;
 });
 
-export default Tab;
+const filter = (config: any) => filterFunction(mForm, config, props);
+
+watchEffect(() => {
+  if (typeof props.config.activeChange === 'function') {
+    props.config.activeChange(mForm, activeTabName.value, {
+      model: props.model,
+      prop: props.prop,
+    });
+  }
+});
+
+const tabItems = (tab: TabPaneConfig) => (props.config.dynamic ? props.config.items : tab.items);
+
+const tabClickHandler = (tab: any) => tabClick(mForm, tab, props);
+
+const onTabAdd = () => {
+  if (!props.config.name) throw new Error('dynamic tab 必须配置name');
+
+  if (typeof props.config.onTabAdd === 'function') {
+    props.config.onTabAdd(mForm, {
+      model: props.model,
+      prop: props.prop,
+      config: props.config,
+    });
+  } else if (tabs.value.length > 0) {
+    const newObj = cloneDeep(tabs.value[0]);
+    newObj.title = `标签${tabs.value.length + 1}`;
+    props.model[props.config.name].push(newObj);
+  }
+  emit('change', props.model);
+  mForm?.$emit('field-change', props.prop, props.model[props.config.name]);
+};
+
+const onTabRemove = (tabName: string) => {
+  if (!props.config.name) throw new Error('dynamic tab 必须配置name');
+
+  if (typeof props.config.onTabRemove === 'function') {
+    props.config.onTabRemove(mForm, tabName, {
+      model: props.model,
+      prop: props.prop,
+      config: props.config,
+    });
+  } else {
+    props.model[props.config.name].splice(+tabName, 1);
+
+    // 防止删除后没有选中的问题
+    if (tabName < activeTabName.value || activeTabName.value >= props.model[props.config.name].length) {
+      activeTabName.value = (+activeTabName.value - 1).toString();
+      tabClick(mForm, { name: activeTabName.value }, props);
+    }
+  }
+  emit('change', props.model);
+  mForm?.$emit('field-change', props.prop, props.model[props.config.name]);
+};
+
+const display = (displayConfig: any) => displayFunc(mForm, displayConfig, props);
+
+const changeHandler = () => {
+  emit('change', props.model);
+  if (typeof props.config.onChange === 'function') {
+    props.config.onChange(mForm, { model: props.model, prop: props.prop, config: props.config });
+  }
+};
 </script>

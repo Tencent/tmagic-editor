@@ -1,6 +1,6 @@
 <template>
-  <el-col v-show="display && config.type !== 'hidden'" :span="span">
-    <m-form-container
+  <TMagicCol v-show="display && config.type !== 'hidden'" :span="span">
+    <Container
       :model="model"
       :config="config"
       :prop="prop"
@@ -8,49 +8,33 @@
       :expand-more="expandMore"
       :size="size"
       @change="changeHandler"
-    ></m-form-container>
-  </el-col>
+    ></Container>
+  </TMagicCol>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, inject, PropType } from 'vue';
+<script setup lang="ts">
+import { computed, inject } from 'vue';
+
+import { TMagicCol } from '@tmagic/design';
 
 import { ChildConfig, FormState } from '../schema';
 import { display as displayFunction } from '../utils/form';
 
-export default defineComponent({
-  props: {
-    labelWidth: String,
-    expandMore: Boolean,
-    span: Number,
+import Container from './Container.vue';
 
-    model: {
-      type: Object,
-      default: () => ({}),
-    },
+const props = defineProps<{
+  model: any;
+  config: ChildConfig;
+  labelWidth?: string;
+  expandMore?: boolean;
+  span?: number;
+  size?: string;
+  prop?: string;
+}>();
 
-    config: {
-      type: Object as PropType<ChildConfig>,
-      default: () => ({}),
-    },
+const emit = defineEmits(['change']);
 
-    prop: String,
-
-    size: String,
-  },
-
-  emits: ['change'],
-
-  setup(props, { emit }) {
-    const mForm = inject<FormState | undefined>('mForm');
-
-    const changeHandler = () => emit('change', props.model);
-
-    return {
-      mForm,
-      display: computed(() => displayFunction(mForm, props.config.display, props)),
-      changeHandler,
-    };
-  },
-});
+const mForm = inject<FormState | undefined>('mForm');
+const display = computed(() => displayFunction(mForm, props.config.display, props));
+const changeHandler = () => emit('change', props.model);
 </script>
