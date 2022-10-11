@@ -19,7 +19,7 @@
 
 <demo-block type="form" :config="[{
   type: 'row',
-  labelWidth: 100,
+  labelWidth: '100px',
   span: 8,
   items: [{
     name: 'text',
@@ -34,7 +34,7 @@
 }, {
   type: 'row',
   span: 12,
-  labelWidth: 100,
+  labelWidth: '100px',
   items: [{
     name: 'text4',
     text: '配置1',
@@ -51,11 +51,11 @@
 
 <demo-block type="form" :config="[{
   name: 'text0',
-  labelWidth: 100,
+  labelWidth: '100px',
   text: '配置0',
 }, {
   type: 'row',
-  labelWidth: 100,
+  labelWidth: '100px',
   items: [{
     name: 'text',
     text: '配置1',
@@ -87,7 +87,7 @@
 
 <demo-block type="form" :config="[{
   type: 'fieldset',
-  labelWidth: 100,
+  labelWidth: '100px',
   legend: 'fieldset',
   items: [{
     name: 'text',

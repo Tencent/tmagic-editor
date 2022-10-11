@@ -228,6 +228,7 @@ export default defineUserConfig({
           { find: /^@tmagic\/form/, replacement: path.join(__dirname, '../../../packages/form/src/index.ts') },
           { find: /^@tmagic\/utils/, replacement: path.join(__dirname, '../../../packages/utils/src/index.ts') },
           { find: /^@tmagic\/schema/, replacement: path.join(__dirname, '../../../packages/schema/src/index.ts') },
+          { find: /^@tmagic\/element-plus-adapter/, replacement: path.join(__dirname, '../../../packages/element-plus-adapter/src/index.ts') },
         ]
       },
        // @ts-expect-error: vite 还没有给 ssr 配置项提供类型
