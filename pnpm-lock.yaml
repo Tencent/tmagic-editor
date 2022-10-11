@@ -77,6 +77,7 @@ importers:
   docs:
     specifiers:
       '@element-plus/icons-vue': ^2.0.9
+      '@tmagic/design': 1.2.0-beta.2
       '@tmagic/element-plus-adapter': 1.2.0-beta.2
       '@tmagic/form': 1.2.0-beta.2
       '@tmagic/schema': 1.2.0-beta.2
@@ -96,6 +97,7 @@ importers:
       vuepress: ^2.0.0-beta.51
     dependencies:
       '@element-plus/icons-vue': 2.0.9_vue@3.2.37
+      '@tmagic/design': link:../packages/design
       '@tmagic/element-plus-adapter': link:../packages/element-plus-adapter
       '@tmagic/form': link:../packages/form
       '@tmagic/schema': link:../packages/schema
@@ -354,6 +356,7 @@ importers:
 
   packages/table:
     specifiers:
+      '@tmagic/design': 1.2.0-beta.2
       '@tmagic/form': 1.2.0-beta.2
       '@tmagic/utils': 1.2.0-beta.2
       '@types/color': ^3.0.1
@@ -371,6 +374,7 @@ importers:
       vue: ^3.2.37
       vue-tsc: ^0.39.4
     dependencies:
+      '@tmagic/design': link:../design
       '@tmagic/form': link:../form
       '@tmagic/utils': link:../utils
       element-plus: 2.2.17_vue@3.2.37
@@ -476,6 +480,7 @@ importers:
   playground:
     specifiers:
       '@element-plus/icons-vue': ^2.0.9
+      '@tmagic/design': 1.2.0-beta.2
       '@tmagic/editor': 1.2.0-beta.2
       '@tmagic/element-plus-adapter': 1.2.0-beta.2
       '@tmagic/form': 1.2.0-beta.2
@@ -500,6 +505,7 @@ importers:
       vue-tsc: ^0.39.4
     dependencies:
       '@element-plus/icons-vue': 2.0.9_vue@3.2.37
+      '@tmagic/design': link:../packages/design
       '@tmagic/editor': link:../packages/editor
       '@tmagic/element-plus-adapter': link:../packages/element-plus-adapter
       '@tmagic/form': link:../packages/form

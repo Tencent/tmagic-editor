@@ -14,6 +14,7 @@ import {
   ElInput,
   ElInputNumber,
   ElMessage,
+  ElMessageBox,
   ElOption,
   ElOptionGroup,
   ElPagination,
@@ -35,6 +36,7 @@ import {
 
 const adapter: any = {
   message: ElMessage,
+  messageBox: ElMessageBox,
   components: {
     button: {
       component: ElButton,
@@ -172,6 +174,11 @@ const adapter: any = {
     },
 
     tabs: {
+      component: ElTabs,
+      props: (props: any) => props,
+    },
+
+    tag: {
       component: ElTabs,
       props: (props: any) => props,
     },

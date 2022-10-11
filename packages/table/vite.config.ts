@@ -30,7 +30,10 @@ export default defineConfig({
     alias:
       process.env.NODE_ENV === 'production'
         ? []
-        : [{ find: /^@tmagic\/form/, replacement: path.join(__dirname, '../form/src/index.ts') }],
+        : [
+            { find: /^@tmagic\/form/, replacement: path.join(__dirname, '../form/src/index.ts') },
+            { find: /^@tmagic\/design/, replacement: path.join(__dirname, '../form/design/index.ts') },
+          ],
   },
 
   build: {

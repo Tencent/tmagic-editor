@@ -1,7 +1,7 @@
 <template>
-  <el-table-column :label="config.label" :width="config.width" :fixed="config.fixed">
+  <TMagicTableColumn :label="config.label" :width="config.width" :fixed="config.fixed">
     <template v-slot="scope">
-      <el-button
+      <TMagicButton
         v-for="(action, actionIndex) in config.actions"
         v-show="display(action.display, scope.row) && !editState[scope.$index]"
         v-html="action.text"
@@ -11,60 +11,48 @@
         size="small"
         :key="actionIndex"
         @click="actionHandler(action, scope.row, scope.$index)"
-      ></el-button>
-      <el-button
+      ></TMagicButton>
+      <TMagicButton
         class="action-btn"
         v-show="editState[scope.$index]"
         text
         type="primary"
         size="small"
         @click="save(scope.$index, config)"
-        >保存</el-button
+        >保存</TMagicButton
       >
-      <el-button
+      <TMagicButton
         class="action-btn"
         v-show="editState[scope.$index]"
         text
         type="primary"
         size="small"
         @click="editState[scope.$index] = undefined"
-        >取消</el-button
+        >取消</TMagicButton
       >
     </template>
-  </el-table-column>
+  </TMagicTableColumn>
 </template>
 
-<script lang="ts">
-import { PropType } from 'vue';
-import { ElMessage, ElMessageBox } from 'element-plus';
+<script lang="ts" setup>
+import { TMagicButton, tMagicMessage, tMagicMessageBox, TMagicTableColumn } from '@tmagic/design';
 
 import { ColumnActionConfig, ColumnConfig } from './schema';
-</script>
 
-<script lang="ts" setup>
-const props = defineProps({
-  columns: {
-    type: Array as PropType<any[]>,
-    require: true,
-    default: () => [],
+const props = withDefaults(
+  defineProps<{
+    columns: any[];
+    config: ColumnConfig;
+    rowkeyName?: string;
+    editState?: any;
+  }>(),
+  {
+    columns: () => [],
+    config: () => ({}),
+    rowkeyName: 'c_id',
+    editState: () => [],
   },
-
-  config: {
-    type: Object as PropType<ColumnConfig>,
-    require: true,
-    default: () => {},
-  },
-
-  rowkeyName: {
-    type: String,
-    default: 'c_id',
-  },
-
-  editState: {
-    type: Object,
-    default: () => {},
-  },
-});
+);
 
 const emit = defineEmits(['afterAction']);
 
@@ -76,14 +64,14 @@ const display = (fuc: boolean | Function | undefined, row: any) => {
 };
 
 const success = (msg: string, action: ColumnActionConfig, row: any) => {
-  ElMessage.success(msg);
+  tMagicMessage.success(msg);
   action.after?.(row);
 };
 
-const error = (msg: string) => ElMessage.error(msg);
+const error = (msg: string) => tMagicMessage.error(msg);
 
 const deleteAction = async (action: ColumnActionConfig, row: any) => {
-  await ElMessageBox.confirm(`确认删除${row[action.name || 'c_name']}(${row[props.rowkeyName]})?`, '提示', {
+  await tMagicMessageBox.confirm(`确认删除${row[action.name || 'c_name']}(${row[props.rowkeyName]})?`, '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
@@ -99,7 +87,7 @@ const deleteAction = async (action: ColumnActionConfig, row: any) => {
 };
 
 const copyHandler = async (action: ColumnActionConfig, row: any) => {
-  await ElMessageBox.confirm(`确定复制${row[action.name || 'c_name']}(${row.c_id})?`, '提示', {
+  await tMagicMessageBox.confirm(`确定复制${row[action.name || 'c_name']}(${row.c_id})?`, '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
@@ -150,16 +138,11 @@ const save = async (index: number, config: ColumnConfig) => {
 
   if (res) {
     if (res.ret === 0) {
-      ElMessage.success('保存成功');
+      tMagicMessage.success('保存成功');
       props.editState[index] = undefined;
       emit('afterAction');
     } else {
-      ElMessage.error({
-        duration: 10000,
-        showClose: true,
-        dangerouslyUseHTMLString: true,
-        message: res.msg || '保存失败',
-      });
+      tMagicMessage.error(res.msg || '保存失败');
     }
   } else {
     props.editState[index] = undefined;

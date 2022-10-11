@@ -1,22 +1,25 @@
 <template>
   <TMagicOptionGroup v-for="(group, index) in options" :key="index" :label="group.label" :disabled="group.disabled">
-    <TMagicOption
+    <component
       v-for="(item, index) in group.options"
+      :is="uiComponent.component"
       :key="index"
-      :label="item.label"
+      :label="item.label || item.text"
       :value="item.value"
       :disabled="item.disabled"
     >
-    </TMagicOption>
+    </component>
   </TMagicOptionGroup>
 </template>
 
 <script lang="ts" setup>
-import { TMagicOption, TMagicOptionGroup } from '@tmagic/design';
+import { getConfig, TMagicOptionGroup } from '@tmagic/design';
 
 import { SelectGroupOption } from '../schema';
 
 defineProps<{
   options: SelectGroupOption[];
 }>();
+
+const uiComponent = getConfig('components').option;
 </script>

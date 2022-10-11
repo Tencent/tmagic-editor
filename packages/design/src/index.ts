@@ -1,9 +1,10 @@
 import { App } from 'vue';
 
 import { getConfig, setConfig } from './config';
-import { PluginOptions, TMagicMessage } from './type';
+import { PluginOptions, TMagicMessage, TMagicMessageBox } from './type';
 
 export * from './type';
+export * from './config';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export { default as TMagicButton } from './Button.vue';
@@ -23,6 +24,7 @@ export { default as TMagicInputNumber } from './InputNumber.vue';
 export { default as TMagicOption } from './Option.vue';
 export { default as TMagicOptionGroup } from './OptionGroup.vue';
 export { default as TMagicPagination } from './Pagination.vue';
+export { default as TMagicPopover } from './Popover.vue';
 export { default as TMagicRadio } from './Radio.vue';
 export { default as TMagicRadioGroup } from './RadioGroup.vue';
 export { default as TMagicRow } from './Row.vue';
@@ -34,11 +36,13 @@ export { default as TMagicTable } from './Table.vue';
 export { default as TMagicTableColumn } from './TableColumn.vue';
 export { default as TMagicTabPane } from './TabPane.vue';
 export { default as TMagicTabs } from './Tabs.vue';
+export { default as TMagicTag } from './Tag.vue';
 export { default as TMagicTimePicker } from './TimePicker.vue';
 export { default as TMagicTooltip } from './Tooltip.vue';
 export { default as TMagicUpload } from './Upload.vue';
 
 export const tMagicMessage: TMagicMessage = getConfig('message') as TMagicMessage;
+export const tMagicMessageBox: TMagicMessageBox = getConfig('messageBox') as TMagicMessageBox;
 
 export default {
   install(app: App, options: PluginOptions) {

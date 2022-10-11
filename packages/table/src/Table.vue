@@ -1,8 +1,8 @@
 <template>
-  <el-table
+  <TMagicTable
     tooltip-effect="dark"
     class="m-table"
-    ref="table"
+    ref="tMagicTable"
     v-loading="loading"
     :data="tableData"
     :show-header="showHeader"
@@ -20,187 +20,151 @@
   >
     <template v-for="(item, columnIndex) in columns">
       <template v-if="item.type === 'expand'">
-        <expand-column :config="item" :key="columnIndex"></expand-column>
+        <ExpandColumn :config="item" :key="columnIndex"></ExpandColumn>
       </template>
 
       <template v-else-if="item.selection">
-        <el-table-column type="selection" :key="columnIndex" width="40" :selectable="item.selectable"></el-table-column>
+        <TMagicTableColumn
+          type="selection"
+          :key="columnIndex"
+          width="40"
+          :selectable="item.selectable"
+        ></TMagicTableColumn>
       </template>
 
       <template v-else-if="item.actions">
-        <actions-column
+        <ActionsColumn
           :columns="columns"
           :config="item"
           :rowkey-name="rowkeyName"
           :edit-state="editState"
           :key="columnIndex"
           @afterAction="$emit('afterAction')"
-        ></actions-column>
+        ></ActionsColumn>
       </template>
 
       <template v-else-if="item.type === 'popover'">
-        <popover-column :key="columnIndex" :config="item"></popover-column>
+        <PopoverColumn :key="columnIndex" :config="item"></PopoverColumn>
       </template>
 
       <template v-else>
-        <text-column :key="columnIndex" :config="item" :edit-state="editState"></text-column>
+        <TextColumn :key="columnIndex" :config="item" :edit-state="editState"></TextColumn>
       </template>
     </template>
-  </el-table>
+  </TMagicTable>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from 'vue';
-import { ElTable } from 'element-plus';
+<script lang="ts" setup>
+import { computed, ref } from 'vue';
 import { cloneDeep } from 'lodash-es';
+
+import { TMagicTable, TMagicTableColumn } from '@tmagic/design';
 
 import ActionsColumn from './ActionsColumn.vue';
 import ExpandColumn from './ExpandColumn.vue';
 import PopoverColumn from './PopoverColumn.vue';
 import TextColumn from './TextColumn.vue';
 
-export default defineComponent({
-  name: 'm-table',
-
-  components: { ExpandColumn, ActionsColumn, PopoverColumn, TextColumn },
-
-  props: {
-    data: {
-      type: Array,
-      require: true,
-    },
-
-    columns: {
-      type: Array as PropType<any[]>,
-      require: true,
-      default: () => [],
-    },
-
+const props = withDefaults(
+  defineProps<{
+    data: any[];
+    columns?: any[];
     /** 合并行或列的计算方法 */
-    spanMethod: {
-      type: Function as PropType<
-        (data: { row: any; column: any; rowIndex: number; columnIndex: number }) => [number, number]
-      >,
-    },
-
-    loading: {
-      type: Boolean,
-      default: false,
-    },
-
+    spanMethod?: (data: { row: any; column: any; rowIndex: number; columnIndex: number }) => [number, number];
+    loading?: boolean;
     /** Table 的最大高度。合法的值为数字或者单位为 px 的高度 */
-    bodyHeight: {
-      type: [String, Number],
-    },
-
+    bodyHeight?: string | number;
     /** 是否显示表头 */
-    showHeader: {
-      type: Boolean,
-      default: true,
-    },
-
+    showHeader?: boolean;
     /** 空数据时显示的文本内容 */
-    emptyText: {
-      type: String,
-    },
-
+    emptyText?: string;
     /** 是否默认展开所有行，当 Table 包含展开行存在或者为树形表格时有效 */
-    defaultExpandAll: {
-      type: Boolean,
-      default: false,
-    },
-
-    rowkeyName: {
-      type: String,
-    },
-
+    defaultExpandAll?: boolean;
+    rowkeyName?: string;
     /** 是否带有纵向边框 */
-    border: {
-      type: Boolean,
-      default: false,
-    },
+    border?: boolean;
+  }>(),
+  {
+    columns: () => [],
+    loading: false,
+    showHeader: true,
+    defaultExpandAll: false,
+    border: false,
   },
+);
 
-  emits: ['sort-change', 'afterAction', 'select', 'select-all', 'selection-change'],
+const emit = defineEmits(['sort-change', 'afterAction', 'select', 'select-all', 'selection-change']);
 
-  data(): {
-    editState: any[];
-  } {
-    return {
-      editState: [],
-    };
-  },
+const tMagicTable = ref<InstanceType<typeof TMagicTable>>();
 
-  computed: {
-    tableData() {
-      if (this.selectionColumn) {
-        return this.data || [];
-      }
+const editState = ref([]);
 
-      return cloneDeep(this.data) || [];
-    },
+const selectionColumn = computed(() => {
+  const column = props.columns.filter((item) => item.selection);
+  return column.length ? column[0] : null;
+});
 
-    selectionColumn() {
-      const column = this.columns.filter((item) => item.selection);
-      return column.length ? column[0] : null;
-    },
+const tableData = computed(() => {
+  if (selectionColumn.value) {
+    return props.data || [];
+  }
 
-    hasBorder() {
-      return typeof this.border !== 'undefined' ? this.border : true;
-    },
-  },
+  return cloneDeep(props.data) || [];
+});
 
-  methods: {
-    sortChange(data: any) {
-      this.$emit('sort-change', data);
-    },
+const hasBorder = computed(() => (typeof props.border !== 'undefined' ? props.border : true));
 
-    selectHandler(selection: any, row: any) {
-      const column = this.selectionColumn;
-      if (!column) {
-        return;
-      }
+const sortChange = (data: any) => {
+  emit('sort-change', data);
+};
 
-      if (column.selection === 'single') {
-        // this.clearSelection()
-        // this.toggleRowSelection(row, true)
-      }
-      this.$emit('select', selection, row);
-    },
+const selectHandler = (selection: any, row: any) => {
+  const column = selectionColumn.value;
+  if (!column) {
+    return;
+  }
 
-    selectAllHandler(selection: any) {
-      this.$emit('select-all', selection);
-    },
+  if (column.selection === 'single') {
+    // this.clearSelection()
+    // this.toggleRowSelection(row, true)
+  }
+  emit('select', selection, row);
+};
 
-    selectionChangeHandler(selection: any) {
-      this.$emit('selection-change', selection);
-    },
+const selectAllHandler = (selection: any) => {
+  emit('select-all', selection);
+};
 
-    toggleRowSelection(row: any, selected: boolean) {
-      const table = this.$refs.table as InstanceType<typeof ElTable>;
-      table.toggleRowSelection.bind(table)(row, selected);
-    },
+const selectionChangeHandler = (selection: any) => {
+  emit('selection-change', selection);
+};
 
-    toggleRowExpansion(row: any, expanded: boolean) {
-      const table = this.$refs.table as InstanceType<typeof ElTable>;
-      table.toggleRowExpansion.bind(table)(row, expanded);
-    },
+const toggleRowSelection = (row: any, selected: boolean) => {
+  tMagicTable.value?.toggleRowSelection(row, selected);
+};
 
-    clearSelection() {
-      const table = this.$refs.table as InstanceType<typeof ElTable>;
-      table.clearSelection.bind(table)();
-    },
+const toggleRowExpansion = (row: any, expanded: boolean) => {
+  tMagicTable.value?.toggleRowExpansion(row, expanded);
+};
 
-    objectSpanMethod(data: any) {
-      if (typeof this.spanMethod === 'function') {
-        return this.spanMethod(data);
-      }
-      return () => ({
-        rowspan: 0,
-        colspan: 0,
-      });
-    },
-  },
+const clearSelection = () => {
+  tMagicTable.value?.clearSelection();
+};
+
+const objectSpanMethod = (data: any) => {
+  if (typeof props.spanMethod === 'function') {
+    return props.spanMethod(data);
+  }
+  return () => ({
+    rowspan: 0,
+    colspan: 0,
+  });
+};
+
+defineExpose({
+  toggleRowSelection,
+  toggleRowExpansion,
+  clearSelection,
 });
 </script>
 

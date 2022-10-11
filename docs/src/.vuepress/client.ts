@@ -4,6 +4,7 @@ import 'highlight.js/styles/github.css';
 import './polyfills';
 import { defineClientConfig  } from '@vuepress/client';
 import ElementPlus from 'element-plus';
+import TMagicDesign from '@tmagic/design';
 import MagicElementPlusAdapter from '@tmagic/element-plus-adapter';
 import MagicForm from '@tmagic/form';
 import DemoBlock from './demo-block.vue';
@@ -11,8 +12,8 @@ import DemoBlock from './demo-block.vue';
 export default defineClientConfig({
   enhance({ app, router, siteData }) {
     app.use(ElementPlus);
+    app.use(TMagicDesign, MagicElementPlusAdapter)
     app.use(MagicForm, {
-      uiAdapter: MagicElementPlusAdapter,
       request: (options: any) => new Promise((resolve) => {
         if (options.url === 'select/remote') {
           setTimeout(() => {

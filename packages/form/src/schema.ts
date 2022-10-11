@@ -215,7 +215,8 @@ export interface SelectGroupOption {
   disabled: boolean;
   options: {
     /** 选项的标签 */
-    label: string;
+    label?: string;
+    text?: string;
     /** 选项的值 */
     value: any;
     /** 是否禁用该选项 */

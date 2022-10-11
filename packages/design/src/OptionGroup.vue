@@ -1,11 +1,11 @@
 <template>
-  <component :is="uiComponent.component" v-bind="uiProps">
+  <component ref="optionGroup" :is="uiComponent.component" v-bind="uiProps">
     <slot></slot>
   </component>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 import { getConfig } from './config';
 
@@ -17,4 +17,10 @@ const props = defineProps<{
 const uiComponent = getConfig('components').optionGroup;
 
 const uiProps = computed(() => uiComponent.props(props));
+
+const optionGroup = ref<any>();
+
+onMounted(() => {
+  optionGroup.value.visible = true;
+});
 </script>
