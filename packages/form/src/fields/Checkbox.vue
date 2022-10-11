@@ -1,67 +1,63 @@
 <template>
-  <el-checkbox
+  <TMagicCheckbox
     v-model="model[name]"
     :size="size"
     :trueLabel="activeValue"
     :falseLabel="inactiveValue"
     :disabled="disabled"
-    :label="config.text"
     @change="changeHandler"
-  ></el-checkbox>
+    >{{ config.text }}</TMagicCheckbox
+  >
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
+
+import { TMagicCheckbox } from '@tmagic/design';
 
 import { CheckboxConfig } from '../schema';
-import fieldProps from '../utils/fieldProps';
 import { useAddField } from '../utils/useAddField';
 
-export default defineComponent({
-  name: 'm-fields-checkbox',
+const props = defineProps<{
+  config: CheckboxConfig;
+  model: any;
+  initValues?: any;
+  values?: any;
+  name: string;
+  prop: string;
+  disabled?: boolean;
+  size: 'mini' | 'small' | 'medium';
+}>();
 
-  props: {
-    ...fieldProps,
-    config: {
-      type: Object as PropType<CheckboxConfig>,
-      required: true,
-    },
-  },
+const emit = defineEmits(['change']);
 
-  emits: ['change', 'input'],
+useAddField(props.prop);
 
-  setup(props, { emit }) {
-    useAddField(props.prop);
+const activeValue = computed(() => {
+  if (typeof props.config.activeValue === 'undefined') {
+    if (props.config.filter === 'number') {
+      return 1;
+    }
+  } else {
+    return props.config.activeValue;
+  }
 
-    return {
-      activeValue: computed(() => {
-        if (typeof props.config.activeValue === 'undefined') {
-          if (props.config.filter === 'number') {
-            return 1;
-          }
-        } else {
-          return props.config.activeValue;
-        }
-
-        return undefined;
-      }),
-
-      inactiveValue: computed(() => {
-        if (typeof props.config.inactiveValue === 'undefined') {
-          if (props.config.filter === 'number') {
-            return 0;
-          }
-        } else {
-          return props.config.inactiveValue;
-        }
-
-        return undefined;
-      }),
-
-      changeHandler(value: number | boolean) {
-        emit('change', value);
-      },
-    };
-  },
+  return undefined;
 });
+
+const inactiveValue = computed(() => {
+  if (typeof props.config.inactiveValue === 'undefined') {
+    if (props.config.filter === 'number') {
+      return 0;
+    }
+  } else {
+    return props.config.inactiveValue;
+  }
+
+  return undefined;
+});
+
+const changeHandler = (value: number | boolean) => {
+  emit('change', value);
+};
 </script>

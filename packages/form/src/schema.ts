@@ -16,6 +16,11 @@
  * limitations under the License.
  */
 
+export interface ValidateError {
+  message: string;
+  field: string;
+}
+
 /**
  * 整个表单的数据，会注入到各个组件中去
  */
@@ -167,7 +172,7 @@ type DefaultValueFunction = (mForm: FormState | undefined) => any;
 /**
  * 下拉选择器选项配置
  */
-export interface SelectOption {
+export interface SelectConfigOption {
   /** 选项的标签 */
   text: string | SelectOptionTextFunction;
   /** 选项的值 */
@@ -176,10 +181,19 @@ export interface SelectOption {
   disabled?: boolean;
 }
 
+export interface SelectOption {
+  /** 选项的标签 */
+  text: string;
+  /** 选项的值 */
+  value: any;
+  /** 是否禁用该选项 */
+  disabled?: boolean;
+}
+
 /**
  * 下拉选择器分组选项配置
  */
-export interface SelectGroupOption {
+export interface SelectConfigGroupOption {
   /** 分组的组名 */
   label: string;
   /** 是否禁用该选项组 */
@@ -189,6 +203,21 @@ export interface SelectGroupOption {
     label: string | SelectOptionTextFunction;
     /** 选项的值 */
     value: any | SelectOptionValueFunction;
+    /** 是否禁用该选项 */
+    disabled?: boolean;
+  }[];
+}
+
+export interface SelectGroupOption {
+  /** 分组的组名 */
+  label: string;
+  /** 是否禁用该选项组 */
+  disabled: boolean;
+  options: {
+    /** 选项的标签 */
+    label: string;
+    /** 选项的值 */
+    value: any;
     /** 是否禁用该选项 */
     disabled?: boolean;
   }[];
@@ -226,11 +255,11 @@ type RemoteSelectOptionRequestFunction = (
   },
 ) => any;
 
-type RemoteSelectOptionItemFunction = (optionsData: Record<string, any>) => SelectOption[];
+type RemoteSelectOptionItemFunction = (optionsData: Record<string, any>) => SelectOption[] | SelectGroupOption[];
 type SelectOptionValueFunction = (item: Record<string, any>) => any;
 type SelectOptionTextFunction = (item: Record<string, any>) => string;
 
-interface CascaderOption {
+export interface CascaderOption {
   /** 指定选项的值为选项对象的某个属性值 */
   value: any;
   /** 指定选项标签为选项对象的某个属性值 */
@@ -302,7 +331,7 @@ export interface NumberConfig extends FormItem {
   min?: number;
   max?: number;
   step?: number;
-  placeholder?: number;
+  placeholder?: string;
 }
 
 /**
@@ -361,7 +390,7 @@ export interface SwitchConfig extends FormItem {
 export interface RadioGroupConfig extends FormItem {
   type: 'radio-group';
   options: {
-    values: string | number | boolean;
+    value: string | number | boolean;
     text: string;
   }[];
 }
@@ -381,6 +410,7 @@ export interface CheckboxGroupConfig extends FormItem {
   options: {
     value: any;
     text: string;
+    disabled?: boolean;
   }[];
 }
 
@@ -394,7 +424,7 @@ export interface SelectConfig extends FormItem, Input {
   valueKey?: string;
   allowCreate?: boolean;
   group?: boolean;
-  options: SelectOption[] | SelectGroupOption[] | SelectOptionFunction;
+  options: SelectConfigOption[] | SelectConfigGroupOption[] | SelectOptionFunction;
   remote: true;
   option: {
     url: string;
@@ -520,7 +550,7 @@ export interface TabPaneConfig {
 }
 export interface TabConfig extends FormItem, ContainerCommonConfig {
   type: 'tab' | 'dynamic-tab';
-  tabType?: 'tab';
+  tabType?: string;
   editable?: boolean;
   dynamic?: boolean;
   tabPosition?: 'top' | 'right' | 'bottom' | 'left';

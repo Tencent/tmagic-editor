@@ -1,65 +1,62 @@
 <template>
-  <el-switch
-    v-if="model"
-    v-model="model[n]"
+  <TMagicSwitch
+    v-model="model[name]"
     :size="size"
     :activeValue="activeValue"
     :inactiveValue="inactiveValue"
     :disabled="disabled"
     @change="changeHandler"
-  ></el-switch>
+  ></TMagicSwitch>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+<script lang="ts" setup>
+import { computed } from 'vue';
+
+import { TMagicSwitch } from '@tmagic/design';
 
 import { SwitchConfig } from '../schema';
-import fieldProps from '../utils/fieldProps';
 import { useAddField } from '../utils/useAddField';
-export default defineComponent({
-  name: 'm-fields-switch',
 
-  props: {
-    ...fieldProps,
-    config: {
-      type: Object as PropType<SwitchConfig>,
-      required: true,
-    },
-  },
+const props = defineProps<{
+  config: SwitchConfig;
+  model: any;
+  initValues?: any;
+  values?: any;
+  name: string;
+  prop: string;
+  disabled?: boolean;
+  size: 'mini' | 'small' | 'medium';
+}>();
 
-  emits: ['change'],
+const emit = defineEmits(['change']);
 
-  setup(props, { emit }) {
-    useAddField(props.prop);
+useAddField(props.prop);
 
-    return {
-      n: computed(() => props.name || props.config.name || ''),
-      activeValue: computed(() => {
-        if (typeof props.config.activeValue === 'undefined') {
-          if (props.config.filter === 'number') {
-            return 1;
-          }
-        } else {
-          return props.config.activeValue;
-        }
+const changeHandler = (value: number) => {
+  emit('change', value);
+};
 
-        return true;
-      }),
-      inactiveValue: computed(() => {
-        if (typeof props.config.inactiveValue === 'undefined') {
-          if (props.config.filter === 'number') {
-            return 0;
-          }
-        } else {
-          return props.config.inactiveValue;
-        }
+const activeValue = computed(() => {
+  if (typeof props.config.activeValue === 'undefined') {
+    if (props.config.filter === 'number') {
+      return 1;
+    }
+  } else {
+    return props.config.activeValue;
+  }
 
-        return false;
-      }),
-      changeHandler: (v: boolean | number | string) => {
-        emit('change', v);
-      },
-    };
-  },
+  return true;
+});
+
+const inactiveValue = computed(() => {
+  if (typeof props.config.inactiveValue === 'undefined') {
+    if (props.config.filter === 'number') {
+      return 0;
+    }
+  } else {
+    return props.config.inactiveValue;
+  }
+
+  return false;
 });
 </script>

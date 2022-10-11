@@ -1,18 +1,18 @@
 <template>
   <div class="m-fields-dynamic-field">
-    <el-form size="small">
-      <el-form-item v-for="key in Object.keys(fieldMap.value)" :key="key" :label="fieldLabelMap.value[key]">
-        <el-input
+    <TMagicForm size="small">
+      <TMagicFormItem v-for="key in Object.keys(fieldMap.value)" :key="key" :label="fieldLabelMap.value[key]">
+        <TMagicInput
           v-model="fieldMap.value[key]"
           :placeholder="fieldLabelMap.value[key]"
           @change="inputChangeHandler(key)"
-        ></el-input>
-      </el-form-item>
-    </el-form>
+        ></TMagicInput>
+      </TMagicFormItem>
+    </TMagicForm>
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 /**
  * 动态表单，目前只支持input类型字段
  * inputType: 'dynamic-field',
@@ -23,87 +23,73 @@
  * 特别注意！！！field的上一级必须extensible: true，才能保存未声明的字段
  */
 
-import { defineComponent, onBeforeUnmount, PropType, reactive, watch } from 'vue';
+import { onBeforeUnmount, reactive, watch } from 'vue';
+
+import { TMagicForm, TMagicFormItem, TMagicInput } from '@tmagic/design';
 
 import { DynamicFieldConfig } from '../schema';
 import { getConfig } from '../utils/config';
-import fieldProps from '../utils/fieldProps';
 import { useAddField } from '../utils/useAddField';
 
-export default defineComponent({
-  name: 'm-fields-dynamic-field',
+const props = defineProps<{
+  config: DynamicFieldConfig;
+  model: any;
+  initValues?: any;
+  values?: any;
+  name: string;
+  prop: string;
+  disabled?: boolean;
+  size: 'mini' | 'small' | 'medium';
+}>();
 
-  props: {
-    ...fieldProps,
-    config: {
-      type: Object as PropType<DynamicFieldConfig>,
-      required: true,
-    },
-  },
+const emit = defineEmits(['change']);
 
-  emits: ['change'],
+useAddField(props.prop);
 
-  setup(props, { emit }) {
-    useAddField(props.prop);
-
-    const request = getConfig('request') as Function;
-    const fieldMap = reactive<{ [key: string]: any }>({
-      value: {},
-    });
-    const fieldLabelMap = reactive<{ [key: string]: any }>({
-      value: {},
-    });
-
-    const changeFieldMap = async () => {
-      if (typeof props.config.returnFields !== 'function' || !props.model) return;
-      const fields = await props.config.returnFields(props.config, props.model, request);
-      fieldMap.value = {};
-      fieldLabelMap.value = {};
-      fields.forEach((v) => {
-        if (typeof v !== 'object' || v.name === undefined) return;
-        let oldVal = props.model?.[v.name] || '';
-        if (!oldVal && v.defaultValue !== undefined) {
-          oldVal = v.defaultValue;
-          emit('change', oldVal, v.name);
-        }
-        fieldMap.value[v.name] = oldVal;
-        fieldLabelMap.value[v.name] = v.label || '';
-      });
-    };
-
-    const unwatch = watch(
-      () => props.model?.[props.config.dynamicKey],
-      (val) => {
-        if (val !== '') {
-          changeFieldMap();
-        }
-      },
-      {
-        immediate: true,
-      },
-    );
-
-    onBeforeUnmount(() => {
-      if (typeof unwatch === 'function') {
-        unwatch();
-      }
-    });
-
-    return {
-      request,
-      fieldMap,
-      fieldLabelMap,
-      unwatch,
-
-      changeFieldMap,
-      inputChangeHandler: (key: string) => {
-        emit('change', fieldMap.value[key], key);
-      },
-    };
-  },
-
-  methods: {
-    init() {},
-  },
+const request = getConfig('request') as Function;
+const fieldMap = reactive<{ [key: string]: any }>({
+  value: {},
 });
+const fieldLabelMap = reactive<{ [key: string]: any }>({
+  value: {},
+});
+
+const changeFieldMap = async () => {
+  if (typeof props.config.returnFields !== 'function' || !props.model) return;
+  const fields = await props.config.returnFields(props.config, props.model, request);
+  fieldMap.value = {};
+  fieldLabelMap.value = {};
+  fields.forEach((v) => {
+    if (typeof v !== 'object' || v.name === undefined) return;
+    let oldVal = props.model?.[v.name] || '';
+    if (!oldVal && v.defaultValue !== undefined) {
+      oldVal = v.defaultValue;
+      emit('change', oldVal, v.name);
+    }
+    fieldMap.value[v.name] = oldVal;
+    fieldLabelMap.value[v.name] = v.label || '';
+  });
+};
+
+const unwatch = watch(
+  () => props.model?.[props.config.dynamicKey],
+  (val) => {
+    if (val !== '') {
+      changeFieldMap();
+    }
+  },
+  {
+    immediate: true,
+  },
+);
+
+onBeforeUnmount(() => {
+  if (typeof unwatch === 'function') {
+    unwatch();
+  }
+});
+
+const inputChangeHandler = (key: string) => {
+  emit('change', fieldMap.value[key], key);
+};
 </script>

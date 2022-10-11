@@ -1,5 +1,5 @@
 <template>
-  <el-dialog
+  <TMagicDialog
     v-model="dialogVisible"
     class="m-form-dialog"
     top="20px"
@@ -15,7 +15,7 @@
       class="m-dialog-body"
       :style="`max-height: ${bodyHeight}; overflow-y: auto; overflow-x: hidden;`"
     >
-      <m-form
+      <Form
         v-model="stepActive"
         ref="form"
         :size="size"
@@ -24,150 +24,128 @@
         :parent-values="parentValues"
         :label-width="labelWidth"
         @change="changeHandler"
-      ></m-form>
+      ></Form>
       <slot></slot>
     </div>
 
     <template #footer>
-      <el-row class="dialog-footer">
-        <el-col :span="12" style="text-align: left">
+      <TMagicRow class="dialog-footer">
+        <TMagicCol :span="12" style="text-align: left">
           <div style="min-height: 1px">
             <slot name="left"></slot>
           </div>
-        </el-col>
-        <el-col :span="12">
+        </TMagicCol>
+        <TMagicCol :span="12">
           <slot name="footer">
-            <el-button @click="cancel" size="small">取 消</el-button>
-            <el-button v-if="hasStep && stepActive > 1" type="info" size="small" @click="preStep">上一步</el-button>
-            <el-button v-if="hasStep && stepCount > stepActive" type="info" size="small" @click="nextStep"
-              >下一步</el-button
+            <TMagicButton @click="cancel" size="small">取 消</TMagicButton>
+            <TMagicButton v-if="hasStep && stepActive > 1" type="info" size="small" @click="preStep"
+              >上一步</TMagicButton
             >
-            <el-button v-else type="primary" size="small" :loading="saveFetch" @click="save">{{
+            <TMagicButton v-if="hasStep && stepCount > stepActive" type="info" size="small" @click="nextStep"
+              >下一步</TMagicButton
+            >
+            <TMagicButton v-else type="primary" size="small" :loading="saveFetch" @click="save">{{
               confirmText
-            }}</el-button>
+            }}</TMagicButton>
           </slot>
-        </el-col>
-      </el-row>
+        </TMagicCol>
+      </TMagicRow>
     </template>
-  </el-dialog>
+  </TMagicDialog>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, PropType, ref } from 'vue';
+<script setup lang="ts">
+import { computed, ref } from 'vue';
+
+import { TMagicButton, TMagicCol, TMagicDialog, TMagicRow } from '@tmagic/design';
 
 import Form from './Form.vue';
 import { FormConfig, StepConfig } from './schema';
 
-export default defineComponent({
-  name: 'm-form-dialog',
-
-  props: {
-    values: {
-      type: Object,
-      default: () => ({}),
-    },
-
-    parentValues: {
-      type: Object,
-    },
-
-    width: [Number, String],
-
-    fullscreen: Boolean,
-
-    title: String,
-
-    config: {
-      type: Array as PropType<FormConfig>,
-      required: true,
-      default: () => [],
-    },
-
-    labelWidth: [Number, String],
-
-    size: String as PropType<'small' | 'default' | 'large'>,
-
-    confirmText: {
-      type: String,
-      default: '确定',
-    },
+const props = withDefaults(
+  defineProps<{
+    config?: FormConfig;
+    values?: Object;
+    parentValues?: Object;
+    width?: string | number;
+    labelWidth?: string;
+    fullscreen?: boolean;
+    title?: string;
+    size?: 'small' | 'default' | 'large';
+    confirmText?: string;
+  }>(),
+  {
+    config: () => [],
+    values: () => ({}),
+    confirmText: '确定',
   },
+);
 
-  emits: ['close', 'submit', 'error', 'change'],
+const emit = defineEmits(['close', 'submit', 'error', 'change']);
 
-  setup(props, { emit }) {
-    const form = ref<InstanceType<typeof Form>>();
-    const dialogVisible = ref(false);
-    const saveFetch = ref(false);
-    const stepActive = ref(1);
-    const bodyHeight = ref(`${document.body.clientHeight - 194}px`);
+const form = ref<InstanceType<typeof Form>>();
+const dialogVisible = ref(false);
+const saveFetch = ref(false);
+const stepActive = ref(1);
+const bodyHeight = ref(`${document.body.clientHeight - 194}px`);
 
-    const stepCount = computed(() => {
-      const { length } = props.config;
-      for (let index = 0; index < length; index++) {
-        if (props.config[index].type === 'step') {
-          return (props.config[index] as StepConfig).items.length;
-        }
-      }
-      return 0;
-    });
+const stepCount = computed(() => {
+  const { length } = props.config;
+  for (let index = 0; index < length; index++) {
+    if (props.config[index].type === 'step') {
+      return (props.config[index] as StepConfig).items.length;
+    }
+  }
+  return 0;
+});
 
-    const hasStep = computed(() => {
-      const { length } = props.config;
-      for (let index = 0; index < length; index++) {
-        if (props.config[index].type === 'step') {
-          return true;
-        }
-      }
+const hasStep = computed(() => {
+  const { length } = props.config;
+  for (let index = 0; index < length; index++) {
+    if (props.config[index].type === 'step') {
+      return true;
+    }
+  }
 
-      return false;
-    });
+  return false;
+});
 
-    const cancel = () => {
-      dialogVisible.value = false;
-    };
+const cancel = () => {
+  dialogVisible.value = false;
+};
 
-    const closeHandler = () => {
-      stepActive.value = 1;
-      emit('close');
-    };
+const closeHandler = () => {
+  stepActive.value = 1;
+  emit('close');
+};
 
-    const save = async () => {
-      try {
-        const values = await form.value?.submitForm();
-        emit('submit', values);
-      } catch (e) {
-        emit('error', e);
-      }
-    };
+const save = async () => {
+  try {
+    const values = await form.value?.submitForm();
+    emit('submit', values);
+  } catch (e) {
+    emit('error', e);
+  }
+};
 
-    const preStep = () => {
-      stepActive.value -= 1;
-    };
+const preStep = () => {
+  stepActive.value -= 1;
+};
 
-    const nextStep = () => {
-      stepActive.value += 1;
-    };
+const nextStep = () => {
+  stepActive.value += 1;
+};
 
-    const changeHandler = (value: any) => {
-      emit('change', value);
-    };
+const changeHandler = (value: any) => {
+  emit('change', value);
+};
 
-    return {
-      form,
-      saveFetch,
-      stepActive,
-      dialogVisible,
-      bodyHeight,
-      stepCount,
-      hasStep,
-      cancel,
-      closeHandler,
-      save,
-      preStep,
-      nextStep,
-      changeHandler,
-    };
-  },
+defineExpose({
+  form,
+  saveFetch,
+  dialogVisible,
+
+  cancel,
+  save,
 });
 </script>

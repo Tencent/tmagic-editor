@@ -1,14 +1,16 @@
 <template>
-  <el-color-picker
+  <TMagicColorPicker
     v-model="model[name]"
     :size="size"
     :disabled="disabled"
     :showAlpha="true"
     @change="changeHandler"
-  ></el-color-picker>
+  ></TMagicColorPicker>
 </template>
 
 <script lang="ts" setup>
+import { TMagicColorPicker } from '@tmagic/design';
+
 import { ColorPickConfig } from '../schema';
 import { useAddField } from '../utils/useAddField';
 

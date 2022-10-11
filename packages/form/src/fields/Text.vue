@@ -1,6 +1,6 @@
 <template>
-  <el-input
-    v-model="model[modelName]"
+  <TMagicInput
+    v-model="model[name]"
     clearable
     :size="size"
     :placeholder="config.placeholder"
@@ -20,117 +20,109 @@
         {{ config.append.text }}
       </el-button>
     </template>
-  </el-input>
+  </TMagicInput>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, inject, PropType } from 'vue';
+<script lang="ts" setup>
+import { inject } from 'vue';
 
+import { TMagicInput } from '@tmagic/design';
 import { isNumber } from '@tmagic/utils';
 
 import { FormState, TextConfig } from '../schema';
-import fieldProps from '../utils/fieldProps';
 import { useAddField } from '../utils/useAddField';
 
-export default defineComponent({
-  name: 'm-fields-text',
+const props = defineProps<{
+  config: TextConfig;
+  model: any;
+  initValues?: any;
+  values?: any;
+  name: string;
+  prop: string;
+  disabled?: boolean;
+  size: 'mini' | 'small' | 'medium';
+}>();
 
-  props: {
-    ...fieldProps,
-    config: {
-      type: Object as PropType<TextConfig>,
-      required: true,
-    },
-  },
+const emit = defineEmits(['change', 'input']);
 
-  emits: ['change', 'input'],
+useAddField(props.prop);
 
-  setup(props, { emit }) {
-    const mForm = inject<FormState | undefined>('mForm');
+const mForm = inject<FormState | undefined>('mForm');
 
-    useAddField(props.prop);
+const changeHandler = (value: number) => {
+  emit('change', value);
+};
 
-    const modelName = computed(() => props.name || props.config.name || '');
-    return {
-      modelName,
+const inputHandler = (v: string) => {
+  emit('input', v);
+  mForm?.$emit('field-input', props.prop, v);
+};
 
-      changeHandler(v: string | number) {
-        emit('change', v);
-      },
+const buttonClickHandler = () => {
+  if (typeof props.config.append === 'string') return;
 
-      inputHandler(v: string | number) {
-        emit('input', v);
-        mForm?.$emit('field-input', props.prop, v);
-      },
+  if (props.config.append?.handler) {
+    props.config.append.handler(mForm, {
+      model: props.model,
+      values: mForm?.values,
+    });
+  }
+};
 
-      buttonClickHandler() {
-        if (typeof props.config.append === 'string') return;
+const keyUpHandler = ($event: KeyboardEvent) => {
+  if (!props.model) return;
+  if (!props.name) return;
 
-        if (props.config.append?.handler) {
-          props.config.append.handler(mForm, {
-            model: props.model,
-            values: mForm?.values,
-          });
-        }
-      },
+  const arrowUp = $event.key === 'ArrowUp';
+  const arrowDown = $event.key === 'ArrowDown';
 
-      keyUpHandler($event: KeyboardEvent) {
-        if (!props.model) return;
-        if (!modelName.value) return;
+  if (!arrowUp && !arrowDown) {
+    return;
+  }
 
-        const arrowUp = $event.key === 'ArrowUp';
-        const arrowDown = $event.key === 'ArrowDown';
+  const value = props.model[props.name];
+  let num;
+  let unit;
+  if (isNumber(value)) {
+    num = +value;
+  } else {
+    value.replace(/^([0-9.]+)([a-z%]+)$/, ($0: string, $1: string, $2: string) => {
+      num = +$1;
+      unit = $2;
+    });
+  }
 
-        if (!arrowUp && !arrowDown) {
-          return;
-        }
+  if (num === undefined) {
+    return;
+  }
 
-        const value = props.model[modelName.value];
-        let num;
-        let unit;
-        if (isNumber(value)) {
-          num = +value;
-        } else {
-          value.replace(/^([0-9.]+)([a-z%]+)$/, ($0: string, $1: string, $2: string) => {
-            num = +$1;
-            unit = $2;
-          });
-        }
+  const ctrl = navigator.platform.match('Mac') ? $event.metaKey : $event.ctrlKey;
+  const shift = $event.shiftKey;
+  const alt = $event.altKey;
 
-        if (num === undefined) {
-          return;
-        }
+  if (arrowUp) {
+    if (ctrl) {
+      num += 100;
+    } else if (alt) {
+      num = (num * 10000 + 1000) / 10000;
+    } else if (shift) {
+      num = num + 10;
+    } else {
+      num += 1;
+    }
+  } else if (arrowDown) {
+    if (ctrl) {
+      num -= 100;
+    } else if (alt) {
+      num = (num * 10000 - 1000) / 10000;
+    } else if (shift) {
+      num -= 10;
+    } else {
+      num -= 1;
+    }
+  }
 
-        const ctrl = navigator.platform.match('Mac') ? $event.metaKey : $event.ctrlKey;
-        const shift = $event.shiftKey;
-        const alt = $event.altKey;
-
-        if (arrowUp) {
-          if (ctrl) {
-            num += 100;
-          } else if (alt) {
-            num = (num * 10000 + 1000) / 10000;
-          } else if (shift) {
-            num = num + 10;
-          } else {
-            num += 1;
-          }
-        } else if (arrowDown) {
-          if (ctrl) {
-            num -= 100;
-          } else if (alt) {
-            num = (num * 10000 - 1000) / 10000;
-          } else if (shift) {
-            num -= 10;
-          } else {
-            num -= 1;
-          }
-        }
-
-        props.model[modelName.value] = `${num}${unit || ''}`;
-        emit('change', props.model[modelName.value]);
-      },
-    };
-  },
-});
+  props.model[props.name] = `${num}${unit || ''}`;
+  emit('change', props.model[props.name]);
+};
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <el-input-number
+  <TMagicInputNumber
     v-if="model"
     v-model="model[name]"
     clearable
@@ -12,42 +12,40 @@
     :disabled="disabled"
     @change="changeHandler"
     @input="inputHandler"
-  ></el-input-number>
+  ></TMagicInputNumber>
 </template>
 
-<script lang="ts">
-import { defineComponent, inject, PropType } from 'vue';
+<script lang="ts" setup>
+import { inject } from 'vue';
+
+import { TMagicInputNumber } from '@tmagic/design';
 
 import { FormState, NumberConfig } from '../schema';
-import fieldProps from '../utils/fieldProps';
 import { useAddField } from '../utils/useAddField';
-export default defineComponent({
-  name: 'm-fields-number',
 
-  props: {
-    ...fieldProps,
-    config: {
-      type: Object as PropType<NumberConfig>,
-      required: true,
-    },
-  },
+const props = defineProps<{
+  config: NumberConfig;
+  model: any;
+  initValues?: any;
+  values?: any;
+  name: string;
+  prop: string;
+  disabled?: boolean;
+  size: 'mini' | 'small' | 'medium';
+}>();
 
-  emits: ['change', 'input'],
+const emit = defineEmits(['change', 'input']);
 
-  setup(props, { emit }) {
-    useAddField(props.prop);
+useAddField(props.prop);
 
-    const mForm = inject<FormState | null>('mForm');
-    return {
-      mForm,
-      changeHandler: (value: number) => {
-        emit('change', value);
-      },
-      inputHandler: (v: string) => {
-        emit('input', v);
-        mForm?.$emit('field-input', props.prop, v);
-      },
-    };
-  },
-});
+const mForm = inject<FormState | null>('mForm');
+
+const changeHandler = (value: number) => {
+  emit('change', value);
+};
+
+const inputHandler = (v: string) => {
+  emit('input', v);
+  mForm?.$emit('field-input', props.prop, v);
+};
 </script>

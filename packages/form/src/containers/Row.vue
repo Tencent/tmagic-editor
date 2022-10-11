@@ -1,5 +1,5 @@
 <template>
-  <el-row :gutter="10">
+  <TMagicRow :gutter="10">
     <Col
       v-for="(col, index) in config.items"
       :key="col[mForm?.keyProp || '__key'] ?? index"
@@ -12,53 +12,31 @@
       :size="size"
       @change="changeHandler"
     />
-  </el-row>
+  </TMagicRow>
 </template>
 
-<script lang="ts">
-import { defineComponent, inject, PropType } from 'vue';
+<script setup lang="ts">
+import { inject } from 'vue';
+
+import { TMagicRow } from '@tmagic/design';
 
 import { FormState, RowConfig } from '../schema';
 
 import Col from './Col.vue';
 
-export default defineComponent({
-  name: 'm-form-row',
+const props = defineProps<{
+  model: any;
+  config: RowConfig;
+  name: string;
+  labelWidth?: string;
+  prop?: string;
+  size?: string;
+  expandMore?: boolean;
+}>();
 
-  components: { Col },
+const emit = defineEmits(['change']);
 
-  props: {
-    labelWidth: String,
-    expandMore: Boolean,
+const mForm = inject<FormState | undefined>('mForm');
 
-    model: {
-      type: Object,
-      default: () => ({}),
-    },
-
-    config: {
-      type: Object as PropType<RowConfig>,
-      default: () => ({}),
-    },
-
-    prop: String,
-
-    name: String,
-
-    size: String,
-  },
-
-  emits: ['change'],
-
-  setup(props, { emit }) {
-    const mForm = inject<FormState | undefined>('mForm');
-
-    const changeHandler = () => emit('change', props.name ? props.model[props.name] : props.model);
-
-    return {
-      mForm,
-      changeHandler,
-    };
-  },
-});
+const changeHandler = () => emit('change', props.name ? props.model[props.name] : props.model);
 </script>
