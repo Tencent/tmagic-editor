@@ -47,6 +47,11 @@ export default defineConfig({
       { find: /^@tmagic\/table/, replacement: path.join(__dirname, '../packages/table/src/index.ts') },
       { find: /^@tmagic\/stage/, replacement: path.join(__dirname, '../packages/stage/src/index.ts') },
       { find: /^@tmagic\/utils/, replacement: path.join(__dirname, '../packages/utils/src/index.ts') },
+      { find: /^@tmagic\/design/, replacement: path.join(__dirname, '../packages/design/src/index.ts') },
+      {
+        find: /^@tmagic\/element-plus-adapter/,
+        replacement: path.join(__dirname, '../packages/element-plus-adapter/src/index.ts'),
+      },
       { find: /^vue$/, replacement: path.join(__dirname, 'node_modules/vue/dist/vue.esm-bundler.js') },
       { find: /^element-plus$/, replacement: path.join(__dirname, 'node_modules/element-plus/es/index.mjs') },
     ],

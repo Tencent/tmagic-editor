@@ -157,6 +157,29 @@ importers:
       typescript: 4.7.4
       vite: 3.1.3
 
+  packages/design:
+    specifiers:
+      '@types/node': ^15.12.4
+      '@vitejs/plugin-vue': ^3.1.0
+      '@vue/compiler-sfc': ^3.2.37
+      '@vue/test-utils': ^2.0.0
+      rimraf: ^3.0.2
+      typescript: ^4.7.4
+      vite: ^3.1.3
+      vue: ^3.2.37
+      vue-tsc: ^0.39.4
+    dependencies:
+      vue: 3.2.37
+    devDependencies:
+      '@types/node': 15.14.9
+      '@vitejs/plugin-vue': 3.1.0_vite@3.1.3+vue@3.2.37
+      '@vue/compiler-sfc': 3.2.37
+      '@vue/test-utils': 2.0.0_vue@3.2.37
+      rimraf: 3.0.2
+      typescript: 4.7.4
+      vite: 3.1.3
+      vue-tsc: 0.39.4_typescript@4.7.4
+
   packages/editor:
     specifiers:
       '@babel/core': ^7.18.0
@@ -220,10 +243,28 @@ importers:
       vite: 3.1.3_sass@1.52.2
       vue-tsc: 0.39.4_typescript@4.7.4
 
+  packages/element-plus-adapter:
+    specifiers:
+      '@types/node': ^15.12.4
+      element-plus: ^2.2.17
+      rimraf: ^3.0.2
+      typescript: ^4.7.4
+      vite: ^3.1.3
+      vue: ^3.2.37
+    dependencies:
+      element-plus: 2.2.17_vue@3.2.37
+      vue: 3.2.37
+    devDependencies:
+      '@types/node': 15.14.9
+      rimraf: 3.0.2
+      typescript: 4.7.4
+      vite: 3.1.3
+
   packages/form:
     specifiers:
       '@babel/core': ^7.18.0
       '@element-plus/icons-vue': ^2.0.9
+      '@tmagic/design': 1.2.0-beta.2
       '@tmagic/utils': 1.2.0-beta.2
       '@types/lodash-es': ^4.17.4
       '@types/node': ^15.12.4
@@ -231,7 +272,6 @@ importers:
       '@vitejs/plugin-vue': ^3.1.0
       '@vue/compiler-sfc': ^3.2.37
       '@vue/test-utils': ^2.0.0
-      element-plus: ^2.2.17
       lodash-es: ^4.17.21
       rimraf: ^3.0.2
       sass: ^1.35.1
@@ -242,8 +282,8 @@ importers:
       vue-tsc: ^0.39.4
     dependencies:
       '@element-plus/icons-vue': 2.0.9_vue@3.2.37
+      '@tmagic/design': link:../design
       '@tmagic/utils': link:../utils
-      element-plus: 2.2.17_vue@3.2.37
       lodash-es: 4.17.21
       sortablejs: 1.15.0
       vue: 3.2.37
@@ -435,6 +475,7 @@ importers:
     specifiers:
       '@element-plus/icons-vue': ^2.0.9
       '@tmagic/editor': 1.2.0-beta.2
+      '@tmagic/element-plus-adapter': 1.2.0-beta.2
       '@tmagic/form': 1.2.0-beta.2
       '@tmagic/schema': 1.2.0-beta.2
       '@tmagic/stage': 1.2.0-beta.2
@@ -458,6 +499,7 @@ importers:
     dependencies:
       '@element-plus/icons-vue': 2.0.9_vue@3.2.37
       '@tmagic/editor': link:../packages/editor
+      '@tmagic/element-plus-adapter': link:../packages/element-plus-adapter
       '@tmagic/form': link:../packages/form
       '@tmagic/schema': link:../packages/schema
       '@tmagic/stage': link:../packages/stage
@@ -1939,7 +1981,7 @@ packages:
     resolution: {integrity: sha512-WCaF33mlKLSvHDKvOD6FzTa5CI2FlMTeJf3MxJsNP0KDgRoI6RdXhHo9dtvCqV4Sywf9Owm17wTLT1Ymu/WsOQ==}
     dependencies:
       '@babel/parser': 7.18.4
-      postcss: 8.4.14
+      postcss: 8.4.16
       source-map: 0.6.1
 
   /@vue/compiler-sfc/3.2.37:
@@ -1953,7 +1995,7 @@ packages:
       '@vue/shared': 3.2.37
       estree-walker: 2.0.2
       magic-string: 0.25.9
-      postcss: 8.4.14
+      postcss: 8.4.16
       source-map: 0.6.1
 
   /@vue/compiler-ssr/3.2.37:
@@ -6247,14 +6289,6 @@ packages:
   /postcss-value-parser/4.2.0:
     resolution: {integrity: sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==}
     dev: true
-
-  /postcss/8.4.14:
-    resolution: {integrity: sha512-E398TUmfAYFPBSdzgeieK2Y1+1cpdxJx8yXbK/m57nRhKSmk1GB2tO4lbLBtlkfPQTDKfe4Xqv1ASWPpayPEig==}
-    engines: {node: ^10 || ^12 || >=14}
-    dependencies:
-      nanoid: 3.3.4
-      picocolors: 1.0.0
-      source-map-js: 1.0.2
 
   /postcss/8.4.16:
     resolution: {integrity: sha512-ipHE1XBvKzm5xI7hiHCZJCSugxvsdq2mPnsq5+UF+VHCjiBvtDrlxJfMBToWaP9D5XlgNmcFGqoHmUn0EYEaRQ==}
