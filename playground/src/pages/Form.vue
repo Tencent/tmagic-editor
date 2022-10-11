@@ -202,7 +202,7 @@ const config = ref([
   {
     type: 'fieldset',
     name: 'fieldset',
-    text: '分组',
+    legend: '分组',
     extra: 'extra',
     checkbox: true,
     expand: 'checkbox',
