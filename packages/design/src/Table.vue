@@ -53,5 +53,9 @@ defineExpose({
   toggleRowSelection(...args: any[]) {
     table.value?.toggleRowSelection(...args);
   },
+
+  toggleRowExpansion(...args: any[]) {
+    table.value?.toggleRowExpansion(...args);
+  },
 });
 </script>

@@ -14,7 +14,26 @@ export interface TMagicMessage {
   error: (msg: string) => void;
 }
 
+export type ElMessageBoxShortcutMethod = ((
+  message: string,
+  title: string,
+  options?: any,
+  appContext?: any | null,
+) => Promise<any>) &
+  ((message: string, options?: any, appContext?: any | null) => Promise<any>);
+
+export interface TMagicMessageBox {
+  alert: ElMessageBoxShortcutMethod;
+
+  confirm: ElMessageBoxShortcutMethod;
+
+  prompt: ElMessageBoxShortcutMethod;
+
+  close(): void;
+}
+
 export interface PluginOptions {
   message?: TMagicMessage;
+  messageBox?: TMagicMessageBox;
   components?: Record<string, any>;
 }

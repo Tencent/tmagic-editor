@@ -26,6 +26,7 @@ import HtmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 import TsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 
+import TMagicDesign from '@tmagic/design';
 import MagicEditor from '@tmagic/editor';
 import MagicElementPlusAdapter from '@tmagic/element-plus-adapter';
 import MagicForm from '@tmagic/form';
@@ -63,9 +64,8 @@ app.use(router);
 app.use(ElementPlus, {
   locale: zhCn,
 });
+app.use(TMagicDesign, MagicElementPlusAdapter);
 app.use(MagicEditor);
-app.use(MagicForm, {
-  uiAdapter: MagicElementPlusAdapter,
-});
+app.use(MagicForm);
 app.use(MagicTable);
 app.mount('#app');

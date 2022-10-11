@@ -35,23 +35,23 @@ export type ColumnConfig = {
   values?: FormValue;
   selection?: boolean | 'single';
   selectable?: (row: any, index: number) => boolean;
-  label: string;
+  label?: string;
   fixed?: 'left' | 'right' | boolean;
   width?: number | string;
   actions?: ColumnActionConfig[];
-  type: 'popover' | 'expand' | string | ((value: any, row: any) => string);
-  text: string;
-  prop: string;
-  showHeader: boolean;
+  type?: 'popover' | 'expand' | string | ((value: any, row: any) => string);
+  text?: string;
+  prop?: string;
+  showHeader?: boolean;
   table?: ColumnConfig[];
   formatter?: 'datetime' | ((item: any, row: Record<string, any>) => any);
-  popover: {
-    placement: '';
-    width: '';
-    trigger: '';
-    tableEmbed: '';
+  popover?: {
+    placement: string;
+    width: string;
+    trigger: string;
+    tableEmbed: string;
   };
   sortable?: boolean | 'custom';
   action?: 'tip' | 'actionLink' | 'img' | 'link' | 'tag';
-  handler: (row: any) => void;
+  handler?: (row: any) => void;
 };

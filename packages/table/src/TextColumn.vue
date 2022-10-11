@@ -1,5 +1,5 @@
 <template>
-  <el-table-column
+  <TMagicTableColumn
     show-overflow-tooltip
     :label="config.label"
     :width="config.width"
@@ -8,7 +8,7 @@
     :prop="config.prop"
   >
     <template v-slot="scope">
-      <el-form v-if="config.type && editState[scope.$index]" label-width="0" :model="editState[scope.$index]">
+      <TMagicForm v-if="config.type && editState[scope.$index]" label-width="0" :model="editState[scope.$index]">
         <m-form-container
           :prop="config.prop"
           :rules="config.rules"
@@ -16,62 +16,61 @@
           :name="config.prop"
           :model="editState[scope.$index]"
         ></m-form-container>
-      </el-form>
+      </TMagicForm>
 
-      <el-button v-else-if="config.action === 'actionLink'" text type="primary" @click="config.handler(scope.row)">
+      <TMagicButton
+        v-else-if="config.action === 'actionLink' && config.prop"
+        text
+        type="primary"
+        @click="config.handler?.(scope.row)"
+      >
         {{ formatter(config, scope.row) }}
-      </el-button>
+      </TMagicButton>
 
-      <a v-else-if="config.action === 'img'" target="_blank" :href="scope.row[config.prop]"
+      <a v-else-if="config.action === 'img' && config.prop" target="_blank" :href="scope.row[config.prop]"
         ><img :src="scope.row[config.prop]" height="50"
       /></a>
 
-      <a v-else-if="config.action === 'link'" target="_blank" :href="scope.row[config.prop]" class="keep-all">{{
-        scope.row[config.prop]
-      }}</a>
+      <a
+        v-else-if="config.action === 'link' && config.prop"
+        target="_blank"
+        :href="scope.row[config.prop]"
+        class="keep-all"
+        >{{ scope.row[config.prop] }}</a
+      >
 
       <el-tooltip v-else-if="config.action === 'tip'" placement="left">
         <template #content>
           <div>{{ formatter(config, scope.row) }}</div>
         </template>
-        <el-button text type="primary">扩展配置</el-button>
+        <TMagicButton text type="primary">扩展配置</TMagicButton>
       </el-tooltip>
 
-      <el-tag
-        v-else-if="config.action === 'tag'"
+      <TMagicTag
+        v-else-if="config.action === 'tag' && config.prop"
         :type="typeof config.type === 'function' ? config.type(scope.row[config.prop], scope.row) : config.type"
         close-transition
-        >{{ formatter(config, scope.row) }}</el-tag
+        >{{ formatter(config, scope.row) }}</TMagicTag
       >
       <div v-else v-html="formatter(config, scope.row)"></div>
     </template>
-  </el-table-column>
+  </TMagicTableColumn>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from 'vue';
+<script lang="ts" setup>
+import { TMagicButton, TMagicForm, TMagicTableColumn, TMagicTag } from '@tmagic/design';
 
 import { ColumnConfig } from './schema';
 import { formatter } from './utils';
 
-export default defineComponent({
-  props: {
-    config: {
-      type: Object as PropType<ColumnConfig>,
-      default: () => ({}),
-      required: true,
-    },
-
-    editState: {
-      type: Object,
-      default: () => {},
-    },
+withDefaults(
+  defineProps<{
+    config: ColumnConfig;
+    editState?: any;
+  }>(),
+  {
+    config: () => ({}),
+    editState: () => ({}),
   },
-
-  setup() {
-    return {
-      formatter,
-    };
-  },
-});
+);
 </script>

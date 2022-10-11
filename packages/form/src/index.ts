@@ -18,8 +18,6 @@
 
 import { App } from 'vue';
 
-import TMagicDesign from '@tmagic/design';
-
 import Container from './containers/Container.vue';
 import Fieldset from './containers/Fieldset.vue';
 import GroupList from './containers/GroupList.vue';
@@ -87,8 +85,6 @@ export { default as MDynamicField } from './fields/DynamicField.vue';
 const defaultInstallOpt = {};
 
 const install = (app: App, opt: any) => {
-  app.use(TMagicDesign, opt.uiAdapter);
-
   const option = Object.assign(defaultInstallOpt, opt);
 
   // eslint-disable-next-line no-param-reassign
