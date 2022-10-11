@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.0.9",
+    "@tmagic/element-plus-adapter": "1.2.0-beta.2",
     "@tmagic/form": "1.2.0-beta.2",
     "@tmagic/schema": "1.2.0-beta.2",
     "@tmagic/utils": "1.2.0-beta.2",
