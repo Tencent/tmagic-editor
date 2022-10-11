@@ -18,7 +18,7 @@ export default defineConfig({
     ],
     include: [
       './packages/editor/tests/**',
-      './packages/form/tests/**',
+      './packages/form/tests/unit/utils/**',
       './packages/stage/tests/**',
       './packages/utils/tests/**',
     ],
