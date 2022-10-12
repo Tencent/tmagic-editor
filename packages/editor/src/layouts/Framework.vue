@@ -10,7 +10,7 @@
       @save="saveCode"
     ></magic-code-editor>
 
-    <layout
+    <Layout
       v-else
       class="m-editor-content"
       left-class="m-editor-framework-left"
@@ -29,7 +29,7 @@
       <template #center>
         <slot v-if="pageLength > 0" name="workspace"></slot>
         <slot v-else name="empty">
-          <add-page-box></add-page-box>
+          <AddPageBox></AddPageBox>
         </slot>
       </template>
 
@@ -38,12 +38,12 @@
           <slot name="props-panel"></slot>
         </TMagicScrollbar>
       </template>
-    </layout>
+    </Layout>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, ref, watchEffect } from 'vue';
+import { computed, inject, ref, watch } from 'vue';
 
 import { TMagicScrollbar } from '@tmagic/design';
 import type { MApp } from '@tmagic/schema';
@@ -71,23 +71,60 @@ const root = computed(() => editorService?.get<MApp>('root'));
 
 const pageLength = computed(() => editorService?.get<number>('pageLength') || 0);
 const showSrc = computed(() => uiService?.get<boolean>('showSrc'));
-const columnWidth = ref<Partial<GetColumnWidth>>({
-  left: DEFAULT_LEFT_COLUMN_WIDTH,
-  center: 0,
-  right: 0,
-});
-uiService?.set('columnWidth', columnWidth.value);
 
-watchEffect(() => {
-  if (pageLength.value <= 0) {
-    columnWidth.value.right = undefined;
-    columnWidth.value.center = globalThis.document.body.clientWidth - DEFAULT_LEFT_COLUMN_WIDTH;
-  } else {
-    columnWidth.value.right = columnWidth.value.right || DEFAULT_RIGHT_COLUMN_WIDTH;
-    columnWidth.value.center =
-      globalThis.document.body.clientWidth - DEFAULT_LEFT_COLUMN_WIDTH - DEFAULT_RIGHT_COLUMN_WIDTH;
-  }
+const LEFT_COLUMN_WIDTH_STORAGE_KEY = '$MagicEditorLeftColumnWidthData';
+const RIGHT_COLUMN_WIDTH_STORAGE_KEY = '$MagicEditorRightColumnWidthData';
+
+const leftColumnWidthCacheData = Number(globalThis.localStorage.getItem(LEFT_COLUMN_WIDTH_STORAGE_KEY));
+const RightColumnWidthCacheData = Number(globalThis.localStorage.getItem(RIGHT_COLUMN_WIDTH_STORAGE_KEY));
+
+const columnWidth = ref<Partial<GetColumnWidth>>({
+  left: leftColumnWidthCacheData,
+  center: 0,
+  right: RightColumnWidthCacheData,
 });
+
+watch(
+  pageLength,
+  (length) => {
+    const left = columnWidth.value.left || DEFAULT_LEFT_COLUMN_WIDTH;
+
+    columnWidth.value.left = left;
+
+    if (length <= 0) {
+      columnWidth.value.right = undefined;
+      columnWidth.value.center = globalThis.document.body.clientWidth - left;
+    } else {
+      const right = columnWidth.value.right || RightColumnWidthCacheData || DEFAULT_RIGHT_COLUMN_WIDTH;
+      columnWidth.value.right = right;
+      columnWidth.value.center = globalThis.document.body.clientWidth - left - right;
+    }
+
+    uiService?.set('columnWidth', columnWidth);
+  },
+  {
+    immediate: true,
+  },
+);
+
+watch(
+  () => columnWidth.value.right,
+  (right) => {
+    if (typeof right === 'undefined') return;
+    globalThis.localStorage.setItem(RIGHT_COLUMN_WIDTH_STORAGE_KEY, `${right}`);
+  },
+);
+
+watch(
+  () => columnWidth.value.left,
+  (left) => {
+    globalThis.localStorage.setItem(LEFT_COLUMN_WIDTH_STORAGE_KEY, `${left}`);
+  },
+);
+
+const columnWidthChange = (columnWidth: GetColumnWidth) => {
+  uiService?.set('columnWidth', columnWidth);
+};
 
 const saveCode = (value: string) => {
   try {
@@ -96,22 +133,5 @@ const saveCode = (value: string) => {
   } catch (e: any) {
     console.error(e);
   }
-};
-
-const COLUMN_WIDTH_STORAGE_KEY = '$MagicEditorColumnWidthData';
-
-const columnWidthCacheData = globalThis.localStorage.getItem(COLUMN_WIDTH_STORAGE_KEY);
-if (columnWidthCacheData) {
-  try {
-    const columnWidthCache = JSON.parse(columnWidthCacheData);
-    columnWidth.value = columnWidthCache;
-  } catch (e) {
-    console.error(e);
-  }
-}
-
-const columnWidthChange = (columnWidth: GetColumnWidth) => {
-  uiService?.set('columnWidth', columnWidth);
-  globalThis.localStorage.setItem(COLUMN_WIDTH_STORAGE_KEY, JSON.stringify(columnWidth));
 };
 </script>
