@@ -37,4 +37,5 @@ export interface PluginOptions {
   message?: TMagicMessage;
   messageBox?: TMagicMessageBox;
   components?: Record<string, any>;
+  [key: string]: any;
 }
