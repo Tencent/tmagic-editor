@@ -560,7 +560,7 @@ export default class StageDragResize extends EventEmitter {
       resizable: true,
       scalable: false,
       rotatable: false,
-      snappable: isAbsolute || isFixed,
+      snappable: true,
       snapGap: isAbsolute || isFixed,
       snapThreshold: 5,
       snapDigit: 0,
