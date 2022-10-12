@@ -74,8 +74,13 @@ const center = ref(0);
 
 const changeLeft = (deltaX: number) => {
   if (typeof props.left === 'undefined') return;
-  const left = Math.max(props.left + deltaX, props.minLeft) || 0;
+  let left = Math.max(props.left + deltaX, props.minLeft) || 0;
   emit('update:left', left);
+
+  if (clientWidth - left - (props.right || 0) <= 0) {
+    left = props.left;
+  }
+
   center.value = clientWidth - left - (props.right || 0);
 
   emit('change', {
@@ -87,8 +92,13 @@ const changeLeft = (deltaX: number) => {
 
 const changeRight = (deltaX: number) => {
   if (typeof props.right === 'undefined') return;
-  const right = Math.max(props.right - deltaX, props.minRight) || 0;
+  let right = Math.max(props.right - deltaX, props.minRight) || 0;
   emit('update:right', right);
+
+  if (clientWidth - (props.left || 0) - right <= 0) {
+    right = props.right;
+  }
+
   center.value = clientWidth - (props.left || 0) - right;
 
   emit('change', {
