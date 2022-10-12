@@ -1,3 +1,25 @@
+# [1.2.0-beta.3](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.2...v1.2.0-beta.3) (2022-10-12)
+
+
+### Bug Fixes
+
+* **stage:** 页面布局修改为流式布局后，组件宽可以设置到边框之外 ([b77cf10](https://github.com/Tencent/tmagic-editor/commit/b77cf108cd28d6d941d389f2a59462716c6d4207)), closes [#395](https://github.com/Tencent/tmagic-editor/issues/395)
+
+
+### Features
+
+* **design:** 新增TMagicDesign，用于适配不同的ui框架 ([e2d7841](https://github.com/Tencent/tmagic-editor/commit/e2d784176b48cff33518328f23b155a0128bbf1d)), closes [#401](https://github.com/Tencent/tmagic-editor/issues/401)
+* **design:** 默认使用element-plus ([476e715](https://github.com/Tencent/tmagic-editor/commit/476e715982597cd56e5ff58e2adf44198e81903f))
+* **editor:** editor使用tmagic-design ([63c61ca](https://github.com/Tencent/tmagic-editor/commit/63c61caccc99873868f02ccf7875ae6f1ce1d4a8)), closes [#401](https://github.com/Tencent/tmagic-editor/issues/401)
+* **editor:** 支持通过左侧组件树进行组件多选 ([e3b7f58](https://github.com/Tencent/tmagic-editor/commit/e3b7f587ee002f730e2e1b592f56d07f21de92bb)), closes [#404](https://github.com/Tencent/tmagic-editor/issues/404)
+* **element-plus-adapter:** 新增element-plus ui适配器 ([c613b12](https://github.com/Tencent/tmagic-editor/commit/c613b12f110dc4b46f4343cda75149543bc0c82c)), closes [#401](https://github.com/Tencent/tmagic-editor/issues/401)
+* **form:** checkboxGroup options支持函数配置 ([6d432ba](https://github.com/Tencent/tmagic-editor/commit/6d432ba1da4783607bbbfc22bed50433a90f0fa6))
+* **form:** 剥离element-plus依赖，使用tamgic-design ([3a1a979](https://github.com/Tencent/tmagic-editor/commit/3a1a9795f6335533d914098e7c46dae1258681f3)), closes [#401](https://github.com/Tencent/tmagic-editor/issues/401)
+* **playground:** 使用@tamgic/design ([36f396a](https://github.com/Tencent/tmagic-editor/commit/36f396ac2452605192a04a8253204f82d062f6c0)), closes [#401](https://github.com/Tencent/tmagic-editor/issues/401)
+* table切换成TMagicDesign ([32a24ad](https://github.com/Tencent/tmagic-editor/commit/32a24ad578b8f43b56b2c251c53eb3cfb78f2c56))
+
+
+
 # [1.2.0-beta.2](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.1...v1.2.0-beta.2) (2022-09-28)
 
 
