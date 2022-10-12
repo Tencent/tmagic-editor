@@ -14,7 +14,7 @@ const props = defineProps<{
   closeTransition?: boolean;
 }>();
 
-const uiComponent = getConfig('components').tab;
+const uiComponent = getConfig('components').tag;
 
 const uiProps = computed(() => uiComponent.props(props));
 </script>
