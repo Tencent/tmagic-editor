@@ -1,7 +1,7 @@
 {
   "name": "docs",
   "private": true,
-  "version": "1.2.0-beta.3",
+  "version": "1.2.0-beta.4",
   "scripts": {
     "clean:top": "rimraf dist",
     "dev": "vuepress dev src",
@@ -9,11 +9,11 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.0.9",
-    "@tmagic/design": "1.2.0-beta.3",
-    "@tmagic/element-plus-adapter": "1.2.0-beta.3",
-    "@tmagic/form": "1.2.0-beta.3",
-    "@tmagic/schema": "1.2.0-beta.3",
-    "@tmagic/utils": "1.2.0-beta.3",
+    "@tmagic/design": "1.2.0-beta.4",
+    "@tmagic/element-plus-adapter": "1.2.0-beta.4",
+    "@tmagic/form": "1.2.0-beta.4",
+    "@tmagic/schema": "1.2.0-beta.4",
+    "@tmagic/utils": "1.2.0-beta.4",
     "element-plus": "^2.2.17",
     "highlight.js": "^11.2.0",
     "lodash": "^4.17.21",

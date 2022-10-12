@@ -1,3 +1,7 @@
+# [1.2.0-beta.4](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.3...v1.2.0-beta.4) (2022-10-12)
+
+
+
 # [1.2.0-beta.3](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.2...v1.2.0-beta.3) (2022-10-12)
 
 
