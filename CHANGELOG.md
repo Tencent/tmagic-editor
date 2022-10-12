@@ -1,14 +1,3 @@
-# [1.2.0-beta.5](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.4...v1.2.0-beta.5) (2022-10-12)
-
-
-### Bug Fixes
-
-* **design:** tag组件获取适配组件出错 ([4369191](https://github.com/Tencent/tmagic-editor/commit/43691911b798e59ee2feb319fdb6f896cb6578d0))
-* **editor:** 列框缓存失效 ([e01d5d9](https://github.com/Tencent/tmagic-editor/commit/e01d5d913fb16f7e615d7c352b73c8df660652fe))
-* **editor:** 拖动改变左右列宽，不能让中间区域宽度小于0 ([0444f68](https://github.com/Tencent/tmagic-editor/commit/0444f68f3a34615b5cb5d978fdec9d959d8d8a3b))
-
-
-
 # [1.2.0-beta.4](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.3...v1.2.0-beta.4) (2022-10-12)
 
 
