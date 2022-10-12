@@ -49,8 +49,33 @@ export { default as TMagicTooltip } from './Tooltip.vue';
 export { default as TMagicTree } from './Tree.vue';
 export { default as TMagicUpload } from './Upload.vue';
 
-export const tMagicMessage = {} as unknown as TMagicMessage;
-export const tMagicMessageBox = {} as unknown as TMagicMessageBox;
+export const tMagicMessage = {
+  error: (msg: string) => {
+    console.error(msg);
+  },
+  success: (msg: string) => {
+    console.log(msg);
+  },
+  warning: (msg: string) => {
+    console.warn(msg);
+  },
+  info: (msg: string) => {
+    console.info(msg);
+  },
+  closeAll: (msg: string) => {},
+} as unknown as TMagicMessage;
+
+export const tMagicMessageBox = {
+  alert: (msg: string) => {
+    console.log(msg);
+  },
+  confirm: (msg: string) => {
+    console.log(msg);
+  },
+  close: (msg: string) => {
+    console.log(msg);
+  },
+} as unknown as TMagicMessageBox;
 
 export default {
   install(app: App, options: PluginOptions) {
@@ -68,6 +93,7 @@ export default {
       tMagicMessageBox.prompt = options.messageBox?.prompt;
       tMagicMessageBox.close = options.messageBox?.close;
     }
+
     app.config.globalProperties.$MAGIC_DESIGN = options;
     setConfig(options);
   },
