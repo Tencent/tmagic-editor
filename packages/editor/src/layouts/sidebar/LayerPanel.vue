@@ -7,16 +7,18 @@
     <slot name="layer-panel-header"></slot>
 
     <TMagicInput
-      class="filterInput"
+      v-model="filterText"
+      class="search-input"
       size="small"
       placeholder="输入关键字进行过滤"
       clearable
-      v-model="filterText"
+      :prefix-icon="Search"
       @change="filterTextChangeHandler"
     ></TMagicInput>
 
     <TMagicTree
       v-if="values.length"
+      class="magic-editor-layer-tree"
       ref="tree"
       node-key="id"
       empty-text="页面空荡荡的"
@@ -65,6 +67,7 @@
 
 <script lang="ts" setup>
 import { computed, inject, ref, watch } from 'vue';
+import { Search } from '@element-plus/icons-vue';
 import KeyController from 'keycon';
 import { throttle } from 'lodash-es';
 
