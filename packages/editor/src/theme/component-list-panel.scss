@@ -1,11 +1,11 @@
 .ui-component-panel {
   height: 100%;
   border-top: 0 !important;
-  margin-top: 50px;
+  margin-top: 48px;
   background-color: $--sidebar-content-background-color;
 
   .search-input {
-    background: #f8fbff;
+    background: #fff;
     color: #bbbbbb;
     padding: 10px;
     position: absolute;
@@ -15,11 +15,7 @@
     z-index: 1;
 
     .el-input__prefix {
-      padding: 10px;
-    }
-
-    .el-input__suffix {
-      padding: 10px 5px;
+      padding: 7px;
     }
   }
 

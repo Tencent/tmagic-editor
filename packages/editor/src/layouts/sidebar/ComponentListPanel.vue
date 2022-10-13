@@ -4,11 +4,11 @@
 
     <TMagicCollapse class="ui-component-panel" :model-value="collapseValue">
       <TMagicInput
-        prefix-icon="el-icon-search"
         placeholder="输入关键字进行过滤"
         class="search-input"
         size="small"
         clearable
+        :prefix-icon="Search"
         v-model="searchText"
       />
       <template v-for="(group, index) in list">
@@ -40,7 +40,7 @@
 
 <script lang="ts" setup>
 import { computed, inject, ref } from 'vue';
-import { Grid } from '@element-plus/icons-vue';
+import { Grid, Search } from '@element-plus/icons-vue';
 import serialize from 'serialize-javascript';
 
 import { TMagicCollapse, TMagicCollapseItem, TMagicInput, TMagicScrollbar, TMagicTooltip } from '@tmagic/design';
