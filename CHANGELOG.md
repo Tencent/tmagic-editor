@@ -1,3 +1,17 @@
+# [1.2.0-beta.6](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.4...v1.2.0-beta.6) (2022-10-14)
+
+
+### Bug Fixes
+
+* **design:** tag组件获取适配组件出错 ([4369191](https://github.com/Tencent/tmagic-editor/commit/43691911b798e59ee2feb319fdb6f896cb6578d0))
+* **editor:** 列框缓存失效 ([e01d5d9](https://github.com/Tencent/tmagic-editor/commit/e01d5d913fb16f7e615d7c352b73c8df660652fe))
+* **editor:** 多选后拖动，组件树会收缩 ([4041029](https://github.com/Tencent/tmagic-editor/commit/40410292d73c38525c2f20da5ab6a75302e5a171))
+* **editor:** 拖动改变左右列宽，不能让中间区域宽度小于0 ([0444f68](https://github.com/Tencent/tmagic-editor/commit/0444f68f3a34615b5cb5d978fdec9d959d8d8a3b))
+* **editor:** 设置高亮节点操作一定要在刷新展开状态之后，否则可能导致设置的高亮无效 ([2c31caf](https://github.com/Tencent/tmagic-editor/commit/2c31caf34f740470a313314112798f7aae2a020c)), closes [#404](https://github.com/Tencent/tmagic-editor/issues/404)
+* **table:** type 为selection只能是table下的children，不能是children的children ([a6ecbb6](https://github.com/Tencent/tmagic-editor/commit/a6ecbb66d1808ece12fd299f0e73577eb2cc5f68))
+
+
+
 # [1.2.0-beta.5](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.4...v1.2.0-beta.5) (2022-10-12)
 
 
