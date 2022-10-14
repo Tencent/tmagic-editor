@@ -37,6 +37,7 @@ import {
   ElTableColumn,
   ElTabPane,
   ElTabs,
+  ElTag,
   ElTimePicker,
   ElTooltip,
   ElTree,
@@ -228,7 +229,7 @@ const adapter: any = {
     },
 
     tag: {
-      component: ElTabs,
+      component: ElTag,
       props: (props: any) => props,
     },
 
