@@ -66,7 +66,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, ref, watch } from 'vue';
+import { computed, inject, nextTick, ref, watch } from 'vue';
 import { Search } from '@element-plus/icons-vue';
 import KeyController from 'keycon';
 import { throttle } from 'lodash-es';
@@ -207,34 +207,28 @@ const filterTextChangeHandler = (val: string) => {
   tree.value?.filter(val);
 };
 
-// 展开树节点
-const expandNodes = () => {
+// 树节点更新后展开上次展开过的节点
+const expandNodes = async () => {
+  if (!tree.value) return;
+  await nextTick();
+  tree.value &&
+    Object.entries(tree.value.getStore().nodesMap).forEach(([id, node]: [string, any]) => {
+      if (node.expanded && node.data.items) {
+        expandedKeys.set(id, id);
+      }
+    });
   expandedKeys.forEach((key) => {
     if (!tree.value) return;
     tree.value.getNode(key)?.expand();
   });
 };
 
-watch([() => editorService?.get('nodes'), tree], ([nodes]) => {
-  if (!tree.value || !editorService || !nodes) return;
-  selectedNodes.value = nodes as unknown as MNode[];
-
-  const parent = editorService.get('parent');
-  if (!parent?.id) return;
-
-  const treeNode = tree.value.getNode(parent.id);
-  treeNode?.updateChildren();
-
-  setTimeout(() => {
-    tree.value &&
-      Object.entries(tree.value.getStore().nodesMap).forEach(([id, node]: [string, any]) => {
-        if (node.expanded && node.data.items) {
-          expandedKeys.set(id, id);
-        }
-      });
-    expandNodes();
-  });
-});
+watch(
+  () => editorService?.get<MNode[]>('nodes'),
+  (nodes) => {
+    selectedNodes.value = nodes ?? [];
+  },
+);
 
 // 设置树节点选中状态
 const setTreeKeyStatus = () => {
@@ -253,7 +247,16 @@ const setTreeKeyStatus = () => {
   }
 };
 
-watch(selectedIds, () => {
+watch([selectedIds, tree], async () => {
+  if (!tree.value || !editorService) return;
+  const parent = editorService.get('parent');
+  if (!parent?.id) return;
+
+  const treeNode = tree.value.getNode(parent.id);
+  treeNode?.updateChildren();
+  await expandNodes();
+
+  // 设置高亮节点操作一定要在刷新展开状态之后，否则可能导致设置的高亮无效
   setTreeKeyStatus();
 });
 
