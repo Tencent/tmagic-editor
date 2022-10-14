@@ -215,31 +215,26 @@ const expandNodes = () => {
   });
 };
 
-watch(
-  () => editorService?.get('nodes'),
-  (nodes) => {
-    if (!tree.value) return;
-    if (!editorService) return;
-    if (!nodes) return;
-    selectedNodes.value = nodes as unknown as MNode[];
+watch([() => editorService?.get('nodes'), tree], ([nodes]) => {
+  if (!tree.value || !editorService || !nodes) return;
+  selectedNodes.value = nodes as unknown as MNode[];
 
-    const parent = editorService.get('parent');
-    if (!parent?.id) return;
+  const parent = editorService.get('parent');
+  if (!parent?.id) return;
 
-    const treeNode = tree.value.getNode(parent.id);
-    treeNode?.updateChildren();
+  const treeNode = tree.value.getNode(parent.id);
+  treeNode?.updateChildren();
 
-    setTimeout(() => {
-      tree.value &&
-        Object.entries(tree.value.getStore().nodesMap).forEach(([id, node]: [string, any]) => {
-          if (node.expanded && node.data.items) {
-            expandedKeys.set(id, id);
-          }
-        });
-      expandNodes();
-    });
-  },
-);
+  setTimeout(() => {
+    tree.value &&
+      Object.entries(tree.value.getStore().nodesMap).forEach(([id, node]: [string, any]) => {
+        if (node.expanded && node.data.items) {
+          expandedKeys.set(id, id);
+        }
+      });
+    expandNodes();
+  });
+});
 
 // 设置树节点选中状态
 const setTreeKeyStatus = () => {

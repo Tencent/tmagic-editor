@@ -484,10 +484,10 @@ class Editor extends BaseService {
     parentNodeItems[index] = newConfig;
 
     // 将update后的配置更新到nodes中
-    const nodes = this.get('nodes');
+    const nodes = this.get<MNode[]>('nodes') || [];
     const targetIndex = nodes.findIndex((nodeItem: MNode) => `${nodeItem.id}` === `${newConfig.id}`);
     nodes.splice(targetIndex, 1, newConfig);
-    this.set('nodes', nodes);
+    this.set('nodes', [...nodes]);
 
     this.get<StageCore | null>('stage')?.update({
       config: cloneDeep(newConfig),

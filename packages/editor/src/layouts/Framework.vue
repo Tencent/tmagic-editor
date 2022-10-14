@@ -33,7 +33,7 @@
         </slot>
       </template>
 
-      <template v-if="pageLength > 0" #right>
+      <template v-if="pageLength > 0 && nodes.length === 1" #right>
         <TMagicScrollbar>
           <slot name="props-panel"></slot>
         </TMagicScrollbar>
@@ -68,6 +68,7 @@ withDefaults(
 const { editorService, uiService } = inject<Services>('services') || {};
 
 const root = computed(() => editorService?.get<MApp>('root'));
+const nodes = computed(() => editorService?.get<Node[]>('nodes') || []);
 
 const pageLength = computed(() => editorService?.get<number>('pageLength') || 0);
 const showSrc = computed(() => uiService?.get<boolean>('showSrc'));
