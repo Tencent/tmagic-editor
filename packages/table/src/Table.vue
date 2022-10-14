@@ -24,12 +24,13 @@
       </template>
 
       <template v-else-if="item.selection">
-        <TMagicTableColumn
-          type="selection"
-          :key="columnIndex"
+        <component
           width="40"
+          type="selection"
+          :is="tableColumnComponent.component"
+          :key="columnIndex"
           :selectable="item.selectable"
-        ></TMagicTableColumn>
+        ></component>
       </template>
 
       <template v-else-if="item.actions">
@@ -58,7 +59,7 @@
 import { computed, ref } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
-import { TMagicTable, TMagicTableColumn } from '@tmagic/design';
+import { getConfig, TMagicTable } from '@tmagic/design';
 
 import ActionsColumn from './ActionsColumn.vue';
 import ExpandColumn from './ExpandColumn.vue';
@@ -99,6 +100,7 @@ const tMagicTable = ref<InstanceType<typeof TMagicTable>>();
 
 const editState = ref([]);
 
+const tableColumnComponent = getConfig('components').tableColumn;
 const selectionColumn = computed(() => {
   const column = props.columns.filter((item) => item.selection);
   return column.length ? column[0] : null;
