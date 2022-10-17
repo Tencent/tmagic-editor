@@ -1,3 +1,13 @@
+# [1.2.0-beta.7](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.6...v1.2.0-beta.7) (2022-10-17)
+
+
+### Bug Fixes
+
+* **design:** input slot 出错 ([d2eaecf](https://github.com/Tencent/tmagic-editor/commit/d2eaecfaab8cdbdd22322c45356e680ac45f30d6))
+* **element-plus-adapter:** tag组件写成了tabs ([b965e66](https://github.com/Tencent/tmagic-editor/commit/b965e66440687de235e267c745c10ba9b5d6b32e))
+
+
+
 # [1.2.0-beta.6](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.4...v1.2.0-beta.6) (2022-10-14)
 
 
