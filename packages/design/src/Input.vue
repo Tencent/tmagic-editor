@@ -6,7 +6,10 @@
     @input="inputHandler"
     @update:modelValue="updateModelValue"
   >
-    <template #append v-if="$slots.prepend">
+    <template #prepend v-if="$slots.prepend">
+      <slot name="prepend"></slot>
+    </template>
+    <template #append v-if="$slots.append">
       <slot name="append"></slot>
     </template>
   </component>
