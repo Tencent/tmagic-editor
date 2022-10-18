@@ -4,13 +4,14 @@
       <TMagicButton
         v-for="(action, actionIndex) in config.actions"
         v-show="display(action.display, scope.row) && !editState[scope.$index]"
-        v-html="action.text"
         class="action-btn"
         text
         type="primary"
         size="small"
+        :icon="action.icon"
         :key="actionIndex"
         @click="actionHandler(action, scope.row, scope.$index)"
+        ><span v-html="formatter(action.text, scope.row)"></span
       ></TMagicButton>
       <TMagicButton
         class="action-btn"
@@ -35,7 +36,7 @@
 </template>
 
 <script lang="ts" setup>
-import { TMagicButton, tMagicMessage, tMagicMessageBox, TMagicTableColumn } from '@tmagic/design';
+import { TMagicButton, tMagicMessage, TMagicTableColumn } from '@tmagic/design';
 
 import { ColumnActionConfig, ColumnConfig } from './schema';
 
@@ -63,56 +64,16 @@ const display = (fuc: boolean | Function | undefined, row: any) => {
   return true;
 };
 
-const success = (msg: string, action: ColumnActionConfig, row: any) => {
-  tMagicMessage.success(msg);
-  action.after?.(row);
-};
-
-const error = (msg: string) => tMagicMessage.error(msg);
-
-const deleteAction = async (action: ColumnActionConfig, row: any) => {
-  await tMagicMessageBox.confirm(`确认删除${row[action.name || 'c_name']}(${row[props.rowkeyName]})?`, '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning',
-  });
-
-  const res = await action.handler?.(row);
-
-  if (res.ret === 0) {
-    success('删除成功!', action, row);
-  } else {
-    error(res.msg || '删除失败');
+const formatter = (fuc: string | Function | undefined, row: any) => {
+  if (typeof fuc === 'function') {
+    return fuc(row);
   }
-};
-
-const copyHandler = async (action: ColumnActionConfig, row: any) => {
-  await tMagicMessageBox.confirm(`确定复制${row[action.name || 'c_name']}(${row.c_id})?`, '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning',
-  });
-
-  try {
-    const res = await action.handler?.(row);
-
-    if (res.ret === 0) {
-      success('复制成功!', action, row);
-    } else {
-      error(`复制失败!${res.msg}`);
-    }
-  } catch (e) {
-    error('复制失败!');
-  }
+  return fuc;
 };
 
 const actionHandler = async (action: ColumnActionConfig, row: any, index: number) => {
   await action.before?.(row);
-  if (action.type === 'delete') {
-    await deleteAction(action, row);
-  } else if (action.type === 'copy') {
-    await copyHandler(action, row);
-  } else if (action.type === 'edit') {
+  if (action.type === 'edit') {
     props.editState[index] = row;
   } else {
     await action.handler?.(row);

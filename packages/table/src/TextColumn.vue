@@ -24,7 +24,7 @@
         type="primary"
         @click="config.handler?.(scope.row)"
       >
-        {{ formatter(config, scope.row) }}
+        <span v-html="formatter(config, scope.row)"></span>
       </TMagicButton>
 
       <a v-else-if="config.action === 'img' && config.prop" target="_blank" :href="scope.row[config.prop]"
