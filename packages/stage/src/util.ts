@@ -229,3 +229,6 @@ export const up = (deltaTop: number, target: HTMLElement | SVGElement): SortEven
     dist: upEls.length && swapIndex > -1 ? upEls[swapIndex].id : target.id,
   };
 };
+
+export const isMoveableButton = (target: Element) =>
+  target.classList.contains('moveable-button') || target.parentElement?.classList.contains('moveable-button');

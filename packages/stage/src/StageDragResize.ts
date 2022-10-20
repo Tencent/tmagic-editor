@@ -27,6 +27,7 @@ import MoveableHelper from 'moveable-helper';
 import { removeClassNameByClassName } from '@tmagic/utils';
 
 import { DRAG_EL_ID_PREFIX, GHOST_EL_ID_PREFIX, GuidesType, Mode, ZIndex } from './const';
+import selectParentAbles from './MoveableSelectParentAble';
 import StageCore from './StageCore';
 import StageMask from './StageMask';
 import type { StageDragResizeConfig } from './types';
@@ -593,6 +594,13 @@ export default class StageDragResize extends EventEmitter {
         bottom: isSortable ? undefined : this.container.clientHeight,
         ...(moveableOptions.bounds || {}),
       },
+
+      props: {
+        selectParent: true,
+      },
+
+      ables: [selectParentAbles(this)],
+
       ...options,
       ...moveableOptions,
     };

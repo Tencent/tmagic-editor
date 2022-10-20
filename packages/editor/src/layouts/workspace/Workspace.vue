@@ -1,5 +1,7 @@
 <template>
   <div class="m-editor-workspace" tabindex="-1" ref="workspace">
+    <Breadcrumb></Breadcrumb>
+
     <slot name="stage">
       <MagicStage :key="page?.id"></MagicStage>
     </slot>
@@ -22,6 +24,7 @@ import { isPage } from '@tmagic/utils';
 
 import type { Services } from '../../type';
 
+import Breadcrumb from './Breadcrumb.vue';
 import PageBar from './PageBar.vue';
 import MagicStage from './Stage.vue';
 

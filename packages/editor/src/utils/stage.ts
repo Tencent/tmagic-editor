@@ -73,6 +73,12 @@ export const useStage = (stageOptions: StageOptions) => {
     editorService.sort(ev.src, ev.dist);
   });
 
+  stage.on('select-parent', () => {
+    const parent = editorService.get('parent');
+    editorService.select(parent);
+    editorService.get<StageCore>('stage').select(parent.id);
+  });
+
   stage.on('changeGuides', (e) => {
     uiService.set('showGuides', true);
 

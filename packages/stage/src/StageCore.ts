@@ -144,6 +144,9 @@ export default class StageCore extends EventEmitter {
       })
       .on('sort', (data: UpdateEventData) => {
         setTimeout(() => this.emit('sort', data));
+      })
+      .on('select-parent', () => {
+        this.emit('select-parent');
       });
 
     this.multiDr
