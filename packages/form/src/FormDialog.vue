@@ -6,6 +6,7 @@
     append-to-body
     :title="title"
     :width="width"
+    :zIndex="zIndex"
     :fullscreen="fullscreen"
     :close-on-click-modal="false"
     @close="closeHandler"
@@ -71,6 +72,7 @@ const props = withDefaults(
     labelWidth?: string;
     fullscreen?: boolean;
     title?: string;
+    zIndex?: number;
     size?: 'small' | 'default' | 'large';
     confirmText?: string;
   }>(),
