@@ -25,7 +25,7 @@ import { Mode, MouseButton, ZIndex } from './const';
 import Rule from './Rule';
 import type StageCore from './StageCore';
 import type { StageMaskConfig } from './types';
-import { getScrollParent, isFixedParent } from './util';
+import { getScrollParent, isFixedParent, isMoveableButton } from './util';
 
 const wrapperClassName = 'editor-mask-wrapper';
 const throttleTime = 100;
@@ -315,13 +315,18 @@ export default class StageMask extends Rule {
     event.stopPropagation();
 
     if (event.button !== MouseButton.LEFT && event.button !== MouseButton.RIGHT) return;
+    if (!event.target) return;
+
+    const targetClassList = (event.target as HTMLDivElement).classList;
+
+    console.log(targetClassList);
 
     // 如果单击多选选中区域，则不需要再触发选中了，而可能是拖动行为
-    if (!this.isMultiSelectStatus && (event.target as HTMLDivElement).className.indexOf('moveable-area') !== -1) {
+    if (!this.isMultiSelectStatus && targetClassList.contains('moveable-area')) {
       return;
     }
-    // 点击对象如果是边框锚点，则可能是resize
-    if ((event.target as HTMLDivElement).className.indexOf('moveable-control') !== -1) {
+    // 点击对象如果是边框锚点，则可能是resize; 点击对象是功能按钮
+    if (targetClassList.contains('moveable-control') || isMoveableButton(event.target as Element)) {
       return;
     }
 
