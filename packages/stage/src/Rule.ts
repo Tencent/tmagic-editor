@@ -12,6 +12,7 @@ export default class Rule extends EventEmitter {
 
   private container: HTMLDivElement;
   private containerResizeObserver: ResizeObserver;
+  private isShowGuides = true;
 
   constructor(container: HTMLDivElement) {
     super();
@@ -32,16 +33,18 @@ export default class Rule extends EventEmitter {
   }
 
   /**
-   * 是否显示标尺
-   * @param show 是否显示
+   * 是否显示辅助线
+   * @param isShowGuides 是否显示
    */
-  public showGuides(show = true) {
+  public showGuides(isShowGuides = true) {
+    this.isShowGuides = isShowGuides;
+
     this.hGuides.setState({
-      showGuides: show,
+      showGuides: isShowGuides,
     });
 
     this.vGuides.setState({
-      showGuides: show,
+      showGuides: isShowGuides,
     });
   }
 
@@ -135,6 +138,7 @@ export default class Rule extends EventEmitter {
       lineColor: '#000',
       textColor: '#000',
       style: this.getGuidesStyle(type),
+      showGuides: this.isShowGuides,
     });
 
   private hGuidesChangeGuidesHandler = (e: GuidesEvents['changeGuides']) => {
