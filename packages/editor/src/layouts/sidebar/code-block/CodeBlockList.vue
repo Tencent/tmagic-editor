@@ -85,7 +85,7 @@
     </TMagicTree>
 
     <!-- 代码块编辑区 -->
-    <code-block-editor>
+    <code-block-editor v-if="isShowCodeBlockEditor">
       <template #code-block-edit-panel-header="{ id }">
         <slot name="code-block-edit-panel-header" :id="id"></slot>
       </template>
@@ -121,6 +121,9 @@ const state = reactive<ListRelationState>({
 });
 
 const editable = computed(() => services?.codeBlockService.getEditStatus());
+
+// 是否展示代码编辑区
+const isShowCodeBlockEditor = computed(() => services?.codeBlockService.getCodeEditorShowStatus() || false);
 
 // 根据代码块ID获取其绑定的组件信息
 const getBindCompsByCodeId = (codeId: string, codeBlockContent: CodeBlockContent) => {

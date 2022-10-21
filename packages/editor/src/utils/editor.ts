@@ -16,13 +16,14 @@
  * limitations under the License.
  */
 
+import serialize from 'serialize-javascript';
+
 import type { MApp, MContainer, MNode, MPage } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
 import { getNodePath, isNumber, isPage, isPop } from '@tmagic/utils';
 
 import { Layout } from '../type';
-
 export const COPY_STORAGE_KEY = '$MagicEditorCopyData';
 
 /**
@@ -237,3 +238,10 @@ export const fixNodePosition = (config: MNode, parent: MContainer, stage: StageC
     left: fixNodeLeft(config, parent, stage?.renderer.contentWindow?.document),
   };
 };
+
+// 序列化配置
+export const serializeConfig = (config: any) =>
+  serialize(config, {
+    space: 2,
+    unsafe: true,
+  }).replace(/"(\w+)":\s/g, '$1: ');

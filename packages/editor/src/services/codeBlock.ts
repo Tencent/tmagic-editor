@@ -23,7 +23,7 @@ import { Id, MNode } from '@tmagic/schema';
 
 import editorService from '../services/editor';
 import type { CodeBlockContent, CodeBlockDSL, CodeState } from '../type';
-import { CodeEditorMode, CodeSelectOp } from '../type';
+import { CODE_DRAFT_STORAGE_KEY, CodeEditorMode, CodeSelectOp } from '../type';
 import { error, info } from '../utils/logger';
 
 import BaseService from './BaseService';
@@ -322,6 +322,27 @@ class CodeBlock extends BaseService {
   }
 
   /**
+   * 设置代码草稿
+   */
+  public setCodeDraft(codeId: string, content: string): void {
+    globalThis.localStorage.setItem(`${CODE_DRAFT_STORAGE_KEY}_${codeId}`, content);
+  }
+
+  /**
+   * 获取代码草稿
+   */
+  public getCodeDraft(codeId: string): string | null {
+    return globalThis.localStorage.getItem(`${CODE_DRAFT_STORAGE_KEY}_${codeId}`);
+  }
+
+  /**
+   * 删除代码草稿
+   */
+  public removeCodeDraft(codeId: string): void {
+    globalThis.localStorage.removeItem(`${CODE_DRAFT_STORAGE_KEY}_${codeId}`);
+  }
+
+  /**
    * 在dsl数据源中删除指定id的代码块
    * @param {string[]} codeIds 需要删除的代码块id数组
    * @returns {CodeBlockDSL} 删除后的code dsl
@@ -345,33 +366,6 @@ class CodeBlock extends BaseService {
     if (!existedIds.includes(newId)) return newId;
     return await this.getUniqueId();
   }
-
-  /**
-   * 一对一解除绑定关系  功能隐藏，暂时注释
-   * @param {string} compId 组件id
-   * @param {string} codeId 代码块id
-   * @param {string[]} codeHooks 代码块挂载hook名称
-   * @returns {boolean} 结果
-   */
-  // public async unbind(compId: Id, codeId: string, codeHooks: string[]): Promise<boolean> {
-  //   const nodeInfo = editorService.getNodeById(compId);
-  //   if (!nodeInfo) return false;
-  //   // 更新node节点信息
-  //   codeHooks.forEach((hook) => {
-  //     if (!isEmpty(nodeInfo[hook])) {
-  //       const newHookInfo = nodeInfo[hook].filter((item: string) => item !== codeId);
-  //       nodeInfo[hook] = newHookInfo;
-  //       editorService.update(nodeInfo);
-  //     }
-  //   });
-  //   // 更新绑定关系
-  //   const oldRelation = await this.getCompRelation();
-  //   const oldCodeIds = oldRelation[compId];
-  //   // 不能直接splice修改原数组,会导致绑定关系更新错乱
-  //   const newCodeIds = oldCodeIds.filter((item) => item !== codeId);
-  //   this.setCompRelation(compId, newCodeIds);
-  //   return true;
-  // }
 
   /**
    * 通过组件id解除绑定关系（删除组件）

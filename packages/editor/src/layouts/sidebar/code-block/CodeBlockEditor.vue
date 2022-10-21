@@ -1,10 +1,10 @@
 <template>
   <TMagicDialog
-    v-model="isShowCodeBlockEditor"
+    :model-value="true"
     class="code-editor-dialog"
     :title="currentTitle"
     :fullscreen="true"
-    :before-close="saveAndClose"
+    :before-close="close"
     :append-to-body="true"
   >
     <Layout v-model:left="left" :min-left="45" class="code-editor-layout">
@@ -58,7 +58,7 @@
                 ref="codeEditor"
                 class="m-editor-container"
                 :init-values="`${codeConfig.content}`"
-                @save="saveCode"
+                @save="saveCodeDraft"
                 :options="{
                   tabSize: 2,
                   fontSize: 16,
@@ -68,10 +68,10 @@
               ></MagicCodeEditor>
               <div class="m-editor-content-bottom" v-if="editable">
                 <TMagicButton type="primary" class="button" @click="saveCode">保存</TMagicButton>
-                <TMagicButton type="primary" class="button" @click="saveAndClose">关闭</TMagicButton>
+                <TMagicButton type="primary" class="button" @click="close">关闭</TMagicButton>
               </div>
               <div class="m-editor-content-bottom" v-else>
-                <TMagicButton type="primary" class="button" @click="saveAndClose">关闭</TMagicButton>
+                <TMagicButton type="primary" class="button" @click="close">关闭</TMagicButton>
               </div>
             </div>
           </TMagicCard>
@@ -83,14 +83,24 @@
 
 <script lang="ts" setup name="MEditorCodeBlockEditor">
 import { computed, inject, reactive, ref, watchEffect } from 'vue';
-import { forIn, isEmpty } from 'lodash-es';
+import { cloneDeep, forIn, isEmpty } from 'lodash-es';
 import type * as monaco from 'monaco-editor';
 
-import { TMagicButton, TMagicCard, TMagicDialog, TMagicInput, tMagicMessage, TMagicTree } from '@tmagic/design';
+import {
+  TMagicButton,
+  TMagicCard,
+  TMagicDialog,
+  TMagicInput,
+  tMagicMessage,
+  tMagicMessageBox,
+  TMagicTree,
+} from '@tmagic/design';
+import { datetimeFormatter } from '@tmagic/utils';
 
 import Layout from '../../../components/Layout.vue';
 import type { CodeBlockContent, CodeDslList, ListState, Services } from '../../../type';
 import { CodeEditorMode } from '../../../type';
+import { serializeConfig } from '../../../utils/editor';
 import MagicCodeEditor from '../../CodeEditor.vue';
 
 const services = inject<Services>('services');
@@ -100,15 +110,13 @@ const left = ref(200);
 const currentTitle = ref('');
 // 编辑器当前需展示的代码块内容
 const codeConfig = ref<CodeBlockContent | null>(null);
+// 原始代码内容
+const originCodeContent = ref<string | null>(null);
 // select选择的内容(ListState)
 const state = reactive<ListState>({
   codeList: [],
 });
 
-// 是否展示代码编辑区
-const isShowCodeBlockEditor = computed(
-  () => (codeConfig.value && services?.codeBlockService.getCodeEditorShowStatus()) || false,
-);
 const mode = computed(() => services?.codeBlockService.getMode());
 const id = computed(() => services?.codeBlockService.getId() || '');
 const editable = computed(() => services?.codeBlockService.getEditStatus());
@@ -116,7 +124,17 @@ const editable = computed(() => services?.codeBlockService.getEditStatus());
 const selectedIds = computed(() => services?.codeBlockService.getCombineIds() || []);
 
 watchEffect(async () => {
-  codeConfig.value = (await services?.codeBlockService.getCodeContentById(id.value)) || null;
+  codeConfig.value = cloneDeep(await services?.codeBlockService.getCodeContentById(id.value)) || null;
+  if (!codeConfig.value) return;
+  if (!originCodeContent.value) {
+    // 暂存原始的代码内容
+    originCodeContent.value = serializeConfig(codeConfig.value.content);
+  }
+  // 有草稿时展示上次保存的草稿内容
+  const codeDraft = services?.codeBlockService.getCodeDraft(id.value);
+  if (codeDraft) {
+    codeConfig.value.content = codeDraft;
+  }
 });
 
 watchEffect(async () => {
@@ -131,6 +149,18 @@ watchEffect(async () => {
   });
   currentTitle.value = state.codeList[0]?.name || '';
 });
+
+// 保存草稿
+const saveCodeDraft = (codeValue: string) => {
+  if (!codeEditor.value) return;
+  if (originCodeContent.value === codeValue) {
+    // 没修改或改回原样 有草稿的话删除草稿
+    services?.codeBlockService.removeCodeDraft(id.value);
+    return;
+  }
+  services?.codeBlockService.setCodeDraft(id.value, codeValue);
+  tMagicMessage.success(`代码草稿保存成功 ${datetimeFormatter(new Date())}`);
+};
 
 // 保存代码
 const saveCode = async (): Promise<boolean> => {
@@ -151,14 +181,33 @@ const saveCode = async (): Promise<boolean> => {
     content: codeConfig.value.content,
   });
   tMagicMessage.success('代码保存成功');
+  // 删除草稿
+  services?.codeBlockService.removeCodeDraft(id.value);
   return true;
 };
 
-// 保存并关闭
-const saveAndClose = async () => {
-  const saveRes = await saveCode();
-  if (saveRes) {
-    await services?.codeBlockService.setCodeEditorShowStatus(false);
+// 关闭弹窗
+const close = async () => {
+  const codeDraft = services?.codeBlockService.getCodeDraft(id.value);
+  let shouldClose = true;
+  if (codeDraft) {
+    await tMagicMessageBox
+      .confirm('您有代码修改未保存，是否保存后再关闭？', '提示', {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        type: 'warning',
+      })
+      .then(async () => {
+        // 保存之后再关闭
+        shouldClose = await saveCode();
+      })
+      .catch(() => {
+        // 删除草稿 直接关闭
+        services?.codeBlockService.removeCodeDraft(id.value);
+      });
+  }
+  if (shouldClose) {
+    services?.codeBlockService.setCodeEditorShowStatus(false);
   }
 };
 

@@ -392,3 +392,6 @@ export enum CodeSelectOp {
   /** 单选修改 */
   CHANGE = 'change',
 }
+
+// 代码块草稿localStorage key
+export const CODE_DRAFT_STORAGE_KEY = 'magicCodeDraft';
