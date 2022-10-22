@@ -75,7 +75,7 @@ export default class StageCore extends EventEmitter {
     this.containerHighlightDuration = config.containerHighlightDuration || 800;
     this.containerHighlightType = config.containerHighlightType;
 
-    this.renderer = new StageRender({ core: this });
+    this.renderer = new StageRender(config.runtimeUrl, this.render);
     this.mask = new StageMask({ core: this });
     this.dr = new StageDragResize({ core: this, container: this.mask.content, mask: this.mask });
     this.multiDr = new StageMultiDragResize({ core: this, container: this.mask.content, mask: this.mask });
@@ -372,6 +372,16 @@ export default class StageCore extends EventEmitter {
     this.removeAllListeners();
 
     this.container = undefined;
+  }
+
+  /**
+   * 传入stageRender供其回调，获取业务方自定义渲染画布页面渲染结果
+   */
+  private async render(): Promise<HTMLElement | null> {
+    if (this.config?.render) {
+      return await this.config.render(this);
+    }
+    return null;
   }
 
   private async getTargetElement(idOrEl: Id | HTMLElement): Promise<HTMLElement> {

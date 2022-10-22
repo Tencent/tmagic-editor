@@ -20,9 +20,8 @@ import { EventEmitter } from 'events';
 
 import { getHost, injectStyle, isSameDomain } from '@tmagic/utils';
 
-import StageCore from './StageCore';
 import style from './style.css?raw';
-import type { Runtime, RuntimeWindow, StageRenderConfig } from './types';
+import type { Runtime, RuntimeWindow } from './types';
 
 export default class StageRender extends EventEmitter {
   /** 组件的js、css执行的环境，直接渲染为当前window，iframe渲染则为iframe.contentWindow */
@@ -34,16 +33,13 @@ export default class StageRender extends EventEmitter {
 
   public runtimeUrl?: string;
 
-  public core: StageCore;
+  private render: () => Promise<HTMLElement | null>;
 
-  private render?: (renderer: StageCore) => Promise<HTMLElement> | HTMLElement;
-
-  constructor({ core }: StageRenderConfig) {
+  constructor(runtimeUrl: string | undefined, render: () => Promise<HTMLElement | null>) {
     super();
 
-    this.core = core;
-    this.runtimeUrl = core.config.runtimeUrl || '';
-    this.render = core.config.render;
+    this.runtimeUrl = runtimeUrl || '';
+    this.render = render;
 
     this.iframe = globalThis.document.createElement('iframe');
     // 同源，直接加载
@@ -119,11 +115,9 @@ export default class StageRender extends EventEmitter {
 
     if (!this.contentWindow) return;
 
-    if (this.render) {
-      const el = await this.render(this.core);
-      if (el) {
-        this.contentWindow.document?.body?.appendChild(el);
-      }
+    const el = await this.render();
+    if (el) {
+      this.contentWindow.document?.body?.appendChild(el);
     }
 
     this.emit('onload');
