@@ -97,6 +97,10 @@ export default class StageRender extends EventEmitter {
     });
   };
 
+  public getDocument(): Document | undefined {
+    return this.contentWindow?.document;
+  }
+
   /**
    * 销毁实例
    */

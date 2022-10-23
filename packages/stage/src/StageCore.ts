@@ -62,6 +62,7 @@ export default class StageCore extends EventEmitter {
   public isContainer: IsContainer;
 
   private canSelect: CanSelect;
+  private pageResizeObserver: ResizeObserver | null = null;
 
   constructor(config: StageCoreConfig) {
     super();
@@ -76,7 +77,7 @@ export default class StageCore extends EventEmitter {
     this.containerHighlightType = config.containerHighlightType;
 
     this.renderer = new StageRender(config.runtimeUrl, this.render);
-    this.mask = new StageMask({ core: this });
+    this.mask = new StageMask(this.renderer.getDocument()?.documentElement);
     this.dr = new StageDragResize({ core: this, container: this.mask.content, mask: this.mask });
     this.multiDr = new StageMultiDragResize({ core: this, container: this.mask.content, mask: this.mask });
     this.highlightLayer = new StageHighlight({ core: this, container: this.mask.wrapper });
@@ -86,6 +87,7 @@ export default class StageCore extends EventEmitter {
     });
     this.renderer.on('page-el-update', (el: HTMLElement) => {
       this.mask?.observe(el);
+      this.observePageResize(el);
     });
 
     this.mask
@@ -163,7 +165,6 @@ export default class StageCore extends EventEmitter {
   public getElementsFromPoint(event: MouseEvent) {
     const { renderer, zoom } = this;
 
-    const doc = renderer.contentWindow?.document;
     let x = event.clientX;
     let y = event.clientY;
 
@@ -175,7 +176,7 @@ export default class StageCore extends EventEmitter {
       }
     }
 
-    return doc?.elementsFromPoint(x / zoom, y / zoom) as HTMLElement[];
+    return renderer.getDocument()?.elementsFromPoint(x / zoom, y / zoom) as HTMLElement[];
   }
 
   public async getElementFromPoint(event: MouseEvent) {
@@ -223,15 +224,16 @@ export default class StageCore extends EventEmitter {
     this.dr.select(el, event);
 
     if (this.config.autoScrollIntoView || el.dataset.autoScrollIntoView) {
-      this.mask.intersectionObserver?.observe(el);
+      this.mask.observerIntersection(el);
     }
 
     this.selectedDom = el;
 
-    if (this.renderer.contentWindow) {
-      removeSelectedClassName(this.renderer.contentWindow.document);
+    const doc = this.renderer.getDocument();
+    if (doc) {
+      removeSelectedClassName(doc);
       if (this.selectedDom) {
-        addSelectedClassName(this.selectedDom, this.renderer.contentWindow.document);
+        addSelectedClassName(this.selectedDom, doc);
       }
     }
   }
@@ -257,7 +259,7 @@ export default class StageCore extends EventEmitter {
       runtime?.update?.(data);
       // 更新配置后，需要等组件渲染更新
       setTimeout(() => {
-        const el = this.renderer.contentWindow?.document.getElementById(`${config.id}`);
+        const el = this.renderer.getDocument()?.getElementById(`${config.id}`);
         // 有可能dom已经重新渲染，不再是原来的dom了，所以这里判断id，而不是判断el === this.selectedDom
         if (el && el.id === this.selectedDom?.id) {
           this.selectedDom = el;
@@ -340,7 +342,7 @@ export default class StageCore extends EventEmitter {
   public async addContainerHighlightClassName(event: MouseEvent, exclude: Element[]) {
     const els = this.getElementsFromPoint(event);
     const { renderer } = this;
-    const doc = renderer.contentWindow?.document;
+    const doc = renderer.getDocument();
 
     if (!doc) return;
 
@@ -362,16 +364,34 @@ export default class StageCore extends EventEmitter {
    * 销毁实例
    */
   public destroy(): void {
-    const { mask, renderer, dr, highlightLayer } = this;
+    const { mask, renderer, dr, highlightLayer, pageResizeObserver } = this;
 
     renderer.destroy();
     mask.destroy();
     dr.destroy();
     highlightLayer.destroy();
+    pageResizeObserver?.disconnect();
 
     this.removeAllListeners();
 
     this.container = undefined;
+  }
+
+  /**
+   * 监听页面大小变化
+   */
+  private observePageResize(page: HTMLElement): void {
+    if (typeof ResizeObserver !== 'undefined') {
+      this.pageResizeObserver = new ResizeObserver((entries) => {
+        this.mask.pageResize(entries);
+
+        if (this.dr.moveable) {
+          this.dr.updateMoveable();
+        }
+      });
+
+      this.pageResizeObserver.observe(page);
+    }
   }
 
   /**
@@ -386,7 +406,7 @@ export default class StageCore extends EventEmitter {
 
   private async getTargetElement(idOrEl: Id | HTMLElement): Promise<HTMLElement> {
     if (typeof idOrEl === 'string' || typeof idOrEl === 'number') {
-      const el = this.renderer.contentWindow?.document.getElementById(`${idOrEl}`);
+      const el = this.renderer.getDocument()?.getElementById(`${idOrEl}`);
       if (!el) throw new Error(`不存在ID为${idOrEl}的元素`);
       return el;
     }

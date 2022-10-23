@@ -23,8 +23,6 @@ import { createDiv, injectStyle } from '@tmagic/utils';
 
 import { Mode, MouseButton, ZIndex } from './const';
 import Rule from './Rule';
-import type StageCore from './StageCore';
-import type { StageMaskConfig } from './types';
 import { getScrollParent, isFixedParent, isMoveableButton } from './util';
 
 const wrapperClassName = 'editor-mask-wrapper';
@@ -71,9 +69,7 @@ const createWrapper = (): HTMLDivElement => {
 export default class StageMask extends Rule {
   public content: HTMLDivElement = createContent();
   public wrapper: HTMLDivElement;
-  public core: StageCore;
   public page: HTMLElement | null = null;
-  public pageScrollParent: HTMLElement | null = null;
   public scrollTop = 0;
   public scrollLeft = 0;
   public width = 0;
@@ -82,12 +78,14 @@ export default class StageMask extends Rule {
   public wrapperWidth = 0;
   public maxScrollTop = 0;
   public maxScrollLeft = 0;
-  public intersectionObserver: IntersectionObserver | null = null;
   public isMultiSelectStatus: Boolean = false;
 
   private mode: Mode = Mode.ABSOLUTE;
-  private pageResizeObserver: ResizeObserver | null = null;
+  private pageScrollParent: HTMLElement | null = null;
+  private intersectionObserver: IntersectionObserver | null = null;
   private wrapperResizeObserver: ResizeObserver | null = null;
+  private renderEl?: HTMLElement;
+
   /**
    * 高亮事件处理函数
    * @param event 事件对象
@@ -96,35 +94,17 @@ export default class StageMask extends Rule {
     this.emit('highlight', event);
   }, throttleTime);
 
-  constructor(config: StageMaskConfig) {
+  constructor(renderEl: HTMLElement | undefined) {
     const wrapper = createWrapper();
     super(wrapper);
 
     this.wrapper = wrapper;
-    this.core = config.core;
+    this.renderEl = renderEl;
 
-    this.content.addEventListener('mousedown', this.mouseDownHandler);
+    this.initContentEventListener();
     this.wrapper.appendChild(this.content);
-    this.content.addEventListener('wheel', this.mouseWheelHandler);
-    this.content.addEventListener('mousemove', this.highlightHandler);
-    this.content.addEventListener('mouseleave', this.mouseLeaveHandler);
 
-    const isMac = /mac os x/.test(navigator.userAgent.toLowerCase());
-
-    const ctrl = isMac ? 'meta' : 'ctrl';
-
-    KeyController.global.keydown(ctrl, (e) => {
-      e.inputEvent.preventDefault();
-      this.isMultiSelectStatus = true;
-    });
-    // ctrl+tab切到其他窗口，需要将多选状态置为false
-    KeyController.global.on('blur', () => {
-      this.isMultiSelectStatus = false;
-    });
-    KeyController.global.keyup(ctrl, (e) => {
-      e.inputEvent.preventDefault();
-      this.isMultiSelectStatus = false;
-    });
+    this.initMultiSelectEvent();
   }
 
   public setMode(mode: Mode) {
@@ -140,63 +120,37 @@ export default class StageMask extends Rule {
   }
 
   /**
-   * 监听页面大小变化
-   * @description 同步页面与mask的大小
+   * 初始化视窗和蒙层监听，监听元素是否在视窗区域、监听mask蒙层所在的wrapper大小变化
+   * @description 初始化视窗和蒙层监听
    * @param page 页面Dom节点
    */
   public observe(page: HTMLElement): void {
     if (!page) return;
 
     this.page = page;
-    this.pageScrollParent = getScrollParent(page) || this.core.renderer.contentWindow?.document.documentElement || null;
-    this.pageResizeObserver?.disconnect();
-    this.wrapperResizeObserver?.disconnect();
-    this.intersectionObserver?.disconnect();
+    this.initObserverIntersection();
+    this.initObserverWrapper();
+  }
 
-    if (typeof IntersectionObserver !== 'undefined') {
-      this.intersectionObserver = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            const { target, intersectionRatio } = entry;
-            if (intersectionRatio <= 0) {
-              this.scrollIntoView(target);
-            }
-            this.intersectionObserver?.unobserve(target);
-          });
-        },
-        {
-          root: this.pageScrollParent,
-          rootMargin: '0px',
-          threshold: 1.0,
-        },
-      );
-    }
+  /**
+   * 处理页面大小变更，同步页面和mask大小
+   * @param entries ResizeObserverEntry，获取页面最新大小
+   */
+  public pageResize(entries: ResizeObserverEntry[]): void {
+    const [entry] = entries;
+    const { clientHeight, clientWidth } = entry.target;
+    this.setHeight(clientHeight);
+    this.setWidth(clientWidth);
 
-    if (typeof ResizeObserver !== 'undefined') {
-      this.pageResizeObserver = new ResizeObserver((entries) => {
-        const [entry] = entries;
-        const { clientHeight, clientWidth } = entry.target;
-        this.setHeight(clientHeight);
-        this.setWidth(clientWidth);
+    this.scroll();
+  }
 
-        this.scroll();
-        if (this.core.dr.moveable) {
-          this.core.dr.updateMoveable();
-        }
-      });
-
-      this.pageResizeObserver.observe(page);
-
-      this.wrapperResizeObserver = new ResizeObserver((entries) => {
-        const [entry] = entries;
-        const { clientHeight, clientWidth } = entry.target;
-        this.wrapperHeight = clientHeight;
-        this.wrapperWidth = clientWidth;
-        this.setMaxScrollLeft();
-        this.setMaxScrollTop();
-      });
-      this.wrapperResizeObserver.observe(this.wrapper);
-    }
+  /**
+   * 监听一个组件是否在画布可视区域内
+   * @param el 被选中的组件，可能是左侧目录树中选中的
+   */
+  public observerIntersection(el: HTMLElement): void {
+    this.intersectionObserver?.observe(el);
   }
 
   /**
@@ -228,11 +182,87 @@ export default class StageMask extends Rule {
     this.content?.remove();
     this.page = null;
     this.pageScrollParent = null;
-    this.pageResizeObserver?.disconnect();
     this.wrapperResizeObserver?.disconnect();
 
     this.content.removeEventListener('mouseleave', this.mouseLeaveHandler);
     super.destroy();
+  }
+
+  /**
+   * 初始化content的事件监听
+   */
+  private initContentEventListener(): void {
+    this.content.addEventListener('mousedown', this.mouseDownHandler);
+    this.content.addEventListener('wheel', this.mouseWheelHandler);
+    this.content.addEventListener('mousemove', this.highlightHandler);
+    this.content.addEventListener('mouseleave', this.mouseLeaveHandler);
+  }
+
+  /**
+   * 初始化多选事件监听
+   */
+  private initMultiSelectEvent(): void {
+    const isMac = /mac os x/.test(navigator.userAgent.toLowerCase());
+
+    const ctrl = isMac ? 'meta' : 'ctrl';
+
+    KeyController.global.keydown(ctrl, (e) => {
+      e.inputEvent.preventDefault();
+      this.isMultiSelectStatus = true;
+    });
+    // ctrl+tab切到其他窗口，需要将多选状态置为false
+    KeyController.global.on('blur', () => {
+      this.isMultiSelectStatus = false;
+    });
+    KeyController.global.keyup(ctrl, (e) => {
+      e.inputEvent.preventDefault();
+      this.isMultiSelectStatus = false;
+    });
+  }
+
+  /**
+   * 监听选中元素是否在画布可视区域内，如果目标元素不在可视区域内，通过滚动使该元素出现在可视区域
+   */
+  private initObserverIntersection(): void {
+    this.pageScrollParent = getScrollParent(this.page as HTMLElement) || this.renderEl || null;
+    this.intersectionObserver?.disconnect();
+
+    if (typeof IntersectionObserver !== 'undefined') {
+      this.intersectionObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            const { target, intersectionRatio } = entry;
+            if (intersectionRatio <= 0) {
+              this.scrollIntoView(target);
+            }
+            this.intersectionObserver?.unobserve(target);
+          });
+        },
+        {
+          root: this.pageScrollParent,
+          rootMargin: '0px',
+          threshold: 1.0,
+        },
+      );
+    }
+  }
+
+  /**
+   * 监听mask的容器大小变化
+   */
+  private initObserverWrapper(): void {
+    this.wrapperResizeObserver?.disconnect();
+    if (typeof ResizeObserver !== 'undefined') {
+      this.wrapperResizeObserver = new ResizeObserver((entries) => {
+        const [entry] = entries;
+        const { clientHeight, clientWidth } = entry.target;
+        this.wrapperHeight = clientHeight;
+        this.wrapperWidth = clientWidth;
+        this.setMaxScrollLeft();
+        this.setMaxScrollTop();
+      });
+      this.wrapperResizeObserver.observe(this.wrapper);
+    }
   }
 
   private scroll() {
@@ -318,8 +348,6 @@ export default class StageMask extends Rule {
     if (!event.target) return;
 
     const targetClassList = (event.target as HTMLDivElement).classList;
-
-    console.log(targetClassList);
 
     // 如果单击多选选中区域，则不需要再触发选中了，而可能是拖动行为
     if (!this.isMultiSelectStatus && targetClassList.contains('moveable-area')) {
