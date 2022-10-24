@@ -4,8 +4,9 @@
     class="code-editor-dialog"
     :title="currentTitle"
     :fullscreen="true"
-    :before-close="close"
+    :close-on-press-escape="false"
     :append-to-body="true"
+    :show-close="false"
   >
     <Layout v-model:left="left" :min-left="45" class="code-editor-layout">
       <!-- 左侧列表 -->
@@ -40,78 +41,38 @@
           ]"
         >
           <slot name="code-block-edit-panel-header" :id="id"></slot>
-          <TMagicCard shadow="never">
-            <template #header>
-              <div class="code-name-wrapper">
-                <div class="code-name-label">代码块名称</div>
-                <TMagicInput
-                  v-if="codeConfig"
-                  class="code-name-input"
-                  v-model="codeConfig.name"
-                  :disabled="!editable"
-                />
-              </div>
-            </template>
-            <div class="m-editor-wrapper">
-              <MagicCodeEditor
-                v-if="codeConfig"
-                ref="codeEditor"
-                class="m-editor-container"
-                :init-values="`${codeConfig.content}`"
-                @save="saveCodeDraft"
-                :options="{
-                  tabSize: 2,
-                  fontSize: 16,
-                  formatOnPaste: true,
-                  readOnly: !editable,
-                }"
-              ></MagicCodeEditor>
-              <div class="m-editor-content-bottom" v-if="editable">
-                <TMagicButton type="primary" class="button" @click="saveCode">保存</TMagicButton>
-                <TMagicButton type="primary" class="button" @click="close">关闭</TMagicButton>
-              </div>
-              <div class="m-editor-content-bottom" v-else>
-                <TMagicButton type="primary" class="button" @click="close">关闭</TMagicButton>
-              </div>
-            </div>
-          </TMagicCard>
+          <FunctionEditor
+            v-if="codeConfig"
+            :id="id"
+            :name="codeConfig.name"
+            :content="codeConfig.content"
+            :editable="!!editable"
+            :autoSaveDraft="mode === CodeEditorMode.EDITOR"
+          ></FunctionEditor>
         </div>
       </template>
-    </Layout>
+    </layout>
   </TMagicDialog>
 </template>
 
 <script lang="ts" setup name="MEditorCodeBlockEditor">
 import { computed, inject, reactive, ref, watchEffect } from 'vue';
 import { cloneDeep, forIn, isEmpty } from 'lodash-es';
-import type * as monaco from 'monaco-editor';
 
-import {
-  TMagicButton,
-  TMagicCard,
-  TMagicDialog,
-  TMagicInput,
-  tMagicMessage,
-  tMagicMessageBox,
-  TMagicTree,
-} from '@tmagic/design';
-import { datetimeFormatter } from '@tmagic/utils';
+import { TMagicDialog, TMagicTree } from '@tmagic/design';
 
+import FunctionEditor from '../../../components/FunctionEditor.vue';
 import Layout from '../../../components/Layout.vue';
 import type { CodeBlockContent, CodeDslList, ListState, Services } from '../../../type';
 import { CodeEditorMode } from '../../../type';
 import { serializeConfig } from '../../../utils/editor';
-import MagicCodeEditor from '../../CodeEditor.vue';
 
 const services = inject<Services>('services');
 
-const codeEditor = ref<InstanceType<typeof MagicCodeEditor>>();
 const left = ref(200);
 const currentTitle = ref('');
 // 编辑器当前需展示的代码块内容
 const codeConfig = ref<CodeBlockContent | null>(null);
-// 原始代码内容
-const originCodeContent = ref<string | null>(null);
 // select选择的内容(ListState)
 const state = reactive<ListState>({
   codeList: [],
@@ -126,15 +87,7 @@ const selectedIds = computed(() => services?.codeBlockService.getCombineIds() ||
 watchEffect(async () => {
   codeConfig.value = cloneDeep(await services?.codeBlockService.getCodeContentById(id.value)) || null;
   if (!codeConfig.value) return;
-  if (!originCodeContent.value) {
-    // 暂存原始的代码内容
-    originCodeContent.value = serializeConfig(codeConfig.value.content);
-  }
-  // 有草稿时展示上次保存的草稿内容
-  const codeDraft = services?.codeBlockService.getCodeDraft(id.value);
-  if (codeDraft) {
-    codeConfig.value.content = codeDraft;
-  }
+  codeConfig.value.content = serializeConfig(codeConfig.value.content);
 });
 
 watchEffect(async () => {
@@ -149,67 +102,6 @@ watchEffect(async () => {
   });
   currentTitle.value = state.codeList[0]?.name || '';
 });
-
-// 保存草稿
-const saveCodeDraft = (codeValue: string) => {
-  if (!codeEditor.value) return;
-  if (originCodeContent.value === codeValue) {
-    // 没修改或改回原样 有草稿的话删除草稿
-    services?.codeBlockService.removeCodeDraft(id.value);
-    return;
-  }
-  services?.codeBlockService.setCodeDraft(id.value, codeValue);
-  tMagicMessage.success(`代码草稿保存成功 ${datetimeFormatter(new Date())}`);
-};
-
-// 保存代码
-const saveCode = async (): Promise<boolean> => {
-  if (!codeEditor.value || !codeConfig.value || !editable.value) return true;
-
-  try {
-    // 代码内容
-    const codeContent = (codeEditor.value.getEditor() as monaco.editor.IStandaloneCodeEditor)?.getValue();
-    /* eslint no-eval: "off" */
-    codeConfig.value.content = eval(codeContent);
-  } catch (e: any) {
-    tMagicMessage.error(e.stack);
-    return false;
-  }
-  // 存入dsl
-  await services?.codeBlockService.setCodeDslById(id.value, {
-    name: codeConfig.value.name,
-    content: codeConfig.value.content,
-  });
-  tMagicMessage.success('代码保存成功');
-  // 删除草稿
-  services?.codeBlockService.removeCodeDraft(id.value);
-  return true;
-};
-
-// 关闭弹窗
-const close = async () => {
-  const codeDraft = services?.codeBlockService.getCodeDraft(id.value);
-  let shouldClose = true;
-  if (codeDraft) {
-    await tMagicMessageBox
-      .confirm('您有代码修改未保存，是否保存后再关闭？', '提示', {
-        confirmButtonText: '确认',
-        cancelButtonText: '取消',
-        type: 'warning',
-      })
-      .then(async () => {
-        // 保存之后再关闭
-        shouldClose = await saveCode();
-      })
-      .catch(() => {
-        // 删除草稿 直接关闭
-        services?.codeBlockService.removeCodeDraft(id.value);
-      });
-  }
-  if (shouldClose) {
-    services?.codeBlockService.setCodeEditorShowStatus(false);
-  }
-};
 
 const selectHandler = (data: CodeDslList) => {
   services?.codeBlockService.setId(data.id);

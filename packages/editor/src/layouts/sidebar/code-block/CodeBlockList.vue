@@ -30,7 +30,7 @@
       <template #default="{ data }">
         <div :id="data.id" class="list-container">
           <div class="list-item">
-            <div class="code-name">{{ data.name }}（{{ data.id }}）</div>
+            <span class="code-name">{{ data.name }}（{{ data.id }}）</span>
             <!-- 右侧工具栏 -->
             <div class="right-tool">
               <TMagicTooltip effect="dark" :content="editable ? '编辑' : '查看'" placement="bottom">

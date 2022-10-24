@@ -3,6 +3,9 @@
   .el-tree-node__content {
     height: auto;
   }
+  .el-tree-node__label {
+    width: 100%;
+  }
   .code-header-wrapper {
     display: flex;
     align-items: center;
@@ -109,6 +112,9 @@
     .side-tree {
       height: 100%;
       overflow: auto;
+      .el-tree-node__label {
+        width: 100%;
+      }
 
       .list-container {
         width: 100%;

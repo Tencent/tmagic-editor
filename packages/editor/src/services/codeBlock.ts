@@ -103,7 +103,11 @@ class CodeBlock extends BaseService {
     if (!codeDsl) {
       // dsl中无代码块字段
       codeDsl = {
-        [id]: codeConfig,
+        [id]: {
+          ...codeConfig,
+          // eslint-disable-next-line no-eval
+          content: eval(codeConfig.content),
+        },
       };
     } else {
       const existContent = codeDsl[id] || {};
@@ -112,6 +116,8 @@ class CodeBlock extends BaseService {
         [id]: {
           ...existContent,
           ...codeConfig,
+          // eslint-disable-next-line no-eval
+          content: eval(codeConfig.content),
         },
       };
     }
