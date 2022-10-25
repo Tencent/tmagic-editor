@@ -33,7 +33,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, defineEmits, defineProps, inject, ref, watchEffect } from 'vue';
+import { computed, defineEmits, defineProps, inject, ref, watch, watchEffect } from 'vue';
 import { cloneDeep, map, xor } from 'lodash-es';
 
 import { TMagicCard, tMagicMessage, TMagicTooltip } from '@tmagic/design';
@@ -77,12 +77,22 @@ const selectConfig = computed(() => {
 });
 const fieldKey = ref('');
 const multiple = ref(true);
-const combineIds = ref<string[]>([]);
 let lastTagSnapshot = cloneDeep(props.model[props.name]) || [];
+let shouldWatch = true;
+
+// 管理端和editor有表现不一致的地方，管理端切换组件表单不会重新渲染，因此增加shouldWatch控制lastTagSnapshot的记录
+watch(
+  () => props.model[props.name],
+  (selectValue) => {
+    if (shouldWatch) {
+      lastTagSnapshot = cloneDeep(selectValue) || [];
+    }
+  },
+);
 
 watchEffect(async () => {
   const combineNames = await Promise.all(
-    combineIds.value.map(async (id) => {
+    props.model[props.name].map(async (id: string) => {
       const { name = '' } = (await services?.codeBlockService.getCodeContentById(id)) || {};
       return name;
     }),
@@ -91,6 +101,7 @@ watchEffect(async () => {
 });
 
 const changeHandler = async (value: any) => {
+  shouldWatch = false;
   let codeIds = value;
   if (typeof value === 'string') {
     multiple.value = false;
@@ -117,13 +128,7 @@ const setCombineRelation = async (codeIds: string[]) => {
   // 记录绑定关系
   await services?.codeBlockService.setCombineRelation(id, diffValues, opFlag, props.prop);
   lastTagSnapshot = codeIds;
-  await setCombineIds(codeIds);
-};
-
-// 记录当前已被绑定的代码块，为查看弹窗的展示内容
-const setCombineIds = async (codeIds: string[]) => {
-  combineIds.value = codeIds;
-  await services?.codeBlockService.setCombineIds(codeIds);
+  shouldWatch = true;
 };
 
 const viewHandler = async () => {
@@ -132,8 +137,8 @@ const viewHandler = async () => {
     return;
   }
   // 记录当前已被绑定的代码块，为查看弹窗的展示内容
-  await setCombineIds(props.model[props.name]);
+  await services?.codeBlockService.setCombineIds(props.model[props.name]);
   await services?.codeBlockService.setMode(CodeEditorMode.LIST);
-  services?.codeBlockService.setCodeEditorContent(true, combineIds.value[0]);
+  services?.codeBlockService.setCodeEditorContent(true, props.model[props.name][0]);
 };
 </script>
