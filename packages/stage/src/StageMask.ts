@@ -84,7 +84,6 @@ export default class StageMask extends Rule {
   private pageScrollParent: HTMLElement | null = null;
   private intersectionObserver: IntersectionObserver | null = null;
   private wrapperResizeObserver: ResizeObserver | null = null;
-  private renderEl?: HTMLElement;
 
   /**
    * 高亮事件处理函数
@@ -94,12 +93,11 @@ export default class StageMask extends Rule {
     this.emit('highlight', event);
   }, throttleTime);
 
-  constructor(renderEl: HTMLElement | undefined) {
+  constructor() {
     const wrapper = createWrapper();
     super(wrapper);
 
     this.wrapper = wrapper;
-    this.renderEl = renderEl;
 
     this.initContentEventListener();
     this.wrapper.appendChild(this.content);
@@ -224,7 +222,7 @@ export default class StageMask extends Rule {
    * 监听选中元素是否在画布可视区域内，如果目标元素不在可视区域内，通过滚动使该元素出现在可视区域
    */
   private initObserverIntersection(): void {
-    this.pageScrollParent = getScrollParent(this.page as HTMLElement) || this.renderEl || null;
+    this.pageScrollParent = getScrollParent(this.page as HTMLElement) || null;
     this.intersectionObserver?.disconnect();
 
     if (typeof IntersectionObserver !== 'undefined') {

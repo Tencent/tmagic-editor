@@ -119,6 +119,9 @@ export const getScrollParent = (element: HTMLElement, includeHidden = false): HT
 
   for (let parent = element; parent.parentElement; ) {
     parent = parent.parentElement;
+
+    if (parent.tagName === 'HTML') return parent;
+
     style = getComputedStyle(parent);
 
     if (isAbsolute(style) && isStatic(style)) continue;

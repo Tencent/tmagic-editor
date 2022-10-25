@@ -77,7 +77,7 @@ export default class StageCore extends EventEmitter {
     this.containerHighlightType = config.containerHighlightType;
 
     this.renderer = new StageRender({ runtimeUrl: config.runtimeUrl, render: this.render.bind(this) });
-    this.mask = new StageMask(this.renderer.getDocument()?.documentElement);
+    this.mask = new StageMask();
     this.dr = new StageDragResize({ core: this, container: this.mask.content, mask: this.mask });
     this.multiDr = new StageMultiDragResize({ core: this, container: this.mask.content, mask: this.mask });
     this.highlightLayer = new StageHighlight({ core: this, container: this.mask.wrapper });
