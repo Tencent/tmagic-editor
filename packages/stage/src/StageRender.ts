@@ -21,7 +21,7 @@ import { EventEmitter } from 'events';
 import { getHost, injectStyle, isSameDomain } from '@tmagic/utils';
 
 import style from './style.css?raw';
-import type { Runtime, RuntimeWindow } from './types';
+import type { Runtime, RuntimeWindow, StageRenderConfig } from './types';
 
 export default class StageRender extends EventEmitter {
   /** 组件的js、css执行的环境，直接渲染为当前window，iframe渲染则为iframe.contentWindow */
@@ -33,9 +33,9 @@ export default class StageRender extends EventEmitter {
 
   public runtimeUrl?: string;
 
-  private render: () => Promise<HTMLElement | null>;
+  private render?: () => Promise<HTMLElement | null>;
 
-  constructor(runtimeUrl: string | undefined, render: () => Promise<HTMLElement | null>) {
+  constructor({ runtimeUrl, render }: StageRenderConfig) {
     super();
 
     this.runtimeUrl = runtimeUrl || '';
@@ -119,9 +119,11 @@ export default class StageRender extends EventEmitter {
 
     if (!this.contentWindow) return;
 
-    const el = await this.render();
-    if (el) {
-      this.contentWindow.document?.body?.appendChild(el);
+    if (this.render) {
+      const el = await this.render();
+      if (el) {
+        this.contentWindow.document?.body?.appendChild(el);
+      }
     }
 
     this.emit('onload');

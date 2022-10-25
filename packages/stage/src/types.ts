@@ -54,7 +54,8 @@ export type StageCoreConfig = {
 };
 
 export interface StageRenderConfig {
-  core: StageCore;
+  runtimeUrl?: string;
+  render?: () => Promise<HTMLElement | null>;
 }
 
 export interface StageMaskConfig {
