@@ -1,3 +1,20 @@
+# [1.2.0-beta.8](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.7...v1.2.0-beta.8) (2022-10-25)
+
+
+### Bug Fixes
+
+* **editor:** 修复管理端和pg表现不一致的问题,删除冗余逻辑 ([bc0f17c](https://github.com/Tencent/tmagic-editor/commit/bc0f17c18fe828faabfd6e4b027f5b75b9f1a034))
+* **stage:** 修复辅助线显隐的bug ([f416530](https://github.com/Tencent/tmagic-editor/commit/f416530d382ee48678d26fdcd58a6ee9426be865)), closes [#444](https://github.com/Tencent/tmagic-editor/issues/444)
+
+
+### Features
+
+* **editor,stage:** 在画布中支持选择父组件 ([11e0e04](https://github.com/Tencent/tmagic-editor/commit/11e0e04cbdf3bcde2ea3fdbe113cba0a91406f53)), closes [#403](https://github.com/Tencent/tmagic-editor/issues/403)
+* **form:** formDialog支持zIndex props ([f6b7e8d](https://github.com/Tencent/tmagic-editor/commit/f6b7e8dad8a012a5446f35fcb5c1e9c744af05b8))
+* **table:** action 支持icon，text支持函数 ([a065552](https://github.com/Tencent/tmagic-editor/commit/a06555268fb26c734aca4343c80deb1617f6bd45))
+
+
+
 # [1.2.0-beta.7](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.6...v1.2.0-beta.7) (2022-10-17)
 
 
