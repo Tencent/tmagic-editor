@@ -32,7 +32,7 @@ $ git clone git@github.com:<yourname>/tmagic-editor.git
 ```bash
 $ git remote add <name> <url>
 # 例如：
-$ git remote add wepy git@github.com:Tencent/tmagic-editor.git
+$ git remote add tmagic git@github.com:Tencent/tmagic-editor.git
 ```
 
 #### 保持与 tmagic-editor 仓库的同步
