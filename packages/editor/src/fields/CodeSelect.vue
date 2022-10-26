@@ -78,19 +78,19 @@ const selectConfig = computed(() => {
 const fieldKey = ref('');
 const multiple = ref(true);
 let lastTagSnapshot = cloneDeep(props.model[props.name]) || [];
-let shouldWatch = true;
 
-// 管理端和editor有表现不一致的地方，管理端切换组件表单不会重新渲染，因此增加shouldWatch控制lastTagSnapshot的记录
+// 管理端和editor有表现不一致的地方，管理端切换组件表单不会重新渲染，通过setTimeout确保lastTagSnapshot的准确性
 watch(
   () => props.model[props.name],
   (selectValue) => {
-    if (shouldWatch) {
+    setTimeout(() => {
       lastTagSnapshot = cloneDeep(selectValue) || [];
-    }
+    });
   },
 );
 
 watchEffect(async () => {
+  if (!props.model[props.name]) return;
   const combineNames = await Promise.all(
     props.model[props.name].map(async (id: string) => {
       const { name = '' } = (await services?.codeBlockService.getCodeContentById(id)) || {};
@@ -101,11 +101,9 @@ watchEffect(async () => {
 });
 
 const changeHandler = async (value: any) => {
-  shouldWatch = false;
   let codeIds = value;
   if (typeof value === 'string') {
     multiple.value = false;
-    lastTagSnapshot = [lastTagSnapshot];
     codeIds = value ? [value] : [];
   }
   await setCombineRelation(codeIds);
@@ -124,11 +122,8 @@ const setCombineRelation = async (codeIds: string[]) => {
     opFlag = codeIds.length < lastTagSnapshot.length ? CodeSelectOp.DELETE : CodeSelectOp.ADD;
     diffValues = xor(codeIds, lastTagSnapshot) as string[];
   }
-
   // 记录绑定关系
   await services?.codeBlockService.setCombineRelation(id, diffValues, opFlag, props.prop);
-  lastTagSnapshot = codeIds;
-  shouldWatch = true;
 };
 
 const viewHandler = async () => {
