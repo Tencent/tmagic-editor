@@ -105,6 +105,7 @@ const saveCode = async (): Promise<boolean> => {
     // 删除草稿
     services?.codeBlockService.removeCodeDraft(props.id);
     emit('save', editorContent);
+    shouldShowDraftTip.value = true;
     return true;
   } catch (e: any) {
     tMagicMessage.error(e.stack);
