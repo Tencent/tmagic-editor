@@ -1,5 +1,5 @@
 <template>
-  <div v-if="menuData.length && visible" class="magic-editor-content-menu" ref="menu" :style="menuStyle">
+  <div v-if="menuData.length" v-show="visible" class="magic-editor-content-menu" ref="menu" :style="menuStyle">
     <div>
       <ToolButton
         v-for="(item, index) in menuData"
