@@ -97,7 +97,9 @@
     </template>
 
     <div style="text-align: center" v-if="config.expand && type !== 'fieldset'">
-      <TMagicButton text @click="expandHandler">{{ expand ? '收起配置' : '展开更多配置' }}</TMagicButton>
+      <TMagicButton type="primary" size="small" text @click="expandHandler">{{
+        expand ? '收起配置' : '展开更多配置'
+      }}</TMagicButton>
     </div>
   </div>
 </template>
@@ -177,11 +179,12 @@ const type = computed((): string => {
 });
 
 const display = computed((): boolean => {
-  if (props.config.display === 'expand') {
+  const value = displayFunction(mForm, props.config.display, props);
+
+  if (value === 'expand') {
     return expand.value;
   }
-
-  return displayFunction(mForm, props.config.display, props);
+  return value;
 });
 
 const itemLabelWidth = computed(() => props.config.labelWidth || props.labelWidth);

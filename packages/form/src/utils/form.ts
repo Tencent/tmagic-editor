@@ -197,6 +197,10 @@ export const filterFunction = (mForm: FormState | undefined, config: any, props:
 };
 
 export const display = function (mForm: FormState | undefined, config: any, props: any) {
+  if (config === 'expand') {
+    return config;
+  }
+
   if (typeof config === 'function') {
     return filterFunction(mForm, config, props);
   }
