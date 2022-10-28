@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { provide, reactive, ref, toRaw, watch } from 'vue';
+import { provide, reactive, ref, toRaw, watch, watchEffect } from 'vue';
 import cloneDeep from 'lodash-es/cloneDeep';
 import isEqual from 'lodash-es/isEqual';
 
@@ -94,6 +94,14 @@ const formState: FormState = reactive<FormState>({
       });
     }
   },
+});
+
+watchEffect(() => {
+  formState.initValues = props.initValues;
+  formState.config = props.config;
+  formState.keyProp = props.keyProp;
+  formState.popperClass = props.popperClass;
+  formState.parentValues = props.parentValues;
 });
 
 provide('mForm', formState);
