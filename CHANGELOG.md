@@ -1,3 +1,20 @@
+# [1.2.0-beta.9](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.8...v1.2.0-beta.9) (2022-10-28)
+
+
+### Bug Fixes
+
+* **editor:** content-menu隐藏时不销毁 ([723da40](https://github.com/Tencent/tmagic-editor/commit/723da40bc7d0830610378efc8b540edaaf7e468d))
+* **editor:** 优化代码逻辑 ([f8d7eae](https://github.com/Tencent/tmagic-editor/commit/f8d7eaea5ed13b2d7a8978c212705bbd130e9d3b))
+* **form:** formState需要同步props更新 ([49c0ec9](https://github.com/Tencent/tmagic-editor/commit/49c0ec9dd9289723f39037e47a58eed598135e2c))
+* 使用form.initValues解决代码块绑定关系更新不及时的问题 ([0ca0abf](https://github.com/Tencent/tmagic-editor/commit/0ca0abf2da4cf835c20c661cd773955350fa830d))
+
+
+### Features
+
+* **form:** 展开更多支持配置函数 ([9fd8385](https://github.com/Tencent/tmagic-editor/commit/9fd8385651c895208a47eb621340a798fe3a4c93))
+
+
+
 # [1.2.0-beta.8](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.7...v1.2.0-beta.8) (2022-10-25)
 
 
