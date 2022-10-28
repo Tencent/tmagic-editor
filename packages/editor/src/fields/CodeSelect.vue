@@ -33,16 +33,16 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, defineEmits, defineProps, inject, ref, watch, watchEffect } from 'vue';
-import { cloneDeep, map, xor } from 'lodash-es';
+import { computed, defineEmits, defineProps, inject, ref, watchEffect } from 'vue';
+import { map, xor } from 'lodash-es';
 
 import { TMagicCard, tMagicMessage, TMagicTooltip } from '@tmagic/design';
-import { SelectConfig } from '@tmagic/form';
+import { FormState, SelectConfig } from '@tmagic/form';
 
 import type { Services } from '../type';
 import { CodeEditorMode, CodeSelectOp } from '../type';
 const services = inject<Services>('services');
-
+const form = inject<FormState>('mForm');
 const emit = defineEmits(['change']);
 
 const props = defineProps<{
@@ -77,17 +77,7 @@ const selectConfig = computed(() => {
 });
 const fieldKey = ref('');
 const multiple = ref(true);
-let lastTagSnapshot = cloneDeep(props.model[props.name]) || [];
-
-// 管理端和editor有表现不一致的地方，管理端切换组件表单不会重新渲染，通过setTimeout确保lastTagSnapshot的准确性
-watch(
-  () => props.model[props.name],
-  (selectValue) => {
-    setTimeout(() => {
-      lastTagSnapshot = cloneDeep(selectValue) || [];
-    });
-  },
-);
+const lastTagSnapshot = ref<string[]>([]);
 
 watchEffect(async () => {
   if (!props.model[props.name]) return;
@@ -119,8 +109,10 @@ const setCombineRelation = async (codeIds: string[]) => {
   let opFlag = CodeSelectOp.CHANGE;
   let diffValues = codeIds;
   if (multiple.value) {
-    opFlag = codeIds.length < lastTagSnapshot.length ? CodeSelectOp.DELETE : CodeSelectOp.ADD;
-    diffValues = xor(codeIds, lastTagSnapshot) as string[];
+    // initValues为表单初始值，当表单内容发生变化时，initValues也会更新，可以理解为上一次表单内容的快照
+    lastTagSnapshot.value = form?.initValues[props.name] || [];
+    opFlag = codeIds.length < lastTagSnapshot.value.length ? CodeSelectOp.DELETE : CodeSelectOp.ADD;
+    diffValues = xor(codeIds, lastTagSnapshot.value) as string[];
   }
   // 记录绑定关系
   await services?.codeBlockService.setCombineRelation(id, diffValues, opFlag, props.prop);
