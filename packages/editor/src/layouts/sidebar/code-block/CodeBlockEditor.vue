@@ -48,6 +48,7 @@
             :content="codeConfig.content"
             :editable="!!editable"
             :autoSaveDraft="mode === CodeEditorMode.EDITOR"
+            :codeOptions="codeOptions"
           ></FunctionEditor>
         </div>
       </template>
@@ -68,6 +69,7 @@ import { CodeEditorMode } from '../../../type';
 import { serializeConfig } from '../../../utils/editor';
 
 const services = inject<Services>('services');
+const codeOptions = inject('codeOptions', {});
 
 const left = ref(200);
 const currentTitle = ref('');

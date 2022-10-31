@@ -5,12 +5,8 @@
       class="m-editor-container"
       :init-values="`${codeContent}`"
       @save="saveCodeDraft"
-      :options="{
-        tabSize: 2,
-        fontSize: 16,
-        formatOnPaste: true,
-        readOnly: !editable,
-      }"
+      :language="language"
+      :options="codeOptions"
     ></magic-code-editor>
     <div class="m-editor-content-bottom" v-if="editable">
       <TMagicButton type="primary" class="button" @click="saveCode">保存</TMagicButton>
@@ -22,7 +18,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { inject, ref, watchEffect } from 'vue';
+import { computed, inject, ref, watchEffect } from 'vue';
 import type * as monaco from 'monaco-editor';
 
 import { TMagicButton, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
@@ -30,9 +26,6 @@ import { datetimeFormatter } from '@tmagic/utils';
 
 import MagicCodeEditor from '../layouts/CodeEditor.vue';
 import type { Services } from '../type';
-
-// 草稿提示延时，避免点击保存时出现两次提醒
-const draftTipTimeOut = 100;
 
 const props = withDefaults(
   defineProps<{
@@ -44,22 +37,30 @@ const props = withDefaults(
     editable?: boolean;
     /** 是否自动保存草稿 */
     autoSaveDraft?: boolean;
+    /** 编辑器参数 */
+    codeOptions?: Object;
+    /** 编辑器语言 */
+    language?: string;
   }>(),
   {
     editable: true,
     autoSaveDraft: true,
   },
 );
-const emit = defineEmits(['save', 'close']);
+const emit = defineEmits(['save', 'close', 'saveAndClose']);
 
 const services = inject<Services>('services');
 
 const codeContent = ref<string>('');
+const editorContent = ref<string>('');
 const codeEditor = ref<InstanceType<typeof MagicCodeEditor>>();
 // 原始代码内容
 const originCodeContent = ref<string | null>(null);
-// 是否展示草稿保存提示语
-const shouldShowDraftTip = ref(true);
+
+const codeOptions = computed(() => ({
+  ...props.codeOptions,
+  readOnly: !props.editable,
+}));
 
 watchEffect(() => {
   codeContent.value = props.content;
@@ -83,63 +84,45 @@ const saveCodeDraft = async (codeValue: string) => {
     return;
   }
   services?.codeBlockService.setCodeDraft(props.id, codeValue);
-
-  setTimeout(() => {
-    if (shouldShowDraftTip.value) {
-      tMagicMessage.success(`代码草稿保存成功 ${datetimeFormatter(new Date())}`);
-    }
-  }, draftTipTimeOut);
+  tMagicMessage.success(`代码草稿保存成功 ${datetimeFormatter(new Date())}`);
 };
 
 // 保存代码
-const saveCode = async (): Promise<boolean> => {
-  if (!codeEditor.value || !props.editable) return true;
-
-  try {
-    // 代码内容
-    const editorContent = (codeEditor.value.getEditor() as monaco.editor.IStandaloneCodeEditor)?.getValue();
-    /* eslint no-eval: "off" */
-    eval(editorContent);
-    // 不重复提示
-    shouldShowDraftTip.value = false;
-    // 删除草稿
-    services?.codeBlockService.removeCodeDraft(props.id);
-    emit('save', editorContent);
-    shouldShowDraftTip.value = true;
-    return true;
-  } catch (e: any) {
-    tMagicMessage.error(e.stack);
-    return false;
-  }
+const saveCode = (): void => {
+  if (!codeEditor.value || !props.editable) return;
+  // 代码内容
+  editorContent.value = (codeEditor.value.getEditor() as monaco.editor.IStandaloneCodeEditor)?.getValue();
+  emit('save', editorContent.value);
 };
 
-const beforeClose = async () => {
-  const codeDraft = services?.codeBlockService.getCodeDraft(props.id);
-  if (!codeDraft || !props.autoSaveDraft) {
-    return await saveCode();
-  }
-  let saveRes = true;
-  await tMagicMessageBox
-    .confirm('您有代码修改未保存，是否保存后再关闭？', '提示', {
-      confirmButtonText: '确认',
-      cancelButtonText: '取消',
-      type: 'warning',
-    })
-    .then(async () => {
-      // 保存之后再关闭
-      saveRes = await saveCode();
-    })
-    .catch(() => {
-      // 删除草稿 直接关闭
-      services?.codeBlockService.removeCodeDraft(props.id);
-    });
-  return saveRes;
+// 保存并关闭
+const saveAndClose = (): void => {
+  if (!codeEditor.value || !props.editable) return;
+  // 代码内容
+  editorContent.value = (codeEditor.value.getEditor() as monaco.editor.IStandaloneCodeEditor)?.getValue();
+  emit('saveAndClose', editorContent.value);
 };
 
 // 关闭弹窗
 const close = async () => {
-  const shouldClose = await beforeClose();
-  if (shouldClose) {
+  const codeDraft = services?.codeBlockService.getCodeDraft(props.id);
+  if (codeDraft) {
+    tMagicMessageBox
+      .confirm('您有代码修改未保存，是否保存后再关闭？', '提示', {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        type: 'warning',
+      })
+      .then(async () => {
+        // 保存之后再关闭
+        saveAndClose();
+      })
+      .catch(() => {
+        // 删除草稿 直接关闭
+        services?.codeBlockService.removeCodeDraft(props.id);
+        emit('close');
+      });
+  } else {
     emit('close');
   }
 };

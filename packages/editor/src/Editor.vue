@@ -319,6 +319,7 @@ export default defineComponent({
 
     provide('services', services);
 
+    provide('codeOptions', props.codeOptions);
     provide(
       'stageOptions',
       reactive({
