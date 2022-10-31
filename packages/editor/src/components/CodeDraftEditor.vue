@@ -55,7 +55,7 @@ const codeContent = ref<string>('');
 const editorContent = ref<string>('');
 const codeEditor = ref<InstanceType<typeof MagicCodeEditor>>();
 // 原始代码内容
-const originCodeContent = ref<string | null>(null);
+const originCodeContent = ref<string>('');
 
 const codeOptions = computed(() => ({
   ...props.codeOptions,
