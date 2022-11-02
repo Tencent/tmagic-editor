@@ -10,8 +10,9 @@
     @tab-remove="onTabRemove"
   >
     <template v-for="(tab, tabIndex) in tabs">
-      <TMagicTabPane
+      <component
         v-if="display(tab.display) && tabItems(tab).length"
+        :is="uiComponent.component"
         :key="tab[mForm?.keyProp || '__key'] ?? tabIndex"
         :name="filter(tab.status) || tabIndex.toString()"
         :label="filter(tab.title)"
@@ -36,7 +37,7 @@
           :expand-more="expandMore"
           @change="changeHandler"
         ></Container>
-      </TMagicTabPane>
+      </component>
     </template>
   </TMagicTabs>
 </template>
@@ -45,12 +46,14 @@
 import { computed, inject, ref, watchEffect } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
-import { TMagicTabPane, TMagicTabs } from '@tmagic/design';
+import { getConfig, TMagicTabs } from '@tmagic/design';
 
 import { FormState, TabConfig, TabPaneConfig } from '../schema';
 import { display as displayFunc, filterFunction } from '../utils/form';
 
 import Container from './Container.vue';
+
+const uiComponent = getConfig('components').tabPane;
 
 const getActive = (mForm: FormState | undefined, props: any, activeTabName: string) => {
   const { config, model, prop } = props;

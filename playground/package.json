@@ -19,7 +19,7 @@
     "@tmagic/schema": "1.2.0-beta.9",
     "@tmagic/stage": "1.2.0-beta.9",
     "@tmagic/utils": "1.2.0-beta.9",
-    "element-plus": "^2.2.17",
+    "element-plus": "^2.2.19",
     "monaco-editor": "^0.34.0",
     "serialize-javascript": "^6.0.0",
     "terser": "^5.14.2",

@@ -200,6 +200,7 @@ export interface MenuComponent {
   /** 是否显示，默认为true */
   className?: string;
   display?: boolean | ((data?: Services) => Promise<boolean> | boolean);
+  [key: string]: any;
 }
 
 /**

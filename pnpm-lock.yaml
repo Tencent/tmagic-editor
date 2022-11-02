@@ -87,7 +87,7 @@ importers:
       '@vuepress/client': ^2.0.0-beta.51
       '@vuepress/plugin-search': ^2.0.0-beta.51
       '@vuepress/theme-default': ^2.0.0-beta.51
-      element-plus: ^2.2.17
+      element-plus: ^2.2.19
       highlight.js: ^11.2.0
       lodash: ^4.17.21
       lodash-es: ^4.17.21
@@ -102,7 +102,7 @@ importers:
       '@tmagic/form': link:../packages/form
       '@tmagic/schema': link:../packages/schema
       '@tmagic/utils': link:../packages/utils
-      element-plus: 2.2.17_vue@3.2.37
+      element-plus: 2.2.19_vue@3.2.37
       highlight.js: 11.5.1
       lodash: 4.17.21
       lodash-es: 4.17.21
@@ -250,13 +250,13 @@ importers:
   packages/element-plus-adapter:
     specifiers:
       '@types/node': ^15.12.4
-      element-plus: ^2.2.17
+      element-plus: ^2.2.19
       rimraf: ^3.0.2
       typescript: ^4.7.4
       vite: ^3.1.3
       vue: ^3.2.37
     dependencies:
-      element-plus: 2.2.17_vue@3.2.37
+      element-plus: 2.2.19_vue@3.2.37
       vue: 3.2.37
     devDependencies:
       '@types/node': 15.14.9
@@ -491,7 +491,7 @@ importers:
       '@vitejs/plugin-vue': ^3.1.0
       '@vitejs/plugin-vue-jsx': ^1.3.10
       '@vue/compiler-sfc': ^3.2.37
-      element-plus: ^2.2.17
+      element-plus: ^2.2.19
       monaco-editor: ^0.34.0
       sass: ^1.35.1
       serialize-javascript: ^6.0.0
@@ -510,7 +510,7 @@ importers:
       '@tmagic/schema': link:../packages/schema
       '@tmagic/stage': link:../packages/stage
       '@tmagic/utils': link:../packages/utils
-      element-plus: 2.2.17_vue@3.2.37
+      element-plus: 2.2.19_vue@3.2.37
       monaco-editor: 0.34.0
       serialize-javascript: 6.0.0
       terser: 5.14.2
@@ -3528,8 +3528,8 @@ packages:
     resolution: {integrity: sha512-H+mFNKow6gi2P5Gi2d1Fvd3TUEJlB9CF7zYaIV9T83BE3wP1xZ0mRPbNTm0KUjyd1QiVy7iKXuIcjlDtBQMiAQ==}
     dev: true
 
-  /element-plus/2.2.17_vue@3.2.37:
-    resolution: {integrity: sha512-MGwMIE/q+FFD3kgS23x8HIe5043tmD1cTRwjhIX9o6fim1avFnUkrsfYRvybbz4CkyqSb185EheZS5AUPpXh2g==}
+  /element-plus/2.2.19_vue@3.2.37:
+    resolution: {integrity: sha512-uN0gt9lUus/IHzu5J6vkbYoYJgUtU05osdtFv9RO27bHKOG5GN7dH6uA3OKfkQQ6R2sV8ZxY1rc9PH1X8Dgrow==}
     peerDependencies:
       vue: ^3.2.0
     dependencies:
