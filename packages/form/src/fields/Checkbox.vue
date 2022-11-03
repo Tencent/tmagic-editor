@@ -10,7 +10,7 @@
   >
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="MFormCheckbox">
 import { computed } from 'vue';
 
 import { TMagicCheckbox } from '@tmagic/design';

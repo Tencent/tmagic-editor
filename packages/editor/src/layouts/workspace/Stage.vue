@@ -22,7 +22,7 @@
   </scroll-viewer>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MEditorStage">
 import { computed, inject, markRaw, onMounted, onUnmounted, ref, toRaw, watch, watchEffect } from 'vue';
 import { cloneDeep } from 'lodash-es';
 

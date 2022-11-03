@@ -24,7 +24,7 @@
   </TMagicForm>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="MForm">
 import { provide, reactive, ref, toRaw, watch, watchEffect } from 'vue';
 import cloneDeep from 'lodash-es/cloneDeep';
 import isEqual from 'lodash-es/isEqual';

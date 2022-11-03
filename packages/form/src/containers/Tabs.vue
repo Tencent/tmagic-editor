@@ -42,7 +42,7 @@
   </TMagicTabs>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="MFormTabs">
 import { computed, inject, ref, watchEffect } from 'vue';
 import { cloneDeep } from 'lodash-es';
 

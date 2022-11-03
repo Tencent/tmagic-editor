@@ -2,7 +2,7 @@
   <content-menu :menu-data="menuData" ref="menu"></content-menu>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MEditorViewerMenu">
 import { computed, inject, markRaw, reactive, ref, watch } from 'vue';
 import { Bottom, Delete, DocumentCopy, Top } from '@element-plus/icons-vue';
 

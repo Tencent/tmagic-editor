@@ -15,7 +15,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MEditorWorkspace">
 import { computed, inject, onMounted, onUnmounted, ref } from 'vue';
 import KeyController from 'keycon';
 

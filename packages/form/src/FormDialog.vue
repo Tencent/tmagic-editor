@@ -55,7 +55,7 @@
   </TMagicDialog>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="MFormDialog">
 import { computed, ref } from 'vue';
 
 import { TMagicButton, TMagicCol, TMagicDialog, TMagicRow } from '@tmagic/design';

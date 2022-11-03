@@ -11,7 +11,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MEditorAddPageBox">
 import { inject, toRaw } from 'vue';
 import { Plus } from '@element-plus/icons-vue';
 

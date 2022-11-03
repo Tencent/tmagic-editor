@@ -4,7 +4,7 @@
   </component>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="TMForm">
 import { computed, ref } from 'vue';
 
 import { getConfig } from './config';

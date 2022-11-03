@@ -38,7 +38,7 @@
   </TMagicScrollbar>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MEditorComponentListPanel">
 import { computed, inject, ref } from 'vue';
 import { Grid, Search } from '@element-plus/icons-vue';
 import serialize from 'serialize-javascript';

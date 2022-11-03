@@ -78,7 +78,7 @@
   </TMagicTabs>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MEditorSidebar">
 import { computed, ref, watch } from 'vue';
 import { Coin, EditPen, Files } from '@element-plus/icons-vue';
 

@@ -18,7 +18,7 @@
   </component>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="TMTree">
 import { computed, ref } from 'vue';
 
 import { getConfig } from './config';

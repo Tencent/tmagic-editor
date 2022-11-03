@@ -49,7 +49,7 @@
   </TMagicCard>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="MFormPanel">
 import { computed, inject, ref } from 'vue';
 import { CaretBottom, CaretRight } from '@element-plus/icons-vue';
 

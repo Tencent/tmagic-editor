@@ -46,7 +46,7 @@
   </PageBarScrollContainer>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MEditorPageBar">
 import { computed, inject } from 'vue';
 import { CaretBottom, Delete, DocumentCopy } from '@element-plus/icons-vue';
 

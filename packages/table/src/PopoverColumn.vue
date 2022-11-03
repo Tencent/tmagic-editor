@@ -21,7 +21,7 @@
   </TMagicTableColumn>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MTablePopoverColumn">
 import { TMagicButton, TMagicPopover, TMagicTableColumn } from '@tmagic/design';
 
 import { ColumnConfig } from './schema';

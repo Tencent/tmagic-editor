@@ -23,7 +23,7 @@
   </TMagicInput>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MFormText">
 import { inject } from 'vue';
 
 import { TMagicInput } from '@tmagic/design';

@@ -6,7 +6,7 @@
   </TMagicCheckboxGroup>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MFormCheckGroup">
 import { computed, inject } from 'vue';
 
 import { TMagicCheckbox, TMagicCheckboxGroup } from '@tmagic/design';

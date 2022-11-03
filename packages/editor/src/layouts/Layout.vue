@@ -20,7 +20,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MEditorLayout">
 import { onMounted, onUnmounted, ref } from 'vue';
 
 import Resizer from './Resizer.vue';

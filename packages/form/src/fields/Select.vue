@@ -25,7 +25,7 @@
   </TMagicSelect>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MFormSelect">
 import { inject, nextTick, onBeforeMount, onMounted, Ref, ref, watchEffect } from 'vue';
 
 import { TMagicSelect } from '@tmagic/design';

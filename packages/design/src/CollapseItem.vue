@@ -7,7 +7,7 @@
   </component>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="TMCollapseItem">
 import { computed } from 'vue';
 
 import { getConfig } from './config';

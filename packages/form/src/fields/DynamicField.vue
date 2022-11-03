@@ -12,7 +12,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MFormDynamicField">
 /**
  * 动态表单，目前只支持input类型字段
  * inputType: 'dynamic-field',

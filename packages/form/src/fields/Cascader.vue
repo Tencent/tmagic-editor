@@ -14,7 +14,7 @@
   ></TMagicCascader>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="MFormCascader">
 import { inject, ref, watchEffect } from 'vue';
 
 import { TMagicCascader } from '@tmagic/design';

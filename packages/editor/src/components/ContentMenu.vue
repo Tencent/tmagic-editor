@@ -22,7 +22,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MEditorContentMenu">
 import { nextTick, onMounted, onUnmounted, ref } from 'vue';
 
 import { MenuButton, MenuComponent } from '../type';

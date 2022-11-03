@@ -93,7 +93,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MEditorCodeBlockList">
 import { computed, inject, reactive, ref, watch } from 'vue';
 import { Close, Edit, Link, View } from '@element-plus/icons-vue';
 import { forIn, isEmpty } from 'lodash-es';

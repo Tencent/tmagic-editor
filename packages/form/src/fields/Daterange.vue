@@ -13,7 +13,7 @@
   ></TMagicDatePicker>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MFormDateRange">
 import { ref, watch } from 'vue';
 
 import { TMagicDatePicker } from '@tmagic/design';

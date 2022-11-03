@@ -4,7 +4,7 @@
   </component>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="TMRow">
 import { getConfig } from './config';
 
 const uiComponent = getConfig('components').row;

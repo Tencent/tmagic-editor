@@ -12,7 +12,7 @@
   </component>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="TMTabs">
 import { computed } from 'vue';
 
 import { getConfig } from './config';

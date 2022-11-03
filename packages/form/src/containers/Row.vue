@@ -15,7 +15,7 @@
   </TMagicRow>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="MFormRow">
 import { inject } from 'vue';
 
 import { TMagicRow } from '@tmagic/design';

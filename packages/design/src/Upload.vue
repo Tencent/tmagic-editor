@@ -2,7 +2,7 @@
   <component ref="upload" :is="uiComponent.component" v-bind="uiProps" @change="changeHandler"></component>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="TMUpload">
 import { computed, ref } from 'vue';
 
 import { getConfig } from './config';

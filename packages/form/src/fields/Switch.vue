@@ -9,7 +9,7 @@
   ></TMagicSwitch>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MFormSwitch">
 import { computed } from 'vue';
 
 import { TMagicSwitch } from '@tmagic/design';

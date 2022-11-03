@@ -39,7 +39,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="MFormGroupListItem">
 import { computed, inject, ref, watchEffect } from 'vue';
 import { CaretBottom, CaretRight, CaretTop, Delete } from '@element-plus/icons-vue';
 

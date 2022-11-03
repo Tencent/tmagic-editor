@@ -2,7 +2,7 @@
   <span v-if="model">{{ model[name] }}</span>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="MFormDisplay">
 import { DisplayConfig } from '../schema';
 import { useAddField } from '../utils/useAddField';
 

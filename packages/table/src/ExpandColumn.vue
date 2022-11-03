@@ -16,7 +16,7 @@
   </TMagicTableColumn>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MTableExpandColumn">
 import { TMagicTableColumn } from '@tmagic/design';
 import { MForm } from '@tmagic/form';
 

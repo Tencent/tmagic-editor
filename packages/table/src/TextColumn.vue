@@ -57,7 +57,7 @@
   </TMagicTableColumn>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MTableColumn">
 import { TMagicButton, TMagicForm, TMagicTableColumn, TMagicTag } from '@tmagic/design';
 
 import { ColumnConfig } from './schema';

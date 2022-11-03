@@ -7,7 +7,7 @@
   <TMagicIcon v-else class="magic-editor-icon"><component :is="toRaw(icon)"></component></TMagicIcon>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MEditorIcon">
 import { toRaw } from 'vue';
 import { Edit } from '@element-plus/icons-vue';
 

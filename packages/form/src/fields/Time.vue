@@ -8,7 +8,7 @@
   ></TMagicTimePicker>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MFormTime">
 import { TMagicTimePicker } from '@tmagic/design';
 
 import { TimeConfig } from '../schema';

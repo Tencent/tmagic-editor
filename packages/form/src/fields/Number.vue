@@ -15,7 +15,7 @@
   ></TMagicInputNumber>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MFormNumber">
 import { inject } from 'vue';
 
 import { TMagicInputNumber } from '@tmagic/design';

@@ -4,7 +4,7 @@
   </span>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MEditorResizer">
 import { onMounted, onUnmounted, ref } from 'vue';
 import Gesto from 'gesto';
 

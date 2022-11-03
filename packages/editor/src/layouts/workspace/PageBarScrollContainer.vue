@@ -26,7 +26,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="MEditorPageBarScrollContainer">
 import { computed, inject, nextTick, onMounted, onUnmounted, ref, toRaw, watch } from 'vue';
 import { ArrowLeftBold, ArrowRightBold, Plus } from '@element-plus/icons-vue';
 

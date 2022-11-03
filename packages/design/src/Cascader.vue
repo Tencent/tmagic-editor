@@ -8,7 +8,7 @@
   ></component>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="TMCascader">
 import { computed, ref } from 'vue';
 
 import { getConfig } from './config';

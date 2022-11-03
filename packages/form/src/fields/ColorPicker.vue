@@ -8,7 +8,7 @@
   ></TMagicColorPicker>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MFormColorPicker">
 import { TMagicColorPicker } from '@tmagic/design';
 
 import { ColorPickConfig } from '../schema';

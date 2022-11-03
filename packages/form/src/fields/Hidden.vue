@@ -2,7 +2,7 @@
   <input v-if="model" v-model="model[name]" type="hidden" />
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="MFormHidden">
 import { HiddenConfig } from '../schema';
 import { useAddField } from '../utils/useAddField';
 

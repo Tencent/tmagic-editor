@@ -55,7 +55,7 @@
   </TMagicTable>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MTable">
 import { computed, ref } from 'vue';
 import { cloneDeep } from 'lodash-es';
 

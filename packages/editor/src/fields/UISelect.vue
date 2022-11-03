@@ -12,7 +12,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MEditorUISelect">
 import { computed, inject, ref } from 'vue';
 import { Close, Delete } from '@element-plus/icons-vue';
 

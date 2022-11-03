@@ -10,7 +10,7 @@
   </component>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="TMTable">
 import { computed, ref } from 'vue';
 
 import { getConfig } from './config';

@@ -6,7 +6,7 @@
   </TMagicRadioGroup>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MFormRadioGroup">
 import { TMagicRadio, TMagicRadioGroup } from '@tmagic/design';
 
 import { RadioGroupConfig } from '../schema';

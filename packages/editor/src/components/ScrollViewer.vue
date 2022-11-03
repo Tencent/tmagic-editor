@@ -22,7 +22,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MEditorScrollViewer">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 
 import { ScrollViewerEvent } from '../type';

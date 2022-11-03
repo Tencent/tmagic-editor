@@ -12,7 +12,7 @@
   </TMagicInput>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MFormTextarea">
 import { inject } from 'vue';
 
 import { TMagicInput } from '@tmagic/design';

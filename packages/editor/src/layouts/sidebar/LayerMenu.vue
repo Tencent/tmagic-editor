@@ -2,7 +2,7 @@
   <content-menu :menu-data="menuData" ref="menu" style="overflow: initial"></content-menu>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MEditorLayerMenu">
 import { computed, inject, markRaw, ref } from 'vue';
 import { Delete, DocumentCopy, Files, Plus } from '@element-plus/icons-vue';
 

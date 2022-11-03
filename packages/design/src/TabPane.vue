@@ -10,7 +10,7 @@
   </component>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="TMTabPane">
 import { computed } from 'vue';
 
 import { getConfig } from './config';

@@ -104,7 +104,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="MFormContainer">
 import { computed, inject, ref, resolveComponent, watchEffect } from 'vue';
 import { WarningFilled } from '@element-plus/icons-vue';
 

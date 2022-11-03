@@ -7,7 +7,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="MEditorBreadcrumb">
 import { computed, inject } from 'vue';
 
 import { TMagicButton } from '@tmagic/design';

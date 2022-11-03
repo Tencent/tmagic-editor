@@ -65,7 +65,7 @@
   </TMagicScrollbar>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MEditorLayerPanel">
 import { computed, inject, nextTick, ref, watch } from 'vue';
 import { Search } from '@element-plus/icons-vue';
 import KeyController from 'keycon';

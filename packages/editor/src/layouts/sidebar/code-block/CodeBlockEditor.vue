@@ -81,7 +81,7 @@
   </TMagicDialog>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MEditorCodeBlockEditor">
 import { computed, inject, reactive, ref, watchEffect } from 'vue';
 import { forIn, isEmpty } from 'lodash-es';
 import type * as monaco from 'monaco-editor';

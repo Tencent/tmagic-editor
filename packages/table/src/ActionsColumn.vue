@@ -35,7 +35,7 @@
   </TMagicTableColumn>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MTableActionsColumn">
 import { TMagicButton, tMagicMessage, TMagicTableColumn } from '@tmagic/design';
 
 import { ColumnActionConfig, ColumnConfig } from './schema';

@@ -52,7 +52,7 @@
   </fieldset>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MFormFieldset">
 import { computed, inject, watch } from 'vue';
 
 import { TMagicCheckbox } from '@tmagic/design';

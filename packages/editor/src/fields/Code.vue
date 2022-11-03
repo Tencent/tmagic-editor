@@ -8,7 +8,7 @@
   ></magic-code-editor>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MEditorCode">
 import { computed } from 'vue';
 
 const emit = defineEmits(['change']);

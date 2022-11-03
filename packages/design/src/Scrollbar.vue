@@ -4,7 +4,7 @@
   </component>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="TMScrollbar">
 import { computed } from 'vue';
 
 import { getConfig } from './config';

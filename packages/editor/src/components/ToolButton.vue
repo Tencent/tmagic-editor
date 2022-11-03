@@ -43,7 +43,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MEditorToolButton">
 import { computed, inject } from 'vue';
 import { ArrowDown } from '@element-plus/icons-vue';
 

@@ -4,7 +4,7 @@
   </component>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="TMDropdownMenu">
 import { computed } from 'vue';
 
 import { getConfig } from './config';

@@ -16,7 +16,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MFormLink">
 import { computed, inject, ref } from 'vue';
 
 import { TMagicButton } from '@tmagic/design';

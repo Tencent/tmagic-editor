@@ -13,7 +13,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MEditorPropsPanel">
 import { computed, getCurrentInstance, inject, onMounted, ref, watchEffect } from 'vue';
 
 import { tMagicMessage } from '@tmagic/design';

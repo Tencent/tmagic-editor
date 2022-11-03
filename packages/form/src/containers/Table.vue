@@ -159,7 +159,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="MFormTable">
 import { computed, inject, onMounted, ref, toRefs } from 'vue';
 import { ArrowDown, ArrowUp, Delete, FullScreen, Grid } from '@element-plus/icons-vue';
 import { cloneDeep } from 'lodash-es';

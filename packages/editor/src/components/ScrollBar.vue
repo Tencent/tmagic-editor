@@ -4,7 +4,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MEditorScrollBar">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import Gesto from 'gesto';
 

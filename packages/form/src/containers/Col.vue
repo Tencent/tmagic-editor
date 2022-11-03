@@ -12,7 +12,7 @@
   </TMagicCol>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="MFormCol">
 import { computed, inject } from 'vue';
 
 import { TMagicCol } from '@tmagic/design';

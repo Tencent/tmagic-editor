@@ -11,7 +11,7 @@
   ></TMagicDatePicker>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MFormDate">
 import { TMagicDatePicker } from '@tmagic/design';
 import { datetimeFormatter } from '@tmagic/utils';
 

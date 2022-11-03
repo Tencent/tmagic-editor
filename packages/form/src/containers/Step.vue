@@ -28,7 +28,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="MFormStep">
 import { inject, ref, watchEffect } from 'vue';
 
 import { TMagicStep, TMagicSteps } from '@tmagic/design';

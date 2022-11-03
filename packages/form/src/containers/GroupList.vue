@@ -27,7 +27,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="MFormGroupList">
 import { computed, inject } from 'vue';
 import { Grid } from '@element-plus/icons-vue';
 

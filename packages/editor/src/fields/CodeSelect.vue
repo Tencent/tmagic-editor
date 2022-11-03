@@ -32,7 +32,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MEditorCodeSelect">
 import { computed, defineEmits, defineProps, inject, ref, watchEffect } from 'vue';
 import { map, xor } from 'lodash-es';
 

@@ -42,7 +42,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="MEditorFramework">
 import { computed, inject, ref, watch } from 'vue';
 
 import { TMagicScrollbar } from '@tmagic/design';

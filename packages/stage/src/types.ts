@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { MoveableOptions } from 'moveable';
+import type { MoveableOptions } from 'moveable';
 
 import Core from '@tmagic/core';
 import type { Id, MApp, MContainer, MNode } from '@tmagic/schema';
