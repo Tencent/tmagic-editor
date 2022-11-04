@@ -37,6 +37,10 @@ const props = withDefaults(
     wrapWidth?: number;
     wrapHeight?: number;
     zoom?: number;
+    correctionScrollSize?: {
+      width: number;
+      height: number;
+    };
   }>(),
   {
     width: 0,
@@ -44,6 +48,10 @@ const props = withDefaults(
     wrapWidth: 0,
     wrapHeight: 0,
     zoom: 1,
+    correctionScrollSize: () => ({
+      width: 0,
+      height: 0,
+    }),
   },
 );
 
@@ -69,6 +77,7 @@ onMounted(() => {
     container: container.value,
     target: el.value,
     zoom: props.zoom,
+    correctionScrollSize: props.correctionScrollSize,
   });
 
   scrollViewer.on('scroll', (data: ScrollViewerEvent) => {

@@ -4,6 +4,10 @@ interface ScrollViewerOptions {
   container: HTMLDivElement;
   target: HTMLDivElement;
   zoom: number;
+  correctionScrollSize?: {
+    width: number;
+    height: number;
+  };
 }
 
 export class ScrollViewer extends EventEmitter {
@@ -23,6 +27,11 @@ export class ScrollViewer extends EventEmitter {
   private translateXCorrectionValue = 0;
   private translateYCorrectionValue = 0;
 
+  private correctionScrollSize = {
+    width: 0,
+    height: 0,
+  };
+
   private resizeObserver = new ResizeObserver(() => {
     this.setSize();
     this.setScrollSize();
@@ -34,6 +43,13 @@ export class ScrollViewer extends EventEmitter {
     this.container = options.container;
     this.target = options.target;
     this.zoom = options.zoom;
+
+    if (this.correctionScrollSize) {
+      this.correctionScrollSize = {
+        ...this.correctionScrollSize,
+        ...options.correctionScrollSize,
+      };
+    }
 
     this.container.addEventListener('wheel', this.wheelHandler, false);
 
@@ -109,9 +125,9 @@ export class ScrollViewer extends EventEmitter {
 
   private setScrollSize = () => {
     const targetRect = this.target.getBoundingClientRect();
-    this.scrollWidth = targetRect.width * this.zoom + 100;
+    this.scrollWidth = targetRect.width * this.zoom + this.correctionScrollSize.width;
     const targetMarginTop = Number(this.target.style.marginTop) || 0;
-    this.scrollHeight = (targetRect.height + targetMarginTop) * this.zoom + 100;
+    this.scrollHeight = (targetRect.height + targetMarginTop) * this.zoom + this.correctionScrollSize.height;
 
     let left: number | undefined;
     let top: number | undefined;

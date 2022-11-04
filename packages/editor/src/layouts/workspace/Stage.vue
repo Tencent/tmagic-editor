@@ -1,5 +1,5 @@
 <template>
-  <scroll-viewer
+  <ScrollViewer
     class="m-editor-stage"
     ref="stageWrap"
     :width="stageRect?.width"
@@ -7,6 +7,10 @@
     :wrap-width="stageContainerRect?.width"
     :wrap-height="stageContainerRect?.height"
     :zoom="zoom"
+    :correction-scroll-size="{
+      width: 60,
+      height: 50,
+    }"
   >
     <div
       class="m-editor-stage-container"
@@ -16,10 +20,10 @@
       @drop="dropHandler"
       @dragover="dragoverHandler"
     ></div>
-    <teleport to="body">
-      <viewer-menu ref="menu" :is-multi-select="isMultiSelect" :stage-content-menu="stageContentMenu"></viewer-menu>
-    </teleport>
-  </scroll-viewer>
+    <Teleport to="body">
+      <ViewerMenu ref="menu" :is-multi-select="isMultiSelect" :stage-content-menu="stageContentMenu"></ViewerMenu>
+    </Teleport>
+  </ScrollViewer>
 </template>
 
 <script lang="ts" setup name="MEditorStage">
