@@ -339,10 +339,10 @@ const parseEntry = function ({ ast, package: module, indexPath }: ParseEntryOpti
   const { importComponentSource, importComponentToken, exportDefaultToken } = tokens;
 
   if (!config) {
-    info(`${module} ${EntryType.CONFIG} 文件声明不合法`);
+    info(`${module} ${EntryType.CONFIG} 文件声明缺失`);
   }
   if (!value) {
-    info(`${module} ${EntryType.VALUE} 文件声明不合法`);
+    info(`${module} ${EntryType.VALUE} 文件声明缺失`);
   }
   if (!event) {
     info(`${module} ${EntryType.EVENT} 文件声明缺失`);
