@@ -2,13 +2,13 @@ import { execSync } from 'child_process';
 import path from 'path';
 import { exit } from 'process';
 
-import chalk from 'chalk';
 import fs from 'fs-extra';
 import * as recast from 'recast';
 
 import type App from '../Core';
 import { Entry, EntryType, ModuleMainFilePath, NpmConfig, PackageType } from '../types';
 
+import { error, execInfo, info } from './logger';
 interface TypeAssertion {
   type: string;
   imports: any[];
@@ -102,7 +102,7 @@ export const resolveAppPackages = (app: App): ModuleMainFilePath => {
     try {
       npmInstall(dependencies, app.options.source, app.options.npmConfig);
     } catch (e) {
-      console.error(e);
+      error(e as string);
     }
 
     if (fs.existsSync(packageBakFile)) {
@@ -144,8 +144,8 @@ const npmInstall = function (dependencies: Record<string, string>, cwd: string, 
 
   const command = `${client} ${install} ${packages} --registry ${registry}`;
 
-  console.log(chalk.blue(cwd));
-  console.log(chalk.blue(command));
+  execInfo(cwd);
+  execInfo(command);
 
   execSync(command, {
     stdio: 'inherit',
@@ -330,8 +330,8 @@ const getIndexPath = function (entry: string) {
 
 const parseEntry = function ({ ast, package: module, indexPath }: ParseEntryOption) {
   if (!ast.program) {
-    console.log(`${module} 入口文件不合法`);
-    return exit(1);
+    error(`${module} 入口文件不合法`);
+    exit(1);
   }
 
   const tokens = getASTTokenByTraverse({ ast, indexPath });
@@ -339,16 +339,13 @@ const parseEntry = function ({ ast, package: module, indexPath }: ParseEntryOpti
   const { importComponentSource, importComponentToken, exportDefaultToken } = tokens;
 
   if (!config) {
-    console.log(`${module} ${EntryType.CONFIG} 文件声明不合法`);
-    return exit(1);
+    info(`${module} ${EntryType.CONFIG} 文件声明不合法`);
   }
   if (!value) {
-    console.log(`${module} ${EntryType.VALUE} 文件声明不合法`);
-    return exit(1);
+    info(`${module} ${EntryType.VALUE} 文件声明不合法`);
   }
   if (!event) {
-    // event 非必须，不需要 exit
-    console.log(`${module} ${EntryType.EVENT} 文件声明缺失`);
+    info(`${module} ${EntryType.EVENT} 文件声明缺失`);
   }
 
   const findIndex = importComponentToken.indexOf(exportDefaultToken);
@@ -358,8 +355,8 @@ const parseEntry = function ({ ast, package: module, indexPath }: ParseEntryOpti
   }
 
   if (!component) {
-    console.log(`${module} ${EntryType.COMPONENT} 文件声明不合法`);
-    return exit(1);
+    info(`${module} ${EntryType.COMPONENT} 文件声明不合法`);
+    exit(1);
   }
 
   const reg = /^.*[/\\]node_modules[/\\](.*)/;
@@ -397,7 +394,7 @@ const getASTTokenByTraverse = ({ ast, indexPath }: { ast: any; indexPath: string
     visitExportNamedDeclaration(p) {
       const { node } = p;
       const { specifiers, source } = node;
-      const name = specifiers?.[0].exported.name.toLowerCase();
+      const name = specifiers?.[0]?.exported.name.toLowerCase();
 
       if (name === EntryType.VALUE) {
         value = path.resolve(path.dirname(indexPath), `${source?.value}`);

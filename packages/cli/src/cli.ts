@@ -1,7 +1,7 @@
 import { cac } from 'cac';
-import chalk from 'chalk';
 
 import { allowTs } from './utils/allowTs';
+import { error } from './utils/logger';
 import { scripts } from './commands';
 import { UserConfig } from './types';
 
@@ -11,7 +11,7 @@ import { UserConfig } from './types';
 const wrapCommand = (cmd: (...args: any[]) => Promise<void>): typeof cmd => {
   const wrappedCommand: typeof cmd = (...args) =>
     cmd(...args).catch((err) => {
-      console.error(chalk.red(err.stack));
+      error(err.stack);
       process.exit(1);
     });
   return wrappedCommand;
