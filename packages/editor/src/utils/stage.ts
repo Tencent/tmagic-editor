@@ -46,7 +46,7 @@ export const useStage = (stageOptions: StageOptions) => {
   ]);
 
   stage.on('select', (el: HTMLElement) => {
-    if (`${editorService.get('node')?.id}` === el.id) return;
+    if (`${editorService.get('node')?.id}` === el.id && editorService.get('nodes').length === 1) return;
     editorService.select(el.id);
   });
 
