@@ -73,7 +73,7 @@ class Editor extends BaseService {
         'copy',
         'paste',
         'doPaste',
-        'duAlignCenter',
+        'doAlignCenter',
         'alignCenter',
         'moveLayer',
         'moveToContainer',
@@ -623,7 +623,11 @@ class Editor extends BaseService {
 
     const newNode = await this.update(newNodes);
 
-    await stage?.multiSelect(newNodes.map((node) => node.id));
+    if (newNodes.length > 1) {
+      await stage?.multiSelect(newNodes.map((node) => node.id));
+    } else {
+      await stage?.select(newNodes[0].id);
+    }
 
     return newNode;
   }
