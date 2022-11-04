@@ -85,7 +85,7 @@ import { Coin, EditPen, Files } from '@element-plus/icons-vue';
 import { getConfig, TMagicTabs } from '@tmagic/design';
 
 import MIcon from '../../components/Icon.vue';
-import type { SideComponent, SideItem } from '../../type';
+import type { MenuButton, MenuComponent, SideComponent, SideItem } from '../../type';
 import { SideBarData } from '../../type';
 
 import CodeBlockList from './code-block/CodeBlockList.vue';
@@ -95,6 +95,7 @@ import LayerPanel from './LayerPanel.vue';
 const props = withDefaults(
   defineProps<{
     data?: SideBarData;
+    layerContentMenu: (MenuButton | MenuComponent)[];
   }>(),
   {
     data: () => ({ type: 'tabs', status: '组件', items: ['component-list', 'layer', 'code-block'] }),
@@ -120,6 +121,9 @@ const getItemConfig = (data: SideItem): SideComponent => {
       type: 'component',
       icon: Files,
       text: '已选组件',
+      props: {
+        layerContentMenu: props.layerContentMenu,
+      },
       component: LayerPanel,
       slots: {},
     },

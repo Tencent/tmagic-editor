@@ -17,7 +17,7 @@
       @dragover="dragoverHandler"
     ></div>
     <teleport to="body">
-      <viewer-menu ref="menu" :is-multi-select="isMultiSelect"></viewer-menu>
+      <viewer-menu ref="menu" :is-multi-select="isMultiSelect" :stage-content-menu="stageContentMenu"></viewer-menu>
     </teleport>
   </scroll-viewer>
 </template>
@@ -30,10 +30,14 @@ import type { MApp, MContainer, MNode, MPage } from '@tmagic/schema';
 import StageCore, { calcValueByFontsize, getOffset, Runtime } from '@tmagic/stage';
 
 import ScrollViewer from '../../components/ScrollViewer.vue';
-import { Layout, Services, StageOptions, StageRect } from '../../type';
+import { Layout, MenuButton, MenuComponent, Services, StageOptions, StageRect } from '../../type';
 import { useStage } from '../../utils/stage';
 
 import ViewerMenu from './ViewerMenu.vue';
+
+defineProps<{
+  stageContentMenu: (MenuButton | MenuComponent)[];
+}>();
 
 let stage: StageCore | null = null;
 let runtime: Runtime | null = null;

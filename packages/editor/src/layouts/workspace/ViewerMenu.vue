@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts" setup name="MEditorViewerMenu">
-import { computed, inject, markRaw, reactive, ref, watch } from 'vue';
+import { computed, inject, markRaw, ref, watch } from 'vue';
 import { Bottom, Delete, DocumentCopy, Top } from '@element-plus/icons-vue';
 
 import { MNode, NodeType } from '@tmagic/schema';
@@ -15,7 +15,10 @@ import storageService from '../../services/storage';
 import { LayerOffset, Layout, MenuButton, MenuComponent, Services } from '../../type';
 import { COPY_STORAGE_KEY } from '../../utils/editor';
 
-const props = withDefaults(defineProps<{ isMultiSelect?: boolean }>(), { isMultiSelect: false });
+const props = withDefaults(
+  defineProps<{ isMultiSelect?: boolean; stageContentMenu: (MenuButton | MenuComponent)[] }>(),
+  { isMultiSelect: false },
+);
 
 const services = inject<Services>('services');
 const editorService = services?.editorService;
@@ -28,9 +31,7 @@ const nodes = computed(() => editorService?.get<MNode[]>('nodes'));
 const parent = computed(() => editorService?.get('parent'));
 const stage = computed(() => editorService?.get<StageCore>('stage'));
 
-const stageContentMenu = inject<(MenuButton | MenuComponent)[]>('stageContentMenu', []);
-
-const menuData = reactive<(MenuButton | MenuComponent)[]>([
+const menuData = computed<(MenuButton | MenuComponent)[]>(() => [
   {
     type: 'button',
     text: '水平居中',
@@ -130,7 +131,7 @@ const menuData = reactive<(MenuButton | MenuComponent)[]>([
       editorService?.get<StageCore>('stage').clearGuides();
     },
   },
-  ...stageContentMenu,
+  ...props.stageContentMenu,
 ]);
 
 watch(

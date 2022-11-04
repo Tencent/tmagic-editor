@@ -1,12 +1,12 @@
 <template>
-  <framework :code-options="codeOptions">
+  <Framework :code-options="codeOptions">
     <template #nav>
-      <slot name="nav" :editorService="editorService"><nav-menu :data="menu"></nav-menu></slot>
+      <slot name="nav" :editorService="editorService"><NavMenu :data="menu"></NavMenu></slot>
     </template>
 
     <template #sidebar>
       <slot name="sidebar" :editorService="editorService">
-        <sidebar :data="sidebar">
+        <Sidebar :data="sidebar" :layer-content-menu="layerContentMenu">
           <template #layer-panel-header>
             <slot name="layer-panel-header"></slot>
           </template>
@@ -34,33 +34,33 @@
           <template #code-block-edit-panel-header="{ id }">
             <slot name="code-block-edit-panel-header" :id="id"></slot>
           </template>
-        </sidebar>
+        </Sidebar>
       </slot>
     </template>
 
     <template #workspace>
       <slot name="workspace" :editorService="editorService">
-        <workspace>
+        <Workspace :stage-content-menu="stageContentMenu">
           <template #stage><slot name="stage"></slot></template>
           <template #workspace-content><slot name="workspace-content" :editorService="editorService"></slot></template>
           <template #page-bar-title="{ page }"><slot name="page-bar-title" :page="page"></slot></template>
           <template #page-bar-popover="{ page }"><slot name="page-bar-popover" :page="page"></slot></template>
-        </workspace>
+        </Workspace>
       </slot>
     </template>
 
     <template #props-panel>
       <slot name="props-panel">
-        <props-panel @mounted="(instance: any) => $emit('props-panel-mounted', instance)">
+        <PropsPanel @mounted="(instance: any) => $emit('props-panel-mounted', instance)">
           <template #props-panel-header>
             <slot name="props-panel-header"></slot>
           </template>
-        </props-panel>
+        </PropsPanel>
       </slot>
     </template>
 
     <template #empty><slot name="empty" :editorService="editorService"></slot></template>
-  </framework>
+  </Framework>
 </template>
 
 <script lang="ts">
@@ -319,8 +319,6 @@ export default defineComponent({
 
     provide('services', services);
 
-    provide('layerContentMenu', props.layerContentMenu);
-    provide('stageContentMenu', props.stageContentMenu);
     provide(
       'stageOptions',
       reactive({

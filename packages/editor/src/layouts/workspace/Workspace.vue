@@ -3,7 +3,7 @@
     <Breadcrumb></Breadcrumb>
 
     <slot name="stage">
-      <MagicStage :key="page?.id"></MagicStage>
+      <MagicStage :key="page?.id" :stage-content-menu="stageContentMenu"></MagicStage>
     </slot>
 
     <slot name="workspace-content"></slot>
@@ -22,11 +22,15 @@ import KeyController from 'keycon';
 import type { MNode, MPage } from '@tmagic/schema';
 import { isPage } from '@tmagic/utils';
 
-import type { Services } from '../../type';
+import type { MenuButton, MenuComponent, Services } from '../../type';
 
 import Breadcrumb from './Breadcrumb.vue';
 import PageBar from './PageBar.vue';
 import MagicStage from './Stage.vue';
+
+defineProps<{
+  stageContentMenu: (MenuButton | MenuComponent)[];
+}>();
 
 const services = inject<Services>('services');
 const workspace = ref<HTMLDivElement>();

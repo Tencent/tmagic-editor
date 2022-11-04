@@ -60,7 +60,7 @@ describe('Stage.vue', () => {
         type: NodeType.ROOT,
         items: [page],
       },
-
+      stageContentMenu: [],
       page,
       node: page,
       uiSelectMode: false,

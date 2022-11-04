@@ -1,5 +1,5 @@
 <template>
-  <content-menu :menu-data="menuData" ref="menu" style="overflow: initial"></content-menu>
+  <ContentMenu :menu-data="menuData" ref="menu" style="overflow: initial"></ContentMenu>
 </template>
 
 <script lang="ts" setup name="MEditorLayerMenu">
@@ -11,14 +11,16 @@ import { NodeType } from '@tmagic/schema';
 import ContentMenu from '../../components/ContentMenu.vue';
 import type { ComponentGroup, MenuButton, MenuComponent, Services } from '../../type';
 
+const props = defineProps<{
+  layerContentMenu: (MenuButton | MenuComponent)[];
+}>();
+
 const services = inject<Services>('services');
 const menu = ref<InstanceType<typeof ContentMenu>>();
 const node = computed(() => services?.editorService.get('node'));
 const isRoot = computed(() => node.value?.type === NodeType.ROOT);
 const isPage = computed(() => node.value?.type === NodeType.PAGE);
 const componentList = computed(() => services?.componentListService.getList() || []);
-
-const layerContentMenu = inject<(MenuComponent | MenuButton)[]>('layerContentMenu', []);
 
 const createMenuItems = (group: ComponentGroup): MenuButton[] =>
   group.items.map((component) => ({
@@ -97,7 +99,7 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() => [
       node.value && services?.editorService.remove(node.value);
     },
   },
-  ...layerContentMenu,
+  ...props.layerContentMenu,
 ]);
 
 const show = (e: MouseEvent) => {

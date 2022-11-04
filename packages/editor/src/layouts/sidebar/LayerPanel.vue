@@ -59,9 +59,9 @@
       </template>
     </TMagicTree>
 
-    <teleport to="body">
-      <layer-menu ref="menu"></layer-menu>
-    </teleport>
+    <Teleport to="body">
+      <LayerMenu ref="menu" :layer-content-menu="layerContentMenu"></LayerMenu>
+    </Teleport>
   </TMagicScrollbar>
 </template>
 
@@ -76,10 +76,14 @@ import type { Id, MNode, MPage } from '@tmagic/schema';
 import { MContainer, NodeType } from '@tmagic/schema';
 import StageCore from '@tmagic/stage';
 
-import type { Services } from '../../type';
+import type { MenuButton, MenuComponent, Services } from '../../type';
 import { Layout } from '../../type';
 
 import LayerMenu from './LayerMenu.vue';
+
+defineProps<{
+  layerContentMenu: (MenuButton | MenuComponent)[];
+}>();
 
 const throttleTime = 150;
 const services = inject<Services>('services');
