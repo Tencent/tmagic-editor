@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts" name="TMTable">
-import { computed, ref } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 
 import { getConfig } from './config';
 
@@ -43,8 +43,16 @@ const sortChangeHandler = (...args: any[]) => {
   emit('sort-change', ...args);
 };
 
+let $el: HTMLDivElement | undefined;
+
+watchEffect(() => {
+  $el = table.value?.$el;
+});
+
 defineExpose({
-  $el: table.value?.$el,
+  instance: table,
+
+  $el,
 
   clearSelection(...args: any[]) {
     return table.value?.clearSelection(...args);

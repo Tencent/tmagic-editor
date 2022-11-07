@@ -160,7 +160,7 @@
 </template>
 
 <script setup lang="ts" name="MFormTable">
-import { computed, inject, onMounted, ref, toRefs } from 'vue';
+import { computed, inject, onMounted, ref, toRefs, watchEffect } from 'vue';
 import { ArrowDown, ArrowUp, Delete, FullScreen, Grid } from '@element-plus/icons-vue';
 import { cloneDeep } from 'lodash-es';
 import Sortable, { SortableEvent } from 'sortablejs';
@@ -248,11 +248,11 @@ const swapArray = (index1: number, index2: number) => {
 };
 
 const rowDrop = () => {
-  const tableEl = tMagicTable.value?.$el;
-  if (tableEl?.querySelectorAll('.el-table__body > tbody')) {
+  const tableEl = tMagicTable.value?.instance.$el;
+  const tBodyEl = tableEl?.querySelector('.el-table__body > tbody');
+  if (tBodyEl) {
     // eslint-disable-next-line prefer-destructuring
-    const el = tableEl.querySelectorAll('.el-table__body > tbody')[0];
-    const sortable = Sortable.create(el, {
+    const sortable = Sortable.create(tBodyEl, {
       onEnd: ({ newIndex, oldIndex }: SortableEvent) => {
         if (typeof newIndex === 'undefined') return;
         if (typeof oldIndex === 'undefined') return;
@@ -262,11 +262,11 @@ const rowDrop = () => {
         sortable.destroy();
         mForm?.$emit('field-change', props.prop, props.model[modelName.value]);
         sleep(1000).then(() => {
-          const eltrs = tableEl.querySelectorAll('.el-table__body > tbody > tr');
-          if (eltrs?.[newIndex]) {
-            eltrs[newIndex].style.backgroundColor = 'rgba(243, 89, 59, 0.2)';
+          const elTrs = tableEl.querySelectorAll('.el-table__body > tbody > tr');
+          if (elTrs?.[newIndex]) {
+            elTrs[newIndex].style.backgroundColor = 'rgba(243, 89, 59, 0.2)';
             sleep(1000).then(() => {
-              eltrs[newIndex].style.backgroundColor = '';
+              elTrs[newIndex].style.backgroundColor = '';
             });
           }
         });
@@ -348,7 +348,9 @@ onMounted(() => {
   if (props.sort && props.sortKey) {
     props.model[modelName.value].sort((a: any, b: any) => b[props.sortKey] - a[props.sortKey]);
   }
+});
 
+watchEffect(() => {
   if (props.config.dropSort) {
     rowDrop();
   }
