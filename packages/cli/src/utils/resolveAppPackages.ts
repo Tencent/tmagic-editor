@@ -335,8 +335,7 @@ const parseEntry = function ({ ast, package: module, indexPath }: ParseEntryOpti
   }
 
   const tokens = getASTTokenByTraverse({ ast, indexPath });
-  let { config, value, event } = tokens;
-  const { importComponentSource, importComponentToken, exportDefaultToken } = tokens;
+  let { config, value, event, component } = tokens;
 
   if (!config) {
     info(`${module} ${EntryType.CONFIG} 文件声明缺失`);
@@ -347,13 +346,6 @@ const parseEntry = function ({ ast, package: module, indexPath }: ParseEntryOpti
   if (!event) {
     info(`${module} ${EntryType.EVENT} 文件声明缺失`);
   }
-
-  const findIndex = importComponentToken.indexOf(exportDefaultToken);
-  let component = '';
-  if (findIndex > -1) {
-    component = path.resolve(path.dirname(indexPath), importComponentSource[findIndex]);
-  }
-
   if (!component) {
     info(`${module} ${EntryType.COMPONENT} 文件声明不合法`);
     exit(1);
@@ -377,31 +369,43 @@ const getASTTokenByTraverse = ({ ast, indexPath }: { ast: any; indexPath: string
   let config = '';
   let value = '';
   let event = '';
-  const importComponentToken: string[] = [];
-  const importComponentSource: any[] = [];
-  let exportDefaultToken = '';
+  let component = '';
+  const importSpecifiersMap: { [key: string]: string } = {};
+  const exportSpecifiersMap: { [key: string]: string | undefined } = {};
 
   recast.types.visit(ast, {
     visitImportDeclaration(p) {
       const { node } = p;
       const { specifiers, source } = node;
 
-      importComponentToken.push(specifiers?.[0].local?.name || '');
-      importComponentSource.push(source.value);
+      if (specifiers?.length === 1 && source.value) {
+        const name = specifiers?.[0].local?.name;
+        if (name) {
+          importSpecifiersMap[name] = source.value as string;
+        }
+      }
 
       this.traverse(p);
     },
     visitExportNamedDeclaration(p) {
       const { node } = p;
-      const { specifiers, source } = node;
-      const name = specifiers?.[0]?.exported.name.toLowerCase();
+      const { specifiers, source, declaration } = node;
 
-      if (name === EntryType.VALUE) {
-        value = path.resolve(path.dirname(indexPath), `${source?.value}`);
-      } else if (name === EntryType.CONFIG) {
-        config = path.resolve(path.dirname(indexPath), `${source?.value}`);
-      } else if (name === EntryType.EVENT) {
-        event = path.resolve(path.dirname(indexPath), `${source?.value}`);
+      if (specifiers?.length === 1 && source?.value) {
+        const name = specifiers?.[0]?.exported.name.toLowerCase();
+        if (name) {
+          exportSpecifiersMap[name] = source.value as string;
+        }
+      } else {
+        specifiers?.forEach((specifier) => {
+          const name = specifier.exported.name.toLowerCase();
+          exportSpecifiersMap[name] = undefined;
+        });
+        (declaration as any)?.declarations.forEach((declare: any) => {
+          const { id, init } = declare;
+          const { name } = id;
+          exportSpecifiersMap[name] = init.name;
+        });
       }
 
       this.traverse(p);
@@ -409,18 +413,32 @@ const getASTTokenByTraverse = ({ ast, indexPath }: { ast: any; indexPath: string
     visitExportDefaultDeclaration(p) {
       const { node } = p;
       const { declaration } = node as any;
-      exportDefaultToken = `${declaration.name}`;
+      component = path.resolve(path.dirname(indexPath), importSpecifiersMap[declaration.name]);
       this.traverse(p);
     },
+  });
+
+  Object.keys(exportSpecifiersMap).forEach((exportName) => {
+    const filePath = path.resolve(
+      path.dirname(indexPath),
+      exportSpecifiersMap[exportName] || importSpecifiersMap[exportName] || '',
+    );
+    if (exportName === EntryType.VALUE) {
+      value = filePath;
+    } else if (exportName === EntryType.CONFIG) {
+      config = filePath;
+    } else if (exportName === EntryType.EVENT) {
+      event = filePath;
+    } else if (exportName === 'default') {
+      component = component || filePath;
+    }
   });
 
   return {
     config,
     value,
     event,
-    importComponentToken,
-    importComponentSource,
-    exportDefaultToken,
+    component,
   };
 };
 
