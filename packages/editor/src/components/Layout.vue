@@ -23,7 +23,7 @@
 <script lang="ts" setup name="MEditorLayout">
 import { onMounted, onUnmounted, ref } from 'vue';
 
-import Resizer from './Resizer.vue';
+import Resizer from '../layouts/Resizer.vue';
 
 const emit = defineEmits(['update:left', 'change', 'update:right']);
 

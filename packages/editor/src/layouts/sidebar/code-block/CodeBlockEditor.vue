@@ -7,7 +7,7 @@
     :before-close="saveAndClose"
     :append-to-body="true"
   >
-    <layout v-model:left="left" :min-left="45" class="code-editor-layout">
+    <Layout v-model:left="left" :min-left="45" class="code-editor-layout">
       <!-- 左侧列表 -->
       <template #left v-if="mode === CodeEditorMode.LIST">
         <TMagicTree
@@ -53,7 +53,7 @@
               </div>
             </template>
             <div class="m-editor-wrapper">
-              <magic-code-editor
+              <MagicCodeEditor
                 v-if="codeConfig"
                 ref="codeEditor"
                 class="m-editor-container"
@@ -65,7 +65,7 @@
                   formatOnPaste: true,
                   readOnly: !editable,
                 }"
-              ></magic-code-editor>
+              ></MagicCodeEditor>
               <div class="m-editor-content-bottom" v-if="editable">
                 <TMagicButton type="primary" class="button" @click="saveCode">保存</TMagicButton>
                 <TMagicButton type="primary" class="button" @click="saveAndClose">关闭</TMagicButton>
@@ -77,7 +77,7 @@
           </TMagicCard>
         </div>
       </template>
-    </layout>
+    </Layout>
   </TMagicDialog>
 </template>
 
@@ -88,10 +88,10 @@ import type * as monaco from 'monaco-editor';
 
 import { TMagicButton, TMagicCard, TMagicDialog, TMagicInput, tMagicMessage, TMagicTree } from '@tmagic/design';
 
+import Layout from '../../../components/Layout.vue';
 import type { CodeBlockContent, CodeDslList, ListState, Services } from '../../../type';
 import { CodeEditorMode } from '../../../type';
 import MagicCodeEditor from '../../CodeEditor.vue';
-import Layout from '../../Layout.vue';
 
 const services = inject<Services>('services');
 

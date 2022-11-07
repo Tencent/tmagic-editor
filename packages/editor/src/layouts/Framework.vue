@@ -48,10 +48,10 @@ import { computed, inject, ref, watch } from 'vue';
 import { TMagicScrollbar } from '@tmagic/design';
 import type { MApp } from '@tmagic/schema';
 
+import Layout from '../components/Layout.vue';
 import { GetColumnWidth, Services } from '../type';
 
 import AddPageBox from './AddPageBox.vue';
-import Layout from './Layout.vue';
 
 const DEFAULT_LEFT_COLUMN_WIDTH = 310;
 const DEFAULT_RIGHT_COLUMN_WIDTH = 480;
