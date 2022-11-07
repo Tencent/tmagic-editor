@@ -27,10 +27,10 @@ const uiProps = computed(() => uiComponent.props(props));
 
 const emit = defineEmits(['size-change', 'current-change']);
 
-const handleSizeChange = (args: any[]) => {
+const handleSizeChange = (...args: any[]) => {
   emit('size-change', ...args);
 };
-const handleCurrentChange = (args: any[]) => {
+const handleCurrentChange = (...args: any[]) => {
   emit('current-change', ...args);
 };
 </script>

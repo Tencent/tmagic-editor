@@ -7,7 +7,7 @@
           v-if="model[modelName]"
           ref="tMagicTable"
           style="width: 100%"
-          :data="model[modelName]"
+          :data="data"
           :border="config.border"
           :max-height="config.maxHeight"
           :default-expand-all="true"
@@ -143,7 +143,7 @@
       <TMagicButton v-if="importable" size="small" type="warning" plain @click="clearHandler()">清空</TMagicButton>
     </div>
 
-    <div class="bottom" style="text-align: right">
+    <div class="bottom" style="text-align: right" v-if="config.pagination">
       <TMagicPagination
         layout="total, sizes, prev, pager, next, jumper"
         :hide-on-single-page="model[modelName].length < pagesize"
@@ -219,6 +219,15 @@ const updateKey = ref(1);
 const isFullscreen = ref(false);
 
 const modelName = computed(() => props.name || props.config.name || '');
+
+const data = computed(() =>
+  props.config.pagination
+    ? props.model[modelName.value].filter(
+        (item: any, index: number) =>
+          index >= pagecontext.value * pagesize.value && index + 1 <= (pagecontext.value + 1) * pagesize.value,
+      )
+    : props.model[modelName.value],
+);
 
 const sortChange = ({ prop, order }: SortProp) => {
   if (order === 'ascending') {

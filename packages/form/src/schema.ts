@@ -610,6 +610,7 @@ export interface TableConfig extends FormItem {
   border?: boolean;
   /** 显示行号 */
   showIndex?: boolean;
+  pagination?: boolean;
   enum?: any[];
   /** 是否显示添加按钮 */
   addable?: (mForm: FormState | undefined, data: any) => boolean | 'undefined' | boolean;
