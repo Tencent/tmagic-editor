@@ -1,3 +1,17 @@
+# [1.2.0-beta.10](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.9...v1.2.0-beta.10) (2022-11-07)
+
+
+### Bug Fixes
+
+* **editor:** content-menu没有响应式 ([c2e8a1c](https://github.com/Tencent/tmagic-editor/commit/c2e8a1caae210993366e1234613fc78e606ce36b))
+* **editor:** 单选水平居中 ([e8c53c2](https://github.com/Tencent/tmagic-editor/commit/e8c53c2bd1bb3c0f32745fcdd840a7faaa61e07b))
+* **editor:** 多选后，再单选多选中的第一个元素，多选状态没有清除 ([66e7278](https://github.com/Tencent/tmagic-editor/commit/66e727838b9306112a38b000b3675b4cdfc8db8a))
+* **editor:** 画布滚动条出现的不准确 ([8d8ef55](https://github.com/Tencent/tmagic-editor/commit/8d8ef55b81ecbfe8b1fa2a8ee738c7b4952369c1))
+* **form:** table 分页 ([929d7c4](https://github.com/Tencent/tmagic-editor/commit/929d7c463f2880a59deef2ec4d377868bd27d9cc))
+* **form:** table 拖动排序 ([617b025](https://github.com/Tencent/tmagic-editor/commit/617b025ce13b87c11292db39d741cf769cbcbc9d))
+
+
+
 # [1.2.0-beta.9](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.8...v1.2.0-beta.9) (2022-10-28)
 
 
