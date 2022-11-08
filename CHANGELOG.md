@@ -1,3 +1,12 @@
+# [1.2.0-beta.11](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.10...v1.2.0-beta.11) (2022-11-08)
+
+
+### Bug Fixes
+
+* **editor:** Layout 组件与Layout ts type 重名，将组件改为LayoutContainer ([eae7769](https://github.com/Tencent/tmagic-editor/commit/eae776990cd8e8df6492b6a3ab89a6ee26edc617))
+
+
+
 # [1.2.0-beta.10](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.9...v1.2.0-beta.10) (2022-11-07)
 
 
