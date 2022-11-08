@@ -419,10 +419,11 @@ const getASTTokenByTraverse = ({ ast, indexPath }: { ast: any; indexPath: string
   });
 
   Object.keys(exportSpecifiersMap).forEach((exportName) => {
-    const filePath = path.resolve(
-      path.dirname(indexPath),
-      exportSpecifiersMap[exportName] || importSpecifiersMap[exportName] || '',
-    );
+    const exportValue = exportSpecifiersMap[exportName];
+    const importValue = importSpecifiersMap[exportName];
+    const connectValue = exportValue ? importSpecifiersMap[exportValue] : '';
+    const filePath = path.resolve(path.dirname(indexPath), connectValue || importValue || exportValue || '');
+
     if (exportName === EntryType.VALUE) {
       value = filePath;
     } else if (exportName === EntryType.CONFIG) {
