@@ -14,6 +14,7 @@ export const prepareEntryFile = (app: App) => {
   );
 
   app.writeTemp('plugin-entry.ts', generateContent(EntryType.PLUGIN, pluginMap));
+  app.writeTemp('async-plugin-entry.ts', generateContent(EntryType.PLUGIN, pluginMap, '', dynamicImport));
   app.writeTemp('config-entry.ts', generateContent(EntryType.CONFIG, configMap));
   app.writeTemp('value-entry.ts', generateContent(EntryType.VALUE, valueMap));
   app.writeTemp('event-entry.ts', generateContent(EntryType.EVENT, eventMap));
