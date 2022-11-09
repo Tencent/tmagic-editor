@@ -19,10 +19,10 @@
 import { reactive } from 'vue';
 import { cloneDeep, forIn, isEmpty, keys, omit, pick } from 'lodash-es';
 
-import { Id, MNode } from '@tmagic/schema';
+import { CodeBlockContent, CodeBlockDSL, HookType, Id, MApp, MNode } from '@tmagic/schema';
 
 import editorService from '../services/editor';
-import type { CodeBlockContent, CodeBlockDSL, CodeState } from '../type';
+import type { CodeRelation, CodeState, HookData } from '../type';
 import { CODE_DRAFT_STORAGE_KEY, CodeEditorMode, CodeSelectOp } from '../type';
 import { error, info } from '../utils/logger';
 
@@ -37,6 +37,7 @@ class CodeBlock extends BaseService {
     mode: CodeEditorMode.EDITOR,
     combineIds: [],
     undeletableList: [],
+    relations: {},
   });
 
   constructor() {
@@ -82,10 +83,10 @@ class CodeBlock extends BaseService {
 
   /**
    * 根据代码块id获取代码块内容
-   * @param {string} id 代码块id
+   * @param {Id} id 代码块id
    * @returns {CodeBlockContent | null}
    */
-  public async getCodeContentById(id: string): Promise<CodeBlockContent | null> {
+  public async getCodeContentById(id: Id): Promise<CodeBlockContent | null> {
     if (!id) return null;
     const totalCodeDsl = await this.getCodeDsl();
     if (!totalCodeDsl) return null;
@@ -94,11 +95,11 @@ class CodeBlock extends BaseService {
 
   /**
    * 设置代码块ID和代码内容到源dsl
-   * @param {string} id 代码块id
+   * @param {Id} id 代码块id
    * @param {CodeBlockContent} codeConfig 代码块内容配置信息
    * @returns {void}
    */
-  public async setCodeDslById(id: string, codeConfig: CodeBlockContent): Promise<void> {
+  public async setCodeDslById(id: Id, codeConfig: CodeBlockContent): Promise<void> {
     let codeDsl = await this.getCodeDsl();
     if (!codeDsl) {
       // dsl中无代码块字段
@@ -154,10 +155,10 @@ class CodeBlock extends BaseService {
   /**
    * 设置代码编辑面板展示状态及展示内容
    * @param {boolean} status 是否展示代码编辑面板
-   * @param {string} id 代码块id
+   * @param {Id} id 代码块id
    * @returns {void}
    */
-  public setCodeEditorContent(status: boolean, id: string): void {
+  public setCodeEditorContent(status: boolean, id: Id): void {
     if (!id) return;
     this.setId(id);
     this.state.isShowCodeEditor = status;
@@ -190,19 +191,19 @@ class CodeBlock extends BaseService {
 
   /**
    * 设置当前选中的代码块ID
-   * @param {string} id 代码块id
+   * @param {Id} id 代码块id
    * @returns {void}
    */
-  public setId(id: string) {
+  public setId(id: Id) {
     if (!id) return;
     this.state.id = id;
   }
 
   /**
    * 获取当前选中的代码块ID
-   * @returns {string} id 代码块id
+   * @returns {Id} id 代码块id
    */
-  public getId(): string {
+  public getId(): Id {
     return this.state.id;
   }
 
@@ -249,12 +250,12 @@ class CodeBlock extends BaseService {
    * @returns {void}
    */
   public async setCombineRelation(compId: Id, diffCodeIds: string[], opFlag: CodeSelectOp, hook: string) {
-    const codeDsl = cloneDeep(await this.getCodeDsl());
-    if (!codeDsl) return;
+    const combineInfo = this.getCombineInfo();
+    if (!combineInfo) return;
     if (opFlag === CodeSelectOp.DELETE) {
       try {
         diffCodeIds.forEach((codeId) => {
-          const compsContent = codeDsl[codeId].comps;
+          const compsContent = combineInfo[codeId];
           const index = compsContent?.[compId].findIndex((item) => item === hook);
           if (typeof index !== 'undefined' && index !== -1) {
             compsContent?.[compId].splice(index, 1);
@@ -267,12 +268,12 @@ class CodeBlock extends BaseService {
     } else if (opFlag === CodeSelectOp.ADD) {
       try {
         diffCodeIds.forEach((codeId) => {
-          const compsContent = codeDsl[codeId].comps;
+          const compsContent = combineInfo[codeId];
           const existHooks = compsContent?.[compId];
           if (isEmpty(existHooks)) {
             // comps属性不存在，或者comps为空：新增
-            codeDsl[codeId].comps = {
-              ...(codeDsl[codeId].comps || {}),
+            combineInfo[codeId] = {
+              ...(combineInfo[codeId] || {}),
               [compId]: [hook],
             };
           } else {
@@ -286,16 +287,16 @@ class CodeBlock extends BaseService {
       }
     } else if (opFlag === CodeSelectOp.CHANGE) {
       // 单选修改
-      forIn(codeDsl, (codeBlockContent, codeId) => {
+      forIn(combineInfo, (combineItem, codeId) => {
         if (codeId === diffCodeIds[0]) {
           // 增加
-          codeBlockContent.comps = {
-            ...(codeBlockContent?.comps || {}),
+          combineItem = {
+            ...(combineItem || {}),
             [compId]: [hook],
           };
         } else if (isEmpty(diffCodeIds) || codeId !== diffCodeIds[0]) {
           // 清空或者移除之前的选项
-          const compHooks = codeBlockContent?.comps?.[compId];
+          const compHooks = combineItem?.[compId];
           // continue
           if (!compHooks) return true;
           const index = compHooks.findIndex((hookName) => hookName === hook);
@@ -307,53 +308,65 @@ class CodeBlock extends BaseService {
         }
       });
     }
-    this.setCodeDsl(codeDsl);
+    console.log('---combineInfo--', combineInfo);
+    console.log('---this.state.relations--', this.state.relations);
+  }
+
+  /**
+   * 获取绑定关系
+   * @returns {CodeRelation | null}
+   */
+  public getCombineInfo(): CodeRelation | null {
+    const root = editorService.get<MApp | null>('root');
+    if (!root) return null;
+    this.recurseMNode(root);
+    return this.state.relations;
   }
 
   /**
    * 获取不可删除列表
-   * @returns {string[]}
+   * @returns {Id[]}
    */
-  public getUndeletableList(): string[] {
+  public getUndeletableList(): Id[] {
     return this.state.undeletableList;
   }
 
   /**
    * 设置不可删除列表：为业务逻辑预留的不可删除的代码块列表，由业务逻辑维护（如代码块上线后不可删除）
-   * @param {string[]} codeIds 代码块id数组
+   * @param {Id[]} codeIds 代码块id数组
    * @returns {void}
    */
-  public async setUndeleteableList(codeIds: string[]): Promise<void> {
+  public async setUndeleteableList(codeIds: Id[]): Promise<void> {
     this.state.undeletableList = codeIds;
   }
 
   /**
    * 设置代码草稿
    */
-  public setCodeDraft(codeId: string, content: string): void {
+  public setCodeDraft(codeId: Id, content: string): void {
     globalThis.localStorage.setItem(`${CODE_DRAFT_STORAGE_KEY}_${codeId}`, content);
   }
 
   /**
    * 获取代码草稿
    */
-  public getCodeDraft(codeId: string): string | null {
+  public getCodeDraft(codeId: Id): string | null {
     return globalThis.localStorage.getItem(`${CODE_DRAFT_STORAGE_KEY}_${codeId}`);
   }
 
   /**
    * 删除代码草稿
    */
-  public removeCodeDraft(codeId: string): void {
+  public removeCodeDraft(codeId: Id): void {
     globalThis.localStorage.removeItem(`${CODE_DRAFT_STORAGE_KEY}_${codeId}`);
   }
 
   /**
    * 在dsl数据源中删除指定id的代码块
-   * @param {string[]} codeIds 需要删除的代码块id数组
+   * @param {Id[]} codeIds 需要删除的代码块id数组
    * @returns {CodeBlockDSL} 删除后的code dsl
    */
-  public async deleteCodeDslByIds(codeIds: string[]): Promise<CodeBlockDSL> {
+  public async deleteCodeDslByIds(codeIds: Id[]): Promise<CodeBlockDSL> {
     const currentDsl = await this.getCodeDsl();
     const newDsl = omit(currentDsl, codeIds);
     await this.setCodeDsl(newDsl);
@@ -362,9 +375,9 @@ class CodeBlock extends BaseService {
 
   /**
    * 生成代码块唯一id
-   * @returns {string} 代码块唯一id
+   * @returns {Id} 代码块唯一id
    */
-  public async getUniqueId(): Promise<string> {
+  public async getUniqueId(): Promise<Id> {
     const newId = `code_${Math.random().toString(10).substring(2).substring(0, 4)}`;
     // 判断是否重复
     const dsl = await this.getCodeDsl();
@@ -381,7 +394,7 @@ class CodeBlock extends BaseService {
   public async deleteCompsInRelation(node: MNode) {
     const codeDsl = cloneDeep(await this.getCodeDsl());
     if (!codeDsl) return;
-    this.recurseNodes(node, codeDsl);
+    this.refreshRelationDeep(node, codeDsl);
     this.setCodeDsl(codeDsl);
   }
 
@@ -395,8 +408,13 @@ class CodeBlock extends BaseService {
     this.state.undeletableList = [];
   }
 
-  // 删除组件时 如果是容器 需要遍历删除其包含节点的绑定信息
-  private recurseNodes(node: MNode, codeDsl: CodeBlockDSL) {
+  /**
+   * 删除组件时 如果是容器 需要遍历删除其包含节点的绑定信息
+   * @param {MNode} node 节点信息
+   * @param {CodeBlockDSL} codeDsl 代码块
+   * @returns void
+   */
+  private refreshRelationDeep(node: MNode, codeDsl: CodeBlockDSL) {
     if (!node.id) return;
     forIn(codeDsl, (codeBlockContent) => {
       const compsContent = codeBlockContent.comps || {};
@@ -404,7 +422,34 @@ class CodeBlock extends BaseService {
     });
     if (!isEmpty(node.items)) {
       node.items.forEach((item: MNode) => {
-        this.recurseNodes(item, codeDsl);
+        this.refreshRelationDeep(item, codeDsl);
+      });
+    }
+  }
+
+  /**
+   * 递归遍历dsl中挂载了代码块的节点，并更新绑定关系数据
+   * @param {MNode} node 节点信息
+   * @returns void
+   */
+  private recurseMNode(node: MNode) {
+    forIn(node, (value, key) => {
+      if (value?.hookType === HookType.CODE && !isEmpty(value?.data)) {
+        value.data.forEach((relationItem: HookData) => {
+          if (!this.state.relations[relationItem.codeId]) {
+            this.state.relations[relationItem.codeId] = {};
+          }
+          const codeItem = this.state.relations[relationItem.codeId];
+          if (isEmpty(codeItem[node.id])) {
+            codeItem[node.id] = [];
+          }
+          codeItem[node.id].push(key);
+        });
+      }
+    });
+    if (!isEmpty(node.items)) {
+      node.items.forEach((item: MNode) => {
+        this.recurseMNode(item);
       });
     }
   }

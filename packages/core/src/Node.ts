@@ -21,6 +21,7 @@ import { EventEmitter } from 'events';
 import { isEmpty } from 'lodash-es';
 
 import type { EventItemConfig, MComponent, MContainer, MPage } from '@tmagic/schema';
+import { HookType } from '@tmagic/schema';
 
 import type App from './App';
 import type Page from './Page';
@@ -85,10 +86,11 @@ class Node extends EventEmitter {
   }
 
   private async runCodeBlock(hook: string) {
-    if (!Array.isArray(this.data[hook]) || !this.app.codeDsl || isEmpty(this.app?.codeDsl)) return;
-    for (const codeId of this.data[hook]) {
+    if (this.data[hook]?.hookType !== HookType.CODE || !this.app.codeDsl || isEmpty(this.app?.codeDsl)) return;
+    for (const item of this.data[hook].data) {
+      const { codeId, params = {} } = item;
       if (this.app.codeDsl[codeId] && typeof this.app?.codeDsl[codeId]?.content === 'function') {
-        await this.app.codeDsl[codeId].content(this);
+        await this.app.codeDsl[codeId].content(this, params);
       }
     }
   }

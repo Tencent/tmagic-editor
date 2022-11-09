@@ -22,6 +22,7 @@ import { computed, inject, ref, watchEffect } from 'vue';
 import type * as monaco from 'monaco-editor';
 
 import { TMagicButton, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
+import { Id } from '@tmagic/schema';
 import { datetimeFormatter } from '@tmagic/utils';
 
 import MagicCodeEditor from '../layouts/CodeEditor.vue';
@@ -30,7 +31,7 @@ import type { Services } from '../type';
 const props = withDefaults(
   defineProps<{
     /** 代码id */
-    id: string;
+    id: Id;
     /** 代码内容 */
     content: string;
     /** 是否可编辑 */

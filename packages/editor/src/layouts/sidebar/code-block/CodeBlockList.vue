@@ -99,11 +99,11 @@ import { Close, Edit, Link, View } from '@element-plus/icons-vue';
 import { forIn, isEmpty } from 'lodash-es';
 
 import { TMagicButton, TMagicInput, tMagicMessage, TMagicTooltip, TMagicTree } from '@tmagic/design';
-import { Id } from '@tmagic/schema';
+import { CodeBlockContent, Id } from '@tmagic/schema';
 import StageCore from '@tmagic/stage';
 
 import Icon from '../../../components/Icon.vue';
-import type { CodeBlockContent, CodeRelation, Services } from '../../../type';
+import type { Services } from '../../../type';
 import { CodeDeleteErrorType, CodeDslList, CodeEditorMode, ListRelationState } from '../../../type';
 
 import codeBlockEditor from './CodeBlockEditor.vue';
@@ -126,15 +126,11 @@ const editable = computed(() => services?.codeBlockService.getEditStatus());
 const isShowCodeBlockEditor = computed(() => services?.codeBlockService.getCodeEditorShowStatus() || false);
 
 // 根据代码块ID获取其绑定的组件信息
-const getBindCompsByCodeId = (codeId: string, codeBlockContent: CodeBlockContent) => {
-  if (isEmpty(codeBlockContent) || isEmpty(codeBlockContent.comps)) {
-    state.bindComps[codeId] = [];
-    return;
-  }
-  const compsField = codeBlockContent.comps as CodeRelation;
-  const bindCompIds = Object.keys(compsField);
-  const bindCompsFiltered = bindCompIds.filter((compId) => !isEmpty(compsField[compId]));
-  const compsInfo = bindCompsFiltered.map((compId) => ({
+const getBindCompsByCodeId = (codeId: string) => {
+  const codeCombineInfo = services?.codeBlockService.getCombineInfo();
+  if (!codeCombineInfo) return null;
+  const bindCompsId = Object.keys(codeCombineInfo[codeId]);
+  const compsInfo = bindCompsId.map((compId) => ({
     id: compId,
     name: getCompName(compId),
   }));
@@ -147,7 +143,7 @@ const initList = async () => {
   if (!codeDsl) return;
   state.codeList = [];
   forIn(codeDsl, (value: CodeBlockContent, codeId: string) => {
-    getBindCompsByCodeId(codeId, value);
+    getBindCompsByCodeId(codeId);
     state.codeList.push({
       id: codeId,
       name: value.name,

@@ -19,7 +19,7 @@
 import type { Component } from 'vue';
 
 import type { FormConfig } from '@tmagic/form';
-import type { Id, MApp, MContainer, MNode, MPage } from '@tmagic/schema';
+import type { CodeBlockContent, CodeBlockDSL, Id, MApp, MContainer, MNode, MPage } from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
 import type { ContainerHighlightType, MoveableOptions } from '@tmagic/stage';
 
@@ -309,28 +309,13 @@ export interface ScrollViewerEvent {
   scrollWidth: number;
 }
 
-export interface CodeBlockDSL {
-  [id: string]: CodeBlockContent;
-}
-
-export interface CodeBlockContent {
-  /** 代码块名称 */
-  name: string;
-  /** 代码块内容 */
-  content: string;
-  /** 代码块与组件的绑定关系 */
-  comps?: CodeRelation;
-  /** 扩展字段 */
-  [propName: string]: any;
-}
-
 export type CodeState = {
   /** 是否展示代码块编辑区 */
   isShowCodeEditor: boolean;
   /** 代码块DSL数据源 */
   codeDsl: CodeBlockDSL | null;
   /** 当前选中的代码块id */
-  id: string;
+  id: Id;
   /** 代码块是否可编辑 */
   editable: boolean;
   /** 代码编辑面板的展示模式 */
@@ -338,12 +323,23 @@ export type CodeState = {
   /** list模式下左侧展示的代码列表 */
   combineIds: string[];
   /** 为业务逻辑预留的不可删除的代码块列表，由业务逻辑维护（如代码块上线后不可删除） */
-  undeletableList: string[];
+  undeletableList: Id[];
+  /** 代码块和组件的绑定关系 */
+  relations: CodeRelation;
+};
+
+export type HookData = {
+  /** 代码块id */
+  codeId: Id;
+  /** 参数 */
+  params?: object;
 };
 
 export type CodeRelation = {
-  /** 组件id:['created'] */
-  [compId: string | number]: string[];
+  [codeId: Id]: {
+    /** 组件id:['created'] */
+    [compId: Id]: string[];
+  };
 };
 
 export enum CodeEditorMode {
@@ -355,7 +351,7 @@ export enum CodeEditorMode {
 
 export interface CodeDslList {
   /** 代码块id */
-  id: string;
+  id: Id;
   /** 代码块名称 */
   name: string;
   /** 代码块函数内容 */
@@ -370,10 +366,10 @@ export interface ListState {
 }
 
 export interface ListRelationState extends ListState {
-  /** 与代码块绑定的组件id信息 */
+  /** 与代码块绑定的组件信息 */
   bindComps: {
     /** 代码块id : 组件信息 */
-    [id: string]: MNode[];
+    [id: Id]: MNode[];
   };
 }
 

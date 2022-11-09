@@ -73,7 +73,7 @@ export interface MApp extends MComponent {
 }
 
 export interface CodeBlockDSL {
-  [id: string]: CodeBlockContent;
+  [id: Id]: CodeBlockContent;
 }
 
 export interface CodeBlockContent {
@@ -81,10 +81,18 @@ export interface CodeBlockContent {
   name: string;
   /** 代码块内容 */
   content: any;
+  /** 扩展字段 */
+  [propName: string]: any;
 }
+
 export interface PastePosition {
   left?: number;
   top?: number;
 }
 
 export type MNode = MComponent | MContainer | MPage | MApp;
+
+export enum HookType {
+  /** 代码块钩子标识 */
+  CODE = 'code',
+}

@@ -77,19 +77,6 @@
 
 .m-fields-code-select {
   width: 100%;
-  .el-card__body {
-    padding: 5px;
-  }
-  .tool-bar {
-    display: flex;
-    align-items: center;
-    justify-content: end;
-    height: 20px;
-    .tool-item {
-      display: flex;
-      align-items: center;
-    }
-  }
 }
 .code-editor-dialog {
   .el-dialog__body {

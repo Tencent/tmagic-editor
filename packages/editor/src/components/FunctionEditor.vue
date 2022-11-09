@@ -23,6 +23,7 @@
 import { inject, ref, watchEffect } from 'vue';
 
 import { TMagicCard, TMagicInput, tMagicMessage } from '@tmagic/design';
+import { Id } from '@tmagic/schema';
 
 import type { Services } from '../type';
 
@@ -30,7 +31,7 @@ import CodeDraftEditor from './CodeDraftEditor.vue';
 
 const props = withDefaults(
   defineProps<{
-    id: string;
+    id: Id;
     name: string;
     content: string;
     editable?: boolean;

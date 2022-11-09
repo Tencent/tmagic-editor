@@ -1,96 +1,131 @@
 <template>
   <div class="m-fields-code-select" :key="fieldKey">
     <TMagicCard shadow="never">
-      <template #header>
-        <m-fields-select
-          :config="selectConfig"
-          :model="model"
-          :prop="prop"
-          :name="name"
-          :size="size"
-          @change="changeHandler"
-        ></m-fields-select>
-      </template>
-      <div class="tool-bar">
-        <TMagicTooltip class="tool-item" effect="dark" content="查看代码块" placement="top">
-          <svg
-            @click="viewHandler"
-            preserveAspectRatio="xMidYMid meet"
-            viewBox="0 0 24 24"
-            width="15px"
-            height="15px"
-            data-v-65a7fb6c=""
-          >
-            <path
-              fill="currentColor"
-              d="m23 12l-7.071 7.071l-1.414-1.414L20.172 12l-5.657-5.657l1.414-1.414L23 12zM3.828 12l5.657 5.657l-1.414 1.414L1 12l7.071-7.071l1.414 1.414L3.828 12z"
-            ></path>
-          </svg>
-        </TMagicTooltip>
-      </div>
+      <m-form-table
+        :config="tableConfig"
+        :model="model[name]"
+        :name="tableConfig.name"
+        :prop="prop"
+        :size="size"
+        @change="changeHandler"
+      >
+      </m-form-table>
     </TMagicCard>
   </div>
 </template>
 
 <script lang="ts" setup name="MEditorCodeSelect">
-import { computed, defineEmits, defineProps, inject, ref, watchEffect } from 'vue';
+import { computed, defineEmits, defineProps, inject, ref } from 'vue';
 import { map, xor } from 'lodash-es';
 
-import { TMagicCard, tMagicMessage, TMagicTooltip } from '@tmagic/design';
-import { FormState, SelectConfig } from '@tmagic/form';
+import { TMagicCard } from '@tmagic/design';
+import { FormState, TableConfig } from '@tmagic/form';
 
 import type { Services } from '../type';
-import { CodeEditorMode, CodeSelectOp } from '../type';
+import { CodeSelectOp } from '../type';
 const services = inject<Services>('services');
 const form = inject<FormState>('mForm');
 const emit = defineEmits(['change']);
 
 const props = defineProps<{
   config: {
-    selectConfig?: SelectConfig;
+    tableConfig?: TableConfig;
   };
   model: any;
   prop: string;
   name: string;
-  size: string;
+  size: 'mini' | 'small' | 'medium';
 }>();
 
-const selectConfig = computed(() => {
+const tableConfig = computed(() => {
   const defaultConfig = {
-    multiple: true,
-    options: async () => {
-      const codeDsl = await services?.codeBlockService.getCodeDsl();
-      if (codeDsl) {
-        return map(codeDsl, (value, key) => ({
-          text: `${value.name}（${key}）`,
-          label: `${value.name}（${key}）`,
-          value: key,
-        }));
-      }
-      return [];
-    },
+    dropSort: true,
+    items: [
+      {
+        type: 'select',
+        label: '代码块',
+        name: 'codeId',
+        options: async () => {
+          const codeDsl = await services?.codeBlockService.getCodeDsl();
+          if (codeDsl) {
+            return map(codeDsl, (value, key) => ({
+              text: `${value.name}（${key}）`,
+              label: `${value.name}（${key}）`,
+              value: key,
+            }));
+          }
+          return [];
+        },
+      },
+      // {
+      //   label: '参数',
+      //   name: 'params',
+      //   filter: v=>JSON.stringify(v)
+      // },
+    ],
   };
   return {
+    name: 'data',
     ...defaultConfig,
-    ...props.config.selectConfig,
+    ...props.config.tableConfig,
   };
 });
+
+// const selectModel = computed(() => {
+//   console.log("props.model[props.name].data",props.model[props.name].data)
+//   return {
+//     [props.name]: props.model[props.name]?.data?.map((item: { codeId: Id }) => item.codeId) || []
+//   }
+// });
+
+// watch(
+//   () => selectModel.value,
+//   () => {
+//     const selectData
+//     if (isEmpty(selectModel)) return;
+//     const hookData = selectModel.value.map((selectedCodeId: Id) => ({
+//       codeId: selectedCodeId,
+//     }));
+//     console.log('hookData', hookData);
+//     if (isEmpty(hookData)) return;
+//     if (!props.model[props.name]?.data || isEmpty(props.model[props.name]?.data)) {
+//       // 新增hook
+//       props.model[props.name] = {
+//         hookType: HookType.CODE,
+//         data: hookData,
+//       };
+//     } else {
+//       // 新增hook data
+//       props.model[props.name].data = {
+//         ...props.model[props.name].data,
+//         ...hookData,
+//       };
+//     }
+//     console.log('-0-props.model[props.name]--', props.model[props.name]);
+//   },
+//   {
+//     deep: true,
+//     immediate: true,
+//   },
+// );
+
 const fieldKey = ref('');
 const multiple = ref(true);
 const lastTagSnapshot = ref<string[]>([]);
 
-watchEffect(async () => {
-  if (!props.model[props.name]) return;
-  const combineNames = await Promise.all(
-    props.model[props.name].map(async (id: string) => {
-      const { name = '' } = (await services?.codeBlockService.getCodeContentById(id)) || {};
-      return name;
-    }),
-  );
-  fieldKey.value = combineNames.join('-');
-});
+// watchEffect(async () => {
+//   if (isEmpty(selectModel)) return;
+//   const combineNames = await Promise.all(
+//     selectModel.value[props.name].map(async (id: string) => {
+//       const { name = '' } = (await services?.codeBlockService.getCodeContentById(id)) || {};
+//       return name;
+//     }),
+//   );
+//   fieldKey.value = combineNames.join('-');
+// });
 
 const changeHandler = async (value: any) => {
+  console.log('---value--', value);
   let codeIds = value;
   if (typeof value === 'string') {
     multiple.value = false;
@@ -118,14 +153,14 @@ const setCombineRelation = async (codeIds: string[]) => {
   await services?.codeBlockService.setCombineRelation(id, diffValues, opFlag, props.prop);
 };
 
-const viewHandler = async () => {
-  if (props.model[props.name].length === 0) {
-    tMagicMessage.error('请先绑定代码块');
-    return;
-  }
-  // 记录当前已被绑定的代码块，为查看弹窗的展示内容
-  await services?.codeBlockService.setCombineIds(props.model[props.name]);
-  await services?.codeBlockService.setMode(CodeEditorMode.LIST);
-  services?.codeBlockService.setCodeEditorContent(true, props.model[props.name][0]);
-};
+// const viewHandler = async () => {
+//   if (props.model[props.name].length === 0) {
+//     tMagicMessage.error('请先绑定代码块');
+//     return;
+//   }
+//   // 记录当前已被绑定的代码块，为查看弹窗的展示内容
+//   await services?.codeBlockService.setCombineIds(props.model[props.name]);
+//   await services?.codeBlockService.setMode(CodeEditorMode.LIST);
+//   services?.codeBlockService.setCodeEditorContent(true, props.model[props.name][0]);
+// };
 </script>

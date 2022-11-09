@@ -52,7 +52,7 @@
           ></FunctionEditor>
         </div>
       </template>
-    </layout>
+    </Layout>
   </TMagicDialog>
 </template>
 
@@ -61,10 +61,11 @@ import { computed, inject, reactive, ref, watchEffect } from 'vue';
 import { cloneDeep, forIn, isEmpty } from 'lodash-es';
 
 import { TMagicDialog, TMagicTree } from '@tmagic/design';
+import { CodeBlockContent } from '@tmagic/schema';
 
 import FunctionEditor from '../../../components/FunctionEditor.vue';
 import Layout from '../../../components/Layout.vue';
-import type { CodeBlockContent, CodeDslList, ListState, Services } from '../../../type';
+import type { CodeDslList, ListState, Services } from '../../../type';
 import { CodeEditorMode } from '../../../type';
 import { serializeConfig } from '../../../utils/editor';
 
@@ -85,6 +86,8 @@ const id = computed(() => services?.codeBlockService.getId() || '');
 const editable = computed(() => services?.codeBlockService.getEditStatus());
 // 当前选中组件绑定的代码块id数组
 const selectedIds = computed(() => services?.codeBlockService.getCombineIds() || []);
+
+services?.codeBlockService.getCombineInfo();
 
 watchEffect(async () => {
   codeConfig.value = cloneDeep(await services?.codeBlockService.getCodeContentById(id.value)) || null;

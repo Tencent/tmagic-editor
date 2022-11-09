@@ -24,19 +24,13 @@ export default {
     code_5336: {
       name: 'getData',
       // eslint-disable-next-line no-eval
-      content: eval(`(vm) => {\n  console.log("this is getData function")\n}`),
-      comps: {
-        page_299: ['mounted', 'created'],
-      },
+      content: eval(`(vm, params) => {\n  console.log("this is getData function",vm,params)\n}`),
+      params: ['name', 'age'],
     },
     code_5316: {
       name: 'getList',
       // eslint-disable-next-line no-eval
       content: eval(`(vm) => {\n  console.log("this is getList function")\n}`),
-      comps: {
-        text_9027: ['created'],
-        page_299: ['created'],
-      },
     },
   },
   items: [
@@ -63,8 +57,29 @@ export default {
         fontWeight: '',
       },
       events: [],
-      created: ['code_5316', 'code_5336'],
-      mounted: ['code_5336'],
+      created: {
+        hookType: 'code',
+        data: [
+          {
+            codeId: 'code_5336',
+            params: {
+              name: 'lisa',
+              age: 12,
+            },
+          },
+          {
+            codeId: 'code_5316',
+          },
+        ],
+      },
+      mounted: {
+        hookType: 'code',
+        data: [
+          {
+            codeId: 'code_5316',
+          },
+        ],
+      },
       items: [
         {
           type: 'text',
@@ -89,7 +104,14 @@ export default {
           text: 'Tmagic editor 营销活动编辑器',
           multiple: true,
           events: [],
-          created: ['code_5316'],
+          created: {
+            hookType: 'code',
+            data: [
+              {
+                codeId: 'code_5316',
+              },
+            ],
+          },
         },
         {
           type: 'qrcode',
