@@ -85,6 +85,11 @@ class Node extends EventEmitter {
   }
 
   private async runCodeBlock(hook: string) {
+    if (typeof this.data[hook] === 'function') {
+      // 兼容旧的数据格式
+      await this.data[hook](this);
+      return;
+    }
     if (this.data[hook]?.hookType !== HookType.CODE || !this.app.codeDsl || isEmpty(this.app?.codeDsl)) return;
     for (const item of this.data[hook].hookData) {
       const { codeId, params = {} } = item;
