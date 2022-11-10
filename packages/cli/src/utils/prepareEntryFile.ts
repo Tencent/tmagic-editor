@@ -3,21 +3,26 @@ import * as recast from 'recast';
 import type App from '../Core';
 import { EntryType } from '../types';
 
-export const prepareEntryFile = (app: App) => {
+export const prepareEntryFile = async (app: App) => {
   const { componentMap = {}, pluginMap = {}, configMap = {}, valueMap = {}, eventMap = {} } = app.moduleMainFilePath;
-  const { componentFileAffix, dynamicImport } = app.options;
+  const { componentFileAffix, dynamicImport, hooks } = app.options;
+  const contentMap: Record<string, string> = {
+    'comp-entry.ts': generateContent(EntryType.COMPONENT, componentMap, componentFileAffix),
+    'async-comp-entry.ts': generateContent(EntryType.COMPONENT, componentMap, componentFileAffix, dynamicImport),
+    'plugin-entry.ts': generateContent(EntryType.PLUGIN, pluginMap),
+    'async-plugin-entry.ts': generateContent(EntryType.PLUGIN, pluginMap, '', dynamicImport),
+    'config-entry.ts': generateContent(EntryType.CONFIG, configMap),
+    'value-entry.ts': generateContent(EntryType.VALUE, valueMap),
+    'event-entry.ts': generateContent(EntryType.EVENT, eventMap),
+  };
 
-  app.writeTemp('comp-entry.ts', generateContent(EntryType.COMPONENT, componentMap, componentFileAffix));
-  app.writeTemp(
-    'async-comp-entry.ts',
-    generateContent(EntryType.COMPONENT, componentMap, componentFileAffix, dynamicImport),
-  );
+  if (typeof hooks?.beforeWriteEntry === 'function') {
+    await hooks.beforeWriteEntry(contentMap, app);
+  }
 
-  app.writeTemp('plugin-entry.ts', generateContent(EntryType.PLUGIN, pluginMap));
-  app.writeTemp('async-plugin-entry.ts', generateContent(EntryType.PLUGIN, pluginMap, '', dynamicImport));
-  app.writeTemp('config-entry.ts', generateContent(EntryType.CONFIG, configMap));
-  app.writeTemp('value-entry.ts', generateContent(EntryType.VALUE, valueMap));
-  app.writeTemp('event-entry.ts', generateContent(EntryType.EVENT, eventMap));
+  Object.keys(contentMap).forEach((fileName: string) => {
+    app.writeTemp(fileName, contentMap[fileName]);
+  });
 };
 
 const generateContent = (

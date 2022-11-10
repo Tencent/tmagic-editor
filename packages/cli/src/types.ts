@@ -60,6 +60,9 @@ export interface UserConfig {
   npmConfig?: NpmConfig;
   /** 是否使用import()加载组件 */
   dynamicImport?: boolean;
+  hooks?: {
+    beforeWriteEntry?: (genContentMap: Record<string, string>, app: Core) => void;
+  };
   onInit?: (app: Core) => ModuleMainFilePath | Promise<ModuleMainFilePath>;
   onPrepare?: (app: Core) => void;
 }
