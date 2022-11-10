@@ -461,7 +461,6 @@ class Editor extends BaseService {
     newConfig = mergeWith(cloneDeep(node), newConfig, (objValue, srcValue) => {
       if (isObject(srcValue) && Array.isArray(objValue)) {
         // 原来的配置是数组，新的配置是对象，则直接使用新的值
-        console.log('--srcValue-', srcValue);
         return srcValue;
       }
       if (Array.isArray(srcValue)) {
