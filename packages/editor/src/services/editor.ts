@@ -375,7 +375,9 @@ class Editor extends BaseService {
       }
     }
 
-    this.pushHistoryState();
+    if (!isPage(newNodes[0])) {
+      this.pushHistoryState();
+    }
 
     this.emit('add', newNodes);
 
@@ -437,8 +439,10 @@ class Editor extends BaseService {
 
     await Promise.all(nodes.map((node) => this.doRemove(node)));
 
-    // 更新历史记录
-    this.pushHistoryState();
+    if (!isPage(nodes[0])) {
+      // 更新历史记录
+      this.pushHistoryState();
+    }
 
     this.emit('remove', nodes);
   }
