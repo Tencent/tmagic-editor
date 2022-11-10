@@ -65,7 +65,7 @@ import { CodeBlockContent } from '@tmagic/schema';
 
 import FunctionEditor from '../../../components/FunctionEditor.vue';
 import Layout from '../../../components/Layout.vue';
-import type { CodeDslList, ListState, Services } from '../../../type';
+import type { CodeDslItem, ListState, Services } from '../../../type';
 import { CodeEditorMode } from '../../../type';
 import { serializeConfig } from '../../../utils/editor';
 
@@ -87,8 +87,6 @@ const editable = computed(() => services?.codeBlockService.getEditStatus());
 // 当前选中组件绑定的代码块id数组
 const selectedIds = computed(() => services?.codeBlockService.getCombineIds() || []);
 
-services?.codeBlockService.getCombineInfo();
-
 watchEffect(async () => {
   codeConfig.value = cloneDeep(await services?.codeBlockService.getCodeContentById(id.value)) || null;
   if (!codeConfig.value) return;
@@ -108,7 +106,7 @@ watchEffect(async () => {
   currentTitle.value = state.codeList[0]?.name || '';
 });
 
-const selectHandler = (data: CodeDslList) => {
+const selectHandler = (data: CodeDslItem) => {
   services?.codeBlockService.setId(data.id);
   currentTitle.value = data.name;
 };

@@ -349,7 +349,7 @@ export enum CodeEditorMode {
   EDITOR = 'editor',
 }
 
-export interface CodeDslList {
+export interface CodeDslItem {
   /** 代码块id */
   id: Id;
   /** 代码块名称 */
@@ -358,19 +358,20 @@ export interface CodeDslList {
   codeBlockContent?: CodeBlockContent;
   /** 是否展示代码绑定关系 */
   showRelation?: boolean;
+  /** 代码块对应绑定的组件信息 */
+  combineInfo?: CombineInfo[];
+}
+
+export interface CombineInfo {
+  /** 组件id */
+  compId: Id;
+  /** 组件名称 */
+  compName: string;
 }
 
 export interface ListState {
   /** 代码块列表 */
-  codeList: CodeDslList[];
-}
-
-export interface ListRelationState extends ListState {
-  /** 与代码块绑定的组件信息 */
-  bindComps: {
-    /** 代码块id : 组件信息 */
-    [id: Id]: MNode[];
-  };
+  codeList: CodeDslItem[];
 }
 
 export enum CodeDeleteErrorType {
@@ -378,15 +379,6 @@ export enum CodeDeleteErrorType {
   UNDELETEABLE = 'undeleteable',
   /** 代码块存在绑定关系 */
   BIND = 'bind',
-}
-
-export enum CodeSelectOp {
-  /** 增加 */
-  ADD = 'add',
-  /** 删除 */
-  DELETE = 'delete',
-  /** 单选修改 */
-  CHANGE = 'change',
 }
 
 // 代码块草稿localStorage key

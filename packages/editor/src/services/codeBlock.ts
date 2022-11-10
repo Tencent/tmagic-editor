@@ -23,8 +23,8 @@ import { CodeBlockContent, CodeBlockDSL, HookType, Id, MApp, MNode } from '@tmag
 
 import editorService from '../services/editor';
 import type { CodeRelation, CodeState, HookData } from '../type';
-import { CODE_DRAFT_STORAGE_KEY, CodeEditorMode, CodeSelectOp } from '../type';
-import { error, info } from '../utils/logger';
+import { CODE_DRAFT_STORAGE_KEY, CodeEditorMode } from '../type';
+import { info } from '../utils/logger';
 
 import BaseService from './BaseService';
 
@@ -242,84 +242,23 @@ class CodeBlock extends BaseService {
   }
 
   /**
-   * 设置绑定关系
-   * @param {Id} 组件id
-   * @param {string[]} diffCodeIds 代码块id数组
-   * @param {CodeSelectOp} opFlag 操作类型
-   * @param {string} hook 代码块挂载hook名称
+   * 刷新绑定关系
    * @returns {void}
    */
-  public async setCombineRelation(compId: Id, diffCodeIds: string[], opFlag: CodeSelectOp, hook: string) {
-    const combineInfo = this.getCombineInfo();
-    if (!combineInfo) return;
-    if (opFlag === CodeSelectOp.DELETE) {
-      try {
-        diffCodeIds.forEach((codeId) => {
-          const compsContent = combineInfo[codeId];
-          const index = compsContent?.[compId].findIndex((item) => item === hook);
-          if (typeof index !== 'undefined' && index !== -1) {
-            compsContent?.[compId].splice(index, 1);
-          }
-        });
-      } catch (e) {
-        error(e);
-        throw new Error('解绑代码块失败');
-      }
-    } else if (opFlag === CodeSelectOp.ADD) {
-      try {
-        diffCodeIds.forEach((codeId) => {
-          const compsContent = combineInfo[codeId];
-          const existHooks = compsContent?.[compId];
-          if (isEmpty(existHooks)) {
-            // comps属性不存在，或者comps为空：新增
-            combineInfo[codeId] = {
-              ...(combineInfo[codeId] || {}),
-              [compId]: [hook],
-            };
-          } else {
-            // 往已有的关系中添加hook
-            existHooks?.push(hook);
-          }
-        });
-      } catch (e) {
-        error(e);
-        throw new Error('绑定代码块失败');
-      }
-    } else if (opFlag === CodeSelectOp.CHANGE) {
-      // 单选修改
-      forIn(combineInfo, (combineItem, codeId) => {
-        if (codeId === diffCodeIds[0]) {
-          // 增加
-          combineItem = {
-            ...(combineItem || {}),
-            [compId]: [hook],
-          };
-        } else if (isEmpty(diffCodeIds) || codeId !== diffCodeIds[0]) {
-          // 清空或者移除之前的选项
-          const compHooks = combineItem?.[compId];
-          // continue
-          if (!compHooks) return true;
-          const index = compHooks.findIndex((hookName) => hookName === hook);
-          if (index !== -1) {
-            compHooks.splice(index, 1);
-            // break
-            return false;
-          }
-        }
-      });
-    }
-    console.log('---combineInfo--', combineInfo);
-    console.log('---this.state.relations--', this.state.relations);
+  public refreshCombineInfo(): CodeRelation | null {
+    const root = editorService.get<MApp | null>('root');
+    if (!root) return null;
+    const relations = {};
+    this.recurseMNode(root, relations);
+    this.state.relations = relations;
+    return this.state.relations;
   }
 
   /**
    * 获取绑定关系
-   * @returns {CodeRelation | null}
+   * @returns {CodeRelation}
    */
-  public getCombineInfo(): CodeRelation | null {
-    const root = editorService.get<MApp | null>('root');
-    if (!root) return null;
-    this.recurseMNode(root);
+  public getCombineInfo(): CodeRelation {
     return this.state.relations;
   }
 
@@ -429,17 +368,19 @@ class CodeBlock extends BaseService {
 
   /**
    * 递归遍历dsl中挂载了代码块的节点，并更新绑定关系数据
-   * @param {MNode} node 节点信息
+   * @param {MContainer} node 节点信息
    * @returns void
    */
-  private recurseMNode(node: MNode) {
+  private recurseMNode(node: MNode, relations: CodeRelation) {
     forIn(node, (value, key) => {
-      if (value?.hookType === HookType.CODE && !isEmpty(value?.data)) {
-        value.data.forEach((relationItem: HookData) => {
-          if (!this.state.relations[relationItem.codeId]) {
-            this.state.relations[relationItem.codeId] = {};
+      if (value?.hookType === HookType.CODE && !isEmpty(value.hookData)) {
+        value.hookData.forEach((relationItem: HookData) => {
+          // continue
+          if (!relationItem.codeId) return;
+          if (!relations[relationItem.codeId]) {
+            relations[relationItem.codeId] = {};
           }
-          const codeItem = this.state.relations[relationItem.codeId];
+          const codeItem = relations[relationItem.codeId];
           if (isEmpty(codeItem[node.id])) {
             codeItem[node.id] = [];
           }
@@ -449,7 +390,7 @@ class CodeBlock extends BaseService {
     });
     if (!isEmpty(node.items)) {
       node.items.forEach((item: MNode) => {
-        this.recurseMNode(item);
+        this.recurseMNode(item, relations);
       });
     }
   }

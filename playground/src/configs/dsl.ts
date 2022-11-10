@@ -59,7 +59,7 @@ export default {
       events: [],
       created: {
         hookType: 'code',
-        data: [
+        hookData: [
           {
             codeId: 'code_5336',
             params: {
@@ -74,7 +74,7 @@ export default {
       },
       mounted: {
         hookType: 'code',
-        data: [
+        hookData: [
           {
             codeId: 'code_5316',
           },
@@ -106,7 +106,7 @@ export default {
           events: [],
           created: {
             hookType: 'code',
-            data: [
+            hookData: [
               {
                 codeId: 'code_5316',
               },

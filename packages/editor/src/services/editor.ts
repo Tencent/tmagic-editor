@@ -17,7 +17,7 @@
  */
 
 import { reactive, toRaw } from 'vue';
-import { cloneDeep, mergeWith, uniq } from 'lodash-es';
+import { cloneDeep, isObject, mergeWith, uniq } from 'lodash-es';
 
 import type { CodeBlockDSL, Id, MApp, MComponent, MContainer, MNode, MPage } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
@@ -459,6 +459,11 @@ class Editor extends BaseService {
     let newConfig = await this.toggleFixedPosition(toRaw(config), node, this.get<MApp>('root'));
 
     newConfig = mergeWith(cloneDeep(node), newConfig, (objValue, srcValue) => {
+      if (isObject(srcValue) && Array.isArray(objValue)) {
+        // 原来的配置是数组，新的配置是对象，则直接使用新的值
+        console.log('--srcValue-', srcValue);
+        return srcValue;
+      }
       if (Array.isArray(srcValue)) {
         return srcValue;
       }
@@ -521,7 +526,7 @@ class Editor extends BaseService {
     this.pushHistoryState();
 
     this.emit('update', newNodes);
-
+    codeBlockService.refreshCombineInfo();
     return Array.isArray(config) ? newNodes : newNodes[0];
   }
 
