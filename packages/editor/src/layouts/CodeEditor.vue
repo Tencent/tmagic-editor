@@ -12,7 +12,7 @@ const props = withDefaults(
   defineProps<{
     initValues?: string | Object;
     modifiedValues?: string | Object;
-    type?: string;
+    type?: 'diff';
     language?: string;
     options?: {
       [key: string]: any;
@@ -20,7 +20,6 @@ const props = withDefaults(
     autoSave?: boolean;
   }>(),
   {
-    type: '',
     autoSave: true,
     language: 'javascript',
     options: () => ({
