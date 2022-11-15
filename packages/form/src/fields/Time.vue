@@ -1,6 +1,8 @@
 <template>
   <TMagicTimePicker
     v-model="model[name]"
+    :value-format="config.valueFormat || 'HH:mm:ss'"
+    :format="config.format || 'HH:mm:ss'"
     :size="size"
     :placeholder="config.placeholder"
     :disabled="disabled"

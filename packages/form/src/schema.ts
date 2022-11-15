@@ -348,6 +348,7 @@ export interface HiddenConfig extends FormItem {
 export interface DateConfig extends FormItem, Input {
   type: 'date';
   format?: 'YYYY-MM-dd HH:mm:ss' | string;
+  valueFormat?: 'YYYY-MM-dd HH:mm:ss' | string;
 }
 
 /**
@@ -365,6 +366,8 @@ export interface DateTimeConfig extends FormItem, Input {
  */
 export interface TimeConfig extends FormItem, Input {
   type: 'time';
+  format?: 'HH:mm:ss' | string;
+  valueFormat?: 'HH:mm:ss' | string;
 }
 
 /**
