@@ -6,7 +6,7 @@ import { EntryType } from '../types';
 export const prepareEntryFile = async (app: App) => {
   const { componentMap = {}, pluginMap = {}, configMap = {}, valueMap = {}, eventMap = {} } = app.moduleMainFilePath;
   const { componentFileAffix, dynamicImport, hooks } = app.options;
-  const contentMap: Record<string, string> = {
+  let contentMap: Record<string, string> = {
     'comp-entry.ts': generateContent(EntryType.COMPONENT, componentMap, componentFileAffix),
     'async-comp-entry.ts': generateContent(EntryType.COMPONENT, componentMap, componentFileAffix, dynamicImport),
     'plugin-entry.ts': generateContent(EntryType.PLUGIN, pluginMap),
@@ -17,7 +17,7 @@ export const prepareEntryFile = async (app: App) => {
   };
 
   if (typeof hooks?.beforeWriteEntry === 'function') {
-    await hooks.beforeWriteEntry(contentMap, app);
+    contentMap = await hooks.beforeWriteEntry(contentMap, app);
   }
 
   Object.keys(contentMap).forEach((fileName: string) => {
