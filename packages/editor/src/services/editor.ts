@@ -788,6 +788,12 @@ class Editor extends BaseService {
     return root.codeBlocks || null;
   }
 
+  public getCodeDslSync(): CodeBlockDSL | null {
+    const root = this.get<MApp | null>('root');
+    if (!root) return null;
+    return root.codeBlocks || null;
+  }
+
   /**
    * 设置代码块到dsl的codeBlocks字段
    * @param {CodeBlockDSL} codeDsl 代码DSL

@@ -17,7 +17,7 @@
     </div>
   </div>
 </template>
-<script lang="ts" setup>
+<script lang="ts" setup name="MEditorCodeDraftEditor">
 import { computed, inject, ref, watchEffect } from 'vue';
 import type * as monaco from 'monaco-editor';
 

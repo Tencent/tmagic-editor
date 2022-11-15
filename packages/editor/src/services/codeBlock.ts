@@ -71,12 +71,17 @@ class CodeBlock extends BaseService {
 
   /**
    * 获取活动的代码块dsl数据源（默认从dsl中的codeBlocks字段读取）
+   * 方法要支持钩子添加扩展，会被重写为异步方法,因此这里显示写为异步以提醒调用者需以异步形式调用
    * @param {boolean} forceRefresh 是否强制从活动dsl拉取刷新
    * @returns {CodeBlockDSL | null}
    */
   public async getCodeDsl(forceRefresh = false): Promise<CodeBlockDSL | null> {
+    return this.getCodeDslSync(forceRefresh);
+  }
+
+  public getCodeDslSync(forceRefresh = false): CodeBlockDSL | null {
     if (!this.state.codeDsl || forceRefresh) {
-      this.state.codeDsl = await editorService.getCodeDsl();
+      this.state.codeDsl = editorService.getCodeDslSync();
     }
     return this.state.codeDsl;
   }

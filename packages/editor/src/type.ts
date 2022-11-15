@@ -383,3 +383,10 @@ export enum CodeDeleteErrorType {
 
 // 代码块草稿localStorage key
 export const CODE_DRAFT_STORAGE_KEY = 'magicCodeDraft';
+
+export interface CodeParamStatement {
+  /** 参数名称 */
+  name: string;
+  /** 参数类型 */
+  type?: string;
+}

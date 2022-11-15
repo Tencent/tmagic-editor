@@ -24,13 +24,21 @@ export default {
     code_5336: {
       name: 'getData',
       // eslint-disable-next-line no-eval
-      content: eval(`(vm, params) => {\n  console.log("this is getData function",vm,params)\n}`),
-      params: ['name', 'age'],
+      content: eval(`(vm, params) => {\n  console.log("this is getData function",params)\n}`),
+      params: [
+        {
+          name: 'age',
+        },
+        {
+          name: 'studentName',
+        },
+      ],
     },
     code_5316: {
       name: 'getList',
       // eslint-disable-next-line no-eval
       content: eval(`(vm) => {\n  console.log("this is getList function")\n}`),
+      params: [],
     },
   },
   items: [
@@ -63,20 +71,13 @@ export default {
           {
             codeId: 'code_5336',
             params: {
-              name: 'lisa',
-              age: 12,
+              studentName: 'lisa',
+              age: 14,
             },
           },
           {
             codeId: 'code_5316',
-          },
-        ],
-      },
-      mounted: {
-        hookType: 'code',
-        hookData: [
-          {
-            codeId: 'code_5316',
+            params: {},
           },
         ],
       },
@@ -104,14 +105,6 @@ export default {
           text: 'Tmagic editor 营销活动编辑器',
           multiple: true,
           events: [],
-          created: {
-            hookType: 'code',
-            hookData: [
-              {
-                codeId: 'code_5316',
-              },
-            ],
-          },
         },
         {
           type: 'qrcode',

@@ -81,10 +81,16 @@ export interface CodeBlockContent {
   name: string;
   /** 代码块内容 */
   content: any;
+  /** 参数定义 */
+  params: CodeParam[] | [];
   /** 扩展字段 */
   [propName: string]: any;
 }
 
+export interface CodeParam {
+  /** 参数名 */
+  name: string;
+}
 export interface PastePosition {
   left?: number;
   top?: number;

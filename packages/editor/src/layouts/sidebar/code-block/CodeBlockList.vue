@@ -145,7 +145,7 @@ const initList = async () => {
 };
 
 watch(
-  [() => services?.codeBlockService.getCodeDsl(), () => services?.codeBlockService.refreshCombineInfo()],
+  [() => services?.codeBlockService.getCodeDslSync(), () => services?.codeBlockService.refreshCombineInfo()],
   () => {
     initList();
   },
@@ -165,6 +165,7 @@ const createCodeBlock = async () => {
   const codeConfig: CodeBlockContent = {
     name: '代码块',
     content: `() => {\n  // place your code here\n}`,
+    params: [],
   };
   await codeBlockService.setMode(CodeEditorMode.EDITOR);
   const id = await codeBlockService.getUniqueId();

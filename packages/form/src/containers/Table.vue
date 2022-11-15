@@ -101,7 +101,7 @@
                   labelWidth="0"
                   :prop="getProp(scope.$index)"
                   :rules="column.rules"
-                  :config="makeConfig(column)"
+                  :config="makeConfig(column, scope.row)"
                   :model="scope.row"
                   :size="size"
                   @change="$emit('change', model[modelName])"
@@ -432,8 +432,11 @@ const toggleRowSelection = (row: any, selected: boolean) => {
   tMagicTable.value?.toggleRowSelection.call(tMagicTable.value, row, selected);
 };
 
-const makeConfig = (config: ColumnConfig) => {
+const makeConfig = (config: ColumnConfig, row: any) => {
   const newConfig = cloneDeep(config);
+  if (typeof config.itemsFunction === 'function') {
+    newConfig.items = config.itemsFunction(row);
+  }
   delete newConfig.display;
   return newConfig;
 };

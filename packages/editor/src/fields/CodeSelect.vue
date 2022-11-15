@@ -4,6 +4,7 @@
       :config="tableConfig"
       :model="model[name]"
       name="hookData"
+      :enableToggleMode="false"
       :prop="prop"
       :size="size"
       @change="changeHandler"
@@ -17,9 +18,9 @@ import { computed, defineEmits, defineProps, inject, watch } from 'vue';
 import { isEmpty, map } from 'lodash-es';
 
 import { FormItem, TableConfig } from '@tmagic/form';
-import { HookType } from '@tmagic/schema';
+import { HookType, Id } from '@tmagic/schema';
 
-import { Services } from '../type';
+import { CodeParamStatement, HookData, Services } from '../type';
 const services = inject<Services>('services');
 const emit = defineEmits(['change']);
 
@@ -32,19 +33,22 @@ const props = defineProps<{
   name: string;
   size: 'mini' | 'small' | 'medium';
 }>();
+const codeDsl = computed(() => services?.codeBlockService.getCodeDslSync());
 
 const tableConfig = computed<FormItem>(() => {
   const defaultConfig = {
     dropSort: true,
+    enableFullscreen: false,
+    border: true,
     items: [
       {
         type: 'select',
         label: '代码块',
         name: 'codeId',
-        options: async () => {
-          const codeDsl = await services?.codeBlockService.getCodeDsl();
-          if (codeDsl) {
-            return map(codeDsl, (value, key) => ({
+        width: '200px',
+        options: () => {
+          if (codeDsl.value) {
+            return map(codeDsl.value, (value, key) => ({
               text: `${value.name}（${key}）`,
               label: `${value.name}（${key}）`,
               value: key,
@@ -52,6 +56,16 @@ const tableConfig = computed<FormItem>(() => {
           }
           return [];
         },
+        onChange: (formState: any, codeId: Id, { model }: any) => {
+          // 参数的items是根据函数生成的，当codeId变化后修正model的值，避免写入其他codeId的params
+          model.params = {};
+        },
+      },
+      {
+        name: 'params',
+        label: '参数',
+        defaultValue: {},
+        itemsFunction: (row: HookData) => getParamsConfig(row.codeId),
       },
     ],
   };
@@ -71,15 +85,6 @@ watch(
         hookType: HookType.CODE,
         hookData: [],
       };
-    } else if (Array.isArray(value) && value.length > 0) {
-      // 兼容旧的数据结构 ['code1','code2']
-      const hookData = value.map((codeId) => ({
-        codeId,
-      }));
-      props.model[props.name] = {
-        hookType: HookType.CODE,
-        hookData,
-      };
     }
   },
   {
@@ -89,5 +94,17 @@ watch(
 
 const changeHandler = async () => {
   emit('change', props.model[props.name]);
+};
+
+const getParamsConfig = (codeId: Id) => {
+  if (!codeDsl.value) return [];
+  const paramStatements = codeDsl.value[codeId]?.params;
+  if (isEmpty(paramStatements)) return [];
+  return paramStatements.map((paramState: CodeParamStatement) => ({
+    name: paramState.name,
+    text: paramState.name,
+    labelWidth: '100px',
+    type: 'text',
+  }));
 };
 </script>
