@@ -55,4 +55,5 @@ export type ColumnConfig = {
   sortable?: boolean | 'custom';
   action?: 'tip' | 'actionLink' | 'img' | 'link' | 'tag';
   handler?: (row: any) => void;
+  expandContent?: (row: any, prop?: string) => string;
 };

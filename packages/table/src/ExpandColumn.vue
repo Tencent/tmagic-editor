@@ -12,6 +12,7 @@
         :config="config.form"
         :init-values="config.values || (config.prop && scope.row[config.prop]) || {}"
       ></MForm>
+      <div v-if="config.expandContent" v-html="config.expandContent(scope.row, config.prop)"></div>
     </template>
   </TMagicTableColumn>
 </template>
