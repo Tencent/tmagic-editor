@@ -1,3 +1,12 @@
+# [1.2.0-beta.13](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.12...v1.2.0-beta.13) (2022-11-15)
+
+
+### Bug Fixes
+
+* **form:** time value改成HH:mm:ss字符串,支持配置 ([4fe45eb](https://github.com/Tencent/tmagic-editor/commit/4fe45eb36df988bbcb972b7599d62f2f9a3d3276))
+
+
+
 # [1.2.0-beta.12](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.11...v1.2.0-beta.12) (2022-11-15)
 
 
