@@ -1,3 +1,33 @@
+# [1.2.0-beta.12](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.11...v1.2.0-beta.12) (2022-11-15)
+
+
+### Bug Fixes
+
+* **cli:** entry生成路径错误问题 ([f5a8d6b](https://github.com/Tencent/tmagic-editor/commit/f5a8d6bdc6e490fbe45fa3472cb6430562d407ab))
+* **editor:** 修复自动保存提示不展示的问 ([0f0ec18](https://github.com/Tencent/tmagic-editor/commit/0f0ec183a869f8530fc39f9cfd533640d707ca98)), closes [#440](https://github.com/Tencent/tmagic-editor/issues/440)
+* **editor:** 区分直接关闭和保存后关闭 ([0eab817](https://github.com/Tencent/tmagic-editor/commit/0eab817a1132561383b545c13c8c90c31f58d5b7)), closes [#440](https://github.com/Tencent/tmagic-editor/issues/440)
+* **editor:** 新增删除页面不应该添加历史 ([3e78a08](https://github.com/Tencent/tmagic-editor/commit/3e78a0809b776081d6f56076770e3b8acba0e993))
+* 代码块结构改造完成 ([c7a8552](https://github.com/Tencent/tmagic-editor/commit/c7a8552d9b9de6709b5a36070cbcbcd2739c02ed))
+* 优化组件列表多选键盘快捷键监听体验 ([b2702aa](https://github.com/Tencent/tmagic-editor/commit/b2702aaa9e3a74194626dee5599a444dd402e154))
+
+
+### Features
+
+* **cli:** ast 解析入口文件优化 ([04e1857](https://github.com/Tencent/tmagic-editor/commit/04e18572fd6cd76b80610d4c7b1cf05cf40eaabd))
+* **cli:** hooks.beforeWriteEntry 改为 async ([cc21c47](https://github.com/Tencent/tmagic-editor/commit/cc21c47829e59be85270b325b884dbcf21d3d83e))
+* **cli:** 优化 logger，优化 ast 解析 ([958bcd3](https://github.com/Tencent/tmagic-editor/commit/958bcd3ec5fc964532e13bb623a5ac36f898915c))
+* **cli:** 增加 hook.beforeWriteEntry ([4c94fa0](https://github.com/Tencent/tmagic-editor/commit/4c94fa0a8fa0cbb9618017709bd2479629d4ac52))
+* **cli:** 文件声明“不合法”修改为“缺失” ([6c5cc55](https://github.com/Tencent/tmagic-editor/commit/6c5cc55f31d7c6b3872a64cf464a53799efd757f))
+* **cli:** 设置 dynamicImport 时生成 async-plugin-entry ([258ac4d](https://github.com/Tencent/tmagic-editor/commit/258ac4d56b1da3bf8b2e0fcd1c6189a13efc7793))
+* core代码执行兼容老的数据格式 ([a03ac7c](https://github.com/Tencent/tmagic-editor/commit/a03ac7c78b3b0a15ebb3744593ee40769d6e126d))
+* **editor:** 代码块支持传递参数 (merge request !9) ([16f671c](https://github.com/Tencent/tmagic-editor/commit/16f671cd8fa0a077a1b00ac374635671412804b3))
+* **editor:** 代码编辑新增草稿功能 ([3673d60](https://github.com/Tencent/tmagic-editor/commit/3673d6016de1289104dd39c77c7f7bbd705f42a0)), closes [#440](https://github.com/Tencent/tmagic-editor/issues/440)
+* **editor:** 拆分代码块编辑器便于以后扩展,支持草稿自动保存,修复代码块列表的样式问题 ([d98d374](https://github.com/Tencent/tmagic-editor/commit/d98d3748d36e3a87e726a27a6f2d851b0c26bf75)), closes [#440](https://github.com/Tencent/tmagic-editor/issues/440)
+* **table:** 支持expand内容可以为html ([f824b66](https://github.com/Tencent/tmagic-editor/commit/f824b661bd897eefce567691c7f3ac55046246de))
+* 修改code_block结构,组件代码关系绑定改为table,绑定关系更新未完成 ([c4293f1](https://github.com/Tencent/tmagic-editor/commit/c4293f17a679015277a4547cae2bf391f10b9fda))
+
+
+
 # [1.2.0-beta.11](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.10...v1.2.0-beta.11) (2022-11-08)
 
 
