@@ -1,5 +1,5 @@
 <template>
-  <div class="m-editor-wrapper">
+  <div class="m-editor-wrapper" :class="isFullScreen ? 'fullScreen' : 'normal'">
     <magic-code-editor
       ref="codeEditor"
       class="m-editor-container"
@@ -9,10 +9,16 @@
       :options="codeOptions"
     ></magic-code-editor>
     <div class="m-editor-content-bottom" v-if="editable">
+      <TMagicButton type="primary" class="button" @click="toggleFullScreen">
+        {{ isFullScreen ? '退出全屏' : '全屏' }}</TMagicButton
+      >
       <TMagicButton type="primary" class="button" @click="saveCode">保存</TMagicButton>
       <TMagicButton type="primary" class="button" @click="close">关闭</TMagicButton>
     </div>
     <div class="m-editor-content-bottom" v-else>
+      <TMagicButton type="primary" class="button" @click="toggleFullScreen">
+        {{ isFullScreen ? '退出全屏' : '全屏' }}</TMagicButton
+      >
       <TMagicButton type="primary" class="button" @click="close">关闭</TMagicButton>
     </div>
   </div>
@@ -57,6 +63,7 @@ const editorContent = ref<string>('');
 const codeEditor = ref<InstanceType<typeof MagicCodeEditor>>();
 // 原始代码内容
 const originCodeContent = ref<string>('');
+const isFullScreen = ref<boolean>(false);
 
 const codeOptions = computed(() => ({
   ...props.codeOptions,
@@ -125,6 +132,14 @@ const close = async () => {
       });
   } else {
     emit('close');
+  }
+};
+
+// 切换全屏
+const toggleFullScreen = () => {
+  isFullScreen.value = !isFullScreen.value;
+  if (codeEditor.value) {
+    codeEditor.value.focus();
   }
 };
 </script>

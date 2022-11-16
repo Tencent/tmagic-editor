@@ -46,6 +46,7 @@ const tableConfig = {
   border: true,
   enableFullscreen: false,
   name: 'params',
+  maxHeight: '150px',
   items: [
     {
       type: 'text',

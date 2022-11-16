@@ -78,6 +78,11 @@
 .m-fields-code-select {
   width: 100%;
 }
+
+.el-dialog.is-fullscreen.code-editor-dialog {
+  overflow: hidden;
+}
+
 .code-editor-dialog {
   .el-dialog__body {
     height: 90%;
@@ -149,7 +154,7 @@
     position: absolute;
     top: 0;
     left: 4px;
-    width: 100%;
+    width: calc(100% - 9px);
     height: 100%;
     z-index: 10;
     background: #fff;
@@ -160,8 +165,16 @@
 
   .m-editor-wrapper {
     height: 100%;
+    &.fullScreen {
+      height: 100%;
+      width: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 100;
+    }
     .m-editor-container {
-      height: calc(100% - 65px);
+      height: calc(100% - 45px);
     }
     .m-editor-content-bottom {
       height: 45px;
@@ -174,7 +187,7 @@
       bottom: 0;
       > button {
         height: 30px;
-        margin-top: 15px;
+        margin-top: 5px;
       }
     }
   }
