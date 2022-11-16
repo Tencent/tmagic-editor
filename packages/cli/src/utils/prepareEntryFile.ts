@@ -5,27 +5,30 @@ import { EntryType } from '../types';
 
 export const prepareEntryFile = async (app: App) => {
   const { componentMap = {}, pluginMap = {}, configMap = {}, valueMap = {}, eventMap = {} } = app.moduleMainFilePath;
-  const { componentFileAffix, dynamicImport, hooks } = app.options;
+  const { componentFileAffix, dynamicImport, hooks, useTs } = app.options;
+
   let contentMap: Record<string, string> = {
-    'comp-entry.ts': generateContent(EntryType.COMPONENT, componentMap, componentFileAffix),
-    'async-comp-entry.ts': generateContent(EntryType.COMPONENT, componentMap, componentFileAffix, dynamicImport),
-    'plugin-entry.ts': generateContent(EntryType.PLUGIN, pluginMap),
-    'async-plugin-entry.ts': generateContent(EntryType.PLUGIN, pluginMap, '', dynamicImport),
-    'config-entry.ts': generateContent(EntryType.CONFIG, configMap),
-    'value-entry.ts': generateContent(EntryType.VALUE, valueMap),
-    'event-entry.ts': generateContent(EntryType.EVENT, eventMap),
+    'comp-entry': generateContent(useTs, EntryType.COMPONENT, componentMap, componentFileAffix),
+    'async-comp-entry': generateContent(useTs, EntryType.COMPONENT, componentMap, componentFileAffix, dynamicImport),
+    'plugin-entry': generateContent(useTs, EntryType.PLUGIN, pluginMap),
+    'async-plugin-entry': generateContent(useTs, EntryType.PLUGIN, pluginMap, '', dynamicImport),
+    'config-entry': generateContent(useTs, EntryType.CONFIG, configMap),
+    'value-entry': generateContent(useTs, EntryType.VALUE, valueMap),
+    'event-entry': generateContent(useTs, EntryType.EVENT, eventMap),
   };
 
   if (typeof hooks?.beforeWriteEntry === 'function') {
     contentMap = await hooks.beforeWriteEntry(contentMap, app);
   }
 
-  Object.keys(contentMap).forEach((fileName: string) => {
-    app.writeTemp(fileName, contentMap[fileName]);
+  Object.keys(contentMap).forEach((file: string) => {
+    const fileName = `${file}.${useTs ? 'ts' : 'js'}`;
+    app.writeTemp(fileName, contentMap[file]);
   });
 };
 
 const generateContent = (
+  useTs = true,
   type: EntryType,
   map: Record<string, string>,
   componentFileAffix = '',
@@ -51,7 +54,7 @@ const generateContent = (
   const exportToken = `${type}s`;
 
   return prettyCode(`${importDeclarations.join(';')}
-    const ${exportToken}: Record<string, any> = {
+    const ${exportToken}${useTs ? ': Record<string, any>' : ''} = {
       ${list.join(',')}
     }
     export default ${exportToken};

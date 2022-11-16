@@ -60,6 +60,8 @@ export interface UserConfig {
   npmConfig?: NpmConfig;
   /** 是否使用import()加载组件 */
   dynamicImport?: boolean;
+  /** 入口文件是否生成为 ts 格式 */
+  useTs?: boolean;
   hooks?: {
     beforeWriteEntry?: (genContentMap: Record<string, string>, app: Core) => Promise<Record<string, string>>;
   };

@@ -8,5 +8,6 @@ cli({
   componentFileAffix: '',
   cleanTemp: true,
   temp: '.tmagic',
+  useTs: true,
   dynamicImport: false,
 });
