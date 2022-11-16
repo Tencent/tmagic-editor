@@ -56,12 +56,12 @@ export interface UserConfig {
   /** 组件文件后缀名，例如vue文件为.vue，tsx文件为.tsx，普通js文件则为.js */
   componentFileAffix: string;
   cleanTemp: boolean;
+  /** 入口文件是否生成为 ts 格式 */
+  useTs: boolean;
   /** npm 配置，用于当packages配置有npm包名时，可以自动安装npm包 */
   npmConfig?: NpmConfig;
   /** 是否使用import()加载组件 */
   dynamicImport?: boolean;
-  /** 入口文件是否生成为 ts 格式 */
-  useTs?: boolean;
   hooks?: {
     beforeWriteEntry?: (genContentMap: Record<string, string>, app: Core) => Promise<Record<string, string>>;
   };

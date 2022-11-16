@@ -28,7 +28,7 @@ export const prepareEntryFile = async (app: App) => {
 };
 
 const generateContent = (
-  useTs = true,
+  useTs: boolean,
   type: EntryType,
   map: Record<string, string>,
   componentFileAffix = '',
