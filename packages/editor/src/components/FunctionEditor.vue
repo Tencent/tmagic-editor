@@ -90,7 +90,7 @@ watchEffect(() => {
   codeContent.value = props.content;
 });
 
-const initTableModel = () => {
+const initTableModel = (): void => {
   const codeDsl = services?.codeBlockService.getCodeDslSync();
   if (!codeDsl) return;
   tableModel.value = {
@@ -131,7 +131,7 @@ const saveCode = async (codeValue: string): Promise<void> => {
 };
 
 // 保存并关闭
-const saveAndClose = async (codeValue: string) => {
+const saveAndClose = async (codeValue: string): Promise<void> => {
   await saveCode(codeValue);
   if (evalRes.value) {
     close();
@@ -139,7 +139,7 @@ const saveAndClose = async (codeValue: string) => {
 };
 
 // 关闭弹窗
-const close = () => {
+const close = (): void => {
   services?.codeBlockService.setCodeEditorShowStatus(false);
 };
 </script>

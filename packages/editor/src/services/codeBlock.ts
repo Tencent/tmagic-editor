@@ -173,7 +173,7 @@ class CodeBlock extends BaseService {
    * 获取当前选中的代码块内容
    * @returns {CodeBlockContent | null}
    */
-  public async getCurrentDsl() {
+  public async getCurrentDsl(): Promise<CodeBlockContent | null> {
     return await this.getCodeContentById(this.state.id);
   }
 
@@ -199,7 +199,7 @@ class CodeBlock extends BaseService {
    * @param {Id} id 代码块id
    * @returns {void}
    */
-  public setId(id: Id) {
+  public setId(id: Id): void {
     if (!id) return;
     this.state.id = id;
   }
@@ -248,7 +248,7 @@ class CodeBlock extends BaseService {
 
   /**
    * 刷新绑定关系
-   * @returns {void}
+   * @returns {CodeRelation | null}
    */
   public refreshCombineInfo(): CodeRelation | null {
     const root = editorService.get<MApp | null>('root');
@@ -335,14 +335,14 @@ class CodeBlock extends BaseService {
    * @param {MNode} compId 组件节点
    * @returns void
    */
-  public async deleteCompsInRelation(node: MNode) {
+  public async deleteCompsInRelation(node: MNode): Promise<void> {
     const codeDsl = cloneDeep(await this.getCodeDsl());
     if (!codeDsl) return;
     this.refreshRelationDeep(node, codeDsl);
     this.setCodeDsl(codeDsl);
   }
 
-  public destroy() {
+  public destroy(): void {
     this.state.isShowCodeEditor = false;
     this.state.codeDsl = null;
     this.state.id = '';
@@ -358,7 +358,7 @@ class CodeBlock extends BaseService {
    * @param {CodeBlockDSL} codeDsl 代码块
    * @returns void
    */
-  private refreshRelationDeep(node: MNode, codeDsl: CodeBlockDSL) {
+  private refreshRelationDeep(node: MNode, codeDsl: CodeBlockDSL): void {
     if (!node.id) return;
     forIn(codeDsl, (codeBlockContent) => {
       const compsContent = codeBlockContent.comps || {};
@@ -376,7 +376,7 @@ class CodeBlock extends BaseService {
    * @param {MContainer} node 节点信息
    * @returns void
    */
-  private recurseMNode(node: MNode, relations: CodeRelation) {
+  private recurseMNode(node: MNode, relations: CodeRelation): void {
     forIn(node, (value, key) => {
       if (value?.hookType === HookType.CODE && !isEmpty(value.hookData)) {
         value.hookData.forEach((relationItem: HookData) => {

@@ -112,7 +112,7 @@ const saveAndClose = (): void => {
 };
 
 // 关闭弹窗
-const close = async () => {
+const close = async (): Promise<void> => {
   const codeDraft = services?.codeBlockService.getCodeDraft(props.id);
   if (codeDraft) {
     tMagicMessageBox
@@ -136,7 +136,7 @@ const close = async () => {
 };
 
 // 切换全屏
-const toggleFullScreen = () => {
+const toggleFullScreen = (): void => {
   isFullScreen.value = !isFullScreen.value;
   if (codeEditor.value) {
     codeEditor.value.focus();
