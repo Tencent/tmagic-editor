@@ -1,6 +1,6 @@
 <template>
   <div ref="el" class="m-editor-layout">
-    <template v-if="typeof props.left !== 'undefined'">
+    <template v-if="hasLeft">
       <div class="m-editor-layout-left" :class="leftClass" :style="`width: ${left}px`">
         <slot name="left"></slot>
       </div>
@@ -11,7 +11,7 @@
       <slot name="center"></slot>
     </div>
 
-    <template v-if="typeof props.right !== 'undefined'">
+    <template v-if="hasRight">
       <Resizer @change="changeRight"></Resizer>
       <div class="m-editor-layout-right" :class="rightClass" :style="`width: ${right}px`">
         <slot name="right"></slot>
@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts" setup name="MEditorLayout">
-import { onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 
 import Resizer from '../layouts/Resizer.vue';
 
@@ -33,29 +33,64 @@ const props = withDefaults(
     right?: number;
     minLeft?: number;
     minRight?: number;
+    minCenter?: number;
     leftClass?: string;
     rightClass?: string;
     centerClass?: string;
   }>(),
   {
-    minLeft: 1,
+    minLeft: 46,
     minRight: 1,
+    minCenter: 1,
   },
 );
 
 const el = ref<HTMLElement>();
+
+const hasLeft = computed(() => typeof props.left !== 'undefined');
+const hasRight = computed(() => typeof props.left !== 'undefined');
+
+const getCenterWidth = (clientWidth: number, left: number, right: number) => {
+  let center = clientWidth - left - right;
+  if (center < props.minCenter) {
+    center = props.minCenter;
+    if (left < right) {
+      right = clientWidth - left - props.minCenter;
+    } else {
+      left = clientWidth - right - props.minCenter;
+    }
+  }
+  return {
+    center,
+    left,
+    right,
+  };
+};
 
 let clientWidth = 0;
 const resizerObserver = new ResizeObserver((entries) => {
   for (const { contentRect } of entries) {
     clientWidth = contentRect.width;
 
-    center.value = clientWidth - (props.left || 0) - (props.right || 0);
+    let left = props.left || 0;
+    let right = props.right || 0;
+
+    if (left > clientWidth) {
+      left = clientWidth / 3;
+    }
+
+    if (right > clientWidth) {
+      right = clientWidth / 3;
+    }
+
+    const columnWidth = getCenterWidth(clientWidth, left, right);
+
+    center.value = columnWidth.center;
 
     emit('change', {
-      left: props.left,
+      left: columnWidth.left,
       center: center.value,
-      right: props.right,
+      right: columnWidth.right,
     });
   }
 });
@@ -81,12 +116,14 @@ const changeLeft = (deltaX: number) => {
     left = props.left;
   }
 
-  center.value = clientWidth - left - (props.right || 0);
+  const columnWidth = getCenterWidth(clientWidth, left, props.right || 0);
+
+  center.value = columnWidth.center;
 
   emit('change', {
-    left,
+    left: columnWidth.left,
     center: center.value,
-    right: props.right,
+    right: columnWidth.right,
   });
 };
 
@@ -99,12 +136,14 @@ const changeRight = (deltaX: number) => {
     right = props.right;
   }
 
-  center.value = clientWidth - (props.left || 0) - right;
+  const columnWidth = getCenterWidth(clientWidth, props.left || 0, right);
+
+  center.value = columnWidth.center;
 
   emit('change', {
-    left: props.left,
+    left: columnWidth.left,
     center: center.value,
-    right,
+    right: columnWidth.right,
   });
 };
 </script>
