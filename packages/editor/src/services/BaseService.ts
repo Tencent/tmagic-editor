@@ -77,7 +77,7 @@ const doAction = async (
  *
  *   editorService.usePlugin({
  *     beforeAdd(value) { return [value] },
- *     afterAdd(value, result) {},
+ *     afterAdd(result, value) { return result },
  *   });
  *
  *   editorService.add(); 最终会变成  () => {
