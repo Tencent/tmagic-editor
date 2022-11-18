@@ -4,7 +4,7 @@
 
 <script lang="ts" setup name="MEditorViewerMenu">
 import { computed, inject, markRaw, ref, watch } from 'vue';
-import { Bottom, Delete, DocumentCopy, Top } from '@element-plus/icons-vue';
+import { Bottom, CopyDocument, Delete, DocumentCopy, Top } from '@element-plus/icons-vue';
 
 import { MNode, NodeType } from '@tmagic/schema';
 import StageCore from '@tmagic/stage';
@@ -44,7 +44,7 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() => [
   {
     type: 'button',
     text: '复制',
-    icon: markRaw(DocumentCopy),
+    icon: markRaw(CopyDocument),
     handler: () => {
       nodes.value && editorService?.copy(nodes.value);
       canPaste.value = true;
@@ -53,6 +53,7 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() => [
   {
     type: 'button',
     text: '粘贴',
+    icon: markRaw(DocumentCopy),
     display: () => canPaste.value,
     handler: () => {
       const rect = menu.value?.$el.getBoundingClientRect();

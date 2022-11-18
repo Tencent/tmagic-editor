@@ -4,7 +4,7 @@
 
 <script lang="ts" setup name="MEditorLayerMenu">
 import { computed, inject, markRaw, ref } from 'vue';
-import { Delete, DocumentCopy, Files, Plus } from '@element-plus/icons-vue';
+import { CopyDocument, Delete, Files, Plus } from '@element-plus/icons-vue';
 
 import { NodeType } from '@tmagic/schema';
 
@@ -84,7 +84,7 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() => [
   {
     type: 'button',
     text: '复制',
-    icon: markRaw(DocumentCopy),
+    icon: markRaw(CopyDocument),
     display: () => !isRoot.value,
     handler: () => {
       node.value && services?.editorService.copy(node.value);
