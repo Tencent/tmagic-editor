@@ -1,3 +1,21 @@
+# [1.2.0-beta.14](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.13...v1.2.0-beta.14) (2022-11-18)
+
+
+### Bug Fixes
+
+* **editor:** 编辑器左中右列宽支持配置最小宽度 ([bddfcee](https://github.com/Tencent/tmagic-editor/commit/bddfcee92b968b09875c43a9035bf9b7817396e3))
+
+
+### Features
+
+* **cli:** useTs 为必填参数 ([bb5aa67](https://github.com/Tencent/tmagic-editor/commit/bb5aa6722f4b1a30034ad96edadadd0bb6575848))
+* **cli:** 增加 useTs 配置 ([b512e14](https://github.com/Tencent/tmagic-editor/commit/b512e141293746871f760895a79f092242e1a0be))
+* **editor:** 代码编辑支持全屏 ([8271a3b](https://github.com/Tencent/tmagic-editor/commit/8271a3b497ac3aadb79364e0eebc912ce7b3304f))
+* **editor:** 添加右键菜单粘贴icon ([813ca55](https://github.com/Tencent/tmagic-editor/commit/813ca55ef6831ce3505ff2b4c9269eab04aad7f8))
+* **table:** expand内容支持vue组件 ([aa9293a](https://github.com/Tencent/tmagic-editor/commit/aa9293af55475948252acc078695594a320e8839))
+
+
+
 # [1.2.0-beta.13](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.12...v1.2.0-beta.13) (2022-11-15)
 
 
