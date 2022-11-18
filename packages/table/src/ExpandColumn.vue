@@ -13,6 +13,7 @@
         :init-values="config.values || (config.prop && scope.row[config.prop]) || {}"
       ></MForm>
       <div v-if="config.expandContent" v-html="config.expandContent(scope.row, config.prop)"></div>
+      <component v-if="config.component" :is="config.component" v-bind="componentProps(scope.row)"></component>
     </template>
   </TMagicTableColumn>
 </template>
@@ -24,7 +25,7 @@ import { MForm } from '@tmagic/form';
 import { ColumnConfig } from './schema';
 import MTable from './Table.vue';
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     config: ColumnConfig;
   }>(),
@@ -32,4 +33,11 @@ withDefaults(
     config: () => ({}),
   },
 );
+
+const componentProps = (row: any) => {
+  if (typeof props.config.props === 'function') {
+    return props.config.props(row) || {};
+  }
+  return props.config.props || {};
+};
 </script>

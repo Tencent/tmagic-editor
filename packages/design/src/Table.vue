@@ -5,6 +5,8 @@
     v-bind="uiProps"
     @select="selectHandler"
     @sort-change="sortChangeHandler"
+    @expand-change="expandChangeHandler"
+    @cell-click="cellClickHandler"
   >
     <slot></slot>
   </component>
@@ -31,7 +33,7 @@ const uiComponent = getConfig('components').table;
 
 const uiProps = computed(() => uiComponent.props(props));
 
-const emit = defineEmits(['select', 'sort-change']);
+const emit = defineEmits(['select', 'sort-change', 'expand-change', 'cell-click']);
 
 const table = ref<any>();
 
@@ -41,6 +43,14 @@ const selectHandler = (...args: any[]) => {
 
 const sortChangeHandler = (...args: any[]) => {
   emit('sort-change', ...args);
+};
+
+const expandChangeHandler = (...args: any[]) => {
+  emit('expand-change', ...args);
+};
+
+const cellClickHandler = (...args: any[]) => {
+  emit('cell-click', ...args);
 };
 
 let $el: HTMLDivElement | undefined;

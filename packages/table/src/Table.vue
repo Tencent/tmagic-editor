@@ -17,6 +17,8 @@
     @select="selectHandler"
     @select-all="selectAllHandler"
     @selection-change="selectionChangeHandler"
+    @cell-click="cellClickHandler"
+    @expand-change="expandChange"
   >
     <template v-for="(item, columnIndex) in columns">
       <template v-if="item.type === 'expand'">
@@ -94,7 +96,15 @@ const props = withDefaults(
   },
 );
 
-const emit = defineEmits(['sort-change', 'afterAction', 'select', 'select-all', 'selection-change']);
+const emit = defineEmits([
+  'sort-change',
+  'afterAction',
+  'select',
+  'select-all',
+  'selection-change',
+  'expand-change',
+  'cell-click',
+]);
 
 const tMagicTable = ref<InstanceType<typeof TMagicTable>>();
 
@@ -139,6 +149,14 @@ const selectAllHandler = (selection: any) => {
 
 const selectionChangeHandler = (selection: any) => {
   emit('selection-change', selection);
+};
+
+const cellClickHandler = (...args: any[]) => {
+  emit('cell-click', ...args);
+};
+
+const expandChange = (...args: any[]) => {
+  emit('expand-change', ...args);
 };
 
 const toggleRowSelection = (row: any, selected: boolean) => {
