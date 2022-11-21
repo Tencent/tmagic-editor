@@ -45,7 +45,7 @@ tmagic-editor提供了三个版本的 runtime 示例，可以参考：
 
 1、在runtime中安装@tmagic/cli
 ```bash
-npm install @magic/cli@beta -D
+npm install @tmagic/cli@beta -D
 ```
 
 2、在package.json 中的scripts中加入 tmagic entry 
