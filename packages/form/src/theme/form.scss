@@ -30,7 +30,7 @@
   }
 
   .el-form-item.hidden {
-    .el-form-item__label {
+    > .el-form-item__label {
       display: none;
     }
   }
