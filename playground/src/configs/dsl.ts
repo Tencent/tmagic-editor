@@ -24,7 +24,7 @@ export default {
     code_5336: {
       name: 'getData',
       // eslint-disable-next-line no-eval
-      content: eval(`(vm, params) => {\n  console.log("this is getData function",params)\n}`),
+      content: eval(`({app, params}) => {\n  console.log("this is getData function",params,app)\n}`),
       params: [
         {
           name: 'age',
@@ -37,7 +37,7 @@ export default {
     code_5316: {
       name: 'getList',
       // eslint-disable-next-line no-eval
-      content: eval(`(vm) => {\n  console.log("this is getList function")\n}`),
+      content: eval(`() => {\n  console.log("this is getList function")\n}`),
       params: [],
     },
   },

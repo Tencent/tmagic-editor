@@ -164,7 +164,7 @@ const createCodeBlock = async () => {
   }
   const codeConfig: CodeBlockContent = {
     name: '代码块',
-    content: `() => {\n  // place your code here\n}`,
+    content: `({app, params}) => {\n  // place your code here\n}`,
     params: [],
   };
   await codeBlockService.setMode(CodeEditorMode.EDITOR);

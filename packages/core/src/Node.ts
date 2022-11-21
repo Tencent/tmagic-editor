@@ -94,7 +94,7 @@ class Node extends EventEmitter {
     for (const item of this.data[hook].hookData) {
       const { codeId, params = {} } = item;
       if (this.app.codeDsl[codeId] && typeof this.app?.codeDsl[codeId]?.content === 'function') {
-        await this.app.codeDsl[codeId].content(this, params);
+        await this.app.codeDsl[codeId].content({ app: this.app, params });
       }
     }
   }
