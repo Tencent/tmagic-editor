@@ -23,6 +23,7 @@
         :default-expanded-keys="defaultExpandedKeys"
         :load="loadItems"
         :data="values"
+        :default-expand-all="true"
         :expand-on-click-node="false"
         :highlight-current="true"
         :props="{
