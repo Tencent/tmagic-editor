@@ -106,13 +106,17 @@ class CodeBlock extends BaseService {
    */
   public async setCodeDslById(id: Id, codeConfig: CodeBlockContent): Promise<void> {
     let codeDsl = await this.getCodeDsl();
+    const codeConfigProcessed = codeConfig;
+    if (codeConfig.content) {
+      // 在保存的时候转换代码内容
+      // eslint-disable-next-line no-eval
+      codeConfigProcessed.content = eval(codeConfig.content);
+    }
     if (!codeDsl) {
       // dsl中无代码块字段
       codeDsl = {
         [id]: {
-          ...codeConfig,
-          // eslint-disable-next-line no-eval
-          content: eval(codeConfig.content),
+          ...codeConfigProcessed,
         },
       };
     } else {
@@ -121,9 +125,7 @@ class CodeBlock extends BaseService {
         ...codeDsl,
         [id]: {
           ...existContent,
-          ...codeConfig,
-          // eslint-disable-next-line no-eval
-          content: eval(codeConfig.content),
+          ...codeConfigProcessed,
         },
       };
     }
