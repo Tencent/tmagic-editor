@@ -1,3 +1,17 @@
+# [1.2.0-beta.15](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.14...v1.2.0-beta.15) (2022-11-22)
+
+
+### Bug Fixes
+
+* **editor:** 修复setCodeDslById不传content引起的问题 ([13dc3ca](https://github.com/Tencent/tmagic-editor/commit/13dc3ca25936cb074f70c6a94591b5e0226fe68c))
+
+
+### Features
+
+* **editor:** 修改代码块参数结构,以对象形式暴露app,params ([8195a60](https://github.com/Tencent/tmagic-editor/commit/8195a600f52f478e0db386fe32b8819fca6d8852))
+
+
+
 # [1.2.0-beta.14](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.13...v1.2.0-beta.14) (2022-11-18)
 
 
