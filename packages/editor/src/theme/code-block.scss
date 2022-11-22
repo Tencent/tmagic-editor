@@ -35,9 +35,7 @@
       display: flex;
       align-items: center;
       .right-tool {
-        position: absolute;
-        right: 15px;
-        padding-left: 5px;
+        width: fit-content !important;
         display: flex;
         align-items: center;
         .edit-icon {
@@ -50,7 +48,8 @@
         white-space: nowrap;
         text-overflow: ellipsis;
         padding: 10px 15px;
-        margin-right: 60px;
+        width: 0 !important;
+        flex: 1;
       }
     }
     .code-comp-map-wrapper {
