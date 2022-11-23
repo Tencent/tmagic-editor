@@ -1,5 +1,5 @@
 <template>
-  <div ref="layerPanel">
+  <div ref="layerPanel" style="height: 100%">
     <TMagicScrollbar class="magic-editor-layer-panel">
       <slot name="layer-panel-header"></slot>
 
