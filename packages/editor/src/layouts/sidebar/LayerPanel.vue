@@ -1,67 +1,68 @@
 <template>
-  <div ref="layerPanel" style="height: 100%">
-    <TMagicScrollbar class="magic-editor-layer-panel">
-      <slot name="layer-panel-header"></slot>
+  <TMagicScrollbar class="magic-editor-layer-panel">
+    <slot name="layer-panel-header"></slot>
 
-      <TMagicInput
-        v-model="filterText"
-        class="search-input"
-        size="small"
-        placeholder="输入关键字进行过滤"
-        clearable
-        :prefix-icon="Search"
-        @change="filterTextChangeHandler"
-      ></TMagicInput>
+    <TMagicInput
+      v-model="filterText"
+      class="search-input"
+      size="small"
+      placeholder="输入关键字进行过滤"
+      clearable
+      :prefix-icon="Search"
+      @change="filterTextChangeHandler"
+    ></TMagicInput>
 
-      <TMagicTree
-        v-if="values.length"
-        class="magic-editor-layer-tree"
-        ref="tree"
-        node-key="id"
-        empty-text="页面空荡荡的"
-        draggable
-        :default-expanded-keys="defaultExpandedKeys"
-        :load="loadItems"
-        :data="values"
-        :default-expand-all="true"
-        :expand-on-click-node="false"
-        :highlight-current="true"
-        :props="{
-          children: 'items',
-        }"
-        :filter-node-method="filterNode"
-        :allow-drop="allowDrop"
-        :show-checkbox="isMultiSelectStatus || selectedIds.length > 1"
-        @node-click="clickHandler"
-        @node-contextmenu="contextmenu"
-        @node-drag-end="handleDragEnd"
-        @node-collapse="handleCollapse"
-        @node-expand="handleExpand"
-        @check="multiClickHandler"
-        @mousedown="toggleClickFlag"
-        @mouseup="toggleClickFlag"
-      >
-        <template #default="{ node, data }">
-          <div
-            :id="data.id"
-            class="cus-tree-node"
-            @mouseenter="highlightHandler(data)"
-            :class="{ 'cus-tree-node-hover': canHighlight(data) }"
-          >
-            <slot name="layer-node-content" :node="node" :data="data">
-              <span>
-                {{ `${data.name} (${data.id})` }}
-              </span>
-            </slot>
-          </div>
-        </template>
-      </TMagicTree>
+    <TMagicTree
+      v-if="values.length"
+      tabindex="-1"
+      class="magic-editor-layer-tree"
+      ref="tree"
+      node-key="id"
+      empty-text="页面空荡荡的"
+      draggable
+      :default-expanded-keys="defaultExpandedKeys"
+      :load="loadItems"
+      :data="values"
+      :default-expand-all="true"
+      :expand-on-click-node="false"
+      :highlight-current="true"
+      :props="{
+        children: 'items',
+      }"
+      :filter-node-method="filterNode"
+      :allow-drop="allowDrop"
+      :show-checkbox="isMultiSelectStatus || selectedIds.length > 1"
+      @node-click="clickHandler"
+      @node-contextmenu="contextmenu"
+      @node-drag-end="handleDragEnd"
+      @node-collapse="handleCollapse"
+      @node-expand="handleExpand"
+      @check="multiClickHandler"
+      @mousedown="toggleClickFlag"
+      @mouseup="toggleClickFlag"
+      @mouseenter="mouseenterHandler"
+      @mouseleave="mouseleaveHandler"
+    >
+      <template #default="{ node, data }">
+        <div
+          :id="data.id"
+          class="cus-tree-node"
+          @mouseenter="highlightHandler(data)"
+          :class="{ 'cus-tree-node-hover': canHighlight(data) }"
+        >
+          <slot name="layer-node-content" :node="node" :data="data">
+            <span>
+              {{ `${data.name} (${data.id})` }}
+            </span>
+          </slot>
+        </div>
+      </template>
+    </TMagicTree>
 
-      <Teleport to="body">
-        <LayerMenu ref="menu" :layer-content-menu="layerContentMenu"></LayerMenu>
-      </Teleport>
-    </TMagicScrollbar>
-  </div>
+    <Teleport to="body">
+      <LayerMenu ref="menu" :layer-content-menu="layerContentMenu"></LayerMenu>
+    </Teleport>
+  </TMagicScrollbar>
 </template>
 
 <script lang="ts" setup name="MEditorLayerPanel">
@@ -263,24 +264,19 @@ watch([selectedIds, tree], async () => {
   setTreeKeyStatus();
 });
 
-const layerPanel = ref<HTMLDivElement>();
 const mouseenterHandler = () => {
-  layerPanel.value?.focus();
+  tree.value?.$el.focus();
 };
 
 const mouseleaveHandler = () => {
-  layerPanel.value?.blur();
-  // 如果鼠标移出监听范围，且当前只选中了一个，置为单选模式(修复按住ctrl不放但鼠标移出的情况)
-  if (selectedIds.value.length === 1) isMultiSelectStatus.value = false;
+  tree.value?.$el.blur();
+  isMultiSelectStatus.value = false;
 };
 
 let keycon: KeyController;
 
 onMounted(() => {
-  layerPanel.value?.addEventListener('mouseenter', mouseenterHandler);
-  layerPanel.value?.addEventListener('mouseleave', mouseleaveHandler);
-
-  keycon = new KeyController(layerPanel.value);
+  keycon = new KeyController(tree.value?.$el);
   const isMac = /mac os x/.test(navigator.userAgent.toLowerCase());
   const ctrl = isMac ? 'meta' : 'ctrl';
 
@@ -289,9 +285,6 @@ onMounted(() => {
       e.inputEvent.preventDefault();
       isMultiSelectStatus.value = true;
     })
-    .on('blur', () => {
-      isMultiSelectStatus.value = false;
-    })
     .keyup(ctrl, (e) => {
       e.inputEvent.preventDefault();
       isMultiSelectStatus.value = false;
@@ -299,8 +292,6 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  layerPanel.value?.removeEventListener('mouseenter', mouseenterHandler);
-  layerPanel.value?.removeEventListener('mouseleave', mouseleaveHandler);
   keycon.destroy();
 });
 
