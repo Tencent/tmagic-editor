@@ -1,3 +1,14 @@
+# [1.2.0-beta.16](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.15...v1.2.0-beta.16) (2022-11-23)
+
+
+### Bug Fixes
+
+* **design:** tabs支持modelValue ([47e851c](https://github.com/Tencent/tmagic-editor/commit/47e851ce5e1e9a60672b3854229552ff24989188))
+* **editor:** 切换选中组件后组件属性表单内存未释放 ([eacc4dc](https://github.com/Tencent/tmagic-editor/commit/eacc4dc7942ab38b4e36ee851cc7e19a3a6bb10b)), closes [#123](https://github.com/Tencent/tmagic-editor/issues/123)
+* 在tree上增加tabindex来监听focus事件,完善组件树多选体验 ([5ae32f0](https://github.com/Tencent/tmagic-editor/commit/5ae32f0792e90319b1e546f72dfba174615307c6))
+
+
+
 # [1.2.0-beta.15](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.14...v1.2.0-beta.15) (2022-11-22)
 
 
