@@ -1,15 +1,16 @@
 <template>
   <div class="m-editor-props-panel">
     <slot name="props-panel-header"></slot>
-    <m-form
+    <MForm
       ref="configForm"
+      :key="node?.type"
       :class="`m-editor-props-panel ${propsPanelSize}`"
       :popper-class="`m-editor-props-panel-popper ${propsPanelSize}`"
       :size="propsPanelSize"
       :init-values="values"
       :config="curFormConfig"
       @change="submit"
-    ></m-form>
+    ></MForm>
   </div>
 </template>
 
@@ -17,7 +18,8 @@
 import { computed, getCurrentInstance, inject, onMounted, ref, watchEffect } from 'vue';
 
 import { tMagicMessage } from '@tmagic/design';
-import type { FormValue, MForm } from '@tmagic/form';
+import type { FormValue } from '@tmagic/form';
+import { MForm } from '@tmagic/form';
 import type { MNode } from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
 
@@ -32,7 +34,9 @@ const configForm = ref<InstanceType<typeof MForm>>();
 const curFormConfig = ref<any>([]);
 const services = inject<Services>('services');
 const node = computed(() => services?.editorService.get<MNode | null>('node'));
-const propsPanelSize = computed(() => services?.uiService.get('propsPanelSize') || 'small');
+const propsPanelSize = computed(
+  () => services?.uiService.get<'large' | 'default' | 'small'>('propsPanelSize') || 'small',
+);
 const stage = computed(() => services?.editorService.get<StageCore>('stage'));
 
 const init = async () => {
