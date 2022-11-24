@@ -1,3 +1,17 @@
+# [1.2.0-beta.18](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.17...v1.2.0-beta.18) (2022-11-24)
+
+
+### Bug Fixes
+
+* **editor:** itemsFunction中补全value ([e497ab0](https://github.com/Tencent/tmagic-editor/commit/e497ab00085e1098842024cbd9df50ec566254a9))
+
+
+### Features
+
+* **cli:** export loadUserConfig ([d46d611](https://github.com/Tencent/tmagic-editor/commit/d46d61184bdbe6628f172cde92a2327ce3f2485f))
+
+
+
 # [1.2.0-beta.17](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.16...v1.2.0-beta.17) (2022-11-24)
 
 
