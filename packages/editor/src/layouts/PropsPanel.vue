@@ -3,7 +3,6 @@
     <slot name="props-panel-header"></slot>
     <MForm
       ref="configForm"
-      :key="node?.type"
       :class="`m-editor-props-panel ${propsPanelSize}`"
       :popper-class="`m-editor-props-panel-popper ${propsPanelSize}`"
       :size="propsPanelSize"
