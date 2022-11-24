@@ -21,7 +21,7 @@ import { Edit, FolderOpened, SwitchButton, Tickets } from '@element-plus/icons-v
 import type { MoveableOptions } from '@tmagic/editor';
 import { ComponentGroup } from '@tmagic/editor';
 import { NodeType } from '@tmagic/schema';
-import StageCore from '@tmagic/stage';
+import { CustomizeMoveableOptionsCallbackConfig } from '@tmagic/stage';
 import { asyncLoadJs } from '@tmagic/utils';
 
 import editorApi from '@src/api/editor';
@@ -89,10 +89,10 @@ export default defineComponent({
       magicPresetConfigs,
       magicPresetEvents,
       editorDefaultSelected,
-      moveableOptions: (core?: StageCore): MoveableOptions => {
+      moveableOptions: (config?: CustomizeMoveableOptionsCallbackConfig): MoveableOptions => {
         const options: MoveableOptions = {};
-        const id = core?.dr?.target?.id;
 
+        const id = config?.targetElId;
         if (!id || !editor.value) return options;
 
         const node = editor.value.editorService.getNodeById(id);

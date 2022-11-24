@@ -18,28 +18,30 @@
 
 import { EventEmitter } from 'events';
 
+import { Id } from '@tmagic/schema';
 import { getHost, injectStyle, isSameDomain } from '@tmagic/utils';
 
+import { DEFAULT_ZOOM } from './const';
 import style from './style.css?raw';
-import type { Runtime, RuntimeWindow, StageRenderConfig } from './types';
+import type { Point, RemoveData, Runtime, RuntimeWindow, StageRenderConfig, UpdateData } from './types';
+import { addSelectedClassName, removeSelectedClassName } from './util';
 
 export default class StageRender extends EventEmitter {
   /** 组件的js、css执行的环境，直接渲染为当前window，iframe渲染则为iframe.contentWindow */
   public contentWindow: RuntimeWindow | null = null;
-
   public runtime: Runtime | null = null;
-
   public iframe?: HTMLIFrameElement;
 
-  public runtimeUrl?: string;
+  private runtimeUrl?: string;
+  private zoom = DEFAULT_ZOOM;
+  private customizedRender?: () => Promise<HTMLElement | null>;
 
-  private render?: () => Promise<HTMLElement | null>;
-
-  constructor({ runtimeUrl, render }: StageRenderConfig) {
+  constructor({ runtimeUrl, zoom, customizedRender }: StageRenderConfig) {
     super();
 
     this.runtimeUrl = runtimeUrl || '';
-    this.render = render;
+    this.customizedRender = customizedRender;
+    this.setZoom(zoom);
 
     this.iframe = globalThis.document.createElement('iframe');
     // 同源，直接加载
@@ -62,6 +64,38 @@ export default class StageRender extends EventEmitter {
       this.emit('runtime-ready', runtime);
     },
   });
+
+  public async add(data: UpdateData): Promise<void> {
+    const runtime = await this.getRuntime();
+    return runtime?.add?.(data);
+  }
+
+  public async remove(data: RemoveData): Promise<void> {
+    const runtime = await this.getRuntime();
+    return runtime?.remove?.(data);
+  }
+
+  public async update(data: UpdateData): Promise<void> {
+    const runtime = await this.getRuntime();
+    // 更新画布中的组件
+    runtime?.update?.(data);
+  }
+
+  public async select(els: HTMLElement[]): Promise<void> {
+    const runtime = await this.getRuntime();
+
+    for (const el of els) {
+      await runtime?.select?.(el.id);
+      if (runtime?.beforeSelect) {
+        await runtime.beforeSelect(el);
+      }
+      this.flagSelectedEl(el);
+    }
+  }
+
+  public setZoom(zoom: number = DEFAULT_ZOOM): void {
+    this.zoom = zoom;
+  }
 
   /**
    * 挂载Dom节点
@@ -102,6 +136,35 @@ export default class StageRender extends EventEmitter {
   }
 
   /**
+   * 通过坐标获得坐标下所有HTML元素数组
+   * @param point 坐标
+   * @returns 坐标下方所有HTML元素数组，会包含父元素直至html，元素层叠时返回顺序是从上到下
+   */
+  public getElementsFromPoint(point: Point): HTMLElement[] {
+    let x = point.clientX;
+    let y = point.clientY;
+
+    if (this.iframe) {
+      const rect = this.iframe.getClientRects()[0];
+      if (rect) {
+        x = x - rect.left;
+        y = y - rect.top;
+      }
+    }
+
+    return this.getDocument()?.elementsFromPoint(x / this.zoom, y / this.zoom) as HTMLElement[];
+  }
+
+  public getTargetElement(idOrEl: Id | HTMLElement): HTMLElement {
+    if (typeof idOrEl === 'string' || typeof idOrEl === 'number') {
+      const el = this.getDocument()?.getElementById(`${idOrEl}`);
+      if (!el) throw new Error(`不存在ID为${idOrEl}的元素`);
+      return el;
+    }
+    return idOrEl;
+  }
+
+  /**
    * 销毁实例
    */
   public destroy(): void {
@@ -112,6 +175,18 @@ export default class StageRender extends EventEmitter {
     this.removeAllListeners();
   }
 
+  /**
+   * 在runtime中对被选中的元素进行标记，部分组件有对选中态进行特殊显示的需求
+   * @param el 被选中的元素
+   */
+  private flagSelectedEl(el: HTMLElement): void {
+    const doc = this.getDocument();
+    if (doc) {
+      removeSelectedClassName(doc);
+      addSelectedClassName(el, doc);
+    }
+  }
+
   private loadHandler = async () => {
     if (!this.contentWindow?.magic) {
       this.postTmagicRuntimeReady();
@@ -119,8 +194,8 @@ export default class StageRender extends EventEmitter {
 
     if (!this.contentWindow) return;
 
-    if (this.render) {
-      const el = await this.render();
+    if (this.customizedRender) {
+      const el = await this.customizedRender();
       if (el) {
         this.contentWindow.document?.body?.appendChild(el);
       }

@@ -1,9 +1,7 @@
 import { MoveableManagerInterface, Renderer } from 'moveable';
 
-import type StageDragResize from './StageDragResize';
-
-export default (dr: StageDragResize) => ({
-  name: 'selectParent',
+export default (selectParentHandler: () => void) => ({
+  name: 'select-parent',
   props: {},
   events: {},
   render(moveable: MoveableManagerInterface<any, any>, React: Renderer) {
@@ -51,7 +49,7 @@ export default (dr: StageDragResize) => ({
           className: 'moveable-button',
           title: '选中父组件',
           onClick: () => {
-            dr.emit('select-parent');
+            selectParentHandler();
           },
         },
         React.createElement(

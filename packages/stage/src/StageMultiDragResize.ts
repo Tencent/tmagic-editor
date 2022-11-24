@@ -16,39 +16,53 @@
  * limitations under the License.
  */
 
-import { EventEmitter } from 'events';
-
-import type { MoveableOptions, OnDragStart, OnResizeStart } from 'moveable';
+import type { OnDragStart, OnResizeStart } from 'moveable';
 import Moveable from 'moveable';
 import MoveableHelper from 'moveable-helper';
 
-import { DRAG_EL_ID_PREFIX, PAGE_CLASS } from './const';
-import StageCore from './StageCore';
-import StageMask from './StageMask';
-import { StageDragResizeConfig, StageDragStatus } from './types';
-import { calcValueByFontsize, getMode, getTargetElStyle } from './util';
+import { DRAG_EL_ID_PREFIX, Mode, ZIndex } from './const';
+import MoveableOptionsManager from './MoveableOptionsManager';
+import TargetShadow from './TargetShadow';
+import { GetRenderDocument, MoveableOptionsManagerConfig, StageDragStatus, StageMultiDragResizeConfig } from './types';
+import { calcValueByFontsize, getMode } from './util';
 
-export default class StageMultiDragResize extends EventEmitter {
-  public core: StageCore;
-  public mask: StageMask;
+export default class StageMultiDragResize extends MoveableOptionsManager {
   /** 画布容器 */
   public container: HTMLElement;
   /** 多选:目标节点组 */
   public targetList: HTMLElement[] = [];
   /** 多选:目标节点在蒙层中的占位节点组 */
-  public dragElList: HTMLDivElement[] = [];
+  public targetShadow: TargetShadow;
   /** Moveable多选拖拽类实例 */
   public moveableForMulti?: Moveable;
   /** 拖动状态 */
   public dragStatus: StageDragStatus = StageDragStatus.END;
   private multiMoveableHelper?: MoveableHelper;
+  private getRenderDocument: GetRenderDocument;
 
-  constructor(config: StageDragResizeConfig) {
-    super();
+  constructor(config: StageMultiDragResizeConfig) {
+    const moveableOptionsManagerConfig: MoveableOptionsManagerConfig = {
+      container: config.container,
+      moveableOptions: config.multiMoveableOptions,
+      getRootContainer: config.getRootContainer,
+    };
+    super(moveableOptionsManagerConfig);
 
-    this.core = config.core;
     this.container = config.container;
-    this.mask = config.mask;
+    this.getRenderDocument = config.getRenderDocument;
+
+    this.targetShadow = new TargetShadow({
+      container: config.container,
+      updateDragEl: config.updateDragEl,
+      zIndex: ZIndex.DRAG_EL,
+      idPrefix: DRAG_EL_ID_PREFIX,
+    });
+
+    this.on('update-moveable', () => {
+      if (this.moveableForMulti) {
+        this.updateMoveable();
+      }
+    });
   }
 
   /**
@@ -56,27 +70,24 @@ export default class StageMultiDragResize extends EventEmitter {
    * @param els
    */
   public multiSelect(els: HTMLElement[]): void {
+    if (els.length === 0) {
+      return;
+    }
+    this.mode = getMode(els[0]);
     this.targetList = els;
-    this.core.dr.destroyDragEl();
-    this.destroyDragElList();
-    // 生成虚拟多选节点
-    this.dragElList = els.map((elItem) => {
-      const dragElDiv = globalThis.document.createElement('div');
-      this.container.append(dragElDiv);
-      dragElDiv.style.cssText = getTargetElStyle(elItem);
-      dragElDiv.id = `${DRAG_EL_ID_PREFIX}${elItem.id}`;
-      // 业务方校准
-      if (typeof this.core.config.updateDragEl === 'function') {
-        this.core.config.updateDragEl(dragElDiv, elItem);
-      }
-      return dragElDiv;
-    });
+
+    this.targetShadow.updateGroup(els);
+
+    // 设置周围元素，用于选中元素跟周围元素的对齐辅助
+    const elementGuidelines: any = this.targetList[0].parentElement?.children || [];
+    this.setElementGuidelines(this.targetList, elementGuidelines);
+
     this.moveableForMulti?.destroy();
     this.multiMoveableHelper?.clear();
     this.moveableForMulti = new Moveable(
       this.container,
-      this.getOptions({
-        target: this.dragElList,
+      this.getOptions(true, {
+        target: this.targetShadow.els,
       }),
     );
     this.multiMoveableHelper = MoveableHelper.create({
@@ -177,39 +188,50 @@ export default class StageMultiDragResize extends EventEmitter {
       })
       .on('clickGroup', (params) => {
         const { inputTarget, targets } = params;
-        // 如果此时mask不处于多选状态下，且有多个元素被选中，同时点击的元素在选中元素中的其中一项，代表多选态切换为该元素的单选态
-        if (!this.mask.isMultiSelectStatus && targets.length > 1 && targets.includes(inputTarget)) {
-          this.emit('select', inputTarget.id.replace(DRAG_EL_ID_PREFIX, ''));
+        // 如果有多个元素被选中，同时点击的元素在选中元素中的其中一项，可能是多选态切换为该元素的单选态，抛事件给上一层继续判断是否切换
+        if (targets.length > 1 && targets.includes(inputTarget)) {
+          this.emit('change-to-select', inputTarget.id.replace(DRAG_EL_ID_PREFIX, ''));
         }
       });
   }
 
-  public canSelect(el: HTMLElement, stop: () => boolean): Boolean {
-    // 多选状态下不可以选中magic-ui-page，并停止继续向上层选中
-    if (el.className.includes(PAGE_CLASS)) {
-      this.core.highlightedDom = undefined;
-      this.core.highlightLayer.clearHighlight();
-      stop();
+  public canSelect(el: HTMLElement, selectedEl: HTMLElement | undefined): boolean {
+    const currentTargetMode = getMode(el);
+    let selectedElMode = '';
+
+    // 流式布局不支持多选
+    if (currentTargetMode === Mode.SORTABLE) {
       return false;
     }
-    const currentTargetMode = getMode(el);
-    let selectedDomMode = '';
-    if (this.core.selectedDom?.className.includes(PAGE_CLASS)) {
-      // 先单击选中了页面(magic-ui-page)，再按住多选键多选时，任一元素均可选中
-      return true;
-    }
-    if (this.targetList.length === 0 && this.core.selectedDom) {
+
+    if (this.targetList.length === 0 && selectedEl) {
       // 单选后添加到多选的情况
-      selectedDomMode = getMode(this.core.selectedDom);
+      selectedElMode = getMode(selectedEl);
     } else if (this.targetList.length > 0) {
       // 已加入多选列表的布局模式是一样的，取第一个判断
-      selectedDomMode = getMode(this.targetList[0]);
+      selectedElMode = getMode(this.targetList[0]);
     }
     // 定位模式不同，不可混选
-    if (currentTargetMode !== selectedDomMode) {
+    if (currentTargetMode !== selectedElMode) {
       return false;
     }
     return true;
+  }
+
+  public updateMoveable(eleList = this.targetList) {
+    if (!this.moveableForMulti) return;
+    if (!eleList) throw new Error('未选中任何节点');
+
+    this.targetList = eleList;
+
+    const options = this.getOptions(true, {
+      target: this.targetShadow.els,
+    });
+
+    Object.entries(options).forEach(([key, value]) => {
+      (this.moveableForMulti as any)[key] = value;
+    });
+    this.moveableForMulti.updateTarget();
   }
 
   /**
@@ -217,7 +239,7 @@ export default class StageMultiDragResize extends EventEmitter {
    */
   public clearSelectStatus(): void {
     if (!this.moveableForMulti) return;
-    this.destroyDragElList();
+    this.targetShadow.destroyEls();
     this.moveableForMulti.target = null;
     this.moveableForMulti.updateTarget();
     this.targetList = [];
@@ -228,14 +250,7 @@ export default class StageMultiDragResize extends EventEmitter {
    */
   public destroy(): void {
     this.moveableForMulti?.destroy();
-    this.destroyDragElList();
-  }
-
-  /**
-   * 清除蒙层占位节点
-   */
-  public destroyDragElList(): void {
-    this.dragElList.forEach((dragElItem) => dragElItem?.remove());
+    this.targetShadow.destroy();
   }
 
   /**
@@ -245,60 +260,19 @@ export default class StageMultiDragResize extends EventEmitter {
   private update(isResize = false): void {
     if (this.targetList.length === 0) return;
 
-    const { contentWindow } = this.core.renderer;
-    const doc = contentWindow?.document;
+    const doc = this.getRenderDocument();
     if (!doc) return;
 
-    this.emit('update', {
-      data: this.targetList.map((targetItem) => {
-        const offset = { left: targetItem.offsetLeft, top: targetItem.offsetTop };
-        const left = calcValueByFontsize(doc, offset.left);
-        const top = calcValueByFontsize(doc, offset.top);
-        const width = calcValueByFontsize(doc, targetItem.clientWidth);
-        const height = calcValueByFontsize(doc, targetItem.clientHeight);
-        return {
-          el: targetItem,
-          style: isResize ? { left, top, width, height } : { left, top },
-        };
-      }),
-      parentEl: null,
+    const data = this.targetList.map((targetItem) => {
+      const left = calcValueByFontsize(doc, targetItem.offsetLeft);
+      const top = calcValueByFontsize(doc, targetItem.offsetTop);
+      const width = calcValueByFontsize(doc, targetItem.clientWidth);
+      const height = calcValueByFontsize(doc, targetItem.clientHeight);
+      return {
+        el: targetItem,
+        style: isResize ? { left, top, width, height } : { left, top },
+      };
     });
-  }
-
-  /**
-   * 获取moveable options参数
-   * @param {MoveableOptions} options
-   * @return {MoveableOptions} moveable options参数
-   */
-  private getOptions(options: MoveableOptions = {}): MoveableOptions {
-    let { multiMoveableOptions = {} } = this.core.config;
-
-    if (typeof multiMoveableOptions === 'function') {
-      multiMoveableOptions = multiMoveableOptions(this.core);
-    }
-
-    return {
-      defaultGroupRotate: 0,
-      defaultGroupOrigin: '50% 50%',
-      draggable: true,
-      resizable: true,
-      throttleDrag: 0,
-      startDragRotate: 0,
-      throttleDragRotate: 0,
-      zoom: 1,
-      origin: true,
-      padding: { left: 0, top: 0, right: 0, bottom: 0 },
-      snappable: true,
-      bounds: {
-        top: 0,
-        // 设置0的话无法移动到left为0，所以只能设置为-1
-        left: -1,
-        right: this.container.clientWidth - 1,
-        bottom: this.container.clientHeight,
-        ...(multiMoveableOptions.bounds || {}),
-      },
-      ...options,
-      ...multiMoveableOptions,
-    };
+    this.emit('update', data, null);
   }
 }

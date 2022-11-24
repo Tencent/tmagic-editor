@@ -20,27 +20,28 @@ import { EventEmitter } from 'events';
 
 import Moveable from 'moveable';
 
-import { HIGHLIGHT_EL_ID_PREFIX } from './const';
-import StageCore from './StageCore';
-import TargetCalibrate from './TargetCalibrate';
-import type { StageHighlightConfig } from './types';
+import { HIGHLIGHT_EL_ID_PREFIX, ZIndex } from './const';
+import TargetShadow from './TargetShadow';
+import type { GetRootContainer, StageHighlightConfig } from './types';
+
 export default class StageHighlight extends EventEmitter {
-  public core: StageCore;
   public container: HTMLElement;
   public target?: HTMLElement;
   public moveable?: Moveable;
-  public calibrationTarget: TargetCalibrate;
+  public targetShadow: TargetShadow;
+  private getRootContainer: GetRootContainer;
 
   constructor(config: StageHighlightConfig) {
     super();
 
-    this.core = config.core;
     this.container = config.container;
-    this.calibrationTarget = new TargetCalibrate({
-      parent: this.core.mask.content,
-      mask: this.core.mask,
-      dr: this.core.dr,
-      core: this.core,
+    this.getRootContainer = config.getRootContainer;
+
+    this.targetShadow = new TargetShadow({
+      container: config.container,
+      updateDragEl: config.updateDragEl,
+      zIndex: ZIndex.HIGHLIGHT_EL,
+      idPrefix: HIGHLIGHT_EL_ID_PREFIX,
     });
   }
 
@@ -54,9 +55,9 @@ export default class StageHighlight extends EventEmitter {
     this.moveable?.destroy();
 
     this.moveable = new Moveable(this.container, {
-      target: this.calibrationTarget.update(el, HIGHLIGHT_EL_ID_PREFIX),
+      target: this.targetShadow.update(el),
       origin: false,
-      rootContainer: this.core.container,
+      rootContainer: this.getRootContainer(),
       zoom: 2,
     });
   }
@@ -65,7 +66,7 @@ export default class StageHighlight extends EventEmitter {
    * 清空高亮
    */
   public clearHighlight(): void {
-    if (!this.moveable) return;
+    if (!this.moveable || !this.target) return;
     this.target = undefined;
     this.moveable.target = null;
     this.moveable.updateTarget();
@@ -76,6 +77,6 @@ export default class StageHighlight extends EventEmitter {
    */
   public destroy(): void {
     this.moveable?.destroy();
-    this.calibrationTarget.destroy();
+    this.targetShadow.destroy();
   }
 }

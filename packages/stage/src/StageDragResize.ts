@@ -17,79 +17,60 @@
  */
 
 /* eslint-disable no-param-reassign */
-import { EventEmitter } from 'events';
-
-import KeyController from 'keycon';
-import type { MoveableOptions } from 'moveable';
-import Moveable from 'moveable';
+import Moveable, { MoveableOptions } from 'moveable';
 import MoveableHelper from 'moveable-helper';
 
-import { removeClassNameByClassName } from '@tmagic/utils';
-
-import { DRAG_EL_ID_PREFIX, GHOST_EL_ID_PREFIX, GuidesType, Mode, ZIndex } from './const';
-import selectParentAbles from './MoveableSelectParentAble';
-import StageCore from './StageCore';
-import StageMask from './StageMask';
-import type { StageDragResizeConfig } from './types';
-import { ContainerHighlightType, StageDragStatus } from './types';
-import { calcValueByFontsize, down, getAbsolutePosition, getMode, getOffset, getTargetElStyle, up } from './util';
+import { DRAG_EL_ID_PREFIX, GHOST_EL_ID_PREFIX, Mode, ZIndex } from './const';
+import MoveableOptionsManager from './MoveableOptionsManager';
+import TargetShadow from './TargetShadow';
+import type { DelayedMarkContainer, GetRenderDocument, MarkContainerEnd, StageDragResizeConfig } from './types';
+import { StageDragStatus } from './types';
+import { calcValueByFontsize, down, getAbsolutePosition, getMode, getOffset, up } from './util';
 
 /**
- * 选中框
+ * 管理单选操作，响应选中操作，初始化moveableOption参数并初始化moveable，处理moveable回调事件对组件进行更新
+ * @extends MoveableOptionsManager
  */
-export default class StageDragResize extends EventEmitter {
-  public core: StageCore;
-  public mask: StageMask;
-  /** 画布容器 */
-  public container: HTMLElement;
+export default class StageDragResize extends MoveableOptionsManager {
   /** 目标节点 */
-  public target?: HTMLElement;
+  private target?: HTMLElement;
   /** 目标节点在蒙层中的占位节点 */
-  public dragEl?: HTMLDivElement;
+  private targetShadow: TargetShadow;
   /** Moveable拖拽类实例 */
-  public moveable?: Moveable;
-  /** 水平参考线 */
-  public horizontalGuidelines: number[] = [];
-  /** 垂直参考线 */
-  public verticalGuidelines: number[] = [];
-  /** 对齐元素集合 */
-  public elementGuidelines: HTMLElement[] = [];
-  /** 布局方式：流式布局、绝对定位、固定定位 */
-  public mode: Mode = Mode.ABSOLUTE;
-
-  private moveableOptions: MoveableOptions = {};
+  private moveable?: Moveable;
   /** 拖动状态 */
   private dragStatus: StageDragStatus = StageDragStatus.END;
   /** 流式布局下，目标节点的镜像节点 */
   private ghostEl: HTMLElement | undefined;
   private moveableHelper?: MoveableHelper;
-  private isContainerHighlight: Boolean = false;
+  private getRenderDocument: GetRenderDocument;
+  private markContainerEnd: MarkContainerEnd;
+  private delayedMarkContainer: DelayedMarkContainer;
 
   constructor(config: StageDragResizeConfig) {
-    super();
+    super(config);
 
-    this.core = config.core;
-    this.container = config.container;
-    this.mask = config.mask;
+    this.getRenderDocument = config.getRenderDocument;
+    this.markContainerEnd = config.markContainerEnd;
+    this.delayedMarkContainer = config.delayedMarkContainer;
 
-    KeyController.global.keydown('alt', (e) => {
-      e.inputEvent.preventDefault();
-      this.isContainerHighlight = true;
+    this.targetShadow = new TargetShadow({
+      container: config.container,
+      updateDragEl: config.updateDragEl,
+      zIndex: ZIndex.DRAG_EL,
+      idPrefix: DRAG_EL_ID_PREFIX,
     });
-    KeyController.global.keyup('alt', (e) => {
-      e.inputEvent.preventDefault();
 
-      const doc = this.core.renderer.contentWindow?.document;
-      if (doc && this.canContainerHighlight()) {
-        removeClassNameByClassName(doc, this.core.containerHighlightClassName);
+    this.on('update-moveable', () => {
+      if (this.moveable) {
+        this.updateMoveable();
       }
-      this.isContainerHighlight = false;
     });
   }
 
   /**
    * 将选中框渲染并覆盖到选中的组件Dom节点上方
-   * 当选中的节点是不是absolute时，会创建一个新的节点出来作为拖拽目标
+   * 当选中的节点不是absolute时，会创建一个新的节点出来作为拖拽目标
    * @param el 选中组件的Dom节点元素
    * @param event 鼠标事件
    */
@@ -97,23 +78,11 @@ export default class StageDragResize extends EventEmitter {
     const oldTarget = this.target;
     this.target = el;
 
-    if (!this.dragEl) {
-      this.dragEl = globalThis.document.createElement('div');
-      this.container.append(this.dragEl);
-    }
-
     // 从不能拖动到能拖动的节点之间切换，要重新创建moveable，不然dragStart不生效
     if (!this.moveable || this.target !== oldTarget) {
-      this.init(el);
-      this.moveableHelper = MoveableHelper.create({
-        useBeforeRender: true,
-        useRender: false,
-        createAuto: true,
-      });
-
-      this.initMoveable();
+      this.initMoveable(el);
     } else {
-      this.updateMoveable();
+      this.updateMoveable(el);
     }
 
     if (event) {
@@ -125,51 +94,24 @@ export default class StageDragResize extends EventEmitter {
    * 初始化选中框并渲染出来
    */
   public updateMoveable(el = this.target): void {
-    if (!this.moveable) throw new Error('未初始化moveable');
+    if (!this.moveable) return;
     if (!el) throw new Error('未选中任何节点');
 
     this.target = el;
 
-    this.init(el);
+    const options: MoveableOptions = this.init(el);
 
-    Object.entries(this.moveableOptions).forEach(([key, value]) => {
+    Object.entries(options).forEach(([key, value]) => {
       (this.moveable as any)[key] = value;
     });
     this.moveable.updateTarget();
   }
 
-  public setGuidelines(type: GuidesType, guidelines: number[]): void {
-    if (type === GuidesType.HORIZONTAL) {
-      this.horizontalGuidelines = guidelines;
-      this.moveableOptions.horizontalGuidelines = guidelines;
-    } else if (type === GuidesType.VERTICAL) {
-      this.verticalGuidelines = guidelines;
-      this.moveableOptions.verticalGuidelines = guidelines;
-    }
-
-    if (this.moveable) {
-      this.updateMoveable();
-    }
-  }
-
-  public clearGuides() {
-    this.horizontalGuidelines = [];
-    this.verticalGuidelines = [];
-    this.moveableOptions.horizontalGuidelines = [];
-    this.moveableOptions.verticalGuidelines = [];
-    this.updateMoveable();
-  }
-
   public clearSelectStatus(): void {
     if (!this.moveable) return;
-    this.destroyDragEl();
-    this.dragEl = undefined;
+    this.targetShadow.destroyEl();
     this.moveable.target = null;
     this.moveable.updateTarget();
-  }
-
-  public destroyDragEl(): void {
-    this.dragEl?.remove();
   }
 
   /**
@@ -178,67 +120,44 @@ export default class StageDragResize extends EventEmitter {
   public destroy(): void {
     this.moveable?.destroy();
     this.destroyGhostEl();
-    this.destroyDragEl();
+    this.targetShadow.destroy();
     this.dragStatus = StageDragStatus.END;
     this.removeAllListeners();
   }
 
-  private init(el: HTMLElement): void {
+  private init(el: HTMLElement): MoveableOptions {
     // 如果有滚动条会导致resize时获取到width，height不准确
     if (/(auto|scroll)/.test(el.style.overflow)) {
       el.style.overflow = 'hidden';
     }
+
     this.mode = getMode(el);
 
     this.destroyGhostEl();
 
-    if (!this.dragEl) {
-      return;
-    }
+    this.targetShadow.update(el);
 
-    this.dragEl.style.cssText = getTargetElStyle(el);
-    this.dragEl.id = `${DRAG_EL_ID_PREFIX}${el.id}`;
+    // 设置选中元素的周围元素，用于选中元素跟周围元素对齐辅助
+    const elementGuidelines: any = this.target?.parentElement?.children || [];
+    this.setElementGuidelines([this.target as HTMLElement], elementGuidelines);
 
-    if (typeof this.core.config.updateDragEl === 'function') {
-      this.core.config.updateDragEl(this.dragEl, el);
-    }
-    this.moveableOptions = this.getOptions({
-      target: this.dragEl,
+    return this.getOptions(false, {
+      target: this.targetShadow.el,
     });
   }
 
-  private setElementGuidelines(nodes: HTMLElement[]) {
-    this.elementGuidelines.forEach((node) => {
-      node.remove();
+  private initMoveable(el: HTMLElement) {
+    const options: MoveableOptions = this.init(el);
+    this.moveableHelper = MoveableHelper.create({
+      useBeforeRender: true,
+      useRender: false,
+      createAuto: true,
     });
-    this.elementGuidelines = [];
 
-    if (this.mode === Mode.ABSOLUTE) {
-      this.container.append(this.createGuidelineElements(nodes));
-    }
-  }
-
-  private createGuidelineElements(nodes: HTMLElement[]) {
-    const frame = globalThis.document.createDocumentFragment();
-
-    for (const node of nodes) {
-      const { width, height } = node.getBoundingClientRect();
-      if (node === this.target) continue;
-      const { left, top } = getOffset(node as HTMLElement);
-      const elementGuideline = globalThis.document.createElement('div');
-      elementGuideline.style.cssText = `position: absolute;width: ${width}px;height: ${height}px;top: ${top}px;left: ${left}px`;
-      this.elementGuidelines.push(elementGuideline);
-      frame.append(elementGuideline);
-    }
-
-    return frame;
-  }
-
-  private initMoveable() {
     this.moveable?.destroy();
 
     this.moveable = new Moveable(this.container, {
-      ...this.moveableOptions,
+      ...options,
     });
 
     this.bindResizeEvent();
@@ -267,7 +186,7 @@ export default class StageDragResize extends EventEmitter {
       })
       .on('resize', (e) => {
         const { width, height, drag } = e;
-        if (!this.moveable || !this.target || !this.dragEl) return;
+        if (!this.moveable || !this.target || !this.targetShadow.el) return;
 
         const { beforeTranslate } = drag;
         this.dragStatus = StageDragStatus.ING;
@@ -275,8 +194,8 @@ export default class StageDragResize extends EventEmitter {
         // 流式布局
         if (this.mode === Mode.SORTABLE) {
           this.target.style.top = '0px';
-          this.dragEl.style.width = `${width}px`;
-          this.dragEl.style.height = `${height}px`;
+          this.targetShadow.el.style.width = `${width}px`;
+          this.targetShadow.el.style.height = `${height}px`;
         } else {
           this.moveableHelper?.onResize(e);
           this.target.style.left = `${frame.left + beforeTranslate[0]}px`;
@@ -302,9 +221,6 @@ export default class StageDragResize extends EventEmitter {
 
     let timeout: NodeJS.Timeout | undefined;
 
-    const { contentWindow } = this.core.renderer;
-    const doc = contentWindow?.document;
-
     this.moveable
       .on('dragStart', (e) => {
         if (!this.target) throw new Error('未选中组件');
@@ -321,16 +237,13 @@ export default class StageDragResize extends EventEmitter {
         frame.left = this.target.offsetLeft;
       })
       .on('drag', (e) => {
-        if (!this.target || !this.dragEl) return;
+        if (!this.target || !this.targetShadow.el) return;
 
         if (timeout) {
           globalThis.clearTimeout(timeout);
           timeout = undefined;
         }
-
-        if (this.canContainerHighlight()) {
-          timeout = this.core.getAddContainerHighlightClassNameTimeout(e.inputEvent, [this.target]);
-        }
+        timeout = this.delayedMarkContainer(e.inputEvent, [this.target]);
 
         this.dragStatus = StageDragStatus.ING;
 
@@ -351,12 +264,7 @@ export default class StageDragResize extends EventEmitter {
           timeout = undefined;
         }
 
-        let parentEl: HTMLElement | null = null;
-
-        if (doc && this.canContainerHighlight()) {
-          parentEl = removeClassNameByClassName(doc, this.core.containerHighlightClassName);
-        }
-
+        const parentEl = this.markContainerEnd();
         // 点击不拖动时会触发dragStart和dragEnd，但是不会有drag事件
         if (this.dragStatus === StageDragStatus.ING) {
           if (parentEl) {
@@ -386,7 +294,7 @@ export default class StageDragResize extends EventEmitter {
         this.moveableHelper?.onRotateStart(e);
       })
       .on('rotate', (e) => {
-        if (!this.target || !this.dragEl) return;
+        if (!this.target || !this.targetShadow.el) return;
         this.dragStatus = StageDragStatus.ING;
         this.moveableHelper?.onRotate(e);
         const frame = this.moveableHelper?.getFrame(e.target);
@@ -417,7 +325,7 @@ export default class StageDragResize extends EventEmitter {
         this.moveableHelper?.onScaleStart(e);
       })
       .on('scale', (e) => {
-        if (!this.target || !this.dragEl) return;
+        if (!this.target || !this.targetShadow.el) return;
         this.dragStatus = StageDragStatus.ING;
         this.moveableHelper?.onScale(e);
         const frame = this.moveableHelper?.getFrame(e.target);
@@ -461,8 +369,7 @@ export default class StageDragResize extends EventEmitter {
   private update(isResize = false, parentEl: HTMLElement | null = null): void {
     if (!this.target) return;
 
-    const { contentWindow } = this.core.renderer;
-    const doc = contentWindow?.document;
+    const doc = this.getRenderDocument();
 
     if (!doc) return;
 
@@ -474,15 +381,24 @@ export default class StageDragResize extends EventEmitter {
     const width = calcValueByFontsize(doc, this.target.clientWidth);
     const height = calcValueByFontsize(doc, this.target.clientHeight);
 
-    if (parentEl && this.mode === Mode.ABSOLUTE && this.dragEl) {
-      const [translateX, translateY] = this.moveableHelper?.getFrame(this.dragEl).properties.transform.translate.value;
+    if (parentEl && this.mode === Mode.ABSOLUTE && this.targetShadow.el) {
+      const targetShadowHtmlEl = this.targetShadow.el as HTMLElement;
+      const targetShadowElOffsetLeft = targetShadowHtmlEl.offsetLeft || 0;
+      const targetShadowElOffsetTop = targetShadowHtmlEl.offsetTop || 0;
+
+      const frame = this.moveableHelper?.getFrame(this.targetShadow.el);
+
+      const [translateX, translateY] = frame?.properties.transform.translate.value;
       const { left: parentLeft, top: parentTop } = getOffset(parentEl);
+
       left =
-        calcValueByFontsize(doc, this.dragEl.offsetLeft) +
+        calcValueByFontsize(doc, targetShadowElOffsetLeft) +
         parseFloat(translateX) -
         calcValueByFontsize(doc, parentLeft);
       top =
-        calcValueByFontsize(doc, this.dragEl.offsetTop) + parseFloat(translateY) - calcValueByFontsize(doc, parentTop);
+        calcValueByFontsize(doc, targetShadowElOffsetTop) +
+        parseFloat(translateY) -
+        calcValueByFontsize(doc, parentTop);
     }
 
     this.emit('update', {
@@ -529,87 +445,5 @@ export default class StageDragResize extends EventEmitter {
   private destroyGhostEl(): void {
     this.ghostEl?.remove();
     this.ghostEl = undefined;
-  }
-
-  private getOptions(options: MoveableOptions = {}): MoveableOptions {
-    if (!this.target) return {};
-
-    const isAbsolute = this.mode === Mode.ABSOLUTE;
-    const isFixed = this.mode === Mode.FIXED;
-    const isSortable = this.mode === Mode.SORTABLE;
-
-    let { moveableOptions = {} } = this.core.config;
-
-    if (typeof moveableOptions === 'function') {
-      moveableOptions = moveableOptions(this.core);
-    }
-
-    const elementGuidelines: any = moveableOptions.elementGuidelines || this.target.parentElement?.children || [];
-
-    this.setElementGuidelines(elementGuidelines);
-
-    if (moveableOptions.elementGuidelines) {
-      delete moveableOptions.elementGuidelines;
-    }
-
-    return {
-      origin: false,
-      rootContainer: this.core.container,
-      zoom: 1,
-      dragArea: false,
-      draggable: true,
-      resizable: true,
-      scalable: false,
-      rotatable: false,
-      snappable: true,
-      snapGap: isAbsolute || isFixed,
-      snapThreshold: 5,
-      snapDigit: 0,
-      throttleDrag: 0,
-      isDisplaySnapDigit: isAbsolute,
-      snapDirections: {
-        top: isAbsolute,
-        right: isAbsolute,
-        bottom: isAbsolute,
-        left: isAbsolute,
-        center: isAbsolute,
-        middle: isAbsolute,
-      },
-      elementSnapDirections: {
-        top: isAbsolute,
-        right: isAbsolute,
-        bottom: isAbsolute,
-        left: isAbsolute,
-      },
-      isDisplayInnerSnapDigit: true,
-      horizontalGuidelines: this.horizontalGuidelines,
-      verticalGuidelines: this.verticalGuidelines,
-      elementGuidelines: this.elementGuidelines,
-
-      bounds: {
-        top: 0,
-        // 设置0的话无法移动到left为0，所以只能设置为-1
-        left: -1,
-        right: this.container.clientWidth - 1,
-        bottom: isSortable ? undefined : this.container.clientHeight,
-        ...(moveableOptions.bounds || {}),
-      },
-
-      props: {
-        selectParent: true,
-      },
-
-      ables: [selectParentAbles(this)],
-
-      ...options,
-      ...moveableOptions,
-    };
-  }
-
-  private canContainerHighlight() {
-    return (
-      this.core.containerHighlightType === ContainerHighlightType.DEFAULT ||
-      (this.core.containerHighlightType === ContainerHighlightType.ALT && this.isContainerHighlight)
-    );
   }
 }

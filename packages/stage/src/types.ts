@@ -21,20 +21,39 @@ import type { MoveableOptions } from 'moveable';
 import Core from '@tmagic/core';
 import type { Id, MApp, MContainer, MNode } from '@tmagic/schema';
 
-import { GuidesType } from './const';
+import { GuidesType, ZIndex } from './const';
 import StageCore from './StageCore';
-import StageDragResize from './StageDragResize';
-import StageMask from './StageMask';
+
+export type TargetElement = HTMLElement | SVGElement;
 
 export type CanSelect = (el: HTMLElement, event: MouseEvent, stop: () => boolean) => boolean | Promise<boolean>;
 export type IsContainer = (el: HTMLElement) => boolean | Promise<boolean>;
+export type CustomizeRender = (renderer: StageCore) => Promise<HTMLElement> | HTMLElement;
+/** 业务方自定义的moveableOptions，可以是配置，也可以是回调函数 */
+export type CustomizeMoveableOptions =
+  | ((config?: CustomizeMoveableOptionsCallbackConfig) => MoveableOptions)
+  | MoveableOptions
+  | undefined;
+/** render提供给的接口，如果是id则转成el，如果是el则直接返回 */
+export type GetTargetElement = (idOrEl: Id | HTMLElement) => HTMLElement;
+/** render提供的接口，通过坐标获得坐标下所有HTML元素数组 */
+export type GetElementsFromPoint = (point: Point) => HTMLElement[];
+export type GetRenderDocument = () => Document | undefined;
+export type DelayedMarkContainer = (event: MouseEvent, exclude: Element[]) => NodeJS.Timeout | undefined;
+export type MarkContainerEnd = () => HTMLElement | null;
+export type GetRootContainer = () => HTMLDivElement | undefined;
 
+/** 将组件添加到容器的方式 */
 export enum ContainerHighlightType {
+  /** 默认方式：组件在容器上方悬停一段时间后加入 */
   DEFAULT = 'default',
+  /** 按住alt键，并在容器上方悬停一段时间后加入 */
   ALT = 'alt',
 }
 
-export type StageCoreConfig = {
+export type UpdateDragEl = (el: TargetElement, target: TargetElement) => void;
+
+export interface StageCoreConfig {
   /** 需要对齐的dom节点的CSS选择器字符串 */
   snapElementQuerySelector?: string;
   /** 放大倍数，默认1倍 */
@@ -44,18 +63,45 @@ export type StageCoreConfig = {
   containerHighlightClassName?: string;
   containerHighlightDuration?: number;
   containerHighlightType?: ContainerHighlightType;
-  moveableOptions?: ((core?: StageCore) => MoveableOptions) | MoveableOptions;
-  multiMoveableOptions?: ((core?: StageCore) => MoveableOptions) | MoveableOptions;
+  moveableOptions?: CustomizeMoveableOptions;
+  multiMoveableOptions?: CustomizeMoveableOptions;
   /** runtime 的HTML地址，可以是一个HTTP地址，如果和编辑器不同域，需要设置跨域，也可以是一个相对或绝对路径 */
   runtimeUrl?: string;
   render?: (renderer: StageCore) => Promise<HTMLElement> | HTMLElement;
   autoScrollIntoView?: boolean;
-  updateDragEl?: (el: HTMLDivElement, target: HTMLElement) => void;
-};
+  updateDragEl?: UpdateDragEl;
+}
+
+export interface ActionManagerConfig {
+  container: HTMLElement;
+  containerHighlightClassName?: string;
+  containerHighlightDuration?: number;
+  containerHighlightType?: ContainerHighlightType;
+  moveableOptions?: CustomizeMoveableOptions;
+  multiMoveableOptions?: CustomizeMoveableOptions;
+  canSelect?: CanSelect;
+  isContainer: IsContainer;
+  getRootContainer: GetRootContainer;
+  getRenderDocument: GetRenderDocument;
+  updateDragEl?: UpdateDragEl;
+  getTargetElement: GetTargetElement;
+  getElementsFromPoint: GetElementsFromPoint;
+}
+
+export interface MoveableOptionsManagerConfig {
+  container: HTMLElement;
+  moveableOptions?: CustomizeMoveableOptions;
+  getRootContainer: GetRootContainer;
+}
+
+export interface CustomizeMoveableOptionsCallbackConfig {
+  targetElId?: string;
+}
 
 export interface StageRenderConfig {
   runtimeUrl?: string;
-  render?: () => Promise<HTMLElement | null>;
+  zoom: number | undefined;
+  customizedRender?: () => Promise<HTMLElement | null>;
 }
 
 export interface StageMaskConfig {
@@ -63,9 +109,29 @@ export interface StageMaskConfig {
 }
 
 export interface StageDragResizeConfig {
-  core: StageCore;
   container: HTMLElement;
-  mask: StageMask;
+  moveableOptions?: CustomizeMoveableOptions;
+  getRootContainer: GetRootContainer;
+  getRenderDocument: GetRenderDocument;
+  markContainerEnd: MarkContainerEnd;
+  delayedMarkContainer: DelayedMarkContainer;
+  updateDragEl?: UpdateDragEl;
+}
+
+export interface StageMultiDragResizeConfig {
+  container: HTMLElement;
+  multiMoveableOptions?: CustomizeMoveableOptions;
+  getRootContainer: GetRootContainer;
+  getRenderDocument: GetRenderDocument;
+  updateDragEl?: UpdateDragEl;
+}
+
+/** 选择状态 */
+export enum SelectStatus {
+  /** 单选 */
+  SELECT = 'select',
+  /** 多选 */
+  MULTI_SELECT = 'multiSelect',
 }
 
 /** 拖动状态 */
@@ -86,6 +152,11 @@ export type Rect = {
 export interface Offset {
   left: number;
   top: number;
+}
+
+export interface Point {
+  clientX: number;
+  clientY: number;
 }
 
 export interface GuidesEventData {
@@ -154,13 +225,14 @@ export interface RuntimeWindow extends Window {
 }
 
 export interface StageHighlightConfig {
-  core: StageCore;
   container: HTMLElement;
+  updateDragEl?: UpdateDragEl;
+  getRootContainer: GetRootContainer;
 }
 
-export interface TargetCalibrateConfig {
-  parent: HTMLElement;
-  mask: StageMask;
-  dr: StageDragResize;
-  core: StageCore;
+export interface TargetShadowConfig {
+  container: HTMLElement;
+  zIndex?: ZIndex;
+  updateDragEl?: UpdateDragEl;
+  idPrefix?: string;
 }

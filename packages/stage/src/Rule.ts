@@ -60,12 +60,12 @@ export default class Rule extends EventEmitter {
       defaultGuides: vLines,
     });
 
-    this.emit('changeGuides', {
+    this.emit('change-guides', {
       type: GuidesType.HORIZONTAL,
       guides: hLines,
     });
 
-    this.emit('changeGuides', {
+    this.emit('change-guides', {
       type: GuidesType.VERTICAL,
       guides: vLines,
     });
@@ -143,7 +143,7 @@ export default class Rule extends EventEmitter {
 
   private hGuidesChangeGuidesHandler = (e: GuidesEvents['changeGuides']) => {
     this.horizontalGuidelines = e.guides;
-    this.emit('changeGuides', {
+    this.emit('change-guides', {
       type: GuidesType.HORIZONTAL,
       guides: this.horizontalGuidelines,
     });
@@ -151,7 +151,7 @@ export default class Rule extends EventEmitter {
 
   private vGuidesChangeGuidesHandler = (e: GuidesEvents['changeGuides']) => {
     this.verticalGuidelines = e.guides;
-    this.emit('changeGuides', {
+    this.emit('change-guides', {
       type: GuidesType.VERTICAL,
       guides: this.verticalGuidelines,
     });

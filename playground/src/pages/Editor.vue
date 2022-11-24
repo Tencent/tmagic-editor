@@ -41,7 +41,7 @@ import serialize from 'serialize-javascript';
 import { editorService, MenuBarData, MoveableOptions, TMagicEditor } from '@tmagic/editor';
 import type { Id, MContainer, MNode } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
-import StageCore from '@tmagic/stage';
+import { CustomizeMoveableOptionsCallbackConfig } from '@tmagic/stage';
 import { asyncLoadJs } from '@tmagic/utils';
 
 import DeviceGroup from '../components/DeviceGroup.vue';
@@ -128,10 +128,10 @@ const menu: MenuBarData = {
   ],
 };
 
-const moveableOptions = (core?: StageCore): MoveableOptions => {
+const moveableOptions = (config?: CustomizeMoveableOptionsCallbackConfig): MoveableOptions => {
   const options: MoveableOptions = {};
-  const id = core?.dr?.target?.id;
 
+  const id = config?.targetElId;
   if (!id || !editor.value) return options;
 
   const node = editor.value.editorService.getNodeById(id);

@@ -16,20 +16,16 @@
  * limitations under the License.
  */
 
-import KeyController from 'keycon';
-import { throttle } from 'lodash-es';
+import { createDiv, getDocument, injectStyle } from '@tmagic/utils';
 
-import { createDiv, injectStyle } from '@tmagic/utils';
-
-import { Mode, MouseButton, ZIndex } from './const';
+import { Mode, ZIndex } from './const';
 import Rule from './Rule';
-import { getScrollParent, isFixedParent, isMoveableButton } from './util';
+import { getScrollParent, isFixedParent } from './util';
 
 const wrapperClassName = 'editor-mask-wrapper';
-const throttleTime = 100;
 
 const hideScrollbar = () => {
-  injectStyle(globalThis.document, `.${wrapperClassName}::-webkit-scrollbar { width: 0 !important; display: none }`);
+  injectStyle(getDocument(), `.${wrapperClassName}::-webkit-scrollbar { width: 0 !important; display: none }`);
 };
 
 const createContent = (): HTMLDivElement =>
@@ -78,20 +74,11 @@ export default class StageMask extends Rule {
   public wrapperWidth = 0;
   public maxScrollTop = 0;
   public maxScrollLeft = 0;
-  public isMultiSelectStatus: Boolean = false;
 
   private mode: Mode = Mode.ABSOLUTE;
   private pageScrollParent: HTMLElement | null = null;
   private intersectionObserver: IntersectionObserver | null = null;
   private wrapperResizeObserver: ResizeObserver | null = null;
-
-  /**
-   * 高亮事件处理函数
-   * @param event 事件对象
-   */
-  private highlightHandler = throttle((event: MouseEvent): void => {
-    this.emit('highlight', event);
-  }, throttleTime);
 
   constructor() {
     const wrapper = createWrapper();
@@ -99,15 +86,16 @@ export default class StageMask extends Rule {
 
     this.wrapper = wrapper;
 
-    this.initContentEventListener();
+    this.content.addEventListener('wheel', this.mouseWheelHandler);
     this.wrapper.appendChild(this.content);
-
-    this.initMultiSelectEvent();
   }
 
   public setMode(mode: Mode) {
     this.mode = mode;
     this.scroll();
+
+    this.content.dataset.mode = mode;
+
     if (mode === Mode.FIXED) {
       this.content.style.width = `${this.wrapperWidth}px`;
       this.content.style.height = `${this.wrapperHeight}px`;
@@ -182,40 +170,7 @@ export default class StageMask extends Rule {
     this.pageScrollParent = null;
     this.wrapperResizeObserver?.disconnect();
 
-    this.content.removeEventListener('mouseleave', this.mouseLeaveHandler);
     super.destroy();
-  }
-
-  /**
-   * 初始化content的事件监听
-   */
-  private initContentEventListener(): void {
-    this.content.addEventListener('mousedown', this.mouseDownHandler);
-    this.content.addEventListener('wheel', this.mouseWheelHandler);
-    this.content.addEventListener('mousemove', this.highlightHandler);
-    this.content.addEventListener('mouseleave', this.mouseLeaveHandler);
-  }
-
-  /**
-   * 初始化多选事件监听
-   */
-  private initMultiSelectEvent(): void {
-    const isMac = /mac os x/.test(navigator.userAgent.toLowerCase());
-
-    const ctrl = isMac ? 'meta' : 'ctrl';
-
-    KeyController.global.keydown(ctrl, (e) => {
-      e.inputEvent.preventDefault();
-      this.isMultiSelectStatus = true;
-    });
-    // ctrl+tab切到其他窗口，需要将多选状态置为false
-    KeyController.global.on('blur', () => {
-      this.isMultiSelectStatus = false;
-    });
-    KeyController.global.keyup(ctrl, (e) => {
-      e.inputEvent.preventDefault();
-      this.isMultiSelectStatus = false;
-    });
   }
 
   /**
@@ -286,6 +241,17 @@ export default class StageMask extends Rule {
 
   private scrollTo(scrollLeft: number, scrollTop: number): void {
     this.content.style.transform = `translate3d(${-scrollLeft}px, ${-scrollTop}px, 0)`;
+
+    const event = new CustomEvent<{
+      scrollLeft: number;
+      scrollTop: number;
+    }>('customScroll', {
+      detail: {
+        scrollLeft: this.scrollLeft,
+        scrollTop: this.scrollTop,
+      },
+    });
+    this.content.dispatchEvent(event);
   }
 
   /**
@@ -333,51 +299,7 @@ export default class StageMask extends Rule {
     if (this.maxScrollLeft < this.scrollLeft) this.scrollLeft = this.maxScrollLeft;
   }
 
-  /**
-   * 点击事件处理函数
-   * @param event 事件对象
-   */
-  private mouseDownHandler = (event: MouseEvent): void => {
-    this.emit('clearHighlight');
-    event.stopImmediatePropagation();
-    event.stopPropagation();
-
-    if (event.button !== MouseButton.LEFT && event.button !== MouseButton.RIGHT) return;
-    if (!event.target) return;
-
-    const targetClassList = (event.target as HTMLDivElement).classList;
-
-    // 如果单击多选选中区域，则不需要再触发选中了，而可能是拖动行为
-    if (!this.isMultiSelectStatus && targetClassList.contains('moveable-area')) {
-      return;
-    }
-    // 点击对象如果是边框锚点，则可能是resize; 点击对象是功能按钮
-    if (targetClassList.contains('moveable-control') || isMoveableButton(event.target as Element)) {
-      return;
-    }
-
-    this.content.removeEventListener('mousemove', this.highlightHandler);
-
-    // 判断触发多选还是单选
-    if (this.isMultiSelectStatus) {
-      this.emit('beforeMultiSelect', event);
-    } else {
-      this.emit('beforeSelect', event);
-    }
-    // 如果是右键点击，这里的mouseup事件监听没有效果
-    globalThis.document.addEventListener('mouseup', this.mouseUpHandler);
-  };
-
-  private mouseUpHandler = (): void => {
-    globalThis.document.removeEventListener('mouseup', this.mouseUpHandler);
-    this.content.addEventListener('mousemove', this.highlightHandler);
-    if (!this.isMultiSelectStatus) {
-      this.emit('select');
-    }
-  };
-
   private mouseWheelHandler = (event: WheelEvent) => {
-    this.emit('clearHighlight');
     if (!this.page) throw new Error('page 未初始化');
 
     const { deltaY, deltaX } = event;
@@ -394,11 +316,6 @@ export default class StageMask extends Rule {
     }
 
     this.scroll();
-
     this.emit('scroll', event);
-  };
-
-  private mouseLeaveHandler = () => {
-    setTimeout(() => this.emit('clearHighlight'), throttleTime);
   };
 }

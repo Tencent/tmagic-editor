@@ -54,7 +54,7 @@ export const useStage = (stageOptions: StageOptions) => {
     editorService.highlight(el.id);
   });
 
-  stage.on('multiSelect', (els: HTMLElement[]) => {
+  stage.on('multi-select', (els: HTMLElement[]) => {
     editorService.multiSelect(els.map((el) => el.id));
   });
 
@@ -79,7 +79,7 @@ export const useStage = (stageOptions: StageOptions) => {
     editorService.get<StageCore>('stage').select(parent.id);
   });
 
-  stage.on('changeGuides', (e) => {
+  stage.on('change-guides', (e) => {
     uiService.set('showGuides', true);
 
     if (!root.value || !page.value) return;

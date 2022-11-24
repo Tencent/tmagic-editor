@@ -21,7 +21,12 @@ import type { Component } from 'vue';
 import type { FormConfig } from '@tmagic/form';
 import type { CodeBlockContent, CodeBlockDSL, Id, MApp, MContainer, MNode, MPage } from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
-import type { ContainerHighlightType, MoveableOptions } from '@tmagic/stage';
+import type {
+  ContainerHighlightType,
+  CustomizeMoveableOptionsCallbackConfig,
+  MoveableOptions,
+  UpdateDragEl,
+} from '@tmagic/stage';
 
 import type { CodeBlockService } from './services/codeBlock';
 import type { ComponentListService } from './services/componentList';
@@ -57,10 +62,10 @@ export interface StageOptions {
   containerHighlightDuration: number;
   containerHighlightType: ContainerHighlightType;
   render: () => HTMLDivElement;
-  moveableOptions: MoveableOptions | ((core?: StageCore) => MoveableOptions);
+  moveableOptions: MoveableOptions | ((config?: CustomizeMoveableOptionsCallbackConfig) => MoveableOptions);
   canSelect: (el: HTMLElement) => boolean | Promise<boolean>;
   isContainer: (el: HTMLElement) => boolean | Promise<boolean>;
-  updateDragEl: (el: HTMLDivElement) => void;
+  updateDragEl: UpdateDragEl;
 }
 
 export interface StoreState {

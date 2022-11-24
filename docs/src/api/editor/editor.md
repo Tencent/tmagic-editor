@@ -292,7 +292,7 @@ icon使用的是[element-plus icon](https://element-plus.org/zh-CN/component/ico
 
 ### moveableOptions
 
-- **类型：** ((core: StageCore) => MoveableOptions) | [MoveableOptions](https://daybrush.com/moveable/release/latest/doc/)
+- **类型：** ((config?: CustomizeMoveableOptionsCallbackConfig) => MoveableOptions) | [MoveableOptions](https://daybrush.com/moveable/release/latest/doc/)
   
 - **默认值：** {}
   

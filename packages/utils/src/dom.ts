@@ -108,3 +108,5 @@ export const createDiv = ({ className, cssText }: { className: string; cssText: 
   el.style.cssText = cssText;
   return el;
 };
+
+export const getDocument = () => globalThis.document;

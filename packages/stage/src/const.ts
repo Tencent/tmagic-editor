@@ -25,7 +25,7 @@ export const DRAG_EL_ID_PREFIX = 'drag_el_';
 /** 高亮时需要在蒙层中创建一个占位节点，该节点的id前缀 */
 export const HIGHLIGHT_EL_ID_PREFIX = 'highlight_el_';
 
-export const CONTAINER_HIGHLIGHT_CLASS = 'tmagic-stage-container-highlight';
+export const CONTAINER_HIGHLIGHT_CLASS_NAME = 'tmagic-stage-container-highlight';
 
 export const PAGE_CLASS = 'magic-ui-page';
 

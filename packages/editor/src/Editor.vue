@@ -69,8 +69,13 @@ import { defineComponent, onUnmounted, PropType, provide, reactive, toRaw, watch
 import { EventOption } from '@tmagic/core';
 import type { FormConfig } from '@tmagic/form';
 import type { MApp, MNode } from '@tmagic/schema';
-import type StageCore from '@tmagic/stage';
-import { CONTAINER_HIGHLIGHT_CLASS, ContainerHighlightType, MoveableOptions } from '@tmagic/stage';
+import {
+  CONTAINER_HIGHLIGHT_CLASS_NAME,
+  ContainerHighlightType,
+  CustomizeMoveableOptionsCallbackConfig,
+  MoveableOptions,
+  UpdateDragEl,
+} from '@tmagic/stage';
 
 import Framework from './layouts/Framework.vue';
 import NavMenu from './layouts/NavMenu.vue';
@@ -164,7 +169,9 @@ export default defineComponent({
 
     /** 画布中组件选中框的移动范围 */
     moveableOptions: {
-      type: [Object, Function] as PropType<MoveableOptions | ((core?: StageCore) => MoveableOptions)>,
+      type: [Object, Function] as PropType<
+        MoveableOptions | ((config?: CustomizeMoveableOptionsCallbackConfig) => MoveableOptions)
+      >,
     },
 
     /** 编辑器初始化时默认选中的组件ID */
@@ -184,7 +191,7 @@ export default defineComponent({
 
     containerHighlightClassName: {
       type: String,
-      default: CONTAINER_HIGHLIGHT_CLASS,
+      default: CONTAINER_HIGHLIGHT_CLASS_NAME,
     },
 
     containerHighlightDuration: {
@@ -207,7 +214,7 @@ export default defineComponent({
     },
 
     updateDragEl: {
-      type: Function as PropType<(el: HTMLDivElement, target: HTMLElement) => void>,
+      type: Function as PropType<UpdateDragEl>,
     },
   },
 

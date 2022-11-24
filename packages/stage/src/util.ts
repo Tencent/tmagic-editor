@@ -18,7 +18,7 @@
 import { removeClassName } from '@tmagic/utils';
 
 import { GHOST_EL_ID_PREFIX, Mode, SELECTED_CLASS, ZIndex } from './const';
-import type { Offset, SortEventData } from './types';
+import type { Offset, SortEventData, TargetElement } from './types';
 
 const getParents = (el: Element, relative: Element) => {
   let cur: Element | null = el.parentElement;
@@ -30,12 +30,16 @@ const getParents = (el: Element, relative: Element) => {
   return parents;
 };
 
-export const getOffset = (el: HTMLElement): Offset => {
-  const { offsetParent } = el;
+export const getOffset = (el: TargetElement): Offset => {
+  const htmlEl = el as HTMLElement;
+  const { offsetParent } = htmlEl;
 
-  const left = el.offsetLeft;
-  const top = el.offsetTop;
+  const left = htmlEl.offsetLeft || 0;
+  const top = htmlEl.offsetTop || 0;
 
+  // 在 Webkit 中，如果元素为隐藏的（该元素或其祖先元素的 style.display 为 "none"），或者该元素的 style.position 被设为 "fixed"，则该属性返回 null。
+  // 在 IE 9 中，如果该元素的 style.position 被设置为 "fixed"，则该属性返回 null。（display:none 无影响。）
+  // body offsetParent 为 null
   if (offsetParent) {
     const parentOffset = getOffset(offsetParent as HTMLElement);
     return {
@@ -51,7 +55,7 @@ export const getOffset = (el: HTMLElement): Offset => {
 };
 
 // 将蒙层占位节点覆盖在原节点上方
-export const getTargetElStyle = (el: HTMLElement) => {
+export const getTargetElStyle = (el: TargetElement, zIndex?: ZIndex) => {
   const offset = getOffset(el);
   const { transform } = getComputedStyle(el);
   return `
@@ -61,13 +65,16 @@ export const getTargetElStyle = (el: HTMLElement) => {
     top: ${offset.top}px;
     width: ${el.clientWidth}px;
     height: ${el.clientHeight}px;
-    z-index: ${ZIndex.DRAG_EL};
+    ${typeof zIndex !== 'undefined' ? `z-index: ${zIndex};` : ''}
   `;
 };
 
 export const getAbsolutePosition = (el: HTMLElement, { top, left }: Offset) => {
   const { offsetParent } = el;
 
+  // 在 Webkit 中，如果元素为隐藏的（该元素或其祖先元素的 style.display 为 "none"），或者该元素的 style.position 被设为 "fixed"，则该属性返回 null。
+  // 在 IE 9 中，如果该元素的 style.position 被设置为 "fixed"，则该属性返回 null。（display:none 无影响。）
+  // body offsetParent 为 null
   if (offsetParent) {
     const parentOffset = getOffset(offsetParent as HTMLElement);
     return {
@@ -87,7 +94,7 @@ export const isStatic = (style: CSSStyleDeclaration): boolean => style.position 
 
 export const isFixed = (style: CSSStyleDeclaration): boolean => style.position === 'fixed';
 
-export const isFixedParent = (el: HTMLElement) => {
+export const isFixedParent = (el: Element) => {
   let fixed = false;
   let dom = el;
   while (dom) {
@@ -104,7 +111,7 @@ export const isFixedParent = (el: HTMLElement) => {
   return fixed;
 };
 
-export const getMode = (el: HTMLElement): Mode => {
+export const getMode = (el: Element): Mode => {
   if (isFixedParent(el)) return Mode.FIXED;
   const style = getComputedStyle(el);
   if (isStatic(style) || isRelative(style)) return Mode.SORTABLE;
@@ -168,7 +175,7 @@ export const calcValueByFontsize = (doc: Document, value: number) => {
  * @param {number} deltaTop 偏移量
  * @param {Object} detail 当前选中的组件配置
  */
-export const down = (deltaTop: number, target: HTMLElement | SVGElement): SortEventData | void => {
+export const down = (deltaTop: number, target: TargetElement): SortEventData | void => {
   let swapIndex = 0;
   let addUpH = target.clientHeight;
   const brothers = Array.from(target.parentNode?.children || []).filter(
@@ -204,7 +211,7 @@ export const down = (deltaTop: number, target: HTMLElement | SVGElement): SortEv
  * @param {number} deltaTop 偏移量
  * @param {Object} detail 当前选中的组件配置
  */
-export const up = (deltaTop: number, target: HTMLElement | SVGElement): SortEventData | void => {
+export const up = (deltaTop: number, target: TargetElement): SortEventData | void => {
   const brothers = Array.from(target.parentNode?.children || []).filter(
     (node) => !node.id.startsWith(GHOST_EL_ID_PREFIX),
   );
