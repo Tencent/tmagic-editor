@@ -1,3 +1,12 @@
+# [1.2.0-beta.17](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.16...v1.2.0-beta.17) (2022-11-24)
+
+
+### Bug Fixes
+
+* **editor:** m-form不能加key，会导致vue示例销毁重建 ([fc50c87](https://github.com/Tencent/tmagic-editor/commit/fc50c87ad51733b16751f4b2b6b0d5f3e9d342e8))
+
+
+
 # [1.2.0-beta.16](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.15...v1.2.0-beta.16) (2022-11-23)
 
 
