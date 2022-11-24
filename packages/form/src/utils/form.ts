@@ -62,9 +62,9 @@ const initItemsValue = (
   { items, name, extensible }: any,
 ) => {
   if (Array.isArray(initValue[name])) {
-    value[name] = initValue[name].map((v: any, index: number) => init(mForm, items, v, value[name]?.[index]));
+    value[name] = initValue[name].map((v: any, index: number) => createValues(mForm, items, v, value[name]?.[index]));
   } else {
-    value[name] = init(mForm, items, initValue[name], value[name]);
+    value[name] = createValues(mForm, items, initValue[name], value[name]);
     if (extensible) {
       value[name] = Object.assign({}, initValue[name], value[name]);
     }
@@ -129,7 +129,7 @@ const initValueItem = function (
 
   if (!name) {
     // 没有配置name，直接跳过
-    return init(mForm, items, initValue, value);
+    return createValues(mForm, items, initValue, value);
   }
 
   setValue(mForm, value, initValue, item);
@@ -137,7 +137,7 @@ const initValueItem = function (
   return value;
 };
 
-const init = function (
+export const createValues = function (
   mForm: FormState | undefined,
   config: FormConfig | TabPaneConfig[] = [],
   initValue: FormValue = {},
@@ -253,7 +253,7 @@ export const initValue = async (
 ) => {
   if (!Array.isArray(config)) throw new Error('config应该为数组');
 
-  let valuesTmp = init(mForm, config, toRaw(initValues), {});
+  let valuesTmp = createValues(mForm, config, toRaw(initValues), {});
 
   const [firstForm] = config as [ContainerCommonConfig];
   if (firstForm && typeof firstForm.onInitValue === 'function') {

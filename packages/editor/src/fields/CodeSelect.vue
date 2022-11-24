@@ -17,11 +17,12 @@
 import { computed, defineEmits, defineProps, inject, watch } from 'vue';
 import { isEmpty, map } from 'lodash-es';
 
-import { FormItem, TableConfig } from '@tmagic/form';
+import { createValues, FormItem, FormState, TableConfig } from '@tmagic/form';
 import { HookType, Id } from '@tmagic/schema';
 
 import { CodeParamStatement, HookData, Services } from '../type';
 const services = inject<Services>('services');
+const mForm = inject<FormState>('mForm');
 const emit = defineEmits(['change']);
 
 const props = defineProps<{
@@ -65,7 +66,14 @@ const tableConfig = computed<FormItem>(() => {
         name: 'params',
         label: '参数',
         defaultValue: {},
-        itemsFunction: (row: HookData) => getParamsConfig(row.codeId),
+        itemsFunction: (row: HookData) => {
+          const paramsConfig = getParamsConfig(row.codeId);
+          if (!row.params) row.params = {};
+          if (isEmpty(row.params)) {
+            createValues(mForm, paramsConfig, {}, row.params);
+          }
+          return paramsConfig;
+        },
       },
     ],
   };
