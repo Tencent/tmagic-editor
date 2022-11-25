@@ -10,14 +10,14 @@ npm i pnpm -g
 # magic依赖安装和构建
 cd ${WORKSPACE}
 npm run reinstall
-npm run build:admin
+npm run build:runtime:admin
 
 echo "magic依赖安装完毕 & 打包完毕"
 
 # 移动runtime打包产物到web
 # 管理端demo已包含打包产物，开发者自建流水线打包时可参考产物
-#rm -rf ${WORKSPACE}/magic-admin/web/public/runtime
-#mv -f ${WORKSPACE}/playground/dist/runtime/ ${WORKSPACE}/magic-admin/web/public
+#rm -rf ${WORKSPACE}/magic-admin/server/static/vue3
+#mv -f ${WORKSPACE}/runtime/vue3/dist/ ${WORKSPACE}/magic-admin/server/static/vue3
 
 #echo "移动runtime打包产物到web完毕"
 
