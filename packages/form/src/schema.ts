@@ -633,6 +633,7 @@ export interface TableConfig extends FormItem {
   enableFullscreen?: boolean;
   fixed?: boolean;
   itemExtra?: string | FilterFunction;
+  rowKey: string;
 }
 
 export interface GroupListConfig extends FormItem {

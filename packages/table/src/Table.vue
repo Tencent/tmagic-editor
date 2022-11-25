@@ -9,7 +9,7 @@
     :max-height="bodyHeight"
     :default-expand-all="defaultExpandAll"
     :border="hasBorder"
-    :row-key="rowkeyName || 'c_id'"
+    :row-key="rowkeyName || 'id'"
     :tree-props="{ children: 'children' }"
     :empty-text="emptyText || '暂无数据'"
     :span-method="objectSpanMethod"

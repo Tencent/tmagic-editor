@@ -7,6 +7,7 @@
           v-if="model[modelName]"
           ref="tMagicTable"
           style="width: 100%"
+          :row-key="config.rowKey || 'id'"
           :data="data"
           :border="config.border"
           :max-height="config.maxHeight"
