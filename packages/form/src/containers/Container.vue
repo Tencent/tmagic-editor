@@ -21,6 +21,7 @@
       :is="tagName"
       :model="model"
       :config="config"
+      :disabled="disabled"
       :name="name"
       :prop="itemProp"
       :step-active="stepActive"
@@ -87,6 +88,7 @@
           :model="name || name === 0 ? model[name] : model"
           :config="item"
           :size="size"
+          :disabled="disabled"
           :step-active="stepActive"
           :expand-more="expand"
           :label-width="itemLabelWidth"
@@ -97,7 +99,7 @@
     </template>
 
     <div style="text-align: center" v-if="config.expand && type !== 'fieldset'">
-      <TMagicButton type="primary" size="small" text @click="expandHandler">{{
+      <TMagicButton type="primary" size="small" :disabled="false" text @click="expandHandler">{{
         expand ? '收起配置' : '展开更多配置'
       }}</TMagicButton>
     </div>
@@ -118,6 +120,7 @@ const props = withDefaults(
     model: FormValue;
     config: ChildConfig;
     prop?: string;
+    disabled?: boolean;
     labelWidth?: string;
     expandMore?: boolean;
     stepActive?: string | number;
@@ -159,7 +162,9 @@ const tagName = computed(() => {
   return 'm-fields-text';
 });
 
-const disabled = computed(() => filterFunction(mForm, props.config.disabled, props));
+const disabled = computed(() =>
+  typeof props.disabled === 'undefined' ? filterFunction(mForm, props.config.disabled, props) : props.disabled,
+);
 
 const tooltip = computed(() => filterFunction(mForm, props.config.tooltip, props));
 

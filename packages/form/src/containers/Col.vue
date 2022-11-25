@@ -7,6 +7,7 @@
       :label-width="config.labelWidth || labelWidth"
       :expand-more="expandMore"
       :size="size"
+      :disabled="disabled"
       @change="changeHandler"
     ></Container>
   </TMagicCol>
@@ -30,6 +31,7 @@ const props = defineProps<{
   span?: number;
   size?: string;
   prop?: string;
+  disabled?: boolean;
 }>();
 
 const emit = defineEmits(['change']);

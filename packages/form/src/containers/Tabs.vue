@@ -22,6 +22,7 @@
           v-for="item in tabItems(tab)"
           :key="item[mForm?.keyProp || '__key']"
           :config="item"
+          :disabled="disabled"
           :model="
             config.dynamic
               ? (name ? model[name] : model)[tabIndex]
@@ -90,6 +91,7 @@ const props = defineProps<{
   labelWidth?: string;
   prop?: string;
   expandMore?: boolean;
+  disabled?: boolean;
 }>();
 
 const emit = defineEmits(['change']);

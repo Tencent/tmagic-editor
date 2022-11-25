@@ -5,21 +5,22 @@
         ><CaretBottom v-if="expand" /><CaretRight v-else
       /></TMagicIcon>
 
-      <TMagicButton text @click="expandHandler">{{ title }}</TMagicButton>
+      <TMagicButton text :disabled="disabled" @click="expandHandler">{{ title }}</TMagicButton>
 
       <TMagicButton
         v-show="showDelete(parseInt(String(index)))"
+        style="color: #f56c6c"
         text
         :icon="Delete"
-        style="color: #f56c6c"
+        :disabled="disabled"
         @click="removeHandler"
       ></TMagicButton>
 
       <template v-if="movable()">
-        <TMagicButton v-show="index !== 0" text size="small" @click="changeOrder(-1)"
+        <TMagicButton v-show="index !== 0" text :disabled="disabled" size="small" @click="changeOrder(-1)"
           >上移<TMagicIcon><CaretTop /></TMagicIcon
         ></TMagicButton>
-        <TMagicButton v-show="index !== length - 1" text size="small" @click="changeOrder(1)"
+        <TMagicButton v-show="index !== length - 1" :disabled="disabled" text size="small" @click="changeOrder(1)"
           >下移<TMagicIcon><CaretBottom /></TMagicIcon
         ></TMagicButton>
       </template>
@@ -34,6 +35,7 @@
       :labelWidth="labelWidth"
       :prop="`${prop}${prop ? '.' : ''}${String(index)}`"
       :size="size"
+      :disabled="disabled"
       @change="changeHandler"
     ></Container>
   </div>
@@ -58,6 +60,7 @@ const props = defineProps<{
   prop?: string;
   size?: string;
   index: number;
+  disabled?: boolean;
 }>();
 
 const emit = defineEmits(['swap-item', 'remove-item', 'change']);

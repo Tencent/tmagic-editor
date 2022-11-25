@@ -10,6 +10,7 @@
       :model="name ? model[name] : model"
       :prop="prop"
       :size="size"
+      :disabled="disabled"
       @change="changeHandler"
     />
   </TMagicRow>
@@ -32,6 +33,7 @@ const props = defineProps<{
   prop?: string;
   size?: string;
   expandMore?: boolean;
+  disabled?: boolean;
 }>();
 
 const emit = defineEmits(['change']);

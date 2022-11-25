@@ -27,6 +27,7 @@
           :rules="name ? rules[name] : []"
           :config="item"
           :prop="prop"
+          :disabled="disabled"
           :labelWidth="lWidth"
           :size="size"
           @change="change"
@@ -46,6 +47,7 @@
         :prop="prop"
         :labelWidth="lWidth"
         :size="size"
+        :disabled="disabled"
         @change="change"
       ></Container>
     </template>
@@ -69,6 +71,7 @@ const props = withDefaults(
     model: Record<string, any>;
     config: FieldsetConfig;
     rules?: any;
+    disabled?: boolean;
   }>(),
   {
     rules: {},

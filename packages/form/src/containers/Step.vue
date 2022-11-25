@@ -20,6 +20,7 @@
           :model="step.name ? model[step.name] : model"
           :prop="`${step.name}`"
           :size="size"
+          :disabled="disabled"
           :label-width="config.labelWidth || labelWidth"
           @change="changeHandler"
         ></Container>
@@ -44,6 +45,7 @@ const props = withDefaults(
     stepActive?: number;
     labelWidth?: string;
     size?: string;
+    disabled?: boolean;
   }>(),
   {
     stepActive: 1,

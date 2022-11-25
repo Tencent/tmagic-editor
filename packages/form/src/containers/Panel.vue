@@ -25,6 +25,7 @@
             :model="name ? model[name] : model"
             :prop="prop"
             :size="size"
+            :disabled="disabled"
             :label-width="config.labelWidth || labelWidth"
             @change="changeHandler"
           ></Container>
@@ -41,6 +42,7 @@
           :model="name ? model[name] : model"
           :prop="prop"
           :size="size"
+          :disabled="disabled"
           :label-width="config.labelWidth || labelWidth"
           @change="changeHandler"
         ></Container>
@@ -67,6 +69,7 @@ const props = defineProps<{
   labelWidth?: string;
   prop?: string;
   size?: string;
+  disabled?: boolean;
 }>();
 
 const emit = defineEmits(['change']);

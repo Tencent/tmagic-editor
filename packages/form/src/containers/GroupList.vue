@@ -15,13 +15,14 @@
       :index="index"
       :label-width="labelWidth"
       :size="size"
+      :disabled="disabled"
       :group-model="model[name]"
       @remove-item="removeHandler"
       @swap-item="swapHandler"
       @change="changeHandler"
     ></MFieldsGroupListItem>
 
-    <TMagicButton @click="addHandler" size="small" v-if="addable">添加组</TMagicButton>
+    <TMagicButton @click="addHandler" size="small" :disabled="disabled" v-if="addable">添加组</TMagicButton>
 
     <TMagicButton :icon="Grid" size="small" @click="toggleMode" v-if="config.enableToggleMode">切换为表格</TMagicButton>
   </div>
@@ -45,6 +46,7 @@ const props = defineProps<{
   labelWidth?: string;
   prop?: string;
   size?: string;
+  disabled?: boolean;
 }>();
 
 const emit = defineEmits(['change']);

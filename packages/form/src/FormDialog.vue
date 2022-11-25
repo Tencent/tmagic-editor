@@ -20,6 +20,7 @@
         v-model="stepActive"
         ref="form"
         :size="size"
+        :disabled="disabled"
         :config="config"
         :init-values="values"
         :parent-values="parentValues"
@@ -71,6 +72,7 @@ const props = withDefaults(
     width?: string | number;
     labelWidth?: string;
     fullscreen?: boolean;
+    disabled?: boolean;
     title?: string;
     zIndex?: number;
     size?: 'small' | 'default' | 'large';

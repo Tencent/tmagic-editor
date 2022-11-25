@@ -50,6 +50,7 @@
                   size="small"
                   type="primary"
                   :icon="ArrowUp"
+                  :disabled="disabled"
                   text
                   @click="upHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
                   @dblclick="topHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
@@ -65,6 +66,7 @@
                   size="small"
                   type="primary"
                   :icon="ArrowDown"
+                  :disabled="disabled"
                   text
                   @click="downHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
                   @dblclick="bottomHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
@@ -100,6 +102,7 @@
                 <Container
                   v-if="scope.$index > -1"
                   labelWidth="0"
+                  :disabled="disabled"
                   :prop="getProp(scope.$index)"
                   :rules="column.rules"
                   :config="makeConfig(column, scope.row)"
@@ -113,7 +116,10 @@
         </TMagicTable>
       </TMagicTooltip>
       <slot></slot>
-      <TMagicButton v-if="addable" size="small" type="primary" plain @click="newHandler()">添加</TMagicButton> &nbsp;
+      <TMagicButton v-if="addable" size="small" type="primary" :disabled="disabled" plain @click="newHandler()"
+        >添加</TMagicButton
+      >
+      &nbsp;
       <TMagicButton
         :icon="Grid"
         size="small"
@@ -133,15 +139,18 @@
       </TMagicButton>
       <TMagicUpload
         v-if="importable"
+        style="display: inline-block"
         ref="excelBtn"
         action="/noop"
+        :disabled="disabled"
         :on-change="excelHandler"
         :auto-upload="false"
-        style="display: inline-block"
       >
-        <TMagicButton size="small" type="success" plain>导入EXCEL</TMagicButton> </TMagicUpload
+        <TMagicButton size="small" type="success" :disabled="disabled" plain>导入EXCEL</TMagicButton> </TMagicUpload
       >&nbsp;
-      <TMagicButton v-if="importable" size="small" type="warning" plain @click="clearHandler()">清空</TMagicButton>
+      <TMagicButton v-if="importable" size="small" type="warning" :disabled="disabled" plain @click="clearHandler()"
+        >清空</TMagicButton
+      >
     </div>
 
     <div class="bottom" style="text-align: right" v-if="config.pagination">
@@ -191,6 +200,7 @@ const props = withDefaults(
     prop?: string;
     labelWidth?: string;
     sort?: boolean;
+    disabled?: boolean;
     sortKey?: string;
     text?: string;
     size?: string;
@@ -414,6 +424,7 @@ const itemExtra = (fuc: any, index: number) => {
 };
 
 const removeHandler = (index: number) => {
+  if (props.disabled) return;
   props.model[modelName.value].splice(index, 1);
   emit('change', props.model[modelName.value]);
 };

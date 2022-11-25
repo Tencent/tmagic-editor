@@ -4,7 +4,6 @@
     ref="tMagicForm"
     :model="values"
     :label-width="labelWidth"
-    :disabled="disabled"
     :style="`height: ${height}`"
     :inline="inline"
     :label-position="labelPosition"
@@ -12,6 +11,7 @@
     <template v-if="initialized && Array.isArray(config)">
       <Container
         v-for="(item, index) in config"
+        :disabled="disabled"
         :key="item[keyProp] ?? index"
         :config="item"
         :model="values"
