@@ -18,24 +18,12 @@
 
 import { reactive } from 'vue';
 
-import type { Id, MPage } from '@tmagic/schema';
+import type { MPage } from '@tmagic/schema';
 
+import { HistoryState, StepValue } from '../type';
 import { UndoRedo } from '../utils/undo-redo';
 
 import BaseService from './BaseService';
-
-export interface StepValue {
-  data: MPage;
-  modifiedNodeIds: Map<Id, Id>;
-  nodeId: Id;
-}
-
-export interface HistoryState {
-  pageId?: Id;
-  pageSteps: Record<Id, UndoRedo<StepValue>>;
-  canRedo: boolean;
-  canUndo: boolean;
-}
 
 class History extends BaseService {
   public state = reactive<HistoryState>({
@@ -76,6 +64,8 @@ class History extends BaseService {
     }
 
     this.setCanUndoRedo();
+
+    this.emit('page-change', this.state.pageSteps[this.state.pageId]);
   }
 
   public empty(): void {

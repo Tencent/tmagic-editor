@@ -25,9 +25,9 @@ import StageCore from '@tmagic/stage';
 import { getNodePath, isNumber, isPage, isPop } from '@tmagic/utils';
 
 import codeBlockService from '../services/codeBlock';
-import historyService, { StepValue } from '../services/history';
+import historyService from '../services/history';
 import storageService, { Protocol } from '../services/storage';
-import type { AddMNode, EditorNodeInfo, PastePosition, StoreState } from '../type';
+import type { AddMNode, EditorNodeInfo, PastePosition, StepValue, StoreState } from '../type';
 import { LayerOffset, Layout } from '../type';
 import {
   change2Fixed,

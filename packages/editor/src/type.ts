@@ -36,6 +36,7 @@ import type { HistoryService } from './services/history';
 import type { PropsService } from './services/props';
 import type { StorageService } from './services/storage';
 import type { UiService } from './services/ui';
+import type { UndoRedo } from './utils/undo-redo';
 
 export type BeforeAdd = (config: MNode, parent: MContainer) => Promise<MNode> | MNode;
 export type GetConfig = (config: FormConfig) => Promise<FormConfig> | FormConfig;
@@ -394,4 +395,17 @@ export interface CodeParamStatement {
   name: string;
   /** 参数类型 */
   type?: string;
+}
+
+export interface StepValue {
+  data: MPage;
+  modifiedNodeIds: Map<Id, Id>;
+  nodeId: Id;
+}
+
+export interface HistoryState {
+  pageId?: Id;
+  pageSteps: Record<Id, UndoRedo<StepValue>>;
+  canRedo: boolean;
+  canUndo: boolean;
 }
