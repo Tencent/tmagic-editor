@@ -3,7 +3,7 @@
     <Breadcrumb></Breadcrumb>
 
     <slot name="stage">
-      <MagicStage :key="page?.id" :stage-content-menu="stageContentMenu"></MagicStage>
+      <MagicStage v-if="page" :stage-content-menu="stageContentMenu"></MagicStage>
     </slot>
 
     <slot name="workspace-content"></slot>

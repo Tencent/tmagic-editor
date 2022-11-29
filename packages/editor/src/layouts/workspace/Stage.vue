@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts" setup name="MEditorStage">
-import { computed, inject, markRaw, onMounted, onUnmounted, ref, toRaw, watch, watchEffect } from 'vue';
+import { computed, inject, markRaw, nextTick, onMounted, onUnmounted, ref, toRaw, watch, watchEffect } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
 import type { MApp, MContainer, MNode, MPage } from '@tmagic/schema';
@@ -93,6 +93,15 @@ watch(zoom, (zoom) => {
 watch(root, (root) => {
   if (runtime && root) {
     runtime.updateRootConfig?.(cloneDeep(toRaw(root)));
+  }
+});
+
+watch(page, (page) => {
+  if (runtime && page) {
+    runtime.updatePageId?.(page.id);
+    nextTick(() => {
+      stage?.select(page.id);
+    });
   }
 });
 
