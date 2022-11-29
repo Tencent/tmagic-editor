@@ -13,7 +13,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - run: git checkout v1.1.6 -b v1.1.6
 
       - name: Install pnpm
         uses: pnpm/action-setup@v2
@@ -36,10 +35,10 @@ jobs:
         run: rm -rf dist
 
       - name: mkdir dist
-        run: mkdir dist && mkdir dist/docs && mkdir dist/docs/v1.1.6 && mkdir dist/playground
+        run: mkdir dist && mkdir dist/docs && mkdir dist/playground
 
       - name: move to dist
-        run: mv docs/dist/* dist/docs/v1.1.6 && mv playground/dist/* dist/playground
+        run: mv docs/dist/* dist/docs && mv playground/dist/* dist/playground
 
       - name: Deploy to GitHub Pages
         uses: crazy-max/ghaction-github-pages@v2

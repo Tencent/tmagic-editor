@@ -131,7 +131,7 @@ export default defineUserConfig({
   title: 'tmagic-editor',
   description: 'tmagic',
   lang: 'zh-CN',
-  base: '/tmagic-editor/docs/v1.1.6/',
+  base: '/tmagic-editor/docs/',
   theme: defaultTheme({
     logo: './favicon.png',
     navbar: [
