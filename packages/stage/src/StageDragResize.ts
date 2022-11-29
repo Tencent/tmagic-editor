@@ -18,14 +18,13 @@
 
 /* eslint-disable no-param-reassign */
 import Moveable, { MoveableOptions } from 'moveable';
-import MoveableHelper from 'moveable-helper';
 
-import { DRAG_EL_ID_PREFIX, GHOST_EL_ID_PREFIX, Mode, ZIndex } from './const';
+import { Mode } from './const';
+import DragResizeHelper from './DragResizeHelper';
 import MoveableOptionsManager from './MoveableOptionsManager';
-import TargetShadow from './TargetShadow';
 import type { DelayedMarkContainer, GetRenderDocument, MarkContainerEnd, StageDragResizeConfig } from './types';
 import { StageDragStatus } from './types';
-import { calcValueByFontsize, down, getAbsolutePosition, getMode, getOffset, up } from './util';
+import { calcValueByFontsize, down, getMode, getOffset, up } from './util';
 
 /**
  * 管理单选操作，响应选中操作，初始化moveableOption参数并初始化moveable，处理moveable回调事件对组件进行更新
@@ -34,15 +33,11 @@ import { calcValueByFontsize, down, getAbsolutePosition, getMode, getOffset, up 
 export default class StageDragResize extends MoveableOptionsManager {
   /** 目标节点 */
   private target?: HTMLElement;
-  /** 目标节点在蒙层中的占位节点 */
-  private targetShadow: TargetShadow;
   /** Moveable拖拽类实例 */
   private moveable?: Moveable;
   /** 拖动状态 */
   private dragStatus: StageDragStatus = StageDragStatus.END;
-  /** 流式布局下，目标节点的镜像节点 */
-  private ghostEl: HTMLElement | undefined;
-  private moveableHelper?: MoveableHelper;
+  private dragResizeHelper: DragResizeHelper;
   private getRenderDocument: GetRenderDocument;
   private markContainerEnd: MarkContainerEnd;
   private delayedMarkContainer: DelayedMarkContainer;
@@ -54,11 +49,9 @@ export default class StageDragResize extends MoveableOptionsManager {
     this.markContainerEnd = config.markContainerEnd;
     this.delayedMarkContainer = config.delayedMarkContainer;
 
-    this.targetShadow = new TargetShadow({
+    this.dragResizeHelper = new DragResizeHelper({
       container: config.container,
       updateDragEl: config.updateDragEl,
-      zIndex: ZIndex.DRAG_EL,
-      idPrefix: DRAG_EL_ID_PREFIX,
     });
 
     this.on('update-moveable', () => {
@@ -75,11 +68,8 @@ export default class StageDragResize extends MoveableOptionsManager {
    * @param event 鼠标事件
    */
   public select(el: HTMLElement, event?: MouseEvent): void {
-    const oldTarget = this.target;
-    this.target = el;
-
     // 从不能拖动到能拖动的节点之间切换，要重新创建moveable，不然dragStart不生效
-    if (!this.moveable || this.target !== oldTarget) {
+    if (!this.moveable || el !== this.target) {
       this.initMoveable(el);
     } else {
       this.updateMoveable(el);
@@ -97,8 +87,6 @@ export default class StageDragResize extends MoveableOptionsManager {
     if (!this.moveable) return;
     if (!el) throw new Error('未选中任何节点');
 
-    this.target = el;
-
     const options: MoveableOptions = this.init(el);
 
     Object.entries(options).forEach(([key, value]) => {
@@ -109,7 +97,7 @@ export default class StageDragResize extends MoveableOptionsManager {
 
   public clearSelectStatus(): void {
     if (!this.moveable) return;
-    this.targetShadow.destroyEl();
+    this.dragResizeHelper.destroyShadowEl();
     this.moveable.target = null;
     this.moveable.updateTarget();
   }
@@ -119,8 +107,7 @@ export default class StageDragResize extends MoveableOptionsManager {
    */
   public destroy(): void {
     this.moveable?.destroy();
-    this.destroyGhostEl();
-    this.targetShadow.destroy();
+    this.dragResizeHelper.destroy();
     this.dragStatus = StageDragStatus.END;
     this.removeAllListeners();
   }
@@ -131,28 +118,24 @@ export default class StageDragResize extends MoveableOptionsManager {
       el.style.overflow = 'hidden';
     }
 
+    this.target = el;
     this.mode = getMode(el);
 
-    this.destroyGhostEl();
-
-    this.targetShadow.update(el);
+    this.dragResizeHelper.updateShadowEl(el);
+    this.dragResizeHelper.setMode(this.mode);
 
     // 设置选中元素的周围元素，用于选中元素跟周围元素对齐辅助
-    const elementGuidelines: any = this.target?.parentElement?.children || [];
+    const elementGuidelines: HTMLElement[] = Array.prototype.slice.call(this.target?.parentElement?.children) || [];
     this.setElementGuidelines([this.target as HTMLElement], elementGuidelines);
 
     return this.getOptions(false, {
-      target: this.targetShadow.el,
+      target: this.dragResizeHelper.getShadowEl(),
     });
   }
 
   private initMoveable(el: HTMLElement) {
     const options: MoveableOptions = this.init(el);
-    this.moveableHelper = MoveableHelper.create({
-      useBeforeRender: true,
-      useRender: false,
-      createAuto: true,
-    });
+    this.dragResizeHelper.clear();
 
     this.moveable?.destroy();
 
@@ -169,41 +152,19 @@ export default class StageDragResize extends MoveableOptionsManager {
   private bindResizeEvent(): void {
     if (!this.moveable) throw new Error('moveable 未初始化');
 
-    const frame = {
-      left: 0,
-      top: 0,
-    };
-
     this.moveable
       .on('resizeStart', (e) => {
         if (!this.target) return;
 
         this.dragStatus = StageDragStatus.START;
-        this.moveableHelper?.onResizeStart(e);
-
-        frame.top = this.target.offsetTop;
-        frame.left = this.target.offsetLeft;
+        this.dragResizeHelper.onResizeStart(e);
       })
       .on('resize', (e) => {
-        const { width, height, drag } = e;
-        if (!this.moveable || !this.target || !this.targetShadow.el) return;
+        if (!this.moveable || !this.target || !this.dragResizeHelper.getShadowEl()) return;
 
-        const { beforeTranslate } = drag;
         this.dragStatus = StageDragStatus.ING;
 
-        // 流式布局
-        if (this.mode === Mode.SORTABLE) {
-          this.target.style.top = '0px';
-          this.targetShadow.el.style.width = `${width}px`;
-          this.targetShadow.el.style.height = `${height}px`;
-        } else {
-          this.moveableHelper?.onResize(e);
-          this.target.style.left = `${frame.left + beforeTranslate[0]}px`;
-          this.target.style.top = `${frame.top + beforeTranslate[1]}px`;
-        }
-
-        this.target.style.width = `${width}px`;
-        this.target.style.height = `${height}px`;
+        this.dragResizeHelper.onResize(e);
       })
       .on('resizeEnd', () => {
         this.dragStatus = StageDragStatus.END;
@@ -214,11 +175,6 @@ export default class StageDragResize extends MoveableOptionsManager {
   private bindDragEvent(): void {
     if (!this.moveable) throw new Error('moveable 未初始化');
 
-    const frame = {
-      left: 0,
-      top: 0,
-    };
-
     let timeout: NodeJS.Timeout | undefined;
 
     this.moveable
@@ -227,17 +183,10 @@ export default class StageDragResize extends MoveableOptionsManager {
 
         this.dragStatus = StageDragStatus.START;
 
-        this.moveableHelper?.onDragStart(e);
-
-        if (this.mode === Mode.SORTABLE) {
-          this.ghostEl = this.generateGhostEl(this.target);
-        }
-
-        frame.top = this.target.offsetTop;
-        frame.left = this.target.offsetLeft;
+        this.dragResizeHelper.onDragStart(e);
       })
       .on('drag', (e) => {
-        if (!this.target || !this.targetShadow.el) return;
+        if (!this.target || !this.dragResizeHelper.getShadowEl()) return;
 
         if (timeout) {
           globalThis.clearTimeout(timeout);
@@ -247,16 +196,7 @@ export default class StageDragResize extends MoveableOptionsManager {
 
         this.dragStatus = StageDragStatus.ING;
 
-        // 流式布局
-        if (this.ghostEl) {
-          this.ghostEl.style.top = `${frame.top + e.beforeTranslate[1]}px`;
-          return;
-        }
-
-        this.moveableHelper?.onDrag(e);
-
-        this.target.style.left = `${frame.left + e.beforeTranslate[0]}px`;
-        this.target.style.top = `${frame.top + e.beforeTranslate[1]}px`;
+        this.dragResizeHelper.onDrag(e);
       })
       .on('dragEnd', () => {
         if (timeout) {
@@ -281,7 +221,7 @@ export default class StageDragResize extends MoveableOptionsManager {
         }
 
         this.dragStatus = StageDragStatus.END;
-        this.destroyGhostEl();
+        this.dragResizeHelper.destroyGhostEl();
       });
   }
 
@@ -291,18 +231,16 @@ export default class StageDragResize extends MoveableOptionsManager {
     this.moveable
       .on('rotateStart', (e) => {
         this.dragStatus = StageDragStatus.START;
-        this.moveableHelper?.onRotateStart(e);
+        this.dragResizeHelper.onRotateStart(e);
       })
       .on('rotate', (e) => {
-        if (!this.target || !this.targetShadow.el) return;
+        if (!this.target || !this.dragResizeHelper.getShadowEl()) return;
         this.dragStatus = StageDragStatus.ING;
-        this.moveableHelper?.onRotate(e);
-        const frame = this.moveableHelper?.getFrame(e.target);
-        this.target.style.transform = frame?.toCSSObject().transform || '';
+        this.dragResizeHelper.onRotate(e);
       })
       .on('rotateEnd', (e) => {
         this.dragStatus = StageDragStatus.END;
-        const frame = this.moveableHelper?.getFrame(e.target);
+        const frame = this.dragResizeHelper?.getFrame(e.target);
         this.emit('update', {
           data: [
             {
@@ -322,18 +260,16 @@ export default class StageDragResize extends MoveableOptionsManager {
     this.moveable
       .on('scaleStart', (e) => {
         this.dragStatus = StageDragStatus.START;
-        this.moveableHelper?.onScaleStart(e);
+        this.dragResizeHelper.onScaleStart(e);
       })
       .on('scale', (e) => {
-        if (!this.target || !this.targetShadow.el) return;
+        if (!this.target || !this.dragResizeHelper.getShadowEl()) return;
         this.dragStatus = StageDragStatus.ING;
-        this.moveableHelper?.onScale(e);
-        const frame = this.moveableHelper?.getFrame(e.target);
-        this.target.style.transform = frame?.toCSSObject().transform || '';
+        this.dragResizeHelper.onScale(e);
       })
       .on('scaleEnd', (e) => {
         this.dragStatus = StageDragStatus.END;
-        const frame = this.moveableHelper?.getFrame(e.target);
+        const frame = this.dragResizeHelper.getFrame(e.target);
         this.emit('update', {
           data: [
             {
@@ -348,8 +284,8 @@ export default class StageDragResize extends MoveableOptionsManager {
   }
 
   private sort(): void {
-    if (!this.target || !this.ghostEl) throw new Error('未知错误');
-    const { top } = this.ghostEl.getBoundingClientRect();
+    if (!this.target || !this.dragResizeHelper.getGhostEl()) throw new Error('未知错误');
+    const { top } = this.dragResizeHelper.getGhostEl()!.getBoundingClientRect();
     const { top: oriTop } = this.target.getBoundingClientRect();
     const deltaTop = top - oriTop;
     if (Math.abs(deltaTop) >= this.target.clientHeight / 2) {
@@ -381,12 +317,13 @@ export default class StageDragResize extends MoveableOptionsManager {
     const width = calcValueByFontsize(doc, this.target.clientWidth);
     const height = calcValueByFontsize(doc, this.target.clientHeight);
 
-    if (parentEl && this.mode === Mode.ABSOLUTE && this.targetShadow.el) {
-      const targetShadowHtmlEl = this.targetShadow.el as HTMLElement;
+    const shadowEl = this.dragResizeHelper.getShadowEl();
+    if (parentEl && this.mode === Mode.ABSOLUTE && shadowEl) {
+      const targetShadowHtmlEl = shadowEl as HTMLElement;
       const targetShadowElOffsetLeft = targetShadowHtmlEl.offsetLeft || 0;
       const targetShadowElOffsetTop = targetShadowHtmlEl.offsetTop || 0;
 
-      const frame = this.moveableHelper?.getFrame(this.targetShadow.el);
+      const frame = this.dragResizeHelper.getFrame(shadowEl);
 
       const [translateX, translateY] = frame?.properties.transform.translate.value;
       const { left: parentLeft, top: parentTop } = getOffset(parentEl);
@@ -410,40 +347,5 @@ export default class StageDragResize extends MoveableOptionsManager {
       ],
       parentEl,
     });
-  }
-
-  private generateGhostEl(el: HTMLElement): HTMLElement {
-    if (this.ghostEl) {
-      this.destroyGhostEl();
-    }
-
-    const ghostEl = el.cloneNode(true) as HTMLElement;
-    this.setGhostElChildrenId(ghostEl);
-    const { top, left } = getAbsolutePosition(el, getOffset(el));
-    ghostEl.id = `${GHOST_EL_ID_PREFIX}${el.id}`;
-    ghostEl.style.zIndex = ZIndex.GHOST_EL;
-    ghostEl.style.opacity = '.5';
-    ghostEl.style.position = 'absolute';
-    ghostEl.style.left = `${left}px`;
-    ghostEl.style.top = `${top}px`;
-    el.after(ghostEl);
-    return ghostEl;
-  }
-
-  private setGhostElChildrenId(el: Element) {
-    for (const child of Array.from(el.children)) {
-      if (child.id) {
-        child.id = `${GHOST_EL_ID_PREFIX}${child.id}`;
-      }
-
-      if (child.children.length) {
-        this.setGhostElChildrenId(child);
-      }
-    }
-  }
-
-  private destroyGhostEl(): void {
-    this.ghostEl?.remove();
-    this.ghostEl = undefined;
   }
 }

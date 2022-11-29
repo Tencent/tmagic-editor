@@ -54,4 +54,9 @@ mask是一个盖在画布区域的一个蒙层，主要作用是隔离鼠标事�
 StageDragResize、StageMultiDragResize的父类，负责管理Moveable的配置
 <br/><br/>
 ## TargetShadow
-统一管理拖拽和高亮框，包括创建、更新、销毁。
+统一管理拖拽框和高亮框，包括创建、更新、销毁。
+<br/><br/>
+## DragResizeHelper
+- 拖拽/改变大小等操作发生时，moveable会抛出各种状态事件，DragResizeHelper负责响应这些事件，对目标节点target和拖拽节点targetShadow进行修改；
+- 其中目标节点是DragResizeHelper直接改的，targetShadow作为直接被操作的拖拽框，是调用moveableHelper改的；
+- 有个特殊情况是流式布局下，moveableHelper不支持，targetShadow也是DragResizeHelper直接改的

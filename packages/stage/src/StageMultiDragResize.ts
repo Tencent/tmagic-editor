@@ -16,13 +16,11 @@
  * limitations under the License.
  */
 
-import type { OnDragStart, OnResizeStart } from 'moveable';
 import Moveable from 'moveable';
-import MoveableHelper from 'moveable-helper';
 
-import { DRAG_EL_ID_PREFIX, Mode, ZIndex } from './const';
+import { DRAG_EL_ID_PREFIX, Mode } from './const';
+import DragResizeHelper from './DragResizeHelper';
 import MoveableOptionsManager from './MoveableOptionsManager';
-import TargetShadow from './TargetShadow';
 import { GetRenderDocument, MoveableOptionsManagerConfig, StageDragStatus, StageMultiDragResizeConfig } from './types';
 import { calcValueByFontsize, getMode } from './util';
 
@@ -31,13 +29,10 @@ export default class StageMultiDragResize extends MoveableOptionsManager {
   public container: HTMLElement;
   /** 多选:目标节点组 */
   public targetList: HTMLElement[] = [];
-  /** 多选:目标节点在蒙层中的占位节点组 */
-  public targetShadow: TargetShadow;
   /** Moveable多选拖拽类实例 */
   public moveableForMulti?: Moveable;
-  /** 拖动状态 */
   public dragStatus: StageDragStatus = StageDragStatus.END;
-  private multiMoveableHelper?: MoveableHelper;
+  private dragResizeHelper: DragResizeHelper;
   private getRenderDocument: GetRenderDocument;
 
   constructor(config: StageMultiDragResizeConfig) {
@@ -51,11 +46,9 @@ export default class StageMultiDragResize extends MoveableOptionsManager {
     this.container = config.container;
     this.getRenderDocument = config.getRenderDocument;
 
-    this.targetShadow = new TargetShadow({
+    this.dragResizeHelper = new DragResizeHelper({
       container: config.container,
       updateDragEl: config.updateDragEl,
-      zIndex: ZIndex.DRAG_EL,
-      idPrefix: DRAG_EL_ID_PREFIX,
     });
 
     this.on('update-moveable', () => {
@@ -76,118 +69,49 @@ export default class StageMultiDragResize extends MoveableOptionsManager {
     this.mode = getMode(els[0]);
     this.targetList = els;
 
-    this.targetShadow.updateGroup(els);
+    this.dragResizeHelper.updateGroup(els);
 
     // 设置周围元素，用于选中元素跟周围元素的对齐辅助
-    const elementGuidelines: any = this.targetList[0].parentElement?.children || [];
+    const elementGuidelines: HTMLElement[] =
+      Array.prototype.slice.call(this.targetList[0].parentElement?.children) || [];
     this.setElementGuidelines(this.targetList, elementGuidelines);
 
     this.moveableForMulti?.destroy();
-    this.multiMoveableHelper?.clear();
+    this.dragResizeHelper.clear();
     this.moveableForMulti = new Moveable(
       this.container,
       this.getOptions(true, {
-        target: this.targetShadow.els,
+        target: this.dragResizeHelper.getShadowEls(),
       }),
     );
-    this.multiMoveableHelper = MoveableHelper.create({
-      useBeforeRender: true,
-      useRender: false,
-      createAuto: true,
-    });
-    const frames: { left: number; top: number; id: string }[] = [];
-
-    const setFrames = (events: OnDragStart[] | OnResizeStart[]) => {
-      // 记录拖动前快照
-      events.forEach((ev) => {
-        // 实际目标元素
-        const matchEventTarget = this.targetList.find(
-          (targetItem) => targetItem.id === ev.target.id.replace(DRAG_EL_ID_PREFIX, ''),
-        );
-        if (!matchEventTarget) return;
-        frames.push({
-          left: matchEventTarget.offsetLeft,
-          top: matchEventTarget.offsetTop,
-          id: matchEventTarget.id,
-        });
-      });
-    };
 
     this.moveableForMulti
-      .on('resizeGroupStart', (params) => {
-        const { events } = params;
-        this.multiMoveableHelper?.onResizeGroupStart(params);
-        setFrames(events);
+      .on('resizeGroupStart', (e) => {
+        this.dragResizeHelper.onResizeGroupStart(e);
         this.dragStatus = StageDragStatus.START;
       })
-      .on('resizeGroup', (params) => {
-        const { events } = params;
-        // 拖动过程更新
-        events.forEach((ev) => {
-          const { width, height, beforeTranslate } = ev.drag;
-          const frameSnapShot = frames.find(
-            (frameItem) => frameItem.id === ev.target.id.replace(DRAG_EL_ID_PREFIX, ''),
-          );
-          if (!frameSnapShot) return;
-          const targeEl = this.targetList.find(
-            (targetItem) => targetItem.id === ev.target.id.replace(DRAG_EL_ID_PREFIX, ''),
-          );
-          if (!targeEl) return;
-          // 元素与其所属组同时加入多选列表时，只更新父元素
-          const isParentIncluded = this.targetList.find((targetItem) => targetItem.id === targeEl.parentElement?.id);
-          if (!isParentIncluded) {
-            // 更新页面元素位置
-            targeEl.style.left = `${frameSnapShot.left + beforeTranslate[0]}px`;
-            targeEl.style.top = `${frameSnapShot.top + beforeTranslate[1]}px`;
-          }
-
-          // 更新页面元素位置
-          targeEl.style.width = `${width}px`;
-          targeEl.style.height = `${height}px`;
-        });
-        this.multiMoveableHelper?.onResizeGroup(params);
+      .on('resizeGroup', (e) => {
+        this.dragResizeHelper.onResizeGroup(e);
         this.dragStatus = StageDragStatus.ING;
       })
       .on('resizeGroupEnd', () => {
         this.update(true);
         this.dragStatus = StageDragStatus.END;
       })
-      .on('dragGroupStart', (params) => {
-        const { events } = params;
-        this.multiMoveableHelper?.onDragGroupStart(params);
-        // 记录拖动前快照
-        setFrames(events);
+      .on('dragGroupStart', (e) => {
+        this.dragResizeHelper.onDragGroupStart(e);
         this.dragStatus = StageDragStatus.START;
       })
-      .on('dragGroup', (params) => {
-        const { events } = params;
-        // 拖动过程更新
-        events.forEach((ev) => {
-          const frameSnapShot = frames.find(
-            (frameItem) => frameItem.id === ev.target.id.replace(DRAG_EL_ID_PREFIX, ''),
-          );
-          if (!frameSnapShot) return;
-          const targeEl = this.targetList.find(
-            (targetItem) => targetItem.id === ev.target.id.replace(DRAG_EL_ID_PREFIX, ''),
-          );
-          if (!targeEl) return;
-          // 元素与其所属组同时加入多选列表时，只更新父元素
-          const isParentIncluded = this.targetList.find((targetItem) => targetItem.id === targeEl.parentElement?.id);
-          if (!isParentIncluded) {
-            // 更新页面元素位置
-            targeEl.style.left = `${frameSnapShot.left + ev.beforeTranslate[0]}px`;
-            targeEl.style.top = `${frameSnapShot.top + ev.beforeTranslate[1]}px`;
-          }
-        });
-        this.multiMoveableHelper?.onDragGroup(params);
+      .on('dragGroup', (e) => {
+        this.dragResizeHelper.onDragGroup(e);
         this.dragStatus = StageDragStatus.ING;
       })
       .on('dragGroupEnd', () => {
         this.update();
         this.dragStatus = StageDragStatus.END;
       })
-      .on('clickGroup', (params) => {
-        const { inputTarget, targets } = params;
+      .on('clickGroup', (e) => {
+        const { inputTarget, targets } = e;
         // 如果有多个元素被选中，同时点击的元素在选中元素中的其中一项，可能是多选态切换为该元素的单选态，抛事件给上一层继续判断是否切换
         if (targets.length > 1 && targets.includes(inputTarget)) {
           this.emit('change-to-select', inputTarget.id.replace(DRAG_EL_ID_PREFIX, ''));
@@ -223,9 +147,10 @@ export default class StageMultiDragResize extends MoveableOptionsManager {
     if (!eleList) throw new Error('未选中任何节点');
 
     this.targetList = eleList;
+    this.dragResizeHelper.setTargetList(eleList);
 
     const options = this.getOptions(true, {
-      target: this.targetShadow.els,
+      target: this.dragResizeHelper.getShadowEls(),
     });
 
     Object.entries(options).forEach(([key, value]) => {
@@ -239,7 +164,7 @@ export default class StageMultiDragResize extends MoveableOptionsManager {
    */
   public clearSelectStatus(): void {
     if (!this.moveableForMulti) return;
-    this.targetShadow.destroyEls();
+    this.dragResizeHelper.clearMultiSelectStatus();
     this.moveableForMulti.target = null;
     this.moveableForMulti.updateTarget();
     this.targetList = [];
@@ -250,7 +175,7 @@ export default class StageMultiDragResize extends MoveableOptionsManager {
    */
   public destroy(): void {
     this.moveableForMulti?.destroy();
-    this.targetShadow.destroy();
+    this.dragResizeHelper.destroy();
   }
 
   /**

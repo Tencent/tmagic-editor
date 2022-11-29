@@ -16,15 +16,15 @@
  * limitations under the License.
  */
 import { Mode, ZIndex } from './const';
-import type { TargetElement, TargetShadowConfig, UpdateDragEl } from './types';
+import type { TargetElement as ShadowElement, TargetShadowConfig, UpdateDragEl } from './types';
 import { getTargetElStyle, isFixedParent } from './util';
 
 /**
  * 将选中的节点修正定位后，添加一个操作节点到蒙层上
  */
 export default class TargetShadow {
-  public el?: TargetElement;
-  public els: TargetElement[] = [];
+  public el?: ShadowElement;
+  public els: ShadowElement[] = [];
 
   private idPrefix = 'target_calibrate_';
   private container: HTMLElement;
@@ -52,13 +52,13 @@ export default class TargetShadow {
     this.container.addEventListener('customScroll', this.scrollHandler);
   }
 
-  public update(target: TargetElement): TargetElement {
+  public update(target: ShadowElement): ShadowElement {
     this.el = this.updateEl(target, this.el);
 
     return this.el;
   }
 
-  public updateGroup(targetGroup: TargetElement[]): TargetElement[] {
+  public updateGroup(targetGroup: ShadowElement[]): ShadowElement[] {
     if (this.els.length > targetGroup.length) {
       this.els.slice(targetGroup.length - 1).forEach((el) => {
         el.remove();
@@ -88,7 +88,7 @@ export default class TargetShadow {
     this.destroyEls();
   }
 
-  private updateEl(target: TargetElement, src?: TargetElement): TargetElement {
+  private updateEl(target: ShadowElement, src?: ShadowElement): ShadowElement {
     const el = src || globalThis.document.createElement('div');
 
     el.id = `${this.idPrefix}${target.id}`;

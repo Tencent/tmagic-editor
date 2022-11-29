@@ -126,6 +126,11 @@ export interface StageMultiDragResizeConfig {
   updateDragEl?: UpdateDragEl;
 }
 
+export interface DragResizeHelperConfig {
+  container: HTMLElement;
+  updateDragEl?: UpdateDragEl;
+}
+
 /** 选择状态 */
 export enum SelectStatus {
   /** 单选 */
