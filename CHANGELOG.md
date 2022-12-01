@@ -1,3 +1,24 @@
+# [1.2.0-beta.19](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.18...v1.2.0-beta.19) (2022-12-01)
+
+
+### Bug Fixes
+
+* **editor:** 页面切换不在重新渲染画布 ([b7934f9](https://github.com/Tencent/tmagic-editor/commit/b7934f9f5108a72ea7224b573e0bbb3722983b64))
+
+
+### Features
+
+* **editor:** history增加page-change事件 ([830c8d8](https://github.com/Tencent/tmagic-editor/commit/830c8d8747cd23e3dbce90d60a9dc0ac1e53662d))
+* **form:** dialog支持disabled配置 ([239b5d3](https://github.com/Tencent/tmagic-editor/commit/239b5d3efeae916a8cf3e3566d88063ecccc0553))
+* **form:** table支持rowkey配置 ([ea8b863](https://github.com/Tencent/tmagic-editor/commit/ea8b8636944f37941ebffa8866074d310cf32918))
+
+
+### Reverts
+
+* Revert "chore: github文档构建锁定在v1.1.6版本" ([c143a5f](https://github.com/Tencent/tmagic-editor/commit/c143a5f7670ae61d80c1a2cfcc780cfb5259849d))
+
+
+
 # [1.2.0-beta.18](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.17...v1.2.0-beta.18) (2022-11-24)
 
 
