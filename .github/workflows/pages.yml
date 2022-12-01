@@ -26,7 +26,7 @@ jobs:
       - run: pnpm bootstrap
 
       - name: Build VuePress site
-        run: npm run build:docs
+        run: npm run docs:build
 
       - name: Build Playground site
         run: npm run build:playground
