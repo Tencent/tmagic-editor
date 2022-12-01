@@ -5,6 +5,8 @@ export default defineConfig({
   title: 'tmagic-editor',
   description: '页面可视化平台',
 
+  base: '/tmagic-editor/docs/',
+
   head: [
     ['meta', { name: 'theme-color', content: '#646cff' }],
   ],
@@ -370,8 +372,6 @@ export default defineConfig({
   },
 
   vite: {
-    base: '/tmagic-editor/docs/',
-
     optimizeDeps: {
       esbuildOptions: {
         define: {
