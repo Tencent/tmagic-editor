@@ -69,7 +69,7 @@ import { defineComponent, onUnmounted, PropType, provide, reactive, toRaw, watch
 import { EventOption } from '@tmagic/core';
 import type { FormConfig } from '@tmagic/form';
 import type { MApp, MNode } from '@tmagic/schema';
-import {
+import StageCore, {
   CONTAINER_HIGHLIGHT_CLASS_NAME,
   ContainerHighlightType,
   CustomizeMoveableOptionsCallbackConfig,
@@ -122,25 +122,27 @@ export default defineComponent({
       type: Object as PropType<SideBarData>,
     },
 
-    layerContentMenu: {
-      type: Array as PropType<(MenuButton | MenuComponent)[]>,
-      default: () => [],
-    },
-
-    stageContentMenu: {
-      type: Array as PropType<(MenuButton | MenuComponent)[]>,
-      default: () => [],
-    },
-
     /** 顶部工具栏配置 */
     menu: {
       type: Object as PropType<MenuBarData>,
       default: () => ({ left: [], right: [] }),
     },
 
+    /** 组件树右键菜单 */
+    layerContentMenu: {
+      type: Array as PropType<(MenuButton | MenuComponent)[]>,
+      default: () => [],
+    },
+
+    /** 画布右键菜单 */
+    stageContentMenu: {
+      type: Array as PropType<(MenuButton | MenuComponent)[]>,
+      default: () => [],
+    },
+
     /** 中间工作区域中画布渲染的内容 */
     render: {
-      type: Function as PropType<() => HTMLDivElement>,
+      type: Function as PropType<(stage: StageCore) => HTMLDivElement | Promise<HTMLDivElement>>,
     },
 
     /** 中间工作区域中画布通过iframe渲染时的页面url */
@@ -163,7 +165,7 @@ export default defineComponent({
 
     /** 组件联动事件选项列表 */
     eventMethodList: {
-      type: Object,
+      type: Object as PropType<Record<string, { events: EventOption[]; methods: EventOption[] }>>,
       default: () => ({}),
     },
 

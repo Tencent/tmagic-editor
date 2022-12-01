@@ -55,7 +55,7 @@ const props = withDefaults(
   },
 );
 
-const emit = defineEmits(['afterAction']);
+const emit = defineEmits(['after-action']);
 
 const display = (fuc: boolean | Function | undefined, row: any) => {
   if (typeof fuc === 'function') {
@@ -101,13 +101,13 @@ const save = async (index: number, config: ColumnConfig) => {
     if (res.ret === 0) {
       tMagicMessage.success('保存成功');
       props.editState[index] = undefined;
-      emit('afterAction');
+      emit('after-action');
     } else {
       tMagicMessage.error(res.msg || '保存失败');
     }
   } else {
     props.editState[index] = undefined;
-    emit('afterAction');
+    emit('after-action');
   }
 };
 </script>

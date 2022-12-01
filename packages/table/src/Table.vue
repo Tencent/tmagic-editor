@@ -42,7 +42,7 @@
           :rowkey-name="rowkeyName"
           :edit-state="editState"
           :key="columnIndex"
-          @afterAction="$emit('afterAction')"
+          @after-action="$emit('after-action')"
         ></ActionsColumn>
       </template>
 
@@ -98,7 +98,7 @@ const props = withDefaults(
 
 const emit = defineEmits([
   'sort-change',
-  'afterAction',
+  'after-action',
   'select',
   'select-all',
   'selection-change',

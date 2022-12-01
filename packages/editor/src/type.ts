@@ -62,7 +62,7 @@ export interface StageOptions {
   containerHighlightClassName: string;
   containerHighlightDuration: number;
   containerHighlightType: ContainerHighlightType;
-  render: () => HTMLDivElement;
+  render: (stage: StageCore) => HTMLDivElement | Promise<HTMLDivElement>;
   moveableOptions: MoveableOptions | ((config?: CustomizeMoveableOptionsCallbackConfig) => MoveableOptions);
   canSelect: (el: HTMLElement) => boolean | Promise<boolean>;
   isContainer: (el: HTMLElement) => boolean | Promise<boolean>;
@@ -170,18 +170,17 @@ export interface MenuButton {
    * 按钮类型
    * button: 只有文字不带边框的按钮
    * text: 纯文本
+   * divider: 分割线
    * dropdown: 下拉菜单
-   * divider: 分隔线
-   * zoom: 放大缩小
    */
-  type: 'button' | 'dropdown' | 'text' | 'divider' | 'zoom';
+  type: 'button' | 'text' | 'divider' | 'dropdown';
   /** 当type为divider时有效，分割线方向, 默认vertical */
   direction?: 'horizontal' | 'vertical';
   /** 展示的文案 */
   text?: string;
   /** 鼠标悬浮是显示的气泡中的文案 */
   tooltip?: string;
-  /** element-plus icon class */
+  /** Vue组件或url */
   icon?: string | Component<{}, {}, any>;
   /** 是否置灰，默认为false */
   disabled?: boolean | ((data?: Services) => boolean);
@@ -189,8 +188,8 @@ export interface MenuButton {
   display?: boolean | ((data?: Services) => boolean);
   /** type为button/dropdown时点击运行的方法 */
   handler?: (data: Services, event: MouseEvent) => Promise<any> | any;
-  /** type为dropdown时，下拉的菜单列表， 或者有子菜单时 */
   className?: string;
+  /** type为dropdown时，下拉的菜单列表， 或者有子菜单时 */
   items?: MenuButton[];
 }
 
@@ -214,8 +213,13 @@ export interface MenuComponent {
  * 'delete': 删除按钮
  * 'undo': 撤销按钮
  * 'redo': 恢复按钮
+ * 'zoom': 'zoom-in', 'zoom-out', 'scale-to-original', 'scale-to-fit' 的集合
  * 'zoom-in': 放大按钮
  * 'zoom-out': 缩小按钮
+ * 'guides': 显示隐藏参考线
+ * 'rule': 显示隐藏标尺
+ * 'scale-to-original': 缩放到实际大小
+ * 'scale-to-fit': 缩放以适应
  */
 export type MenuItem =
   | '/'
@@ -227,6 +231,8 @@ export type MenuItem =
   | 'zoom-out'
   | 'guides'
   | 'rule'
+  | 'scale-to-original'
+  | 'scale-to-fit'
   | MenuButton
   | MenuComponent
   | string;
@@ -244,13 +250,14 @@ export interface MenuBarData {
 export interface SideComponent extends MenuComponent {
   /** 显示文案 */
   text: string;
-  /** element-plus icon class */
+  /** vue组件或url */
   icon: Component<{}, {}, any>;
 }
 
 /**
  * component-list: 组件列表
  * layer: 已选组件树
+ * code-block: 代码块
  */
 export type SideItem = 'component-list' | 'layer' | 'code-block' | SideComponent;
 
@@ -269,8 +276,9 @@ export interface ComponentItem {
   text: string;
   /** 组件类型 */
   type: string;
-  /** element-plus icon class */
-  icon?: string | Component;
+  /** Vue组件或url */
+  icon?: string | Component<{}, {}, any>;
+  /** 新增组件时需要透传到组价节点上的数据 */
   data?: {
     [key: string]: any;
   };

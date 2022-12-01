@@ -91,7 +91,7 @@ class Props extends BaseService {
    * @param type 组件类型
    * @param value 组件初始值
    */
-  public setPropsValue(type: string, value: MNode) {
+  public async setPropsValue(type: string, value: MNode) {
     this.state.propsValueMap[type] = value;
   }
 

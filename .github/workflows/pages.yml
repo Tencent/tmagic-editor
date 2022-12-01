@@ -38,7 +38,7 @@ jobs:
         run: mkdir dist && mkdir dist/docs && mkdir dist/playground
 
       - name: move to dist
-        run: mv docs/dist/* dist/docs && mv playground/dist/* dist/playground
+        run: mv docs/.vitepress/dist/* dist/docs && mv playground/dist/* dist/playground
 
       - name: Deploy to GitHub Pages
         uses: crazy-max/ghaction-github-pages@v2

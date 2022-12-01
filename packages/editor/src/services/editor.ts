@@ -91,9 +91,8 @@ class Editor extends BaseService {
 
   /**
    * 设置当前指点节点配置
-   * @param name 'root' | 'page' | 'parent' | 'node' | 'highlightNode' | 'nodes'
+   * @param name 'root' | 'page' | 'parent' | 'node' | 'highlightNode' | 'nodes' | 'stage' | 'modifiedNodeIds' | 'pageLength'
    * @param value MNode
-   * @returns MNode
    */
   public set<T = MNode>(name: keyof StoreState, value: T) {
     this.state[name] = value as any;
@@ -109,7 +108,7 @@ class Editor extends BaseService {
 
   /**
    * 获取当前指点节点配置
-   * @param name  'root' | 'page' | 'parent' | 'node' | 'highlightNode' | 'nodes'
+   * @param name  'root' | 'page' | 'parent' | 'node' | 'highlightNode' | 'nodes' | 'stage' | 'modifiedNodeIds' | 'pageLength'
    * @returns MNode
    */
   public get<T = MNode>(name: keyof StoreState): T {
@@ -432,7 +431,6 @@ class Editor extends BaseService {
   /**
    * 删除组件
    * @param {Object} node
-   * @return {Object} 删除的组件配置
    */
   public async remove(nodeOrNodeList: MNode | MNode[]): Promise<void> {
     const nodes = Array.isArray(nodeOrNodeList) ? nodeOrNodeList : [nodeOrNodeList];
