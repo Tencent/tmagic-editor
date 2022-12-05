@@ -62,7 +62,7 @@ const zoom = computed(() => services?.uiService.get<number>('zoom') || 1);
 const node = computed(() => services?.editorService.get<MNode>('node'));
 
 watchEffect(() => {
-  if (stage) return;
+  if (stage || !page.value) return;
 
   if (!stageContainer.value) return;
   if (!(stageOptions?.runtimeUrl || stageOptions?.render) || !root.value) return;

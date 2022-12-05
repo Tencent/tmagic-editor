@@ -224,15 +224,25 @@ export default defineComponent({
 
   setup(props, { emit }) {
     editorService.on('root-change', (value) => {
-      const node = editorService.get<MNode | null>('node');
-      const nodeId = node?.id || props.defaultSelected;
-      if (nodeId && node !== value) {
-        editorService.select(nodeId);
-      } else {
-        editorService.set('nodes', [value]);
+      const nodeId = editorService.get<MNode | null>('node')?.id || props.defaultSelected;
+      let node;
+      if (nodeId) {
+        node = editorService.getNodeById(nodeId);
       }
 
-      emit('update:modelValue', toRaw(editorService.get('root')));
+      if (node && node !== value) {
+        editorService.select(node.id);
+      } else if (value?.items?.length) {
+        editorService.select(value.items[0]);
+      } else if (value?.id) {
+        editorService.set('nodes', [value]);
+        editorService.set('parent', null);
+        editorService.set('page', null);
+      }
+
+      if (toRaw(value) !== toRaw(editorService.get('root'))) {
+        emit('update:modelValue', value);
+      }
     });
 
     // 初始值变化，重新设置节点信息
