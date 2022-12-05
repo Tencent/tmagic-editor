@@ -1,3 +1,13 @@
+# [1.2.0-beta.20](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.19...v1.2.0-beta.20) (2022-12-05)
+
+
+### Bug Fixes
+
+* **editor:** 复制粘贴时添加的到的父组件应当是当前父组件 ([828681e](https://github.com/Tencent/tmagic-editor/commit/828681e9608629414811d49da7ba3a3100e82ccd)), closes [#448](https://github.com/Tencent/tmagic-editor/issues/448)
+* **editor:** 编辑器初始化默认选择节点 ([45eaea6](https://github.com/Tencent/tmagic-editor/commit/45eaea6f686d81d04c92bbed42a3a0092b7228d8))
+
+
+
 # [1.2.0-beta.19](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.18...v1.2.0-beta.19) (2022-12-01)
 
 

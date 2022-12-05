@@ -1,6 +1,6 @@
 {
   "name": "tmagic-playground",
-  "version": "1.2.0-beta.19",
+  "version": "1.2.0-beta.20",
   "private": true,
   "scripts": {
     "clean:top": "rimraf dist",
@@ -12,13 +12,13 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.0.9",
-    "@tmagic/design": "1.2.0-beta.19",
-    "@tmagic/editor": "1.2.0-beta.19",
-    "@tmagic/element-plus-adapter": "1.2.0-beta.19",
-    "@tmagic/form": "1.2.0-beta.19",
-    "@tmagic/schema": "1.2.0-beta.19",
-    "@tmagic/stage": "1.2.0-beta.19",
-    "@tmagic/utils": "1.2.0-beta.19",
+    "@tmagic/design": "1.2.0-beta.20",
+    "@tmagic/editor": "1.2.0-beta.20",
+    "@tmagic/element-plus-adapter": "1.2.0-beta.20",
+    "@tmagic/form": "1.2.0-beta.20",
+    "@tmagic/schema": "1.2.0-beta.20",
+    "@tmagic/stage": "1.2.0-beta.20",
+    "@tmagic/utils": "1.2.0-beta.20",
     "element-plus": "^2.2.19",
     "monaco-editor": "^0.34.0",
     "serialize-javascript": "^6.0.0",
