@@ -352,6 +352,9 @@ class Editor extends BaseService {
 
     const newNodes = await Promise.all(
       addNodes.map((node) => {
+        if (isPage(node)) {
+          return this.doAdd(node, this.get('root'));
+        }
         const parentNode = parent && typeof parent !== 'function' ? parent : getAddParent(node);
         if (!parentNode) throw new Error('未找到父元素');
         return this.doAdd(node, parentNode);
@@ -579,7 +582,7 @@ class Editor extends BaseService {
 
     const pasteConfigs = await this.doPaste(config, position);
 
-    return this.add(pasteConfigs);
+    return this.add(pasteConfigs, this.get('parent'));
   }
 
   public async doPaste(config: MNode[], position: PastePosition = {}): Promise<MNode[]> {
