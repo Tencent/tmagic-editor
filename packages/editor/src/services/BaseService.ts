@@ -169,6 +169,11 @@ export default class extends EventEmitter {
     });
   }
 
+  public removeAllPlugins() {
+    this.pluginOptionsList = {};
+    this.middleware = {};
+  }
+
   private async doTask() {
     this.doingTask = true;
     let task = this.taskList.shift();
