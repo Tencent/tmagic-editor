@@ -1,5 +1,5 @@
 {
-  "version": "1.2.0-beta.21",
+  "version": "1.2.0-beta.22",
   "name": "@tmagic/ui",
   "type": "module",
   "main": "src/index.ts",
@@ -12,9 +12,9 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "@tmagic/core": "1.2.0-beta.21",
-    "@tmagic/schema": "1.2.0-beta.21",
-    "@tmagic/utils": "1.2.0-beta.21",
+    "@tmagic/core": "1.2.0-beta.22",
+    "@tmagic/schema": "1.2.0-beta.22",
+    "@tmagic/utils": "1.2.0-beta.22",
     "delegate": "^3.2.0",
     "qrcode": "^1.5.0",
     "tiny-emitter": "^2.1.0",
