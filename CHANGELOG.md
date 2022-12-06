@@ -1,3 +1,18 @@
+# [1.2.0-beta.21](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.20...v1.2.0-beta.21) (2022-12-06)
+
+
+### Bug Fixes
+
+* **editor:** layout 组件中hasRight判断出错 ([f6dca97](https://github.com/Tencent/tmagic-editor/commit/f6dca97442339f1cc941ebaf39eddbe657f76512))
+* **editor:** services在组件unmounted时只重置状态不移除事件 ([45a20d9](https://github.com/Tencent/tmagic-editor/commit/45a20d9405900c62dfc1c3b82612c69c409da373))
+
+
+### Features
+
+* **editor:** 新增可以移除所有service插件的方法 ([67c7faf](https://github.com/Tencent/tmagic-editor/commit/67c7faf832c811866f6c012a7362472397fdc6ef))
+
+
+
 # [1.2.0-beta.20](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.19...v1.2.0-beta.20) (2022-12-05)
 
 
