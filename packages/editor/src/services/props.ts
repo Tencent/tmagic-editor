@@ -171,10 +171,15 @@ class Props extends BaseService {
         };
   }
 
-  public destroy() {
+  public resetState() {
     this.state.propsConfigMap = {};
     this.state.propsValueMap = {};
+  }
+
+  public destroy() {
+    this.resetState();
     this.removeAllListeners();
+    this.removeAllPlugins();
   }
 
   /**

@@ -42,9 +42,14 @@ class ComponentList extends BaseService {
     return this.state.list;
   }
 
-  public destroy() {
+  public resetState() {
     this.state.list = [];
+  }
+
+  public destroy() {
+    this.resetState();
     this.removeAllListeners();
+    this.removeAllPlugins();
   }
 }
 

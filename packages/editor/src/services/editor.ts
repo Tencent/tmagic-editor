@@ -207,7 +207,7 @@ class Editor extends BaseService {
     if (page) {
       historyService.changePage(toRaw(page));
     } else {
-      historyService.empty();
+      historyService.resetState();
     }
 
     if (node?.id) {
@@ -762,8 +762,7 @@ class Editor extends BaseService {
     });
   }
 
-  public destroy() {
-    this.removeAllListeners();
+  public resetState() {
     this.set('root', null);
     this.set('node', null);
     this.set('nodes', []);
@@ -773,6 +772,12 @@ class Editor extends BaseService {
     this.set('highlightNode', null);
     this.set('modifiedNodeIds', new Map());
     this.set('pageLength', new Map());
+  }
+
+  public destroy() {
+    this.removeAllListeners();
+    this.resetState();
+    this.removeAllPlugins();
   }
 
   public resetModifiedNodeId() {

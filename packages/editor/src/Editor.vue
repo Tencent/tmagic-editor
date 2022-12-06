@@ -316,13 +316,12 @@ export default defineComponent({
     );
 
     onUnmounted(() => {
-      editorService.destroy();
-      historyService.destroy();
-      propsService.destroy();
-      uiService.destroy();
-      componentListService.destroy();
-      storageService.destroy();
-      codeBlockService.destroy();
+      editorService.resetState();
+      historyService.resetState();
+      propsService.resetState();
+      uiService.resetState();
+      componentListService.resetState();
+      codeBlockService.resetState();
     });
 
     const services: Services = {

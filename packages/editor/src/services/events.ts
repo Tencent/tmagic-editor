@@ -76,10 +76,15 @@ class Events extends BaseService {
     return cloneDeep(methodMap[type] || DEFAULT_METHODS);
   }
 
-  public destroy() {
+  public resetState() {
     eventMap = reactive({});
     methodMap = reactive({});
+  }
+
+  public destroy() {
+    this.resetState();
     this.removeAllListeners();
+    this.removeAllPlugins();
   }
 }
 

@@ -344,7 +344,7 @@ class CodeBlock extends BaseService {
     this.setCodeDsl(codeDsl);
   }
 
-  public destroy(): void {
+  public resetState() {
     this.state.isShowCodeEditor = false;
     this.state.codeDsl = null;
     this.state.id = '';
@@ -352,6 +352,12 @@ class CodeBlock extends BaseService {
     this.state.mode = CodeEditorMode.EDITOR;
     this.state.combineIds = [];
     this.state.undeletableList = [];
+  }
+
+  public destroy(): void {
+    this.resetState();
+    this.removeAllListeners();
+    this.removeAllPlugins();
   }
 
   /**

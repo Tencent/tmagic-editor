@@ -97,8 +97,20 @@ class Ui extends BaseService {
     return Math.min((width - 60) / stageWidth || 1, (height - 80) / stageHeight || 1);
   }
 
+  public resetState() {
+    this.set('showSrc', false);
+    this.set('uiSelectMode', false);
+    this.set('zoom', 1);
+    this.set('stageContainerRect', {
+      width: 0,
+      height: 0,
+    });
+  }
+
   public destroy() {
+    this.resetState();
     this.removeAllListeners();
+    this.removeAllPlugins();
   }
 
   private async setStageRect(value: StageRect) {

@@ -109,6 +109,7 @@ export class WebStorage extends BaseService {
 
   public destroy() {
     this.removeAllListeners();
+    this.removeAllPlugins();
   }
 
   private getValueAndProtocol(value: string | null) {

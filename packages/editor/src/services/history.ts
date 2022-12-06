@@ -68,7 +68,7 @@ class History extends BaseService {
     this.emit('page-change', this.state.pageSteps[this.state.pageId]);
   }
 
-  public empty(): void {
+  public resetState(): void {
     this.state.pageId = undefined;
     this.state.pageSteps = {};
     this.state.canRedo = false;
@@ -100,8 +100,9 @@ class History extends BaseService {
   }
 
   public destroy(): void {
-    this.empty();
+    this.resetState();
     this.removeAllListeners();
+    this.removeAllPlugins();
   }
 
   private getUndoRedo() {
