@@ -48,7 +48,7 @@ const props = withDefaults(
 const el = ref<HTMLElement>();
 
 const hasLeft = computed(() => typeof props.left !== 'undefined');
-const hasRight = computed(() => typeof props.left !== 'undefined');
+const hasRight = computed(() => typeof props.right !== 'undefined');
 
 const getCenterWidth = (clientWidth: number, left: number, right: number) => {
   let center = clientWidth - left - right;
