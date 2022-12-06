@@ -5,19 +5,20 @@
   "sideEffects": [
     "dist/*"
   ],
-  "main": "dist/index.js",
-  "module": "dist/index.js",
+  "main": "dist/tmagic-element-plus-adapter.umd.cjs",
+  "module": "dist/tmagic-element-plus-adapter.js",
   "types": "types/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.js"
+      "import": "./dist/tmagic-element-plus-adapter.js",
+      "require": "./dist/tmagic-element-plus-adapter.umd.cjs"
     },
     "./*": "./*"
   },
   "license": "Apache-2.0",
   "scripts": {
-    "build": "tsc -b tsconfig.build.json",
+    "build": "npm run build:type && vite build",
+    "build:type": "npm run clear:type && tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
     "clear:type": "rimraf ./types"
   },
   "engines": {

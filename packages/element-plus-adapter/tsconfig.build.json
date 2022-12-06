@@ -6,9 +6,6 @@
     "declarationDir": "types",
     "forceConsistentCasingInFileNames": true,
     "paths": {},
-    "module": "CommonJS",
-    "rootDir": "./src",
-    "outDir": "./dist",
   },
   "include": [
 		"src"
