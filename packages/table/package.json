@@ -1,16 +1,17 @@
 {
   "version": "1.2.0-beta.20",
   "name": "@tmagic/table",
+  "type": "module",
   "sideEffects": [
     "dist/*"
   ],
-  "main": "dist/tmagic-table.umd.js",
-  "module": "dist/tmagic-table.mjs",
+  "main": "dist/tmagic-table.umd.cjs",
+  "module": "dist/tmagic-table.js",
   "types": "types/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/tmagic-table.mjs",
-      "require": "./dist/tmagic-table.umd.js"
+      "import": "./dist/tmagic-table.js",
+      "require": "./dist/tmagic-table.umd.cjs"
     },
     "./dist/style.css": {
       "import": "./dist/style.css",

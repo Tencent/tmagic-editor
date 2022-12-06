@@ -1,6 +1,7 @@
 {
   "version": "1.2.0-beta.20",
   "name": "@tmagic/element-plus-adapter",
+  "type": "module",
   "sideEffects": [
     "dist/*"
   ],

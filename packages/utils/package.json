@@ -1,13 +1,14 @@
 {
   "version": "1.2.0-beta.20",
   "name": "@tmagic/utils",
-  "main": "dist/tmagic-utils.umd.js",
-  "module": "dist/tmagic-utils.mjs",
+  "type": "module",
+  "main": "dist/tmagic-utils.umd.cjs",
+  "module": "dist/tmagic-utils.js",
   "types": "types/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/tmagic-utils.mjs",
-      "require": "./dist/tmagic-utils.umd.js"
+      "import": "./dist/tmagic-utils.js",
+      "require": "./dist/tmagic-utils.umd.cjs"
     }
   },
   "license": "Apache-2.0",

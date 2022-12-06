@@ -1,16 +1,17 @@
 {
   "version": "1.2.0-beta.20",
   "name": "@tmagic/design",
+  "type": "module",
   "sideEffects": [
     "dist/*"
   ],
-  "main": "dist/tmagic-design.umd.js",
-  "module": "dist/tmagic-design.mjs",
+  "main": "dist/tmagic-design.umd.cjs",
+  "module": "dist/tmagic-design.js",
   "types": "types/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/tmagic-design.mjs",
-      "require": "./dist/tmagic-design.umd.js"
+      "import": "./dist/tmagic-design.js",
+      "require": "./dist/tmagic-design.umd.cjs"
     },
     "./*": "./*"
   },

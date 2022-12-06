@@ -1,16 +1,17 @@
 {
   "version": "1.2.0-beta.20",
   "name": "@tmagic/core",
+  "type": "module",
   "sideEffects": [
     "dist/*"
   ],
-  "main": "dist/tmagic-core.umd.js",
-  "module": "dist/tmagic-core.mjs",
+  "main": "dist/tmagic-core.umd.cjs",
+  "module": "dist/tmagic-core.js",
   "types": "types/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/tmagic-core.mjs",
-      "require": "./dist/tmagic-core.umd.js"
+      "import": "./dist/tmagic-core.js",
+      "require": "./dist/tmagic-core.umd.cjs"
     },
     "./dist/style.css": {
       "import": "./dist/style.css",

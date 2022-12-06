@@ -1,14 +1,15 @@
 {
   "version": "1.2.0-beta.20",
   "name": "@tmagic/schema",
+  "type": "module",
   "sideEffects": false,
-  "main": "dist/tmagic-schema.umd.js",
-  "module": "dist/tmagic-schema.mjs",
+  "main": "dist/tmagic-schema.umd.cjs",
+  "module": "dist/tmagic-schema.js",
   "types": "types/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/tmagic-schema.mjs",
-      "require": "./dist/tmagic-schema.umd.js"
+      "import": "./dist/tmagic-schema.js",
+      "require": "./dist/tmagic-schema.umd.cjs"
     },
     "./*": "./*"
   },

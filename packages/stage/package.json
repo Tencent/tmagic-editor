@@ -1,16 +1,17 @@
 {
   "version": "1.2.0-beta.20",
   "name": "@tmagic/stage",
+  "type": "module",
   "sideEffects": [
     "dist/*"
   ],
-  "main": "dist/tmagic-stage.umd.js",
-  "module": "dist/tmagic-stage.mjs",
+  "main": "dist/tmagic-stage.umd.cjs",
+  "module": "dist/tmagic-stage.js",
   "types": "types/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/tmagic-stage.mjs",
-      "require": "./dist/tmagic-stage.umd.js"
+      "import": "./dist/tmagic-stage.js",
+      "require": "./dist/tmagic-stage.umd.cjs"
     },
     "./*": "./*"
   },
