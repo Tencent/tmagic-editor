@@ -223,7 +223,7 @@ export default defineComponent({
   emits: ['props-panel-mounted', 'update:modelValue'],
 
   setup(props, { emit }) {
-    editorService.on('root-change', (value) => {
+    editorService.on('root-change', (value, preValue) => {
       const nodeId = editorService.get<MNode | null>('node')?.id || props.defaultSelected;
       let node;
       if (nodeId) {
@@ -240,7 +240,7 @@ export default defineComponent({
         editorService.set('page', null);
       }
 
-      if (toRaw(value) !== toRaw(editorService.get('root'))) {
+      if (toRaw(value) !== toRaw(preValue)) {
         emit('update:modelValue', value);
       }
     });

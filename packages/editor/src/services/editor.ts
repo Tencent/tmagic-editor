@@ -95,6 +95,7 @@ class Editor extends BaseService {
    * @param value MNode
    */
   public set<T = MNode>(name: keyof StoreState, value: T) {
+    const preValue = this.state[name];
     this.state[name] = value as any;
     // set nodes时将node设置为nodes第一个元素
     if (name === 'nodes') {
@@ -102,7 +103,7 @@ class Editor extends BaseService {
     }
     if (name === 'root') {
       this.state.pageLength = (value as unknown as MApp)?.items?.length || 0;
-      this.emit('root-change', value);
+      this.emit('root-change', value, preValue);
     }
   }
 
