@@ -1,3 +1,14 @@
+# [1.2.0-beta.25](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.24...v1.2.0-beta.25) (2022-12-07)
+
+
+### Bug Fixes
+
+* **cli:** 异步组件返回应该是个函数 ([138614a](https://github.com/Tencent/tmagic-editor/commit/138614a57adaf11b46b86f95c70df00975903c7b))
+* **cli:** 插件不支持ts的问题 ([ccb4e67](https://github.com/Tencent/tmagic-editor/commit/ccb4e675ab8e33cafb5374f9db4c602c380ccc31))
+* **playground:** 加载组件表单配置资源失败 ([ba20eb8](https://github.com/Tencent/tmagic-editor/commit/ba20eb8cf1aebc735d75c6fb2f3023f0c61b8360))
+
+
+
 # [1.2.0-beta.24](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.23...v1.2.0-beta.24) (2022-12-07)
 
 
