@@ -162,9 +162,7 @@ const tagName = computed(() => {
   return 'm-fields-text';
 });
 
-const disabled = computed(() =>
-  typeof props.disabled === 'undefined' ? filterFunction(mForm, props.config.disabled, props) : props.disabled,
-);
+const disabled = computed(() => props.disabled || filterFunction(mForm, props.config.disabled, props));
 
 const tooltip = computed(() => filterFunction(mForm, props.config.tooltip, props));
 
