@@ -1,3 +1,12 @@
+# [1.2.0-beta.24](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.23...v1.2.0-beta.24) (2022-12-07)
+
+
+### Bug Fixes
+
+* **form:** disable配置失效 ([12d56ae](https://github.com/Tencent/tmagic-editor/commit/12d56aeda9197dfc31bf5b7e8fe480deca4a85f1))
+
+
+
 # [1.2.0-beta.23](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.22...v1.2.0-beta.23) (2022-12-07)
 
 
