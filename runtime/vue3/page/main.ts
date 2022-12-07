@@ -33,10 +33,7 @@ const magicApp = createApp(AppComponent);
 magicApp.use(request);
 
 Object.entries(components).forEach(([type, component]: [string, any]) => {
-  magicApp.component(
-    `magic-ui-${type}`,
-    defineAsyncComponent(() => component),
-  );
+  magicApp.component(`magic-ui-${type}`, defineAsyncComponent(component));
 });
 
 Object.values(plugins).forEach((plugin: any) => {

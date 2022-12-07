@@ -41,7 +41,7 @@ const generateContent = (
     const name = makeCamelCase(key);
     if (dynamicImport) {
       list.push(
-        `'${key}': import('${packagePath}${packagePath.endsWith(componentFileAffix) ? '' : componentFileAffix}')`,
+        `'${key}': () => import('${packagePath}${packagePath.endsWith(componentFileAffix) ? '' : componentFileAffix}')`,
       );
     } else {
       importDeclarations.push(
