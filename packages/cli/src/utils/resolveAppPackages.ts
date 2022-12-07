@@ -63,7 +63,7 @@ export const resolveAppPackages = (app: App): ModuleMainFilePath => {
           return;
         }
         const indexCode = fs.readFileSync(i.indexPath, { encoding: 'utf-8', flag: 'r' });
-        const ast = recast.parse(indexCode);
+        const ast = recast.parse(indexCode, { parser: require('recast/parsers/typescript') });
         if (typeAssertion({ ast, indexPath }).type === PackageType.PLUGIN) {
           // 插件
           pluginMap[i.type] = i.indexPath;
