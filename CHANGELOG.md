@@ -1,3 +1,17 @@
+# [1.2.0-beta.23](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.22...v1.2.0-beta.23) (2022-12-07)
+
+
+### Bug Fixes
+
+* **editor:** modelValue自动更新不成功 ([e813129](https://github.com/Tencent/tmagic-editor/commit/e813129eb8ea6e11e683c081847dd17fb1104dfd))
+
+
+### Features
+
+* **form:** 完善select remote功能 ([7445d24](https://github.com/Tencent/tmagic-editor/commit/7445d2453194258256c70d4936aa43d04dfecdb2))
+
+
+
 # [1.2.0-beta.22](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.21...v1.2.0-beta.22) (2022-12-06)
 
 
