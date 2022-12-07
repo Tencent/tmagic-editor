@@ -99,11 +99,16 @@ const getOptions = async () => {
 
   const { config } = props;
   const { option } = config;
-  let { body } = option;
+  const { root = '', totalKey = 'total' } = option;
+  let { body = {}, url } = option;
+
+  if (typeof url === 'function') {
+    url = await url(mForm, { model: props.model, formValue: mForm?.values });
+  }
 
   let postOptions: Record<string, any> = {
     method: option.method || 'POST',
-    url: option.url,
+    url,
     cache: option.cache,
     timeout: option.timeout,
     mode: option.mode,
@@ -111,21 +116,20 @@ const getOptions = async () => {
     json: option.json || false,
   };
 
-  if (body) {
-    if (typeof body === 'function') {
-      body = body(mForm, {
-        model: props.model,
-        formValue: mForm?.values,
-        formValues: mForm?.values,
-        config: props.config,
-      }) as Record<string, any>;
-    }
-
-    body.query = query.value;
-    body.pgSize = pgSize.value;
-    body.pgIndex = pgIndex.value;
-    postOptions.data = body;
+  if (typeof body === 'function') {
+    body = body(mForm, {
+      model: props.model,
+      formValue: mForm?.values,
+      formValues: mForm?.values,
+      config: props.config,
+    }) as Record<string, any>;
   }
+
+  body.query = query.value;
+  body.pgSize = pgSize.value;
+  body.pgIndex = pgIndex.value;
+
+  postOptions.data = body;
 
   const requestFuc = getConfig('request') as Function;
 
@@ -151,10 +155,14 @@ const getOptions = async () => {
     });
   }
 
-  const optionsData = res[option.root];
+  const optionsData = root.split('.').reduce((accumulator, currentValue: any) => accumulator[currentValue], res);
 
-  if (res.total > 0) {
-    total.value = res.total;
+  const resTotal = globalThis.parseInt(
+    totalKey.split('.').reduce((accumulator, currentValue: any) => accumulator[currentValue], res),
+    10,
+  );
+  if (resTotal > 0) {
+    total.value = resTotal;
   }
 
   remoteData.value = remoteData.value.concat(optionsData);
@@ -214,6 +222,8 @@ const getInitOption = async () => {
 
   const { config } = props;
   const { option } = config;
+  const { root = '', initRoot = '' } = option;
+  let { initBody = {} } = option;
 
   let options: SelectOption[] | SelectGroupOption[] = [];
 
@@ -226,24 +236,53 @@ const getInitOption = async () => {
     url = await url(mForm, { model: props.model, formValue: mForm?.values });
   }
 
-  const postOptions: Record<string, any> = {
+  if (typeof initBody === 'function') {
+    initBody = initBody(mForm, {
+      model: props.model,
+      formValue: mForm?.values,
+      formValues: mForm?.values,
+      config: props.config,
+    }) as Record<string, any>;
+  }
+
+  let postOptions: Record<string, any> = {
     method: option.method || 'POST',
     url,
     data: {
       id: props.model[props.name],
+      ...initBody,
     },
     mode: option.mode,
     headers: option.headers || {},
     json: option.json || false,
   };
+
+  if (typeof option.beforeInitRequest === 'function') {
+    postOptions = option.beforeInitRequest(mForm, postOptions, {
+      model: props.model,
+      formValue: mForm?.values,
+    });
+  }
+
   if (option.method?.toLocaleLowerCase() === 'jsonp') {
     postOptions.jsonpCallback = option.jsonpCallback || 'callback';
   }
 
   const requestFuc = getConfig('request') as Function;
-  const res = await requestFuc(postOptions);
+  let res = await requestFuc(postOptions);
 
-  let initData = res[option.root];
+  if (typeof option.afterRequest === 'function') {
+    res = option.afterRequest(mForm, res, {
+      model: props.model,
+      formValue: mForm?.values,
+      formValues: mForm?.values,
+      config: props.config,
+    });
+  }
+
+  let initData = (initRoot || root)
+    .split('.')
+    .reduce((accumulator, currentValue: any) => accumulator[currentValue], res);
   if (initData) {
     if (!Array.isArray(initData)) {
       initData = [initData];

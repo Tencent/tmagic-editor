@@ -433,7 +433,7 @@ export interface SelectConfig extends FormItem, Input {
   options: SelectConfigOption[] | SelectConfigGroupOption[] | SelectOptionFunction;
   remote: true;
   option: {
-    url: string;
+    url: string | ((mForm: FormState | undefined, data: { model: any; formValue: any }) => string);
     initUrl?: string | ((mForm: FormState | undefined, data: { model: any; formValue: any }) => string);
     method?: 'jsonp' | string;
     cache?: boolean;
@@ -444,13 +444,22 @@ export interface SelectConfig extends FormItem, Input {
     };
     json?: false | boolean;
     body?: Record<string, any> | RemoteSelectOptionBodyFunction;
+    initBody?: Record<string, any> | RemoteSelectOptionBodyFunction;
     jsonpCallback?: 'callback' | string;
     afterRequest?: RemoteSelectOptionRequestFunction;
+    afterInitRequest?: RemoteSelectOptionRequestFunction;
     beforeRequest?: (mForm: FormState | undefined, postOptions: Record<string, any>, data: any) => Record<string, any>;
-    root: string;
+    beforeInitRequest?: (
+      mForm: FormState | undefined,
+      postOptions: Record<string, any>,
+      data: any,
+    ) => Record<string, any>;
+    root?: string;
+    totalKey?: string;
+    initRoot?: string;
     item?: RemoteSelectOptionItemFunction;
-    value: string | SelectOptionValueFunction;
-    text: string | SelectOptionTextFunction;
+    value?: string | SelectOptionValueFunction;
+    text?: string | SelectOptionTextFunction;
   };
 }
 
