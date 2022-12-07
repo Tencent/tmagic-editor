@@ -158,13 +158,13 @@ const save = () => {
   editor.value?.editorService.resetModifiedNodeId();
 };
 
-asyncLoadJs(`${VITE_ENTRY_PATH}/config/index.umd.js`).then(() => {
+asyncLoadJs(`${VITE_ENTRY_PATH}/config/index.umd.cjs`).then(() => {
   propsConfigs.value = (globalThis as any).magicPresetConfigs;
 });
-asyncLoadJs(`${VITE_ENTRY_PATH}/value/index.umd.js`).then(() => {
+asyncLoadJs(`${VITE_ENTRY_PATH}/value/index.umd.cjs`).then(() => {
   propsValues.value = (globalThis as any).magicPresetValues;
 });
-asyncLoadJs(`${VITE_ENTRY_PATH}/event/index.umd.js`).then(() => {
+asyncLoadJs(`${VITE_ENTRY_PATH}/event/index.umd.cjs`).then(() => {
   eventMethodList.value = (globalThis as any).magicPresetEvents;
 });
 
