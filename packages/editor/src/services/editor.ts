@@ -581,9 +581,20 @@ class Editor extends BaseService {
 
     if (!Array.isArray(config)) return;
 
+    const node = this.get<MNode>('node');
+
+    let parent: MContainer | undefined = undefined;
+    // 粘贴的组件为当前选中组件的副本时，则添加到当前选中组件的父组件中
+    if (config.length === 1 && config[0].id === node.id) {
+      parent = this.get<MContainer>('parent');
+      if (parent.type === NodeType.ROOT) {
+        parent = this.get<MPage>('page');
+      }
+    }
+
     const pasteConfigs = await this.doPaste(config, position);
 
-    return this.add(pasteConfigs, this.get('parent'));
+    return this.add(pasteConfigs, parent);
   }
 
   public async doPaste(config: MNode[], position: PastePosition = {}): Promise<MNode[]> {
