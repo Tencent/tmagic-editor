@@ -581,12 +581,6 @@ alignCenter可以支持一次水平居中多个组件，alignCenter是通过调�
 
   更新当前选中组件位置，通常用于键盘上下左右快捷键操作
 
-## destroy
-
-- **详情：**
-
-  销毁editorService
-
 ## resetModifiedNodeId
 
 - **详情：**
@@ -630,3 +624,80 @@ alignCenter可以支持一次水平居中多个组件，alignCenter是通过调�
 - **详情：**
 
   设置代码块到dsl的codeBlocks字段
+
+## resetState
+
+- **详情：**
+
+清空state
+
+## destroy
+
+- **详情：**
+
+  销毁editorService
+
+  移除所有事件监听，清空state，移除所有插件
+
+## use
+
+使用中间件的方式扩展方法，上述方法中标记有`扩展支持： 是`的方法都支持使用use扩展
+
+- **示例：**
+
+```js
+import { editorService, getAddParent } from '@tmagic/editor';
+import { ElMessageBox } from 'element-plus';
+
+editorService.use({
+  // 添加是否删除节点确认提示
+  async remove(node, next) {
+    await ElMessageBox.confirm('是否删除', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    });
+
+    next();
+  },
+
+  add(node, next) {
+    // text组件只能添加到container中
+    const parentNode = getAddParent(node);
+    if (node.type === 'text' && parentNode?.type !== 'container') {
+      return;
+    }
+
+    next();
+  },
+});
+```
+
+## usePlugin
+
+- **详情：**
+
+相对于[use](#use), usePlugin支持更加灵活更加细致的扩展， 上述方法中标记有`扩展支持： 是`的方法都支持使用usePlugin扩展
+
+每个支持扩展的方法都支持定制before、after两个hook来干预原有方法的行为，before可以用于修改传入参数，after可以用于修改返回的值
+
+- **示例：**
+
+```js
+import { editorService } from '@tmagic/editor';
+
+editorService.usePlugin({
+  // 添加组件的时候设置一个添加时间
+  beforeDoAdd: (config, parent) => {
+    config.addTime = new Date().getTime();
+
+    return [config, parent];
+  },
+});
+```
+
+## removeAllPlugins
+
+- **详情：**
+
+删掉当前设置的所有扩展
