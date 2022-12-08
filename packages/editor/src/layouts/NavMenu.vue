@@ -1,7 +1,7 @@
 <template>
   <div class="m-editor-nav-menu" :style="{ height: `${height}px` }">
     <div v-for="key in keys" :class="`menu-${key}`" :key="key" :style="`width: ${columnWidth?.[key]}px`">
-      <tool-button :data="item" v-for="(item, index) in buttons[key]" :key="index"></tool-button>
+      <ToolButton :data="item" v-for="(item, index) in buttons[key]" :key="index"></ToolButton>
     </div>
   </div>
 </template>

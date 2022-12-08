@@ -26,3 +26,6 @@ pnpm-debug.log*
 *.sw?
 
 coverage
+
+auto-imports.d.ts
+components.d.ts

@@ -1,7 +1,7 @@
 <template>
   <Framework :code-options="codeOptions">
     <template #nav>
-      <slot name="nav" :editorService="editorService"><NavMenu :data="menu"></NavMenu></slot>
+      <slot name="nav" :editorService="editorService"><TMagicNavMenu :data="menu"></TMagicNavMenu></slot>
     </template>
 
     <template #sidebar>
@@ -96,7 +96,7 @@ export default defineComponent({
   name: 'm-editor',
 
   components: {
-    NavMenu,
+    TMagicNavMenu: NavMenu,
     Sidebar,
     Workspace,
     PropsPanel,
