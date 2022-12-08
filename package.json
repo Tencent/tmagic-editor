@@ -62,7 +62,7 @@
     "element-plus": "^2.2.19",
     "enquirer": "^2.3.6",
     "eslint": "^7.29.0",
-    "eslint-config-tencent": "^1.0.1",
+    "eslint-config-tencent": "^1.0.4",
     "eslint-plugin-import": "^2.23.4",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-simple-import-sort": "^7.0.0",

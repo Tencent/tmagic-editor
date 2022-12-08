@@ -14,7 +14,7 @@ module.exports = {
     'eslint-config-tencent',
     'eslint-config-tencent/ts',
     'plugin:vue/vue3-essential',
-    'eslint-config-tencent/prettier',
+    './prettier',
   ],
   parser: 'vue-eslint-parser',
   parserOptions: {
