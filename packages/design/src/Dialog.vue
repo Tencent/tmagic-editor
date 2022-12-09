@@ -1,5 +1,11 @@
 <template>
-  <component :is="uiComponent.component" v-bind="uiProps" @close="closeHandler" @update:modelValue="updateModelValue">
+  <component
+    class="tmagic-design-dialog"
+    :is="uiComponent.component"
+    v-bind="uiProps"
+    @close="closeHandler"
+    @update:modelValue="updateModelValue"
+  >
     <slot></slot>
 
     <template #footer>
@@ -21,7 +27,6 @@ const props = defineProps<{
   width?: string | number;
   fullscreen?: boolean;
   closeOnClickModal?: boolean;
-  labelPosition?: string;
 }>();
 
 const uiComponent = getConfig('components').dialog;

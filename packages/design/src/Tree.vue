@@ -1,5 +1,6 @@
 <template>
   <component
+    class="tmagic-design-tree"
     ref="tree"
     :is="uiComponent.component"
     v-bind="uiProps"

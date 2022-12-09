@@ -1,5 +1,6 @@
 <template>
   <component
+    class="tmagic-design-input"
     :is="uiComponent.component"
     v-bind="uiProps"
     @change="changeHandler"
@@ -21,12 +22,12 @@ import { computed } from 'vue';
 import { getConfig } from './config';
 
 const props = defineProps<{
-  modelValue?: string | number | boolean;
+  modelValue?: string | number;
   clearable?: boolean;
   disabled?: boolean;
   placeholder?: string;
   type?: string;
-  size?: 'mini' | 'small' | 'medium';
+  size?: 'large' | 'default' | 'small';
 }>();
 
 const uiComponent = getConfig('components').input;

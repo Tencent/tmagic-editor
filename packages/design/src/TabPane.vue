@@ -1,5 +1,5 @@
 <template>
-  <component :is="uiComponent.component" v-bind="uiProps">
+  <component class="tmagic-design-tab-pane" :is="uiComponent.component" v-bind="uiProps">
     <template #default>
       <slot></slot>
     </template>

@@ -1,5 +1,6 @@
 <template>
   <component
+    class="tmagic-design-tabs"
     :is="uiComponent.component"
     v-bind="uiProps"
     @tab-click="tabClickHandler"

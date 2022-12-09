@@ -1,5 +1,6 @@
 <template>
   <component
+    class="tmagic-design-input-number"
     :is="uiComponent.component"
     v-bind="uiProps"
     @change="changeHandler"
@@ -22,7 +23,7 @@ const props = defineProps<{
   step?: number;
   min?: number;
   max?: number;
-  size?: 'mini' | 'small' | 'medium';
+  size?: 'large' | 'default' | 'small';
 }>();
 
 const uiComponent = getConfig('components').inputNumber;

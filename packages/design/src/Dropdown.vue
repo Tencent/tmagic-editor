@@ -1,5 +1,5 @@
 <template>
-  <component :is="uiComponent.component" v-bind="uiProps" @command="commandHandler">
+  <component class="tmagic-design-dropdown" :is="uiComponent.component" v-bind="uiProps" @command="commandHandler">
     <slot></slot>
 
     <template #dropdown>

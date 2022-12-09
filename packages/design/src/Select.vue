@@ -1,10 +1,12 @@
 <template>
   <component
+    class="tmagic-design-select"
     ref="select"
     :is="uiComponent.component"
     v-bind="uiProps"
     @change="changeHandler"
     @visible-change="visibleHandler"
+    @popup-visible-change="visibleHandler"
     @update:modelValue="updateModelValue"
   >
     <slot></slot>
@@ -30,7 +32,7 @@ const props = defineProps<{
   allowCreate?: boolean;
   valueKey?: string;
   remoteMethod?: any;
-  size?: 'mini' | 'small' | 'medium';
+  size?: 'large' | 'default' | 'small';
 }>();
 
 const uiComponent = getConfig('components').select;
@@ -39,22 +41,22 @@ const uiProps = computed(() => uiComponent.props(props));
 
 const emit = defineEmits(['change', 'update:modelValue', 'visibleHandler']);
 
-const changeHandler = (v: any) => {
-  emit('change', v);
+const changeHandler = (...args: any[]) => {
+  emit('change', ...args);
 };
 
-const updateModelValue = (v: any) => {
-  emit('update:modelValue', v);
+const updateModelValue = (...args: any[]) => {
+  emit('update:modelValue', ...args);
 };
 
-const visibleHandler = (v: any) => {
-  emit('visibleHandler', v);
+const visibleHandler = (...args: any[]) => {
+  emit('visibleHandler', ...args);
 };
 
 const scrollbarWrap = ref<HTMLDivElement | undefined>();
 
 onMounted(() => {
-  scrollbarWrap.value = select.value?.scrollbar.wrap$;
+  scrollbarWrap.value = select.value?.scrollbar?.wrap$;
 });
 
 defineExpose({

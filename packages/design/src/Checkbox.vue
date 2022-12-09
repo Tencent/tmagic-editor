@@ -1,5 +1,11 @@
 <template>
-  <component :is="uiComponent.component" v-bind="uiProps" @update:modelValue="updateModelValue" @change="changeHandler">
+  <component
+    class="tmagic-design-checkbox"
+    :is="uiComponent.component"
+    v-bind="uiProps"
+    @update:modelValue="updateModelValue"
+    @change="changeHandler"
+  >
     <template #default>
       <slot></slot>
     </template>
@@ -18,7 +24,7 @@ const props = withDefaults(
     trueLabel?: string | number | boolean;
     falseLabel?: string | number | boolean;
     disabled?: boolean;
-    size?: 'mini' | 'small' | 'medium';
+    size?: 'large' | 'default' | 'small';
   }>(),
   {
     trueLabel: undefined,

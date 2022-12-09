@@ -1,5 +1,11 @@
 <template>
-  <component :is="uiComponent.component" v-bind="uiProps" @change="changeHandler" @update:modelValue="updateModelValue">
+  <component
+    class="tmagic-design-date-picker"
+    :is="uiComponent.component"
+    v-bind="uiProps"
+    @change="changeHandler"
+    @update:modelValue="updateModelValue"
+  >
   </component>
 </template>
 
@@ -23,7 +29,7 @@ const props = withDefaults(
     /** 在范围选择器里取消两个日期面板之间的联动 */
     unlinkPanels?: boolean;
     defaultTime?: any;
-    size?: 'mini' | 'small' | 'medium';
+    size?: 'large' | 'default' | 'small';
   }>(),
   {
     type: 'date',

@@ -1,5 +1,11 @@
 <template>
-  <component :is="uiComponent.component" v-bind="uiProps" @change="changeHandler" @update:modelValue="updateModelValue">
+  <component
+    class="tmagic-design-color-picker"
+    :is="uiComponent.component"
+    v-bind="uiProps"
+    @change="changeHandler"
+    @update:modelValue="updateModelValue"
+  >
   </component>
 </template>
 
@@ -13,7 +19,7 @@ const props = withDefaults(
     modelValue?: string;
     disabled?: boolean;
     showAlpha?: boolean;
-    size?: 'mini' | 'small' | 'medium';
+    size?: 'large' | 'default' | 'small';
   }>(),
   {
     showAlpha: false,

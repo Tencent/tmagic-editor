@@ -1,5 +1,5 @@
 <template>
-  <component :is="uiComponent.component" v-bind="uiProps" @click="clickHandler">
+  <component class="tmagic-design-step" :is="uiComponent.component" v-bind="uiProps" @click="clickHandler">
     <slot></slot>
   </component>
 </template>

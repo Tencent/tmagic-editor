@@ -1,5 +1,5 @@
 <template>
-  <component :is="uiComponent.component" v-bind="uiProps">
+  <component class="tmagic-design-form-item" :is="uiComponent.component" v-bind="uiProps">
     <template #label>
       <slot name="label"></slot>
     </template>

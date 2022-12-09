@@ -1,10 +1,12 @@
 <template>
-  <component :is="uiComponent.component" v-bind="uiProps">
+  <component class="tmagic-design-card" :is="uiComponent.component" v-bind="uiProps">
     <template #header>
-      <slot name="header"></slot>
+      <slot name="header" class="header"></slot>
     </template>
 
-    <slot></slot>
+    <template #default>
+      <slot name="default"></slot>
+    </template>
   </component>
 </template>
 

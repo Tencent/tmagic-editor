@@ -1,5 +1,5 @@
 <template>
-  <component :is="uiComponent.component" v-bind="uiProps">
+  <component class="tmagic-design-radio" :is="uiComponent.component" v-bind="uiProps">
     <slot></slot>
   </component>
 </template>

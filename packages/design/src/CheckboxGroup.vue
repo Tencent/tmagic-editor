@@ -1,5 +1,11 @@
 <template>
-  <component :is="uiComponent.component" v-bind="uiProps" @change="changeHandler" @update:modelValue="updateModelValue">
+  <component
+    class="tmagic-design-checkbox-group"
+    :is="uiComponent.component"
+    v-bind="uiProps"
+    @change="changeHandler"
+    @update:modelValue="updateModelValue"
+  >
     <slot></slot>
   </component>
 </template>
@@ -13,7 +19,7 @@ const props = defineProps<{
   modelValue?: any[];
   label?: string;
   disabled?: boolean;
-  size?: 'mini' | 'small' | 'medium';
+  size?: 'large' | 'default' | 'small';
 }>();
 
 const uiComponent = getConfig('components').checkboxGroup;

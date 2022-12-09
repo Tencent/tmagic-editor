@@ -1,5 +1,5 @@
 <template>
-  <component :is="uiComponent.component" v-bind="uiProps">
+  <component class="tmagic-design-tooltip" :is="uiComponent.component" v-bind="uiProps">
     <template #content>
       <slot name="content"></slot>
     </template>

@@ -1,5 +1,5 @@
 <template>
-  <component :is="uiComponent.component" v-bind="uiProps" @click="clickHandler">
+  <component class="tmagic-design-button" :is="uiComponent.component" v-bind="uiProps" @click="clickHandler">
     <slot></slot>
   </component>
 </template>
@@ -11,7 +11,7 @@ import { getConfig } from './config';
 
 const props = defineProps<{
   type?: string;
-  size?: string;
+  size?: 'large' | 'default' | 'small';
   text?: boolean;
   icon?: any;
 }>();

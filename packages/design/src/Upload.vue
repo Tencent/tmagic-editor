@@ -1,5 +1,11 @@
 <template>
-  <component ref="upload" :is="uiComponent.component" v-bind="uiProps" @change="changeHandler"></component>
+  <component
+    class="tmagic-design-upload"
+    ref="upload"
+    :is="uiComponent.component"
+    v-bind="uiProps"
+    @change="changeHandler"
+  ></component>
 </template>
 
 <script setup lang="ts" name="TMUpload">
@@ -10,6 +16,7 @@ import { getConfig } from './config';
 const props = defineProps<{
   action?: string;
   autoUpload?: boolean;
+  disabled?: boolean;
 }>();
 
 const emit = defineEmits(['change']);

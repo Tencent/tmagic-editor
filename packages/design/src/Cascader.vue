@@ -1,6 +1,7 @@
 <template>
   <component
     ref="cascader"
+    class="tmagic-design-cascader"
     :is="uiComponent.component"
     v-bind="uiProps"
     @update:modelValue="updateModelValue"
@@ -21,7 +22,7 @@ const props = defineProps<{
   clearable?: boolean;
   filterable?: boolean;
   options?: CascaderOption[];
-  size?: 'mini' | 'small' | 'medium';
+  size?: 'large' | 'default' | 'small';
   props: {
     expandTrigger?: 'click' | 'hover';
     multiple?: boolean;

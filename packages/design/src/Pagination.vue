@@ -1,5 +1,6 @@
 <template>
   <component
+    class="tmagic-design-pagination"
     :is="uiComponent.component"
     v-bind="uiProps"
     @size-change="handleSizeChange"

@@ -1,5 +1,5 @@
 <template>
-  <component :is="uiComponent.component">
+  <component class="tmagic-design-row" :is="uiComponent.component">
     <slot></slot>
   </component>
 </template>

@@ -1,5 +1,11 @@
 <template>
-  <component :is="uiComponent.component" v-bind="uiProps" @update:modelValue="updateModelValue" @change="changeHandler">
+  <component
+    class="tmagic-design-collapse"
+    :is="uiComponent.component"
+    v-bind="uiProps"
+    @update:modelValue="updateModelValue"
+    @change="changeHandler"
+  >
     <slot></slot>
   </component>
 </template>

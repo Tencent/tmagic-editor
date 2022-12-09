@@ -1,5 +1,5 @@
 <template>
-  <component :is="uiComponent.component" v-bind="uiProps">
+  <component class="tmagic-design-tag" :is="uiComponent.component" v-bind="uiProps">
     <slot></slot>
   </component>
 </template>
@@ -11,7 +11,7 @@ import { getConfig } from './config';
 
 const props = defineProps<{
   type?: string;
-  closeTransition?: boolean;
+  disableTransition?: boolean;
 }>();
 
 const uiComponent = getConfig('components').tag;

@@ -1,5 +1,6 @@
 <template>
   <component
+    class="tmagic-design-table"
     ref="table"
     :is="uiComponent.component"
     v-bind="uiProps"

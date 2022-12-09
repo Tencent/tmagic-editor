@@ -1,5 +1,11 @@
 <template>
-  <component :is="uiComponent.component" v-bind="uiProps" @change="changeHandler" @update:modelValue="updateModelValue">
+  <component
+    class="tmagic-design-time-picker"
+    :is="uiComponent.component"
+    v-bind="uiProps"
+    @change="changeHandler"
+    @update:modelValue="updateModelValue"
+  >
   </component>
 </template>
 
@@ -12,7 +18,7 @@ const props = defineProps<{
   modelValue?: any;
   disabled?: boolean;
   placeholder?: string;
-  size?: 'mini' | 'small' | 'medium';
+  size?: 'large' | 'default' | 'small';
 }>();
 
 const uiComponent = getConfig('components').timePicker;

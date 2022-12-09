@@ -1,5 +1,11 @@
 <template>
-  <component :is="uiComponent.component" v-bind="uiProps" @change="changeHandler" @update:modelValue="updateModelValue">
+  <component
+    class="tmagic-design-radio-group"
+    :is="uiComponent.component"
+    v-bind="uiProps"
+    @change="changeHandler"
+    @update:modelValue="updateModelValue"
+  >
     <slot></slot>
   </component>
 </template>
@@ -12,7 +18,7 @@ import { getConfig } from './config';
 const props = defineProps<{
   modelValue?: string | number | boolean;
   disabled?: boolean;
-  size?: 'mini' | 'small' | 'medium';
+  size?: 'large' | 'default' | 'small';
 }>();
 
 const uiComponent = getConfig('components').radioGroup;

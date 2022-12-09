@@ -1,5 +1,5 @@
 <template>
-  <component ref="optionGroup" :is="uiComponent.component" v-bind="uiProps">
+  <component class="tmagic-design-option-group" ref="optionGroup" :is="uiComponent.component" v-bind="uiProps">
     <slot></slot>
   </component>
 </template>
