@@ -1,8 +1,12 @@
 <template>
   <TMagicRadioGroup v-if="model" v-model="model[name]" :size="size" :disabled="disabled" @change="changeHandler">
-    <TMagicRadio v-for="option in config.options" :label="option.value" :key="`${option.value}`">{{
-      option.text
-    }}</TMagicRadio>
+    <TMagicRadio
+      v-for="option in config.options"
+      :label="option.value"
+      :value="option.value"
+      :key="`${option.value}`"
+      >{{ option.text }}</TMagicRadio
+    >
   </TMagicRadioGroup>
 </template>
 
@@ -20,7 +24,7 @@ const props = defineProps<{
   name: string;
   prop: string;
   disabled?: boolean;
-  size: 'mini' | 'small' | 'medium';
+  size?: 'large' | 'default' | 'small';
 }>();
 
 const emit = defineEmits(['change']);

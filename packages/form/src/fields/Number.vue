@@ -31,7 +31,7 @@ const props = defineProps<{
   name: string;
   prop: string;
   disabled?: boolean;
-  size: 'mini' | 'small' | 'medium';
+  size?: 'large' | 'default' | 'small';
 }>();
 
 const emit = defineEmits(['change', 'input']);

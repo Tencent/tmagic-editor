@@ -1,6 +1,11 @@
 <template>
   <TMagicCheckboxGroup v-model="model[name]" :size="size" :disabled="disabled" @change="changeHandler">
-    <TMagicCheckbox v-for="option in options" :label="option.value" :key="option.value" :disabled="option.disabled"
+    <TMagicCheckbox
+      v-for="option in options"
+      :label="option.value"
+      :value="option.value"
+      :key="option.value"
+      :disabled="option.disabled"
       >{{ option.text }}
     </TMagicCheckbox>
   </TMagicCheckboxGroup>
@@ -23,7 +28,7 @@ const props = defineProps<{
   name: string;
   prop: string;
   disabled?: boolean;
-  size: 'mini' | 'small' | 'medium';
+  size?: 'large' | 'default' | 'small';
 }>();
 
 const emit = defineEmits(['change']);
