@@ -83,14 +83,22 @@
 }
 
 .code-editor-dialog {
-  .el-dialog__body {
+  .tmagic-design-card {
+    .t-card__header {
+      display: block;
+    }
+  }
+
+  .el-dialog__body,
+  .t-dialog__body {
     height: 90%;
     padding-top: 10px;
   }
-  .el-card {
+  .tmagic-design-card {
     height: 100%;
     background: #fff;
-    .el-card__body {
+    .el-card__body,
+    .t-card__body {
       height: 100%;
       background: #fff;
     }

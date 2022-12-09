@@ -1,4 +1,4 @@
-.ui-component-panel {
+.ui-component-panel.tmagic-design-collapse {
   height: 100%;
   border-top: 0 !important;
   margin-top: 48px;
@@ -19,14 +19,15 @@
     }
   }
 
-  .el-collapse-item {
+  .tmagic-design-collapse-item {
     > div:first-of-type {
       border-bottom: 1px solid $--border-color;
       margin-bottom: 10px;
     }
   }
 
-  .el-collapse-item__header {
+  .el-collapse-item__header,
+  .t-collapse-panel__header {
     background: $--sidebar-content-background-color;
     color: $--font-color;
     height: 25px;
@@ -40,11 +41,13 @@
     }
   }
 
-  .el-collapse-item__wrap {
+  .el-collapse-item__wrap,
+  .t-collapse-panel__body {
     background: $--sidebar-content-background-color;
     border-bottom: 0;
 
-    .el-collapse-item__content {
+    .el-collapse-item__content,
+    .t-collapse-panel__content {
       padding: 10px;
       display: flex;
       flex-wrap: wrap;
