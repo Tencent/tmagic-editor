@@ -38,6 +38,7 @@ export default class StageDragResize extends MoveableOptionsManager {
   /** 拖动状态 */
   private dragStatus: StageDragStatus = StageDragStatus.END;
   private dragResizeHelper: DragResizeHelper;
+  private disabledDragStart?: boolean;
   private getRenderDocument: GetRenderDocument;
   private markContainerEnd: MarkContainerEnd;
   private delayedMarkContainer: DelayedMarkContainer;
@@ -48,6 +49,7 @@ export default class StageDragResize extends MoveableOptionsManager {
     this.getRenderDocument = config.getRenderDocument;
     this.markContainerEnd = config.markContainerEnd;
     this.delayedMarkContainer = config.delayedMarkContainer;
+    this.disabledDragStart = config.disabledDragStart;
 
     this.dragResizeHelper = new DragResizeHelper({
       container: config.container,
@@ -75,7 +77,7 @@ export default class StageDragResize extends MoveableOptionsManager {
       this.updateMoveable(el);
     }
 
-    if (event) {
+    if (event && !this.disabledDragStart) {
       this.moveable?.dragStart(event);
     }
   }

@@ -102,6 +102,7 @@ export default class ActionManager extends EventEmitter {
 
     this.dr = new StageDragResize({
       container: config.container,
+      disabledDragStart: config.disabledDragStart,
       getRootContainer: config.getRootContainer,
       getRenderDocument: config.getRenderDocument,
       updateDragEl: config.updateDragEl,

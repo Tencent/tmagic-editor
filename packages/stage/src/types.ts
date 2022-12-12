@@ -70,6 +70,7 @@ export interface StageCoreConfig {
   render?: (renderer: StageCore) => Promise<HTMLElement> | HTMLElement;
   autoScrollIntoView?: boolean;
   updateDragEl?: UpdateDragEl;
+  disabledDragStart?: boolean;
 }
 
 export interface ActionManagerConfig {
@@ -79,6 +80,7 @@ export interface ActionManagerConfig {
   containerHighlightType?: ContainerHighlightType;
   moveableOptions?: CustomizeMoveableOptions;
   multiMoveableOptions?: CustomizeMoveableOptions;
+  disabledDragStart?: boolean;
   canSelect?: CanSelect;
   isContainer: IsContainer;
   getRootContainer: GetRootContainer;
@@ -111,6 +113,7 @@ export interface StageMaskConfig {
 export interface StageDragResizeConfig {
   container: HTMLElement;
   moveableOptions?: CustomizeMoveableOptions;
+  disabledDragStart?: boolean;
   getRootContainer: GetRootContainer;
   getRenderDocument: GetRenderDocument;
   markContainerEnd: MarkContainerEnd;

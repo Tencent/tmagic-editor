@@ -218,6 +218,10 @@ export default defineComponent({
     updateDragEl: {
       type: Function as PropType<UpdateDragEl>,
     },
+
+    disabledDragStart: {
+      type: Boolean,
+    },
   },
 
   emits: ['props-panel-mounted', 'update:modelValue'],
@@ -351,6 +355,7 @@ export default defineComponent({
         containerHighlightClassName: props.containerHighlightClassName,
         containerHighlightDuration: props.containerHighlightDuration,
         containerHighlightType: props.containerHighlightType,
+        disabledDragStart: props.disabledDragStart,
       }),
     );
 

@@ -62,6 +62,7 @@ export interface StageOptions {
   containerHighlightClassName: string;
   containerHighlightDuration: number;
   containerHighlightType: ContainerHighlightType;
+  disabledDragStart?: boolean;
   render: (stage: StageCore) => HTMLDivElement | Promise<HTMLDivElement>;
   moveableOptions: MoveableOptions | ((config?: CustomizeMoveableOptionsCallbackConfig) => MoveableOptions);
   canSelect: (el: HTMLElement) => boolean | Promise<boolean>;
