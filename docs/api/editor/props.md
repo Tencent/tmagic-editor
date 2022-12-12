@@ -773,4 +773,22 @@ const updateDragEl = (el, target) => {
   el.style.left = `${left}px`;
 };
 ```
+
+## disabledDragStart
+
+- **详情：**
+  
+禁用组件未选中情况下，按住鼠标直接拖动
+
+- **类型：** `boolean`
+  
+- **默认值：** `false`
+
+- **示例：**
+
+```html
+<template>
+  <m-editor :disabled-drag-start="true"></m-editor>
+</template>
+```
   
