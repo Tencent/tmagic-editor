@@ -1,3 +1,19 @@
+# [1.2.0-beta.26](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.25...v1.2.0-beta.26) (2022-12-12)
+
+
+### Bug Fixes
+
+* **editor:** 粘贴的组件为当前选中组件的副本时，则添加到当前选中组件的父组件中 ([3dcdc04](https://github.com/Tencent/tmagic-editor/commit/3dcdc04127362fae1a5a291b7950ddd44b79a7ad)), closes [#448](https://github.com/Tencent/tmagic-editor/issues/448)
+
+
+### Features
+
+* **design:** 添加class ([ffb84cf](https://github.com/Tencent/tmagic-editor/commit/ffb84cffca8afda45bc153e467a926cf1ec5c0be))
+* **stage,editor:** 添加disabledDragStart配置,用于关闭按下鼠标并拖动功能 ([dd8ac99](https://github.com/Tencent/tmagic-editor/commit/dd8ac99d5d20a019c1a18f445d77bb9075c831d9))
+* **tdesign-vue-next-adapter:** 新增tdesign设配器 ([c3888be](https://github.com/Tencent/tmagic-editor/commit/c3888bedf229c025b41f97c307771493e84839b9))
+
+
+
 # [1.2.0-beta.25](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.24...v1.2.0-beta.25) (2022-12-07)
 
 
