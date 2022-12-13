@@ -170,8 +170,12 @@ export default class extends EventEmitter {
   }
 
   public removeAllPlugins() {
-    this.pluginOptionsList = {};
-    this.middleware = {};
+    Object.keys(this.pluginOptionsList).forEach((key) => {
+      this.pluginOptionsList[key] = [];
+    });
+    Object.keys(this.middleware).forEach((key) => {
+      this.middleware[key] = [];
+    });
   }
 
   private async doTask() {

@@ -227,7 +227,7 @@ export default defineComponent({
   emits: ['props-panel-mounted', 'update:modelValue'],
 
   setup(props, { emit }) {
-    editorService.on('root-change', (value, preValue) => {
+    const rootChangeHandler = (value: MApp, preValue?: MApp | null) => {
       const nodeId = editorService.get<MNode | null>('node')?.id || props.defaultSelected;
       let node;
       if (nodeId) {
@@ -247,7 +247,9 @@ export default defineComponent({
       if (toRaw(value) !== toRaw(preValue)) {
         emit('update:modelValue', value);
       }
-    });
+    };
+
+    editorService.on('root-change', rootChangeHandler);
 
     // 初始值变化，重新设置节点信息
     watch(
@@ -326,6 +328,8 @@ export default defineComponent({
       uiService.resetState();
       componentListService.resetState();
       codeBlockService.resetState();
+
+      editorService.off('root-change', rootChangeHandler);
     });
 
     const services: Services = {

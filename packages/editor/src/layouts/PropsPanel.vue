@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts" setup name="MEditorPropsPanel">
-import { computed, getCurrentInstance, inject, onMounted, ref, watchEffect } from 'vue';
+import { computed, getCurrentInstance, inject, onMounted, onUnmounted, ref, watchEffect } from 'vue';
 
 import { tMagicMessage } from '@tmagic/design';
 import type { FormValue } from '@tmagic/form';
@@ -54,6 +54,10 @@ services?.propsService.on('props-configs-change', init);
 
 onMounted(() => {
   emit('mounted', internalInstance);
+});
+
+onUnmounted(() => {
+  services?.propsService.off('props-configs-change', init);
 });
 
 watchEffect(() => {

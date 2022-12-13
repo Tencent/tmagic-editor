@@ -104,12 +104,6 @@ const filterText = ref('');
 // 默认展开节点
 const defaultExpandedKeys = computed(() => (selectedIds.value.length > 0 ? selectedIds.value : []));
 
-editorService?.on('remove', () => {
-  setTimeout(() => {
-    tree.value?.getNode(editorService.get('node').id)?.updateChildren();
-  }, 0);
-});
-
 // 触发画布单选
 const select = async (data: MNode) => {
   if (!data.id) {
@@ -273,9 +267,17 @@ const mouseleaveHandler = () => {
   isMultiSelectStatus.value = false;
 };
 
+const editorServiceRemoveHandler = () => {
+  setTimeout(() => {
+    tree.value?.getNode(editorService?.get('node').id)?.updateChildren();
+  }, 0);
+};
+
 let keycon: KeyController;
 
 onMounted(() => {
+  editorService?.on('remove', editorServiceRemoveHandler);
+
   keycon = new KeyController(tree.value?.$el);
   const isMac = /mac os x/.test(navigator.userAgent.toLowerCase());
   const ctrl = isMac ? 'meta' : 'ctrl';
@@ -293,6 +295,8 @@ onMounted(() => {
 
 onUnmounted(() => {
   keycon.destroy();
+
+  editorService?.off('remove', editorServiceRemoveHandler);
 });
 
 // 鼠标是否按下标志，用于高亮状态互斥
