@@ -1,3 +1,12 @@
+# [1.2.0-beta.27](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.26...v1.2.0-beta.27) (2022-12-13)
+
+
+### Bug Fixes
+
+* **editor:** 组件销毁时移除service的时间监听 ([cfc57f1](https://github.com/Tencent/tmagic-editor/commit/cfc57f17af8c7b32ca31056570aa422219963d04))
+
+
+
 # [1.2.0-beta.26](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.25...v1.2.0-beta.26) (2022-12-12)
 
 

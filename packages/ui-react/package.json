@@ -1,6 +1,6 @@
 {
   "name": "@tmagic/ui-react",
-  "version": "1.2.0-beta.26",
+  "version": "1.2.0-beta.27",
   "type": "module",
   "main": "src/index.ts",
   "engines": {
@@ -14,8 +14,8 @@
     "react:build": "tsc && vite build"
   },
   "dependencies": {
-    "@tmagic/core": "1.2.0-beta.26",
-    "@tmagic/schema": "1.2.0-beta.26",
+    "@tmagic/core": "1.2.0-beta.27",
+    "@tmagic/schema": "1.2.0-beta.27",
     "qrcode": "^1.5.0",
     "react": "^17.0.0",
     "react-dom": "^17.0.0"
