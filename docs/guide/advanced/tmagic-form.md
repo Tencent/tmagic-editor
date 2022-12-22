@@ -8,11 +8,11 @@ tmagic-editor的表单配置，核心就是使用了 @tmagic/form 来作为渲�
 
 ```bash
 # 最新稳定版
-$ npm install @tmagic/form@beta
+$ npm install @tmagic/form
 ```
 
 ```bash
-$ npm install @tmagic/element-plus-adapter@beta @tmagic/design@beta element-plus -S
+$ npm install @tmagic/element-plus-adapter @tmagic/design element-plus -S
 ```
 
 ## 快速上手

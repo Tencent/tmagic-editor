@@ -11,13 +11,13 @@ node.js > 14
 > 使用Vue CLI生成的项目需要在vue.config.js中加上配置：transpileDependencies: [/@tmagic/]
 
 ```bash
-$ npm install @tmagic/editor@beta @tmagic/form@beta -S
+$ npm install @tmagic/editor @tmagic/form -S
 ```
 
 由于在实际应用中项目常常会用到例如[element-plus](https://element-plus.org/)、[tdesign-vue-next](https://tdesign.tencent.com/vue-next/overview)等UI组件库。为了能让使用者能够选择不同UI库，[@tmagic/editor](https://github.com/Tencent/tmagic-editor/tree/master/packages/editor)将其中使用到的UI组件封装到[@tmagic/design](https://github.com/Tencent/tmagic-editor/tree/master/packages/design)中，然后通过不同的adapter来指定使用具体的对应的UI库，我们提供了[@tmagic/element-plus-adapter](https://github.com/Tencent/tmagic-editor/tree/master/packages/element-plus-adapter)来支持[element-plus](https://element-plus.org/)，所以还需要安装相关的依赖。
 
 ```bash
-$ npm install @tmagic/element-plus-adapter@beta @tmagic/design@beta element-plus -S
+$ npm install @tmagic/element-plus-adapter @tmagic/design element-plus -S
 ```
 
 editor 中还包含了[monaco-editor](https://microsoft.github.io/monaco-editor/)，所以还需安装monaco-editor，可以参考 monaco-editor 的[配置指引](https://github.com/microsoft/monaco-editor/blob/main/docs/integrate-esm.md)。
