@@ -9,11 +9,13 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@tmagic/editor": "1.1.0",
-    "@tmagic/form": "1.1.0",
-    "@tmagic/schema": "1.1.0",
-    "@tmagic/stage": "1.1.0",
-    "@tmagic/utils": "1.1.0",
+    "@tmagic/design": "1.2.0",
+    "@tmagic/editor": "1.2.0",
+    "@tmagic/element-plus-adapter": "1.2.0",
+    "@tmagic/form": "1.2.0",
+    "@tmagic/schema": "1.2.0",
+    "@tmagic/stage": "1.2.0",
+    "@tmagic/utils": "1.2.0",
     "axios": "^0.27.2",
     "axios-jsonp": "^1.0.4",
     "core-js": "^3.20.0",
