@@ -1,3 +1,12 @@
+# [1.2.0](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.27...v1.2.0) (2022-12-22)
+
+
+### Bug Fixes
+
+* **editor:** 代码块列表无法滚动 ([87a19c9](https://github.com/Tencent/tmagic-editor/commit/87a19c9bae4dc0d88c6bb2c9d164db6198e8f6ee))
+
+
+
 # [1.2.0-beta.27](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.26...v1.2.0-beta.27) (2022-12-13)
 
 
