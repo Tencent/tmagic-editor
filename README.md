@@ -71,6 +71,8 @@ runtime 是魔方提供的页面渲染环境。通过加载在编辑器中产出
 ### 使用
 playground 的示例项目，就是为开发者提供的基础应用示例。开发者可以基于此或者参考自行实现，搭建一个基于魔方的可视化搭建平台。
 
+tmagic-editor主要定位是搭建生成移动端H5页面，如果有搭建PC端低代码平台的需求，可以了解一下腾讯出品的另外一个低代码平台：[无极低代码平台](https://wujicode.cn?from=tmagic)。
+
 ### 参与贡献
 
 如果你有好的意见或建议，欢迎给我们提 Issues 或 Pull Requests，为提升魔方可视化编辑器开发体验贡献力量。<br>详见：[CONTRIBUTING.md](./CONTRIBUTING.md)
@@ -78,3 +80,6 @@ playground 的示例项目，就是为开发者提供的基础应用示例。开
 ### 欢迎入群交流
 
 <img src="https://vfiles.gtimg.cn/vupload/20220412/b85d331649748582992.jpg" width=375>
+
+
+
