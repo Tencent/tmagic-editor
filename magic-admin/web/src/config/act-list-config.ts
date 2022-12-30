@@ -18,6 +18,8 @@
 
 import type { Router } from 'vue-router';
 
+import { MagicTable } from '@tmagic/table';
+
 import type { ActListItem } from '@src/api/act';
 import type { ColumnItem } from '@src/typings';
 import { datetimeFormatter } from '@src/util/utils';
@@ -29,31 +31,38 @@ export const getActListFormConfig = (
   router: Router,
   copyActHandler: ColumnItem['handler'],
   copyActAfterHandler: ColumnItem['handler'],
-): ColumnItem[] => [
+) => [
   {
     prop: '',
     type: 'expand',
-    table: [
-      {
-        prop: 'pageTitle',
-        label: '页面标题',
-      },
-      {
-        prop: 'pagePublishTime',
-        label: '页面发布时间',
-        formatter: datetimeFormatter,
-      },
-      {
-        prop: 'pagePublishStatus',
-        label: '页面状态',
-        formatter: pageStatusFormatter,
-      },
-      {
-        prop: 'pagePublishOperator',
-        label: '发布人',
-        formatter: (v: string | number | Date) => (v as string) || '-',
-      },
-    ],
+    component: MagicTable,
+    props: (row: ActListItem) => ({
+      data: row.pages,
+      border: true,
+      columns: [
+        {
+          prop: 'pageTitle',
+          label: '页面标题',
+        },
+        {
+          prop: 'pagePublishTime',
+          label: '页面发布时间',
+          formatter: datetimeFormatter,
+        },
+        {
+          prop: 'pagePublishStatus',
+          label: '页面状态',
+          action: 'tag',
+          type: (v: number) => ['', 'success'][v],
+          formatter: pageStatusFormatter,
+        },
+        {
+          prop: 'pagePublishOperator',
+          label: '发布人',
+          formatter: (v: string | number | Date) => (v as string) || '-',
+        },
+      ],
+    }),
   },
   {
     prop: 'actId',
@@ -86,6 +95,7 @@ export const getActListFormConfig = (
     prop: 'actStatus',
     label: '活动状态',
     action: 'tag',
+    type: (v: number) => ['info', '', 'success'][v],
     formatter: actStatusFormatter,
   },
   {

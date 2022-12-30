@@ -16,25 +16,11 @@
  * limitations under the License.
  */
 
-import momentTimezone from 'moment-timezone';
 import serialize from 'serialize-javascript';
 
 import { EditorInfo } from '@src/typings';
 
-export const datetimeFormatter = function (v: string | number | Date): string {
-  if (v) {
-    let time = null;
-    time = momentHandler(v);
-    // 格式化为北京时间
-    if (time !== 'Invalid date') {
-      return time;
-    }
-    return '-';
-  }
-  return '-';
-};
-const momentHandler = (v: string | number | Date) =>
-  momentTimezone.tz(v, 'Asia/Shanghai').format('YYYY-MM-DD HH:mm:ss');
+export { datetimeFormatter } from '@tmagic/utils';
 
 export const serializeConfig = function (value: EditorInfo): string {
   return serialize(value, {

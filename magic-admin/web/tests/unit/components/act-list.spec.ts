@@ -236,7 +236,7 @@ describe('List', () => {
     const wrapper = getWrapper();
     const createButton = wrapper.find('#create');
     await createButton.trigger('click');
-    expect(wrapper.vm.formDialogVisible).toBe(true);
+    expect(wrapper.vm.dialog?.dialogVisible).toBe(true);
   });
 
   it('路由的活动状态值缺省', () => {

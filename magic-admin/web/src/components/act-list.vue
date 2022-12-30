@@ -41,7 +41,14 @@
         </el-row>
       </template>
 
-      <m-table :data="tableData.res" :config="columns" @sort-change="sortChange" />
+      <magic-table
+        rowkey-name="actId"
+        :data="tableData.res.data"
+        :loading="!tableData.res.fetch"
+        :empty-text="tableData.res.errorMsg"
+        :columns="columns"
+        @sort-change="sortChange"
+      />
 
       <div class="bottom clearfix" style="margin-top: 10px; text-align: right">
         <el-pagination
@@ -57,15 +64,13 @@
       </div>
     </el-card>
 
-    <form-dialog
+    <MFormDialog
+      ref="dialog"
       title="新建活动"
-      :visible="formDialogVisible"
       :values="actValues"
-      :action="action"
       :config="formConfig"
-      @afterAction="afterAction"
-      @close="closeFormDialogHandler"
-    ></form-dialog>
+      @submit="submitHandler"
+    ></MFormDialog>
   </div>
 </template>
 
@@ -76,22 +81,25 @@ import { defineComponent, onMounted, watch } from '@vue/runtime-core';
 import { ElMessage } from 'element-plus';
 import Cookies from 'js-cookie';
 
-import actApi, { ActListItem, ActListQuery, ActListRes, CopyInfo, OrderItem } from '@src/api/act';
-import FormDialog from '@src/components/form-dialog.vue';
-import MTable from '@src/components/table.vue';
+import { MFormDialog } from '@tmagic/form';
+import { MagicTable } from '@tmagic/table';
+
+import actApi, { ActInfoDetail, ActListItem, ActListQuery, ActListRes, CopyInfo, OrderItem } from '@src/api/act';
 import { getActListFormConfig } from '@src/config/act-list-config';
 import { BlankActFormConfig } from '@src/config/blank-act-config';
 import { ActStatus } from '@src/config/status';
-import type { ActFormValue, ColumnItem } from '@src/typings';
+import type { ActFormValue } from '@src/typings';
 import { status } from '@src/use/use-status';
 import { Res } from '@src/util/request';
 import { datetimeFormatter } from '@src/util/utils';
 
 export default defineComponent({
   name: 'act-list',
-  components: { FormDialog, MTable },
+  components: { MFormDialog, MagicTable },
 
   setup() {
+    const dialog = ref<InstanceType<typeof MFormDialog>>();
+
     const actStatus = [...status.actStatus];
     const pageStatus = [...status.pageStatus];
     const router = useRouter();
@@ -119,7 +127,6 @@ export default defineComponent({
     const tableData = reactive<{ res: ActListRes }>({
       res: { data: [], fetch: false, errorMsg: '', total: 0 },
     });
-    const formDialogVisible = ref<boolean>(false);
     // 更新活动列表
     const getActs = async () => {
       const res = await actApi.getList({
@@ -165,7 +172,7 @@ export default defineComponent({
     const copyActAfterHandler = async () => {
       await getActs();
     };
-    const columns: ColumnItem[] = getActListFormConfig(
+    const columns = getActListFormConfig(
       pageStatusFormatter,
       actStatusFormatter,
       router,
@@ -240,7 +247,7 @@ export default defineComponent({
         actBeginTime: datetimeFormatter(new Date()),
         actEndTime: datetimeFormatter(new Date()),
       };
-      formDialogVisible.value = true;
+      dialog.value && (dialog.value.dialogVisible = true);
     };
 
     const afterAction = (res: Res<{ actId: number }>) => {
@@ -248,28 +255,30 @@ export default defineComponent({
       router.push(`/editor/${actId}`);
     };
 
-    const closeFormDialogHandler = () => {
-      formDialogVisible.value = false;
+    const submitHandler = async (info: ActInfoDetail) => {
+      const res = await actApi.saveAct({
+        data: info,
+      });
+
+      afterAction(res);
     };
 
     return {
+      dialog,
       actStatus,
       columns,
       query,
       tableData,
       actValues: toRefs(actValues).data,
-      formDialogVisible,
       formConfig: BlankActFormConfig,
-      action: actApi.saveAct,
       searchChangeHandler,
       actStatusChangeHandle,
       pageTitleChangeHandler,
       sortChange,
       handleSizeChange,
       handleCurrentChange,
-      afterAction,
-      closeFormDialogHandler,
       newHandler,
+      submitHandler,
     };
   },
 });

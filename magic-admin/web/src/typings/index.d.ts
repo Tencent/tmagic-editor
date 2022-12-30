@@ -134,8 +134,8 @@ export interface EditorInfo {
 // 新建活动的初始值类型
 export interface ActFormValue {
   operator: string;
-  actBeginTime: string;
-  actEndTime: string;
+  actBeginTime: string | number;
+  actEndTime: string | number;
 }
 // 侧边栏配置
 export interface AsideState {

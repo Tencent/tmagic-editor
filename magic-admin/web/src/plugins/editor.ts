@@ -19,9 +19,9 @@
 import { ElMessage, ElMessageBox } from 'element-plus';
 
 import type { MNode } from '@tmagic/schema';
+import { isPage } from '@tmagic/utils';
 
 import actApi from '@src/api/act';
-import { isPage } from '@tmagic/utils';
 
 export default {
   /**
