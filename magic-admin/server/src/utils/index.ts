@@ -19,13 +19,18 @@
 import path from 'path';
 
 import axios from 'axios';
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
 import { createWriteStream, emptyDir } from 'fs-extra';
-import momentTimezone from 'moment-timezone';
 import serialize from 'serialize-javascript';
 import uglifyJS from 'uglify-js';
 
 import type { UiConfig } from '@src/typings';
 import { babelTransform } from '@src/utils/transform';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 /**
  * 格式化配置内容
@@ -91,6 +96,6 @@ const getFileFromUrl = async ({ url, filePath, fileName }) => {
  * @returns {string} 格式化之后的时间
  */
 const getFormatTime = (time: string | number = Date.now(), formatTmp = 'YYYY-MM-DD HH:mm:ss') =>
-  momentTimezone.tz(time, 'Asia/Shanghai').format(formatTmp);
+  dayjs.tz(time, 'Asia/Shanghai').format(formatTmp);
 
 export { serializeConfig, configTransformDist, processTransConfig, getFileFromUrl, getFormatTime };
