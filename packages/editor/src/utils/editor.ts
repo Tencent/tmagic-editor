@@ -110,10 +110,16 @@ const getMiddleTop = (node: MNode, parentNode: MNode, stage: StageCore | null) =
 
 export const getInitPositionStyle = (style: Record<string, any> = {}, layout: Layout) => {
   if (layout === Layout.ABSOLUTE) {
-    return {
+    const newStyle: Record<string, any> = {
       ...style,
       position: 'absolute',
     };
+
+    if (typeof newStyle.left === 'undefined' && typeof newStyle.right === 'undefined') {
+      newStyle.left = 0;
+    }
+
+    return newStyle;
   }
 
   if (layout === Layout.RELATIVE) {
