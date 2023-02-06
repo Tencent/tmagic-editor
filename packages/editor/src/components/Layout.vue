@@ -41,7 +41,7 @@ const props = withDefaults(
   {
     minLeft: 46,
     minRight: 1,
-    minCenter: 1,
+    minCenter: 5,
   },
 );
 

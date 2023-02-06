@@ -122,8 +122,11 @@ watch(
   },
 );
 
-const columnWidthChange = (columnWidth: GetColumnWidth) => {
-  uiService?.set('columnWidth', columnWidth);
+const columnWidthChange = (columnW: GetColumnWidth) => {
+  columnWidth.value.left = columnW.left;
+  columnWidth.value.center = columnW.center;
+  columnWidth.value.right = columnW.right;
+  uiService?.set('columnWidth', columnW);
 };
 
 const saveCode = (value: string) => {
