@@ -19,7 +19,7 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
-import type { MNode } from '@tmagic/schema';
+import type { MComponent, MNode } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 
 export * from './dom';
@@ -126,9 +126,9 @@ export const getUrlParam = (param: string, url?: string) => {
   return '';
 };
 
-export const isPop = (node: MNode): boolean => Boolean(node.type?.toLowerCase().endsWith('pop'));
+export const isPop = (node: MComponent | null): boolean => Boolean(node?.type?.toLowerCase().endsWith('pop'));
 
-export const isPage = (node: MNode | undefined): boolean => {
+export const isPage = (node?: MComponent | null): boolean => {
   if (!node) return false;
   return Boolean(node.type?.toLowerCase() === NodeType.PAGE);
 };
