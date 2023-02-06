@@ -44,7 +44,6 @@ import { Grid, Search } from '@element-plus/icons-vue';
 import serialize from 'serialize-javascript';
 
 import { TMagicCollapse, TMagicCollapseItem, TMagicInput, TMagicScrollbar, TMagicTooltip } from '@tmagic/design';
-import type StageCore from '@tmagic/stage';
 import { removeClassNameByClassName } from '@tmagic/utils';
 
 import MIcon from '../../components/Icon.vue';
@@ -54,7 +53,7 @@ const searchText = ref('');
 const services = inject<Services>('services');
 const stageOptions = inject<StageOptions>('stageOptions');
 
-const stage = computed(() => services?.editorService.get<StageCore>('stage'));
+const stage = computed(() => services?.editorService.get('stage'));
 const list = computed(() =>
   services?.componentListService.getList().map((group: ComponentGroup) => ({
     ...group,

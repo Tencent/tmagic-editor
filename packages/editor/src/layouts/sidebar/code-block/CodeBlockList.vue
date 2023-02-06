@@ -93,7 +93,6 @@ import { cloneDeep, forIn, isEmpty } from 'lodash-es';
 
 import { TMagicButton, TMagicInput, tMagicMessage, TMagicScrollbar, TMagicTooltip, TMagicTree } from '@tmagic/design';
 import { CodeBlockContent, Id } from '@tmagic/schema';
-import StageCore from '@tmagic/stage';
 
 import Icon from '../../../components/Icon.vue';
 import type { CodeRelation, Services } from '../../../type';
@@ -228,7 +227,7 @@ const getCompName = (compId: Id): string => {
 
 // 选中组件
 const selectComp = (compId: Id) => {
-  const stage = services?.editorService.get<StageCore | null>('stage');
+  const stage = services?.editorService.get('stage');
   services?.editorService.select(compId);
   stage?.select(compId);
 };

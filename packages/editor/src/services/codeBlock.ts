@@ -19,7 +19,7 @@
 import { reactive } from 'vue';
 import { cloneDeep, forIn, isEmpty, keys, omit, pick } from 'lodash-es';
 
-import { CodeBlockContent, CodeBlockDSL, HookType, Id, MApp, MNode } from '@tmagic/schema';
+import { CodeBlockContent, CodeBlockDSL, HookType, Id, MNode } from '@tmagic/schema';
 
 import editorService from '../services/editor';
 import type { CodeRelation, CodeState, HookData } from '../type';
@@ -253,7 +253,7 @@ class CodeBlock extends BaseService {
    * @returns {CodeRelation | null}
    */
   public refreshCombineInfo(): CodeRelation | null {
-    const root = editorService.get<MApp | null>('root');
+    const root = editorService.get('root');
     if (!root) return null;
     const relations = {};
     this.recurseMNode(root, relations);

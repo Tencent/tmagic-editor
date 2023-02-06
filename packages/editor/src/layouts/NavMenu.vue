@@ -13,7 +13,7 @@ import { Back, Delete, FullScreen, Grid, Memo, Right, ScaleToOriginal, ZoomIn, Z
 import { NodeType } from '@tmagic/schema';
 
 import ToolButton from '../components/ToolButton.vue';
-import { ColumnLayout, GetColumnWidth, MenuBarData, MenuButton, MenuComponent, MenuItem, Services } from '../type';
+import { ColumnLayout, MenuBarData, MenuButton, MenuComponent, MenuItem, Services } from '../type';
 
 const props = withDefaults(
   defineProps<{
@@ -29,12 +29,12 @@ const props = withDefaults(
 const services = inject<Services>('services');
 const uiService = services?.uiService;
 
-const columnWidth = computed(() => services?.uiService.get<GetColumnWidth>('columnWidth'));
+const columnWidth = computed(() => services?.uiService.get('columnWidth'));
 const keys = Object.values(ColumnLayout);
 
-const showGuides = computed((): boolean => uiService?.get<boolean>('showGuides') ?? true);
-const showRule = computed((): boolean => uiService?.get<boolean>('showRule') ?? true);
-const zoom = computed((): number => uiService?.get<number>('zoom') ?? 1);
+const showGuides = computed((): boolean => uiService?.get('showGuides') ?? true);
+const showRule = computed((): boolean => uiService?.get('showRule') ?? true);
+const zoom = computed((): number => uiService?.get('zoom') ?? 1);
 
 const isMac = /mac os x/.test(navigator.userAgent.toLowerCase());
 const ctrl = isMac ? 'Command' : 'Ctrl';
@@ -67,7 +67,10 @@ const getConfig = (item: MenuItem): (MenuButton | MenuComponent)[] => {
         icon: markRaw(Delete),
         tooltip: `刪除(Delete)`,
         disabled: () => services?.editorService.get('node')?.type === NodeType.PAGE,
-        handler: () => services?.editorService.remove(services?.editorService.get('node')),
+        handler: () => {
+          const node = services?.editorService.get('node');
+          node && services?.editorService.remove(node);
+        },
       });
       break;
     case 'undo':

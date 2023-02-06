@@ -65,7 +65,6 @@ import { difference, throttle, union } from 'lodash-es';
 import { TMagicInput, TMagicScrollbar, TMagicTree } from '@tmagic/design';
 import type { Id, MNode, MPage } from '@tmagic/schema';
 import { MContainer, NodeType } from '@tmagic/schema';
-import StageCore from '@tmagic/stage';
 import { getNodePath, isPage } from '@tmagic/utils';
 
 import type { MenuButton, MenuComponent, Services } from '../../type';
@@ -108,8 +107,8 @@ const treeProps = {
 
 const isMultiSelect = computed(() => isCtrlKeyDown.value || checkedKeys.value.length > 1);
 
-const nodes = computed(() => editorService?.get<MNode[]>('nodes') || []);
-const page = computed(() => editorService?.get<MPage>('page'));
+const nodes = computed(() => editorService?.get('nodes') || []);
+const page = computed(() => editorService?.get('page'));
 const values = computed(() => (page.value ? [page.value] : []));
 // 高亮的节点
 const highlightNode = computed(() => editorService?.get('highlightNode'));
@@ -121,13 +120,13 @@ const select = async (data: MNode) => {
   }
 
   await editorService?.select(data);
-  editorService?.get<StageCore>('stage')?.select(data.id);
+  editorService?.get('stage')?.select(data.id);
 };
 
 // 触发画布多选
 const multiSelect = async (data: Id[]) => {
   await editorService?.multiSelect(data);
-  editorService?.get<StageCore>('stage')?.multiSelect(data);
+  editorService?.get('stage')?.multiSelect(data);
 };
 
 // 触发画布高亮
@@ -136,7 +135,7 @@ const highlight = (data: MNode) => {
     throw new Error('没有id');
   }
   editorService?.highlight(data);
-  editorService?.get<StageCore>('stage')?.highlight(data.id);
+  editorService?.get('stage')?.highlight(data.id);
 };
 
 // tree方法：拖拽时判定目标节点能否成为拖动目标位置
@@ -230,14 +229,14 @@ watch(nodes, (nodes) => {
 
 watch(isMultiSelect, (isMultiSelect) => {
   if (!isMultiSelect) {
-    currentNodeKey.value = editorService?.get<MNode>('node').id;
+    currentNodeKey.value = editorService?.get('node')?.id;
     tree.value?.setCurrentKey(currentNodeKey.value);
   }
 });
 
 const editorServiceRemoveHandler = () => {
   setTimeout(() => {
-    tree.value?.getNode(editorService?.get('node').id)?.updateChildren();
+    tree.value?.getNode(editorService?.get('node')?.id)?.updateChildren();
   }, 0);
 };
 
@@ -300,7 +299,7 @@ const clickHandler = (data: MNode): void => {
   if (isCtrlKeyDown.value) {
     return;
   }
-  if (services?.uiService.get<boolean>('uiSelectMode')) {
+  if (services?.uiService.get('uiSelectMode')) {
     document.dispatchEvent(new CustomEvent('ui-select', { detail: data }));
     return;
   }

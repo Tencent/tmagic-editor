@@ -82,6 +82,8 @@ export interface StoreState {
   pageLength: number;
 }
 
+export type StoreStateKey = keyof StoreState;
+
 export interface PropsState {
   propsConfigMap: Record<string, FormConfig>;
   propsValueMap: Record<string, MNode>;
@@ -138,9 +140,9 @@ export interface UiState {
 }
 
 export interface EditorNodeInfo {
-  node?: MNode;
-  parent?: MContainer;
-  page?: MPage;
+  node: MNode | null;
+  parent: MContainer | null;
+  page: MPage | null;
 }
 
 export interface AddMNode {

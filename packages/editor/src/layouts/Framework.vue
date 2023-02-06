@@ -46,7 +46,6 @@
 import { computed, inject, ref, watch } from 'vue';
 
 import { TMagicScrollbar } from '@tmagic/design';
-import type { MApp } from '@tmagic/schema';
 
 import Layout from '../components/Layout.vue';
 import { GetColumnWidth, Services } from '../type';
@@ -67,11 +66,11 @@ withDefaults(
 
 const { editorService, uiService } = inject<Services>('services') || {};
 
-const root = computed(() => editorService?.get<MApp>('root'));
-const nodes = computed(() => editorService?.get<Node[]>('nodes') || []);
+const root = computed(() => editorService?.get('root'));
+const nodes = computed(() => editorService?.get('nodes') || []);
 
-const pageLength = computed(() => editorService?.get<number>('pageLength') || 0);
-const showSrc = computed(() => uiService?.get<boolean>('showSrc'));
+const pageLength = computed(() => editorService?.get('pageLength') || 0);
+const showSrc = computed(() => uiService?.get('showSrc'));
 
 const LEFT_COLUMN_WIDTH_STORAGE_KEY = '$MagicEditorLeftColumnWidthData';
 const RIGHT_COLUMN_WIDTH_STORAGE_KEY = '$MagicEditorRightColumnWidthData';
@@ -101,7 +100,7 @@ watch(
       columnWidth.value.center = globalThis.document.body.clientWidth - left - right;
     }
 
-    uiService?.set('columnWidth', columnWidth);
+    uiService?.set('columnWidth', columnWidth.value as GetColumnWidth);
   },
   {
     immediate: true,

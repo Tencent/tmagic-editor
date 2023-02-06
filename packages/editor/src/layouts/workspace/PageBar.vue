@@ -51,7 +51,7 @@ import { computed, inject } from 'vue';
 import { CaretBottom, Delete, DocumentCopy } from '@element-plus/icons-vue';
 
 import { TMagicIcon, TMagicPopover, TMagicTooltip } from '@tmagic/design';
-import type { MApp, MPage } from '@tmagic/schema';
+import type { MPage } from '@tmagic/schema';
 
 import ToolButton from '../../components/ToolButton.vue';
 import type { Services } from '../../type';
@@ -61,7 +61,7 @@ import PageBarScrollContainer from './PageBarScrollContainer.vue';
 const services = inject<Services>('services');
 const editorService = services?.editorService;
 
-const root = computed(() => editorService?.get<MApp>('root'));
+const root = computed(() => editorService?.get('root'));
 
 const page = computed(() => editorService?.get('page'));
 

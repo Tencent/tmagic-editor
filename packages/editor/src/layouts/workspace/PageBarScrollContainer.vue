@@ -100,7 +100,7 @@ const scroll = (type: 'left' | 'right' | 'start' | 'end') => {
   itemsContainer.value.style.transform = `translate(${translateLeft}px, 0px)`;
 };
 
-const pageLength = computed(() => editorService?.get<number>('pageLength'));
+const pageLength = computed(() => editorService?.get('pageLength'));
 
 watch(pageLength, (length = 0, preLength = 0) => {
   setTimeout(() => {
@@ -115,9 +115,11 @@ watch(pageLength, (length = 0, preLength = 0) => {
 
 const addPage = () => {
   if (!editorService) return;
+  const root = toRaw(editorService.get('root'));
+  if (!root) throw new Error('root 不能为空');
   const pageConfig = {
     type: NodeType.PAGE,
-    name: generatePageNameByApp(toRaw(editorService.get('root'))),
+    name: generatePageNameByApp(root),
   };
   editorService.add(pageConfig);
 };

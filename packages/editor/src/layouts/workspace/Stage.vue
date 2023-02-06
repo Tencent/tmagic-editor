@@ -30,11 +30,11 @@
 import { computed, inject, markRaw, nextTick, onMounted, onUnmounted, ref, toRaw, watch, watchEffect } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
-import type { MApp, MContainer, MNode, MPage } from '@tmagic/schema';
+import type { MContainer } from '@tmagic/schema';
 import StageCore, { calcValueByFontsize, getOffset, Runtime } from '@tmagic/stage';
 
 import ScrollViewer from '../../components/ScrollViewer.vue';
-import { Layout, MenuButton, MenuComponent, Services, StageOptions, StageRect } from '../../type';
+import { Layout, MenuButton, MenuComponent, Services, StageOptions } from '../../type';
 import { useStage } from '../../utils/stage';
 
 import ViewerMenu from './ViewerMenu.vue';
@@ -53,13 +53,14 @@ const stageWrap = ref<InstanceType<typeof ScrollViewer>>();
 const stageContainer = ref<HTMLDivElement>();
 const menu = ref<InstanceType<typeof ViewerMenu>>();
 
-const isMultiSelect = computed(() => services?.editorService.get('nodes')?.length > 1);
-const stageRect = computed(() => services?.uiService.get<StageRect>('stageRect'));
-const stageContainerRect = computed(() => services?.uiService.get<StageRect>('stageContainerRect'));
-const root = computed(() => services?.editorService.get<MApp>('root'));
-const page = computed(() => services?.editorService.get<MPage>('page'));
-const zoom = computed(() => services?.uiService.get<number>('zoom') || 1);
-const node = computed(() => services?.editorService.get<MNode>('node'));
+const nodes = computed(() => services?.editorService.get('nodes') || []);
+const isMultiSelect = computed(() => nodes.value.length > 1);
+const stageRect = computed(() => services?.uiService.get('stageRect'));
+const stageContainerRect = computed(() => services?.uiService.get('stageContainerRect'));
+const root = computed(() => services?.editorService.get('root'));
+const page = computed(() => services?.editorService.get('page'));
+const zoom = computed(() => services?.uiService.get('zoom') || 1);
+const node = computed(() => services?.editorService.get('node'));
 
 watchEffect(() => {
   if (stage || !page.value) return;
@@ -142,7 +143,7 @@ const dropHandler = async (e: DragEvent) => {
   const doc = stage?.renderer.contentWindow?.document;
   const parentEl: HTMLElement | null | undefined = doc?.querySelector(`.${stageOptions?.containerHighlightClassName}`);
 
-  let parent: MContainer | undefined = page.value;
+  let parent: MContainer | undefined | null = page.value;
   if (parentEl) {
     parent = services?.editorService.getNodeById(parentEl.id, false) as MContainer;
   }

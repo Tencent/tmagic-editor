@@ -10,7 +10,6 @@
 import { defineComponent, ref } from 'vue';
 
 import { editorService } from '@tmagic/editor';
-import type StageCore from '@tmagic/stage';
 
 enum DeviceType {
   Phone = 'phone',
@@ -49,7 +48,7 @@ export default defineComponent({
 
   setup(props, { emit }) {
     const calcFontsize = (width: number) => {
-      const { iframe } = editorService.get<StageCore>('stage').renderer;
+      const iframe = editorService.get('stage')?.renderer.iframe;
       if (!iframe?.contentWindow) return;
       iframe.contentWindow.appInstance.designWidth = width;
     };

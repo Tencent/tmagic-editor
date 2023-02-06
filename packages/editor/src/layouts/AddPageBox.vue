@@ -28,9 +28,12 @@ const clickHandler = () => {
 
   if (!editorService) return;
 
+  const root = toRaw(editorService.get('root'));
+  if (!root) throw new Error('root 不能为空');
+
   editorService.add({
     type: NodeType.PAGE,
-    name: generatePageNameByApp(toRaw(editorService.get('root'))),
+    name: generatePageNameByApp(root),
   });
 };
 </script>

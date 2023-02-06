@@ -1,6 +1,5 @@
 import { computed } from 'vue';
 
-import { MApp, MPage } from '@tmagic/schema';
 import StageCore, { GuidesType, SortEventData, UpdateEventData } from '@tmagic/stage';
 
 import editorService from '../services/editor';
@@ -9,10 +8,10 @@ import { H_GUIDE_LINE_STORAGE_KEY, StageOptions, V_GUIDE_LINE_STORAGE_KEY } from
 
 import { getGuideLineFromCache } from './editor';
 
-const root = computed(() => editorService.get<MApp>('root'));
-const page = computed(() => editorService.get<MPage>('page'));
-const zoom = computed(() => uiService.get<number>('zoom') || 1);
-const uiSelectMode = computed(() => uiService.get<boolean>('uiSelectMode'));
+const root = computed(() => editorService.get('root'));
+const page = computed(() => editorService.get('page'));
+const zoom = computed(() => uiService.get('zoom') || 1);
+const uiSelectMode = computed(() => uiService.get('uiSelectMode'));
 
 const getGuideLineKey = (key: string) => `${key}_${root.value?.id}_${page.value?.id}`;
 
@@ -76,8 +75,9 @@ export const useStage = (stageOptions: StageOptions) => {
 
   stage.on('select-parent', () => {
     const parent = editorService.get('parent');
+    if (!parent) throw new Error('父节点为空');
     editorService.select(parent);
-    editorService.get<StageCore>('stage').select(parent.id);
+    editorService.get('stage')?.select(parent.id);
   });
 
   stage.on('change-guides', (e) => {

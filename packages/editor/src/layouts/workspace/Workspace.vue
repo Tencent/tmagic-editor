@@ -19,7 +19,6 @@
 import { computed, inject, onMounted, onUnmounted, ref } from 'vue';
 import KeyController from 'keycon';
 
-import type { MNode, MPage } from '@tmagic/schema';
 import { isPage } from '@tmagic/utils';
 
 import type { MenuButton, MenuComponent, Services } from '../../type';
@@ -34,8 +33,8 @@ defineProps<{
 
 const services = inject<Services>('services');
 const workspace = ref<HTMLDivElement>();
-const nodes = computed(() => services?.editorService.get<MNode[]>('nodes'));
-const page = computed(() => services?.editorService.get<MPage>('page'));
+const nodes = computed(() => services?.editorService.get('nodes'));
+const page = computed(() => services?.editorService.get('page'));
 
 const mouseenterHandler = () => {
   workspace.value?.focus();

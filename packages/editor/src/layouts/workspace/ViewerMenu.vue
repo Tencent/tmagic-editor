@@ -6,8 +6,7 @@
 import { computed, inject, markRaw, ref, watch } from 'vue';
 import { Bottom, CopyDocument, Delete, DocumentCopy, Top } from '@element-plus/icons-vue';
 
-import { MNode, NodeType } from '@tmagic/schema';
-import StageCore from '@tmagic/stage';
+import { NodeType } from '@tmagic/schema';
 import { isPage } from '@tmagic/utils';
 
 import ContentMenu from '../../components/ContentMenu.vue';
@@ -26,10 +25,10 @@ const menu = ref<InstanceType<typeof ContentMenu>>();
 const canPaste = ref(false);
 const canCenter = ref(false);
 
-const node = computed(() => editorService?.get<MNode>('node'));
-const nodes = computed(() => editorService?.get<MNode[]>('nodes'));
+const node = computed(() => editorService?.get('node'));
+const nodes = computed(() => editorService?.get('nodes'));
 const parent = computed(() => editorService?.get('parent'));
-const stage = computed(() => editorService?.get<StageCore>('stage'));
+const stage = computed(() => editorService?.get('stage'));
 
 const menuData = computed<(MenuButton | MenuComponent)[]>(() => [
   {
@@ -129,7 +128,7 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() => [
     type: 'button',
     text: '清空参考线',
     handler: () => {
-      editorService?.get<StageCore>('stage').clearGuides();
+      editorService?.get('stage')?.clearGuides();
     },
   },
   ...props.stageContentMenu,

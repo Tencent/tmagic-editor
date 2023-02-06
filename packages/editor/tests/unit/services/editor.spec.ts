@@ -19,7 +19,7 @@
 import { beforeAll, describe, expect, test } from 'vitest';
 import { cloneDeep } from 'lodash-es';
 
-import type { MApp, MContainer, MNode } from '@tmagic/schema';
+import type { MApp } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 
 import editorService from '@editor/services/editor';
@@ -74,7 +74,7 @@ enum NodeId {
 }
 
 // mock 页面数据，包含一个页面，两个组件
-const root: MNode = {
+const root: MApp = {
   id: NodeId.ROOT_ID,
   type: NodeType.ROOT,
   items: [
@@ -109,7 +109,7 @@ describe('get', () => {
 
   test('get', () => {
     const root = editorService.get('root');
-    expect(root.id).toBe(NodeId.ROOT_ID);
+    expect(root?.id).toBe(NodeId.ROOT_ID);
   });
 
   test('get undefined', () => {
@@ -131,9 +131,9 @@ describe('getNodeInfo', () => {
 
   test('异常', () => {
     const info = editorService.getNodeInfo(NodeId.ERROR_NODE_ID);
-    expect(info?.node).toBeUndefined();
+    expect(info?.node).toBeNull();
     expect(info?.parent?.id).toBeUndefined();
-    expect(info?.page).toBeUndefined();
+    expect(info?.page).toBeNull();
   });
 });
 
@@ -147,7 +147,7 @@ describe('getNodeById', () => {
 
   test('异常', () => {
     const node = editorService.getNodeById(NodeId.ERROR_NODE_ID);
-    expect(node).toBeUndefined();
+    expect(node).toBeNull();
   });
 });
 
@@ -210,9 +210,9 @@ describe('add', () => {
     const node = editorService.get('node');
     const parent = editorService.get('parent');
     if (!Array.isArray(newNode)) {
-      expect(node.id).toBe(newNode.id);
+      expect(node?.id).toBe(newNode.id);
     }
-    expect(parent.items).toHaveLength(3);
+    expect(parent?.items).toHaveLength(3);
   });
 
   test('正常， 当前不是容器', async () => {
@@ -226,15 +226,15 @@ describe('add', () => {
     const node = editorService.get('node');
     const parent = editorService.get('parent');
     if (!Array.isArray(newNode)) {
-      expect(node.id).toBe(newNode.id);
+      expect(node?.id).toBe(newNode.id);
     }
-    expect(parent.items).toHaveLength(3);
+    expect(parent?.items).toHaveLength(3);
   });
 
   test('往root下添加page', async () => {
     editorService.set('root', cloneDeep(root));
     await editorService.select(NodeId.PAGE_ID);
-    const rootNode = editorService.get<MApp>('root');
+    const rootNode = editorService.get('root');
     const newNode = await editorService.add(
       {
         type: NodeType.PAGE,
@@ -243,15 +243,15 @@ describe('add', () => {
     );
     const node = editorService.get('node');
     if (!Array.isArray(newNode)) {
-      expect(node.id).toBe(newNode.id);
+      expect(node?.id).toBe(newNode.id);
     }
-    expect(rootNode.items.length).toBe(2);
+    expect(rootNode?.items.length).toBe(2);
   });
 
   test.skip('往root下添加普通节点', () => {
     editorService.set('root', cloneDeep(root));
     // 根节点下只能加页面
-    const rootNode = editorService.get<MApp>('root');
+    const rootNode = editorService.get('root');
     expect(() =>
       editorService.add(
         {
@@ -269,13 +269,13 @@ describe('remove', () => {
   test('正常', async () => {
     editorService.remove({ id: NodeId.NODE_ID, type: 'text' });
     const node = editorService.getNodeById(NodeId.NODE_ID);
-    expect(node).toBeUndefined();
+    expect(node).toBeNull();
   });
 
   test('remove page', async () => {
     editorService.set('root', cloneDeep(root));
     editorService.select(NodeId.PAGE_ID);
-    const rootNode = editorService.get<MApp>('root');
+    const rootNode = editorService.get('root');
     // 先加一个页面
     const newPage = await editorService.add(
       {
@@ -283,9 +283,9 @@ describe('remove', () => {
       },
       rootNode,
     );
-    expect(rootNode.items.length).toBe(2);
+    expect(rootNode?.items.length).toBe(2);
     await editorService.remove(newPage);
-    expect(rootNode.items.length).toBe(1);
+    expect(rootNode?.items.length).toBe(1);
   });
 
   test.skip('undefine', async () => {
@@ -347,11 +347,11 @@ describe('sort', () => {
 
   test('正常', async () => {
     await editorService.select(NodeId.NODE_ID2);
-    let parent = editorService.get<MContainer>('parent');
-    expect(parent.items[0].id).toBe(NodeId.NODE_ID);
+    let parent = editorService.get('parent');
+    expect(parent?.items[0].id).toBe(NodeId.NODE_ID);
     await editorService.sort(NodeId.NODE_ID2, NodeId.NODE_ID);
-    parent = editorService.get<MContainer>('parent');
-    expect(parent.items[0].id).toBe(NodeId.NODE_ID2);
+    parent = editorService.get('parent');
+    expect(parent?.items[0].id).toBe(NodeId.NODE_ID2);
   });
 });
 
@@ -371,9 +371,9 @@ describe('moveLayer', () => {
   test('正常', async () => {
     // 设置当前编辑的组件
     await editorService.select(NodeId.NODE_ID);
-    const parent = editorService.get<MContainer>('parent');
+    const parent = editorService.get('parent');
     await editorService.moveLayer(1);
-    expect(parent.items[0].id).toBe(NodeId.NODE_ID2);
+    expect(parent?.items[0].id).toBe(NodeId.NODE_ID2);
   });
 });
 
@@ -385,9 +385,10 @@ describe('undo redo', () => {
     // 设置当前编辑的组件
     await editorService.select(NodeId.NODE_ID);
     const node = editorService.get('node');
+    if (!node) throw new Error('未选中节点');
     await editorService.remove(node);
     const removedNode = editorService.getNodeById(NodeId.NODE_ID);
-    expect(removedNode).toBeUndefined();
+    expect(removedNode).toBeNull();
     await editorService.undo();
     const undoNode = editorService.getNodeById(NodeId.NODE_ID);
     expect(undoNode?.id).toBe(NodeId.NODE_ID);

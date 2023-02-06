@@ -1,8 +1,7 @@
 import { toRaw } from 'vue';
 import { isEmpty } from 'lodash-es';
 
-import { Id, MApp, MContainer, MNode } from '@tmagic/schema';
-import StageCore from '@tmagic/stage';
+import { Id, MContainer, MNode } from '@tmagic/schema';
 import { isPage } from '@tmagic/utils';
 
 import editorService from '../services/editor';
@@ -18,7 +17,7 @@ import { generatePageNameByApp, getInitPositionStyle } from '../utils/editor';
  */
 export const beforePaste = async (position: PastePosition, config: MNode[]): Promise<MNode[]> => {
   if (!config[0]?.style) return config;
-  const curNode = editorService.get<MContainer>('node');
+  const curNode = editorService.get('node');
   // 将数组中第一个元素的坐标作为参照点
   const { left: referenceLeft, top: referenceTop } = config[0].style;
   // 坐标校准后的粘贴数据
@@ -28,7 +27,7 @@ export const beforePaste = async (position: PastePosition, config: MNode[]): Pro
       const { offsetX = 0, offsetY = 0, ...positionClone } = position;
       let pastePosition = positionClone;
 
-      if (!isEmpty(pastePosition) && curNode.items) {
+      if (!isEmpty(pastePosition) && curNode?.items) {
         // 如果没有传入粘贴坐标则可能为键盘操作，不再转换
         // 如果粘贴时选中了容器，则将元素粘贴到容器内，坐标需要转换为相对于容器的坐标
         pastePosition = getPositionInContainer(pastePosition, curNode.id);
@@ -59,8 +58,9 @@ export const beforePaste = async (position: PastePosition, config: MNode[]): Pro
           ...pastePosition,
         };
       }
-      if (isPage(pasteConfig)) {
-        pasteConfig.name = generatePageNameByApp(editorService.get('root'));
+      const root = editorService.get('root');
+      if (isPage(pasteConfig) && root) {
+        pasteConfig.name = generatePageNameByApp(root);
       }
       return pasteConfig as MNode;
     }),
@@ -76,7 +76,7 @@ export const beforePaste = async (position: PastePosition, config: MNode[]): Pro
  */
 export const getPositionInContainer = (position: PastePosition = {}, id: Id) => {
   let { left = 0, top = 0 } = position;
-  const parentEl = editorService.get<StageCore>('stage')?.renderer?.contentWindow?.document.getElementById(`${id}`);
+  const parentEl = editorService.get('stage')?.renderer?.contentWindow?.document.getElementById(`${id}`);
   const parentElRect = parentEl?.getBoundingClientRect();
   left = left - (parentElRect?.left || 0);
   top = top - (parentElRect?.top || 0);
@@ -87,14 +87,14 @@ export const getPositionInContainer = (position: PastePosition = {}, id: Id) => 
 };
 
 export const getAddParent = (node: MNode) => {
-  const curNode = editorService.get<MContainer>('node');
+  const curNode = editorService.get('node');
 
   let parentNode;
   if (isPage(node)) {
-    parentNode = editorService.get<MApp>('root');
-  } else if (curNode.items) {
-    parentNode = curNode;
-  } else {
+    parentNode = editorService.get('root');
+  } else if (curNode?.items) {
+    parentNode = curNode as MContainer;
+  } else if (curNode?.id) {
     parentNode = editorService.getParentById(curNode.id, false);
   }
   return parentNode;

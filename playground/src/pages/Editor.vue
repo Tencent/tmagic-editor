@@ -39,7 +39,7 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import serialize from 'serialize-javascript';
 
 import { editorService, MenuBarData, MoveableOptions, TMagicEditor } from '@tmagic/editor';
-import type { Id, MContainer, MNode } from '@tmagic/schema';
+import type { MContainer, MNode } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 import { CustomizeMoveableOptionsCallbackConfig } from '@tmagic/stage';
 import { asyncLoadJs } from '@tmagic/utils';
@@ -65,7 +65,7 @@ const stageRect = ref({
 });
 
 const previewUrl = computed(
-  () => `${VITE_RUNTIME_PATH}/page/index.html?localPreview=1&page=${editor.value?.editorService.get('page').id}`,
+  () => `${VITE_RUNTIME_PATH}/page/index.html?localPreview=1&page=${editor.value?.editorService.get('page')?.id}`,
 );
 
 const menu: MenuBarData = {
@@ -93,7 +93,7 @@ const menu: MenuBarData = {
       text: '预览',
       icon: Connection,
       handler: async (services) => {
-        if (services?.editorService.get<Map<Id, Id>>('modifiedNodeIds').size > 0) {
+        if (services?.editorService.get('modifiedNodeIds').size > 0) {
           try {
             await ElMessageBox.confirm('有修改未保存，是否先保存再预览', '提示', {
               confirmButtonText: '保存并预览',

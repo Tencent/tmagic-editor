@@ -37,7 +37,7 @@ const uiSelectMode = ref(false);
 
 const cancelHandler = () => {
   if (!services?.uiService) return;
-  services.uiService.set<boolean>('uiSelectMode', false);
+  services.uiService.set('uiSelectMode', false);
   uiSelectMode.value = false;
   globalThis.document.removeEventListener('ui-select', clickHandler as EventListener);
 };
@@ -61,7 +61,7 @@ const toName = computed(() => {
 
 const startSelect = () => {
   if (!services?.uiService) return;
-  services.uiService.set<boolean>('uiSelectMode', true);
+  services.uiService.set('uiSelectMode', true);
   uiSelectMode.value = true;
   globalThis.document.addEventListener('ui-select', clickHandler as EventListener);
 };

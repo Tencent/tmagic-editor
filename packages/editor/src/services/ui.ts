@@ -18,8 +18,6 @@
 
 import { reactive } from 'vue';
 
-import type StageCore from '@tmagic/stage';
-
 import editorService from '../services/editor';
 import type { StageRect, UiState } from '../type';
 
@@ -53,8 +51,8 @@ class Ui extends BaseService {
     super(['zoom', 'calcZoom']);
   }
 
-  public set<T = any>(name: keyof UiState, value: T) {
-    const mask = editorService.get<StageCore>('stage')?.mask;
+  public set<K extends keyof UiState, T extends UiState[K]>(name: K, value: T) {
+    const mask = editorService.get('stage')?.mask;
 
     if (name === 'stageRect') {
       this.setStageRect(value as unknown as StageRect);
@@ -69,16 +67,16 @@ class Ui extends BaseService {
       mask?.showRule(value as unknown as boolean);
     }
 
-    (state as any)[name] = value;
+    state[name] = value;
   }
 
-  public get<T>(name: keyof typeof state): T {
-    return (state as any)[name];
+  public get<K extends keyof UiState>(name: K) {
+    return state[name];
   }
 
   public async zoom(zoom: number) {
-    this.set('zoom', (this.get<number>('zoom') * 100 + zoom * 100) / 100);
-    if (this.get<number>('zoom') < 0.1) this.set('zoom', 0.1);
+    this.set('zoom', (this.get('zoom') * 100 + zoom * 100) / 100);
+    if (this.get('zoom') < 0.1) this.set('zoom', 0.1);
   }
 
   public async calcZoom() {

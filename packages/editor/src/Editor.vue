@@ -228,7 +228,7 @@ export default defineComponent({
 
   setup(props, { emit }) {
     const rootChangeHandler = (value: MApp, preValue?: MApp | null) => {
-      const nodeId = editorService.get<MNode | null>('node')?.id || props.defaultSelected;
+      const nodeId = editorService.get('node')?.id || props.defaultSelected;
       let node;
       if (nodeId) {
         node = editorService.getNodeById(nodeId);
