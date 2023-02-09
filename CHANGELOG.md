@@ -1,3 +1,12 @@
+## [1.2.2](https://github.com/Tencent/tmagic-editor/compare/v1.2.1...v1.2.2) (2023-02-09)
+
+
+### Bug Fixes
+
+* **editor:** set root 可能没有items ([aa566e9](https://github.com/Tencent/tmagic-editor/commit/aa566e9535c5afd76fa15b39f42de395758189eb))
+
+
+
 ## [1.2.1](https://github.com/Tencent/tmagic-editor/compare/v1.2.0...v1.2.1) (2023-02-09)
 
 
