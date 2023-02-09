@@ -1,3 +1,22 @@
+## [1.2.1](https://github.com/Tencent/tmagic-editor/compare/v1.2.0...v1.2.1) (2023-02-09)
+
+
+### Bug Fixes
+
+* **editor:** 新增的组件如果没有初始化left值,会导致无法通过键盘方向键左右移动 ([3b30d89](https://github.com/Tencent/tmagic-editor/commit/3b30d89956717d686046876156c3571f35c0036f)), closes [#468](https://github.com/Tencent/tmagic-editor/issues/468)
+* **editor:** 编辑器中间列宽度出现负值 ([a6226cb](https://github.com/Tencent/tmagic-editor/commit/a6226cba188ca107919237c4d92c0f19c33e77fe))
+
+
+### Features
+
+* **admin:** 使用@tmagic/table重构活动列表 ([8fa1d4a](https://github.com/Tencent/tmagic-editor/commit/8fa1d4a5c3294df6449eb15ef9181717416e3dc4))
+* **cli:** export allowTs函数 ([bf547fe](https://github.com/Tencent/tmagic-editor/commit/bf547fe1a06239d6703d1887f86fa47f0ee66232))
+* **editor,form,schema:** 优化代码 ([0b537f5](https://github.com/Tencent/tmagic-editor/commit/0b537f5bff3466fff2a6cfb5ed37811b28968066))
+* **editor:** 修改service get set 方法的ts定义，不再需要传入泛型参数 ([0491487](https://github.com/Tencent/tmagic-editor/commit/0491487385257642e0c5e246831f2158175ca532))
+* **util:** 修改isPage函数定义 ([b9d4e8c](https://github.com/Tencent/tmagic-editor/commit/b9d4e8c66c2b0c3fc8085d1ee23ed4f0739ed3cb))
+
+
+
 # [1.2.0](https://github.com/Tencent/tmagic-editor/compare/v1.2.0-beta.27...v1.2.0) (2022-12-22)
 
 
