@@ -108,8 +108,8 @@ class Editor extends BaseService {
         throw new Error('root 不能为数组');
       }
 
-      if (isObject(value) && !(value instanceof StageCore) && !(value instanceof Map)) {
-        this.state.pageLength = value.items.length;
+      if (value && isObject(value) && !(value instanceof StageCore) && !(value instanceof Map)) {
+        this.state.pageLength = value.items?.length || 0;
       } else {
         this.state.pageLength = 0;
       }
