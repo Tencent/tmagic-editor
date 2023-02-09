@@ -9,17 +9,27 @@
       :size="size"
       @change="changeHandler"
     >
+      <template #operateCol="{ scope }">
+        <Icon
+          v-if="scope.row.codeId"
+          :icon="editable ? Edit : View"
+          class="edit-icon"
+          @click="editCode(scope.row.codeId)"
+        ></Icon>
+      </template>
     </m-form-table>
   </div>
 </template>
 
 <script lang="ts" setup name="MEditorCodeSelect">
 import { computed, defineEmits, defineProps, inject, watch } from 'vue';
+import { Edit, View } from '@element-plus/icons-vue';
 import { isEmpty, map } from 'lodash-es';
 
 import { createValues, FormItem, FormState, TableConfig } from '@tmagic/form';
 import { HookType, Id } from '@tmagic/schema';
 
+import Icon from '../components/Icon.vue';
 import { CodeParamStatement, HookData, Services } from '../type';
 const services = inject<Services>('services');
 const mForm = inject<FormState>('mForm');
@@ -38,9 +48,10 @@ const codeDsl = computed(() => services?.codeBlockService.getCodeDslSync());
 
 const tableConfig = computed<FormItem>(() => {
   const defaultConfig = {
-    dropSort: true,
+    dropSort: false,
     enableFullscreen: false,
     border: true,
+    operateColWidth: 60,
     items: [
       {
         type: 'select',
@@ -68,8 +79,8 @@ const tableConfig = computed<FormItem>(() => {
         defaultValue: {},
         itemsFunction: (row: HookData) => {
           const paramsConfig = getParamsConfig(row.codeId);
-          if (!row.params) row.params = {};
-          if (isEmpty(row.params)) {
+          // 如果参数没有填值，则使用createValues补全空值
+          if (isEmpty(row.params) || !row.params) {
             createValues(mForm, paramsConfig, {}, row.params);
           }
           return paramsConfig;
@@ -82,6 +93,8 @@ const tableConfig = computed<FormItem>(() => {
     ...props.config.tableConfig,
   };
 });
+
+const editable = computed(() => services?.codeBlockService.getEditStatus());
 
 watch(
   () => props.model[props.name],
@@ -104,15 +117,18 @@ const changeHandler = async () => {
   emit('change', props.model[props.name]);
 };
 
-const getParamsConfig = (codeId: Id) => {
+const getParamsConfig = (codeId: Id): CodeParamStatement[] => {
   if (!codeDsl.value) return [];
   const paramStatements = codeDsl.value[codeId]?.params;
   if (isEmpty(paramStatements)) return [];
   return paramStatements.map((paramState: CodeParamStatement) => ({
-    name: paramState.name,
-    text: paramState.name,
     labelWidth: '100px',
-    type: 'text',
+    text: paramState.name,
+    ...paramState,
   }));
+};
+
+const editCode = (codeId: Id) => {
+  services?.codeBlockService.setCodeEditorContent(true, codeId);
 };
 </script>

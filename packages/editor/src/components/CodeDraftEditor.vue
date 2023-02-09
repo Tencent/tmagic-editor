@@ -12,7 +12,7 @@
       <TMagicButton type="primary" class="button" @click="toggleFullScreen">
         {{ isFullScreen ? '退出全屏' : '全屏' }}</TMagicButton
       >
-      <TMagicButton type="primary" class="button" @click="saveCode">保存</TMagicButton>
+      <TMagicButton type="primary" class="button" @click="saveAndClose">确认</TMagicButton>
       <TMagicButton type="primary" class="button" @click="close">关闭</TMagicButton>
     </div>
     <div class="m-editor-content-bottom" v-else>
@@ -54,7 +54,7 @@ const props = withDefaults(
     autoSaveDraft: true,
   },
 );
-const emit = defineEmits(['save', 'close', 'saveAndClose']);
+const emit = defineEmits(['close', 'saveAndClose']);
 
 const services = inject<Services>('services');
 
@@ -93,14 +93,6 @@ const saveCodeDraft = async (codeValue: string) => {
   }
   services?.codeBlockService.setCodeDraft(props.id, codeValue);
   tMagicMessage.success(`代码草稿保存成功 ${datetimeFormatter(new Date())}`);
-};
-
-// 保存代码
-const saveCode = (): void => {
-  if (!codeEditor.value || !props.editable) return;
-  // 代码内容
-  editorContent.value = (codeEditor.value.getEditor() as monaco.editor.IStandaloneCodeEditor)?.getValue();
-  emit('save', editorContent.value);
 };
 
 // 保存并关闭

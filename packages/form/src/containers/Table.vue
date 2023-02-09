@@ -24,11 +24,12 @@
 
           <TMagicTableColumn
             label="操作"
-            width="55"
+            :width="config.operateColWidth || 55"
             align="center"
             :fixed="config.fixed === false ? undefined : 'left'"
           >
             <template v-slot="scope">
+              <slot name="operateCol" :scope="scope"></slot>
               <TMagicIcon
                 v-show="showDelete(scope.$index + 1 + pagecontext * pagesize - 1)"
                 class="m-table-delete-icon"

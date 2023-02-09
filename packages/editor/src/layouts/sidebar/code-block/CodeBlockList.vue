@@ -78,7 +78,7 @@
     </TMagicScrollbar>
 
     <!-- 代码块编辑区 -->
-    <code-block-editor v-if="isShowCodeBlockEditor">
+    <code-block-editor v-if="isShowCodeBlockEditor" :paramsColConfig="paramsColConfig">
       <template #code-block-edit-panel-header="{ id }">
         <slot name="code-block-edit-panel-header" :id="id"></slot>
       </template>
@@ -92,16 +92,18 @@ import { Close, Edit, Link, View } from '@element-plus/icons-vue';
 import { cloneDeep, forIn, isEmpty } from 'lodash-es';
 
 import { TMagicButton, TMagicInput, tMagicMessage, TMagicScrollbar, TMagicTooltip, TMagicTree } from '@tmagic/design';
+import { ColumnConfig } from '@tmagic/form';
 import { CodeBlockContent, Id } from '@tmagic/schema';
 
 import Icon from '../../../components/Icon.vue';
 import type { CodeRelation, Services } from '../../../type';
-import { CodeDeleteErrorType, CodeDslItem, CodeEditorMode, ListState } from '../../../type';
+import { CodeDeleteErrorType, CodeDslItem, ListState } from '../../../type';
 
 import codeBlockEditor from './CodeBlockEditor.vue';
 
 const props = defineProps<{
   customError?: (id: Id, errorType: CodeDeleteErrorType) => any;
+  paramsColConfig?: ColumnConfig;
 }>();
 
 const services = inject<Services>('services');
@@ -168,7 +170,6 @@ const createCodeBlock = async () => {
     content: `({app, params}) => {\n  // place your code here\n}`,
     params: [],
   };
-  await codeBlockService.setMode(CodeEditorMode.EDITOR);
   const id = await codeBlockService.getUniqueId();
   await codeBlockService.setCodeDslById(id, codeConfig);
   codeBlockService.setCodeEditorContent(true, id);
@@ -176,7 +177,6 @@ const createCodeBlock = async () => {
 
 // 编辑代码块
 const editCode = async (key: Id) => {
-  await services?.codeBlockService.setMode(CodeEditorMode.EDITOR);
   services?.codeBlockService.setCodeEditorContent(true, key);
 };
 

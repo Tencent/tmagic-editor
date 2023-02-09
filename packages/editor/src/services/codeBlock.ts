@@ -23,7 +23,7 @@ import { CodeBlockContent, CodeBlockDSL, HookType, Id, MNode } from '@tmagic/sch
 
 import editorService from '../services/editor';
 import type { CodeRelation, CodeState, HookData } from '../type';
-import { CODE_DRAFT_STORAGE_KEY, CodeEditorMode } from '../type';
+import { CODE_DRAFT_STORAGE_KEY } from '../type';
 import { info } from '../utils/logger';
 
 import BaseService from './BaseService';
@@ -34,7 +34,6 @@ class CodeBlock extends BaseService {
     codeDsl: null,
     id: '',
     editable: true,
-    mode: CodeEditorMode.EDITOR,
     combineIds: [],
     undeletableList: [],
     relations: {},
@@ -50,7 +49,6 @@ class CodeBlock extends BaseService {
       'setCodeDslById',
       'setCodeEditorShowStatus',
       'setEditStatus',
-      'setMode',
       'setCombineIds',
       'setUndeleteableList',
       'deleteCodeDslByIds',
@@ -215,23 +213,6 @@ class CodeBlock extends BaseService {
   }
 
   /**
-   * 获取当前模式
-   * @returns {CodeEditorMode}
-   */
-  public getMode(): CodeEditorMode {
-    return this.state.mode;
-  }
-
-  /**
-   * 设置当前模式
-   * @param {CodeEditorMode} mode 模式
-   * @returns {void}
-   */
-  public async setMode(mode: CodeEditorMode): Promise<void> {
-    this.state.mode = mode;
-  }
-
-  /**
    * 设置当前选中组件已关联绑定的代码块id数组
    * @param {string[]} ids 代码块id数组
    * @returns {void}
@@ -349,7 +330,6 @@ class CodeBlock extends BaseService {
     this.state.codeDsl = null;
     this.state.id = '';
     this.state.editable = true;
-    this.state.mode = CodeEditorMode.EDITOR;
     this.state.combineIds = [];
     this.state.undeletableList = [];
   }
@@ -386,6 +366,7 @@ class CodeBlock extends BaseService {
    */
   private recurseMNode(node: MNode, relations: CodeRelation): void {
     forIn(node, (value, key) => {
+      let unConfirmedValue: MNode = { id: node.id };
       if (value?.hookType === HookType.CODE && !isEmpty(value.hookData)) {
         value.hookData.forEach((relationItem: HookData) => {
           // continue
@@ -399,6 +380,16 @@ class CodeBlock extends BaseService {
           }
           codeItem[node.id].push(key);
         });
+        // continue
+        return;
+      }
+      if (typeof value === 'object') {
+        // 检查value内部是否有嵌套
+        unConfirmedValue = {
+          ...unConfirmedValue,
+          ...value,
+        };
+        this.recurseMNode(unConfirmedValue, relations);
       }
     });
     if (!isEmpty(node.items)) {

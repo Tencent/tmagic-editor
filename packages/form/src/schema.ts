@@ -598,11 +598,11 @@ export interface PanelConfig extends FormItem, ContainerCommonConfig {
   schematic?: string;
 }
 
-export interface ColumnConfig extends FormItem, ContainerCommonConfig {
-  name: string;
+export interface ColumnConfig extends FormItem {
+  name?: string;
   label: string;
-  width: string | number;
-  sortable: boolean;
+  width?: string | number;
+  sortable?: boolean;
   [key: string]: any;
 }
 
@@ -622,6 +622,8 @@ export interface TableConfig extends FormItem {
   border?: boolean;
   /** 显示行号 */
   showIndex?: boolean;
+  /** 操作栏宽度 */
+  operateColWidth?: number | string;
   pagination?: boolean;
   enum?: any[];
   /** 是否显示添加按钮 */
@@ -642,7 +644,7 @@ export interface TableConfig extends FormItem {
   enableFullscreen?: boolean;
   fixed?: boolean;
   itemExtra?: string | FilterFunction;
-  rowKey: string;
+  rowKey?: string;
 }
 
 export interface GroupListConfig extends FormItem {

@@ -335,8 +335,6 @@ export type CodeState = {
   id: Id;
   /** 代码块是否可编辑 */
   editable: boolean;
-  /** 代码编辑面板的展示模式 */
-  mode: CodeEditorMode;
   /** list模式下左侧展示的代码列表 */
   combineIds: string[];
   /** 为业务逻辑预留的不可删除的代码块列表，由业务逻辑维护（如代码块上线后不可删除） */
@@ -358,13 +356,6 @@ export type CodeRelation = {
     [compId: Id]: string[];
   };
 };
-
-export enum CodeEditorMode {
-  /** 左侧菜单，右侧代码 */
-  LIST = 'list',
-  /** 全屏代码 */
-  EDITOR = 'editor',
-}
 
 export interface CodeDslItem {
   /** 代码块id */
@@ -406,6 +397,7 @@ export interface CodeParamStatement {
   name: string;
   /** 参数类型 */
   type?: string;
+  [key: string]: any;
 }
 
 export interface StepValue {

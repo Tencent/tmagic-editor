@@ -90,6 +90,8 @@ export interface CodeBlockContent {
 export interface CodeParam {
   /** 参数名 */
   name: string;
+  /** 扩展字段 */
+  [propName: string]: any;
 }
 export interface PastePosition {
   left?: number;

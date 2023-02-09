@@ -78,6 +78,10 @@
 
 .m-fields-code-select {
   width: 100%;
+  .edit-icon {
+    cursor: pointer;
+    margin-right: 5px;
+  }
 }
 
 .el-dialog.is-fullscreen.code-editor-dialog {
