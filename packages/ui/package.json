@@ -21,6 +21,7 @@
     "vue": "^3.2.37"
   },
   "peerDependencies": {
+    "qrcode": "^1.5.0",
     "vue": "^3.2.37"
   },
   "devDependencies": {

@@ -28,6 +28,9 @@
     "@tmagic/schema": "1.2.2",
     "dayjs": "^1.11.4"
   },
+  "peerDependencies": {
+    "dayjs": "^1.11.4"
+  },
   "devDependencies": {
     "@types/node": "^15.12.4",
     "rimraf": "^3.0.2",
