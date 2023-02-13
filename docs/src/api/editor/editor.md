@@ -123,6 +123,7 @@ import ModListPanel from '../components/sidebars/ModListPanel.vue';
       component: ModListPanel,
       text: '模块',
     },
+  ]
 }
 ```
 
