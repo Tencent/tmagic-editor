@@ -38,6 +38,10 @@ export interface NpmConfig {
   registry?: string;
   /** pnpm | npm | yarn */
   client?: 'npm' | 'yarn' | 'pnpm';
+  /** 是否自动安装组件依赖，默认为true */
+  autoInstall?: boolean;
+  /** 安装组件后，npm默认会将依赖写入package.json中，将该值设置为true，则不会写入，默认为true */
+  keepPackageJsonClean?: boolean;
 }
 
 export interface ModuleMainFilePath {

@@ -82,7 +82,9 @@ export const resolveAppPackages = (app: App): ModuleMainFilePath => {
     dependencies[moduleName] = version;
   };
 
-  app.options.packages.forEach((item) => {
+  const { packages = [], npmConfig = {} } = app.options;
+
+  packages.forEach((item) => {
     if (typeof item === 'object') {
       Object.entries(item).forEach(([, packagePath]) => {
         getDependencies(packagePath);
@@ -92,26 +94,26 @@ export const resolveAppPackages = (app: App): ModuleMainFilePath => {
     }
   });
 
-  if (Object.keys(dependencies).length) {
-    const packageFile = path.join(app.options.source, 'package.json');
-    const packageBakFile = path.join(app.options.source, 'package.json.bak');
-    if (fs.existsSync(packageFile)) {
-      fs.copyFileSync(packageFile, packageBakFile);
-    }
-
-    try {
+  if (npmConfig.autoInstall && Object.keys(dependencies).length) {
+    if (!npmConfig.keepPackageJsonClean) {
       npmInstall(dependencies, app.options.source, app.options.npmConfig);
-    } catch (e) {
-      error(e as string);
-    }
+    } else {
+      const packageFile = path.join(app.options.source, 'package.json');
+      const packageBakFile = path.join(app.options.source, 'package.json.bak');
+      if (fs.existsSync(packageFile)) {
+        fs.copyFileSync(packageFile, packageBakFile);
+      }
 
-    if (fs.existsSync(packageBakFile)) {
-      fs.unlinkSync(packageFile);
-      fs.renameSync(packageBakFile, packageFile);
+      npmInstall(dependencies, app.options.source, app.options.npmConfig);
+
+      if (fs.existsSync(packageBakFile)) {
+        fs.unlinkSync(packageFile);
+        fs.renameSync(packageBakFile, packageFile);
+      }
     }
   }
 
-  app.options.packages.forEach((item) => {
+  packages.forEach((item) => {
     if (typeof item === 'object') {
       Object.entries(item).forEach(([key, packagePath]) => {
         setPackages(app.options.source, packagePath, key);
@@ -131,26 +133,30 @@ export const resolveAppPackages = (app: App): ModuleMainFilePath => {
 };
 
 const npmInstall = function (dependencies: Record<string, string>, cwd: string, npmConfig: NpmConfig = {}) {
-  const { client = 'npm', registry = 'https://registry.npmjs.org/' } = npmConfig;
-  const install = {
-    npm: 'install',
-    yarn: 'add',
-    pnpm: 'add',
-  }[client];
+  try {
+    const { client = 'npm', registry = 'https://registry.npmjs.org/' } = npmConfig;
+    const install = {
+      npm: 'install',
+      yarn: 'add',
+      pnpm: 'add',
+    }[client];
 
-  const packages = Object.entries(dependencies)
-    .map(([name, version]) => `${name}@${version}`)
-    .join(' ');
+    const packages = Object.entries(dependencies)
+      .map(([name, version]) => `${name}@${version}`)
+      .join(' ');
 
-  const command = `${client} ${install} ${packages} --registry ${registry}`;
+    const command = `${client} ${install} ${packages} --registry ${registry}`;
 
-  execInfo(cwd);
-  execInfo(command);
+    execInfo(cwd);
+    execInfo(command);
 
-  execSync(command, {
-    stdio: 'inherit',
-    cwd,
-  });
+    execSync(command, {
+      stdio: 'inherit',
+      cwd,
+    });
+  } catch (e) {
+    error(e as string);
+  }
 };
 
 /**

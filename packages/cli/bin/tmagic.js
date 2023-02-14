@@ -10,4 +10,9 @@ cli({
   temp: '.tmagic',
   useTs: true,
   dynamicImport: false,
+  npmConfig: {
+    client: 'npm',
+    autoInstall: true,
+    keepPackageJsonClean: true,
+  },
 });

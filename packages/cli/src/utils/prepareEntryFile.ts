@@ -22,7 +22,13 @@ export const prepareEntryFile = async (app: App) => {
   }
 
   Object.keys(contentMap).forEach((file: string) => {
-    const fileName = `${file}.${useTs ? 'ts' : 'js'}`;
+    let fileName = `${file}.ts`;
+    if (useTs) {
+      app.writeTemp(fileName, contentMap[file]);
+    } else {
+      fileName = `${file}.js`;
+      app.writeTemp(`${file}.d.ts`, `const type: Record<string, any>;\n\nexport default type;`);
+    }
     app.writeTemp(fileName, contentMap[file]);
   });
 };

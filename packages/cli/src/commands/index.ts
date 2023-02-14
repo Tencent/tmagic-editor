@@ -22,12 +22,16 @@ export const scripts = (defaultAppConfig: UserConfig) => {
       path.resolve(defaultAppConfig.temp, 'config.cjs'),
     ].find((item) => fs.pathExistsSync(item));
 
-    const userConfig = await loadUserConfig(userConfigPath);
+    const { npmConfig = {}, ...userConfig } = await loadUserConfig(userConfigPath);
 
     // resolve the final app config to use
     const appConfig = {
       ...defaultAppConfig,
       ...userConfig,
+      npmConfig: {
+        ...(defaultAppConfig.npmConfig || {}),
+        ...npmConfig,
+      },
     };
 
     if (appConfig === null) {
