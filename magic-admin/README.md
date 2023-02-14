@@ -145,10 +145,15 @@ watchEffect(async () => {
 
 ```js
 cd magic
-npm run build
+npm run build:runtime:admin
 ```
 
-将 /playground/dist/runtime 文件夹复制到 /magic-admin/web/public 和 /magic-admin/server/assets 目录下。web 下的 runtime 提供给模拟画布使用，server 下的 runtime 提供给发布后的页面来使用。
+将 /runtime/vue3|vue2|react/dist 文件夹复制到 /magic-admin/serve/static 目录下。
+
+```
+mkdir ./magic-admin/server/static/vue3
+cp -rf ./runtime/vue3/dist/* ./magic-admin/server/static/vue3
+```
 
 上面的操作我们提供了/magic-admin/setup.sh 脚本文件来实现，开发者可以参考该脚本文件来搭建流水线。
 
