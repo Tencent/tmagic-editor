@@ -253,6 +253,7 @@ type RemoteSelectOptionRequestFunction = (
     formValue: any;
     formValues: any;
     config: any;
+    postOptions: Record<string, any>;
   },
 ) => any;
 

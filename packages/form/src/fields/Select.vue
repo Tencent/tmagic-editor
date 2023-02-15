@@ -152,6 +152,7 @@ const getOptions = async () => {
       formValue: mForm?.values,
       formValues: mForm?.values,
       config: props.config,
+      postOptions,
     });
   }
 
@@ -277,6 +278,7 @@ const getInitOption = async () => {
       formValue: mForm?.values,
       formValues: mForm?.values,
       config: props.config,
+      postOptions,
     });
   }
 
