@@ -52,6 +52,36 @@ export default defineComponent({
         console.log('update config', config);
         root.value = config;
         app?.setConfig(config, curPageId.value);
+
+        const text = config.items[0]?.items.find((p) => p.type === 'text');
+        if (text) {
+          text.bind = true;
+          text.attrs = {
+            text: {
+              id: 1,
+              key: 'num1',
+            },
+          };
+        }
+
+        app?.setDataSet(
+          config,
+          // 直接写死一个数据源用于测试
+          {
+            id: 1,
+            url: 'https://wangminghua.usemock.com/api/data1',
+            name: '数据源1',
+            keys: ['num1', 'num2', 'num3', 'num4', 'num5', 'num6', 'num7', 'num8', 'num9', 'num10', 'num11'],
+            alias: [
+              {
+                key: 'num1',
+                name: '默认值',
+              },
+            ],
+            rtype: 'list',
+            interval: 5,
+          },
+        );
       },
 
       updatePageId(id: Id) {

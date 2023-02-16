@@ -49,6 +49,20 @@ export interface MComponent {
     [key: string]: any;
   };
   [key: string]: any;
+  /** 数据绑定 */
+  bind?: boolean;
+  /** 属性绑定 */
+  attrs?: Record<
+    string,
+    {
+      /** 使用的数据源id */
+      id: string | number;
+      /** 使用的对应数据源的key */
+      key: string;
+      /** 映射字段，注意此时 key 的值应该为空 */
+      map?: { [name: string]: string } | Array<{ key: string; bindName: string; [property: string]: any }>;
+    }
+  >;
 }
 
 export interface MContainer extends MComponent {
