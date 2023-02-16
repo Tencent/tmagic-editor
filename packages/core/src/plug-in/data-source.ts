@@ -8,7 +8,7 @@ import { EventEmitter } from 'events';
  */
 import { reactive } from 'vue';
 import axios from 'axios';
-import { get, values } from 'lodash-es';
+import { get, template as lodashTemplate, values } from 'lodash-es';
 
 /**
  * 结果类型，如果结果类型为 【list】返回的是 ListData 结果，如果结果类型为 【table】返回的是 TableData 结果
@@ -178,26 +178,47 @@ export class DataSet {
    * @param key KEY
    * @returns
    */
-  value(id: string | number, key: string | { [name: string]: string } | Array<{ key: string; bindName: string }>): any {
+  value(
+    id: string | number,
+    key: string | { [name: string]: string } | Array<{ key: string; bindName: string }>,
+    template?: string,
+  ): any {
     if (!this.#sources.has(id)) return undefined;
     const result = this.#sources.get(id)?.data || {};
     if (typeof key === 'string') {
-      return get(result, key);
+      const property = key;
+      const val = get(result, property);
+      const compiled = template && lodashTemplate(template);
+      if (compiled) {
+        return compiled({ [property]: val });
+      }
+      return val;
     }
     // 特殊兼容语法，该模式任然需要思考
     if (Array.isArray(key)) {
       return key.reduce<{ [key: string]: any }>((merge, { key: prop }) => {
         const property = prop;
-        // eslint-disable-next-line no-param-reassign
-        merge[prop] = get(result, property);
+        const val = get(result, property);
+        const compiled = template && lodashTemplate(template);
+        if (compiled) {
+          merge[prop] = compiled({ [property]: val });
+        } else {
+          merge[prop] = val;
+        }
         return merge;
       }, {});
     }
     const map = key;
     return Object.keys(map).reduce<{ [key: string]: any }>((merge, prop) => {
       const property = map[prop];
-      // eslint-disable-next-line no-param-reassign
-      merge[prop] = get(result, property);
+      const val = get(result, property);
+      const compiled = template && lodashTemplate(template);
+      console.log('xxxxxxxxxxxx', template, property, val);
+      if (compiled) {
+        merge[prop] = compiled({ [property]: val });
+      } else {
+        merge[prop] = val;
+      }
       return merge;
     }, {});
   }

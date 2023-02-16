@@ -178,7 +178,7 @@ class App extends EventEmitter {
   // 设置数据集
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setDataSet(config: MApp, schemas: DataSourceSchema | Array<DataSourceSchema>, options?: DataSetOptions) {
-    console.log('xxxx', config, schemas, options);
+    // console.log('xxxx', config, schemas, options);
     const ds: DataSet = new DataSet(schemas, options);
     // 当前不支持画布属性的双向绑定，todo
     // 迭代items，创建数据绑定操作
@@ -195,15 +195,28 @@ class App extends EventEmitter {
       if (item.bind && item.attrs && Object.keys(item.attrs).length > 0) {
         const map = new Map<string, { id: string | number; key: string; map?: { [name: string]: string } }>();
         Object.keys(item.attrs).forEach((key) => {
-          map.set(key, item.attrs?.[key] as { id: string | number; key: string; map?: { [name: string]: string } });
+          map.set(
+            key,
+            item.attrs?.[key] as {
+              id: string | number;
+              key: string;
+              template?: string;
+              map?: { [name: string]: string };
+            },
+          );
         });
         return new Proxy(item, {
           get(target, prop: string) {
             if (map.has(prop)) {
               // eslint-disable-next-line @typescript-eslint/naming-convention
-              const _bind = map.get(prop) as { id: string | number; key: string; map?: { [name: string]: string } };
+              const _bind = map.get(prop) as {
+                id: string | number;
+                key: string;
+                template?: string;
+                map?: { [name: string]: string };
+              };
               // 返回的对象具备 reactive 特性
-              return ds.value(_bind?.id, _bind?.key || _bind?.map || '');
+              return ds.value(_bind?.id, _bind?.key || _bind?.map || '', _bind.template);
             }
             return target[prop];
           },
