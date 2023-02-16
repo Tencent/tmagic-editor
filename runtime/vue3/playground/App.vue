@@ -60,6 +60,7 @@ export default defineComponent({
             text: {
               id: 1,
               key: 'num1',
+              template: '你好啊：<%= num1 %> hi',
             },
           };
         }
