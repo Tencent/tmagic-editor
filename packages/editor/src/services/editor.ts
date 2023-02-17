@@ -24,7 +24,6 @@ import { NodeType } from '@tmagic/schema';
 import StageCore from '@tmagic/stage';
 import { getNodePath, isNumber, isPage, isPop } from '@tmagic/utils';
 
-import codeBlockService from '../services/codeBlock';
 import historyService from '../services/history';
 import storageService, { Protocol } from '../services/storage';
 import type { AddMNode, EditorNodeInfo, PastePosition, StepValue, StoreState, StoreStateKey } from '../type';
@@ -452,9 +451,6 @@ class Editor extends BaseService {
     }
 
     this.addModifiedNodeId(parent.id);
-
-    // 通知codeBlockService解除绑定关系
-    codeBlockService.deleteCompsInRelation(node);
   }
 
   /**
@@ -555,7 +551,6 @@ class Editor extends BaseService {
     this.pushHistoryState();
 
     this.emit('update', newNodes);
-    codeBlockService.refreshCombineInfo();
     return Array.isArray(config) ? newNodes : newNodes[0];
   }
 

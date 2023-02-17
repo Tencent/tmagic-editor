@@ -351,10 +351,8 @@ export type HookData = {
 };
 
 export type CodeRelation = {
-  [codeId: Id]: {
-    /** 组件id:['created'] */
-    [compId: Id]: string[];
-  };
+  /** 组件id:[代码id1，代码id2] */
+  [compId: Id]: Id[];
 };
 
 export interface CodeDslItem {

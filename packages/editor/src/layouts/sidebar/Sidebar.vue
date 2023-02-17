@@ -6,7 +6,12 @@
     type="card"
     tab-position="left"
   >
-    <component :is="uiComponent.component" v-for="(config, index) in sideBarItems" :key="index" :name="config.text">
+    <component
+      :is="uiComponent.component"
+      v-for="(config, index) in sideBarItems"
+      :key="config.$key || index"
+      :name="config.text"
+    >
       <template #label>
         <div :key="config.text">
           <MIcon v-if="config.icon" :icon="config.icon"></MIcon>
