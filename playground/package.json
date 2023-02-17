@@ -1,6 +1,6 @@
 {
   "name": "tmagic-playground",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "type": "module",
   "private": true,
   "scripts": {
@@ -13,13 +13,13 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.0.9",
-    "@tmagic/design": "1.2.3",
-    "@tmagic/editor": "1.2.3",
-    "@tmagic/element-plus-adapter": "1.2.3",
-    "@tmagic/form": "1.2.3",
-    "@tmagic/schema": "1.2.3",
-    "@tmagic/stage": "1.2.3",
-    "@tmagic/utils": "1.2.3",
+    "@tmagic/design": "1.2.4",
+    "@tmagic/editor": "1.2.4",
+    "@tmagic/element-plus-adapter": "1.2.4",
+    "@tmagic/form": "1.2.4",
+    "@tmagic/schema": "1.2.4",
+    "@tmagic/stage": "1.2.4",
+    "@tmagic/utils": "1.2.4",
     "element-plus": "^2.2.19",
     "monaco-editor": "^0.34.0",
     "serialize-javascript": "^6.0.0",

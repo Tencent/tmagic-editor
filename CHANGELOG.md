@@ -1,3 +1,12 @@
+## [1.2.4](https://github.com/Tencent/tmagic-editor/compare/v1.2.3...v1.2.4) (2023-02-17)
+
+
+### Bug Fixes
+
+* 调整绑定关系结构,优化性能  ([a013f35](https://github.com/Tencent/tmagic-editor/commit/a013f35cd9bd5bb9b3f3c796d603c9efc31d5b5d))
+
+
+
 ## [1.2.3](https://github.com/Tencent/tmagic-editor/compare/v1.2.2...v1.2.3) (2023-02-15)
 
 
