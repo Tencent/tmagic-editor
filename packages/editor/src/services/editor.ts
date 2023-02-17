@@ -886,6 +886,7 @@ class Editor extends BaseService {
       await this.select(value.nodeId);
       this.get('stage')?.select(value.nodeId);
     }, 0);
+    this.emit('history-change', value.data);
   }
 
   private async toggleFixedPosition(dist: MNode, src: MNode, root: MApp) {

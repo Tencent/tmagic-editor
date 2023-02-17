@@ -19,7 +19,7 @@
 import { reactive } from 'vue';
 import { cloneDeep, forIn, isEmpty, keys, omit, pick, union } from 'lodash-es';
 
-import { CodeBlockContent, CodeBlockDSL, HookType, Id, MNode } from '@tmagic/schema';
+import { CodeBlockContent, CodeBlockDSL, HookType, Id, MNode, MPage } from '@tmagic/schema';
 
 import editorService from '../services/editor';
 import type { CodeRelation, CodeState, HookData } from '../type';
@@ -250,6 +250,12 @@ class CodeBlock extends BaseService {
       nodes.forEach((node: MNode) => {
         this.state.relations = this.deleteNodeRelation(node, this.state.relations);
       });
+    });
+    // 监听历史记录，历史快照为页面整体，需要深层遍历更新
+    editorService.on('history-change', (page: MPage) => {
+      const relations: CodeRelation = {};
+      this.getNodeRelation(page, relations, true);
+      this.state.relations = relations;
     });
   }
 

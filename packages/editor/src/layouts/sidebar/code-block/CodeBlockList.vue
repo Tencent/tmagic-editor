@@ -87,7 +87,7 @@
 </template>
 
 <script lang="ts" setup name="MEditorCodeBlockList">
-import { computed, inject, onMounted, reactive, ref, watch } from 'vue';
+import { computed, inject, reactive, ref, watch } from 'vue';
 import { Close, Edit, Link, View } from '@element-plus/icons-vue';
 import { cloneDeep, forIn, isEmpty } from 'lodash-es';
 
@@ -152,10 +152,13 @@ const refreshCodeList = async () => {
   });
 };
 
-onMounted(() => {
-  services?.codeBlockService.refreshAllRelations();
-  refreshCodeList();
-});
+watch(
+  () => services?.editorService.get('root'),
+  () => {
+    services?.codeBlockService.refreshAllRelations();
+    refreshCodeList();
+  },
+);
 
 watch(
   [() => services?.codeBlockService.getCodeDslSync(), () => services?.codeBlockService.getCombineInfo()],
