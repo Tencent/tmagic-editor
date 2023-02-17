@@ -1,5 +1,5 @@
 {
-  "version": "1.2.4",
+  "version": "1.2.5",
   "name": "@tmagic/core",
   "type": "module",
   "sideEffects": [
@@ -36,7 +36,7 @@
     "vue"
   ],
   "dependencies": {
-    "@tmagic/schema": "1.2.4",
+    "@tmagic/schema": "1.2.5",
     "events": "^3.3.0",
     "lodash-es": "^4.17.21"
   },
