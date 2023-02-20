@@ -17,6 +17,7 @@
  */
 
 import React, { useState } from 'react';
+import { reaction } from '@formily/reactive';
 
 import type { MComponent } from '@tmagic/schema';
 
@@ -27,11 +28,13 @@ interface TextProps {
 }
 
 const Text: React.FC<TextProps> = ({ config }) => {
-  const { app, ref } = useApp({ config });
+  const { app, ref, created } = useApp({ config });
 
   if (!app) return null;
 
-  const [displayText] = useState(config.text);
+  const [displayText, setDisplayText] = useState(config.text);
+  // 数据响应式更新
+  if (!created) reaction(() => config.text, setDisplayText);
 
   return (
     <div ref={ref} className="magic-ui-text" style={app.transformStyle(config.style || {})} id={`${config.id || ''}`}>

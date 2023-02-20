@@ -70,6 +70,28 @@ const operations = {
   updateRootConfig(root: MApp) {
     console.log('update root config', root);
     app?.setConfig(root);
+    const config: MApp = root;
+    app?.setDataSet(
+      config,
+      // 直接写死一个数据源用于测试
+      {
+        id: 1,
+        url: 'https://wangminghua.usemock.com/api/data1',
+        name: '数据源1',
+        keys: ['num1', 'num2', 'num3', 'num4', 'num5', 'num6', 'num7', 'num8', 'num9', 'num10', 'num11'],
+        alias: [
+          {
+            key: 'num1',
+            name: '默认值',
+          },
+        ],
+        rtype: 'list',
+        interval: 5,
+      },
+      {
+        adapter: 'react',
+      },
+    );
   },
 
   updatePageId(id: string) {

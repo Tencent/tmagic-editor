@@ -52,19 +52,6 @@ export default defineComponent({
         console.log('update config', config);
         root.value = config;
         app?.setConfig(config, curPageId.value);
-
-        const text = config.items[0]?.items.find((p) => p.type === 'text');
-        if (text) {
-          text.bind = true;
-          text.attrs = {
-            text: {
-              id: 1,
-              key: 'num1',
-              template: '你好啊：<%= num1 %> hi',
-            },
-          };
-        }
-
         app?.setDataSet(
           config,
           // 直接写死一个数据源用于测试
@@ -81,6 +68,9 @@ export default defineComponent({
             ],
             rtype: 'list',
             interval: 5,
+          },
+          {
+            adapter: 'vue3',
           },
         );
       },

@@ -58,7 +58,7 @@ export interface MComponent {
       /** 使用的数据源id */
       id: string | number;
       /** 使用的对应数据源的key */
-      key: string;
+      key: string | Array<string>;
       /** 数据绑定模板 @see https://www.lodashjs.com/docs/lodash.template */
       template?: string;
       /** 映射字段，注意此时 key 的值应该为空 */

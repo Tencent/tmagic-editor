@@ -54,5 +54,5 @@ export default ({ config, methods }: UseAppOptions) => {
     };
   }, []);
 
-  return { app };
+  return { app, created };
 };
