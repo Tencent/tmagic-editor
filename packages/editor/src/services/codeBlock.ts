@@ -17,9 +17,9 @@
  */
 
 import { reactive } from 'vue';
-import { cloneDeep, forIn, isEmpty, keys, omit, pick } from 'lodash-es';
+import { cloneDeep, forIn, isEmpty, keys, omit, pick, union } from 'lodash-es';
 
-import { CodeBlockContent, CodeBlockDSL, HookType, Id, MNode } from '@tmagic/schema';
+import { CodeBlockContent, CodeBlockDSL, HookType, Id, MNode, MPage } from '@tmagic/schema';
 
 import editorService from '../services/editor';
 import type { CodeRelation, CodeState, HookData } from '../type';
@@ -230,16 +230,45 @@ class CodeBlock extends BaseService {
   }
 
   /**
-   * 刷新绑定关系
-   * @returns {CodeRelation | null}
+   * 监听组件更新来更新代码块绑定关系
+   * @returns {void}
    */
-  public refreshCombineInfo(): CodeRelation | null {
+  public addCodeRelationListener(): void {
+    // 监听组件更新
+    editorService.on('update', (nodes: MNode[]) => {
+      const relations: CodeRelation = cloneDeep(this.state.relations);
+      nodes.forEach((node: MNode) => {
+        if (node?.id) {
+          relations[node.id] = [];
+          this.getNodeRelation(node, relations);
+        }
+      });
+      this.state.relations = { ...relations };
+    });
+    // 监听组件删除
+    editorService.on('remove', (nodes: MNode[]) => {
+      nodes.forEach((node: MNode) => {
+        this.state.relations = this.deleteNodeRelation(node, this.state.relations);
+      });
+    });
+    // 监听历史记录，历史快照为页面整体，需要深层遍历更新
+    editorService.on('history-change', (page: MPage) => {
+      const relations: CodeRelation = {};
+      this.getNodeRelation(page, relations, true);
+      this.state.relations = relations;
+    });
+  }
+
+  /**
+   * 更新全部绑定关系
+   * @returns {void}
+   */
+  public refreshAllRelations(): void {
     const root = editorService.get('root');
-    if (!root) return null;
-    const relations = {};
-    this.recurseMNode(root, relations);
+    if (!root) return;
+    const relations: CodeRelation = {};
+    this.getNodeRelation(root, relations, true);
     this.state.relations = relations;
-    return this.state.relations;
   }
 
   /**
@@ -313,18 +342,6 @@ class CodeBlock extends BaseService {
     return await this.getUniqueId();
   }
 
-  /**
-   * 通过组件id解除绑定关系（删除组件）
-   * @param {MNode} compId 组件节点
-   * @returns void
-   */
-  public async deleteCompsInRelation(node: MNode): Promise<void> {
-    const codeDsl = cloneDeep(await this.getCodeDsl());
-    if (!codeDsl) return;
-    this.refreshRelationDeep(node, codeDsl);
-    this.setCodeDsl(codeDsl);
-  }
-
   public resetState() {
     this.state.isShowCodeEditor = false;
     this.state.codeDsl = null;
@@ -341,62 +358,62 @@ class CodeBlock extends BaseService {
   }
 
   /**
-   * 删除组件时 如果是容器 需要遍历删除其包含节点的绑定信息
-   * @param {MNode} node 节点信息
-   * @param {CodeBlockDSL} codeDsl 代码块
-   * @returns void
-   */
-  private refreshRelationDeep(node: MNode, codeDsl: CodeBlockDSL): void {
-    if (!node.id) return;
-    forIn(codeDsl, (codeBlockContent) => {
-      const compsContent = codeBlockContent.comps || {};
-      codeBlockContent.comps = omit(compsContent, node.id);
-    });
-    if (!isEmpty(node.items)) {
-      node.items.forEach((item: MNode) => {
-        this.refreshRelationDeep(item, codeDsl);
-      });
-    }
-  }
-
-  /**
    * 递归遍历dsl中挂载了代码块的节点，并更新绑定关系数据
-   * @param {MContainer} node 节点信息
+   * @param {MNode} node 节点信息
+   * @param {CodeRelation} relation 关系数据
+   * @param {boolean} deep 是否深层遍历
    * @returns void
    */
-  private recurseMNode(node: MNode, relations: CodeRelation): void {
+  private getNodeRelation(node: MNode, relation: CodeRelation, deep = false): void {
     forIn(node, (value, key) => {
-      let unConfirmedValue: MNode = { id: node.id };
       if (value?.hookType === HookType.CODE && !isEmpty(value.hookData)) {
         value.hookData.forEach((relationItem: HookData) => {
-          // continue
-          if (!relationItem.codeId) return;
-          if (!relations[relationItem.codeId]) {
-            relations[relationItem.codeId] = {};
+          if (relationItem.codeId) {
+            relation[node.id] = union(relation[node.id], [relationItem.codeId]);
           }
-          const codeItem = relations[relationItem.codeId];
-          if (isEmpty(codeItem[node.id])) {
-            codeItem[node.id] = [];
-          }
-          codeItem[node.id].push(key);
         });
         // continue
         return;
       }
-      if (typeof value === 'object') {
+      let isContinue = false;
+      try {
+        // 只遍历更新当前组件的关系，不再深层遍历容器包含的组件
+        isContinue = key !== 'items' && typeof value === 'object' && JSON.stringify(value).includes('hookType');
+      } catch (error) {
+        console.error(error);
+      }
+      if (isContinue) {
         // 检查value内部是否有嵌套
-        unConfirmedValue = {
-          ...unConfirmedValue,
+        const unConfirmedValue = {
+          id: node.id,
           ...value,
         };
-        this.recurseMNode(unConfirmedValue, relations);
+        this.getNodeRelation(unConfirmedValue, relation);
+      }
+      // 深层遍历用于代码列表初始化
+      if (key === 'items' && !isEmpty(value) && deep) {
+        value.forEach((item: MNode) => {
+          this.getNodeRelation(item, relation, deep);
+        });
       }
     });
+  }
+
+  /**
+   * 删除组件关系
+   * @param {MNode} node 节点信息
+   * @param {CodeRelation} relations 关系数据
+   * @returns CodeRelation
+   */
+  private deleteNodeRelation(node: MNode, relations: CodeRelation): CodeRelation {
+    if (!node.id) return {};
+    let newRelations = omit(relations, [node.id]);
     if (!isEmpty(node.items)) {
       node.items.forEach((item: MNode) => {
-        this.recurseMNode(item, relations);
+        newRelations = this.deleteNodeRelation(item, newRelations);
       });
     }
+    return newRelations;
   }
 }
 

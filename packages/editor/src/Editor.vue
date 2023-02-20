@@ -362,6 +362,8 @@ export default defineComponent({
         disabledDragStart: props.disabledDragStart,
       }),
     );
+    // 监听组件update
+    codeBlockService.addCodeRelationListener();
 
     return services;
   },

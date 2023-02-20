@@ -96,7 +96,7 @@ import { ColumnConfig } from '@tmagic/form';
 import { CodeBlockContent, Id } from '@tmagic/schema';
 
 import Icon from '../../../components/Icon.vue';
-import type { CodeRelation, Services } from '../../../type';
+import type { CodeRelation, CombineInfo, Services } from '../../../type';
 import { CodeDeleteErrorType, CodeDslItem, ListState } from '../../../type';
 
 import codeBlockEditor from './CodeBlockEditor.vue';
@@ -121,17 +121,22 @@ const isShowCodeBlockEditor = computed(() => services?.codeBlockService.getCodeE
 const codeCombineInfo = ref<CodeRelation | null>(null);
 
 // 根据代码块ID获取其绑定的组件信息
-const getBindCompsByCodeId = (codeId: Id) => {
-  if (!codeCombineInfo.value || !codeCombineInfo.value[codeId]) return [];
-  const bindCompsId = Object.keys(codeCombineInfo.value[codeId]);
-  return bindCompsId.map((compId) => ({
-    compId,
-    compName: getCompName(compId),
-  }));
+const getBindCompsByCodeId = (codeId: Id): CombineInfo[] => {
+  if (!codeCombineInfo.value) return [];
+  const bindsComp = [] as CombineInfo[];
+  forIn(codeCombineInfo.value, (codeIds, compId) => {
+    if (codeIds.includes(codeId)) {
+      bindsComp.push({
+        compId,
+        compName: getCompName(compId),
+      });
+    }
+  });
+  return bindsComp as CombineInfo[];
 };
 
-// 初始化代码块列表
-const initList = async () => {
+// 更新代码块列表
+const refreshCodeList = async () => {
   const codeDsl = cloneDeep(await services?.codeBlockService.getCodeDsl()) || null;
   codeCombineInfo.value = cloneDeep(services?.codeBlockService.getCombineInfo()) || null;
   if (!codeDsl || !codeCombineInfo.value) return;
@@ -148,12 +153,19 @@ const initList = async () => {
 };
 
 watch(
-  [() => services?.codeBlockService.getCodeDslSync(), () => services?.codeBlockService.refreshCombineInfo()],
+  () => services?.editorService.get('root'),
   () => {
-    initList();
+    services?.codeBlockService.refreshAllRelations();
+    refreshCodeList();
+  },
+);
+
+watch(
+  [() => services?.codeBlockService.getCodeDslSync(), () => services?.codeBlockService.getCombineInfo()],
+  () => {
+    refreshCodeList();
   },
   {
-    immediate: true,
     deep: true,
   },
 );

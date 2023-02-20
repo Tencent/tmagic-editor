@@ -1,3 +1,31 @@
+## [1.2.5](https://github.com/Tencent/tmagic-editor/compare/v1.2.4...v1.2.5) (2023-02-17)
+
+
+### Bug Fixes
+
+* **editor:** 修复优化性能引起的问题,支持回退撤销对代码关系的更新 ([0109181](https://github.com/Tencent/tmagic-editor/commit/010918198a7daa97ed3bd3c797ac88c091ef90a1))
+
+
+
+## [1.2.4](https://github.com/Tencent/tmagic-editor/compare/v1.2.3...v1.2.4) (2023-02-17)
+
+
+### Bug Fixes
+
+* 调整绑定关系结构,优化性能  ([a013f35](https://github.com/Tencent/tmagic-editor/commit/a013f35cd9bd5bb9b3f3c796d603c9efc31d5b5d))
+
+
+
+## [1.2.3](https://github.com/Tencent/tmagic-editor/compare/v1.2.2...v1.2.3) (2023-02-15)
+
+
+### Features
+
+* **cli:** 支持配置是否自动安装组件npm包，支持配置安装组件npm包后是否保持package.json不变 ([d06a874](https://github.com/Tencent/tmagic-editor/commit/d06a874c3b997a73f80bed4196974a331d6ef133))
+* **form:** select config.option.afterRequest添加postOptions ([4d0b4c3](https://github.com/Tencent/tmagic-editor/commit/4d0b4c31781e5a3381fc4d73bf62c6f66253a563))
+
+
+
 ## [1.2.2](https://github.com/Tencent/tmagic-editor/compare/v1.2.1...v1.2.2) (2023-02-09)
 
 
