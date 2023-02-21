@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts" name="TMSelect">
-import { computed, onMounted, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 import { getConfig } from './config';
 
@@ -55,9 +55,19 @@ const visibleHandler = (...args: any[]) => {
 
 const scrollbarWrap = ref<HTMLDivElement | undefined>();
 
-onMounted(() => {
-  scrollbarWrap.value = select.value?.scrollbar?.wrap$;
-});
+const unWacth = watch(
+  () => select.value?.scrollbar?.wrap$ || select.value?.scrollbar?.wrapRef,
+  (wrap) => {
+    if (!wrap) {
+      return;
+    }
+    scrollbarWrap.value = wrap;
+    unWacth();
+  },
+  {
+    immediate: true,
+  },
+);
 
 defineExpose({
   scrollbarWrap,
