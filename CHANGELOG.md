@@ -1,3 +1,12 @@
+## [1.2.6](https://github.com/Tencent/tmagic-editor/compare/v1.2.5...v1.2.6) (2023-02-21)
+
+
+### Bug Fixes
+
+* **form:** select下拉列表分页不生效问题 ([8edf023](https://github.com/Tencent/tmagic-editor/commit/8edf023a0014747758b193c411b285baa11f05de))
+
+
+
 ## [1.2.5](https://github.com/Tencent/tmagic-editor/compare/v1.2.4...v1.2.5) (2023-02-17)
 
 
