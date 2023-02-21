@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts" setup name="MFormSelect">
-import { inject, nextTick, onBeforeMount, onMounted, Ref, ref, watchEffect } from 'vue';
+import { inject, onBeforeMount, Ref, ref, watch, watchEffect } from 'vue';
 
 import { TMagicSelect } from '@tmagic/design';
 
@@ -331,26 +331,36 @@ if (typeof props.config.options === 'function') {
   });
 }
 
-props.config.remote &&
-  onMounted(async () => {
-    await nextTick();
-    tMagicSelect.value?.scrollbarWrap?.addEventListener('scroll', async (e: Event) => {
-      const el = e.currentTarget as HTMLDivElement;
-      if (moreLoadingVisible.value) {
+if (props.config.remote) {
+  const unWacth = watch(
+    () => tMagicSelect.value?.scrollbarWrap,
+    (scrollbarWrap) => {
+      if (!scrollbarWrap) {
         return;
       }
-      if (el.scrollHeight - el.clientHeight - el.scrollTop > 1) {
-        return;
-      }
-      if (total.value <= options.value.length) {
-        return;
-      }
-      moreLoadingVisible.value = true;
-      pgIndex.value += 1;
-      options.value = await getOptions();
-      moreLoadingVisible.value = false;
-    });
-  });
+      scrollbarWrap.addEventListener('scroll', async (e: Event) => {
+        const el = e.currentTarget as HTMLDivElement;
+        if (moreLoadingVisible.value) {
+          return;
+        }
+        if (el.scrollHeight - el.clientHeight - el.scrollTop > 1) {
+          return;
+        }
+        if (total.value <= options.value.length) {
+          return;
+        }
+        moreLoadingVisible.value = true;
+        pgIndex.value += 1;
+        options.value = await getOptions();
+        moreLoadingVisible.value = false;
+      });
+      unWacth();
+    },
+    {
+      immediate: true,
+    },
+  );
+}
 
 const popperClass = mForm?.popperClass;
 
