@@ -3,12 +3,13 @@ import { cac } from 'cac';
 import { allowTs } from './utils/allowTs';
 import { error } from './utils/logger';
 import { scripts } from './commands';
+import App from './Core';
 import { UserConfig } from './types';
 
 /**
  * Wrap raw command to catch errors and exit process
  */
-const wrapCommand = (cmd: (...args: any[]) => Promise<void>): typeof cmd => {
+const wrapCommand = (cmd: (...args: any[]) => Promise<App>): typeof cmd => {
   const wrappedCommand: typeof cmd = (...args) =>
     cmd(...args).catch((err) => {
       error(err.stack);

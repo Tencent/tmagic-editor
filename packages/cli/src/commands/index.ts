@@ -7,7 +7,7 @@ import { UserConfig } from '../types';
 import { loadUserConfig } from '../utils/loadUserConfig';
 
 export const scripts = (defaultAppConfig: UserConfig) => {
-  const entry = async (): Promise<void> => {
+  const entry = async (): Promise<App> => {
     if (process.env.NODE_ENV === undefined) {
       process.env.NODE_ENV = 'development';
     }
@@ -34,10 +34,6 @@ export const scripts = (defaultAppConfig: UserConfig) => {
       },
     };
 
-    if (appConfig === null) {
-      return;
-    }
-
     // create vuepress app
     const app = new App(appConfig);
 
@@ -49,6 +45,8 @@ export const scripts = (defaultAppConfig: UserConfig) => {
     // initialize and prepare
     await app.init();
     await app.prepare();
+
+    return app;
   };
 
   return entry;
