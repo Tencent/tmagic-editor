@@ -17,8 +17,8 @@
  */
 
 import React, { useState } from 'react';
-import { reaction } from '@formily/reactive';
 
+import { Reactive } from '@tmagic/core';
 import type { MComponent } from '@tmagic/schema';
 
 import useApp from '../useApp';
@@ -34,7 +34,7 @@ const Text: React.FC<TextProps> = ({ config }) => {
 
   const [displayText, setDisplayText] = useState(config.text);
   // 数据响应式更新
-  if (!created) reaction(() => config.text, setDisplayText);
+  if (!created) Reactive.reaction(() => config.text,() => setDisplayText(config.text));
 
   return (
     <div ref={ref} className="magic-ui-text" style={app.transformStyle(config.style || {})} id={`${config.id || ''}`}>

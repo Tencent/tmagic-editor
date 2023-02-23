@@ -70,7 +70,7 @@ export default defineComponent({
             interval: 5,
           },
           {
-            adapter: 'vue3',
+            adapter: reactive,
           },
         );
       },

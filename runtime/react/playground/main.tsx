@@ -19,7 +19,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Core from '@tmagic/core';
+import Core, { Reactive } from '@tmagic/core';
 import type { MApp } from '@tmagic/schema';
 import type { RemoveData, SortEventData, UpdateData } from '@tmagic/stage';
 import { AppContent } from '@tmagic/ui-react';
@@ -89,7 +89,7 @@ const operations = {
         interval: 5,
       },
       {
-        adapter: 'react',
+        adapter: Reactive.observable,
       },
     );
   },

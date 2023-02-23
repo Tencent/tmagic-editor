@@ -3,11 +3,6 @@
 // eslint-disable-next-line max-classes-per-file
 import { EventEmitter } from 'events';
 
-/**
- * 暂时先用vue的reactive来实现数据响应式变化，后期修改为支持react的响应式变化适配器
- */
-import { reactive } from 'vue';
-import { observable } from '@formily/reactive';
 import axios from 'axios';
 import { get, template as lodashTemplate, values } from 'lodash-es';
 
@@ -15,10 +10,6 @@ import { get, template as lodashTemplate, values } from 'lodash-es';
  * 结果类型，如果结果类型为 【list】返回的是 ListData 结果，如果结果类型为 【table】返回的是 TableData 结果
  */
 export type ResultType = 'list' | 'table';
-/**
- * 数据适配器类型
- */
-export type AdapterType = 'vue2' | 'vue3' | 'react';
 
 /**
  * 列表数据
@@ -116,9 +107,9 @@ export interface DataSetOptions {
    */
   autostart?: boolean;
   /**
-   * 响应式适配器
+   * 适配器（响应式对象包装函数）
    */
-  adapter?: AdapterType;
+  adapter?: Function;
 }
 
 /**
@@ -175,7 +166,7 @@ export class DataSet {
    * @returns DataSource 数据源对象
    */
   factory(schema: DataSourceSchema & { [name: string]: any }): DataSource {
-    const { adapter } = this.#options;
+    const { adapter } = this.options;
     if (schema.url) {
       return new HttpDataSource(schema as HttpDataSourceSchema, adapter);
     }
@@ -199,6 +190,7 @@ export class DataSet {
       const property = key;
       const val = get(result, property);
       const compiled = template && lodashTemplate(template);
+      // console.log(template);
       if (compiled) {
         return compiled({ [property]: val });
       }
@@ -212,7 +204,7 @@ export class DataSet {
         return merge;
       }, {});
       const compiled = template && lodashTemplate(template);
-      console.log(template);
+      // console.log(template);
       if (compiled) {
         return compiled(result2);
       }
@@ -255,8 +247,8 @@ export abstract class DataSource extends EventEmitter {
 
   #name: string;
 
-  #data: { [key: string]: any }; // = reactive({});
-  // #data: { [key: string]: any } = {};
+  // #data: { [key: string]: any } = Reactive.observable({}); // 创建响应式对象
+  #data: { [key: string]: any };
 
   #keys: Array<string>;
 
@@ -264,12 +256,10 @@ export abstract class DataSource extends EventEmitter {
 
   #rtype: ResultType;
 
-  #adapter?: AdapterType;
-
   /**
    *
    */
-  constructor(schema: DataSourceSchema, adapter?: AdapterType) {
+  constructor(schema: DataSourceSchema, adapter?: Function) {
     super();
     this.#id = schema.id;
     this.#name = schema.name || '未知数据源';
@@ -277,13 +267,11 @@ export abstract class DataSource extends EventEmitter {
     this.#alias = schema.alias;
     this.#rtype = schema.rtype;
     this.#schema = schema;
-    if (adapter === 'react') {
-      this.#data = observable({});
-    } else if (adapter === 'vue3') {
-      this.#data = reactive({});
-    } else {
-      this.#data = {};
-    }
+    const data = schema.keys
+      .concat(schema.alias.map((p) => p.name))
+      .reduce((t, key) => Object.assign(t, { [key]: '' }), {});
+    if (typeof adapter === 'function') this.#data = adapter(data);
+    else this.#data = data;
   }
 
   /**
@@ -407,7 +395,7 @@ export class HttpDataSource extends DataSource {
    * @param {HttpDataSourceSchema} schema 配置
    */
   // eslint-disable-next-line @typescript-eslint/member-ordering
-  constructor(schema: HttpDataSourceSchema, adapter?: any) {
+  constructor(schema: HttpDataSourceSchema, adapter?: Function) {
     super(schema, adapter);
     this.#spec = schema.spec;
     this.#schema = schema;

@@ -116,7 +116,7 @@ export default {
         },
         {
           type: 'text',
-          id: 'text_9027',
+          id: 'text_9028',
           bind: true,
           attrs: {
             text: {

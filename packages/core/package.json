@@ -37,7 +37,6 @@
   ],
   "dependencies": {
     "@tmagic/schema": "1.2.5",
-    "@formily/reactive": "^2.2.19",
     "axios": "^1.3.3",
     "events": "^3.3.0",
     "lodash-es": "^4.17.21"
