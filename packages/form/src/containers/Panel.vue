@@ -23,11 +23,14 @@
             :key="item[mForm?.keyProp || '__key'] ?? index"
             :config="item"
             :model="name ? model[name] : model"
+            :lastValues="name ? lastValues[name] : lastValues"
+            :is-compare="isCompare"
             :prop="prop"
             :size="size"
             :disabled="disabled"
             :label-width="config.labelWidth || labelWidth"
             @change="changeHandler"
+            @addDiffCount="onAddDiffCount()"
           ></Container>
         </div>
 
@@ -40,11 +43,14 @@
           :key="item[mForm?.keyProp || '__key'] ?? index"
           :config="item"
           :model="name ? model[name] : model"
+          :lastValues="name ? lastValues[name] : lastValues"
+          :is-compare="isCompare"
           :prop="prop"
           :size="size"
           :disabled="disabled"
           :label-width="config.labelWidth || labelWidth"
           @change="changeHandler"
+          @addDiffCount="onAddDiffCount()"
         ></Container>
       </template>
     </div>
@@ -64,6 +70,8 @@ import Container from './Container.vue';
 
 const props = defineProps<{
   model: any;
+  lastValues?: any;
+  isCompare?: boolean;
   config: PanelConfig;
   name: string;
   labelWidth?: string;
@@ -72,7 +80,7 @@ const props = defineProps<{
   disabled?: boolean;
 }>();
 
-const emit = defineEmits(['change']);
+const emit = defineEmits(['change', 'addDiffCount']);
 
 const mForm = inject<FormState | undefined>('mForm');
 
@@ -83,4 +91,5 @@ const items = computed(() => props.config.items);
 const filter = (config: any) => filterFunction(mForm, config, props);
 
 const changeHandler = () => emit('change', props.model);
+const onAddDiffCount = () => emit('addDiffCount');
 </script>

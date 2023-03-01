@@ -158,6 +158,9 @@ watch(
     services?.codeBlockService.refreshAllRelations();
     refreshCodeList();
   },
+  {
+    immediate: true,
+  },
 );
 
 watch(

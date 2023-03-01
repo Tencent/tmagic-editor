@@ -18,11 +18,14 @@
           :key="item[mForm?.keyProp || '__key']"
           :config="item"
           :model="step.name ? model[step.name] : model"
+          :lastValues="step.name ? lastValues[step.name] : lastValues"
+          :is-compare="isCompare"
           :prop="`${step.name}`"
           :size="size"
           :disabled="disabled"
           :label-width="config.labelWidth || labelWidth"
           @change="changeHandler"
+          @addDiffCount="onAddDiffCount()"
         ></Container>
       </template>
     </template>
@@ -41,6 +44,8 @@ import Container from './Container.vue';
 const props = withDefaults(
   defineProps<{
     model: any;
+    lastValues?: any;
+    isCompare?: boolean;
     config: StepConfig;
     stepActive?: number;
     labelWidth?: string;
@@ -52,7 +57,7 @@ const props = withDefaults(
   },
 );
 
-const emit = defineEmits(['change']);
+const emit = defineEmits(['change', 'addDiffCount']);
 
 const mForm = inject<FormState | undefined>('mForm');
 const active = ref(1);
@@ -69,4 +74,5 @@ const stepClick = (index: number) => {
 const changeHandler = () => {
   emit('change', props.model);
 };
+const onAddDiffCount = () => emit('addDiffCount');
 </script>

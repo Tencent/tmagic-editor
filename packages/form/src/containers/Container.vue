@@ -20,6 +20,8 @@
       :size="size"
       :is="tagName"
       :model="model"
+      :last-values="lastValues"
+      :is-compare="isCompare"
       :config="config"
       :disabled="disabled"
       :name="name"
@@ -28,15 +30,120 @@
       :expand-more="expand"
       :label-width="itemLabelWidth"
       @change="onChangeHandler"
+      @addDiffCount="onAddDiffCount"
     ></component>
 
-    <template v-else-if="type && display">
+    <template v-else-if="type && display && !showDiff">
       <TMagicFormItem
         :style="config.tip ? 'flex: 1' : ''"
         :class="{ hidden: `${itemLabelWidth}` === '0' || !config.text }"
         :prop="itemProp"
         :label-width="itemLabelWidth"
         :rules="rule"
+      >
+        <template #label><span v-html="type === 'checkbox' ? '' : config.text"></span></template>
+        <TMagicTooltip v-if="tooltip">
+          <component
+            :key="key(config)"
+            :size="size"
+            :is="tagName"
+            :model="model"
+            :config="config"
+            :name="name"
+            :disabled="disabled"
+            :prop="itemProp"
+            @change="onChangeHandler"
+            @addDiffCount="onAddDiffCount"
+          ></component>
+          <template #content>
+            <div v-html="tooltip"></div>
+          </template>
+        </TMagicTooltip>
+
+        <component
+          v-else
+          :key="key(config)"
+          :size="size"
+          :is="tagName"
+          :model="model"
+          :config="config"
+          :name="name"
+          :disabled="disabled"
+          :prop="itemProp"
+          @change="onChangeHandler"
+          @addDiffCount="onAddDiffCount"
+        ></component>
+
+        <div v-if="extra" v-html="extra" class="m-form-tip"></div>
+      </TMagicFormItem>
+
+      <TMagicTooltip v-if="config.tip" placement="left">
+        <TMagicIcon style="line-height: 40px; margin-left: 5px"><warning-filled /></TMagicIcon>
+        <template #content>
+          <div v-html="config.tip"></div>
+        </template>
+      </TMagicTooltip>
+    </template>
+
+    <!-- 对比 -->
+    <template v-else-if="type && display && showDiff">
+      <!-- 上次内容 -->
+      <TMagicFormItem
+        :style="config.tip ? 'flex: 1' : ''"
+        :class="{ hidden: `${itemLabelWidth}` === '0' || !config.text }"
+        :prop="itemProp"
+        :label-width="itemLabelWidth"
+        :rules="rule"
+        style="background: #f7dadd"
+      >
+        <template #label><span v-html="type === 'checkbox' ? '' : config.text"></span></template>
+        <TMagicTooltip v-if="tooltip">
+          <component
+            :key="key(config)"
+            :size="size"
+            :is="tagName"
+            :model="lastValues"
+            :config="config"
+            :name="name"
+            :disabled="disabled"
+            :prop="itemProp"
+            @change="onChangeHandler"
+          ></component>
+          <template #content>
+            <div v-html="tooltip"></div>
+          </template>
+        </TMagicTooltip>
+
+        <component
+          v-else
+          :key="key(config)"
+          :size="size"
+          :is="tagName"
+          :model="lastValues"
+          :config="config"
+          :name="name"
+          :disabled="disabled"
+          :prop="itemProp"
+          @change="onChangeHandler"
+        ></component>
+
+        <div v-if="extra" v-html="extra" class="m-form-tip"></div>
+      </TMagicFormItem>
+
+      <TMagicTooltip v-if="config.tip" placement="left">
+        <TMagicIcon style="line-height: 40px; margin-left: 5px"><warning-filled /></TMagicIcon>
+        <template #content>
+          <div v-html="config.tip"></div>
+        </template>
+      </TMagicTooltip>
+      <!-- 当前内容 -->
+      <TMagicFormItem
+        :style="config.tip ? 'flex: 1' : ''"
+        :class="{ hidden: `${itemLabelWidth}` === '0' || !config.text }"
+        :prop="itemProp"
+        :label-width="itemLabelWidth"
+        :rules="rule"
+        style="background: #def7da"
       >
         <template #label><span v-html="type === 'checkbox' ? '' : config.text"></span></template>
         <TMagicTooltip v-if="tooltip">
@@ -86,6 +193,8 @@
           v-for="item in items"
           :key="key(item)"
           :model="name || name === 0 ? model[name] : model"
+          :last-values="name || name === 0 ? lastValues[name] : lastValues"
+          :is-compare="isCompare"
           :config="item"
           :size="size"
           :disabled="disabled"
@@ -94,6 +203,7 @@
           :label-width="itemLabelWidth"
           :prop="itemProp"
           @change="onChangeHandler"
+          @addDiffCount="onAddDiffCount"
         ></Container>
       </template>
     </template>
@@ -107,8 +217,9 @@
 </template>
 
 <script setup lang="ts" name="MFormContainer">
-import { computed, inject, ref, resolveComponent, watchEffect } from 'vue';
+import { computed, inject, ref, resolveComponent, watch, watchEffect } from 'vue';
 import { WarningFilled } from '@element-plus/icons-vue';
+import { isEqual } from 'lodash-es';
 
 import { TMagicButton, TMagicFormItem, TMagicIcon, TMagicTooltip } from '@tmagic/design';
 
@@ -117,7 +228,10 @@ import { display as displayFunction, filterFunction, getRules } from '../utils/f
 
 const props = withDefaults(
   defineProps<{
+    /** 表单值 */
     model: FormValue;
+    /** 需对比的值（开启对比模式时传入） */
+    lastValues?: FormValue;
     config: ChildConfig;
     prop?: string;
     disabled?: boolean;
@@ -125,21 +239,33 @@ const props = withDefaults(
     expandMore?: boolean;
     stepActive?: string | number;
     size?: string;
+    /** 是否开启对比模式 */
+    isCompare?: boolean;
   }>(),
   {
     prop: '',
     size: 'small',
     expandMore: false,
+    lastValues: () => ({}),
+    isCompare: false,
   },
 );
 
-const emit = defineEmits(['change']);
+const emit = defineEmits(['change', 'addDiffCount']);
 
 const mForm = inject<FormState | undefined>('mForm');
 
 const expand = ref(false);
 
 const name = computed(() => props.config.name || '');
+
+// 是否展示两个版本的对比内容
+const showDiff = computed(() => {
+  if (!props.isCompare) return false;
+  const curValue = name.value ? props.model[name.value] : props.model;
+  const lastValue = name.value ? props.lastValues[name.value] : props.lastValues;
+  return !isEqual(curValue, lastValue);
+});
 
 const items = computed(() => (props.config as ContainerCommonConfig).items);
 
@@ -196,6 +322,21 @@ watchEffect(() => {
   expand.value = props.expandMore;
 });
 
+// 监听是否展示对比内容，如果出现差异项则触发差异数计数事件
+watch(
+  showDiff,
+  (showDiff) => {
+    if (type.value === 'hidden') return;
+    if (items.value && !props.config.text && type.value && display.value) return;
+    if (display.value && showDiff && type.value) {
+      emit('addDiffCount');
+    }
+  },
+  {
+    immediate: true,
+  },
+);
+
 const expandHandler = () => (expand.value = !expand.value);
 
 const key = (config: any) => config[mForm?.keyProps];
@@ -235,6 +376,9 @@ const trimHandler = (trim: any, value: FormValue | number | string) => {
     return value.replace(/^\s*/, '').replace(/\s*$/, '');
   }
 };
+
+// 继续抛出给更高层级的组件
+const onAddDiffCount = () => emit('addDiffCount');
 
 const onChangeHandler = async function (v: FormValue, key?: string) {
   const { filter, onChange, trim, name, dynamicKey } = props.config as any;

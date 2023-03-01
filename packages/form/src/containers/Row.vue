@@ -8,10 +8,13 @@
       :labelWidth="config.labelWidth || labelWidth"
       :expandMore="expandMore"
       :model="name ? model[name] : model"
+      :lastValues="name ? lastValues[name] : lastValues"
+      :is-compare="isCompare"
       :prop="prop"
       :size="size"
       :disabled="disabled"
       @change="changeHandler"
+      @add-diff-count="onAddDiffCount"
     />
   </TMagicRow>
 </template>
@@ -27,6 +30,8 @@ import Col from './Col.vue';
 
 const props = defineProps<{
   model: any;
+  lastValues?: any;
+  isCompare?: boolean;
   config: RowConfig;
   name: string;
   labelWidth?: string;
@@ -36,9 +41,10 @@ const props = defineProps<{
   disabled?: boolean;
 }>();
 
-const emit = defineEmits(['change']);
+const emit = defineEmits(['change', 'addDiffCount']);
 
 const mForm = inject<FormState | undefined>('mForm');
 
 const changeHandler = () => emit('change', props.name ? props.model[props.name] : props.model);
+const onAddDiffCount = () => emit('addDiffCount');
 </script>
