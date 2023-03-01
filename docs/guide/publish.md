@@ -100,59 +100,102 @@ npm run entry
 
 在 runtime 中，我们通过 vite.config.ts 定义了打包入口文件，在 package.json 中声明了打包命令。你可以进入对应的 runtime 目录中尝试执行
 
-我们就可以得到打包产物 dist 目录。其中有我们在线上项目页面使用的 page.html 和编辑器模拟器使用的 playground.html 两个 runtime 页面框架。
+我们就可以在playground/public得到打包产物 。其中有我们在线上项目页面使用的 page/index.html 和编辑器模拟器使用的 playground/index.html 两个 runtime 页面框架。
 
 ## 页面发布
-tmagic-editor的页面发布，目前使用的是静态资源发布。而所有配置出的项目页唯一的区别，就是配置信息。我们发布页面时，将页面的配置信息插入到 page.html 中，然后将修改后的 page.html 发布至 CDN，得到项目页面。
+tmagic-editor的页面发布，目前使用的是静态资源发布。而所有配置出的项目页唯一的区别，就是配置信息。我们发布页面时，将页面的配置信息插入到 page/index.html 中，然后将修改后的 page/index.html 发布至 CDN，得到项目页面。
 
-原始的 page.html 页面框架
+原始的 page/index.html 页面框架
+```html
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="/static/vue3/runtime/page/favicon.png" type="image/png">
+    <title>Vue3 Page</title>
+    <style>
+      html,
+      body,
+      #app {
+        width: 100%;
+        height: 100%;
+      }
+
+      #app {
+        position: relative;
+        overflow: auto;
+      }
+
+      #app::-webkit-scrollbar {
+        width: 0 !important;
+        display: none;
+      }
+    </style>
+    <script type="module" crossorigin src="/static/vue3/runtime/page/assets/index.2a9a64ca.js"></script>
+    <script type="module">try{import.meta.url;import("_").catch(()=>1);}catch(e){}window.__vite_is_modern_browser=true;</script>
+    <script type="module">!function(){if(window.__vite_is_modern_browser)return;console.warn("vite: loading legacy build because dynamic import or import.meta.url is unsupported, syntax error above should be ignored");var e=document.getElementById("vite-legacy-polyfill"),n=document.createElement("script");n.src=e.src,n.onload=function(){System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))},document.body.appendChild(n)}();</script>
+  </head>
+  <body>
+    <div id="app"></div>
+    
+    <script nomodule>!function(){var e=document,t=e.createElement("script");if(!("noModule"in t)&&"onbeforeload"in t){var n=!1;e.addEventListener("beforeload",(function(e){if(e.target===t)n=!0;else if(!e.target.hasAttribute("nomodule")||!n)return;e.preventDefault()}),!0),t.type="module",t.src=".",e.head.appendChild(t),t.remove()}}();</script>
+    <script nomodule crossorigin id="vite-legacy-polyfill" src="/static/vue3/runtime/page/assets/polyfills-legacy.a62c3647.js"></script>
+    <script nomodule crossorigin id="vite-legacy-entry" data-src="/static/vue3/runtime/page/assets/index-legacy.1dc0be94.js">System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))</script>
+  </body>
+</html>
+
+```
+
+插入项目信息后的 page/index.html
 ```html
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Magic App</title>
-    <script src="https://unpkg.com/vue@next/dist/vue.runtime.global.js"></script>
-    <script type="module" crossorigin src="assets/page.js"></script>
-    <link rel="modulepreload" href="assets/App.10f9c9e1.js">
-    <link rel="modulepreload" href="assets/vendor.1dc07625.js">
-    <link rel="modulepreload" href="assets/index.3456a0b9.js">
-    <link rel="modulepreload" href="assets/components.js">
-    <link rel="stylesheet" href="assets/App.91ddd4a6.css">
-    <link rel="stylesheet" href="assets/page.6c73043b.css">
-  </head>
-  <body>
-    <div id="app"></div>
-    
-  </body>
-</html>
-```
+    <link rel="icon" href="/static/vue3/runtime/page/favicon.png" type="image/png">
+    <title>Vue3 Page</title>
+    <style>
+      html,
+      body,
+      #app {
+        width: 100%;
+        height: 100%;
+      }
 
-插入项目信息后的 page.html 
-```html
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Publish Page</title>
-    <!-- 这里插入了项目相关的 DSL.js -->
-    <script type="module" src="./DSL.js"></script>
-    <script src="https://unpkg.com/vue@next/dist/vue.runtime.global.js"></script>
-    <script type="module" crossorigin src="assets/page.js"></script>
-    <link rel="modulepreload" href="assets/App.10f9c9e1.js">
-    <link rel="modulepreload" href="assets/vendor.1dc07625.js">
-    <link rel="modulepreload" href="assets/index.3456a0b9.js">
-    <link rel="modulepreload" href="assets/components.js">
-    <link rel="stylesheet" href="assets/App.91ddd4a6.css">
-    <link rel="stylesheet" href="assets/page.6c73043b.css">
+      #app {
+        position: relative;
+        overflow: auto;
+      }
+
+      #app::-webkit-scrollbar {
+        width: 0 !important;
+        display: none;
+      }
+    </style>
+    <script type='module' src='./DSL.js'></script>
+	  <script src="https://unpkg.com/vue@next/dist/vue.runtime.global.js"></script>
+    <script type="module" crossorigin src="/static/vue3/runtime/page/assets/index.2a9a64ca.js"></script>
+    <script type="module">try{import.meta.url;import("_").catch(()=>1);}catch(e){}window.__vite_is_modern_browser=true;</script>
+    <script type="module">!function(){if(window.__vite_is_modern_browser)return;console.warn("vite: loading legacy build because dynamic import or import.meta.url is unsupported, syntax error above should be ignored");var e=document.getElementById("vite-legacy-polyfill"),n=document.createElement("script");n.src=e.src,n.onload=function(){System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))},document.body.appendChild(n)}();</script>
   </head>
   <body>
     <div id="app"></div>
     
+    <script nomodule>!function(){var e=document,t=e.createElement("script");if(!("noModule"in t)&&"onbeforeload"in t){var n=!1;e.addEventListener("beforeload",(function(e){if(e.target===t)n=!0;else if(!e.target.hasAttribute("nomodule")||!n)return;e.preventDefault()}),!0),t.type="module",t.src=".",e.head.appendChild(t),t.remove()}}();</script>
+    <script nomodule crossorigin id="vite-legacy-polyfill" src="/static/vue3/runtime/page/assets/polyfills-legacy.a62c3647.js"></script>
+    <script nomodule crossorigin id="vite-legacy-entry" data-src="/static/vue3/runtime/page/assets/index-legacy.1dc0be94.js">System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))</script>
   </body>
 </html>
 
 ```
 
+其中DSL.js文件为：
+
+```
+window.magicDSL = [
+  // DSL
+]
+```

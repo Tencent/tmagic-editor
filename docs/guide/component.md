@@ -122,7 +122,7 @@ export default Test;
 在 runtime vue3 中，我们已经提供好一份示例。在 tmagic.config.ts 文件中。只需要在 packages 加入你创建的组件的路径（如果是个 npm 包，则将路径替换为包名即可），打包工具就会自动识别到你的组件。
 
 ### 3. 启动 playground
-在上面的步骤完成后，在 playground/src/page/Editor.vue 中。找到组件栏的基础组件列表，在其中加入你的开发组件
+在上面的步骤完成后，在 playground/src/configs/componentGroupList 中。找到组件栏的基础组件列表，在其中加入你的开发组件
 ```javascript
 {
   title: '基础组件',
