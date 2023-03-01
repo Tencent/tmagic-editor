@@ -220,7 +220,7 @@
 
 - **详情：**
 
-## refreshCombineInfo
+## refreshAllRelations
 
 - **参数：**
 

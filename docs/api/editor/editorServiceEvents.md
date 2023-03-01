@@ -9,27 +9,32 @@
 
 ## select
 
-- **详情：** 选中组价，[editorService.select()](./editorServiceMethods.md#select)后触发
+- **详情：** 选中组件，[editorService.select()](./editorServiceMethods.md#select)后触发
 
 - **回调函数：** (node: [MNode](https://github.com/Tencent/tmagic-editor/blob/c143a5f7670ae61d80c1a2cfcc780cfb5259849d/packages/schema/src/index.ts#L99)) => void
 
 ## add
 
-- **详情：** 选中组价，[editorService.add()](./editorServiceMethods.md#add)后触发
+- **详情：** 选中组件，[editorService.add()](./editorServiceMethods.md#add)后触发
 
 - **回调函数：** (node: [MNode](https://github.com/Tencent/tmagic-editor/blob/c143a5f7670ae61d80c1a2cfcc780cfb5259849d/packages/schema/src/index.ts#L99)[]) => void
 
 
 ## remove
 
-- **详情：** 选中组价，[editorService.remove()](./editorServiceMethods.md#remove)后触发
+- **详情：** 选中组件，[editorService.remove()](./editorServiceMethods.md#remove)后触发
 
 - **回调函数：** (node: [MNode](https://github.com/Tencent/tmagic-editor/blob/c143a5f7670ae61d80c1a2cfcc780cfb5259849d/packages/schema/src/index.ts#L99)[]) => void
 
 
 ## update
 
-- **详情：** 选中组价，[editorService.update()](./editorServiceMethods.md#update)后触发
+- **详情：** 选中组件，[editorService.update()](./editorServiceMethods.md#update)后触发
 
 - **回调函数：** (node: [MNode](https://github.com/Tencent/tmagic-editor/blob/c143a5f7670ae61d80c1a2cfcc780cfb5259849d/packages/schema/src/index.ts#L99)[]) => void
 
+
+## history-change
+- **详情：** 历史记录改变，[editorService.redo()，editorService.undo()](./editorServiceMethods.html#undo)后触发
+
+- **回调函数：** (node: [MNode](https://github.com/Tencent/tmagic-editor/blob/c143a5f7670ae61d80c1a2cfcc780cfb5259849d/packages/schema/src/index.ts#L99)) => void
