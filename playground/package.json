@@ -20,7 +20,7 @@
     "@tmagic/schema": "1.2.7",
     "@tmagic/stage": "1.2.7",
     "@tmagic/utils": "1.2.7",
-    "element-plus": "^2.2.19",
+    "element-plus": "^2.2.32",
     "monaco-editor": "^0.34.0",
     "serialize-javascript": "^6.0.0",
     "terser": "^5.14.2",

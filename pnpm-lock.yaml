@@ -18,7 +18,7 @@ importers:
       commitizen: ^4.2.4
       conventional-changelog-cli: ^2.2.2
       cz-conventional-changelog: ^3.3.0
-      element-plus: ^2.2.19
+      element-plus: ^2.2.32
       enquirer: ^2.3.6
       eslint: ^7.29.0
       eslint-config-tencent: ^1.0.4
@@ -58,7 +58,7 @@ importers:
       commitizen: 4.2.4
       conventional-changelog-cli: 2.2.2
       cz-conventional-changelog: 3.3.0
-      element-plus: 2.2.19_vue@3.2.37
+      element-plus: 2.2.32_vue@3.2.37
       enquirer: 2.3.6
       eslint: 7.32.0
       eslint-config-tencent: 1.0.4_yc26u4iv6m7pqrlmpzebuxponm
@@ -221,13 +221,13 @@ importers:
   packages/element-plus-adapter:
     specifiers:
       '@types/node': ^15.12.4
-      element-plus: ^2.2.19
+      element-plus: ^2.2.32
       rimraf: ^3.0.2
       typescript: ^4.7.4
       vite: ^3.1.3
       vue: ^3.2.37
     dependencies:
-      element-plus: 2.2.19_vue@3.2.37
+      element-plus: 2.2.32_vue@3.2.37
       vue: 3.2.37
     devDependencies:
       '@types/node': 15.14.9
@@ -371,14 +371,14 @@ importers:
       '@types/node': ^15.12.4
       '@vitejs/plugin-vue': ^3.1.0
       '@vue/compiler-sfc': ^3.2.37
-      element-plus: ^2.2.19
+      element-plus: ^2.2.32
       rimraf: ^3.0.2
       tdesign-vue-next: ^0.26.0
       typescript: ^4.7.4
       vite: ^3.1.3
       vue: ^3.2.37
     dependencies:
-      element-plus: 2.2.19_vue@3.2.45
+      element-plus: 2.2.32_vue@3.2.45
       tdesign-vue-next: 0.26.0_vue@3.2.45
       vue: 3.2.45
     devDependencies:
@@ -489,7 +489,7 @@ importers:
       '@vitejs/plugin-vue': ^3.1.0
       '@vitejs/plugin-vue-jsx': ^1.3.10
       '@vue/compiler-sfc': ^3.2.37
-      element-plus: ^2.2.19
+      element-plus: ^2.2.32
       monaco-editor: ^0.34.0
       sass: ^1.35.1
       serialize-javascript: ^6.0.0
@@ -510,7 +510,7 @@ importers:
       '@tmagic/schema': link:../packages/schema
       '@tmagic/stage': link:../packages/stage
       '@tmagic/utils': link:../packages/utils
-      element-plus: 2.2.19_vue@3.2.37
+      element-plus: 2.2.32_vue@3.2.37
       monaco-editor: 0.34.0
       serialize-javascript: 6.0.0
       terser: 5.14.2
@@ -3395,8 +3395,8 @@ packages:
   /electron-to-chromium/1.4.147:
     resolution: {integrity: sha512-czclPqxLMPqPMkahKcske4TaS5lcznsc26ByBlEFDU8grTBVK9C5W6K9I6oEEhm4Ai4jTihGnys90xY1yjXcRg==}
 
-  /element-plus/2.2.19_vue@3.2.37:
-    resolution: {integrity: sha512-uN0gt9lUus/IHzu5J6vkbYoYJgUtU05osdtFv9RO27bHKOG5GN7dH6uA3OKfkQQ6R2sV8ZxY1rc9PH1X8Dgrow==}
+  /element-plus/2.2.32_vue@3.2.37:
+    resolution: {integrity: sha512-DTJMhYOy6MApbmh6z/95hPTK5WrBiNHGzV4IN+uEkup1WoimQ+Qyt8RxKdTe/X1LWEJ8YgWv/Cl8P4ocrt5z5g==}
     peerDependencies:
       vue: ^3.2.0
     dependencies:
@@ -3419,8 +3419,8 @@ packages:
     transitivePeerDependencies:
       - '@vue/composition-api'
 
-  /element-plus/2.2.19_vue@3.2.45:
-    resolution: {integrity: sha512-uN0gt9lUus/IHzu5J6vkbYoYJgUtU05osdtFv9RO27bHKOG5GN7dH6uA3OKfkQQ6R2sV8ZxY1rc9PH1X8Dgrow==}
+  /element-plus/2.2.32_vue@3.2.45:
+    resolution: {integrity: sha512-DTJMhYOy6MApbmh6z/95hPTK5WrBiNHGzV4IN+uEkup1WoimQ+Qyt8RxKdTe/X1LWEJ8YgWv/Cl8P4ocrt5z5g==}
     peerDependencies:
       vue: ^3.2.0
     dependencies:

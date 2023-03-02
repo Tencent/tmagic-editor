@@ -36,12 +36,12 @@
     "typescript"
   ],
   "dependencies": {
-    "element-plus": "^2.2.19",
+    "element-plus": "^2.2.32",
     "tdesign-vue-next": "^0.26.0",
     "vue": "^3.2.37"
   },
   "peerDependencies": {
-    "element-plus": "^2.2.19",
+    "element-plus": "^2.2.32",
     "tdesign-vue-next": "^0.26.0",
     "vue": "^3.2.37"
   },
