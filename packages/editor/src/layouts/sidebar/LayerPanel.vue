@@ -287,6 +287,9 @@ const toggleClickFlag = () => {
 
 // 选择节点多选框
 const checkHandler = (data: MNode, { checkedNodes }: any): void => {
+  if (!isCtrlKeyDown.value && nodes.value.length < 2) {
+    return;
+  }
   if (checkedNodes.length > 0) {
     multiSelect(checkedNodes.map((node: MNode) => node.id));
   } else {
