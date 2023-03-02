@@ -1,3 +1,20 @@
+## [1.2.7](https://github.com/Tencent/tmagic-editor/compare/v1.2.6...v1.2.7) (2023-03-02)
+
+
+### Bug Fixes
+
+* **design:** element-plus@2.2.22开始scrollbar.wrap$改成wrapRef ([62038c8](https://github.com/Tencent/tmagic-editor/commit/62038c8c601f4143ea8812f4d77782c6dac69df0))
+* **stage:** 选择父组件的able功能丢失 ([b4bee9e](https://github.com/Tencent/tmagic-editor/commit/b4bee9eb82b5367d8a6e1960b5bab02ab8f6f8e3))
+
+
+### Features
+
+* **cli:** cli返回app ([c41af9d](https://github.com/Tencent/tmagic-editor/commit/c41af9d01d3746d218e3f71166c54eb2a9476fe2))
+* **form:** 支持表单差异对比 ([6610f30](https://github.com/Tencent/tmagic-editor/commit/6610f30afd84fce9a989f49eb2de8a9b8eee745a))
+* **stage,editor:** 增肌删除快捷按钮 ([c9bacb9](https://github.com/Tencent/tmagic-editor/commit/c9bacb96cddfc69b737a8ecb058f5479ba8240b7))
+
+
+
 ## [1.2.6](https://github.com/Tencent/tmagic-editor/compare/v1.2.5...v1.2.6) (2023-02-21)
 
 
