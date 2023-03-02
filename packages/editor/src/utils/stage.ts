@@ -1,6 +1,6 @@
 import { computed } from 'vue';
 
-import StageCore, { GuidesType, SortEventData, UpdateEventData } from '@tmagic/stage';
+import StageCore, { GuidesType, RemoveEventData, SortEventData, UpdateEventData } from '@tmagic/stage';
 
 import editorService from '../services/editor';
 import uiService from '../services/ui';
@@ -71,6 +71,14 @@ export const useStage = (stageOptions: StageOptions) => {
 
   stage.on('sort', (ev: SortEventData) => {
     editorService.sort(ev.src, ev.dist);
+  });
+
+  stage.on('remove', (ev: RemoveEventData) => {
+    editorService.remove(
+      ev.data.map(({ el }) => ({
+        id: el.id,
+      })),
+    );
   });
 
   stage.on('select-parent', () => {

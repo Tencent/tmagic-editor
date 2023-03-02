@@ -30,6 +30,7 @@ import {
   GuidesEventData,
   Point,
   RemoveData,
+  RemoveEventData,
   Runtime,
   StageCoreConfig,
   UpdateData,
@@ -313,6 +314,9 @@ export default class StageCore extends EventEmitter {
       })
       .on('select-parent', () => {
         this.emit('select-parent');
+      })
+      .on('remove', (data: RemoveEventData) => {
+        this.emit('remove', data);
       });
   }
 

@@ -22,8 +22,8 @@ import { merge } from 'lodash-es';
 import { MoveableOptions } from 'moveable';
 
 import { GuidesType, Mode } from './const';
-import selectParentAbles from './MoveableSelectParentAble';
-import { GetRootContainer, MoveableOptionsManagerConfig } from './types';
+import MoveableActionsAble from './MoveableActionsAble';
+import { AbleActionEventType, GetRootContainer, MoveableOptionsManagerConfig } from './types';
 import { getOffset } from './util';
 
 /**
@@ -173,10 +173,10 @@ export default class MoveableOptionsManager extends EventEmitter {
       isDisplayInnerSnapDigit: true,
 
       props: {
-        selectParent: true,
+        actions: true,
       },
 
-      ables: [selectParentAbles(this.selectParentHandler.bind(this))],
+      ables: [MoveableActionsAble(this.actionHandler.bind(this))],
     };
   }
 
@@ -208,8 +208,8 @@ export default class MoveableOptionsManager extends EventEmitter {
   /**
    * 这是给selectParentAbles的回调函数，用于触发选中父元素事件
    */
-  private selectParentHandler(): void {
-    this.emit('select-parent');
+  private actionHandler(type: AbleActionEventType): void {
+    this.emit(type);
   }
 
   /**
