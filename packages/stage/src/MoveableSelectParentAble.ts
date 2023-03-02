@@ -1,7 +1,7 @@
 import { MoveableManagerInterface, Renderer } from 'moveable';
 
 export default (selectParentHandler: () => void) => ({
-  name: 'select-parent',
+  name: 'selectParent',
   props: {},
   events: {},
   render(moveable: MoveableManagerInterface<any, any>, React: Renderer) {
