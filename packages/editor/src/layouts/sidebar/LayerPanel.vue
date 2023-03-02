@@ -221,10 +221,15 @@ watch(nodes, (nodes) => {
   ) {
     tree.value?.setCheckedKeys([], false);
 
-    [currentNodeKey.value] = ids;
     checkedKeys.value = ids.filter((id) => id !== page.value?.id);
     expandedKeys.value = union(expandedKeys.value, ids);
   }
+
+  [currentNodeKey.value] = ids;
+
+  setTimeout(() => {
+    tree.value?.setCurrentKey(currentNodeKey.value);
+  });
 });
 
 watch(isMultiSelect, (isMultiSelect) => {
