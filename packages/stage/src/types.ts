@@ -190,6 +190,12 @@ export interface UpdateEventData {
   parentEl: HTMLElement | null;
 }
 
+export interface RemoveEventData {
+  data: {
+    el: HTMLElement;
+  }[];
+}
+
 export interface SortEventData {
   src: Id;
   dist: Id;
@@ -243,4 +249,9 @@ export interface TargetShadowConfig {
   zIndex?: ZIndex;
   updateDragEl?: UpdateDragEl;
   idPrefix?: string;
+}
+
+export enum AbleActionEventType {
+  SELECT_PARENT = 'select-parent',
+  REMOVE = 'remove',
 }

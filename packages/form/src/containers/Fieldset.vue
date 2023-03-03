@@ -24,6 +24,8 @@
           v-for="(item, index) in config.items"
           :key="key(item, index)"
           :model="name ? model[name] : model"
+          :lastValues="name ? lastValues[name] : lastValues"
+          :is-compare="isCompare"
           :rules="name ? rules[name] : []"
           :config="item"
           :prop="prop"
@@ -31,6 +33,7 @@
           :labelWidth="lWidth"
           :size="size"
           @change="change"
+          @add-diff-count="onAddDiffCount()"
         ></Container>
       </div>
 
@@ -42,6 +45,8 @@
         v-for="(item, index) in config.items"
         :key="key(item, index)"
         :model="name ? model[name] : model"
+        :lastValues="name ? lastValues[name] : lastValues"
+        :is-compare="isCompare"
         :rules="name ? rules[name] : []"
         :config="item"
         :prop="prop"
@@ -49,6 +54,7 @@
         :size="size"
         :disabled="disabled"
         @change="change"
+        @addDiffCount="onAddDiffCount()"
       ></Container>
     </template>
   </fieldset>
@@ -69,6 +75,8 @@ const props = withDefaults(
     prop: string;
     size?: string;
     model: Record<string, any>;
+    lastValues?: Record<string, any>;
+    isCompare?: boolean;
     config: FieldsetConfig;
     rules?: any;
     disabled?: boolean;
@@ -76,10 +84,12 @@ const props = withDefaults(
   {
     rules: {},
     prop: '',
+    lastValues: () => ({}),
+    isCompare: false,
   },
 );
 
-const emit = defineEmits(['change']);
+const emit = defineEmits(['change', 'addDiffCount']);
 
 const mForm = inject<FormState | undefined>('mForm');
 
@@ -113,4 +123,5 @@ if (props.config.checkbox && name.value) {
     },
   );
 }
+const onAddDiffCount = () => emit('addDiffCount');
 </script>

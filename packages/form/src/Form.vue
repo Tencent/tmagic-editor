@@ -15,6 +15,8 @@
         :key="item[keyProp] ?? index"
         :config="item"
         :model="values"
+        :last-values="lastValuesProcessed"
+        :is-compare="isCompare"
         :label-width="item.labelWidth || labelWidth"
         :step-active="stepActive"
         :size="size"
@@ -26,8 +28,8 @@
 
 <script setup lang="ts" name="MForm">
 import { provide, reactive, ref, toRaw, watch, watchEffect } from 'vue';
+import { isEqual } from 'lodash-es';
 import cloneDeep from 'lodash-es/cloneDeep';
-import isEqual from 'lodash-es/isEqual';
 
 import { TMagicForm } from '@tmagic/design';
 
@@ -38,8 +40,14 @@ import type { FormConfig, FormState, FormValue, ValidateError } from './schema';
 
 const props = withDefaults(
   defineProps<{
+    /** 表单配置 */
     config: FormConfig;
+    /** 表单值 */
     initValues: Object;
+    /** 需对比的值（开启对比模式时传入） */
+    lastValues?: Object;
+    /** 是否开启对比模式 */
+    isCompare?: boolean;
     parentValues?: Object;
     labelWidth?: string;
     disabled?: boolean;
@@ -54,6 +62,8 @@ const props = withDefaults(
   {
     config: () => [],
     initValues: () => ({}),
+    lastValues: () => ({}),
+    isCompare: false,
     parentValues: () => ({}),
     labelWidth: '200px',
     disabled: false,
@@ -70,6 +80,7 @@ const emit = defineEmits(['change', 'field-input', 'field-change']);
 const tMagicForm = ref<InstanceType<typeof TMagicForm>>();
 const initialized = ref(false);
 const values = ref<FormValue>({});
+const lastValuesProcessed = ref<FormValue>({});
 const fields = new Map<string, any>();
 
 const requestFuc = getConfig('request') as Function;
@@ -79,8 +90,11 @@ const formState: FormState = reactive<FormState>({
   popperClass: props.popperClass,
   config: props.config,
   initValues: props.initValues,
+  isCompare: props.isCompare,
+  lastValues: props.lastValues,
   parentValues: props.parentValues,
   values,
+  lastValuesProcessed,
   $emit: emit as (event: string, ...args: any[]) => void,
   fields,
   setField: (prop: string, field: any) => fields.set(prop, field),
@@ -98,6 +112,8 @@ const formState: FormState = reactive<FormState>({
 
 watchEffect(() => {
   formState.initValues = props.initValues;
+  formState.lastValues = props.lastValues;
+  formState.isCompare = props.isCompare;
   formState.config = props.config;
   formState.keyProp = props.keyProp;
   formState.popperClass = props.popperClass;
@@ -118,8 +134,20 @@ watch(
       config: props.config,
     }).then((value) => {
       values.value = value;
-      initialized.value = true;
+      // 非对比模式，初始化完成
+      initialized.value = !props.isCompare;
     });
+
+    if (props.isCompare) {
+      // 对比模式下初始化待对比的表单值
+      initValue(formState, {
+        initValues: props.lastValues,
+        config: props.config,
+      }).then((value) => {
+        lastValuesProcessed.value = value;
+        initialized.value = true;
+      });
+    }
   },
   { immediate: true },
 );
@@ -130,6 +158,7 @@ const changeHandler = () => {
 
 defineExpose({
   values,
+  lastValuesProcessed,
   formState,
   initialized,
 

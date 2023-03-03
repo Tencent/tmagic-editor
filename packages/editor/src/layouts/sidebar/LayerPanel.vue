@@ -221,10 +221,15 @@ watch(nodes, (nodes) => {
   ) {
     tree.value?.setCheckedKeys([], false);
 
-    [currentNodeKey.value] = ids;
     checkedKeys.value = ids.filter((id) => id !== page.value?.id);
     expandedKeys.value = union(expandedKeys.value, ids);
   }
+
+  [currentNodeKey.value] = ids;
+
+  setTimeout(() => {
+    tree.value?.setCurrentKey(currentNodeKey.value);
+  });
 });
 
 watch(isMultiSelect, (isMultiSelect) => {
@@ -287,6 +292,9 @@ const toggleClickFlag = () => {
 
 // 选择节点多选框
 const checkHandler = (data: MNode, { checkedNodes }: any): void => {
+  if (!isCtrlKeyDown.value && nodes.value.length < 2) {
+    return;
+  }
   if (checkedNodes.length > 0) {
     multiSelect(checkedNodes.map((node: MNode) => node.id));
   } else {

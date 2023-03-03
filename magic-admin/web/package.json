@@ -20,7 +20,7 @@
     "axios": "^0.27.2",
     "axios-jsonp": "^1.0.4",
     "core-js": "^3.20.0",
-    "element-plus": "^2.2.19",
+    "element-plus": "^2.2.32",
     "js-cookie": "^3.0.0",
     "serialize-javascript": "^6.0.0",
     "vue": "^3.2.26",

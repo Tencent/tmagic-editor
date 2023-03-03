@@ -9,6 +9,7 @@
           style="width: 100%"
           :row-key="config.rowKey || 'id'"
           :data="data"
+          :lastData="lastData"
           :border="config.border"
           :max-height="config.maxHeight"
           :default-expand-all="true"
@@ -108,8 +109,11 @@
                   :rules="column.rules"
                   :config="makeConfig(column, scope.row)"
                   :model="scope.row"
+                  :lastValues="lastData[scope.$index]"
+                  :is-compare="isCompare"
                   :size="size"
                   @change="$emit('change', model[modelName])"
+                  @addDiffCount="onAddDiffCount()"
                 ></Container>
               </template>
             </TMagicTableColumn>
@@ -196,6 +200,8 @@ import Container from './Container.vue';
 const props = withDefaults(
   defineProps<{
     model: any;
+    lastValues?: any;
+    isCompare?: boolean;
     config: TableConfig;
     name: string;
     prop?: string;
@@ -213,10 +219,12 @@ const props = withDefaults(
     sortKey: '',
     enableToggleMode: true,
     showIndex: true,
+    lastValues: () => ({}),
+    isCompare: false,
   },
 );
 
-const emit = defineEmits(['change', 'select']);
+const emit = defineEmits(['change', 'select', 'addDiffCount']);
 
 let timer: any | null = null;
 const mForm = inject<FormState | undefined>('mForm');
@@ -239,6 +247,15 @@ const data = computed(() =>
           index >= pagecontext.value * pagesize.value && index + 1 <= (pagecontext.value + 1) * pagesize.value,
       )
     : props.model[modelName.value],
+);
+
+const lastData = computed(() =>
+  props.config.pagination
+    ? props.lastValues[modelName.value].filter(
+        (item: any, index: number) =>
+          index >= pagecontext.value * pagesize.value && index + 1 <= (pagecontext.value + 1) * pagesize.value,
+      )
+    : props.lastValues[modelName.value] || {},
 );
 
 const sortChange = ({ prop, order }: SortProp) => {
@@ -592,6 +609,8 @@ const getProp = (index: number) => {
   const { prop } = toRefs(props);
   return `${prop.value}${prop.value ? '.' : ''}${index + 1 + pagecontext.value * pagesize.value - 1}`;
 };
+
+const onAddDiffCount = () => emit('addDiffCount');
 
 defineExpose({
   toggleRowSelection,

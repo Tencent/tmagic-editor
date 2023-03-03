@@ -366,6 +366,15 @@ export default defineConfig({
               link: '/form-config/relate.md',
             }
           ]
+        },
+        {
+          text: '表单对比',
+          items: [
+            {
+              text: '表单对比',
+              link: '/form-config/compare.md',
+            }
+          ]
         }
       ]
     },

@@ -39,6 +39,7 @@ import {
   GetTargetElement,
   IsContainer,
   Point,
+  RemoveEventData,
   SelectStatus,
   StageDragStatus,
   UpdateEventData,
@@ -454,6 +455,14 @@ export default class ActionManager extends EventEmitter {
       })
       .on('select-parent', () => {
         this.emit('select-parent');
+      })
+      .on('remove', () => {
+        const drTarget = this.dr.getTarget();
+        if (!drTarget) return;
+        const data: RemoveEventData = {
+          data: [{ el: drTarget }],
+        };
+        this.emit('remove', data);
       });
 
     this.multiDr

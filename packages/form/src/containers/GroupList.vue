@@ -10,6 +10,8 @@
       v-for="(item, index) in model[name]"
       :key="index"
       :model="item"
+      :lastValues="getLastValues(lastValues[name], index)"
+      :is-compare="isCompare"
       :config="config"
       :prop="prop"
       :index="index"
@@ -20,6 +22,7 @@
       @remove-item="removeHandler"
       @swap-item="swapHandler"
       @change="changeHandler"
+      @addDiffCount="onAddDiffCount()"
     ></MFieldsGroupListItem>
 
     <TMagicButton @click="addHandler" size="small" :disabled="disabled" v-if="addable">添加组</TMagicButton>
@@ -41,6 +44,8 @@ import MFieldsGroupListItem from './GroupListItem.vue';
 
 const props = defineProps<{
   model: any;
+  lastValues?: any;
+  isCompare?: boolean;
   config: GroupListConfig;
   name: string;
   labelWidth?: string;
@@ -49,7 +54,7 @@ const props = defineProps<{
   disabled?: boolean;
 }>();
 
-const emit = defineEmits(['change']);
+const emit = defineEmits(['change', 'addDiffCount']);
 
 const mForm = inject<FormState | undefined>('mForm');
 
@@ -123,4 +128,7 @@ const toggleMode = () => {
       text: null,
     }))) as any;
 };
+const onAddDiffCount = () => emit('addDiffCount');
+
+const getLastValues = (item: any, index: number) => item?.[index] || {};
 </script>

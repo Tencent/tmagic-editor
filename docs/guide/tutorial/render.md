@@ -8,7 +8,7 @@ tmagic 提供了 vue3/vue2/react 三个版本的解析渲染组件，可以直�
 
 [@tmagic/ui-react](https://www.npmjs.com/package/@tmagic/ui-react)
 
-接下来是已vue3为基础，来讲述如何实现一个[@tmagic/ui](https://www.npmjs.com/package/@tmagic/ui)
+接下来是以vue3为基础，来讲述如何实现一个[@tmagic/ui](https://www.npmjs.com/package/@tmagic/ui)
 
 ## 准备工作
 

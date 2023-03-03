@@ -18,25 +18,26 @@
         :label="filter(tab.title)"
         :lazy="tab.lazy || false"
       >
+        <template #label>
+          <span class="custom-tabs-label">
+            {{ filter(tab.title)
+            }}<el-badge :hidden="!diffCount[tabIndex]" :value="diffCount[tabIndex]" class="diff-count-badge"></el-badge>
+          </span>
+        </template>
         <Container
           v-for="item in tabItems(tab)"
           :key="item[mForm?.keyProp || '__key']"
           :config="item"
           :disabled="disabled"
-          :model="
-            config.dynamic
-              ? (name ? model[name] : model)[tabIndex]
-              : tab.name
-              ? (name ? model[name] : model)[tab.name]
-              : name
-              ? model[name]
-              : model
-          "
+          :model="getValues(model, tabIndex, tab)"
+          :last-values="getValues(lastValues, tabIndex, tab)"
+          :is-compare="isCompare"
           :prop="config.dynamic ? `${prop}${prop ? '.' : ''}${String(tabIndex)}` : prop"
           :size="size"
           :label-width="tab.labelWidth || labelWidth"
           :expand-more="expandMore"
           @change="changeHandler"
+          @addDiffCount="onAddDiffCount(tabIndex)"
         ></Container>
       </component>
     </template>
@@ -53,6 +54,10 @@ import { FormState, TabConfig, TabPaneConfig } from '../schema';
 import { display as displayFunc, filterFunction } from '../utils/form';
 
 import Container from './Container.vue';
+
+type DiffCount = {
+  [tabIndex: number]: number;
+};
 
 const uiComponent = getConfig('components').tabPane;
 
@@ -83,21 +88,30 @@ const tabClick = (mForm: FormState | undefined, tab: any, props: any) => {
   }
 };
 
-const props = defineProps<{
-  model: any;
-  config: TabConfig;
-  name: string;
-  size?: string;
-  labelWidth?: string;
-  prop?: string;
-  expandMore?: boolean;
-  disabled?: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    model: any;
+    lastValues?: any;
+    isCompare?: boolean;
+    config: TabConfig;
+    name: string;
+    size?: string;
+    labelWidth?: string;
+    prop?: string;
+    expandMore?: boolean;
+    disabled?: boolean;
+  }>(),
+  {
+    lastValues: () => ({}),
+    isCompare: false,
+  },
+);
 
-const emit = defineEmits(['change']);
+const emit = defineEmits(['change', 'addDiffCount']);
 
 const mForm = inject<FormState | undefined>('mForm');
 const activeTabName = ref(getActive(mForm, props, ''));
+const diffCount = ref<DiffCount>({});
 
 const tabs = computed(() => {
   if (props.config.dynamic) {
@@ -169,5 +183,28 @@ const changeHandler = () => {
   if (typeof props.config.onChange === 'function') {
     props.config.onChange(mForm, { model: props.model, prop: props.prop, config: props.config });
   }
+};
+
+const getValues = (model: any, tabIndex: number, tab: any) => {
+  const tabName = props.config.dynamic ? (model[props?.name] || model)[tabIndex] : tab.name;
+  let propName = props.name;
+  if (tabName) {
+    propName = (model[props?.name] || model)[tab.name];
+  }
+  if (propName) {
+    return model[props.name];
+  }
+  return model;
+};
+
+// 在tabs组件中收集事件触发次数，即该tab下的差异数
+const onAddDiffCount = (tabIndex: number) => {
+  if (!diffCount.value[tabIndex]) {
+    diffCount.value[tabIndex] = 1;
+  } else {
+    diffCount.value[tabIndex] += 1;
+  }
+  // 继续抛出给更高层级的组件
+  emit('addDiffCount');
 };
 </script>

@@ -18,7 +18,7 @@ importers:
       commitizen: ^4.2.4
       conventional-changelog-cli: ^2.2.2
       cz-conventional-changelog: ^3.3.0
-      element-plus: ^2.2.19
+      element-plus: ^2.2.32
       enquirer: ^2.3.6
       eslint: ^7.29.0
       eslint-config-tencent: ^1.0.4
@@ -58,7 +58,7 @@ importers:
       commitizen: 4.2.4
       conventional-changelog-cli: 2.2.2
       cz-conventional-changelog: 3.3.0
-      element-plus: 2.2.19_vue@3.2.37
+      element-plus: 2.2.32_vue@3.2.37
       enquirer: 2.3.6
       eslint: 7.32.0
       eslint-config-tencent: 1.0.4_yc26u4iv6m7pqrlmpzebuxponm
@@ -107,7 +107,7 @@ importers:
 
   packages/core:
     specifiers:
-      '@tmagic/schema': 1.2.6
+      '@tmagic/schema': 1.2.7
       '@types/events': ^3.0.0
       '@types/lodash-es': ^4.17.4
       '@types/node': ^15.12.4
@@ -157,12 +157,12 @@ importers:
     specifiers:
       '@babel/core': ^7.18.0
       '@element-plus/icons-vue': ^2.0.9
-      '@tmagic/core': 1.2.6
-      '@tmagic/design': 1.2.6
-      '@tmagic/form': 1.2.6
-      '@tmagic/schema': 1.2.6
-      '@tmagic/stage': 1.2.6
-      '@tmagic/utils': 1.2.6
+      '@tmagic/core': 1.2.7
+      '@tmagic/design': 1.2.7
+      '@tmagic/form': 1.2.7
+      '@tmagic/schema': 1.2.7
+      '@tmagic/stage': 1.2.7
+      '@tmagic/utils': 1.2.7
       '@types/events': ^3.0.0
       '@types/lodash-es': ^4.17.4
       '@types/node': ^15.12.4
@@ -221,13 +221,13 @@ importers:
   packages/element-plus-adapter:
     specifiers:
       '@types/node': ^15.12.4
-      element-plus: ^2.2.19
+      element-plus: ^2.2.32
       rimraf: ^3.0.2
       typescript: ^4.7.4
       vite: ^3.1.3
       vue: ^3.2.37
     dependencies:
-      element-plus: 2.2.19_vue@3.2.37
+      element-plus: 2.2.32_vue@3.2.37
       vue: 3.2.37
     devDependencies:
       '@types/node': 15.14.9
@@ -239,8 +239,8 @@ importers:
     specifiers:
       '@babel/core': ^7.18.0
       '@element-plus/icons-vue': ^2.0.9
-      '@tmagic/design': 1.2.6
-      '@tmagic/utils': 1.2.6
+      '@tmagic/design': 1.2.7
+      '@tmagic/utils': 1.2.7
       '@types/lodash-es': ^4.17.4
       '@types/node': ^15.12.4
       '@types/sortablejs': ^1.10.7
@@ -292,31 +292,31 @@ importers:
 
   packages/stage:
     specifiers:
-      '@scena/guides': ^0.17.0
-      '@tmagic/core': 1.2.6
-      '@tmagic/schema': 1.2.6
-      '@tmagic/utils': 1.2.6
+      '@scena/guides': ^0.23.3
+      '@tmagic/core': 1.2.7
+      '@tmagic/schema': 1.2.7
+      '@tmagic/utils': 1.2.7
       '@types/events': ^3.0.0
       '@types/lodash-es': ^4.17.4
       '@types/node': ^15.12.4
       events: ^3.3.0
       keycon: ^1.1.2
       lodash-es: ^4.17.21
-      moveable: ^0.30.0
+      moveable: ^0.43.1
       moveable-helper: ^0.4.0
       rimraf: ^3.0.2
       sass: ^1.35.1
       typescript: ^4.7.4
       vite: ^3.1.3
     dependencies:
-      '@scena/guides': 0.17.0
+      '@scena/guides': 0.23.3
       '@tmagic/core': link:../core
       '@tmagic/schema': link:../schema
       '@tmagic/utils': link:../utils
       events: 3.3.0
       keycon: 1.1.2
       lodash-es: 4.17.21
-      moveable: 0.30.0
+      moveable: 0.43.1
       moveable-helper: 0.4.0
     devDependencies:
       '@types/events': 3.0.0
@@ -329,9 +329,9 @@ importers:
 
   packages/table:
     specifiers:
-      '@tmagic/design': 1.2.6
-      '@tmagic/form': 1.2.6
-      '@tmagic/utils': 1.2.6
+      '@tmagic/design': 1.2.7
+      '@tmagic/form': 1.2.7
+      '@tmagic/utils': 1.2.7
       '@types/color': ^3.0.1
       '@types/lodash-es': ^4.17.4
       '@types/node': ^15.12.4
@@ -371,14 +371,14 @@ importers:
       '@types/node': ^15.12.4
       '@vitejs/plugin-vue': ^3.1.0
       '@vue/compiler-sfc': ^3.2.37
-      element-plus: ^2.2.19
+      element-plus: ^2.2.32
       rimraf: ^3.0.2
       tdesign-vue-next: ^0.26.0
       typescript: ^4.7.4
       vite: ^3.1.3
       vue: ^3.2.37
     dependencies:
-      element-plus: 2.2.19_vue@3.2.45
+      element-plus: 2.2.32_vue@3.2.45
       tdesign-vue-next: 0.26.0_vue@3.2.45
       vue: 3.2.45
     devDependencies:
@@ -392,9 +392,9 @@ importers:
   packages/ui:
     specifiers:
       '@testing-library/vue': ^6.4.2
-      '@tmagic/core': 1.2.6
-      '@tmagic/schema': 1.2.6
-      '@tmagic/utils': 1.2.6
+      '@tmagic/core': 1.2.7
+      '@tmagic/schema': 1.2.7
+      '@tmagic/utils': 1.2.7
       '@types/qrcode': ^1.4.2
       '@vue/compiler-sfc': ^3.2.37
       '@vue/test-utils': ^2.0.0
@@ -418,8 +418,8 @@ importers:
 
   packages/ui-react:
     specifiers:
-      '@tmagic/core': 1.2.6
-      '@tmagic/schema': 1.2.6
+      '@tmagic/core': 1.2.7
+      '@tmagic/schema': 1.2.7
       '@types/react': ^17.0.37
       '@types/react-dom': ^17.0.11
       qrcode: ^1.5.0
@@ -439,9 +439,9 @@ importers:
 
   packages/ui-vue2:
     specifiers:
-      '@tmagic/core': 1.2.6
-      '@tmagic/schema': 1.2.6
-      '@tmagic/utils': 1.2.6
+      '@tmagic/core': 1.2.7
+      '@tmagic/schema': 1.2.7
+      '@tmagic/utils': 1.2.7
       qrcode: ^1.5.0
       vite: ^3.1.3
       vue: ^2.7.4
@@ -458,7 +458,7 @@ importers:
 
   packages/utils:
     specifiers:
-      '@tmagic/schema': 1.2.6
+      '@tmagic/schema': 1.2.7
       '@types/node': ^15.12.4
       dayjs: ^1.11.4
       rimraf: ^3.0.2
@@ -476,20 +476,20 @@ importers:
   playground:
     specifiers:
       '@element-plus/icons-vue': ^2.0.9
-      '@tmagic/design': 1.2.6
-      '@tmagic/editor': 1.2.6
-      '@tmagic/element-plus-adapter': 1.2.6
-      '@tmagic/form': 1.2.6
-      '@tmagic/schema': 1.2.6
-      '@tmagic/stage': 1.2.6
-      '@tmagic/utils': 1.2.6
+      '@tmagic/design': 1.2.7
+      '@tmagic/editor': 1.2.7
+      '@tmagic/element-plus-adapter': 1.2.7
+      '@tmagic/form': 1.2.7
+      '@tmagic/schema': 1.2.7
+      '@tmagic/stage': 1.2.7
+      '@tmagic/utils': 1.2.7
       '@types/node': ^15.12.4
       '@types/serialize-javascript': ^5.0.1
       '@vitejs/plugin-legacy': ^2.2.0
       '@vitejs/plugin-vue': ^3.1.0
       '@vitejs/plugin-vue-jsx': ^1.3.10
       '@vue/compiler-sfc': ^3.2.37
-      element-plus: ^2.2.19
+      element-plus: ^2.2.32
       monaco-editor: ^0.34.0
       sass: ^1.35.1
       serialize-javascript: ^6.0.0
@@ -510,7 +510,7 @@ importers:
       '@tmagic/schema': link:../packages/schema
       '@tmagic/stage': link:../packages/stage
       '@tmagic/utils': link:../packages/utils
-      element-plus: 2.2.19_vue@3.2.37
+      element-plus: 2.2.32_vue@3.2.37
       monaco-editor: 0.34.0
       serialize-javascript: 6.0.0
       terser: 5.14.2
@@ -532,12 +532,12 @@ importers:
 
   runtime/react:
     specifiers:
-      '@tmagic/cli': 1.2.6
-      '@tmagic/core': 1.2.6
-      '@tmagic/schema': 1.2.6
-      '@tmagic/stage': 1.2.6
-      '@tmagic/ui-react': 1.2.6
-      '@tmagic/utils': 1.2.6
+      '@tmagic/cli': 1.2.7
+      '@tmagic/core': 1.2.7
+      '@tmagic/schema': 1.2.7
+      '@tmagic/stage': 1.2.7
+      '@tmagic/ui-react': 1.2.7
+      '@tmagic/utils': 1.2.7
       '@types/react': ^17.0.37
       '@types/react-dom': ^17.0.11
       '@vitejs/plugin-legacy': ^2.2.0
@@ -571,12 +571,12 @@ importers:
 
   runtime/vue2:
     specifiers:
-      '@tmagic/cli': 1.2.6
-      '@tmagic/core': 1.2.6
-      '@tmagic/schema': 1.2.6
-      '@tmagic/stage': 1.2.6
-      '@tmagic/ui-vue2': 1.2.6
-      '@tmagic/utils': 1.2.6
+      '@tmagic/cli': 1.2.7
+      '@tmagic/core': 1.2.7
+      '@tmagic/schema': 1.2.7
+      '@tmagic/stage': 1.2.7
+      '@tmagic/ui-vue2': 1.2.7
+      '@tmagic/utils': 1.2.7
       '@types/events': ^3.0.0
       '@vitejs/plugin-legacy': ^2.2.0
       '@vitejs/plugin-vue2': ^1.1.2
@@ -612,12 +612,12 @@ importers:
 
   runtime/vue3:
     specifiers:
-      '@tmagic/cli': 1.2.6
-      '@tmagic/core': 1.2.6
-      '@tmagic/schema': 1.2.6
-      '@tmagic/stage': 1.2.6
-      '@tmagic/ui': 1.2.6
-      '@tmagic/utils': 1.2.6
+      '@tmagic/cli': 1.2.7
+      '@tmagic/core': 1.2.7
+      '@tmagic/schema': 1.2.7
+      '@tmagic/stage': 1.2.7
+      '@tmagic/ui': 1.2.7
+      '@tmagic/utils': 1.2.7
       '@types/node': ^15.12.4
       '@vitejs/plugin-legacy': ^2.2.0
       '@vitejs/plugin-vue': ^3.1.0
@@ -1322,6 +1322,10 @@ packages:
     resolution: {integrity: sha512-ej5oVy6lykXsvieQtqZxCOaLT+xD4+QNarq78cIYISHmZXshCvROLudpQN3lfL8G0NL7plMSSK+zlyvCaIJ4Iw==}
     engines: {node: '>=10'}
 
+  /@daybrush/utils/1.10.2:
+    resolution: {integrity: sha512-fNMWeGUDokdIpebU8oIBUXkyGYITCwwodBfgx277p8d+kvI+k9wdFtKtdY4mvbWxhbAwuWprtVDq8My3KQ24Dg==}
+    dev: false
+
   /@daybrush/utils/1.6.0:
     resolution: {integrity: sha512-9MjMoOLl1U+l8lXByN3BbLZXf+mktoLyeb6t78Jz2WZ7LRldK0FNg8oW//9giO2hHCUyxS7LX6jS1hToGIfRWA==}
     dev: false
@@ -1583,10 +1587,10 @@ packages:
       picomatch: 2.3.1
     dev: true
 
-  /@scena/dragscroll/1.1.1:
-    resolution: {integrity: sha512-RnoGpQC0aJ5Z+glLzQAAAf1jmRac1yRuil4zi4HQ8GhzoxTqlgplAOGkFF/IRnUMK1uc5S6R/MEEybfyDGlEcQ==}
+  /@scena/dragscroll/1.4.0:
+    resolution: {integrity: sha512-3O8daaZD9VXA9CP3dra6xcgt/qrm0mg0xJCwiX6druCteQ9FFsXffkF8PrqxY4Z4VJ58fFKEa0RlKqbsi/XnRA==}
     dependencies:
-      '@daybrush/utils': 1.6.0
+      '@daybrush/utils': 1.10.2
       '@scena/event-emitter': 1.0.5
     dev: false
 
@@ -1596,11 +1600,12 @@ packages:
       '@daybrush/utils': 1.6.0
     dev: false
 
-  /@scena/guides/0.17.0:
-    resolution: {integrity: sha512-gs2um9m+X0oYoZ8oU2YHobiqGx5KxaI4CWy3frbqbUq4aPiaUNFD+uj/NQC9Ja5Ftl0rehhZAE/c1tbSYSILOQ==}
+  /@scena/guides/0.23.3:
+    resolution: {integrity: sha512-bbbByPjTku5qEx7OhMKlnJ5zXF2NSJekpLMFneRFEPK3evlb3viprOpMGCDswGvf06z7geyif4UZlABE9pLMYg==}
     dependencies:
       '@scena/event-emitter': 1.0.5
-      react-compat-guides: 0.14.0
+      react-compat-guides: 0.20.3
+      react-simple-compat: 1.2.3
     dev: false
 
   /@scena/matrix/1.1.1:
@@ -1609,21 +1614,22 @@ packages:
       '@daybrush/utils': 1.7.1
     dev: false
 
-  /@scena/react-guides/0.16.0:
-    resolution: {integrity: sha512-njivmQC89gsHKD1tqLsKwhQPADds+InloGDWsMDfEgfl9Fg0jE72RMLKJOxLW5kj/XMSDGSBB2FUWYTR4FcIZw==}
+  /@scena/react-guides/0.22.3:
+    resolution: {integrity: sha512-jnY1SlmHbzwWKVqAydw95fQNLIOgMAq9XKYEyN49wBxVswyhfNagdymOFMjEmFiJHe6mi8/nDz7sWIjNoNBL4A==}
     dependencies:
-      '@daybrush/utils': 1.6.0
-      '@scena/react-ruler': 0.8.1
+      '@daybrush/utils': 1.10.2
+      '@scena/dragscroll': 1.4.0
+      '@scena/react-ruler': 0.14.2
       css-to-mat: 1.0.3
       framework-utils: 1.1.0
-      gesto: 1.8.1
-      react-css-styled: 1.0.3_@daybrush+utils@1.6.0
+      gesto: 1.15.1
+      react-css-styled: 1.0.4_@daybrush+utils@1.10.2
     dev: false
 
-  /@scena/react-ruler/0.8.1:
-    resolution: {integrity: sha512-r9FbtF1kbs5CRrK7avVGcRvhJitk8BzzOUUV2uIEjDxS2dBqCOrUD2e09FXwPdv3hcFvVmGcLYeuNrjl4P7ddA==}
+  /@scena/react-ruler/0.14.2:
+    resolution: {integrity: sha512-69c7uu60zNMpJHBLniT3FK2CtaYEcIcs/yrZAy/uh+Zz6P9gs/Xo7sLdOf9tKf90MCOzdrJnqzqjLXlxpWYNCQ==}
     dependencies:
-      '@daybrush/utils': 1.6.0
+      '@daybrush/utils': 1.10.2
       framework-utils: 1.1.0
     dev: false
 
@@ -3135,6 +3141,15 @@ packages:
       which: 2.0.2
     dev: true
 
+  /css-styled/1.0.0_@daybrush+utils@1.10.2:
+    resolution: {integrity: sha512-lDdPvM2/djv+La110zVY3RGQ7X4OOlzLS+IEjRcn8UlUmJd1+GNcGfDFmsKWwnLBupsY1w0QM1gRgV4RdcCjfw==}
+    peerDependencies:
+      '@daybrush/utils': '>=1.0.0'
+    dependencies:
+      '@daybrush/utils': 1.10.2
+      string-hash: 1.1.3
+    dev: false
+
   /css-styled/1.0.0_@daybrush+utils@1.6.0:
     resolution: {integrity: sha512-lDdPvM2/djv+La110zVY3RGQ7X4OOlzLS+IEjRcn8UlUmJd1+GNcGfDFmsKWwnLBupsY1w0QM1gRgV4RdcCjfw==}
     peerDependencies:
@@ -3144,12 +3159,12 @@ packages:
       string-hash: 1.1.3
     dev: false
 
-  /css-styled/1.0.0_@daybrush+utils@1.7.1:
-    resolution: {integrity: sha512-lDdPvM2/djv+La110zVY3RGQ7X4OOlzLS+IEjRcn8UlUmJd1+GNcGfDFmsKWwnLBupsY1w0QM1gRgV4RdcCjfw==}
+  /css-styled/1.0.1_@daybrush+utils@1.10.2:
+    resolution: {integrity: sha512-psJCbNDPPusDBWH/gszP6BetPh577QaqpvaysTNPitxX0nxdGiTgELiOCus0gZ0yXk3gvjShBrFP07nvn58/TQ==}
     peerDependencies:
       '@daybrush/utils': '>=1.0.0'
     dependencies:
-      '@daybrush/utils': 1.7.1
+      '@daybrush/utils': 1.10.2
       string-hash: 1.1.3
     dev: false
 
@@ -3395,8 +3410,8 @@ packages:
   /electron-to-chromium/1.4.147:
     resolution: {integrity: sha512-czclPqxLMPqPMkahKcske4TaS5lcznsc26ByBlEFDU8grTBVK9C5W6K9I6oEEhm4Ai4jTihGnys90xY1yjXcRg==}
 
-  /element-plus/2.2.19_vue@3.2.37:
-    resolution: {integrity: sha512-uN0gt9lUus/IHzu5J6vkbYoYJgUtU05osdtFv9RO27bHKOG5GN7dH6uA3OKfkQQ6R2sV8ZxY1rc9PH1X8Dgrow==}
+  /element-plus/2.2.32_vue@3.2.37:
+    resolution: {integrity: sha512-DTJMhYOy6MApbmh6z/95hPTK5WrBiNHGzV4IN+uEkup1WoimQ+Qyt8RxKdTe/X1LWEJ8YgWv/Cl8P4ocrt5z5g==}
     peerDependencies:
       vue: ^3.2.0
     dependencies:
@@ -3419,8 +3434,8 @@ packages:
     transitivePeerDependencies:
       - '@vue/composition-api'
 
-  /element-plus/2.2.19_vue@3.2.45:
-    resolution: {integrity: sha512-uN0gt9lUus/IHzu5J6vkbYoYJgUtU05osdtFv9RO27bHKOG5GN7dH6uA3OKfkQQ6R2sV8ZxY1rc9PH1X8Dgrow==}
+  /element-plus/2.2.32_vue@3.2.45:
+    resolution: {integrity: sha512-DTJMhYOy6MApbmh6z/95hPTK5WrBiNHGzV4IN+uEkup1WoimQ+Qyt8RxKdTe/X1LWEJ8YgWv/Cl8P4ocrt5z5g==}
     peerDependencies:
       vue: ^3.2.0
     dependencies:
@@ -4698,17 +4713,17 @@ packages:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
     engines: {node: '>=6.9.0'}
 
+  /gesto/1.15.1:
+    resolution: {integrity: sha512-mqdBeVeYpymupHojEEyH33u0KvL/hbG6gKbqoQKoR7aeWrN82CIXYZkAo4Ie81PUhxS5HNDdmJVcSzqOpPm0JQ==}
+    dependencies:
+      '@daybrush/utils': 1.10.2
+      '@scena/event-emitter': 1.0.5
+    dev: false
+
   /gesto/1.8.1:
     resolution: {integrity: sha512-FwZ3e4C9cJ3DN1PgeOf9tFQIYzBk5RzavtT2bDzGG51Wbp6+JEGzX4A8VqbgkHVTBlJGaRLdsNKRnH0fIVFsmA==}
     dependencies:
       '@daybrush/utils': 1.6.0
-      '@scena/event-emitter': 1.0.5
-    dev: false
-
-  /gesto/1.9.0:
-    resolution: {integrity: sha512-WxzswA0zAHK+hM5WyR8G6PdIMt2d/TEY1lFfkfhC8YHHLO5pM5k8AyGu8lhwyBnrPntomWgLy3xl+iBzLHelew==}
-    dependencies:
-      '@daybrush/utils': 1.7.1
       '@scena/event-emitter': 1.0.5
     dev: false
 
@@ -5776,13 +5791,13 @@ packages:
       scenejs: 1.6.0
     dev: false
 
-  /moveable/0.30.0:
-    resolution: {integrity: sha512-WkIccP2vs7oi7Vtf7c8xmduyF7Kb6+lkJwxSOp+Yx3gFFHUdVTQDO8UhJWwuIrlX5eLymk99bIRi+RPttAK2Yg==}
+  /moveable/0.43.1:
+    resolution: {integrity: sha512-D533ZWgftClA0dVN1IrctxCFEYsRKDsQcT4VneI02TJu2N2ArtaPwkYi6Je/ZHx9ShxKbdS8iCzUkDLy1+yOyA==}
     dependencies:
       '@scena/event-emitter': 1.0.5
-      react-compat-moveable: 0.18.0
-      react-moveable: 0.33.0
-      react-simple-compat: 1.2.2
+      react-compat-moveable: 0.31.1
+      react-moveable: 0.46.1
+      react-simple-compat: 1.2.3
     dev: false
 
   /ms/2.0.0:
@@ -5947,10 +5962,10 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /overlap-area/1.0.0:
-    resolution: {integrity: sha512-Oi3hxRf6Flvv1upldnjOtV7euFkc75G/wsxYfS/ssNKEZ3Z+HbIoPHkFfLH3hgwqLJKpq9wdFo7I6xcdS6k8yg==}
+  /overlap-area/1.1.0:
+    resolution: {integrity: sha512-3dlJgJCaVeXH0/eZjYVJvQiLVVrPO4U1ZGqlATtx6QGO3b5eNM6+JgUKa7oStBTdYuGTk7gVoABCW6Tp+dhRdw==}
     dependencies:
-      '@daybrush/utils': 1.7.1
+      '@daybrush/utils': 1.10.2
     dev: false
 
   /p-limit/1.3.0:
@@ -6228,61 +6243,58 @@ packages:
     dependencies:
       safe-buffer: 5.2.1
 
-  /react-compat-css-styled/1.0.8:
-    resolution: {integrity: sha512-CG0kVbpKjiLMQc85pP50+Z0R9PGp7NIkkGqO88QTjEsSMOGKYlCXIAnXdKR2ZII23NJmA4XrJry03jkXOxTUkg==}
+  /react-compat-css-styled/1.0.9:
+    resolution: {integrity: sha512-YpUgTpXU1wR58aPQJVGAWq6QeEFWkafV0qq4Y8KRUwpQJLbJF2GYu5ZQ/kafHGvN3dqQX2e340NlNZ+zbZZv2w==}
     dependencies:
-      '@daybrush/utils': 1.6.0
-      css-styled: 1.0.0_@daybrush+utils@1.6.0
+      '@daybrush/utils': 1.10.2
+      css-styled: 1.0.0_@daybrush+utils@1.10.2
       framework-utils: 1.1.0
-      react-css-styled: 1.0.3_@daybrush+utils@1.6.0
+      react-css-styled: 1.0.4_@daybrush+utils@1.10.2
     dev: false
 
-  /react-compat-guides/0.14.0:
-    resolution: {integrity: sha512-Qy5ZYSZQmbp2VvhXf9K73ZgZvx+eiDPH6GNUzzKmPcPCKVYJ3L2rbBVReOyWV9XMSQI8tLmHfkICoDBXsBDeZA==}
+  /react-compat-guides/0.20.3:
+    resolution: {integrity: sha512-+N36pfgWgNBWmwf/ZkI9WmGSVaqLiI7Kvxcts7tyOjog7u4tMUsvAWL5J1D5SiZBtkkEFD215SGmvGb0EzsHiA==}
     dependencies:
-      '@scena/react-guides': 0.16.0
-      react-compat-css-styled: 1.0.8
-      react-compat-ruler: 0.7.1
-      react-simple-compat: 1.2.2
+      '@daybrush/utils': 1.10.2
+      '@scena/dragscroll': 1.4.0
+      '@scena/react-guides': 0.22.3
+      css-to-mat: 1.0.3
+      framework-utils: 1.1.0
+      gesto: 1.15.1
+      react-compat-css-styled: 1.0.9
+      react-compat-ruler: 0.13.2
+      react-css-styled: 1.0.4_@daybrush+utils@1.10.2
     dev: false
 
-  /react-compat-moveable/0.18.0:
-    resolution: {integrity: sha512-ACEFE/GKtyqzJBSQ1cosZtD6cD2uuwFBsyNF/zIeM/JvF4zGae3cUUVchOpfHBjPBnjqiHjKMAaucMXPOTDosQ==}
+  /react-compat-moveable/0.31.1:
+    resolution: {integrity: sha512-PI1YmWeJnGR00sG+4RJvfxjYcGQ0HpMFK3gVAyjh9Y7GGFo3GPms55JNyRK9UYYw47ik0Vx3mHEr90l5ZUNK7Q==}
     dependencies:
-      '@daybrush/utils': 1.7.1
+      '@daybrush/utils': 1.10.2
       '@egjs/agent': 2.4.2
       '@egjs/children-differ': 1.0.1
-      '@scena/dragscroll': 1.1.1
+      '@egjs/list-differ': 1.0.0
+      '@scena/dragscroll': 1.4.0
+      '@scena/event-emitter': 1.0.5
       '@scena/matrix': 1.1.1
       css-to-mat: 1.0.3
       framework-utils: 1.1.0
-      gesto: 1.9.0
-      overlap-area: 1.0.0
-      react-compat-css-styled: 1.0.8
-      react-css-styled: 1.0.3_@daybrush+utils@1.7.1
-      react-moveable: 0.33.0
+      gesto: 1.15.1
+      overlap-area: 1.1.0
+      react-compat-css-styled: 1.0.9
+      react-css-styled: 1.0.4_@daybrush+utils@1.10.2
+      react-moveable: 0.46.1
     dev: false
 
-  /react-compat-ruler/0.7.1:
-    resolution: {integrity: sha512-aN70fW4Zy0T8Ys0kY9wn8HvnGxGar3Rqq0H1zVvonE1bXP9y/BlAJ0HgK2bQcmwQprq7LCgLs6reGBZoEDG+0w==}
+  /react-compat-ruler/0.13.2:
+    resolution: {integrity: sha512-wLjhE9PKMC7qmnSD4woCNTQGRe/zFPgMkIWZp8k8euhpVjdVjQ873zXTz4co4SWL7k+8tCahIaYtme/dGm/AZw==}
     dependencies:
-      '@scena/react-ruler': 0.8.1
-      react-simple-compat: 1.2.2
+      '@scena/react-ruler': 0.14.2
     dev: false
 
-  /react-css-styled/1.0.3_@daybrush+utils@1.6.0:
-    resolution: {integrity: sha512-6H3aZPO66PYmYg9wx12WzOJpPlBEdA7O5JefCh+4SldlihVKBCxA6mityfWSGWL5ldOkJdHJWGwHR6nGPcVm+A==}
+  /react-css-styled/1.0.4_@daybrush+utils@1.10.2:
+    resolution: {integrity: sha512-nRske1bAKOCaf7Gf3o76tKQFIYggaW1qH4rutBlitH5lYnRPA7WoAYKrcxqdUPZd00oASg3SvFZSh3Mc1Wvj3w==}
     dependencies:
-      css-styled: 1.0.0_@daybrush+utils@1.6.0
-      framework-utils: 1.1.0
-    transitivePeerDependencies:
-      - '@daybrush/utils'
-    dev: false
-
-  /react-css-styled/1.0.3_@daybrush+utils@1.7.1:
-    resolution: {integrity: sha512-6H3aZPO66PYmYg9wx12WzOJpPlBEdA7O5JefCh+4SldlihVKBCxA6mityfWSGWL5ldOkJdHJWGwHR6nGPcVm+A==}
-    dependencies:
-      css-styled: 1.0.0_@daybrush+utils@1.7.1
+      css-styled: 1.0.1_@daybrush+utils@1.10.2
       framework-utils: 1.1.0
     transitivePeerDependencies:
       - '@daybrush/utils'
@@ -6303,20 +6315,21 @@ packages:
     resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
     dev: true
 
-  /react-moveable/0.33.0:
-    resolution: {integrity: sha512-ro8dojnbyxHFpfpDCvYwZFF050bHoaVOKTKk3Kvc1Pz863dF7Ejrd3zjdg4ix4xNbZfNsfRKdz0BHgeZzyyzOg==}
+  /react-moveable/0.46.1:
+    resolution: {integrity: sha512-Xi+64z51p7nrXwu3PeTUCoOYgRUwaZ6wxkrrbLAxYIqEd9Mfu/WHdiWzp5sp0kHsegJPX2t+XEErTmulAEQaIQ==}
     dependencies:
-      '@daybrush/utils': 1.7.1
+      '@daybrush/utils': 1.10.2
       '@egjs/agent': 2.4.2
       '@egjs/children-differ': 1.0.1
-      '@scena/dragscroll': 1.1.1
+      '@egjs/list-differ': 1.0.0
+      '@scena/dragscroll': 1.4.0
       '@scena/event-emitter': 1.0.5
       '@scena/matrix': 1.1.1
       css-to-mat: 1.0.3
       framework-utils: 1.1.0
-      gesto: 1.9.0
-      overlap-area: 1.0.0
-      react-css-styled: 1.0.3_@daybrush+utils@1.7.1
+      gesto: 1.15.1
+      overlap-area: 1.1.0
+      react-css-styled: 1.0.4_@daybrush+utils@1.10.2
     dev: false
 
   /react-refresh/0.10.0:
@@ -6324,10 +6337,10 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /react-simple-compat/1.2.2:
-    resolution: {integrity: sha512-DYa9MHplwzjL/9xDKmTvM70umky8R162aZsKsWC2XRD7d+mIXyr8IQmAoRMlH2uwl4yGGgZbg7bj20qlCMhIYA==}
+  /react-simple-compat/1.2.3:
+    resolution: {integrity: sha512-vYepRjSriGRyEmFtSsTQoHWVQRbBMYR4ONATeZtuf8GDY8jWGkc6R4+lIb5rVhPBIkx3ru68bpl+9r8V4YA/nA==}
     dependencies:
-      '@daybrush/utils': 1.6.0
+      '@daybrush/utils': 1.7.1
       '@egjs/list-differ': 1.0.0
     dev: false
 

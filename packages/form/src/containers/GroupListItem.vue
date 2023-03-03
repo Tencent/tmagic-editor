@@ -32,11 +32,14 @@
       v-if="expand"
       :config="rowConfig"
       :model="model"
+      :lastValues="lastValues"
+      :is-compare="isCompare"
       :labelWidth="labelWidth"
       :prop="`${prop}${prop ? '.' : ''}${String(index)}`"
       :size="size"
       :disabled="disabled"
       @change="changeHandler"
+      @addDiffCount="onAddDiffCount()"
     ></Container>
   </div>
 </template>
@@ -54,6 +57,8 @@ import Container from './Container.vue';
 
 const props = defineProps<{
   model: any;
+  lastValues: any;
+  isCompare?: boolean;
   groupModel: any[];
   config: GroupListConfig;
   labelWidth?: string;
@@ -63,7 +68,7 @@ const props = defineProps<{
   disabled?: boolean;
 }>();
 
-const emit = defineEmits(['swap-item', 'remove-item', 'change']);
+const emit = defineEmits(['swap-item', 'remove-item', 'change', 'addDiffCount']);
 
 const mForm = inject<FormState | undefined>('mForm');
 const expand = ref(false);
@@ -122,4 +127,5 @@ const movable = () => {
   }
   return movable;
 };
+const onAddDiffCount = () => emit('addDiffCount');
 </script>

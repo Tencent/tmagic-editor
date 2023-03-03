@@ -1,5 +1,5 @@
 {
-  "version": "1.2.6",
+  "version": "1.2.7",
   "name": "tmagic",
   "private": true,
   "packageManager": "pnpm@7.1.9",
@@ -59,7 +59,7 @@
     "commitizen": "^4.2.4",
     "conventional-changelog-cli": "^2.2.2",
     "cz-conventional-changelog": "^3.3.0",
-    "element-plus": "^2.2.19",
+    "element-plus": "^2.2.32",
     "enquirer": "^2.3.6",
     "eslint": "^7.29.0",
     "eslint-config-tencent": "^1.0.4",

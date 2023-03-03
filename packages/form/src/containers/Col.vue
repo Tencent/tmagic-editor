@@ -2,6 +2,8 @@
   <TMagicCol v-show="display && config.type !== 'hidden'" :span="span">
     <Container
       :model="model"
+      :lastValues="lastValues"
+      :is-compare="isCompare"
       :config="config"
       :prop="prop"
       :label-width="config.labelWidth || labelWidth"
@@ -9,6 +11,7 @@
       :size="size"
       :disabled="disabled"
       @change="changeHandler"
+      @add-diff-count="onAddDiffCount"
     ></Container>
   </TMagicCol>
 </template>
@@ -25,6 +28,8 @@ import Container from './Container.vue';
 
 const props = defineProps<{
   model: any;
+  lastValues?: any;
+  isCompare?: boolean;
   config: ChildConfig;
   labelWidth?: string;
   expandMore?: boolean;
@@ -34,9 +39,10 @@ const props = defineProps<{
   disabled?: boolean;
 }>();
 
-const emit = defineEmits(['change']);
+const emit = defineEmits(['change', 'addDiffCount']);
 
 const mForm = inject<FormState | undefined>('mForm');
 const display = computed(() => displayFunction(mForm, props.config.display, props));
 const changeHandler = () => emit('change', props.model);
+const onAddDiffCount = () => emit('addDiffCount');
 </script>

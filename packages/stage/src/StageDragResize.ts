@@ -63,6 +63,10 @@ export default class StageDragResize extends MoveableOptionsManager {
     });
   }
 
+  public getTarget() {
+    return this.target;
+  }
+
   /**
    * 将选中框渲染并覆盖到选中的组件Dom节点上方
    * 当选中的节点不是absolute时，会创建一个新的节点出来作为拖拽目标

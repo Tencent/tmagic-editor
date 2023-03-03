@@ -1,9 +1,21 @@
 <template>
-  <div style="width: 100%">
+  <div style="width: 100%; overflow-y: auto">
     <nav-menu :data="menu"></nav-menu>
+    <div class="diff-form">
+      <div>开启表单对比功能</div>
+      <m-form
+        ref="form"
+        :config="diffFormConfig"
+        :is-compare="true"
+        :init-values="currentVersion"
+        :last-values="lastVersion"
+        size="small"
+        height="100%"
+      ></m-form>
+    </div>
+    <div class="title">表单字段展示</div>
     <div class="form-content">
       <m-form ref="form" :config="config" :init-values="initValue" size="small" height="100%"></m-form>
-
       <magic-code-editor class="code-editor-content" :init-values="config" @save="change"></magic-code-editor>
     </div>
   </div>
@@ -29,6 +41,58 @@ const router = useRouter();
 const resultVisible = ref(false);
 const result = ref('');
 const form = ref<InstanceType<typeof MForm>>();
+
+const diffFormConfig = ref([
+  {
+    type: 'tab',
+    items: [
+      {
+        title: 'tab1',
+        labelWidth: '80px',
+        items: [
+          {
+            name: 'text1',
+            text: '文本字段1',
+          },
+          {
+            name: 'text2',
+            text: '文本字段2',
+          },
+          {
+            type: 'number',
+            text: '计数器',
+            name: 'number',
+          },
+        ],
+      },
+      {
+        title: 'tab2',
+        labelWidth: '80px',
+        items: [
+          {
+            type: 'colorPicker',
+            text: '取色器',
+            name: 'colorPicker',
+          },
+        ],
+      },
+    ],
+  },
+]);
+
+const currentVersion = ref({
+  text1: '当前版本的文本内容',
+  text2: '你好',
+  number: 10,
+  colorPicker: '#ffffff',
+});
+
+const lastVersion = ref({
+  text1: '上一版本的文本内容',
+  text2: '你好',
+  number: 12,
+  colorPicker: '#000000',
+});
 
 const config = ref([
   {
@@ -358,9 +422,16 @@ function change(value: string) {
 </script>
 
 <style lang="scss">
+.diff-form {
+  width: 500px;
+  margin: 20px 0 0 50px;
+}
+.title {
+  margin: 20px 0 0 50px;
+}
 .form-content {
   display: flex;
-  height: calc(100% - 75px);
+  height: 800px;
 
   .code-editor-content,
   .m-form {
