@@ -20,6 +20,7 @@ import { nextTick, ref } from 'vue';
 import { mount } from '@vue/test-utils';
 
 import { editorService } from '@tmagic/editor';
+import { MApp } from '@tmagic/schema';
 
 import publishApi from '@src/api/publish';
 import PublishPageList from '@src/components/publish-page-list.vue';
@@ -74,7 +75,7 @@ const actInfo = {
     },
   ],
 };
-editorService.set('root', root);
+editorService.set('root', root as MApp);
 magicStore.set('actInfo', actInfo);
 
 jest.mock('vue-router', () => {

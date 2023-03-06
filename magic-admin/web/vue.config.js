@@ -40,6 +40,6 @@ module.exports = defineConfig({
       },
     },
 
-    plugins: [new MonacoWebpackPlugin()],
+    plugins: [new MonacoWebpackPlugin({ languages: ['javascript'] })],
   },
 });

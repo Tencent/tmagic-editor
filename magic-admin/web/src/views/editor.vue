@@ -66,13 +66,13 @@ export default defineComponent({
       await initConfigByActId({ actId: Number(route.params.actId) });
     };
 
-    asyncLoadJs('/static/vue3/entry/config/index.umd.js').then(() => {
+    asyncLoadJs('/static/vue3/entry/config/index.umd.cjs').then(() => {
       magicPresetConfigs.value = (window as any).magicPresetConfigs;
     });
-    asyncLoadJs('/static/vue3/entry/value/index.umd.js').then(() => {
+    asyncLoadJs('/static/vue3/entry/value/index.umd.cjs').then(() => {
       magicPresetValues.value = (window as any).magicPresetValues;
     });
-    asyncLoadJs('/static/vue3/entry/event/index.umd.js').then(() => {
+    asyncLoadJs('/static/vue3/entry/event/index.umd.cjs').then(() => {
       magicPresetEvents.value = (window as any).magicPresetEvents;
     });
 
