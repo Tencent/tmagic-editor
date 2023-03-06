@@ -24,7 +24,7 @@ import DragResizeHelper from './DragResizeHelper';
 import MoveableOptionsManager from './MoveableOptionsManager';
 import type { DelayedMarkContainer, GetRenderDocument, MarkContainerEnd, StageDragResizeConfig } from './types';
 import { StageDragStatus } from './types';
-import { calcValueByFontsize, down, getMode, getOffset, up } from './util';
+import { down, getMode, up } from './util';
 
 /**
  * 管理单选操作，响应选中操作，初始化moveableOption参数并初始化moveable，处理moveable回调事件对组件进行更新
@@ -51,10 +51,7 @@ export default class StageDragResize extends MoveableOptionsManager {
     this.delayedMarkContainer = config.delayedMarkContainer;
     this.disabledDragStart = config.disabledDragStart;
 
-    this.dragResizeHelper = new DragResizeHelper({
-      container: config.container,
-      updateDragEl: config.updateDragEl,
-    });
+    this.dragResizeHelper = config.dragResizeHelper;
 
     this.on('update-moveable', () => {
       if (this.moveable) {
@@ -315,40 +312,13 @@ export default class StageDragResize extends MoveableOptionsManager {
 
     if (!doc) return;
 
-    const offset =
-      this.mode === Mode.SORTABLE ? { left: 0, top: 0 } : { left: this.target.offsetLeft, top: this.target.offsetTop };
-
-    let left = calcValueByFontsize(doc, offset.left);
-    let top = calcValueByFontsize(doc, offset.top);
-    const width = calcValueByFontsize(doc, this.target.clientWidth);
-    const height = calcValueByFontsize(doc, this.target.clientHeight);
-
-    const shadowEl = this.dragResizeHelper.getShadowEl();
-    if (parentEl && this.mode === Mode.ABSOLUTE && shadowEl) {
-      const targetShadowHtmlEl = shadowEl as HTMLElement;
-      const targetShadowElOffsetLeft = targetShadowHtmlEl.offsetLeft || 0;
-      const targetShadowElOffsetTop = targetShadowHtmlEl.offsetTop || 0;
-
-      const frame = this.dragResizeHelper.getFrame(shadowEl);
-
-      const [translateX, translateY] = frame?.properties.transform.translate.value;
-      const { left: parentLeft, top: parentTop } = getOffset(parentEl);
-
-      left =
-        calcValueByFontsize(doc, targetShadowElOffsetLeft) +
-        parseFloat(translateX) -
-        calcValueByFontsize(doc, parentLeft);
-      top =
-        calcValueByFontsize(doc, targetShadowElOffsetTop) +
-        parseFloat(translateY) -
-        calcValueByFontsize(doc, parentTop);
-    }
+    const rect = this.dragResizeHelper.getUpdatedElRect(this.target, parentEl, doc);
 
     this.emit('update', {
       data: [
         {
           el: this.target,
-          style: isResize ? { left, top, width, height } : { left, top },
+          style: isResize ? rect : { left: rect.left, top: rect.top },
         },
       ],
       parentEl,

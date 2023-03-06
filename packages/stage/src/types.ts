@@ -22,6 +22,7 @@ import Core from '@tmagic/core';
 import type { Id, MApp, MContainer, MNode } from '@tmagic/schema';
 
 import { GuidesType, ZIndex } from './const';
+import DragResizeHelper from './DragResizeHelper';
 import StageCore from './StageCore';
 
 export type TargetElement = HTMLElement | SVGElement;
@@ -112,21 +113,23 @@ export interface StageMaskConfig {
 
 export interface StageDragResizeConfig {
   container: HTMLElement;
+  dragResizeHelper: DragResizeHelper;
   moveableOptions?: CustomizeMoveableOptions;
   disabledDragStart?: boolean;
   getRootContainer: GetRootContainer;
   getRenderDocument: GetRenderDocument;
   markContainerEnd: MarkContainerEnd;
   delayedMarkContainer: DelayedMarkContainer;
-  updateDragEl?: UpdateDragEl;
 }
 
 export interface StageMultiDragResizeConfig {
   container: HTMLElement;
+  dragResizeHelper: DragResizeHelper;
   multiMoveableOptions?: CustomizeMoveableOptions;
   getRootContainer: GetRootContainer;
   getRenderDocument: GetRenderDocument;
-  updateDragEl?: UpdateDragEl;
+  markContainerEnd: MarkContainerEnd;
+  delayedMarkContainer: DelayedMarkContainer;
 }
 
 export interface DragResizeHelperConfig {

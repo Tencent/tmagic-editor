@@ -34,8 +34,8 @@ import MoveableHelper from 'moveable-helper';
 
 import { DRAG_EL_ID_PREFIX, GHOST_EL_ID_PREFIX, Mode, ZIndex } from './const';
 import TargetShadow from './TargetShadow';
-import { DragResizeHelperConfig, TargetElement } from './types';
-import { getAbsolutePosition, getOffset } from './util';
+import { DragResizeHelperConfig, Rect, TargetElement } from './types';
+import { calcValueByFontsize, getAbsolutePosition, getOffset } from './util';
 
 /**
  * 拖拽/改变大小等操作发生时，moveable会抛出各种状态事件，DragResizeHelper负责响应这些事件，对目标节点target和拖拽节点targetShadow进行修改；
@@ -280,6 +280,44 @@ export default class DragResizeHelper {
       }
     });
     this.moveableHelper.onDragGroup(e);
+  }
+
+  public getUpdatedElRect(el: HTMLElement, parentEl: HTMLElement | null, doc: Document): Rect {
+    const offset = this.mode === Mode.SORTABLE ? { left: 0, top: 0 } : { left: el.offsetLeft, top: el.offsetTop };
+
+    let left = calcValueByFontsize(doc, offset.left);
+    let top = calcValueByFontsize(doc, offset.top);
+    const width = calcValueByFontsize(doc, el.clientWidth);
+    const height = calcValueByFontsize(doc, el.clientHeight);
+
+    let shadowEl = this.getShadowEl();
+    const shadowEls = this.getShadowEls();
+
+    if (shadowEls.length) {
+      shadowEl = shadowEls.find((item) => item.id.endsWith(el.id));
+    }
+
+    if (parentEl && this.mode === Mode.ABSOLUTE && shadowEl) {
+      const targetShadowHtmlEl = shadowEl as HTMLElement;
+      const targetShadowElOffsetLeft = targetShadowHtmlEl.offsetLeft || 0;
+      const targetShadowElOffsetTop = targetShadowHtmlEl.offsetTop || 0;
+
+      const frame = this.getFrame(shadowEl);
+
+      const [translateX, translateY] = frame?.properties.transform.translate.value;
+      const { left: parentLeft, top: parentTop } = getOffset(parentEl);
+
+      left =
+        calcValueByFontsize(doc, targetShadowElOffsetLeft) +
+        parseFloat(translateX) -
+        calcValueByFontsize(doc, parentLeft);
+      top =
+        calcValueByFontsize(doc, targetShadowElOffsetTop) +
+        parseFloat(translateY) -
+        calcValueByFontsize(doc, parentTop);
+    }
+
+    return { width, height, left, top };
   }
 
   /**

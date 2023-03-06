@@ -21,8 +21,15 @@ import Moveable from 'moveable';
 import { DRAG_EL_ID_PREFIX, Mode } from './const';
 import DragResizeHelper from './DragResizeHelper';
 import MoveableOptionsManager from './MoveableOptionsManager';
-import { GetRenderDocument, MoveableOptionsManagerConfig, StageDragStatus, StageMultiDragResizeConfig } from './types';
-import { calcValueByFontsize, getMode } from './util';
+import {
+  DelayedMarkContainer,
+  GetRenderDocument,
+  MarkContainerEnd,
+  MoveableOptionsManagerConfig,
+  StageDragStatus,
+  StageMultiDragResizeConfig,
+} from './types';
+import { getMode } from './util';
 
 export default class StageMultiDragResize extends MoveableOptionsManager {
   /** 画布容器 */
@@ -34,6 +41,8 @@ export default class StageMultiDragResize extends MoveableOptionsManager {
   public dragStatus: StageDragStatus = StageDragStatus.END;
   private dragResizeHelper: DragResizeHelper;
   private getRenderDocument: GetRenderDocument;
+  private delayedMarkContainer: DelayedMarkContainer;
+  private markContainerEnd: MarkContainerEnd;
 
   constructor(config: StageMultiDragResizeConfig) {
     const moveableOptionsManagerConfig: MoveableOptionsManagerConfig = {
@@ -43,13 +52,12 @@ export default class StageMultiDragResize extends MoveableOptionsManager {
     };
     super(moveableOptionsManagerConfig);
 
+    this.delayedMarkContainer = config.delayedMarkContainer;
+    this.markContainerEnd = config.markContainerEnd;
     this.container = config.container;
     this.getRenderDocument = config.getRenderDocument;
 
-    this.dragResizeHelper = new DragResizeHelper({
-      container: config.container,
-      updateDragEl: config.updateDragEl,
-    });
+    this.dragResizeHelper = config.dragResizeHelper;
 
     this.on('update-moveable', () => {
       if (this.moveableForMulti) {
@@ -85,6 +93,8 @@ export default class StageMultiDragResize extends MoveableOptionsManager {
       }),
     );
 
+    let timeout: NodeJS.Timeout | undefined;
+
     this.moveableForMulti
       .on('resizeGroupStart', (e) => {
         this.dragResizeHelper.onResizeGroupStart(e);
@@ -103,11 +113,18 @@ export default class StageMultiDragResize extends MoveableOptionsManager {
         this.dragStatus = StageDragStatus.START;
       })
       .on('dragGroup', (e) => {
+        if (timeout) {
+          globalThis.clearTimeout(timeout);
+          timeout = undefined;
+        }
+        timeout = this.delayedMarkContainer(e.inputEvent, this.targetList);
+
         this.dragResizeHelper.onDragGroup(e);
         this.dragStatus = StageDragStatus.ING;
       })
       .on('dragGroupEnd', () => {
-        this.update();
+        const parentEl = this.markContainerEnd();
+        this.update(false, parentEl);
         this.dragStatus = StageDragStatus.END;
       })
       .on('clickGroup', (e) => {
@@ -182,22 +199,19 @@ export default class StageMultiDragResize extends MoveableOptionsManager {
    * 拖拽完成后将更新的位置信息暴露给上层业务方，业务方可以接收事件进行保存
    * @param isResize 是否进行大小缩放
    */
-  private update(isResize = false): void {
+  private update(isResize = false, parentEl: HTMLElement | null = null): void {
     if (this.targetList.length === 0) return;
 
     const doc = this.getRenderDocument();
     if (!doc) return;
 
     const data = this.targetList.map((targetItem) => {
-      const left = calcValueByFontsize(doc, targetItem.offsetLeft);
-      const top = calcValueByFontsize(doc, targetItem.offsetTop);
-      const width = calcValueByFontsize(doc, targetItem.clientWidth);
-      const height = calcValueByFontsize(doc, targetItem.clientHeight);
+      const rect = this.dragResizeHelper.getUpdatedElRect(targetItem, parentEl, doc);
       return {
         el: targetItem,
-        style: isResize ? { left, top, width, height } : { left, top },
+        style: isResize ? rect : { left: rect.left, top: rect.top },
       };
     });
-    this.emit('update', data, null);
+    this.emit('update', { data, parentEl });
   }
 }

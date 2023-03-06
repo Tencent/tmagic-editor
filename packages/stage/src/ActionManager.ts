@@ -25,6 +25,7 @@ import { Id } from '@tmagic/schema';
 import { addClassName, getDocument, removeClassNameByClassName } from '@tmagic/utils';
 
 import { CONTAINER_HIGHLIGHT_CLASS_NAME, GHOST_EL_ID_PREFIX, GuidesType, MouseButton, PAGE_CLASS } from './const';
+import DragResizeHelper from './DragResizeHelper';
 import StageDragResize from './StageDragResize';
 import StageHighlight from './StageHighlight';
 import StageMultiDragResize from './StageMultiDragResize';
@@ -101,27 +102,30 @@ export default class ActionManager extends EventEmitter {
     this.getRenderDocument = config.getRenderDocument;
     this.isContainer = config.isContainer;
 
+    const createDrHelper = () =>
+      new DragResizeHelper({
+        container: config.container,
+        updateDragEl: config.updateDragEl,
+      });
+
     this.dr = new StageDragResize({
       container: config.container,
       disabledDragStart: config.disabledDragStart,
+      moveableOptions: this.changeCallback(config.moveableOptions),
+      dragResizeHelper: createDrHelper(),
       getRootContainer: config.getRootContainer,
       getRenderDocument: config.getRenderDocument,
-      updateDragEl: config.updateDragEl,
-      markContainerEnd: () => this.markContainerEnd(),
-      delayedMarkContainer: (event: MouseEvent, exclude: Element[]) => {
-        if (this.canAddToContainer()) {
-          return this.delayedMarkContainer(event, exclude);
-        }
-        return undefined;
-      },
-      moveableOptions: this.changeCallback(config.moveableOptions),
+      markContainerEnd: this.markContainerEnd.bind(this),
+      delayedMarkContainer: this.delayedMarkContainer.bind(this),
     });
     this.multiDr = new StageMultiDragResize({
       container: config.container,
       multiMoveableOptions: config.multiMoveableOptions,
+      dragResizeHelper: createDrHelper(),
       getRootContainer: config.getRootContainer,
       getRenderDocument: config.getRenderDocument,
-      updateDragEl: config.updateDragEl,
+      markContainerEnd: this.markContainerEnd.bind(this),
+      delayedMarkContainer: this.delayedMarkContainer.bind(this),
     });
     this.highlightLayer = new StageHighlight({
       container: config.container,
@@ -320,10 +324,13 @@ export default class ActionManager extends EventEmitter {
    * @param excludeElList 计算鼠标所在容器时要排除的元素列表
    * @returns timeoutId，调用方在鼠标移走时要取消该timeout，阻止标记
    */
-  public delayedMarkContainer(event: MouseEvent, excludeElList: Element[] = []): NodeJS.Timeout {
-    return globalThis.setTimeout(() => {
-      this.addContainerHighlightClassName(event, excludeElList);
-    }, this.containerHighlightDuration);
+  public delayedMarkContainer(event: MouseEvent, excludeElList: Element[] = []): NodeJS.Timeout | undefined {
+    if (this.canAddToContainer()) {
+      return globalThis.setTimeout(() => {
+        this.addContainerHighlightClassName(event, excludeElList);
+      }, this.containerHighlightDuration);
+    }
+    return undefined;
   }
 
   public destroy(): void {
@@ -466,8 +473,8 @@ export default class ActionManager extends EventEmitter {
       });
 
     this.multiDr
-      .on('update', (data: UpdateEventData, parentEl: HTMLElement | null) => {
-        this.emit('multi-update', data, parentEl);
+      .on('update', (data: UpdateEventData) => {
+        this.emit('multi-update', data);
       })
       .on('change-to-select', async (id: Id) => {
         // 如果还在多选状态，不触发切换到单选

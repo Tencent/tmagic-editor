@@ -189,7 +189,10 @@ export default class StageCore extends EventEmitter {
   /**
    * @deprecated 废弃接口，建议用delayedMarkContainer代替
    */
-  public getAddContainerHighlightClassNameTimeout(event: MouseEvent, excludeElList: Element[] = []): NodeJS.Timeout {
+  public getAddContainerHighlightClassNameTimeout(
+    event: MouseEvent,
+    excludeElList: Element[] = [],
+  ): NodeJS.Timeout | undefined {
     return this.delayedMarkContainer(event, excludeElList);
   }
 
@@ -200,7 +203,7 @@ export default class StageCore extends EventEmitter {
    * @param excludeElList 计算鼠标所在容器时要排除的元素列表
    * @returns timeoutId，调用方在鼠标移走时要取消该timeout，阻止标记
    */
-  public delayedMarkContainer(event: MouseEvent, excludeElList: Element[] = []): NodeJS.Timeout {
+  public delayedMarkContainer(event: MouseEvent, excludeElList: Element[] = []): NodeJS.Timeout | undefined {
     return this.actionManager.delayedMarkContainer(event, excludeElList);
   }
 
@@ -331,8 +334,8 @@ export default class StageCore extends EventEmitter {
         // 先保证画布内完成渲染，再通知外部更新
         setTimeout(() => this.emit('select', el));
       })
-      .on('multi-update', (data: UpdateEventData, parentEl: HTMLElement | null) => {
-        this.emit('update', { data, parentEl });
+      .on('multi-update', (data: UpdateEventData) => {
+        this.emit('update', data);
       });
   }
 
