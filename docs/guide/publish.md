@@ -107,6 +107,7 @@ tmagic-editor的页面发布，目前使用的是静态资源发布。而所有�
 
 原始的 page.html 页面框架
 ```html
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -129,7 +130,7 @@ tmagic-editor的页面发布，目前使用的是静态资源发布。而所有�
 </html>
 ```
 
-插入项目信息后的 page.html 
+插入项目信息后的 page.html
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -156,3 +157,10 @@ tmagic-editor的页面发布，目前使用的是静态资源发布。而所有�
 
 ```
 
+其中DSL.js文件为：
+
+```
+window.magicDSL = [
+  // DSL
+]
+```
