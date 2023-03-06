@@ -26,12 +26,12 @@ import AppContent from './AppContent';
 interface UseAppOptions {
   config: MComponent;
   methods?: {
-    string: Function;
+    [key: string]: Function;
   };
 }
 
 export default ({ config, methods }: UseAppOptions) => {
-  const app: Core = useContext(AppContent);
+  const app: Core | undefined = useContext(AppContent);
   const node = app?.page?.getNode(config.id);
   const [created, setCreated] = useState(false);
 

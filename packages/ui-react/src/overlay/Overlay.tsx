@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 
 import Core from '@tmagic/core';
 import type { MComponent, MNode } from '@tmagic/schema';
@@ -31,7 +31,7 @@ interface OverlayProps {
 const Overlay: React.FC<OverlayProps> = ({ config }) => {
   const [visible, setVisible] = useState(false);
 
-  const app: Core = useContext(AppContent);
+  const app: Core | undefined = useContext(AppContent);
   const node = app?.page?.getNode(config.id);
 
   if (!app) return null;
@@ -58,7 +58,7 @@ const Overlay: React.FC<OverlayProps> = ({ config }) => {
     },
   });
 
-  app?.on('editor:select', (info: any, path: MNode[]) => {
+  app?.page?.on('editor:select', (info: any, path: MNode[]) => {
     if (path.find((node: MNode) => node.id === config.id)) {
       openOverlay();
     } else {

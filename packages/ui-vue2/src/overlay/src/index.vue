@@ -43,7 +43,7 @@ export default defineComponent({
       }
     };
 
-    app?.on('editor:select', (info, path) => {
+    app?.page?.on('editor:select', (info, path) => {
       if (path.find((node: MNode) => node.id === props.config.id)) {
         openOverlay();
       } else {
