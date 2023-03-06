@@ -1,3 +1,19 @@
+## [1.2.8](https://github.com/Tencent/tmagic-editor/compare/v1.2.7...v1.2.8) (2023-03-06)
+
+
+### Bug Fixes
+
+* **editor,ui,ui-vue2,ui-react:** 页面配置更新后，蒙层无法显示 ([c025508](https://github.com/Tencent/tmagic-editor/commit/c025508cd79009e757b73a190cbb201cd44b3edf)), closes [#472](https://github.com/Tencent/tmagic-editor/issues/472)
+* **editor:** 更新组件后，组件树选中状态被重置 ([e0c0143](https://github.com/Tencent/tmagic-editor/commit/e0c014397056bcddf82acd063288d3d045bd2dc5))
+* **editor:** 组件树切换选择组件可能触发多选 ([b8cda53](https://github.com/Tencent/tmagic-editor/commit/b8cda53d6a9af8c06d4f8670289d2a6c9eadfe5c))
+
+
+### Features
+
+* **stage:** 支持多选组件并将多个组件拖入指定容器中 ([449efcc](https://github.com/Tencent/tmagic-editor/commit/449efcc56b0cee6898ff439ff441a8a67a1a143c)), closes [#405](https://github.com/Tencent/tmagic-editor/issues/405)
+
+
+
 ## [1.2.7](https://github.com/Tencent/tmagic-editor/compare/v1.2.6...v1.2.7) (2023-03-02)
 
 
