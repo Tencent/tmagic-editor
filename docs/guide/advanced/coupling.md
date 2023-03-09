@@ -85,17 +85,26 @@ export default {
 <script lang="ts" setup>
 import { defineComponent, inject } from 'vue';
 
+const props = defineProps({
+  config: {
+    type: Object,
+    default: () => ({}),
+  },
+})
+
 const app: Core | undefined = inject('app');
+
+const node = app?.page?.getNode(props.config.id);
 
 const onClick = () => {
   // app.emit 第一个参数为事件名，其余参数为你要传给接受事件组件的参数
-  app?.emit("yourComponent:finishSomething", /*可以传参给接收方*/);
+  app?.emit("yourComponent:finishSomething", node, /*可以传参给接收方*/);
 };
 
-defineExport({
+defineExpose({
   // 此处实现事件动作
   // 实际触发时是调用vue实例上的方法，所以需要将改方法暴露到实例上
-  toast: (/*接收触发事件组件传进来的参数*/) => {
+  toast: (/*触发组件node*/, /*接收触发事件组件传进来的参数*/) => {
     toast('测试 vue3')
   }
 });
@@ -146,6 +155,6 @@ export default Test;
 按照上述实现触发事件和事件动作，就可以完成组件的联动事件分发响应。
 
 :::tip
-组件事件的联动是借助了@tmagic/core，需要在组件实例化的时候将需要暴露的方法提供给@tmagic/core，在上述例子中useApp方法的调用就是完成这个操作，useApp返回的app对象就是@tmagic/core的实例。在vue的实现中useApp是将整个vue实例都提供给了app，所以需要defineExport来定义vue instance上的方法，react则是将需要暴露的方法作为useApp的参数传入
+组件事件的联动是借助了@tmagic/core，需要在组件实例化的时候将需要暴露的方法提供给@tmagic/core，在上述例子中useApp方法的调用就是完成这个操作，useApp返回的app对象就是@tmagic/core的实例。在vue的实现中useApp是将整个vue实例都提供给了app，所以需要defineExpose来定义vue instance上的方法，react则是将需要暴露的方法作为useApp的参数传入
 :::
 
