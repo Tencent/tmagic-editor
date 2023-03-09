@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { createApp, defineAsyncComponent } from 'vue';
+import { createApp, defineAsyncComponent, reactive } from 'vue';
 
 import Core from '@tmagic/core';
 import { getUrlParam } from '@tmagic/utils';
@@ -42,11 +42,36 @@ Object.values(plugins).forEach((plugin: any) => {
 
 const designWidth = document.documentElement.getBoundingClientRect().width;
 
+const config = ((getUrlParam('localPreview') ? getLocalConfig() : window.magicDSL) || [])[0] || {};
+const curPageId = getUrlParam('page');
 const app = new Core({
   designWidth,
-  config: ((getUrlParam('localPreview') ? getLocalConfig() : window.magicDSL) || [])[0] || {},
-  curPage: getUrlParam('page'),
+  config,
+  curPage: curPageId,
 });
+
+app?.setConfig(config, curPageId);
+app?.setDataSet(
+  config,
+  // 直接写死一个数据源用于测试
+  {
+    id: 1,
+    url: 'https://wangminghua.usemock.com/api/data1',
+    name: '数据源1',
+    keys: ['num1', 'num2', 'num3', 'num4', 'num5', 'num6', 'num7', 'num8', 'num9', 'num10', 'num11'],
+    alias: [
+      {
+        key: 'num1',
+        name: '默认值',
+      },
+    ],
+    rtype: 'list',
+    interval: 5,
+  },
+  {
+    adapter: reactive,
+  },
+);
 
 magicApp.config.globalProperties.app = app;
 magicApp.provide('app', app);
