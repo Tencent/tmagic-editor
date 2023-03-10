@@ -18,7 +18,7 @@
         :lazy="tab.lazy || false"
       >
         <template #label>
-          <span class="custom-tabs-label">
+          <span>
             {{ filter(tab.title)
             }}<el-badge :hidden="!diffCount[tabIndex]" :value="diffCount[tabIndex]" class="diff-count-badge"></el-badge>
           </span>
