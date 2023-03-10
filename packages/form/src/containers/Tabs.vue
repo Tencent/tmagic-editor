@@ -15,7 +15,6 @@
         :is="uiComponent.component"
         :key="tab[mForm?.keyProp || '__key'] ?? tabIndex"
         :name="filter(tab.status) || tabIndex.toString()"
-        :label="filter(tab.title)"
         :lazy="tab.lazy || false"
       >
         <template #label>
@@ -29,8 +28,26 @@
           :key="item[mForm?.keyProp || '__key']"
           :config="item"
           :disabled="disabled"
-          :model="getValues(model, tabIndex, tab)"
-          :last-values="getValues(lastValues, tabIndex, tab)"
+          :model="
+            config.dynamic
+              ? (name ? model[name] : model)[tabIndex]
+              : tab.name
+              ? (name ? model[name] : model)[tab.name]
+              : name
+              ? model[name]
+              : model
+          "
+          :last-values="
+            isEmpty(lastValues)
+              ? {}
+              : config.dynamic
+              ? (name ? lastValues[name] : lastValues)[tabIndex]
+              : tab.name
+              ? (name ? lastValues[name] : lastValues)[tab.name]
+              : name
+              ? lastValues[name]
+              : lastValues
+          "
           :is-compare="isCompare"
           :prop="config.dynamic ? `${prop}${prop ? '.' : ''}${String(tabIndex)}` : prop"
           :size="size"
@@ -46,7 +63,7 @@
 
 <script setup lang="ts" name="MFormTabs">
 import { computed, inject, ref, watchEffect } from 'vue';
-import { cloneDeep } from 'lodash-es';
+import { cloneDeep, isEmpty } from 'lodash-es';
 
 import { getConfig, TMagicTabs } from '@tmagic/design';
 
@@ -183,18 +200,6 @@ const changeHandler = () => {
   if (typeof props.config.onChange === 'function') {
     props.config.onChange(mForm, { model: props.model, prop: props.prop, config: props.config });
   }
-};
-
-const getValues = (model: any, tabIndex: number, tab: any) => {
-  const tabName = props.config.dynamic ? (model[props?.name] || model)[tabIndex] : tab.name;
-  let propName = props.name;
-  if (tabName) {
-    propName = (model[props?.name] || model)[tab.name];
-  }
-  if (propName) {
-    return model[props.name];
-  }
-  return model;
 };
 
 // 在tabs组件中收集事件触发次数，即该tab下的差异数
