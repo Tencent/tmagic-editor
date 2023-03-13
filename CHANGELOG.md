@@ -1,3 +1,13 @@
+## [1.2.9](https://github.com/Tencent/tmagic-editor/compare/v1.2.8...v1.2.9) (2023-03-13)
+
+
+### Bug Fixes
+
+* 修复动态tab渲染问题 ([67428f6](https://github.com/Tencent/tmagic-editor/commit/67428f606aa0be17b5e140e27f65fb0da56f538e))
+* 解决codecc安全工单,更新了admin中对编辑器的一些用法 ([a840750](https://github.com/Tencent/tmagic-editor/commit/a8407503b97413c26f9436ff3cbf4f3555d51acc))
+
+
+
 ## [1.2.8](https://github.com/Tencent/tmagic-editor/compare/v1.2.7...v1.2.8) (2023-03-06)
 
 
