@@ -1,5 +1,7 @@
 import type Core from './Core';
 
+export type App = Core;
+
 export enum EntryType {
   CONFIG = 'config',
   VALUE = 'value',

@@ -67,14 +67,14 @@ const generateContent = (
   `);
 };
 
-const prettyCode = (code: string) =>
+export const prettyCode = (code: string) =>
   recast.prettyPrint(recast.parse(code.replace(/\\/g, '/'), { parser: require('recast/parsers/typescript') }), {
     tabWidth: 2,
     trailingComma: true,
     quote: 'single',
   }).code;
 
-const makeCamelCase = function (name: string): string {
+export const makeCamelCase = function (name: string): string {
   if (typeof name !== 'string') {
     return '';
   }
