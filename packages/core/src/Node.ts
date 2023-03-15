@@ -65,6 +65,11 @@ class Node extends EventEmitter {
     });
   }
 
+  public setData(data: MComponent | MContainer | MPage) {
+    this.data = data;
+    this.emit('updata-data');
+  }
+
   private listenLifeSafe() {
     this.once('created', async (instance: any) => {
       this.instance = instance;

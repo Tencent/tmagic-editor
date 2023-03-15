@@ -18,7 +18,7 @@
 
 import { EventEmitter } from 'events';
 
-import type { CodeBlockDSL, EventItemConfig, Id, MApp } from '@tmagic/schema';
+import type { CodeBlockDSL, EventItemConfig, Id, MApp, MPage } from '@tmagic/schema';
 
 import Env from './Env';
 import { bindCommonEventListener, isCommonMethod, triggerCommonMethod } from './events';
@@ -144,16 +144,20 @@ class App extends EventEmitter {
     this.codeDsl = config.codeBlocks;
     this.pages = new Map();
     config.items?.forEach((page) => {
-      this.pages.set(
-        page.id,
-        new Page({
-          config: page,
-          app: this,
-        }),
-      );
+      this.addPage(page);
     });
 
     this.setPage(curPage || this.page?.data?.id);
+  }
+
+  public addPage(config: MPage) {
+    this.pages.set(
+      config.id,
+      new Page({
+        config,
+        app: this,
+      }),
+    );
   }
 
   public setPage(id?: Id) {
@@ -172,6 +176,17 @@ class App extends EventEmitter {
     if (this.platform !== 'magic') {
       this.bindEvents();
     }
+  }
+
+  public deletePage(id: Id) {
+    this.pages.delete(id);
+    if (!this.pages.size) {
+      this.page = undefined;
+    }
+  }
+
+  public getPage(id: Id) {
+    return this.pages.get(id);
   }
 
   public registerComponent(type: string, Component: any) {
