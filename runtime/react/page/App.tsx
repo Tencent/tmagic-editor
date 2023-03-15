@@ -19,7 +19,7 @@
 import React, { useContext } from 'react';
 
 import Core from '@tmagic/core';
-import type { Page } from '@tmagic/schema';
+import type { MPage } from '@tmagic/schema';
 import { AppContent } from '@tmagic/ui-react';
 
 function App() {
@@ -31,7 +31,7 @@ function App() {
 
   const MagicUiPage = app.resolveComponent('page');
 
-  return <MagicUiPage config={app?.page?.data as Page}></MagicUiPage>;
+  return <MagicUiPage config={app?.page?.data as MPage}></MagicUiPage>;
 }
 
 export default App;

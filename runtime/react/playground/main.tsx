@@ -29,6 +29,12 @@ import plugins from '../.tmagic/plugin-entry';
 
 import App from './App';
 
+declare global {
+  interface Window {
+    appInstance: Core;
+  }
+}
+
 const designWidth = document.documentElement.getBoundingClientRect().width;
 
 const app = new Core({
@@ -107,7 +113,7 @@ const operations = {
 
   sortNode({ root }: SortEventData) {
     console.log('sort config', root);
-    updateConfig(root);
+    root && updateConfig(root);
   },
 
   remove({ root }: RemoveData) {

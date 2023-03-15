@@ -6,13 +6,14 @@
 import { computed, defineComponent, nextTick, provide, reactive, ref, watch } from 'vue';
 
 import Core from '@tmagic/core';
-import type { Id, MApp, MNode } from '@tmagic/schema';
+import type { Id, MApp, MNode, MPage } from '@tmagic/schema';
 import { Magic, RemoveData, UpdateData } from '@tmagic/stage';
 import { getNodePath } from '@tmagic/utils';
 
 declare global {
   interface Window {
     magic: Magic;
+    appInstance: Core;
   }
 }
 
@@ -34,7 +35,7 @@ export default defineComponent({
       platform: 'editor',
     });
 
-    globalThis.appInstance = app;
+    window.appInstance = app;
 
     provide('app', app);
 
@@ -64,6 +65,11 @@ export default defineComponent({
       select(id: Id) {
         console.log('select config', id);
         selectedId.value = id;
+
+        if (app.getPage(id)) {
+          this.updatePageId?.(id);
+        }
+
         const el = document.getElementById(`${id}`);
         if (el) return el;
         // 未在当前文档下找到目标元素，可能是还未渲染，等待渲染完成后再尝试获取
@@ -79,6 +85,13 @@ export default defineComponent({
 
         const parent = getNodePath(parentId, [root.value]).pop();
         if (!parent) throw new Error('未找到父节点');
+
+        if (config.type === 'page') {
+          app?.addPage(config as MPage);
+        } else {
+          const parentNode = app?.page?.getNode(parent.id);
+          parentNode && app?.page?.initNode(config, parentNode);
+        }
 
         if (parent.id !== selectedId.value) {
           const index = parent.items?.findIndex((child: MNode) => child.id === selectedId.value);
@@ -101,16 +114,30 @@ export default defineComponent({
         const parent = getNodePath(parentId, [root.value]).pop();
         if (!parent) throw new Error('未找到父节点');
 
+        const nodeInstance = app.page?.getNode(config.id);
+        if (nodeInstance) {
+          nodeInstance.setData(config);
+        }
+
         const index = parent.items?.findIndex((child: MNode) => child.id === node.id);
         parent.items.splice(index, 1, reactive(config));
       },
 
       remove({ id, parentId }: RemoveData) {
         if (!root.value) throw new Error('error');
+
         const node = getNodePath(id, [root.value]).pop();
         if (!node) throw new Error('未找到目标元素');
+
         const parent = getNodePath(parentId, [root.value]).pop();
         if (!parent) throw new Error('未找到父元素');
+
+        if (node.type === 'page') {
+          app?.deletePage(node.id);
+        } else {
+          app.page?.deleteNode(node.id);
+        }
+
         const index = parent.items?.findIndex((child: MNode) => child.id === node.id);
         parent.items.splice(index, 1);
       },
