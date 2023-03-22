@@ -75,6 +75,8 @@ const commonClickEventHandler = (app: App, eventName: string, e: any) => {
 };
 
 export const bindCommonEventListener = (app: App) => {
+  if (app.jsEngine !== 'browser') return;
+
   window.document.body.addEventListener('click', (e: any) => {
     commonClickEventHandler(app, 'click', e);
   });
@@ -91,6 +93,8 @@ export const bindCommonEventListener = (app: App) => {
 export const triggerCommonMethod = (methodName: string, node: Node) => {
   const { instance } = node;
 
+  if (!instance) return;
+
   switch (methodName.replace(COMMON_METHOD_PREFIX, '')) {
     case CommonMethod.SHOW:
       instance.show();
@@ -101,7 +105,7 @@ export const triggerCommonMethod = (methodName: string, node: Node) => {
       break;
 
     case CommonMethod.SCROLL_TO_VIEW:
-      instance.$el.scrollIntoView({ behavior: 'smooth' });
+      instance.$el?.scrollIntoView({ behavior: 'smooth' });
       break;
 
     case CommonMethod.SCROLL_TO_TOP:

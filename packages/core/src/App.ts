@@ -68,7 +68,7 @@ class App extends EventEmitter {
     options.designWidth && (this.designWidth = options.designWidth);
 
     // 根据屏幕大小计算出跟节点的font-size，用于rem样式的适配
-    if (this.platform === 'mobile' || this.platform === 'editor') {
+    if (this.jsEngine === 'browser') {
       const calcFontsize = () => {
         const { width } = document.documentElement.getBoundingClientRect();
         const fontSize = width / (this.designWidth / 100);
