@@ -1,6 +1,0 @@
-dist/
-node_modules/
-babel.config.js
-vue.config.js
-jest.config.js
-tscofnig.json

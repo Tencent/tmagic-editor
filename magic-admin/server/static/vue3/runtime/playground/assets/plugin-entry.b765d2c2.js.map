@@ -1,1 +1,0 @@
-{"version":3,"file":"plugin-entry.b765d2c2.js","sources":["../../../../.tmagic/plugin-entry.ts"],"sourcesContent":["const plugins: Record<string, any> = {};\nexport default plugins;"],"names":["plugins"],"mappings":"AAAA,MAAMA,EAA+B,CAAA"}

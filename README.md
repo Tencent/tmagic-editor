@@ -44,6 +44,10 @@ http://localhost:8098/tmagic-editor/playground/
 
 即可得到一个魔方编辑器示例项目
 
+## magic-admin
+
+已迁移至 https://github.com/vft-magic/tmagic-admin
+
 ## 项目介绍
 在本项目中，我们核心内容，是包含在 `packages/editor` 中的编辑器，以及 `runtime` 和 `packages/ui` 提供的各个前端框架相关的 runtime 和 ui。
 
