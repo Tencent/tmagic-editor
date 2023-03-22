@@ -97,6 +97,8 @@ npm run serve -- --port=8078
 
 const value = ref({
   type: 'app',
+  // 必须加上ID，这个id可能是数据库生成的key，也可以是生成的uuid
+  id: 1,
   items: [],
 });
 

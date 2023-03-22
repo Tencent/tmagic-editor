@@ -51,7 +51,7 @@ cd hello-world
 ## 添加依赖
 
 ```bash
-npm install --save @tmagic/editor @tmagic/form @tmagic/stage element-plus
+npm install --save @tmagic/editor @tmagic/form @tmagic/stage @tmagic/design @tmagic/element-plus-adapter element-plus
 ```
 
 ## 注册组件
@@ -66,13 +66,16 @@ import '@tmagic/form/dist/style.css';
 import { createApp } from 'vue';
 import ElementPlus from 'element-plus';
 
+import TMagicDesign from '@tmagic/design';
 import TMagicEditor from '@tmagic/editor';
+import TMagicElementPlusAdapter from '@tmagic/element-plus-adapter';
 import TMagicForm from '@tmagic/form';
 
 import App from './App.vue';
 
 createApp(App)
   .use(ElementPlus)
+  .use(TMagicDesign, TMagicElementPlusAdapter)
   .use(TMagicEditor)
   .use(TMagicForm)
   .mount('#app');
@@ -157,6 +160,8 @@ api详情：[modelValue](../../api/editor/props.md#modelvalue-v-model)
 ```ts
 const value = ref({
   type: 'app',
+  // 必须加上ID，这个id可能是数据库生成的key，也可以是生成的uuid
+  id: 1,
   items: [],
 });
 ```
