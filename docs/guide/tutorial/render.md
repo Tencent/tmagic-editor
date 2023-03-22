@@ -279,4 +279,4 @@ app.mount('#app');
 
 ```
 
-[源码](https://github.com/jia000/tmagic-tutorial/tree/master/course3)
+[源码](https://github.com/vft-magic/tmagic-tutorial/tree/master/course3)

@@ -291,4 +291,4 @@ const render = async ({ renderer }: StageCore) => {
 并不是render函数不好，但是从设计上将，render函数还是让渲染逻辑落到了编辑器中，@tmagic/editor的设计是希望做到渲染跟编辑器解耦
 :::
 
-[源码](https://github.com/jia000/tmagic-tutorial)
+[源码](https://github.com/vft-magic/tmagic-tutorial)

@@ -232,4 +232,4 @@ watch(page, async () => {
 
 当前教程中实现了一个简单的page，tmagic提供了一个比较完善的实现，将在下一节介绍
 
-[源码](https://github.com/jia000/tmagic-tutorial/tree/master/course2)
+[源码](https://github.com/vft-magic/tmagic-tutorial/tree/master/course2)
