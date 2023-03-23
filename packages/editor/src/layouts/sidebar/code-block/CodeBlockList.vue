@@ -164,7 +164,7 @@ watch(
 );
 
 watch(
-  [() => services?.codeBlockService.getCodeDslSync(), () => services?.codeBlockService.getCombineInfo()],
+  [() => services?.codeBlockService.getCodeDsl(), () => services?.codeBlockService.getCombineInfo()],
   () => {
     refreshCodeList();
   },

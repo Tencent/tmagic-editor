@@ -136,7 +136,7 @@ watchEffect(() => {
 });
 
 const initTableModel = (): void => {
-  const codeDsl = cloneDeep(services?.codeBlockService.getCodeDslSync());
+  const codeDsl = cloneDeep(services?.codeBlockService.getCodeDsl());
   if (!codeDsl) return;
   tableModel.value = {
     params: codeDsl[props.id]?.params || [],

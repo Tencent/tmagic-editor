@@ -587,44 +587,6 @@ alignCenter可以支持一次水平居中多个组件，alignCenter是通过调�
 
 重置当前记录的修改过的节点id记录，通常用于保存之后
 
-## getCodeDsl
-
-- **[扩展支持](../../guide/editor-expand#行为扩展)：** 是
-
-- **返回：**
-
-  - {Promise<[CodeBlockDSL](https://github.com/Tencent/tmagic-editor/blob/c143a5f7670ae61d80c1a2cfcc780cfb5259849d/packages/schema/src/index.ts#L75) | null>}
-
-- **详情：**
-
-  从dsl中的codeBlocks字段读取活动的代码块
-
-## getCodeDslSync
-
-- **返回：**
-
-  - [CodeBlockDSL](https://github.com/Tencent/tmagic-editor/blob/c143a5f7670ae61d80c1a2cfcc780cfb5259849d/packages/schema/src/index.ts#L75) | null
-
-- **详情：**
-  
-  从dsl中的codeBlocks字段读取活动的代码块
-
-## setCodeDsl
-
-- **[扩展支持](../../guide/editor-expand#行为扩展)：** 是
-
-- **参数：**
-
-  - {[CodeBlockDSL](https://github.com/Tencent/tmagic-editor/blob/c143a5f7670ae61d80c1a2cfcc780cfb5259849d/packages/schema/src/index.ts#L75)} CodeBlockDSL
-
-- **返回：**
-
-  - `{Promise<void>}`
-
-- **详情：**
-
-  设置代码块到dsl的codeBlocks字段
-
 ## resetState
 
 - **详情：**

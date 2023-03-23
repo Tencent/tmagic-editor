@@ -41,8 +41,6 @@ class CodeBlock extends BaseService {
 
   constructor() {
     super([
-      'setCodeDsl',
-      'getCodeDsl',
       'getCodeContentById',
       'getCodeDslByIds',
       'getCurrentDsl',
@@ -62,7 +60,6 @@ class CodeBlock extends BaseService {
    */
   public async setCodeDsl(codeDsl: CodeBlockDSL): Promise<void> {
     this.state.codeDsl = codeDsl;
-    await editorService.setCodeDsl(this.state.codeDsl);
     info('[code-block]:code-dsl-change', this.state.codeDsl);
     this.emit('code-dsl-change', this.state.codeDsl);
   }
@@ -73,14 +70,7 @@ class CodeBlock extends BaseService {
    * @param {boolean} forceRefresh 是否强制从活动dsl拉取刷新
    * @returns {CodeBlockDSL | null}
    */
-  public async getCodeDsl(forceRefresh = false): Promise<CodeBlockDSL | null> {
-    return this.getCodeDslSync(forceRefresh);
-  }
-
-  public getCodeDslSync(forceRefresh = false): CodeBlockDSL | null {
-    if (!this.state.codeDsl || forceRefresh) {
-      this.state.codeDsl = editorService.getCodeDslSync();
-    }
+  public getCodeDsl(): CodeBlockDSL | null {
     return this.state.codeDsl;
   }
 
@@ -103,31 +93,25 @@ class CodeBlock extends BaseService {
    * @returns {void}
    */
   public async setCodeDslById(id: Id, codeConfig: CodeBlockContent): Promise<void> {
-    let codeDsl = await this.getCodeDsl();
+    const codeDsl = await this.getCodeDsl();
+
+    if (!codeDsl) {
+      throw new Error('dsl中没有codeBlocks');
+    }
+
     const codeConfigProcessed = codeConfig;
     if (codeConfig.content) {
       // 在保存的时候转换代码内容
       // eslint-disable-next-line no-eval
       codeConfigProcessed.content = eval(codeConfig.content);
     }
-    if (!codeDsl) {
-      // dsl中无代码块字段
-      codeDsl = {
-        [id]: {
-          ...codeConfigProcessed,
-        },
-      };
-    } else {
-      const existContent = codeDsl[id] || {};
-      codeDsl = {
-        ...codeDsl,
-        [id]: {
-          ...existContent,
-          ...codeConfigProcessed,
-        },
-      };
-    }
-    await this.setCodeDsl(codeDsl);
+
+    const existContent = codeDsl[id] || {};
+
+    codeDsl[id] = {
+      ...existContent,
+      ...codeConfigProcessed,
+    };
   }
 
   /**
@@ -320,13 +304,15 @@ class CodeBlock extends BaseService {
   /**
    * 在dsl数据源中删除指定id的代码块
    * @param {Id[]} codeIds 需要删除的代码块id数组
-   * @returns {CodeBlockDSL} 删除后的code dsl
    */
-  public async deleteCodeDslByIds(codeIds: Id[]): Promise<CodeBlockDSL> {
+  public async deleteCodeDslByIds(codeIds: Id[]): Promise<void> {
     const currentDsl = await this.getCodeDsl();
-    const newDsl = omit(currentDsl, codeIds);
-    await this.setCodeDsl(newDsl);
-    return newDsl;
+
+    if (!currentDsl) return;
+
+    codeIds.forEach((id) => {
+      delete currentDsl[id];
+    });
   }
 
   /**

@@ -19,7 +19,7 @@
 import { reactive, toRaw } from 'vue';
 import { cloneDeep, isObject, mergeWith, uniq } from 'lodash-es';
 
-import type { CodeBlockDSL, Id, MApp, MComponent, MContainer, MNode, MPage } from '@tmagic/schema';
+import type { Id, MApp, MComponent, MContainer, MNode, MPage } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 import StageCore from '@tmagic/stage';
 import { getNodePath, isNumber, isPage, isPop } from '@tmagic/utils';
@@ -80,8 +80,6 @@ class Editor extends BaseService {
         'undo',
         'redo',
         'highlight',
-        'getCodeDsl',
-        'setCodeDsl',
       ],
       // 需要注意循环依赖问题，如果函数间有相互调用的话，不能设置为串行调用
       ['select', 'update', 'moveLayer'],
@@ -830,30 +828,6 @@ class Editor extends BaseService {
 
   public resetModifiedNodeId() {
     this.get('modifiedNodeIds').clear();
-  }
-
-  /**
-   * 从dsl中的codeBlocks字段读取活动的代码块
-   * @returns {CodeBlockDSL | null}
-   */
-  public async getCodeDsl(): Promise<CodeBlockDSL | null> {
-    const root = this.get('root');
-    return root?.codeBlocks || null;
-  }
-
-  public getCodeDslSync(): CodeBlockDSL | null {
-    const root = this.get('root');
-    return root?.codeBlocks || null;
-  }
-
-  /**
-   * 设置代码块到dsl的codeBlocks字段
-   * @param {CodeBlockDSL} codeDsl 代码DSL
-   * @returns {void}
-   */
-  public async setCodeDsl(codeDsl: CodeBlockDSL): Promise<void> {
-    if (!this.state.root) return;
-    this.state.root.codeBlocks = codeDsl;
   }
 
   private addModifiedNodeId(id: Id) {

@@ -4,8 +4,6 @@
 
 ## setCodeDsl
 
-- **[扩展支持](../../guide/editor-expand#行为扩展)：** 是
-
 - **参数：**
 
   - 
@@ -18,8 +16,6 @@
 
 ## getCodeDsl
 
-- **[扩展支持](../../guide/editor-expand#行为扩展)：** 是
-
 - **参数：**
 
   - 
@@ -29,8 +25,6 @@
   - `{Promise<void>}`
 
 - **详情：**
-
-## getCodeDslSync
 
 ## getCodeContentById
 

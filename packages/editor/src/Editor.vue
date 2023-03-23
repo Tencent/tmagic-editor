@@ -247,6 +247,10 @@ export default defineComponent({
       if (toRaw(value) !== toRaw(preValue)) {
         emit('update:modelValue', value);
       }
+
+      value.codeBlocks = value.codeBlocks || {};
+
+      codeBlockService.setCodeDsl(value.codeBlocks);
     };
 
     editorService.on('root-change', rootChangeHandler);

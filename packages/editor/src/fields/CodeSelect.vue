@@ -44,7 +44,7 @@ const props = defineProps<{
   name: string;
   size: 'mini' | 'small' | 'medium';
 }>();
-const codeDsl = computed(() => services?.codeBlockService.getCodeDslSync());
+const codeDsl = computed(() => services?.codeBlockService.getCodeDsl());
 
 const tableConfig = computed<FormItem>(() => {
   const defaultConfig = {
