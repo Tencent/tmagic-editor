@@ -48,6 +48,7 @@
             :size="size"
             :is="tagName"
             :model="model"
+            :last-values="lastValues"
             :config="config"
             :name="name"
             :disabled="disabled"
@@ -66,6 +67,7 @@
           :size="size"
           :is="tagName"
           :model="model"
+          :last-values="lastValues"
           :config="config"
           :name="name"
           :disabled="disabled"
@@ -193,7 +195,7 @@
           v-for="item in items"
           :key="key(item)"
           :model="name || name === 0 ? model[name] : model"
-          :last-values="name || name === 0 ? lastValues[name] : lastValues"
+          :last-values="name || name === 0 ? lastValues[name] || {} : lastValues"
           :is-compare="isCompare"
           :config="item"
           :size="size"
@@ -258,7 +260,6 @@ const mForm = inject<FormState | undefined>('mForm');
 const expand = ref(false);
 
 const name = computed(() => props.config.name || '');
-
 // 是否展示两个版本的对比内容
 const showDiff = computed(() => {
   if (!props.isCompare) return false;
