@@ -1,3 +1,19 @@
+## [1.2.10](https://github.com/Tencent/tmagic-editor/compare/v1.2.9...v1.2.10) (2023-03-27)
+
+
+### Bug Fixes
+
+* **core:** 非浏览器环境屏蔽相关代码 ([36c4ffa](https://github.com/Tencent/tmagic-editor/commit/36c4ffa02e1b8f7e43a53e29e3e5f57541ca1574))
+* **form:** 修复lastvalues漏传的问题 ([54e2ce2](https://github.com/Tencent/tmagic-editor/commit/54e2ce2c7e49d7eaeecd2044bc4a287d1fa4cc0e))
+* **runtime:** vue playgound 中dsl更新没有同步到Core中 ([b665262](https://github.com/Tencent/tmagic-editor/commit/b6652624e396b73657867759a3d34c852f6de43f))
+
+
+### Features
+
+* **core:** 新增节点操作方法 ([f1f100f](https://github.com/Tencent/tmagic-editor/commit/f1f100f9527ec5e318e0f753d8770a9587eb45c1))
+
+
+
 ## [1.2.9](https://github.com/Tencent/tmagic-editor/compare/v1.2.8...v1.2.9) (2023-03-13)
 
 
