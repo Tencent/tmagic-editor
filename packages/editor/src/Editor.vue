@@ -68,7 +68,7 @@ import { defineComponent, onUnmounted, PropType, provide, reactive, toRaw, watch
 
 import { EventOption } from '@tmagic/core';
 import type { FormConfig } from '@tmagic/form';
-import type { MApp, MNode } from '@tmagic/schema';
+import { CodeBlockContent, Id, MApp, MNode, MPage } from '@tmagic/schema';
 import StageCore, {
   CONTAINER_HIGHLIGHT_CLASS_NAME,
   ContainerHighlightType,
@@ -84,12 +84,14 @@ import Sidebar from './layouts/sidebar/Sidebar.vue';
 import Workspace from './layouts/workspace/Workspace.vue';
 import codeBlockService from './services/codeBlock';
 import componentListService from './services/componentList';
+import depService from './services/dep';
 import editorService from './services/editor';
 import eventsService from './services/events';
 import historyService from './services/history';
 import propsService from './services/props';
 import storageService from './services/storage';
 import uiService from './services/ui';
+import { createCodeBlockTarget } from './utils/dep';
 import type { ComponentGroup, MenuBarData, MenuButton, MenuComponent, Services, SideBarData, StageRect } from './type';
 
 export default defineComponent({
@@ -227,7 +229,7 @@ export default defineComponent({
   emits: ['props-panel-mounted', 'update:modelValue'],
 
   setup(props, { emit }) {
-    const rootChangeHandler = (value: MApp, preValue?: MApp | null) => {
+    const rootChangeHandler = async (value: MApp, preValue?: MApp | null) => {
       const nodeId = editorService.get('node')?.id || props.defaultSelected;
       let node;
       if (nodeId) {
@@ -235,9 +237,9 @@ export default defineComponent({
       }
 
       if (node && node !== value) {
-        editorService.select(node.id);
+        await editorService.select(node.id);
       } else if (value?.items?.length) {
-        editorService.select(value.items[0]);
+        await editorService.select(value.items[0]);
       } else if (value?.id) {
         editorService.set('nodes', [value]);
         editorService.set('parent', null);
@@ -251,9 +253,57 @@ export default defineComponent({
       value.codeBlocks = value.codeBlocks || {};
 
       codeBlockService.setCodeDsl(value.codeBlocks);
+
+      depService.removeTargets('code-block');
+
+      Object.entries(value.codeBlocks).forEach(([id, code]) => {
+        depService.addTarget(createCodeBlockTarget(id, code));
+      });
+
+      if (value && Array.isArray(value.items)) {
+        depService.collect(value.items, true);
+      } else {
+        depService.clear();
+      }
     };
 
+    const nodeAddHandler = (nodes: MNode[]) => {
+      depService.collect(nodes);
+    };
+
+    const nodeUpdateHandler = (nodes: MNode[]) => {
+      depService.collect(nodes);
+    };
+
+    const nodeRemoveHandler = (nodes: MNode[]) => {
+      depService.clear(nodes);
+    };
+
+    const historyChangeHandler = (page: MPage) => {
+      depService.collect([page], true);
+    };
+
+    editorService.on('history-change', historyChangeHandler);
     editorService.on('root-change', rootChangeHandler);
+    editorService.on('add', nodeAddHandler);
+    editorService.on('remove', nodeRemoveHandler);
+    editorService.on('update', nodeUpdateHandler);
+
+    const codeBlockAddOrUpdateHandler = (id: Id, codeBlock: CodeBlockContent) => {
+      if (depService.hasTarget(id)) {
+        depService.getTarget(id)!.name = codeBlock.name;
+        return;
+      }
+
+      depService.addTarget(createCodeBlockTarget(id, codeBlock));
+    };
+
+    const codeBlockRemoveHandler = (id: Id) => {
+      depService.removeTarget(id);
+    };
+
+    codeBlockService.on('addOrUpdate', codeBlockAddOrUpdateHandler);
+    codeBlockService.on('remove', codeBlockRemoveHandler);
 
     // 初始值变化，重新设置节点信息
     watch(
@@ -325,17 +375,6 @@ export default defineComponent({
       },
     );
 
-    onUnmounted(() => {
-      editorService.resetState();
-      historyService.resetState();
-      propsService.resetState();
-      uiService.resetState();
-      componentListService.resetState();
-      codeBlockService.resetState();
-
-      editorService.off('root-change', rootChangeHandler);
-    });
-
     const services: Services = {
       componentListService,
       eventsService,
@@ -345,6 +384,7 @@ export default defineComponent({
       uiService,
       storageService,
       codeBlockService,
+      depService,
     };
 
     provide('services', services);
@@ -366,8 +406,24 @@ export default defineComponent({
         disabledDragStart: props.disabledDragStart,
       }),
     );
-    // 监听组件update
-    codeBlockService.addCodeRelationListener();
+
+    onUnmounted(() => {
+      editorService.resetState();
+      historyService.resetState();
+      propsService.resetState();
+      uiService.resetState();
+      componentListService.resetState();
+      codeBlockService.resetState();
+
+      editorService.off('history-change', historyChangeHandler);
+      editorService.off('root-change', rootChangeHandler);
+      editorService.off('add', nodeAddHandler);
+      editorService.off('remove', nodeRemoveHandler);
+      editorService.off('update', nodeUpdateHandler);
+
+      codeBlockService.off('addOrUpdate', codeBlockAddOrUpdateHandler);
+      codeBlockService.off('remove', codeBlockRemoveHandler);
+    });
 
     return services;
   },

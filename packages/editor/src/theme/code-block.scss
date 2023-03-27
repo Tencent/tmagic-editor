@@ -1,13 +1,6 @@
 .m-editor-code-block-list {
   height: 100%;
   margin-top: 5px;
-
-  .el-tree-node__content {
-    height: auto;
-  }
-  .el-tree-node__label {
-    width: 100%;
-  }
   .code-header-wrapper {
     display: flex;
     align-items: center;
@@ -32,45 +25,24 @@
   .list-container {
     width: 100%;
     overflow: hidden;
-    margin-left: -25px;
     .list-item {
       display: flex;
-      align-items: center;
+      width: 100%;
+
       .right-tool {
-        width: fit-content !important;
         display: flex;
-        align-items: center;
+        width: fit-content !important;
         .edit-icon {
           margin: 0 5px;
         }
       }
       .code-name {
-        font-size: 14px;
-        overflow: hidden;
         white-space: nowrap;
+        overflow: hidden;
         text-overflow: ellipsis;
-        padding: 10px 15px;
         width: 0 !important;
         flex: 1;
-      }
-    }
-    .code-comp-map-wrapper {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-left: 20px;
-      margin-bottom: 5px;
-      .arrow-left {
-        transform: rotate(-45deg);
-        width: 20px;
-        height: 20px;
-      }
-      .code-comp {
-        margin-left: 5px;
-        padding: 5px;
-        .comp-delete-icon {
-          margin-left: 3px;
-        }
+        line-height: 18px;
       }
     }
   }

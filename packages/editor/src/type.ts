@@ -30,6 +30,7 @@ import type {
 
 import type { CodeBlockService } from './services/codeBlock';
 import type { ComponentListService } from './services/componentList';
+import type { DepService } from './services/dep';
 import type { EditorService } from './services/editor';
 import type { EventsService } from './services/events';
 import type { HistoryService } from './services/history';
@@ -54,6 +55,7 @@ export interface Services {
   componentListService: ComponentListService;
   uiService: UiService;
   codeBlockService: CodeBlockService;
+  depService: DepService;
 }
 
 export interface StageOptions {
@@ -339,8 +341,6 @@ export type CodeState = {
   combineIds: string[];
   /** 为业务逻辑预留的不可删除的代码块列表，由业务逻辑维护（如代码块上线后不可删除） */
   undeletableList: Id[];
-  /** 代码块和组件的绑定关系 */
-  relations: CodeRelation;
 };
 
 export type HookData = {
