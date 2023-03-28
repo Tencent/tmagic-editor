@@ -228,7 +228,7 @@ class Editor extends BaseService {
     if (node?.id) {
       this.get('stage')
         ?.renderer.runtime?.getApp?.()
-        .page?.emit(
+        ?.page?.emit(
           'editor:select',
           {
             node,

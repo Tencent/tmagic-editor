@@ -18,7 +18,7 @@
 
 import { EventEmitter } from 'events';
 
-import type { CodeBlockDSL, EventItemConfig, Id, MApp, MPage } from '@tmagic/schema';
+import type { CodeBlockDSL, EventItemConfig, Id, MApp } from '@tmagic/schema';
 
 import Env from './Env';
 import { bindCommonEventListener, isCommonMethod, triggerCommonMethod } from './events';
@@ -44,10 +44,10 @@ interface EventCache {
 
 class App extends EventEmitter {
   public env;
-  public codeDsl: CodeBlockDSL | undefined;
-  public pages = new Map<Id, Page>();
+  public dsl?: MApp;
+  public codeDsl?: CodeBlockDSL;
 
-  public page: Page | undefined;
+  public page?: Page;
 
   public platform = 'mobile';
   public jsEngine = 'browser';
@@ -86,13 +86,15 @@ class App extends EventEmitter {
       this.transformStyle = options.transformStyle;
     }
 
-    options.config && this.setConfig(options.config, options.curPage);
+    if (options.config) {
+      this.setConfig(options.config, options.curPage);
+    }
 
     bindCommonEventListener(this);
   }
 
   /**
-   * 将dsl中的style配置转换成css，主要是将数子转成rem为单位的样式值，例如100将被转换成1rem
+   * 将dsl中的style配置转换成css，主要是将数值转成rem为单位的样式值，例如100将被转换成1rem
    * @param style Object
    * @returns Object
    */
@@ -141,52 +143,60 @@ class App extends EventEmitter {
    * @param curPage 当前页面id
    */
   public setConfig(config: MApp, curPage?: Id) {
+    this.dsl = config;
     this.codeDsl = config.codeBlocks;
-    this.pages = new Map();
-    config.items?.forEach((page) => {
-      this.addPage(page);
-    });
-
     this.setPage(curPage || this.page?.data?.id);
   }
 
-  public addPage(config: MPage) {
-    this.pages.set(
-      config.id,
-      new Page({
-        config,
-        app: this,
-      }),
-    );
+  /**
+   * 留着为了兼容，不让报错
+   * @deprecated
+   */
+  public addPage() {
+    console.info('addPage 已经弃用');
   }
 
   public setPage(id?: Id) {
-    let page;
+    const pageConfig = this.dsl?.items.find((page) => page.id === id);
 
-    if (id) {
-      page = this.pages.get(id);
+    if (!pageConfig) {
+      if (this.page) {
+        this.page.destroy();
+        this.page = undefined;
+      }
+      return;
     }
 
-    if (!page) {
-      page = this.pages.get(this.pages.keys().next().value);
+    if (pageConfig === this.page?.data) return;
+
+    if (this.page) {
+      this.page.destroy();
     }
 
-    this.page = page;
+    this.page = new Page({
+      config: pageConfig,
+      app: this,
+    });
 
     if (this.platform !== 'magic') {
       this.bindEvents();
     }
   }
 
-  public deletePage(id: Id) {
-    this.pages.delete(id);
-    if (!this.pages.size) {
-      this.page = undefined;
-    }
+  public deletePage() {
+    this.page = undefined;
   }
 
-  public getPage(id: Id) {
-    return this.pages.get(id);
+  /**
+   * 兼容id参数
+   * @param id 节点id
+   * @returns Page | void
+   */
+  public getPage(id?: Id) {
+    if (!id) return this.page;
+    if (this.page?.data.id === id) {
+      return this.page;
+    }
   }
 
   public registerComponent(type: string, Component: any) {
@@ -252,7 +262,7 @@ class App extends EventEmitter {
 
   public destroy() {
     this.removeAllListeners();
-    this.pages.clear();
+    this.page = undefined;
   }
 
   private addEventToMap(event: EventCache) {

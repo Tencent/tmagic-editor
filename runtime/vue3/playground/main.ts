@@ -18,6 +18,8 @@
 
 import { createApp } from 'vue';
 
+import Core from '@tmagic/core';
+
 import App from './App.vue';
 
 Promise.all([import('../.tmagic/comp-entry'), import('../.tmagic/plugin-entry')]).then(([components, plugins]) => {
@@ -30,6 +32,15 @@ Promise.all([import('../.tmagic/comp-entry'), import('../.tmagic/plugin-entry')]
   Object.values(plugins.default).forEach((plugin: any) => {
     magicApp.use(plugin);
   });
+
+  const designWidth = document.documentElement.getBoundingClientRect().width;
+  const app = new Core({
+    designWidth,
+    platform: 'editor',
+  });
+
+  magicApp.config.globalProperties.app = app;
+  magicApp.provide('app', app);
 
   magicApp.mount('#app');
 });

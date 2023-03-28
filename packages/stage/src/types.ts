@@ -219,7 +219,7 @@ export interface RemoveData {
 }
 
 export interface Runtime {
-  getApp?: () => Core;
+  getApp?: () => Core | undefined;
   beforeSelect?: (el: HTMLElement) => Promise<boolean> | boolean;
   updateRootConfig?: (config: MApp) => void;
   updatePageId?: (id: Id) => void;

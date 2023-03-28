@@ -1,12 +1,12 @@
 <template>
-  <magic-ui-page v-if="pageConfig" :config="pageConfig"></magic-ui-page>
+  <magic-ui-page v-if="pageConfig" :key="pageConfig.id" :config="pageConfig"></magic-ui-page>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, provide, reactive, ref, watch } from 'vue';
+import { computed, defineComponent, inject, nextTick, reactive, ref, watch } from 'vue';
 
 import Core from '@tmagic/core';
-import type { Id, MApp, MNode, MPage } from '@tmagic/schema';
+import type { Id, MApp, MNode } from '@tmagic/schema';
 import { Magic, RemoveData, UpdateData } from '@tmagic/stage';
 import { getNodePath } from '@tmagic/utils';
 
@@ -18,6 +18,8 @@ declare global {
 
 export default defineComponent({
   setup() {
+    const app = inject<Core | undefined>('app');
+
     const root = ref<MApp>();
     const curPageId = ref<Id>();
     const selectedId = ref<Id>();
@@ -25,17 +27,6 @@ export default defineComponent({
     const pageConfig = computed(
       () => root.value?.items?.find((item: MNode) => item.id === curPageId.value) || root.value?.items?.[0],
     );
-
-    const designWidth = document.documentElement.getBoundingClientRect().width;
-    const app = new Core({
-      designWidth,
-      config: root.value,
-      platform: 'editor',
-    });
-
-    window.appInstance = app;
-
-    provide('app', app);
 
     watch(pageConfig, async () => {
       await nextTick();
@@ -64,7 +55,7 @@ export default defineComponent({
         console.log('select config', id);
         selectedId.value = id;
 
-        if (app.getPage(id)) {
+        if (app?.getPage(id)) {
           this.updatePageId?.(id);
         }
 
@@ -84,9 +75,7 @@ export default defineComponent({
         const parent = getNodePath(parentId, [root.value]).pop();
         if (!parent) throw new Error('未找到父节点');
 
-        if (config.type === 'page') {
-          app?.addPage(config as MPage);
-        } else {
+        if (config.type !== 'page') {
           const parentNode = app?.page?.getNode(parent.id);
           parentNode && app?.page?.initNode(config, parentNode);
         }
@@ -112,7 +101,7 @@ export default defineComponent({
         if (!node) throw new Error('未找到目标节点');
         if (!parent) throw new Error('未找到父节点');
 
-        const nodeInstance = app.page?.getNode(config.id);
+        const nodeInstance = app?.page?.getNode(config.id);
         if (nodeInstance) {
           nodeInstance.setData(config);
         }
@@ -131,9 +120,9 @@ export default defineComponent({
         if (!parent) throw new Error('未找到父元素');
 
         if (node.type === 'page') {
-          app?.deletePage(node.id);
+          app?.deletePage();
         } else {
-          app.page?.deleteNode(node.id);
+          app?.page?.deleteNode(node.id);
         }
 
         const index = parent.items?.findIndex((child: MNode) => child.id === node.id);

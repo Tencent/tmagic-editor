@@ -61,6 +61,12 @@ class Page extends Node {
   public deleteNode(id: Id) {
     this.nodes.delete(id);
   }
+
+  public destroy(): void {
+    super.destroy();
+
+    this.nodes.clear();
+  }
 }
 
 export default Page;

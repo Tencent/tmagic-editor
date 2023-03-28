@@ -39,7 +39,6 @@ const designWidth = document.documentElement.getBoundingClientRect().width;
 
 const app = new Core({
   designWidth,
-  config: {},
   platform: 'editor',
 });
 

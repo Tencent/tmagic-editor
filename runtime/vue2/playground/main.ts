@@ -18,6 +18,8 @@
 
 import Vue from 'vue';
 
+import Core from '@tmagic/core';
+
 import App from './App.vue';
 
 Promise.all([import('../.tmagic/comp-entry'), import('../.tmagic/plugin-entry')]).then(([components, plugins]) => {
@@ -29,9 +31,21 @@ Promise.all([import('../.tmagic/comp-entry'), import('../.tmagic/plugin-entry')]
     Vue.use(plugin);
   });
 
+  const designWidth = document.documentElement.getBoundingClientRect().width;
+
+  const app = new Core({
+    designWidth,
+    platform: 'editor',
+  });
+
+  Vue.prototype.app = app;
+
   new Vue({
     // @ts-ignore
     render: (h) => h(App),
+    provide: {
+      app,
+    },
     el: '#app',
   });
 });

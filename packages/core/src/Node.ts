@@ -70,6 +70,10 @@ class Node extends EventEmitter {
     this.emit('updata-data');
   }
 
+  public destroy() {
+    this.removeAllListeners();
+  }
+
   private listenLifeSafe() {
     this.once('created', async (instance: any) => {
       this.instance = instance;
