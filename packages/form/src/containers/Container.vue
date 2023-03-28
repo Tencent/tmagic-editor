@@ -76,7 +76,7 @@
           @addDiffCount="onAddDiffCount"
         ></component>
 
-        <div v-if="extra" v-html="extra" class="m-form-tip"></div>
+        <div v-if="extra && type !== 'table'" v-html="extra" class="m-form-tip"></div>
       </TMagicFormItem>
 
       <TMagicTooltip v-if="config.tip" placement="left">
