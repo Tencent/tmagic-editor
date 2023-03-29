@@ -68,6 +68,8 @@ class App extends EventEmitter {
 
   public eventQueueMap: Record<string, EventCache[]> = {};
 
+  private eventList: { [name: string]: (fromCpt: Node, ...args: any[]) => void } = {};
+
   constructor(options: AppOptionsConfig) {
     super();
 
@@ -175,6 +177,7 @@ class App extends EventEmitter {
         this.page.destroy();
         this.page = undefined;
       }
+      super.emit('page-change');
       return;
     }
 
@@ -188,6 +191,8 @@ class App extends EventEmitter {
       config: pageConfig,
       app: this,
     });
+
+    super.emit('page-change', this.page);
 
     if (this.platform !== 'magic') {
       this.bindEvents();
@@ -223,20 +228,25 @@ class App extends EventEmitter {
   }
 
   public bindEvents() {
+    Object.entries(this.eventList).forEach(([name, handler]) => {
+      this.off(name, handler);
+    });
+
+    this.eventList = {};
+
     if (!this.page) return;
 
-    this.removeAllListeners();
-
     for (const [, value] of this.page.nodes) {
-      value.events?.forEach((event) => this.bindEvent(event, `${value.data.id}`));
-    }
-  }
+      value.events?.forEach((event) => {
+        const eventName = `${event.name}_${value.data.id}`;
+        const eventHanlder = (fromCpt: Node, ...args: any[]) => {
+          this.eventHandler(event, fromCpt, args);
+        };
+        this.eventList[eventName] = eventHanlder;
 
-  public bindEvent(event: EventConfig | DeprecatedEventConfig, id: string) {
-    const { name } = event;
-    this.on(`${name}_${id}`, async (fromCpt: Node, ...args) => {
-      await this.eventHandler(event, fromCpt, args);
-    });
+        this.on(eventName, eventHanlder);
+      });
+    }
   }
 
   public emit(name: string | symbol, node: any, ...args: any[]): boolean {
