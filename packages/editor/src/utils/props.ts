@@ -18,9 +18,6 @@
 
 import { FormConfig, FormState } from '@tmagic/form';
 
-import editorService from '../services/editor';
-import eventsService from '../services/events';
-
 /**
  * 统一为组件属性表单加上事件、高级、样式配置
  * @param config 组件属性配置
@@ -183,39 +180,8 @@ export const fillConfig = (config: FormConfig = []) => [
         title: '事件',
         items: [
           {
-            type: 'table',
             name: 'events',
-            items: [
-              {
-                name: 'name',
-                label: '事件名',
-                type: 'select',
-                options: (mForm: FormState, { formValue }: any) =>
-                  eventsService.getEvent(formValue.type).map((option) => ({
-                    text: option.label,
-                    value: option.value,
-                  })),
-              },
-              {
-                name: 'to',
-                label: '联动组件',
-                type: 'ui-select',
-              },
-              {
-                name: 'method',
-                label: '动作',
-                type: 'select',
-                options: (mForm: FormState, { model }: any) => {
-                  const node = editorService.getNodeById(model.to);
-                  if (!node?.type) return [];
-
-                  return eventsService.getMethod(node.type).map((option) => ({
-                    text: option.label,
-                    value: option.value,
-                  }));
-                },
-              },
-            ],
+            type: 'event-select',
           },
         ],
       },

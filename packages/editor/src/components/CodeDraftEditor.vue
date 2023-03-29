@@ -25,6 +25,7 @@
 </template>
 <script lang="ts" setup name="MEditorCodeDraftEditor">
 import { computed, inject, ref, watchEffect } from 'vue';
+import type { Action } from 'element-plus';
 import type * as monaco from 'monaco-editor';
 
 import { TMagicButton, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
@@ -109,18 +110,21 @@ const close = async (): Promise<void> => {
   if (codeDraft) {
     tMagicMessageBox
       .confirm('您有代码修改未保存，是否保存后再关闭？', '提示', {
-        confirmButtonText: '确认',
-        cancelButtonText: '取消',
+        confirmButtonText: '保存并关闭',
+        cancelButtonText: '直接关闭',
         type: 'warning',
+        distinguishCancelAndClose: true,
       })
       .then(async () => {
         // 保存之后再关闭
         saveAndClose();
       })
-      .catch(() => {
-        // 删除草稿 直接关闭
-        services?.codeBlockService.removeCodeDraft(props.id);
-        emit('close');
+      .catch((action: Action) => {
+        if (action === 'cancel') {
+          // 删除草稿 直接关闭
+          services?.codeBlockService.removeCodeDraft(props.id);
+          emit('close');
+        }
       });
   } else {
     emit('close');

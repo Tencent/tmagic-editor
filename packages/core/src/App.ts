@@ -18,7 +18,18 @@
 
 import { EventEmitter } from 'events';
 
-import type { CodeBlockDSL, EventItemConfig, Id, MApp } from '@tmagic/schema';
+import { has, isEmpty } from 'lodash-es';
+
+import {
+  ActionType,
+  CodeBlockDSL,
+  CodeItemConfig,
+  CompItemConfig,
+  DeprecatedEventConfig,
+  EventConfig,
+  Id,
+  MApp,
+} from '@tmagic/schema';
 
 import Env from './Env';
 import { bindCommonEventListener, isCommonMethod, triggerCommonMethod } from './events';
@@ -37,7 +48,7 @@ interface AppOptionsConfig {
 }
 
 interface EventCache {
-  eventConfig: EventItemConfig;
+  eventConfig: CompItemConfig | DeprecatedEventConfig;
   fromCpt: any;
   args: any[];
 }
@@ -221,10 +232,10 @@ class App extends EventEmitter {
     }
   }
 
-  public bindEvent(event: EventItemConfig, id: string) {
+  public bindEvent(event: EventConfig | DeprecatedEventConfig, id: string) {
     const { name } = event;
-    this.on(`${name}_${id}`, (fromCpt: Node, ...args) => {
-      this.eventHandler(event, fromCpt, args);
+    this.on(`${name}_${id}`, async (fromCpt: Node, ...args) => {
+      await this.eventHandler(event, fromCpt, args);
     });
   }
 
@@ -235,11 +246,53 @@ class App extends EventEmitter {
     return super.emit(name, node, ...args);
   }
 
-  public eventHandler(eventConfig: EventItemConfig, fromCpt: any, args: any[]) {
+  /**
+   * 事件联动处理函数
+   * @param eventConfig 事件配置
+   * @param fromCpt 触发事件的组件
+   * @param args 事件参数
+   */
+  public async eventHandler(eventConfig: EventConfig | DeprecatedEventConfig, fromCpt: any, args: any[]) {
+    if (has(eventConfig, 'actions')) {
+      // EventConfig类型
+      const { actions } = eventConfig as EventConfig;
+      for (const actionItem of actions) {
+        if (actionItem.actionType === ActionType.COMP) {
+          // 组件动作
+          await this.compActionHandler(actionItem as CompItemConfig, fromCpt, args);
+        } else if (actionItem.actionType === ActionType.CODE) {
+          // 执行代码块
+          await this.codeActionHandler(actionItem as CodeItemConfig);
+        }
+      }
+    } else {
+      // 兼容DeprecatedEventConfig类型 组件动作
+      await this.compActionHandler(eventConfig as DeprecatedEventConfig, fromCpt, args);
+    }
+  }
+
+  /**
+   * 执行代码块动作
+   * @param eventConfig 代码动作的配置
+   * @returns void
+   */
+  public async codeActionHandler(eventConfig: CodeItemConfig) {
+    const { codeId = '', params = {} } = eventConfig;
+    if (!codeId || isEmpty(this.codeDsl)) return;
+    if (this.codeDsl![codeId] && typeof this.codeDsl![codeId]?.content === 'function') {
+      await this.codeDsl![codeId].content({ app: this, params });
+    }
+  }
+
+  /**
+   * 执行联动组件动作
+   * @param eventConfig 联动组件的配置
+   * @returns void
+   */
+  public async compActionHandler(eventConfig: CompItemConfig | DeprecatedEventConfig, fromCpt: any, args: any[]) {
     if (!this.page) throw new Error('当前没有页面');
 
     const { method: methodName, to } = eventConfig;
-
     const toNode = this.page.getNode(to);
     if (!toNode) throw `ID为${to}的组件不存在`;
 
@@ -249,7 +302,7 @@ class App extends EventEmitter {
 
     if (toNode.instance) {
       if (typeof toNode.instance[methodName] === 'function') {
-        toNode.instance[methodName](fromCpt, ...args);
+        await toNode.instance[methodName](fromCpt, ...args);
       }
     } else {
       this.addEventToMap({

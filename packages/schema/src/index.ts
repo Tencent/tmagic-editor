@@ -24,14 +24,50 @@ export enum NodeType {
 
 export type Id = string | number;
 
-export interface EventItemConfig {
+// 事件联动的动作类型
+export enum ActionType {
+  /** 联动组件 */
+  COMP = 'comp',
+  /** 联动代码 */
+  CODE = 'code',
+}
+
+/** 事件类型(已废弃，后续不建议继续使用) */
+export interface DeprecatedEventConfig {
+  /** 待触发的事件名称 */
+  name: string;
   /** 被选中组件ID */
   to: Id;
-  /** 被选中组件名称 */
-  name: string;
   /** 触发事件后执行被选中组件的方法 */
   method: string;
 }
+
+export interface EventConfig {
+  /** 待触发的事件名称 */
+  name: string;
+  /** 动作响应配置 */
+  actions: EventActionItem[];
+}
+
+export interface CodeItemConfig {
+  /** 动作类型 */
+  actionType: ActionType;
+  /** 代码ID */
+  codeId: Id;
+  /** 代码参数 */
+  params?: object;
+}
+
+export interface CompItemConfig {
+  /** 动作类型 */
+  actionType: ActionType;
+  /** 被选中组件ID */
+  to: Id;
+  /** 触发事件后执行被选中组件的方法 */
+  method: string;
+}
+
+export type EventActionItem = CompItemConfig | CodeItemConfig;
 
 export interface MComponent {
   /** 组件ID，默认为${type}_${number}}形式, 如：page_123 */
@@ -43,7 +79,7 @@ export interface MComponent {
   /** 组件根Dom上的class */
   className?: string;
   /* 关联事件集合 */
-  events?: EventItemConfig[];
+  events?: EventConfig[] | DeprecatedEventConfig[];
   /** 组件根Dom的style */
   style?: {
     [key: string]: any;

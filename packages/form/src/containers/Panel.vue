@@ -5,11 +5,11 @@
     :body-style="{ display: expand ? 'block' : 'none' }"
   >
     <template #header>
-      <div class="clearfix">
-        <a href="javascript:" style="width: 100%; display: block" @click="expand = !expand">
-          <TMagicIcon><CaretBottom v-if="expand" /><CaretRight v-else /></TMagicIcon> {{ filter(config.title) }}
-          <span v-if="config && config.extra" v-html="config.extra" class="m-form-tip"></span>
-        </a>
+      <div style="width: 100%; display: flex; align-items: center">
+        <TMagicButton style="padding: 0" text :icon="expand ? CaretBottom : CaretRight" @click="expand = !expand">
+        </TMagicButton>
+        <span v-if="config && config.extra" v-html="config.extra" class="m-form-tip"></span>
+        <slot name="header">{{ filter(config.title) }}</slot>
       </div>
     </template>
 
@@ -61,7 +61,7 @@
 import { computed, inject, ref } from 'vue';
 import { CaretBottom, CaretRight } from '@element-plus/icons-vue';
 
-import { TMagicCard, TMagicIcon } from '@tmagic/design';
+import { TMagicButton, TMagicCard } from '@tmagic/design';
 
 import { FormState, PanelConfig } from '../schema';
 import { filterFunction } from '../utils/form';
@@ -73,7 +73,7 @@ const props = defineProps<{
   lastValues?: any;
   isCompare?: boolean;
   config: PanelConfig;
-  name: string;
+  name?: string;
   labelWidth?: string;
   prop?: string;
   size?: string;

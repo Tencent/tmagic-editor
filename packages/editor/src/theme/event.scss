@@ -1,0 +1,24 @@
+.m-fields-event-select {
+  width: 100%;
+  .fullWidth {
+    width: 100%;
+  }
+  .m-form-panel .el-card__body {
+    padding: 10px 25px;
+  }
+
+  .event-select-code {
+    margin-left: 20px;
+    width: auto;
+  }
+  .m-form-panel {
+    margin: 10px 0px;
+  }
+
+  .el-card.is-always-shadow {
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.12);
+  }
+}
+.m-fields-code-select-col {
+  width: 100%;
+}

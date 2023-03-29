@@ -18,7 +18,7 @@
 
 import type { Component } from 'vue';
 
-import type { FormConfig } from '@tmagic/form';
+import type { FormConfig, FormItem } from '@tmagic/form';
 import type { CodeBlockContent, CodeBlockDSL, Id, MApp, MContainer, MNode, MPage } from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
 import type {
@@ -409,4 +409,19 @@ export interface HistoryState {
   pageSteps: Record<Id, UndoRedo<StepValue>>;
   canRedo: boolean;
   canUndo: boolean;
+}
+
+export interface EventSelectConfig {
+  name: string;
+  type: 'event-select';
+  /** 事件名称表单配置 */
+  eventNameConfig?: FormItem;
+  /** 动作类型配置 */
+  actionTypeConfig?: FormItem;
+  /** 联动组件配置 */
+  targetCompConfig?: FormItem;
+  /** 联动组件动作配置 */
+  compActionConfig?: FormItem;
+  /** 联动代码配置 */
+  codeActionConfig?: FormItem;
 }

@@ -171,7 +171,7 @@ class CodeBlock extends BaseService {
 
   /**
    * 设置编辑状态
-   * @param {boolean} 是否可编辑
+   * @param {boolean} status 是否可编辑
    * @returns {void}
    */
   public async setEditStatus(status: boolean): Promise<void> {

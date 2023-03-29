@@ -28,9 +28,11 @@ export default {
       params: [
         {
           name: 'age',
+          type: 'number',
         },
         {
           name: 'studentName',
+          type: 'text',
         },
       ],
     },
@@ -64,7 +66,35 @@ export default {
         fontSize: '',
         fontWeight: '',
       },
-      events: [],
+      events: [
+        {
+          name: 'magic:common:events:click', // 事件名
+          actions: [
+            {
+              actionType: 'code', // 联动动作类型
+              codeId: 'code_5336', // 代码块id
+              params: {
+                age: 12,
+              }, // 参数
+            },
+            {
+              actionType: 'comp',
+              to: 'overlay_2159', // 联动组件id
+              method: 'openOverlay', // 联动组件方法
+            },
+          ],
+        },
+        {
+          name: 'magic:common:events:click', // 事件名
+          actions: [
+            {
+              actionType: 'code', // 联动动作类型
+              codeId: 'code_5316', // 代码块id
+              params: {},
+            },
+          ],
+        },
+      ],
       created: {
         hookType: 'code',
         hookData: [

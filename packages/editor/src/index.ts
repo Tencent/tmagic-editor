@@ -20,6 +20,8 @@ import { App } from 'vue';
 import Code from './fields/Code.vue';
 import CodeLink from './fields/CodeLink.vue';
 import CodeSelect from './fields/CodeSelect.vue';
+import CodeSelectCol from './fields/CodeSelectCol.vue';
+import EventSelect from './fields/EventSelect.vue';
 import uiSelect from './fields/UISelect.vue';
 import CodeEditor from './layouts/CodeEditor.vue';
 import { setConfig } from './utils/config';
@@ -44,6 +46,8 @@ export { default as depService } from './services/dep';
 export { default as ComponentListPanel } from './layouts/sidebar/ComponentListPanel.vue';
 export { default as LayerPanel } from './layouts/sidebar/LayerPanel.vue';
 export { default as CodeSelect } from './fields/CodeSelect.vue';
+export { default as CodeSelectCol } from './fields/CodeSelectCol.vue';
+export { default as EventSelect } from './fields/EventSelect.vue';
 export { default as CodeBlockList } from './layouts/sidebar/code-block/CodeBlockList.vue';
 export { default as PropsPanel } from './layouts/PropsPanel.vue';
 export { default as ToolButton } from './components/ToolButton.vue';
@@ -68,5 +72,7 @@ export default {
     app.component('m-fields-vs-code', Code);
     app.component('magic-code-editor', CodeEditor);
     app.component('m-fields-code-select', CodeSelect);
+    app.component('m-fields-code-select-col', CodeSelectCol);
+    app.component('m-fields-event-select', EventSelect);
   },
 };
