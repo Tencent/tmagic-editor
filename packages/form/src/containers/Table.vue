@@ -272,11 +272,8 @@ const foreUpdate = () => {
 };
 
 const swapArray = (index1: number, index2: number) => {
-  [props.model[modelName.value][index1]] = props.model[modelName.value].splice(
-    index2,
-    1,
-    props.model[modelName.value][index1],
-  );
+  props.model[modelName.value].splice(index1, 0, props.model[modelName.value].splice(index2, 1)[0]);
+
   if (props.sortKey) {
     for (let i = props.model[modelName.value].length - 1, v = 0; i >= 0; i--, v++) {
       props.model[modelName.value][v][props.sortKey] = i;
