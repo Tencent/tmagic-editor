@@ -1,3 +1,17 @@
+## [1.2.13](https://github.com/Tencent/tmagic-editor/compare/v1.2.12...v1.2.13) (2023-03-30)
+
+
+### Bug Fixes
+
+* **editor:** 代码块code-block-panel-tool slot data丢失 ([aa12779](https://github.com/Tencent/tmagic-editor/commit/aa12779598ba94a56f26776a6dc1213ed5bb35dc))
+
+
+### Features
+
+* **design,element-plus-adapter,tdesign-vue-next-adapter:** 新增drawer ([1b5d3e5](https://github.com/Tencent/tmagic-editor/commit/1b5d3e564d8afe0bb2709ef9c14e8577592b2c9e))
+
+
+
 ## [1.2.12](https://github.com/Tencent/tmagic-editor/compare/v1.2.11...v1.2.12) (2023-03-30)
 
 
