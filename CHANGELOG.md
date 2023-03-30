@@ -1,3 +1,21 @@
+## [1.2.11](https://github.com/Tencent/tmagic-editor/compare/v1.2.10...v1.2.11) (2023-03-30)
+
+
+### Bug Fixes
+
+* **form:** table 移动列变成了交换 ([37045f7](https://github.com/Tencent/tmagic-editor/commit/37045f7201a48105a32e0371f27c69154393e777))
+* **form:** table可能出现两个extra ([0cac40e](https://github.com/Tencent/tmagic-editor/commit/0cac40eb316f83a5dcee8fbf627f97fb9af8a713))
+
+
+### Features
+
+* **core,runtime:** 删除App中pages，只留下当前page ([cfd2a6e](https://github.com/Tencent/tmagic-editor/commit/cfd2a6eee38bde7f723c27509a1cd9f57c3165ba))
+* **editor,form,core,schema:** 事件支持触发代码块 ([39468f3](https://github.com/Tencent/tmagic-editor/commit/39468f3b95749c424be84e4229c18fcd18ec9b54))
+* **editor:** 新增依赖收集器 ([35f9a59](https://github.com/Tencent/tmagic-editor/commit/35f9a59f442d50b195b14f91da26b6b314928f55))
+* **edtior:** 代码块使用依赖收集器改造 ([3b6ca97](https://github.com/Tencent/tmagic-editor/commit/3b6ca97f4ceeab215cb9d43b237159993bb6370b))
+
+
+
 ## [1.2.10](https://github.com/Tencent/tmagic-editor/compare/v1.2.9...v1.2.10) (2023-03-27)
 
 
