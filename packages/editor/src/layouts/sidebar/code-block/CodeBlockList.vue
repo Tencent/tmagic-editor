@@ -1,5 +1,5 @@
 <template>
-  <div class="m-editor-code-block-list">
+  <TMagicScrollbar class="m-editor-code-block-list">
     <slot name="code-block-panel-header">
       <div class="code-header-wrapper">
         <SearchInput @search="filterTextChangeHandler"></SearchInput>
@@ -10,38 +10,36 @@
     </slot>
 
     <!-- 代码块列表 -->
-    <TMagicScrollbar>
-      <TMagicTree
-        ref="tree"
-        class="magic-editor-layer-tree"
-        node-key="id"
-        empty-text="暂无代码块"
-        default-expand-all
-        :expand-on-click-node="false"
-        :data="codeList"
-        :highlight-current="true"
-        :filter-node-method="filterNode"
-        @node-click="clickHandler"
-      >
-        <template #default="{ data }">
-          <div :id="data.id" class="list-container">
-            <div class="list-item">
-              <span class="code-name">{{ data.name }}（{{ data.id }}）</span>
-              <!-- 右侧工具栏 -->
-              <div class="right-tool" v-if="data.type === 'code'">
-                <TMagicTooltip effect="dark" :content="editable ? '编辑' : '查看'" placement="bottom">
-                  <Icon :icon="editable ? Edit : View" class="edit-icon" @click.stop="editCode(`${data.id}`)"></Icon>
-                </TMagicTooltip>
-                <TMagicTooltip effect="dark" content="删除" placement="bottom" v-if="editable">
-                  <Icon :icon="Close" class="edit-icon" @click.stop="deleteCode(`${data.id}`)"></Icon>
-                </TMagicTooltip>
-                <slot name="code-block-panel-tool" :id="data.id" :data="data.codeBlockContent"></slot>
-              </div>
+    <TMagicTree
+      ref="tree"
+      class="magic-editor-layer-tree"
+      node-key="id"
+      empty-text="暂无代码块"
+      default-expand-all
+      :expand-on-click-node="false"
+      :data="codeList"
+      :highlight-current="true"
+      :filter-node-method="filterNode"
+      @node-click="clickHandler"
+    >
+      <template #default="{ data }">
+        <div :id="data.id" class="list-container">
+          <div class="list-item">
+            <span class="code-name">{{ data.name }}（{{ data.id }}）</span>
+            <!-- 右侧工具栏 -->
+            <div class="right-tool" v-if="data.type === 'code'">
+              <TMagicTooltip effect="dark" :content="editable ? '编辑' : '查看'" placement="bottom">
+                <Icon :icon="editable ? Edit : View" class="edit-icon" @click.stop="editCode(`${data.id}`)"></Icon>
+              </TMagicTooltip>
+              <TMagicTooltip effect="dark" content="删除" placement="bottom" v-if="editable">
+                <Icon :icon="Close" class="edit-icon" @click.stop="deleteCode(`${data.id}`)"></Icon>
+              </TMagicTooltip>
+              <slot name="code-block-panel-tool" :id="data.id" :data="data.codeBlockContent"></slot>
             </div>
           </div>
-        </template>
-      </TMagicTree>
-    </TMagicScrollbar>
+        </div>
+      </template>
+    </TMagicTree>
 
     <!-- 代码块编辑区 -->
     <CodeBlockEditor v-if="isShowCodeBlockEditor" :paramsColConfig="paramsColConfig">
@@ -49,7 +47,7 @@
         <slot name="code-block-edit-panel-header" :id="id"></slot>
       </template>
     </CodeBlockEditor>
-  </div>
+  </TMagicScrollbar>
 </template>
 
 <script setup lang="ts" name="MEditorCodeBlockList">

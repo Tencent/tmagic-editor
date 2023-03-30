@@ -1,6 +1,10 @@
 .m-editor-code-block-list {
   height: 100%;
-  margin-top: 48px;
+
+  .magic-editor-layer-tree {
+    padding-top: 48px;
+  }
+
   .code-header-wrapper {
     display: flex;
     align-items: center;
@@ -8,6 +12,7 @@
     position: absolute;
     top: 0;
     width: 100%;
+    z-index: 1;
 
     .search-input {
       flex: 1;
