@@ -11,6 +11,7 @@ import {
   ElDatePicker,
   ElDialog,
   ElDivider,
+  ElDrawer,
   ElDropdown,
   ElDropdownItem,
   ElDropdownMenu,
@@ -105,6 +106,11 @@ const adapter: any = {
 
     divider: {
       component: ElDivider,
+      props: (props: any) => props,
+    },
+
+    drawer: {
+      component: ElDrawer,
       props: (props: any) => props,
     },
 

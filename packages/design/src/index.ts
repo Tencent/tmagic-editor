@@ -19,6 +19,7 @@ export { default as TMagicColorPicker } from './ColorPicker.vue';
 export { default as TMagicDatePicker } from './DatePicker.vue';
 export { default as TMagicDialog } from './Dialog.vue';
 export { default as TMagicDivider } from './Divider.vue';
+export { default as TMagicDrawer } from './Drawer.vue';
 export { default as TMagicDropdown } from './Dropdown.vue';
 export { default as TMagicDropdownItem } from './DropdownItem.vue';
 export { default as TMagicDropdownMenu } from './DropdownMenu.vue';

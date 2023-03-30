@@ -60,6 +60,11 @@ export default {
       props: (props: any) => props,
     },
 
+    drawer: {
+      component: 'el-drawer',
+      props: (props: any) => props,
+    },
+
     dropdown: {
       component: 'el-dropdown',
       props: (props: any) => props,

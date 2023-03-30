@@ -1,4 +1,5 @@
 import {
+  ElDrawer,
   ElDropdown,
   ElDropdownItem,
   ElDropdownMenu,
@@ -165,6 +166,11 @@ const adapter: any = {
         layout: props.direction,
         content: props.contentPosition,
       }),
+    },
+
+    drawer: {
+      component: ElDrawer,
+      props: (props: any) => props,
     },
 
     dropdown: {
