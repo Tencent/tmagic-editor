@@ -100,7 +100,11 @@ class App extends EventEmitter {
     }
 
     if (options.config) {
-      this.setConfig(options.config, options.curPage);
+      let pageId = options.curPage;
+      if (!pageId && options.config.items.length) {
+        pageId = options.config.items[0].id;
+      }
+      this.setConfig(options.config, pageId);
     }
 
     bindCommonEventListener(this);
@@ -177,6 +181,7 @@ class App extends EventEmitter {
         this.page.destroy();
         this.page = undefined;
       }
+
       super.emit('page-change');
       return;
     }
