@@ -1,3 +1,13 @@
+## [1.2.12](https://github.com/Tencent/tmagic-editor/compare/v1.2.11...v1.2.12) (2023-03-30)
+
+
+### Bug Fixes
+
+* **core:** style兼容hippy ([fb026a1](https://github.com/Tencent/tmagic-editor/commit/fb026a134ff74193a89519428a0185806c339b04))
+* **core:** 没有设置curPage，默认取第一个page ([44290b6](https://github.com/Tencent/tmagic-editor/commit/44290b65ba77b597304165acce46b94ceb7c40be))
+
+
+
 ## [1.2.11](https://github.com/Tencent/tmagic-editor/compare/v1.2.10...v1.2.11) (2023-03-30)
 
 
