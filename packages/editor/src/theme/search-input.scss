@@ -1,0 +1,14 @@
+.tmagic-design-input.search-input {
+  background: #fff;
+  color: #bbbbbb;
+  padding: 10px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  z-index: 1;
+
+  .el-input__prefix {
+    padding: 7px;
+  }
+}

@@ -2,15 +2,7 @@
   <TMagicScrollbar class="magic-editor-layer-panel">
     <slot name="layer-panel-header"></slot>
 
-    <TMagicInput
-      v-model="filterText"
-      class="search-input"
-      size="small"
-      placeholder="输入关键字进行过滤"
-      clearable
-      :prefix-icon="Search"
-      @change="filterTextChangeHandler"
-    ></TMagicInput>
+    <SearchInput @search="filterTextChangeHandler"></SearchInput>
 
     <TMagicTree
       v-if="values.length"
@@ -58,15 +50,15 @@
 
 <script lang="ts" setup name="MEditorLayerPanel">
 import { computed, inject, onMounted, onUnmounted, ref, watch } from 'vue';
-import { Search } from '@element-plus/icons-vue';
 import KeyController from 'keycon';
 import { difference, throttle, union } from 'lodash-es';
 
-import { TMagicInput, TMagicScrollbar, TMagicTree } from '@tmagic/design';
+import { TMagicScrollbar, TMagicTree } from '@tmagic/design';
 import type { Id, MNode, MPage } from '@tmagic/schema';
 import { MContainer, NodeType } from '@tmagic/schema';
 import { getNodePath, isPage } from '@tmagic/utils';
 
+import SearchInput from '../../components/SearchInput.vue';
 import type { MenuButton, MenuComponent, Services } from '../../type';
 import { Layout } from '../../type';
 
@@ -87,7 +79,6 @@ const menu = ref<InstanceType<typeof LayerMenu>>();
 const checkedKeys = ref<Id[]>([]);
 // 是否多选
 const isCtrlKeyDown = ref(false);
-const filterText = ref('');
 // 默认展开节点
 const expandedKeys = ref<Id[]>([]);
 const currentNodeKey = ref<Id>();

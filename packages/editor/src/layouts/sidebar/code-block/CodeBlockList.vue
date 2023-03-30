@@ -2,14 +2,7 @@
   <div class="m-editor-code-block-list">
     <slot name="code-block-panel-header">
       <div class="code-header-wrapper">
-        <TMagicInput
-          :class="[editable ? 'code-filter-input' : 'code-filter-input-no-btn']"
-          size="small"
-          placeholder="输入关键字进行过滤"
-          clearable
-          v-model="filterText"
-          @input="filterTextChangeHandler"
-        ></TMagicInput>
+        <SearchInput @search="filterTextChangeHandler"></SearchInput>
         <TMagicButton class="create-code-button" type="primary" size="small" @click="createCodeBlock" v-if="editable"
           >新增</TMagicButton
         >
@@ -63,11 +56,12 @@
 import { computed, inject, ref } from 'vue';
 import { Close, Edit, View } from '@element-plus/icons-vue';
 
-import { TMagicButton, TMagicInput, tMagicMessage, TMagicScrollbar, TMagicTooltip, TMagicTree } from '@tmagic/design';
+import { TMagicButton, tMagicMessage, TMagicScrollbar, TMagicTooltip, TMagicTree } from '@tmagic/design';
 import { ColumnConfig } from '@tmagic/form';
 import { CodeBlockContent, Id } from '@tmagic/schema';
 
 import Icon from '../../../components/Icon.vue';
+import SearchInput from '../../../components/SearchInput.vue';
 import { CodeDeleteErrorType, CodeDslItem, Services } from '../../../type';
 
 import CodeBlockEditor from './CodeBlockEditor.vue';
@@ -141,7 +135,6 @@ const deleteCode = (key: Id) => {
   }
 };
 
-const filterText = ref('');
 const tree = ref<InstanceType<typeof TMagicTree>>();
 
 const filterNode = (value: string, data: CodeDslItem): boolean => {

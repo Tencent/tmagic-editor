@@ -3,14 +3,7 @@
     <slot name="component-list-panel-header"></slot>
 
     <TMagicCollapse class="ui-component-panel" :model-value="collapseValue">
-      <TMagicInput
-        placeholder="输入关键字进行过滤"
-        class="search-input"
-        size="small"
-        clearable
-        :prefix-icon="Search"
-        v-model="searchText"
-      />
+      <SearchInput @search="filterTextChangeHandler"></SearchInput>
       <template v-for="(group, index) in list">
         <TMagicCollapseItem v-if="group.items && group.items.length" :key="index" :name="`${index}`">
           <template #title><MIcon :icon="Grid"></MIcon>{{ group.title }}</template>
@@ -40,16 +33,22 @@
 
 <script lang="ts" setup name="MEditorComponentListPanel">
 import { computed, inject, ref } from 'vue';
-import { Grid, Search } from '@element-plus/icons-vue';
+import { Grid } from '@element-plus/icons-vue';
 import serialize from 'serialize-javascript';
 
-import { TMagicCollapse, TMagicCollapseItem, TMagicInput, TMagicScrollbar, TMagicTooltip } from '@tmagic/design';
+import { TMagicCollapse, TMagicCollapseItem, TMagicScrollbar, TMagicTooltip } from '@tmagic/design';
 import { removeClassNameByClassName } from '@tmagic/utils';
 
 import MIcon from '../../components/Icon.vue';
+import SearchInput from '../../components/SearchInput.vue';
 import type { ComponentGroup, ComponentItem, Services, StageOptions } from '../../type';
 
 const searchText = ref('');
+
+const filterTextChangeHandler = (v: string) => {
+  searchText.value = v;
+};
+
 const services = inject<Services>('services');
 const stageOptions = inject<StageOptions>('stageOptions');
 
