@@ -39,9 +39,6 @@ class CodeBlock extends BaseService {
 
   constructor() {
     super([
-      'getCodeContentById',
-      'getCodeDslByIds',
-      'getCurrentDsl',
       'setCodeDslById',
       'setCodeEditorShowStatus',
       'setEditStatus',
@@ -77,9 +74,9 @@ class CodeBlock extends BaseService {
    * @param {Id} id 代码块id
    * @returns {CodeBlockContent | null}
    */
-  public async getCodeContentById(id: Id): Promise<CodeBlockContent | null> {
+  public getCodeContentById(id: Id): CodeBlockContent | null {
     if (!id) return null;
-    const totalCodeDsl = await this.getCodeDsl();
+    const totalCodeDsl = this.getCodeDsl();
     if (!totalCodeDsl) return null;
     return totalCodeDsl[id] ?? null;
   }
@@ -91,7 +88,7 @@ class CodeBlock extends BaseService {
    * @returns {void}
    */
   public async setCodeDslById(id: Id, codeConfig: CodeBlockContent): Promise<void> {
-    const codeDsl = await this.getCodeDsl();
+    const codeDsl = this.getCodeDsl();
 
     if (!codeDsl) {
       throw new Error('dsl中没有codeBlocks');
@@ -119,8 +116,8 @@ class CodeBlock extends BaseService {
    * @param {string[]} ids 代码块id数组
    * @returns {CodeBlockDSL}
    */
-  public async getCodeDslByIds(ids: string[]): Promise<CodeBlockDSL> {
-    const codeDsl = await this.getCodeDsl();
+  public getCodeDslByIds(ids: string[]): CodeBlockDSL {
+    const codeDsl = this.getCodeDsl();
     return pick(codeDsl, ids) as CodeBlockDSL;
   }
 
@@ -157,8 +154,8 @@ class CodeBlock extends BaseService {
    * 获取当前选中的代码块内容
    * @returns {CodeBlockContent | null}
    */
-  public async getCurrentDsl(): Promise<CodeBlockContent | null> {
-    return await this.getCodeContentById(this.state.id);
+  public getCurrentDsl(): CodeBlockContent | null {
+    return this.getCodeContentById(this.state.id);
   }
 
   /**

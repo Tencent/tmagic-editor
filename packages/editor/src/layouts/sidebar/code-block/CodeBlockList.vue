@@ -85,6 +85,7 @@ const codeList = computed(() =>
     id: target.id,
     name: target.name,
     type: 'code',
+    codeBlockContent: codeBlockService?.getCodeContentById(target.id),
     children: Object.entries(target.deps).map(([id, dep]) => ({
       name: dep.name,
       type: 'node',
