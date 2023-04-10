@@ -39,9 +39,9 @@ import serialize from 'serialize-javascript';
 import { TMagicCollapse, TMagicCollapseItem, TMagicScrollbar, TMagicTooltip } from '@tmagic/design';
 import { removeClassNameByClassName } from '@tmagic/utils';
 
-import MIcon from '../../components/Icon.vue';
-import SearchInput from '../../components/SearchInput.vue';
-import type { ComponentGroup, ComponentItem, Services, StageOptions } from '../../type';
+import MIcon from '@editor/components/Icon.vue';
+import SearchInput from '@editor/components/SearchInput.vue';
+import type { ComponentGroup, ComponentItem, Services, StageOptions } from '@editor/type';
 
 const searchText = ref('');
 

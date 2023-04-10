@@ -2,8 +2,8 @@ import { isEmpty } from 'lodash-es';
 
 import { CodeBlockContent, HookType, Id } from '@tmagic/schema';
 
-import { Target } from '../services/dep';
-import { HookData } from '../type';
+import { Target } from '@editor/services/dep';
+import type { HookData } from '@editor/type';
 
 export const createCodeBlockTarget = (id: Id, codeBlock: CodeBlockContent) =>
   new Target({

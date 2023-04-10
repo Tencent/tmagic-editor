@@ -47,8 +47,8 @@ import { computed, inject, ref, watch } from 'vue';
 
 import { TMagicScrollbar } from '@tmagic/design';
 
-import Layout from '../components/Layout.vue';
-import { GetColumnWidth, Services } from '../type';
+import Layout from '@editor/components/Layout.vue';
+import type { GetColumnWidth, Services } from '@editor/type';
 
 import AddPageBox from './AddPageBox.vue';
 

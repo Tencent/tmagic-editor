@@ -14,7 +14,8 @@ import { isEmpty, map } from 'lodash-es';
 import { createValues, FieldsetConfig, FormState } from '@tmagic/form';
 import { Id } from '@tmagic/schema';
 
-import { CodeParamStatement, Services } from '../type';
+import type { CodeParamStatement, Services } from '@editor/type';
+
 const services = inject<Services>('services');
 const mForm = inject<FormState>('mForm');
 const emit = defineEmits(['change']);

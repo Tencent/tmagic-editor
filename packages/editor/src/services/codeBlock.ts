@@ -21,9 +21,9 @@ import { keys, pick } from 'lodash-es';
 
 import { CodeBlockContent, CodeBlockDSL, Id } from '@tmagic/schema';
 
-import type { CodeState } from '../type';
-import { CODE_DRAFT_STORAGE_KEY } from '../type';
-import { info } from '../utils/logger';
+import type { CodeState } from '@editor/type';
+import { CODE_DRAFT_STORAGE_KEY } from '@editor/type';
+import { info } from '@editor/utils/logger';
 
 import BaseService from './BaseService';
 

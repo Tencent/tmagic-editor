@@ -53,8 +53,8 @@ import { CaretBottom, Delete, DocumentCopy } from '@element-plus/icons-vue';
 import { TMagicIcon, TMagicPopover, TMagicTooltip } from '@tmagic/design';
 import type { MPage } from '@tmagic/schema';
 
-import ToolButton from '../../components/ToolButton.vue';
-import type { Services } from '../../type';
+import ToolButton from '@editor/components/ToolButton.vue';
+import type { Services } from '@editor/type';
 
 import PageBarScrollContainer from './PageBarScrollContainer.vue';
 

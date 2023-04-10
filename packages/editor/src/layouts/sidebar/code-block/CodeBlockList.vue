@@ -58,9 +58,9 @@ import { TMagicButton, tMagicMessage, TMagicScrollbar, TMagicTooltip, TMagicTree
 import { ColumnConfig } from '@tmagic/form';
 import { CodeBlockContent, Id } from '@tmagic/schema';
 
-import Icon from '../../../components/Icon.vue';
-import SearchInput from '../../../components/SearchInput.vue';
-import { CodeDeleteErrorType, CodeDslItem, Services } from '../../../type';
+import Icon from '@editor/components/Icon.vue';
+import SearchInput from '@editor/components/SearchInput.vue';
+import { CodeDeleteErrorType, CodeDslItem, Services } from '@editor/type';
 
 import CodeBlockEditor from './CodeBlockEditor.vue';
 

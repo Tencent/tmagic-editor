@@ -19,7 +19,7 @@ import { Close, Delete } from '@element-plus/icons-vue';
 import { TMagicButton, TMagicTooltip } from '@tmagic/design';
 import { FormState } from '@tmagic/form';
 
-import { Services } from '../type';
+import type { Services } from '@editor/type';
 
 const props = defineProps<{
   config: any;

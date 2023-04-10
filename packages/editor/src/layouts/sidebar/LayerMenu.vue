@@ -8,8 +8,8 @@ import { CopyDocument, Delete, Files, Plus } from '@element-plus/icons-vue';
 
 import { NodeType } from '@tmagic/schema';
 
-import ContentMenu from '../../components/ContentMenu.vue';
-import type { ComponentGroup, MenuButton, MenuComponent, Services } from '../../type';
+import ContentMenu from '@editor/components/ContentMenu.vue';
+import type { ComponentGroup, MenuButton, MenuComponent, Services } from '@editor/type';
 
 const props = defineProps<{
   layerContentMenu: (MenuButton | MenuComponent)[];

@@ -18,7 +18,7 @@
 
 import { reactive } from 'vue';
 
-import type { ComponentGroup, ComponentGroupState } from '../type';
+import type { ComponentGroup, ComponentGroupState } from '@editor/type';
 
 import BaseService from './BaseService';
 

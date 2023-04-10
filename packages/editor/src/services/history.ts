@@ -20,8 +20,8 @@ import { reactive } from 'vue';
 
 import type { MPage } from '@tmagic/schema';
 
-import { HistoryState, StepValue } from '../type';
-import { UndoRedo } from '../utils/undo-redo';
+import type { HistoryState, StepValue } from '@editor/type';
+import { UndoRedo } from '@editor/utils/undo-redo';
 
 import BaseService from './BaseService';
 

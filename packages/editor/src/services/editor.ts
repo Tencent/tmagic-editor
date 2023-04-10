@@ -24,10 +24,10 @@ import { NodeType } from '@tmagic/schema';
 import StageCore from '@tmagic/stage';
 import { getNodePath, isNumber, isPage, isPop } from '@tmagic/utils';
 
-import historyService from '../services/history';
-import storageService, { Protocol } from '../services/storage';
-import type { AddMNode, EditorNodeInfo, PastePosition, StepValue, StoreState, StoreStateKey } from '../type';
-import { LayerOffset, Layout } from '../type';
+import historyService from '@editor/services/history';
+import storageService, { Protocol } from '@editor/services/storage';
+import type { AddMNode, EditorNodeInfo, PastePosition, StepValue, StoreState, StoreStateKey } from '@editor/type';
+import { LayerOffset, Layout } from '@editor/type';
 import {
   change2Fixed,
   COPY_STORAGE_KEY,
@@ -37,8 +37,8 @@ import {
   getNodeIndex,
   isFixed,
   setLayout,
-} from '../utils/editor';
-import { beforePaste, getAddParent } from '../utils/operator';
+} from '@editor/utils/editor';
+import { beforePaste, getAddParent } from '@editor/utils/operator';
 
 import BaseService from './BaseService';
 import propsService from './props';

@@ -89,9 +89,9 @@ import { Coin, EditPen, Files } from '@element-plus/icons-vue';
 
 import { getConfig, TMagicTabs } from '@tmagic/design';
 
-import MIcon from '../../components/Icon.vue';
-import type { MenuButton, MenuComponent, SideComponent, SideItem } from '../../type';
-import { SideBarData } from '../../type';
+import MIcon from '@editor/components/Icon.vue';
+import type { MenuButton, MenuComponent, SideComponent, SideItem } from '@editor/type';
+import { SideBarData } from '@editor/type';
 
 import CodeBlockList from './code-block/CodeBlockList.vue';
 import ComponentListPanel from './ComponentListPanel.vue';

@@ -58,9 +58,9 @@ import type { Id, MNode, MPage } from '@tmagic/schema';
 import { MContainer, NodeType } from '@tmagic/schema';
 import { getNodePath, isPage } from '@tmagic/utils';
 
-import SearchInput from '../../components/SearchInput.vue';
-import type { MenuButton, MenuComponent, Services } from '../../type';
-import { Layout } from '../../type';
+import SearchInput from '@editor/components/SearchInput.vue';
+import type { MenuButton, MenuComponent, Services } from '@editor/type';
+import { Layout } from '@editor/type';
 
 import LayerMenu from './LayerMenu.vue';
 
@@ -138,7 +138,7 @@ const allowDrop = (draggingNode: any, dropNode: any, type: string): boolean => {
 
   if (ingType !== NodeType.PAGE && data.type === NodeType.PAGE) return false;
   if (ingType === NodeType.PAGE && data.type !== NodeType.PAGE) return false;
-  if (!data || !data.type) return false;
+  if (!data?.type) return false;
   if (['prev', 'next'].includes(type)) return true;
   if (data.items || data.type === 'container') return true;
 

@@ -25,8 +25,8 @@
 <script lang="ts" setup name="MEditorScrollViewer">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 
-import { ScrollViewerEvent } from '../type';
-import { ScrollViewer } from '../utils/scroll-viewer';
+import type { ScrollViewerEvent } from '@editor/type';
+import { ScrollViewer } from '@editor/utils/scroll-viewer';
 
 import ScrollBar from './ScrollBar.vue';
 

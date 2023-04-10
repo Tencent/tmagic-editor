@@ -4,10 +4,10 @@ import { isEmpty } from 'lodash-es';
 import { Id, MContainer, MNode } from '@tmagic/schema';
 import { isPage } from '@tmagic/utils';
 
-import editorService from '../services/editor';
-import propsService from '../services/props';
-import { AddMNode, PastePosition } from '../type';
-import { generatePageNameByApp, getInitPositionStyle } from '../utils/editor';
+import editorService from '@editor/services/editor';
+import propsService from '@editor/services/props';
+import type { AddMNode, PastePosition } from '@editor/type';
+import { generatePageNameByApp, getInitPositionStyle } from '@editor/utils/editor';
 
 /**
  * 粘贴前置操作：返回分配了新id以及校准了坐标的配置

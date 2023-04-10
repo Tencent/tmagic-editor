@@ -41,7 +41,8 @@ import { TMagicButton } from '@tmagic/design';
 import { FormState } from '@tmagic/form';
 import { ActionType } from '@tmagic/schema';
 
-import { EventSelectConfig, Services } from '../type';
+import type { EventSelectConfig, Services } from '@editor/type';
+
 const services = inject<Services>('services');
 
 const props = defineProps<{

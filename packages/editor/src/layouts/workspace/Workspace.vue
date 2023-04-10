@@ -21,7 +21,7 @@ import KeyController from 'keycon';
 
 import { isPage } from '@tmagic/utils';
 
-import type { MenuButton, MenuComponent, Services } from '../../type';
+import type { MenuButton, MenuComponent, Services } from '@editor/type';
 
 import Breadcrumb from './Breadcrumb.vue';
 import PageBar from './PageBar.vue';

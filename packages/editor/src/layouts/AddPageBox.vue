@@ -17,9 +17,9 @@ import { Plus } from '@element-plus/icons-vue';
 
 import { NodeType } from '@tmagic/schema';
 
-import MIcon from '../components/Icon.vue';
-import type { Services } from '../type';
-import { generatePageNameByApp } from '../utils';
+import MIcon from '@editor/components/Icon.vue';
+import type { Services } from '@editor/type';
+import { generatePageNameByApp } from '@editor/utils';
 
 const services = inject<Services>('services');
 

@@ -18,8 +18,8 @@
 
 import { reactive } from 'vue';
 
-import editorService from '../services/editor';
-import type { StageRect, UiState } from '../type';
+import editorService from '@editor/services/editor';
+import type { StageRect, UiState } from '@editor/type';
 
 import BaseService from './BaseService';
 

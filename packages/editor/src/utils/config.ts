@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { InstallOptions } from '../type';
+import { InstallOptions } from '@editor/type';
 
 let $TMAGIC_EDITOR: InstallOptions = {} as any;
 

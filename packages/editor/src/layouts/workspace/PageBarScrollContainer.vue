@@ -32,9 +32,9 @@ import { ArrowLeftBold, ArrowRightBold, Plus } from '@element-plus/icons-vue';
 
 import { NodeType } from '@tmagic/schema';
 
-import Icon from '../../components/Icon.vue';
-import type { Services } from '../../type';
-import { generatePageNameByApp } from '../../utils/editor';
+import Icon from '@editor/components/Icon.vue';
+import type { Services } from '@editor/type';
+import { generatePageNameByApp } from '@editor/utils/editor';
 
 const services = inject<Services>('services');
 const editorService = services?.editorService;

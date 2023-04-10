@@ -9,10 +9,10 @@ import { Bottom, CopyDocument, Delete, DocumentCopy, Top } from '@element-plus/i
 import { NodeType } from '@tmagic/schema';
 import { isPage } from '@tmagic/utils';
 
-import ContentMenu from '../../components/ContentMenu.vue';
-import storageService from '../../services/storage';
-import { LayerOffset, Layout, MenuButton, MenuComponent, Services } from '../../type';
-import { COPY_STORAGE_KEY } from '../../utils/editor';
+import ContentMenu from '@editor/components/ContentMenu.vue';
+import storageService from '@editor/services/storage';
+import { LayerOffset, Layout, MenuButton, MenuComponent, Services } from '@editor/type';
+import { COPY_STORAGE_KEY } from '@editor/utils/editor';
 
 const props = withDefaults(
   defineProps<{ isMultiSelect?: boolean; stageContentMenu: (MenuButton | MenuComponent)[] }>(),

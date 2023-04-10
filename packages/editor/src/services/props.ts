@@ -23,8 +23,8 @@ import type { FormConfig } from '@tmagic/form';
 import type { MComponent, MNode } from '@tmagic/schema';
 import { toLine } from '@tmagic/utils';
 
-import type { PropsState } from '../type';
-import { fillConfig } from '../utils/props';
+import type { PropsState } from '@editor/type';
+import { fillConfig } from '@editor/utils/props';
 
 import BaseService from './BaseService';
 

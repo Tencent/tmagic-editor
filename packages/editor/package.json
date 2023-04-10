@@ -24,7 +24,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "build": "npm run build:type && vite build",
-    "build:type": "npm run clear:type && vue-tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
+    "build:type": "npm run clear:type && vue-tsc --declaration --emitDeclarationOnly --project tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "clear:type": "rimraf ./types"
   },
   "engines": {
@@ -78,6 +78,7 @@
     "@vue/test-utils": "^2.0.0",
     "rimraf": "^3.0.2",
     "sass": "^1.35.1",
+    "tsc-alias": "^1.8.5",
     "typescript": "^5.0.4",
     "vite": "^4.2.1",
     "vite-plugin-vue-setup-extend": "^0.4.0",

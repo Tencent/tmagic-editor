@@ -2,9 +2,9 @@ import { computed } from 'vue';
 
 import StageCore, { GuidesType, RemoveEventData, SortEventData, UpdateEventData } from '@tmagic/stage';
 
-import editorService from '../services/editor';
-import uiService from '../services/ui';
-import { H_GUIDE_LINE_STORAGE_KEY, StageOptions, V_GUIDE_LINE_STORAGE_KEY } from '../type';
+import editorService from '@editor/services/editor';
+import uiService from '@editor/services/ui';
+import { H_GUIDE_LINE_STORAGE_KEY, StageOptions, V_GUIDE_LINE_STORAGE_KEY } from '@editor/type';
 
 import { getGuideLineFromCache } from './editor';
 

@@ -33,9 +33,9 @@ import { cloneDeep } from 'lodash-es';
 import type { MContainer } from '@tmagic/schema';
 import StageCore, { calcValueByFontsize, getOffset, Runtime } from '@tmagic/stage';
 
-import ScrollViewer from '../../components/ScrollViewer.vue';
-import { Layout, MenuButton, MenuComponent, Services, StageOptions } from '../../type';
-import { useStage } from '../../utils/stage';
+import ScrollViewer from '@editor/components/ScrollViewer.vue';
+import { Layout, MenuButton, MenuComponent, Services, StageOptions } from '@editor/type';
+import { useStage } from '@editor/utils/stage';
 
 import ViewerMenu from './ViewerMenu.vue';
 

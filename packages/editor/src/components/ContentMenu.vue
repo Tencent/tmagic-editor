@@ -25,7 +25,7 @@
 <script lang="ts" setup name="MEditorContentMenu">
 import { nextTick, onMounted, onUnmounted, ref } from 'vue';
 
-import { MenuButton, MenuComponent } from '../type';
+import { MenuButton, MenuComponent } from '@editor/type';
 
 import ToolButton from './ToolButton.vue';
 

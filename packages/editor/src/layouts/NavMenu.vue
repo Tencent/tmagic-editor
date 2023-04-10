@@ -12,8 +12,8 @@ import { Back, Delete, FullScreen, Grid, Memo, Right, ScaleToOriginal, ZoomIn, Z
 
 import { NodeType } from '@tmagic/schema';
 
-import ToolButton from '../components/ToolButton.vue';
-import { ColumnLayout, MenuBarData, MenuButton, MenuComponent, MenuItem, Services } from '../type';
+import ToolButton from '@editor/components/ToolButton.vue';
+import { ColumnLayout, MenuBarData, MenuButton, MenuComponent, MenuItem, Services } from '@editor/type';
 
 const props = withDefaults(
   defineProps<{

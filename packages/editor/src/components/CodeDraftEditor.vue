@@ -32,8 +32,8 @@ import { TMagicButton, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
 import { Id } from '@tmagic/schema';
 import { datetimeFormatter } from '@tmagic/utils';
 
-import MagicCodeEditor from '../layouts/CodeEditor.vue';
-import type { Services } from '../type';
+import MagicCodeEditor from '@editor/layouts/CodeEditor.vue';
+import type { Services } from '@editor/type';
 
 const props = withDefaults(
   defineProps<{

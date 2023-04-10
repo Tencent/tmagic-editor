@@ -29,8 +29,9 @@ import { isEmpty, map } from 'lodash-es';
 import { createValues, FormItem, FormState, TableConfig } from '@tmagic/form';
 import { HookType, Id } from '@tmagic/schema';
 
-import Icon from '../components/Icon.vue';
-import { CodeParamStatement, HookData, Services } from '../type';
+import Icon from '@editor/components/Icon.vue';
+import type { CodeParamStatement, HookData, Services } from '@editor/type';
+
 const services = inject<Services>('services');
 const mForm = inject<FormState>('mForm');
 const emit = defineEmits(['change']);

@@ -20,7 +20,7 @@ import { tMagicMessage } from '@tmagic/design';
 import type { FormValue } from '@tmagic/form';
 import { MForm } from '@tmagic/form';
 
-import type { Services } from '../type';
+import type { Services } from '@editor/type';
 
 const emit = defineEmits(['mounted']);
 

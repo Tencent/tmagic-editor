@@ -38,10 +38,10 @@ import { TMagicDrawer } from '@tmagic/design';
 import { ColumnConfig } from '@tmagic/form';
 import { CodeBlockContent } from '@tmagic/schema';
 
-import FunctionEditor from '../../../components/FunctionEditor.vue';
-import Layout from '../../../components/Layout.vue';
-import type { ListState, Services } from '../../../type';
-import { serializeConfig } from '../../../utils/editor';
+import FunctionEditor from '@editor/components/FunctionEditor.vue';
+import Layout from '@editor/components/Layout.vue';
+import type { ListState, Services } from '@editor/type';
+import { serializeConfig } from '@editor/utils/editor';
 
 const services = inject<Services>('services');
 const codeOptions = inject('codeOptions', {});
