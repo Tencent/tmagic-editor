@@ -35,18 +35,18 @@ export default ({ config, methods }: UseAppOptions) => {
   const node = app?.page?.getNode(config.id);
   const [created, setCreated] = useState(false);
 
+  const emitData = {
+    config,
+    ...methods,
+  };
+
   if (!created) {
     // 只需要触发一次 created
     setCreated(true);
-    node?.emit('created', { methods });
+    node?.emit('created', emitData);
   }
 
   useEffect(() => {
-    const emitData = {
-      config,
-      ...methods,
-    };
-
     node?.emit('mounted', emitData);
 
     return () => {

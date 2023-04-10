@@ -6,47 +6,47 @@
     :style="style"
   >
     <slot></slot>
-    <magic-ui-component v-for="item in config.items" :key="item.id" :config="item"></magic-ui-component>
+    <MComponent v-for="item in config.items" :key="item.id" :config="item"></MComponent>
   </div>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+<script lang="ts" setup>
+import { computed, inject } from 'vue';
 
+import Core from '@tmagic/core';
 import type { MContainer } from '@tmagic/schema';
 
-import Component from '../../Component.vue';
+import MComponent from '../../Component.vue';
 import useApp from '../../useApp';
 import useCommonMethod from '../../useCommonMethod';
 
-export default defineComponent({
-  components: {
-    'magic-ui-component': Component,
+const props = withDefaults(
+  defineProps<{
+    config: MContainer;
+    model: any;
+  }>(),
+  {
+    model: () => ({}),
   },
+);
 
-  props: {
-    config: {
-      type: Object as PropType<MContainer>,
-      default: () => ({}),
-    },
-  },
+const app: Core | undefined = inject('app');
 
-  setup(props) {
-    const app = useApp(props);
+const style = computed(() => app?.transformStyle(props.config.style || {}));
 
-    return {
-      style: computed(() => app?.transformStyle(props.config.style || {})),
+const display = () => {
+  const displayCfg = props.config?.display;
 
-      display: () => {
-        const displayCfg = props.config?.display;
+  if (typeof displayCfg === 'function') {
+    return displayCfg(app);
+  }
+  return displayCfg !== false;
+};
 
-        if (typeof displayCfg === 'function') {
-          return displayCfg(app);
-        }
-        return displayCfg !== false;
-      },
-      ...useCommonMethod(props),
-    };
+useApp({
+  config: props.config,
+  methods: {
+    ...useCommonMethod(props),
   },
 });
 </script>

@@ -1,32 +1,27 @@
 <template>
   <img class="magic-ui-img" :src="config.src" @click="clickHandler" />
 </template>
-<script lang="ts">
-import { defineComponent, PropType } from 'vue';
+<script lang="ts" setup>
+import { MComponent } from '@tmagic/schema';
 
-import { MImg } from '../../types';
 import useApp from '../../useApp';
 
-export default defineComponent({
-  props: {
-    config: {
-      type: Object as PropType<MImg>,
-      default: () => ({}),
-    },
-
-    model: {
-      type: Object,
-      default: () => ({}),
-    },
+const props = withDefaults(
+  defineProps<{
+    config: MComponent;
+    model: any;
+  }>(),
+  {
+    model: () => ({}),
   },
-  setup(props) {
-    useApp(props);
+);
 
-    return {
-      clickHandler() {
-        if (props.config.url) window.location.href = props.config.url;
-      },
-    };
-  },
+const clickHandler = () => {
+  if (props.config.url) window.location.href = props.config.url;
+};
+
+useApp({
+  config: props.config,
+  methods: {},
 });
 </script>

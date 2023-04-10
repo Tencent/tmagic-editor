@@ -16,24 +16,35 @@
  * limitations under the License.
  */
 
-import { getCurrentInstance, inject, onMounted, onUnmounted } from 'vue';
+import { inject, onMounted, onUnmounted } from 'vue';
 
 import Core from '@tmagic/core';
+import type { MComponent } from '@tmagic/schema';
 
-export default (props: any) => {
+interface UseAppOptions {
+  config: MComponent;
+  methods?: {
+    [key: string]: Function;
+  };
+}
+
+export default ({ config, methods }: UseAppOptions) => {
   const app: Core | undefined = inject('app');
-  const node = app?.page?.getNode(props.config.id);
+  const node = app?.page?.getNode(config.id);
 
-  const vm = getCurrentInstance()?.proxy;
+  const emitData = {
+    config,
+    ...methods,
+  };
 
-  node?.emit('created', vm);
+  node?.emit('created', emitData);
 
   onMounted(() => {
-    node?.emit('mounted', vm);
+    node?.emit('mounted', emitData);
   });
 
   onUnmounted(() => {
-    node?.emit('destroy', vm);
+    node?.emit('destroy', emitData);
   });
 
   return app;

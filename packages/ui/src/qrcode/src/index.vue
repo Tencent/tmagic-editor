@@ -2,46 +2,41 @@
   <img class="magic-ui-qrcode" :src="imgUrl" />
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType, ref, watch } from 'vue';
+<script lang="ts" setup>
+import { ref, watch } from 'vue';
 import QRCode from 'qrcode';
 
-import { MQrcode } from '../../types';
+import type { MComponent } from '@tmagic/schema';
+
 import useApp from '../../useApp';
 
-export default defineComponent({
-  props: {
-    config: {
-      type: Object as PropType<MQrcode>,
-      default: () => ({}),
-    },
-
-    model: {
-      type: Object,
-      default: () => ({}),
-    },
+const props = withDefaults(
+  defineProps<{
+    config: MComponent;
+    model: any;
+  }>(),
+  {
+    model: () => ({}),
   },
+);
 
-  setup(props) {
-    useApp(props);
-    const imgUrl = ref();
+const imgUrl = ref();
 
-    watch(
-      () => props.config.url,
-      (url = '') => {
-        QRCode.toDataURL(url, (e: any, url: string) => {
-          if (e) console.error(e);
-          imgUrl.value = url;
-        });
-      },
-      {
-        immediate: true,
-      },
-    );
-
-    return {
-      imgUrl,
-    };
+watch(
+  () => props.config.url,
+  (url = '') => {
+    QRCode.toDataURL(url, (e: any, url: string) => {
+      if (e) console.error(e);
+      imgUrl.value = url;
+    });
   },
+  {
+    immediate: true,
+  },
+);
+
+useApp({
+  config: props.config,
+  methods: {},
 });
 </script>
