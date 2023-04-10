@@ -54,7 +54,7 @@ interface EventCache {
 }
 
 class App extends EventEmitter {
-  public env;
+  public env: Env = new Env();
   public dsl?: MApp;
   public codeDsl?: CodeBlockDSL;
 
@@ -73,26 +73,14 @@ class App extends EventEmitter {
   constructor(options: AppOptionsConfig) {
     super();
 
-    this.env = new Env(options.ua);
+    this.setEnv(options.ua);
     // 代码块描述内容在dsl codeBlocks字段
     this.codeDsl = options.config?.codeBlocks;
     options.platform && (this.platform = options.platform);
     options.jsEngine && (this.jsEngine = options.jsEngine);
-    options.designWidth && (this.designWidth = options.designWidth);
 
-    // 根据屏幕大小计算出跟节点的font-size，用于rem样式的适配
-    if (this.jsEngine === 'browser') {
-      const calcFontsize = () => {
-        const { width } = document.documentElement.getBoundingClientRect();
-        const fontSize = width / (this.designWidth / 100);
-        document.documentElement.style.fontSize = `${fontSize}px`;
-      };
-
-      calcFontsize();
-
-      document.body.style.fontSize = '14px';
-
-      globalThis.addEventListener('resize', calcFontsize);
+    if (typeof options.designWidth !== 'undefined') {
+      this.setDesignWidth(options.designWidth);
     }
 
     if (options.transformStyle) {
@@ -108,6 +96,20 @@ class App extends EventEmitter {
     }
 
     bindCommonEventListener(this);
+  }
+
+  public setEnv(ua?: string) {
+    this.env = new Env(ua);
+  }
+
+  public setDesignWidth(width: number) {
+    this.designWidth = width;
+    // 根据屏幕大小计算出跟节点的font-size，用于rem样式的适配
+    if (this.jsEngine === 'browser') {
+      this.calcFontsize();
+      globalThis.removeEventListener('resize', this.calcFontsize);
+      globalThis.addEventListener('resize', this.calcFontsize);
+    }
   }
 
   /**
@@ -326,6 +328,10 @@ class App extends EventEmitter {
   public destroy() {
     this.removeAllListeners();
     this.page = undefined;
+
+    if (this.jsEngine === 'browser') {
+      globalThis.removeEventListener('resize', this.calcFontsize);
+    }
   }
 
   private addEventToMap(event: EventCache) {
@@ -353,6 +359,12 @@ class App extends EventEmitter {
     }
     const values = transform.join(' ');
     return !values.trim() ? 'none' : values;
+  }
+
+  private calcFontsize() {
+    const { width } = document.documentElement.getBoundingClientRect();
+    const fontSize = width / (this.designWidth / 100);
+    document.documentElement.style.fontSize = `${fontSize}px`;
   }
 }
 
