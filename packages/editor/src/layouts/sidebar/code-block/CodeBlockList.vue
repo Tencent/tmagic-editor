@@ -15,7 +15,7 @@
       class="magic-editor-layer-tree"
       node-key="id"
       empty-text="暂无代码块"
-      default-expand-all
+      :default-expanded-keys="expandedKeys"
       :expand-on-click-node="false"
       :data="codeList"
       :highlight-current="true"
@@ -25,6 +25,7 @@
       <template #default="{ data }">
         <div :id="data.id" class="list-container">
           <div class="list-item">
+            <CodeIcon style="width: 15px; margin-right: 5px" v-if="data.type === 'code'"></CodeIcon>
             <span class="code-name">{{ data.name }}（{{ data.id }}）</span>
             <!-- 右侧工具栏 -->
             <div class="right-tool" v-if="data.type === 'code'">
@@ -58,6 +59,7 @@ import { TMagicButton, tMagicMessage, TMagicScrollbar, TMagicTooltip, TMagicTree
 import { ColumnConfig } from '@tmagic/form';
 import { CodeBlockContent, Id } from '@tmagic/schema';
 
+import CodeIcon from '@editor/components/CodeIcon.vue';
 import Icon from '@editor/components/Icon.vue';
 import SearchInput from '@editor/components/SearchInput.vue';
 import { CodeDeleteErrorType, CodeDslItem, Services } from '@editor/type';
@@ -86,6 +88,9 @@ const codeList = computed(() =>
     })),
   })),
 );
+
+// 默认展开节点
+const expandedKeys = computed(() => codeList.value.map((item) => item.id));
 
 const editable = computed(() => codeBlockService?.getEditStatus());
 
