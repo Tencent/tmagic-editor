@@ -37,7 +37,7 @@ class Node extends EventEmitter {
   public style?: {
     [key: string]: any;
   };
-  public events?: DeprecatedEventConfig[] | EventConfig[];
+  public events: DeprecatedEventConfig[] | EventConfig[];
   public instance?: any;
   public page?: Page;
   public parent?: Node;
@@ -52,7 +52,7 @@ class Node extends EventEmitter {
     this.app = options.app;
     const { events } = options.config;
     this.data = options.config;
-    this.events = events;
+    this.events = events || [];
     this.listenLifeSafe();
 
     this.once('destroy', () => {
