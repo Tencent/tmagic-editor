@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.0.9",
+    "@tmagic/core": "1.2.13",
     "@tmagic/design": "1.2.13",
     "@tmagic/editor": "1.2.13",
     "@tmagic/element-plus-adapter": "1.2.13",

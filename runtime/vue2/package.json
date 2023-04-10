@@ -41,7 +41,7 @@
     "sass": "^1.35.1",
     "vite": "^4.2.1",
     "@vitejs/plugin-legacy": "^4.0.2",
-    "@vitejs/plugin-vue2": "^1.1.2",
+    "@vitejs/plugin-vue2": "^2.2.0",
     "vue-template-compiler": "^2.7.4"
   }
 }

@@ -6,16 +6,13 @@
   </el-radio-group>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from 'vue';
+<script lang="ts" setup>
+import { nextTick, ref } from 'vue';
 
+import Core from '@tmagic/core';
 import { editorService } from '@tmagic/editor';
 
-enum DeviceType {
-  Phone = 'phone',
-  Pad = 'pad',
-  PC = 'pc',
-}
+import { DeviceType, uaMap } from '../const';
 
 const devH: Record<DeviceType, number> = {
   phone: 817,
@@ -33,43 +30,50 @@ const getDeviceHeight = (viewerDevice: DeviceType) => devH[viewerDevice];
 
 const getDeviceWidth = (viewerDevice: DeviceType) => devW[viewerDevice];
 
-export default defineComponent({
-  props: {
+withDefaults(
+  defineProps<{
     modelValue: {
-      type: Object,
-      default: () => ({
-        width: 375,
-        height: 817,
-      }),
-    },
-  },
-
-  emits: ['update:modelValue'],
-
-  setup(props, { emit }) {
-    const calcFontsize = (width: number) => {
-      const iframe = editorService.get('stage')?.renderer.iframe;
-      if (!iframe?.contentWindow) return;
-      iframe.contentWindow.appInstance.designWidth = width;
+      width: number;
+      height: number;
     };
-
-    const viewerDevice = ref(DeviceType.Phone);
-
-    return {
-      viewerDevice,
-
-      deviceSelect(device: DeviceType) {
-        const width = getDeviceWidth(device);
-        const height = getDeviceHeight(device);
-        emit('update:modelValue', {
-          width,
-          height,
-        });
-
-        calcFontsize(width);
-      },
-    };
+  }>(),
+  {
+    modelValue: () => ({
+      width: 375,
+      height: 817,
+    }),
   },
+);
+
+const emit = defineEmits(['update:modelValue']);
+
+const calcFontsize = (width: number) => {
+  const iframe = editorService.get('stage')?.renderer.iframe;
+  if (!iframe?.contentWindow) return;
+
+  const app: Core = (iframe.contentWindow as any).appInstance;
+
+  app.setEnv(uaMap[viewerDevice.value]);
+
+  app.setDesignWidth(app.env.isWeb ? width : 375);
+};
+
+const viewerDevice = ref(DeviceType.Phone);
+
+const deviceSelect = async (device: DeviceType) => {
+  const width = getDeviceWidth(device);
+  const height = getDeviceHeight(device);
+  emit('update:modelValue', {
+    width,
+    height,
+  });
+
+  await nextTick();
+  calcFontsize(width);
+};
+
+defineExpose({
+  viewerDevice,
 });
 </script>
 

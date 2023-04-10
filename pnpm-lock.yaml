@@ -665,6 +665,9 @@ importers:
       '@element-plus/icons-vue':
         specifier: ^2.0.9
         version: 2.0.9(vue@3.2.37)
+      '@tmagic/core':
+        specifier: 1.2.13
+        version: link:../packages/core
       '@tmagic/design':
         specifier: 1.2.13
         version: link:../packages/design
@@ -843,8 +846,8 @@ importers:
         specifier: ^4.0.2
         version: 4.0.2(terser@5.14.2)(vite@4.2.1)
       '@vitejs/plugin-vue2':
-        specifier: ^1.1.2
-        version: 1.1.2(vite@4.2.1)(vue@2.7.4)
+        specifier: ^2.2.0
+        version: 2.2.0(vite@4.2.1)(vue@2.7.4)
       recast:
         specifier: ^0.20.4
         version: 0.20.4
@@ -3495,11 +3498,11 @@ packages:
       - supports-color
     dev: true
 
-  /@vitejs/plugin-vue2@1.1.2(vite@4.2.1)(vue@2.7.4):
-    resolution: {integrity: sha512-y6OEA+2UdJ0xrEQHodq20v9r3SpS62IOHrgN92JPLvVpNkhcissu7yvD5PXMzMESyazj0XNWGsc8UQk8+mVrjQ==}
-    engines: {node: '>=14.6.0'}
+  /@vitejs/plugin-vue2@2.2.0(vite@4.2.1)(vue@2.7.4):
+    resolution: {integrity: sha512-1km7zEuZ/9QRPvzXSjikbTYGQPG86Mq1baktpC4sXqsXlb02HQKfi+fl8qVS703JM7cgm24Ga9j+RwKmvFn90A==}
+    engines: {node: ^14.18.0 || >= 16.0.0}
     peerDependencies:
-      vite: '>=2.5.10'
+      vite: ^3.0.0 || ^4.0.0
       vue: ^2.7.0-0
     dependencies:
       vite: 4.2.1(@types/node@18.15.11)(sass@1.35.1)(terser@5.14.2)

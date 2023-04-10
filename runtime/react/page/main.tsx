@@ -50,13 +50,13 @@ const getLocalConfig = (): MApp[] => {
 
 window.magicDSL = [];
 
-const designWidth = document.documentElement.getBoundingClientRect().width;
-
 const app = new Core({
-  designWidth,
+  ua: window.navigator.userAgent,
   config: ((getUrlParam('localPreview') ? getLocalConfig() : window.magicDSL) || [])[0] || {},
   curPage: getUrlParam('page'),
 });
+
+app.setDesignWidth(app.env.isWeb ? window.document.documentElement.getBoundingClientRect().width : 375);
 
 Object.keys(components).forEach((type: string) => app.registerComponent(type, components[type]));
 Object.values(plugins).forEach((plugin: any) => {

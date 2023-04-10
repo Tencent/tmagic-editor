@@ -15,7 +15,7 @@
       :stage-rect="stageRect"
     >
       <template #workspace-content>
-        <DeviceGroup v-model="stageRect"></DeviceGroup>
+        <DeviceGroup ref="deviceGroup" v-model="stageRect"></DeviceGroup>
       </template>
     </m-editor>
 
@@ -26,13 +26,19 @@
       title="预览"
       :width="stageRect && stageRect.width"
     >
-      <iframe v-if="previewVisible" width="100%" :height="stageRect && stageRect.height" :src="previewUrl"></iframe>
+      <iframe
+        v-if="previewVisible"
+        ref="iframe"
+        width="100%"
+        :height="stageRect && stageRect.height"
+        :src="previewUrl"
+      ></iframe>
     </el-dialog>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, toRaw } from 'vue';
+import { computed, nextTick, ref, toRaw } from 'vue';
 import { useRouter } from 'vue-router';
 import { Coin, Connection, Document } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
@@ -47,12 +53,15 @@ import { asyncLoadJs } from '@tmagic/utils';
 import DeviceGroup from '../components/DeviceGroup.vue';
 import componentGroupList from '../configs/componentGroupList';
 import dsl from '../configs/dsl';
+import { uaMap } from '../const';
 
 const { VITE_RUNTIME_PATH, VITE_ENTRY_PATH } = import.meta.env;
 
 const runtimeUrl = `${VITE_RUNTIME_PATH}/playground/index.html`;
 const router = useRouter();
 const editor = ref<InstanceType<typeof TMagicEditor>>();
+const deviceGroup = ref<InstanceType<typeof DeviceGroup>>();
+const iframe = ref<HTMLIFrameElement>();
 const previewVisible = ref(false);
 const value = ref(dsl);
 const defaultSelected = ref(dsl.items[0].id);
@@ -107,6 +116,14 @@ const menu: MenuBarData = {
           }
         }
         previewVisible.value = true;
+
+        await nextTick();
+
+        if (!iframe.value?.contentWindow || !deviceGroup.value?.viewerDevice) return;
+        Object.defineProperty(iframe.value.contentWindow.navigator, 'userAgent', {
+          value: uaMap[deviceGroup.value.viewerDevice],
+          writable: true,
+        });
       },
     },
     {
