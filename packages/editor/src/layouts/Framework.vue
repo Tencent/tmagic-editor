@@ -18,8 +18,8 @@
       right-class="m-editor-framework-right"
       v-model:left="columnWidth.left"
       v-model:right="columnWidth.right"
-      :min-left="45"
-      :min-right="1"
+      :min-left="65"
+      :min-right="20"
       @change="columnWidthChange"
     >
       <template #left>
