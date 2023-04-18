@@ -1,13 +1,14 @@
 <template>
   <div class="m-fields-event-select">
-    <m-form-container
+    <m-form-table
       v-if="isOldVersion"
       ref="eventForm"
       :size="props.size"
       :model="model"
+      name="events"
       :config="tableConfig"
       @change="onChangeHandler"
-    ></m-form-container>
+    ></m-form-table>
 
     <div v-else class="fullWidth">
       <TMagicButton class="create-button" type="primary" size="small" @click="addEvent()">添加事件</TMagicButton>

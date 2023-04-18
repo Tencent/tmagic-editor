@@ -36,21 +36,45 @@
       display: flex;
       align-items: center;
       width: 100%;
+      align-items: center;
 
       .right-tool {
         display: flex;
         width: fit-content !important;
+        align-items: center;
+        margin-right: 10px;
         .edit-icon {
           margin: 0 5px;
         }
       }
+
+      .codeIcon {
+        width: 20px;
+        height: 20px;
+        margin-right: 5px;
+      }
+
+      .compIcon {
+        width: 15px;
+        height: 15px;
+        margin-right: 5px;
+      }
+
       .code-name {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         width: 0 !important;
         flex: 1;
-        line-height: 18px;
+        line-height: 22px;
+
+        &.code {
+          color: #000;
+        }
+
+        &.hook {
+          color: #909399;
+        }
       }
     }
   }
@@ -58,9 +82,8 @@
 
 .m-fields-code-select {
   width: 100%;
-  .edit-icon {
-    cursor: pointer;
-    margin-right: 5px;
+  .el-card__header {
+    display: none;
   }
 }
 

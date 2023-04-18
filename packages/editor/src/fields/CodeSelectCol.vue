@@ -1,7 +1,16 @@
 <template>
   <div class="m-fields-code-select-col">
-    <!-- 代码块下拉框 -->
-    <m-form-container :config="selectConfig" :model="model" @change="onParamsChangeHandler"></m-form-container>
+    <div class="code-select-container">
+      <!-- 代码块下拉框 -->
+      <m-form-container
+        class="select"
+        :config="selectConfig"
+        :model="model"
+        @change="onParamsChangeHandler"
+      ></m-form-container>
+      <!-- 查看/编辑按钮 -->
+      <Icon class="icon" :icon="editable ? Edit : View" @click="editCode"></Icon>
+    </div>
     <!-- 参数填写框 -->
     <m-form-container :config="codeParamsConfig" :model="model" @change="onParamsChangeHandler"></m-form-container>
   </div>
@@ -9,11 +18,13 @@
 
 <script lang="ts" setup name="MEditorCodeSelectCol">
 import { computed, defineEmits, defineProps, inject, ref, watch } from 'vue';
+import { Edit, View } from '@element-plus/icons-vue';
 import { isEmpty, map } from 'lodash-es';
 
 import { createValues, FieldsetConfig, FormState } from '@tmagic/form';
 import { Id } from '@tmagic/schema';
 
+import Icon from '@editor/components/Icon.vue';
 import type { CodeParamStatement, Services } from '@editor/type';
 
 const services = inject<Services>('services');
@@ -31,6 +42,7 @@ const props = withDefaults(
   {},
 );
 const codeDsl = computed(() => services?.codeBlockService.getCodeDsl());
+const editable = computed(() => services?.codeBlockService.getEditStatus());
 const codeParamsConfig = ref<FieldsetConfig>({
   type: 'fieldset',
   items: [],
@@ -115,4 +127,9 @@ watch(
     immediate: true,
   },
 );
+
+// 打开代码编辑框
+const editCode = () => {
+  services?.codeBlockService.setCodeEditorContent(true, props.model.codeId);
+};
 </script>

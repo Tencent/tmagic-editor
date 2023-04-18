@@ -25,8 +25,11 @@
       <template #default="{ data }">
         <div :id="data.id" class="list-container">
           <div class="list-item">
-            <CodeIcon style="width: 15px; margin-right: 5px" v-if="data.type === 'code'"></CodeIcon>
-            <span class="code-name">{{ data.name }}（{{ data.id }}）</span>
+            <CodeIcon v-if="data.type === 'code'" class="codeIcon"></CodeIcon>
+            <AppManageIcon v-if="data.type === 'node'" class="compIcon"></AppManageIcon>
+            <span class="code-name" :class="{ code: data.type === 'code', hook: data.type === 'key' }"
+              >{{ data.name }}（{{ data.id }}）</span
+            >
             <!-- 右侧工具栏 -->
             <div class="right-tool" v-if="data.type === 'code'">
               <TMagicTooltip effect="dark" :content="editable ? '编辑' : '查看'" placement="bottom">
@@ -59,9 +62,10 @@ import { TMagicButton, tMagicMessage, TMagicScrollbar, TMagicTooltip, TMagicTree
 import { ColumnConfig } from '@tmagic/form';
 import { CodeBlockContent, Id } from '@tmagic/schema';
 
-import CodeIcon from '@editor/components/CodeIcon.vue';
 import Icon from '@editor/components/Icon.vue';
 import SearchInput from '@editor/components/SearchInput.vue';
+import AppManageIcon from '@editor/icons/AppManageIcon.vue';
+import CodeIcon from '@editor/icons/CodeIcon.vue';
 import { CodeDeleteErrorType, CodeDslItem, Services } from '@editor/type';
 
 import CodeBlockEditor from './CodeBlockEditor.vue';
@@ -75,21 +79,25 @@ const { codeBlockService, depService, editorService } = inject<Services>('servic
 
 // 代码块列表
 const codeList = computed(() =>
-  Object.values(depService?.targets['code-block'] || {}).map((target) => ({
-    id: target.id,
-    name: target.name,
-    type: 'code',
-    codeBlockContent: codeBlockService?.getCodeContentById(target.id),
-    children: Object.entries(target.deps).map(([id, dep]) => ({
+  Object.values(depService?.targets['code-block'] || {}).map((target) => {
+    // 组件节点
+    const compNodes = Object.entries(target.deps).map(([id, dep]) => ({
       name: dep.name,
       type: 'node',
       id,
       children: dep.keys.map((key) => ({ name: key, id: key, type: 'key' })),
-    })),
-  })),
+    }));
+    return {
+      id: target.id,
+      name: target.name,
+      type: 'code',
+      codeBlockContent: codeBlockService?.getCodeContentById(target.id),
+      children: compNodes,
+    };
+  }),
 );
 
-// 默认展开节点
+// 默认展开组件层级的节点
 const expandedKeys = computed(() => codeList.value.map((item) => item.id));
 
 const editable = computed(() => codeBlockService?.getEditStatus());

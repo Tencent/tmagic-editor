@@ -3,11 +3,12 @@
     class="code-editor-dialog"
     :model-value="true"
     :title="currentTitle"
-    :close-on-press-escape="false"
+    :close-on-press-escape="true"
     :append-to-body="true"
     :show-close="false"
-    :close-on-click-modal="false"
+    :close-on-click-modal="true"
     :size="size"
+    :before-close="handleClose"
   >
     <Layout v-model:left="left" :min-left="45" class="code-editor-layout">
       <!-- 右侧区域 -->
@@ -15,6 +16,7 @@
         <div v-if="!isEmpty(codeConfig)" class="m-editor-code-block-editor-panel">
           <slot name="code-block-edit-panel-header" :id="id"></slot>
           <FunctionEditor
+            ref="functionEditor"
             v-if="codeConfig"
             :id="id"
             :name="codeConfig.name"
@@ -84,4 +86,11 @@ watchEffect(async () => {
   });
   currentTitle.value = state.codeList[0]?.name || '';
 });
+
+const functionEditor = ref<InstanceType<typeof FunctionEditor>>();
+
+const handleClose = async () => {
+  // 触发codeDraftEditor组件关闭事件
+  await functionEditor.value?.codeDraftEditor?.close();
+};
 </script>

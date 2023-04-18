@@ -25,7 +25,6 @@
 </template>
 <script lang="ts" setup name="MEditorCodeDraftEditor">
 import { computed, inject, ref, watchEffect } from 'vue';
-import type { Action } from 'element-plus';
 import type * as monaco from 'monaco-editor';
 
 import { TMagicButton, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
@@ -93,7 +92,7 @@ const saveCodeDraft = async (codeValue: string) => {
     return;
   }
   services?.codeBlockService.setCodeDraft(props.id, codeValue);
-  tMagicMessage.success(`代码草稿保存成功 ${datetimeFormatter(new Date())}`);
+  tMagicMessage.success(`代码草稿成功保存到本地 ${datetimeFormatter(new Date())}`);
 };
 
 // 保存并关闭
@@ -108,24 +107,23 @@ const saveAndClose = (): void => {
 const close = async (): Promise<void> => {
   const codeDraft = services?.codeBlockService.getCodeDraft(props.id);
   if (codeDraft) {
-    tMagicMessageBox
-      .confirm('您有代码修改未保存，是否保存后再关闭？', '提示', {
+    try {
+      await tMagicMessageBox.confirm('您有代码修改未保存，是否保存后再关闭？', '提示', {
         confirmButtonText: '保存并关闭',
         cancelButtonText: '直接关闭',
         type: 'warning',
         distinguishCancelAndClose: true,
-      })
-      .then(async () => {
-        // 保存之后再关闭
-        saveAndClose();
-      })
-      .catch((action: Action) => {
-        if (action === 'cancel') {
-          // 删除草稿 直接关闭
-          services?.codeBlockService.removeCodeDraft(props.id);
-          emit('close');
-        }
       });
+
+      // 保存之后再关闭
+      saveAndClose();
+    } catch (action: any) {
+      if (action === 'cancel') {
+        // 删除草稿 直接关闭
+        services?.codeBlockService.removeCodeDraft(props.id);
+        emit('close');
+      }
+    }
   } else {
     emit('close');
   }
@@ -138,4 +136,9 @@ const toggleFullScreen = (): void => {
     codeEditor.value.focus();
   }
 };
+
+defineExpose({
+  saveAndClose,
+  close,
+});
 </script>

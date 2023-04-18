@@ -29,10 +29,12 @@ export default {
         {
           name: 'age',
           type: 'number',
+          tip: '年纪',
         },
         {
           name: 'studentName',
           type: 'text',
+          tip: '学生姓名',
         },
       ],
     },
