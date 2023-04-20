@@ -1,3 +1,21 @@
+## [1.2.14](https://github.com/Tencent/tmagic-editor/compare/v1.2.13...v1.2.14) (2023-04-20)
+
+
+### Bug Fixes
+
+* **core:** node events 为空时，应为空数组 ([abcac71](https://github.com/Tencent/tmagic-editor/commit/abcac71826b2e8eaff36c97726448923d5853e3d)), closes [#500](https://github.com/Tencent/tmagic-editor/issues/500)
+* **playground,runtime:** 设备切换时，重新设置root font size与ua ([84e2cdf](https://github.com/Tencent/tmagic-editor/commit/84e2cdf22da1f376689e87fb05fe98f62db1e62a)), closes [#501](https://github.com/Tencent/tmagic-editor/issues/501)
+
+
+### Features
+
+* **core:** 重新设置designWidth时，应该重新计算root font size ([3d9f387](https://github.com/Tencent/tmagic-editor/commit/3d9f38781a059b29ec23d1947ae0574e57ffce32))
+* **editor:** 代码列表默认只展开第一层 ([41cd22b](https://github.com/Tencent/tmagic-editor/commit/41cd22b17f0d434016254cddda949651c21a65e3))
+* **editor:** 代码编辑交互优化 ([51dadab](https://github.com/Tencent/tmagic-editor/commit/51dadabc2c89403b772cf3aa1f5ed77f959c82e4))
+* **ui:** 修改useApp实现，与ui-react中保持一致 ([befaf67](https://github.com/Tencent/tmagic-editor/commit/befaf67ba74ec0ec1dc3683b26d0de10ee6b3cf0))
+
+
+
 ## [1.2.13](https://github.com/Tencent/tmagic-editor/compare/v1.2.12...v1.2.13) (2023-03-30)
 
 

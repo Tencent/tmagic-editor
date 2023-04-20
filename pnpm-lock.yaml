@@ -153,7 +153,7 @@ importers:
   packages/core:
     dependencies:
       '@tmagic/schema':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../schema
       events:
         specifier: ^3.3.0
@@ -224,22 +224,22 @@ importers:
         specifier: ^2.0.9
         version: 2.0.9(vue@3.2.37)
       '@tmagic/core':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../core
       '@tmagic/design':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../design
       '@tmagic/form':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../form
       '@tmagic/schema':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../schema
       '@tmagic/stage':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../stage
       '@tmagic/utils':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../utils
       buffer:
         specifier: ^6.0.3
@@ -340,10 +340,10 @@ importers:
         specifier: ^2.0.9
         version: 2.0.9(vue@3.2.37)
       '@tmagic/design':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../design
       '@tmagic/utils':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../utils
       lodash-es:
         specifier: ^4.17.21
@@ -416,13 +416,13 @@ importers:
         specifier: ^0.23.3
         version: 0.23.3
       '@tmagic/core':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../core
       '@tmagic/schema':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../schema
       '@tmagic/utils':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../utils
       events:
         specifier: ^3.3.0
@@ -465,13 +465,13 @@ importers:
   packages/table:
     dependencies:
       '@tmagic/design':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../design
       '@tmagic/form':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../form
       '@tmagic/utils':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../utils
       lodash-es:
         specifier: ^4.17.21
@@ -551,13 +551,13 @@ importers:
   packages/ui:
     dependencies:
       '@tmagic/core':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../core
       '@tmagic/schema':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../schema
       '@tmagic/utils':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../utils
       delegate:
         specifier: ^3.2.0
@@ -588,10 +588,10 @@ importers:
   packages/ui-react:
     dependencies:
       '@tmagic/core':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../core
       '@tmagic/schema':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../schema
       qrcode:
         specifier: ^1.5.0
@@ -616,13 +616,13 @@ importers:
   packages/ui-vue2:
     dependencies:
       '@tmagic/core':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../core
       '@tmagic/schema':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../schema
       '@tmagic/utils':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../utils
       qrcode:
         specifier: ^1.5.0
@@ -641,7 +641,7 @@ importers:
   packages/utils:
     dependencies:
       '@tmagic/schema':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../schema
       dayjs:
         specifier: ^1.11.4
@@ -666,28 +666,28 @@ importers:
         specifier: ^2.0.9
         version: 2.0.9(vue@3.2.37)
       '@tmagic/core':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../packages/core
       '@tmagic/design':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../packages/design
       '@tmagic/editor':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../packages/editor
       '@tmagic/element-plus-adapter':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../packages/element-plus-adapter
       '@tmagic/form':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../packages/form
       '@tmagic/schema':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../packages/schema
       '@tmagic/stage':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../packages/stage
       '@tmagic/utils':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../packages/utils
       element-plus:
         specifier: ^2.2.32
@@ -751,22 +751,22 @@ importers:
   runtime/react:
     dependencies:
       '@tmagic/cli':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../../packages/cli
       '@tmagic/core':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../../packages/core
       '@tmagic/schema':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../../packages/schema
       '@tmagic/stage':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../../packages/stage
       '@tmagic/ui-react':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../../packages/ui-react
       '@tmagic/utils':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../../packages/utils
       axios:
         specifier: ^0.25.0
@@ -809,22 +809,22 @@ importers:
   runtime/vue2:
     dependencies:
       '@tmagic/cli':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../../packages/cli
       '@tmagic/core':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../../packages/core
       '@tmagic/schema':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../../packages/schema
       '@tmagic/stage':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../../packages/stage
       '@tmagic/ui-vue2':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../../packages/ui-vue2
       '@tmagic/utils':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../../packages/utils
       axios:
         specifier: ^0.25.0
@@ -870,22 +870,22 @@ importers:
   runtime/vue3:
     dependencies:
       '@tmagic/cli':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../../packages/cli
       '@tmagic/core':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../../packages/core
       '@tmagic/schema':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../../packages/schema
       '@tmagic/stage':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../../packages/stage
       '@tmagic/ui':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../../packages/ui
       '@tmagic/utils':
-        specifier: 1.2.13
+        specifier: 1.2.14
         version: link:../../packages/utils
       axios:
         specifier: ^0.25.0
