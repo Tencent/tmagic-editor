@@ -534,7 +534,7 @@ const clearHandler = () => {
 };
 
 const excelHandler = (file: any) => {
-  if (!file || !file.raw) {
+  if (!file?.raw) {
     return false;
   }
   const reader = new FileReader();

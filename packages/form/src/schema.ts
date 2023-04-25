@@ -432,6 +432,7 @@ export interface SelectConfig extends FormItem, Input {
   multiple?: boolean;
   valueKey?: string;
   allowCreate?: boolean;
+  filterable?: boolean;
   group?: boolean;
   options: SelectConfigOption[] | SelectConfigGroupOption[] | SelectOptionFunction;
   remote: true;

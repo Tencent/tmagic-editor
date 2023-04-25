@@ -5,8 +5,8 @@
     v-loading="loading"
     class="m-select"
     ref="tMagicSelect"
-    clearable
-    filterable
+    :clearable="typeof config.clearable !== 'undefined' ? config.clearable : true"
+    :filterable="typeof config.filterable !== 'undefined' ? config.filterable : true"
     :popper-class="`m-select-popper ${popperClass}`"
     :size="size"
     :remote="remote"
