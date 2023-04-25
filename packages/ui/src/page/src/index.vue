@@ -23,7 +23,7 @@ import useApp from '../../useApp';
 const props = withDefaults(
   defineProps<{
     config: MPage;
-    model: any;
+    model?: any;
   }>(),
   {
     model: () => ({}),

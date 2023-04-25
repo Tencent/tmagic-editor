@@ -23,7 +23,7 @@ import useCommonMethod from '../../useCommonMethod';
 const props = withDefaults(
   defineProps<{
     config: MContainer;
-    model: any;
+    model?: any;
   }>(),
   {
     model: () => ({}),

@@ -19,7 +19,7 @@ import { toLine } from '@tmagic/utils';
 const props = withDefaults(
   defineProps<{
     config: Record<string, any>;
-    model: any;
+    model?: any;
   }>(),
   {
     config: () => ({}),

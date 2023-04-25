@@ -15,7 +15,7 @@ import useApp from '../../useApp';
 const props = withDefaults(
   defineProps<{
     config: MComponent;
-    model: any;
+    model?: any;
   }>(),
   {
     model: () => ({}),
