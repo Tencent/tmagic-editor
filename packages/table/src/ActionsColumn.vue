@@ -6,7 +6,7 @@
         v-show="display(action.display, scope.row) && !editState[scope.$index]"
         class="action-btn"
         text
-        type="primary"
+        :type="action.buttonType || 'primary'"
         size="small"
         :icon="action.icon"
         :key="actionIndex"
@@ -72,13 +72,13 @@ const formatter = (fuc: string | Function | undefined, row: any) => {
 };
 
 const actionHandler = async (action: ColumnActionConfig, row: any, index: number) => {
-  await action.before?.(row);
+  await action.before?.(row, index);
   if (action.type === 'edit') {
     props.editState[index] = row;
   } else {
-    await action.handler?.(row);
+    await action.handler?.(row, index);
   }
-  action.after?.(row);
+  action.after?.(row, index);
 };
 
 const save = async (index: number, config: ColumnConfig) => {

@@ -20,13 +20,14 @@ import { FormConfig, FormValue } from '@tmagic/form';
 
 export interface ColumnActionConfig {
   type?: 'delete' | 'copy' | 'edit';
+  buttonType: string;
   display?: (row: any) => boolean;
   text: string | ((row: any) => string);
   name: string;
   icon?: any;
-  handler?: (row: any) => Promise<any> | any;
-  before?: (row: any) => void;
-  after?: (row: any) => void;
+  handler?: (row: any, index: number) => Promise<any> | any;
+  before?: (row: any, index: number) => void;
+  after?: (row: any, index: number) => void;
   action?: (data: { data: any }) => void;
 }
 
