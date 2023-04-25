@@ -18,7 +18,14 @@
     @keypress="inputHandler"
     @change="changeHandler"
     @update:modelValue="updateModelValue"
-  ></TInput>
+  >
+    <template #prefix-icon v-if="$slots.prefix">
+      <slot name="prefix"></slot>
+    </template>
+    <template #suffix v-if="$slots.suffix">
+      <slot name="suffix"></slot>
+    </template>
+  </TInput>
 </template>
 
 <script lang="ts" setup>

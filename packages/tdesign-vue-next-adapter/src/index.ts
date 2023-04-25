@@ -1,20 +1,19 @@
+import { h } from 'vue';
 import {
   ElDrawer,
   ElDropdown,
   ElDropdownItem,
   ElDropdownMenu,
-  ElIcon,
   ElMessageBox,
   ElPagination,
   ElPopover,
   ElScrollbar,
   ElTable,
   ElTableColumn,
-  ElTabPane,
-  ElTabs,
   ElTree,
 } from 'element-plus';
 import {
+  Badge as TBadge,
   Button as TButton,
   Card as TCard,
   Cascader as TCascader,
@@ -33,12 +32,15 @@ import {
   Option as TOption,
   OptionGroup as TOptionGroup,
   Radio as TRadio,
+  RadioButton as TRadioButton,
   RadioGroup as TRadioGroup,
   Row as TRow,
   Select as TSelect,
   StepItem as TStepItem,
   Steps as TSteps,
   Switch as TSwitch,
+  TabPanel as TTabPanel,
+  Tabs as TTabs,
   Tag as TTag,
   TimePicker as TTimePicker,
   Tooltip as TTooltip,
@@ -46,18 +48,30 @@ import {
 } from 'tdesign-vue-next';
 
 import DatePicker from './DatePicker.vue';
+import Icon from './Icon.vue';
 import Input from './Input.vue';
+import { vLoading } from './loading';
 
 const adapter: any = {
   message: MessagePlugin,
   messageBox: ElMessageBox,
+  loading: vLoading,
   components: {
+    badge: {
+      component: TBadge,
+      props: (props: any) => ({
+        count: props.value,
+        dot: props.isDot,
+        maxCount: props.max,
+      }),
+    },
+
     button: {
       component: TButton,
       props: (props: any) => ({
         theme: props.type,
         size: props.size === 'default' ? 'medium' : props.size,
-        icon: props.icon,
+        icon: () => (props.icon ? h(props.icon) : null),
         variant: props.text ? 'text' : 'base',
       }),
     },
@@ -209,7 +223,7 @@ const adapter: any = {
     },
 
     icon: {
-      component: ElIcon,
+      component: Icon,
       props: (props: any) => props,
     },
 
@@ -258,6 +272,13 @@ const adapter: any = {
 
     radio: {
       component: TRadio,
+      props: (props: any) => ({
+        label: props.label,
+      }),
+    },
+
+    radioButton: {
+      component: TRadioButton,
       props: (props: any) => ({
         label: props.label,
       }),
@@ -336,13 +357,21 @@ const adapter: any = {
     },
 
     tabPane: {
-      component: ElTabPane,
-      props: (props: any) => props,
+      component: TTabPanel,
+      props: (props: any) => ({
+        label: props.label,
+        value: props.name,
+      }),
     },
 
     tabs: {
-      component: ElTabs,
-      props: (props: any) => props,
+      component: TTabs,
+      props: (props: any) => ({
+        addable: props.editable,
+        theme: props.type === 'card' ? 'card' : 'normal',
+        placement: props.tabPosition,
+        value: props.modelValue,
+      }),
     },
 
     tag: {

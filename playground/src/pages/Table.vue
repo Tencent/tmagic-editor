@@ -18,8 +18,8 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { ElMessage } from 'element-plus';
 
+import { tMagicMessage } from '@tmagic/design';
 import { MenuButton } from '@tmagic/editor';
 
 import NavMenu from '../components/NavMenu.vue';
@@ -71,9 +71,9 @@ function change(value: string) {
   try {
     // eslint-disable-next-line no-eval
     columns.value = eval(value);
-    ElMessage.success('更新成功');
+    tMagicMessage.success('更新成功');
   } catch (e: any) {
-    ElMessage.error(e.message);
+    tMagicMessage.error(e.message);
   }
 }
 
@@ -81,9 +81,9 @@ function changeData(value: string) {
   try {
     // eslint-disable-next-line no-eval
     data.value = eval(value);
-    ElMessage.success('更新成功');
+    tMagicMessage.success('更新成功');
   } catch (e: any) {
-    ElMessage.error(e.message);
+    tMagicMessage.error(e.message);
   }
 }
 </script>

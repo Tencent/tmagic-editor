@@ -1,4 +1,5 @@
 import {
+  ElBadge,
   ElButton,
   ElCard,
   ElCascader,
@@ -27,6 +28,7 @@ import {
   ElPagination,
   ElPopover,
   ElRadio,
+  ElRadioButton,
   ElRadioGroup,
   ElRow,
   ElScrollbar,
@@ -49,6 +51,11 @@ const adapter: any = {
   message: ElMessage,
   messageBox: ElMessageBox,
   components: {
+    badge: {
+      component: ElBadge,
+      props: (props: any) => props,
+    },
+
     button: {
       component: ElButton,
       props: (props: any) => props,
@@ -176,6 +183,11 @@ const adapter: any = {
 
     radio: {
       component: ElRadio,
+      props: (props: any) => props,
+    },
+
+    radioButton: {
+      component: ElRadioButton,
       props: (props: any) => props,
     },
 

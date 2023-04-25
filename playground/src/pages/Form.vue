@@ -20,17 +20,17 @@
     </div>
   </div>
 
-  <el-dialog v-model="resultVisible" title="result" append-to-body>
+  <TMagicDialog v-model="resultVisible" title="result" append-to-body>
     <pre><code class="language-javascript hljs" v-html="result"></code></pre>
-  </el-dialog>
+  </TMagicDialog>
 </template>
 
 <script lang="ts" setup>
 import { markRaw, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { Coin } from '@element-plus/icons-vue';
-import { ElMessage } from 'element-plus';
 
+import { TMagicDialog, tMagicMessage } from '@tmagic/design';
 import { MenuButton } from '@tmagic/editor';
 import { MForm } from '@tmagic/form';
 
@@ -401,12 +401,7 @@ async function submit() {
     result.value = JSON.stringify(values, null, 2);
   } catch (e: any) {
     console.error(e);
-    ElMessage.error({
-      duration: 10000,
-      showClose: true,
-      message: e.message,
-      dangerouslyUseHTMLString: true,
-    });
+    tMagicMessage.error(e.message);
   }
 }
 
@@ -414,9 +409,9 @@ function change(value: string) {
   try {
     // eslint-disable-next-line no-eval
     config.value = eval(value);
-    ElMessage.success('更新成功');
+    tMagicMessage.success('更新成功');
   } catch (e: any) {
-    ElMessage.error(e.message);
+    tMagicMessage.error(e.message);
   }
 }
 </script>

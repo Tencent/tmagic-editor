@@ -1,71 +1,77 @@
 <template>
-  <TMagicTabs
+  <component
     v-model="activeTabName"
-    :class="config.dynamic ? 'magic-form-dynamic-tab' : 'magic-form-tab'"
-    :type="config.tabType"
-    :editable="config.editable || false"
-    :tab-position="config.tabPosition || 'top'"
+    v-bind="
+      tabsComponent.props({
+        type: config.tabType,
+        editable: config.editable || false,
+        tabPosition: config.tabPosition || 'top',
+      })
+    "
+    :is="tabsComponent.component"
+    :class="`tmagic-design-tabs ${config.dynamic ? 'magic-form-dynamic-tab' : 'magic-form-tab'}`"
     @tab-click="tabClickHandler"
     @tab-add="onTabAdd"
     @tab-remove="onTabRemove"
   >
-    <template v-for="(tab, tabIndex) in tabs">
-      <component
-        v-if="display(tab.display) && tabItems(tab).length"
-        :is="uiComponent.component"
-        :key="tab[mForm?.keyProp || '__key'] ?? tabIndex"
-        :name="filter(tab.status) || tabIndex.toString()"
-        :lazy="tab.lazy || false"
-      >
-        <template #label>
-          <span>
-            {{ filter(tab.title)
-            }}<el-badge :hidden="!diffCount[tabIndex]" :value="diffCount[tabIndex]" class="diff-count-badge"></el-badge>
-          </span>
-        </template>
-        <Container
-          v-for="item in tabItems(tab)"
-          :key="item[mForm?.keyProp || '__key']"
-          :config="item"
-          :disabled="disabled"
-          :model="
-            config.dynamic
-              ? (name ? model[name] : model)[tabIndex]
-              : tab.name
-              ? (name ? model[name] : model)[tab.name]
-              : name
-              ? model[name]
-              : model
-          "
-          :last-values="
-            isEmpty(lastValues)
-              ? {}
-              : config.dynamic
-              ? (name ? lastValues[name] : lastValues)[tabIndex]
-              : tab.name
-              ? (name ? lastValues[name] : lastValues)[tab.name]
-              : name
-              ? lastValues[name]
-              : lastValues
-          "
-          :is-compare="isCompare"
-          :prop="config.dynamic ? `${prop}${prop ? '.' : ''}${String(tabIndex)}` : prop"
-          :size="size"
-          :label-width="tab.labelWidth || labelWidth"
-          :expand-more="expandMore"
-          @change="changeHandler"
-          @addDiffCount="onAddDiffCount(tabIndex)"
-        ></Container>
-      </component>
-    </template>
-  </TMagicTabs>
+    <component
+      v-for="(tab, tabIndex) in tabs"
+      :is="tabPaneComponent.component"
+      :key="tab[mForm?.keyProp || '__key'] ?? tabIndex"
+      v-bind="tabPaneComponent.props({ name: filter(tab.status) || tabIndex.toString(), lazy: tab.lazy || false })"
+    >
+      <template #label>
+        <span>
+          {{ filter(tab.title)
+          }}<TMagicBadge
+            :hidden="!diffCount[tabIndex]"
+            :value="diffCount[tabIndex]"
+            class="diff-count-badge"
+          ></TMagicBadge>
+        </span>
+      </template>
+      <Container
+        v-for="item in tabItems(tab)"
+        :key="item[mForm?.keyProp || '__key']"
+        :config="item"
+        :disabled="disabled"
+        :model="
+          config.dynamic
+            ? (name ? model[name] : model)[tabIndex]
+            : tab.name
+            ? (name ? model[name] : model)[tab.name]
+            : name
+            ? model[name]
+            : model
+        "
+        :last-values="
+          isEmpty(lastValues)
+            ? {}
+            : config.dynamic
+            ? (name ? lastValues[name] : lastValues)[tabIndex]
+            : tab.name
+            ? (name ? lastValues[name] : lastValues)[tab.name]
+            : name
+            ? lastValues[name]
+            : lastValues
+        "
+        :is-compare="isCompare"
+        :prop="config.dynamic ? `${prop}${prop ? '.' : ''}${String(tabIndex)}` : prop"
+        :size="size"
+        :label-width="tab.labelWidth || labelWidth"
+        :expand-more="expandMore"
+        @change="changeHandler"
+        @addDiffCount="onAddDiffCount(tabIndex)"
+      ></Container>
+    </component>
+  </component>
 </template>
 
 <script setup lang="ts" name="MFormTabs">
 import { computed, inject, ref, watchEffect } from 'vue';
 import { cloneDeep, isEmpty } from 'lodash-es';
 
-import { getConfig, TMagicTabs } from '@tmagic/design';
+import { getConfig, TMagicBadge } from '@tmagic/design';
 
 import { FormState, TabConfig, TabPaneConfig } from '../schema';
 import { display as displayFunc, filterFunction } from '../utils/form';
@@ -76,7 +82,8 @@ type DiffCount = {
   [tabIndex: number]: number;
 };
 
-const uiComponent = getConfig('components').tabPane;
+const tabPaneComponent = getConfig('components').tabPane;
+const tabsComponent = getConfig('components').tabs;
 
 const getActive = (mForm: FormState | undefined, props: any, activeTabName: string) => {
   const { config, model, prop } = props;
@@ -135,7 +142,7 @@ const tabs = computed(() => {
     if (!props.config.name) throw new Error('dynamic tab 必须配置name');
     return props.model[props.config.name] || [];
   }
-  return props.config.items;
+  return props.config.items.filter((item) => displayFunc(mForm, item.display, props));
 });
 
 const filter = (config: any) => filterFunction(mForm, config, props);
@@ -192,8 +199,6 @@ const onTabRemove = (tabName: string) => {
   emit('change', props.model);
   mForm?.$emit('field-change', props.prop, props.model[props.config.name]);
 };
-
-const display = (displayConfig: any) => displayFunc(mForm, displayConfig, props);
 
 const changeHandler = () => {
   emit('change', props.model);

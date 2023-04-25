@@ -11,14 +11,14 @@
   >
     <template #append v-if="config.append">
       <span v-if="typeof config.append === 'string'">{{ config.append }}</span>
-      <el-button
+      <TMagicButton
         v-if="typeof config.append === 'object' && config.append.type === 'button'"
         style="color: #409eff"
         :size="size"
         @click.prevent="buttonClickHandler"
       >
         {{ config.append.text }}
-      </el-button>
+      </TMagicButton>
     </template>
   </TMagicInput>
 </template>
@@ -26,7 +26,7 @@
 <script lang="ts" setup name="MFormText">
 import { inject } from 'vue';
 
-import { TMagicInput } from '@tmagic/design';
+import { TMagicButton, TMagicInput } from '@tmagic/design';
 import { isNumber } from '@tmagic/utils';
 
 import { FormState, TextConfig } from '../schema';

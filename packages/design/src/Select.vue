@@ -32,6 +32,7 @@ const props = defineProps<{
   allowCreate?: boolean;
   valueKey?: string;
   remoteMethod?: any;
+  loading?: boolean;
   size?: 'large' | 'default' | 'small';
 }>();
 

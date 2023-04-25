@@ -1,16 +1,16 @@
 <template>
-  <TMagicTabs
+  <component
     v-if="data.type === 'tabs' && data.items.length"
-    class="m-editor-sidebar"
     v-model="activeTabName"
-    type="card"
-    tab-position="left"
+    class="m-editor-sidebar tmagic-design-tabs"
+    v-bind="tabsComponent.props({ type: 'card', tabPosition: 'left' })"
+    :is="tabsComponent.component"
   >
     <component
-      :is="uiComponent.component"
       v-for="(config, index) in sideBarItems"
+      v-bind="tabPaneComponent.props({ name: config.text })"
+      :is="tabPaneComponent.component"
       :key="config.$key || index"
-      :name="config.text"
     >
       <template #label>
         <div :key="config.text">
@@ -80,14 +80,14 @@
         </template>
       </component>
     </component>
-  </TMagicTabs>
+  </component>
 </template>
 
 <script lang="ts" setup name="MEditorSidebar">
 import { computed, ref, watch } from 'vue';
 import { Coin, EditPen, Files } from '@element-plus/icons-vue';
 
-import { getConfig, TMagicTabs } from '@tmagic/design';
+import { getConfig } from '@tmagic/design';
 
 import MIcon from '@editor/components/Icon.vue';
 import type { MenuButton, MenuComponent, SideComponent, SideItem } from '@editor/type';
@@ -107,7 +107,8 @@ const props = withDefaults(
   },
 );
 
-const uiComponent = getConfig('components').tabPane;
+const tabPaneComponent = getConfig('components').tabPane;
+const tabsComponent = getConfig('components').tabs;
 
 const activeTabName = ref(props.data?.status);
 

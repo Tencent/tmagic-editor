@@ -1,15 +1,16 @@
 <template>
-  <el-radio-group size="small" v-model="viewerDevice" :class="viewerDevice" @change="deviceSelect">
-    <el-radio-button label="phone">Phone</el-radio-button>
-    <el-radio-button label="pad">Pad</el-radio-button>
-    <el-radio-button label="pc">PC</el-radio-button>
-  </el-radio-group>
+  <TMagicRadioGroup size="small" v-model="viewerDevice" :class="viewerDevice" @change="deviceSelect">
+    <TMagicRadioButton label="phone">Phone</TMagicRadioButton>
+    <TMagicRadioButton label="pad">Pad</TMagicRadioButton>
+    <TMagicRadioButton label="pc">PC</TMagicRadioButton>
+  </TMagicRadioGroup>
 </template>
 
 <script lang="ts" setup>
 import { nextTick, ref } from 'vue';
 
 import Core from '@tmagic/core';
+import { TMagicRadioButton, TMagicRadioGroup } from '@tmagic/design';
 import { editorService } from '@tmagic/editor';
 
 import { DeviceType, uaMap } from '../const';

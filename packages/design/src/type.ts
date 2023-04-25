@@ -1,3 +1,5 @@
+import { Directive } from 'vue';
+
 export interface CascaderOption {
   /** 指定选项的值为选项对象的某个属性值 */
   value: any;
@@ -33,9 +35,20 @@ export interface TMagicMessageBox {
   close(): void;
 }
 
+export type LoadingBinding = boolean;
+
+const INSTANCE_KEY = Symbol('TdesignLoading');
+
+export interface ElementLoading extends HTMLElement {
+  [INSTANCE_KEY]?: {
+    instance: any;
+  };
+}
+
 export interface PluginOptions {
   message?: TMagicMessage;
   messageBox?: TMagicMessageBox;
   components?: Record<string, any>;
+  loading?: Directive<ElementLoading, LoadingBinding>;
   [key: string]: any;
 }

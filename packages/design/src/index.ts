@@ -7,6 +7,7 @@ export * from './type';
 export * from './config';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
+export { default as TMagicBadge } from './Badge.vue';
 export { default as TMagicButton } from './Button.vue';
 export { default as TMagicCard } from './Card.vue';
 export { default as TMagicCascader } from './Cascader.vue';
@@ -33,6 +34,7 @@ export { default as TMagicOptionGroup } from './OptionGroup.vue';
 export { default as TMagicPagination } from './Pagination.vue';
 export { default as TMagicPopover } from './Popover.vue';
 export { default as TMagicRadio } from './Radio.vue';
+export { default as TMagicRadioButton } from './RadioButton.vue';
 export { default as TMagicRadioGroup } from './RadioGroup.vue';
 export { default as TMagicRow } from './Row.vue';
 export { default as TMagicScrollbar } from './Scrollbar.vue';
@@ -93,6 +95,10 @@ export default {
       tMagicMessageBox.confirm = options.messageBox?.confirm;
       tMagicMessageBox.prompt = options.messageBox?.prompt;
       tMagicMessageBox.close = options.messageBox?.close;
+    }
+
+    if (options.loading) {
+      app.directive('loading', options.loading);
     }
 
     app.config.globalProperties.$MAGIC_DESIGN = options;

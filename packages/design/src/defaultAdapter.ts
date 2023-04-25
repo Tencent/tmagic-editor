@@ -1,5 +1,10 @@
 export default {
   components: {
+    badge: {
+      component: 'el-badge',
+      props: (props: any) => props,
+    },
+
     button: {
       component: 'el-button',
       props: (props: any) => props,
@@ -127,6 +132,11 @@ export default {
 
     radio: {
       component: 'el-radio',
+      props: (props: any) => props,
+    },
+
+    radioButton: {
+      component: 'el-radio-button',
       props: (props: any) => props,
     },
 

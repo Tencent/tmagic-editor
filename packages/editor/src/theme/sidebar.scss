@@ -1,11 +1,24 @@
-.m-editor-sidebar {
+.m-editor-sidebar.tmagic-design-tabs {
   height: 100%;
 
-  &.el-tabs--left .el-tabs__header {
+  .el-tabs__header,
+  .t-tabs__header {
     background: $--sidebar-heder-background-color;
     border: 0;
+    height: 100%;
 
-    &.is-left {
+    .t-tabs__nav--card {
+      background-color: transparent;
+    }
+
+    .t-tabs__nav--card.t-tabs__nav-item:not(.t-is-disabled):not(
+        .t-is-active
+      ):hover {
+      background-color: transparent;
+    }
+
+    &.is-left,
+    &.t-is-left {
       width: 40px;
       margin-right: 0;
     }
@@ -23,7 +36,8 @@
       margin-left: 2px;
     }
 
-    .el-tabs__item.is-left {
+    .el-tabs__item.is-left,
+    .t-tabs__nav-item {
       line-height: 15px;
       border: 0;
       height: auto;
@@ -31,8 +45,10 @@
       color: rgb(255, 255, 255);
       box-sizing: border-box;
 
-      &.is-left {
-        &.is-active {
+      &.is-left,
+      &.t-is-left {
+        &.is-active,
+        &.t-is-active {
           background: $--sidebar-content-background-color;
           border: 0;
 
@@ -49,6 +65,10 @@
           border-right: 0;
         }
       }
+    }
+
+    .t-tabs__nav-item {
+      padding: 7px;
     }
 
     i {

@@ -5,16 +5,19 @@
     size="small"
     placeholder="输入关键字进行过滤"
     clearable
-    :prefix-icon="Search"
     @input="filterTextChangeHandler"
-  ></TMagicInput>
+  >
+    <template #prefix>
+      <TMagicIcon><Search /></TMagicIcon>
+    </template>
+  </TMagicInput>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Search } from '@element-plus/icons-vue';
 
-import { TMagicInput } from '@tmagic/design';
+import { TMagicIcon, TMagicInput } from '@tmagic/design';
 
 const emit = defineEmits(['search']);
 

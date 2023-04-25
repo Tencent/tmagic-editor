@@ -1,6 +1,6 @@
 <template>
   <div class="m-editor-nav-menu">
-    <el-button
+    <TMagicButton
       v-for="(item, index) in data"
       class="menu-item button"
       :key="index"
@@ -8,25 +8,26 @@
       text
       @click="item.handler"
     >
-      <el-icon><component :is="item.icon"></component></el-icon><span>{{ item.text }}</span>
-    </el-button>
+      <TMagicIcon><component :is="item.icon"></component></TMagicIcon><span>{{ item.text }}</span>
+    </TMagicButton>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 
+import { TMagicButton, TMagicIcon } from '@tmagic/design';
 import { MenuButton } from '@tmagic/editor';
 
 export default defineComponent({
   name: 'nav-menu',
-
   props: {
     data: {
       type: Array as PropType<MenuButton[]>,
       default: () => [],
     },
   },
+  components: { TMagicIcon, TMagicButton },
 });
 </script>
 
