@@ -7,6 +7,7 @@
     @opened="openedHandler"
     @close="closeHandler"
     @closed="closedHandler"
+    @update:modelValue="updateModelValue"
   >
     <slot></slot>
 
@@ -40,7 +41,7 @@ const uiComponent = getConfig('components').drawer;
 
 const uiProps = computed(() => uiComponent.props(props));
 
-const emit = defineEmits(['open', 'opened', 'close', 'closed']);
+const emit = defineEmits(['open', 'opened', 'close', 'closed', 'update:modelValue']);
 
 const openHandler = (...args: any[]) => {
   emit('open', ...args);
@@ -53,5 +54,8 @@ const closeHandler = (...args: any[]) => {
 };
 const closedHandler = (...args: any[]) => {
   emit('closed', ...args);
+};
+const updateModelValue = (v: any) => {
+  emit('update:modelValue', v);
 };
 </script>
