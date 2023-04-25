@@ -1,80 +1,18 @@
 .m-editor-code-block-list {
   height: 100%;
 
-  .magic-editor-layer-tree {
-    padding-top: 48px;
-  }
-
-  .code-header-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    top: 0;
-    width: 100%;
-    z-index: 1;
-
-    .search-input {
-      flex: 1;
-      position: relative;
-    }
-
-    .create-code-button {
-      margin-left: 2px;
-      margin-right: 10px;
-    }
-  }
-
-  .divider {
-    margin: 10px 0 0 0;
-  }
-
   .list-container {
-    width: 100%;
-    overflow: hidden;
     .list-item {
-      display: flex;
-      align-items: center;
-      width: 100%;
-      align-items: center;
-
-      .right-tool {
-        display: flex;
-        width: fit-content !important;
-        align-items: center;
-        margin-right: 10px;
-        .edit-icon {
-          margin: 0 5px;
-        }
-      }
-
       .codeIcon {
-        width: 20px;
-        height: 20px;
+        width: 22px;
+        height: 22px;
         margin-right: 5px;
       }
 
       .compIcon {
-        width: 15px;
-        height: 15px;
+        width: 22px;
+        height: 22px;
         margin-right: 5px;
-      }
-
-      .code-name {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        width: 0 !important;
-        flex: 1;
-        line-height: 22px;
-
-        &.code {
-          color: #000;
-        }
-
-        &.hook {
-          color: #909399;
-        }
       }
     }
   }

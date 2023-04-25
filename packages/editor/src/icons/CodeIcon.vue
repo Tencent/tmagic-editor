@@ -1,16 +1,7 @@
 <template>
   <!-- 代码icon，cdn链接：https://cloudcache.tencent-cloud.com/qcloud/ui/static/government/0d463ed5-6407-4498-8865-3d05b5e70115.svg -->
-  <svg
-    width="32px"
-    height="32px"
-    viewBox="0 0 32 32"
-    version="1.1"
-    xmlns="http://www.w3.org/2000/svg"
-    xmlns:xlink="http://www.w3.org/1999/xlink"
-  >
+  <svg viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 60.1 (88133) - https://sketch.com -->
-    <title>gsd-icon-line-Universal-code</title>
-    <desc>Created with Sketch.</desc>
     <defs><rect id="path-1" x="0" y="0" width="32" height="32"></rect></defs>
     <g id="组件规范" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
       <g id="03图标" transform="translate(-561.000000, -2356.000000)">

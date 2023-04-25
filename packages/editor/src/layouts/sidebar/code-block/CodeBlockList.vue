@@ -1,7 +1,7 @@
 <template>
-  <TMagicScrollbar class="m-editor-code-block-list">
+  <TMagicScrollbar class="m-editor-code-block-list m-editor-dep-list-panel">
     <slot name="code-block-panel-header">
-      <div class="code-header-wrapper">
+      <div class="search-wrapper">
         <SearchInput @search="filterTextChangeHandler"></SearchInput>
         <TMagicButton class="create-code-button" type="primary" size="small" @click="createCodeBlock" v-if="editable"
           >新增</TMagicButton
@@ -27,8 +27,8 @@
           <div class="list-item">
             <CodeIcon v-if="data.type === 'code'" class="codeIcon"></CodeIcon>
             <AppManageIcon v-if="data.type === 'node'" class="compIcon"></AppManageIcon>
-            <span class="code-name" :class="{ code: data.type === 'code', hook: data.type === 'key' }"
-              >{{ data.name }}（{{ data.id }}）</span
+            <span class="name" :class="{ code: data.type === 'code', hook: data.type === 'key' }"
+              >{{ data.name }} ({{ data.id }})</span
             >
             <!-- 右侧工具栏 -->
             <div class="right-tool" v-if="data.type === 'code'">

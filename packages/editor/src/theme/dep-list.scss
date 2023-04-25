@@ -1,0 +1,59 @@
+.m-editor-dep-list-panel {
+  .magic-editor-layer-tree {
+    padding-top: 48px;
+  }
+
+  .search-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 1;
+
+    .search-input {
+      flex: 1;
+      position: relative;
+    }
+
+    .tmagic-design-button {
+      margin-right: 10px;
+    }
+  }
+
+  .list-container {
+    width: 100%;
+    overflow: hidden;
+    .list-item {
+      display: flex;
+      width: 100%;
+      align-items: center;
+
+      .right-tool {
+        display: flex;
+        width: fit-content !important;
+        align-items: center;
+        .edit-icon {
+          margin: 0 5px;
+        }
+      }
+      .name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 0 !important;
+        flex: 1;
+        line-height: 22px;
+
+        &.code {
+          color: #000;
+        }
+
+        &.hook {
+          color: #909399;
+        }
+      }
+    }
+  }
+}
