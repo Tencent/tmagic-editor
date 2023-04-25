@@ -21,7 +21,7 @@ import { cloneDeep, mergeWith } from 'lodash-es';
 
 import type { FormConfig } from '@tmagic/form';
 import type { MComponent, MNode } from '@tmagic/schema';
-import { toLine } from '@tmagic/utils';
+import { guid, toLine } from '@tmagic/utils';
 
 import type { PropsState } from '@editor/type';
 import { fillConfig } from '@editor/utils/props';
@@ -130,7 +130,7 @@ class Props extends BaseService {
   }
 
   public async createId(type: string | number): Promise<string> {
-    return `${type}_${this.guid()}`;
+    return `${type}_${guid()}`;
   }
 
   /**
@@ -180,19 +180,6 @@ class Props extends BaseService {
     this.resetState();
     this.removeAllListeners();
     this.removeAllPlugins();
-  }
-
-  /**
-   * 生成指定位数的GUID，无【-】格式
-   * @param digit 位数，默认值8
-   * @returns
-   */
-  private guid(digit = 8): string {
-    return 'x'.repeat(digit).replace(/[xy]/g, (c) => {
-      const r = (Math.random() * 16) | 0;
-      const v = c === 'x' ? r : (r & 0x3) | 0x8;
-      return v.toString(16);
-    });
   }
 }
 

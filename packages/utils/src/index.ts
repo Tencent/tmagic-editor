@@ -144,3 +144,15 @@ export const isSameDomain = (targetUrl = '', source = globalThis.location.host) 
 
   return getHost(targetUrl) === source;
 };
+
+/**
+ * 生成指定位数的GUID，无【-】格式
+ * @param digit 位数，默认值8
+ * @returns
+ */
+export const guid = (digit = 8): string =>
+  'x'.repeat(digit).replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
