@@ -1,3 +1,22 @@
+## [1.2.15](https://github.com/Tencent/tmagic-editor/compare/v1.2.14...v1.2.15) (2023-04-26)
+
+
+### Bug Fixes
+
+* **design:** drawer v-model失效 ([fded83e](https://github.com/Tencent/tmagic-editor/commit/fded83ee0d8e141dda5ed177646665dfc1c9efee))
+* **form:** fieldset初始化时就触发了change事件 ([982cc46](https://github.com/Tencent/tmagic-editor/commit/982cc4685ec1aca07e6ebaab973e2be616562c01))
+* **ui:** model prop设置成可选 ([315e83d](https://github.com/Tencent/tmagic-editor/commit/315e83da190ac9eaa41fa20149925e0792148940))
+
+
+### Features
+
+* **form:** select支持clearable,filterable配置 ([af393e3](https://github.com/Tencent/tmagic-editor/commit/af393e34fb3782ad237cd5ca928ba57c1c4a003d))
+* **table:** action hook配置加入index参数 ([26835f6](https://github.com/Tencent/tmagic-editor/commit/26835f6a29a7586ab45240e9d3c9e5afa97252b0))
+* **util:** guid方法 ([0295d6f](https://github.com/Tencent/tmagic-editor/commit/0295d6f4b54ea90b51a3746a6f9137fd7068d42c))
+* 完善tdesign-vue-next适配 ([ea4af42](https://github.com/Tencent/tmagic-editor/commit/ea4af425f35e0ee9ad561b7ff26f047ece73000d))
+
+
+
 ## [1.2.14](https://github.com/Tencent/tmagic-editor/compare/v1.2.13...v1.2.14) (2023-04-20)
 
 
