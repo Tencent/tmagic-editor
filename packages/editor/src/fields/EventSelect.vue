@@ -132,6 +132,7 @@ const compActionConfig = computed(() => {
 const codeActionConfig = computed(() => {
   const defaultCodeActionConfig = {
     type: 'code-select-col',
+    labelWidth: 0,
     display: (mForm: FormState, { model }: { model: Record<any, any> }) => model.actionType === ActionType.CODE,
   };
   return { ...defaultCodeActionConfig, ...props.config.codeActionConfig };

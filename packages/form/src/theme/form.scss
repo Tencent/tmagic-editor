@@ -34,4 +34,10 @@
       display: none;
     }
   }
+
+  .t-form__item.hidden {
+    > .t-form__label {
+      display: none;
+    }
+  }
 }

@@ -35,6 +35,7 @@ const codeConfig = computed(() => ({
   items: [
     {
       type: 'code-select-col',
+      labelWidth: 0,
     },
   ],
 }));

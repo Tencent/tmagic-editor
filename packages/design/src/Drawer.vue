@@ -35,6 +35,7 @@ const props = defineProps<{
   fullscreen?: boolean;
   closeOnClickModal?: boolean;
   closeOnPressEscape?: boolean;
+  direction?: 'rtl' | 'ltr' | 'ttb' | 'bt';
 }>();
 
 const uiComponent = getConfig('components').drawer;

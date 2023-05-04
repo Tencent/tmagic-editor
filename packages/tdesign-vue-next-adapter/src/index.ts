@@ -1,18 +1,5 @@
 import { h } from 'vue';
 import {
-  ElDrawer,
-  ElDropdown,
-  ElDropdownItem,
-  ElDropdownMenu,
-  ElMessageBox,
-  ElPagination,
-  ElPopover,
-  ElScrollbar,
-  ElTable,
-  ElTableColumn,
-  ElTree,
-} from 'element-plus';
-import {
   Badge as TBadge,
   Button as TButton,
   Card as TCard,
@@ -24,13 +11,19 @@ import {
   CollapsePanel as TCollapsePanel,
   ColorPicker as TColorPicker,
   Dialog as TDialog,
+  DialogPlugin,
   Divider as TDivider,
+  Drawer as TDrawer,
+  Dropdown as TDropdown,
+  DropdownItem as TDropdownItem,
   Form as TForm,
   FormItem as TFormItem,
   InputNumber as TInputNumber,
   MessagePlugin,
   Option as TOption,
   OptionGroup as TOptionGroup,
+  Pagination as TPagination,
+  Popup as TPopup,
   Radio as TRadio,
   RadioButton as TRadioButton,
   RadioGroup as TRadioGroup,
@@ -39,11 +32,13 @@ import {
   StepItem as TStepItem,
   Steps as TSteps,
   Switch as TSwitch,
+  Table as TTable,
   TabPanel as TTabPanel,
   Tabs as TTabs,
   Tag as TTag,
   TimePicker as TTimePicker,
   Tooltip as TTooltip,
+  TreeNodeModel,
   Upload as TUpload,
 } from 'tdesign-vue-next';
 
@@ -51,10 +46,27 @@ import DatePicker from './DatePicker.vue';
 import Icon from './Icon.vue';
 import Input from './Input.vue';
 import { vLoading } from './loading';
+import Scrollbar from './Scrollbar.vue';
+import TableColumn from './TableColumn.vue';
+import Tree from './Tree.vue';
 
 const adapter: any = {
   message: MessagePlugin,
-  messageBox: ElMessageBox,
+  messageBox: {
+    alert: (msg: string) => {
+      DialogPlugin.alert({
+        body: msg,
+      });
+    },
+    confirm: (msg: string) => {
+      DialogPlugin.confirm({
+        body: msg,
+      });
+    },
+    close: (msg: string) => {
+      console.log(msg);
+    },
+  },
   loading: vLoading,
   components: {
     badge: {
@@ -183,22 +195,49 @@ const adapter: any = {
     },
 
     drawer: {
-      component: ElDrawer,
-      props: (props: any) => props,
+      component: TDrawer,
+      props: (props: any) => ({
+        visible: props.modelValue,
+        size: props.size,
+        closeOnEscKeydown: props.closeOnPressEscape,
+        closeOnOverlayClick: props.closeOnClickModal,
+        attach: props.appendToBody ? 'body' : undefined,
+        placement: {
+          rtl: 'right',
+          ltr: 'left',
+          ttb: 'top',
+          bt: 'bottom',
+        }[props.direction as string],
+      }),
     },
 
     dropdown: {
-      component: ElDropdown,
-      props: (props: any) => props,
+      component: TDropdown,
+      props: (props: any) => ({
+        maxHeight: props.maxHeight,
+        disabled: props.disable,
+        direction: props.placement,
+        trigger: props.trigger,
+        hideAfterItemClick: props.hideOnClick,
+        popupProps: {
+          overlayClassName: props.popperClass,
+          ...(props.popperOptions || {}),
+        },
+      }),
     },
 
     dropdownItem: {
-      component: ElDropdownItem,
-      props: (props: any) => props,
+      component: TDropdownItem,
+      props: (props: any) => ({
+        disabled: props.disabled,
+        divider: props.divided,
+        prefixIcon: props.icon && (() => h(props.icon)),
+        onClick: props.command?.(),
+      }),
     },
 
     dropdownMenu: {
-      component: ElDropdownMenu,
+      component: TDropdown,
       props: (props: any) => props,
     },
 
@@ -261,13 +300,24 @@ const adapter: any = {
     },
 
     pagination: {
-      component: ElPagination,
-      props: (props: any) => props,
+      component: TPagination,
+      props: (props: any) => ({
+        current: props.curPage,
+        pageSizeOptions: props.pageSizes,
+        pageSize: props.pagesize,
+        total: props.total,
+      }),
     },
 
     popover: {
-      component: ElPopover,
-      props: (props: any) => props,
+      component: TPopup,
+      props: (props: any) => ({
+        placement: props.placement,
+        trigger: props.trigger,
+        content: props.content,
+        disabled: props.disabled,
+        overlayClassName: props.popperClass,
+      }),
     },
 
     radio: {
@@ -298,7 +348,7 @@ const adapter: any = {
     },
 
     scrollbar: {
-      component: ElScrollbar,
+      component: Scrollbar,
       props: (props: any) => props,
     },
 
@@ -347,12 +397,12 @@ const adapter: any = {
     },
 
     table: {
-      component: ElTable,
+      component: TTable,
       props: (props: any) => props,
     },
 
     tableColumn: {
-      component: ElTableColumn,
+      component: TableColumn,
       props: (props: any) => props,
     },
 
@@ -400,8 +450,29 @@ const adapter: any = {
     },
 
     tree: {
-      component: ElTree,
-      props: (props: any) => props,
+      component: Tree,
+      props: (props: any) => ({
+        ...props,
+        data: props.data,
+        draggable: props.draggable,
+        activable: props.highlightCurrent,
+        activeMultiple: props.highlightCurrent,
+        defaultActived: props.defaultCheckedKeys,
+        checkable: props.showCheckbox,
+        empty: props.emptyText,
+        expandAll: props.defaultExpandAll,
+        checkStrictly: props.checkStrictly,
+        load: props.load,
+        keys: props.props,
+      }),
+      listeners: {
+        click(context: { node: TreeNodeModel<any>; e: MouseEvent }) {
+          return {
+            node: context.node,
+            data: context.node.data,
+          };
+        },
+      },
     },
 
     upload: {

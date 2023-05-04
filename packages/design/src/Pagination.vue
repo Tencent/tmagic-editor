@@ -4,6 +4,7 @@
     :is="uiComponent.component"
     v-bind="uiProps"
     @size-change="handleSizeChange"
+    @page-size-change="handleSizeChange"
     @current-change="handleCurrentChange"
   ></component>
 </template>

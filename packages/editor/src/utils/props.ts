@@ -182,6 +182,7 @@ export const fillConfig = (config: FormConfig = []) => [
           {
             name: 'events',
             type: 'event-select',
+            labelWidth: 0,
           },
         ],
       },

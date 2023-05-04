@@ -41,7 +41,7 @@ const props = defineProps<{
   checkStrictly?: boolean;
   defaultCheckedKeys?: any[];
   currentNodeKey?: string | number;
-  filterNodeMethod?: (value: any, data: any, node: any) => void;
+  filterNodeMethod?: (value: any, data: any, node: any) => boolean;
   accordion?: boolean;
   indent?: number;
   icon?: any;

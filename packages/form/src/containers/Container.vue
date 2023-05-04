@@ -317,7 +317,7 @@ const display = computed((): boolean => {
   return value;
 });
 
-const itemLabelWidth = computed(() => props.config.labelWidth || props.labelWidth);
+const itemLabelWidth = computed(() => props.config.labelWidth ?? props.labelWidth);
 
 watchEffect(() => {
   expand.value = props.expandMore;

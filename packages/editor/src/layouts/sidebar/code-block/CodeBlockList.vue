@@ -18,6 +18,7 @@
       :default-expanded-keys="expandedKeys"
       :expand-on-click-node="false"
       :data="codeList"
+      :props="treeProps"
       :highlight-current="true"
       :filter-node-method="filterNode"
       @node-click="clickHandler"
@@ -74,6 +75,12 @@ const props = defineProps<{
   customError?: (id: Id, errorType: CodeDeleteErrorType) => any;
   paramsColConfig?: ColumnConfig;
 }>();
+
+const treeProps = {
+  children: 'children',
+  label: 'name',
+  value: 'id',
+};
 
 const { codeBlockService, depService, editorService } = inject<Services>('services') || {};
 

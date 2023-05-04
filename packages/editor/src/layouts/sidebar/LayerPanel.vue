@@ -87,6 +87,8 @@ const clicked = ref(false);
 
 const treeProps = {
   children: 'items',
+  label: 'name',
+  value: 'id',
   disabled: (data: MNode) => Boolean(data.items?.length),
   class: (data: MNode) => {
     if (clicked.value || isPage(data)) return '';
