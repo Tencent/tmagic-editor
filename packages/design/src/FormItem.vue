@@ -13,7 +13,7 @@ import { computed } from 'vue';
 import { getConfig } from './config';
 const props = defineProps<{
   prop?: string;
-  labelWidth?: string;
+  labelWidth?: string | number;
   rules?: any;
 }>();
 

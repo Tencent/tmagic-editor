@@ -13,7 +13,7 @@ const form = ref<any>();
 
 const props = defineProps<{
   model?: any;
-  labelWidth?: string;
+  labelWidth?: string | number;
   disabled?: boolean;
   inline?: boolean;
   labelPosition?: string;
