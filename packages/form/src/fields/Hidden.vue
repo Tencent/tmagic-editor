@@ -13,6 +13,7 @@ const props = defineProps<{
   values?: any;
   name: string;
   prop: string;
+  lastValues?: Record<string, any>;
 }>();
 
 useAddField(props.prop);

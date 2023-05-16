@@ -13,6 +13,7 @@ const props = defineProps<{
   values?: any;
   name: string;
   prop: string;
+  lastValues?: Record<string, any>;
 }>();
 
 if (props.config.initValue && props.model) {

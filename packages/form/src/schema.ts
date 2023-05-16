@@ -87,6 +87,7 @@ export interface FormItem {
   dynamicKey?: string;
   /** 是否需要显示`展开更多配置` */
   expand?: boolean;
+  [key: string]: any;
 }
 
 export interface ContainerCommonConfig {
@@ -567,6 +568,7 @@ export interface TabPaneConfig {
   onTabClick?: (mForm: FormState | undefined, tab: any, data: any) => void;
   [key: string]: any;
 }
+
 export interface TabConfig extends FormItem, ContainerCommonConfig {
   type: 'tab' | 'dynamic-tab';
   tabType?: string;
@@ -718,6 +720,6 @@ export type ChildConfig =
   | DynamicFieldConfig
   | ComponentConfig;
 
-export type FormConfig = (ChildConfig & { [key: string]: any })[];
+export type FormConfig = ChildConfig[];
 
 export type FormValue = Record<string | number, any>;
