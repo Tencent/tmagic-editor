@@ -257,6 +257,26 @@ describe('isPop', () => {
   });
 });
 
+describe('isPage', () => {
+  test('true', () => {
+    expect(
+      util.isPage({
+        type: 'page',
+        id: 1,
+      }),
+    ).toBeTruthy();
+  });
+
+  test('false', () => {
+    expect(
+      util.isPage({
+        type: 'pop1',
+        id: 1,
+      }),
+    ).toBeFalsy();
+  });
+});
+
 describe('getHost', () => {
   test('正常', () => {
     const host = util.getHost('https://film.qq.com/index.html');
@@ -278,5 +298,295 @@ describe('isSameDomain', () => {
   test('不是http', () => {
     const flag = util.isSameDomain('ftp://film.qq.com/index.html', 'test.film.qq.com');
     expect(flag).toBeTruthy();
+  });
+});
+
+describe('guid', () => {
+  test('获取id', () => {
+    const id = util.guid();
+    const id1 = util.guid();
+    expect(typeof id).toBe('string');
+    expect(id === id1).toBeFalsy();
+  });
+});
+
+describe('getValueByKeyPath', () => {
+  test('key', () => {
+    const value = util.getValueByKeyPath('a', {
+      a: 1,
+    });
+
+    expect(value).toBe(1);
+  });
+
+  test('keys', () => {
+    const value = util.getValueByKeyPath('a.b', {
+      a: {
+        b: 1,
+      },
+    });
+
+    expect(value).toBe(1);
+  });
+
+  test('error', () => {
+    const value = util.getValueByKeyPath('a.b.c.d', {
+      a: {},
+    });
+
+    expect(value).toBeUndefined();
+
+    const value1 = util.getValueByKeyPath('a.b.c', {
+      a: {},
+    });
+
+    expect(value1).toBeUndefined();
+  });
+});
+
+describe('getNodes', () => {
+  test('获取id', () => {
+    const root = [
+      {
+        id: 1,
+        type: 'container',
+        items: [
+          {
+            id: 11,
+            items: [
+              {
+                id: 111,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 2,
+        type: 'container',
+        items: [
+          {
+            id: 22,
+            items: [
+              {
+                id: 222,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 3,
+        type: 'container',
+        items: {
+          id: 33,
+          items: [
+            {
+              id: 333,
+            },
+          ],
+        },
+      },
+    ];
+    const nodes = util.getNodes([22, 111, 2], root);
+    expect(nodes.length).toBe(3);
+  });
+});
+
+describe('getDepKeys', () => {
+  test('get keys', () => {
+    const keys = util.getDepKeys(
+      {
+        ds_bebcb2d5: {
+          61705611: {
+            name: '文本',
+            keys: ['text'],
+          },
+        },
+      },
+      61705611,
+    );
+    expect(keys).toEqual(['text']);
+  });
+});
+
+describe('getDepNodeIds', () => {
+  test('get node ids', () => {
+    const ids = util.getDepNodeIds({
+      ds_bebcb2d5: {
+        61705611: {
+          name: '文本',
+          keys: ['text'],
+        },
+      },
+    });
+    expect(ids).toEqual(['61705611']);
+  });
+});
+
+describe('replaceChildNode', () => {
+  test('replace', () => {
+    const root = [
+      {
+        id: 1,
+        text: '',
+        type: 'container',
+        items: [
+          {
+            id: 11,
+            text: '',
+            items: [
+              {
+                id: 111,
+                text: '',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 2,
+        type: 'container',
+        text: '',
+        items: [
+          {
+            id: 22,
+            text: '',
+            items: [
+              {
+                id: 222,
+                text: '',
+              },
+            ],
+          },
+        ],
+      },
+    ];
+    expect(root[1].items[0].items[0].text).toBe('');
+    util.replaceChildNode(
+      {
+        id: 222,
+        text: '文本',
+      },
+      root,
+    );
+    expect(root[1].items[0].items[0].text).toBe('文本');
+  });
+
+  test('replace whith parent', () => {
+    const root = [
+      {
+        id: 1,
+        text: '',
+        type: 'container',
+        items: [
+          {
+            id: 11,
+            text: '',
+            items: [
+              {
+                id: 111,
+                text: '',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 2,
+        type: 'container',
+        text: '',
+        items: [
+          {
+            id: 22,
+            text: '',
+            items: [
+              {
+                id: 222,
+                text: '',
+              },
+            ],
+          },
+        ],
+      },
+    ];
+    expect(root[1].items[0].items[0].text).toBe('');
+    util.replaceChildNode(
+      {
+        id: 222,
+        text: '文本',
+      },
+      root,
+      22,
+    );
+    expect(root[1].items[0].items[0].text).toBe('文本');
+  });
+});
+
+describe('compiledNode', () => {
+  test('compiled', () => {
+    const node = util.compiledNode(
+      (_str: string) => '123',
+      {
+        id: 61705611,
+        type: 'text',
+        text: '456',
+      },
+      {
+        ds_bebcb2d5: {
+          61705611: {
+            name: '文本',
+            keys: ['text'],
+          },
+        },
+      },
+    );
+
+    expect(node.text).toBe('123');
+  });
+
+  test('compile with source id', () => {
+    const node = util.compiledNode(
+      (_str: string) => '123',
+      {
+        id: 61705611,
+        type: 'text',
+        text: '456',
+      },
+      {
+        ds_bebcb2d5: {
+          61705611: {
+            name: '文本',
+            keys: ['text'],
+          },
+        },
+      },
+      'ds_bebcb2d5',
+    );
+
+    expect(node.text).toBe('123');
+  });
+
+  test('compile error', () => {
+    const node = util.compiledNode(
+      (_str: string) => {
+        throw new Error('error');
+      },
+      {
+        id: 61705611,
+        type: 'text',
+        text: '456',
+      },
+      {
+        ds_bebcb2d5: {
+          61705611: {
+            name: '文本',
+            keys: ['text'],
+          },
+        },
+      },
+    );
+
+    expect(node.text).toBe('');
   });
 });

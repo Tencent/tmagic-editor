@@ -30,6 +30,7 @@ import type {
 
 import type { CodeBlockService } from './services/codeBlock';
 import type { ComponentListService } from './services/componentList';
+import { DataSourceService } from './services/dataSource';
 import type { DepService } from './services/dep';
 import type { EditorService } from './services/editor';
 import type { EventsService } from './services/events';
@@ -56,6 +57,7 @@ export interface Services {
   uiService: UiService;
   codeBlockService: CodeBlockService;
   depService: DepService;
+  dataSourceService: DataSourceService;
 }
 
 export interface StageOptions {
@@ -264,7 +266,7 @@ export interface SideComponent extends MenuComponent {
  * layer: 已选组件树
  * code-block: 代码块
  */
-export type SideItem = 'component-list' | 'layer' | 'code-block' | SideComponent;
+export type SideItem = 'component-list' | 'layer' | 'code-block' | 'data-source' | SideComponent;
 
 /** 工具栏 */
 export interface SideBarData {

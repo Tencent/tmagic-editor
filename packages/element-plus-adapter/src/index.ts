@@ -1,4 +1,5 @@
 import {
+  ElAutocomplete,
   ElBadge,
   ElButton,
   ElCard,
@@ -51,6 +52,11 @@ const adapter: any = {
   message: ElMessage,
   messageBox: ElMessageBox,
   components: {
+    autocomplete: {
+      component: ElAutocomplete,
+      props: (props: any) => props,
+    },
+
     badge: {
       component: ElBadge,
       props: (props: any) => props,

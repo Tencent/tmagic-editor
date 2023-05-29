@@ -57,7 +57,6 @@ describe('Time', () => {
     await input.setValue('12:00:00');
 
     const value = await (wrapper.vm as any).submitForm();
-    console.log(value.time);
     expect(value.time).toMatch('12:00:00');
   });
 });

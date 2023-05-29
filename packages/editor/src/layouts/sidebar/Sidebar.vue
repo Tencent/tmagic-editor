@@ -8,7 +8,7 @@
   >
     <component
       v-for="(config, index) in sideBarItems"
-      v-bind="tabPaneComponent.props({ name: config.text })"
+      v-bind="tabPaneComponent.props({ name: config.text, lazy: config.lazy })"
       :is="tabPaneComponent.component"
       :key="config.$key || index"
     >
@@ -85,7 +85,7 @@
 
 <script lang="ts" setup name="MEditorSidebar">
 import { computed, ref, watch } from 'vue';
-import { Coin, EditPen, Files } from '@element-plus/icons-vue';
+import { Coin, EditPen, Goods, List } from '@element-plus/icons-vue';
 
 import { getConfig } from '@tmagic/design';
 
@@ -94,16 +94,17 @@ import type { MenuButton, MenuComponent, SideComponent, SideItem } from '@editor
 import { SideBarData } from '@editor/type';
 
 import CodeBlockList from './code-block/CodeBlockList.vue';
+import DataSourceListPanel from './data-source/DataSourceListPanel.vue';
 import ComponentListPanel from './ComponentListPanel.vue';
 import LayerPanel from './LayerPanel.vue';
 
 const props = withDefaults(
   defineProps<{
-    data?: SideBarData;
+    data: SideBarData;
     layerContentMenu: (MenuButton | MenuComponent)[];
   }>(),
   {
-    data: () => ({ type: 'tabs', status: '组件', items: ['component-list', 'layer', 'code-block'] }),
+    data: () => ({ type: 'tabs', status: '组件', items: ['component-list', 'layer', 'code-block', 'data-source'] }),
   },
 );
 
@@ -117,7 +118,7 @@ const getItemConfig = (data: SideItem): SideComponent => {
     'component-list': {
       $key: 'component-list',
       type: 'component',
-      icon: Coin,
+      icon: Goods,
       text: '组件',
       component: ComponentListPanel,
       slots: {},
@@ -125,7 +126,7 @@ const getItemConfig = (data: SideItem): SideComponent => {
     layer: {
       $key: 'layer',
       type: 'component',
-      icon: Files,
+      icon: List,
       text: '已选组件',
       props: {
         layerContentMenu: props.layerContentMenu,
@@ -139,6 +140,14 @@ const getItemConfig = (data: SideItem): SideComponent => {
       icon: EditPen,
       text: '代码编辑',
       component: CodeBlockList,
+      slots: {},
+    },
+    'data-source': {
+      $key: 'data-source',
+      type: 'component',
+      icon: Coin,
+      text: '数据源',
+      component: DataSourceListPanel,
       slots: {},
     },
   };

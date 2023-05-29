@@ -32,6 +32,10 @@ export enum ActionType {
   CODE = 'code',
 }
 
+export interface DataSourceDeps {
+  [dataSourceId: string | number]: Dep;
+}
+
 /** 事件类型(已废弃，后续不建议继续使用) */
 export interface DeprecatedEventConfig {
   /** 待触发的事件名称 */
@@ -106,6 +110,10 @@ export interface MApp extends MComponent {
   items: MPage[];
   /** 代码块 */
   codeBlocks?: CodeBlockDSL;
+
+  dataSources?: DataSourceSchema[];
+
+  dataSourceDeps?: DataSourceDeps;
 }
 
 export interface CodeBlockDSL {
@@ -139,4 +147,42 @@ export type MNode = MComponent | MContainer | MPage | MApp;
 export enum HookType {
   /** 代码块钩子标识 */
   CODE = 'code',
+}
+
+export interface DataSchema {
+  type?: 'null' | 'boolean' | 'object' | 'array' | 'number' | 'string' | 'any';
+  /** 键名 */
+  name: string;
+  /** 展示名称 */
+  title?: string;
+  /** 实体描述，鼠标hover时展示 */
+  description?: string;
+  /** 默认值 */
+  defaultValue?: any;
+  /** 是否可用 */
+  enable?: boolean;
+  /** type === 'object' || type === 'array' */
+  fields?: DataSchema[];
+}
+
+export interface DataSourceSchema {
+  /** 数据源类型，根据类型来实例化；例如http则使用new HttpDataSource */
+  type: string;
+  /** 实体ID */
+  id: string;
+  /** 实体名称，用于关联时展示 */
+  title?: string;
+  /** 实体描述，鼠标hover时展示 */
+  description?: string;
+  /** 字段列表 */
+  fields: DataSchema[];
+  /** 扩展字段 */
+  [key: string]: any;
+}
+
+export interface Dep {
+  [nodeId: Id]: {
+    name: string;
+    keys: Id[];
+  };
 }

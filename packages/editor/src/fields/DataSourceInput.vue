@@ -1,0 +1,342 @@
+<template>
+  <component
+    v-if="!disabled && isFocused"
+    :is="getConfig('components').autocomplete.component"
+    class="tmagic-design-auto-complete"
+    ref="autocomplete"
+    v-model="state"
+    v-bind="
+      getConfig('components').autocomplete.props({
+        disabled,
+        size,
+        fetchSuggestions: querySearch,
+        triggerOnFocus: false,
+        clearable: true,
+      })
+    "
+    style="width: 100%"
+    @blur="blurHandler"
+    @change="changeHandler"
+    @input="inputHandler"
+    @select="selectHandler"
+  >
+    <template #suffix>
+      <Icon :icon="Coin" />
+    </template>
+    <template #default="{ item }">
+      <div style="display: flex; flex-direction: column; line-height: 1.2em">
+        <div>{{ item.text }}</div>
+        <span style="font-size: 10px; color: rgba(0, 0, 0, 0.6)">{{ item.value }}</span>
+      </div>
+    </template>
+  </component>
+  <div :class="`el-input el-input--${size}`" @mouseup="mouseupHandler" v-else>
+    <div
+      :class="`el-input__wrapper ${isFocused ? ' is-focus' : ''}`"
+      :contenteditable="!disabled"
+      style="justify-content: left"
+    >
+      <template v-for="(item, index) in displayState">
+        <span :key="index" v-if="item.type === 'text'" style="margin-right: 2px">{{ item.value }}</span>
+        <TMagicTag :key="index" :size="size" v-if="item.type === 'var'">{{ item.value }}</TMagicTag>
+      </template>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { computed, inject, nextTick, ref, watchEffect } from 'vue';
+import { Coin } from '@element-plus/icons-vue';
+
+import { getConfig, TMagicAutocomplete, TMagicTag } from '@tmagic/design';
+import type { DataSchema, DataSourceSchema } from '@tmagic/schema';
+
+import Icon from '@editor/components/Icon.vue';
+import type { Services } from '@editor/type';
+
+const props = withDefaults(
+  defineProps<{
+    config: {
+      type: 'data-source-input';
+      name: string;
+      text: string;
+    };
+    model: Record<string, any>;
+    name: string;
+    prop: string;
+    disabled: boolean;
+    lastValues?: Record<string, any>;
+    size?: 'large' | 'default' | 'small';
+  }>(),
+  {
+    disabled: false,
+  },
+);
+
+const emit = defineEmits<(e: 'change', value: string) => void>();
+
+const { dataSourceService } = inject<Services>('services') || {};
+
+const autocomplete = ref<InstanceType<typeof TMagicAutocomplete>>();
+const isFocused = ref(false);
+const state = ref('');
+const displayState = ref<{ value: string; type: 'var' | 'text' }[]>([]);
+
+const input = computed<HTMLInputElement>(() => autocomplete.value?.inputRef?.input);
+
+watchEffect(() => {
+  state.value = props.model[props.name] || '';
+});
+
+const mouseupHandler = async () => {
+  isFocused.value = true;
+  await nextTick();
+  autocomplete.value?.focus();
+};
+
+const blurHandler = () => {
+  isFocused.value = false;
+
+  displayState.value = [];
+
+  const matches = state.value.matchAll(/\{\{([\s\S]+?)\}\}/g);
+  let index = 0;
+  for (const match of matches) {
+    if (typeof match.index === 'undefined') break;
+
+    displayState.value.push({
+      type: 'text',
+      value: state.value.substring(index, match.index),
+    });
+    let dsText = '';
+    let ds: DataSourceSchema | undefined;
+    let fields: DataSchema[] | undefined;
+    match[1].split('.').forEach((item, index) => {
+      if (index === 0) {
+        ds = dataSources.value.find((ds) => ds.id === item);
+        dsText += ds?.title || item;
+        fields = ds?.fields;
+        return;
+      }
+
+      const field = fields?.find((field) => field.name === item);
+      fields = field?.fields;
+      dsText += `.${field?.title || item}`;
+    });
+    displayState.value.push({
+      type: 'var',
+      value: dsText,
+    });
+    index = match.index + match[0].length;
+  }
+
+  if (index < state.value.length) {
+    displayState.value.push({
+      type: 'text',
+      value: state.value.substring(index),
+    });
+  }
+};
+
+const changeHandler = (v: string) => {
+  emit('change', v);
+};
+
+let inputText = '';
+
+const inputHandler = (v: string) => {
+  if (!v) {
+    inputText = v;
+  }
+};
+
+const dataSources = computed(() => dataSourceService?.get('dataSources') || []);
+
+/**
+ * 光标位置是不是}
+ * @param selectionStart 光标位置
+ */
+const isRightCurlyBracket = (selectionStart = 0) => {
+  const lastChar = inputText.substring(selectionStart - 1, selectionStart);
+  return lastChar === '}';
+};
+
+/**
+ * 获取光标位置
+ */
+const getSelectionStart = () => {
+  let selectionStart = input.value?.selectionStart || 0;
+
+  // 输入法可能会自动补全}，如果当前光标前面一个字符是}，则光标前移一位
+  if (isRightCurlyBracket(selectionStart)) {
+    selectionStart -= 1;
+  }
+
+  return selectionStart;
+};
+
+/**
+ * 当前输入的是{
+ * @param leftCurlyBracketIndex {字符索引
+ */
+const curCharIsLeftCurlyBracket = (leftCurlyBracketIndex: number) =>
+  leftCurlyBracketIndex > -1 && leftCurlyBracketIndex === getSelectionStart() - 1;
+
+/**
+ * 当前输入的是.
+ * @param leftCurlyBracketIndex .字符索引
+ */
+const curCharIsDot = (dotIndex: number) => dotIndex > -1 && dotIndex === getSelectionStart() - 1;
+
+/**
+ * @param leftCurlyBracketIndex 左大括号字符索引
+ * @param cb 建议的方法
+ */
+const dsQuerySearch = (queryString: string, leftCurlyBracketIndex: number, cb: (data: { value: string }[]) => void) => {
+  let result: DataSourceSchema[] = [];
+
+  if (curCharIsLeftCurlyBracket(leftCurlyBracketIndex)) {
+    // 当前输入的是{
+    result = dataSources.value;
+  } else if (leftCurlyBracketIndex > -1) {
+    // 当前输入的是{xx
+    const queryName = queryString.substring(leftCurlyBracketIndex + 1).toLowerCase();
+    result = dataSources.value.filter((ds) => ds.title?.toLowerCase().includes(queryName) || ds.id.includes(queryName));
+  }
+
+  cb(
+    result.map((ds) => ({
+      value: ds.id,
+      text: ds.title,
+      type: 'dataSource',
+    })),
+  );
+};
+
+/**
+ * 字段提示
+ * @param queryString 当前输入框内的字符串
+ * @param leftAngleIndex {字符索引
+ * @param dotIndex .字符索引
+ * @param cb 建议回调
+ */
+const fieldQuerySearch = (
+  queryString: string,
+  leftAngleIndex: number,
+  dotIndex: number,
+  cb: (data: { value: string }[]) => void,
+) => {
+  let result: DataSchema[] = [];
+
+  const dsKey = queryString.substring(leftAngleIndex + 1, dotIndex);
+  // 可能是xx.xx.xx，存在链式调用
+  const keys = dsKey.split('.');
+  // 最前的是数据源id
+  const ds = dataSources.value.find((ds) => ds.id === keys.shift());
+  if (!ds) {
+    return;
+  }
+
+  let fields = ds.fields || [];
+
+  // 后面这些事字段
+  let key = keys.shift();
+  while (key) {
+    for (const field of fields) {
+      if (field.name === key) {
+        fields = field.fields || [];
+        key = keys.shift();
+        break;
+      }
+    }
+  }
+
+  if (curCharIsDot(dotIndex)) {
+    // 当前输入的是.
+    result = fields || [];
+  } else if (dotIndex > -1) {
+    const queryName = queryString.substring(dotIndex + 1).toLowerCase();
+    result =
+      fields.filter(
+        (field) => field.name?.toLowerCase().includes(queryName) || field.title?.toLowerCase().includes(queryName),
+      ) || [];
+  }
+
+  cb(
+    result.map((field) => ({
+      value: field.name,
+      text: field.title,
+      type: 'field',
+    })),
+  );
+};
+
+/**
+ * 数据源提示
+ * @param queryString 当前输入框内的字符串
+ * @param cb 建议回调
+ */
+const querySearch = (queryString: string, cb: (data: { value: string }[]) => void) => {
+  inputText = queryString;
+
+  const selectionStart = getSelectionStart();
+
+  const curQueryString = queryString.substring(0, selectionStart);
+
+  const fieldKeyStringLastIndex = curQueryString.lastIndexOf('.');
+  const dsKeyStringLastIndex = curQueryString.lastIndexOf('{');
+
+  const isFieldTip = fieldKeyStringLastIndex > dsKeyStringLastIndex;
+
+  if (isFieldTip) {
+    fieldQuerySearch(curQueryString, dsKeyStringLastIndex, fieldKeyStringLastIndex, cb);
+  } else {
+    dsQuerySearch(curQueryString, dsKeyStringLastIndex, cb);
+  }
+};
+
+/**
+ * 选择建议
+ * @param value 建议值
+ * @param type 建议类型，是数据源还是字段
+ */
+const selectHandler = async ({ value, type }: { value: string; type: 'dataSource' | 'field' }) => {
+  const isDataSource = type === 'dataSource';
+  const selectionStart = input.value?.selectionStart || 0;
+  let startText = inputText.substring(0, selectionStart);
+
+  const dotIndex = startText.lastIndexOf('.');
+  const leftCurlyBracketIndex = startText.lastIndexOf('{');
+
+  const endText = inputText.substring(selectionStart);
+
+  let suggestText = value;
+
+  if (isDataSource) {
+    if (!curCharIsLeftCurlyBracket(leftCurlyBracketIndex)) {
+      startText = startText.substring(0, leftCurlyBracketIndex + 1);
+    }
+
+    // 当前光标后一位是否为}，不是的话需要补上
+    if (!isRightCurlyBracket(selectionStart + 1)) {
+      suggestText = `${suggestText}}`;
+    }
+    suggestText = `{${suggestText}}`;
+  } else if (!curCharIsDot(dotIndex)) {
+    startText = startText.substring(0, dotIndex + 1);
+  }
+
+  state.value = `${startText}${suggestText}${endText}`;
+
+  await nextTick();
+
+  // 由于选择数据源时会在后面补全}}, 所以光标要前移2位
+  let newSelectionStart = 0;
+  if (isDataSource) {
+    newSelectionStart = leftCurlyBracketIndex + suggestText.length - 1;
+  } else {
+    newSelectionStart = dotIndex + suggestText.length + 1;
+  }
+  input.value?.setSelectionRange(newSelectionStart, newSelectionStart);
+};
+</script>

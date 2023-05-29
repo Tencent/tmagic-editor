@@ -20,5 +20,6 @@ export default [
   {
     text: '文本',
     name: 'text',
+    type: 'data-source-input',
   },
 ];

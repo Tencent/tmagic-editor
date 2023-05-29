@@ -20,6 +20,7 @@ export default [
   {
     name: 'text',
     text: '文本',
+    type: 'data-source-input',
   },
   {
     name: 'multiple',

@@ -5,6 +5,11 @@ export default {
       props: (props: any) => props,
     },
 
+    autocomplete: {
+      component: 'el-autocomplete',
+      props: (props: any) => props,
+    },
+
     button: {
       component: 'el-button',
       props: (props: any) => props,

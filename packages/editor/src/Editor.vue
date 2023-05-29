@@ -73,6 +73,7 @@ import Sidebar from './layouts/sidebar/Sidebar.vue';
 import Workspace from './layouts/workspace/Workspace.vue';
 import codeBlockService from './services/codeBlock';
 import componentListService from './services/componentList';
+import dataSourceService from './services/dataSource';
 import depService from './services/dep';
 import editorService from './services/editor';
 import eventsService from './services/events';
@@ -110,6 +111,7 @@ export default defineComponent({
       storageService,
       codeBlockService,
       depService,
+      dataSourceService,
     };
 
     initServiceEvents(props, emit, services);

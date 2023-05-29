@@ -27,7 +27,10 @@ export default defineConfig({
     alias:
       process.env.NODE_ENV === 'production'
         ? []
-        : [{ find: /^@tmagic\/schema/, replacement: path.join(__dirname, '../schema/src/index.ts') }],
+        : [
+            { find: /^@tmagic\/schema/, replacement: path.join(__dirname, '../schema/src/index.ts') },
+            { find: /^@tmagic\/data-source/, replacement: path.join(__dirname, '../data-source/src/index.ts') },
+          ],
   },
 
   build: {

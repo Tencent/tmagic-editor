@@ -267,6 +267,8 @@ export class Watcher extends EventEmitter {
         });
       });
     });
+
+    this.emit('collected', nodes, deep);
   }
 
   /**
@@ -299,6 +301,7 @@ export class Watcher extends EventEmitter {
 
         if (target.isTarget(key, value)) {
           target.updateDep(node, fullKey);
+          this.emit('update-dep', node, fullKey);
         } else if (!keyIsItems && Array.isArray(value)) {
           value.forEach((item, index) => {
             collectTarget(item, `${fullKey}.${index}`);

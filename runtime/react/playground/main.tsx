@@ -18,11 +18,13 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { cloneDeep } from 'lodash-es';
 
 import Core from '@tmagic/core';
 import type { MApp } from '@tmagic/schema';
 import type { RemoveData, SortEventData, UpdateData } from '@tmagic/stage';
 import { AppContent } from '@tmagic/ui-react';
+import { replaceChildNode } from '@tmagic/utils';
 
 import components from '../.tmagic/comp-entry';
 import plugins from '../.tmagic/plugin-entry';
@@ -75,12 +77,10 @@ const operations = {
   },
 
   updateRootConfig(root: MApp) {
-    console.log('update root config', root);
     app?.setConfig(root);
   },
 
   updatePageId(id: string) {
-    console.log('update page id', id);
     curPageId = id;
     app?.setPage(curPageId);
     renderDom();
@@ -91,7 +91,6 @@ const operations = {
   },
 
   select(id: string) {
-    console.log('select config', id);
     const el = document.getElementById(id);
     if (el) return el;
     // 未在当前文档下找到目标元素，可能是还未渲染，等待渲染完成后再尝试获取
@@ -103,22 +102,19 @@ const operations = {
   },
 
   add({ root }: UpdateData) {
-    console.log('add config', root);
     updateConfig(root);
   },
 
-  update({ root }: UpdateData) {
-    console.log('update config', root);
-    updateConfig(root);
+  update({ config, root }: UpdateData) {
+    replaceChildNode(app.compiledNode(config, app.dataSourceManager?.data || {}), root.items);
+    updateConfig(cloneDeep(root));
   },
 
   sortNode({ root }: SortEventData) {
-    console.log('sort config', root);
     root && updateConfig(root);
   },
 
   remove({ root }: RemoveData) {
-    console.log('remove config', root);
     updateConfig(root);
   },
 };

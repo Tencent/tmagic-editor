@@ -13,13 +13,13 @@
         {{ isFullScreen ? '退出全屏' : '全屏' }}</TMagicButton
       >
       <TMagicButton type="primary" class="button" @click="saveAndClose">确认</TMagicButton>
-      <TMagicButton type="primary" class="button" @click="close">关闭</TMagicButton>
+      <TMagicButton class="button" @click="close">关闭</TMagicButton>
     </div>
     <div class="m-editor-content-bottom" v-else>
       <TMagicButton type="primary" class="button" @click="toggleFullScreen">
         {{ isFullScreen ? '退出全屏' : '全屏' }}</TMagicButton
       >
-      <TMagicButton type="primary" class="button" @click="close">关闭</TMagicButton>
+      <TMagicButton class="button" @click="close">关闭</TMagicButton>
     </div>
   </div>
 </template>

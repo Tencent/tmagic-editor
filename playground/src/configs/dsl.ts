@@ -208,7 +208,7 @@ export default {
             fontWeight: '',
           },
           name: '按钮',
-          text: '打开弹窗',
+          text: '{{ds_b64c92b5.text}}',
           multiple: true,
           events: [
             {
@@ -334,4 +334,29 @@ export default {
       ],
     },
   ],
+  dataSources: [
+    {
+      id: 'ds_b64c92b5',
+      type: 'base',
+      title: 'button',
+      description: '按钮',
+      fields: [
+        {
+          type: 'string',
+          name: 'text',
+          title: '按钮文案',
+          description: '',
+          defaultValue: '打开弹窗',
+        },
+      ],
+    },
+  ],
+  dataSourceDeps: {
+    ds_b64c92b5: {
+      button_430: {
+        name: '按钮',
+        keys: ['text'],
+      },
+    },
+  },
 };

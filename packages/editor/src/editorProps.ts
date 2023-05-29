@@ -79,6 +79,11 @@ export default {
     default: () => ({}),
   },
 
+  dataScourceConfigs: {
+    type: Object as PropType<Record<string, FormConfig>>,
+    default: () => ({}),
+  },
+
   /** 画布中组件选中框的移动范围 */
   moveableOptions: {
     type: [Object, Function] as PropType<

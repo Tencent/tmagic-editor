@@ -21,7 +21,10 @@ import Code from './fields/Code.vue';
 import CodeLink from './fields/CodeLink.vue';
 import CodeSelect from './fields/CodeSelect.vue';
 import CodeSelectCol from './fields/CodeSelectCol.vue';
+import DataSourceFields from './fields/DataSourceFields.vue';
+import DataSourceInput from './fields/DataSourceInput.vue';
 import EventSelect from './fields/EventSelect.vue';
+import KeyValue from './fields/KeyValue.vue';
 import uiSelect from './fields/UISelect.vue';
 import CodeEditor from './layouts/CodeEditor.vue';
 import { setConfig } from './utils/config';
@@ -40,6 +43,7 @@ export { default as propsService } from './services/props';
 export { default as historyService } from './services/history';
 export { default as storageService } from './services/storage';
 export { default as eventsService } from './services/events';
+export { default as dataSourceService } from './services/dataSource';
 export { default as uiService } from './services/ui';
 export { default as codeBlockService } from './services/codeBlock';
 export { default as depService } from './services/dep';
@@ -47,7 +51,10 @@ export { default as ComponentListPanel } from './layouts/sidebar/ComponentListPa
 export { default as LayerPanel } from './layouts/sidebar/LayerPanel.vue';
 export { default as CodeSelect } from './fields/CodeSelect.vue';
 export { default as CodeSelectCol } from './fields/CodeSelectCol.vue';
+export { default as DataSourceFields } from './fields/DataSourceFields.vue';
+export { default as DataSourceInput } from './fields/DataSourceInput.vue';
 export { default as EventSelect } from './fields/EventSelect.vue';
+export { default as KeyValue } from './fields/KeyValue.vue';
 export { default as CodeBlockList } from './layouts/sidebar/code-block/CodeBlockList.vue';
 export { default as PropsPanel } from './layouts/PropsPanel.vue';
 export { default as ToolButton } from './components/ToolButton.vue';
@@ -74,5 +81,8 @@ export default {
     app.component('m-fields-code-select', CodeSelect);
     app.component('m-fields-code-select-col', CodeSelectCol);
     app.component('m-fields-event-select', EventSelect);
+    app.component('m-fields-data-source-fields', DataSourceFields);
+    app.component('m-fields-key-value', KeyValue);
+    app.component('m-fields-data-source-input', DataSourceInput);
   },
 };

@@ -1,5 +1,5 @@
 import path from 'path';
-import { defineConfig, DefaultTheme } from 'vitepress'
+import { defineConfig } from 'vitepress'
 
 export default defineConfig({
   title: 'tmagic-editor',
@@ -13,6 +13,10 @@ export default defineConfig({
 
   themeConfig: {
     logo: './favicon.png',
+
+    search: {
+      provider: 'local'
+    },
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/Tencent/tmagic-editor' }

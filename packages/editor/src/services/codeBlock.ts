@@ -23,7 +23,6 @@ import { CodeBlockContent, CodeBlockDSL, Id } from '@tmagic/schema';
 
 import type { CodeState } from '@editor/type';
 import { CODE_DRAFT_STORAGE_KEY } from '@editor/type';
-import { info } from '@editor/utils/logger';
 
 import BaseService from './BaseService';
 
@@ -55,7 +54,6 @@ class CodeBlock extends BaseService {
    */
   public async setCodeDsl(codeDsl: CodeBlockDSL): Promise<void> {
     this.state.codeDsl = codeDsl;
-    info('[code-block]:code-dsl-change', this.state.codeDsl);
     this.emit('code-dsl-change', this.state.codeDsl);
   }
 

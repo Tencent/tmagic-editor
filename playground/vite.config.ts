@@ -58,6 +58,8 @@ export default defineConfig({
       { find: /^@tmagic\/stage/, replacement: path.join(__dirname, '../packages/stage/src/index.ts') },
       { find: /^@tmagic\/utils/, replacement: path.join(__dirname, '../packages/utils/src/index.ts') },
       { find: /^@tmagic\/design/, replacement: path.join(__dirname, '../packages/design/src/index.ts') },
+      { find: /^@tmagic\/data-source/, replacement: path.join(__dirname, '../packages/data-source/src/index.ts') },
+      { find: /^@data-source/, replacement: path.join(__dirname, '../packages/data-source/src') },
       {
         find: /^@tmagic\/element-plus-adapter/,
         replacement: path.join(__dirname, '../packages/element-plus-adapter/src/index.ts'),

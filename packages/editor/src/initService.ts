@@ -1,10 +1,13 @@
 import type { ExtractPropTypes } from 'vue';
 import { onUnmounted, toRaw, watch } from 'vue';
+import { cloneDeep } from 'lodash-es';
 
 import type { EventOption } from '@tmagic/core';
-import type { CodeBlockContent, Id, MApp, MNode, MPage } from '@tmagic/schema';
+import type { CodeBlockContent, DataSourceSchema, Id, MApp, MNode, MPage } from '@tmagic/schema';
+import { getNodes } from '@tmagic/utils';
 
-import { createCodeBlockTarget } from './utils/dep';
+import type { Target } from './services/dep';
+import { createCodeBlockTarget, createDataSourceTarget } from './utils/dep';
 import editorProps from './editorProps';
 import type { Services } from './type';
 
@@ -107,8 +110,85 @@ export const initServiceState = (
 export const initServiceEvents = (
   props: Readonly<LooseRequired<Readonly<ExtractPropTypes<typeof editorProps>>>>,
   emit: (event: 'props-panel-mounted' | 'update:modelValue', ...args: any[]) => void,
-  { editorService, codeBlockService, depService }: Services,
+  { editorService, codeBlockService, dataSourceService, depService }: Services,
 ) => {
+  const getApp = () => {
+    const stage = editorService.get('stage');
+    return stage?.renderer.runtime?.getApp?.();
+  };
+
+  const updateDataSoucreSchema = () => {
+    const root = editorService.get('root');
+
+    if (root?.dataSources) {
+      getApp()?.dataSourceManager?.updateSchema(root.dataSources);
+    }
+  };
+
+  const upateNodeWhenDataSourceChange = (nodes: MNode[]) => {
+    const root = editorService.get('root');
+    const stage = editorService.get('stage');
+
+    if (!root || !stage) return;
+
+    const app = getApp();
+
+    if (!app) return;
+
+    if (app.dsl) {
+      app.dsl.dataSourceDeps = root.dataSourceDeps;
+      app.dsl.dataSources = root.dataSources;
+    }
+
+    updateDataSoucreSchema();
+
+    nodes.forEach((node) => {
+      const deps = Object.values(root.dataSourceDeps || {});
+      deps.forEach((dep) => {
+        if (dep[node.id]) {
+          stage.update({
+            config: cloneDeep(node),
+            parentId: editorService.getParentById(node.id)?.id,
+            root: cloneDeep(root),
+          });
+        }
+      });
+    });
+  };
+
+  const targetAddHandler = (target: Target) => {
+    if (target.type !== 'data-source') return;
+
+    const root = editorService.get('root');
+    if (!root) return;
+
+    if (!root.dataSourceDeps) {
+      root.dataSourceDeps = {};
+    }
+
+    root.dataSourceDeps[target.id] = target.deps;
+  };
+
+  const targetRemoveHandler = (id: string | number) => {
+    const root = editorService.get('root');
+    if (!root?.dataSourceDeps) return;
+
+    delete root.dataSourceDeps[id];
+  };
+
+  const depUpdateHandler = (node: MNode) => {
+    upateNodeWhenDataSourceChange([node]);
+  };
+
+  const collectedHandler = (nodes: MNode[]) => {
+    upateNodeWhenDataSourceChange(nodes);
+  };
+
+  depService.on('add-target', targetAddHandler);
+  depService.on('remove-target', targetRemoveHandler);
+  depService.on('dep-update', depUpdateHandler);
+  depService.on('collected', collectedHandler);
+
   const rootChangeHandler = async (value: MApp, preValue?: MApp | null) => {
     const nodeId = editorService.get('node')?.id || props.defaultSelected;
     let node;
@@ -131,8 +211,10 @@ export const initServiceEvents = (
     }
 
     value.codeBlocks = value.codeBlocks || {};
+    value.dataSources = value.dataSources || [];
 
     codeBlockService.setCodeDsl(value.codeBlocks);
+    dataSourceService.set('dataSources', value.dataSources);
 
     depService.removeTargets('code-block');
 
@@ -140,10 +222,15 @@ export const initServiceEvents = (
       depService.addTarget(createCodeBlockTarget(id, code));
     });
 
+    value.dataSources.forEach((ds) => {
+      depService.addTarget(createDataSourceTarget(ds.id, ds));
+    });
+
     if (value && Array.isArray(value.items)) {
       depService.collect(value.items, true);
     } else {
       depService.clear();
+      delete value.dataSourceDeps;
     }
   };
 
@@ -185,7 +272,39 @@ export const initServiceEvents = (
   codeBlockService.on('addOrUpdate', codeBlockAddOrUpdateHandler);
   codeBlockService.on('remove', codeBlockRemoveHandler);
 
+  const dataSourceAddHandler = (config: DataSourceSchema) => {
+    depService.addTarget(createDataSourceTarget(config.id, config));
+    getApp()?.dataSourceManager?.addDataSource(config);
+  };
+
+  const dataSourceUpdateHandler = (config: DataSourceSchema) => {
+    if (config.title) {
+      depService.getTarget(config.id)!.name = config.title;
+    }
+    const root = editorService.get('root');
+
+    const targets = depService.getTargets('data-source');
+
+    const nodes = getNodes(Object.keys(targets[config.id].deps), root?.items);
+
+    upateNodeWhenDataSourceChange(nodes);
+  };
+
+  const dataSourceRemoveHandler = (id: string) => {
+    depService.removeTarget(id);
+    getApp()?.dataSourceManager?.removeDataSource(id);
+  };
+
+  dataSourceService.on('add', dataSourceAddHandler);
+  dataSourceService.on('update', dataSourceUpdateHandler);
+  dataSourceService.on('remove', dataSourceRemoveHandler);
+
   onUnmounted(() => {
+    depService.off('add-target', targetAddHandler);
+    depService.off('remove-target', targetRemoveHandler);
+    depService.off('dep-update', depUpdateHandler);
+    depService.off('collected', collectedHandler);
+
     editorService.off('history-change', historyChangeHandler);
     editorService.off('root-change', rootChangeHandler);
     editorService.off('add', nodeAddHandler);
@@ -194,5 +313,9 @@ export const initServiceEvents = (
 
     codeBlockService.off('addOrUpdate', codeBlockAddOrUpdateHandler);
     codeBlockService.off('remove', codeBlockRemoveHandler);
+
+    dataSourceService.off('add', dataSourceAddHandler);
+    dataSourceService.off('update', dataSourceUpdateHandler);
+    dataSourceService.off('remove', dataSourceRemoveHandler);
   });
 };

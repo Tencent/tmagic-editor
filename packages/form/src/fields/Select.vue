@@ -29,6 +29,7 @@
 import { inject, onBeforeMount, Ref, ref, watch, watchEffect } from 'vue';
 
 import { TMagicSelect } from '@tmagic/design';
+import { getValueByKeyPath } from '@tmagic/utils';
 
 import { FormState, SelectConfig, SelectGroupOption, SelectOption } from '../schema';
 import { getConfig } from '../utils/config';
@@ -157,12 +158,9 @@ const getOptions = async () => {
     });
   }
 
-  const optionsData = root.split('.').reduce((accumulator, currentValue: any) => accumulator[currentValue], res);
+  const optionsData = getValueByKeyPath(root, res);
 
-  const resTotal = globalThis.parseInt(
-    totalKey.split('.').reduce((accumulator, currentValue: any) => accumulator[currentValue], res),
-    10,
-  );
+  const resTotal = globalThis.parseInt(getValueByKeyPath(totalKey, res), 10);
   if (resTotal > 0) {
     total.value = resTotal;
   }
@@ -283,9 +281,7 @@ const getInitOption = async () => {
     });
   }
 
-  let initData = (initRoot || root)
-    .split('.')
-    .reduce((accumulator, currentValue: any) => accumulator[currentValue], res);
+  let initData = getValueByKeyPath(initRoot || root, res);
   if (initData) {
     if (!Array.isArray(initData)) {
       initData = [initData];

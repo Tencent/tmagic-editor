@@ -23,5 +23,7 @@ import './resetcss.css';
 export * from './events';
 
 export { default as Env } from './Env';
+export { default as Page } from './Page';
+export { default as Node } from './Node';
 
 export default App;

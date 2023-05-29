@@ -53,7 +53,7 @@ module.exports = {
           ["^(react|vue|vite)", "^@?\\w"],
           ["^(@tmagic)(/.*|$)"],
           // Internal packages.
-          ["^(@|@editor)(/.*|$)"],
+          ["^(@|@editor|@data-source)(/.*|$)"],
           // Side effect imports.
           ["^\\u0000"],
           // Parent imports. Put `..` last.

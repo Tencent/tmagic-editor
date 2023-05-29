@@ -36,7 +36,9 @@
     "vue"
   ],
   "dependencies": {
+    "@tmagic/data-source": "1.2.15",
     "@tmagic/schema": "1.2.15",
+    "@tmagic/utils": "1.2.15",
     "events": "^3.3.0",
     "lodash-es": "^4.17.21"
   },

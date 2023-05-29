@@ -24,5 +24,6 @@ export default [
   {
     text: '链接',
     name: 'url',
+    type: 'data-source-input',
   },
 ];

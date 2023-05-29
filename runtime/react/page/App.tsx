@@ -16,22 +16,32 @@
  * limitations under the License.
  */
 
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
+import { cloneDeep } from 'lodash-es';
 
 import Core from '@tmagic/core';
-import type { MPage } from '@tmagic/schema';
+import type { MNode } from '@tmagic/schema';
 import { AppContent } from '@tmagic/ui-react';
+import { replaceChildNode } from '@tmagic/utils';
 
 function App() {
   const app = useContext<Core | undefined>(AppContent);
 
-  if (!app?.page?.data) {
-    return null;
-  }
+  if (!app?.page) return null;
+
+  const [config, setConfig] = useState(app.page.data);
+
+  app.dataSourceManager?.on('update-data', (nodes: MNode[], sourceId: string) => {
+    nodes.forEach((node) => {
+      const newNode = app.compiledNode(node, app.dataSourceManager?.data || {}, sourceId);
+      replaceChildNode(newNode, [config]);
+      setConfig(cloneDeep(config));
+    });
+  });
 
   const MagicUiPage = app.resolveComponent('page');
 
-  return <MagicUiPage config={app?.page?.data as MPage}></MagicUiPage>;
+  return <MagicUiPage config={config}></MagicUiPage>;
 }
 
 export default App;

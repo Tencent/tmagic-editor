@@ -8,7 +8,7 @@ import { computed, defineComponent, inject, nextTick, reactive, ref, watch } fro
 import Core from '@tmagic/core';
 import type { Id, MApp, MNode } from '@tmagic/schema';
 import { Magic, RemoveData, UpdateData } from '@tmagic/stage';
-import { getNodePath } from '@tmagic/utils';
+import { getNodePath, replaceChildNode } from '@tmagic/utils';
 
 declare global {
   interface Window {
@@ -41,19 +41,16 @@ export default defineComponent({
       },
 
       updateRootConfig(config: MApp) {
-        console.log('update config', config);
         root.value = config;
         app?.setConfig(config, curPageId.value);
       },
 
       updatePageId(id: Id) {
-        console.log('update page id', id);
         curPageId.value = id;
         app?.setPage(id);
       },
 
       select(id: Id) {
-        console.log('select config', id);
         selectedId.value = id;
 
         if (app?.getPage(id)) {
@@ -67,8 +64,6 @@ export default defineComponent({
       },
 
       add({ config, parentId }: UpdateData) {
-        console.log('add config', config);
-
         if (!root.value) throw new Error('error');
         if (!selectedId.value) throw new Error('error');
         if (!parentId) throw new Error('error');
@@ -91,24 +86,15 @@ export default defineComponent({
       },
 
       update({ config, parentId }: UpdateData) {
-        console.log('update config', config);
+        if (!root.value || !app) throw new Error('error');
 
-        if (!root.value) throw new Error('error');
+        const newNode = app.compiledNode(config, app.dataSourceManager?.data || {});
+        replaceChildNode(reactive(newNode), [root.value], parentId);
 
-        const node = getNodePath(config.id, [root.value]).pop();
-        if (!node) throw new Error('未找到目标节点');
-
-        if (!parentId) throw new Error('error');
-        const parent = getNodePath(parentId, [root.value]).pop();
-        if (!parent) throw new Error('未找到父节点');
-
-        const nodeInstance = app?.page?.getNode(config.id);
+        const nodeInstance = app.page?.getNode(config.id);
         if (nodeInstance) {
           nodeInstance.setData(config);
         }
-
-        const index = parent.items?.findIndex((child: MNode) => child.id === node.id);
-        parent.items.splice(index, 1, reactive(config));
       },
 
       remove({ id, parentId }: RemoveData) {

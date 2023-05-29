@@ -18,8 +18,14 @@
 
 import { EventEmitter } from 'events';
 
-import { has, isEmpty } from 'lodash-es';
+import { cloneDeep, has, isEmpty, template } from 'lodash-es';
 
+import {
+  createDataSourceManager,
+  DataSourceManager,
+  DataSourceManagerData,
+  RequestFunction,
+} from '@tmagic/data-source';
 import {
   ActionType,
   CodeBlockDSL,
@@ -29,7 +35,9 @@ import {
   EventConfig,
   Id,
   MApp,
+  MNode,
 } from '@tmagic/schema';
+import { compiledNode } from '@tmagic/utils';
 
 import Env from './Env';
 import { bindCommonEventListener, isCommonMethod, triggerCommonMethod } from './events';
@@ -45,6 +53,7 @@ interface AppOptionsConfig {
   designWidth?: number;
   curPage?: Id;
   transformStyle?: (style: Record<string, any>) => Record<string, any>;
+  request?: RequestFunction;
 }
 
 interface EventCache {
@@ -57,6 +66,7 @@ class App extends EventEmitter {
   public env: Env = new Env();
   public dsl?: MApp;
   public codeDsl?: CodeBlockDSL;
+  public dataSourceManager?: DataSourceManager;
 
   public page?: Page;
 
@@ -88,11 +98,7 @@ class App extends EventEmitter {
     }
 
     if (options.config) {
-      let pageId = options.curPage;
-      if (!pageId && options.config.items.length) {
-        pageId = options.config.items[0].id;
-      }
-      this.setConfig(options.config, pageId);
+      this.setConfig(options.config, options.curPage, options.request);
     }
 
     bindCommonEventListener(this);
@@ -156,8 +162,25 @@ class App extends EventEmitter {
    * @param config dsl跟节点
    * @param curPage 当前页面id
    */
-  public setConfig(config: MApp, curPage?: Id) {
+  public setConfig(config: MApp, curPage?: Id, request?: RequestFunction) {
     this.dsl = config;
+
+    if (!curPage && config.items.length) {
+      curPage = config.items[0].id;
+    }
+
+    if (this.dataSourceManager) {
+      this.dataSourceManager.destroy();
+    }
+
+    this.dataSourceManager = createDataSourceManager(
+      config,
+      (node: MNode, content: DataSourceManagerData) => this.compiledNode(node, content),
+      {
+        request,
+      },
+    );
+
     this.codeDsl = config.codeBlocks;
     this.setPage(curPage || this.page?.data?.id);
   }
@@ -196,9 +219,7 @@ class App extends EventEmitter {
 
     super.emit('page-change', this.page);
 
-    if (this.platform !== 'magic') {
-      this.bindEvents();
-    }
+    this.bindEvents();
   }
 
   public deletePage() {
@@ -259,31 +280,6 @@ class App extends EventEmitter {
   }
 
   /**
-   * 事件联动处理函数
-   * @param eventConfig 事件配置
-   * @param fromCpt 触发事件的组件
-   * @param args 事件参数
-   */
-  public async eventHandler(eventConfig: EventConfig | DeprecatedEventConfig, fromCpt: any, args: any[]) {
-    if (has(eventConfig, 'actions')) {
-      // EventConfig类型
-      const { actions } = eventConfig as EventConfig;
-      for (const actionItem of actions) {
-        if (actionItem.actionType === ActionType.COMP) {
-          // 组件动作
-          await this.compActionHandler(actionItem as CompItemConfig, fromCpt, args);
-        } else if (actionItem.actionType === ActionType.CODE) {
-          // 执行代码块
-          await this.codeActionHandler(actionItem as CodeItemConfig);
-        }
-      }
-    } else {
-      // 兼容DeprecatedEventConfig类型 组件动作
-      await this.compActionHandler(eventConfig as DeprecatedEventConfig, fromCpt, args);
-    }
-  }
-
-  /**
    * 执行代码块动作
    * @param eventConfig 代码动作的配置
    * @returns void
@@ -325,12 +321,49 @@ class App extends EventEmitter {
     }
   }
 
+  public compiledNode(node: MNode, content: DataSourceManagerData, sourceId?: Id) {
+    return compiledNode(
+      (str: string) =>
+        template(str, {
+          escape: /\{\{([\s\S]+?)\}\}/g,
+        })(content),
+      cloneDeep(node),
+      this.dsl?.dataSourceDeps,
+      sourceId,
+    );
+  }
+
   public destroy() {
     this.removeAllListeners();
     this.page = undefined;
 
     if (this.jsEngine === 'browser') {
       globalThis.removeEventListener('resize', this.calcFontsize);
+    }
+  }
+
+  /**
+   * 事件联动处理函数
+   * @param eventConfig 事件配置
+   * @param fromCpt 触发事件的组件
+   * @param args 事件参数
+   */
+  private async eventHandler(eventConfig: EventConfig | DeprecatedEventConfig, fromCpt: any, args: any[]) {
+    if (has(eventConfig, 'actions')) {
+      // EventConfig类型
+      const { actions } = eventConfig as EventConfig;
+      for (const actionItem of actions) {
+        if (actionItem.actionType === ActionType.COMP) {
+          // 组件动作
+          await this.compActionHandler(actionItem as CompItemConfig, fromCpt, args);
+        } else if (actionItem.actionType === ActionType.CODE) {
+          // 执行代码块
+          await this.codeActionHandler(actionItem as CodeItemConfig);
+        }
+      }
+    } else {
+      // 兼容DeprecatedEventConfig类型 组件动作
+      await this.compActionHandler(eventConfig as DeprecatedEventConfig, fromCpt, args);
     }
   }
 

@@ -1,0 +1,31 @@
+.babelrc
+.eslintrc
+.editorconfig
+node_modules
+.DS_Store
+examples
+tests
+.code.yml
+reports
+tsconfig.build.json
+tsconfig.json
+vite.config.ts
+
+# local env files
+.env.local
+.env.*.local
+
+# Log files
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

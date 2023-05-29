@@ -19,7 +19,7 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
-import type { MComponent, MNode } from '@tmagic/schema';
+import type { DataSourceDeps, Id, MComponent, MNode } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 
 export * from './dom';
@@ -72,7 +72,7 @@ export const emptyFn = (): any => undefined;
  * @param {Array} data 要查找的根容器节点
  * @return {Array} 组件在data中的子孙路径
  */
-export const getNodePath = (id: number | string, data: MNode[] = []): MNode[] => {
+export const getNodePath = (id: Id, data: MNode[] = []): MNode[] => {
   const path: MNode[] = [];
 
   const get = function (id: number | string, data: MNode[]): MNode | null {
@@ -81,7 +81,7 @@ export const getNodePath = (id: number | string, data: MNode[] = []): MNode[] =>
     }
 
     for (let i = 0, l = data.length; i < l; i++) {
-      const item: any = data[i];
+      const item = data[i];
 
       path.push(item);
       if (`${item.id}` === `${id}`) {
@@ -156,3 +156,134 @@ export const guid = (digit = 8): string =>
     const v = c === 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
+
+export const getValueByKeyPath: any = (keys: string, value: Record<string | number, any>) => {
+  const path = keys.split('.');
+  const pathLength = path.length;
+
+  return path.reduce((accumulator, currentValue: any, currentIndex: number) => {
+    if (Object.prototype.toString.call(accumulator) === '[object Object]' || Array.isArray(accumulator)) {
+      return accumulator[currentValue];
+    }
+
+    if (pathLength - 1 === currentIndex) {
+      return undefined;
+    }
+
+    return {};
+  }, value);
+};
+
+export const getNodes = (ids: Id[], data: MNode[] = []): MNode[] => {
+  const nodes: MNode[] = [];
+
+  const get = function (ids: Id[], data: MNode[]) {
+    if (!Array.isArray(data)) {
+      return;
+    }
+
+    for (let i = 0, l = data.length; i < l; i++) {
+      const item = data[i];
+      const index = ids.findIndex((id: Id) => `${id}` === `${item.id}`);
+
+      if (index > -1) {
+        ids.slice(index, 1);
+        nodes.push(item);
+      }
+
+      if (item.items) {
+        get(ids, item.items);
+      }
+    }
+  };
+
+  get(ids, data);
+
+  return nodes;
+};
+
+export const getDepKeys = (dataSourceDeps: DataSourceDeps = {}, nodeId: Id) =>
+  Array.from(
+    Object.values(dataSourceDeps).reduce((prev, cur) => {
+      (cur[nodeId]?.keys || []).forEach((key) => prev.add(key));
+      return prev;
+    }, new Set<Id>()),
+  );
+
+export const getDepNodeIds = (dataSourceDeps: DataSourceDeps = {}) =>
+  Array.from(
+    Object.values(dataSourceDeps).reduce((prev, cur) => {
+      Object.keys(cur).forEach((id) => {
+        prev.add(id);
+      });
+      return prev;
+    }, new Set<string>()),
+  );
+
+/**
+ * 将新节点更新到data或者parentId对应的节点的子节点中
+ * @param newNode 新节点
+ * @param data 需要修改的数据
+ * @param parentId 父节点 id
+ */
+export const replaceChildNode = (newNode: MNode, data?: MNode[], parentId?: Id) => {
+  const path = getNodePath(newNode.id, data);
+  const node = path.pop();
+  let parent = path.pop();
+
+  if (parentId) {
+    parent = getNodePath(parentId, data).pop();
+  }
+
+  if (!node) throw new Error('未找到目标节点');
+  if (!parent) throw new Error('未找到父节点');
+
+  const index = parent.items?.findIndex((child: MNode) => child.id === node.id);
+  parent.items.splice(index, 1, newNode);
+};
+
+export const compiledNode = (
+  compile: (template: string) => string,
+  node: MNode,
+  dataSourceDeps: DataSourceDeps = {},
+  sourceId?: Id,
+) => {
+  let keys: Id[] = [];
+  if (!sourceId) {
+    keys = getDepKeys(dataSourceDeps, node.id);
+  } else {
+    const dep = dataSourceDeps[sourceId];
+    keys = dep?.[node.id].keys || [];
+  }
+
+  const keyPrefix = '__magic__';
+
+  keys.forEach((key) => {
+    const keyPath = `${key}`.split('.');
+    const keyPathLength = keyPath.length;
+    keyPath.reduce((accumulator, currentValue: any, currentIndex) => {
+      if (keyPathLength - 1 === currentIndex) {
+        if (typeof accumulator[`${keyPrefix}${currentValue}`] === 'undefined') {
+          accumulator[`${keyPrefix}${currentValue}`] = accumulator[currentValue];
+        }
+
+        try {
+          accumulator[currentValue] = compile(accumulator[`${keyPrefix}${currentValue}`]);
+        } catch (e) {
+          console.error(e);
+          accumulator[currentValue] = '';
+        }
+
+        return accumulator;
+      }
+
+      if (Object.prototype.toString.call(accumulator) === '[object Object]' || Array.isArray(accumulator)) {
+        return accumulator[currentValue];
+      }
+
+      return {};
+    }, node);
+  });
+
+  return node;
+};

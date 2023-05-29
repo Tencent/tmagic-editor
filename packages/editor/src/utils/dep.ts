@@ -1,6 +1,6 @@
 import { isEmpty } from 'lodash-es';
 
-import { CodeBlockContent, HookType, Id } from '@tmagic/schema';
+import { CodeBlockContent, DataSourceSchema, HookType, Id } from '@tmagic/schema';
 
 import { Target } from '@editor/services/dep';
 import type { HookData } from '@editor/type';
@@ -18,4 +18,12 @@ export const createCodeBlockTarget = (id: Id, codeBlock: CodeBlockContent) =>
 
       return false;
     },
+  });
+
+export const createDataSourceTarget = (id: Id, ds: DataSourceSchema) =>
+  new Target({
+    type: 'data-source',
+    id,
+    name: ds.title || `${id}`,
+    isTarget: (key: string | number, value: any) => typeof value === 'string' && value.includes(`${id}`),
   });

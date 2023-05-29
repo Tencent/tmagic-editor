@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "declaration": true,
+    "declarationDir": "types",
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./types",
+    "paths": {
+      "@data-source/*": ["src/*"],
+    },
+  },
+  "include": [
+		"src"
+	],
+}
