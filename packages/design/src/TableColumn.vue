@@ -1,5 +1,5 @@
 <template>
-  <component :is="uiComponent.component" v-bind="uiProps">
+  <component :is="uiComponent" v-bind="uiProps">
     <template #default="{ $index, row }">
       <!-- eslint-disable-next-line vue/valid-attribute-name -->
       <slot :$index="$index" :row="row"></slot>
@@ -19,7 +19,9 @@ defineOptions({
 
 const props = defineProps<TableColumnProps>();
 
-const uiComponent = getConfig('components').tableColumn;
+const ui = getConfig('components')?.tableColumn;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-table-column';
+
+const uiProps = computed(() => ui?.props(props) || {});
 </script>

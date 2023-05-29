@@ -1,5 +1,5 @@
 <template>
-  <component class="tmagic-design-row" :is="uiComponent.component">
+  <component class="tmagic-design-row" :is="uiComponent">
     <slot></slot>
   </component>
 </template>
@@ -11,5 +11,5 @@ defineOptions({
   name: 'TMRow',
 });
 
-const uiComponent = getConfig('components').row;
+const uiComponent = getConfig('components')?.row.component || 'el-row';
 </script>

@@ -3,13 +3,13 @@
     v-if="data.type === 'tabs' && data.items.length"
     v-model="activeTabName"
     class="m-editor-sidebar tmagic-design-tabs"
-    v-bind="tabsComponent.props({ type: 'card', tabPosition: 'left' })"
-    :is="tabsComponent.component"
+    v-bind="tabsComponent?.props({ type: 'card', tabPosition: 'left' }) || {}"
+    :is="tabsComponent?.component || 'el-tabs'"
   >
     <component
       v-for="(config, index) in sideBarItems"
-      v-bind="tabPaneComponent.props({ name: config.text, lazy: config.lazy })"
-      :is="tabPaneComponent.component"
+      v-bind="tabPaneComponent?.props({ name: config.text, lazy: config.lazy }) || {}"
+      :is="tabPaneComponent?.component || 'el-tab-pane'"
       :key="config.$key || index"
     >
       <template #label>
@@ -112,8 +112,8 @@ const props = withDefaults(
   },
 );
 
-const tabPaneComponent = getConfig('components').tabPane;
-const tabsComponent = getConfig('components').tabs;
+const tabPaneComponent = getConfig('components')?.tabPane;
+const tabsComponent = getConfig('components')?.tabs;
 
 const activeTabName = ref(props.data?.status);
 

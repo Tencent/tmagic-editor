@@ -2,7 +2,7 @@
   <component
     ref="cascader"
     class="tmagic-design-cascader"
-    :is="uiComponent.component"
+    :is="uiComponent"
     v-bind="uiProps"
     @update:modelValue="updateModelValue"
     @change="changeHandler"
@@ -21,9 +21,11 @@ defineOptions({
 
 const props = defineProps<CascaderProps>();
 
-const uiComponent = getConfig('components').cascader;
+const ui = getConfig('components')?.cascader;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-cascader';
+
+const uiProps = computed(() => ui?.props(props) || {});
 
 const cascader = ref<any>();
 

@@ -1,5 +1,5 @@
 <template>
-  <component class="tmagic-design-button" :is="uiComponent.component" v-bind="uiProps" @click="clickHandler">
+  <component class="tmagic-design-button" :is="uiComponent" v-bind="uiProps" @click="clickHandler">
     <template #default v-if="$slots.default">
       <slot></slot>
     </template>
@@ -18,9 +18,11 @@ defineOptions({
 
 const props = defineProps<ButtonProps>();
 
-const uiComponent = getConfig('components').button;
+const ui = getConfig('components')?.button;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-button';
+
+const uiProps = computed(() => ui?.props(props) || {});
 
 const emit = defineEmits(['click']);
 

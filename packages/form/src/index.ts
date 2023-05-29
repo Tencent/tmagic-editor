@@ -82,45 +82,47 @@ export { default as MSelect } from './fields/Select.vue';
 export { default as MCascader } from './fields/Cascader.vue';
 export { default as MDynamicField } from './fields/DynamicField.vue';
 
-const defaultInstallOpt = {};
+export interface InstallOptions {
+  [key: string]: any;
+}
 
-const install = (app: App, opt: any) => {
-  const option = Object.assign(defaultInstallOpt, opt);
-
-  // eslint-disable-next-line no-param-reassign
-  app.config.globalProperties.$MAGIC_FORM = option;
-  setConfig(option);
-
-  app.component('m-form', Form);
-  app.component('m-form-dialog', FormDialog);
-  app.component('m-form-container', Container);
-  app.component('m-form-fieldset', Fieldset);
-  app.component('m-form-group-list', GroupList);
-  app.component('m-form-panel', Panel);
-  app.component('m-form-row', Row);
-  app.component('m-form-step', MStep);
-  app.component('m-form-table', Table);
-  app.component('m-form-tab', Tabs);
-  app.component('m-fields-text', Text);
-  app.component('m-fields-number', Number);
-  app.component('m-fields-textarea', Textarea);
-  app.component('m-fields-hidden', Hidden);
-  app.component('m-fields-date', Date);
-  app.component('m-fields-datetime', DateTime);
-  app.component('m-fields-daterange', Daterange);
-  app.component('m-fields-time', Time);
-  app.component('m-fields-checkbox', Checkbox);
-  app.component('m-fields-switch', Switch);
-  app.component('m-fields-color-picker', ColorPicker);
-  app.component('m-fields-checkbox-group', CheckboxGroup);
-  app.component('m-fields-radio-group', RadioGroup);
-  app.component('m-fields-display', Display);
-  app.component('m-fields-link', Link);
-  app.component('m-fields-select', Select);
-  app.component('m-fields-cascader', Cascader);
-  app.component('m-fields-dynamic-field', DynamicField);
-};
+const defaultInstallOpt: InstallOptions = {};
 
 export default {
-  install,
+  install(app: App, opt: InstallOptions = {}) {
+    const option = Object.assign(defaultInstallOpt, opt);
+
+    // eslint-disable-next-line no-param-reassign
+    app.config.globalProperties.$MAGIC_FORM = option;
+    setConfig(option);
+
+    app.component('m-form', Form);
+    app.component('m-form-dialog', FormDialog);
+    app.component('m-form-container', Container);
+    app.component('m-form-fieldset', Fieldset);
+    app.component('m-form-group-list', GroupList);
+    app.component('m-form-panel', Panel);
+    app.component('m-form-row', Row);
+    app.component('m-form-step', MStep);
+    app.component('m-form-table', Table);
+    app.component('m-form-tab', Tabs);
+    app.component('m-fields-text', Text);
+    app.component('m-fields-number', Number);
+    app.component('m-fields-textarea', Textarea);
+    app.component('m-fields-hidden', Hidden);
+    app.component('m-fields-date', Date);
+    app.component('m-fields-datetime', DateTime);
+    app.component('m-fields-daterange', Daterange);
+    app.component('m-fields-time', Time);
+    app.component('m-fields-checkbox', Checkbox);
+    app.component('m-fields-switch', Switch);
+    app.component('m-fields-color-picker', ColorPicker);
+    app.component('m-fields-checkbox-group', CheckboxGroup);
+    app.component('m-fields-radio-group', RadioGroup);
+    app.component('m-fields-display', Display);
+    app.component('m-fields-link', Link);
+    app.component('m-fields-select', Select);
+    app.component('m-fields-cascader', Cascader);
+    app.component('m-fields-dynamic-field', DynamicField);
+  },
 };

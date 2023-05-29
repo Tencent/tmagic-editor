@@ -1,5 +1,5 @@
 <template>
-  <component class="tmagic-design-col" :is="uiComponent.component" v-bind="uiProps">
+  <component class="tmagic-design-col" :is="uiComponent" v-bind="uiProps">
     <slot></slot>
   </component>
 </template>
@@ -16,7 +16,9 @@ defineOptions({
 
 const props = defineProps<ColProps>();
 
-const uiComponent = getConfig('components').col;
+const ui = getConfig('components')?.col;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-col';
+
+const uiProps = computed(() => ui?.props(props));
 </script>

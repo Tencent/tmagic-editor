@@ -1,7 +1,7 @@
 <template>
   <component
     class="tmagic-design-tabs"
-    :is="uiComponent.component"
+    :is="uiComponent"
     v-bind="uiProps"
     @tab-click="tabClickHandler"
     @tab-add="onTabAdd"
@@ -26,9 +26,11 @@ defineOptions({
 
 const props = defineProps<TabsProps>();
 
-const uiComponent = getConfig('components').tabs;
+const ui = getConfig('components')?.tabs;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-tabs';
+
+const uiProps = computed(() => ui?.props(props) || {});
 
 const emit = defineEmits(['tab-click', 'tab-add', 'tab-remove', 'update:model-value']);
 

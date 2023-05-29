@@ -1,5 +1,5 @@
 <template>
-  <component class="tmagic-design-badge" :is="uiComponent.component" v-bind="uiProps">
+  <component class="tmagic-design-badge" :is="uiComponent" v-bind="uiProps">
     <slot></slot>
   </component>
 </template>
@@ -16,7 +16,8 @@ defineOptions({
 
 const props = defineProps<BadgeProps>();
 
-const uiComponent = getConfig('components').badge;
+const ui = getConfig('components')?.badge;
+const uiComponent = ui?.component || 'el-badge';
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiProps = computed(() => ui?.props(props) || {});
 </script>

@@ -2,7 +2,7 @@
   <component
     class="tmagic-design-upload"
     ref="upload"
-    :is="uiComponent.component"
+    :is="uiComponent"
     v-bind="uiProps"
     @change="changeHandler"
   ></component>
@@ -25,9 +25,11 @@ const emit = defineEmits(['change']);
 const changeHandler = (...args: any[]) => {
   emit('change', ...args);
 };
-const uiComponent = getConfig('components').upload;
+const ui = getConfig('components')?.upload;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-upload';
+
+const uiProps = computed(() => ui?.props(props) || {});
 
 const upload = ref<any>();
 

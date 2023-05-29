@@ -1,5 +1,5 @@
 <template>
-  <component class="tmagic-design-tab-pane" :is="uiComponent.component" v-bind="uiProps">
+  <component class="tmagic-design-tab-pane" :is="uiComponent" v-bind="uiProps">
     <template #default>
       <slot></slot>
     </template>
@@ -21,7 +21,10 @@ defineOptions({
 });
 
 const props = defineProps<TabPaneProps>();
-const uiComponent = getConfig('components').tabPane;
 
-const uiProps = computed(() => uiComponent.props(props));
+const ui = getConfig('components')?.tabPane;
+
+const uiComponent = ui?.component || 'el-tab-pane';
+
+const uiProps = computed(() => ui?.props(props) || {});
 </script>

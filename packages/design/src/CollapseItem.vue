@@ -1,7 +1,7 @@
 <template>
   <component
     class="tmagic-design-collapse-item"
-    :is="uiComponent.component"
+    :is="uiComponent"
     v-bind="uiProps"
     @update:modelValue="updateModelValue"
     @change="changeHandler"
@@ -28,9 +28,11 @@ defineOptions({
 
 const props = defineProps<CollapseItemProps>();
 
-const uiComponent = getConfig('components').collapseItem;
+const ui = getConfig('components')?.collapseItem;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-collapse-item';
+
+const uiProps = computed(() => ui?.props(props) || {});
 
 const emit = defineEmits(['change', 'update:modelValue']);
 

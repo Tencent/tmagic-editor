@@ -1,5 +1,5 @@
 <template>
-  <component class="tmagic-design-step" :is="uiComponent.component" v-bind="uiProps" @click="clickHandler">
+  <component class="tmagic-design-step" :is="uiComponent" v-bind="uiProps" @click="clickHandler">
     <slot></slot>
   </component>
 </template>
@@ -22,7 +22,9 @@ const clickHandler = (...args: any[]) => {
   emit('click', ...args);
 };
 
-const uiComponent = getConfig('components').step;
+const ui = getConfig('components')?.step;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-step';
+
+const uiProps = computed(() => ui?.props(props) || {});
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <component class="tmagic-design-dropdown" :is="uiComponent.component" v-bind="uiProps" @command="commandHandler">
+  <component class="tmagic-design-dropdown" :is="uiComponent" v-bind="uiProps" @command="commandHandler">
     <slot></slot>
 
     <template #dropdown>
@@ -20,9 +20,11 @@ defineOptions({
 
 const props = defineProps<DropdownProps>();
 
-const uiComponent = getConfig('components').dropdown;
+const ui = getConfig('components')?.dropdown;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-dropdown';
+
+const uiProps = computed(() => ui?.props(props) || {});
 
 const emit = defineEmits(['command']);
 

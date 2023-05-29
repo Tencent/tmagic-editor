@@ -1,7 +1,7 @@
 <template>
   <component
     class="tmagic-design-time-picker"
-    :is="uiComponent.component"
+    :is="uiComponent"
     v-bind="uiProps"
     @change="changeHandler"
     @update:modelValue="updateModelValue"
@@ -21,9 +21,11 @@ defineOptions({
 
 const props = defineProps<TimePickerProps>();
 
-const uiComponent = getConfig('components').timePicker;
+const ui = getConfig('components')?.timePicker;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-time-picker';
+
+const uiProps = computed(() => ui?.props(props) || {});
 
 const emit = defineEmits(['change', 'update:modelValue']);
 

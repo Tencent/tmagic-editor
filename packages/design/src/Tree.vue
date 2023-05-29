@@ -2,7 +2,7 @@
   <component
     class="tmagic-design-tree"
     ref="tree"
-    :is="uiComponent.component"
+    :is="uiComponent"
     v-bind="uiProps"
     @node-click="nodeClickHandler"
     @node-contextmenu="contextmenu"
@@ -31,9 +31,11 @@ defineOptions({
 
 const props = defineProps<TreeProps>();
 
-const uiComponent = getConfig('components').tree;
+const ui = getConfig('components')?.tree;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-tree';
+
+const uiProps = computed(() => ui?.props(props) || {});
 
 const emit = defineEmits([
   'node-click',

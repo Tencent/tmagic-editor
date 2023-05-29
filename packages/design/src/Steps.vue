@@ -1,5 +1,5 @@
 <template>
-  <component class="tmagic-design-steps" :is="uiComponent.component" v-bind="uiProps">
+  <component class="tmagic-design-steps" :is="uiComponent" v-bind="uiProps">
     <slot></slot>
   </component>
 </template>
@@ -16,7 +16,9 @@ defineOptions({
 
 const props = defineProps<StepsProps>();
 
-const uiComponent = getConfig('components').steps;
+const ui = getConfig('components')?.steps;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-steps';
+
+const uiProps = computed(() => ui?.props(props) || {});
 </script>

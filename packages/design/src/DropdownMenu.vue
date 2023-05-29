@@ -1,5 +1,5 @@
 <template>
-  <component class="tmagic-design-dropdown-menu" :is="uiComponent.component">
+  <component class="tmagic-design-dropdown-menu" :is="uiComponent">
     <slot></slot>
   </component>
 </template>
@@ -11,5 +11,7 @@ defineOptions({
   name: 'TMDropdownMenu',
 });
 
-const uiComponent = getConfig('components').dropdownMenu;
+const ui = getConfig('components')?.dropdownMenu;
+
+const uiComponent = ui?.component || 'el-dropdown-menu';
 </script>

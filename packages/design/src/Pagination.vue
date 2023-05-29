@@ -1,7 +1,7 @@
 <template>
   <component
     class="tmagic-design-pagination"
-    :is="uiComponent.component"
+    :is="uiComponent"
     v-bind="uiProps"
     @size-change="handleSizeChange"
     @page-size-change="handleSizeChange"
@@ -21,9 +21,11 @@ defineOptions({
 
 const props = defineProps<PaginationProps>();
 
-const uiComponent = getConfig('components').pagination;
+const ui = getConfig('components')?.pagination;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-pagination';
+
+const uiProps = computed(() => ui?.props(props) || {});
 
 const emit = defineEmits(['size-change', 'current-change']);
 

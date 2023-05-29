@@ -1,5 +1,5 @@
 <template>
-  <component class="tmagic-design-icon" :is="uiComponent.component">
+  <component class="tmagic-design-icon" :is="uiComponent">
     <slot></slot>
   </component>
 </template>
@@ -11,5 +11,6 @@ defineOptions({
   name: 'TMIcon',
 });
 
-const uiComponent = getConfig('components').icon;
+const ui = getConfig('components')?.icon;
+const uiComponent = ui?.component || 'el-icon';
 </script>

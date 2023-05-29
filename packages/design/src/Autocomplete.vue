@@ -2,7 +2,7 @@
   <component
     class="tmagic-design-auto-complete"
     ref="autocomplete"
-    :is="uiComponent.component"
+    :is="uiComponent"
     v-bind="uiProps"
     @change="changeHandler"
     @select="selectHandler"
@@ -38,9 +38,11 @@ defineOptions({
 
 const props = defineProps<AutocompleteProps>();
 
-const uiComponent = getConfig('components').autocomplete;
+const ui = getConfig('components')?.autocomplete;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-autocomplete';
+
+const uiProps = computed(() => ui?.props(props) || {});
 
 const emit = defineEmits(['change', 'select', 'update:modelValue']);
 

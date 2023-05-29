@@ -2,7 +2,7 @@
   <TMagicOptionGroup v-for="(group, index) in options" :key="index" :label="group.label" :disabled="group.disabled">
     <component
       v-for="(item, index) in group.options"
-      :is="uiComponent.component"
+      :is="uiComponent"
       :key="index"
       :label="item.label || item.text"
       :value="item.value"
@@ -25,5 +25,5 @@ defineProps<{
   options: SelectGroupOption[];
 }>();
 
-const uiComponent = getConfig('components').option;
+const uiComponent = getConfig('components')?.option.component || 'el-option';
 </script>

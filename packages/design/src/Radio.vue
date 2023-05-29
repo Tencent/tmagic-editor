@@ -1,5 +1,5 @@
 <template>
-  <component class="tmagic-design-radio" :is="uiComponent.component" v-bind="uiProps">
+  <component class="tmagic-design-radio" :is="uiComponent" v-bind="uiProps">
     <slot></slot>
   </component>
 </template>
@@ -16,7 +16,9 @@ defineOptions({
 
 const props = defineProps<RadioProps>();
 
-const uiComponent = getConfig('components').radio;
+const ui = getConfig('components')?.radio;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-radio';
+
+const uiProps = computed(() => ui?.props(props) || {});
 </script>

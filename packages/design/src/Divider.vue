@@ -1,5 +1,5 @@
 <template>
-  <component class="tmagic-design-divider" :is="uiComponent.component" v-bind="uiProps">
+  <component class="tmagic-design-divider" :is="uiComponent" v-bind="uiProps">
     <slot></slot>
   </component>
 </template>
@@ -16,7 +16,9 @@ defineOptions({
 
 const props = defineProps<DividerProps>();
 
-const uiComponent = getConfig('components').divider;
+const ui = getConfig('components')?.divider;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-divider';
+
+const uiProps = computed(() => ui?.props(props) || {});
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <component class="tmagic-design-tag" :is="uiComponent.component" v-bind="uiProps">
+  <component class="tmagic-design-tag" :is="uiComponent" v-bind="uiProps">
     <slot></slot>
   </component>
 </template>
@@ -16,7 +16,9 @@ defineOptions({
 
 const props = defineProps<TagProps>();
 
-const uiComponent = getConfig('components').tag;
+const ui = getConfig('components')?.tag;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-tag';
+
+const uiProps = computed(() => ui?.props(props) || {});
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <component class="tmagic-design-card" :is="uiComponent.component" v-bind="uiProps">
+  <component class="tmagic-design-card" :is="uiComponent" v-bind="uiProps">
     <template #header>
       <slot name="header" class="header"></slot>
     </template>
@@ -22,7 +22,9 @@ defineOptions({
 
 const props = defineProps<CardProps>();
 
-const uiComponent = getConfig('components').card;
+const ui = getConfig('components')?.card;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-card';
+
+const uiProps = computed(() => ui?.props(props) || {});
 </script>

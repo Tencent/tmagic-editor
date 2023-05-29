@@ -2,7 +2,7 @@
   <component
     class="tmagic-design-select"
     ref="select"
-    :is="uiComponent.component"
+    :is="uiComponent"
     v-bind="uiProps"
     @change="changeHandler"
     @visible-change="visibleHandler"
@@ -25,9 +25,11 @@ defineOptions({
 
 const props = defineProps<SelectProps>();
 
-const uiComponent = getConfig('components').select;
+const ui = getConfig('components')?.select;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-select';
+
+const uiProps = computed(() => ui?.props(props) || {});
 
 const emit = defineEmits(['change', 'update:modelValue', 'visibleHandler']);
 

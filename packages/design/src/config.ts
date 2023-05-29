@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-import defaultAdapter from './defaultAdapter';
 import { PluginOptions } from './types';
 
 let $MAGIC_DESIGN: PluginOptions = {};
@@ -25,6 +24,6 @@ const setConfig = (options: PluginOptions): void => {
   $MAGIC_DESIGN = options;
 };
 
-const getConfig = (key: string): any => $MAGIC_DESIGN[key] || (defaultAdapter as any)[key];
+const getConfig = <K extends keyof PluginOptions>(key: K) => $MAGIC_DESIGN[key];
 
 export { getConfig, setConfig };

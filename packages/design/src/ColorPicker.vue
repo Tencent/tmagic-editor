@@ -1,7 +1,7 @@
 <template>
   <component
     class="tmagic-design-color-picker"
-    :is="uiComponent.component"
+    :is="uiComponent"
     v-bind="uiProps"
     @change="changeHandler"
     @update:modelValue="updateModelValue"
@@ -24,9 +24,11 @@ const props = withDefaults(defineProps<ColorPickerProps>(), {
   disabled: false,
 });
 
-const uiComponent = getConfig('components').colorPicker;
+const ui = getConfig('components')?.colorPicker;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-color-picker';
+
+const uiProps = computed(() => ui?.props(props) || {});
 
 const emit = defineEmits(['change', 'update:modelValue']);
 

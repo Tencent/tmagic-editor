@@ -1,5 +1,5 @@
 <template>
-  <component class="tmagic-design-option" :is="uiComponent.component" v-bind="uiProps">
+  <component class="tmagic-design-option" :is="uiComponent" v-bind="uiProps">
     <slot></slot>
   </component>
 </template>
@@ -16,7 +16,9 @@ defineOptions({
 
 const props = defineProps<OptionProps>();
 
-const uiComponent = getConfig('components').option;
+const ui = getConfig('components')?.option;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-option';
+
+const uiProps = computed(() => ui?.props(props) || {});
 </script>

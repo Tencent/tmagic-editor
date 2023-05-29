@@ -1,18 +1,18 @@
 <template>
   <component
-    v-if="!disabled && isFocused"
-    :is="getConfig('components').autocomplete.component"
+    v-if="disabled || isFocused"
+    :is="getConfig('components')?.autocomplete.component || 'el-autocomplete'"
     class="tmagic-design-auto-complete"
     ref="autocomplete"
     v-model="state"
     v-bind="
-      getConfig('components').autocomplete.props({
+      getConfig('components')?.autocomplete.props({
         disabled,
         size,
         fetchSuggestions: querySearch,
         triggerOnFocus: false,
         clearable: true,
-      })
+      }) || {}
     "
     style="width: 100%"
     @blur="blurHandler"
@@ -31,11 +31,13 @@
     </template>
   </component>
   <div :class="`el-input el-input--${size}`" @mouseup="mouseupHandler" v-else>
-    <div :class="`el-input__wrapper ${isFocused ? ' is-focus' : ''}`" style="justify-content: left">
-      <template v-for="(item, index) in displayState">
-        <span :key="index" v-if="item.type === 'text'" style="margin-right: 2px">{{ item.value }}</span>
-        <TMagicTag :key="index" :size="size" v-if="item.type === 'var'">{{ item.value }}</TMagicTag>
-      </template>
+    <div :class="`el-input__wrapper ${isFocused ? ' is-focus' : ''}`">
+      <div class="el-input__inner">
+        <template v-for="(item, index) in displayState">
+          <span :key="index" v-if="item.type === 'text'" style="margin-right: 2px">{{ item.value }}</span>
+          <TMagicTag :key="index" :size="size" v-if="item.type === 'var'">{{ item.value }}</TMagicTag>
+        </template>
+      </div>
     </div>
   </div>
 </template>
@@ -44,7 +46,7 @@
 import { computed, inject, nextTick, ref, watch } from 'vue';
 import { Coin } from '@element-plus/icons-vue';
 
-import { getConfig, TMagicAutocomplete, TMagicTag } from '@tmagic/design';
+import { FieldSize, getConfig, TMagicAutocomplete, TMagicTag } from '@tmagic/design';
 import type { DataSchema, DataSourceSchema } from '@tmagic/schema';
 
 import Icon from '@editor/components/Icon.vue';
@@ -66,7 +68,7 @@ const props = withDefaults(
     prop: string;
     disabled: boolean;
     lastValues?: Record<string, any>;
-    size?: 'large' | 'default' | 'small';
+    size?: FieldSize;
   }>(),
   {
     disabled: false,

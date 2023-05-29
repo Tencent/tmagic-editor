@@ -1,7 +1,7 @@
 <template>
   <component
     class="tmagic-design-dialog"
-    :is="uiComponent.component"
+    :is="uiComponent"
     v-bind="uiProps"
     @close="closeHandler"
     @update:modelValue="updateModelValue"
@@ -26,9 +26,11 @@ defineOptions({
 
 const props = defineProps<DialogProps>();
 
-const uiComponent = getConfig('components').dialog;
+const ui = getConfig('components')?.dialog;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-dialog';
+
+const uiProps = computed(() => ui?.props(props) || {});
 
 const emit = defineEmits(['close', 'update:modelValue']);
 

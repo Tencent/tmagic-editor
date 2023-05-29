@@ -2,7 +2,7 @@
   <component
     class="tmagic-design-table"
     ref="table"
-    :is="uiComponent.component"
+    :is="uiComponent"
     v-bind="uiProps"
     @select="selectHandler"
     @sort-change="sortChangeHandler"
@@ -27,9 +27,11 @@ const props = withDefaults(defineProps<TableProps>(), {
   data: () => [],
 });
 
-const uiComponent = getConfig('components').table;
+const ui = getConfig('components')?.table;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-table';
+
+const uiProps = computed(() => ui?.props(props) || {});
 
 const emit = defineEmits(['select', 'sort-change', 'expand-change', 'cell-click']);
 

@@ -1,7 +1,7 @@
 <template>
   <component
     class="tmagic-design-checkbox-group"
-    :is="uiComponent.component"
+    :is="uiComponent"
     v-bind="uiProps"
     @change="changeHandler"
     @update:modelValue="updateModelValue"
@@ -22,9 +22,11 @@ defineOptions({
 
 const props = defineProps<CheckboxGroupProps>();
 
-const uiComponent = getConfig('components').checkboxGroup;
+const ui = getConfig('components')?.checkboxGroup;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-checkbox-group';
+
+const uiProps = computed(() => ui?.props(props) || {});
 
 const emit = defineEmits(['change', 'update:modelValue']);
 

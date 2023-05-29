@@ -1,7 +1,7 @@
 <template>
   <component
     class="tmagic-design-input"
-    :is="uiComponent.component"
+    :is="uiComponent"
     v-bind="uiProps"
     @change="changeHandler"
     @input="inputHandler"
@@ -34,9 +34,11 @@ defineOptions({
 
 const props = defineProps<InputProps>();
 
-const uiComponent = getConfig('components').input;
+const ui = getConfig('components')?.input;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-input';
+
+const uiProps = computed(() => ui?.props(props) || {});
 
 const emit = defineEmits(['change', 'input', 'update:modelValue']);
 

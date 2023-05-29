@@ -1,5 +1,5 @@
 <template>
-  <component class="tmagic-design-tooltip" :is="uiComponent.component" v-bind="uiProps">
+  <component class="tmagic-design-tooltip" :is="uiComponent" v-bind="uiProps">
     <template #content>
       <slot name="content"></slot>
     </template>
@@ -19,7 +19,9 @@ defineOptions({
 
 const props = defineProps<TooltipProps>();
 
-const uiComponent = getConfig('components').tooltip;
+const ui = getConfig('components')?.tooltip;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-tooltip';
+
+const uiProps = computed(() => ui?.props(props) || {});
 </script>

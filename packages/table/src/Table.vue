@@ -29,7 +29,7 @@
         <component
           width="40"
           type="selection"
-          :is="tableColumnComponent.component"
+          :is="tableColumnComponent?.component || 'el-table-column'"
           :key="columnIndex"
           :selectable="item.selectable"
         ></component>
@@ -114,7 +114,7 @@ const tMagicTable = ref<InstanceType<typeof TMagicTable>>();
 
 const editState = ref([]);
 
-const tableColumnComponent = getConfig('components').tableColumn;
+const tableColumnComponent = getConfig('components')?.tableColumn;
 const selectionColumn = computed(() => {
   const column = props.columns.filter((item) => item.selection);
   return column.length ? column[0] : null;

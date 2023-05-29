@@ -1,7 +1,7 @@
 <template>
   <component
     class="tmagic-design-date-picker"
-    :is="uiComponent.component"
+    :is="uiComponent"
     v-bind="uiProps"
     @change="changeHandler"
     @update:modelValue="updateModelValue"
@@ -23,9 +23,11 @@ const props = withDefaults(defineProps<DatePickerProps>(), {
   type: 'date',
 });
 
-const uiComponent = getConfig('components').datePicker;
+const ui = getConfig('components')?.datePicker;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-date-picker';
+
+const uiProps = computed(() => ui?.props(props) || {});
 
 const emit = defineEmits(['change', 'update:modelValue']);
 

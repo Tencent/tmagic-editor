@@ -2,13 +2,13 @@
   <component
     v-model="activeTabName"
     v-bind="
-      tabsComponent.props({
+      tabsComponent?.props({
         type: config.tabType,
         editable: config.editable || false,
         tabPosition: config.tabPosition || 'top',
-      })
+      }) || {}
     "
-    :is="tabsComponent.component"
+    :is="tabsComponent?.component || 'el-tabs'"
     :class="`tmagic-design-tabs ${config.dynamic ? 'magic-form-dynamic-tab' : 'magic-form-tab'}`"
     @tab-click="tabClickHandler"
     @tab-add="onTabAdd"
@@ -16,9 +16,11 @@
   >
     <component
       v-for="(tab, tabIndex) in tabs"
-      :is="tabPaneComponent.component"
+      :is="tabPaneComponent?.component || 'el-tab-pane'"
       :key="tab[mForm?.keyProp || '__key'] ?? tabIndex"
-      v-bind="tabPaneComponent.props({ name: filter(tab.status) || tabIndex.toString(), lazy: tab.lazy || false })"
+      v-bind="
+        tabPaneComponent?.props({ name: filter(tab.status) || tabIndex.toString(), lazy: tab.lazy || false }) || {}
+      "
     >
       <template #label>
         <span>
@@ -86,8 +88,8 @@ type DiffCount = {
   [tabIndex: number]: number;
 };
 
-const tabPaneComponent = getConfig('components').tabPane;
-const tabsComponent = getConfig('components').tabs;
+const tabPaneComponent = getConfig('components')?.tabPane;
+const tabsComponent = getConfig('components')?.tabs;
 
 const getActive = (mForm: FormState | undefined, props: any, activeTabName: string) => {
   const { config, model, prop } = props;

@@ -1,5 +1,5 @@
 <template>
-  <component class="tmagic-design-form-item" :is="uiComponent.component" v-bind="uiProps">
+  <component class="tmagic-design-form-item" :is="uiComponent" v-bind="uiProps">
     <template #label>
       <slot name="label"></slot>
     </template>
@@ -19,7 +19,9 @@ defineOptions({
 
 const props = defineProps<FormItemProps>();
 
-const uiComponent = getConfig('components').formItem;
+const ui = getConfig('components')?.formItem;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-form-item';
+
+const uiProps = computed(() => ui?.props(props) || {});
 </script>

@@ -1,7 +1,7 @@
 <template>
   <component
     class="tmagic-design-drawer"
-    :is="uiComponent.component"
+    :is="uiComponent"
     v-bind="uiProps"
     @open="openHandler"
     @opened="openedHandler"
@@ -35,9 +35,11 @@ const props = defineProps<DrawerProps>();
 
 const emit = defineEmits(['open', 'opened', 'close', 'closed', 'update:modelValue']);
 
-const uiComponent = getConfig('components').drawer;
+const ui = getConfig('components')?.drawer;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-drawer';
+
+const uiProps = computed(() => ui?.props(props) || {});
 
 const openHandler = (...args: any[]) => {
   emit('open', ...args);

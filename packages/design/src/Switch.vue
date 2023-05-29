@@ -1,7 +1,7 @@
 <template>
   <component
     class="tmagic-design-switch"
-    :is="uiComponent.component"
+    :is="uiComponent"
     v-bind="uiProps"
     @update:modelValue="updateModelValue"
     @change="changeHandler"
@@ -24,9 +24,11 @@ defineOptions({
 
 const props = defineProps<SwitchProps>();
 
-const uiComponent = getConfig('components').switch;
+const ui = getConfig('components')?.switch;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-switch';
+
+const uiProps = computed(() => ui?.props(props) || {});
 
 const emit = defineEmits(['change', 'update:modelValue']);
 

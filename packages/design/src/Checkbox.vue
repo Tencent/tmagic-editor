@@ -1,7 +1,7 @@
 <template>
   <component
     class="tmagic-design-checkbox"
-    :is="uiComponent.component"
+    :is="uiComponent"
     v-bind="uiProps"
     @update:modelValue="updateModelValue"
     @change="changeHandler"
@@ -27,9 +27,11 @@ const props = withDefaults(defineProps<CheckboxProps>(), {
   falseLabel: undefined,
 });
 
-const uiComponent = getConfig('components').checkbox;
+const ui = getConfig('components')?.checkbox;
 
-const uiProps = computed(() => uiComponent.props(props));
+const uiComponent = ui?.component || 'el-checkbox';
+
+const uiProps = computed(() => ui?.props(props) || {});
 
 const emit = defineEmits(['change', 'update:modelValue']);
 
