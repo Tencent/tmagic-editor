@@ -31,11 +31,7 @@
     </template>
   </component>
   <div :class="`el-input el-input--${size}`" @mouseup="mouseupHandler" v-else>
-    <div
-      :class="`el-input__wrapper ${isFocused ? ' is-focus' : ''}`"
-      :contenteditable="!disabled"
-      style="justify-content: left"
-    >
+    <div :class="`el-input__wrapper ${isFocused ? ' is-focus' : ''}`" style="justify-content: left">
       <template v-for="(item, index) in displayState">
         <span :key="index" v-if="item.type === 'text'" style="margin-right: 2px">{{ item.value }}</span>
         <TMagicTag :key="index" :size="size" v-if="item.type === 'var'">{{ item.value }}</TMagicTag>
@@ -45,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, nextTick, ref, watchEffect } from 'vue';
+import { computed, inject, nextTick, ref, watch } from 'vue';
 import { Coin } from '@element-plus/icons-vue';
 
 import { getConfig, TMagicAutocomplete, TMagicTag } from '@tmagic/design';
@@ -83,20 +79,9 @@ const state = ref('');
 const displayState = ref<{ value: string; type: 'var' | 'text' }[]>([]);
 
 const input = computed<HTMLInputElement>(() => autocomplete.value?.inputRef?.input);
+const dataSources = computed(() => dataSourceService?.get('dataSources') || []);
 
-watchEffect(() => {
-  state.value = props.model[props.name] || '';
-});
-
-const mouseupHandler = async () => {
-  isFocused.value = true;
-  await nextTick();
-  autocomplete.value?.focus();
-};
-
-const blurHandler = () => {
-  isFocused.value = false;
-
+const setDisplayState = () => {
   displayState.value = [];
 
   const matches = state.value.matchAll(/\{\{([\s\S]+?)\}\}/g);
@@ -108,9 +93,11 @@ const blurHandler = () => {
       type: 'text',
       value: state.value.substring(index, match.index),
     });
+
     let dsText = '';
     let ds: DataSourceSchema | undefined;
     let fields: DataSchema[] | undefined;
+
     match[1].split('.').forEach((item, index) => {
       if (index === 0) {
         ds = dataSources.value.find((ds) => ds.id === item);
@@ -123,10 +110,12 @@ const blurHandler = () => {
       fields = field?.fields;
       dsText += `.${field?.title || item}`;
     });
+
     displayState.value.push({
       type: 'var',
       value: dsText,
     });
+
     index = match.index + match[0].length;
   }
 
@@ -136,6 +125,28 @@ const blurHandler = () => {
       value: state.value.substring(index),
     });
   }
+};
+
+watch(
+  () => props.model[props.name],
+  (value = '') => {
+    state.value = value;
+
+    setDisplayState();
+  },
+  { immediate: true },
+);
+
+const mouseupHandler = async () => {
+  isFocused.value = true;
+  await nextTick();
+  autocomplete.value?.focus();
+};
+
+const blurHandler = () => {
+  isFocused.value = false;
+
+  setDisplayState();
 };
 
 const changeHandler = (v: string) => {
@@ -149,8 +160,6 @@ const inputHandler = (v: string) => {
     inputText = v;
   }
 };
-
-const dataSources = computed(() => dataSourceService?.get('dataSources') || []);
 
 /**
  * 光标位置是不是}
