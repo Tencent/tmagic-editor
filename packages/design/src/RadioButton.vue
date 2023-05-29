@@ -4,16 +4,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMRadioButton">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { RadioButtonProps } from './types';
 
-const props = defineProps<{
-  label?: string | number | boolean;
-  disabled?: boolean;
-  name?: string;
-}>();
+defineOptions({
+  name: 'TMRadioButton',
+});
+
+const props = defineProps<RadioButtonProps>();
 
 const uiComponent = getConfig('components').radioButton;
 

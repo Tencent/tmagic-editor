@@ -1,9 +1,9 @@
 import { App } from 'vue';
 
 import { setConfig } from './config';
-import { PluginOptions, TMagicMessage, TMagicMessageBox } from './type';
+import { PluginOptions, TMagicMessage, TMagicMessageBox } from './types';
 
-export * from './type';
+export * from './types';
 export * from './config';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */

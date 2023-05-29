@@ -16,7 +16,7 @@
   </TMagicCol>
 </template>
 
-<script setup lang="ts" name="MFormCol">
+<script setup lang="ts">
 import { computed, inject } from 'vue';
 
 import { TMagicCol } from '@tmagic/design';
@@ -25,6 +25,10 @@ import { ChildConfig, FormState } from '../schema';
 import { display as displayFunction } from '../utils/form';
 
 import Container from './Container.vue';
+
+defineOptions({
+  name: 'MFormCol',
+});
 
 const props = defineProps<{
   model: any;

@@ -24,6 +24,10 @@ import { TMagicButton, tMagicMessageBox } from '@tmagic/design';
 import { FormConfig, FormState, MFormDialog } from '@tmagic/form';
 import { MagicTable } from '@tmagic/table';
 
+defineOptions({
+  name: 'MEditorDataSourceFields',
+});
+
 const props = withDefaults(
   defineProps<{
     config: {

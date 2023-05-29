@@ -9,19 +9,17 @@
   ></component>
 </template>
 
-<script setup lang="ts" name="TMPagination">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { PaginationProps } from './types';
 
-const props = defineProps<{
-  layout?: string;
-  hideOnSinglePage?: boolean;
-  curPage?: number;
-  pageSizes?: number[];
-  pagesize?: number;
-  total?: number;
-}>();
+defineOptions({
+  name: 'TMPagination',
+});
+
+const props = defineProps<PaginationProps>();
 
 const uiComponent = getConfig('components').pagination;
 

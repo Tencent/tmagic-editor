@@ -14,21 +14,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMDialog">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { DialogProps } from './types';
 
-const props = defineProps<{
-  modelValue?: boolean;
-  appendToBody?: boolean;
-  beforeClose?: any;
-  title?: string;
-  width?: string | number;
-  fullscreen?: boolean;
-  closeOnClickModal?: boolean;
-  closeOnPressEscape?: boolean;
-}>();
+defineOptions({
+  name: 'TMDialog',
+});
+
+const props = defineProps<DialogProps>();
 
 const uiComponent = getConfig('components').dialog;
 

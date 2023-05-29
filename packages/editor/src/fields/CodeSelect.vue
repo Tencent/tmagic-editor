@@ -6,12 +6,16 @@
   </div>
 </template>
 
-<script lang="ts" setup name="MEditorCodeSelect">
-import { computed, defineEmits, defineProps, watch } from 'vue';
+<script lang="ts" setup>
+import { computed, watch } from 'vue';
 import { isEmpty } from 'lodash-es';
 
 import { TMagicCard } from '@tmagic/design';
 import { HookType } from '@tmagic/schema';
+
+defineOptions({
+  name: 'MEditorCodeSelect',
+});
 
 const emit = defineEmits(['change']);
 

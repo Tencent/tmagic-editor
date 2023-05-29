@@ -57,7 +57,7 @@
   </TMagicTable>
 </template>
 
-<script lang="ts" setup name="MTable">
+<script lang="ts" setup>
 import { computed, ref } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
@@ -67,6 +67,10 @@ import ActionsColumn from './ActionsColumn.vue';
 import ExpandColumn from './ExpandColumn.vue';
 import PopoverColumn from './PopoverColumn.vue';
 import TextColumn from './TextColumn.vue';
+
+defineOptions({
+  name: 'MTable',
+});
 
 const props = withDefaults(
   defineProps<{

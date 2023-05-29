@@ -4,15 +4,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMTag">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { TagProps } from './types';
 
-const props = defineProps<{
-  type?: string;
-  disableTransition?: boolean;
-}>();
+defineOptions({
+  name: 'TMTag',
+});
+
+const props = defineProps<TagProps>();
 
 const uiComponent = getConfig('components').tag;
 

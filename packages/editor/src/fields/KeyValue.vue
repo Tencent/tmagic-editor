@@ -38,6 +38,10 @@ import { Delete, Plus } from '@element-plus/icons-vue';
 
 import { TMagicButton, TMagicInput } from '@tmagic/design';
 
+defineOptions({
+  name: 'MEditorKeyValue',
+});
+
 const props = withDefaults(
   defineProps<{
     config: {

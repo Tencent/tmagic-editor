@@ -12,7 +12,7 @@
   </div>
 </template>
 
-<script lang="ts" setup name="MEditorUISelect">
+<script lang="ts" setup>
 import { computed, inject, ref } from 'vue';
 import { Close, Delete } from '@element-plus/icons-vue';
 
@@ -20,6 +20,10 @@ import { TMagicButton, TMagicTooltip } from '@tmagic/design';
 import { FormState } from '@tmagic/form';
 
 import type { Services } from '@editor/type';
+
+defineOptions({
+  name: 'MEditorUISelect',
+});
 
 const props = defineProps<{
   config: any;

@@ -1,228 +1,272 @@
+import type {
+  AutocompleteProps,
+  BadgeProps,
+  ButtonProps,
+  CardProps,
+  CascaderProps,
+  CheckboxGroupProps,
+  CheckboxProps,
+  CollapseItemProps,
+  CollapseProps,
+  ColorPickerProps,
+  ColProps,
+  DatePickerProps,
+  DialogProps,
+  DividerProps,
+  DrawerProps,
+  DropdownItemProps,
+  DropdownProps,
+  FormItemProps,
+  FormProps,
+  InputNumberProps,
+  InputProps,
+  OptionGroupProps,
+  OptionProps,
+  PaginationProps,
+  PopoverProps,
+  RadioButtonProps,
+  RadioGroupProps,
+  RadioProps,
+  SelectProps,
+  StepProps,
+  StepsProps,
+  SwitchProps,
+  TableColumnProps,
+  TableProps,
+  TabPaneProps,
+  TabsProps,
+  TagProps,
+  TimePickerProps,
+  TooltipProps,
+  TreeProps,
+  UploadProps,
+} from './types';
+
 export default {
   components: {
     badge: {
       component: 'el-badge',
-      props: (props: any) => props,
+      props: (props: BadgeProps) => props,
     },
 
     autocomplete: {
       component: 'el-autocomplete',
-      props: (props: any) => props,
+      props: (props: AutocompleteProps) => props,
     },
 
     button: {
       component: 'el-button',
-      props: (props: any) => props,
+      props: (props: ButtonProps) => props,
     },
 
     card: {
       component: 'el-card',
-      props: (props: any) => props,
+      props: (props: CardProps) => props,
     },
 
     cascader: {
       component: 'el-cascader',
-      props: (props: any) => props,
+      props: (props: CascaderProps) => props,
     },
 
     checkbox: {
       component: 'el-checkbox',
-      props: (props: any) => props,
+      props: (props: CheckboxProps) => props,
     },
 
     checkboxGroup: {
       component: 'el-checkbox-group',
-      props: (props: any) => props,
+      props: (props: CheckboxGroupProps) => props,
     },
 
     col: {
       component: 'el-col',
-      props: (props: any) => props,
+      props: (props: ColProps) => props,
     },
 
     collapse: {
       component: 'el-collapse',
-      props: (props: any) => props,
+      props: (props: CollapseProps) => props,
     },
 
     collapseItem: {
       component: 'el-collapse-item',
-      props: (props: any) => props,
+      props: (props: CollapseItemProps) => props,
     },
 
     colorPicker: {
       component: 'el-color-picker',
-      props: (props: any) => props,
+      props: (props: ColorPickerProps) => props,
     },
 
     datePicker: {
       component: 'el-date-picker',
-      props: (props: any) => props,
+      props: (props: DatePickerProps) => props,
     },
 
     dialog: {
       component: 'el-dialog',
-      props: (props: any) => props,
+      props: (props: DialogProps) => props,
     },
 
     divider: {
       component: 'el-divider',
-      props: (props: any) => props,
+      props: (props: DividerProps) => props,
     },
 
     drawer: {
       component: 'el-drawer',
-      props: (props: any) => props,
+      props: (props: DrawerProps) => props,
     },
 
     dropdown: {
       component: 'el-dropdown',
-      props: (props: any) => props,
+      props: (props: DropdownProps) => props,
     },
 
     dropdownItem: {
       component: 'dropdown-item',
-      props: (props: any) => props,
+      props: (props: DropdownItemProps) => props,
     },
 
     dropdownMenu: {
       component: 'dropdown-menu',
-      props: (props: any) => props,
+      props: () => ({}),
     },
 
     form: {
       component: 'el-form',
-      props: (props: any) => props,
+      props: (props: FormProps) => props,
     },
 
     formItem: {
       component: 'el-form-item',
-      props: (props: any) => props,
+      props: (props: FormItemProps) => props,
     },
 
     icon: {
       component: 'el-icon',
-      props: (props: any) => props,
+      props: () => ({}),
     },
 
     input: {
       component: 'el-input',
-      props: (props: any) => props,
+      props: (props: InputProps) => props,
     },
 
     inputNumber: {
       component: 'el-input-number',
-      props: (props: any) => props,
+      props: (props: InputNumberProps) => props,
     },
 
     option: {
       component: 'el-option',
-      props: (props: any) => props,
+      props: (props: OptionProps) => props,
     },
 
     optionGroup: {
       component: 'el-option-group',
-      props: (props: any) => props,
+      props: (props: OptionGroupProps) => props,
     },
 
     pagination: {
       component: 'el-pagination',
-      props: (props: any) => props,
+      props: (props: PaginationProps) => props,
     },
 
     popover: {
       component: 'el-popover',
-      props: (props: any) => props,
+      props: (props: PopoverProps) => props,
     },
 
     radio: {
       component: 'el-radio',
-      props: (props: any) => props,
+      props: (props: RadioProps) => props,
     },
 
     radioButton: {
       component: 'el-radio-button',
-      props: (props: any) => props,
+      props: (props: RadioButtonProps) => props,
     },
 
     radioGroup: {
       component: 'el-radio-group',
-      props: (props: any) => props,
+      props: (props: RadioGroupProps) => props,
     },
 
     row: {
       component: 'el-row',
-      props: (props: any) => props,
+      props: () => ({}),
     },
 
     scrollbar: {
       component: 'el-scrollbar',
-      props: (props: any) => props,
+      props: () => ({}),
     },
 
     select: {
       component: 'el-select',
-      props: (props: any) => props,
+      props: (props: SelectProps) => props,
     },
 
     step: {
       component: 'el-step',
-      props: (props: any) => props,
+      props: (props: StepProps) => props,
     },
 
     steps: {
       component: 'el-steps',
-      props: (props: any) => props,
+      props: (props: StepsProps) => props,
     },
 
     switch: {
       component: 'el-switch',
-      props: (props: any) => props,
+      props: (props: SwitchProps) => props,
     },
 
     table: {
       component: 'el-table',
-      props: (props: any) => props,
+      props: (props: TableProps) => props,
     },
 
     tableColumn: {
       component: 'el-table-column',
-      props: (props: any) => props,
+      props: (props: TableColumnProps) => props,
     },
 
     tabPane: {
       component: 'el-tab-pane',
-      props: (props: any) => props,
+      props: (props: TabPaneProps) => props,
     },
 
     tabs: {
       component: 'el-tabs',
-      props: (props: any) => props,
+      props: (props: TabsProps) => props,
     },
 
     tag: {
       component: 'el-tag',
-      props: (props: any) => props,
+      props: (props: TagProps) => props,
     },
 
     timePicker: {
       component: 'el-time-picker',
-      props: (props: any) => props,
+      props: (props: TimePickerProps) => props,
     },
 
     tooltip: {
       component: 'el-tooltip',
-      props: (props: any) => props,
+      props: (props: TooltipProps) => props,
     },
 
     tree: {
       component: 'el-tree',
-      props: (props: any) => props,
+      props: (props: TreeProps) => props,
     },
 
     upload: {
       component: 'el-upload',
-      props: (props: any) => props,
+      props: (props: UploadProps) => props,
     },
   },
 };

@@ -35,10 +35,14 @@
   </TMagicTableColumn>
 </template>
 
-<script lang="ts" setup name="MTableActionsColumn">
+<script lang="ts" setup>
 import { TMagicButton, tMagicMessage, TMagicTableColumn } from '@tmagic/design';
 
 import { ColumnActionConfig, ColumnConfig } from './schema';
+
+defineOptions({
+  name: 'MTableActionsColumn',
+});
 
 const props = withDefaults(
   defineProps<{

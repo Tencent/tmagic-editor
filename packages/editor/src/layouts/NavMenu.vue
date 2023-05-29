@@ -6,7 +6,7 @@
   </div>
 </template>
 
-<script lang="ts" setup name="MEditorNavMenu">
+<script lang="ts" setup>
 import { computed, inject, markRaw } from 'vue';
 import { Back, Delete, FullScreen, Grid, Memo, Right, ScaleToOriginal, ZoomIn, ZoomOut } from '@element-plus/icons-vue';
 
@@ -14,6 +14,10 @@ import { NodeType } from '@tmagic/schema';
 
 import ToolButton from '@editor/components/ToolButton.vue';
 import { ColumnLayout, MenuBarData, MenuButton, MenuComponent, MenuItem, Services } from '@editor/type';
+
+defineOptions({
+  name: 'MEditorNavMenu',
+});
 
 const props = withDefaults(
   defineProps<{

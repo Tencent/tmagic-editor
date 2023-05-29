@@ -12,19 +12,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMSwitch">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { SwitchProps } from './types';
 
-const props = defineProps<{
-  modelValue?: string | number | boolean;
-  label?: any;
-  activeValue?: string | number | boolean;
-  inactiveValue?: string | number | boolean;
-  disabled?: boolean;
-  size?: 'large' | 'default' | 'small';
-}>();
+defineOptions({
+  name: 'TMSwitch',
+});
+
+const props = defineProps<SwitchProps>();
 
 const uiComponent = getConfig('components').switch;
 

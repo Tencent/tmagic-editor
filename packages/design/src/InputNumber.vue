@@ -9,22 +9,17 @@
   ></component>
 </template>
 
-<script setup lang="ts" name="TMInputNumber">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { InputNumberProps } from './types';
 
-const props = defineProps<{
-  modelValue?: string | number | boolean;
-  clearable?: boolean;
-  controlsPosition?: string;
-  disabled?: boolean;
-  placeholder?: string;
-  step?: number;
-  min?: number;
-  max?: number;
-  size?: 'large' | 'default' | 'small';
-}>();
+defineOptions({
+  name: 'TMInputNumber',
+});
+
+const props = defineProps<InputNumberProps>();
 
 const uiComponent = getConfig('components').inputNumber;
 

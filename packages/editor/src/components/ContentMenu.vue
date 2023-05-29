@@ -22,12 +22,16 @@
   </div>
 </template>
 
-<script lang="ts" setup name="MEditorContentMenu">
+<script lang="ts" setup>
 import { nextTick, onMounted, onUnmounted, ref } from 'vue';
 
 import { MenuButton, MenuComponent } from '@editor/type';
 
 import ToolButton from './ToolButton.vue';
+
+defineOptions({
+  name: 'MEditorContentMenu',
+});
 
 const props = withDefaults(
   defineProps<{

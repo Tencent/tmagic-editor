@@ -14,7 +14,7 @@
   ></TMagicCascader>
 </template>
 
-<script setup lang="ts" name="MFormCascader">
+<script setup lang="ts">
 import { inject, ref, watchEffect } from 'vue';
 
 import { TMagicCascader } from '@tmagic/design';
@@ -22,6 +22,10 @@ import { TMagicCascader } from '@tmagic/design';
 import { CascaderConfig, FormState } from '../schema';
 import { getConfig } from '../utils/config';
 import { useAddField } from '../utils/useAddField';
+
+defineOptions({
+  name: 'MFormCascader',
+});
 
 const props = defineProps<{
   config: CascaderConfig;

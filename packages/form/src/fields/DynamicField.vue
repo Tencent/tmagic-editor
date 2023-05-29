@@ -12,7 +12,7 @@
   </div>
 </template>
 
-<script lang="ts" setup name="MFormDynamicField">
+<script lang="ts" setup>
 /**
  * 动态表单，目前只支持input类型字段
  * inputType: 'dynamic-field',
@@ -30,6 +30,10 @@ import { TMagicForm, TMagicFormItem, TMagicInput } from '@tmagic/design';
 import { DynamicFieldConfig } from '../schema';
 import { getConfig } from '../utils/config';
 import { useAddField } from '../utils/useAddField';
+
+defineOptions({
+  name: 'MFormDynamicField',
+});
 
 const props = defineProps<{
   config: DynamicFieldConfig;

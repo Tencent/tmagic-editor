@@ -10,13 +10,17 @@
   >
 </template>
 
-<script setup lang="ts" name="MFormCheckbox">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { TMagicCheckbox } from '@tmagic/design';
 
 import { CheckboxConfig } from '../schema';
 import { useAddField } from '../utils/useAddField';
+
+defineOptions({
+  name: 'MFormCheckbox',
+});
 
 const props = defineProps<{
   config: CheckboxConfig;

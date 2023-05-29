@@ -174,7 +174,7 @@
   </div>
 </template>
 
-<script setup lang="ts" name="MFormTable">
+<script setup lang="ts">
 import { computed, inject, onMounted, ref, toRefs, watchEffect } from 'vue';
 import { ArrowDown, ArrowUp, Delete, FullScreen, Grid } from '@element-plus/icons-vue';
 import { cloneDeep } from 'lodash-es';
@@ -196,6 +196,10 @@ import { ColumnConfig, FormState, SortProp, TableConfig } from '../schema';
 import { display as displayFunc, initValue } from '../utils/form';
 
 import Container from './Container.vue';
+
+defineOptions({
+  name: 'MFormTable',
+});
 
 const props = withDefaults(
   defineProps<{

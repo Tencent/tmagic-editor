@@ -43,7 +43,7 @@
   </div>
 </template>
 
-<script lang="ts" setup name="MEditorToolButton">
+<script lang="ts" setup>
 import { computed, inject } from 'vue';
 import { ArrowDown } from '@element-plus/icons-vue';
 
@@ -59,6 +59,10 @@ import {
 
 import MIcon from '../components/Icon.vue';
 import type { MenuButton, MenuComponent, Services } from '../type';
+
+defineOptions({
+  name: 'MEditorToolButton',
+});
 
 const props = withDefaults(
   defineProps<{

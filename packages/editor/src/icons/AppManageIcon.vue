@@ -8,4 +8,8 @@
   </svg>
 </template>
 
-<script lang="ts" setup name="MEditorAppManageIcon"></script>
+<script lang="ts" setup>
+defineOptions({
+  name: 'MEditorAppManageIcon',
+});
+</script>

@@ -9,17 +9,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMTimePicker">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { TimePickerProps } from './types';
 
-const props = defineProps<{
-  modelValue?: any;
-  disabled?: boolean;
-  placeholder?: string;
-  size?: 'large' | 'default' | 'small';
-}>();
+defineOptions({
+  name: 'TMTimePicker',
+});
+
+const props = defineProps<TimePickerProps>();
 
 const uiComponent = getConfig('components').timePicker;
 

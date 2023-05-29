@@ -2,7 +2,7 @@
   <ContentMenu :menu-data="menuData" ref="menu" style="overflow: initial"></ContentMenu>
 </template>
 
-<script lang="ts" setup name="MEditorLayerMenu">
+<script lang="ts" setup>
 import { computed, inject, markRaw, ref } from 'vue';
 import { CopyDocument, Delete, Files, Plus } from '@element-plus/icons-vue';
 
@@ -10,6 +10,10 @@ import { NodeType } from '@tmagic/schema';
 
 import ContentMenu from '@editor/components/ContentMenu.vue';
 import type { ComponentGroup, MenuButton, MenuComponent, Services } from '@editor/type';
+
+defineOptions({
+  name: 'MEditorLayerMenu',
+});
 
 const props = defineProps<{
   layerContentMenu: (MenuButton | MenuComponent)[];

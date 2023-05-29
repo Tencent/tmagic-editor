@@ -20,10 +20,14 @@
   </div>
 </template>
 
-<script lang="ts" setup name="MEditorLayout">
+<script lang="ts" setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 
 import Resizer from '@editor/layouts/Resizer.vue';
+
+defineOptions({
+  name: 'MEditorLayout',
+});
 
 const emit = defineEmits(['update:left', 'change', 'update:right']);
 

@@ -8,11 +8,15 @@
   ></TMagicColorPicker>
 </template>
 
-<script lang="ts" setup name="MFormColorPicker">
+<script lang="ts" setup>
 import { TMagicColorPicker } from '@tmagic/design';
 
 import { ColorPickConfig } from '../schema';
 import { useAddField } from '../utils/useAddField';
+
+defineOptions({
+  name: 'MFormColorPicker',
+});
 
 const props = defineProps<{
   config: ColorPickConfig;

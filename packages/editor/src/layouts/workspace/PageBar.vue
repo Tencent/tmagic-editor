@@ -46,7 +46,7 @@
   </PageBarScrollContainer>
 </template>
 
-<script lang="ts" setup name="MEditorPageBar">
+<script lang="ts" setup>
 import { computed, inject } from 'vue';
 import { CaretBottom, Delete, DocumentCopy } from '@element-plus/icons-vue';
 
@@ -57,6 +57,10 @@ import ToolButton from '@editor/components/ToolButton.vue';
 import type { Services } from '@editor/type';
 
 import PageBarScrollContainer from './PageBarScrollContainer.vue';
+
+defineOptions({
+  name: 'MEditorPageBar',
+});
 
 const services = inject<Services>('services');
 const editorService = services?.editorService;

@@ -6,17 +6,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMButton">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { ButtonProps } from './types';
 
-const props = defineProps<{
-  type?: string;
-  size?: 'large' | 'default' | 'small';
-  text?: boolean;
-  icon?: any;
-}>();
+defineOptions({
+  name: 'TMButton',
+});
+
+const props = defineProps<ButtonProps>();
 
 const uiComponent = getConfig('components').button;
 

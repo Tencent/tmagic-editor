@@ -11,7 +11,7 @@
   </div>
 </template>
 
-<script lang="ts" setup name="MEditorAddPageBox">
+<script lang="ts" setup>
 import { inject, toRaw } from 'vue';
 import { Plus } from '@element-plus/icons-vue';
 
@@ -20,6 +20,10 @@ import { NodeType } from '@tmagic/schema';
 import MIcon from '@editor/components/Icon.vue';
 import type { Services } from '@editor/type';
 import { generatePageNameByApp } from '@editor/utils';
+
+defineOptions({
+  name: 'MEditorAddPageBox',
+});
 
 const services = inject<Services>('services');
 

@@ -10,16 +10,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMTabPane">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { TabPaneProps } from './types';
 
-const props = defineProps<{
-  name?: string;
-  label?: string;
-  lazy?: boolean;
-}>();
+defineOptions({
+  name: 'TMTabPane',
+});
+
+const props = defineProps<TabPaneProps>();
 const uiComponent = getConfig('components').tabPane;
 
 const uiProps = computed(() => uiComponent.props(props));

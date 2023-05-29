@@ -4,9 +4,13 @@
   </div>
 </template>
 
-<script lang="ts" setup name="MEditorScrollBar">
+<script lang="ts" setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import Gesto from 'gesto';
+
+defineOptions({
+  name: 'MEditorScrollBar',
+});
 
 const props = defineProps<{
   size: number;

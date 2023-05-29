@@ -4,16 +4,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMDivider">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { DividerProps } from './types';
 
-const props = defineProps<{
-  direction?: string;
-  borderStyle?: string;
-  contentPosition?: string;
-}>();
+defineOptions({
+  name: 'TMDivider',
+});
+
+const props = defineProps<DividerProps>();
 
 const uiComponent = getConfig('components').divider;
 

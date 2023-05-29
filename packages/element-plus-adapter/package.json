@@ -36,12 +36,14 @@
     "typescript"
   ],
   "dependencies": {
+    "@tmagic/design": "^1.2.15",
     "element-plus": "^2.2.32",
-    "vue": "^3.2.37"
+    "vue": "^3.3.4"
   },
   "peerDependencies": {
+    "@tmagic/design": "^1.2.15",
     "element-plus": "^2.2.32",
-    "vue": "^3.2.37"
+    "vue": "^3.3.4"
   },
   "devDependencies": {
     "@types/node": "^15.12.4",

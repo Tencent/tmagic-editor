@@ -22,13 +22,17 @@
   </div>
 </template>
 
-<script lang="ts" setup name="MEditorScrollViewer">
+<script lang="ts" setup>
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 
 import type { ScrollViewerEvent } from '@editor/type';
 import { ScrollViewer } from '@editor/utils/scroll-viewer';
 
 import ScrollBar from './ScrollBar.vue';
+
+defineOptions({
+  name: 'MEditorScrollViewer',
+});
 
 const props = withDefaults(
   defineProps<{

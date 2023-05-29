@@ -13,7 +13,7 @@
   </div>
 </template>
 
-<script lang="ts" setup name="MEditorPropsPanel">
+<script lang="ts" setup>
 import { computed, getCurrentInstance, inject, onMounted, onUnmounted, ref, watchEffect } from 'vue';
 
 import { tMagicMessage } from '@tmagic/design';
@@ -21,6 +21,10 @@ import type { FormValue } from '@tmagic/form';
 import { MForm } from '@tmagic/form';
 
 import type { Services } from '@editor/type';
+
+defineOptions({
+  name: 'MEditorPropsPanel',
+});
 
 const emit = defineEmits(['mounted']);
 

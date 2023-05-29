@@ -23,4 +23,8 @@
   </svg>
 </template>
 
-<script lang="ts" setup name="MEditorCodeIcon"></script>
+<script lang="ts" setup>
+defineOptions({
+  name: 'MEditorCodeIcon',
+});
+</script>

@@ -8,16 +8,17 @@
   ></component>
 </template>
 
-<script setup lang="ts" name="TMUpload">
+<script setup lang="ts">
 import { computed, ref } from 'vue';
 
 import { getConfig } from './config';
+import type { UploadProps } from './types';
 
-const props = defineProps<{
-  action?: string;
-  autoUpload?: boolean;
-  disabled?: boolean;
-}>();
+defineOptions({
+  name: 'TMUpload',
+});
+
+const props = defineProps<UploadProps>();
 
 const emit = defineEmits(['change']);
 

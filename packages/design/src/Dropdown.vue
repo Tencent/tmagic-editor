@@ -8,26 +8,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMDropdown">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { DropdownProps } from './types';
 
-const props = defineProps<{
-  type?: string;
-  size?: string;
-  maxHeight?: string | number;
-  splitButton?: boolean;
-  disable?: boolean;
-  placement?: string;
-  trigger?: string;
-  hideOnClick?: boolean;
-  showTimeout?: number;
-  role?: string;
-  tabindex?: number;
-  popperClass?: string;
-  popperOptions?: any;
-}>();
+defineOptions({
+  name: 'TMDropdown',
+});
+
+const props = defineProps<DropdownProps>();
 
 const uiComponent = getConfig('components').dropdown;
 

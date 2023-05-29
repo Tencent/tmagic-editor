@@ -67,7 +67,7 @@
   </component>
 </template>
 
-<script setup lang="ts" name="MFormTabs">
+<script setup lang="ts">
 import { computed, inject, ref, watchEffect } from 'vue';
 import { cloneDeep, isEmpty } from 'lodash-es';
 
@@ -77,6 +77,10 @@ import { FormState, TabConfig, TabPaneConfig } from '../schema';
 import { display as displayFunc, filterFunction } from '../utils/form';
 
 import Container from './Container.vue';
+
+defineOptions({
+  name: 'MFormTabs',
+});
 
 type DiffCount = {
   [tabIndex: number]: number;

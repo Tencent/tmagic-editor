@@ -33,8 +33,8 @@
   </div>
 </template>
 
-<script lang="ts" setup name="MEditorEventSelect">
-import { computed, defineProps, inject } from 'vue';
+<script lang="ts" setup>
+import { computed, inject } from 'vue';
 import { Delete } from '@element-plus/icons-vue';
 import { has } from 'lodash-es';
 
@@ -44,7 +44,9 @@ import { ActionType } from '@tmagic/schema';
 
 import type { EventSelectConfig, Services } from '@editor/type';
 
-const services = inject<Services>('services');
+defineOptions({
+  name: 'MEditorEventSelect',
+});
 
 const props = defineProps<{
   config: EventSelectConfig;
@@ -53,7 +55,10 @@ const props = defineProps<{
   name: string;
   size: 'small' | 'default' | 'large';
 }>();
+
 const emit = defineEmits(['change']);
+
+const services = inject<Services>('services');
 
 // 事件名称下拉框表单配置
 const eventNameConfig = computed(() => {

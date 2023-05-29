@@ -15,7 +15,7 @@
   </div>
 </template>
 
-<script lang="ts" setup name="MEditorWorkspace">
+<script lang="ts" setup>
 import { computed, inject, onMounted, onUnmounted, ref } from 'vue';
 import KeyController from 'keycon';
 
@@ -26,6 +26,10 @@ import type { MenuButton, MenuComponent, Services } from '@editor/type';
 import Breadcrumb from './Breadcrumb.vue';
 import PageBar from './PageBar.vue';
 import MagicStage from './Stage.vue';
+
+defineOptions({
+  name: 'MEditorWorkspace',
+});
 
 defineProps<{
   stageContentMenu: (MenuButton | MenuComponent)[];

@@ -10,16 +10,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMRadioGroup">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { RadioGroupProps } from './types';
 
-const props = defineProps<{
-  modelValue?: string | number | boolean;
-  disabled?: boolean;
-  size?: 'large' | 'default' | 'small';
-}>();
+defineOptions({
+  name: 'TMRadioGroup',
+});
+
+const props = defineProps<RadioGroupProps>();
 
 const uiComponent = getConfig('components').radioGroup;
 

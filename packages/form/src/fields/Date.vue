@@ -11,12 +11,16 @@
   ></TMagicDatePicker>
 </template>
 
-<script lang="ts" setup name="MFormDate">
+<script lang="ts" setup>
 import { TMagicDatePicker } from '@tmagic/design';
 import { datetimeFormatter } from '@tmagic/utils';
 
 import { DateConfig } from '../schema';
 import { useAddField } from '../utils/useAddField';
+
+defineOptions({
+  name: 'MFormDate',
+});
 
 const props = defineProps<{
   config: DateConfig;

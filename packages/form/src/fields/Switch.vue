@@ -9,13 +9,17 @@
   ></TMagicSwitch>
 </template>
 
-<script lang="ts" setup name="MFormSwitch">
+<script lang="ts" setup>
 import { computed } from 'vue';
 
 import { TMagicSwitch } from '@tmagic/design';
 
 import { SwitchConfig } from '../schema';
 import { useAddField } from '../utils/useAddField';
+
+defineOptions({
+  name: 'MFormSwitch',
+});
 
 const props = defineProps<{
   config: SwitchConfig;

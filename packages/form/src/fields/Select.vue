@@ -25,7 +25,7 @@
   </TMagicSelect>
 </template>
 
-<script lang="ts" setup name="MFormSelect">
+<script lang="ts" setup>
 import { inject, onBeforeMount, Ref, ref, watch, watchEffect } from 'vue';
 
 import { TMagicSelect } from '@tmagic/design';
@@ -37,6 +37,10 @@ import { useAddField } from '../utils/useAddField';
 
 import SelectOptionGroups from './SelectOptionGroups.vue';
 import SelectOptions from './SelectOptions.vue';
+
+defineOptions({
+  name: 'MFormSelect',
+});
 
 const props = defineProps<{
   config: SelectConfig;

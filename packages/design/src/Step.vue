@@ -4,15 +4,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMStep">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { StepProps } from './types';
 
-const props = defineProps<{
-  title?: string;
-  active?: number;
-}>();
+defineOptions({
+  name: 'TMStep',
+});
+
+const props = defineProps<StepProps>();
 
 const emit = defineEmits(['click']);
 

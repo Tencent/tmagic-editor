@@ -86,7 +86,7 @@ import { initServiceEvents, initServiceState } from './initService';
 import type { Services } from './type';
 
 export default defineComponent({
-  name: 'm-editor',
+  name: 'MEditor',
 
   components: {
     TMagicNavMenu: NavMenu,

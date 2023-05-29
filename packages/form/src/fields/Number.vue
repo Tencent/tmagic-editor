@@ -15,13 +15,17 @@
   ></TMagicInputNumber>
 </template>
 
-<script lang="ts" setup name="MFormNumber">
+<script lang="ts" setup>
 import { inject } from 'vue';
 
 import { TMagicInputNumber } from '@tmagic/design';
 
 import { FormState, NumberConfig } from '../schema';
 import { useAddField } from '../utils/useAddField';
+
+defineOptions({
+  name: 'MFormNumber',
+});
 
 const props = defineProps<{
   config: NumberConfig;

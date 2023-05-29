@@ -17,13 +17,12 @@
  */
 
 import { defineConfig } from 'vite';
-import VueSetupExtend from 'vite-plugin-vue-setup-extend';
 import vue from '@vitejs/plugin-vue';
 
 import pkg from './package.json';
 
 export default defineConfig({
-  plugins: [vue(), VueSetupExtend()],
+  plugins: [vue()],
 
   optimizeDeps: {
     esbuildOptions: {

@@ -13,22 +13,19 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMTable">
+<script setup lang="ts">
 import { computed, ref, watchEffect } from 'vue';
 
 import { getConfig } from './config';
+import type { TableProps } from './types';
 
-const props = withDefaults(
-  defineProps<{
-    data?: any[];
-    border?: boolean;
-    maxHeight?: number | string;
-    defaultExpandAll?: boolean;
-  }>(),
-  {
-    data: () => [],
-  },
-);
+defineOptions({
+  name: 'TMTable',
+});
+
+const props = withDefaults(defineProps<TableProps>(), {
+  data: () => [],
+});
 
 const uiComponent = getConfig('components').table;
 

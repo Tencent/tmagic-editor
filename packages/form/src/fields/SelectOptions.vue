@@ -8,10 +8,14 @@
   ></TMagicOption>
 </template>
 
-<script lang="ts" setup name="MFormSelectOptions">
+<script lang="ts" setup>
 import { TMagicOption } from '@tmagic/design';
 
 import { SelectOption } from '../schema';
+
+defineOptions({
+  name: 'MFormSelectOptions',
+});
 
 defineProps<{
   options: SelectOption[];

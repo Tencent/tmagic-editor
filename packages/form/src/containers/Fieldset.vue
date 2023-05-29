@@ -61,7 +61,7 @@
   </fieldset>
 </template>
 
-<script lang="ts" setup name="MFormFieldset">
+<script lang="ts" setup>
 import { computed, inject } from 'vue';
 
 import { TMagicCheckbox } from '@tmagic/design';
@@ -69,6 +69,10 @@ import { TMagicCheckbox } from '@tmagic/design';
 import { FieldsetConfig, FormState } from '../schema';
 
 import Container from './Container.vue';
+
+defineOptions({
+  name: 'MFormFieldset',
+});
 
 const props = withDefaults(
   defineProps<{

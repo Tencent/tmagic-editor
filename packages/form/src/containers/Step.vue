@@ -32,7 +32,7 @@
   </div>
 </template>
 
-<script setup lang="ts" name="MFormStep">
+<script setup lang="ts">
 import { inject, ref, watchEffect } from 'vue';
 
 import { TMagicStep, TMagicSteps } from '@tmagic/design';
@@ -40,6 +40,10 @@ import { TMagicStep, TMagicSteps } from '@tmagic/design';
 import { FormState, StepConfig } from '../schema';
 
 import Container from './Container.vue';
+
+defineOptions({
+  name: 'MFormStep',
+});
 
 const props = withDefaults(
   defineProps<{

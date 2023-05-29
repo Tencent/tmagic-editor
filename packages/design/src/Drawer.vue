@@ -21,28 +21,23 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMDrawer">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { DrawerProps } from './types';
 
-const props = defineProps<{
-  modelValue?: boolean;
-  appendToBody?: boolean;
-  beforeClose?: any;
-  title?: string;
-  size?: string | number;
-  fullscreen?: boolean;
-  closeOnClickModal?: boolean;
-  closeOnPressEscape?: boolean;
-  direction?: 'rtl' | 'ltr' | 'ttb' | 'bt';
-}>();
+defineOptions({
+  name: 'TMDrawer',
+});
+
+const props = defineProps<DrawerProps>();
+
+const emit = defineEmits(['open', 'opened', 'close', 'closed', 'update:modelValue']);
 
 const uiComponent = getConfig('components').drawer;
 
 const uiProps = computed(() => uiComponent.props(props));
-
-const emit = defineEmits(['open', 'opened', 'close', 'closed', 'update:modelValue']);
 
 const openHandler = (...args: any[]) => {
   emit('open', ...args);

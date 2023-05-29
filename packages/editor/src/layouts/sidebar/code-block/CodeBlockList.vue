@@ -55,7 +55,7 @@
   </TMagicScrollbar>
 </template>
 
-<script setup lang="ts" name="MEditorCodeBlockList">
+<script setup lang="ts">
 import { computed, inject, ref } from 'vue';
 import { Close, Edit, View } from '@element-plus/icons-vue';
 
@@ -70,6 +70,10 @@ import CodeIcon from '@editor/icons/CodeIcon.vue';
 import { CodeDeleteErrorType, CodeDslItem, Services } from '@editor/type';
 
 import CodeBlockEditor from './CodeBlockEditor.vue';
+
+defineOptions({
+  name: 'MEditorCodeBlockList',
+});
 
 const props = defineProps<{
   customError?: (id: Id, errorType: CodeDeleteErrorType) => any;

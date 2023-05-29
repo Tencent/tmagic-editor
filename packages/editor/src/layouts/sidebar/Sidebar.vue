@@ -83,7 +83,7 @@
   </component>
 </template>
 
-<script lang="ts" setup name="MEditorSidebar">
+<script lang="ts" setup>
 import { computed, ref, watch } from 'vue';
 import { Coin, EditPen, Goods, List } from '@element-plus/icons-vue';
 
@@ -97,6 +97,10 @@ import CodeBlockList from './code-block/CodeBlockList.vue';
 import DataSourceListPanel from './data-source/DataSourceListPanel.vue';
 import ComponentListPanel from './ComponentListPanel.vue';
 import LayerPanel from './LayerPanel.vue';
+
+defineOptions({
+  name: 'MEditorSidebar',
+});
 
 const props = withDefaults(
   defineProps<{

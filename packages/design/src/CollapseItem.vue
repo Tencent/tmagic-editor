@@ -16,16 +16,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMCollapseItem">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { CollapseItemProps } from './types';
 
-const props = defineProps<{
-  name?: string | number;
-  title?: string;
-  disabled?: boolean;
-}>();
+defineOptions({
+  name: 'TMCollapseItem',
+});
+
+const props = defineProps<CollapseItemProps>();
 
 const uiComponent = getConfig('components').collapseItem;
 

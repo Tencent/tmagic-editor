@@ -10,16 +10,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMCard">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { CardProps } from './types';
 
-const props = defineProps<{
-  bodyStyle?: Record<string, any>;
-  shadow?: string;
-  header?: string;
-}>();
+defineOptions({
+  name: 'TMCard',
+});
+
+const props = defineProps<CardProps>();
 
 const uiComponent = getConfig('components').card;
 

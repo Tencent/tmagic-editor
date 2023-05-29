@@ -4,18 +4,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMBadge">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { BadgeProps } from './types';
 
-const props = defineProps<{
-  value?: string | number;
-  type?: 'primary' | 'success' | 'warning' | 'danger' | 'info';
-  max?: number;
-  isDot?: boolean;
-  hidden?: boolean;
-}>();
+defineOptions({
+  name: 'TMBadge',
+});
+
+const props = defineProps<BadgeProps>();
 
 const uiComponent = getConfig('components').badge;
 

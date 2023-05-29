@@ -32,7 +32,7 @@
   </TMagicDrawer>
 </template>
 
-<script lang="ts" setup name="MEditorCodeBlockEditor">
+<script lang="ts" setup>
 import { computed, inject, reactive, ref, watchEffect } from 'vue';
 import { cloneDeep, forIn, isEmpty } from 'lodash-es';
 
@@ -44,6 +44,10 @@ import FunctionEditor from '@editor/components/FunctionEditor.vue';
 import Layout from '@editor/components/Layout.vue';
 import type { ListState, Services } from '@editor/type';
 import { serializeConfig } from '@editor/utils/editor';
+
+defineOptions({
+  name: 'MEditorCodeBlockEditor',
+});
 
 const services = inject<Services>('services');
 const codeOptions = inject('codeOptions', {});

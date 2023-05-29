@@ -27,32 +27,9 @@
 import { computed, h, ref } from 'vue';
 import { Tree as TTree, TreeNodeModel, TreeNodeValue } from 'tdesign-vue-next';
 
-const props = defineProps<{
-  data?: any[];
-  emptyText?: string;
-  nodeKey?: string;
-  props?: any;
-  renderAfterExpand?: boolean;
-  load?: any;
-  renderContent?: any;
-  highlightCurrent?: boolean;
-  defaultExpandAll?: boolean;
-  checkOnClickNode?: boolean;
-  autoExpandParent?: boolean;
-  defaultExpandedKeys?: any[];
-  showCheckbox?: boolean;
-  checkStrictly?: boolean;
-  defaultCheckedKeys?: any[];
-  currentNodeKey?: string | number;
-  filterNodeMethod?: (value: any, data: any, node: any) => boolean;
-  accordion?: boolean;
-  indent?: number;
-  icon?: any;
-  lazy?: boolean;
-  draggable?: boolean;
-  allowDrag?: (node: any) => boolean;
-  allowDrop?: any;
-}>();
+import type { TreeProps } from '@tmagic/design';
+
+const props = defineProps<TreeProps>();
 
 const nodeKeys = computed(() => ({
   value: props.props?.value || 'value',

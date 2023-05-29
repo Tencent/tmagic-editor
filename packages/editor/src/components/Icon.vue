@@ -7,11 +7,15 @@
   <TMagicIcon v-else class="magic-editor-icon"><component :is="toRaw(icon)"></component></TMagicIcon>
 </template>
 
-<script lang="ts" setup name="MEditorIcon">
+<script lang="ts" setup>
 import { toRaw } from 'vue';
 import { Edit } from '@element-plus/icons-vue';
 
 import { TMagicIcon } from '@tmagic/design';
+
+defineOptions({
+  name: 'MEditorIcon',
+});
 
 defineProps<{
   icon?: any;

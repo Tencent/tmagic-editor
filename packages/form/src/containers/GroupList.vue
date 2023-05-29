@@ -31,7 +31,7 @@
   </div>
 </template>
 
-<script setup lang="ts" name="MFormGroupList">
+<script setup lang="ts">
 import { computed, inject } from 'vue';
 import { Grid } from '@element-plus/icons-vue';
 
@@ -41,6 +41,10 @@ import { FormState, GroupListConfig } from '../schema';
 import { initValue } from '../utils/form';
 
 import MFieldsGroupListItem from './GroupListItem.vue';
+
+defineOptions({
+  name: 'MFormGroupList',
+});
 
 const props = defineProps<{
   model: any;

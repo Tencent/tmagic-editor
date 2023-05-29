@@ -10,15 +10,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMCollapse">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { CollapseProps } from './types';
 
-const props = defineProps<{
-  modelValue?: string | string[];
-  accordion?: boolean;
-}>();
+defineOptions({
+  name: 'TMCollapse',
+});
+
+const props = defineProps<CollapseProps>();
 
 const uiComponent = getConfig('components').collapse;
 

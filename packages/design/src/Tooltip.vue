@@ -7,19 +7,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMTooltip">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { TooltipProps } from './types';
 
-const props = defineProps<{
-  placement?: string;
-  disabled?: boolean;
-  content?: string;
-  effect?: string;
-  transition?: string;
-  offset?: number;
-}>();
+defineOptions({
+  name: 'TMTooltip',
+});
+
+const props = defineProps<TooltipProps>();
 
 const uiComponent = getConfig('components').tooltip;
 

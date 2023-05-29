@@ -42,7 +42,7 @@
   </div>
 </template>
 
-<script setup lang="ts" name="MFormGroupListItem">
+<script setup lang="ts">
 import { computed, inject, ref, watchEffect } from 'vue';
 import { CaretBottom, CaretRight, CaretTop, Delete } from '@element-plus/icons-vue';
 
@@ -52,6 +52,10 @@ import { FormState, GroupListConfig } from '../schema';
 import { filterFunction } from '../utils/form';
 
 import Container from './Container.vue';
+
+defineOptions({
+  name: 'MFormGroupListItem',
+});
 
 const props = defineProps<{
   model: any;

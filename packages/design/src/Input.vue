@@ -22,19 +22,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMInput">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { InputProps } from './types';
 
-const props = defineProps<{
-  modelValue?: string | number;
-  clearable?: boolean;
-  disabled?: boolean;
-  placeholder?: string;
-  type?: string;
-  size?: 'large' | 'default' | 'small';
-}>();
+defineOptions({
+  name: 'TMInput',
+});
+
+const props = defineProps<InputProps>();
 
 const uiComponent = getConfig('components').input;
 

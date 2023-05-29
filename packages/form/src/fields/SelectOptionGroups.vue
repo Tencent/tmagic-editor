@@ -12,10 +12,14 @@
   </TMagicOptionGroup>
 </template>
 
-<script lang="ts" setup name="MFormSelectOptionGroups">
+<script lang="ts" setup>
 import { getConfig, TMagicOptionGroup } from '@tmagic/design';
 
 import { SelectGroupOption } from '../schema';
+
+defineOptions({
+  name: 'MFormSelectOptionGroups',
+});
 
 defineProps<{
   options: SelectGroupOption[];

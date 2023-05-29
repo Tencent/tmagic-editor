@@ -10,17 +10,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMCheckboxGroup">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { CheckboxGroupProps } from './types';
 
-const props = defineProps<{
-  modelValue?: any[];
-  label?: string;
-  disabled?: boolean;
-  size?: 'large' | 'default' | 'small';
-}>();
+defineOptions({
+  name: 'TMCheckboxGroup',
+});
+
+const props = defineProps<CheckboxGroupProps>();
 
 const uiComponent = getConfig('components').checkboxGroup;
 

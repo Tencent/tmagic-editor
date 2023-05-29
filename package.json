@@ -48,7 +48,7 @@
     "@types/node": "^18.15.11",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
-    "@vitejs/plugin-vue": "^4.1.0",
+    "@vitejs/plugin-vue": "^4.2.3",
     "@vitest/coverage-c8": "^0.30.0",
     "c8": "^7.11.3",
     "chalk": "^4.1.0",
@@ -79,7 +79,7 @@
     "vite": "^4.3.8",
     "vitepress": "1.0.0-beta.1",
     "vitest": "^0.31.1",
-    "vue": "^3.2.37"
+    "vue": "^3.3.4"
   },
   "config": {
     "commitizen": {

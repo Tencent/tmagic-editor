@@ -16,8 +16,8 @@
   </div>
 </template>
 
-<script lang="ts" setup name="MEditorCodeSelectCol">
-import { computed, defineEmits, defineProps, inject, ref, watch } from 'vue';
+<script lang="ts" setup name="">
+import { computed, inject, ref, watch } from 'vue';
 import { Edit, View } from '@element-plus/icons-vue';
 import { isEmpty, map } from 'lodash-es';
 
@@ -26,6 +26,10 @@ import { Id } from '@tmagic/schema';
 
 import Icon from '@editor/components/Icon.vue';
 import type { CodeParamStatement, Services } from '@editor/type';
+
+defineOptions({
+  name: 'MEditorCodeSelectCol',
+});
 
 const services = inject<Services>('services');
 const mForm = inject<FormState>('mForm');

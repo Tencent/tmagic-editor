@@ -23,7 +23,7 @@
   </TMagicInput>
 </template>
 
-<script lang="ts" setup name="MFormText">
+<script lang="ts" setup>
 import { inject } from 'vue';
 
 import { TMagicButton, TMagicInput } from '@tmagic/design';
@@ -31,6 +31,10 @@ import { isNumber } from '@tmagic/utils';
 
 import { FormState, TextConfig } from '../schema';
 import { useAddField } from '../utils/useAddField';
+
+defineOptions({
+  name: 'MFormText',
+});
 
 const props = defineProps<{
   config: TextConfig;

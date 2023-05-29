@@ -4,15 +4,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMOptionGroup">
+<script setup lang="ts">
 import { computed, ref } from 'vue';
 
 import { getConfig } from './config';
+import type { OptionGroupProps } from './types';
 
-const props = defineProps<{
-  label?: string;
-  disabled?: boolean;
-}>();
+defineOptions({
+  name: 'TMOptionGroup',
+});
+
+const props = defineProps<OptionGroupProps>();
 
 const uiComponent = getConfig('components').optionGroup;
 

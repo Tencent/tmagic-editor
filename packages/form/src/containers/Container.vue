@@ -218,7 +218,7 @@
   </div>
 </template>
 
-<script setup lang="ts" name="MFormContainer">
+<script setup lang="ts">
 import { computed, inject, ref, resolveComponent, watch, watchEffect } from 'vue';
 import { WarningFilled } from '@element-plus/icons-vue';
 import { isEqual } from 'lodash-es';
@@ -227,6 +227,10 @@ import { TMagicButton, TMagicFormItem, TMagicIcon, TMagicTooltip } from '@tmagic
 
 import { ChildConfig, ContainerCommonConfig, FormState, FormValue } from '../schema';
 import { display as displayFunction, filterFunction, getRules } from '../utils/form';
+
+defineOptions({
+  name: 'MFormContainer',
+});
 
 const props = withDefaults(
   defineProps<{

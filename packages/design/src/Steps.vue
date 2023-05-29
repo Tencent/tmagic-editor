@@ -4,15 +4,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMSteps">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { StepsProps } from './types';
 
-const props = defineProps<{
-  active?: number;
-  space?: number | string;
-}>();
+defineOptions({
+  name: 'TMSteps',
+});
+
+const props = defineProps<StepsProps>();
 
 const uiComponent = getConfig('components').steps;
 

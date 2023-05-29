@@ -4,17 +4,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMDropdownItem">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { DropdownItemProps } from './types';
 
-const props = defineProps<{
-  command?: any;
-  disabled?: boolean;
-  divided?: boolean;
-  icon?: any;
-}>();
+defineOptions({
+  name: 'TMDropdownItem',
+});
+
+const props = defineProps<DropdownItemProps>();
 
 const uiComponent = getConfig('components').dropdownItem;
 

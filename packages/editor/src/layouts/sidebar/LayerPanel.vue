@@ -48,7 +48,7 @@
   </TMagicScrollbar>
 </template>
 
-<script lang="ts" setup name="MEditorLayerPanel">
+<script lang="ts" setup>
 import { computed, inject, onMounted, onUnmounted, ref, watch } from 'vue';
 import KeyController from 'keycon';
 import { difference, throttle, union } from 'lodash-es';
@@ -63,6 +63,10 @@ import type { MenuButton, MenuComponent, Services } from '@editor/type';
 import { Layout } from '@editor/type';
 
 import LayerMenu from './LayerMenu.vue';
+
+defineOptions({
+  name: 'MEditorLayerPanel',
+});
 
 defineProps<{
   layerContentMenu: (MenuButton | MenuComponent)[];

@@ -12,25 +12,20 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMCheckbox">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { CheckboxProps } from './types';
 
-const props = withDefaults(
-  defineProps<{
-    modelValue?: string | number | boolean;
-    label?: any;
-    trueLabel?: string | number | boolean;
-    falseLabel?: string | number | boolean;
-    disabled?: boolean;
-    size?: 'large' | 'default' | 'small';
-  }>(),
-  {
-    trueLabel: undefined,
-    falseLabel: undefined,
-  },
-);
+defineOptions({
+  name: 'TMCheckbox',
+});
+
+const props = withDefaults(defineProps<CheckboxProps>(), {
+  trueLabel: undefined,
+  falseLabel: undefined,
+});
 
 const uiComponent = getConfig('components').checkbox;
 

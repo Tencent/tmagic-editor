@@ -2,7 +2,7 @@
   <content-menu :menu-data="menuData" ref="menu"></content-menu>
 </template>
 
-<script lang="ts" setup name="MEditorViewerMenu">
+<script lang="ts" setup>
 import { computed, inject, markRaw, ref, watch } from 'vue';
 import { Bottom, CopyDocument, Delete, DocumentCopy, Top } from '@element-plus/icons-vue';
 
@@ -13,6 +13,10 @@ import ContentMenu from '@editor/components/ContentMenu.vue';
 import storageService from '@editor/services/storage';
 import { LayerOffset, Layout, MenuButton, MenuComponent, Services } from '@editor/type';
 import { COPY_STORAGE_KEY } from '@editor/utils/editor';
+
+defineOptions({
+  name: 'MEditorViewerMenu',
+});
 
 const props = withDefaults(
   defineProps<{ isMultiSelect?: boolean; stageContentMenu: (MenuButton | MenuComponent)[] }>(),

@@ -56,13 +56,17 @@
   </TMagicDialog>
 </template>
 
-<script setup lang="ts" name="MFormDialog">
+<script setup lang="ts">
 import { computed, ref } from 'vue';
 
 import { TMagicButton, TMagicCol, TMagicDialog, TMagicRow } from '@tmagic/design';
 
 import Form from './Form.vue';
 import { FormConfig, StepConfig } from './schema';
+
+defineOptions({
+  name: 'MFormDialog',
+});
 
 const props = withDefaults(
   defineProps<{

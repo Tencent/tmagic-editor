@@ -18,16 +18,16 @@
     "delegate": "^3.2.0",
     "qrcode": "^1.5.0",
     "tiny-emitter": "^2.1.0",
-    "vue": "^3.2.37"
+    "vue": "^3.3.4"
   },
   "peerDependencies": {
     "qrcode": "^1.5.0",
-    "vue": "^3.2.37"
+    "vue": "^3.3.4"
   },
   "devDependencies": {
     "@testing-library/vue": "^6.4.2",
     "@types/qrcode": "^1.4.2",
-    "@vue/compiler-sfc": "^3.2.37",
-    "@vue/test-utils": "^2.0.0"
+    "@vue/compiler-sfc": "^3.3.4",
+    "@vue/test-utils": "^2.3.2"
   }
 }

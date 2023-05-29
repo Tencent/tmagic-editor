@@ -31,23 +31,14 @@
 import { computed } from 'vue';
 import { DatePicker as TDatePicker, DateRangePicker as TDateRangePicker } from 'tdesign-vue-next';
 
+import type { DatePickerProps } from '@tmagic/design';
+
 const props = withDefaults(
-  defineProps<{
-    type?: any;
-    modelValue?: any;
-    disabled?: boolean;
-    placeholder?: string;
-    rangeSeparator?: string;
-    startPlaceholder?: string;
-    endPlaceholder?: string;
-    format?: string;
-    /** 可选，绑定值的格式。 不指定则绑定值为 Date 对象 */
-    valueFormat?: any;
-    /** 在范围选择器里取消两个日期面板之间的联动 */
-    unlinkPanels?: boolean;
-    defaultTime?: any;
-    size?: 'large' | 'default' | 'small';
-  }>(),
+  defineProps<
+    DatePickerProps & {
+      valueFormat: any;
+    }
+  >(),
   {
     type: 'date',
   },

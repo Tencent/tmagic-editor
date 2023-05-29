@@ -4,24 +4,23 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMForm">
+<script setup lang="ts">
 import { computed, ref } from 'vue';
 
 import { getConfig } from './config';
+import type { FormProps } from './types';
 
-const form = ref<any>();
+defineOptions({
+  name: 'TMForm',
+});
 
-const props = defineProps<{
-  model?: any;
-  labelWidth?: string | number;
-  disabled?: boolean;
-  inline?: boolean;
-  labelPosition?: string;
-}>();
+const props = defineProps<FormProps>();
 
 const uiComponent = getConfig('components').form;
 
 const uiProps = computed(() => uiComponent.props(props));
+
+const form = ref<any>();
 
 defineExpose({
   validate() {

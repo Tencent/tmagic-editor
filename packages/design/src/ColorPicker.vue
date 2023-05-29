@@ -9,23 +9,20 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMColorPicker">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { ColorPickerProps } from './types';
 
-const props = withDefaults(
-  defineProps<{
-    modelValue?: string;
-    disabled?: boolean;
-    showAlpha?: boolean;
-    size?: 'large' | 'default' | 'small';
-  }>(),
-  {
-    showAlpha: false,
-    disabled: false,
-  },
-);
+defineOptions({
+  name: 'TMColorPicker',
+});
+
+const props = withDefaults(defineProps<ColorPickerProps>(), {
+  showAlpha: false,
+  disabled: false,
+});
 
 const uiComponent = getConfig('components').colorPicker;
 

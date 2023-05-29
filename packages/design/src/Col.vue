@@ -4,14 +4,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMCol">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { ColProps } from './types';
 
-const props = defineProps<{
-  span?: number;
-}>();
+defineOptions({
+  name: 'TMCol',
+});
+
+const props = defineProps<ColProps>();
 
 const uiComponent = getConfig('components').col;
 

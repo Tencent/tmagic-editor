@@ -8,21 +8,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMPopover">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { PopoverProps } from './types';
 
-const props = defineProps<{
-  placement?: string;
-  width?: string | number;
-  title?: string;
-  trigger?: string;
-  effect?: string;
-  content?: string;
-  disabled?: boolean;
-  popperClass?: string;
-}>();
+defineOptions({
+  name: 'TMPopover',
+});
+
+const props = defineProps<PopoverProps>();
 
 const uiComponent = getConfig('components').popover;
 

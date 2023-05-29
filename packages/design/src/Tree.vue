@@ -19,37 +19,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMTree">
+<script setup lang="ts">
 import { computed, ref } from 'vue';
 
 import { getConfig } from './config';
+import type { TreeProps } from './types';
 
-const props = defineProps<{
-  data?: any[];
-  emptyText?: string;
-  nodeKey?: string;
-  props?: any;
-  renderAfterExpand?: boolean;
-  load?: any;
-  renderContent?: any;
-  highlightCurrent?: boolean;
-  defaultExpandAll?: boolean;
-  checkOnClickNode?: boolean;
-  autoExpandParent?: boolean;
-  defaultExpandedKeys?: any[];
-  showCheckbox?: boolean;
-  checkStrictly?: boolean;
-  defaultCheckedKeys?: any[];
-  currentNodeKey?: string | number;
-  filterNodeMethod?: (value: any, data: any, node: any) => boolean;
-  accordion?: boolean;
-  indent?: number;
-  icon?: any;
-  lazy?: boolean;
-  draggable?: boolean;
-  allowDrag?: (node: any) => boolean;
-  allowDrop?: any;
-}>();
+defineOptions({
+  name: 'TMTree',
+});
+
+const props = defineProps<TreeProps>();
 
 const uiComponent = getConfig('components').tree;
 

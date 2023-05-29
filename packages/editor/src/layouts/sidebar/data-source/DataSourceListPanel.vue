@@ -61,6 +61,10 @@ import type { Services } from '@editor/type';
 
 import DataSourceConfigPanel from './DataSourceConfigPanel.vue';
 
+defineOptions({
+  name: 'MEditorDataSourceListPanel',
+});
+
 const services = inject<Partial<Services>>('services', {});
 const { dataSourceService, depService } = inject<Services>('services') || {};
 

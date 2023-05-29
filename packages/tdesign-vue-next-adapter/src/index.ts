@@ -42,6 +42,48 @@ import {
   Upload as TUpload,
 } from 'tdesign-vue-next';
 
+import type {
+  BadgeProps,
+  ButtonProps,
+  CardProps,
+  CascaderProps,
+  CheckboxGroupProps,
+  CheckboxProps,
+  CollapseItemProps,
+  CollapseProps,
+  ColorPickerProps,
+  ColProps,
+  DatePickerProps,
+  DialogProps,
+  DrawerProps,
+  DropdownItemProps,
+  DropdownProps,
+  FormItemProps,
+  FormProps,
+  InputNumberProps,
+  InputProps,
+  OptionGroupProps,
+  OptionProps,
+  PaginationProps,
+  PopoverProps,
+  RadioButtonProps,
+  RadioGroupProps,
+  RadioProps,
+  SelectProps,
+  StepProps,
+  StepsProps,
+  SwitchProps,
+  TableColumnProps,
+  TableProps,
+  TabPaneProps,
+  TabsProps,
+  TagProps,
+  TimePickerProps,
+  TooltipProps,
+  TreeProps,
+  UploadProps,
+} from '@tmagic/design';
+
 import DatePicker from './DatePicker.vue';
 import Icon from './Icon.vue';
 import Input from './Input.vue';
@@ -71,7 +113,7 @@ const adapter: any = {
   components: {
     badge: {
       component: TBadge,
-      props: (props: any) => ({
+      props: (props: BadgeProps) => ({
         count: props.value,
         dot: props.isDot,
         maxCount: props.max,
@@ -80,7 +122,7 @@ const adapter: any = {
 
     button: {
       component: TButton,
-      props: (props: any) => ({
+      props: (props: ButtonProps) => ({
         theme: props.type,
         size: props.size === 'default' ? 'medium' : props.size,
         icon: () => (props.icon ? h(props.icon) : null),
@@ -90,7 +132,7 @@ const adapter: any = {
 
     card: {
       component: TCard,
-      props: (props: any) => ({
+      props: (props: CardProps) => ({
         shadow: props.shadow !== 'never',
         hoverShadow: props.shadow === 'hover',
         header: props.header,
@@ -99,7 +141,7 @@ const adapter: any = {
 
     cascader: {
       component: TCascader,
-      props: (props: any) => ({
+      props: (props: CascaderProps) => ({
         modelValue: props.modelValue,
         placeholder: props.placeholder,
         disabled: props.disabled,
@@ -117,7 +159,7 @@ const adapter: any = {
 
     checkbox: {
       component: TCheckbox,
-      props: (props: any) => ({
+      props: (props: CheckboxProps) => ({
         modelValue: props.modelValue,
         label: props.label,
         value: props.value,
@@ -127,7 +169,7 @@ const adapter: any = {
 
     checkboxGroup: {
       component: TCheckboxGroup,
-      props: (props: any) => ({
+      props: (props: CheckboxGroupProps) => ({
         modelValue: props.modelValue,
         label: props.label,
         disabled: props.disabled,
@@ -136,14 +178,14 @@ const adapter: any = {
 
     col: {
       component: TCol,
-      props: (props: any) => ({
+      props: (props: ColProps) => ({
         span: props.span,
       }),
     },
 
     collapse: {
       component: TCollapse,
-      props: (props: any) => ({
+      props: (props: CollapseProps) => ({
         value: props.modelValue,
         expandIconPlacement: 'right',
       }),
@@ -151,7 +193,7 @@ const adapter: any = {
 
     collapseItem: {
       component: TCollapsePanel,
-      props: (props: any) => ({
+      props: (props: CollapseItemProps) => ({
         value: props.name,
         header: props.title,
         disabled: props.disabled,
@@ -160,7 +202,7 @@ const adapter: any = {
 
     colorPicker: {
       component: TColorPicker,
-      props: (props: any) => ({
+      props: (props: ColorPickerProps) => ({
         modelValue: props.modelValue,
         disabled: props.disabled,
         size: props.size === 'default' ? 'medium' : props.size,
@@ -171,12 +213,12 @@ const adapter: any = {
 
     datePicker: {
       component: DatePicker,
-      props: (props: any) => props,
+      props: (props: DatePickerProps) => props,
     },
 
     dialog: {
       component: TDialog,
-      props: (props: any) => ({
+      props: (props: DialogProps) => ({
         visible: props.modelValue,
         attach: props.appendToBody ? 'body' : '',
         header: props.title,
@@ -196,7 +238,7 @@ const adapter: any = {
 
     drawer: {
       component: TDrawer,
-      props: (props: any) => ({
+      props: (props: DrawerProps) => ({
         visible: props.modelValue,
         size: props.size,
         closeOnEscKeydown: props.closeOnPressEscape,
@@ -213,7 +255,7 @@ const adapter: any = {
 
     dropdown: {
       component: TDropdown,
-      props: (props: any) => ({
+      props: (props: DropdownProps) => ({
         maxHeight: props.maxHeight,
         disabled: props.disable,
         direction: props.placement,
@@ -228,7 +270,7 @@ const adapter: any = {
 
     dropdownItem: {
       component: TDropdownItem,
-      props: (props: any) => ({
+      props: (props: DropdownItemProps) => ({
         disabled: props.disabled,
         divider: props.divided,
         prefixIcon: props.icon && (() => h(props.icon)),
@@ -238,12 +280,12 @@ const adapter: any = {
 
     dropdownMenu: {
       component: TDropdown,
-      props: (props: any) => props,
+      props: () => ({}),
     },
 
     form: {
       component: TForm,
-      props: (props: any) => ({
+      props: (props: FormProps) => ({
         data: props.model,
         labelWidth: props.labelWidth,
         disabled: props.disabled,
@@ -254,7 +296,7 @@ const adapter: any = {
 
     formItem: {
       component: TFormItem,
-      props: (props: any) => ({
+      props: (props: FormItemProps) => ({
         labelWidth: props.labelWidth,
         name: props.prop,
         rules: props.rules,
@@ -263,17 +305,17 @@ const adapter: any = {
 
     icon: {
       component: Icon,
-      props: (props: any) => props,
+      props: () => ({}),
     },
 
     input: {
       component: Input,
-      props: (props: any) => props,
+      props: (props: InputProps) => props,
     },
 
     inputNumber: {
       component: TInputNumber,
-      props: (props: any) => ({
+      props: (props: InputNumberProps) => ({
         modelValue: props.modelValue,
         align: props.controlsPosition,
         disabled: props.disabled,
@@ -287,7 +329,7 @@ const adapter: any = {
 
     option: {
       component: TOption,
-      props: (props: any) => ({
+      props: (props: OptionProps) => ({
         value: props.value,
         label: props.label,
         disabled: props.disabled,
@@ -296,12 +338,12 @@ const adapter: any = {
 
     optionGroup: {
       component: TOptionGroup,
-      props: (props: any) => props,
+      props: (props: OptionGroupProps) => props,
     },
 
     pagination: {
       component: TPagination,
-      props: (props: any) => ({
+      props: (props: PaginationProps) => ({
         current: props.curPage,
         pageSizeOptions: props.pageSizes,
         pageSize: props.pagesize,
@@ -311,7 +353,7 @@ const adapter: any = {
 
     popover: {
       component: TPopup,
-      props: (props: any) => ({
+      props: (props: PopoverProps) => ({
         placement: props.placement,
         trigger: props.trigger,
         content: props.content,
@@ -322,21 +364,21 @@ const adapter: any = {
 
     radio: {
       component: TRadio,
-      props: (props: any) => ({
+      props: (props: RadioProps) => ({
         label: props.label,
       }),
     },
 
     radioButton: {
       component: TRadioButton,
-      props: (props: any) => ({
+      props: (props: RadioButtonProps) => ({
         label: props.label,
       }),
     },
 
     radioGroup: {
       component: TRadioGroup,
-      props: (props: any) => ({
+      props: (props: RadioGroupProps) => ({
         modelValue: props.modelValue,
         disabled: props.disabled,
         size: props.size === 'default' ? 'medium' : props.size,
@@ -349,12 +391,12 @@ const adapter: any = {
 
     scrollbar: {
       component: Scrollbar,
-      props: (props: any) => props,
+      props: () => ({}),
     },
 
     select: {
       component: TSelect,
-      props: (props: any) => ({
+      props: (props: SelectProps) => ({
         modelValue: props.modelValue,
         clearable: props.clearable,
         filterable: props.filterable,
@@ -372,7 +414,7 @@ const adapter: any = {
 
     step: {
       component: TStepItem,
-      props: (props: any) => ({
+      props: (props: StepProps) => ({
         title: props.props,
         value: props.status,
       }),
@@ -380,14 +422,14 @@ const adapter: any = {
 
     steps: {
       component: TSteps,
-      props: (props: any) => ({
+      props: (props: StepsProps) => ({
         current: props.active,
       }),
     },
 
     switch: {
       component: TSwitch,
-      props: (props: any) => ({
+      props: (props: SwitchProps) => ({
         modelValue: props.modelValue,
         disabled: props.disabled,
         label: props.label,
@@ -398,17 +440,17 @@ const adapter: any = {
 
     table: {
       component: TTable,
-      props: (props: any) => props,
+      props: (props: TableProps) => props,
     },
 
     tableColumn: {
       component: TableColumn,
-      props: (props: any) => props,
+      props: (props: TableColumnProps) => props,
     },
 
     tabPane: {
       component: TTabPanel,
-      props: (props: any) => ({
+      props: (props: TabPaneProps) => ({
         label: props.label,
         value: props.name,
       }),
@@ -416,7 +458,7 @@ const adapter: any = {
 
     tabs: {
       component: TTabs,
-      props: (props: any) => ({
+      props: (props: TabsProps) => ({
         addable: props.editable,
         theme: props.type === 'card' ? 'card' : 'normal',
         placement: props.tabPosition,
@@ -426,14 +468,14 @@ const adapter: any = {
 
     tag: {
       component: TTag,
-      props: (props: any) => ({
+      props: (props: TagProps) => ({
         theme: props.type ? props.type : 'default',
       }),
     },
 
     timePicker: {
       component: TTimePicker,
-      props: (props: any) => ({
+      props: (props: TimePickerProps) => ({
         modelValue: props.modelValue,
         disabled: props.disabled,
         size: props.size === 'default' ? 'medium' : props.size,
@@ -443,7 +485,7 @@ const adapter: any = {
 
     tooltip: {
       component: TTooltip,
-      props: (props: any) => ({
+      props: (props: TooltipProps) => ({
         placement: props.placement,
         content: props.content,
       }),
@@ -451,7 +493,7 @@ const adapter: any = {
 
     tree: {
       component: Tree,
-      props: (props: any) => ({
+      props: (props: TreeProps) => ({
         ...props,
         data: props.data,
         draggable: props.draggable,
@@ -477,7 +519,7 @@ const adapter: any = {
 
     upload: {
       component: TUpload,
-      props: (props: any) => ({
+      props: (props: UploadProps) => ({
         action: props.action,
         disabled: props.disabled,
         autoUpload: props.autoUpload,

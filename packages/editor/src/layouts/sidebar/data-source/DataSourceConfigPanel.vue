@@ -27,6 +27,10 @@ import { MForm } from '@tmagic/form';
 
 import type { Services } from '@editor/type';
 
+defineOptions({
+  name: 'MEditorDataSourceConfigPanel',
+});
+
 const props = defineProps<{
   title?: string;
   values: any;

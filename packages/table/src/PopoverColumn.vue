@@ -21,12 +21,16 @@
   </TMagicTableColumn>
 </template>
 
-<script lang="ts" setup name="MTablePopoverColumn">
+<script lang="ts" setup>
 import { TMagicButton, TMagicPopover, TMagicTableColumn } from '@tmagic/design';
 
 import { ColumnConfig } from './schema';
 import MTable from './Table.vue';
 import { formatter } from './utils';
+
+defineOptions({
+  name: 'MTablePopoverColumn',
+});
 
 withDefaults(
   defineProps<{

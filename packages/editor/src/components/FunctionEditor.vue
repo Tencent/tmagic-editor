@@ -32,7 +32,7 @@
     ></CodeDraftEditor>
   </TMagicCard>
 </template>
-<script lang="ts" setup name="MEditorFunctionEditor">
+<script lang="ts" setup>
 import { inject, ref, watchEffect } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
@@ -43,6 +43,11 @@ import { CodeParam, Id } from '@tmagic/schema';
 import type { Services } from '@editor/type';
 
 import CodeDraftEditor from './CodeDraftEditor.vue';
+
+defineOptions({
+  name: 'MEditorFunctionEditor',
+});
+
 const defaultParamColConfig: ColumnConfig = {
   type: 'row',
   label: '参数类型',

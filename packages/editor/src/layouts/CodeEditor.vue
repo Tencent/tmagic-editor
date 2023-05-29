@@ -2,11 +2,15 @@
   <div ref="codeEditor" class="magic-code-editor"></div>
 </template>
 
-<script lang="ts" setup name="MEditorCodeEditor">
+<script lang="ts" setup>
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { throttle } from 'lodash-es';
 import * as monaco from 'monaco-editor';
 import serialize from 'serialize-javascript';
+
+defineOptions({
+  name: 'MEditorCodeEditor',
+});
 
 const props = withDefaults(
   defineProps<{

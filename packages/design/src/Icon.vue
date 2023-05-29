@@ -4,8 +4,12 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMIcon">
+<script setup lang="ts">
 import { getConfig } from './config';
+
+defineOptions({
+  name: 'TMIcon',
+});
 
 const uiComponent = getConfig('components').icon;
 </script>

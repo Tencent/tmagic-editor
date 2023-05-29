@@ -19,6 +19,10 @@ import { Search } from '@element-plus/icons-vue';
 
 import { TMagicIcon, TMagicInput } from '@tmagic/design';
 
+defineOptions({
+  name: 'MEditorSearchInput',
+});
+
 const emit = defineEmits(['search']);
 
 const filterText = ref('');

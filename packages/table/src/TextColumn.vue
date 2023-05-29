@@ -57,11 +57,15 @@
   </TMagicTableColumn>
 </template>
 
-<script lang="ts" setup name="MTableColumn">
+<script lang="ts" setup>
 import { TMagicButton, TMagicForm, TMagicTableColumn, TMagicTag } from '@tmagic/design';
 
 import { ColumnConfig } from './schema';
 import { formatter } from './utils';
+
+defineOptions({
+  name: 'MTableColumn',
+});
 
 withDefaults(
   defineProps<{

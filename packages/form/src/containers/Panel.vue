@@ -57,7 +57,7 @@
   </TMagicCard>
 </template>
 
-<script setup lang="ts" name="MFormPanel">
+<script setup lang="ts">
 import { computed, inject, ref } from 'vue';
 import { CaretBottom, CaretRight } from '@element-plus/icons-vue';
 
@@ -67,6 +67,10 @@ import { FormState, PanelConfig } from '../schema';
 import { filterFunction } from '../utils/form';
 
 import Container from './Container.vue';
+
+defineOptions({
+  name: 'MFormPanel',
+});
 
 const props = defineProps<{
   model: any;

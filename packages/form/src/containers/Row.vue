@@ -19,7 +19,7 @@
   </TMagicRow>
 </template>
 
-<script setup lang="ts" name="MFormRow">
+<script setup lang="ts">
 import { inject } from 'vue';
 
 import { TMagicRow } from '@tmagic/design';
@@ -27,6 +27,10 @@ import { TMagicRow } from '@tmagic/design';
 import { FormState, RowConfig } from '../schema';
 
 import Col from './Col.vue';
+
+defineOptions({
+  name: 'MFormRow',
+});
 
 const props = defineProps<{
   model: any;

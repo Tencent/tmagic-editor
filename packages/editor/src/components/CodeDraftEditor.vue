@@ -23,7 +23,7 @@
     </div>
   </div>
 </template>
-<script lang="ts" setup name="MEditorCodeDraftEditor">
+<script lang="ts" setup>
 import { computed, inject, ref, watchEffect } from 'vue';
 import type * as monaco from 'monaco-editor';
 
@@ -33,6 +33,10 @@ import { datetimeFormatter } from '@tmagic/utils';
 
 import MagicCodeEditor from '@editor/layouts/CodeEditor.vue';
 import type { Services } from '@editor/type';
+
+defineOptions({
+  name: 'MEditorCodeDraftEditor',
+});
 
 const props = withDefaults(
   defineProps<{

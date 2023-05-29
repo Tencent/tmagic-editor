@@ -9,28 +9,17 @@
   ></component>
 </template>
 
-<script setup lang="ts" name="TMCascader">
+<script setup lang="ts">
 import { computed, ref } from 'vue';
 
 import { getConfig } from './config';
-import { CascaderOption } from './type';
+import { CascaderProps } from './types';
 
-const props = defineProps<{
-  modelValue?: any;
-  placeholder?: string;
-  disabled?: boolean;
-  clearable?: boolean;
-  filterable?: boolean;
-  options?: CascaderOption[];
-  size?: 'large' | 'default' | 'small';
-  props: {
-    expandTrigger?: 'click' | 'hover';
-    multiple?: boolean;
-    checkStrictly?: boolean;
-    emitPath?: boolean;
-    lazy?: boolean;
-  };
-}>();
+defineOptions({
+  name: 'TMCascader',
+});
+
+const props = defineProps<CascaderProps>();
 
 const uiComponent = getConfig('components').cascader;
 

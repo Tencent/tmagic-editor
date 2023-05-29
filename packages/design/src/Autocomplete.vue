@@ -26,23 +26,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMAutocomplete">
+<script setup lang="ts">
 import { computed, ref, watchEffect } from 'vue';
 
 import { getConfig } from './config';
+import type { AutocompleteProps } from './types';
 
-const props = defineProps<{
-  modelValue?: string;
-  placeholder?: string;
-  label?: string;
-  clearable?: boolean;
-  disabled?: boolean;
-  triggerOnFocus?: boolean;
-  valueKey?: string;
-  debounce?: number;
-  placement?: 'top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end';
-  fetchSuggestions?: (queryString: string, callback: (data: any[]) => any) => void;
-}>();
+defineOptions({
+  name: 'TMAutocomplete',
+});
+
+const props = defineProps<AutocompleteProps>();
 
 const uiComponent = getConfig('components').autocomplete;
 

@@ -4,8 +4,12 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMRow">
+<script setup lang="ts">
 import { getConfig } from './config';
+
+defineOptions({
+  name: 'TMRow',
+});
 
 const uiComponent = getConfig('components').row;
 </script>

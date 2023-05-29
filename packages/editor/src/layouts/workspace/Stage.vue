@@ -26,7 +26,7 @@
   </ScrollViewer>
 </template>
 
-<script lang="ts" setup name="MEditorStage">
+<script lang="ts" setup>
 import { computed, inject, markRaw, nextTick, onMounted, onUnmounted, ref, toRaw, watch, watchEffect } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
@@ -38,6 +38,10 @@ import { Layout, MenuButton, MenuComponent, Services, StageOptions } from '@edit
 import { useStage } from '@editor/utils/stage';
 
 import ViewerMenu from './ViewerMenu.vue';
+
+defineOptions({
+  name: 'MEditorStage',
+});
 
 defineProps<{
   stageContentMenu: (MenuButton | MenuComponent)[];

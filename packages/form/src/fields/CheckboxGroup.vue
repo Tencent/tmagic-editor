@@ -11,14 +11,18 @@
   </TMagicCheckboxGroup>
 </template>
 
-<script lang="ts" setup name="MFormCheckGroup">
+<script lang="ts" setup>
 import { computed, inject } from 'vue';
 
 import { TMagicCheckbox, TMagicCheckboxGroup } from '@tmagic/design';
 
 import { CheckboxGroupConfig, FormState } from '../schema';
+import { filterFunction } from '../utils/form';
 import { useAddField } from '../utils/useAddField';
-import { filterFunction } from '..';
+
+defineOptions({
+  name: 'MFormCheckGroup',
+});
 
 const props = defineProps<{
   config: CheckboxGroupConfig;

@@ -14,17 +14,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMTabs">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { TabsProps } from './types';
 
-const props = defineProps<{
-  type?: string;
-  editable?: boolean;
-  tabPosition?: string;
-  modelValue?: string | number;
-}>();
+defineOptions({
+  name: 'TMTabs',
+});
+
+const props = defineProps<TabsProps>();
 
 const uiComponent = getConfig('components').tabs;
 

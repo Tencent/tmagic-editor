@@ -9,32 +9,19 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMDatePicker">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { DatePickerProps } from './types';
 
-const props = withDefaults(
-  defineProps<{
-    type?: string;
-    modelValue?: any;
-    disabled?: boolean;
-    placeholder?: string;
-    rangeSeparator?: string;
-    startPlaceholder?: string;
-    endPlaceholder?: string;
-    format?: string;
-    /** 可选，绑定值的格式。 不指定则绑定值为 Date 对象 */
-    valueFormat?: string;
-    /** 在范围选择器里取消两个日期面板之间的联动 */
-    unlinkPanels?: boolean;
-    defaultTime?: any;
-    size?: 'large' | 'default' | 'small';
-  }>(),
-  {
-    type: 'date',
-  },
-);
+defineOptions({
+  name: 'TMDatePicker',
+});
+
+const props = withDefaults(defineProps<DatePickerProps>(), {
+  type: 'date',
+});
 
 const uiComponent = getConfig('components').datePicker;
 

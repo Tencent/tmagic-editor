@@ -4,16 +4,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMOption">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { OptionProps } from './types';
 
-const props = defineProps<{
-  value?: any;
-  label?: string;
-  disabled?: boolean;
-}>();
+defineOptions({
+  name: 'TMOption',
+});
+
+const props = defineProps<OptionProps>();
 
 const uiComponent = getConfig('components').option;
 

@@ -50,6 +50,10 @@ import type { DataSchema, DataSourceSchema } from '@tmagic/schema';
 import Icon from '@editor/components/Icon.vue';
 import type { Services } from '@editor/type';
 
+defineOptions({
+  name: 'MEditorDataSourceInput',
+});
+
 const props = withDefaults(
   defineProps<{
     config: {

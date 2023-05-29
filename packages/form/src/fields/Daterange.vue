@@ -13,7 +13,7 @@
   ></TMagicDatePicker>
 </template>
 
-<script lang="ts" setup name="MFormDateRange">
+<script lang="ts" setup>
 import { ref, watch } from 'vue';
 
 import { TMagicDatePicker } from '@tmagic/design';
@@ -21,6 +21,10 @@ import { datetimeFormatter } from '@tmagic/utils';
 
 import { DaterangeConfig } from '../schema';
 import { useAddField } from '../utils/useAddField';
+
+defineOptions({
+  name: 'MFormDateRange',
+});
 
 const props = defineProps<{
   config: DaterangeConfig;

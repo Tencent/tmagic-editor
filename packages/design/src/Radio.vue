@@ -4,14 +4,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMRadio">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
+import type { RadioProps } from './types';
 
-const props = defineProps<{
-  label?: string | number | boolean;
-}>();
+defineOptions({
+  name: 'TMRadio',
+});
+
+const props = defineProps<RadioProps>();
 
 const uiComponent = getConfig('components').radio;
 

@@ -2,9 +2,13 @@
   <m-fields-link :config="formConfig" :model="modelValue" name="form" @change="changeHandler"></m-fields-link>
 </template>
 
-<script lang="ts" setup name="MEditorCodeLink">
+<script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 import serialize from 'serialize-javascript';
+
+defineOptions({
+  name: 'MEditorCodeLink',
+});
 
 const props = defineProps<{
   config: {

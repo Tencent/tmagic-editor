@@ -31,7 +31,7 @@
   </TMagicScrollbar>
 </template>
 
-<script lang="ts" setup name="MEditorComponentListPanel">
+<script lang="ts" setup>
 import { computed, inject, ref } from 'vue';
 import { Grid } from '@element-plus/icons-vue';
 import serialize from 'serialize-javascript';
@@ -42,6 +42,10 @@ import { removeClassNameByClassName } from '@tmagic/utils';
 import MIcon from '@editor/components/Icon.vue';
 import SearchInput from '@editor/components/SearchInput.vue';
 import type { ComponentGroup, ComponentItem, Services, StageOptions } from '@editor/type';
+
+defineOptions({
+  name: 'MEditorComponentListPanel',
+});
 
 const searchText = ref('');
 

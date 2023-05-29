@@ -4,9 +4,13 @@
   </span>
 </template>
 
-<script lang="ts" setup name="MEditorResizer">
+<script lang="ts" setup>
 import { onMounted, onUnmounted, ref } from 'vue';
 import Gesto from 'gesto';
+
+defineOptions({
+  name: 'MEditorResizer',
+});
 
 const emit = defineEmits(['change']);
 

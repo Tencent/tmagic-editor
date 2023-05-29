@@ -61,28 +61,27 @@
     "lodash-es": "^4.17.21",
     "monaco-editor": "^0.34.0",
     "serialize-javascript": "^6.0.0",
-    "vue": "^3.2.37"
+    "vue": "^3.3.4"
   },
   "peerDependencies": {
     "@tmagic/design": "1.2.15",
     "@tmagic/form": "1.2.15",
     "monaco-editor": "^0.34.0",
-    "vue": "^3.2.37"
+    "vue": "^3.3.4"
   },
   "devDependencies": {
     "@types/events": "^3.0.0",
     "@types/lodash-es": "^4.17.4",
     "@types/node": "^15.12.4",
     "@types/serialize-javascript": "^5.0.1",
-    "@vitejs/plugin-vue": "^4.1.0",
-    "@vue/compiler-sfc": "^3.2.37",
-    "@vue/test-utils": "^2.0.0",
+    "@vitejs/plugin-vue": "^4.2.3",
+    "@vue/compiler-sfc": "^3.3.4",
+    "@vue/test-utils": "^2.3.2",
     "rimraf": "^3.0.2",
     "sass": "^1.35.1",
     "tsc-alias": "^1.8.5",
     "typescript": "^5.0.4",
     "vite": "^4.3.8",
-    "vite-plugin-vue-setup-extend": "^0.4.0",
-    "vue-tsc": "^1.0.11"
+    "vue-tsc": "^1.6.5"
   }
 }

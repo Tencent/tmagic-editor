@@ -7,15 +7,17 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMFormItem">
+<script setup lang="ts">
 import { computed } from 'vue';
 
 import { getConfig } from './config';
-const props = defineProps<{
-  prop?: string;
-  labelWidth?: string | number;
-  rules?: any;
-}>();
+import type { FormItemProps } from './types';
+
+defineOptions({
+  name: 'TMFormItem',
+});
+
+const props = defineProps<FormItemProps>();
 
 const uiComponent = getConfig('components').formItem;
 

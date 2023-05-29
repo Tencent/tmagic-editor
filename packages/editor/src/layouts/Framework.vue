@@ -42,7 +42,7 @@
   </div>
 </template>
 
-<script lang="ts" setup name="MEditorFramework">
+<script lang="ts" setup>
 import { computed, inject, ref, watch } from 'vue';
 
 import { TMagicScrollbar } from '@tmagic/design';
@@ -51,6 +51,10 @@ import Layout from '@editor/components/Layout.vue';
 import type { GetColumnWidth, Services } from '@editor/type';
 
 import AddPageBox from './AddPageBox.vue';
+
+defineOptions({
+  name: 'MEditorFramework',
+});
 
 const DEFAULT_LEFT_COLUMN_WIDTH = 310;
 const DEFAULT_RIGHT_COLUMN_WIDTH = 480;

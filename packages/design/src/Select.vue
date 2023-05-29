@@ -13,34 +13,25 @@
   </component>
 </template>
 
-<script setup lang="ts" name="TMSelect">
+<script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 
 import { getConfig } from './config';
+import type { SelectProps } from './types';
 
-const select = ref<any>();
+defineOptions({
+  name: 'TMSelect',
+});
 
-const props = defineProps<{
-  modelValue?: any;
-  clearable?: boolean;
-  filterable?: boolean;
-  popperClass?: string;
-  disabled?: boolean;
-  placeholder?: string;
-  remote?: boolean;
-  multiple?: boolean;
-  allowCreate?: boolean;
-  valueKey?: string;
-  remoteMethod?: any;
-  loading?: boolean;
-  size?: 'large' | 'default' | 'small';
-}>();
+const props = defineProps<SelectProps>();
 
 const uiComponent = getConfig('components').select;
 
 const uiProps = computed(() => uiComponent.props(props));
 
 const emit = defineEmits(['change', 'update:modelValue', 'visibleHandler']);
+
+const select = ref<any>();
 
 const changeHandler = (...args: any[]) => {
   emit('change', ...args);

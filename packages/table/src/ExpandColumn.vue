@@ -18,12 +18,16 @@
   </TMagicTableColumn>
 </template>
 
-<script lang="ts" setup name="MTableExpandColumn">
+<script lang="ts" setup>
 import { TMagicTableColumn } from '@tmagic/design';
 import { MForm } from '@tmagic/form';
 
 import { ColumnConfig } from './schema';
 import MTable from './Table.vue';
+
+defineOptions({
+  name: 'MTableExpandColumn',
+});
 
 const props = withDefaults(
   defineProps<{

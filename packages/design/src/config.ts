@@ -17,7 +17,7 @@
  */
 
 import defaultAdapter from './defaultAdapter';
-import { PluginOptions } from './type';
+import { PluginOptions } from './types';
 
 let $MAGIC_DESIGN: PluginOptions = {};
 
