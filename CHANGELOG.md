@@ -1,3 +1,19 @@
+# [1.3.0-alpha.4](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.3...v1.3.0-alpha.4) (2023-05-30)
+
+
+### Bug Fixes
+
+* **design:** 默认props ([05dfd9d](https://github.com/Tencent/tmagic-editor/commit/05dfd9d9361c77e573eca61d674ac28930645776))
+
+
+### Features
+
+* **editor:** 事件配置默认展开全部 ([256a958](https://github.com/Tencent/tmagic-editor/commit/256a9586d73fc53ab9ff0018d7fb8fba3dd6491a))
+* **editor:** 代码块配置默认全部展开 ([e83cf32](https://github.com/Tencent/tmagic-editor/commit/e83cf322b5099e2ecd6b77605dea4145a6b33e88))
+* **form:** groupList新增默认展开所有的配置 ([9281d06](https://github.com/Tencent/tmagic-editor/commit/9281d067234ceb24e0712901ed27984e8e6c60ba))
+
+
+
 # [1.3.0-alpha.3](https://github.com/Tencent/tmagic-editor/compare/v1.2.15...v1.3.0-alpha.3) (2023-05-30)
 
 
