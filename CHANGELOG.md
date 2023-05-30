@@ -1,3 +1,19 @@
+# [1.3.0-alpha.3](https://github.com/Tencent/tmagic-editor/compare/v1.2.15...v1.3.0-alpha.3) (2023-05-30)
+
+
+### Bug Fixes
+
+* **design:** button 判断默认slot ([a97523e](https://github.com/Tencent/tmagic-editor/commit/a97523e800a0530fd8241b88173eba4a55881458))
+* **editor:** 数据源模板输入框初始化显示问题 ([668991d](https://github.com/Tencent/tmagic-editor/commit/668991de264e498569018b496e49763a34888e82))
+
+
+### Features
+
+* 完善tdesign-vue-next适配 ([24604c9](https://github.com/Tencent/tmagic-editor/commit/24604c9d36feb716a1f4c384f17fa152aa0b3c12))
+* 新增数据源 ([aac478e](https://github.com/Tencent/tmagic-editor/commit/aac478eebc609050e57c85f5945250daed14ff00))
+
+
+
 ## [1.2.15](https://github.com/Tencent/tmagic-editor/compare/v1.2.14...v1.2.15) (2023-04-26)
 
 
