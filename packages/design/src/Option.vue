@@ -20,5 +20,5 @@ const ui = getConfig('components')?.option;
 
 const uiComponent = ui?.component || 'el-option';
 
-const uiProps = computed(() => ui?.props(props) || {});
+const uiProps = computed(() => ui?.props(props) || props);
 </script>

@@ -39,7 +39,7 @@ const ui = getConfig('components')?.drawer;
 
 const uiComponent = ui?.component || 'el-drawer';
 
-const uiProps = computed(() => ui?.props(props) || {});
+const uiProps = computed(() => ui?.props(props) || props);
 
 const openHandler = (...args: any[]) => {
   emit('open', ...args);

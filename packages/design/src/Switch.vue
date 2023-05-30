@@ -28,7 +28,7 @@ const ui = getConfig('components')?.switch;
 
 const uiComponent = ui?.component || 'el-switch';
 
-const uiProps = computed(() => ui?.props(props) || {});
+const uiProps = computed(() => ui?.props(props) || props);
 
 const emit = defineEmits(['change', 'update:modelValue']);
 

@@ -20,7 +20,7 @@ const ui = getConfig('components')?.form;
 
 const uiComponent = ui?.component || 'el-form';
 
-const uiProps = computed(() => ui?.props(props) || {});
+const uiProps = computed(() => ui?.props(props) || props);
 
 const form = ref<any>();
 

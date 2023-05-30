@@ -22,7 +22,7 @@ const ui = getConfig('components')?.button;
 
 const uiComponent = ui?.component || 'el-button';
 
-const uiProps = computed(() => ui?.props(props) || {});
+const uiProps = computed(() => ui?.props(props) || props);
 
 const emit = defineEmits(['click']);
 

@@ -31,7 +31,7 @@ const ui = getConfig('components')?.table;
 
 const uiComponent = ui?.component || 'el-table';
 
-const uiProps = computed(() => ui?.props(props) || {});
+const uiProps = computed(() => ui?.props(props) || props);
 
 const emit = defineEmits(['select', 'sort-change', 'expand-change', 'cell-click']);
 

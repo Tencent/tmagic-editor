@@ -26,5 +26,5 @@ const ui = getConfig('components')?.step;
 
 const uiComponent = ui?.component || 'el-step';
 
-const uiProps = computed(() => ui?.props(props) || {});
+const uiProps = computed(() => ui?.props(props) || props);
 </script>

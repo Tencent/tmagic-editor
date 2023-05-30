@@ -20,5 +20,5 @@ const ui = getConfig('components')?.tag;
 
 const uiComponent = ui?.component || 'el-tag';
 
-const uiProps = computed(() => ui?.props(props) || {});
+const uiProps = computed(() => ui?.props(props) || props);
 </script>

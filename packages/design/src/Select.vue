@@ -25,13 +25,13 @@ defineOptions({
 
 const props = defineProps<SelectProps>();
 
+const emit = defineEmits(['change', 'update:modelValue', 'visibleHandler']);
+
 const ui = getConfig('components')?.select;
 
 const uiComponent = ui?.component || 'el-select';
 
-const uiProps = computed(() => ui?.props(props) || {});
-
-const emit = defineEmits(['change', 'update:modelValue', 'visibleHandler']);
+const uiProps = computed(() => ui?.props(props) || props);
 
 const select = ref<any>();
 

@@ -35,7 +35,7 @@ const ui = getConfig('components')?.tree;
 
 const uiComponent = ui?.component || 'el-tree';
 
-const uiProps = computed(() => ui?.props(props) || {});
+const uiProps = computed(() => ui?.props(props) || props);
 
 const emit = defineEmits([
   'node-click',

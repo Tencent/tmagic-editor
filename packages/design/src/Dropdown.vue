@@ -24,7 +24,7 @@ const ui = getConfig('components')?.dropdown;
 
 const uiComponent = ui?.component || 'el-dropdown';
 
-const uiProps = computed(() => ui?.props(props) || {});
+const uiProps = computed(() => ui?.props(props) || props);
 
 const emit = defineEmits(['command']);
 

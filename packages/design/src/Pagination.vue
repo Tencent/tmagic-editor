@@ -21,13 +21,13 @@ defineOptions({
 
 const props = defineProps<PaginationProps>();
 
+const emit = defineEmits(['size-change', 'current-change']);
+
 const ui = getConfig('components')?.pagination;
 
 const uiComponent = ui?.component || 'el-pagination';
 
-const uiProps = computed(() => ui?.props(props) || {});
-
-const emit = defineEmits(['size-change', 'current-change']);
+const uiProps = computed(() => ui?.props(props) || props);
 
 const handleSizeChange = (...args: any[]) => {
   emit('size-change', ...args);

@@ -20,7 +20,7 @@ const ui = getConfig('components')?.optionGroup;
 
 const uiComponent = ui?.component || 'el-option-group';
 
-const uiProps = computed(() => ui?.props(props) || {});
+const uiProps = computed(() => ui?.props(props) || props);
 
 const optionGroup = ref<any>();
 </script>

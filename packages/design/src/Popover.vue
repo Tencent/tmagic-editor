@@ -24,5 +24,5 @@ const ui = getConfig('components')?.popover;
 
 const uiComponent = ui?.component || 'el-popover';
 
-const uiProps = computed(() => ui?.props(props) || {});
+const uiProps = computed(() => ui?.props(props) || props);
 </script>

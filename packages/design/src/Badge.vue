@@ -19,5 +19,5 @@ const props = defineProps<BadgeProps>();
 const ui = getConfig('components')?.badge;
 const uiComponent = ui?.component || 'el-badge';
 
-const uiProps = computed(() => ui?.props(props) || {});
+const uiProps = computed(() => ui?.props(props) || props);
 </script>

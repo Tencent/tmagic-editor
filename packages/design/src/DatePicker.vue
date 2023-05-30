@@ -27,7 +27,7 @@ const ui = getConfig('components')?.datePicker;
 
 const uiComponent = ui?.component || 'el-date-picker';
 
-const uiProps = computed(() => ui?.props(props) || {});
+const uiProps = computed(() => ui?.props(props) || props);
 
 const emit = defineEmits(['change', 'update:modelValue']);
 

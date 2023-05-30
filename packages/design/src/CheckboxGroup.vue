@@ -26,7 +26,7 @@ const ui = getConfig('components')?.checkboxGroup;
 
 const uiComponent = ui?.component || 'el-checkbox-group';
 
-const uiProps = computed(() => ui?.props(props) || {});
+const uiProps = computed(() => ui?.props(props) || props);
 
 const emit = defineEmits(['change', 'update:modelValue']);
 

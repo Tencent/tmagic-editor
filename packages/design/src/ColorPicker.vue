@@ -28,7 +28,7 @@ const ui = getConfig('components')?.colorPicker;
 
 const uiComponent = ui?.component || 'el-color-picker';
 
-const uiProps = computed(() => ui?.props(props) || {});
+const uiProps = computed(() => ui?.props(props) || props);
 
 const emit = defineEmits(['change', 'update:modelValue']);
 

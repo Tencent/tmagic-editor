@@ -30,7 +30,7 @@ const ui = getConfig('components')?.tabs;
 
 const uiComponent = ui?.component || 'el-tabs';
 
-const uiProps = computed(() => ui?.props(props) || {});
+const uiProps = computed(() => ui?.props(props) || props);
 
 const emit = defineEmits(['tab-click', 'tab-add', 'tab-remove', 'update:model-value']);
 

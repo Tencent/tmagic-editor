@@ -38,7 +38,7 @@ const ui = getConfig('components')?.input;
 
 const uiComponent = ui?.component || 'el-input';
 
-const uiProps = computed(() => ui?.props(props) || {});
+const uiProps = computed(() => ui?.props(props) || props);
 
 const emit = defineEmits(['change', 'input', 'update:modelValue']);
 

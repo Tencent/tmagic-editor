@@ -32,7 +32,7 @@ const ui = getConfig('components')?.collapseItem;
 
 const uiComponent = ui?.component || 'el-collapse-item';
 
-const uiProps = computed(() => ui?.props(props) || {});
+const uiProps = computed(() => ui?.props(props) || props);
 
 const emit = defineEmits(['change', 'update:modelValue']);
 

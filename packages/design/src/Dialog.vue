@@ -26,13 +26,13 @@ defineOptions({
 
 const props = defineProps<DialogProps>();
 
+const emit = defineEmits(['close', 'update:modelValue']);
+
 const ui = getConfig('components')?.dialog;
 
 const uiComponent = ui?.component || 'el-dialog';
 
-const uiProps = computed(() => ui?.props(props) || {});
-
-const emit = defineEmits(['close', 'update:modelValue']);
+const uiProps = computed(() => ui?.props(props) || props);
 
 const closeHandler = (...args: any[]) => {
   emit('close', ...args);

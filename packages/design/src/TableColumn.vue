@@ -23,5 +23,5 @@ const ui = getConfig('components')?.tableColumn;
 
 const uiComponent = ui?.component || 'el-table-column';
 
-const uiProps = computed(() => ui?.props(props) || {});
+const uiProps = computed(() => ui?.props(props) || props);
 </script>

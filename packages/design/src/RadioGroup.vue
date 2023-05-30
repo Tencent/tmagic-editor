@@ -26,7 +26,7 @@ const ui = getConfig('components')?.radioGroup;
 
 const uiComponent = ui?.component || 'el-radio-group';
 
-const uiProps = computed(() => ui?.props(props) || {});
+const uiProps = computed(() => ui?.props(props) || props);
 
 const emit = defineEmits(['change', 'update:modelValue']);
 
