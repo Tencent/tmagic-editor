@@ -36,6 +36,8 @@ const codeConfig = computed(() => ({
   type: 'group-list',
   name: 'hookData',
   enableToggleMode: false,
+  expandAll: true,
+  titleKey: 'codeId',
   items: [
     {
       type: 'code-select-col',
