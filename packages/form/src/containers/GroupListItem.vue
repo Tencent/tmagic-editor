@@ -76,7 +76,7 @@ const mForm = inject<FormState | undefined>('mForm');
 const expand = ref(false);
 
 watchEffect(() => {
-  expand.value = !props.index;
+  expand.value = props.config.expandAll || !props.index;
 });
 
 const rowConfig = computed(() => ({
