@@ -186,6 +186,7 @@ const actionsConfig = computed(() => ({
     {
       type: 'group-list',
       name: 'actions',
+      expandAll: true,
       enableToggleMode: false,
       items: [actionTypeConfig.value, targetCompConfig.value, compActionConfig.value, codeActionConfig.value],
     },
