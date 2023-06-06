@@ -1,3 +1,12 @@
+# [1.3.0-alpha.5](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.4...v1.3.0-alpha.5) (2023-06-06)
+
+
+### Features
+
+* **editor:** 添加几个slot ([97101f1](https://github.com/Tencent/tmagic-editor/commit/97101f18a6e2b86ca8c293f6af77069681a85ced))
+
+
+
 # [1.3.0-alpha.4](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.3...v1.3.0-alpha.4) (2023-05-30)
 
 
