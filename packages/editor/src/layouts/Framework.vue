@@ -1,14 +1,14 @@
 <template>
   <div class="m-editor">
-    <slot name="nav" class="m-editor-nav-menu"></slot>
+    <slot name="header"></slot>
 
-    <magic-code-editor
-      v-if="showSrc"
-      class="m-editor-content"
-      :init-values="root"
-      :options="codeOptions"
-      @save="saveCode"
-    ></magic-code-editor>
+    <slot name="nav"></slot>
+
+    <slot name="content-before"></slot>
+
+    <slot name="src-code" v-if="showSrc">
+      <CodeEditor class="m-editor-content" :init-values="root" :options="codeOptions" @save="saveCode"></CodeEditor>
+    </slot>
 
     <Layout
       v-else
@@ -39,6 +39,9 @@
         </TMagicScrollbar>
       </template>
     </Layout>
+
+    <slot name="content-after"></slot>
+    <slot name="footer"></slot>
   </div>
 </template>
 
@@ -51,6 +54,7 @@ import Layout from '@editor/components/Layout.vue';
 import type { GetColumnWidth, Services } from '@editor/type';
 
 import AddPageBox from './AddPageBox.vue';
+import CodeEditor from './CodeEditor.vue';
 
 defineOptions({
   name: 'MEditorFramework',
@@ -59,15 +63,7 @@ defineOptions({
 const DEFAULT_LEFT_COLUMN_WIDTH = 310;
 const DEFAULT_RIGHT_COLUMN_WIDTH = 480;
 
-withDefaults(
-  defineProps<{
-    codeOptions?: Record<string, any>;
-  }>(),
-  {
-    codeOptions: () => ({}),
-  },
-);
-
+const codeOptions = inject('codeOptions', {});
 const { editorService, uiService } = inject<Services>('services') || {};
 
 const root = computed(() => editorService?.get('root'));

@@ -1,8 +1,18 @@
 <template>
-  <Framework :code-options="codeOptions">
+  <Framework>
+    <template #header>
+      <slot name="header"></slot>
+    </template>
+
     <template #nav>
       <slot name="nav" :editorService="editorService"><TMagicNavMenu :data="menu"></TMagicNavMenu></slot>
     </template>
+
+    <template #content-before>
+      <slot name="content-before"></slot>
+    </template>
+
+    <template #src-code><slot name="src-code" :editorService="editorService"></slot></template>
 
     <template #sidebar>
       <slot name="sidebar" :editorService="editorService">
@@ -60,6 +70,14 @@
     </template>
 
     <template #empty><slot name="empty" :editorService="editorService"></slot></template>
+
+    <template #content-after>
+      <slot name="content-after"></slot>
+    </template>
+
+    <template #footer>
+      <slot name="footer"></slot>
+    </template>
   </Framework>
 </template>
 

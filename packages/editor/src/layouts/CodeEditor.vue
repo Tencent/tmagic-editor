@@ -14,8 +14,8 @@ defineOptions({
 
 const props = withDefaults(
   defineProps<{
-    initValues?: string | Object;
-    modifiedValues?: string | Object;
+    initValues?: string | Record<string | number, any> | null;
+    modifiedValues?: string | Record<string | number, any> | null;
     type?: 'diff';
     language?: string;
     options?: {
