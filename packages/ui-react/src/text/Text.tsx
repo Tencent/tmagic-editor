@@ -32,9 +32,9 @@ const Text: React.FC<TextProps> = ({ config }) => {
   if (!app) return null;
 
   return (
-    <div className="magic-ui-text" style={app.transformStyle(config.style || {})} id={`${config.id || ''}`}>
+    <p className="magic-ui-text" style={app.transformStyle(config.style || {})} id={`${config.id || ''}`}>
       {config.text}
-    </div>
+    </p>
   );
 };
 

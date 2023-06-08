@@ -1,5 +1,5 @@
 <template>
-  <span>{{ config.text }}</span>
+  <p>{{ config.text }}</p>
 </template>
 
 <script lang="ts" setup>
