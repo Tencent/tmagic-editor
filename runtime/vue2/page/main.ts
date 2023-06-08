@@ -28,6 +28,8 @@ import request from './utils/request';
 import AppComponent from './App.vue';
 import { getLocalConfig } from './utils';
 
+import '@tmagic/utils/resetcss.css';
+
 Vue.use(request);
 
 const app = new Core({

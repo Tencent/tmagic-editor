@@ -30,6 +30,7 @@
         v-if="previewVisible"
         ref="iframe"
         width="100%"
+        style="border: none"
         :height="stageRect && stageRect.height"
         :src="previewUrl"
       ></iframe>

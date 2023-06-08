@@ -9,6 +9,10 @@
     ".": {
       "import": "./dist/tmagic-utils.js",
       "require": "./dist/tmagic-utils.umd.cjs"
+    },
+    "./resetcss.css": {
+      "import": "./src/resetcss.css",
+      "require": "./src/resetcss.css"
     }
   },
   "license": "Apache-2.0",

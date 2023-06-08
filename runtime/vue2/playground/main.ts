@@ -22,6 +22,8 @@ import Core from '@tmagic/core';
 
 import App from './App.vue';
 
+import '@tmagic/utils/resetcss.css';
+
 Promise.all([import('../.tmagic/comp-entry'), import('../.tmagic/plugin-entry')]).then(([components, plugins]) => {
   Object.entries(components.default).forEach(([type, component]: [string, any]) => {
     Vue.component(`magic-ui-${type}`, component);

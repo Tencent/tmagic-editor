@@ -31,6 +31,8 @@ import plugins from '../.tmagic/plugin-entry';
 
 import App from './App';
 
+import '@tmagic/utils/resetcss.css';
+
 declare global {
   interface Window {
     appInstance: Core;

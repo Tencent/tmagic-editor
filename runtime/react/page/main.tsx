@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -28,6 +27,8 @@ import components from '../.tmagic/comp-entry';
 import plugins from '../.tmagic/plugin-entry';
 
 import App from './App';
+
+import '@tmagic/utils/resetcss.css';
 declare global {
   interface Window {
     magicDSL: MApp[];
