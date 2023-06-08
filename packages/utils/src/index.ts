@@ -285,5 +285,9 @@ export const compiledNode = (
     }, node);
   });
 
+  if (Array.isArray(node.items)) {
+    node.items.forEach((item) => compiledNode(compile, item, dataSourceDeps));
+  }
+
   return node;
 };
