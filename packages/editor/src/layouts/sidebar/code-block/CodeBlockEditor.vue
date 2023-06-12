@@ -10,7 +10,7 @@
     :size="size"
     :before-close="handleClose"
   >
-    <Layout v-model:left="left" :min-left="45" class="code-editor-layout">
+    <SplitView v-model:left="left" :min-left="45" class="code-editor-layout">
       <!-- 右侧区域 -->
       <template #center>
         <div v-if="!isEmpty(codeConfig)" class="m-editor-code-block-editor-panel">
@@ -28,7 +28,7 @@
           ></FunctionEditor>
         </div>
       </template>
-    </Layout>
+    </SplitView>
   </TMagicDrawer>
 </template>
 
@@ -41,7 +41,7 @@ import { ColumnConfig } from '@tmagic/form';
 import { CodeBlockContent } from '@tmagic/schema';
 
 import FunctionEditor from '@editor/components/FunctionEditor.vue';
-import Layout from '@editor/components/Layout.vue';
+import SplitView from '@editor/components/SplitView.vue';
 import type { ListState, Services } from '@editor/type';
 import { serializeConfig } from '@editor/utils/editor';
 

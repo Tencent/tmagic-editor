@@ -10,7 +10,7 @@
       <CodeEditor class="m-editor-content" :init-values="root" :options="codeOptions" @save="saveCode"></CodeEditor>
     </slot>
 
-    <Layout
+    <SplitView
       v-else
       class="m-editor-content"
       left-class="m-editor-framework-left"
@@ -38,7 +38,7 @@
           <slot name="props-panel"></slot>
         </TMagicScrollbar>
       </template>
-    </Layout>
+    </SplitView>
 
     <slot name="content-after"></slot>
     <slot name="footer"></slot>
@@ -50,7 +50,7 @@ import { computed, inject, ref, watch } from 'vue';
 
 import { TMagicScrollbar } from '@tmagic/design';
 
-import Layout from '@editor/components/Layout.vue';
+import SplitView from '@editor/components/SplitView.vue';
 import type { GetColumnWidth, Services } from '@editor/type';
 
 import AddPageBox from './AddPageBox.vue';

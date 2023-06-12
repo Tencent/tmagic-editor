@@ -23,7 +23,7 @@
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 
-import Resizer from '@editor/layouts/Resizer.vue';
+import Resizer from './Resizer.vue';
 
 defineOptions({
   name: 'MEditorLayout',

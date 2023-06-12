@@ -4,14 +4,38 @@
   width: 8px;
   margin: 0 -5px;
   height: 100%;
-  opacity: 0.9;
+  opacity: 0.8;
   background: padding-box #d8dee8;
   box-sizing: border-box;
   cursor: col-resize;
   z-index: 1;
+  position: relative;
 
   &:hover {
     border-color: #d8dee8;
+
+    .icon-container {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
+
+  &.m-editor-resizer-draging {
+    &::after {
+      content: "";
+      position: absolute;
+      width: 600px;
+      height: 100%;
+      left: 0;
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      width: 600px;
+      height: 100%;
+      right: 0;
+    }
   }
 
   .icon-container {
@@ -39,13 +63,4 @@
     color: #fff;
     font-size: 18px;
   }
-}
-
-.magic-editor-resizer:hover {
-  .icon-container {
-    visibility: visible;
-    opacity: 1;
-  }
-  // border-left: 5px solid rgba(0,0,0,.5);
-  // border-right: 5px solid rgba(0,0,0,.5);
 }
