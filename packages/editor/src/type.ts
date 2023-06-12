@@ -30,11 +30,12 @@ import type {
 
 import type { CodeBlockService } from './services/codeBlock';
 import type { ComponentListService } from './services/componentList';
-import { DataSourceService } from './services/dataSource';
+import type { DataSourceService } from './services/dataSource';
 import type { DepService } from './services/dep';
 import type { EditorService } from './services/editor';
 import type { EventsService } from './services/events';
 import type { HistoryService } from './services/history';
+import type { KeybindingService } from './services/keybinding';
 import type { PropsService } from './services/props';
 import type { StorageService } from './services/storage';
 import type { UiService } from './services/ui';
@@ -58,6 +59,7 @@ export interface Services {
   codeBlockService: CodeBlockService;
   depService: DepService;
   dataSourceService: DataSourceService;
+  keybindingService: KeybindingService;
 }
 
 export interface StageOptions {

@@ -96,6 +96,7 @@ import depService from './services/dep';
 import editorService from './services/editor';
 import eventsService from './services/events';
 import historyService from './services/history';
+import keybindingService from './services/keybinding';
 import propsService from './services/props';
 import storageService from './services/storage';
 import uiService from './services/ui';
@@ -130,6 +131,7 @@ export default defineComponent({
       codeBlockService,
       depService,
       dataSourceService,
+      keybindingService,
     };
 
     initServiceEvents(props, emit, services);

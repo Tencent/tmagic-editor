@@ -10,6 +10,7 @@
       ref="tree"
       node-key="id"
       empty-text="页面空荡荡的"
+      tabindex="-1"
       draggable
       :default-expanded-keys="expandedKeys"
       :default-checked-keys="checkedKeys"
@@ -75,6 +76,7 @@ defineProps<{
 const throttleTime = 150;
 const services = inject<Services>('services');
 const editorService = services?.editorService;
+const keybindingService = services?.keybindingService;
 
 const tree = ref<InstanceType<typeof TMagicTree>>();
 const menu = ref<InstanceType<typeof LayerMenu>>();
@@ -246,27 +248,40 @@ const windowBlurHandler = () => {
   isCtrlKeyDown.value = false;
 };
 
+const globalKeyupHandler = () => {
+  if (document.activeElement !== tree.value?.$el) {
+    isCtrlKeyDown.value = false;
+  }
+};
+
 let keycon: KeyController;
 
 onMounted(() => {
   editorService?.on('remove', editorServiceRemoveHandler);
 
-  keycon = new KeyController();
-  const isMac = /mac os x/.test(navigator.userAgent.toLowerCase());
-  const ctrl = isMac ? 'meta' : 'ctrl';
+  if (tree.value?.$el) {
+    // 如果是在树上按下ctrl，那么在树外松开ctrl时，也要触发松开事件
+    keybindingService?.on('keyup', globalKeyupHandler);
 
-  keycon
-    .keydown((e) => {
-      if (e.key !== ctrl) {
+    keycon = new KeyController(tree.value.$el);
+    const isMac = /mac os x/.test(navigator.userAgent.toLowerCase());
+    const ctrl = isMac ? 'meta' : 'ctrl';
+
+    keycon
+      .keydown((e) => {
+        if (e.key !== ctrl) {
+          isCtrlKeyDown.value = false;
+        }
+      })
+      .keydown(ctrl, () => {
+        isCtrlKeyDown.value = true;
+      })
+      .keyup(ctrl, () => {
         isCtrlKeyDown.value = false;
-      }
-    })
-    .keydown(ctrl, () => {
-      isCtrlKeyDown.value = true;
-    })
-    .keyup(ctrl, () => {
-      isCtrlKeyDown.value = false;
-    });
+      });
+
+    tree.value.$el.addEventListener('blur', windowBlurHandler);
+  }
 
   globalThis.addEventListener('blur', windowBlurHandler);
 });
@@ -275,7 +290,9 @@ onUnmounted(() => {
   keycon.destroy();
 
   editorService?.off('remove', editorServiceRemoveHandler);
+  keybindingService?.off('keyup', globalKeyupHandler);
   globalThis.removeEventListener('blur', windowBlurHandler);
+  tree.value?.$el.removeEventListener('blur', windowBlurHandler);
 });
 
 // 鼠标在组件树移动触发高亮
