@@ -1,3 +1,21 @@
+# [1.3.0-alpha.6](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.5...v1.3.0-alpha.6) (2023-06-12)
+
+
+### Bug Fixes
+
+* **runtime:** resetcss不生效 ([567b054](https://github.com/Tencent/tmagic-editor/commit/567b054b32c344af1b5ad25615da09de027966ef))
+* **utils:** 容器发生更新，需要编译子组建配置 ([ed4b3c7](https://github.com/Tencent/tmagic-editor/commit/ed4b3c77ef468289f5b24030a9cf3a514408a8c3)), closes [#512](https://github.com/Tencent/tmagic-editor/issues/512)
+
+
+### Features
+
+* **app,utils,runtime:** 将resetcss.css移到utils,在runtime中引入 ([01d1dcc](https://github.com/Tencent/tmagic-editor/commit/01d1dccbb65eb3c77c1caeff69e6c83610b4409a))
+* **editor:** 优化工作区间大小拖动体验 ([da18842](https://github.com/Tencent/tmagic-editor/commit/da18842e42456b7cba55c8c0dc69c0b197ecf738))
+* **editor:** 优化快捷键操作 ([06d289a](https://github.com/Tencent/tmagic-editor/commit/06d289aff33221615def85aca6f2954200bb5eb7))
+* **ui:** text使用p渲染 ([391fcee](https://github.com/Tencent/tmagic-editor/commit/391fceef30db5e771323adc20330b8529308eaad))
+
+
+
 # [1.3.0-alpha.5](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.4...v1.3.0-alpha.5) (2023-06-06)
 
 
