@@ -254,7 +254,7 @@ const globalKeyupHandler = () => {
   }
 };
 
-let keycon: KeyController;
+let keycon: KeyController | undefined;
 
 onMounted(() => {
   editorService?.on('remove', editorServiceRemoveHandler);
@@ -287,7 +287,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  keycon.destroy();
+  keycon?.destroy();
 
   editorService?.off('remove', editorServiceRemoveHandler);
   keybindingService?.off('keyup', globalKeyupHandler);
