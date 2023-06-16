@@ -12,6 +12,7 @@
     </div>
     <teleport to="body">
       <content-menu
+        v-if="subMenuData.length"
         class="sub-menu"
         ref="subMenu"
         :menu-data="subMenuData"
@@ -55,6 +56,8 @@ const menuStyle = ref({
   top: '0',
 });
 
+const contains = (el: HTMLElement) => menu.value?.contains(el) || subMenu.value?.contains(el);
+
 const hide = () => {
   if (!visible.value) return;
 
@@ -69,7 +72,7 @@ const hideHandler = (e: MouseEvent) => {
   if (!visible.value || !target) {
     return;
   }
-  if (menu.value?.contains(target) || subMenu.value?.$el?.contains(target)) {
+  if (contains(target)) {
     return;
   }
   hide();
@@ -104,13 +107,15 @@ const showSubMenu = (item: MenuButton | MenuComponent) => {
     return;
   }
 
-  subMenuData.value = menuItem.items;
-  if (menu.value) {
-    subMenu.value.show({
-      clientX: menu.value.offsetLeft + menu.value.clientWidth,
-      clientY: menu.value.offsetTop,
-    });
-  }
+  subMenuData.value = menuItem.items || [];
+  setTimeout(() => {
+    if (menu.value) {
+      subMenu.value?.show({
+        clientX: menu.value.offsetLeft + menu.value.clientWidth,
+        clientY: menu.value.offsetTop,
+      });
+    }
+  }, 0);
 };
 
 onMounted(() => {
@@ -126,7 +131,9 @@ onUnmounted(() => {
 });
 
 defineExpose({
+  menu,
   hide,
   show,
+  contains,
 });
 </script>
