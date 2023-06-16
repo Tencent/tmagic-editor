@@ -50,8 +50,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, onMounted, onUnmounted, ref, watch } from 'vue';
-import KeyController from 'keycon';
+import { computed, inject, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue';
 import { difference, throttle, union } from 'lodash-es';
 
 import { TMagicScrollbar, TMagicTree } from '@tmagic/design';
@@ -248,51 +247,71 @@ const windowBlurHandler = () => {
   isCtrlKeyDown.value = false;
 };
 
-const globalKeyupHandler = () => {
-  if (document.activeElement !== tree.value?.$el) {
+keybindingService?.registeCommand('layer-panel-not-ctrl-keydown', (e) => {
+  if (e.key !== keybindingService.ctrlKey) {
     isCtrlKeyDown.value = false;
   }
-};
+});
 
-let keycon: KeyController | undefined;
+keybindingService?.registeCommand('layer-panel-ctrl-keydown', () => {
+  isCtrlKeyDown.value = true;
+});
+
+keybindingService?.registeCommand('layer-panel-ctrl-keyup', () => {
+  isCtrlKeyDown.value = false;
+});
+
+keybindingService?.registeCommand('layer-panel-global-keydwon', () => {
+  if (!tree.value?.$el.contains(document.activeElement)) {
+    isCtrlKeyDown.value = false;
+  }
+});
+
+keybindingService?.registe([
+  {
+    command: 'layer-panel-not-ctrl-keydown',
+    when: [['layer-panel', 'keydown']],
+  },
+  {
+    command: 'layer-panel-ctrl-keydown',
+    keybinding: 'ctrl',
+    when: [['layer-panel', 'keydown']],
+  },
+  {
+    command: 'layer-panel-ctrl-keyup',
+    keybinding: 'ctrl',
+    when: [['layer-panel', 'keyup']],
+  },
+  {
+    command: 'layer-panel-global-keydwon',
+    keybinding: 'ctrl',
+    when: [['global', 'keydown']],
+  },
+]);
+
+watch(tree, () => {
+  if (tree.value?.$el) {
+    keybindingService?.registeEl('layer-panel', tree.value.$el);
+
+    tree.value.$el.addEventListener('blur', windowBlurHandler);
+  } else {
+    keybindingService?.unregisteEl('layer-panel');
+  }
+});
 
 onMounted(() => {
   editorService?.on('remove', editorServiceRemoveHandler);
 
-  if (tree.value?.$el) {
-    // 如果是在树上按下ctrl，那么在树外松开ctrl时，也要触发松开事件
-    keybindingService?.on('keyup', globalKeyupHandler);
-
-    keycon = new KeyController(tree.value.$el);
-    const isMac = /mac os x/.test(navigator.userAgent.toLowerCase());
-    const ctrl = isMac ? 'meta' : 'ctrl';
-
-    keycon
-      .keydown((e) => {
-        if (e.key !== ctrl) {
-          isCtrlKeyDown.value = false;
-        }
-      })
-      .keydown(ctrl, () => {
-        isCtrlKeyDown.value = true;
-      })
-      .keyup(ctrl, () => {
-        isCtrlKeyDown.value = false;
-      });
-
-    tree.value.$el.addEventListener('blur', windowBlurHandler);
-  }
-
   globalThis.addEventListener('blur', windowBlurHandler);
 });
 
-onUnmounted(() => {
-  keycon?.destroy();
-
-  editorService?.off('remove', editorServiceRemoveHandler);
-  keybindingService?.off('keyup', globalKeyupHandler);
-  globalThis.removeEventListener('blur', windowBlurHandler);
+onBeforeUnmount(() => {
   tree.value?.$el.removeEventListener('blur', windowBlurHandler);
+});
+
+onUnmounted(() => {
+  editorService?.off('remove', editorServiceRemoveHandler);
+  globalThis.removeEventListener('blur', windowBlurHandler);
 });
 
 // 鼠标在组件树移动触发高亮

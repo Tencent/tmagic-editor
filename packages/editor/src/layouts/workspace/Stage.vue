@@ -2,6 +2,7 @@
   <ScrollViewer
     class="m-editor-stage"
     ref="stageWrap"
+    tabindex="-1"
     :width="stageRect?.width"
     :height="stageRect?.height"
     :wrap-width="stageContainerRect?.width"
@@ -74,6 +75,10 @@ watchEffect(() => {
 
   stage = useStage(stageOptions);
 
+  stage.on('select', () => {
+    stageWrap.value?.container?.focus();
+  });
+
   services?.editorService.set('stage', markRaw(stage));
 
   stage?.mount(stageContainer.value);
@@ -120,13 +125,17 @@ const resizeObserver = new ResizeObserver((entries) => {
 });
 
 onMounted(() => {
-  stageWrap.value?.container && resizeObserver.observe(stageWrap.value.container);
+  if (stageWrap.value?.container) {
+    resizeObserver.observe(stageWrap.value.container);
+    services?.keybindingService.registeEl('stage', stageWrap.value.container);
+  }
 });
 
 onUnmounted(() => {
   stage?.destroy();
   resizeObserver.disconnect();
   services?.editorService.set('stage', null);
+  services?.keybindingService.unregisteEl('stage');
 });
 
 const contextmenuHandler = (e: MouseEvent) => {

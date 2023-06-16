@@ -1,5 +1,5 @@
 <template>
-  <div class="m-editor-workspace" tabindex="-1">
+  <div class="m-editor-workspace">
     <Breadcrumb></Breadcrumb>
 
     <slot name="stage">
@@ -18,7 +18,7 @@
 <script lang="ts" setup>
 import { computed, inject } from 'vue';
 
-import type { MenuButton, MenuComponent, Services } from '@editor/type';
+import { MenuButton, MenuComponent, Services } from '@editor/type';
 
 import Breadcrumb from './Breadcrumb.vue';
 import PageBar from './PageBar.vue';

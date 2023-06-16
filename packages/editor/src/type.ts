@@ -429,3 +429,58 @@ export interface EventSelectConfig {
   /** 联动代码配置 */
   codeActionConfig?: FormItem;
 }
+
+export enum KeyBindingCommand {
+  /** 复制 */
+  COPY_NODE = 'tmagic-system-copy-node',
+  /** 粘贴 */
+  PASTE_NODE = 'tmagic-system-paste-node',
+  /** 删除 */
+  DELETE_NODE = 'tmagic-system-delete-node',
+  /** 剪切 */
+  CUT_NODE = 'tmagic-system-cut-node',
+  /** 撤销 */
+  UNDO = 'tmagic-system-undo',
+  /** 重做 */
+  REDO = 'tmagic-system-redo',
+  /** 放大 */
+  ZOOM_IN = 'tmagic-system-zoom-in',
+  /** 缩小 */
+  ZOOM_OUT = 'tmagic-system-zoom-out',
+  /** 缩放到实际大小 */
+  ZOOM_RESET = 'tmagic-system-zoom-reset',
+  /** 缩放以适应 */
+  ZOOM_FIT = 'tmagic-system-zoom-fit',
+  /** 向上移动1px */
+  MOVE_UP_1 = 'tmagic-system-move-up-1',
+  /** 向下移动1px */
+  MOVE_DOWN_1 = 'tmagic-system-move-down-1',
+  /** 向左移动1px */
+  MOVE_LEFT_1 = 'tmagic-system-move-left-1',
+  /** 向右移动1px */
+  MOVE_RIGHT_1 = 'tmagic-system-move-right-1',
+  /** 向上移动10px */
+  MOVE_UP_10 = 'tmagic-system-move-up-10',
+  /** 向下移动10px */
+  MOVE_DOWN_10 = 'tmagic-system-move-down-10',
+  /** 向左移动10px */
+  MOVE_LEFT_10 = 'tmagic-system-move-left-10',
+  /** 向右移动10px */
+  MOVE_RIGHT_10 = 'tmagic-system-move-right-10',
+  /** 切换组件 */
+  SWITCH_NODE = 'tmagic-system-switch-node',
+}
+
+export interface KeyBindingItem {
+  command: KeyBindingCommand | string;
+  keybinding?: string | string[];
+  when: [string, 'keyup' | 'keydown'][];
+}
+
+export interface KeyBindingCacheItem {
+  type: string;
+  command: KeyBindingCommand | string;
+  keybinding?: string | string[];
+  eventType: 'keyup' | 'keydown';
+  binded: boolean;
+}

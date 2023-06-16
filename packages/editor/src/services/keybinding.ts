@@ -1,237 +1,182 @@
-import KeyController from 'keycon';
+import KeyController, { KeyControllerEvent } from 'keycon';
 
 import { isPage } from '@tmagic/utils';
+
+import { KeyBindingCacheItem, KeyBindingCommand, KeyBindingItem } from '@editor/type';
 
 import BaseService from './BaseService';
 import editorService from './editor';
 import uiService from './ui';
 
 class Keybinding extends BaseService {
-  private keycon = new KeyController();
+  public ctrlKey = /mac os x/.test(navigator.userAgent.toLowerCase()) ? 'meta' : 'ctrl';
 
-  private ctrlKey = /mac os x/.test(navigator.userAgent.toLowerCase()) ? 'meta' : 'ctrl';
+  private controllers = new Map<string, KeyController>();
 
-  constructor() {
-    super();
+  private bindingList: KeyBindingCacheItem[] = [];
 
-    this.keycon
-      .keyup((e) => {
-        this.emit('keyup', e.inputEvent);
-      })
-      .keyup('delete', (e) => {
-        if (this.isDisabledKeyEvent(e.inputEvent.target)) {
-          return;
-        }
+  private commands: Record<KeyBindingCommand | string, (e: KeyboardEvent) => void | Promise<void>> = {
+    [KeyBindingCommand.DELETE_NODE]: () => {
+      const nodes = editorService.get('nodes');
 
-        e.inputEvent.preventDefault();
+      if (!nodes || isPage(nodes[0])) return;
+      editorService.remove(nodes);
+    },
+    [KeyBindingCommand.COPY_NODE]: () => {
+      const nodes = editorService.get('nodes');
+      nodes && editorService.copy(nodes);
+    },
+    [KeyBindingCommand.CUT_NODE]: () => {
+      const nodes = editorService.get('nodes');
 
-        this.removeNode();
-      })
-      .keyup('backspace', (e) => {
-        if (this.isDisabledKeyEvent(e.inputEvent.target)) {
-          return;
-        }
+      if (!nodes || isPage(nodes[0])) return;
+      editorService.copy(nodes);
+      editorService.remove(nodes);
+    },
+    [KeyBindingCommand.PASTE_NODE]: () => {
+      const nodes = editorService.get('nodes');
+      nodes && editorService.paste({ offsetX: 10, offsetY: 10 });
+    },
+    [KeyBindingCommand.UNDO]: () => {
+      editorService.undo();
+    },
+    [KeyBindingCommand.REDO]: () => {
+      editorService.redo();
+    },
+    [KeyBindingCommand.ZOOM_IN]: () => {
+      uiService.zoom(0.1);
+    },
+    [KeyBindingCommand.ZOOM_OUT]: () => {
+      uiService.zoom(-0.1);
+    },
+    [KeyBindingCommand.ZOOM_RESET]: () => {
+      uiService.set('zoom', 1);
+    },
+    [KeyBindingCommand.ZOOM_FIT]: async () => {
+      uiService.set('zoom', await uiService.calcZoom());
+    },
+    [KeyBindingCommand.MOVE_UP_1]: () => {
+      editorService.move(0, -1);
+    },
+    [KeyBindingCommand.MOVE_DOWN_1]: () => {
+      editorService.move(0, 1);
+    },
+    [KeyBindingCommand.MOVE_LEFT_1]: () => {
+      editorService.move(-1, 0);
+    },
+    [KeyBindingCommand.MOVE_RIGHT_1]: () => {
+      editorService.move(1, 0);
+    },
+    [KeyBindingCommand.MOVE_UP_10]: () => {
+      editorService.move(0, -10);
+    },
+    [KeyBindingCommand.MOVE_DOWN_10]: () => {
+      editorService.move(0, 10);
+    },
+    [KeyBindingCommand.MOVE_LEFT_10]: () => {
+      editorService.move(-10, 0);
+    },
+    [KeyBindingCommand.MOVE_RIGHT_10]: () => {
+      editorService.move(10, 0);
+    },
+    [KeyBindingCommand.SWITCH_NODE]: () => {
+      editorService.selectNextNode();
+    },
+  };
 
-        e.inputEvent.preventDefault();
+  public registeCommand(command: string, handler: (e: KeyboardEvent) => void | Promise<void>) {
+    this.commands[command] = handler;
+  }
 
-        this.removeNode();
-      })
-      .keydown([this.ctrlKey, 'c'], (e) => {
-        if (this.isDisabledKeyEvent(e.inputEvent.target)) {
-          return;
-        }
+  public unregisteCommand(command: string) {
+    delete this.commands[command];
+  }
 
-        e.inputEvent.preventDefault();
+  public registeEl(name: string, el?: HTMLElement) {
+    if (name !== 'global' && !el) {
+      throw new Error('只有name为global可以不传el');
+    }
 
-        const nodes = editorService.get('nodes');
-        nodes && editorService.copy(nodes);
-      })
-      .keydown([this.ctrlKey, 'v'], (e) => {
-        if (this.isDisabledKeyEvent(e.inputEvent.target)) {
-          return;
-        }
+    const keycon = new KeyController(el);
+    this.controllers.set(name, keycon);
+    this.bind(name);
+  }
 
-        e.inputEvent.preventDefault();
+  public unregisteEl(name: string) {
+    this.controllers.get(name)?.destroy();
+    this.controllers.delete(name);
+    this.bindingList.forEach((item) => {
+      item.binded = false;
+    });
+  }
 
-        const nodes = editorService.get('nodes');
-        nodes && editorService.paste({ offsetX: 10, offsetY: 10 });
-      })
-      .keydown([this.ctrlKey, 'x'], (e) => {
-        if (this.isDisabledKeyEvent(e.inputEvent.target)) {
-          return;
-        }
+  public registe(maps: KeyBindingItem[]) {
+    for (const keybindingItem of maps) {
+      const { command, keybinding, when } = keybindingItem;
 
-        e.inputEvent.preventDefault();
-        if (this.isDisabledKeyEvent(e.inputEvent.target)) {
-          return;
-        }
+      for (const [type = '', eventType = 'keydown'] of when) {
+        const cacheItem: KeyBindingCacheItem = { type, command, keybinding, eventType, binded: false };
 
-        const nodes = editorService.get('nodes');
+        this.bindingList.push(cacheItem);
+      }
+    }
 
-        if (!nodes || isPage(nodes[0])) return;
-        editorService.copy(nodes);
-        editorService.remove(nodes);
-      })
-      .keydown([this.ctrlKey, 'z'], (e) => {
-        if (this.isDisabledKeyEvent(e.inputEvent.target)) {
-          return;
-        }
+    this.bind();
+  }
 
-        e.inputEvent.preventDefault();
-        editorService.undo();
-      })
-      .keydown([this.ctrlKey, 'shift', 'z'], (e) => {
-        if (this.isDisabledKeyEvent(e.inputEvent.target)) {
-          return;
-        }
-
-        e.inputEvent.preventDefault();
-        editorService.redo();
-      })
-      .keydown('up', (e) => {
-        if (this.isDisabledKeyEvent(e.inputEvent.target)) {
-          return;
-        }
-
-        e.inputEvent.preventDefault();
-        editorService.move(0, -1);
-      })
-      .keydown('down', (e) => {
-        if (this.isDisabledKeyEvent(e.inputEvent.target)) {
-          return;
-        }
-
-        e.inputEvent.preventDefault();
-        editorService.move(0, 1);
-      })
-      .keydown('left', (e) => {
-        if (this.isDisabledKeyEvent(e.inputEvent.target)) {
-          return;
-        }
-
-        e.inputEvent.preventDefault();
-        editorService.move(-1, 0);
-      })
-      .keydown('right', (e) => {
-        if (this.isDisabledKeyEvent(e.inputEvent.target)) {
-          return;
-        }
-
-        e.inputEvent.preventDefault();
-        editorService.move(1, 0);
-      })
-      .keydown([this.ctrlKey, 'up'], (e) => {
-        if (this.isDisabledKeyEvent(e.inputEvent.target)) {
-          return;
-        }
-
-        e.inputEvent.preventDefault();
-        editorService.move(0, -10);
-      })
-      .keydown([this.ctrlKey, 'down'], (e) => {
-        if (this.isDisabledKeyEvent(e.inputEvent.target)) {
-          return;
-        }
-
-        e.inputEvent.preventDefault();
-        editorService.move(0, 10);
-      })
-      .keydown([this.ctrlKey, 'left'], (e) => {
-        if (this.isDisabledKeyEvent(e.inputEvent.target)) {
-          return;
-        }
-
-        e.inputEvent.preventDefault();
-        editorService.move(-10, 0);
-      })
-      .keydown([this.ctrlKey, 'right'], (e) => {
-        e.inputEvent.preventDefault();
-        editorService.move(10, 0);
-      })
-      .keydown('tab', (e) => {
-        if (this.isDisabledKeyEvent(e.inputEvent.target)) {
-          return;
-        }
-
-        e.inputEvent.preventDefault();
-        editorService.selectNextNode();
-      })
-      .keydown([this.ctrlKey, 'tab'], (e) => {
-        if (this.isDisabledKeyEvent(e.inputEvent.target)) {
-          return;
-        }
-
-        e.inputEvent.preventDefault();
-        editorService.selectNextPage();
-      })
-      .keydown([this.ctrlKey, '='], (e) => {
-        if (this.isDisabledKeyEvent(e.inputEvent.target)) {
-          return;
-        }
-
-        e.inputEvent.preventDefault();
-        uiService.zoom(0.1);
-      })
-      .keydown([this.ctrlKey, 'numpadplus'], (e) => {
-        if (this.isDisabledKeyEvent(e.inputEvent.target)) {
-          return;
-        }
-
-        e.inputEvent.preventDefault();
-        uiService.zoom(0.1);
-      })
-      .keydown([this.ctrlKey, '-'], (e) => {
-        if (this.isDisabledKeyEvent(e.inputEvent.target)) {
-          return;
-        }
-
-        e.inputEvent.preventDefault();
-        uiService.zoom(-0.1);
-      })
-      .keydown([this.ctrlKey, 'numpad-'], (e) => {
-        if (this.isDisabledKeyEvent(e.inputEvent.target)) {
-          return;
-        }
-
-        e.inputEvent.preventDefault();
-        uiService.zoom(-0.1);
-      })
-      .keydown([this.ctrlKey, '0'], async (e) => {
-        if (this.isDisabledKeyEvent(e.inputEvent.target)) {
-          return;
-        }
-
-        e.inputEvent.preventDefault();
-        uiService.set('zoom', await uiService.calcZoom());
-      })
-      .keydown([this.ctrlKey, '1'], (e) => {
-        if (this.isDisabledKeyEvent(e.inputEvent.target)) {
-          return;
-        }
-
-        e.inputEvent.preventDefault();
-        uiService.set('zoom', 1);
-      });
+  public reset() {
+    this.controllers.forEach((keycon) => {
+      keycon.destroy();
+    });
+    this.controllers.clear();
+    this.bindingList = [];
   }
 
   public destroy() {
-    this.keycon.destroy();
+    this.reset();
   }
 
-  private isDisabledKeyEvent(node: EventTarget | null) {
-    const el = node as HTMLElement | null;
+  private bind(name?: string) {
+    for (const item of this.bindingList) {
+      const { type, eventType, command, keybinding, binded } = item;
 
-    if (!el) return false;
+      if (name && name !== type) {
+        continue;
+      }
 
-    // 当前是在输入框中，禁止响应画布快捷键
-    return el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable;
+      if (binded) {
+        continue;
+      }
+
+      const keycon = this.controllers.get(type);
+      if (!keycon) {
+        continue;
+      }
+
+      const handler = (e: KeyControllerEvent) => {
+        e.inputEvent.preventDefault();
+
+        this.commands[command]?.(e.inputEvent);
+      };
+      this.getKeyconKeys(keybinding).forEach((keys) => {
+        if (keys[0]) {
+          keycon[eventType](keys, handler);
+        } else {
+          keycon[eventType](handler);
+        }
+      });
+
+      item.binded = true;
+    }
   }
 
-  private removeNode() {
-    const nodes = editorService.get('nodes');
+  private getKeyconKeys(keybinding: string | string[] = '') {
+    const splitKey = (key: string) => key.split('+').map((k) => (k === 'ctrl' ? this.ctrlKey : k));
 
-    if (!nodes || isPage(nodes[0])) return;
-    editorService.remove(nodes);
+    if (Array.isArray(keybinding)) {
+      return keybinding.map((key) => splitKey(key));
+    }
+    return [splitKey(keybinding)];
   }
 }
 

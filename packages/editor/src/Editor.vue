@@ -100,6 +100,7 @@ import keybindingService from './services/keybinding';
 import propsService from './services/props';
 import storageService from './services/storage';
 import uiService from './services/ui';
+import keybindingConfig from './utils/keybinding-config';
 import editorProps from './editorProps';
 import { initServiceEvents, initServiceState } from './initService';
 import type { Services } from './type';
@@ -136,6 +137,8 @@ export default defineComponent({
 
     initServiceEvents(props, emit, services);
     initServiceState(props, services);
+    keybindingService.registe(keybindingConfig);
+    keybindingService.registeEl('global');
 
     provide('services', services);
 
