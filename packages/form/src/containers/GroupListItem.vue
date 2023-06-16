@@ -43,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref, watchEffect } from 'vue';
+import { computed, inject, ref } from 'vue';
 import { CaretBottom, CaretRight, CaretTop, Delete } from '@element-plus/icons-vue';
 
 import { TMagicButton, TMagicIcon } from '@tmagic/design';
@@ -73,11 +73,7 @@ const props = defineProps<{
 const emit = defineEmits(['swap-item', 'remove-item', 'change', 'addDiffCount']);
 
 const mForm = inject<FormState | undefined>('mForm');
-const expand = ref(false);
-
-watchEffect(() => {
-  expand.value = props.config.expandAll || !props.index;
-});
+const expand = ref(props.config.expandAll || !props.index);
 
 const rowConfig = computed(() => ({
   type: 'row',

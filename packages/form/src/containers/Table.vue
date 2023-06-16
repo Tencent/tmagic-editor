@@ -122,7 +122,7 @@
       </TMagicTooltip>
       <slot></slot>
       <TMagicButton v-if="addable" size="small" type="primary" :disabled="disabled" plain @click="newHandler()"
-        >添加</TMagicButton
+        >新增一行</TMagicButton
       >
       &nbsp;
       <TMagicButton
