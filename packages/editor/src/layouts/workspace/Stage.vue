@@ -36,6 +36,7 @@ import StageCore, { calcValueByFontsize, getOffset, Runtime } from '@tmagic/stag
 
 import ScrollViewer from '@editor/components/ScrollViewer.vue';
 import { Layout, MenuButton, MenuComponent, Services, StageOptions } from '@editor/type';
+import { getConfig } from '@editor/utils/config';
 import { useStage } from '@editor/utils/stage';
 
 import ViewerMenu from './ViewerMenu.vue';
@@ -162,8 +163,8 @@ const dropHandler = async (e: DragEvent) => {
   }
 
   if (e.dataTransfer && parent && stageContainer.value && stage) {
-    // eslint-disable-next-line no-eval
-    const config = eval(`(${e.dataTransfer.getData('data')})`);
+    const parseDSL = getConfig('parseDSL');
+    const config = parseDSL(`(${e.dataTransfer.getData('data')})`);
     const layout = await services?.editorService.getLayout(parent);
 
     const containerRect = stageContainer.value.getBoundingClientRect();

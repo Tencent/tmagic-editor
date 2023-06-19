@@ -45,6 +45,7 @@ export type BeforeAdd = (config: MNode, parent: MContainer) => Promise<MNode> | 
 export type GetConfig = (config: FormConfig) => Promise<FormConfig> | FormConfig;
 
 export interface InstallOptions {
+  parseDSL: (dsl: string) => MApp;
   [key: string]: any;
 }
 

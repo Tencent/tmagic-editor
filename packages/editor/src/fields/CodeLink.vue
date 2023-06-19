@@ -6,6 +6,8 @@
 import { computed, reactive, watch } from 'vue';
 import serialize from 'serialize-javascript';
 
+import { getConfig } from '@editor/utils/config';
+
 defineOptions({
   name: 'MEditorCodeLink',
 });
@@ -69,8 +71,8 @@ const changeHandler = (v: Record<string, any>) => {
   if (!props.name || !props.model) return;
 
   try {
-    // eslint-disable-next-line no-eval
-    props.model[props.name] = eval(`(${v[props.name]})`);
+    const parseDSL = getConfig('parseDSL');
+    props.model[props.name] = parseDSL(`(${v[props.name]})`);
     emit('change', props.model[props.name]);
   } catch (e) {
     console.error(e);

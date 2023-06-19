@@ -1,5 +1,7 @@
 import serialize from 'serialize-javascript';
 
+import { getConfig } from '@editor/utils/config';
+
 import BaseService from './BaseService';
 
 interface Options {
@@ -64,8 +66,7 @@ export class WebStorage extends BaseService {
 
     switch (protocol) {
       case Protocol.OBJECT:
-        // eslint-disable-next-line no-eval
-        return eval(`(${item})`);
+        return getConfig('parseDSL')(`(${item})`);
       case Protocol.JSON:
         return JSON.parse(item);
       case Protocol.NUMBER:

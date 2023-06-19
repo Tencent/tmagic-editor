@@ -64,11 +64,12 @@ export { default as LayoutContainer } from './components/SplitView.vue';
 export { default as SplitView } from './components/SplitView.vue';
 
 const defaultInstallOpt: InstallOptions = {
-  // @todo, 自定义图片上传方法等编辑器依赖的外部选项
+  // eslint-disable-next-line no-eval
+  parseDSL: (dsl: string) => eval(dsl),
 };
 
 export default {
-  install: (app: App, opt?: InstallOptions): void => {
+  install: (app: App, opt?: Partial<InstallOptions>): void => {
     const option = Object.assign(defaultInstallOpt, opt || {});
 
     // eslint-disable-next-line no-param-reassign

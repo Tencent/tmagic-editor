@@ -52,6 +52,7 @@ import { TMagicScrollbar } from '@tmagic/design';
 
 import SplitView from '@editor/components/SplitView.vue';
 import type { GetColumnWidth, Services } from '@editor/type';
+import { getConfig } from '@editor/utils/config';
 
 import AddPageBox from './AddPageBox.vue';
 import CodeEditor from './CodeEditor.vue';
@@ -131,8 +132,8 @@ const columnWidthChange = (columnW: GetColumnWidth) => {
 
 const saveCode = (value: string) => {
   try {
-    // eslint-disable-next-line no-eval
-    editorService?.set('root', eval(value));
+    const parseDSL = getConfig('parseDSL');
+    editorService?.set('root', parseDSL(value));
   } catch (e: any) {
     console.error(e);
   }

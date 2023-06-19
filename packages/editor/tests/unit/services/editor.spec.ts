@@ -25,7 +25,12 @@ import { NodeType } from '@tmagic/schema';
 import editorService from '@editor/services/editor';
 import historyService from '@editor/services/history';
 import storageService from '@editor/services/storage';
-import { COPY_STORAGE_KEY } from '@editor/utils';
+import { COPY_STORAGE_KEY, setConfig } from '@editor/utils';
+
+setConfig({
+  // eslint-disable-next-line no-eval
+  parseDSL: (dsl: string) => eval(dsl),
+});
 
 // mock window.localStage
 class LocalStorageMock {
@@ -306,7 +311,7 @@ describe('update', () => {
   test('没有id', async () => {
     try {
       await editorService.update({ type: 'text', text: 'text', id: '' });
-    } catch (e: InstanceType<Error>) {
+    } catch (e: any) {
       expect(e.message).toBe('没有配置或者配置缺少id值');
     }
   });
@@ -315,7 +320,7 @@ describe('update', () => {
     // 一般可能出现在外边扩展功能
     try {
       await editorService.update({ type: '', text: 'text', id: NodeId.NODE_ID });
-    } catch (e: InstanceType<Error>) {
+    } catch (e: any) {
       expect(e.message).toBe('配置缺少type值');
     }
   });
@@ -325,7 +330,7 @@ describe('update', () => {
       // 设置当前编辑的页面
       await editorService.select(NodeId.PAGE_ID);
       await editorService.update({ type: 'text', text: 'text', id: NodeId.ERROR_NODE_ID });
-    } catch (e: InstanceType<Error>) {
+    } catch (e: any) {
       expect(e.message).toBe(`获取不到id为${NodeId.ERROR_NODE_ID}的节点`);
     }
   });

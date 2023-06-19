@@ -23,6 +23,7 @@ import { CodeBlockContent, CodeBlockDSL, Id } from '@tmagic/schema';
 
 import type { CodeState } from '@editor/type';
 import { CODE_DRAFT_STORAGE_KEY } from '@editor/type';
+import { getConfig } from '@editor/utils/config';
 
 import BaseService from './BaseService';
 
@@ -95,8 +96,8 @@ class CodeBlock extends BaseService {
     const codeConfigProcessed = codeConfig;
     if (codeConfig.content) {
       // 在保存的时候转换代码内容
-      // eslint-disable-next-line no-eval
-      codeConfigProcessed.content = eval(codeConfig.content);
+      const parseDSL = getConfig('parseDSL');
+      codeConfigProcessed.content = parseDSL(codeConfig.content);
     }
 
     const existContent = codeDsl[id] || {};
