@@ -1,3 +1,20 @@
+# [1.3.0-alpha.7](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.6...v1.3.0-alpha.7) (2023-06-19)
+
+
+### Bug Fixes
+
+* **editor:** 异常处理 ([b37568b](https://github.com/Tencent/tmagic-editor/commit/b37568b440a87cf8804232c87c8fbeefc498cce3))
+* **editor:** 支持多层右键菜单 ([1f55272](https://github.com/Tencent/tmagic-editor/commit/1f5527270cc780f6efe0be542e4b87e7961680b7))
+* **form:** group-list默认展开 ([8ca6b3f](https://github.com/Tencent/tmagic-editor/commit/8ca6b3fbe4a305ba3c74b48090e05096a63fef35))
+
+
+### Features
+
+* **editor:** 完善快捷键注册机制 ([9716ace](https://github.com/Tencent/tmagic-editor/commit/9716aceabf5b587ad4412499cab2b55ad968a251))
+* **editor:** 新增parseDSL配置，用于解析DSL，默认使用eval ([2b881c3](https://github.com/Tencent/tmagic-editor/commit/2b881c386316258aa9ccf89b5bd2328c4a9c8b18))
+
+
+
 # [1.3.0-alpha.6](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.5...v1.3.0-alpha.6) (2023-06-12)
 
 
