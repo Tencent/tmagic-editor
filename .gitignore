@@ -29,4 +29,4 @@ coverage
 
 auto-imports.d.ts
 components.d.ts
-docs/.vitepress/cache/deps
+docs/.vitepress/cache

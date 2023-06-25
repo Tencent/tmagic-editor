@@ -121,6 +121,14 @@ app.mount("#app");
 </script>
 
 <style lang="scss">
+  html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
   #app {
     width: 100%;
     height: 100%;
@@ -137,6 +145,30 @@ app.mount("#app");
 关于 [@tmagic/editor](https://github.com/Tencent/tmagic-editor/tree/master/packages/editor) 组件，更多的属性配置详情请参考[编辑器 API](../api/editor/props.md)。
 
 其中，**有四个需要注意的属性配置项**：`runtimeUrl` `values` `configs` `componentGroupList`。这是能让我们的编辑器正常运行的关键。
+
+:::tip
+如果出现```Preprocessor dependency "sass" not found. Did you install it?```，那么需要install sass
+
+```bash
+npm install sass -D
+```
+:::
+
+:::tip
+如果是使用vite构建工具，如果出现 ```Uncaught ReferenceError: global is not defined```，那么需要再vite.config.js中添加如下配置：
+
+```js
+{
+  optimizeDeps: {
+    esbuildOptions: {
+      define: {
+        global: 'globalThis',
+      },
+    },
+  },
+}
+```
+:::
 
 ## runtimeUrl
 
