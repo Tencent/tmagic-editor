@@ -22,6 +22,7 @@ const props = defineProps<{
 const services = inject<Services>('services');
 const menu = ref<InstanceType<typeof ContentMenu>>();
 const node = computed(() => services?.editorService.get('node'));
+const nodes = computed(() => services?.editorService.get('nodes'));
 const isRoot = computed(() => node.value?.type === NodeType.ROOT);
 const isPage = computed(() => node.value?.type === NodeType.PAGE);
 const componentList = computed(() => services?.componentListService.getList() || []);
@@ -82,7 +83,7 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() => [
     type: 'button',
     text: '新增',
     icon: markRaw(Plus),
-    display: () => node.value?.items,
+    display: () => node.value?.items && nodes.value?.length === 1,
     items: getSubMenuData.value,
   },
   {
@@ -91,7 +92,7 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() => [
     icon: markRaw(CopyDocument),
     display: () => !isRoot.value,
     handler: () => {
-      node.value && services?.editorService.copy(node.value);
+      node.value && services?.editorService.copy(nodes.value || []);
     },
   },
   {
@@ -100,7 +101,7 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() => [
     icon: markRaw(Delete),
     display: () => !isRoot.value && !isPage.value,
     handler: () => {
-      node.value && services?.editorService.remove(node.value);
+      node.value && services?.editorService.remove(nodes.value || []);
     },
   },
   ...props.layerContentMenu,

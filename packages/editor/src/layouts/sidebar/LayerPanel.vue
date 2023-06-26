@@ -350,7 +350,11 @@ const clickHandler = (data: MNode): void => {
 // 右键菜单
 const contextmenu = async (event: MouseEvent, data: MNode): Promise<void> => {
   event.preventDefault();
-  await select(data);
+
+  if (nodes.value.length < 2) {
+    await select(data);
+  }
+
   menu.value?.show(event);
 };
 </script>
