@@ -301,8 +301,8 @@ importers:
         specifier: ^4.17.21
         version: 4.17.21
       monaco-editor:
-        specifier: ^0.34.0
-        version: 0.34.0
+        specifier: ^0.39.0
+        version: 0.39.0
       serialize-javascript:
         specifier: ^6.0.0
         version: 6.0.0
@@ -728,8 +728,8 @@ importers:
         specifier: ^2.2.32
         version: 2.2.32(vue@3.3.4)
       monaco-editor:
-        specifier: ^0.34.0
-        version: 0.34.0
+        specifier: ^0.39.0
+        version: 0.39.0
       serialize-javascript:
         specifier: ^6.0.0
         version: 6.0.0
@@ -7226,8 +7226,8 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /monaco-editor@0.34.0:
-    resolution: {integrity: sha512-VF+S5zG8wxfinLKLrWcl4WUizMx+LeJrG4PM/M78OhcwocpV0jiyhX/pG6Q9jIOhrb/ckYi6nHnaR5OojlOZCQ==}
+  /monaco-editor@0.39.0:
+    resolution: {integrity: sha512-zhbZ2Nx93tLR8aJmL2zI1mhJpsl87HMebNBM6R8z4pLfs8pj604pIVIVwyF1TivcfNtIPpMXL+nb3DsBmE/x6Q==}
     dev: false
 
   /moveable-helper@0.4.0(scenejs@1.9.4):

@@ -59,14 +59,14 @@
     "gesto": "^1.7.0",
     "keycon": "^1.1.2",
     "lodash-es": "^4.17.21",
-    "monaco-editor": "^0.34.0",
+    "monaco-editor": "^0.39.0",
     "serialize-javascript": "^6.0.0",
     "vue": "^3.3.4"
   },
   "peerDependencies": {
     "@tmagic/design": "1.3.0-alpha.7",
     "@tmagic/form": "1.3.0-alpha.7",
-    "monaco-editor": "^0.34.0",
+    "monaco-editor": "^0.39.0",
     "vue": "^3.3.4"
   },
   "devDependencies": {
