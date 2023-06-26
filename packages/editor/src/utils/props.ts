@@ -107,6 +107,38 @@ export const fillConfig = (config: FormConfig = []) => [
               },
               {
                 type: 'fieldset',
+                legend: '边框',
+                items: [
+                  {
+                    name: 'borderWidth',
+                    text: '宽度',
+                  },
+                  {
+                    name: 'borderColor',
+                    text: '颜色',
+                    type: 'colorPicker',
+                  },
+                  {
+                    name: 'borderStyle',
+                    text: '样式',
+                    type: 'select',
+                    options: [
+                      { text: 'none', value: 'none' },
+                      { text: 'hidden', value: 'hidden' },
+                      { text: 'dotted', value: 'dotted' },
+                      { text: 'dashed', value: 'dashed' },
+                      { text: 'solid', value: 'solid' },
+                      { text: 'double', value: 'double' },
+                      { text: 'groove', value: 'groove' },
+                      { text: 'ridge', value: 'ridge' },
+                      { text: 'inset', value: 'inset' },
+                      { text: 'outset', value: 'outset' },
+                    ],
+                  },
+                ],
+              },
+              {
+                type: 'fieldset',
                 legend: '背景',
                 items: [
                   {
