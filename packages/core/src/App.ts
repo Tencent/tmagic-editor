@@ -322,15 +322,7 @@ class App extends EventEmitter {
   }
 
   public compiledNode(node: MNode, content: DataSourceManagerData, sourceId?: Id) {
-    return compiledNode(
-      (str: string) =>
-        template(str, {
-          escape: /\{\{([\s\S]+?)\}\}/g,
-        })(content),
-      cloneDeep(node),
-      this.dsl?.dataSourceDeps,
-      sourceId,
-    );
+    return compiledNode((str: string) => template(str)(content), cloneDeep(node), this.dsl?.dataSourceDeps, sourceId);
   }
 
   public destroy() {

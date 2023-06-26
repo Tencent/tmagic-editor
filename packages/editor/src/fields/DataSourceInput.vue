@@ -30,13 +30,15 @@
       </div>
     </template>
   </component>
-  <div :class="`el-input el-input--${size}`" @mouseup="mouseupHandler" v-else>
-    <div :class="`el-input__wrapper ${isFocused ? ' is-focus' : ''}`">
+  <div :class="`tmagic-data-source-input-text el-input el-input--${size}`" @mouseup="mouseupHandler" v-else>
+    <div :class="`tmagic-data-source-input-text-wrapper el-input__wrapper ${isFocused ? ' is-focus' : ''}`">
       <div class="el-input__inner">
         <template v-for="(item, index) in displayState">
           <span :key="index" v-if="item.type === 'text'" style="margin-right: 2px">{{ item.value }}</span>
           <TMagicTag :key="index" :size="size" v-if="item.type === 'var'">{{ item.value }}</TMagicTag>
         </template>
+
+        <Icon class="tmagic-data-source-input-icon" :icon="Coin" />
       </div>
     </div>
   </div>
@@ -90,7 +92,7 @@ const dataSources = computed(() => dataSourceService?.get('dataSources') || []);
 const setDisplayState = () => {
   displayState.value = [];
 
-  const matches = state.value.matchAll(/\{\{([\s\S]+?)\}\}/g);
+  const matches = state.value.matchAll(/\$\{([\s\S]+?)\}/g);
   let index = 0;
   for (const match of matches) {
     if (typeof match.index === 'undefined') break;
@@ -195,7 +197,7 @@ const getSelectionStart = () => {
  * @param leftCurlyBracketIndex {字符索引
  */
 const curCharIsLeftCurlyBracket = (leftCurlyBracketIndex: number) =>
-  leftCurlyBracketIndex > -1 && leftCurlyBracketIndex === getSelectionStart() - 1;
+  leftCurlyBracketIndex > 0 && leftCurlyBracketIndex === getSelectionStart() - 1;
 
 /**
  * 当前输入的是.
@@ -213,7 +215,7 @@ const dsQuerySearch = (queryString: string, leftCurlyBracketIndex: number, cb: (
   if (curCharIsLeftCurlyBracket(leftCurlyBracketIndex)) {
     // 当前输入的是{
     result = dataSources.value;
-  } else if (leftCurlyBracketIndex > -1) {
+  } else if (leftCurlyBracketIndex > 0) {
     // 当前输入的是{xx
     const queryName = queryString.substring(leftCurlyBracketIndex + 1).toLowerCase();
     result = dataSources.value.filter((ds) => ds.title?.toLowerCase().includes(queryName) || ds.id.includes(queryName));
@@ -299,7 +301,7 @@ const querySearch = (queryString: string, cb: (data: { value: string }[]) => voi
   const curQueryString = queryString.substring(0, selectionStart);
 
   const fieldKeyStringLastIndex = curQueryString.lastIndexOf('.');
-  const dsKeyStringLastIndex = curQueryString.lastIndexOf('{');
+  const dsKeyStringLastIndex = curQueryString.lastIndexOf('${') + 1;
 
   const isFieldTip = fieldKeyStringLastIndex > dsKeyStringLastIndex;
 
@@ -321,7 +323,7 @@ const selectHandler = async ({ value, type }: { value: string; type: 'dataSource
   let startText = inputText.substring(0, selectionStart);
 
   const dotIndex = startText.lastIndexOf('.');
-  const leftCurlyBracketIndex = startText.lastIndexOf('{');
+  const leftCurlyBracketIndex = startText.lastIndexOf('${') + 1;
 
   const endText = inputText.substring(selectionStart);
 
@@ -336,7 +338,6 @@ const selectHandler = async ({ value, type }: { value: string; type: 'dataSource
     if (!isRightCurlyBracket(selectionStart + 1)) {
       suggestText = `${suggestText}}`;
     }
-    suggestText = `{${suggestText}}`;
   } else if (!curCharIsDot(dotIndex)) {
     startText = startText.substring(0, dotIndex + 1);
   }
@@ -345,10 +346,10 @@ const selectHandler = async ({ value, type }: { value: string; type: 'dataSource
 
   await nextTick();
 
-  // 由于选择数据源时会在后面补全}}, 所以光标要前移2位
+  // 由于选择数据源时会在后面补全}, 所以光标要前移2位
   let newSelectionStart = 0;
   if (isDataSource) {
-    newSelectionStart = leftCurlyBracketIndex + suggestText.length - 1;
+    newSelectionStart = leftCurlyBracketIndex + suggestText.length;
   } else {
     newSelectionStart = dotIndex + suggestText.length + 1;
   }

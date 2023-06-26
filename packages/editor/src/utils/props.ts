@@ -112,6 +112,7 @@ export const fillConfig = (config: FormConfig = []) => [
                   {
                     name: 'borderWidth',
                     text: '宽度',
+                    defaultValue: '0',
                   },
                   {
                     name: 'borderColor',
@@ -122,6 +123,7 @@ export const fillConfig = (config: FormConfig = []) => [
                     name: 'borderStyle',
                     text: '样式',
                     type: 'select',
+                    defaultValue: 'none',
                     options: [
                       { text: 'none', value: 'none' },
                       { text: 'hidden', value: 'hidden' },

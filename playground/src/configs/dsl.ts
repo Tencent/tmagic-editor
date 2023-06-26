@@ -208,7 +208,7 @@ export default {
             fontWeight: '',
           },
           name: '按钮',
-          text: '{{ds_b64c92b5.text}}',
+          text: '${ds_b64c92b5.text}',
           multiple: true,
           events: [
             {
