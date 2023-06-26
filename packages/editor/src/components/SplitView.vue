@@ -1,6 +1,6 @@
 <template>
   <div ref="el" class="m-editor-layout">
-    <template v-if="hasLeft">
+    <template v-if="hasLeft && $slots.left">
       <div class="m-editor-layout-left" :class="leftClass" :style="`width: ${left}px`">
         <slot name="left"></slot>
       </div>
@@ -11,7 +11,7 @@
       <slot name="center"></slot>
     </div>
 
-    <template v-if="hasRight">
+    <template v-if="hasRight && $slots.right">
       <Resizer @change="changeRight"></Resizer>
       <div class="m-editor-layout-right" :class="rightClass" :style="`width: ${right}px`">
         <slot name="right"></slot>

@@ -1,5 +1,5 @@
 <template>
-  <div class="m-editor-props-panel">
+  <div class="m-editor-props-panel" v-if="nodes.length === 1">
     <slot name="props-panel-header"></slot>
     <MForm
       ref="configForm"
@@ -35,6 +35,7 @@ const configForm = ref<InstanceType<typeof MForm>>();
 const curFormConfig = ref<any>([]);
 const services = inject<Services>('services');
 const node = computed(() => services?.editorService.get('node'));
+const nodes = computed(() => services?.editorService.get('nodes') || []);
 const propsPanelSize = computed(() => services?.uiService.get('propsPanelSize') || 'small');
 const stage = computed(() => services?.editorService.get('stage'));
 
