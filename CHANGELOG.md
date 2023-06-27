@@ -1,3 +1,20 @@
+# [1.3.0-alpha.8](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.7...v1.3.0-alpha.8) (2023-06-27)
+
+
+### Bug Fixes
+
+* **editor:** 没有页面时隐藏属性面板 ([91e4680](https://github.com/Tencent/tmagic-editor/commit/91e46800244eaa1cbd0b05712380388ea243dd7b))
+* **editor:** 组件树右键菜单支持多选 ([1660e94](https://github.com/Tencent/tmagic-editor/commit/1660e941d7e1e1597725b2131885c0d14f358f65))
+
+
+### Features
+
+* **editor,core:** 数据源模板改成使用 ES 分隔符 ([b952e6e](https://github.com/Tencent/tmagic-editor/commit/b952e6efd1e096b47f7f32b938cd5ae6975fc4bf))
+* **editor:** 导出Resizer组件 ([fbf3896](https://github.com/Tencent/tmagic-editor/commit/fbf3896878709343651401f237ff14d9ae6ccd3c))
+* **editor:** 属性样式添加边框 ([4daf6b4](https://github.com/Tencent/tmagic-editor/commit/4daf6b441034b354a5e0ebb984cf7ffa30d22fce))
+
+
+
 # [1.3.0-alpha.7](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.6...v1.3.0-alpha.7) (2023-06-19)
 
 
