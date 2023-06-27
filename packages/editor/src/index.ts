@@ -62,6 +62,7 @@ export { default as ContentMenu } from './components/ContentMenu.vue';
 export { default as Icon } from './components/Icon.vue';
 export { default as LayoutContainer } from './components/SplitView.vue';
 export { default as SplitView } from './components/SplitView.vue';
+export { default as Resizer } from './components/Resizer.vue';
 
 const defaultInstallOpt: InstallOptions = {
   // eslint-disable-next-line no-eval
