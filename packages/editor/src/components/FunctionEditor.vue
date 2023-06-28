@@ -49,7 +49,7 @@ defineOptions({
   name: 'MEditorFunctionEditor',
 });
 
-provide('mForm', {});
+provide('mForm', null);
 
 const defaultParamColConfig: ColumnConfig = {
   type: 'row',
