@@ -15,6 +15,7 @@
       :expand-on-click-node="false"
       :data="list"
       :highlight-current="true"
+      @node-click="clickHandler"
     >
       <template #default="{ data }">
         <div :id="data.id" class="list-container">
@@ -53,7 +54,7 @@ import { computed, inject, ref } from 'vue';
 import { Aim, Close, Coin, Edit } from '@element-plus/icons-vue';
 
 import { TMagicButton, tMagicMessageBox, TMagicScrollbar, TMagicTooltip, TMagicTree } from '@tmagic/design';
-import { DataSourceSchema } from '@tmagic/schema';
+import { DataSourceSchema, Id } from '@tmagic/schema';
 
 import Icon from '@editor/components/Icon.vue';
 import SearchInput from '@editor/components/SearchInput.vue';
@@ -66,7 +67,7 @@ defineOptions({
 });
 
 const services = inject<Partial<Services>>('services', {});
-const { dataSourceService, depService } = inject<Services>('services') || {};
+const { dataSourceService, depService, editorService } = inject<Services>('services') || {};
 
 const list = computed(() =>
   Object.values(depService?.targets['data-source'] || {}).map((target) => ({
@@ -130,5 +131,20 @@ const tree = ref<InstanceType<typeof TMagicTree>>();
 
 const filterTextChangeHandler = (val: string) => {
   tree.value?.filter(val);
+};
+
+// 选中组件
+const selectComp = (compId: Id) => {
+  const stage = editorService?.get('stage');
+  editorService?.select(compId);
+  stage?.select(compId);
+};
+
+const clickHandler = (data: any, node: any) => {
+  if (data.type === 'node') {
+    selectComp(data.id);
+  } else if (data.type === 'key') {
+    selectComp(node.parent.data.id);
+  }
 };
 </script>

@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+// @ts-nocheck
 export default {
   id: '75f0extui9d7yksklx27hff8xg',
   name: 'test',
@@ -23,8 +24,9 @@ export default {
   codeBlocks: {
     code_5336: {
       name: 'getData',
-      // eslint-disable-next-line no-eval
-      content: eval(`({app, params}) => {\n  console.log("this is getData function",params,app)\n}`),
+      content: ({ app, params }) => {
+        console.log('this is getData function', params, app);
+      },
       params: [
         {
           name: 'age',
@@ -40,8 +42,9 @@ export default {
     },
     code_5316: {
       name: 'getList',
-      // eslint-disable-next-line no-eval
-      content: eval(`() => {\n  console.log("this is getList function")\n}`),
+      content: () => {
+        console.log('this is getList function');
+      },
       params: [],
     },
   },
@@ -76,8 +79,8 @@ export default {
               actionType: 'code', // 联动动作类型
               codeId: 'code_5336', // 代码块id
               params: {
-                age: 12,
-              }, // 参数
+                age: 12, // 参数
+              },
             },
             {
               actionType: 'comp',
@@ -206,6 +209,13 @@ export default {
             color: '',
             fontSize: '',
             fontWeight: '',
+            borderWidth: '0',
+            borderColor: '',
+            borderStyle: 'none',
+            transform: {
+              rotate: '',
+              scale: '',
+            },
           },
           name: '按钮',
           text: '${ds_b64c92b5.text}',
@@ -213,8 +223,13 @@ export default {
           events: [
             {
               name: 'magic:common:events:click',
-              to: 'overlay_2159',
-              method: 'openOverlay',
+              actions: [
+                {
+                  actionType: 'comp',
+                  to: 'overlay_2159',
+                  method: 'openOverlay',
+                },
+              ],
             },
           ],
           created: [],
@@ -272,6 +287,13 @@ export default {
                     color: '',
                     fontSize: '',
                     fontWeight: '',
+                    borderWidth: '0',
+                    borderColor: '',
+                    borderStyle: 'none',
+                    transform: {
+                      rotate: '',
+                      scale: '',
+                    },
                   },
                   name: '按钮',
                   text: '关闭弹窗',
@@ -279,8 +301,13 @@ export default {
                   events: [
                     {
                       name: 'magic:common:events:click',
-                      to: 'overlay_2159',
-                      method: 'closeOverlay',
+                      actions: [
+                        {
+                          actionType: 'comp',
+                          to: 'overlay_2159',
+                          method: 'closeOverlay',
+                        },
+                      ],
                     },
                   ],
                   created: [],

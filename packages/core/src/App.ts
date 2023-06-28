@@ -322,7 +322,20 @@ class App extends EventEmitter {
   }
 
   public compiledNode(node: MNode, content: DataSourceManagerData, sourceId?: Id) {
-    return compiledNode((str: string) => template(str)(content), cloneDeep(node), this.dsl?.dataSourceDeps, sourceId);
+    return compiledNode(
+      (value: any) => {
+        if (typeof value === 'string') {
+          return template(value)(content);
+        }
+        if (value?.isBindDataSource && value.dataSourceId) {
+          return content[value.dataSourceId];
+        }
+        return value;
+      },
+      cloneDeep(node),
+      this.dsl?.dataSourceDeps,
+      sourceId,
+    );
   }
 
   public destroy() {

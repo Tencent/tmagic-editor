@@ -236,18 +236,22 @@ export const initServiceEvents = (
     }
   };
 
+  // 新增节点，收集依赖
   const nodeAddHandler = (nodes: MNode[]) => {
     depService.collect(nodes);
   };
 
+  // 节点更新，收集依赖
   const nodeUpdateHandler = (nodes: MNode[]) => {
     depService.collect(nodes);
   };
 
+  // 节点删除，清除对齐的依赖收集
   const nodeRemoveHandler = (nodes: MNode[]) => {
     depService.clear(nodes);
   };
 
+  // 由于历史记录变化是更新整个page，所以历史记录变化时，需要重新收集依赖
   const historyChangeHandler = (page: MPage) => {
     depService.collect([page], true);
   };

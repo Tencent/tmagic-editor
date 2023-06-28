@@ -435,9 +435,9 @@ export interface SelectConfig extends FormItem, Input {
   allowCreate?: boolean;
   filterable?: boolean;
   group?: boolean;
-  options: SelectConfigOption[] | SelectConfigGroupOption[] | SelectOptionFunction;
-  remote: true;
-  option: {
+  options?: SelectConfigOption[] | SelectConfigGroupOption[] | SelectOptionFunction;
+  remote?: true;
+  option?: {
     url: string | ((mForm: FormState | undefined, data: { model: any; formValue: any }) => string);
     initUrl?: string | ((mForm: FormState | undefined, data: { model: any; formValue: any }) => string);
     method?: 'jsonp' | string;

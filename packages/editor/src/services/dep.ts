@@ -262,6 +262,7 @@ export class Watcher extends EventEmitter {
     Object.values(this.targets).forEach((targets) => {
       Object.values(targets).forEach((target) => {
         nodes.forEach((node) => {
+          // 先删除原有依赖，重新收集
           target.removeDep(node);
           this.collectItem(node, target, deep);
         });

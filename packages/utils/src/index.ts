@@ -243,7 +243,7 @@ export const replaceChildNode = (newNode: MNode, data?: MNode[], parentId?: Id) 
 };
 
 export const compiledNode = (
-  compile: (template: string) => string,
+  compile: (value: any) => any,
   node: MNode,
   dataSourceDeps: DataSourceDeps = {},
   sourceId?: Id,
@@ -263,12 +263,14 @@ export const compiledNode = (
     const keyPathLength = keyPath.length;
     keyPath.reduce((accumulator, currentValue: any, currentIndex) => {
       if (keyPathLength - 1 === currentIndex) {
-        if (typeof accumulator[`${keyPrefix}${currentValue}`] === 'undefined') {
-          accumulator[`${keyPrefix}${currentValue}`] = accumulator[currentValue];
+        const cacheKey = `${keyPrefix}${currentValue}`;
+
+        if (typeof accumulator[cacheKey] === 'undefined') {
+          accumulator[cacheKey] = accumulator[currentValue];
         }
 
         try {
-          accumulator[currentValue] = compile(accumulator[`${keyPrefix}${currentValue}`]);
+          accumulator[currentValue] = compile(accumulator[cacheKey]);
         } catch (e) {
           console.error(e);
           accumulator[currentValue] = '';

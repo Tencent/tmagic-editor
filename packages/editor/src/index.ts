@@ -23,6 +23,7 @@ import CodeSelect from './fields/CodeSelect.vue';
 import CodeSelectCol from './fields/CodeSelectCol.vue';
 import DataSourceFields from './fields/DataSourceFields.vue';
 import DataSourceInput from './fields/DataSourceInput.vue';
+import DataSourceSelect from './fields/DataSourceSelect.vue';
 import EventSelect from './fields/EventSelect.vue';
 import KeyValue from './fields/KeyValue.vue';
 import uiSelect from './fields/UISelect.vue';
@@ -53,6 +54,7 @@ export { default as CodeSelect } from './fields/CodeSelect.vue';
 export { default as CodeSelectCol } from './fields/CodeSelectCol.vue';
 export { default as DataSourceFields } from './fields/DataSourceFields.vue';
 export { default as DataSourceInput } from './fields/DataSourceInput.vue';
+export { default as DataSourceSelect } from './fields/DataSourceSelect.vue';
 export { default as EventSelect } from './fields/EventSelect.vue';
 export { default as KeyValue } from './fields/KeyValue.vue';
 export { default as CodeBlockList } from './layouts/sidebar/code-block/CodeBlockList.vue';
@@ -87,5 +89,6 @@ export default {
     app.component('m-fields-data-source-fields', DataSourceFields);
     app.component('m-fields-key-value', KeyValue);
     app.component('m-fields-data-source-input', DataSourceInput);
+    app.component('m-fields-data-source-select', DataSourceSelect);
   },
 };

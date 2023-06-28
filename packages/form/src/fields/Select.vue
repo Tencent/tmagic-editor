@@ -82,13 +82,17 @@ const equalValue = (value: any, v: any): boolean => {
 };
 
 const mapOptions = (data: any[]) => {
-  const { option } = props.config;
-  const { text } = option;
-  const { value } = option;
+  const {
+    option = {
+      text: 'text',
+      value: 'value',
+    },
+  } = props.config;
+  const { text = 'text', value = 'value' } = option;
 
   return data.map((item) => ({
-    text: typeof text === 'function' ? text(item) : item[text || 'text'],
-    value: typeof value === 'function' ? value(item) : item[value || 'value'],
+    text: typeof text === 'function' ? text(item) : item[text],
+    value: typeof value === 'function' ? value(item) : item[value],
   }));
 };
 
@@ -103,8 +107,10 @@ const getOptions = async () => {
 
   let items: SelectOption[] | SelectGroupOption[] = [];
 
-  const { config } = props;
-  const { option } = config;
+  const { option } = props.config;
+
+  if (!option) return [];
+
   const { root = '', totalKey = 'total' } = option;
   let { body = {}, url } = option;
 
@@ -224,8 +230,10 @@ const getInitLocalOption = async () => {
 const getInitOption = async () => {
   if (!props.model) return [];
 
-  const { config } = props;
-  const { option } = config;
+  const { option } = props.config;
+
+  if (!option) return [];
+
   const { root = '', initRoot = '' } = option;
   let { initBody = {} } = option;
 

@@ -11,6 +11,10 @@ export const createCodeBlockTarget = (id: Id, codeBlock: CodeBlockContent) =>
     id,
     name: codeBlock.name,
     isTarget: (key: string | number, value: any) => {
+      if (id === value) {
+        return true;
+      }
+
       if (value?.hookType === HookType.CODE && !isEmpty(value.hookData)) {
         const index = value.hookData.findIndex((item: HookData) => item.codeId === id);
         return Boolean(index > -1);
@@ -25,5 +29,7 @@ export const createDataSourceTarget = (id: Id, ds: DataSourceSchema) =>
     type: 'data-source',
     id,
     name: ds.title || `${id}`,
-    isTarget: (key: string | number, value: any) => typeof value === 'string' && value.includes(`${id}`),
+    isTarget: (key: string | number, value: any) =>
+      // 关联数据源对象或者在模板在使用数据源
+      (value.isBindDataSource && value.dataSourceId) || (typeof value === 'string' && value.includes(`${id}`)),
   });
