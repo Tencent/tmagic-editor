@@ -83,14 +83,13 @@ const appendComponent = ({ text, type, data = {} }: ComponentItem): void => {
 
 const dragstartHandler = ({ text, type, data = {} }: ComponentItem, e: DragEvent) => {
   if (e.dataTransfer) {
-    e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData(
-      'data',
+      'text/html',
       serialize({
         name: text,
         type,
         ...data,
-      }).replace(/"(\w+)":\s/g, '$1: '),
+      }),
     );
   }
 };
@@ -121,6 +120,6 @@ const dragHandler = (e: DragEvent) => {
 
   if (timeout || !stage.value) return;
 
-  timeout = stage.value.getAddContainerHighlightClassNameTimeout(e);
+  timeout = stage.value.delayedMarkContainer(e);
 };
 </script>

@@ -146,9 +146,8 @@ const contextmenuHandler = (e: MouseEvent) => {
 
 const dragoverHandler = (e: DragEvent) => {
   e.preventDefault();
-  if (e.dataTransfer) {
-    e.dataTransfer.dropEffect = 'move';
-  }
+  if (!e.dataTransfer) return;
+  e.dataTransfer.dropEffect = 'move';
 };
 
 const dropHandler = async (e: DragEvent) => {
@@ -164,7 +163,15 @@ const dropHandler = async (e: DragEvent) => {
 
   if (e.dataTransfer && parent && stageContainer.value && stage) {
     const parseDSL = getConfig('parseDSL');
-    const config = parseDSL(`(${e.dataTransfer.getData('data')})`);
+
+    const data = e.dataTransfer.getData('text/html');
+
+    if (!data) return;
+
+    const config = parseDSL(`(${data})`);
+
+    if (!config) return;
+
     const layout = await services?.editorService.getLayout(parent);
 
     const containerRect = stageContainer.value.getBoundingClientRect();
