@@ -78,7 +78,7 @@ class App extends EventEmitter {
 
   public eventQueueMap: Record<string, EventCache[]> = {};
 
-  private eventList: { [name: string]: (fromCpt: Node, ...args: any[]) => void } = {};
+  private eventList = new Map<(fromCpt: Node, ...args: any[]) => void, string>();
 
   constructor(options: AppOptionsConfig) {
     super();
@@ -251,11 +251,12 @@ class App extends EventEmitter {
   }
 
   public bindEvents() {
-    Object.entries(this.eventList).forEach(([name, handler]) => {
-      this.off(name, handler);
+    Array.from(this.eventList.keys()).forEach((handler) => {
+      const name = this.eventList.get(handler);
+      name && this.off(name, handler);
     });
 
-    this.eventList = {};
+    this.eventList.clear();
 
     if (!this.page) return;
 
@@ -265,8 +266,7 @@ class App extends EventEmitter {
         const eventHanlder = (fromCpt: Node, ...args: any[]) => {
           this.eventHandler(event, fromCpt, args);
         };
-        this.eventList[eventName] = eventHanlder;
-
+        this.eventList.set(eventHanlder, eventName);
         this.on(eventName, eventHanlder);
       });
     }
