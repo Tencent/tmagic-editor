@@ -81,7 +81,7 @@ const setEditorValue = (v: string | any, m: string | any) => {
 };
 
 const getEditorValue = () =>
-  props.type === 'diff' ? vsDiffEditor?.getModifiedEditor().getValue() : vsEditor?.getValue();
+  (props.type === 'diff' ? vsDiffEditor?.getModifiedEditor().getValue() : vsEditor?.getValue()) || '';
 
 const init = async () => {
   if (!codeEditor.value) return;
@@ -109,13 +109,19 @@ const init = async () => {
     if (e.keyCode === 83 && (navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey)) {
       e.preventDefault();
       e.stopPropagation();
-      emit('save', getEditorValue());
+      const newValue = getEditorValue();
+      values.value = newValue;
+      emit('save', newValue);
     }
   });
 
   if (props.type !== 'diff' && props.autoSave) {
     vsEditor?.onDidBlurEditorWidget(() => {
-      emit('save', getEditorValue());
+      const newValue = getEditorValue();
+      if (values.value !== newValue) {
+        values.value = newValue;
+        emit('save', newValue);
+      }
     });
   }
 
@@ -146,8 +152,18 @@ onUnmounted(() => {
 });
 
 defineExpose({
+  values,
+
   getEditor() {
     return vsEditor || vsDiffEditor;
+  },
+
+  getVsEditor() {
+    return vsEditor;
+  },
+
+  getVsDiffEditor() {
+    return vsDiffEditor;
   },
 
   setEditorValue,
