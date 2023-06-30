@@ -35,6 +35,8 @@ export default defineComponent({
       style: computed(() => app?.transformStyle(props.config.style || {})),
 
       display: () => {
+        if (props.config.visible === false) return false;
+
         const displayCfg = props.config?.display;
 
         if (typeof displayCfg === 'function') {

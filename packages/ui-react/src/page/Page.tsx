@@ -49,6 +49,8 @@ const Page: React.FC<PageProps> = ({ config }) => {
 
         if (!MagicUiComp) return null;
 
+        if (item.visible === false) return null;
+
         return (
           <MagicUiComp
             id={`${item.id || ''}`}

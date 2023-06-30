@@ -44,6 +44,12 @@
 .magic-editor-layer-panel .cus-tree-node {
   width: 100%;
   overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+
+  .layer-node-tool {
+    margin-right: 15px;
+  }
 }
 
 .magic-editor-layer-panel .cus-tree-node-hover {

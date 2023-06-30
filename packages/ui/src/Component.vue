@@ -33,6 +33,8 @@ const tagName = computed(() => `magic-ui-${toLine(props.config.type)}`);
 const style = computed(() => app?.transformStyle(props.config.style));
 
 const display = () => {
+  if (props.config.visible === false) return false;
+
   const displayCfg = props.config?.display;
 
   if (typeof displayCfg === 'function') {

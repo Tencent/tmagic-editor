@@ -35,9 +35,7 @@
       <template #default="{ node, data }">
         <div class="cus-tree-node" :id="data.id" @mouseenter="highlightHandler(data)">
           <slot name="layer-node-content" :node="node" :data="data">
-            <span>
-              {{ `${data.name} (${data.id})` }}
-            </span>
+            <LayerNode :data="data"></LayerNode>
           </slot>
         </div>
       </template>
@@ -63,6 +61,7 @@ import type { MenuButton, MenuComponent, Services } from '@editor/type';
 import { Layout } from '@editor/type';
 
 import LayerMenu from './LayerMenu.vue';
+import LayerNode from './LayerNode.vue';
 
 defineOptions({
   name: 'MEditorLayerPanel',
