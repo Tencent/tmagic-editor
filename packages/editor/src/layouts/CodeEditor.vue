@@ -37,10 +37,14 @@ const emit = defineEmits(['initd', 'save']);
 const toString = (v: string | any, language: string): string => {
   let value = '';
   if (typeof v !== 'string') {
-    value = serialize(v, {
-      space: 2,
-      unsafe: true,
-    }).replace(/"(\w+)":\s/g, '$1: ');
+    if (props.language.toLocaleLowerCase() === 'json') {
+      value = JSON.stringify(v, null, 2);
+    } else {
+      value = serialize(v, {
+        space: 2,
+        unsafe: true,
+      }).replace(/"(\w+)":\s/g, '$1: ');
+    }
   } else {
     value = v;
   }
