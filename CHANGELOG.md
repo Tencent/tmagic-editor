@@ -1,3 +1,22 @@
+# [1.3.0-alpha.9](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.8...v1.3.0-alpha.9) (2023-07-03)
+
+
+### Bug Fixes
+
+* **core:** 一个组件配置多个相同的事件销毁后没有能成功移除事件绑定 ([47c26ed](https://github.com/Tencent/tmagic-editor/commit/47c26ed189cee952871c479bad61861abd05a482))
+* **editor:** code-editor组件json类型序列化出错 ([2d4a6aa](https://github.com/Tencent/tmagic-editor/commit/2d4a6aa22a4d09aec9665cf4dfc7ba6dec275754))
+* **editor:** 代码编辑器只有在内容发生变化时才触发保存 ([5b3c700](https://github.com/Tencent/tmagic-editor/commit/5b3c700f0034de25e9f494598c6bcf1888073fc3))
+* **editor:** 添加代码块参数时出错 ([d480a03](https://github.com/Tencent/tmagic-editor/commit/d480a03369820e7d106d2e7d2a7fad24d8f8eace))
+* **editor:** 组件树上的节点拖动画布中出错，应该不响应 ([d8d9184](https://github.com/Tencent/tmagic-editor/commit/d8d9184f3f5dda40b3fa4b49efecde4cdbcfd73f)), closes [#519](https://github.com/Tencent/tmagic-editor/issues/519)
+
+
+### Features
+
+* **editor, core:** 支持直接绑定整个数据源对象 ([74c9dea](https://github.com/Tencent/tmagic-editor/commit/74c9deaa29ba1fb6bd14486b17f68f8c8ab5afce))
+* **editor,ui:** 新增显示隐藏组件功能 ([42b0436](https://github.com/Tencent/tmagic-editor/commit/42b043670e7fbb0cf293faadb5f2a8cb24a7dfa5)), closes [#516](https://github.com/Tencent/tmagic-editor/issues/516)
+
+
+
 # [1.3.0-alpha.8](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.7...v1.3.0-alpha.8) (2023-06-27)
 
 
