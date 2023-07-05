@@ -11,7 +11,7 @@
     "build:playground": "vite build --config build.vite.config.ts --mode playground",
     "build:page:admin": "vite build --config build.vite.config.ts --mode page:admin",
     "build:playground:admin": "vite build --config build.vite.config.ts --mode playground:admin",
-    "build:libs": "tmagic entry && npm run build:config & npm run build:value & npm run build:event",
+    "build:libs": "tmagic entry && npm run build:config && npm run build:value && npm run build:event",
     "build:libs:admin": "tmagic entry && npm run build:config:admin && npm run build:value:admin && npm run build:event:admin",
     "build:config": "vite build --config build.vite.config.ts --mode config",
     "build:value": "vite build --config build.vite.config.ts --mode value",
