@@ -4,10 +4,11 @@
       <ToolButton
         v-for="(item, index) in menuData"
         event-type="mouseup"
+        ref="buttons"
         :data="item"
         :key="index"
         @mouseup="hide"
-        @mouseenter="showSubMenu(item)"
+        @mouseenter="showSubMenu(item, index)"
       ></ToolButton>
     </div>
     <teleport to="body">
@@ -48,6 +49,7 @@ const props = withDefaults(
 const emit = defineEmits(['hide', 'show']);
 
 const menu = ref<HTMLDivElement>();
+const buttons = ref<InstanceType<typeof ToolButton>[]>();
 const subMenu = ref<any>();
 const visible = ref(false);
 const subMenuData = ref<(MenuButton | MenuComponent)[]>([]);
@@ -101,7 +103,7 @@ const show = (e: MouseEvent) => {
   }, 300);
 };
 
-const showSubMenu = (item: MenuButton | MenuComponent) => {
+const showSubMenu = (item: MenuButton | MenuComponent, index: number) => {
   const menuItem = item as MenuButton;
   if (typeof item !== 'object' || !menuItem.items?.length) {
     return;
@@ -110,9 +112,15 @@ const showSubMenu = (item: MenuButton | MenuComponent) => {
   subMenuData.value = menuItem.items || [];
   setTimeout(() => {
     if (menu.value) {
+      // 将子菜单放置在按钮右侧，与按钮齐平
+      let y = menu.value.offsetTop;
+      if (buttons.value?.[index].$el) {
+        const rect = buttons.value?.[index].$el.getBoundingClientRect();
+        y = rect.top;
+      }
       subMenu.value?.show({
         clientX: menu.value.offsetLeft + menu.value.clientWidth,
-        clientY: menu.value.offsetTop,
+        clientY: y,
       });
     }
   }, 0);

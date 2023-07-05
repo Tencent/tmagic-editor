@@ -4,14 +4,16 @@
 
 <script lang="ts" setup>
 import { computed, inject, markRaw, ref, watch } from 'vue';
-import { Bottom, CopyDocument, Delete, DocumentCopy, Top } from '@element-plus/icons-vue';
+import { Bottom, Top } from '@element-plus/icons-vue';
 
 import { NodeType } from '@tmagic/schema';
 import { isPage } from '@tmagic/utils';
 
 import ContentMenu from '@editor/components/ContentMenu.vue';
+import CenterIcon from '@editor/icons/CenterIcon.vue';
 import storageService from '@editor/services/storage';
 import { LayerOffset, Layout, MenuButton, MenuComponent, Services } from '@editor/type';
+import { useCopyMenu, useDeleteMenu, useMoveToMenu, usePasteMenu } from '@editor/utils/content-menu';
 import { COPY_STORAGE_KEY } from '@editor/utils/editor';
 
 defineOptions({
@@ -32,42 +34,20 @@ const canCenter = ref(false);
 const node = computed(() => editorService?.get('node'));
 const nodes = computed(() => editorService?.get('nodes'));
 const parent = computed(() => editorService?.get('parent'));
-const stage = computed(() => editorService?.get('stage'));
 
 const menuData = computed<(MenuButton | MenuComponent)[]>(() => [
   {
     type: 'button',
     text: '水平居中',
+    icon: markRaw(CenterIcon),
     display: () => canCenter.value,
     handler: () => {
       if (!nodes.value) return;
       editorService?.alignCenter(nodes.value);
     },
   },
-  {
-    type: 'button',
-    text: '复制',
-    icon: markRaw(CopyDocument),
-    handler: () => {
-      nodes.value && editorService?.copy(nodes.value);
-      canPaste.value = true;
-    },
-  },
-  {
-    type: 'button',
-    text: '粘贴',
-    icon: markRaw(DocumentCopy),
-    display: () => canPaste.value,
-    handler: () => {
-      const rect = menu.value?.$el.getBoundingClientRect();
-      const parentRect = stage.value?.container?.getBoundingClientRect();
-      const initialLeft = (rect?.left || 0) - (parentRect?.left || 0);
-      const initialTop = (rect?.top || 0) - (parentRect?.top || 0);
-
-      if (!nodes.value || nodes.value.length === 0) return;
-      editorService?.paste({ left: initialLeft, top: initialTop });
-    },
-  },
+  useCopyMenu(),
+  usePasteMenu(menu),
   {
     type: 'divider',
     direction: 'horizontal',
@@ -97,6 +77,7 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() => [
   {
     type: 'button',
     text: '置顶',
+    icon: markRaw(Top),
     display: () => !isPage(node.value) && !props.isMultiSelect,
     handler: () => {
       editorService?.moveLayer(LayerOffset.TOP);
@@ -105,25 +86,19 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() => [
   {
     type: 'button',
     text: '置底',
+    icon: markRaw(Bottom),
     display: () => !isPage(node.value) && !props.isMultiSelect,
     handler: () => {
       editorService?.moveLayer(LayerOffset.BOTTOM);
     },
   },
+  useMoveToMenu(services),
   {
     type: 'divider',
     direction: 'horizontal',
     display: () => !isPage(node.value) && !props.isMultiSelect,
   },
-  {
-    type: 'button',
-    text: '删除',
-    icon: Delete,
-    display: () => !isPage(node.value),
-    handler: () => {
-      nodes.value && editorService?.remove(nodes.value);
-    },
-  },
+  useDeleteMenu(),
   {
     type: 'divider',
     direction: 'horizontal',
