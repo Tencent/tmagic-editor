@@ -29,7 +29,7 @@ export const resolveAppPackages = (app: App): ModuleMainFilePath => {
 
   const dependencies: Record<string, string> = {};
 
-  const setPackages = (cwd: string, packagePath: string, key?: string) => {
+  const setPackages = (cwd: string, tmp: string, packagePath: string, key?: string) => {
     const { name: moduleName } = splitNameVersion(packagePath);
 
     if (!moduleName) throw Error('packages中包含非法配置');
@@ -42,10 +42,10 @@ export const resolveAppPackages = (app: App): ModuleMainFilePath => {
     const result = typeAssertion({ ast, indexPath });
 
     const setItem = (key: string, entry: Entry) => {
-      if (entry.component) componentMap[key] = entry.component;
-      if (entry.config) configMap[key] = entry.config;
-      if (entry.event) eventMap[key] = entry.event;
-      if (entry.value) valueMap[key] = entry.value;
+      if (entry.component) componentMap[key] = path.relative(tmp, entry.component);
+      if (entry.config) configMap[key] = path.relative(tmp, entry.config);
+      if (entry.event) eventMap[key] = path.relative(tmp, entry.event);
+      if (entry.value) valueMap[key] = path.relative(tmp, entry.value);
     };
 
     if (result.type === PackageType.COMPONENT && key) {
@@ -116,10 +116,10 @@ export const resolveAppPackages = (app: App): ModuleMainFilePath => {
   packages.forEach((item) => {
     if (typeof item === 'object') {
       Object.entries(item).forEach(([key, packagePath]) => {
-        setPackages(app.options.source, packagePath, key);
+        setPackages(app.options.source, app.options.temp, packagePath, key);
       });
     } else {
-      setPackages(app.options.source, item);
+      setPackages(app.options.source, app.options.temp, item);
     }
   });
 
