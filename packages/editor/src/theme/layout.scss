@@ -2,4 +2,8 @@
   width: 100%;
   display: flex;
   justify-self: space-between;
+
+  &:has(.m-editor-resizer-draging) {
+    overflow: hidden;
+  }
 }
