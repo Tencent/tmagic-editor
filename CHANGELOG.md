@@ -1,3 +1,21 @@
+# [1.3.0-alpha.10](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.9...v1.3.0-alpha.10) (2023-07-06)
+
+
+### Bug Fixes
+
+* **design:** tDesign form 使用reset ([c9b9e76](https://github.com/Tencent/tmagic-editor/commit/c9b9e76514f2606dc60231568bf0ed182b26c1ff)), closes [#522](https://github.com/Tencent/tmagic-editor/issues/522)
+
+
+### Features
+
+* **cli:** 生成的entry文件里面的import使用相对路径 ([24bb45e](https://github.com/Tencent/tmagic-editor/commit/24bb45e2b95a246f53e82ecf0ada5269660d3593))
+* **editor,form:** 添加属性配置表单formState扩展函数prop ([fd53170](https://github.com/Tencent/tmagic-editor/commit/fd53170e59179f51c16f6908d8f817c6f77e96a1))
+* **editor:** 新增右键菜单移动至其他页面功能 ([434bf2e](https://github.com/Tencent/tmagic-editor/commit/434bf2ed70b8261eb669ea39eab99fab29ecff46))
+* **editor:** 点击画布区域聚焦，使得能使用画布的快捷键 ([9d24069](https://github.com/Tencent/tmagic-editor/commit/9d24069dcd75d2fc27bfd84aeda9d204d2e68762))
+* **stage): feat(stage:** 新增获取moveable配置的方法 ([1710168](https://github.com/Tencent/tmagic-editor/commit/17101687bfbaa852f93a3b8c6856e13d916294cf)), closes [#521](https://github.com/Tencent/tmagic-editor/issues/521)
+
+
+
 # [1.3.0-alpha.9](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.8...v1.3.0-alpha.9) (2023-07-03)
 
 
