@@ -1,3 +1,7 @@
+# [1.3.0-alpha.11](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.10...v1.3.0-alpha.11) (2023-07-06)
+
+
+
 # [1.3.0-alpha.10](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.9...v1.3.0-alpha.10) (2023-07-06)
 
 
