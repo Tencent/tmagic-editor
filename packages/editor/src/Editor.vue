@@ -61,7 +61,10 @@
 
     <template #props-panel>
       <slot name="props-panel">
-        <PropsPanel @mounted="(instance: any) => $emit('props-panel-mounted', instance)">
+        <PropsPanel
+          :extend-state="extendFormState"
+          @mounted="(instance: any) => $emit('props-panel-mounted', instance)"
+        >
           <template #props-panel-header>
             <slot name="props-panel-header"></slot>
           </template>

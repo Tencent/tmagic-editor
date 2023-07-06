@@ -1,7 +1,7 @@
 import type { PropType } from 'vue';
 
 import type { EventOption } from '@tmagic/core';
-import type { FormConfig } from '@tmagic/form';
+import type { FormConfig, FormState } from '@tmagic/form';
 import type { MApp, MNode } from '@tmagic/schema';
 import StageCore, {
   CONTAINER_HIGHLIGHT_CLASS_NAME,
@@ -136,5 +136,9 @@ export default {
 
   disabledDragStart: {
     type: Boolean,
+  },
+
+  extendFormState: {
+    type: Function as PropType<(state: FormState) => Record<string, any> | Promise<Record<string, any>>>,
   },
 };

@@ -1,5 +1,5 @@
 <template>
-  <div class="m-editor-props-panel" v-if="nodes.length === 1">
+  <div class="m-editor-props-panel" v-show="nodes.length === 1">
     <slot name="props-panel-header"></slot>
     <MForm
       ref="configForm"
@@ -8,6 +8,7 @@
       :size="propsPanelSize"
       :init-values="values"
       :config="curFormConfig"
+      :extend-state="extendState"
       @change="submit"
     ></MForm>
   </div>
@@ -17,7 +18,7 @@
 import { computed, getCurrentInstance, inject, onMounted, onUnmounted, ref, watchEffect } from 'vue';
 
 import { tMagicMessage } from '@tmagic/design';
-import type { FormValue } from '@tmagic/form';
+import type { FormState, FormValue } from '@tmagic/form';
 import { MForm } from '@tmagic/form';
 
 import type { Services } from '@editor/type';
@@ -25,6 +26,10 @@ import type { Services } from '@editor/type';
 defineOptions({
   name: 'MEditorPropsPanel',
 });
+
+defineProps<{
+  extendState?: (state: FormState) => Record<string, any> | Promise<Record<string, any>>;
+}>();
 
 const emit = defineEmits(['mounted']);
 
@@ -78,5 +83,5 @@ const submit = async () => {
   }
 };
 
-defineExpose({ submit });
+defineExpose({ configForm, submit });
 </script>

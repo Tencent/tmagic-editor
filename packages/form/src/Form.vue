@@ -62,6 +62,7 @@ const props = withDefaults(
     labelPosition?: string;
     keyProp?: string;
     popperClass?: string;
+    extendState?: (state: FormState) => Record<string, any> | Promise<Record<string, any>>;
   }>(),
   {
     config: () => [],
@@ -114,7 +115,7 @@ const formState: FormState = reactive<FormState>({
   },
 });
 
-watchEffect(() => {
+watchEffect(async () => {
   formState.initValues = props.initValues;
   formState.lastValues = props.lastValues;
   formState.isCompare = props.isCompare;
@@ -122,6 +123,13 @@ watchEffect(() => {
   formState.keyProp = props.keyProp;
   formState.popperClass = props.popperClass;
   formState.parentValues = props.parentValues;
+
+  if (typeof props.extendState === 'function') {
+    const state = (await props.extendState(formState)) || {};
+    Object.entries(state).forEach(([key, value]) => {
+      formState[key] = value;
+    });
+  }
 });
 
 provide('mForm', formState);
