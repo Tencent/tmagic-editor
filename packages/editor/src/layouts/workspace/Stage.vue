@@ -12,6 +12,7 @@
       width: 60,
       height: 50,
     }"
+    @click="stageWrap?.container?.focus()"
   >
     <div
       class="m-editor-stage-container"
