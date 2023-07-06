@@ -30,7 +30,12 @@ defineExpose({
   },
 
   resetFields() {
-    return form.value?.resetFields();
+    if (typeof form.value?.resetFields === 'function') {
+      return form.value?.resetFields();
+    }
+    if (typeof form.value?.reset === 'function') {
+      return form.value?.reset();
+    }
   },
 });
 </script>
