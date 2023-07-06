@@ -19,9 +19,10 @@ import EventEmitter from 'events';
 
 import KeyController from 'keycon';
 import { throttle } from 'lodash-es';
+import type { MoveableOptions } from 'moveable';
 
 import { Env } from '@tmagic/core';
-import { Id } from '@tmagic/schema';
+import type { Id } from '@tmagic/schema';
 import { addClassName, getDocument, removeClassNameByClassName } from '@tmagic/utils';
 
 import { CONTAINER_HIGHLIGHT_CLASS_NAME, GHOST_EL_ID_PREFIX, GuidesType, MouseButton, PAGE_CLASS } from './const';
@@ -184,6 +185,15 @@ export default class ActionManager extends EventEmitter {
 
   public getSelectedElList(): HTMLElement[] {
     return this.selectedElList;
+  }
+
+  public getMoveableOption<K extends keyof MoveableOptions>(key: K): MoveableOptions[K] | undefined {
+    if (this.dr.getTarget()) {
+      return this.dr.getOption(key);
+    }
+    if (this.multiDr.targetList.length) {
+      return this.multiDr.getOption(key);
+    }
   }
 
   /**

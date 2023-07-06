@@ -36,6 +36,7 @@ export default class MoveableOptionsManager extends EventEmitter {
 
   /** 画布容器 */
   protected container: HTMLElement;
+  protected options: MoveableOptions = {};
 
   /** 水平参考线 */
   private horizontalGuidelines: number[] = [];
@@ -53,6 +54,10 @@ export default class MoveableOptionsManager extends EventEmitter {
     this.customizedOptions = config.moveableOptions;
     this.container = config.container;
     this.getRootContainer = config.getRootContainer;
+  }
+
+  public getOption<K extends keyof MoveableOptions>(key: K): MoveableOptions[K] {
+    return this.options[key];
   }
 
   /**
@@ -106,7 +111,8 @@ export default class MoveableOptionsManager extends EventEmitter {
     const defaultOptions = this.getDefaultOptions(isMultiSelect);
     const customizedOptions = this.getCustomizeOptions();
 
-    return merge(defaultOptions, customizedOptions, runtimeOptions);
+    this.options = merge(defaultOptions, customizedOptions, runtimeOptions);
+    return this.options;
   }
 
   /**
