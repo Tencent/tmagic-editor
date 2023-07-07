@@ -86,7 +86,7 @@ class CodeBlock extends BaseService {
    * @param {CodeBlockContent} codeConfig 代码块内容配置信息
    * @returns {void}
    */
-  public async setCodeDslById(id: Id, codeConfig: CodeBlockContent): Promise<void> {
+  public async setCodeDslById(id: Id, codeConfig: Partial<CodeBlockContent>): Promise<void> {
     const codeDsl = this.getCodeDsl();
 
     if (!codeDsl) {
