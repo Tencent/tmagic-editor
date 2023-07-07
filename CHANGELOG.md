@@ -1,3 +1,12 @@
+# [1.3.0-alpha.12](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.11...v1.3.0-alpha.12) (2023-07-07)
+
+
+### Bug Fixes
+
+* **editor:** 组件拖入画布出错 ([565881c](https://github.com/Tencent/tmagic-editor/commit/565881c8c9b1ff89b1f129530da1d1d92846990c)), closes [#524](https://github.com/Tencent/tmagic-editor/issues/524)
+
+
+
 # [1.3.0-alpha.11](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.10...v1.3.0-alpha.11) (2023-07-06)
 
 
