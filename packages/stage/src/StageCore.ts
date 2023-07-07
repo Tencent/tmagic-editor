@@ -125,6 +125,10 @@ export default class StageCore extends EventEmitter {
     this.actionManager.highlight(idOrEl);
   }
 
+  public clearHighlight(): void {
+    this.actionManager.clearHighlight();
+  }
+
   /**
    * 更新组件
    * @param data 更新组件的数据
