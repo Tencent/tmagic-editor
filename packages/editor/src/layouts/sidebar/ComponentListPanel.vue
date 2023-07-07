@@ -84,7 +84,7 @@ const appendComponent = ({ text, type, data = {} }: ComponentItem): void => {
 const dragstartHandler = ({ text, type, data = {} }: ComponentItem, e: DragEvent) => {
   if (e.dataTransfer) {
     e.dataTransfer.setData(
-      'text/html',
+      'text/json',
       serialize({
         name: text,
         type,

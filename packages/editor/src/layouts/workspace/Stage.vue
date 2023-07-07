@@ -165,7 +165,7 @@ const dropHandler = async (e: DragEvent) => {
   if (e.dataTransfer && parent && stageContainer.value && stage) {
     const parseDSL = getConfig('parseDSL');
 
-    const data = e.dataTransfer.getData('text/html');
+    const data = e.dataTransfer.getData('text/json');
 
     if (!data) return;
 
