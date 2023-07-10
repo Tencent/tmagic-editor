@@ -59,7 +59,14 @@
 import { computed, inject, ref } from 'vue';
 import { Close, Edit, View } from '@element-plus/icons-vue';
 
-import { TMagicButton, tMagicMessage, TMagicScrollbar, TMagicTooltip, TMagicTree } from '@tmagic/design';
+import {
+  TMagicButton,
+  tMagicMessage,
+  tMagicMessageBox,
+  TMagicScrollbar,
+  TMagicTooltip,
+  TMagicTree,
+} from '@tmagic/design';
 import { ColumnConfig } from '@tmagic/form';
 import { CodeBlockContent, Id } from '@tmagic/schema';
 
@@ -141,11 +148,17 @@ const editCode = async (key: Id) => {
 };
 
 // 删除代码块
-const deleteCode = (key: Id) => {
+const deleteCode = async (key: Id) => {
   const currentCode = codeList.value.find((codeItem) => codeItem.id === key);
   const existBinds = Boolean(currentCode?.children.length);
   const undeleteableList = codeBlockService?.getUndeletableList() || [];
   if (!existBinds && !undeleteableList.includes(key)) {
+    await tMagicMessageBox.confirm('确定删除该代码块吗？', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    });
+
     // 无绑定关系，且不在不可删除列表中
     codeBlockService?.deleteCodeDslByIds([key]);
   } else {
