@@ -1,3 +1,14 @@
+# [1.3.0-alpha.13](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.12...v1.3.0-alpha.13) (2023-07-10)
+
+
+### Features
+
+* **editor:** 代码块删除新增确认 ([8e82d38](https://github.com/Tencent/tmagic-editor/commit/8e82d38bbb4fade53d881f8b11b5bed2d2fb7567))
+* **editor:** 组件选择器点击已选择组件由重新选择改成选择组件 ([07cd306](https://github.com/Tencent/tmagic-editor/commit/07cd3065b2517c22a04ff3e6dc16243b582d9400))
+* **stage:** 新增清除高亮方法 ([ee3ad63](https://github.com/Tencent/tmagic-editor/commit/ee3ad63aa3065d1ba0fd28b81af1f2d6b245101b))
+
+
+
 # [1.3.0-alpha.12](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.11...v1.3.0-alpha.12) (2023-07-07)
 
 
