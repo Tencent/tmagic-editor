@@ -7,17 +7,21 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, watch } from 'vue';
+import { computed, inject, watch } from 'vue';
 import { isEmpty } from 'lodash-es';
 
 import { TMagicCard } from '@tmagic/design';
 import { HookType } from '@tmagic/schema';
+
+import type { Services } from '@editor/type';
 
 defineOptions({
   name: 'MEditorCodeSelect',
 });
 
 const emit = defineEmits(['change']);
+
+const services = inject<Services>('services');
 
 const props = withDefaults(
   defineProps<{
@@ -41,7 +45,9 @@ const codeConfig = computed(() => ({
   items: [
     {
       type: 'code-select-col',
+      name: 'codeId',
       labelWidth: 0,
+      disabled: () => !services?.codeBlockService.getEditStatus(),
     },
   ],
 }));
