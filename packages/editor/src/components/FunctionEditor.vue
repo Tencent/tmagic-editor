@@ -12,6 +12,7 @@
           :config="tableConfig"
           :model="tableModel"
           :enableToggleMode="false"
+          :disabled="!editable"
           name="params"
           prop="params"
           size="small"
@@ -118,7 +119,7 @@ const tableConfig: TableConfig = {
     {
       type: 'text',
       label: '参数注释',
-      name: 'tip',
+      name: 'extra',
       width: 200,
     },
     paramsColConfig,
