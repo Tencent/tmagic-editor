@@ -56,6 +56,7 @@ export * from './utils/useAddField';
 
 export { default as MForm } from './Form.vue';
 export { default as MFormDialog } from './FormDialog.vue';
+export { default as MFormDrawer } from './FormDrawer.vue';
 export { default as MContainer } from './containers/Container.vue';
 export { default as MFieldset } from './containers/Fieldset.vue';
 export { default as MPanel } from './containers/Panel.vue';

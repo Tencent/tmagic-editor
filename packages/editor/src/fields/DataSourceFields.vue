@@ -1,6 +1,6 @@
 <template>
   <div class="m-editor-data-source-fields">
-    <MagicTable :data="model[name]" :columns="filedColumns"></MagicTable>
+    <MagicTable :data="model[name]" :columns="fieldColumns"></MagicTable>
 
     <div class="m-editor-data-source-fields-footer">
       <TMagicButton size="small" type="primary" :disabled="disabled" plain @click="newHandler()">添加</TMagicButton>
@@ -12,6 +12,7 @@
       :config="dataSourceFieldsConfig"
       :values="fieldValues"
       :parentValues="model[name]"
+      :disabled="disabled"
       @submit="fieldChange"
     ></MFormDialog>
   </div>
@@ -35,6 +36,7 @@ const props = withDefaults(
     };
     model: any;
     prop: string;
+    lastValues?: any;
     disabled: boolean;
     name: string;
   }>(),
@@ -50,27 +52,24 @@ const fieldValues = ref<Record<string, any>>({});
 const filedTitle = ref('');
 
 const newHandler = () => {
-  if (!addDialog.value) return;
   fieldValues.value = {};
   filedTitle.value = '新增属性';
-  addDialog.value.dialogVisible = true;
+  addDialog.value?.show();
 };
 
 const fieldChange = ({ index, ...value }: Record<string, any>) => {
-  if (!addDialog.value) return;
-
   if (index > -1) {
     props.model[props.name][index] = value;
   } else {
     props.model[props.name].push(value);
   }
 
-  addDialog.value.dialogVisible = false;
+  addDialog.value?.hide();
 
   emit('change', props.model[props.name]);
 };
 
-const filedColumns = [
+const fieldColumns = [
   {
     label: '属性名称',
     prop: 'title',
@@ -90,13 +89,12 @@ const filedColumns = [
       {
         text: '编辑',
         handler: (row: Record<string, any>, index: number) => {
-          if (!addDialog.value) return;
           fieldValues.value = {
             ...row,
             index,
           };
           filedTitle.value = `编辑${row.title}`;
-          addDialog.value.dialogVisible = true;
+          addDialog.value?.show();
         },
       },
       {

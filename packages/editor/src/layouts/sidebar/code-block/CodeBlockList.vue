@@ -1,82 +1,56 @@
 <template>
-  <TMagicScrollbar class="m-editor-code-block-list m-editor-dep-list-panel">
-    <slot name="code-block-panel-header">
-      <div class="search-wrapper">
-        <SearchInput @search="filterTextChangeHandler"></SearchInput>
-        <TMagicButton class="create-code-button" type="primary" size="small" @click="createCodeBlock" v-if="editable"
-          >新增</TMagicButton
-        >
-      </div>
-    </slot>
-
-    <!-- 代码块列表 -->
-    <TMagicTree
-      ref="tree"
-      class="magic-editor-layer-tree"
-      node-key="id"
-      empty-text="暂无代码块"
-      :default-expanded-keys="expandedKeys"
-      :expand-on-click-node="false"
-      :data="codeList"
-      :props="treeProps"
-      :highlight-current="true"
-      :filter-node-method="filterNode"
-      @node-click="clickHandler"
-    >
-      <template #default="{ data }">
-        <div :id="data.id" class="list-container">
-          <div class="list-item">
-            <CodeIcon v-if="data.type === 'code'" class="codeIcon"></CodeIcon>
-            <AppManageIcon v-if="data.type === 'node'" class="compIcon"></AppManageIcon>
-            <span class="name" :class="{ code: data.type === 'code', hook: data.type === 'key' }"
-              >{{ data.name }} ({{ data.id }})</span
-            >
-            <!-- 右侧工具栏 -->
-            <div class="right-tool" v-if="data.type === 'code'">
-              <TMagicTooltip effect="dark" :content="editable ? '编辑' : '查看'" placement="bottom">
-                <Icon :icon="editable ? Edit : View" class="edit-icon" @click.stop="editCode(`${data.id}`)"></Icon>
-              </TMagicTooltip>
-              <TMagicTooltip effect="dark" content="删除" placement="bottom" v-if="editable">
-                <Icon :icon="Close" class="edit-icon" @click.stop="deleteCode(`${data.id}`)"></Icon>
-              </TMagicTooltip>
-              <slot name="code-block-panel-tool" :id="data.id" :data="data.codeBlockContent"></slot>
-            </div>
+  <TMagicTree
+    ref="tree"
+    class="magic-editor-layer-tree"
+    node-key="id"
+    empty-text="暂无代码块"
+    :default-expanded-keys="expandedKeys"
+    :expand-on-click-node="false"
+    :data="codeList"
+    :props="{
+      children: 'children',
+      label: 'name',
+      value: 'id',
+    }"
+    :highlight-current="true"
+    :filter-node-method="filterNode"
+    @node-click="clickHandler"
+  >
+    <template #default="{ data }">
+      <div :id="data.id" class="list-container">
+        <div class="list-item">
+          <CodeIcon v-if="data.type === 'code'" class="codeIcon"></CodeIcon>
+          <AppManageIcon v-if="data.type === 'node'" class="compIcon"></AppManageIcon>
+          <span class="name" :class="{ code: data.type === 'code', hook: data.type === 'key' }"
+            >{{ data.name }} ({{ data.id }})</span
+          >
+          <!-- 右侧工具栏 -->
+          <div class="right-tool" v-if="data.type === 'code'">
+            <TMagicTooltip effect="dark" :content="editable ? '编辑' : '查看'" placement="bottom">
+              <Icon :icon="editable ? Edit : View" class="edit-icon" @click.stop="editCode(data.id)"></Icon>
+            </TMagicTooltip>
+            <TMagicTooltip v-if="editable" effect="dark" content="删除" placement="bottom">
+              <Icon :icon="Close" class="edit-icon" @click.stop="deleteCode(`${data.id}`)"></Icon>
+            </TMagicTooltip>
+            <slot name="code-block-panel-tool" :id="data.id" :data="data.codeBlockContent"></slot>
           </div>
         </div>
-      </template>
-    </TMagicTree>
-
-    <!-- 代码块编辑区 -->
-    <CodeBlockEditor v-if="isShowCodeBlockEditor" :paramsColConfig="paramsColConfig">
-      <template #code-block-edit-panel-header="{ id }">
-        <slot name="code-block-edit-panel-header" :id="id"></slot>
-      </template>
-    </CodeBlockEditor>
-  </TMagicScrollbar>
+      </div>
+    </template>
+  </TMagicTree>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { computed, inject, ref } from 'vue';
 import { Close, Edit, View } from '@element-plus/icons-vue';
 
-import {
-  TMagicButton,
-  tMagicMessage,
-  tMagicMessageBox,
-  TMagicScrollbar,
-  TMagicTooltip,
-  TMagicTree,
-} from '@tmagic/design';
-import { ColumnConfig } from '@tmagic/form';
-import { CodeBlockContent, Id } from '@tmagic/schema';
+import { tMagicMessage, tMagicMessageBox, TMagicTooltip, TMagicTree } from '@tmagic/design';
+import type { Id } from '@tmagic/schema';
 
 import Icon from '@editor/components/Icon.vue';
-import SearchInput from '@editor/components/SearchInput.vue';
 import AppManageIcon from '@editor/icons/AppManageIcon.vue';
 import CodeIcon from '@editor/icons/CodeIcon.vue';
 import { CodeDeleteErrorType, CodeDslItem, Services } from '@editor/type';
-
-import CodeBlockEditor from './CodeBlockEditor.vue';
 
 defineOptions({
   name: 'MEditorCodeBlockList',
@@ -84,14 +58,12 @@ defineOptions({
 
 const props = defineProps<{
   customError?: (id: Id, errorType: CodeDeleteErrorType) => any;
-  paramsColConfig?: ColumnConfig;
 }>();
 
-const treeProps = {
-  children: 'children',
-  label: 'name',
-  value: 'id',
-};
+const emit = defineEmits<{
+  edit: [id: string];
+  remove: [id: string];
+}>();
 
 const { codeBlockService, depService, editorService } = inject<Services>('services') || {};
 
@@ -114,73 +86,15 @@ const codeList = computed(() =>
     };
   }),
 );
-
 // 默认展开组件层级的节点
 const expandedKeys = computed(() => codeList.value.map((item) => item.id));
-
 const editable = computed(() => codeBlockService?.getEditStatus());
-
-// 是否展示代码编辑区
-const isShowCodeBlockEditor = computed(() => codeBlockService?.getCodeEditorShowStatus() || false);
-
-// 新增代码块
-const createCodeBlock = async () => {
-  if (!codeBlockService) {
-    tMagicMessage.error('新增代码块失败');
-    return;
-  }
-
-  const codeConfig: CodeBlockContent = {
-    name: '代码块',
-    content: `({app, params}) => {\n  // place your code here\n}`,
-    params: [],
-  };
-
-  const id = await codeBlockService.getUniqueId();
-
-  await codeBlockService.setCodeDslById(id, codeConfig);
-  codeBlockService.setCodeEditorContent(true, id);
-};
-
-// 编辑代码块
-const editCode = async (key: Id) => {
-  codeBlockService?.setCodeEditorContent(true, key);
-};
-
-// 删除代码块
-const deleteCode = async (key: Id) => {
-  const currentCode = codeList.value.find((codeItem) => codeItem.id === key);
-  const existBinds = Boolean(currentCode?.children.length);
-  const undeleteableList = codeBlockService?.getUndeletableList() || [];
-  if (!existBinds && !undeleteableList.includes(key)) {
-    await tMagicMessageBox.confirm('确定删除该代码块吗？', '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning',
-    });
-
-    // 无绑定关系，且不在不可删除列表中
-    codeBlockService?.deleteCodeDslByIds([key]);
-  } else {
-    if (typeof props.customError === 'function') {
-      props.customError(key, existBinds ? CodeDeleteErrorType.BIND : CodeDeleteErrorType.UNDELETEABLE);
-    } else {
-      tMagicMessage.error('代码块删除失败');
-    }
-  }
-};
-
-const tree = ref<InstanceType<typeof TMagicTree>>();
 
 const filterNode = (value: string, data: CodeDslItem): boolean => {
   if (!value) {
     return true;
   }
   return `${data.name}${data.id}`.toLocaleLowerCase().indexOf(value.toLocaleLowerCase()) !== -1;
-};
-
-const filterTextChangeHandler = (val: string) => {
-  tree.value?.filter(val);
 };
 
 // 选中组件
@@ -197,4 +111,39 @@ const clickHandler = (data: any, node: any) => {
     selectComp(node.parent.data.id);
   }
 };
+
+// 编辑代码块
+const editCode = (id: string) => {
+  emit('edit', id);
+};
+
+const deleteCode = async (id: string) => {
+  const currentCode = codeList.value.find((codeItem) => codeItem.id === id);
+  const existBinds = Boolean(currentCode?.children.length);
+  const undeleteableList = codeBlockService?.getUndeletableList() || [];
+  if (!existBinds && !undeleteableList.includes(id)) {
+    await tMagicMessageBox.confirm('确定删除该代码块吗？', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    });
+
+    // 无绑定关系，且不在不可删除列表中
+    emit('remove', id);
+  } else {
+    if (typeof props.customError === 'function') {
+      props.customError(id, existBinds ? CodeDeleteErrorType.BIND : CodeDeleteErrorType.UNDELETEABLE);
+    } else {
+      tMagicMessage.error('代码块删除失败');
+    }
+  }
+};
+
+const tree = ref<InstanceType<typeof TMagicTree>>();
+
+defineExpose({
+  filter(val: string) {
+    tree.value?.filter(val);
+  },
+});
 </script>

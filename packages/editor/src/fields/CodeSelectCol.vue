@@ -9,18 +9,26 @@
         @change="onParamsChangeHandler"
       ></m-form-container>
       <!-- 查看/编辑按钮 -->
-      <Icon v-if="model[name]" class="icon" :icon="!disabled ? Edit : View" @click="editCode"></Icon>
+      <Icon v-if="model[name]" class="icon" :icon="!disabled ? Edit : View" @click="editCode(model[name])"></Icon>
     </div>
+
     <!-- 参数填写框 -->
     <CodeParams
       v-if="paramsConfig.length"
       name="params"
       :model="model"
       :size="size"
-      :disabled="disabled"
       :params-config="paramsConfig"
       @change="onParamsChangeHandler"
     ></CodeParams>
+
+    <CodeBlockEditor
+      ref="codeBlockEditor"
+      v-if="codeConfig"
+      :disabled="disabled"
+      :content="codeConfig"
+      @submit="submitCodeBlockHandler"
+    ></CodeBlockEditor>
   </div>
 </template>
 
@@ -32,9 +40,11 @@ import { isEmpty, map } from 'lodash-es';
 import { createValues } from '@tmagic/form';
 import type { Id } from '@tmagic/schema';
 
+import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
 import CodeParams from '@editor/components/CodeParams.vue';
 import Icon from '@editor/components/Icon.vue';
 import type { CodeParamStatement, CodeSelectColConfig, Services } from '@editor/type';
+import { useCodeBlockEdit } from '@editor/utils/use-code-block-edit';
 
 defineOptions({
   name: 'MEditorCodeSelectCol',
@@ -53,7 +63,9 @@ const props = withDefaults(
     disabled?: boolean;
     size: 'small' | 'default' | 'large';
   }>(),
-  {},
+  {
+    disabled: false,
+  },
 );
 
 /**
@@ -114,8 +126,5 @@ const onParamsChangeHandler = (value: any) => {
   emit('change', props.model);
 };
 
-// 打开代码编辑框
-const editCode = () => {
-  services?.codeBlockService.setCodeEditorContent(true, props.model[props.name]);
-};
+const { codeBlockEditor, codeConfig, editCode, submitCodeBlockHandler } = useCodeBlockEdit(services?.codeBlockService);
 </script>

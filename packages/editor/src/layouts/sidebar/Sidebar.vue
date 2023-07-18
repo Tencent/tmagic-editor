@@ -59,14 +59,6 @@
         </template>
 
         <template
-          #code-block-edit-panel-header="{ id }"
-          v-if="config.$key === 'code-block' || config.slots?.codeBlockEditPanelHeader"
-        >
-          <slot v-if="config.$key === 'code-block'" name="code-block-edit-panel-header" :id="id"></slot>
-          <component v-else-if="config.slots?.codeBlockEditPanelHeader" :is="config.slots.codeBlockEditPanelHeader" />
-        </template>
-
-        <template
           #layer-node-content="{ data: nodeData, node }"
           v-if="config.$key === 'layer' || config.slots?.layerNodeContent"
         >
@@ -93,7 +85,7 @@ import MIcon from '@editor/components/Icon.vue';
 import type { MenuButton, MenuComponent, SideComponent, SideItem } from '@editor/type';
 import { SideBarData } from '@editor/type';
 
-import CodeBlockList from './code-block/CodeBlockList.vue';
+import CodeBlockListPanel from './code-block/CodeBlockListPanel.vue';
 import DataSourceListPanel from './data-source/DataSourceListPanel.vue';
 import ComponentListPanel from './ComponentListPanel.vue';
 import LayerPanel from './LayerPanel.vue';
@@ -143,7 +135,7 @@ const getItemConfig = (data: SideItem): SideComponent => {
       type: 'component',
       icon: EditPen,
       text: '代码编辑',
-      component: CodeBlockList,
+      component: CodeBlockListPanel,
       slots: {},
     },
     'data-source': {

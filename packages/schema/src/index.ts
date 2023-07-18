@@ -30,6 +30,8 @@ export enum ActionType {
   COMP = 'comp',
   /** 联动代码 */
   CODE = 'code',
+  /** 数据源 */
+  DATA_SOURCE = 'data-source',
 }
 
 export interface DataSourceDeps {
@@ -71,7 +73,16 @@ export interface CompItemConfig {
   method: string;
 }
 
-export type EventActionItem = CompItemConfig | CodeItemConfig;
+export interface DataSourceItemConfig {
+  /** 动作类型 */
+  actionType: ActionType;
+  /** [数据源id, 方法] */
+  dataSourceMethod: [string, string];
+  /** 代码参数 */
+  params?: object;
+}
+
+export type EventActionItem = CompItemConfig | CodeItemConfig | DataSourceItemConfig;
 
 export interface MComponent {
   /** 组件ID，默认为${type}_${number}}形式, 如：page_123 */
@@ -124,9 +135,11 @@ export interface CodeBlockContent {
   /** 代码块名称 */
   name: string;
   /** 代码块内容 */
-  content: any;
+  content: ((...args: any[]) => any) | string;
   /** 参数定义 */
   params: CodeParam[] | [];
+  /** 注释 */
+  desc?: string;
   /** 扩展字段 */
   [propName: string]: any;
 }
@@ -137,6 +150,7 @@ export interface CodeParam {
   /** 扩展字段 */
   [propName: string]: any;
 }
+
 export interface PastePosition {
   left?: number;
   top?: number;
@@ -176,6 +190,8 @@ export interface DataSourceSchema {
   description?: string;
   /** 字段列表 */
   fields: DataSchema[];
+  /** 方法列表 */
+  methods?: CodeBlockContent[];
   /** 扩展字段 */
   [key: string]: any;
 }

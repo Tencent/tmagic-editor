@@ -1,7 +1,32 @@
 .magic-code-editor {
   width: 100%;
+}
 
-  .margin {
-    margin: 0;
+.magic-code-editor-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+
+  &.full-screen {
+    position: fixed;
+    z-index: 10000;
+    top: 0;
+    left: 0;
+  }
+
+  .magic-code-editor-content {
+    width: 100%;
+    height: 100%;
+
+    .margin {
+      margin: 0;
+    }
+  }
+
+  .magic-code-editor-full-screen-icon {
+    position: absolute;
+    top: 5px;
+    right: 0;
+    z-index: 1;
   }
 }

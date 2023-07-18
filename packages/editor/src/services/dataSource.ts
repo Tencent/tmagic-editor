@@ -11,6 +11,7 @@ import BaseService from './BaseService';
 
 interface State {
   dataSources: DataSourceSchema[];
+  editable: boolean;
   configs: Record<string, FormConfig>;
 }
 
@@ -18,6 +19,7 @@ type StateKey = keyof State;
 class DataSource extends BaseService {
   private state = reactive<State>({
     dataSources: [],
+    editable: true,
     configs: {},
   });
 

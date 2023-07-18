@@ -18,7 +18,7 @@
 
 import type { Component } from 'vue';
 
-import type { FilterFunction, FormConfig, FormItem } from '@tmagic/form';
+import type { ColumnConfig, FilterFunction, FormConfig, FormItem } from '@tmagic/form';
 import type { CodeBlockContent, CodeBlockDSL, Id, MApp, MContainer, MNode, MPage } from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
 import type {
@@ -45,7 +45,7 @@ export type BeforeAdd = (config: MNode, parent: MContainer) => Promise<MNode> | 
 export type GetConfig = (config: FormConfig) => Promise<FormConfig> | FormConfig;
 
 export interface InstallOptions {
-  parseDSL: (dsl: string) => MApp;
+  parseDSL: <T = any>(dsl: string) => T;
   [key: string]: any;
 }
 
@@ -334,18 +334,15 @@ export interface ScrollViewerEvent {
 }
 
 export type CodeState = {
-  /** 是否展示代码块编辑区 */
-  isShowCodeEditor: boolean;
   /** 代码块DSL数据源 */
   codeDsl: CodeBlockDSL | null;
-  /** 当前选中的代码块id */
-  id: Id;
   /** 代码块是否可编辑 */
   editable: boolean;
   /** list模式下左侧展示的代码列表 */
   combineIds: string[];
   /** 为业务逻辑预留的不可删除的代码块列表，由业务逻辑维护（如代码块上线后不可删除） */
   undeletableList: Id[];
+  paramsColConfig?: ColumnConfig;
 };
 
 export type HookData = {
@@ -429,6 +426,8 @@ export interface EventSelectConfig {
   compActionConfig?: FormItem;
   /** 联动代码配置 */
   codeActionConfig?: FormItem;
+  /** 联动数据源配置 */
+  dataSourceActionConfig?: FormItem;
 }
 
 export enum KeyBindingCommand {
@@ -488,6 +487,14 @@ export interface KeyBindingCacheItem {
 
 export interface CodeSelectColConfig {
   type: 'code-select-col';
+  name: string;
+  labelWidth?: number | string;
+  disabled?: boolean | FilterFunction;
+  display?: boolean | FilterFunction;
+}
+
+export interface DataSourceMethodSelectConfig {
+  type: 'data-source-method-select';
   name: string;
   labelWidth?: number | string;
   disabled?: boolean | FilterFunction;

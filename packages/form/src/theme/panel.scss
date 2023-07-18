@@ -16,3 +16,9 @@
     margin-left: 5px;
   }
 }
+
+.m-container-panel {
+  &:not(:last-of-type) {
+    margin-bottom: 20px;
+  }
+}

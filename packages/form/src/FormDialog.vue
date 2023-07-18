@@ -118,10 +118,6 @@ const hasStep = computed(() => {
   return false;
 });
 
-const cancel = () => {
-  dialogVisible.value = false;
-};
-
 const closeHandler = () => {
   stepActive.value = 1;
   emit('close');
@@ -148,6 +144,18 @@ const changeHandler = (value: any) => {
   emit('change', value);
 };
 
+const show = () => {
+  dialogVisible.value = true;
+};
+
+const hide = () => {
+  dialogVisible.value = false;
+};
+
+const cancel = () => {
+  hide();
+};
+
 defineExpose({
   form,
   saveFetch,
@@ -155,5 +163,7 @@ defineExpose({
 
   cancel,
   save,
+  show,
+  hide,
 });
 </script>

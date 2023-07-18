@@ -17,6 +17,17 @@ const fillConfig = (config: FormConfig): FormConfig => [
       },
     ],
   },
+  {
+    type: 'panel',
+    title: '方法定义',
+    items: [
+      {
+        name: 'methods',
+        type: 'data-source-methods',
+        defaultValue: [],
+      },
+    ],
+  },
 ];
 
 export const getFormConfig = (type: string, configs: Record<string, FormConfig>): FormConfig => {

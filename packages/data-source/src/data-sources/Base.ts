@@ -17,7 +17,7 @@
  */
 import EventEmitter from 'events';
 
-import type { DataSchema } from '@tmagic/schema';
+import type { CodeBlockContent, DataSchema } from '@tmagic/schema';
 
 import type { DataSourceOptions } from '@data-source/types';
 import { getDefaultValueFromFields } from '@data-source/util';
@@ -35,18 +35,28 @@ export default class DataSource extends EventEmitter {
   public data: Record<string, any> = {};
 
   private fields: DataSchema[] = [];
+  private methods: CodeBlockContent[] = [];
 
   constructor(options: DataSourceOptions) {
     super();
 
     this.id = options.schema.id;
     this.setFields(options.schema.fields);
+    this.setMethods(options.schema.methods || []);
 
     this.updateDefaultData();
   }
 
   public setFields(fields: DataSchema[]) {
     this.fields = fields;
+  }
+
+  public setMethods(methods: CodeBlockContent[]) {
+    this.methods = methods;
+  }
+
+  public getMethods() {
+    return this.methods;
   }
 
   public setData(data: Record<string, any>) {

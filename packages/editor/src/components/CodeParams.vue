@@ -51,7 +51,6 @@ const codeParamsConfig = computed(() => getFormConfig(props.paramsConfig));
 const onParamsChangeHandler = async () => {
   try {
     const value = await form.value?.submitForm(true);
-    console.log(value);
     emit('change', value);
   } catch (e) {
     console.log(e);

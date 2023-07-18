@@ -2,8 +2,7 @@
   <div
     v-if="config"
     :style="config.tip ? 'display: flex;align-items: baseline;' : ''"
-    :class="config.className"
-    class="m-form-container"
+    :class="`m-form-container m-container-${type || ''} ${config.className || ''}`"
   >
     <m-fields-hidden
       v-if="type === 'hidden'"

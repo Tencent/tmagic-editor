@@ -19,7 +19,8 @@
 import { reactive } from 'vue';
 import { keys, pick } from 'lodash-es';
 
-import { CodeBlockContent, CodeBlockDSL, Id } from '@tmagic/schema';
+import type { ColumnConfig } from '@tmagic/form';
+import type { CodeBlockContent, CodeBlockDSL, Id } from '@tmagic/schema';
 
 import type { CodeState } from '@editor/type';
 import { CODE_DRAFT_STORAGE_KEY } from '@editor/type';
@@ -29,23 +30,15 @@ import BaseService from './BaseService';
 
 class CodeBlock extends BaseService {
   private state = reactive<CodeState>({
-    isShowCodeEditor: false,
     codeDsl: null,
-    id: '',
     editable: true,
     combineIds: [],
     undeletableList: [],
+    paramsColConfig: undefined,
   });
 
   constructor() {
-    super([
-      'setCodeDslById',
-      'setCodeEditorShowStatus',
-      'setEditStatus',
-      'setCombineIds',
-      'setUndeleteableList',
-      'deleteCodeDslByIds',
-    ]);
+    super(['setCodeDslById', 'setEditStatus', 'setCombineIds', 'setUndeleteableList', 'deleteCodeDslByIds']);
   }
 
   /**
@@ -97,7 +90,10 @@ class CodeBlock extends BaseService {
     if (codeConfig.content) {
       // 在保存的时候转换代码内容
       const parseDSL = getConfig('parseDSL');
-      codeConfigProcessed.content = parseDSL(codeConfig.content);
+      if (typeof codeConfig.content === 'string') {
+        codeConfig.content = parseDSL<(...args: any[]) => any>(codeConfig.content);
+      }
+      codeConfigProcessed.content = codeConfig.content;
     }
 
     const existContent = codeDsl[id] || {};
@@ -121,43 +117,6 @@ class CodeBlock extends BaseService {
   }
 
   /**
-   * 设置代码编辑面板展示状态
-   * @param {boolean} status 是否展示代码编辑面板
-   * @returns {void}
-   */
-  public async setCodeEditorShowStatus(status: boolean): Promise<void> {
-    this.state.isShowCodeEditor = status;
-  }
-
-  /**
-   * 获取代码编辑面板展示状态
-   * @returns {boolean} 是否展示代码编辑面板
-   */
-  public getCodeEditorShowStatus(): boolean {
-    return this.state.isShowCodeEditor;
-  }
-
-  /**
-   * 设置代码编辑面板展示状态及展示内容
-   * @param {boolean} status 是否展示代码编辑面板
-   * @param {Id} id 代码块id
-   * @returns {void}
-   */
-  public setCodeEditorContent(status: boolean, id: Id): void {
-    if (!id) return;
-    this.setId(id);
-    this.state.isShowCodeEditor = status;
-  }
-
-  /**
-   * 获取当前选中的代码块内容
-   * @returns {CodeBlockContent | null}
-   */
-  public getCurrentDsl(): CodeBlockContent | null {
-    return this.getCodeContentById(this.state.id);
-  }
-
-  /**
    * 获取编辑状态
    * @returns {boolean} 是否可编辑
    */
@@ -172,24 +131,6 @@ class CodeBlock extends BaseService {
    */
   public async setEditStatus(status: boolean): Promise<void> {
     this.state.editable = status;
-  }
-
-  /**
-   * 设置当前选中的代码块ID
-   * @param {Id} id 代码块id
-   * @returns {void}
-   */
-  public setId(id: Id): void {
-    if (!id) return;
-    this.state.id = id;
-  }
-
-  /**
-   * 获取当前选中的代码块ID
-   * @returns {Id} id 代码块id
-   */
-  public getId(): Id {
-    return this.state.id;
   }
 
   /**
@@ -263,11 +204,19 @@ class CodeBlock extends BaseService {
     });
   }
 
+  public setParamsColConfig(config: ColumnConfig): void {
+    this.state.paramsColConfig = config;
+  }
+
+  public getParamsColConfig(): ColumnConfig | undefined {
+    return this.state.paramsColConfig;
+  }
+
   /**
    * 生成代码块唯一id
    * @returns {Id} 代码块唯一id
    */
-  public async getUniqueId(): Promise<Id> {
+  public async getUniqueId(): Promise<string> {
     const newId = `code_${Math.random().toString(10).substring(2).substring(0, 4)}`;
     // 判断是否重复
     const dsl = await this.getCodeDsl();
@@ -277,9 +226,7 @@ class CodeBlock extends BaseService {
   }
 
   public resetState() {
-    this.state.isShowCodeEditor = false;
     this.state.codeDsl = null;
-    this.state.id = '';
     this.state.editable = true;
     this.state.combineIds = [];
     this.state.undeletableList = [];

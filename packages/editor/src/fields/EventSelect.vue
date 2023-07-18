@@ -42,7 +42,7 @@ import { TMagicButton } from '@tmagic/design';
 import { FormState } from '@tmagic/form';
 import { ActionType } from '@tmagic/schema';
 
-import type { EventSelectConfig, Services } from '@editor/type';
+import type { CodeSelectColConfig, DataSourceMethodSelectConfig, EventSelectConfig, Services } from '@editor/type';
 
 defineOptions({
   name: 'MEditorEventSelect',
@@ -81,7 +81,7 @@ const actionTypeConfig = computed(() => {
   const defaultActionTypeConfig = {
     name: 'actionType',
     text: '联动类型',
-    labelWidth: '70px',
+    labelWidth: '80px',
     type: 'select',
     defaultValue: ActionType.COMP,
     options: () => [
@@ -93,7 +93,14 @@ const actionTypeConfig = computed(() => {
       {
         text: '代码',
         label: '代码',
+        disabled: !Object.keys(services?.codeBlockService.getCodeDsl() || {}).length,
         value: ActionType.CODE,
+      },
+      {
+        text: '数据源',
+        label: '数据源',
+        disabled: !services?.dataSourceService.get('dataSources')?.filter((ds) => ds.methods?.length).length,
+        value: ActionType.DATA_SOURCE,
       },
     ],
   };
@@ -105,7 +112,7 @@ const targetCompConfig = computed(() => {
   const defaultTargetCompConfig = {
     name: 'to',
     text: '联动组件',
-    labelWidth: '70px',
+    labelWidth: '80px',
     type: 'ui-select',
     display: (mForm: FormState, { model }: { model: Record<any, any> }) => model.actionType === ActionType.COMP,
   };
@@ -117,7 +124,7 @@ const compActionConfig = computed(() => {
   const defaultCompActionConfig = {
     name: 'method',
     text: '动作',
-    labelWidth: '70px',
+    labelWidth: '80px',
     type: 'select',
     display: (mForm: FormState, { model }: { model: Record<any, any> }) => model.actionType === ActionType.COMP,
     options: (mForm: FormState, { model }: any) => {
@@ -135,12 +142,25 @@ const compActionConfig = computed(() => {
 
 // 代码联动配置
 const codeActionConfig = computed(() => {
-  const defaultCodeActionConfig = {
+  const defaultCodeActionConfig: CodeSelectColConfig = {
     type: 'code-select-col',
     labelWidth: 0,
-    display: (mForm: FormState, { model }: { model: Record<any, any> }) => model.actionType === ActionType.CODE,
+    name: 'codeId',
+    disabled: () => !services?.codeBlockService.getEditStatus(),
+    display: (mForm, { model }) => model.actionType === ActionType.CODE,
   };
   return { ...defaultCodeActionConfig, ...props.config.codeActionConfig };
+});
+
+// 数据源联动配置
+const dataSourceActionConfig = computed(() => {
+  const defaultDataSourceActionConfig: DataSourceMethodSelectConfig = {
+    type: 'data-source-method-select',
+    name: 'dataSourceMethod',
+    labelWidth: 0,
+    display: (mForm, { model }) => model.actionType === ActionType.DATA_SOURCE,
+  };
+  return { ...defaultDataSourceActionConfig, ...props.config.dataSourceActionConfig };
 });
 
 // 兼容旧的数据格式
@@ -188,7 +208,13 @@ const actionsConfig = computed(() => ({
       name: 'actions',
       expandAll: true,
       enableToggleMode: false,
-      items: [actionTypeConfig.value, targetCompConfig.value, compActionConfig.value, codeActionConfig.value],
+      items: [
+        actionTypeConfig.value,
+        targetCompConfig.value,
+        compActionConfig.value,
+        codeActionConfig.value,
+        dataSourceActionConfig.value,
+      ],
     },
   ],
 }));

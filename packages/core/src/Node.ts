@@ -102,8 +102,11 @@ class Node extends EventEmitter {
     if (this.data[hook]?.hookType !== HookType.CODE || isEmpty(this.app.codeDsl)) return;
     for (const item of this.data[hook].hookData) {
       const { codeId, params = {} } = item;
-      if (this.app.codeDsl![codeId] && typeof this.app.codeDsl![codeId]?.content === 'function') {
-        await this.app.codeDsl![codeId].content({ app: this.app, params });
+
+      const functionContent = this.app.codeDsl?.[codeId]?.content;
+
+      if (typeof functionContent === 'function') {
+        await functionContent({ app: this.app, params });
       }
     }
   }

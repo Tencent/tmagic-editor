@@ -31,6 +31,7 @@ import {
   CodeBlockDSL,
   CodeItemConfig,
   CompItemConfig,
+  DataSourceItemConfig,
   DeprecatedEventConfig,
   EventConfig,
   Id,
@@ -321,6 +322,28 @@ class App extends EventEmitter {
     }
   }
 
+  public async dataSourceActionHandler(eventConfig: DataSourceItemConfig) {
+    const { dataSourceMethod = [], params = {} } = eventConfig;
+
+    const [id, methodName] = dataSourceMethod;
+
+    if (!id || !methodName) return;
+
+    const dataSource = this.dataSourceManager?.get(id);
+
+    if (!dataSource) return;
+
+    const methods = dataSource.getMethods() || [];
+
+    const method = methods.find((item) => item.name === methodName);
+
+    if (!method) return;
+
+    if (typeof method.content === 'function') {
+      await method.content({ app: this, params, dataSource });
+    }
+  }
+
   public compiledNode(node: MNode, content: DataSourceManagerData, sourceId?: Id) {
     return compiledNode(
       (value: any) => {
@@ -364,6 +387,8 @@ class App extends EventEmitter {
         } else if (actionItem.actionType === ActionType.CODE) {
           // 执行代码块
           await this.codeActionHandler(actionItem as CodeItemConfig);
+        } else if (actionItem.actionType === ActionType.DATA_SOURCE) {
+          await this.dataSourceActionHandler(actionItem as DataSourceItemConfig);
         }
       }
     } else {

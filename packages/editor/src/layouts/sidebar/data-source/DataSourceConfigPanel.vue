@@ -1,29 +1,23 @@
 <template>
-  <TMagicDrawer
-    v-model="visible"
+  <MFormDrawer
+    ref="fomDrawer"
+    label-width="80px"
     :title="title"
-    :close-on-press-escape="true"
-    :append-to-body="true"
-    :show-close="true"
-    :close-on-click-modal="true"
-    :size="size"
-  >
-    <MForm ref="form" :config="dataSourceConfig" :init-values="initValues" @change="changeHandler"></MForm>
-
-    <template #footer>
-      <div>
-        <TMagicButton type="primary" @click="submitHandler">确定</TMagicButton>
-        <TMagicButton @click="hide">关闭</TMagicButton>
-      </div>
-    </template>
-  </TMagicDrawer>
+    :width="size"
+    :config="dataSourceConfig"
+    :values="initValues"
+    :disabled="disabled"
+    @change="changeHandler"
+    @submit="submitHandler"
+    @error="errorHandler"
+  ></MFormDrawer>
 </template>
 
 <script setup lang="ts">
 import { computed, inject, ref, watchEffect } from 'vue';
 
-import { TMagicButton, TMagicDrawer, tMagicMessage } from '@tmagic/design';
-import { MForm } from '@tmagic/form';
+import { tMagicMessage } from '@tmagic/design';
+import { MFormDrawer } from '@tmagic/form';
 
 import type { Services } from '@editor/type';
 
@@ -34,6 +28,7 @@ defineOptions({
 const props = defineProps<{
   title?: string;
   values: any;
+  disabled: boolean;
 }>();
 
 const type = ref('base');
@@ -46,7 +41,7 @@ const size = computed(() => globalThis.document.body.clientWidth - (services?.ui
 
 const dataSourceConfig = computed(() => services?.dataSourceService.getFormConfig(type.value) || []);
 
-const form = ref<InstanceType<typeof MForm>>();
+const fomDrawer = ref<InstanceType<typeof MFormDrawer>>();
 
 const initValues = ref({});
 
@@ -63,26 +58,21 @@ const changeHandler = (value: Record<string, any>) => {
   initValues.value = value;
 };
 
-const submitHandler = async () => {
-  try {
-    const values = await form.value?.submitForm();
-    emit('submit', values);
-  } catch (error: any) {
-    tMagicMessage.error(error.message);
-  }
+const submitHandler = (values: any) => {
+  emit('submit', values);
 };
 
-const visible = ref(false);
-
-const hide = () => {
-  visible.value = false;
+const errorHandler = (error: any) => {
+  tMagicMessage.error(error.message);
 };
 
 defineExpose({
   show() {
-    visible.value = true;
+    fomDrawer.value?.show();
   },
 
-  hide,
+  hide() {
+    fomDrawer.value?.hide();
+  },
 });
 </script>

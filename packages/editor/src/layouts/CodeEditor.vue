@@ -1,12 +1,31 @@
 <template>
-  <div ref="codeEditor" class="magic-code-editor"></div>
+  <div :class="`magic-code-editor`">
+    <Teleport to="body" :disabled="!fullScreen">
+      <div
+        :class="`magic-code-editor-wrapper${fullScreen ? ' full-screen' : ''}`"
+        :style="!fullScreen && height ? `height: ${height}` : ''"
+      >
+        <TMagicButton
+          class="magic-code-editor-full-screen-icon"
+          circle
+          size="small"
+          :icon="FullScreen"
+          @click="fullScreenHandler"
+        ></TMagicButton>
+        <div ref="codeEditor" class="magic-code-editor-content"></div>
+      </div>
+    </Teleport>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { FullScreen } from '@element-plus/icons-vue';
 import { throttle } from 'lodash-es';
 import * as monaco from 'monaco-editor';
 import serialize from 'serialize-javascript';
+
+import { TMagicButton } from '@tmagic/design';
 
 defineOptions({
   name: 'MEditorCodeEditor',
@@ -21,6 +40,7 @@ const props = withDefaults(
     options?: {
       [key: string]: any;
     };
+    height?: string;
     autoSave?: boolean;
   }>(),
   {
@@ -154,6 +174,17 @@ onMounted(async () => {
 onUnmounted(() => {
   resizeObserver.disconnect();
 });
+
+const fullScreen = ref(false);
+const fullScreenHandler = () => {
+  fullScreen.value = !fullScreen.value;
+  setTimeout(() => {
+    vsEditor?.focus();
+    vsEditor?.layout();
+    vsDiffEditor?.focus();
+    vsDiffEditor?.layout();
+  });
+};
 
 defineExpose({
   values,

@@ -40,10 +40,6 @@
           <template #code-block-panel-tool="{ id, data }">
             <slot name="code-block-panel-tool" :id="id" :data="data"></slot>
           </template>
-
-          <template #code-block-edit-panel-header="{ id }">
-            <slot name="code-block-edit-panel-header" :id="id"></slot>
-          </template>
         </Sidebar>
       </slot>
     </template>

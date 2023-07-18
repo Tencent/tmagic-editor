@@ -19,18 +19,21 @@
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.12);
   }
 }
-.m-fields-code-select-col {
+.m-fields-code-select-col,
+.m-fields-data-source-method-select {
   width: 100%;
-  .code-select-container {
-    display: flex;
-    align-items: center;
-    .select {
-      flex: 10 0 100px;
-    }
-    .icon {
-      flex: 1 0 20px;
-      cursor: pointer;
-      margin-right: 5px;
-    }
+}
+
+.code-select-container,
+.data-source-method-select-container {
+  display: flex;
+  align-items: center;
+  .select {
+    flex: 10 0 100px;
+  }
+  .icon {
+    flex: 1 0 20px;
+    cursor: pointer;
+    margin-right: 5px;
   }
 }
