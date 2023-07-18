@@ -146,7 +146,7 @@ export type TypeFunction = (
   },
 ) => string;
 
-type FilterFunction = (
+export type FilterFunction = (
   mForm: FormState | undefined,
   data: {
     model: Record<any, any>;

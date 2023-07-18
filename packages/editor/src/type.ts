@@ -18,7 +18,7 @@
 
 import type { Component } from 'vue';
 
-import type { FormConfig, FormItem } from '@tmagic/form';
+import type { FilterFunction, FormConfig, FormItem } from '@tmagic/form';
 import type { CodeBlockContent, CodeBlockDSL, Id, MApp, MContainer, MNode, MPage } from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
 import type {
@@ -484,4 +484,12 @@ export interface KeyBindingCacheItem {
   keybinding?: string | string[];
   eventType: 'keyup' | 'keydown';
   binded: boolean;
+}
+
+export interface CodeSelectColConfig {
+  type: 'code-select-col';
+  name: string;
+  labelWidth?: number | string;
+  disabled?: boolean | FilterFunction;
+  display?: boolean | FilterFunction;
 }
