@@ -3,7 +3,7 @@
     <Teleport to="body" :disabled="!fullScreen">
       <div
         :class="`magic-code-editor-wrapper${fullScreen ? ' full-screen' : ''}`"
-        :style="!fullScreen && height ? `height: ${height}` : ''"
+        :style="!fullScreen && height ? `height: ${height}` : '100%'"
       >
         <TMagicButton
           class="magic-code-editor-full-screen-icon"

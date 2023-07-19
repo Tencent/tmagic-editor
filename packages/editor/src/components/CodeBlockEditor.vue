@@ -9,6 +9,7 @@
     :disabled="disabled"
     @submit="submitForm"
     @error="errorHandler"
+    @open="openHandler"
   ></MFormDrawer>
 </template>
 
@@ -37,7 +38,10 @@ const emit = defineEmits<{
 
 const services = inject<Services>('services');
 
-const size = computed(() => globalThis.document.body.clientWidth - (services?.uiService.get('columnWidth').left || 0));
+const columnWidth = computed(() => services?.uiService.get('columnWidth'));
+const size = computed(() => (columnWidth.value ? columnWidth.value.center + columnWidth.value.right : 600));
+
+const codeEditorHeight = ref('600px');
 
 const defaultParamColConfig: ColumnConfig = {
   type: 'row',
@@ -104,6 +108,7 @@ const functionConfig = computed(() => [
     name: 'content',
     type: 'vs-code',
     options: inject('codeOptions', {}),
+    height: codeEditorHeight.value,
     onChange: (formState: FormState | undefined, code: string) => {
       try {
         // 检测js代码是否存在语法错误
@@ -128,6 +133,15 @@ const errorHandler = (error: any) => {
 };
 
 const fomDrawer = ref<InstanceType<typeof MFormDrawer>>();
+
+const openHandler = () => {
+  setTimeout(() => {
+    if (fomDrawer.value) {
+      const height = fomDrawer.value?.bodyHeight - 468;
+      codeEditorHeight.value = `${height > 100 ? height : 600}px`;
+    }
+  });
+};
 
 defineExpose({
   show() {

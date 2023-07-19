@@ -2,4 +2,10 @@
   .el-drawer__header {
     margin: 0;
   }
+
+  .m-drawer-body {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
 }

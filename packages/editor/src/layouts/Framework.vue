@@ -1,5 +1,5 @@
 <template>
-  <div class="m-editor">
+  <div class="m-editor" ref="content">
     <slot name="header"></slot>
 
     <slot name="nav"></slot>
@@ -67,6 +67,8 @@ const DEFAULT_RIGHT_COLUMN_WIDTH = 480;
 const codeOptions = inject('codeOptions', {});
 const { editorService, uiService } = inject<Services>('services') || {};
 
+const content = ref<HTMLDivElement>();
+
 const root = computed(() => editorService?.get('root'));
 
 const pageLength = computed(() => editorService?.get('pageLength') || 0);
@@ -91,13 +93,15 @@ watch(
 
     columnWidth.value.left = left;
 
+    const container = content.value || document.body;
+
     if (length <= 0) {
       columnWidth.value.right = undefined;
-      columnWidth.value.center = globalThis.document.body.clientWidth - left;
+      columnWidth.value.center = container.clientWidth - left;
     } else {
       const right = columnWidth.value.right || RightColumnWidthCacheData || DEFAULT_RIGHT_COLUMN_WIDTH;
       columnWidth.value.right = right;
-      columnWidth.value.center = globalThis.document.body.clientWidth - left - right;
+      columnWidth.value.center = container.clientWidth - left - right;
     }
 
     uiService?.set('columnWidth', columnWidth.value as GetColumnWidth);

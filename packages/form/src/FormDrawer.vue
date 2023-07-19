@@ -9,12 +9,10 @@
     :close-on-click-modal="true"
     :size="width"
     :zIndex="zIndex"
+    @open="openHandler"
+    @opened="openedHandler"
   >
-    <div
-      v-if="visible"
-      class="m-drawer-body"
-      :style="`max-height: ${bodyHeight}; overflow-y: auto; overflow-x: hidden;`"
-    >
+    <div v-if="visible" ref="drawerBody" class="m-drawer-body">
       <Form
         ref="form"
         :size="size"
@@ -47,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watchEffect } from 'vue';
 
 import { TMagicButton, TMagicCol, TMagicDrawer, TMagicRow } from '@tmagic/design';
 
@@ -78,12 +76,19 @@ withDefaults(
   },
 );
 
-const emit = defineEmits(['close', 'submit', 'error', 'change']);
+const emit = defineEmits(['close', 'submit', 'error', 'change', 'open', 'opened']);
 
 const form = ref<InstanceType<typeof Form>>();
+const drawerBody = ref<HTMLDivElement>();
 const visible = ref(false);
 const saveFetch = ref(false);
-const bodyHeight = ref(`${document.body.clientHeight - 194}px`);
+const bodyHeight = ref(0);
+
+watchEffect(() => {
+  if (drawerBody.value) {
+    bodyHeight.value = drawerBody.value.clientHeight;
+  }
+});
 
 const submitHandler = async () => {
   try {
@@ -98,6 +103,14 @@ const changeHandler = (value: any) => {
   emit('change', value);
 };
 
+const openHandler = (value: any) => {
+  emit('open', value);
+};
+
+const openedHandler = (value: any) => {
+  emit('opened', value);
+};
+
 const show = () => {
   visible.value = true;
 };
@@ -109,6 +122,7 @@ const hide = () => {
 defineExpose({
   form,
   saveFetch,
+  bodyHeight,
 
   show,
   hide,

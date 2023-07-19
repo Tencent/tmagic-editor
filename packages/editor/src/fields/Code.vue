@@ -1,8 +1,8 @@
 <template>
   <MagicCodeEditor
-    :height="height"
+    :height="config.height"
     :init-values="model[name]"
-    :language="language"
+    :language="config.language"
     :options="{
       ...config.options,
       readOnly: disabled,
@@ -12,8 +12,6 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
-
 import MagicCodeEditor from '@editor/layouts/CodeEditor.vue';
 
 defineOptions({
@@ -40,9 +38,6 @@ const props = withDefaults(
     disabled: false,
   },
 );
-
-const language = computed(() => props.config.language || 'javascript');
-const height = computed(() => props.config.height || `${document.body.clientHeight - 168}px`);
 
 const save = (v: string) => {
   props.model[props.name] = v;
