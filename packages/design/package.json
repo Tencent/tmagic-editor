@@ -48,7 +48,7 @@
     "@vue/test-utils": "^2.3.2",
     "rimraf": "^3.0.2",
     "typescript": "^5.0.4",
-    "vite": "^4.3.8",
+    "vite": "^4.4.4",
     "vue-tsc": "^1.6.5"
   }
 }
