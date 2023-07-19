@@ -1,3 +1,18 @@
+# [1.3.0-alpha.14](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.13...v1.3.0-alpha.14) (2023-07-19)
+
+
+### Bug Fixes
+
+* **editor:** 修复CodeSelectColConfig interface找不到问题 ([1a546c3](https://github.com/Tencent/tmagic-editor/commit/1a546c326cd89f4f8bd50ff34f2d134a1954cd52)), closes [#525](https://github.com/Tencent/tmagic-editor/issues/525)
+
+
+### Features
+
+* **core,editor,data-source,form,schema:** 新增数据源方法配置,支持事件联动数据源方法 ([2a0680c](https://github.com/Tencent/tmagic-editor/commit/2a0680c7077914dcf24a818cf947172e0f586b2c))
+* **editor:** 代码块参数注释改用extra来显示 ([0a9c7c9](https://github.com/Tencent/tmagic-editor/commit/0a9c7c9dda634dce8bdb924cd3599efba696fced))
+
+
+
 # [1.3.0-alpha.13](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.12...v1.3.0-alpha.13) (2023-07-10)
 
 

@@ -1,5 +1,5 @@
 {
-  "version": "1.3.0-alpha.13",
+  "version": "1.3.0-alpha.14",
   "name": "@tmagic/data-source",
   "type": "module",
   "sideEffects": [
@@ -32,8 +32,8 @@
     "data-source"
   ],
   "dependencies": {
-    "@tmagic/utils": "1.3.0-alpha.13",
-    "@tmagic/schema": "1.3.0-alpha.13",
+    "@tmagic/utils": "1.3.0-alpha.14",
+    "@tmagic/schema": "1.3.0-alpha.14",
     "events": "^3.3.0"
   },
   "devDependencies": {
