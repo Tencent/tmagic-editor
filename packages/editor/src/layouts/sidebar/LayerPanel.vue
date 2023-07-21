@@ -156,7 +156,7 @@ const handleDragEnd = async (e: any) => {
   if (!tree.value) return;
   const { data: node } = e;
   const parent = editorService?.getParentById(node.id, false) as MContainer;
-  const layout = await editorService?.getLayout(parent);
+  const layout = await editorService?.getLayout(parent, node);
   node.style.position = layout;
   if (layout === Layout.RELATIVE) {
     node.style.top = 0;
