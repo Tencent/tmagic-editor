@@ -1,3 +1,13 @@
+# [1.3.0-alpha.15](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.14...v1.3.0-alpha.15) (2023-07-24)
+
+
+### Bug Fixes
+
+* **editor:** 代码块节点slot参数丢失 ([23bee0b](https://github.com/Tencent/tmagic-editor/commit/23bee0b3ae13fd2bdfdce84a6dfed132b3d8bee2))
+* **editor:** 流式布局下通过组件树拖动layout判断不正确 ([ce6d268](https://github.com/Tencent/tmagic-editor/commit/ce6d2684b73d503b1aec0b656262bda35e4cfe29))
+
+
+
 # [1.3.0-alpha.14](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.13...v1.3.0-alpha.14) (2023-07-19)
 
 
