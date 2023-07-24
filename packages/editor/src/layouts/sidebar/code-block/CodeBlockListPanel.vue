@@ -10,12 +10,11 @@
     </slot>
 
     <!-- 代码块列表 -->
-    <CodeBlockList
-      ref="codeBlockList"
-      :custom-error="customError"
-      @edit="editCode"
-      @remove="deleteCode"
-    ></CodeBlockList>
+    <CodeBlockList ref="codeBlockList" :custom-error="customError" @edit="editCode" @remove="deleteCode">
+      <template #code-block-panel-tool="{ id, data }">
+        <slot name="code-block-panel-tool" :id="id" :data="data"></slot>
+      </template>
+    </CodeBlockList>
 
     <!-- 代码块编辑区 -->
     <CodeBlockEditor
