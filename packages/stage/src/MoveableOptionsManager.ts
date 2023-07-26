@@ -177,7 +177,8 @@ export default class MoveableOptionsManager extends EventEmitter {
         left: isAbsolute,
       },
       isDisplayInnerSnapDigit: true,
-
+      dragTarget: '.moveable-drag-area-button',
+      dragTargetSelf: true,
       props: {
         actions: true,
       },

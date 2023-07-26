@@ -1,0 +1,98 @@
+.moveable-button {
+  width: 20px;
+  height: 20px;
+  background: #4af;
+  border-radius: 4px;
+  appearance: none;
+  border: 0;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  margin-left: 2px;
+  position: relative;
+}
+.moveable-remove-button:before, .moveable-remove-button:after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  width: 14px;
+  height: 2px;
+  background: #fff;
+  border-radius: 1px;
+  cursor: pointer;
+}
+.moveable-remove-button:after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.moveable-select-parent-arrow-top-icon {
+  transform: rotateZ(-45deg);
+  width: 4px;
+  height: 4px;
+  border-color: #fff;
+  border-width: 2px 2px 0 0;
+  border-style: solid;
+  position: absolute;
+  left: 4px;
+  top: 4px;
+}
+
+.moveable-select-parent-arrow-body-icon {
+  width: 7px;
+  height: 11px;
+  border-color: #fff;
+  border-width: 0 0 2px 2px;
+  border-style: solid;
+}
+
+.moveable-drag-area-button .moveable-select-parent-arrow-top-icon {
+  width: 2px;
+  height: 2px;
+}
+
+.moveable-drag-area-button .moveable-select-parent-arrow-top-icon-top {
+  transform: rotateZ(-45deg);
+  left: 8px;
+  top: 3px;
+}
+
+.moveable-drag-area-button .moveable-select-parent-arrow-top-icon-bottom {
+  transform: rotateZ(135deg);
+  left: 8px;
+  top: auto;
+  bottom: 3px;
+}
+
+.moveable-drag-area-button .moveable-select-parent-arrow-top-icon-right {
+  transform: rotateZ(45deg);
+  right: 3px;
+  left: auto;
+  top: 8px;
+}
+
+.moveable-drag-area-button .moveable-select-parent-arrow-top-icon-left {
+  transform: rotateZ(235deg);
+  left: 3px;
+  top: 8px;
+}
+
+.moveable-drag-area-button .moveable-select-parent-arrow-body-icon-horizontal {
+  width: 2px;
+  height: 11px;
+  background-color: #fff;
+  position: absolute;
+  left: 9px;
+  top: 4px;
+}
+
+.moveable-drag-area-button .moveable-select-parent-arrow-body-icon-vertical {
+  width: 11px;
+  height: 2px;
+  background-color: #fff;
+  position: absolute;
+  left: 4px;
+  top: 9px;
+}
+
