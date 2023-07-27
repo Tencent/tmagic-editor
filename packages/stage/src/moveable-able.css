@@ -47,35 +47,43 @@
   border-style: solid;
 }
 
+.moveable-drag-area-button {
+  cursor: move;
+}
+
 .moveable-drag-area-button .moveable-select-parent-arrow-top-icon {
   width: 2px;
   height: 2px;
 }
 
 .moveable-drag-area-button .moveable-select-parent-arrow-top-icon-top {
-  transform: rotateZ(-45deg);
-  left: 8px;
+  transform: rotateZ(-45deg) translateX(-50%);
+  left: 50%;
   top: 3px;
+  transform-origin: left;
 }
 
 .moveable-drag-area-button .moveable-select-parent-arrow-top-icon-bottom {
-  transform: rotateZ(135deg);
-  left: 8px;
+  transform: rotateZ(135deg) translateX(-50%);
+  transform-origin: left;
+  left: 50%;
   top: auto;
   bottom: 3px;
 }
 
 .moveable-drag-area-button .moveable-select-parent-arrow-top-icon-right {
-  transform: rotateZ(45deg);
+  transform: rotateZ(45deg)  translateY(-50%);
+  transform-origin: top;
   right: 3px;
   left: auto;
-  top: 8px;
+  top: 50%;
 }
 
 .moveable-drag-area-button .moveable-select-parent-arrow-top-icon-left {
-  transform: rotateZ(235deg);
+  transform: rotateZ(235deg) translateY(-50%);
+  transform-origin: top;
   left: 3px;
-  top: 8px;
+  top: 50%;
 }
 
 .moveable-drag-area-button .moveable-select-parent-arrow-body-icon-horizontal {
@@ -83,7 +91,8 @@
   height: 11px;
   background-color: #fff;
   position: absolute;
-  left: 9px;
+  transform: translateX(-50%);
+  left: 50%;
   top: 4px;
 }
 
@@ -92,7 +101,8 @@
   height: 2px;
   background-color: #fff;
   position: absolute;
+  transform: translateY(-50%);
   left: 4px;
-  top: 9px;
+  top: 50%;;
 }
 
