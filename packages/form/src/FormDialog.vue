@@ -46,7 +46,7 @@
             <TMagicButton v-if="hasStep && stepCount > stepActive" type="info" size="small" @click="nextStep"
               >下一步</TMagicButton
             >
-            <TMagicButton v-else type="primary" size="small" :loading="saveFetch" @click="save">{{
+            <TMagicButton v-else type="primary" size="small" :disabled="disabled" :loading="saveFetch" @click="save">{{
               confirmText
             }}</TMagicButton>
           </slot>

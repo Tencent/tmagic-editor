@@ -36,7 +36,9 @@
         <TMagicCol :span="12">
           <slot name="footer">
             <TMagicButton @click="hide">关闭</TMagicButton>
-            <TMagicButton type="primary" @click="submitHandler" :loading="saveFetch">{{ confirmText }}</TMagicButton>
+            <TMagicButton type="primary" :disabled="disabled" :loading="saveFetch" @click="submitHandler">{{
+              confirmText
+            }}</TMagicButton>
           </slot>
         </TMagicCol>
       </TMagicRow>
