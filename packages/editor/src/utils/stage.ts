@@ -1,5 +1,6 @@
 import { computed } from 'vue';
 
+import type { MNode } from '@tmagic/schema';
 import StageCore, { GuidesType, RemoveEventData, SortEventData, UpdateEventData } from '@tmagic/stage';
 
 import editorService from '@editor/services/editor';
@@ -74,11 +75,8 @@ export const useStage = (stageOptions: StageOptions) => {
   });
 
   stage.on('remove', (ev: RemoveEventData) => {
-    editorService.remove(
-      ev.data.map(({ el }) => ({
-        id: el.id,
-      })),
-    );
+    const nodes = ev.data.map(({ el }) => editorService.getNodeById(el.id));
+    editorService.remove(nodes.filter((node) => Boolean(node)) as MNode[]);
   });
 
   stage.on('select-parent', () => {
