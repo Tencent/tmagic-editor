@@ -1,3 +1,18 @@
+# [1.3.0-alpha.16](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.15...v1.3.0-alpha.16) (2023-08-02)
+
+
+### Bug Fixes
+
+* **editor:** 删除组件后，依赖清除出现可能出现大量重复循环 ([b424abd](https://github.com/Tencent/tmagic-editor/commit/b424abd17a0239da25e0fd57b00b3163164e0125))
+* **form:** dialog,drawer disable时确认按钮置灰 ([ded82aa](https://github.com/Tencent/tmagic-editor/commit/ded82aae410160e623534a5a5125b4b859a7dd9f))
+
+
+### Features
+
+* **editor:** 新增拖动按钮 ([90205f5](https://github.com/Tencent/tmagic-editor/commit/90205f539563cb047cf7070379c78b6af01103f4))
+
+
+
 # [1.3.0-alpha.15](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.14...v1.3.0-alpha.15) (2023-07-24)
 
 
