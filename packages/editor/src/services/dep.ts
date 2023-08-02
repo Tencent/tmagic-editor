@@ -19,7 +19,7 @@ import { EventEmitter } from 'events';
 
 import { reactive } from 'vue';
 
-import { MNode } from '@tmagic/schema';
+import { Id, MNode } from '@tmagic/schema';
 
 type IsTarget = (key: string | number, value: any) => boolean;
 
@@ -277,13 +277,15 @@ export class Watcher extends EventEmitter {
    * @param nodes 需要清除依赖的节点
    */
   public clear(nodes?: MNode[]) {
+    const clearedItemsNodeIds: Id[] = [];
     Object.values(this.targets).forEach((targets) => {
       Object.values(targets).forEach((target) => {
         if (nodes) {
           nodes.forEach((node) => {
             target.removeDep(node);
 
-            if (Array.isArray(node.items)) {
+            if (Array.isArray(node.items) && node.items.length && !clearedItemsNodeIds.includes(node.id)) {
+              clearedItemsNodeIds.push(node.id);
               this.clear(node.items);
             }
           });
