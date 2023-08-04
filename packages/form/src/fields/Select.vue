@@ -31,7 +31,7 @@ import { inject, onBeforeMount, Ref, ref, watch, watchEffect } from 'vue';
 import { TMagicSelect } from '@tmagic/design';
 import { getValueByKeyPath } from '@tmagic/utils';
 
-import { FormState, SelectConfig, SelectGroupOption, SelectOption } from '../schema';
+import type { FieldProps, FormState, SelectConfig, SelectGroupOption, SelectOption } from '../schema';
 import { getConfig } from '../utils/config';
 import { useAddField } from '../utils/useAddField';
 
@@ -42,17 +42,7 @@ defineOptions({
   name: 'MFormSelect',
 });
 
-const props = defineProps<{
-  config: SelectConfig;
-  model: any;
-  initValues?: any;
-  values?: any;
-  name: string;
-  prop: string;
-  disabled?: boolean;
-  size?: 'large' | 'default' | 'small';
-  lastValues?: Record<string, any>;
-}>();
+const props = defineProps<FieldProps<SelectConfig>>();
 
 const emit = defineEmits(['change']);
 

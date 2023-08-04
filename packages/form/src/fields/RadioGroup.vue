@@ -13,24 +13,14 @@
 <script lang="ts" setup>
 import { TMagicRadio, TMagicRadioGroup } from '@tmagic/design';
 
-import { RadioGroupConfig } from '../schema';
+import type { FieldProps, RadioGroupConfig } from '../schema';
 import { useAddField } from '../utils/useAddField';
 
 defineOptions({
   name: 'MFormRadioGroup',
 });
 
-const props = defineProps<{
-  config: RadioGroupConfig;
-  model: any;
-  initValues?: any;
-  values?: any;
-  name: string;
-  prop: string;
-  disabled?: boolean;
-  size?: 'large' | 'default' | 'small';
-  lastValues?: Record<string, any>;
-}>();
+const props = defineProps<FieldProps<RadioGroupConfig>>();
 
 const emit = defineEmits(['change']);
 

@@ -21,6 +21,18 @@ export interface ValidateError {
   field: string;
 }
 
+export interface FieldProps<T = any> {
+  config: T;
+  model: any;
+  initValues?: any;
+  values?: any;
+  name: string;
+  prop: string;
+  disabled?: boolean;
+  size?: 'large' | 'default' | 'small';
+  lastValues?: Record<string, any>;
+}
+
 /**
  * 整个表单的数据，会注入到各个组件中去
  */

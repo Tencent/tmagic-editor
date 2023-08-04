@@ -15,24 +15,14 @@ import { computed } from 'vue';
 
 import { TMagicCheckbox } from '@tmagic/design';
 
-import { CheckboxConfig } from '../schema';
+import type { CheckboxConfig, FieldProps } from '../schema';
 import { useAddField } from '../utils/useAddField';
 
 defineOptions({
   name: 'MFormCheckbox',
 });
 
-const props = defineProps<{
-  config: CheckboxConfig;
-  model: any;
-  initValues?: any;
-  values?: any;
-  name: string;
-  prop: string;
-  disabled?: boolean;
-  size?: 'large' | 'default' | 'small';
-  lastValues?: Record<string, any>;
-}>();
+const props = defineProps<FieldProps<CheckboxConfig>>();
 
 const emit = defineEmits(['change']);
 

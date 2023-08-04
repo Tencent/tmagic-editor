@@ -3,22 +3,14 @@
 </template>
 
 <script setup lang="ts">
-import { DisplayConfig } from '../schema';
+import type { DisplayConfig, FieldProps } from '../schema';
 import { useAddField } from '../utils/useAddField';
 
 defineOptions({
   name: 'MFormDisplay',
 });
 
-const props = defineProps<{
-  config: DisplayConfig;
-  model: any;
-  initValues?: any;
-  values?: any;
-  name: string;
-  prop: string;
-  lastValues?: Record<string, any>;
-}>();
+const props = defineProps<FieldProps<DisplayConfig>>();
 
 if (props.config.initValue && props.model) {
   // eslint-disable-next-line vue/no-setup-props-destructure

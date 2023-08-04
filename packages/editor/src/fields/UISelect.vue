@@ -1,17 +1,29 @@
 <template>
   <div class="m-fields-ui-select" v-if="uiSelectMode" @click="cancelHandler">
-    <TMagicButton type="danger" :icon="Delete" text style="padding: 0">取消</TMagicButton>
+    <TMagicButton type="danger" :icon="Delete" :disabled="disabled" :size="size" text style="padding: 0"
+      >取消</TMagicButton
+    >
   </div>
   <div class="m-fields-ui-select" v-else style="display: flex">
     <template v-if="val">
       <TMagicTooltip content="清除" placement="top">
-        <TMagicButton style="padding: 0" type="danger" :icon="Close" text @click.stop="deleteHandler"></TMagicButton>
+        <TMagicButton
+          style="padding: 0"
+          type="danger"
+          :icon="Close"
+          :disabled="disabled"
+          :size="size"
+          text
+          @click.stop="deleteHandler"
+        ></TMagicButton>
       </TMagicTooltip>
 
       <TMagicTooltip content="点击选中组件" placement="top">
         <TMagicButton
           text
           style="padding: 0; margin: 0"
+          :disabled="disabled"
+          :size="size"
           @click="selectNode(val)"
           @mouseenter="highlight(val)"
           @mouseleave="unhightlight"
@@ -21,7 +33,9 @@
     </template>
 
     <TMagicTooltip v-else content="点击此处选择" placement="top">
-      <TMagicButton text style="padding: 0; margin: 0" @click="startSelect">点击此处选择</TMagicButton>
+      <TMagicButton text style="padding: 0; margin: 0" :disabled="disabled" :size="size" @click="startSelect"
+        >点击此处选择</TMagicButton
+      >
     </TMagicTooltip>
   </div>
 </template>
@@ -32,7 +46,7 @@ import { Close, Delete } from '@element-plus/icons-vue';
 import { throttle } from 'lodash-es';
 
 import { TMagicButton, TMagicTooltip } from '@tmagic/design';
-import { FormState } from '@tmagic/form';
+import type { FieldProps, FormState } from '@tmagic/form';
 import type { Id } from '@tmagic/schema';
 
 import type { Services } from '@editor/type';
@@ -41,12 +55,7 @@ defineOptions({
   name: 'MEditorUISelect',
 });
 
-const props = defineProps<{
-  config: any;
-  model: any;
-  prop: string;
-  name: string;
-}>();
+const props = defineProps<FieldProps<any>>();
 
 const emit = defineEmits(['change']);
 

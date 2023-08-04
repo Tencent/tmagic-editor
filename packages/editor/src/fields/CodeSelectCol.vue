@@ -37,7 +37,7 @@ import { computed, inject, ref } from 'vue';
 import { Edit, View } from '@element-plus/icons-vue';
 import { isEmpty, map } from 'lodash-es';
 
-import { createValues } from '@tmagic/form';
+import { createValues, FieldProps } from '@tmagic/form';
 import type { Id } from '@tmagic/schema';
 
 import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
@@ -53,20 +53,9 @@ defineOptions({
 const services = inject<Services>('services');
 const emit = defineEmits(['change']);
 
-const props = withDefaults(
-  defineProps<{
-    config: CodeSelectColConfig;
-    model: any;
-    prop: string;
-    name: string;
-    lastValues?: any;
-    disabled?: boolean;
-    size: 'small' | 'default' | 'large';
-  }>(),
-  {
-    disabled: false,
-  },
-);
+const props = withDefaults(defineProps<FieldProps<CodeSelectColConfig>>(), {
+  disabled: false,
+});
 
 /**
  * 根据代码块id获取代码块参数配置

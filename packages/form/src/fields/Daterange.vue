@@ -19,24 +19,14 @@ import { ref, watch } from 'vue';
 import { TMagicDatePicker } from '@tmagic/design';
 import { datetimeFormatter } from '@tmagic/utils';
 
-import { DaterangeConfig } from '../schema';
+import type { DaterangeConfig, FieldProps } from '../schema';
 import { useAddField } from '../utils/useAddField';
 
 defineOptions({
   name: 'MFormDateRange',
 });
 
-const props = defineProps<{
-  config: DaterangeConfig;
-  model: any;
-  initValues?: any;
-  values?: any;
-  name: string;
-  prop: string;
-  disabled?: boolean;
-  size?: 'large' | 'default' | 'small';
-  lastValues?: Record<string, any>;
-}>();
+const props = defineProps<FieldProps<DaterangeConfig>>();
 
 const emit = defineEmits(['change']);
 

@@ -12,25 +12,16 @@
 <script setup lang="ts">
 import { computed, inject } from 'vue';
 
-import { DataSourceFieldSelectConfig, Services } from '@editor/type';
+import type { FieldProps } from '@tmagic/form';
+
+import type { DataSourceFieldSelectConfig, Services } from '@editor/type';
 
 const services = inject<Services>('services');
 const emit = defineEmits(['change']);
 
-const props = withDefaults(
-  defineProps<{
-    config: DataSourceFieldSelectConfig;
-    model: any;
-    lastValues?: any;
-    prop: string;
-    name: string;
-    disabled?: boolean;
-    size: 'small' | 'default' | 'large';
-  }>(),
-  {
-    disabled: false,
-  },
-);
+const props = withDefaults(defineProps<FieldProps<DataSourceFieldSelectConfig>>(), {
+  disabled: false,
+});
 
 const dataSources = computed(() => services?.dataSourceService.get('dataSources'));
 

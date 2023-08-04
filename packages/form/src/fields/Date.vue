@@ -15,26 +15,18 @@
 import { TMagicDatePicker } from '@tmagic/design';
 import { datetimeFormatter } from '@tmagic/utils';
 
-import { DateConfig } from '../schema';
+import type { DateConfig, FieldProps } from '../schema';
 import { useAddField } from '../utils/useAddField';
 
 defineOptions({
   name: 'MFormDate',
 });
 
-const props = defineProps<{
-  config: DateConfig;
-  model: any;
-  initValues?: any;
-  values?: any;
-  name: string;
-  prop: string;
-  disabled?: boolean;
-  size?: 'large' | 'default' | 'small';
-  lastValues?: Record<string, any>;
-}>();
+const props = defineProps<FieldProps<DateConfig>>();
 
-const emit = defineEmits(['change']);
+const emit = defineEmits<{
+  change: [value: string];
+}>();
 
 useAddField(props.prop);
 

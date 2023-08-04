@@ -21,6 +21,7 @@
         class="m-fileds-key-value-delete"
         type="danger"
         :size="size"
+        :disabled="disabled"
         circle
         plain
         :icon="Delete"
@@ -28,7 +29,9 @@
       ></TMagicButton>
     </div>
 
-    <TMagicButton type="primary" :size="size" plain :icon="Plus" @click="addHandler">添加</TMagicButton>
+    <TMagicButton type="primary" :size="size" :disabled="disabled" plain :icon="Plus" @click="addHandler"
+      >添加</TMagicButton
+    >
   </div>
 </template>
 
@@ -37,25 +40,20 @@ import { ref, watchEffect } from 'vue';
 import { Delete, Plus } from '@element-plus/icons-vue';
 
 import { TMagicButton, TMagicInput } from '@tmagic/design';
+import type { FieldProps } from '@tmagic/form';
 
 defineOptions({
   name: 'MEditorKeyValue',
 });
 
 const props = withDefaults(
-  defineProps<{
-    config: {
+  defineProps<
+    FieldProps<{
       type: 'key-value';
       name: string;
       text: string;
-    };
-    model: Record<string, any>;
-    name: string;
-    prop: string;
-    disabled: boolean;
-    lastValues?: Record<string, any>;
-    size?: 'large' | 'default' | 'small';
-  }>(),
+    }>
+  >(),
   {
     disabled: false,
   },

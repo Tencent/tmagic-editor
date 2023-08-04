@@ -6,24 +6,23 @@
 import { computed, reactive, watch } from 'vue';
 import serialize from 'serialize-javascript';
 
+import type { FieldProps } from '@tmagic/form';
+
 import { getConfig } from '@editor/utils/config';
 
 defineOptions({
   name: 'MEditorCodeLink',
 });
 
-const props = defineProps<{
-  config: {
+const props = defineProps<
+  FieldProps<{
     type: 'code-link';
     name: string;
     text?: string;
     formTitle?: string;
     codeOptions?: Object;
-  };
-  model: any;
-  name: string;
-  prop: string;
-}>();
+  }>
+>();
 
 const emit = defineEmits(['change']);
 

@@ -20,26 +20,19 @@ import { inject } from 'vue';
 
 import { TMagicInputNumber } from '@tmagic/design';
 
-import { FormState, NumberConfig } from '../schema';
+import type { FieldProps, FormState, NumberConfig } from '../schema';
 import { useAddField } from '../utils/useAddField';
 
 defineOptions({
   name: 'MFormNumber',
 });
 
-const props = defineProps<{
-  config: NumberConfig;
-  model: any;
-  initValues?: any;
-  values?: any;
-  name: string;
-  prop: string;
-  disabled?: boolean;
-  size?: 'large' | 'default' | 'small';
-  lastValues?: Record<string, any>;
-}>();
+const props = defineProps<FieldProps<NumberConfig>>();
 
-const emit = defineEmits(['change', 'input']);
+const emit = defineEmits<{
+  change: [values: number];
+  input: [values: number];
+}>();
 
 useAddField(props.prop);
 
@@ -49,7 +42,7 @@ const changeHandler = (value: number) => {
   emit('change', value);
 };
 
-const inputHandler = (v: string) => {
+const inputHandler = (v: number) => {
   emit('input', v);
   mForm?.$emit('field-input', props.prop, v);
 };

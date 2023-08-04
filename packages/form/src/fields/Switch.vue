@@ -14,30 +14,22 @@ import { computed } from 'vue';
 
 import { TMagicSwitch } from '@tmagic/design';
 
-import { SwitchConfig } from '../schema';
+import type { FieldProps, SwitchConfig } from '../schema';
 import { useAddField } from '../utils/useAddField';
 
 defineOptions({
   name: 'MFormSwitch',
 });
 
-const props = defineProps<{
-  config: SwitchConfig;
-  model: any;
-  initValues?: any;
-  values?: any;
-  name: string;
-  prop: string;
-  disabled?: boolean;
-  size?: 'large' | 'default' | 'small';
-  lastValues?: Record<string, any>;
-}>();
+const props = defineProps<FieldProps<SwitchConfig>>();
 
-const emit = defineEmits(['change']);
+const emit = defineEmits<{
+  change: [value: any];
+}>();
 
 useAddField(props.prop);
 
-const changeHandler = (value: number) => {
+const changeHandler = (value: any) => {
   emit('change', value);
 };
 

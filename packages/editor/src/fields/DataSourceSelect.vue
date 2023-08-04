@@ -14,8 +14,7 @@
 <script setup lang="ts">
 import { computed, inject } from 'vue';
 
-import { FieldSize } from '@tmagic/design';
-import { MSelect, SelectConfig } from '@tmagic/form';
+import { FieldProps, MSelect, SelectConfig } from '@tmagic/form';
 
 import { Services } from '../type';
 
@@ -26,21 +25,15 @@ defineOptions({
 const emit = defineEmits(['change']);
 
 const props = withDefaults(
-  defineProps<{
-    config: {
+  defineProps<
+    FieldProps<{
       type: 'data-source-select';
       name: string;
       text: string;
       placeholder: string;
       dataSourceType?: string;
-    };
-    model: Record<string, any>;
-    name: string;
-    prop: string;
-    disabled: boolean;
-    lastValues?: Record<string, any>;
-    size?: FieldSize;
-  }>(),
+    }>
+  >(),
   {
     disabled: false,
   },

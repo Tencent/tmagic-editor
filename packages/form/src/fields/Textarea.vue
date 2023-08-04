@@ -17,32 +17,25 @@ import { inject } from 'vue';
 
 import { TMagicInput } from '@tmagic/design';
 
-import { FormState, TextareaConfig } from '../schema';
+import type { FieldProps, FormState, TextareaConfig } from '../schema';
 import { useAddField } from '../utils/useAddField';
 
 defineOptions({
   name: 'MFormTextarea',
 });
 
-const props = defineProps<{
-  config: TextareaConfig;
-  model: any;
-  initValues?: any;
-  values?: any;
-  name: string;
-  prop: string;
-  disabled?: boolean;
-  size?: 'large' | 'default' | 'small';
-  lastValues?: Record<string, any>;
-}>();
+const props = defineProps<FieldProps<TextareaConfig>>();
 
-const emit = defineEmits(['change', 'input']);
+const emit = defineEmits<{
+  change: [value: string];
+  input: [value: string];
+}>();
 
 useAddField(props.prop);
 
 const mForm = inject<FormState | null>('mForm');
 
-const changeHandler = (value: number) => {
+const changeHandler = (value: string) => {
   emit('change', value);
 };
 

@@ -21,24 +21,14 @@
 <script lang="ts" setup>
 import { TMagicInput } from '@tmagic/design';
 
-import type { NumberRangeConfig } from '../schema';
+import type { FieldProps, NumberRangeConfig } from '../schema';
 import { useAddField } from '../utils/useAddField';
 
 defineOptions({
   name: 'MFormNumberRange',
 });
 
-const props = defineProps<{
-  config: NumberRangeConfig;
-  model: any;
-  initValues?: any;
-  values?: any;
-  name: string;
-  prop: string;
-  disabled?: boolean;
-  size?: 'large' | 'default' | 'small';
-  lastValues?: Record<string, any>;
-}>();
+const props = defineProps<FieldProps<NumberRangeConfig>>();
 
 const emit = defineEmits<{
   change: [values: [number, number]];

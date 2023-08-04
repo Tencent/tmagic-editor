@@ -11,6 +11,7 @@ import { computed, inject, watch } from 'vue';
 import { isEmpty } from 'lodash-es';
 
 import { TMagicCard } from '@tmagic/design';
+import type { FieldProps } from '@tmagic/form';
 import { HookType } from '@tmagic/schema';
 
 import type { Services } from '@editor/type';
@@ -24,15 +25,11 @@ const emit = defineEmits(['change']);
 const services = inject<Services>('services');
 
 const props = withDefaults(
-  defineProps<{
-    config: {
+  defineProps<
+    FieldProps<{
       className?: string;
-    };
-    model: any;
-    prop: string;
-    name: string;
-    size: 'small' | 'default' | 'large';
-  }>(),
+    }>
+  >(),
   {},
 );
 

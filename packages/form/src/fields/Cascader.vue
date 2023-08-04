@@ -19,7 +19,7 @@ import { inject, ref, watchEffect } from 'vue';
 
 import { TMagicCascader } from '@tmagic/design';
 
-import { CascaderConfig, FormState } from '../schema';
+import type { CascaderConfig, FieldProps, FormState } from '../schema';
 import { getConfig } from '../utils/config';
 import { useAddField } from '../utils/useAddField';
 
@@ -27,17 +27,7 @@ defineOptions({
   name: 'MFormCascader',
 });
 
-const props = defineProps<{
-  config: CascaderConfig;
-  model: any;
-  initValues?: any;
-  values?: any;
-  name: string;
-  prop: string;
-  disabled?: boolean;
-  size?: 'large' | 'default' | 'small';
-  lastValues?: Record<string, any>;
-}>();
+const props = defineProps<FieldProps<CascaderConfig>>();
 
 const emit = defineEmits(['change']);
 

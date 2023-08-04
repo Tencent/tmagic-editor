@@ -13,26 +13,18 @@
 <script lang="ts" setup>
 import { TMagicTimePicker } from '@tmagic/design';
 
-import { TimeConfig } from '../schema';
+import type { FieldProps, TimeConfig } from '../schema';
 import { useAddField } from '../utils/useAddField';
 
 defineOptions({
   name: 'MFormTime',
 });
 
-const props = defineProps<{
-  config: TimeConfig;
-  model: any;
-  initValues?: any;
-  values?: any;
-  name: string;
-  prop: string;
-  disabled?: boolean;
-  size?: 'large' | 'default' | 'small';
-  lastValues?: Record<string, any>;
-}>();
+const props = defineProps<FieldProps<TimeConfig>>();
 
-const emit = defineEmits(['change']);
+const emit = defineEmits<{
+  change: [value: string];
+}>();
 
 useAddField(props.prop);
 

@@ -20,29 +20,24 @@
 
 <script setup lang="ts">
 import { TMagicButton } from '@tmagic/design';
+import type { FieldProps } from '@tmagic/form';
 import type { CodeBlockContent } from '@tmagic/schema';
 import { MagicTable } from '@tmagic/table';
 
 import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
+import type { CodeParamStatement } from '@editor/type';
 import { useDataSourceMethod } from '@editor/utils/use-data-source-method';
-
-import { CodeParamStatement } from '..';
 
 defineOptions({
   name: 'MEditorDataSourceMethods',
 });
 
 const props = withDefaults(
-  defineProps<{
-    config: {
+  defineProps<
+    FieldProps<{
       type: 'data-source-methods';
-    };
-    model: any;
-    prop: string;
-    lastValues?: any;
-    disabled: boolean;
-    name: string;
-  }>(),
+    }>
+  >(),
   {
     disabled: false,
   },

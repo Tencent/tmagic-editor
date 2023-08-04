@@ -29,32 +29,25 @@ import { inject } from 'vue';
 import { TMagicButton, TMagicInput } from '@tmagic/design';
 import { isNumber } from '@tmagic/utils';
 
-import { FormState, TextConfig } from '../schema';
+import type { FieldProps, FormState, TextConfig } from '../schema';
 import { useAddField } from '../utils/useAddField';
 
 defineOptions({
   name: 'MFormText',
 });
 
-const props = defineProps<{
-  config: TextConfig;
-  model: any;
-  initValues?: any;
-  values?: any;
-  name: string;
-  prop: string;
-  disabled?: boolean;
-  size?: 'large' | 'default' | 'small';
-  lastValues?: Record<string, any>;
-}>();
+const props = defineProps<FieldProps<TextConfig>>();
 
-const emit = defineEmits(['change', 'input']);
+const emit = defineEmits<{
+  change: [value: string];
+  input: [value: string];
+}>();
 
 useAddField(props.prop);
 
 const mForm = inject<FormState | undefined>('mForm');
 
-const changeHandler = (value: number) => {
+const changeHandler = (value: string) => {
   emit('change', value);
 };
 

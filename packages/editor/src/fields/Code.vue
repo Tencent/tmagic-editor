@@ -12,6 +12,8 @@
 </template>
 
 <script lang="ts" setup>
+import type { FieldProps } from '@tmagic/form';
+
 import MagicCodeEditor from '@editor/layouts/CodeEditor.vue';
 
 defineOptions({
@@ -21,19 +23,13 @@ defineOptions({
 const emit = defineEmits(['change']);
 
 const props = withDefaults(
-  defineProps<{
-    config: {
+  defineProps<
+    FieldProps<{
       language?: string;
       options?: Object;
       height?: string;
-    };
-    model: any;
-    name: string;
-    prop: string;
-    lastValues?: any;
-    disabled?: boolean;
-    size?: 'small' | 'default' | 'large';
-  }>(),
+    }>
+  >(),
   {
     disabled: false,
   },

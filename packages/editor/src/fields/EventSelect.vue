@@ -3,18 +3,23 @@
     <m-form-table
       v-if="isOldVersion"
       ref="eventForm"
-      :size="props.size"
-      :model="model"
       name="events"
+      :size="size"
+      :disabled="disabled"
+      :model="model"
       :config="tableConfig"
       @change="onChangeHandler"
     ></m-form-table>
 
     <div v-else class="fullWidth">
-      <TMagicButton class="create-button" type="primary" size="small" @click="addEvent()">添加事件</TMagicButton>
+      <TMagicButton class="create-button" type="primary" :size="size" :disabled="disabled" @click="addEvent()"
+        >添加事件</TMagicButton
+      >
       <m-form-panel
         v-for="(cardItem, index) in model[name]"
         :key="index"
+        :disabled="disabled"
+        :size="size"
         :config="actionsConfig"
         :model="cardItem"
         @change="onChangeHandler"
@@ -24,9 +29,18 @@
             class="fullWidth"
             :config="eventNameConfig"
             :model="cardItem"
+            :disabled="disabled"
+            :size="size"
             @change="onChangeHandler"
           ></m-form-container>
-          <TMagicButton style="color: #f56c6c" text :icon="Delete" @click="removeEvent(index)"></TMagicButton>
+          <TMagicButton
+            style="color: #f56c6c"
+            text
+            :icon="Delete"
+            :disabled="disabled"
+            :size="size"
+            @click="removeEvent(index)"
+          ></TMagicButton>
         </template>
       </m-form-panel>
     </div>
@@ -39,7 +53,7 @@ import { Delete } from '@element-plus/icons-vue';
 import { has } from 'lodash-es';
 
 import { TMagicButton } from '@tmagic/design';
-import { FormState } from '@tmagic/form';
+import type { FieldProps, FormState } from '@tmagic/form';
 import { ActionType } from '@tmagic/schema';
 
 import type { CodeSelectColConfig, DataSourceMethodSelectConfig, EventSelectConfig, Services } from '@editor/type';
@@ -48,13 +62,7 @@ defineOptions({
   name: 'MEditorEventSelect',
 });
 
-const props = defineProps<{
-  config: EventSelectConfig;
-  model: any;
-  prop: string;
-  name: string;
-  size: 'small' | 'default' | 'large';
-}>();
+const props = defineProps<FieldProps<EventSelectConfig>>();
 
 const emit = defineEmits(['change']);
 

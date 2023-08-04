@@ -27,7 +27,7 @@ import { onBeforeUnmount, reactive, watch } from 'vue';
 
 import { TMagicForm, TMagicFormItem, TMagicInput } from '@tmagic/design';
 
-import { DynamicFieldConfig } from '../schema';
+import type { DynamicFieldConfig, FieldProps } from '../schema';
 import { getConfig } from '../utils/config';
 import { useAddField } from '../utils/useAddField';
 
@@ -35,23 +35,13 @@ defineOptions({
   name: 'MFormDynamicField',
 });
 
-const props = defineProps<{
-  config: DynamicFieldConfig;
-  model: any;
-  initValues?: any;
-  values?: any;
-  name: string;
-  prop: string;
-  disabled?: boolean;
-  size?: 'large' | 'default' | 'small';
-  lastValues?: Record<string, any>;
-}>();
+const props = defineProps<FieldProps<DynamicFieldConfig>>();
 
 const emit = defineEmits(['change']);
 
 useAddField(props.prop);
 
-const request = getConfig('request') as Function;
+const request = getConfig<Function>('request');
 const fieldMap = reactive<{ [key: string]: any }>({
   value: {},
 });

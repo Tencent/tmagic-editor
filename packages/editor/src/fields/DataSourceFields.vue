@@ -22,7 +22,7 @@
 import { ref } from 'vue';
 
 import { TMagicButton, tMagicMessageBox } from '@tmagic/design';
-import { FormConfig, FormState, MFormDialog } from '@tmagic/form';
+import { FieldProps, FormConfig, FormState, MFormDialog } from '@tmagic/form';
 import { MagicTable } from '@tmagic/table';
 
 defineOptions({
@@ -30,16 +30,11 @@ defineOptions({
 });
 
 const props = withDefaults(
-  defineProps<{
-    config: {
+  defineProps<
+    FieldProps<{
       type: 'data-source-fields';
-    };
-    model: any;
-    prop: string;
-    lastValues?: any;
-    disabled: boolean;
-    name: string;
-  }>(),
+    }>
+  >(),
   {
     disabled: false,
   },

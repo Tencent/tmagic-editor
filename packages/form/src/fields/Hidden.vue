@@ -3,22 +3,14 @@
 </template>
 
 <script setup lang="ts">
-import { HiddenConfig } from '../schema';
+import type { FieldProps, HiddenConfig } from '../schema';
 import { useAddField } from '../utils/useAddField';
 
 defineOptions({
   name: 'MFormHidden',
 });
 
-const props = defineProps<{
-  config: HiddenConfig;
-  model: any;
-  initValues?: any;
-  values?: any;
-  name: string;
-  prop: string;
-  lastValues?: Record<string, any>;
-}>();
+const props = defineProps<FieldProps<HiddenConfig>>();
 
 useAddField(props.prop);
 </script>

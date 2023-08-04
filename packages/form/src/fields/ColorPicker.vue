@@ -11,26 +11,18 @@
 <script lang="ts" setup>
 import { TMagicColorPicker } from '@tmagic/design';
 
-import { ColorPickConfig } from '../schema';
+import type { ColorPickConfig, FieldProps } from '../schema';
 import { useAddField } from '../utils/useAddField';
 
 defineOptions({
   name: 'MFormColorPicker',
 });
 
-const props = defineProps<{
-  config: ColorPickConfig;
-  model: any;
-  initValues?: any;
-  values?: any;
-  name: string;
-  prop: string;
-  disabled?: boolean;
-  size?: 'large' | 'default' | 'small';
-  lastValues?: Record<string, any>;
-}>();
+const props = defineProps<FieldProps<ColorPickConfig>>();
 
-const emit = defineEmits(['change']);
+const emit = defineEmits<{
+  change: [value: string];
+}>();
 
 useAddField(props.prop);
 

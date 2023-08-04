@@ -48,7 +48,8 @@
 import { computed, inject, nextTick, ref, watch } from 'vue';
 import { Coin } from '@element-plus/icons-vue';
 
-import { FieldSize, getConfig, TMagicAutocomplete, TMagicTag } from '@tmagic/design';
+import { getConfig, TMagicAutocomplete, TMagicTag } from '@tmagic/design';
+import type { FieldProps } from '@tmagic/form';
 import type { DataSchema, DataSourceSchema } from '@tmagic/schema';
 
 import Icon from '@editor/components/Icon.vue';
@@ -59,25 +60,21 @@ defineOptions({
 });
 
 const props = withDefaults(
-  defineProps<{
-    config: {
+  defineProps<
+    FieldProps<{
       type: 'data-source-input';
       name: string;
       text: string;
-    };
-    model: Record<string, any>;
-    name: string;
-    prop: string;
-    disabled: boolean;
-    lastValues?: Record<string, any>;
-    size?: FieldSize;
-  }>(),
+    }>
+  >(),
   {
     disabled: false,
   },
 );
 
-const emit = defineEmits<(e: 'change', value: string) => void>();
+const emit = defineEmits<{
+  change: [value: string];
+}>();
 
 const { dataSourceService } = inject<Services>('services') || {};
 

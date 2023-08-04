@@ -16,7 +16,7 @@ import { computed, inject } from 'vue';
 
 import { TMagicCheckbox, TMagicCheckboxGroup } from '@tmagic/design';
 
-import { CheckboxGroupConfig, FormState } from '../schema';
+import type { CheckboxGroupConfig, FieldProps, FormState } from '../schema';
 import { filterFunction } from '../utils/form';
 import { useAddField } from '../utils/useAddField';
 
@@ -24,17 +24,7 @@ defineOptions({
   name: 'MFormCheckGroup',
 });
 
-const props = defineProps<{
-  config: CheckboxGroupConfig;
-  model: any;
-  initValues?: any;
-  values?: any;
-  name: string;
-  prop: string;
-  disabled?: boolean;
-  size?: 'large' | 'default' | 'small';
-  lastValues?: Record<string, any>;
-}>();
+const props = defineProps<FieldProps<CheckboxGroupConfig>>();
 
 const emit = defineEmits(['change']);
 
