@@ -126,6 +126,8 @@ export const getUrlParam = (param: string, url?: string) => {
   return '';
 };
 
+export const isObject = (obj: any) => Object.prototype.toString.call(obj) === '[object Object]';
+
 export const isPop = (node: MComponent | null): boolean => Boolean(node?.type?.toLowerCase().endsWith('pop'));
 
 export const isPage = (node?: MComponent | null): boolean => {
