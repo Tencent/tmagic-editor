@@ -16,10 +16,9 @@ export default defineComponent({
     const app = inject<Core | undefined>('app');
     const pageConfig = reactive(app?.page?.data || {});
 
-    app?.dataSourceManager?.on('update-data', (nodes: MNode[], sourceId: string) => {
+    app?.dataSourceManager?.on('update-data', (nodes: MNode[]) => {
       nodes.forEach((node) => {
-        const newNode = app.compiledNode(node, app.dataSourceManager?.data || {}, sourceId);
-        replaceChildNode(reactive(newNode), [pageConfig as MNode]);
+        replaceChildNode(reactive(node), [pageConfig as MNode]);
       });
     });
 

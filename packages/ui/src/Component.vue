@@ -34,6 +34,7 @@ const style = computed(() => app?.transformStyle(props.config.style));
 
 const display = () => {
   if (props.config.visible === false) return false;
+  if (props.config.condResult === false) return false;
 
   const displayCfg = props.config?.display;
 

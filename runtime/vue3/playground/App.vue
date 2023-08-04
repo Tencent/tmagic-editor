@@ -85,7 +85,7 @@ window.magic?.onRuntimeReady({
   update({ config, parentId }: UpdateData) {
     if (!root.value || !app) throw new Error('error');
 
-    const newNode = app.compiledNode(config, app.dataSourceManager?.data || {});
+    const newNode = app.dataSourceManager?.compiledNode(config) || config;
     replaceChildNode(reactive(newNode), [root.value], parentId);
 
     const nodeInstance = app.page?.getNode(config.id);

@@ -18,7 +18,10 @@
 
 import EventEmitter from 'events';
 
-import { DataSourceSchema } from '@tmagic/schema';
+import { cloneDeep, template } from 'lodash-es';
+
+import { DataSourceDeps, DataSourceSchema, Id, MNode } from '@tmagic/schema';
+import { compiledCond, compiledNode } from '@tmagic/utils';
 
 import { DataSource, HttpDataSource } from './data-sources';
 import type { DataSourceManagerData, DataSourceManagerOptions, HttpDataSourceSchema, RequestFunction } from './types';
@@ -32,11 +35,16 @@ class DataSourceManager extends EventEmitter {
   public dataSourceMap = new Map<string, DataSource>();
 
   public data: DataSourceManagerData = {};
+  public dataSourceDeps: DataSourceDeps = {};
+  public dataSourceCondDeps: DataSourceDeps = {};
 
   private request?: RequestFunction;
 
   constructor(options: DataSourceManagerOptions) {
     super();
+
+    this.dataSourceDeps = options.dataSourceDeps || {};
+    this.dataSourceCondDeps = options.dataSourceCondDeps || {};
 
     if (options.httpDataSourceOptions?.request) {
       this.request = options.httpDataSourceOptions.request;
@@ -100,6 +108,50 @@ class DataSourceManager extends EventEmitter {
       ds.updateDefaultData();
       this.data[ds.id] = ds.data;
     });
+  }
+
+  public compiledNode(node: MNode, sourceId?: Id) {
+    if (node.condResult === false) return node;
+    if (node.visible === false) return node;
+
+    return compiledNode(
+      (value: any) => {
+        if (typeof value === 'string') {
+          return template(value)(this.data);
+        }
+        if (value?.isBindDataSource && value.dataSourceId) {
+          return this.data[value.dataSourceId];
+        }
+        return value;
+      },
+      cloneDeep(node),
+      this.dataSourceDeps,
+      sourceId,
+    );
+  }
+
+  public compliedConds(node: MNode) {
+    if (!node.displayConds || !Array.isArray(node.displayConds) || !node.displayConds.length) return true;
+
+    for (const { cond } of node.displayConds) {
+      if (!cond) continue;
+
+      let result = true;
+      for (const { op, value, range, field } of cond) {
+        const [sourceId, fieldKey] = field;
+        const fieldValue = this.data[sourceId][fieldKey];
+        if (!compiledCond(op, fieldValue, value, range)) {
+          result = false;
+          break;
+        }
+      }
+
+      if (result) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   public destroy() {

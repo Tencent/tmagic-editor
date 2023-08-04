@@ -295,3 +295,48 @@ export const compiledNode = (
 
   return node;
 };
+
+export const compiledCond = (op: string, fieldValue: any, value: any, range: [number, number]): boolean => {
+  switch (op) {
+    case 'is':
+      if (!fieldValue) return false;
+      break;
+    case 'not':
+      if (fieldValue) return false;
+      break;
+    case '=':
+      if (fieldValue !== value) return false;
+      break;
+    case '!=':
+      if (fieldValue === value) return false;
+      break;
+    case '>':
+      if (fieldValue <= value) return false;
+      break;
+    case '>=':
+      if (fieldValue < value) return false;
+      break;
+    case '<':
+      if (fieldValue >= value) return false;
+      break;
+    case '<=':
+      if (fieldValue > value) return false;
+      break;
+    case 'between':
+      if (fieldValue < range[0] || fieldValue > range[1]) return false;
+      break;
+    case 'not_between':
+      if (fieldValue >= range[0] && fieldValue <= range[1]) return false;
+      break;
+    case 'include':
+      if (!fieldValue.includes(value)) return false;
+      break;
+    case 'not_include':
+      if (fieldValue.includes(value)) return false;
+      break;
+    default:
+      break;
+  }
+
+  return true;
+};

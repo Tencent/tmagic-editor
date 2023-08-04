@@ -18,14 +18,9 @@
 
 import { EventEmitter } from 'events';
 
-import { cloneDeep, has, isEmpty, template } from 'lodash-es';
+import { has, isEmpty } from 'lodash-es';
 
-import {
-  createDataSourceManager,
-  DataSourceManager,
-  DataSourceManagerData,
-  RequestFunction,
-} from '@tmagic/data-source';
+import { createDataSourceManager, DataSourceManager, RequestFunction } from '@tmagic/data-source';
 import {
   ActionType,
   CodeBlockDSL,
@@ -36,9 +31,7 @@ import {
   EventConfig,
   Id,
   MApp,
-  MNode,
 } from '@tmagic/schema';
-import { compiledNode } from '@tmagic/utils';
 
 import Env from './Env';
 import { bindCommonEventListener, isCommonMethod, triggerCommonMethod } from './events';
@@ -174,13 +167,9 @@ class App extends EventEmitter {
       this.dataSourceManager.destroy();
     }
 
-    this.dataSourceManager = createDataSourceManager(
-      config,
-      (node: MNode, content: DataSourceManagerData) => this.compiledNode(node, content),
-      {
-        request,
-      },
-    );
+    this.dataSourceManager = createDataSourceManager(config, this.platform, {
+      request,
+    });
 
     this.codeDsl = config.codeBlocks;
     this.setPage(curPage || this.page?.data?.id);
@@ -342,23 +331,6 @@ class App extends EventEmitter {
     if (typeof method.content === 'function') {
       await method.content({ app: this, params, dataSource });
     }
-  }
-
-  public compiledNode(node: MNode, content: DataSourceManagerData, sourceId?: Id) {
-    return compiledNode(
-      (value: any) => {
-        if (typeof value === 'string') {
-          return template(value)(content);
-        }
-        if (value?.isBindDataSource && value.dataSourceId) {
-          return content[value.dataSourceId];
-        }
-        return value;
-      },
-      cloneDeep(node),
-      this.dsl?.dataSourceDeps,
-      sourceId,
-    );
   }
 
   public destroy() {

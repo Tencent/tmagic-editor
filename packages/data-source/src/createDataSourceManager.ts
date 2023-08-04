@@ -15,11 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { MApp, MNode } from '@tmagic/schema';
+import { cloneDeep } from 'lodash-es';
+
+import type { MApp } from '@tmagic/schema';
 import { getDepNodeIds, getNodes, replaceChildNode } from '@tmagic/utils';
 
 import DataSourceManager from './DataSourceManager';
-import type { DataSourceManagerData, HttpDataSourceOptions } from './types';
+import type { HttpDataSourceOptions } from './types';
 
 /**
  * 创建数据源管理器
@@ -29,26 +31,54 @@ import type { DataSourceManagerData, HttpDataSourceOptions } from './types';
  */
 export const createDataSourceManager = (
   dsl: MApp,
-  compiledNode = (node: MNode, _content: DataSourceManagerData) => node,
+  platform: string,
   httpDataSourceOptions?: Partial<HttpDataSourceOptions>,
 ) => {
   if (!dsl?.dataSources) return;
 
   const dataSourceManager = new DataSourceManager({
     dataSourceConfigs: dsl.dataSources,
+    dataSourceDeps: dsl.dataSourceDeps,
+    dataSourceCondDeps: dsl.dataSourceCondDeps,
     httpDataSourceOptions,
   });
 
+  if (dsl.dataSources && dsl.dataSourceCondDeps && platform !== 'editor') {
+    getNodes(getDepNodeIds(dsl.dataSourceCondDeps), dsl.items).forEach((node) => {
+      node.condResult = dataSourceManager.compliedConds(node);
+      replaceChildNode(node, dsl!.items);
+    });
+  }
+
   if (dsl.dataSources && dsl.dataSourceDeps) {
     getNodes(getDepNodeIds(dsl.dataSourceDeps), dsl.items).forEach((node) => {
-      replaceChildNode(compiledNode(node, dataSourceManager.data), dsl!.items);
+      replaceChildNode(dataSourceManager.compiledNode(node), dsl!.items);
     });
   }
 
   dataSourceManager.on('change', (sourceId: string) => {
     const dep = dsl.dataSourceDeps?.[sourceId];
-    if (!dep) return;
-    dataSourceManager.emit('update-data', getNodes(Object.keys(dep), dsl.items), sourceId);
+    const condDep = dsl.dataSourceCondDeps?.[sourceId];
+
+    if (condDep) {
+      dataSourceManager.emit(
+        'update-data',
+        getNodes(Object.keys(condDep), dsl.items).map((node) => {
+          const newNode = cloneDeep(node);
+          newNode.condResult = dataSourceManager.compliedConds(node);
+          return newNode;
+        }),
+        sourceId,
+      );
+    }
+
+    if (dep) {
+      dataSourceManager.emit(
+        'update-data',
+        getNodes(Object.keys(dep), dsl.items).map((node) => dataSourceManager.compiledNode(node)),
+        sourceId,
+      );
+    }
   });
 
   return dataSourceManager;

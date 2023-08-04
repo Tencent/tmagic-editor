@@ -1,4 +1,4 @@
-import { DataSourceSchema } from '@tmagic/schema';
+import { DataSourceDeps, DataSourceSchema } from '@tmagic/schema';
 
 export interface DataSourceOptions {
   schema: DataSourceSchema;
@@ -32,6 +32,8 @@ export interface HttpDataSourceOptions {
 
 export interface DataSourceManagerOptions {
   dataSourceConfigs: DataSourceSchema[];
+  dataSourceDeps?: DataSourceDeps;
+  dataSourceCondDeps?: DataSourceDeps;
   httpDataSourceOptions?: Partial<HttpDataSourceOptions>;
 }
 

@@ -108,7 +108,7 @@ const operations = {
   },
 
   update({ config, root }: UpdateData) {
-    replaceChildNode(app.compiledNode(config, app.dataSourceManager?.data || {}), root.items);
+    replaceChildNode(app.dataSourceManager?.compiledNode(config) || config, root.items);
     updateConfig(cloneDeep(root));
   },
 

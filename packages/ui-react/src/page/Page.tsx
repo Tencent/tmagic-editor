@@ -50,6 +50,7 @@ const Page: React.FC<PageProps> = ({ config }) => {
         if (!MagicUiComp) return null;
 
         if (item.visible === false) return null;
+        if (item.condResult === false) return null;
 
         return (
           <MagicUiComp

@@ -235,7 +235,7 @@ export const displayTabConfig: TabPaneConfig = {
   items: [
     {
       type: 'groupList',
-      name: 'showCond',
+      name: 'displayConds',
       items: [
         {
           type: 'table',

@@ -46,6 +46,7 @@ const Container: React.FC<ContainerProps> = ({ config, id }) => {
         if (!MagicUiComp) return null;
 
         if (item.visible === false) return null;
+        if (item.condResult === false) return null;
 
         return (
           <MagicUiComp

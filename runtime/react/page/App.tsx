@@ -31,10 +31,9 @@ function App() {
 
   const [config, setConfig] = useState(app.page.data);
 
-  app.dataSourceManager?.on('update-data', (nodes: MNode[], sourceId: string) => {
+  app.dataSourceManager?.on('update-data', (nodes: MNode[]) => {
     nodes.forEach((node) => {
-      const newNode = app.compiledNode(node, app.dataSourceManager?.data || {}, sourceId);
-      replaceChildNode(newNode, [config]);
+      replaceChildNode(node, [config]);
       setConfig(cloneDeep(config));
     });
   });
