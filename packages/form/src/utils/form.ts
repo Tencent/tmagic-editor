@@ -174,7 +174,7 @@ const getDefaultValue = function (mForm: FormState | undefined, { defaultValue, 
     return false;
   }
 
-  if (multiple) {
+  if (multiple || type === 'number-range') {
     return [];
   }
 

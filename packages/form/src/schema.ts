@@ -340,6 +340,13 @@ export interface NumberConfig extends FormItem {
 }
 
 /**
+ * 数值范围
+ */
+export interface NumberRangeConfig extends FormItem {
+  type?: 'number-range';
+}
+
+/**
  * 隐藏域
  */
 export interface HiddenConfig extends FormItem {
