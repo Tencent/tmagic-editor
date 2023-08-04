@@ -122,10 +122,10 @@ describe('depService', () => {
     const target1 = depService.getTarget('collect_1');
     const target2 = depService.getTarget('collect_2');
 
-    expect((target1?.deps || {}).node_1.name).toBe('node');
-    expect((target2?.deps || {}).node_1.name).toBe('node');
-    expect((target1?.deps || {}).node_1.keys).toHaveLength(1);
-    expect((target2?.deps || {}).node_1.keys).toHaveLength(3);
+    expect(target1?.deps?.node_1.name).toBe('node');
+    expect(target2?.deps?.node_1.name).toBe('node');
+    expect(target1?.deps?.node_1.keys).toHaveLength(1);
+    expect(target2?.deps?.node_1.keys).toHaveLength(3);
 
     depService.collect([
       {
@@ -146,8 +146,8 @@ describe('depService', () => {
       },
     ]);
 
-    expect((target1?.deps || {}).node_1).toBeUndefined();
-    expect((target2?.deps || {}).node_1.keys).toHaveLength(1);
+    expect(target1?.deps?.node_1).toBeUndefined();
+    expect(target2?.deps?.node_1.keys).toHaveLength(1);
 
     depService.collect([
       {
@@ -158,8 +158,8 @@ describe('depService', () => {
       },
     ]);
 
-    expect((target1?.deps || {}).node_1).toBeUndefined();
-    expect((target2?.deps || {}).node_1.keys[0]).toBe('text1');
+    expect(target1?.deps?.node_1).toBeUndefined();
+    expect(target2?.deps?.node_1.keys[0]).toBe('text1');
 
     depService.clear([
       {
@@ -168,8 +168,8 @@ describe('depService', () => {
       },
     ]);
 
-    expect((target1?.deps || {}).node_1).toBeUndefined();
-    expect((target2?.deps || {}).node_1).toBeUndefined();
+    expect(target1?.deps?.node_1).toBeUndefined();
+    expect(target2?.deps?.node_1).toBeUndefined();
   });
 
   test('collect deep', () => {
@@ -204,8 +204,8 @@ describe('depService', () => {
 
     const target1 = depService.getTarget('collect_1');
 
-    expect((target1?.deps || {}).node_1.name).toBe('node');
-    expect((target1?.deps || {}).node_2.name).toBe('node2');
+    expect(target1?.deps?.node_1.name).toBe('node');
+    expect(target1?.deps?.node_2.name).toBe('node2');
 
     depService.clear([
       {
@@ -221,7 +221,7 @@ describe('depService', () => {
       },
     ]);
 
-    expect((target1?.deps || {}).node_1).toBeUndefined();
-    expect((target1?.deps || {}).node_2).toBeUndefined();
+    expect(target1?.deps?.node_1).toBeUndefined();
+    expect(target1?.deps?.node_2).toBeUndefined();
   });
 });

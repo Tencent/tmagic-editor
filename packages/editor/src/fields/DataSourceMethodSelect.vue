@@ -105,7 +105,7 @@ const cascaderConfig = {
     dataSources.value
       ?.filter((ds) => ds.methods?.length)
       ?.map((ds) => ({
-        label: `${ds.title}（${ds.id}）`,
+        label: ds.title || ds.id,
         value: ds.id,
         children: ds.methods?.map((method) => ({
           label: method.name,

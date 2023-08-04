@@ -19,27 +19,24 @@ import { EventEmitter } from 'events';
 
 import { reactive } from 'vue';
 
-import { Id, MNode } from '@tmagic/schema';
+import type { Dep, Id, MNode } from '@tmagic/schema';
+import { isObject } from '@tmagic/utils';
+
+import { DepTargetType } from '@editor/type';
 
 type IsTarget = (key: string | number, value: any) => boolean;
 
 interface TargetOptions {
   isTarget: IsTarget;
   id: string | number;
-  type?: string;
-  name: string;
-}
-
-interface Dep {
-  [key: string | number]: {
-    name: string;
-    keys: (string | number)[];
-  };
+  /** 类型，数据源、代码块或其他 */
+  type?: DepTargetType | string;
+  name?: string;
 }
 
 interface TargetList {
-  [key: string]: {
-    [key: string | number]: Target;
+  [type: DepTargetType | string]: {
+    [targetId: string | number]: Target;
   };
 }
 
@@ -60,11 +57,11 @@ export class Target extends EventEmitter {
   /**
    * 目标名称，用于显示在依赖列表中
    */
-  public name: string;
+  public name?: string;
   /**
    * 不同的目标可以进行分类，例如代码块，数据源可以为两个不同的type
    */
-  public type = 'default';
+  public type: DepTargetType | string = DepTargetType.DEFAULT;
   /**
    * 依赖详情
    * 实例：{ 'node_id': { name: 'node_name', keys: [ created, mounted ] } }
@@ -156,14 +153,14 @@ export class Target extends EventEmitter {
 }
 
 export class Watcher extends EventEmitter {
-  public targets = reactive<TargetList>({});
+  private targets = reactive<TargetList>({});
 
   /**
    * 获取指定类型中的所有target
    * @param type 分类
    * @returns Target[]
    */
-  public getTargets(type = 'default') {
+  public getTargets(type: DepTargetType | string = DepTargetType.DEFAULT) {
     return this.targets[type] || {};
   }
 
@@ -230,7 +227,7 @@ export class Watcher extends EventEmitter {
    * @param type 分类
    * @returns void
    */
-  public removeTargets(type = 'default') {
+  public removeTargets(type: DepTargetType | string = DepTargetType.DEFAULT) {
     const targets = this.targets[type];
 
     if (!targets) return;
@@ -307,9 +304,11 @@ export class Watcher extends EventEmitter {
           this.emit('update-dep', node, fullKey);
         } else if (!keyIsItems && Array.isArray(value)) {
           value.forEach((item, index) => {
-            collectTarget(item, `${fullKey}.${index}`);
+            if (isObject(item)) {
+              collectTarget(item, `${fullKey}.${index}`);
+            }
           });
-        } else if (Object.prototype.toString.call(value) === '[object Object]') {
+        } else if (isObject(value)) {
           collectTarget(value, fullKey);
         }
 
@@ -321,6 +320,7 @@ export class Watcher extends EventEmitter {
       };
 
       Object.entries(config).forEach(([key, value]) => {
+        if (typeof value === 'undefined' || value === '') return;
         doCollect(key, value);
       });
     };

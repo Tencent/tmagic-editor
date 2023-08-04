@@ -500,3 +500,23 @@ export interface DataSourceMethodSelectConfig {
   disabled?: boolean | FilterFunction;
   display?: boolean | FilterFunction;
 }
+
+export interface DataSourceFieldSelectConfig {
+  type: 'data-source-field-select';
+  name: string;
+  labelWidth?: number | string;
+  disabled?: boolean | FilterFunction;
+  display?: boolean | FilterFunction;
+}
+
+export enum DepTargetType {
+  DEFAULT = 'default',
+  /** 代码块 */
+  CODE_BLOCK = 'code-block',
+  /** 数据源 */
+  DATA_SOURCE = 'data-source',
+  /** 数据源方法 */
+  DATA_SOURCE_METHOD = 'data-source-method',
+  /** 数据源条件 */
+  DATA_SOURCE_COND = 'data-source-cond',
+}

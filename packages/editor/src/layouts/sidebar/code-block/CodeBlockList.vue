@@ -50,7 +50,7 @@ import type { Id } from '@tmagic/schema';
 import Icon from '@editor/components/Icon.vue';
 import AppManageIcon from '@editor/icons/AppManageIcon.vue';
 import CodeIcon from '@editor/icons/CodeIcon.vue';
-import { CodeDeleteErrorType, CodeDslItem, Services } from '@editor/type';
+import { CodeDeleteErrorType, CodeDslItem, DepTargetType, Services } from '@editor/type';
 
 defineOptions({
   name: 'MEditorCodeBlockList',
@@ -69,7 +69,7 @@ const { codeBlockService, depService, editorService } = inject<Services>('servic
 
 // 代码块列表
 const codeList = computed(() =>
-  Object.values(depService?.targets['code-block'] || {}).map((target) => {
+  Object.values(depService?.getTargets(DepTargetType.CODE_BLOCK) || {}).map((target) => {
     // 组件节点
     const compNodes = Object.entries(target.deps).map(([id, dep]) => ({
       name: dep.name,

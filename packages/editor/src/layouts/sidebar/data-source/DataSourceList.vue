@@ -15,11 +15,11 @@
         <div class="list-item">
           <Icon v-if="data.type === 'code'" class="codeIcon" :icon="Coin"></Icon>
           <Icon v-if="data.type === 'node'" class="compIcon" :icon="Aim"></Icon>
-          <span class="name" :class="{ code: data.type === 'code', hook: data.type === 'key' }"
-            >{{ data.name }}（{{ data.id }}）</span
-          >
+          <span class="name" :class="{ code: data.type === 'ds', hook: data.type === 'key' }">{{
+            data.type === 'key' ? data.name : `${data.name}(${data.id})`
+          }}</span>
           <!-- 右侧工具栏 -->
-          <div class="right-tool" v-if="data.type === 'code'">
+          <div class="right-tool" v-if="data.type === 'ds'">
             <TMagicTooltip effect="dark" :content="editable ? '编辑' : '查看'" placement="bottom">
               <Icon :icon="editable ? Edit : View" class="edit-icon" @click.stop="editHandler(`${data.id}`)"></Icon>
             </TMagicTooltip>
@@ -39,10 +39,10 @@ import { computed, inject, ref } from 'vue';
 import { Aim, Close, Coin, Edit, View } from '@element-plus/icons-vue';
 
 import { tMagicMessageBox, TMagicTooltip, TMagicTree } from '@tmagic/design';
-import { Id } from '@tmagic/schema';
+import { Dep, Id } from '@tmagic/schema';
 
 import Icon from '@editor/components/Icon.vue';
-import type { Services } from '@editor/type';
+import { DepTargetType, Services } from '@editor/type';
 
 defineOptions({
   name: 'MEditorDataSourceList',
@@ -57,18 +57,52 @@ const { depService, editorService, dataSourceService } = inject<Services>('servi
 
 const editable = computed(() => dataSourceService?.get('editable') ?? true);
 
+const dataSources = computed(() => dataSourceService?.get('dataSources') || []);
+
+const dsDep = computed(() => depService?.getTargets(DepTargetType.DATA_SOURCE) || {});
+const dsMethodDep = computed(() => depService?.getTargets(DepTargetType.DATA_SOURCE_METHOD) || {});
+const dsCondDep = computed(() => depService?.getTargets(DepTargetType.DATA_SOURCE_COND) || {});
+
+const getKeyTreeConfig = (dep: Dep[string], type?: string) =>
+  dep.keys.map((key) => ({ name: key, id: key, type: 'key', isMethod: type === 'method', isCond: type === 'cond' }));
+
+const getNodeTreeConfig = (id: string, dep: Dep[string], type?: string) => ({
+  name: dep.name,
+  type: 'node',
+  id,
+  children: getKeyTreeConfig(dep, type),
+});
+
 const list = computed(() =>
-  Object.values(depService?.targets['data-source'] || {}).map((target) => ({
-    id: target.id,
-    name: target.name,
-    type: 'code',
-    children: Object.entries(target.deps).map(([id, dep]) => ({
-      name: dep.name,
-      type: 'node',
-      id,
-      children: dep.keys.map((key) => ({ name: key, id: key, type: 'key' })),
-    })),
-  })),
+  dataSources.value.map((ds) => {
+    const dsDeps = dsDep.value[ds.id].deps;
+    const dsMethodDeps = dsMethodDep.value[ds.id].deps;
+    const dsCondDeps = dsCondDep.value[ds.id].deps;
+
+    const children: any[] = [];
+
+    const mergeChildren = (deps: Dep, type?: string) => {
+      Object.entries(deps).forEach(([id, dep]) => {
+        const nodeItem = children.find((item) => item.id === id);
+        if (nodeItem) {
+          nodeItem.children = nodeItem.children.concat(getKeyTreeConfig(dep, type));
+        } else {
+          children.push(getNodeTreeConfig(id, dep, type));
+        }
+      });
+    };
+
+    mergeChildren(dsDeps);
+    mergeChildren(dsMethodDeps, 'method');
+    mergeChildren(dsCondDeps, 'cond');
+
+    return {
+      id: ds.id,
+      name: ds.title,
+      type: 'ds',
+      children,
+    };
+  }),
 );
 
 const editHandler = (id: string) => {

@@ -22,6 +22,7 @@ import CodeLink from './fields/CodeLink.vue';
 import CodeSelect from './fields/CodeSelect.vue';
 import CodeSelectCol from './fields/CodeSelectCol.vue';
 import DataSourceFields from './fields/DataSourceFields.vue';
+import DataSourceFieldSelect from './fields/DataSourceFieldSelect.vue';
 import DataSourceInput from './fields/DataSourceInput.vue';
 import DataSourceMethods from './fields/DataSourceMethods.vue';
 import DataSourceMethodSelect from './fields/DataSourceMethodSelect.vue';
@@ -59,6 +60,7 @@ export { default as DataSourceMethods } from './fields/DataSourceMethods.vue';
 export { default as DataSourceInput } from './fields/DataSourceInput.vue';
 export { default as DataSourceSelect } from './fields/DataSourceSelect.vue';
 export { default as DataSourceMethodSelect } from './fields/DataSourceMethodSelect.vue';
+export { default as DataSourceFieldSelect } from './fields/DataSourceFieldSelect.vue';
 export { default as EventSelect } from './fields/EventSelect.vue';
 export { default as KeyValue } from './fields/KeyValue.vue';
 export { default as CodeBlockList } from './layouts/sidebar/code-block/CodeBlockList.vue';
@@ -98,5 +100,6 @@ export default {
     app.component('m-fields-data-source-select', DataSourceSelect);
     app.component('m-fields-data-source-methods', DataSourceMethods);
     app.component('m-fields-data-source-method-select', DataSourceMethodSelect);
+    app.component('m-fields-data-source-field-select', DataSourceFieldSelect);
   },
 };

@@ -125,6 +125,7 @@ export interface MApp extends MComponent {
   dataSources?: DataSourceSchema[];
 
   dataSourceDeps?: DataSourceDeps;
+  dataSourceCondDeps?: DataSourceDeps;
 }
 
 export interface CodeBlockDSL {
@@ -191,14 +192,15 @@ export interface DataSourceSchema {
   /** 字段列表 */
   fields: DataSchema[];
   /** 方法列表 */
-  methods?: CodeBlockContent[];
+  methods: CodeBlockContent[];
   /** 扩展字段 */
   [key: string]: any;
 }
 
 export interface Dep {
   [nodeId: Id]: {
+    /** 组件名称 */
     name: string;
-    keys: Id[];
+    keys: (string | number)[];
   };
 }

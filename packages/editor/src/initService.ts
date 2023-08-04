@@ -7,9 +7,14 @@ import type { CodeBlockContent, DataSourceSchema, Id, MApp, MNode, MPage } from 
 import { getNodes } from '@tmagic/utils';
 
 import type { Target } from './services/dep';
-import { createCodeBlockTarget, createDataSourceTarget } from './utils/dep';
+import {
+  createCodeBlockTarget,
+  createDataSourceCondTarget,
+  createDataSourceMethodTarget,
+  createDataSourceTarget,
+} from './utils/dep';
 import editorProps from './editorProps';
-import type { Services } from './type';
+import { DepTargetType, Services } from './type';
 
 export declare type LooseRequired<T> = {
   [P in string & keyof T]: T[P];
@@ -139,6 +144,7 @@ export const initServiceEvents = (
 
     if (app.dsl) {
       app.dsl.dataSourceDeps = root.dataSourceDeps;
+      app.dsl.dataSourceCondDeps = root.dataSourceCondDeps;
       app.dsl.dataSources = root.dataSources;
     }
 
@@ -159,23 +165,34 @@ export const initServiceEvents = (
   };
 
   const targetAddHandler = (target: Target) => {
-    if (target.type !== 'data-source') return;
-
     const root = editorService.get('root');
     if (!root) return;
 
-    if (!root.dataSourceDeps) {
-      root.dataSourceDeps = {};
+    if (target.type === DepTargetType.DATA_SOURCE) {
+      if (!root.dataSourceDeps) {
+        root.dataSourceDeps = {};
+      }
+      root.dataSourceDeps[target.id] = target.deps;
     }
 
-    root.dataSourceDeps[target.id] = target.deps;
+    if (target.type === DepTargetType.DATA_SOURCE_COND) {
+      if (!root.dataSourceCondDeps) {
+        root.dataSourceCondDeps = {};
+      }
+      root.dataSourceCondDeps[target.id] = target.deps;
+    }
   };
 
   const targetRemoveHandler = (id: string | number) => {
     const root = editorService.get('root');
-    if (!root?.dataSourceDeps) return;
 
-    delete root.dataSourceDeps[id];
+    if (root?.dataSourceDeps) {
+      delete root.dataSourceDeps[id];
+    }
+
+    if (root?.dataSourceCondDeps) {
+      delete root.dataSourceCondDeps[id];
+    }
   };
 
   const depUpdateHandler = (node: MNode) => {
@@ -190,6 +207,12 @@ export const initServiceEvents = (
   depService.on('remove-target', targetRemoveHandler);
   depService.on('dep-update', depUpdateHandler);
   depService.on('collected', collectedHandler);
+
+  const initDataSourceDepTarget = (ds: DataSourceSchema) => {
+    depService.addTarget(createDataSourceTarget(ds.id));
+    depService.addTarget(createDataSourceMethodTarget(ds.id));
+    depService.addTarget(createDataSourceCondTarget(ds.id));
+  };
 
   const rootChangeHandler = async (value: MApp, preValue?: MApp | null) => {
     const nodeId = editorService.get('node')?.id || props.defaultSelected;
@@ -218,14 +241,14 @@ export const initServiceEvents = (
     codeBlockService.setCodeDsl(value.codeBlocks);
     dataSourceService.set('dataSources', value.dataSources);
 
-    depService.removeTargets('code-block');
+    depService.removeTargets(DepTargetType.CODE_BLOCK);
 
     Object.entries(value.codeBlocks).forEach(([id, code]) => {
       depService.addTarget(createCodeBlockTarget(id, code));
     });
 
     value.dataSources.forEach((ds) => {
-      depService.addTarget(createDataSourceTarget(ds.id, ds));
+      initDataSourceDepTarget(ds);
     });
 
     if (value && Array.isArray(value.items)) {
@@ -279,17 +302,14 @@ export const initServiceEvents = (
   codeBlockService.on('remove', codeBlockRemoveHandler);
 
   const dataSourceAddHandler = (config: DataSourceSchema) => {
-    depService.addTarget(createDataSourceTarget(config.id, config));
+    initDataSourceDepTarget(config);
     getApp()?.dataSourceManager?.addDataSource(config);
   };
 
   const dataSourceUpdateHandler = (config: DataSourceSchema) => {
-    if (config.title) {
-      depService.getTarget(config.id)!.name = config.title;
-    }
     const root = editorService.get('root');
 
-    const targets = depService.getTargets('data-source');
+    const targets = depService.getTargets(DepTargetType.DATA_SOURCE);
 
     const nodes = getNodes(Object.keys(targets[config.id].deps), root?.items);
 
