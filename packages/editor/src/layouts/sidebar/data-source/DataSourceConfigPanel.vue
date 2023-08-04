@@ -2,6 +2,7 @@
   <MFormDrawer
     ref="fomDrawer"
     label-width="80px"
+    :close-on-press-escape="false"
     :title="title"
     :width="size"
     :config="dataSourceConfig"

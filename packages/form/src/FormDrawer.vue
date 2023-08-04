@@ -3,7 +3,7 @@
     class="m-form-drawer"
     v-model="visible"
     :title="title"
-    :close-on-press-escape="true"
+    :close-on-press-escape="closeOnPressEscape"
     :append-to-body="true"
     :show-close="true"
     :close-on-click-modal="true"
@@ -66,12 +66,14 @@ withDefaults(
     width?: string | number;
     labelWidth?: string;
     disabled?: boolean;
+    closeOnPressEscape?: boolean;
     title?: string;
     zIndex?: number;
     size?: 'small' | 'default' | 'large';
     confirmText?: string;
   }>(),
   {
+    closeOnPressEscape: true,
     config: () => [],
     values: () => ({}),
     confirmText: '确定',
