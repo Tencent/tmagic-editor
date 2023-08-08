@@ -193,6 +193,7 @@ export const filterFunction = (mForm: FormState | undefined, config: any, props:
     formValue: mForm?.values || props.model,
     prop: props.prop,
     config: props.config,
+    index: props.index,
   });
 };
 

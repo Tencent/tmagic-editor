@@ -88,7 +88,13 @@ const title = computed(() => {
     return props.model[props.config.titleKey];
   }
 
-  return `组 ${String(props.index)}`;
+  if (props.config.title) {
+    return filterFunction(mForm, props.config.title, props);
+  }
+
+  const titlePrefix = props.config.titlePrefix || '组';
+
+  return `${titlePrefix} ${String(props.index + 1)}`;
 });
 
 const length = computed(() => props.groupModel?.length || 0);
@@ -113,7 +119,7 @@ const showDelete = (index: number) => {
 };
 
 // 调换顺序
-const changeOrder = (offset = 0) => emit('swap-item', props.index, `${String(props.index)}${offset}`);
+const changeOrder = (offset = 0) => emit('swap-item', props.index, props.index + offset);
 
 const movable = () => {
   const { movable } = props.config;

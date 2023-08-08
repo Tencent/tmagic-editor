@@ -132,6 +132,7 @@ const toggleMode = () => {
       text: null,
     }))) as any;
 };
+
 const onAddDiffCount = () => emit('addDiffCount');
 
 const getLastValues = (item: any, index: number) => item?.[index] || {};
