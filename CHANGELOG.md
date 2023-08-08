@@ -1,3 +1,24 @@
+# [1.3.0-alpha.17](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.16...v1.3.0-alpha.17) (2023-08-08)
+
+
+### Bug Fixes
+
+* **editor:** diff code editor中全屏按钮点击无效 ([f9dc628](https://github.com/Tencent/tmagic-editor/commit/f9dc628ef41437001650a6b57be0556b9f8b08bb))
+* **editor:** 使用画布上的删除按钮删除组件时依赖没有清空 ([0d3cd11](https://github.com/Tencent/tmagic-editor/commit/0d3cd11ade5fbd697e24aa5c61fbc0be7c3ea9e6))
+* **form:** group-list上移下移行为不对 ([aabc77d](https://github.com/Tencent/tmagic-editor/commit/aabc77d90309976f3ddc0c67bb5e34104487d333))
+
+
+### Features
+
+* **core,data-source,ui,ui-react,ui-vue2,utils,runtime:** 解析显示条件配置 ([92df80e](https://github.com/Tencent/tmagic-editor/commit/92df80e71192df43cb87495ab53a4f47b1a3599c))
+* **design:** input支持textarea rows ([63d8c98](https://github.com/Tencent/tmagic-editor/commit/63d8c988224ac2f635e3be5ad73370b0f152d783))
+* **editor,schema:** 支持组件显示条件配置 ([3586207](https://github.com/Tencent/tmagic-editor/commit/35862078b3c86eefa53cea9dada92ded6ccc91c9))
+* **form:** text配置支持函数 ([26cd37b](https://github.com/Tencent/tmagic-editor/commit/26cd37be23e23f3ffea4f92c57c498e6518072c0))
+* **form:** 新增数字范围控件 ([5887977](https://github.com/Tencent/tmagic-editor/commit/5887977e458b3235a685e5176fba7a9775512c18))
+* **utils:** 新增isObject ([46f6aea](https://github.com/Tencent/tmagic-editor/commit/46f6aeaaf70c257849a20bed825aadbbcc898b12))
+
+
+
 # [1.3.0-alpha.16](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.15...v1.3.0-alpha.16) (2023-08-02)
 
 
