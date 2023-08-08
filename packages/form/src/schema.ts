@@ -84,7 +84,7 @@ export interface FormItem {
   /** 值发生改变时调用的方法 */
   onChange?: OnChangeHandler;
   /** label 标签的文本 */
-  text?: string;
+  text?: string | FilterFunction;
   /** 右侧感叹号 */
   tip?: string;
 

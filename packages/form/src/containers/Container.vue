@@ -14,7 +14,7 @@
     ></m-fields-hidden>
 
     <component
-      v-else-if="items && !config.text && type && display"
+      v-else-if="items && !text && type && display"
       :key="key(config)"
       :size="size"
       :is="tagName"
@@ -35,12 +35,12 @@
     <template v-else-if="type && display && !showDiff">
       <TMagicFormItem
         :style="config.tip ? 'flex: 1' : ''"
-        :class="{ hidden: `${itemLabelWidth}` === '0' || !config.text }"
+        :class="{ hidden: `${itemLabelWidth}` === '0' || !text }"
         :prop="itemProp"
         :label-width="itemLabelWidth"
         :rules="rule"
       >
-        <template #label><span v-html="type === 'checkbox' ? '' : config.text"></span></template>
+        <template #label><span v-html="type === 'checkbox' ? '' : text"></span></template>
         <TMagicTooltip v-if="tooltip">
           <component
             :key="key(config)"
@@ -91,13 +91,13 @@
       <!-- 上次内容 -->
       <TMagicFormItem
         :style="config.tip ? 'flex: 1' : ''"
-        :class="{ hidden: `${itemLabelWidth}` === '0' || !config.text }"
+        :class="{ hidden: `${itemLabelWidth}` === '0' || !text }"
         :prop="itemProp"
         :label-width="itemLabelWidth"
         :rules="rule"
         style="background: #f7dadd"
       >
-        <template #label><span v-html="type === 'checkbox' ? '' : config.text"></span></template>
+        <template #label><span v-html="type === 'checkbox' ? '' : text"></span></template>
         <TMagicTooltip v-if="tooltip">
           <component
             :key="key(config)"
@@ -140,13 +140,13 @@
       <!-- 当前内容 -->
       <TMagicFormItem
         :style="config.tip ? 'flex: 1' : ''"
-        :class="{ hidden: `${itemLabelWidth}` === '0' || !config.text }"
+        :class="{ hidden: `${itemLabelWidth}` === '0' || !text }"
         :prop="itemProp"
         :label-width="itemLabelWidth"
         :rules="rule"
         style="background: #def7da"
       >
-        <template #label><span v-html="type === 'checkbox' ? '' : config.text"></span></template>
+        <template #label><span v-html="type === 'checkbox' ? '' : text"></span></template>
         <TMagicTooltip v-if="tooltip">
           <component
             :key="key(config)"
@@ -294,6 +294,8 @@ const tagName = computed(() => {
 
 const disabled = computed(() => props.disabled || filterFunction(mForm, props.config.disabled, props));
 
+const text = computed(() => filterFunction(mForm, props.config.text, props));
+
 const tooltip = computed(() => filterFunction(mForm, props.config.tooltip, props));
 
 const extra = computed(() => filterFunction(mForm, props.config.extra, props));
@@ -331,7 +333,7 @@ watch(
   showDiff,
   (showDiff) => {
     if (type.value === 'hidden') return;
-    if (items.value && !props.config.text && type.value && display.value) return;
+    if (items.value && !text.value && type.value && display.value) return;
     if (display.value && showDiff && type.value) {
       emit('addDiffCount');
     }
