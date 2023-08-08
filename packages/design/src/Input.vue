@@ -1,5 +1,6 @@
 <template>
   <component
+    ref="instance"
     class="tmagic-design-input"
     :is="uiComponent"
     v-bind="uiProps"
@@ -23,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 import { getConfig } from './config';
 import type { InputProps } from './types';
@@ -42,6 +43,8 @@ const uiProps = computed(() => ui?.props(props) || props);
 
 const emit = defineEmits(['change', 'input', 'update:modelValue']);
 
+const instance = ref<any>();
+
 const changeHandler = (...args: any[]) => {
   emit('change', ...args);
 };
@@ -53,4 +56,14 @@ const inputHandler = (...args: any[]) => {
 const updateModelValue = (...args: any[]) => {
   emit('update:modelValue', ...args);
 };
+
+defineExpose({
+  instance,
+  getInput() {
+    return instance.value.input;
+  },
+  getTextarea() {
+    return instance.value.textarea;
+  },
+});
 </script>

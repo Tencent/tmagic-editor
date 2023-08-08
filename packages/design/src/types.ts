@@ -181,6 +181,7 @@ export interface InputProps {
   clearable?: boolean;
   disabled?: boolean;
   placeholder?: string;
+  rows?: number;
   type?: string;
   size?: FieldSize;
 }
@@ -515,7 +516,17 @@ export interface Components {
   };
 
   input: {
-    component: DefineComponent<InputProps, {}, any> | string;
+    component:
+      | DefineComponent<
+          InputProps,
+          {
+            instance: any;
+            getInput: () => HTMLInputElement | undefined;
+            getTextarea: () => HTMLTextAreaElement | undefined;
+          },
+          any
+        >
+      | string;
     props: (props: InputProps) => InputProps;
   };
 
