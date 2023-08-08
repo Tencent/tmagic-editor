@@ -112,7 +112,7 @@ export default class ActionManager extends EventEmitter {
     this.dr = new StageDragResize({
       container: config.container,
       disabledDragStart: config.disabledDragStart,
-      moveableOptions: this.changeCallback(config.moveableOptions),
+      moveableOptions: this.changeCallback(config.moveableOptions, false),
       dragResizeHelper: createDrHelper(),
       getRootContainer: config.getRootContainer,
       getRenderDocument: config.getRenderDocument,
@@ -121,7 +121,7 @@ export default class ActionManager extends EventEmitter {
     });
     this.multiDr = new StageMultiDragResize({
       container: config.container,
-      multiMoveableOptions: config.multiMoveableOptions,
+      moveableOptions: this.changeCallback(config.moveableOptions, true),
       dragResizeHelper: createDrHelper(),
       getRootContainer: config.getRootContainer,
       getRenderDocument: config.getRenderDocument,
@@ -353,14 +353,18 @@ export default class ActionManager extends EventEmitter {
     this.highlightLayer.destroy();
   }
 
-  private changeCallback(options: CustomizeMoveableOptions): CustomizeMoveableOptions {
+  private changeCallback(options: CustomizeMoveableOptions, isMulti: boolean): CustomizeMoveableOptions {
     // 在actionManager才能获取到各种参数，在这里传好参数有比较好的扩展性
     if (typeof options === 'function') {
       return () => {
         // 要再判断一次，不然过不了ts检查
         if (typeof options === 'function') {
           const cfg: CustomizeMoveableOptionsCallbackConfig = {
+            targetEl: this.selectedEl,
             targetElId: this.selectedEl?.id,
+            targetEls: this.selectedElList,
+            targetElIds: this.selectedElList?.map((item) => item.id),
+            isMulti,
           };
           return options(cfg);
         }

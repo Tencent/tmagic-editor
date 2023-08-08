@@ -253,7 +253,6 @@ export default class StageCore extends EventEmitter {
       containerHighlightDuration: config.containerHighlightDuration,
       containerHighlightType: config.containerHighlightType,
       moveableOptions: config.moveableOptions,
-      multiMoveableOptions: config.multiMoveableOptions,
       container: this.mask.content,
       disabledDragStart: config.disabledDragStart,
       canSelect: config.canSelect,

@@ -149,14 +149,20 @@ const menu: MenuBarData = {
 const moveableOptions = (config?: CustomizeMoveableOptionsCallbackConfig): MoveableOptions => {
   const options: MoveableOptions = {};
 
-  const id = config?.targetElId;
-  if (!id || !editor.value) return options;
+  if (!editor.value) return options;
 
-  const node = editor.value.editorService.getNodeById(id);
+  const page = editor.value.editorService.get('page');
 
-  if (!node) return options;
+  const ids = config?.targetElIds || [];
+  let isPage = page && ids.includes(`${page.id}`);
 
-  const isPage = node.type === NodeType.PAGE;
+  if (!isPage) {
+    const id = config?.targetElId;
+    if (id) {
+      const node = editor.value.editorService.getNodeById(id);
+      isPage = node?.type === NodeType.PAGE;
+    }
+  }
 
   options.draggable = !isPage;
   options.resizable = !isPage;

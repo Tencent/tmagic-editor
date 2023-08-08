@@ -47,7 +47,7 @@ export default class StageMultiDragResize extends MoveableOptionsManager {
   constructor(config: StageMultiDragResizeConfig) {
     const moveableOptionsManagerConfig: MoveableOptionsManagerConfig = {
       container: config.container,
-      moveableOptions: config.multiMoveableOptions,
+      moveableOptions: config.moveableOptions,
       getRootContainer: config.getRootContainer,
     };
     super(moveableOptionsManagerConfig);
@@ -170,10 +170,12 @@ export default class StageMultiDragResize extends MoveableOptionsManager {
       target: this.dragResizeHelper.getShadowEls(),
     });
 
+    console.log(options);
+
     Object.entries(options).forEach(([key, value]) => {
       (this.moveableForMulti as any)[key] = value;
     });
-    this.moveableForMulti.updateTarget();
+    this.moveableForMulti.updateRect();
   }
 
   /**

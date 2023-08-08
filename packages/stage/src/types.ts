@@ -65,7 +65,6 @@ export interface StageCoreConfig {
   containerHighlightDuration?: number;
   containerHighlightType?: ContainerHighlightType;
   moveableOptions?: CustomizeMoveableOptions;
-  multiMoveableOptions?: CustomizeMoveableOptions;
   /** runtime 的HTML地址，可以是一个HTTP地址，如果和编辑器不同域，需要设置跨域，也可以是一个相对或绝对路径 */
   runtimeUrl?: string;
   render?: (renderer: StageCore) => Promise<HTMLElement> | HTMLElement;
@@ -80,7 +79,6 @@ export interface ActionManagerConfig {
   containerHighlightDuration?: number;
   containerHighlightType?: ContainerHighlightType;
   moveableOptions?: CustomizeMoveableOptions;
-  multiMoveableOptions?: CustomizeMoveableOptions;
   disabledDragStart?: boolean;
   canSelect?: CanSelect;
   isContainer: IsContainer;
@@ -98,7 +96,11 @@ export interface MoveableOptionsManagerConfig {
 }
 
 export interface CustomizeMoveableOptionsCallbackConfig {
+  targetEl?: HTMLElement;
   targetElId?: string;
+  targetEls?: HTMLElement[];
+  targetElIds?: string[];
+  isMulti: boolean;
 }
 
 export interface StageRenderConfig {
@@ -125,7 +127,7 @@ export interface StageDragResizeConfig {
 export interface StageMultiDragResizeConfig {
   container: HTMLElement;
   dragResizeHelper: DragResizeHelper;
-  multiMoveableOptions?: CustomizeMoveableOptions;
+  moveableOptions?: CustomizeMoveableOptions;
   getRootContainer: GetRootContainer;
   getRenderDocument: GetRenderDocument;
   markContainerEnd: MarkContainerEnd;
