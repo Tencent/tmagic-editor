@@ -20,6 +20,8 @@ interface ParseEntryOption {
   indexPath: string;
 }
 
+const getRelativePath = (str: string, base: string) => (path.isAbsolute(str) ? path.relative(base, str) : str);
+
 export const resolveAppPackages = (app: App): ModuleMainFilePath => {
   const componentMap: Record<string, string> = {};
   const configMap: Record<string, string> = {};
@@ -42,10 +44,10 @@ export const resolveAppPackages = (app: App): ModuleMainFilePath => {
     const result = typeAssertion({ ast, indexPath });
 
     const setItem = (key: string, entry: Entry) => {
-      if (entry.component) componentMap[key] = path.relative(tmp, entry.component);
-      if (entry.config) configMap[key] = path.relative(tmp, entry.config);
-      if (entry.event) eventMap[key] = path.relative(tmp, entry.event);
-      if (entry.value) valueMap[key] = path.relative(tmp, entry.value);
+      if (entry.component) componentMap[key] = getRelativePath(entry.component, tmp);
+      if (entry.config) configMap[key] = getRelativePath(entry.config, tmp);
+      if (entry.event) eventMap[key] = getRelativePath(entry.event, tmp);
+      if (entry.value) valueMap[key] = getRelativePath(entry.value, tmp);
     };
 
     if (result.type === PackageType.COMPONENT && key) {
@@ -134,7 +136,7 @@ export const resolveAppPackages = (app: App): ModuleMainFilePath => {
 
 const npmInstall = function (dependencies: Record<string, string>, cwd: string, npmConfig: NpmConfig = {}) {
   try {
-    const { client = 'npm', registry = 'https://registry.npmjs.org/' } = npmConfig;
+    const { client = 'npm', registry } = npmConfig;
     const install = {
       npm: 'install',
       yarn: 'add',
@@ -145,7 +147,7 @@ const npmInstall = function (dependencies: Record<string, string>, cwd: string, 
       .map(([name, version]) => `${name}@${version}`)
       .join(' ');
 
-    const command = `${client} ${install} ${packages} --registry ${registry}`;
+    const command = `${client} ${install} ${packages}${registry ? `--registry ${registry}` : ''}`;
 
     execInfo(cwd);
     execInfo(command);
