@@ -25,8 +25,8 @@ import type { CodeBlockContent } from '@tmagic/schema';
 import { MagicTable } from '@tmagic/table';
 
 import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
+import { useDataSourceMethod } from '@editor/hooks/use-data-source-method';
 import type { CodeParamStatement } from '@editor/type';
-import { useDataSourceMethod } from '@editor/utils/use-data-source-method';
 
 defineOptions({
   name: 'MEditorDataSourceMethods',

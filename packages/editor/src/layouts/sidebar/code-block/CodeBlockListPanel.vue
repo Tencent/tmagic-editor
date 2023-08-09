@@ -35,8 +35,8 @@ import type { Id } from '@tmagic/schema';
 
 import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
 import SearchInput from '@editor/components/SearchInput.vue';
+import { useCodeBlockEdit } from '@editor/hooks/use-code-block-edit';
 import type { CodeDeleteErrorType, Services } from '@editor/type';
-import { useCodeBlockEdit } from '@editor/utils/use-code-block-edit';
 
 import CodeBlockList from './CodeBlockList.vue';
 

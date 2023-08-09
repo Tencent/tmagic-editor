@@ -39,6 +39,7 @@ import './theme/index.scss';
 
 export type { MoveableOptions } from '@tmagic/stage';
 export * from './type';
+export * from './hooks';
 export * from './utils';
 export { default as TMagicEditor } from './Editor.vue';
 export { default as TMagicCodeEditor } from './layouts/CodeEditor.vue';

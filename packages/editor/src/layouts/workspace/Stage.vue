@@ -36,9 +36,9 @@ import type { MContainer } from '@tmagic/schema';
 import StageCore, { calcValueByFontsize, getOffset, Runtime } from '@tmagic/stage';
 
 import ScrollViewer from '@editor/components/ScrollViewer.vue';
+import { useStage } from '@editor/hooks/use-stage';
 import { Layout, MenuButton, MenuComponent, Services, StageOptions } from '@editor/type';
 import { getConfig } from '@editor/utils/config';
-import { useStage } from '@editor/utils/stage';
 
 import ViewerMenu from './ViewerMenu.vue';
 

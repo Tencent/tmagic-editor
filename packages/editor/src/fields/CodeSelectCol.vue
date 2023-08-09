@@ -43,8 +43,8 @@ import type { Id } from '@tmagic/schema';
 import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
 import CodeParams from '@editor/components/CodeParams.vue';
 import Icon from '@editor/components/Icon.vue';
+import { useCodeBlockEdit } from '@editor/hooks/use-code-block-edit';
 import type { CodeParamStatement, CodeSelectColConfig, Services } from '@editor/type';
-import { useCodeBlockEdit } from '@editor/utils/use-code-block-edit';
 
 defineOptions({
   name: 'MEditorCodeSelectCol',

@@ -5,8 +5,7 @@ import { tMagicMessage } from '@tmagic/design';
 import type { CodeBlockContent, DataSourceSchema } from '@tmagic/schema';
 
 import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
-
-import { getConfig } from './config';
+import { getConfig } from '@editor/utils/config';
 
 export const useDataSourceMethod = () => {
   const codeConfig = ref<CodeBlockContent>();

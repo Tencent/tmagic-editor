@@ -40,8 +40,8 @@ import type { CodeBlockContent, Id } from '@tmagic/schema';
 import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
 import CodeParams from '@editor/components/CodeParams.vue';
 import Icon from '@editor/components/Icon.vue';
+import { useDataSourceMethod } from '@editor/hooks/use-data-source-method';
 import type { CodeParamStatement, DataSourceMethodSelectConfig, Services } from '@editor/type';
-import { useDataSourceMethod } from '@editor/utils/use-data-source-method';
 
 defineOptions({
   name: 'MEditorDataSourceMethodSelect',

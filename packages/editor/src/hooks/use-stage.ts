@@ -6,8 +6,7 @@ import StageCore, { GuidesType, RemoveEventData, SortEventData, UpdateEventData 
 import editorService from '@editor/services/editor';
 import uiService from '@editor/services/ui';
 import { H_GUIDE_LINE_STORAGE_KEY, StageOptions, V_GUIDE_LINE_STORAGE_KEY } from '@editor/type';
-
-import { getGuideLineFromCache } from './editor';
+import { getGuideLineFromCache } from '@editor/utils/editor';
 
 const root = computed(() => editorService.get('root'));
 const page = computed(() => editorService.get('page'));
