@@ -311,7 +311,7 @@ const getComponentPackageImports = function ({
 
     if (propertyMatch) {
       result.imports.push({
-        type: property.key.name,
+        type: property.key.name ?? property.key.value,
         name: propertyMatch.specifiers[0].local.name,
         indexPath: getIndexPath(path.resolve(path.dirname(indexPath), propertyMatch.source.value)),
       });
