@@ -1,3 +1,13 @@
+# [1.3.0-alpha.18](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.17...v1.3.0-alpha.18) (2023-08-09)
+
+
+### Bug Fixes
+
+* **cli:** npm包会被转成相对路径 ([b1ea4ce](https://github.com/Tencent/tmagic-editor/commit/b1ea4cebad697f7348d8d11a1170aabc43be3314))
+* **stage,playground:** moveableOptions对多选无效 ([4c9ef87](https://github.com/Tencent/tmagic-editor/commit/4c9ef8797571eb5a3d3cc9b0e753fa55c505be76)), closes [#529](https://github.com/Tencent/tmagic-editor/issues/529)
+
+
+
 # [1.3.0-alpha.17](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.16...v1.3.0-alpha.17) (2023-08-08)
 
 
