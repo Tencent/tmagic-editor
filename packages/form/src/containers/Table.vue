@@ -1,162 +1,160 @@
 <template>
   <div ref="mTable" class="m-fields-table" :class="{ 'm-fields-table-item-extra': config.itemExtra }">
     <span v-if="config.extra" style="color: rgba(0, 0, 0, 0.45)" v-html="config.extra"></span>
-    <div class="el-form-item__content">
-      <TMagicTooltip content="拖拽可排序" placement="left-start" :disabled="config.dropSort !== true">
-        <TMagicTable
-          v-if="model[modelName]"
-          ref="tMagicTable"
-          style="width: 100%"
-          :row-key="config.rowKey || 'id'"
-          :data="data"
-          :lastData="lastData"
-          :border="config.border"
-          :max-height="config.maxHeight"
-          :default-expand-all="true"
-          :key="updateKey"
-          @select="selectHandle"
-          @sort-change="sortChange"
-        >
-          <TMagicTableColumn v-if="config.itemExtra" :fixed="'left'" width="30" type="expand">
-            <template v-slot="scope">
-              <span v-html="itemExtra(config.itemExtra, scope.$index)" class="m-form-tip"></span>
-            </template>
-          </TMagicTableColumn>
-
-          <TMagicTableColumn
-            label="操作"
-            :width="config.operateColWidth || 55"
-            align="center"
-            :fixed="config.fixed === false ? undefined : 'left'"
-          >
-            <template v-slot="scope">
-              <slot name="operateCol" :scope="scope"></slot>
-              <TMagicIcon
-                v-show="showDelete(scope.$index + 1 + pagecontext * pagesize - 1)"
-                class="m-table-delete-icon"
-                @click="removeHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
-                ><Delete
-              /></TMagicIcon>
-            </template>
-          </TMagicTableColumn>
-
-          <TMagicTableColumn v-if="sort && model[modelName] && model[modelName].length > 1" label="排序" width="60">
-            <template v-slot="scope">
-              <TMagicTooltip
-                v-if="scope.$index + 1 + pagecontext * pagesize - 1 !== 0"
-                content="点击上移，双击置顶"
-                placement="top"
-              >
-                <TMagicButton
-                  plain
-                  size="small"
-                  type="primary"
-                  :icon="ArrowUp"
-                  :disabled="disabled"
-                  text
-                  @click="upHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
-                  @dblclick="topHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
-                ></TMagicButton>
-              </TMagicTooltip>
-              <TMagicTooltip
-                v-if="scope.$index + 1 + pagecontext * pagesize - 1 !== model[modelName].length - 1"
-                content="点击下移，双击置底"
-                placement="top"
-              >
-                <TMagicButton
-                  plain
-                  size="small"
-                  type="primary"
-                  :icon="ArrowDown"
-                  :disabled="disabled"
-                  text
-                  @click="downHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
-                  @dblclick="bottomHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
-                ></TMagicButton>
-              </TMagicTooltip>
-            </template>
-          </TMagicTableColumn>
-
-          <TMagicTableColumn
-            v-if="selection"
-            align="center"
-            header-align="center"
-            type="selection"
-            width="45"
-          ></TMagicTableColumn>
-
-          <TMagicTableColumn width="60" label="序号" v-if="showIndex && config.showIndex">
-            <template v-slot="scope">{{ scope.$index + 1 + pagecontext * pagesize }}</template>
-          </TMagicTableColumn>
-
-          <template v-for="(column, index) in config.items">
-            <TMagicTableColumn
-              v-if="column.type !== 'hidden' && display(column.display)"
-              :prop="column.name"
-              :width="column.width"
-              :label="column.label"
-              :sortable="column.sortable"
-              :sort-orders="['ascending', 'descending']"
-              :key="column[mForm?.keyProp || '__key'] ?? index"
-              :class-name="config.dropSort === true ? 'el-table__column--dropable' : ''"
-            >
-              <template #default="scope">
-                <Container
-                  v-if="scope.$index > -1"
-                  labelWidth="0"
-                  :disabled="disabled"
-                  :prop="getProp(scope.$index)"
-                  :rules="column.rules"
-                  :config="makeConfig(column, scope.row)"
-                  :model="scope.row"
-                  :lastValues="lastData[scope.$index]"
-                  :is-compare="isCompare"
-                  :size="size"
-                  @change="$emit('change', model[modelName])"
-                  @addDiffCount="onAddDiffCount()"
-                ></Container>
-              </template>
-            </TMagicTableColumn>
+    <TMagicTooltip content="拖拽可排序" placement="left-start" :disabled="config.dropSort !== true">
+      <TMagicTable
+        v-if="model[modelName]"
+        ref="tMagicTable"
+        style="width: 100%"
+        :row-key="config.rowKey || 'id'"
+        :data="data"
+        :lastData="lastData"
+        :border="config.border"
+        :max-height="config.maxHeight"
+        :default-expand-all="true"
+        :key="updateKey"
+        @select="selectHandle"
+        @sort-change="sortChange"
+      >
+        <TMagicTableColumn v-if="config.itemExtra" :fixed="'left'" width="30" type="expand">
+          <template v-slot="scope">
+            <span v-html="itemExtra(config.itemExtra, scope.$index)" class="m-form-tip"></span>
           </template>
-        </TMagicTable>
-      </TMagicTooltip>
-      <slot></slot>
-      <TMagicButton v-if="addable" size="small" type="primary" :disabled="disabled" plain @click="newHandler()"
-        >新增一行</TMagicButton
-      >
-      &nbsp;
-      <TMagicButton
-        :icon="Grid"
-        size="small"
-        type="primary"
-        @click="toggleMode"
-        v-if="enableToggleMode && !isFullscreen"
-        >展开配置</TMagicButton
-      >
-      <TMagicButton
-        :icon="FullScreen"
-        size="small"
-        type="primary"
-        @click="toggleFullscreen"
-        v-if="config.enableFullscreen !== false"
-      >
-        {{ isFullscreen ? '退出全屏' : '全屏编辑' }}
-      </TMagicButton>
-      <TMagicUpload
-        v-if="importable"
-        style="display: inline-block"
-        ref="excelBtn"
-        action="/noop"
-        :disabled="disabled"
-        :on-change="excelHandler"
-        :auto-upload="false"
-      >
-        <TMagicButton size="small" type="success" :disabled="disabled" plain>导入EXCEL</TMagicButton> </TMagicUpload
-      >&nbsp;
-      <TMagicButton v-if="importable" size="small" type="warning" :disabled="disabled" plain @click="clearHandler()"
-        >清空</TMagicButton
-      >
-    </div>
+        </TMagicTableColumn>
+
+        <TMagicTableColumn
+          label="操作"
+          :width="config.operateColWidth || 55"
+          align="center"
+          :fixed="config.fixed === false ? undefined : 'left'"
+        >
+          <template v-slot="scope">
+            <slot name="operateCol" :scope="scope"></slot>
+            <TMagicIcon
+              v-show="showDelete(scope.$index + 1 + pagecontext * pagesize - 1)"
+              class="m-table-delete-icon"
+              @click="removeHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
+              ><Delete
+            /></TMagicIcon>
+          </template>
+        </TMagicTableColumn>
+
+        <TMagicTableColumn v-if="sort && model[modelName] && model[modelName].length > 1" label="排序" width="60">
+          <template v-slot="scope">
+            <TMagicTooltip
+              v-if="scope.$index + 1 + pagecontext * pagesize - 1 !== 0"
+              content="点击上移，双击置顶"
+              placement="top"
+            >
+              <TMagicButton
+                plain
+                size="small"
+                type="primary"
+                :icon="ArrowUp"
+                :disabled="disabled"
+                text
+                @click="upHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
+                @dblclick="topHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
+              ></TMagicButton>
+            </TMagicTooltip>
+            <TMagicTooltip
+              v-if="scope.$index + 1 + pagecontext * pagesize - 1 !== model[modelName].length - 1"
+              content="点击下移，双击置底"
+              placement="top"
+            >
+              <TMagicButton
+                plain
+                size="small"
+                type="primary"
+                :icon="ArrowDown"
+                :disabled="disabled"
+                text
+                @click="downHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
+                @dblclick="bottomHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
+              ></TMagicButton>
+            </TMagicTooltip>
+          </template>
+        </TMagicTableColumn>
+
+        <TMagicTableColumn
+          v-if="selection"
+          align="center"
+          header-align="center"
+          type="selection"
+          width="45"
+        ></TMagicTableColumn>
+
+        <TMagicTableColumn width="60" label="序号" v-if="showIndex && config.showIndex">
+          <template v-slot="scope">{{ scope.$index + 1 + pagecontext * pagesize }}</template>
+        </TMagicTableColumn>
+
+        <template v-for="(column, index) in config.items">
+          <TMagicTableColumn
+            v-if="column.type !== 'hidden' && display(column.display)"
+            :prop="column.name"
+            :width="column.width"
+            :label="column.label"
+            :sortable="column.sortable"
+            :sort-orders="['ascending', 'descending']"
+            :key="column[mForm?.keyProp || '__key'] ?? index"
+            :class-name="config.dropSort === true ? 'el-table__column--dropable' : ''"
+          >
+            <template #default="scope">
+              <Container
+                v-if="scope.$index > -1"
+                labelWidth="0"
+                :disabled="disabled"
+                :prop="getProp(scope.$index)"
+                :rules="column.rules"
+                :config="makeConfig(column, scope.row)"
+                :model="scope.row"
+                :lastValues="lastData[scope.$index]"
+                :is-compare="isCompare"
+                :size="size"
+                @change="$emit('change', model[modelName])"
+                @addDiffCount="onAddDiffCount()"
+              ></Container>
+            </template>
+          </TMagicTableColumn>
+        </template>
+      </TMagicTable>
+    </TMagicTooltip>
+    <slot></slot>
+    <TMagicButton v-if="addable" size="small" type="primary" :disabled="disabled" plain @click="newHandler()"
+      >新增一行</TMagicButton
+    >
+    &nbsp;
+    <TMagicButton
+      :icon="Grid"
+      size="small"
+      type="primary"
+      @click="toggleMode"
+      v-if="enableToggleMode && config.enableToggleMode !== false && !isFullscreen"
+      >展开配置</TMagicButton
+    >
+    <TMagicButton
+      :icon="FullScreen"
+      size="small"
+      type="primary"
+      @click="toggleFullscreen"
+      v-if="config.enableFullscreen !== false"
+    >
+      {{ isFullscreen ? '退出全屏' : '全屏编辑' }}
+    </TMagicButton>
+    <TMagicUpload
+      v-if="importable"
+      style="display: inline-block"
+      ref="excelBtn"
+      action="/noop"
+      :disabled="disabled"
+      :on-change="excelHandler"
+      :auto-upload="false"
+    >
+      <TMagicButton size="small" type="success" :disabled="disabled" plain>导入EXCEL</TMagicButton> </TMagicUpload
+    >&nbsp;
+    <TMagicButton v-if="importable" size="small" type="warning" :disabled="disabled" plain @click="clearHandler()"
+      >清空</TMagicButton
+    >
 
     <div class="bottom" style="text-align: right" v-if="config.pagination">
       <TMagicPagination

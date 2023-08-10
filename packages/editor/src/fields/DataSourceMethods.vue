@@ -9,10 +9,11 @@
     </div>
 
     <CodeBlockEditor
-      ref="codeBlockEditor"
       v-if="codeConfig"
+      ref="codeBlockEditor"
       :disabled="disabled"
       :content="codeConfig"
+      :is-data-source="true"
       @submit="submitCodeHandler"
     ></CodeBlockEditor>
   </div>
@@ -53,8 +54,12 @@ const methodColumns = [
     prop: 'name',
   },
   {
-    label: '注释',
+    label: '描述',
     prop: 'desc',
+  },
+  {
+    label: '执行时机',
+    prop: 'timing',
   },
   {
     label: '参数',

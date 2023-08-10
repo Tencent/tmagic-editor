@@ -6,15 +6,16 @@
       <TMagicButton size="small" type="primary" :disabled="disabled" plain @click="newHandler()">添加</TMagicButton>
     </div>
 
-    <MFormDialog
+    <MFormDrawer
       ref="addDialog"
+      label-width="80px"
       :title="filedTitle"
       :config="dataSourceFieldsConfig"
       :values="fieldValues"
       :parentValues="model[name]"
       :disabled="disabled"
       @submit="fieldChange"
-    ></MFormDialog>
+    ></MFormDrawer>
   </div>
 </template>
 
@@ -22,7 +23,7 @@
 import { ref } from 'vue';
 
 import { TMagicButton, tMagicMessageBox } from '@tmagic/design';
-import { FieldProps, FormConfig, FormState, MFormDialog } from '@tmagic/form';
+import { FieldProps, FormConfig, FormState, MFormDrawer } from '@tmagic/form';
 import { MagicTable } from '@tmagic/table';
 
 defineOptions({
@@ -42,7 +43,7 @@ const props = withDefaults(
 
 const emit = defineEmits(['change']);
 
-const addDialog = ref<InstanceType<typeof MFormDialog>>();
+const addDialog = ref<InstanceType<typeof MFormDrawer>>();
 const fieldValues = ref<Record<string, any>>({});
 const filedTitle = ref('');
 
@@ -76,6 +77,10 @@ const fieldColumns = [
   {
     label: '属性描述',
     prop: 'desc',
+  },
+  {
+    label: '默认值',
+    prop: 'defaultValue',
   },
   {
     label: '操作',
@@ -154,6 +159,7 @@ const dataSourceFieldsConfig: FormConfig = [
   {
     name: 'description',
     text: '描述',
+    type: 'textarea',
   },
   {
     name: 'defaultValue',

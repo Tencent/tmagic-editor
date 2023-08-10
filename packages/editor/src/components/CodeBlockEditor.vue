@@ -1,5 +1,6 @@
 <template>
   <MFormDrawer
+    class="m-editor-code-block-editor"
     ref="fomDrawer"
     label-width="80px"
     :close-on-press-escape="false"
@@ -28,9 +29,10 @@ defineOptions({
   name: 'MEditorCodeBlockEditor',
 });
 
-defineProps<{
+const props = defineProps<{
   content: CodeBlockContent;
   disabled?: boolean;
+  isDataSource?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -40,7 +42,9 @@ const emit = defineEmits<{
 const services = inject<Services>('services');
 
 const columnWidth = computed(() => services?.uiService.get('columnWidth'));
-const size = computed(() => (columnWidth.value ? columnWidth.value.center + columnWidth.value.right : 600));
+const size = computed(() =>
+  columnWidth.value ? columnWidth.value.center + columnWidth.value.right - (props.isDataSource ? 100 : 0) : 600,
+);
 
 const codeEditorHeight = ref('600px');
 
@@ -80,16 +84,26 @@ const functionConfig = computed(() => [
     name: 'name',
   },
   {
-    text: '注释',
+    text: '描述',
     name: 'desc',
+  },
+  {
+    text: '执行时机',
+    name: 'timing',
+    type: 'select',
+    options: [
+      { text: '初始化前', value: 'beforeInit' },
+      { text: '初始化后', value: 'afterInit' },
+    ],
+    display: () => props.isDataSource,
   },
   {
     type: 'table',
     border: true,
     text: '参数',
     enableFullscreen: false,
+    enableToggleMode: false,
     name: 'params',
-    maxHeight: '300px',
     dropSort: false,
     items: [
       {
@@ -99,7 +113,7 @@ const functionConfig = computed(() => [
       },
       {
         type: 'text',
-        label: '注释',
+        label: '描述',
         name: 'extra',
       },
       services?.codeBlockService.getParamsColConfig() || defaultParamColConfig,
@@ -138,7 +152,7 @@ const fomDrawer = ref<InstanceType<typeof MFormDrawer>>();
 const openHandler = () => {
   setTimeout(() => {
     if (fomDrawer.value) {
-      const height = fomDrawer.value?.bodyHeight - 468;
+      const height = fomDrawer.value?.bodyHeight - 348 - (props.isDataSource ? 50 : 0);
       codeEditorHeight.value = `${height > 100 ? height : 600}px`;
     }
   });
