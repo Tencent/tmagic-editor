@@ -1,3 +1,18 @@
+# [1.3.0-alpha.19](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.18...v1.3.0-alpha.19) (2023-08-10)
+
+
+### Bug Fixes
+
+* **cli:** 组件配置json key支持使用字符串常量 ([a8f8f48](https://github.com/Tencent/tmagic-editor/commit/a8f8f488adff794c132335b7681b80329d648e39))
+* **stage:** 拖动出现left -1 ([e3b2594](https://github.com/Tencent/tmagic-editor/commit/e3b2594c57c21f5946de63a704728c7a7d989c90))
+
+
+### Features
+
+* **editor,data-source:** 支持数据源方法配置执行时机 ([07c49be](https://github.com/Tencent/tmagic-editor/commit/07c49bee4e3daafc0c05b87249c294f133a94aab))
+
+
+
 # [1.3.0-alpha.18](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.17...v1.3.0-alpha.18) (2023-08-09)
 
 
