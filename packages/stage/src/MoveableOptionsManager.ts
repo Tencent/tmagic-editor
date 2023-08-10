@@ -134,9 +134,8 @@ export default class MoveableOptionsManager extends EventEmitter {
       elementGuidelines: this.elementGuidelines,
       bounds: {
         top: 0,
-        // 设置0的话无法移动到left为0，所以只能设置为-1
-        left: -1,
-        right: this.container.clientWidth - 1,
+        left: 0,
+        right: this.container.clientWidth,
         bottom: isSortable ? undefined : this.container.clientHeight,
       },
     };
