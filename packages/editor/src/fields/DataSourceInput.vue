@@ -89,11 +89,13 @@ const dataSources = computed(() => dataSourceService?.get('dataSources') || []);
 const setDisplayState = () => {
   displayState.value = [];
 
+  // 匹配es6字符串模块
   const matches = state.value.matchAll(/\$\{([\s\S]+?)\}/g);
   let index = 0;
   for (const match of matches) {
     if (typeof match.index === 'undefined') break;
 
+    // 字符串常量
     displayState.value.push({
       type: 'text',
       value: state.value.substring(index, match.index),
@@ -103,6 +105,7 @@ const setDisplayState = () => {
     let ds: DataSourceSchema | undefined;
     let fields: DataSchema[] | undefined;
 
+    // 将模块解析成数据源对应的值
     match[1].split('.').forEach((item, index) => {
       if (index === 0) {
         ds = dataSources.value.find((ds) => ds.id === item);
@@ -243,17 +246,21 @@ const fieldQuerySearch = (
   let result: DataSchema[] = [];
 
   const dsKey = queryString.substring(leftAngleIndex + 1, dotIndex);
+
   // 可能是xx.xx.xx，存在链式调用
   const keys = dsKey.split('.');
+
   // 最前的是数据源id
-  const ds = dataSources.value.find((ds) => ds.id === keys.shift());
+  const dsId = keys.shift();
+  const ds = dataSources.value.find((ds) => ds.id === dsId);
   if (!ds) {
+    cb([]);
     return;
   }
 
   let fields = ds.fields || [];
 
-  // 后面这些事字段
+  // 后面这些是字段
   let key = keys.shift();
   while (key) {
     for (const field of fields) {
