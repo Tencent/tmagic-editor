@@ -6,7 +6,7 @@
     :placeholder="config.placeholder"
     :disabled="disabled"
     :format="config.format"
-    :value-format="config.valueFormat || 'YYYY-MM-DD HH:mm:ss'"
+    :value-format="config.valueFormat || 'YYYY/MM/DD HH:mm:ss'"
     @change="changeHandler"
   ></TMagicDatePicker>
 </template>
