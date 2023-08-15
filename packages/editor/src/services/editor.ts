@@ -705,9 +705,9 @@ class Editor extends BaseService {
     brothers.splice(index, 1);
 
     if (offset === LayerOffset.TOP) {
-      brothers.splice(isRelative ? 0 : brothers.length - 1, 0, node);
+      brothers.splice(isRelative ? 0 : brothers.length, 0, node);
     } else if (offset === LayerOffset.BOTTOM) {
-      brothers.splice(isRelative ? brothers.length - 1 : 0, 0, node);
+      brothers.splice(isRelative ? brothers.length : 0, 0, node);
     } else {
       brothers.splice(index + (isRelative ? -offset : offset), 0, node);
     }
