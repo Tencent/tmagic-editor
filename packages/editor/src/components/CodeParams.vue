@@ -16,6 +16,7 @@ import { computed, ref } from 'vue';
 import { FormConfig, MForm } from '@tmagic/form';
 
 import type { CodeParamStatement } from '@editor/type';
+import { error } from '@editor/utils';
 
 defineOptions({
   name: 'MEditorCodeParams',
@@ -53,7 +54,7 @@ const onParamsChangeHandler = async () => {
     const value = await form.value?.submitForm(true);
     emit('change', value);
   } catch (e) {
-    console.log(e);
+    error(e);
   }
 };
 </script>

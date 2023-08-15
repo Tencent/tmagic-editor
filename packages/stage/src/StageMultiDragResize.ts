@@ -170,8 +170,6 @@ export default class StageMultiDragResize extends MoveableOptionsManager {
       target: this.dragResizeHelper.getShadowEls(),
     });
 
-    console.log(options);
-
     Object.entries(options).forEach(([key, value]) => {
       (this.moveableForMulti as any)[key] = value;
     });
