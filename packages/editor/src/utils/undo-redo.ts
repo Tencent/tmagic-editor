@@ -23,7 +23,7 @@ export class UndoRedo<T = any> {
   private listCursor: number;
   private listMaxSize: number;
 
-  constructor(listMaxSize = 200) {
+  constructor(listMaxSize = 20) {
     const minListMaxSize = 2;
     this.elementList = [];
     this.listCursor = 0;
