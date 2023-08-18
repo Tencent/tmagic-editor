@@ -27,7 +27,8 @@ import { DataSource, HttpDataSource } from './data-sources';
 import type { DataSourceManagerData, DataSourceManagerOptions, HttpDataSourceSchema, RequestFunction } from './types';
 
 class DataSourceManager extends EventEmitter {
-  public static dataSourceClassMap = new Map<string, typeof DataSource>();
+  private static dataSourceClassMap = new Map<string, typeof DataSource>();
+
   public static registe(type: string, dataSource: typeof DataSource) {
     DataSourceManager.dataSourceClassMap.set(type, dataSource);
   }
