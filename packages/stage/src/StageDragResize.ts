@@ -71,7 +71,8 @@ export default class StageDragResize extends MoveableOptionsManager {
    * @param event 鼠标事件
    */
   public select(el: HTMLElement, event?: MouseEvent): void {
-    if (!this.moveable) {
+    // 从不能拖动到能拖动的节点之间切换，要重新创建moveable，不然dragStart不生效
+    if (!this.moveable || el !== this.target) {
       this.initMoveable(el);
     } else {
       this.updateMoveable(el);
@@ -94,13 +95,14 @@ export default class StageDragResize extends MoveableOptionsManager {
     Object.entries(options).forEach(([key, value]) => {
       (this.moveable as any)[key] = value;
     });
-    this.moveable.updateRect();
+    this.moveable.updateTarget();
   }
 
   public clearSelectStatus(): void {
     if (!this.moveable) return;
-    this.moveable.zoom = 0;
-    this.moveable.updateRect();
+    this.dragResizeHelper.destroyShadowEl();
+    this.moveable.target = null;
+    this.moveable.updateTarget();
   }
 
   /**
@@ -109,9 +111,6 @@ export default class StageDragResize extends MoveableOptionsManager {
   public destroy(): void {
     this.moveable?.destroy();
     this.dragResizeHelper.destroy();
-
-    this.moveable = undefined;
-
     this.dragStatus = StageDragStatus.END;
     this.removeAllListeners();
   }
@@ -133,7 +132,7 @@ export default class StageDragResize extends MoveableOptionsManager {
     this.setElementGuidelines([this.target as HTMLElement], elementGuidelines);
 
     return this.getOptions(false, {
-      zoom: 1,
+      target: this.dragResizeHelper.getShadowEl(),
     });
   }
 
@@ -141,8 +140,9 @@ export default class StageDragResize extends MoveableOptionsManager {
     const options: MoveableOptions = this.init(el);
     this.dragResizeHelper.clear();
 
+    this.moveable?.destroy();
+
     this.moveable = new Moveable(this.container, {
-      target: this.dragResizeHelper.getShadowEl(),
       ...options,
     });
 

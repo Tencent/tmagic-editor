@@ -28,7 +28,7 @@ export default class StageHighlight extends EventEmitter {
   public container: HTMLElement;
   public target?: HTMLElement;
   public moveable?: Moveable;
-  public targetShadow?: TargetShadow;
+  public targetShadow: TargetShadow;
   private getRootContainer: GetRootContainer;
 
   constructor(config: StageHighlightConfig) {
@@ -52,19 +52,14 @@ export default class StageHighlight extends EventEmitter {
   public highlight(el: HTMLElement): void {
     if (!el || el === this.target) return;
     this.target = el;
+    this.moveable?.destroy();
 
-    this.targetShadow?.update(el);
-    if (this.moveable) {
-      this.moveable.zoom = 2;
-      this.moveable.updateRect();
-    } else {
-      this.moveable = new Moveable(this.container, {
-        target: this.targetShadow?.el,
-        origin: false,
-        rootContainer: this.getRootContainer(),
-        zoom: 2,
-      });
-    }
+    this.moveable = new Moveable(this.container, {
+      target: this.targetShadow.update(el),
+      origin: false,
+      rootContainer: this.getRootContainer(),
+      zoom: 2,
+    });
   }
 
   /**
@@ -72,9 +67,9 @@ export default class StageHighlight extends EventEmitter {
    */
   public clearHighlight(): void {
     if (!this.moveable || !this.target) return;
-    this.moveable.zoom = 0;
-    this.moveable.updateRect();
     this.target = undefined;
+    this.moveable.target = null;
+    this.moveable.updateTarget();
   }
 
   /**
@@ -82,8 +77,6 @@ export default class StageHighlight extends EventEmitter {
    */
   public destroy(): void {
     this.moveable?.destroy();
-    this.targetShadow?.destroy();
-    this.moveable = undefined;
-    this.targetShadow = undefined;
+    this.targetShadow.destroy();
   }
 }

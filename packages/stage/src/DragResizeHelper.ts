@@ -85,6 +85,10 @@ export default class DragResizeHelper {
     this.moveableHelper.clear();
   }
 
+  public destroyShadowEl(): void {
+    this.targetShadow.destroyEl();
+  }
+
   public getShadowEl(): TargetElement | undefined {
     return this.targetShadow.el;
   }
