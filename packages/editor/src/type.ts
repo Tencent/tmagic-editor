@@ -93,7 +93,7 @@ export type StoreStateKey = keyof StoreState;
 
 export interface PropsState {
   propsConfigMap: Record<string, FormConfig>;
-  propsValueMap: Record<string, MNode>;
+  propsValueMap: Record<string, Partial<MNode>>;
 }
 
 export interface ComponentGroupState {
@@ -519,4 +519,9 @@ export enum DepTargetType {
   DATA_SOURCE_METHOD = 'data-source-method',
   /** 数据源条件 */
   DATA_SOURCE_COND = 'data-source-cond',
+}
+
+export interface DatasourceTypeOption {
+  type: string;
+  text: string;
 }

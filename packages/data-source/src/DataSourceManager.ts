@@ -100,13 +100,19 @@ class DataSourceManager extends EventEmitter {
           }
         }
       });
+
+      this.change(ds);
     });
 
     ds.on('change', () => {
-      Object.assign(this.data[ds.id], ds.data);
-
-      this.emit('change', ds.id);
+      this.change(ds);
     });
+  }
+
+  public change(ds: DataSource) {
+    Object.assign(this.data[ds.id], ds.data);
+
+    this.emit('change', ds.id);
   }
 
   public removeDataSource(id: string) {

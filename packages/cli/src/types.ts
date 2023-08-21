@@ -5,15 +5,20 @@ export type App = Core;
 export enum EntryType {
   CONFIG = 'config',
   VALUE = 'value',
-  COMPONENT = 'component',
   EVENT = 'event',
+  COMPONENT = 'component',
   PLUGIN = 'plugin',
+  DS_CONFIG = 'dsConfig',
+  DS_VALUE = 'dsValue',
+  DS_EVENT = 'dsEvent',
+  DATASOURCE = 'datasource',
 }
 
 export enum PackageType {
   COMPONENT = '1',
   PLUGIN = '2',
   COMPONENT_PACKAGE = '3',
+  DATASOURCE = '4',
 }
 
 export interface Entry {
@@ -21,6 +26,7 @@ export interface Entry {
   [EntryType.VALUE]?: string;
   [EntryType.COMPONENT]?: string;
   [EntryType.EVENT]?: string;
+  [EntryType.DATASOURCE]?: string;
 }
 
 export interface OptionEntry {
@@ -52,6 +58,10 @@ export interface ModuleMainFilePath {
   configMap: Record<string, string>;
   valueMap: Record<string, string>;
   eventMap: Record<string, string>;
+  datasourceMap: Record<string, string>;
+  dsConfigMap: Record<string, string>;
+  dsValueMap: Record<string, string>;
+  dsEventMap: Record<string, string>;
 }
 
 export interface UserConfig {

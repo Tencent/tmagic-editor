@@ -19,14 +19,23 @@
 import Vue from 'vue';
 
 import Core from '@tmagic/core';
+import { DataSourceManager } from '@tmagic/data-source';
 
 import App from './App.vue';
 
 import '@tmagic/utils/resetcss.css';
 
-Promise.all([import('../.tmagic/comp-entry'), import('../.tmagic/plugin-entry')]).then(([components, plugins]) => {
+Promise.all([
+  import('../.tmagic/comp-entry'),
+  import('../.tmagic/plugin-entry'),
+  import('../.tmagic/datasource-entry'),
+]).then(([components, plugins, datasources]) => {
   Object.entries(components.default).forEach(([type, component]: [string, any]) => {
     Vue.component(`magic-ui-${type}`, component);
+  });
+
+  Object.entries(datasources).forEach(([type, ds]: [string, any]) => {
+    DataSourceManager.registe(type, ds);
   });
 
   Object.values(plugins.default).forEach((plugin: any) => {

@@ -19,11 +19,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import Core from '@tmagic/core';
+import { DataSourceManager } from '@tmagic/data-source';
 import type { MApp } from '@tmagic/schema';
 import { AppContent } from '@tmagic/ui-react';
 import { getUrlParam } from '@tmagic/utils';
 
 import components from '../.tmagic/comp-entry';
+import datasources from '../.tmagic/datasource-entry';
 import plugins from '../.tmagic/plugin-entry';
 
 import App from './App';
@@ -51,6 +53,10 @@ const getLocalConfig = (): MApp[] => {
 
 window.magicDSL = [];
 
+Object.entries(datasources).forEach(([type, ds]: [string, any]) => {
+  DataSourceManager.registe(type, ds);
+});
+
 const app = new Core({
   ua: window.navigator.userAgent,
   config: ((getUrlParam('localPreview') ? getLocalConfig() : window.magicDSL) || [])[0] || {},
@@ -60,6 +66,7 @@ const app = new Core({
 app.setDesignWidth(app.env.isWeb ? window.document.documentElement.getBoundingClientRect().width : 375);
 
 Object.keys(components).forEach((type: string) => app.registerComponent(type, components[type]));
+
 Object.values(plugins).forEach((plugin: any) => {
   plugin.install(app);
 });

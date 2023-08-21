@@ -1,10 +1,12 @@
 import { FormConfig } from '@tmagic/form';
 
+import { DatasourceTypeOption } from '@editor/type';
+
 import BaseFormConfig from './formConfigs/base';
 import HttpFormConfig from './formConfigs/http';
 
-const fillConfig = (config: FormConfig): FormConfig => [
-  ...BaseFormConfig,
+const fillConfig = (config: FormConfig, datasourceTypeList: DatasourceTypeOption[]): FormConfig => [
+  ...BaseFormConfig(datasourceTypeList),
   ...config,
   {
     type: 'panel',
@@ -30,13 +32,17 @@ const fillConfig = (config: FormConfig): FormConfig => [
   },
 ];
 
-export const getFormConfig = (type: string, configs: Record<string, FormConfig>): FormConfig => {
+export const getFormConfig = (
+  type: string,
+  datasourceTypeList: DatasourceTypeOption[],
+  configs: Record<string, FormConfig>,
+): FormConfig => {
   switch (type) {
     case 'base':
-      return fillConfig([]);
+      return fillConfig([], datasourceTypeList);
     case 'http':
-      return fillConfig(HttpFormConfig);
+      return fillConfig(HttpFormConfig, datasourceTypeList);
     default:
-      return fillConfig(configs[type] || []);
+      return fillConfig(configs[type] || [], datasourceTypeList);
   }
 };

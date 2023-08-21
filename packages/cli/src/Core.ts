@@ -16,6 +16,10 @@ export default class Core {
     configMap: {},
     valueMap: {},
     eventMap: {},
+    datasourceMap: {},
+    dsConfigMap: {},
+    dsValueMap: {},
+    dsEventMap: {},
   };
 
   public dir = {

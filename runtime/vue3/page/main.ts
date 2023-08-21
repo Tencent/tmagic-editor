@@ -19,9 +19,11 @@
 import { createApp, defineAsyncComponent } from 'vue';
 
 import Core from '@tmagic/core';
+import { DataSourceManager } from '@tmagic/data-source';
 import { getUrlParam } from '@tmagic/utils';
 
 import components from '../.tmagic/async-comp-entry';
+import datasources from '../.tmagic/datasource-entry';
 import plugins from '../.tmagic/plugin-entry';
 
 import request from './utils/request';
@@ -36,6 +38,10 @@ magicApp.use(request);
 
 Object.entries(components).forEach(([type, component]: [string, any]) => {
   magicApp.component(`magic-ui-${type}`, defineAsyncComponent(component));
+});
+
+Object.entries(datasources).forEach(([type, ds]: [string, any]) => {
+  DataSourceManager.registe(type, ds);
 });
 
 Object.values(plugins).forEach((plugin: any) => {

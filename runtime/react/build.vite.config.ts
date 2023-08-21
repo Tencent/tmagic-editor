@@ -23,9 +23,14 @@ import legacy from '@vitejs/plugin-legacy';
 import reactRefresh from '@vitejs/plugin-react-refresh';
 
 export default defineConfig(({ mode }) => {
-  if (['value', 'config', 'event', 'value:admin', 'config:admin', 'event:admin'].includes(mode)) {
-    const [type, isAdmin] = mode.split(':');
-    const capitalToken = type.charAt(0).toUpperCase() + type.slice(1);
+  if (['value', 'config', 'event', 'ds:value', 'ds:config', 'ds:event'].includes(mode)) {
+    const capitalToken = mode
+      .split(':')
+      .map((word) => word[0].toUpperCase() + word.slice(1))
+      .join('');
+
+    const fileName = mode.replace(':', '-');
+
     return {
       publicDir: './.tmagic/public',
       build: {
@@ -33,10 +38,10 @@ export default defineConfig(({ mode }) => {
         sourcemap: true,
         minify: false,
         target: 'esnext',
-        outDir: isAdmin ? `./dist/entry/${type}` : `../../playground/public/entry/react/${type}`,
+        outDir: `../../playground/public/entry/react/${fileName}`,
 
         lib: {
-          entry: `.tmagic/${type}-entry.ts`,
+          entry: `.tmagic/${fileName}-entry.ts`,
           name: `magicPreset${capitalToken}s`,
           fileName: 'index',
           formats: ['umd'],
@@ -45,12 +50,7 @@ export default defineConfig(({ mode }) => {
     };
   }
 
-  if (['page', 'playground', 'page:admin', 'playground:admin'].includes(mode)) {
-    const [type, isAdmin] = mode.split(':');
-    const base = isAdmin ? `/static/react/runtime/${type}/` : `/tmagic-editor/playground/runtime/react/${type}`;
-    const outDir = isAdmin
-      ? path.resolve(process.cwd(), `./dist/runtime/${type}`)
-      : path.resolve(process.cwd(), `../../playground/public/runtime/react/${type}`);
+  if (['page', 'playground'].includes(mode)) {
     return {
       plugins: [
         reactRefresh(),
@@ -59,16 +59,16 @@ export default defineConfig(({ mode }) => {
         }),
       ],
 
-      root: `./${type}/`,
+      root: `./${mode}/`,
 
       publicDir: '../public',
 
-      base,
+      base: `/tmagic-editor/playground/runtime/react/${mode}`,
 
       build: {
         emptyOutDir: true,
         sourcemap: true,
-        outDir,
+        outDir: path.resolve(process.cwd(), `../../playground/public/runtime/react/${mode}`),
       },
     };
   }

@@ -2,25 +2,30 @@ import { reactive } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
 import type { FormConfig } from '@tmagic/form';
-import { DataSourceSchema } from '@tmagic/schema';
+import type { DataSourceSchema } from '@tmagic/schema';
 import { guid } from '@tmagic/utils';
 
+import type { DatasourceTypeOption } from '@editor/type';
 import { getFormConfig } from '@editor/utils/data-source';
 
 import BaseService from './BaseService';
 
 interface State {
+  datasourceTypeList: DatasourceTypeOption[];
   dataSources: DataSourceSchema[];
   editable: boolean;
   configs: Record<string, FormConfig>;
+  values: Record<string, Partial<DataSourceSchema>>;
 }
 
 type StateKey = keyof State;
 class DataSource extends BaseService {
   private state = reactive<State>({
+    datasourceTypeList: [],
     dataSources: [],
     editable: true,
     configs: {},
+    values: {},
   });
 
   public set<K extends StateKey, T extends State[K]>(name: K, value: T) {
@@ -32,11 +37,19 @@ class DataSource extends BaseService {
   }
 
   public getFormConfig(type = 'base') {
-    return getFormConfig(type, this.get('configs'));
+    return getFormConfig(type, this.get('datasourceTypeList'), this.get('configs'));
   }
 
   public setFormConfig(type: string, config: FormConfig) {
     this.get('configs')[type] = config;
+  }
+
+  public getFormValue(type = 'base') {
+    return this.get('values')[type];
+  }
+
+  public setFormValue(type: string, value: Partial<DataSourceSchema>) {
+    this.get('values')[type] = value;
   }
 
   public add(config: DataSourceSchema) {

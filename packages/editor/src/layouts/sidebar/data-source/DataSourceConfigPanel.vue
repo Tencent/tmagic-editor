@@ -16,6 +16,7 @@
 
 <script setup lang="ts">
 import { computed, inject, ref, watchEffect } from 'vue';
+import { cloneDeep, mergeWith } from 'lodash-es';
 
 import { tMagicMessage } from '@tmagic/design';
 import { MFormDrawer } from '@tmagic/form';
@@ -56,7 +57,16 @@ const changeHandler = (value: Record<string, any>) => {
     return;
   }
   type.value = value.type || 'base';
-  initValues.value = value;
+
+  initValues.value = mergeWith(
+    cloneDeep(value),
+    services?.dataSourceService.getFormValue(type.value) || {},
+    (objValue, srcValue) => {
+      if (Array.isArray(srcValue)) {
+        return srcValue;
+      }
+    },
+  );
 };
 
 const submitHandler = (values: any) => {

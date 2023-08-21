@@ -2,7 +2,7 @@ import type { PropType } from 'vue';
 
 import type { EventOption } from '@tmagic/core';
 import type { FormConfig, FormState } from '@tmagic/form';
-import type { MApp, MNode } from '@tmagic/schema';
+import type { DataSourceSchema, MApp, MNode } from '@tmagic/schema';
 import StageCore, {
   CONTAINER_HIGHLIGHT_CLASS_NAME,
   ContainerHighlightType,
@@ -11,7 +11,15 @@ import StageCore, {
   UpdateDragEl,
 } from '@tmagic/stage';
 
-import type { ComponentGroup, MenuBarData, MenuButton, MenuComponent, SideBarData, StageRect } from './type';
+import type {
+  ComponentGroup,
+  DatasourceTypeOption,
+  MenuBarData,
+  MenuButton,
+  MenuComponent,
+  SideBarData,
+  StageRect,
+} from './type';
 
 export default {
   /** 页面初始值 */
@@ -24,6 +32,12 @@ export default {
   /** 左侧面板中的组件列表 */
   componentGroupList: {
     type: Array as PropType<ComponentGroup[]>,
+    default: () => [],
+  },
+
+  /** 左侧面板中的组件列表 */
+  datasourceList: {
+    type: Array as PropType<DatasourceTypeOption[]>,
     default: () => [],
   },
 
@@ -69,7 +83,7 @@ export default {
 
   /** 添加组件时的默认值 */
   propsValues: {
-    type: Object as PropType<Record<string, MNode>>,
+    type: Object as PropType<Record<string, Partial<MNode>>>,
     default: () => ({}),
   },
 
@@ -79,6 +93,19 @@ export default {
     default: () => ({}),
   },
 
+  /** 组件的属性配置表单的dsl */
+  datasourceConfigs: {
+    type: Object as PropType<Record<string, FormConfig>>,
+    default: () => ({}),
+  },
+
+  /** 添加数据源时的默认值 */
+  datasourceValues: {
+    type: Object as PropType<Record<string, Partial<DataSourceSchema>>>,
+    default: () => ({}),
+  },
+
+  /** 数据源的属性配置表单的dsl */
   dataScourceConfigs: {
     type: Object as PropType<Record<string, FormConfig>>,
     default: () => ({}),

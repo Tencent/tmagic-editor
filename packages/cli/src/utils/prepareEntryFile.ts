@@ -4,39 +4,49 @@ import type App from '../Core';
 import { EntryType } from '../types';
 
 export const prepareEntryFile = async (app: App) => {
-  const { componentMap = {}, pluginMap = {}, configMap = {}, valueMap = {}, eventMap = {} } = app.moduleMainFilePath;
-  const { componentFileAffix, dynamicImport, hooks, useTs } = app.options;
+  const { moduleMainFilePath, options } = app;
+  const { componentFileAffix, dynamicImport, hooks, useTs } = options;
 
   let contentMap: Record<string, string> = {
-    'comp-entry': generateContent(useTs, EntryType.COMPONENT, componentMap, componentFileAffix),
-    'async-comp-entry': generateContent(useTs, EntryType.COMPONENT, componentMap, componentFileAffix, dynamicImport),
-    'plugin-entry': generateContent(useTs, EntryType.PLUGIN, pluginMap),
-    'async-plugin-entry': generateContent(useTs, EntryType.PLUGIN, pluginMap, '', dynamicImport),
-    'config-entry': generateContent(useTs, EntryType.CONFIG, configMap),
-    'value-entry': generateContent(useTs, EntryType.VALUE, valueMap),
-    'event-entry': generateContent(useTs, EntryType.EVENT, eventMap),
+    'comp-entry': generateContent(useTs, EntryType.COMPONENT, moduleMainFilePath.componentMap, componentFileAffix),
+    'async-comp-entry': generateContent(
+      useTs,
+      EntryType.COMPONENT,
+      moduleMainFilePath.componentMap,
+      componentFileAffix,
+      dynamicImport,
+    ),
+    'plugin-entry': generateContent(useTs, EntryType.PLUGIN, moduleMainFilePath.pluginMap),
+    'async-plugin-entry': generateContent(useTs, EntryType.PLUGIN, moduleMainFilePath.pluginMap, '', dynamicImport),
+    'config-entry': generateContent(useTs, EntryType.CONFIG, moduleMainFilePath.configMap),
+    'value-entry': generateContent(useTs, EntryType.VALUE, moduleMainFilePath.valueMap),
+    'event-entry': generateContent(useTs, EntryType.EVENT, moduleMainFilePath.eventMap),
+    'datasource-entry': generateContent(useTs, EntryType.DATASOURCE, moduleMainFilePath.datasourceMap),
+    'ds-config-entry': generateContent(useTs, EntryType.DS_CONFIG, moduleMainFilePath.dsConfigMap),
+    'ds-value-entry': generateContent(useTs, EntryType.DS_VALUE, moduleMainFilePath.dsValueMap),
+    'ds-event-entry': generateContent(useTs, EntryType.DS_EVENT, moduleMainFilePath.dsEventMap),
   };
 
   if (typeof hooks?.beforeWriteEntry === 'function') {
     contentMap = await hooks.beforeWriteEntry(contentMap, app);
   }
 
-  Object.keys(contentMap).forEach((file: string) => {
+  Object.entries(contentMap).forEach(([file, content]) => {
     let fileName = `${file}.ts`;
     if (useTs) {
-      app.writeTemp(fileName, contentMap[file]);
+      app.writeTemp(fileName, content);
     } else {
       fileName = `${file}.js`;
       app.writeTemp(`${file}.d.ts`, `const type: Record<string, any>;\n\nexport default type;`);
     }
-    app.writeTemp(fileName, contentMap[file]);
+    app.writeTemp(fileName, content);
   });
 };
 
 const generateContent = (
   useTs: boolean,
   type: EntryType,
-  map: Record<string, string>,
+  map: Record<string, string> = {},
   componentFileAffix = '',
   dynamicImport = false,
 ) => {

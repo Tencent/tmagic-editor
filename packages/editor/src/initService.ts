@@ -31,6 +31,7 @@ export const initServiceState = (
     uiService,
     codeBlockService,
     keybindingService,
+    dataSourceService,
   }: Services,
 ) => {
   // 初始值变化，重新设置节点信息
@@ -47,6 +48,14 @@ export const initServiceState = (
   watch(
     () => props.componentGroupList,
     (componentGroupList) => componentListService.setList(componentGroupList),
+    {
+      immediate: true,
+    },
+  );
+
+  watch(
+    () => props.datasourceList,
+    (datasourceList) => dataSourceService.set('datasourceTypeList', datasourceList),
     {
       immediate: true,
     },
@@ -81,6 +90,30 @@ export const initServiceState = (
 
       eventsService.setEvents(eventsList);
       eventsService.setMethods(methodsList);
+    },
+    {
+      immediate: true,
+    },
+  );
+
+  watch(
+    () => props.datasourceConfigs,
+    (configs) => {
+      Object.entries(configs).forEach(([key, value]) => {
+        dataSourceService.setFormConfig(key, value);
+      });
+    },
+    {
+      immediate: true,
+    },
+  );
+
+  watch(
+    () => props.datasourceValues,
+    (values) => {
+      Object.entries(values).forEach(([key, value]) => {
+        dataSourceService.setFormValue(key, value);
+      });
     },
     {
       immediate: true,

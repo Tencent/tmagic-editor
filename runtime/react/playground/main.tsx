@@ -21,12 +21,14 @@ import ReactDOM from 'react-dom';
 import { cloneDeep } from 'lodash-es';
 
 import Core from '@tmagic/core';
+import { DataSourceManager } from '@tmagic/data-source';
 import type { MApp } from '@tmagic/schema';
 import type { RemoveData, SortEventData, UpdateData } from '@tmagic/stage';
 import { AppContent } from '@tmagic/ui-react';
 import { replaceChildNode } from '@tmagic/utils';
 
 import components from '../.tmagic/comp-entry';
+import datasources from '../.tmagic/datasource-entry';
 import plugins from '../.tmagic/plugin-entry';
 
 import App from './App';
@@ -38,6 +40,10 @@ declare global {
     appInstance: Core;
   }
 }
+
+Object.entries(datasources).forEach(([type, ds]: [string, any]) => {
+  DataSourceManager.registe(type, ds);
+});
 
 const app = new Core({
   ua: window.navigator.userAgent,

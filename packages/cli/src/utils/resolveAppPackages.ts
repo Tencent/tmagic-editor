@@ -6,133 +6,33 @@ import fs from 'fs-extra';
 import * as recast from 'recast';
 
 import type App from '../Core';
-import { Entry, EntryType, ModuleMainFilePath, NpmConfig, PackageType } from '../types';
+import { EntryType, ModuleMainFilePath, NpmConfig, PackageType } from '../types';
 
 import { error, execInfo, info } from './logger';
+
+type Ast = any;
+
 interface TypeAssertion {
   type: string;
   imports: any[];
 }
 
 interface ParseEntryOption {
-  ast: any;
+  ast: Ast;
   package: string;
   indexPath: string;
 }
 
+interface TypeAssertionOption {
+  ast: Ast;
+  indexPath: string;
+  componentFileAffix?: string;
+}
+
+const isFile = (filePath: string) => fs.existsSync(filePath) && fs.lstatSync(filePath).isFile();
+const isDirectory = (filePath: string) => fs.existsSync(filePath) && fs.lstatSync(filePath).isDirectory();
+
 const getRelativePath = (str: string, base: string) => (path.isAbsolute(str) ? path.relative(base, str) : str);
-
-export const resolveAppPackages = (app: App): ModuleMainFilePath => {
-  const componentMap: Record<string, string> = {};
-  const configMap: Record<string, string> = {};
-  const eventMap: Record<string, string> = {};
-  const valueMap: Record<string, string> = {};
-  const pluginMap: Record<string, string> = {};
-
-  const dependencies: Record<string, string> = {};
-
-  const setPackages = (cwd: string, tmp: string, packagePath: string, key?: string) => {
-    const { name: moduleName } = splitNameVersion(packagePath);
-
-    if (!moduleName) throw Error('packages中包含非法配置');
-
-    const indexPath = execSync(`node -e "console.log(require.resolve('${moduleName.replace(/\\/g, '/')}'))"`, { cwd })
-      .toString()
-      .replace('\n', '');
-    const indexCode = fs.readFileSync(indexPath, { encoding: 'utf-8', flag: 'r' });
-    const ast = recast.parse(indexCode, { parser: require('recast/parsers/typescript') });
-    const result = typeAssertion({ ast, indexPath });
-
-    const setItem = (key: string, entry: Entry) => {
-      if (entry.component) componentMap[key] = getRelativePath(entry.component, tmp);
-      if (entry.config) configMap[key] = getRelativePath(entry.config, tmp);
-      if (entry.event) eventMap[key] = getRelativePath(entry.event, tmp);
-      if (entry.value) valueMap[key] = getRelativePath(entry.value, tmp);
-    };
-
-    if (result.type === PackageType.COMPONENT && key) {
-      // 组件
-      setItem(key, parseEntry({ ast, package: moduleName, indexPath }));
-    } else if (result.type === PackageType.PLUGIN && key) {
-      // 插件
-      pluginMap[key] = moduleName;
-    } else if (result.type === PackageType.COMPONENT_PACKAGE) {
-      // 组件&插件包
-      result.imports.forEach((i) => {
-        const affixReg = new RegExp(`${app.options.componentFileAffix}$`);
-        if (affixReg.test(i.indexPath)) {
-          componentMap[i.type] = i.indexPath;
-          return;
-        }
-        const indexCode = fs.readFileSync(i.indexPath, { encoding: 'utf-8', flag: 'r' });
-        const ast = recast.parse(indexCode, { parser: require('recast/parsers/typescript') });
-        if (typeAssertion({ ast, indexPath }).type === PackageType.PLUGIN) {
-          // 插件
-          pluginMap[i.type] = i.indexPath;
-        } else {
-          // 组件
-          setItem(i.type, parseEntry({ ast, package: `${module} | ${i.name}`, indexPath: i.indexPath }));
-        }
-      });
-    }
-  };
-
-  const getDependencies = (packagePath: string) => {
-    if (fs.existsSync(packagePath)) return;
-    const { name: moduleName, version } = splitNameVersion(packagePath);
-    if (!moduleName) return;
-    dependencies[moduleName] = version;
-  };
-
-  const { packages = [], npmConfig = {} } = app.options;
-
-  packages.forEach((item) => {
-    if (typeof item === 'object') {
-      Object.entries(item).forEach(([, packagePath]) => {
-        getDependencies(packagePath);
-      });
-    } else {
-      getDependencies(item);
-    }
-  });
-
-  if (npmConfig.autoInstall && Object.keys(dependencies).length) {
-    if (!npmConfig.keepPackageJsonClean) {
-      npmInstall(dependencies, app.options.source, app.options.npmConfig);
-    } else {
-      const packageFile = path.join(app.options.source, 'package.json');
-      const packageBakFile = path.join(app.options.source, 'package.json.bak');
-      if (fs.existsSync(packageFile)) {
-        fs.copyFileSync(packageFile, packageBakFile);
-      }
-
-      npmInstall(dependencies, app.options.source, app.options.npmConfig);
-
-      if (fs.existsSync(packageBakFile)) {
-        fs.unlinkSync(packageFile);
-        fs.renameSync(packageBakFile, packageFile);
-      }
-    }
-  }
-
-  packages.forEach((item) => {
-    if (typeof item === 'object') {
-      Object.entries(item).forEach(([key, packagePath]) => {
-        setPackages(app.options.source, app.options.temp, packagePath, key);
-      });
-    } else {
-      setPackages(app.options.source, app.options.temp, item);
-    }
-  });
-
-  return {
-    componentMap,
-    configMap,
-    eventMap,
-    valueMap,
-    pluginMap,
-  };
-};
 
 const npmInstall = function (dependencies: Record<string, string>, cwd: string, npmConfig: NpmConfig = {}) {
   try {
@@ -162,27 +62,51 @@ const npmInstall = function (dependencies: Record<string, string>, cwd: string, 
 };
 
 /**
- *  1 判断是否组件&插件包
- *  2 判断是组件还是插件
- *  3 组件插件分开写入 comp-entry.ts
+ *  1 判断是否组件&插件&数据源包
+ *  2 判断是组件还是插件还是数据源
+ *  3 组件插件数据源分开写入 comp-entry.ts
+ *
+ *  export default 是对象字面量并且有install方法则为插件
+ *
+ *  export default 是类并且superClass为DataSource则为数据源
+ *
+ *  其他情况为组件或者包
+ *
  * @param {*} ast
  * @param {String} indexPath
  * @return {Object} { type: '', imports: [] } 返回传入组件的类型。如果是组件包，imports 中包含所有子组件的入口文件路径
  */
-const typeAssertion = function ({ ast, indexPath }: { ast: any; indexPath: string }): TypeAssertion {
+const typeAssertion = function ({ ast, indexPath, componentFileAffix }: TypeAssertionOption): TypeAssertion {
   const n = recast.types.namedTypes;
 
-  const result = {
+  const result: TypeAssertion = {
     type: '',
     imports: [],
   };
 
-  const { importDeclarations, variableDeclarations, exportDefaultName, exportDefaultNode } =
+  const { importDeclarations, variableDeclarations, exportDefaultName, exportDefaultNode, exportDefaultClass } =
     getAssertionTokenByTraverse(ast);
 
   if (exportDefaultName) {
     importDeclarations.every((node) => {
       const [specifier] = node.specifiers;
+
+      const defaultFile = getIndexPath(path.resolve(path.dirname(indexPath), node.source.value));
+      if (componentFileAffix && !['.js', '.ts'].includes(componentFileAffix)) {
+        if (node.source.value?.endsWith(componentFileAffix) || isFile(`${defaultFile}${componentFileAffix}`)) {
+          result.type = PackageType.COMPONENT;
+          return false;
+        }
+      }
+
+      if (isFile(defaultFile)) {
+        const defaultCode = fs.readFileSync(defaultFile, { encoding: 'utf-8', flag: 'r' });
+        const ast = recast.parse(defaultCode, { parser: require('recast/parsers/typescript') });
+        if (isDatasource(ast.program.body.find((node: any) => node.type === 'ExportDefaultDeclaration')?.declaration)) {
+          result.type = PackageType.DATASOURCE;
+          return false;
+        }
+      }
 
       // 从 import 语句中找到 export default 的变量，认为是组件
       if (n.ImportDefaultSpecifier.check(specifier) && specifier.local?.name === exportDefaultName) {
@@ -230,6 +154,10 @@ const typeAssertion = function ({ ast, indexPath }: { ast: any; indexPath: strin
     }
   }
 
+  if (isDatasource(exportDefaultClass)) {
+    result.type = PackageType.DATASOURCE;
+  }
+
   return result;
 };
 
@@ -240,6 +168,7 @@ const getAssertionTokenByTraverse = (ast: any) => {
 
   let exportDefaultName = '';
   let exportDefaultNode = undefined;
+  let exportDefaultClass = undefined;
 
   recast.types.visit(ast, {
     visitImportDeclaration(p) {
@@ -264,6 +193,11 @@ const getAssertionTokenByTraverse = (ast: any) => {
         exportDefaultNode = declaration;
       }
 
+      // 导出的是类
+      if (n.ClassDeclaration.check(declaration)) {
+        exportDefaultClass = declaration;
+      }
+
       this.traverse(p);
     },
   });
@@ -273,6 +207,7 @@ const getAssertionTokenByTraverse = (ast: any) => {
     variableDeclarations,
     exportDefaultName,
     exportDefaultNode,
+    exportDefaultClass,
   };
 };
 
@@ -281,6 +216,8 @@ const isPlugin = function (properties: any[]) {
 
   return !!match;
 };
+
+const isDatasource = (exportDefaultClass: any) => exportDefaultClass?.superClass?.name === 'DataSource';
 
 const getComponentPackageImports = function ({
   result,
@@ -322,11 +259,14 @@ const getComponentPackageImports = function ({
 };
 
 const getIndexPath = function (entry: string) {
-  if (fs.lstatSync(entry).isFile()) {
-    return entry;
+  for (const affix of ['', '.js', '.ts']) {
+    const filePath = `${entry}${affix}`;
+    if (isFile(filePath)) {
+      return filePath;
+    }
   }
 
-  if (fs.lstatSync(entry).isDirectory()) {
+  if (isDirectory(entry)) {
     const files = fs.readdirSync(entry);
     const [index] = files.filter((file) => file.split('.')[0] === 'index');
 
@@ -346,16 +286,16 @@ const parseEntry = function ({ ast, package: module, indexPath }: ParseEntryOpti
   let { config, value, event, component } = tokens;
 
   if (!config) {
-    info(`${module} ${EntryType.CONFIG} 文件声明缺失`);
+    info(`${module} 表单配置文件声明缺失`);
   }
   if (!value) {
-    info(`${module} ${EntryType.VALUE} 文件声明缺失`);
+    info(`${module} 初始化数据文件声明缺失`);
   }
   if (!event) {
-    info(`${module} ${EntryType.EVENT} 文件声明缺失`);
+    info(`${module} 事件声明文件声明缺失`);
   }
   if (!component) {
-    info(`${module} ${EntryType.COMPONENT} 文件声明不合法`);
+    info(`${module} 组件或数据源文件声明不合法`);
     exit(1);
   }
 
@@ -466,4 +406,137 @@ const splitNameVersion = function (str: string) {
     name,
     version,
   };
+};
+
+const getDependencies = (dependencies: Record<string, string>, packagePath: string) => {
+  if (fs.existsSync(packagePath)) return;
+
+  const { name: moduleName, version } = splitNameVersion(packagePath);
+
+  if (!moduleName) return;
+
+  dependencies[moduleName] = version;
+};
+
+const setPackages = (packages: ModuleMainFilePath, app: App, packagePath: string, key?: string) => {
+  const { options } = app;
+  const { temp, source, componentFileAffix } = options;
+
+  let { name: moduleName } = splitNameVersion(packagePath);
+
+  if (!moduleName) throw Error('packages中包含非法配置');
+
+  if (fs.lstatSync(moduleName).isDirectory()) {
+    if (!fs.existsSync(path.join(moduleName, './package.json'))) {
+      ['index.js', 'index.ts'].forEach((index) => {
+        const indexFile = path.join(moduleName!, `./${index}`);
+        if (fs.existsSync(indexFile)) {
+          moduleName = indexFile;
+          return;
+        }
+      });
+    }
+  }
+
+  // 获取完整路径
+  const indexPath = execSync(`node -e "console.log(require.resolve('${moduleName.replace(/\\/g, '/')}'))"`, {
+    cwd: source,
+  })
+    .toString()
+    .replace('\n', '');
+
+  const indexCode = fs.readFileSync(indexPath, { encoding: 'utf-8', flag: 'r' });
+  const ast: Ast = recast.parse(indexCode, { parser: require('recast/parsers/typescript') });
+  const result = typeAssertion({ ast, indexPath, componentFileAffix });
+
+  // 组件&插件&数据源包
+  if (result.type === PackageType.COMPONENT_PACKAGE) {
+    result.imports.forEach((i) => {
+      setPackages(packages, app, i.indexPath, i.type);
+    });
+
+    return;
+  }
+
+  if (!key) return;
+
+  if (result.type === PackageType.COMPONENT) {
+    // 组件
+    const entry = parseEntry({ ast, package: moduleName, indexPath });
+
+    if (entry.component) packages.componentMap[key] = getRelativePath(entry.component, temp);
+    if (entry.config) packages.configMap[key] = getRelativePath(entry.config, temp);
+    if (entry.event) packages.eventMap[key] = getRelativePath(entry.event, temp);
+    if (entry.value) packages.valueMap[key] = getRelativePath(entry.value, temp);
+  } else if (result.type === PackageType.DATASOURCE) {
+    // 数据源
+    const entry = parseEntry({ ast, package: moduleName, indexPath });
+
+    if (entry.component) packages.datasourceMap[key] = getRelativePath(entry.component, temp);
+    if (entry.config) packages.dsConfigMap[key] = getRelativePath(entry.config, temp);
+    if (entry.event) packages.dsEventMap[key] = getRelativePath(entry.event, temp);
+    if (entry.value) packages.dsValueMap[key] = getRelativePath(entry.value, temp);
+  } else if (result.type === PackageType.PLUGIN) {
+    // 插件
+    packages.pluginMap[key] = getRelativePath(moduleName, temp);
+  }
+};
+
+const flattenPackagesConfig = (packages: (string | Record<string, string>)[]) => {
+  const packagesConfig: ([string] | [string, string])[] = [];
+  packages.forEach((item) => {
+    if (typeof item === 'object') {
+      Object.entries(item).forEach(([key, packagePath]) => {
+        packagesConfig.push([packagePath, key]);
+      });
+    } else if (typeof item === 'string') {
+      packagesConfig.push([item]);
+    }
+  });
+  return packagesConfig;
+};
+
+export const resolveAppPackages = (app: App): ModuleMainFilePath => {
+  const dependencies: Record<string, string> = {};
+
+  const { packages = [], npmConfig = {}, source } = app.options;
+
+  const packagePaths = flattenPackagesConfig(packages);
+
+  packagePaths.forEach(([packagePath]) => getDependencies(dependencies, packagePath));
+
+  if (npmConfig.autoInstall && Object.keys(dependencies).length) {
+    if (!npmConfig.keepPackageJsonClean) {
+      npmInstall(dependencies, source, npmConfig);
+    } else {
+      const packageFile = path.join(source, 'package.json');
+      const packageBakFile = path.join(source, 'package.json.bak');
+      if (fs.existsSync(packageFile)) {
+        fs.copyFileSync(packageFile, packageBakFile);
+      }
+
+      npmInstall(dependencies, source, npmConfig);
+
+      if (fs.existsSync(packageBakFile)) {
+        fs.unlinkSync(packageFile);
+        fs.renameSync(packageBakFile, packageFile);
+      }
+    }
+  }
+
+  const packagesMap: ModuleMainFilePath = {
+    componentMap: {},
+    configMap: {},
+    eventMap: {},
+    valueMap: {},
+    pluginMap: {},
+    datasourceMap: {},
+    dsConfigMap: {},
+    dsEventMap: {},
+    dsValueMap: {},
+  };
+
+  packagePaths.forEach(([packagePath, key]) => setPackages(packagesMap, app, packagePath, key));
+
+  return packagesMap;
 };

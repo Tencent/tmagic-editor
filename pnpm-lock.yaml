@@ -794,6 +794,9 @@ importers:
       '@tmagic/core':
         specifier: 1.3.0-alpha.19
         version: link:../../packages/core
+      '@tmagic/data-source':
+        specifier: 1.3.0-alpha.19
+        version: link:../../packages/data-source
       '@tmagic/schema':
         specifier: 1.3.0-alpha.19
         version: link:../../packages/schema
@@ -858,6 +861,9 @@ importers:
       '@tmagic/core':
         specifier: 1.3.0-alpha.19
         version: link:../../packages/core
+      '@tmagic/data-source':
+        specifier: 1.3.0-alpha.19
+        version: link:../../packages/data-source
       '@tmagic/schema':
         specifier: 1.3.0-alpha.19
         version: link:../../packages/schema
@@ -919,6 +925,9 @@ importers:
       '@tmagic/core':
         specifier: 1.3.0-alpha.19
         version: link:../../packages/core
+      '@tmagic/data-source':
+        specifier: 1.3.0-alpha.19
+        version: link:../../packages/data-source
       '@tmagic/schema':
         specifier: 1.3.0-alpha.19
         version: link:../../packages/schema

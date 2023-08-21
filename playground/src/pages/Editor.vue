@@ -8,7 +8,10 @@
       :props-configs="propsConfigs"
       :props-values="propsValues"
       :event-method-list="eventMethodList"
+      :datasource-configs="datasourceConfigs"
+      :datasource-values="datasourceValues"
       :component-group-list="componentGroupList"
+      :datasource-list="datasourceList"
       :default-selected="defaultSelected"
       :moveable-options="moveableOptions"
       :auto-scroll-into-view="true"
@@ -45,7 +48,7 @@ import { Coin, Connection, Document } from '@element-plus/icons-vue';
 import serialize from 'serialize-javascript';
 
 import { TMagicDialog, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
-import { editorService, MenuBarData, MoveableOptions, TMagicEditor } from '@tmagic/editor';
+import { DatasourceTypeOption, editorService, MenuBarData, MoveableOptions, TMagicEditor } from '@tmagic/editor';
 import type { MContainer, MNode } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 import { CustomizeMoveableOptionsCallbackConfig } from '@tmagic/stage';
@@ -58,6 +61,7 @@ import { uaMap } from '../const';
 
 const { VITE_RUNTIME_PATH, VITE_ENTRY_PATH } = import.meta.env;
 
+const datasourceList: DatasourceTypeOption[] = [];
 const runtimeUrl = `${VITE_RUNTIME_PATH}/playground/index.html`;
 const router = useRouter();
 const editor = ref<InstanceType<typeof TMagicEditor>>();
@@ -69,6 +73,8 @@ const defaultSelected = ref(dsl.items[0].id);
 const propsValues = ref<Record<string, any>>({});
 const propsConfigs = ref<Record<string, any>>({});
 const eventMethodList = ref<Record<string, any>>({});
+const datasourceConfigs = ref<Record<string, any>>({});
+const datasourceValues = ref<Record<string, any>>({});
 const stageRect = ref({
   width: 375,
   height: 817,
@@ -190,6 +196,12 @@ asyncLoadJs(`${VITE_ENTRY_PATH}/value/index.umd.cjs`).then(() => {
 });
 asyncLoadJs(`${VITE_ENTRY_PATH}/event/index.umd.cjs`).then(() => {
   eventMethodList.value = (globalThis as any).magicPresetEvents;
+});
+asyncLoadJs(`${VITE_ENTRY_PATH}/ds-config/index.umd.cjs`).then(() => {
+  datasourceConfigs.value = (globalThis as any).magicPresetDsConfigs;
+});
+asyncLoadJs(`${VITE_ENTRY_PATH}/ds-value/index.umd.cjs`).then(() => {
+  datasourceValues.value = (globalThis as any).magicPresetDsValues;
 });
 
 save();

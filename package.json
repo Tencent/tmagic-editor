@@ -17,7 +17,6 @@
     "playground:react": "pnpm --filter \"runtime-react\" --filter \"tmagic-playground\" dev:react",
     "pg:react": "pnpm playground:react",
     "build": "pnpm --filter \"@tmagic/*\" build",
-    "build:runtime:admin": "pnpm --filter \"runtime-*\" build:admin",
     "build:playground": "pnpm --filter \"runtime-vue3\" build && pnpm --filter \"tmagic-playground\" build",
     "docs:dev": "vitepress dev docs",
     "docs:serve": "vitepress serve docs",

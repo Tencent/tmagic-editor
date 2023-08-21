@@ -80,7 +80,7 @@ class Props extends BaseService {
     return cloneDeep(this.state.propsConfigMap[type] || (await this.fillConfig([])));
   }
 
-  public setPropsValues(values: Record<string, MNode>) {
+  public setPropsValues(values: Record<string, Partial<MNode>>) {
     Object.keys(values).forEach((type: string) => {
       this.setPropsValue(toLine(type), values[type]);
     });
@@ -91,7 +91,7 @@ class Props extends BaseService {
    * @param type 组件类型
    * @param value 组件初始值
    */
-  public async setPropsValue(type: string, value: MNode) {
+  public async setPropsValue(type: string, value: Partial<MNode>) {
     this.state.propsValueMap[type] = value;
   }
 
