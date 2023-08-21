@@ -95,14 +95,14 @@ export default class StageDragResize extends MoveableOptionsManager {
     Object.entries(options).forEach(([key, value]) => {
       (this.moveable as any)[key] = value;
     });
-    this.moveable.updateTarget();
+    this.moveable.updateRect();
   }
 
   public clearSelectStatus(): void {
     if (!this.moveable) return;
     this.dragResizeHelper.destroyShadowEl();
     this.moveable.target = null;
-    this.moveable.updateTarget();
+    this.moveable.updateRect();
   }
 
   /**
