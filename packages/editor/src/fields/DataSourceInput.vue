@@ -54,6 +54,7 @@ import type { DataSchema, DataSourceSchema } from '@tmagic/schema';
 
 import Icon from '@editor/components/Icon.vue';
 import type { Services } from '@editor/type';
+import { getDisplayField } from '@editor/utils/data-source';
 
 defineOptions({
   name: 'MEditorDataSourceInput',
@@ -87,52 +88,7 @@ const input = computed<HTMLInputElement>(() => autocomplete.value?.inputRef?.inp
 const dataSources = computed(() => dataSourceService?.get('dataSources') || []);
 
 const setDisplayState = () => {
-  displayState.value = [];
-
-  // 匹配es6字符串模块
-  const matches = state.value.matchAll(/\$\{([\s\S]+?)\}/g);
-  let index = 0;
-  for (const match of matches) {
-    if (typeof match.index === 'undefined') break;
-
-    // 字符串常量
-    displayState.value.push({
-      type: 'text',
-      value: state.value.substring(index, match.index),
-    });
-
-    let dsText = '';
-    let ds: DataSourceSchema | undefined;
-    let fields: DataSchema[] | undefined;
-
-    // 将模块解析成数据源对应的值
-    match[1].split('.').forEach((item, index) => {
-      if (index === 0) {
-        ds = dataSources.value.find((ds) => ds.id === item);
-        dsText += ds?.title || item;
-        fields = ds?.fields;
-        return;
-      }
-
-      const field = fields?.find((field) => field.name === item);
-      fields = field?.fields;
-      dsText += `.${field?.title || item}`;
-    });
-
-    displayState.value.push({
-      type: 'var',
-      value: dsText,
-    });
-
-    index = match.index + match[0].length;
-  }
-
-  if (index < state.value.length) {
-    displayState.value.push({
-      type: 'text',
-      value: state.value.substring(index),
-    });
-  }
+  displayState.value = getDisplayField(dataSources.value, state.value);
 };
 
 watch(

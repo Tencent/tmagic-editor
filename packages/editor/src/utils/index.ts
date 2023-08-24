@@ -21,3 +21,4 @@ export * from './props';
 export * from './logger';
 export * from './editor';
 export * from './operator';
+export * from './data-source';
