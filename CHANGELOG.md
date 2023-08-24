@@ -1,3 +1,25 @@
+# [1.3.0-alpha.20](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.19...v1.3.0-alpha.20) (2023-08-24)
+
+
+### Bug Fixes
+
+* **editor:** 数据源字符串模板提示出错 ([07a0271](https://github.com/Tencent/tmagic-editor/commit/07a02714df4ba4370f4a8cd4eaf1467db2be1069)), closes [#530](https://github.com/Tencent/tmagic-editor/issues/530)
+* **editor:** 置顶计算错误 ([3f833d4](https://github.com/Tencent/tmagic-editor/commit/3f833d41f32cbe5a16c71d94235c815475786f0b))
+
+
+### Features
+
+* **cli,data-source,editor,playground,runtime:** 支持自定义数据源 ([573f1a2](https://github.com/Tencent/tmagic-editor/commit/573f1a2c17b7e7bd8fce7280d84a01892d2d8ae9))
+* **editor:** 历史记录最多存储20条 ([ec8e8a1](https://github.com/Tencent/tmagic-editor/commit/ec8e8a17d233c80051d441655ac8d24217f16dc7))
+* **form:** date,date-time值默认的日期格式改成/,以兼容ios ([2b07a6d](https://github.com/Tencent/tmagic-editor/commit/2b07a6de2d5f339b42c9a1c43992bd0d60e6f8fa))
+
+
+### Reverts
+
+* Revert "chore(stage): 优化高亮与单选性能" ([0274c36](https://github.com/Tencent/tmagic-editor/commit/0274c36afd1a9a4a14e2ed78868771f4dd13ca2f))
+
+
+
 # [1.3.0-alpha.19](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.18...v1.3.0-alpha.19) (2023-08-10)
 
 
