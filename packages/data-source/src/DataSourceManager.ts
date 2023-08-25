@@ -20,11 +20,11 @@ import EventEmitter from 'events';
 
 import { cloneDeep, template } from 'lodash-es';
 
-import { DataSourceDeps, DataSourceSchema, Id, MNode } from '@tmagic/schema';
+import type { DataSourceSchema, Id, MNode } from '@tmagic/schema';
 import { compiledCond, compiledNode } from '@tmagic/utils';
 
 import { DataSource, HttpDataSource } from './data-sources';
-import type { DataSourceManagerData, DataSourceManagerOptions, HttpDataSourceSchema, RequestFunction } from './types';
+import type { DataSourceManagerData, DataSourceManagerOptions, HttpDataSourceSchema } from './types';
 
 class DataSourceManager extends EventEmitter {
   private static dataSourceClassMap = new Map<string, typeof DataSource>();
@@ -33,25 +33,22 @@ class DataSourceManager extends EventEmitter {
     DataSourceManager.dataSourceClassMap.set(type, dataSource);
   }
 
+  public static getDataSourceClass(type: string) {
+    return DataSourceManager.dataSourceClassMap.get(type);
+  }
+
+  public app: any;
+
   public dataSourceMap = new Map<string, DataSource>();
 
   public data: DataSourceManagerData = {};
-  public dataSourceDeps: DataSourceDeps = {};
-  public dataSourceCondDeps: DataSourceDeps = {};
 
-  private request?: RequestFunction;
-
-  constructor(options: DataSourceManagerOptions) {
+  constructor({ app }: DataSourceManagerOptions) {
     super();
 
-    this.dataSourceDeps = options.dataSourceDeps || {};
-    this.dataSourceCondDeps = options.dataSourceCondDeps || {};
+    this.app = app;
 
-    if (options.httpDataSourceOptions?.request) {
-      this.request = options.httpDataSourceOptions.request;
-    }
-
-    options.dataSourceConfigs.forEach((config) => {
+    app.dsl?.dataSources?.forEach((config: any) => {
       this.addDataSource(config);
     });
   }
@@ -60,14 +57,14 @@ class DataSourceManager extends EventEmitter {
     return this.dataSourceMap.get(id);
   }
 
-  public addDataSource(config?: DataSourceSchema) {
+  public async addDataSource(config?: DataSourceSchema) {
     if (!config) return;
 
     let ds: DataSource;
     if (config.type === 'http') {
       ds = new HttpDataSource({
         schema: config as HttpDataSourceSchema,
-        request: this.request,
+        request: this.app.request,
       });
     } else {
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -82,36 +79,34 @@ class DataSourceManager extends EventEmitter {
 
     this.data[ds.id] = ds.data;
 
+    const beforeInit: ((...args: any[]) => any)[] = [];
+    const afterInit: ((...args: any[]) => any)[] = [];
+
     ds.getMethods().forEach((method) => {
+      if (typeof method.content !== 'function') return;
       if (method.timing === 'beforeInit') {
-        if (typeof method.content === 'function') {
-          method.content({ params: {}, dataSource: ds });
-        }
+        beforeInit.push(method.content);
+      }
+      if (method.timing === 'afterInit') {
+        afterInit.push(method.content);
       }
     });
 
-    ds.init().then(() => {
-      this.data[ds.id] = ds.data;
+    await Promise.all(beforeInit.map((method) => method({ params: {}, dataSource: ds, app: this.app })));
 
-      ds.getMethods().forEach((method) => {
-        if (method.timing === 'afterInit') {
-          if (typeof method.content === 'function') {
-            method.content({ params: {}, dataSource: ds });
-          }
-        }
-      });
+    await ds.init();
 
-      this.change(ds);
-    });
+    await Promise.all(afterInit.map((method) => method({ params: {}, dataSource: ds, app: this.app })));
+
+    this.setData(ds);
 
     ds.on('change', () => {
-      this.change(ds);
+      this.setData(ds);
     });
   }
 
-  public change(ds: DataSource) {
+  public setData(ds: DataSource) {
     Object.assign(this.data[ds.id], ds.data);
-
     this.emit('change', ds.id);
   }
 
@@ -148,7 +143,7 @@ class DataSourceManager extends EventEmitter {
         return value;
       },
       cloneDeep(node),
-      this.dataSourceDeps,
+      this.app.dsl?.dataSourceDeps || {},
       sourceId,
     );
   }

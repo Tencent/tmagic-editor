@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
-import { MApp, MNode, NodeType } from '@tmagic/schema';
+import Core from '@tmagic/core';
+import { MApp, NodeType } from '@tmagic/schema';
 
 import { createDataSourceManager, DataSourceManager } from '@data-source/index';
 
@@ -37,13 +38,14 @@ const dsl: MApp = {
           name: 'text',
         },
       ],
+      methods: [],
     },
   ],
 };
 
 describe('createDataSourceManager', () => {
   test('instance', () => {
-    const manager = createDataSourceManager(dsl, (node: MNode) => node, {});
+    const manager = createDataSourceManager(new Core({ config: dsl }));
     expect(manager).toBeInstanceOf(DataSourceManager);
   });
 });

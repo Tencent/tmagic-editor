@@ -67,6 +67,7 @@ class App extends EventEmitter {
   public platform = 'mobile';
   public jsEngine = 'browser';
   public designWidth = 375;
+  public request?: RequestFunction;
 
   public components = new Map();
 
@@ -91,8 +92,12 @@ class App extends EventEmitter {
       this.transformStyle = options.transformStyle;
     }
 
+    if (options.request) {
+      this.request = options.request;
+    }
+
     if (options.config) {
-      this.setConfig(options.config, options.curPage, options.request);
+      this.setConfig(options.config, options.curPage);
     }
 
     bindCommonEventListener(this);
@@ -156,7 +161,7 @@ class App extends EventEmitter {
    * @param config dsl跟节点
    * @param curPage 当前页面id
    */
-  public setConfig(config: MApp, curPage?: Id, request?: RequestFunction) {
+  public setConfig(config: MApp, curPage?: Id) {
     this.dsl = config;
 
     if (!curPage && config.items.length) {
@@ -167,9 +172,7 @@ class App extends EventEmitter {
       this.dataSourceManager.destroy();
     }
 
-    this.dataSourceManager = createDataSourceManager(config, this.platform, {
-      request,
-    });
+    this.dataSourceManager = createDataSourceManager(this);
 
     this.codeDsl = config.codeBlocks;
     this.setPage(curPage || this.page?.data?.id);

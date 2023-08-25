@@ -17,11 +17,9 @@
  */
 import { cloneDeep } from 'lodash-es';
 
-import type { MApp } from '@tmagic/schema';
 import { getDepNodeIds, getNodes, replaceChildNode } from '@tmagic/utils';
 
 import DataSourceManager from './DataSourceManager';
-import type { HttpDataSourceOptions } from './types';
 
 /**
  * 创建数据源管理器
@@ -29,19 +27,11 @@ import type { HttpDataSourceOptions } from './types';
  * @param httpDataSourceOptions http 数据源配置
  * @returns DataSourceManager
  */
-export const createDataSourceManager = (
-  dsl: MApp,
-  platform: string,
-  httpDataSourceOptions?: Partial<HttpDataSourceOptions>,
-) => {
+export const createDataSourceManager = (app: any) => {
+  const { dsl, platform } = app;
   if (!dsl?.dataSources) return;
 
-  const dataSourceManager = new DataSourceManager({
-    dataSourceConfigs: dsl.dataSources,
-    dataSourceDeps: dsl.dataSourceDeps,
-    dataSourceCondDeps: dsl.dataSourceCondDeps,
-    httpDataSourceOptions,
-  });
+  const dataSourceManager = new DataSourceManager({ app });
 
   if (dsl.dataSources && dsl.dataSourceCondDeps && platform !== 'editor') {
     getNodes(getDepNodeIds(dsl.dataSourceCondDeps), dsl.items).forEach((node) => {
