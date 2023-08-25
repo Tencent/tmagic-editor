@@ -206,6 +206,9 @@ importers:
         specifier: ^4.17.21
         version: 4.17.21
     devDependencies:
+      '@tmagic/core':
+        specifier: 1.3.0-alpha.21
+        version: link:../core
       '@types/events':
         specifier: ^3.0.0
         version: 3.0.0

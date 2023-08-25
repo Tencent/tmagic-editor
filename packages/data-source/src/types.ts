@@ -1,3 +1,4 @@
+import type Core from '@tmagic/core';
 import type { DataSourceSchema } from '@tmagic/schema';
 
 export interface DataSourceOptions {
@@ -31,7 +32,7 @@ export interface HttpDataSourceOptions {
 }
 
 export interface DataSourceManagerOptions {
-  app: any;
+  app: Core;
 }
 
 export interface DataSourceManagerData {

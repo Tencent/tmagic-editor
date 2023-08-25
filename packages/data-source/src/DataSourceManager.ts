@@ -20,6 +20,7 @@ import EventEmitter from 'events';
 
 import { cloneDeep, template } from 'lodash-es';
 
+import type Core from '@tmagic/core';
 import type { DataSourceSchema, Id, MNode } from '@tmagic/schema';
 import { compiledCond, compiledNode } from '@tmagic/utils';
 
@@ -37,7 +38,7 @@ class DataSourceManager extends EventEmitter {
     return DataSourceManager.dataSourceClassMap.get(type);
   }
 
-  public app: any;
+  public app: Core;
 
   public dataSourceMap = new Map<string, DataSource>();
 
@@ -48,7 +49,7 @@ class DataSourceManager extends EventEmitter {
 
     this.app = app;
 
-    app.dsl?.dataSources?.forEach((config: any) => {
+    app.dsl?.dataSources?.forEach((config) => {
       this.addDataSource(config);
     });
   }

@@ -17,6 +17,7 @@
  */
 import { cloneDeep } from 'lodash-es';
 
+import type Core from '@tmagic/core';
 import { getDepNodeIds, getNodes, replaceChildNode } from '@tmagic/utils';
 
 import DataSourceManager from './DataSourceManager';
@@ -27,7 +28,7 @@ import DataSourceManager from './DataSourceManager';
  * @param httpDataSourceOptions http 数据源配置
  * @returns DataSourceManager
  */
-export const createDataSourceManager = (app: any) => {
+export const createDataSourceManager = (app: Core) => {
   const { dsl, platform } = app;
   if (!dsl?.dataSources) return;
 
