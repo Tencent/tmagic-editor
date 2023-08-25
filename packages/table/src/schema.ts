@@ -24,6 +24,8 @@ export interface ColumnActionConfig {
   display?: (row: any) => boolean;
   text: string | ((row: any) => string);
   name: string;
+  tooltip?: string;
+  tooltipPlacement?: string;
   icon?: any;
   handler?: (row: any, index: number) => Promise<any> | any;
   before?: (row: any, index: number) => void;

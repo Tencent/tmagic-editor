@@ -1,18 +1,24 @@
 <template>
   <TMagicTableColumn :label="config.label" :width="config.width" :fixed="config.fixed">
     <template v-slot="scope">
-      <TMagicButton
+      <TMagicTooltip
         v-for="(action, actionIndex) in config.actions"
-        v-show="display(action.display, scope.row) && !editState[scope.$index]"
-        class="action-btn"
-        text
-        :type="action.buttonType || 'primary'"
-        size="small"
-        :icon="action.icon"
+        :placement="action.tooltipPlacement || 'top'"
         :key="actionIndex"
-        @click="actionHandler(action, scope.row, scope.$index)"
-        ><span v-html="formatter(action.text, scope.row)"></span
-      ></TMagicButton>
+        :disabled="!Boolean(action.tooltip)"
+        :content="action.tooltip"
+      >
+        <TMagicButton
+          v-show="display(action.display, scope.row) && !editState[scope.$index]"
+          class="action-btn"
+          text
+          size="small"
+          :type="action.buttonType || 'primary'"
+          :icon="action.icon"
+          @click="actionHandler(action, scope.row, scope.$index)"
+          ><span v-html="formatter(action.text, scope.row)"></span
+        ></TMagicButton>
+      </TMagicTooltip>
       <TMagicButton
         class="action-btn"
         v-show="editState[scope.$index]"
@@ -36,7 +42,7 @@
 </template>
 
 <script lang="ts" setup>
-import { TMagicButton, tMagicMessage, TMagicTableColumn } from '@tmagic/design';
+import { TMagicButton, tMagicMessage, TMagicTableColumn, TMagicTooltip } from '@tmagic/design';
 
 import { ColumnActionConfig, ColumnConfig } from './schema';
 
