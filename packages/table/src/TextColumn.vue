@@ -43,7 +43,7 @@
         <template #content>
           <div>{{ formatter(config, scope.row) }}</div>
         </template>
-        <TMagicButton text type="primary">扩展配置</TMagicButton>
+        <TMagicButton text type="primary">{{ config.buttonText || '扩展配置' }}</TMagicButton>
       </el-tooltip>
 
       <TMagicTag

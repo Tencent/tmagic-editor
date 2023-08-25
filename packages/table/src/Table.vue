@@ -25,6 +25,10 @@
         <ExpandColumn :config="item" :key="columnIndex"></ExpandColumn>
       </template>
 
+      <template v-else-if="item.type === 'component'">
+        <ComponentColumn :config="item" :key="columnIndex"></ComponentColumn>
+      </template>
+
       <template v-else-if="item.selection">
         <component
           width="40"
@@ -64,6 +68,7 @@ import { cloneDeep } from 'lodash-es';
 import { getConfig, TMagicTable } from '@tmagic/design';
 
 import ActionsColumn from './ActionsColumn.vue';
+import ComponentColumn from './ComponentColumn.vue';
 import ExpandColumn from './ExpandColumn.vue';
 import PopoverColumn from './PopoverColumn.vue';
 import TextColumn from './TextColumn.vue';

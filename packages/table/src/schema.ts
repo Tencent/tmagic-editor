@@ -41,7 +41,7 @@ export type ColumnConfig = {
   fixed?: 'left' | 'right' | boolean;
   width?: number | string;
   actions?: ColumnActionConfig[];
-  type?: 'popover' | 'expand' | string | ((value: any, row: any) => string);
+  type?: 'popover' | 'expand' | 'component' | string | ((value: any, row: any) => string);
   text?: string;
   prop?: string;
   showHeader?: boolean;
@@ -58,8 +58,10 @@ export type ColumnConfig = {
   handler?: (row: any) => void;
   /** 当type为expand时有效，展开为html */
   expandContent?: (row: any, prop?: string) => string;
-  /** 当type为expand时有效，展开为vue组件 */
+  /** 当type为expand时，展开为vue组件；当type为component时显示的组件 */
   component?: any;
   /** 当type为expand时有效，展开的vue组件props */
   props?: any;
+  /** 当type为tip时有效，显示文案 */
+  buttonText?: string;
 };
