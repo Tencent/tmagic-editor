@@ -1,3 +1,14 @@
+# [1.3.0-alpha.21](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.20...v1.3.0-alpha.21) (2023-08-25)
+
+
+### Features
+
+* **editor:** 组件列表中的tooltip改成title ([54ec6de](https://github.com/Tencent/tmagic-editor/commit/54ec6de4f285b3b0fa31b3b579ffa372f3c9446a))
+* **table:** action新增tooltip配置 ([5c9fd9a](https://github.com/Tencent/tmagic-editor/commit/5c9fd9a0f4728847ba346c44b9155ad6e35c31d9))
+* **table:** 新增支持配置组件 ([bd6fae9](https://github.com/Tencent/tmagic-editor/commit/bd6fae9aede8cb1513c3883a21afee17d7dfc8fd))
+
+
+
 # [1.3.0-alpha.20](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.19...v1.3.0-alpha.20) (2023-08-24)
 
 
