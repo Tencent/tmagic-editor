@@ -14,7 +14,7 @@ const fillConfig = (config: FormConfig): FormConfig => [
       {
         name: 'fields',
         type: 'data-source-fields',
-        defaultValue: [],
+        defaultValue: () => [],
       },
     ],
   },
@@ -25,7 +25,7 @@ const fillConfig = (config: FormConfig): FormConfig => [
       {
         name: 'methods',
         type: 'data-source-methods',
-        defaultValue: [],
+        defaultValue: () => [],
       },
     ],
   },
