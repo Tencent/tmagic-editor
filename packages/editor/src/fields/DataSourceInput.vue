@@ -16,7 +16,6 @@
     "
     style="width: 100%"
     @blur="blurHandler"
-    @change="changeHandler"
     @input="inputHandler"
     @select="selectHandler"
   >
@@ -111,6 +110,8 @@ const blurHandler = () => {
   isFocused.value = false;
 
   setDisplayState();
+
+  emit('change', state.value);
 };
 
 const changeHandler = (v: string) => {
@@ -314,5 +315,7 @@ const selectHandler = async ({ value, type }: { value: string; type: 'dataSource
     newSelectionStart = dotIndex + suggestText.length + 1;
   }
   input.value?.setSelectionRange(newSelectionStart, newSelectionStart);
+
+  changeHandler(state.value);
 };
 </script>
