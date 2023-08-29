@@ -3,6 +3,7 @@ import type { DataSourceSchema } from '@tmagic/schema';
 
 export interface DataSourceOptions {
   schema: DataSourceSchema;
+  app: Core;
 }
 
 export type Method = 'get' | 'GET' | 'delete' | 'DELETE' | 'post' | 'POST' | 'put' | 'PUT';
@@ -28,6 +29,7 @@ export interface HttpDataSourceSchema extends DataSourceSchema {
 
 export interface HttpDataSourceOptions {
   schema: HttpDataSourceSchema;
+  app: Core;
   request?: RequestFunction;
 }
 

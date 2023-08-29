@@ -74,12 +74,15 @@ export default class HttpDataSource extends DataSource {
   public httpOptions: HttpOptions;
 
   private fetch?: RequestFunction;
+  private beforeRequest: ((...args: any[]) => any)[] = [];
+  private afterRequest: ((...args: any[]) => any)[] = [];
 
   constructor(options: HttpDataSourceOptions) {
     const { options: httpOptions, ...dataSourceOptions } = options.schema;
 
     super({
       schema: dataSourceOptions,
+      app: options.app,
     });
 
     this.schema = options.schema;
@@ -90,6 +93,16 @@ export default class HttpDataSource extends DataSource {
     } else if (typeof globalThis.fetch === 'function') {
       this.fetch = webRequest;
     }
+
+    this.getMethods().forEach((method) => {
+      if (typeof method.content !== 'function') return;
+      if (method.timing === 'beforeRequest') {
+        this.beforeRequest.push(method.content);
+      }
+      if (method.timing === 'afterRequest') {
+        this.afterRequest.push(method.content);
+      }
+    });
   }
 
   public async init() {
@@ -101,10 +114,18 @@ export default class HttpDataSource extends DataSource {
   }
 
   public async request(options: HttpOptions) {
+    await Promise.all(
+      this.beforeRequest.map((method) => method({ options, params: {}, dataSource: this, app: this.app })),
+    );
+
     const res = await this.fetch?.({
       ...this.httpOptions,
       ...options,
     });
+
+    await Promise.all(
+      this.afterRequest.map((method) => method({ res, options, params: {}, dataSource: this, app: this.app })),
+    );
 
     if (this.schema.responseOptions?.dataPath) {
       const data = getValueByKeyPath(this.schema.responseOptions.dataPath, res);

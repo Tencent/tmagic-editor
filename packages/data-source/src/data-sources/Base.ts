@@ -17,6 +17,7 @@
  */
 import EventEmitter from 'events';
 
+import type Core from '@tmagic/core';
 import type { CodeBlockContent, DataSchema } from '@tmagic/schema';
 
 import type { DataSourceOptions } from '@data-source/types';
@@ -34,12 +35,15 @@ export default class DataSource extends EventEmitter {
 
   public data: Record<string, any> = {};
 
+  public app: Core;
+
   private fields: DataSchema[] = [];
   private methods: CodeBlockContent[] = [];
 
   constructor(options: DataSourceOptions) {
     super();
 
+    this.app = options.app;
     this.id = options.schema.id;
     this.setFields(options.schema.fields);
     this.setMethods(options.schema.methods || []);

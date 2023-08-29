@@ -64,6 +64,7 @@ class DataSourceManager extends EventEmitter {
     let ds: DataSource;
     if (config.type === 'http') {
       ds = new HttpDataSource({
+        app: this.app,
         schema: config as HttpDataSourceSchema,
         request: this.app.request,
       });
@@ -72,6 +73,7 @@ class DataSourceManager extends EventEmitter {
       const DataSourceClass = DataSourceManager.dataSourceClassMap.get(config.type) || DataSource;
 
       ds = new DataSourceClass({
+        app: this.app,
         schema: config,
       });
     }
