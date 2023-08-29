@@ -1,3 +1,20 @@
+# [1.3.0-alpha.22](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.21...v1.3.0-alpha.22) (2023-08-29)
+
+
+### Bug Fixes
+
+* **cli:** packages设置npm包初始化报错 ([0865cf4](https://github.com/Tencent/tmagic-editor/commit/0865cf4952d3d68f125a2b4739fd871b14c53561))
+* **editor:** datasource自动补全用鼠标操作出错 ([7b2fd6e](https://github.com/Tencent/tmagic-editor/commit/7b2fd6ebd40680343c299941427194dbeccf53b7))
+* **editor:** 新增数据源字段受上一次新增数据影响 ([f9ba8b8](https://github.com/Tencent/tmagic-editor/commit/f9ba8b8df56305c69b8823d2f1520701133b0022))
+
+
+### Features
+
+* **data-source:** 数据源中新增app属性，http数据源新增钩子 ([c5a1c2d](https://github.com/Tencent/tmagic-editor/commit/c5a1c2db769af8282ba0807cff30385ac133d2a7))
+* **editor:** 新增数据源时先选类型 ([2bd86d2](https://github.com/Tencent/tmagic-editor/commit/2bd86d21012d28bc474951f87a81f622255ac36b))
+
+
+
 # [1.3.0-alpha.21](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.20...v1.3.0-alpha.21) (2023-08-25)
 
 
