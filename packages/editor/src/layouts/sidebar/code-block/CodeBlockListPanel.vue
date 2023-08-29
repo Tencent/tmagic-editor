@@ -6,6 +6,7 @@
         <TMagicButton v-if="editable" class="create-code-button" type="primary" size="small" @click="createCodeBlock"
           >新增</TMagicButton
         >
+        <slot name="code-block-panel-search"></slot>
       </div>
     </slot>
 

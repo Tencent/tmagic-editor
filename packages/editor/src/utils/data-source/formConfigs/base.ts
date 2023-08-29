@@ -1,8 +1,6 @@
 import type { FormConfig } from '@tmagic/form';
 
-import type { DatasourceTypeOption } from '@editor/type';
-
-export default function (datasourceTypeList: DatasourceTypeOption[] = []): FormConfig {
+export default function (): FormConfig {
   return [
     {
       name: 'id',
@@ -11,12 +9,7 @@ export default function (datasourceTypeList: DatasourceTypeOption[] = []): FormC
     {
       name: 'type',
       text: '类型',
-      type: 'select',
-      options: [
-        { text: '基础', value: 'base' },
-        { text: 'HTTP', value: 'http' },
-        ...datasourceTypeList.map((item) => ({ text: item.text, value: item.type })),
-      ],
+      type: 'hidden',
       defaultValue: 'base',
     },
     {

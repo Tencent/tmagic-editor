@@ -159,7 +159,7 @@ export const guid = (digit = 8): string =>
     return v.toString(16);
   });
 
-export const getValueByKeyPath: any = (keys: string, value: Record<string | number, any>) => {
+export const getValueByKeyPath: any = (keys: string, value: Record<string | number, any> = {}) => {
   const path = keys.split('.');
   const pathLength = path.length;
 

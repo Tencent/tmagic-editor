@@ -2,7 +2,24 @@
   <TMagicScrollbar class="data-source-list-panel m-editor-dep-list-panel">
     <div class="search-wrapper">
       <SearchInput @search="filterTextChangeHandler"></SearchInput>
-      <TMagicButton v-if="editable" type="primary" size="small" @click="addHandler">新增</TMagicButton>
+      <TMagicPopover v-if="editable" placement="right">
+        <template #reference>
+          <TMagicButton type="primary" size="small">新增</TMagicButton>
+        </template>
+        <div class="data-source-list-panel-add-menu">
+          <ToolButton
+            v-for="(item, index) in datasourceTypeList"
+            :data="{
+              type: 'button',
+              text: item.text,
+              handler: () => {
+                addHandler(item.type);
+              },
+            }"
+            :key="index"
+          ></ToolButton>
+        </div>
+      </TMagicPopover>
     </div>
 
     <!-- 数据源列表 -->
@@ -12,7 +29,7 @@
       ref="editDialog"
       :disabled="!editable"
       :values="dataSourceValues"
-      :title="typeof dataSourceValues.id !== 'undefined' ? `编辑${dataSourceValues.title}` : '新增'"
+      :title="dialogTitle"
       @submit="submitDataSourceHandler"
     ></DataSourceConfigPanel>
   </TMagicScrollbar>
@@ -21,10 +38,11 @@
 <script setup lang="ts" name="MEditorDataSourceListPanel">
 import { computed, inject, ref } from 'vue';
 
-import { TMagicButton, TMagicScrollbar } from '@tmagic/design';
+import { TMagicButton, TMagicPopover, TMagicScrollbar } from '@tmagic/design';
 import type { DataSourceSchema } from '@tmagic/schema';
 
 import SearchInput from '@editor/components/SearchInput.vue';
+import ToolButton from '@editor/components/ToolButton.vue';
 import type { Services } from '@editor/type';
 
 import DataSourceConfigPanel from './DataSourceConfigPanel.vue';
@@ -40,12 +58,26 @@ const editDialog = ref<InstanceType<typeof DataSourceConfigPanel>>();
 
 const dataSourceValues = ref<Record<string, any>>({});
 
-const editable = computed(() => dataSourceService?.get('editable') ?? true);
+const dialogTitle = ref('');
 
-const addHandler = () => {
+const editable = computed(() => dataSourceService?.get('editable') ?? true);
+const datasourceTypeList = computed(() =>
+  [
+    { text: '基础', type: 'base' },
+    { text: 'HTTP', type: 'http' },
+  ].concat(dataSourceService?.get('datasourceTypeList') ?? []),
+);
+
+const addHandler = (type: string) => {
   if (!editDialog.value) return;
 
-  dataSourceValues.value = {};
+  dataSourceValues.value = {
+    type,
+  };
+
+  const datasourceType = datasourceTypeList.value.find((item) => item.type === type);
+
+  dialogTitle.value = `新增${datasourceType?.text || ''}`;
 
   editDialog.value.show();
 };
@@ -56,6 +88,8 @@ const editHandler = (id: string) => {
   dataSourceValues.value = {
     ...dataSourceService?.getDataSourceById(id),
   };
+
+  dialogTitle.value = `新增${dataSourceValues.value.title || ''}`;
 
   editDialog.value.show();
 };

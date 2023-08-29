@@ -37,7 +37,7 @@ class DataSource extends BaseService {
   }
 
   public getFormConfig(type = 'base') {
-    return getFormConfig(type, this.get('datasourceTypeList'), this.get('configs'));
+    return getFormConfig(type, this.get('configs'));
   }
 
   public setFormConfig(type: string, config: FormConfig) {

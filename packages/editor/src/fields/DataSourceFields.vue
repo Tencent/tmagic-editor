@@ -14,17 +14,20 @@
       :values="fieldValues"
       :parentValues="model[name]"
       :disabled="disabled"
+      :width="width"
       @submit="fieldChange"
     ></MFormDrawer>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, inject, ref } from 'vue';
 
 import { TMagicButton, tMagicMessageBox } from '@tmagic/design';
-import { FieldProps, FormConfig, FormState, MFormDrawer } from '@tmagic/form';
+import { type FieldProps, type FormConfig, type FormState, MFormDrawer } from '@tmagic/form';
 import { MagicTable } from '@tmagic/table';
+
+import type { Services } from '@editor/type';
 
 defineOptions({
   name: 'MEditorDataSourceFields',
@@ -43,9 +46,13 @@ const props = withDefaults(
 
 const emit = defineEmits(['change']);
 
+const services = inject<Services>('services');
+
 const addDialog = ref<InstanceType<typeof MFormDrawer>>();
 const fieldValues = ref<Record<string, any>>({});
 const filedTitle = ref('');
+
+const width = computed(() => globalThis.document.body.clientWidth - (services?.uiService.get('columnWidth').left || 0));
 
 const newHandler = () => {
   fieldValues.value = {};
