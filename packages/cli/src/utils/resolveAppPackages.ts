@@ -44,10 +44,10 @@ const npmInstall = function (dependencies: Record<string, string>, cwd: string, 
     }[client];
 
     const packages = Object.entries(dependencies)
-      .map(([name, version]) => `${name}@${version}`)
+      .map(([name, version]) => (version ? `${name}@${version}` : name))
       .join(' ');
 
-    const command = `${client} ${install} ${packages}${registry ? `--registry ${registry}` : ''}`;
+    const command = `${client} ${install} ${packages}${registry ? ` --registry ${registry}` : ''}`;
 
     execInfo(cwd);
     execInfo(command);
@@ -395,6 +395,14 @@ const splitNameVersion = function (str: string) {
   if (typeof str !== 'string') {
     return {};
   }
+
+  if (fs.existsSync(str)) {
+    return {
+      name: str,
+      version: '',
+    };
+  }
+
   const packStr = String.prototype.trim.call(str);
   const ret = packStr.match(/((^|@).+)@(.+)/);
   let name = packStr;
@@ -426,7 +434,7 @@ const setPackages = (packages: ModuleMainFilePath, app: App, packagePath: string
 
   if (!moduleName) throw Error('packages中包含非法配置');
 
-  if (fs.lstatSync(moduleName).isDirectory()) {
+  if (isDirectory(moduleName)) {
     if (!fs.existsSync(path.join(moduleName, './package.json'))) {
       ['index.js', 'index.ts'].forEach((index) => {
         const indexFile = path.join(moduleName!, `./${index}`);
