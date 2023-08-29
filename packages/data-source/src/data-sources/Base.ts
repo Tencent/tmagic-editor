@@ -17,10 +17,9 @@
  */
 import EventEmitter from 'events';
 
-import type Core from '@tmagic/core';
 import type { CodeBlockContent, DataSchema } from '@tmagic/schema';
 
-import type { DataSourceOptions } from '@data-source/types';
+import type { AppCore, DataSourceOptions } from '@data-source/types';
 import { getDefaultValueFromFields } from '@data-source/util';
 
 /**
@@ -35,7 +34,7 @@ export default class DataSource extends EventEmitter {
 
   public data: Record<string, any> = {};
 
-  public app: Core;
+  public app: AppCore;
 
   private fields: DataSchema[] = [];
   private methods: CodeBlockContent[] = [];

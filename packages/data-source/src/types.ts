@@ -1,9 +1,15 @@
-import type Core from '@tmagic/core';
-import type { DataSourceSchema } from '@tmagic/schema';
+import type { DataSourceSchema, MApp } from '@tmagic/schema';
+
+export interface AppCore {
+  dsl?: MApp;
+  platform?: string;
+  jsEngine?: string;
+  request?: RequestFunction;
+}
 
 export interface DataSourceOptions {
   schema: DataSourceSchema;
-  app: Core;
+  app: AppCore;
 }
 
 export type Method = 'get' | 'GET' | 'delete' | 'DELETE' | 'post' | 'POST' | 'put' | 'PUT';
@@ -29,12 +35,12 @@ export interface HttpDataSourceSchema extends DataSourceSchema {
 
 export interface HttpDataSourceOptions {
   schema: HttpDataSourceSchema;
-  app: Core;
+  app: AppCore;
   request?: RequestFunction;
 }
 
 export interface DataSourceManagerOptions {
-  app: Core;
+  app: AppCore;
 }
 
 export interface DataSourceManagerData {
