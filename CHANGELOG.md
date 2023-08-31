@@ -1,3 +1,18 @@
+# [1.3.0-alpha.23](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.22...v1.3.0-alpha.23) (2023-08-31)
+
+
+### Bug Fixes
+
+* **core:** node销毁后重新渲染再销毁不会触发destroy事件 ([a8eea1a](https://github.com/Tencent/tmagic-editor/commit/a8eea1a73b2fe43f4784a6f5961be52ab4393bfa))
+* **editor:** 当组件设置的bottom/right是，上下左右快捷键失效 ([cda3b04](https://github.com/Tencent/tmagic-editor/commit/cda3b04b85b02e572275d73d9c3981ba87981461))
+
+
+### Features
+
+* **editor:** fixed布局水平居中处理 ([2ccf47f](https://github.com/Tencent/tmagic-editor/commit/2ccf47f7dd3ec0a52e78f2cf12e06eabf6d26365))
+
+
+
 # [1.3.0-alpha.22](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.21...v1.3.0-alpha.22) (2023-08-29)
 
 
