@@ -1,24 +1,23 @@
 <template>
-  <component
-    v-if="data.type === 'tabs' && data.items.length"
-    v-model="activeTabName"
-    class="m-editor-sidebar tmagic-design-tabs"
-    v-bind="tabsComponent?.props({ type: 'card', tabPosition: 'left' }) || {}"
-    :is="tabsComponent?.component || 'el-tabs'"
-  >
-    <component
+  <div class="m-editor-sidebar" v-if="data.type === 'tabs' && data.items.length">
+    <div class="m-editor-sidebar-header">
+      <div
+        class="m-editor-sidebar-header-item"
+        v-for="(config, index) in sideBarItems"
+        :key="config.$key ?? index"
+        :class="{ 'is-active': activeTabName === config.text }"
+        @click="activeTabName = config.text || `${index}`"
+      >
+        <MIcon v-if="config.icon" :icon="config.icon"></MIcon>
+        <div v-if="config.text" class="magic-editor-tab-panel-title">{{ config.text }}</div>
+      </div>
+    </div>
+    <div
+      class="m-editor-sidebar-content"
       v-for="(config, index) in sideBarItems"
-      v-bind="tabPaneComponent?.props({ name: config.text, lazy: config.lazy }) || {}"
-      :is="tabPaneComponent?.component || 'el-tab-pane'"
-      :key="config.$key || index"
+      :key="config.$key ?? index"
+      v-show="activeTabName === config.text"
     >
-      <template #label>
-        <div :key="config.text">
-          <MIcon v-if="config.icon" :icon="config.icon"></MIcon>
-          <div v-if="config.text" class="magic-editor-tab-panel-title">{{ config.text }}</div>
-        </div>
-      </template>
-
       <component v-if="config" :is="config.component" v-bind="config.props || {}" v-on="config?.listeners || {}">
         <template
           #component-list-panel-header
@@ -71,15 +70,13 @@
           />
         </template>
       </component>
-    </component>
-  </component>
+    </div>
+  </div>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { Coin, EditPen, Goods, List } from '@element-plus/icons-vue';
-
-import { getConfig } from '@tmagic/design';
 
 import MIcon from '@editor/components/Icon.vue';
 import type { MenuButton, MenuComponent, SideComponent, SideItem } from '@editor/type';
@@ -103,9 +100,6 @@ const props = withDefaults(
     data: () => ({ type: 'tabs', status: '组件', items: ['component-list', 'layer', 'code-block', 'data-source'] }),
   },
 );
-
-const tabPaneComponent = getConfig('components')?.tabPane;
-const tabsComponent = getConfig('components')?.tabs;
 
 const activeTabName = ref(props.data?.status);
 

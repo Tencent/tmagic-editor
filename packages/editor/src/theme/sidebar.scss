@@ -1,74 +1,31 @@
-.m-editor-sidebar.tmagic-design-tabs {
+.m-editor-sidebar {
+  display: flex;
   height: 100%;
 
-  .el-tabs__header,
-  .t-tabs__header {
+  .m-editor-sidebar-header {
     background: $--sidebar-heder-background-color;
-    border: 0;
     height: 100%;
+    width: 40px;
 
-    .t-tabs__nav--card {
-      background-color: transparent;
-    }
-
-    .t-tabs__nav--card.t-tabs__nav-item:not(.t-is-disabled):not(
-        .t-is-active
-      ):hover {
-      background-color: transparent;
-    }
-
-    &.is-left,
-    &.t-is-left {
-      width: 40px;
-      margin-right: 0;
-    }
-
-    .el-tabs__nav-wrap {
-      margin: 0;
-    }
-
-    .el-tabs__nav {
-      border: 0;
-      border-radius: 0;
-    }
-
-    .tab-label {
-      margin-left: 2px;
-    }
-
-    .el-tabs__item.is-left,
-    .t-tabs__nav-item {
+    .m-editor-sidebar-header-item {
       line-height: 15px;
-      border: 0;
       height: auto;
       padding: 8px;
       color: rgb(255, 255, 255);
       box-sizing: border-box;
+      cursor: pointer;
 
-      &.is-left,
-      &.t-is-left {
-        &.is-active,
-        &.t-is-active {
-          background: $--sidebar-content-background-color;
-          border: 0;
+      &.is-active {
+        background: $--sidebar-content-background-color;
 
-          i {
-            color: #353140;
-          }
-
-          .magic-editor-tab-panel-title {
-            color: #353140;
-          }
+        i {
+          color: #353140;
         }
 
-        &:first-child {
-          border-right: 0;
+        .magic-editor-tab-panel-title {
+          color: #353140;
         }
       }
-    }
-
-    .t-tabs__nav-item {
-      padding: 7px;
     }
 
     i {
@@ -84,6 +41,12 @@
       font-size: 12px;
       white-space: normal;
     }
+  }
+
+  .m-editor-sidebar-content {
+    height: 100%;
+    width: calc(100% - 40px);
+    overflow: auto;
   }
 
   .el-scrollbar {
@@ -108,10 +71,5 @@
     &:hover {
       background: rgba(0, 0, 0, 0.2);
     }
-  }
-
-  .el-tabs__content,
-  .el-tab-pane {
-    height: 100%;
   }
 }
