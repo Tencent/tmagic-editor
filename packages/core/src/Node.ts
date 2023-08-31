@@ -54,15 +54,6 @@ class Node extends EventEmitter {
     this.data = options.config;
     this.events = events || [];
     this.listenLifeSafe();
-
-    this.once('destroy', () => {
-      this.instance = null;
-      if (typeof this.data.destroy === 'function') {
-        this.data.destroy(this);
-      }
-
-      this.listenLifeSafe();
-    });
   }
 
   public setData(data: MComponent | MContainer | MPage) {
@@ -76,6 +67,15 @@ class Node extends EventEmitter {
 
   private listenLifeSafe() {
     this.once('created', async (instance: any) => {
+      this.once('destroy', () => {
+        this.instance = null;
+        if (typeof this.data.destroy === 'function') {
+          this.data.destroy(this);
+        }
+
+        this.listenLifeSafe();
+      });
+
       this.instance = instance;
       await this.runCodeBlock('created');
     });
