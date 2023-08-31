@@ -648,7 +648,7 @@ class Editor extends BaseService {
 
     if (doc) {
       const el = doc.getElementById(`${node.id}`);
-      const parentEl = el?.offsetParent;
+      const parentEl = layout === Layout.FIXED ? doc.body : el?.offsetParent;
       if (parentEl && el) {
         node.style.left = (parentEl.clientWidth - el.clientWidth) / 2;
       }
