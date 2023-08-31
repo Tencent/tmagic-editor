@@ -651,9 +651,11 @@ class Editor extends BaseService {
       const parentEl = layout === Layout.FIXED ? doc.body : el?.offsetParent;
       if (parentEl && el) {
         node.style.left = (parentEl.clientWidth - el.clientWidth) / 2;
+        node.style.right = '';
       }
     } else if (parent.style && isNumber(parent.style?.width) && isNumber(node.style?.width)) {
       node.style.left = (parent.style.width - node.style.width) / 2;
+      node.style.right = '';
     }
 
     return node;
@@ -792,20 +794,46 @@ class Editor extends BaseService {
     if (!node || isPage(node)) return;
 
     const { style, id, type } = node;
-    if (!style || style.position !== 'absolute') return;
+    if (!style || !['absolute', 'fixed'].includes(style.position)) return;
 
-    if (top && !isNumber(style.top)) return;
-    if (left && !isNumber(style.left)) return;
+    const update = (style: { [key: string]: any }) =>
+      this.update({
+        id,
+        type,
+        style,
+      });
 
-    this.update({
-      id,
-      type,
-      style: {
-        ...style,
-        left: Number(style.left) + left,
-        top: Number(style.top) + top,
-      },
-    });
+    if (top) {
+      if (isNumber(style.top)) {
+        update({
+          ...style,
+          top: Number(style.top) + Number(top),
+          bottom: '',
+        });
+      } else if (isNumber(style.bottom)) {
+        update({
+          ...style,
+          bottom: Number(style.bottom) - Number(top),
+          top: '',
+        });
+      }
+    }
+
+    if (left) {
+      if (isNumber(style.left)) {
+        update({
+          ...style,
+          left: Number(style.left) + Number(left),
+          right: '',
+        });
+      } else if (isNumber(style.right)) {
+        update({
+          ...style,
+          right: Number(style.right) - Number(left),
+          left: '',
+        });
+      }
+    }
   }
 
   public resetState() {
