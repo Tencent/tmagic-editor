@@ -174,10 +174,6 @@ npm install sass -D
 
 该配置涉及到 [runtime 概念](runtime.md)，tmagic-editor编辑器中心的模拟器画布，是一个 iframe（这里的 `runtimeUrl` 配置的，就是你提供的 iframe 的 url），其中渲染了一个 runtime，用来响应编辑器中的组件增删改等操作。
 
-::: tip 如何快速得到一个 runtime
-如果要快速启动，可以使用[tmagic-editor项目源码](https://github.com/Tencent/tmagic-editor)中的 runtime，在提供的三个框架 vue2/vue3/react runtime 目录中选择一个，执行 `npm run build:admin` 得到产物，并将产物放到你的项目中，此处的 runtimeUrl 指向你放置 runtime/playground/index.html 的路径。
-:::
-
 ## componentGroupList
 
 `componentGroupList` 是指定左侧组件库内容的配置。此处定义了在编辑器组件库中有什么组件。在添加的时候通过组件 `type` 来确定 runtime 中要渲染什么组件。可以参考 [componentGroupList 配置](../api/editor/props.html#componentgrouplist)。
