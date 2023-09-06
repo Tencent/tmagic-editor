@@ -21,6 +21,8 @@
         :init-values="values"
         :parent-values="parentValues"
         :label-width="labelWidth"
+        :label-position="labelPosition"
+        :inline="inline"
         @change="changeHandler"
       ></Form>
       <slot></slot>
@@ -71,6 +73,8 @@ withDefaults(
     zIndex?: number;
     size?: 'small' | 'default' | 'large';
     confirmText?: string;
+    inline?: boolean;
+    labelPosition?: string;
   }>(),
   {
     closeOnPressEscape: true,

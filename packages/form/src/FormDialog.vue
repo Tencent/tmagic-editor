@@ -25,6 +25,8 @@
         :init-values="values"
         :parent-values="parentValues"
         :label-width="labelWidth"
+        :label-position="labelPosition"
+        :inline="inline"
         @change="changeHandler"
       ></Form>
       <slot></slot>
@@ -78,6 +80,8 @@ const props = withDefaults(
     fullscreen?: boolean;
     disabled?: boolean;
     title?: string;
+    inline?: boolean;
+    labelPosition?: string;
     zIndex?: number;
     size?: 'small' | 'default' | 'large';
     confirmText?: string;
