@@ -1,3 +1,18 @@
+# [1.3.0-alpha.24](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.23...v1.3.0-alpha.24) (2023-09-07)
+
+
+### Bug Fixes
+
+* **editor:** 代码变化时，参数表单需要重新渲染 ([3cd1ac1](https://github.com/Tencent/tmagic-editor/commit/3cd1ac1cc4e3a57adcea1dd19d4f2ccb71a75a83))
+
+
+### Features
+
+* **form:** form-dialog,form-drawer新增inline,label-position配置 ([7bf5992](https://github.com/Tencent/tmagic-editor/commit/7bf59929b0196363d9f54fad58416c3677e1a58f))
+* **form:** 时间容器增加每日周期显示 ([a0a2242](https://github.com/Tencent/tmagic-editor/commit/a0a2242341c3555ba0402250d38da4124d3062aa))
+
+
+
 # [1.3.0-alpha.23](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.22...v1.3.0-alpha.23) (2023-08-31)
 
 
