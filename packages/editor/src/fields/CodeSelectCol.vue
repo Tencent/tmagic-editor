@@ -33,7 +33,7 @@
 </template>
 
 <script lang="ts" setup name="">
-import { computed, inject, ref } from 'vue';
+import { computed, inject, ref, watch } from 'vue';
 import { Edit, View } from '@element-plus/icons-vue';
 import { isEmpty, map } from 'lodash-es';
 
@@ -77,6 +77,15 @@ const getParamItemsConfig = (codeId?: Id): CodeParamStatement[] => {
 
 const codeDsl = computed(() => services?.codeBlockService.getCodeDsl());
 const paramsConfig = ref<CodeParamStatement[]>(getParamItemsConfig(props.model[props.name]));
+
+watch(
+  () => props.model[props.name],
+  (v, preV) => {
+    if (v !== preV) {
+      paramsConfig.value = getParamItemsConfig(v);
+    }
+  },
+);
 
 const selectConfig = {
   type: 'select',
