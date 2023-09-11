@@ -6,7 +6,10 @@
 import { computed, inject, markRaw, ref } from 'vue';
 import { Files, Plus } from '@element-plus/icons-vue';
 
+import { isPage } from '@tmagic/utils';
+
 import ContentMenu from '@editor/components/ContentMenu.vue';
+import FolderMinusIcon from '@editor/icons/FolderMinusIcon.vue';
 import type { ComponentGroup, MenuButton, MenuComponent, Services } from '@editor/type';
 import { useCopyMenu, useDeleteMenu, useMoveToMenu, usePasteMenu } from '@editor/utils/content-menu';
 
@@ -16,6 +19,10 @@ defineOptions({
 
 const props = defineProps<{
   layerContentMenu: (MenuButton | MenuComponent)[];
+}>();
+
+const emit = defineEmits<{
+  'collapse-all': [];
 }>();
 
 const services = inject<Services>('services');
@@ -76,6 +83,15 @@ const getSubMenuData = computed<MenuButton[]>(() => {
 });
 
 const menuData = computed<(MenuButton | MenuComponent)[]>(() => [
+  {
+    type: 'button',
+    text: '全部折叠',
+    icon: FolderMinusIcon,
+    display: () => isPage(node.value),
+    handler: () => {
+      emit('collapse-all');
+    },
+  },
   {
     type: 'button',
     text: '新增',

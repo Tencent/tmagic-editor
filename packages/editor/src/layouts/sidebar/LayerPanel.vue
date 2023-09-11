@@ -42,7 +42,7 @@
     </TMagicTree>
 
     <Teleport to="body">
-      <LayerMenu ref="menu" :layer-content-menu="layerContentMenu"></LayerMenu>
+      <LayerMenu ref="menu" :layer-content-menu="layerContentMenu" @collapse-all="collapseAllHandler"></LayerMenu>
     </Teleport>
   </TMagicScrollbar>
 </template>
@@ -355,5 +355,15 @@ const contextmenu = async (event: MouseEvent, data: MNode): Promise<void> => {
   }
 
   menu.value?.show(event);
+};
+
+const collapseAllHandler = () => {
+  const page = editorService?.get('page');
+  if (!tree.value || !page) return;
+  const rootNode = tree.value.getNode(page.id);
+  rootNode.childNodes.forEach((node: any) => {
+    node.collapse();
+    handleCollapse(node.data);
+  });
 };
 </script>
