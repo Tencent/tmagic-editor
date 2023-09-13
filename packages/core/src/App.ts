@@ -20,17 +20,19 @@ import { EventEmitter } from 'events';
 
 import { has, isEmpty } from 'lodash-es';
 
-import { createDataSourceManager, DataSourceManager, RequestFunction } from '@tmagic/data-source';
+import { createDataSourceManager, DataSourceManager } from '@tmagic/data-source';
 import {
   ActionType,
-  CodeBlockDSL,
-  CodeItemConfig,
-  CompItemConfig,
-  DataSourceItemConfig,
-  DeprecatedEventConfig,
-  EventConfig,
-  Id,
-  MApp,
+  type AppCore,
+  type CodeBlockDSL,
+  type CodeItemConfig,
+  type CompItemConfig,
+  type DataSourceItemConfig,
+  type DeprecatedEventConfig,
+  type EventConfig,
+  type Id,
+  type MApp,
+  type RequestFunction,
 } from '@tmagic/schema';
 
 import Env from './Env';
@@ -56,7 +58,7 @@ interface EventCache {
   args: any[];
 }
 
-class App extends EventEmitter {
+class App extends EventEmitter implements AppCore {
   public env: Env = new Env();
   public dsl?: MApp;
   public codeDsl?: CodeBlockDSL;

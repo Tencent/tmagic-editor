@@ -15,6 +15,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+export type Method = 'get' | 'GET' | 'delete' | 'DELETE' | 'post' | 'POST' | 'put' | 'PUT';
+
+export interface HttpOptions {
+  url: string;
+  params?: Record<string, string>;
+  data?: Record<string, any>;
+  headers?: Record<string, string>;
+  method?: Method;
+  [key: string]: any;
+}
+
+export type RequestFunction = (options: HttpOptions) => Promise<any>;
+
+export interface AppCore {
+  dsl?: MApp;
+  platform?: string;
+  jsEngine?: string;
+  request?: RequestFunction;
+  [key: string]: any;
+}
 
 export enum NodeType {
   CONTAINER = 'container',

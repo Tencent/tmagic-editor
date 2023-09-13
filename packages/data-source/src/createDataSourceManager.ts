@@ -17,10 +17,10 @@
  */
 import { cloneDeep } from 'lodash-es';
 
+import type { AppCore } from '@tmagic/schema';
 import { getDepNodeIds, getNodes, replaceChildNode } from '@tmagic/utils';
 
 import DataSourceManager from './DataSourceManager';
-import type { AppCore } from './types';
 
 /**
  * 创建数据源管理器

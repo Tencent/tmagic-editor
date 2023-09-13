@@ -17,9 +17,9 @@
  */
 import EventEmitter from 'events';
 
-import type { CodeBlockContent, DataSchema } from '@tmagic/schema';
+import type { AppCore, CodeBlockContent, DataSchema } from '@tmagic/schema';
 
-import type { AppCore, DataSourceOptions } from '@data-source/types';
+import type { DataSourceOptions } from '@data-source/types';
 import { getDefaultValueFromFields } from '@data-source/util';
 
 /**

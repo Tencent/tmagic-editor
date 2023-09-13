@@ -20,11 +20,11 @@ import EventEmitter from 'events';
 
 import { cloneDeep, template } from 'lodash-es';
 
-import type { DataSourceSchema, Id, MNode } from '@tmagic/schema';
+import type { AppCore, DataSourceSchema, Id, MNode } from '@tmagic/schema';
 import { compiledCond, compiledNode } from '@tmagic/utils';
 
 import { DataSource, HttpDataSource } from './data-sources';
-import type { AppCore, DataSourceManagerData, DataSourceManagerOptions, HttpDataSourceSchema } from './types';
+import type { DataSourceManagerData, DataSourceManagerOptions, HttpDataSourceSchema } from './types';
 
 class DataSourceManager extends EventEmitter {
   private static dataSourceClassMap = new Map<string, typeof DataSource>();

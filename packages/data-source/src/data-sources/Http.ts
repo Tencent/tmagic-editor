@@ -15,9 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { HttpOptions, RequestFunction } from '@tmagic/schema';
 import { getValueByKeyPath } from '@tmagic/utils';
 
-import { HttpDataSourceOptions, HttpDataSourceSchema, HttpOptions, RequestFunction } from '@data-source/types';
+import { HttpDataSourceOptions, HttpDataSourceSchema } from '@data-source/types';
 
 import DataSource from './Base';
 
@@ -69,7 +70,10 @@ export default class HttpDataSource extends DataSource {
   public type = 'http';
 
   public isLoading = false;
-  public error?: Error;
+  public error?: {
+    msg?: string;
+    code?: string | number;
+  };
   public schema: HttpDataSourceSchema;
   public httpOptions: HttpOptions;
 
@@ -114,24 +118,34 @@ export default class HttpDataSource extends DataSource {
   }
 
   public async request(options: HttpOptions) {
-    await Promise.all(
-      this.beforeRequest.map((method) => method({ options, params: {}, dataSource: this, app: this.app })),
-    );
+    try {
+      await Promise.all(
+        this.beforeRequest.map((method) => method({ options, params: {}, dataSource: this, app: this.app })),
+      );
 
-    const res = await this.fetch?.({
-      ...this.httpOptions,
-      ...options,
-    });
+      const res = await this.fetch?.({
+        ...this.httpOptions,
+        ...options,
+      });
 
-    await Promise.all(
-      this.afterRequest.map((method) => method({ res, options, params: {}, dataSource: this, app: this.app })),
-    );
+      await Promise.all(
+        this.afterRequest.map((method) => method({ res, options, params: {}, dataSource: this, app: this.app })),
+      );
 
-    if (this.schema.responseOptions?.dataPath) {
-      const data = getValueByKeyPath(this.schema.responseOptions.dataPath, res);
-      this.setData(data);
-    } else {
-      this.setData(res);
+      if (this.schema.responseOptions?.dataPath) {
+        const data = getValueByKeyPath(this.schema.responseOptions.dataPath, res);
+        this.setData(data);
+      } else {
+        this.setData(res);
+      }
+
+      this.error = undefined;
+    } catch (error: any) {
+      this.error = {
+        msg: error.message,
+      };
+
+      this.emit('error', error);
     }
   }
 
