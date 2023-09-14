@@ -93,12 +93,6 @@ export default {
     default: () => ({}),
   },
 
-  /** 组件的属性配置表单的dsl */
-  datasourceConfigs: {
-    type: Object as PropType<Record<string, FormConfig>>,
-    default: () => ({}),
-  },
-
   /** 添加数据源时的默认值 */
   datasourceValues: {
     type: Object as PropType<Record<string, Partial<DataSourceSchema>>>,
@@ -106,7 +100,7 @@ export default {
   },
 
   /** 数据源的属性配置表单的dsl */
-  dataScourceConfigs: {
+  datasourceConfigs: {
     type: Object as PropType<Record<string, FormConfig>>,
     default: () => ({}),
   },

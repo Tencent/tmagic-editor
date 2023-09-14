@@ -35,8 +35,9 @@
   </TMagicScrollbar>
 </template>
 
-<script setup lang="ts" name="MEditorDataSourceListPanel">
+<script setup lang="ts">
 import { computed, inject, ref } from 'vue';
+import { mergeWith } from 'lodash-es';
 
 import { TMagicButton, TMagicPopover, TMagicScrollbar } from '@tmagic/design';
 import type { DataSourceSchema } from '@tmagic/schema';
@@ -71,11 +72,17 @@ const datasourceTypeList = computed(() =>
 const addHandler = (type: string) => {
   if (!editDialog.value) return;
 
-  dataSourceValues.value = {
-    type,
-  };
-
   const datasourceType = datasourceTypeList.value.find((item) => item.type === type);
+
+  dataSourceValues.value = mergeWith(
+    { type, title: datasourceType?.text },
+    dataSourceService?.getFormValue(type) || {},
+    (objValue, srcValue) => {
+      if (Array.isArray(srcValue)) {
+        return srcValue;
+      }
+    },
+  );
 
   dialogTitle.value = `新增${datasourceType?.text || ''}`;
 
