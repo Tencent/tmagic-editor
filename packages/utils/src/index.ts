@@ -329,10 +329,10 @@ export const compiledCond = (op: string, fieldValue: any, value: any, range: [nu
       if (fieldValue >= range[0] && fieldValue <= range[1]) return false;
       break;
     case 'include':
-      if (!fieldValue.includes(value)) return false;
+      if (typeof fieldValue !== 'undefined' && !fieldValue.includes?.(value)) return false;
       break;
     case 'not_include':
-      if (fieldValue.includes(value)) return false;
+      if (typeof fieldValue !== 'undefined' && fieldValue.includes?.(value)) return false;
       break;
     default:
       break;
