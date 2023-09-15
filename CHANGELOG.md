@@ -1,3 +1,21 @@
+# [1.3.0-beta.0](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.24...v1.3.0-beta.0) (2023-09-15)
+
+
+### Bug Fixes
+
+* **editor:** 新增数据源时，设置初始值 ([75b0d9c](https://github.com/Tencent/tmagic-editor/commit/75b0d9cdf3a41348bf6e00c721bf145c0a150810))
+* **utils:** 编译条件函数异常兼容 ([7a617d4](https://github.com/Tencent/tmagic-editor/commit/7a617d4a17bde2fbf8d942f12fe522299f36ce62))
+
+
+### Features
+
+* **design:** drawer增加handleClose方法 ([a9c5004](https://github.com/Tencent/tmagic-editor/commit/a9c5004f4d3c88d9947f30660064ee4fec7b24c2))
+* **editor:** 已选组件新增根节点右键菜单项：全部折叠 ([ea1cae7](https://github.com/Tencent/tmagic-editor/commit/ea1cae79684850f26703273d7df4a73829ffde4b))
+* **editor:** 新增代码块编辑时查看修改 ([436914e](https://github.com/Tencent/tmagic-editor/commit/436914e7ee45ac4f84b90ff24e1569c7388e4ce4))
+* **form,editor:** 代码块编辑后关闭新增确认弹窗 ([ac30340](https://github.com/Tencent/tmagic-editor/commit/ac303405efa6d98e029bec73c8bfa1e1a7e65d8a))
+
+
+
 # [1.3.0-alpha.24](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.23...v1.3.0-alpha.24) (2023-09-07)
 
 
