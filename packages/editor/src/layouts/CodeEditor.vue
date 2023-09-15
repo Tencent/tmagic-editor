@@ -202,6 +202,7 @@ defineExpose({
   },
 
   setEditorValue,
+  getEditorValue,
 
   focus() {
     vsEditor?.focus();

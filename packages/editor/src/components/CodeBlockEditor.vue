@@ -15,16 +15,45 @@
     @error="errorHandler"
     @open="openHandler"
     @closed="closedHandler"
-  ></MFormDrawer>
+  >
+    <template #left>
+      <TMagicButton type="primary" text @click="difVisible = true">查看修改</TMagicButton>
+    </template>
+  </MFormDrawer>
+
+  <TMagicDialog v-model="difVisible" title="查看修改" fullscreen>
+    <div style="display: flex; margin-bottom: 10px">
+      <div style="flex: 1"><TMagicTag size="small" type="info">修改前</TMagicTag></div>
+      <div style="flex: 1"><TMagicTag size="small" type="success">修改后</TMagicTag></div>
+    </div>
+
+    <CodeEditor
+      v-if="difVisible"
+      ref="magicVsEditor"
+      type="diff"
+      language="json"
+      :initValues="content.content"
+      :modifiedValues="fomDrawer?.form?.values.content"
+      :style="`height: ${height - 200}px`"
+    ></CodeEditor>
+
+    <template #footer>
+      <span class="dialog-footer">
+        <TMagicButton size="small" @click="difVisible = false">取消</TMagicButton>
+        <TMagicButton size="small" type="primary" @click="diffChange">确定</TMagicButton>
+      </span>
+    </template>
+  </TMagicDialog>
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, ref } from 'vue';
+import { computed, inject, onUnmounted, ref } from 'vue';
 
-import { tMagicMessage, tMagicMessageBox } from '@tmagic/design';
+import { TMagicButton, TMagicDialog, tMagicMessage, tMagicMessageBox, TMagicTag } from '@tmagic/design';
 import { ColumnConfig, FormState, MFormDrawer } from '@tmagic/form';
 import type { CodeBlockContent } from '@tmagic/schema';
 
+import CodeEditor from '@editor/layouts/CodeEditor.vue';
 import type { Services } from '@editor/type';
 import { getConfig } from '@editor/utils/config';
 
@@ -43,6 +72,31 @@ const emit = defineEmits<{
 }>();
 
 const services = inject<Services>('services');
+
+const difVisible = ref(false);
+const height = ref(globalThis.innerHeight);
+
+const windowReizehandler = () => {
+  height.value = globalThis.innerHeight;
+};
+
+globalThis.addEventListener('resize', windowReizehandler);
+
+onUnmounted(() => {
+  globalThis.removeEventListener('resize', windowReizehandler);
+});
+
+const magicVsEditor = ref<InstanceType<typeof CodeEditor>>();
+
+const diffChange = () => {
+  if (!magicVsEditor.value || !fomDrawer.value?.form) {
+    return;
+  }
+
+  fomDrawer.value.form.values.content = magicVsEditor.value.getEditorValue();
+
+  difVisible.value = false;
+};
 
 const columnWidth = computed(() => services?.uiService.get('columnWidth'));
 const size = computed(() =>
