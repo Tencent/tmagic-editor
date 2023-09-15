@@ -481,7 +481,15 @@ export interface Components {
   };
 
   drawer: {
-    component: DefineComponent<DrawerProps, {}, any> | string;
+    component:
+      | DefineComponent<
+          DrawerProps,
+          {
+            handleClose: () => void;
+          },
+          any
+        >
+      | string;
     props: (props: DrawerProps) => DrawerProps;
   };
 
