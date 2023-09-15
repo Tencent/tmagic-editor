@@ -1,6 +1,7 @@
 <template>
   <TMagicDrawer
     class="m-form-drawer"
+    ref="drawer"
     v-model="visible"
     :title="title"
     :close-on-press-escape="closeOnPressEscape"
@@ -9,8 +10,11 @@
     :close-on-click-modal="true"
     :size="width"
     :zIndex="zIndex"
+    :before-close="beforeClose"
     @open="openHandler"
     @opened="openedHandler"
+    @close="closeHandler"
+    @closed="closedHandler"
   >
     <div v-if="visible" ref="drawerBody" class="m-drawer-body">
       <Form
@@ -37,7 +41,7 @@
         </TMagicCol>
         <TMagicCol :span="12">
           <slot name="footer">
-            <TMagicButton @click="hide">关闭</TMagicButton>
+            <TMagicButton @click="handleClose">关闭</TMagicButton>
             <TMagicButton type="primary" :disabled="disabled" :loading="saveFetch" @click="submitHandler">{{
               confirmText
             }}</TMagicButton>
@@ -75,6 +79,8 @@ withDefaults(
     confirmText?: string;
     inline?: boolean;
     labelPosition?: string;
+    /** 关闭前的回调，会暂停 Drawer 的关闭; done 是个 function type 接受一个 boolean 参数, 执行 done 使用 true 参数或不提供参数将会终止关闭 */
+    beforeClose?: (done: (cancel?: boolean) => void) => void;
   }>(),
   {
     closeOnPressEscape: true,
@@ -84,8 +90,9 @@ withDefaults(
   },
 );
 
-const emit = defineEmits(['close', 'submit', 'error', 'change', 'open', 'opened']);
+const emit = defineEmits(['close', 'closed', 'submit', 'error', 'change', 'open', 'opened']);
 
+const drawer = ref<InstanceType<typeof TMagicDrawer>>();
 const form = ref<InstanceType<typeof Form>>();
 const drawerBody = ref<HTMLDivElement>();
 const visible = ref(false);
@@ -111,12 +118,20 @@ const changeHandler = (value: any) => {
   emit('change', value);
 };
 
-const openHandler = (value: any) => {
-  emit('open', value);
+const openHandler = () => {
+  emit('open');
 };
 
-const openedHandler = (value: any) => {
-  emit('opened', value);
+const openedHandler = () => {
+  emit('opened');
+};
+
+const closeHandler = () => {
+  emit('close');
+};
+
+const closedHandler = () => {
+  emit('closed');
 };
 
 const show = () => {
@@ -127,6 +142,11 @@ const hide = () => {
   visible.value = false;
 };
 
+/** 用于关闭 Drawer, 该方法会调用传入的 before-close 方法 */
+const handleClose = () => {
+  drawer.value?.handleClose();
+};
+
 defineExpose({
   form,
   saveFetch,
@@ -134,5 +154,6 @@ defineExpose({
 
   show,
   hide,
+  handleClose,
 });
 </script>

@@ -9,16 +9,19 @@
     :config="functionConfig"
     :values="content"
     :disabled="disabled"
+    :before-close="beforeClose"
+    @change="changeHandler"
     @submit="submitForm"
     @error="errorHandler"
     @open="openHandler"
+    @closed="closedHandler"
   ></MFormDrawer>
 </template>
 
 <script lang="ts" setup>
 import { computed, inject, ref } from 'vue';
 
-import { tMagicMessage } from '@tmagic/design';
+import { tMagicMessage, tMagicMessageBox } from '@tmagic/design';
 import { ColumnConfig, FormState, MFormDrawer } from '@tmagic/form';
 import type { CodeBlockContent } from '@tmagic/schema';
 
@@ -139,7 +142,7 @@ const functionConfig = computed(() => [
   },
 ]);
 
-const submitForm = async (values: CodeBlockContent) => {
+const submitForm = (values: CodeBlockContent) => {
   emit('submit', values);
 };
 
@@ -156,6 +159,36 @@ const openHandler = () => {
       codeEditorHeight.value = `${height > 100 ? height : 600}px`;
     }
   });
+};
+
+const changedValue = ref<CodeBlockContent>();
+const changeHandler = (values: CodeBlockContent) => {
+  changedValue.value = values;
+};
+
+const beforeClose = (done: (cancel?: boolean) => void) => {
+  if (!changedValue.value) {
+    done();
+    return;
+  }
+  tMagicMessageBox
+    .confirm('当前代码块已修改，是否保存？', '提示', {
+      confirmButtonText: '保存并关闭',
+      cancelButtonText: '不保存并关闭',
+      type: 'warning',
+      distinguishCancelAndClose: true,
+    })
+    .then(() => {
+      changedValue.value && submitForm(changedValue.value);
+      done();
+    })
+    .catch((action: string) => {
+      done(action === 'close');
+    });
+};
+
+const closedHandler = () => {
+  changedValue.value = undefined;
 };
 
 defineExpose({

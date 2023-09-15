@@ -47,12 +47,12 @@ const props = withDefaults(
     /** 表单配置 */
     config: FormConfig;
     /** 表单值 */
-    initValues: Object;
+    initValues: Record<string, any>;
     /** 需对比的值（开启对比模式时传入） */
-    lastValues?: Object;
+    lastValues?: Record<string, any>;
     /** 是否开启对比模式 */
     isCompare?: boolean;
-    parentValues?: Object;
+    parentValues?: Record<string, any>;
     labelWidth?: string;
     disabled?: boolean;
     height?: string;
