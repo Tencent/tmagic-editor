@@ -94,11 +94,15 @@ class DataSourceManager extends EventEmitter {
       }
     });
 
-    await Promise.all(beforeInit.map((method) => method({ params: {}, dataSource: ds, app: this.app })));
+    for (const method of beforeInit) {
+      await method({ params: {}, dataSource: ds, app: this.app });
+    }
 
     await ds.init();
 
-    await Promise.all(afterInit.map((method) => method({ params: {}, dataSource: ds, app: this.app })));
+    for (const method of afterInit) {
+      await method({ params: {}, dataSource: ds, app: this.app });
+    }
 
     this.setData(ds);
 

@@ -119,18 +119,18 @@ export default class HttpDataSource extends DataSource {
 
   public async request(options: HttpOptions) {
     try {
-      await Promise.all(
-        this.beforeRequest.map((method) => method({ options, params: {}, dataSource: this, app: this.app })),
-      );
+      for (const method of this.beforeRequest) {
+        await method({ options, params: {}, dataSource: this, app: this.app });
+      }
 
       const res = await this.fetch?.({
         ...this.httpOptions,
         ...options,
       });
 
-      await Promise.all(
-        this.afterRequest.map((method) => method({ res, options, params: {}, dataSource: this, app: this.app })),
-      );
+      for (const method of this.afterRequest) {
+        await method({ res, options, params: {}, dataSource: this, app: this.app });
+      }
 
       if (this.schema.responseOptions?.dataPath) {
         const data = getValueByKeyPath(this.schema.responseOptions.dataPath, res);
