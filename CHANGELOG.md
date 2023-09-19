@@ -1,3 +1,14 @@
+# [1.3.0-beta.1](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-beta.0...v1.3.0-beta.1) (2023-09-19)
+
+
+### Features
+
+* **data-source:** timing改成串行 ([28b3d2e](https://github.com/Tencent/tmagic-editor/commit/28b3d2e4b337e6c76c7a00fac6602424efd8d467))
+* **editor,stage:** 新增鼠标悬停在组件上显示当前位置下所有组件菜单 ([1c6c9ab](https://github.com/Tencent/tmagic-editor/commit/1c6c9ab3e86420fcf17ae00c4ec4ec65c6015e19))
+* **editor,util:** 完善数据源配置 ([5840ee5](https://github.com/Tencent/tmagic-editor/commit/5840ee537f698b46ce35400e8b26bbf343f2fc19))
+
+
+
 # [1.3.0-beta.0](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-alpha.24...v1.3.0-beta.0) (2023-09-15)
 
 
