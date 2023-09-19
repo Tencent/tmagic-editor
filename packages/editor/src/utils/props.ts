@@ -248,7 +248,7 @@ export const displayTabConfig: TabPaneConfig = {
             },
             {
               type: 'select',
-              options: (mForm: FormState | undefined, { model }: any) => {
+              options: (mForm, { model }) => {
                 const [id, field] = model.field;
 
                 const ds = dataSourceService.getDataSourceById(id);
@@ -284,23 +284,33 @@ export const displayTabConfig: TabPaneConfig = {
               items: [
                 {
                   name: 'value',
-                  display: (vm: FormState, { model }: any) =>
-                    !['between', 'not_between', 'is', 'not'].includes(model.op),
-                },
-                {
-                  name: 'value',
-                  type: 'select',
+                  type: (mForm, { model }) => {
+                    const [id, field] = model.field;
+
+                    const ds = dataSourceService.getDataSourceById(id);
+
+                    const type = ds?.fields.find((f) => f.name === field)?.type;
+
+                    if (type === 'number') {
+                      return 'number';
+                    }
+
+                    if (type === 'boolean') {
+                      return 'select';
+                    }
+
+                    return 'text';
+                  },
                   options: [
                     { text: 'true', value: true },
                     { text: 'false', value: false },
                   ],
-                  display: (vm: FormState, { model }: any) => ['is', 'not'].includes(model.op),
+                  display: (vm, { model }) => !['between', 'not_between'].includes(model.op),
                 },
                 {
                   name: 'range',
                   type: 'number-range',
-                  display: (vm: FormState, { model }: any) =>
-                    ['between', 'not_between'].includes(model.op) && !['is', 'not'].includes(model.op),
+                  display: (vm, { model }) => ['between', 'not_between'].includes(model.op),
                 },
               ],
             },

@@ -50,7 +50,7 @@
 import { computed, inject, onUnmounted, ref } from 'vue';
 
 import { TMagicButton, TMagicDialog, tMagicMessage, tMagicMessageBox, TMagicTag } from '@tmagic/design';
-import { ColumnConfig, FormState, MFormDrawer } from '@tmagic/form';
+import { ColumnConfig, FormConfig, FormState, MFormDrawer } from '@tmagic/form';
 import type { CodeBlockContent } from '@tmagic/schema';
 
 import CodeEditor from '@editor/layouts/CodeEditor.vue';
@@ -65,6 +65,7 @@ const props = defineProps<{
   content: CodeBlockContent;
   disabled?: boolean;
   isDataSource?: boolean;
+  dataSourceType?: string;
 }>();
 
 const emit = defineEmits<{
@@ -135,10 +136,11 @@ const defaultParamColConfig: ColumnConfig = {
   ],
 };
 
-const functionConfig = computed(() => [
+const functionConfig = computed<FormConfig>(() => [
   {
     text: '名称',
     name: 'name',
+    rules: [{ required: true, message: '请输入名称', trigger: 'blur' }],
   },
   {
     text: '描述',
@@ -148,10 +150,17 @@ const functionConfig = computed(() => [
     text: '执行时机',
     name: 'timing',
     type: 'select',
-    options: [
-      { text: '初始化前', value: 'beforeInit' },
-      { text: '初始化后', value: 'afterInit' },
-    ],
+    options: () => {
+      const options = [
+        { text: '初始化前', value: 'beforeInit' },
+        { text: '初始化后', value: 'afterInit' },
+      ];
+      if (props.dataSourceType !== 'base') {
+        options.push({ text: '请求前', value: 'beforeRequest' });
+        options.push({ text: '请求后', value: 'afterRequest' });
+      }
+      return options;
+    },
     display: () => props.isDataSource,
   },
   {

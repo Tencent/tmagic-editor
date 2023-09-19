@@ -171,6 +171,16 @@ const dataSourceFieldsConfig: FormConfig = [
   {
     name: 'defaultValue',
     text: '默认值',
+    type: (mForm: FormState | undefined, { model }: any) => {
+      if (model.type === 'number') return 'number';
+      if (model.type === 'boolean') return 'select';
+
+      return 'string';
+    },
+    options: [
+      { text: 'true', value: true },
+      { text: 'false', value: false },
+    ],
   },
   {
     name: 'enable',

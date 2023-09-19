@@ -8,6 +8,15 @@ export default [
     defaultValue: true,
   },
   {
+    name: 'responseOptions',
+    items: [
+      {
+        name: 'dataPath',
+        text: '数据路径',
+      },
+    ],
+  },
+  {
     type: 'fieldset',
     name: 'options',
     legend: 'HTTP 配置',

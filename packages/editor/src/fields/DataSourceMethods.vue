@@ -14,6 +14,7 @@
       :disabled="disabled"
       :content="codeConfig"
       :is-data-source="true"
+      :data-source-type="model.type"
       @submit="submitCodeHandler"
     ></CodeBlockEditor>
   </div>
