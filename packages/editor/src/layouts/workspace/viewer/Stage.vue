@@ -24,6 +24,7 @@
     ></div>
     <Teleport to="body">
       <ViewerMenu ref="menu" :is-multi-select="isMultiSelect" :stage-content-menu="stageContentMenu"></ViewerMenu>
+      <NodeListMenu ref="nodeList" :is-multi-select="isMultiSelect"></NodeListMenu>
     </Teleport>
   </ScrollViewer>
 </template>
@@ -40,6 +41,7 @@ import { useStage } from '@editor/hooks/use-stage';
 import { Layout, MenuButton, MenuComponent, Services, StageOptions } from '@editor/type';
 import { getConfig } from '@editor/utils/config';
 
+import NodeListMenu from './NodeListMenu.vue';
 import ViewerMenu from './ViewerMenu.vue';
 
 defineOptions({

@@ -37,6 +37,8 @@ import type { InstallOptions } from './type';
 
 import './theme/index.scss';
 
+export type { OnDrag } from 'gesto';
+
 export type { MoveableOptions } from '@tmagic/stage';
 export * from './type';
 export * from './hooks';

@@ -201,6 +201,8 @@ export interface MenuButton {
   className?: string;
   /** type为dropdown时，下拉的菜单列表， 或者有子菜单时 */
   items?: MenuButton[];
+  /** 唯一标识，用于高亮 */
+  id?: string | number;
 }
 
 export interface MenuComponent {

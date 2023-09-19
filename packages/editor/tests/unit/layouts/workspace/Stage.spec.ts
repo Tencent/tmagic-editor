@@ -20,7 +20,7 @@ import { mount } from '@vue/test-utils';
 
 import { NodeType } from '@tmagic/schema';
 
-import Stage from '@editor/layouts/workspace/Stage.vue';
+import Stage from '@editor/layouts/workspace/viewer/Stage.vue';
 
 globalThis.ResizeObserver =
   globalThis.ResizeObserver ||

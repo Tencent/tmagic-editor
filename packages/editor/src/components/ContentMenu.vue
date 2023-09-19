@@ -1,31 +1,42 @@
 <template>
-  <div v-if="menuData.length" v-show="visible" class="magic-editor-content-menu" ref="menu" :style="menuStyle">
-    <div>
-      <ToolButton
-        v-for="(item, index) in menuData"
-        event-type="mouseup"
-        ref="buttons"
-        :data="item"
-        :key="index"
-        @mouseup="hide"
-        @mouseenter="showSubMenu(item, index)"
-      ></ToolButton>
+  <transition name="fade">
+    <div
+      v-show="visible"
+      class="magic-editor-content-menu"
+      ref="menu"
+      :style="menuStyle"
+      @mouseenter="mouseenterHandler()"
+    >
+      <slot name="title"></slot>
+      <div>
+        <ToolButton
+          v-for="(item, index) in menuData"
+          event-type="mouseup"
+          ref="buttons"
+          :class="{ active: active && item.id === active }"
+          :data="item"
+          :key="index"
+          @mouseup="clickHandler"
+          @mouseenter="showSubMenu(item, index)"
+        ></ToolButton>
+      </div>
+      <teleport to="body">
+        <content-menu
+          v-if="subMenuData.length"
+          class="sub-menu"
+          ref="subMenu"
+          :active="active"
+          :menu-data="subMenuData"
+          :is-sub-menu="true"
+          @hide="hide"
+        ></content-menu>
+      </teleport>
     </div>
-    <teleport to="body">
-      <content-menu
-        v-if="subMenuData.length"
-        class="sub-menu"
-        ref="subMenu"
-        :menu-data="subMenuData"
-        :is-sub-menu="true"
-        @hide="hide"
-      ></content-menu>
-    </teleport>
-  </div>
+  </transition>
 </template>
 
 <script lang="ts" setup>
-import { nextTick, onMounted, onUnmounted, ref } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
 
 import { MenuButton, MenuComponent } from '@editor/type';
 
@@ -39,24 +50,37 @@ const props = withDefaults(
   defineProps<{
     menuData?: (MenuButton | MenuComponent)[];
     isSubMenu?: boolean;
+    active?: string | number;
+    autoHide?: boolean;
   }>(),
   {
     menuData: () => [],
     isSubMenu: false,
+    autoHide: true,
   },
 );
 
-const emit = defineEmits(['hide', 'show']);
+const emit = defineEmits<{
+  hide: [];
+  show: [];
+  mouseenter: [];
+}>();
 
 const menu = ref<HTMLDivElement>();
 const buttons = ref<InstanceType<typeof ToolButton>[]>();
 const subMenu = ref<any>();
 const visible = ref(false);
 const subMenuData = ref<(MenuButton | MenuComponent)[]>([]);
-const menuStyle = ref({
-  left: '0',
-  top: '0',
+
+const menuPosition = ref({
+  left: 0,
+  top: 0,
 });
+
+const menuStyle = computed(() => ({
+  top: `${menuPosition.value.top}px`,
+  left: `${menuPosition.value.left}px`,
+}));
 
 const contains = (el: HTMLElement) => menu.value?.contains(el) || subMenu.value?.contains(el);
 
@@ -69,7 +93,15 @@ const hide = () => {
   emit('hide');
 };
 
-const hideHandler = (e: MouseEvent) => {
+const clickHandler = () => {
+  if (!props.autoHide) return;
+
+  hide();
+};
+
+const outsideClickhideHandler = (e: MouseEvent) => {
+  if (!props.autoHide) return;
+
   const target = e.target as HTMLElement | undefined;
   if (!visible.value || !target) {
     return;
@@ -80,23 +112,31 @@ const hideHandler = (e: MouseEvent) => {
   hide();
 };
 
-const show = (e: MouseEvent) => {
+const setPosition = (e: { clientY: number; clientX: number }) => {
+  const menuHeight = menu.value?.clientHeight || 0;
+
+  let top = e.clientY;
+  if (menuHeight + e.clientY > document.body.clientHeight) {
+    top = document.body.clientHeight - menuHeight;
+  }
+
+  menuPosition.value = {
+    top,
+    left: e.clientX,
+  };
+};
+
+const show = (e?: MouseEvent) => {
   // 加settimeout是以为，如果菜单中的按钮监听的是mouseup，那么菜单显示出来时鼠标如果正好在菜单上就会马上触发按钮的mouseup
   setTimeout(() => {
     visible.value = true;
 
+    if (!e) {
+      return;
+    }
+
     nextTick(() => {
-      const menuHeight = menu.value?.clientHeight || 0;
-
-      let top = e.clientY;
-      if (menuHeight + e.clientY > document.body.clientHeight) {
-        top = document.body.clientHeight - menuHeight;
-      }
-
-      menuStyle.value = {
-        top: `${top}px`,
-        left: `${e.clientX}px`,
-      };
+      setPosition(e);
 
       emit('show');
     });
@@ -126,22 +166,28 @@ const showSubMenu = (item: MenuButton | MenuComponent, index: number) => {
   }, 0);
 };
 
+const mouseenterHandler = () => {
+  emit('mouseenter');
+};
+
 onMounted(() => {
   if (props.isSubMenu) return;
 
-  globalThis.addEventListener('mousedown', hideHandler, true);
+  globalThis.addEventListener('mousedown', outsideClickhideHandler, true);
 });
 
 onUnmounted(() => {
   if (props.isSubMenu) return;
 
-  globalThis.removeEventListener('mousedown', hideHandler, true);
+  globalThis.removeEventListener('mousedown', outsideClickhideHandler, true);
 });
 
 defineExpose({
   menu,
+  menuPosition,
   hide,
   show,
   contains,
+  setPosition,
 });
 </script>

@@ -18,7 +18,7 @@
 
 import { EventEmitter } from 'events';
 
-import type { MoveableOptions } from 'moveable';
+import type { MoveableOptions, OnDragStart } from 'moveable';
 
 import type { Id } from '@tmagic/schema';
 
@@ -217,6 +217,10 @@ export default class StageCore extends EventEmitter {
     return this.actionManager.getMoveableOption(key);
   }
 
+  public getDragStatus() {
+    return this.actionManager.getDragStatus();
+  }
+
   /**
    * 销毁实例
    */
@@ -292,6 +296,7 @@ export default class StageCore extends EventEmitter {
     this.initDrEvent();
     this.initMulDrEvent();
     this.initHighlightEvent();
+    this.initMouseEvent();
   }
 
   /**
@@ -355,5 +360,21 @@ export default class StageCore extends EventEmitter {
     this.actionManager.on('highlight', async (highlightEl: HTMLElement) => {
       this.emit('highlight', highlightEl);
     });
+  }
+
+  /**
+   * 初始化Highlight类通过ActionManager抛出来的事件监听
+   */
+  private initMouseEvent(): void {
+    this.actionManager
+      .on('mousemove', async (event: MouseEvent) => {
+        this.emit('mousemove', event);
+      })
+      .on('mouseleave', async (event: MouseEvent) => {
+        this.emit('mouseleave', event);
+      })
+      .on('drag-start', (e: OnDragStart) => {
+        this.emit('drag-start', e);
+      });
   }
 }

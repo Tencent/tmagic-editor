@@ -105,6 +105,10 @@ export default class StageDragResize extends MoveableOptionsManager {
     this.moveable.updateRect();
   }
 
+  public getDragStatus(): StageDragStatus {
+    return this.dragStatus;
+  }
+
   /**
    * 销毁实例
    */
@@ -187,6 +191,7 @@ export default class StageDragResize extends MoveableOptionsManager {
         this.dragStatus = StageDragStatus.START;
 
         this.dragResizeHelper.onDragStart(e);
+        this.emit('drag-start', e);
       })
       .on('drag', (e) => {
         if (!this.target || !this.dragResizeHelper.getShadowEl()) return;

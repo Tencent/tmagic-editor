@@ -22,6 +22,7 @@
 
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { OnDrag } from 'gesto';
 
 import Resizer from './Resizer.vue';
 
@@ -111,7 +112,7 @@ onUnmounted(() => {
 
 const center = ref(0);
 
-const changeLeft = (deltaX: number) => {
+const changeLeft = ({ deltaX }: OnDrag) => {
   if (typeof props.left === 'undefined') return;
   let left = Math.max(props.left + deltaX, props.minLeft) || 0;
   emit('update:left', left);
@@ -131,7 +132,7 @@ const changeLeft = (deltaX: number) => {
   });
 };
 
-const changeRight = (deltaX: number) => {
+const changeRight = ({ deltaX }: OnDrag) => {
   if (typeof props.right === 'undefined') return;
   let right = Math.max(props.right - deltaX, props.minRight) || 0;
   emit('update:right', right);

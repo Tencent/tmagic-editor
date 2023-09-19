@@ -20,9 +20,9 @@ import { computed, inject } from 'vue';
 
 import { MenuButton, MenuComponent, Services } from '@editor/type';
 
+import MagicStage from './viewer/Stage.vue';
 import Breadcrumb from './Breadcrumb.vue';
 import PageBar from './PageBar.vue';
-import MagicStage from './Stage.vue';
 
 defineOptions({
   name: 'MEditorWorkspace',

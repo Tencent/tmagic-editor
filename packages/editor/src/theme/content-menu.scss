@@ -3,12 +3,13 @@
   font-size: 12px;
   background: #fff;
   box-shadow: 0 2px 8px 2px rgba(68, 73, 77, 0.16);
-  z-index: 9999;
+  z-index: 1000;
   transform-origin: 0% 0%;
   font-weight: 600;
   padding: 4px 0px;
   overflow: auto;
   max-height: 80%;
+  min-width: 180px;
 
   .menu-item {
     color: #333;
@@ -43,8 +44,31 @@
       }
     }
 
+    &.active {
+      background-color: $--theme-color;
+      .tmagic-design-button,
+      .tmagic-design-button:active,
+      .tmagic-design-button:focus {
+        color: #fff;
+        background-color: $--theme-color;
+      }
+
+      &.menu-item i {
+        color: #fff;
+      }
+    }
+
     &:hover {
       background-color: $--hover-color;
+      .tmagic-design-button,
+      .tmagic-design-button:active,
+      .tmagic-design-button:focus {
+        color: $--font-color;
+      }
+
+      &.menu-item i {
+        color: $--font-color;
+      }
     }
   }
 }

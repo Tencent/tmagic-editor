@@ -19,7 +19,7 @@ import EventEmitter from 'events';
 
 import KeyController from 'keycon';
 import { throttle } from 'lodash-es';
-import type { MoveableOptions } from 'moveable';
+import type { MoveableOptions, OnDragStart } from 'moveable';
 
 import { Env } from '@tmagic/core';
 import type { Id } from '@tmagic/schema';
@@ -88,6 +88,9 @@ export default class ActionManager extends EventEmitter {
       this.clearHighlight();
       return;
     }
+
+    this.emit('mousemove', event);
+
     this.highlight(el);
   }, throttleTime);
 
@@ -203,6 +206,8 @@ export default class ActionManager extends EventEmitter {
    */
   public async getElementFromPoint(event: MouseEvent): Promise<HTMLElement | undefined> {
     const els = this.getElementsFromPoint(event as Point);
+
+    this.emit('get-elements-from-point', els);
 
     let stopped = false;
     const stop = () => (stopped = true);
@@ -341,6 +346,10 @@ export default class ActionManager extends EventEmitter {
       }, this.containerHighlightDuration);
     }
     return undefined;
+  }
+
+  public getDragStatus() {
+    return this.dr.getDragStatus();
   }
 
   public destroy(): void {
@@ -484,6 +493,9 @@ export default class ActionManager extends EventEmitter {
           data: [{ el: drTarget }],
         };
         this.emit('remove', data);
+      })
+      .on('drag-start', (e: OnDragStart) => {
+        this.emit('drag-start', e);
       });
 
     this.multiDr
