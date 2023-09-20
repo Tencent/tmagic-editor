@@ -163,7 +163,14 @@ class DataSourceManager extends EventEmitter {
       let result = true;
       for (const { op, value, range, field } of cond) {
         const [sourceId, fieldKey] = field;
-        const fieldValue = this.data[sourceId][fieldKey];
+
+        const dsData = this.data[sourceId];
+
+        if (!dsData || !fieldKey) {
+          break;
+        }
+
+        const fieldValue = dsData[fieldKey];
         if (!compiledCond(op, fieldValue, value, range)) {
           result = false;
           break;

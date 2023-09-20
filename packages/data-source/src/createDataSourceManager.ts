@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { cloneDeep } from 'lodash-es';
+import { cloneDeep, union } from 'lodash-es';
 
 import type { AppCore } from '@tmagic/schema';
 import { getDepNodeIds, getNodes, replaceChildNode } from '@tmagic/utils';
@@ -48,28 +48,20 @@ export const createDataSourceManager = (app: AppCore) => {
   }
 
   dataSourceManager.on('change', (sourceId: string) => {
-    const dep = dsl.dataSourceDeps?.[sourceId];
-    const condDep = dsl.dataSourceCondDeps?.[sourceId];
+    const dep = dsl.dataSourceDeps?.[sourceId] || {};
+    const condDep = dsl.dataSourceCondDeps?.[sourceId] || {};
 
-    if (condDep) {
-      dataSourceManager.emit(
-        'update-data',
-        getNodes(Object.keys(condDep), dsl.items).map((node) => {
-          const newNode = cloneDeep(node);
-          newNode.condResult = dataSourceManager.compliedConds(node);
-          return newNode;
-        }),
-        sourceId,
-      );
-    }
+    const nodeIds = union([...Object.keys(condDep), ...Object.keys(dep)]);
 
-    if (dep) {
-      dataSourceManager.emit(
-        'update-data',
-        getNodes(Object.keys(dep), dsl.items).map((node) => dataSourceManager.compiledNode(node)),
-        sourceId,
-      );
-    }
+    dataSourceManager.emit(
+      'update-data',
+      getNodes(nodeIds, dsl.items).map((node) => {
+        const newNode = cloneDeep(node);
+        newNode.condResult = dataSourceManager.compliedConds(node);
+        return dataSourceManager.compiledNode(newNode);
+      }),
+      sourceId,
+    );
   });
 
   return dataSourceManager;

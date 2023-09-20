@@ -175,7 +175,7 @@ const dataSourceFieldsConfig: FormConfig = [
       if (model.type === 'number') return 'number';
       if (model.type === 'boolean') return 'select';
 
-      return 'string';
+      return 'text';
     },
     options: [
       { text: 'true', value: true },
