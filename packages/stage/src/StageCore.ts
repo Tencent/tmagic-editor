@@ -367,10 +367,10 @@ export default class StageCore extends EventEmitter {
    */
   private initMouseEvent(): void {
     this.actionManager
-      .on('mousemove', async (event: MouseEvent) => {
+      .on('mousemove', (event: MouseEvent) => {
         this.emit('mousemove', event);
       })
-      .on('mouseleave', async (event: MouseEvent) => {
+      .on('mouseleave', (event: MouseEvent) => {
         this.emit('mouseleave', event);
       })
       .on('drag-start', (e: OnDragStart) => {

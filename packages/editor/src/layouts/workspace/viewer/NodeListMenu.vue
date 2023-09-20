@@ -1,6 +1,8 @@
 <template>
-  <content-menu
+  <ContentMenu
     ref="menu"
+    class="magic-editor-node-list-menu"
+    style="max-width: 280px"
     :menu-data="menuData"
     :active="node?.id"
     :auto-hide="!pinned"
@@ -9,7 +11,7 @@
     <template #title>
       <NodeListMenuTitle v-model:pinned="pinned" @change="dragMenuHandler" @close="closeHandler"></NodeListMenuTitle>
     </template>
-  </content-menu>
+  </ContentMenu>
 </template>
 
 <script lang="ts" setup>
@@ -53,6 +55,14 @@ const cancel = () => {
   menu.value?.hide();
 };
 
+const clearTimeoutLazy = () => {
+  globalThis.setTimeout(() => {
+    if (timeout) {
+      globalThis.clearTimeout(timeout);
+    }
+  }, 300);
+};
+
 const unWatch = watch(
   stage,
   (stage) => {
@@ -90,7 +100,8 @@ const unWatch = watch(
     });
 
     stage.on('mouseleave', () => {
-      cancel();
+      // mouseleave后，大概率还有最后一个mousemove事件，这里延迟清除
+      clearTimeoutLazy();
     });
 
     unWatch();
@@ -135,11 +146,7 @@ const menuData = computed<MenuButton[]>(() =>
 
 const mouseenterHandler = () => {
   // menu的mouseenter后，大概率还有最后一个mousemove事件，这里延迟清除
-  globalThis.setTimeout(() => {
-    if (timeout) {
-      globalThis.clearTimeout(timeout);
-    }
-  }, 300);
+  clearTimeoutLazy();
 };
 
 const dragMenuHandler = ({ deltaY, deltaX }: OnDrag) => {

@@ -567,8 +567,9 @@ export default class ActionManager extends EventEmitter {
     }
   };
 
-  private mouseLeaveHandler = () => {
+  private mouseLeaveHandler = (event: MouseEvent) => {
     setTimeout(() => this.clearHighlight(), throttleTime);
+    this.emit('mouseleave', event);
   };
 
   private mouseWheelHandler = () => {

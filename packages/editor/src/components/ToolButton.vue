@@ -16,7 +16,7 @@
           ><MIcon v-if="data.icon" :icon="data.icon"></MIcon><span>{{ data.text }}</span></TMagicButton
         >
       </TMagicTooltip>
-      <TMagicButton v-else size="small" text :disabled="disabled"
+      <TMagicButton v-else size="small" text :disabled="disabled" :title="data.text"
         ><MIcon v-if="data.icon" :icon="data.icon"></MIcon><span>{{ data.text }}</span></TMagicButton
       >
     </template>

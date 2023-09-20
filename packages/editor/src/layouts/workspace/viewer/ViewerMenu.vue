@@ -1,5 +1,5 @@
 <template>
-  <content-menu :menu-data="menuData" ref="menu"></content-menu>
+  <ContentMenu :menu-data="menuData" ref="menu"></ContentMenu>
 </template>
 
 <script lang="ts" setup>
