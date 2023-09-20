@@ -44,30 +44,32 @@
       }
     }
 
-    &.active {
-      background-color: $--theme-color;
-      .tmagic-design-button,
-      .tmagic-design-button:active,
-      .tmagic-design-button:focus {
-        color: #fff;
+    &.button {
+      &:hover {
+        background-color: $--hover-color;
+        .tmagic-design-button,
+        .tmagic-design-button:active,
+        .tmagic-design-button:focus {
+          color: $--font-color;
+        }
+
+        &.menu-item i {
+          color: $--font-color;
+        }
+      }
+
+      &.active {
         background-color: $--theme-color;
-      }
+        .tmagic-design-button,
+        .tmagic-design-button:active,
+        .tmagic-design-button:focus {
+          color: #fff;
+          background-color: transparent;
+        }
 
-      &.menu-item i {
-        color: #fff;
-      }
-    }
-
-    &:hover {
-      background-color: $--hover-color;
-      .tmagic-design-button,
-      .tmagic-design-button:active,
-      .tmagic-design-button:focus {
-        color: $--font-color;
-      }
-
-      &.menu-item i {
-        color: $--font-color;
+        &.menu-item i {
+          color: #fff;
+        }
       }
     }
   }
