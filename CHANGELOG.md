@@ -1,3 +1,18 @@
+# [1.3.0-beta.2](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-beta.1...v1.3.0-beta.2) (2023-09-21)
+
+
+### Bug Fixes
+
+* **data-source:** 组件配置与条件关联了不同数据源时，编译问题 ([36988cd](https://github.com/Tencent/tmagic-editor/commit/36988cd3e08be743b4d6c92c6e7de0be9ce5f01e))
+* **editor,stage:** 优化悬停出现组件列表的交互体验 ([5a25899](https://github.com/Tencent/tmagic-editor/commit/5a25899b5701c0539d3bf7002e3710895501addd))
+
+
+### Features
+
+* **editor:** 数据源事件配置 ([8b7a1e4](https://github.com/Tencent/tmagic-editor/commit/8b7a1e4e3ca2faee77ddf19c0a16abc6d114a907))
+
+
+
 # [1.3.0-beta.1](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-beta.0...v1.3.0-beta.1) (2023-09-19)
 
 
