@@ -78,9 +78,6 @@ export default defineConfig({
   },
 
   server: {
-    fs: {
-      strict: false,
-    },
     host: '0.0.0.0',
     port: 8098,
     strictPort: true,

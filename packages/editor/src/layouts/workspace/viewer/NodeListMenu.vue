@@ -80,7 +80,7 @@ const unWatch = watch(
       }
 
       timeout = globalThis.setTimeout(() => {
-        const els = stage?.renderer.getElementsFromPoint(event);
+        const els = stage.renderer.getElementsFromPoint(event) || [];
 
         const nodes = getNodes(
           els.map((el) => el.id),
