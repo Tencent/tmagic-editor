@@ -29,6 +29,18 @@ const fillConfig = (config: FormConfig): FormConfig => [
       },
     ],
   },
+  {
+    type: 'panel',
+    title: '事件配置',
+    display: false,
+    items: [
+      {
+        name: 'events',
+        src: 'datasource',
+        type: 'event-select',
+      },
+    ],
+  },
 ];
 
 export const getFormConfig = (type: string, configs: Record<string, FormConfig>): FormConfig => {

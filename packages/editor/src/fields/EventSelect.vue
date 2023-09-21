@@ -52,6 +52,7 @@ import { computed, inject } from 'vue';
 import { Delete } from '@element-plus/icons-vue';
 import { has } from 'lodash-es';
 
+import type { EventOption } from '@tmagic/core';
 import { TMagicButton } from '@tmagic/design';
 import type { FieldProps, FormState } from '@tmagic/form';
 import { ActionType } from '@tmagic/schema';
@@ -75,11 +76,22 @@ const eventNameConfig = computed(() => {
     text: '事件',
     type: 'select',
     labelWidth: '40px',
-    options: (mForm: FormState, { formValue }: any) =>
-      services?.eventsService.getEvent(formValue.type).map((option: any) => ({
+    options: (mForm: FormState, { formValue }: any) => {
+      let events: EventOption[] = [];
+
+      if (!services) return events;
+
+      if (props.config.src === 'component') {
+        events = services.eventsService.getEvent(formValue.type);
+      } else if (props.config.src === 'datasource') {
+        events = services.dataSourceService.getFormEvent(formValue.type);
+      }
+
+      return events.map((option) => ({
         text: option.label,
         value: option.value,
-      })),
+      }));
+    },
   };
   return { ...defaultEventNameConfig, ...props.config.eventNameConfig };
 });

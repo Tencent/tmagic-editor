@@ -205,6 +205,7 @@ export const eventTabConfig: TabPaneConfig = {
   items: [
     {
       name: 'events',
+      src: 'component',
       type: 'event-select',
     },
   ],

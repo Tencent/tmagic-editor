@@ -1,6 +1,7 @@
 import { reactive } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
+import type { EventOption } from '@tmagic/core';
 import type { FormConfig } from '@tmagic/form';
 import type { DataSourceSchema } from '@tmagic/schema';
 import { guid } from '@tmagic/utils';
@@ -16,6 +17,7 @@ interface State {
   editable: boolean;
   configs: Record<string, FormConfig>;
   values: Record<string, Partial<DataSourceSchema>>;
+  events: Record<string, EventOption[]>;
 }
 
 type StateKey = keyof State;
@@ -26,6 +28,7 @@ class DataSource extends BaseService {
     editable: true,
     configs: {},
     values: {},
+    events: {},
   });
 
   public set<K extends StateKey, T extends State[K]>(name: K, value: T) {
@@ -50,6 +53,14 @@ class DataSource extends BaseService {
 
   public setFormValue(type: string, value: Partial<DataSourceSchema>) {
     this.get('values')[type] = value;
+  }
+
+  public getFormEvent(type = 'base') {
+    return this.get('events')[type] || [];
+  }
+
+  public setFormEvent(type: string, value: EventOption[] = []) {
+    this.get('events')[type] = value;
   }
 
   public add(config: DataSourceSchema) {

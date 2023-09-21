@@ -418,6 +418,7 @@ export interface HistoryState {
 export interface EventSelectConfig {
   name: string;
   type: 'event-select';
+  src: 'datasource' | 'component';
   /** 事件名称表单配置 */
   eventNameConfig?: FormItem;
   /** 动作类型配置 */
