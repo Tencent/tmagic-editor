@@ -145,12 +145,16 @@ const show = (e?: MouseEvent) => {
 
 const showSubMenu = (item: MenuButton | MenuComponent, index: number) => {
   const menuItem = item as MenuButton;
-  if (typeof item !== 'object' || !menuItem.items?.length) {
+  if (typeof item !== 'object') {
     return;
   }
 
   subMenuData.value = menuItem.items || [];
   setTimeout(() => {
+    if (!visible.value) {
+      return;
+    }
+
     if (menu.value) {
       // 将子菜单放置在按钮右侧，与按钮齐平
       let y = menu.value.offsetTop;
