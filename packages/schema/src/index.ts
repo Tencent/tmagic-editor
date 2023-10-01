@@ -200,6 +200,13 @@ export interface DataSchema {
   fields?: DataSchema[];
 }
 
+export interface MockSchema {
+  title: string;
+  description?: string;
+  enable: boolean;
+  data: Record<string | number, any>;
+}
+
 export interface DataSourceSchema {
   /** 数据源类型，根据类型来实例化；例如http则使用new HttpDataSource */
   type: string;
@@ -213,6 +220,8 @@ export interface DataSourceSchema {
   fields: DataSchema[];
   /** 方法列表 */
   methods: CodeBlockContent[];
+  /** mock数据 */
+  mocks?: MockSchema[];
   /** 扩展字段 */
   [key: string]: any;
 }

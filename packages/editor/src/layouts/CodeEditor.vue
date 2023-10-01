@@ -27,6 +27,8 @@ import serialize from 'serialize-javascript';
 
 import { TMagicButton } from '@tmagic/design';
 
+import { getConfig } from '@editor/utils/config';
+
 defineOptions({
   name: 'MEditorCodeEditor',
 });
@@ -42,6 +44,7 @@ const props = withDefaults(
     };
     height?: string;
     autoSave?: boolean;
+    parse?: boolean;
   }>(),
   {
     autoSave: true,
@@ -49,6 +52,7 @@ const props = withDefaults(
     options: () => ({
       tabSize: 2,
     }),
+    parse: false,
   },
 );
 
@@ -57,7 +61,7 @@ const emit = defineEmits(['initd', 'save']);
 const toString = (v: string | any, language: string): string => {
   let value = '';
   if (typeof v !== 'string') {
-    if (props.language.toLocaleLowerCase() === 'json') {
+    if (language === 'json') {
       value = JSON.stringify(v, null, 2);
     } else {
       value = serialize(v, {
@@ -72,6 +76,18 @@ const toString = (v: string | any, language: string): string => {
     value = `(${value})`;
   }
   return value;
+};
+
+const parse = (v: string | any, language: string): any => {
+  if (typeof v !== 'string') {
+    return v;
+  }
+
+  if (language === 'json') {
+    return JSON.parse(v);
+  }
+
+  return getConfig('parseDSL')(v);
 };
 
 let vsEditor: monaco.editor.IStandaloneCodeEditor | null = null;
@@ -89,7 +105,7 @@ const resizeObserver = new globalThis.ResizeObserver(
 );
 
 const setEditorValue = (v: string | any, m: string | any) => {
-  values.value = toString(v, props.language);
+  values.value = toString(v, props.language.toLocaleLowerCase());
 
   if (props.type === 'diff') {
     const originalModel = monaco.editor.createModel(values.value, 'text/javascript');
@@ -135,7 +151,7 @@ const init = async () => {
       e.stopPropagation();
       const newValue = getEditorValue();
       values.value = newValue;
-      emit('save', newValue);
+      emit('save', props.parse ? parse(newValue, props.language) : newValue);
     }
   });
 
@@ -144,7 +160,7 @@ const init = async () => {
       const newValue = getEditorValue();
       if (values.value !== newValue) {
         values.value = newValue;
-        emit('save', newValue);
+        emit('save', props.parse ? parse(newValue, props.language) : newValue);
       }
     });
   }

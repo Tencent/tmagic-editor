@@ -8,7 +8,11 @@
     :prop="config.prop"
   >
     <template v-slot="scope">
-      <component :is="config.component" v-bind="componentProps(scope.row)"></component>
+      <component
+        :is="config.component"
+        v-bind="componentProps(scope.row, scope.$index)"
+        v-on="componentListeners(scope.row, scope.$index)"
+      ></component>
     </template>
   </TMagicTableColumn>
 </template>
@@ -31,10 +35,17 @@ const props = withDefaults(
   },
 );
 
-const componentProps = (row: any) => {
+const componentProps = (row: any, index: number) => {
   if (typeof props.config.props === 'function') {
-    return props.config.props(row) || {};
+    return props.config.props(row, index) || {};
   }
   return props.config.props || {};
+};
+
+const componentListeners = (row: any, index: number) => {
+  if (typeof props.config.listeners === 'function') {
+    return props.config.listeners(row, index) || {};
+  }
+  return props.config.listeners || {};
 };
 </script>

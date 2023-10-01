@@ -7,6 +7,7 @@
       ...config.options,
       readOnly: disabled,
     }"
+    :parse="config.parse"
     @save="save"
   ></MagicCodeEditor>
 </template>
@@ -20,14 +21,19 @@ defineOptions({
   name: 'MEditorCode',
 });
 
-const emit = defineEmits(['change']);
+const emit = defineEmits<{
+  change: [value: string | any];
+}>();
 
 const props = withDefaults(
   defineProps<
     FieldProps<{
       language?: string;
-      options?: Object;
+      options?: {
+        [key: string]: any;
+      };
       height?: string;
+      parse?: boolean;
     }>
   >(),
   {
@@ -35,7 +41,7 @@ const props = withDefaults(
   },
 );
 
-const save = (v: string) => {
+const save = (v: string | any) => {
   props.model[props.name] = v;
   emit('change', v);
 };

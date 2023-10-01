@@ -9,7 +9,7 @@
     <MFormDrawer
       ref="addDialog"
       label-width="80px"
-      :title="filedTitle"
+      :title="fieldTitle"
       :config="dataSourceFieldsConfig"
       :values="fieldValues"
       :parentValues="model[name]"
@@ -50,13 +50,13 @@ const services = inject<Services>('services');
 
 const addDialog = ref<InstanceType<typeof MFormDrawer>>();
 const fieldValues = ref<Record<string, any>>({});
-const filedTitle = ref('');
+const fieldTitle = ref('');
 
 const width = computed(() => globalThis.document.body.clientWidth - (services?.uiService.get('columnWidth').left || 0));
 
 const newHandler = () => {
   fieldValues.value = {};
-  filedTitle.value = '新增属性';
+  fieldTitle.value = '新增属性';
   addDialog.value?.show();
 };
 
@@ -100,7 +100,7 @@ const fieldColumns = [
             ...row,
             index,
           };
-          filedTitle.value = `编辑${row.title}`;
+          fieldTitle.value = `编辑${row.title}`;
           addDialog.value?.show();
         },
       },

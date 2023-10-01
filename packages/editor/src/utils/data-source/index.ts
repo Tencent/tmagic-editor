@@ -41,6 +41,17 @@ const fillConfig = (config: FormConfig): FormConfig => [
       },
     ],
   },
+  {
+    type: 'panel',
+    title: 'mock数据',
+    items: [
+      {
+        name: 'mocks',
+        type: 'data-source-mocks',
+        defaultValue: () => [],
+      },
+    ],
+  },
 ];
 
 export const getFormConfig = (type: string, configs: Record<string, FormConfig>): FormConfig => {

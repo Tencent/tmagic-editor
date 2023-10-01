@@ -62,8 +62,10 @@ export type ColumnConfig = {
   expandContent?: (row: any, prop?: string) => string;
   /** 当type为expand时，展开为vue组件；当type为component时显示的组件 */
   component?: any;
-  /** 当type为expand时有效，展开的vue组件props */
+  /** 当type为expand时，展开的vue组件props；当type为component时显示的组件的props */
   props?: any;
+  /** 当type为component时显示的组件的事件监听 */
+  listeners?: any;
   /** 当type为tip时有效，显示文案 */
   buttonText?: string;
 };
