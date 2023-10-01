@@ -27,6 +27,7 @@ interface TypeAssertionOption {
   ast: Ast;
   indexPath: string;
   componentFileAffix?: string;
+  datasoucreSuperClass?: string[];
 }
 
 const isFile = (filePath: string) => fs.existsSync(filePath) && fs.lstatSync(filePath).isFile();
@@ -76,7 +77,12 @@ const npmInstall = function (dependencies: Record<string, string>, cwd: string, 
  * @param {String} indexPath
  * @return {Object} { type: '', imports: [] } 返回传入组件的类型。如果是组件包，imports 中包含所有子组件的入口文件路径
  */
-const typeAssertion = function ({ ast, indexPath, componentFileAffix }: TypeAssertionOption): TypeAssertion {
+const typeAssertion = function ({
+  ast,
+  indexPath,
+  componentFileAffix,
+  datasoucreSuperClass,
+}: TypeAssertionOption): TypeAssertion {
   const n = recast.types.namedTypes;
 
   const result: TypeAssertion = {
@@ -102,7 +108,12 @@ const typeAssertion = function ({ ast, indexPath, componentFileAffix }: TypeAsse
       if (isFile(defaultFile)) {
         const defaultCode = fs.readFileSync(defaultFile, { encoding: 'utf-8', flag: 'r' });
         const ast = recast.parse(defaultCode, { parser: require('recast/parsers/typescript') });
-        if (isDatasource(ast.program.body.find((node: any) => node.type === 'ExportDefaultDeclaration')?.declaration)) {
+        if (
+          isDatasource(
+            datasoucreSuperClass,
+            ast.program.body.find((node: any) => node.type === 'ExportDefaultDeclaration')?.declaration,
+          )
+        ) {
           result.type = PackageType.DATASOURCE;
           return false;
         }
@@ -154,7 +165,7 @@ const typeAssertion = function ({ ast, indexPath, componentFileAffix }: TypeAsse
     }
   }
 
-  if (isDatasource(exportDefaultClass)) {
+  if (isDatasource(datasoucreSuperClass, exportDefaultClass)) {
     result.type = PackageType.DATASOURCE;
   }
 
@@ -217,7 +228,8 @@ const isPlugin = function (properties: any[]) {
   return !!match;
 };
 
-const isDatasource = (exportDefaultClass: any) => exportDefaultClass?.superClass?.name === 'DataSource';
+const isDatasource = (datasoucreSuperClass: string[] = [], exportDefaultClass: any) =>
+  [...datasoucreSuperClass, 'DataSource', 'HttpDataSource'].includes(exportDefaultClass?.superClass?.name);
 
 const getComponentPackageImports = function ({
   result,
@@ -428,7 +440,7 @@ const getDependencies = (dependencies: Record<string, string>, packagePath: stri
 
 const setPackages = (packages: ModuleMainFilePath, app: App, packagePath: string, key?: string) => {
   const { options } = app;
-  const { temp, source, componentFileAffix } = options;
+  const { temp, source, componentFileAffix, datasoucreSuperClass } = options;
 
   let { name: moduleName } = splitNameVersion(packagePath);
 
@@ -455,7 +467,7 @@ const setPackages = (packages: ModuleMainFilePath, app: App, packagePath: string
 
   const indexCode = fs.readFileSync(indexPath, { encoding: 'utf-8', flag: 'r' });
   const ast: Ast = recast.parse(indexCode, { parser: require('recast/parsers/typescript') });
-  const result = typeAssertion({ ast, indexPath, componentFileAffix });
+  const result = typeAssertion({ ast, indexPath, componentFileAffix, datasoucreSuperClass });
 
   // 组件&插件&数据源包
   if (result.type === PackageType.COMPONENT_PACKAGE) {
