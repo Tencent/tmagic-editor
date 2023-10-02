@@ -27,6 +27,7 @@ import { TMagicButton, tMagicMessageBox, TMagicSwitch } from '@tmagic/design';
 import { type FieldProps, type FormConfig, type FormState, MFormDrawer } from '@tmagic/form';
 import type { MockSchema } from '@tmagic/schema';
 import { MagicTable } from '@tmagic/table';
+import { getDefaultValueFromFields } from '@tmagic/utils';
 
 import { Services } from '@editor/type';
 
@@ -131,11 +132,7 @@ const columns = [
     }),
     listeners: (row: MockSchema, index: number) => ({
       'update:modelValue': (v: boolean) => {
-        formChangeHandler({
-          ...row,
-          enable: v,
-          index,
-        });
+        toggleEnable(row, v, index);
       },
     }),
   },
@@ -168,7 +165,9 @@ const columns = [
 ];
 
 const newHandler = () => {
-  formValues.value = {};
+  formValues.value = {
+    data: getDefaultValueFromFields(props.model.fields || []),
+  };
   drawerTitle.value = '新增Mock';
   addDialog.value?.show();
 };
@@ -183,5 +182,19 @@ const formChangeHandler = ({ index, ...value }: Record<string, any>) => {
   addDialog.value?.hide();
 
   emit('change', props.model[props.name]);
+};
+
+const toggleEnable = (row: MockSchema, enable: boolean, index: number) => {
+  if (enable) {
+    props.model[props.name].forEach((item: MockSchema) => {
+      item.enable = false;
+    });
+  }
+
+  formChangeHandler({
+    ...row,
+    enable,
+    index,
+  });
 };
 </script>
