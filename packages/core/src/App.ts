@@ -48,6 +48,7 @@ interface AppOptionsConfig {
   jsEngine?: 'browser' | 'hippy';
   designWidth?: number;
   curPage?: Id;
+  useMock?: boolean;
   transformStyle?: (style: Record<string, any>) => Record<string, any>;
   request?: RequestFunction;
 }
@@ -66,6 +67,7 @@ class App extends EventEmitter implements AppCore {
 
   public page?: Page;
 
+  public useMock = false;
   public platform = 'mobile';
   public jsEngine = 'browser';
   public designWidth = 375;
@@ -85,6 +87,10 @@ class App extends EventEmitter implements AppCore {
     this.codeDsl = options.config?.codeBlocks;
     options.platform && (this.platform = options.platform);
     options.jsEngine && (this.jsEngine = options.jsEngine);
+
+    if (typeof options.useMock === 'boolean') {
+      this.useMock = options.useMock;
+    }
 
     if (typeof options.designWidth !== 'undefined') {
       this.setDesignWidth(options.designWidth);
@@ -174,7 +180,7 @@ class App extends EventEmitter implements AppCore {
       this.dataSourceManager.destroy();
     }
 
-    this.dataSourceManager = createDataSourceManager(this);
+    this.dataSourceManager = createDataSourceManager(this, this.useMock);
 
     this.codeDsl = config.codeBlocks;
     this.setPage(curPage || this.page?.data?.id);

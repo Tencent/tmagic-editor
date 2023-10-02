@@ -123,10 +123,12 @@ export default class HttpDataSource extends DataSource {
         await method({ options, params: {}, dataSource: this, app: this.app });
       }
 
-      const res = await this.fetch?.({
-        ...this.httpOptions,
-        ...options,
-      });
+      const res = this.mockData
+        ? this.mockData.data
+        : await this.fetch?.({
+            ...this.httpOptions,
+            ...options,
+          });
 
       for (const method of this.afterRequest) {
         await method({ res, options, params: {}, dataSource: this, app: this.app });

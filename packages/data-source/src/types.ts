@@ -3,6 +3,7 @@ import type { AppCore, DataSourceSchema, HttpOptions, RequestFunction } from '@t
 export interface DataSourceOptions {
   schema: DataSourceSchema;
   app: AppCore;
+  useMock?: boolean;
 }
 
 export interface HttpDataSourceSchema extends DataSourceSchema {
@@ -14,14 +15,14 @@ export interface HttpDataSourceSchema extends DataSourceSchema {
   autoFetch?: boolean;
 }
 
-export interface HttpDataSourceOptions {
+export interface HttpDataSourceOptions extends DataSourceOptions {
   schema: HttpDataSourceSchema;
-  app: AppCore;
   request?: RequestFunction;
 }
 
 export interface DataSourceManagerOptions {
   app: AppCore;
+  useMock?: boolean;
 }
 
 export interface DataSourceManagerData {

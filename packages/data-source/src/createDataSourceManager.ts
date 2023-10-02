@@ -28,11 +28,11 @@ import DataSourceManager from './DataSourceManager';
  * @param httpDataSourceOptions http 数据源配置
  * @returns DataSourceManager
  */
-export const createDataSourceManager = (app: AppCore) => {
+export const createDataSourceManager = (app: AppCore, useMock?: boolean) => {
   const { dsl, platform } = app;
   if (!dsl?.dataSources) return;
 
-  const dataSourceManager = new DataSourceManager({ app });
+  const dataSourceManager = new DataSourceManager({ app, useMock });
 
   if (dsl.dataSources && dsl.dataSourceCondDeps && platform !== 'editor') {
     getNodes(getDepNodeIds(dsl.dataSourceCondDeps), dsl.items).forEach((node) => {

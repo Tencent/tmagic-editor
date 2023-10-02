@@ -17,7 +17,7 @@
  */
 import EventEmitter from 'events';
 
-import type { AppCore, CodeBlockContent, DataSchema } from '@tmagic/schema';
+import type { AppCore, CodeBlockContent, DataSchema, MockSchema } from '@tmagic/schema';
 import { getDefaultValueFromFields } from '@tmagic/utils';
 
 import type { DataSourceOptions } from '@data-source/types';
@@ -36,6 +36,8 @@ export default class DataSource extends EventEmitter {
 
   public app: AppCore;
 
+  protected mockData?: MockSchema;
+
   private fields: DataSchema[] = [];
   private methods: CodeBlockContent[] = [];
 
@@ -47,7 +49,15 @@ export default class DataSource extends EventEmitter {
     this.setFields(options.schema.fields);
     this.setMethods(options.schema.methods || []);
 
+    if (typeof options.useMock === 'boolean' && options.useMock) {
+      this.mockData = options.schema.mocks?.find((mock) => mock.enable);
+    }
+
     this.updateDefaultData();
+
+    if (this.mockData) {
+      this.setData(this.mockData.data);
+    }
   }
 
   public setFields(fields: DataSchema[]) {

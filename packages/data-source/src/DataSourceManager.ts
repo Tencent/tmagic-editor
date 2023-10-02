@@ -43,13 +43,13 @@ class DataSourceManager extends EventEmitter {
 
   public data: DataSourceManagerData = {};
 
-  constructor({ app }: DataSourceManagerOptions) {
+  constructor({ app, useMock }: DataSourceManagerOptions) {
     super();
 
     this.app = app;
 
     app.dsl?.dataSources?.forEach((config) => {
-      this.addDataSource(config);
+      this.addDataSource(config, useMock);
     });
   }
 
@@ -57,7 +57,7 @@ class DataSourceManager extends EventEmitter {
     return this.dataSourceMap.get(id);
   }
 
-  public async addDataSource(config?: DataSourceSchema) {
+  public async addDataSource(config?: DataSourceSchema, useMock?: boolean) {
     if (!config) return;
 
     let ds: DataSource;
@@ -66,6 +66,7 @@ class DataSourceManager extends EventEmitter {
         app: this.app,
         schema: config as HttpDataSourceSchema,
         request: this.app.request,
+        useMock,
       });
     } else {
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -74,12 +75,17 @@ class DataSourceManager extends EventEmitter {
       ds = new DataSourceClass({
         app: this.app,
         schema: config,
+        useMock,
       });
     }
 
     this.dataSourceMap.set(config.id, ds);
 
     this.data[ds.id] = ds.data;
+
+    ds.on('change', () => {
+      this.setData(ds);
+    });
 
     const beforeInit: ((...args: any[]) => any)[] = [];
     const afterInit: ((...args: any[]) => any)[] = [];
@@ -103,12 +109,6 @@ class DataSourceManager extends EventEmitter {
     for (const method of afterInit) {
       await method({ params: {}, dataSource: ds, app: this.app });
     }
-
-    this.setData(ds);
-
-    ds.on('change', () => {
-      this.setData(ds);
-    });
   }
 
   public setData(ds: DataSource) {
