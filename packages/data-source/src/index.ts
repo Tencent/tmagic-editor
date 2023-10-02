@@ -19,5 +19,4 @@
 export { default as DataSourceManager } from './DataSourceManager';
 export * from './data-sources';
 export * from './createDataSourceManager';
-export * from './util';
 export * from './types';

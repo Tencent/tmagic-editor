@@ -19,7 +19,7 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
-import type { DataSourceDeps, Id, MComponent, MNode } from '@tmagic/schema';
+import type { DataSchema, DataSourceDeps, Id, MComponent, MNode } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 
 export * from './dom';
@@ -339,4 +339,31 @@ export const compiledCond = (op: string, fieldValue: any, value: any, range: [nu
   }
 
   return true;
+};
+
+export const getDefaultValueFromFields = (fields: DataSchema[]) => {
+  const data: Record<string, any> = {};
+
+  const defaultValue: Record<string, any> = {
+    string: '',
+    object: {},
+    array: [],
+    boolean: false,
+    number: 0,
+    null: null,
+    any: undefined,
+  };
+
+  fields.forEach((field) => {
+    if (typeof field.defaultValue !== 'undefined') {
+      data[field.name] = field.defaultValue;
+    } else if (field.type === 'object') {
+      data[field.name] = field.fields ? getDefaultValueFromFields(field.fields) : {};
+    } else if (field.type) {
+      data[field.name] = defaultValue[field.type];
+    } else {
+      data[field.name] = undefined;
+    }
+  });
+  return data;
 };
