@@ -52,6 +52,7 @@ const app = new Core({
   ua: window.navigator.userAgent,
   config: ((getUrlParam('localPreview') ? getLocalConfig() : window.magicDSL) || [])[0] || {},
   curPage: getUrlParam('page'),
+  useMock: Boolean(getUrlParam('useMock')),
 });
 
 app.setDesignWidth(app.env.isWeb ? window.document.documentElement.getBoundingClientRect().width : 375);
