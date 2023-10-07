@@ -8,6 +8,7 @@
       :props-configs="propsConfigs"
       :props-values="propsValues"
       :event-method-list="eventMethodList"
+      :datasource-event-method-list="datasourceEventMethodList"
       :datasource-configs="datasourceConfigs"
       :datasource-values="datasourceValues"
       :component-group-list="componentGroupList"
@@ -73,6 +74,12 @@ const defaultSelected = ref(dsl.items[0].id);
 const propsValues = ref<Record<string, any>>({});
 const propsConfigs = ref<Record<string, any>>({});
 const eventMethodList = ref<Record<string, any>>({});
+const datasourceEventMethodList = ref<Record<string, any>>({
+  base: {
+    events: [],
+    methods: [],
+  },
+});
 const datasourceConfigs = ref<Record<string, any>>({});
 const datasourceValues = ref<Record<string, any>>({});
 const stageRect = ref({

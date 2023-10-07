@@ -18,6 +18,7 @@ interface State {
   configs: Record<string, FormConfig>;
   values: Record<string, Partial<DataSourceSchema>>;
   events: Record<string, EventOption[]>;
+  methods: Record<string, EventOption[]>;
 }
 
 type StateKey = keyof State;
@@ -29,6 +30,7 @@ class DataSource extends BaseService {
     configs: {},
     values: {},
     events: {},
+    methods: {},
   });
 
   public set<K extends StateKey, T extends State[K]>(name: K, value: T) {
@@ -61,6 +63,14 @@ class DataSource extends BaseService {
 
   public setFormEvent(type: string, value: EventOption[] = []) {
     this.get('events')[type] = value;
+  }
+
+  public getFormMethod(type = 'base') {
+    return this.get('methods')[type] || [];
+  }
+
+  public setFormMethod(type: string, value: EventOption[] = []) {
+    this.get('methods')[type] = value;
   }
 
   public add(config: DataSourceSchema) {

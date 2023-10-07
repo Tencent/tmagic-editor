@@ -50,6 +50,7 @@ export interface EditorProps {
   datasourceValues?: Record<string, Partial<DataSourceSchema>>;
   /** 数据源的属性配置表单的dsl */
   datasourceConfigs?: Record<string, FormConfig>;
+  datasourceEventMethodList?: Record<string, { events: EventOption[]; methods: EventOption[] }>;
   /** 画布中组件选中框的移动范围 */
   moveableOptions?: MoveableOptions | ((config?: CustomizeMoveableOptionsCallbackConfig) => MoveableOptions);
   /** 编辑器初始化时默认选中的组件ID */

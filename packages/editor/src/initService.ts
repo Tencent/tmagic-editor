@@ -124,6 +124,30 @@ export const initServiceState = (
   );
 
   watch(
+    () => props.datasourceEventMethodList,
+    (eventMethodList) => {
+      const eventsList: Record<string, EventOption[]> = {};
+      const methodsList: Record<string, EventOption[]> = {};
+
+      eventMethodList &&
+        Object.keys(eventMethodList).forEach((type: string) => {
+          eventsList[type] = eventMethodList[type].events;
+          methodsList[type] = eventMethodList[type].methods;
+        });
+
+      Object.entries(eventsList).forEach(([key, value]) => {
+        dataSourceService.setFormEvent(key, value);
+      });
+      Object.entries(methodsList).forEach(([key, value]) => {
+        dataSourceService.setFormMethod(key, value);
+      });
+    },
+    {
+      immediate: true,
+    },
+  );
+
+  watch(
     () => props.defaultSelected,
     (defaultSelected) => defaultSelected && editorService.select(defaultSelected),
     {

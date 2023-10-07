@@ -69,6 +69,11 @@ const emit = defineEmits(['change']);
 
 const services = inject<Services>('services');
 
+const editorService = services?.editorService;
+const dataSourceService = services?.dataSourceService;
+const eventsService = services?.eventsService;
+const codeBlockService = services?.codeBlockService;
+
 // 事件名称下拉框表单配置
 const eventNameConfig = computed(() => {
   const defaultEventNameConfig = {
@@ -79,12 +84,12 @@ const eventNameConfig = computed(() => {
     options: (mForm: FormState, { formValue }: any) => {
       let events: EventOption[] = [];
 
-      if (!services) return events;
+      if (!eventsService || !dataSourceService) return events;
 
       if (props.config.src === 'component') {
-        events = services.eventsService.getEvent(formValue.type);
+        events = eventsService.getEvent(formValue.type);
       } else if (props.config.src === 'datasource') {
-        events = services.dataSourceService.getFormEvent(formValue.type);
+        events = dataSourceService.getFormEvent(formValue.type);
       }
 
       return events.map((option) => ({
@@ -113,13 +118,15 @@ const actionTypeConfig = computed(() => {
       {
         text: '代码',
         label: '代码',
-        disabled: !Object.keys(services?.codeBlockService.getCodeDsl() || {}).length,
+        disabled: !Object.keys(codeBlockService?.getCodeDsl() || {}).length,
         value: ActionType.CODE,
       },
       {
         text: '数据源',
         label: '数据源',
-        disabled: !services?.dataSourceService.get('dataSources')?.filter((ds) => ds.methods?.length).length,
+        disabled: !dataSourceService
+          ?.get('dataSources')
+          ?.filter((ds) => ds.methods?.length || dataSourceService?.getFormMethod(ds.type).length).length,
         value: ActionType.DATA_SOURCE,
       },
     ],
@@ -148,10 +155,10 @@ const compActionConfig = computed(() => {
     type: 'select',
     display: (mForm: FormState, { model }: { model: Record<any, any> }) => model.actionType === ActionType.COMP,
     options: (mForm: FormState, { model }: any) => {
-      const node = services?.editorService.getNodeById(model.to);
+      const node = editorService?.getNodeById(model.to);
       if (!node?.type) return [];
 
-      return services?.eventsService.getMethod(node.type).map((option: any) => ({
+      return eventsService?.getMethod(node.type).map((option: any) => ({
         text: option.label,
         value: option.value,
       }));
@@ -166,7 +173,7 @@ const codeActionConfig = computed(() => {
     type: 'code-select-col',
     labelWidth: 0,
     name: 'codeId',
-    disabled: () => !services?.codeBlockService.getEditStatus(),
+    disabled: () => !codeBlockService?.getEditStatus(),
     display: (mForm, { model }) => model.actionType === ActionType.CODE,
   };
   return { ...defaultCodeActionConfig, ...props.config.codeActionConfig };
@@ -193,7 +200,7 @@ const tableConfig = computed(() => ({
       label: '事件名',
       type: eventNameConfig.value.type,
       options: (mForm: FormState, { formValue }: any) =>
-        services?.eventsService.getEvent(formValue.type).map((option: any) => ({
+        eventsService?.getEvent(formValue.type).map((option: any) => ({
           text: option.label,
           value: option.value,
         })),
@@ -208,10 +215,10 @@ const tableConfig = computed(() => ({
       label: '动作',
       type: compActionConfig.value.type,
       options: (mForm: FormState, { model }: any) => {
-        const node = services?.editorService.getNodeById(model.to);
+        const node = editorService?.getNodeById(model.to);
         if (!node?.type) return [];
 
-        return services?.eventsService.getMethod(node.type).map((option: any) => ({
+        return eventsService?.getMethod(node.type).map((option: any) => ({
           text: option.label,
           value: option.value,
         }));

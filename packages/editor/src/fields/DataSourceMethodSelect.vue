@@ -50,11 +50,13 @@ defineOptions({
 const services = inject<Services>('services');
 const emit = defineEmits(['change']);
 
+const dataSourceService = services?.dataSourceService;
+
 const props = withDefaults(defineProps<FieldProps<DataSourceMethodSelectConfig>>(), {
   disabled: false,
 });
 
-const dataSources = computed(() => services?.dataSourceService.get('dataSources'));
+const dataSources = computed(() => dataSourceService?.get('dataSources'));
 
 const getParamItemsConfig = ([dataSourceId, medthodName]: [Id, string] = ['', '']): CodeParamStatement[] => {
   if (!dataSourceId) return [];
@@ -85,28 +87,35 @@ const setParamsConfig = (dataSourceMethod: [Id, string], formState: any = {}) =>
   }
 };
 
-const cascaderConfig = {
+const methodsOptions = computed(
+  () =>
+    dataSources.value
+      ?.filter((ds) => ds.methods?.length || dataSourceService?.getFormMethod(ds.type).length)
+      ?.map((ds) => ({
+        label: ds.title || ds.id,
+        value: ds.id,
+        children: [
+          ...(dataSourceService?.getFormMethod(ds.type) || []),
+          ...(ds.methods || []).map((method) => ({
+            label: method.name,
+            value: method.name,
+          })),
+        ],
+      })) || [],
+);
+
+const cascaderConfig = computed(() => ({
   type: 'cascader',
   text: '数据源方法',
   name: props.name,
   labelWidth: '80px',
-  options: () =>
-    dataSources.value
-      ?.filter((ds) => ds.methods?.length)
-      ?.map((ds) => ({
-        label: ds.title || ds.id,
-        value: ds.id,
-        children: ds.methods?.map((method) => ({
-          label: method.name,
-          value: method.name,
-        })),
-      })) || [],
+  options: methodsOptions.value,
   onChange: (formState: any, dataSourceMethod: [Id, string]) => {
     setParamsConfig(dataSourceMethod, formState);
 
     return dataSourceMethod;
   },
-};
+}));
 
 /**
  * 参数值修改更新
@@ -121,7 +130,7 @@ const { codeBlockEditor, codeConfig, editCode, submitCode } = useDataSourceMetho
 const editCodeHandler = () => {
   const [id, name] = props.model[props.name];
 
-  const dataSource = services?.dataSourceService.getDataSourceById(id);
+  const dataSource = dataSourceService?.getDataSourceById(id);
 
   if (!dataSource) return;
 
