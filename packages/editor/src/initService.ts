@@ -1,4 +1,3 @@
-import type { ExtractPropTypes } from 'vue';
 import { onUnmounted, toRaw, watch } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
@@ -6,6 +5,7 @@ import type { EventOption } from '@tmagic/core';
 import type { CodeBlockContent, DataSourceSchema, Id, MApp, MNode, MPage } from '@tmagic/schema';
 import { getNodes } from '@tmagic/utils';
 
+import PropsPanel from './layouts/PropsPanel.vue';
 import type { Target } from './services/dep';
 import {
   createCodeBlockTarget,
@@ -13,7 +13,7 @@ import {
   createDataSourceMethodTarget,
   createDataSourceTarget,
 } from './utils/dep';
-import editorProps from './editorProps';
+import { EditorProps } from './editorProps';
 import { DepTargetType, Services } from './type';
 
 export declare type LooseRequired<T> = {
@@ -21,7 +21,7 @@ export declare type LooseRequired<T> = {
 };
 
 export const initServiceState = (
-  props: Readonly<LooseRequired<Readonly<ExtractPropTypes<typeof editorProps>>>>,
+  props: EditorProps,
   {
     editorService,
     historyService,
@@ -38,7 +38,7 @@ export const initServiceState = (
   watch(
     () => props.modelValue,
     (modelValue) => {
-      editorService.set('root', modelValue);
+      editorService.set('root', modelValue || null);
     },
     {
       immediate: true,
@@ -47,7 +47,7 @@ export const initServiceState = (
 
   watch(
     () => props.componentGroupList,
-    (componentGroupList) => componentListService.setList(componentGroupList),
+    (componentGroupList) => componentGroupList && componentListService.setList(componentGroupList),
     {
       immediate: true,
     },
@@ -55,7 +55,7 @@ export const initServiceState = (
 
   watch(
     () => props.datasourceList,
-    (datasourceList) => dataSourceService.set('datasourceTypeList', datasourceList),
+    (datasourceList) => datasourceList && dataSourceService.set('datasourceTypeList', datasourceList),
     {
       immediate: true,
     },
@@ -63,7 +63,7 @@ export const initServiceState = (
 
   watch(
     () => props.propsConfigs,
-    (configs) => propsService.setPropsConfigs(configs),
+    (configs) => configs && propsService.setPropsConfigs(configs),
     {
       immediate: true,
     },
@@ -71,7 +71,7 @@ export const initServiceState = (
 
   watch(
     () => props.propsValues,
-    (values) => propsService.setPropsValues(values),
+    (values) => values && propsService.setPropsValues(values),
     {
       immediate: true,
     },
@@ -83,10 +83,11 @@ export const initServiceState = (
       const eventsList: Record<string, EventOption[]> = {};
       const methodsList: Record<string, EventOption[]> = {};
 
-      Object.keys(eventMethodList).forEach((type: string) => {
-        eventsList[type] = eventMethodList[type].events;
-        methodsList[type] = eventMethodList[type].methods;
-      });
+      eventMethodList &&
+        Object.keys(eventMethodList).forEach((type: string) => {
+          eventsList[type] = eventMethodList[type].events;
+          methodsList[type] = eventMethodList[type].methods;
+        });
 
       eventsService.setEvents(eventsList);
       eventsService.setMethods(methodsList);
@@ -99,9 +100,10 @@ export const initServiceState = (
   watch(
     () => props.datasourceConfigs,
     (configs) => {
-      Object.entries(configs).forEach(([key, value]) => {
-        dataSourceService.setFormConfig(key, value);
-      });
+      configs &&
+        Object.entries(configs).forEach(([key, value]) => {
+          dataSourceService.setFormConfig(key, value);
+        });
     },
     {
       immediate: true,
@@ -111,9 +113,10 @@ export const initServiceState = (
   watch(
     () => props.datasourceValues,
     (values) => {
-      Object.entries(values).forEach(([key, value]) => {
-        dataSourceService.setFormValue(key, value);
-      });
+      values &&
+        Object.entries(values).forEach(([key, value]) => {
+          dataSourceService.setFormValue(key, value);
+        });
     },
     {
       immediate: true,
@@ -148,8 +151,9 @@ export const initServiceState = (
 };
 
 export const initServiceEvents = (
-  props: Readonly<LooseRequired<Readonly<ExtractPropTypes<typeof editorProps>>>>,
-  emit: (event: 'props-panel-mounted' | 'update:modelValue', ...args: any[]) => void,
+  props: EditorProps,
+  emit: ((event: 'props-panel-mounted', instance: InstanceType<typeof PropsPanel>) => void) &
+    ((event: 'update:modelValue', value: MApp | null) => void),
   { editorService, codeBlockService, dataSourceService, depService }: Services,
 ) => {
   const getApp = () => {
@@ -247,7 +251,7 @@ export const initServiceEvents = (
     depService.addTarget(createDataSourceCondTarget(ds.id));
   };
 
-  const rootChangeHandler = async (value: MApp, preValue?: MApp | null) => {
+  const rootChangeHandler = async (value: MApp | null, preValue?: MApp | null) => {
     const nodeId = editorService.get('node')?.id || props.defaultSelected;
     let node;
     if (nodeId) {
@@ -267,6 +271,8 @@ export const initServiceEvents = (
     if (toRaw(value) !== toRaw(preValue)) {
       emit('update:modelValue', value);
     }
+
+    if (!value) return;
 
     value.codeBlocks = value.codeBlocks || {};
     value.dataSources = value.dataSources || [];

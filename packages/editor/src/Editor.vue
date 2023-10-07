@@ -80,11 +80,13 @@
   </Framework>
 </template>
 
-<script lang="ts">
-import { defineComponent, provide, reactive } from 'vue';
+<script lang="ts" setup>
+import { provide, reactive } from 'vue';
+
+import { MApp } from '@tmagic/schema';
 
 import Framework from './layouts/Framework.vue';
-import NavMenu from './layouts/NavMenu.vue';
+import TMagicNavMenu from './layouts/NavMenu.vue';
 import PropsPanel from './layouts/PropsPanel.vue';
 import Sidebar from './layouts/sidebar/Sidebar.vue';
 import Workspace from './layouts/workspace/Workspace.vue';
@@ -100,66 +102,59 @@ import propsService from './services/props';
 import storageService from './services/storage';
 import uiService from './services/ui';
 import keybindingConfig from './utils/keybinding-config';
-import editorProps from './editorProps';
+import { defaultEditorProps, EditorProps } from './editorProps';
 import { initServiceEvents, initServiceState } from './initService';
 import type { Services } from './type';
 
-export default defineComponent({
+defineOptions({
   name: 'MEditor',
-
-  components: {
-    TMagicNavMenu: NavMenu,
-    Sidebar,
-    Workspace,
-    PropsPanel,
-    Framework,
-  },
-
-  props: editorProps,
-
-  emits: ['props-panel-mounted', 'update:modelValue'],
-
-  setup(props, { emit }) {
-    const services: Services = {
-      componentListService,
-      eventsService,
-      historyService,
-      propsService,
-      editorService,
-      uiService,
-      storageService,
-      codeBlockService,
-      depService,
-      dataSourceService,
-      keybindingService,
-    };
-
-    initServiceEvents(props, emit, services);
-    initServiceState(props, services);
-    keybindingService.registe(keybindingConfig);
-    keybindingService.registeEl('global');
-
-    provide('services', services);
-
-    provide('codeOptions', props.codeOptions);
-    provide(
-      'stageOptions',
-      reactive({
-        runtimeUrl: props.runtimeUrl,
-        autoScrollIntoView: props.autoScrollIntoView,
-        render: props.render,
-        moveableOptions: props.moveableOptions,
-        canSelect: props.canSelect,
-        updateDragEl: props.updateDragEl,
-        isContainer: props.isContainer,
-        containerHighlightClassName: props.containerHighlightClassName,
-        containerHighlightDuration: props.containerHighlightDuration,
-        containerHighlightType: props.containerHighlightType,
-        disabledDragStart: props.disabledDragStart,
-      }),
-    );
-
-    return services;
-  },
 });
+
+const emit = defineEmits<{
+  'props-panel-mounted': [instance: InstanceType<typeof PropsPanel>];
+  'update:modelValue': [value: MApp | null];
+}>();
+
+const props = withDefaults(defineProps<EditorProps>(), defaultEditorProps);
+
+const services: Services = {
+  componentListService,
+  eventsService,
+  historyService,
+  propsService,
+  editorService,
+  uiService,
+  storageService,
+  codeBlockService,
+  depService,
+  dataSourceService,
+  keybindingService,
+};
+
+initServiceEvents(props, emit, services);
+initServiceState(props, services);
+keybindingService.registe(keybindingConfig);
+keybindingService.registeEl('global');
+
+provide('services', services);
+
+provide('codeOptions', props.codeOptions);
+provide(
+  'stageOptions',
+  reactive({
+    runtimeUrl: props.runtimeUrl,
+    autoScrollIntoView: props.autoScrollIntoView,
+    render: props.render,
+    moveableOptions: props.moveableOptions,
+    canSelect: props.canSelect,
+    updateDragEl: props.updateDragEl,
+    isContainer: props.isContainer,
+    containerHighlightClassName: props.containerHighlightClassName,
+    containerHighlightDuration: props.containerHighlightDuration,
+    containerHighlightType: props.containerHighlightType,
+    disabledDragStart: props.disabledDragStart,
+  }),
+);
+
+defineExpose(services);
 </script>

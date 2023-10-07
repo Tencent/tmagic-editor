@@ -5,7 +5,7 @@ import { EntryType } from '../types';
 
 export const prepareEntryFile = async (app: App) => {
   const { moduleMainFilePath, options } = app;
-  const { componentFileAffix, dynamicImport, hooks, useTs } = options;
+  const { componentFileAffix, dynamicImport, hooks, useTs = true } = options;
 
   let contentMap: Record<string, string> = {
     'comp-entry': generateContent(useTs, EntryType.COMPONENT, moduleMainFilePath.componentMap, componentFileAffix),
