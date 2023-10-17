@@ -21,7 +21,7 @@ import EventEmitter from 'events';
 import { cloneDeep, template } from 'lodash-es';
 
 import type { AppCore, DataSourceSchema, Id, MNode } from '@tmagic/schema';
-import { compiledCond, compiledNode } from '@tmagic/utils';
+import { compiledCond, compiledNode, DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX, isObject } from '@tmagic/utils';
 
 import { DataSource, HttpDataSource } from './data-sources';
 import type { DataSourceManagerData, DataSourceManagerOptions, HttpDataSourceSchema } from './types';
@@ -143,12 +143,40 @@ class DataSourceManager extends EventEmitter {
 
     return compiledNode(
       (value: any) => {
+        // 使用data-source-input等表单控件配置的字符串模板，如：`xxx${id.field}xxx`
         if (typeof value === 'string') {
           return template(value)(this.data);
         }
+
+        // 使用data-source-select等表单控件配置的数据源，如：{ isBindDataSource: true, dataSourceId: 'xxx'}
         if (value?.isBindDataSource && value.dataSourceId) {
           return this.data[value.dataSourceId];
         }
+
+        // 使用data-source-field-select等表单控件的数据源字段，如：[`${DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX}${id}`, 'field']
+        if (Array.isArray(value) && typeof value[0] === 'string') {
+          const [prefixId, ...fields] = value;
+          const prefixIndex = prefixId.indexOf(DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX);
+
+          if (prefixIndex > -1) {
+            const dsId = prefixId.substring(prefixIndex + DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX.length);
+
+            const data = this.data[dsId];
+
+            if (!data) return value;
+
+            return fields.reduce((accumulator, currentValue: any) => {
+              if (Array.isArray(accumulator)) return accumulator;
+
+              if (isObject(accumulator)) {
+                return accumulator[currentValue];
+              }
+
+              return '';
+            }, data);
+          }
+        }
+
         return value;
       },
       cloneDeep(node),

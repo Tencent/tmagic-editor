@@ -281,7 +281,7 @@ export const compiledNode = (
         return accumulator;
       }
 
-      if (Object.prototype.toString.call(accumulator) === '[object Object]' || Array.isArray(accumulator)) {
+      if (isObject(accumulator) || Array.isArray(accumulator)) {
         return accumulator[currentValue];
       }
 
@@ -367,3 +367,5 @@ export const getDefaultValueFromFields = (fields: DataSchema[]) => {
   });
   return data;
 };
+
+export const DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX = 'ds-field::';

@@ -507,6 +507,7 @@ export interface DataSourceMethodSelectConfig {
 export interface DataSourceFieldSelectConfig {
   type: 'data-source-field-select';
   name: string;
+  value?: 'key' | 'value';
   labelWidth?: number | string;
   disabled?: boolean | FilterFunction;
   display?: boolean | FilterFunction;

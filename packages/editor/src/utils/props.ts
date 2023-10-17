@@ -245,6 +245,7 @@ export const displayTabConfig: TabPaneConfig = {
             {
               type: 'data-source-field-select',
               name: 'field',
+              value: 'key',
               label: '字段',
             },
             {
