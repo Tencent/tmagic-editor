@@ -42,14 +42,16 @@ class DataSourceManager extends EventEmitter {
   public dataSourceMap = new Map<string, DataSource>();
 
   public data: DataSourceManagerData = {};
+  public useMock?: boolean = false;
 
   constructor({ app, useMock }: DataSourceManagerOptions) {
     super();
 
     this.app = app;
+    this.useMock = useMock;
 
     app.dsl?.dataSources?.forEach((config) => {
-      this.addDataSource(config, useMock);
+      this.addDataSource(config);
     });
   }
 
@@ -57,7 +59,7 @@ class DataSourceManager extends EventEmitter {
     return this.dataSourceMap.get(id);
   }
 
-  public async addDataSource(config?: DataSourceSchema, useMock?: boolean) {
+  public async addDataSource(config?: DataSourceSchema) {
     if (!config) return;
 
     let ds: DataSource;
@@ -66,7 +68,7 @@ class DataSourceManager extends EventEmitter {
         app: this.app,
         schema: config as HttpDataSourceSchema,
         request: this.app.request,
-        useMock,
+        useMock: this.useMock,
       });
     } else {
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -75,7 +77,7 @@ class DataSourceManager extends EventEmitter {
       ds = new DataSourceClass({
         app: this.app,
         schema: config,
-        useMock,
+        useMock: this.useMock,
       });
     }
 
@@ -90,7 +92,7 @@ class DataSourceManager extends EventEmitter {
     const beforeInit: ((...args: any[]) => any)[] = [];
     const afterInit: ((...args: any[]) => any)[] = [];
 
-    ds.getMethods().forEach((method) => {
+    ds.methods.forEach((method) => {
       if (typeof method.content !== 'function') return;
       if (method.timing === 'beforeInit') {
         beforeInit.push(method.content);
@@ -128,9 +130,10 @@ class DataSourceManager extends EventEmitter {
       if (!ds) {
         return;
       }
-      ds.setFields(schema.fields);
-      ds.updateDefaultData();
-      this.data[ds.id] = ds.data;
+
+      this.removeDataSource(schema.id);
+
+      this.addDataSource(schema);
     });
   }
 
@@ -191,7 +194,7 @@ class DataSourceManager extends EventEmitter {
     this.dataSourceMap.forEach((ds) => {
       ds.destroy();
     });
-    this.dataSourceMap = new Map();
+    this.dataSourceMap.clear();
   }
 }
 

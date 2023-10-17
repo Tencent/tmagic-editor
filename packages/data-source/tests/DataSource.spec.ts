@@ -9,7 +9,9 @@ describe('DataSource', () => {
         type: 'base',
         id: '1',
         fields: [{ name: 'name' }],
+        methods: [],
       },
+      app: {},
     });
 
     expect(ds).toBeInstanceOf(DataSource);
@@ -22,7 +24,9 @@ describe('DataSource', () => {
         type: 'base',
         id: '1',
         fields: [{ name: 'name' }],
+        methods: [],
       },
+      app: {},
     });
 
     ds.init();

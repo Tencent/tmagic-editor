@@ -17,7 +17,7 @@
  */
 import EventEmitter from 'events';
 
-import type { AppCore, CodeBlockContent, DataSchema, MockSchema } from '@tmagic/schema';
+import type { AppCore, CodeBlockContent, DataSchema } from '@tmagic/schema';
 import { getDefaultValueFromFields } from '@tmagic/utils';
 
 import type { DataSourceOptions } from '@data-source/types';
@@ -26,50 +26,64 @@ import type { DataSourceOptions } from '@data-source/types';
  * 静态数据源
  */
 export default class DataSource extends EventEmitter {
-  public type = 'base';
-
-  public id: string;
-
   public isInit = false;
 
   public data: Record<string, any> = {};
 
+  /** @tmagic/core 实例 */
   public app: AppCore;
 
-  protected mockData?: MockSchema;
+  protected mockData?: Record<string | number, any>;
 
-  private fields: DataSchema[] = [];
-  private methods: CodeBlockContent[] = [];
+  #type = 'base';
+  #id: string;
+
+  /** 数据源自定义字段配置 */
+  #fields: DataSchema[] = [];
+  /** 数据源自定义方法配置 */
+  #methods: CodeBlockContent[] = [];
 
   constructor(options: DataSourceOptions) {
     super();
 
     this.app = options.app;
-    this.id = options.schema.id;
+    this.#id = options.schema.id;
     this.setFields(options.schema.fields);
     this.setMethods(options.schema.methods || []);
 
-    if (typeof options.useMock === 'boolean' && options.useMock) {
-      this.mockData = options.schema.mocks?.find((mock) => mock.enable);
+    const defaultData = this.getDefaultData();
+
+    if (this.app.platform === 'editor') {
+      this.mockData = options.schema.mocks?.find((mock) => mock.useInEditor)?.data || defaultData;
+    } else if (typeof options.useMock === 'boolean' && options.useMock) {
+      this.mockData = options.schema.mocks?.find((mock) => mock.enable)?.data;
     }
 
-    this.updateDefaultData();
+    this.setData(this.mockData || defaultData);
+  }
 
-    if (this.mockData) {
-      this.setData(this.mockData.data);
-    }
+  public get id() {
+    return this.#id;
+  }
+
+  public get type() {
+    return this.#type;
+  }
+
+  public get fields() {
+    return this.#fields;
+  }
+
+  public get methods() {
+    return this.#methods;
   }
 
   public setFields(fields: DataSchema[]) {
-    this.fields = fields;
+    this.#fields = fields;
   }
 
   public setMethods(methods: CodeBlockContent[]) {
-    this.methods = methods;
-  }
-
-  public getMethods() {
-    return this.methods;
+    this.#methods = methods;
   }
 
   public setData(data: Record<string, any>) {
@@ -79,11 +93,7 @@ export default class DataSource extends EventEmitter {
   }
 
   public getDefaultData() {
-    return getDefaultValueFromFields(this.fields);
-  }
-
-  public updateDefaultData() {
-    this.setData(this.getDefaultData());
+    return getDefaultValueFromFields(this.#fields);
   }
 
   public async init() {
@@ -92,7 +102,7 @@ export default class DataSource extends EventEmitter {
 
   public destroy() {
     this.data = {};
-    this.fields = [];
+    this.#fields = [];
     this.removeAllListeners();
   }
 }

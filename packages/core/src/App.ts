@@ -333,7 +333,7 @@ class App extends EventEmitter implements AppCore {
 
     if (!dataSource) return;
 
-    const methods = dataSource.getMethods() || [];
+    const methods = dataSource.methods || [];
 
     const method = methods.find((item) => item.name === methodName);
 

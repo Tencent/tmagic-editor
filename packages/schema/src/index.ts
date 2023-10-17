@@ -201,9 +201,15 @@ export interface DataSchema {
 }
 
 export interface MockSchema {
+  /** 名称 */
   title: string;
+  /** 详细描述 */
   description?: string;
+  /** 是否启用，用于编辑器以外的runtime */
   enable: boolean;
+  /** 编辑器中使用使用此条数据，仅用于编辑器runtime中 */
+  useInEditor: boolean;
+  /** mock数据 */
   data: Record<string | number, any>;
 }
 

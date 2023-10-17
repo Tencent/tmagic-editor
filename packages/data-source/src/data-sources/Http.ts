@@ -67,19 +67,24 @@ const webRequest = async (options: HttpOptions) => {
  * @description 通过 http 请求获取数据
  */
 export default class HttpDataSource extends DataSource {
-  public type = 'http';
-
+  /** 是否正在发起请求 */
   public isLoading = false;
   public error?: {
     msg?: string;
     code?: string | number;
   };
   public schema: HttpDataSourceSchema;
+  /** 请求配置 */
   public httpOptions: HttpOptions;
 
-  private fetch?: RequestFunction;
-  private beforeRequest: ((...args: any[]) => any)[] = [];
-  private afterRequest: ((...args: any[]) => any)[] = [];
+  /** 请求函数 */
+  #fetch?: RequestFunction;
+  /** 请求前需要执行的函数队列 */
+  #beforeRequest: ((...args: any[]) => any)[] = [];
+  /** 请求后需要执行的函数队列 */
+  #afterRequest: ((...args: any[]) => any)[] = [];
+
+  #type = 'http';
 
   constructor(options: HttpDataSourceOptions) {
     const { options: httpOptions, ...dataSourceOptions } = options.schema;
@@ -93,20 +98,24 @@ export default class HttpDataSource extends DataSource {
     this.httpOptions = httpOptions;
 
     if (typeof options.request === 'function') {
-      this.fetch = options.request;
+      this.#fetch = options.request;
     } else if (typeof globalThis.fetch === 'function') {
-      this.fetch = webRequest;
+      this.#fetch = webRequest;
     }
 
-    this.getMethods().forEach((method) => {
+    this.methods.forEach((method) => {
       if (typeof method.content !== 'function') return;
       if (method.timing === 'beforeRequest') {
-        this.beforeRequest.push(method.content);
+        this.#beforeRequest.push(method.content);
       }
       if (method.timing === 'afterRequest') {
-        this.afterRequest.push(method.content);
+        this.#afterRequest.push(method.content);
       }
     });
+  }
+
+  public get type() {
+    return this.#type;
   }
 
   public async init() {
@@ -117,20 +126,23 @@ export default class HttpDataSource extends DataSource {
     super.init();
   }
 
-  public async request(options: HttpOptions) {
+  public async request(options: Partial<HttpOptions> = {}) {
+    this.isLoading = true;
+
     try {
-      for (const method of this.beforeRequest) {
+      for (const method of this.#beforeRequest) {
         await method({ options, params: {}, dataSource: this, app: this.app });
       }
 
+      // 注意：在编辑器中mockData不会为空，至少是默认值，不会发起请求
       const res = this.mockData
-        ? this.mockData.data
-        : await this.fetch?.({
+        ? this.mockData
+        : await this.#fetch?.({
             ...this.httpOptions,
             ...options,
           });
 
-      for (const method of this.afterRequest) {
+      for (const method of this.#afterRequest) {
         await method({ res, options, params: {}, dataSource: this, app: this.app });
       }
 
@@ -149,6 +161,8 @@ export default class HttpDataSource extends DataSource {
 
       this.emit('error', error);
     }
+
+    this.isLoading = false;
   }
 
   public get(options: Partial<HttpOptions> & { url: string }) {

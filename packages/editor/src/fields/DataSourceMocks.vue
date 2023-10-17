@@ -8,7 +8,7 @@
 
     <MFormDrawer
       ref="addDialog"
-      label-width="80px"
+      label-width="120px"
       :title="drawerTitle"
       :config="formConfig"
       :values="formValues"
@@ -29,6 +29,7 @@ import type { MockSchema } from '@tmagic/schema';
 import { MagicTable } from '@tmagic/table';
 import { getDefaultValueFromFields } from '@tmagic/utils';
 
+import CodeEditor from '@editor/layouts/CodeEditor.vue';
 import { Services } from '@editor/type';
 
 defineOptions({
@@ -81,6 +82,11 @@ const formConfig: FormConfig = [
     type: 'switch',
   },
   {
+    name: 'useInEditor',
+    text: '编辑器中使用',
+    type: 'switch',
+  },
+  {
     name: 'data',
     text: 'mock数据',
     type: 'vs-code',
@@ -113,6 +119,18 @@ const formConfig: FormConfig = [
 
 const columns = [
   {
+    type: 'expand',
+    component: CodeEditor,
+    props: (row: MockSchema) => ({
+      initValues: row.data,
+      language: 'json',
+      height: '150px',
+      options: {
+        readOnly: true,
+      },
+    }),
+  },
+  {
     label: '名称',
     prop: 'title',
   },
@@ -132,7 +150,23 @@ const columns = [
     }),
     listeners: (row: MockSchema, index: number) => ({
       'update:modelValue': (v: boolean) => {
-        toggleEnable(row, v, index);
+        toggleValue(row, 'enable', v, index);
+      },
+    }),
+  },
+  {
+    label: '编辑器中使用',
+    prop: 'useInEditor',
+    type: 'component',
+    component: TMagicSwitch,
+    props: (row: MockSchema) => ({
+      modelValue: row.useInEditor,
+      activeValue: true,
+      inactiveValue: false,
+    }),
+    listeners: (row: MockSchema, index: number) => ({
+      'update:modelValue': (v: boolean) => {
+        toggleValue(row, 'useInEditor', v, index);
       },
     }),
   },
@@ -165,8 +199,11 @@ const columns = [
 ];
 
 const newHandler = () => {
+  const isFirstRow = props.model[props.name].length === 0;
   formValues.value = {
     data: getDefaultValueFromFields(props.model.fields || []),
+    useInEditor: isFirstRow,
+    enable: isFirstRow,
   };
   drawerTitle.value = '新增Mock';
   addDialog.value?.show();
@@ -184,16 +221,16 @@ const formChangeHandler = ({ index, ...value }: Record<string, any>) => {
   emit('change', props.model[props.name]);
 };
 
-const toggleEnable = (row: MockSchema, enable: boolean, index: number) => {
-  if (enable) {
+const toggleValue = (row: MockSchema, key: 'enable' | 'useInEditor', value: boolean, index: number) => {
+  if (value) {
     props.model[props.name].forEach((item: MockSchema) => {
-      item.enable = false;
+      item[key] = false;
     });
   }
 
   formChangeHandler({
     ...row,
-    enable,
+    [key]: value,
     index,
   });
 };
