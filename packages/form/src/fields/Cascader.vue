@@ -9,7 +9,11 @@
     :placeholder="config.placeholder"
     :disabled="disabled"
     :options="options"
-    :props="{ multiple: config.multiple }"
+    :props="{
+      multiple: config.multiple ?? false,
+      emitPath: config.emitPath ?? true,
+      checkStrictly: config.checkStrictly ?? false,
+    }"
     @change="changeHandler"
   ></TMagicCascader>
 </template>

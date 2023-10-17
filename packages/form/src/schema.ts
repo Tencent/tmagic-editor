@@ -527,7 +527,12 @@ export interface LinkConfig extends FormItem {
 export interface CascaderConfig extends FormItem, Input {
   type: 'cascader';
   remote?: boolean;
+  /** 在选中节点改变时，是否返回由该节点所在的各级菜单的值所组成的数组，若设置 false，则只返回该节点的值，默认 true */
+  emitPath?: boolean;
+  /** 是否多选，默认 false */
   multiple?: boolean;
+  /** 是否严格的遵守父子节点不互相关联，默认 false */
+  checkStrictly?: boolean;
   options?:
     | ((
         mForm: FormState | undefined,
@@ -544,12 +549,6 @@ export interface CascaderConfig extends FormItem, Input {
     body?: Record<string, any> | RemoteSelectOptionBodyFunction;
     root: 'string';
     item: (optionsData: Record<string, any>) => CascaderOption[];
-  };
-  add?: {
-    action: {
-      method: 'post' | 'get';
-      body?: Record<string, any>;
-    };
   };
 }
 
