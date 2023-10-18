@@ -41,6 +41,7 @@ const cascaderConfig = computed(() => {
     type: 'cascader',
     name: props.name,
     checkStrictly: !valueIsKey,
+    text: '',
     options: () =>
       dataSources.value
         ?.filter((ds) => ds.fields?.length)
