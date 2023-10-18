@@ -120,41 +120,46 @@
       </TMagicTable>
     </TMagicTooltip>
     <slot></slot>
-    <TMagicButton v-if="addable" size="small" type="primary" :disabled="disabled" plain @click="newHandler()"
-      >新增一行</TMagicButton
-    >
-    &nbsp;
-    <TMagicButton
-      :icon="Grid"
-      size="small"
-      type="primary"
-      @click="toggleMode"
-      v-if="enableToggleMode && config.enableToggleMode !== false && !isFullscreen"
-      >展开配置</TMagicButton
-    >
-    <TMagicButton
-      :icon="FullScreen"
-      size="small"
-      type="primary"
-      @click="toggleFullscreen"
-      v-if="config.enableFullscreen !== false"
-    >
-      {{ isFullscreen ? '退出全屏' : '全屏编辑' }}
-    </TMagicButton>
-    <TMagicUpload
-      v-if="importable"
-      style="display: inline-block"
-      ref="excelBtn"
-      action="/noop"
-      :disabled="disabled"
-      :on-change="excelHandler"
-      :auto-upload="false"
-    >
-      <TMagicButton size="small" type="success" :disabled="disabled" plain>导入EXCEL</TMagicButton> </TMagicUpload
-    >&nbsp;
-    <TMagicButton v-if="importable" size="small" type="warning" :disabled="disabled" plain @click="clearHandler()"
-      >清空</TMagicButton
-    >
+
+    <div style="display: flex; justify-content: space-between; margin: 10px 0">
+      <TMagicButton v-if="addable" size="small" type="primary" :disabled="disabled" plain @click="newHandler()"
+        >新增一行</TMagicButton
+      >
+
+      <div style="display: flex">
+        <TMagicButton
+          :icon="Grid"
+          size="small"
+          type="primary"
+          @click="toggleMode"
+          v-if="enableToggleMode && config.enableToggleMode !== false && !isFullscreen"
+          >展开配置</TMagicButton
+        >
+        <TMagicButton
+          :icon="FullScreen"
+          size="small"
+          type="primary"
+          @click="toggleFullscreen"
+          v-if="config.enableFullscreen !== false"
+        >
+          {{ isFullscreen ? '退出全屏' : '全屏编辑' }}
+        </TMagicButton>
+        <TMagicUpload
+          v-if="importable"
+          style="display: inline-block"
+          ref="excelBtn"
+          action="/noop"
+          :disabled="disabled"
+          :on-change="excelHandler"
+          :auto-upload="false"
+        >
+          <TMagicButton size="small" type="success" :disabled="disabled" plain>导入EXCEL</TMagicButton>
+        </TMagicUpload>
+        <TMagicButton v-if="importable" size="small" type="warning" :disabled="disabled" plain @click="clearHandler()"
+          >清空</TMagicButton
+        >
+      </div>
+    </div>
 
     <div class="bottom" style="text-align: right" v-if="config.pagination">
       <TMagicPagination
@@ -371,10 +376,6 @@ const newHandler = async (row?: any) => {
   emit('change', props.model[modelName.value]);
 };
 
-if (!(globalThis as any).XLSX) {
-  asyncLoadJs('https://cdn.bootcdn.net/ajax/libs/xlsx/0.17.0/xlsx.full.min.js');
-}
-
 onMounted(() => {
   if (props.config.defautSort) {
     sortChange(props.config.defautSort);
@@ -535,10 +536,15 @@ const clearHandler = () => {
   mForm?.$emit('field-change', props.prop, props.model[modelName.value]);
 };
 
-const excelHandler = (file: any) => {
+const excelHandler = async (file: any) => {
   if (!file?.raw) {
     return false;
   }
+
+  if (!(globalThis as any).XLSX) {
+    await asyncLoadJs('https://cdn.bootcdn.net/ajax/libs/xlsx/0.17.0/xlsx.full.min.js');
+  }
+
   const reader = new FileReader();
   reader.onload = () => {
     const data = reader.result;
