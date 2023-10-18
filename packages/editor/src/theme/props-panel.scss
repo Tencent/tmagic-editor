@@ -20,6 +20,14 @@
   .el-input__wrapper {
     border-radius: 0;
   }
+
+  .m-fields-group-list {
+    .tmagic-design-table {
+      th {
+        font-size: 12px;
+      }
+    }
+  }
 }
 
 .m-editor-props-panel-popper {

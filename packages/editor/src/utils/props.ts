@@ -237,6 +237,8 @@ export const displayTabConfig: TabPaneConfig = {
     {
       type: 'groupList',
       name: 'displayConds',
+      titlePrefix: '条件组',
+      expandAll: true,
       items: [
         {
           type: 'table',
