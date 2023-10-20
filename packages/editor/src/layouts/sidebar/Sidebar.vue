@@ -58,16 +58,11 @@
         </template>
 
         <template
-          #layer-node-content="{ data: nodeData, node }"
+          #layer-node-content="{ data: nodeData }"
           v-if="config.$key === 'layer' || config.slots?.layerNodeContent"
         >
-          <slot v-if="config.$key === 'layer'" name="layer-node-content" :data="nodeData" :node="node"></slot>
-          <component
-            v-else-if="config.slots?.layerNodeContent"
-            :is="config.slots.layerNodeContent"
-            :data="nodeData"
-            :node="node"
-          />
+          <slot v-if="config.$key === 'layer'" name="layer-node-content" :data="nodeData"></slot>
+          <component v-else-if="config.slots?.layerNodeContent" :is="config.slots.layerNodeContent" :data="nodeData" />
         </template>
       </component>
     </div>
@@ -79,13 +74,15 @@ import { computed, ref, watch } from 'vue';
 import { Coin, EditPen, Goods, List } from '@element-plus/icons-vue';
 
 import MIcon from '@editor/components/Icon.vue';
-import type { MenuButton, MenuComponent, SideComponent, SideItem } from '@editor/type';
+import type { MenuButton, MenuComponent, SidebarSlots, SideComponent, SideItem } from '@editor/type';
 import { SideBarData } from '@editor/type';
 
 import CodeBlockListPanel from './code-block/CodeBlockListPanel.vue';
 import DataSourceListPanel from './data-source/DataSourceListPanel.vue';
+import LayerPanel from './layer/LayerPanel.vue';
 import ComponentListPanel from './ComponentListPanel.vue';
-import LayerPanel from './LayerPanel.vue';
+
+defineSlots<SidebarSlots>();
 
 defineOptions({
   name: 'MEditorSidebar',

@@ -50,7 +50,9 @@ import type { Id } from '@tmagic/schema';
 import Icon from '@editor/components/Icon.vue';
 import AppManageIcon from '@editor/icons/AppManageIcon.vue';
 import CodeIcon from '@editor/icons/CodeIcon.vue';
-import { CodeDeleteErrorType, CodeDslItem, DepTargetType, Services } from '@editor/type';
+import { CodeBlockListSlots, CodeDeleteErrorType, CodeDslItem, DepTargetType, Services } from '@editor/type';
+
+defineSlots<CodeBlockListSlots>();
 
 defineOptions({
   name: 'MEditorCodeBlockList',

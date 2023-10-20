@@ -37,9 +37,11 @@ import type { Id } from '@tmagic/schema';
 import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
 import SearchInput from '@editor/components/SearchInput.vue';
 import { useCodeBlockEdit } from '@editor/hooks/use-code-block-edit';
-import type { CodeDeleteErrorType, Services } from '@editor/type';
+import type { CodeBlockListPanelSlots, CodeDeleteErrorType, Services } from '@editor/type';
 
 import CodeBlockList from './CodeBlockList.vue';
+
+defineSlots<CodeBlockListPanelSlots>();
 
 defineOptions({
   name: 'MEditorCodeBlockListPanel',

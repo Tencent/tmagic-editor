@@ -18,7 +18,7 @@
 
 import serialize from 'serialize-javascript';
 
-import type { MApp, MContainer, MNode, MPage } from '@tmagic/schema';
+import type { Id, MApp, MContainer, MNode, MPage } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
 import { getNodePath, isNumber, isPage, isPop } from '@tmagic/utils';
@@ -77,9 +77,9 @@ export const generatePageNameByApp = (app: MApp): string => generatePageName(get
  */
 export const isFixed = (node: MNode): boolean => node.style?.position === 'fixed';
 
-export const getNodeIndex = (node: MNode, parent: MContainer | MApp): number => {
+export const getNodeIndex = (id: Id, parent: MContainer | MApp): number => {
   const items = parent?.items || [];
-  return items.findIndex((item: MNode) => `${item.id}` === `${node.id}`);
+  return items.findIndex((item: MNode) => `${item.id}` === `${id}`);
 };
 
 export const getRelativeStyle = (style: Record<string, any> = {}): Record<string, any> => ({
@@ -251,3 +251,14 @@ export const serializeConfig = (config: any) =>
     space: 2,
     unsafe: true,
   }).replace(/"(\w+)":\s/g, '$1: ');
+
+export const traverseNode = (node: MNode, cb: (node: MNode, parents: MNode[]) => void, parents: MNode[] = []) => {
+  cb(node, parents);
+
+  if (node.items?.length) {
+    parents.push(node);
+    node.items.forEach((item: MNode) => {
+      traverseNode(item, cb, parents);
+    });
+  }
+};

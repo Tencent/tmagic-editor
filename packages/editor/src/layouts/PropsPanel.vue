@@ -21,7 +21,9 @@ import { tMagicMessage } from '@tmagic/design';
 import type { FormState, FormValue } from '@tmagic/form';
 import { MForm } from '@tmagic/form';
 
-import type { Services } from '@editor/type';
+import type { PropsPanelSlots, Services } from '@editor/type';
+
+defineSlots<PropsPanelSlots>();
 
 defineOptions({
   name: 'MEditorPropsPanel',

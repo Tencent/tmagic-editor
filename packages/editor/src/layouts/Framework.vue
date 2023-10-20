@@ -51,11 +51,13 @@ import { computed, inject, ref, watch } from 'vue';
 import { TMagicScrollbar } from '@tmagic/design';
 
 import SplitView from '@editor/components/SplitView.vue';
-import type { GetColumnWidth, Services } from '@editor/type';
+import type { FrameworkSlots, GetColumnWidth, Services } from '@editor/type';
 import { getConfig } from '@editor/utils/config';
 
 import AddPageBox from './AddPageBox.vue';
 import CodeEditor from './CodeEditor.vue';
+
+defineSlots<FrameworkSlots>();
 
 defineOptions({
   name: 'MEditorFramework',

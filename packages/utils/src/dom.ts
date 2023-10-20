@@ -85,8 +85,8 @@ export const addClassName = (el: Element, doc: Document, className: string) => {
   if (!el.classList.contains(className)) el.classList.add(className);
 };
 
-export const removeClassName = (el: Element, className: string) => {
-  el.classList.remove(className);
+export const removeClassName = (el: Element, ...className: string[]) => {
+  el.classList.remove(...className);
 };
 
 export const removeClassNameByClassName = (doc: Document, className: string) => {

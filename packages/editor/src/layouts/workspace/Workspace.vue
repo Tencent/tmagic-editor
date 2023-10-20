@@ -18,11 +18,13 @@
 <script lang="ts" setup>
 import { computed, inject } from 'vue';
 
-import { MenuButton, MenuComponent, Services } from '@editor/type';
+import type { MenuButton, MenuComponent, Services, WorkspaceSlots } from '@editor/type';
 
 import MagicStage from './viewer/Stage.vue';
 import Breadcrumb from './Breadcrumb.vue';
 import PageBar from './PageBar.vue';
+
+defineSlots<WorkspaceSlots>();
 
 defineOptions({
   name: 'MEditorWorkspace',

@@ -39,7 +39,16 @@ import { removeClassNameByClassName } from '@tmagic/utils';
 
 import MIcon from '@editor/components/Icon.vue';
 import SearchInput from '@editor/components/SearchInput.vue';
-import type { ComponentGroup, ComponentItem, Services, StageOptions } from '@editor/type';
+import {
+  type ComponentGroup,
+  type ComponentItem,
+  ComponentListPanelSlots,
+  DragType,
+  type Services,
+  type StageOptions,
+} from '@editor/type';
+
+defineSlots<ComponentListPanelSlots>();
 
 defineOptions({
   name: 'MEditorComponentListPanel',
@@ -80,16 +89,17 @@ const appendComponent = ({ text, type, data = {} }: ComponentItem): void => {
 };
 
 const dragstartHandler = ({ text, type, data = {} }: ComponentItem, e: DragEvent) => {
-  if (e.dataTransfer) {
-    e.dataTransfer.setData(
-      'text/json',
-      serialize({
+  e.dataTransfer?.setData(
+    'text/json',
+    serialize({
+      dragType: DragType.COMPONENT_LIST,
+      data: {
         name: text,
         type,
         ...data,
-      }),
-    );
-  }
+      },
+    }),
+  );
 };
 
 const dragendHandler = () => {

@@ -38,7 +38,7 @@ import StageCore, { calcValueByFontsize, getOffset, Runtime } from '@tmagic/stag
 
 import ScrollViewer from '@editor/components/ScrollViewer.vue';
 import { useStage } from '@editor/hooks/use-stage';
-import { Layout, MenuButton, MenuComponent, Services, StageOptions } from '@editor/type';
+import { DragType, Layout, type MenuButton, type MenuComponent, type Services, type StageOptions } from '@editor/type';
 import { getConfig } from '@editor/utils/config';
 
 import NodeListMenu from './NodeListMenu.vue';
@@ -142,18 +142,30 @@ onUnmounted(() => {
   services?.keybindingService.unregisteEl('stage');
 });
 
+const parseDSL = getConfig('parseDSL');
+
 const contextmenuHandler = (e: MouseEvent) => {
   e.preventDefault();
   menu.value?.show(e);
 };
 
 const dragoverHandler = (e: DragEvent) => {
-  e.preventDefault();
   if (!e.dataTransfer) return;
+  e.preventDefault();
   e.dataTransfer.dropEffect = 'move';
 };
 
 const dropHandler = async (e: DragEvent) => {
+  if (!e.dataTransfer) return;
+
+  const data = e.dataTransfer.getData('text/json');
+
+  if (!data) return;
+
+  const config = parseDSL(`(${data})`);
+
+  if (!config || config.dragType !== DragType.COMPONENT_LIST) return;
+
   e.preventDefault();
 
   const doc = stage?.renderer.contentWindow?.document;
@@ -164,22 +176,12 @@ const dropHandler = async (e: DragEvent) => {
     parent = services?.editorService.getNodeById(parentEl.id, false) as MContainer;
   }
 
-  if (e.dataTransfer && parent && stageContainer.value && stage) {
-    const parseDSL = getConfig('parseDSL');
-
-    const data = e.dataTransfer.getData('text/json');
-
-    if (!data) return;
-
-    const config = parseDSL(`(${data})`);
-
-    if (!config) return;
-
+  if (parent && stageContainer.value && stage) {
     const layout = await services?.editorService.getLayout(parent);
 
     const containerRect = stageContainer.value.getBoundingClientRect();
     const { scrollTop, scrollLeft } = stage.mask;
-    const { style = {} } = config;
+    const { style = {} } = config.data;
 
     let top = 0;
     let left = 0;
@@ -197,16 +199,16 @@ const dropHandler = async (e: DragEvent) => {
       }
     }
 
-    config.style = {
+    config.data.style = {
       ...style,
       position,
       top: top / zoom.value,
       left: left / zoom.value,
     };
 
-    config.inputEvent = e;
+    config.data.inputEvent = e;
 
-    services?.editorService.add(config, parent);
+    services?.editorService.add(config.data, parent);
   }
 };
 </script>

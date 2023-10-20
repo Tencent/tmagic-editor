@@ -96,43 +96,31 @@ describe('isFixed', () => {
 
 describe('getNodeIndex', () => {
   test('能获取到', () => {
-    const index = editor.getNodeIndex(
-      {
-        type: 'text',
-        id: 1,
-      },
-      {
-        id: 2,
-        type: NodeType.PAGE,
-        items: [
-          {
-            type: 'text',
-            id: 1,
-          },
-        ],
-      },
-    );
+    const index = editor.getNodeIndex(1, {
+      id: 2,
+      type: NodeType.PAGE,
+      items: [
+        {
+          type: 'text',
+          id: 1,
+        },
+      ],
+    });
     expect(index).toBe(0);
   });
 
   test('不能能获取到', () => {
     // id为1不在查找数据中
-    const index = editor.getNodeIndex(
-      {
-        type: 'text',
-        id: 1,
-      },
-      {
-        id: 2,
-        type: NodeType.PAGE,
-        items: [
-          {
-            type: 'text',
-            id: 3,
-          },
-        ],
-      },
-    );
+    const index = editor.getNodeIndex(1, {
+      id: 2,
+      type: NodeType.PAGE,
+      items: [
+        {
+          type: 'text',
+          id: 3,
+        },
+      ],
+    });
     expect(index).toBe(-1);
   });
 });

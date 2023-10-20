@@ -41,6 +41,54 @@ import type { StorageService } from './services/storage';
 import type { UiService } from './services/ui';
 import type { UndoRedo } from './utils/undo-redo';
 
+export interface FrameworkSlots {
+  header(props: {}): any;
+  nav(props: {}): any;
+  'content-before'(props: {}): any;
+  'content-after'(props: {}): any;
+  'src-code'(props: {}): any;
+  sidebar(props: {}): any;
+  empty(props: {}): any;
+  workspace(props: {}): any;
+  'props-panel'(props: {}): any;
+  'footer'(props: {}): any;
+}
+
+export interface WorkspaceSlots {
+  stage(props: {}): any;
+  'workspace-content'(props: {}): any;
+  'page-bar-title'(props: { page: MPage }): any;
+  'page-bar-popover'(props: { page: MPage }): any;
+}
+
+export interface ComponentListPanelSlots {
+  'component-list-panel-header'(props: {}): any;
+  'component-list-item'(props: { component: ComponentItem }): any;
+}
+
+export interface CodeBlockListPanelSlots extends CodeBlockListSlots {
+  'code-block-panel-search'(props: {}): any;
+  'code-block-panel-header'(props: {}): any;
+}
+
+export interface CodeBlockListSlots {
+  'code-block-panel-tool'(props: { id: Id; data: CodeBlockContent }): any;
+}
+
+export interface LayerNodeSlots {
+  'layer-node-content'(props: { data: MNode }): any;
+}
+
+export interface LayerPanelSlots extends LayerNodeSlots {
+  'layer-panel-header'(props: {}): any;
+}
+
+export interface PropsPanelSlots {
+  'props-panel-header'(props: {}): any;
+}
+
+export type SidebarSlots = LayerPanelSlots & CodeBlockListPanelSlots & ComponentListPanelSlots;
+
 export type BeforeAdd = (config: MNode, parent: MContainer) => Promise<MNode> | MNode;
 export type GetConfig = (config: FormConfig) => Promise<FormConfig> | FormConfig;
 
@@ -528,4 +576,15 @@ export enum DepTargetType {
 export interface DatasourceTypeOption {
   type: string;
   text: string;
+}
+
+export interface LayerNodeStatus {
+  visible: boolean;
+  expand: boolean;
+  selected: boolean;
+}
+
+export enum DragType {
+  COMPONENT_LIST = 'component-list',
+  LAYER_TREE = 'layer-tree',
 }

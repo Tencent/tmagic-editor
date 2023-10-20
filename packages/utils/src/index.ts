@@ -369,3 +369,5 @@ export const getDefaultValueFromFields = (fields: DataSchema[]) => {
 };
 
 export const DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX = 'ds-field::';
+
+export const getKeys = Object.keys as <T extends object>(obj: T) => Array<keyof T>;
