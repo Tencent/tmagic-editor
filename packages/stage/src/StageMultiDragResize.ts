@@ -80,8 +80,7 @@ export default class StageMultiDragResize extends MoveableOptionsManager {
     this.dragResizeHelper.updateGroup(els);
 
     // 设置周围元素，用于选中元素跟周围元素的对齐辅助
-    const elementGuidelines: HTMLElement[] =
-      Array.prototype.slice.call(this.targetList[0].parentElement?.children) || [];
+    const elementGuidelines: Element[] = Array.from(this.targetList[0].parentElement?.children || []);
     this.setElementGuidelines(this.targetList, elementGuidelines);
 
     this.moveableForMulti?.destroy();

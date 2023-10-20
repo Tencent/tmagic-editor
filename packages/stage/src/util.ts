@@ -30,7 +30,7 @@ const getParents = (el: Element, relative: Element) => {
   return parents;
 };
 
-export const getOffset = (el: TargetElement): Offset => {
+export const getOffset = (el: Element): Offset => {
   const htmlEl = el as HTMLElement;
   const { offsetParent } = htmlEl;
 

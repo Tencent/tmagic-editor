@@ -132,7 +132,7 @@ export default class StageDragResize extends MoveableOptionsManager {
     this.dragResizeHelper.setMode(this.mode);
 
     // 设置选中元素的周围元素，用于选中元素跟周围元素对齐辅助
-    const elementGuidelines: HTMLElement[] = Array.prototype.slice.call(this.target?.parentElement?.children) || [];
+    const elementGuidelines: Element[] = Array.from(this.target?.parentElement?.children || []);
     this.setElementGuidelines([this.target as HTMLElement], elementGuidelines);
 
     return this.getOptions(false, {

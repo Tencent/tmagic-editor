@@ -90,7 +90,7 @@ export default class MoveableOptionsManager extends EventEmitter {
    * @param selectedElList 选中的元素列表，需要排除在对齐元素之外
    * @param allElList 全部元素列表
    */
-  protected setElementGuidelines(selectedElList: HTMLElement[], allElList: HTMLElement[]): void {
+  protected setElementGuidelines(selectedElList: HTMLElement[], allElList: Element[]): void {
     this.elementGuidelines.forEach((node) => {
       node.remove();
     });
@@ -224,7 +224,7 @@ export default class MoveableOptionsManager extends EventEmitter {
    * @param allElList 全部元素列表
    * @returns frame 辅助对齐元素集合的页面片
    */
-  private createGuidelineElements(selectedElList: HTMLElement[], allElList: HTMLElement[]): DocumentFragment {
+  private createGuidelineElements(selectedElList: HTMLElement[], allElList: Element[]): DocumentFragment {
     const frame = globalThis.document.createDocumentFragment();
 
     for (const node of allElList) {
@@ -246,7 +246,7 @@ export default class MoveableOptionsManager extends EventEmitter {
    * @param eleList 元素列表
    * @returns 是否在元素列表里面
    */
-  private isInElementList(ele: HTMLElement, eleList: HTMLElement[]): boolean {
+  private isInElementList(ele: Element, eleList: Element[]): boolean {
     for (const eleItem of eleList) {
       if (ele === eleItem) return true;
     }
