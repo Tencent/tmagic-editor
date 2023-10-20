@@ -27,7 +27,11 @@ const emit = defineEmits(['search']);
 
 const filterText = ref('');
 
+let timer: NodeJS.Timeout | null = null;
 const filterTextChangeHandler = () => {
-  emit('search', filterText.value);
+  timer && clearTimeout(timer);
+  timer = setTimeout(() => {
+    emit('search', filterText.value);
+  }, 300);
 };
 </script>
