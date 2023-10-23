@@ -87,12 +87,9 @@ export default class HttpDataSource extends DataSource {
   #type = 'http';
 
   constructor(options: HttpDataSourceOptions) {
-    const { options: httpOptions, ...dataSourceOptions } = options.schema;
+    const { options: httpOptions } = options.schema;
 
-    super({
-      schema: dataSourceOptions,
-      app: options.app,
-    });
+    super(options);
 
     this.schema = options.schema;
     this.httpOptions = httpOptions;
