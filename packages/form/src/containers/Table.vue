@@ -249,7 +249,7 @@ const modelName = computed(() => props.name || props.config.name || '');
 
 const data = computed(() =>
   props.config.pagination
-    ? props.model[modelName.value].filter(
+    ? (props.model[modelName.value] || []).filter(
         (item: any, index: number) =>
           index >= pagecontext.value * pagesize.value && index + 1 <= (pagecontext.value + 1) * pagesize.value,
       )
@@ -258,11 +258,11 @@ const data = computed(() =>
 
 const lastData = computed(() =>
   props.config.pagination
-    ? props.lastValues[modelName.value].filter(
+    ? (props.lastValues[modelName.value] || []).filter(
         (item: any, index: number) =>
           index >= pagecontext.value * pagesize.value && index + 1 <= (pagecontext.value + 1) * pagesize.value,
       )
-    : props.lastValues[modelName.value] || {},
+    : props.lastValues[modelName.value] || [],
 );
 
 const sortChange = ({ prop, order }: SortProp) => {
