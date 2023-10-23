@@ -1,3 +1,12 @@
+# [1.3.0-beta.4](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-beta.3...v1.3.0-beta.4) (2023-10-23)
+
+
+### Bug Fixes
+
+* **data-source:** http数据源参数透传入base ([359806d](https://github.com/Tencent/tmagic-editor/commit/359806da96f7ca2f6d048a7676ba53f3b7b3fb01))
+
+
+
 # [1.3.0-beta.3](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-beta.2...v1.3.0-beta.3) (2023-10-23)
 
 
