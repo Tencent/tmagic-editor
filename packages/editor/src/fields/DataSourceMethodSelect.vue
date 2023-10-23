@@ -68,7 +68,6 @@ const getParamItemsConfig = ([dataSourceId, medthodName]: [Id, string] = ['', ''
   if (!paramStatements) return [];
 
   return paramStatements.map((paramState: CodeParamStatement) => ({
-    labelWidth: '100px',
     text: paramState.name,
     ...paramState,
   }));
@@ -106,9 +105,7 @@ const methodsOptions = computed(
 
 const cascaderConfig = computed(() => ({
   type: 'cascader',
-  text: '数据源方法',
   name: props.name,
-  labelWidth: '80px',
   options: methodsOptions.value,
   onChange: (formState: any, dataSourceMethod: [Id, string]) => {
     setParamsConfig(dataSourceMethod, formState);

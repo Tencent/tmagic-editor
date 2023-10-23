@@ -6,6 +6,7 @@
         class="select"
         :config="selectConfig"
         :model="model"
+        :size="size"
         @change="onParamsChangeHandler"
       ></m-form-container>
       <!-- 查看/编辑按钮 -->
@@ -89,9 +90,7 @@ watch(
 
 const selectConfig = {
   type: 'select',
-  text: '代码块',
   name: props.name,
-  labelWidth: '80px',
   options: () => {
     if (codeDsl.value) {
       return map(codeDsl.value, (value, key) => ({

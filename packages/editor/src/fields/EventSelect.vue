@@ -22,6 +22,7 @@
         :size="size"
         :config="actionsConfig"
         :model="cardItem"
+        :label-width="config.labelWidth || '100px'"
         @change="onChangeHandler"
       >
         <template #header>
@@ -106,7 +107,6 @@ const actionTypeConfig = computed(() => {
   const defaultActionTypeConfig = {
     name: 'actionType',
     text: '联动类型',
-    labelWidth: '80px',
     type: 'select',
     defaultValue: ActionType.COMP,
     options: () => [
@@ -139,7 +139,6 @@ const targetCompConfig = computed(() => {
   const defaultTargetCompConfig = {
     name: 'to',
     text: '联动组件',
-    labelWidth: '80px',
     type: 'ui-select',
     display: (mForm: FormState, { model }: { model: Record<any, any> }) => model.actionType === ActionType.COMP,
   };
@@ -151,7 +150,6 @@ const compActionConfig = computed(() => {
   const defaultCompActionConfig = {
     name: 'method',
     text: '动作',
-    labelWidth: '80px',
     type: 'select',
     display: (mForm: FormState, { model }: { model: Record<any, any> }) => model.actionType === ActionType.COMP,
     options: (mForm: FormState, { model }: any) => {
@@ -171,7 +169,7 @@ const compActionConfig = computed(() => {
 const codeActionConfig = computed(() => {
   const defaultCodeActionConfig: CodeSelectColConfig = {
     type: 'code-select-col',
-    labelWidth: 0,
+    text: '代码块',
     name: 'codeId',
     disabled: () => !codeBlockService?.getEditStatus(),
     display: (mForm, { model }) => model.actionType === ActionType.CODE,
@@ -183,8 +181,8 @@ const codeActionConfig = computed(() => {
 const dataSourceActionConfig = computed(() => {
   const defaultDataSourceActionConfig: DataSourceMethodSelectConfig = {
     type: 'data-source-method-select',
+    text: '数据源方法',
     name: 'dataSourceMethod',
-    labelWidth: 0,
     display: (mForm, { model }) => model.actionType === ActionType.DATA_SOURCE,
   };
   return { ...defaultDataSourceActionConfig, ...props.config.dataSourceActionConfig };
@@ -235,6 +233,7 @@ const actionsConfig = computed(() => ({
       name: 'actions',
       expandAll: true,
       enableToggleMode: false,
+      titlePrefix: '动作',
       items: [
         actionTypeConfig.value,
         targetCompConfig.value,
