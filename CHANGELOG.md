@@ -1,3 +1,28 @@
+# [1.3.0-beta.3](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-beta.2...v1.3.0-beta.3) (2023-10-23)
+
+
+### Bug Fixes
+
+* **editor:** data-source-field-select出现两个label ([c25be06](https://github.com/Tencent/tmagic-editor/commit/c25be06441e2f2d70a84dce060eac9f1e18b05a7))
+* **editor:** 右键菜单消失子菜单可能不会跟着消失 ([1ce6411](https://github.com/Tencent/tmagic-editor/commit/1ce6411e052e22b200a79ac18d0d63b83ab26252))
+* **form:** table分页lastData初始化异常 ([bd9686d](https://github.com/Tencent/tmagic-editor/commit/bd9686dbd8159e482943a73ce569aad9da34ead9))
+
+
+### Features
+
+* **cli:** 新增datasoucreSuperClass配置 ([2b2a9c6](https://github.com/Tencent/tmagic-editor/commit/2b2a9c6706333d777bf87a06ec67f15f10294de3))
+* **core,data-source:** 数据源支持mock ([4c46a4e](https://github.com/Tencent/tmagic-editor/commit/4c46a4e575107a8e19a667deeca67fb69f934c37))
+* **data-source,editor,schema:** 数据源mock新增在编辑器中使用的配置 ([83ab94f](https://github.com/Tencent/tmagic-editor/commit/83ab94fcad40a31fc612db578268bab714ff7cc0))
+* **editor,data-source:** 组件配置支持关联数据源字段 ([e4613ba](https://github.com/Tencent/tmagic-editor/commit/e4613ba0536d719c87dbab48a1f2d8d1822988b2))
+* **editor,schema:** 支持配置数据源mock ([d4a8b89](https://github.com/Tencent/tmagic-editor/commit/d4a8b89e6f9e079d9cfdc1eb8a9935f0f2aacb5b))
+* **editor:** 事件关联数据源方法支持预置 ([588ec68](https://github.com/Tencent/tmagic-editor/commit/588ec68b2124cd997af1bae3ad7c8e9580959ad8))
+* **editor:** 搜索防抖 ([d3171f4](https://github.com/Tencent/tmagic-editor/commit/d3171f4c69189c7326fc5e43d18f8b04af62be20))
+* **editor:** 支持通过json快速配置数据源字段 ([56dfacb](https://github.com/Tencent/tmagic-editor/commit/56dfacbaaa343c3d3cd15c8c8cafcc9640a08dc9))
+* **form:** cascader支持check-strictly/emit-path配置 ([ed3c3d6](https://github.com/Tencent/tmagic-editor/commit/ed3c3d60ce79e75062d15ecb1e38552a057dd410))
+* **runtime:** 支持数据源mock ([9072642](https://github.com/Tencent/tmagic-editor/commit/9072642f2211911c9886987b33d05bfee1836daa))
+
+
+
 # [1.3.0-beta.2](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-beta.1...v1.3.0-beta.2) (2023-09-21)
 
 
