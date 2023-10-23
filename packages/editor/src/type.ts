@@ -467,6 +467,7 @@ export interface EventSelectConfig {
   name: string;
   type: 'event-select';
   src: 'datasource' | 'component';
+  labelWidth?: string;
   /** 事件名称表单配置 */
   eventNameConfig?: FormItem;
   /** 动作类型配置 */
@@ -539,6 +540,7 @@ export interface KeyBindingCacheItem {
 export interface CodeSelectColConfig {
   type: 'code-select-col';
   name: string;
+  text: string;
   labelWidth?: number | string;
   disabled?: boolean | FilterFunction;
   display?: boolean | FilterFunction;
@@ -547,6 +549,7 @@ export interface CodeSelectColConfig {
 export interface DataSourceMethodSelectConfig {
   type: 'data-source-method-select';
   name: string;
+  text: string;
   labelWidth?: number | string;
   disabled?: boolean | FilterFunction;
   display?: boolean | FilterFunction;
@@ -561,6 +564,7 @@ export interface DataSourceFieldSelectConfig {
   display?: boolean | FilterFunction;
 }
 
+/** 依赖收集的目标类型 */
 export enum DepTargetType {
   DEFAULT = 'default',
   /** 代码块 */
@@ -573,18 +577,31 @@ export enum DepTargetType {
   DATA_SOURCE_COND = 'data-source-cond',
 }
 
+/** 可新增的数据源类型选项 */
 export interface DatasourceTypeOption {
+  /** 数据源类型 */
   type: string;
+  /** 数据源名称 */
   text: string;
 }
 
+/** 组件树节点状态 */
 export interface LayerNodeStatus {
+  /** 显隐 */
   visible: boolean;
+  /** 展开子节点 */
   expand: boolean;
+  /** 选中 */
   selected: boolean;
 }
 
+/** 拖拽类型 */
 export enum DragType {
+  /** 从组件列表拖到画布 */
   COMPONENT_LIST = 'component-list',
+  /** 拖动组件树节点 */
   LAYER_TREE = 'layer-tree',
 }
+
+/** 当uiService.get('uiSelectMode')为true,点击组件（包括任何形式，组件树/画布）时触发的事件名 */
+export const UI_SELECT_MODE_EVENT_NAME = 'ui-select';

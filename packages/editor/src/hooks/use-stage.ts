@@ -5,7 +5,12 @@ import StageCore, { GuidesType, RemoveEventData, SortEventData, UpdateEventData 
 
 import editorService from '@editor/services/editor';
 import uiService from '@editor/services/ui';
-import { H_GUIDE_LINE_STORAGE_KEY, StageOptions, V_GUIDE_LINE_STORAGE_KEY } from '@editor/type';
+import {
+  H_GUIDE_LINE_STORAGE_KEY,
+  StageOptions,
+  UI_SELECT_MODE_EVENT_NAME,
+  V_GUIDE_LINE_STORAGE_KEY,
+} from '@editor/type';
 import { getGuideLineFromCache } from '@editor/utils/editor';
 
 const root = computed(() => editorService.get('root'));
@@ -30,7 +35,7 @@ export const useStage = (stageOptions: StageOptions) => {
       const elCanSelect = stageOptions.canSelect(el);
       // 在组件联动过程中不能再往下选择，返回并触发 ui-select
       if (uiSelectMode.value && elCanSelect && event.type === 'mousedown') {
-        document.dispatchEvent(new CustomEvent('ui-select', { detail: el }));
+        document.dispatchEvent(new CustomEvent(UI_SELECT_MODE_EVENT_NAME, { detail: el }));
         return stop();
       }
 

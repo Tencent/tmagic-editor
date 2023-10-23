@@ -49,7 +49,7 @@ import { TMagicButton, TMagicTooltip } from '@tmagic/design';
 import type { FieldProps, FormState } from '@tmagic/form';
 import type { Id } from '@tmagic/schema';
 
-import type { Services } from '@editor/type';
+import { Services, UI_SELECT_MODE_EVENT_NAME } from '@editor/type';
 
 defineOptions({
   name: 'MEditorUISelect',
@@ -68,7 +68,7 @@ const cancelHandler = () => {
   if (!services?.uiService) return;
   services.uiService.set('uiSelectMode', false);
   uiSelectMode.value = false;
-  globalThis.document.removeEventListener('ui-select', clickHandler as EventListener);
+  globalThis.document.removeEventListener(UI_SELECT_MODE_EVENT_NAME, clickHandler as EventListener);
 };
 
 const clickHandler = ({ detail }: Event & { detail: any }) => {
@@ -92,7 +92,7 @@ const startSelect = () => {
   if (!services?.uiService) return;
   services.uiService.set('uiSelectMode', true);
   uiSelectMode.value = true;
-  globalThis.document.addEventListener('ui-select', clickHandler as EventListener);
+  globalThis.document.addEventListener(UI_SELECT_MODE_EVENT_NAME, clickHandler as EventListener);
 };
 
 const deleteHandler = () => {

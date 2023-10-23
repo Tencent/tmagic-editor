@@ -62,7 +62,7 @@ import type { Id, MContainer, MNode } from '@tmagic/schema';
 import { isPage } from '@tmagic/utils';
 
 import MIcon from '@editor/components/Icon.vue';
-import type { LayerNodeSlots, LayerNodeStatus, Services } from '@editor/type';
+import { LayerNodeSlots, LayerNodeStatus, Services, UI_SELECT_MODE_EVENT_NAME } from '@editor/type';
 
 import LayerNodeTool from './LayerNodeTool.vue';
 import { useDrag } from './use-drag';
@@ -128,7 +128,7 @@ const nodeClickHandler = () => {
   if (!nodeStatusMap?.value) return;
 
   if (uiService?.get('uiSelectMode')) {
-    document.dispatchEvent(new CustomEvent('ui-select', { detail: props.data }));
+    document.dispatchEvent(new CustomEvent(UI_SELECT_MODE_EVENT_NAME, { detail: props.data }));
     return;
   }
 
@@ -155,7 +155,7 @@ const nodeContentmenuHandler = (event: MouseEvent, node: MNode) => {
   emit('node-contextmenu', event, node);
 };
 
-// 触发画布单选
+// 触发画布选中
 const select = async (data: MNode) => {
   if (!data.id) {
     throw new Error('没有id');
