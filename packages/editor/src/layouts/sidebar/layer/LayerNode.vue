@@ -145,8 +145,10 @@ const nodeClickHandler = () => {
 
 const contextmenuHandler = (event: MouseEvent) => {
   event.preventDefault();
-
-  nodeClickHandler();
+  const nodes = editorService?.get('nodes') || [];
+  if (nodes.length < 2 || !nodes.includes(props.data)) {
+    nodeClickHandler();
+  }
 
   emit('node-contextmenu', event, props.data);
 };
