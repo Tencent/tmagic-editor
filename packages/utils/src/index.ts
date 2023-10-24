@@ -356,15 +356,42 @@ export const getDefaultValueFromFields = (fields: DataSchema[]) => {
 
   fields.forEach((field) => {
     if (typeof field.defaultValue !== 'undefined') {
+      if (field.type === 'array' && !Array.isArray(field.defaultValue)) {
+        data[field.name] = defaultValue.array;
+        return;
+      }
+
+      if (field.type === 'object' && !isObject(field.defaultValue)) {
+        if (typeof field.defaultValue === 'string') {
+          try {
+            data[field.name] = JSON.parse(field.defaultValue);
+          } catch (e) {
+            data[field.name] = defaultValue.object;
+          }
+          return;
+        }
+
+        data[field.name] = defaultValue.object;
+        return;
+      }
+
       data[field.name] = field.defaultValue;
-    } else if (field.type === 'object') {
-      data[field.name] = field.fields ? getDefaultValueFromFields(field.fields) : {};
-    } else if (field.type) {
-      data[field.name] = defaultValue[field.type];
-    } else {
-      data[field.name] = undefined;
+      return;
     }
+
+    if (field.type === 'object') {
+      data[field.name] = field.fields ? getDefaultValueFromFields(field.fields) : defaultValue.object;
+      return;
+    }
+
+    if (field.type) {
+      data[field.name] = defaultValue[field.type];
+      return;
+    }
+
+    data[field.name] = undefined;
   });
+
   return data;
 };
 
