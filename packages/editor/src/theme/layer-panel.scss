@@ -11,6 +11,7 @@
 
     .magic-editor-layer-node {
       cursor: pointer;
+      white-space: nowrap;
 
       .layer-node {
         display: flex;
@@ -61,6 +62,9 @@
           .layer-node-label {
             line-height: $--node-height;
             flex: 1;
+            width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
         }
 
