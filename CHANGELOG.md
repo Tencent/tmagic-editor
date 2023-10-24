@@ -1,3 +1,20 @@
+# [1.3.0-beta.5](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-beta.4...v1.3.0-beta.5) (2023-10-24)
+
+
+### Bug Fixes
+
+* **editor:** 粘贴容器，组件树中子组件没有显示 ([5e7a0a0](https://github.com/Tencent/tmagic-editor/commit/5e7a0a0c53807422e936909a2a11a9edc572fad5))
+* **editor:** 组件树多选后右键点击不会变回单选 ([af72d81](https://github.com/Tencent/tmagic-editor/commit/af72d819fee4b67a5f584c415d9776a2e37fa95e))
+* **editor:** 组件树注册快捷方式 ([257c8c9](https://github.com/Tencent/tmagic-editor/commit/257c8c9fa1be795f63691b12846fca6c54fb8a24))
+* **utils:** 完善生成数据源默认值 ([808c82f](https://github.com/Tencent/tmagic-editor/commit/808c82f1934773cff436d757b8f9bdd5026e4f50))
+
+
+### Features
+
+* **editor:** 组件列表支持设置tooltip显示详情 ([6a53747](https://github.com/Tencent/tmagic-editor/commit/6a5374726e54e5ef7610d8262080ca8b13856b19))
+
+
+
 # [1.3.0-beta.4](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-beta.3...v1.3.0-beta.4) (2023-10-23)
 
 
