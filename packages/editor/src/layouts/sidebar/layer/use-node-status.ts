@@ -82,17 +82,21 @@ export const useNodeStatus = (services: Services | undefined, page: ComputedRef<
 
   services?.editorService.on('add', (newNodes: MNode[]) => {
     newNodes.forEach((node) => {
-      nodeStatusMap.value?.set(node.id, {
-        visible: true,
-        expand: Array.isArray(node.items),
-        selected: true,
+      traverseNode(node, (node: MNode) => {
+        nodeStatusMap.value?.set(node.id, {
+          visible: true,
+          expand: Array.isArray(node.items),
+          selected: true,
+        });
       });
     });
   });
 
   services?.editorService.on('remove', (nodes: MNode[]) => {
     nodes.forEach((node) => {
-      nodeStatusMap.value?.delete(node.id);
+      traverseNode(node, (node: MNode) => {
+        nodeStatusMap.value?.delete(node.id);
+      });
     });
   });
 
