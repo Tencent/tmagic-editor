@@ -1,6 +1,8 @@
 <template>
   <TMagicIcon v-if="!icon" class="magic-editor-icon"><Edit></Edit></TMagicIcon>
-  <TMagicIcon v-else-if="typeof icon === 'string' && icon.startsWith('http')" class="magic-editor-icon"
+  <TMagicIcon
+    v-else-if="typeof icon === 'string' && (icon.startsWith('http') || isRelativePath(icon))"
+    class="magic-editor-icon"
     ><img :src="icon"
   /></TMagicIcon>
   <i v-else-if="typeof icon === 'string'" class="magic-editor-icon" :class="icon"></i>
@@ -20,4 +22,6 @@ defineOptions({
 defineProps<{
   icon?: any;
 }>();
+
+const isRelativePath = (str: string) => /^(\.|(\.\.)?\/)/.test(str);
 </script>

@@ -334,6 +334,8 @@ export interface SideBarData {
 export interface ComponentItem {
   /** 显示文案 */
   text: string;
+  /** 详情，用于tooltip */
+  desc?: string;
   /** 组件类型 */
   type: string;
   /** Vue组件或url */

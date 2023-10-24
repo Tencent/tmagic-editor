@@ -18,8 +18,9 @@
             @drag="dragHandler"
           >
             <slot name="component-list-item" :component="item">
-              <MIcon :title="item.text" :icon="item.icon"></MIcon>
-
+              <TMagicTooltip placement="right" :disabled="!Boolean(item.desc)" :content="item.desc">
+                <MIcon :icon="item.icon"></MIcon>
+              </TMagicTooltip>
               <span :title="item.text">{{ item.text }}</span>
             </slot>
           </div>
@@ -34,7 +35,7 @@ import { computed, inject, ref } from 'vue';
 import { Grid } from '@element-plus/icons-vue';
 import serialize from 'serialize-javascript';
 
-import { TMagicCollapse, TMagicCollapseItem, TMagicScrollbar } from '@tmagic/design';
+import { TMagicCollapse, TMagicCollapseItem, TMagicScrollbar, TMagicTooltip } from '@tmagic/design';
 import { removeClassNameByClassName } from '@tmagic/utils';
 
 import MIcon from '@editor/components/Icon.vue';
