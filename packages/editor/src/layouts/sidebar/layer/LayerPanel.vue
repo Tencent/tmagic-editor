@@ -4,7 +4,7 @@
 
     <SearchInput @search="filterTextChangeHandler"></SearchInput>
 
-    <div class="magic-editor-layer-tree" tabindex="-1" @dragover="handleDragOver">
+    <div class="magic-editor-layer-tree" ref="layerTreeContainer" tabindex="-1" @dragover="handleDragOver">
       <LayerNode
         v-if="page && root"
         :data="page"
@@ -52,11 +52,13 @@ defineProps<{
 const services = inject<Services>('services');
 const editorService = services?.editorService;
 
+const layerTreeContainer = ref<HTMLDivElement>();
+
 const page = computed(() => editorService?.get('page'));
 const root = computed(() => editorService?.get('root'));
 
 const { nodeStatusMap } = useNodeStatus(services, page);
-const { isCtrlKeyDown } = useKeybinding(services);
+const { isCtrlKeyDown } = useKeybinding(services, layerTreeContainer);
 
 provide('nodeStatusMap', nodeStatusMap);
 

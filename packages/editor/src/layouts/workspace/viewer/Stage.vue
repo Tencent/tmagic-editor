@@ -40,6 +40,7 @@ import ScrollViewer from '@editor/components/ScrollViewer.vue';
 import { useStage } from '@editor/hooks/use-stage';
 import { DragType, Layout, type MenuButton, type MenuComponent, type Services, type StageOptions } from '@editor/type';
 import { getConfig } from '@editor/utils/config';
+import { KeyBindingContainerKey } from '@editor/utils/keybinding-config';
 
 import NodeListMenu from './NodeListMenu.vue';
 import ViewerMenu from './ViewerMenu.vue';
@@ -131,7 +132,7 @@ const resizeObserver = new ResizeObserver((entries) => {
 onMounted(() => {
   if (stageWrap.value?.container) {
     resizeObserver.observe(stageWrap.value.container);
-    services?.keybindingService.registeEl('stage', stageWrap.value.container);
+    services?.keybindingService.registeEl(KeyBindingContainerKey.STAGE, stageWrap.value.container);
   }
 });
 

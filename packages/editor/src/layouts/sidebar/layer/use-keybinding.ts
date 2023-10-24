@@ -1,8 +1,9 @@
-import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { type Ref, ref, watchEffect } from 'vue';
 
 import type { Services } from '@editor/type';
+import { KeyBindingContainerKey } from '@editor/utils/keybinding-config';
 
-export const useKeybinding = (services: Services | undefined) => {
+export const useKeybinding = (services: Services | undefined, contianer: Ref<HTMLDivElement | undefined>) => {
   const keybindingService = services?.keybindingService;
 
   // 是否多选
@@ -33,12 +34,14 @@ export const useKeybinding = (services: Services | undefined) => {
     },
   ]);
 
-  onMounted(() => {
-    globalThis.addEventListener('blur', windowBlurHandler);
-  });
-
-  onBeforeUnmount(() => {
-    globalThis.removeEventListener('blur', windowBlurHandler);
+  watchEffect(() => {
+    if (contianer.value) {
+      globalThis.addEventListener('blur', windowBlurHandler);
+      keybindingService?.registeEl(KeyBindingContainerKey.LAYER_PANEL, contianer.value);
+    } else {
+      globalThis.removeEventListener('blur', windowBlurHandler);
+      keybindingService?.unregisteEl(KeyBindingContainerKey.LAYER_PANEL);
+    }
   });
 
   return {
