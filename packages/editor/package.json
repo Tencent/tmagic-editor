@@ -12,6 +12,7 @@
   "types": "types/index.d.ts",
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "import": "./dist/tmagic-editor.js",
       "require": "./dist/tmagic-editor.umd.cjs"
     },

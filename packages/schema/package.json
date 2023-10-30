@@ -8,6 +8,7 @@
   "types": "types/index.d.ts",
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "import": "./dist/tmagic-schema.js",
       "require": "./dist/tmagic-schema.umd.cjs"
     },

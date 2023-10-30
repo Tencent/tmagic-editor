@@ -10,6 +10,7 @@
   "types": "types/index.d.ts",
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "import": "./dist/tmagic-tdesign-vue-next-adapter.js",
       "require": "./dist/tmagic-tdesign-vue-next-adapter.umd.cjs"
     },

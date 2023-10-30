@@ -10,6 +10,7 @@
   "types": "types/index.d.ts",
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "import": "./dist/tmagic-design.js",
       "require": "./dist/tmagic-design.umd.cjs"
     },

@@ -7,6 +7,7 @@
   "types": "types/index.d.ts",
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "import": "./dist/tmagic-utils.js",
       "require": "./dist/tmagic-utils.umd.cjs"
     },
