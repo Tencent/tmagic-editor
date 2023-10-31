@@ -1,5 +1,7 @@
 import type { AppCore, DataSourceSchema, HttpOptions, RequestFunction } from '@tmagic/schema';
 
+import HttpDataSource from './data-sources/Http';
+
 export interface DataSourceOptions {
   schema: DataSourceSchema;
   app: AppCore;
@@ -13,6 +15,10 @@ export interface HttpDataSourceSchema extends DataSourceSchema {
     dataPath?: string;
   };
   autoFetch?: boolean;
+  beforeRequest:
+    | string
+    | ((options: HttpOptions, content: { app: AppCore; dataSource: HttpDataSource }) => HttpOptions);
+  afterResponse: string | ((response: any, content: { app: AppCore; dataSource: HttpDataSource }) => any);
 }
 
 export interface HttpDataSourceOptions extends DataSourceOptions {

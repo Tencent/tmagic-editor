@@ -7,7 +7,7 @@ import type { DataSourceSchema } from '@tmagic/schema';
 import { guid } from '@tmagic/utils';
 
 import type { DatasourceTypeOption } from '@editor/type';
-import { getFormConfig } from '@editor/utils/data-source';
+import { getFormConfig, getFormValue } from '@editor/utils/data-source';
 
 import BaseService from './BaseService';
 
@@ -50,7 +50,7 @@ class DataSource extends BaseService {
   }
 
   public getFormValue(type = 'base') {
-    return this.get('values')[type];
+    return getFormValue(type, this.get('values')[type]);
   }
 
   public setFormValue(type: string, value: Partial<DataSourceSchema>) {

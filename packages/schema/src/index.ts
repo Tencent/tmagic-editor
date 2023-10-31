@@ -18,10 +18,15 @@
 export type Method = 'get' | 'GET' | 'delete' | 'DELETE' | 'post' | 'POST' | 'put' | 'PUT';
 
 export interface HttpOptions {
+  /** 请求链接 */
   url: string;
+  /** query参数 */
   params?: Record<string, string>;
+  /** body数据 */
   data?: Record<string, any>;
+  /** 请求头 */
   headers?: Record<string, string>;
+  /** 请求方法 GET/POST */
   method?: Method;
   [key: string]: any;
 }

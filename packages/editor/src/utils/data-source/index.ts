@@ -1,4 +1,4 @@
-import { FormConfig } from '@tmagic/form';
+import { FormConfig, FormState } from '@tmagic/form';
 import { DataSchema, DataSourceSchema } from '@tmagic/schema';
 
 import BaseFormConfig from './formConfigs/base';
@@ -8,47 +8,72 @@ const fillConfig = (config: FormConfig): FormConfig => [
   ...BaseFormConfig(),
   ...config,
   {
-    type: 'panel',
-    title: '数据定义',
+    type: 'tab',
     items: [
       {
-        name: 'fields',
-        type: 'data-source-fields',
-        defaultValue: () => [],
+        title: '数据定义',
+        items: [
+          {
+            name: 'fields',
+            type: 'data-source-fields',
+            defaultValue: () => [],
+          },
+        ],
       },
-    ],
-  },
-  {
-    type: 'panel',
-    title: '方法定义',
-    items: [
       {
-        name: 'methods',
-        type: 'data-source-methods',
-        defaultValue: () => [],
+        title: '方法定义',
+        items: [
+          {
+            name: 'methods',
+            type: 'data-source-methods',
+            defaultValue: () => [],
+          },
+        ],
       },
-    ],
-  },
-  {
-    type: 'panel',
-    title: '事件配置',
-    display: false,
-    items: [
       {
-        name: 'events',
-        src: 'datasource',
-        type: 'event-select',
+        title: '事件配置',
+        display: false,
+        items: [
+          {
+            name: 'events',
+            src: 'datasource',
+            type: 'event-select',
+          },
+        ],
       },
-    ],
-  },
-  {
-    type: 'panel',
-    title: 'mock数据',
-    items: [
       {
-        name: 'mocks',
-        type: 'data-source-mocks',
-        defaultValue: () => [],
+        title: 'mock数据',
+        items: [
+          {
+            name: 'mocks',
+            type: 'data-source-mocks',
+            defaultValue: () => [],
+          },
+        ],
+      },
+      {
+        title: '请求参数裁剪',
+        display: (formState: FormState, { model }: any) => model.type === 'http',
+        items: [
+          {
+            name: 'beforeRequest',
+            type: 'vs-code',
+            parse: true,
+            height: '600px',
+          },
+        ],
+      },
+      {
+        title: '响应数据裁剪',
+        display: (formState: FormState, { model }: any) => model.type === 'http',
+        items: [
+          {
+            name: 'afterResponse',
+            type: 'vs-code',
+            parse: true,
+            height: '600px',
+          },
+        ],
       },
     ],
   },
@@ -63,6 +88,64 @@ export const getFormConfig = (type: string, configs: Record<string, FormConfig>)
     default:
       return fillConfig(configs[type] || []);
   }
+};
+
+export const getFormValue = (type: string, values: Partial<DataSourceSchema>): Partial<DataSourceSchema> => {
+  if (type !== 'http') {
+    return values;
+  }
+
+  return {
+    beforeRequest: `(options, context) => {
+  /**
+   * 用户可以直接编写函数，在原始接口调用之前，会运行该函数，将这个函数的返回值作为该数据源接口的入参
+   *
+   * options: HttpOptions
+   *
+   * interface HttpOptions {
+   *  // 请求链接
+   *  url: string;
+   *  // query参数
+   *  params?: Record<string, string>;
+   *  // body数据
+   *  data?: Record<string, any>;
+   *  // 请求头
+   *  headers?: Record<string, string>;
+   *  // 请求方法 GET/POST
+   *  method?: Method;
+   * }
+   *
+   * context：上下文对象
+   *
+   * interface Content {
+   *  app: AppCore;
+   *  dataSource: HttpDataSource;
+   * }
+   *
+   * return: HttpOptions
+   */
+
+  // 此处的返回值会作为这个接口的入参
+  return options;
+}`,
+    afterResponse: `(response, context) => {
+  /**
+   * 用户可以直接编写函数，在原始接口返回之后，会运行该函数，将这个函数的返回值作为该数据源接口的返回
+
+    * context：上下文对象
+    *
+    * interface Content {
+    *  app: AppCore;
+    *  dataSource: HttpDataSource;
+    * }
+    *
+    */
+
+  // 此处的返回值会作为这个接口的返回值
+  return response;
+}`,
+    ...values,
+  };
 };
 
 export const getDisplayField = (dataSources: DataSourceSchema[], key: string) => {

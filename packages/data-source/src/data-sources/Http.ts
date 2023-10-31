@@ -126,21 +126,29 @@ export default class HttpDataSource extends DataSource {
   public async request(options: Partial<HttpOptions> = {}) {
     this.isLoading = true;
 
+    let reqOptions = {
+      ...this.httpOptions,
+      ...options,
+    };
+
     try {
       for (const method of this.#beforeRequest) {
-        await method({ options, params: {}, dataSource: this, app: this.app });
+        await method({ options: reqOptions, params: {}, dataSource: this, app: this.app });
+      }
+
+      if (typeof this.schema.beforeRequest === 'function') {
+        reqOptions = this.schema.beforeRequest(reqOptions, { app: this.app, dataSource: this });
       }
 
       // 注意：在编辑器中mockData不会为空，至少是默认值，不会发起请求
-      const res = this.mockData
-        ? this.mockData
-        : await this.#fetch?.({
-            ...this.httpOptions,
-            ...options,
-          });
+      let res = this.mockData ? this.mockData : await this.#fetch?.(reqOptions);
 
       for (const method of this.#afterRequest) {
-        await method({ res, options, params: {}, dataSource: this, app: this.app });
+        await method({ res, options: reqOptions, params: {}, dataSource: this, app: this.app });
+      }
+
+      if (typeof this.schema.afterResponse === 'function') {
+        res = this.schema.afterResponse(res, { app: this.app, dataSource: this });
       }
 
       if (this.schema.responseOptions?.dataPath) {
