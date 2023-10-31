@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev:vue2": "npm run build:libs && vite --config dev.vite.config.ts",
+    "dev:vue2": "vite --config dev.vite.config.ts",
     "dev:playground": "vite --config dev.vite.config.ts",
     "build": "npm run build:libs && npm run build:page && npm run build:playground",
     "build:page": "vite build --config build.vite.config.ts --mode page",
