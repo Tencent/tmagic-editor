@@ -47,6 +47,7 @@ const props = withDefaults(
     parse?: boolean;
   }>(),
   {
+    initValues: '',
     autoSave: true,
     language: 'javascript',
     options: () => ({

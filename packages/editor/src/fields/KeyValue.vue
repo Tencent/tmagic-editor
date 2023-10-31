@@ -91,5 +91,6 @@ const addHandler = () => {
 
 const deleteHandler = (index: number) => {
   records.value.splice(index, 1);
+  emit('change', getValue());
 };
 </script>
