@@ -1,5 +1,5 @@
 {
-  "version": "1.3.0-beta.5",
+  "version": "1.3.0-beta.6",
   "name": "@tmagic/editor",
   "type": "module",
   "sideEffects": [
@@ -47,13 +47,13 @@
   "dependencies": {
     "@babel/core": "^7.18.0",
     "@element-plus/icons-vue": "^2.0.9",
-    "@tmagic/core": "1.3.0-beta.5",
-    "@tmagic/design": "1.3.0-beta.5",
-    "@tmagic/form": "1.3.0-beta.5",
-    "@tmagic/schema": "1.3.0-beta.5",
-    "@tmagic/stage": "1.3.0-beta.5",
-    "@tmagic/table": "1.3.0-beta.5",
-    "@tmagic/utils": "1.3.0-beta.5",
+    "@tmagic/core": "1.3.0-beta.6",
+    "@tmagic/design": "1.3.0-beta.6",
+    "@tmagic/form": "1.3.0-beta.6",
+    "@tmagic/schema": "1.3.0-beta.6",
+    "@tmagic/stage": "1.3.0-beta.6",
+    "@tmagic/table": "1.3.0-beta.6",
+    "@tmagic/utils": "1.3.0-beta.6",
     "buffer": "^6.0.3",
     "color": "^3.1.3",
     "events": "^3.3.0",
@@ -65,8 +65,8 @@
     "vue": "^3.3.4"
   },
   "peerDependencies": {
-    "@tmagic/design": "1.3.0-beta.5",
-    "@tmagic/form": "1.3.0-beta.5",
+    "@tmagic/design": "1.3.0-beta.6",
+    "@tmagic/form": "1.3.0-beta.6",
     "monaco-editor": "^0.41.0",
     "vue": "^3.3.4"
   },

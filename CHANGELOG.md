@@ -1,3 +1,17 @@
+# [1.3.0-beta.6](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-beta.5...v1.3.0-beta.6) (2023-10-31)
+
+
+### Bug Fixes
+
+* **editor:** 数据源参数、请求头、请求体无法删除 ([cb2ff28](https://github.com/Tencent/tmagic-editor/commit/cb2ff281299417798ff41b260f970fc62bcdcbab)), closes [#543](https://github.com/Tencent/tmagic-editor/issues/543)
+
+
+### Features
+
+* **editor, data-source:** 支持http数据源请求、响应裁剪配置 ([f48afa9](https://github.com/Tencent/tmagic-editor/commit/f48afa98f28ab5eedefe4dfbc1a32303593b1786))
+
+
+
 # [1.3.0-beta.5](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-beta.4...v1.3.0-beta.5) (2023-10-24)
 
 
