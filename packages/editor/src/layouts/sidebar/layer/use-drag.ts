@@ -65,7 +65,7 @@ export const useDrag = (services: Services | undefined) => {
     if (!event.target) return;
 
     const targetEl = getNodeEl(event.target as HTMLElement);
-    if (!targetEl) return;
+    if (!targetEl?.draggable) return;
 
     const labelEl = targetEl.children[0];
     if (!labelEl) return;
