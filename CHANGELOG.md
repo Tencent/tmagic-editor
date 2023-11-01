@@ -1,3 +1,17 @@
+# [1.3.0-beta.7](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-beta.6...v1.3.0-beta.7) (2023-11-01)
+
+
+### Bug Fixes
+
+* **editor:** 不允许拖动的节点不允许被拖入 ([5021c74](https://github.com/Tencent/tmagic-editor/commit/5021c746fc87c6ac0e0d9206fe3b7b32626363ca)), closes [#544](https://github.com/Tencent/tmagic-editor/issues/544)
+
+
+### Features
+
+* **editor:** 新增组件树、数据源slots ([480d013](https://github.com/Tencent/tmagic-editor/commit/480d013994c02ecc98261d1f04726f2ed3a5a4b1))
+
+
+
 # [1.3.0-beta.6](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-beta.5...v1.3.0-beta.6) (2023-10-31)
 
 
