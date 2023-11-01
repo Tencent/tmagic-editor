@@ -25,6 +25,10 @@
             <slot name="layer-node-content" :data="data"></slot>
           </template>
 
+          <template #layer-node-tool="{ data }">
+            <slot name="layer-node-tool" :data="data"></slot>
+          </template>
+
           <template #component-list-panel-header>
             <slot name="component-list-panel-header"></slot>
           </template>
@@ -39,6 +43,10 @@
 
           <template #code-block-panel-tool="{ id, data }">
             <slot name="code-block-panel-tool" :id="id" :data="data"></slot>
+          </template>
+
+          <template #data-source-panel-tool="{ data }">
+            <slot name="data-source-panel-tool" :data="data"></slot>
           </template>
         </Sidebar>
       </slot>

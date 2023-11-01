@@ -64,6 +64,19 @@
           <slot v-if="config.$key === 'layer'" name="layer-node-content" :data="nodeData"></slot>
           <component v-else-if="config.slots?.layerNodeContent" :is="config.slots.layerNodeContent" :data="nodeData" />
         </template>
+
+        <template #layer-node-tool="{ data: nodeData }" v-if="config.$key === 'layer' || config.slots?.layerNodeTool">
+          <slot v-if="config.$key === 'layer'" name="layer-node-tool" :data="nodeData"></slot>
+          <component v-else-if="config.slots?.layerNodeTool" :is="config.slots.layerNodeTool" :data="nodeData" />
+        </template>
+
+        <template
+          #data-source-panel-tool="{ data }"
+          v-if="config.$key === 'data-source' || config.slots?.codeBlockPanelTool"
+        >
+          <slot v-if="config.$key === 'data-source'" name="data-source-panel-tool" :data="data"></slot>
+          <component v-else-if="config.slots?.DataSourcePanelTool" :is="config.slots.DataSourcePanelTool" />
+        </template>
       </component>
     </div>
   </div>

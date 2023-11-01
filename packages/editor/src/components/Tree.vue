@@ -1,14 +1,19 @@
 <template>
   <div class="m-editor-tree" @dragover="handleDragOver">
-    <TreeNode v-for="item in data" :key="item.id" :data="item" :indent="indent" :node-status-map="nodeStatusMap">
-      <template #tree-node-content="{ data: nodeData }">
-        <slot name="tree-node-content" :data="nodeData"> </slot>
-      </template>
+    <template v-if="data?.length">
+      <TreeNode v-for="item in data" :key="item.id" :data="item" :indent="indent" :node-status-map="nodeStatusMap">
+        <template #tree-node-content="{ data: nodeData }">
+          <slot name="tree-node-content" :data="nodeData"> </slot>
+        </template>
 
-      <template #tree-node-tool="{ data: nodeData }">
-        <slot name="tree-node-tool" :data="nodeData"> </slot>
-      </template>
-    </TreeNode>
+        <template #tree-node-tool="{ data: nodeData }">
+          <slot name="tree-node-tool" :data="nodeData"> </slot>
+        </template>
+      </TreeNode>
+    </template>
+    <div v-else>
+      <p>{{ emptyText }}</p>
+    </div>
   </div>
 </template>
 
@@ -47,9 +52,11 @@ withDefaults(
     data: TreeNodeData[];
     nodeStatusMap: Map<Id, LayerNodeStatus>;
     indent?: number;
+    emptyText?: string;
   }>(),
   {
     indent: 0,
+    emptyText: '暂无数据',
   },
 );
 

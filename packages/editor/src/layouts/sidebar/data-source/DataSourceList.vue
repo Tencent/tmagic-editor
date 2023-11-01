@@ -26,7 +26,7 @@
             <TMagicTooltip v-if="editable" effect="dark" content="删除" placement="bottom">
               <Icon :icon="Close" class="edit-icon" @click.stop="removeHandler(`${data.id}`)"></Icon>
             </TMagicTooltip>
-            <slot name="data-source-panel-tool" :id="data.id" :data="data.codeBlockContent"></slot>
+            <slot name="data-source-panel-tool" :data="data"></slot>
           </div>
         </div>
       </div>
@@ -42,7 +42,9 @@ import { tMagicMessageBox, TMagicTooltip, TMagicTree } from '@tmagic/design';
 import { Dep, Id } from '@tmagic/schema';
 
 import Icon from '@editor/components/Icon.vue';
-import { DepTargetType, Services } from '@editor/type';
+import { type DataSourceListSlots, DepTargetType, type Services } from '@editor/type';
+
+defineSlots<DataSourceListSlots>();
 
 defineOptions({
   name: 'MEditorDataSourceList',

@@ -19,7 +19,9 @@
       @node-click="nodeClickHandler"
     >
       <template #tree-node-tool="{ data: nodeData }">
-        <LayerNodeTool :data="nodeData"></LayerNodeTool>
+        <slot name="layer-node-tool" :data="nodeData">
+          <LayerNodeTool :data="nodeData"></LayerNodeTool>
+        </slot>
       </template>
 
       <template #tree-node-content="{ data: nodeData }">

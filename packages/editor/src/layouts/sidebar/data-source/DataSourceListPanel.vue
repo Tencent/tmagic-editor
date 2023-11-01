@@ -23,7 +23,11 @@
     </div>
 
     <!-- 数据源列表 -->
-    <DataSourceList @edit="editHandler" @remove="removeHandler"></DataSourceList>
+    <DataSourceList @edit="editHandler" @remove="removeHandler">
+      <template #data-source-panel-tool="{ data }">
+        <slot name="data-source-panel-tool" :data="data"></slot>
+      </template>
+    </DataSourceList>
 
     <DataSourceConfigPanel
       ref="editDialog"
@@ -44,10 +48,12 @@ import type { DataSourceSchema } from '@tmagic/schema';
 
 import SearchInput from '@editor/components/SearchInput.vue';
 import ToolButton from '@editor/components/ToolButton.vue';
-import type { Services } from '@editor/type';
+import type { DataSourceListSlots, Services } from '@editor/type';
 
 import DataSourceConfigPanel from './DataSourceConfigPanel.vue';
 import DataSourceList from './DataSourceList.vue';
+
+defineSlots<DataSourceListSlots>();
 
 defineOptions({
   name: 'MEditorDataSourceListPanel',

@@ -75,19 +75,25 @@ export interface CodeBlockListSlots {
   'code-block-panel-tool'(props: { id: Id; data: CodeBlockContent }): any;
 }
 
+export interface DataSourceListSlots {
+  'data-source-panel-tool'(props: { data: any }): any;
+}
+
 export interface LayerNodeSlots {
   'layer-node-content'(props: { data: MNode }): any;
 }
 
 export interface LayerPanelSlots extends LayerNodeSlots {
   'layer-panel-header'(props: {}): any;
+  'layer-node-tool'(props: { data: MNode }): any;
+  'layer-node-content'(props: { data: MNode }): any;
 }
 
 export interface PropsPanelSlots {
   'props-panel-header'(props: {}): any;
 }
 
-export type SidebarSlots = LayerPanelSlots & CodeBlockListPanelSlots & ComponentListPanelSlots;
+export type SidebarSlots = LayerPanelSlots & CodeBlockListPanelSlots & ComponentListPanelSlots & DataSourceListSlots;
 
 export type BeforeAdd = (config: MNode, parent: MContainer) => Promise<MNode> | MNode;
 export type GetConfig = (config: FormConfig) => Promise<FormConfig> | FormConfig;
@@ -614,4 +620,5 @@ export interface TreeNodeData {
   id: Id;
   name?: string;
   items?: TreeNodeData[];
+  [key: string]: any;
 }
