@@ -1,22 +1,31 @@
 <template>
-  <TMagicScrollbar class="magic-editor-layer-panel">
+  <TMagicScrollbar class="m-editor-layer-panel">
     <slot name="layer-panel-header"></slot>
 
     <SearchInput @search="filterTextChangeHandler"></SearchInput>
 
-    <div class="magic-editor-layer-tree" ref="layerTreeContainer" tabindex="-1" @dragover="handleDragOver">
-      <LayerNode
-        v-if="page && root"
-        :data="page"
-        :filter-text="filterText"
-        :is-ctrl-key-down="isCtrlKeyDown"
-        @node-contextmenu="contextmenu"
-      >
-        <template #layer-node-content="{ data: nodeData }">
-          <slot name="layer-node-content" :data="nodeData"> </slot>
-        </template>
-      </LayerNode>
-    </div>
+    <Tree
+      v-if="page && nodeStatusMap"
+      tabindex="-1"
+      ref="tree"
+      :data="[page]"
+      :node-status-map="nodeStatusMap"
+      @node-dragover="handleDragOver"
+      @node-dragstart="handleDragStart"
+      @node-dragleave="handleDragLeave"
+      @node-dragend="handleDragEnd"
+      @node-contextmenu="nodeContentmenuHandler"
+      @node-mouseenter="mouseenterHandler"
+      @node-click="nodeClickHandler"
+    >
+      <template #tree-node-tool="{ data: nodeData }">
+        <LayerNodeTool :data="nodeData"></LayerNodeTool>
+      </template>
+
+      <template #tree-node-content="{ data: nodeData }">
+        <slot name="layer-node-content" :data="nodeData"> </slot>
+      </template>
+    </Tree>
 
     <Teleport to="body">
       <LayerMenu ref="menu" :layer-content-menu="layerContentMenu" @collapse-all="collapseAllHandler"></LayerMenu>
@@ -25,15 +34,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, provide, ref } from 'vue';
+import { computed, inject, ref } from 'vue';
 
 import { TMagicScrollbar } from '@tmagic/design';
 
 import SearchInput from '@editor/components/SearchInput.vue';
-import type { LayerPanelSlots, MenuButton, MenuComponent, Services } from '@editor/type';
+import Tree from '@editor/components/Tree.vue';
+import { LayerPanelSlots, MenuButton, MenuComponent, Services } from '@editor/type';
 
 import LayerMenu from './LayerMenu.vue';
-import LayerNode from './LayerNode.vue';
+import LayerNodeTool from './LayerNodeTool.vue';
+import { useClick } from './use-click';
 import { useDrag } from './use-drag';
 import { useFilter } from './use-filter';
 import { useKeybinding } from './use-keybinding';
@@ -52,17 +63,14 @@ defineProps<{
 const services = inject<Services>('services');
 const editorService = services?.editorService;
 
-const layerTreeContainer = ref<HTMLDivElement>();
+const tree = ref<InstanceType<typeof Tree>>();
 
 const page = computed(() => editorService?.get('page'));
-const root = computed(() => editorService?.get('root'));
 
 const { nodeStatusMap } = useNodeStatus(services, page);
-const { isCtrlKeyDown } = useKeybinding(services, layerTreeContainer);
+const { isCtrlKeyDown } = useKeybinding(services, tree);
 
-provide('nodeStatusMap', nodeStatusMap);
-
-const { filterText, filterTextChangeHandler } = useFilter(nodeStatusMap, page);
+const { filterTextChangeHandler } = useFilter(nodeStatusMap, page);
 
 const collapseAllHandler = () => {
   if (!page.value || !nodeStatusMap.value) return;
@@ -75,13 +83,12 @@ const collapseAllHandler = () => {
   }
 };
 
-// 右键菜单
-const menu = ref<InstanceType<typeof LayerMenu>>();
-const contextmenu = (event: MouseEvent): void => {
-  event.preventDefault();
+const { handleDragStart, handleDragEnd, handleDragLeave, handleDragOver } = useDrag(services);
 
-  menu.value?.show(event);
-};
-
-const { handleDragOver } = useDrag(services);
+const {
+  menu,
+  nodeClickHandler,
+  nodeContentmenuHandler,
+  highlightHandler: mouseenterHandler,
+} = useClick(services, isCtrlKeyDown, nodeStatusMap);
 </script>

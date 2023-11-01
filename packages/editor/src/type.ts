@@ -595,6 +595,8 @@ export interface LayerNodeStatus {
   expand: boolean;
   /** 选中 */
   selected: boolean;
+  /** 是否可拖拽 */
+  draggable: boolean;
 }
 
 /** 拖拽类型 */
@@ -607,3 +609,9 @@ export enum DragType {
 
 /** 当uiService.get('uiSelectMode')为true,点击组件（包括任何形式，组件树/画布）时触发的事件名 */
 export const UI_SELECT_MODE_EVENT_NAME = 'ui-select';
+
+export interface TreeNodeData {
+  id: Id;
+  name?: string;
+  items?: TreeNodeData[];
+}

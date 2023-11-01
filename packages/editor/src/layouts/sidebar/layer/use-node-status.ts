@@ -5,8 +5,7 @@ import { getNodePath } from '@tmagic/utils';
 
 import { LayerNodeStatus, Services } from '@editor/type';
 import { traverseNode } from '@editor/utils';
-
-import { updateStatus } from './use-filter';
+import { updateStatus } from '@editor/utils/tree';
 
 const createPageNodeStatus = (services: Services | undefined, pageId: Id) => {
   const map = new Map<Id, LayerNodeStatus>();
@@ -15,6 +14,7 @@ const createPageNodeStatus = (services: Services | undefined, pageId: Id) => {
     visible: true,
     expand: true,
     selected: true,
+    draggable: false,
   });
 
   services?.editorService.getNodeById(pageId)?.items.forEach((node: MNode) =>
@@ -23,6 +23,7 @@ const createPageNodeStatus = (services: Services | undefined, pageId: Id) => {
         visible: true,
         expand: false,
         selected: false,
+        draggable: true,
       });
     }),
   );
@@ -87,6 +88,7 @@ export const useNodeStatus = (services: Services | undefined, page: ComputedRef<
           visible: true,
           expand: Array.isArray(node.items),
           selected: true,
+          draggable: true,
         });
       });
     });
