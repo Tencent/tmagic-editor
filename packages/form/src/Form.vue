@@ -28,8 +28,7 @@
 
 <script setup lang="ts">
 import { provide, reactive, ref, toRaw, watch, watchEffect } from 'vue';
-import { isEqual } from 'lodash-es';
-import cloneDeep from 'lodash-es/cloneDeep';
+import { cloneDeep, isEqual } from 'lodash-es';
 
 import { TMagicForm } from '@tmagic/design';
 
