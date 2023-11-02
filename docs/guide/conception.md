@@ -73,4 +73,4 @@ DSL 是编辑器搭建页面的最终产物（描述文件），其中包含了�
 
 ### 组件联动
 组件 A 在完成点击事件后，希望组件 B 可以展示一个弹窗，就是组件联动的一个示例。tmagic-editor通过事件绑定方式，可以为组件 A 和 B 配置事件关联，实现上述的组件联动。
-<img src="https://image.video.qpic.cn/oa_88b7d-37_723692309_1636032154483681" alt="组件联动">
+<img src="https://vip.image.video.qpic.cn/vupload/20231027/3e02d31698914788006.png" alt="组件联动">

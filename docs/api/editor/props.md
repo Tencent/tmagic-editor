@@ -49,7 +49,7 @@ const dsl = ref({
 
 - **默认值：** `[]`
 
-- **类型：** [ComponentGroup](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/editor/src/type.ts#L279-L284)
+- **类型：** [ComponentGroup](https://github.com/Tencent/tmagic-editor/blob/5880dfbe15fcead63e9dc7c91900f8c4e7a574d8/packages/editor/src/type.ts#L355)
 
 ::: tip
 icon使用的是[element-plus icon](https://element-plus.org/zh-CN/component/icon.html)
@@ -60,6 +60,19 @@ icon使用的是[element-plus icon](https://element-plus.org/zh-CN/component/ico
   icon: 'https://vfiles.gtimg.cn/vupload/20220614/9cc3091655207317835.png'
 }
 ```
+url支持相对路径或者绝对路径，例如
+```js
+{
+  icon: './icon.png'
+}
+{
+  icon: '/icon.png'
+}
+```
+:::
+
+:::warning
+请注意如果只是文件名的话是不行的，会被认为是css class
 :::
 
 - **示例：**
@@ -105,6 +118,39 @@ const componentGroupList = ref([
 
 ::: warning
 此配置仅在[sidebar](#sidebar)中配置了'component-list'时有效
+:::
+
+## datasourceList
+
+- **详情：**
+  
+  左侧数据源面板中可新增的自定义数据源列表
+
+- **默认值：**  `[]`
+
+- **类型：** [DatasourceTypeOption](https://github.com/Tencent/tmagic-editor/blob/5880dfbe15fcead63e9dc7c91900f8c4e7a574d8/packages/editor/src/type.ts#L589)
+
+- **示例：**
+
+```html
+<template>
+  <m-editor :datasource-list="datasourceTypeList"></m-editor>
+</template>
+
+<script setup>
+import { ref } from 'Vue';
+
+const datasourceTypeList = ref([
+  {
+    type: 'http',
+    text: 'Http数据源'
+  }
+])
+</script>
+```
+
+:::tip
+系统默认已提供了base,http两种基础数据源，此处配置的使用者新增的数据源
 :::
 
 ## sidebar
@@ -513,6 +559,92 @@ const eventMethodList = {
 };
 </script>
 ```
+
+## datasourceValues
+
+- **详情：**
+  
+  与 `propsValues` 类似，新增数据源时的默认值
+
+  :::tip
+  该属性最终会设置到[dataSourceService](./dataSourceServiceMethods.md)中，所以也可直接调用[dataSourceService.setFormValue()](./dataSourceServiceMethods.md#setFormValue)方法来配置
+  :::
+
+- **默认值：** `{}`
+
+- **类型：** Record<string, Partial<[DataSourceSchema](https://github.com/Tencent/tmagic-editor/blob/5880dfbe15fcead63e9dc7c91900f8c4e7a574d8/packages/schema/src/index.ts#L221)>>
+  
+- **示例：**
+
+```html
+<template>
+  <m-editor :datasource-values="datasourceValues"></m-editor>
+</template>
+
+<script setup>
+const datasourceValues = {
+  'user-info': {
+    type: 'user-info',
+    title: '用户信息',
+    description: '用户信息',
+    fields: [
+      {
+        type: 'string',
+        name: 'nick',
+        title: '昵称',
+        defaultValue: '请登录',
+        enable: true,
+      },
+    ]
+  },
+};
+</script>
+```
+
+## datasourceConfigs
+
+- **详情：**
+  
+  与 `propsConfigs` 类似，数据源的属性配置[表单的dsl](../../form-config/fields/text.md)
+
+  :::tip
+  该属性最终会设置到[dataSourceService](./dataSourceServiceMethods.md)中，所以也可直接调用[dataSourceService.setFormConfig()](./dataSourceServiceMethods.md#setFormConfig)方法来配置
+  :::
+
+- **默认值：** `{}`
+
+- **类型：** Record<string, [FormConfig](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/form/src/schema.ts#L706)>
+  
+- **示例：**
+
+```html
+<template>
+  <m-editor  :datasource-configs="datasourceConfigs"></m-editor>
+</template>
+
+<script setup>
+const datasourceConfigs = {
+  'user-info': [
+    {
+      type: 'select',
+      name: 'type',
+      text: '类型'，
+      options: [
+        { text: 'qq', value: 'qq'}
+      ]
+    }
+  ],
+};
+</script>
+```
+
+## datasourceEventMethodList
+
+- **详情：**
+  
+  组件属性配置中事件tab中的事件名与动作的下拉选项列表
+
+- **默认值：** `{}`
 
 ## moveableOptions
 
