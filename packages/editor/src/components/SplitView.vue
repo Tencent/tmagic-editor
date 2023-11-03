@@ -1,5 +1,5 @@
 <template>
-  <div ref="el" class="m-editor-layout">
+  <div ref="el" class="m-editor-layout" :style="`min-width: ${props.minCenter + props.minLeft + props.minRight}px`">
     <template v-if="hasLeft && $slots.left">
       <div class="m-editor-layout-left" :class="leftClass" :style="`width: ${left}px`">
         <slot name="left"></slot>
@@ -55,14 +55,18 @@ const el = ref<HTMLElement>();
 const hasLeft = computed(() => typeof props.left !== 'undefined');
 const hasRight = computed(() => typeof props.right !== 'undefined');
 
-const getCenterWidth = (clientWidth: number, left: number, right: number) => {
+const getCenterWidth = (clientWidth: number, l = 0, r = 0) => {
+  let right = r > 0 ? r : 0;
+  let left = l > 0 ? l : 0;
   let center = clientWidth - left - right;
+
   if (center < props.minCenter) {
     center = props.minCenter;
-    if (left < right) {
-      right = clientWidth - left - props.minCenter;
+    if (right > center + props.minRight) {
+      right = clientWidth - left - center;
     } else {
-      left = clientWidth - right - props.minCenter;
+      right = props.minRight;
+      left = clientWidth - right - center;
     }
   }
   return {
@@ -141,7 +145,7 @@ const changeRight = ({ deltaX }: OnDrag) => {
     right = props.right;
   }
 
-  const columnWidth = getCenterWidth(clientWidth, props.left || 0, right);
+  const columnWidth = getCenterWidth(clientWidth, props.left, right);
 
   center.value = columnWidth.center;
 
@@ -151,4 +155,16 @@ const changeRight = ({ deltaX }: OnDrag) => {
     right: columnWidth.right,
   });
 };
+
+defineExpose({
+  updateWidth() {
+    const columnWidth = getCenterWidth(el.value?.clientWidth || clientWidth, props.left, props.right);
+
+    emit('change', {
+      left: columnWidth.left,
+      center: center.value,
+      right: columnWidth.right,
+    });
+  },
+});
 </script>
