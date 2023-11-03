@@ -14,7 +14,7 @@ module.exports = {
     'eslint-config-tencent',
     'eslint-config-tencent/ts',
     'plugin:vue/vue3-essential',
-    './prettier',
+    './prettier.cjs',
   ],
   parser: 'vue-eslint-parser',
   parserOptions: {
@@ -28,7 +28,7 @@ module.exports = {
     '@typescript-eslint',
     'simple-import-sort'
   ],
-  ignorePatterns: ['.eslintrc.js'],
+  ignorePatterns: ['.eslintrc.cjs'],
   rules: {
     'vue/no-mutating-props': 'off',
     'vue/multi-word-component-names': 'off',
