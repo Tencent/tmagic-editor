@@ -26,11 +26,15 @@ import ContentMenu from '@editor/components/ContentMenu.vue';
 import type { ComponentItem, MenuButton, Services } from '@editor/type';
 
 import NodeListMenuTitle from './NodeListMenuTitle.vue';
+
+const PINNED_STATUE_CACHE_KEY = 'tmagic-pinned-node-list-pinned-status';
+
 const props = defineProps<{ isMultiSelect?: boolean }>();
 
 const menu = ref<InstanceType<typeof ContentMenu>>();
 const nodeList = ref<MNode[]>([]);
-const pinned = ref(false);
+const pinned = ref(Boolean(globalThis.localStorage.getItem(PINNED_STATUE_CACHE_KEY)));
+const firstShow = ref(true);
 
 const services = inject<Services>('services');
 const editorService = services?.editorService;
@@ -94,7 +98,8 @@ const unWatch = watch(
         nodeList.value = nodes;
 
         if (nodeList.value.length > 1) {
-          menu.value?.show(pinned.value ? undefined : event);
+          menu.value?.show(pinned.value && !firstShow.value ? undefined : event);
+          firstShow.value = false;
         }
       }, 1500);
     });
@@ -163,4 +168,8 @@ const dragMenuHandler = ({ deltaY, deltaX }: OnDrag) => {
 const closeHandler = () => {
   menu.value?.hide();
 };
+
+watch(pinned, () => {
+  globalThis.localStorage.setItem(PINNED_STATUE_CACHE_KEY, pinned.value.toString());
+});
 </script>

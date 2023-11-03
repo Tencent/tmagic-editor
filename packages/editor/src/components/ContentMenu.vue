@@ -126,17 +126,13 @@ const setPosition = (e: { clientY: number; clientX: number }) => {
   };
 };
 
-const show = (e?: MouseEvent) => {
+const show = (e?: { clientY: number; clientX: number }) => {
   // 加settimeout是以为，如果菜单中的按钮监听的是mouseup，那么菜单显示出来时鼠标如果正好在菜单上就会马上触发按钮的mouseup
   setTimeout(() => {
     visible.value = true;
 
-    if (!e) {
-      return;
-    }
-
     nextTick(() => {
-      setPosition(e);
+      e && setPosition(e);
 
       emit('show');
     });
