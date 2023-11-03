@@ -1,3 +1,18 @@
+# [1.3.0-beta.8](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-beta.7...v1.3.0-beta.8) (2023-11-03)
+
+
+### Bug Fixes
+
+* **editor:** 数据源列表中依赖的key会重复出现 ([2d5b772](https://github.com/Tencent/tmagic-editor/commit/2d5b7726efaff5032f01e4180126e801507b77cd))
+* **editor:** 画布区域不允许宽度为0 ([1c3f8ab](https://github.com/Tencent/tmagic-editor/commit/1c3f8abaf4881bc7d5b206b1ccc3686a7226cfda))
+
+
+### Features
+
+* **editor:** 缓存可选组件菜单置于顶层状态 ([263533f](https://github.com/Tencent/tmagic-editor/commit/263533f09ad0e2e1316550b8d93877a3aeb76455))
+
+
+
 # [1.3.0-beta.7](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-beta.6...v1.3.0-beta.7) (2023-11-01)
 
 
