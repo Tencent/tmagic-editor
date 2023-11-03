@@ -75,6 +75,26 @@ const getNodeTreeConfig = (id: string, dep: Dep[string], type?: string) => ({
   children: getKeyTreeConfig(dep, type),
 });
 
+/**
+ * 生成tree中依赖节点的数据
+ * @param children 节点
+ * @param deps 依赖
+ * @param type 依赖类型
+ */
+const mergeChildren = (children: any[], deps: Dep, type?: string) => {
+  Object.entries(deps).forEach(([id, dep]) => {
+    // 已经生成过的节点
+    const nodeItem = children.find((item) => item.id === id);
+    // 节点存在，则追加依赖的key
+    if (nodeItem) {
+      nodeItem.children = nodeItem.children.concat(getKeyTreeConfig(dep, type));
+    } else {
+      // 节点不存在，则生成
+      children.push(getNodeTreeConfig(id, dep, type));
+    }
+  });
+};
+
 const list = computed(() =>
   dataSources.value.map((ds) => {
     const dsDeps = dsDep.value[ds.id].deps;
@@ -82,21 +102,10 @@ const list = computed(() =>
     const dsCondDeps = dsCondDep.value[ds.id].deps;
 
     const children: any[] = [];
-
-    const mergeChildren = (deps: Dep, type?: string) => {
-      Object.entries(deps).forEach(([id, dep]) => {
-        const nodeItem = children.find((item) => item.id === id);
-        if (nodeItem) {
-          nodeItem.children = nodeItem.children.concat(getKeyTreeConfig(dep, type));
-        } else {
-          children.push(getNodeTreeConfig(id, dep, type));
-        }
-      });
-    };
-
-    mergeChildren(dsDeps);
-    mergeChildren(dsMethodDeps, 'method');
-    mergeChildren(dsCondDeps, 'cond');
+    // 数据源依赖分为三种类型：key/node、method、cond，是分开存储，这里将其合并展示
+    mergeChildren(children, dsDeps);
+    mergeChildren(children, dsMethodDeps, 'method');
+    mergeChildren(children, dsCondDeps, 'cond');
 
     return {
       id: ds.id,

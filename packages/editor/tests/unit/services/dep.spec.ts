@@ -96,7 +96,7 @@ describe('depService', () => {
         type: 'target',
         id: 'collect_2',
         name: 'test2',
-        isTarget: (key: string | number, value: any) => key === 'text1' && value === 'text',
+        isTarget: (key: string | number, value: any) => `${key}`.includes('text1') && value === 'text',
       }),
     );
 

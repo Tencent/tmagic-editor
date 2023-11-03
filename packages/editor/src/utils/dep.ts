@@ -58,8 +58,13 @@ export const createDataSourceCondTarget = (id: string) =>
   new Target({
     type: DepTargetType.DATA_SOURCE_COND,
     id,
-    isTarget: (key: string | number, value: any) =>
-      Array.isArray(value) && value[0] === id && Boolean(dataSourceService.getDataSourceById(id)),
+    isTarget: (key: string | number, value: any) => {
+      if (!Array.isArray(value) || value[0] !== id || !`${key}`.startsWith('displayConds')) return false;
+
+      const ds = dataSourceService.getDataSourceById(id);
+
+      return Boolean(ds?.fields?.find((field) => field.name === value[1]));
+    },
   });
 
 export const createDataSourceMethodTarget = (id: string) =>

@@ -299,7 +299,7 @@ export class Watcher extends EventEmitter {
         const keyIsItems = key === 'items';
         const fullKey = prop ? `${prop}.${key}` : key;
 
-        if (target.isTarget(key, value)) {
+        if (target.isTarget(fullKey, value)) {
           target.updateDep(node, fullKey);
           this.emit('update-dep', node, fullKey);
         } else if (!keyIsItems && Array.isArray(value)) {
