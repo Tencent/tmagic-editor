@@ -33,7 +33,7 @@
 import { computed, inject, markRaw, nextTick, onMounted, onUnmounted, ref, toRaw, watch, watchEffect } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
-import type { MContainer } from '@tmagic/schema';
+import type { MApp, MContainer } from '@tmagic/schema';
 import StageCore, { calcValueByFontsize, getOffset, Runtime } from '@tmagic/stage';
 
 import ScrollViewer from '@editor/components/ScrollViewer.vue';
@@ -105,12 +105,6 @@ watch(zoom, (zoom) => {
   stage.setZoom(zoom);
 });
 
-watch(root, (root) => {
-  if (runtime && root) {
-    runtime.updateRootConfig?.(cloneDeep(toRaw(root)));
-  }
-});
-
 watch(page, (page) => {
   if (runtime && page) {
     runtime.updatePageId?.(page.id);
@@ -119,6 +113,14 @@ watch(page, (page) => {
     });
   }
 });
+
+const rootChangeHandler = (root: MApp) => {
+  if (runtime && root) {
+    runtime.updateRootConfig?.(cloneDeep(toRaw(root)));
+  }
+};
+
+services?.editorService.on('root-change', rootChangeHandler);
 
 const resizeObserver = new ResizeObserver((entries) => {
   for (const { contentRect } of entries) {
@@ -141,6 +143,7 @@ onUnmounted(() => {
   resizeObserver.disconnect();
   services?.editorService.set('stage', null);
   services?.keybindingService.unregisteEl('stage');
+  services?.editorService.off('root-change', rootChangeHandler);
 });
 
 const parseDSL = getConfig('parseDSL');

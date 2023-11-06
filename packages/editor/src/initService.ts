@@ -276,26 +276,6 @@ export const initServiceEvents = (
   };
 
   const rootChangeHandler = async (value: MApp | null, preValue?: MApp | null) => {
-    const nodeId = editorService.get('node')?.id || props.defaultSelected;
-    let node;
-    if (nodeId) {
-      node = editorService.getNodeById(nodeId);
-    }
-
-    if (node && node !== value) {
-      await editorService.select(node.id);
-    } else if (value?.items?.length) {
-      await editorService.select(value.items[0]);
-    } else if (value?.id) {
-      editorService.set('nodes', [value]);
-      editorService.set('parent', null);
-      editorService.set('page', null);
-    }
-
-    if (toRaw(value) !== toRaw(preValue)) {
-      emit('update:modelValue', value);
-    }
-
     if (!value) return;
 
     value.codeBlocks = value.codeBlocks || {};
@@ -314,11 +294,31 @@ export const initServiceEvents = (
       initDataSourceDepTarget(ds);
     });
 
-    if (value && Array.isArray(value.items)) {
+    if (Array.isArray(value.items)) {
       depService.collect(value.items, true);
     } else {
       depService.clear();
       delete value.dataSourceDeps;
+    }
+
+    const nodeId = editorService.get('node')?.id || props.defaultSelected;
+    let node;
+    if (nodeId) {
+      node = editorService.getNodeById(nodeId);
+    }
+
+    if (node && node !== value) {
+      await editorService.select(node.id);
+    } else if (value.items?.length) {
+      await editorService.select(value.items[0]);
+    } else if (value.id) {
+      editorService.set('nodes', [value]);
+      editorService.set('parent', null);
+      editorService.set('page', null);
+    }
+
+    if (toRaw(value) !== toRaw(preValue)) {
+      emit('update:modelValue', value);
     }
   };
 
