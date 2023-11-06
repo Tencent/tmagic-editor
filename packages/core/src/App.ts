@@ -195,7 +195,7 @@ class App extends EventEmitter implements AppCore {
   }
 
   public setPage(id?: Id) {
-    const pageConfig = this.dsl?.items.find((page) => page.id === id);
+    const pageConfig = this.dsl?.items.find((page) => `${page.id}` === `${id}`);
 
     if (!pageConfig) {
       if (this.page) {
@@ -234,7 +234,7 @@ class App extends EventEmitter implements AppCore {
    */
   public getPage(id?: Id) {
     if (!id) return this.page;
-    if (this.page?.data.id === id) {
+    if (this.page && `${this.page.data.id}` === `${id}`) {
       return this.page;
     }
   }
