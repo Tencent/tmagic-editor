@@ -21,9 +21,6 @@ export default class Rule extends EventEmitter {
     this.hGuides = this.createGuides(GuidesType.HORIZONTAL, this.horizontalGuidelines);
     this.vGuides = this.createGuides(GuidesType.VERTICAL, this.verticalGuidelines);
 
-    this.hGuides.on('changeGuides', this.hGuidesChangeGuidesHandler);
-    this.vGuides.on('changeGuides', this.vGuidesChangeGuidesHandler);
-
     this.containerResizeObserver = new ResizeObserver(() => {
       this.vGuides.resize();
       this.hGuides.resize();
@@ -129,8 +126,8 @@ export default class Rule extends EventEmitter {
     height: type === GuidesType.HORIZONTAL ? '30px' : '100%',
   });
 
-  private createGuides = (type: GuidesType, defaultGuides: number[] = []): Guides =>
-    new Guides(this.container, {
+  private createGuides = (type: GuidesType, defaultGuides: number[] = []): Guides => {
+    const guides = new Guides(this.container, {
       type,
       defaultGuides,
       displayDragPos: true,
@@ -140,6 +137,18 @@ export default class Rule extends EventEmitter {
       style: this.getGuidesStyle(type),
       showGuides: this.isShowGuides,
     });
+
+    const changEventHandler = {
+      [GuidesType.HORIZONTAL]: this.hGuidesChangeGuidesHandler,
+      [GuidesType.VERTICAL]: this.vGuidesChangeGuidesHandler,
+    }[type];
+
+    if (changEventHandler) {
+      guides.on('changeGuides', changEventHandler);
+    }
+
+    return guides;
+  };
 
   private hGuidesChangeGuidesHandler = (e: GuidesEvents['changeGuides']) => {
     this.horizontalGuidelines = e.guides;
