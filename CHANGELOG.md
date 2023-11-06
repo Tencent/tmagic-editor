@@ -1,3 +1,14 @@
+# [1.3.0](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-beta.8...v1.3.0) (2023-11-06)
+
+
+### Bug Fixes
+
+* **core:** 设置page时查找原page兼容数字id情况 ([168ec28](https://github.com/Tencent/tmagic-editor/commit/168ec281aaa6005498dd73de6f64739d67d66b1d)), closes [#547](https://github.com/Tencent/tmagic-editor/issues/547)
+* **editor:** model-value变化后需要重新生成依赖后再通知runtime更新 ([f0f94d4](https://github.com/Tencent/tmagic-editor/commit/f0f94d4fcc451dc1d3e55ea2a3656d75592bd62e))
+* **stage:** 隐藏标尺后再显示标尺，拖出来的线没有吸附作用 ([7a228b1](https://github.com/Tencent/tmagic-editor/commit/7a228b13e6d1137e29a24022e5b914c5813a7fd6)), closes [#548](https://github.com/Tencent/tmagic-editor/issues/548)
+
+
+
 # [1.3.0-beta.8](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-beta.7...v1.3.0-beta.8) (2023-11-03)
 
 
