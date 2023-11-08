@@ -149,7 +149,6 @@ const tree = ref<InstanceType<typeof TMagicTree>>();
 
 defineExpose({
   filter(val: string) {
-    debugger;
     tree.value?.filter(val);
   },
 });
