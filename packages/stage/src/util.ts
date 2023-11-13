@@ -242,3 +242,21 @@ export const up = (deltaTop: number, target: TargetElement): SortEventData | voi
 
 export const isMoveableButton = (target: Element) =>
   target.classList.contains('moveable-button') || target.parentElement?.classList.contains('moveable-button');
+
+export const getMarginValue = (el: Element) => {
+  if (!el)
+    return {
+      marginLeft: 0,
+      marginTop: 0,
+    };
+
+  const { marginLeft, marginTop } = getComputedStyle(el);
+
+  const marginLeftValue = parseFloat(marginLeft) || 0;
+  const marginTopValue = parseFloat(marginTop) || 0;
+
+  return {
+    marginLeft: marginLeftValue,
+    marginTop: marginTopValue,
+  };
+};

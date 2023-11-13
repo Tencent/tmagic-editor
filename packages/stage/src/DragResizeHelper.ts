@@ -35,7 +35,7 @@ import MoveableHelper from 'moveable-helper';
 import { DRAG_EL_ID_PREFIX, GHOST_EL_ID_PREFIX, Mode, ZIndex } from './const';
 import TargetShadow from './TargetShadow';
 import { DragResizeHelperConfig, Rect, TargetElement } from './types';
-import { calcValueByFontsize, getAbsolutePosition, getOffset } from './util';
+import { calcValueByFontsize, getAbsolutePosition, getMarginValue, getOffset } from './util';
 
 /**
  * 拖拽/改变大小等操作发生时，moveable会抛出各种状态事件，DragResizeHelper负责响应这些事件，对目标节点target和拖拽节点targetShadow进行修改；
@@ -126,8 +126,9 @@ export default class DragResizeHelper {
       }
     } else {
       this.moveableHelper.onResize(e);
-      this.target.style.left = `${this.frameSnapShot.left + beforeTranslate[0]}px`;
-      this.target.style.top = `${this.frameSnapShot.top + beforeTranslate[1]}px`;
+      const { marginLeft, marginTop } = getMarginValue(this.target);
+      this.target.style.left = `${this.frameSnapShot.left + beforeTranslate[0] - marginLeft}px`;
+      this.target.style.top = `${this.frameSnapShot.top + beforeTranslate[1] - marginTop} - marginToppx`;
     }
 
     this.target.style.width = `${width}px`;
@@ -154,8 +155,10 @@ export default class DragResizeHelper {
 
     this.moveableHelper.onDrag(e);
 
-    this.target.style.left = `${this.frameSnapShot.left + e.beforeTranslate[0]}px`;
-    this.target.style.top = `${this.frameSnapShot.top + e.beforeTranslate[1]}px`;
+    const { marginLeft, marginTop } = getMarginValue(this.target);
+
+    this.target.style.left = `${this.frameSnapShot.left + e.beforeTranslate[0] - marginLeft}px`;
+    this.target.style.top = `${this.frameSnapShot.top + e.beforeTranslate[1] - marginTop}px`;
   }
 
   public onRotateStart(e: OnRotateStart): void {
@@ -241,8 +244,9 @@ export default class DragResizeHelper {
 
       if (!isParentIncluded) {
         // 更新页面元素位置
-        targeEl.style.left = `${frameSnapShot.left + beforeTranslate[0]}px`;
-        targeEl.style.top = `${frameSnapShot.top + beforeTranslate[1]}px`;
+        const { marginLeft, marginTop } = getMarginValue(targeEl);
+        targeEl.style.left = `${frameSnapShot.left + beforeTranslate[0] - marginLeft}px`;
+        targeEl.style.top = `${frameSnapShot.top + beforeTranslate[1] - marginTop}px`;
       }
 
       // 更新页面元素大小
@@ -275,8 +279,9 @@ export default class DragResizeHelper {
       const isParentIncluded = this.targetList.find((targetItem) => targetItem.id === targeEl.parentElement?.id);
       if (!isParentIncluded) {
         // 更新页面元素位置
-        targeEl.style.left = `${frameSnapShot.left + ev.beforeTranslate[0]}px`;
-        targeEl.style.top = `${frameSnapShot.top + ev.beforeTranslate[1]}px`;
+        const { marginLeft, marginTop } = getMarginValue(targeEl);
+        targeEl.style.left = `${frameSnapShot.left + ev.beforeTranslate[0] - marginLeft}px`;
+        targeEl.style.top = `${frameSnapShot.top + ev.beforeTranslate[1] - marginTop}px`;
       }
     });
     this.moveableHelper.onDragGroup(e);
@@ -285,8 +290,10 @@ export default class DragResizeHelper {
   public getUpdatedElRect(el: HTMLElement, parentEl: HTMLElement | null, doc: Document): Rect {
     const offset = this.mode === Mode.SORTABLE ? { left: 0, top: 0 } : { left: el.offsetLeft, top: el.offsetTop };
 
-    let left = calcValueByFontsize(doc, offset.left);
-    let top = calcValueByFontsize(doc, offset.top);
+    const { marginLeft, marginTop } = getMarginValue(el);
+
+    let left = calcValueByFontsize(doc, offset.left) - marginLeft;
+    let top = calcValueByFontsize(doc, offset.top) - marginTop;
     const width = calcValueByFontsize(doc, el.clientWidth);
     const height = calcValueByFontsize(doc, el.clientHeight);
 
@@ -358,6 +365,8 @@ export default class DragResizeHelper {
     ghostEl.style.position = 'absolute';
     ghostEl.style.left = `${left}px`;
     ghostEl.style.top = `${top}px`;
+    ghostEl.style.marginLeft = '0';
+    ghostEl.style.marginTop = '0';
     el.after(ghostEl);
     return ghostEl;
   }
