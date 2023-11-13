@@ -129,23 +129,28 @@ export const getInitPositionStyle = (style: Record<string, any> = {}, layout: La
   return style;
 };
 
-export const setLayout = (node: MNode, layout: Layout) => {
+export const setChilrenLayout = (node: MContainer, layout: Layout) => {
   node.items?.forEach((child: MNode) => {
-    if (isPop(child)) return;
-
-    const style = child.style || {};
-
-    // 是 fixed 不做处理
-    if (style.position === 'fixed') return;
-
-    if (layout !== Layout.RELATIVE) {
-      style.position = 'absolute';
-    } else {
-      child.style = getRelativeStyle(style);
-      child.style.right = 'auto';
-      child.style.bottom = 'auto';
-    }
+    setLayout(child, layout);
   });
+  return node;
+};
+
+export const setLayout = (node: MNode, layout: Layout) => {
+  if (isPop(node)) return;
+
+  const style = node.style || {};
+
+  // 是 fixed 不做处理
+  if (style.position === 'fixed') return;
+
+  if (layout !== Layout.RELATIVE) {
+    style.position = 'absolute';
+  } else {
+    node.style = getRelativeStyle(style);
+    node.style.right = 'auto';
+    node.style.bottom = 'auto';
+  }
   return node;
 };
 

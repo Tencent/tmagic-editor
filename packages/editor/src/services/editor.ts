@@ -36,6 +36,7 @@ import {
   getInitPositionStyle,
   getNodeIndex,
   isFixed,
+  setChilrenLayout,
   setLayout,
 } from '@editor/utils/editor';
 import { beforePaste, getAddParent } from '@editor/utils/operator';
@@ -510,8 +511,8 @@ class Editor extends BaseService {
 
     const newLayout = await this.getLayout(newConfig);
     const layout = await this.getLayout(node);
-    if (newLayout !== layout) {
-      newConfig = setLayout(newConfig, newLayout);
+    if (Array.isArray(newConfig.items) && newLayout !== layout) {
+      newConfig = setChilrenLayout(newConfig as MContainer, newLayout);
     }
 
     parentNodeItems[index] = newConfig;
@@ -788,7 +789,15 @@ class Editor extends BaseService {
       }
     }
 
+    const layout = await this.getLayout(parent);
+    const newLayout = await this.getLayout(targetParent);
+
+    if (newLayout !== layout) {
+      setLayout(config, newLayout);
+    }
+
     parent.items?.splice(index, 1);
+
     targetParent.items?.splice(targetIndex, 0, config);
 
     const page = this.get('page');
