@@ -83,6 +83,10 @@ export default class ActionManager extends EventEmitter {
   private getRenderDocument: GetRenderDocument;
 
   private mouseMoveHandler = throttle(async (event: MouseEvent): Promise<void> => {
+    if ((event.target as HTMLDivElement)?.classList?.contains('moveable-direction')) {
+      return;
+    }
+
     const el = await this.getElementFromPoint(event);
     if (!el) {
       this.clearHighlight();
@@ -90,7 +94,6 @@ export default class ActionManager extends EventEmitter {
     }
 
     this.emit('mousemove', event);
-
     this.highlight(el);
   }, throttleTime);
 
