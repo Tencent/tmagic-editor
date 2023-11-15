@@ -45,7 +45,7 @@ interface AppOptionsConfig {
   ua?: string;
   config?: MApp;
   platform?: 'editor' | 'mobile' | 'tv' | 'pc';
-  jsEngine?: 'browser' | 'hippy';
+  jsEngine?: 'browser' | 'hippy' | 'nodejs';
   designWidth?: number;
   curPage?: Id;
   useMock?: boolean;

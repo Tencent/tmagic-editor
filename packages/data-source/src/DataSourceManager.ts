@@ -24,7 +24,7 @@ import type { AppCore, DataSourceSchema, Id, MNode } from '@tmagic/schema';
 import { compiledCond, compiledNode, DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX, isObject } from '@tmagic/utils';
 
 import { DataSource, HttpDataSource } from './data-sources';
-import type { DataSourceManagerData, DataSourceManagerOptions, HttpDataSourceSchema } from './types';
+import type { DataSourceManagerData, DataSourceManagerOptions } from './types';
 
 class DataSourceManager extends EventEmitter {
   private static dataSourceClassMap = new Map<string, typeof DataSource>();
@@ -44,15 +44,52 @@ class DataSourceManager extends EventEmitter {
   public data: DataSourceManagerData = {};
   public useMock?: boolean = false;
 
-  constructor({ app, useMock }: DataSourceManagerOptions) {
+  constructor({ app, useMock, initialData }: DataSourceManagerOptions) {
     super();
 
     this.app = app;
     this.useMock = useMock;
 
+    if (initialData) {
+      this.data = initialData;
+    }
+
     app.dsl?.dataSources?.forEach((config) => {
       this.addDataSource(config);
     });
+  }
+
+  public async init() {
+    await Promise.all(
+      Array.from(this.dataSourceMap).map(async ([, ds]) => {
+        if (ds.isInit) {
+          return;
+        }
+
+        const beforeInit: ((...args: any[]) => any)[] = [];
+        const afterInit: ((...args: any[]) => any)[] = [];
+
+        ds.methods.forEach((method) => {
+          if (typeof method.content !== 'function') return;
+          if (method.timing === 'beforeInit') {
+            beforeInit.push(method.content);
+          }
+          if (method.timing === 'afterInit') {
+            afterInit.push(method.content);
+          }
+        });
+
+        for (const method of beforeInit) {
+          await method({ params: {}, dataSource: ds, app: this.app });
+        }
+
+        await ds.init();
+
+        for (const method of afterInit) {
+          await method({ params: {}, dataSource: ds, app: this.app });
+        }
+      }),
+    );
   }
 
   public get(id: string) {
@@ -62,24 +99,16 @@ class DataSourceManager extends EventEmitter {
   public async addDataSource(config?: DataSourceSchema) {
     if (!config) return;
 
-    let ds: DataSource;
-    if (config.type === 'http') {
-      ds = new HttpDataSource({
-        app: this.app,
-        schema: config as HttpDataSourceSchema,
-        request: this.app.request,
-        useMock: this.useMock,
-      });
-    } else {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      const DataSourceClass = DataSourceManager.dataSourceClassMap.get(config.type) || DataSource;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const DataSourceClass = DataSourceManager.dataSourceClassMap.get(config.type) || DataSource;
 
-      ds = new DataSourceClass({
-        app: this.app,
-        schema: config,
-        useMock: this.useMock,
-      });
-    }
+    const ds = new DataSourceClass({
+      app: this.app,
+      schema: config,
+      request: this.app.request,
+      useMock: this.useMock,
+      initialData: this.data[config.id],
+    });
 
     this.dataSourceMap.set(config.id, ds);
 
@@ -89,28 +118,7 @@ class DataSourceManager extends EventEmitter {
       this.setData(ds);
     });
 
-    const beforeInit: ((...args: any[]) => any)[] = [];
-    const afterInit: ((...args: any[]) => any)[] = [];
-
-    ds.methods.forEach((method) => {
-      if (typeof method.content !== 'function') return;
-      if (method.timing === 'beforeInit') {
-        beforeInit.push(method.content);
-      }
-      if (method.timing === 'afterInit') {
-        afterInit.push(method.content);
-      }
-    });
-
-    for (const method of beforeInit) {
-      await method({ params: {}, dataSource: ds, app: this.app });
-    }
-
-    await ds.init();
-
-    for (const method of afterInit) {
-      await method({ params: {}, dataSource: ds, app: this.app });
-    }
+    this.init();
   }
 
   public setData(ds: DataSource) {
@@ -225,5 +233,7 @@ class DataSourceManager extends EventEmitter {
     this.dataSourceMap.clear();
   }
 }
+
+DataSourceManager.registe('http', HttpDataSource);
 
 export default DataSourceManager;

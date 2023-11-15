@@ -34,9 +34,13 @@ export interface HttpOptions {
 export type RequestFunction = (options: HttpOptions) => Promise<any>;
 
 export interface AppCore {
+  /** 页面配置描述 */
   dsl?: MApp;
-  platform?: string;
-  jsEngine?: string;
+  /** 允许平台，editor: 编辑器中，mobile: 手机端，tv: 电视端, pc: 电脑端 */
+  platform?: 'editor' | 'mobile' | 'tv' | 'pc' | string;
+  /** 代码运行环境 */
+  jsEngine?: 'browser' | 'hippy' | 'nodejs' | string;
+  /** 网络请求函数 */
   request?: RequestFunction;
   [key: string]: any;
 }

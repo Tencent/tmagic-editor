@@ -51,15 +51,22 @@ export default class DataSource extends EventEmitter {
     this.setFields(options.schema.fields);
     this.setMethods(options.schema.methods || []);
 
-    const defaultData = this.getDefaultData();
-
     if (this.app.platform === 'editor') {
-      this.mockData = options.schema.mocks?.find((mock) => mock.useInEditor)?.data || defaultData;
+      // 编辑器中有mock使用mock，没有使用默认值
+      this.mockData = options.schema.mocks?.find((mock) => mock.useInEditor)?.data || this.getDefaultData();
+      this.setData(this.mockData);
     } else if (typeof options.useMock === 'boolean' && options.useMock) {
-      this.mockData = options.schema.mocks?.find((mock) => mock.enable)?.data;
+      // 设置了使用mock就使用mock数据
+      this.mockData = options.schema.mocks?.find((mock) => mock.enable)?.data || this.getDefaultData();
+      this.setData(this.mockData);
+    } else if (!options.initialData) {
+      this.setData(this.getDefaultData());
+    } else {
+      // 在ssr模式下，会将server端获取的数据设置到initialData
+      this.setData(options.initialData);
+      // 设置isInit,防止manager中执行init方法
+      this.isInit = true;
     }
-
-    this.setData(this.mockData || defaultData);
   }
 
   public get id() {

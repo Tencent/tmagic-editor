@@ -21,18 +21,20 @@ import type { AppCore } from '@tmagic/schema';
 import { getDepNodeIds, getNodes, replaceChildNode } from '@tmagic/utils';
 
 import DataSourceManager from './DataSourceManager';
+import { DataSourceManagerData } from './types';
 
 /**
  * 创建数据源管理器
- * @param dsl DSL
- * @param httpDataSourceOptions http 数据源配置
- * @returns DataSourceManager
+ * @param app AppCore
+ * @param useMock 是否使用mock数据
+ * @param initialData 初始化数据，ssr数据可以由此传入
+ * @returns DataSourceManager | undefined
  */
-export const createDataSourceManager = (app: AppCore, useMock?: boolean) => {
+export const createDataSourceManager = (app: AppCore, useMock?: boolean, initialData?: DataSourceManagerData) => {
   const { dsl, platform } = app;
   if (!dsl?.dataSources) return;
 
-  const dataSourceManager = new DataSourceManager({ app, useMock });
+  const dataSourceManager = new DataSourceManager({ app, useMock, initialData });
 
   if (dsl.dataSources && dsl.dataSourceCondDeps && platform !== 'editor') {
     getNodes(getDepNodeIds(dsl.dataSourceCondDeps), dsl.items).forEach((node) => {
@@ -47,22 +49,26 @@ export const createDataSourceManager = (app: AppCore, useMock?: boolean) => {
     });
   }
 
-  dataSourceManager.on('change', (sourceId: string) => {
-    const dep = dsl.dataSourceDeps?.[sourceId] || {};
-    const condDep = dsl.dataSourceCondDeps?.[sourceId] || {};
+  // ssr环境下，数据应该是提前准备好的（放到initialData中），不应该发生变化，无需监听
+  // 有initialData不一定是在ssr环境下
+  if (app.jsEngine !== 'nodejs') {
+    dataSourceManager.on('change', (sourceId: string) => {
+      const dep = dsl.dataSourceDeps?.[sourceId] || {};
+      const condDep = dsl.dataSourceCondDeps?.[sourceId] || {};
 
-    const nodeIds = union([...Object.keys(condDep), ...Object.keys(dep)]);
+      const nodeIds = union([...Object.keys(condDep), ...Object.keys(dep)]);
 
-    dataSourceManager.emit(
-      'update-data',
-      getNodes(nodeIds, dsl.items).map((node) => {
-        const newNode = cloneDeep(node);
-        newNode.condResult = dataSourceManager.compliedConds(node);
-        return dataSourceManager.compiledNode(newNode);
-      }),
-      sourceId,
-    );
-  });
+      dataSourceManager.emit(
+        'update-data',
+        getNodes(nodeIds, dsl.items).map((node) => {
+          const newNode = cloneDeep(node);
+          newNode.condResult = dataSourceManager.compliedConds(node);
+          return dataSourceManager.compiledNode(newNode);
+        }),
+        sourceId,
+      );
+    });
+  }
 
   return dataSourceManager;
 };

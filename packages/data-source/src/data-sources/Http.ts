@@ -18,7 +18,7 @@
 import { HttpOptions, RequestFunction } from '@tmagic/schema';
 import { getValueByKeyPath } from '@tmagic/utils';
 
-import { HttpDataSourceOptions, HttpDataSourceSchema } from '@data-source/types';
+import { DataSourceOptions, HttpDataSourceSchema } from '@data-source/types';
 
 import DataSource from './Base';
 
@@ -86,7 +86,7 @@ export default class HttpDataSource extends DataSource {
 
   #type = 'http';
 
-  constructor(options: HttpDataSourceOptions) {
+  constructor(options: DataSourceOptions<HttpDataSourceSchema>) {
     const { options: httpOptions } = options.schema;
 
     super(options);
