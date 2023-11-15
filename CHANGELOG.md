@@ -1,3 +1,20 @@
+## [1.3.1](https://github.com/Tencent/tmagic-editor/compare/v1.3.0...v1.3.1) (2023-11-15)
+
+
+### Bug Fixes
+
+* **editor:** 在组件树将组件拖入不同布局的容器内，需要改变其布局 ([ce0c941](https://github.com/Tencent/tmagic-editor/commit/ce0c941bf15987b01cf4949dea57313486768ed9)), closes [#552](https://github.com/Tencent/tmagic-editor/issues/552)
+* **stage:** 当页面大小小于画布时，组件又处于画布边缘，moveable边框会超出画布，导致获取到画布外的元素 ([3b789f4](https://github.com/Tencent/tmagic-editor/commit/3b789f4d13e95b76881678b7cc55cf7bc68e7b8a)), closes [#546](https://github.com/Tencent/tmagic-editor/issues/546)
+* **stage:** 设置margin后拖动位置出现漂移 ([7f6ba9d](https://github.com/Tencent/tmagic-editor/commit/7f6ba9de9967f07286e0c412211495f35f2d9649)), closes [#549](https://github.com/Tencent/tmagic-editor/issues/549)
+
+
+### Features
+
+* **core:** 将事件响应中的剩余事件参数传入到配置的代码块与数据源方法中 ([436fb3f](https://github.com/Tencent/tmagic-editor/commit/436fb3f5aa0fb3cc332e6e1d1ecb385579ff97f3)), closes [#551](https://github.com/Tencent/tmagic-editor/issues/551)
+* **data-source:** 数据源支持ssr ([ffd8130](https://github.com/Tencent/tmagic-editor/commit/ffd8130269ea75a9a6ca1238336fd5e3385cd6c0))
+
+
+
 # [1.3.0](https://github.com/Tencent/tmagic-editor/compare/v1.3.0-beta.8...v1.3.0) (2023-11-06)
 
 
