@@ -198,6 +198,20 @@ export interface UiState {
   propsPanelSize: 'large' | 'default' | 'small';
   /** 是否显示新增页面按钮 */
   showAddPageButton: boolean;
+
+  /** slide 拖拽悬浮窗 state */
+  floatBox: Map<
+    string,
+    {
+      status: boolean;
+      zIndex: number;
+      top: number;
+      left: number;
+    }
+  >;
+
+  /** 是否隐藏侧边栏 */
+  hideSlideBar: boolean;
 }
 
 export interface EditorNodeInfo {
@@ -318,6 +332,8 @@ export interface SideComponent extends MenuComponent {
   text: string;
   /** vue组件或url */
   icon: Component<{}, {}, any>;
+  /** slide 唯一标识 key */
+  $key: string;
 }
 
 /**
@@ -336,6 +352,12 @@ export interface SideBarData {
   /** panel列表 */
   items: SideItem[];
 }
+
+/**
+ * drawer 抽屉
+ * box 悬浮窗
+ */
+export type SlideType = 'drawer' | 'box';
 
 export interface ComponentItem {
   /** 显示文案 */

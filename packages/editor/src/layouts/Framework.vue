@@ -82,8 +82,10 @@ const showSrc = computed(() => uiService?.get('showSrc'));
 const LEFT_COLUMN_WIDTH_STORAGE_KEY = '$MagicEditorLeftColumnWidthData';
 const RIGHT_COLUMN_WIDTH_STORAGE_KEY = '$MagicEditorRightColumnWidthData';
 
-const leftColumnWidthCacheData =
+const getLeftColumnWidthCacheData = () =>
   Number(globalThis.localStorage.getItem(LEFT_COLUMN_WIDTH_STORAGE_KEY)) || DEFAULT_LEFT_COLUMN_WIDTH;
+
+const leftColumnWidthCacheData = getLeftColumnWidthCacheData();
 const RightColumnWidthCacheData =
   Number(globalThis.localStorage.getItem(RIGHT_COLUMN_WIDTH_STORAGE_KEY)) || DEFAULT_RIGHT_COLUMN_WIDTH;
 
@@ -115,6 +117,13 @@ watch(
   () => columnWidth.value.left,
   (left) => {
     globalThis.localStorage.setItem(LEFT_COLUMN_WIDTH_STORAGE_KEY, `${left}`);
+  },
+);
+
+watch(
+  () => uiService?.get('hideSlideBar'),
+  (hideSlideBar) => {
+    columnWidth.value.left = hideSlideBar ? 0 : getLeftColumnWidthCacheData();
   },
 );
 

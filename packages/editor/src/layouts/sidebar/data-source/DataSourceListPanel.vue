@@ -23,20 +23,16 @@
     </div>
 
     <!-- 数据源列表 -->
-    <DataSourceList @edit="editHandler" @remove="removeHandler">
-      <template #data-source-panel-tool="{ data }">
-        <slot name="data-source-panel-tool" :data="data"></slot>
-      </template>
-    </DataSourceList>
-
-    <DataSourceConfigPanel
-      ref="editDialog"
-      :disabled="!editable"
-      :values="dataSourceValues"
-      :title="dialogTitle"
-      @submit="submitDataSourceHandler"
-    ></DataSourceConfigPanel>
+    <DataSourceList @edit="editHandler" @remove="removeHandler"></DataSourceList>
   </TMagicScrollbar>
+  <DataSourceConfigPanel
+    ref="editDialog"
+    :disabled="!editable"
+    :values="dataSourceValues"
+    :title="dialogTitle"
+    :slideType="slideType"
+    @submit="submitDataSourceHandler"
+  ></DataSourceConfigPanel>
 </template>
 
 <script setup lang="ts">
@@ -48,7 +44,7 @@ import type { DataSourceSchema } from '@tmagic/schema';
 
 import SearchInput from '@editor/components/SearchInput.vue';
 import ToolButton from '@editor/components/ToolButton.vue';
-import type { DataSourceListSlots, Services } from '@editor/type';
+import type { DataSourceListSlots, Services, SlideType } from '@editor/type';
 
 import DataSourceConfigPanel from './DataSourceConfigPanel.vue';
 import DataSourceList from './DataSourceList.vue';
@@ -58,6 +54,10 @@ defineSlots<DataSourceListSlots>();
 defineOptions({
   name: 'MEditorDataSourceListPanel',
 });
+
+defineProps<{
+  slideType?: SlideType;
+}>();
 
 const { dataSourceService } = inject<Services>('services') || {};
 
@@ -102,7 +102,7 @@ const editHandler = (id: string) => {
     ...dataSourceService?.getDataSourceById(id),
   };
 
-  dialogTitle.value = `新增${dataSourceValues.value.title || ''}`;
+  dialogTitle.value = `编辑${dataSourceValues.value.title || ''}`;
 
   editDialog.value.show();
 };

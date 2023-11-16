@@ -1,5 +1,5 @@
 <template>
-  <div class="m-editor-sidebar" v-if="data.type === 'tabs' && data.items.length">
+  <div class="m-editor-sidebar" v-if="data.type === 'tabs' && data.items.length" v-show="!isHideSlideBar">
     <div class="m-editor-sidebar-header">
       <div
         class="m-editor-sidebar-header-item"
@@ -7,6 +7,10 @@
         :key="config.$key ?? index"
         :class="{ 'is-active': activeTabName === config.text }"
         @click="activeTabName = config.text || `${index}`"
+        draggable="true"
+        @dragstart="dragstartHandler"
+        @dragend="dragendHandler(config.$key, $event)"
+        v-show="!floatBoxStates?.get(config.$key)?.status"
       >
         <MIcon v-if="config.icon" :icon="config.icon"></MIcon>
         <div v-if="config.text" class="magic-editor-tab-panel-title">{{ config.text }}</div>
@@ -18,7 +22,12 @@
       :key="config.$key ?? index"
       v-show="activeTabName === config.text"
     >
-      <component v-if="config" :is="config.component" v-bind="config.props || {}" v-on="config?.listeners || {}">
+      <component
+        v-if="config && !floatBoxStates?.get(config.$key)?.status"
+        :is="config.component"
+        v-bind="config.props || {}"
+        v-on="config?.listeners || {}"
+      >
         <template
           #component-list-panel-header
           v-if="config.$key === 'component-list' || config.slots?.componentListPanelHeader"
@@ -80,15 +89,56 @@
       </component>
     </div>
   </div>
+
+  <Teleport to="body">
+    <div class="m-editor-float-box-list">
+      <div
+        v-for="(config, index) in sideBarItems"
+        :key="config.$key ?? index"
+        ref="floatBox"
+        :class="['m-editor-float-box', `m-editor-float-box-${config.$key}`]"
+        :style="{
+          left: `${floatBoxStates?.get(config.$key)?.left}px`,
+          top: `${floatBoxStates?.get(config.$key)?.top}px`,
+          zIndex: floatBoxStates?.get(config.$key)?.zIndex,
+        }"
+        v-show="floatBoxStates?.get(config.$key)?.status"
+      >
+        <div
+          :class="['m-editor-float-box-header', `m-editor-float-box-header-${config.$key}`]"
+          @click="showFloatBox(config.$key)"
+        >
+          <div>{{ config.text }}</div>
+          <MIcon class="m-editor-float-box-close" :icon="Close" @click.stop="closeFloatBox(config.$key)"></MIcon>
+        </div>
+        <div class="m-editor-float-box-body">
+          <component
+            v-if="config && floatBoxStates?.get(config.$key)?.status"
+            :is="config.component"
+            v-bind="{ ...config.props, slideType: 'box' }"
+            v-on="config?.listeners || {}"
+          />
+        </div>
+      </div>
+    </div>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
-import { Coin, EditPen, Goods, List } from '@element-plus/icons-vue';
+import { computed, inject, ref, watch } from 'vue';
+import { Close, Coin, EditPen, Goods, List } from '@element-plus/icons-vue';
 
 import MIcon from '@editor/components/Icon.vue';
-import type { MenuButton, MenuComponent, SidebarSlots, SideComponent, SideItem } from '@editor/type';
-import { SideBarData } from '@editor/type';
+import { useFloatBox } from '@editor/hooks/use-float-box';
+import type {
+  MenuButton,
+  MenuComponent,
+  Services,
+  SideBarData,
+  SidebarSlots,
+  SideComponent,
+  SideItem,
+} from '@editor/type';
 
 import CodeBlockListPanel from './code-block/CodeBlockListPanel.vue';
 import DataSourceListPanel from './data-source/DataSourceListPanel.vue';
@@ -110,6 +160,8 @@ const props = withDefaults(
     data: () => ({ type: 'tabs', status: '组件', items: ['component-list', 'layer', 'code-block', 'data-source'] }),
   },
 );
+
+const services = inject<Services>('services');
 
 const activeTabName = ref(props.data?.status);
 
@@ -161,6 +213,29 @@ watch(
   () => props.data.status,
   (status) => {
     activeTabName.value = status || '0';
+  },
+);
+
+const slideKeys = computed(() => sideBarItems.value.map((sideBarItem) => sideBarItem.$key));
+const isHideSlideBar = computed(() => services?.uiService.get('hideSlideBar'));
+
+const { showFloatBox, closeFloatBox, dragstartHandler, dragendHandler, floatBoxStates, floatBox, showingBoxKeys } =
+  useFloatBox(slideKeys);
+
+watch(
+  () => showingBoxKeys.value,
+  () => {
+    const isActiveTabShow = showingBoxKeys.value.some(
+      (key) => activeTabName.value === sideBarItems.value.find((v) => v.$key === key)?.text,
+    );
+    if (!isActiveTabShow) return;
+    const nextSlideBarItem = sideBarItems.value.find((sideBarItem) => !showingBoxKeys.value.includes(sideBarItem.$key));
+    if (!nextSlideBarItem) {
+      services?.uiService.set('hideSlideBar', true);
+      return;
+    }
+    services?.uiService.set('hideSlideBar', false);
+    activeTabName.value = nextSlideBarItem?.text;
   },
 );
 

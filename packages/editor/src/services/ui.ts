@@ -44,6 +44,8 @@ const state = reactive<UiState>({
   showRule: true,
   propsPanelSize: 'small',
   showAddPageButton: true,
+  floatBox: new Map(),
+  hideSlideBar: false,
 });
 
 class Ui extends BaseService {
@@ -93,6 +95,19 @@ class Ui extends BaseService {
     }
     // 60/80是为了不要让画布太过去贴住四周（这样好看些）
     return Math.min((width - 60) / stageWidth || 1, (height - 80) / stageHeight || 1);
+  }
+
+  public async setFloatBox(keys: string[]) {
+    const map = state.floatBox;
+    for (const key of keys) {
+      if (map.get(key)) continue;
+      map.set(key, {
+        status: false,
+        zIndex: 99,
+        top: 0,
+        left: 0,
+      });
+    }
   }
 
   public resetState() {

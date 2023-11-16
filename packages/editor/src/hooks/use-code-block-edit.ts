@@ -68,6 +68,8 @@ export const useCodeBlockEdit = (codeBlockService?: CodeBlockService) => {
 
     await codeBlockService?.setCodeDslById(codeId.value, values);
 
+    tMagicMessage.success('代码块保存成功');
+
     codeBlockEditor.value?.hide();
   };
 

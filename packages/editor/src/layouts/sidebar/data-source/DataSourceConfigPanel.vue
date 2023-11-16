@@ -1,5 +1,6 @@
 <template>
-  <MFormDrawer
+  <component
+    :is="slideType === 'box' ? MFormBox : MFormDrawer"
     ref="fomDrawer"
     label-width="80px"
     :close-on-press-escape="false"
@@ -10,17 +11,17 @@
     :disabled="disabled"
     @submit="submitHandler"
     @error="errorHandler"
-  ></MFormDrawer>
+  ></component>
 </template>
 
 <script setup lang="ts">
 import { computed, inject, ref, watchEffect } from 'vue';
 
 import { tMagicMessage } from '@tmagic/design';
-import { FormConfig, MFormDrawer } from '@tmagic/form';
+import { FormConfig, MFormBox, MFormDrawer } from '@tmagic/form';
 import { DataSourceSchema } from '@tmagic/schema';
 
-import type { Services } from '@editor/type';
+import type { Services, SlideType } from '@editor/type';
 
 defineOptions({
   name: 'MEditorDataSourceConfigPanel',
@@ -30,6 +31,7 @@ const props = defineProps<{
   title?: string;
   values: any;
   disabled: boolean;
+  slideType?: SlideType;
 }>();
 
 const emit = defineEmits(['submit']);
