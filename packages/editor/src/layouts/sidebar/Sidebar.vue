@@ -1,5 +1,5 @@
 <template>
-  <div class="m-editor-sidebar" v-if="data.type === 'tabs' && data.items.length" v-show="!isHideSlideBar">
+  <div class="m-editor-sidebar" v-if="data.type === 'tabs' && data.items.length">
     <div class="m-editor-sidebar-header">
       <div
         class="m-editor-sidebar-header-item"
@@ -114,8 +114,8 @@
         <div class="m-editor-float-box-body">
           <component
             v-if="config && floatBoxStates?.get(config.$key)?.status"
-            :is="config.component"
-            v-bind="{ ...config.props, slideType: 'box' }"
+            :is="config.boxComponentConfig?.component || config.component"
+            v-bind="config.boxComponentConfig?.props || config.props || {}"
             v-on="config?.listeners || {}"
           />
         </div>
@@ -193,6 +193,11 @@ const getItemConfig = (data: SideItem): SideComponent => {
       text: '代码编辑',
       component: CodeBlockListPanel,
       slots: {},
+      boxComponentConfig: {
+        props: {
+          slideType: 'box',
+        },
+      },
     },
     'data-source': {
       $key: 'data-source',
@@ -201,6 +206,11 @@ const getItemConfig = (data: SideItem): SideComponent => {
       text: '数据源',
       component: DataSourceListPanel,
       slots: {},
+      boxComponentConfig: {
+        props: {
+          slideType: 'box',
+        },
+      },
     },
   };
 
@@ -217,20 +227,20 @@ watch(
 );
 
 const slideKeys = computed(() => sideBarItems.value.map((sideBarItem) => sideBarItem.$key));
-const isHideSlideBar = computed(() => services?.uiService.get('hideSlideBar'));
 
 const { showFloatBox, closeFloatBox, dragstartHandler, dragendHandler, floatBoxStates, floatBox, showingBoxKeys } =
   useFloatBox(slideKeys);
 
 watch(
-  () => showingBoxKeys.value,
+  () => showingBoxKeys.value.length,
   () => {
     const isActiveTabShow = showingBoxKeys.value.some(
       (key) => activeTabName.value === sideBarItems.value.find((v) => v.$key === key)?.text,
     );
-    if (!isActiveTabShow) return;
+    if (!isActiveTabShow && activeTabName.value) return;
     const nextSlideBarItem = sideBarItems.value.find((sideBarItem) => !showingBoxKeys.value.includes(sideBarItem.$key));
     if (!nextSlideBarItem) {
+      activeTabName.value = '';
       services?.uiService.set('hideSlideBar', true);
       return;
     }

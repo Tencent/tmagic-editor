@@ -334,6 +334,14 @@ export interface SideComponent extends MenuComponent {
   icon: Component<{}, {}, any>;
   /** slide 唯一标识 key */
   $key: string;
+
+  /** 组件扩展参数 */
+  boxComponentConfig?: {
+    /** Vue3组件 */
+    component?: any;
+    /** 传入组件的props对象 */
+    props?: Record<string, any>;
+  };
 }
 
 /**
