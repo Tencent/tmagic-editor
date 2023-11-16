@@ -121,6 +121,10 @@ export const useDrag = (services: Services | undefined) => {
     removeStatusClass(dragState.container);
 
     if (node && dragState.dragOverNodeId && dragState.dropType && services) {
+      if (dragState.dragOverNodeId === node.id) {
+        return;
+      }
+
       const targetInfo = services.editorService.getNodeInfo(dragState.dragOverNodeId, false);
       const targetNode = targetInfo.node;
       let targetParent = targetInfo.parent;
