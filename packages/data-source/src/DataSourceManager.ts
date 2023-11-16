@@ -161,6 +161,11 @@ class DataSourceManager extends EventEmitter {
           return this.data[value.dataSourceId];
         }
 
+        // 指定数据源的字符串模板，如：{ isBindDataSourceField: true, dataSourceId: 'id', template: `xxx${field}xxx`}
+        if (value?.isBindDataSourceField && value.dataSourceId && typeof value.template === 'string') {
+          return template(value.template)(this.data[value.dataSourceId]);
+        }
+
         // 使用data-source-field-select等表单控件的数据源字段，如：[`${DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX}${id}`, 'field']
         if (Array.isArray(value) && typeof value[0] === 'string') {
           const [prefixId, ...fields] = value;
