@@ -425,13 +425,6 @@ export type CodeState = {
   paramsColConfig?: ColumnConfig;
 };
 
-export type HookData = {
-  /** 代码块id */
-  codeId: Id;
-  /** 参数 */
-  params?: object;
-};
-
 export type CodeRelation = {
   /** 组件id:[代码id1，代码id2] */
   [compId: Id]: Id[];
@@ -592,19 +585,6 @@ export interface DataSourceFieldSelectConfig {
   labelWidth?: number | string;
   disabled?: boolean | FilterFunction;
   display?: boolean | FilterFunction;
-}
-
-/** 依赖收集的目标类型 */
-export enum DepTargetType {
-  DEFAULT = 'default',
-  /** 代码块 */
-  CODE_BLOCK = 'code-block',
-  /** 数据源 */
-  DATA_SOURCE = 'data-source',
-  /** 数据源方法 */
-  DATA_SOURCE_METHOD = 'data-source-method',
-  /** 数据源条件 */
-  DATA_SOURCE_COND = 'data-source-cond',
 }
 
 /** 可新增的数据源类型选项 */

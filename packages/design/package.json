@@ -37,15 +37,15 @@
     "typescript"
   ],
   "dependencies": {
-    "vue": "^3.3.4"
+    "vue": "^3.3.8"
   },
   "peerDependencies": {
-    "vue": "^3.3.4"
+    "vue": "^3.3.8"
   },
   "devDependencies": {
     "@types/node": "^15.12.4",
     "@vitejs/plugin-vue": "^4.2.3",
-    "@vue/compiler-sfc": "^3.3.4",
+    "@vue/compiler-sfc": "^3.3.8",
     "@vue/test-utils": "^2.3.2",
     "rimraf": "^3.0.2",
     "typescript": "^5.0.4",

@@ -54,6 +54,7 @@
     "chalk": "^4.1.0",
     "commitizen": "^4.3.0",
     "conventional-changelog-cli": "^4.1.0",
+    "cosmiconfig": "^8.3.6",
     "cz-conventional-changelog": "^3.3.0",
     "element-plus": "^2.2.32",
     "enquirer": "^2.3.6",
@@ -79,7 +80,7 @@
     "vite": "^4.4.4",
     "vitepress": "1.0.0-rc.24",
     "vitest": "^0.31.1",
-    "vue": "^3.3.4"
+    "vue": "^3.3.8"
   },
   "config": {
     "commitizen": {

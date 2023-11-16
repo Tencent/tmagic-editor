@@ -40,6 +40,7 @@ import './theme/index.scss';
 
 export type { OnDrag } from 'gesto';
 
+export type { DepTargetType } from '@tmagic/dep';
 export type { MoveableOptions } from '@tmagic/stage';
 export * from './type';
 export * from './hooks';

@@ -24,7 +24,7 @@
     "element-plus": "^2.2.32",
     "monaco-editor": "^0.41.0",
     "serialize-javascript": "^6.0.0",
-    "vue": "^3.3.4",
+    "vue": "^3.3.8",
     "vue-router": "^4.0.10"
   },
   "devDependencies": {
@@ -34,7 +34,7 @@
     "@vitejs/plugin-legacy": "^4.1.0",
     "@vitejs/plugin-vue": "^4.2.3",
     "@vitejs/plugin-vue-jsx": "^3.0.1",
-    "@vue/compiler-sfc": "^3.3.4",
+    "@vue/compiler-sfc": "^3.3.8",
     "sass": "^1.35.1",
     "terser": "^5.14.2",
     "typescript": "^5.0.4",

@@ -22,6 +22,7 @@ export default defineConfig({
       './packages/stage/tests/**',
       './packages/utils/tests/**',
       './packages/data-source/tests/**',
+      './packages/dep/tests/**',
     ],
     environment: 'jsdom',
   },

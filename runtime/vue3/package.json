@@ -26,7 +26,7 @@
     "@tmagic/stage": "1.3.1",
     "@tmagic/utils": "1.3.1",
     "axios": "^0.25.0",
-    "vue": "^3.3.4"
+    "vue": "^3.3.8"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.21.4",
@@ -34,7 +34,7 @@
     "@vitejs/plugin-legacy": "^4.1.0",
     "@vitejs/plugin-vue": "^4.2.3",
     "@vitejs/plugin-vue-jsx": "^3.0.1",
-    "@vue/compiler-sfc": "^3.3.4",
+    "@vue/compiler-sfc": "^3.3.8",
     "@vue/test-utils": "^2.3.2",
     "recast": "^0.20.4",
     "rollup": "^2.25.0",

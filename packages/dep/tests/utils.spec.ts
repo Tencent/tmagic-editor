@@ -1,10 +1,10 @@
 import { describe, expect, test } from 'vitest';
 
-import * as dep from '@editor/utils/dep';
+import * as utils from '../src/utils';
 
-describe('dep', () => {
+describe('utils', () => {
   test('createCodeBlockTarget', () => {
-    const target = dep.createCodeBlockTarget('code_5316', {
+    const target = utils.createCodeBlockTarget('code_5316', {
       name: 'code',
       content: () => false,
       params: [],
@@ -33,7 +33,7 @@ describe('dep', () => {
 
     expect(isTarget).toBeTruthy();
 
-    const target1 = dep.createCodeBlockTarget('1', {
+    const target1 = utils.createCodeBlockTarget('1', {
       name: 'code',
       content: () => false,
       params: [],

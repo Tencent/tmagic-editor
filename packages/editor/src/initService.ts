@@ -1,20 +1,21 @@
-import { onUnmounted, toRaw, watch } from 'vue';
+import { onUnmounted, reactive, toRaw, watch } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
 import type { EventOption } from '@tmagic/core';
-import type { CodeBlockContent, DataSourceSchema, Id, MApp, MNode, MPage } from '@tmagic/schema';
-import { getNodes } from '@tmagic/utils';
-
-import PropsPanel from './layouts/PropsPanel.vue';
-import type { Target } from './services/dep';
+import type { Target } from '@tmagic/dep';
 import {
   createCodeBlockTarget,
   createDataSourceCondTarget,
   createDataSourceMethodTarget,
   createDataSourceTarget,
-} from './utils/dep';
+  DepTargetType,
+} from '@tmagic/dep';
+import type { CodeBlockContent, DataSourceSchema, Id, MApp, MNode, MPage } from '@tmagic/schema';
+import { getNodes } from '@tmagic/utils';
+
+import PropsPanel from './layouts/PropsPanel.vue';
 import { EditorProps } from './editorProps';
-import { DepTargetType, Services } from './type';
+import { Services } from './type';
 
 export declare type LooseRequired<T> = {
   [P in string & keyof T]: T[P];
@@ -270,9 +271,9 @@ export const initServiceEvents = (
   depService.on('collected', collectedHandler);
 
   const initDataSourceDepTarget = (ds: DataSourceSchema) => {
-    depService.addTarget(createDataSourceTarget(ds.id));
-    depService.addTarget(createDataSourceMethodTarget(ds.id));
-    depService.addTarget(createDataSourceCondTarget(ds.id));
+    depService.addTarget(createDataSourceTarget(ds, reactive({})));
+    depService.addTarget(createDataSourceMethodTarget(ds, reactive({})));
+    depService.addTarget(createDataSourceCondTarget(ds, reactive({})));
   };
 
   const rootChangeHandler = async (value: MApp | null, preValue?: MApp | null) => {

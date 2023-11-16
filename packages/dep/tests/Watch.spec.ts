@@ -1,88 +1,110 @@
 import { describe, expect, test } from 'vitest';
 
-import depService, { Target, Watcher } from '@editor/services/dep';
+import Target from '../src/Target';
+import Watcher from '../src/Watcher';
 
 describe('Watcher', () => {
   test('instance', () => {
     const watcher = new Watcher();
     expect(watcher).toBeInstanceOf(Watcher);
   });
-});
-
-describe('depService', () => {
-  const defaultTarget = new Target({
-    id: 1,
-    name: 'test',
-    isTarget: () => true,
-  });
-
-  const target = new Target({
-    type: 'target',
-    id: 2,
-    name: 'test',
-    isTarget: () => true,
-  });
-
-  test('default target type', () => {
-    expect(defaultTarget.type).toBe('default');
-    expect(target.type).toBe('target');
-  });
 
   test('addTarget', () => {
-    depService.addTarget(target);
+    const watcher = new Watcher();
+    const target = new Target({
+      isTarget: () => true,
+      id: 'target',
+      type: 'target',
+    });
 
-    expect(depService.getTarget(1)).toBeUndefined();
-    expect(depService.getTarget(2)?.id).toBe(2);
-    expect(Object.keys(depService.getTargets())).toHaveLength(0);
-    expect(Object.keys(depService.getTargets('target'))).toHaveLength(1);
+    watcher.addTarget(target);
+
+    expect(watcher.getTarget(1)).toBeUndefined();
+    expect(watcher.getTarget('target')?.id).toBe('target');
+    expect(Object.keys(watcher.getTargets())).toHaveLength(0);
+    expect(Object.keys(watcher.getTargets('target'))).toHaveLength(1);
   });
 
   test('clearTargets', () => {
-    depService.clearTargets();
+    const watcher = new Watcher();
+    watcher.clearTargets();
 
-    depService.addTarget(target);
+    const target = new Target({
+      isTarget: () => true,
+      id: 'target',
+    });
 
-    expect(depService.hasTarget(2)).toBeTruthy();
+    watcher.addTarget(target);
 
-    depService.clearTargets();
+    expect(watcher.hasTarget('target')).toBeTruthy();
 
-    expect(depService.hasTarget(2)).toBeFalsy();
+    watcher.clearTargets();
+
+    expect(watcher.hasTarget('target')).toBeFalsy();
   });
 
   test('hasTarget', () => {
-    depService.clearTargets();
+    const watcher = new Watcher();
 
-    depService.addTarget(target);
+    const target = new Target({
+      isTarget: () => true,
+      id: 'target2',
+    });
 
-    expect(depService.hasTarget(1)).toBeFalsy();
-    expect(depService.hasTarget(2)).toBeTruthy();
+    watcher.clearTargets();
+
+    watcher.addTarget(target);
+
+    expect(watcher.hasTarget('target')).toBeFalsy();
+    expect(watcher.hasTarget('target2')).toBeTruthy();
   });
 
   test('removeTarget', () => {
-    depService.clearTargets();
-    depService.addTarget(target);
-    expect(depService.hasTarget(2)).toBeTruthy();
-    depService.removeTarget(2);
-    expect(depService.hasTarget(2)).toBeFalsy();
+    const watcher = new Watcher();
+
+    const target = new Target({
+      isTarget: () => true,
+      id: 'target',
+    });
+
+    watcher.clearTargets();
+    watcher.addTarget(target);
+    expect(watcher.hasTarget('target')).toBeTruthy();
+    watcher.removeTarget('target');
+    expect(watcher.hasTarget('target')).toBeFalsy();
   });
 
   test('removeTargets', () => {
-    depService.clearTargets();
-    depService.addTarget(defaultTarget);
-    depService.addTarget(target);
-    expect(depService.hasTarget(1)).toBeTruthy();
-    expect(depService.hasTarget(2)).toBeTruthy();
-    depService.removeTargets('target');
-    expect(depService.hasTarget(1)).toBeTruthy();
-    expect(depService.hasTarget(2)).toBeFalsy();
+    const watcher = new Watcher();
 
-    depService.removeTargets('target1');
+    const defaultTarget = new Target({
+      isTarget: () => true,
+      id: 'defaultTarget',
+    });
+
+    const target = new Target({
+      isTarget: () => true,
+      type: 'targetType',
+      id: 'target',
+    });
+
+    watcher.clearTargets();
+    watcher.addTarget(defaultTarget);
+    watcher.addTarget(target);
+    expect(watcher.hasTarget('defaultTarget')).toBeTruthy();
+    expect(watcher.hasTarget('target')).toBeTruthy();
+
+    watcher.removeTargets('targetType');
+    expect(watcher.hasTarget('defaultTarget')).toBeTruthy();
+    expect(watcher.hasTarget('target')).toBeFalsy();
   });
 
   test('collect', () => {
-    depService.clearTargets();
+    const watcher = new Watcher();
 
-    depService.addTarget(
+    watcher.clearTargets();
+
+    watcher.addTarget(
       new Target({
         type: 'target',
         id: 'collect_1',
@@ -91,7 +113,7 @@ describe('depService', () => {
       }),
     );
 
-    depService.addTarget(
+    watcher.addTarget(
       new Target({
         type: 'target',
         id: 'collect_2',
@@ -100,7 +122,7 @@ describe('depService', () => {
       }),
     );
 
-    depService.collect([
+    watcher.collect([
       {
         id: 'node_1',
         name: 'node',
@@ -119,15 +141,15 @@ describe('depService', () => {
       },
     ]);
 
-    const target1 = depService.getTarget('collect_1');
-    const target2 = depService.getTarget('collect_2');
+    const target1 = watcher.getTarget('collect_1');
+    const target2 = watcher.getTarget('collect_2');
 
     expect(target1?.deps?.node_1.name).toBe('node');
     expect(target2?.deps?.node_1.name).toBe('node');
     expect(target1?.deps?.node_1.keys).toHaveLength(1);
     expect(target2?.deps?.node_1.keys).toHaveLength(3);
 
-    depService.collect([
+    watcher.collect([
       {
         id: 'node_1',
         name: 'node',
@@ -149,7 +171,7 @@ describe('depService', () => {
     expect(target1?.deps?.node_1).toBeUndefined();
     expect(target2?.deps?.node_1.keys).toHaveLength(1);
 
-    depService.collect([
+    watcher.collect([
       {
         id: 'node_1',
         name: 'node',
@@ -161,7 +183,7 @@ describe('depService', () => {
     expect(target1?.deps?.node_1).toBeUndefined();
     expect(target2?.deps?.node_1.keys[0]).toBe('text1');
 
-    depService.clear([
+    watcher.clear([
       {
         id: 'node_1',
         name: 'node',
@@ -173,9 +195,11 @@ describe('depService', () => {
   });
 
   test('collect deep', () => {
-    depService.clearTargets();
+    const watcher = new Watcher();
 
-    depService.addTarget(
+    watcher.clearTargets();
+
+    watcher.addTarget(
       new Target({
         type: 'target',
         id: 'collect_1',
@@ -184,7 +208,7 @@ describe('depService', () => {
       }),
     );
 
-    depService.collect(
+    watcher.collect(
       [
         {
           id: 'node_1',
@@ -202,12 +226,12 @@ describe('depService', () => {
       true,
     );
 
-    const target1 = depService.getTarget('collect_1');
+    const target1 = watcher.getTarget('collect_1');
 
     expect(target1?.deps?.node_1.name).toBe('node');
     expect(target1?.deps?.node_2.name).toBe('node2');
 
-    depService.clear([
+    watcher.clear([
       {
         id: 'node_1',
         name: 'node',

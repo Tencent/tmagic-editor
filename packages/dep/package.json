@@ -1,18 +1,18 @@
 {
   "version": "1.3.1",
-  "name": "@tmagic/element-plus-adapter",
+  "name": "@tmagic/dep",
   "type": "module",
   "sideEffects": [
     "dist/*"
   ],
-  "main": "dist/tmagic-element-plus-adapter.umd.cjs",
-  "module": "dist/tmagic-element-plus-adapter.js",
+  "main": "dist/tmagic-dep.umd.cjs",
+  "module": "dist/tmagic-dep.js",
   "types": "types/index.d.ts",
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
-      "import": "./dist/tmagic-element-plus-adapter.js",
-      "require": "./dist/tmagic-element-plus-adapter.umd.cjs"
+      "import": "./dist/tmagic-dep.js",
+      "require": "./dist/tmagic-dep.umd.cjs"
     },
     "./*": "./*"
   },
@@ -29,22 +29,9 @@
     "type": "git",
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
-  "homepage": "https://tencent.github.io/tmagic-editor/docs/",
-  "keywords": [
-    "design",
-    "vue",
-    "vue3",
-    "typescript"
-  ],
   "dependencies": {
-    "@tmagic/design": "1.3.1",
-    "element-plus": "^2.2.32",
-    "vue": "^3.3.8"
-  },
-  "peerDependencies": {
-    "@tmagic/design": "1.3.1",
-    "element-plus": "^2.2.32",
-    "vue": "^3.3.8"
+    "@tmagic/schema": "1.3.1",
+    "@tmagic/utils": "1.3.1"
   },
   "devDependencies": {
     "@types/node": "^15.12.4",

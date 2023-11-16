@@ -64,7 +64,7 @@ export enum ActionType {
 }
 
 export interface DataSourceDeps {
-  [dataSourceId: string | number]: Dep;
+  [dataSourceId: string | number]: DepData;
 }
 
 /** 事件类型(已废弃，后续不建议继续使用) */
@@ -241,10 +241,17 @@ export interface DataSourceSchema {
   [key: string]: any;
 }
 
-export interface Dep {
+export interface DepData {
   [nodeId: Id]: {
     /** 组件名称 */
     name: string;
     keys: (string | number)[];
   };
 }
+
+export type HookData = {
+  /** 代码块id */
+  codeId: Id;
+  /** 参数 */
+  params?: object;
+};

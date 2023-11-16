@@ -38,11 +38,12 @@
 import { computed, inject, ref } from 'vue';
 import { Aim, Close, Coin, Edit, View } from '@element-plus/icons-vue';
 
+import { DepTargetType } from '@tmagic/dep';
 import { tMagicMessageBox, TMagicTooltip, TMagicTree } from '@tmagic/design';
-import { Dep, Id } from '@tmagic/schema';
+import { DepData, Id } from '@tmagic/schema';
 
 import Icon from '@editor/components/Icon.vue';
-import { type DataSourceListSlots, DepTargetType, type Services } from '@editor/type';
+import type { DataSourceListSlots, Services } from '@editor/type';
 
 defineSlots<DataSourceListSlots>();
 
@@ -65,10 +66,10 @@ const dsDep = computed(() => depService?.getTargets(DepTargetType.DATA_SOURCE) |
 const dsMethodDep = computed(() => depService?.getTargets(DepTargetType.DATA_SOURCE_METHOD) || {});
 const dsCondDep = computed(() => depService?.getTargets(DepTargetType.DATA_SOURCE_COND) || {});
 
-const getKeyTreeConfig = (dep: Dep[string], type?: string) =>
+const getKeyTreeConfig = (dep: DepData[string], type?: string) =>
   dep.keys.map((key) => ({ name: key, id: key, type: 'key', isMethod: type === 'method', isCond: type === 'cond' }));
 
-const getNodeTreeConfig = (id: string, dep: Dep[string], type?: string) => ({
+const getNodeTreeConfig = (id: string, dep: DepData[string], type?: string) => ({
   name: dep.name,
   type: 'node',
   id,
@@ -81,7 +82,7 @@ const getNodeTreeConfig = (id: string, dep: Dep[string], type?: string) => ({
  * @param deps 依赖
  * @param type 依赖类型
  */
-const mergeChildren = (children: any[], deps: Dep, type?: string) => {
+const mergeChildren = (children: any[], deps: DepData, type?: string) => {
   Object.entries(deps).forEach(([id, dep]) => {
     // 已经生成过的节点
     const nodeItem = children.find((item) => item.id === id);
@@ -97,9 +98,9 @@ const mergeChildren = (children: any[], deps: Dep, type?: string) => {
 
 const list = computed(() =>
   dataSources.value.map((ds) => {
-    const dsDeps = dsDep.value[ds.id].deps;
-    const dsMethodDeps = dsMethodDep.value[ds.id].deps;
-    const dsCondDeps = dsCondDep.value[ds.id].deps;
+    const dsDeps = dsDep.value[ds.id]?.deps || {};
+    const dsMethodDeps = dsMethodDep.value[ds.id]?.deps || {};
+    const dsCondDeps = dsCondDep.value[ds.id]?.deps || {};
 
     const children: any[] = [];
     // 数据源依赖分为三种类型：key/node、method、cond，是分开存储，这里将其合并展示
