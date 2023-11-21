@@ -181,7 +181,7 @@ const getDefaultValue = function (mForm: FormState | undefined, { defaultValue, 
   return '';
 };
 
-export const filterFunction = (mForm: FormState | undefined, config: any, props: any) => {
+export const filterFunction = <T = any>(mForm: FormState | undefined, config: T, props: any) => {
   if (typeof config !== 'function') {
     return config;
   }
