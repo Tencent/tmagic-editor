@@ -40,14 +40,20 @@ export const createDataSourceTarget = (ds: DataSourceSchema, initialDeps: DepDat
       // 关联数据源对象,如：{ isBindDataSource: true, dataSourceId: 'xxx'}
       // 或者在模板在使用数据源,如：`xxx${id.field}xxx`
       if (
-        (value?.isBindDataSource && value.dataSourceId) ||
+        (value?.isBindDataSource && value.dataSourceId && value.dataSourceId === ds.id) ||
         (typeof value === 'string' && value.includes(`${ds.id}`) && /\$\{([\s\S]+?)\}/.test(value))
       ) {
+        console.log('value', value, ds.id);
         return true;
       }
 
       // 指定数据源的字符串模板,如：{ isBindDataSourceField: true, dataSourceId: 'id', template: `xxx${field}xxx`}
-      if (value?.isBindDataSourceField && value.dataSourceId && typeof value.template === 'string') {
+      if (
+        value?.isBindDataSourceField &&
+        value.dataSourceId &&
+        value.dataSourceId === ds.id &&
+        typeof value.template === 'string'
+      ) {
         return true;
       }
 
