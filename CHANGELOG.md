@@ -1,3 +1,23 @@
+## [1.3.2](https://github.com/Tencent/tmagic-editor/compare/v1.3.1...v1.3.2) (2023-11-21)
+
+
+### Bug Fixes
+
+* **dep:** 数据源依赖收集不收集单独的id，因为id不需要编译 ([eea8032](https://github.com/Tencent/tmagic-editor/commit/eea8032f0db1881961095802c4242fa7c0e2a232))
+* **editor:** 不允许容器节点拖动到自己里面 ([fded262](https://github.com/Tencent/tmagic-editor/commit/fded26251f637a25dbd5af2a6ac2de55ccd06715)), closes [#553](https://github.com/Tencent/tmagic-editor/issues/553)
+* **editor:** 修复slide 全部拖出来再关闭回去时不展示slide操作栏的问题 ([c80ea82](https://github.com/Tencent/tmagic-editor/commit/c80ea829ac54b76323f221f99d6655ad1a943239))
+* **editor:** 更新dsl，组件树列表不更新 ([e35a963](https://github.com/Tencent/tmagic-editor/commit/e35a963b67cf279f01beb08e00cc678ab4e7d7ea)), closes [#554](https://github.com/Tencent/tmagic-editor/issues/554)
+
+
+### Features
+
+* **data-source:** 新增指定数据源的字符串模板编译 ([2e6d8af](https://github.com/Tencent/tmagic-editor/commit/2e6d8afb939cdc6ebd0a120e6bcdbc4190978678))
+* **editor:** dataSourceService.add返回添加的数据源 ([ab02c2f](https://github.com/Tencent/tmagic-editor/commit/ab02c2f3ee7e97c0a64da627768447070acfc932))
+* **editor:** 支持 slide 侧边栏可拖拽悬浮 ([2b10e7e](https://github.com/Tencent/tmagic-editor/commit/2b10e7eda90f3e30b75358d36b1e25ac0f5bc099))
+* **editor:** 数据源选择器支持选择数据源id ([cdba8ae](https://github.com/Tencent/tmagic-editor/commit/cdba8aeaf2ec7b05c8e9ba9c767e5d3f00fb34e2))
+
+
+
 ## [1.3.1](https://github.com/Tencent/tmagic-editor/compare/v1.3.0...v1.3.1) (2023-11-15)
 
 
