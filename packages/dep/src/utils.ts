@@ -41,7 +41,7 @@ export const createDataSourceTarget = (ds: DataSourceSchema, initialDeps: DepDat
       // 或者在模板在使用数据源,如：`xxx${id.field}xxx`
       if (
         (value?.isBindDataSource && value.dataSourceId) ||
-        (typeof value === 'string' && value.includes(`${ds.id}`))
+        (typeof value === 'string' && value.includes(`${ds.id}`) && /\$\{([\s\S]+?)\}/.test(value))
       ) {
         return true;
       }
