@@ -31,7 +31,7 @@ export interface HttpOptions {
   [key: string]: any;
 }
 
-export type RequestFunction = (options: HttpOptions) => Promise<any>;
+export type RequestFunction = <T = any>(options: HttpOptions) => Promise<T>;
 
 export interface AppCore {
   /** 页面配置描述 */
