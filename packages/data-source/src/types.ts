@@ -21,7 +21,9 @@ export interface HttpDataSourceSchema extends DataSourceSchema {
   beforeRequest:
     | string
     | ((options: HttpOptions, content: { app: AppCore; dataSource: HttpDataSource }) => HttpOptions);
-  afterResponse: string | ((response: any, content: { app: AppCore; dataSource: HttpDataSource }) => any);
+  afterResponse:
+    | string
+    | ((response: any, content: { app: AppCore; dataSource: HttpDataSource; options: Partial<HttpOptions> }) => any);
 }
 
 export interface DataSourceManagerOptions {

@@ -148,7 +148,7 @@ export default class HttpDataSource extends DataSource {
       }
 
       if (typeof this.schema.afterResponse === 'function') {
-        res = this.schema.afterResponse(res, { app: this.app, dataSource: this });
+        res = this.schema.afterResponse(res, { app: this.app, dataSource: this, options: reqOptions });
       }
 
       if (this.schema.responseOptions?.dataPath) {
