@@ -1,3 +1,17 @@
+## [1.3.3](https://github.com/Tencent/tmagic-editor/compare/v1.3.2...v1.3.3) (2023-11-21)
+
+
+### Bug Fixes
+
+* **dep:** 数据源依赖收集 ([5547eb4](https://github.com/Tencent/tmagic-editor/commit/5547eb4ee870d27fbeed8ed095c371dd8c341f74))
+
+
+### Features
+
+* **data-sources:** http数据裁剪函数content参数添加options ([5549e8c](https://github.com/Tencent/tmagic-editor/commit/5549e8cff9938ba205dcbf896d5c46db065db9ea))
+
+
+
 ## [1.3.2](https://github.com/Tencent/tmagic-editor/compare/v1.3.1...v1.3.2) (2023-11-21)
 
 
