@@ -7,7 +7,11 @@ import { LayerNodeStatus, Services } from '@editor/type';
 import { traverseNode } from '@editor/utils';
 import { updateStatus } from '@editor/utils/tree';
 
-const createPageNodeStatus = (services: Services | undefined, pageId: Id) => {
+const createPageNodeStatus = (
+  services: Services | undefined,
+  pageId: Id,
+  initalLayerNodeStatus?: Map<Id, LayerNodeStatus>,
+) => {
   const map = new Map<Id, LayerNodeStatus>();
 
   map.set(pageId, {
@@ -19,12 +23,15 @@ const createPageNodeStatus = (services: Services | undefined, pageId: Id) => {
 
   services?.editorService.getNodeById(pageId)?.items.forEach((node: MNode) =>
     traverseNode(node, (node) => {
-      map.set(node.id, {
-        visible: true,
-        expand: false,
-        selected: false,
-        draggable: true,
-      });
+      map.set(
+        node.id,
+        initalLayerNodeStatus?.get(node.id) || {
+          visible: true,
+          expand: false,
+          selected: false,
+          draggable: true,
+        },
+      );
     }),
   );
 
@@ -42,17 +49,15 @@ export const useNodeStatus = (services: Services | undefined, page: ComputedRef<
     page.value ? nodeStatusMaps.value.get(page.value.id) : new Map<Id, LayerNodeStatus>(),
   );
 
-  // 切换页面，重新生成节点状态
+  // 切换页面或者新增页面，重新生成节点状态
   watch(
-    () => page.value?.id,
-    (pageId) => {
-      // 已经存在，不需要重新生成
-      if (!pageId || nodeStatusMaps.value.has(pageId)) {
+    page,
+    (page) => {
+      if (!page) {
         return;
       }
-
-      // 新增页面，生成节点状态
-      nodeStatusMaps.value.set(pageId, createPageNodeStatus(services, pageId));
+      // 生成节点状态
+      nodeStatusMaps.value.set(page.id, createPageNodeStatus(services, page.id, nodeStatusMaps.value.get(page.id)));
     },
     {
       immediate: true,
