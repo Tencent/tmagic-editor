@@ -82,6 +82,8 @@ class DataSource extends BaseService {
     this.get('dataSources').push(newConfig);
 
     this.emit('add', newConfig);
+
+    return newConfig;
   }
 
   public update(config: DataSourceSchema) {
@@ -92,6 +94,8 @@ class DataSource extends BaseService {
     dataSources[index] = cloneDeep(config);
 
     this.emit('update', config);
+
+    return config;
   }
 
   public remove(id: string) {
