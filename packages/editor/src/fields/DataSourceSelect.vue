@@ -29,9 +29,10 @@ const props = withDefaults(
     FieldProps<{
       type: 'data-source-select';
       name: string;
-      text: string;
-      placeholder: string;
+      text?: string;
+      placeholder?: string;
       dataSourceType?: string;
+      value?: 'id' | 'value';
     }>
   >(),
   {
@@ -44,19 +45,24 @@ const { dataSourceService } = inject<Services>('services') || {};
 const dataSources = computed(() => dataSourceService?.get('dataSources') || []);
 
 const selectConfig = computed<SelectConfig>(() => {
-  const { type, dataSourceType, ...config } = props.config;
+  const { type, dataSourceType, value, ...config } = props.config;
+
+  const valueIsId = props.config.value === 'id';
+
   return {
     ...config,
     type: 'select',
     valueKey: 'dataSourceId',
     options: dataSources.value
-      .filter((ds) => !dataSourceType || ds.type === dataSourceType)
+      .filter((ds) => !props.config.dataSourceType || ds.type === props.config.dataSourceType)
       .map((ds) => ({
-        value: {
-          isBindDataSource: true,
-          dataSourceType: ds.type,
-          dataSourceId: ds.id,
-        },
+        value: valueIsId
+          ? ds.id
+          : {
+              isBindDataSource: true,
+              dataSourceType: ds.type,
+              dataSourceId: ds.id,
+            },
         text: ds.title || ds.id,
       })),
   };
