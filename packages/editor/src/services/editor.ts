@@ -548,7 +548,9 @@ class Editor extends BaseService {
 
     const newNodes = await Promise.all(nodes.map((node) => this.doUpdate(node)));
 
-    this.pushHistoryState();
+    if (newNodes[0]?.type !== NodeType.ROOT) {
+      this.pushHistoryState();
+    }
 
     this.emit('update', newNodes);
     return Array.isArray(config) ? newNodes : newNodes[0];
