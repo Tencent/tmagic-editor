@@ -299,10 +299,10 @@ export const compiledNode = (
 export const compiledCond = (op: string, fieldValue: any, value: any, range: [number, number]): boolean => {
   switch (op) {
     case 'is':
-      if (!fieldValue) return false;
+      if (fieldValue !== value) return false;
       break;
     case 'not':
-      if (fieldValue) return false;
+      if (fieldValue === value) return false;
       break;
     case '=':
       if (fieldValue !== value) return false;
