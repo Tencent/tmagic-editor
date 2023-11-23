@@ -43,7 +43,6 @@ export const createDataSourceTarget = (ds: DataSourceSchema, initialDeps: DepDat
         (value?.isBindDataSource && value.dataSourceId && value.dataSourceId === ds.id) ||
         (typeof value === 'string' && value.includes(`${ds.id}`) && /\$\{([\s\S]+?)\}/.test(value))
       ) {
-        console.log('value', value, ds.id);
         return true;
       }
 

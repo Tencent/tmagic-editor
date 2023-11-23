@@ -270,7 +270,6 @@ const getFieldsConfig = (value: any) => {
 };
 
 const addFromJsonFromChange = ({ data }: { data: string }) => {
-  console.log(data);
   try {
     const value = JSON.parse(data);
 
