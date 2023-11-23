@@ -191,7 +191,11 @@ const dropHandler = async (e: DragEvent) => {
     let left = 0;
     let position = 'relative';
 
-    if (layout === Layout.ABSOLUTE) {
+    if (style.position === 'fixed') {
+      position = 'fixed';
+      top = e.clientY - containerRect.top;
+      left = e.clientX - containerRect.left;
+    } else if (layout === Layout.ABSOLUTE) {
       position = 'absolute';
       top = e.clientY - containerRect.top + scrollTop;
       left = e.clientX - containerRect.left + scrollLeft;
