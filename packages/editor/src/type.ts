@@ -173,8 +173,8 @@ export interface GetColumnWidth {
 }
 
 export interface StageRect {
-  width: number;
-  height: number;
+  width: number | string;
+  height: number | string;
 }
 
 export interface UiState {
@@ -185,7 +185,10 @@ export interface UiState {
   /** 画布显示放大倍数，默认为 1 */
   zoom: number;
   /** 画布容器的宽高 */
-  stageContainerRect: StageRect;
+  stageContainerRect: {
+    width: number;
+    height: number;
+  };
   /** 画布顶层div的宽高，可用于改变画布的大小 */
   stageRect: StageRect;
   /** 编辑器列布局每一列的宽度，分为左中右三列 */

@@ -7,24 +7,27 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, ref } from 'vue';
+import { computed, inject, nextTick, ref } from 'vue';
 
 import Core from '@tmagic/core';
 import { TMagicRadioButton, TMagicRadioGroup } from '@tmagic/design';
-import { editorService } from '@tmagic/editor';
+import type { Services } from '@tmagic/editor';
+import { convertToNumber } from '@tmagic/utils';
 
 import { DeviceType, uaMap } from '../const';
 
-const devH: Record<DeviceType, number> = {
+const services = inject<Services>('services');
+
+const devH: Record<DeviceType, number | string> = {
   phone: 817,
   pad: 1024,
-  pc: 900,
+  pc: '100%',
 };
 
-const devW: Record<DeviceType, number> = {
+const devW: Record<DeviceType, number | string> = {
   phone: 375,
   pad: 768,
-  pc: 1600,
+  pc: '100%',
 };
 
 const getDeviceHeight = (viewerDevice: DeviceType) => devH[viewerDevice];
@@ -48,15 +51,29 @@ withDefaults(
 
 const emit = defineEmits(['update:modelValue']);
 
-const calcFontsize = (width: number) => {
-  const iframe = editorService.get('stage')?.renderer.iframe;
+const stageContainerRect = computed(() => services?.uiService.get('stageContainerRect'));
+
+const calcFontsize = () => {
+  if (!services) return;
+
+  const iframe = services.editorService.get('stage')?.renderer.iframe;
   if (!iframe?.contentWindow) return;
 
   const app: Core = (iframe.contentWindow as any).appInstance;
 
+  if (!app) return;
+
   app.setEnv(uaMap[viewerDevice.value]);
 
-  app.setDesignWidth(app.env.isWeb ? width : 375);
+  if (app.env.isWeb) {
+    const stageRect = services.uiService.get('stageRect');
+
+    const stageWidth: number = convertToNumber(stageRect.width, convertToNumber(stageContainerRect.value?.width || 0));
+
+    app.setDesignWidth(stageWidth);
+  } else {
+    app.setDesignWidth(375);
+  }
 };
 
 const viewerDevice = ref(DeviceType.Phone);
@@ -70,7 +87,7 @@ const deviceSelect = async (device: DeviceType) => {
   });
 
   await nextTick();
-  calcFontsize(width);
+  calcFontsize();
 };
 
 defineExpose({

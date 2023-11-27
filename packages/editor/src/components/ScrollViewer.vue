@@ -25,6 +25,8 @@
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 
+import { isNumber } from '@tmagic/utils';
+
 import type { ScrollViewerEvent } from '@editor/type';
 import { ScrollViewer } from '@editor/utils/scroll-viewer';
 
@@ -36,8 +38,8 @@ defineOptions({
 
 const props = withDefaults(
   defineProps<{
-    width?: number;
-    height?: number;
+    width?: number | string;
+    height?: number | string;
     wrapWidth?: number;
     wrapHeight?: number;
     zoom?: number;
@@ -63,8 +65,8 @@ const container = ref<HTMLDivElement>();
 const el = ref<HTMLDivElement>();
 const style = computed(
   () => `
-        width: ${props.width}px;
-        height: ${props.height}px;
+        width: ${isNumber(`${props.width}`) ? `${props.width}px` : props.width};
+        height: ${isNumber(`${props.height}`) ? `${props.height}px` : props.height};
         position: absolute;
         margin-top: 30px;
       `,

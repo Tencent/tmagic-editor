@@ -18,6 +18,8 @@
 
 import { reactive } from 'vue';
 
+import { convertToNumber } from '@tmagic/utils';
+
 import editorService from '@editor/services/editor';
 import type { StageRect, UiState } from '@editor/type';
 
@@ -86,9 +88,12 @@ class Ui extends BaseService {
     const { height, width } = stageContainerRect;
     if (!width || !height) return 1;
 
+    let stageWidth: number = convertToNumber(stageRect.width, width);
+    let stageHeight: number = convertToNumber(stageRect.height, height);
+
     // 30为标尺的大小
-    const stageWidth = stageRect.width + 30;
-    const stageHeight = stageRect.height + 30;
+    stageWidth = stageWidth + 30;
+    stageHeight = stageHeight + 30;
 
     if (width > stageWidth && height > stageHeight) {
       return 1;
