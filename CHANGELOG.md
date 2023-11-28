@@ -1,3 +1,22 @@
+## [1.3.4](https://github.com/Tencent/tmagic-editor/compare/v1.3.3...v1.3.4) (2023-11-28)
+
+
+### Bug Fixes
+
+* **editor:** 从组件树中拖入画布新增的情况如果初始position为fixed不改变布局 ([b0fcafd](https://github.com/Tencent/tmagic-editor/commit/b0fcafd089c23126a87fda00f6fdcd6b63bb8b82))
+* **editor:** 修改根节点不添加历史记录 ([c9aab11](https://github.com/Tencent/tmagic-editor/commit/c9aab11e0352b7cc2518d113eb1960693bc64e98))
+* **util:** 条件编译对应is与not实现对应value为false的情况出错 ([33c8f8b](https://github.com/Tencent/tmagic-editor/commit/33c8f8bf5a43fc55d5bd6ccc616dcb22a1ce2be2))
+
+
+### Features
+
+* **editor:** http数据源请求体配置支持写json ([141e1c7](https://github.com/Tencent/tmagic-editor/commit/141e1c7130b66d9e6ce16428b7282fdcda5ac53b))
+* **editor:** 数据源数据定义快速添加支持与已有数据合并 ([6299d28](https://github.com/Tencent/tmagic-editor/commit/6299d286ba07f5661f3d477b3d6fc1ad913a40ea))
+* **editor:** 画布大小支持配置百分比 ([eb43deb](https://github.com/Tencent/tmagic-editor/commit/eb43deb9f57c4b7afa8b2c53d4d694c6cb38604a))
+* **stage:** 支持配置对齐元素 ([f8125aa](https://github.com/Tencent/tmagic-editor/commit/f8125aa1492aceceaef05330f8bfb1e96b280829))
+
+
+
 ## [1.3.3](https://github.com/Tencent/tmagic-editor/compare/v1.3.2...v1.3.3) (2023-11-21)
 
 
