@@ -52,7 +52,7 @@ import { TMagicDialog, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
 import { DatasourceTypeOption, editorService, MenuBarData, MoveableOptions, TMagicEditor } from '@tmagic/editor';
 import type { MContainer, MNode } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
-import { CustomizeMoveableOptionsCallbackConfig } from '@tmagic/stage';
+import type { CustomizeMoveableOptionsCallbackConfig } from '@tmagic/stage';
 import { asyncLoadJs } from '@tmagic/utils';
 
 import DeviceGroup from '../components/DeviceGroup.vue';

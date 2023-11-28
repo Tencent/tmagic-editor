@@ -19,7 +19,7 @@
 import EventEmitter from 'events';
 
 import { merge } from 'lodash-es';
-import { MoveableOptions } from 'moveable';
+import type { ElementGuidelineValueOption, MoveableOptions, MoveableRefType } from 'moveable';
 
 import { GuidesType, Mode } from './const';
 import MoveableActionsAble from './MoveableActionsAble';
@@ -88,16 +88,19 @@ export default class MoveableOptionsManager extends EventEmitter {
   /**
    * 设置有哪些元素要辅助对齐
    * @param selectedElList 选中的元素列表，需要排除在对齐元素之外
-   * @param allElList 全部元素列表
    */
-  protected setElementGuidelines(selectedElList: HTMLElement[], allElList: Element[]): void {
+  protected setElementGuidelines(selectedElList: HTMLElement[]): void {
     this.elementGuidelines.forEach((node) => {
       node.remove();
     });
     this.elementGuidelines = [];
 
+    // 设置选中元素的周围元素，用于选中元素跟周围元素对齐辅助
+    const elementGuidelines: Array<ElementGuidelineValueOption | MoveableRefType<Element>> =
+      this.getCustomizeOptions()?.elementGuidelines || Array.from(selectedElList[0]?.parentElement?.children || []);
+
     if (this.mode === Mode.ABSOLUTE) {
-      this.container.append(this.createGuidelineElements(selectedElList, allElList));
+      this.container.append(this.createGuidelineElements(selectedElList, elementGuidelines));
     }
   }
 
@@ -224,13 +227,29 @@ export default class MoveableOptionsManager extends EventEmitter {
    * @param allElList 全部元素列表
    * @returns frame 辅助对齐元素集合的页面片
    */
-  private createGuidelineElements(selectedElList: HTMLElement[], allElList: Element[]): DocumentFragment {
+  private createGuidelineElements(
+    selectedElList: HTMLElement[],
+    allElList: Array<ElementGuidelineValueOption | MoveableRefType<Element>>,
+  ): DocumentFragment {
     const frame = globalThis.document.createDocumentFragment();
 
-    for (const node of allElList) {
-      const { width, height } = node.getBoundingClientRect();
-      if (this.isInElementList(node, selectedElList)) continue;
-      const { left, top } = getOffset(node);
+    for (const element of allElList) {
+      let node: MoveableRefType<Element> =
+        (element as ElementGuidelineValueOption).element || (element as MoveableRefType<Element>);
+
+      if (!node || typeof node === 'string') continue;
+
+      if (typeof node === 'function') {
+        node = node();
+      }
+
+      if (this.isInElementList(node as Element, selectedElList)) continue;
+
+      const { width, height } = (node as Element).getBoundingClientRect();
+
+      if (!width || !height) continue;
+
+      const { left, top } = getOffset(node as Element);
       const elementGuideline = globalThis.document.createElement('div');
       elementGuideline.style.cssText = `position: absolute;width: ${width}px;height: ${height}px;top: ${top}px;left: ${left}px`;
       this.elementGuidelines.push(elementGuideline);

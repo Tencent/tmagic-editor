@@ -377,6 +377,7 @@ export default class ActionManager extends EventEmitter {
             targetEls: this.selectedElList,
             targetElIds: this.selectedElList?.map((item) => item.id),
             isMulti,
+            document: this.getRenderDocument(),
           };
           return options(cfg);
         }

@@ -101,6 +101,7 @@ export interface CustomizeMoveableOptionsCallbackConfig {
   targetEls?: HTMLElement[];
   targetElIds?: string[];
   isMulti: boolean;
+  document?: Document;
 }
 
 export interface StageRenderConfig {
