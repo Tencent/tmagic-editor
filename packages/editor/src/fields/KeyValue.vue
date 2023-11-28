@@ -1,37 +1,60 @@
 <template>
   <div class="m-fields-key-value">
-    <div class="m-fields-key-value-item" v-for="(item, index) in records" :key="index">
-      <TMagicInput
-        placeholder="key"
-        v-model="records[index][0]"
-        :disabled="disabled"
-        :size="size"
-        @change="keyChangeHandler"
-      ></TMagicInput>
-      <span class="m-fileds-key-value-delimiter">:</span>
-      <TMagicInput
-        placeholder="value"
-        v-model="records[index][1]"
-        :disabled="disabled"
-        :size="size"
-        @change="valueChangeHandler"
-      ></TMagicInput>
+    <div v-if="!showCode">
+      <div class="m-fields-key-value-item" v-for="(item, index) in records" :key="index">
+        <TMagicInput
+          placeholder="key"
+          v-model="records[index][0]"
+          :disabled="disabled"
+          :size="size"
+          @change="keyChangeHandler"
+        ></TMagicInput>
+        <span class="m-fileds-key-value-delimiter">:</span>
+        <TMagicInput
+          placeholder="value"
+          v-model="records[index][1]"
+          :disabled="disabled"
+          :size="size"
+          @change="valueChangeHandler"
+        ></TMagicInput>
 
-      <TMagicButton
-        class="m-fileds-key-value-delete"
-        type="danger"
-        :size="size"
-        :disabled="disabled"
-        circle
-        plain
-        :icon="Delete"
-        @click="deleteHandler(index)"
-      ></TMagicButton>
+        <TMagicButton
+          class="m-fileds-key-value-delete"
+          type="danger"
+          :size="size"
+          :disabled="disabled"
+          circle
+          plain
+          :icon="Delete"
+          @click="deleteHandler(index)"
+        ></TMagicButton>
+      </div>
+
+      <TMagicButton type="primary" :size="size" :disabled="disabled" plain :icon="Plus" @click="addHandler"
+        >添加</TMagicButton
+      >
     </div>
 
-    <TMagicButton type="primary" :size="size" :disabled="disabled" plain :icon="Plus" @click="addHandler"
-      >添加</TMagicButton
-    >
+    <MagicCodeEditor
+      v-if="config.advanced && showCode"
+      height="200px"
+      :init-values="model[name]"
+      language="json"
+      :options="{
+        readOnly: disabled,
+      }"
+      :parse="true"
+      @save="save"
+    ></MagicCodeEditor>
+
+    <TMagicButton
+      v-if="config.advanced"
+      size="default"
+      :disabled="disabled"
+      text
+      :icon="CodeIcon"
+      @click="showCode = !showCode"
+    ></TMagicButton>
   </div>
 </template>
 
@@ -41,6 +64,9 @@ import { Delete, Plus } from '@element-plus/icons-vue';
 
 import { TMagicButton, TMagicInput } from '@tmagic/design';
 import type { FieldProps } from '@tmagic/form';
+
+import CodeIcon from '@editor/icons/CodeIcon.vue';
+import MagicCodeEditor from '@editor/layouts/CodeEditor.vue';
 
 defineOptions({
   name: 'MEditorKeyValue',
@@ -52,6 +78,7 @@ const props = withDefaults(
       type: 'key-value';
       name: string;
       text: string;
+      advanced?: boolean;
     }>
   >(),
   {
@@ -62,9 +89,19 @@ const props = withDefaults(
 const emit = defineEmits<(e: 'change', value: Record<string, any>) => void>();
 
 const records = ref<[string, string][]>([]);
+const showCode = ref(false);
 
 watchEffect(() => {
-  records.value = Object.entries(props.model[props.name] || {});
+  const initValues: [string, any][] = Object.entries(props.model[props.name] || {});
+
+  for (const [, value] of initValues) {
+    if (typeof value !== 'string') {
+      showCode.value = true;
+      break;
+    }
+  }
+
+  records.value = initValues;
 });
 
 const getValue = () => {
@@ -92,5 +129,9 @@ const addHandler = () => {
 const deleteHandler = (index: number) => {
   records.value.splice(index, 1);
   emit('change', getValue());
+};
+
+const save = (v: string | any) => {
+  emit('change', v);
 };
 </script>

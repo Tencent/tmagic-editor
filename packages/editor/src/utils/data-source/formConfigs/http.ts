@@ -46,6 +46,7 @@ export default [
         name: 'data',
         type: 'key-value',
         defaultValue: {},
+        advanced: true,
         text: '请求体',
       },
       {
