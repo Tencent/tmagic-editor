@@ -345,11 +345,11 @@ export const getDefaultValueFromFields = (fields: DataSchema[]) => {
   const data: Record<string, any> = {};
 
   const defaultValue: Record<string, any> = {
-    string: '',
+    string: undefined,
     object: {},
     array: [],
-    boolean: false,
-    number: 0,
+    boolean: undefined,
+    number: undefined,
     null: null,
     any: undefined,
   };

@@ -38,6 +38,7 @@ import { TMagicButton, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
 import { type FieldProps, type FormConfig, type FormState, MFormDrawer } from '@tmagic/form';
 import type { DataSchema } from '@tmagic/schema';
 import { MagicTable } from '@tmagic/table';
+import { getDefaultValueFromFields } from '@tmagic/utils';
 
 import type { Services } from '@editor/type';
 
@@ -96,7 +97,7 @@ const fieldColumns = [
   },
   {
     label: '属性描述',
-    prop: 'desc',
+    prop: 'description',
   },
   {
     label: '默认值',
@@ -229,6 +230,7 @@ const jsonFromValues = ref({
 });
 
 const newFromJsonHandler = () => {
+  jsonFromValues.value.data = getDefaultValueFromFields(props.model[props.name]);
   addFromJsonDialog.value?.show();
 };
 
@@ -243,37 +245,41 @@ const getValueType = (value: any) => {
   return 'any';
 };
 
-const getFieldsConfig = (value: any) => {
+const getFieldsConfig = (value: any, fields: DataSchema[] = []) => {
   if (!value || typeof value !== 'object') throw new Error('数据格式错误');
 
-  const fields: DataSchema[] = [];
+  const newFields: DataSchema[] = [];
   Object.entries(value).forEach(([key, value]) => {
     const type = getValueType(value);
 
+    const oldField = fields.find((field) => field.name === key);
+
     let childFields: DataSchema[] = [];
     if (Array.isArray(value) && value.length > 0) {
-      childFields = getFieldsConfig(value[0]);
+      childFields = getFieldsConfig(value[0], oldField?.fields);
     } else if (type === 'object') {
-      childFields = getFieldsConfig(value);
+      childFields = getFieldsConfig(value, oldField?.fields);
     }
 
-    fields.push({
+    newFields.push({
       name: key,
-      title: key,
+      title: oldField?.title || key,
       type,
+      description: oldField?.description || '',
+      enable: oldField?.enable ?? true,
       defaultValue: value,
       fields: childFields,
     });
   });
 
-  return fields;
+  return newFields;
 };
 
 const addFromJsonFromChange = ({ data }: { data: string }) => {
   try {
     const value = JSON.parse(data);
 
-    props.model[props.name] = getFieldsConfig(value);
+    props.model[props.name] = getFieldsConfig(value, props.model[props.name]);
 
     addFromJsonDialog.value?.hide();
 
