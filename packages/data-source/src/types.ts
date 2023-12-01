@@ -2,7 +2,7 @@ import type { AppCore, DataSourceSchema, HttpOptions, RequestFunction } from '@t
 
 import HttpDataSource from './data-sources/Http';
 
-export interface DataSourceOptions<T = DataSourceSchema> {
+export interface DataSourceOptions<T extends DataSourceSchema = DataSourceSchema> {
   schema: T;
   app: AppCore;
   initialData?: Record<string, any>;
@@ -12,7 +12,6 @@ export interface DataSourceOptions<T = DataSourceSchema> {
 }
 
 export interface HttpDataSourceSchema extends DataSourceSchema {
-  type: 'http';
   options: HttpOptions;
   responseOptions?: {
     dataPath?: string;

@@ -66,14 +66,13 @@ const webRequest = async (options: HttpOptions) => {
  * Http 数据源
  * @description 通过 http 请求获取数据
  */
-export default class HttpDataSource extends DataSource {
+export default class HttpDataSource extends DataSource<HttpDataSourceSchema> {
   /** 是否正在发起请求 */
   public isLoading = false;
   public error?: {
     msg?: string;
     code?: string | number;
   };
-  public schema: HttpDataSourceSchema;
   /** 请求配置 */
   public httpOptions: HttpOptions;
 
@@ -91,7 +90,6 @@ export default class HttpDataSource extends DataSource {
 
     super(options);
 
-    this.schema = options.schema;
     this.httpOptions = httpOptions;
 
     if (typeof options.request === 'function') {

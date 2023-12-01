@@ -17,7 +17,7 @@
  */
 import EventEmitter from 'events';
 
-import type { AppCore, CodeBlockContent, DataSchema } from '@tmagic/schema';
+import type { AppCore, CodeBlockContent, DataSchema, DataSourceSchema } from '@tmagic/schema';
 import { getDefaultValueFromFields } from '@tmagic/utils';
 
 import type { DataSourceOptions } from '@data-source/types';
@@ -25,7 +25,7 @@ import type { DataSourceOptions } from '@data-source/types';
 /**
  * 静态数据源
  */
-export default class DataSource extends EventEmitter {
+export default class DataSource<T extends DataSourceSchema = DataSourceSchema> extends EventEmitter {
   public isInit = false;
 
   public data: Record<string, any> = {};
@@ -37,17 +37,21 @@ export default class DataSource extends EventEmitter {
 
   #type = 'base';
   #id: string;
+  #schema: T;
 
   /** 数据源自定义字段配置 */
   #fields: DataSchema[] = [];
   /** 数据源自定义方法配置 */
   #methods: CodeBlockContent[] = [];
 
-  constructor(options: DataSourceOptions) {
+  constructor(options: DataSourceOptions<T>) {
     super();
 
-    this.app = options.app;
     this.#id = options.schema.id;
+    this.#schema = options.schema;
+
+    this.app = options.app;
+
     this.setFields(options.schema.fields);
     this.setMethods(options.schema.methods || []);
 
@@ -75,6 +79,10 @@ export default class DataSource extends EventEmitter {
 
   public get type() {
     return this.#type;
+  }
+
+  public get schema() {
+    return this.#schema;
   }
 
   public get fields() {

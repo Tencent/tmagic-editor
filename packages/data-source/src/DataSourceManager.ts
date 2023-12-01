@@ -29,7 +29,7 @@ import type { DataSourceManagerData, DataSourceManagerOptions } from './types';
 class DataSourceManager extends EventEmitter {
   private static dataSourceClassMap = new Map<string, typeof DataSource>();
 
-  public static registe(type: string, dataSource: typeof DataSource) {
+  public static registe<T extends typeof DataSource = typeof DataSource>(type: string, dataSource: T) {
     DataSourceManager.dataSourceClassMap.set(type, dataSource);
   }
 
@@ -57,39 +57,37 @@ class DataSourceManager extends EventEmitter {
     app.dsl?.dataSources?.forEach((config) => {
       this.addDataSource(config);
     });
+
+    Promise.all(Array.from(this.dataSourceMap).map(async ([, ds]) => this.init(ds)));
   }
 
-  public async init() {
-    await Promise.all(
-      Array.from(this.dataSourceMap).map(async ([, ds]) => {
-        if (ds.isInit) {
-          return;
-        }
+  public async init(ds: DataSource) {
+    if (ds.isInit) {
+      return;
+    }
 
-        const beforeInit: ((...args: any[]) => any)[] = [];
-        const afterInit: ((...args: any[]) => any)[] = [];
+    const beforeInit: ((...args: any[]) => any)[] = [];
+    const afterInit: ((...args: any[]) => any)[] = [];
 
-        ds.methods.forEach((method) => {
-          if (typeof method.content !== 'function') return;
-          if (method.timing === 'beforeInit') {
-            beforeInit.push(method.content);
-          }
-          if (method.timing === 'afterInit') {
-            afterInit.push(method.content);
-          }
-        });
+    ds.methods.forEach((method) => {
+      if (typeof method.content !== 'function') return;
+      if (method.timing === 'beforeInit') {
+        beforeInit.push(method.content);
+      }
+      if (method.timing === 'afterInit') {
+        afterInit.push(method.content);
+      }
+    });
 
-        for (const method of beforeInit) {
-          await method({ params: {}, dataSource: ds, app: this.app });
-        }
+    for (const method of beforeInit) {
+      await method({ params: {}, dataSource: ds, app: this.app });
+    }
 
-        await ds.init();
+    await ds.init();
 
-        for (const method of afterInit) {
-          await method({ params: {}, dataSource: ds, app: this.app });
-        }
-      }),
-    );
+    for (const method of afterInit) {
+      await method({ params: {}, dataSource: ds, app: this.app });
+    }
   }
 
   public get(id: string) {
@@ -117,8 +115,6 @@ class DataSourceManager extends EventEmitter {
     ds.on('change', () => {
       this.setData(ds);
     });
-
-    this.init();
   }
 
   public setData(ds: DataSource) {
@@ -134,7 +130,7 @@ class DataSourceManager extends EventEmitter {
 
   public updateSchema(schemas: DataSourceSchema[]) {
     schemas.forEach((schema) => {
-      const ds = this.dataSourceMap.get(schema.id);
+      const ds = this.get(schema.id);
       if (!ds) {
         return;
       }
@@ -142,6 +138,10 @@ class DataSourceManager extends EventEmitter {
       this.removeDataSource(schema.id);
 
       this.addDataSource(schema);
+      const newDs = this.get(schema.id);
+      if (newDs) {
+        this.init(newDs);
+      }
     });
   }
 
@@ -239,6 +239,6 @@ class DataSourceManager extends EventEmitter {
   }
 }
 
-DataSourceManager.registe('http', HttpDataSource);
+DataSourceManager.registe('http', HttpDataSource as any);
 
 export default DataSourceManager;
