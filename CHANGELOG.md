@@ -1,3 +1,12 @@
+## [1.3.5](https://github.com/Tencent/tmagic-editor/compare/v1.3.4...v1.3.5) (2023-12-01)
+
+
+### Bug Fixes
+
+* **data-source:** 数据源初始化 ([78762b9](https://github.com/Tencent/tmagic-editor/commit/78762b920e0315b16b43a5f3f67a5bb02d52c849))
+
+
+
 ## [1.3.4](https://github.com/Tencent/tmagic-editor/compare/v1.3.3...v1.3.4) (2023-11-28)
 
 

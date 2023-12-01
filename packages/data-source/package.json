@@ -1,5 +1,5 @@
 {
-  "version": "1.3.4",
+  "version": "1.3.5",
   "name": "@tmagic/data-source",
   "type": "module",
   "sideEffects": [
@@ -33,8 +33,8 @@
     "data-source"
   ],
   "dependencies": {
-    "@tmagic/utils": "1.3.4",
-    "@tmagic/schema": "1.3.4",
+    "@tmagic/utils": "1.3.5",
+    "@tmagic/schema": "1.3.5",
     "events": "^3.3.0",
     "lodash-es": "^4.17.21"
   },
