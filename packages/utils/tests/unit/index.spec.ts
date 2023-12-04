@@ -665,3 +665,13 @@ describe('getDefaultValueFromFields', () => {
     expect(data.name.key).toBe('key');
   });
 });
+
+describe('compiledCond', () => {
+  test('is', () => {
+    expect(util.compiledCond('is', undefined, 1)).toBeFalsy();
+    expect(util.compiledCond('is', 1, 1)).toBeTruthy();
+    expect(util.compiledCond('is', '1', 1)).toBeFalsy();
+    expect(util.compiledCond('is', NaN, 1)).toBeFalsy();
+    expect(util.compiledCond('is', NaN, undefined)).toBeFalsy();
+  });
+});

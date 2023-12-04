@@ -41,7 +41,7 @@ describe('DataSourceManager', () => {
   test('registe', () => {
     class TestDataSource extends DataSource {}
 
-    DataSourceManager.registe('test', TestDataSource);
+    DataSourceManager.registe('test', TestDataSource as any);
     expect(DataSourceManager.getDataSourceClass('test')).toBe(TestDataSource);
   });
 

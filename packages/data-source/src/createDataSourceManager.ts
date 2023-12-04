@@ -62,7 +62,7 @@ export const createDataSourceManager = (app: AppCore, useMock?: boolean, initial
         'update-data',
         getNodes(nodeIds, dsl.items).map((node) => {
           const newNode = cloneDeep(node);
-          newNode.condResult = dataSourceManager.compliedConds(node);
+          newNode.condResult = dataSourceManager.compliedConds(newNode);
           return dataSourceManager.compiledNode(newNode);
         }),
         sourceId,

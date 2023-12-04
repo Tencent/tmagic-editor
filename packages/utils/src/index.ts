@@ -296,49 +296,37 @@ export const compiledNode = (
   return node;
 };
 
-export const compiledCond = (op: string, fieldValue: any, value: any, range: [number, number]): boolean => {
+export const compiledCond = (op: string, fieldValue: any, value: any, range: number[] = []): boolean => {
   switch (op) {
     case 'is':
-      if (fieldValue !== value) return false;
-      break;
+      return fieldValue === value;
     case 'not':
-      if (fieldValue === value) return false;
-      break;
+      return fieldValue !== value;
     case '=':
-      if (fieldValue !== value) return false;
-      break;
+      return fieldValue === value;
     case '!=':
-      if (fieldValue === value) return false;
-      break;
+      return fieldValue !== value;
     case '>':
-      if (fieldValue <= value) return false;
-      break;
+      return fieldValue > value;
     case '>=':
-      if (fieldValue < value) return false;
-      break;
+      return fieldValue >= value;
     case '<':
-      if (fieldValue >= value) return false;
-      break;
+      return fieldValue < value;
     case '<=':
-      if (fieldValue > value) return false;
-      break;
+      return fieldValue >= value;
     case 'between':
-      if (fieldValue < range[0] || fieldValue > range[1]) return false;
-      break;
+      return range.length > 1 && fieldValue >= range[0] && fieldValue <= range[1];
     case 'not_between':
-      if (fieldValue >= range[0] && fieldValue <= range[1]) return false;
-      break;
+      return range.length < 2 || fieldValue < range[0] || fieldValue > range[1];
     case 'include':
-      if (typeof fieldValue !== 'undefined' && !fieldValue.includes?.(value)) return false;
-      break;
+      return fieldValue?.includes?.(value);
     case 'not_include':
-      if (typeof fieldValue !== 'undefined' && fieldValue.includes?.(value)) return false;
-      break;
+      return typeof fieldValue === 'undefined' || !fieldValue.includes?.(value);
     default:
       break;
   }
 
-  return true;
+  return false;
 };
 
 export const getDefaultValueFromFields = (fields: DataSchema[]) => {

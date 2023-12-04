@@ -12,6 +12,7 @@ export interface DataSourceOptions<T extends DataSourceSchema = DataSourceSchema
 }
 
 export interface HttpDataSourceSchema extends DataSourceSchema {
+  type: 'http';
   options: HttpOptions;
   responseOptions?: {
     dataPath?: string;
