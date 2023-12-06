@@ -24,13 +24,48 @@ const methodName = (prefix: string, name: string) => `${prefix}${name[0].toUpper
 
 const isError = (error: any): boolean => Object.prototype.toString.call(error) === '[object Error]';
 
-const doAction = async (
+const doAction = (
   args: any[],
   scope: any,
   sourceMethod: any,
   beforeMethodName: string,
   afterMethodName: string,
-  fn: (args: any[], next?: Function | undefined) => Promise<void>,
+  fn: (args: any[], next?: Function | undefined) => void,
+) => {
+  try {
+    let beforeArgs = args;
+
+    for (const beforeMethod of scope.pluginOptionsList[beforeMethodName]) {
+      beforeArgs = beforeMethod(...beforeArgs) || [];
+
+      if (isError(beforeArgs)) throw beforeArgs;
+
+      if (!Array.isArray(beforeArgs)) {
+        beforeArgs = [beforeArgs];
+      }
+    }
+
+    let returnValue: any = fn(beforeArgs, sourceMethod.bind(scope));
+
+    for (const afterMethod of scope.pluginOptionsList[afterMethodName]) {
+      returnValue = afterMethod(returnValue, ...beforeArgs);
+
+      if (isError(returnValue)) throw returnValue;
+    }
+
+    return returnValue;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const doAsyncAction = async (
+  args: any[],
+  scope: any,
+  sourceMethod: any,
+  beforeMethodName: string,
+  afterMethodName: string,
+  fn: (args: any[], next?: Function | undefined) => Promise<void> | void,
 ) => {
   try {
     let beforeArgs = args;
@@ -112,10 +147,10 @@ export default class extends EventEmitter {
   private taskList: (() => Promise<void>)[] = [];
   private doingTask = false;
 
-  constructor(methods: string[] = [], serialMethods: string[] = []) {
+  constructor(methods: { name: string; isAsync: boolean }[] = [], serialMethods: string[] = []) {
     super();
 
-    methods.forEach((propertyName: string) => {
+    methods.forEach(({ name: propertyName, isAsync }) => {
       const scope = this as any;
 
       const sourceMethod = scope[propertyName];
@@ -127,32 +162,34 @@ export default class extends EventEmitter {
       this.pluginOptionsList[afterMethodName] = [];
       this.middleware[propertyName] = [];
 
-      const fn = compose(this.middleware[propertyName]);
+      const fn = compose(this.middleware[propertyName], isAsync);
       Object.defineProperty(scope, propertyName, {
-        value: async (...args: any[]) => {
-          if (!serialMethods.includes(propertyName)) {
-            return doAction(args, scope, sourceMethod, beforeMethodName, afterMethodName, fn);
-          }
-
-          // 由于async await，所以会出现函数执行到await时让出线程，导致执行顺序出错，例如调用了select(1) -> update -> select(2)，这个时候就有可能出现update了2；
-          // 这里保证函数调用严格按顺序执行；
-          const promise = new Promise<any>((resolve, reject) => {
-            this.taskList.push(async () => {
-              try {
-                const value = await doAction(args, scope, sourceMethod, beforeMethodName, afterMethodName, fn);
-                resolve(value);
-              } catch (e) {
-                reject(e);
+        value: isAsync
+          ? async (...args: any[]) => {
+              if (!serialMethods.includes(propertyName)) {
+                return doAsyncAction(args, scope, sourceMethod, beforeMethodName, afterMethodName, fn);
               }
-            });
-          });
 
-          if (!this.doingTask) {
-            this.doTask();
-          }
+              // 由于async await，所以会出现函数执行到await时让出线程，导致执行顺序出错，例如调用了select(1) -> update -> select(2)，这个时候就有可能出现update了2；
+              // 这里保证函数调用严格按顺序执行；
+              const promise = new Promise<any>((resolve, reject) => {
+                this.taskList.push(async () => {
+                  try {
+                    const value = await doAsyncAction(args, scope, sourceMethod, beforeMethodName, afterMethodName, fn);
+                    resolve(value);
+                  } catch (e) {
+                    reject(e);
+                  }
+                });
+              });
 
-          return promise;
-        },
+              if (!this.doingTask) {
+                this.doTask();
+              }
+
+              return promise;
+            }
+          : (...args: any[]) => doAction(args, scope, sourceMethod, beforeMethodName, afterMethodName, fn),
       });
     });
   }

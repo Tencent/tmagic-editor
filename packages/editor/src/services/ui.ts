@@ -52,7 +52,10 @@ const state = reactive<UiState>({
 
 class Ui extends BaseService {
   constructor() {
-    super(['zoom', 'calcZoom']);
+    super([
+      { name: 'zoom', isAsync: true },
+      { name: 'calcZoom', isAsync: true },
+    ]);
   }
 
   public set<K extends keyof UiState, T extends UiState[K]>(name: K, value: T) {

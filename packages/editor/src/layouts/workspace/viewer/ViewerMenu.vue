@@ -127,9 +127,9 @@ watch(
   { immediate: true },
 );
 
-const show = async (e: MouseEvent) => {
+const show = (e: MouseEvent) => {
   menu.value?.show(e);
-  const data = await storageService.getItem(COPY_STORAGE_KEY);
+  const data = storageService.getItem(COPY_STORAGE_KEY);
   canPaste.value = data !== 'undefined' && !!data;
 };
 

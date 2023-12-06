@@ -365,7 +365,7 @@ describe('copy', () => {
   test('正常', async () => {
     const node = editorService.getNodeById(NodeId.NODE_ID2);
     await editorService.copy(node!);
-    const str = await storageService.getItem(COPY_STORAGE_KEY);
+    const str = storageService.getItem(COPY_STORAGE_KEY);
     expect(str).toHaveLength(1);
   });
 });

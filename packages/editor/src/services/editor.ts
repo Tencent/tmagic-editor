@@ -61,27 +61,27 @@ class Editor extends BaseService {
   constructor() {
     super(
       [
-        'getLayout',
-        'select',
-        'doAdd',
-        'add',
-        'doRemove',
-        'remove',
-        'doUpdate',
-        'update',
-        'sort',
-        'copy',
-        'paste',
-        'doPaste',
-        'doAlignCenter',
-        'alignCenter',
-        'moveLayer',
-        'moveToContainer',
-        'move',
-        'undo',
-        'redo',
-        'highlight',
-        'dragTo',
+        { name: 'getLayout', isAsync: true },
+        { name: 'select', isAsync: true },
+        { name: 'doAdd', isAsync: true },
+        { name: 'add', isAsync: true },
+        { name: 'doRemove', isAsync: true },
+        { name: 'remove', isAsync: true },
+        { name: 'doUpdate', isAsync: true },
+        { name: 'update', isAsync: true },
+        { name: 'sort', isAsync: true },
+        { name: 'copy', isAsync: true },
+        { name: 'paste', isAsync: true },
+        { name: 'doPaste', isAsync: true },
+        { name: 'doAlignCenter', isAsync: true },
+        { name: 'alignCenter', isAsync: true },
+        { name: 'moveLayer', isAsync: true },
+        { name: 'moveToContainer', isAsync: true },
+        { name: 'move', isAsync: true },
+        { name: 'undo', isAsync: true },
+        { name: 'redo', isAsync: true },
+        { name: 'highlight', isAsync: true },
+        { name: 'dragTo', isAsync: true },
       ],
       // 需要注意循环依赖问题，如果函数间有相互调用的话，不能设置为串行调用
       ['select', 'update', 'moveLayer'],
@@ -597,8 +597,8 @@ class Editor extends BaseService {
    * @param config 组件节点配置
    * @returns 组件节点配置
    */
-  public async copy(config: MNode | MNode[]): Promise<void> {
-    await storageService.setItem(COPY_STORAGE_KEY, Array.isArray(config) ? config : [config], {
+  public copy(config: MNode | MNode[]): void {
+    storageService.setItem(COPY_STORAGE_KEY, Array.isArray(config) ? config : [config], {
       protocol: Protocol.OBJECT,
     });
   }
@@ -609,7 +609,7 @@ class Editor extends BaseService {
    * @returns 添加后的组件节点配置
    */
   public async paste(position: PastePosition = {}): Promise<MNode | MNode[] | void> {
-    const config: MNode[] = await storageService.getItem(COPY_STORAGE_KEY);
+    const config: MNode[] = storageService.getItem(COPY_STORAGE_KEY);
 
     if (!Array.isArray(config)) return;
 

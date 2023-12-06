@@ -36,14 +36,14 @@ class Props extends BaseService {
 
   constructor() {
     super([
-      'setPropsConfig',
-      'getPropsConfig',
-      'setPropsValue',
-      'getPropsValue',
-      'createId',
-      'setNewItemId',
-      'fillConfig',
-      'getDefaultPropsValue',
+      { name: 'setPropsConfig', isAsync: true },
+      { name: 'getPropsConfig', isAsync: true },
+      { name: 'setPropsValue', isAsync: true },
+      { name: 'getPropsValue', isAsync: true },
+      { name: 'createId', isAsync: false },
+      { name: 'setNewItemId', isAsync: true },
+      { name: 'fillConfig', isAsync: true },
+      { name: 'getDefaultPropsValue', isAsync: true },
     ]);
   }
 

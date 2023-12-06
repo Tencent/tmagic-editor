@@ -25,7 +25,14 @@ export class WebStorage extends BaseService {
   private namespace = 'tmagic';
 
   constructor() {
-    super(['getStorage', 'getNamespace', 'clear', 'getItem', 'removeItem', 'setItem']);
+    super([
+      { name: 'getStorage', isAsync: false },
+      { name: 'getNamespace', isAsync: false },
+      { name: 'clear', isAsync: false },
+      { name: 'getItem', isAsync: false },
+      { name: 'removeItem', isAsync: false },
+      { name: 'setItem', isAsync: false },
+    ]);
   }
 
   /**
@@ -38,26 +45,27 @@ export class WebStorage extends BaseService {
    *    },
    * });
    */
-  public async getStorage(): Promise<Storage> {
+  public getStorage(): Storage {
     return this.storage;
   }
 
-  public async getNamespace(): Promise<string> {
+  public getNamespace(): string {
     return this.namespace;
   }
 
   /**
    * 清理，支持storageService.usePlugin
    */
-  public async clear(): Promise<void> {
-    const storage = await this.getStorage();
+  public clear(): void {
+    const storage = this.getStorage();
     storage.clear();
   }
   /**
    * 获取存储项，支持storageService.usePlugin
    */
-  public async getItem(key: string, options: Options = {}): Promise<any> {
-    const [storage, namespace] = await Promise.all([this.getStorage(), this.getNamespace()]);
+  public getItem(key: string, options: Options = {}): any {
+    const storage = this.getStorage();
+    const namespace = this.getNamespace();
     const { protocol = options.protocol, item } = this.getValueAndProtocol(
       storage.getItem(`${options.namespace || namespace}:${key}`),
     );
@@ -80,24 +88,26 @@ export class WebStorage extends BaseService {
   /**
    * 获取指定索引位置的key
    */
-  public async key(index: number): Promise<string | null> {
-    const storage = await this.getStorage();
+  public key(index: number): string | null {
+    const storage = this.getStorage();
     return storage.key(index);
   }
 
   /**
    * 移除存储项，支持storageService.usePlugin
    */
-  public async removeItem(key: string, options: Options = {}): Promise<void> {
-    const [storage, namespace] = await Promise.all([this.getStorage(), this.getNamespace()]);
+  public removeItem(key: string, options: Options = {}): void {
+    const storage = this.getStorage();
+    const namespace = this.getNamespace();
     storage.removeItem(`${options.namespace || namespace}:${key}`);
   }
 
   /**
    * 设置存储项，支持storageService.usePlugin
    */
-  public async setItem(key: string, value: any, options: Options = {}): Promise<void> {
-    const [storage, namespace] = await Promise.all([this.getStorage(), this.getNamespace()]);
+  public setItem(key: string, value: any, options: Options = {}): void {
+    const storage = this.getStorage();
+    const namespace = this.getNamespace();
     let item = value;
     const protocol = options.protocol ? `${options.protocol}:` : '';
     if (typeof value === Protocol.STRING || typeof value === Protocol.NUMBER) {

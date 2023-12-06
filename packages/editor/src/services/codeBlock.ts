@@ -38,7 +38,13 @@ class CodeBlock extends BaseService {
   });
 
   constructor() {
-    super(['setCodeDslById', 'setEditStatus', 'setCombineIds', 'setUndeleteableList', 'deleteCodeDslByIds']);
+    super([
+      { name: 'setCodeDslById', isAsync: true },
+      { name: 'setEditStatus', isAsync: true },
+      { name: 'setCombineIds', isAsync: true },
+      { name: 'setUndeleteableList', isAsync: true },
+      { name: 'deleteCodeDslByIds', isAsync: true },
+    ]);
   }
 
   /**
