@@ -1,4 +1,4 @@
-import { computed, type ComputedRef, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 import type { Id, MNode, MPage } from '@tmagic/schema';
 import { getNodePath } from '@tmagic/utils';
@@ -7,21 +7,17 @@ import { LayerNodeStatus, Services } from '@editor/type';
 import { traverseNode } from '@editor/utils';
 import { updateStatus } from '@editor/utils/tree';
 
-const createPageNodeStatus = (
-  services: Services | undefined,
-  pageId: Id,
-  initalLayerNodeStatus?: Map<Id, LayerNodeStatus>,
-) => {
+const createPageNodeStatus = (page: MPage, initalLayerNodeStatus?: Map<Id, LayerNodeStatus>) => {
   const map = new Map<Id, LayerNodeStatus>();
 
-  map.set(pageId, {
+  map.set(page.id, {
     visible: true,
     expand: true,
     selected: true,
     draggable: false,
   });
 
-  services?.editorService.getNodeById(pageId)?.items.forEach((node: MNode) =>
+  page.items.forEach((node: MNode) =>
     traverseNode(node, (node) => {
       map.set(
         node.id,
@@ -38,7 +34,8 @@ const createPageNodeStatus = (
   return map;
 };
 
-export const useNodeStatus = (services: Services | undefined, page: ComputedRef<MPage | null | undefined>) => {
+export const useNodeStatus = (services: Services | undefined) => {
+  const page = computed(() => services?.editorService.get('page'));
   const nodes = computed(() => services?.editorService.get('nodes') || []);
 
   /** 所有页面的节点状态 */
@@ -57,7 +54,7 @@ export const useNodeStatus = (services: Services | undefined, page: ComputedRef<
         return;
       }
       // 生成节点状态
-      nodeStatusMaps.value.set(page.id, createPageNodeStatus(services, page.id, nodeStatusMaps.value.get(page.id)));
+      nodeStatusMaps.value.set(page.id, createPageNodeStatus(page, nodeStatusMaps.value.get(page.id)));
     },
     {
       immediate: true,

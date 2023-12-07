@@ -4,13 +4,13 @@
       <div
         class="m-editor-sidebar-header-item"
         v-for="(config, index) in sideBarItems"
+        v-show="!floatBoxStates?.get(config.$key)?.status"
+        draggable="true"
         :key="config.$key ?? index"
         :class="{ 'is-active': activeTabName === config.text }"
         @click="activeTabName = config.text || `${index}`"
-        draggable="true"
         @dragstart="dragstartHandler"
         @dragend="dragendHandler(config.$key, $event)"
-        v-show="!floatBoxStates?.get(config.$key)?.status"
       >
         <MIcon v-if="config.icon" :icon="config.icon"></MIcon>
         <div v-if="config.text" class="magic-editor-tab-panel-title">{{ config.text }}</div>

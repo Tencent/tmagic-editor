@@ -39,10 +39,11 @@
 import { computed, inject, ref } from 'vue';
 
 import { TMagicScrollbar } from '@tmagic/design';
+import type { MNode } from '@tmagic/schema';
 
 import SearchInput from '@editor/components/SearchInput.vue';
 import Tree from '@editor/components/Tree.vue';
-import { LayerPanelSlots, MenuButton, MenuComponent, Services } from '@editor/type';
+import type { LayerPanelSlots, MenuButton, MenuComponent, Services } from '@editor/type';
 
 import LayerMenu from './LayerMenu.vue';
 import LayerNodeTool from './LayerNodeTool.vue';
@@ -69,10 +70,21 @@ const tree = ref<InstanceType<typeof Tree>>();
 
 const page = computed(() => editorService?.get('page'));
 
-const { nodeStatusMap } = useNodeStatus(services, page);
+const { nodeStatusMap } = useNodeStatus(services);
 const { isCtrlKeyDown } = useKeybinding(services, tree);
 
-const { filterTextChangeHandler } = useFilter(nodeStatusMap, page);
+const filterNodeMethod = (v: string, data: MNode): boolean => {
+  let name = '';
+  if (data.name) {
+    name = data.name;
+  } else if (data.items) {
+    name = 'container';
+  }
+
+  return `${data.id}${name}${data.type}`.includes(v);
+};
+
+const { filterTextChangeHandler } = useFilter(services, nodeStatusMap, filterNodeMethod);
 
 const collapseAllHandler = () => {
   if (!page.value || !nodeStatusMap.value) return;

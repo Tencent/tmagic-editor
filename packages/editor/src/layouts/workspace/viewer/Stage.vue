@@ -22,9 +22,10 @@
       @drop="dropHandler"
       @dragover="dragoverHandler"
     ></div>
+    <NodeListMenu></NodeListMenu>
+
     <Teleport to="body">
       <ViewerMenu ref="menu" :is-multi-select="isMultiSelect" :stage-content-menu="stageContentMenu"></ViewerMenu>
-      <NodeListMenu ref="nodeList" :is-multi-select="isMultiSelect"></NodeListMenu>
     </Teleport>
   </ScrollViewer>
 </template>

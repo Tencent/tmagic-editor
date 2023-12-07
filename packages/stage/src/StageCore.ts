@@ -307,14 +307,14 @@ export default class StageCore extends EventEmitter {
       .on('before-select', (idOrEl: Id | HTMLElement, event?: MouseEvent) => {
         this.select(idOrEl, event);
       })
-      .on('select', (selectedEl: HTMLElement) => {
-        this.emit('select', selectedEl);
+      .on('select', (selectedEl: HTMLElement, event: MouseEvent) => {
+        this.emit('select', selectedEl, event);
       })
       .on('before-multi-select', (idOrElList: HTMLElement[] | Id[]) => {
         this.multiSelect(idOrElList);
       })
-      .on('multi-select', (selectedElList: HTMLElement[]) => {
-        this.emit('multi-select', selectedElList);
+      .on('multi-select', (selectedElList: HTMLElement[], event: MouseEvent) => {
+        this.emit('multi-select', selectedElList, event);
       });
   }
 

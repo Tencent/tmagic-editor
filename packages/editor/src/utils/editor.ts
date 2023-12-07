@@ -263,7 +263,7 @@ export const traverseNode = (node: MNode, cb: (node: MNode, parents: MNode[]) =>
   if (node.items?.length) {
     parents.push(node);
     node.items.forEach((item: MNode) => {
-      traverseNode(item, cb, parents);
+      traverseNode(item, cb, [...parents]);
     });
   }
 };

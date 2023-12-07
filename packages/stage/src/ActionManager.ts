@@ -561,13 +561,13 @@ export default class ActionManager extends EventEmitter {
   /**
    * 在up事件中负责对外通知选中事件，通知画布之外的编辑器更新
    */
-  private mouseUpHandler = (): void => {
+  private mouseUpHandler = (event: MouseEvent): void => {
     getDocument().removeEventListener('mouseup', this.mouseUpHandler);
     this.container.addEventListener('mousemove', this.mouseMoveHandler);
     if (this.isMultiSelectStatus) {
-      this.emit('multi-select', this.selectedElList);
+      this.emit('multi-select', this.selectedElList, event);
     } else {
-      this.emit('select', this.selectedEl);
+      this.emit('select', this.selectedEl, event);
     }
   };
 

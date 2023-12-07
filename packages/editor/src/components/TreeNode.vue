@@ -108,7 +108,7 @@ const selected = computed(() => nodeStatus.value.selected);
 const visible = computed(() => nodeStatus.value.visible);
 const draggable = computed(() => nodeStatus.value.draggable);
 
-const hasChilren = computed(() => props.data.items && props.data.items.length > 0);
+const hasChilren = computed(() => props.data.items?.some((item) => props.nodeStatusMap.get(item.id)?.visible));
 
 const handleDragStart = (event: DragEvent) => {
   treeEmit?.('node-dragstart', event, props.data);

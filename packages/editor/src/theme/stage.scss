@@ -25,3 +25,27 @@
     width: 0 !important;
   }
 }
+
+.m-editor-stage-float-button {
+  cursor: pointer;
+  transform: translateY(-50%);
+  width: 12px;
+  font-size: 12px;
+  line-height: 1.2;
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  padding: 5px;
+  background-color: #ffffff;
+  transition: background-color 0.2s;
+  color: rgba(0, 0, 0, 0.88);
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08),
+    0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+}
+
+.m-editor-node-list-menu {
+  height: 100%;
+  width: 100%;
+  min-width: 300px;
+  max-height: 500px;
+}

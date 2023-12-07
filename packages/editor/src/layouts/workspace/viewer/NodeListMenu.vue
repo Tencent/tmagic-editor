@@ -1,112 +1,63 @@
 <template>
-  <ContentMenu
-    ref="menu"
-    class="magic-editor-node-list-menu"
-    style="max-width: 280px"
-    :menu-data="menuData"
-    :active="node?.id"
-    :auto-hide="!pinned"
-    @mouseenter="mouseenterHandler()"
+  <TMagicTooltip v-if="page" content="点击查看当前位置下的组件">
+    <div ref="button" class="m-editor-stage-float-button" @click="visible = true">可选组件</div>
+  </TMagicTooltip>
+  <FloatingBox
+    v-if="page && nodeStatusMap"
+    ref="box"
+    v-model:visible="visible"
+    title="当前位置下的组件"
+    :position="menuPosition"
   >
-    <template #title>
-      <NodeListMenuTitle v-model:pinned="pinned" @change="dragMenuHandler" @close="closeHandler"></NodeListMenuTitle>
+    <template #body>
+      <Tree
+        class="m-editor-node-list-menu magic-editor-layer-tree"
+        :data="[page]"
+        :node-status-map="nodeStatusMap"
+        @node-click="clickHandler"
+      ></Tree>
     </template>
-  </ContentMenu>
+  </FloatingBox>
 </template>
 
 <script lang="ts" setup>
-import { Component, computed, inject, ref, watch } from 'vue';
-import type { OnDrag } from 'gesto';
+import { computed, inject, nextTick, ref, watch } from 'vue';
 
+import { TMagicTooltip } from '@tmagic/design';
 import type { MNode } from '@tmagic/schema';
-import { StageDragStatus } from '@tmagic/stage';
-import { getNodes } from '@tmagic/utils';
 
-import ContentMenu from '@editor/components/ContentMenu.vue';
-import type { ComponentItem, MenuButton, Services } from '@editor/type';
-
-import NodeListMenuTitle from './NodeListMenuTitle.vue';
-
-const PINNED_STATUE_CACHE_KEY = 'tmagic-pinned-node-list-pinned-status';
-
-const props = defineProps<{ isMultiSelect?: boolean }>();
-
-const menu = ref<InstanceType<typeof ContentMenu>>();
-const nodeList = ref<MNode[]>([]);
-const pinned = ref(Boolean(globalThis.localStorage.getItem(PINNED_STATUE_CACHE_KEY)));
-const firstShow = ref(true);
+import FloatingBox from '@editor/components/FloatingBox.vue';
+import Tree from '@editor/components/Tree.vue';
+import { useFilter } from '@editor/layouts/sidebar/layer/use-filter';
+import { useNodeStatus } from '@editor/layouts/sidebar/layer/use-node-status';
+import type { Services, TreeNodeData } from '@editor/type';
 
 const services = inject<Services>('services');
 const editorService = services?.editorService;
-const componentListService = services?.componentListService;
+
+const visible = ref(false);
+const button = ref<HTMLDivElement>();
+const box = ref<InstanceType<typeof FloatingBox>>();
 
 const stage = computed(() => editorService?.get('stage'));
 const page = computed(() => editorService?.get('page'));
-const node = computed(() => editorService?.get('node'));
+const nodes = computed(() => editorService?.get('nodes') || []);
 
-let timeout: NodeJS.Timeout | null = null;
+const { nodeStatusMap } = useNodeStatus(services);
 
-const cancel = () => {
-  if (timeout) {
-    globalThis.clearTimeout(timeout);
-  }
+const filterNodeMethod = (value: string, data: MNode): boolean => data.id === value;
 
-  if (pinned.value) {
-    return;
-  }
-
-  nodeList.value = [];
-  menu.value?.hide();
-};
-
-const clearTimeoutLazy = () => {
-  globalThis.setTimeout(() => {
-    if (timeout) {
-      globalThis.clearTimeout(timeout);
-    }
-  }, 300);
-};
+const { filterTextChangeHandler } = useFilter(services, nodeStatusMap, filterNodeMethod);
 
 const unWatch = watch(
   stage,
   (stage) => {
     if (!stage) return;
 
-    stage.on('drag-start', () => {
-      cancel();
-    });
-
-    stage.on('mousemove', (event: MouseEvent) => {
-      cancel();
-
-      if (props.isMultiSelect || stage.getDragStatus() !== StageDragStatus.END) {
-        return;
-      }
-
-      timeout = globalThis.setTimeout(() => {
-        const els = stage.renderer.getElementsFromPoint(event) || [];
-
-        const nodes = getNodes(
-          els.map((el) => el.id),
-          page.value?.items,
-        );
-
-        if (pinned.value && nodes.length === 0) {
-          return;
-        }
-
-        nodeList.value = nodes;
-
-        if (nodeList.value.length > 1) {
-          menu.value?.show(pinned.value && !firstShow.value ? undefined : event);
-          firstShow.value = false;
-        }
-      }, 1500);
-    });
-
-    stage.on('mouseleave', () => {
-      // mouseleave后，大概率还有最后一个mousemove事件，这里延迟清除
-      clearTimeoutLazy();
+    stage.on('select', (el: HTMLElement, event: MouseEvent) => {
+      const els = stage.renderer.getElementsFromPoint(event) || [];
+      const ids = els.map((el) => el.id).filter((id) => Boolean(id));
+      filterTextChangeHandler(ids);
     });
 
     unWatch();
@@ -116,60 +67,43 @@ const unWatch = watch(
   },
 );
 
-const componentMap = computed(() => {
-  const map: Record<string, ComponentItem> = {};
-  componentListService?.getList().forEach((group) => {
-    group.items.forEach((item) => {
-      map[item.type] = item;
-    });
-  });
-  return map;
-});
+watch(
+  nodes,
+  (nodes) => {
+    if (!nodeStatusMap.value) return;
 
-const menuData = computed<MenuButton[]>(() =>
-  nodeList.value.map((node: MNode) => {
-    let text = node.name;
-    let icon: string | Component<{}, {}, any> | undefined;
-    if (node.type) {
-      const item = componentMap.value[node.type];
-      text += ` (${item?.text})`;
-      icon = item?.icon;
+    for (const [id, status] of nodeStatusMap.value.entries()) {
+      status.selected = nodes.some((node) => node.id === id);
     }
-
-    return {
-      type: 'button',
-      text,
-      id: node.id,
-      icon,
-      handler: async () => {
-        await editorService?.select(node);
-        stage.value?.select(node.id);
-      },
-    };
-  }),
+  },
+  {
+    immediate: true,
+  },
 );
 
-const mouseenterHandler = () => {
-  // menu的mouseenter后，大概率还有最后一个mousemove事件，这里延迟清除
-  clearTimeoutLazy();
+const clickHandler = async (event: MouseEvent, data: TreeNodeData) => {
+  await editorService?.select(data.id);
+  stage.value?.select(data.id);
 };
 
-const dragMenuHandler = ({ deltaY, deltaX }: OnDrag) => {
-  if (!menu.value) return;
+const menuPosition = ref({
+  left: 0,
+  top: 0,
+});
 
-  const { menuPosition } = menu.value;
+watch(visible, async (visible) => {
+  if (!button.value || !visible) {
+    return;
+  }
 
-  menu.value?.setPosition({
-    clientY: menuPosition.top + deltaY,
-    clientX: menuPosition.left + deltaX,
-  });
-};
+  await nextTick();
 
-const closeHandler = () => {
-  menu.value?.hide();
-};
+  const rect = button.value.getBoundingClientRect();
+  const height = box.value?.target?.clientHeight || 0;
 
-watch(pinned, () => {
-  globalThis.localStorage.setItem(PINNED_STATUE_CACHE_KEY, pinned.value.toString());
+  menuPosition.value = {
+    left: rect.left + rect.width + 5,
+    top: rect.top - height / 2 + rect.height / 2,
+  };
 });
 </script>
