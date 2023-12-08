@@ -19,8 +19,8 @@ describe('Watcher', () => {
 
     watcher.addTarget(target);
 
-    expect(watcher.getTarget(1)).toBeUndefined();
-    expect(watcher.getTarget('target')?.id).toBe('target');
+    expect(watcher.getTarget(1, 'target')).toBeUndefined();
+    expect(watcher.getTarget('target', 'target')?.id).toBe('target');
     expect(Object.keys(watcher.getTargets())).toHaveLength(0);
     expect(Object.keys(watcher.getTargets('target'))).toHaveLength(1);
   });
@@ -92,11 +92,11 @@ describe('Watcher', () => {
     watcher.addTarget(defaultTarget);
     watcher.addTarget(target);
     expect(watcher.hasTarget('defaultTarget')).toBeTruthy();
-    expect(watcher.hasTarget('target')).toBeTruthy();
+    expect(watcher.hasTarget('target', 'targetType')).toBeTruthy();
 
     watcher.removeTargets('targetType');
     expect(watcher.hasTarget('defaultTarget')).toBeTruthy();
-    expect(watcher.hasTarget('target')).toBeFalsy();
+    expect(watcher.hasTarget('target', 'targetType')).toBeFalsy();
   });
 
   test('collect', () => {
@@ -141,8 +141,8 @@ describe('Watcher', () => {
       },
     ]);
 
-    const target1 = watcher.getTarget('collect_1');
-    const target2 = watcher.getTarget('collect_2');
+    const target1 = watcher.getTarget('collect_1', 'target');
+    const target2 = watcher.getTarget('collect_2', 'target');
 
     expect(target1?.deps?.node_1.name).toBe('node');
     expect(target2?.deps?.node_1.name).toBe('node');
@@ -226,7 +226,7 @@ describe('Watcher', () => {
       true,
     );
 
-    const target1 = watcher.getTarget('collect_1');
+    const target1 = watcher.getTarget('collect_1', 'target');
 
     expect(target1?.deps?.node_1.name).toBe('node');
     expect(target1?.deps?.node_2.name).toBe('node2');

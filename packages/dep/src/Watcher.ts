@@ -40,13 +40,8 @@ export default class Watcher {
    * @param id target id
    * @returns Target
    */
-  public getTarget(id: string | number) {
-    const allTargets = Object.values(this.targetsList);
-    for (const targets of allTargets) {
-      if (targets[id]) {
-        return targets[id];
-      }
-    }
+  public getTarget(id: string | number, type: string = DepTargetType.DEFAULT) {
+    return this.getTargets(type)[id];
   }
 
   /**
@@ -54,21 +49,19 @@ export default class Watcher {
    * @param id target id
    * @returns boolean
    */
-  public hasTarget(id: string | number) {
-    return Boolean(this.getTarget(id));
+  public hasTarget(id: string | number, type: string = DepTargetType.DEFAULT) {
+    return Boolean(this.getTarget(id, type));
   }
 
   /**
    * 删除指定id的target
    * @param id target id
    */
-  public removeTarget(id: string | number) {
-    const allTargets = Object.values(this.targetsList);
-    for (const targets of allTargets) {
-      if (targets[id]) {
-        targets[id].destroy();
-        delete targets[id];
-      }
+  public removeTarget(id: string | number, type: string = DepTargetType.DEFAULT) {
+    const targets = this.getTargets(type);
+    if (targets[id]) {
+      targets[id].destroy();
+      delete targets[id];
     }
   }
 
