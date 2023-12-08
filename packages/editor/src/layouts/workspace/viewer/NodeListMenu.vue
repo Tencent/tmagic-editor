@@ -1,9 +1,9 @@
 <template>
-  <TMagicTooltip v-if="page" content="点击查看当前位置下的组件">
+  <TMagicTooltip v-if="page && buttonVisible" content="点击查看当前位置下的组件">
     <div ref="button" class="m-editor-stage-float-button" @click="visible = true">可选组件</div>
   </TMagicTooltip>
   <FloatingBox
-    v-if="page && nodeStatusMap"
+    v-if="page && nodeStatusMap && buttonVisible"
     ref="box"
     v-model:visible="visible"
     title="当前位置下的组件"
@@ -36,6 +36,7 @@ const services = inject<Services>('services');
 const editorService = services?.editorService;
 
 const visible = ref(false);
+const buttonVisible = ref(false);
 const button = ref<HTMLDivElement>();
 const box = ref<InstanceType<typeof FloatingBox>>();
 
@@ -58,6 +59,9 @@ const unWatch = watch(
     stage.on('select', (el: HTMLElement, event: MouseEvent) => {
       const els = stage.renderer.getElementsFromPoint(event) || [];
       const ids = els.map((el) => el.id).filter((id) => Boolean(id));
+
+      buttonVisible.value = ids.length > 3;
+
       filterTextChangeHandler(ids);
     });
 
