@@ -23,7 +23,7 @@ import { inject, ref, watchEffect } from 'vue';
 
 import { TMagicCascader } from '@tmagic/design';
 
-import type { CascaderConfig, FieldProps, FormState } from '../schema';
+import type { CascaderConfig, CascaderOption, FieldProps, FormState } from '../schema';
 import { getConfig } from '../utils/config';
 import { useAddField } from '../utils/useAddField';
 
@@ -43,7 +43,7 @@ const requestFunc = getConfig('request') as Function;
 
 const tMagicCascader = ref<InstanceType<typeof TMagicCascader>>();
 
-const options = Array.isArray(props.config.options) ? ref(props.config.options) : ref([]);
+const options = ref<CascaderOption[]>([]);
 const remoteData = ref<any>(null);
 
 const setRemoteOptions = async function () {
@@ -86,6 +86,10 @@ if (typeof props.config.options === 'function' && props.model && mForm) {
   );
 } else if (!props.config.options?.length || props.config.remote) {
   Promise.resolve(setRemoteOptions());
+} else if (Array.isArray(props.config.options)) {
+  watchEffect(() => {
+    options.value = props.config.options as CascaderOption[];
+  });
 }
 
 const changeHandler = (value: any) => {
