@@ -291,7 +291,7 @@ export const initServiceEvents = (
       depService.addTarget(createCodeBlockTarget(id, code));
     });
 
-    value.dataSources.forEach((ds) => {
+    dataSourceService.get('dataSources').forEach((ds) => {
       initDataSourceDepTarget(ds);
     });
 
@@ -350,8 +350,8 @@ export const initServiceEvents = (
   editorService.on('update', nodeUpdateHandler);
 
   const codeBlockAddOrUpdateHandler = (id: Id, codeBlock: CodeBlockContent) => {
-    if (depService.hasTarget(id)) {
-      depService.getTarget(id)!.name = codeBlock.name;
+    if (depService.hasTarget(id, DepTargetType.CODE_BLOCK)) {
+      depService.getTarget(id, DepTargetType.CODE_BLOCK)!.name = codeBlock.name;
       return;
     }
 
@@ -359,7 +359,7 @@ export const initServiceEvents = (
   };
 
   const codeBlockRemoveHandler = (id: Id) => {
-    depService.removeTarget(id);
+    depService.removeTarget(id, DepTargetType.CODE_BLOCK);
   };
 
   codeBlockService.on('addOrUpdate', codeBlockAddOrUpdateHandler);
@@ -372,6 +372,10 @@ export const initServiceEvents = (
 
   const dataSourceUpdateHandler = (config: DataSourceSchema) => {
     const root = editorService.get('root');
+    removeDataSourceTarget(config.id);
+    initDataSourceDepTarget(config);
+
+    depService.collect(root?.items || [], true);
 
     const targets = depService.getTargets(DepTargetType.DATA_SOURCE);
 
@@ -380,8 +384,14 @@ export const initServiceEvents = (
     upateNodeWhenDataSourceChange(nodes);
   };
 
+  const removeDataSourceTarget = (id: string) => {
+    depService.removeTarget(id, DepTargetType.DATA_SOURCE);
+    depService.removeTarget(id, DepTargetType.DATA_SOURCE_COND);
+    depService.removeTarget(id, DepTargetType.DATA_SOURCE_METHOD);
+  };
+
   const dataSourceRemoveHandler = (id: string) => {
-    depService.removeTarget(id);
+    removeDataSourceTarget(id);
     getApp()?.dataSourceManager?.removeDataSource(id);
   };
 

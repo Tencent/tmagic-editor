@@ -35,8 +35,8 @@ class Dep extends BaseService {
     return this.watcher.getTargets(type);
   }
 
-  public getTarget(id: Id) {
-    return this.watcher.getTarget(id);
+  public getTarget(id: Id, type: string = DepTargetType.DEFAULT) {
+    return this.watcher.getTarget(id, type);
   }
 
   public addTarget(target: Target) {
@@ -44,8 +44,8 @@ class Dep extends BaseService {
     this.emit('add-target', target);
   }
 
-  public removeTarget(id: Id) {
-    this.watcher.removeTarget(id);
+  public removeTarget(id: Id, type: string = DepTargetType.DEFAULT) {
+    this.watcher.removeTarget(id, type);
     this.emit('remove-target');
   }
 
@@ -62,8 +62,8 @@ class Dep extends BaseService {
     return this.watcher.clear(nodes);
   }
 
-  public hasTarget(id: Id) {
-    return this.watcher.hasTarget(id);
+  public hasTarget(id: Id, type: string = DepTargetType.DEFAULT) {
+    return this.watcher.hasTarget(id, type);
   }
 }
 
