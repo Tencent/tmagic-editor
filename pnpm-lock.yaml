@@ -54,8 +54,8 @@ importers:
         specifier: ^3.3.0
         version: 3.3.0(typescript@5.0.4)
       element-plus:
-        specifier: ^2.2.32
-        version: 2.2.32(vue@3.3.8)
+        specifier: ^2.4.3
+        version: 2.4.3(vue@3.3.8)
       enquirer:
         specifier: ^2.3.6
         version: 2.3.6
@@ -287,8 +287,8 @@ importers:
         specifier: ^7.18.0
         version: 7.18.0
       '@element-plus/icons-vue':
-        specifier: ^2.0.9
-        version: 2.0.9(vue@3.3.8)
+        specifier: ^2.3.1
+        version: 2.3.1(vue@3.3.8)
       '@tmagic/core':
         specifier: 1.3.5
         version: link:../core
@@ -390,8 +390,8 @@ importers:
         specifier: 1.3.5
         version: link:../design
       element-plus:
-        specifier: ^2.2.32
-        version: 2.2.32(vue@3.3.8)
+        specifier: ^2.4.3
+        version: 2.4.3(vue@3.3.8)
       vue:
         specifier: ^3.3.8
         version: 3.3.8(typescript@5.0.4)
@@ -412,8 +412,8 @@ importers:
   packages/form:
     dependencies:
       '@element-plus/icons-vue':
-        specifier: ^2.0.9
-        version: 2.0.9(vue@3.3.8)
+        specifier: ^2.3.1
+        version: 2.3.1(vue@3.3.8)
       '@tmagic/design':
         specifier: 1.3.5
         version: link:../design
@@ -732,8 +732,8 @@ importers:
   playground:
     dependencies:
       '@element-plus/icons-vue':
-        specifier: ^2.0.9
-        version: 2.0.9(vue@3.3.8)
+        specifier: ^2.3.1
+        version: 2.3.1(vue@3.3.8)
       '@tmagic/core':
         specifier: 1.3.5
         version: link:../packages/core
@@ -759,8 +759,8 @@ importers:
         specifier: 1.3.5
         version: link:../packages/utils
       element-plus:
-        specifier: ^2.2.32
-        version: 2.2.32(vue@3.3.8)
+        specifier: ^2.4.3
+        version: 2.4.3(vue@3.3.8)
       monaco-editor:
         specifier: ^0.41.0
         version: 0.41.0
@@ -3732,8 +3732,8 @@ packages:
     resolution: {integrity: sha512-OTFTDQcWS+1ZREOdCWuk5hCBgYO4OsD30lXcOCyVOAjXMhgL5rBRDnt/otb6Nz8CzU0L/igdcaQBDLWc4t9gvg==}
     dev: false
 
-  /@element-plus/icons-vue@2.0.9(vue@3.3.8):
-    resolution: {integrity: sha512-okdrwiVeKBmW41Hkl0eMrXDjzJwhQMuKiBOu17rOszqM+LS/yBYpNQNV5Jvoh06Wc+89fMmb/uhzf8NZuDuUaQ==}
+  /@element-plus/icons-vue@2.3.1(vue@3.3.8):
+    resolution: {integrity: sha512-XxVUZv48RZAd87ucGS48jPf6pKu0yV5UCg9f4FFwtrYxXOwWuVJo6wOvSLKEoMQKjv8GsX/mhP6UsC1lRwbUWg==}
     peerDependencies:
       vue: ^3.2.0
     dependencies:
@@ -5075,7 +5075,7 @@ packages:
       '@types/web-bluetooth': 0.0.16
       '@vueuse/metadata': 9.13.0
       '@vueuse/shared': 9.13.0(vue@3.3.8)
-      vue-demi: 0.13.11(vue@3.3.8)
+      vue-demi: 0.14.6(vue@3.3.8)
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
@@ -5149,7 +5149,7 @@ packages:
   /@vueuse/shared@9.13.0(vue@3.3.8):
     resolution: {integrity: sha512-UrnhU+Cnufu4S6JLCPZnkWh0WwZGUp72ktOF2DFptMlOs3TOdVv8xJN53zhHGARmVOsz5KqOls09+J1NR6sBKw==}
     dependencies:
-      vue-demi: 0.14.5(vue@3.3.8)
+      vue-demi: 0.14.6(vue@3.3.8)
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
@@ -6404,13 +6404,13 @@ packages:
     resolution: {integrity: sha512-guZ84yoou4+ILNdj0XEbmGs6DEWj6zpVOWYpY09GU66yEb0DSYvP/biBPzHn0GuW/3RC/pnaYNUWlQE1fJYtgA==}
     dev: true
 
-  /element-plus@2.2.32(vue@3.3.8):
-    resolution: {integrity: sha512-DTJMhYOy6MApbmh6z/95hPTK5WrBiNHGzV4IN+uEkup1WoimQ+Qyt8RxKdTe/X1LWEJ8YgWv/Cl8P4ocrt5z5g==}
+  /element-plus@2.4.3(vue@3.3.8):
+    resolution: {integrity: sha512-b3q26j+lM4SBqiyzw8HybybGnP2pk4MWgrnzzzYW5qKQUgV6EG1Zg7nMCfgCVccI8tNvZoTiUHb2mFaiB9qT8w==}
     peerDependencies:
       vue: ^3.2.0
     dependencies:
       '@ctrl/tinycolor': 3.6.0
-      '@element-plus/icons-vue': 2.0.9(vue@3.3.8)
+      '@element-plus/icons-vue': 2.3.1(vue@3.3.8)
       '@floating-ui/dom': 1.2.6
       '@popperjs/core': /@sxzz/popperjs-es@2.11.7
       '@types/lodash': 4.14.192
@@ -10360,34 +10360,6 @@ packages:
     resolution: {integrity: sha512-AFbieoL7a5LMqcnOF04ji+rpXadgOXnZsxQr//r83kLPr7biP7am3g9zbaZIaBGwBRWeSvoMD4mgPdX3e4NWBg==}
     dev: true
 
-  /vue-demi@0.13.11(vue@3.3.8):
-    resolution: {integrity: sha512-IR8HoEEGM65YY3ZJYAjMlKygDQn25D5ajNFNoKh9RSDMQtlzCxtfQjdQgv9jjK+m3377SsJXY8ysq8kLCZL25A==}
-    engines: {node: '>=12'}
-    hasBin: true
-    requiresBuild: true
-    peerDependencies:
-      '@vue/composition-api': ^1.0.0-rc.1
-      vue: ^3.0.0-0 || ^2.6.0
-    peerDependenciesMeta:
-      '@vue/composition-api':
-        optional: true
-    dependencies:
-      vue: 3.3.8(typescript@5.0.4)
-
-  /vue-demi@0.14.5(vue@3.3.8):
-    resolution: {integrity: sha512-o9NUVpl/YlsGJ7t+xuqJKx8EBGf1quRhCiT6D/J0pfwmk9zUwYkC7yrF4SZCe6fETvSM3UNL2edcbYrSyc4QHA==}
-    engines: {node: '>=12'}
-    hasBin: true
-    requiresBuild: true
-    peerDependencies:
-      '@vue/composition-api': ^1.0.0-rc.1
-      vue: ^3.0.0-0 || ^2.6.0
-    peerDependenciesMeta:
-      '@vue/composition-api':
-        optional: true
-    dependencies:
-      vue: 3.3.8(typescript@5.0.4)
-
   /vue-demi@0.14.6(vue@3.3.8):
     resolution: {integrity: sha512-8QA7wrYSHKaYgUxDA5ZC24w+eHm3sYCbp0EzcDwKqN3p6HqtTCGR/GVsPyZW92unff4UlcSh++lmqDWN3ZIq4w==}
     engines: {node: '>=12'}
@@ -10401,7 +10373,6 @@ packages:
         optional: true
     dependencies:
       vue: 3.3.8(typescript@5.0.4)
-    dev: true
 
   /vue-eslint-parser@9.1.1(eslint@8.38.0):
     resolution: {integrity: sha512-C2aI/r85Q6tYcz4dpgvrs4wH/MqVrRAVIdpYedrxnATDHHkb+TroeRcDpKWGZCx/OcECMWfz7tVwQ8e+Opy6rA==}

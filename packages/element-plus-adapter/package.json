@@ -38,12 +38,12 @@
   ],
   "dependencies": {
     "@tmagic/design": "1.3.5",
-    "element-plus": "^2.2.32",
+    "element-plus": "^2.4.3",
     "vue": "^3.3.8"
   },
   "peerDependencies": {
     "@tmagic/design": "1.3.5",
-    "element-plus": "^2.2.32",
+    "element-plus": "^2.4.3",
     "vue": "^3.3.8"
   },
   "devDependencies": {
