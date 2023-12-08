@@ -1,5 +1,5 @@
 <template>
-  <TMagicScrollbar class="m-editor-code-block-list m-editor-dep-list-panel">
+  <TMagicScrollbar class="m-editor-code-block-list m-editor-layer-panel">
     <slot name="code-block-panel-header">
       <div class="search-wrapper">
         <SearchInput @search="filterTextChangeHandler"></SearchInput>
@@ -17,6 +17,7 @@
       </template>
     </CodeBlockList>
   </TMagicScrollbar>
+
   <!-- 代码块编辑区 -->
   <CodeBlockEditor
     v-if="codeConfig"

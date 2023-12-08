@@ -4,4 +4,23 @@
   .m-editor-tree {
     padding-top: 48px;
   }
+
+  .search-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 1;
+
+    .search-input {
+      flex: 1;
+      position: relative;
+    }
+
+    .tmagic-design-button {
+      margin-right: 10px;
+    }
+  }
 }

@@ -81,12 +81,12 @@ export interface DataSourceListSlots {
 
 export interface LayerNodeSlots {
   'layer-node-content'(props: { data: MNode }): any;
+  'layer-node-tool'(props: { data: MNode }): any;
+  'layer-node-label'(props: { data: MNode }): any;
 }
 
 export interface LayerPanelSlots extends LayerNodeSlots {
   'layer-panel-header'(props: {}): any;
-  'layer-node-tool'(props: { data: MNode }): any;
-  'layer-node-content'(props: { data: MNode }): any;
 }
 
 export interface PropsPanelSlots {

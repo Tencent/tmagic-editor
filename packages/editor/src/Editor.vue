@@ -25,6 +25,10 @@
             <slot name="layer-node-content" :data="data"></slot>
           </template>
 
+          <template #layer-node-label="{ data }">
+            <slot name="layer-node-label" :data="data"></slot>
+          </template>
+
           <template #layer-node-tool="{ data }">
             <slot name="layer-node-tool" :data="data"></slot>
           </template>

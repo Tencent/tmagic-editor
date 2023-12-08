@@ -1,57 +1,42 @@
 <template>
-  <TMagicTree
-    ref="tree"
-    class="magic-editor-layer-tree"
-    node-key="id"
-    empty-text="暂无代码块"
-    :default-expanded-keys="expandedKeys"
-    :expand-on-click-node="false"
-    :data="codeList"
-    :props="{
-      children: 'children',
-      label: 'name',
-      value: 'id',
-    }"
-    :highlight-current="true"
-    :filter-node-method="filterNode"
-    @node-click="clickHandler"
-  >
-    <template #default="{ data }">
-      <div :id="data.id" class="list-container">
-        <div class="list-item">
-          <CodeIcon v-if="data.type === 'code'" class="codeIcon"></CodeIcon>
-          <AppManageIcon v-if="data.type === 'node'" class="compIcon"></AppManageIcon>
-          <span class="name" :class="{ code: data.type === 'code', hook: data.type === 'key' }"
-            >{{ data.name }} ({{ data.id }})</span
-          >
-          <!-- 右侧工具栏 -->
-          <div class="right-tool" v-if="data.type === 'code'">
-            <TMagicTooltip effect="dark" :content="editable ? '编辑' : '查看'" placement="bottom">
-              <Icon :icon="editable ? Edit : View" class="edit-icon" @click.stop="editCode(data.id)"></Icon>
-            </TMagicTooltip>
-            <TMagicTooltip v-if="editable" effect="dark" content="删除" placement="bottom">
-              <Icon :icon="Close" class="edit-icon" @click.stop="deleteCode(`${data.id}`)"></Icon>
-            </TMagicTooltip>
-            <slot name="code-block-panel-tool" :id="data.id" :data="data.codeBlockContent"></slot>
-          </div>
-        </div>
+  <Tree :data="codeList" :node-status-map="nodeStatusMap" @node-click="clickHandler">
+    <template #tree-node-label="{ data }">
+      <div
+        :class="{
+          code: data.type === 'code',
+          hook: data.type === 'key',
+          disabled: data.type === 'key' || data.type === 'code',
+        }"
+      >
+        {{ data.name }} {{ data.key ? `(${data.key})` : '' }}
       </div>
     </template>
-  </TMagicTree>
+
+    <template #tree-node-tool="{ data }">
+      <TMagicTooltip v-if="data.type === 'code'" effect="dark" :content="editable ? '编辑' : '查看'" placement="bottom">
+        <Icon :icon="editable ? Edit : View" class="edit-icon" @click.stop="editCode(`${data.key}`)"></Icon>
+      </TMagicTooltip>
+      <TMagicTooltip v-if="data.type === 'code' && editable" effect="dark" content="删除" placement="bottom">
+        <Icon :icon="Close" class="edit-icon" @click.stop="deleteCode(`${data.key}`)"></Icon>
+      </TMagicTooltip>
+      <slot name="code-block-panel-tool" :id="data.key" :data="data.codeBlockContent"></slot>
+    </template>
+  </Tree>
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, ref } from 'vue';
+import { computed, inject } from 'vue';
 import { Close, Edit, View } from '@element-plus/icons-vue';
 
 import { DepTargetType } from '@tmagic/dep';
-import { tMagicMessage, tMagicMessageBox, TMagicTooltip, TMagicTree } from '@tmagic/design';
-import type { Id } from '@tmagic/schema';
+import { tMagicMessage, tMagicMessageBox, TMagicTooltip } from '@tmagic/design';
+import type { Id, MNode } from '@tmagic/schema';
 
 import Icon from '@editor/components/Icon.vue';
-import AppManageIcon from '@editor/icons/AppManageIcon.vue';
-import CodeIcon from '@editor/icons/CodeIcon.vue';
-import { type CodeBlockListSlots, CodeDeleteErrorType, type CodeDslItem, type Services } from '@editor/type';
+import Tree from '@editor/components/Tree.vue';
+import { useFilter } from '@editor/hooks/use-filter';
+import { useNodeStatus } from '@editor/hooks/use-node-status';
+import { type CodeBlockListSlots, CodeDeleteErrorType, type Services, type TreeNodeData } from '@editor/type';
 
 defineSlots<CodeBlockListSlots>();
 
@@ -68,37 +53,48 @@ const emit = defineEmits<{
   remove: [id: string];
 }>();
 
-const { codeBlockService, depService, editorService } = inject<Services>('services') || {};
+const services = inject<Services>('services');
+const { codeBlockService, depService, editorService } = services || {};
 
 // 代码块列表
-const codeList = computed(() =>
+const codeList = computed<TreeNodeData[]>(() =>
   Object.values(depService?.getTargets(DepTargetType.CODE_BLOCK) || {}).map((target) => {
     // 组件节点
-    const compNodes = Object.entries(target.deps).map(([id, dep]) => ({
+    const compNodes: TreeNodeData[] = Object.entries(target.deps).map(([id, dep]) => ({
       name: dep.name,
       type: 'node',
-      id,
-      children: dep.keys.map((key) => ({ name: key, id: key, type: 'key' })),
+      id: `${target.id}_${id}`,
+      key: id,
+      items: dep.keys.map((key) => {
+        const data: TreeNodeData = { name: `${key}`, id: `${target.id}_${id}_${key}`, type: 'key' };
+        return data;
+      }),
     }));
-    return {
+
+    const data: TreeNodeData = {
       id: target.id,
+      key: target.id,
       name: target.name,
       type: 'code',
       codeBlockContent: codeBlockService?.getCodeContentById(target.id),
-      children: compNodes,
+      items: compNodes,
     };
+
+    return data;
   }),
 );
-// 默认展开组件层级的节点
-const expandedKeys = computed(() => codeList.value.map((item) => item.id));
-const editable = computed(() => codeBlockService?.getEditStatus());
 
-const filterNode = (value: string, data: CodeDslItem): boolean => {
+const filterNode = (value: string, data: MNode): boolean => {
   if (!value) {
     return true;
   }
-  return `${data.name}${data.id}`.toLocaleLowerCase().indexOf(value.toLocaleLowerCase()) !== -1;
+  return `${data.name}${data.id}`.toLocaleLowerCase().includes(value.toLocaleLowerCase());
 };
+
+const { nodeStatusMap } = useNodeStatus(codeList);
+const { filterTextChangeHandler } = useFilter(codeList, nodeStatusMap, filterNode);
+
+const editable = computed(() => codeBlockService?.getEditStatus());
 
 // 选中组件
 const selectComp = (compId: Id) => {
@@ -107,11 +103,9 @@ const selectComp = (compId: Id) => {
   stage?.select(compId);
 };
 
-const clickHandler = (data: any, node: any) => {
+const clickHandler = (event: MouseEvent, data: any) => {
   if (data.type === 'node') {
-    selectComp(data.id);
-  } else if (data.type === 'key') {
-    selectComp(node.parent.data.id);
+    selectComp(data.key);
   }
 };
 
@@ -122,7 +116,7 @@ const editCode = (id: string) => {
 
 const deleteCode = async (id: string) => {
   const currentCode = codeList.value.find((codeItem) => codeItem.id === id);
-  const existBinds = Boolean(currentCode?.children.length);
+  const existBinds = Boolean(currentCode?.items?.length);
   const undeleteableList = codeBlockService?.getUndeletableList() || [];
   if (!existBinds && !undeleteableList.includes(id)) {
     await tMagicMessageBox.confirm('确定删除该代码块吗？', '提示', {
@@ -142,11 +136,7 @@ const deleteCode = async (id: string) => {
   }
 };
 
-const tree = ref<InstanceType<typeof TMagicTree>>();
-
 defineExpose({
-  filter(val: string) {
-    tree.value?.filter(val);
-  },
+  filter: filterTextChangeHandler,
 });
 </script>

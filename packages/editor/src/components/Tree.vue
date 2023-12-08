@@ -6,6 +6,10 @@
           <slot name="tree-node-content" :data="nodeData"> </slot>
         </template>
 
+        <template #tree-node-label="{ data: nodeData }">
+          <slot name="tree-node-label" :data="nodeData"> </slot>
+        </template>
+
         <template #tree-node-tool="{ data: nodeData }">
           <slot name="tree-node-tool" :data="nodeData"> </slot>
         </template>
@@ -28,6 +32,7 @@ import TreeNode from './TreeNode.vue';
 
 defineSlots<{
   'tree-node-content'(props: { data: TreeNodeData }): any;
+  'tree-node-label'(props: { data: TreeNodeData }): any;
   'tree-node-tool'(props: { data: TreeNodeData }): any;
 }>();
 

@@ -1,18 +1,16 @@
-import { computed, type ComputedRef, ref } from 'vue';
+import { type Ref, ref } from 'vue';
 
-import { Id, MNode } from '@tmagic/schema';
+import type { Id, MNode } from '@tmagic/schema';
 
-import { LayerNodeStatus, Services } from '@editor/type';
+import type { LayerNodeStatus, TreeNodeData } from '@editor/type';
 import { traverseNode } from '@editor/utils';
 import { updateStatus } from '@editor/utils/tree';
 
 export const useFilter = (
-  services: Services | undefined,
-  nodeStatusMap: ComputedRef<Map<Id, LayerNodeStatus> | undefined>,
+  nodeData: Ref<TreeNodeData[]>,
+  nodeStatusMap: Ref<Map<Id, LayerNodeStatus> | undefined>,
   filterNodeMethod: (value: string, data: MNode) => boolean,
 ) => {
-  const page = computed(() => services?.editorService.get('page'));
-
   // tree方法：对树节点进行筛选时执行的方法
   const filterIsMatch = (value: string | string[], data: MNode): boolean => {
     const string = !Array.isArray(value) ? [value] : value;
@@ -25,18 +23,14 @@ export const useFilter = (
   };
 
   const filter = (text: string | string[]) => {
-    if (!page.value?.items?.length) return;
+    if (!nodeData.value.length) return;
 
-    page.value.items.forEach((node) => {
+    nodeData.value.forEach((node) => {
       traverseNode(node, (node: MNode, parents: MNode[]) => {
         if (!nodeStatusMap.value) return;
 
         const visible = filterIsMatch(text, node);
         if (visible && parents.length) {
-          console.log(
-            node.id,
-            parents.map((a) => a.id),
-          );
           parents.forEach((parent) => {
             updateStatus(nodeStatusMap.value!, parent.id, {
               visible,

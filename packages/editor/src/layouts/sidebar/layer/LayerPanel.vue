@@ -8,7 +8,7 @@
       v-if="page && nodeStatusMap"
       tabindex="-1"
       ref="tree"
-      :data="[page]"
+      :data="nodeData"
       :node-status-map="nodeStatusMap"
       @node-dragover="handleDragOver"
       @node-dragstart="handleDragStart"
@@ -18,14 +18,18 @@
       @node-mouseenter="mouseenterHandler"
       @node-click="nodeClickHandler"
     >
+      <template #tree-node-content="{ data: nodeData }">
+        <slot name="layer-node-content" :data="nodeData"> </slot>
+      </template>
+
       <template #tree-node-tool="{ data: nodeData }">
         <slot name="layer-node-tool" :data="nodeData">
           <LayerNodeTool :data="nodeData"></LayerNodeTool>
         </slot>
       </template>
 
-      <template #tree-node-content="{ data: nodeData }">
-        <slot name="layer-node-content" :data="nodeData"> </slot>
+      <template #tree-node-label="{ data: nodeData }">
+        <slot name="layer-node-label" :data="nodeData"></slot>
       </template>
     </Tree>
 
@@ -43,13 +47,13 @@ import type { MNode } from '@tmagic/schema';
 
 import SearchInput from '@editor/components/SearchInput.vue';
 import Tree from '@editor/components/Tree.vue';
-import type { LayerPanelSlots, MenuButton, MenuComponent, Services } from '@editor/type';
+import { useFilter } from '@editor/hooks/use-filter';
+import { LayerPanelSlots, MenuButton, MenuComponent, Services, TreeNodeData } from '@editor/type';
 
 import LayerMenu from './LayerMenu.vue';
 import LayerNodeTool from './LayerNodeTool.vue';
 import { useClick } from './use-click';
 import { useDrag } from './use-drag';
-import { useFilter } from './use-filter';
 import { useKeybinding } from './use-keybinding';
 import { useNodeStatus } from './use-node-status';
 
@@ -69,6 +73,7 @@ const editorService = services?.editorService;
 const tree = ref<InstanceType<typeof Tree>>();
 
 const page = computed(() => editorService?.get('page'));
+const nodeData = computed<TreeNodeData[]>(() => (!page.value ? [] : [page.value]));
 
 const { nodeStatusMap } = useNodeStatus(services);
 const { isCtrlKeyDown } = useKeybinding(services, tree);
@@ -84,7 +89,7 @@ const filterNodeMethod = (v: string, data: MNode): boolean => {
   return `${data.id}${name}${data.type}`.includes(v);
 };
 
-const { filterTextChangeHandler } = useFilter(services, nodeStatusMap, filterNodeMethod);
+const { filterTextChangeHandler } = useFilter(nodeData, nodeStatusMap, filterNodeMethod);
 
 const collapseAllHandler = () => {
   if (!page.value || !nodeStatusMap.value) return;

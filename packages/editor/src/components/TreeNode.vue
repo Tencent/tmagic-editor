@@ -25,7 +25,9 @@
 
       <div class="tree-node-content" @click="nodeClickHandler">
         <slot name="tree-node-content" :data="data">
-          <div class="tree-node-label">{{ `${data.name} (${data.id})` }}</div>
+          <div class="tree-node-label">
+            <slot name="tree-node-label" :data="data">{{ `${data.name} (${data.id})` }}</slot>
+          </div>
           <div class="tree-node-tool">
             <slot name="tree-node-tool" :data="data"></slot>
           </div>
@@ -43,6 +45,9 @@
       >
         <template #tree-node-content="{ data: nodeData }">
           <slot name="tree-node-content" :data="nodeData"> </slot>
+        </template>
+        <template #tree-node-label="{ data: nodeData }">
+          <slot name="tree-node-label" :data="nodeData"> </slot>
         </template>
         <template #tree-node-tool="{ data: nodeData }">
           <slot name="tree-node-tool" :data="nodeData"> </slot>
@@ -63,6 +68,7 @@ import type { LayerNodeStatus, TreeNodeData } from '@editor/type';
 import { updateStatus } from '@editor/utils/tree';
 
 defineSlots<{
+  'tree-node-label'(props: { data: TreeNodeData }): any;
   'tree-node-tool'(props: { data: TreeNodeData }): any;
   'tree-node-content'(props: { data: TreeNodeData }): any;
 }>();

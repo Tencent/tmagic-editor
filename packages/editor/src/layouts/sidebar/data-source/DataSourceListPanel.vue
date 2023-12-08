@@ -1,5 +1,5 @@
 <template>
-  <TMagicScrollbar class="data-source-list-panel m-editor-dep-list-panel">
+  <TMagicScrollbar class="data-source-list-panel m-editor-layer-panel">
     <div class="search-wrapper">
       <SearchInput @search="filterTextChangeHandler"></SearchInput>
       <TMagicPopover v-if="editable" placement="right">

@@ -12,7 +12,7 @@
     <template #body>
       <Tree
         class="m-editor-node-list-menu magic-editor-layer-tree"
-        :data="[page]"
+        :data="nodeData"
         :node-status-map="nodeStatusMap"
         @node-click="clickHandler"
       ></Tree>
@@ -28,7 +28,7 @@ import type { MNode } from '@tmagic/schema';
 
 import FloatingBox from '@editor/components/FloatingBox.vue';
 import Tree from '@editor/components/Tree.vue';
-import { useFilter } from '@editor/layouts/sidebar/layer/use-filter';
+import { useFilter } from '@editor/hooks/use-filter';
 import { useNodeStatus } from '@editor/layouts/sidebar/layer/use-node-status';
 import type { Services, TreeNodeData } from '@editor/type';
 
@@ -42,12 +42,13 @@ const box = ref<InstanceType<typeof FloatingBox>>();
 const stage = computed(() => editorService?.get('stage'));
 const page = computed(() => editorService?.get('page'));
 const nodes = computed(() => editorService?.get('nodes') || []);
+const nodeData = computed<TreeNodeData[]>(() => (!page.value ? [] : [page.value]));
 
 const { nodeStatusMap } = useNodeStatus(services);
 
 const filterNodeMethod = (value: string, data: MNode): boolean => data.id === value;
 
-const { filterTextChangeHandler } = useFilter(services, nodeStatusMap, filterNodeMethod);
+const { filterTextChangeHandler } = useFilter(nodeData, nodeStatusMap, filterNodeMethod);
 
 const unWatch = watch(
   stage,

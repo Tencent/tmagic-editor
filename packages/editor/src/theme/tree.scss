@@ -59,13 +59,24 @@
           width: 100px;
           overflow: hidden;
           text-overflow: ellipsis;
+
+          .disabled {
+            cursor: default;
+          }
+
+          .hook {
+            color: #999;
+          }
         }
       }
 
       .tree-node-tool {
-        margin-right: 15px;
         display: flex;
         align-items: center;
+
+        .tmagic-design-icon {
+          margin-right: 10px;
+        }
       }
     }
   }
