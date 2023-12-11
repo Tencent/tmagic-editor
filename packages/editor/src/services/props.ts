@@ -139,12 +139,13 @@ class Props extends BaseService {
 
   /**
    * 将组件与组件的子元素配置中的id都设置成一个新的ID
-   * 如果没有相同ID则保持不变
+   * 如果没有相同ID并且force为false则保持不变
    * @param {Object} config 组件配置
+   * @param {Boolean} force 是否强制设置新的ID
    */
   /* eslint no-param-reassign: ["error", { "props": false }] */
-  public async setNewItemId(config: MNode) {
-    if (editorService.getNodeById(config.id)) {
+  public async setNewItemId(config: MNode, force = true) {
+    if (force || editorService.getNodeById(config.id)) {
       const newId = await this.createId(config.type || 'component');
       this.setRelateId(config.id, newId);
       config.id = newId;
