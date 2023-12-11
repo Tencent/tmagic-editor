@@ -17,12 +17,15 @@
  */
 
 import { reactive } from 'vue';
-import { cloneDeep, mergeWith } from 'lodash-es';
+import { cloneDeep, get, mergeWith, set } from 'lodash-es';
 
+import { DepTargetType } from '@tmagic/dep';
 import type { FormConfig } from '@tmagic/form';
-import type { MComponent, MNode } from '@tmagic/schema';
+import type { Id, MComponent, MNode } from '@tmagic/schema';
 import { guid, toLine } from '@tmagic/utils';
 
+import depService from '@editor/services/dep';
+import editorService from '@editor/services/editor';
 import type { PropsState } from '@editor/type';
 import { fillConfig } from '@editor/utils/props';
 
@@ -32,6 +35,7 @@ class Props extends BaseService {
   private state = reactive<PropsState>({
     propsConfigMap: {},
     propsValueMap: {},
+    relateIdMap: {},
   });
 
   constructor() {
@@ -135,11 +139,16 @@ class Props extends BaseService {
 
   /**
    * 将组件与组件的子元素配置中的id都设置成一个新的ID
+   * 如果没有相同ID则保持不变
    * @param {Object} config 组件配置
    */
   /* eslint no-param-reassign: ["error", { "props": false }] */
   public async setNewItemId(config: MNode) {
-    config.id = await this.createId(config.type || 'component');
+    if (editorService.getNodeById(config.id)) {
+      const newId = await this.createId(config.type || 'component');
+      this.setRelateId(config.id, newId);
+      config.id = newId;
+    }
 
     if (config.items && Array.isArray(config.items)) {
       for (const item of config.items) {
@@ -176,10 +185,58 @@ class Props extends BaseService {
     this.state.propsValueMap = {};
   }
 
+  /**
+   * 替换关联ID
+   * @param originConfigs 原组件配置
+   * @param targetConfigs 待替换的组件配置
+   */
+  public replaceRelateId(originConfigs: MNode[], targetConfigs: MNode[]) {
+    const relateIdMap = this.getRelateIdMap();
+    if (Object.keys(relateIdMap).length === 0) return;
+    const target = depService.getTarget(DepTargetType.RELATED_COMP_WHEN_COPY, DepTargetType.RELATED_COMP_WHEN_COPY);
+    if (!target) return;
+    originConfigs.forEach((config: MNode) => {
+      const newId = relateIdMap[config.id];
+      const targetConfig = targetConfigs.find((targetConfig) => targetConfig.id === newId);
+      if (!targetConfig) return;
+      target.deps[config.id]?.keys?.forEach((fullKey) => {
+        const relateOriginId = get(config, fullKey);
+        const relateTargetId = relateIdMap[relateOriginId];
+        if (!relateTargetId) return;
+        set(targetConfig, fullKey, relateTargetId);
+      });
+    });
+  }
+
+  /**
+   * 清除setNewItemId前后映射关系
+   */
+  public clearRelateId() {
+    this.state.relateIdMap = {};
+  }
+
   public destroy() {
     this.resetState();
     this.removeAllListeners();
     this.removeAllPlugins();
+  }
+
+  /**
+   * 获取setNewItemId前后映射关系
+   * @param oldId 原组件ID
+   * @returns 新旧ID映射
+   */
+  private getRelateIdMap() {
+    return this.state.relateIdMap;
+  }
+
+  /**
+   * 记录setNewItemId前后映射关系
+   * @param oldId 原组件ID
+   * @param newId 分配的新ID
+   */
+  private setRelateId(oldId: Id, newId: Id) {
+    this.state.relateIdMap[oldId] = newId;
   }
 }
 

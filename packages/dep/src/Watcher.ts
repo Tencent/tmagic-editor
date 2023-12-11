@@ -54,6 +54,15 @@ export default class Watcher {
   }
 
   /**
+   * 判断是否存在指定类型的target
+   * @param type target type
+   * @returns boolean
+   */
+  public hasSpecifiedTypeTarget(type: string = DepTargetType.DEFAULT): boolean {
+    return Object.keys(this.getTargets(type)).length > 0;
+  }
+
+  /**
    * 删除指定id的target
    * @param id target id
    */
@@ -95,10 +104,12 @@ export default class Watcher {
    * 收集依赖
    * @param nodes 需要收集的节点
    * @param deep 是否需要收集子节点
+   * @param type 强制收集指定类型的依赖
    */
-  public collect(nodes: Record<string | number, any>[], deep = false) {
+  public collect(nodes: Record<string | number, any>[], deep = false, type?: DepTargetType) {
     Object.values(this.targetsList).forEach((targets) => {
       Object.values(targets).forEach((target) => {
+        if ((!type && !target.isCollectByDefault) || (type && target.type !== type)) return;
         nodes.forEach((node) => {
           // 先删除原有依赖，重新收集
           target.removeDep(node);
@@ -143,7 +154,7 @@ export default class Watcher {
         } else if (!keyIsItems && Array.isArray(value)) {
           value.forEach((item, index) => {
             if (isObject(item)) {
-              collectTarget(item, `${fullKey}.${index}`);
+              collectTarget(item, `${fullKey}[${index}]`);
             }
           });
         } else if (isObject(value)) {

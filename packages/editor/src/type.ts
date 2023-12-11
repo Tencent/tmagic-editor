@@ -148,6 +148,7 @@ export type StoreStateKey = keyof StoreState;
 export interface PropsState {
   propsConfigMap: Record<string, FormConfig>;
   propsValueMap: Record<string, Partial<MNode>>;
+  relateIdMap: Record<Id, Id>;
 }
 
 export interface ComponentGroupState {

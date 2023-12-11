@@ -17,13 +17,15 @@
  */
 
 import { reactive, toRaw } from 'vue';
-import { cloneDeep, isObject, mergeWith, uniq } from 'lodash-es';
+import { cloneDeep, get, isObject, mergeWith, uniq } from 'lodash-es';
 
+import { DepTargetType } from '@tmagic/dep';
 import type { Id, MApp, MComponent, MContainer, MNode, MPage } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 import StageCore from '@tmagic/stage';
 import { getNodePath, isNumber, isPage, isPop } from '@tmagic/utils';
 
+import depService from '@editor/services/dep';
 import historyService from '@editor/services/history';
 import storageService, { Protocol } from '@editor/services/storage';
 import type { AddMNode, EditorNodeInfo, PastePosition, StepValue, StoreState, StoreStateKey } from '@editor/type';
@@ -593,12 +595,47 @@ class Editor extends BaseService {
   }
 
   /**
-   * 将组将节点配置转化成string，然后存储到localStorage中
+   * 将组件节点配置存储到localStorage中
    * @param config 组件节点配置
-   * @returns 组件节点配置
+   * @returns
    */
   public copy(config: MNode | MNode[]): void {
     storageService.setItem(COPY_STORAGE_KEY, Array.isArray(config) ? config : [config], {
+      protocol: Protocol.OBJECT,
+    });
+  }
+
+  /**
+   * 复制时会带上组件关联的依赖
+   * @param config 组件节点配置
+   * @returns
+   */
+  public copyWithRelated(config: MNode | MNode[]): void {
+    const copyNodes: MNode[] = Array.isArray(config) ? config : [config];
+    // 关联的组件也一并复制
+    depService.getTarget(DepTargetType.RELATED_COMP_WHEN_COPY, DepTargetType.RELATED_COMP_WHEN_COPY)?.removeDep();
+    depService.collect(copyNodes, true, DepTargetType.RELATED_COMP_WHEN_COPY);
+    const customTarget = depService.getTarget(
+      DepTargetType.RELATED_COMP_WHEN_COPY,
+      DepTargetType.RELATED_COMP_WHEN_COPY,
+    );
+    if (customTarget) {
+      Object.keys(customTarget.deps).forEach((nodeId: Id) => {
+        const node = this.getNodeById(nodeId);
+        if (!node) return;
+        customTarget!.deps[nodeId].keys.forEach((key) => {
+          const relateNodeId = get(node, key);
+          const isExist = copyNodes.find((node) => node.id === relateNodeId);
+          if (!isExist) {
+            const relateNode = this.getNodeById(relateNodeId);
+            if (relateNode) {
+              copyNodes.push(relateNode);
+            }
+          }
+        });
+      });
+    }
+    storageService.setItem(COPY_STORAGE_KEY, copyNodes, {
       protocol: Protocol.OBJECT,
     });
   }
@@ -610,7 +647,6 @@ class Editor extends BaseService {
    */
   public async paste(position: PastePosition = {}): Promise<MNode | MNode[] | void> {
     const config: MNode[] = storageService.getItem(COPY_STORAGE_KEY);
-
     if (!Array.isArray(config)) return;
 
     const node = this.get('node');
@@ -623,13 +659,13 @@ class Editor extends BaseService {
         parent = this.get('page');
       }
     }
-
     const pasteConfigs = await this.doPaste(config, position);
-
+    propsService.replaceRelateId(config, pasteConfigs);
     return this.add(pasteConfigs, parent);
   }
 
   public async doPaste(config: MNode[], position: PastePosition = {}): Promise<MNode[]> {
+    propsService.clearRelateId();
     const pasteConfigs = await beforePaste(position, cloneDeep(config));
     return pasteConfigs;
   }

@@ -53,8 +53,8 @@ class Dep extends BaseService {
     this.watcher.clearTargets();
   }
 
-  public collect(nodes: MNode[], deep = false) {
-    this.watcher.collect(nodes, deep);
+  public collect(nodes: MNode[], deep = false, type?: DepTargetType) {
+    this.watcher.collect(nodes, deep, type);
     this.emit('collected', nodes, deep);
   }
 
@@ -64,6 +64,10 @@ class Dep extends BaseService {
 
   public hasTarget(id: Id, type: string = DepTargetType.DEFAULT) {
     return this.watcher.hasTarget(id, type);
+  }
+
+  public hasSpecifiedTypeTarget(type: string = DepTargetType.DEFAULT): boolean {
+    return this.watcher.hasSpecifiedTypeTarget(type);
   }
 }
 

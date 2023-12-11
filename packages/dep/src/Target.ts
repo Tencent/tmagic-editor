@@ -29,11 +29,16 @@ export default class Target {
    * 实例：{ 'node_id': { name: 'node_name', keys: [ created, mounted ] } }
    */
   public deps: DepData = {};
+  /**
+   * 是否默认收集，默认为true，当值为false时需要传入type参数给collect方法才会被收集
+   */
+  public isCollectByDefault?: boolean;
 
   constructor(options: TargetOptions) {
     this.isTarget = options.isTarget;
     this.id = options.id;
     this.name = options.name;
+    this.isCollectByDefault = options.isCollectByDefault ?? true;
     if (options.type) {
       this.type = options.type;
     }

@@ -9,7 +9,7 @@ import {
 import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX } from '@tmagic/utils';
 
 import Target from './Target';
-import { DepTargetType } from './types';
+import { CustomTargetOptions, DepTargetType } from './types';
 
 export const createCodeBlockTarget = (id: Id, codeBlock: CodeBlockContent, initialDeps: DepData = {}) =>
   new Target({
@@ -29,6 +29,13 @@ export const createCodeBlockTarget = (id: Id, codeBlock: CodeBlockContent, initi
 
       return false;
     },
+  });
+
+export const createRelatedCompTarget = (options: CustomTargetOptions) =>
+  new Target({
+    id: DepTargetType.RELATED_COMP_WHEN_COPY,
+    type: DepTargetType.RELATED_COMP_WHEN_COPY,
+    ...options,
   });
 
 export const createDataSourceTarget = (ds: DataSourceSchema, initialDeps: DepData = {}) =>

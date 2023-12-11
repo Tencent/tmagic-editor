@@ -2,13 +2,14 @@ import { onUnmounted, reactive, toRaw, watch } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
 import type { EventOption } from '@tmagic/core';
-import type { Target } from '@tmagic/dep';
 import {
   createCodeBlockTarget,
   createDataSourceCondTarget,
   createDataSourceMethodTarget,
   createDataSourceTarget,
+  createRelatedCompTarget,
   DepTargetType,
+  Target,
 } from '@tmagic/dep';
 import type { CodeBlockContent, DataSourceSchema, Id, MApp, MNode, MPage } from '@tmagic/schema';
 import { getNodes } from '@tmagic/utils';
@@ -186,7 +187,7 @@ export const initServiceEvents = (
     return stage?.renderer.runtime?.getApp?.();
   };
 
-  const updateDataSoucreSchema = () => {
+  const updateDataSourceSchema = () => {
     const root = editorService.get('root');
 
     if (root?.dataSources) {
@@ -194,7 +195,7 @@ export const initServiceEvents = (
     }
   };
 
-  const upateNodeWhenDataSourceChange = (nodes: MNode[]) => {
+  const updateNodeWhenDataSourceChange = (nodes: MNode[]) => {
     const root = editorService.get('root');
     const stage = editorService.get('stage');
 
@@ -210,7 +211,7 @@ export const initServiceEvents = (
       app.dsl.dataSources = root.dataSources;
     }
 
-    updateDataSoucreSchema();
+    updateDataSourceSchema();
 
     nodes.forEach((node) => {
       const deps = Object.values(root.dataSourceDeps || {});
@@ -258,11 +259,11 @@ export const initServiceEvents = (
   };
 
   const depUpdateHandler = (node: MNode) => {
-    upateNodeWhenDataSourceChange([node]);
+    updateNodeWhenDataSourceChange([node]);
   };
 
   const collectedHandler = (nodes: MNode[]) => {
-    upateNodeWhenDataSourceChange(nodes);
+    updateNodeWhenDataSourceChange(nodes);
   };
 
   depService.on('add-target', targetAddHandler);
@@ -381,7 +382,7 @@ export const initServiceEvents = (
 
     const nodes = getNodes(Object.keys(targets[config.id].deps), root?.items);
 
-    upateNodeWhenDataSourceChange(nodes);
+    updateNodeWhenDataSourceChange(nodes);
   };
 
   const removeDataSourceTarget = (id: string) => {
@@ -398,6 +399,11 @@ export const initServiceEvents = (
   dataSourceService.on('add', dataSourceAddHandler);
   dataSourceService.on('update', dataSourceUpdateHandler);
   dataSourceService.on('remove', dataSourceRemoveHandler);
+
+  // 初始化复制组件相关的依赖收集器
+  if (props.collectorOptions && !depService.hasTarget(DepTargetType.RELATED_COMP_WHEN_COPY)) {
+    depService.addTarget(createRelatedCompTarget(props.collectorOptions));
+  }
 
   onUnmounted(() => {
     depService.off('add-target', targetAddHandler);

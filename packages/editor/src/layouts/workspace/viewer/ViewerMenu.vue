@@ -11,10 +11,8 @@ import { isPage } from '@tmagic/utils';
 
 import ContentMenu from '@editor/components/ContentMenu.vue';
 import CenterIcon from '@editor/icons/CenterIcon.vue';
-import storageService from '@editor/services/storage';
 import { LayerOffset, Layout, MenuButton, MenuComponent, Services } from '@editor/type';
 import { useCopyMenu, useDeleteMenu, useMoveToMenu, usePasteMenu } from '@editor/utils/content-menu';
-import { COPY_STORAGE_KEY } from '@editor/utils/editor';
 
 defineOptions({
   name: 'MEditorViewerMenu',
@@ -28,7 +26,6 @@ const props = withDefaults(
 const services = inject<Services>('services');
 const editorService = services?.editorService;
 const menu = ref<InstanceType<typeof ContentMenu>>();
-const canPaste = ref(false);
 const canCenter = ref(false);
 
 const node = computed(() => editorService?.get('node'));
@@ -129,8 +126,6 @@ watch(
 
 const show = (e: MouseEvent) => {
   menu.value?.show(e);
-  const data = storageService.getItem(COPY_STORAGE_KEY);
-  canPaste.value = data !== 'undefined' && !!data;
 };
 
 defineExpose({ show });

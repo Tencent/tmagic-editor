@@ -1,4 +1,4 @@
-import { computed, markRaw, Ref, ref } from 'vue';
+import { computed, markRaw, Ref } from 'vue';
 import { CopyDocument, Delete, DocumentCopy } from '@element-plus/icons-vue';
 
 import { Id, MContainer, NodeType } from '@tmagic/schema';
@@ -6,6 +6,8 @@ import { isPage } from '@tmagic/utils';
 
 import ContentMenu from '@editor/components/ContentMenu.vue';
 import type { MenuButton, Services } from '@editor/type';
+
+import { COPY_STORAGE_KEY } from './editor';
 
 export const useDeleteMenu = (): MenuButton => ({
   type: 'button',
@@ -21,8 +23,6 @@ export const useDeleteMenu = (): MenuButton => ({
   },
 });
 
-const canPaste = ref(false);
-
 export const useCopyMenu = (): MenuButton => ({
   type: 'button',
   text: '复制',
@@ -30,7 +30,6 @@ export const useCopyMenu = (): MenuButton => ({
   handler: (services) => {
     const nodes = services?.editorService?.get('nodes');
     nodes && services?.editorService?.copy(nodes);
-    canPaste.value = true;
   },
 });
 
@@ -38,7 +37,7 @@ export const usePasteMenu = (menu?: Ref<InstanceType<typeof ContentMenu> | undef
   type: 'button',
   text: '粘贴',
   icon: markRaw(DocumentCopy),
-  display: () => canPaste.value,
+  display: (services) => !!services?.storageService?.getItem(COPY_STORAGE_KEY),
   handler: (services) => {
     const nodes = services?.editorService?.get('nodes');
     if (!nodes || nodes.length === 0) return;
