@@ -29,7 +29,7 @@
     "clear:type": "rimraf ./types"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "repository": {
     "type": "git",
@@ -49,15 +49,15 @@
   "devDependencies": {
     "@babel/core": "^7.18.0",
     "@types/lodash-es": "^4.17.4",
-    "@types/node": "^15.12.4",
+    "@types/node": "^18.19.0",
     "@types/sortablejs": "^1.10.7",
-    "@vitejs/plugin-vue": "^4.2.3",
+    "@vitejs/plugin-vue": "^4.5.2",
     "@vue/compiler-sfc": "^3.3.8",
     "@vue/test-utils": "^2.3.2",
     "rimraf": "^3.0.2",
     "sass": "^1.35.1",
     "typescript": "^5.0.4",
-    "vite": "^4.4.4",
-    "vue-tsc": "^1.6.5"
+    "vite": "^5.0.7",
+    "vue-tsc": "^1.8.25"
   }
 }

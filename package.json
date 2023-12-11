@@ -31,7 +31,7 @@
     "release": "node scripts/release.cjs"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=18"
   },
   "workspaces": [
     "packages/*"
@@ -45,11 +45,11 @@
     "@babel/core": "^7.18.0",
     "@commitlint/cli": "^18.2.0",
     "@commitlint/config-conventional": "^18.1.0",
-    "@types/node": "^18.15.11",
+    "@types/node": "^18.19.0",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
-    "@vitejs/plugin-vue": "^4.2.3",
-    "@vitest/coverage-c8": "^0.30.0",
+    "@vitejs/plugin-vue": "^4.5.2",
+    "@vitest/coverage-v8": "^1.0.4",
     "c8": "^7.11.3",
     "chalk": "^4.1.0",
     "commitizen": "^4.3.0",
@@ -77,9 +77,9 @@
     "serialize-javascript": "^6.0.0",
     "shx": "^0.3.4",
     "typescript": "^5.0.4",
-    "vite": "^4.4.4",
-    "vitepress": "1.0.0-rc.24",
-    "vitest": "^0.31.1",
+    "vite": "^5.0.7",
+    "vitepress": "1.0.0-rc.31",
+    "vitest": "^1.0.4",
     "vue": "^3.3.8"
   },
   "config": {

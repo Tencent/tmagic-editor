@@ -23,7 +23,7 @@
     "clear:type": "rimraf ./types"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "repository": {
     "type": "git",
@@ -41,9 +41,9 @@
   "devDependencies": {
     "@types/events": "^3.0.0",
     "@types/lodash-es": "^4.17.4",
-    "@types/node": "^15.12.4",
+    "@types/node": "^18.19.0",
     "tsc-alias": "^1.8.5",
     "typescript": "^4.7.4",
-    "vite": "^4.4.4"
+    "vite": "^5.0.7"
   }
 }

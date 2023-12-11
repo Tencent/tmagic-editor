@@ -23,7 +23,7 @@
     "clear:type": "rimraf ./types"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "repository": {
     "type": "git",
@@ -47,11 +47,11 @@
     "vue": "^3.3.8"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.2.3",
+    "@vitejs/plugin-vue": "^4.5.2",
     "@vue/compiler-sfc": "^3.3.8",
-    "@types/node": "^15.12.4",
+    "@types/node": "^18.19.0",
     "rimraf": "^3.0.2",
     "typescript": "^5.0.4",
-    "vite": "^4.4.4"
+    "vite": "^5.0.7"
   }
 }

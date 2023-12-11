@@ -30,10 +30,10 @@
   },
   "devDependencies": {
     "@babel/preset-env": "^7.21.4",
-    "@types/node": "^15.12.4",
-    "@vitejs/plugin-legacy": "^4.1.0",
-    "@vitejs/plugin-vue": "^4.2.3",
-    "@vitejs/plugin-vue-jsx": "^3.0.1",
+    "@types/node": "^18.19.0",
+    "@vitejs/plugin-legacy": "^5.2.0",
+    "@vitejs/plugin-vue": "^4.5.2",
+    "@vitejs/plugin-vue-jsx": "^3.1.0",
     "@vue/compiler-sfc": "^3.3.8",
     "@vue/test-utils": "^2.3.2",
     "recast": "^0.20.4",
@@ -42,7 +42,7 @@
     "sass": "^1.35.1",
     "terser": "^5.14.2",
     "typescript": "^4.3.4",
-    "vite": "^4.4.4",
-    "vue-tsc": "^1.6.5"
+    "vite": "^5.0.7",
+    "vue-tsc": "^1.8.25"
   }
 }

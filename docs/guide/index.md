@@ -1,10 +1,10 @@
 # 快速开始
 
-tmagic-editor的编辑器我们已经封装成一个 npm 包，可以直接安装使用。编辑器是使用 vue3 开发的，但使用编辑器的业务可以不限框架，可以用 vue2、react 等开发业务组件。
+tmagic-editor的编辑器我们已经封装成一个 npm 包，可以直接安装使用。编辑器是使用 vue3 开发的(仅支持vue3)，但使用编辑器的业务(runtime)可以不限框架，可以用 vue2、react 等开发业务组件。
 
 ## 安装
 
-node.js > 14
+node.js >= 18
 
 可以通过[Vite](https://cn.vitejs.dev/) 或 [Vue CLI](https://cli.vuejs.org/zh/)快速创建项目。
 

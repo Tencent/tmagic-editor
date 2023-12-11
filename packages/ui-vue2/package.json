@@ -4,7 +4,7 @@
   "type": "module",
   "main": "src/index.ts",
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "repository": {
     "type": "git",
@@ -22,7 +22,6 @@
     "vue": "^2.7.4"
   },
   "devDependencies": {
-    "vite": "^4.4.4",
     "vue-template-compiler": "^2.7.4"
   }
 }

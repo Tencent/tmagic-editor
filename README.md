@@ -16,7 +16,7 @@ https://tencent.github.io/tmagic-editor/playground/index.html
 
 ## 环境准备
 
-node.js >= 16
+node.js >= 18
 
 pnpm >= 8
 
