@@ -73,7 +73,7 @@ export interface CodeBlockListPanelSlots extends CodeBlockListSlots {
 }
 
 export interface CodeBlockListSlots {
-  'code-block-panel-tool'(props: { id: Id; data: CodeBlockContent }): any;
+  'code-block-panel-tool'(props: { id: Id; data: any }): any;
 }
 
 export interface DataSourceListSlots {

@@ -19,7 +19,7 @@
       <TMagicTooltip v-if="data.type === 'code' && editable" effect="dark" content="删除" placement="bottom">
         <Icon :icon="Close" class="edit-icon" @click.stop="deleteCode(`${data.key}`)"></Icon>
       </TMagicTooltip>
-      <slot name="code-block-panel-tool" :id="data.key" :data="data.codeBlockContent"></slot>
+      <slot name="code-block-panel-tool" :id="data.key" :data="data"></slot>
     </template>
   </Tree>
 </template>
