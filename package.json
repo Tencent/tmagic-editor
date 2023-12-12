@@ -3,7 +3,6 @@
   "name": "tmagic",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@8.2.0",
   "scripts": {
     "bootstrap": "pnpm i && pnpm build",
     "clean:top": "rimraf */**/dist */**/types */dist coverage dwt*",
