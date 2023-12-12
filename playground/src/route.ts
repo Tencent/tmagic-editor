@@ -20,11 +20,13 @@ import { createRouter, createWebHashHistory } from 'vue-router';
 
 import Editor from './pages/Editor.vue';
 import Form from './pages/Form.vue';
+import FormEditor from './pages/FormEditor.vue';
 import Table from './pages/Table.vue';
 
 const routes = [
   { path: '/', component: Editor },
   { path: '/form', component: Form },
+  { path: '/form-editor', component: FormEditor },
   { path: '/table', component: Table },
 ];
 

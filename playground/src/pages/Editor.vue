@@ -107,6 +107,11 @@ const menu: MenuBarData = {
     },
     {
       type: 'button',
+      text: 'Form Editor Playground',
+      handler: () => router.push('form-editor'),
+    },
+    {
+      type: 'button',
       text: 'Table Playground',
       handler: () => router.push('table'),
     },

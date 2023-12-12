@@ -62,6 +62,11 @@ const menu: MenuButton[] = [
   },
   {
     type: 'button',
+    text: 'Form Editor Playground',
+    handler: () => router.push('form-editor'),
+  },
+  {
+    type: 'button',
     text: 'Form Playground',
     handler: () => router.push('form'),
   },
