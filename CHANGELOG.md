@@ -1,3 +1,28 @@
+## [1.3.6](https://github.com/Tencent/tmagic-editor/compare/v1.3.5...v1.3.6) (2023-12-12)
+
+
+### Bug Fixes
+
+* **data-source,utils:** 显示条件编译对于undefined理解不正确 ([75dd89f](https://github.com/Tencent/tmagic-editor/commit/75dd89f2fe560f9bfcad8d0aa3afc481cdf42286))
+* **dep:** get-tagert需要指定type ([70f2b11](https://github.com/Tencent/tmagic-editor/commit/70f2b11df50cd8ebbc58e96b1f0e2c87e7d6db84))
+* **editor:** 新增数据源方法不会收集依赖 ([fe26ac5](https://github.com/Tencent/tmagic-editor/commit/fe26ac5ffc39da1449fd1c54af48a0ad8ba24491))
+* **editor:** 有复制的内容时展示粘贴菜单 ([456692f](https://github.com/Tencent/tmagic-editor/commit/456692ff8ab2959519c6c858cd0098b06188560c))
+* **form:** cascader options不会自动更新 ([cc202d7](https://github.com/Tencent/tmagic-editor/commit/cc202d79f9e76853e19177bb889e4cb7517514ec))
+* **table:** 修复element table tooltip position 默认使用 fixed 定位导致气泡偏移的问题 ([0c994f1](https://github.com/Tencent/tmagic-editor/commit/0c994f1e230127aa27bb222ad201e096a86e05ad))
+
+
+### Features
+
+* **editor,stage:** 优化可选组件交互 ([258d2bc](https://github.com/Tencent/tmagic-editor/commit/258d2bc2eaa587c8f86fa2193b9740f9648a2705))
+* **editor:** propsService.setNewItemId新增force参数 ([a9d794d](https://github.com/Tencent/tmagic-editor/commit/a9d794dc19f80d760459c8cf6b4636f48016c258))
+* **editor:** service扩展支持设置成同步的 ([5c6a345](https://github.com/Tencent/tmagic-editor/commit/5c6a3455b039383dc78eaf1f08fb3ac7d53c379d))
+* **editor:** 修改code-block-list code-block-panel-tool slot data ([268ec4c](https://github.com/Tencent/tmagic-editor/commit/268ec4c27a9a1dacc68edd93b5e1ff6aae72c300))
+* **editor:** 可选组件按钮只有在可选组件长度大于3时才显示 ([e50e332](https://github.com/Tencent/tmagic-editor/commit/e50e332818dbe44f33489167aa5be4e42196e82a))
+* **playground:** 新增表单编辑器 ([cf72039](https://github.com/Tencent/tmagic-editor/commit/cf72039ff149f5563cd018dcc572b9a6af38c007))
+* **stage, editor:** runtime支持直接渲染模式不用iframe ([ba2f1e5](https://github.com/Tencent/tmagic-editor/commit/ba2f1e5ac5b71ece1d61aec81b84adf166ab063e))
+
+
+
 ## [1.3.5](https://github.com/Tencent/tmagic-editor/compare/v1.3.4...v1.3.5) (2023-12-01)
 
 
