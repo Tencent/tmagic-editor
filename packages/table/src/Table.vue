@@ -1,6 +1,7 @@
 <template>
   <TMagicTable
     tooltip-effect="dark"
+    :tooltip-options="{ popperOptions: { strategy: 'absolute' } }"
     class="m-table"
     ref="tMagicTable"
     v-loading="loading"
