@@ -23,7 +23,15 @@ import { getHost, injectStyle, isSameDomain } from '@tmagic/utils';
 
 import { DEFAULT_ZOOM } from './const';
 import style from './style.css?raw';
-import type { Point, RemoveData, Runtime, RuntimeWindow, StageRenderConfig, UpdateData } from './types';
+import {
+  type Point,
+  type RemoveData,
+  RenderType,
+  type Runtime,
+  type RuntimeWindow,
+  type StageRenderConfig,
+  type UpdateData,
+} from './types';
 import { addSelectedClassName, removeSelectedClassName } from './util';
 
 export default class StageRender extends EventEmitter {
@@ -31,28 +39,26 @@ export default class StageRender extends EventEmitter {
   public contentWindow: RuntimeWindow | null = null;
   public runtime: Runtime | null = null;
   public iframe?: HTMLIFrameElement;
+  public nativeContainer?: HTMLDivElement;
 
   private runtimeUrl?: string;
   private zoom = DEFAULT_ZOOM;
+  private renderType: RenderType;
   private customizedRender?: () => Promise<HTMLElement | null>;
 
-  constructor({ runtimeUrl, zoom, customizedRender }: StageRenderConfig) {
+  constructor({ runtimeUrl, zoom, customizedRender, renderType = RenderType.IFRAME }: StageRenderConfig) {
     super();
 
+    this.renderType = renderType;
     this.runtimeUrl = runtimeUrl || '';
     this.customizedRender = customizedRender;
     this.setZoom(zoom);
 
-    this.iframe = globalThis.document.createElement('iframe');
-    // 同源，直接加载
-    this.iframe.src = isSameDomain(this.runtimeUrl) ? this.runtimeUrl : '';
-    this.iframe.style.cssText = `
-      border: 0;
-      width: 100%;
-      height: 100%;
-    `;
-
-    this.iframe.addEventListener('load', this.loadHandler);
+    if (this.renderType === RenderType.IFRAME) {
+      this.createIframe();
+    } else if (this.renderType === RenderType.NATIVE) {
+      this.createNativeContainer();
+    }
   }
 
   public getMagicApi = () => ({
@@ -102,22 +108,22 @@ export default class StageRender extends EventEmitter {
    * @param el 将页面挂载到该Dom节点上
    */
   public async mount(el: HTMLDivElement) {
-    if (!this.iframe) {
-      throw Error('mount 失败');
+    if (this.iframe) {
+      if (!isSameDomain(this.runtimeUrl) && this.runtimeUrl) {
+        // 不同域，使用srcdoc发起异步请求，需要目标地址支持跨域
+        let html = await fetch(this.runtimeUrl).then((res) => res.text());
+        // 使用base, 解决相对路径或绝对路径的问题
+        const base = `${location.protocol}//${getHost(this.runtimeUrl)}`;
+        html = html.replace('<head>', `<head>\n<base href="${base}">`);
+        this.iframe.srcdoc = html;
+      }
+
+      el.appendChild<HTMLIFrameElement>(this.iframe);
+
+      this.postTmagicRuntimeReady();
+    } else if (this.nativeContainer) {
+      el.appendChild(this.nativeContainer);
     }
-
-    if (!isSameDomain(this.runtimeUrl) && this.runtimeUrl) {
-      // 不同域，使用srcdoc发起异步请求，需要目标地址支持跨域
-      let html = await fetch(this.runtimeUrl).then((res) => res.text());
-      // 使用base, 解决相对路径或绝对路径的问题
-      const base = `${location.protocol}//${getHost(this.runtimeUrl)}`;
-      html = html.replace('<head>', `<head>\n<base href="${base}">`);
-      this.iframe.srcdoc = html;
-    }
-
-    el.appendChild<HTMLIFrameElement>(this.iframe);
-
-    this.postTmagicRuntimeReady();
   }
 
   public getRuntime = (): Promise<Runtime> => {
@@ -150,6 +156,12 @@ export default class StageRender extends EventEmitter {
         x = x - rect.left;
         y = y - rect.top;
       }
+    } else if (this.nativeContainer) {
+      const rect = this.nativeContainer.getClientRects()[0];
+      if (rect) {
+        x = x - rect.left;
+        y = y - rect.top;
+      }
     }
 
     return this.getDocument()?.elementsFromPoint(x / this.zoom, y / this.zoom) as HTMLElement[];
@@ -168,11 +180,40 @@ export default class StageRender extends EventEmitter {
    * 销毁实例
    */
   public destroy(): void {
-    this.iframe?.removeEventListener('load', this.loadHandler);
+    this.iframe?.removeEventListener('load', this.iframeLoadHandler);
     this.contentWindow = null;
     this.iframe?.remove();
     this.iframe = undefined;
     this.removeAllListeners();
+  }
+
+  private createIframe(): HTMLIFrameElement {
+    this.iframe = globalThis.document.createElement('iframe');
+    // 同源，直接加载
+    this.iframe.src = this.runtimeUrl && isSameDomain(this.runtimeUrl) ? this.runtimeUrl : '';
+    this.iframe.style.cssText = `
+      border: 0;
+      width: 100%;
+      height: 100%;
+    `;
+
+    this.iframe.addEventListener('load', this.iframeLoadHandler);
+
+    return this.iframe;
+  }
+
+  private async createNativeContainer() {
+    this.contentWindow = globalThis as unknown as RuntimeWindow;
+    this.nativeContainer = globalThis.document.createElement('div');
+
+    this.contentWindow.magic = this.getMagicApi();
+
+    if (this.customizedRender) {
+      const el = await this.customizedRender();
+      if (el) {
+        this.nativeContainer.appendChild(el);
+      }
+    }
   }
 
   /**
@@ -187,7 +228,7 @@ export default class StageRender extends EventEmitter {
     }
   }
 
-  private loadHandler = async () => {
+  private iframeLoadHandler = async () => {
     if (!this.contentWindow?.magic) {
       this.postTmagicRuntimeReady();
     }

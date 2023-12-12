@@ -7,6 +7,7 @@ import StageCore, {
   ContainerHighlightType,
   CustomizeMoveableOptionsCallbackConfig,
   MoveableOptions,
+  RenderType,
   UpdateDragEl,
 } from '@tmagic/stage';
 
@@ -39,6 +40,8 @@ export interface EditorProps {
   render?: (stage: StageCore) => HTMLDivElement | Promise<HTMLDivElement>;
   /** 中间工作区域中画布通过iframe渲染时的页面url */
   runtimeUrl?: string;
+  /** 是用iframe渲染还是直接渲染 */
+  renderType?: RenderType;
   /** 选中时是否自动滚动到可视区域 */
   autoScrollIntoView?: boolean;
   /** 组件的属性配置表单的dsl */
@@ -87,4 +90,5 @@ export const defaultEditorProps = {
   containerHighlightDuration: 800,
   containerHighlightType: ContainerHighlightType.DEFAULT,
   codeOptions: () => ({}),
+  renderType: RenderType.IFRAME,
 };

@@ -31,6 +31,7 @@ export const useStage = (stageOptions: StageOptions) => {
     containerHighlightDuration: stageOptions.containerHighlightDuration,
     containerHighlightType: stageOptions.containerHighlightType,
     disabledDragStart: stageOptions.disabledDragStart,
+    renderType: stageOptions.renderType,
     canSelect: (el, event, stop) => {
       const elCanSelect = stageOptions.canSelect(el);
       // 在组件联动过程中不能再往下选择，返回并触发 ui-select

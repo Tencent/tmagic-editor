@@ -257,13 +257,22 @@ export const serializeConfig = (config: any) =>
     unsafe: true,
   }).replace(/"(\w+)":\s/g, '$1: ');
 
-export const traverseNode = (node: MNode, cb: (node: MNode, parents: MNode[]) => void, parents: MNode[] = []) => {
+export interface NodeItem {
+  items?: NodeItem[];
+  [key: string]: any;
+}
+
+export const traverseNode = <T extends NodeItem = NodeItem>(
+  node: T,
+  cb: (node: T, parents: T[]) => void,
+  parents: T[] = [],
+) => {
   cb(node, parents);
 
   if (node.items?.length) {
     parents.push(node);
-    node.items.forEach((item: MNode) => {
-      traverseNode(item, cb, [...parents]);
+    node.items.forEach((item) => {
+      traverseNode(item as T, cb, [...parents]);
     });
   }
 };

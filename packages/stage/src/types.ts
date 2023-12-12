@@ -52,7 +52,12 @@ export enum ContainerHighlightType {
   ALT = 'alt',
 }
 
-export type UpdateDragEl = (el: TargetElement, target: TargetElement) => void;
+export enum RenderType {
+  IFRAME = 'iframe',
+  NATIVE = 'native',
+}
+
+export type UpdateDragEl = (el: TargetElement, target: TargetElement, container: HTMLElement) => void;
 
 export interface StageCoreConfig {
   /** 需要对齐的dom节点的CSS选择器字符串 */
@@ -71,6 +76,7 @@ export interface StageCoreConfig {
   autoScrollIntoView?: boolean;
   updateDragEl?: UpdateDragEl;
   disabledDragStart?: boolean;
+  renderType?: RenderType;
 }
 
 export interface ActionManagerConfig {
@@ -107,6 +113,7 @@ export interface CustomizeMoveableOptionsCallbackConfig {
 export interface StageRenderConfig {
   runtimeUrl?: string;
   zoom: number | undefined;
+  renderType?: RenderType;
   customizedRender?: () => Promise<HTMLElement | null>;
 }
 

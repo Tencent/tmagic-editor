@@ -18,7 +18,7 @@ const createPageNodeStatus = (page: MPage, initalLayerNodeStatus?: Map<Id, Layer
   });
 
   page.items.forEach((node: MNode) =>
-    traverseNode(node, (node) => {
+    traverseNode<MNode>(node, (node) => {
       map.set(
         node.id,
         initalLayerNodeStatus?.get(node.id) || {

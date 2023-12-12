@@ -25,6 +25,7 @@ import type {
   ContainerHighlightType,
   CustomizeMoveableOptionsCallbackConfig,
   MoveableOptions,
+  RenderType,
   UpdateDragEl,
 } from '@tmagic/stage';
 
@@ -129,6 +130,7 @@ export interface StageOptions {
   canSelect: (el: HTMLElement) => boolean | Promise<boolean>;
   isContainer: (el: HTMLElement) => boolean | Promise<boolean>;
   updateDragEl: UpdateDragEl;
+  renderType: RenderType;
 }
 
 export interface StoreState {

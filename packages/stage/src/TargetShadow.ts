@@ -96,7 +96,7 @@ export default class TargetShadow {
     el.style.cssText = getTargetElStyle(target, this.zIndex);
 
     if (typeof this.updateDragEl === 'function') {
-      this.updateDragEl(el, target);
+      this.updateDragEl(el, target, this.container);
     }
     const isFixed = isFixedParent(target);
     const mode = this.container.dataset.mode || Mode.ABSOLUTE;

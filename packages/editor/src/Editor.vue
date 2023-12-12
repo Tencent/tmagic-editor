@@ -175,6 +175,7 @@ provide(
     containerHighlightDuration: props.containerHighlightDuration,
     containerHighlightType: props.containerHighlightType,
     disabledDragStart: props.disabledDragStart,
+    renderType: props.renderType,
   }),
 );
 
