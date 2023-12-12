@@ -186,16 +186,10 @@ async function publishPackage(pkgName, version, runIfNotDry) {
 
   step(`Publishing ${pkgName}...`);
   try {
-    await runIfNotDry(
-      // note: use of yarn is intentional here as we rely on its publishing
-      // behavior.
-      'yarn',
-      ['publish', '--new-version', version, ...(releaseTag ? ['--tag', releaseTag] : []), '--access', 'public'],
-      {
-        cwd: pkgRoot,
-        stdio: 'pipe',
-      },
-    );
+    await runIfNotDry('pnpm', ['publish', ...(releaseTag ? ['--tag', releaseTag] : []), '--access', 'public'], {
+      cwd: pkgRoot,
+      stdio: 'pipe',
+    });
     console.log(chalk.green(`Successfully published ${pkgName}@${version}`));
   } catch (e) {
     if (e.stderr.match(/previously published/)) {
