@@ -36,7 +36,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 
 import { MenuButton, MenuComponent } from '@editor/type';
 
@@ -99,7 +99,7 @@ const clickHandler = () => {
   hide();
 };
 
-const outsideClickhideHandler = (e: MouseEvent) => {
+const outsideClickHideHandler = (e: MouseEvent) => {
   if (!props.autoHide) return;
 
   const target = e.target as HTMLElement | undefined;
@@ -173,13 +173,13 @@ const mouseenterHandler = () => {
 onMounted(() => {
   if (props.isSubMenu) return;
 
-  globalThis.addEventListener('mousedown', outsideClickhideHandler, true);
+  globalThis.addEventListener('mousedown', outsideClickHideHandler, true);
 });
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
   if (props.isSubMenu) return;
 
-  globalThis.removeEventListener('mousedown', outsideClickhideHandler, true);
+  globalThis.removeEventListener('mousedown', outsideClickHideHandler, true);
 });
 
 defineExpose({

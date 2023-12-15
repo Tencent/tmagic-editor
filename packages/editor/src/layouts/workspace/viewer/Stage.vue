@@ -31,7 +31,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, markRaw, nextTick, onMounted, onUnmounted, ref, toRaw, watch, watchEffect } from 'vue';
+import { computed, inject, markRaw, nextTick, onBeforeUnmount, onMounted, ref, toRaw, watch, watchEffect } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
 import type { MApp, MContainer } from '@tmagic/schema';
@@ -140,7 +140,7 @@ onMounted(() => {
   }
 });
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
   stage?.destroy();
   resizeObserver.disconnect();
   services?.editorService.set('stage', null);

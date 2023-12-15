@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, getCurrentInstance, inject, onMounted, onUnmounted, ref, watchEffect } from 'vue';
+import { computed, getCurrentInstance, inject, onBeforeUnmount, onMounted, ref, watchEffect } from 'vue';
 
 import { tMagicMessage } from '@tmagic/design';
 import type { FormState, FormValue } from '@tmagic/form';
@@ -64,7 +64,7 @@ onMounted(() => {
   emit('mounted', internalInstance);
 });
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
   services?.propsService.off('props-configs-change', init);
 });
 

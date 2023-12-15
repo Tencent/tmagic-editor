@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { inject, onMounted, onUnmounted } from 'vue';
+import { inject, onBeforeUnmount, onMounted } from 'vue';
 
 import Core from '@tmagic/core';
 import type { MComponent } from '@tmagic/schema';
@@ -43,7 +43,7 @@ export default ({ config, methods }: UseAppOptions) => {
     node?.emit('mounted', emitData);
   });
 
-  onUnmounted(() => {
+  onBeforeUnmount(() => {
     node?.emit('destroy', emitData);
   });
 

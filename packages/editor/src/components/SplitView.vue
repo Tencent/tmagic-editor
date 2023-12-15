@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { OnDrag } from 'gesto';
 
 import Resizer from './Resizer.vue';
@@ -110,7 +110,7 @@ onMounted(() => {
   }
 });
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
   resizerObserver.disconnect();
 });
 

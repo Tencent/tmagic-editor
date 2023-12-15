@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 
 import { getConfig } from './config';
 import type { SelectProps } from './types';
@@ -49,14 +49,16 @@ const visibleHandler = (...args: any[]) => {
 
 const scrollbarWrap = ref<HTMLDivElement | undefined>();
 
-const unWacth = watch(
+const unWatch = watch(
   () => select.value?.scrollbar?.wrap$ || select.value?.scrollbar?.wrapRef,
   (wrap) => {
     if (!wrap) {
       return;
     }
+
+    nextTick(() => unWatch());
+
     scrollbarWrap.value = wrap;
-    unWacth();
   },
   {
     immediate: true,

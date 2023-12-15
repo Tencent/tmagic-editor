@@ -1,4 +1,4 @@
-import { onMounted, onUnmounted, type Ref, ref } from 'vue';
+import { onBeforeUnmount, onMounted, type Ref, ref } from 'vue';
 import Gesto, { type OnDrag } from 'gesto';
 
 export const useGetSo = (target: Ref<HTMLElement | undefined>, emit: (evt: 'change', e: OnDrag<Gesto>) => void) => {
@@ -24,7 +24,7 @@ export const useGetSo = (target: Ref<HTMLElement | undefined>, emit: (evt: 'chan
       });
   });
 
-  onUnmounted(() => {
+  onBeforeUnmount(() => {
     getso?.unset();
     isDraging.value = false;
   });

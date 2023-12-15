@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, nextTick, onMounted, onUnmounted, ref, toRaw, watch } from 'vue';
+import { computed, inject, nextTick, onBeforeUnmount, onMounted, ref, toRaw, watch } from 'vue';
 import { ArrowLeftBold, ArrowRightBold, Plus } from '@element-plus/icons-vue';
 
 import { NodeType } from '@tmagic/schema';
@@ -72,7 +72,7 @@ onMounted(() => {
   pageBar.value && resizeObserver.observe(pageBar.value);
 });
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
   resizeObserver.disconnect();
 });
 

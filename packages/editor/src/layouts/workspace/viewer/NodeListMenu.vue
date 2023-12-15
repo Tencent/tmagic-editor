@@ -56,6 +56,8 @@ const unWatch = watch(
   (stage) => {
     if (!stage) return;
 
+    nextTick(() => unWatch());
+
     stage.on('select', (el: HTMLElement, event: MouseEvent) => {
       const els = stage.renderer.getElementsFromPoint(event) || [];
       const ids = els.map((el) => el.id).filter((id) => Boolean(id));
@@ -64,8 +66,6 @@ const unWatch = watch(
 
       filterTextChangeHandler(ids);
     });
-
-    unWatch();
   },
   {
     immediate: true,

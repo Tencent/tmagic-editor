@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { getCurrentInstance, inject, onMounted, onUnmounted } from 'vue';
+import { getCurrentInstance, inject, onBeforeUnmount, onMounted } from 'vue';
 
 import Core from '@tmagic/core';
 
@@ -32,7 +32,7 @@ export default (props: any) => {
     node?.emit('mounted', vm);
   });
 
-  onUnmounted(() => {
+  onBeforeUnmount(() => {
     node?.emit('destroy', vm);
   });
 

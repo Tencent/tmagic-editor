@@ -1,4 +1,4 @@
-import { onUnmounted, reactive, toRaw, watch } from 'vue';
+import { onBeforeUnmount, reactive, toRaw, watch } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
 import type { EventOption } from '@tmagic/core';
@@ -165,7 +165,7 @@ export const initServiceState = (
     },
   );
 
-  onUnmounted(() => {
+  onBeforeUnmount(() => {
     editorService.resetState();
     historyService.resetState();
     propsService.resetState();
@@ -405,7 +405,7 @@ export const initServiceEvents = (
     depService.addTarget(createRelatedCompTarget(props.collectorOptions));
   }
 
-  onUnmounted(() => {
+  onBeforeUnmount(() => {
     depService.off('add-target', targetAddHandler);
     depService.off('remove-target', targetRemoveHandler);
     depService.off('dep-update', depUpdateHandler);

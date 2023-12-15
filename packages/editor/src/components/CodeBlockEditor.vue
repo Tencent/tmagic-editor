@@ -48,7 +48,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, onUnmounted, ref } from 'vue';
+import { computed, inject, onBeforeUnmount, ref } from 'vue';
 
 import { TMagicButton, TMagicDialog, tMagicMessage, tMagicMessageBox, TMagicTag } from '@tmagic/design';
 import { ColumnConfig, FormConfig, FormState, MFormBox, MFormDrawer } from '@tmagic/form';
@@ -85,7 +85,7 @@ const windowReizehandler = () => {
 
 globalThis.addEventListener('resize', windowReizehandler);
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
   globalThis.removeEventListener('resize', windowReizehandler);
 });
 

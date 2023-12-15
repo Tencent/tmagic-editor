@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { FullScreen } from '@element-plus/icons-vue';
 import { throttle } from 'lodash-es';
 import * as monaco from 'monaco-editor';
@@ -188,7 +188,7 @@ onMounted(async () => {
   init();
 });
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
   resizeObserver.disconnect();
 });
 

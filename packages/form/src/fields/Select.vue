@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts" setup>
-import { inject, onBeforeMount, Ref, ref, watch, watchEffect } from 'vue';
+import { inject, nextTick, onBeforeMount, Ref, ref, watch, watchEffect } from 'vue';
 
 import { TMagicSelect } from '@tmagic/design';
 import { getValueByKeyPath } from '@tmagic/utils';
@@ -331,12 +331,15 @@ if (typeof props.config.options === 'function') {
 }
 
 if (props.config.remote) {
-  const unWacth = watch(
+  const unWatch = watch(
     () => tMagicSelect.value?.scrollbarWrap,
     (scrollbarWrap) => {
       if (!scrollbarWrap) {
         return;
       }
+
+      nextTick(() => unWatch());
+
       scrollbarWrap.addEventListener('scroll', async (e: Event) => {
         const el = e.currentTarget as HTMLDivElement;
         if (moreLoadingVisible.value) {
@@ -353,7 +356,6 @@ if (props.config.remote) {
         options.value = await getOptions();
         moreLoadingVisible.value = false;
       });
-      unWacth();
     },
     {
       immediate: true,
