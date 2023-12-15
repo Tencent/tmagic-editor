@@ -43,7 +43,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, ref, toRaw } from 'vue';
+import { computed, nextTick, onBeforeUnmount, ref, toRaw } from 'vue';
 import { useRouter } from 'vue-router';
 import { Coin, Connection, Document } from '@element-plus/icons-vue';
 import serialize from 'serialize-javascript';
@@ -232,6 +232,10 @@ editorService.usePlugin({
 
     return [config, parent];
   },
+});
+
+onBeforeUnmount(() => {
+  editorService.removeAllPlugins();
 });
 </script>
 

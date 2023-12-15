@@ -181,7 +181,7 @@ export default class ActionManager extends EventEmitter {
     return el.id === this.selectedEl?.id;
   }
 
-  public setSelectedEl(el: HTMLElement): void {
+  public setSelectedEl(el?: HTMLElement): void {
     this.selectedEl = el;
   }
 
@@ -258,7 +258,7 @@ export default class ActionManager extends EventEmitter {
   }
 
   public select(el: HTMLElement, event: MouseEvent | undefined): void {
-    this.selectedEl = el;
+    this.setSelectedEl(el);
     this.clearSelectStatus(SelectStatus.MULTI_SELECT);
     this.dr.select(el, event);
   }
@@ -399,7 +399,7 @@ export default class ActionManager extends EventEmitter {
     // 如果已有单选选中元素，不是magic-ui-page就可以加入多选列表
     if (this.selectedEl && !this.selectedEl.className.includes(PAGE_CLASS)) {
       this.selectedElList.push(this.selectedEl as HTMLElement);
-      this.selectedEl = undefined;
+      this.setSelectedEl(undefined);
     }
     // 判断元素是否已在多选列表
     const existIndex = this.selectedElList.findIndex((selectedDom) => selectedDom.id === el.id);

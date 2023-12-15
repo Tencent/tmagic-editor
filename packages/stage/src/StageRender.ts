@@ -156,12 +156,6 @@ export default class StageRender extends EventEmitter {
         x = x - rect.left;
         y = y - rect.top;
       }
-    } else if (this.nativeContainer) {
-      const rect = this.nativeContainer.getClientRects()[0];
-      if (rect) {
-        x = x - rect.left;
-        y = y - rect.top;
-      }
     }
 
     return this.getDocument()?.elementsFromPoint(x / this.zoom, y / this.zoom) as HTMLElement[];

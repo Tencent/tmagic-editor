@@ -4,11 +4,11 @@
     :menu="menu"
     :sidebar="sidebar"
     :component-group-list="componentGroupList"
-    :render-type="RenderType.NATIVE"
+    :props-configs="propsConfigs"
     :render="render"
     :can-select="canSelect"
-    :update-drag-el="updateDragEl"
     :stage-rect="{ width: 'calc(100% - 70px)', height: '100%' }"
+    :moveable-options="{ resizable: false }"
   >
     <template #layer-node-label="{ data }">
       {{ data.text || data.name || 'container' }}
@@ -17,21 +17,33 @@
 </template>
 
 <script setup lang="tsx">
-import { createApp, nextTick, ref } from 'vue';
+import { createApp, onBeforeUnmount, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { Document } from '@element-plus/icons-vue';
+import cssStyle from 'element-plus/dist/index.css?raw';
 
-import { ComponentGroup, MenuBarData, SideBarData, TMagicEditor, traverseNode, uiService } from '@tmagic/editor';
-import MagicForm, { MForm } from '@tmagic/form';
-import { MApp, MNode, NodeType } from '@tmagic/schema';
-import { getOffset, RenderType, RuntimeWindow, TargetElement } from '@tmagic/stage';
-import { guid } from '@tmagic/utils';
+import {
+  ComponentGroup,
+  MenuBarData,
+  propsService,
+  SideBarData,
+  TMagicEditor,
+  traverseNode,
+  uiService,
+} from '@tmagic/editor';
+import MagicForm, { type FormConfig, MForm } from '@tmagic/form';
+import { type MApp, type MNode, NodeType } from '@tmagic/schema';
+import type StageCore from '@tmagic/stage';
+import { guid, injectStyle } from '@tmagic/utils';
 
+import propsConfigs from '../configs/form-config';
+import commonConfig from '../configs/form-config/common';
 import formDsl from '../configs/formDsl';
 
 formDsl.forEach((item) => {
   traverseNode<any>(item, (item) => {
     item.id = `${item.type}_${guid()}`;
+    item.type = item.type || (item.items ? 'container' : 'text');
     item.style = {
       left: 0,
       top: 0,
@@ -53,28 +65,41 @@ const config = ref<MApp>({
   ],
 });
 
-const render = () => {
-  const el = globalThis.document.createElement('div');
-  el.style.position = 'relative';
+const render = (stage: StageCore) => {
+  injectStyle(stage.renderer.getDocument()!, cssStyle);
+  injectStyle(
+    stage.renderer.getDocument()!,
+    `
+html,
+  body,
+  #app {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+  }
+  ::-webkit-scrollbar {
+    width: 0;
+  }
+`,
+  );
+
+  const el: HTMLDivElement = globalThis.document.createElement('div');
+  el.id = 'app';
+  el.style.overflow = 'auto';
   createApp(MForm, {
-    config: formDsl,
+    config: config.value.items[0].items,
     initValues: {},
   })
     .use(MagicForm)
     .mount(el);
 
-  nextTick(() => {
-    (globalThis as unknown as RuntimeWindow).magic.onPageElUpdate(el);
+  stage.renderer.contentWindow?.magic?.onRuntimeReady({});
+  setTimeout(() => {
+    stage.renderer.contentWindow?.magic.onPageElUpdate(el.children[0] as HTMLElement);
     uiService.set('showRule', false);
   });
 
   return el;
-};
-
-const updateDragEl = (el: TargetElement, target: TargetElement, container: HTMLElement) => {
-  const { left, top } = getOffset(container);
-  el.style.left = `${globalThis.parseFloat(el.style.left) - left}px`;
-  el.style.top = `${globalThis.parseFloat(el.style.top) - top}px`;
 };
 
 const componentGroupList: ComponentGroup[] = [
@@ -162,5 +187,26 @@ const sidebar: SideBarData = {
   items: ['component-list', 'layer'],
 };
 
-const canSelect = (el: HTMLElement) => el.classList.contains('m-form-container');
+const canSelect = (el: HTMLElement) => Boolean(el.dataset.magicId);
+
+propsService.usePlugin({
+  afterFillConfig(config: FormConfig, itemConfig: FormConfig) {
+    return [
+      {
+        type: 'tab',
+        items: [
+          {
+            title: '属性',
+            labelWidth: '80px',
+            items: [...commonConfig, ...itemConfig],
+          },
+        ],
+      },
+    ];
+  },
+});
+
+onBeforeUnmount(() => {
+  propsService.removeAllPlugins();
+});
 </script>
