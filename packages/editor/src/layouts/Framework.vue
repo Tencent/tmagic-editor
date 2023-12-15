@@ -11,6 +11,8 @@
     </slot>
 
     <SplitView
+      v-loading="stageLoading"
+      element-loading-text="Runtime 加载中..."
       v-else
       ref="splitView"
       class="m-editor-content"
@@ -77,6 +79,7 @@ const splitView = ref<InstanceType<typeof SplitView>>();
 const root = computed(() => editorService?.get('root'));
 
 const pageLength = computed(() => editorService?.get('pageLength') || 0);
+const stageLoading = computed(() => editorService?.get('stageLoading') || false);
 const showSrc = computed(() => uiService?.get('showSrc'));
 
 const LEFT_COLUMN_WIDTH_STORAGE_KEY = '$MagicEditorLeftColumnWidthData';

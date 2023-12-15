@@ -141,6 +141,7 @@ export interface StoreState {
   highlightNode: MNode | null;
   nodes: MNode[];
   stage: StageCore | null;
+  stageLoading: boolean;
   modifiedNodeIds: Map<Id, Id>;
   pageLength: number;
 }

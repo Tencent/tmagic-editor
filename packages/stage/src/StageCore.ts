@@ -279,6 +279,8 @@ export default class StageCore extends EventEmitter {
     this.renderer.on('page-el-update', (el: HTMLElement) => {
       this.mask?.observe(el);
       this.observePageResize(el);
+
+      this.emit('page-el-update', el);
     });
   }
 

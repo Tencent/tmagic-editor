@@ -54,6 +54,7 @@ class Editor extends BaseService {
     node: null,
     nodes: [],
     stage: null,
+    stageLoading: true,
     highlightNode: null,
     modifiedNodeIds: new Map(),
     pageLength: 0,
@@ -111,8 +112,10 @@ class Editor extends BaseService {
 
       if (value && isObject(value) && !(value instanceof StageCore) && !(value instanceof Map)) {
         this.state.pageLength = value.items?.length || 0;
+        this.state.stageLoading = this.state.pageLength !== 0;
       } else {
         this.state.pageLength = 0;
+        this.state.stageLoading = false;
       }
 
       this.emit('root-change', value, preValue);

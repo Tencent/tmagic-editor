@@ -108,6 +108,7 @@ watch(zoom, (zoom) => {
 
 watch(page, (page) => {
   if (runtime && page) {
+    services?.editorService.set('stageLoading', true);
     runtime.updatePageId?.(page.id);
     nextTick(() => {
       stage?.select(page.id);

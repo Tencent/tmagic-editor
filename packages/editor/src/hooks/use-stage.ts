@@ -51,6 +51,10 @@ export const useStage = (stageOptions: StageOptions) => {
     getGuideLineFromCache(getGuideLineKey(V_GUIDE_LINE_STORAGE_KEY)),
   ]);
 
+  stage.on('page-el-update', () => {
+    editorService.set('stageLoading', false);
+  });
+
   stage.on('select', (el: HTMLElement) => {
     if (`${editorService.get('node')?.id}` === el.id && editorService.get('nodes').length === 1) return;
     editorService.select(el.id);
