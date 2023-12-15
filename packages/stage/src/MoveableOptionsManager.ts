@@ -21,9 +21,9 @@ import EventEmitter from 'events';
 import { merge } from 'lodash-es';
 import type { ElementGuidelineValueOption, MoveableOptions, MoveableRefType } from 'moveable';
 
-import { GuidesType, Mode } from './const';
+import { AbleActionEventType, GuidesType, Mode } from './const';
 import MoveableActionsAble from './MoveableActionsAble';
-import { AbleActionEventType, GetRootContainer, MoveableOptionsManagerConfig } from './types';
+import type { GetRootContainer, MoveableOptionsManagerConfig } from './types';
 import { getOffset } from './util';
 
 /**

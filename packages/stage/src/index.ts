@@ -19,6 +19,7 @@
 import StageCore from './StageCore';
 
 export type { MoveableOptions, OnDragStart } from 'moveable';
+export type { GuidesOptions } from '@scena/guides';
 export { default as StageRender } from './StageRender';
 export { default as StageMask } from './StageMask';
 export { default as StageDragResize } from './StageDragResize';

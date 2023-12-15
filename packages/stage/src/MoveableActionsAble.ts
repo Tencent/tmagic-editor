@@ -1,7 +1,7 @@
 import { MoveableManagerInterface, Renderer } from 'moveable';
 
+import { AbleActionEventType } from './const';
 import ableCss from './moveable-able.css?raw';
-import { AbleActionEventType } from './types';
 
 export default (handler: (type: AbleActionEventType) => void) => ({
   name: 'actions',

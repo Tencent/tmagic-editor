@@ -20,6 +20,7 @@ import { createDiv, getDocument, injectStyle } from '@tmagic/utils';
 
 import { Mode, ZIndex } from './const';
 import Rule from './Rule';
+import type { RuleOptions } from './types';
 import { getScrollParent, isFixedParent } from './util';
 
 const wrapperClassName = 'editor-mask-wrapper';
@@ -80,9 +81,9 @@ export default class StageMask extends Rule {
   private intersectionObserver: IntersectionObserver | null = null;
   private wrapperResizeObserver: ResizeObserver | null = null;
 
-  constructor() {
+  constructor(options?: RuleOptions) {
     const wrapper = createWrapper();
-    super(wrapper);
+    super(wrapper, options);
 
     this.wrapper = wrapper;
 

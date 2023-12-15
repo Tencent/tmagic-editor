@@ -44,6 +44,7 @@ export const useStage = (stageOptions: StageOptions) => {
     },
     moveableOptions: stageOptions.moveableOptions,
     updateDragEl: stageOptions.updateDragEl,
+    guidesOptions: stageOptions.guidesOptions,
   });
 
   stage.mask.setGuides([

@@ -73,3 +73,8 @@ export enum Mode {
 
 /** 选中节点的class name */
 export const SELECTED_CLASS = 'tmagic-stage-selected-area';
+
+export enum AbleActionEventType {
+  SELECT_PARENT = 'select-parent',
+  REMOVE = 'remove',
+}

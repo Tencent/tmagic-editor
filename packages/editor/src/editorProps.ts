@@ -1,14 +1,15 @@
 import type { EventOption } from '@tmagic/core';
-import { CustomTargetOptions } from '@tmagic/dep';
+import type { CustomTargetOptions } from '@tmagic/dep';
 import type { FormConfig, FormState } from '@tmagic/form';
 import type { DataSourceSchema, Id, MApp, MNode } from '@tmagic/schema';
 import StageCore, {
   CONTAINER_HIGHLIGHT_CLASS_NAME,
   ContainerHighlightType,
-  CustomizeMoveableOptionsCallbackConfig,
-  MoveableOptions,
+  type CustomizeMoveableOptionsCallbackConfig,
+  type GuidesOptions,
+  type MoveableOptions,
   RenderType,
-  UpdateDragEl,
+  type UpdateDragEl,
 } from '@tmagic/stage';
 
 import type {
@@ -71,6 +72,7 @@ export interface EditorProps {
   extendFormState?: (state: FormState) => Record<string, any> | Promise<Record<string, any>>;
   /** 自定义依赖收集器，复制组件时会将关联依赖一并复制 */
   collectorOptions?: CustomTargetOptions;
+  guidesOptions?: Partial<GuidesOptions>;
 }
 
 export const defaultEditorProps = {

@@ -1,8 +1,9 @@
 import EventEmitter from 'events';
 
-import Guides, { GuidesEvents } from '@scena/guides';
+import Guides, { type GuidesEvents, type GuidesOptions } from '@scena/guides';
 
 import { GuidesType } from './const';
+import type { RuleOptions } from './types';
 
 export default class Rule extends EventEmitter {
   public hGuides: Guides;
@@ -13,9 +14,12 @@ export default class Rule extends EventEmitter {
   private container: HTMLDivElement;
   private containerResizeObserver: ResizeObserver;
   private isShowGuides = true;
+  private guidesOptions?: Partial<GuidesOptions>;
 
-  constructor(container: HTMLDivElement) {
+  constructor(container: HTMLDivElement, options?: RuleOptions) {
     super();
+
+    this.guidesOptions = options?.guidesOptions || {};
 
     this.container = container;
     this.hGuides = this.createGuides(GuidesType.HORIZONTAL, this.horizontalGuidelines);
@@ -136,6 +140,7 @@ export default class Rule extends EventEmitter {
       textColor: '#000',
       style: this.getGuidesStyle(type),
       showGuides: this.isShowGuides,
+      ...this.guidesOptions,
     });
 
     const changEventHandler = {

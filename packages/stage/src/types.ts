@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import type { GuidesOptions } from '@scena/guides';
 import type { MoveableOptions } from 'moveable';
 
 import Core from '@tmagic/core';
@@ -77,6 +78,7 @@ export interface StageCoreConfig {
   updateDragEl?: UpdateDragEl;
   disabledDragStart?: boolean;
   renderType?: RenderType;
+  guidesOptions?: Partial<GuidesOptions>;
 }
 
 export interface ActionManagerConfig {
@@ -264,7 +266,6 @@ export interface TargetShadowConfig {
   idPrefix?: string;
 }
 
-export enum AbleActionEventType {
-  SELECT_PARENT = 'select-parent',
-  REMOVE = 'remove',
+export interface RuleOptions {
+  guidesOptions?: Partial<GuidesOptions>;
 }

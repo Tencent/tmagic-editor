@@ -24,6 +24,7 @@ import type StageCore from '@tmagic/stage';
 import type {
   ContainerHighlightType,
   CustomizeMoveableOptionsCallbackConfig,
+  GuidesOptions,
   MoveableOptions,
   RenderType,
   UpdateDragEl,
@@ -131,6 +132,7 @@ export interface StageOptions {
   isContainer: (el: HTMLElement) => boolean | Promise<boolean>;
   updateDragEl: UpdateDragEl;
   renderType: RenderType;
+  guidesOptions: Partial<GuidesOptions>;
 }
 
 export interface StoreState {
