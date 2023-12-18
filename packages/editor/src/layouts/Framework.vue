@@ -31,13 +31,18 @@
       </template>
 
       <template #center>
-        <slot v-if="pageLength > 0" name="workspace"></slot>
+        <slot v-if="page" name="workspace"></slot>
         <slot v-else name="empty">
-          <AddPageBox></AddPageBox>
+          <AddPageBox :disabled-page-fragment="disabledPageFragment"></AddPageBox>
         </slot>
+
+        <PageBar :disabled-page-fragment="disabledPageFragment">
+          <template #page-bar-title="{ page }"><slot name="page-bar-title" :page="page"></slot></template>
+          <template #page-bar-popover="{ page }"><slot name="page-bar-popover" :page="page"></slot></template>
+        </PageBar>
       </template>
 
-      <template v-if="pageLength > 0" #right>
+      <template v-if="page" #right>
         <TMagicScrollbar>
           <slot name="props-panel"></slot>
         </TMagicScrollbar>
@@ -58,6 +63,7 @@ import SplitView from '@editor/components/SplitView.vue';
 import type { FrameworkSlots, GetColumnWidth, Services } from '@editor/type';
 import { getConfig } from '@editor/utils/config';
 
+import PageBar from './page-bar/PageBar.vue';
 import AddPageBox from './AddPageBox.vue';
 import CodeEditor from './CodeEditor.vue';
 
@@ -66,6 +72,10 @@ defineSlots<FrameworkSlots>();
 defineOptions({
   name: 'MEditorFramework',
 });
+
+defineProps<{
+  disabledPageFragment: boolean;
+}>();
 
 const DEFAULT_LEFT_COLUMN_WIDTH = 310;
 const DEFAULT_RIGHT_COLUMN_WIDTH = 480;
@@ -77,6 +87,7 @@ const content = ref<HTMLDivElement>();
 const splitView = ref<InstanceType<typeof SplitView>>();
 
 const root = computed(() => editorService?.get('root'));
+const page = computed(() => editorService?.get('page'));
 
 const pageLength = computed(() => editorService?.get('pageLength') || 0);
 const stageLoading = computed(() => editorService?.get('stageLoading') || false);

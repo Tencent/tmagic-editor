@@ -21,6 +21,8 @@ import Container from './container';
 import Img from './img';
 import Overlay from './overlay';
 import Page from './page';
+import pageFragment from './page-fragment';
+import pageFragmentContainer from './page-fragment-container';
 import Qrcode from './qrcode';
 import Text from './text';
 export { default as AppContent } from './AppContent';
@@ -36,6 +38,8 @@ const ui: Record<string, any> = {
   text: Text,
   qrcode: Qrcode,
   overlay: Overlay,
+  'page-fragment': pageFragment,
+  'page-fragment-container': pageFragmentContainer,
 };
 
 export default ui;

@@ -19,7 +19,7 @@
 import type { Component } from 'vue';
 
 import type { ColumnConfig, FilterFunction, FormConfig, FormItem } from '@tmagic/form';
-import type { CodeBlockContent, CodeBlockDSL, Id, MApp, MContainer, MNode, MPage } from '@tmagic/schema';
+import type { CodeBlockContent, CodeBlockDSL, Id, MApp, MContainer, MNode, MPage, MPageFragment } from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
 import type {
   ContainerHighlightType,
@@ -54,13 +54,13 @@ export interface FrameworkSlots {
   workspace(props: {}): any;
   'props-panel'(props: {}): any;
   'footer'(props: {}): any;
+  'page-bar-title'(props: { page: MPage | MPageFragment }): any;
+  'page-bar-popover'(props: { page: MPage | MPageFragment }): any;
 }
 
 export interface WorkspaceSlots {
   stage(props: {}): any;
   'workspace-content'(props: {}): any;
-  'page-bar-title'(props: { page: MPage }): any;
-  'page-bar-popover'(props: { page: MPage }): any;
 }
 
 export interface ComponentListPanelSlots {
@@ -138,7 +138,7 @@ export interface StageOptions {
 
 export interface StoreState {
   root: MApp | null;
-  page: MPage | null;
+  page: MPage | MPageFragment | null;
   parent: MContainer | null;
   node: MNode | null;
   highlightNode: MNode | null;
@@ -147,6 +147,7 @@ export interface StoreState {
   stageLoading: boolean;
   modifiedNodeIds: Map<Id, Id>;
   pageLength: number;
+  pageFragmentLength: number;
   disabledMultiSelect: boolean;
 }
 
@@ -228,7 +229,7 @@ export interface UiState {
 export interface EditorNodeInfo {
   node: MNode | null;
   parent: MContainer | null;
-  page: MPage | null;
+  page: MPage | MPageFragment | null;
 }
 
 export interface AddMNode {
@@ -493,7 +494,7 @@ export interface CodeParamStatement {
 }
 
 export interface StepValue {
-  data: MPage;
+  data: MPage | MPageFragment;
   modifiedNodeIds: Map<Id, Id>;
   nodeId: Id;
 }
@@ -581,6 +582,15 @@ export interface KeyBindingCacheItem {
 
 export interface CodeSelectColConfig {
   type: 'code-select-col';
+  name: string;
+  text: string;
+  labelWidth?: number | string;
+  disabled?: boolean | FilterFunction;
+  display?: boolean | FilterFunction;
+}
+
+export interface PageFragmentSelectConfig {
+  type: 'page-fragment-select';
   name: string;
   text: string;
   labelWidth?: number | string;

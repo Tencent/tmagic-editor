@@ -11,7 +11,7 @@ import {
   DepTargetType,
   Target,
 } from '@tmagic/dep';
-import type { CodeBlockContent, DataSourceSchema, Id, MApp, MNode, MPage } from '@tmagic/schema';
+import type { CodeBlockContent, DataSourceSchema, Id, MApp, MNode, MPage, MPageFragment } from '@tmagic/schema';
 import { getNodes } from '@tmagic/utils';
 
 import PropsPanel from './layouts/PropsPanel.vue';
@@ -350,7 +350,7 @@ export const initServiceEvents = (
   };
 
   // 由于历史记录变化是更新整个page，所以历史记录变化时，需要重新收集依赖
-  const historyChangeHandler = (page: MPage) => {
+  const historyChangeHandler = (page: MPage | MPageFragment) => {
     depService.collect([page], true);
   };
 

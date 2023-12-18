@@ -1,13 +1,13 @@
 import { computed, ref, watch } from 'vue';
 
-import type { Id, MNode, MPage } from '@tmagic/schema';
+import type { Id, MNode, MPage, MPageFragment } from '@tmagic/schema';
 import { getNodePath } from '@tmagic/utils';
 
 import { LayerNodeStatus, Services } from '@editor/type';
 import { traverseNode } from '@editor/utils';
 import { updateStatus } from '@editor/utils/tree';
 
-const createPageNodeStatus = (page: MPage, initalLayerNodeStatus?: Map<Id, LayerNodeStatus>) => {
+const createPageNodeStatus = (page: MPage | MPageFragment, initialLayerNodeStatus?: Map<Id, LayerNodeStatus>) => {
   const map = new Map<Id, LayerNodeStatus>();
 
   map.set(page.id, {
@@ -21,7 +21,7 @@ const createPageNodeStatus = (page: MPage, initalLayerNodeStatus?: Map<Id, Layer
     traverseNode<MNode>(node, (node) => {
       map.set(
         node.id,
-        initalLayerNodeStatus?.get(node.id) || {
+        initialLayerNodeStatus?.get(node.id) || {
           visible: true,
           expand: false,
           selected: false,

@@ -1,7 +1,24 @@
-.m-editor-page-bar {
+.m-editor-page-bar-tabs {
   position: fixed;
   bottom: 0;
   left: 0;
+  width: 100%;
+
+  .tmagic-design-button.m-editor-page-bar-switch-type-button {
+    margin-left: 7px;
+    position: relative;
+    top: 1px;
+    border-radius: 3px 3px 0 0;
+    border: 1px solid $--border-color;
+    border-bottom: 1px solid transparent;
+
+    &.active {
+      background-color: #f3f3f3;
+    }
+  }
+}
+
+.m-editor-page-bar {
   display: flex;
   width: 100%;
   height: $--page-bar-height;

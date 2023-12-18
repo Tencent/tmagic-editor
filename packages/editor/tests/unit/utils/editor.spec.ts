@@ -54,7 +54,7 @@ describe('util form', () => {
 
   test('generatePageName', () => {
     // 已有一个页面了，再生成出来的name格式为page_${index}
-    const name = editor.generatePageName(['index', 'page_2']);
+    const name = editor.generatePageName(['index', 'page_2'], NodeType.PAGE);
     // 第二个页面
     expect(name).toBe('page_3');
   });

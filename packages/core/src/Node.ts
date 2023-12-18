@@ -20,7 +20,8 @@ import { EventEmitter } from 'events';
 
 import { isEmpty } from 'lodash-es';
 
-import { DeprecatedEventConfig, EventConfig, HookType, MComponent, MContainer, MPage } from '@tmagic/schema';
+import type { DeprecatedEventConfig, EventConfig, MComponent, MContainer, MPage, MPageFragment } from '@tmagic/schema';
+import { HookType } from '@tmagic/schema';
 
 import type App from './App';
 import type Page from './Page';
@@ -33,7 +34,7 @@ interface NodeOptions {
   app: App;
 }
 class Node extends EventEmitter {
-  public data: MComponent | MContainer | MPage;
+  public data: MComponent | MContainer | MPage | MPageFragment;
   public style?: {
     [key: string]: any;
   };
@@ -56,9 +57,9 @@ class Node extends EventEmitter {
     this.listenLifeSafe();
   }
 
-  public setData(data: MComponent | MContainer | MPage) {
+  public setData(data: MComponent | MContainer | MPage | MPageFragment) {
     this.data = data;
-    this.emit('updata-data');
+    this.emit('update-data');
   }
 
   public destroy() {

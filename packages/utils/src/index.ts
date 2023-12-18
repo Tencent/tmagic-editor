@@ -135,6 +135,11 @@ export const isPage = (node?: MComponent | null): boolean => {
   return Boolean(node.type?.toLowerCase() === NodeType.PAGE);
 };
 
+export const isPageFragment = (node?: MComponent | null): boolean => {
+  if (!node) return false;
+  return Boolean(node.type?.toLowerCase() === NodeType.PAGE_FRAGMENT);
+};
+
 export const isNumber = (value: string) => /^(-?\d+)(\.\d+)?$/.test(value);
 
 export const getHost = (targetUrl: string) => targetUrl.match(/\/\/([^/]+)/)?.[1];

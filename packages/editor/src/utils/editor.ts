@@ -18,24 +18,29 @@
 
 import serialize from 'serialize-javascript';
 
-import type { Id, MApp, MContainer, MNode, MPage } from '@tmagic/schema';
+import type { Id, MApp, MContainer, MNode, MPage, MPageFragment } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
-import { getNodePath, isNumber, isPage, isPop } from '@tmagic/utils';
+import { getNodePath, isNumber, isPage, isPageFragment, isPop } from '@tmagic/utils';
 
 import { Layout } from '@editor/type';
 export const COPY_STORAGE_KEY = '$MagicEditorCopyData';
 
 /**
  * 获取所有页面配置
- * @param app DSL跟节点
+ * @param root DSL跟节点
  * @returns 所有页面配置
  */
-export const getPageList = (app: MApp): MPage[] => {
-  if (app.items && Array.isArray(app.items)) {
-    return app.items.filter((item: MPage) => item.type === NodeType.PAGE);
-  }
-  return [];
+export const getPageList = (root?: MApp | null): MPage[] => {
+  if (!root) return [];
+  if (!Array.isArray(root.items)) return [];
+  return root.items.filter((item) => isPage(item)) as MPage[];
+};
+
+export const getPageFragmentList = (root?: MApp | null): MPageFragment[] => {
+  if (!root) return [];
+  if (!Array.isArray(root.items)) return [];
+  return root.items.filter((item) => isPageFragment(item)) as MPageFragment[];
 };
 
 /**
@@ -43,22 +48,23 @@ export const getPageList = (app: MApp): MPage[] => {
  * @param pages 所有页面配置
  * @returns 所有页面名称
  */
-export const getPageNameList = (pages: MPage[]): string[] => pages.map((page: MPage) => page.name || 'index');
+export const getPageNameList = (pages: (MPage | MPageFragment)[]): string[] =>
+  pages.map((page) => page.name || 'index');
 
 /**
  * 新增页面时，生成页面名称
  * @param {Object} pageNameList 所有页面名称
  * @returns {string}
  */
-export const generatePageName = (pageNameList: string[]): string => {
+export const generatePageName = (pageNameList: string[], type: NodeType.PAGE | NodeType.PAGE_FRAGMENT): string => {
   let pageLength = pageNameList.length;
 
-  if (!pageLength) return 'index';
+  if (!pageLength) return `${type}_index`;
 
-  let pageName = `page_${pageLength}`;
+  let pageName = `${type}_${pageLength}`;
   while (pageNameList.includes(pageName)) {
     pageLength += 1;
-    pageName = `page_${pageLength}`;
+    pageName = `${type}_${pageLength}`;
   }
 
   return pageName;
@@ -69,7 +75,8 @@ export const generatePageName = (pageNameList: string[]): string => {
  * @param {Object} app 所有页面配置
  * @returns {string}
  */
-export const generatePageNameByApp = (app: MApp): string => generatePageName(getPageNameList(getPageList(app)));
+export const generatePageNameByApp = (app: MApp, type: NodeType.PAGE | NodeType.PAGE_FRAGMENT): string =>
+  generatePageName(getPageNameList(type === 'page' ? getPageList(app) : getPageFragmentList(app)), type);
 
 /**
  * @param {Object} node
@@ -129,7 +136,7 @@ export const getInitPositionStyle = (style: Record<string, any> = {}, layout: La
   return style;
 };
 
-export const setChilrenLayout = (node: MContainer, layout: Layout) => {
+export const setChildrenLayout = (node: MContainer, layout: Layout) => {
   node.items?.forEach((child: MNode) => {
     setLayout(child, layout);
   });

@@ -20,10 +20,9 @@ import { reactive, toRaw } from 'vue';
 import { cloneDeep, get, isObject, mergeWith, uniq } from 'lodash-es';
 
 import { DepTargetType } from '@tmagic/dep';
-import type { Id, MApp, MComponent, MContainer, MNode, MPage } from '@tmagic/schema';
+import type { Id, MApp, MComponent, MContainer, MNode, MPage, MPageFragment } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
-import StageCore from '@tmagic/stage';
-import { getNodePath, isNumber, isPage, isPop } from '@tmagic/utils';
+import { getNodePath, isNumber, isPage, isPageFragment, isPop } from '@tmagic/utils';
 
 import depService from '@editor/services/dep';
 import historyService from '@editor/services/history';
@@ -37,8 +36,10 @@ import {
   fixNodePosition,
   getInitPositionStyle,
   getNodeIndex,
+  getPageFragmentList,
+  getPageList,
   isFixed,
-  setChilrenLayout,
+  setChildrenLayout,
   setLayout,
 } from '@editor/utils/editor';
 import { beforePaste, getAddParent } from '@editor/utils/operator';
@@ -58,6 +59,7 @@ class Editor extends BaseService {
     highlightNode: null,
     modifiedNodeIds: new Map(),
     pageLength: 0,
+    pageFragmentLength: 0,
     disabledMultiSelect: false,
   });
   private isHistoryStateChange = false;
@@ -94,7 +96,7 @@ class Editor extends BaseService {
 
   /**
    * 设置当前指点节点配置
-   * @param name 'root' | 'page' | 'parent' | 'node' | 'highlightNode' | 'nodes' | 'stage' | 'modifiedNodeIds' | 'pageLength'
+   * @param name 'root' | 'page' | 'parent' | 'node' | 'highlightNode' | 'nodes' | 'stage' | 'modifiedNodeIds' | 'pageLength' | 'pageFragmentLength
    * @param value MNode
    */
   public set<K extends StoreStateKey, T extends StoreState[K]>(name: K, value: T) {
@@ -111,11 +113,14 @@ class Editor extends BaseService {
         throw new Error('root 不能为数组');
       }
 
-      if (value && isObject(value) && !(value instanceof StageCore) && !(value instanceof Map)) {
-        this.state.pageLength = value.items?.length || 0;
+      if (value && isObject(value)) {
+        const app = value as MApp;
+        this.state.pageLength = getPageList(app).length || 0;
+        this.state.pageFragmentLength = getPageFragmentList(app).length || 0;
         this.state.stageLoading = this.state.pageLength !== 0;
       } else {
         this.state.pageLength = 0;
+        this.state.pageFragmentLength = 0;
         this.state.stageLoading = false;
       }
 
@@ -125,7 +130,7 @@ class Editor extends BaseService {
 
   /**
    * 获取当前指点节点配置
-   * @param name  'root' | 'page' | 'parent' | 'node' | 'highlightNode' | 'nodes' | 'stage' | 'modifiedNodeIds' | 'pageLength'
+   * @param name  'root' | 'page' | 'parent' | 'node' | 'highlightNode' | 'nodes' | 'stage' | 'modifiedNodeIds' | 'pageLength' | 'pageFragmentLength'
    * @returns MNode
    */
   public get<K extends StoreStateKey>(name: K): StoreState[K] {
@@ -167,8 +172,8 @@ class Editor extends BaseService {
     info.parent = path[path.length - 2] as MContainer;
 
     path.forEach((item) => {
-      if (item.type === NodeType.PAGE) {
-        info.page = item as MPage;
+      if (isPage(item) || isPageFragment(item)) {
+        info.page = item as MPage | MPageFragment;
         return;
       }
     });
@@ -316,6 +321,17 @@ class Editor extends BaseService {
     this.set('nodes', nodes);
   }
 
+  public selectRoot() {
+    const root = this.get('root');
+    if (!root) return;
+
+    this.set('nodes', [root]);
+    this.set('parent', null);
+    this.set('page', null);
+    this.set('stage', null);
+    this.set('highlightNode', null);
+  }
+
   public async doAdd(node: MNode, parent: MContainer): Promise<MNode> {
     const root = this.get('root');
 
@@ -326,11 +342,11 @@ class Editor extends BaseService {
 
     if (!curNode) throw new Error('当前选中节点为空');
 
-    if ((parent.type === NodeType.ROOT || curNode?.type === NodeType.ROOT) && node.type !== NodeType.PAGE) {
+    if ((parent.type === NodeType.ROOT || curNode?.type === NodeType.ROOT) && !(isPage(node) || isPageFragment(node))) {
       throw new Error('app下不能添加组件');
     }
 
-    if (parent.id !== curNode.id && node.type !== NodeType.PAGE) {
+    if (parent.id !== curNode.id && !(isPage(node) || isPageFragment(node))) {
       const index = parent.items.indexOf(curNode);
       parent.items?.splice(index + 1, 0, node);
     } else {
@@ -384,7 +400,7 @@ class Editor extends BaseService {
     const newNodes = await Promise.all(
       addNodes.map((node) => {
         const root = this.get('root');
-        if (isPage(node) && root) {
+        if ((isPage(node) || isPageFragment(node)) && root) {
           return this.doAdd(node, root);
         }
         const parentNode = parent && typeof parent !== 'function' ? parent : getAddParent(node);
@@ -403,13 +419,15 @@ class Editor extends BaseService {
 
       if (isPage(newNodes[0])) {
         this.state.pageLength += 1;
+      } else if (isPageFragment(newNodes[0])) {
+        this.state.pageFragmentLength += 1;
       } else {
         // 新增页面，这个时候页面还有渲染出来，此时select会出错，在runtime-ready的时候回去select
         stage?.select(newNodes[0].id);
       }
     }
 
-    if (!isPage(newNodes[0])) {
+    if (!(isPage(newNodes[0]) || isPageFragment(newNodes[0]))) {
       this.pushHistoryState();
     }
 
@@ -422,7 +440,7 @@ class Editor extends BaseService {
     const root = this.get('root');
     if (!root) throw new Error('root不能为空');
 
-    const { parent, node: curNode } = this.getNodeInfo(node.id);
+    const { parent, node: curNode } = this.getNodeInfo(node.id, false);
 
     if (!parent || !curNode) throw new Error('找不要删除的节点');
 
@@ -434,29 +452,38 @@ class Editor extends BaseService {
     const stage = this.get('stage');
     stage?.remove({ id: node.id, parentId: parent.id, root: cloneDeep(root) });
 
-    if (node.type === NodeType.PAGE) {
+    const selectDefault = async (pages: MNode[]) => {
+      if (pages[0]) {
+        await this.select(pages[0]);
+        stage?.select(pages[0].id);
+      } else {
+        this.selectRoot();
+
+        historyService.resetPage();
+      }
+    };
+
+    const rootItems = root.items || [];
+
+    if (isPage(node)) {
       this.state.pageLength -= 1;
 
-      if (root.items[0]) {
-        await this.select(root.items[0]);
-        stage?.select(root.items[0].id);
-      } else {
-        this.set('nodes', [root]);
-        this.set('parent', null);
-        this.set('page', null);
-        this.set('stage', null);
-        this.set('highlightNode', null);
-        this.resetModifiedNodeId();
-        historyService.reset();
+      await selectDefault(getPageList(root));
+    } else if (isPageFragment(node)) {
+      this.state.pageFragmentLength -= 1;
 
-        return;
-      }
+      await selectDefault(getPageFragmentList(root));
     } else {
       await this.select(parent);
       stage?.select(parent.id);
+
+      this.addModifiedNodeId(parent.id);
     }
 
-    this.addModifiedNodeId(parent.id);
+    if (!rootItems.length) {
+      this.resetModifiedNodeId();
+      historyService.reset();
+    }
   }
 
   /**
@@ -468,7 +495,7 @@ class Editor extends BaseService {
 
     await Promise.all(nodes.map((node) => this.doRemove(node)));
 
-    if (!isPage(nodes[0])) {
+    if (!(isPage(nodes[0]) || isPageFragment(nodes[0]))) {
       // 更新历史记录
       this.pushHistoryState();
     }
@@ -518,7 +545,7 @@ class Editor extends BaseService {
     const newLayout = await this.getLayout(newConfig);
     const layout = await this.getLayout(node);
     if (Array.isArray(newConfig.items) && newLayout !== layout) {
-      newConfig = setChilrenLayout(newConfig as MContainer, newLayout);
+      newConfig = setChildrenLayout(newConfig as MContainer, newLayout);
     }
 
     parentNodeItems[index] = newConfig;
@@ -535,8 +562,8 @@ class Editor extends BaseService {
       root: cloneDeep(root),
     });
 
-    if (newConfig.type === NodeType.PAGE) {
-      this.set('page', newConfig as MPage);
+    if (isPage(newConfig) || isPageFragment(newConfig)) {
+      this.set('page', newConfig as MPage | MPageFragment);
     }
 
     this.addModifiedNodeId(newConfig.id);

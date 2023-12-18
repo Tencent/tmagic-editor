@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-import type { Id, MComponent, MContainer, MPage } from '@tmagic/schema';
+import type { Id, MComponent, MContainer, MPage, MPageFragment } from '@tmagic/schema';
 
 import type App from './App';
 import Node from './Node';
 interface ConfigOptions {
-  config: MPage;
+  config: MPage | MPageFragment;
   app: App;
 }
 
@@ -44,6 +44,13 @@ class Page extends Node {
     });
 
     this.setNode(config.id, node);
+
+    if (config.type === 'page-fragment-container' && config.pageFragmentId) {
+      const pageFragment = this.app.dsl?.items?.find((page) => page.id === config.pageFragmentId);
+      if (pageFragment) {
+        config.items = [pageFragment];
+      }
+    }
 
     config.items?.forEach((element: MComponent | MContainer) => {
       this.initNode(element, node);

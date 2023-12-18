@@ -30,6 +30,7 @@ import DataSourceMocks from './fields/DataSourceMocks.vue';
 import DataSourceSelect from './fields/DataSourceSelect.vue';
 import EventSelect from './fields/EventSelect.vue';
 import KeyValue from './fields/KeyValue.vue';
+import PageFragmentSelect from './fields/PageFragmentSelect.vue';
 import uiSelect from './fields/UISelect.vue';
 import CodeEditor from './layouts/CodeEditor.vue';
 import { setConfig } from './utils/config';
@@ -79,6 +80,7 @@ export { default as LayoutContainer } from './components/SplitView.vue';
 export { default as SplitView } from './components/SplitView.vue';
 export { default as Resizer } from './components/Resizer.vue';
 export { default as CodeBlockEditor } from './components/CodeBlockEditor.vue';
+export { default as PageFragmentSelect } from './fields/PageFragmentSelect.vue';
 
 const defaultInstallOpt: InstallOptions = {
   // eslint-disable-next-line no-eval
@@ -108,5 +110,6 @@ export default {
     app.component('m-fields-data-source-methods', DataSourceMethods);
     app.component('m-fields-data-source-method-select', DataSourceMethodSelect);
     app.component('m-fields-data-source-field-select', DataSourceFieldSelect);
+    app.component('m-fields-page-fragment-select', PageFragmentSelect);
   },
 };

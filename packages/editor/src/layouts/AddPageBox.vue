@@ -1,11 +1,18 @@
 <template>
   <div class="m-editor-empty-panel">
     <div class="m-editor-empty-content">
-      <div class="m-editor-empty-button" @click="clickHandler">
+      <div class="m-editor-empty-button" @click="clickHandler(NodeType.PAGE)">
         <div>
           <MIcon :icon="Plus"></MIcon>
         </div>
         <p>新增页面</p>
+      </div>
+
+      <div v-if="!disabledPageFragment" class="m-editor-empty-button" @click="clickHandler(NodeType.PAGE_FRAGMENT)">
+        <div>
+          <MIcon :icon="Plus"></MIcon>
+        </div>
+        <p>新增页面片</p>
       </div>
     </div>
   </div>
@@ -25,9 +32,13 @@ defineOptions({
   name: 'MEditorAddPageBox',
 });
 
+defineProps<{
+  disabledPageFragment: boolean;
+}>();
+
 const services = inject<Services>('services');
 
-const clickHandler = () => {
+const clickHandler = (type: NodeType.PAGE | NodeType.PAGE_FRAGMENT) => {
   const { editorService } = services || {};
 
   if (!editorService) return;
@@ -36,8 +47,9 @@ const clickHandler = () => {
   if (!root) throw new Error('root 不能为空');
 
   editorService.add({
-    type: NodeType.PAGE,
-    name: generatePageNameByApp(root),
+    type,
+    name: generatePageNameByApp(root, type),
+    items: [],
   });
 };
 </script>

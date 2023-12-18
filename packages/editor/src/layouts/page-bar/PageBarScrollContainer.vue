@@ -1,25 +1,20 @@
 <template>
   <div class="m-editor-page-bar" ref="pageBar">
-    <div
-      v-if="showAddPageButton"
-      id="m-editor-page-bar-add-icon"
-      class="m-editor-page-bar-item m-editor-page-bar-item-icon"
-      @click="addPage"
-    >
-      <Icon :icon="Plus"></Icon>
-    </div>
-    <div v-else style="width: 21px"></div>
+    <slot name="prepend"></slot>
+
     <div v-if="canScroll" class="m-editor-page-bar-item m-editor-page-bar-item-icon" @click="scroll('left')">
       <Icon :icon="ArrowLeftBold"></Icon>
     </div>
+
     <div
-      v-if="pageLength"
+      v-if="(type === NodeType.PAGE && pageLength) || (type === NodeType.PAGE_FRAGMENT && pageFragmentLength)"
       class="m-editor-page-bar-items"
       ref="itemsContainer"
       :style="`width: ${itemsContainerWidth}px`"
     >
       <slot></slot>
     </div>
+
     <div v-if="canScroll" class="m-editor-page-bar-item m-editor-page-bar-item-icon" @click="scroll('right')">
       <Icon :icon="ArrowRightBold"></Icon>
     </div>
@@ -27,18 +22,31 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, nextTick, onBeforeUnmount, onMounted, ref, toRaw, watch } from 'vue';
-import { ArrowLeftBold, ArrowRightBold, Plus } from '@element-plus/icons-vue';
+import {
+  computed,
+  type ComputedRef,
+  inject,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+  type WatchStopHandle,
+} from 'vue';
+import { ArrowLeftBold, ArrowRightBold } from '@element-plus/icons-vue';
 
 import { NodeType } from '@tmagic/schema';
 
 import Icon from '@editor/components/Icon.vue';
 import type { Services } from '@editor/type';
-import { generatePageNameByApp } from '@editor/utils/editor';
 
 defineOptions({
   name: 'MEditorPageBarScrollContainer',
 });
+
+const props = defineProps<{
+  type: NodeType.PAGE | NodeType.PAGE_FRAGMENT;
+}>();
 
 const services = inject<Services>('services');
 const editorService = services?.editorService;
@@ -104,27 +112,45 @@ const scroll = (type: 'left' | 'right' | 'start' | 'end') => {
   itemsContainer.value.style.transform = `translate(${translateLeft}px, 0px)`;
 };
 
-const pageLength = computed(() => editorService?.get('pageLength'));
+const pageLength = computed(() => editorService?.get('pageLength') || 0);
+const pageFragmentLength = computed(() => editorService?.get('pageFragmentLength') || 0);
 
-watch(pageLength, (length = 0, preLength = 0) => {
-  setTimeout(() => {
-    setCanScroll();
-    if (length < preLength) {
-      scroll('start');
+const crateWatchLength = (length: ComputedRef<number>) =>
+  watch(
+    length,
+    (length = 0, preLength = 0) => {
+      setTimeout(() => {
+        setCanScroll();
+        if (length < preLength) {
+          scroll('start');
+        } else {
+          scroll('end');
+        }
+      });
+    },
+    {
+      immediate: true,
+    },
+  );
+
+let unWatchPageLength: WatchStopHandle | null;
+let unWatchPageFragmentLength: WatchStopHandle | null;
+
+watch(
+  () => props.type,
+  (type) => {
+    if (type === NodeType.PAGE) {
+      unWatchPageFragmentLength?.();
+      unWatchPageFragmentLength = null;
+      unWatchPageLength = crateWatchLength(pageLength);
     } else {
-      scroll('end');
+      unWatchPageLength?.();
+      unWatchPageLength = null;
+      unWatchPageFragmentLength = crateWatchLength(pageFragmentLength);
     }
-  });
-});
-
-const addPage = () => {
-  if (!editorService) return;
-  const root = toRaw(editorService.get('root'));
-  if (!root) throw new Error('root 不能为空');
-  const pageConfig = {
-    type: NodeType.PAGE,
-    name: generatePageNameByApp(root),
-  };
-  editorService.add(pageConfig);
-};
+  },
+  {
+    immediate: true,
+  },
+);
 </script>

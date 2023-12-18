@@ -1,8 +1,8 @@
 import { toRaw } from 'vue';
 import { isEmpty } from 'lodash-es';
 
-import { Id, MContainer, MNode } from '@tmagic/schema';
-import { isPage } from '@tmagic/utils';
+import { Id, MContainer, MNode, NodeType } from '@tmagic/schema';
+import { isPage, isPageFragment } from '@tmagic/utils';
 
 import editorService from '@editor/services/editor';
 import propsService from '@editor/services/props';
@@ -58,8 +58,8 @@ export const beforePaste = async (position: PastePosition, config: MNode[]): Pro
         };
       }
       const root = editorService.get('root');
-      if (isPage(pasteConfig) && root) {
-        pasteConfig.name = generatePageNameByApp(root);
+      if ((isPage(pasteConfig) || isPageFragment(pasteConfig)) && root) {
+        pasteConfig.name = generatePageNameByApp(root, isPage(pasteConfig) ? NodeType.PAGE : NodeType.PAGE_FRAGMENT);
       }
       return pasteConfig as MNode;
     }),

@@ -1,6 +1,6 @@
 import KeyController, { KeyControllerEvent } from 'keycon';
 
-import { isPage } from '@tmagic/utils';
+import { isPage, isPageFragment } from '@tmagic/utils';
 
 import { KeyBindingCacheItem, KeyBindingCommand, KeyBindingItem } from '@editor/type';
 
@@ -19,7 +19,7 @@ class Keybinding extends BaseService {
     [KeyBindingCommand.DELETE_NODE]: () => {
       const nodes = editorService.get('nodes');
 
-      if (!nodes || isPage(nodes[0])) return;
+      if (!nodes || isPage(nodes[0]) || isPageFragment(nodes[0])) return;
       editorService.remove(nodes);
     },
     [KeyBindingCommand.COPY_NODE]: () => {
@@ -29,7 +29,7 @@ class Keybinding extends BaseService {
     [KeyBindingCommand.CUT_NODE]: () => {
       const nodes = editorService.get('nodes');
 
-      if (!nodes || isPage(nodes[0])) return;
+      if (!nodes || isPage(nodes[0]) || isPageFragment(nodes[0])) return;
       editorService.copy(nodes);
       editorService.remove(nodes);
     },

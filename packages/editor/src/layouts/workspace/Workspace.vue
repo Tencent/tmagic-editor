@@ -11,11 +11,6 @@
     </slot>
 
     <slot name="workspace-content"></slot>
-
-    <PageBar>
-      <template #page-bar-title="{ page }"><slot name="page-bar-title" :page="page"></slot></template>
-      <template #page-bar-popover="{ page }"><slot name="page-bar-popover" :page="page"></slot></template>
-    </PageBar>
   </div>
 </template>
 
@@ -26,7 +21,6 @@ import type { MenuButton, MenuComponent, Services, WorkspaceSlots } from '@edito
 
 import MagicStage from './viewer/Stage.vue';
 import Breadcrumb from './Breadcrumb.vue';
-import PageBar from './PageBar.vue';
 
 defineSlots<WorkspaceSlots>();
 

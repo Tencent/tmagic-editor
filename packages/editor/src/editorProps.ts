@@ -72,8 +72,12 @@ export interface EditorProps {
   extendFormState?: (state: FormState) => Record<string, any> | Promise<Record<string, any>>;
   /** 自定义依赖收集器，复制组件时会将关联依赖一并复制 */
   collectorOptions?: CustomTargetOptions;
+  /** 标尺配置 */
   guidesOptions?: Partial<GuidesOptions>;
+  /** 禁止多选 */
   disabledMultiSelect?: boolean;
+  /** 禁用页面片 */
+  disabledPageFragment?: boolean;
   customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
 }
 
@@ -96,4 +100,5 @@ export const defaultEditorProps = {
   codeOptions: () => ({}),
   renderType: RenderType.IFRAME,
   disabledMultiSelect: false,
+  disabledPageFragment: false,
 };

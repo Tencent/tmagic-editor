@@ -1,5 +1,5 @@
 <template>
-  <Framework>
+  <Framework :disabled-page-fragment="disabledPageFragment">
     <template #header>
       <slot name="header"></slot>
     </template>
@@ -61,8 +61,6 @@
         <Workspace :stage-content-menu="stageContentMenu" :custom-content-menu="customContentMenu">
           <template #stage><slot name="stage"></slot></template>
           <template #workspace-content><slot name="workspace-content" :editorService="editorService"></slot></template>
-          <template #page-bar-title="{ page }"><slot name="page-bar-title" :page="page"></slot></template>
-          <template #page-bar-popover="{ page }"><slot name="page-bar-popover" :page="page"></slot></template>
         </Workspace>
       </slot>
     </template>
@@ -89,6 +87,9 @@
     <template #footer>
       <slot name="footer"></slot>
     </template>
+
+    <template #page-bar-title="{ page }"><slot name="page-bar-title" :page="page"></slot></template>
+    <template #page-bar-popover="{ page }"><slot name="page-bar-popover" :page="page"></slot></template>
   </Framework>
 </template>
 

@@ -18,7 +18,7 @@
 
 import { reactive } from 'vue';
 
-import type { MPage } from '@tmagic/schema';
+import type { MPage, MPageFragment } from '@tmagic/schema';
 
 import type { HistoryState, StepValue } from '@editor/type';
 import { UndoRedo } from '@editor/utils/undo-redo';
@@ -41,12 +41,16 @@ class History extends BaseService {
 
   public reset() {
     this.state.pageSteps = {};
+    this.resetPage();
+  }
+
+  public resetPage() {
     this.state.pageId = undefined;
     this.state.canRedo = false;
     this.state.canUndo = false;
   }
 
-  public changePage(page: MPage): void {
+  public changePage(page: MPage | MPageFragment): void {
     if (!page) return;
 
     this.state.pageId = page.id;

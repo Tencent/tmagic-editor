@@ -48,9 +48,14 @@ export interface AppCore {
 }
 
 export enum NodeType {
+  /** 容器 */
   CONTAINER = 'container',
+  /** 页面 */
   PAGE = 'page',
+  /** 根类型 */
   ROOT = 'app',
+  /** 页面片 */
+  PAGE_FRAGMENT = 'page-fragment',
 }
 
 export type Id = string | number;
@@ -145,11 +150,16 @@ export interface MPage extends MContainer {
   type: NodeType.PAGE;
 }
 
+export interface MPageFragment extends MContainer {
+  /** 页面类型 */
+  type: NodeType.PAGE_FRAGMENT;
+}
+
 export interface MApp extends MComponent {
   /** App页面类型，app作为整个结构的根节点；有且只有一个 */
   type: NodeType.ROOT;
   /** */
-  items: MPage[];
+  items: (MPage | MPageFragment)[];
   /** 代码块 */
   codeBlocks?: CodeBlockDSL;
 
