@@ -3,7 +3,11 @@
     <Breadcrumb></Breadcrumb>
 
     <slot name="stage">
-      <MagicStage v-if="page" :stage-content-menu="stageContentMenu"></MagicStage>
+      <MagicStage
+        v-if="page"
+        :stage-content-menu="stageContentMenu"
+        :custom-content-menu="customContentMenu"
+      ></MagicStage>
     </slot>
 
     <slot name="workspace-content"></slot>
@@ -32,6 +36,7 @@ defineOptions({
 
 defineProps<{
   stageContentMenu: (MenuButton | MenuComponent)[];
+  customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
 }>();
 
 const services = inject<Services>('services');

@@ -160,6 +160,7 @@ const props = withDefaults(
   defineProps<{
     data: SideBarData;
     layerContentMenu: (MenuButton | MenuComponent)[];
+    customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
   }>(),
   {
     data: () => ({ type: 'tabs', status: '组件', items: ['component-list', 'layer', 'code-block', 'data-source'] }),
@@ -187,6 +188,7 @@ const getItemConfig = (data: SideItem): SideComponent => {
       text: '已选组件',
       props: {
         layerContentMenu: props.layerContentMenu,
+        customContentMenu: props.customContentMenu,
       },
       component: LayerPanel,
       slots: {},

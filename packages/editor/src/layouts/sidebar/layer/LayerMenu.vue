@@ -17,9 +17,16 @@ defineOptions({
   name: 'MEditorLayerMenu',
 });
 
-const props = defineProps<{
-  layerContentMenu: (MenuButton | MenuComponent)[];
-}>();
+const props = withDefaults(
+  defineProps<{
+    layerContentMenu: (MenuButton | MenuComponent)[];
+    customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
+  }>(),
+  {
+    layerContentMenu: () => [],
+    customContentMenu: (menus: (MenuButton | MenuComponent)[]) => menus,
+  },
+);
 
 const emit = defineEmits<{
   'collapse-all': [];
@@ -82,29 +89,34 @@ const getSubMenuData = computed<MenuButton[]>(() => {
   return [];
 });
 
-const menuData = computed<(MenuButton | MenuComponent)[]>(() => [
-  {
-    type: 'button',
-    text: '全部折叠',
-    icon: FolderMinusIcon,
-    display: () => isPage(node.value),
-    handler: () => {
-      emit('collapse-all');
-    },
-  },
-  {
-    type: 'button',
-    text: '新增',
-    icon: markRaw(Plus),
-    display: () => node.value?.items && nodes.value?.length === 1,
-    items: getSubMenuData.value,
-  },
-  useCopyMenu(),
-  usePasteMenu(),
-  useDeleteMenu(),
-  useMoveToMenu(services),
-  ...props.layerContentMenu,
-]);
+const menuData = computed<(MenuButton | MenuComponent)[]>(() =>
+  props.customContentMenu(
+    [
+      {
+        type: 'button',
+        text: '全部折叠',
+        icon: FolderMinusIcon,
+        display: () => isPage(node.value),
+        handler: () => {
+          emit('collapse-all');
+        },
+      },
+      {
+        type: 'button',
+        text: '新增',
+        icon: markRaw(Plus),
+        display: () => node.value?.items && nodes.value?.length === 1,
+        items: getSubMenuData.value,
+      },
+      useCopyMenu(),
+      usePasteMenu(),
+      useDeleteMenu(),
+      useMoveToMenu(services),
+      ...props.layerContentMenu,
+    ],
+    'layer',
+  ),
+);
 
 const show = (e: MouseEvent) => {
   menu.value?.show(e);

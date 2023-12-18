@@ -34,7 +34,12 @@
     </Tree>
 
     <Teleport to="body">
-      <LayerMenu ref="menu" :layer-content-menu="layerContentMenu" @collapse-all="collapseAllHandler"></LayerMenu>
+      <LayerMenu
+        ref="menu"
+        :layer-content-menu="layerContentMenu"
+        :custom-content-menu="customContentMenu"
+        @collapse-all="collapseAllHandler"
+      ></LayerMenu>
     </Teleport>
   </TMagicScrollbar>
 </template>
@@ -65,6 +70,7 @@ defineOptions({
 
 defineProps<{
   layerContentMenu: (MenuButton | MenuComponent)[];
+  customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
 }>();
 
 const services = inject<Services>('services');

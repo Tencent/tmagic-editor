@@ -25,7 +25,12 @@
     <NodeListMenu></NodeListMenu>
 
     <Teleport to="body">
-      <ViewerMenu ref="menu" :is-multi-select="isMultiSelect" :stage-content-menu="stageContentMenu"></ViewerMenu>
+      <ViewerMenu
+        ref="menu"
+        :is-multi-select="isMultiSelect"
+        :stage-content-menu="stageContentMenu"
+        :custom-content-menu="customContentMenu"
+      ></ViewerMenu>
     </Teleport>
   </ScrollViewer>
 </template>
@@ -52,6 +57,7 @@ defineOptions({
 
 defineProps<{
   stageContentMenu: (MenuButton | MenuComponent)[];
+  customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
 }>();
 
 let stage: StageCore | null = null;

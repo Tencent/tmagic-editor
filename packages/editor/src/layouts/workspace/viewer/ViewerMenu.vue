@@ -19,8 +19,16 @@ defineOptions({
 });
 
 const props = withDefaults(
-  defineProps<{ isMultiSelect?: boolean; stageContentMenu: (MenuButton | MenuComponent)[] }>(),
-  { isMultiSelect: false },
+  defineProps<{
+    isMultiSelect?: boolean;
+    stageContentMenu: (MenuButton | MenuComponent)[];
+    customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
+  }>(),
+  {
+    isMultiSelect: false,
+    stageContentMenu: () => [],
+    customContentMenu: (menus: (MenuButton | MenuComponent)[]) => menus,
+  },
 );
 
 const services = inject<Services>('services');
@@ -32,83 +40,88 @@ const node = computed(() => editorService?.get('node'));
 const nodes = computed(() => editorService?.get('nodes'));
 const parent = computed(() => editorService?.get('parent'));
 
-const menuData = computed<(MenuButton | MenuComponent)[]>(() => [
-  {
-    type: 'button',
-    text: '水平居中',
-    icon: markRaw(CenterIcon),
-    display: () => canCenter.value,
-    handler: () => {
-      if (!nodes.value) return;
-      editorService?.alignCenter(nodes.value);
-    },
-  },
-  useCopyMenu(),
-  usePasteMenu(menu),
-  {
-    type: 'divider',
-    direction: 'horizontal',
-    display: () => {
-      if (!node.value) return false;
-      return !isPage(node.value);
-    },
-  },
-  {
-    type: 'button',
-    text: '上移一层',
-    icon: markRaw(Top),
-    display: () => !isPage(node.value) && !props.isMultiSelect,
-    handler: () => {
-      editorService?.moveLayer(1);
-    },
-  },
-  {
-    type: 'button',
-    text: '下移一层',
-    icon: markRaw(Bottom),
-    display: () => !isPage(node.value) && !props.isMultiSelect,
-    handler: () => {
-      editorService?.moveLayer(-1);
-    },
-  },
-  {
-    type: 'button',
-    text: '置顶',
-    icon: markRaw(Top),
-    display: () => !isPage(node.value) && !props.isMultiSelect,
-    handler: () => {
-      editorService?.moveLayer(LayerOffset.TOP);
-    },
-  },
-  {
-    type: 'button',
-    text: '置底',
-    icon: markRaw(Bottom),
-    display: () => !isPage(node.value) && !props.isMultiSelect,
-    handler: () => {
-      editorService?.moveLayer(LayerOffset.BOTTOM);
-    },
-  },
-  useMoveToMenu(services),
-  {
-    type: 'divider',
-    direction: 'horizontal',
-    display: () => !isPage(node.value) && !props.isMultiSelect,
-  },
-  useDeleteMenu(),
-  {
-    type: 'divider',
-    direction: 'horizontal',
-  },
-  {
-    type: 'button',
-    text: '清空参考线',
-    handler: () => {
-      editorService?.get('stage')?.clearGuides();
-    },
-  },
-  ...props.stageContentMenu,
-]);
+const menuData = computed<(MenuButton | MenuComponent)[]>(() =>
+  props.customContentMenu(
+    [
+      {
+        type: 'button',
+        text: '水平居中',
+        icon: markRaw(CenterIcon),
+        display: () => canCenter.value,
+        handler: () => {
+          if (!nodes.value) return;
+          editorService?.alignCenter(nodes.value);
+        },
+      },
+      useCopyMenu(),
+      usePasteMenu(menu),
+      {
+        type: 'divider',
+        direction: 'horizontal',
+        display: () => {
+          if (!node.value) return false;
+          return !isPage(node.value);
+        },
+      },
+      {
+        type: 'button',
+        text: '上移一层',
+        icon: markRaw(Top),
+        display: () => !isPage(node.value) && !props.isMultiSelect,
+        handler: () => {
+          editorService?.moveLayer(1);
+        },
+      },
+      {
+        type: 'button',
+        text: '下移一层',
+        icon: markRaw(Bottom),
+        display: () => !isPage(node.value) && !props.isMultiSelect,
+        handler: () => {
+          editorService?.moveLayer(-1);
+        },
+      },
+      {
+        type: 'button',
+        text: '置顶',
+        icon: markRaw(Top),
+        display: () => !isPage(node.value) && !props.isMultiSelect,
+        handler: () => {
+          editorService?.moveLayer(LayerOffset.TOP);
+        },
+      },
+      {
+        type: 'button',
+        text: '置底',
+        icon: markRaw(Bottom),
+        display: () => !isPage(node.value) && !props.isMultiSelect,
+        handler: () => {
+          editorService?.moveLayer(LayerOffset.BOTTOM);
+        },
+      },
+      useMoveToMenu(services),
+      {
+        type: 'divider',
+        direction: 'horizontal',
+        display: () => !isPage(node.value) && !props.isMultiSelect,
+      },
+      useDeleteMenu(),
+      {
+        type: 'divider',
+        direction: 'horizontal',
+      },
+      {
+        type: 'button',
+        text: '清空参考线',
+        handler: () => {
+          editorService?.get('stage')?.clearGuides();
+        },
+      },
+      ...props.stageContentMenu,
+    ],
+    'viewer',
+  ),
+);
 
 watch(
   parent,

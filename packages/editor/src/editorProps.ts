@@ -74,6 +74,7 @@ export interface EditorProps {
   collectorOptions?: CustomTargetOptions;
   guidesOptions?: Partial<GuidesOptions>;
   disabledMultiSelect?: boolean;
+  customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
 }
 
 export const defaultEditorProps = {

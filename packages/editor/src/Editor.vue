@@ -16,7 +16,7 @@
 
     <template #sidebar>
       <slot name="sidebar" :editorService="editorService">
-        <Sidebar :data="sidebar" :layer-content-menu="layerContentMenu">
+        <Sidebar :data="sidebar" :layer-content-menu="layerContentMenu" :custom-content-menu="customContentMenu">
           <template #layer-panel-header>
             <slot name="layer-panel-header"></slot>
           </template>
@@ -58,7 +58,7 @@
 
     <template #workspace>
       <slot name="workspace" :editorService="editorService">
-        <Workspace :stage-content-menu="stageContentMenu">
+        <Workspace :stage-content-menu="stageContentMenu" :custom-content-menu="customContentMenu">
           <template #stage><slot name="stage"></slot></template>
           <template #workspace-content><slot name="workspace-content" :editorService="editorService"></slot></template>
           <template #page-bar-title="{ page }"><slot name="page-bar-title" :page="page"></slot></template>
