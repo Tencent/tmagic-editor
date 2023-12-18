@@ -924,3 +924,21 @@ const updateDragEl = (el, target) => {
 </template>
 ```
   
+## disabledMultiSelect
+
+- **详情：**
+  
+禁止多选
+
+- **类型：** `boolean`
+  
+- **默认值：** `false`
+
+- **示例：**
+
+```html
+<template>
+  <m-editor :disabled-multi-select="true"></m-editor>
+</template>
+```
+  

@@ -18,7 +18,7 @@
     >
       <MIcon
         class="expand-icon"
-        :style="hasChilren ? '' : 'color: transparent; cursor: default'"
+        :style="hasChildren ? '' : 'color: transparent; cursor: default'"
         :icon="expanded ? ArrowDown : ArrowRight"
         @click="expandHandler"
       ></MIcon>
@@ -35,7 +35,7 @@
       </div>
     </div>
 
-    <div v-if="hasChilren && expanded" class="m-editor-tree-node-children">
+    <div v-if="hasChildren && expanded" class="m-editor-tree-node-children">
       <TreeNode
         v-for="item in data.items"
         :key="item.id"
@@ -114,7 +114,7 @@ const selected = computed(() => nodeStatus.value.selected);
 const visible = computed(() => nodeStatus.value.visible);
 const draggable = computed(() => nodeStatus.value.draggable);
 
-const hasChilren = computed(() => props.data.items?.some((item) => props.nodeStatusMap.get(item.id)?.visible));
+const hasChildren = computed(() => props.data.items?.some((item) => props.nodeStatusMap.get(item.id)?.visible));
 
 const handleDragStart = (event: DragEvent) => {
   treeEmit?.('node-dragstart', event, props.data);

@@ -224,6 +224,14 @@ export default class StageCore extends EventEmitter {
     return this.actionManager.getDragStatus();
   }
 
+  public disableMultiSelect() {
+    this.actionManager.disableMultiSelect();
+  }
+
+  public enableMultiSelect() {
+    this.actionManager.enableMultiSelect();
+  }
+
   /**
    * 销毁实例
    */
@@ -262,6 +270,7 @@ export default class StageCore extends EventEmitter {
       moveableOptions: config.moveableOptions,
       container: this.mask.content,
       disabledDragStart: config.disabledDragStart,
+      disabledMultiSelect: config.disabledMultiSelect,
       canSelect: config.canSelect,
       isContainer: config.isContainer,
       updateDragEl: config.updateDragEl,

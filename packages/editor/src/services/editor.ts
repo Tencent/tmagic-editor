@@ -58,6 +58,7 @@ class Editor extends BaseService {
     highlightNode: null,
     modifiedNodeIds: new Map(),
     pageLength: 0,
+    disabledMultiSelect: false,
   });
   private isHistoryStateChange = false;
 

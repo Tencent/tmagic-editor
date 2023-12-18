@@ -79,6 +79,7 @@ export interface StageCoreConfig {
   disabledDragStart?: boolean;
   renderType?: RenderType;
   guidesOptions?: Partial<GuidesOptions>;
+  disabledMultiSelect?: boolean;
 }
 
 export interface ActionManagerConfig {
@@ -88,6 +89,7 @@ export interface ActionManagerConfig {
   containerHighlightType?: ContainerHighlightType;
   moveableOptions?: CustomizeMoveableOptions;
   disabledDragStart?: boolean;
+  disabledMultiSelect?: boolean;
   canSelect?: CanSelect;
   isContainer: IsContainer;
   getRootContainer: GetRootContainer;

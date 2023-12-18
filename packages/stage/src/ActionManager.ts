@@ -57,7 +57,7 @@ const defaultContainerHighlightDuration = 800;
  */
 export default class ActionManager extends EventEmitter {
   private dr: StageDragResize;
-  private multiDr: StageMultiDragResize;
+  private multiDr?: StageMultiDragResize;
   private highlightLayer: StageHighlight;
   /** 单选、多选、高亮的容器（蒙层的content） */
   private container: HTMLElement;
@@ -81,6 +81,8 @@ export default class ActionManager extends EventEmitter {
   private canSelect: CanSelect;
   private isContainer: IsContainer;
   private getRenderDocument: GetRenderDocument;
+  private disabledMultiSelect = false;
+  private config: ActionManagerConfig;
 
   private mouseMoveHandler = throttle(async (event: MouseEvent): Promise<void> => {
     if ((event.target as HTMLDivElement)?.classList?.contains('moveable-direction')) {
@@ -99,41 +101,24 @@ export default class ActionManager extends EventEmitter {
 
   constructor(config: ActionManagerConfig) {
     super();
+    this.config = config;
     this.container = config.container;
     this.containerHighlightClassName = config.containerHighlightClassName || CONTAINER_HIGHLIGHT_CLASS_NAME;
     this.containerHighlightDuration = config.containerHighlightDuration || defaultContainerHighlightDuration;
     this.containerHighlightType = config.containerHighlightType;
+    this.disabledMultiSelect = config.disabledMultiSelect ?? false;
     this.getTargetElement = config.getTargetElement;
     this.getElementsFromPoint = config.getElementsFromPoint;
     this.canSelect = config.canSelect || ((el: HTMLElement) => !!el.id);
     this.getRenderDocument = config.getRenderDocument;
     this.isContainer = config.isContainer;
 
-    const createDrHelper = () =>
-      new DragResizeHelper({
-        container: config.container,
-        updateDragEl: config.updateDragEl,
-      });
+    this.dr = this.createDr(config);
 
-    this.dr = new StageDragResize({
-      container: config.container,
-      disabledDragStart: config.disabledDragStart,
-      moveableOptions: this.changeCallback(config.moveableOptions, false),
-      dragResizeHelper: createDrHelper(),
-      getRootContainer: config.getRootContainer,
-      getRenderDocument: config.getRenderDocument,
-      markContainerEnd: this.markContainerEnd.bind(this),
-      delayedMarkContainer: this.delayedMarkContainer.bind(this),
-    });
-    this.multiDr = new StageMultiDragResize({
-      container: config.container,
-      moveableOptions: this.changeCallback(config.moveableOptions, true),
-      dragResizeHelper: createDrHelper(),
-      getRootContainer: config.getRootContainer,
-      getRenderDocument: config.getRenderDocument,
-      markContainerEnd: this.markContainerEnd.bind(this),
-      delayedMarkContainer: this.delayedMarkContainer.bind(this),
-    });
+    if (!this.disabledMultiSelect) {
+      this.multiDr = this.createMultiDr(config);
+    }
+
     this.highlightLayer = new StageHighlight({
       container: config.container,
       updateDragEl: config.updateDragEl,
@@ -142,7 +127,22 @@ export default class ActionManager extends EventEmitter {
 
     this.initMouseEvent();
     this.initKeyEvent();
-    this.initActionEvent();
+  }
+
+  public disableMultiSelect() {
+    this.disabledMultiSelect = true;
+    if (this.multiDr) {
+      this.multiDr.destroy();
+      this.multiDr = undefined;
+    }
+  }
+
+  public enableMultiSelect() {
+    this.disabledMultiSelect = false;
+
+    if (!this.multiDr) {
+      this.multiDr = this.createMultiDr(this.config);
+    }
   }
 
   /**
@@ -152,7 +152,7 @@ export default class ActionManager extends EventEmitter {
    */
   public setGuidelines(type: GuidesType, guidelines: number[]): void {
     this.dr.setGuidelines(type, guidelines);
-    this.multiDr.setGuidelines(type, guidelines);
+    this.multiDr?.setGuidelines(type, guidelines);
   }
 
   /**
@@ -160,7 +160,7 @@ export default class ActionManager extends EventEmitter {
    */
   public clearGuides(): void {
     this.dr.clearGuides();
-    this.multiDr.clearGuides();
+    this.multiDr?.clearGuides();
   }
 
   /**
@@ -170,7 +170,7 @@ export default class ActionManager extends EventEmitter {
   public updateMoveable(el?: HTMLElement): void {
     this.dr.updateMoveable(el);
     // 多选时不可配置元素，因此不存在多选元素变更，不需要传el
-    this.multiDr.updateMoveable();
+    this.multiDr?.updateMoveable();
   }
 
   /**
@@ -197,7 +197,7 @@ export default class ActionManager extends EventEmitter {
     if (this.dr.getTarget()) {
       return this.dr.getOption(key);
     }
-    if (this.multiDr.targetList.length) {
+    if (this.multiDr?.targetList.length) {
       return this.multiDr.getOption(key);
     }
   }
@@ -254,7 +254,7 @@ export default class ActionManager extends EventEmitter {
     if (selectedEl?.className.includes(PAGE_CLASS)) {
       return true;
     }
-    return this.multiDr.canSelect(el, selectedEl);
+    return this.multiDr?.canSelect(el, selectedEl) || false;
   }
 
   public select(el: HTMLElement, event: MouseEvent | undefined): void {
@@ -266,7 +266,7 @@ export default class ActionManager extends EventEmitter {
   public multiSelect(idOrElList: HTMLElement[] | Id[]): void {
     this.selectedElList = idOrElList.map((idOrEl) => this.getTargetElement(idOrEl));
     this.clearSelectStatus(SelectStatus.SELECT);
-    this.multiDr.multiSelect(this.selectedElList);
+    this.multiDr?.multiSelect(this.selectedElList);
   }
 
   public getHighlightEl(): HTMLElement | undefined {
@@ -287,7 +287,7 @@ export default class ActionManager extends EventEmitter {
     }
 
     // 选中组件不高亮、多选拖拽状态不高亮
-    if (el === this.getSelectedEl() || this.multiDr.dragStatus === StageDragStatus.ING) {
+    if (el === this.getSelectedEl() || this.multiDr?.dragStatus === StageDragStatus.ING) {
       this.clearHighlight();
       return;
     }
@@ -309,7 +309,7 @@ export default class ActionManager extends EventEmitter {
    */
   public clearSelectStatus(selectType: SelectStatus): void {
     if (selectType === SelectStatus.MULTI_SELECT) {
-      this.multiDr.clearSelectStatus();
+      this.multiDr?.clearSelectStatus();
       this.selectedElList = [];
     } else {
       this.dr.clearSelectStatus();
@@ -361,8 +361,82 @@ export default class ActionManager extends EventEmitter {
     this.container.removeEventListener('mouseleave', this.mouseLeaveHandler);
     this.container.removeEventListener('wheel', this.mouseWheelHandler);
     this.dr.destroy();
-    this.multiDr.destroy();
+    this.multiDr?.destroy();
     this.highlightLayer.destroy();
+  }
+
+  private createDr(config: ActionManagerConfig) {
+    const createDrHelper = () =>
+      new DragResizeHelper({
+        container: config.container,
+        updateDragEl: config.updateDragEl,
+      });
+
+    const dr = new StageDragResize({
+      container: config.container,
+      disabledDragStart: config.disabledDragStart,
+      moveableOptions: this.changeCallback(config.moveableOptions, false),
+      dragResizeHelper: createDrHelper(),
+      getRootContainer: config.getRootContainer,
+      getRenderDocument: config.getRenderDocument,
+      markContainerEnd: this.markContainerEnd.bind(this),
+      delayedMarkContainer: this.delayedMarkContainer.bind(this),
+    });
+
+    dr.on('update', (data: UpdateEventData) => {
+      // 点击组件并立即拖动的场景，要保证select先被触发，延迟update通知
+      setTimeout(() => this.emit('update', data));
+    })
+      .on('sort', (data: UpdateEventData) => {
+        // 点击组件并立即拖动的场景，要保证select先被触发，延迟update通知
+        setTimeout(() => this.emit('sort', data));
+      })
+      .on('select-parent', () => {
+        this.emit('select-parent');
+      })
+      .on('remove', () => {
+        const drTarget = this.dr.getTarget();
+        if (!drTarget) return;
+        const data: RemoveEventData = {
+          data: [{ el: drTarget }],
+        };
+        this.emit('remove', data);
+      })
+      .on('drag-start', (e: OnDragStart) => {
+        this.emit('drag-start', e);
+      });
+
+    return dr;
+  }
+
+  private createMultiDr(config: ActionManagerConfig) {
+    const createDrHelper = () =>
+      new DragResizeHelper({
+        container: config.container,
+        updateDragEl: config.updateDragEl,
+      });
+    const multiDr = new StageMultiDragResize({
+      container: config.container,
+      moveableOptions: this.changeCallback(config.moveableOptions, true),
+      dragResizeHelper: createDrHelper(),
+      getRootContainer: config.getRootContainer,
+      getRenderDocument: config.getRenderDocument,
+      markContainerEnd: this.markContainerEnd.bind(this),
+      delayedMarkContainer: this.delayedMarkContainer.bind(this),
+    });
+
+    multiDr
+      ?.on('update', (data: UpdateEventData) => {
+        this.emit('multi-update', data);
+      })
+      .on('change-to-select', async (id: Id) => {
+        // 如果还在多选状态，不触发切换到单选
+        if (this.isMultiSelectStatus) return false;
+        const el = this.getTargetElement(id);
+        this.emit('change-to-select', el);
+      });
+
+    return multiDr;
   }
 
   private changeCallback(options: CustomizeMoveableOptions, isMulti: boolean): CustomizeMoveableOptions {
@@ -450,15 +524,21 @@ export default class ActionManager extends EventEmitter {
     // 多选启用状态监听
     KeyController.global.keydown(ctrl, (e) => {
       e.inputEvent.preventDefault();
-      this.isMultiSelectStatus = true;
+      if (!this.disabledMultiSelect) {
+        this.isMultiSelectStatus = true;
+      }
     });
     // ctrl+tab切到其他窗口，需要将多选状态置为false
     KeyController.global.on('blur', () => {
-      this.isMultiSelectStatus = false;
+      if (!this.disabledMultiSelect) {
+        this.isMultiSelectStatus = false;
+      }
     });
     KeyController.global.keyup(ctrl, (e) => {
       e.inputEvent.preventDefault();
-      this.isMultiSelectStatus = false;
+      if (!this.disabledMultiSelect) {
+        this.isMultiSelectStatus = false;
+      }
     });
 
     // alt健监听，用于启用拖拽组件加入容器状态
@@ -472,46 +552,6 @@ export default class ActionManager extends EventEmitter {
       this.markContainerEnd();
       this.isAltKeydown = false;
     });
-  }
-
-  /**
-   * 处理单选、多选抛出来的事件
-   */
-  private initActionEvent(): void {
-    this.dr
-      .on('update', (data: UpdateEventData) => {
-        // 点击组件并立即拖动的场景，要保证select先被触发，延迟update通知
-        setTimeout(() => this.emit('update', data));
-      })
-      .on('sort', (data: UpdateEventData) => {
-        // 点击组件并立即拖动的场景，要保证select先被触发，延迟update通知
-        setTimeout(() => this.emit('sort', data));
-      })
-      .on('select-parent', () => {
-        this.emit('select-parent');
-      })
-      .on('remove', () => {
-        const drTarget = this.dr.getTarget();
-        if (!drTarget) return;
-        const data: RemoveEventData = {
-          data: [{ el: drTarget }],
-        };
-        this.emit('remove', data);
-      })
-      .on('drag-start', (e: OnDragStart) => {
-        this.emit('drag-start', e);
-      });
-
-    this.multiDr
-      .on('update', (data: UpdateEventData) => {
-        this.emit('multi-update', data);
-      })
-      .on('change-to-select', async (id: Id) => {
-        // 如果还在多选状态，不触发切换到单选
-        if (this.isMultiSelectStatus) return false;
-        const el = this.getTargetElement(id);
-        this.emit('change-to-select', el);
-      });
   }
 
   /**

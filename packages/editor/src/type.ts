@@ -133,6 +133,7 @@ export interface StageOptions {
   updateDragEl: UpdateDragEl;
   renderType: RenderType;
   guidesOptions: Partial<GuidesOptions>;
+  disabledMultiSelect?: boolean;
 }
 
 export interface StoreState {
@@ -146,6 +147,7 @@ export interface StoreState {
   stageLoading: boolean;
   modifiedNodeIds: Map<Id, Id>;
   pageLength: number;
+  disabledMultiSelect: boolean;
 }
 
 export type StoreStateKey = keyof StoreState;

@@ -1,4 +1,4 @@
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 
 import type { MNode } from '@tmagic/schema';
 import StageCore, { GuidesType, RemoveEventData, SortEventData, UpdateEventData } from '@tmagic/stage';
@@ -45,7 +45,19 @@ export const useStage = (stageOptions: StageOptions) => {
     moveableOptions: stageOptions.moveableOptions,
     updateDragEl: stageOptions.updateDragEl,
     guidesOptions: stageOptions.guidesOptions,
+    disabledMultiSelect: stageOptions.disabledMultiSelect,
   });
+
+  watch(
+    () => editorService.get('disabledMultiSelect'),
+    (disabledMultiSelect) => {
+      if (disabledMultiSelect) {
+        stage.disableMultiSelect();
+      } else {
+        stage.enableMultiSelect();
+      }
+    },
+  );
 
   stage.mask.setGuides([
     getGuideLineFromCache(getGuideLineKey(H_GUIDE_LINE_STORAGE_KEY)),

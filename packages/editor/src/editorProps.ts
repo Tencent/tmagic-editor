@@ -73,6 +73,7 @@ export interface EditorProps {
   /** 自定义依赖收集器，复制组件时会将关联依赖一并复制 */
   collectorOptions?: CustomTargetOptions;
   guidesOptions?: Partial<GuidesOptions>;
+  disabledMultiSelect?: boolean;
 }
 
 export const defaultEditorProps = {
@@ -93,4 +94,5 @@ export const defaultEditorProps = {
   containerHighlightType: ContainerHighlightType.DEFAULT,
   codeOptions: () => ({}),
   renderType: RenderType.IFRAME,
+  disabledMultiSelect: false,
 };

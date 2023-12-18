@@ -48,6 +48,16 @@ export const initServiceState = (
   );
 
   watch(
+    () => props.disabledMultiSelect,
+    (disabledMultiSelect) => {
+      editorService.set('disabledMultiSelect', disabledMultiSelect || false);
+    },
+    {
+      immediate: true,
+    },
+  );
+
+  watch(
     () => props.componentGroupList,
     (componentGroupList) => componentGroupList && componentListService.setList(componentGroupList),
     {

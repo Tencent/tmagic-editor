@@ -177,6 +177,7 @@ provide(
     disabledDragStart: props.disabledDragStart,
     renderType: props.renderType,
     guidesOptions: props.guidesOptions,
+    disabledMultiSelect: props.disabledMultiSelect,
   }),
 );
 

@@ -1,4 +1,4 @@
-import { type ComputedRef, nextTick, type Ref, ref } from 'vue';
+import { computed, type ComputedRef, nextTick, type Ref, ref } from 'vue';
 import { throttle } from 'lodash-es';
 
 import { Id, MNode } from '@tmagic/schema';
@@ -13,13 +13,15 @@ export const useClick = (
   isCtrlKeyDown: Ref<boolean>,
   nodeStatusMap: ComputedRef<Map<Id, LayerNodeStatus> | undefined>,
 ) => {
+  const isMultiSelect = computed(() => isCtrlKeyDown.value && !services?.editorService.get('disabledMultiSelect'));
+
   // 触发画布选中
   const select = async (data: MNode) => {
     if (!data.id) {
       throw new Error('没有id');
     }
 
-    if (isCtrlKeyDown.value) {
+    if (isMultiSelect.value) {
       multiSelect(data);
     } else {
       await services?.editorService.select(data);
@@ -70,7 +72,7 @@ export const useClick = (
       return;
     }
 
-    if (data.items && data.items.length > 0 && !isCtrlKeyDown.value) {
+    if (data.items && data.items.length > 0 && !isMultiSelect.value) {
       updateStatus(nodeStatusMap.value, data.id, {
         expand: true,
       });
