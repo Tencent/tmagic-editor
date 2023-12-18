@@ -31,6 +31,7 @@ import {
   type DeprecatedEventConfig,
   type EventConfig,
   type Id,
+  type JsEngine,
   type MApp,
   type RequestFunction,
 } from '@tmagic/schema';
@@ -45,7 +46,7 @@ interface AppOptionsConfig {
   ua?: string;
   config?: MApp;
   platform?: 'editor' | 'mobile' | 'tv' | 'pc';
-  jsEngine?: 'browser' | 'hippy' | 'nodejs';
+  jsEngine?: JsEngine;
   designWidth?: number;
   curPage?: Id;
   useMock?: boolean;

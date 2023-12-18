@@ -33,13 +33,15 @@ export interface HttpOptions {
 
 export type RequestFunction = <T = any>(options: HttpOptions) => Promise<T>;
 
+export type JsEngine = 'browser' | 'hippy' | 'nodejs';
+
 export interface AppCore {
   /** 页面配置描述 */
   dsl?: MApp;
   /** 允许平台，editor: 编辑器中，mobile: 手机端，tv: 电视端, pc: 电脑端 */
   platform?: 'editor' | 'mobile' | 'tv' | 'pc' | string;
   /** 代码运行环境 */
-  jsEngine?: 'browser' | 'hippy' | 'nodejs' | string;
+  jsEngine?: JsEngine | string;
   /** 网络请求函数 */
   request?: RequestFunction;
   [key: string]: any;
@@ -237,6 +239,8 @@ export interface DataSourceSchema {
   methods: CodeBlockContent[];
   /** mock数据 */
   mocks?: MockSchema[];
+  /** 不执行init的环境 */
+  disabledInitInJsEngine?: (JsEngine | string)[];
   /** 扩展字段 */
   [key: string]: any;
 }

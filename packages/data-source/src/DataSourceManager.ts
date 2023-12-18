@@ -29,8 +29,15 @@ import type { DataSourceManagerData, DataSourceManagerOptions } from './types';
 class DataSourceManager extends EventEmitter {
   private static dataSourceClassMap = new Map<string, typeof DataSource>();
 
-  public static registe<T extends typeof DataSource = typeof DataSource>(type: string, dataSource: T) {
+  public static register<T extends typeof DataSource = typeof DataSource>(type: string, dataSource: T) {
     DataSourceManager.dataSourceClassMap.set(type, dataSource);
+  }
+
+  /**
+   * @deprecated
+   */
+  public static registe<T extends typeof DataSource = typeof DataSource>(type: string, dataSource: T) {
+    DataSourceManager.register(type, dataSource);
   }
 
   public static getDataSourceClass(type: string) {
@@ -63,6 +70,10 @@ class DataSourceManager extends EventEmitter {
 
   public async init(ds: DataSource) {
     if (ds.isInit) {
+      return;
+    }
+
+    if (this.app.jsEngine && ds.schema.disabledInitInJsEngine?.includes(this.app.jsEngine)) {
       return;
     }
 
@@ -239,6 +250,6 @@ class DataSourceManager extends EventEmitter {
   }
 }
 
-DataSourceManager.registe('http', HttpDataSource as any);
+DataSourceManager.register('http', HttpDataSource as any);
 
 export default DataSourceManager;
