@@ -136,7 +136,7 @@ const resizeObserver = new ResizeObserver((entries) => {
 onMounted(() => {
   if (stageWrap.value?.container) {
     resizeObserver.observe(stageWrap.value.container);
-    services?.keybindingService.registeEl(KeyBindingContainerKey.STAGE, stageWrap.value.container);
+    services?.keybindingService.registerEl(KeyBindingContainerKey.STAGE, stageWrap.value.container);
   }
 });
 
@@ -144,7 +144,7 @@ onBeforeUnmount(() => {
   stage?.destroy();
   resizeObserver.disconnect();
   services?.editorService.set('stage', null);
-  services?.keybindingService.unregisteEl('stage');
+  services?.keybindingService.unregisterEl('stage');
   services?.editorService.off('root-change', rootChangeHandler);
 });
 

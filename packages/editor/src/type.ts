@@ -574,7 +574,7 @@ export interface KeyBindingCacheItem {
   command: KeyBindingCommand | string;
   keybinding?: string | string[];
   eventType: 'keyup' | 'keydown';
-  binded: boolean;
+  bound: boolean;
 }
 
 export interface CodeSelectColConfig {

@@ -155,8 +155,8 @@ const services: Services = {
 
 initServiceEvents(props, emit, services);
 initServiceState(props, services);
-keybindingService.registe(keybindingConfig);
-keybindingService.registeEl('global');
+keybindingService.register(keybindingConfig);
+keybindingService.registerEl('global');
 
 provide('services', services);
 

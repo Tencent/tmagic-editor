@@ -84,15 +84,29 @@ class Keybinding extends BaseService {
     },
   };
 
-  public registeCommand(command: string, handler: (e: KeyboardEvent) => void | Promise<void>) {
+  public registerCommand(command: string, handler: (e: KeyboardEvent) => void | Promise<void>) {
     this.commands[command] = handler;
   }
 
-  public unregisteCommand(command: string) {
+  /**
+   * @deprecated
+   */
+  public registeCommand(command: string, handler: (e: KeyboardEvent) => void | Promise<void>) {
+    this.registerCommand(command, handler);
+  }
+
+  public unregisterCommand(command: string) {
     delete this.commands[command];
   }
 
-  public registeEl(name: string, el?: HTMLElement) {
+  /**
+   * @deprecated
+   */
+  public unregisteCommand(command: string) {
+    this.unregisterCommand(command);
+  }
+
+  public registerEl(name: string, el?: HTMLElement) {
     if (name !== 'global' && !el) {
       throw new Error('只有name为global可以不传el');
     }
@@ -102,26 +116,47 @@ class Keybinding extends BaseService {
     this.bind(name);
   }
 
-  public unregisteEl(name: string) {
+  /**
+   * @deprecated
+   */
+  public registeEl(name: string, el?: HTMLElement) {
+    this.registerEl(name, el);
+  }
+
+  public unregisterEl(name: string) {
     this.controllers.get(name)?.destroy();
     this.controllers.delete(name);
     this.bindingList.forEach((item) => {
-      item.binded = false;
+      item.bound = false;
     });
   }
 
-  public registe(maps: KeyBindingItem[]) {
+  /**
+   * @deprecated
+   */
+  public unregisteEl(name: string) {
+    this.unregisterEl(name);
+  }
+
+  public register(maps: KeyBindingItem[]) {
     for (const keybindingItem of maps) {
       const { command, keybinding, when } = keybindingItem;
 
       for (const [type = '', eventType = 'keydown'] of when) {
-        const cacheItem: KeyBindingCacheItem = { type, command, keybinding, eventType, binded: false };
+        const cacheItem: KeyBindingCacheItem = { type, command, keybinding, eventType, bound: false };
 
         this.bindingList.push(cacheItem);
       }
     }
 
     this.bind();
+  }
+
+  /**
+   * @deprecated
+   */
+  public registe(map: KeyBindingItem[]) {
+    this.register(map);
   }
 
   public reset() {
@@ -138,13 +173,13 @@ class Keybinding extends BaseService {
 
   private bind(name?: string) {
     for (const item of this.bindingList) {
-      const { type, eventType, command, keybinding, binded } = item;
+      const { type, eventType, command, keybinding, bound } = item;
 
       if (name && name !== type) {
         continue;
       }
 
-      if (binded) {
+      if (bound) {
         continue;
       }
 
@@ -166,7 +201,7 @@ class Keybinding extends BaseService {
         }
       });
 
-      item.binded = true;
+      item.bound = true;
     }
   }
 

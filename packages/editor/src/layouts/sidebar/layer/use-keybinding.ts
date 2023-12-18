@@ -6,7 +6,7 @@ import { KeyBindingContainerKey } from '@editor/utils/keybinding-config';
 
 export const useKeybinding = (
   services: Services | undefined,
-  contianer: Ref<InstanceType<typeof Tree> | undefined>,
+  container: Ref<InstanceType<typeof Tree> | undefined>,
 ) => {
   const keybindingService = services?.keybindingService;
 
@@ -17,17 +17,17 @@ export const useKeybinding = (
     isCtrlKeyDown.value = false;
   };
 
-  keybindingService?.registeCommand('layer-panel-global-keyup', () => {
+  keybindingService?.registerCommand('layer-panel-global-keyup', () => {
     isCtrlKeyDown.value = false;
   });
 
-  keybindingService?.registeCommand('layer-panel-global-keydwon', () => {
+  keybindingService?.registerCommand('layer-panel-global-keydown', () => {
     isCtrlKeyDown.value = true;
   });
 
-  keybindingService?.registe([
+  keybindingService?.register([
     {
-      command: 'layer-panel-global-keydwon',
+      command: 'layer-panel-global-keydown',
       keybinding: 'ctrl',
       when: [['global', 'keydown']],
     },
@@ -39,12 +39,12 @@ export const useKeybinding = (
   ]);
 
   watchEffect(() => {
-    if (contianer.value) {
+    if (container.value) {
       globalThis.addEventListener('blur', windowBlurHandler);
-      keybindingService?.registeEl(KeyBindingContainerKey.LAYER_PANEL, contianer.value.$el);
+      keybindingService?.registerEl(KeyBindingContainerKey.LAYER_PANEL, container.value.$el);
     } else {
       globalThis.removeEventListener('blur', windowBlurHandler);
-      keybindingService?.unregisteEl(KeyBindingContainerKey.LAYER_PANEL);
+      keybindingService?.unregisterEl(KeyBindingContainerKey.LAYER_PANEL);
     }
   });
 
