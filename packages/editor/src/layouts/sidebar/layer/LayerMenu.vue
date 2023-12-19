@@ -6,7 +6,7 @@
 import { computed, inject, markRaw, ref } from 'vue';
 import { Files, Plus } from '@element-plus/icons-vue';
 
-import { isPage } from '@tmagic/utils';
+import { isPage, isPageFragment } from '@tmagic/utils';
 
 import ContentMenu from '@editor/components/ContentMenu.vue';
 import FolderMinusIcon from '@editor/icons/FolderMinusIcon.vue';
@@ -96,7 +96,7 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() =>
         type: 'button',
         text: '全部折叠',
         icon: FolderMinusIcon,
-        display: () => isPage(node.value),
+        display: () => isPage(node.value) || isPageFragment(node.value),
         handler: () => {
           emit('collapse-all');
         },

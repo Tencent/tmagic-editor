@@ -7,7 +7,7 @@ import { computed, inject, markRaw, ref, watch } from 'vue';
 import { Bottom, Top } from '@element-plus/icons-vue';
 
 import { NodeType } from '@tmagic/schema';
-import { isPage } from '@tmagic/utils';
+import { isPage, isPageFragment } from '@tmagic/utils';
 
 import ContentMenu from '@editor/components/ContentMenu.vue';
 import CenterIcon from '@editor/icons/CenterIcon.vue';
@@ -60,14 +60,14 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() =>
         direction: 'horizontal',
         display: () => {
           if (!node.value) return false;
-          return !isPage(node.value);
+          return !isPage(node.value) && !isPageFragment(node.value);
         },
       },
       {
         type: 'button',
         text: '上移一层',
         icon: markRaw(Top),
-        display: () => !isPage(node.value) && !props.isMultiSelect,
+        display: () => !isPage(node.value) && !isPageFragment(node.value) && !props.isMultiSelect,
         handler: () => {
           editorService?.moveLayer(1);
         },
@@ -76,7 +76,7 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() =>
         type: 'button',
         text: '下移一层',
         icon: markRaw(Bottom),
-        display: () => !isPage(node.value) && !props.isMultiSelect,
+        display: () => !isPage(node.value) && !isPageFragment(node.value) && !props.isMultiSelect,
         handler: () => {
           editorService?.moveLayer(-1);
         },
@@ -85,7 +85,7 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() =>
         type: 'button',
         text: '置顶',
         icon: markRaw(Top),
-        display: () => !isPage(node.value) && !props.isMultiSelect,
+        display: () => !isPage(node.value) && !isPageFragment(node.value) && !props.isMultiSelect,
         handler: () => {
           editorService?.moveLayer(LayerOffset.TOP);
         },
@@ -94,7 +94,7 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() =>
         type: 'button',
         text: '置底',
         icon: markRaw(Bottom),
-        display: () => !isPage(node.value) && !props.isMultiSelect,
+        display: () => !isPage(node.value) && !isPageFragment(node.value) && !props.isMultiSelect,
         handler: () => {
           editorService?.moveLayer(LayerOffset.BOTTOM);
         },
@@ -103,7 +103,7 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() =>
       {
         type: 'divider',
         direction: 'horizontal',
-        display: () => !isPage(node.value) && !props.isMultiSelect,
+        display: () => !isPage(node.value) && !isPageFragment(node.value) && !props.isMultiSelect,
       },
       useDeleteMenu(),
       {

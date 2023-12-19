@@ -2,7 +2,7 @@ import { computed, markRaw, Ref } from 'vue';
 import { CopyDocument, Delete, DocumentCopy } from '@element-plus/icons-vue';
 
 import { Id, MContainer, NodeType } from '@tmagic/schema';
-import { isPage } from '@tmagic/utils';
+import { isPage, isPageFragment } from '@tmagic/utils';
 
 import ContentMenu from '@editor/components/ContentMenu.vue';
 import type { MenuButton, Services } from '@editor/type';
@@ -15,7 +15,7 @@ export const useDeleteMenu = (): MenuButton => ({
   icon: Delete,
   display: (services) => {
     const node = services?.editorService?.get('node');
-    return node?.type !== NodeType.ROOT && !isPage(node);
+    return node?.type !== NodeType.ROOT && !isPage(node) && !isPageFragment(node);
   },
   handler: (services) => {
     const nodes = services?.editorService?.get('nodes');
