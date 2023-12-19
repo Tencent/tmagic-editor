@@ -1,3 +1,29 @@
+## [1.3.7](https://github.com/Tencent/tmagic-editor/compare/v1.3.6...v1.3.7) (2023-12-19)
+
+
+### Bug Fixes
+
+* **form:** table全屏后蒙层在最上一层 ([4ec0b69](https://github.com/Tencent/tmagic-editor/commit/4ec0b69a8dc8168c6e3393094f8366dfe81d7298))
+
+
+### Features
+
+* **core,editor,ui:** 新增页面片 ([7b6dced](https://github.com/Tencent/tmagic-editor/commit/7b6dcedfad07af458d2496b69230fe2920dead70))
+* **data-source:** 支持在指定js环境下不执行init的配置 ([86bdb9f](https://github.com/Tencent/tmagic-editor/commit/86bdb9f0990a9ae1a774729c4aa7f2e92ab70d13))
+* **editor, stage:** 初始化加载runtime loading ([7305f87](https://github.com/Tencent/tmagic-editor/commit/7305f878f341ea8531f4075cb23e27a75590029b))
+* **editor, stage:** 新增禁用多选的props ([2a5b9ec](https://github.com/Tencent/tmagic-editor/commit/2a5b9ec6bd23d3e859b8783102e5366182bf9463))
+* **editor,stage:** 新增标尺配置props ([f212be1](https://github.com/Tencent/tmagic-editor/commit/f212be136e140f1d3b568b22cce01d2801b12157)), closes [#558](https://github.com/Tencent/tmagic-editor/issues/558)
+* **editor:** 右键菜单兼容页面片 ([41a3b8c](https://github.com/Tencent/tmagic-editor/commit/41a3b8c7c7469cf1246689b24084eb0e8b0eb8cf))
+* **editor:** 新增自定义右键菜单函数配置 ([698c345](https://github.com/Tencent/tmagic-editor/commit/698c3451ff85bfdb07310fa001253943c9a7f8e8))
+* **playground:** 完善form editor ([538f96c](https://github.com/Tencent/tmagic-editor/commit/538f96c0825e3d5d3fb26783bb0bac0ddbcbcceb))
+
+
+### Reverts
+
+* Revert "chore: 去掉pnpm的限制" ([04a72da](https://github.com/Tencent/tmagic-editor/commit/04a72da06ce84d00a184a67e4eff907c41b08639))
+
+
+
 ## [1.3.6](https://github.com/Tencent/tmagic-editor/compare/v1.3.5...v1.3.6) (2023-12-12)
 
 
