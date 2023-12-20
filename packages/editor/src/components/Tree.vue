@@ -15,7 +15,7 @@
         </template>
       </TreeNode>
     </template>
-    <div v-else>
+    <div v-else class="m-editor-tree-empty">
       <p>{{ emptyText }}</p>
     </div>
   </div>
