@@ -33,6 +33,23 @@ class DataSource extends BaseService {
     methods: {},
   });
 
+  constructor() {
+    super([
+      { name: 'getFormConfig', isAsync: false },
+      { name: 'setFormConfig', isAsync: false },
+      { name: 'getFormValue', isAsync: false },
+      { name: 'setFormValue', isAsync: false },
+      { name: 'getFormEvent', isAsync: false },
+      { name: 'setFormEvent', isAsync: false },
+      { name: 'getFormMethod', isAsync: false },
+      { name: 'setFormMethod', isAsync: false },
+      { name: 'add', isAsync: false },
+      { name: 'update', isAsync: false },
+      { name: 'remove', isAsync: false },
+      { name: 'createId', isAsync: false },
+    ]);
+  }
+
   public set<K extends StateKey, T extends State[K]>(name: K, value: T) {
     this.state[name] = value;
   }
