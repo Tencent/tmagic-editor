@@ -54,6 +54,7 @@ export interface FrameworkSlots {
   workspace(props: {}): any;
   'props-panel'(props: {}): any;
   'footer'(props: {}): any;
+  'page-bar'(props: {}): any;
   'page-bar-title'(props: { page: MPage | MPageFragment }): any;
   'page-bar-popover'(props: { page: MPage | MPageFragment }): any;
 }

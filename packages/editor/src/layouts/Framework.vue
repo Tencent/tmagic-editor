@@ -36,10 +36,12 @@
           <AddPageBox :disabled-page-fragment="disabledPageFragment"></AddPageBox>
         </slot>
 
-        <PageBar :disabled-page-fragment="disabledPageFragment">
-          <template #page-bar-title="{ page }"><slot name="page-bar-title" :page="page"></slot></template>
-          <template #page-bar-popover="{ page }"><slot name="page-bar-popover" :page="page"></slot></template>
-        </PageBar>
+        <slot name="page-bar">
+          <PageBar :disabled-page-fragment="disabledPageFragment">
+            <template #page-bar-title="{ page }"><slot name="page-bar-title" :page="page"></slot></template>
+            <template #page-bar-popover="{ page }"><slot name="page-bar-popover" :page="page"></slot></template>
+          </PageBar>
+        </slot>
       </template>
 
       <template v-if="page" #right>
