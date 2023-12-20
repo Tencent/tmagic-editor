@@ -22,12 +22,12 @@
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { FullScreen } from '@element-plus/icons-vue';
 import { throttle } from 'lodash-es';
-import * as monaco from 'monaco-editor';
 import serialize from 'serialize-javascript';
 
 import { TMagicButton } from '@tmagic/design';
 
 import { getConfig } from '@editor/utils/config';
+import monaco from '@editor/utils/monaco-editor';
 
 defineOptions({
   name: 'MEditorCodeEditor',
