@@ -325,6 +325,15 @@ const newHandler = async (row?: any) => {
     return;
   }
 
+  if (typeof props.config.beforeAddRow === 'function') {
+    const beforeCheckRes = props.config.beforeAddRow(mForm, {
+      model: props.model[modelName.value],
+      formValue: mForm?.values,
+      prop: props.prop,
+    });
+    if (!beforeCheckRes) return;
+  }
+
   const columns = props.config.items;
   const enumValues = props.config.enum || [];
   let enumV = [];

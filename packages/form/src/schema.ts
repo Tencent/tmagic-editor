@@ -669,6 +669,8 @@ export interface TableConfig extends FormItem {
   fixed?: boolean;
   itemExtra?: string | FilterFunction<string>;
   rowKey?: string;
+  /** table 新增行时前置回调 */
+  beforeAddRow?: (mForm: FormState | undefined, data: any) => boolean;
 }
 
 export interface GroupListConfig extends FormItem {
