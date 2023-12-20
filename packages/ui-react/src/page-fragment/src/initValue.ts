@@ -20,6 +20,6 @@ export default {
   items: [],
   style: {
     width: '375',
-    height: '950',
+    height: '817',
   },
 };

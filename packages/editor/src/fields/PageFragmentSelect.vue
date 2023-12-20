@@ -9,16 +9,20 @@
         :size="size"
         @change="changeHandler"
       ></m-form-container>
+      <!-- 编辑按钮 -->
+      <Icon v-if="model[name]" class="icon" :icon="Edit" @click="editPageFragment(model[name])"></Icon>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { computed, inject } from 'vue';
+import { Edit } from '@element-plus/icons-vue';
 
 import { FieldProps } from '@tmagic/form';
-import { NodeType } from '@tmagic/schema';
+import { Id, NodeType } from '@tmagic/schema';
 
+import Icon from '@editor/components/Icon.vue';
 import type { PageFragmentSelectConfig, Services } from '@editor/type';
 
 defineOptions({
@@ -41,8 +45,8 @@ const selectConfig = {
   options: () => {
     if (pageList.value) {
       return pageList.value.map((item) => ({
-        text: `${item.name}（${item.id}）`,
-        label: `${item.name}（${item.id}）`,
+        text: `${item.devconfig?.tabName || item.title || item.name}（${item.id}）`,
+        label: `${item.devconfig?.tabName || item.title || item.name}（${item.id}）`,
         value: item.id,
       }));
     }
@@ -51,5 +55,9 @@ const selectConfig = {
 };
 const changeHandler = async () => {
   emit('change', props.model[props.name]);
+};
+
+const editPageFragment = (id: Id) => {
+  services?.editorService.select(id);
 };
 </script>

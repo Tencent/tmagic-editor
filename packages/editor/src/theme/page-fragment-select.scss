@@ -1,0 +1,14 @@
+.m-fields-page-fragment-select {
+  width: 100%;
+  .page-fragment-select-container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    .select {
+      flex: 1;
+    }
+    .icon {
+      margin-left: 10px;
+    }
+  }
+}
