@@ -79,7 +79,7 @@ const props = withDefaults(
   },
 );
 
-const emit = defineEmits(['change', 'field-input', 'field-change']);
+const emit = defineEmits(['change', 'error', 'field-input', 'field-change']);
 
 const tMagicForm = ref<InstanceType<typeof TMagicForm>>();
 const initialized = ref(false);
@@ -182,6 +182,8 @@ defineExpose({
       await tMagicForm.value?.validate();
       return native ? values.value : cloneDeep(toRaw(values.value));
     } catch (invalidFields: any) {
+      emit('error', invalidFields);
+
       const error: string[] = [];
 
       Object.entries(invalidFields).forEach(([, ValidateError]) => {
@@ -191,6 +193,7 @@ defineExpose({
           if (!field && message) error.push(`${message}`);
         });
       });
+
       throw new Error(error.join('<br>'));
     }
   },

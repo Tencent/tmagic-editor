@@ -70,6 +70,8 @@
         <PropsPanel
           :extend-state="extendFormState"
           @mounted="(instance: any) => $emit('props-panel-mounted', instance)"
+          @form-error="(e: any) => $emit('props-form-error', e)"
+          @submit-error="(e: any) => $emit('props-submit-error', e)"
         >
           <template #props-panel-header>
             <slot name="props-panel-header"></slot>
@@ -137,6 +139,8 @@ defineOptions({
 const emit = defineEmits<{
   'props-panel-mounted': [instance: InstanceType<typeof PropsPanel>];
   'update:modelValue': [value: MApp | null];
+  'props-form-error': [e: any];
+  'props-submit-error': [e: any];
 }>();
 
 const props = withDefaults(defineProps<EditorProps>(), defaultEditorProps);

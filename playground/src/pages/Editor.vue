@@ -17,6 +17,7 @@
       :moveable-options="moveableOptions"
       :auto-scroll-into-view="true"
       :stage-rect="stageRect"
+      @props-submit-error="propsSubmitErrorHandler"
     >
       <template #workspace-content>
         <DeviceGroup ref="deviceGroup" v-model="stageRect"></DeviceGroup>
@@ -237,6 +238,12 @@ editorService.usePlugin({
 onBeforeUnmount(() => {
   editorService.removeAllPlugins();
 });
+
+const propsSubmitErrorHandler = async (e: any) => {
+  console.error(e);
+  tMagicMessage.closeAll();
+  tMagicMessage.error(e.message);
+};
 </script>
 
 <style lang="scss">

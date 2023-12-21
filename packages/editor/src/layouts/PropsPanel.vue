@@ -10,6 +10,7 @@
       :config="curFormConfig"
       :extend-state="extendState"
       @change="submit"
+      @error="errorHandler"
     ></MForm>
   </div>
 </template>
@@ -17,7 +18,6 @@
 <script lang="ts" setup>
 import { computed, getCurrentInstance, inject, onBeforeUnmount, onMounted, ref, watchEffect } from 'vue';
 
-import { tMagicMessage } from '@tmagic/design';
 import type { FormState, FormValue } from '@tmagic/form';
 import { MForm } from '@tmagic/form';
 
@@ -33,7 +33,7 @@ defineProps<{
   extendState?: (state: FormState) => Record<string, any> | Promise<Record<string, any>>;
 }>();
 
-const emit = defineEmits(['mounted']);
+const emit = defineEmits(['mounted', 'submit-error', 'form-error']);
 
 const internalInstance = getCurrentInstance();
 const values = ref<FormValue>({});
@@ -79,10 +79,12 @@ const submit = async () => {
     const values = await configForm.value?.submitForm();
     services?.editorService.update(values);
   } catch (e: any) {
-    console.error(e);
-    tMagicMessage.closeAll();
-    tMagicMessage.error(e.message);
+    emit('submit-error', e);
   }
+};
+
+const errorHandler = (e: any) => {
+  emit('form-error', e);
 };
 
 defineExpose({ configForm, submit });
