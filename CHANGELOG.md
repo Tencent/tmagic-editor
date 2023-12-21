@@ -1,3 +1,17 @@
+## [1.3.8](https://github.com/Tencent/tmagic-editor/compare/v1.3.7...v1.3.8) (2023-12-21)
+
+
+### Features
+
+* **editor,dep:** watcher新增方法:清除指定类型的依赖 ([d981014](https://github.com/Tencent/tmagic-editor/commit/d981014160625ce4bafad52428862cc070e5c604))
+* **editor,form:** 新增属性配置表单error事件 ([fbe1d88](https://github.com/Tencent/tmagic-editor/commit/fbe1d88d27bcaf53ea606706c2526fa5436e7e78)), closes [#557](https://github.com/Tencent/tmagic-editor/issues/557)
+* **editor,ui:** 页面片下拉选择框支持点击跳转编辑,修改页面片组件initvalue ([2dc810a](https://github.com/Tencent/tmagic-editor/commit/2dc810a9fd15ed9fe730d3d6046ed8addc68da9d))
+* **editor:** data-source-service支持扩展 ([bd8bbc6](https://github.com/Tencent/tmagic-editor/commit/bd8bbc6154c22c59d8c10cb56a2390498cbe41e3))
+* **editor:** 新增page-bar slot ([7c90b93](https://github.com/Tencent/tmagic-editor/commit/7c90b9339dbd262e3023083543d46a45c017aaca))
+* **form:** table 增加 beforeAddRow 钩子函数校验是否可增加行 ([2dcef44](https://github.com/Tencent/tmagic-editor/commit/2dcef449bfe04c7cb38223c1025d1ecb8df0074e))
+
+
+
 ## [1.3.7](https://github.com/Tencent/tmagic-editor/compare/v1.3.6...v1.3.7) (2023-12-19)
 
 
