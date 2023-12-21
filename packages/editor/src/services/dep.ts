@@ -62,6 +62,10 @@ class Dep extends BaseService {
     return this.watcher.clear(nodes);
   }
 
+  public clearByType(type: DepTargetType, nodes?: MNode[]) {
+    return this.watcher.clearByType(type, nodes);
+  }
+
   public hasTarget(id: Id, type: string = DepTargetType.DEFAULT) {
     return this.watcher.hasTarget(id, type);
   }

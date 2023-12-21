@@ -120,7 +120,7 @@ export default class Watcher {
   }
 
   /**
-   * 清除依赖
+   * 清除所有目标的依赖
    * @param nodes 需要清除依赖的节点
    */
   public clear(nodes?: Record<string | number, any>[]) {
@@ -140,6 +140,29 @@ export default class Watcher {
           target.removeDep();
         }
       });
+    });
+  }
+
+  /**
+   * 清除指定类型的依赖
+   * @param type 类型
+   * @param nodes 需要清除依赖的节点
+   */
+  public clearByType(type: DepTargetType, nodes?: Record<string | number, any>[]) {
+    const clearedItemsNodeIds: (string | number)[] = [];
+    const targetList = this.getTargets(type);
+    Object.values(targetList).forEach((target) => {
+      if (nodes) {
+        nodes.forEach((node) => {
+          target.removeDep(node);
+          if (Array.isArray(node.items) && node.items.length && !clearedItemsNodeIds.includes(node.id)) {
+            clearedItemsNodeIds.push(node.id);
+            this.clear(node.items);
+          }
+        });
+      } else {
+        target.removeDep();
+      }
     });
   }
 

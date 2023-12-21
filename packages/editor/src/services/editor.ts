@@ -644,7 +644,7 @@ class Editor extends BaseService {
   public copyWithRelated(config: MNode | MNode[]): void {
     const copyNodes: MNode[] = Array.isArray(config) ? config : [config];
     // 关联的组件也一并复制
-    depService.getTarget(DepTargetType.RELATED_COMP_WHEN_COPY, DepTargetType.RELATED_COMP_WHEN_COPY)?.removeDep();
+    depService.clearByType(DepTargetType.RELATED_COMP_WHEN_COPY);
     depService.collect(copyNodes, true, DepTargetType.RELATED_COMP_WHEN_COPY);
     const customTarget = depService.getTarget(
       DepTargetType.RELATED_COMP_WHEN_COPY,
