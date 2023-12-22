@@ -128,7 +128,7 @@ export default class DragResizeHelper {
       this.moveableHelper.onResize(e);
       const { marginLeft, marginTop } = getMarginValue(this.target);
       this.target.style.left = `${this.frameSnapShot.left + beforeTranslate[0] - marginLeft}px`;
-      this.target.style.top = `${this.frameSnapShot.top + beforeTranslate[1] - marginTop} - marginToppx`;
+      this.target.style.top = `${this.frameSnapShot.top + beforeTranslate[1] - marginTop}px`;
     }
 
     this.target.style.width = `${width}px`;
