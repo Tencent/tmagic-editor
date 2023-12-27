@@ -775,17 +775,23 @@ class Editor extends BaseService {
     const layout = await this.getLayout(parent, node);
     const isRelative = layout === Layout.RELATIVE;
 
-    brothers.splice(index, 1);
-
+    let offsetIndex: number;
     if (offset === LayerOffset.TOP) {
-      brothers.splice(isRelative ? 0 : brothers.length, 0, node);
+      offsetIndex = isRelative ? 0 : brothers.length;
     } else if (offset === LayerOffset.BOTTOM) {
-      brothers.splice(isRelative ? brothers.length : 0, 0, node);
+      offsetIndex = isRelative ? brothers.length : 0;
     } else {
-      brothers.splice(index + (isRelative ? -offset : offset), 0, node);
+      offsetIndex = index + (isRelative ? -offset : offset);
     }
 
+    if ((offsetIndex > 0 && offsetIndex > brothers.length) || offsetIndex < 0) {
+      return;
+    }
+    brothers.splice(index, 1);
+    brothers.splice(offsetIndex, 0, node);
+
     const grandparent = this.getParentById(parent.id);
+
     this.get('stage')?.update({
       config: cloneDeep(toRaw(parent)),
       parentId: grandparent?.id,
@@ -794,6 +800,8 @@ class Editor extends BaseService {
 
     this.addModifiedNodeId(parent.id);
     this.pushHistoryState();
+
+    this.emit('move-layer', offset);
   }
 
   /**
