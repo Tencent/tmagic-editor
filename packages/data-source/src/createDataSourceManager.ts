@@ -21,7 +21,7 @@ import type { AppCore } from '@tmagic/schema';
 import { getDepNodeIds, getNodes, replaceChildNode } from '@tmagic/utils';
 
 import DataSourceManager from './DataSourceManager';
-import { DataSourceManagerData } from './types';
+import type { ChangeEvent, DataSourceManagerData } from './types';
 
 /**
  * 创建数据源管理器
@@ -52,7 +52,7 @@ export const createDataSourceManager = (app: AppCore, useMock?: boolean, initial
   // ssr环境下，数据应该是提前准备好的（放到initialData中），不应该发生变化，无需监听
   // 有initialData不一定是在ssr环境下
   if (app.jsEngine !== 'nodejs') {
-    dataSourceManager.on('change', (sourceId: string) => {
+    dataSourceManager.on('change', (sourceId: string, changeEvent: ChangeEvent) => {
       const dep = dsl.dataSourceDeps?.[sourceId] || {};
       const condDep = dsl.dataSourceCondDeps?.[sourceId] || {};
 
@@ -66,6 +66,7 @@ export const createDataSourceManager = (app: AppCore, useMock?: boolean, initial
           return dataSourceManager.compiledNode(newNode);
         }),
         sourceId,
+        changeEvent,
       );
     });
   }

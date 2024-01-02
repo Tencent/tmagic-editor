@@ -331,6 +331,28 @@ describe('getValueByKeyPath', () => {
     expect(value).toBe(1);
   });
 
+  test('array', () => {
+    const value = util.getValueByKeyPath('a.0.b', {
+      a: [
+        {
+          b: 1,
+        },
+      ],
+    });
+
+    expect(value).toBe(1);
+
+    const value1 = util.getValueByKeyPath('a[0].b', {
+      a: [
+        {
+          b: 1,
+        },
+      ],
+    });
+
+    expect(value1).toBe(1);
+  });
+
   test('error', () => {
     const value = util.getValueByKeyPath('a.b.c.d', {
       a: {},
@@ -475,7 +497,7 @@ describe('replaceChildNode', () => {
     expect(root[1].items[0].items[0].text).toBe('文本');
   });
 
-  test('replace whith parent', () => {
+  test('replace with parent', () => {
     const root = [
       {
         id: 1,
@@ -532,19 +554,21 @@ describe('compiledNode', () => {
       {
         id: 61705611,
         type: 'text',
-        text: '456',
+        text: {
+          value: '456',
+        },
       },
       {
         ds_bebcb2d5: {
           61705611: {
             name: '文本',
-            keys: ['text'],
+            keys: ['text.value'],
           },
         },
       },
     );
 
-    expect(node.text).toBe('123');
+    expect(node.text.value).toBe('123');
   });
 
   test('compile with source id', () => {
@@ -595,61 +619,61 @@ describe('compiledNode', () => {
 
 describe('getDefaultValueFromFields', () => {
   test('最简单', () => {
-    const fileds = [
+    const fields = [
       {
         name: 'name',
       },
     ];
-    const data = util.getDefaultValueFromFields(fileds);
+    const data = util.getDefaultValueFromFields(fields);
     expect(data).toHaveProperty('name');
   });
 
   test('默认值为string', () => {
-    const fileds = [
+    const fields = [
       {
         name: 'name',
         defaultValue: 'name',
       },
     ];
-    const data = util.getDefaultValueFromFields(fileds);
+    const data = util.getDefaultValueFromFields(fields);
     expect(data.name).toBe('name');
   });
 
   test('type 为 object', () => {
-    const fileds: DataSchema[] = [
+    const fields: DataSchema[] = [
       {
         type: 'object',
         name: 'name',
       },
     ];
-    const data = util.getDefaultValueFromFields(fileds);
+    const data = util.getDefaultValueFromFields(fields);
     expect(data.name).toEqual({});
   });
 
   test('type 为 array', () => {
-    const fileds: DataSchema[] = [
+    const fields: DataSchema[] = [
       {
         type: 'array',
         name: 'name',
       },
     ];
-    const data = util.getDefaultValueFromFields(fileds);
+    const data = util.getDefaultValueFromFields(fields);
     expect(data.name).toEqual([]);
   });
 
   test('type 为 null', () => {
-    const fileds: DataSchema[] = [
+    const fields: DataSchema[] = [
       {
         type: 'null',
         name: 'name',
       },
     ];
-    const data = util.getDefaultValueFromFields(fileds);
+    const data = util.getDefaultValueFromFields(fields);
     expect(data.name).toBeNull();
   });
 
   test('object 嵌套', () => {
-    const fileds: DataSchema[] = [
+    const fields: DataSchema[] = [
       {
         type: 'object',
         name: 'name',
@@ -661,7 +685,7 @@ describe('getDefaultValueFromFields', () => {
         ],
       },
     ];
-    const data = util.getDefaultValueFromFields(fileds);
+    const data = util.getDefaultValueFromFields(fields);
     expect(data.name.key).toBe('key');
   });
 });

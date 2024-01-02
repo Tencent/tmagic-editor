@@ -18,6 +18,7 @@
 
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import { cloneDeep, get as objectGet, set as objectSet } from 'lodash-es';
 
 import type { DataSchema, DataSourceDeps, Id, MComponent, MNode } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
@@ -164,22 +165,10 @@ export const guid = (digit = 8): string =>
     return v.toString(16);
   });
 
-export const getValueByKeyPath: any = (keys: string, value: Record<string | number, any> = {}) => {
-  const path = keys.split('.');
-  const pathLength = path.length;
+export const getValueByKeyPath: any = (keys: string, data: Record<string | number, any> = {}) => objectGet(data, keys);
 
-  return path.reduce((accumulator, currentValue: any, currentIndex: number) => {
-    if (Object.prototype.toString.call(accumulator) === '[object Object]' || Array.isArray(accumulator)) {
-      return accumulator[currentValue];
-    }
-
-    if (pathLength - 1 === currentIndex) {
-      return undefined;
-    }
-
-    return {};
-  }, value);
-};
+export const setValueByKeyPath: any = (keys: string, value: any, data: Record<string | number, any> = {}) =>
+  objectSet(data, keys, value);
 
 export const getNodes = (ids: Id[], data: MNode[] = []): MNode[] => {
   const nodes: MNode[] = [];
@@ -266,32 +255,25 @@ export const compiledNode = (
   const keyPrefix = '__magic__';
 
   keys.forEach((key) => {
-    const keyPath = `${key}`.split('.');
-    const keyPathLength = keyPath.length;
-    keyPath.reduce((accumulator, currentValue: any, currentIndex) => {
-      if (keyPathLength - 1 === currentIndex) {
-        const cacheKey = `${keyPrefix}${currentValue}`;
+    const cacheKey = `${keyPrefix}${key}`;
 
-        if (typeof accumulator[cacheKey] === 'undefined') {
-          accumulator[cacheKey] = accumulator[currentValue];
-        }
+    const value = getValueByKeyPath(key, node);
+    let templateValue = getValueByKeyPath(cacheKey, node);
 
-        try {
-          accumulator[currentValue] = compile(accumulator[cacheKey]);
-        } catch (e) {
-          console.error(e);
-          accumulator[currentValue] = '';
-        }
+    if (typeof templateValue === 'undefined') {
+      setValueByKeyPath(cacheKey, value, node);
+      templateValue = value;
+    }
 
-        return accumulator;
-      }
+    let newValue;
+    try {
+      newValue = compile(templateValue);
+    } catch (e) {
+      console.error(e);
+      newValue = '';
+    }
 
-      if (isObject(accumulator) || Array.isArray(accumulator)) {
-        return accumulator[currentValue];
-      }
-
-      return {};
-    }, node);
+    setValueByKeyPath(key, newValue, node);
   });
 
   if (Array.isArray(node.items)) {
@@ -368,7 +350,8 @@ export const getDefaultValueFromFields = (fields: DataSchema[]) => {
         return;
       }
 
-      data[field.name] = field.defaultValue;
+      data[field.name] = cloneDeep(field.defaultValue);
+
       return;
     }
 

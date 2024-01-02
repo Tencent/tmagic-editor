@@ -17,12 +17,12 @@
  */
 
 import { reactive } from 'vue';
-import { cloneDeep, get, mergeWith, set } from 'lodash-es';
+import { cloneDeep, mergeWith } from 'lodash-es';
 
 import { DepTargetType } from '@tmagic/dep';
 import type { FormConfig } from '@tmagic/form';
 import type { Id, MComponent, MNode } from '@tmagic/schema';
-import { guid, toLine } from '@tmagic/utils';
+import { getValueByKeyPath, guid, setValueByKeyPath, toLine } from '@tmagic/utils';
 
 import depService from '@editor/services/dep';
 import editorService from '@editor/services/editor';
@@ -194,17 +194,22 @@ class Props extends BaseService {
   public replaceRelateId(originConfigs: MNode[], targetConfigs: MNode[]) {
     const relateIdMap = this.getRelateIdMap();
     if (Object.keys(relateIdMap).length === 0) return;
+
     const target = depService.getTarget(DepTargetType.RELATED_COMP_WHEN_COPY, DepTargetType.RELATED_COMP_WHEN_COPY);
     if (!target) return;
+
     originConfigs.forEach((config: MNode) => {
       const newId = relateIdMap[config.id];
       const targetConfig = targetConfigs.find((targetConfig) => targetConfig.id === newId);
+
       if (!targetConfig) return;
+
       target.deps[config.id]?.keys?.forEach((fullKey) => {
-        const relateOriginId = get(config, fullKey);
+        const relateOriginId = getValueByKeyPath(fullKey, config);
         const relateTargetId = relateIdMap[relateOriginId];
         if (!relateTargetId) return;
-        set(targetConfig, fullKey, relateTargetId);
+
+        setValueByKeyPath(fullKey, relateTargetId, targetConfig);
       });
     });
   }

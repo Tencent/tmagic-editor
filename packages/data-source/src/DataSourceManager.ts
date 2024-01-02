@@ -24,7 +24,7 @@ import type { AppCore, DataSourceSchema, Id, MNode } from '@tmagic/schema';
 import { compiledCond, compiledNode, DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX, isObject } from '@tmagic/utils';
 
 import { DataSource, HttpDataSource } from './data-sources';
-import type { DataSourceManagerData, DataSourceManagerOptions } from './types';
+import type { ChangeEvent, DataSourceManagerData, DataSourceManagerOptions } from './types';
 
 class DataSourceManager extends EventEmitter {
   private static dataSourceClassMap = new Map<string, typeof DataSource>();
@@ -123,14 +123,14 @@ class DataSourceManager extends EventEmitter {
 
     this.data[ds.id] = ds.data;
 
-    ds.on('change', () => {
-      this.setData(ds);
+    ds.on('change', (changeEvent: ChangeEvent) => {
+      this.setData(ds, changeEvent);
     });
   }
 
-  public setData(ds: DataSource) {
-    Object.assign(this.data[ds.id], ds.data);
-    this.emit('change', ds.id);
+  public setData(ds: DataSource, changeEvent: ChangeEvent) {
+    this.data[ds.id] = ds.data;
+    this.emit('change', ds.id, changeEvent);
   }
 
   public removeDataSource(id: string) {

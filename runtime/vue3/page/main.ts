@@ -41,7 +41,7 @@ Object.entries(components).forEach(([type, component]: [string, any]) => {
 });
 
 Object.entries(datasources).forEach(([type, ds]: [string, any]) => {
-  DataSourceManager.registe(type, ds);
+  DataSourceManager.register(type, ds);
 });
 
 Object.values(plugins).forEach((plugin: any) => {

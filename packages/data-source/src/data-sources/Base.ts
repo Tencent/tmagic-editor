@@ -18,9 +18,9 @@
 import EventEmitter from 'events';
 
 import type { AppCore, CodeBlockContent, DataSchema, DataSourceSchema } from '@tmagic/schema';
-import { getDefaultValueFromFields } from '@tmagic/utils';
+import { getDefaultValueFromFields, setValueByKeyPath } from '@tmagic/utils';
 
-import type { DataSourceOptions } from '@data-source/types';
+import type { ChangeEvent, DataSourceOptions } from '@data-source/types';
 
 /**
  * 静态数据源
@@ -101,10 +101,20 @@ export default class DataSource<T extends DataSourceSchema = DataSourceSchema> e
     this.#methods = methods;
   }
 
-  public setData(data: Record<string, any>) {
-    // todo: 校验数据，看是否符合 schema
-    this.data = data;
-    this.emit('change');
+  public setData(data: any, path?: string) {
+    if (path) {
+      setValueByKeyPath(path, data, this.data);
+    } else {
+      // todo: 校验数据，看是否符合 schema
+      this.data = data;
+    }
+
+    const changeEvent: ChangeEvent = {
+      updateData: data,
+      path,
+    };
+
+    this.emit('change', changeEvent);
   }
 
   public getDefaultData() {

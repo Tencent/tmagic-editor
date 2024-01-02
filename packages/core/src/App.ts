@@ -38,7 +38,7 @@ import {
 
 import Env from './Env';
 import { bindCommonEventListener, isCommonMethod, triggerCommonMethod } from './events';
-import type Node from './Node';
+import Node from './Node';
 import Page from './Page';
 import { fillBackgroundImage, isNumber, style2Obj } from './utils';
 
@@ -265,20 +265,21 @@ class App extends EventEmitter implements AppCore {
     for (const [, value] of this.page.nodes) {
       value.events?.forEach((event) => {
         const eventName = `${event.name}_${value.data.id}`;
-        const eventHanlder = (fromCpt: Node, ...args: any[]) => {
+        const eventHandler = (fromCpt: Node, ...args: any[]) => {
           this.eventHandler(event, fromCpt, args);
         };
-        this.eventList.set(eventHanlder, eventName);
-        this.on(eventName, eventHanlder);
+        this.eventList.set(eventHandler, eventName);
+        this.on(eventName, eventHandler);
       });
     }
   }
 
-  public emit(name: string | symbol, node: any, ...args: any[]): boolean {
-    if (node?.data?.id) {
-      return super.emit(`${String(name)}_${node.data.id}`, node, ...args);
+  public emit(name: string | symbol, ...args: any[]): boolean {
+    const [node, ...otherArgs] = args;
+    if (node instanceof Node && node?.data?.id) {
+      return super.emit(`${String(name)}_${node.data.id}`, node, ...otherArgs);
     }
-    return super.emit(name, node, ...args);
+    return super.emit(name, ...args);
   }
 
   /**

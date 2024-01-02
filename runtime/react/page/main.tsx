@@ -54,7 +54,7 @@ const getLocalConfig = (): MApp[] => {
 window.magicDSL = [];
 
 Object.entries(datasources).forEach(([type, ds]: [string, any]) => {
-  DataSourceManager.registe(type, ds);
+  DataSourceManager.register(type, ds);
 });
 
 const app = new Core({

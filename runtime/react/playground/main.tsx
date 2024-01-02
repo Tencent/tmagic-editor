@@ -59,7 +59,7 @@ window.appInstance = app;
 let curPageId = '';
 
 const updateConfig = (root: MApp) => {
-  app?.setConfig(root,curPageId);
+  app?.setConfig(root, curPageId);
   renderDom();
 };
 

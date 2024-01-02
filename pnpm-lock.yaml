@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 importers:
 
   .:
@@ -711,7 +715,13 @@ importers:
       dayjs:
         specifier: ^1.11.4
         version: 1.11.4
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
     devDependencies:
+      '@types/lodash-es':
+        specifier: ^4.17.4
+        version: 4.17.7
       '@types/node':
         specifier: ^18.19.0
         version: 18.19.3
@@ -11263,7 +11273,3 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false

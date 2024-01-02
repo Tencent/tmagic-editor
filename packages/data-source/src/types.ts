@@ -37,3 +37,8 @@ export interface DataSourceManagerOptions {
 export interface DataSourceManagerData {
   [key: string]: Record<string, any>;
 }
+
+export interface ChangeEvent {
+  path?: string;
+  updateData: any;
+}

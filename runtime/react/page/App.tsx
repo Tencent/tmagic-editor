@@ -20,6 +20,7 @@ import React, { useContext, useState } from 'react';
 import { cloneDeep } from 'lodash-es';
 
 import Core from '@tmagic/core';
+import type { ChangeEvent } from '@tmagic/data-source';
 import type { MNode } from '@tmagic/schema';
 import { AppContent } from '@tmagic/ui-react';
 import { replaceChildNode } from '@tmagic/utils';
@@ -31,11 +32,20 @@ function App() {
 
   const [config, setConfig] = useState(app.page.data);
 
-  app.dataSourceManager?.on('update-data', (nodes: MNode[]) => {
+  app.dataSourceManager?.on('update-data', (nodes: MNode[], sourceId: string, event: ChangeEvent) => {
     nodes.forEach((node) => {
       replaceChildNode(node, [config]);
-      setConfig(cloneDeep(config));
     });
+
+    setConfig(cloneDeep(config));
+
+    setTimeout(() => {
+      app.emit('replaced-node', {
+        ...event,
+        nodes,
+        sourceId,
+      });
+    }, 0);
   });
 
   const MagicUiPage = app.resolveComponent('page');
