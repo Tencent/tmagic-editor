@@ -16,30 +16,35 @@
  * limitations under the License.
  */
 
-import { defineConfig } from 'vite';
+import { defineConfig, type LibraryFormats } from 'vite';
 
 import pkg from './package.json';
 
 const deps = Object.keys(pkg.dependencies);
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   build: {
     cssCodeSplit: false,
     sourcemap: true,
     minify: false,
     target: 'esnext',
+    emptyOutDir: false,
 
     lib: {
       entry: 'src/index.ts',
       name: 'TMagicUtils',
+      formats: ['es', 'umd', 'cjs'].includes(mode) ? [mode as LibraryFormats] : ['es', 'umd'],
       fileName: 'tmagic-utils',
     },
 
     rollupOptions: {
       // 确保外部化处理那些你不想打包进库的依赖
       external(id: string) {
+        if (mode === 'umd' && id === 'lodash-es') {
+          return false;
+        }
         return deps.some((k) => new RegExp(`^${k}`).test(id));
       },
     },
   },
-});
+}));
