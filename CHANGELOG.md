@@ -1,3 +1,20 @@
+## [1.3.9](https://github.com/Tencent/tmagic-editor/compare/v1.3.8...v1.3.9) (2024-01-03)
+
+
+### Bug Fixes
+
+* **editor:** 上下移一层溢出 ([2326962](https://github.com/Tencent/tmagic-editor/commit/23269625e12bb853392f2a140a6a9b4999d57c46)), closes [#563](https://github.com/Tencent/tmagic-editor/issues/563)
+* **stage:** 有margin的组件拖动大小时top偏移 ([3204204](https://github.com/Tencent/tmagic-editor/commit/320420478cce8df6f27e90920abc6fe8a89639dc)), closes [#559](https://github.com/Tencent/tmagic-editor/issues/559)
+* **stage:** 组件添加粗一点的边框后resize操作 选中样式没有和组件本身对齐 ([783f7c3](https://github.com/Tencent/tmagic-editor/commit/783f7c3fc1349182b280c847f666dd88c9bc7760)), closes [#562](https://github.com/Tencent/tmagic-editor/issues/562)
+
+
+### Features
+
+* **data-source,utils,runtime:** 数据源setData支持指定路径 ([d3777b2](https://github.com/Tencent/tmagic-editor/commit/d3777b236d85c091a2ab1e83d7dc3616e72a465e))
+* 代码编辑器支持emmet插件 --story=115432867 ([6b4bfae](https://github.com/Tencent/tmagic-editor/commit/6b4bfae30b9541b7d965fa139f9b1097faaeb921))
+
+
+
 ## [1.3.8](https://github.com/Tencent/tmagic-editor/compare/v1.3.7...v1.3.8) (2023-12-21)
 
 
