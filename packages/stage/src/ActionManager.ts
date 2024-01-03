@@ -429,11 +429,11 @@ export default class ActionManager extends EventEmitter {
       ?.on('update', (data: UpdateEventData) => {
         this.emit('multi-update', data);
       })
-      .on('change-to-select', async (id: Id) => {
+      .on('change-to-select', async (id: Id, e: MouseEvent) => {
         // 如果还在多选状态，不触发切换到单选
         if (this.isMultiSelectStatus) return false;
         const el = this.getTargetElement(id);
-        this.emit('change-to-select', el);
+        this.emit('change-to-select', el, e);
       });
 
     return multiDr;

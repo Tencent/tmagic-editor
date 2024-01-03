@@ -128,7 +128,7 @@ export default class StageMultiDragResize extends MoveableOptionsManager {
         const { inputTarget, targets } = e;
         // 如果有多个元素被选中，同时点击的元素在选中元素中的其中一项，可能是多选态切换为该元素的单选态，抛事件给上一层继续判断是否切换
         if (targets.length > 1 && targets.includes(inputTarget)) {
-          this.emit('change-to-select', inputTarget.id.replace(DRAG_EL_ID_PREFIX, ''));
+          this.emit('change-to-select', inputTarget.id.replace(DRAG_EL_ID_PREFIX, ''), e.inputEvent);
         }
       });
   }

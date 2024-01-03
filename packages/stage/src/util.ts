@@ -57,7 +57,7 @@ export const getOffset = (el: Element): Offset => {
 // 将蒙层占位节点覆盖在原节点上方
 export const getTargetElStyle = (el: TargetElement, zIndex?: ZIndex) => {
   const offset = getOffset(el);
-  const { transform } = getComputedStyle(el);
+  const { transform, border } = getComputedStyle(el);
   return `
     position: absolute;
     transform: ${transform};
@@ -65,6 +65,7 @@ export const getTargetElStyle = (el: TargetElement, zIndex?: ZIndex) => {
     top: ${offset.top}px;
     width: ${el.clientWidth}px;
     height: ${el.clientHeight}px;
+    border: ${border};
     ${typeof zIndex !== 'undefined' ? `z-index: ${zIndex};` : ''}
   `;
 };
@@ -258,5 +259,24 @@ export const getMarginValue = (el: Element) => {
   return {
     marginLeft: marginLeftValue,
     marginTop: marginTopValue,
+  };
+};
+
+export const getBorderWidth = (el: Element) => {
+  if (!el)
+    return {
+      borderLeftWidth: 0,
+      borderRightWidth: 0,
+      borderTopWidth: 0,
+      borderBottomWidth: 0,
+    };
+
+  const { borderLeftWidth, borderRightWidth, borderTopWidth, borderBottomWidth } = getComputedStyle(el);
+
+  return {
+    borderLeftWidth: parseFloat(borderLeftWidth) || 0,
+    borderRightWidth: parseFloat(borderRightWidth) || 0,
+    borderTopWidth: parseFloat(borderTopWidth) || 0,
+    borderBottomWidth: parseFloat(borderBottomWidth) || 0,
   };
 };

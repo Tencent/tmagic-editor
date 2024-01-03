@@ -357,10 +357,10 @@ export default class StageCore extends EventEmitter {
   private initMulDrEvent(): void {
     this.actionManager
       // 多选切换到单选
-      .on('change-to-select', (el: HTMLElement) => {
+      .on('change-to-select', (el: HTMLElement, e: MouseEvent) => {
         this.select(el);
         // 先保证画布内完成渲染，再通知外部更新
-        setTimeout(() => this.emit('select', el));
+        setTimeout(() => this.emit('select', el, e));
       })
       .on('multi-update', (data: UpdateEventData) => {
         this.emit('update', data);

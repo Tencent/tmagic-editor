@@ -35,7 +35,7 @@ import MoveableHelper from 'moveable-helper';
 import { DRAG_EL_ID_PREFIX, GHOST_EL_ID_PREFIX, Mode, ZIndex } from './const';
 import TargetShadow from './TargetShadow';
 import { DragResizeHelperConfig, Rect, TargetElement } from './types';
-import { calcValueByFontsize, getAbsolutePosition, getMarginValue, getOffset } from './util';
+import { calcValueByFontsize, getAbsolutePosition, getBorderWidth, getMarginValue, getOffset } from './util';
 
 /**
  * 拖拽/改变大小等操作发生时，moveable会抛出各种状态事件，DragResizeHelper负责响应这些事件，对目标节点target和拖拽节点targetShadow进行修改；
@@ -131,8 +131,10 @@ export default class DragResizeHelper {
       this.target.style.top = `${this.frameSnapShot.top + beforeTranslate[1] - marginTop}px`;
     }
 
-    this.target.style.width = `${width}px`;
-    this.target.style.height = `${height}px`;
+    const { borderLeftWidth, borderRightWidth, borderTopWidth, borderBottomWidth } = getBorderWidth(this.target);
+
+    this.target.style.width = `${width + borderLeftWidth + borderRightWidth}px`;
+    this.target.style.height = `${height + borderTopWidth + borderBottomWidth}px`;
   }
 
   public onDragStart(e: OnDragStart): void {
@@ -294,8 +296,11 @@ export default class DragResizeHelper {
 
     let left = calcValueByFontsize(doc, offset.left) - marginLeft;
     let top = calcValueByFontsize(doc, offset.top) - marginTop;
-    const width = calcValueByFontsize(doc, el.clientWidth);
-    const height = calcValueByFontsize(doc, el.clientHeight);
+
+    const { borderLeftWidth, borderRightWidth, borderTopWidth, borderBottomWidth } = getBorderWidth(el);
+
+    const width = calcValueByFontsize(doc, el.clientWidth + borderLeftWidth + borderRightWidth);
+    const height = calcValueByFontsize(doc, el.clientHeight + borderTopWidth + borderBottomWidth);
 
     let shadowEl = this.getShadowEl();
     const shadowEls = this.getShadowEls();
