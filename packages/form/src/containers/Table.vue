@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="m-fields-table-wrap">
     <teleport to="body" :disabled="!isFullscreen">
       <div ref="mTable" class="m-fields-table" :class="{ 'm-fields-table-item-extra': config.itemExtra }">
         <span v-if="config.extra" style="color: rgba(0, 0, 0, 0.45)" v-html="config.extra"></span>
