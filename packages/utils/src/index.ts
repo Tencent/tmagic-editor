@@ -300,7 +300,7 @@ export const compiledCond = (op: string, fieldValue: any, value: any, range: num
     case '<':
       return fieldValue < value;
     case '<=':
-      return fieldValue >= value;
+      return fieldValue <= value;
     case 'between':
       return range.length > 1 && fieldValue >= range[0] && fieldValue <= range[1];
     case 'not_between':
