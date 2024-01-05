@@ -1,32 +1,44 @@
 <template>
-  <TMagicInput
-    v-model="model[name]"
-    clearable
-    :size="size"
-    :placeholder="config.placeholder"
-    :disabled="disabled"
-    @change="changeHandler"
-    @input="inputHandler"
-    @keyup="keyUpHandler($event)"
-  >
-    <template #append v-if="config.append">
-      <span v-if="typeof config.append === 'string'">{{ config.append }}</span>
-      <TMagicButton
-        v-if="typeof config.append === 'object' && config.append.type === 'button'"
-        style="color: #409eff"
+  <TMagicPopover :visible="popoverVisible" width="220px">
+    <template #reference>
+      <TMagicInput
+        v-model="model[name]"
+        clearable
         :size="size"
-        @click.prevent="buttonClickHandler"
+        :placeholder="config.placeholder"
+        :disabled="disabled"
+        @change="changeHandler"
+        @input="inputHandler"
+        @keyup="keyUpHandler($event)"
       >
-        {{ config.append.text }}
-      </TMagicButton>
+        <template #append v-if="config.append">
+          <span v-if="typeof config.append === 'string'">{{ config.append }}</span>
+          <TMagicButton
+            v-if="typeof config.append === 'object' && config.append.type === 'button'"
+            style="color: #409eff"
+            :size="size"
+            @click.prevent="buttonClickHandler"
+          >
+            {{ config.append.text }}
+          </TMagicButton>
+        </template>
+      </TMagicInput>
     </template>
-  </TMagicInput>
+
+    <div class="m-form-item__content">
+      <div class="m-form-validate__warning">输入内容前后有空格，是否移除空格？</div>
+      <div style="display: flex; justify-content: flex-end">
+        <TMagicButton type="text" size="small" @click="popoverVisible = false">保持原样</TMagicButton>
+        <TMagicButton type="primary" size="small" @click="confirmTrimHandler">移除空格</TMagicButton>
+      </div>
+    </div>
+  </TMagicPopover>
 </template>
 
 <script lang="ts" setup>
-import { inject } from 'vue';
+import { inject, ref } from 'vue';
 
-import { TMagicButton, TMagicInput } from '@tmagic/design';
+import { TMagicButton, TMagicInput, TMagicPopover } from '@tmagic/design';
 import { isNumber } from '@tmagic/utils';
 
 import type { FieldProps, FormState, TextConfig } from '../schema';
@@ -47,11 +59,25 @@ useAddField(props.prop);
 
 const mForm = inject<FormState | undefined>('mForm');
 
+const popoverVisible = ref(false);
+
+const confirmTrimHandler = () => {
+  emit('change', props.model[props.name].trim() || '');
+  popoverVisible.value = false;
+};
+
+const checkWhiteSpace = (value: unknown) => {
+  if (typeof value === 'string' && !props.config.trim) {
+    popoverVisible.value = value.trim() !== value;
+  }
+};
+
 const changeHandler = (value: string) => {
   emit('change', value);
 };
 
 const inputHandler = (v: string) => {
+  checkWhiteSpace(v);
   emit('input', v);
   mForm?.$emit('field-input', props.prop, v);
 };
@@ -124,3 +150,11 @@ const keyUpHandler = ($event: KeyboardEvent) => {
   emit('change', props.model[props.name]);
 };
 </script>
+<style lang="scss" scoped>
+.m-form-validate__warning {
+  color: var(--el-color-warning);
+  font-size: 12px;
+  width: 100%;
+  line-height: 1.4;
+}
+</style>
