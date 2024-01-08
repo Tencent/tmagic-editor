@@ -12,11 +12,11 @@
 
     <template v-else-if="data.type === 'button'">
       <TMagicTooltip v-if="data.tooltip" effect="dark" placement="bottom-start" :content="data.tooltip">
-        <TMagicButton size="small" text :disabled="disabled"
+        <TMagicButton size="small" link :disabled="disabled"
           ><MIcon v-if="data.icon" :icon="data.icon"></MIcon><span>{{ data.text }}</span></TMagicButton
         >
       </TMagicTooltip>
-      <TMagicButton v-else size="small" text :disabled="disabled" :title="data.text"
+      <TMagicButton v-else size="small" link :disabled="disabled" :title="data.text"
         ><MIcon v-if="data.icon" :icon="data.icon"></MIcon><span>{{ data.text }}</span></TMagicButton
       >
     </template>

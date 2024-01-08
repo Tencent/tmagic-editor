@@ -6,7 +6,7 @@
           <span>{{ title }}</span>
         </slot>
         <div>
-          <TMagicButton text size="small" :icon="Close" @click="closeHandler"></TMagicButton>
+          <TMagicButton link size="small" :icon="Close" @click="closeHandler"></TMagicButton>
         </div>
       </div>
       <div class="m-editor-float-box-body">

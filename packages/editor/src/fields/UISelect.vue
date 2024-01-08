@@ -1,6 +1,6 @@
 <template>
   <div class="m-fields-ui-select" v-if="uiSelectMode" @click="cancelHandler">
-    <TMagicButton type="danger" :icon="Delete" :disabled="disabled" :size="size" text style="padding: 0"
+    <TMagicButton type="danger" :icon="Delete" :disabled="disabled" :size="size" link style="padding: 0"
       >取消</TMagicButton
     >
   </div>
@@ -13,14 +13,14 @@
           :icon="Close"
           :disabled="disabled"
           :size="size"
-          text
+          link
           @click.stop="deleteHandler"
         ></TMagicButton>
       </TMagicTooltip>
 
       <TMagicTooltip content="点击选中组件" placement="top">
         <TMagicButton
-          text
+          link
           style="padding: 0; margin: 0"
           :disabled="disabled"
           :size="size"
@@ -33,7 +33,7 @@
     </template>
 
     <TMagicTooltip v-else content="点击此处选择" placement="top">
-      <TMagicButton text style="padding: 0; margin: 0" :disabled="disabled" :size="size" @click="startSelect"
+      <TMagicButton link style="padding: 0; margin: 0" :disabled="disabled" :size="size" @click="startSelect"
         >点击此处选择</TMagicButton
       >
     </TMagicTooltip>

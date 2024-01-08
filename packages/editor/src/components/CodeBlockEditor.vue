@@ -18,7 +18,7 @@
     @closed="closedHandler"
   >
     <template #left>
-      <TMagicButton type="primary" text @click="difVisible = true">查看修改</TMagicButton>
+      <TMagicButton type="primary" link @click="difVisible = true">查看修改</TMagicButton>
     </template>
   </component>
 

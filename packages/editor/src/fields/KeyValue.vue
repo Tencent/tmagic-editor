@@ -51,7 +51,7 @@
       v-if="config.advanced"
       size="default"
       :disabled="disabled"
-      text
+      link
       :icon="CodeIcon"
       @click="showCode = !showCode"
     ></TMagicButton>

@@ -126,7 +126,7 @@ const adapter: any = {
         theme: props.type,
         size: props.size === 'default' ? 'medium' : props.size,
         icon: () => (props.icon ? h(props.icon) : null),
-        variant: props.text ? 'text' : 'base',
+        variant: props.link || props.text ? 'text' : 'base',
       }),
     },
 

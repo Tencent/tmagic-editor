@@ -14,7 +14,7 @@
           :data="(config.prop && scope.row[config.prop]) || []"
         ></MTable>
         <template #reference>
-          <TMagicButton text type="primary"> {{ config.text || formatter(config, scope.row) }}</TMagicButton>
+          <TMagicButton link type="primary"> {{ config.text || formatter(config, scope.row) }}</TMagicButton>
         </template>
       </TMagicPopover>
     </template>

@@ -36,7 +36,7 @@
           ></m-form-container>
           <TMagicButton
             style="color: #f56c6c"
-            text
+            link
             :icon="Delete"
             :disabled="disabled"
             :size="size"

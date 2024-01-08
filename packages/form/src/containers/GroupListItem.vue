@@ -1,24 +1,24 @@
 <template>
   <div class="m-fields-group-list-item">
     <div>
-      <TMagicButton text :disabled="disabled" :icon="expand ? CaretBottom : CaretRight" @click="expandHandler">{{
+      <TMagicButton link :disabled="disabled" :icon="expand ? CaretBottom : CaretRight" @click="expandHandler">{{
         title
       }}</TMagicButton>
 
       <TMagicButton
         v-show="showDelete(parseInt(String(index)))"
         style="color: #f56c6c"
-        text
+        link
         :icon="Delete"
         :disabled="disabled"
         @click="removeHandler"
       ></TMagicButton>
 
       <template v-if="movable()">
-        <TMagicButton v-show="index !== 0" text :disabled="disabled" size="small" @click="changeOrder(-1)"
+        <TMagicButton v-show="index !== 0" link :disabled="disabled" size="small" @click="changeOrder(-1)"
           >上移<TMagicIcon><CaretTop /></TMagicIcon
         ></TMagicButton>
-        <TMagicButton v-show="index !== length - 1" :disabled="disabled" text size="small" @click="changeOrder(1)"
+        <TMagicButton v-show="index !== length - 1" :disabled="disabled" link size="small" @click="changeOrder(1)"
           >下移<TMagicIcon><CaretBottom /></TMagicIcon
         ></TMagicButton>
       </template>

@@ -6,7 +6,7 @@
   >
     <template #header>
       <div style="width: 100%; display: flex; align-items: center">
-        <TMagicButton style="padding: 0" text :icon="expand ? CaretBottom : CaretRight" @click="expand = !expand">
+        <TMagicButton style="padding: 0" link :icon="expand ? CaretBottom : CaretRight" @click="expand = !expand">
         </TMagicButton>
         <span v-if="config && config.extra" v-html="config.extra" class="m-form-tip"></span>
         <slot name="header">{{ filter(config.title) }}</slot>

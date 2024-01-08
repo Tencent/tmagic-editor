@@ -11,7 +11,7 @@
         <TMagicButton
           v-show="display(action.display, scope.row) && !editState[scope.$index]"
           class="action-btn"
-          text
+          link
           size="small"
           :type="action.buttonType || 'primary'"
           :icon="action.icon"
@@ -22,7 +22,7 @@
       <TMagicButton
         class="action-btn"
         v-show="editState[scope.$index]"
-        text
+        link
         type="primary"
         size="small"
         @click="save(scope.$index, config)"
@@ -31,7 +31,7 @@
       <TMagicButton
         class="action-btn"
         v-show="editState[scope.$index]"
-        text
+        link
         type="primary"
         size="small"
         @click="editState[scope.$index] = undefined"

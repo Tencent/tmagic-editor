@@ -54,7 +54,7 @@
                     type="primary"
                     :icon="ArrowUp"
                     :disabled="disabled"
-                    text
+                    link
                     @click="upHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
                     @dblclick="topHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
                   ></TMagicButton>
@@ -70,7 +70,7 @@
                     type="primary"
                     :icon="ArrowDown"
                     :disabled="disabled"
-                    text
+                    link
                     @click="downHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
                     @dblclick="bottomHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
                   ></TMagicButton>

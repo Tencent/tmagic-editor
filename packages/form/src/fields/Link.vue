@@ -2,7 +2,7 @@
   <a v-if="config.href && !disabled" target="_blank" :href="href" :style="config.css || {}">{{ displayText }}</a>
   <span v-else-if="config.href && disabled" :style="config.disabledCss || {}">{{ displayText }}</span>
   <div v-else class="m-fields-link">
-    <TMagicButton :text="true" type="primary" @click="editHandler">点击编辑</TMagicButton>
+    <TMagicButton link type="primary" @click="editHandler">点击编辑</TMagicButton>
     <FormDialog
       ref="editor"
       :title="config.formTitle || '编辑扩展配置'"

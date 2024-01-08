@@ -20,7 +20,7 @@
 
       <TMagicButton
         v-else-if="config.action === 'actionLink' && config.prop"
-        text
+        link
         type="primary"
         @click="config.handler?.(scope.row)"
       >
@@ -43,7 +43,7 @@
         <template #content>
           <div>{{ formatter(config, scope.row) }}</div>
         </template>
-        <TMagicButton text type="primary">{{ config.buttonText || '扩展配置' }}</TMagicButton>
+        <TMagicButton link type="primary">{{ config.buttonText || '扩展配置' }}</TMagicButton>
       </el-tooltip>
 
       <TMagicTag

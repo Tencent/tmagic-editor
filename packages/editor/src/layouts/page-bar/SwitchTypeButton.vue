@@ -4,7 +4,7 @@
     class="m-editor-page-bar-switch-type-button"
     size="small"
     :key="item.type"
-    text
+    link
     :class="{ active: modelValue === item.type }"
     :type="modelValue === item.type ? 'primary' : ''"
     @click="clickHandler(item.type)"

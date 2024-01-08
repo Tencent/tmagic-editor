@@ -27,6 +27,7 @@ export interface BadgeProps {
 export interface ButtonProps {
   type?: string;
   size?: FieldSize;
+  link?: boolean;
   text?: boolean;
   icon?: any;
 }

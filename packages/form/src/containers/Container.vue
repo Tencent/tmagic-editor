@@ -212,7 +212,7 @@
     </template>
 
     <div style="text-align: center" v-if="config.expand && type !== 'fieldset'">
-      <TMagicButton type="primary" size="small" :disabled="false" text @click="expandHandler">{{
+      <TMagicButton type="primary" size="small" :disabled="false" link @click="expandHandler">{{
         expand ? '收起配置' : '展开更多配置'
       }}</TMagicButton>
     </div>

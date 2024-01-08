@@ -5,7 +5,7 @@
       class="menu-item button"
       :key="index"
       size="small"
-      text
+      link
       @click="item.handler"
     >
       <TMagicIcon><component :is="item.icon"></component></TMagicIcon><span>{{ item.text }}</span>
