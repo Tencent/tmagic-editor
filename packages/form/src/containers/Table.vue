@@ -202,6 +202,7 @@ import {
   TMagicTableColumn,
   TMagicTooltip,
   TMagicUpload,
+  useZIndex,
 } from '@tmagic/design';
 import { asyncLoadJs, sleep } from '@tmagic/utils';
 
@@ -245,6 +246,8 @@ const emit = defineEmits(['change', 'select', 'addDiffCount']);
 
 let timer: any | null = null;
 const mForm = inject<FormState | undefined>('mForm');
+
+const { nextZIndex } = useZIndex();
 
 const tMagicTable = ref<InstanceType<typeof TMagicTable>>();
 const excelBtn = ref<InstanceType<typeof TMagicUpload>>();
@@ -620,11 +623,14 @@ const toggleMode = () => {
 };
 
 const toggleFullscreen = () => {
+  if (!mTable.value) return;
+
   if (isFullscreen.value) {
-    mTable.value?.classList.remove('fixed');
+    mTable.value.classList.remove('fixed');
     isFullscreen.value = false;
   } else {
-    mTable.value?.classList.add('fixed');
+    mTable.value.classList.add('fixed');
+    mTable.value.style.zIndex = `${nextZIndex()}`;
     isFullscreen.value = true;
   }
 };
