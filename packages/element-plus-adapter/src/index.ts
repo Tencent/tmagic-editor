@@ -46,6 +46,7 @@ import {
   ElTooltip,
   ElTree,
   ElUpload,
+  useZIndex,
 } from 'element-plus';
 
 import type {
@@ -94,6 +95,7 @@ import type {
 } from '@tmagic/design';
 
 const adapter: PluginOptions = {
+  useZIndex,
   message: ElMessage,
   messageBox: ElMessageBox,
   components: {

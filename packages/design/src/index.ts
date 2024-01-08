@@ -1,4 +1,5 @@
-import { App } from 'vue';
+import type { App, Ref } from 'vue';
+import { computed, ref, unref } from 'vue';
 
 import { setConfig } from './config';
 import { PluginOptions, TMagicMessage, TMagicMessageBox } from './types';
@@ -81,6 +82,30 @@ export const tMagicMessageBox = {
   },
 } as unknown as TMagicMessageBox;
 
+const zIndex = ref(0);
+export const DEFAULT_INITIAL_Z_INDEX = 2000;
+
+// eslint-disable-next-line import/no-mutable-exports
+export let useZIndex = (zIndexOverrides?: Ref<number>) => {
+  const zIndexInjection = zIndexOverrides;
+  const initialZIndex = computed(() => {
+    const zIndexFromInjection = unref(zIndexInjection);
+    return zIndexFromInjection ?? DEFAULT_INITIAL_Z_INDEX;
+  });
+  const currentZIndex = computed(() => initialZIndex.value + zIndex.value);
+
+  const nextZIndex = () => {
+    zIndex.value += 1;
+    return currentZIndex.value;
+  };
+
+  return {
+    initialZIndex,
+    currentZIndex,
+    nextZIndex,
+  };
+};
+
 export default {
   install(app: App, options: PluginOptions) {
     if (options.message) {
@@ -100,6 +125,10 @@ export default {
 
     if (options.loading) {
       app.directive('loading', options.loading);
+    }
+
+    if (options.useZIndex) {
+      useZIndex = options.useZIndex;
     }
 
     app.config.globalProperties.$MAGIC_DESIGN = options;

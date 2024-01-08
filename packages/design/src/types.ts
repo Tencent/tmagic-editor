@@ -1,4 +1,4 @@
-import { DefineComponent, Directive } from 'vue';
+import { ComputedRef, DefineComponent, Directive, Ref } from 'vue';
 
 export type FieldSize = 'large' | 'default' | 'small';
 
@@ -704,5 +704,10 @@ export interface PluginOptions {
   messageBox?: TMagicMessageBox;
   components?: Components;
   loading?: Directive<ElementLoading, LoadingBinding>;
+  useZIndex?: (zIndexOverrides?: Ref<number>) => {
+    initialZIndex: ComputedRef<number>;
+    currentZIndex: ComputedRef<number>;
+    nextZIndex: () => number;
+  };
   [key: string]: any;
 }
