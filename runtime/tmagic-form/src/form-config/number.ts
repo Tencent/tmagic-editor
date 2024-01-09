@@ -1,6 +1,6 @@
-import type { FormConfig } from '@tmagic/form';
+import { createForm } from '@tmagic/form';
 
-export default [
+export default createForm([
   {
     type: 'number',
     name: 'min',
@@ -20,4 +20,4 @@ export default [
     name: 'placeholder',
     text: 'placeholder',
   },
-] as FormConfig;
+]);

@@ -1,6 +1,6 @@
-import type { FormConfig } from '@tmagic/form';
+import { createForm } from '@tmagic/form';
 
-export default [
+export default createForm([
   {
     name: 'placeholder',
     text: 'placeholder',
@@ -10,7 +10,14 @@ export default [
     legend: '后置按钮',
     type: 'fieldset',
     labelWidth: '80px',
+    checkbox: true,
+    expand: true,
     items: [
+      {
+        name: 'type',
+        type: 'hidden',
+        defaultValue: 'button',
+      },
       {
         name: 'text',
         text: '按钮文案',
@@ -23,4 +30,4 @@ export default [
       },
     ],
   },
-] as FormConfig;
+]);

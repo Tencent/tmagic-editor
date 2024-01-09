@@ -1,6 +1,6 @@
-import type { FormConfig } from '@tmagic/form';
+import { createForm } from '@tmagic/form';
 
-export default [
+export default createForm([
   {
     name: 'id',
     type: 'hidden',
@@ -24,4 +24,10 @@ export default [
     text: '标签宽度',
     extra: '表单域标签的的宽度，例如 "50px"。支持 auto。',
   },
-] as FormConfig;
+  {
+    name: 'disabled',
+    text: '是否禁用',
+    type: 'switch',
+    defaultValue: false,
+  },
+]);
