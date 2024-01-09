@@ -20,7 +20,7 @@ import { describe, expect, test } from 'vitest';
 
 import { FormConfig } from '@tmagic/form';
 
-import createForm from '../../../src/utils/createForm';
+import { createForm } from '../../../src';
 
 describe('createForm', () => {
   test('正常创建', () => {

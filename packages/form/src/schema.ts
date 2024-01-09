@@ -320,8 +320,9 @@ export interface TextConfig extends FormItem, Input {
     | string
     | {
         text: string;
+        value?: 0 | 1;
         type: 'button';
-        handler: (
+        handler?: (
           mForm: FormState | undefined,
           data: {
             model: any;

@@ -11,15 +11,14 @@
         @input="inputHandler"
         @keyup="keyUpHandler($event)"
       >
-        <template #append v-if="config.append">
-          <span v-if="typeof config.append === 'string'">{{ config.append }}</span>
+        <template #append v-if="appendConfig">
           <TMagicButton
-            v-if="typeof config.append === 'object' && config.append.type === 'button'"
+            v-if="appendConfig.type === 'button'"
             style="color: #409eff"
             :size="size"
             @click.prevent="buttonClickHandler"
           >
-            {{ config.append.text }}
+            {{ appendConfig.text }}
           </TMagicButton>
         </template>
       </TMagicInput>
@@ -36,7 +35,7 @@
 </template>
 
 <script lang="ts" setup>
-import { inject, ref } from 'vue';
+import { computed, inject, ref } from 'vue';
 
 import { TMagicButton, TMagicInput, TMagicPopover } from '@tmagic/design';
 import { isNumber } from '@tmagic/utils';
@@ -58,6 +57,26 @@ const emit = defineEmits<{
 useAddField(props.prop);
 
 const mForm = inject<FormState | undefined>('mForm');
+
+const appendConfig = computed(() => {
+  if (typeof props.config.append === 'string') {
+    return {
+      text: props.config.append,
+      type: 'button',
+      handler: undefined,
+    };
+  }
+
+  if (props.config.append && typeof props.config.append === 'object') {
+    if (props.config.append.value === 0) {
+      return false;
+    }
+
+    return props.config.append;
+  }
+
+  return false;
+});
 
 const popoverVisible = ref(false);
 
@@ -83,10 +102,9 @@ const inputHandler = (v: string) => {
 };
 
 const buttonClickHandler = () => {
-  if (typeof props.config.append === 'string') return;
-
-  if (props.config.append?.handler) {
-    props.config.append.handler(mForm, {
+  if (!appendConfig.value) return;
+  if (typeof appendConfig.value.handler === 'function') {
+    appendConfig.value.handler(mForm, {
       model: props.model,
       values: mForm?.values,
     });
@@ -150,11 +168,3 @@ const keyUpHandler = ($event: KeyboardEvent) => {
   emit('change', props.model[props.name]);
 };
 </script>
-<style lang="scss" scoped>
-.m-form-validate__warning {
-  color: var(--el-color-warning);
-  font-size: 12px;
-  width: 100%;
-  line-height: 1.4;
-}
-</style>

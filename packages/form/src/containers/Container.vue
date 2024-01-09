@@ -312,6 +312,7 @@ const type = computed((): string => {
     });
   }
   if (type === 'form') return '';
+  if (type === 'container') return '';
   return type?.replace(/([A-Z])/g, '-$1').toLowerCase() || (items.value ? '' : 'text');
 });
 

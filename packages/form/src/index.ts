@@ -49,6 +49,7 @@ import Timerange from './fields/Timerange.vue';
 import { setConfig } from './utils/config';
 import Form from './Form.vue';
 import FormDialog from './FormDialog.vue';
+import type { FormConfig } from './schema';
 
 import './theme/index.scss';
 
@@ -87,6 +88,10 @@ export { default as MLink } from './fields/Link.vue';
 export { default as MSelect } from './fields/Select.vue';
 export { default as MCascader } from './fields/Cascader.vue';
 export { default as MDynamicField } from './fields/DynamicField.vue';
+
+export const createForm = function (config: FormConfig) {
+  return config;
+};
 
 export interface InstallOptions {
   [key: string]: any;
