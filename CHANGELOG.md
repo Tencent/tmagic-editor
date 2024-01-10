@@ -1,3 +1,21 @@
+## [1.3.10](https://github.com/Tencent/tmagic-editor/compare/v1.3.9...v1.3.10) (2024-01-10)
+
+
+### Bug Fixes
+
+* **form:** table全屏后zindex问题 ([aa601f8](https://github.com/Tencent/tmagic-editor/commit/aa601f8703acc097b072d7b2c20e6ab0eb7010ab))
+* **runtime:** 更新Vue3 cdn链接 ([84cbc74](https://github.com/Tencent/tmagic-editor/commit/84cbc745c7a11d0220c6f2a8b415426a1167df59))
+* **utils:** <=条件编译出错 ([acab44a](https://github.com/Tencent/tmagic-editor/commit/acab44aaa4c80f7f046f738d63791e7a1dfd055d))
+
+
+### Features
+
+* **design,element-plus-adapter:** 新增获取浮层zIndex的方法 ([81e3d0a](https://github.com/Tencent/tmagic-editor/commit/81e3d0a18eac05b29838d39ee237000d2120f49d))
+* 新增tmagic-form-runtime ([f8443ed](https://github.com/Tencent/tmagic-editor/commit/f8443ed3161020ffb25aee326b24bf8eda57582e))
+* 输入文本含有空格时,弹窗提示 ([ab5e31d](https://github.com/Tencent/tmagic-editor/commit/ab5e31dfea348bb970c87b5f41ca378e22dfb7f2))
+
+
+
 ## [1.3.9](https://github.com/Tencent/tmagic-editor/compare/v1.3.8...v1.3.9) (2024-01-03)
 
 
