@@ -210,8 +210,8 @@ const dropHandler = async (e: DragEvent) => {
 
       if (parentEl && doc) {
         const { left: parentLeft, top: parentTop } = getOffset(parentEl);
-        left = left - calcValueByFontsize(doc, parentLeft);
-        top = top - calcValueByFontsize(doc, parentTop);
+        left = left - calcValueByFontsize(doc, parentLeft) * zoom.value;
+        top = top - calcValueByFontsize(doc, parentTop) * zoom.value;
       }
     }
 
