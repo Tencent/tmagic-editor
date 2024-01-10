@@ -27,7 +27,7 @@
     <div class="m-form-item__content">
       <div class="m-form-validate__warning">输入内容前后有空格，是否移除空格？</div>
       <div style="display: flex; justify-content: flex-end">
-        <TMagicButton type="text" size="small" @click="popoverVisible = false">保持原样</TMagicButton>
+        <TMagicButton link size="small" @click="popoverVisible = false">保持原样</TMagicButton>
         <TMagicButton type="primary" size="small" @click="confirmTrimHandler">移除空格</TMagicButton>
       </div>
     </div>
