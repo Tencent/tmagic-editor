@@ -1,3 +1,17 @@
+## [1.3.11](https://github.com/Tencent/tmagic-editor/compare/v1.3.10...v1.3.11) (2024-01-12)
+
+
+### Bug Fixes
+
+* **editor:** 拖动组件进画布后，父容器位置计算有误 ([#565](https://github.com/Tencent/tmagic-editor/issues/565)) ([115123a](https://github.com/Tencent/tmagic-editor/commit/115123a0bcd1d63f53eeb23361547e1985241b67))
+
+
+### Features
+
+* **editor,stage:** 双击画布可以已弹层方向显示并显示完整的组件 ([e4af8ca](https://github.com/Tencent/tmagic-editor/commit/e4af8cadb04f23669c0762993052b13a5422afac))
+
+
+
 ## [1.3.10](https://github.com/Tencent/tmagic-editor/compare/v1.3.9...v1.3.10) (2024-01-10)
 
 
