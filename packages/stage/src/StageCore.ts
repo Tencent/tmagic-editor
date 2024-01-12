@@ -46,8 +46,8 @@ export default class StageCore extends EventEmitter {
   public container?: HTMLDivElement;
   public renderer: StageRender;
   public mask: StageMask;
+  public actionManager: ActionManager;
 
-  private actionManager: ActionManager;
   private pageResizeObserver: ResizeObserver | null = null;
   private autoScrollIntoView: boolean | undefined;
   private customizedRender?: CustomizeRender;
@@ -329,6 +329,9 @@ export default class StageCore extends EventEmitter {
       })
       .on('multi-select', (selectedElList: HTMLElement[], event: MouseEvent) => {
         this.emit('multi-select', selectedElList, event);
+      })
+      .on('dblclick', (event: MouseEvent) => {
+        this.emit('dblclick', event);
       });
   }
 

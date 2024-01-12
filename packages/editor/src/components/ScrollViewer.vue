@@ -4,11 +4,13 @@
       <slot></slot>
     </div>
 
+    <slot name="content"></slot>
+
     <ScrollBar
       v-if="scrollHeight > wrapHeight"
       :scroll-size="scrollHeight"
-      :size="wrapHeight"
       :pos="vOffset"
+      :size="wrapHeight"
       @scroll="vScrollHandler"
     ></ScrollBar>
     <ScrollBar

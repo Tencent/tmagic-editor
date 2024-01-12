@@ -360,6 +360,7 @@ export default class ActionManager extends EventEmitter {
     this.container.removeEventListener('mousemove', this.mouseMoveHandler);
     this.container.removeEventListener('mouseleave', this.mouseLeaveHandler);
     this.container.removeEventListener('wheel', this.mouseWheelHandler);
+    this.container.removeEventListener('dblclick', this.dblclickHandler);
     this.dr.destroy();
     this.multiDr?.destroy();
     this.highlightLayer.destroy();
@@ -512,6 +513,7 @@ export default class ActionManager extends EventEmitter {
     this.container.addEventListener('mousemove', this.mouseMoveHandler);
     this.container.addEventListener('mouseleave', this.mouseLeaveHandler);
     this.container.addEventListener('wheel', this.mouseWheelHandler);
+    this.container.addEventListener('dblclick', this.dblclickHandler);
   }
 
   /**
@@ -618,5 +620,9 @@ export default class ActionManager extends EventEmitter {
 
   private mouseWheelHandler = () => {
     this.clearHighlight();
+  };
+
+  private dblclickHandler = (event: MouseEvent) => {
+    this.emit('dblclick', event);
   };
 }
