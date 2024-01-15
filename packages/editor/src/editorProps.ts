@@ -37,8 +37,6 @@ export interface EditorProps {
   layerContentMenu?: (MenuButton | MenuComponent)[];
   /** 画布右键菜单 */
   stageContentMenu?: (MenuButton | MenuComponent)[];
-  /** 中间工作区域中画布渲染的内容 */
-  render?: (stage: StageCore) => HTMLDivElement | Promise<HTMLDivElement>;
   /** 中间工作区域中画布通过iframe渲染时的页面url */
   runtimeUrl?: string;
   /** 是用iframe渲染还是直接渲染 */
@@ -60,16 +58,18 @@ export interface EditorProps {
   moveableOptions?: MoveableOptions | ((config?: CustomizeMoveableOptionsCallbackConfig) => MoveableOptions);
   /** 编辑器初始化时默认选中的组件ID */
   defaultSelected?: Id;
-  canSelect?: (el: HTMLElement) => boolean | Promise<boolean>;
-  isContainer?: (el: HTMLElement) => boolean | Promise<boolean>;
+  /** 拖入画布中容器时，识别到容器后给容器根dom加上的class */
   containerHighlightClassName?: string;
+  /** 拖入画布中容器时，悬停识别容器的时间 */
   containerHighlightDuration?: number;
+  /** 拖入画布中容器时，识别容器的操作类型 */
   containerHighlightType?: ContainerHighlightType;
+  /** 画布大小 */
   stageRect?: StageRect;
+  /** monaco editor 的配置 */
   codeOptions?: { [key: string]: any };
-  updateDragEl?: UpdateDragEl;
+  /** 禁用鼠标左键按下时就开始拖拽，需要先选中再可以拖拽 */
   disabledDragStart?: boolean;
-  extendFormState?: (state: FormState) => Record<string, any> | Promise<Record<string, any>>;
   /** 自定义依赖收集器，复制组件时会将关联依赖一并复制 */
   collectorOptions?: CustomTargetOptions;
   /** 标尺配置 */
@@ -78,10 +78,26 @@ export interface EditorProps {
   disabledMultiSelect?: boolean;
   /** 禁用页面片 */
   disabledPageFragment?: boolean;
+  /** 中间工作区域中画布渲染的内容 */
+  render?: (stage: StageCore) => HTMLDivElement | Promise<HTMLDivElement>;
+  /** 选中时会在画布上复制出一个大小相同的dom，实际拖拽的是这个dom，此方法用于干预这个dom的生成方式 */
+  updateDragEl?: UpdateDragEl;
+  /** 用于设置画布上的dom是否可以被选中 */
+  canSelect?: (el: HTMLElement) => boolean | Promise<boolean>;
+  /** 用于设置画布上的dom是否可以被拖入其中 */
+  isContainer?: (el: HTMLElement) => boolean | Promise<boolean>;
+  /** 用于自定义组件树与画布的右键菜单 */
   customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
+  extendFormState?: (state: FormState) => Record<string, any> | Promise<Record<string, any>>;
 }
 
 export const defaultEditorProps = {
+  renderType: RenderType.IFRAME,
+  disabledMultiSelect: false,
+  disabledPageFragment: false,
+  containerHighlightClassName: CONTAINER_HIGHLIGHT_CLASS_NAME,
+  containerHighlightDuration: 800,
+  containerHighlightType: ContainerHighlightType.DEFAULT,
   componentGroupList: () => [],
   datasourceList: () => [],
   menu: () => ({ left: [], right: [] }),
@@ -94,11 +110,5 @@ export const defaultEditorProps = {
   datasourceConfigs: () => ({}),
   canSelect: (el: HTMLElement) => Boolean(el.id),
   isContainer: (el: HTMLElement) => el.classList.contains('magic-ui-container'),
-  containerHighlightClassName: CONTAINER_HIGHLIGHT_CLASS_NAME,
-  containerHighlightDuration: 800,
-  containerHighlightType: ContainerHighlightType.DEFAULT,
   codeOptions: () => ({}),
-  renderType: RenderType.IFRAME,
-  disabledMultiSelect: false,
-  disabledPageFragment: false,
 };
