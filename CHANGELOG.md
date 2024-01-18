@@ -1,3 +1,17 @@
+## [1.3.12](https://github.com/Tencent/tmagic-editor/compare/v1.3.11...v1.3.12) (2024-01-18)
+
+
+### Bug Fixes
+
+* **editor:** 移动元素到容器中的时候root没有更新问题 ([#569](https://github.com/Tencent/tmagic-editor/issues/569)) ([edc7c11](https://github.com/Tencent/tmagic-editor/commit/edc7c119291253dfc747005be7f607104263c1ed))
+
+
+### Features
+
+* **editor,stage:** 完善双击画布可以已弹层方向显示并显示完整的组件 ([c30e7d3](https://github.com/Tencent/tmagic-editor/commit/c30e7d340b4ec58de3edd7d3f3a8db5ac8b7e07d))
+
+
+
 ## [1.3.11](https://github.com/Tencent/tmagic-editor/compare/v1.3.10...v1.3.11) (2024-01-12)
 
 
