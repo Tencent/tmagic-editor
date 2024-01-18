@@ -19,7 +19,7 @@ const wrapCommand = (cmd: (...args: any[]) => Promise<App>): typeof cmd => {
 };
 
 /**
- * Vuepress cli
+ * TMagic cli
  */
 export const cli = (defaultAppConfig: UserConfig): void => {
   // allow ts files globally
@@ -35,7 +35,7 @@ export const cli = (defaultAppConfig: UserConfig): void => {
   // display help message
   program.help();
 
-  // register `dev` command
+  // register `entry` command
   program.command('entry', 'Start development server').action(wrapCommand(scripts(defaultAppConfig)));
 
   program.parse(process.argv);
