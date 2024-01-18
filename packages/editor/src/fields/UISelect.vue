@@ -106,16 +106,19 @@ const deleteHandler = () => {
 const selectNode = async (id: Id) => {
   await services?.editorService.select(id);
   services?.editorService.get('stage')?.select(id);
+  services?.stageOverlayService.get('stage')?.select(id);
 };
 
 const highlight = throttle((id: Id) => {
   services?.editorService.highlight(id);
   services?.editorService.get('stage')?.highlight(id);
+  services?.stageOverlayService.get('stage')?.highlight(id);
 }, 150);
 
 const unhightlight = () => {
   services?.editorService.set('highlightNode', null);
   services?.editorService.get('stage')?.clearHighlight();
+  services?.stageOverlayService.get('stage')?.clearHighlight();
 };
 </script>
 

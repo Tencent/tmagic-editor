@@ -26,6 +26,7 @@ export const useClick = (
     } else {
       await services?.editorService.select(data);
       services?.editorService.get('stage')?.select(data.id);
+      services?.stageOverlayService.get('stage')?.select(data.id);
     }
   };
 
@@ -50,6 +51,7 @@ export const useClick = (
 
     await services?.editorService.multiSelect(newNodes);
     services?.editorService.get('stage')?.multiSelect(newNodes);
+    services?.stageOverlayService.get('stage')?.multiSelect(newNodes);
   };
 
   const throttleTime = 300;
@@ -62,6 +64,7 @@ export const useClick = (
   const highlight = (data: TreeNodeData) => {
     services?.editorService?.highlight(data);
     services?.editorService?.get('stage')?.highlight(data.id);
+    services?.stageOverlayService?.get('stage')?.highlight(data.id);
   };
 
   const nodeClickHandler = (event: MouseEvent, data: TreeNodeData) => {
