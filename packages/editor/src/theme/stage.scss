@@ -26,6 +26,30 @@
   }
 }
 
+.m-editor-stage-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  z-index: 20;
+  overflow: auto;
+}
+
+.m-editor-stage-overlay-container {
+  position: relative;
+  flex-shrink: 0;
+  margin: auto;
+}
+
+.m-editor-stage-overlay-close.tmagic-design-icon {
+  position: fixed;
+  right: 10px;
+  top: 10px;
+}
+
 .m-editor-stage-float-button {
   cursor: pointer;
   transform: translateY(-50%);

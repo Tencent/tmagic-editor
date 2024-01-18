@@ -5,14 +5,14 @@ import type { Id, MNode } from '@tmagic/schema';
 import { LayerNodeStatus, TreeNodeData } from '@editor/type';
 import { traverseNode } from '@editor/utils';
 
-const createPageNodeStatus = (nodeData: TreeNodeData[], initalLayerNodeStatus?: Map<Id, LayerNodeStatus>) => {
+const createPageNodeStatus = (nodeData: TreeNodeData[], initialLayerNodeStatus?: Map<Id, LayerNodeStatus>) => {
   const map = new Map<Id, LayerNodeStatus>();
 
   nodeData.forEach((node: MNode) =>
     traverseNode(node, (node) => {
       map.set(
         node.id,
-        initalLayerNodeStatus?.get(node.id) || {
+        initialLayerNodeStatus?.get(node.id) || {
           visible: true,
           expand: false,
           selected: false,

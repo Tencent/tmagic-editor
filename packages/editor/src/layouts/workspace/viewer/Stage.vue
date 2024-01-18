@@ -22,16 +22,21 @@
       @drop="dropHandler"
       @dragover="dragoverHandler"
     ></div>
+
     <NodeListMenu></NodeListMenu>
 
-    <Teleport to="body">
-      <ViewerMenu
-        ref="menu"
-        :is-multi-select="isMultiSelect"
-        :stage-content-menu="stageContentMenu"
-        :custom-content-menu="customContentMenu"
-      ></ViewerMenu>
-    </Teleport>
+    <template #content>
+      <StageOverlay></StageOverlay>
+
+      <Teleport to="body">
+        <ViewerMenu
+          ref="menu"
+          :is-multi-select="isMultiSelect"
+          :stage-content-menu="stageContentMenu"
+          :custom-content-menu="customContentMenu"
+        ></ViewerMenu>
+      </Teleport>
+    </template>
   </ScrollViewer>
 </template>
 
@@ -49,6 +54,7 @@ import { getConfig } from '@editor/utils/config';
 import { KeyBindingContainerKey } from '@editor/utils/keybinding-config';
 
 import NodeListMenu from './NodeListMenu.vue';
+import StageOverlay from './StageOverlay.vue';
 import ViewerMenu from './ViewerMenu.vue';
 
 defineOptions({
@@ -93,10 +99,13 @@ watchEffect(() => {
 
   services?.editorService.set('stage', markRaw(stage));
 
-  stage?.mount(stageContainer.value);
+  stage.mount(stageContainer.value);
 
-  if (!node.value?.id) return;
-  stage?.on('runtime-ready', (rt) => {
+  if (!node.value?.id) {
+    return;
+  }
+
+  stage.on('runtime-ready', (rt) => {
     runtime = rt;
     // toRaw返回的值是一个引用而非快照，需要cloneDeep
     root.value && runtime?.updateRootConfig?.(cloneDeep(toRaw(root.value)));

@@ -15,6 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { guid } from '@tmagic/utils';
+
 import { Mode, ZIndex } from './const';
 import type { TargetElement as ShadowElement, TargetShadowConfig, UpdateDragEl } from './types';
 import { getTargetElStyle, isFixedParent } from './util';
@@ -26,7 +28,7 @@ export default class TargetShadow {
   public el?: ShadowElement;
   public els: ShadowElement[] = [];
 
-  private idPrefix = 'target_calibrate_';
+  private idPrefix = `target_calibrate_${guid()}`;
   private container: HTMLElement;
   private scrollLeft = 0;
   private scrollTop = 0;
@@ -46,7 +48,7 @@ export default class TargetShadow {
     }
 
     if (config.idPrefix) {
-      this.idPrefix = config.idPrefix;
+      this.idPrefix = `${config.idPrefix}_${guid()}`;
     }
 
     this.container.addEventListener('customScroll', this.scrollHandler);

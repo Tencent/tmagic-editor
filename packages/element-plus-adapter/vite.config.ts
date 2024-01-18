@@ -22,7 +22,7 @@ import pkg from './package.json';
 export default defineConfig({
   build: {
     cssCodeSplit: false,
-    sourcemap: true,
+    sourcemap: false,
     minify: false,
     target: 'esnext',
 
