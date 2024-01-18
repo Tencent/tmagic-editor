@@ -810,7 +810,7 @@ class Editor extends BaseService {
    * @param targetId 容器ID
    */
   public async moveToContainer(config: MNode, targetId: Id): Promise<MNode | undefined> {
-    const root = cloneDeep(this.get('root'));
+    const root = this.get('root');
     const { node, parent } = this.getNodeInfo(config.id, false);
     const target = this.getNodeById(targetId, false) as MContainer;
 
@@ -819,7 +819,7 @@ class Editor extends BaseService {
       const index = getNodeIndex(node.id, parent);
       parent.items?.splice(index, 1);
 
-      await stage.remove({ id: node.id, parentId: parent.id, root });
+      await stage.remove({ id: node.id, parentId: parent.id, root: cloneDeep(root) });
 
       const layout = await this.getLayout(target);
 
@@ -835,7 +835,7 @@ class Editor extends BaseService {
       await stage.select(targetId);
 
       const targetParent = this.getParentById(target.id);
-      await stage.update({ config: cloneDeep(target), parentId: targetParent?.id, root });
+      await stage.update({ config: cloneDeep(target), parentId: targetParent?.id, root: cloneDeep(root) });
 
       await this.select(newConfig);
       stage.select(newConfig.id);
