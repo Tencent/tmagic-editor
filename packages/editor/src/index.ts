@@ -54,6 +54,7 @@ export { default as historyService } from './services/history';
 export { default as storageService } from './services/storage';
 export { default as eventsService } from './services/events';
 export { default as dataSourceService } from './services/dataSource';
+export { default as stageOverlayService } from './services/stageOverlay';
 export { default as uiService } from './services/ui';
 export { default as codeBlockService } from './services/codeBlock';
 export { default as depService } from './services/dep';

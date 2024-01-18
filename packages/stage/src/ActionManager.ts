@@ -79,7 +79,7 @@ export default class ActionManager extends EventEmitter {
   private getTargetElement: GetTargetElement;
   private getElementsFromPoint: GetElementsFromPoint;
   private canSelect: CanSelect;
-  private isContainer: IsContainer;
+  private isContainer?: IsContainer;
   private getRenderDocument: GetRenderDocument;
   private disabledMultiSelect = false;
   private config: ActionManagerConfig;
@@ -328,7 +328,7 @@ export default class ActionManager extends EventEmitter {
     const els = this.getElementsFromPoint(event);
 
     for (const el of els) {
-      if (!el.id.startsWith(GHOST_EL_ID_PREFIX) && (await this.isContainer(el)) && !excludeElList.includes(el)) {
+      if (!el.id.startsWith(GHOST_EL_ID_PREFIX) && (await this.isContainer?.(el)) && !excludeElList.includes(el)) {
         addClassName(el, doc, this.containerHighlightClassName);
         break;
       }

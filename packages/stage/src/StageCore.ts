@@ -252,6 +252,10 @@ export default class StageCore extends EventEmitter {
    * 监听页面大小变化
    */
   private observePageResize(page: HTMLElement): void {
+    if (this.pageResizeObserver) {
+      this.pageResizeObserver.disconnect();
+    }
+
     if (typeof ResizeObserver !== 'undefined') {
       this.pageResizeObserver = new ResizeObserver((entries) => {
         this.mask.pageResize(entries);

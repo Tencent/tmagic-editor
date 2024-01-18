@@ -58,7 +58,11 @@
 
     <template #workspace>
       <slot name="workspace" :editorService="editorService">
-        <Workspace :stage-content-menu="stageContentMenu" :custom-content-menu="customContentMenu">
+        <Workspace
+          :disabled-stage-overlay="disabledStageOverlay"
+          :stage-content-menu="stageContentMenu"
+          :custom-content-menu="customContentMenu"
+        >
           <template #stage><slot name="stage"></slot></template>
           <template #workspace-content><slot name="workspace-content" :editorService="editorService"></slot></template>
         </Workspace>
@@ -97,7 +101,7 @@
 </template>
 
 <script lang="ts" setup>
-import { provide, reactive } from 'vue';
+import { provide } from 'vue';
 
 import type { MApp } from '@tmagic/schema';
 
@@ -115,6 +119,7 @@ import eventsService from './services/events';
 import historyService from './services/history';
 import keybindingService from './services/keybinding';
 import propsService from './services/props';
+import stageOverlayService from './services/stageOverlay';
 import storageService from './services/storage';
 import uiService from './services/ui';
 import keybindingConfig from './utils/keybinding-config';
@@ -157,6 +162,7 @@ const services: Services = {
   depService,
   dataSourceService,
   keybindingService,
+  stageOverlayService,
 };
 
 initServiceEvents(props, emit, services);
@@ -164,28 +170,29 @@ initServiceState(props, services);
 keybindingService.register(keybindingConfig);
 keybindingService.registerEl('global');
 
+const stageOptions = {
+  runtimeUrl: props.runtimeUrl,
+  autoScrollIntoView: props.autoScrollIntoView,
+  render: props.render,
+  moveableOptions: props.moveableOptions,
+  canSelect: props.canSelect,
+  updateDragEl: props.updateDragEl,
+  isContainer: props.isContainer,
+  containerHighlightClassName: props.containerHighlightClassName,
+  containerHighlightDuration: props.containerHighlightDuration,
+  containerHighlightType: props.containerHighlightType,
+  disabledDragStart: props.disabledDragStart,
+  renderType: props.renderType,
+  guidesOptions: props.guidesOptions,
+  disabledMultiSelect: props.disabledMultiSelect,
+};
+
+stageOverlayService.set('stageOptions', stageOptions);
+
 provide('services', services);
 
 provide('codeOptions', props.codeOptions);
-provide(
-  'stageOptions',
-  reactive({
-    runtimeUrl: props.runtimeUrl,
-    autoScrollIntoView: props.autoScrollIntoView,
-    render: props.render,
-    moveableOptions: props.moveableOptions,
-    canSelect: props.canSelect,
-    updateDragEl: props.updateDragEl,
-    isContainer: props.isContainer,
-    containerHighlightClassName: props.containerHighlightClassName,
-    containerHighlightDuration: props.containerHighlightDuration,
-    containerHighlightType: props.containerHighlightType,
-    disabledDragStart: props.disabledDragStart,
-    renderType: props.renderType,
-    guidesOptions: props.guidesOptions,
-    disabledMultiSelect: props.disabledMultiSelect,
-  }),
-);
+provide('stageOptions', stageOptions);
 
 defineExpose(services);
 </script>

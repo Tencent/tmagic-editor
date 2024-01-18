@@ -187,6 +187,13 @@ const moveableOptions = (config?: CustomizeMoveableOptionsCallbackConfig): Movea
   options.resizable = !isPage;
   options.rotatable = !isPage;
 
+  // 双击后在弹层中编辑时，根组件不能拖拽
+  if (config?.targetEl?.parentElement?.classList.contains('tmagic-editor-sub-stage-wrap')) {
+    options.draggable = false;
+    options.resizable = false;
+    options.rotatable = false;
+  }
+
   return options;
 };
 

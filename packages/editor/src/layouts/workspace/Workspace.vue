@@ -5,6 +5,7 @@
     <slot name="stage">
       <MagicStage
         v-if="page"
+        :disabled-stage-overlay="disabledStageOverlay"
         :stage-content-menu="stageContentMenu"
         :custom-content-menu="customContentMenu"
       ></MagicStage>
@@ -28,10 +29,16 @@ defineOptions({
   name: 'MEditorWorkspace',
 });
 
-defineProps<{
-  stageContentMenu: (MenuButton | MenuComponent)[];
-  customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
-}>();
+withDefaults(
+  defineProps<{
+    stageContentMenu: (MenuButton | MenuComponent)[];
+    disabledStageOverlay?: boolean;
+    customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
+  }>(),
+  {
+    disabledStageOverlay: false,
+  },
+);
 
 const services = inject<Services>('services');
 

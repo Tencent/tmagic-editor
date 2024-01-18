@@ -33,7 +33,9 @@ export const useStage = (stageOptions: StageOptions) => {
     disabledDragStart: stageOptions.disabledDragStart,
     renderType: stageOptions.renderType,
     canSelect: (el, event, stop) => {
-      const elCanSelect = stageOptions.canSelect(el);
+      if (!stageOptions.canSelect) return true;
+
+      const elCanSelect = stageOptions.canSelect?.(el);
       // 在组件联动过程中不能再往下选择，返回并触发 ui-select
       if (uiSelectMode.value && elCanSelect && event.type === 'mousedown') {
         document.dispatchEvent(new CustomEvent(UI_SELECT_MODE_EVENT_NAME, { detail: el }));

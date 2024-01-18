@@ -24,6 +24,8 @@ import type { Id, MApp, MComponent, MContainer, MNode, MPage, MPageFragment } fr
 import { NodeType } from '@tmagic/schema';
 import { getNodePath, isNumber, isPage, isPageFragment, isPop } from '@tmagic/utils';
 
+import BaseService from '@editor/services//BaseService';
+import propsService from '@editor/services//props';
 import depService from '@editor/services/dep';
 import historyService from '@editor/services/history';
 import storageService, { Protocol } from '@editor/services/storage';
@@ -43,9 +45,6 @@ import {
   setLayout,
 } from '@editor/utils/editor';
 import { beforePaste, getAddParent } from '@editor/utils/operator';
-
-import BaseService from './BaseService';
-import propsService from './props';
 
 class Editor extends BaseService {
   public state: StoreState = reactive({

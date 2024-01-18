@@ -27,7 +27,7 @@ import { OnDrag } from 'gesto';
 import Resizer from './Resizer.vue';
 
 defineOptions({
-  name: 'MEditorLayout',
+  name: 'MEditorSplitView',
 });
 
 const emit = defineEmits(['update:left', 'change', 'update:right']);

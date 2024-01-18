@@ -66,6 +66,7 @@ export const getTargetElStyle = (el: TargetElement, zIndex?: ZIndex) => {
     width: ${el.clientWidth}px;
     height: ${el.clientHeight}px;
     border: ${border};
+    opacity: 0;
     ${typeof zIndex !== 'undefined' ? `z-index: ${zIndex};` : ''}
   `;
 };

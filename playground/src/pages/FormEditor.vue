@@ -8,6 +8,7 @@
     :render="render"
     :can-select="canSelect"
     :disabled-page-fragment="true"
+    :disabled-stage-overlay="true"
     :stage-rect="{ width: 'calc(100% - 70px)', height: '100%' }"
     :moveable-options="{ resizable: false }"
   >

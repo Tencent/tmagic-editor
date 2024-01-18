@@ -108,8 +108,8 @@ const dragendHandler = () => {
     globalThis.clearTimeout(timeout);
     timeout = undefined;
   }
-  const doc = stage.value?.renderer.contentWindow?.document;
-  if (doc && stageOptions) {
+  const doc = stage.value?.renderer.getDocument();
+  if (doc && stageOptions?.containerHighlightClassName) {
     removeClassNameByClassName(doc, stageOptions.containerHighlightClassName);
   }
   clientX = 0;

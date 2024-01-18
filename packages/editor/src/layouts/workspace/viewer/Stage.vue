@@ -26,7 +26,7 @@
     <NodeListMenu></NodeListMenu>
 
     <template #content>
-      <StageOverlay></StageOverlay>
+      <StageOverlay v-if="!disabledStageOverlay"></StageOverlay>
 
       <Teleport to="body">
         <ViewerMenu
@@ -61,10 +61,16 @@ defineOptions({
   name: 'MEditorStage',
 });
 
-defineProps<{
-  stageContentMenu: (MenuButton | MenuComponent)[];
-  customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
-}>();
+withDefaults(
+  defineProps<{
+    stageContentMenu: (MenuButton | MenuComponent)[];
+    disabledStageOverlay?: boolean;
+    customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
+  }>(),
+  {
+    disabledStageOverlay: false,
+  },
+);
 
 let stage: StageCore | null = null;
 let runtime: Runtime | null = null;

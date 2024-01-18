@@ -39,6 +39,7 @@ import type { EventsService } from './services/events';
 import type { HistoryService } from './services/history';
 import type { KeybindingService } from './services/keybinding';
 import type { PropsService } from './services/props';
+import type { StageOverlayService } from './services/stageOverlay';
 import type { StorageService } from './services/storage';
 import type { UiService } from './services/ui';
 import type { UndoRedo } from './utils/undo-redo';
@@ -118,22 +119,23 @@ export interface Services {
   depService: DepService;
   dataSourceService: DataSourceService;
   keybindingService: KeybindingService;
+  stageOverlayService: StageOverlayService;
 }
 
 export interface StageOptions {
-  runtimeUrl: string;
-  autoScrollIntoView: boolean;
-  containerHighlightClassName: string;
-  containerHighlightDuration: number;
-  containerHighlightType: ContainerHighlightType;
+  runtimeUrl?: string;
+  autoScrollIntoView?: boolean;
+  containerHighlightClassName?: string;
+  containerHighlightDuration?: number;
+  containerHighlightType?: ContainerHighlightType;
   disabledDragStart?: boolean;
-  render: (stage: StageCore) => HTMLDivElement | Promise<HTMLDivElement>;
-  moveableOptions: MoveableOptions | ((config?: CustomizeMoveableOptionsCallbackConfig) => MoveableOptions);
-  canSelect: (el: HTMLElement) => boolean | Promise<boolean>;
-  isContainer: (el: HTMLElement) => boolean | Promise<boolean>;
-  updateDragEl: UpdateDragEl;
-  renderType: RenderType;
-  guidesOptions: Partial<GuidesOptions>;
+  render?: (stage: StageCore) => HTMLDivElement | Promise<HTMLDivElement>;
+  moveableOptions?: MoveableOptions | ((config?: CustomizeMoveableOptionsCallbackConfig) => MoveableOptions);
+  canSelect?: (el: HTMLElement) => boolean | Promise<boolean>;
+  isContainer?: (el: HTMLElement) => boolean | Promise<boolean>;
+  updateDragEl?: UpdateDragEl;
+  renderType?: RenderType;
+  guidesOptions?: Partial<GuidesOptions>;
   disabledMultiSelect?: boolean;
 }
 
@@ -158,6 +160,17 @@ export interface PropsState {
   propsConfigMap: Record<string, FormConfig>;
   propsValueMap: Record<string, Partial<MNode>>;
   relateIdMap: Record<Id, Id>;
+}
+
+export interface StageOverlayState {
+  wrapDiv: HTMLDivElement;
+  sourceEl: HTMLElement | null;
+  contentEl: HTMLElement | null;
+  stage: StageCore | null;
+  stageOptions: StageOptions | null;
+  wrapWidth: number;
+  wrapHeight: number;
+  stageOverlayVisible: boolean;
 }
 
 export interface ComponentGroupState {

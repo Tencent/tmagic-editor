@@ -66,7 +66,7 @@ export interface StageCoreConfig {
   /** 放大倍数，默认1倍 */
   zoom?: number;
   canSelect?: CanSelect;
-  isContainer: IsContainer;
+  isContainer?: IsContainer;
   containerHighlightClassName?: string;
   containerHighlightDuration?: number;
   containerHighlightType?: ContainerHighlightType;
@@ -91,7 +91,7 @@ export interface ActionManagerConfig {
   disabledDragStart?: boolean;
   disabledMultiSelect?: boolean;
   canSelect?: CanSelect;
-  isContainer: IsContainer;
+  isContainer?: IsContainer;
   getRootContainer: GetRootContainer;
   getRenderDocument: GetRenderDocument;
   updateDragEl?: UpdateDragEl;
