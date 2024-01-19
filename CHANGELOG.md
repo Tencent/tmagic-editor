@@ -1,3 +1,14 @@
+## [1.3.13](https://github.com/Tencent/tmagic-editor/compare/v1.3.12...v1.3.13) (2024-01-19)
+
+
+### Bug Fixes
+
+* **editor:** stage-overlay状态更新 ([2432bc5](https://github.com/Tencent/tmagic-editor/commit/2432bc5a6931b95434a0711f4f67f540b8b9c9c3))
+* **editor:** 弹层画布响应组件树点击 ([2114b89](https://github.com/Tencent/tmagic-editor/commit/2114b89365bdb889b14264799d23ae7b5b6ca39a))
+* **stage:** scrollIntoView不能有横向滚动 ([01f8040](https://github.com/Tencent/tmagic-editor/commit/01f8040a1a24da463f1d2b22dca8022f86424cb0))
+
+
+
 ## [1.3.12](https://github.com/Tencent/tmagic-editor/compare/v1.3.11...v1.3.12) (2024-01-18)
 
 
