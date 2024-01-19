@@ -51,6 +51,8 @@ class StageOverlay extends BaseService {
     editorService.on('update', this.updateHandler);
     editorService.on('add', this.addHandler);
     editorService.on('remove', this.removeHandler);
+    editorService.on('drag-to', this.updateHandler);
+    editorService.on('move-layer', this.updateHandler);
   }
 
   public closeOverlay() {
@@ -67,6 +69,8 @@ class StageOverlay extends BaseService {
     editorService.off('update', this.updateHandler);
     editorService.off('add', this.addHandler);
     editorService.off('remove', this.removeHandler);
+    editorService.off('drag-to', this.updateHandler);
+    editorService.off('move-layer', this.updateHandler);
   }
 
   public updateOverlay() {
@@ -99,13 +103,6 @@ class StageOverlay extends BaseService {
         }
 
         const wrapDiv = this.get('wrapDiv');
-        const sourceEl = this.get('sourceEl');
-
-        wrapDiv.style.cssText = `
-            width: ${sourceEl?.scrollWidth}px;
-            height: ${sourceEl?.scrollHeight}px;
-            background-color: #fff;
-          `;
 
         await this.render();
 
@@ -141,11 +138,18 @@ class StageOverlay extends BaseService {
     this.createContentEl();
 
     const contentEl = this.get('contentEl');
+    const sourceEl = this.get('sourceEl');
     const wrapDiv = this.get('wrapDiv');
     const subStage = this.get('stage');
     const stageOptions = this.get('stageOptions');
 
     if (!contentEl) return;
+
+    wrapDiv.style.cssText = `
+      width: ${sourceEl?.scrollWidth}px;
+      height: ${sourceEl?.scrollHeight}px;
+      background-color: #fff;
+    `;
 
     Array.from(wrapDiv.children).forEach((element) => {
       element.remove();
@@ -162,19 +166,37 @@ class StageOverlay extends BaseService {
   }
 
   private updateHandler = () => {
-    this.render();
-    this.updateOverlay();
+    setTimeout(() => {
+      this.render();
+      this.updateOverlay();
+
+      this.updateSelectStatus();
+    });
   };
 
   private addHandler = () => {
     this.render();
     this.updateOverlay();
+
+    this.updateSelectStatus();
   };
 
   private removeHandler = () => {
     this.render();
     this.updateOverlay();
+
+    this.updateSelectStatus();
   };
+
+  private updateSelectStatus() {
+    const subStage = this.get('stage');
+    const nodes = editorService.get('nodes');
+    if (nodes.length > 1) {
+      subStage?.multiSelect(nodes.map((n) => n.id));
+    } else {
+      subStage?.select(nodes[0].id);
+    }
+  }
 }
 
 export type StageOverlayService = StageOverlay;

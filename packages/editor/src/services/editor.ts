@@ -892,6 +892,8 @@ class Editor extends BaseService {
     this.addModifiedNodeId(parent.id);
 
     this.pushHistoryState();
+
+    this.emit('drag-to', { index, targetIndex, config, parent, targetParent });
   }
 
   /**
