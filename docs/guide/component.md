@@ -170,7 +170,8 @@ import './page-config.js';
 
 然后执行在 runtime/vue3 目录下执行
 ```
-npm run start
+npm run build:libs
+npm run dev
 ```
 
 至此，我们就可以得到这个开发中组件在编辑器中进行了配置并保存后，在真实页面中应该有的样子。
