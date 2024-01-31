@@ -1,20 +1,25 @@
 <template>
-  <MForm ref="mForm" :id="config?.id" :data-magic-id="config?.id" :config="formConfig" :init-values="values"></MForm>
+  <MForm
+    ref="mForm"
+    :key="config?.id"
+    :id="config?.id"
+    :data-magic-id="config?.id"
+    :config="formConfig"
+    :init-values="values"
+  ></MForm>
 </template>
 
 <script setup lang="ts">
 import { watch } from 'vue';
 
 import { MForm } from '@tmagic/form';
-import type StageCore from '@tmagic/stage';
 
+import { AppProps } from './types';
 import { useFormConfig } from './useFormConfig';
 
-const props = defineProps<{
-  stage: StageCore;
-}>();
+const props = defineProps<AppProps>();
 
-const { mForm, formConfig, config, values } = useFormConfig(props.stage.renderer.contentWindow);
+const { mForm, formConfig, config, values } = useFormConfig(props);
 
 watch(formConfig, async () => {
   setTimeout(() => {

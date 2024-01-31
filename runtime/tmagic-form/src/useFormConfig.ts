@@ -3,10 +3,13 @@ import { computed, nextTick, onBeforeUnmount, reactive, ref } from 'vue';
 import Core from '@tmagic/core';
 import { type FormConfig, initValue, MForm } from '@tmagic/form';
 import type { Id, MApp, MNode } from '@tmagic/schema';
-import type { RemoveData, RuntimeWindow, UpdateData } from '@tmagic/stage';
+import type { RemoveData, UpdateData } from '@tmagic/stage';
 import { getNodePath, replaceChildNode } from '@tmagic/utils';
 
-export const useFormConfig = (contentWindow: RuntimeWindow | null) => {
+import { AppProps } from './types';
+
+export const useFormConfig = (props: AppProps) => {
+  const { contentWindow } = props.stage.renderer;
   const mForm = ref<InstanceType<typeof MForm>>();
 
   const root = ref<MApp>();
@@ -17,13 +20,16 @@ export const useFormConfig = (contentWindow: RuntimeWindow | null) => {
   const config = computed(
     () => root.value?.items?.find((item: MNode) => item.id === curPageId.value) || root.value?.items?.[0],
   );
-
-  const formConfig = computed(() => (config.value?.items || []) as FormConfig);
+  // @ts-ignore
+  const formConfig = computed(() => props.fillConfig((config.value?.items || []) as FormConfig, mForm));
 
   const app = new Core({
     ua: contentWindow?.navigator.userAgent,
     platform: 'editor',
   });
+
+  // @ts-ignore
+  app.mForm = mForm;
 
   const resetValues = () => {
     initValue(mForm.value?.formState, {
