@@ -20,7 +20,7 @@ export default (handler: (type: AbleActionEventType) => void) => ({
         left: 0px;
         top: 0px;
         will-change: transform;
-        transform-origin: 0px 0px;
+        transform-origin: 60px 28px;
         display: flex;
       }
       ${ableCss}
