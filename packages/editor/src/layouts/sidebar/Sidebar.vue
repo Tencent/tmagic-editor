@@ -4,7 +4,7 @@
       <div
         class="m-editor-sidebar-header-item"
         v-for="(config, index) in sideBarItems"
-        v-show="!floatBoxStates?.get(config.$key)?.status"
+        v-show="!floatBoxStates[config.$key]?.status"
         draggable="true"
         :key="config.$key ?? index"
         :class="{ 'is-active': activeTabName === config.text }"
@@ -23,7 +23,7 @@
       v-show="activeTabName === config.text"
     >
       <component
-        v-if="config && !floatBoxStates?.get(config.$key)?.status"
+        v-if="config && !floatBoxStates[config.$key]?.status"
         :is="config.component"
         v-bind="config.props || {}"
         v-on="config?.listeners || {}"
@@ -96,43 +96,37 @@
   </div>
 
   <Teleport to="body">
-    <div class="m-editor-float-box-list">
-      <div
-        v-for="(config, index) in sideBarItems"
+    <template v-for="(config, index) in sideBarItems">
+      <FloatingBox
         :key="config.$key ?? index"
-        ref="floatBox"
-        :class="['m-editor-float-box', `m-editor-float-box-${config.$key}`]"
-        :style="{
-          left: `${floatBoxStates?.get(config.$key)?.left}px`,
-          top: `${floatBoxStates?.get(config.$key)?.top}px`,
-          zIndex: floatBoxStates?.get(config.$key)?.zIndex,
+        v-if="floatBoxStates[config.$key]?.status"
+        v-model:visible="floatBoxStates[config.$key].status"
+        :title="config.text"
+        :position="{
+          left: floatBoxStates[config.$key].left,
+          top: floatBoxStates[config.$key].top,
         }"
-        v-show="floatBoxStates?.get(config.$key)?.status"
       >
-        <div
-          :class="['m-editor-float-box-header', `m-editor-float-box-header-${config.$key}`]"
-          @click="showFloatBox(config.$key)"
-        >
-          <div>{{ config.text }}</div>
-          <MIcon class="m-editor-float-box-close" :icon="Close" @click.stop="closeFloatBox(config.$key)"></MIcon>
-        </div>
-        <div class="m-editor-float-box-body">
-          <component
-            v-if="config && floatBoxStates?.get(config.$key)?.status"
-            :is="config.boxComponentConfig?.component || config.component"
-            v-bind="config.boxComponentConfig?.props || config.props || {}"
-            v-on="config?.listeners || {}"
-          />
-        </div>
-      </div>
-    </div>
+        <template #body>
+          <div class="m-editor-slide-list-box">
+            <component
+              v-if="config && floatBoxStates[config.$key].status"
+              :is="config.boxComponentConfig?.component || config.component"
+              v-bind="config.boxComponentConfig?.props || config.props || {}"
+              v-on="config?.listeners || {}"
+            />
+          </div>
+        </template>
+      </FloatingBox>
+    </template>
   </Teleport>
 </template>
 
 <script setup lang="ts">
 import { computed, inject, ref, watch } from 'vue';
-import { Close, Coin, EditPen, Goods, List } from '@element-plus/icons-vue';
+import { Coin, EditPen, Goods, List } from '@element-plus/icons-vue';
 
+import FloatingBox from '@editor/components/FloatingBox.vue';
 import MIcon from '@editor/components/Icon.vue';
 import { useFloatBox } from '@editor/hooks/use-float-box';
 import type {
@@ -200,11 +194,6 @@ const getItemConfig = (data: SideItem): SideComponent => {
       text: '代码编辑',
       component: CodeBlockListPanel,
       slots: {},
-      boxComponentConfig: {
-        props: {
-          slideType: 'box',
-        },
-      },
     },
     'data-source': {
       $key: 'data-source',
@@ -213,11 +202,6 @@ const getItemConfig = (data: SideItem): SideComponent => {
       text: '数据源',
       component: DataSourceListPanel,
       slots: {},
-      boxComponentConfig: {
-        props: {
-          slideType: 'box',
-        },
-      },
     },
   };
 
@@ -235,8 +219,7 @@ watch(
 
 const slideKeys = computed(() => sideBarItems.value.map((sideBarItem) => sideBarItem.$key));
 
-const { showFloatBox, closeFloatBox, dragstartHandler, dragendHandler, floatBoxStates, floatBox, showingBoxKeys } =
-  useFloatBox(slideKeys);
+const { dragstartHandler, dragendHandler, floatBoxStates, showingBoxKeys } = useFloatBox(slideKeys);
 
 watch(
   () => showingBoxKeys.value.length,
