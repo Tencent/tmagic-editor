@@ -1,12 +1,14 @@
 import { computed, ComputedRef, ref, watch } from 'vue';
 
+interface State {
+  status: boolean;
+  top: number;
+  left: number;
+}
+
 export const useFloatBox = (slideKeys: ComputedRef<string[]>) => {
   const floatBoxStates = ref<{
-    [key in (typeof slideKeys.value)[number]]: {
-      status: boolean;
-      top: number;
-      left: number;
-    };
+    [key in (typeof slideKeys.value)[number]]: State;
   }>(
     slideKeys.value.reduce(
       (total, cur) => ({
