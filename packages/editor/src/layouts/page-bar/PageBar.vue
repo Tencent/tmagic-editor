@@ -123,7 +123,7 @@ watch(
 
 watch(active, (active) => {
   if (active === NodeType.PAGE) {
-    if (!activePage.value) {
+    if (!activePage.value && !pageList.value.length) {
       editorService?.selectRoot();
       return;
     }
@@ -132,11 +132,12 @@ watch(active, (active) => {
   }
 
   if (active === NodeType.PAGE_FRAGMENT) {
-    if (!activePageFragment.value) {
+    // 之前没有选中过页面片并且当前没有页面片
+    if (!activePageFragment.value && !pageFragmentList.value.length) {
       editorService?.selectRoot();
       return;
     }
-    switchPage(activePageFragment.value);
+    switchPage(activePageFragment.value || pageFragmentList.value[0].id);
   }
 });
 
