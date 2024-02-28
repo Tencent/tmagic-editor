@@ -12,7 +12,8 @@ import { isEmpty } from 'lodash-es';
 
 import { TMagicCard } from '@tmagic/design';
 import type { FieldProps } from '@tmagic/form';
-import { HookType } from '@tmagic/schema';
+import { FormState } from '@tmagic/form';
+import { HookCodeType, HookType } from '@tmagic/schema';
 
 import type { Services } from '@editor/type';
 
@@ -38,13 +39,40 @@ const codeConfig = computed(() => ({
   name: 'hookData',
   enableToggleMode: false,
   expandAll: true,
-  titleKey: 'codeId',
+  title: (mForm: FormState, { model, index }: any) => {
+    if (model.codeType === HookCodeType.DATA_SOURCE_METHOD) {
+      if (Array.isArray(model.codeId)) {
+        const ds = services?.dataSourceService.getDataSourceById(model.codeId[0]);
+        return `${ds?.title} / ${model.codeId[1]}`;
+      }
+
+      return Array.isArray(model.codeId) ? model.codeId.join('/') : index;
+    }
+    return model.codeId || index;
+  },
   items: [
     {
-      type: 'code-select-col',
-      name: 'codeId',
-      labelWidth: 0,
-      disabled: () => !services?.codeBlockService.getEditStatus(),
+      type: 'row',
+      items: [
+        {
+          type: 'select',
+          name: 'codeType',
+          span: 8,
+          options: [
+            { value: HookCodeType.CODE, text: '代码块' },
+            { value: HookCodeType.DATA_SOURCE_METHOD, text: '数据源方法' },
+          ],
+          defaultValue: 'code',
+        },
+        {
+          type: (mForm: FormState, { model }: any) =>
+            model.codeType === HookCodeType.DATA_SOURCE_METHOD ? 'data-source-method-select' : 'code-select-col',
+          name: 'codeId',
+          span: 16,
+          labelWidth: 0,
+          disabled: () => !services?.codeBlockService.getEditStatus(),
+        },
+      ],
     },
   ],
 }));

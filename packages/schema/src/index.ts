@@ -205,6 +205,13 @@ export enum HookType {
   CODE = 'code',
 }
 
+export enum HookCodeType {
+  /** 代码块 */
+  CODE = 'code',
+  /** 数据源方法 */
+  DATA_SOURCE_METHOD = 'data-source-method',
+}
+
 export interface DataSchema {
   type?: 'null' | 'boolean' | 'object' | 'array' | 'number' | 'string' | 'any';
   /** 键名 */

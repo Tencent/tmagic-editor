@@ -17,6 +17,7 @@
     <CodeParams
       v-if="paramsConfig.length"
       name="params"
+      :key="model[name]"
       :model="model"
       :size="size"
       :params-config="paramsConfig"
@@ -33,7 +34,7 @@
   </div>
 </template>
 
-<script lang="ts" setup name="">
+<script lang="ts" setup>
 import { computed, inject, ref, watch } from 'vue';
 import { Edit, View } from '@element-plus/icons-vue';
 import { isEmpty, map } from 'lodash-es';
