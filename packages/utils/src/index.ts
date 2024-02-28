@@ -283,32 +283,36 @@ export const compiledNode = (
   return node;
 };
 
-export const compiledCond = (op: string, fieldValue: any, value: any, range: number[] = []): boolean => {
+export const compiledCond = (op: string, fieldValue: any, inputValue: any, range: number[] = []): boolean => {
+  if (typeof fieldValue === 'string' && typeof inputValue === 'undefined') {
+    inputValue = '';
+  }
+
   switch (op) {
     case 'is':
-      return fieldValue === value;
+      return fieldValue === inputValue;
     case 'not':
-      return fieldValue !== value;
+      return fieldValue !== inputValue;
     case '=':
-      return fieldValue === value;
+      return fieldValue === inputValue;
     case '!=':
-      return fieldValue !== value;
+      return fieldValue !== inputValue;
     case '>':
-      return fieldValue > value;
+      return fieldValue > inputValue;
     case '>=':
-      return fieldValue >= value;
+      return fieldValue >= inputValue;
     case '<':
-      return fieldValue < value;
+      return fieldValue < inputValue;
     case '<=':
-      return fieldValue <= value;
+      return fieldValue <= inputValue;
     case 'between':
       return range.length > 1 && fieldValue >= range[0] && fieldValue <= range[1];
     case 'not_between':
       return range.length < 2 || fieldValue < range[0] || fieldValue > range[1];
     case 'include':
-      return fieldValue?.includes?.(value);
+      return fieldValue?.includes?.(inputValue);
     case 'not_include':
-      return typeof fieldValue === 'undefined' || !fieldValue.includes?.(value);
+      return typeof fieldValue === 'undefined' || !fieldValue.includes?.(inputValue);
     default:
       break;
   }
