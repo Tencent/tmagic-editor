@@ -17,8 +17,8 @@
  */
 import { cloneDeep, union } from 'lodash-es';
 
-import type { AppCore } from '@tmagic/schema';
-import { getDepNodeIds, getNodes, replaceChildNode } from '@tmagic/utils';
+import type { AppCore, MApp, MNode, MPage, MPageFragment } from '@tmagic/schema';
+import { getDepNodeIds, getNodes, isPage, isPageFragment, replaceChildNode } from '@tmagic/utils';
 
 import DataSourceManager from './DataSourceManager';
 import type { ChangeEvent, DataSourceManagerData } from './types';
@@ -39,13 +39,13 @@ export const createDataSourceManager = (app: AppCore, useMock?: boolean, initial
   if (dsl.dataSources && dsl.dataSourceCondDeps && platform !== 'editor') {
     getNodes(getDepNodeIds(dsl.dataSourceCondDeps), dsl.items).forEach((node) => {
       node.condResult = dataSourceManager.compliedConds(node);
-      replaceChildNode(node, dsl!.items);
+      updateNode(node, dsl!);
     });
   }
 
   if (dsl.dataSources && dsl.dataSourceDeps) {
     getNodes(getDepNodeIds(dsl.dataSourceDeps), dsl.items).forEach((node) => {
-      replaceChildNode(dataSourceManager.compiledNode(node), dsl!.items);
+      updateNode(dataSourceManager.compiledNode(node), dsl!);
     });
   }
 
@@ -72,4 +72,13 @@ export const createDataSourceManager = (app: AppCore, useMock?: boolean, initial
   }
 
   return dataSourceManager;
+};
+
+const updateNode = (node: MNode, dsl: MApp) => {
+  if (isPage(node) || isPageFragment(node)) {
+    const index = dsl.items?.findIndex((child: MNode) => child.id === node.id);
+    dsl.items.splice(index, 1, node as MPage | MPageFragment);
+  } else {
+    replaceChildNode(node, dsl!.items);
+  }
 };
