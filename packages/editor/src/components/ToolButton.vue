@@ -39,7 +39,12 @@
       </template>
     </TMagicDropdown>
 
-    <component v-else-if="data.type === 'component'" v-bind="data.props || {}" :is="data.component"></component>
+    <component
+      v-else-if="data.type === 'component'"
+      v-bind="data.props || {}"
+      v-on="(data as MenuComponent).listeners || {}"
+      :is="data.component"
+    ></component>
   </div>
 </template>
 
