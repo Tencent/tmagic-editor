@@ -138,7 +138,7 @@ function updateVersions(version) {
   updatePackage(path.resolve(__dirname, '..'), version);
   // 2. update all packages
   packages.forEach((p) => updatePackage(getPkgRoot(p), version));
-  ['vue3', 'react', 'vue2'].forEach((p) => updatePackage(getRunTimeRoot(p), version));
+  ['vue3', 'react', 'vue2', 'tmagic-form'].forEach((p) => updatePackage(getRunTimeRoot(p), version));
   updatePackage(getPlayground(), version);
 }
 
