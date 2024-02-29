@@ -1,3 +1,17 @@
+## [1.3.15](https://github.com/Tencent/tmagic-editor/compare/v1.3.14...v1.3.15) (2024-02-29)
+
+
+### Bug Fixes
+
+* **runtime:** 数据源变化更新页面出错 ([0df98bc](https://github.com/Tencent/tmagic-editor/commit/0df98bc226396cfc924afde1768e7707f789dd19))
+
+
+### Features
+
+* **editor:** 代码选择器，数据源方法选择新增不可编辑配置，与disabled区分开 ([58b62d1](https://github.com/Tencent/tmagic-editor/commit/58b62d18e4874b5a1214bc0717ebe090e4fbf489))
+
+
+
 ## [1.3.14](https://github.com/Tencent/tmagic-editor/compare/v1.3.13...v1.3.14) (2024-02-29)
 
 
