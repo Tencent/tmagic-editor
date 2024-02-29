@@ -42,6 +42,10 @@ const codeConfig = computed(() => ({
   title: (mForm: FormState, { model, index }: any) => {
     if (model.codeType === HookCodeType.DATA_SOURCE_METHOD) {
       if (Array.isArray(model.codeId)) {
+        if (model.codeId.length < 2) {
+          return index;
+        }
+
         const ds = services?.dataSourceService.getDataSourceById(model.codeId[0]);
         return `${ds?.title} / ${model.codeId[1]}`;
       }
@@ -63,14 +67,31 @@ const codeConfig = computed(() => ({
             { value: HookCodeType.DATA_SOURCE_METHOD, text: '数据源方法' },
           ],
           defaultValue: 'code',
+          onChange: (mForm: FormState, v: HookCodeType, { model }: any) => {
+            if (v === HookCodeType.DATA_SOURCE_METHOD) {
+              model.codeId = [];
+            } else {
+              model.codeId = '';
+            }
+
+            return v;
+          },
         },
         {
-          type: (mForm: FormState, { model }: any) =>
-            model.codeType === HookCodeType.DATA_SOURCE_METHOD ? 'data-source-method-select' : 'code-select-col',
+          type: 'code-select-col',
           name: 'codeId',
           span: 16,
           labelWidth: 0,
-          disabled: () => !services?.codeBlockService.getEditStatus(),
+          display: (mForm: FormState, { model }: any) => model.codeType !== HookCodeType.DATA_SOURCE_METHOD,
+          notEditable: () => !services?.codeBlockService.getEditStatus(),
+        },
+        {
+          type: 'data-source-method-select',
+          name: 'codeId',
+          span: 16,
+          labelWidth: 0,
+          display: (mForm: FormState, { model }: any) => model.codeType === HookCodeType.DATA_SOURCE_METHOD,
+          notEditable: () => !services?.dataSourceService.get('editable'),
         },
       ],
     },

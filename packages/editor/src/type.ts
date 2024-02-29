@@ -600,6 +600,7 @@ export interface CodeSelectColConfig {
   text: string;
   labelWidth?: number | string;
   disabled?: boolean | FilterFunction;
+  notEditable?: boolean | FilterFunction;
   display?: boolean | FilterFunction;
 }
 
@@ -618,6 +619,7 @@ export interface DataSourceMethodSelectConfig {
   text: string;
   labelWidth?: number | string;
   disabled?: boolean | FilterFunction;
+  notEditable?: boolean | FilterFunction;
   display?: boolean | FilterFunction;
 }
 
