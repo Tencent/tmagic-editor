@@ -23,7 +23,7 @@ import Core from '@tmagic/core';
 import type { ChangeEvent } from '@tmagic/data-source';
 import type { MNode } from '@tmagic/schema';
 import { AppContent } from '@tmagic/ui-react';
-import { replaceChildNode } from '@tmagic/utils';
+import { isPage, replaceChildNode } from '@tmagic/utils';
 
 function App() {
   const app = useContext<Core | undefined>(AppContent);
@@ -33,11 +33,16 @@ function App() {
   const [config, setConfig] = useState(app.page.data);
 
   app.dataSourceManager?.on('update-data', (nodes: MNode[], sourceId: string, event: ChangeEvent) => {
+    let pageConfig = config;
     nodes.forEach((node) => {
-      replaceChildNode(node, [config]);
+      if (isPage(node)) {
+        pageConfig = node;
+      } else {
+        replaceChildNode(node, [pageConfig]);
+      }
     });
 
-    setConfig(cloneDeep(config));
+    setConfig(cloneDeep(pageConfig));
 
     setTimeout(() => {
       app.emit('replaced-node', {
