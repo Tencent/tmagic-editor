@@ -1,3 +1,22 @@
+## [1.3.14](https://github.com/Tencent/tmagic-editor/compare/v1.3.13...v1.3.14) (2024-02-29)
+
+
+### Bug Fixes
+
+* **data-source, ui:** 页面配置配置数据源字段模块出错 ([455c696](https://github.com/Tencent/tmagic-editor/commit/455c696ff0e871d6513473c74202b6c3b8fc8b40))
+* **editor:** 从页面切换成页面片时不会默认选中第一个页面片 ([3fe83f9](https://github.com/Tencent/tmagic-editor/commit/3fe83f9fa49676cc89e9f2d799d0fbe3fd7f2ec6))
+* **editor:** 复制页面后，组件树选中状态不对 ([b4df7f5](https://github.com/Tencent/tmagic-editor/commit/b4df7f5eea5724b8c3d656f6885bfc3b78910f0a))
+* **tmagic-form-runtime:** 完善form-runtime ([8d1ba22](https://github.com/Tencent/tmagic-editor/commit/8d1ba220c1685f993d8bdffaaa9f053e1b02df0b))
+* **utils:** 数据源条件解析空字符出错 ([33fcee6](https://github.com/Tencent/tmagic-editor/commit/33fcee66dfbf7fb95f4784e7a290caad2b375845))
+
+
+### Features
+
+* **editor,core,schema:** 组件高级配置支持配置数据源方法 ([074d764](https://github.com/Tencent/tmagic-editor/commit/074d76456b5fa35684d1db7ea12107c1b145dec0))
+* **editor:** menu配置支持事件 ([fcede5c](https://github.com/Tencent/tmagic-editor/commit/fcede5c0aceeb32851e129111d5aa690de1a7d1b))
+
+
+
 ## [1.3.13](https://github.com/Tencent/tmagic-editor/compare/v1.3.12...v1.3.13) (2024-01-19)
 
 
