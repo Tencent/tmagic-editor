@@ -138,14 +138,17 @@ function updateVersions(version) {
   updatePackage(path.resolve(__dirname, '..'), version);
   // 2. update all packages
   packages.forEach((p) => updatePackage(getPkgRoot(p), version));
-  ['vue3', 'react', 'vue2', 'tmagic-form'].forEach((p) => updatePackage(getRunTimeRoot(p), version));
+  ['vue3', 'react', 'vue2'].forEach((p) => updatePackage(getRunTimeRoot(p), version));
   updatePackage(getPlayground(), version);
+  updatePackage(getRunTimeRoot('tmagic-form'), version, false);
 }
 
-function updatePackage(pkgRoot, version) {
+function updatePackage(pkgRoot, version, updateVersion = true) {
   const pkgPath = path.resolve(pkgRoot, 'package.json');
   const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
-  pkg.version = version;
+  if (updateVersion) {
+    pkg.version = version;
+  }
   updateDeps(pkg, 'dependencies', version);
   updateDeps(pkg, 'peerDependencies', version);
   fs.writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
