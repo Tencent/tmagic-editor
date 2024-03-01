@@ -81,6 +81,7 @@ export interface CodeBlockListSlots {
 
 export interface DataSourceListSlots {
   'data-source-panel-tool'(props: { data: any }): any;
+  'data-source-panel-search'(props: {}): any;
 }
 
 export interface LayerNodeSlots {

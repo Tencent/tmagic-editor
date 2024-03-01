@@ -73,6 +73,7 @@ export { default as EventSelect } from './fields/EventSelect.vue';
 export { default as KeyValue } from './fields/KeyValue.vue';
 export { default as CodeBlockList } from './layouts/sidebar/code-block/CodeBlockList.vue';
 export { default as CodeBlockListPanel } from './layouts/sidebar/code-block/CodeBlockListPanel.vue';
+export { default as DataSourceConfigPanel } from './layouts/sidebar/data-source/DataSourceConfigPanel.vue';
 export { default as PropsPanel } from './layouts/PropsPanel.vue';
 export { default as ToolButton } from './components/ToolButton.vue';
 export { default as ContentMenu } from './components/ContentMenu.vue';

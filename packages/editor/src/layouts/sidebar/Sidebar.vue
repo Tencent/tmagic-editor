@@ -96,6 +96,11 @@
           <slot v-if="config.$key === 'data-source'" name="data-source-panel-tool" :data="data"></slot>
           <component v-else-if="config.slots?.DataSourcePanelTool" :is="config.slots.DataSourcePanelTool" />
         </template>
+
+        <template #data-source-panel-search v-if="config.$key === 'data-source' || config.slots?.dataSourcePanelSearch">
+          <slot v-if="config.$key === 'data-source'" name="data-source-panel-search"></slot>
+          <component v-else-if="config.slots?.dataSourcePanelSearch" :is="config.slots.dataSourcePanelSearch" />
+        </template>
       </component>
     </div>
   </div>
