@@ -66,6 +66,11 @@
           <component v-else-if="config.slots?.codeBlockPanelTool" :is="config.slots.codeBlockPanelTool" />
         </template>
 
+        <template #code-block-panel-search v-if="config.$key === 'code-block' || config.slots?.codeBlockPanelSearch">
+          <slot v-if="config.$key === 'code-block'" name="code-block-panel-search"></slot>
+          <component v-else-if="config.slots?.codeBlockPanelSearch" :is="config.slots.codeBlockPanelSearch" />
+        </template>
+
         <template
           #layer-node-content="{ data: nodeData }"
           v-if="config.$key === 'layer' || config.slots?.layerNodeContent"
@@ -86,7 +91,7 @@
 
         <template
           #data-source-panel-tool="{ data }"
-          v-if="config.$key === 'data-source' || config.slots?.codeBlockPanelTool"
+          v-if="config.$key === 'data-source' || config.slots?.dataSourcePanelTool"
         >
           <slot v-if="config.$key === 'data-source'" name="data-source-panel-tool" :data="data"></slot>
           <component v-else-if="config.slots?.DataSourcePanelTool" :is="config.slots.DataSourcePanelTool" />

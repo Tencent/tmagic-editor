@@ -49,6 +49,10 @@
             <slot name="code-block-panel-tool" :id="id" :data="data"></slot>
           </template>
 
+          <template #code-block-panel-search>
+            <slot name="code-block-panel-search"></slot>
+          </template>
+
           <template #data-source-panel-tool="{ data }">
             <slot name="data-source-panel-tool" :data="data"></slot>
           </template>
