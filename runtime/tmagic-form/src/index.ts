@@ -22,7 +22,7 @@ export const useRuntime = ({
 }: {
   plugins?: Plugin[];
   fillConfig?: (config: FormConfig) => FormConfig;
-}) => {
+} = {}) => {
   const render = (stage: StageCore) => {
     injectStyle(stage.renderer.getDocument()!, cssStyle);
     injectStyle(
