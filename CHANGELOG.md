@@ -1,3 +1,19 @@
+## [1.3.16](https://github.com/Tencent/tmagic-editor/compare/v1.3.15...v1.3.16) (2024-03-01)
+
+
+### Bug Fixes
+
+* **design,editor,tdesign-vue-next-adapter:** tMagicPopover在TDesign下异常 ([ffc3e57](https://github.com/Tencent/tmagic-editor/commit/ffc3e57aa1ac2f2aad2a0f6451cf8719b32269cd)), closes [#574](https://github.com/Tencent/tmagic-editor/issues/574)
+* **tmagic-form-runtime:** useRuntime添加默认参数 ([1b3c598](https://github.com/Tencent/tmagic-editor/commit/1b3c598a663499491e1ee44792771ea3703753b3))
+
+
+### Features
+
+* **editor:** 新增code-block-panel-search slot ([a073b8c](https://github.com/Tencent/tmagic-editor/commit/a073b8c50d0e8b90d9bf8099ed8482cbb42e4709))
+* **editor:** 新增data-source-panel-search slot ([6821ce5](https://github.com/Tencent/tmagic-editor/commit/6821ce5fbfba80a3ae2e36e46b707863d2ec0af3))
+
+
+
 ## [1.3.15](https://github.com/Tencent/tmagic-editor/compare/v1.3.14...v1.3.15) (2024-02-29)
 
 
