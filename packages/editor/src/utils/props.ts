@@ -41,7 +41,6 @@ const numberOptions = [
 
 export const styleTabConfig: TabPaneConfig = {
   title: '样式',
-  labelWidth: '80px',
   items: [
     {
       name: 'style',
@@ -219,13 +218,11 @@ export const advancedTabConfig: TabPaneConfig = {
     {
       name: 'created',
       text: 'created',
-      labelWidth: '100px',
       type: 'code-select',
     },
     {
       name: 'mounted',
       text: 'mounted',
-      labelWidth: '100px',
       type: 'code-select',
     },
   ],
@@ -331,13 +328,13 @@ export const displayTabConfig: TabPaneConfig = {
  * @param config 组件属性配置
  * @returns Object
  */
-export const fillConfig = (config: FormConfig = []) => [
+export const fillConfig = (config: FormConfig = [], labelWidth = '80px') => [
   {
     type: 'tab',
+    labelWidth,
     items: [
       {
         title: '属性',
-        labelWidth: '80px',
         items: [
           // 组件类型，必须要有
           {

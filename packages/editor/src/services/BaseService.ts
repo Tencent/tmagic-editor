@@ -103,7 +103,7 @@ const doAsyncAction = async (
  * 例如：
  *   Class EditorService extends BaseService {
  *     constructor() {
- *       super(['add']);
+ *       super([ { name: 'add', isAsync: true },]);
  *     }
  *     add(value) { return result; }
  *   };
@@ -131,7 +131,7 @@ const doAsyncAction = async (
  * 例如：
  *   Class EditorService extends BaseService {
  *     constructor() {
- *       super(['add']);
+ *       super([ { name: 'add', isAsync: true },]);
  *     }
  *     add(value) { return result; }
  *   };

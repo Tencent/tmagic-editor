@@ -58,8 +58,8 @@ class Props extends BaseService {
     this.emit('props-configs-change');
   }
 
-  public async fillConfig(config: FormConfig) {
-    return fillConfig(config);
+  public async fillConfig(config: FormConfig, labelWidth?: string) {
+    return fillConfig(config, typeof labelWidth !== 'function' ? labelWidth : '80px');
   }
 
   /**
