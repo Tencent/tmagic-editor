@@ -73,7 +73,7 @@ class Props extends BaseService {
   }
 
   public async setPropsConfig(type: string, config: FormConfig) {
-    this.state.propsConfigMap[type] = await this.fillConfig(Array.isArray(config) ? config : [config]);
+    this.state.propsConfigMap[toLine(type)] = await this.fillConfig(Array.isArray(config) ? config : [config]);
   }
 
   /**
@@ -86,7 +86,7 @@ class Props extends BaseService {
       return await this.getPropsConfig('button');
     }
 
-    return cloneDeep(this.state.propsConfigMap[type] || (await this.fillConfig([])));
+    return cloneDeep(this.state.propsConfigMap[toLine(type)] || (await this.fillConfig([])));
   }
 
   public setPropsValues(values: Record<string, Partial<MNode>>) {
@@ -101,7 +101,7 @@ class Props extends BaseService {
    * @param value 组件初始值
    */
   public async setPropsValue(type: string, value: Partial<MNode>) {
-    this.state.propsValueMap[type] = value;
+    this.state.propsValueMap[toLine(type)] = value;
   }
 
   /**
@@ -109,7 +109,9 @@ class Props extends BaseService {
    * @param type 组件类型
    * @returns 组件初始值
    */
-  public async getPropsValue(type: string, { inputEvent, ...defaultValue }: Record<string, any> = {}) {
+  public async getPropsValue(componentType: string, { inputEvent, ...defaultValue }: Record<string, any> = {}) {
+    const type = toLine(componentType);
+
     if (type === 'area') {
       const value = (await this.getPropsValue('button')) as MComponent;
       value.className = 'action-area';

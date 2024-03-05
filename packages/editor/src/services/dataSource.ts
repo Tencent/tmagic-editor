@@ -5,7 +5,7 @@ import { Writable } from 'type-fest';
 import type { EventOption } from '@tmagic/core';
 import type { FormConfig } from '@tmagic/form';
 import type { DataSourceSchema } from '@tmagic/schema';
-import { guid } from '@tmagic/utils';
+import { guid, toLine } from '@tmagic/utils';
 
 import type { DatasourceTypeOption, SyncHookPlugin } from '@editor/type';
 import { getFormConfig, getFormValue } from '@editor/utils/data-source';
@@ -68,35 +68,35 @@ class DataSource extends BaseService {
   }
 
   public getFormConfig(type = 'base') {
-    return getFormConfig(type, this.get('configs'));
+    return getFormConfig(toLine(type), this.get('configs'));
   }
 
   public setFormConfig(type: string, config: FormConfig) {
-    this.get('configs')[type] = config;
+    this.get('configs')[toLine(type)] = config;
   }
 
   public getFormValue(type = 'base') {
-    return getFormValue(type, this.get('values')[type]);
+    return getFormValue(toLine(type), this.get('values')[type]);
   }
 
   public setFormValue(type: string, value: Partial<DataSourceSchema>) {
-    this.get('values')[type] = value;
+    this.get('values')[toLine(type)] = value;
   }
 
   public getFormEvent(type = 'base') {
-    return this.get('events')[type] || [];
+    return this.get('events')[toLine(type)] || [];
   }
 
   public setFormEvent(type: string, value: EventOption[] = []) {
-    this.get('events')[type] = value;
+    this.get('events')[toLine(type)] = value;
   }
 
   public getFormMethod(type = 'base') {
-    return this.get('methods')[type] || [];
+    return this.get('methods')[toLine(type)] || [];
   }
 
   public setFormMethod(type: string, value: EventOption[] = []) {
-    this.get('methods')[type] = value;
+    this.get('methods')[toLine(type)] = value;
   }
 
   public add(config: DataSourceSchema) {
