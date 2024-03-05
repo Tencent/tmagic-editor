@@ -66,6 +66,8 @@ export interface FormItem {
   __key?: string | number;
   /** 表单域标签的的宽度，例如 '50px'。支持 auto。 */
   labelWidth?: string;
+  /** label 标签的title属性 */
+  labelTitle?: string;
   className?: string;
   /** 表单组件类型 */
   type?: string | TypeFunction;

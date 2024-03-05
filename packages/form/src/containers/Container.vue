@@ -42,7 +42,7 @@
         :label-width="itemLabelWidth"
         :rules="rule"
       >
-        <template #label><span v-html="type === 'checkbox' ? '' : text"></span></template>
+        <template #label><span v-html="type === 'checkbox' ? '' : text" :title="config.labelTitle"></span></template>
         <TMagicTooltip v-if="tooltip">
           <component
             :key="key(config)"
@@ -99,7 +99,7 @@
         :rules="rule"
         style="background: #f7dadd"
       >
-        <template #label><span v-html="type === 'checkbox' ? '' : text"></span></template>
+        <template #label><span v-html="type === 'checkbox' ? '' : text" :title="config.labelTitle"></span></template>
         <TMagicTooltip v-if="tooltip">
           <component
             :key="key(config)"
@@ -148,7 +148,7 @@
         :rules="rule"
         style="background: #def7da"
       >
-        <template #label><span v-html="type === 'checkbox' ? '' : text"></span></template>
+        <template #label><span v-html="type === 'checkbox' ? '' : text" :title="config.labelTitle"></span></template>
         <TMagicTooltip v-if="tooltip">
           <component
             :key="key(config)"
