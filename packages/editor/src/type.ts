@@ -19,8 +19,18 @@
 import type { Component } from 'vue';
 import type { PascalCasedProperties } from 'type-fest';
 
-import type { ColumnConfig, FilterFunction, FormConfig, FormItem } from '@tmagic/form';
-import type { CodeBlockContent, CodeBlockDSL, Id, MApp, MContainer, MNode, MPage, MPageFragment } from '@tmagic/schema';
+import type { ColumnConfig, FilterFunction, FormConfig, FormItem, Input } from '@tmagic/form';
+import type {
+  CodeBlockContent,
+  CodeBlockDSL,
+  DataSourceFieldType,
+  Id,
+  MApp,
+  MContainer,
+  MNode,
+  MPage,
+  MPageFragment,
+} from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
 import type {
   ContainerHighlightType,
@@ -596,42 +606,41 @@ export interface KeyBindingCacheItem {
   bound: boolean;
 }
 
-export interface CodeSelectColConfig {
+export interface CodeSelectColConfig extends FormItem {
   type: 'code-select-col';
-  name: string;
-  text: string;
-  labelWidth?: number | string;
-  disabled?: boolean | FilterFunction;
+  /** 是否可以编辑代码块，disable表示的是是否可以选择代码块 */
   notEditable?: boolean | FilterFunction;
-  display?: boolean | FilterFunction;
 }
 
-export interface PageFragmentSelectConfig {
+export interface PageFragmentSelectConfig extends FormItem {
   type: 'page-fragment-select';
-  name: string;
-  text: string;
-  labelWidth?: number | string;
-  disabled?: boolean | FilterFunction;
-  display?: boolean | FilterFunction;
 }
 
-export interface DataSourceMethodSelectConfig {
+export interface DataSourceSelect extends FormItem, Input {
+  type: 'data-source-select';
+  /** 数据源类型: base、http... */
+  dataSourceType?: string;
+  /** 是否要编译成数据源的data。
+   * id: 不编译，就是要数据源id;
+   * value: 要编译（数据源data）
+   * */
+  value?: 'id' | 'value';
+}
+
+export interface DataSourceMethodSelectConfig extends FormItem {
   type: 'data-source-method-select';
-  name: string;
-  text: string;
-  labelWidth?: number | string;
-  disabled?: boolean | FilterFunction;
+  /** 是否可以编辑数据源，disable表示的是是否可以选择数据源 */
   notEditable?: boolean | FilterFunction;
-  display?: boolean | FilterFunction;
 }
 
-export interface DataSourceFieldSelectConfig {
+export interface DataSourceFieldSelectConfig extends FormItem {
   type: 'data-source-field-select';
-  name: string;
+  /** 是否要编译成数据源的data。
+   * key: 不编译，就是要数据源id和field name;
+   * value: 要编译（数据源data[`${filed}`]）
+   * */
   value?: 'key' | 'value';
-  labelWidth?: number | string;
-  disabled?: boolean | FilterFunction;
-  display?: boolean | FilterFunction;
+  fieldType?: DataSourceFieldType;
 }
 
 /** 可新增的数据源类型选项 */

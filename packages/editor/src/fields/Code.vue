@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { FieldProps } from '@tmagic/form';
+import type { FieldProps, FormItem } from '@tmagic/form';
 
 import MagicCodeEditor from '@editor/layouts/CodeEditor.vue';
 
@@ -27,14 +27,16 @@ const emit = defineEmits<{
 
 const props = withDefaults(
   defineProps<
-    FieldProps<{
-      language?: string;
-      options?: {
-        [key: string]: any;
-      };
-      height?: string;
-      parse?: boolean;
-    }>
+    FieldProps<
+      {
+        language?: string;
+        options?: {
+          [key: string]: any;
+        };
+        height?: string;
+        parse?: boolean;
+      } & FormItem
+    >
   >(),
   {
     disabled: false,

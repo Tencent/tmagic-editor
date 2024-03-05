@@ -11,7 +11,7 @@ import { computed, inject, watch } from 'vue';
 import { isEmpty } from 'lodash-es';
 
 import { TMagicCard } from '@tmagic/design';
-import type { FieldProps } from '@tmagic/form';
+import type { FieldProps, FormItem } from '@tmagic/form';
 import { FormState } from '@tmagic/form';
 import { HookCodeType, HookType } from '@tmagic/schema';
 
@@ -27,9 +27,11 @@ const services = inject<Services>('services');
 
 const props = withDefaults(
   defineProps<
-    FieldProps<{
-      className?: string;
-    }>
+    FieldProps<
+      {
+        className?: string;
+      } & FormItem
+    >
   >(),
   {},
 );

@@ -6,7 +6,7 @@
 import { computed, reactive, watch } from 'vue';
 import serialize from 'serialize-javascript';
 
-import type { FieldProps } from '@tmagic/form';
+import type { FieldProps, FormItem } from '@tmagic/form';
 
 import { getConfig } from '@editor/utils/config';
 
@@ -15,13 +15,13 @@ defineOptions({
 });
 
 const props = defineProps<
-  FieldProps<{
-    type: 'code-link';
-    name: string;
-    text?: string;
-    formTitle?: string;
-    codeOptions?: Object;
-  }>
+  FieldProps<
+    {
+      type: 'code-link';
+      formTitle?: string;
+      codeOptions?: Object;
+    } & FormItem
+  >
 >();
 
 const emit = defineEmits(['change']);

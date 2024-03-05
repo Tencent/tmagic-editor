@@ -35,7 +35,7 @@ mask是一个盖在画布区域的一个蒙层，主要作用是隔离鼠标事�
 ## ActionManager
 - 负责监听鼠标和键盘事件，基于这些事件，形成单选、多选、高亮行为。主要监听的是蒙层上的鼠标事件，通过StageRender.getElementsFromPoint计算获得鼠标下方的组件，实现事件监听和实际组件的解构。
 - 向上负责跟StageCore双向通信，提供接口供core调用，并向core抛出事件
-- 向下管理StageDragResize、StageMultiDragResize、StageHightlight这三个单选、多选、高亮类，让它们协同工作
+- 向下管理StageDragResize、StageMultiDragResize、StageHighlight这三个单选、多选、高亮类，让它们协同工作
 <br/><br/>
 ## StageDragResize
 负责单选相关逻辑，拖拽、改变大小、旋转等行为是依赖于开源库Moveable实现的，这些行为并不是直接作用于组件本身，而是在蒙层上创建了一个跟组件同等大小的边框div，实际拖拽的是边框div，在拖拽过程中同步更新组件。
@@ -47,7 +47,7 @@ mask是一个盖在画布区域的一个蒙层，主要作用是隔离鼠标事�
 ## StageMultiDragResize
 功能跟StageDragResize类似，只是这个类是负责多选操作的，通过ctrl健选中多个组件，多选状态下不支持通过表单配置组件。
 <br/><br/>
-## StageHightlight
+## StageHighlight
 在鼠标经过画布中的组件、或者鼠标经过组件目录树中的组件时，会触发组件高亮，高亮也是通过moveable实现的，这个类主要负责初始化moveable并管理高亮状态。
 <br/><br/>
 ## MoveableOptionsManager

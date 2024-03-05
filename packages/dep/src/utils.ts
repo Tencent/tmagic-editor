@@ -45,6 +45,7 @@ export const createDataSourceTarget = (ds: DataSourceSchema, initialDeps: DepDat
     initialDeps,
     isTarget: (key: string | number, value: any) => {
       // 关联数据源对象,如：{ isBindDataSource: true, dataSourceId: 'xxx'}
+      // 使用data-source-select value: 'value' 可以配置出来
       // 或者在模板在使用数据源,如：`xxx${id.field}xxx`
       if (
         (value?.isBindDataSource && value.dataSourceId && value.dataSourceId === ds.id) ||
@@ -64,6 +65,7 @@ export const createDataSourceTarget = (ds: DataSourceSchema, initialDeps: DepDat
       }
 
       // 关联数据源字段，格式为 [前缀+数据源ID, 字段名]
+      // 使用data-source-field-select value: 'value' 可以配置出来
       if (!Array.isArray(value) || typeof value[0] !== 'string') {
         return false;
       }
@@ -87,6 +89,7 @@ export const createDataSourceCondTarget = (ds: DataSourceSchema, initialDeps: De
     id: ds.id,
     initialDeps,
     isTarget: (key: string | number, value: any) => {
+      // 使用data-source-field-select value: 'key' 可以配置出来
       if (!Array.isArray(value) || value[0] !== ds.id || !`${key}`.startsWith('displayConds')) return false;
       return Boolean(ds?.fields?.find((field) => field.name === value[1]));
     },
@@ -98,6 +101,7 @@ export const createDataSourceMethodTarget = (ds: DataSourceSchema, initialDeps: 
     id: ds.id,
     initialDeps,
     isTarget: (key: string | number, value: any) => {
+      // 使用data-source-method-select 可以配置出来
       if (!Array.isArray(value) || value[0] !== ds.id) return false;
 
       return Boolean(ds?.methods?.find((method) => method.name === value[1]));
