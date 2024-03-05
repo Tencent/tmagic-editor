@@ -230,6 +230,9 @@ export default class DragResizeHelper {
    */
   public onResizeGroup(e: OnResizeGroup): void {
     const { events } = e;
+
+    this.moveableHelper.onResizeGroup(e);
+
     // 拖动过程更新
     events.forEach((ev) => {
       const { width, height, beforeTranslate } = ev.drag;
@@ -255,26 +258,28 @@ export default class DragResizeHelper {
       targeEl.style.width = `${width}px`;
       targeEl.style.height = `${height}px`;
     });
-    this.moveableHelper.onResizeGroup(e);
   }
 
   public onDragGroupStart(e: OnDragGroupStart): void {
-    const { events } = e;
     this.moveableHelper.onDragGroupStart(e);
+
+    const { events } = e;
     // 记录拖动前快照
     this.setFramesSnapShot(events);
   }
 
   public onDragGroup(e: OnDragGroup): void {
+    this.moveableHelper.onDragGroup(e);
+
     const { events } = e;
     // 拖动过程更新
     events.forEach((ev) => {
       const frameSnapShot = this.framesSnapShot.find(
-        (frameItem) => frameItem.id === ev.target.id.replace(DRAG_EL_ID_PREFIX, ''),
+        (frameItem) => ev.target.id.startsWith(DRAG_EL_ID_PREFIX) && ev.target.id.endsWith(frameItem.id),
       );
       if (!frameSnapShot) return;
       const targeEl = this.targetList.find(
-        (targetItem) => targetItem.id === ev.target.id.replace(DRAG_EL_ID_PREFIX, ''),
+        (targetItem) => ev.target.id.startsWith(DRAG_EL_ID_PREFIX) && ev.target.id.endsWith(targetItem.id),
       );
       if (!targeEl) return;
       // 元素与其所属组同时加入多选列表时，只更新父元素
@@ -286,7 +291,6 @@ export default class DragResizeHelper {
         targeEl.style.top = `${frameSnapShot.top + ev.beforeTranslate[1] - marginTop}px`;
       }
     });
-    this.moveableHelper.onDragGroup(e);
   }
 
   public getUpdatedElRect(el: HTMLElement, parentEl: HTMLElement | null, doc: Document): Rect {
@@ -342,7 +346,7 @@ export default class DragResizeHelper {
     events.forEach((ev) => {
       // 实际目标元素
       const matchEventTarget = this.targetList.find(
-        (targetItem) => targetItem.id === ev.target.id.replace(DRAG_EL_ID_PREFIX, ''),
+        (targetItem) => ev.target.id.startsWith(DRAG_EL_ID_PREFIX) && ev.target.id.endsWith(targetItem.id),
       );
       if (!matchEventTarget) return;
       this.framesSnapShot.push({
