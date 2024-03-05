@@ -377,6 +377,9 @@ importers:
       tsc-alias:
         specifier: ^1.8.5
         version: 1.8.5
+      type-fest:
+        specifier: ^4.10.3
+        version: 4.11.1
       typescript:
         specifier: ^5.0.4
         version: 5.0.4
@@ -9552,7 +9555,7 @@ packages:
     dependencies:
       find-up: 6.3.0
       read-pkg: 8.1.0
-      type-fest: 4.6.0
+      type-fest: 4.11.1
     dev: true
 
   /read-pkg-up@7.0.1:
@@ -9581,7 +9584,7 @@ packages:
       '@types/normalize-package-data': 2.4.1
       normalize-package-data: 6.0.0
       parse-json: 7.1.1
-      type-fest: 4.6.0
+      type-fest: 4.11.1
     dev: true
 
   /readable-stream@3.6.2:
@@ -10491,8 +10494,8 @@ packages:
     engines: {node: '>=14.16'}
     dev: true
 
-  /type-fest@4.6.0:
-    resolution: {integrity: sha512-rLjWJzQFOq4xw7MgJrCZ6T1jIOvvYElXT12r+y0CC6u67hegDHaxcPqb2fZHOGlqxugGQPNB1EnTezjBetkwkw==}
+  /type-fest@4.11.1:
+    resolution: {integrity: sha512-MFMf6VkEVZAETidGGSYW2B1MjXbGX+sWIywn2QPEaJ3j08V+MwVRHMXtf2noB8ENJaD0LIun9wh5Z6OPNf1QzQ==}
     engines: {node: '>=16'}
     dev: true
 

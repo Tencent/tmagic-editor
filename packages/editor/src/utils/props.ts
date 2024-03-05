@@ -328,7 +328,7 @@ export const displayTabConfig: TabPaneConfig = {
  * @param config 组件属性配置
  * @returns Object
  */
-export const fillConfig = (config: FormConfig = [], labelWidth = '80px') => [
+export const fillConfig = (config: FormConfig = [], labelWidth = '80px'): FormConfig => [
   {
     type: 'tab',
     labelWidth,

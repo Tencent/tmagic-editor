@@ -17,11 +17,12 @@
  */
 
 import { reactive } from 'vue';
+import type { Writable } from 'type-fest';
 
 import { convertToNumber } from '@tmagic/utils';
 
 import editorService from '@editor/services/editor';
-import type { StageRect, UiState } from '@editor/type';
+import type { AsyncHookPlugin, StageRect, UiState } from '@editor/type';
 
 import BaseService from './BaseService';
 
@@ -50,12 +51,16 @@ const state = reactive<UiState>({
   hideSlideBar: false,
 });
 
+const canUsePluginMethods = {
+  async: ['zoom', 'calcZoom'] as const,
+  sync: [] as const,
+};
+
+type AsyncMethodName = Writable<(typeof canUsePluginMethods)['async']>;
+
 class Ui extends BaseService {
   constructor() {
-    super([
-      { name: 'zoom', isAsync: true },
-      { name: 'calcZoom', isAsync: true },
-    ]);
+    super(canUsePluginMethods.async.map((methodName) => ({ name: methodName, isAsync: true })));
   }
 
   public set<K extends keyof UiState, T extends UiState[K]>(name: K, value: T) {
@@ -132,6 +137,10 @@ class Ui extends BaseService {
     this.resetState();
     this.removeAllListeners();
     this.removeAllPlugins();
+  }
+
+  public usePlugin(options: AsyncHookPlugin<AsyncMethodName, Ui>): void {
+    super.usePlugin(options);
   }
 
   private async setStageRect(value: StageRect) {

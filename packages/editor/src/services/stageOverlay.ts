@@ -1,11 +1,19 @@
 import { reactive } from 'vue';
+import type { Writable } from 'type-fest';
 
 import StageCore from '@tmagic/stage';
 
 import { useStage } from '@editor/hooks/use-stage';
 import BaseService from '@editor/services//BaseService';
 import editorService from '@editor/services//editor';
-import type { StageOptions, StageOverlayState } from '@editor/type';
+import type { StageOptions, StageOverlayState, SyncHookPlugin } from '@editor/type';
+
+const canUsePluginMethods = {
+  async: [],
+  sync: ['openOverlay', 'closeOverlay', 'updateOverlay', 'createStage'] as const,
+};
+
+type SyncMethodName = Writable<(typeof canUsePluginMethods)['sync']>;
 
 class StageOverlay extends BaseService {
   private state: StageOverlayState = reactive({
@@ -20,12 +28,7 @@ class StageOverlay extends BaseService {
   });
 
   constructor() {
-    super([
-      { name: 'openOverlay', isAsync: false },
-      { name: 'closeOverlay', isAsync: false },
-      { name: 'updateOverlay', isAsync: false },
-      { name: 'createStage', isAsync: false },
-    ]);
+    super(canUsePluginMethods.sync.map((methodName) => ({ name: methodName, isAsync: false })));
 
     this.get('wrapDiv').classList.add('tmagic-editor-sub-stage-wrap');
   }
@@ -109,6 +112,10 @@ class StageOverlay extends BaseService {
         return wrapDiv;
       },
     });
+  }
+
+  public usePlugin(options: SyncHookPlugin<SyncMethodName, StageOverlay>): void {
+    super.usePlugin(options);
   }
 
   private createContentEl() {

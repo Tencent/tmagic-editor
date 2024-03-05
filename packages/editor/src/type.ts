@@ -17,6 +17,7 @@
  */
 
 import type { Component } from 'vue';
+import type { PascalCasedProperties } from 'type-fest';
 
 import type { ColumnConfig, FilterFunction, FormConfig, FormItem } from '@tmagic/form';
 import type { CodeBlockContent, CodeBlockDSL, Id, MApp, MContainer, MNode, MPage, MPageFragment } from '@tmagic/schema';
@@ -670,3 +671,35 @@ export interface TreeNodeData {
   items?: TreeNodeData[];
   [key: string]: any;
 }
+
+export type AsyncBeforeHook<Value extends Array<string>, C extends Record<Value[number], (...args: any) => any>> = {
+  [K in Value[number]]?: (...args: Parameters<C[K]>) => Promise<Parameters<C[K]>>;
+};
+
+export type AsyncAfterHook<Value extends Array<string>, C extends Record<Value[number], (...args: any) => any>> = {
+  [K in Value[number]]?: (result: Awaited<ReturnType<C[K]>>, ...args: Parameters<C[K]>) => ReturnType<C[K]>;
+};
+
+export type SyncBeforeHook<Value extends Array<string>, C extends Record<Value[number], (...args: any) => any>> = {
+  [K in Value[number]]?: (...args: Parameters<C[K]>) => Parameters<C[K]>;
+};
+
+export type SyncAfterHook<Value extends Array<string>, C extends Record<Value[number], (...args: any) => any>> = {
+  [K in Value[number]]?: (result: ReturnType<C[K]>, ...args: Parameters<C[K]>) => ReturnType<C[K]>;
+};
+
+export type AddPrefixToObject<T, P extends string> = {
+  [K in keyof T as K extends string ? `${P}${K}` : never]: T[K];
+};
+
+export type AsyncHookPlugin<
+  T extends Array<string>,
+  C extends Record<T[number], (...args: any) => any>,
+> = AddPrefixToObject<PascalCasedProperties<AsyncBeforeHook<T, C>>, 'before'> &
+  AddPrefixToObject<PascalCasedProperties<AsyncAfterHook<T, C>>, 'after'>;
+
+export type SyncHookPlugin<
+  T extends Array<string>,
+  C extends Record<T[number], (...args: any) => any>,
+> = AddPrefixToObject<PascalCasedProperties<SyncBeforeHook<T, C>>, 'before'> &
+  AddPrefixToObject<PascalCasedProperties<SyncAfterHook<T, C>>, 'after'>;
