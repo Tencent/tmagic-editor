@@ -46,6 +46,8 @@ export interface CascaderProps {
   filterable?: boolean;
   options?: CascaderOption[];
   size?: FieldSize;
+  /** 弹出内容的自定义类名 */
+  popperClass?: string;
   props: {
     expandTrigger?: 'click' | 'hover';
     multiple?: boolean;

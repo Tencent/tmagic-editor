@@ -9,6 +9,7 @@
     :placeholder="config.placeholder"
     :disabled="disabled"
     :options="options"
+    :popper-class="config.popperClass"
     :props="{
       multiple: config.multiple ?? false,
       emitPath: config.emitPath ?? true,
