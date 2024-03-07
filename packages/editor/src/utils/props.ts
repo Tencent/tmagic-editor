@@ -91,6 +91,19 @@ export const styleTabConfig: TabPaneConfig = {
               name: 'height',
               text: '高度',
             },
+            {
+              text: 'overflow',
+              name: 'overflow',
+              type: 'select',
+              options: [
+                { text: 'visible', value: 'visible' },
+                { text: 'hidden', value: 'hidden' },
+                { text: 'clip', value: 'clip' },
+                { text: 'scroll', value: 'scroll' },
+                { text: 'auto', value: 'auto' },
+                { text: 'overlay', value: 'overlay' },
+              ],
+            },
           ],
         },
         {
@@ -247,15 +260,23 @@ export const displayTabConfig: TabPaneConfig = {
               name: 'field',
               value: 'key',
               label: '字段',
+              checkStrictly: false,
+              fieldType: ['string', 'number', 'boolean', 'any'],
             },
             {
               type: 'select',
               options: (mForm, { model }) => {
-                const [id, field] = model.field;
+                const [id, ...fieldNames] = model.field;
 
                 const ds = dataSourceService.getDataSourceById(id);
 
-                const type = ds?.fields.find((f) => f.name === field)?.type;
+                let fields = ds?.fields || [];
+                let type = '';
+                (fieldNames || []).forEach((fieldName: string) => {
+                  const field = fields.find((f) => f.name === fieldName);
+                  fields = field?.fields || [];
+                  type = field?.type || '';
+                });
 
                 if (type === 'array') {
                   return arrayOptions;
@@ -287,11 +308,17 @@ export const displayTabConfig: TabPaneConfig = {
                 {
                   name: 'value',
                   type: (mForm, { model }) => {
-                    const [id, field] = model.field;
+                    const [id, ...fieldNames] = model.field;
 
                     const ds = dataSourceService.getDataSourceById(id);
 
-                    const type = ds?.fields.find((f) => f.name === field)?.type;
+                    let fields = ds?.fields || [];
+                    let type = '';
+                    (fieldNames || []).forEach((fieldName: string) => {
+                      const field = fields.find((f) => f.name === fieldName);
+                      fields = field?.fields || [];
+                      type = field?.type || '';
+                    });
 
                     if (type === 'number') {
                       return 'number';

@@ -18,7 +18,7 @@
 
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import { cloneDeep, get as objectGet, set as objectSet } from 'lodash-es';
+import { cloneDeep, set as objectSet } from 'lodash-es';
 
 import type { DataSchema, DataSourceDeps, Id, MComponent, MNode } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
@@ -165,7 +165,18 @@ export const guid = (digit = 8): string =>
     return v.toString(16);
   });
 
-export const getValueByKeyPath: any = (keys: string, data: Record<string | number, any> = {}) => objectGet(data, keys);
+export const getValueByKeyPath: any = (keys = '', data: Record<string | number, any> = {}) =>
+  // 将 array[0] 转成 array.0
+  keys
+    .replaceAll(/\[(\d+)\]/g, '.$1')
+    .split('.')
+    .reduce((accumulator, currentValue: any) => {
+      if (isObject(accumulator) || Array.isArray(accumulator)) {
+        return accumulator[currentValue];
+      }
+
+      return void 0;
+    }, data);
 
 export const setValueByKeyPath: any = (keys: string, value: any, data: Record<string | number, any> = {}) =>
   objectSet(data, keys, value);
@@ -238,6 +249,8 @@ export const replaceChildNode = (newNode: MNode, data?: MNode[], parentId?: Id) 
   parent.items.splice(index, 1, newNode);
 };
 
+export const DSL_NODE_KEY_COPY_PREFIX = '__magic__';
+
 export const compiledNode = (
   compile: (value: any) => any,
   node: MNode,
@@ -252,10 +265,8 @@ export const compiledNode = (
     keys = dep?.[node.id].keys || [];
   }
 
-  const keyPrefix = '__magic__';
-
   keys.forEach((key) => {
-    const cacheKey = `${keyPrefix}${key}`;
+    const cacheKey = `${DSL_NODE_KEY_COPY_PREFIX}${key}`;
 
     const value = getValueByKeyPath(key, node);
     let templateValue = getValueByKeyPath(cacheKey, node);
@@ -275,10 +286,6 @@ export const compiledNode = (
 
     setValueByKeyPath(key, newValue, node);
   });
-
-  if (Array.isArray(node.items)) {
-    node.items.forEach((item) => compiledNode(compile, item, dataSourceDeps));
-  }
 
   return node;
 };

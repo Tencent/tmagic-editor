@@ -16,28 +16,9 @@
  * limitations under the License.
  */
 
-import Button from './button';
-import Container from './container';
-import Img from './img';
-import IteratorContainer from './iterator-container';
-import Overlay from './overlay';
-import Page from './page';
-import PageFragment from './page-fragment';
-import PageFragmentContainer from './page-fragment-container';
-import QRcode from './qrcode';
-import Text from './text';
+import IteratorContainer from './src/IteratorContainer';
 
-const ui: Record<string, any> = {
-  page: Page,
-  container: Container,
-  button: Button,
-  text: Text,
-  img: Img,
-  qrcode: QRcode,
-  overlay: Overlay,
-  'page-fragment-container': PageFragmentContainer,
-  'page-fragment': PageFragment,
-  'iterator-container': IteratorContainer,
-};
+export { default as config } from './src/formConfig';
+export { default as value } from './src/initValue';
 
-export default ui;
+export default IteratorContainer;

@@ -640,7 +640,9 @@ export interface DataSourceFieldSelectConfig extends FormItem {
    * value: 要编译（数据源data[`${filed}`]）
    * */
   value?: 'key' | 'value';
-  fieldType?: DataSourceFieldType;
+  /** 是否严格的遵守父子节点不互相关联 */
+  checkStrictly?: boolean;
+  fieldType?: DataSourceFieldType[];
 }
 
 /** 可新增的数据源类型选项 */

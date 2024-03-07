@@ -24,7 +24,7 @@
 import { TMagicButton } from '@tmagic/design';
 import type { FieldProps } from '@tmagic/form';
 import type { CodeBlockContent } from '@tmagic/schema';
-import { MagicTable } from '@tmagic/table';
+import { type ColumnConfig, MagicTable } from '@tmagic/table';
 
 import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
 import { useDataSourceMethod } from '@editor/hooks/use-data-source-method';
@@ -49,7 +49,7 @@ const emit = defineEmits(['change']);
 
 const { codeConfig, codeBlockEditor, createCode, editCode, deleteCode, submitCode } = useDataSourceMethod();
 
-const methodColumns = [
+const methodColumns: ColumnConfig[] = [
   {
     label: '名称',
     prop: 'name',

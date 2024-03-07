@@ -37,7 +37,7 @@ import { computed, inject, ref } from 'vue';
 import { TMagicButton, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
 import { type FieldProps, type FormConfig, type FormState, MFormDrawer } from '@tmagic/form';
 import type { DataSchema } from '@tmagic/schema';
-import { MagicTable } from '@tmagic/table';
+import { type ColumnConfig, MagicTable } from '@tmagic/table';
 import { getDefaultValueFromFields } from '@tmagic/utils';
 
 import type { Services } from '@editor/type';
@@ -86,7 +86,7 @@ const fieldChange = ({ index, ...value }: Record<string, any>) => {
   emit('change', props.model[props.name]);
 };
 
-const fieldColumns = [
+const fieldColumns: ColumnConfig[] = [
   {
     label: '属性名称',
     prop: 'title',
@@ -102,6 +102,13 @@ const fieldColumns = [
   {
     label: '默认值',
     prop: 'defaultValue',
+    formatter(item, row) {
+      try {
+        return JSON.stringify(row.defaultValue);
+      } catch (e) {
+        return row.defaultValue;
+      }
+    },
   },
   {
     label: '操作',

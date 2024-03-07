@@ -17,11 +17,12 @@
  */
 import { cloneDeep, union } from 'lodash-es';
 
-import type { AppCore, MApp, MNode, MPage, MPageFragment } from '@tmagic/schema';
-import { getDepNodeIds, getNodes, isPage, isPageFragment, replaceChildNode } from '@tmagic/utils';
+import type { AppCore } from '@tmagic/schema';
+import { getDepNodeIds, getNodes } from '@tmagic/utils';
 
 import DataSourceManager from './DataSourceManager';
 import type { ChangeEvent, DataSourceManagerData } from './types';
+import { updateNode } from './utils';
 
 /**
  * 创建数据源管理器
@@ -72,13 +73,4 @@ export const createDataSourceManager = (app: AppCore, useMock?: boolean, initial
   }
 
   return dataSourceManager;
-};
-
-const updateNode = (node: MNode, dsl: MApp) => {
-  if (isPage(node) || isPageFragment(node)) {
-    const index = dsl.items?.findIndex((child: MNode) => child.id === node.id);
-    dsl.items.splice(index, 1, node as MPage | MPageFragment);
-  } else {
-    replaceChildNode(node, dsl!.items);
-  }
 };

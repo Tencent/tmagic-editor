@@ -20,10 +20,10 @@ import { FormConfig, FormValue } from '@tmagic/form';
 
 export interface ColumnActionConfig {
   type?: 'delete' | 'copy' | 'edit';
-  buttonType: string;
+  buttonType?: string;
   display?: (row: any) => boolean;
-  text: string | ((row: any) => string);
-  name: string;
+  text?: string | ((row: any) => string);
+  name?: string;
   tooltip?: string;
   tooltipPlacement?: string;
   icon?: any;

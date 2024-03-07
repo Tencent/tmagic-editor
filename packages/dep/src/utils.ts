@@ -1,5 +1,6 @@
 import {
   type CodeBlockContent,
+  type DataSchema,
   type DataSourceSchema,
   type DepData,
   type HookData,
@@ -46,12 +47,53 @@ export const createDataSourceTarget = (ds: DataSourceSchema, initialDeps: DepDat
     isTarget: (key: string | number, value: any) => {
       // 关联数据源对象,如：{ isBindDataSource: true, dataSourceId: 'xxx'}
       // 使用data-source-select value: 'value' 可以配置出来
-      // 或者在模板在使用数据源,如：`xxx${id.field}xxx`
-      if (
-        (value?.isBindDataSource && value.dataSourceId && value.dataSourceId === ds.id) ||
-        (typeof value === 'string' && value.includes(`${ds.id}`) && /\$\{([\s\S]+?)\}/.test(value))
-      ) {
+
+      if (value?.isBindDataSource && value.dataSourceId && value.dataSourceId === ds.id) {
         return true;
+      }
+
+      // 或者在模板在使用数据源,如：`xxx${dsId.field}xxx${dsId.field}`
+      if (typeof value === 'string' && value.includes(`${ds.id}`) && /\$\{([\s\S]+?)\}/.test(value)) {
+        // 模板中可能会存在多个表达式，将表达式从模板中提取出来
+        const templates = value.match(/\$\{([\s\S]+?)\}/g) || [];
+
+        for (const tpl of templates) {
+          const keys = tpl
+            // 将${dsId.xxxx} 转成 dsId.xxxx
+            .substring(2, tpl.length - 1)
+            // 将 array[0] 转成 array.0
+            .replaceAll(/\[(\d+)\]/g, '.$1')
+            .split('.');
+          const dsId = keys.shift();
+
+          if (!dsId || dsId !== ds.id) {
+            continue;
+          }
+
+          // ${dsId.array} ${dsId.array[0]} ${dsId.array[0].a} 这种是依赖
+          // ${dsId.array.a} 这种不是依赖，这种需要再迭代器容器中的组件才能使用，依赖由迭代器处理
+          let includeArray = false;
+          keys.reduce((accumulator: DataSchema[], currentValue: string, currentIndex: number) => {
+            const field = accumulator.find(({ name }) => name === currentValue);
+            if (
+              field &&
+              field.type === 'array' &&
+              typeof keys[currentIndex + 1] !== 'number' &&
+              currentIndex < keys.length - 1
+            ) {
+              includeArray = true;
+            }
+            return field?.fields || [];
+          }, ds.fields);
+
+          if (includeArray) {
+            continue;
+          }
+
+          return true;
+        }
+
+        return false;
       }
 
       // 指定数据源的字符串模板,如：{ isBindDataSourceField: true, dataSourceId: 'id', template: `xxx${field}xxx`}

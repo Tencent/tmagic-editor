@@ -668,6 +668,9 @@ importers:
       '@tmagic/schema':
         specifier: 1.3.16
         version: link:../schema
+      '@tmagic/utils':
+        specifier: 1.3.16
+        version: link:../utils
       qrcode:
         specifier: ^1.5.0
         version: 1.5.0

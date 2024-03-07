@@ -72,6 +72,7 @@ import ActionsColumn from './ActionsColumn.vue';
 import ComponentColumn from './ComponentColumn.vue';
 import ExpandColumn from './ExpandColumn.vue';
 import PopoverColumn from './PopoverColumn.vue';
+import type { ColumnConfig } from './schema';
 import TextColumn from './TextColumn.vue';
 
 defineOptions({
@@ -81,7 +82,7 @@ defineOptions({
 const props = withDefaults(
   defineProps<{
     data: any[];
-    columns?: any[];
+    columns?: ColumnConfig[];
     /** 合并行或列的计算方法 */
     spanMethod?: (data: { row: any; column: any; rowIndex: number; columnIndex: number }) => [number, number];
     loading?: boolean;

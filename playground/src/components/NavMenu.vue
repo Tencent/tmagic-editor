@@ -31,7 +31,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .m-editor-nav-menu {
   justify-content: flex-end;
   height: 35px;
