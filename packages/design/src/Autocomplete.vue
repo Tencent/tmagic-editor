@@ -8,8 +8,8 @@
     @select="selectHandler"
     @update:modelValue="updateModelValue"
   >
-    <template #defalut="{ item }" v-if="$slots.defalut">
-      <slot name="defalut" :item="item"></slot>
+    <template #default="{ item }" v-if="$slots.default">
+      <slot name="default" :item="item"></slot>
     </template>
     <template #prepend v-if="$slots.prepend">
       <slot name="prepend"></slot>
