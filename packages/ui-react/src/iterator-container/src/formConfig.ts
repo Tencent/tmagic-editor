@@ -22,7 +22,7 @@ export default [
     name: 'iteratorData',
     text: '数据源数据',
     value: 'value',
-    fieldType: ['array'],
+    dataSourceFieldType: ['array'],
     checkStrictly: false,
     type: 'data-source-field-select',
     onChange: (vm: any, v: string[] = [], { model }: any) => {

@@ -19,7 +19,7 @@
 import type { Component } from 'vue';
 import type { PascalCasedProperties } from 'type-fest';
 
-import type { ColumnConfig, FilterFunction, FormConfig, FormItem, Input } from '@tmagic/form';
+import type { ChildConfig, ColumnConfig, FilterFunction, FormConfig, FormItem, Input } from '@tmagic/form';
 import type {
   CodeBlockContent,
   CodeBlockDSL,
@@ -642,7 +642,8 @@ export interface DataSourceFieldSelectConfig extends FormItem {
   value?: 'key' | 'value';
   /** 是否严格的遵守父子节点不互相关联 */
   checkStrictly?: boolean;
-  fieldType?: DataSourceFieldType[];
+  dataSourceFieldType?: DataSourceFieldType[];
+  fieldConfig?: ChildConfig;
 }
 
 /** 可新增的数据源类型选项 */
