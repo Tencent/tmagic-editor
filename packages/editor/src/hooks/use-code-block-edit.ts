@@ -54,7 +54,6 @@ export const useCodeBlockEdit = (codeBlockService?: CodeBlockService) => {
     codeId.value = id;
 
     await nextTick();
-
     codeBlockEditor.value?.show();
   };
 

@@ -236,20 +236,16 @@ export interface UiState {
   propsPanelSize: 'large' | 'default' | 'small';
   /** 是否显示新增页面按钮 */
   showAddPageButton: boolean;
-
-  /** slide 拖拽悬浮窗 state */
-  floatBox: Map<
-    string,
-    {
-      status: boolean;
-      zIndex: number;
-      top: number;
-      left: number;
-    }
-  >;
-
   /** 是否隐藏侧边栏 */
   hideSlideBar: boolean;
+
+  // navMenu 的宽高
+  navMenuRect: {
+    left: number;
+    top: number;
+    width: number;
+    height: number;
+  };
 }
 
 export interface EditorNodeInfo {

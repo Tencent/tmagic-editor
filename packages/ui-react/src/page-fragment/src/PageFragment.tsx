@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 import type { MComponent, MContainer, MPageFragment } from '@tmagic/schema';

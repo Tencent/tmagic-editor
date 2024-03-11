@@ -1,6 +1,5 @@
 <template>
-  <component
-    :is="slideType === 'box' ? MFormBox : MFormDrawer"
+  <MFormBox
     class="m-editor-code-block-editor"
     ref="fomDrawer"
     label-width="80px"
@@ -20,7 +19,7 @@
     <template #left>
       <TMagicButton type="primary" link @click="difVisible = true">查看修改</TMagicButton>
     </template>
-  </component>
+  </MFormBox>
 
   <TMagicDialog v-model="difVisible" title="查看修改" fullscreen>
     <div style="display: flex; margin-bottom: 10px">
@@ -55,7 +54,7 @@ import { ColumnConfig, FormConfig, FormState, MFormBox, MFormDrawer } from '@tma
 import type { CodeBlockContent } from '@tmagic/schema';
 
 import CodeEditor from '@editor/layouts/CodeEditor.vue';
-import type { Services, SlideType } from '@editor/type';
+import type { Services } from '@editor/type';
 import { getConfig } from '@editor/utils/config';
 
 defineOptions({
@@ -67,7 +66,6 @@ const props = defineProps<{
   disabled?: boolean;
   isDataSource?: boolean;
   dataSourceType?: string;
-  slideType?: SlideType;
 }>();
 
 const emit = defineEmits<{

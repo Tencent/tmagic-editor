@@ -204,6 +204,11 @@ const getItemConfig = (data: SideItem): SideComponent => {
       text: '代码编辑',
       component: CodeBlockListPanel,
       slots: {},
+      boxComponentConfig: {
+        props: {
+          slideType: 'box',
+        },
+      },
     },
     'data-source': {
       $key: 'data-source',

@@ -72,12 +72,15 @@
 }
 
 .m-editor-slide-list-box {
-  min-width: 270px;
+  display: flex;
+  min-width: 240px;
   min-height: 500px;
-  max-height: 1024px;
   > div {
     &:first-child {
-      width: 100%;
+      min-width: 240px;
     }
+  }
+  .m-form-box {
+    border-left: 1px solid #e0e0e0;
   }
 }
