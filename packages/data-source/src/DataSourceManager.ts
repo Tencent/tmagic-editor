@@ -162,9 +162,16 @@ class DataSourceManager extends EventEmitter {
     });
   }
 
-  public compiledNode(node: MNode, sourceId?: Id) {
-    if (node.condResult === false) return node;
-    if (node.visible === false) return node;
+  public compiledNode({ items, ...node }: MNode, sourceId?: Id, deep = false) {
+    const newNode = cloneDeep(node);
+
+    if (items) {
+      newNode.items =
+        Array.isArray(items) && deep ? items.map((item) => this.compiledNode(item, sourceId, deep)) : items;
+    }
+
+    if (node.condResult === false) return newNode;
+    if (node.visible === false) return newNode;
 
     return compiledNode(
       (value: any) => {
@@ -201,7 +208,7 @@ class DataSourceManager extends EventEmitter {
 
         return value;
       },
-      cloneDeep(node),
+      newNode,
       this.app.dsl?.dataSourceDeps || {},
       sourceId,
     );
@@ -229,7 +236,7 @@ class DataSourceManager extends EventEmitter {
 
       return compiledNode(
         (value: string) => template(value)(createIteratorContentData(itemData, dsId, fields)),
-        cloneDeep(item),
+        item,
         {
           [dsId]: {
             [item.id]: {

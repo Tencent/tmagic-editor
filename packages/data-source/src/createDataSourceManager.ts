@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { cloneDeep, union } from 'lodash-es';
+import { union } from 'lodash-es';
 
 import type { AppCore } from '@tmagic/schema';
 import { getDepNodeIds, getNodes } from '@tmagic/utils';
@@ -62,9 +62,11 @@ export const createDataSourceManager = (app: AppCore, useMock?: boolean, initial
       dataSourceManager.emit(
         'update-data',
         getNodes(nodeIds, dsl.items).map((node) => {
-          const newNode = cloneDeep(node);
-          newNode.condResult = dataSourceManager.compliedConds(newNode);
-          return dataSourceManager.compiledNode(newNode);
+          if (app.platform !== 'editor') {
+            node.condResult = dataSourceManager.compliedConds(node);
+          }
+
+          return dataSourceManager.compiledNode(node);
         }),
         sourceId,
         changeEvent,
