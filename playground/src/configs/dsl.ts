@@ -426,6 +426,41 @@ export default {
       beforeRequest: '',
       afterResponse: '',
     },
+    {
+      id: 'ds_d1a460c5',
+      type: 'base',
+      title: 'style',
+      description: '',
+      fields: [
+        {
+          name: 'color',
+          title: 'color',
+          type: 'string',
+          description: '',
+          enable: true,
+          defaultValue: '#fff',
+          fields: [],
+        },
+      ],
+      methods: [
+        {
+          name: 'setCorlor',
+          desc: '',
+          timing: '',
+          params: [],
+          content: ({ dataSource }) => {
+            // place your code here
+            setTimeout(() => {
+              dataSource.setData('red', 'color');
+            }, 1000);
+          },
+        },
+      ],
+      events: '',
+      mocks: [],
+      beforeRequest: '',
+      afterResponse: '',
+    },
   ],
   dataSourceDeps: {
     ds_b64c92b5: {

@@ -1,6 +1,6 @@
 <template>
   <component
-    v-if="display()"
+    v-if="display"
     :is="tagName"
     :id="config.id"
     :class="`magic-ui-component${config.className ? ` ${config.className}` : ''}`"
@@ -34,7 +34,7 @@ export default defineComponent({
       tagName: computed(() => `magic-ui-${toLine(props.config.type)}`),
       style: computed(() => app?.transformStyle(props.config.style || {})),
 
-      display: () => {
+      display: computed(() => {
         if (props.config.visible === false) return false;
         if (props.config.condResult === false) return false;
 
@@ -44,7 +44,7 @@ export default defineComponent({
           return displayCfg(app);
         }
         return displayCfg !== false;
-      },
+      }),
     };
   },
 });
