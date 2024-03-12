@@ -1,6 +1,6 @@
 <template>
   <Teleport to="body" v-if="visible">
-    <div ref="target" class="m-editor-float-box" :style="style" @mousedown="nextZIndex">
+    <div ref="target" class="m-editor-float-box" :style="{ ...style, zIndex: curZIndex }" @mousedown="nextZIndex">
       <div ref="dragTarget" class="m-editor-float-box-title">
         <slot name="title">
           <span>{{ title }}</span>
@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, ref, watch, watchEffect } from 'vue';
 import { Close } from '@element-plus/icons-vue';
 import VanillaMoveable from 'moveable';
 
@@ -33,21 +33,12 @@ interface Rect {
   height: number | string;
 }
 
-const props = withDefaults(
-  defineProps<{
-    visible: boolean;
-    position?: Position;
-    rect?: Rect;
-    title?: string;
-    beforeClose?: (done: (cancel?: boolean) => void) => void;
-  }>(),
-  {
-    visible: false,
-    title: '',
-    position: () => ({ left: 0, top: 0 }),
-    rect: () => ({ width: 'auto', height: 'auto' }),
-  },
-);
+const props = withDefaults(defineProps<{ visible: boolean; position?: Position; rect?: Rect; title?: string }>(), {
+  visible: false,
+  title: '',
+  position: () => ({ left: 0, top: 0 }),
+  rect: () => ({ width: 'auto', height: 'auto' }),
+});
 
 const emit = defineEmits<{
   'update:visible': [boolean];
@@ -59,12 +50,23 @@ const dragTarget = ref<HTMLDivElement>();
 const zIndex = useZIndex();
 const curZIndex = ref<number>(zIndex.nextZIndex());
 
+const rect = ref({
+  width: props.rect.width,
+  height: props.rect.height,
+});
+
+watchEffect(() => {
+  rect.value = {
+    width: props.rect.width,
+    height: props.rect.height,
+  };
+});
+
 const style = computed(() => ({
   left: `${props.position.left}px`,
   top: `${props.position.top}px`,
-  width: typeof props.rect.width === 'string' ? props.rect.width : `${props.rect.width}px`,
-  height: typeof props.rect.height === 'string' ? props.rect.height : `${props.rect.height}px`,
-  zIndex: curZIndex.value,
+  width: typeof rect.value.width === 'string' ? rect.value.width : `${rect.value.width}px`,
+  height: typeof rect.value.height === 'string' ? rect.value.height : `${rect.value.height}px`,
 }));
 
 let moveable: VanillaMoveable | null = null;
@@ -91,6 +93,8 @@ const initMoveable = () => {
   });
 
   moveable.on('resize', (e) => {
+    rect.value.width = e.width;
+    rect.value.height = e.height;
     e.target.style.width = `${e.width}px`;
     e.target.style.height = `${e.height}px`;
     e.target.style.transform = e.drag.transform;
@@ -121,18 +125,8 @@ onBeforeUnmount(() => {
   destroyMoveable();
 });
 
-const hide = (cancel?: boolean) => {
-  if (cancel !== false) {
-    emit('update:visible', false);
-  }
-};
-
 const closeHandler = () => {
-  if (typeof props.beforeClose === 'function') {
-    props.beforeClose(hide);
-  } else {
-    hide();
-  }
+  emit('update:visible', false);
 };
 
 const nextZIndex = () => {
