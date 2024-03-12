@@ -227,7 +227,7 @@ asyncLoadJs(`${VITE_ENTRY_PATH}/ds-value/index.umd.cjs`).then(() => {
 save();
 
 editorService.usePlugin({
-  beforeDoAdd: async (config: MNode, parent: MContainer) => {
+  beforeDoAdd: (config: MNode, parent: MContainer) => {
     if (config.type === 'overlay') {
       config.style = {
         ...config.style,

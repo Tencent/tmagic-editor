@@ -681,11 +681,14 @@ export interface TreeNodeData {
 }
 
 export type AsyncBeforeHook<Value extends Array<string>, C extends Record<Value[number], (...args: any) => any>> = {
-  [K in Value[number]]?: (...args: Parameters<C[K]>) => Promise<Parameters<C[K]>>;
+  [K in Value[number]]?: (...args: Parameters<C[K]>) => Promise<Parameters<C[K]>> | Parameters<C[K]>;
 };
 
 export type AsyncAfterHook<Value extends Array<string>, C extends Record<Value[number], (...args: any) => any>> = {
-  [K in Value[number]]?: (result: Awaited<ReturnType<C[K]>>, ...args: Parameters<C[K]>) => ReturnType<C[K]>;
+  [K in Value[number]]?: (
+    result: Awaited<ReturnType<C[K]>>,
+    ...args: Parameters<C[K]>
+  ) => ReturnType<C[K]> | Awaited<ReturnType<C[K]>>;
 };
 
 export type SyncBeforeHook<Value extends Array<string>, C extends Record<Value[number], (...args: any) => any>> = {
