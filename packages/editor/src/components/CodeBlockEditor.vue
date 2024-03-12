@@ -1,25 +1,33 @@
 <template>
-  <MFormBox
-    class="m-editor-code-block-editor"
-    ref="fomDrawer"
-    label-width="80px"
-    :close-on-press-escape="false"
-    :title="content.name"
-    :width="size"
-    :config="functionConfig"
-    :values="content"
-    :disabled="disabled"
-    :before-close="beforeClose"
-    @change="changeHandler"
-    @submit="submitForm"
-    @error="errorHandler"
-    @open="openHandler"
-    @closed="closedHandler"
-  >
-    <template #left>
-      <TMagicButton type="primary" link @click="difVisible = true">查看修改</TMagicButton>
+  <!-- 代码块编辑区 -->
+  <FloatingBox v-model:visible="boxVisible" title="代码编辑" :position="boxPosition" :before-close="beforeClose">
+    <template #body>
+      <div ref="floatingBoxBody"></div>
     </template>
-  </MFormBox>
+  </FloatingBox>
+
+  <Teleport :to="floatingBoxBody" :disabled="slideType === 'box'" v-if="editVisible">
+    <MFormBox
+      class="m-editor-code-block-editor"
+      ref="fomDrawer"
+      label-width="80px"
+      :close-on-press-escape="false"
+      :title="content.name"
+      :width="size"
+      :config="functionConfig"
+      :values="content"
+      :disabled="disabled"
+      @change="changeHandler"
+      @submit="submitForm"
+      @error="errorHandler"
+      @open="openHandler"
+      @closed="closedHandler"
+    >
+      <template #left>
+        <TMagicButton type="primary" link @click="difVisible = true">查看修改</TMagicButton>
+      </template>
+    </MFormBox>
+  </Teleport>
 
   <TMagicDialog v-model="difVisible" title="查看修改" fullscreen>
     <div style="display: flex; margin-bottom: 10px">
@@ -47,14 +55,15 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, onBeforeUnmount, ref } from 'vue';
+import { computed, inject, nextTick, onBeforeUnmount, ref } from 'vue';
 
 import { TMagicButton, TMagicDialog, tMagicMessage, tMagicMessageBox, TMagicTag } from '@tmagic/design';
 import { ColumnConfig, FormConfig, FormState, MFormBox, MFormDrawer } from '@tmagic/form';
 import type { CodeBlockContent } from '@tmagic/schema';
 
+import FloatingBox from '@editor/components/FloatingBox.vue';
 import CodeEditor from '@editor/layouts/CodeEditor.vue';
-import type { Services } from '@editor/type';
+import type { Services, SlideType } from '@editor/type';
 import { getConfig } from '@editor/utils/config';
 
 defineOptions({
@@ -66,6 +75,7 @@ const props = defineProps<{
   disabled?: boolean;
   isDataSource?: boolean;
   dataSourceType?: string;
+  slideType?: SlideType;
 }>();
 
 const emit = defineEmits<{
@@ -246,7 +256,7 @@ const beforeClose = (done: (cancel?: boolean) => void) => {
       done();
     })
     .catch((action: string) => {
-      done(action === 'close');
+      done(action === 'cancel');
     });
 };
 
@@ -254,8 +264,26 @@ const closedHandler = () => {
   changedValue.value = undefined;
 };
 
+const boxVisible = ref<boolean>(false);
+const editVisible = ref<boolean>(false);
+const floatingBoxBody = ref<HTMLDivElement>();
+
+const boxPosition = computed(() => {
+  const columnWidth = services?.uiService?.get('columnWidth');
+  const navMenuRect = services?.uiService?.get('navMenuRect');
+  return {
+    left: columnWidth?.left ?? 0,
+    top: (navMenuRect?.top ?? 0) + (navMenuRect?.height ?? 0),
+  };
+});
+
 defineExpose({
-  show() {
+  async show() {
+    if (props.slideType !== 'box') {
+      boxVisible.value = true;
+    }
+    await nextTick();
+    editVisible.value = true;
     fomDrawer.value?.show();
   },
 
