@@ -69,8 +69,6 @@ export default defineConfig({
         find: /^@tmagic\/element-plus-adapter/,
         replacement: path.join(__dirname, '../packages/element-plus-adapter/src/index.ts'),
       },
-      { find: /^vue$/, replacement: path.join(__dirname, 'node_modules/vue/dist/vue.esm-bundler.js') },
-      { find: /^element-plus$/, replacement: path.join(__dirname, 'node_modules/element-plus/es/index.mjs') },
     ],
   },
 
