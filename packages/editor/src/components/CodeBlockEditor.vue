@@ -9,7 +9,7 @@
   <Teleport :to="floatingBoxBody" :disabled="slideType === 'box'" v-if="editVisible">
     <MFormBox
       class="m-editor-code-block-editor"
-      ref="fomDrawer"
+      ref="formBox"
       label-width="80px"
       :close-on-press-escape="false"
       :title="content.name"
@@ -41,7 +41,7 @@
       type="diff"
       language="json"
       :initValues="content.content"
-      :modifiedValues="fomDrawer?.form?.values.content"
+      :modifiedValues="formBox?.form?.values.content"
       :style="`height: ${height - 200}px`"
     ></CodeEditor>
 
@@ -58,7 +58,7 @@
 import { computed, inject, nextTick, onBeforeUnmount, ref } from 'vue';
 
 import { TMagicButton, TMagicDialog, tMagicMessage, tMagicMessageBox, TMagicTag } from '@tmagic/design';
-import { ColumnConfig, FormConfig, FormState, MFormBox, MFormDrawer } from '@tmagic/form';
+import { ColumnConfig, FormConfig, FormState, MFormBox } from '@tmagic/form';
 import type { CodeBlockContent } from '@tmagic/schema';
 
 import FloatingBox from '@editor/components/FloatingBox.vue';
@@ -87,24 +87,24 @@ const services = inject<Services>('services');
 const difVisible = ref(false);
 const height = ref(globalThis.innerHeight);
 
-const windowReizehandler = () => {
+const windowResizeHandler = () => {
   height.value = globalThis.innerHeight;
 };
 
-globalThis.addEventListener('resize', windowReizehandler);
+globalThis.addEventListener('resize', windowResizeHandler);
 
 onBeforeUnmount(() => {
-  globalThis.removeEventListener('resize', windowReizehandler);
+  globalThis.removeEventListener('resize', windowResizeHandler);
 });
 
 const magicVsEditor = ref<InstanceType<typeof CodeEditor>>();
 
 const diffChange = () => {
-  if (!magicVsEditor.value || !fomDrawer.value?.form) {
+  if (!magicVsEditor.value || !formBox.value?.form) {
     return;
   }
 
-  fomDrawer.value.form.values.content = magicVsEditor.value.getEditorValue();
+  formBox.value.form.values.content = magicVsEditor.value.getEditorValue();
 
   difVisible.value = false;
 };
@@ -216,6 +216,7 @@ const functionConfig = computed<FormConfig>(() => [
 ]);
 
 const submitForm = (values: CodeBlockContent) => {
+  changedValue.value = undefined;
   emit('submit', values);
 };
 
@@ -223,12 +224,12 @@ const errorHandler = (error: any) => {
   tMagicMessage.error(error.message);
 };
 
-const fomDrawer = ref<InstanceType<typeof MFormDrawer>>();
+const formBox = ref<InstanceType<typeof MFormBox>>();
 
 const openHandler = () => {
   setTimeout(() => {
-    if (fomDrawer.value) {
-      const height = fomDrawer.value?.bodyHeight - 348 - (props.isDataSource ? 50 : 0);
+    if (formBox.value) {
+      const height = formBox.value?.bodyHeight - 348 - (props.isDataSource ? 50 : 0);
       codeEditorHeight.value = `${height > 100 ? height : 600}px`;
     }
   });
@@ -241,6 +242,7 @@ const changeHandler = (values: CodeBlockContent) => {
 
 const beforeClose = (done: (cancel?: boolean) => void) => {
   if (!changedValue.value) {
+    editVisible.value = false;
     done();
     return;
   }
@@ -253,9 +255,13 @@ const beforeClose = (done: (cancel?: boolean) => void) => {
     })
     .then(() => {
       changedValue.value && submitForm(changedValue.value);
+      editVisible.value = false;
       done();
     })
     .catch((action: string) => {
+      if (action === 'cancel') {
+        editVisible.value = false;
+      }
       done(action === 'cancel');
     });
 };
@@ -281,14 +287,19 @@ defineExpose({
   async show() {
     if (props.slideType !== 'box') {
       boxVisible.value = true;
+      await nextTick();
     }
-    await nextTick();
+
     editVisible.value = true;
-    fomDrawer.value?.show();
   },
 
-  hide() {
-    fomDrawer.value?.hide();
+  async hide() {
+    editVisible.value = false;
+
+    if (props.slideType !== 'box') {
+      await nextTick();
+      boxVisible.value = false;
+    }
   },
 });
 </script>
