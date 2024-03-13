@@ -33,12 +33,21 @@ interface Rect {
   height: number | string;
 }
 
-const props = withDefaults(defineProps<{ visible: boolean; position?: Position; rect?: Rect; title?: string }>(), {
-  visible: false,
-  title: '',
-  position: () => ({ left: 0, top: 0 }),
-  rect: () => ({ width: 'auto', height: 'auto' }),
-});
+const props = withDefaults(
+  defineProps<{
+    visible: boolean;
+    position?: Position;
+    rect?: Rect;
+    title?: string;
+    beforeClose?: (done: (cancel?: boolean) => void) => void;
+  }>(),
+  {
+    visible: false,
+    title: '',
+    position: () => ({ left: 0, top: 0 }),
+    rect: () => ({ width: 'auto', height: 'auto' }),
+  },
+);
 
 const emit = defineEmits<{
   'update:visible': [boolean];
@@ -125,8 +134,18 @@ onBeforeUnmount(() => {
   destroyMoveable();
 });
 
+const hide = (cancel?: boolean) => {
+  if (cancel !== false) {
+    emit('update:visible', false);
+  }
+};
+
 const closeHandler = () => {
-  emit('update:visible', false);
+  if (typeof props.beforeClose === 'function') {
+    props.beforeClose(hide);
+  } else {
+    hide();
+  }
 };
 
 const nextZIndex = () => {
