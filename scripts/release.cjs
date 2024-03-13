@@ -105,7 +105,7 @@ async function main() {
   if (stdout) {
     step('\nCommitting changes...');
     await runIfNotDry('git', ['add', '-A']);
-    await runIfNotDry('git', ['commit', '-m', `chore: release v${targetVersion}`]);
+    await runIfNotDry('git', ['commit', '-m', `chore: release v${targetVersion}`, '--no-verify']);
   } else {
     console.log('No changes to commit.');
   }
