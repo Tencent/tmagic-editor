@@ -163,13 +163,13 @@ importers:
   packages/core:
     dependencies:
       '@tmagic/data-source':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../data-source
       '@tmagic/schema':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../schema
       '@tmagic/utils':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../utils
       events:
         specifier: ^3.3.0
@@ -200,10 +200,10 @@ importers:
   packages/data-source:
     dependencies:
       '@tmagic/schema':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../schema
       '@tmagic/utils':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../utils
       events:
         specifier: ^3.3.0
@@ -234,10 +234,10 @@ importers:
   packages/dep:
     dependencies:
       '@tmagic/schema':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../schema
       '@tmagic/utils':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../utils
     devDependencies:
       '@types/node':
@@ -293,28 +293,28 @@ importers:
         specifier: ^2.3.1
         version: 2.3.1(vue@3.4.21)
       '@tmagic/core':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../core
       '@tmagic/dep':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../dep
       '@tmagic/design':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../design
       '@tmagic/form':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../form
       '@tmagic/schema':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../schema
       '@tmagic/stage':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../stage
       '@tmagic/table':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../table
       '@tmagic/utils':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../utils
       buffer:
         specifier: ^6.0.3
@@ -396,7 +396,7 @@ importers:
   packages/element-plus-adapter:
     dependencies:
       '@tmagic/design':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../design
       element-plus:
         specifier: ^2.6.1
@@ -424,10 +424,10 @@ importers:
         specifier: ^2.3.1
         version: 2.3.1(vue@3.4.21)
       '@tmagic/design':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../design
       '@tmagic/utils':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../utils
       lodash-es:
         specifier: ^4.17.21
@@ -497,13 +497,13 @@ importers:
         specifier: ^0.29.2
         version: 0.29.2
       '@tmagic/core':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../core
       '@tmagic/schema':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../schema
       '@tmagic/utils':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../utils
       events:
         specifier: ^3.3.0
@@ -546,13 +546,13 @@ importers:
   packages/table:
     dependencies:
       '@tmagic/design':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../design
       '@tmagic/form':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../form
       '@tmagic/utils':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../utils
       lodash-es:
         specifier: ^4.17.21
@@ -598,7 +598,7 @@ importers:
   packages/tdesign-vue-next-adapter:
     dependencies:
       '@tmagic/design':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../design
       tdesign-vue-next:
         specifier: ^1.8.1
@@ -632,13 +632,13 @@ importers:
   packages/ui:
     dependencies:
       '@tmagic/core':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../core
       '@tmagic/schema':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../schema
       '@tmagic/utils':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../utils
       delegate:
         specifier: ^3.2.0
@@ -669,13 +669,13 @@ importers:
   packages/ui-react:
     dependencies:
       '@tmagic/core':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../core
       '@tmagic/schema':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../schema
       '@tmagic/utils':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../utils
       qrcode:
         specifier: ^1.5.0
@@ -700,13 +700,13 @@ importers:
   packages/ui-vue2:
     dependencies:
       '@tmagic/core':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../core
       '@tmagic/schema':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../schema
       '@tmagic/utils':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../utils
       qrcode:
         specifier: ^1.5.0
@@ -722,7 +722,7 @@ importers:
   packages/utils:
     dependencies:
       '@tmagic/schema':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../schema
       dayjs:
         specifier: ^1.11.4
@@ -753,31 +753,31 @@ importers:
         specifier: ^2.3.1
         version: 2.3.1(vue@3.4.21)
       '@tmagic/core':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../packages/core
       '@tmagic/design':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../packages/design
       '@tmagic/editor':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../packages/editor
       '@tmagic/element-plus-adapter':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../packages/element-plus-adapter
       '@tmagic/form':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../packages/form
       '@tmagic/schema':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../packages/schema
       '@tmagic/stage':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../packages/stage
       '@tmagic/tmagic-form-runtime':
         specifier: 1.0.2
         version: 1.0.2(@tmagic/editor@packages+editor)(@tmagic/form@packages+form)(@tmagic/schema@packages+schema)(dayjs@1.11.10)(element-plus@2.6.1)(vue@3.4.21)
       '@tmagic/utils':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../packages/utils
       element-plus:
         specifier: ^2.6.1
@@ -838,25 +838,25 @@ importers:
   runtime/react:
     dependencies:
       '@tmagic/cli':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../../packages/cli
       '@tmagic/core':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../../packages/core
       '@tmagic/data-source':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../../packages/data-source
       '@tmagic/schema':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../../packages/schema
       '@tmagic/stage':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../../packages/stage
       '@tmagic/ui-react':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../../packages/ui-react
       '@tmagic/utils':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../../packages/utils
       axios:
         specifier: ^0.25.0
@@ -905,19 +905,19 @@ importers:
   runtime/tmagic-form:
     dependencies:
       '@tmagic/core':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../../packages/core
       '@tmagic/editor':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../../packages/editor
       '@tmagic/form':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../../packages/form
       '@tmagic/schema':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../../packages/schema
       '@tmagic/utils':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../../packages/utils
       element-plus:
         specifier: ^2.6.1
@@ -928,7 +928,7 @@ importers:
     devDependencies:
       '@tmagic/stage':
         specifier: ^1.3.9
-        version: link:../../packages/stage
+        version: 1.3.16(dayjs@1.11.10)(scenejs@1.9.4)
       '@types/node':
         specifier: ^18.19.0
         version: 18.19.3
@@ -954,25 +954,25 @@ importers:
   runtime/vue2:
     dependencies:
       '@tmagic/cli':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../../packages/cli
       '@tmagic/core':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../../packages/core
       '@tmagic/data-source':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../../packages/data-source
       '@tmagic/schema':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../../packages/schema
       '@tmagic/stage':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../../packages/stage
       '@tmagic/ui-vue2':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../../packages/ui-vue2
       '@tmagic/utils':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../../packages/utils
       axios:
         specifier: ^0.25.0
@@ -1018,25 +1018,25 @@ importers:
   runtime/vue3:
     dependencies:
       '@tmagic/cli':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../../packages/cli
       '@tmagic/core':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../../packages/core
       '@tmagic/data-source':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../../packages/data-source
       '@tmagic/schema':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../../packages/schema
       '@tmagic/stage':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../../packages/stage
       '@tmagic/ui':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../../packages/ui
       '@tmagic/utils':
-        specifier: 1.3.16
+        specifier: 1.4.0-beta.1
         version: link:../../packages/utils
       axios:
         specifier: ^0.25.0
@@ -3657,13 +3657,11 @@ packages:
     resolution: {integrity: sha512-DqFagZYApByyx5xcQfG5dApxjAZzhr53biM8eB5sTXsZbTaIZ6E+MyocoeTAChg4GArM9qsRT0QWEtdbIDsJdA==}
     dependencies:
       '@egjs/component': 3.0.4
-    dev: false
 
   /@cfcs/core@0.0.6:
     resolution: {integrity: sha512-FxfJMwoLB8MEMConeXUCqtMGqxdtePQxRBOiGip9ULcYYam3WfCgoY6xdnMaSkYvRvmosp5iuG+TiPofm65+Pw==}
     dependencies:
       '@egjs/component': 3.0.4
-    dev: false
 
   /@commitlint/cli@18.2.0(typescript@5.4.2):
     resolution: {integrity: sha512-F/DCG791kMFmWg5eIdogakuGeg4OiI2kD430ed1a1Hh3epvrJdeIAgcGADAMIOmF+m0S1+VlIYUKG2dvQQ1Izw==}
@@ -3839,11 +3837,9 @@ packages:
 
   /@daybrush/utils@1.11.0:
     resolution: {integrity: sha512-/T0Oe7KkfUoCusFj1cJ6N+Tu+jFZXVkaKqDBcDY3P0goJfcfaT+4+oG8aHi4LDgBErNjP6uvC3IEOSMe2ka/yQ==}
-    dev: false
 
   /@daybrush/utils@1.13.0:
     resolution: {integrity: sha512-ALK12C6SQNNHw1enXK+UO8bdyQ+jaWNQ1Af7Z3FNxeAwjYhQT7do+TRE4RASAJ3ObaS2+TJ7TXR3oz2Gzbw0PQ==}
-    dev: false
 
   /@docsearch/css@3.5.2:
     resolution: {integrity: sha512-SPiDHaWKQZpwR2siD0KQUwlStvIAnEyK6tAE2h2Wuoq8ue9skzhlyVQ1ddzOxX6khULnAALDiR/isSF3bnuciA==}
@@ -3890,21 +3886,17 @@ packages:
 
   /@egjs/agent@2.4.3:
     resolution: {integrity: sha512-XvksSENe8wPeFlEVouvrOhKdx8HMniJ3by7sro2uPF3M6QqWwjzVcmvwoPtdjiX8O1lfRoLhQMp1a7NGlVTdIA==}
-    dev: false
 
   /@egjs/children-differ@1.0.1:
     resolution: {integrity: sha512-DRvyqMf+CPCOzAopQKHtW+X8iN6Hy6SFol+/7zCUiE5y4P/OB8JP8FtU4NxtZwtafvSL4faD5KoQYPj3JHzPFQ==}
     dependencies:
       '@egjs/list-differ': 1.0.1
-    dev: false
 
   /@egjs/component@3.0.4:
     resolution: {integrity: sha512-sXA7bGbIeLF2OAw/vpka66c6QBBUPcA4UUhR4WGJfnp2XWdiI8QrnJGJMr/UxpE/xnevX9tN3jvNPlW8WkHl3g==}
-    dev: false
 
   /@egjs/list-differ@1.0.1:
     resolution: {integrity: sha512-OTFTDQcWS+1ZREOdCWuk5hCBgYO4OsD30lXcOCyVOAjXMhgL5rBRDnt/otb6Nz8CzU0L/igdcaQBDLWc4t9gvg==}
-    dev: false
 
   /@element-plus/icons-vue@2.3.1(vue@3.4.21):
     resolution: {integrity: sha512-XxVUZv48RZAd87ucGS48jPf6pKu0yV5UCg9f4FFwtrYxXOwWuVJo6wOvSLKEoMQKjv8GsX/mhP6UsC1lRwbUWg==}
@@ -4637,13 +4629,11 @@ packages:
     dependencies:
       '@daybrush/utils': 1.13.0
       '@scena/event-emitter': 1.0.5
-    dev: false
 
   /@scena/event-emitter@1.0.5:
     resolution: {integrity: sha512-AzY4OTb0+7ynefmWFQ6hxDdk0CySAq/D4efljfhtRHCOP7MBF9zUfhKG3TJiroVjASqVgkRJFdenS8ArZo6Olg==}
     dependencies:
       '@daybrush/utils': 1.13.0
-    dev: false
 
   /@scena/guides@0.29.2:
     resolution: {integrity: sha512-gnXiB/Ji3ix/mGCgJiWz4k6U9OjEwcpdKUvmh3pYLXuL2x6DouCPAJ/PwnrYgaSMURhSyNkzp4WJdHqbAdYDXw==}
@@ -4651,13 +4641,11 @@ packages:
       '@scena/event-emitter': 1.0.5
       croact: 1.0.4
       croact-guides: 0.26.2
-    dev: false
 
   /@scena/matrix@1.1.1:
     resolution: {integrity: sha512-JVKBhN0tm2Srl+Yt+Ywqu0oLgLcdemDQlD1OxmN9jaCTwaFPZ7tY8n6dhVgMEaR9qcR7r+kAlMXnSfNyYdE+Vg==}
     dependencies:
       '@daybrush/utils': 1.13.0
-    dev: false
 
   /@scena/react-guides@0.28.2:
     resolution: {integrity: sha512-3TylBDU32BPk/SARQdZ2dkwW0NbQA7D21XUMMdGm/RXxuMNg39oHrxQ/XjlkFOvRFDgc7gPDsDgi1Am8wRuu1Q==}
@@ -4669,14 +4657,12 @@ packages:
       framework-utils: 1.1.0
       gesto: 1.19.1
       react-css-styled: 1.1.9
-    dev: false
 
   /@scena/react-ruler@0.19.0:
     resolution: {integrity: sha512-2OEOjLMOptDxdSuEqID2JAljQuYoeoV09MnLjiBeyzJxoUcVjzyBCPwkMbHRKj2Z3WrwztJAFBF+y6yNNM5Lcw==}
     dependencies:
       '@daybrush/utils': 1.13.0
       framework-utils: 1.1.0
-    dev: false
 
   /@sinclair/typebox@0.27.8:
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
@@ -4726,7 +4712,6 @@ packages:
       lodash-es: 4.17.21
     transitivePeerDependencies:
       - dayjs
-    dev: false
 
   /@tmagic/data-source@1.3.16(dayjs@1.11.10):
     resolution: {integrity: sha512-QSAegN2jkal6KdD76RDIVeMk2d3iTKTQSzyNtffruPNDU23aK3t4KVlCo3CpgtKtMaixKpuspmbdNUF3g0y9NA==}
@@ -4738,12 +4723,28 @@ packages:
       lodash-es: 4.17.21
     transitivePeerDependencies:
       - dayjs
-    dev: false
 
   /@tmagic/schema@1.3.16:
     resolution: {integrity: sha512-2OXS8PaHWSom7EiQOGNqmmzsbJwQZ2q8NX1KBODHPT+hSvH4T6Uc2dnVYgqZH6G99ex/uZIdeR1BX0od7fNxOQ==}
     engines: {node: '>=18'}
-    dev: false
+
+  /@tmagic/stage@1.3.16(dayjs@1.11.10)(scenejs@1.9.4):
+    resolution: {integrity: sha512-rdv53pjlPqx83Rp2658/cEFhwsbWACebE7l7tmB231ncYRFxeE5Ah/6Z6YlIk8IlOSMUHa2bYTSIkfsZTiInaw==}
+    engines: {node: '>=18'}
+    dependencies:
+      '@scena/guides': 0.29.2
+      '@tmagic/core': 1.3.16(dayjs@1.11.10)
+      '@tmagic/schema': 1.3.16
+      '@tmagic/utils': 1.3.16(dayjs@1.11.10)
+      events: 3.3.0
+      keycon: 1.4.0
+      lodash-es: 4.17.21
+      moveable: 0.51.1
+      moveable-helper: 0.4.0(scenejs@1.9.4)
+    transitivePeerDependencies:
+      - dayjs
+      - scenejs
+    dev: true
 
   /@tmagic/tmagic-form-runtime@1.0.2(@tmagic/editor@packages+editor)(@tmagic/form@packages+form)(@tmagic/schema@packages+schema)(dayjs@1.11.10)(element-plus@2.6.1)(vue@3.4.21):
     resolution: {integrity: sha512-596/I+6qZ7s6MM3TT8YN9GKqcp2xb4H4j4G0n3saOb7kwN6pLsYqiyw/vD9AMPuEcvpNDUci3oRf+/9fPAtHbw==}
@@ -4775,7 +4776,6 @@ packages:
       '@tmagic/schema': 1.3.16
       dayjs: 1.11.10
       lodash-es: 4.17.21
-    dev: false
 
   /@tootallnate/once@2.0.0:
     resolution: {integrity: sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==}
@@ -6478,7 +6478,6 @@ packages:
       '@daybrush/utils': 1.13.0
       css-styled: 1.0.8
       framework-utils: 1.1.0
-    dev: false
 
   /croact-guides@0.26.2:
     resolution: {integrity: sha512-Q2oRK8jo70mLC93Drce+dEozqgJdVjpbC6b0OxXVbvaXaZnamNH6UHeileuATcXLRbsgY49XfI/2H0mY82vwJQ==}
@@ -6492,7 +6491,6 @@ packages:
       framework-utils: 1.1.0
       gesto: 1.19.1
       react-css-styled: 1.1.9
-    dev: false
 
   /croact-moveable@0.7.1(croact@1.0.4):
     resolution: {integrity: sha512-GW4W/TO7MOXWWRW+F6LIpvmPHy7ZNsVMMDXBiR1UejyQQX6a4gCecnFdcvflzDg2LaUa0kHVhfeUDfxmZYrUgQ==}
@@ -6514,20 +6512,17 @@ packages:
       overlap-area: 1.1.0
       react-css-styled: 1.1.9
       react-moveable: 0.54.1
-    dev: false
 
   /croact-ruler@0.18.0:
     resolution: {integrity: sha512-FZtYH1n3Mpv7VX24y26lAMOVqem+/qRG4a7nBy9pwDeh9Q8UycOQqAdmWxNC1CNh1Pw1k4K28/gRQOyo4r1Zag==}
     dependencies:
       '@scena/react-ruler': 0.19.0
-    dev: false
 
   /croact@1.0.4:
     resolution: {integrity: sha512-9GhvyzTY/IVUrMQ2iz/mzgZ8+NcjczmIo/t4FkC1CU0CEcau6v6VsEih4jkTa4ZmRgYTF0qXEZLObCzdDFplpw==}
     dependencies:
       '@daybrush/utils': 1.13.0
       '@egjs/list-differ': 1.0.1
-    dev: false
 
   /cross-spawn@7.0.3:
     resolution: {integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==}
@@ -6542,14 +6537,12 @@ packages:
     resolution: {integrity: sha512-tCpP7kLRI8dI95rCh3Syl7I+v7PP+2JYOzWkl0bUEoSbJM+u8ITbutjlQVf0NC2/g4ULROJPi16sfwDIO8/84g==}
     dependencies:
       '@daybrush/utils': 1.13.0
-    dev: false
 
   /css-to-mat@1.1.1:
     resolution: {integrity: sha512-kvpxFYZb27jRd2vium35G7q5XZ2WJ9rWjDUMNT36M3Hc41qCrLXFM5iEKMGXcrPsKfXEN+8l/riB4QzwwwiEyQ==}
     dependencies:
       '@daybrush/utils': 1.13.0
       '@scena/matrix': 1.1.1
-    dev: false
 
   /cssesc@3.0.0:
     resolution: {integrity: sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==}
@@ -7300,7 +7293,6 @@ packages:
   /events@3.3.0:
     resolution: {integrity: sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==}
     engines: {node: '>=0.8.x'}
-    dev: false
 
   /execa@4.0.2:
     resolution: {integrity: sha512-QI2zLa6CjGWdiQsmSkZoGtDx2N+cQIGb3yNolGTdjSQzydzLgYYf8LRuagp7S7fPimjcrzUDSUFd/MgzELMi4Q==}
@@ -7521,7 +7513,6 @@ packages:
 
   /framework-utils@1.1.0:
     resolution: {integrity: sha512-KAfqli5PwpFJ8o3psRNs8svpMGyCSAe8nmGcjQ0zZBWN2H6dZDnq+ABp3N3hdUmFeMrLtjOCTXD4yplUJIWceg==}
-    dev: false
 
   /fs-extra@10.1.0:
     resolution: {integrity: sha512-oRXApq54ETRj4eMiFzGnHWGy+zo5raudjuxN0b8H7s/RU2oW0Wvsx9O0ACRN/kRq9E8Vu/ReskGB5o3ji+FzHQ==}
@@ -7598,7 +7589,6 @@ packages:
     dependencies:
       '@daybrush/utils': 1.13.0
       '@scena/event-emitter': 1.0.5
-    dev: false
 
   /get-caller-file@2.0.5:
     resolution: {integrity: sha512-DyFP3BM/3YHTQOCUL/w0OZHR0lpKeGrxotcHWcqNEdnltqFwXVfhEBQ94eIo34AfQpo0rGki4cyIiftY06h2Fg==}
@@ -8524,7 +8514,6 @@ packages:
 
   /keycode@2.2.1:
     resolution: {integrity: sha512-Rdgz9Hl9Iv4QKi8b0OlCRQEzp4AgVxyCtz5S/+VIHezDmrDhkp2N2TqBWOLz0/gbeREXOOiI9/4b8BY9uw2vFg==}
-    dev: false
 
   /keycon@1.4.0:
     resolution: {integrity: sha512-p1NAIxiRMH3jYfTeXRs2uWbVJ1WpEjpi8ktzUyBJsX7/wn2qu2VRXktneBLNtKNxJmlUYxRi9gOJt1DuthXR7A==}
@@ -8533,7 +8522,6 @@ packages:
       '@daybrush/utils': 1.11.0
       '@scena/event-emitter': 1.0.5
       keycode: 2.2.1
-    dev: false
 
   /kind-of@6.0.3:
     resolution: {integrity: sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==}
@@ -9042,7 +9030,6 @@ packages:
     dependencies:
       '@daybrush/utils': 1.11.0
       scenejs: 1.9.4
-    dev: false
 
   /moveable@0.51.1:
     resolution: {integrity: sha512-YvMWmlM1MMWNvY+u7RmPvMvu6YDvYV0GVpdrfA2hacUa/iv5RslyMNe8+yp4WcQYN7RPF0TIyu/SqC6z2Y+5qw==}
@@ -9052,7 +9039,6 @@ packages:
       croact: 1.0.4
       croact-moveable: 0.7.1(croact@1.0.4)
       react-moveable: 0.54.1
-    dev: false
 
   /mrmime@1.0.1:
     resolution: {integrity: sha512-hzzEagAgDyoU1Q6yg5uI+AorQgdvMCur3FcKf7NhMKWsaYg+RnbTyHRa/9IlLF9rf455MOCtcqqrQQ83pPP7Uw==}
@@ -9278,7 +9264,6 @@ packages:
       '@daybrush/utils': '>=1.0.0'
     dependencies:
       '@daybrush/utils': 1.13.0
-    dev: false
 
   /os-tmpdir@1.0.2:
     resolution: {integrity: sha512-D2FR03Vir7FIu45XBY20mTb+/ZSWB00sjU9jdQXt83gDrI4Ztz5Fs7/yy74g2N5SVQY4xY1qDr4rNddwYRVX0g==}
@@ -9289,7 +9274,6 @@ packages:
     resolution: {integrity: sha512-3dlJgJCaVeXH0/eZjYVJvQiLVVrPO4U1ZGqlATtx6QGO3b5eNM6+JgUKa7oStBTdYuGTk7gVoABCW6Tp+dhRdw==}
     dependencies:
       '@daybrush/utils': 1.13.0
-    dev: false
 
   /p-limit@2.3.0:
     resolution: {integrity: sha512-//88mFWSJx8lxCzwdAABTJL2MyWB12+eIY7MDL2SqLmAkeKU9qxRvWuSyTjm3FUmpBEMuFfckAIqEaVGUDxb6w==}
@@ -9621,7 +9605,6 @@ packages:
     dependencies:
       css-styled: 1.0.8
       framework-utils: 1.1.0
-    dev: false
 
   /react-dom@17.0.2(react@17.0.2):
     resolution: {integrity: sha512-s4h96KtLDUQlsENhMn1ar8t2bEa+q/YAtj8pPPdIjPDGBDIVNsrD9aXNWqspUe6AzKCIG0C1HZZLqLV7qpOBGA==}
@@ -9658,7 +9641,6 @@ packages:
       overlap-area: 1.1.0
       react-css-styled: 1.1.9
       react-selecto: 1.26.0
-    dev: false
 
   /react-refresh@0.9.0:
     resolution: {integrity: sha512-Gvzk7OZpiqKSkxsQvO/mbTN1poglhmAV7gR/DdIrRrSMXraRQQlfikRJOr3Nb9GTMPC5kof948Zy6jJZIFtDvQ==}
@@ -9669,7 +9651,6 @@ packages:
     resolution: {integrity: sha512-aBTZEYA68uE+o8TytNjTb2GpIn4oKEv0U4LIow3cspJQlF/PdAnBwkq9UuiKVuFluu5kfLQ7Keu3S2Tihlmw0g==}
     dependencies:
       selecto: 1.26.0
-    dev: false
 
   /react@17.0.2:
     resolution: {integrity: sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA==}
@@ -9997,7 +9978,6 @@ packages:
       '@scena/event-emitter': 1.0.5
       css-styled: 1.0.8
       order-map: 0.2.2(@daybrush/utils@1.13.0)
-    dev: false
 
   /scheduler@0.20.2:
     resolution: {integrity: sha512-2eWfGgAqqWFGqtdMmcL5zCMK1U8KlXv8SQFGglL3CEtd0aDVDWgeF/YoCmvln55m5zSk3J/20hTaSBeSObsQDQ==}
@@ -10027,7 +10007,6 @@ packages:
       gesto: 1.19.1
       keycon: 1.4.0
       overlap-area: 1.1.0
-    dev: false
 
   /semver-compare@1.0.0:
     resolution: {integrity: sha512-YM3/ITh2MJ5MtzaM429anh+x2jiLVjqILF4m4oyQB18W7Ggea7BfqdH/wGMK7dDiMghv/6WG7znWMwUDzJiXow==}

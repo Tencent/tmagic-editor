@@ -32,18 +32,18 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "@tmagic/core": "1.3.16",
-    "@tmagic/editor": "1.3.16",
-    "@tmagic/form": "1.3.16",
-    "@tmagic/utils": "1.3.16",
-    "@tmagic/schema": "1.3.16",
+    "@tmagic/core": "1.4.0-beta.1",
+    "@tmagic/editor": "1.4.0-beta.1",
+    "@tmagic/form": "1.4.0-beta.1",
+    "@tmagic/utils": "1.4.0-beta.1",
+    "@tmagic/schema": "1.4.0-beta.1",
     "element-plus": "^2.6.1",
     "vue": "^3.4.21"
   },
   "peerDependencies": {
-    "@tmagic/editor": "1.3.16",
-    "@tmagic/form": "1.3.16",
-    "@tmagic/schema": "1.3.16",
+    "@tmagic/editor": "1.4.0-beta.1",
+    "@tmagic/form": "1.4.0-beta.1",
+    "@tmagic/schema": "1.4.0-beta.1",
     "element-plus": "^2.6.1",
     "vue": "^3.4.21"
   },
