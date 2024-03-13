@@ -49,7 +49,7 @@ import { useCodeBlockEdit } from '@editor/hooks/use-code-block-edit';
 import type { CodeParamStatement, CodeSelectColConfig, Services } from '@editor/type';
 
 defineOptions({
-  name: 'MEditorCodeSelectCol',
+  name: 'MFieldsCodeSelectCol',
 });
 
 const mForm = inject<FormState | undefined>('mForm');

@@ -43,7 +43,7 @@ import { getDefaultValueFromFields } from '@tmagic/utils';
 import type { Services } from '@editor/type';
 
 defineOptions({
-  name: 'MEditorDataSourceFields',
+  name: 'MFieldsDataSourceFields',
 });
 
 const props = withDefaults(

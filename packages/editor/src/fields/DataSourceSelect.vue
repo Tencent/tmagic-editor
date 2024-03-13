@@ -19,7 +19,7 @@ import { type FieldProps, MSelect, type SelectConfig } from '@tmagic/form';
 import type { DataSourceSelect, Services } from '../type';
 
 defineOptions({
-  name: 'MEditorDataSourceSelect',
+  name: 'MFieldsDataSourceSelect',
 });
 
 const emit = defineEmits(['change']);

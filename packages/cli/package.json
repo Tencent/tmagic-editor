@@ -5,7 +5,7 @@
   "types": "lib/index.d.ts",
   "license": "Apache-2.0",
   "scripts": {
-    "build": "tsc -b tsconfig.build.json",
+    "build": "pnpm clean && tsc -b tsconfig.build.json",
     "clean": "rimraf lib *.tsbuildinfo"
   },
   "bin": {
@@ -32,6 +32,7 @@
     "tslib": "^2.4.0"
   },
   "devDependencies": {
-    "@types/fs-extra": "^9.0.13"
+    "@types/fs-extra": "^9.0.13",
+    "@types/node": "^18.19.0"
   }
 }

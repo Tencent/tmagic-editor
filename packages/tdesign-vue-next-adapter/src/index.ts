@@ -358,6 +358,7 @@ const adapter: any = {
       component: TRadio,
       props: (props: RadioProps) => ({
         label: props.label,
+        value: props.value,
       }),
     },
 

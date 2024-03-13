@@ -39,7 +39,7 @@ import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX } from '@tmagic/utils';
 import type { DataSourceFieldSelectConfig, Services } from '@editor/type';
 
 defineOptions({
-  name: 'MEditorDataSourceFieldSelect',
+  name: 'MFieldsDataSourceFieldSelect',
 });
 
 const services = inject<Services>('services');

@@ -61,8 +61,8 @@ export interface CheckboxProps {
   modelValue?: string | number | boolean;
   value?: string | number | boolean;
   label?: any;
-  trueLabel?: string | number | boolean;
-  falseLabel?: string | number | boolean;
+  trueValue?: string | number;
+  falseValue?: string | number;
   disabled?: boolean;
   size?: FieldSize;
 }
@@ -234,10 +234,13 @@ export interface PopoverProps {
 }
 
 export interface RadioProps {
+  modelValue?: string | number | boolean;
+  value?: string | number | boolean;
   label?: string | number | boolean;
 }
 
 export interface RadioButtonProps {
+  value?: string | number | boolean;
   label?: string | number | boolean;
   disabled?: boolean;
   name?: string;

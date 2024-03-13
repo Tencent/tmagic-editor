@@ -23,8 +23,8 @@ defineOptions({
 });
 
 const props = withDefaults(defineProps<CheckboxProps>(), {
-  trueLabel: undefined,
-  falseLabel: undefined,
+  trueValue: undefined,
+  falseValue: undefined,
 });
 
 const ui = getConfig('components')?.checkbox;

@@ -61,7 +61,7 @@ import { ActionType } from '@tmagic/schema';
 import type { CodeSelectColConfig, DataSourceMethodSelectConfig, EventSelectConfig, Services } from '@editor/type';
 
 defineOptions({
-  name: 'MEditorEventSelect',
+  name: 'MFieldsEventSelect',
 });
 
 const props = defineProps<FieldProps<EventSelectConfig>>();

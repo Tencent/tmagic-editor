@@ -401,8 +401,8 @@ export interface TimeConfig extends FormItem, Input {
  */
 export interface CheckboxConfig extends FormItem {
   type: 'checkbox';
-  activeValue?: boolean | number | string;
-  inactiveValue?: boolean | number | string;
+  activeValue?: number | string;
+  inactiveValue?: number | string;
 }
 
 /**

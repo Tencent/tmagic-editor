@@ -52,7 +52,7 @@ import type { Id } from '@tmagic/schema';
 import { Services, UI_SELECT_MODE_EVENT_NAME } from '@editor/type';
 
 defineOptions({
-  name: 'MEditorUISelect',
+  name: 'MFieldsUISelect',
 });
 
 const props = defineProps<FieldProps<{ type: 'ui-select' } & FormItem>>();

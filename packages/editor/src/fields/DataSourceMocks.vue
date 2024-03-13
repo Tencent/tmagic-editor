@@ -33,7 +33,7 @@ import CodeEditor from '@editor/layouts/CodeEditor.vue';
 import { Services } from '@editor/type';
 
 defineOptions({
-  name: 'MEditorDataSourceMocks',
+  name: 'MFieldsDataSourceMocks',
 });
 
 const props = withDefaults(

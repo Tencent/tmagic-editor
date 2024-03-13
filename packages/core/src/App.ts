@@ -290,8 +290,9 @@ class App extends EventEmitter implements AppCore {
   public async codeActionHandler(eventConfig: CodeItemConfig, args: any[]) {
     const { codeId = '', params = {} } = eventConfig;
     if (!codeId || isEmpty(this.codeDsl)) return;
-    if (this.codeDsl![codeId] && typeof this.codeDsl![codeId]?.content === 'function') {
-      await this.codeDsl![codeId].content({ app: this, params, eventParams: args });
+    const content = this.codeDsl?.[codeId]?.content;
+    if (typeof content === 'function') {
+      await content({ app: this, params, eventParams: args });
     }
   }
 

@@ -96,11 +96,11 @@ export default {
     // eslint-disable-next-line no-param-reassign
     app.config.globalProperties.$TMAGIC_EDITOR = option;
     setConfig(option);
-    app.component(Editor.name, Editor);
+    app.component(`${Editor.name || 'MEditor'}`, Editor);
+    app.component('magic-code-editor', CodeEditor);
     app.component('m-fields-ui-select', uiSelect);
     app.component('m-fields-code-link', CodeLink);
     app.component('m-fields-vs-code', Code);
-    app.component('magic-code-editor', CodeEditor);
     app.component('m-fields-code-select', CodeSelect);
     app.component('m-fields-code-select-col', CodeSelectCol);
     app.component('m-fields-event-select', EventSelect);

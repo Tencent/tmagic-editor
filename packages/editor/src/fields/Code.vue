@@ -18,7 +18,7 @@ import type { FieldProps, FormItem } from '@tmagic/form';
 import MagicCodeEditor from '@editor/layouts/CodeEditor.vue';
 
 defineOptions({
-  name: 'MEditorCode',
+  name: 'MFieldsVsCode',
 });
 
 const emit = defineEmits<{

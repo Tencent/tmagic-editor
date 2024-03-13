@@ -11,7 +11,7 @@ import type { FieldProps, FormItem } from '@tmagic/form';
 import { getConfig } from '@editor/utils/config';
 
 defineOptions({
-  name: 'MEditorCodeLink',
+  name: 'MFieldsCodeLink',
 });
 
 const props = defineProps<

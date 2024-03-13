@@ -2,8 +2,8 @@
   <TMagicCheckbox
     v-model="model[name]"
     :size="size"
-    :trueLabel="activeValue"
-    :falseLabel="inactiveValue"
+    :trueValue="activeValue"
+    :falseValue="inactiveValue"
     :disabled="disabled"
     @change="changeHandler"
     >{{ config.text }}</TMagicCheckbox

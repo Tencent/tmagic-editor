@@ -69,7 +69,7 @@ import CodeIcon from '@editor/icons/CodeIcon.vue';
 import MagicCodeEditor from '@editor/layouts/CodeEditor.vue';
 
 defineOptions({
-  name: 'MEditorKeyValue',
+  name: 'MFieldsKeyValue',
 });
 
 const props = withDefaults(

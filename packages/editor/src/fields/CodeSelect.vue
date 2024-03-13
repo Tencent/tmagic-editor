@@ -18,7 +18,7 @@ import { HookCodeType, HookType } from '@tmagic/schema';
 import type { Services } from '@editor/type';
 
 defineOptions({
-  name: 'MEditorCodeSelect',
+  name: 'MFieldsCodeSelect',
 });
 
 const emit = defineEmits(['change']);

@@ -56,7 +56,7 @@ import type { Services } from '@editor/type';
 import { getDisplayField } from '@editor/utils/data-source';
 
 defineOptions({
-  name: 'MEditorDataSourceInput',
+  name: 'MFieldsDataSourceInput',
 });
 
 const props = withDefaults(
