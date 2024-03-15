@@ -1,6 +1,20 @@
 .m-editor-props-panel {
   padding: 0 10px;
 
+  .m-editor-props-panel-src-icon {
+    position: absolute;
+    right: 15px;
+    bottom: 15px;
+    z-index: 30;
+  }
+
+  .magic-code-editor {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 10;
+  }
+
   &.small {
     .el-form-item__label {
       font-size: 12px;
