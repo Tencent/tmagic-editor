@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watchEffect } from 'vue';
 import { OnDrag } from 'gesto';
 
 import Resizer from './Resizer.vue';
@@ -34,6 +34,7 @@ const emit = defineEmits(['update:left', 'change', 'update:right']);
 
 const props = withDefaults(
   defineProps<{
+    width?: number;
     left?: number;
     right?: number;
     minLeft?: number;
@@ -54,8 +55,11 @@ const el = ref<HTMLElement>();
 
 const hasLeft = computed(() => typeof props.left !== 'undefined');
 const hasRight = computed(() => typeof props.right !== 'undefined');
+const center = ref(0);
 
-const getCenterWidth = (clientWidth: number, l = 0, r = 0) => {
+let clientWidth = 0;
+
+const getCenterWidth = (l = 0, r = 0) => {
   let right = r > 0 ? r : 0;
   let left = l > 0 ? l : 0;
   let center = clientWidth - left - right;
@@ -76,45 +80,51 @@ const getCenterWidth = (clientWidth: number, l = 0, r = 0) => {
   };
 };
 
-let clientWidth = 0;
-const resizerObserver = new ResizeObserver((entries) => {
-  for (const { contentRect } of entries) {
-    clientWidth = contentRect.width;
-
-    let left = props.left || 0;
-    let right = props.right || 0;
-
-    if (left > clientWidth) {
-      left = clientWidth / 3;
-    }
-
-    if (right > clientWidth) {
-      right = clientWidth / 3;
-    }
-
-    const columnWidth = getCenterWidth(clientWidth, left, right);
-
-    center.value = columnWidth.center;
-
-    emit('change', {
-      left: columnWidth.left,
-      center: center.value,
-      right: columnWidth.right,
-    });
+const widthChange = (width: number) => {
+  if (width <= 0) {
+    return;
   }
-});
 
-onMounted(() => {
-  if (el.value) {
-    resizerObserver.observe(el.value);
+  clientWidth = width;
+  let left = props.left || 0;
+  let right = props.right || 0;
+
+  if (left > clientWidth) {
+    left = clientWidth / 3;
   }
-});
 
-onBeforeUnmount(() => {
-  resizerObserver.disconnect();
-});
+  if (right > clientWidth) {
+    right = clientWidth / 3;
+  }
 
-const center = ref(0);
+  const columnWidth = getCenterWidth(left, right);
+
+  center.value = columnWidth.center;
+
+  emit('change', columnWidth);
+};
+
+if (typeof props.width !== 'number') {
+  const resizerObserver = new ResizeObserver((entries) => {
+    for (const { contentRect } of entries) {
+      widthChange(contentRect.width);
+    }
+  });
+
+  onMounted(() => {
+    if (el.value) {
+      resizerObserver.observe(el.value);
+    }
+  });
+
+  onBeforeUnmount(() => {
+    resizerObserver.disconnect();
+  });
+} else {
+  watchEffect(() => {
+    if (typeof props.width === 'number') widthChange(props.width);
+  });
+}
 
 const changeLeft = ({ deltaX }: OnDrag) => {
   if (typeof props.left === 'undefined') return;
@@ -125,7 +135,7 @@ const changeLeft = ({ deltaX }: OnDrag) => {
     left = props.left;
   }
 
-  const columnWidth = getCenterWidth(clientWidth, left, props.right || 0);
+  const columnWidth = getCenterWidth(left, props.right || 0);
 
   center.value = columnWidth.center;
 
@@ -145,7 +155,7 @@ const changeRight = ({ deltaX }: OnDrag) => {
     right = props.right;
   }
 
-  const columnWidth = getCenterWidth(clientWidth, props.left, right);
+  const columnWidth = getCenterWidth(props.left, right);
 
   center.value = columnWidth.center;
 
@@ -158,7 +168,8 @@ const changeRight = ({ deltaX }: OnDrag) => {
 
 defineExpose({
   updateWidth() {
-    const columnWidth = getCenterWidth(el.value?.clientWidth || clientWidth, props.left, props.right);
+    clientWidth = props.width ?? el.value?.clientWidth ?? clientWidth;
+    const columnWidth = getCenterWidth(props.left, props.right);
 
     emit('change', {
       left: columnWidth.left,

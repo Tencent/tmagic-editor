@@ -54,6 +54,12 @@ const state = reactive<UiState>({
     width: 0,
     height: 0,
   },
+  frameworkRect: {
+    width: 0,
+    height: 0,
+    left: 0,
+    top: 0,
+  },
 });
 
 const canUsePluginMethods = {
