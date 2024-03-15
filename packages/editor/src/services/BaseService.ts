@@ -103,7 +103,7 @@ const doAsyncAction = async (
  * 例如：
  *   Class EditorService extends BaseService {
  *     constructor() {
- *       super(['add']);
+ *       super([ { name: 'add', isAsync: true },]);
  *     }
  *     add(value) { return result; }
  *   };
@@ -131,7 +131,7 @@ const doAsyncAction = async (
  * 例如：
  *   Class EditorService extends BaseService {
  *     constructor() {
- *       super(['add']);
+ *       super([ { name: 'add', isAsync: true },]);
  *     }
  *     add(value) { return result; }
  *   };
@@ -194,6 +194,9 @@ export default class extends EventEmitter {
     });
   }
 
+  /**
+   * @deprecated 请使用usePlugin代替
+   */
   public use(options: Record<string, Function>) {
     Object.entries(options).forEach(([methodName, method]: [string, Function]) => {
       if (typeof method === 'function') this.middleware[methodName].push(method);

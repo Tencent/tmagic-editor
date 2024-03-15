@@ -17,11 +17,12 @@
  */
 
 import { reactive } from 'vue';
+import type { Writable } from 'type-fest';
 
 import { convertToNumber } from '@tmagic/utils';
 
 import editorService from '@editor/services/editor';
-import type { StageRect, UiState } from '@editor/type';
+import type { AsyncHookPlugin, StageRect, UiState } from '@editor/type';
 
 import BaseService from './BaseService';
 
@@ -46,16 +47,31 @@ const state = reactive<UiState>({
   showRule: true,
   propsPanelSize: 'small',
   showAddPageButton: true,
-  floatBox: new Map(),
   hideSlideBar: false,
+  navMenuRect: {
+    left: 0,
+    top: 0,
+    width: 0,
+    height: 0,
+  },
+  frameworkRect: {
+    width: 0,
+    height: 0,
+    left: 0,
+    top: 0,
+  },
 });
+
+const canUsePluginMethods = {
+  async: ['zoom', 'calcZoom'] as const,
+  sync: [] as const,
+};
+
+type AsyncMethodName = Writable<(typeof canUsePluginMethods)['async']>;
 
 class Ui extends BaseService {
   constructor() {
-    super([
-      { name: 'zoom', isAsync: true },
-      { name: 'calcZoom', isAsync: true },
-    ]);
+    super(canUsePluginMethods.async.map((methodName) => ({ name: methodName, isAsync: true })));
   }
 
   public set<K extends keyof UiState, T extends UiState[K]>(name: K, value: T) {
@@ -105,19 +121,6 @@ class Ui extends BaseService {
     return Math.min((width - 60) / stageWidth || 1, (height - 80) / stageHeight || 1);
   }
 
-  public async setFloatBox(keys: string[]) {
-    const map = state.floatBox;
-    for (const key of keys) {
-      if (map.get(key)) continue;
-      map.set(key, {
-        status: false,
-        zIndex: 99,
-        top: 0,
-        left: 0,
-      });
-    }
-  }
-
   public resetState() {
     this.set('showSrc', false);
     this.set('uiSelectMode', false);
@@ -132,6 +135,10 @@ class Ui extends BaseService {
     this.resetState();
     this.removeAllListeners();
     this.removeAllPlugins();
+  }
+
+  public usePlugin(options: AsyncHookPlugin<AsyncMethodName, Ui>): void {
+    super.usePlugin(options);
   }
 
   private async setStageRect(value: StageRect) {

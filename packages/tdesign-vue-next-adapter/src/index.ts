@@ -23,7 +23,6 @@ import {
   Option as TOption,
   OptionGroup as TOptionGroup,
   Pagination as TPagination,
-  Popup as TPopup,
   Radio as TRadio,
   RadioButton as TRadioButton,
   RadioGroup as TRadioGroup,
@@ -87,7 +86,7 @@ import type {
 import DatePicker from './DatePicker.vue';
 import Icon from './Icon.vue';
 import Input from './Input.vue';
-import { vLoading } from './loading';
+import Popover from './Popover.vue';
 import Scrollbar from './Scrollbar.vue';
 import TableColumn from './TableColumn.vue';
 import Tree from './Tree.vue';
@@ -109,7 +108,6 @@ const adapter: any = {
       console.log(msg);
     },
   },
-  loading: vLoading,
   components: {
     badge: {
       component: TBadge,
@@ -240,7 +238,7 @@ const adapter: any = {
       component: TDrawer,
       props: (props: DrawerProps) => ({
         visible: props.modelValue,
-        size: props.size,
+        size: typeof props.size === 'number' ? `${props.size}px` : props.size,
         closeOnEscKeydown: props.closeOnPressEscape,
         closeOnOverlayClick: props.closeOnClickModal,
         attach: props.appendToBody ? 'body' : undefined,
@@ -352,20 +350,15 @@ const adapter: any = {
     },
 
     popover: {
-      component: TPopup,
-      props: (props: PopoverProps) => ({
-        placement: props.placement,
-        trigger: props.trigger,
-        content: props.content,
-        disabled: props.disabled,
-        overlayClassName: props.popperClass,
-      }),
+      component: Popover,
+      props: (props: PopoverProps) => props,
     },
 
     radio: {
       component: TRadio,
       props: (props: RadioProps) => ({
         label: props.label,
+        value: props.value,
       }),
     },
 
@@ -486,6 +479,7 @@ const adapter: any = {
     tooltip: {
       component: TTooltip,
       props: (props: TooltipProps) => ({
+        ...props,
         placement: props.placement,
         content: props.content,
       }),

@@ -55,11 +55,11 @@ class Events extends BaseService {
   }
 
   public setEvent(type: string, events: EventOption[]) {
-    eventMap[type] = [...DEFAULT_EVENTS, ...events];
+    eventMap[toLine(type)] = [...DEFAULT_EVENTS, ...events];
   }
 
   public getEvent(type: string): EventOption[] {
-    return cloneDeep(eventMap[type] || DEFAULT_EVENTS);
+    return cloneDeep(eventMap[toLine(type)] || DEFAULT_EVENTS);
   }
 
   public setMethods(methods: Record<string, EventOption[]>) {
@@ -69,11 +69,11 @@ class Events extends BaseService {
   }
 
   public setMethod(type: string, method: EventOption[]) {
-    methodMap[type] = [...DEFAULT_METHODS, ...method];
+    methodMap[toLine(type)] = [...DEFAULT_METHODS, ...method];
   }
 
   public getMethod(type: string) {
-    return cloneDeep(methodMap[type] || DEFAULT_METHODS);
+    return cloneDeep(methodMap[toLine(type)] || DEFAULT_METHODS);
   }
 
   public resetState() {

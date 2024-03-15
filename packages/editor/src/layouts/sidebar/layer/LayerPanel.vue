@@ -14,7 +14,7 @@
       @node-dragstart="handleDragStart"
       @node-dragleave="handleDragLeave"
       @node-dragend="handleDragEnd"
-      @node-contextmenu="nodeContentmenuHandler"
+      @node-contextmenu="nodeContentMenuHandler"
       @node-mouseenter="mouseenterHandler"
       @node-click="nodeClickHandler"
     >
@@ -113,7 +113,7 @@ const { handleDragStart, handleDragEnd, handleDragLeave, handleDragOver } = useD
 const {
   menu,
   nodeClickHandler,
-  nodeContentmenuHandler,
+  nodeContentMenuHandler,
   highlightHandler: mouseenterHandler,
 } = useClick(services, isCtrlKeyDown, nodeStatusMap);
 </script>

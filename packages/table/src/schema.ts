@@ -20,10 +20,10 @@ import { FormConfig, FormValue } from '@tmagic/form';
 
 export interface ColumnActionConfig {
   type?: 'delete' | 'copy' | 'edit';
-  buttonType: string;
+  buttonType?: string;
   display?: (row: any) => boolean;
-  text: string | ((row: any) => string);
-  name: string;
+  text?: string | ((row: any) => string);
+  name?: string;
   tooltip?: string;
   tooltipPlacement?: string;
   icon?: any;
@@ -33,7 +33,7 @@ export interface ColumnActionConfig {
   action?: (data: { data: any }) => void;
 }
 
-export type ColumnConfig = {
+export interface ColumnConfig<T = any> {
   form?: FormConfig;
   rules?: any;
   values?: FormValue;
@@ -43,12 +43,12 @@ export type ColumnConfig = {
   fixed?: 'left' | 'right' | boolean;
   width?: number | string;
   actions?: ColumnActionConfig[];
-  type?: 'popover' | 'expand' | 'component' | string | ((value: any, row: any) => string);
+  type?: 'popover' | 'expand' | 'component' | string | ((value: any, row: T) => string);
   text?: string;
   prop?: string;
   showHeader?: boolean;
   table?: ColumnConfig[];
-  formatter?: 'datetime' | ((item: any, row: Record<string, any>) => any);
+  formatter?: 'datetime' | ((item: any, row: T) => any);
   popover?: {
     placement: string;
     width: string;
@@ -57,9 +57,9 @@ export type ColumnConfig = {
   };
   sortable?: boolean | 'custom';
   action?: 'tip' | 'actionLink' | 'img' | 'link' | 'tag';
-  handler?: (row: any) => void;
+  handler?: (row: T) => void;
   /** 当type为expand时有效，展开为html */
-  expandContent?: (row: any, prop?: string) => string;
+  expandContent?: (row: T, prop?: string) => string;
   /** 当type为expand时，展开为vue组件；当type为component时显示的组件 */
   component?: any;
   /** 当type为expand时，展开的vue组件props；当type为component时显示的组件的props */
@@ -68,4 +68,4 @@ export type ColumnConfig = {
   listeners?: any;
   /** 当type为tip时有效，显示文案 */
   buttonText?: string;
-};
+}

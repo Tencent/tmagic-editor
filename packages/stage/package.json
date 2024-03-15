@@ -1,5 +1,5 @@
 {
-  "version": "1.3.13",
+  "version": "1.4.0-beta.1",
   "name": "@tmagic/stage",
   "type": "module",
   "sideEffects": [
@@ -31,9 +31,9 @@
   },
   "dependencies": {
     "@scena/guides": "^0.29.2",
-    "@tmagic/core": "1.3.13",
-    "@tmagic/schema": "1.3.13",
-    "@tmagic/utils": "1.3.13",
+    "@tmagic/core": "1.4.0-beta.1",
+    "@tmagic/schema": "1.4.0-beta.1",
+    "@tmagic/utils": "1.4.0-beta.1",
     "events": "^3.3.0",
     "keycon": "^1.4.0",
     "lodash-es": "^4.17.21",
@@ -46,7 +46,7 @@
     "@types/node": "^18.19.0",
     "rimraf": "^3.0.2",
     "sass": "^1.35.1",
-    "typescript": "^5.0.4",
-    "vite": "^5.0.7"
+    "typescript": "^5.4.2",
+    "vite": "^5.1.6"
   }
 }

@@ -1,5 +1,7 @@
 import serialize from 'serialize-javascript';
+import type { Writable } from 'type-fest';
 
+import type { SyncHookPlugin } from '@editor/type';
 import { getConfig } from '@editor/utils/config';
 
 import BaseService from './BaseService';
@@ -17,6 +19,13 @@ export enum Protocol {
   BOOLEAN = 'boolean',
 }
 
+const canUsePluginMethods = {
+  async: [],
+  sync: ['getStorage', 'getNamespace', 'clear', 'getItem', 'removeItem', 'setItem'] as const,
+};
+
+type SyncMethodName = Writable<(typeof canUsePluginMethods)['sync']>;
+
 /**
  * 数据存储服务
  */
@@ -25,14 +34,7 @@ export class WebStorage extends BaseService {
   private namespace = 'tmagic';
 
   constructor() {
-    super([
-      { name: 'getStorage', isAsync: false },
-      { name: 'getNamespace', isAsync: false },
-      { name: 'clear', isAsync: false },
-      { name: 'getItem', isAsync: false },
-      { name: 'removeItem', isAsync: false },
-      { name: 'setItem', isAsync: false },
-    ]);
+    super(canUsePluginMethods.sync.map((methodName) => ({ name: methodName, isAsync: false })));
   }
 
   /**
@@ -121,6 +123,10 @@ export class WebStorage extends BaseService {
   public destroy() {
     this.removeAllListeners();
     this.removeAllPlugins();
+  }
+
+  public usePlugin(options: SyncHookPlugin<SyncMethodName, WebStorage>): void {
+    super.usePlugin(options);
   }
 
   private getValueAndProtocol(value: string | null) {

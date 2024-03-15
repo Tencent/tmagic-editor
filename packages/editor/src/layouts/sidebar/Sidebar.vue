@@ -4,7 +4,7 @@
       <div
         class="m-editor-sidebar-header-item"
         v-for="(config, index) in sideBarItems"
-        v-show="!floatBoxStates?.get(config.$key)?.status"
+        v-show="!floatBoxStates[config.$key]?.status"
         draggable="true"
         :key="config.$key ?? index"
         :class="{ 'is-active': activeTabName === config.text }"
@@ -23,7 +23,7 @@
       v-show="activeTabName === config.text"
     >
       <component
-        v-if="config && !floatBoxStates?.get(config.$key)?.status"
+        v-if="config && !floatBoxStates[config.$key]?.status"
         :is="config.component"
         v-bind="config.props || {}"
         v-on="config?.listeners || {}"
@@ -66,6 +66,11 @@
           <component v-else-if="config.slots?.codeBlockPanelTool" :is="config.slots.codeBlockPanelTool" />
         </template>
 
+        <template #code-block-panel-search v-if="config.$key === 'code-block' || config.slots?.codeBlockPanelSearch">
+          <slot v-if="config.$key === 'code-block'" name="code-block-panel-search"></slot>
+          <component v-else-if="config.slots?.codeBlockPanelSearch" :is="config.slots.codeBlockPanelSearch" />
+        </template>
+
         <template
           #layer-node-content="{ data: nodeData }"
           v-if="config.$key === 'layer' || config.slots?.layerNodeContent"
@@ -86,63 +91,65 @@
 
         <template
           #data-source-panel-tool="{ data }"
-          v-if="config.$key === 'data-source' || config.slots?.codeBlockPanelTool"
+          v-if="config.$key === 'data-source' || config.slots?.dataSourcePanelTool"
         >
           <slot v-if="config.$key === 'data-source'" name="data-source-panel-tool" :data="data"></slot>
           <component v-else-if="config.slots?.DataSourcePanelTool" :is="config.slots.DataSourcePanelTool" />
+        </template>
+
+        <template #data-source-panel-search v-if="config.$key === 'data-source' || config.slots?.dataSourcePanelSearch">
+          <slot v-if="config.$key === 'data-source'" name="data-source-panel-search"></slot>
+          <component v-else-if="config.slots?.dataSourcePanelSearch" :is="config.slots.dataSourcePanelSearch" />
         </template>
       </component>
     </div>
   </div>
 
   <Teleport to="body">
-    <div class="m-editor-float-box-list">
-      <div
-        v-for="(config, index) in sideBarItems"
+    <template v-for="(config, index) in sideBarItems">
+      <FloatingBox
         :key="config.$key ?? index"
-        ref="floatBox"
-        :class="['m-editor-float-box', `m-editor-float-box-${config.$key}`]"
-        :style="{
-          left: `${floatBoxStates?.get(config.$key)?.left}px`,
-          top: `${floatBoxStates?.get(config.$key)?.top}px`,
-          zIndex: floatBoxStates?.get(config.$key)?.zIndex,
+        v-if="floatBoxStates[config.$key]?.status"
+        v-model:visible="floatBoxStates[config.$key].status"
+        :width="columnLeftWitch"
+        :height="600"
+        :title="config.text"
+        :position="{
+          left: floatBoxStates[config.$key].left,
+          top: floatBoxStates[config.$key].top,
         }"
-        v-show="floatBoxStates?.get(config.$key)?.status"
       >
-        <div
-          :class="['m-editor-float-box-header', `m-editor-float-box-header-${config.$key}`]"
-          @click="showFloatBox(config.$key)"
-        >
-          <div>{{ config.text }}</div>
-          <MIcon class="m-editor-float-box-close" :icon="Close" @click.stop="closeFloatBox(config.$key)"></MIcon>
-        </div>
-        <div class="m-editor-float-box-body">
-          <component
-            v-if="config && floatBoxStates?.get(config.$key)?.status"
-            :is="config.boxComponentConfig?.component || config.component"
-            v-bind="config.boxComponentConfig?.props || config.props || {}"
-            v-on="config?.listeners || {}"
-          />
-        </div>
-      </div>
-    </div>
+        <template #body>
+          <div class="m-editor-slide-list-box">
+            <component
+              v-if="config && floatBoxStates[config.$key].status"
+              :is="config.boxComponentConfig?.component || config.component"
+              v-bind="config.boxComponentConfig?.props || config.props || {}"
+              v-on="config?.listeners || {}"
+            />
+          </div>
+        </template>
+      </FloatingBox>
+    </template>
   </Teleport>
 </template>
 
 <script setup lang="ts">
 import { computed, inject, ref, watch } from 'vue';
-import { Close, Coin, EditPen, Goods, List } from '@element-plus/icons-vue';
+import { Coin, EditPen, Goods, List } from '@element-plus/icons-vue';
 
+import FloatingBox from '@editor/components/FloatingBox.vue';
 import MIcon from '@editor/components/Icon.vue';
 import { useFloatBox } from '@editor/hooks/use-float-box';
-import type {
-  MenuButton,
-  MenuComponent,
-  Services,
-  SideBarData,
-  SidebarSlots,
-  SideComponent,
-  SideItem,
+import {
+  ColumnLayout,
+  type MenuButton,
+  type MenuComponent,
+  type Services,
+  type SideBarData,
+  type SidebarSlots,
+  type SideComponent,
+  type SideItem,
 } from '@editor/type';
 
 import CodeBlockListPanel from './code-block/CodeBlockListPanel.vue';
@@ -168,6 +175,8 @@ const props = withDefaults(
 );
 
 const services = inject<Services>('services');
+
+const columnLeftWitch = computed(() => services?.uiService.get('columnWidth')[ColumnLayout.LEFT] || 0);
 
 const activeTabName = ref(props.data?.status);
 
@@ -213,11 +222,6 @@ const getItemConfig = (data: SideItem): SideComponent => {
       text: '数据源',
       component: DataSourceListPanel,
       slots: {},
-      boxComponentConfig: {
-        props: {
-          slideType: 'box',
-        },
-      },
     },
   };
 
@@ -235,8 +239,7 @@ watch(
 
 const slideKeys = computed(() => sideBarItems.value.map((sideBarItem) => sideBarItem.$key));
 
-const { showFloatBox, closeFloatBox, dragstartHandler, dragendHandler, floatBoxStates, floatBox, showingBoxKeys } =
-  useFloatBox(slideKeys);
+const { dragstartHandler, dragendHandler, floatBoxStates, showingBoxKeys } = useFloatBox(slideKeys);
 
 watch(
   () => showingBoxKeys.value.length,

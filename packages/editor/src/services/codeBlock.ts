@@ -18,15 +18,23 @@
 
 import { reactive } from 'vue';
 import { keys, pick } from 'lodash-es';
+import type { Writable } from 'type-fest';
 
 import type { ColumnConfig } from '@tmagic/form';
 import type { CodeBlockContent, CodeBlockDSL, Id } from '@tmagic/schema';
 
-import type { CodeState } from '@editor/type';
+import type { AsyncHookPlugin, CodeState } from '@editor/type';
 import { CODE_DRAFT_STORAGE_KEY } from '@editor/type';
 import { getConfig } from '@editor/utils/config';
 
 import BaseService from './BaseService';
+
+const canUsePluginMethods = {
+  async: ['setCodeDslById', 'setEditStatus', 'setCombineIds', 'setUndeleteableList', 'deleteCodeDslByIds'] as const,
+  sync: [],
+};
+
+type AsyncMethodName = Writable<(typeof canUsePluginMethods)['async']>;
 
 class CodeBlock extends BaseService {
   private state = reactive<CodeState>({
@@ -38,13 +46,7 @@ class CodeBlock extends BaseService {
   });
 
   constructor() {
-    super([
-      { name: 'setCodeDslById', isAsync: true },
-      { name: 'setEditStatus', isAsync: true },
-      { name: 'setCombineIds', isAsync: true },
-      { name: 'setUndeleteableList', isAsync: true },
-      { name: 'deleteCodeDslByIds', isAsync: true },
-    ]);
+    super(canUsePluginMethods.async.map((methodName) => ({ name: methodName, isAsync: true })));
   }
 
   /**
@@ -242,6 +244,10 @@ class CodeBlock extends BaseService {
     this.resetState();
     this.removeAllListeners();
     this.removeAllPlugins();
+  }
+
+  public usePlugin(options: AsyncHookPlugin<AsyncMethodName, CodeBlock>): void {
+    super.usePlugin(options);
   }
 }
 

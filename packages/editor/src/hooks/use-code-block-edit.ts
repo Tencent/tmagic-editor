@@ -20,7 +20,7 @@ export const useCodeBlockEdit = (codeBlockService?: CodeBlockService) => {
     }
 
     codeConfig.value = {
-      name: '代码块',
+      name: '',
       content: `({app, params}) => {\n  // place your code here\n}`,
       params: [],
     };
@@ -54,7 +54,6 @@ export const useCodeBlockEdit = (codeBlockService?: CodeBlockService) => {
     codeId.value = id;
 
     await nextTick();
-
     codeBlockEditor.value?.show();
   };
 

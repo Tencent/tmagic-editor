@@ -17,9 +17,20 @@
  */
 
 import type { Component } from 'vue';
+import type { PascalCasedProperties } from 'type-fest';
 
-import type { ColumnConfig, FilterFunction, FormConfig, FormItem } from '@tmagic/form';
-import type { CodeBlockContent, CodeBlockDSL, Id, MApp, MContainer, MNode, MPage, MPageFragment } from '@tmagic/schema';
+import type { ChildConfig, ColumnConfig, FilterFunction, FormConfig, FormItem, Input } from '@tmagic/form';
+import type {
+  CodeBlockContent,
+  CodeBlockDSL,
+  DataSourceFieldType,
+  Id,
+  MApp,
+  MContainer,
+  MNode,
+  MPage,
+  MPageFragment,
+} from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
 import type {
   ContainerHighlightType,
@@ -81,6 +92,7 @@ export interface CodeBlockListSlots {
 
 export interface DataSourceListSlots {
   'data-source-panel-tool'(props: { data: any }): any;
+  'data-source-panel-search'(props: {}): any;
 }
 
 export interface LayerNodeSlots {
@@ -224,20 +236,22 @@ export interface UiState {
   propsPanelSize: 'large' | 'default' | 'small';
   /** 是否显示新增页面按钮 */
   showAddPageButton: boolean;
-
-  /** slide 拖拽悬浮窗 state */
-  floatBox: Map<
-    string,
-    {
-      status: boolean;
-      zIndex: number;
-      top: number;
-      left: number;
-    }
-  >;
-
   /** 是否隐藏侧边栏 */
   hideSlideBar: boolean;
+
+  // navMenu 的宽高
+  navMenuRect: {
+    left: number;
+    top: number;
+    width: number;
+    height: number;
+  };
+  frameworkRect: {
+    left: number;
+    top: number;
+    width: number;
+    height: number;
+  };
 }
 
 export interface EditorNodeInfo {
@@ -594,40 +608,44 @@ export interface KeyBindingCacheItem {
   bound: boolean;
 }
 
-export interface CodeSelectColConfig {
+export interface CodeSelectColConfig extends FormItem {
   type: 'code-select-col';
-  name: string;
-  text: string;
-  labelWidth?: number | string;
-  disabled?: boolean | FilterFunction;
-  display?: boolean | FilterFunction;
+  /** 是否可以编辑代码块，disable表示的是是否可以选择代码块 */
+  notEditable?: boolean | FilterFunction;
 }
 
-export interface PageFragmentSelectConfig {
+export interface PageFragmentSelectConfig extends FormItem {
   type: 'page-fragment-select';
-  name: string;
-  text: string;
-  labelWidth?: number | string;
-  disabled?: boolean | FilterFunction;
-  display?: boolean | FilterFunction;
 }
 
-export interface DataSourceMethodSelectConfig {
+export interface DataSourceSelect extends FormItem, Input {
+  type: 'data-source-select';
+  /** 数据源类型: base、http... */
+  dataSourceType?: string;
+  /** 是否要编译成数据源的data。
+   * id: 不编译，就是要数据源id;
+   * value: 要编译（数据源data）
+   * */
+  value?: 'id' | 'value';
+}
+
+export interface DataSourceMethodSelectConfig extends FormItem {
   type: 'data-source-method-select';
-  name: string;
-  text: string;
-  labelWidth?: number | string;
-  disabled?: boolean | FilterFunction;
-  display?: boolean | FilterFunction;
+  /** 是否可以编辑数据源，disable表示的是是否可以选择数据源 */
+  notEditable?: boolean | FilterFunction;
 }
 
-export interface DataSourceFieldSelectConfig {
+export interface DataSourceFieldSelectConfig extends FormItem {
   type: 'data-source-field-select';
-  name: string;
+  /** 是否要编译成数据源的data。
+   * key: 不编译，就是要数据源id和field name;
+   * value: 要编译（数据源data[`${filed}`]）
+   * */
   value?: 'key' | 'value';
-  labelWidth?: number | string;
-  disabled?: boolean | FilterFunction;
-  display?: boolean | FilterFunction;
+  /** 是否严格的遵守父子节点不互相关联 */
+  checkStrictly?: boolean;
+  dataSourceFieldType?: DataSourceFieldType[];
+  fieldConfig?: ChildConfig;
 }
 
 /** 可新增的数据源类型选项 */
@@ -667,3 +685,38 @@ export interface TreeNodeData {
   items?: TreeNodeData[];
   [key: string]: any;
 }
+
+export type AsyncBeforeHook<Value extends Array<string>, C extends Record<Value[number], (...args: any) => any>> = {
+  [K in Value[number]]?: (...args: Parameters<C[K]>) => Promise<Parameters<C[K]>> | Parameters<C[K]>;
+};
+
+export type AsyncAfterHook<Value extends Array<string>, C extends Record<Value[number], (...args: any) => any>> = {
+  [K in Value[number]]?: (
+    result: Awaited<ReturnType<C[K]>>,
+    ...args: Parameters<C[K]>
+  ) => ReturnType<C[K]> | Awaited<ReturnType<C[K]>>;
+};
+
+export type SyncBeforeHook<Value extends Array<string>, C extends Record<Value[number], (...args: any) => any>> = {
+  [K in Value[number]]?: (...args: Parameters<C[K]>) => Parameters<C[K]>;
+};
+
+export type SyncAfterHook<Value extends Array<string>, C extends Record<Value[number], (...args: any) => any>> = {
+  [K in Value[number]]?: (result: ReturnType<C[K]>, ...args: Parameters<C[K]>) => ReturnType<C[K]>;
+};
+
+export type AddPrefixToObject<T, P extends string> = {
+  [K in keyof T as K extends string ? `${P}${K}` : never]: T[K];
+};
+
+export type AsyncHookPlugin<
+  T extends Array<string>,
+  C extends Record<T[number], (...args: any) => any>,
+> = AddPrefixToObject<PascalCasedProperties<AsyncBeforeHook<T, C>>, 'before'> &
+  AddPrefixToObject<PascalCasedProperties<AsyncAfterHook<T, C>>, 'after'>;
+
+export type SyncHookPlugin<
+  T extends Array<string>,
+  C extends Record<T[number], (...args: any) => any>,
+> = AddPrefixToObject<PascalCasedProperties<SyncBeforeHook<T, C>>, 'before'> &
+  AddPrefixToObject<PascalCasedProperties<SyncAfterHook<T, C>>, 'after'>;

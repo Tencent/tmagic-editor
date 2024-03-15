@@ -1,18 +1,13 @@
 .m-form-box {
   display: flex;
   flex-direction: column;
-  padding: 16px;
-  width: 100%;
   .el-box__header {
     margin: 0;
   }
 
-  .m-box-body {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
   .dialog-footer {
-    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 }

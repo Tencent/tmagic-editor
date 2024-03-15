@@ -46,6 +46,8 @@ export interface CascaderProps {
   filterable?: boolean;
   options?: CascaderOption[];
   size?: FieldSize;
+  /** 弹出内容的自定义类名 */
+  popperClass?: string;
   props: {
     expandTrigger?: 'click' | 'hover';
     multiple?: boolean;
@@ -59,8 +61,8 @@ export interface CheckboxProps {
   modelValue?: string | number | boolean;
   value?: string | number | boolean;
   label?: any;
-  trueLabel?: string | number | boolean;
-  falseLabel?: string | number | boolean;
+  trueValue?: string | number;
+  falseValue?: string | number;
   disabled?: boolean;
   size?: FieldSize;
 }
@@ -228,13 +230,17 @@ export interface PopoverProps {
   content?: string;
   disabled?: boolean;
   popperClass?: string;
+  visible?: boolean | null;
 }
 
 export interface RadioProps {
+  modelValue?: string | number | boolean;
+  value?: string | number | boolean;
   label?: string | number | boolean;
 }
 
 export interface RadioButtonProps {
+  value?: string | number | boolean;
   label?: string | number | boolean;
   disabled?: boolean;
   name?: string;

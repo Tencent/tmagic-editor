@@ -48,7 +48,7 @@ import { computed, inject, nextTick, ref, watch } from 'vue';
 import { Coin } from '@element-plus/icons-vue';
 
 import { getConfig, TMagicAutocomplete, TMagicTag } from '@tmagic/design';
-import type { FieldProps } from '@tmagic/form';
+import type { FieldProps, FormItem } from '@tmagic/form';
 import type { DataSchema, DataSourceSchema } from '@tmagic/schema';
 
 import Icon from '@editor/components/Icon.vue';
@@ -56,16 +56,16 @@ import type { Services } from '@editor/type';
 import { getDisplayField } from '@editor/utils/data-source';
 
 defineOptions({
-  name: 'MEditorDataSourceInput',
+  name: 'MFieldsDataSourceInput',
 });
 
 const props = withDefaults(
   defineProps<
-    FieldProps<{
-      type: 'data-source-input';
-      name: string;
-      text: string;
-    }>
+    FieldProps<
+      {
+        type: 'data-source-input';
+      } & FormItem
+    >
   >(),
   {
     disabled: false,

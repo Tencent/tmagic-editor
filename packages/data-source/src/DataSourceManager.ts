@@ -21,10 +21,16 @@ import EventEmitter from 'events';
 import { cloneDeep, template } from 'lodash-es';
 
 import type { AppCore, DataSourceSchema, Id, MNode } from '@tmagic/schema';
-import { compiledCond, compiledNode, DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX, isObject } from '@tmagic/utils';
+import {
+  compiledNode,
+  DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX,
+  DSL_NODE_KEY_COPY_PREFIX,
+  getValueByKeyPath,
+} from '@tmagic/utils';
 
 import { DataSource, HttpDataSource } from './data-sources';
 import type { ChangeEvent, DataSourceManagerData, DataSourceManagerOptions } from './types';
+import { compliedConditions, createIteratorContentData } from './utils';
 
 class DataSourceManager extends EventEmitter {
   private static dataSourceClassMap = new Map<string, typeof DataSource>();
@@ -156,9 +162,16 @@ class DataSourceManager extends EventEmitter {
     });
   }
 
-  public compiledNode(node: MNode, sourceId?: Id) {
-    if (node.condResult === false) return node;
-    if (node.visible === false) return node;
+  public compiledNode({ items, ...node }: MNode, sourceId?: Id, deep = false) {
+    const newNode = cloneDeep(node);
+
+    if (items) {
+      newNode.items =
+        Array.isArray(items) && deep ? items.map((item) => this.compiledNode(item, sourceId, deep)) : items;
+    }
+
+    if (node.condResult === false) return newNode;
+    if (node.visible === false) return newNode;
 
     return compiledNode(
       (value: any) => {
@@ -189,55 +202,52 @@ class DataSourceManager extends EventEmitter {
 
             if (!data) return value;
 
-            return fields.reduce((accumulator, currentValue: any) => {
-              if (Array.isArray(accumulator)) return accumulator;
-
-              if (isObject(accumulator)) {
-                return accumulator[currentValue];
-              }
-
-              return '';
-            }, data);
+            return getValueByKeyPath(fields.join('.'), data);
           }
         }
 
         return value;
       },
-      cloneDeep(node),
+      newNode,
       this.app.dsl?.dataSourceDeps || {},
       sourceId,
     );
   }
 
   public compliedConds(node: MNode) {
-    if (!node.displayConds || !Array.isArray(node.displayConds) || !node.displayConds.length) return true;
+    return compliedConditions(node, this.data);
+  }
 
-    for (const { cond } of node.displayConds) {
-      if (!cond) continue;
+  public compliedIteratorItems(itemData: any, items: MNode[], dataSourceField: string[] = []) {
+    return items.map((item) => {
+      const keys: string[] = [];
+      const [dsId, ...fields] = dataSourceField;
 
-      let result = true;
-      for (const { op, value, range, field } of cond) {
-        const [sourceId, fieldKey] = field;
-
-        const dsData = this.data[sourceId];
-
-        if (!dsData || !fieldKey) {
-          break;
+      Object.entries(item).forEach(([key, value]) => {
+        if (
+          typeof value === 'string' &&
+          !key.startsWith(DSL_NODE_KEY_COPY_PREFIX) &&
+          value.includes(`${dsId}`) &&
+          /\$\{([\s\S]+?)\}/.test(value)
+        ) {
+          keys.push(key);
         }
+      });
 
-        const fieldValue = dsData[fieldKey];
-        if (!compiledCond(op, fieldValue, value, range)) {
-          result = false;
-          break;
-        }
-      }
-
-      if (result) {
-        return true;
-      }
-    }
-
-    return false;
+      return compiledNode(
+        (value: string) => template(value)(createIteratorContentData(itemData, dsId, fields)),
+        item,
+        {
+          [dsId]: {
+            [item.id]: {
+              name: '',
+              keys,
+            },
+          },
+        },
+        dsId,
+      );
+    });
   }
 
   public destroy() {

@@ -26,6 +26,7 @@ export default [
   {
     text: '页面标题',
     name: 'title',
+    type: 'data-source-input',
   },
   {
     name: 'layout',

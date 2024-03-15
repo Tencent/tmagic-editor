@@ -94,7 +94,7 @@ export const useClick = (
 
     nodeClickHandler,
 
-    nodeContentmenuHandler(event: MouseEvent, data: TreeNodeData) {
+    nodeContentMenuHandler(event: MouseEvent, data: TreeNodeData) {
       event.preventDefault();
 
       const nodes = services?.editorService.get('nodes') || [];

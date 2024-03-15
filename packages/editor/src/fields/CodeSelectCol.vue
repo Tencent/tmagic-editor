@@ -10,13 +10,14 @@
         @change="onParamsChangeHandler"
       ></m-form-container>
       <!-- 查看/编辑按钮 -->
-      <Icon v-if="model[name]" class="icon" :icon="!disabled ? Edit : View" @click="editCode(model[name])"></Icon>
+      <Icon v-if="model[name]" class="icon" :icon="!notEditable ? Edit : View" @click="editCode(model[name])"></Icon>
     </div>
 
     <!-- 参数填写框 -->
     <CodeParams
       v-if="paramsConfig.length"
       name="params"
+      :key="model[name]"
       :model="model"
       :size="size"
       :params-config="paramsConfig"
@@ -26,19 +27,19 @@
     <CodeBlockEditor
       ref="codeBlockEditor"
       v-if="codeConfig"
-      :disabled="disabled"
+      :disabled="notEditable"
       :content="codeConfig"
       @submit="submitCodeBlockHandler"
     ></CodeBlockEditor>
   </div>
 </template>
 
-<script lang="ts" setup name="">
+<script lang="ts" setup>
 import { computed, inject, ref, watch } from 'vue';
 import { Edit, View } from '@element-plus/icons-vue';
 import { isEmpty, map } from 'lodash-es';
 
-import { createValues, FieldProps } from '@tmagic/form';
+import { createValues, type FieldProps, filterFunction, type FormState } from '@tmagic/form';
 import type { Id } from '@tmagic/schema';
 
 import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
@@ -48,12 +49,14 @@ import { useCodeBlockEdit } from '@editor/hooks/use-code-block-edit';
 import type { CodeParamStatement, CodeSelectColConfig, Services } from '@editor/type';
 
 defineOptions({
-  name: 'MEditorCodeSelectCol',
+  name: 'MFieldsCodeSelectCol',
 });
 
+const mForm = inject<FormState | undefined>('mForm');
 const services = inject<Services>('services');
 const emit = defineEmits(['change']);
 
+const notEditable = computed(() => filterFunction(mForm, props.config.notEditable, props));
 const props = withDefaults(defineProps<FieldProps<CodeSelectColConfig>>(), {
   disabled: false,
 });
@@ -91,6 +94,7 @@ watch(
 const selectConfig = {
   type: 'select',
   name: props.name,
+  disable: props.disabled,
   options: () => {
     if (codeDsl.value) {
       return map(codeDsl.value, (value, key) => ({

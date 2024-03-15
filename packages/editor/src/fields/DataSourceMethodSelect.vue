@@ -7,7 +7,12 @@
         :model="model"
         @change="onChangeHandler"
       ></m-form-container>
-      <Icon v-if="model[name]" class="icon" :icon="!disabled ? Edit : View" @click="editCodeHandler"></Icon>
+      <Icon
+        v-if="model[name] && isCustomMethod"
+        class="icon"
+        :icon="!notEditable ? Edit : View"
+        @click="editCodeHandler"
+      ></Icon>
     </div>
 
     <CodeParams
@@ -23,7 +28,7 @@
     <CodeBlockEditor
       ref="codeBlockEditor"
       v-if="codeConfig"
-      :disabled="disabled"
+      :disabled="notEditable"
       :content="codeConfig"
       @submit="submitCodeBlockHandler"
     ></CodeBlockEditor>
@@ -34,7 +39,7 @@
 import { computed, inject, ref } from 'vue';
 import { Edit, View } from '@element-plus/icons-vue';
 
-import { createValues, FieldProps } from '@tmagic/form';
+import { createValues, type FieldProps, filterFunction, type FormState } from '@tmagic/form';
 import type { CodeBlockContent, Id } from '@tmagic/schema';
 
 import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
@@ -44,9 +49,10 @@ import { useDataSourceMethod } from '@editor/hooks/use-data-source-method';
 import type { CodeParamStatement, DataSourceMethodSelectConfig, Services } from '@editor/type';
 
 defineOptions({
-  name: 'MEditorDataSourceMethodSelect',
+  name: 'MFieldsDataSourceMethodSelect',
 });
 
+const mForm = inject<FormState | undefined>('mForm');
 const services = inject<Services>('services');
 const emit = defineEmits(['change']);
 
@@ -56,14 +62,24 @@ const props = withDefaults(defineProps<FieldProps<DataSourceMethodSelectConfig>>
   disabled: false,
 });
 
+const notEditable = computed(() => filterFunction(mForm, props.config.notEditable, props));
+
 const dataSources = computed(() => dataSourceService?.get('dataSources'));
 
-const getParamItemsConfig = ([dataSourceId, medthodName]: [Id, string] = ['', '']): CodeParamStatement[] => {
+const isCustomMethod = computed(() => {
+  const [id, name] = props.model[props.name];
+
+  const dataSource = dataSourceService?.getDataSourceById(id);
+
+  return Boolean(dataSource?.methods.find((method) => method.name === name));
+});
+
+const getParamItemsConfig = ([dataSourceId, methodName]: [Id, string] = ['', '']): CodeParamStatement[] => {
   if (!dataSourceId) return [];
 
   const paramStatements = dataSources.value
     ?.find((item) => item.id === dataSourceId)
-    ?.methods?.find((item) => item.name === medthodName)?.params;
+    ?.methods?.find((item) => item.name === methodName)?.params;
 
   if (!paramStatements) return [];
 
@@ -107,6 +123,7 @@ const cascaderConfig = computed(() => ({
   type: 'cascader',
   name: props.name,
   options: methodsOptions.value,
+  disable: props.disabled,
   onChange: (formState: any, dataSourceMethod: [Id, string]) => {
     setParamsConfig(dataSourceMethod, formState);
 

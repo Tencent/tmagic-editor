@@ -70,3 +70,17 @@
     }
   }
 }
+
+.m-editor-slide-list-box {
+  display: flex;
+  min-width: 240px;
+  min-height: 500px;
+  > div {
+    &:first-child {
+      min-width: 240px;
+    }
+  }
+  .m-form-box {
+    border-left: 1px solid #e0e0e0;
+  }
+}

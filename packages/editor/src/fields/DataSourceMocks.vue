@@ -26,14 +26,14 @@ import { computed, inject, ref } from 'vue';
 import { TMagicButton, tMagicMessageBox, TMagicSwitch } from '@tmagic/design';
 import { type FieldProps, type FormConfig, type FormState, MFormDrawer } from '@tmagic/form';
 import type { MockSchema } from '@tmagic/schema';
-import { MagicTable } from '@tmagic/table';
+import { type ColumnConfig, MagicTable } from '@tmagic/table';
 import { getDefaultValueFromFields } from '@tmagic/utils';
 
 import CodeEditor from '@editor/layouts/CodeEditor.vue';
 import { Services } from '@editor/type';
 
 defineOptions({
-  name: 'MEditorDataSourceMocks',
+  name: 'MFieldsDataSourceMocks',
 });
 
 const props = withDefaults(
@@ -117,7 +117,7 @@ const formConfig: FormConfig = [
   },
 ];
 
-const columns = [
+const columns: ColumnConfig[] = [
   {
     type: 'expand',
     component: CodeEditor,

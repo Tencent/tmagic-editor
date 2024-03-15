@@ -120,6 +120,10 @@ export default class StageMultiDragResize extends MoveableOptionsManager {
         this.dragStatus = StageDragStatus.ING;
       })
       .on('dragGroupEnd', () => {
+        if (timeout) {
+          globalThis.clearTimeout(timeout);
+          timeout = undefined;
+        }
         const parentEl = this.markContainerEnd();
         this.update(false, parentEl);
         this.dragStatus = StageDragStatus.END;

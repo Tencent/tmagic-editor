@@ -1,5 +1,5 @@
 {
-  "version": "1.3.13",
+  "version": "1.4.0-beta.1",
   "name": "@tmagic/utils",
   "type": "module",
   "main": "dist/tmagic-utils.umd.cjs",
@@ -30,7 +30,7 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "@tmagic/schema": "1.3.13",
+    "@tmagic/schema": "1.4.0-beta.1",
     "dayjs": "^1.11.4",
     "lodash-es": "^4.17.21"
   },
@@ -41,7 +41,7 @@
     "@types/lodash-es": "^4.17.4",
     "@types/node": "^18.19.0",
     "rimraf": "^3.0.2",
-    "typescript": "^5.0.4",
-    "vite": "^5.0.7"
+    "typescript": "^5.4.2",
+    "vite": "^5.1.6"
   }
 }

@@ -1,4 +1,4 @@
-import { FolderOpened, Grid, PictureFilled, SwitchButton, Ticket, Tickets } from '@element-plus/icons-vue';
+import { Files, FolderOpened, Grid, PictureFilled, SwitchButton, Ticket, Tickets } from '@element-plus/icons-vue';
 
 export default [
   {
@@ -18,6 +18,11 @@ export default [
         icon: Ticket,
         text: '页面片容器',
         type: 'page-fragment-container',
+      },
+      {
+        icon: Files,
+        text: '迭代器容器',
+        type: 'iterator-container',
       },
     ],
   },

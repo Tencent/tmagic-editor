@@ -1,5 +1,5 @@
 {
-  "version": "1.3.13",
+  "version": "1.4.0-beta.1",
   "name": "@tmagic/dep",
   "type": "module",
   "sideEffects": [
@@ -30,13 +30,13 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "@tmagic/schema": "1.3.13",
-    "@tmagic/utils": "1.3.13"
+    "@tmagic/schema": "1.4.0-beta.1",
+    "@tmagic/utils": "1.4.0-beta.1"
   },
   "devDependencies": {
     "@types/node": "^18.19.0",
     "rimraf": "^3.0.2",
-    "typescript": "^5.0.4",
-    "vite": "^5.0.7"
+    "typescript": "^5.4.2",
+    "vite": "^5.1.6"
   }
 }

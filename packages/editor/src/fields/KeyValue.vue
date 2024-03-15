@@ -63,23 +63,23 @@ import { ref, watchEffect } from 'vue';
 import { Delete, Plus } from '@element-plus/icons-vue';
 
 import { TMagicButton, TMagicInput } from '@tmagic/design';
-import type { FieldProps } from '@tmagic/form';
+import type { FieldProps, FormItem } from '@tmagic/form';
 
 import CodeIcon from '@editor/icons/CodeIcon.vue';
 import MagicCodeEditor from '@editor/layouts/CodeEditor.vue';
 
 defineOptions({
-  name: 'MEditorKeyValue',
+  name: 'MFieldsKeyValue',
 });
 
 const props = withDefaults(
   defineProps<
-    FieldProps<{
-      type: 'key-value';
-      name: string;
-      text: string;
-      advanced?: boolean;
-    }>
+    FieldProps<
+      {
+        type: 'key-value';
+        advanced?: boolean;
+      } & FormItem
+    >
   >(),
   {
     disabled: false,

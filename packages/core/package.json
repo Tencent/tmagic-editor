@@ -1,5 +1,5 @@
 {
-  "version": "1.3.13",
+  "version": "1.4.0-beta.1",
   "name": "@tmagic/core",
   "type": "module",
   "sideEffects": [
@@ -37,9 +37,9 @@
     "vue"
   ],
   "dependencies": {
-    "@tmagic/data-source": "1.3.13",
-    "@tmagic/schema": "1.3.13",
-    "@tmagic/utils": "1.3.13",
+    "@tmagic/data-source": "1.4.0-beta.1",
+    "@tmagic/schema": "1.4.0-beta.1",
+    "@tmagic/utils": "1.4.0-beta.1",
     "events": "^3.3.0",
     "lodash-es": "^4.17.21"
   },
@@ -48,7 +48,7 @@
     "@types/lodash-es": "^4.17.4",
     "@types/node": "^18.19.0",
     "rimraf": "^3.0.2",
-    "typescript": "^5.0.4",
-    "vite": "^5.0.7"
+    "typescript": "^5.4.2",
+    "vite": "^5.1.6"
   }
 }

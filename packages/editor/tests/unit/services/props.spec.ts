@@ -11,17 +11,17 @@ test('createId', async () => {
 });
 
 describe('setNewItemId', () => {
-  test('普通', async () => {
+  test('普通', () => {
     const config = {
       id: 1,
       type: 'text',
     };
     // 将组件与组件的子元素配置中的id都设置成一个新的ID
-    await props.setNewItemId(config);
+    props.setNewItemId(config);
     expect(config.id === 1).toBeFalsy();
   });
 
-  test('items', async () => {
+  test('items', () => {
     const config = {
       id: 1,
       type: NodeType.PAGE,
@@ -32,7 +32,7 @@ describe('setNewItemId', () => {
         },
       ],
     };
-    await props.setNewItemId(config);
+    props.setNewItemId(config);
     expect(config.id === 1).toBeFalsy();
     expect(config.items[0].id === 2).toBeFalsy();
   });

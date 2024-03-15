@@ -21,8 +21,8 @@ export const useRuntime = ({
   fillConfig = (config) => config,
 }: {
   plugins?: Plugin[];
-  fillConfig?: (config: FormConfig) => FormConfig;
-}) => {
+  fillConfig?: (config: FormConfig, mForm: any) => FormConfig;
+} = {}) => {
   const render = (stage: StageCore) => {
     injectStyle(stage.renderer.getDocument()!, cssStyle);
     injectStyle(
@@ -60,24 +60,24 @@ export const useRuntime = ({
   };
 
   propsService.usePlugin({
-    afterFillConfig(config: FormConfig, itemConfig: FormConfig) {
+    async afterFillConfig(config: FormConfig, itemConfig: FormConfig, labelWidth = '80px') {
       return [
         {
           type: 'tab',
           items: [
             {
               title: '属性',
-              labelWidth: '80px',
+              labelWidth,
               items: [...commonConfig, ...itemConfig],
             },
           ],
         },
-      ];
+      ] as FormConfig;
     },
   });
 
   editorService.usePlugin({
-    afterGetLayout() {
+    async afterGetLayout() {
       return Layout.RELATIVE;
     },
   });

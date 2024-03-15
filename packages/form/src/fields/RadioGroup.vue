@@ -1,12 +1,8 @@
 <template>
   <TMagicRadioGroup v-if="model" v-model="model[name]" :size="size" :disabled="disabled" @change="changeHandler">
-    <TMagicRadio
-      v-for="option in config.options"
-      :label="option.value"
-      :value="option.value"
-      :key="`${option.value}`"
-      >{{ option.text }}</TMagicRadio
-    >
+    <TMagicRadio v-for="option in config.options" :value="option.value" :key="`${option.value}`">{{
+      option.text
+    }}</TMagicRadio>
   </TMagicRadioGroup>
 </template>
 

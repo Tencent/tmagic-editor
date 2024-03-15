@@ -1,7 +1,7 @@
 import { computed, ref, watch } from 'vue';
 
 import type { Id, MNode, MPage, MPageFragment } from '@tmagic/schema';
-import { getNodePath } from '@tmagic/utils';
+import { getNodePath, isPage, isPageFragment } from '@tmagic/utils';
 
 import { LayerNodeStatus, Services } from '@editor/type';
 import { traverseNode } from '@editor/utils';
@@ -48,13 +48,14 @@ export const useNodeStatus = (services: Services | undefined) => {
 
   // 切换页面或者新增页面，重新生成节点状态
   watch(
-    page,
-    (page) => {
-      if (!page) {
+    () => page.value?.id,
+    (pageId) => {
+      if (!pageId) {
         return;
       }
+
       // 生成节点状态
-      nodeStatusMaps.value.set(page.id, createPageNodeStatus(page, nodeStatusMaps.value.get(page.id)));
+      nodeStatusMaps.value.set(pageId, createPageNodeStatus(page.value!, nodeStatusMaps.value.get(pageId)));
     },
     {
       immediate: true,
@@ -85,6 +86,8 @@ export const useNodeStatus = (services: Services | undefined) => {
 
   services?.editorService.on('add', (newNodes: MNode[]) => {
     newNodes.forEach((node) => {
+      if (isPage(node) || isPageFragment(node)) return;
+
       traverseNode(node, (node: MNode) => {
         nodeStatusMap.value?.set(node.id, {
           visible: true,

@@ -14,31 +14,19 @@
 <script setup lang="ts">
 import { computed, inject } from 'vue';
 
-import { FieldProps, MSelect, SelectConfig } from '@tmagic/form';
+import { type FieldProps, MSelect, type SelectConfig } from '@tmagic/form';
 
-import { Services } from '../type';
+import type { DataSourceSelect, Services } from '../type';
 
 defineOptions({
-  name: 'MEditorDataSourceSelect',
+  name: 'MFieldsDataSourceSelect',
 });
 
 const emit = defineEmits(['change']);
 
-const props = withDefaults(
-  defineProps<
-    FieldProps<{
-      type: 'data-source-select';
-      name: string;
-      text?: string;
-      placeholder?: string;
-      dataSourceType?: string;
-      value?: 'id' | 'value';
-    }>
-  >(),
-  {
-    disabled: false,
-  },
-);
+const props = withDefaults(defineProps<FieldProps<DataSourceSelect>>(), {
+  disabled: false,
+});
 
 const { dataSourceService } = inject<Services>('services') || {};
 

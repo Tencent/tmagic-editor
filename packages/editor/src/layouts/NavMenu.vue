@@ -1,5 +1,5 @@
 <template>
-  <div class="m-editor-nav-menu" :style="{ height: `${height}px` }">
+  <div class="m-editor-nav-menu" :style="{ height: `${height}px` }" ref="navMenu">
     <div v-for="key in keys" :class="`menu-${key}`" :key="key" :style="`width: ${columnWidth?.[key]}px`">
       <ToolButton :data="item" v-for="(item, index) in buttons[key]" :key="index"></ToolButton>
     </div>
@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, markRaw } from 'vue';
+import { computed, inject, markRaw, onBeforeUnmount, onMounted, ref } from 'vue';
 import { Back, Delete, FullScreen, Grid, Memo, Right, ScaleToOriginal, ZoomIn, ZoomOut } from '@element-plus/icons-vue';
 
 import { NodeType } from '@tmagic/schema';
@@ -177,5 +177,24 @@ const buttons = computed(() => {
     });
   });
   return data;
+});
+
+const resizeObserver = new ResizeObserver(() => {
+  const rect = navMenu.value?.getBoundingClientRect();
+  if (rect) {
+    uiService?.set('navMenuRect', {
+      left: rect.left,
+      top: rect.top,
+      width: rect.width,
+      height: rect.height,
+    });
+  }
+});
+const navMenu = ref<HTMLDivElement>();
+onMounted(() => {
+  navMenu.value && resizeObserver.observe(navMenu.value);
+});
+onBeforeUnmount(() => {
+  resizeObserver.disconnect();
 });
 </script>

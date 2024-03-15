@@ -66,6 +66,8 @@ export interface FormItem {
   __key?: string | number;
   /** 表单域标签的的宽度，例如 '50px'。支持 auto。 */
   labelWidth?: string;
+  /** label 标签的title属性 */
+  labelTitle?: string;
   className?: string;
   /** 表单组件类型 */
   type?: string | TypeFunction;
@@ -399,8 +401,8 @@ export interface TimeConfig extends FormItem, Input {
  */
 export interface CheckboxConfig extends FormItem {
   type: 'checkbox';
-  activeValue?: boolean | number | string;
-  inactiveValue?: boolean | number | string;
+  activeValue?: number | string;
+  inactiveValue?: number | string;
 }
 
 /**
@@ -534,6 +536,8 @@ export interface CascaderConfig extends FormItem, Input {
   multiple?: boolean;
   /** 是否严格的遵守父子节点不互相关联，默认 false */
   checkStrictly?: boolean;
+  /** 弹出内容的自定义类名 */
+  popperClass?: string;
   options?:
     | ((
         mForm: FormState | undefined,

@@ -15,55 +15,53 @@ import { generatePageNameByApp, getInitPositionStyle } from '@editor/utils/edito
  * @param config 待粘贴的元素配置(复制时保存的那份配置)
  * @returns
  */
-export const beforePaste = async (position: PastePosition, config: MNode[]): Promise<MNode[]> => {
+export const beforePaste = (position: PastePosition, config: MNode[]): MNode[] => {
   if (!config[0]?.style) return config;
   const curNode = editorService.get('node');
   // 将数组中第一个元素的坐标作为参照点
   const { left: referenceLeft, top: referenceTop } = config[0].style;
   // 坐标校准后的粘贴数据
-  const pasteConfigs: MNode[] = await Promise.all(
-    config.map(async (configItem: MNode): Promise<MNode> => {
-      // 解构 position 对象，从 position 删除 offsetX、offsetY字段
-      const { offsetX = 0, offsetY = 0, ...positionClone } = position;
-      let pastePosition = positionClone;
+  const pasteConfigs: MNode[] = config.map((configItem: MNode): MNode => {
+    // 解构 position 对象，从 position 删除 offsetX、offsetY字段
+    const { offsetX = 0, offsetY = 0, ...positionClone } = position;
+    let pastePosition = positionClone;
 
-      if (!isEmpty(pastePosition) && curNode?.items) {
-        // 如果没有传入粘贴坐标则可能为键盘操作，不再转换
-        // 如果粘贴时选中了容器，则将元素粘贴到容器内，坐标需要转换为相对于容器的坐标
-        pastePosition = getPositionInContainer(pastePosition, curNode.id);
+    if (!isEmpty(pastePosition) && curNode?.items) {
+      // 如果没有传入粘贴坐标则可能为键盘操作，不再转换
+      // 如果粘贴时选中了容器，则将元素粘贴到容器内，坐标需要转换为相对于容器的坐标
+      pastePosition = getPositionInContainer(pastePosition, curNode.id);
+    }
+
+    // 将所有待粘贴元素坐标相对于多选第一个元素坐标重新计算，以保证多选粘贴后元素间距不变
+    if (pastePosition.left && configItem.style?.left) {
+      pastePosition.left = configItem.style.left - referenceLeft + pastePosition.left;
+    }
+    if (pastePosition.top && configItem.style?.top) {
+      pastePosition.top = configItem.style?.top - referenceTop + pastePosition.top;
+    }
+    const pasteConfig = propsService.setNewItemId(configItem, false);
+
+    if (pasteConfig.style) {
+      const { left, top } = pasteConfig.style;
+      // 判断能转换为数字时，做粘贴偏移量计算
+      if (typeof left === 'number' || (!!left && !isNaN(Number(left)))) {
+        pasteConfig.style.left = Number(left) + offsetX;
+      }
+      if (typeof top === 'number' || (!!top && !isNaN(Number(top)))) {
+        pasteConfig.style.top = Number(top) + offsetY;
       }
 
-      // 将所有待粘贴元素坐标相对于多选第一个元素坐标重新计算，以保证多选粘贴后元素间距不变
-      if (pastePosition.left && configItem.style?.left) {
-        pastePosition.left = configItem.style.left - referenceLeft + pastePosition.left;
-      }
-      if (pastePosition.top && configItem.style?.top) {
-        pastePosition.top = configItem.style?.top - referenceTop + pastePosition.top;
-      }
-      const pasteConfig = await propsService.setNewItemId(configItem, false);
-
-      if (pasteConfig.style) {
-        const { left, top } = pasteConfig.style;
-        // 判断能转换为数字时，做粘贴偏移量计算
-        if (typeof left === 'number' || (!!left && !isNaN(Number(left)))) {
-          pasteConfig.style.left = Number(left) + offsetX;
-        }
-        if (typeof top === 'number' || (!!top && !isNaN(Number(top)))) {
-          pasteConfig.style.top = Number(top) + offsetY;
-        }
-
-        pasteConfig.style = {
-          ...pasteConfig.style,
-          ...pastePosition,
-        };
-      }
-      const root = editorService.get('root');
-      if ((isPage(pasteConfig) || isPageFragment(pasteConfig)) && root) {
-        pasteConfig.name = generatePageNameByApp(root, isPage(pasteConfig) ? NodeType.PAGE : NodeType.PAGE_FRAGMENT);
-      }
-      return pasteConfig as MNode;
-    }),
-  );
+      pasteConfig.style = {
+        ...pasteConfig.style,
+        ...pastePosition,
+      };
+    }
+    const root = editorService.get('root');
+    if ((isPage(pasteConfig) || isPageFragment(pasteConfig)) && root) {
+      pasteConfig.name = generatePageNameByApp(root, isPage(pasteConfig) ? NodeType.PAGE : NodeType.PAGE_FRAGMENT);
+    }
+    return pasteConfig as MNode;
+  });
   return pasteConfigs;
 };
 

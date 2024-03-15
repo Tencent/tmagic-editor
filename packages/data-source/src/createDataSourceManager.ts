@@ -15,13 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { cloneDeep, union } from 'lodash-es';
+import { union } from 'lodash-es';
 
 import type { AppCore } from '@tmagic/schema';
-import { getDepNodeIds, getNodes, replaceChildNode } from '@tmagic/utils';
+import { getDepNodeIds, getNodes } from '@tmagic/utils';
 
 import DataSourceManager from './DataSourceManager';
 import type { ChangeEvent, DataSourceManagerData } from './types';
+import { updateNode } from './utils';
 
 /**
  * 创建数据源管理器
@@ -39,13 +40,13 @@ export const createDataSourceManager = (app: AppCore, useMock?: boolean, initial
   if (dsl.dataSources && dsl.dataSourceCondDeps && platform !== 'editor') {
     getNodes(getDepNodeIds(dsl.dataSourceCondDeps), dsl.items).forEach((node) => {
       node.condResult = dataSourceManager.compliedConds(node);
-      replaceChildNode(node, dsl!.items);
+      updateNode(node, dsl!);
     });
   }
 
   if (dsl.dataSources && dsl.dataSourceDeps) {
     getNodes(getDepNodeIds(dsl.dataSourceDeps), dsl.items).forEach((node) => {
-      replaceChildNode(dataSourceManager.compiledNode(node), dsl!.items);
+      updateNode(dataSourceManager.compiledNode(node), dsl!);
     });
   }
 
@@ -61,9 +62,11 @@ export const createDataSourceManager = (app: AppCore, useMock?: boolean, initial
       dataSourceManager.emit(
         'update-data',
         getNodes(nodeIds, dsl.items).map((node) => {
-          const newNode = cloneDeep(node);
-          newNode.condResult = dataSourceManager.compliedConds(newNode);
-          return dataSourceManager.compiledNode(newNode);
+          if (app.platform !== 'editor') {
+            node.condResult = dataSourceManager.compliedConds(node);
+          }
+
+          return dataSourceManager.compiledNode(node);
         }),
         sourceId,
         changeEvent,

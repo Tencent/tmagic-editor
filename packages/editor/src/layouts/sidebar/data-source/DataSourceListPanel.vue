@@ -20,11 +20,14 @@
           ></ToolButton>
         </div>
       </TMagicPopover>
+
+      <slot name="data-source-panel-search"></slot>
     </div>
 
     <!-- 数据源列表 -->
     <DataSourceList @edit="editHandler" @remove="removeHandler"></DataSourceList>
   </TMagicScrollbar>
+
   <DataSourceConfigPanel
     ref="editDialog"
     :disabled="!editable"

@@ -61,7 +61,7 @@ import { ActionType } from '@tmagic/schema';
 import type { CodeSelectColConfig, DataSourceMethodSelectConfig, EventSelectConfig, Services } from '@editor/type';
 
 defineOptions({
-  name: 'MEditorEventSelect',
+  name: 'MFieldsEventSelect',
 });
 
 const props = defineProps<FieldProps<EventSelectConfig>>();
@@ -171,7 +171,7 @@ const codeActionConfig = computed(() => {
     type: 'code-select-col',
     text: '代码块',
     name: 'codeId',
-    disabled: () => !codeBlockService?.getEditStatus(),
+    notEditable: () => !codeBlockService?.getEditStatus(),
     display: (mForm, { model }) => model.actionType === ActionType.CODE,
   };
   return { ...defaultCodeActionConfig, ...props.config.codeActionConfig };
@@ -183,6 +183,7 @@ const dataSourceActionConfig = computed(() => {
     type: 'data-source-method-select',
     text: '数据源方法',
     name: 'dataSourceMethod',
+    notEditable: () => !services?.dataSourceService.get('editable'),
     display: (mForm, { model }) => model.actionType === ActionType.DATA_SOURCE,
   };
   return { ...defaultDataSourceActionConfig, ...props.config.dataSourceActionConfig };

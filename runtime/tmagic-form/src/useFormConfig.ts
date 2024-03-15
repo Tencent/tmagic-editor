@@ -23,7 +23,7 @@ export const useFormConfig = (props: AppProps) => {
   // @ts-ignore
   const formConfig = computed(() => props.fillConfig((config.value?.items || []) as FormConfig, mForm));
 
-  const app = new Core({
+  let app: Core | undefined = new Core({
     ua: contentWindow?.navigator.userAgent,
     platform: 'editor',
   });
@@ -137,6 +137,7 @@ export const useFormConfig = (props: AppProps) => {
   contentWindow?.addEventListener('message', runtimeReadyHandler);
 
   onBeforeUnmount(() => {
+    app = undefined;
     contentWindow?.removeEventListener('message', runtimeReadyHandler);
   });
 

@@ -1,5 +1,5 @@
 {
-  "version": "1.3.13",
+  "version": "1.4.0-beta.1",
   "name": "@tmagic/data-source",
   "type": "module",
   "sideEffects": [
@@ -33,8 +33,8 @@
     "data-source"
   ],
   "dependencies": {
-    "@tmagic/utils": "1.3.13",
-    "@tmagic/schema": "1.3.13",
+    "@tmagic/utils": "1.4.0-beta.1",
+    "@tmagic/schema": "1.4.0-beta.1",
     "events": "^3.3.0",
     "lodash-es": "^4.17.21"
   },
@@ -43,7 +43,7 @@
     "@types/lodash-es": "^4.17.4",
     "@types/node": "^18.19.0",
     "tsc-alias": "^1.8.5",
-    "typescript": "^4.7.4",
-    "vite": "^5.0.7"
+    "typescript": "^5.4.2",
+    "vite": "^5.1.6"
   }
 }

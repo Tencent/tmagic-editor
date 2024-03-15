@@ -18,7 +18,6 @@
     </CodeBlockList>
   </TMagicScrollbar>
 
-  <!-- 代码块编辑区 -->
   <CodeBlockEditor
     v-if="codeConfig"
     ref="codeBlockEditor"

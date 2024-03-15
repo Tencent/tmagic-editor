@@ -105,7 +105,7 @@ async function main() {
   if (stdout) {
     step('\nCommitting changes...');
     await runIfNotDry('git', ['add', '-A']);
-    await runIfNotDry('git', ['commit', '-m', `chore: release v${targetVersion}`]);
+    await runIfNotDry('git', ['commit', '-m', `chore: release v${targetVersion}`, '--no-verify']);
   } else {
     console.log('No changes to commit.');
   }
@@ -140,12 +140,15 @@ function updateVersions(version) {
   packages.forEach((p) => updatePackage(getPkgRoot(p), version));
   ['vue3', 'react', 'vue2'].forEach((p) => updatePackage(getRunTimeRoot(p), version));
   updatePackage(getPlayground(), version);
+  updatePackage(getRunTimeRoot('tmagic-form'), version, false);
 }
 
-function updatePackage(pkgRoot, version) {
+function updatePackage(pkgRoot, version, updateVersion = true) {
   const pkgPath = path.resolve(pkgRoot, 'package.json');
   const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
-  pkg.version = version;
+  if (updateVersion) {
+    pkg.version = version;
+  }
   updateDeps(pkg, 'dependencies', version);
   updateDeps(pkg, 'peerDependencies', version);
   fs.writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);

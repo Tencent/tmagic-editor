@@ -21,6 +21,8 @@ import { App } from 'vue';
 import Table from './Table.vue';
 
 export { default as MagicTable } from './Table.vue';
+export * from './schema';
+export * from './utils';
 
 export default {
   install(app: App) {

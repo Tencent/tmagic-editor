@@ -18,7 +18,7 @@ defineOptions({
   name: 'TMPopover',
 });
 
-const props = defineProps<PopoverProps>();
+const props = withDefaults(defineProps<PopoverProps>(), { visible: null });
 
 const ui = getConfig('components')?.popover;
 

@@ -82,11 +82,6 @@ export default {
                 age: 12, // 参数
               },
             },
-            {
-              actionType: 'comp',
-              to: 'overlay_2159', // 联动组件id
-              method: 'openOverlay', // 联动组件方法
-            },
           ],
         },
         {
@@ -369,13 +364,102 @@ export default {
       description: '按钮',
       fields: [
         {
-          type: 'string',
           name: 'text',
           title: '按钮文案',
+          type: 'string',
           description: '',
+          enable: true,
           defaultValue: '打开弹窗',
+          fields: [],
+        },
+        {
+          name: 'array',
+          title: 'array',
+          type: 'array',
+          description: '',
+          enable: true,
+          defaultValue: [
+            {
+              a: 1,
+            },
+            {
+              a: 2,
+            },
+          ],
+          fields: [
+            {
+              name: 'a',
+              title: 'a',
+              type: 'number',
+              description: '',
+              enable: true,
+              defaultValue: 1,
+              fields: [],
+            },
+          ],
+        },
+        {
+          name: 'object',
+          title: 'object',
+          type: 'object',
+          description: '',
+          enable: true,
+          defaultValue: {
+            a: 1,
+          },
+          fields: [
+            {
+              name: 'a',
+              title: 'a',
+              type: 'number',
+              description: '',
+              enable: true,
+              defaultValue: 1,
+              fields: [],
+            },
+          ],
         },
       ],
+      methods: [],
+      events: '',
+      mocks: [],
+      beforeRequest: '',
+      afterResponse: '',
+    },
+    {
+      id: 'ds_d1a460c5',
+      type: 'base',
+      title: 'style',
+      description: '',
+      fields: [
+        {
+          name: 'color',
+          title: 'color',
+          type: 'string',
+          description: '',
+          enable: true,
+          defaultValue: '#fff',
+          fields: [],
+        },
+      ],
+      methods: [
+        {
+          name: 'setCorlor',
+          desc: '',
+          timing: '',
+          params: [],
+          content: ({ dataSource }) => {
+            // place your code here
+            setTimeout(() => {
+              dataSource.setData('red', 'color');
+            }, 1000);
+          },
+        },
+      ],
+      events: '',
+      mocks: [],
+      beforeRequest: '',
+      afterResponse: '',
     },
   ],
   dataSourceDeps: {

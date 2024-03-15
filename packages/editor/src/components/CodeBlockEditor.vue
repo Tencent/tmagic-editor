@@ -1,26 +1,39 @@
 <template>
-  <component
-    :is="slideType === 'box' ? MFormBox : MFormDrawer"
-    class="m-editor-code-block-editor"
-    ref="fomDrawer"
-    label-width="80px"
-    :close-on-press-escape="false"
-    :title="content.name"
-    :width="size"
-    :config="functionConfig"
-    :values="content"
-    :disabled="disabled"
+  <!-- 代码块编辑区 -->
+  <FloatingBox
+    v-model:visible="boxVisible"
+    v-model:width="width"
+    v-model:height="codeBlockEditorHeight"
+    :title="content.name ? `${disabled ? '查看' : '编辑'}${content.name}` : '新增代码'"
+    :position="boxPosition"
     :before-close="beforeClose"
-    @change="changeHandler"
-    @submit="submitForm"
-    @error="errorHandler"
-    @open="openHandler"
-    @closed="closedHandler"
   >
-    <template #left>
-      <TMagicButton type="primary" link @click="difVisible = true">查看修改</TMagicButton>
+    <template #body>
+      <div ref="floatingBoxBody" style="height: 100%"></div>
     </template>
-  </component>
+  </FloatingBox>
+
+  <Teleport :to="floatingBoxBody" :disabled="slideType === 'box'" v-if="editVisible">
+    <MFormBox
+      class="m-editor-code-block-editor"
+      ref="formBox"
+      label-width="80px"
+      :close-on-press-escape="false"
+      :title="content.name"
+      :config="functionConfig"
+      :values="content"
+      :disabled="disabled"
+      :height="floatingBoxBody?.clientHeight"
+      @change="changeHandler"
+      @submit="submitForm"
+      @error="errorHandler"
+      @closed="closedHandler"
+    >
+      <template #left>
+        <TMagicButton v-if="!disabled" type="primary" link @click="difVisible = true">查看修改</TMagicButton>
+      </template>
+    </MFormBox>
+  </Teleport>
 
   <TMagicDialog v-model="difVisible" title="查看修改" fullscreen>
     <div style="display: flex; margin-bottom: 10px">
@@ -34,8 +47,8 @@
       type="diff"
       language="json"
       :initValues="content.content"
-      :modifiedValues="fomDrawer?.form?.values.content"
-      :style="`height: ${height - 200}px`"
+      :modifiedValues="formBox?.form?.values.content"
+      :style="`height: ${windowRect.height - 150}px`"
     ></CodeEditor>
 
     <template #footer>
@@ -48,12 +61,15 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, onBeforeUnmount, ref } from 'vue';
+import { computed, inject, nextTick, ref } from 'vue';
 
 import { TMagicButton, TMagicDialog, tMagicMessage, tMagicMessageBox, TMagicTag } from '@tmagic/design';
-import { ColumnConfig, FormConfig, FormState, MFormBox, MFormDrawer } from '@tmagic/form';
+import { ColumnConfig, FormConfig, FormState, MFormBox } from '@tmagic/form';
 import type { CodeBlockContent } from '@tmagic/schema';
 
+import FloatingBox from '@editor/components/FloatingBox.vue';
+import { useEditorContentHeight } from '@editor/hooks/use-editor-content-height';
+import { useWindowRect } from '@editor/hooks/use-window-rect';
 import CodeEditor from '@editor/layouts/CodeEditor.vue';
 import type { Services, SlideType } from '@editor/type';
 import { getConfig } from '@editor/utils/config';
@@ -61,6 +77,9 @@ import { getConfig } from '@editor/utils/config';
 defineOptions({
   name: 'MEditorCodeBlockEditor',
 });
+
+const width = defineModel<number>('width', { default: 670 });
+const boxVisible = defineModel<boolean>('visible', { default: false });
 
 const props = defineProps<{
   content: CodeBlockContent;
@@ -76,37 +95,22 @@ const emit = defineEmits<{
 
 const services = inject<Services>('services');
 
+const { height: codeBlockEditorHeight } = useEditorContentHeight();
+
 const difVisible = ref(false);
-const height = ref(globalThis.innerHeight);
-
-const windowReizehandler = () => {
-  height.value = globalThis.innerHeight;
-};
-
-globalThis.addEventListener('resize', windowReizehandler);
-
-onBeforeUnmount(() => {
-  globalThis.removeEventListener('resize', windowReizehandler);
-});
+const { rect: windowRect } = useWindowRect();
 
 const magicVsEditor = ref<InstanceType<typeof CodeEditor>>();
 
 const diffChange = () => {
-  if (!magicVsEditor.value || !fomDrawer.value?.form) {
+  if (!magicVsEditor.value || !formBox.value?.form) {
     return;
   }
 
-  fomDrawer.value.form.values.content = magicVsEditor.value.getEditorValue();
+  formBox.value.form.values.content = magicVsEditor.value.getEditorValue();
 
   difVisible.value = false;
 };
-
-const columnWidth = computed(() => services?.uiService.get('columnWidth'));
-const size = computed(() =>
-  columnWidth.value ? columnWidth.value.center + columnWidth.value.right - (props.isDataSource ? 100 : 0) : 600,
-);
-
-const codeEditorHeight = ref('600px');
 
 const defaultParamColConfig: ColumnConfig = {
   type: 'row',
@@ -191,7 +195,7 @@ const functionConfig = computed<FormConfig>(() => [
     name: 'content',
     type: 'vs-code',
     options: inject('codeOptions', {}),
-    height: codeEditorHeight.value,
+    height: '500px',
     onChange: (formState: FormState | undefined, code: string) => {
       try {
         // 检测js代码是否存在语法错误
@@ -208,6 +212,7 @@ const functionConfig = computed<FormConfig>(() => [
 ]);
 
 const submitForm = (values: CodeBlockContent) => {
+  changedValue.value = undefined;
   emit('submit', values);
 };
 
@@ -215,16 +220,7 @@ const errorHandler = (error: any) => {
   tMagicMessage.error(error.message);
 };
 
-const fomDrawer = ref<InstanceType<typeof MFormDrawer>>();
-
-const openHandler = () => {
-  setTimeout(() => {
-    if (fomDrawer.value) {
-      const height = fomDrawer.value?.bodyHeight - 348 - (props.isDataSource ? 50 : 0);
-      codeEditorHeight.value = `${height > 100 ? height : 600}px`;
-    }
-  });
-};
+const formBox = ref<InstanceType<typeof MFormBox>>();
 
 const changedValue = ref<CodeBlockContent>();
 const changeHandler = (values: CodeBlockContent) => {
@@ -233,6 +229,7 @@ const changeHandler = (values: CodeBlockContent) => {
 
 const beforeClose = (done: (cancel?: boolean) => void) => {
   if (!changedValue.value) {
+    editVisible.value = false;
     done();
     return;
   }
@@ -245,10 +242,14 @@ const beforeClose = (done: (cancel?: boolean) => void) => {
     })
     .then(() => {
       changedValue.value && submitForm(changedValue.value);
+      editVisible.value = false;
       done();
     })
     .catch((action: string) => {
-      done(action === 'close');
+      if (action === 'cancel') {
+        editVisible.value = false;
+      }
+      done(action === 'cancel');
     });
 };
 
@@ -256,13 +257,35 @@ const closedHandler = () => {
   changedValue.value = undefined;
 };
 
+const editVisible = ref<boolean>(false);
+const floatingBoxBody = ref<HTMLDivElement>();
+
+const boxPosition = computed(() => {
+  const columnWidth = services?.uiService?.get('columnWidth');
+  const navMenuRect = services?.uiService?.get('navMenuRect');
+  return {
+    left: columnWidth?.left ?? 0,
+    top: (navMenuRect?.top ?? 0) + (navMenuRect?.height ?? 0),
+  };
+});
+
 defineExpose({
-  show() {
-    fomDrawer.value?.show();
+  async show() {
+    if (props.slideType !== 'box') {
+      boxVisible.value = true;
+      await nextTick();
+    }
+
+    editVisible.value = true;
   },
 
-  hide() {
-    fomDrawer.value?.hide();
+  async hide() {
+    editVisible.value = false;
+
+    if (props.slideType !== 'box') {
+      await nextTick();
+      boxVisible.value = false;
+    }
   },
 });
 </script>

@@ -5,6 +5,8 @@
   border: 1px solid $--border-color;
   display: flex;
   flex-direction: column;
+  max-height: 100%;
+  max-width: 100%;
 
   .m-editor-float-box-title {
     text-align: center;
@@ -19,9 +21,9 @@
   }
 
   .m-editor-float-box-body {
-    padding: 5px;
-    flex: 1;
     overflow: auto;
+    flex: 1;
+    padding: 0 16px;
   }
 }
 

@@ -1,5 +1,5 @@
 {
-  "version": "1.3.13",
+  "version": "1.4.0-beta.1",
   "name": "@tmagic/element-plus-adapter",
   "type": "module",
   "sideEffects": [
@@ -37,19 +37,19 @@
     "typescript"
   ],
   "dependencies": {
-    "@tmagic/design": "1.3.13",
-    "element-plus": "^2.4.3",
-    "vue": "^3.3.8"
+    "@tmagic/design": "1.4.0-beta.1",
+    "element-plus": "^2.6.1",
+    "vue": "^3.4.21"
   },
   "peerDependencies": {
-    "@tmagic/design": "1.3.13",
-    "element-plus": "^2.4.3",
-    "vue": "^3.3.8"
+    "@tmagic/design": "1.4.0-beta.1",
+    "element-plus": "^2.6.1",
+    "vue": "^3.4.21"
   },
   "devDependencies": {
     "@types/node": "^18.19.0",
     "rimraf": "^3.0.2",
-    "typescript": "^5.0.4",
-    "vite": "^5.0.7"
+    "typescript": "^5.4.2",
+    "vite": "^5.1.6"
   }
 }

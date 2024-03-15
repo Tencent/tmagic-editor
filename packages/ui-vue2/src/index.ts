@@ -19,11 +19,12 @@
 import Button from './button';
 import Container from './container';
 import Img from './img';
+import IteratorContainer from './iterator-container';
 import Overlay from './overlay';
 import Page from './page';
 import PageFragment from './page-fragment';
 import PageFragmentContainer from './page-fragment-container';
-import Qrcode from './qrcode';
+import QRcode from './qrcode';
 import Text from './text';
 
 const ui: Record<string, any> = {
@@ -32,10 +33,11 @@ const ui: Record<string, any> = {
   button: Button,
   text: Text,
   img: Img,
-  qrcode: Qrcode,
+  qrcode: QRcode,
   overlay: Overlay,
-  'page-fragment': PageFragment,
   'page-fragment-container': PageFragmentContainer,
+  'page-fragment': PageFragment,
+  'iterator-container': IteratorContainer,
 };
 
 export default ui;

@@ -1,88 +1,96 @@
-.ui-component-panel.tmagic-design-collapse {
-  height: 100%;
-  border-top: 0 !important;
-  margin-top: 48px;
-  background-color: $--sidebar-content-background-color;
+.ui-component-panel {
+  &.tmagic-design-collapse {
+    height: 100%;
+    border-top: 0 !important;
+    margin-top: 48px;
+    background-color: $--sidebar-content-background-color;
 
-  .tmagic-design-collapse-item {
-    > div:first-of-type {
-      border-bottom: 1px solid $--border-color;
-      margin-bottom: 10px;
-    }
-  }
-
-  .el-collapse-item__header,
-  .t-collapse-panel__header {
-    background: $--sidebar-content-background-color;
-    color: $--font-color;
-    height: 25px;
-    line-height: 25px;
-    padding-left: 10px;
-    font-size: 12px;
-
-    i {
-      margin-right: 5px;
-      font-size: 14px;
-    }
-  }
-
-  .el-collapse-item__wrap,
-  .t-collapse-panel__body {
-    background: $--sidebar-content-background-color;
-    border-bottom: 0;
-
-    .el-collapse-item__content,
-    .t-collapse-panel__content {
-      padding: 10px;
-      display: flex;
-      flex-wrap: wrap;
+    .tmagic-design-collapse-item {
+      > div:first-of-type {
+        border-bottom: 1px solid $--border-color;
+        margin-bottom: 10px;
+      }
     }
 
-    .component-item {
-      display: flex;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin: 5px 10px;
-      box-sizing: border-box;
+    .el-collapse-item__header,
+    .t-collapse-panel__header {
+      background: $--sidebar-content-background-color;
       color: $--font-color;
-      flex-direction: column;
-      width: 42px;
-      cursor: pointer;
+      height: 25px;
+      line-height: 25px;
+      padding-left: 10px;
+      font-size: 12px;
 
       i {
-        font-size: 20px;
-        background: #fff;
-        height: 40px;
-        width: 40px;
-        line-height: 40px;
-        border-radius: 5px;
-        color: #909090;
-        border: 1px solid $--border-color;
-        display: flex;
-        justify-content: space-evenly;
-        align-items: center;
-        margin-bottom: 5px;
-
-        &:hover {
-          background: #2882e0;
-          color: #fff;
-          border-color: #4e8be1;
-        }
-      }
-
-      span {
-        font-size: 12px;
-        text-align: center;
-      }
-
-      .el-tooltip {
-        width: 50px;
-        height: 30px;
-        line-height: 15px;
-        display: block;
-        white-space: normal;
-        margin: 0;
+        margin-right: 5px;
+        font-size: 14px;
       }
     }
+
+    .el-collapse-item__wrap,
+    .t-collapse-panel__body {
+      background: $--sidebar-content-background-color;
+      border-bottom: 0;
+
+      .el-collapse-item__content,
+      .t-collapse-panel__content {
+        padding: 10px;
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      .component-item {
+        display: flex;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin: 5px 10px;
+        box-sizing: border-box;
+        color: $--font-color;
+        flex-direction: column;
+        width: 42px;
+        cursor: pointer;
+
+        i {
+          font-size: 20px;
+          background: #fff;
+          height: 40px;
+          width: 40px;
+          line-height: 40px;
+          border-radius: 5px;
+          color: #909090;
+          border: 1px solid $--border-color;
+          display: flex;
+          justify-content: space-evenly;
+          align-items: center;
+          margin-bottom: 5px;
+
+          &:hover {
+            background: #2882e0;
+            color: #fff;
+            border-color: #4e8be1;
+          }
+        }
+
+        span {
+          font-size: 12px;
+          text-align: center;
+        }
+
+        .el-tooltip {
+          width: 50px;
+          height: 30px;
+          line-height: 15px;
+          display: block;
+          white-space: normal;
+          margin: 0;
+        }
+      }
+    }
+  }
+
+  .t-collapse {
+    margin-top: 0;
+    padding-top: 48px;
+    position: relative;
   }
 }

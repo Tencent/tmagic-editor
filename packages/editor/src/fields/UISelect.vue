@@ -26,7 +26,7 @@
           :size="size"
           @click="selectNode(val)"
           @mouseenter="highlight(val)"
-          @mouseleave="unhightlight"
+          @mouseleave="unhighlight"
           >{{ `${toName}_${val}` }}</TMagicButton
         >
       </TMagicTooltip>
@@ -46,16 +46,16 @@ import { Close, Delete } from '@element-plus/icons-vue';
 import { throttle } from 'lodash-es';
 
 import { TMagicButton, TMagicTooltip } from '@tmagic/design';
-import type { FieldProps, FormState } from '@tmagic/form';
+import type { FieldProps, FormItem, FormState } from '@tmagic/form';
 import type { Id } from '@tmagic/schema';
 
 import { Services, UI_SELECT_MODE_EVENT_NAME } from '@editor/type';
 
 defineOptions({
-  name: 'MEditorUISelect',
+  name: 'MFieldsUISelect',
 });
 
-const props = defineProps<FieldProps<any>>();
+const props = defineProps<FieldProps<{ type: 'ui-select' } & FormItem>>();
 
 const emit = defineEmits(['change']);
 
@@ -115,7 +115,7 @@ const highlight = throttle((id: Id) => {
   services?.stageOverlayService.get('stage')?.highlight(id);
 }, 150);
 
-const unhightlight = () => {
+const unhighlight = () => {
   services?.editorService.set('highlightNode', null);
   services?.editorService.get('stage')?.clearHighlight();
   services?.stageOverlayService.get('stage')?.clearHighlight();

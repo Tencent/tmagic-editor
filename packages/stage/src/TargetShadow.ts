@@ -93,7 +93,7 @@ export default class TargetShadow {
   private updateEl(target: ShadowElement, src?: ShadowElement): ShadowElement {
     const el = src || globalThis.document.createElement('div');
 
-    el.id = `${this.idPrefix}${target.id}`;
+    el.id = `${this.idPrefix}_${target.id}`;
 
     el.style.cssText = getTargetElStyle(target, this.zIndex);
 

@@ -1,5 +1,5 @@
 {
-  "version": "1.3.13",
+  "version": "1.4.0-beta.1",
   "name": "@tmagic/tdesign-vue-next-adapter",
   "type": "module",
   "sideEffects": [
@@ -20,7 +20,8 @@
   "scripts": {
     "build": "npm run build:type && vite build",
     "build:type": "npm run clear:type && tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
-    "clear:type": "rimraf ./types"
+    "clear:type": "rimraf ./types",
+    "type:check": "vue-tsc --noEmit"
   },
   "engines": {
     "node": ">=18"
@@ -37,21 +38,22 @@
     "typescript"
   ],
   "dependencies": {
-    "@tmagic/design": "1.3.13",
-    "tdesign-vue-next": "^1.3.4",
-    "vue": "^3.3.8"
+    "@tmagic/design": "1.4.0-beta.1",
+    "tdesign-vue-next": "^1.8.1",
+    "vue": "^3.4.21"
   },
   "peerDependencies": {
-    "@tmagic/design": "1.3.13",
-    "tdesign-vue-next": "^1.3.4",
-    "vue": "^3.3.8"
+    "@tmagic/design": "1.4.0-beta.1",
+    "tdesign-vue-next": "^1.8.1",
+    "vue": "^3.4.21"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.5.2",
-    "@vue/compiler-sfc": "^3.3.8",
+    "@vue/compiler-sfc": "^3.4.21",
     "@types/node": "^18.19.0",
     "rimraf": "^3.0.2",
-    "typescript": "^5.0.4",
-    "vite": "^5.0.7"
+    "typescript": "^5.4.2",
+    "vite": "^5.1.6",
+    "vue-tsc": "^2.0.6"
   }
 }

@@ -8,8 +8,8 @@
       <TMagicCheckbox
         v-model="model[name].value"
         :prop="`${prop}${prop ? '.' : ''}${config.name}.value`"
-        :true-label="1"
-        :false-label="0"
+        :true-value="1"
+        :false-value="0"
         @update:modelValue="change"
         ><span v-html="config.legend"></span><span v-if="config.extra" v-html="config.extra" class="m-form-tip"></span
       ></TMagicCheckbox>

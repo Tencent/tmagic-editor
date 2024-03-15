@@ -26,7 +26,7 @@ import Icon from '@editor/components/Icon.vue';
 import type { PageFragmentSelectConfig, Services } from '@editor/type';
 
 defineOptions({
-  name: 'MEditorPageFragmentSelect',
+  name: 'MFieldsPageFragmentSelect',
 });
 
 const services = inject<Services>('services');

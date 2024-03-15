@@ -205,8 +205,17 @@ export enum HookType {
   CODE = 'code',
 }
 
+export enum HookCodeType {
+  /** 代码块 */
+  CODE = 'code',
+  /** 数据源方法 */
+  DATA_SOURCE_METHOD = 'data-source-method',
+}
+
+export type DataSourceFieldType = 'null' | 'boolean' | 'object' | 'array' | 'number' | 'string' | 'any';
+
 export interface DataSchema {
-  type?: 'null' | 'boolean' | 'object' | 'array' | 'number' | 'string' | 'any';
+  type?: DataSourceFieldType;
   /** 键名 */
   name: string;
   /** 展示名称 */

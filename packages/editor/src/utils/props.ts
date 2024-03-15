@@ -41,7 +41,6 @@ const numberOptions = [
 
 export const styleTabConfig: TabPaneConfig = {
   title: '样式',
-  labelWidth: '80px',
   items: [
     {
       name: 'style',
@@ -51,30 +50,59 @@ export const styleTabConfig: TabPaneConfig = {
           legend: '位置',
           items: [
             {
+              type: 'data-source-field-select',
               name: 'position',
-              type: 'checkbox',
-              activeValue: 'fixed',
-              inactiveValue: 'absolute',
-              defaultValue: 'absolute',
               text: '固定定位',
+              checkStrictly: false,
+              dataSourceFieldType: ['string'],
+              fieldConfig: {
+                type: 'checkbox',
+                activeValue: 'fixed',
+                inactiveValue: 'absolute',
+                defaultValue: 'absolute',
+              },
             },
             {
+              type: 'data-source-field-select',
               name: 'left',
               text: 'left',
+              checkStrictly: false,
+              dataSourceFieldType: ['string', 'number'],
+              fieldConfig: {
+                type: 'text',
+              },
             },
             {
+              type: 'data-source-field-select',
               name: 'top',
               text: 'top',
+              checkStrictly: false,
+              dataSourceFieldType: ['string', 'number'],
+              fieldConfig: {
+                type: 'text',
+              },
               disabled: (vm: FormState, { model }: any) =>
                 model.position === 'fixed' && model._magic_position === 'fixedBottom',
             },
             {
+              type: 'data-source-field-select',
               name: 'right',
               text: 'right',
+              checkStrictly: false,
+              dataSourceFieldType: ['string', 'number'],
+              fieldConfig: {
+                type: 'text',
+              },
             },
             {
+              type: 'data-source-field-select',
               name: 'bottom',
               text: 'bottom',
+              checkStrictly: false,
+              dataSourceFieldType: ['string', 'number'],
+              fieldConfig: {
+                type: 'text',
+              },
               disabled: (vm: FormState, { model }: any) =>
                 model.position === 'fixed' && model._magic_position === 'fixedTop',
             },
@@ -85,12 +113,42 @@ export const styleTabConfig: TabPaneConfig = {
           legend: '盒子',
           items: [
             {
+              type: 'data-source-field-select',
               name: 'width',
               text: '宽度',
+              checkStrictly: false,
+              dataSourceFieldType: ['string', 'number'],
+              fieldConfig: {
+                type: 'text',
+              },
             },
             {
+              type: 'data-source-field-select',
               name: 'height',
               text: '高度',
+              checkStrictly: false,
+              dataSourceFieldType: ['string', 'number'],
+              fieldConfig: {
+                type: 'text',
+              },
+            },
+            {
+              type: 'data-source-field-select',
+              text: 'overflow',
+              name: 'overflow',
+              checkStrictly: false,
+              dataSourceFieldType: ['string'],
+              fieldConfig: {
+                type: 'select',
+                options: [
+                  { text: 'visible', value: 'visible' },
+                  { text: 'hidden', value: 'hidden' },
+                  { text: 'clip', value: 'clip' },
+                  { text: 'scroll', value: 'scroll' },
+                  { text: 'auto', value: 'auto' },
+                  { text: 'overlay', value: 'overlay' },
+                ],
+              },
             },
           ],
         },
@@ -99,32 +157,48 @@ export const styleTabConfig: TabPaneConfig = {
           legend: '边框',
           items: [
             {
+              type: 'data-source-field-select',
               name: 'borderWidth',
               text: '宽度',
               defaultValue: '0',
+              checkStrictly: false,
+              dataSourceFieldType: ['string', 'number'],
+              fieldConfig: {
+                type: 'text',
+              },
             },
             {
+              type: 'data-source-field-select',
               name: 'borderColor',
               text: '颜色',
-              type: 'colorPicker',
+              checkStrictly: false,
+              dataSourceFieldType: ['string'],
+              fieldConfig: {
+                type: 'text',
+              },
             },
             {
+              type: 'data-source-field-select',
               name: 'borderStyle',
               text: '样式',
-              type: 'select',
               defaultValue: 'none',
-              options: [
-                { text: 'none', value: 'none' },
-                { text: 'hidden', value: 'hidden' },
-                { text: 'dotted', value: 'dotted' },
-                { text: 'dashed', value: 'dashed' },
-                { text: 'solid', value: 'solid' },
-                { text: 'double', value: 'double' },
-                { text: 'groove', value: 'groove' },
-                { text: 'ridge', value: 'ridge' },
-                { text: 'inset', value: 'inset' },
-                { text: 'outset', value: 'outset' },
-              ],
+              checkStrictly: false,
+              dataSourceFieldType: ['string'],
+              fieldConfig: {
+                type: 'select',
+                options: [
+                  { text: 'none', value: 'none' },
+                  { text: 'hidden', value: 'hidden' },
+                  { text: 'dotted', value: 'dotted' },
+                  { text: 'dashed', value: 'dashed' },
+                  { text: 'solid', value: 'solid' },
+                  { text: 'double', value: 'double' },
+                  { text: 'groove', value: 'groove' },
+                  { text: 'ridge', value: 'ridge' },
+                  { text: 'inset', value: 'inset' },
+                  { text: 'outset', value: 'outset' },
+                ],
+              },
             },
           ],
         },
@@ -133,31 +207,53 @@ export const styleTabConfig: TabPaneConfig = {
           legend: '背景',
           items: [
             {
+              type: 'data-source-field-select',
               name: 'backgroundImage',
               text: '背景图',
+              checkStrictly: false,
+              dataSourceFieldType: ['string'],
+              fieldConfig: {
+                type: 'text',
+              },
             },
             {
+              type: 'data-source-field-select',
               name: 'backgroundColor',
               text: '背景颜色',
-              type: 'colorPicker',
+              checkStrictly: false,
+              dataSourceFieldType: ['string'],
+              fieldConfig: {
+                type: 'colorPicker',
+              },
             },
             {
+              type: 'data-source-field-select',
               name: 'backgroundRepeat',
               text: '背景图重复',
-              type: 'select',
               defaultValue: 'no-repeat',
-              options: [
-                { text: 'repeat', value: 'repeat' },
-                { text: 'repeat-x', value: 'repeat-x' },
-                { text: 'repeat-y', value: 'repeat-y' },
-                { text: 'no-repeat', value: 'no-repeat' },
-                { text: 'inherit', value: 'inherit' },
-              ],
+              checkStrictly: false,
+              dataSourceFieldType: ['string'],
+              fieldConfig: {
+                type: 'select',
+                options: [
+                  { text: 'repeat', value: 'repeat' },
+                  { text: 'repeat-x', value: 'repeat-x' },
+                  { text: 'repeat-y', value: 'repeat-y' },
+                  { text: 'no-repeat', value: 'no-repeat' },
+                  { text: 'inherit', value: 'inherit' },
+                ],
+              },
             },
             {
+              type: 'data-source-field-select',
               name: 'backgroundSize',
               text: '背景图大小',
               defaultValue: '100% 100%',
+              checkStrictly: false,
+              dataSourceFieldType: ['string'],
+              fieldConfig: {
+                type: 'text',
+              },
             },
           ],
         },
@@ -166,17 +262,34 @@ export const styleTabConfig: TabPaneConfig = {
           legend: '字体',
           items: [
             {
+              type: 'data-source-field-select',
               name: 'color',
               text: '颜色',
-              type: 'colorPicker',
+              checkStrictly: false,
+              dataSourceFieldType: ['string'],
+              fieldConfig: {
+                type: 'colorPicker',
+              },
             },
             {
+              type: 'data-source-field-select',
               name: 'fontSize',
               text: '大小',
+              checkStrictly: false,
+              dataSourceFieldType: ['string', 'number'],
+              fieldConfig: {
+                type: 'text',
+              },
             },
             {
+              type: 'data-source-field-select',
               name: 'fontWeight',
               text: '粗细',
+              checkStrictly: false,
+              dataSourceFieldType: ['string', 'number'],
+              fieldConfig: {
+                type: 'text',
+              },
             },
           ],
         },
@@ -186,12 +299,24 @@ export const styleTabConfig: TabPaneConfig = {
           name: 'transform',
           items: [
             {
+              type: 'data-source-field-select',
               name: 'rotate',
               text: '旋转角度',
+              checkStrictly: false,
+              dataSourceFieldType: ['string'],
+              fieldConfig: {
+                type: 'text',
+              },
             },
             {
+              type: 'data-source-field-select',
               name: 'scale',
               text: '缩放',
+              checkStrictly: false,
+              dataSourceFieldType: ['number', 'string'],
+              fieldConfig: {
+                type: 'text',
+              },
             },
           ],
         },
@@ -219,13 +344,11 @@ export const advancedTabConfig: TabPaneConfig = {
     {
       name: 'created',
       text: 'created',
-      labelWidth: '100px',
       type: 'code-select',
     },
     {
       name: 'mounted',
       text: 'mounted',
-      labelWidth: '100px',
       type: 'code-select',
     },
   ],
@@ -250,15 +373,23 @@ export const displayTabConfig: TabPaneConfig = {
               name: 'field',
               value: 'key',
               label: '字段',
+              checkStrictly: false,
+              dataSourceFieldType: ['string', 'number', 'boolean', 'any'],
             },
             {
               type: 'select',
               options: (mForm, { model }) => {
-                const [id, field] = model.field;
+                const [id, ...fieldNames] = model.field;
 
                 const ds = dataSourceService.getDataSourceById(id);
 
-                const type = ds?.fields.find((f) => f.name === field)?.type;
+                let fields = ds?.fields || [];
+                let type = '';
+                (fieldNames || []).forEach((fieldName: string) => {
+                  const field = fields.find((f) => f.name === fieldName);
+                  fields = field?.fields || [];
+                  type = field?.type || '';
+                });
 
                 if (type === 'array') {
                   return arrayOptions;
@@ -290,11 +421,17 @@ export const displayTabConfig: TabPaneConfig = {
                 {
                   name: 'value',
                   type: (mForm, { model }) => {
-                    const [id, field] = model.field;
+                    const [id, ...fieldNames] = model.field;
 
                     const ds = dataSourceService.getDataSourceById(id);
 
-                    const type = ds?.fields.find((f) => f.name === field)?.type;
+                    let fields = ds?.fields || [];
+                    let type = '';
+                    (fieldNames || []).forEach((fieldName: string) => {
+                      const field = fields.find((f) => f.name === fieldName);
+                      fields = field?.fields || [];
+                      type = field?.type || '';
+                    });
 
                     if (type === 'number') {
                       return 'number';
@@ -331,13 +468,13 @@ export const displayTabConfig: TabPaneConfig = {
  * @param config 组件属性配置
  * @returns Object
  */
-export const fillConfig = (config: FormConfig = []) => [
+export const fillConfig = (config: FormConfig = [], labelWidth = '80px'): FormConfig => [
   {
     type: 'tab',
+    labelWidth,
     items: [
       {
         title: '属性',
-        labelWidth: '80px',
         items: [
           // 组件类型，必须要有
           {

@@ -1,4 +1,3 @@
-
 import React, { constructor, useEffect, useMemo, useState } from 'react';
 
 import type { MComponent, MContainer, MNode, MPage, MPageFragment } from '@tmagic/schema';
@@ -16,24 +15,24 @@ const PageFragmentContainer: React.FC<PageFragmentContainerProps> = ({ config })
 
   if (!app) return null;
   const MagicUiContainer = app.resolveComponent('container');
-  let containerConfig = {}
-  const fragment = app?.dsl?.items?.find((page) => page.id === config.pageFragmentId)
-  if(fragment) {
+  let containerConfig = {};
+  const fragment = app?.dsl?.items?.find((page) => page.id === config.pageFragmentId);
+  if (fragment) {
     const { id, type, items, ...others } = fragment;
     const itemsWithoutId = items.map((item: MNode) => {
       const { id, ...otherConfig } = item;
       return otherConfig;
     });
     if (app?.platform === 'editor') {
-      containerConfig ={
+      containerConfig = {
         ...others,
         items: itemsWithoutId,
       };
-    }else {
+    } else {
       containerConfig = {
         ...others,
-        items
-      }
+        items,
+      };
     }
   }
 
@@ -43,9 +42,7 @@ const PageFragmentContainer: React.FC<PageFragmentContainerProps> = ({ config })
       className="magic-ui-page-fragment-container"
       style={app.transformStyle(config.style || {})}
     >
-      <MagicUiContainer
-        config={containerConfig}
-      ></MagicUiContainer>
+      <MagicUiContainer config={containerConfig}></MagicUiContainer>
     </div>
   );
 };

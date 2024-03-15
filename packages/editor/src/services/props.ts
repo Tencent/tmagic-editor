@@ -18,6 +18,7 @@
 
 import { reactive } from 'vue';
 import { cloneDeep, mergeWith } from 'lodash-es';
+import { Writable } from 'type-fest';
 
 import { DepTargetType } from '@tmagic/dep';
 import type { FormConfig } from '@tmagic/form';
@@ -26,10 +27,25 @@ import { getValueByKeyPath, guid, setValueByKeyPath, toLine } from '@tmagic/util
 
 import depService from '@editor/services/dep';
 import editorService from '@editor/services/editor';
-import type { PropsState } from '@editor/type';
+import type { AsyncHookPlugin, PropsState, SyncHookPlugin } from '@editor/type';
 import { fillConfig } from '@editor/utils/props';
 
 import BaseService from './BaseService';
+
+const canUsePluginMethods = {
+  async: [
+    'setPropsConfig',
+    'getPropsConfig',
+    'setPropsValue',
+    'getPropsValue',
+    'fillConfig',
+    'getDefaultPropsValue',
+  ] as const,
+  sync: ['createId', 'setNewItemId'] as const,
+};
+
+type AsyncMethodName = Writable<(typeof canUsePluginMethods)['async']>;
+type SyncMethodName = Writable<(typeof canUsePluginMethods)['sync']>;
 
 class Props extends BaseService {
   private state = reactive<PropsState>({
@@ -40,14 +56,8 @@ class Props extends BaseService {
 
   constructor() {
     super([
-      { name: 'setPropsConfig', isAsync: true },
-      { name: 'getPropsConfig', isAsync: true },
-      { name: 'setPropsValue', isAsync: true },
-      { name: 'getPropsValue', isAsync: true },
-      { name: 'createId', isAsync: false },
-      { name: 'setNewItemId', isAsync: true },
-      { name: 'fillConfig', isAsync: true },
-      { name: 'getDefaultPropsValue', isAsync: true },
+      ...canUsePluginMethods.async.map((methodName) => ({ name: methodName, isAsync: true })),
+      ...canUsePluginMethods.sync.map((methodName) => ({ name: methodName, isAsync: false })),
     ]);
   }
 
@@ -58,17 +68,12 @@ class Props extends BaseService {
     this.emit('props-configs-change');
   }
 
-  public async fillConfig(config: FormConfig) {
-    return fillConfig(config);
+  public async fillConfig(config: FormConfig, labelWidth?: string) {
+    return fillConfig(config, typeof labelWidth !== 'function' ? labelWidth : '80px');
   }
 
-  /**
-   * 为指定类型组件设置组件属性表单配置
-   * @param type 组件类型
-   * @param config 组件属性表单配置
-   */
   public async setPropsConfig(type: string, config: FormConfig) {
-    this.state.propsConfigMap[type] = await this.fillConfig(Array.isArray(config) ? config : [config]);
+    this.state.propsConfigMap[toLine(type)] = await this.fillConfig(Array.isArray(config) ? config : [config]);
   }
 
   /**
@@ -81,7 +86,7 @@ class Props extends BaseService {
       return await this.getPropsConfig('button');
     }
 
-    return cloneDeep(this.state.propsConfigMap[type] || (await this.fillConfig([])));
+    return cloneDeep(this.state.propsConfigMap[toLine(type)] || (await this.fillConfig([])));
   }
 
   public setPropsValues(values: Record<string, Partial<MNode>>) {
@@ -96,7 +101,7 @@ class Props extends BaseService {
    * @param value 组件初始值
    */
   public async setPropsValue(type: string, value: Partial<MNode>) {
-    this.state.propsValueMap[type] = value;
+    this.state.propsValueMap[toLine(type)] = value;
   }
 
   /**
@@ -104,7 +109,9 @@ class Props extends BaseService {
    * @param type 组件类型
    * @returns 组件初始值
    */
-  public async getPropsValue(type: string, { inputEvent, ...defaultValue }: Record<string, any> = {}) {
+  public async getPropsValue(componentType: string, { inputEvent, ...defaultValue }: Record<string, any> = {}) {
+    const type = toLine(componentType);
+
     if (type === 'area') {
       const value = (await this.getPropsValue('button')) as MComponent;
       value.className = 'action-area';
@@ -115,16 +122,14 @@ class Props extends BaseService {
       return value;
     }
 
-    const [id, defaultPropsValue, data] = await Promise.all([
-      this.createId(type),
-      this.getDefaultPropsValue(type),
-      this.setNewItemId(
-        cloneDeep({
-          type,
-          ...defaultValue,
-        } as any),
-      ),
-    ]);
+    const id = this.createId(type);
+    const defaultPropsValue = this.getDefaultPropsValue(type);
+    const data = this.setNewItemId(
+      cloneDeep({
+        type,
+        ...defaultValue,
+      } as any),
+    );
 
     return {
       id,
@@ -133,7 +138,7 @@ class Props extends BaseService {
     };
   }
 
-  public async createId(type: string | number): Promise<string> {
+  public createId(type: string | number): string {
     return `${type}_${guid()}`;
   }
 
@@ -144,16 +149,16 @@ class Props extends BaseService {
    * @param {Boolean} force 是否强制设置新的ID
    */
   /* eslint no-param-reassign: ["error", { "props": false }] */
-  public async setNewItemId(config: MNode, force = true) {
+  public setNewItemId(config: MNode, force = true) {
     if (force || editorService.getNodeById(config.id)) {
-      const newId = await this.createId(config.type || 'component');
+      const newId = this.createId(config.type || 'component');
       this.setRelateId(config.id, newId);
       config.id = newId;
     }
 
     if (config.items && Array.isArray(config.items)) {
       for (const item of config.items) {
-        await this.setNewItemId(item);
+        this.setNewItemId(item);
       }
     }
 
@@ -165,7 +170,7 @@ class Props extends BaseService {
    * @param type 组件类型
    * @returns Object
    */
-  public async getDefaultPropsValue(type: string) {
+  public getDefaultPropsValue(type: string) {
     return ['page', 'container'].includes(type)
       ? {
           type,
@@ -225,6 +230,10 @@ class Props extends BaseService {
     this.resetState();
     this.removeAllListeners();
     this.removeAllPlugins();
+  }
+
+  public usePlugin(options: AsyncHookPlugin<AsyncMethodName, Props> & SyncHookPlugin<SyncMethodName, Props>): void {
+    super.usePlugin(options);
   }
 
   /**

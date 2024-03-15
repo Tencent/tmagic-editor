@@ -18,6 +18,7 @@
 
 import { reactive, toRaw } from 'vue';
 import { cloneDeep, get, isObject, mergeWith, uniq } from 'lodash-es';
+import { Writable } from 'type-fest';
 
 import { DepTargetType } from '@tmagic/dep';
 import type { Id, MApp, MComponent, MContainer, MNode, MPage, MPageFragment } from '@tmagic/schema';
@@ -29,7 +30,15 @@ import propsService from '@editor/services//props';
 import depService from '@editor/services/dep';
 import historyService from '@editor/services/history';
 import storageService, { Protocol } from '@editor/services/storage';
-import type { AddMNode, EditorNodeInfo, PastePosition, StepValue, StoreState, StoreStateKey } from '@editor/type';
+import type {
+  AddMNode,
+  AsyncHookPlugin,
+  EditorNodeInfo,
+  PastePosition,
+  StepValue,
+  StoreState,
+  StoreStateKey,
+} from '@editor/type';
 import { LayerOffset, Layout } from '@editor/type';
 import {
   change2Fixed,
@@ -45,6 +54,36 @@ import {
   setLayout,
 } from '@editor/utils/editor';
 import { beforePaste, getAddParent } from '@editor/utils/operator';
+
+const canUsePluginMethods = {
+  async: [
+    'getLayout',
+    'highlight',
+    'select',
+    'multiSelect',
+    'doAdd',
+    'add',
+    'doRemove',
+    'remove',
+    'doUpdate',
+    'update',
+    'sort',
+    'copy',
+    'paste',
+    'doPaste',
+    'doAlignCenter',
+    'alignCenter',
+    'moveLayer',
+    'moveToContainer',
+    'dragTo',
+    'undo',
+    'redo',
+    'move',
+  ] as const,
+  sync: [],
+};
+
+type AsyncMethodName = Writable<(typeof canUsePluginMethods)['async']>;
 
 class Editor extends BaseService {
   public state: StoreState = reactive({
@@ -65,29 +104,7 @@ class Editor extends BaseService {
 
   constructor() {
     super(
-      [
-        { name: 'getLayout', isAsync: true },
-        { name: 'select', isAsync: true },
-        { name: 'doAdd', isAsync: true },
-        { name: 'add', isAsync: true },
-        { name: 'doRemove', isAsync: true },
-        { name: 'remove', isAsync: true },
-        { name: 'doUpdate', isAsync: true },
-        { name: 'update', isAsync: true },
-        { name: 'sort', isAsync: true },
-        { name: 'copy', isAsync: true },
-        { name: 'paste', isAsync: true },
-        { name: 'doPaste', isAsync: true },
-        { name: 'doAlignCenter', isAsync: true },
-        { name: 'alignCenter', isAsync: true },
-        { name: 'moveLayer', isAsync: true },
-        { name: 'moveToContainer', isAsync: true },
-        { name: 'move', isAsync: true },
-        { name: 'undo', isAsync: true },
-        { name: 'redo', isAsync: true },
-        { name: 'highlight', isAsync: true },
-        { name: 'dragTo', isAsync: true },
-      ],
+      canUsePluginMethods.async.map((methodName) => ({ name: methodName, isAsync: true })),
       // 需要注意循环依赖问题，如果函数间有相互调用的话，不能设置为串行调用
       ['select', 'update', 'moveLayer'],
     );
@@ -696,7 +713,7 @@ class Editor extends BaseService {
 
   public async doPaste(config: MNode[], position: PastePosition = {}): Promise<MNode[]> {
     propsService.clearRelateId();
-    const pasteConfigs = await beforePaste(position, cloneDeep(config));
+    const pasteConfigs = beforePaste(position, cloneDeep(config));
     return pasteConfigs;
   }
 
@@ -983,6 +1000,10 @@ class Editor extends BaseService {
 
   public resetModifiedNodeId() {
     this.get('modifiedNodeIds').clear();
+  }
+
+  public usePlugin(options: AsyncHookPlugin<AsyncMethodName, Editor>): void {
+    super.usePlugin(options);
   }
 
   private addModifiedNodeId(id: Id) {

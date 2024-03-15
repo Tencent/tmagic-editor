@@ -18,10 +18,17 @@
 
 import { EventEmitter } from 'events';
 
-import { isEmpty } from 'lodash-es';
-
-import type { DeprecatedEventConfig, EventConfig, MComponent, MContainer, MPage, MPageFragment } from '@tmagic/schema';
-import { HookType } from '@tmagic/schema';
+import { DataSource } from '@tmagic/data-source';
+import type {
+  AppCore,
+  DeprecatedEventConfig,
+  EventConfig,
+  MComponent,
+  MContainer,
+  MPage,
+  MPageFragment,
+} from '@tmagic/schema';
+import { HookCodeType, HookType } from '@tmagic/schema';
 
 import type App from './App';
 import type Page from './Page';
@@ -78,7 +85,7 @@ class Node extends EventEmitter {
       });
 
       this.instance = instance;
-      await this.runCodeBlock('created');
+      await this.runHookCode('created');
     });
 
     this.once('mounted', async (instance: any) => {
@@ -90,24 +97,51 @@ class Node extends EventEmitter {
         this.app.compActionHandler(eventConfig.eventConfig, eventConfig.fromCpt, eventConfig.args);
       }
 
-      await this.runCodeBlock('mounted');
+      await this.runHookCode('mounted');
     });
   }
 
-  private async runCodeBlock(hook: string) {
+  private async runHookCode(hook: string) {
     if (typeof this.data[hook] === 'function') {
       // 兼容旧的数据格式
       await this.data[hook](this);
       return;
     }
-    if (this.data[hook]?.hookType !== HookType.CODE || isEmpty(this.app.codeDsl)) return;
-    for (const item of this.data[hook].hookData) {
-      const { codeId, params = {} } = item;
 
-      const functionContent = this.app.codeDsl?.[codeId]?.content;
+    const hookData = this.data[hook] as {
+      /** 钩子类型 */
+      hookType: HookType;
+      hookData: {
+        /** 函数类型 */
+        codeType?: HookCodeType;
+        /** 函数id, 代码块为string, 数据源为[数据源id, 方法名称] */
+        codeId: string | [string, string];
+        /** 参数配置 */
+        params: Record<string, any>;
+      }[];
+    };
 
-      if (typeof functionContent === 'function') {
-        await functionContent({ app: this.app, params });
+    if (hookData?.hookType !== HookType.CODE) return;
+
+    for (const item of hookData.hookData) {
+      const { codeType = HookCodeType.CODE, codeId, params = {} } = item;
+
+      let functionContent: ((...args: any[]) => any) | string | undefined;
+      const functionParams: { app: AppCore; params: Record<string, any>; dataSource?: DataSource } = {
+        app: this.app,
+        params,
+      };
+
+      if (codeType === HookCodeType.CODE && typeof codeId === 'string' && this.app.codeDsl?.[codeId]) {
+        functionContent = this.app.codeDsl[codeId].content;
+      } else if (codeType === HookCodeType.DATA_SOURCE_METHOD && Array.isArray(codeId) && codeId.length > 1) {
+        const dataSource = this.app.dataSourceManager?.get(codeId[0]);
+        functionContent = dataSource?.methods.find((method) => method.name === codeId[1])?.content;
+        functionParams.dataSource = dataSource;
+      }
+
+      if (functionContent && typeof functionContent === 'function') {
+        await functionContent(functionParams);
       }
     }
   }

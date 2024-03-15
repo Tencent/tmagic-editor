@@ -1,5 +1,5 @@
 {
-  "version": "1.3.13",
+  "version": "1.4.0-beta.1",
   "name": "@tmagic/ui-vue2",
   "type": "module",
   "main": "src/index.ts",
@@ -11,9 +11,9 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "@tmagic/core": "1.3.13",
-    "@tmagic/schema": "1.3.13",
-    "@tmagic/utils": "1.3.13",
+    "@tmagic/core": "1.4.0-beta.1",
+    "@tmagic/schema": "1.4.0-beta.1",
+    "@tmagic/utils": "1.4.0-beta.1",
     "qrcode": "^1.5.0",
     "vue": "^2.7.4"
   },

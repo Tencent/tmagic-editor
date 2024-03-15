@@ -1,6 +1,6 @@
 <template>
   <component
-    v-if="display()"
+    v-if="display"
     ref="component"
     :is="tagName"
     :id="config.id"
@@ -32,7 +32,7 @@ const app: Core | undefined = inject('app');
 const tagName = computed(() => `magic-ui-${toLine(props.config.type)}`);
 const style = computed(() => app?.transformStyle(props.config.style));
 
-const display = () => {
+const display = computed(() => {
   if (props.config.visible === false) return false;
   if (props.config.condResult === false) return false;
 
@@ -42,5 +42,5 @@ const display = () => {
     return displayCfg(app);
   }
   return displayCfg !== false;
-};
+});
 </script>

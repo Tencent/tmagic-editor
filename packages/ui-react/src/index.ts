@@ -19,6 +19,7 @@
 import Button from './button';
 import Container from './container';
 import Img from './img';
+import IteratorContainer from './iterator-container';
 import Overlay from './overlay';
 import Page from './page';
 import pageFragment from './page-fragment';
@@ -40,6 +41,7 @@ const ui: Record<string, any> = {
   overlay: Overlay,
   'page-fragment': pageFragment,
   'page-fragment-container': pageFragmentContainer,
+  'iterator-container': IteratorContainer,
 };
 
 export default ui;
