@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body" v-if="visible">
     <div ref="target" class="m-editor-float-box" :style="{ ...style, zIndex: curZIndex }" @mousedown="nextZIndex">
-      <div ref="dragTarget" class="m-editor-float-box-title">
+      <div ref="titleEl" class="m-editor-float-box-title">
         <slot name="title">
           <span>{{ title }}</span>
         </slot>
@@ -9,7 +9,7 @@
           <TMagicButton link size="small" :icon="Close" @click="closeHandler"></TMagicButton>
         </div>
       </div>
-      <div class="m-editor-float-box-body">
+      <div class="m-editor-float-box-body" :style="{ height: `${bodyHeight}px` }">
         <slot name="body"></slot>
       </div>
     </div>
@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, ref, watch, watchEffect } from 'vue';
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
 import { Close } from '@element-plus/icons-vue';
 import VanillaMoveable from 'moveable';
 
@@ -28,54 +28,46 @@ interface Position {
   top: number;
 }
 
-interface Rect {
-  width: number | string;
-  height: number | string;
-}
+const width = defineModel<number>('width', { default: 0 });
+const height = defineModel<number>('height', { default: 0 });
+const visible = defineModel<boolean>('visible', { default: false });
 
 const props = withDefaults(
   defineProps<{
-    visible: boolean;
     position?: Position;
-    rect?: Rect;
     title?: string;
     beforeClose?: (done: (cancel?: boolean) => void) => void;
   }>(),
   {
-    visible: false,
     title: '',
     position: () => ({ left: 0, top: 0 }),
-    rect: () => ({ width: 'auto', height: 'auto' }),
   },
 );
 
-const emit = defineEmits<{
-  'update:visible': [boolean];
-}>();
-
 const target = ref<HTMLDivElement>();
-const dragTarget = ref<HTMLDivElement>();
+const titleEl = ref<HTMLDivElement>();
 
 const zIndex = useZIndex();
 const curZIndex = ref<number>(zIndex.nextZIndex());
 
-const rect = ref({
-  width: props.rect.width,
-  height: props.rect.height,
-});
+const titleHeight = ref(0);
+const bodyHeight = computed(() => {
+  if (height.value) {
+    return height.value - titleHeight.value;
+  }
 
-watchEffect(() => {
-  rect.value = {
-    width: props.rect.width,
-    height: props.rect.height,
-  };
+  if (target.value) {
+    return target.value.clientHeight - titleHeight.value;
+  }
+
+  return 'auto';
 });
 
 const style = computed(() => ({
   left: `${props.position.left}px`,
   top: `${props.position.top}px`,
-  width: typeof rect.value.width === 'string' ? rect.value.width : `${rect.value.width}px`,
-  height: typeof rect.value.height === 'string' ? rect.value.height : `${rect.value.height}px`,
+  width: width.value ? `${width.value}px` : 'auto',
+  height: height.value ? `${height.value}px` : 'auto',
 }));
 
 let moveable: VanillaMoveable | null = null;
@@ -90,7 +82,7 @@ const initMoveable = () => {
     keepRatio: false,
     origin: false,
     snappable: true,
-    dragTarget: dragTarget.value,
+    dragTarget: titleEl.value,
     dragTargetSelf: false,
     linePadding: 10,
     controlPadding: 10,
@@ -98,12 +90,14 @@ const initMoveable = () => {
   });
 
   moveable.on('drag', (e) => {
+    width.value = e.width;
+    height.value = e.height;
     e.target.style.transform = e.transform;
   });
 
   moveable.on('resize', (e) => {
-    rect.value.width = e.width;
-    rect.value.height = e.height;
+    width.value = e.width;
+    height.value = e.height;
     e.target.style.width = `${e.width}px`;
     e.target.style.height = `${e.height}px`;
     e.target.style.transform = e.drag.transform;
@@ -116,11 +110,22 @@ const destroyMoveable = () => {
 };
 
 watch(
-  () => props.visible,
+  visible,
   async (visible) => {
     if (visible) {
       await nextTick();
-      initMoveable();
+
+      const targetRect = target.value?.getBoundingClientRect();
+      if (targetRect) {
+        width.value = targetRect.width;
+        height.value = targetRect.height;
+        initMoveable();
+      }
+
+      if (titleEl.value) {
+        const titleRect = titleEl.value.getBoundingClientRect();
+        titleHeight.value = titleRect.height;
+      }
     } else {
       destroyMoveable();
     }
@@ -136,7 +141,7 @@ onBeforeUnmount(() => {
 
 const hide = (cancel?: boolean) => {
   if (cancel !== false) {
-    emit('update:visible', false);
+    visible.value = false;
   }
 };
 
@@ -153,6 +158,8 @@ const nextZIndex = () => {
 };
 
 defineExpose({
+  bodyHeight,
   target,
+  titleEl,
 });
 </script>

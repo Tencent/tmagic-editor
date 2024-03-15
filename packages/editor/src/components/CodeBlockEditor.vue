@@ -1,8 +1,15 @@
 <template>
   <!-- 代码块编辑区 -->
-  <FloatingBox v-model:visible="boxVisible" title="代码编辑" :position="boxPosition" :before-close="beforeClose">
+  <FloatingBox
+    v-model:visible="boxVisible"
+    v-model:width="width"
+    v-model:height="codeBlockEditorHeight"
+    :title="content.name ? `${disabled ? '查看' : '编辑'}${content.name}` : '新增代码'"
+    :position="boxPosition"
+    :before-close="beforeClose"
+  >
     <template #body>
-      <div ref="floatingBoxBody"></div>
+      <div ref="floatingBoxBody" style="height: 100%"></div>
     </template>
   </FloatingBox>
 
@@ -13,18 +20,17 @@
       label-width="80px"
       :close-on-press-escape="false"
       :title="content.name"
-      :width="size"
       :config="functionConfig"
       :values="content"
       :disabled="disabled"
+      :height="floatingBoxBody?.clientHeight"
       @change="changeHandler"
       @submit="submitForm"
       @error="errorHandler"
-      @open="openHandler"
       @closed="closedHandler"
     >
       <template #left>
-        <TMagicButton type="primary" link @click="difVisible = true">查看修改</TMagicButton>
+        <TMagicButton v-if="!disabled" type="primary" link @click="difVisible = true">查看修改</TMagicButton>
       </template>
     </MFormBox>
   </Teleport>
@@ -42,7 +48,7 @@
       language="json"
       :initValues="content.content"
       :modifiedValues="formBox?.form?.values.content"
-      :style="`height: ${height - 200}px`"
+      :style="`height: ${windowRect.height - 150}px`"
     ></CodeEditor>
 
     <template #footer>
@@ -55,13 +61,15 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, nextTick, onBeforeUnmount, ref } from 'vue';
+import { computed, inject, nextTick, ref } from 'vue';
 
 import { TMagicButton, TMagicDialog, tMagicMessage, tMagicMessageBox, TMagicTag } from '@tmagic/design';
 import { ColumnConfig, FormConfig, FormState, MFormBox } from '@tmagic/form';
 import type { CodeBlockContent } from '@tmagic/schema';
 
 import FloatingBox from '@editor/components/FloatingBox.vue';
+import { useEditorContentHeight } from '@editor/hooks/use-editor-content-height';
+import { useWindowRect } from '@editor/hooks/use-window-rect';
 import CodeEditor from '@editor/layouts/CodeEditor.vue';
 import type { Services, SlideType } from '@editor/type';
 import { getConfig } from '@editor/utils/config';
@@ -69,6 +77,9 @@ import { getConfig } from '@editor/utils/config';
 defineOptions({
   name: 'MEditorCodeBlockEditor',
 });
+
+const width = defineModel<number>('width', { default: 670 });
+const boxVisible = defineModel<boolean>('visible', { default: false });
 
 const props = defineProps<{
   content: CodeBlockContent;
@@ -84,18 +95,10 @@ const emit = defineEmits<{
 
 const services = inject<Services>('services');
 
+const { height: codeBlockEditorHeight } = useEditorContentHeight();
+
 const difVisible = ref(false);
-const height = ref(globalThis.innerHeight);
-
-const windowResizeHandler = () => {
-  height.value = globalThis.innerHeight;
-};
-
-globalThis.addEventListener('resize', windowResizeHandler);
-
-onBeforeUnmount(() => {
-  globalThis.removeEventListener('resize', windowResizeHandler);
-});
+const { rect: windowRect } = useWindowRect();
 
 const magicVsEditor = ref<InstanceType<typeof CodeEditor>>();
 
@@ -108,13 +111,6 @@ const diffChange = () => {
 
   difVisible.value = false;
 };
-
-const columnWidth = computed(() => services?.uiService.get('columnWidth'));
-const size = computed(() =>
-  columnWidth.value ? columnWidth.value.center + columnWidth.value.right - (props.isDataSource ? 100 : 0) : 600,
-);
-
-const codeEditorHeight = ref('600px');
 
 const defaultParamColConfig: ColumnConfig = {
   type: 'row',
@@ -199,7 +195,7 @@ const functionConfig = computed<FormConfig>(() => [
     name: 'content',
     type: 'vs-code',
     options: inject('codeOptions', {}),
-    height: codeEditorHeight.value,
+    height: '500px',
     onChange: (formState: FormState | undefined, code: string) => {
       try {
         // 检测js代码是否存在语法错误
@@ -225,15 +221,6 @@ const errorHandler = (error: any) => {
 };
 
 const formBox = ref<InstanceType<typeof MFormBox>>();
-
-const openHandler = () => {
-  setTimeout(() => {
-    if (formBox.value) {
-      const height = formBox.value?.bodyHeight - 348 - (props.isDataSource ? 50 : 0);
-      codeEditorHeight.value = `${height > 100 ? height : 600}px`;
-    }
-  });
-};
 
 const changedValue = ref<CodeBlockContent>();
 const changeHandler = (values: CodeBlockContent) => {
@@ -270,7 +257,6 @@ const closedHandler = () => {
   changedValue.value = undefined;
 };
 
-const boxVisible = ref<boolean>(false);
 const editVisible = ref<boolean>(false);
 const floatingBoxBody = ref<HTMLDivElement>();
 

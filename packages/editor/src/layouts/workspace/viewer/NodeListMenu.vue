@@ -2,6 +2,7 @@
   <TMagicTooltip v-if="page && buttonVisible" content="点击查看当前位置下的组件">
     <div ref="button" class="m-editor-stage-float-button" @click="visible = true">可选组件</div>
   </TMagicTooltip>
+
   <FloatingBox
     v-if="page && nodeStatusMap && buttonVisible"
     ref="box"

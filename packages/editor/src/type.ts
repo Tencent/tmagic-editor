@@ -246,6 +246,12 @@ export interface UiState {
     width: number;
     height: number;
   };
+  frameworkRect: {
+    left: number;
+    top: number;
+    width: number;
+    height: number;
+  };
 }
 
 export interface EditorNodeInfo {

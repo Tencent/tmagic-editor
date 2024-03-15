@@ -26,34 +26,34 @@ export const useFloatBox = (slideKeys: ComputedRef<string[]>) => {
   const showingBoxKeys = computed(() =>
     Object.keys(floatBoxStates.value).filter((key) => floatBoxStates.value[key].status),
   );
-  const isDraging = ref(false);
+  const isDragging = ref(false);
 
-  const dragstartHandler = () => (isDraging.value = true);
+  const dragstartHandler = () => (isDragging.value = true);
   const dragendHandler = (key: string, e: DragEvent) => {
     floatBoxStates.value[key] = {
       left: e.clientX,
       top: e.clientY,
       status: true,
     };
-    isDraging.value = false;
+    isDragging.value = false;
   };
 
   document.body.addEventListener('dragover', (e: DragEvent) => {
-    if (!isDraging.value) return;
+    if (!isDragging.value) return;
     e.preventDefault();
   });
 
   watch(
     () => slideKeys.value,
-    () => {
-      for (const key in slideKeys.value) {
-        if (floatBoxStates.value[key]) continue;
+    (slideKeys) => {
+      slideKeys.forEach((key) => {
+        if (floatBoxStates.value[key]) return;
         floatBoxStates.value[key] = {
           status: false,
           top: 0,
           left: 0,
         };
-      }
+      });
     },
     {
       deep: true,

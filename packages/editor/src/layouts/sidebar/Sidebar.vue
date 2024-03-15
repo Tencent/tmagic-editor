@@ -111,6 +111,8 @@
         :key="config.$key ?? index"
         v-if="floatBoxStates[config.$key]?.status"
         v-model:visible="floatBoxStates[config.$key].status"
+        :width="columnLeftWitch"
+        :height="600"
         :title="config.text"
         :position="{
           left: floatBoxStates[config.$key].left,
@@ -139,14 +141,15 @@ import { Coin, EditPen, Goods, List } from '@element-plus/icons-vue';
 import FloatingBox from '@editor/components/FloatingBox.vue';
 import MIcon from '@editor/components/Icon.vue';
 import { useFloatBox } from '@editor/hooks/use-float-box';
-import type {
-  MenuButton,
-  MenuComponent,
-  Services,
-  SideBarData,
-  SidebarSlots,
-  SideComponent,
-  SideItem,
+import {
+  ColumnLayout,
+  type MenuButton,
+  type MenuComponent,
+  type Services,
+  type SideBarData,
+  type SidebarSlots,
+  type SideComponent,
+  type SideItem,
 } from '@editor/type';
 
 import CodeBlockListPanel from './code-block/CodeBlockListPanel.vue';
@@ -172,6 +175,8 @@ const props = withDefaults(
 );
 
 const services = inject<Services>('services');
+
+const columnLeftWitch = computed(() => services?.uiService.get('columnWidth')[ColumnLayout.LEFT] || 0);
 
 const activeTabName = ref(props.data?.status);
 
