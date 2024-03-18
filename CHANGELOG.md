@@ -1,3 +1,21 @@
+# [1.4.0-beta.2](https://github.com/Tencent/tmagic-editor/compare/v1.4.0-beta.1...v1.4.0-beta.2) (2024-03-18)
+
+
+### Bug Fixes
+
+* **editor:** 修复直接关闭代码块编辑窗口告警 ([62e7888](https://github.com/Tencent/tmagic-editor/commit/62e7888fcfcac2e1e4610e7edb59ba329e5b9c93))
+* **editor:** 修复第一次打开编辑器左右边栏宽度可能为0问题 ([36a1a18](https://github.com/Tencent/tmagic-editor/commit/36a1a18615ac29fc4448ee2498d51ece51fe8dbd))
+* **editor:** 拖动浮动窗口会导致窗口变大 ([42f1f28](https://github.com/Tencent/tmagic-editor/commit/42f1f28b02fa274d201fa6d945f88129b465aac5))
+
+
+### Features
+
+* **editor:** 优化代码块编辑弹窗 ([c83e76e](https://github.com/Tencent/tmagic-editor/commit/c83e76e641476c5e7222db15e5e36aa4a453e389))
+* **editor:** 属性面板支持切换源码 ([de1711d](https://github.com/Tencent/tmagic-editor/commit/de1711d7133cd4dcf19c2c868ff21b03c02f6a11))
+* **stage,editor:** 选中的元素不存在时不报错,并完善事件ts定义 ([fff56a9](https://github.com/Tencent/tmagic-editor/commit/fff56a97f7403009be377841c8a05cd7b7a583de)), closes [#579](https://github.com/Tencent/tmagic-editor/issues/579)
+
+
+
 # [1.4.0-beta.1](https://github.com/Tencent/tmagic-editor/compare/v1.3.16...v1.4.0-beta.1) (2024-03-13)
 
 
