@@ -19,11 +19,16 @@
 /* eslint-disable no-param-reassign */
 import Moveable, { MoveableOptions } from 'moveable';
 
-import { Mode } from './const';
+import { Mode, StageDragStatus } from './const';
 import DragResizeHelper from './DragResizeHelper';
 import MoveableOptionsManager from './MoveableOptionsManager';
-import type { DelayedMarkContainer, GetRenderDocument, MarkContainerEnd, StageDragResizeConfig } from './types';
-import { StageDragStatus } from './types';
+import type {
+  DelayedMarkContainer,
+  DrEvents,
+  GetRenderDocument,
+  MarkContainerEnd,
+  StageDragResizeConfig,
+} from './types';
 import { down, getMode, up } from './util';
 
 /**
@@ -32,7 +37,7 @@ import { down, getMode, up } from './util';
  */
 export default class StageDragResize extends MoveableOptionsManager {
   /** 目标节点 */
-  private target?: HTMLElement;
+  private target: HTMLElement | null = null;
   /** Moveable拖拽类实例 */
   private moveable?: Moveable;
   /** 拖动状态 */
@@ -70,7 +75,12 @@ export default class StageDragResize extends MoveableOptionsManager {
    * @param el 选中组件的Dom节点元素
    * @param event 鼠标事件
    */
-  public select(el: HTMLElement, event?: MouseEvent): void {
+  public select(el: HTMLElement | null, event?: MouseEvent): void {
+    if (!el) {
+      this.moveable?.destroy();
+      this.moveable = undefined;
+      return;
+    }
     // 从不能拖动到能拖动的节点之间切换，要重新创建moveable，不然dragStart不生效
     if (!this.moveable || el !== this.target) {
       this.initMoveable(el);
@@ -117,6 +127,17 @@ export default class StageDragResize extends MoveableOptionsManager {
     this.dragResizeHelper.destroy();
     this.dragStatus = StageDragStatus.END;
     this.removeAllListeners();
+  }
+
+  public on<Name extends keyof DrEvents, Param extends DrEvents[Name]>(
+    eventName: Name,
+    listener: (...args: Param) => void | Promise<void>,
+  ) {
+    return super.on(eventName, listener as any);
+  }
+
+  public emit<Name extends keyof DrEvents, Param extends DrEvents[Name]>(eventName: Name, ...args: Param) {
+    return super.emit(eventName, ...args);
   }
 
   private init(el: HTMLElement): MoveableOptions {
@@ -247,16 +268,19 @@ export default class StageDragResize extends MoveableOptionsManager {
       .on('rotateEnd', (e) => {
         this.dragStatus = StageDragStatus.END;
         const frame = this.dragResizeHelper?.getFrame(e.target);
-        this.emit('update', {
-          data: [
-            {
-              el: this.target,
-              style: {
-                transform: frame?.get('transform'),
+        if (this.target && frame) {
+          this.emit('update', {
+            data: [
+              {
+                el: this.target,
+                style: {
+                  transform: frame.get('transform'),
+                },
               },
-            },
-          ],
-        });
+            ],
+            parentEl: null,
+          });
+        }
       });
   }
 
@@ -276,16 +300,19 @@ export default class StageDragResize extends MoveableOptionsManager {
       .on('scaleEnd', (e) => {
         this.dragStatus = StageDragStatus.END;
         const frame = this.dragResizeHelper.getFrame(e.target);
-        this.emit('update', {
-          data: [
-            {
-              el: this.target,
-              style: {
-                transform: frame?.get('transform'),
+        if (this.target && frame) {
+          this.emit('update', {
+            data: [
+              {
+                el: this.target,
+                style: {
+                  transform: frame.get('transform'),
+                },
               },
-            },
-          ],
-        });
+            ],
+            parentEl: null,
+          });
+        }
       });
   }
 

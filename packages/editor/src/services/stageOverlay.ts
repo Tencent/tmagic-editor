@@ -41,7 +41,7 @@ class StageOverlay extends BaseService {
     this.state[name] = value;
   }
 
-  public openOverlay(el: HTMLElement | undefined | null) {
+  public openOverlay(el: HTMLElement | null) {
     const stageOptions = this.get('stageOptions');
     if (!el || !stageOptions) return;
 
@@ -168,7 +168,7 @@ class StageOverlay extends BaseService {
     });
 
     if (await stageOptions?.canSelect?.(contentEl)) {
-      subStage?.select(contentEl);
+      subStage?.select(contentEl.id);
     }
   }
 

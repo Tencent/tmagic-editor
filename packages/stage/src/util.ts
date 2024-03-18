@@ -177,7 +177,7 @@ export const calcValueByFontsize = (doc: Document, value: number) => {
  * @param {number} deltaTop 偏移量
  * @param {Object} detail 当前选中的组件配置
  */
-export const down = (deltaTop: number, target: TargetElement): SortEventData | void => {
+export const down = (deltaTop: number, target: TargetElement): SortEventData => {
   let swapIndex = 0;
   let addUpH = target.clientHeight;
   const brothers = Array.from(target.parentNode?.children || []).filter(
@@ -213,7 +213,7 @@ export const down = (deltaTop: number, target: TargetElement): SortEventData | v
  * @param {number} deltaTop 偏移量
  * @param {Object} detail 当前选中的组件配置
  */
-export const up = (deltaTop: number, target: TargetElement): SortEventData | void => {
+export const up = (deltaTop: number, target: TargetElement): SortEventData => {
   const brothers = Array.from(target.parentNode?.children || []).filter(
     (node) => !node.id.startsWith(GHOST_EL_ID_PREFIX),
   );

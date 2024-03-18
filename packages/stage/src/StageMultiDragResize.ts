@@ -18,7 +18,7 @@
 
 import Moveable from 'moveable';
 
-import { DRAG_EL_ID_PREFIX, Mode } from './const';
+import { DRAG_EL_ID_PREFIX, Mode, StageDragStatus } from './const';
 import DragResizeHelper from './DragResizeHelper';
 import MoveableOptionsManager from './MoveableOptionsManager';
 import {
@@ -26,7 +26,7 @@ import {
   GetRenderDocument,
   MarkContainerEnd,
   MoveableOptionsManagerConfig,
-  StageDragStatus,
+  MultiDrEvents,
   StageMultiDragResizeConfig,
 } from './types';
 import { getMode } from './util';
@@ -137,7 +137,7 @@ export default class StageMultiDragResize extends MoveableOptionsManager {
       });
   }
 
-  public canSelect(el: HTMLElement, selectedEl: HTMLElement | undefined): boolean {
+  public canSelect(el: HTMLElement, selectedEl: HTMLElement | null): boolean {
     const currentTargetMode = getMode(el);
     let selectedElMode = '';
 
@@ -194,6 +194,17 @@ export default class StageMultiDragResize extends MoveableOptionsManager {
   public destroy(): void {
     this.moveableForMulti?.destroy();
     this.dragResizeHelper.destroy();
+  }
+
+  public on<Name extends keyof MultiDrEvents, Param extends MultiDrEvents[Name]>(
+    eventName: Name,
+    listener: (...args: Param) => void | Promise<void>,
+  ) {
+    return super.on(eventName, listener as any);
+  }
+
+  public emit<Name extends keyof MultiDrEvents, Param extends MultiDrEvents[Name]>(eventName: Name, ...args: Param) {
+    return super.emit(eventName, ...args);
   }
 
   /**

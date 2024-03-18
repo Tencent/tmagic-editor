@@ -28,12 +28,14 @@ import StageMask from './StageMask';
 import StageRender from './StageRender';
 import type {
   ActionManagerConfig,
+  CoreEvents,
   CustomizeRender,
   GuidesEventData,
   Point,
   RemoveData,
   RemoveEventData,
   Runtime,
+  SortEventData,
   StageCoreConfig,
   UpdateData,
   UpdateEventData,
@@ -81,41 +83,41 @@ export default class StageCore extends EventEmitter {
 
   /**
    * 单选选中元素
-   * @param idOrEl 选中的id或者元素
+   * @param id 选中的id
    */
-  public async select(idOrEl: Id | HTMLElement, event?: MouseEvent): Promise<void> {
-    const el = this.renderer.getTargetElement(idOrEl);
+  public async select(id: Id, event?: MouseEvent): Promise<void> {
+    const el = this.renderer.getTargetElement(id);
     if (el === this.actionManager.getSelectedEl()) return;
 
-    await this.renderer.select([el]);
+    await this.renderer.select([id]);
 
-    this.mask.setLayout(el);
+    el && this.mask.setLayout(el);
 
     this.actionManager.select(el, event);
 
-    if (this.autoScrollIntoView || el.dataset.autoScrollIntoView) {
+    if (el && (this.autoScrollIntoView || el.dataset.autoScrollIntoView)) {
       this.mask.observerIntersection(el);
     }
   }
 
   /**
    * 多选选中多个元素
-   * @param idOrElList 选中元素的id或元素列表
+   * @param ids 选中元素的id列表
    */
-  public async multiSelect(idOrElList: HTMLElement[] | Id[]): Promise<void> {
-    const els = idOrElList.map((idOrEl) => this.renderer.getTargetElement(idOrEl));
+  public async multiSelect(ids: Id[]): Promise<void> {
+    const els = ids.map((id) => this.renderer.getTargetElement(id)).filter((el) => Boolean(el));
     if (els.length === 0) return;
 
     const lastEl = els[els.length - 1];
     // 是否减少了组件选择
     const isReduceSelect = els.length < this.actionManager.getSelectedElList().length;
-    await this.renderer.select(els);
+    await this.renderer.select(ids);
 
-    this.mask.setLayout(lastEl);
+    lastEl && this.mask.setLayout(lastEl);
 
-    this.actionManager.multiSelect(idOrElList);
+    this.actionManager.multiSelect(ids);
 
-    if ((this.autoScrollIntoView || lastEl.dataset.autoScrollIntoView) && !isReduceSelect) {
+    if (lastEl && (this.autoScrollIntoView || lastEl.dataset.autoScrollIntoView) && !isReduceSelect) {
       this.mask.observerIntersection(lastEl);
     }
   }
@@ -124,8 +126,8 @@ export default class StageCore extends EventEmitter {
    * 高亮选中元素
    * @param el 要高亮的元素
    */
-  public highlight(idOrEl: Id | HTMLElement): void {
-    this.actionManager.highlight(idOrEl);
+  public highlight(id: Id): void {
+    this.actionManager.highlight(id);
   }
 
   public clearHighlight(): void {
@@ -248,6 +250,17 @@ export default class StageCore extends EventEmitter {
     this.container = undefined;
   }
 
+  public on<Name extends keyof CoreEvents, Param extends CoreEvents[Name]>(
+    eventName: Name,
+    listener: (...args: Param) => void | Promise<void>,
+  ) {
+    return super.on(eventName, listener as any);
+  }
+
+  public emit<Name extends keyof CoreEvents, Param extends CoreEvents[Name]>(eventName: Name, ...args: Param) {
+    return super.emit(eventName, ...args);
+  }
+
   /**
    * 监听页面大小变化
    */
@@ -280,7 +293,7 @@ export default class StageCore extends EventEmitter {
       updateDragEl: config.updateDragEl,
       getRootContainer: () => this.container,
       getRenderDocument: () => this.renderer.getDocument(),
-      getTargetElement: (idOrEl: Id | HTMLElement) => this.renderer.getTargetElement(idOrEl),
+      getTargetElement: (id: Id) => this.renderer.getTargetElement(id),
       getElementsFromPoint: (point: Point) => this.renderer.getElementsFromPoint(point),
     };
 
@@ -322,14 +335,14 @@ export default class StageCore extends EventEmitter {
    */
   private initActionManagerEvent(): void {
     this.actionManager
-      .on('before-select', (idOrEl: Id | HTMLElement, event?: MouseEvent) => {
-        this.select(idOrEl, event);
+      .on('before-select', (el: HTMLElement, event?: MouseEvent) => {
+        this.select(el.id, event);
       })
       .on('select', (selectedEl: HTMLElement, event: MouseEvent) => {
         this.emit('select', selectedEl, event);
       })
-      .on('before-multi-select', (idOrElList: HTMLElement[] | Id[]) => {
-        this.multiSelect(idOrElList);
+      .on('before-multi-select', (els: HTMLElement[]) => {
+        this.multiSelect(els.map((el) => el.id));
       })
       .on('multi-select', (selectedElList: HTMLElement[], event: MouseEvent) => {
         this.emit('multi-select', selectedElList, event);
@@ -347,7 +360,7 @@ export default class StageCore extends EventEmitter {
       .on('update', (data: UpdateEventData) => {
         this.emit('update', data);
       })
-      .on('sort', (data: UpdateEventData) => {
+      .on('sort', (data: SortEventData) => {
         this.emit('sort', data);
       })
       .on('select-parent', () => {
@@ -364,10 +377,13 @@ export default class StageCore extends EventEmitter {
   private initMulDrEvent(): void {
     this.actionManager
       // 多选切换到单选
-      .on('change-to-select', (el: HTMLElement, e: MouseEvent) => {
-        this.select(el);
+      .on('change-to-select', (id: Id, e: MouseEvent) => {
+        this.select(id);
         // 先保证画布内完成渲染，再通知外部更新
-        setTimeout(() => this.emit('select', el, e));
+        setTimeout(() => {
+          const el = this.renderer.getTargetElement(id);
+          el && this.emit('select', el, e);
+        });
       })
       .on('multi-update', (data: UpdateEventData) => {
         this.emit('update', data);
@@ -378,7 +394,7 @@ export default class StageCore extends EventEmitter {
    * 初始化Highlight类通过ActionManager抛出来的事件监听
    */
   private initHighlightEvent(): void {
-    this.actionManager.on('highlight', async (highlightEl: HTMLElement) => {
+    this.actionManager.on('highlight', (highlightEl: HTMLElement) => {
       this.emit('highlight', highlightEl);
     });
   }
