@@ -18,7 +18,10 @@ export default defineComponent({
     const app = inject<Core | undefined>('app');
     const pageConfig = ref(app?.page?.data || {});
 
-    app?.on('page-change', (page: Page) => {
+    app?.on('page-change', (page: Page | string) => {
+      if (typeof page === 'string') {
+        throw new Error(`ID为${page}的页面不存在`);
+      }
       //   pageConfig.value = page.data; // 此方式不会更改url上链接的page参数
       const url = new URL(window.location.href);
       const { searchParams } = url;
