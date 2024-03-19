@@ -405,3 +405,23 @@ export const convertToNumber = (value: number | string, parentValue = 0) => {
 
   return parseFloat(value);
 };
+
+/**
+ * 添加参数到URL
+ * @param obj 参数对象
+ * @param global window对象
+ * @param needReload 是否需要刷新
+ */
+export const addParamToUrl = (obj: Record<string, any>, global = globalThis, needReload = true) => {
+  const url = new URL(global.location.href);
+  const { searchParams } = url;
+  for (const [k, v] of Object.entries(obj)) {
+    searchParams.set(k, v);
+  }
+  const newUrl = url.toString();
+  if (needReload) {
+    window.location.href = newUrl;
+  } else {
+    window.history.pushState({ path: url.href }, '', url.href);
+  }
+};

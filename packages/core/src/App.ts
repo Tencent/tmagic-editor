@@ -204,7 +204,7 @@ class App extends EventEmitter implements AppCore {
         this.page = undefined;
       }
 
-      super.emit('page-change', id);
+      super.emit('page-change');
       return;
     }
 
