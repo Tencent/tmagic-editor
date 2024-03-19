@@ -420,8 +420,8 @@ export const addParamToUrl = (obj: Record<string, any>, global = globalThis, nee
   }
   const newUrl = url.toString();
   if (needReload) {
-    window.location.href = newUrl;
+    global.location.href = newUrl;
   } else {
-    window.history.pushState({ path: url.href }, '', url.href);
+    global.history.pushState({}, '', url);
   }
 };
