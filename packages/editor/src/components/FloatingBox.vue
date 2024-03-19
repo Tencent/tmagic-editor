@@ -90,8 +90,6 @@ const initMoveable = () => {
   });
 
   moveable.on('drag', (e) => {
-    width.value = e.width;
-    height.value = e.height;
     e.target.style.transform = e.transform;
   });
 

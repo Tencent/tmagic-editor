@@ -78,3 +78,34 @@ export enum AbleActionEventType {
   SELECT_PARENT = 'select-parent',
   REMOVE = 'remove',
 }
+
+/** 将组件添加到容器的方式 */
+export enum ContainerHighlightType {
+  /** 默认方式：组件在容器上方悬停一段时间后加入 */
+  DEFAULT = 'default',
+  /** 按住alt键，并在容器上方悬停一段时间后加入 */
+  ALT = 'alt',
+}
+
+export enum RenderType {
+  IFRAME = 'iframe',
+  NATIVE = 'native',
+}
+
+/** 选择状态 */
+export enum SelectStatus {
+  /** 单选 */
+  SELECT = 'select',
+  /** 多选 */
+  MULTI_SELECT = 'multiSelect',
+}
+
+/** 拖动状态 */
+export enum StageDragStatus {
+  /** 开始拖动 */
+  START = 'start',
+  /** 拖动中 */
+  ING = 'ing',
+  /** 拖动结束 */
+  END = 'end',
+}

@@ -25,15 +25,25 @@ import { Env } from '@tmagic/core';
 import type { Id } from '@tmagic/schema';
 import { addClassName, getDocument, removeClassNameByClassName } from '@tmagic/utils';
 
-import { CONTAINER_HIGHLIGHT_CLASS_NAME, GHOST_EL_ID_PREFIX, GuidesType, MouseButton, PAGE_CLASS } from './const';
+import {
+  AbleActionEventType,
+  CONTAINER_HIGHLIGHT_CLASS_NAME,
+  ContainerHighlightType,
+  GHOST_EL_ID_PREFIX,
+  GuidesType,
+  MouseButton,
+  PAGE_CLASS,
+  SelectStatus,
+  StageDragStatus,
+} from './const';
 import DragResizeHelper from './DragResizeHelper';
 import StageDragResize from './StageDragResize';
 import StageHighlight from './StageHighlight';
 import StageMultiDragResize from './StageMultiDragResize';
-import {
+import type {
   ActionManagerConfig,
+  ActionManagerEvents,
   CanSelect,
-  ContainerHighlightType,
   CustomizeMoveableOptions,
   CustomizeMoveableOptionsCallbackConfig,
   GetElementsFromPoint,
@@ -42,8 +52,7 @@ import {
   IsContainer,
   Point,
   RemoveEventData,
-  SelectStatus,
-  StageDragStatus,
+  SortEventData,
   UpdateEventData,
 } from './types';
 import { isMoveableButton } from './util';
@@ -62,7 +71,7 @@ export default class ActionManager extends EventEmitter {
   /** 单选、多选、高亮的容器（蒙层的content） */
   private container: HTMLElement;
   /** 当前选中的节点 */
-  private selectedEl: HTMLElement | undefined;
+  private selectedEl: HTMLElement | null = null;
   /** 多选选中的节点组 */
   private selectedElList: HTMLElement[] = [];
   /** 当前高亮的节点 */
@@ -96,7 +105,7 @@ export default class ActionManager extends EventEmitter {
     }
 
     this.emit('mousemove', event);
-    this.highlight(el);
+    this.highlight(el.id);
   }, throttleTime);
 
   constructor(config: ActionManagerConfig) {
@@ -181,11 +190,11 @@ export default class ActionManager extends EventEmitter {
     return el.id === this.selectedEl?.id;
   }
 
-  public setSelectedEl(el?: HTMLElement): void {
+  public setSelectedEl(el: HTMLElement | null): void {
     this.selectedEl = el;
   }
 
-  public getSelectedEl(): HTMLElement | undefined {
+  public getSelectedEl(): HTMLElement | null {
     return this.selectedEl;
   }
 
@@ -207,7 +216,7 @@ export default class ActionManager extends EventEmitter {
    * @param event 鼠标事件
    * @returns 鼠标下方第一个可选中元素
    */
-  public async getElementFromPoint(event: MouseEvent): Promise<HTMLElement | undefined> {
+  public async getElementFromPoint(event: MouseEvent): Promise<HTMLElement | null> {
     const els = this.getElementsFromPoint(event as Point);
 
     this.emit('get-elements-from-point', els);
@@ -220,6 +229,7 @@ export default class ActionManager extends EventEmitter {
         return el;
       }
     }
+    return null;
   }
 
   /**
@@ -257,14 +267,20 @@ export default class ActionManager extends EventEmitter {
     return this.multiDr?.canSelect(el, selectedEl) || false;
   }
 
-  public select(el: HTMLElement, event: MouseEvent | undefined): void {
+  public select(el: HTMLElement | null, event?: MouseEvent): void {
     this.setSelectedEl(el);
     this.clearSelectStatus(SelectStatus.MULTI_SELECT);
     this.dr.select(el, event);
   }
 
-  public multiSelect(idOrElList: HTMLElement[] | Id[]): void {
-    this.selectedElList = idOrElList.map((idOrEl) => this.getTargetElement(idOrEl));
+  public multiSelect(ids: Id[]): void {
+    this.selectedElList = [];
+    ids.forEach((id) => {
+      const el = this.getTargetElement(id);
+      if (el) {
+        this.selectedElList.push(el);
+      }
+    });
     this.clearSelectStatus(SelectStatus.SELECT);
     this.multiDr?.multiSelect(this.selectedElList);
   }
@@ -277,10 +293,10 @@ export default class ActionManager extends EventEmitter {
     this.highlightedEl = el;
   }
 
-  public highlight(idOrEl: Id | HTMLElement): void {
+  public highlight(id: Id): void {
     let el;
     try {
-      el = this.getTargetElement(idOrEl);
+      el = this.getTargetElement(id);
     } catch (error) {
       this.clearHighlight();
       return;
@@ -366,6 +382,20 @@ export default class ActionManager extends EventEmitter {
     this.highlightLayer.destroy();
   }
 
+  public on<Name extends keyof ActionManagerEvents, Param extends ActionManagerEvents[Name]>(
+    eventName: Name,
+    listener: (...args: Param) => void,
+  ) {
+    return super.on(eventName, listener as any);
+  }
+
+  public emit<Name extends keyof ActionManagerEvents, Param extends ActionManagerEvents[Name]>(
+    eventName: Name,
+    ...args: Param
+  ) {
+    return super.emit(eventName, ...args);
+  }
+
   private createDr(config: ActionManagerConfig) {
     const createDrHelper = () =>
       new DragResizeHelper({
@@ -388,14 +418,14 @@ export default class ActionManager extends EventEmitter {
       // 点击组件并立即拖动的场景，要保证select先被触发，延迟update通知
       setTimeout(() => this.emit('update', data));
     })
-      .on('sort', (data: UpdateEventData) => {
+      .on('sort', (data: SortEventData) => {
         // 点击组件并立即拖动的场景，要保证select先被触发，延迟update通知
         setTimeout(() => this.emit('sort', data));
       })
-      .on('select-parent', () => {
+      .on(AbleActionEventType.SELECT_PARENT, () => {
         this.emit('select-parent');
       })
-      .on('remove', () => {
+      .on(AbleActionEventType.REMOVE, () => {
         const drTarget = this.dr.getTarget();
         if (!drTarget) return;
         const data: RemoveEventData = {
@@ -430,11 +460,10 @@ export default class ActionManager extends EventEmitter {
       ?.on('update', (data: UpdateEventData) => {
         this.emit('multi-update', data);
       })
-      .on('change-to-select', async (id: Id, e: MouseEvent) => {
+      .on('change-to-select', (id: Id, e: MouseEvent) => {
         // 如果还在多选状态，不触发切换到单选
-        if (this.isMultiSelectStatus) return false;
-        const el = this.getTargetElement(id);
-        this.emit('change-to-select', el, e);
+        if (this.isMultiSelectStatus) return;
+        this.emit('change-to-select', id, e);
       });
 
     return multiDr;
@@ -474,13 +503,16 @@ export default class ActionManager extends EventEmitter {
     // 如果已有单选选中元素，不是magic-ui-page就可以加入多选列表
     if (this.selectedEl && !this.selectedEl.className.includes(PAGE_CLASS)) {
       this.selectedElList.push(this.selectedEl as HTMLElement);
-      this.setSelectedEl(undefined);
+      this.setSelectedEl(null);
     }
+
     // 判断元素是否已在多选列表
     const existIndex = this.selectedElList.findIndex((selectedDom) => selectedDom.id === el.id);
     if (existIndex !== -1) {
       // 再次点击取消选中
-      this.selectedElList.splice(existIndex, 1);
+      if (this.selectedElList.length > 1) {
+        this.selectedElList.splice(existIndex, 1);
+      }
     } else {
       this.selectedElList.push(el);
     }
@@ -580,6 +612,7 @@ export default class ActionManager extends EventEmitter {
       if (!el) return;
       this.emit('before-select', el, event);
     }
+
     getDocument().addEventListener('mouseup', this.mouseUpHandler);
   };
 

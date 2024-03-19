@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import {
+import type {
   OnDrag,
   OnDragGroup,
   OnDragGroupStart,
@@ -34,7 +34,7 @@ import MoveableHelper from 'moveable-helper';
 
 import { DRAG_EL_ID_PREFIX, GHOST_EL_ID_PREFIX, Mode, ZIndex } from './const';
 import TargetShadow from './TargetShadow';
-import { DragResizeHelperConfig, Rect, TargetElement } from './types';
+import type { DragResizeHelperConfig, Rect, TargetElement } from './types';
 import { calcValueByFontsize, getAbsolutePosition, getBorderWidth, getMarginValue, getOffset } from './util';
 
 /**

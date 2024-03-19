@@ -12,16 +12,41 @@
       @change="submit"
       @error="errorHandler"
     ></MForm>
+
+    <TMagicButton
+      class="m-editor-props-panel-src-icon"
+      circle
+      size="large"
+      title="源码"
+      :icon="DocumentIcon"
+      :type="showSrc ? 'primary' : ''"
+      @click="showSrc = !showSrc"
+    ></TMagicButton>
+
+    <CodeEditor
+      v-if="showSrc"
+      :height="`${editorContentHeight}px`"
+      :init-values="values"
+      :options="codeOptions"
+      :parse="true"
+      @save="saveCode"
+    ></CodeEditor>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { computed, getCurrentInstance, inject, onBeforeUnmount, onMounted, ref, watchEffect } from 'vue';
+import { Document as DocumentIcon } from '@element-plus/icons-vue';
 
+import { TMagicButton } from '@tmagic/design';
 import type { FormState, FormValue } from '@tmagic/form';
 import { MForm } from '@tmagic/form';
+import type { MNode } from '@tmagic/schema';
 
+import { useEditorContentHeight } from '@editor/hooks/use-editor-content-height';
 import type { PropsPanelSlots, Services } from '@editor/type';
+
+import CodeEditor from './CodeEditor.vue';
 
 defineSlots<PropsPanelSlots>();
 
@@ -33,7 +58,11 @@ defineProps<{
   extendState?: (state: FormState) => Record<string, any> | Promise<Record<string, any>>;
 }>();
 
+const codeOptions = inject('codeOptions', {});
+
 const emit = defineEmits(['mounted', 'submit-error', 'form-error']);
+
+const showSrc = ref(false);
 
 const internalInstance = getCurrentInstance();
 const values = ref<FormValue>({});
@@ -45,6 +74,8 @@ const node = computed(() => services?.editorService.get('node'));
 const nodes = computed(() => services?.editorService.get('nodes') || []);
 const propsPanelSize = computed(() => services?.uiService.get('propsPanelSize') || 'small');
 const stage = computed(() => services?.editorService.get('stage'));
+
+const { height: editorContentHeight } = useEditorContentHeight();
 
 const init = async () => {
   if (!node.value) {
@@ -85,6 +116,10 @@ const submit = async () => {
 
 const errorHandler = (e: any) => {
   emit('form-error', e);
+};
+
+const saveCode = (values: MNode) => {
+  services?.editorService.update(values);
 };
 
 defineExpose({ configForm, submit });

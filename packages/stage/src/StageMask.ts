@@ -20,7 +20,7 @@ import { createDiv, getDocument, injectStyle } from '@tmagic/utils';
 
 import { Mode, ZIndex } from './const';
 import Rule from './Rule';
-import type { RuleOptions } from './types';
+import type { MaskEvents, RuleOptions } from './types';
 import { getScrollParent, isFixedParent } from './util';
 
 const wrapperClassName = 'editor-mask-wrapper';
@@ -176,6 +176,17 @@ export default class StageMask extends Rule {
     this.wrapperResizeObserver?.disconnect();
 
     super.destroy();
+  }
+
+  public on<Name extends keyof MaskEvents, Param extends MaskEvents[Name]>(
+    eventName: Name,
+    listener: (...args: Param) => void | Promise<void>,
+  ) {
+    return super.on(eventName, listener as any);
+  }
+
+  public emit<Name extends keyof MaskEvents, Param extends MaskEvents[Name]>(eventName: Name, ...args: Param) {
+    return super.emit(eventName, ...args);
   }
 
   /**

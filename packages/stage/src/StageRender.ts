@@ -21,17 +21,9 @@ import { EventEmitter } from 'events';
 import { Id } from '@tmagic/schema';
 import { getHost, injectStyle, isSameDomain } from '@tmagic/utils';
 
-import { DEFAULT_ZOOM } from './const';
+import { DEFAULT_ZOOM, RenderType } from './const';
 import style from './style.css?raw';
-import {
-  type Point,
-  type RemoveData,
-  RenderType,
-  type Runtime,
-  type RuntimeWindow,
-  type StageRenderConfig,
-  type UpdateData,
-} from './types';
+import type { Point, RemoveData, RenderEvents, Runtime, RuntimeWindow, StageRenderConfig, UpdateData } from './types';
 import { addSelectedClassName, removeSelectedClassName } from './util';
 
 export default class StageRender extends EventEmitter {
@@ -87,15 +79,13 @@ export default class StageRender extends EventEmitter {
     runtime?.update?.(data);
   }
 
-  public async select(els: HTMLElement[]): Promise<void> {
+  public async select(ids: Id[]): Promise<void> {
     const runtime = await this.getRuntime();
 
-    for (const el of els) {
-      await runtime?.select?.(el.id);
-      if (runtime?.beforeSelect) {
-        await runtime.beforeSelect(el);
-      }
-      this.flagSelectedEl(el);
+    for (const id of ids) {
+      await runtime?.select?.(id);
+
+      this.flagSelectedEl(this.getTargetElement(id));
     }
   }
 
@@ -161,13 +151,8 @@ export default class StageRender extends EventEmitter {
     return this.getDocument()?.elementsFromPoint(x / this.zoom, y / this.zoom) as HTMLElement[];
   }
 
-  public getTargetElement(idOrEl: Id | HTMLElement): HTMLElement {
-    if (typeof idOrEl === 'string' || typeof idOrEl === 'number') {
-      const el = this.getDocument()?.getElementById(`${idOrEl}`);
-      if (!el) throw new Error(`不存在ID为${idOrEl}的元素`);
-      return el;
-    }
-    return idOrEl;
+  public getTargetElement(id: Id): HTMLElement | null {
+    return this.getDocument()?.getElementById(`${id}`) || null;
   }
 
   /**
@@ -179,6 +164,17 @@ export default class StageRender extends EventEmitter {
     this.iframe?.remove();
     this.iframe = undefined;
     this.removeAllListeners();
+  }
+
+  public on<Name extends keyof RenderEvents, Param extends RenderEvents[Name]>(
+    eventName: Name,
+    listener: (...args: Param) => void | Promise<void>,
+  ) {
+    return super.on(eventName, listener as any);
+  }
+
+  public emit<Name extends keyof RenderEvents, Param extends RenderEvents[Name]>(eventName: Name, ...args: Param) {
+    return super.emit(eventName, ...args);
   }
 
   private createIframe(): HTMLIFrameElement {
@@ -214,11 +210,11 @@ export default class StageRender extends EventEmitter {
    * 在runtime中对被选中的元素进行标记，部分组件有对选中态进行特殊显示的需求
    * @param el 被选中的元素
    */
-  private flagSelectedEl(el: HTMLElement): void {
+  private flagSelectedEl(el: HTMLElement | null): void {
     const doc = this.getDocument();
     if (doc) {
       removeSelectedClassName(doc);
-      addSelectedClassName(el, doc);
+      el && addSelectedClassName(el, doc);
     }
   }
 
