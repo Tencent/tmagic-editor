@@ -83,6 +83,13 @@ tmagic-editor主要定位是搭建生成移动端H5页面，如果有搭建PC端
 
 如果你有好的意见或建议，欢迎给我们提 Issues 或 Pull Requests，为提升魔方可视化编辑器开发体验贡献力量。<br>详见：[CONTRIBUTING.md](./CONTRIBUTING.md)
 
+## 贡献者
+
+<a href="https://github.com/Tencent/tmagic-editor/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Tencent/tmagic-editor" />
+</a>
+
+
 ### 欢迎入群交流
 
 <img src="https://vfiles.gtimg.cn/vupload/20220412/b85d331649748582992.jpg" width=375>
