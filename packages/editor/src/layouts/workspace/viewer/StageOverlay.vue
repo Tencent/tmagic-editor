@@ -1,6 +1,8 @@
 <template>
   <div v-if="stageOverlayVisible" class="m-editor-stage-overlay" @click="closeOverlayHandler">
-    <TMagicIcon class="m-editor-stage-overlay-close" :size="20" @click="closeOverlayHandler"><CloseBold /></TMagicIcon>
+    <TMagicIcon class="m-editor-stage-overlay-close" :size="'20'" @click="closeOverlayHandler"
+      ><CloseBold
+    /></TMagicIcon>
     <div ref="stageOverlay" class="m-editor-stage-overlay-container" :style="style" @click.stop></div>
   </div>
 </template>

@@ -69,6 +69,7 @@ import type {
   DropdownProps,
   FormItemProps,
   FormProps,
+  IconProps,
   InputNumberProps,
   InputProps,
   OptionGroupProps,
@@ -200,8 +201,8 @@ const adapter: PluginOptions = {
     },
 
     icon: {
-      component: ElIcon,
-      props: () => ({}),
+      component: ElIcon as any,
+      props: (props: IconProps) => props,
     },
 
     input: {

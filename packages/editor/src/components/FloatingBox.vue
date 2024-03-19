@@ -6,7 +6,7 @@
           <span>{{ title }}</span>
         </slot>
         <div>
-          <TMagicButton link size="small" :icon="Close" @click="closeHandler"></TMagicButton>
+          <TMagicButton link size="small" @click="closeHandler"><MIcon :icon="Close"></MIcon></TMagicButton>
         </div>
       </div>
       <div class="m-editor-float-box-body" :style="{ height: `${bodyHeight}px` }">
@@ -22,6 +22,8 @@ import { Close } from '@element-plus/icons-vue';
 import VanillaMoveable from 'moveable';
 
 import { TMagicButton, useZIndex } from '@tmagic/design';
+
+import MIcon from '@editor/components/Icon.vue';
 
 interface Position {
   left: number;

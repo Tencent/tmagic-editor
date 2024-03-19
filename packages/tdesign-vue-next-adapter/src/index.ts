@@ -59,6 +59,7 @@ import type {
   DropdownProps,
   FormItemProps,
   FormProps,
+  IconProps,
   InputNumberProps,
   InputProps,
   OptionGroupProps,
@@ -125,6 +126,7 @@ const adapter: any = {
         size: props.size === 'default' ? 'medium' : props.size,
         icon: () => (props.icon ? h(props.icon) : null),
         variant: props.link || props.text ? 'text' : 'base',
+        shape: props.circle ? 'circle' : 'rectangle',
       }),
     },
 
@@ -303,7 +305,7 @@ const adapter: any = {
 
     icon: {
       component: Icon,
-      props: () => ({}),
+      props: (props: IconProps) => props,
     },
 
     input: {

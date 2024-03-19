@@ -1,7 +1,9 @@
 <template>
-  <div class="tdesign-scrollbar" style="overflow: hidden; height: 100%">
-    <div style="overflow: auto; height: 100%">
-      <slot></slot>
+  <div class="tdesign-scrollbar" style="overflow: hidden; position: relative; height: 100%">
+    <div class="tdesign-scrollbar-wrap" style="overflow: auto; height: 100%">
+      <div class="tdesign-scrollbar-view">
+        <slot></slot>
+      </div>
     </div>
   </div>
 </template>

@@ -18,10 +18,11 @@
       circle
       size="large"
       title="源码"
-      :icon="DocumentIcon"
       :type="showSrc ? 'primary' : ''"
       @click="showSrc = !showSrc"
-    ></TMagicButton>
+    >
+      <MIcon :icon="DocumentIcon"></MIcon>
+    </TMagicButton>
 
     <CodeEditor
       v-if="showSrc"
@@ -43,6 +44,7 @@ import type { FormState, FormValue } from '@tmagic/form';
 import { MForm } from '@tmagic/form';
 import type { MNode } from '@tmagic/schema';
 
+import MIcon from '@editor/components/Icon.vue';
 import { useEditorContentHeight } from '@editor/hooks/use-editor-content-height';
 import type { PropsPanelSlots, Services } from '@editor/type';
 

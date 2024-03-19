@@ -29,9 +29,13 @@
       </div>
     </template>
   </component>
-  <div :class="`tmagic-data-source-input-text el-input el-input--${size}`" @mouseup="mouseupHandler" v-else>
+  <div
+    :class="`tmagic-data-source-input-text el-input t-input t-size-${size?.[0]} el-input--${size}`"
+    @mouseup="mouseupHandler"
+    v-else
+  >
     <div :class="`tmagic-data-source-input-text-wrapper el-input__wrapper ${isFocused ? ' is-focus' : ''}`">
-      <div class="el-input__inner">
+      <div class="el-input__inner t-input__inner">
         <template v-for="(item, index) in displayState">
           <span :key="index" v-if="item.type === 'text'" style="margin-right: 2px">{{ item.value }}</span>
           <TMagicTag :key="index" :size="size" v-if="item.type === 'var'">{{ item.value }}</TMagicTag>

@@ -19,9 +19,9 @@
       style="margin-left: 5px"
       link
       :type="showDataSourceFieldSelect ? 'primary' : 'default'"
-      :icon="Coin"
       :size="size"
       @click="showDataSourceFieldSelect = !showDataSourceFieldSelect"
+      ><MIcon :icon="Coin"></MIcon
     ></TMagicButton>
   </div>
 </template>
@@ -36,6 +36,7 @@ import { MCascader } from '@tmagic/form';
 import type { DataSchema, DataSourceFieldType } from '@tmagic/schema';
 import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX } from '@tmagic/utils';
 
+import MIcon from '@editor/components/Icon.vue';
 import type { DataSourceFieldSelectConfig, Services } from '@editor/type';
 
 defineOptions({
