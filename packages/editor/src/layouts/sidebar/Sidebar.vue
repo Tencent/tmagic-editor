@@ -111,8 +111,8 @@
         :key="config.$key ?? index"
         v-if="floatBoxStates[config.$key]?.status"
         v-model:visible="floatBoxStates[config.$key].status"
-        :width="columnLeftWitch"
-        :height="600"
+        v-model:width="columnLeftWidth"
+        v-model:height="columnLeftHeight"
         :title="config.text"
         :position="{
           left: floatBoxStates[config.$key].left,
@@ -123,8 +123,8 @@
           <div class="m-editor-slide-list-box">
             <component
               v-if="config && floatBoxStates[config.$key].status"
-              :is="config.boxComponentConfig?.component || config.component"
-              v-bind="config.boxComponentConfig?.props || config.props || {}"
+              :is="config.component"
+              v-bind="config.props || {}"
               v-on="config?.listeners || {}"
             />
           </div>
@@ -140,6 +140,7 @@ import { Coin, EditPen, Goods, List } from '@element-plus/icons-vue';
 
 import FloatingBox from '@editor/components/FloatingBox.vue';
 import MIcon from '@editor/components/Icon.vue';
+import { useEditorContentHeight } from '@editor/hooks/use-editor-content-height';
 import { useFloatBox } from '@editor/hooks/use-float-box';
 import {
   ColumnLayout,
@@ -176,7 +177,8 @@ const props = withDefaults(
 
 const services = inject<Services>('services');
 
-const columnLeftWitch = computed(() => services?.uiService.get('columnWidth')[ColumnLayout.LEFT] || 0);
+const columnLeftWidth = computed(() => services?.uiService.get('columnWidth')[ColumnLayout.LEFT] || 0);
+const { height: columnLeftHeight } = useEditorContentHeight();
 
 const activeTabName = ref(props.data?.status);
 
@@ -209,11 +211,6 @@ const getItemConfig = (data: SideItem): SideComponent => {
       text: '代码编辑',
       component: CodeBlockListPanel,
       slots: {},
-      boxComponentConfig: {
-        props: {
-          slideType: 'box',
-        },
-      },
     },
     'data-source': {
       $key: 'data-source',

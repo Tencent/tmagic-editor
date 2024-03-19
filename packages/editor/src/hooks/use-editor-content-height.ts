@@ -10,7 +10,7 @@ export const useEditorContentHeight = () => {
 
   const height = ref(0);
   watchEffect(() => {
-    if (height.value > 0) return;
+    if (height.value > 0 && height.value === editorContentHeight.value) return;
     height.value = editorContentHeight.value;
   });
 

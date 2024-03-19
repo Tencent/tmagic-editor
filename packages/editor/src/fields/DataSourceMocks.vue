@@ -6,31 +6,43 @@
       <TMagicButton size="small" type="primary" :disabled="disabled" plain @click="newHandler()">添加</TMagicButton>
     </div>
 
-    <MFormDrawer
-      ref="addDialog"
-      label-width="120px"
+    <FloatingBox
+      v-model:visible="addDialogVisible"
+      v-model:width="width"
+      v-model:height="editorHeight"
       :title="drawerTitle"
-      :config="formConfig"
-      :values="formValues"
-      :parentValues="model[name]"
-      :disabled="disabled"
-      :width="width"
-      @submit="formChangeHandler"
-    ></MFormDrawer>
+      :position="boxPosition"
+    >
+      <template #body>
+        <MFormBox
+          ref="addDialog"
+          label-width="120px"
+          :config="formConfig"
+          :values="formValues"
+          :parentValues="model[name]"
+          :disabled="disabled"
+          @submit="formChangeHandler"
+        ></MFormBox>
+      </template>
+    </FloatingBox>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref } from 'vue';
+import { inject, Ref, ref } from 'vue';
 
 import { TMagicButton, tMagicMessageBox, TMagicSwitch } from '@tmagic/design';
-import { type FieldProps, type FormConfig, type FormState, MFormDrawer } from '@tmagic/form';
+import { type FieldProps, type FormConfig, type FormState, MFormBox } from '@tmagic/form';
 import type { MockSchema } from '@tmagic/schema';
 import { type ColumnConfig, MagicTable } from '@tmagic/table';
 import { getDefaultValueFromFields } from '@tmagic/utils';
 
+import FloatingBox from '@editor/components/FloatingBox.vue';
+import { useNextFloatBoxPosition } from '@editor/hooks/use-next-float-box-position';
 import CodeEditor from '@editor/layouts/CodeEditor.vue';
 import { Services } from '@editor/type';
+
+import { useEditorContentHeight } from '..';
 
 defineOptions({
   name: 'MFieldsDataSourceMocks',
@@ -50,9 +62,8 @@ const props = withDefaults(
 const emit = defineEmits(['change']);
 
 const services = inject<Services>('services');
-const width = computed(() => globalThis.document.body.clientWidth - (services?.uiService.get('columnWidth').left || 0));
+const width = defineModel<number>('width', { default: 670 });
 
-const addDialog = ref<InstanceType<typeof MFormDrawer>>();
 const drawerTitle = ref('');
 const formValues = ref<Record<string, any>>({});
 
@@ -182,7 +193,8 @@ const columns: ColumnConfig[] = [
             index,
           };
           drawerTitle.value = `编辑${row.title}`;
-          addDialog.value?.show();
+          calcBoxPosition();
+          addDialogVisible.value = true;
         },
       },
       {
@@ -206,7 +218,8 @@ const newHandler = () => {
     enable: isFirstRow,
   };
   drawerTitle.value = '新增Mock';
-  addDialog.value?.show();
+  calcBoxPosition();
+  addDialogVisible.value = true;
 };
 
 const formChangeHandler = ({ index, ...value }: Record<string, any>) => {
@@ -216,7 +229,7 @@ const formChangeHandler = ({ index, ...value }: Record<string, any>) => {
     props.model[props.name].push(value);
   }
 
-  addDialog.value?.hide();
+  addDialogVisible.value = false;
 
   emit('change', props.model[props.name]);
 };
@@ -234,4 +247,9 @@ const toggleValue = (row: MockSchema, key: 'enable' | 'useInEditor', value: bool
     index,
   });
 };
+
+const addDialogVisible = defineModel<boolean>('visible', { default: false });
+const { height: editorHeight } = useEditorContentHeight();
+const parentFloating = inject<Ref<HTMLDivElement>>('parentFloating');
+const { boxPosition, calcBoxPosition } = useNextFloatBoxPosition(services?.uiService, parentFloating);
 </script>

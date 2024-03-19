@@ -23,7 +23,6 @@
     ref="codeBlockEditor"
     :disabled="!editable"
     :content="codeConfig"
-    :slideType="slideType"
     @submit="submitCodeBlockHandler"
   ></CodeBlockEditor>
 </template>
@@ -37,7 +36,7 @@ import type { Id } from '@tmagic/schema';
 import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
 import SearchInput from '@editor/components/SearchInput.vue';
 import { useCodeBlockEdit } from '@editor/hooks/use-code-block-edit';
-import type { CodeBlockListPanelSlots, CodeDeleteErrorType, Services, SlideType } from '@editor/type';
+import type { CodeBlockListPanelSlots, CodeDeleteErrorType, Services } from '@editor/type';
 
 import CodeBlockList from './CodeBlockList.vue';
 
@@ -49,7 +48,6 @@ defineOptions({
 
 defineProps<{
   customError?: (id: Id, errorType: CodeDeleteErrorType) => any;
-  slideType?: SlideType;
 }>();
 
 const { codeBlockService } = inject<Services>('services') || {};
