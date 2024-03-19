@@ -2,7 +2,7 @@ import { Ref, ref } from 'vue';
 
 import { UiService } from '@editor/services/ui';
 
-export const useNextFloatBoxPosition = (uiService?: UiService, parent?: Ref<HTMLDivElement>) => {
+export const useNextFloatBoxPosition = (uiService?: UiService, parent?: Ref<HTMLDivElement | null>) => {
   const boxPosition = ref({
     left: 0,
     top: 0,

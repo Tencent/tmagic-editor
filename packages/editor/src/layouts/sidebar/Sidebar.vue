@@ -111,8 +111,8 @@
         :key="config.$key ?? index"
         v-if="floatBoxStates[config.$key]?.status"
         v-model:visible="floatBoxStates[config.$key].status"
-        v-model:width="columnLeftWidth"
         v-model:height="columnLeftHeight"
+        :width="columnLeftWidth"
         :title="config.text"
         :position="{
           left: floatBoxStates[config.$key].left,

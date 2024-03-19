@@ -250,6 +250,6 @@ const toggleValue = (row: MockSchema, key: 'enable' | 'useInEditor', value: bool
 
 const addDialogVisible = defineModel<boolean>('visible', { default: false });
 const { height: editorHeight } = useEditorContentHeight();
-const parentFloating = inject<Ref<HTMLDivElement>>('parentFloating');
+const parentFloating = inject<Ref<HTMLDivElement | null>>('parentFloating', ref(null));
 const { boxPosition, calcBoxPosition } = useNextFloatBoxPosition(services?.uiService, parentFloating);
 </script>

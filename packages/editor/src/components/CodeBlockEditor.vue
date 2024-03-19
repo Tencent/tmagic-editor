@@ -252,7 +252,7 @@ const closedHandler = () => {
   changedValue.value = undefined;
 };
 
-const parentFloating = inject<Ref<HTMLDivElement>>('parentFloating');
+const parentFloating = inject<Ref<HTMLDivElement | null>>('parentFloating', ref(null));
 const { boxPosition, calcBoxPosition } = useNextFloatBoxPosition(services?.uiService, parentFloating);
 
 defineExpose({

@@ -55,13 +55,12 @@ const dataSourceConfig = ref<FormConfig>([]);
 
 const { height: editorHeight } = useEditorContentHeight();
 
-const parentFloating = inject<Ref<HTMLDivElement>>('parentFloating');
+const parentFloating = inject<Ref<HTMLDivElement | null>>('parentFloating', ref(null));
 const { boxPosition, calcBoxPosition } = useNextFloatBoxPosition(services?.uiService, parentFloating);
 
 watchEffect(() => {
   initValues.value = props.values;
   dataSourceConfig.value = services?.dataSourceService.getFormConfig(initValues.value.type) || [];
-  console.log(dataSourceConfig.value);
 });
 
 const submitHandler = (values: any) => {
