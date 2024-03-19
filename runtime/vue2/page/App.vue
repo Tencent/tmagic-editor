@@ -5,6 +5,7 @@
 <script lang="ts">
 import { defineComponent, inject, nextTick, reactive, ref } from 'vue';
 
+import type { Page } from '@tmagic/core';
 import Core from '@tmagic/core';
 import type { ChangeEvent } from '@tmagic/data-source';
 import type { MNode } from '@tmagic/schema';
@@ -16,6 +17,15 @@ export default defineComponent({
   setup() {
     const app = inject<Core | undefined>('app');
     const pageConfig = ref(app?.page?.data || {});
+
+    app?.on('page-change', (page: Page) => {
+      //   pageConfig.value = page.data; // 此方式不会更改url上链接的page参数
+      const url = new URL(window.location.href);
+      const { searchParams } = url;
+      searchParams.set('page', page.data.id as string);
+      const newUrl = url.toString();
+      window.location.href = newUrl;
+    });
 
     app?.dataSourceManager?.on('update-data', (nodes: MNode[], sourceId: string, changeEvent: ChangeEvent) => {
       nodes.forEach((node) => {
