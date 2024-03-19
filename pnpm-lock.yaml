@@ -163,13 +163,13 @@ importers:
   packages/core:
     dependencies:
       '@tmagic/data-source':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../data-source
       '@tmagic/schema':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../schema
       '@tmagic/utils':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../utils
       events:
         specifier: ^3.3.0
@@ -200,10 +200,10 @@ importers:
   packages/data-source:
     dependencies:
       '@tmagic/schema':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../schema
       '@tmagic/utils':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../utils
       events:
         specifier: ^3.3.0
@@ -234,10 +234,10 @@ importers:
   packages/dep:
     dependencies:
       '@tmagic/schema':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../schema
       '@tmagic/utils':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../utils
     devDependencies:
       '@types/node':
@@ -293,28 +293,28 @@ importers:
         specifier: ^2.3.1
         version: 2.3.1(vue@3.4.21)
       '@tmagic/core':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../core
       '@tmagic/dep':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../dep
       '@tmagic/design':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../design
       '@tmagic/form':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../form
       '@tmagic/schema':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../schema
       '@tmagic/stage':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../stage
       '@tmagic/table':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../table
       '@tmagic/utils':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../utils
       buffer:
         specifier: ^6.0.3
@@ -396,7 +396,7 @@ importers:
   packages/element-plus-adapter:
     dependencies:
       '@tmagic/design':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../design
       element-plus:
         specifier: ^2.6.1
@@ -424,10 +424,10 @@ importers:
         specifier: ^2.3.1
         version: 2.3.1(vue@3.4.21)
       '@tmagic/design':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../design
       '@tmagic/utils':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../utils
       lodash-es:
         specifier: ^4.17.21
@@ -497,13 +497,13 @@ importers:
         specifier: ^0.29.2
         version: 0.29.2
       '@tmagic/core':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../core
       '@tmagic/schema':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../schema
       '@tmagic/utils':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../utils
       events:
         specifier: ^3.3.0
@@ -546,13 +546,13 @@ importers:
   packages/table:
     dependencies:
       '@tmagic/design':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../design
       '@tmagic/form':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../form
       '@tmagic/utils':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../utils
       lodash-es:
         specifier: ^4.17.21
@@ -598,7 +598,7 @@ importers:
   packages/tdesign-vue-next-adapter:
     dependencies:
       '@tmagic/design':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../design
       tdesign-vue-next:
         specifier: ^1.8.1
@@ -632,13 +632,13 @@ importers:
   packages/ui:
     dependencies:
       '@tmagic/core':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../core
       '@tmagic/schema':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../schema
       '@tmagic/utils':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../utils
       delegate:
         specifier: ^3.2.0
@@ -669,13 +669,13 @@ importers:
   packages/ui-react:
     dependencies:
       '@tmagic/core':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../core
       '@tmagic/schema':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../schema
       '@tmagic/utils':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../utils
       qrcode:
         specifier: ^1.5.0
@@ -700,13 +700,13 @@ importers:
   packages/ui-vue2:
     dependencies:
       '@tmagic/core':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../core
       '@tmagic/schema':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../schema
       '@tmagic/utils':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../utils
       qrcode:
         specifier: ^1.5.0
@@ -722,7 +722,7 @@ importers:
   packages/utils:
     dependencies:
       '@tmagic/schema':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../schema
       dayjs:
         specifier: ^1.11.4
@@ -753,31 +753,31 @@ importers:
         specifier: ^2.3.1
         version: 2.3.1(vue@3.4.21)
       '@tmagic/core':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../packages/core
       '@tmagic/design':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../packages/design
       '@tmagic/editor':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../packages/editor
       '@tmagic/element-plus-adapter':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../packages/element-plus-adapter
       '@tmagic/form':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../packages/form
       '@tmagic/schema':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../packages/schema
       '@tmagic/stage':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../packages/stage
       '@tmagic/tmagic-form-runtime':
         specifier: 1.0.2
         version: 1.0.2(@tmagic/editor@packages+editor)(@tmagic/form@packages+form)(@tmagic/schema@packages+schema)(dayjs@1.11.10)(element-plus@2.6.1)(vue@3.4.21)
       '@tmagic/utils':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../packages/utils
       element-plus:
         specifier: ^2.6.1
@@ -838,25 +838,25 @@ importers:
   runtime/react:
     dependencies:
       '@tmagic/cli':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../../packages/cli
       '@tmagic/core':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../../packages/core
       '@tmagic/data-source':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../../packages/data-source
       '@tmagic/schema':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../../packages/schema
       '@tmagic/stage':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../../packages/stage
       '@tmagic/ui-react':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../../packages/ui-react
       '@tmagic/utils':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../../packages/utils
       axios:
         specifier: ^0.25.0
@@ -905,22 +905,22 @@ importers:
   runtime/tmagic-form:
     dependencies:
       '@tmagic/core':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../../packages/core
       '@tmagic/editor':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../../packages/editor
       '@tmagic/form':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../../packages/form
       '@tmagic/schema':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../../packages/schema
       '@tmagic/stage':
-        specifier: ^1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../../packages/stage
       '@tmagic/utils':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../../packages/utils
       element-plus:
         specifier: ^2.6.1
@@ -954,25 +954,25 @@ importers:
   runtime/vue2:
     dependencies:
       '@tmagic/cli':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../../packages/cli
       '@tmagic/core':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../../packages/core
       '@tmagic/data-source':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../../packages/data-source
       '@tmagic/schema':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../../packages/schema
       '@tmagic/stage':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../../packages/stage
       '@tmagic/ui-vue2':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../../packages/ui-vue2
       '@tmagic/utils':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../../packages/utils
       axios:
         specifier: ^0.25.0
@@ -1018,25 +1018,25 @@ importers:
   runtime/vue3:
     dependencies:
       '@tmagic/cli':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../../packages/cli
       '@tmagic/core':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../../packages/core
       '@tmagic/data-source':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../../packages/data-source
       '@tmagic/schema':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../../packages/schema
       '@tmagic/stage':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../../packages/stage
       '@tmagic/ui':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../../packages/ui
       '@tmagic/utils':
-        specifier: 1.4.0-beta.2
+        specifier: 1.4.0
         version: link:../../packages/utils
       axios:
         specifier: ^0.25.0

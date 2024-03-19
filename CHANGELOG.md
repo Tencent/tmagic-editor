@@ -1,3 +1,14 @@
+# [1.4.0](https://github.com/Tencent/tmagic-editor/compare/v1.4.0-beta.2...v1.4.0) (2024-03-19)
+
+
+### Features
+
+* **editor:** 数据源抽屉切floatbox ([96149bd](https://github.com/Tencent/tmagic-editor/commit/96149bd2ae0f7ec2bcee381f60dbd3c495705b9e))
+* **runtime, utils:** Fix issue [#503](https://github.com/Tencent/tmagic-editor/issues/503), setPage实现跳转页面 ([#581](https://github.com/Tencent/tmagic-editor/issues/581)) ([0c746aa](https://github.com/Tencent/tmagic-editor/commit/0c746aa3d97cdb28531408bb0e89564f4b567186))
+* 完善tdesign-vue-next适配 ([92b7a2a](https://github.com/Tencent/tmagic-editor/commit/92b7a2aecfb3d0bb0f2674aded9f6c225487c102))
+
+
+
 # [1.4.0-beta.2](https://github.com/Tencent/tmagic-editor/compare/v1.4.0-beta.1...v1.4.0-beta.2) (2024-03-18)
 
 
