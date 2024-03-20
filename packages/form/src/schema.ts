@@ -122,6 +122,7 @@ export interface Rule {
   type?: string;
   /** 是否必填 */
   required?: boolean;
+  trigger?: string;
   /** 自定义验证器 */
   validator?: (
     options: {

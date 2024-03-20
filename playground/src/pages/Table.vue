@@ -1,16 +1,16 @@
 <template>
   <div style="width: 100%">
-    <nav-menu :data="menu"></nav-menu>
+    <NavMenu :data="menu"></NavMenu>
     <div class="table-content">
-      <m-table class="left-panel" :columns="columns" :data="data" :show-header="true"></m-table>
-      <el-tabs class="right-panel" modelValue="columns">
-        <el-tab-pane label="columns" name="columns">
-          <magic-code-editor class="code-editor-content" :init-values="columns" @save="change"></magic-code-editor>
-        </el-tab-pane>
-        <el-tab-pane label="data" name="data">
-          <magic-code-editor class="code-editor-content" :init-values="data" @save="changeData"></magic-code-editor>
-        </el-tab-pane>
-      </el-tabs>
+      <MagicTable class="left-panel" :columns="columns" :data="data" :show-header="true"></MagicTable>
+      <TMagicTabs class="right-panel" modelValue="columns">
+        <TMagicTabPane label="columns" name="columns">
+          <TMagicCodeEditor class="code-editor-content" :init-values="columns" @save="change"></TMagicCodeEditor>
+        </TMagicTabPane>
+        <TMagicTabPane label="data" name="data">
+          <TMagicCodeEditor class="code-editor-content" :init-values="data" @save="changeData"></TMagicCodeEditor>
+        </TMagicTabPane>
+      </TMagicTabs>
     </div>
   </div>
 </template>
@@ -19,14 +19,15 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { tMagicMessage } from '@tmagic/design';
-import { MenuButton } from '@tmagic/editor';
+import { tMagicMessage, TMagicTabPane, TMagicTabs } from '@tmagic/design';
+import { MenuButton, TMagicCodeEditor } from '@tmagic/editor';
+import { type ColumnConfig, MagicTable } from '@tmagic/table';
 
 import NavMenu from '../components/NavMenu.vue';
 
 const router = useRouter();
 
-const columns = ref([
+const columns = ref<ColumnConfig[]>([
   {
     type: 'expand',
     prop: 'b',

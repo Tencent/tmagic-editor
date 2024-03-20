@@ -1,4 +1,6 @@
-export default [
+import { createForm } from '@tmagic/form';
+
+export default createForm([
   {
     text: '文本',
     name: 'text',
@@ -173,7 +175,7 @@ export default [
     legend: '分组',
     extra: 'extra',
     checkbox: true,
-    expand: 'checkbox',
+    expand: true,
     // schematic: 'https://vfiles.gtimg.cn/vupload/20210329/9712631617027075445.png',
     items: [
       {
@@ -263,4 +265,4 @@ export default [
       },
     ],
   },
-];
+]);
