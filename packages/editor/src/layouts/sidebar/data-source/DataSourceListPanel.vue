@@ -25,7 +25,7 @@
     </div>
 
     <!-- 数据源列表 -->
-    <DataSourceList @edit="editHandler" @remove="removeHandler"></DataSourceList>
+    <DataSourceList ref="dataSourceList" @edit="editHandler" @remove="removeHandler"></DataSourceList>
   </TMagicScrollbar>
 
   <DataSourceConfigPanel
