@@ -1,3 +1,13 @@
+## [1.4.1](https://github.com/Tencent/tmagic-editor/compare/v1.4.0...v1.4.1) (2024-03-22)
+
+
+### Bug Fixes
+
+* **design:** element-plus select中scrollbar变量名改变 ([6ccd8bb](https://github.com/Tencent/tmagic-editor/commit/6ccd8bb06bf04aa4a5c5ccabe4266d0f572711e8))
+* **editor:** 数据源列表搜索过滤无响应问题 ([#582](https://github.com/Tencent/tmagic-editor/issues/582)) ([b564907](https://github.com/Tencent/tmagic-editor/commit/b564907b12d97caee1a944c9251ede7abbea7694))
+
+
+
 # [1.4.0](https://github.com/Tencent/tmagic-editor/compare/v1.4.0-beta.2...v1.4.0) (2024-03-19)
 
 
