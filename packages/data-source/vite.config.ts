@@ -22,7 +22,7 @@ import { defineConfig } from 'vite';
 
 import pkg from './package.json';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   resolve: {
     alias:
       process.env.NODE_ENV === 'production'
@@ -48,8 +48,11 @@ export default defineConfig({
     rollupOptions: {
       // 确保外部化处理那些你不想打包进库的依赖
       external(id: string) {
+        if (mode === 'umd' && id === 'lodash-es') {
+          return false;
+        }
         return Object.keys(pkg.dependencies).some((k) => new RegExp(`^${k}`).test(id));
       },
     },
   },
-});
+}));
