@@ -1,0 +1,2 @@
+import{u}from"./useApp-9vdAgOwh.js";const s={class:"magic-ui-button"},p=Vue.defineComponent({__name:"index",props:{config:{},model:{default:()=>({})}},setup(o){const t=o,n=Vue.computed(()=>{var e;return{type:"text",text:((e=t.config)==null?void 0:e.text)||""}});return u({config:t.config,methods:{}}),(e,i)=>{const c=Vue.resolveComponent("magic-ui-text");return Vue.openBlock(),Vue.createElementBlock("button",s,[Vue.renderSlot(e.$slots,"default",{},()=>[Vue.createVNode(c,{config:n.value},null,8,["config"])])])}}});export{p as default};
+//# sourceMappingURL=index-aAYHA_e4.js.map
