@@ -1,3 +1,22 @@
+## [1.4.2](https://github.com/Tencent/tmagic-editor/compare/v1.4.1...v1.4.2) (2024-03-26)
+
+
+### Bug Fixes
+
+* **editor:** element-plus更新到2.6后表单项清除后是undefined，改回是空字符串 ([ceff0d4](https://github.com/Tencent/tmagic-editor/commit/ceff0d41472efb04d58f0b477c4a63fb37c7a122))
+* **editor:** element-plus更新到2.6后表单项清除后是undefined，除了string外其他统一改成null ([a4fc957](https://github.com/Tencent/tmagic-editor/commit/a4fc95775eab88ecb5850f824ae5bf7889e951e4))
+* **editor:** 代码块配置表单项大小不受配置控制 ([f92127e](https://github.com/Tencent/tmagic-editor/commit/f92127e3d6a597413d3c3832ba2f1e6a993f0b3b))
+* **editor:** 初始化时如果浏览器切到后台编辑器列宽度计算出问题 ([7049b1f](https://github.com/Tencent/tmagic-editor/commit/7049b1ff45c3bd2c70c39c1451b505fcaf2639bf))
+* **form:** select 支持tdesign-vue-next ([15b88c9](https://github.com/Tencent/tmagic-editor/commit/15b88c97fc289c349467cf524b4becc44646ca2a)), closes [#584](https://github.com/Tencent/tmagic-editor/issues/584)
+
+
+### Features
+
+* **data-srouce:** manager新增init事件 ([9343989](https://github.com/Tencent/tmagic-editor/commit/934398911d7f9dc4ac9fc9c2b56ef4d158d06611))
+* **editor:** 数据源字段选择器增加编辑按钮 ([66e1645](https://github.com/Tencent/tmagic-editor/commit/66e16452a89bf8aa8dec4faaf73efd1df87cd04e))
+
+
+
 ## [1.4.1](https://github.com/Tencent/tmagic-editor/compare/v1.4.0...v1.4.1) (2024-03-22)
 
 
