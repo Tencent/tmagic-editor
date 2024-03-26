@@ -42,10 +42,10 @@ import { computed, inject, ref } from 'vue';
 import { mergeWith } from 'lodash-es';
 
 import { TMagicButton, TMagicPopover, TMagicScrollbar } from '@tmagic/design';
-import type { DataSourceSchema } from '@tmagic/schema';
 
 import SearchInput from '@editor/components/SearchInput.vue';
 import ToolButton from '@editor/components/ToolButton.vue';
+import { useDataSourceEdit } from '@editor/hooks/use-data-source-edit';
 import type { DataSourceListSlots, Services } from '@editor/type';
 
 import DataSourceConfigPanel from './DataSourceConfigPanel.vue';
@@ -59,13 +59,9 @@ defineOptions({
 
 const { dataSourceService } = inject<Services>('services') || {};
 
-const editDialog = ref<InstanceType<typeof DataSourceConfigPanel>>();
+const { editDialog, dataSourceValues, dialogTitle, editable, editHandler, submitDataSourceHandler } =
+  useDataSourceEdit(dataSourceService);
 
-const dataSourceValues = ref<Record<string, any>>({});
-
-const dialogTitle = ref('');
-
-const editable = computed(() => dataSourceService?.get('editable') ?? true);
 const datasourceTypeList = computed(() =>
   [
     { text: '基础', type: 'base' },
@@ -93,30 +89,8 @@ const addHandler = (type: string) => {
   editDialog.value.show();
 };
 
-const editHandler = (id: string) => {
-  if (!editDialog.value) return;
-
-  dataSourceValues.value = {
-    ...dataSourceService?.getDataSourceById(id),
-  };
-
-  dialogTitle.value = `编辑${dataSourceValues.value.title || ''}`;
-
-  editDialog.value.show();
-};
-
 const removeHandler = (id: string) => {
   dataSourceService?.remove(id);
-};
-
-const submitDataSourceHandler = (value: DataSourceSchema) => {
-  if (value.id) {
-    dataSourceService?.update(value);
-  } else {
-    dataSourceService?.add(value);
-  }
-
-  editDialog.value?.hide();
 };
 
 const dataSourceList = ref<InstanceType<typeof DataSourceList>>();
