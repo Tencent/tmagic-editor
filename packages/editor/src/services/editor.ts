@@ -535,11 +535,7 @@ class Editor extends BaseService {
 
     newConfig = mergeWith(cloneDeep(node), newConfig, (objValue, srcValue, key) => {
       if (typeof srcValue === 'undefined' && Object.hasOwn(newConfig, key)) {
-        if (typeof objValue === 'string') {
-          return '';
-        }
-
-        return null;
+        return '';
       }
 
       if (isObject(srcValue) && Array.isArray(objValue)) {
