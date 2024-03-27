@@ -1,27 +1,37 @@
 <template>
-  <component
-    :is="slideType === 'box' ? MFormBox : MFormDrawer"
-    ref="fomDrawer"
-    label-width="80px"
-    :close-on-press-escape="false"
+  <FloatingBox
+    v-model:visible="boxVisible"
+    v-model:width="width"
+    v-model:height="editorHeight"
     :title="title"
-    :width="size"
-    :config="dataSourceConfig"
-    :values="initValues"
-    :disabled="disabled"
-    @submit="submitHandler"
-    @error="errorHandler"
-  ></component>
+    :position="boxPosition"
+  >
+    <template #body>
+      <MFormBox
+        label-width="80px"
+        :title="title"
+        :config="dataSourceConfig"
+        :values="initValues"
+        :disabled="disabled"
+        style="height: 100%"
+        @submit="submitHandler"
+        @error="errorHandler"
+      ></MFormBox>
+    </template>
+  </FloatingBox>
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref, watchEffect } from 'vue';
+import { inject, Ref, ref, watchEffect } from 'vue';
 
 import { tMagicMessage } from '@tmagic/design';
-import { FormConfig, MFormBox, MFormDrawer } from '@tmagic/form';
+import { FormConfig, MFormBox } from '@tmagic/form';
 import { DataSourceSchema } from '@tmagic/schema';
 
-import type { Services, SlideType } from '@editor/type';
+import FloatingBox from '@editor/components/FloatingBox.vue';
+import { useEditorContentHeight } from '@editor/hooks';
+import { useNextFloatBoxPosition } from '@editor/hooks/use-next-float-box-position';
+import type { Services } from '@editor/type';
 
 defineOptions({
   name: 'MEditorDataSourceConfigPanel',
@@ -31,19 +41,22 @@ const props = defineProps<{
   title?: string;
   values: any;
   disabled: boolean;
-  slideType?: SlideType;
 }>();
+
+const boxVisible = defineModel<boolean>('visible', { default: false });
+const width = defineModel<number>('width', { default: 670 });
 
 const emit = defineEmits(['submit']);
 
 const services = inject<Services>('services');
 
-const size = computed(() => globalThis.document.body.clientWidth - (services?.uiService.get('columnWidth').left || 0));
-
-const fomDrawer = ref<InstanceType<typeof MFormDrawer>>();
-
 const initValues = ref<Partial<DataSourceSchema>>({});
 const dataSourceConfig = ref<FormConfig>([]);
+
+const { height: editorHeight } = useEditorContentHeight();
+
+const parentFloating = inject<Ref<HTMLDivElement | null>>('parentFloating', ref(null));
+const { boxPosition, calcBoxPosition } = useNextFloatBoxPosition(services?.uiService, parentFloating);
 
 watchEffect(() => {
   initValues.value = props.values;
@@ -60,11 +73,12 @@ const errorHandler = (error: any) => {
 
 defineExpose({
   show() {
-    fomDrawer.value?.show();
+    calcBoxPosition();
+    boxVisible.value = true;
   },
 
   hide() {
-    fomDrawer.value?.hide();
+    boxVisible.value = false;
   },
 });
 </script>

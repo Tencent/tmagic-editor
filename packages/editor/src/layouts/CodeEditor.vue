@@ -5,12 +5,8 @@
         :class="`magic-code-editor-wrapper${fullScreen ? ' full-screen' : ''}`"
         :style="!fullScreen && height ? `height: ${height}` : '100%'"
       >
-        <TMagicButton
-          class="magic-code-editor-full-screen-icon"
-          circle
-          size="small"
-          :icon="FullScreen"
-          @click="fullScreenHandler"
+        <TMagicButton class="magic-code-editor-full-screen-icon" circle size="small" @click="fullScreenHandler"
+          ><MIcon :icon="FullScreen"></MIcon
         ></TMagicButton>
         <div ref="codeEditor" class="magic-code-editor-content"></div>
       </div>
@@ -26,6 +22,7 @@ import serialize from 'serialize-javascript';
 
 import { TMagicButton } from '@tmagic/design';
 
+import MIcon from '@editor/components/Icon.vue';
 import { getConfig } from '@editor/utils/config';
 import monaco from '@editor/utils/monaco-editor';
 

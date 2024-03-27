@@ -1,5 +1,5 @@
 <template>
-  <i style="width: 1em; height: 1em">
+  <i>
     <slot></slot>
   </i>
 </template>

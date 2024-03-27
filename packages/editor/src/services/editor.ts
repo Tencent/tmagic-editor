@@ -533,7 +533,11 @@ class Editor extends BaseService {
 
     let newConfig = await this.toggleFixedPosition(toRaw(config), node, root);
 
-    newConfig = mergeWith(cloneDeep(node), newConfig, (objValue, srcValue) => {
+    newConfig = mergeWith(cloneDeep(node), newConfig, (objValue, srcValue, key) => {
+      if (typeof srcValue === 'undefined' && Object.hasOwn(newConfig, key)) {
+        return '';
+      }
+
       if (isObject(srcValue) && Array.isArray(objValue)) {
         // 原来的配置是数组，新的配置是对象，则直接使用新的值
         return srcValue;

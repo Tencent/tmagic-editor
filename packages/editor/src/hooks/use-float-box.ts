@@ -1,4 +1,6 @@
-import { computed, ComputedRef, ref, watch } from 'vue';
+import { computed, ComputedRef, inject, ref, watch } from 'vue';
+
+import type { Services } from '@editor/type';
 
 interface State {
   status: boolean;
@@ -7,6 +9,8 @@ interface State {
 }
 
 export const useFloatBox = (slideKeys: ComputedRef<string[]>) => {
+  const services = inject<Services>('services');
+
   const floatBoxStates = ref<{
     [key in (typeof slideKeys.value)[number]]: State;
   }>(
@@ -30,9 +34,10 @@ export const useFloatBox = (slideKeys: ComputedRef<string[]>) => {
 
   const dragstartHandler = () => (isDragging.value = true);
   const dragendHandler = (key: string, e: DragEvent) => {
+    const navMenuRect = services?.uiService?.get('navMenuRect');
     floatBoxStates.value[key] = {
       left: e.clientX,
-      top: e.clientY,
+      top: (navMenuRect?.top ?? 0) + (navMenuRect?.height ?? 0),
       status: true,
     };
     isDragging.value = false;
@@ -47,12 +52,13 @@ export const useFloatBox = (slideKeys: ComputedRef<string[]>) => {
     () => slideKeys.value,
     (slideKeys) => {
       slideKeys.forEach((key) => {
-        if (floatBoxStates.value[key]) return;
-        floatBoxStates.value[key] = {
-          status: false,
-          top: 0,
-          left: 0,
-        };
+        if (!floatBoxStates.value[key]) {
+          floatBoxStates.value[key] = {
+            status: false,
+            top: 0,
+            left: 0,
+          };
+        }
       });
     },
     {

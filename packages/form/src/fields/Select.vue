@@ -19,24 +19,62 @@
     @change="changeHandler"
     @visible-change="visibleHandler"
   >
-    <template v-if="config.group"><SelectOptionGroups :options="groupOptions"></SelectOptionGroups></template>
-    <template v-else><SelectOptions :options="itemOptions"></SelectOptions></template>
+    <template v-if="config.group">
+      <component
+        v-for="(group, index) in (options as SelectGroupOption[])"
+        :key="index"
+        :is="optionGroupComponent?.component"
+        v-bind="
+          optionGroupComponent?.props({
+            label: group.label,
+            disabled: group.disabled,
+          })
+        "
+      >
+        <component
+          v-for="(item, index) in group.options"
+          :is="optionComponent?.component"
+          :key="index"
+          v-bind="
+            optionComponent?.props({
+              label: item.label || item.text,
+              value: item.value,
+              disabled: item.disabled,
+            })
+          "
+        >
+        </component>
+      </component>
+    </template>
+    <template v-else>
+      <component
+        v-for="option in (options as SelectOption[])"
+        class="tmagic-design-option"
+        :key="config.valueKey ? option.value[config.valueKey] : option.value"
+        :is="optionComponent?.component"
+        v-bind="
+          optionComponent?.props({
+            label: option.text,
+            value: option.value,
+            disabled: option.disabled,
+          })
+        "
+      >
+      </component>
+    </template>
     <div v-loading="true" v-if="moreLoadingVisible"></div>
   </TMagicSelect>
 </template>
 
 <script lang="ts" setup>
-import { inject, nextTick, onBeforeMount, Ref, ref, watch, watchEffect } from 'vue';
+import { inject, nextTick, onBeforeMount, ref, watch, watchEffect } from 'vue';
 
-import { TMagicSelect } from '@tmagic/design';
+import { getConfig as getDesignConfig, TMagicSelect } from '@tmagic/design';
 import { getValueByKeyPath } from '@tmagic/utils';
 
 import type { FieldProps, FormState, SelectConfig, SelectGroupOption, SelectOption } from '../schema';
 import { getConfig } from '../utils/config';
 import { useAddField } from '../utils/useAddField';
-
-import SelectOptionGroups from './SelectOptionGroups.vue';
-import SelectOptions from './SelectOptions.vue';
 
 defineOptions({
   name: 'MFormSelect',
@@ -45,6 +83,9 @@ defineOptions({
 const props = defineProps<FieldProps<SelectConfig>>();
 
 const emit = defineEmits(['change']);
+
+const optionComponent = getDesignConfig('components')?.option;
+const optionGroupComponent = getDesignConfig('components')?.optionGroup;
 
 if (!props.model) throw new Error('不能没有model');
 useAddField(props.prop);
@@ -394,7 +435,4 @@ const remoteMethod = async (q: string) => {
       }, 0);
   }
 };
-
-const itemOptions = options as Ref<SelectOption[]>;
-const groupOptions = options as Ref<SelectGroupOption[]>;
 </script>

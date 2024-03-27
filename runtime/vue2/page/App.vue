@@ -5,10 +5,11 @@
 <script lang="ts">
 import { defineComponent, inject, nextTick, reactive, ref } from 'vue';
 
+import type { Page } from '@tmagic/core';
 import Core from '@tmagic/core';
 import type { ChangeEvent } from '@tmagic/data-source';
 import type { MNode } from '@tmagic/schema';
-import { isPage, replaceChildNode } from '@tmagic/utils';
+import { addParamToUrl, isPage, replaceChildNode } from '@tmagic/utils';
 
 export default defineComponent({
   name: 'App',
@@ -16,6 +17,13 @@ export default defineComponent({
   setup() {
     const app = inject<Core | undefined>('app');
     const pageConfig = ref(app?.page?.data || {});
+
+    app?.on('page-change', (page?: Page) => {
+      if (!page) {
+        throw new Error(`页面不存在`);
+      }
+      addParamToUrl({ page: page.data.id }, window);
+    });
 
     app?.dataSourceManager?.on('update-data', (nodes: MNode[], sourceId: string, changeEvent: ChangeEvent) => {
       nodes.forEach((node) => {

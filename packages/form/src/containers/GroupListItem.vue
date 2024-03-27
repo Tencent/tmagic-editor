@@ -1,9 +1,9 @@
 <template>
   <div class="m-fields-group-list-item">
     <div>
-      <TMagicButton link :disabled="disabled" :icon="expand ? CaretBottom : CaretRight" @click="expandHandler">{{
-        title
-      }}</TMagicButton>
+      <TMagicButton link :disabled="disabled" @click="expandHandler">
+        <TMagicIcon><CaretBottom v-if="expand" /><CaretRight v-else /></TMagicIcon>{{ title }}
+      </TMagicButton>
 
       <TMagicButton
         v-show="showDelete(parseInt(String(index)))"

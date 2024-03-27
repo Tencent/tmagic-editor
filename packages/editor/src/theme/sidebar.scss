@@ -50,10 +50,6 @@
     overflow: auto;
   }
 
-  .tmagic-design-scrollbar {
-    height: 100%;
-  }
-
   .fold-icon {
     position: absolute;
     bottom: 8px;
@@ -72,9 +68,6 @@
 }
 
 .m-editor-slide-list-box {
-  display: flex;
-  min-width: 240px;
-  min-height: 500px;
   > div {
     &:first-child {
       min-width: 240px;

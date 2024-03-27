@@ -71,7 +71,19 @@ class DataSourceManager extends EventEmitter {
       this.addDataSource(config);
     });
 
-    Promise.all(Array.from(this.dataSourceMap).map(async ([, ds]) => this.init(ds)));
+    const dataSourceList = Array.from(this.dataSourceMap);
+    Promise.allSettled<Record<string, any>>(dataSourceList.map(([, ds]) => this.init(ds))).then((values) => {
+      const data: DataSourceManagerData = {};
+
+      values.forEach((value, index) => {
+        if (value.status === 'fulfilled') {
+          const dsId = dataSourceList[index][0];
+          data[dsId] = this.data[dsId];
+        }
+      });
+
+      this.emit('init', data);
+    });
   }
 
   public async init(ds: DataSource) {

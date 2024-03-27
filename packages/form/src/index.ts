@@ -89,9 +89,7 @@ export { default as MSelect } from './fields/Select.vue';
 export { default as MCascader } from './fields/Cascader.vue';
 export { default as MDynamicField } from './fields/DynamicField.vue';
 
-export const createForm = function (config: FormConfig) {
-  return config;
-};
+export const createForm = <T extends [] = []>(config: FormConfig | T) => config;
 
 export interface InstallOptions {
   [key: string]: any;

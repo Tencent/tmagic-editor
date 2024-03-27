@@ -7,39 +7,57 @@
       <TMagicButton size="small" type="primary" :disabled="disabled" plain @click="newHandler()">添加</TMagicButton>
     </div>
 
-    <MFormDrawer
-      ref="addDialog"
-      label-width="80px"
+    <FloatingBox
+      v-model:visible="addDialogVisible"
+      v-model:width="width"
+      v-model:height="editorHeight"
       :title="fieldTitle"
-      :config="dataSourceFieldsConfig"
-      :values="fieldValues"
-      :parentValues="model[name]"
-      :disabled="disabled"
-      :width="width"
-      @submit="fieldChange"
-    ></MFormDrawer>
+      :position="boxPosition"
+    >
+      <template #body>
+        <MFormBox
+          label-width="80px"
+          :title="fieldTitle"
+          :config="dataSourceFieldsConfig"
+          :values="fieldValues"
+          :parentValues="model[name]"
+          :disabled="disabled"
+          @submit="fieldChange"
+        ></MFormBox>
+      </template>
+    </FloatingBox>
 
-    <MFormDrawer
-      ref="addFromJsonDialog"
+    <FloatingBox
+      v-model:visible="addFromJsonDialogVisible"
+      v-model:width="width"
+      v-model:height="editorHeight"
       title="快速添加数据定义"
-      :config="jsonFromConfig"
-      :values="jsonFromValues"
-      :disabled="disabled"
-      :width="width"
-      @submit="addFromJsonFromChange"
-    ></MFormDrawer>
+      :position="boxPosition"
+    >
+      <template #body>
+        <MFormBox
+          :config="jsonFromConfig"
+          :values="jsonFromValues"
+          :disabled="disabled"
+          @submit="addFromJsonFromChange"
+        ></MFormBox>
+      </template>
+    </FloatingBox>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref } from 'vue';
+import { inject, Ref, ref } from 'vue';
 
 import { TMagicButton, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
-import { type FieldProps, type FormConfig, type FormState, MFormDrawer } from '@tmagic/form';
+import { type FieldProps, type FormConfig, type FormState, MFormBox } from '@tmagic/form';
 import type { DataSchema } from '@tmagic/schema';
 import { type ColumnConfig, MagicTable } from '@tmagic/table';
 import { getDefaultValueFromFields } from '@tmagic/utils';
 
+import FloatingBox from '@editor/components/FloatingBox.vue';
+import { useEditorContentHeight } from '@editor/hooks';
+import { useNextFloatBoxPosition } from '@editor/hooks/use-next-float-box-position';
 import type { Services } from '@editor/type';
 
 defineOptions({
@@ -61,17 +79,16 @@ const emit = defineEmits(['change']);
 
 const services = inject<Services>('services');
 
-const addDialog = ref<InstanceType<typeof MFormDrawer>>();
-
 const fieldValues = ref<Record<string, any>>({});
 const fieldTitle = ref('');
 
-const width = computed(() => globalThis.document.body.clientWidth - (services?.uiService.get('columnWidth').left || 0));
+const width = defineModel<number>('width', { default: 670 });
 
 const newHandler = () => {
   fieldValues.value = {};
   fieldTitle.value = '新增属性';
-  addDialog.value?.show();
+  calcBoxPosition();
+  addDialogVisible.value = true;
 };
 
 const fieldChange = ({ index, ...value }: Record<string, any>) => {
@@ -81,7 +98,7 @@ const fieldChange = ({ index, ...value }: Record<string, any>) => {
     props.model[props.name].push(value);
   }
 
-  addDialog.value?.hide();
+  addDialogVisible.value = false;
 
   emit('change', props.model[props.name]);
 };
@@ -122,7 +139,8 @@ const fieldColumns: ColumnConfig[] = [
             index,
           };
           fieldTitle.value = `编辑${row.title}`;
-          addDialog.value?.show();
+          calcBoxPosition();
+          addDialogVisible.value = true;
         },
       },
       {
@@ -220,7 +238,6 @@ const dataSourceFieldsConfig: FormConfig = [
   },
 ];
 
-const addFromJsonDialog = ref<InstanceType<typeof MFormDrawer>>();
 const jsonFromConfig: FormConfig = [
   {
     name: 'data',
@@ -238,7 +255,8 @@ const jsonFromValues = ref({
 
 const newFromJsonHandler = () => {
   jsonFromValues.value.data = getDefaultValueFromFields(props.model[props.name]);
-  addFromJsonDialog.value?.show();
+  calcBoxPosition();
+  addFromJsonDialogVisible.value = true;
 };
 
 const getValueType = (value: any) => {
@@ -288,11 +306,18 @@ const addFromJsonFromChange = ({ data }: { data: string }) => {
 
     props.model[props.name] = getFieldsConfig(value, props.model[props.name]);
 
-    addFromJsonDialog.value?.hide();
+    addFromJsonDialogVisible.value = false;
 
     emit('change', props.model[props.name]);
   } catch (e: any) {
     tMagicMessage.error(e.message);
   }
 };
+
+const addDialogVisible = defineModel<boolean>('visible', { default: false });
+const addFromJsonDialogVisible = defineModel<boolean>('visible1', { default: false });
+const { height: editorHeight } = useEditorContentHeight();
+
+const parentFloating = inject<Ref<HTMLDivElement | null>>('parentFloating', ref(null));
+const { boxPosition, calcBoxPosition } = useNextFloatBoxPosition(services?.uiService, parentFloating);
 </script>

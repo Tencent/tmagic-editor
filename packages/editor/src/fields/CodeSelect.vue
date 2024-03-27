@@ -1,7 +1,16 @@
 <template>
   <div class="m-fields-code-select" :class="config.className">
     <TMagicCard>
-      <m-form-container :config="codeConfig" :model="model[name]" @change="changeHandler"> </m-form-container>
+      <MContainer
+        :config="codeConfig"
+        :size="size"
+        :prop="prop"
+        :disabled="disabled"
+        :lastValues="lastValues"
+        :model="model[name]"
+        @change="changeHandler"
+      >
+      </MContainer>
     </TMagicCard>
   </div>
 </template>
@@ -12,7 +21,7 @@ import { isEmpty } from 'lodash-es';
 
 import { TMagicCard } from '@tmagic/design';
 import type { FieldProps, FormItem } from '@tmagic/form';
-import { FormState } from '@tmagic/form';
+import { FormState, MContainer } from '@tmagic/form';
 import { HookCodeType, HookType } from '@tmagic/schema';
 
 import type { Services } from '@editor/type';

@@ -28,9 +28,9 @@ export interface ColumnActionConfig {
   tooltipPlacement?: string;
   icon?: any;
   handler?: (row: any, index: number) => Promise<any> | any;
-  before?: (row: any, index: number) => void;
-  after?: (row: any, index: number) => void;
-  action?: (data: { data: any }) => void;
+  before?: (row: any, index: number) => Promise<void> | void;
+  after?: (row: any, index: number) => Promise<void> | void;
+  action?: (data: { data: any }) => Promise<void> | void;
 }
 
 export interface ColumnConfig<T = any> {
@@ -53,7 +53,7 @@ export interface ColumnConfig<T = any> {
     placement: string;
     width: string;
     trigger: string;
-    tableEmbed: string;
+    tableEmbed: boolean;
   };
   sortable?: boolean | 'custom';
   action?: 'tip' | 'actionLink' | 'img' | 'link' | 'tag';

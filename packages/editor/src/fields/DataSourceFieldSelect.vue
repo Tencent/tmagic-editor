@@ -15,20 +15,36 @@
       @change="onChangeHandler"
     ></component>
     <TMagicButton
+      v-if="(showDataSourceFieldSelect || !config.fieldConfig) && selectedDataSourceId"
+      style="margin-left: 5px"
+      link
+      :size="size"
+      @click="editHandler(selectedDataSourceId)"
+      ><MIcon :icon="Edit"></MIcon
+    ></TMagicButton>
+    <TMagicButton
       v-if="config.fieldConfig"
       style="margin-left: 5px"
       link
       :type="showDataSourceFieldSelect ? 'primary' : 'default'"
-      :icon="Coin"
       :size="size"
       @click="showDataSourceFieldSelect = !showDataSourceFieldSelect"
+      ><MIcon :icon="Coin"></MIcon
     ></TMagicButton>
+
+    <DataSourceConfigPanel
+      ref="editDialog"
+      :disabled="!editable"
+      :values="dataSourceValues"
+      :title="dialogTitle"
+      @submit="submitDataSourceHandler"
+    ></DataSourceConfigPanel>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, resolveComponent } from 'vue';
-import { Coin } from '@element-plus/icons-vue';
+import { Coin, Edit } from '@element-plus/icons-vue';
 
 import { TMagicButton } from '@tmagic/design';
 import type { CascaderConfig, CascaderOption, FieldProps, FormState } from '@tmagic/form';
@@ -36,6 +52,9 @@ import { MCascader } from '@tmagic/form';
 import type { DataSchema, DataSourceFieldType } from '@tmagic/schema';
 import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX } from '@tmagic/utils';
 
+import MIcon from '@editor/components/Icon.vue';
+import { useDataSourceEdit } from '@editor/hooks/use-data-source-edit';
+import DataSourceConfigPanel from '@editor/layouts/sidebar/data-source/DataSourceConfigPanel.vue';
 import type { DataSourceFieldSelectConfig, Services } from '@editor/type';
 
 defineOptions({
@@ -47,6 +66,15 @@ const emit = defineEmits(['change']);
 
 const props = withDefaults(defineProps<FieldProps<DataSourceFieldSelectConfig>>(), {
   disabled: false,
+});
+
+const selectedDataSourceId = computed(() => {
+  const value = props.model[props.name];
+  if (!Array.isArray(value) || !value.length) {
+    return '';
+  }
+
+  return value[0].replace(DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX, '');
 });
 
 const dataSources = computed(() => services?.dataSourceService.get('dataSources'));
@@ -75,7 +103,7 @@ const getOptionChildren = (
       return;
     }
 
-    if (!dataSourceFieldType.includes(fieldType) && fieldType !== 'object') {
+    if (!dataSourceFieldType.includes(fieldType) && !['array', 'object', 'any'].includes(fieldType)) {
       return;
     }
 
@@ -116,7 +144,7 @@ onMounted(() => {
     typeof value[0] === 'string' &&
     value[0].startsWith(DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX)
   ) {
-    return (showDataSourceFieldSelect.value = true);
+    showDataSourceFieldSelect.value = true;
   }
 });
 
@@ -147,4 +175,8 @@ const tagName = computed(() => {
 const onChangeHandler = (value: any) => {
   emit('change', value);
 };
+
+const { editDialog, dataSourceValues, dialogTitle, editable, editHandler, submitDataSourceHandler } = useDataSourceEdit(
+  services?.dataSourceService,
+);
 </script>

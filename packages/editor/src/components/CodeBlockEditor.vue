@@ -9,59 +9,57 @@
     :before-close="beforeClose"
   >
     <template #body>
-      <div ref="floatingBoxBody" style="height: 100%"></div>
+      <MFormBox
+        class="m-editor-code-block-editor"
+        ref="formBox"
+        label-width="80px"
+        :close-on-press-escape="false"
+        :title="content.name"
+        :config="functionConfig"
+        :values="content"
+        :disabled="disabled"
+        style="height: 100%"
+        @change="changeHandler"
+        @submit="submitForm"
+        @error="errorHandler"
+        @closed="closedHandler"
+      >
+        <template #left>
+          <TMagicButton v-if="!disabled" type="primary" link @click="difVisible = true">查看修改</TMagicButton>
+        </template>
+      </MFormBox>
     </template>
   </FloatingBox>
 
-  <Teleport :to="floatingBoxBody" :disabled="slideType === 'box'" v-if="editVisible">
-    <MFormBox
-      class="m-editor-code-block-editor"
-      ref="formBox"
-      label-width="80px"
-      :close-on-press-escape="false"
-      :title="content.name"
-      :config="functionConfig"
-      :values="content"
-      :disabled="disabled"
-      :height="floatingBoxBody?.clientHeight"
-      @change="changeHandler"
-      @submit="submitForm"
-      @error="errorHandler"
-      @closed="closedHandler"
-    >
-      <template #left>
-        <TMagicButton v-if="!disabled" type="primary" link @click="difVisible = true">查看修改</TMagicButton>
+  <Teleport to="body">
+    <TMagicDialog title="查看修改" v-model="difVisible" fullscreen>
+      <div style="display: flex; margin-bottom: 10px">
+        <div style="flex: 1"><TMagicTag size="small" type="info">修改前</TMagicTag></div>
+        <div style="flex: 1"><TMagicTag size="small" type="success">修改后</TMagicTag></div>
+      </div>
+
+      <CodeEditor
+        v-if="difVisible"
+        ref="magicVsEditor"
+        type="diff"
+        language="json"
+        :initValues="content.content"
+        :modifiedValues="formBox?.form?.values.content"
+        :style="`height: ${windowRect.height - 150}px`"
+      ></CodeEditor>
+
+      <template #footer>
+        <span class="dialog-footer">
+          <TMagicButton size="small" @click="difVisible = false">取消</TMagicButton>
+          <TMagicButton size="small" type="primary" @click="diffChange">确定</TMagicButton>
+        </span>
       </template>
-    </MFormBox>
+    </TMagicDialog>
   </Teleport>
-
-  <TMagicDialog v-model="difVisible" title="查看修改" fullscreen>
-    <div style="display: flex; margin-bottom: 10px">
-      <div style="flex: 1"><TMagicTag size="small" type="info">修改前</TMagicTag></div>
-      <div style="flex: 1"><TMagicTag size="small" type="success">修改后</TMagicTag></div>
-    </div>
-
-    <CodeEditor
-      v-if="difVisible"
-      ref="magicVsEditor"
-      type="diff"
-      language="json"
-      :initValues="content.content"
-      :modifiedValues="formBox?.form?.values.content"
-      :style="`height: ${windowRect.height - 150}px`"
-    ></CodeEditor>
-
-    <template #footer>
-      <span class="dialog-footer">
-        <TMagicButton size="small" @click="difVisible = false">取消</TMagicButton>
-        <TMagicButton size="small" type="primary" @click="diffChange">确定</TMagicButton>
-      </span>
-    </template>
-  </TMagicDialog>
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, nextTick, ref } from 'vue';
+import { computed, inject, Ref, ref } from 'vue';
 
 import { TMagicButton, TMagicDialog, tMagicMessage, tMagicMessageBox, TMagicTag } from '@tmagic/design';
 import { ColumnConfig, FormConfig, FormState, MFormBox } from '@tmagic/form';
@@ -69,9 +67,10 @@ import type { CodeBlockContent } from '@tmagic/schema';
 
 import FloatingBox from '@editor/components/FloatingBox.vue';
 import { useEditorContentHeight } from '@editor/hooks/use-editor-content-height';
+import { useNextFloatBoxPosition } from '@editor/hooks/use-next-float-box-position';
 import { useWindowRect } from '@editor/hooks/use-window-rect';
 import CodeEditor from '@editor/layouts/CodeEditor.vue';
-import type { Services, SlideType } from '@editor/type';
+import type { Services } from '@editor/type';
 import { getConfig } from '@editor/utils/config';
 
 defineOptions({
@@ -86,7 +85,6 @@ const props = defineProps<{
   disabled?: boolean;
   isDataSource?: boolean;
   dataSourceType?: string;
-  slideType?: SlideType;
 }>();
 
 const emit = defineEmits<{
@@ -229,7 +227,6 @@ const changeHandler = (values: CodeBlockContent) => {
 
 const beforeClose = (done: (cancel?: boolean) => void) => {
   if (!changedValue.value) {
-    editVisible.value = false;
     done();
     return;
   }
@@ -242,12 +239,10 @@ const beforeClose = (done: (cancel?: boolean) => void) => {
     })
     .then(() => {
       changedValue.value && submitForm(changedValue.value);
-      editVisible.value = false;
       done();
     })
     .catch((action: string) => {
       if (action === 'cancel') {
-        editVisible.value = false;
       }
       done(action === 'cancel');
     });
@@ -257,35 +252,17 @@ const closedHandler = () => {
   changedValue.value = undefined;
 };
 
-const editVisible = ref<boolean>(false);
-const floatingBoxBody = ref<HTMLDivElement>();
-
-const boxPosition = computed(() => {
-  const columnWidth = services?.uiService?.get('columnWidth');
-  const navMenuRect = services?.uiService?.get('navMenuRect');
-  return {
-    left: columnWidth?.left ?? 0,
-    top: (navMenuRect?.top ?? 0) + (navMenuRect?.height ?? 0),
-  };
-});
+const parentFloating = inject<Ref<HTMLDivElement | null>>('parentFloating', ref(null));
+const { boxPosition, calcBoxPosition } = useNextFloatBoxPosition(services?.uiService, parentFloating);
 
 defineExpose({
   async show() {
-    if (props.slideType !== 'box') {
-      boxVisible.value = true;
-      await nextTick();
-    }
-
-    editVisible.value = true;
+    calcBoxPosition();
+    boxVisible.value = true;
   },
 
   async hide() {
-    editVisible.value = false;
-
-    if (props.slideType !== 'box') {
-      await nextTick();
-      boxVisible.value = false;
-    }
+    boxVisible.value = false;
   },
 });
 </script>

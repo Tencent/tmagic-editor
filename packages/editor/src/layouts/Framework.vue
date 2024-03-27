@@ -102,10 +102,13 @@ const RIGHT_COLUMN_WIDTH_STORAGE_KEY = '$MagicEditorRightColumnWidthData';
 const getLeftColumnWidthCacheData = () =>
   Number(globalThis.localStorage.getItem(LEFT_COLUMN_WIDTH_STORAGE_KEY)) || DEFAULT_LEFT_COLUMN_WIDTH;
 
+const getRightColumnWidthCacheData = () =>
+  Number(globalThis.localStorage.getItem(RIGHT_COLUMN_WIDTH_STORAGE_KEY)) || DEFAULT_RIGHT_COLUMN_WIDTH;
+
 const columnWidth = ref<Partial<GetColumnWidth>>({
   left: getLeftColumnWidthCacheData(),
   center: 0,
-  right: Number(globalThis.localStorage.getItem(RIGHT_COLUMN_WIDTH_STORAGE_KEY)) || DEFAULT_RIGHT_COLUMN_WIDTH,
+  right: getRightColumnWidthCacheData(),
 });
 
 watch(pageLength, () => {

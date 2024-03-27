@@ -6,7 +6,7 @@
           <span>{{ title }}</span>
         </slot>
         <div>
-          <TMagicButton link size="small" :icon="Close" @click="closeHandler"></TMagicButton>
+          <TMagicButton link size="small" @click="closeHandler"><MIcon :icon="Close"></MIcon></TMagicButton>
         </div>
       </div>
       <div class="m-editor-float-box-body" :style="{ height: `${bodyHeight}px` }">
@@ -17,11 +17,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
+import { computed, inject, nextTick, onBeforeUnmount, provide, ref, watch } from 'vue';
 import { Close } from '@element-plus/icons-vue';
 import VanillaMoveable from 'moveable';
 
 import { TMagicButton, useZIndex } from '@tmagic/design';
+
+import MIcon from '@editor/components/Icon.vue';
+import type { Services } from '@editor/type';
 
 interface Position {
   left: number;
@@ -48,7 +51,7 @@ const target = ref<HTMLDivElement>();
 const titleEl = ref<HTMLDivElement>();
 
 const zIndex = useZIndex();
-const curZIndex = ref<number>(zIndex.nextZIndex());
+const curZIndex = ref<number>(0);
 
 const titleHeight = ref(0);
 const bodyHeight = computed(() => {
@@ -63,12 +66,21 @@ const bodyHeight = computed(() => {
   return 'auto';
 });
 
-const style = computed(() => ({
-  left: `${props.position.left}px`,
-  top: `${props.position.top}px`,
-  width: width.value ? `${width.value}px` : 'auto',
-  height: height.value ? `${height.value}px` : 'auto',
-}));
+const services = inject<Services>('services');
+const frameworkWidth = computed(() => services?.uiService.get('frameworkRect').width || 0);
+const style = computed(() => {
+  let { left } = props.position;
+  if (width.value) {
+    left = left + width.value > frameworkWidth.value ? frameworkWidth.value - width.value : left;
+  }
+
+  return {
+    left: `${left}px`,
+    top: `${props.position.top}px`,
+    width: width.value ? `${width.value}px` : 'auto',
+    height: height.value ? `${height.value}px` : 'auto',
+  };
+});
 
 let moveable: VanillaMoveable | null = null;
 
@@ -112,6 +124,7 @@ watch(
   async (visible) => {
     if (visible) {
       await nextTick();
+      curZIndex.value = zIndex.nextZIndex();
 
       const targetRect = target.value?.getBoundingClientRect();
       if (targetRect) {
@@ -154,6 +167,8 @@ const closeHandler = () => {
 const nextZIndex = () => {
   curZIndex.value = zIndex.nextZIndex();
 };
+
+provide('parentFloating', target);
 
 defineExpose({
   bodyHeight,

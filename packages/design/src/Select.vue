@@ -50,7 +50,7 @@ const visibleHandler = (...args: any[]) => {
 const scrollbarWrap = ref<HTMLDivElement | undefined>();
 
 const unWatch = watch(
-  () => select.value?.scrollbar?.wrap$ || select.value?.scrollbar?.wrapRef,
+  () => select.value?.scrollbar?.wrap$ || select.value?.scrollbar?.wrapRef || select.value?.scrollbarRef?.wrapRef,
   (wrap) => {
     if (!wrap) {
       return;

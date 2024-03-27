@@ -169,6 +169,11 @@ const changeRight = ({ deltaX }: OnDrag) => {
 defineExpose({
   updateWidth() {
     clientWidth = props.width ?? el.value?.clientWidth ?? clientWidth;
+
+    if (clientWidth <= 0) {
+      return;
+    }
+
     const columnWidth = getCenterWidth(props.left, props.right);
 
     emit('change', {

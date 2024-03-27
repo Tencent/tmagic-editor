@@ -401,12 +401,6 @@ export interface SideBarData {
   items: SideItem[];
 }
 
-/**
- * drawer 抽屉
- * box 悬浮窗
- */
-export type SlideType = 'drawer' | 'box';
-
 export interface ComponentItem {
   /** 显示文案 */
   text: string;

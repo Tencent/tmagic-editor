@@ -29,6 +29,7 @@ export interface ButtonProps {
   size?: FieldSize;
   link?: boolean;
   text?: boolean;
+  circle?: boolean;
   icon?: any;
 }
 
@@ -380,6 +381,10 @@ export interface CascaderOption {
   children?: CascaderOption[];
 }
 
+export interface IconProps {
+  size?: string;
+}
+
 export interface TMagicMessage {
   success: (msg: string) => void;
   warning: (msg: string) => void;
@@ -526,8 +531,8 @@ export interface Components {
   };
 
   icon: {
-    component: DefineComponent<{}, {}, any> | string;
-    props: () => {};
+    component: DefineComponent<IconProps, {}, any> | string;
+    props: (props: IconProps) => IconProps;
   };
 
   input: {

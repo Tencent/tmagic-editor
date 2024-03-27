@@ -1,5 +1,5 @@
 {
-  "version": "1.4.0-beta.2",
+  "version": "1.4.2",
   "name": "@tmagic/data-source",
   "type": "module",
   "sideEffects": [
@@ -18,7 +18,7 @@
   },
   "license": "Apache-2.0",
   "scripts": {
-    "build": "npm run build:type && vite build",
+    "build": "npm run build:type && vite build --mode=es && vite build --mode=umd",
     "build:type": "npm run clear:type && tsc --declaration --emitDeclarationOnly --project tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "clear:type": "rimraf ./types"
   },
@@ -33,8 +33,8 @@
     "data-source"
   ],
   "dependencies": {
-    "@tmagic/utils": "1.4.0-beta.2",
-    "@tmagic/schema": "1.4.0-beta.2",
+    "@tmagic/utils": "1.4.2",
+    "@tmagic/schema": "1.4.2",
     "events": "^3.3.0",
     "lodash-es": "^4.17.21"
   },
