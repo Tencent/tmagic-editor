@@ -199,6 +199,9 @@ importers:
 
   packages/data-source:
     dependencies:
+      '@tmagic/dep':
+        specifier: 1.4.2
+        version: link:../dep
       '@tmagic/schema':
         specifier: 1.4.2
         version: link:../schema
@@ -4715,33 +4718,33 @@ packages:
       - '@vue/server-renderer'
     dev: true
 
-  /@tmagic/core@1.3.16(dayjs@1.11.10):
-    resolution: {integrity: sha512-Q5s9kCExr+oKdXRHIINs4tTC0tBN6pzbQGZmIbOn89LRzjScjV9OMr47pNBrkygRkSrKbhWlJv+6JWV0CDNiew==}
+  /@tmagic/core@1.4.2(dayjs@1.11.10):
+    resolution: {integrity: sha512-ti8RmSCu+m96OmpqTTfVN14lAw2YkPZLg47cWbsWpIvvpo9D/eFSJr6njU/OpmsAYU4ypyEPzdnPDklOvhHiJA==}
     engines: {node: '>=18'}
     dependencies:
-      '@tmagic/data-source': 1.3.16(dayjs@1.11.10)
-      '@tmagic/schema': 1.3.16
-      '@tmagic/utils': 1.3.16(dayjs@1.11.10)
+      '@tmagic/data-source': 1.4.2(dayjs@1.11.10)
+      '@tmagic/schema': 1.4.2
+      '@tmagic/utils': 1.4.2(dayjs@1.11.10)
       events: 3.3.0
       lodash-es: 4.17.21
     transitivePeerDependencies:
       - dayjs
     dev: false
 
-  /@tmagic/data-source@1.3.16(dayjs@1.11.10):
-    resolution: {integrity: sha512-QSAegN2jkal6KdD76RDIVeMk2d3iTKTQSzyNtffruPNDU23aK3t4KVlCo3CpgtKtMaixKpuspmbdNUF3g0y9NA==}
+  /@tmagic/data-source@1.4.2(dayjs@1.11.10):
+    resolution: {integrity: sha512-HCWdUCn56JBH4A5Ea9JNzIgjwTll8h9FAopeLRYRvtkDLFxoyAIONweT99D2ih4S9PmcyxxE0Dy2C4Ef4JVX0Q==}
     engines: {node: '>=18'}
     dependencies:
-      '@tmagic/schema': 1.3.16
-      '@tmagic/utils': 1.3.16(dayjs@1.11.10)
+      '@tmagic/schema': 1.4.2
+      '@tmagic/utils': 1.4.2(dayjs@1.11.10)
       events: 3.3.0
       lodash-es: 4.17.21
     transitivePeerDependencies:
       - dayjs
     dev: false
 
-  /@tmagic/schema@1.3.16:
-    resolution: {integrity: sha512-2OXS8PaHWSom7EiQOGNqmmzsbJwQZ2q8NX1KBODHPT+hSvH4T6Uc2dnVYgqZH6G99ex/uZIdeR1BX0od7fNxOQ==}
+  /@tmagic/schema@1.4.2:
+    resolution: {integrity: sha512-XDmvKLclLoYyCgD/XnDk5ONf/hyTiiSovhWnv1XjyFV9hTr3JahVrFz89Wzk7UX0y2AoaVtW/kpm3QNjDvDbvQ==}
     engines: {node: '>=18'}
     dev: false
 
@@ -4755,24 +4758,24 @@ packages:
       element-plus: ^2.4.3
       vue: ^3.3.8
     dependencies:
-      '@tmagic/core': 1.3.16(dayjs@1.11.10)
+      '@tmagic/core': 1.4.2(dayjs@1.11.10)
       '@tmagic/editor': link:packages/editor
       '@tmagic/form': link:packages/form
       '@tmagic/schema': link:packages/schema
-      '@tmagic/utils': 1.3.16(dayjs@1.11.10)
+      '@tmagic/utils': 1.4.2(dayjs@1.11.10)
       element-plus: 2.6.1(vue@3.4.21)
       vue: 3.4.21(typescript@5.4.2)
     transitivePeerDependencies:
       - dayjs
     dev: false
 
-  /@tmagic/utils@1.3.16(dayjs@1.11.10):
-    resolution: {integrity: sha512-PI26Fllv03NAyUze6P59r9U5pIgkkjHUGmj9VM9y+7KI+N/9HhnstbZSpOIsmUANOzAhD1VLq0Bt7tUcMSaFxg==}
+  /@tmagic/utils@1.4.2(dayjs@1.11.10):
+    resolution: {integrity: sha512-OQ0qo+3JZD94lXsxlSjxqR4tuv55MwnKpxN2C/wLmY0h4z9Aelchd0qRVN3ukC4WL6SleRbk50lWmWiOLVCdYQ==}
     engines: {node: '>=18'}
     peerDependencies:
       dayjs: ^1.11.4
     dependencies:
-      '@tmagic/schema': 1.3.16
+      '@tmagic/schema': 1.4.2
       dayjs: 1.11.10
       lodash-es: 4.17.21
     dev: false

@@ -33,6 +33,7 @@
     "data-source"
   ],
   "dependencies": {
+    "@tmagic/dep": "1.4.2",
     "@tmagic/utils": "1.4.2",
     "@tmagic/schema": "1.4.2",
     "events": "^3.3.0",
