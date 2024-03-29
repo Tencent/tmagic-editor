@@ -17,7 +17,6 @@
     <TMagicButton
       v-if="(showDataSourceFieldSelect || !config.fieldConfig) && selectedDataSourceId"
       style="margin-left: 5px"
-      link
       :size="size"
       @click="editHandler(selectedDataSourceId)"
       ><MIcon :icon="Edit"></MIcon
@@ -25,7 +24,6 @@
     <TMagicButton
       v-if="config.fieldConfig"
       style="margin-left: 5px"
-      link
       :type="showDataSourceFieldSelect ? 'primary' : 'default'"
       :size="size"
       @click="showDataSourceFieldSelect = !showDataSourceFieldSelect"
@@ -43,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, onMounted, ref, resolveComponent } from 'vue';
+import { computed, inject, ref, resolveComponent, watch } from 'vue';
 import { Coin, Edit } from '@element-plus/icons-vue';
 
 import { TMagicButton } from '@tmagic/design';
@@ -137,16 +135,23 @@ const cascaderConfig = computed<CascaderConfig>(() => {
 
 const showDataSourceFieldSelect = ref(false);
 
-onMounted(() => {
-  const value = props.model[props.name];
-  if (
-    Array.isArray(value) &&
-    typeof value[0] === 'string' &&
-    value[0].startsWith(DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX)
-  ) {
-    showDataSourceFieldSelect.value = true;
-  }
-});
+watch(
+  () => props.model[props.name],
+  (value) => {
+    if (
+      Array.isArray(value) &&
+      typeof value[0] === 'string' &&
+      value[0].startsWith(DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX)
+    ) {
+      showDataSourceFieldSelect.value = true;
+    } else {
+      showDataSourceFieldSelect.value = false;
+    }
+  },
+  {
+    immediate: true,
+  },
+);
 
 const mForm = inject<FormState | undefined>('mForm');
 
