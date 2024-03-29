@@ -1,5 +1,5 @@
 {
-  "version": "1.4.2",
+  "version": "1.4.3",
   "name": "@tmagic/stage",
   "type": "module",
   "sideEffects": [
@@ -31,9 +31,9 @@
   },
   "dependencies": {
     "@scena/guides": "^0.29.2",
-    "@tmagic/core": "1.4.2",
-    "@tmagic/schema": "1.4.2",
-    "@tmagic/utils": "1.4.2",
+    "@tmagic/core": "1.4.3",
+    "@tmagic/schema": "1.4.3",
+    "@tmagic/utils": "1.4.3",
     "events": "^3.3.0",
     "keycon": "^1.4.0",
     "lodash-es": "^4.17.21",

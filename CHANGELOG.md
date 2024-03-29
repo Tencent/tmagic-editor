@@ -1,3 +1,18 @@
+## [1.4.3](https://github.com/Tencent/tmagic-editor/compare/v1.4.2...v1.4.3) (2024-03-29)
+
+
+### Bug Fixes
+
+* **data-source,dep,utils:** 迭代器数据源配置编译 ([0e0f501](https://github.com/Tencent/tmagic-editor/commit/0e0f50187ee3409dcc03c69171e7ec71b5515abd))
+* **editor:** 数据源字段选择器初始化状态 ([05527a4](https://github.com/Tencent/tmagic-editor/commit/05527a41a1c063b16714f374d0b9c953fa9d8a2d))
+
+
+### Features
+
+* **playground:** 缓存上次保存dsl ([47b19ae](https://github.com/Tencent/tmagic-editor/commit/47b19ae7fa43fb03608e8f7380b8c69cd50d68f0))
+
+
+
 ## [1.4.2](https://github.com/Tencent/tmagic-editor/compare/v1.4.1...v1.4.2) (2024-03-26)
 
 
