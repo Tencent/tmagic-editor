@@ -1,8 +1,8 @@
 <template>
   <TMagicRadioGroup size="small" v-model="viewerDevice" :class="viewerDevice" @change="deviceSelect">
-    <TMagicRadioButton label="phone">Phone</TMagicRadioButton>
-    <TMagicRadioButton label="pad">Pad</TMagicRadioButton>
-    <TMagicRadioButton label="pc">PC</TMagicRadioButton>
+    <TMagicRadioButton value="phone">Phone</TMagicRadioButton>
+    <TMagicRadioButton value="pad">Pad</TMagicRadioButton>
+    <TMagicRadioButton value="pc">PC</TMagicRadioButton>
   </TMagicRadioGroup>
 </template>
 
@@ -34,22 +34,15 @@ const getDeviceHeight = (viewerDevice: DeviceType) => devH[viewerDevice];
 
 const getDeviceWidth = (viewerDevice: DeviceType) => devW[viewerDevice];
 
-withDefaults(
-  defineProps<{
-    modelValue: {
-      width: number;
-      height: number;
-    };
-  }>(),
-  {
-    modelValue: () => ({
-      width: 375,
-      height: 817,
-    }),
-  },
-);
-
-const emit = defineEmits(['update:modelValue']);
+const modelValue = defineModel<{
+  width: number | string;
+  height: number | string;
+}>('modelValue', {
+  default: () => ({
+    width: 375,
+    height: 817,
+  }),
+});
 
 const stageContainerRect = computed(() => services?.uiService.get('stageContainerRect'));
 
@@ -81,10 +74,10 @@ const viewerDevice = ref(DeviceType.Phone);
 const deviceSelect = async (device: DeviceType) => {
   const width = getDeviceWidth(device);
   const height = getDeviceHeight(device);
-  emit('update:modelValue', {
+  modelValue.value = {
     width,
     height,
-  });
+  };
 
   await nextTick();
   calcFontsize();

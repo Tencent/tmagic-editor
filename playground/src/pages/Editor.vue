@@ -24,19 +24,13 @@
       </template>
     </m-editor>
 
-    <TMagicDialog
-      v-model="previewVisible"
-      destroy-on-close
-      class="pre-viewer"
-      title="预览"
-      :width="stageRect && stageRect.width"
-    >
+    <TMagicDialog v-model="previewVisible" destroy-on-close class="pre-viewer" title="预览" :width="stageRect?.width">
       <iframe
         v-if="previewVisible"
         ref="iframe"
         width="100%"
         style="border: none"
-        :height="stageRect && stageRect.height"
+        :height="stageRect?.height"
         :src="previewUrl"
       ></iframe>
     </TMagicDialog>
