@@ -1,4 +1,4 @@
-import { computed, inject, ref, watchEffect } from 'vue';
+import { computed, inject, ref, watch } from 'vue';
 
 import type { Services } from '@editor/type';
 
@@ -9,10 +9,16 @@ export const useEditorContentHeight = () => {
   const editorContentHeight = computed(() => frameworkHeight.value - navMenuHeight.value);
 
   const height = ref(0);
-  watchEffect(() => {
-    if (height.value > 0 && height.value === editorContentHeight.value) return;
-    height.value = editorContentHeight.value;
-  });
+  watch(
+    editorContentHeight,
+    () => {
+      if (height.value > 0 && height.value === editorContentHeight.value) return;
+      height.value = editorContentHeight.value;
+    },
+    {
+      immediate: true,
+    },
+  );
 
   return {
     height,
