@@ -29,14 +29,6 @@
       @click="showDataSourceFieldSelect = !showDataSourceFieldSelect"
       ><MIcon :icon="Coin"></MIcon
     ></TMagicButton>
-
-    <DataSourceConfigPanel
-      ref="editDialog"
-      :disabled="!editable"
-      :values="dataSourceValues"
-      :title="dialogTitle"
-      @submit="submitDataSourceHandler"
-    ></DataSourceConfigPanel>
   </div>
 </template>
 
@@ -51,15 +43,14 @@ import type { DataSchema, DataSourceFieldType } from '@tmagic/schema';
 import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX } from '@tmagic/utils';
 
 import MIcon from '@editor/components/Icon.vue';
-import { useDataSourceEdit } from '@editor/hooks/use-data-source-edit';
-import DataSourceConfigPanel from '@editor/layouts/sidebar/data-source/DataSourceConfigPanel.vue';
-import type { DataSourceFieldSelectConfig, Services } from '@editor/type';
+import type { DataSourceFieldSelectConfig, EventBus, Services } from '@editor/type';
 
 defineOptions({
   name: 'MFieldsDataSourceFieldSelect',
 });
 
 const services = inject<Services>('services');
+const eventBus = inject<EventBus>('eventBus');
 const emit = defineEmits(['change']);
 
 const props = withDefaults(defineProps<FieldProps<DataSourceFieldSelectConfig>>(), {
@@ -181,7 +172,7 @@ const onChangeHandler = (value: any) => {
   emit('change', value);
 };
 
-const { editDialog, dataSourceValues, dialogTitle, editable, editHandler, submitDataSourceHandler } = useDataSourceEdit(
-  services?.dataSourceService,
-);
+const editHandler = (id: string) => {
+  eventBus?.emit('edit-data-source', id);
+};
 </script>

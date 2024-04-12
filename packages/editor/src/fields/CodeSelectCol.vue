@@ -2,13 +2,13 @@
   <div class="m-fields-code-select-col">
     <div class="code-select-container">
       <!-- 代码块下拉框 -->
-      <m-form-container
+      <MContainer
         class="select"
         :config="selectConfig"
         :model="model"
         :size="size"
         @change="onParamsChangeHandler"
-      ></m-form-container>
+      ></MContainer>
       <!-- 查看/编辑按钮 -->
       <Icon v-if="model[name]" class="icon" :icon="!notEditable ? Edit : View" @click="editCode(model[name])"></Icon>
     </div>
@@ -23,14 +23,6 @@
       :params-config="paramsConfig"
       @change="onParamsChangeHandler"
     ></CodeParams>
-
-    <CodeBlockEditor
-      ref="codeBlockEditor"
-      v-if="codeConfig"
-      :disabled="notEditable"
-      :content="codeConfig"
-      @submit="submitCodeBlockHandler"
-    ></CodeBlockEditor>
   </div>
 </template>
 
@@ -39,14 +31,12 @@ import { computed, inject, ref, watch } from 'vue';
 import { Edit, View } from '@element-plus/icons-vue';
 import { isEmpty, map } from 'lodash-es';
 
-import { createValues, type FieldProps, filterFunction, type FormState } from '@tmagic/form';
+import { createValues, type FieldProps, filterFunction, type FormState, MContainer } from '@tmagic/form';
 import type { Id } from '@tmagic/schema';
 
-import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
 import CodeParams from '@editor/components/CodeParams.vue';
 import Icon from '@editor/components/Icon.vue';
-import { useCodeBlockEdit } from '@editor/hooks/use-code-block-edit';
-import type { CodeParamStatement, CodeSelectColConfig, Services } from '@editor/type';
+import type { CodeParamStatement, CodeSelectColConfig, EventBus, Services } from '@editor/type';
 
 defineOptions({
   name: 'MFieldsCodeSelectCol',
@@ -54,6 +44,7 @@ defineOptions({
 
 const mForm = inject<FormState | undefined>('mForm');
 const services = inject<Services>('services');
+const eventBus = inject<EventBus>('eventBus');
 const emit = defineEmits(['change']);
 
 const notEditable = computed(() => filterFunction(mForm, props.config.notEditable, props));
@@ -127,5 +118,7 @@ const onParamsChangeHandler = (value: any) => {
   emit('change', props.model);
 };
 
-const { codeBlockEditor, codeConfig, editCode, submitCodeBlockHandler } = useCodeBlockEdit(services?.codeBlockService);
+const editCode = (id: string) => {
+  eventBus?.emit('edit-code', id);
+};
 </script>

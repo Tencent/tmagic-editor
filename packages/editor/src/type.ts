@@ -17,6 +17,7 @@
  */
 
 import type { Component } from 'vue';
+import type EventEmitter from 'events';
 import type { PascalCasedProperties } from 'type-fest';
 
 import type { ChildConfig, ColumnConfig, FilterFunction, FormConfig, FormItem, Input } from '@tmagic/form';
@@ -714,3 +715,16 @@ export type SyncHookPlugin<
   C extends Record<T[number], (...args: any) => any>,
 > = AddPrefixToObject<PascalCasedProperties<SyncBeforeHook<T, C>>, 'before'> &
   AddPrefixToObject<PascalCasedProperties<SyncAfterHook<T, C>>, 'after'>;
+
+export interface EventBusEvent {
+  'edit-data-source': [id: string];
+  'edit-code': [id: string];
+}
+
+export interface EventBus extends EventEmitter {
+  on<Name extends keyof EventBusEvent, Param extends EventBusEvent[Name]>(
+    eventName: Name,
+    listener: (...args: Param) => void,
+  ): this;
+  emit<Name extends keyof EventBusEvent, Param extends EventBusEvent[Name]>(eventName: Name, ...args: Param): boolean;
+}

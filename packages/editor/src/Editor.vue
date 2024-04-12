@@ -110,6 +110,8 @@
 </template>
 
 <script lang="ts" setup>
+import { EventEmitter } from 'events';
+
 import { provide } from 'vue';
 
 import type { MApp } from '@tmagic/schema';
@@ -134,7 +136,7 @@ import uiService from './services/ui';
 import keybindingConfig from './utils/keybinding-config';
 import { defaultEditorProps, EditorProps } from './editorProps';
 import { initServiceEvents, initServiceState } from './initService';
-import type { FrameworkSlots, PropsPanelSlots, Services, SidebarSlots, WorkspaceSlots } from './type';
+import type { EventBus, FrameworkSlots, PropsPanelSlots, Services, SidebarSlots, WorkspaceSlots } from './type';
 
 defineSlots<
   FrameworkSlots &
@@ -202,6 +204,8 @@ provide('services', services);
 
 provide('codeOptions', props.codeOptions);
 provide('stageOptions', stageOptions);
+
+provide<EventBus>('eventBus', new EventEmitter());
 
 defineExpose(services);
 </script>
