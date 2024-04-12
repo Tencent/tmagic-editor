@@ -371,8 +371,10 @@ export interface MenuBarData {
 export interface SideComponent extends MenuComponent {
   /** 显示文案 */
   text: string;
+  /** tab样式 */
+  tabStyle?: string | Record<string, any>;
   /** vue组件或url */
-  icon: Component<{}, {}, any>;
+  icon?: Component<{}, {}, any>;
   /** slide 唯一标识 key */
   $key: string;
 

@@ -8,6 +8,7 @@
         draggable="true"
         :key="config.$key ?? index"
         :class="{ 'is-active': activeTabName === config.text }"
+        :style="config.tabStyle || {}"
         @click="activeTabName = config.text || `${index}`"
         @dragstart="dragstartHandler"
         @dragend="dragendHandler(config.$key, $event)"
