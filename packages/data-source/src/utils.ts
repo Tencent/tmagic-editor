@@ -13,7 +13,7 @@ import {
   replaceChildNode,
 } from '@tmagic/utils';
 
-import type { DataSourceManagerData } from './types';
+import type { AsyncDataSourceResolveResult, DataSourceManagerData } from './types';
 
 export const compliedConditions = (node: MNode, data: DataSourceManagerData) => {
   if (!node.displayConds || !Array.isArray(node.displayConds) || !node.displayConds.length) return true;
@@ -150,4 +150,35 @@ export const compliedIteratorItems = (itemData: any, items: MNode[], dsId: strin
       dsId,
     );
   });
+};
+
+export const registerDataSourceOnDemand = async (
+  dsl: MApp,
+  dataSourceModules: Record<string, () => Promise<AsyncDataSourceResolveResult>>,
+) => {
+  const { dataSourceCondDeps = {}, dataSourceDeps = {}, dataSources = [] } = dsl;
+
+  const dsModuleMap: Record<string, () => Promise<AsyncDataSourceResolveResult>> = {};
+
+  dataSources.forEach((ds) => {
+    let dep = dataSourceCondDeps[ds.id] || {};
+
+    if (!Object.keys(dep).length) {
+      dep = dataSourceDeps[ds.id] || {};
+    }
+
+    if (Object.keys(dep).length && dataSourceModules[ds.type]) {
+      dsModuleMap[ds.type] = dataSourceModules[ds.type];
+    }
+  });
+
+  const modules = await Promise.all(Object.values(dsModuleMap).map((asyncModule) => asyncModule()));
+
+  const moduleMap: Record<string, any> = {};
+  modules.forEach((module, index) => {
+    const type = Object.keys(dsModuleMap)[index];
+    moduleMap[type] = module.default;
+  });
+
+  return moduleMap;
 };

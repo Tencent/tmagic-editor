@@ -1,6 +1,7 @@
 import type { AppCore, DataSourceSchema, HttpOptions, RequestFunction } from '@tmagic/schema';
 
-import HttpDataSource from './data-sources/Http';
+import type DataSource from './data-sources/Base';
+import type HttpDataSource from './data-sources/Http';
 
 export interface DataSourceOptions<T extends DataSourceSchema = DataSourceSchema> {
   schema: T;
@@ -42,3 +43,7 @@ export interface ChangeEvent {
   path?: string;
   updateData: any;
 }
+
+export type AsyncDataSourceResolveResult<T = typeof DataSource> = {
+  default: T;
+};

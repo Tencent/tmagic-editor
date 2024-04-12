@@ -29,15 +29,15 @@ Promise.all([
   import('../.tmagic/comp-entry'),
   import('../.tmagic/plugin-entry'),
   import('../.tmagic/datasource-entry'),
-]).then(([components, plugins, datasources]) => {
+]).then(([components, plugins, dataSources]) => {
   const magicApp = createApp(App);
 
   Object.entries(components.default).forEach(([type, component]: [string, any]) => {
     magicApp.component(`magic-ui-${type}`, component);
   });
 
-  Object.entries(datasources).forEach(([type, ds]: [string, any]) => {
-    DataSourceManager.registe(type, ds);
+  Object.entries(dataSources.default).forEach(([type, ds]: [string, any]) => {
+    DataSourceManager.register(type, ds);
   });
 
   Object.values(plugins.default).forEach((plugin: any) => {

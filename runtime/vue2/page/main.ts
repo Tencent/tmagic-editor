@@ -23,7 +23,7 @@ import { DataSourceManager } from '@tmagic/data-source';
 import { getUrlParam } from '@tmagic/utils';
 
 import components from '../.tmagic/comp-entry';
-import datasources from '../.tmagic/datasource-entry';
+import dataSources from '../.tmagic/datasource-entry';
 import plugins from '../.tmagic/plugin-entry';
 
 import request from './utils/request';
@@ -38,7 +38,7 @@ Object.keys(components).forEach((type: string) => {
   Vue.component(`magic-ui-${type}`, components[type]);
 });
 
-Object.entries(datasources).forEach(([type, ds]: [string, any]) => {
+Object.entries(dataSources).forEach(([type, ds]: [string, any]) => {
   DataSourceManager.register(type, ds);
 });
 
