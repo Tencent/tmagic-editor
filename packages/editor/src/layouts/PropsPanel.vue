@@ -3,7 +3,7 @@
     <slot name="props-panel-header"></slot>
     <MForm
       ref="configForm"
-      :class="`m-editor-props-panel ${propsPanelSize}`"
+      :class="propsPanelSize"
       :popper-class="`m-editor-props-panel-popper ${propsPanelSize}`"
       :size="propsPanelSize"
       :init-values="values"
@@ -14,6 +14,7 @@
     ></MForm>
 
     <TMagicButton
+      v-if="!disabledShowSrc"
       class="m-editor-props-panel-src-icon"
       circle
       size="large"
@@ -57,6 +58,7 @@ defineOptions({
 });
 
 defineProps<{
+  disabledShowSrc?: boolean;
   extendState?: (state: FormState) => Record<string, any> | Promise<Record<string, any>>;
 }>();
 

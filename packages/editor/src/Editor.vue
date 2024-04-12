@@ -81,6 +81,7 @@
       <slot name="props-panel">
         <PropsPanel
           :extend-state="extendFormState"
+          :disabled-show-src="disabledShowSrc"
           @mounted="(instance: any) => $emit('props-panel-mounted', instance)"
           @form-error="(e: any) => $emit('props-form-error', e)"
           @submit-error="(e: any) => $emit('props-submit-error', e)"
