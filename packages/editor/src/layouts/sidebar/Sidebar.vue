@@ -9,7 +9,7 @@
         :key="config.$key ?? index"
         :class="{ 'is-active': activeTabName === config.text }"
         :style="config.tabStyle || {}"
-        @click="activeTabName = config.text || `${index}`"
+        @click="activeTabName = config.text || config.$key || `${index}`"
         @dragstart="dragstartHandler"
         @dragend="dragendHandler(config.$key, $event)"
       >
@@ -21,7 +21,7 @@
       class="m-editor-sidebar-content"
       v-for="(config, index) in sideBarItems"
       :key="config.$key ?? index"
-      v-show="activeTabName === config.text"
+      v-show="[config.text, config.$key, `${index}`].includes(activeTabName)"
     >
       <component
         v-if="config && !floatBoxStates[config.$key]?.status"
@@ -152,6 +152,7 @@ import {
   type SidebarSlots,
   type SideComponent,
   type SideItem,
+  SideItemKey,
 } from '@editor/type';
 
 import CodeBlockListPanel from './code-block/CodeBlockListPanel.vue';
@@ -172,7 +173,11 @@ const props = withDefaults(
     customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
   }>(),
   {
-    data: () => ({ type: 'tabs', status: '组件', items: ['component-list', 'layer', 'code-block', 'data-source'] }),
+    data: () => ({
+      type: 'tabs',
+      status: '组件',
+      items: [SideItemKey.COMPONENT_LIST, SideItemKey.LAYER, SideItemKey.CODE_BLOCK, SideItemKey.DATA_SOURCE],
+    }),
   },
 );
 
@@ -185,8 +190,8 @@ const activeTabName = ref(props.data?.status);
 
 const getItemConfig = (data: SideItem): SideComponent => {
   const map: Record<string, SideComponent> = {
-    'component-list': {
-      $key: 'component-list',
+    [SideItemKey.COMPONENT_LIST]: {
+      $key: SideItemKey.COMPONENT_LIST,
       type: 'component',
       icon: Goods,
       text: '组件',
@@ -205,7 +210,7 @@ const getItemConfig = (data: SideItem): SideComponent => {
       component: LayerPanel,
       slots: {},
     },
-    'code-block': {
+    [SideItemKey.CODE_BLOCK]: {
       $key: 'code-block',
       type: 'component',
       icon: EditPen,
@@ -213,8 +218,8 @@ const getItemConfig = (data: SideItem): SideComponent => {
       component: CodeBlockListPanel,
       slots: {},
     },
-    'data-source': {
-      $key: 'data-source',
+    [SideItemKey.DATA_SOURCE]: {
+      $key: SideItemKey.DATA_SOURCE,
       type: 'component',
       icon: Coin,
       text: '数据源',
@@ -227,6 +232,16 @@ const getItemConfig = (data: SideItem): SideComponent => {
 };
 
 const sideBarItems = computed(() => props.data.items.map((item) => getItemConfig(item)));
+
+watch(
+  sideBarItems,
+  (items) => {
+    services?.uiService.set('sideBarItems', items);
+  },
+  {
+    immediate: true,
+  },
+);
 
 watch(
   () => props.data.status,

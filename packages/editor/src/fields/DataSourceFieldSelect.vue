@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 100%; display: flex; align-items: center">
+  <div class="m-fields-data-source-field-select">
     <component
       style="width: 100%"
       :is="tagName"
@@ -14,13 +14,15 @@
       :prop="`${prop}${prop ? '.' : ''}${name}`"
       @change="onChangeHandler"
     ></component>
+
     <TMagicButton
-      v-if="(showDataSourceFieldSelect || !config.fieldConfig) && selectedDataSourceId"
-      style="margin-left: 5px"
+      v-if="(showDataSourceFieldSelect || !config.fieldConfig) && selectedDataSourceId && hasDataSourceSidePanel"
+      class="m-fields-select-action-button"
       :size="size"
       @click="editHandler(selectedDataSourceId)"
-      ><MIcon :icon="Edit"></MIcon
+      ><MIcon :icon="!notEditable ? Edit : View"></MIcon
     ></TMagicButton>
+
     <TMagicButton
       v-if="config.fieldConfig"
       style="margin-left: 5px"
@@ -34,16 +36,17 @@
 
 <script setup lang="ts">
 import { computed, inject, ref, resolveComponent, watch } from 'vue';
-import { Coin, Edit } from '@element-plus/icons-vue';
+import { Coin, Edit, View } from '@element-plus/icons-vue';
 
 import { TMagicButton } from '@tmagic/design';
 import type { CascaderConfig, CascaderOption, FieldProps, FormState } from '@tmagic/form';
-import { MCascader } from '@tmagic/form';
+import { filterFunction, MCascader } from '@tmagic/form';
 import type { DataSchema, DataSourceFieldType } from '@tmagic/schema';
 import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX } from '@tmagic/utils';
 
 import MIcon from '@editor/components/Icon.vue';
 import type { DataSourceFieldSelectConfig, EventBus, Services } from '@editor/type';
+import { SideItemKey } from '@editor/type';
 
 defineOptions({
   name: 'MFieldsDataSourceFieldSelect',
@@ -56,6 +59,12 @@ const emit = defineEmits(['change']);
 const props = withDefaults(defineProps<FieldProps<DataSourceFieldSelectConfig>>(), {
   disabled: false,
 });
+
+const notEditable = computed(() => filterFunction(mForm, props.config.notEditable, props));
+
+const hasDataSourceSidePanel = computed(() =>
+  (services?.uiService.get('sideBarItems') || []).find((item) => item.$key === SideItemKey.DATA_SOURCE),
+);
 
 const selectedDataSourceId = computed(() => {
   const value = props.model[props.name];

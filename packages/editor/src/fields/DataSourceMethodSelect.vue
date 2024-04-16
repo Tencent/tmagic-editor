@@ -8,12 +8,15 @@
         :size="size"
         @change="onChangeHandler"
       ></MContainer>
-      <Icon
-        v-if="model[name] && isCustomMethod"
-        class="icon"
-        :icon="!notEditable ? Edit : View"
+
+      <TMagicButton
+        v-if="model[name] && isCustomMethod && hasDataSourceSidePanel"
+        class="m-fields-select-action-button"
+        :size="size"
         @click="editCodeHandler"
-      ></Icon>
+      >
+        <MIcon :icon="!notEditable ? Edit : View"></MIcon>
+      </TMagicButton>
     </div>
 
     <CodeParams
@@ -32,12 +35,14 @@
 import { computed, inject, ref } from 'vue';
 import { Edit, View } from '@element-plus/icons-vue';
 
+import { TMagicButton } from '@tmagic/design';
 import { createValues, type FieldProps, filterFunction, type FormState, MContainer } from '@tmagic/form';
 import type { Id } from '@tmagic/schema';
 
 import CodeParams from '@editor/components/CodeParams.vue';
-import Icon from '@editor/components/Icon.vue';
+import MIcon from '@editor/components/Icon.vue';
 import type { CodeParamStatement, DataSourceMethodSelectConfig, EventBus, Services } from '@editor/type';
+import { SideItemKey } from '@editor/type';
 
 defineOptions({
   name: 'MFieldsDataSourceMethodSelect',
@@ -54,6 +59,10 @@ const dataSourceService = services?.dataSourceService;
 const props = withDefaults(defineProps<FieldProps<DataSourceMethodSelectConfig>>(), {
   disabled: false,
 });
+
+const hasDataSourceSidePanel = computed(() =>
+  (services?.uiService.get('sideBarItems') || []).find((item) => item.$key === SideItemKey.DATA_SOURCE),
+);
 
 const notEditable = computed(() => filterFunction(mForm, props.config.notEditable, props));
 

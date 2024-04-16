@@ -9,8 +9,16 @@
         :size="size"
         @change="onParamsChangeHandler"
       ></MContainer>
+
       <!-- 查看/编辑按钮 -->
-      <Icon v-if="model[name]" class="icon" :icon="!notEditable ? Edit : View" @click="editCode(model[name])"></Icon>
+      <TMagicButton
+        v-if="model[name] && hasCodeBlockSidePanel"
+        class="m-fields-select-action-button"
+        :size="size"
+        @click="editCode(model[name])"
+      >
+        <MIcon :icon="!notEditable ? Edit : View"></MIcon>
+      </TMagicButton>
     </div>
 
     <!-- 参数填写框 -->
@@ -31,12 +39,14 @@ import { computed, inject, ref, watch } from 'vue';
 import { Edit, View } from '@element-plus/icons-vue';
 import { isEmpty, map } from 'lodash-es';
 
+import { TMagicButton } from '@tmagic/design';
 import { createValues, type FieldProps, filterFunction, type FormState, MContainer } from '@tmagic/form';
 import type { Id } from '@tmagic/schema';
 
 import CodeParams from '@editor/components/CodeParams.vue';
-import Icon from '@editor/components/Icon.vue';
+import MIcon from '@editor/components/Icon.vue';
 import type { CodeParamStatement, CodeSelectColConfig, EventBus, Services } from '@editor/type';
+import { SideItemKey } from '@editor/type';
 
 defineOptions({
   name: 'MFieldsCodeSelectCol',
@@ -47,10 +57,15 @@ const services = inject<Services>('services');
 const eventBus = inject<EventBus>('eventBus');
 const emit = defineEmits(['change']);
 
-const notEditable = computed(() => filterFunction(mForm, props.config.notEditable, props));
 const props = withDefaults(defineProps<FieldProps<CodeSelectColConfig>>(), {
   disabled: false,
 });
+
+const notEditable = computed(() => filterFunction(mForm, props.config.notEditable, props));
+
+const hasCodeBlockSidePanel = computed(() =>
+  (services?.uiService.get('sideBarItems') || []).find((item) => item.$key === SideItemKey.CODE_BLOCK),
+);
 
 /**
  * 根据代码块id获取代码块参数配置
