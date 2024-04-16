@@ -1,7 +1,6 @@
 <template>
   <div class="m-fields-data-source-field-select">
     <component
-      style="width: 100%"
       :is="tagName"
       :config="showDataSourceFieldSelect || !config.fieldConfig ? cascaderConfig : config.fieldConfig"
       :model="model"
