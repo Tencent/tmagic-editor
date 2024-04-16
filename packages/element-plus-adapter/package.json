@@ -1,5 +1,5 @@
 {
-  "version": "1.4.3",
+  "version": "1.4.4",
   "name": "@tmagic/element-plus-adapter",
   "type": "module",
   "sideEffects": [
@@ -37,12 +37,12 @@
     "typescript"
   ],
   "dependencies": {
-    "@tmagic/design": "1.4.3",
+    "@tmagic/design": "1.4.4",
     "element-plus": "^2.6.1",
     "vue": "^3.4.21"
   },
   "peerDependencies": {
-    "@tmagic/design": "1.4.3",
+    "@tmagic/design": "1.4.4",
     "element-plus": "^2.6.1",
     "vue": "^3.4.21"
   },

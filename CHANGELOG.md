@@ -1,3 +1,23 @@
+## [1.4.4](https://github.com/Tencent/tmagic-editor/compare/v1.4.3...v1.4.4) (2024-04-16)
+
+
+### Bug Fixes
+
+* **editor:** floating-box高度无法改变 ([872c978](https://github.com/Tencent/tmagic-editor/commit/872c978b9b471e8e1bc2f42d8ce0865def159950))
+* **editor:** 在组件属性配置表单中编辑数据源方法无法保存问题 ([b1e79c1](https://github.com/Tencent/tmagic-editor/commit/b1e79c1e05a164c057a53ac9d895ae744bd1cb5a))
+* **playground:** 画布尺寸切换无效 ([3af247f](https://github.com/Tencent/tmagic-editor/commit/3af247febb58d0a042c6735c56fd8b7d5c445fe8)), closes [#586](https://github.com/Tencent/tmagic-editor/issues/586)
+* **runtime:** 更新page后，在编辑器中无法打开蒙层 ([69c555f](https://github.com/Tencent/tmagic-editor/commit/69c555f567e09f872501f024080a12fc3192bf7c)), closes [#587](https://github.com/Tencent/tmagic-editor/issues/587)
+
+
+### Features
+
+* **cli,data-source,runtime:** 数据源支持动态按需加载 ([0061331](https://github.com/Tencent/tmagic-editor/commit/006133102fbb1e18306a18f77cbafa65f57302fa))
+* **editor:** 优化数据源选择器与代码选择的编辑按钮 ([fc1a7a0](https://github.com/Tencent/tmagic-editor/commit/fc1a7a09fffb90f65616ffbbe72fc11561d8f8ee))
+* **editor:** 支持配置左侧边栏tab style ([4054c6e](https://github.com/Tencent/tmagic-editor/commit/4054c6ed572c43e879fa59ad9b60d02f63cbc17d))
+* **editor:** 新增配置控制属性配置面板右下角的源码按钮是否显示 ([92049cf](https://github.com/Tencent/tmagic-editor/commit/92049cf2516834632eebf639e90a87f568111276))
+
+
+
 ## [1.4.3](https://github.com/Tencent/tmagic-editor/compare/v1.4.2...v1.4.3) (2024-03-29)
 
 
