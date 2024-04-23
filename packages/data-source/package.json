@@ -20,6 +20,7 @@
   "scripts": {
     "build": "npm run build:type && vite build --mode=es && vite build --mode=umd",
     "build:type": "npm run clear:type && tsc --declaration --emitDeclarationOnly --project tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "check:type": "tsc --noEmit --project tsconfig.build.json",
     "clear:type": "rimraf ./types"
   },
   "engines": {

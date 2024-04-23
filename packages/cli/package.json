@@ -6,7 +6,8 @@
   "license": "Apache-2.0",
   "scripts": {
     "build": "pnpm clean && tsc -b tsconfig.build.json",
-    "clean": "rimraf lib *.tsbuildinfo"
+    "clean": "rimraf lib *.tsbuildinfo",
+    "check:type": "tsc --noEmit --project tsconfig.build.json"
   },
   "bin": {
     "tmagic": "bin/tmagic.js"

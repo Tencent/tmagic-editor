@@ -20,6 +20,7 @@
   "scripts": {
     "build": "npm run build:type && vite build",
     "build:type": "npm run clear:type && tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
+    "check:type": "tsc --noEmit --project tsconfig.build.json",
     "clear:type": "rimraf ./types"
   },
   "engines": {
