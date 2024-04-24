@@ -45,7 +45,8 @@ import { computed, inject, markRaw, nextTick, onBeforeUnmount, onMounted, ref, t
 import { cloneDeep } from 'lodash-es';
 
 import type { MApp, MContainer } from '@tmagic/schema';
-import StageCore, { calcValueByFontsize, getOffset, Runtime } from '@tmagic/stage';
+import StageCore, { getOffset, Runtime } from '@tmagic/stage';
+import { calcValueByFontsize } from '@tmagic/utils';
 
 import ScrollViewer from '@editor/components/ScrollViewer.vue';
 import { useStage } from '@editor/hooks/use-stage';
@@ -220,8 +221,8 @@ const dropHandler = async (e: DragEvent) => {
       left = e.clientX - containerRect.left;
     } else if (layout === Layout.ABSOLUTE) {
       position = 'absolute';
-      top = e.clientY - containerRect.top + scrollTop;
-      left = e.clientX - containerRect.left + scrollLeft;
+      top = calcValueByFontsize(doc, e.clientY - containerRect.top + scrollTop);
+      left = calcValueByFontsize(doc, e.clientX - containerRect.left + scrollLeft);
 
       if (parentEl && doc) {
         const { left: parentLeft, top: parentTop } = getOffset(parentEl);

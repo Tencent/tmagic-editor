@@ -32,10 +32,12 @@ import type {
 } from 'moveable';
 import MoveableHelper from 'moveable-helper';
 
+import { calcValueByFontsize } from '@tmagic/utils';
+
 import { DRAG_EL_ID_PREFIX, GHOST_EL_ID_PREFIX, Mode, ZIndex } from './const';
 import TargetShadow from './TargetShadow';
 import type { DragResizeHelperConfig, Rect, TargetElement } from './types';
-import { calcValueByFontsize, getAbsolutePosition, getBorderWidth, getMarginValue, getOffset } from './util';
+import { getAbsolutePosition, getBorderWidth, getMarginValue, getOffset } from './util';
 
 /**
  * 拖拽/改变大小等操作发生时，moveable会抛出各种状态事件，DragResizeHelper负责响应这些事件，对目标节点target和拖拽节点targetShadow进行修改；

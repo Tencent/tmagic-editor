@@ -21,7 +21,7 @@ import serialize from 'serialize-javascript';
 import type { Id, MApp, MContainer, MNode, MPage, MPageFragment } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
-import { getNodePath, isNumber, isPage, isPageFragment, isPop } from '@tmagic/utils';
+import { calcValueByFontsize, getNodePath, isNumber, isPage, isPageFragment, isPop } from '@tmagic/utils';
 
 import { Layout } from '@editor/type';
 export const COPY_STORAGE_KEY = '$MagicEditorCopyData';
@@ -106,13 +106,16 @@ const getMiddleTop = (node: MNode, parentNode: MNode, stage: StageCore | null) =
   }
 
   const { height: parentHeight } = parentNode.style;
-
+  // wrapperHeight 是未 calcValue的高度, 所以要将其calcValueByFontsize一下, 否则在pad or pc端计算的结果有误
+  const { scrollTop = 0, wrapperHeight } = stage.mask;
+  const wrapperHeightDeal = calcValueByFontsize(stage.renderer.getDocument()!, wrapperHeight);
+  const scrollTopDeal = calcValueByFontsize(stage.renderer.getDocument()!, scrollTop);
   if (isPage(parentNode)) {
-    const { scrollTop = 0, wrapperHeight } = stage.mask;
-    return (wrapperHeight - height) / 2 + scrollTop;
+    return (wrapperHeightDeal - height) / 2 + scrollTopDeal;
   }
 
-  return (parentHeight - height) / 2;
+  // 如果容器的元素高度大于当前视口高度的2倍, 添加的元素居中位置也会看不见, 所以要取最小值计算
+  return (Math.min(parentHeight, wrapperHeightDeal) - height) / 2;
 };
 
 export const getInitPositionStyle = (style: Record<string, any> = {}, layout: Layout) => {
