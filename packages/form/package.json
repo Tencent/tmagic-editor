@@ -1,5 +1,5 @@
 {
-  "version": "1.4.2",
+  "version": "1.4.4",
   "name": "@tmagic/form",
   "type": "module",
   "sideEffects": [
@@ -27,7 +27,7 @@
     "build": "npm run build:type && vite build",
     "build:type": "npm run clear:type && vue-tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
     "clear:type": "rimraf ./types",
-    "type:check": "vue-tsc --noEmit"
+    "check:type": "vue-tsc --noEmit --project tsconfig.build.json"
   },
   "engines": {
     "node": ">=18"
@@ -38,8 +38,8 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
-    "@tmagic/design": "1.4.2",
-    "@tmagic/utils": "1.4.2",
+    "@tmagic/design": "1.4.4",
+    "@tmagic/utils": "1.4.4",
     "lodash-es": "^4.17.21",
     "sortablejs": "^1.14.0",
     "vue": "^3.4.21"

@@ -1,5 +1,5 @@
 {
-  "version": "1.4.2",
+  "version": "1.4.4",
   "name": "@tmagic/utils",
   "type": "module",
   "main": "dist/tmagic-utils.umd.cjs",
@@ -20,7 +20,8 @@
   "scripts": {
     "build": "rimraf ./dist && npm run build:type && vite build --mode=es && vite build --mode=umd",
     "build:type": "npm run clear:type && tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
-    "clear:type": "rimraf ./types"
+    "clear:type": "rimraf ./types",
+    "check:type": "tsc --noEmit --project tsconfig.build.json"
   },
   "engines": {
     "node": ">=18"
@@ -30,7 +31,7 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "@tmagic/schema": "1.4.2",
+    "@tmagic/schema": "1.4.4",
     "dayjs": "^1.11.4",
     "lodash-es": "^4.17.21"
   },

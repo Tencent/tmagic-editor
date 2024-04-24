@@ -80,6 +80,8 @@ export interface EditorProps {
   disabledPageFragment?: boolean;
   /** 禁用双击在浮层中单独编辑选中组件 */
   disabledStageOverlay?: boolean;
+  /** 禁用属性配置面板右下角显示源码的按钮 */
+  disabledShowSrc?: boolean;
   /** 中间工作区域中画布渲染的内容 */
   render?: (stage: StageCore) => HTMLDivElement | Promise<HTMLDivElement>;
   /** 选中时会在画布上复制出一个大小相同的dom，实际拖拽的是这个dom，此方法用于干预这个dom的生成方式 */
@@ -101,6 +103,7 @@ export const defaultEditorProps = {
   containerHighlightClassName: CONTAINER_HIGHLIGHT_CLASS_NAME,
   containerHighlightDuration: 800,
   containerHighlightType: ContainerHighlightType.DEFAULT,
+  disabledShowSrc: false,
   componentGroupList: () => [],
   datasourceList: () => [],
   menu: () => ({ left: [], right: [] }),

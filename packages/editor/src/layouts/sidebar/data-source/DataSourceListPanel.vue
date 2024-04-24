@@ -46,7 +46,7 @@ import { TMagicButton, TMagicPopover, TMagicScrollbar } from '@tmagic/design';
 import SearchInput from '@editor/components/SearchInput.vue';
 import ToolButton from '@editor/components/ToolButton.vue';
 import { useDataSourceEdit } from '@editor/hooks/use-data-source-edit';
-import type { DataSourceListSlots, Services } from '@editor/type';
+import type { DataSourceListSlots, EventBus, Services } from '@editor/type';
 
 import DataSourceConfigPanel from './DataSourceConfigPanel.vue';
 import DataSourceList from './DataSourceList.vue';
@@ -57,6 +57,7 @@ defineOptions({
   name: 'MEditorDataSourceListPanel',
 });
 
+const eventBus = inject<EventBus>('eventBus');
 const { dataSourceService } = inject<Services>('services') || {};
 
 const { editDialog, dataSourceValues, dialogTitle, editable, editHandler, submitDataSourceHandler } =
@@ -98,4 +99,8 @@ const dataSourceList = ref<InstanceType<typeof DataSourceList>>();
 const filterTextChangeHandler = (val: string) => {
   dataSourceList.value?.filter(val);
 };
+
+eventBus?.on('edit-data-source', (id: string) => {
+  editHandler(id);
+});
 </script>

@@ -1,12 +1,13 @@
 {
-  "version": "1.4.2",
+  "version": "1.4.4",
   "name": "@tmagic/cli",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "license": "Apache-2.0",
   "scripts": {
     "build": "pnpm clean && tsc -b tsconfig.build.json",
-    "clean": "rimraf lib *.tsbuildinfo"
+    "clean": "rimraf lib *.tsbuildinfo",
+    "check:type": "tsc --noEmit --project tsconfig.build.json"
   },
   "bin": {
     "tmagic": "bin/tmagic.js"

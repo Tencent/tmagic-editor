@@ -1,5 +1,5 @@
 {
-  "version": "1.4.2",
+  "version": "1.4.4",
   "name": "@tmagic/tdesign-vue-next-adapter",
   "type": "module",
   "sideEffects": [
@@ -21,7 +21,7 @@
     "build": "npm run build:type && vite build",
     "build:type": "npm run clear:type && tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
     "clear:type": "rimraf ./types",
-    "type:check": "vue-tsc --noEmit"
+    "check:type": "tsc --noEmit --project tsconfig.build.json"
   },
   "engines": {
     "node": ">=18"
@@ -38,12 +38,12 @@
     "typescript"
   ],
   "dependencies": {
-    "@tmagic/design": "1.4.2",
+    "@tmagic/design": "1.4.4",
     "tdesign-vue-next": "^1.8.1",
     "vue": "^3.4.21"
   },
   "peerDependencies": {
-    "@tmagic/design": "1.4.2",
+    "@tmagic/design": "1.4.4",
     "tdesign-vue-next": "^1.8.1",
     "vue": "^3.4.21"
   },

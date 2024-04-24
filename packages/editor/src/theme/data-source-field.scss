@@ -1,0 +1,12 @@
+.m-fields-data-source-select,
+.m-fields-data-source-field-select,
+.m-fields-data-source-method-select .data-source-method-select-container,
+.m-fields-code-select-col .code-select-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+
+  .m-fields-select-action-button {
+    margin-left: 5px;
+  }
+}

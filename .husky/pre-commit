@@ -2,4 +2,5 @@
 . "$(dirname "$0")/_/husky.sh"
 
 npx lint-staged
-pnpm --filter "@tmagic/*" build:type
+
+pnpm --filter "@tmagic/*" check:type

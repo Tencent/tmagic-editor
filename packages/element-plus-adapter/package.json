@@ -1,5 +1,5 @@
 {
-  "version": "1.4.2",
+  "version": "1.4.4",
   "name": "@tmagic/element-plus-adapter",
   "type": "module",
   "sideEffects": [
@@ -20,7 +20,8 @@
   "scripts": {
     "build": "npm run build:type && vite build",
     "build:type": "npm run clear:type && tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
-    "clear:type": "rimraf ./types"
+    "clear:type": "rimraf ./types",
+    "check:type": "tsc --noEmit --project tsconfig.build.json"
   },
   "engines": {
     "node": ">=18"
@@ -37,12 +38,12 @@
     "typescript"
   ],
   "dependencies": {
-    "@tmagic/design": "1.4.2",
+    "@tmagic/design": "1.4.4",
     "element-plus": "^2.6.1",
     "vue": "^3.4.21"
   },
   "peerDependencies": {
-    "@tmagic/design": "1.4.2",
+    "@tmagic/design": "1.4.4",
     "element-plus": "^2.6.1",
     "vue": "^3.4.21"
   },

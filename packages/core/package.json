@@ -1,5 +1,5 @@
 {
-  "version": "1.4.2",
+  "version": "1.4.4",
   "name": "@tmagic/core",
   "type": "module",
   "sideEffects": [
@@ -24,6 +24,7 @@
   "scripts": {
     "build": "npm run build:type && vite build",
     "build:type": "npm run clear:type && tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
+    "check:type": "tsc --noEmit --project tsconfig.build.json",
     "clear:type": "rimraf ./types"
   },
   "engines": {
@@ -37,9 +38,9 @@
     "vue"
   ],
   "dependencies": {
-    "@tmagic/data-source": "1.4.2",
-    "@tmagic/schema": "1.4.2",
-    "@tmagic/utils": "1.4.2",
+    "@tmagic/data-source": "1.4.4",
+    "@tmagic/schema": "1.4.4",
+    "@tmagic/utils": "1.4.4",
     "events": "^3.3.0",
     "lodash-es": "^4.17.21"
   },

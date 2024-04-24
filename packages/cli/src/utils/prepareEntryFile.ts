@@ -22,6 +22,13 @@ export const prepareEntryFile = async (app: App) => {
     'value-entry': generateContent(useTs, EntryType.VALUE, moduleMainFilePath.valueMap),
     'event-entry': generateContent(useTs, EntryType.EVENT, moduleMainFilePath.eventMap),
     'datasource-entry': generateContent(useTs, EntryType.DATASOURCE, moduleMainFilePath.datasourceMap),
+    'async-datasource-entry': generateContent(
+      useTs,
+      EntryType.DATASOURCE,
+      moduleMainFilePath.datasourceMap,
+      '',
+      dynamicImport,
+    ),
     'ds-config-entry': generateContent(useTs, EntryType.DS_CONFIG, moduleMainFilePath.dsConfigMap),
     'ds-value-entry': generateContent(useTs, EntryType.DS_VALUE, moduleMainFilePath.dsValueMap),
     'ds-event-entry': generateContent(useTs, EntryType.DS_EVENT, moduleMainFilePath.dsEventMap),
@@ -43,7 +50,7 @@ export const prepareEntryFile = async (app: App) => {
   });
 };
 
-const generateContent = (
+export const generateContent = (
   useTs: boolean,
   type: EntryType,
   map: Record<string, string> = {},

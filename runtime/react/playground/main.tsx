@@ -28,7 +28,7 @@ import { AppContent } from '@tmagic/ui-react';
 import { replaceChildNode } from '@tmagic/utils';
 
 import components from '../.tmagic/comp-entry';
-import datasources from '../.tmagic/datasource-entry';
+import dataSources from '../.tmagic/datasource-entry';
 import plugins from '../.tmagic/plugin-entry';
 
 import App from './App';
@@ -41,8 +41,8 @@ declare global {
   }
 }
 
-Object.entries(datasources).forEach(([type, ds]: [string, any]) => {
-  DataSourceManager.registe(type, ds);
+Object.entries(dataSources).forEach(([type, ds]: [string, any]) => {
+  DataSourceManager.register(type, ds);
 });
 
 const app = new Core({

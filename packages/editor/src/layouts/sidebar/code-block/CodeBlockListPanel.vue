@@ -36,7 +36,7 @@ import type { Id } from '@tmagic/schema';
 import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
 import SearchInput from '@editor/components/SearchInput.vue';
 import { useCodeBlockEdit } from '@editor/hooks/use-code-block-edit';
-import type { CodeBlockListPanelSlots, CodeDeleteErrorType, Services } from '@editor/type';
+import type { CodeBlockListPanelSlots, CodeDeleteErrorType, EventBus, Services } from '@editor/type';
 
 import CodeBlockList from './CodeBlockList.vue';
 
@@ -50,6 +50,7 @@ defineProps<{
   customError?: (id: Id, errorType: CodeDeleteErrorType) => any;
 }>();
 
+const eventBus = inject<EventBus>('eventBus');
 const { codeBlockService } = inject<Services>('services') || {};
 
 const editable = computed(() => codeBlockService?.getEditStatus());
@@ -62,4 +63,8 @@ const codeBlockList = ref<InstanceType<typeof CodeBlockList>>();
 const filterTextChangeHandler = (val: string) => {
   codeBlockList.value?.filter(val);
 };
+
+eventBus?.on('edit-code', (id: string) => {
+  editCode(id);
+});
 </script>

@@ -29,6 +29,7 @@ export default defineConfig(({ mode }) => ({
         ? [{ find: /^@data-source/, replacement: path.join(__dirname, './src') }]
         : [
             { find: /^@data-source/, replacement: path.join(__dirname, './src') },
+            { find: /^@tmagic\/dep/, replacement: path.join(__dirname, '../dep/src/index.ts') },
             { find: /^@tmagic\/schema/, replacement: path.join(__dirname, '../schema/src/index.ts') },
           ],
   },

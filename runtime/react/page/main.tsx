@@ -25,7 +25,7 @@ import { AppContent } from '@tmagic/ui-react';
 import { getUrlParam } from '@tmagic/utils';
 
 import components from '../.tmagic/comp-entry';
-import datasources from '../.tmagic/datasource-entry';
+import dataSources from '../.tmagic/datasource-entry';
 import plugins from '../.tmagic/plugin-entry';
 
 import App from './App';
@@ -53,7 +53,7 @@ const getLocalConfig = (): MApp[] => {
 
 window.magicDSL = [];
 
-Object.entries(datasources).forEach(([type, ds]: [string, any]) => {
+Object.entries(dataSources).forEach(([type, ds]: [string, any]) => {
   DataSourceManager.register(type, ds);
 });
 

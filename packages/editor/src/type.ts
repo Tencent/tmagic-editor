@@ -17,6 +17,7 @@
  */
 
 import type { Component } from 'vue';
+import type EventEmitter from 'events';
 import type { PascalCasedProperties } from 'type-fest';
 
 import type { ChildConfig, ColumnConfig, FilterFunction, FormConfig, FormItem, Input } from '@tmagic/form';
@@ -238,6 +239,8 @@ export interface UiState {
   showAddPageButton: boolean;
   /** 是否隐藏侧边栏 */
   hideSlideBar: boolean;
+  /** 侧边栏面板配置 */
+  sideBarItems: SideComponent[];
 
   // navMenu 的宽高
   navMenuRect: {
@@ -370,8 +373,10 @@ export interface MenuBarData {
 export interface SideComponent extends MenuComponent {
   /** 显示文案 */
   text: string;
+  /** tab样式 */
+  tabStyle?: string | Record<string, any>;
   /** vue组件或url */
-  icon: Component<{}, {}, any>;
+  icon?: any;
   /** slide 唯一标识 key */
   $key: string;
 
@@ -384,12 +389,19 @@ export interface SideComponent extends MenuComponent {
   };
 }
 
+export enum SideItemKey {
+  COMPONENT_LIST = 'component-list',
+  LAYER = 'layer',
+  CODE_BLOCK = 'code-block',
+  DATA_SOURCE = 'data-source',
+}
+
 /**
  * component-list: 组件列表
  * layer: 已选组件树
  * code-block: 代码块
  */
-export type SideItem = 'component-list' | 'layer' | 'code-block' | 'data-source' | SideComponent;
+export type SideItem = `${SideItemKey}` | SideComponent;
 
 /** 工具栏 */
 export interface SideBarData {
@@ -621,6 +633,8 @@ export interface DataSourceSelect extends FormItem, Input {
    * value: 要编译（数据源data）
    * */
   value?: 'id' | 'value';
+  /** 是否可以编辑数据源，disable表示的是是否可以选择数据源 */
+  notEditable?: boolean | FilterFunction;
 }
 
 export interface DataSourceMethodSelectConfig extends FormItem {
@@ -640,6 +654,8 @@ export interface DataSourceFieldSelectConfig extends FormItem {
   checkStrictly?: boolean;
   dataSourceFieldType?: DataSourceFieldType[];
   fieldConfig?: ChildConfig;
+  /** 是否可以编辑数据源，disable表示的是是否可以选择数据源 */
+  notEditable?: boolean | FilterFunction;
 }
 
 /** 可新增的数据源类型选项 */
@@ -714,3 +730,16 @@ export type SyncHookPlugin<
   C extends Record<T[number], (...args: any) => any>,
 > = AddPrefixToObject<PascalCasedProperties<SyncBeforeHook<T, C>>, 'before'> &
   AddPrefixToObject<PascalCasedProperties<SyncAfterHook<T, C>>, 'after'>;
+
+export interface EventBusEvent {
+  'edit-data-source': [id: string];
+  'edit-code': [id: string];
+}
+
+export interface EventBus extends EventEmitter {
+  on<Name extends keyof EventBusEvent, Param extends EventBusEvent[Name]>(
+    eventName: Name,
+    listener: (...args: Param) => void,
+  ): this;
+  emit<Name extends keyof EventBusEvent, Param extends EventBusEvent[Name]>(eventName: Name, ...args: Param): boolean;
+}

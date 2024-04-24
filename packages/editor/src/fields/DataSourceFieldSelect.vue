@@ -1,7 +1,6 @@
 <template>
-  <div style="width: 100%; display: flex; align-items: center">
+  <div class="m-fields-data-source-field-select">
     <component
-      style="width: 100%"
       :is="tagName"
       :config="showDataSourceFieldSelect || !config.fieldConfig ? cascaderConfig : config.fieldConfig"
       :model="model"
@@ -14,59 +13,57 @@
       :prop="`${prop}${prop ? '.' : ''}${name}`"
       @change="onChangeHandler"
     ></component>
+
     <TMagicButton
-      v-if="(showDataSourceFieldSelect || !config.fieldConfig) && selectedDataSourceId"
-      style="margin-left: 5px"
-      link
+      v-if="(showDataSourceFieldSelect || !config.fieldConfig) && selectedDataSourceId && hasDataSourceSidePanel"
+      class="m-fields-select-action-button"
       :size="size"
       @click="editHandler(selectedDataSourceId)"
-      ><MIcon :icon="Edit"></MIcon
+      ><MIcon :icon="!notEditable ? Edit : View"></MIcon
     ></TMagicButton>
+
     <TMagicButton
       v-if="config.fieldConfig"
       style="margin-left: 5px"
-      link
       :type="showDataSourceFieldSelect ? 'primary' : 'default'"
       :size="size"
       @click="showDataSourceFieldSelect = !showDataSourceFieldSelect"
       ><MIcon :icon="Coin"></MIcon
     ></TMagicButton>
-
-    <DataSourceConfigPanel
-      ref="editDialog"
-      :disabled="!editable"
-      :values="dataSourceValues"
-      :title="dialogTitle"
-      @submit="submitDataSourceHandler"
-    ></DataSourceConfigPanel>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, inject, onMounted, ref, resolveComponent } from 'vue';
-import { Coin, Edit } from '@element-plus/icons-vue';
+import { computed, inject, ref, resolveComponent, watch } from 'vue';
+import { Coin, Edit, View } from '@element-plus/icons-vue';
 
 import { TMagicButton } from '@tmagic/design';
 import type { CascaderConfig, CascaderOption, FieldProps, FormState } from '@tmagic/form';
-import { MCascader } from '@tmagic/form';
+import { filterFunction, MCascader } from '@tmagic/form';
 import type { DataSchema, DataSourceFieldType } from '@tmagic/schema';
 import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX } from '@tmagic/utils';
 
 import MIcon from '@editor/components/Icon.vue';
-import { useDataSourceEdit } from '@editor/hooks/use-data-source-edit';
-import DataSourceConfigPanel from '@editor/layouts/sidebar/data-source/DataSourceConfigPanel.vue';
-import type { DataSourceFieldSelectConfig, Services } from '@editor/type';
+import type { DataSourceFieldSelectConfig, EventBus, Services } from '@editor/type';
+import { SideItemKey } from '@editor/type';
 
 defineOptions({
   name: 'MFieldsDataSourceFieldSelect',
 });
 
 const services = inject<Services>('services');
+const eventBus = inject<EventBus>('eventBus');
 const emit = defineEmits(['change']);
 
 const props = withDefaults(defineProps<FieldProps<DataSourceFieldSelectConfig>>(), {
   disabled: false,
 });
+
+const notEditable = computed(() => filterFunction(mForm, props.config.notEditable, props));
+
+const hasDataSourceSidePanel = computed(() =>
+  (services?.uiService.get('sideBarItems') || []).find((item) => item.$key === SideItemKey.DATA_SOURCE),
+);
 
 const selectedDataSourceId = computed(() => {
   const value = props.model[props.name];
@@ -137,16 +134,23 @@ const cascaderConfig = computed<CascaderConfig>(() => {
 
 const showDataSourceFieldSelect = ref(false);
 
-onMounted(() => {
-  const value = props.model[props.name];
-  if (
-    Array.isArray(value) &&
-    typeof value[0] === 'string' &&
-    value[0].startsWith(DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX)
-  ) {
-    showDataSourceFieldSelect.value = true;
-  }
-});
+watch(
+  () => props.model[props.name],
+  (value) => {
+    if (
+      Array.isArray(value) &&
+      typeof value[0] === 'string' &&
+      value[0].startsWith(DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX)
+    ) {
+      showDataSourceFieldSelect.value = true;
+    } else {
+      showDataSourceFieldSelect.value = false;
+    }
+  },
+  {
+    immediate: true,
+  },
+);
 
 const mForm = inject<FormState | undefined>('mForm');
 
@@ -176,7 +180,7 @@ const onChangeHandler = (value: any) => {
   emit('change', value);
 };
 
-const { editDialog, dataSourceValues, dialogTitle, editable, editHandler, submitDataSourceHandler } = useDataSourceEdit(
-  services?.dataSourceService,
-);
+const editHandler = (id: string) => {
+  eventBus?.emit('edit-data-source', id);
+};
 </script>

@@ -19,11 +19,11 @@
 import { createApp, defineAsyncComponent } from 'vue';
 
 import Core from '@tmagic/core';
-import { DataSourceManager } from '@tmagic/data-source';
+import { DataSourceManager, registerDataSourceOnDemand } from '@tmagic/data-source';
 import { getUrlParam } from '@tmagic/utils';
 
 import components from '../.tmagic/async-comp-entry';
-import datasources from '../.tmagic/datasource-entry';
+import asyncDataSources from '../.tmagic/async-datasource-entry';
 import plugins from '../.tmagic/plugin-entry';
 
 import request from './utils/request';
@@ -40,24 +40,28 @@ Object.entries(components).forEach(([type, component]: [string, any]) => {
   magicApp.component(`magic-ui-${type}`, defineAsyncComponent(component));
 });
 
-Object.entries(datasources).forEach(([type, ds]: [string, any]) => {
-  DataSourceManager.register(type, ds);
-});
-
 Object.values(plugins).forEach((plugin: any) => {
   magicApp.use(plugin);
 });
 
-const app = new Core({
-  ua: window.navigator.userAgent,
-  config: ((getUrlParam('localPreview') ? getLocalConfig() : window.magicDSL) || [])[0] || {},
-  curPage: getUrlParam('page'),
-  useMock: Boolean(getUrlParam('useMock')),
+const dsl = ((getUrlParam('localPreview') ? getLocalConfig() : window.magicDSL) || [])[0] || {};
+
+registerDataSourceOnDemand(dsl, asyncDataSources).then((dataSources) => {
+  Object.entries(dataSources).forEach(([type, ds]: [string, any]) => {
+    DataSourceManager.register(type, ds);
+  });
+
+  const app = new Core({
+    ua: window.navigator.userAgent,
+    config: dsl,
+    curPage: getUrlParam('page'),
+    useMock: Boolean(getUrlParam('useMock')),
+  });
+
+  app.setDesignWidth(app.env.isWeb ? window.document.documentElement.getBoundingClientRect().width : 375);
+
+  magicApp.config.globalProperties.app = app;
+  magicApp.provide('app', app);
+
+  magicApp.mount('#app');
 });
-
-app.setDesignWidth(app.env.isWeb ? window.document.documentElement.getBoundingClientRect().width : 375);
-
-magicApp.config.globalProperties.app = app;
-magicApp.provide('app', app);
-
-magicApp.mount('#app');

@@ -1,18 +1,22 @@
 <template>
   <div class="m-fields-data-source-method-select">
     <div class="data-source-method-select-container">
-      <m-form-container
+      <MContainer
         class="select"
         :config="cascaderConfig"
         :model="model"
+        :size="size"
         @change="onChangeHandler"
-      ></m-form-container>
-      <Icon
-        v-if="model[name] && isCustomMethod"
-        class="icon"
-        :icon="!notEditable ? Edit : View"
+      ></MContainer>
+
+      <TMagicButton
+        v-if="model[name] && isCustomMethod && hasDataSourceSidePanel"
+        class="m-fields-select-action-button"
+        :size="size"
         @click="editCodeHandler"
-      ></Icon>
+      >
+        <MIcon :icon="!notEditable ? Edit : View"></MIcon>
+      </TMagicButton>
     </div>
 
     <CodeParams
@@ -24,14 +28,6 @@
       :params-config="paramsConfig"
       @change="onChangeHandler"
     ></CodeParams>
-
-    <CodeBlockEditor
-      ref="codeBlockEditor"
-      v-if="codeConfig"
-      :disabled="notEditable"
-      :content="codeConfig"
-      @submit="submitCodeBlockHandler"
-    ></CodeBlockEditor>
   </div>
 </template>
 
@@ -39,14 +35,14 @@
 import { computed, inject, ref } from 'vue';
 import { Edit, View } from '@element-plus/icons-vue';
 
-import { createValues, type FieldProps, filterFunction, type FormState } from '@tmagic/form';
-import type { CodeBlockContent, Id } from '@tmagic/schema';
+import { TMagicButton } from '@tmagic/design';
+import { createValues, type FieldProps, filterFunction, type FormState, MContainer } from '@tmagic/form';
+import type { Id } from '@tmagic/schema';
 
-import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
 import CodeParams from '@editor/components/CodeParams.vue';
-import Icon from '@editor/components/Icon.vue';
-import { useDataSourceMethod } from '@editor/hooks/use-data-source-method';
-import type { CodeParamStatement, DataSourceMethodSelectConfig, Services } from '@editor/type';
+import MIcon from '@editor/components/Icon.vue';
+import type { CodeParamStatement, DataSourceMethodSelectConfig, EventBus, Services } from '@editor/type';
+import { SideItemKey } from '@editor/type';
 
 defineOptions({
   name: 'MFieldsDataSourceMethodSelect',
@@ -54,6 +50,8 @@ defineOptions({
 
 const mForm = inject<FormState | undefined>('mForm');
 const services = inject<Services>('services');
+const eventBus = inject<EventBus>('eventBus');
+
 const emit = defineEmits(['change']);
 
 const dataSourceService = services?.dataSourceService;
@@ -61,6 +59,10 @@ const dataSourceService = services?.dataSourceService;
 const props = withDefaults(defineProps<FieldProps<DataSourceMethodSelectConfig>>(), {
   disabled: false,
 });
+
+const hasDataSourceSidePanel = computed(() =>
+  (services?.uiService.get('sideBarItems') || []).find((item) => item.$key === SideItemKey.DATA_SOURCE),
+);
 
 const notEditable = computed(() => filterFunction(mForm, props.config.notEditable, props));
 
@@ -139,21 +141,13 @@ const onChangeHandler = (value: any) => {
   emit('change', props.model);
 };
 
-const { codeBlockEditor, codeConfig, editCode, submitCode } = useDataSourceMethod();
-
 const editCodeHandler = () => {
-  const [id, name] = props.model[props.name];
+  const [id] = props.model[props.name];
 
   const dataSource = dataSourceService?.getDataSourceById(id);
 
   if (!dataSource) return;
 
-  editCode(dataSource, name);
-
-  setParamsConfig([id, name]);
-};
-
-const submitCodeBlockHandler = (value: CodeBlockContent) => {
-  submitCode(value);
+  eventBus?.emit('edit-data-source', id);
 };
 </script>

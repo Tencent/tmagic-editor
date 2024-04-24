@@ -24,19 +24,13 @@
       </template>
     </m-editor>
 
-    <TMagicDialog
-      v-model="previewVisible"
-      destroy-on-close
-      class="pre-viewer"
-      title="预览"
-      :width="stageRect && stageRect.width"
-    >
+    <TMagicDialog v-model="previewVisible" destroy-on-close class="pre-viewer" title="预览" :width="stageRect?.width">
       <iframe
         v-if="previewVisible"
         ref="iframe"
         width="100%"
         style="border: none"
-        :height="stageRect && stageRect.height"
+        :height="stageRect?.height"
         :src="previewUrl"
       ></iframe>
     </TMagicDialog>
@@ -224,7 +218,18 @@ asyncLoadJs(`${VITE_ENTRY_PATH}/ds-value/index.umd.cjs`).then(() => {
   datasourceValues.value = (globalThis as any).magicPresetDsValues;
 });
 
-save();
+try {
+  // eslint-disable-next-line no-eval
+  const magicDSL = eval(`(${localStorage.getItem('magicDSL')})`);
+  if (!magicDSL) {
+    save();
+  } else {
+    value.value = magicDSL;
+  }
+} catch (e) {
+  console.error(e);
+  save();
+}
 
 editorService.usePlugin({
   beforeDoAdd: (config: MNode, parent: MContainer) => {

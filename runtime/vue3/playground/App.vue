@@ -90,7 +90,11 @@ window.magic?.onRuntimeReady({
 
     const nodeInstance = app.page?.getNode(config.id);
     if (nodeInstance) {
-      nodeInstance.setData(config);
+      nodeInstance.setData(newNode);
+    }
+
+    if (app.page?.data.id === config.id) {
+      app.page.setData(newNode);
     }
   },
 

@@ -1,5 +1,5 @@
 {
-  "version": "1.4.2",
+  "version": "1.4.4",
   "name": "@tmagic/design",
   "type": "module",
   "sideEffects": [
@@ -21,7 +21,7 @@
     "build": "npm run build:type && vite build",
     "build:type": " vue-tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
     "clear:type": "rimraf ./types",
-    "type:check": "vue-tsc --noEmit"
+    "check:type": "vue-tsc --noEmit --project tsconfig.build.json"
   },
   "engines": {
     "node": ">=18"

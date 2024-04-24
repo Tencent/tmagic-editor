@@ -48,6 +48,7 @@ const state = reactive<UiState>({
   propsPanelSize: 'small',
   showAddPageButton: true,
   hideSlideBar: false,
+  sideBarItems: [],
   navMenuRect: {
     left: 0,
     top: 0,

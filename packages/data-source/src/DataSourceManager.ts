@@ -18,19 +18,14 @@
 
 import EventEmitter from 'events';
 
-import { cloneDeep, template } from 'lodash-es';
+import { cloneDeep } from 'lodash-es';
 
 import type { AppCore, DataSourceSchema, Id, MNode } from '@tmagic/schema';
-import {
-  compiledNode,
-  DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX,
-  DSL_NODE_KEY_COPY_PREFIX,
-  getValueByKeyPath,
-} from '@tmagic/utils';
+import { compiledNode } from '@tmagic/utils';
 
 import { DataSource, HttpDataSource } from './data-sources';
 import type { ChangeEvent, DataSourceManagerData, DataSourceManagerOptions } from './types';
-import { compliedConditions, createIteratorContentData } from './utils';
+import { compiledNodeField, compliedConditions, compliedIteratorItems } from './utils';
 
 class DataSourceManager extends EventEmitter {
   private static dataSourceClassMap = new Map<string, typeof DataSource>();
@@ -186,40 +181,7 @@ class DataSourceManager extends EventEmitter {
     if (node.visible === false) return newNode;
 
     return compiledNode(
-      (value: any) => {
-        // 使用data-source-input等表单控件配置的字符串模板，如：`xxx${id.field}xxx`
-        if (typeof value === 'string') {
-          return template(value)(this.data);
-        }
-
-        // 使用data-source-select等表单控件配置的数据源，如：{ isBindDataSource: true, dataSourceId: 'xxx'}
-        if (value?.isBindDataSource && value.dataSourceId) {
-          return this.data[value.dataSourceId];
-        }
-
-        // 指定数据源的字符串模板，如：{ isBindDataSourceField: true, dataSourceId: 'id', template: `xxx${field}xxx`}
-        if (value?.isBindDataSourceField && value.dataSourceId && typeof value.template === 'string') {
-          return template(value.template)(this.data[value.dataSourceId]);
-        }
-
-        // 使用data-source-field-select等表单控件的数据源字段，如：[`${DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX}${id}`, 'field']
-        if (Array.isArray(value) && typeof value[0] === 'string') {
-          const [prefixId, ...fields] = value;
-          const prefixIndex = prefixId.indexOf(DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX);
-
-          if (prefixIndex > -1) {
-            const dsId = prefixId.substring(prefixIndex + DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX.length);
-
-            const data = this.data[dsId];
-
-            if (!data) return value;
-
-            return getValueByKeyPath(fields.join('.'), data);
-          }
-        }
-
-        return value;
-      },
+      (value: any) => compiledNodeField(value, this.data),
       newNode,
       this.app.dsl?.dataSourceDeps || {},
       sourceId,
@@ -231,35 +193,10 @@ class DataSourceManager extends EventEmitter {
   }
 
   public compliedIteratorItems(itemData: any, items: MNode[], dataSourceField: string[] = []) {
-    return items.map((item) => {
-      const keys: string[] = [];
-      const [dsId, ...fields] = dataSourceField;
-
-      Object.entries(item).forEach(([key, value]) => {
-        if (
-          typeof value === 'string' &&
-          !key.startsWith(DSL_NODE_KEY_COPY_PREFIX) &&
-          value.includes(`${dsId}`) &&
-          /\$\{([\s\S]+?)\}/.test(value)
-        ) {
-          keys.push(key);
-        }
-      });
-
-      return compiledNode(
-        (value: string) => template(value)(createIteratorContentData(itemData, dsId, fields)),
-        item,
-        {
-          [dsId]: {
-            [item.id]: {
-              name: '',
-              keys,
-            },
-          },
-        },
-        dsId,
-      );
-    });
+    const [dsId, ...keys] = dataSourceField;
+    const ds = this.get(dsId);
+    if (!ds) return items;
+    return compliedIteratorItems(itemData, items, dsId, keys);
   }
 
   public destroy() {

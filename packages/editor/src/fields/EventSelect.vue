@@ -15,7 +15,7 @@
       <TMagicButton class="create-button" type="primary" :size="size" :disabled="disabled" @click="addEvent()"
         >添加事件</TMagicButton
       >
-      <m-form-panel
+      <MPanel
         v-for="(cardItem, index) in model[name]"
         :key="index"
         :disabled="disabled"
@@ -26,14 +26,14 @@
         @change="onChangeHandler"
       >
         <template #header>
-          <m-form-container
+          <MContainer
             class="fullWidth"
             :config="eventNameConfig"
             :model="cardItem"
             :disabled="disabled"
             :size="size"
             @change="onChangeHandler"
-          ></m-form-container>
+          ></MContainer>
           <TMagicButton
             style="color: #f56c6c"
             link
@@ -43,7 +43,7 @@
             @click="removeEvent(index)"
           ></TMagicButton>
         </template>
-      </m-form-panel>
+      </MPanel>
     </div>
   </div>
 </template>
@@ -55,7 +55,8 @@ import { has } from 'lodash-es';
 
 import type { EventOption } from '@tmagic/core';
 import { TMagicButton } from '@tmagic/design';
-import type { FieldProps, FormState } from '@tmagic/form';
+import type { FieldProps, FormState, PanelConfig } from '@tmagic/form';
+import { MContainer, MPanel } from '@tmagic/form';
 import { ActionType } from '@tmagic/schema';
 
 import type { CodeSelectColConfig, DataSourceMethodSelectConfig, EventSelectConfig, Services } from '@editor/type';
@@ -227,7 +228,8 @@ const tableConfig = computed(() => ({
 }));
 
 // 组件动作组表单配置
-const actionsConfig = computed(() => ({
+const actionsConfig = computed<PanelConfig>(() => ({
+  type: 'panel',
   items: [
     {
       type: 'group-list',

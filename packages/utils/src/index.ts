@@ -165,18 +165,17 @@ export const guid = (digit = 8): string =>
     return v.toString(16);
   });
 
-export const getValueByKeyPath: any = (keys = '', data: Record<string | number, any> = {}) =>
+export const getValueByKeyPath: any = (keys: string | string[] = '', data: Record<string | number, any> = {}) => {
   // 将 array[0] 转成 array.0
-  keys
-    .replaceAll(/\[(\d+)\]/g, '.$1')
-    .split('.')
-    .reduce((accumulator, currentValue: any) => {
-      if (isObject(accumulator) || Array.isArray(accumulator)) {
-        return accumulator[currentValue];
-      }
+  const keyArray = Array.isArray(keys) ? keys : keys.replaceAll(/\[(\d+)\]/g, '.$1').split('.');
+  return keyArray.reduce((accumulator, currentValue: any) => {
+    if (isObject(accumulator) || Array.isArray(accumulator)) {
+      return accumulator[currentValue];
+    }
 
-      return void 0;
-    }, data);
+    return void 0;
+  }, data);
+};
 
 export const setValueByKeyPath: any = (keys: string, value: any, data: Record<string | number, any> = {}) =>
   objectSet(data, keys, value);
@@ -266,13 +265,20 @@ export const compiledNode = (
   }
 
   keys.forEach((key) => {
-    const cacheKey = `${DSL_NODE_KEY_COPY_PREFIX}${key}`;
+    const keys = `${key}`.replaceAll(/\[(\d+)\]/g, '.$1').split('.');
+
+    const cacheKey = keys.map((key, index) => {
+      if (index < keys.length - 1) {
+        return key;
+      }
+      return `${DSL_NODE_KEY_COPY_PREFIX}${key}`;
+    });
 
     const value = getValueByKeyPath(key, node);
     let templateValue = getValueByKeyPath(cacheKey, node);
 
     if (typeof templateValue === 'undefined') {
-      setValueByKeyPath(cacheKey, value, node);
+      setValueByKeyPath(cacheKey.join('.'), value, node);
       templateValue = value;
     }
 
