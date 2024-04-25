@@ -23,7 +23,7 @@ import { Writable } from 'type-fest';
 import { DepTargetType } from '@tmagic/dep';
 import type { Id, MApp, MComponent, MContainer, MNode, MPage, MPageFragment } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
-import { getNodePath, isNumber, isPage, isPageFragment, isPop } from '@tmagic/utils';
+import { calcValueByFontsize, getNodePath, isNumber, isPage, isPageFragment, isPop } from '@tmagic/utils';
 
 import BaseService from '@editor/services//BaseService';
 import propsService from '@editor/services//props';
@@ -741,7 +741,7 @@ class Editor extends BaseService {
       const el = doc.getElementById(`${node.id}`);
       const parentEl = layout === Layout.FIXED ? doc.body : el?.offsetParent;
       if (parentEl && el) {
-        node.style.left = (parentEl.clientWidth - el.clientWidth) / 2;
+        node.style.left = calcValueByFontsize(doc, (parentEl.clientWidth - el.clientWidth) / 2);
         node.style.right = '';
       }
     } else if (parent.style && isNumber(parent.style?.width) && isNumber(node.style?.width)) {

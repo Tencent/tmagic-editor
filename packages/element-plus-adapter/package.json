@@ -39,13 +39,11 @@
   ],
   "dependencies": {
     "@tmagic/design": "1.4.4",
-    "element-plus": "^2.6.1",
-    "vue": "^3.4.21"
+    "element-plus": "^2.6.1"
   },
   "peerDependencies": {
     "@tmagic/design": "1.4.4",
-    "element-plus": "^2.6.1",
-    "vue": "^3.4.21"
+    "element-plus": "^2.6.1"
   },
   "devDependencies": {
     "@types/node": "^18.19.0",
