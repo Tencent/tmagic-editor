@@ -110,3 +110,15 @@ export const createDiv = ({ className, cssText }: { className: string; cssText: 
 };
 
 export const getDocument = () => globalThis.document;
+
+export const calcValueByFontsize = (doc: Document | undefined, value: number) => {
+  if (!doc) return value;
+  const { fontSize } = doc.documentElement.style;
+
+  if (fontSize) {
+    const times = globalThis.parseFloat(fontSize) / 100;
+    return Number((value / times).toFixed(2));
+  }
+
+  return value;
+};
