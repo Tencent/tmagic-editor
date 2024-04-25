@@ -241,8 +241,12 @@ export const fixNodeLeft = (config: MNode, parent: MContainer, doc?: Document) =
   const parentEl = doc.getElementById(`${parent.id}`);
 
   const left = Number(config.style?.left) || 0;
-  if (el && parentEl && el.offsetWidth + left > parentEl.offsetWidth) {
-    return parentEl.offsetWidth - el.offsetWidth;
+  if (el && parentEl) {
+    const calcParentOffsetWidth = calcValueByFontsize(doc, parentEl.offsetWidth);
+    const calcElOffsetWidth = calcValueByFontsize(doc, el.offsetWidth);
+    if (calcElOffsetWidth + left > calcParentOffsetWidth) {
+      return calcParentOffsetWidth - calcElOffsetWidth;
+    }
   }
 
   return config.style.left;

@@ -221,21 +221,21 @@ const dropHandler = async (e: DragEvent) => {
       left = e.clientX - containerRect.left;
     } else if (layout === Layout.ABSOLUTE) {
       position = 'absolute';
-      top = calcValueByFontsize(doc, e.clientY - containerRect.top + scrollTop);
-      left = calcValueByFontsize(doc, e.clientX - containerRect.left + scrollLeft);
+      top = e.clientY - containerRect.top + scrollTop;
+      left = e.clientX - containerRect.left + scrollLeft;
 
-      if (parentEl && doc) {
+      if (parentEl) {
         const { left: parentLeft, top: parentTop } = getOffset(parentEl);
-        left = left - calcValueByFontsize(doc, parentLeft) * zoom.value;
-        top = top - calcValueByFontsize(doc, parentTop) * zoom.value;
+        left = left - parentLeft * zoom.value;
+        top = top - parentTop * zoom.value;
       }
     }
 
     config.data.style = {
       ...style,
       position,
-      top: top / zoom.value,
-      left: left / zoom.value,
+      top: calcValueByFontsize(doc, top / zoom.value),
+      left: calcValueByFontsize(doc, left / zoom.value),
     };
 
     config.data.inputEvent = e;
