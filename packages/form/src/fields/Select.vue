@@ -23,24 +23,23 @@
       <component
         v-for="(group, index) in (options as SelectGroupOption[])"
         :key="index"
-        :is="optionGroupComponent?.component"
-        v-bind="
-          optionGroupComponent?.props({
-            label: group.label,
-            disabled: group.disabled,
-          })
-        "
+        :is="optionGroupComponent?.component || 'el-option-group'"
+        v-bind="optionGroupComponent?.props(group) || group"
       >
         <component
           v-for="(item, index) in group.options"
-          :is="optionComponent?.component"
+          :is="optionComponent?.component || 'el-option'"
           :key="index"
           v-bind="
             optionComponent?.props({
               label: item.label || item.text,
               value: item.value,
               disabled: item.disabled,
-            })
+            }) || {
+              label: item.label || item.text,
+              value: item.value,
+              disabled: item.disabled,
+            }
           "
         >
         </component>
@@ -51,14 +50,8 @@
         v-for="option in (options as SelectOption[])"
         class="tmagic-design-option"
         :key="config.valueKey ? option.value[config.valueKey] : option.value"
-        :is="optionComponent?.component"
-        v-bind="
-          optionComponent?.props({
-            label: option.text,
-            value: option.value,
-            disabled: option.disabled,
-          })
-        "
+        :is="optionComponent?.component || 'el-option'"
+        v-bind="optionComponent?.props(option) || option"
       >
       </component>
     </template>
