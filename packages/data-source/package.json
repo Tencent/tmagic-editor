@@ -34,9 +34,9 @@
     "data-source"
   ],
   "dependencies": {
-    "@tmagic/dep": "1.4.4",
-    "@tmagic/utils": "1.4.4",
-    "@tmagic/schema": "1.4.4",
+    "@tmagic/dep": "workspace:*",
+    "@tmagic/utils": "workspace:*",
+    "@tmagic/schema": "workspace:*",
     "events": "^3.3.0",
     "lodash-es": "^4.17.21"
   },
