@@ -905,23 +905,23 @@ importers:
   runtime/tmagic-form:
     dependencies:
       '@tmagic/core':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.10)
+        specifier: workspace:*
+        version: link:../../packages/core
       '@tmagic/editor':
-        specifier: 1.4.4
-        version: 1.4.4(@tmagic/design@1.4.4(vue@3.4.21(typescript@5.4.2)))(@tmagic/form@1.4.4(dayjs@1.11.10)(vue@3.4.21(typescript@5.4.2)))(dayjs@1.11.10)(monaco-editor@0.47.0)(scenejs@1.9.4)(vue@3.4.21(typescript@5.4.2))
+        specifier: workspace:*
+        version: link:../../packages/editor
       '@tmagic/form':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.10)(vue@3.4.21(typescript@5.4.2))
+        specifier: workspace:*
+        version: link:../../packages/form
       '@tmagic/schema':
-        specifier: 1.4.4
-        version: 1.4.4
+        specifier: workspace:*
+        version: link:../../packages/schema
       '@tmagic/stage':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.10)(scenejs@1.9.4)
+        specifier: workspace:*
+        version: link:../../packages/stage
       '@tmagic/utils':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.10)
+        specifier: workspace:*
+        version: link:../../packages/utils
       element-plus:
         specifier: ^2.6.1
         version: 2.6.1(vue@3.4.21(typescript@5.4.2))

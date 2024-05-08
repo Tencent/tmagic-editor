@@ -1,5 +1,5 @@
 {
-  "version": "workspace:*",
+  "version": "1.4.4",
   "name": "@tmagic/editor",
   "type": "module",
   "sideEffects": [
