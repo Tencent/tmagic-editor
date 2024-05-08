@@ -23,12 +23,14 @@ import { cloneDeep } from 'lodash-es';
 import type { AppCore, DataSourceSchema, Id, MNode } from '@tmagic/schema';
 import { compiledNode } from '@tmagic/utils';
 
+import { DeepObservedData } from './observed-data/DeepObservedData';
 import { DataSource, HttpDataSource } from './data-sources';
-import type { ChangeEvent, DataSourceManagerData, DataSourceManagerOptions } from './types';
+import type { ChangeEvent, DataSourceManagerData, DataSourceManagerOptions, ObservedDataClass } from './types';
 import { compiledNodeField, compliedConditions, compliedIteratorItems } from './utils';
 
 class DataSourceManager extends EventEmitter {
   private static dataSourceClassMap = new Map<string, typeof DataSource>();
+  private static ObservedDataClass: ObservedDataClass = DeepObservedData;
 
   public static register<T extends typeof DataSource = typeof DataSource>(type: string, dataSource: T) {
     DataSourceManager.dataSourceClassMap.set(type, dataSource);
@@ -43,6 +45,10 @@ class DataSourceManager extends EventEmitter {
 
   public static getDataSourceClass(type: string) {
     return DataSourceManager.dataSourceClassMap.get(type);
+  }
+
+  public static registerObservedData(ObservedDataClass: ObservedDataClass) {
+    DataSourceManager.ObservedDataClass = ObservedDataClass;
   }
 
   public app: AppCore;
@@ -130,6 +136,7 @@ class DataSourceManager extends EventEmitter {
       request: this.app.request,
       useMock: this.useMock,
       initialData: this.data[config.id],
+      ObservedDataClass: DataSourceManager.ObservedDataClass,
     });
 
     this.dataSourceMap.set(config.id, ds);
@@ -206,6 +213,14 @@ class DataSourceManager extends EventEmitter {
       ds.destroy();
     });
     this.dataSourceMap.clear();
+  }
+
+  public onDataChange(id: string, path: string, callback: (newVal: any) => void) {
+    return this.get(id)?.onDataChange(path, callback);
+  }
+
+  public offDataChange(id: string, path: string, callback: (newVal: any) => void) {
+    return this.get(id)?.offDataChange(path, callback);
   }
 }
 

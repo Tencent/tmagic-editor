@@ -18,9 +18,11 @@
 import EventEmitter from 'events';
 
 import type { AppCore, CodeBlockContent, DataSchema, DataSourceSchema } from '@tmagic/schema';
-import { getDefaultValueFromFields, setValueByKeyPath } from '@tmagic/utils';
+import { getDefaultValueFromFields } from '@tmagic/utils';
 
 import type { ChangeEvent, DataSourceOptions } from '@data-source/types';
+
+import { ObservedData } from '../observed-data/ObservedData';
 
 /**
  * 静态数据源
@@ -28,7 +30,7 @@ import type { ChangeEvent, DataSourceOptions } from '@data-source/types';
 export default class DataSource<T extends DataSourceSchema = DataSourceSchema> extends EventEmitter {
   public isInit = false;
 
-  public data: Record<string, any> = {};
+  // public data: Record<string, any> = {};
 
   /** @tmagic/core 实例 */
   public app: AppCore;
@@ -38,6 +40,7 @@ export default class DataSource<T extends DataSourceSchema = DataSourceSchema> e
   #type = 'base';
   #id: string;
   #schema: T;
+  #observedData: ObservedData;
 
   /** 数据源自定义字段配置 */
   #fields: DataSchema[] = [];
@@ -55,22 +58,26 @@ export default class DataSource<T extends DataSourceSchema = DataSourceSchema> e
     this.setFields(options.schema.fields);
     this.setMethods(options.schema.methods || []);
 
+    let data = options.initialData;
     if (this.app.platform === 'editor') {
       // 编辑器中有mock使用mock，没有使用默认值
       this.mockData = options.schema.mocks?.find((mock) => mock.useInEditor)?.data || this.getDefaultData();
-      this.setData(this.mockData);
+      data = this.mockData;
     } else if (typeof options.useMock === 'boolean' && options.useMock) {
       // 设置了使用mock就使用mock数据
       this.mockData = options.schema.mocks?.find((mock) => mock.enable)?.data || this.getDefaultData();
-      this.setData(this.mockData);
+      data = this.mockData;
     } else if (!options.initialData) {
-      this.setData(this.getDefaultData());
+      data = this.getDefaultData();
     } else {
       // 在ssr模式下，会将server端获取的数据设置到initialData
-      this.setData(options.initialData);
+      this.#observedData = new options.ObservedDataClass(options.initialData ?? {});
       // 设置isInit,防止manager中执行init方法
       this.isInit = true;
+      return;
     }
+    this.#observedData = new options.ObservedDataClass(data ?? {});
+    console.log(this.#observedData);
   }
 
   public get id() {
@@ -101,13 +108,18 @@ export default class DataSource<T extends DataSourceSchema = DataSourceSchema> e
     this.#methods = methods;
   }
 
+  public get data() {
+    return this.#observedData.getData('');
+  }
+
   public setData(data: any, path?: string) {
-    if (path) {
-      setValueByKeyPath(path, data, this.data);
-    } else {
-      // todo: 校验数据，看是否符合 schema
-      this.data = data;
-    }
+    this.#observedData.update(path ?? '', data);
+    // if (path) {
+    //   setValueByKeyPath(path, data, this.data);
+    // } else {
+    //   // todo: 校验数据，看是否符合 schema
+    //   this.data = data;
+    // }
 
     const changeEvent: ChangeEvent = {
       updateData: data,
@@ -115,6 +127,14 @@ export default class DataSource<T extends DataSourceSchema = DataSourceSchema> e
     };
 
     this.emit('change', changeEvent);
+  }
+
+  public onDataChange(path: string, callback: (newVal: any) => void) {
+    this.#observedData.on(path, callback);
+  }
+
+  public offDataChange(path: string, callback: (newVal: any) => void) {
+    this.#observedData.off(path, callback);
   }
 
   public getDefaultData() {
@@ -126,8 +146,9 @@ export default class DataSource<T extends DataSourceSchema = DataSourceSchema> e
   }
 
   public destroy() {
-    this.data = {};
+    // this.data = {};
     this.#fields = [];
     this.removeAllListeners();
+    this.#observedData.destroy();
   }
 }
