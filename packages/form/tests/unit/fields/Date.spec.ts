@@ -57,7 +57,14 @@ describe('Date', () => {
   });
 
   test('输入', async () => {
-    const wrapper = getWrapper();
+    const wrapper = getWrapper([
+      {
+        text: 'date',
+        type: 'date',
+        name: 'date',
+        valueFormat: 'YYYY-MM-DD',
+      },
+    ]);
 
     await nextTick();
 

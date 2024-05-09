@@ -98,7 +98,14 @@ describe('DateTime', () => {
     expect(value.datetime).toMatch('');
   });
   test('输入日期', async () => {
-    const wrapper = getWrapper();
+    const wrapper = getWrapper([
+      {
+        text: 'dateTime',
+        type: 'datetime',
+        name: 'datetime',
+        valueFormat: 'YYYY-MM-DD HH:mm:ss',
+      },
+    ]);
 
     await nextTick();
 
