@@ -340,7 +340,7 @@ const getASTTokenByTraverse = ({ ast, indexPath }: { ast: any; indexPath: string
 
       if (specifiers?.length === 1 && source.value) {
         const name = specifiers?.[0].local?.name;
-        if (name) {
+        if (typeof name === 'string') {
           importSpecifiersMap[name] = source.value as string;
         }
       }
@@ -352,14 +352,16 @@ const getASTTokenByTraverse = ({ ast, indexPath }: { ast: any; indexPath: string
       const { specifiers, source, declaration } = node;
 
       if (specifiers?.length === 1 && source?.value) {
-        const name = specifiers?.[0]?.exported.name.toLowerCase();
-        if (name) {
-          exportSpecifiersMap[name] = source.value as string;
+        const name = specifiers?.[0]?.exported.name;
+        if (typeof name === 'string') {
+          exportSpecifiersMap[name.toLowerCase()] = source.value as string;
         }
       } else {
         specifiers?.forEach((specifier) => {
-          const name = specifier.exported.name.toLowerCase();
-          exportSpecifiersMap[name] = undefined;
+          const { name } = specifier.exported;
+          if (typeof name === 'string') {
+            exportSpecifiersMap[name.toLowerCase()] = undefined;
+          }
         });
         (declaration as any)?.declarations.forEach((declare: any) => {
           const { id, init } = declare;

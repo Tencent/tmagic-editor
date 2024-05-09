@@ -38,7 +38,7 @@
     "events": "^3.3.0",
     "keycon": "^1.4.0",
     "lodash-es": "^4.17.21",
-    "moveable": "^0.51.1",
+    "moveable": "^0.53.0",
     "moveable-helper": "^0.4.0"
   },
   "devDependencies": {
@@ -46,8 +46,8 @@
     "@types/lodash-es": "^4.17.4",
     "@types/node": "^18.19.0",
     "rimraf": "^3.0.2",
-    "sass": "^1.35.1",
+    "sass": "^1.77.0",
     "typescript": "^5.4.2",
-    "vite": "^5.1.6"
+    "vite": "^5.2.11"
   }
 }

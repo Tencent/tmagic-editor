@@ -42,13 +42,12 @@
   },
   "devDependencies": {
     "@algolia/client-search": ">= 4.9.1 < 6",
-    "@babel/core": "^7.18.0",
     "@commitlint/cli": "^18.2.0",
     "@commitlint/config-conventional": "^18.1.0",
     "@types/node": "^18.19.0",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
-    "@vitejs/plugin-vue": "^4.5.2",
+    "@vitejs/plugin-vue": "^5.0.4",
     "@vitest/coverage-v8": "^1.0.4",
     "c8": "^7.11.3",
     "commitizen": "^4.3.0",
@@ -77,10 +76,10 @@
     "serialize-javascript": "^6.0.0",
     "shx": "^0.3.4",
     "typescript": "^5.4.2",
-    "vite": "^5.1.6",
-    "vitepress": "1.0.0-rc.31",
-    "vitest": "^1.0.4",
-    "vue": "^3.4.21"
+    "vite": "^5.2.11",
+    "vitepress": "1.1.4",
+    "vitest": "^1.6.0",
+    "vue": "^3.4.27"
   },
   "config": {
     "commitizen": {
