@@ -20,9 +20,9 @@ import EventEmitter from 'events';
 import type { AppCore, CodeBlockContent, DataSchema, DataSourceSchema } from '@tmagic/schema';
 import { getDefaultValueFromFields } from '@tmagic/utils';
 
+import { ObservedData } from '@data-source/observed-data/ObservedData';
+import { SimpleObservedData } from '@data-source/observed-data/SimpleObservedData';
 import type { ChangeEvent, DataSourceOptions } from '@data-source/types';
-
-import { ObservedData } from '../observed-data/ObservedData';
 
 /**
  * 静态数据源
@@ -59,6 +59,8 @@ export default class DataSource<T extends DataSourceSchema = DataSourceSchema> e
     this.setMethods(options.schema.methods || []);
 
     let data = options.initialData;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const ObservedDataClass = options.ObservedDataClass || SimpleObservedData;
     if (this.app.platform === 'editor') {
       // 编辑器中有mock使用mock，没有使用默认值
       this.mockData = options.schema.mocks?.find((mock) => mock.useInEditor)?.data || this.getDefaultData();
@@ -71,13 +73,12 @@ export default class DataSource<T extends DataSourceSchema = DataSourceSchema> e
       data = this.getDefaultData();
     } else {
       // 在ssr模式下，会将server端获取的数据设置到initialData
-      this.#observedData = new options.ObservedDataClass(options.initialData ?? {});
+      this.#observedData = new ObservedDataClass(options.initialData ?? {});
       // 设置isInit,防止manager中执行init方法
       this.isInit = true;
       return;
     }
-    this.#observedData = new options.ObservedDataClass(data ?? {});
-    console.log(this.#observedData);
+    this.#observedData = new ObservedDataClass(data ?? {});
   }
 
   public get id() {

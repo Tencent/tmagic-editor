@@ -12,7 +12,7 @@ export interface DataSourceOptions<T extends DataSourceSchema = DataSourceSchema
   initialData?: Record<string, any>;
   useMock?: boolean;
   request?: RequestFunction;
-  ObservedDataClass: ObservedDataClass;
+  ObservedDataClass?: ObservedDataClass;
   [key: string]: any;
 }
 
