@@ -15,6 +15,12 @@ import {
 
 import type { AsyncDataSourceResolveResult, DataSourceManagerData } from './types';
 
+/**
+ * 编译数据源条件组
+ * @param node dsl节点
+ * @param data 数据源数据
+ * @returns boolean
+ */
 export const compliedConditions = (node: MNode, data: DataSourceManagerData) => {
   if (!node.displayConds || !Array.isArray(node.displayConds) || !node.displayConds.length) return true;
 
@@ -56,6 +62,13 @@ export const updateNode = (node: MNode, dsl: MApp) => {
   }
 };
 
+/**
+ * 创建迭代器容器编译的数据上下文
+ * @param itemData 迭代数据
+ * @param dsId 数据源id
+ * @param fields dsl节点字段，如a.b.c
+ * @returns 数据上下文
+ */
 export const createIteratorContentData = (itemData: any, dsId: string, fields: string[] = []) => {
   const data = {
     [dsId]: {},
@@ -70,6 +83,15 @@ export const createIteratorContentData = (itemData: any, dsId: string, fields: s
   return data;
 };
 
+/**
+ * 编译通过tmagic-editor的数据源源选择器配(data-source-field-select)
+ * 格式为 [`${DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX}${id}`, 'field']
+ * DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX常量可通过@tmagic/utils获取
+ *
+ * @param value dsl节点中的数据源配置
+ * @param data 数据源数据
+ * @returns 编译好的配置
+ */
 export const compliedDataSourceField = (value: any, data: DataSourceManagerData) => {
   const [prefixId, ...fields] = value;
   const prefixIndex = prefixId.indexOf(DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX);
@@ -87,6 +109,12 @@ export const compliedDataSourceField = (value: any, data: DataSourceManagerData)
   return value;
 };
 
+/**
+ * 编译通过tmagic-editor的数据源源选择器（data-source-input，data-source-select，data-source-field-select）配置出来的数据，或者其他符合规范的配置
+ * @param value dsl节点中的数据源配置
+ * @param data 数据源数据
+ * @returns 编译好的配置
+ */
 export const compiledNodeField = (value: any, data: DataSourceManagerData) => {
   // 使用data-source-input等表单控件配置的字符串模板，如：`xxx${id.field}xxx`
   if (typeof value === 'string') {

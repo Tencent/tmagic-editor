@@ -263,10 +263,10 @@ class App extends EventEmitter implements AppCore {
     if (!this.page) return;
 
     for (const [, value] of this.page.nodes) {
-      value.events?.forEach((event) => {
+      value.events?.forEach((event, index) => {
         const eventName = `${event.name}_${value.data.id}`;
         const eventHandler = (fromCpt: Node, ...args: any[]) => {
-          this.eventHandler(event, fromCpt, args);
+          this.eventHandler(index, fromCpt, args);
         };
         this.eventList.set(eventHandler, eventName);
         this.on(eventName, eventHandler);
@@ -358,15 +358,18 @@ class App extends EventEmitter implements AppCore {
 
   /**
    * 事件联动处理函数
-   * @param eventConfig 事件配置
+   * @param eventsConfigIndex 事件配置索引，可以通过此索引从node.event中获取最新事件配置
    * @param fromCpt 触发事件的组件
    * @param args 事件参数
    */
-  private async eventHandler(eventConfig: EventConfig | DeprecatedEventConfig, fromCpt: any, args: any[]) {
+  private async eventHandler(eventsConfigIndex: number, fromCpt: Node, args: any[]) {
+    const eventConfig = fromCpt.events[eventsConfigIndex] as EventConfig | DeprecatedEventConfig;
     if (has(eventConfig, 'actions')) {
       // EventConfig类型
       const { actions } = eventConfig as EventConfig;
-      for (const actionItem of actions) {
+      for (let i = 0; i < actions.length; i++) {
+        // 事件响应中可能会有修改数据源数据的，会更新dsl，所以这里需要重新获取
+        const actionItem = (fromCpt.events[eventsConfigIndex] as EventConfig).actions[i];
         if (actionItem.actionType === ActionType.COMP) {
           // 组件动作
           await this.compActionHandler(actionItem as CompItemConfig, fromCpt, args);

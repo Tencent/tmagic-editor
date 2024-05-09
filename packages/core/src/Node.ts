@@ -41,11 +41,11 @@ interface NodeOptions {
   app: App;
 }
 class Node extends EventEmitter {
-  public data: MComponent | MContainer | MPage | MPageFragment;
+  public data!: MComponent | MContainer | MPage | MPageFragment;
   public style?: {
     [key: string]: any;
   };
-  public events: DeprecatedEventConfig[] | EventConfig[];
+  public events: DeprecatedEventConfig[] | EventConfig[] = [];
   public instance?: any;
   public page?: Page;
   public parent?: Node;
@@ -58,14 +58,15 @@ class Node extends EventEmitter {
     this.page = options.page;
     this.parent = options.parent;
     this.app = options.app;
-    const { events } = options.config;
-    this.data = options.config;
-    this.events = events || [];
+    this.setData(options.config);
     this.listenLifeSafe();
   }
 
   public setData(data: MComponent | MContainer | MPage | MPageFragment) {
     this.data = data;
+    const { events, style } = data;
+    this.events = events || [];
+    this.style = style || {};
     this.emit('update-data');
   }
 
