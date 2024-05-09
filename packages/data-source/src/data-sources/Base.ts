@@ -114,13 +114,7 @@ export default class DataSource<T extends DataSourceSchema = DataSourceSchema> e
   }
 
   public setData(data: any, path?: string) {
-    this.#observedData.update(path ?? '', data);
-    // if (path) {
-    //   setValueByKeyPath(path, data, this.data);
-    // } else {
-    //   // todo: 校验数据，看是否符合 schema
-    //   this.data = data;
-    // }
+    this.#observedData.update(data, path);
 
     const changeEvent: ChangeEvent = {
       updateData: data,

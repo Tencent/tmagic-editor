@@ -20,7 +20,7 @@ export class DeepObservedData extends ObservedData {
     super(initialData);
     this.state = new State(initialData);
   }
-  update = (path: string, data: any) => {
+  update = (data: any, path?: string) => {
     this.state?.update(path ?? '', data);
   };
   on = (path: string, callback: (newVal: any) => void) => {

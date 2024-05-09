@@ -208,6 +208,9 @@ importers:
       '@tmagic/utils':
         specifier: workspace:*
         version: link:../utils
+      deep-state-observer:
+        specifier: ^5.5.13
+        version: 5.5.13
       events:
         specifier: ^3.3.0
         version: 3.3.0

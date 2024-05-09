@@ -23,7 +23,6 @@ export class SimpleObservedData extends ObservedData {
       updateData: data,
       path: path ?? '',
     };
-
     this.event.emit(path ?? '', changeEvent);
   }
   on(path: string, callback: (newVal: any) => void): void {

@@ -35,8 +35,9 @@
   ],
   "dependencies": {
     "@tmagic/dep": "workspace:*",
-    "@tmagic/utils": "workspace:*",
     "@tmagic/schema": "workspace:*",
+    "@tmagic/utils": "workspace:*",
+    "deep-state-observer": "^5.5.13",
     "events": "^3.3.0",
     "lodash-es": "^4.17.21"
   },
