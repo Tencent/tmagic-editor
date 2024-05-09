@@ -31,8 +31,8 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "@tmagic/schema": "1.4.4",
-    "@tmagic/utils": "1.4.4"
+    "@tmagic/schema": "workspace:*",
+    "@tmagic/utils": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^18.19.0",

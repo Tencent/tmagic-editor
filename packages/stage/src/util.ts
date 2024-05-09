@@ -161,17 +161,6 @@ export const addSelectedClassName = (el: Element, doc: Document) => {
   });
 };
 
-export const calcValueByFontsize = (doc: Document, value: number) => {
-  const { fontSize } = doc.documentElement.style;
-
-  if (fontSize) {
-    const times = globalThis.parseFloat(fontSize) / 100;
-    return Number((value / times).toFixed(2));
-  }
-
-  return value;
-};
-
 /**
  * 下移组件位置
  * @param {number} deltaTop 偏移量

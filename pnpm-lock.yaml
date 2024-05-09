@@ -38,9 +38,6 @@ importers:
       c8:
         specifier: ^7.11.3
         version: 7.11.3
-      chalk:
-        specifier: ^4.1.0
-        version: 4.1.0
       commitizen:
         specifier: ^4.3.0
         version: 4.3.0(typescript@5.4.2)
@@ -95,6 +92,9 @@ importers:
       minimist:
         specifier: ^1.2.6
         version: 1.2.6
+      picocolors:
+        specifier: ^1.0.0
+        version: 1.0.0
       prettier:
         specifier: ^2.8.7
         version: 2.8.7
@@ -134,9 +134,6 @@ importers:
       cac:
         specifier: ^6.7.12
         version: 6.7.12
-      chalk:
-        specifier: ^4.1.0
-        version: 4.1.0
       chokidar:
         specifier: ^3.5.3
         version: 3.5.3
@@ -146,6 +143,9 @@ importers:
       fs-extra:
         specifier: ^10.1.0
         version: 10.1.0
+      picocolors:
+        specifier: ^1.0.0
+        version: 1.0.0
       recast:
         specifier: ^0.21.1
         version: 0.21.1
@@ -163,14 +163,14 @@ importers:
   packages/core:
     dependencies:
       '@tmagic/data-source':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.10)
+        specifier: workspace:*
+        version: link:../data-source
       '@tmagic/schema':
-        specifier: 1.4.4
-        version: 1.4.4
+        specifier: workspace:*
+        version: link:../schema
       '@tmagic/utils':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.10)
+        specifier: workspace:*
+        version: link:../utils
       events:
         specifier: ^3.3.0
         version: 3.3.0
@@ -200,17 +200,14 @@ importers:
   packages/data-source:
     dependencies:
       '@tmagic/dep':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.10)
+        specifier: workspace:*
+        version: link:../dep
       '@tmagic/schema':
-        specifier: 1.4.4
-        version: 1.4.4
+        specifier: workspace:*
+        version: link:../schema
       '@tmagic/utils':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.10)
-      deep-state-observer:
-        specifier: ^5.5.13
-        version: 5.5.13
+        specifier: workspace:*
+        version: link:../utils
       events:
         specifier: ^3.3.0
         version: 3.3.0
@@ -240,11 +237,11 @@ importers:
   packages/dep:
     dependencies:
       '@tmagic/schema':
-        specifier: 1.4.4
-        version: 1.4.4
+        specifier: workspace:*
+        version: link:../schema
       '@tmagic/utils':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.10)
+        specifier: workspace:*
+        version: link:../utils
     devDependencies:
       '@types/node':
         specifier: ^18.19.0
@@ -299,29 +296,29 @@ importers:
         specifier: ^2.3.1
         version: 2.3.1(vue@3.4.21(typescript@5.4.2))
       '@tmagic/core':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.10)
+        specifier: workspace:*
+        version: link:../core
       '@tmagic/dep':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.10)
+        specifier: workspace:*
+        version: link:../dep
       '@tmagic/design':
-        specifier: 1.4.4
-        version: 1.4.4(vue@3.4.21(typescript@5.4.2))
+        specifier: workspace:*
+        version: link:../design
       '@tmagic/form':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.10)(vue@3.4.21(typescript@5.4.2))
+        specifier: workspace:*
+        version: link:../form
       '@tmagic/schema':
-        specifier: 1.4.4
-        version: 1.4.4
+        specifier: workspace:*
+        version: link:../schema
       '@tmagic/stage':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.10)(scenejs@1.9.4)
+        specifier: workspace:*
+        version: link:../stage
       '@tmagic/table':
-        specifier: 1.4.4
-        version: 1.4.4(@tmagic/form@1.4.4(dayjs@1.11.10)(vue@3.4.21(typescript@5.4.2)))(dayjs@1.11.10)(vue@3.4.21(typescript@5.4.2))
+        specifier: workspace:*
+        version: link:../table
       '@tmagic/utils':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.10)
+        specifier: workspace:*
+        version: link:../utils
       buffer:
         specifier: ^6.0.3
         version: 6.0.3
@@ -402,14 +399,11 @@ importers:
   packages/element-plus-adapter:
     dependencies:
       '@tmagic/design':
-        specifier: 1.4.4
-        version: 1.4.4(vue@3.4.21(typescript@5.4.2))
+        specifier: workspace:*
+        version: link:../design
       element-plus:
         specifier: ^2.6.1
         version: 2.6.1(vue@3.4.21(typescript@5.4.2))
-      vue:
-        specifier: ^3.4.21
-        version: 3.4.21(typescript@5.4.2)
     devDependencies:
       '@types/node':
         specifier: ^18.19.0
@@ -430,11 +424,11 @@ importers:
         specifier: ^2.3.1
         version: 2.3.1(vue@3.4.21(typescript@5.4.2))
       '@tmagic/design':
-        specifier: 1.4.4
-        version: 1.4.4(vue@3.4.21(typescript@5.4.2))
+        specifier: workspace:*
+        version: link:../design
       '@tmagic/utils':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.10)
+        specifier: workspace:*
+        version: link:../utils
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -503,14 +497,14 @@ importers:
         specifier: ^0.29.2
         version: 0.29.2
       '@tmagic/core':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.10)
+        specifier: workspace:*
+        version: link:../core
       '@tmagic/schema':
-        specifier: 1.4.4
-        version: 1.4.4
+        specifier: workspace:*
+        version: link:../schema
       '@tmagic/utils':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.10)
+        specifier: workspace:*
+        version: link:../utils
       events:
         specifier: ^3.3.0
         version: 3.3.0
@@ -552,14 +546,14 @@ importers:
   packages/table:
     dependencies:
       '@tmagic/design':
-        specifier: 1.4.4
-        version: 1.4.4(vue@3.4.21(typescript@5.4.2))
+        specifier: workspace:*
+        version: link:../design
       '@tmagic/form':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.10)(vue@3.4.21(typescript@5.4.2))
+        specifier: workspace:*
+        version: link:../form
       '@tmagic/utils':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.10)
+        specifier: workspace:*
+        version: link:../utils
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -604,8 +598,8 @@ importers:
   packages/tdesign-vue-next-adapter:
     dependencies:
       '@tmagic/design':
-        specifier: 1.4.4
-        version: 1.4.4(vue@3.4.21(typescript@5.4.2))
+        specifier: workspace:*
+        version: link:../design
       tdesign-vue-next:
         specifier: ^1.8.1
         version: 1.8.1(vue@3.4.21(typescript@5.4.2))
@@ -728,8 +722,8 @@ importers:
   packages/utils:
     dependencies:
       '@tmagic/schema':
-        specifier: 1.4.4
-        version: 1.4.4
+        specifier: workspace:*
+        version: link:../schema
       dayjs:
         specifier: ^1.11.4
         version: 1.11.4
@@ -911,23 +905,23 @@ importers:
   runtime/tmagic-form:
     dependencies:
       '@tmagic/core':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.10)
+        specifier: workspace:*
+        version: link:../../packages/core
       '@tmagic/editor':
-        specifier: 1.4.4
-        version: 1.4.4(@tmagic/design@1.4.4(vue@3.4.21(typescript@5.4.2)))(@tmagic/form@1.4.4(dayjs@1.11.10)(vue@3.4.21(typescript@5.4.2)))(dayjs@1.11.10)(monaco-editor@0.47.0)(scenejs@1.9.4)(vue@3.4.21(typescript@5.4.2))
+        specifier: workspace:*
+        version: link:../../packages/editor
       '@tmagic/form':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.10)(vue@3.4.21(typescript@5.4.2))
+        specifier: workspace:*
+        version: link:../../packages/form
       '@tmagic/schema':
-        specifier: 1.4.4
-        version: 1.4.4
+        specifier: workspace:*
+        version: link:../../packages/schema
       '@tmagic/stage':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.10)(scenejs@1.9.4)
+        specifier: workspace:*
+        version: link:../../packages/stage
       '@tmagic/utils':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.10)
+        specifier: workspace:*
+        version: link:../../packages/utils
       element-plus:
         specifier: ^2.6.1
         version: 2.6.1(vue@3.4.21(typescript@5.4.2))

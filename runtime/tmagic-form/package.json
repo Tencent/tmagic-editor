@@ -32,12 +32,12 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "@tmagic/core": "1.4.4",
-    "@tmagic/editor": "1.4.4",
-    "@tmagic/form": "1.4.4",
-    "@tmagic/utils": "1.4.4",
-    "@tmagic/schema": "1.4.4",
-    "@tmagic/stage": "1.4.4",
+    "@tmagic/core": "workspace:*",
+    "@tmagic/editor": "workspace:*",
+    "@tmagic/form": "workspace:*",
+    "@tmagic/utils": "workspace:*",
+    "@tmagic/schema": "workspace:*",
+    "@tmagic/stage": "workspace:*",
     "element-plus": "^2.6.1",
     "vue": "^3.4.21"
   },

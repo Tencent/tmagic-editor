@@ -38,12 +38,12 @@
     "typescript"
   ],
   "dependencies": {
-    "@tmagic/design": "1.4.4",
+    "@tmagic/design": "workspace:*",
     "tdesign-vue-next": "^1.8.1",
     "vue": "^3.4.21"
   },
   "peerDependencies": {
-    "@tmagic/design": "1.4.4",
+    "@tmagic/design": "workspace:*",
     "tdesign-vue-next": "^1.8.1",
     "vue": "^3.4.21"
   },
