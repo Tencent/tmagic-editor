@@ -539,12 +539,15 @@ export interface CascaderConfig extends FormItem, Input {
   checkStrictly?: boolean;
   /** 弹出内容的自定义类名 */
   popperClass?: string;
+  /** 合并成字符串时的分隔符 */
+  valueSeparator?: string;
   options?:
     | ((
         mForm: FormState | undefined,
         data: {
           model: Record<any, any>;
-          formValues: Record<any, any>;
+          prop: string;
+          formValue: Record<any, any>;
         },
       ) => CascaderOption[])
     | CascaderOption[];

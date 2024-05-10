@@ -55,7 +55,7 @@ import { has } from 'lodash-es';
 
 import type { EventOption } from '@tmagic/core';
 import { TMagicButton } from '@tmagic/design';
-import type { FieldProps, FormState, PanelConfig } from '@tmagic/form';
+import type { CascaderOption, FieldProps, FormState, PanelConfig } from '@tmagic/form';
 import { MContainer, MPanel } from '@tmagic/form';
 import { ActionType } from '@tmagic/schema';
 
@@ -78,26 +78,30 @@ const codeBlockService = services?.codeBlockService;
 
 // 事件名称下拉框表单配置
 const eventNameConfig = computed(() => {
+  const fieldType = props.config.src === 'component' ? 'select' : 'cascader';
   const defaultEventNameConfig = {
     name: 'name',
     text: '事件',
-    type: 'select',
+    type: fieldType,
     labelWidth: '40px',
+    checkStrictly: true,
+    valueSeparator: '.',
     options: (mForm: FormState, { formValue }: any) => {
-      let events: EventOption[] = [];
+      let events: EventOption[] | CascaderOption[] = [];
 
       if (!eventsService || !dataSourceService) return events;
 
       if (props.config.src === 'component') {
         events = eventsService.getEvent(formValue.type);
-      } else if (props.config.src === 'datasource') {
-        events = dataSourceService.getFormEvent(formValue.type);
+        return events.map((option) => ({
+          text: option.label,
+          value: option.value,
+        }));
       }
-
-      return events.map((option) => ({
-        text: option.label,
-        value: option.value,
-      }));
+      if (props.config.src === 'datasource') {
+        events = dataSourceService.getEvent(formValue.type);
+        return events;
+      }
     },
   };
   return { ...defaultEventNameConfig, ...props.config.eventNameConfig };
@@ -275,6 +279,7 @@ const removeEvent = (index: number) => {
 };
 
 const onChangeHandler = () => {
+  console.log(props.model);
   emit('change', props.model);
 };
 </script>

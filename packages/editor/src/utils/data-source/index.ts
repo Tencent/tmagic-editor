@@ -32,7 +32,6 @@ const fillConfig = (config: FormConfig): FormConfig => [
       },
       {
         title: '事件配置',
-        display: false,
         items: [
           {
             name: 'events',
