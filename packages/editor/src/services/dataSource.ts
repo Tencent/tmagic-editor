@@ -120,13 +120,13 @@ class DataSource extends BaseService {
   }
 
   public getEvent(type: string): (EventOption & Partial<CascaderOption>)[] {
-    const events: (EventOption & Partial<CascaderOption>)[] = this.getFormEvent(type);
-    events.push({
+    const events = this.getFormEvent(type);
+    const dataSourceFieldChangeEvent = {
       label: '数据变化',
       value: DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX,
       children: this.getFields(type),
-    });
-    return events;
+    };
+    return [...events, dataSourceFieldChangeEvent];
   }
 
   public setFormValue(type: string, value: Partial<DataSourceSchema>) {

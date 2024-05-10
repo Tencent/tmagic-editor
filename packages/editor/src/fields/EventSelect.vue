@@ -279,7 +279,6 @@ const removeEvent = (index: number) => {
 };
 
 const onChangeHandler = () => {
-  console.log(props.model);
   emit('change', props.model);
 };
 </script>

@@ -273,8 +273,8 @@ class App extends EventEmitter implements AppCore {
       (dataSource.events || []).forEach((event) => {
         const [prefix, ...path] = event.name?.split('.') || [];
         if (!prefix) return;
-        const handler = (newVal: any) => {
-          this.eventHandler(event, this.dataSourceManager?.get(dataSource.id), newVal);
+        const handler = (...args: any[]) => {
+          this.eventHandler(event, this.dataSourceManager?.get(dataSource.id), args);
         };
         dataSourceEvent.set(event.name, handler);
         if (prefix === DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX) {
