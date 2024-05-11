@@ -3,9 +3,9 @@ import { cloneDeep } from 'lodash-es';
 import { Writable } from 'type-fest';
 
 import type { EventOption } from '@tmagic/core';
-import type { CascaderOption, FormConfig } from '@tmagic/form';
-import type { DataSchema, DataSourceFieldType, DataSourceSchema } from '@tmagic/schema';
-import { DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX, guid, toLine } from '@tmagic/utils';
+import type { FormConfig } from '@tmagic/form';
+import type { DataSourceSchema } from '@tmagic/schema';
+import { guid, toLine } from '@tmagic/utils';
 
 import type { DatasourceTypeOption, SyncHookPlugin } from '@editor/type';
 import { getFormConfig, getFormValue } from '@editor/utils/data-source';
@@ -77,56 +77,6 @@ class DataSource extends BaseService {
 
   public getFormValue(type = 'base') {
     return getFormValue(toLine(type), this.get('values')[type]);
-  }
-
-  public getFields(type: string) {
-    const getOptionChildren = (
-      fields: DataSchema[] = [],
-      dataSourceFieldType: DataSourceFieldType[] = ['any'],
-    ): CascaderOption[] => {
-      const child: CascaderOption[] = [];
-      fields.forEach((field) => {
-        if (!dataSourceFieldType.length) {
-          dataSourceFieldType.push('any');
-        }
-
-        const children = getOptionChildren(field.fields, dataSourceFieldType);
-
-        const item = {
-          label: field.title || field.name,
-          value: field.name,
-          children,
-        };
-
-        const fieldType = field.type || 'any';
-        if (dataSourceFieldType.includes('any') || dataSourceFieldType.includes(fieldType)) {
-          child.push(item);
-          return;
-        }
-
-        if (!dataSourceFieldType.includes(fieldType) && !['array', 'object', 'any'].includes(fieldType)) {
-          return;
-        }
-
-        if (!children.length && ['object', 'array', 'any'].includes(field.type || '')) {
-          return;
-        }
-
-        child.push(item);
-      });
-      return child;
-    };
-    return getOptionChildren(this.get('dataSources').find((item) => item.type === type)?.fields);
-  }
-
-  public getEvent(type: string): (EventOption & Partial<CascaderOption>)[] {
-    const events = this.getFormEvent(type);
-    const dataSourceFieldChangeEvent = {
-      label: '数据变化',
-      value: DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX,
-      children: this.getFields(type),
-    };
-    return [...events, dataSourceFieldChangeEvent];
   }
 
   public setFormValue(type: string, value: Partial<DataSourceSchema>) {
