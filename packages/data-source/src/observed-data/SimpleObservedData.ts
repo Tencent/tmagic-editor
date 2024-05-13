@@ -9,7 +9,7 @@ export class SimpleObservedData extends ObservedData {
   private event = new EventEmitter();
 
   constructor(initialData: Record<string, any>) {
-    super(initialData);
+    super();
     this.data = initialData;
   }
   update(data: any, path?: string): void {

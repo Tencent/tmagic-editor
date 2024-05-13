@@ -17,7 +17,7 @@ export class DeepObservedData extends ObservedData {
   state?: State;
   subscribers = new Map<string, Map<Function, () => void>>();
   constructor(initialData: Record<string, any>) {
-    super(initialData);
+    super();
     this.state = new State(initialData);
   }
   update = (data: any, path?: string) => {

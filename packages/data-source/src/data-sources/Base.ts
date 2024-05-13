@@ -139,7 +139,6 @@ export default class DataSource<T extends DataSourceSchema = DataSourceSchema> e
   }
 
   public destroy() {
-    // this.data = {};
     this.#fields = [];
     this.removeAllListeners();
     this.#observedData.destroy();
