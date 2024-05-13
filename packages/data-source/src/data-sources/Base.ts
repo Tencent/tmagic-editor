@@ -30,8 +30,6 @@ import type { ChangeEvent, DataSourceOptions } from '@data-source/types';
 export default class DataSource<T extends DataSourceSchema = DataSourceSchema> extends EventEmitter {
   public isInit = false;
 
-  // public data: Record<string, any> = {};
-
   /** @tmagic/core 实例 */
   public app: AppCore;
 
