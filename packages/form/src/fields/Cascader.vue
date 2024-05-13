@@ -1,6 +1,6 @@
 <template>
   <TMagicCascader
-    v-model="model[name]"
+    v-model="value"
     ref="tMagicCascader"
     style="width: 100%"
     clearable
@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { inject, ref, watchEffect } from 'vue';
+import { computed, inject, ref, watchEffect } from 'vue';
 
 import { TMagicCascader } from '@tmagic/design';
 
@@ -46,6 +46,22 @@ const tMagicCascader = ref<InstanceType<typeof TMagicCascader>>();
 
 const options = ref<CascaderOption[]>([]);
 const remoteData = ref<any>(null);
+
+const value = computed({
+  get() {
+    if (typeof props.model[props.name] === 'string' && props.config.valueSeparator) {
+      return props.model[props.name].split(props.config.valueSeparator);
+    }
+    return props.model[props.name];
+  },
+  set(value) {
+    let result = value;
+    if (props.config.valueSeparator) {
+      result = value.join(props.config.valueSeparator);
+    }
+    props.model[props.name] = result;
+  },
+});
 
 const setRemoteOptions = async function () {
   const { config } = props;
@@ -82,9 +98,18 @@ const setRemoteOptions = async function () {
 
 // 初始化
 if (typeof props.config.options === 'function' && props.model && mForm) {
-  watchEffect(
-    () => (options.value = (props.config.options as Function)(mForm, { model: props.model, formValues: mForm.values })),
-  );
+  watchEffect(() => {
+    typeof props.config.options === 'function' &&
+      Promise.resolve(
+        props.config.options(mForm, {
+          model: props.model,
+          prop: props.prop,
+          formValue: mForm?.values,
+        }),
+      ).then((data) => {
+        options.value = data;
+      });
+  });
 } else if (!props.config.options?.length || props.config.remote) {
   Promise.resolve(setRemoteOptions());
 } else if (Array.isArray(props.config.options)) {
@@ -93,10 +118,10 @@ if (typeof props.config.options === 'function' && props.model && mForm) {
   });
 }
 
-const changeHandler = (value: any) => {
+const changeHandler = () => {
   if (!tMagicCascader.value) return;
   tMagicCascader.value.setQuery('');
   tMagicCascader.value.setPreviousQuery(null);
-  emit('change', value);
+  emit('change', props.model[props.name]);
 };
 </script>

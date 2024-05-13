@@ -55,11 +55,13 @@ import { has } from 'lodash-es';
 
 import type { EventOption } from '@tmagic/core';
 import { TMagicButton } from '@tmagic/design';
-import type { FieldProps, FormState, PanelConfig } from '@tmagic/form';
+import type { CascaderOption, FieldProps, FormState, PanelConfig } from '@tmagic/form';
 import { MContainer, MPanel } from '@tmagic/form';
 import { ActionType } from '@tmagic/schema';
+import { DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX } from '@tmagic/utils';
 
 import type { CodeSelectColConfig, DataSourceMethodSelectConfig, EventSelectConfig, Services } from '@editor/type';
+import { getCascaderOptionsFromFields } from '@editor/utils';
 
 defineOptions({
   name: 'MFieldsEventSelect',
@@ -78,26 +80,45 @@ const codeBlockService = services?.codeBlockService;
 
 // 事件名称下拉框表单配置
 const eventNameConfig = computed(() => {
+  const fieldType = props.config.src === 'component' ? 'select' : 'cascader';
   const defaultEventNameConfig = {
     name: 'name',
     text: '事件',
-    type: 'select',
+    type: fieldType,
     labelWidth: '40px',
+    checkStrictly: true,
+    valueSeparator: '.',
     options: (mForm: FormState, { formValue }: any) => {
-      let events: EventOption[] = [];
+      let events: EventOption[] | CascaderOption[] = [];
 
       if (!eventsService || !dataSourceService) return events;
 
       if (props.config.src === 'component') {
         events = eventsService.getEvent(formValue.type);
-      } else if (props.config.src === 'datasource') {
-        events = dataSourceService.getFormEvent(formValue.type);
+        return events.map((option) => ({
+          text: option.label,
+          value: option.value,
+        }));
       }
+      if (props.config.src === 'datasource') {
+        // 从数据源类型中获取到相关事件
+        events = dataSourceService.getFormEvent(formValue.type);
+        // 从数据源类型和实例中分别获取数据以追加数据变化的事件
+        const dataSource = dataSourceService.getDataSourceById(formValue.id);
+        const fields = dataSource?.fields || [];
+        if (fields.length > 0) {
+          return [
+            ...events,
+            {
+              label: '数据变化',
+              value: DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX,
+              children: getCascaderOptionsFromFields(fields),
+            },
+          ];
+        }
 
-      return events.map((option) => ({
-        text: option.label,
-        value: option.value,
-      }));
+        return events;
+      }
     },
   };
   return { ...defaultEventNameConfig, ...props.config.eventNameConfig };

@@ -258,6 +258,8 @@ export interface DataSourceSchema {
   methods: CodeBlockContent[];
   /** mock数据 */
   mocks?: MockSchema[];
+  /** 事件 */
+  events: EventConfig[];
   /** 不执行init的环境 */
   disabledInitInJsEngine?: (JsEngine | string)[];
   /** 扩展字段 */
