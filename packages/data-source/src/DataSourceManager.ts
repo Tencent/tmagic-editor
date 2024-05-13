@@ -23,14 +23,15 @@ import { cloneDeep } from 'lodash-es';
 import type { AppCore, DataSourceSchema, Id, MNode } from '@tmagic/schema';
 import { compiledNode } from '@tmagic/utils';
 
-import { DeepObservedData } from './observed-data/DeepObservedData';
+import { SimpleObservedData } from './observed-data/SimpleObservedData';
 import { DataSource, HttpDataSource } from './data-sources';
 import type { ChangeEvent, DataSourceManagerData, DataSourceManagerOptions, ObservedDataClass } from './types';
 import { compiledNodeField, compliedConditions, compliedIteratorItems } from './utils';
 
 class DataSourceManager extends EventEmitter {
   private static dataSourceClassMap = new Map<string, typeof DataSource>();
-  private static ObservedDataClass: ObservedDataClass = DeepObservedData;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  private static ObservedDataClass: ObservedDataClass = SimpleObservedData;
 
   public static register<T extends typeof DataSource = typeof DataSource>(type: string, dataSource: T) {
     DataSourceManager.dataSourceClassMap.set(type, dataSource);

@@ -20,7 +20,7 @@ import { EventEmitter } from 'events';
 
 import { has, isEmpty } from 'lodash-es';
 
-import { createDataSourceManager, DataSourceManager } from '@tmagic/data-source';
+import { createDataSourceManager, DataSourceManager, ObservedDataClass } from '@tmagic/data-source';
 import {
   ActionType,
   type AppCore,
@@ -53,6 +53,7 @@ interface AppOptionsConfig {
   useMock?: boolean;
   transformStyle?: (style: Record<string, any>) => Record<string, any>;
   request?: RequestFunction;
+  DataSourceObservedData?: ObservedDataClass;
 }
 
 interface EventCache {
@@ -254,41 +255,6 @@ class App extends EventEmitter implements AppCore {
     return this.components.get(type);
   }
 
-  bindDataSourceEvents() {
-    // 先清掉之前注册的事件，重新注册
-    Array.from(this.dataSourceEventList.keys()).forEach((dataSourceId) => {
-      const dataSourceEvent = this.dataSourceEventList.get(dataSourceId)!;
-      Array.from(dataSourceEvent.keys()).forEach((eventName) => {
-        const [prefix, ...path] = eventName.split('.');
-        if (prefix === DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX) {
-          this.dataSourceManager?.offDataChange(dataSourceId, path.join('.'), dataSourceEvent.get(eventName)!);
-        } else {
-          this.dataSourceManager?.get(dataSourceId)?.off(prefix, dataSourceEvent.get(eventName)!);
-        }
-      });
-    });
-
-    (this.dsl?.dataSources || []).forEach((dataSource) => {
-      const dataSourceEvent = this.dataSourceEventList.get(dataSource.id) ?? new Map<string, (args: any) => void>();
-      (dataSource.events || []).forEach((event) => {
-        const [prefix, ...path] = event.name?.split('.') || [];
-        if (!prefix) return;
-        const handler = (...args: any[]) => {
-          this.eventHandler(event, this.dataSourceManager?.get(dataSource.id), args);
-        };
-        dataSourceEvent.set(event.name, handler);
-        if (prefix === DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX) {
-          // 数据源数据变化
-          this.dataSourceManager?.onDataChange(dataSource.id, path.join('.'), handler);
-        } else {
-          // 数据源自定义事件
-          this.dataSourceManager?.get(dataSource.id)?.on(prefix, handler);
-        }
-      });
-      this.dataSourceEventList.set(dataSource.id, dataSourceEvent);
-    });
-  }
-
   public bindEvents() {
     Array.from(this.eventList.keys()).forEach((handler) => {
       const name = this.eventList.get(handler);
@@ -392,6 +358,43 @@ class App extends EventEmitter implements AppCore {
     if (this.jsEngine === 'browser') {
       globalThis.removeEventListener('resize', this.calcFontsize);
     }
+  }
+
+  private bindDataSourceEvents() {
+    if (this.platform === 'editor') return;
+
+    // 先清掉之前注册的事件，重新注册
+    Array.from(this.dataSourceEventList.keys()).forEach((dataSourceId) => {
+      const dataSourceEvent = this.dataSourceEventList.get(dataSourceId)!;
+      Array.from(dataSourceEvent.keys()).forEach((eventName) => {
+        const [prefix, ...path] = eventName.split('.');
+        if (prefix === DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX) {
+          this.dataSourceManager?.offDataChange(dataSourceId, path.join('.'), dataSourceEvent.get(eventName)!);
+        } else {
+          this.dataSourceManager?.get(dataSourceId)?.off(prefix, dataSourceEvent.get(eventName)!);
+        }
+      });
+    });
+
+    (this.dsl?.dataSources || []).forEach((dataSource) => {
+      const dataSourceEvent = this.dataSourceEventList.get(dataSource.id) ?? new Map<string, (args: any) => void>();
+      (dataSource.events || []).forEach((event) => {
+        const [prefix, ...path] = event.name?.split('.') || [];
+        if (!prefix) return;
+        const handler = (...args: any[]) => {
+          this.eventHandler(event, this.dataSourceManager?.get(dataSource.id), args);
+        };
+        dataSourceEvent.set(event.name, handler);
+        if (prefix === DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX) {
+          // 数据源数据变化
+          this.dataSourceManager?.onDataChange(dataSource.id, path.join('.'), handler);
+        } else {
+          // 数据源自定义事件
+          this.dataSourceManager?.get(dataSource.id)?.on(prefix, handler);
+        }
+      });
+      this.dataSourceEventList.set(dataSource.id, dataSourceEvent);
+    });
   }
 
   /**
