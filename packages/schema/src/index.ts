@@ -130,7 +130,7 @@ export interface MComponent {
   /** 组件根Dom上的class */
   className?: string;
   /* 关联事件集合 */
-  events?: EventConfig[] | DeprecatedEventConfig[];
+  events?: EventConfig[];
   /** 组件根Dom的style */
   style?: {
     [key: string]: any;
