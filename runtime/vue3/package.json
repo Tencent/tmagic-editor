@@ -26,22 +26,20 @@
     "@tmagic/stage": "1.4.4",
     "@tmagic/utils": "1.4.4",
     "axios": "^0.25.0",
-    "vue": "^3.4.21"
+    "vue": "^3.4.27"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.21.4",
     "@types/node": "^18.19.0",
-    "@vitejs/plugin-legacy": "^5.2.0",
-    "@vitejs/plugin-vue": "^4.5.2",
+    "@vitejs/plugin-legacy": "^5.4.0",
+    "@vitejs/plugin-vue": "^5.0.4",
     "@vitejs/plugin-vue-jsx": "^3.1.0",
-    "@vue/compiler-sfc": "^3.4.21",
-    "@vue/test-utils": "^2.4.4",
-    "recast": "^0.20.4",
-    "rollup": "^2.25.0",
-    "rollup-plugin-external-globals": "^0.6.1",
-    "sass": "^1.35.1",
-    "terser": "^5.14.2",
+    "@vue/compiler-sfc": "^3.4.27",
+    "@vue/test-utils": "^2.4.6",
+    "rollup": "^4.17.2",
+    "rollup-plugin-external-globals": "^0.10.0",
+    "sass": "^1.77.0",
+    "terser": "^5.31.0",
     "typescript": "^5.4.2",
-    "vite": "^5.1.6"
+    "vite": "^5.2.11"
   }
 }

@@ -46,16 +46,15 @@
     "typescript"
   ],
   "dependencies": {
-    "@babel/core": "^7.18.0",
     "@element-plus/icons-vue": "^2.3.1",
-    "@tmagic/core": "1.4.4",
-    "@tmagic/dep": "1.4.4",
-    "@tmagic/design": "1.4.4",
-    "@tmagic/form": "1.4.4",
-    "@tmagic/schema": "1.4.4",
-    "@tmagic/stage": "1.4.4",
-    "@tmagic/table": "1.4.4",
-    "@tmagic/utils": "1.4.4",
+    "@tmagic/core": "workspace:*",
+    "@tmagic/dep": "workspace:*",
+    "@tmagic/design": "workspace:*",
+    "@tmagic/form": "workspace:*",
+    "@tmagic/schema": "workspace:*",
+    "@tmagic/stage": "workspace:*",
+    "@tmagic/table": "workspace:*",
+    "@tmagic/utils": "workspace:*",
     "buffer": "^6.0.3",
     "color": "^3.1.3",
     "emmet-monaco-es": "^5.3.0",
@@ -63,31 +62,31 @@
     "gesto": "^1.19.1",
     "keycon": "^1.4.0",
     "lodash-es": "^4.17.21",
-    "monaco-editor": "^0.47.0",
-    "moveable": "^0.51.1",
+    "monaco-editor": "^0.48.0",
+    "moveable": "^0.53.0",
     "serialize-javascript": "^6.0.0",
-    "vue": "^3.4.21"
+    "vue": "^3.4.27"
   },
   "peerDependencies": {
-    "@tmagic/design": "1.4.4",
-    "@tmagic/form": "1.4.4",
-    "monaco-editor": "^0.47.0",
-    "vue": "^3.4.21"
+    "@tmagic/design": "workspace:*",
+    "@tmagic/form": "workspace:*",
+    "monaco-editor": "^0.48.0",
+    "vue": "^3.4.27"
   },
   "devDependencies": {
     "@types/events": "^3.0.0",
     "@types/lodash-es": "^4.17.4",
     "@types/node": "^18.19.0",
     "@types/serialize-javascript": "^5.0.1",
-    "@vitejs/plugin-vue": "^4.5.2",
-    "@vue/compiler-sfc": "^3.4.21",
-    "@vue/test-utils": "^2.4.4",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "@vue/compiler-sfc": "^3.4.27",
+    "@vue/test-utils": "^2.4.6",
     "rimraf": "^3.0.2",
-    "sass": "^1.35.1",
+    "sass": "^1.77.0",
     "tsc-alias": "^1.8.5",
     "type-fest": "^4.10.3",
     "typescript": "^5.4.2",
-    "vite": "^5.1.6",
-    "vue-tsc": "^2.0.6"
+    "vite": "^5.2.11",
+    "vue-tsc": "^2.0.16"
   }
 }

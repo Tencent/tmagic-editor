@@ -20,7 +20,7 @@ import { EventEmitter } from 'events';
 
 import { has, isEmpty } from 'lodash-es';
 
-import { createDataSourceManager, DataSourceManager } from '@tmagic/data-source';
+import { createDataSourceManager, DataSourceManager, ObservedDataClass } from '@tmagic/data-source';
 import {
   ActionType,
   type AppCore,
@@ -35,6 +35,7 @@ import {
   type MApp,
   type RequestFunction,
 } from '@tmagic/schema';
+import { DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX } from '@tmagic/utils';
 
 import Env from './Env';
 import { bindCommonEventListener, isCommonMethod, triggerCommonMethod } from './events';
@@ -52,6 +53,7 @@ interface AppOptionsConfig {
   useMock?: boolean;
   transformStyle?: (style: Record<string, any>) => Record<string, any>;
   request?: RequestFunction;
+  DataSourceObservedData?: ObservedDataClass;
 }
 
 interface EventCache {
@@ -79,6 +81,7 @@ class App extends EventEmitter implements AppCore {
   public eventQueueMap: Record<string, EventCache[]> = {};
 
   private eventList = new Map<(fromCpt: Node, ...args: any[]) => void, string>();
+  private dataSourceEventList = new Map<string, Map<string, (...args: any[]) => void>>();
 
   constructor(options: AppOptionsConfig) {
     super();
@@ -263,15 +266,16 @@ class App extends EventEmitter implements AppCore {
     if (!this.page) return;
 
     for (const [, value] of this.page.nodes) {
-      value.events?.forEach((event) => {
+      value.events?.forEach((event, index) => {
         const eventName = `${event.name}_${value.data.id}`;
         const eventHandler = (fromCpt: Node, ...args: any[]) => {
-          this.eventHandler(event, fromCpt, args);
+          this.eventHandler(index, fromCpt, args);
         };
         this.eventList.set(eventHandler, eventName);
         this.on(eventName, eventHandler);
       });
     }
+    this.bindDataSourceEvents();
   }
 
   public emit(name: string | symbol, ...args: any[]): boolean {
@@ -356,17 +360,57 @@ class App extends EventEmitter implements AppCore {
     }
   }
 
+  private bindDataSourceEvents() {
+    if (this.platform === 'editor') return;
+
+    // 先清掉之前注册的事件，重新注册
+    Array.from(this.dataSourceEventList.keys()).forEach((dataSourceId) => {
+      const dataSourceEvent = this.dataSourceEventList.get(dataSourceId)!;
+      Array.from(dataSourceEvent.keys()).forEach((eventName) => {
+        const [prefix, ...path] = eventName.split('.');
+        if (prefix === DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX) {
+          this.dataSourceManager?.offDataChange(dataSourceId, path.join('.'), dataSourceEvent.get(eventName)!);
+        } else {
+          this.dataSourceManager?.get(dataSourceId)?.off(prefix, dataSourceEvent.get(eventName)!);
+        }
+      });
+    });
+
+    (this.dsl?.dataSources || []).forEach((dataSource) => {
+      const dataSourceEvent = this.dataSourceEventList.get(dataSource.id) ?? new Map<string, (args: any) => void>();
+      (dataSource.events || []).forEach((event) => {
+        const [prefix, ...path] = event.name?.split('.') || [];
+        if (!prefix) return;
+        const handler = (...args: any[]) => {
+          this.eventHandler(event, this.dataSourceManager?.get(dataSource.id), args);
+        };
+        dataSourceEvent.set(event.name, handler);
+        if (prefix === DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX) {
+          // 数据源数据变化
+          this.dataSourceManager?.onDataChange(dataSource.id, path.join('.'), handler);
+        } else {
+          // 数据源自定义事件
+          this.dataSourceManager?.get(dataSource.id)?.on(prefix, handler);
+        }
+      });
+      this.dataSourceEventList.set(dataSource.id, dataSourceEvent);
+    });
+  }
+
   /**
    * 事件联动处理函数
-   * @param eventConfig 事件配置
+   * @param eventsConfigIndex 事件配置索引，可以通过此索引从node.event中获取最新事件配置
    * @param fromCpt 触发事件的组件
    * @param args 事件参数
    */
-  private async eventHandler(eventConfig: EventConfig | DeprecatedEventConfig, fromCpt: any, args: any[]) {
+  private async eventHandler(eventsConfigIndex: number, fromCpt: Node, args: any[]) {
+    const eventConfig = fromCpt.events[eventsConfigIndex] as EventConfig | DeprecatedEventConfig;
     if (has(eventConfig, 'actions')) {
       // EventConfig类型
       const { actions } = eventConfig as EventConfig;
-      for (const actionItem of actions) {
+      for (let i = 0; i < actions.length; i++) {
+        // 事件响应中可能会有修改数据源数据的，会更新dsl，所以这里需要重新获取
+        const actionItem = (fromCpt.events[eventsConfigIndex] as EventConfig).actions[i];
         if (actionItem.actionType === ActionType.COMP) {
           // 组件动作
           await this.compActionHandler(actionItem as CompItemConfig, fromCpt, args);

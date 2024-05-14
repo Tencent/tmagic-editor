@@ -1,9 +1,16 @@
 import { describe, expect, test } from 'vitest';
 
-import Core from '@tmagic/core';
-import { NodeType } from '@tmagic/schema';
+import { type MApp, NodeType } from '@tmagic/schema';
 
 import { DataSource, DataSourceManager } from '@data-source/index';
+
+class Core {
+  public dsl?: MApp;
+
+  constructor(options: any) {
+    this.dsl = options.config;
+  }
+}
 
 const app = new Core({
   config: {

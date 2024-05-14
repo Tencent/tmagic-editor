@@ -32,7 +32,9 @@ class Page extends Node {
     super(options);
 
     this.setNode(options.config.id, this);
-    this.initNode(options.config, this);
+    options.config.items.forEach((config) => {
+      this.initNode(config, this);
+    });
   }
 
   public initNode(config: MComponent | MContainer, parent: Node) {

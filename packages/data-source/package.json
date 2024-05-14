@@ -34,9 +34,10 @@
     "data-source"
   ],
   "dependencies": {
-    "@tmagic/dep": "1.4.4",
-    "@tmagic/utils": "1.4.4",
-    "@tmagic/schema": "1.4.4",
+    "@tmagic/dep": "workspace:*",
+    "@tmagic/schema": "workspace:*",
+    "@tmagic/utils": "workspace:*",
+    "deep-state-observer": "^5.5.13",
     "events": "^3.3.0",
     "lodash-es": "^4.17.21"
   },
@@ -46,6 +47,6 @@
     "@types/node": "^18.19.0",
     "tsc-alias": "^1.8.5",
     "typescript": "^5.4.2",
-    "vite": "^5.1.6"
+    "vite": "^5.2.11"
   }
 }

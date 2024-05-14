@@ -38,14 +38,14 @@ import { computed, inject, ref, resolveComponent, watch } from 'vue';
 import { Coin, Edit, View } from '@element-plus/icons-vue';
 
 import { TMagicButton } from '@tmagic/design';
-import type { CascaderConfig, CascaderOption, FieldProps, FormState } from '@tmagic/form';
+import type { CascaderConfig, FieldProps, FormState } from '@tmagic/form';
 import { filterFunction, MCascader } from '@tmagic/form';
-import type { DataSchema, DataSourceFieldType } from '@tmagic/schema';
 import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX } from '@tmagic/utils';
 
 import MIcon from '@editor/components/Icon.vue';
 import type { DataSourceFieldSelectConfig, EventBus, Services } from '@editor/type';
 import { SideItemKey } from '@editor/type';
+import { getCascaderOptionsFromFields } from '@editor/utils';
 
 defineOptions({
   name: 'MFieldsDataSourceFieldSelect',
@@ -76,43 +76,6 @@ const selectedDataSourceId = computed(() => {
 
 const dataSources = computed(() => services?.dataSourceService.get('dataSources'));
 
-const getOptionChildren = (
-  fields: DataSchema[] = [],
-  dataSourceFieldType: DataSourceFieldType[] = ['any'],
-): CascaderOption[] => {
-  const child: CascaderOption[] = [];
-  fields.forEach((field) => {
-    if (!dataSourceFieldType.length) {
-      dataSourceFieldType.push('any');
-    }
-
-    const children = getOptionChildren(field.fields, dataSourceFieldType);
-
-    const item = {
-      label: field.title || field.name,
-      value: field.name,
-      children,
-    };
-
-    const fieldType = field.type || 'any';
-    if (dataSourceFieldType.includes('any') || dataSourceFieldType.includes(fieldType)) {
-      child.push(item);
-      return;
-    }
-
-    if (!dataSourceFieldType.includes(fieldType) && !['array', 'object', 'any'].includes(fieldType)) {
-      return;
-    }
-
-    if (!children.length && ['object', 'array', 'any'].includes(field.type || '')) {
-      return;
-    }
-
-    child.push(item);
-  });
-  return child;
-};
-
 const cascaderConfig = computed<CascaderConfig>(() => {
   const valueIsKey = props.config.value === 'key';
 
@@ -125,7 +88,7 @@ const cascaderConfig = computed<CascaderConfig>(() => {
         dataSources.value?.map((ds) => ({
           label: ds.title || ds.id,
           value: valueIsKey ? ds.id : `${DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX}${ds.id}`,
-          children: getOptionChildren(ds.fields, props.config.dataSourceFieldType),
+          children: getCascaderOptionsFromFields(ds.fields, props.config.dataSourceFieldType),
         })) || [];
       return options.filter((option) => option.children.length);
     },

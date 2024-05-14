@@ -2,6 +2,9 @@ import type { AppCore, DataSourceSchema, HttpOptions, RequestFunction } from '@t
 
 import type DataSource from './data-sources/Base';
 import type HttpDataSource from './data-sources/Http';
+import { ObservedData } from './observed-data/ObservedData';
+
+export type ObservedDataClass = new (...args: any[]) => ObservedData;
 
 export interface DataSourceOptions<T extends DataSourceSchema = DataSourceSchema> {
   schema: T;
@@ -9,6 +12,7 @@ export interface DataSourceOptions<T extends DataSourceSchema = DataSourceSchema
   initialData?: Record<string, any>;
   useMock?: boolean;
   request?: RequestFunction;
+  ObservedDataClass?: ObservedDataClass;
   [key: string]: any;
 }
 
