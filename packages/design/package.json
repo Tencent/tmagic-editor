@@ -37,9 +37,6 @@
     "vue3",
     "typescript"
   ],
-  "dependencies": {
-    "vue": "^3.4.27"
-  },
   "peerDependencies": {
     "vue": "^3.4.27"
   },

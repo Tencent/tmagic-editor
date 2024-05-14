@@ -31,12 +31,11 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "@tmagic/schema": "workspace:*",
     "dayjs": "^1.11.11",
     "lodash-es": "^4.17.21"
   },
   "peerDependencies": {
-    "dayjs": "^1.11.11"
+    "@tmagic/schema": "workspace:*"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.4",

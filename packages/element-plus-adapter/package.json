@@ -37,10 +37,6 @@
     "vue3",
     "typescript"
   ],
-  "dependencies": {
-    "@tmagic/design": "workspace:*",
-    "element-plus": "^2.6.1"
-  },
   "peerDependencies": {
     "@tmagic/design": "workspace:*",
     "element-plus": "^2.6.1"

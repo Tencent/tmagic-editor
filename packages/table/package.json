@@ -35,14 +35,12 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
+    "lodash-es": "^4.17.21"
+  },
+  "peerDependencies": {
     "@tmagic/design": "workspace:*",
     "@tmagic/form": "workspace:*",
     "@tmagic/utils": "workspace:*",
-    "lodash-es": "^4.17.21",
-    "vue": "^3.4.27"
-  },
-  "peerDependencies": {
-    "@tmagic/form": "workspace:*",
     "vue": "^3.4.27"
   },
   "devDependencies": {

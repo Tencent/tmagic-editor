@@ -52,7 +52,10 @@ export default defineConfig(({ mode }) => ({
         if (mode === 'umd' && id === 'lodash-es') {
           return false;
         }
-        return Object.keys(pkg.dependencies).some((k) => new RegExp(`^${k}`).test(id));
+        return Object.keys({
+          ...pkg.dependencies,
+          ...pkg.peerDependencies,
+        }).some((k) => new RegExp(`^${k}`).test(id));
       },
     },
   },
