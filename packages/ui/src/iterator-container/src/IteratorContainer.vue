@@ -1,14 +1,13 @@
 <template>
-  <div class="magic-ui-iterator-container" :id="`${config.id || ''}`" :style="style">
+  <div class="magic-ui-iterator-container">
     <Container v-for="(item, index) in configs" :key="index" :config="item"></Container>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, inject } from 'vue';
+import { computed } from 'vue';
 
-import Core from '@tmagic/core';
-import type { MContainer } from '@tmagic/schema';
+import { type MContainer, NodeType } from '@tmagic/schema';
 
 import Container from '../../container';
 import useApp from '../../useApp';
@@ -31,9 +30,10 @@ const props = withDefaults(
   },
 );
 
-const app: Core | undefined = inject('app');
-
-const style = computed(() => app?.transformStyle(props.config.style || {}));
+const { app } = useApp({
+  config: props.config,
+  methods: {},
+});
 
 const configs = computed(() => {
   const { iteratorData = [] } = props.config;
@@ -47,6 +47,7 @@ const configs = computed(() => {
       app?.dataSourceManager?.compliedIteratorItems(itemData, props.config.items, props.config.dsField) ??
       props.config.items,
     id: '',
+    type: NodeType.CONTAINER,
     style: {
       ...props.config.itemConfig.style,
       position: 'relative',
@@ -54,10 +55,5 @@ const configs = computed(() => {
       top: 0,
     },
   }));
-});
-
-useApp({
-  config: props.config,
-  methods: {},
 });
 </script>

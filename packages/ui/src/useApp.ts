@@ -16,36 +16,60 @@
  * limitations under the License.
  */
 
-import { inject, onBeforeUnmount, onMounted } from 'vue';
+import { computed, inject, onBeforeUnmount, onMounted } from 'vue';
 
 import Core from '@tmagic/core';
-import type { MComponent } from '@tmagic/schema';
+import type { MNode } from '@tmagic/schema';
 
-interface UseAppOptions {
-  config: MComponent;
+interface UseAppOptions<T extends MNode = MNode> {
+  config: T;
   methods?: {
     [key: string]: Function;
   };
 }
 
-export default ({ config, methods }: UseAppOptions) => {
+export default ({ methods, config }: UseAppOptions) => {
   const app: Core | undefined = inject('app');
-  const node = app?.page?.getNode(config.id);
+
+  const node = app?.page?.getNode(config.id || '');
+
+  const style = computed(() => (app ? app.transformStyle(config.style || {}) : config.style));
 
   const emitData = {
     config,
     ...methods,
   };
 
-  node?.emit('created', emitData);
+  const display = <T extends MNode>(config: T) => {
+    if (config.visible === false) return false;
+    if (config.condResult === false) return false;
 
-  onMounted(() => {
-    node?.emit('mounted', emitData);
-  });
+    const displayCfg = config.display;
 
-  onBeforeUnmount(() => {
-    node?.emit('destroy', emitData);
-  });
+    if (typeof displayCfg === 'function') {
+      return displayCfg(app);
+    }
 
-  return app;
+    return displayCfg !== false;
+  };
+
+  if (node) {
+    node.emit('created', emitData);
+
+    onMounted(() => {
+      node.emit('mounted', emitData);
+    });
+
+    onBeforeUnmount(() => {
+      node.emit('destroy', emitData);
+    });
+  }
+
+  return {
+    app,
+    node,
+    style,
+
+    display,
+  };
 };

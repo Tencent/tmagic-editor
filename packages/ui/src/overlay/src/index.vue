@@ -3,17 +3,21 @@
     <slot></slot>
   </magic-ui-container>
 </template>
-<script lang="ts" setup>
-import { inject, ref } from 'vue';
 
-import Core from '@tmagic/core';
-import type { MComponent, MNode } from '@tmagic/schema';
+<script lang="ts" setup>
+import { ref } from 'vue';
+
+import type { MContainer, MNode } from '@tmagic/schema';
 
 import useApp from '../../useApp';
 
+interface OverlaySchema extends MContainer {
+  type: 'overlay';
+}
+
 const props = withDefaults(
   defineProps<{
-    config: MComponent;
+    config: OverlaySchema;
     model?: any;
   }>(),
   {
@@ -22,36 +26,26 @@ const props = withDefaults(
 );
 
 const visible = ref(false);
-const app: Core | undefined = inject('app');
-const node = app?.page?.getNode(props.config.id);
 
-const openOverlay = () => {
-  visible.value = true;
-  if (app) {
-    app.emit('overlay:open', node);
-  }
-};
-
-const closeOverlay = () => {
-  visible.value = false;
-  if (app) {
-    app.emit('overlay:close', node);
-  }
-};
+const { app, node } = useApp({
+  config: props.config,
+  methods: {
+    openOverlay() {
+      visible.value = true;
+      app?.emit('overlay:open', node);
+    },
+    closeOverlay() {
+      visible.value = false;
+      app?.emit('overlay:close', node);
+    },
+  },
+});
 
 app?.page?.on('editor:select', (info, path) => {
   if (path.find((node: MNode) => node.id === props.config.id)) {
-    openOverlay();
+    node?.instance.openOverlay();
   } else {
-    closeOverlay();
+    node?.instance.closeOverlay();
   }
-});
-
-useApp({
-  config: props.config,
-  methods: {
-    openOverlay,
-    closeOverlay,
-  },
 });
 </script>
