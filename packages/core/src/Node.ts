@@ -19,7 +19,7 @@
 import { EventEmitter } from 'events';
 
 import { DataSource } from '@tmagic/data-source';
-import type { AppCore, EventConfig, MComponent, MContainer, MPage, MPageFragment } from '@tmagic/schema';
+import type { AppCore, EventConfig, MComponent, MContainer, MNode, MPage, MPageFragment } from '@tmagic/schema';
 import { HookCodeType, HookType } from '@tmagic/schema';
 
 import type App from './App';
@@ -27,14 +27,14 @@ import type Page from './Page';
 import Store from './Store';
 
 interface NodeOptions {
-  config: MComponent | MContainer;
+  config: MNode;
   page?: Page;
   parent?: Node;
   app: App;
 }
 class Node extends EventEmitter {
-  public data!: MComponent | MContainer | MPage | MPageFragment;
-  public style?: {
+  public data!: MNode;
+  public style!: {
     [key: string]: any;
   };
   public events: EventConfig[] = [];

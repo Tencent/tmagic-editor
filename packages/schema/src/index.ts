@@ -131,6 +131,10 @@ export interface MComponent {
   className?: string;
   /* 关联事件集合 */
   events?: EventConfig[];
+  /** 是否隐藏 */
+  visible?: boolean;
+  /** 显示条件中配置的数据源条件的编译结果 */
+  condResult?: boolean;
   /** 组件根Dom的style */
   style?: {
     [key: string]: any;
@@ -198,7 +202,7 @@ export interface PastePosition {
   top?: number;
 }
 
-export type MNode = MComponent | MContainer | MPage | MApp;
+export type MNode = MComponent | MContainer | MPage | MApp | MPageFragment;
 
 export enum HookType {
   /** 代码块钩子标识 */
