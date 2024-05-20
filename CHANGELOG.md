@@ -1,3 +1,21 @@
+## [1.4.5](https://github.com/Tencent/tmagic-editor/compare/v1.4.4...v1.4.5) (2024-05-20)
+
+
+### Bug Fixes
+
+* **core,data-source:** 事件参数中关联数据源字段无法自动更新 ([c665bf3](https://github.com/Tencent/tmagic-editor/commit/c665bf3ccc7627f134efb5fe7bc7f53c88ec338c))
+* **editor,stage,utils:** 修复在ipad等大屏场景下编辑画布中元素位置计算偏差问题 ([#598](https://github.com/Tencent/tmagic-editor/issues/598)) ([e39a7d1](https://github.com/Tencent/tmagic-editor/commit/e39a7d140fef9bc00376b84910a78b04b277fae7))
+* **form:** select option label不生效 ([9034cef](https://github.com/Tencent/tmagic-editor/commit/9034cef0d21626472f0b6618aaa5f5355019b9ed))
+* **form:** select option 在没有adapter的时候默认使用el-option ([ad2146f](https://github.com/Tencent/tmagic-editor/commit/ad2146f3bd4df4720bf86fef14e33f1dbbd355de))
+
+
+### Features
+
+* **data-source:** manager init 事件增加error数据 ([708d3db](https://github.com/Tencent/tmagic-editor/commit/708d3db4bbeb2b2512d5c85919b1e738dc55da83))
+* 支持数据源事件 ([#605](https://github.com/Tencent/tmagic-editor/issues/605)) ([88c04c6](https://github.com/Tencent/tmagic-editor/commit/88c04c6dac6ada5bacf30b33b6ed0a7649020fa2))
+
+
+
 ## [1.4.4](https://github.com/Tencent/tmagic-editor/compare/v1.4.3...v1.4.4) (2024-04-16)
 
 
