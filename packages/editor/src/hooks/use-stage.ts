@@ -24,7 +24,7 @@ export const useStage = (stageOptions: StageOptions) => {
   const stage = new StageCore({
     render: stageOptions.render,
     runtimeUrl: stageOptions.runtimeUrl,
-    zoom: zoom.value,
+    zoom: stageOptions.zoom ?? zoom.value,
     autoScrollIntoView: stageOptions.autoScrollIntoView,
     isContainer: stageOptions.isContainer,
     containerHighlightClassName: stageOptions.containerHighlightClassName,

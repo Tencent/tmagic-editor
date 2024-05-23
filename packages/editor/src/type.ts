@@ -150,6 +150,7 @@ export interface StageOptions {
   renderType?: RenderType;
   guidesOptions?: Partial<GuidesOptions>;
   disabledMultiSelect?: boolean;
+  zoom?: number;
 }
 
 export interface StoreState {
