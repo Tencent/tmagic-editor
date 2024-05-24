@@ -1,5 +1,5 @@
 {
-  "version": "1.4.4",
+  "version": "1.4.5",
   "name": "@tmagic/design",
   "type": "module",
   "sideEffects": [
@@ -37,9 +37,6 @@
     "vue3",
     "typescript"
   ],
-  "dependencies": {
-    "vue": "^3.4.27"
-  },
   "peerDependencies": {
     "vue": "^3.4.27"
   },

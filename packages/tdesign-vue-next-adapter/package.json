@@ -1,5 +1,5 @@
 {
-  "version": "1.4.4",
+  "version": "1.4.5",
   "name": "@tmagic/tdesign-vue-next-adapter",
   "type": "module",
   "sideEffects": [
@@ -37,11 +37,6 @@
     "vue3",
     "typescript"
   ],
-  "dependencies": {
-    "@tmagic/design": "workspace:*",
-    "tdesign-vue-next": "^1.8.1",
-    "vue": "^3.4.27"
-  },
   "peerDependencies": {
     "@tmagic/design": "workspace:*",
     "tdesign-vue-next": "^1.8.1",

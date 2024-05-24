@@ -1,5 +1,5 @@
 {
-  "version": "1.4.4",
+  "version": "1.4.5",
   "name": "@tmagic/dep",
   "type": "module",
   "sideEffects": [
@@ -30,7 +30,7 @@
     "type": "git",
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
-  "dependencies": {
+  "peerDependencies": {
     "@tmagic/schema": "workspace:*",
     "@tmagic/utils": "workspace:*"
   },

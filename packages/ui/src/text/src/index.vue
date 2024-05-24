@@ -3,13 +3,13 @@
 </template>
 
 <script lang="ts" setup>
-import { MComponent } from '@tmagic/schema';
+import type { MComponent } from '@tmagic/schema';
 
 import useApp from '../../useApp';
 
 const props = withDefaults(
   defineProps<{
-    config: MComponent;
+    config: MComponent & { type: 'text'; text: string };
     model?: any;
   }>(),
   {

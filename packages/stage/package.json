@@ -1,5 +1,5 @@
 {
-  "version": "1.4.4",
+  "version": "1.4.5",
   "name": "@tmagic/stage",
   "type": "module",
   "sideEffects": [
@@ -32,14 +32,16 @@
   },
   "dependencies": {
     "@scena/guides": "^0.29.2",
-    "@tmagic/core": "workspace:*",
-    "@tmagic/schema": "workspace:*",
-    "@tmagic/utils": "workspace:*",
     "events": "^3.3.0",
     "keycon": "^1.4.0",
     "lodash-es": "^4.17.21",
     "moveable": "^0.53.0",
     "moveable-helper": "^0.4.0"
+  },
+  "peerDependencies": {
+    "@tmagic/core": "workspace:*",
+    "@tmagic/schema": "workspace:*",
+    "@tmagic/utils": "workspace:*"
   },
   "devDependencies": {
     "@types/events": "^3.0.0",

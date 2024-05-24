@@ -1,9 +1,9 @@
 {
-  "version": "1.4.4",
+  "version": "1.4.5",
   "name": "tmagic",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@9.1.0",
+  "packageManager": "pnpm@9.1.2",
   "scripts": {
     "bootstrap": "pnpm i && pnpm build",
     "clean:top": "rimraf */**/dist */**/types */dist coverage dwt*",

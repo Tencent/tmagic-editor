@@ -82,6 +82,7 @@ export { default as LayoutContainer } from './components/SplitView.vue';
 export { default as SplitView } from './components/SplitView.vue';
 export { default as Resizer } from './components/Resizer.vue';
 export { default as CodeBlockEditor } from './components/CodeBlockEditor.vue';
+export { default as FloatingBox } from './components/FloatingBox.vue';
 export { default as PageFragmentSelect } from './fields/PageFragmentSelect.vue';
 
 const defaultInstallOpt: InstallOptions = {

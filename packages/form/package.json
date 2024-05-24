@@ -1,5 +1,5 @@
 {
-  "version": "1.4.4",
+  "version": "1.4.5",
   "name": "@tmagic/form",
   "type": "module",
   "sideEffects": [
@@ -38,13 +38,12 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
-    "@tmagic/design": "workspace:*",
-    "@tmagic/utils": "workspace:*",
     "lodash-es": "^4.17.21",
-    "sortablejs": "^1.15.2",
-    "vue": "^3.4.27"
+    "sortablejs": "^1.15.2"
   },
   "peerDependencies": {
+    "@tmagic/design": "workspace:*",
+    "@tmagic/utils": "workspace:*",
     "vue": "^3.4.27"
   },
   "devDependencies": {

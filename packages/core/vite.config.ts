@@ -48,7 +48,10 @@ export default defineConfig({
     rollupOptions: {
       // 确保外部化处理那些你不想打包进库的依赖
       external(id: string) {
-        return Object.keys(pkg.dependencies).some((k) => new RegExp(`^${k}`).test(id));
+        return Object.keys({
+          ...pkg.dependencies,
+          ...pkg.peerDependencies,
+        }).some((k) => new RegExp(`^${k}`).test(id));
       },
     },
   },

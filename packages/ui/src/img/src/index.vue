@@ -1,14 +1,21 @@
 <template>
   <img class="magic-ui-img" :src="config.src" @click="clickHandler" />
 </template>
+
 <script lang="ts" setup>
-import { MComponent } from '@tmagic/schema';
+import type { MComponent } from '@tmagic/schema';
 
 import useApp from '../../useApp';
 
+interface ImgSchema extends MComponent {
+  type: 'img';
+  src: string;
+  url: string;
+}
+
 const props = withDefaults(
   defineProps<{
-    config: MComponent;
+    config: ImgSchema;
     model?: any;
   }>(),
   {

@@ -1,5 +1,5 @@
 {
-  "version": "1.0.6",
+  "version": "1.0.9",
   "name": "@tmagic/tmagic-form-runtime",
   "type": "module",
   "sideEffects": [
@@ -31,20 +31,13 @@
     "type": "git",
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
-  "dependencies": {
+  "peerDependencies": {
     "@tmagic/core": "workspace:*",
     "@tmagic/editor": "workspace:*",
     "@tmagic/form": "workspace:*",
     "@tmagic/utils": "workspace:*",
     "@tmagic/schema": "workspace:*",
     "@tmagic/stage": "workspace:*",
-    "element-plus": "^2.6.1",
-    "vue": "^3.4.27"
-  },
-  "peerDependencies": {
-    "@tmagic/editor": "1.4.4",
-    "@tmagic/form": "1.4.4",
-    "@tmagic/schema": "1.4.4",
     "element-plus": "^2.6.1",
     "vue": "^3.4.27"
   },

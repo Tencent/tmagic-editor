@@ -1,31 +1,30 @@
 <template>
   <button class="magic-ui-button">
     <slot>
-      <magic-ui-text :config="textConfig"></magic-ui-text>
+      <p>{{ config?.text || '' }}</p>
     </slot>
   </button>
 </template>
-<script lang="ts" setup>
-import { computed } from 'vue';
 
-import { MComponent } from '@tmagic/schema';
+<script lang="ts" setup>
+import type { MComponent } from '@tmagic/schema';
 
 import useApp from '../../useApp';
 
+interface ButtonSchema extends MComponent {
+  type: 'button';
+  text: string;
+}
+
 const props = withDefaults(
   defineProps<{
-    config: MComponent;
+    config: ButtonSchema;
     model?: any;
   }>(),
   {
     model: () => ({}),
   },
 );
-
-const textConfig = computed(() => ({
-  type: 'text',
-  text: props.config?.text || '',
-}));
 
 useApp({
   config: props.config,

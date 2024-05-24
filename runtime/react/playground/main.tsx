@@ -113,8 +113,9 @@ const operations = {
     updateConfig(root);
   },
 
-  update({ config, root }: UpdateData) {
-    replaceChildNode(app.dataSourceManager?.compiledNode(config, undefined, true) || config, root.items);
+  update({ config, root, parentId}: UpdateData) {
+    const newNode = app.dataSourceManager?.compiledNode(config, undefined, true) || config;
+		replaceChildNode(newNode, [root], parentId);
     updateConfig(cloneDeep(root));
   },
 
