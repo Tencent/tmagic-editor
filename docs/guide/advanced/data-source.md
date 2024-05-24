@@ -100,6 +100,6 @@ formConfig.js
 - index 入口文件，引入下面几个文件
 - formConfig 表单配置描述
 - initValue 表单初始值
-- event 定义联动事件，具体可以参考[组件联动](../guide/advanced/coupling.html#组件联动)
+- event 定义联动事件，具体可以参考[组件联动](./coupling.html#组件联动)
 - dataSource 数据源逻辑代码
 
