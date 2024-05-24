@@ -1,17 +1,11 @@
 <template>
-  <magic-ui-page v-if="pageConfig" :config="pageConfig" :key="pageConfig.id"></magic-ui-page>
+  <magic-ui-page v-if="pageConfig" :key="pageConfig.id" :config="pageConfig"></magic-ui-page>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 
 import { useEditorDsl } from '@tmagic/vue-runtime-help';
-declare global {
-  interface Window {
-    magic: Magic;
-    appInstance: Core;
-  }
-}
 
 export default defineComponent({
   setup() {

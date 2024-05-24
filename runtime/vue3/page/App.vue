@@ -3,6 +3,8 @@
 </template>
 
 <script lang="ts" setup>
+import { inject } from 'vue';
+
 import type { Page } from '@tmagic/core';
 import Core from '@tmagic/core';
 import { addParamToUrl } from '@tmagic/utils';
