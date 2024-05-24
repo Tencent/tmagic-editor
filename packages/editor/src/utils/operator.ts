@@ -2,7 +2,7 @@ import { toRaw } from 'vue';
 import { isEmpty } from 'lodash-es';
 
 import { Id, MContainer, MNode, NodeType } from '@tmagic/schema';
-import { isPage, isPageFragment } from '@tmagic/utils';
+import { calcValueByFontsize, isPage, isPageFragment } from '@tmagic/utils';
 
 import editorService from '@editor/services/editor';
 import propsService from '@editor/services/props';
@@ -15,7 +15,7 @@ import { generatePageNameByApp, getInitPositionStyle } from '@editor/utils/edito
  * @param config 待粘贴的元素配置(复制时保存的那份配置)
  * @returns
  */
-export const beforePaste = (position: PastePosition, config: MNode[]): MNode[] => {
+export const beforePaste = (position: PastePosition, config: MNode[], doc?: Document): MNode[] => {
   if (!config[0]?.style) return config;
   const curNode = editorService.get('node');
   // 将数组中第一个元素的坐标作为参照点
@@ -29,7 +29,7 @@ export const beforePaste = (position: PastePosition, config: MNode[]): MNode[] =
     if (!isEmpty(pastePosition) && curNode?.items) {
       // 如果没有传入粘贴坐标则可能为键盘操作，不再转换
       // 如果粘贴时选中了容器，则将元素粘贴到容器内，坐标需要转换为相对于容器的坐标
-      pastePosition = getPositionInContainer(pastePosition, curNode.id);
+      pastePosition = getPositionInContainer(pastePosition, curNode.id, doc);
     }
 
     // 将所有待粘贴元素坐标相对于多选第一个元素坐标重新计算，以保证多选粘贴后元素间距不变
@@ -71,12 +71,12 @@ export const beforePaste = (position: PastePosition, config: MNode[]): MNode[] =
  * @param id 元素id
  * @returns PastePosition 转换后的坐标
  */
-export const getPositionInContainer = (position: PastePosition = {}, id: Id) => {
+export const getPositionInContainer = (position: PastePosition = {}, id: Id, doc?: Document) => {
   let { left = 0, top = 0 } = position;
   const parentEl = editorService.get('stage')?.renderer?.contentWindow?.document.getElementById(`${id}`);
   const parentElRect = parentEl?.getBoundingClientRect();
-  left = left - (parentElRect?.left || 0);
-  top = top - (parentElRect?.top || 0);
+  left = left - calcValueByFontsize(doc, parentElRect?.left || 0);
+  top = top - calcValueByFontsize(doc, parentElRect?.top || 0);
   return {
     left,
     top,
