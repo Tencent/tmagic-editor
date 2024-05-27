@@ -1,3 +1,21 @@
+## [1.4.6](https://github.com/Tencent/tmagic-editor/compare/v1.4.5...v1.4.6) (2024-05-27)
+
+
+### Bug Fixes
+
+* **editor:** stageOverlay不应受编辑器zoom影响 ([47c4222](https://github.com/Tencent/tmagic-editor/commit/47c42222b317a4a62ba1bbc3e496e5eef085dd0d))
+* **runtime:react:** update page时出错 ([af3f621](https://github.com/Tencent/tmagic-editor/commit/af3f621424cd472c72b54bcdfbed3a4ccc91fd5e))
+* **runtime:** vue runtime App组件中缺失inject ([15e9cdc](https://github.com/Tencent/tmagic-editor/commit/15e9cdc2d6255bb9fe5b9924ab79405ba9c95465))
+
+
+### Features
+
+* **editor,dep:** 支持复制组件时将组件绑定的数据源一并复制 ([faabf1b](https://github.com/Tencent/tmagic-editor/commit/faabf1bb3ad77b6b09498bb7512e3f2d1a7f0a76))
+* **editor:** export FloatingBox ([5ce099c](https://github.com/Tencent/tmagic-editor/commit/5ce099c11d02eb564ce7575922c3f2419d2322df))
+* **runtime:** vue2/vue3公共部分提出到vue-runtime-help中 ([f8dd062](https://github.com/Tencent/tmagic-editor/commit/f8dd062a502766579c6a59df642b89b075a68c1f))
+
+
+
 ## [1.4.5](https://github.com/Tencent/tmagic-editor/compare/v1.4.4...v1.4.5) (2024-05-20)
 
 
