@@ -37,18 +37,23 @@
     "vue3",
     "typescript"
   ],
-  "peerDependencies": {
-    "@tmagic/design": "workspace:*",
-    "tdesign-vue-next": "^1.8.1",
-    "vue": "^3.4.27"
-  },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
     "@vue/compiler-sfc": "^3.4.27",
     "@types/node": "^18.19.0",
     "rimraf": "^3.0.2",
-    "typescript": "^5.4.2",
     "vite": "^5.2.11",
     "vue-tsc": "^2.0.16"
+  },
+  "peerDependencies": {
+    "@tmagic/design": "workspace:*",
+    "tdesign-vue-next": "^1.8.1",
+    "vue": "^3.4.27",
+    "typescript": "*"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
   }
 }

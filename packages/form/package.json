@@ -41,11 +41,6 @@
     "lodash-es": "^4.17.21",
     "sortablejs": "^1.15.2"
   },
-  "peerDependencies": {
-    "@tmagic/design": "workspace:*",
-    "@tmagic/utils": "workspace:*",
-    "vue": "^3.4.27"
-  },
   "devDependencies": {
     "@types/lodash-es": "^4.17.4",
     "@types/node": "^18.19.0",
@@ -55,8 +50,18 @@
     "@vue/test-utils": "^2.4.6",
     "rimraf": "^3.0.2",
     "sass": "^1.77.0",
-    "typescript": "^5.4.2",
     "vite": "^5.2.11",
     "vue-tsc": "^2.0.16"
+  },
+  "peerDependencies": {
+    "@tmagic/design": "workspace:*",
+    "@tmagic/utils": "workspace:*",
+    "vue": "^3.4.27",
+    "typescript": "*"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
   }
 }

@@ -1,4 +1,4 @@
-import { DepData } from '@tmagic/schema';
+import type { DepData } from '@tmagic/schema';
 
 import type Target from './Target';
 

@@ -37,17 +37,22 @@
     "vue3",
     "typescript"
   ],
-  "peerDependencies": {
-    "vue": "^3.4.27"
-  },
   "devDependencies": {
     "@types/node": "^18.19.0",
     "@vitejs/plugin-vue": "^5.0.4",
     "@vue/compiler-sfc": "^3.4.27",
     "@vue/test-utils": "^2.4.6",
     "rimraf": "^3.0.2",
-    "typescript": "^5.4.2",
     "vite": "^5.2.11",
     "vue-tsc": "^2.0.16"
+  },
+  "peerDependencies": {
+    "vue": "^3.4.27",
+    "typescript": "*"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
   }
 }

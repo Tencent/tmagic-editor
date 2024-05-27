@@ -25,8 +25,6 @@ import { NodeType } from '@tmagic/schema';
 
 export * from './dom';
 
-dayjs.extend(utc);
-
 export const sleep = (ms: number): Promise<void> =>
   new Promise((resolve) => {
     const timer = setTimeout(() => {
@@ -45,6 +43,7 @@ export const datetimeFormatter = (
     if (['x', 'timestamp'].includes(format)) {
       time = dayjs(v).valueOf();
     } else if ((typeof v === 'string' && v.includes('Z')) || v.constructor === Date) {
+      dayjs.extend(utc);
       // UTC字符串时间或Date对象格式化为北京时间
       time = dayjs(v).utcOffset(8).format(format);
     } else {

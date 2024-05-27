@@ -34,14 +34,19 @@
     "dayjs": "^1.11.11",
     "lodash-es": "^4.17.21"
   },
-  "peerDependencies": {
-    "@tmagic/schema": "workspace:*"
-  },
   "devDependencies": {
     "@types/lodash-es": "^4.17.4",
     "@types/node": "^18.19.0",
     "rimraf": "^3.0.2",
-    "typescript": "^5.4.2",
     "vite": "^5.2.11"
+  },
+  "peerDependencies": {
+    "@tmagic/schema": "workspace:*",
+    "typescript": "*"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
   }
 }

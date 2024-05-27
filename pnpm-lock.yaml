@@ -146,6 +146,9 @@ importers:
       tslib:
         specifier: ^2.6.2
         version: 2.6.2
+      typescript:
+        specifier: '*'
+        version: 5.4.2
     devDependencies:
       '@types/fs-extra':
         specifier: ^11.0.4
@@ -171,6 +174,9 @@ importers:
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
+      typescript:
+        specifier: '*'
+        version: 5.4.2
     devDependencies:
       '@types/events':
         specifier: ^3.0.0
@@ -184,9 +190,6 @@ importers:
       rimraf:
         specifier: ^3.0.2
         version: 3.0.2
-      typescript:
-        specifier: ^5.4.2
-        version: 5.4.2
       vite:
         specifier: ^5.2.11
         version: 5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0)
@@ -211,6 +214,9 @@ importers:
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
+      typescript:
+        specifier: '*'
+        version: 5.4.2
     devDependencies:
       '@types/events':
         specifier: ^3.0.0
@@ -224,9 +230,6 @@ importers:
       tsc-alias:
         specifier: ^1.8.5
         version: 1.8.5
-      typescript:
-        specifier: ^5.4.2
-        version: 5.4.2
       vite:
         specifier: ^5.2.11
         version: 5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0)
@@ -239,6 +242,9 @@ importers:
       '@tmagic/utils':
         specifier: workspace:*
         version: link:../utils
+      typescript:
+        specifier: '*'
+        version: 5.4.2
     devDependencies:
       '@types/node':
         specifier: ^18.19.0
@@ -246,15 +252,15 @@ importers:
       rimraf:
         specifier: ^3.0.2
         version: 3.0.2
-      typescript:
-        specifier: ^5.4.2
-        version: 5.4.2
       vite:
         specifier: ^5.2.11
         version: 5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0)
 
   packages/design:
     dependencies:
+      typescript:
+        specifier: '*'
+        version: 5.4.2
       vue:
         specifier: ^3.4.27
         version: 3.4.27(typescript@5.4.2)
@@ -274,9 +280,6 @@ importers:
       rimraf:
         specifier: ^3.0.2
         version: 3.0.2
-      typescript:
-        specifier: ^5.4.2
-        version: 5.4.2
       vite:
         specifier: ^5.2.11
         version: 5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0)
@@ -343,6 +346,9 @@ importers:
       serialize-javascript:
         specifier: ^6.0.0
         version: 6.0.0
+      typescript:
+        specifier: '*'
+        version: 5.4.2
       vue:
         specifier: ^3.4.27
         version: 3.4.27(typescript@5.4.2)
@@ -380,9 +386,6 @@ importers:
       type-fest:
         specifier: ^4.10.3
         version: 4.11.1
-      typescript:
-        specifier: ^5.4.2
-        version: 5.4.2
       vite:
         specifier: ^5.2.11
         version: 5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0)
@@ -398,6 +401,9 @@ importers:
       element-plus:
         specifier: ^2.6.1
         version: 2.6.1(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))
+      typescript:
+        specifier: '*'
+        version: 5.4.2
     devDependencies:
       '@types/node':
         specifier: ^18.19.0
@@ -405,9 +411,6 @@ importers:
       rimraf:
         specifier: ^3.0.2
         version: 3.0.2
-      typescript:
-        specifier: ^5.4.2
-        version: 5.4.2
       vite:
         specifier: ^5.2.11
         version: 5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0)
@@ -429,6 +432,9 @@ importers:
       sortablejs:
         specifier: ^1.15.2
         version: 1.15.2
+      typescript:
+        specifier: '*'
+        version: 5.4.2
       vue:
         specifier: ^3.4.27
         version: 3.4.27(typescript@5.4.2)
@@ -457,9 +463,6 @@ importers:
       sass:
         specifier: ^1.77.0
         version: 1.77.0
-      typescript:
-        specifier: ^5.4.2
-        version: 5.4.2
       vite:
         specifier: ^5.2.11
         version: 5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0)
@@ -468,6 +471,10 @@ importers:
         version: 2.0.16(typescript@5.4.2)
 
   packages/schema:
+    dependencies:
+      typescript:
+        specifier: '*'
+        version: 5.4.2
     devDependencies:
       '@types/node':
         specifier: ^18.19.0
@@ -475,9 +482,6 @@ importers:
       rimraf:
         specifier: ^3.0.2
         version: 3.0.2
-      typescript:
-        specifier: ^5.4.2
-        version: 5.4.2
       vite:
         specifier: ^5.2.11
         version: 5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0)
@@ -511,6 +515,9 @@ importers:
       moveable-helper:
         specifier: ^0.4.0
         version: 0.4.0(scenejs@1.9.4)
+      typescript:
+        specifier: '*'
+        version: 5.4.2
     devDependencies:
       '@types/events':
         specifier: ^3.0.0
@@ -527,9 +534,6 @@ importers:
       sass:
         specifier: ^1.77.0
         version: 1.77.0
-      typescript:
-        specifier: ^5.4.2
-        version: 5.4.2
       vite:
         specifier: ^5.2.11
         version: 5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0)
@@ -548,6 +552,9 @@ importers:
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
+      typescript:
+        specifier: '*'
+        version: 5.4.2
       vue:
         specifier: ^3.4.27
         version: 3.4.27(typescript@5.4.2)
@@ -573,9 +580,6 @@ importers:
       sass:
         specifier: ^1.77.0
         version: 1.77.0
-      typescript:
-        specifier: ^5.4.2
-        version: 5.4.2
       vite:
         specifier: ^5.2.11
         version: 5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0)
@@ -591,6 +595,9 @@ importers:
       tdesign-vue-next:
         specifier: ^1.8.1
         version: 1.8.1(vue@3.4.27(typescript@5.4.2))
+      typescript:
+        specifier: '*'
+        version: 5.4.2
       vue:
         specifier: ^3.4.27
         version: 3.4.27(typescript@5.4.2)
@@ -607,9 +614,6 @@ importers:
       rimraf:
         specifier: ^3.0.2
         version: 3.0.2
-      typescript:
-        specifier: ^5.4.2
-        version: 5.4.2
       vite:
         specifier: ^5.2.11
         version: 5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0)
@@ -718,6 +722,9 @@ importers:
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
+      typescript:
+        specifier: '*'
+        version: 5.4.2
     devDependencies:
       '@types/lodash-es':
         specifier: ^4.17.4
@@ -728,9 +735,6 @@ importers:
       rimraf:
         specifier: ^3.0.2
         version: 3.0.2
-      typescript:
-        specifier: ^5.4.2
-        version: 5.4.2
       vite:
         specifier: ^5.2.11
         version: 5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0)
