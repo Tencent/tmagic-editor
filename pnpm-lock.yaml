@@ -770,6 +770,9 @@ importers:
       element-plus:
         specifier: ^2.6.1
         version: 2.6.1(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
       monaco-editor:
         specifier: ^0.48.0
         version: 0.48.0
@@ -783,6 +786,9 @@ importers:
         specifier: ^4.0.10
         version: 4.0.10(vue@3.4.27(typescript@5.4.2))
     devDependencies:
+      '@types/lodash-es':
+        specifier: ^4.17.4
+        version: 4.17.7
       '@types/node':
         specifier: ^18.19.0
         version: 18.19.3

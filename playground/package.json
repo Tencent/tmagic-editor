@@ -23,12 +23,14 @@
     "@tmagic/stage": "1.4.5",
     "@tmagic/utils": "1.4.5",
     "element-plus": "^2.6.1",
+    "lodash-es": "^4.17.21",
     "monaco-editor": "^0.48.0",
     "serialize-javascript": "^6.0.0",
     "vue": "^3.4.27",
     "vue-router": "^4.0.10"
   },
   "devDependencies": {
+    "@types/lodash-es": "^4.17.4",
     "@types/node": "^18.19.0",
     "@types/serialize-javascript": "^5.0.1",
     "@vitejs/plugin-legacy": "^5.4.0",

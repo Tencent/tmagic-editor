@@ -23,7 +23,7 @@ import { Writable } from 'type-fest';
 import { DepTargetType } from '@tmagic/dep';
 import type { FormConfig } from '@tmagic/form';
 import type { Id, MComponent, MNode } from '@tmagic/schema';
-import { getValueByKeyPath, guid, setValueByKeyPath, toLine } from '@tmagic/utils';
+import { getNodePath, getValueByKeyPath, guid, setValueByKeyPath, toLine } from '@tmagic/utils';
 
 import depService from '@editor/services/dep';
 import editorService from '@editor/services/editor';
@@ -199,13 +199,14 @@ class Props extends BaseService {
   public replaceRelateId(originConfigs: MNode[], targetConfigs: MNode[]) {
     const relateIdMap = this.getRelateIdMap();
     if (Object.keys(relateIdMap).length === 0) return;
-
+    depService.clearByType(DepTargetType.RELATED_COMP_WHEN_COPY);
+    depService.collect(originConfigs, true, DepTargetType.RELATED_COMP_WHEN_COPY);
     const target = depService.getTarget(DepTargetType.RELATED_COMP_WHEN_COPY, DepTargetType.RELATED_COMP_WHEN_COPY);
     if (!target) return;
-
     originConfigs.forEach((config: MNode) => {
       const newId = relateIdMap[config.id];
-      const targetConfig = targetConfigs.find((targetConfig) => targetConfig.id === newId);
+      const path = getNodePath(newId, targetConfigs);
+      const targetConfig = path[path.length - 1];
 
       if (!targetConfig) return;
 
@@ -213,9 +214,13 @@ class Props extends BaseService {
         const relateOriginId = getValueByKeyPath(fullKey, config);
         const relateTargetId = relateIdMap[relateOriginId];
         if (!relateTargetId) return;
-
         setValueByKeyPath(fullKey, relateTargetId, targetConfig);
       });
+
+      // 递归items
+      if (config.items && Array.isArray(config.items)) {
+        this.replaceRelateId(config.items, targetConfigs);
+      }
     });
   }
 

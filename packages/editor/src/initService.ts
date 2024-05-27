@@ -7,7 +7,7 @@ import {
   createDataSourceCondTarget,
   createDataSourceMethodTarget,
   createDataSourceTarget,
-  createRelatedCompTarget,
+  createRelatedTargetForCopy,
   DepTargetType,
   Target,
 } from '@tmagic/dep';
@@ -412,7 +412,17 @@ export const initServiceEvents = (
 
   // 初始化复制组件相关的依赖收集器
   if (props.collectorOptions && !depService.hasTarget(DepTargetType.RELATED_COMP_WHEN_COPY)) {
-    depService.addTarget(createRelatedCompTarget(props.collectorOptions));
+    depService.addTarget(createRelatedTargetForCopy(props.collectorOptions, DepTargetType.RELATED_COMP_WHEN_COPY));
+  }
+  if (props.collectorOptionsForCode && !depService.hasTarget(DepTargetType.RELATED_CODE_WHEN_COPY)) {
+    depService.addTarget(
+      createRelatedTargetForCopy(props.collectorOptionsForCode, DepTargetType.RELATED_CODE_WHEN_COPY),
+    );
+  }
+  if (props.collectorOptionsForDataSource && !depService.hasTarget(DepTargetType.RELATED_DS_WHEN_COPY)) {
+    depService.addTarget(
+      createRelatedTargetForCopy(props.collectorOptionsForDataSource, DepTargetType.RELATED_DS_WHEN_COPY),
+    );
   }
 
   onBeforeUnmount(() => {
