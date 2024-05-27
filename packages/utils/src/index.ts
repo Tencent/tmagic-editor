@@ -165,9 +165,12 @@ export const guid = (digit = 8): string =>
     return v.toString(16);
   });
 
-export const getValueByKeyPath: any = (keys: string | string[] = '', data: Record<string | number, any> = {}) => {
+export const getValueByKeyPath = (
+  keys: number | string | string[] = '',
+  data: Record<string | number, any> = {},
+): any => {
   // 将 array[0] 转成 array.0
-  const keyArray = Array.isArray(keys) ? keys : keys.replaceAll(/\[(\d+)\]/g, '.$1').split('.');
+  const keyArray = Array.isArray(keys) ? keys : `${keys}`.replaceAll(/\[(\d+)\]/g, '.$1').split('.');
   return keyArray.reduce((accumulator, currentValue: any) => {
     if (isObject(accumulator) || Array.isArray(accumulator)) {
       return accumulator[currentValue];
@@ -177,7 +180,7 @@ export const getValueByKeyPath: any = (keys: string | string[] = '', data: Recor
   }, data);
 };
 
-export const setValueByKeyPath: any = (keys: string, value: any, data: Record<string | number, any> = {}) =>
+export const setValueByKeyPath = (keys: string | number, value: any, data: Record<string | number, any> = {}): any =>
   objectSet(data, keys, value);
 
 export const getNodes = (ids: Id[], data: MNode[] = []): MNode[] => {
