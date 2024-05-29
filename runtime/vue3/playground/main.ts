@@ -30,19 +30,7 @@ Promise.all([
   import('../.tmagic/plugin-entry'),
   import('../.tmagic/datasource-entry'),
 ]).then(([components, plugins, dataSources]) => {
-  const magicApp = createApp(App);
-
-  Object.entries(components.default).forEach(([type, component]: [string, any]) => {
-    magicApp.component(`magic-ui-${type}`, component);
-  });
-
-  Object.entries(dataSources.default).forEach(([type, ds]: [string, any]) => {
-    DataSourceManager.register(type, ds);
-  });
-
-  Object.values(plugins.default).forEach((plugin: any) => {
-    magicApp.use(plugin);
-  });
+  const vueApp = createApp(App);
 
   const app = new Core({
     ua: window.navigator.userAgent,
@@ -53,9 +41,21 @@ Promise.all([
     app.setDesignWidth(window.document.documentElement.getBoundingClientRect().width);
   }
 
-  window.appInstance = app;
-  magicApp.config.globalProperties.app = app;
-  magicApp.provide('app', app);
+  Object.entries(components.default).forEach(([type, component]: [string, any]) => {
+    vueApp.component(`magic-ui-${type}`, component);
+  });
 
-  magicApp.mount('#app');
+  Object.entries(dataSources.default).forEach(([type, ds]: [string, any]) => {
+    DataSourceManager.register(type, ds);
+  });
+
+  Object.values(plugins.default).forEach((plugin: any) => {
+    vueApp.use(plugin, { app });
+  });
+
+  window.appInstance = app;
+  vueApp.config.globalProperties.app = app;
+  vueApp.provide('app', app);
+
+  vueApp.mount('#app');
 });

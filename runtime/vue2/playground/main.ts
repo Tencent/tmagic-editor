@@ -30,6 +30,15 @@ Promise.all([
   import('../.tmagic/plugin-entry'),
   import('../.tmagic/datasource-entry'),
 ]).then(([components, plugins, dataSources]) => {
+  const app = new Core({
+    ua: window.navigator.userAgent,
+    platform: 'editor',
+  });
+
+  if (app.env.isWeb) {
+    app.setDesignWidth(window.document.documentElement.getBoundingClientRect().width);
+  }
+
   Object.entries(components.default).forEach(([type, component]: [string, any]) => {
     Vue.component(`magic-ui-${type}`, component);
   });
@@ -39,17 +48,8 @@ Promise.all([
   });
 
   Object.values(plugins.default).forEach((plugin: any) => {
-    Vue.use(plugin);
+    Vue.use(plugin, { app });
   });
-
-  const app = new Core({
-    ua: window.navigator.userAgent,
-    platform: 'editor',
-  });
-
-  if (app.env.isWeb) {
-    app.setDesignWidth(window.document.documentElement.getBoundingClientRect().width);
-  }
 
   window.appInstance = app;
 

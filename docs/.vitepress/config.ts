@@ -94,6 +94,10 @@ export default defineConfig({
               link: '/guide/advanced/code-block.md',
             },
             {
+              text: '数据源',
+              link: '/guide/advanced/data-source.md'
+            },
+            {
               text: '@tmagic/ui',
               link: '/guide/advanced/tmagic-ui.md',
             },

@@ -25,6 +25,8 @@ import { calcValueByFontsize, getNodePath, isNumber, isPage, isPageFragment, isP
 
 import { Layout } from '@editor/type';
 export const COPY_STORAGE_KEY = '$MagicEditorCopyData';
+export const COPY_CODE_STORAGE_KEY = '$MagicEditorCopyCode';
+export const COPY_DS_STORAGE_KEY = '$MagicEditorCopyDataSource';
 
 /**
  * 获取所有页面配置

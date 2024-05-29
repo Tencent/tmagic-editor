@@ -32,10 +32,10 @@ export const createCodeBlockTarget = (id: Id, codeBlock: CodeBlockContent, initi
     },
   });
 
-export const createRelatedCompTarget = (options: CustomTargetOptions) =>
+export const createRelatedTargetForCopy = (options: CustomTargetOptions, type: DepTargetType) =>
   new Target({
-    id: DepTargetType.RELATED_COMP_WHEN_COPY,
-    type: DepTargetType.RELATED_COMP_WHEN_COPY,
+    id: type,
+    type,
     ...options,
   });
 

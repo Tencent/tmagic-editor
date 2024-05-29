@@ -8,9 +8,6 @@ importers:
 
   .:
     devDependencies:
-      '@algolia/client-search':
-        specifier: '>= 4.9.1 < 6'
-        version: 4.9.1
       '@commitlint/cli':
         specifier: ^18.2.0
         version: 18.2.0(typescript@5.4.2)
@@ -49,7 +46,7 @@ importers:
         version: 3.3.0(typescript@5.4.2)
       element-plus:
         specifier: ^2.6.1
-        version: 2.6.1(vue@3.4.27(typescript@5.4.2))
+        version: 2.6.1(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))
       enquirer:
         specifier: ^2.3.6
         version: 2.3.6
@@ -117,8 +114,8 @@ importers:
         specifier: ^5.2.11
         version: 5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0)
       vitepress:
-        specifier: 1.1.4
-        version: 1.1.4(@algolia/client-search@4.9.1)(@types/node@18.19.3)(@types/react@17.0.37)(async-validator@4.2.5)(axios@0.25.0)(postcss@8.4.38)(qrcode@1.5.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.77.0)(search-insights@2.9.0)(sortablejs@1.15.2)(terser@5.31.0)(typescript@5.4.2)
+        specifier: 1.2.2
+        version: 1.2.2(@algolia/client-search@4.23.3)(@types/node@18.19.3)(@types/react@17.0.37)(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(async-validator@4.2.5)(axios@0.25.0)(postcss@8.4.38)(qrcode@1.5.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.77.0)(search-insights@2.9.0)(sortablejs@1.15.2)(terser@5.31.0)(typescript@5.4.2)
       vitest:
         specifier: ^1.6.0
         version: 1.6.0(@types/node@18.19.3)(jsdom@19.0.0)(sass@1.77.0)(terser@5.31.0)
@@ -149,6 +146,9 @@ importers:
       tslib:
         specifier: ^2.6.2
         version: 2.6.2
+      typescript:
+        specifier: '*'
+        version: 5.4.2
     devDependencies:
       '@types/fs-extra':
         specifier: ^11.0.4
@@ -174,6 +174,9 @@ importers:
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
+      typescript:
+        specifier: '*'
+        version: 5.4.2
     devDependencies:
       '@types/events':
         specifier: ^3.0.0
@@ -187,9 +190,6 @@ importers:
       rimraf:
         specifier: ^3.0.2
         version: 3.0.2
-      typescript:
-        specifier: ^5.4.2
-        version: 5.4.2
       vite:
         specifier: ^5.2.11
         version: 5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0)
@@ -214,6 +214,9 @@ importers:
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
+      typescript:
+        specifier: '*'
+        version: 5.4.2
     devDependencies:
       '@types/events':
         specifier: ^3.0.0
@@ -227,9 +230,6 @@ importers:
       tsc-alias:
         specifier: ^1.8.5
         version: 1.8.5
-      typescript:
-        specifier: ^5.4.2
-        version: 5.4.2
       vite:
         specifier: ^5.2.11
         version: 5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0)
@@ -242,6 +242,9 @@ importers:
       '@tmagic/utils':
         specifier: workspace:*
         version: link:../utils
+      typescript:
+        specifier: '*'
+        version: 5.4.2
     devDependencies:
       '@types/node':
         specifier: ^18.19.0
@@ -249,15 +252,15 @@ importers:
       rimraf:
         specifier: ^3.0.2
         version: 3.0.2
-      typescript:
-        specifier: ^5.4.2
-        version: 5.4.2
       vite:
         specifier: ^5.2.11
         version: 5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0)
 
   packages/design:
     dependencies:
+      typescript:
+        specifier: '*'
+        version: 5.4.2
       vue:
         specifier: ^3.4.27
         version: 3.4.27(typescript@5.4.2)
@@ -277,9 +280,6 @@ importers:
       rimraf:
         specifier: ^3.0.2
         version: 3.0.2
-      typescript:
-        specifier: ^5.4.2
-        version: 5.4.2
       vite:
         specifier: ^5.2.11
         version: 5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0)
@@ -346,6 +346,9 @@ importers:
       serialize-javascript:
         specifier: ^6.0.0
         version: 6.0.0
+      typescript:
+        specifier: '*'
+        version: 5.4.2
       vue:
         specifier: ^3.4.27
         version: 3.4.27(typescript@5.4.2)
@@ -383,9 +386,6 @@ importers:
       type-fest:
         specifier: ^4.10.3
         version: 4.11.1
-      typescript:
-        specifier: ^5.4.2
-        version: 5.4.2
       vite:
         specifier: ^5.2.11
         version: 5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0)
@@ -400,7 +400,10 @@ importers:
         version: link:../design
       element-plus:
         specifier: ^2.6.1
-        version: 2.6.1(vue@3.4.27(typescript@5.4.2))
+        version: 2.6.1(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))
+      typescript:
+        specifier: '*'
+        version: 5.4.2
     devDependencies:
       '@types/node':
         specifier: ^18.19.0
@@ -408,9 +411,6 @@ importers:
       rimraf:
         specifier: ^3.0.2
         version: 3.0.2
-      typescript:
-        specifier: ^5.4.2
-        version: 5.4.2
       vite:
         specifier: ^5.2.11
         version: 5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0)
@@ -432,6 +432,9 @@ importers:
       sortablejs:
         specifier: ^1.15.2
         version: 1.15.2
+      typescript:
+        specifier: '*'
+        version: 5.4.2
       vue:
         specifier: ^3.4.27
         version: 3.4.27(typescript@5.4.2)
@@ -460,9 +463,6 @@ importers:
       sass:
         specifier: ^1.77.0
         version: 1.77.0
-      typescript:
-        specifier: ^5.4.2
-        version: 5.4.2
       vite:
         specifier: ^5.2.11
         version: 5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0)
@@ -471,6 +471,10 @@ importers:
         version: 2.0.16(typescript@5.4.2)
 
   packages/schema:
+    dependencies:
+      typescript:
+        specifier: '*'
+        version: 5.4.2
     devDependencies:
       '@types/node':
         specifier: ^18.19.0
@@ -478,9 +482,6 @@ importers:
       rimraf:
         specifier: ^3.0.2
         version: 3.0.2
-      typescript:
-        specifier: ^5.4.2
-        version: 5.4.2
       vite:
         specifier: ^5.2.11
         version: 5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0)
@@ -514,6 +515,9 @@ importers:
       moveable-helper:
         specifier: ^0.4.0
         version: 0.4.0(scenejs@1.9.4)
+      typescript:
+        specifier: '*'
+        version: 5.4.2
     devDependencies:
       '@types/events':
         specifier: ^3.0.0
@@ -530,9 +534,6 @@ importers:
       sass:
         specifier: ^1.77.0
         version: 1.77.0
-      typescript:
-        specifier: ^5.4.2
-        version: 5.4.2
       vite:
         specifier: ^5.2.11
         version: 5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0)
@@ -551,6 +552,9 @@ importers:
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
+      typescript:
+        specifier: '*'
+        version: 5.4.2
       vue:
         specifier: ^3.4.27
         version: 3.4.27(typescript@5.4.2)
@@ -576,9 +580,6 @@ importers:
       sass:
         specifier: ^1.77.0
         version: 1.77.0
-      typescript:
-        specifier: ^5.4.2
-        version: 5.4.2
       vite:
         specifier: ^5.2.11
         version: 5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0)
@@ -594,6 +595,9 @@ importers:
       tdesign-vue-next:
         specifier: ^1.8.1
         version: 1.8.1(vue@3.4.27(typescript@5.4.2))
+      typescript:
+        specifier: '*'
+        version: 5.4.2
       vue:
         specifier: ^3.4.27
         version: 3.4.27(typescript@5.4.2)
@@ -610,9 +614,6 @@ importers:
       rimraf:
         specifier: ^3.0.2
         version: 3.0.2
-      typescript:
-        specifier: ^5.4.2
-        version: 5.4.2
       vite:
         specifier: ^5.2.11
         version: 5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0)
@@ -721,6 +722,9 @@ importers:
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
+      typescript:
+        specifier: '*'
+        version: 5.4.2
     devDependencies:
       '@types/lodash-es':
         specifier: ^4.17.4
@@ -731,9 +735,6 @@ importers:
       rimraf:
         specifier: ^3.0.2
         version: 3.0.2
-      typescript:
-        specifier: ^5.4.2
-        version: 5.4.2
       vite:
         specifier: ^5.2.11
         version: 5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0)
@@ -754,7 +755,7 @@ importers:
         version: 1.4.5(@tmagic/core@1.4.5(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/design@1.4.5(vue@3.4.27(typescript@5.4.2)))(@tmagic/form@1.4.5(@tmagic/design@1.4.5(vue@3.4.27(typescript@5.4.2)))(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(vue@3.4.27(typescript@5.4.2)))(@tmagic/schema@1.4.5)(@tmagic/stage@1.4.5(@tmagic/core@1.4.5(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(scenejs@1.9.4))(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(monaco-editor@0.48.0)(vue@3.4.27(typescript@5.4.2))
       '@tmagic/element-plus-adapter':
         specifier: 1.4.5
-        version: 1.4.5(@tmagic/design@1.4.5(vue@3.4.27(typescript@5.4.2)))(element-plus@2.6.1(vue@3.4.27(typescript@5.4.2)))
+        version: 1.4.5(@tmagic/design@1.4.5(vue@3.4.27(typescript@5.4.2)))(element-plus@2.6.1(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2)))
       '@tmagic/form':
         specifier: 1.4.5
         version: 1.4.5(@tmagic/design@1.4.5(vue@3.4.27(typescript@5.4.2)))(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(vue@3.4.27(typescript@5.4.2))
@@ -766,13 +767,16 @@ importers:
         version: 1.4.5(@tmagic/core@1.4.5(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(scenejs@1.9.4)
       '@tmagic/tmagic-form-runtime':
         specifier: 1.0.2
-        version: 1.0.2(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/editor@1.4.5(@tmagic/core@1.4.5(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/design@1.4.5(vue@3.4.27(typescript@5.4.2)))(@tmagic/form@1.4.5(@tmagic/design@1.4.5(vue@3.4.27(typescript@5.4.2)))(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(vue@3.4.27(typescript@5.4.2)))(@tmagic/schema@1.4.5)(@tmagic/stage@1.4.5(@tmagic/core@1.4.5(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(scenejs@1.9.4))(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(monaco-editor@0.48.0)(vue@3.4.27(typescript@5.4.2)))(@tmagic/form@1.4.5(@tmagic/design@1.4.5(vue@3.4.27(typescript@5.4.2)))(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(vue@3.4.27(typescript@5.4.2)))(@tmagic/schema@1.4.5)(element-plus@2.6.1(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))
+        version: 1.0.2(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/editor@1.4.5(@tmagic/core@1.4.5(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/design@1.4.5(vue@3.4.27(typescript@5.4.2)))(@tmagic/form@1.4.5(@tmagic/design@1.4.5(vue@3.4.27(typescript@5.4.2)))(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(vue@3.4.27(typescript@5.4.2)))(@tmagic/schema@1.4.5)(@tmagic/stage@1.4.5(@tmagic/core@1.4.5(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(scenejs@1.9.4))(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(monaco-editor@0.48.0)(vue@3.4.27(typescript@5.4.2)))(@tmagic/form@1.4.5(@tmagic/design@1.4.5(vue@3.4.27(typescript@5.4.2)))(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(vue@3.4.27(typescript@5.4.2)))(@tmagic/schema@1.4.5)(element-plus@2.6.1(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))
       '@tmagic/utils':
         specifier: 1.4.5
         version: 1.4.5(@tmagic/schema@1.4.5)
       element-plus:
         specifier: ^2.6.1
-        version: 2.6.1(vue@3.4.27(typescript@5.4.2))
+        version: 2.6.1(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
       monaco-editor:
         specifier: ^0.48.0
         version: 0.48.0
@@ -786,6 +790,9 @@ importers:
         specifier: ^4.0.10
         version: 4.0.10(vue@3.4.27(typescript@5.4.2))
     devDependencies:
+      '@types/lodash-es':
+        specifier: ^4.17.4
+        version: 4.17.7
       '@types/node':
         specifier: ^18.19.0
         version: 18.19.3
@@ -815,7 +822,7 @@ importers:
         version: 5.4.2
       unplugin-auto-import:
         specifier: ^0.12.0
-        version: 0.12.0(@vueuse/core@10.9.0(vue@3.4.27(typescript@5.4.2)))(rollup@2.25.0)
+        version: 0.12.0(@vueuse/core@10.9.0(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2)))(rollup@2.25.0)
       unplugin-vue-components:
         specifier: ^0.22.11
         version: 0.22.11(@babel/parser@7.24.5)(rollup@2.25.0)(vue@3.4.27(typescript@5.4.2))
@@ -906,7 +913,7 @@ importers:
         version: link:../../packages/utils
       element-plus:
         specifier: ^2.6.1
-        version: 2.6.1(vue@3.4.27(typescript@5.4.2))
+        version: 2.6.1(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))
       vue:
         specifier: ^3.4.27
         version: 3.4.27(typescript@5.4.2)
@@ -933,6 +940,43 @@ importers:
         specifier: ^2.0.16
         version: 2.0.16(typescript@5.4.2)
 
+  runtime/vue-runtime-help:
+    dependencies:
+      '@tmagic/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@tmagic/data-source':
+        specifier: workspace:*
+        version: link:../../packages/data-source
+      '@tmagic/schema':
+        specifier: workspace:*
+        version: link:../../packages/schema
+      '@tmagic/stage':
+        specifier: workspace:*
+        version: link:../../packages/stage
+      '@tmagic/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
+      '@vue/composition-api':
+        specifier: '>=1.7.2'
+        version: 1.7.2(vue@3.4.27(typescript@5.4.2))
+      vue:
+        specifier: '>=2.0.0 || >=3.0.0'
+        version: 3.4.27(typescript@5.4.2)
+      vue-demi:
+        specifier: ^0.14.7
+        version: 0.14.7(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))
+    devDependencies:
+      '@types/node':
+        specifier: ^18.19.0
+        version: 18.19.3
+      rimraf:
+        specifier: ^3.0.2
+        version: 3.0.2
+      typescript:
+        specifier: ^5.4.2
+        version: 5.4.2
+
   runtime/vue2:
     dependencies:
       '@tmagic/cli':
@@ -947,15 +991,15 @@ importers:
       '@tmagic/schema':
         specifier: 1.4.5
         version: 1.4.5
-      '@tmagic/stage':
-        specifier: 1.4.5
-        version: 1.4.5(@tmagic/core@1.4.5(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(scenejs@1.9.4)
       '@tmagic/ui-vue2':
         specifier: 1.4.5
         version: 1.4.5(dayjs@1.11.11)(qrcode@1.5.0)(vue@2.7.4)
       '@tmagic/utils':
         specifier: 1.4.5
         version: 1.4.5(@tmagic/schema@1.4.5)
+      '@tmagic/vue-runtime-help':
+        specifier: ^0.0.2
+        version: 0.0.2(@tmagic/core@1.4.5(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(@vue/composition-api@1.7.2(vue@2.7.4))(scenejs@1.9.4)(vue@2.7.4)
       axios:
         specifier: ^0.25.0
         version: 0.25.0
@@ -993,9 +1037,6 @@ importers:
 
   runtime/vue3:
     dependencies:
-      '@tmagic/cli':
-        specifier: 1.4.5
-        version: 1.4.5
       '@tmagic/core':
         specifier: 1.4.5
         version: 1.4.5(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))
@@ -1005,15 +1046,15 @@ importers:
       '@tmagic/schema':
         specifier: 1.4.5
         version: 1.4.5
-      '@tmagic/stage':
-        specifier: 1.4.5
-        version: 1.4.5(@tmagic/core@1.4.5(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(scenejs@1.9.4)
       '@tmagic/ui':
         specifier: 1.4.5
         version: 1.4.5(dayjs@1.11.11)(qrcode@1.5.0)(vue@3.4.27(typescript@5.4.2))
       '@tmagic/utils':
         specifier: 1.4.5
         version: 1.4.5(@tmagic/schema@1.4.5)
+      '@tmagic/vue-runtime-help':
+        specifier: ^0.0.2
+        version: 0.0.2(@tmagic/core@1.4.5(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(scenejs@1.9.4)(vue@3.4.27(typescript@5.4.2))
       axios:
         specifier: ^0.25.0
         version: 0.25.0
@@ -1021,6 +1062,9 @@ importers:
         specifier: ^3.4.27
         version: 3.4.27(typescript@5.4.2)
     devDependencies:
+      '@tmagic/cli':
+        specifier: 1.4.5
+        version: 1.4.5
       '@types/node':
         specifier: ^18.19.0
         version: 18.19.3
@@ -1086,8 +1130,8 @@ packages:
   '@algolia/cache-common@4.20.0':
     resolution: {integrity: sha512-vCfxauaZutL3NImzB2G9LjLt36vKAckc6DhMp05An14kVo8F1Yofb6SIl6U3SaEz8pG2QOB9ptwM5c+zGevwIQ==}
 
-  '@algolia/cache-common@4.9.1':
-    resolution: {integrity: sha512-tcvw4mOfFy44V4ZxDEy9wNGr6vFROZKRpXKTEBgdw/WBn6mX51H1ar4RWtceDEcDU4H5fIv5tsY3ip2hU+fTPg==}
+  '@algolia/cache-common@4.23.3':
+    resolution: {integrity: sha512-h9XcNI6lxYStaw32pHpB1TMm0RuxphF+Ik4o7tcQiodEdpKK+wKufY6QXtba7t3k8eseirEMVB83uFFF3Nu54A==}
 
   '@algolia/cache-in-memory@4.20.0':
     resolution: {integrity: sha512-Wm9ak/IaacAZXS4mB3+qF/KCoVSBV6aLgIGFEtQtJwjv64g4ePMapORGmCyulCFwfePaRAtcaTbMcJF+voc/bg==}
@@ -1101,8 +1145,8 @@ packages:
   '@algolia/client-common@4.20.0':
     resolution: {integrity: sha512-P3WgMdEss915p+knMMSd/fwiHRHKvDu4DYRrCRaBrsfFw7EQHon+EbRSm4QisS9NYdxbS04kcvNoavVGthyfqQ==}
 
-  '@algolia/client-common@4.9.1':
-    resolution: {integrity: sha512-UziRTZ8km3qwoVPIyEre8TV6V+MX7UtbfVqPmSafZ0xu41UUZ+sL56YoKjOXkbKuybeIC9prXMGy/ID5bXkTqg==}
+  '@algolia/client-common@4.23.3':
+    resolution: {integrity: sha512-l6EiPxdAlg8CYhroqS5ybfIczsGUIAC47slLPOMDeKSVXYG1n0qGiz4RjAHLw2aD0xzh2EXZ7aRguPfz7UKDKw==}
 
   '@algolia/client-personalization@4.20.0':
     resolution: {integrity: sha512-N9+zx0tWOQsLc3K4PVRDV8GUeOLAY0i445En79Pr3zWB+m67V+n/8w4Kw1C5LlbHDDJcyhMMIlqezh6BEk7xAQ==}
@@ -1110,14 +1154,14 @@ packages:
   '@algolia/client-search@4.20.0':
     resolution: {integrity: sha512-zgwqnMvhWLdpzKTpd3sGmMlr4c+iS7eyyLGiaO51zDZWGMkpgoNVmltkzdBwxOVXz0RsFMznIxB9zuarUv4TZg==}
 
-  '@algolia/client-search@4.9.1':
-    resolution: {integrity: sha512-r9Cw2r8kJr45iYncFDht6EshARghU265wuY8Q8oHrpFHjAziEYdsUOdNmQKbsSH5J3gLjDPx1EI5DzVd6ivn3w==}
+  '@algolia/client-search@4.23.3':
+    resolution: {integrity: sha512-P4VAKFHqU0wx9O+q29Q8YVuaowaZ5EM77rxfmGnkHUJggh28useXQdopokgwMeYw2XUht49WX5RcTQ40rZIabw==}
 
   '@algolia/logger-common@4.20.0':
     resolution: {integrity: sha512-xouigCMB5WJYEwvoWW5XDv7Z9f0A8VoXJc3VKwlHJw/je+3p2RcDXfksLI4G4lIVncFUYMZx30tP/rsdlvvzHQ==}
 
-  '@algolia/logger-common@4.9.1':
-    resolution: {integrity: sha512-9mPrbFlFyPT7or/7PXTiJjyOewWB9QRkZKVXkt5zHAUiUzGxmmdpJIGpPv3YQnDur8lXrXaRI0MHXUuIDMY1ng==}
+  '@algolia/logger-common@4.23.3':
+    resolution: {integrity: sha512-y9kBtmJwiZ9ZZ+1Ek66P0M68mHQzKRxkW5kAAXYN/rdzgDN0d2COsViEFufxJ0pb45K4FRcfC7+33YB4BLrZ+g==}
 
   '@algolia/logger-console@4.20.0':
     resolution: {integrity: sha512-THlIGG1g/FS63z0StQqDhT6bprUczBI8wnLT3JWvfAQDZX5P6fCg7dG+pIrUBpDIHGszgkqYEqECaKKsdNKOUA==}
@@ -1128,8 +1172,8 @@ packages:
   '@algolia/requester-common@4.20.0':
     resolution: {integrity: sha512-9h6ye6RY/BkfmeJp7Z8gyyeMrmmWsMOCRBXQDs4mZKKsyVlfIVICpcSibbeYcuUdurLhIlrOUkH3rQEgZzonng==}
 
-  '@algolia/requester-common@4.9.1':
-    resolution: {integrity: sha512-9hPgXnlCSbqJqF69M5x5WN3h51Dc+mk/iWNeJSVxExHGvCDfBBZd0v6S15i8q2a9cD1I2RnhMpbnX5BmGtabVA==}
+  '@algolia/requester-common@4.23.3':
+    resolution: {integrity: sha512-xloIdr/bedtYEGcXCiF2muajyvRhwop4cMZo+K2qzNht0CMzlRkm8YsDdj5IaBhshqfgmBb3rTg4sL4/PpvLYw==}
 
   '@algolia/requester-node-http@4.20.0':
     resolution: {integrity: sha512-ocJ66L60ABSSTRFnCHIEZpNHv6qTxsBwJEPfYaSBsLQodm0F9ptvalFkHMpvj5DfE22oZrcrLbOYM2bdPJRHng==}
@@ -1137,8 +1181,8 @@ packages:
   '@algolia/transporter@4.20.0':
     resolution: {integrity: sha512-Lsii1pGWOAISbzeyuf+r/GPhvHMPHSPrTDWNcIzOE1SG1inlJHICaVe2ikuoRjcpgxZNU54Jl+if15SUCsaTUg==}
 
-  '@algolia/transporter@4.9.1':
-    resolution: {integrity: sha512-AbjFfGzX+cAuj7Qyc536OxIQzjFOA5FU2ANGStx8LBH+AKXScwfkx67C05riuaRR5adSCLMSEbVvUscH0nF+6A==}
+  '@algolia/transporter@4.23.3':
+    resolution: {integrity: sha512-Wjl5gttqnf/gQKJA+dafnD0Y6Yw97yvfY8R9h0dQltX1GXTgNs1zWgvtWW0tHl1EgMdhAyw189uWiZMnL3QebQ==}
 
   '@ampproject/remapping@2.2.1':
     resolution: {integrity: sha512-lFMjJTrFL3j7L9yBxwYfCq2k6qqwHyzuUl/XBnif78PWTJYyL/dfowQHWE3sp6U6ZzqWiiIZnpTMO96zhkjwtg==}
@@ -2647,11 +2691,11 @@ packages:
   '@scena/react-ruler@0.19.0':
     resolution: {integrity: sha512-2OEOjLMOptDxdSuEqID2JAljQuYoeoV09MnLjiBeyzJxoUcVjzyBCPwkMbHRKj2Z3WrwztJAFBF+y6yNNM5Lcw==}
 
-  '@shikijs/core@1.5.1':
-    resolution: {integrity: sha512-xjV63pRUBvxA1LsxOUhRKLPh0uUjwBLzAKLdEuYSLIylo71sYuwDcttqNP01Ib1TZlLfO840CXHPlgUUsYFjzg==}
+  '@shikijs/core@1.6.0':
+    resolution: {integrity: sha512-NIEAi5U5R7BLkbW1pG/ZKu3eb1lzc3/+jD0lFsuxMT7zjaf9bbNwdNyMr7zh/Zl8EXQtQ+MYBAt5G+JLu+5DlA==}
 
-  '@shikijs/transformers@1.5.1':
-    resolution: {integrity: sha512-vir+y0elkjh2CepLVbqeGX+ftuc6WpfWNCMV/EBIallSLzhBfDO9r/TORDVOzegbTg9JMEmtOFv6PT9cSZTcyA==}
+  '@shikijs/transformers@1.6.0':
+    resolution: {integrity: sha512-qGfHe1ECiqfE2STPWvfogIj/9Q0SK+MCRJdoITkW7AmFuB7DmbFnBT2US84+zklJOB51MzNO8RUXZiauWssJlQ==}
 
   '@sinclair/typebox@0.27.8':
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
@@ -2811,6 +2855,20 @@ packages:
     engines: {node: '>=18'}
     peerDependencies:
       '@tmagic/schema': 1.4.5
+
+  '@tmagic/vue-runtime-help@0.0.2':
+    resolution: {integrity: sha512-bE2Fmt9pXlS4AZn/oJZfojId2erKID1FleYxGswUjFAMF4heoPU4/Bhl17cA3jn/hQAQpUWtW+Xqj5KwZAkWaw==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@tmagic/core': 1.4.5
+      '@tmagic/data-source': 1.4.5
+      '@tmagic/schema': 1.4.5
+      '@tmagic/utils': 1.4.5
+      '@vue/composition-api': '>=1.7.2'
+      vue: '>=2.0.0 || >=3.0.0'
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
 
   '@tootallnate/once@2.0.0':
     resolution: {integrity: sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==}
@@ -3067,19 +3125,24 @@ packages:
   '@vue/compiler-ssr@3.4.27':
     resolution: {integrity: sha512-CVRzSJIltzMG5FcidsW0jKNQnNRYC8bT21VegyMMtHmhW3UOI7knmUehzswXLrExDLE6lQCZdrhD4ogI7c+vuw==}
 
+  '@vue/composition-api@1.7.2':
+    resolution: {integrity: sha512-M8jm9J/laYrYT02665HkZ5l2fWTK4dcVg3BsDHm/pfz+MjDYwX+9FUaZyGwEyXEDonQYRCo0H7aLgdklcIELjw==}
+    peerDependencies:
+      vue: '>= 2.5 < 2.7'
+
   '@vue/devtools-api@6.5.0':
     resolution: {integrity: sha512-o9KfBeaBmCKl10usN4crU53fYtC1r7jJwdGKjPT24t348rHxgfpZ0xL3Xm/gLUYnc0oTp8LAmrxOeLyu6tbk2Q==}
 
-  '@vue/devtools-api@7.1.3':
-    resolution: {integrity: sha512-W8IwFJ/o5iUk78jpqhvScbgCsPiOp2uileDVC0NDtW38gCWhsnu9SeBTjcdu3lbwLdsjc+H1c5Msd/x9ApbcFA==}
+  '@vue/devtools-api@7.2.1':
+    resolution: {integrity: sha512-6oNCtyFOrNdqm6GUkFujsCgFlpbsHLnZqq7edeM/+cxAbMyCWvsaCsIMUaz7AiluKLccCGEM8fhOsjaKgBvb7g==}
 
-  '@vue/devtools-kit@7.1.3':
-    resolution: {integrity: sha512-NFskFSJMVCBXTkByuk2llzI3KD3Blcm7WqiRorWjD6nClHPgkH5BobDH08rfulqq5ocRt5xV+3qOT1Q9FXJrwQ==}
+  '@vue/devtools-kit@7.2.1':
+    resolution: {integrity: sha512-Wak/fin1X0Q8LLIfCAHBrdaaB+R6IdpSXsDByPHbQ3BmkCP0/cIo/oEGp9i0U2+gEqD4L3V9RDjNf1S34DTzQQ==}
     peerDependencies:
       vue: ^3.0.0
 
-  '@vue/devtools-shared@7.1.3':
-    resolution: {integrity: sha512-KJ3AfgjTn3tJz/XKF+BlVShNPecim3G21oHRue+YQOsooW+0s+qXvm09U09aO7yBza5SivL1QgxSrzAbiKWjhQ==}
+  '@vue/devtools-shared@7.2.1':
+    resolution: {integrity: sha512-PCJF4UknJmOal68+X9XHyVeQ+idv0LFujkTOIW30+GaMJqwFVN9LkQKX4gLqn61KkGMdJTzQ1bt7EJag3TI6AA==}
 
   '@vue/language-core@2.0.16':
     resolution: {integrity: sha512-Bc2sexRH99pznOph8mLw2BlRZ9edm7tW51kcBXgx8adAoOcZUWJj3UNSsdQ6H9Y8meGz7BoazVrVo/jUukIsPw==}
@@ -5597,8 +5660,8 @@ packages:
     engines: {node: '>=4'}
     hasBin: true
 
-  shiki@1.5.1:
-    resolution: {integrity: sha512-vx4Ds3M3B9ZEmLeSXqBAB85osBWV8ErZfP69kuFQZozPgHc33m7spLTCUkcjwEjFm3gk3F9IdXMv8kX+v9xDHA==}
+  shiki@1.6.0:
+    resolution: {integrity: sha512-P31ROeXcVgW/k3Z+vUUErcxoTah7ZRaimctOpzGuqAntqnnSmx1HOsvnbAB8Z2qfXPRhw61yptAzCsuKOhTHwQ==}
 
   shx@0.3.4:
     resolution: {integrity: sha512-N6A9MLVqjxZYcVn8hLmtneQWIJtp8IKzMP4eMnx+nqkvXoqinUPCbUFLp2UcWTEIUONhlk0ewxr/jaVGlc+J+g==}
@@ -6064,8 +6127,8 @@ packages:
       terser:
         optional: true
 
-  vitepress@1.1.4:
-    resolution: {integrity: sha512-bWIzFZXpPB6NIDBuWnS20aMADH+FcFKDfQNYFvbOWij03PR29eImTceQHIzCKordjXYBhM/TjE5VKFTUJ3EheA==}
+  vitepress@1.2.2:
+    resolution: {integrity: sha512-uZ3nXR5NY4nYj3RJWCo5jev9qlNZAQo5SUXu1U0QSUx84cUm/o7hCTDVjZ4njVSVui+PsV1oAbdQOg8ygbaf4w==}
     hasBin: true
     peerDependencies:
       markdown-it-mathjax3: ^4
@@ -6103,17 +6166,6 @@ packages:
 
   vue-component-type-helpers@2.0.16:
     resolution: {integrity: sha512-qisL/iAfdO++7w+SsfYQJVPj6QKvxp4i1MMxvsNO41z/8zu3KuAw9LkhKUfP/kcOWGDxESp+pQObWppXusejCA==}
-
-  vue-demi@0.14.6:
-    resolution: {integrity: sha512-8QA7wrYSHKaYgUxDA5ZC24w+eHm3sYCbp0EzcDwKqN3p6HqtTCGR/GVsPyZW92unff4UlcSh++lmqDWN3ZIq4w==}
-    engines: {node: '>=12'}
-    hasBin: true
-    peerDependencies:
-      '@vue/composition-api': ^1.0.0-rc.1
-      vue: ^3.0.0-0 || ^2.6.0
-    peerDependenciesMeta:
-      '@vue/composition-api':
-        optional: true
 
   vue-demi@0.14.7:
     resolution: {integrity: sha512-EOG8KXDQNwkJILkx/gPcoL/7vH+hORoBaKgGe+6W7VFMvCYJfmF2dGbvgDroVnI8LU7/kTu8mbjRZGBU1z9NTA==}
@@ -6314,32 +6366,32 @@ packages:
 
 snapshots:
 
-  '@algolia/autocomplete-core@1.9.3(@algolia/client-search@4.9.1)(algoliasearch@4.20.0)(search-insights@2.9.0)':
+  '@algolia/autocomplete-core@1.9.3(@algolia/client-search@4.23.3)(algoliasearch@4.20.0)(search-insights@2.9.0)':
     dependencies:
-      '@algolia/autocomplete-plugin-algolia-insights': 1.9.3(@algolia/client-search@4.9.1)(algoliasearch@4.20.0)(search-insights@2.9.0)
-      '@algolia/autocomplete-shared': 1.9.3(@algolia/client-search@4.9.1)(algoliasearch@4.20.0)
+      '@algolia/autocomplete-plugin-algolia-insights': 1.9.3(@algolia/client-search@4.23.3)(algoliasearch@4.20.0)(search-insights@2.9.0)
+      '@algolia/autocomplete-shared': 1.9.3(@algolia/client-search@4.23.3)(algoliasearch@4.20.0)
     transitivePeerDependencies:
       - '@algolia/client-search'
       - algoliasearch
       - search-insights
 
-  '@algolia/autocomplete-plugin-algolia-insights@1.9.3(@algolia/client-search@4.9.1)(algoliasearch@4.20.0)(search-insights@2.9.0)':
+  '@algolia/autocomplete-plugin-algolia-insights@1.9.3(@algolia/client-search@4.23.3)(algoliasearch@4.20.0)(search-insights@2.9.0)':
     dependencies:
-      '@algolia/autocomplete-shared': 1.9.3(@algolia/client-search@4.9.1)(algoliasearch@4.20.0)
+      '@algolia/autocomplete-shared': 1.9.3(@algolia/client-search@4.23.3)(algoliasearch@4.20.0)
       search-insights: 2.9.0
     transitivePeerDependencies:
       - '@algolia/client-search'
       - algoliasearch
 
-  '@algolia/autocomplete-preset-algolia@1.9.3(@algolia/client-search@4.9.1)(algoliasearch@4.20.0)':
+  '@algolia/autocomplete-preset-algolia@1.9.3(@algolia/client-search@4.23.3)(algoliasearch@4.20.0)':
     dependencies:
-      '@algolia/autocomplete-shared': 1.9.3(@algolia/client-search@4.9.1)(algoliasearch@4.20.0)
-      '@algolia/client-search': 4.9.1
+      '@algolia/autocomplete-shared': 1.9.3(@algolia/client-search@4.23.3)(algoliasearch@4.20.0)
+      '@algolia/client-search': 4.23.3
       algoliasearch: 4.20.0
 
-  '@algolia/autocomplete-shared@1.9.3(@algolia/client-search@4.9.1)(algoliasearch@4.20.0)':
+  '@algolia/autocomplete-shared@1.9.3(@algolia/client-search@4.23.3)(algoliasearch@4.20.0)':
     dependencies:
-      '@algolia/client-search': 4.9.1
+      '@algolia/client-search': 4.23.3
       algoliasearch: 4.20.0
 
   '@algolia/cache-browser-local-storage@4.20.0':
@@ -6348,7 +6400,7 @@ snapshots:
 
   '@algolia/cache-common@4.20.0': {}
 
-  '@algolia/cache-common@4.9.1': {}
+  '@algolia/cache-common@4.23.3': {}
 
   '@algolia/cache-in-memory@4.20.0':
     dependencies:
@@ -6372,10 +6424,10 @@ snapshots:
       '@algolia/requester-common': 4.20.0
       '@algolia/transporter': 4.20.0
 
-  '@algolia/client-common@4.9.1':
+  '@algolia/client-common@4.23.3':
     dependencies:
-      '@algolia/requester-common': 4.9.1
-      '@algolia/transporter': 4.9.1
+      '@algolia/requester-common': 4.23.3
+      '@algolia/transporter': 4.23.3
 
   '@algolia/client-personalization@4.20.0':
     dependencies:
@@ -6389,15 +6441,15 @@ snapshots:
       '@algolia/requester-common': 4.20.0
       '@algolia/transporter': 4.20.0
 
-  '@algolia/client-search@4.9.1':
+  '@algolia/client-search@4.23.3':
     dependencies:
-      '@algolia/client-common': 4.9.1
-      '@algolia/requester-common': 4.9.1
-      '@algolia/transporter': 4.9.1
+      '@algolia/client-common': 4.23.3
+      '@algolia/requester-common': 4.23.3
+      '@algolia/transporter': 4.23.3
 
   '@algolia/logger-common@4.20.0': {}
 
-  '@algolia/logger-common@4.9.1': {}
+  '@algolia/logger-common@4.23.3': {}
 
   '@algolia/logger-console@4.20.0':
     dependencies:
@@ -6409,7 +6461,7 @@ snapshots:
 
   '@algolia/requester-common@4.20.0': {}
 
-  '@algolia/requester-common@4.9.1': {}
+  '@algolia/requester-common@4.23.3': {}
 
   '@algolia/requester-node-http@4.20.0':
     dependencies:
@@ -6421,11 +6473,11 @@ snapshots:
       '@algolia/logger-common': 4.20.0
       '@algolia/requester-common': 4.20.0
 
-  '@algolia/transporter@4.9.1':
+  '@algolia/transporter@4.23.3':
     dependencies:
-      '@algolia/cache-common': 4.9.1
-      '@algolia/logger-common': 4.9.1
-      '@algolia/requester-common': 4.9.1
+      '@algolia/cache-common': 4.23.3
+      '@algolia/logger-common': 4.23.3
+      '@algolia/requester-common': 4.23.3
 
   '@ampproject/remapping@2.2.1':
     dependencies:
@@ -7661,9 +7713,9 @@ snapshots:
 
   '@docsearch/css@3.6.0': {}
 
-  '@docsearch/js@3.6.0(@algolia/client-search@4.9.1)(@types/react@17.0.37)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(search-insights@2.9.0)':
+  '@docsearch/js@3.6.0(@algolia/client-search@4.23.3)(@types/react@17.0.37)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(search-insights@2.9.0)':
     dependencies:
-      '@docsearch/react': 3.6.0(@algolia/client-search@4.9.1)(@types/react@17.0.37)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(search-insights@2.9.0)
+      '@docsearch/react': 3.6.0(@algolia/client-search@4.23.3)(@types/react@17.0.37)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(search-insights@2.9.0)
       preact: 10.13.2
     transitivePeerDependencies:
       - '@algolia/client-search'
@@ -7672,10 +7724,10 @@ snapshots:
       - react-dom
       - search-insights
 
-  '@docsearch/react@3.6.0(@algolia/client-search@4.9.1)(@types/react@17.0.37)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(search-insights@2.9.0)':
+  '@docsearch/react@3.6.0(@algolia/client-search@4.23.3)(@types/react@17.0.37)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(search-insights@2.9.0)':
     dependencies:
-      '@algolia/autocomplete-core': 1.9.3(@algolia/client-search@4.9.1)(algoliasearch@4.20.0)(search-insights@2.9.0)
-      '@algolia/autocomplete-preset-algolia': 1.9.3(@algolia/client-search@4.9.1)(algoliasearch@4.20.0)
+      '@algolia/autocomplete-core': 1.9.3(@algolia/client-search@4.23.3)(algoliasearch@4.20.0)(search-insights@2.9.0)
+      '@algolia/autocomplete-preset-algolia': 1.9.3(@algolia/client-search@4.23.3)(algoliasearch@4.20.0)
       '@docsearch/css': 3.6.0
       algoliasearch: 4.20.0
     optionalDependencies:
@@ -8072,11 +8124,11 @@ snapshots:
       '@daybrush/utils': 1.13.0
       framework-utils: 1.1.0
 
-  '@shikijs/core@1.5.1': {}
+  '@shikijs/core@1.6.0': {}
 
-  '@shikijs/transformers@1.5.1':
+  '@shikijs/transformers@1.6.0':
     dependencies:
-      shiki: 1.5.1
+      shiki: 1.6.0
 
   '@sinclair/typebox@0.27.8': {}
 
@@ -8187,10 +8239,10 @@ snapshots:
       serialize-javascript: 6.0.0
       vue: 3.4.27(typescript@5.4.2)
 
-  '@tmagic/element-plus-adapter@1.4.5(@tmagic/design@1.4.5(vue@3.4.27(typescript@5.4.2)))(element-plus@2.6.1(vue@3.4.27(typescript@5.4.2)))':
+  '@tmagic/element-plus-adapter@1.4.5(@tmagic/design@1.4.5(vue@3.4.27(typescript@5.4.2)))(element-plus@2.6.1(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2)))':
     dependencies:
       '@tmagic/design': 1.4.5(vue@3.4.27(typescript@5.4.2))
-      element-plus: 2.6.1(vue@3.4.27(typescript@5.4.2))
+      element-plus: 2.6.1(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))
 
   '@tmagic/form@1.4.5(@tmagic/design@1.4.5(vue@3.4.27(typescript@5.4.2)))(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(vue@3.4.27(typescript@5.4.2))':
     dependencies:
@@ -8227,14 +8279,14 @@ snapshots:
       lodash-es: 4.17.21
       vue: 3.4.27(typescript@5.4.2)
 
-  ? '@tmagic/tmagic-form-runtime@1.0.2(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/editor@1.4.5(@tmagic/core@1.4.5(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/design@1.4.5(vue@3.4.27(typescript@5.4.2)))(@tmagic/form@1.4.5(@tmagic/design@1.4.5(vue@3.4.27(typescript@5.4.2)))(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(vue@3.4.27(typescript@5.4.2)))(@tmagic/schema@1.4.5)(@tmagic/stage@1.4.5(@tmagic/core@1.4.5(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(scenejs@1.9.4))(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(monaco-editor@0.48.0)(vue@3.4.27(typescript@5.4.2)))(@tmagic/form@1.4.5(@tmagic/design@1.4.5(vue@3.4.27(typescript@5.4.2)))(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(vue@3.4.27(typescript@5.4.2)))(@tmagic/schema@1.4.5)(element-plus@2.6.1(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))'
+  ? '@tmagic/tmagic-form-runtime@1.0.2(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/editor@1.4.5(@tmagic/core@1.4.5(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/design@1.4.5(vue@3.4.27(typescript@5.4.2)))(@tmagic/form@1.4.5(@tmagic/design@1.4.5(vue@3.4.27(typescript@5.4.2)))(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(vue@3.4.27(typescript@5.4.2)))(@tmagic/schema@1.4.5)(@tmagic/stage@1.4.5(@tmagic/core@1.4.5(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(scenejs@1.9.4))(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(monaco-editor@0.48.0)(vue@3.4.27(typescript@5.4.2)))(@tmagic/form@1.4.5(@tmagic/design@1.4.5(vue@3.4.27(typescript@5.4.2)))(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(vue@3.4.27(typescript@5.4.2)))(@tmagic/schema@1.4.5)(element-plus@2.6.1(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))'
   : dependencies:
       '@tmagic/core': 1.4.5(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))
       '@tmagic/editor': 1.4.5(@tmagic/core@1.4.5(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/design@1.4.5(vue@3.4.27(typescript@5.4.2)))(@tmagic/form@1.4.5(@tmagic/design@1.4.5(vue@3.4.27(typescript@5.4.2)))(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(vue@3.4.27(typescript@5.4.2)))(@tmagic/schema@1.4.5)(@tmagic/stage@1.4.5(@tmagic/core@1.4.5(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(scenejs@1.9.4))(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(monaco-editor@0.48.0)(vue@3.4.27(typescript@5.4.2))
       '@tmagic/form': 1.4.5(@tmagic/design@1.4.5(vue@3.4.27(typescript@5.4.2)))(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(vue@3.4.27(typescript@5.4.2))
       '@tmagic/schema': 1.4.5
       '@tmagic/utils': 1.4.5(@tmagic/schema@1.4.5)
-      element-plus: 2.6.1(vue@3.4.27(typescript@5.4.2))
+      element-plus: 2.6.1(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))
       vue: 3.4.27(typescript@5.4.2)
     transitivePeerDependencies:
       - '@tmagic/data-source'
@@ -8283,6 +8335,34 @@ snapshots:
       '@tmagic/schema': 1.4.5
       dayjs: 1.11.11
       lodash-es: 4.17.21
+
+  '@tmagic/vue-runtime-help@0.0.2(@tmagic/core@1.4.5(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(@vue/composition-api@1.7.2(vue@2.7.4))(scenejs@1.9.4)(vue@2.7.4)':
+    dependencies:
+      '@tmagic/core': 1.4.5(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))
+      '@tmagic/data-source': 1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))
+      '@tmagic/schema': 1.4.5
+      '@tmagic/stage': 1.4.5(@tmagic/core@1.4.5(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(scenejs@1.9.4)
+      '@tmagic/utils': 1.4.5(@tmagic/schema@1.4.5)
+      vue: 2.7.4
+      vue-demi: 0.14.7(@vue/composition-api@1.7.2(vue@2.7.4))(vue@2.7.4)
+    optionalDependencies:
+      '@vue/composition-api': 1.7.2(vue@2.7.4)
+    transitivePeerDependencies:
+      - scenejs
+
+  '@tmagic/vue-runtime-help@0.0.2(@tmagic/core@1.4.5(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(scenejs@1.9.4)(vue@3.4.27(typescript@5.4.2))':
+    dependencies:
+      '@tmagic/core': 1.4.5(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))
+      '@tmagic/data-source': 1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))
+      '@tmagic/schema': 1.4.5
+      '@tmagic/stage': 1.4.5(@tmagic/core@1.4.5(@tmagic/data-source@1.4.5(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5)))(@tmagic/schema@1.4.5)(@tmagic/utils@1.4.5(@tmagic/schema@1.4.5))(scenejs@1.9.4)
+      '@tmagic/utils': 1.4.5(@tmagic/schema@1.4.5)
+      vue: 3.4.27(typescript@5.4.2)
+      vue-demi: 0.14.7(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))
+    optionalDependencies:
+      '@vue/composition-api': 1.7.2(vue@3.4.27(typescript@5.4.2))
+    transitivePeerDependencies:
+      - scenejs
 
   '@tootallnate/once@2.0.0': {}
 
@@ -8628,24 +8708,33 @@ snapshots:
       '@vue/compiler-dom': 3.4.27
       '@vue/shared': 3.4.27
 
+  '@vue/composition-api@1.7.2(vue@2.7.4)':
+    dependencies:
+      vue: 2.7.4
+    optional: true
+
+  '@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2))':
+    dependencies:
+      vue: 3.4.27(typescript@5.4.2)
+
   '@vue/devtools-api@6.5.0': {}
 
-  '@vue/devtools-api@7.1.3(vue@3.4.27(typescript@5.4.2))':
+  '@vue/devtools-api@7.2.1(vue@3.4.27(typescript@5.4.2))':
     dependencies:
-      '@vue/devtools-kit': 7.1.3(vue@3.4.27(typescript@5.4.2))
+      '@vue/devtools-kit': 7.2.1(vue@3.4.27(typescript@5.4.2))
     transitivePeerDependencies:
       - vue
 
-  '@vue/devtools-kit@7.1.3(vue@3.4.27(typescript@5.4.2))':
+  '@vue/devtools-kit@7.2.1(vue@3.4.27(typescript@5.4.2))':
     dependencies:
-      '@vue/devtools-shared': 7.1.3
+      '@vue/devtools-shared': 7.2.1
       hookable: 5.5.3
       mitt: 3.0.1
       perfect-debounce: 1.0.0
       speakingurl: 14.0.1
       vue: 3.4.27(typescript@5.4.2)
 
-  '@vue/devtools-shared@7.1.3':
+  '@vue/devtools-shared@7.2.1':
     dependencies:
       rfdc: 1.3.1
 
@@ -8689,31 +8778,31 @@ snapshots:
       js-beautify: 1.15.1
       vue-component-type-helpers: 2.0.16
 
-  '@vueuse/core@10.9.0(vue@3.4.27(typescript@5.4.2))':
+  '@vueuse/core@10.9.0(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))':
     dependencies:
       '@types/web-bluetooth': 0.0.20
       '@vueuse/metadata': 10.9.0
-      '@vueuse/shared': 10.9.0(vue@3.4.27(typescript@5.4.2))
-      vue-demi: 0.14.7(vue@3.4.27(typescript@5.4.2))
+      '@vueuse/shared': 10.9.0(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))
+      vue-demi: 0.14.7(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
 
-  '@vueuse/core@9.13.0(vue@3.4.27(typescript@5.4.2))':
+  '@vueuse/core@9.13.0(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))':
     dependencies:
       '@types/web-bluetooth': 0.0.16
       '@vueuse/metadata': 9.13.0
-      '@vueuse/shared': 9.13.0(vue@3.4.27(typescript@5.4.2))
-      vue-demi: 0.14.6(vue@3.4.27(typescript@5.4.2))
+      '@vueuse/shared': 9.13.0(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))
+      vue-demi: 0.14.7(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
 
-  '@vueuse/integrations@10.9.0(async-validator@4.2.5)(axios@0.25.0)(focus-trap@7.5.4)(qrcode@1.5.0)(sortablejs@1.15.2)(vue@3.4.27(typescript@5.4.2))':
+  '@vueuse/integrations@10.9.0(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(async-validator@4.2.5)(axios@0.25.0)(focus-trap@7.5.4)(qrcode@1.5.0)(sortablejs@1.15.2)(vue@3.4.27(typescript@5.4.2))':
     dependencies:
-      '@vueuse/core': 10.9.0(vue@3.4.27(typescript@5.4.2))
-      '@vueuse/shared': 10.9.0(vue@3.4.27(typescript@5.4.2))
-      vue-demi: 0.14.7(vue@3.4.27(typescript@5.4.2))
+      '@vueuse/core': 10.9.0(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))
+      '@vueuse/shared': 10.9.0(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))
+      vue-demi: 0.14.7(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))
     optionalDependencies:
       async-validator: 4.2.5
       axios: 0.25.0
@@ -8728,16 +8817,16 @@ snapshots:
 
   '@vueuse/metadata@9.13.0': {}
 
-  '@vueuse/shared@10.9.0(vue@3.4.27(typescript@5.4.2))':
+  '@vueuse/shared@10.9.0(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))':
     dependencies:
-      vue-demi: 0.14.7(vue@3.4.27(typescript@5.4.2))
+      vue-demi: 0.14.7(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
 
-  '@vueuse/shared@9.13.0(vue@3.4.27(typescript@5.4.2))':
+  '@vueuse/shared@9.13.0(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))':
     dependencies:
-      vue-demi: 0.14.6(vue@3.4.27(typescript@5.4.2))
+      vue-demi: 0.14.7(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
@@ -9500,7 +9589,7 @@ snapshots:
 
   electron-to-chromium@1.4.761: {}
 
-  element-plus@2.6.1(vue@3.4.27(typescript@5.4.2)):
+  element-plus@2.6.1(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2)):
     dependencies:
       '@ctrl/tinycolor': 3.6.0
       '@element-plus/icons-vue': 2.3.1(vue@3.4.27(typescript@5.4.2))
@@ -9508,7 +9597,7 @@ snapshots:
       '@popperjs/core': '@sxzz/popperjs-es@2.11.7'
       '@types/lodash': 4.14.192
       '@types/lodash-es': 4.17.7
-      '@vueuse/core': 9.13.0(vue@3.4.27(typescript@5.4.2))
+      '@vueuse/core': 9.13.0(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))
       async-validator: 4.2.5
       dayjs: 1.11.10
       escape-html: 1.0.3
@@ -11457,9 +11546,9 @@ snapshots:
       interpret: 1.4.0
       rechoir: 0.6.2
 
-  shiki@1.5.1:
+  shiki@1.6.0:
     dependencies:
-      '@shikijs/core': 1.5.1
+      '@shikijs/core': 1.6.0
 
   shx@0.3.4:
     dependencies:
@@ -11819,7 +11908,7 @@ snapshots:
 
   universalify@2.0.0: {}
 
-  unplugin-auto-import@0.12.0(@vueuse/core@10.9.0(vue@3.4.27(typescript@5.4.2)))(rollup@2.25.0):
+  unplugin-auto-import@0.12.0(@vueuse/core@10.9.0(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2)))(rollup@2.25.0):
     dependencies:
       '@antfu/utils': 0.7.2
       '@rollup/pluginutils': 5.0.2(rollup@2.25.0)
@@ -11828,7 +11917,7 @@ snapshots:
       unimport: 1.3.0(rollup@2.25.0)
       unplugin: 1.3.1
     optionalDependencies:
-      '@vueuse/core': 10.9.0(vue@3.4.27(typescript@5.4.2))
+      '@vueuse/core': 10.9.0(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))
     transitivePeerDependencies:
       - rollup
 
@@ -11934,21 +12023,22 @@ snapshots:
       sass: 1.77.0
       terser: 5.31.0
 
-  vitepress@1.1.4(@algolia/client-search@4.9.1)(@types/node@18.19.3)(@types/react@17.0.37)(async-validator@4.2.5)(axios@0.25.0)(postcss@8.4.38)(qrcode@1.5.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.77.0)(search-insights@2.9.0)(sortablejs@1.15.2)(terser@5.31.0)(typescript@5.4.2):
+  vitepress@1.2.2(@algolia/client-search@4.23.3)(@types/node@18.19.3)(@types/react@17.0.37)(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(async-validator@4.2.5)(axios@0.25.0)(postcss@8.4.38)(qrcode@1.5.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.77.0)(search-insights@2.9.0)(sortablejs@1.15.2)(terser@5.31.0)(typescript@5.4.2):
     dependencies:
       '@docsearch/css': 3.6.0
-      '@docsearch/js': 3.6.0(@algolia/client-search@4.9.1)(@types/react@17.0.37)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(search-insights@2.9.0)
-      '@shikijs/core': 1.5.1
-      '@shikijs/transformers': 1.5.1
+      '@docsearch/js': 3.6.0(@algolia/client-search@4.23.3)(@types/react@17.0.37)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(search-insights@2.9.0)
+      '@shikijs/core': 1.6.0
+      '@shikijs/transformers': 1.6.0
       '@types/markdown-it': 14.1.1
       '@vitejs/plugin-vue': 5.0.4(vite@5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0))(vue@3.4.27(typescript@5.4.2))
-      '@vue/devtools-api': 7.1.3(vue@3.4.27(typescript@5.4.2))
-      '@vueuse/core': 10.9.0(vue@3.4.27(typescript@5.4.2))
-      '@vueuse/integrations': 10.9.0(async-validator@4.2.5)(axios@0.25.0)(focus-trap@7.5.4)(qrcode@1.5.0)(sortablejs@1.15.2)(vue@3.4.27(typescript@5.4.2))
+      '@vue/devtools-api': 7.2.1(vue@3.4.27(typescript@5.4.2))
+      '@vue/shared': 3.4.27
+      '@vueuse/core': 10.9.0(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2))
+      '@vueuse/integrations': 10.9.0(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(async-validator@4.2.5)(axios@0.25.0)(focus-trap@7.5.4)(qrcode@1.5.0)(sortablejs@1.15.2)(vue@3.4.27(typescript@5.4.2))
       focus-trap: 7.5.4
       mark.js: 8.11.1
       minisearch: 6.3.0
-      shiki: 1.5.1
+      shiki: 1.6.0
       vite: 5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0)
       vue: 3.4.27(typescript@5.4.2)
     optionalDependencies:
@@ -12016,13 +12106,17 @@ snapshots:
 
   vue-component-type-helpers@2.0.16: {}
 
-  vue-demi@0.14.6(vue@3.4.27(typescript@5.4.2)):
+  vue-demi@0.14.7(@vue/composition-api@1.7.2(vue@2.7.4))(vue@2.7.4):
     dependencies:
-      vue: 3.4.27(typescript@5.4.2)
+      vue: 2.7.4
+    optionalDependencies:
+      '@vue/composition-api': 1.7.2(vue@2.7.4)
 
-  vue-demi@0.14.7(vue@3.4.27(typescript@5.4.2)):
+  vue-demi@0.14.7(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.2)))(vue@3.4.27(typescript@5.4.2)):
     dependencies:
       vue: 3.4.27(typescript@5.4.2)
+    optionalDependencies:
+      '@vue/composition-api': 1.7.2(vue@3.4.27(typescript@5.4.2))
 
   vue-eslint-parser@9.1.1(eslint@8.38.0):
     dependencies:

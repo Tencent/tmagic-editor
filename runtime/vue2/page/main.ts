@@ -19,14 +19,14 @@
 import Vue from 'vue';
 
 import Core from '@tmagic/core';
-import { DataSourceManager } from '@tmagic/data-source';
+import { DataSourceManager, registerDataSourceOnDemand } from '@tmagic/data-source';
 import { getUrlParam } from '@tmagic/utils';
 
+import asyncDataSources from '../.tmagic/async-datasource-entry';
 import components from '../.tmagic/comp-entry';
-import dataSources from '../.tmagic/datasource-entry';
 import plugins from '../.tmagic/plugin-entry';
 
-import request from './utils/request';
+import request, { service } from './utils/request';
 import AppComponent from './App.vue';
 import { getLocalConfig } from './utils';
 
@@ -34,35 +34,40 @@ import '@tmagic/utils/resetcss.css';
 
 Vue.use(request);
 
-Object.keys(components).forEach((type: string) => {
-  Vue.component(`magic-ui-${type}`, components[type]);
-});
-
-Object.entries(dataSources).forEach(([type, ds]: [string, any]) => {
-  DataSourceManager.register(type, ds);
-});
-
-Object.values(plugins).forEach((plugin: any) => {
-  Vue.use(plugin);
-});
+const dsl = ((getUrlParam('localPreview') ? getLocalConfig() : window.magicDSL) || [])[0] || {};
 
 const app = new Core({
   ua: window.navigator.userAgent,
-  config: ((getUrlParam('localPreview') ? getLocalConfig() : window.magicDSL) || [])[0] || {},
+  config: dsl,
+  request: service,
   curPage: getUrlParam('page'),
   useMock: Boolean(getUrlParam('useMock')),
 });
 
 app.setDesignWidth(app.env.isWeb ? window.document.documentElement.getBoundingClientRect().width : 375);
 
-Vue.prototype.app = app;
-
-const magicApp = new Vue({
-  provide: {
-    app,
-  },
-
-  render: (h) => h(AppComponent),
+Object.keys(components).forEach((type: string) => {
+  Vue.component(`magic-ui-${type}`, components[type]);
 });
 
-magicApp.$mount('#app');
+Object.values(plugins).forEach((plugin: any) => {
+  Vue.use(plugin, { app });
+});
+
+registerDataSourceOnDemand(dsl, asyncDataSources).then((dataSources) => {
+  Object.entries(dataSources).forEach(([type, ds]: [string, any]) => {
+    DataSourceManager.register(type, ds);
+  });
+
+  Vue.prototype.app = app;
+
+  const vueApp = new Vue({
+    provide: {
+      app,
+    },
+
+    render: (h) => h(AppComponent),
+  });
+
+  vueApp.$mount('#app');
+});
