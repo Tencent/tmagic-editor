@@ -17,21 +17,26 @@
  */
 
 import { reactive } from 'vue';
-import { keys, pick } from 'lodash-es';
+import { cloneDeep, get, keys, pick } from 'lodash-es';
 import type { Writable } from 'type-fest';
 
+import { DepTargetType } from '@tmagic/dep';
 import type { ColumnConfig } from '@tmagic/form';
-import type { CodeBlockContent, CodeBlockDSL, Id } from '@tmagic/schema';
+import type { CodeBlockContent, CodeBlockDSL, Id, MNode } from '@tmagic/schema';
 
+import depService from '@editor/services/dep';
+import editorService from '@editor/services/editor';
+import storageService, { Protocol } from '@editor/services/storage';
 import type { AsyncHookPlugin, CodeState } from '@editor/type';
 import { CODE_DRAFT_STORAGE_KEY } from '@editor/type';
 import { getConfig } from '@editor/utils/config';
+import { COPY_CODE_STORAGE_KEY } from '@editor/utils/editor';
 
 import BaseService from './BaseService';
 
 const canUsePluginMethods = {
   async: ['setCodeDslById', 'setEditStatus', 'setCombineIds', 'setUndeleteableList', 'deleteCodeDslByIds'] as const,
-  sync: [],
+  sync: ['setCodeDslByIdSync'],
 };
 
 type AsyncMethodName = Writable<(typeof canUsePluginMethods)['async']>;
@@ -46,7 +51,10 @@ class CodeBlock extends BaseService {
   });
 
   constructor() {
-    super(canUsePluginMethods.async.map((methodName) => ({ name: methodName, isAsync: true })));
+    super([
+      ...canUsePluginMethods.async.map((methodName) => ({ name: methodName, isAsync: true })),
+      ...canUsePluginMethods.sync.map((methodName) => ({ name: methodName, isAsync: false })),
+    ]);
   }
 
   /**
@@ -88,20 +96,32 @@ class CodeBlock extends BaseService {
    * @returns {void}
    */
   public async setCodeDslById(id: Id, codeConfig: Partial<CodeBlockContent>): Promise<void> {
+    this.setCodeDslByIdSync(id, codeConfig, true);
+  }
+
+  /**
+   * 为了兼容历史原因
+   * 设置代码块ID和代码内容到源dsl
+   * @param {Id} id 代码块id
+   * @param {CodeBlockContent} codeConfig 代码块内容配置信息
+   * @param {boolean} force 是否强制写入，默认true
+   * @returns {void}
+   */
+  public setCodeDslByIdSync(id: Id, codeConfig: Partial<CodeBlockContent>, force = true): void {
     const codeDsl = this.getCodeDsl();
 
     if (!codeDsl) {
       throw new Error('dsl中没有codeBlocks');
     }
+    if (codeDsl[id] && !force) return;
 
-    const codeConfigProcessed = codeConfig;
-    if (codeConfig.content) {
+    const codeConfigProcessed = cloneDeep(codeConfig);
+    if (codeConfigProcessed.content) {
       // 在保存的时候转换代码内容
       const parseDSL = getConfig('parseDSL');
-      if (typeof codeConfig.content === 'string') {
-        codeConfig.content = parseDSL<(...args: any[]) => any>(codeConfig.content);
+      if (typeof codeConfigProcessed.content === 'string') {
+        codeConfigProcessed.content = parseDSL<(...args: any[]) => any>(codeConfigProcessed.content);
       }
-      codeConfigProcessed.content = codeConfig.content;
     }
 
     const existContent = codeDsl[id] || {};
@@ -231,6 +251,54 @@ class CodeBlock extends BaseService {
     const existedIds = keys(dsl);
     if (!existedIds.includes(newId)) return newId;
     return await this.getUniqueId();
+  }
+
+  /**
+   * 复制时会带上组件关联的代码块
+   * @param config 组件节点配置
+   * @returns
+   */
+  public copyWithRelated(config: MNode | MNode[]): void {
+    const copyNodes: MNode[] = Array.isArray(config) ? config : [config];
+    // 关联的代码块也一并复制
+    depService.clearByType(DepTargetType.RELATED_CODE_WHEN_COPY);
+    depService.collect(copyNodes, true, DepTargetType.RELATED_CODE_WHEN_COPY);
+    const customTarget = depService.getTarget(
+      DepTargetType.RELATED_CODE_WHEN_COPY,
+      DepTargetType.RELATED_CODE_WHEN_COPY,
+    );
+    const copyData: CodeBlockDSL = {};
+    if (customTarget) {
+      Object.keys(customTarget.deps).forEach((nodeId: Id) => {
+        const node = editorService.getNodeById(nodeId);
+        if (!node) return;
+        customTarget!.deps[nodeId].keys.forEach((key) => {
+          const relateCodeId = get(node, key);
+          const isExist = Object.keys(copyData).find((codeId: Id) => codeId === relateCodeId);
+          if (!isExist) {
+            const relateCode = this.getCodeContentById(relateCodeId);
+            if (relateCode) {
+              copyData[relateCodeId] = relateCode;
+            }
+          }
+        });
+      });
+    }
+    storageService.setItem(COPY_CODE_STORAGE_KEY, copyData, {
+      protocol: Protocol.OBJECT,
+    });
+  }
+
+  /**
+   * 粘贴代码块
+   * @returns
+   */
+  public paste() {
+    const codeDsl: CodeBlockDSL = storageService.getItem(COPY_CODE_STORAGE_KEY);
+    Object.keys(codeDsl).forEach((codeId: Id) => {
+      // 不覆盖同样id的代码块
+      this.setCodeDslByIdSync(codeId, codeDsl[codeId], false);
+    });
   }
 
   public resetState() {

@@ -1,5 +1,5 @@
 {
-  "version": "1.4.5",
+  "version": "1.4.6",
   "name": "@tmagic/stage",
   "type": "module",
   "sideEffects": [
@@ -38,18 +38,23 @@
     "moveable": "^0.53.0",
     "moveable-helper": "^0.4.0"
   },
-  "peerDependencies": {
-    "@tmagic/core": "workspace:*",
-    "@tmagic/schema": "workspace:*",
-    "@tmagic/utils": "workspace:*"
-  },
   "devDependencies": {
     "@types/events": "^3.0.0",
     "@types/lodash-es": "^4.17.4",
     "@types/node": "^18.19.0",
     "rimraf": "^3.0.2",
     "sass": "^1.77.0",
-    "typescript": "^5.4.2",
     "vite": "^5.2.11"
+  },
+  "peerDependencies": {
+    "@tmagic/core": "workspace:*",
+    "@tmagic/schema": "workspace:*",
+    "@tmagic/utils": "workspace:*",
+    "typescript": "*"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
   }
 }

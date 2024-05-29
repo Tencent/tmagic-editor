@@ -1,5 +1,5 @@
 {
-  "version": "1.4.5",
+  "version": "1.4.6",
   "name": "@tmagic/cli",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -35,5 +35,13 @@
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^18.19.0"
+  },
+  "peerDependencies": {
+    "typescript": "*"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
   }
 }

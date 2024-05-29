@@ -212,8 +212,8 @@ class App extends EventEmitter implements AppCore {
     this.components.delete(type);
   }
 
-  public resolveComponent(type: string) {
-    return this.components.get(type);
+  public resolveComponent<T = any>(type: string) {
+    return this.components.get(type) as T;
   }
 
   public bindEvents() {

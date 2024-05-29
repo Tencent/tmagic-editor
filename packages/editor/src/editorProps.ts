@@ -70,8 +70,12 @@ export interface EditorProps {
   codeOptions?: { [key: string]: any };
   /** 禁用鼠标左键按下时就开始拖拽，需要先选中再可以拖拽 */
   disabledDragStart?: boolean;
-  /** 自定义依赖收集器，复制组件时会将关联依赖一并复制 */
+  /** 自定义依赖收集器，复制组件时会将关联组件一并复制 */
   collectorOptions?: CustomTargetOptions;
+  /** 自定义依赖收集器，复制组件时会将关联代码块一并复制 */
+  collectorOptionsForCode?: CustomTargetOptions;
+  /** 自定义依赖收集器，复制组件时会将关联数据源一并复制 */
+  collectorOptionsForDataSource?: CustomTargetOptions;
   /** 标尺配置 */
   guidesOptions?: Partial<GuidesOptions>;
   /** 禁止多选 */

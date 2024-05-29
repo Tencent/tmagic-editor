@@ -38,6 +38,7 @@ export default defineConfig({
       { find: /^@tmagic\/dep/, replacement: path.join(__dirname, '../../packages/dep/src/index.ts') },
       { find: /^@data-source/, replacement: path.join(__dirname, '../../packages/data-source/src') },
       { find: /^@tmagic\/schema/, replacement: path.join(__dirname, '../../packages/schema/src/index.ts') },
+      { find: /^@tmagic\/vue-runtime-help/, replacement: path.join(__dirname, '../vue-runtime-help/src/index.ts') },
     ],
   },
 

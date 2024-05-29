@@ -26,42 +26,43 @@ import components from '../.tmagic/async-comp-entry';
 import asyncDataSources from '../.tmagic/async-datasource-entry';
 import plugins from '../.tmagic/plugin-entry';
 
-import request from './utils/request';
+import request, { service } from './utils/request';
 import AppComponent from './App.vue';
 import { getLocalConfig } from './utils';
 
 import '@tmagic/utils/resetcss.css';
 
-const magicApp = createApp(AppComponent);
+const vueApp = createApp(AppComponent);
 
-magicApp.use(request);
+vueApp.use(request);
+
+const dsl = ((getUrlParam('localPreview') ? getLocalConfig() : window.magicDSL) || [])[0] || {};
+
+const app = new Core({
+  ua: window.navigator.userAgent,
+  config: dsl,
+  request: service,
+  curPage: getUrlParam('page'),
+  useMock: Boolean(getUrlParam('useMock')),
+});
+
+app.setDesignWidth(app.env.isWeb ? window.document.documentElement.getBoundingClientRect().width : 375);
 
 Object.entries(components).forEach(([type, component]: [string, any]) => {
-  magicApp.component(`magic-ui-${type}`, defineAsyncComponent(component));
+  vueApp.component(`magic-ui-${type}`, defineAsyncComponent(component));
 });
 
 Object.values(plugins).forEach((plugin: any) => {
-  magicApp.use(plugin);
+  vueApp.use(plugin, { app });
 });
-
-const dsl = ((getUrlParam('localPreview') ? getLocalConfig() : window.magicDSL) || [])[0] || {};
 
 registerDataSourceOnDemand(dsl, asyncDataSources).then((dataSources) => {
   Object.entries(dataSources).forEach(([type, ds]: [string, any]) => {
     DataSourceManager.register(type, ds);
   });
 
-  const app = new Core({
-    ua: window.navigator.userAgent,
-    config: dsl,
-    curPage: getUrlParam('page'),
-    useMock: Boolean(getUrlParam('useMock')),
-  });
+  vueApp.config.globalProperties.app = app;
+  vueApp.provide('app', app);
 
-  app.setDesignWidth(app.env.isWeb ? window.document.documentElement.getBoundingClientRect().width : 375);
-
-  magicApp.config.globalProperties.app = app;
-  magicApp.provide('app', app);
-
-  magicApp.mount('#app');
+  vueApp.mount('#app');
 });

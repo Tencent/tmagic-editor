@@ -3,42 +3,26 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, inject, nextTick, reactive, ref } from 'vue';
+import { defineComponent, inject } from 'vue';
 
 import type { Page } from '@tmagic/core';
 import Core from '@tmagic/core';
-import type { ChangeEvent } from '@tmagic/data-source';
-import type { MNode } from '@tmagic/schema';
-import { addParamToUrl, isPage, replaceChildNode } from '@tmagic/utils';
+import { addParamToUrl } from '@tmagic/utils';
+import { useDsl } from '@tmagic/vue-runtime-help';
 
 export default defineComponent({
   name: 'App',
 
   setup() {
+    const { pageConfig } = useDsl();
+
     const app = inject<Core | undefined>('app');
-    const pageConfig = ref(app?.page?.data || {});
 
     app?.on('page-change', (page?: Page) => {
       if (!page) {
         throw new Error(`页面不存在`);
       }
       addParamToUrl({ page: page.data.id }, window);
-    });
-
-    app?.dataSourceManager?.on('update-data', (nodes: MNode[], sourceId: string, changeEvent: ChangeEvent) => {
-      nodes.forEach((node) => {
-        if (isPage(node)) {
-          pageConfig.value = node;
-        } else {
-          replaceChildNode(reactive(node), [pageConfig.value as MNode]);
-        }
-      });
-
-      if (!app) return;
-
-      nextTick(() => {
-        app.emit('replaced-node', { nodes, sourceId, ...changeEvent });
-      });
     });
 
     return {

@@ -3,10 +3,10 @@
 
 ## 能力展示
 代码块支持的能力有
-1、在线编辑
-2、参数定义，包括：参数类型定义
-3、自动保存草稿
-4、参数注释
+- 1、在线编辑
+- 2、参数定义，包括：参数类型定义
+- 3、自动保存草稿
+- 4、参数注释
 下面将主要介绍代码块的实现原理，包含dsl结构定义，以及代码块挂载执行时机等
 ## 协议描述
 我们将在线编写的代码内容保存在[DSL](../advanced/js-schema.md)中，与app同一层级，这样的好处是代码块可以在同一活动，不同页面中实现灵活编排。
@@ -38,7 +38,7 @@
 
 在页面中创建代码块也就是会将新的代码内容添加到DSL中的codeBlocks数组并保存下来，这里涉及的逻辑可以参见CodeBlock类中的[setCodeDslById](https://github.com/Tencent/tmagic-editor/blob/c143a5f7670ae61d80c1a2cfcc780cfb5259849d/packages/editor/src/services/codeBlock.ts#L107)方法。
 并且可以在编辑器左侧的“代码块”tab下看到当前活动的代码块列表
-<img src="https://vip.image.video.qpic.cn/vupload/20230228/4d17861677585336888.png" alt="代码块列表">
+<img src="/code-block.png" alt="代码块列表">
 
 ## 组件绑定
 代码块的初衷是为了实现对组件逻辑的在线干预（代码执行的时机平台提供了组件created, mounted两个钩子），因此我们需要将创建的代码与组件进行关联。
@@ -78,7 +78,7 @@
 
 ## 代码块界面展示
 侧边栏的代码块列表可以查看当前创建的代码块，以及每个代码块绑定的组件，点击代码块下方展示的组件icon可以在画布中选中该组件
-<img src="https://vip.image.video.qpic.cn/vupload/20230228/92dcfe1677636899649.png" alt="代码块列表">
+<img src="/code-block-list.png" alt="代码块列表">
 
 代码块编辑面板，可以在这里编写代码内容，申明参数
 <img src="https://vip.image.video.qpic.cn/vupload/20230228/1fd2e11677637006239.png" alt="代码块编辑面板">

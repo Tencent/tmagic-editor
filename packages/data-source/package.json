@@ -1,5 +1,5 @@
 {
-  "version": "1.4.5",
+  "version": "1.4.6",
   "name": "@tmagic/data-source",
   "type": "module",
   "sideEffects": [
@@ -39,16 +39,21 @@
     "events": "^3.3.0",
     "lodash-es": "^4.17.21"
   },
-  "peerDependencies": {
-    "@tmagic/schema": "workspace:*",
-    "@tmagic/utils": "workspace:*"
-  },
   "devDependencies": {
     "@types/events": "^3.0.0",
     "@types/lodash-es": "^4.17.4",
     "@types/node": "^18.19.0",
     "tsc-alias": "^1.8.5",
-    "typescript": "^5.4.2",
     "vite": "^5.2.11"
+  },
+  "peerDependencies": {
+    "@tmagic/schema": "workspace:*",
+    "@tmagic/utils": "workspace:*",
+    "typescript": "*"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
   }
 }
