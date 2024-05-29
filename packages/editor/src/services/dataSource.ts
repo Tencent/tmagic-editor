@@ -3,12 +3,11 @@ import { cloneDeep, get } from 'lodash-es';
 import { Writable } from 'type-fest';
 
 import type { EventOption } from '@tmagic/core';
-import { DepTargetType } from '@tmagic/dep';
+import { type CustomTargetOptions, Target, Watcher } from '@tmagic/dep';
 import type { FormConfig } from '@tmagic/form';
 import type { DataSourceSchema, Id, MNode } from '@tmagic/schema';
 import { guid, toLine } from '@tmagic/utils';
 
-import depService from '@editor/services/dep';
 import editorService from '@editor/services/editor';
 import storageService, { Protocol } from '@editor/services/storage';
 import type { DatasourceTypeOption, SyncHookPlugin } from '@editor/type';
@@ -163,13 +162,26 @@ class DataSource extends BaseService {
    * @param config 组件节点配置
    * @returns
    */
-  public copyWithRelated(config: MNode | MNode[]): void {
+  public copyWithRelated(config: MNode | MNode[], collectorOptions?: CustomTargetOptions): void {
     const copyNodes: MNode[] = Array.isArray(config) ? config : [config];
-    depService.clearByType(DepTargetType.RELATED_DS_WHEN_COPY);
-    depService.collect(copyNodes, true, DepTargetType.RELATED_DS_WHEN_COPY);
-    const customTarget = depService.getTarget(DepTargetType.RELATED_DS_WHEN_COPY, DepTargetType.RELATED_DS_WHEN_COPY);
     const copyData: DataSourceSchema[] = [];
-    if (customTarget) {
+
+    if (collectorOptions && typeof collectorOptions.isTarget === 'function') {
+      const customTarget = new Target({
+        id: 'related-ds-when-copy',
+        ...collectorOptions,
+      });
+
+      const coperWatcher = new Watcher();
+
+      coperWatcher.addTarget(customTarget);
+
+      coperWatcher.collect(
+        copyNodes.map((node) => ({ id: `${node.id}`, name: `${node.name || node.id}` })),
+        {},
+        true,
+      );
+
       Object.keys(customTarget.deps).forEach((nodeId: Id) => {
         const node = editorService.getNodeById(nodeId);
         if (!node) return;

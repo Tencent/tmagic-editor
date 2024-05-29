@@ -74,7 +74,7 @@
     "semver": "^7.3.7",
     "serialize-javascript": "^6.0.0",
     "shx": "^0.3.4",
-    "typescript": "^5.4.2",
+    "typescript": "^5.4.5",
     "vite": "^5.2.11",
     "vitepress": "1.2.2",
     "vitest": "^1.6.0",

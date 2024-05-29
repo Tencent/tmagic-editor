@@ -10,7 +10,7 @@ import {
 import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX } from '@tmagic/utils';
 
 import Target from './Target';
-import { CustomTargetOptions, DepTargetType } from './types';
+import { DepTargetType, type TargetList } from './types';
 
 export const createCodeBlockTarget = (id: Id, codeBlock: CodeBlockContent, initialDeps: DepData = {}) =>
   new Target({
@@ -30,13 +30,6 @@ export const createCodeBlockTarget = (id: Id, codeBlock: CodeBlockContent, initi
 
       return false;
     },
-  });
-
-export const createRelatedTargetForCopy = (options: CustomTargetOptions, type: DepTargetType) =>
-  new Target({
-    id: type,
-    type,
-    ...options,
   });
 
 /**
@@ -199,3 +192,14 @@ export const createDataSourceMethodTarget = (ds: DataSourceSchema, initialDeps: 
       return Boolean(ds?.methods?.find((method) => method.name === value[1]));
     },
   });
+
+export const traverseTarget = (targetsList: TargetList, cb: (target: Target) => void, type?: DepTargetType) => {
+  Object.values(targetsList).forEach((targets) => {
+    Object.values(targets).forEach((target) => {
+      if (type && target.type !== type) {
+        return;
+      }
+      cb(target);
+    });
+  });
+};

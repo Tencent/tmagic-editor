@@ -2,6 +2,13 @@ import type { DepData } from '@tmagic/schema';
 
 import { DepTargetType, type IsTarget, type TargetOptions } from './types';
 
+export interface DepUpdateOptions {
+  id: string | number;
+  name: string;
+  key: string | number;
+  data: Record<string, any>;
+}
+
 /**
  * 需要收集依赖的目标
  * 例如：一个代码块可以为一个目标
@@ -49,20 +56,20 @@ export default class Target {
 
   /**
    * 更新依赖
-   * @param node 节点配置
+   * @param option 节点配置
    * @param key 哪个key配置了这个目标的id
    */
-  public updateDep(node: Record<string | number, any>, key: string | number) {
-    const dep = this.deps[node.id] || {
-      name: node.name,
+  public updateDep({ id, name, key, data }: DepUpdateOptions) {
+    const dep = this.deps[id] || {
+      name,
       keys: [],
     };
 
-    if (node.name) {
-      dep.name = node.name;
-    }
+    dep.name = name;
 
-    this.deps[node.id] = dep;
+    dep.data = data;
+
+    this.deps[id] = dep;
 
     if (dep.keys.indexOf(key) === -1) {
       dep.keys.push(key);
@@ -75,15 +82,15 @@ export default class Target {
    * @param key 节点下哪个key需要移除，如果为空，则移除改节点下的所有依赖key
    * @returns void
    */
-  public removeDep(node?: Record<string | number, any>, key?: string | number) {
-    if (!node) {
+  public removeDep(id?: string | number, key?: string | number) {
+    if (typeof id === 'undefined') {
       Object.keys(this.deps).forEach((depKey) => {
         delete this.deps[depKey];
       });
       return;
     }
 
-    const dep = this.deps[node.id];
+    const dep = this.deps[id];
 
     if (!dep) return;
 
@@ -92,10 +99,10 @@ export default class Target {
       dep.keys.splice(index, 1);
 
       if (dep.keys.length === 0) {
-        delete this.deps[node.id];
+        delete this.deps[id];
       }
     } else {
-      delete this.deps[node.id];
+      delete this.deps[id];
     }
   }
 
@@ -105,8 +112,8 @@ export default class Target {
    * @param key 哪个key
    * @returns boolean
    */
-  public hasDep(node: Record<string | number, any>, key: string | number) {
-    const dep = this.deps[node.id];
+  public hasDep(id: string | number, key: string | number) {
+    const dep = this.deps[id];
 
     return Boolean(dep?.keys.find((d) => d === key));
   }

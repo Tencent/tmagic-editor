@@ -7,12 +7,11 @@ import {
   createDataSourceCondTarget,
   createDataSourceMethodTarget,
   createDataSourceTarget,
-  createRelatedTargetForCopy,
   DepTargetType,
   Target,
 } from '@tmagic/dep';
 import type { CodeBlockContent, DataSourceSchema, Id, MApp, MNode, MPage, MPageFragment } from '@tmagic/schema';
-import { getNodes } from '@tmagic/utils';
+import { getNodes, isPage } from '@tmagic/utils';
 
 import PropsPanel from './layouts/PropsPanel.vue';
 import { EditorProps } from './editorProps';
@@ -268,17 +267,12 @@ export const initServiceEvents = (
     }
   };
 
-  const depUpdateHandler = (node: MNode) => {
-    updateNodeWhenDataSourceChange([node]);
-  };
-
   const collectedHandler = (nodes: MNode[]) => {
     updateNodeWhenDataSourceChange(nodes);
   };
 
   depService.on('add-target', targetAddHandler);
   depService.on('remove-target', targetRemoveHandler);
-  depService.on('dep-update', depUpdateHandler);
   depService.on('collected', collectedHandler);
 
   const initDataSourceDepTarget = (ds: DataSourceSchema) => {
@@ -307,7 +301,9 @@ export const initServiceEvents = (
     });
 
     if (Array.isArray(value.items)) {
-      depService.collect(value.items, true);
+      value.items.forEach((page) => {
+        depService.collectIdle([page], { pageId: page.id }, true);
+      });
     } else {
       depService.clear();
       delete value.dataSourceDeps;
@@ -334,14 +330,28 @@ export const initServiceEvents = (
     }
   };
 
+  const collectIdle = (nodes: MNode[], deep: boolean) => {
+    nodes.forEach((node) => {
+      let pageId: Id | undefined;
+
+      if (isPage(node)) {
+        pageId = node.id;
+      } else {
+        const info = editorService.getNodeInfo(node.id);
+        pageId = info.page?.id;
+      }
+      depService.collectIdle([node], { pageId }, deep);
+    });
+  };
+
   // 新增节点，收集依赖
   const nodeAddHandler = (nodes: MNode[]) => {
-    depService.collect(nodes);
+    collectIdle(nodes, true);
   };
 
   // 节点更新，收集依赖
   const nodeUpdateHandler = (nodes: MNode[]) => {
-    depService.collect(nodes);
+    collectIdle(nodes, false);
   };
 
   // 节点删除，清除对齐的依赖收集
@@ -351,7 +361,7 @@ export const initServiceEvents = (
 
   // 由于历史记录变化是更新整个page，所以历史记录变化时，需要重新收集依赖
   const historyChangeHandler = (page: MPage | MPageFragment) => {
-    depService.collect([page], true);
+    depService.collectIdle([page], { pageId: page.id }, true);
   };
 
   editorService.on('history-change', historyChangeHandler);
@@ -386,7 +396,9 @@ export const initServiceEvents = (
     removeDataSourceTarget(config.id);
     initDataSourceDepTarget(config);
 
-    depService.collect(root?.items || [], true);
+    (root?.items || []).forEach((page) => {
+      depService.collectIdle([page], { pageId: page.id }, true);
+    });
 
     const targets = depService.getTargets(DepTargetType.DATA_SOURCE);
 
@@ -410,25 +422,9 @@ export const initServiceEvents = (
   dataSourceService.on('update', dataSourceUpdateHandler);
   dataSourceService.on('remove', dataSourceRemoveHandler);
 
-  // 初始化复制组件相关的依赖收集器
-  if (props.collectorOptions && !depService.hasTarget(DepTargetType.RELATED_COMP_WHEN_COPY)) {
-    depService.addTarget(createRelatedTargetForCopy(props.collectorOptions, DepTargetType.RELATED_COMP_WHEN_COPY));
-  }
-  if (props.collectorOptionsForCode && !depService.hasTarget(DepTargetType.RELATED_CODE_WHEN_COPY)) {
-    depService.addTarget(
-      createRelatedTargetForCopy(props.collectorOptionsForCode, DepTargetType.RELATED_CODE_WHEN_COPY),
-    );
-  }
-  if (props.collectorOptionsForDataSource && !depService.hasTarget(DepTargetType.RELATED_DS_WHEN_COPY)) {
-    depService.addTarget(
-      createRelatedTargetForCopy(props.collectorOptionsForDataSource, DepTargetType.RELATED_DS_WHEN_COPY),
-    );
-  }
-
   onBeforeUnmount(() => {
     depService.off('add-target', targetAddHandler);
     depService.off('remove-target', targetRemoveHandler);
-    depService.off('dep-update', depUpdateHandler);
     depService.off('collected', collectedHandler);
 
     editorService.off('history-change', historyChangeHandler);

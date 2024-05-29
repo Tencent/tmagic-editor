@@ -20,11 +20,10 @@ import { reactive } from 'vue';
 import { cloneDeep, get, keys, pick } from 'lodash-es';
 import type { Writable } from 'type-fest';
 
-import { DepTargetType } from '@tmagic/dep';
+import { type CustomTargetOptions, Target, Watcher } from '@tmagic/dep';
 import type { ColumnConfig } from '@tmagic/form';
 import type { CodeBlockContent, CodeBlockDSL, Id, MNode } from '@tmagic/schema';
 
-import depService from '@editor/services/dep';
 import editorService from '@editor/services/editor';
 import storageService, { Protocol } from '@editor/services/storage';
 import type { AsyncHookPlugin, CodeState } from '@editor/type';
@@ -258,17 +257,26 @@ class CodeBlock extends BaseService {
    * @param config 组件节点配置
    * @returns
    */
-  public copyWithRelated(config: MNode | MNode[]): void {
+  public copyWithRelated(config: MNode | MNode[], collectorOptions?: CustomTargetOptions): void {
     const copyNodes: MNode[] = Array.isArray(config) ? config : [config];
-    // 关联的代码块也一并复制
-    depService.clearByType(DepTargetType.RELATED_CODE_WHEN_COPY);
-    depService.collect(copyNodes, true, DepTargetType.RELATED_CODE_WHEN_COPY);
-    const customTarget = depService.getTarget(
-      DepTargetType.RELATED_CODE_WHEN_COPY,
-      DepTargetType.RELATED_CODE_WHEN_COPY,
-    );
     const copyData: CodeBlockDSL = {};
-    if (customTarget) {
+
+    if (collectorOptions && typeof collectorOptions.isTarget === 'function') {
+      const customTarget = new Target({
+        id: 'related-code-when-copy',
+        ...collectorOptions,
+      });
+
+      const coperWatcher = new Watcher();
+
+      coperWatcher.addTarget(customTarget);
+
+      coperWatcher.collect(
+        copyNodes.map((node) => ({ id: `${node.id}`, name: `${node.name || node.id}` })),
+        {},
+        true,
+      );
+
       Object.keys(customTarget.deps).forEach((nodeId: Id) => {
         const node = editorService.getNodeById(nodeId);
         if (!node) return;

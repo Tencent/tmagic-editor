@@ -1,6 +1,6 @@
 <template>
   <div class="editor-app">
-    <m-editor
+    <TMagicEditor
       v-model="value"
       ref="editor"
       :menu="menu"
@@ -17,7 +17,6 @@
       :moveable-options="moveableOptions"
       :auto-scroll-into-view="true"
       :stage-rect="stageRect"
-      :collector-options="collectorOptions"
       :layerContentMenu="contentMenuData"
       :stageContentMenu="contentMenuData"
       @props-submit-error="propsSubmitErrorHandler"
@@ -25,7 +24,7 @@
       <template #workspace-content>
         <DeviceGroup ref="deviceGroup" v-model="stageRect"></DeviceGroup>
       </template>
-    </m-editor>
+    </TMagicEditor>
 
     <TMagicDialog v-model="previewVisible" destroy-on-close class="pre-viewer" title="预览" :width="stageRect?.width">
       <iframe
@@ -51,13 +50,12 @@ import { TMagicDialog, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
 import {
   ContentMenu,
   COPY_STORAGE_KEY,
-  DatasourceTypeOption,
-  DepTargetType,
+  type DatasourceTypeOption,
   editorService,
-  MenuBarData,
-  MenuButton,
-  MoveableOptions,
-  Services,
+  type MenuBarData,
+  type MenuButton,
+  type MoveableOptions,
+  type Services,
   TMagicEditor,
 } from '@tmagic/editor';
 import type { MContainer, MNode } from '@tmagic/schema';
@@ -136,16 +134,14 @@ const usePasteMenu = (menu?: Ref<InstanceType<typeof ContentMenu> | undefined>):
   },
 });
 
-const contentMenuData = computed(() => [
+const contentMenuData = computed<MenuButton[]>(() => [
   {
     type: 'button',
     text: '复制(带关联信息)',
     icon: markRaw(CopyDocument),
-    display: (services: Services) =>
-      services?.depService?.hasSpecifiedTypeTarget(DepTargetType.RELATED_COMP_WHEN_COPY) || false,
     handler: (services: Services) => {
       const nodes = services?.editorService?.get('nodes');
-      nodes && services?.editorService?.copyWithRelated(cloneDeep(nodes));
+      nodes && services?.editorService?.copyWithRelated(cloneDeep(nodes), collectorOptions);
       nodes && services?.codeBlockService?.copyWithRelated(cloneDeep(nodes));
       nodes && services?.dataSourceService?.copyWithRelated(cloneDeep(nodes));
     },

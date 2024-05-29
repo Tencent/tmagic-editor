@@ -20,12 +20,11 @@ import { reactive } from 'vue';
 import { cloneDeep, mergeWith } from 'lodash-es';
 import { Writable } from 'type-fest';
 
-import { DepTargetType } from '@tmagic/dep';
+import { type CustomTargetOptions, Target, Watcher } from '@tmagic/dep';
 import type { FormConfig } from '@tmagic/form';
 import type { Id, MComponent, MNode } from '@tmagic/schema';
 import { getNodePath, getValueByKeyPath, guid, setValueByKeyPath, toLine } from '@tmagic/utils';
 
-import depService from '@editor/services/dep';
 import editorService from '@editor/services/editor';
 import type { AsyncHookPlugin, PropsState, SyncHookPlugin } from '@editor/type';
 import { fillConfig } from '@editor/utils/props';
@@ -196,13 +195,21 @@ class Props extends BaseService {
    * @param originConfigs 原组件配置
    * @param targetConfigs 待替换的组件配置
    */
-  public replaceRelateId(originConfigs: MNode[], targetConfigs: MNode[]) {
+  public replaceRelateId(originConfigs: MNode[], targetConfigs: MNode[], collectorOptions: CustomTargetOptions) {
     const relateIdMap = this.getRelateIdMap();
+
     if (Object.keys(relateIdMap).length === 0) return;
-    depService.clearByType(DepTargetType.RELATED_COMP_WHEN_COPY);
-    depService.collect(originConfigs, true, DepTargetType.RELATED_COMP_WHEN_COPY);
-    const target = depService.getTarget(DepTargetType.RELATED_COMP_WHEN_COPY, DepTargetType.RELATED_COMP_WHEN_COPY);
-    if (!target) return;
+
+    const target = new Target({
+      id: 'related-comp-when-copy',
+      ...collectorOptions,
+    });
+
+    const coperWatcher = new Watcher();
+
+    coperWatcher.addTarget(target);
+    coperWatcher.collect(originConfigs);
+
     originConfigs.forEach((config: MNode) => {
       const newId = relateIdMap[config.id];
       const path = getNodePath(newId, targetConfigs);
@@ -219,7 +226,7 @@ class Props extends BaseService {
 
       // 递归items
       if (config.items && Array.isArray(config.items)) {
-        this.replaceRelateId(config.items, targetConfigs);
+        this.replaceRelateId(config.items, targetConfigs, collectorOptions);
       }
     });
   }

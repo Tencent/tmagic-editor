@@ -1,14 +1,22 @@
 import { isObject } from '@tmagic/utils';
 
 import type Target from './Target';
-import { DepTargetType, type TargetList } from './types';
+import { type DepExtendedData, DepTargetType, type TargetList, TargetNode } from './types';
+import { traverseTarget } from './utils';
 
 export default class Watcher {
   private targetsList: TargetList = {};
+  private childrenProp = 'items';
+  private idProp = 'id';
+  private nameProp = 'name';
 
-  constructor(options?: { initialTargets?: TargetList }) {
+  constructor(options?: { initialTargets?: TargetList; childrenProp?: string }) {
     if (options?.initialTargets) {
       this.targetsList = options.initialTargets;
+    }
+
+    if (options?.childrenProp) {
+      this.childrenProp = options.childrenProp;
     }
   }
 
@@ -106,58 +114,58 @@ export default class Watcher {
    * @param deep 是否需要收集子节点
    * @param type 强制收集指定类型的依赖
    */
-  public collect(nodes: Record<string | number, any>[], deep = false, type?: DepTargetType) {
-    Object.values(this.targetsList).forEach((targets) => {
-      Object.values(targets).forEach((target) => {
-        if ((!type && !target.isCollectByDefault) || (type && target.type !== type)) return;
-        nodes.forEach((node) => {
-          // 先删除原有依赖，重新收集
-          target.removeDep(node);
-          this.collectItem(node, target, deep);
-        });
-      });
+  public collect(nodes: TargetNode[], depExtendedData: DepExtendedData = {}, deep = false, type?: DepTargetType) {
+    this.collectByCallback(nodes, type, ({ node, target }) => {
+      this.removeTargetDep(target, node);
+      this.collectItem(node, target, depExtendedData, deep);
     });
+  }
+
+  public collectByCallback(
+    nodes: TargetNode[],
+    type: DepTargetType | undefined,
+    cb: (data: { node: TargetNode; target: Target }) => void,
+  ) {
+    traverseTarget(
+      this.targetsList,
+      (target) => {
+        if (!type && !target.isCollectByDefault) {
+          return;
+        }
+        nodes.forEach((node) => {
+          cb({ node, target });
+        });
+      },
+      type,
+    );
   }
 
   /**
    * 清除所有目标的依赖
    * @param nodes 需要清除依赖的节点
    */
-  public clear(nodes?: Record<string | number, any>[]) {
-    const clearedItemsNodeIds: (string | number)[] = [];
-    Object.values(this.targetsList).forEach((targets) => {
-      Object.values(targets).forEach((target) => {
-        if (nodes) {
-          nodes.forEach((node) => {
-            target.removeDep(node);
+  public clear(nodes?: TargetNode[], type?: DepTargetType) {
+    let { targetsList } = this;
 
-            if (Array.isArray(node.items) && node.items.length && !clearedItemsNodeIds.includes(node.id)) {
-              clearedItemsNodeIds.push(node.id);
-              this.clear(node.items);
-            }
-          });
-        } else {
-          target.removeDep();
-        }
-      });
-    });
-  }
+    if (type) {
+      targetsList = {
+        [type]: this.getTargets(type),
+      };
+    }
 
-  /**
-   * 清除指定类型的依赖
-   * @param type 类型
-   * @param nodes 需要清除依赖的节点
-   */
-  public clearByType(type: DepTargetType, nodes?: Record<string | number, any>[]) {
     const clearedItemsNodeIds: (string | number)[] = [];
-    const targetList = this.getTargets(type);
-    Object.values(targetList).forEach((target) => {
+    traverseTarget(targetsList, (target) => {
       if (nodes) {
         nodes.forEach((node) => {
-          target.removeDep(node);
-          if (Array.isArray(node.items) && node.items.length && !clearedItemsNodeIds.includes(node.id)) {
-            clearedItemsNodeIds.push(node.id);
-            this.clear(node.items);
+          target.removeDep(node[this.idProp]);
+
+          if (
+            Array.isArray(node[this.childrenProp]) &&
+            node[this.childrenProp].length &&
+            !clearedItemsNodeIds.includes(node[this.idProp])
+          ) {
+            clearedItemsNodeIds.push(node[this.idProp]);
+            this.clear(node[this.childrenProp]);
           }
         });
       } else {
@@ -166,14 +174,28 @@ export default class Watcher {
     });
   }
 
-  private collectItem(node: Record<string | number, any>, target: Target, deep = false) {
+  /**
+   * 清除指定类型的依赖
+   * @param type 类型
+   * @param nodes 需要清除依赖的节点
+   */
+  public clearByType(type: DepTargetType, nodes?: TargetNode[]) {
+    this.clear(nodes, type);
+  }
+
+  public collectItem(node: TargetNode, target: Target, depExtendedData: DepExtendedData = {}, deep = false) {
     const collectTarget = (config: Record<string | number, any>, prop = '') => {
       const doCollect = (key: string, value: any) => {
-        const keyIsItems = key === 'items';
+        const keyIsItems = key === this.childrenProp;
         const fullKey = prop ? `${prop}.${key}` : key;
 
         if (target.isTarget(fullKey, value)) {
-          target.updateDep(node, fullKey);
+          target.updateDep({
+            id: node[this.idProp],
+            name: `${node[this.nameProp] || node[this.idProp]}`,
+            data: depExtendedData,
+            key: fullKey,
+          });
         } else if (!keyIsItems && Array.isArray(value)) {
           value.forEach((item, index) => {
             if (isObject(item)) {
@@ -186,7 +208,7 @@ export default class Watcher {
 
         if (keyIsItems && deep && Array.isArray(value)) {
           value.forEach((child) => {
-            this.collectItem(child, target, deep);
+            this.collectItem(child, target, depExtendedData, deep);
           });
         }
       };
@@ -198,5 +220,14 @@ export default class Watcher {
     };
 
     collectTarget(node);
+  }
+
+  public removeTargetDep(target: Target, node: TargetNode, key?: string | number) {
+    target.removeDep(node[this.idProp], key);
+    if (typeof key === 'undefined' && Array.isArray(node[this.childrenProp]) && node[this.childrenProp].length) {
+      node[this.childrenProp].forEach((item: TargetNode) => {
+        this.removeTargetDep(target, item, key);
+      });
+    }
   }
 }

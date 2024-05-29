@@ -39,7 +39,7 @@
     "rollup-plugin-external-globals": "^0.10.0",
     "sass": "^1.77.0",
     "terser": "^5.31.0",
-    "typescript": "^5.4.2",
+    "typescript": "^5.4.5",
     "vite": "^5.2.11"
   }
 }

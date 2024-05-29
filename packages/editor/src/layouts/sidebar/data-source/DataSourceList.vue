@@ -81,16 +81,19 @@ const getNodeTreeConfig = (id: string, dep: DepData[string], type?: string, pare
  * @param deps 依赖
  * @param type 依赖类型
  */
-const mergeChildren = (dsId: Id, items: any[], deps: DepData, type?: string) => {
+const mergeChildren = (dsId: Id, pageItems: any[], deps: DepData, type?: string) => {
   Object.entries(deps).forEach(([id, dep]) => {
+    // 按页面分类显示
+    const page = pageItems.find((page) => page.key === dep.data?.pageId);
+
     // 已经生成过的节点
-    const nodeItem = items.find((item) => item.key === id);
+    const nodeItem = page?.items.find((item: any) => item.key === id);
     // 节点存在，则追加依赖的key
     if (nodeItem) {
       nodeItem.items = nodeItem.items.concat(getKeyTreeConfig(dep, type, nodeItem.key));
     } else {
       // 节点不存在，则生成
-      items.push(getNodeTreeConfig(id, dep, type, dsId));
+      page?.items.push(getNodeTreeConfig(id, dep, type, page.id));
     }
   });
 };
@@ -101,7 +104,15 @@ const list = computed(() =>
     const dsMethodDeps = dsMethodDep.value[ds.id]?.deps || {};
     const dsCondDeps = dsCondDep.value[ds.id]?.deps || {};
 
-    const items: any[] = [];
+    const items =
+      editorService?.get('root')?.items.map((page) => ({
+        name: page.devconfig?.tabName || page.name,
+        type: 'node',
+        id: `${ds.id}_${page.id}`,
+        key: page.id,
+        items: [],
+      })) || [];
+
     // 数据源依赖分为三种类型：key/node、method、cond，是分开存储，这里将其合并展示
     mergeChildren(ds.id, items, dsDeps);
     mergeChildren(ds.id, items, dsMethodDeps, 'method');
@@ -112,7 +123,8 @@ const list = computed(() =>
       key: ds.id,
       name: ds.title,
       type: 'ds',
-      items,
+      // 只有一个页面不显示页面分类
+      items: items.length > 1 ? items.filter((page) => page.items.length) : items[0]?.items || [],
     };
   }),
 );

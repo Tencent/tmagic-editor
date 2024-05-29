@@ -223,6 +223,7 @@ describe('Watcher', () => {
           ],
         },
       ],
+      {},
       true,
     );
 

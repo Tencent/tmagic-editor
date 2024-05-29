@@ -17,10 +17,21 @@
  */
 import { reactive } from 'vue';
 
-import { DepTargetType, type Target, Watcher } from '@tmagic/dep';
+import { type DepExtendedData, DepTargetType, type Target, type TargetNode, Watcher } from '@tmagic/dep';
 import type { Id, MNode } from '@tmagic/schema';
+import { isPage } from '@tmagic/utils';
+
+import { IdleTask } from '@editor/utils/idle-task';
 
 import BaseService from './BaseService';
+
+export interface DepEvents {
+  'add-target': [target: Target];
+  'remove-target': [id: string | number];
+  collected: [nodes: MNode[], deep: boolean];
+}
+
+const idleTask = new IdleTask<{ node: TargetNode; deep: boolean; target: Target }>();
 
 class Dep extends BaseService {
   private watcher = new Watcher({ initialTargets: reactive({}) });
@@ -28,7 +39,13 @@ class Dep extends BaseService {
   public removeTargets(type: string = DepTargetType.DEFAULT) {
     this.watcher.removeTargets(type);
 
-    this.emit('remove-target');
+    const targets = this.watcher.getTargets(type);
+
+    if (!targets) return;
+
+    for (const target of Object.values(targets)) {
+      this.emit('remove-target', target.id);
+    }
   }
 
   public getTargets(type: string = DepTargetType.DEFAULT) {
@@ -46,16 +63,53 @@ class Dep extends BaseService {
 
   public removeTarget(id: Id, type: string = DepTargetType.DEFAULT) {
     this.watcher.removeTarget(id, type);
-    this.emit('remove-target');
+    this.emit('remove-target', id);
   }
 
   public clearTargets() {
     this.watcher.clearTargets();
   }
 
-  public collect(nodes: MNode[], deep = false, type?: DepTargetType) {
-    this.watcher.collect(nodes, deep, type);
+  public collect(nodes: MNode[], depExtendedData: DepExtendedData = {}, deep = false, type?: DepTargetType) {
+    this.watcher.collectByCallback(nodes, type, ({ node, target }) => {
+      this.collectNode(node, target, depExtendedData, deep);
+    });
+
     this.emit('collected', nodes, deep);
+  }
+
+  public collectIdle(nodes: MNode[], depExtendedData: DepExtendedData = {}, deep = false, type?: DepTargetType) {
+    this.watcher.collectByCallback(nodes, type, ({ node, target }) => {
+      idleTask.enqueueTask(
+        ({ node, deep, target }) => {
+          this.collectNode(node, target, depExtendedData, deep);
+        },
+        {
+          node,
+          deep,
+          target,
+        },
+      );
+    });
+
+    idleTask.once('finish', () => {
+      this.emit('collected', nodes, deep);
+    });
+  }
+
+  collectNode(node: MNode, target: Target, depExtendedData: DepExtendedData = {}, deep = false) {
+    // 先删除原有依赖，重新收集
+    if (isPage(node)) {
+      Object.entries(target.deps).forEach(([depKey, dep]) => {
+        if (dep.data?.pageId && dep.data.pageId === depExtendedData.pageId) {
+          delete target.deps[depKey];
+        }
+      });
+    } else {
+      this.watcher.removeTargetDep(target, node);
+    }
+
+    this.watcher.collectItem(node, target, depExtendedData, deep);
   }
 
   public clear(nodes?: MNode[]) {
@@ -72,6 +126,24 @@ class Dep extends BaseService {
 
   public hasSpecifiedTypeTarget(type: string = DepTargetType.DEFAULT): boolean {
     return this.watcher.hasSpecifiedTypeTarget(type);
+  }
+
+  public on<Name extends keyof DepEvents, Param extends DepEvents[Name]>(
+    eventName: Name,
+    listener: (...args: Param) => void | Promise<void>,
+  ) {
+    return super.on(eventName, listener as any);
+  }
+
+  public once<Name extends keyof DepEvents, Param extends DepEvents[Name]>(
+    eventName: Name,
+    listener: (...args: Param) => void | Promise<void>,
+  ) {
+    return super.once(eventName, listener as any);
+  }
+
+  public emit<Name extends keyof DepEvents, Param extends DepEvents[Name]>(eventName: Name, ...args: Param) {
+    return super.emit(eventName, ...args);
   }
 }
 

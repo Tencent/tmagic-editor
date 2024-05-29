@@ -1,5 +1,7 @@
 import { Files, FolderOpened, Grid, PictureFilled, SwitchButton, Ticket, Tickets } from '@element-plus/icons-vue';
 
+import type { ComponentGroup } from '@tmagic/editor';
+
 export default [
   {
     title: '示例容器',
@@ -90,4 +92,4 @@ export default [
       },
     ],
   },
-];
+] as ComponentGroup[];

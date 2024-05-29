@@ -13,12 +13,6 @@ export enum DepTargetType {
   DATA_SOURCE_METHOD = 'data-source-method',
   /** 数据源条件 */
   DATA_SOURCE_COND = 'data-source-cond',
-  /** 复制组件时关联的组件 */
-  RELATED_COMP_WHEN_COPY = 'related-comp-when-copy',
-  /** 复制组件时关联的代码块 */
-  RELATED_CODE_WHEN_COPY = 'related-code-when-copy',
-  /** 复制组件时关联的数据源 */
-  RELATED_DS_WHEN_COPY = 'related-ds-when-copy',
 }
 
 export type IsTarget = (key: string | number, value: any) => boolean;
@@ -47,3 +41,11 @@ export interface TargetList {
     [targetId: string | number]: Target;
   };
 }
+
+export interface TargetNode {
+  readonly id: string | number;
+  readonly name?: string;
+  readonly [key: string | number]: any;
+}
+
+export type DepExtendedData = Record<string, any>;

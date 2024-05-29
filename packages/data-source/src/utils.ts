@@ -154,7 +154,7 @@ export const compliedIteratorItems = (itemData: any, items: MNode[], dsId: strin
     }),
   );
 
-  watcher.collect(items, true);
+  watcher.collect(items, {}, true);
 
   const { deps } = watcher.getTarget(dsId);
   if (!Object.keys(deps).length) {

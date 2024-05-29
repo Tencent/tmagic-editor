@@ -275,6 +275,7 @@ export interface DepData {
     /** 组件名称 */
     name: string;
     keys: (string | number)[];
+    data?: Record<string, any>;
   };
 }
 

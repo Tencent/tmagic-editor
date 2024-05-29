@@ -20,14 +20,13 @@ import { reactive, toRaw } from 'vue';
 import { cloneDeep, get, isObject, mergeWith, uniq } from 'lodash-es';
 import { Writable } from 'type-fest';
 
-import { DepTargetType } from '@tmagic/dep';
+import { type CustomTargetOptions, Target, Watcher } from '@tmagic/dep';
 import type { Id, MApp, MComponent, MContainer, MNode, MPage, MPageFragment } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 import { calcValueByFontsize, getNodePath, isNumber, isPage, isPageFragment, isPop } from '@tmagic/utils';
 
 import BaseService from '@editor/services//BaseService';
 import propsService from '@editor/services//props';
-import depService from '@editor/services/dep';
 import historyService from '@editor/services/history';
 import storageService, { Protocol } from '@editor/services/storage';
 import type {
@@ -661,16 +660,26 @@ class Editor extends BaseService {
    * @param config 组件节点配置
    * @returns
    */
-  public copyWithRelated(config: MNode | MNode[]): void {
+  public copyWithRelated(config: MNode | MNode[], collectorOptions?: CustomTargetOptions): void {
     const copyNodes: MNode[] = Array.isArray(config) ? config : [config];
-    // 关联的组件也一并复制
-    depService.clearByType(DepTargetType.RELATED_COMP_WHEN_COPY);
-    depService.collect(copyNodes, true, DepTargetType.RELATED_COMP_WHEN_COPY);
-    const customTarget = depService.getTarget(
-      DepTargetType.RELATED_COMP_WHEN_COPY,
-      DepTargetType.RELATED_COMP_WHEN_COPY,
-    );
-    if (customTarget) {
+
+    // 初始化复制组件相关的依赖收集器
+    if (collectorOptions && typeof collectorOptions.isTarget === 'function') {
+      const customTarget = new Target({
+        id: 'related-comp-when-copy',
+        ...collectorOptions,
+      });
+
+      const coperWatcher = new Watcher();
+
+      coperWatcher.addTarget(customTarget);
+
+      coperWatcher.collect(
+        copyNodes.map((node) => ({ id: `${node.id}`, name: `${node.name || node.id}` })),
+        {},
+        true,
+      );
+
       Object.keys(customTarget.deps).forEach((nodeId: Id) => {
         const node = this.getNodeById(nodeId);
         if (!node) return;
@@ -686,6 +695,7 @@ class Editor extends BaseService {
         });
       });
     }
+
     storageService.setItem(COPY_STORAGE_KEY, copyNodes, {
       protocol: Protocol.OBJECT,
     });
@@ -696,7 +706,10 @@ class Editor extends BaseService {
    * @param position 粘贴的坐标
    * @returns 添加后的组件节点配置
    */
-  public async paste(position: PastePosition = {}): Promise<MNode | MNode[] | void> {
+  public async paste(
+    position: PastePosition = {},
+    collectorOptions?: CustomTargetOptions,
+  ): Promise<MNode | MNode[] | void> {
     const config: MNode[] = storageService.getItem(COPY_STORAGE_KEY);
     if (!Array.isArray(config)) return;
 
@@ -711,7 +724,11 @@ class Editor extends BaseService {
       }
     }
     const pasteConfigs = await this.doPaste(config, position);
-    propsService.replaceRelateId(config, pasteConfigs);
+
+    if (collectorOptions && typeof collectorOptions.isTarget === 'function') {
+      propsService.replaceRelateId(config, pasteConfigs, collectorOptions);
+    }
+
     return this.add(pasteConfigs, parent);
   }
 

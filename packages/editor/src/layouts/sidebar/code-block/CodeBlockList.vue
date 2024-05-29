@@ -58,26 +58,44 @@ const { codeBlockService, depService, editorService } = services || {};
 
 // 代码块列表
 const codeList = computed<TreeNodeData[]>(() =>
-  Object.values(depService?.getTargets(DepTargetType.CODE_BLOCK) || {}).map((target) => {
+  Object.entries(codeBlockService?.getCodeDsl() || {}).map(([codeId, code]) => {
+    const target = depService?.getTarget(codeId, DepTargetType.CODE_BLOCK);
+
+    // 按页面分类显示
+    const pageList: TreeNodeData[] =
+      editorService?.get('root')?.items.map((page) => ({
+        name: page.devconfig?.tabName || page.name,
+        type: 'node',
+        id: `${codeId}_${page.id}`,
+        key: page.id,
+        items: [],
+      })) || [];
+
     // 组件节点
-    const compNodes: TreeNodeData[] = Object.entries(target.deps).map(([id, dep]) => ({
-      name: dep.name,
-      type: 'node',
-      id: `${target.id}_${id}`,
-      key: id,
-      items: dep.keys.map((key) => {
-        const data: TreeNodeData = { name: `${key}`, id: `${target.id}_${id}_${key}`, type: 'key' };
-        return data;
-      }),
-    }));
+    if (target) {
+      Object.entries(target.deps).forEach(([id, dep]) => {
+        const page = pageList.find((page) => page.key === dep.data?.pageId);
+        page?.items?.push({
+          name: dep.name,
+          type: 'node',
+          id: `${page.id}_${id}`,
+          key: id,
+          items: dep.keys.map((key) => {
+            const data: TreeNodeData = { name: `${key}`, id: `${target.id}_${id}_${key}`, type: 'key' };
+            return data;
+          }),
+        });
+      });
+    }
 
     const data: TreeNodeData = {
-      id: target.id,
-      key: target.id,
-      name: target.name,
+      id: codeId,
+      key: codeId,
+      name: code.name,
       type: 'code',
-      codeBlockContent: codeBlockService?.getCodeContentById(target.id),
-      items: compNodes,
+      codeBlockContent: codeBlockService?.getCodeContentById(codeId),
+      // 只有一个页面不显示页面分类
+      items: pageList.length > 1 ? pageList.filter((page) => page.items?.length) : pageList[0]?.items || [],
     };
 
     return data;
