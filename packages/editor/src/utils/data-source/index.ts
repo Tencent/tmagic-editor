@@ -1,5 +1,6 @@
 import { CascaderOption, FormConfig, FormState } from '@tmagic/form';
 import { DataSchema, DataSourceFieldType, DataSourceSchema } from '@tmagic/schema';
+import { isNumber } from '@tmagic/utils';
 
 import BaseFormConfig from './formConfigs/base';
 import HttpFormConfig from './formConfigs/http';
@@ -165,20 +166,26 @@ export const getDisplayField = (dataSources: DataSourceSchema[], key: string) =>
     let dsText = '';
     let ds: DataSourceSchema | undefined;
     let fields: DataSchema[] | undefined;
-
     // 将模块解析成数据源对应的值
-    match[1].split('.').forEach((item, index) => {
-      if (index === 0) {
-        ds = dataSources.find((ds) => ds.id === item);
-        dsText += ds?.title || item;
-        fields = ds?.fields;
-        return;
-      }
+    match[1]
+      .replaceAll(/\[(\d+)\]/g, '.$1')
+      .split('.')
+      .forEach((item, index) => {
+        if (index === 0) {
+          ds = dataSources.find((ds) => ds.id === item);
+          dsText += ds?.title || item;
+          fields = ds?.fields;
+          return;
+        }
 
-      const field = fields?.find((field) => field.name === item);
-      fields = field?.fields;
-      dsText += `.${field?.title || item}`;
-    });
+        if (isNumber(item)) {
+          dsText += `[${item}]`;
+        } else {
+          const field = fields?.find((field) => field.name === item);
+          fields = field?.fields;
+          dsText += `.${field?.title || item}`;
+        }
+      });
 
     displayState.push({
       type: 'var',
