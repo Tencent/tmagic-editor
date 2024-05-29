@@ -46,8 +46,16 @@ export default defineConfig({
   resolve: {
     alias: [
       {
-        find: /^@tmagic\/editor\/src\/theme\/index.scss/,
+        find: /^@tmagic\/editor\/dist\/style.css/,
         replacement: path.join(__dirname, '../packages/editor/src/theme/index.scss'),
+      },
+      {
+        find: /^@tmagic\/form\/dist\/style.css/,
+        replacement: path.join(__dirname, '../packages/form/src/theme/index.scss'),
+      },
+      {
+        find: /^@tmagic\/table\/dist\/style.css/,
+        replacement: path.join(__dirname, '../packages/table/dist/style.css'),
       },
       { find: /^@tmagic\/core/, replacement: path.join(__dirname, '../packages/core/src/index.ts') },
       { find: /^@editor/, replacement: path.join(__dirname, '../packages/editor/src/') },

@@ -33,7 +33,9 @@ import App from './App.vue';
 import router from './route';
 
 import 'element-plus/dist/index.css';
-import '@tmagic/editor/src/theme/index.scss';
+import '@tmagic/editor/dist/style.css';
+import '@tmagic/form/dist/style.css';
+import '@tmagic/table/dist/style.css';
 
 // @ts-ignore
 globalThis.MonacoEnvironment = {
