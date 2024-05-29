@@ -734,7 +734,8 @@ class Editor extends BaseService {
 
   public async doPaste(config: MNode[], position: PastePosition = {}): Promise<MNode[]> {
     propsService.clearRelateId();
-    const pasteConfigs = beforePaste(position, cloneDeep(config));
+    const doc = this.get('stage')?.renderer.contentWindow?.document;
+    const pasteConfigs = beforePaste(position, cloneDeep(config), doc);
     return pasteConfigs;
   }
 
