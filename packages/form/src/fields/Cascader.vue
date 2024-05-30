@@ -13,7 +13,7 @@
     :props="{
       multiple: config.multiple ?? false,
       emitPath: config.emitPath ?? true,
-      checkStrictly: config.checkStrictly ?? false,
+      checkStrictly: checkStrictly ?? false,
     }"
     @change="changeHandler"
   ></TMagicCascader>
@@ -26,6 +26,7 @@ import { TMagicCascader } from '@tmagic/design';
 
 import type { CascaderConfig, CascaderOption, FieldProps, FormState } from '../schema';
 import { getConfig } from '../utils/config';
+import { filterFunction } from '../utils/form';
 import { useAddField } from '../utils/useAddField';
 
 defineOptions({
@@ -36,7 +37,7 @@ const props = defineProps<FieldProps<CascaderConfig>>();
 
 const emit = defineEmits(['change']);
 
-const mForm = inject<FormState | null>('mForm');
+const mForm = inject<FormState | undefined>('mForm');
 
 useAddField(props.prop);
 
@@ -47,17 +48,20 @@ const tMagicCascader = ref<InstanceType<typeof TMagicCascader>>();
 const options = ref<CascaderOption[]>([]);
 const remoteData = ref<any>(null);
 
+const checkStrictly = computed(() => filterFunction(mForm, props.config.checkStrictly, props));
+const valueSeparator = computed(() => filterFunction(mForm, props.config.valueSeparator, props));
+
 const value = computed({
   get() {
-    if (typeof props.model[props.name] === 'string' && props.config.valueSeparator) {
-      return props.model[props.name].split(props.config.valueSeparator);
+    if (typeof props.model[props.name] === 'string' && valueSeparator.value) {
+      return props.model[props.name].split(valueSeparator.value);
     }
     return props.model[props.name];
   },
   set(value) {
     let result = value;
-    if (props.config.valueSeparator) {
-      result = value.join(props.config.valueSeparator);
+    if (valueSeparator.value) {
+      result = value.join(valueSeparator.value);
     }
     props.model[props.name] = result;
   },

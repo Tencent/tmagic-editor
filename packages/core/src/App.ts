@@ -18,7 +18,7 @@
 
 import { EventEmitter } from 'events';
 
-import { has, isEmpty } from 'lodash-es';
+import { has, isArray, isEmpty } from 'lodash-es';
 
 import { createDataSourceManager, DataSource, DataSourceManager, ObservedDataClass } from '@tmagic/data-source';
 import {
@@ -228,10 +228,20 @@ class App extends EventEmitter implements AppCore {
 
     for (const [, value] of this.page.nodes) {
       value.events?.forEach((event, index) => {
-        const eventName = `${event.name}_${value.data.id}`;
-        const eventHandler = (fromCpt: Node, ...args: any[]) => {
+        let eventName = `${event.name}_${value.data.id}`;
+        let eventHandler = (fromCpt: Node, ...args: any[]) => {
           this.eventHandler(index, fromCpt, args);
         };
+
+        // 页面片容器可以配置页面片内组件的事件，形式为“${nodeId}.${eventName}”
+        const eventNames = event.name.split('.');
+        if (eventNames.length > 1) {
+          eventName = `${eventNames[1]}_${eventNames[0]}`;
+          eventHandler = (fromCpt: Node, ...args: any[]) => {
+            this.eventHandler(index, value, args);
+          };
+        }
+
         this.eventList.set(eventHandler, eventName);
         this.on(eventName, eventHandler);
       });
@@ -269,7 +279,12 @@ class App extends EventEmitter implements AppCore {
   public async compActionHandler(eventConfig: CompItemConfig, fromCpt: Node | DataSource, args: any[]) {
     if (!this.page) throw new Error('当前没有页面');
 
-    const { method: methodName, to } = eventConfig;
+    let { method: methodName, to } = eventConfig;
+
+    if (isArray(methodName)) {
+      [to, methodName] = methodName;
+    }
+
     const toNode = this.page.getNode(to);
     if (!toNode) throw `ID为${to}的组件不存在`;
 

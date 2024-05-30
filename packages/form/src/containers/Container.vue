@@ -220,13 +220,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref, resolveComponent, watch, watchEffect } from 'vue';
+import { computed, inject, ref, watch, watchEffect } from 'vue';
 import { WarningFilled } from '@element-plus/icons-vue';
 import { isEqual } from 'lodash-es';
 
 import { TMagicButton, TMagicFormItem, TMagicIcon, TMagicTooltip } from '@tmagic/design';
 
-import { ChildConfig, ContainerCommonConfig, FormState, FormValue } from '../schema';
+import { ChildConfig, ContainerCommonConfig, FormState, FormValue, TypeFunction } from '../schema';
 import { display as displayFunction, filterFunction, getRules } from '../utils/form';
 
 defineOptions({
@@ -288,11 +288,7 @@ const itemProp = computed(() => {
   return `${props.prop}${props.prop ? '.' : ''}${n}`;
 });
 
-const tagName = computed(() => {
-  const component = resolveComponent(`m-${items.value ? 'form' : 'fields'}-${type.value}`);
-  if (typeof component !== 'string') return component;
-  return 'm-fields-text';
-});
+const tagName = computed(() => `m-${items.value ? 'form' : 'fields'}-${type.value}`);
 
 const disabled = computed(() => props.disabled || filterFunction(mForm, props.config.disabled, props));
 
@@ -306,11 +302,7 @@ const rule = computed(() => getRules(mForm, props.config.rules, props));
 
 const type = computed((): string => {
   let { type } = props.config;
-  if (typeof type === 'function') {
-    type = type(mForm, {
-      model: props.model,
-    });
-  }
+  type = type && (filterFunction<string | TypeFunction>(mForm, type, props) as string);
   if (type === 'form') return '';
   if (type === 'container') return '';
   return type?.replace(/([A-Z])/g, '-$1').toLowerCase() || (items.value ? '' : 'text');

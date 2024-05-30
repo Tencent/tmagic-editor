@@ -536,11 +536,11 @@ export interface CascaderConfig extends FormItem, Input {
   /** 是否多选，默认 false */
   multiple?: boolean;
   /** 是否严格的遵守父子节点不互相关联，默认 false */
-  checkStrictly?: boolean;
+  checkStrictly?: boolean | FilterFunction<boolean>;
   /** 弹出内容的自定义类名 */
   popperClass?: string;
   /** 合并成字符串时的分隔符 */
-  valueSeparator?: string;
+  valueSeparator?: string | FilterFunction<string>;
   options?:
     | ((
         mForm: FormState | undefined,
