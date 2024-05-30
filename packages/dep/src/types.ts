@@ -28,14 +28,6 @@ export interface TargetOptions {
   isCollectByDefault?: boolean;
 }
 
-export interface CustomTargetOptions {
-  isTarget: IsTarget;
-  name?: string;
-  initialDeps?: DepData;
-  /** 是否默认收集，默认为true，当值为false时需要传入type参数给collect方法才会被收集 */
-  isCollectByDefault?: boolean;
-}
-
 export interface TargetList {
   [type: string]: {
     [targetId: string | number]: Target;

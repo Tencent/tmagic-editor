@@ -114,7 +114,12 @@ export default class Watcher {
    * @param deep 是否需要收集子节点
    * @param type 强制收集指定类型的依赖
    */
-  public collect(nodes: TargetNode[], depExtendedData: DepExtendedData = {}, deep = false, type?: DepTargetType) {
+  public collect(
+    nodes: TargetNode[],
+    depExtendedData: DepExtendedData = {},
+    deep = false,
+    type?: DepTargetType | string,
+  ) {
     this.collectByCallback(nodes, type, ({ node, target }) => {
       this.removeTargetDep(target, node);
       this.collectItem(node, target, depExtendedData, deep);
@@ -123,7 +128,7 @@ export default class Watcher {
 
   public collectByCallback(
     nodes: TargetNode[],
-    type: DepTargetType | undefined,
+    type: DepTargetType | string | undefined,
     cb: (data: { node: TargetNode; target: Target }) => void,
   ) {
     traverseTarget(
@@ -144,7 +149,7 @@ export default class Watcher {
    * 清除所有目标的依赖
    * @param nodes 需要清除依赖的节点
    */
-  public clear(nodes?: TargetNode[], type?: DepTargetType) {
+  public clear(nodes?: TargetNode[], type?: DepTargetType | string) {
     let { targetsList } = this;
 
     if (type) {
@@ -179,7 +184,7 @@ export default class Watcher {
    * @param type 类型
    * @param nodes 需要清除依赖的节点
    */
-  public clearByType(type: DepTargetType, nodes?: TargetNode[]) {
+  public clearByType(type: DepTargetType | string, nodes?: TargetNode[]) {
     this.clear(nodes, type);
   }
 

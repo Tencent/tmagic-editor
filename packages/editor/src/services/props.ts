@@ -20,7 +20,7 @@ import { reactive } from 'vue';
 import { cloneDeep, mergeWith } from 'lodash-es';
 import { Writable } from 'type-fest';
 
-import { type CustomTargetOptions, Target, Watcher } from '@tmagic/dep';
+import { Target, type TargetOptions, Watcher } from '@tmagic/dep';
 import type { FormConfig } from '@tmagic/form';
 import type { Id, MComponent, MNode } from '@tmagic/schema';
 import { getNodePath, getValueByKeyPath, guid, setValueByKeyPath, toLine } from '@tmagic/utils';
@@ -195,20 +195,19 @@ class Props extends BaseService {
    * @param originConfigs 原组件配置
    * @param targetConfigs 待替换的组件配置
    */
-  public replaceRelateId(originConfigs: MNode[], targetConfigs: MNode[], collectorOptions: CustomTargetOptions) {
+  public replaceRelateId(originConfigs: MNode[], targetConfigs: MNode[], collectorOptions: TargetOptions) {
     const relateIdMap = this.getRelateIdMap();
 
     if (Object.keys(relateIdMap).length === 0) return;
 
     const target = new Target({
-      id: 'related-comp-when-copy',
       ...collectorOptions,
     });
 
     const coperWatcher = new Watcher();
 
     coperWatcher.addTarget(target);
-    coperWatcher.collect(originConfigs);
+    coperWatcher.collect(originConfigs, {}, true, collectorOptions.type);
 
     originConfigs.forEach((config: MNode) => {
       const newId = relateIdMap[config.id];

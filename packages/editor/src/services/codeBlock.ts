@@ -20,7 +20,7 @@ import { reactive } from 'vue';
 import { cloneDeep, get, keys, pick } from 'lodash-es';
 import type { Writable } from 'type-fest';
 
-import { type CustomTargetOptions, Target, Watcher } from '@tmagic/dep';
+import { Target, type TargetOptions, Watcher } from '@tmagic/dep';
 import type { ColumnConfig } from '@tmagic/form';
 import type { CodeBlockContent, CodeBlockDSL, Id, MNode } from '@tmagic/schema';
 
@@ -257,13 +257,12 @@ class CodeBlock extends BaseService {
    * @param config 组件节点配置
    * @returns
    */
-  public copyWithRelated(config: MNode | MNode[], collectorOptions?: CustomTargetOptions): void {
+  public copyWithRelated(config: MNode | MNode[], collectorOptions?: TargetOptions): void {
     const copyNodes: MNode[] = Array.isArray(config) ? config : [config];
     const copyData: CodeBlockDSL = {};
 
     if (collectorOptions && typeof collectorOptions.isTarget === 'function') {
       const customTarget = new Target({
-        id: 'related-code-when-copy',
         ...collectorOptions,
       });
 
@@ -271,11 +270,7 @@ class CodeBlock extends BaseService {
 
       coperWatcher.addTarget(customTarget);
 
-      coperWatcher.collect(
-        copyNodes.map((node) => ({ id: `${node.id}`, name: `${node.name || node.id}` })),
-        {},
-        true,
-      );
+      coperWatcher.collect(copyNodes, {}, true, collectorOptions.type);
 
       Object.keys(customTarget.deps).forEach((nodeId: Id) => {
         const node = editorService.getNodeById(nodeId);

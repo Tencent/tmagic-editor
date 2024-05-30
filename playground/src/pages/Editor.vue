@@ -104,7 +104,7 @@ const collectorOptions = {
   name: '蒙层',
   isTarget: (key: string | number, value: any) =>
     typeof key === 'string' && typeof value === 'string' && key.includes('events') && value.startsWith('overlay_'),
-  autoCollect: false,
+  isCollectByDefault: false,
 };
 
 const usePasteMenu = (menu?: Ref<InstanceType<typeof ContentMenu> | undefined>): MenuButton => ({

@@ -20,7 +20,7 @@ import { reactive, toRaw } from 'vue';
 import { cloneDeep, get, isObject, mergeWith, uniq } from 'lodash-es';
 import { Writable } from 'type-fest';
 
-import { type CustomTargetOptions, Target, Watcher } from '@tmagic/dep';
+import { Target, type TargetOptions, Watcher } from '@tmagic/dep';
 import type { Id, MApp, MComponent, MContainer, MNode, MPage, MPageFragment } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 import { calcValueByFontsize, getNodePath, isNumber, isPage, isPageFragment, isPop } from '@tmagic/utils';
@@ -660,13 +660,12 @@ class Editor extends BaseService {
    * @param config 组件节点配置
    * @returns
    */
-  public copyWithRelated(config: MNode | MNode[], collectorOptions?: CustomTargetOptions): void {
+  public copyWithRelated(config: MNode | MNode[], collectorOptions?: TargetOptions): void {
     const copyNodes: MNode[] = Array.isArray(config) ? config : [config];
 
     // 初始化复制组件相关的依赖收集器
     if (collectorOptions && typeof collectorOptions.isTarget === 'function') {
       const customTarget = new Target({
-        id: 'related-comp-when-copy',
         ...collectorOptions,
       });
 
@@ -674,12 +673,7 @@ class Editor extends BaseService {
 
       coperWatcher.addTarget(customTarget);
 
-      coperWatcher.collect(
-        copyNodes.map((node) => ({ id: `${node.id}`, name: `${node.name || node.id}` })),
-        {},
-        true,
-      );
-
+      coperWatcher.collect(copyNodes, {}, true, collectorOptions.type);
       Object.keys(customTarget.deps).forEach((nodeId: Id) => {
         const node = this.getNodeById(nodeId);
         if (!node) return;
@@ -706,10 +700,7 @@ class Editor extends BaseService {
    * @param position 粘贴的坐标
    * @returns 添加后的组件节点配置
    */
-  public async paste(
-    position: PastePosition = {},
-    collectorOptions?: CustomTargetOptions,
-  ): Promise<MNode | MNode[] | void> {
+  public async paste(position: PastePosition = {}, collectorOptions?: TargetOptions): Promise<MNode | MNode[] | void> {
     const config: MNode[] = storageService.getItem(COPY_STORAGE_KEY);
     if (!Array.isArray(config)) return;
 

@@ -193,7 +193,11 @@ export const createDataSourceMethodTarget = (ds: DataSourceSchema, initialDeps: 
     },
   });
 
-export const traverseTarget = (targetsList: TargetList, cb: (target: Target) => void, type?: DepTargetType) => {
+export const traverseTarget = (
+  targetsList: TargetList,
+  cb: (target: Target) => void,
+  type?: DepTargetType | string,
+) => {
   Object.values(targetsList).forEach((targets) => {
     Object.values(targets).forEach((target) => {
       if (type && target.type !== type) {
