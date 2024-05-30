@@ -165,7 +165,7 @@ async function main() {
   // build all packages with types
   step('\nBuilding all packages...');
   if (!skipBuild && !isDryRun) {
-    await run('pnpm', ['run', 'build']);
+    await run('pnpm', ['run', 'reinstall']);
   } else {
     console.log(`(skipped)`);
   }
