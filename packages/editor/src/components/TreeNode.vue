@@ -114,7 +114,9 @@ const selected = computed(() => nodeStatus.value.selected);
 const visible = computed(() => nodeStatus.value.visible);
 const draggable = computed(() => nodeStatus.value.draggable);
 
-const hasChildren = computed(() => props.data.items?.some((item) => props.nodeStatusMap.get(item.id)?.visible));
+const hasChildren = computed(
+  () => Array.isArray(props.data.items) && props.data.items.some((item) => props.nodeStatusMap.get(item.id)?.visible),
+);
 
 const handleDragStart = (event: DragEvent) => {
   treeEmit?.('node-dragstart', event, props.data);
