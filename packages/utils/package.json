@@ -16,6 +16,10 @@
       "require": "./src/resetcss.css"
     }
   },
+  "files": [
+    "dist",
+    "types"
+  ],
   "license": "Apache-2.0",
   "scripts": {
     "build": "rimraf ./dist && npm run build:type && vite build --mode=es && vite build --mode=umd",

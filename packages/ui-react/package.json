@@ -3,6 +3,9 @@
   "version": "1.4.7",
   "type": "module",
   "main": "src/index.ts",
+  "files": [
+    "src"
+  ],
   "engines": {
     "node": ">=18"
   },

@@ -16,6 +16,10 @@
     },
     "./*": "./*"
   },
+  "files": [
+    "dist",
+    "types"
+  ],
   "license": "Apache-2.0",
   "scripts": {
     "build": "npm run build:type && vite build --mode=es && vite build --mode=umd",

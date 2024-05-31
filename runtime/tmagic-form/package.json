@@ -2,10 +2,6 @@
   "version": "1.0.9",
   "name": "@tmagic/tmagic-form-runtime",
   "type": "module",
-  "sideEffects": [
-    "dist/*",
-    "src/theme/*"
-  ],
   "main": "dist/tmagic-form-runtime.umd.cjs",
   "module": "dist/tmagic-form-runtime.js",
   "types": "types/index.d.ts",
@@ -17,6 +13,10 @@
     },
     "./*": "./*"
   },
+  "files": [
+    "dist",
+    "types"
+  ],
   "license": "Apache-2.0",
   "scripts": {
     "build": "npm run build:type && vite build",

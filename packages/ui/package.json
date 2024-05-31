@@ -3,6 +3,9 @@
   "name": "@tmagic/ui",
   "type": "module",
   "main": "src/index.ts",
+  "files": [
+    "src"
+  ],
   "engines": {
     "node": ">=18"
   },
