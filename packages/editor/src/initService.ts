@@ -11,11 +11,12 @@ import {
   Target,
 } from '@tmagic/dep';
 import type { CodeBlockContent, DataSourceSchema, Id, MApp, MNode, MPage, MPageFragment } from '@tmagic/schema';
-import { getNodes, isPage } from '@tmagic/utils';
+import { isPage } from '@tmagic/utils';
 
 import PropsPanel from './layouts/PropsPanel.vue';
 import { EditorProps } from './editorProps';
 import { Services } from './type';
+import { traverseNode } from './utils';
 
 export declare type LooseRequired<T> = {
   [P in string & keyof T]: T[P];
@@ -204,38 +205,6 @@ export const initServiceEvents = (
     }
   };
 
-  const updateNodeWhenDataSourceChange = (nodes: MNode[]) => {
-    const root = editorService.get('root');
-    const stage = editorService.get('stage');
-
-    if (!root || !stage) return;
-
-    const app = getApp();
-
-    if (!app) return;
-
-    if (app.dsl) {
-      app.dsl.dataSourceDeps = root.dataSourceDeps;
-      app.dsl.dataSourceCondDeps = root.dataSourceCondDeps;
-      app.dsl.dataSources = root.dataSources;
-    }
-
-    updateDataSourceSchema();
-
-    nodes.forEach((node) => {
-      const deps = Object.values(root.dataSourceDeps || {});
-      deps.forEach((dep) => {
-        if (dep[node.id]) {
-          stage.update({
-            config: cloneDeep(node),
-            parentId: editorService.getParentById(node.id)?.id,
-            root: cloneDeep(root),
-          });
-        }
-      });
-    });
-  };
-
   const targetAddHandler = (target: Target) => {
     const root = editorService.get('root');
     if (!root) return;
@@ -267,8 +236,50 @@ export const initServiceEvents = (
     }
   };
 
-  const collectedHandler = (nodes: MNode[]) => {
-    updateNodeWhenDataSourceChange(nodes);
+  const collectedHandler = (nodes: MNode[], deep: boolean) => {
+    const root = editorService.get('root');
+    const stage = editorService.get('stage');
+
+    if (!root || !stage) return;
+
+    const app = getApp();
+
+    if (!app) return;
+
+    if (app.dsl) {
+      app.dsl.dataSourceDeps = root.dataSourceDeps;
+      app.dsl.dataSourceCondDeps = root.dataSourceCondDeps;
+      app.dsl.dataSources = root.dataSources;
+    }
+
+    updateDataSourceSchema();
+
+    const allNodes: MNode[] = [];
+
+    if (deep) {
+      nodes.forEach((node) => {
+        traverseNode<MNode>(node, (node) => {
+          if (!allNodes.includes(node)) {
+            allNodes.push(node);
+          }
+        });
+      });
+    } else {
+      allNodes.push(...nodes);
+    }
+
+    const deps = Object.values(root.dataSourceDeps || {});
+    deps.forEach((dep) => {
+      Object.keys(dep).forEach((id) => {
+        const node = allNodes.find((node) => node.id === id);
+        node &&
+          stage.update({
+            config: cloneDeep(node),
+            parentId: editorService.getParentById(node.id)?.id,
+            root: cloneDeep(root),
+          });
+      });
+    });
   };
 
   depService.on('add-target', targetAddHandler);
@@ -399,12 +410,6 @@ export const initServiceEvents = (
     (root?.items || []).forEach((page) => {
       depService.collectIdle([page], { pageId: page.id }, true);
     });
-
-    const targets = depService.getTargets(DepTargetType.DATA_SOURCE);
-
-    const nodes = getNodes(Object.keys(targets[config.id].deps), root?.items);
-
-    updateNodeWhenDataSourceChange(nodes);
   };
 
   const removeDataSourceTarget = (id: string) => {

@@ -73,6 +73,13 @@ export default defineConfig(({ mode }) => {
         sourcemap: true,
         outDir: path.resolve(process.cwd(), `../../playground/public/runtime/vue2/${mode}`),
       },
+
+      resolve: {
+        alias: [
+          { find: /^vue$/, replacement: path.join(__dirname, 'node_modules/vue/dist/vue.esm.js') },
+          { find: /^vue-demi$/, replacement: path.join(__dirname, 'node_modules/vue/dist/vue.esm.js') },
+        ],
+      },
     };
   }
 

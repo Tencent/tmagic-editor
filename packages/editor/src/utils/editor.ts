@@ -285,7 +285,7 @@ export const traverseNode = <T extends NodeItem = NodeItem>(
 ) => {
   cb(node, parents);
 
-  if (node.items?.length) {
+  if (Array.isArray(node.items) && node.items.length) {
     parents.push(node);
     node.items.forEach((item) => {
       traverseNode(item as T, cb, [...parents]);
