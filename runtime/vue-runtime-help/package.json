@@ -1,5 +1,5 @@
 {
-  "version": "0.0.2",
+  "version": "0.0.3",
   "name": "@tmagic/vue-runtime-help",
   "type": "module",
   "sideEffects": false,
@@ -26,25 +26,34 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "@tmagic/stage": "workspace:*",
     "vue-demi": "^0.14.7"
   },
   "peerDependencies": {
     "@tmagic/core": "workspace:*",
     "@tmagic/data-source": "workspace:*",
     "@tmagic/schema": "workspace:*",
+    "@tmagic/stage": "workspace:*",
     "@tmagic/utils": "workspace:*",
     "@vue/composition-api": ">=1.7.2",
+    "typescript": "*",
     "vue": ">=2.0.0 || >=3.0.0"
   },
   "peerDependenciesMeta": {
     "@vue/composition-api": {
       "optional": true
+    },
+    "@tmagic/schema": {
+      "optional": true
+    },
+    "@tmagic/stage": {
+      "optional": true
+    },
+    "typescript": {
+      "optional": true
     }
   },
   "devDependencies": {
     "@types/node": "^18.19.0",
-    "rimraf": "^3.0.2",
-    "typescript": "^5.4.5"
+    "rimraf": "^3.0.2"
   }
 }

@@ -14,9 +14,8 @@ export default defineComponent({
   name: 'App',
 
   setup() {
-    const { pageConfig } = useDsl();
-
     const app = inject<Core | undefined>('app');
+    const { pageConfig } = useDsl(app);
 
     app?.on('page-change', (page?: Page) => {
       if (!page) {

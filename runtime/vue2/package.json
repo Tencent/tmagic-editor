@@ -23,8 +23,9 @@
     "@tmagic/data-source": "1.4.7",
     "@tmagic/ui-vue2": "1.4.7",
     "@tmagic/schema": "1.4.7",
+    "@tmagic/stage": "1.4.7",
     "@tmagic/utils": "1.4.7",
-    "@tmagic/vue-runtime-help": "^0.0.2",
+    "@tmagic/vue-runtime-help": "^0.0.3",
     "axios": "^0.25.0",
     "terser": "^5.31.0",
     "vue": "^2.7.4"

@@ -1,4 +1,4 @@
-import { computed, inject, nextTick, reactive, ref, watch } from 'vue-demi';
+import { computed, nextTick, reactive, ref, watch } from 'vue-demi';
 
 import Core from '@tmagic/core';
 import type { Id, MApp, MNode } from '@tmagic/schema';
@@ -11,9 +11,7 @@ declare global {
   }
 }
 
-export const useEditorDsl = (win = window) => {
-  const app = inject<Core | undefined>('app');
-
+export const useEditorDsl = (app: Core | undefined, win = window) => {
   const root = ref<MApp>();
   const curPageId = ref<Id>();
   const selectedId = ref<Id>();
