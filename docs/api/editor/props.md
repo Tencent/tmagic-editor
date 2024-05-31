@@ -195,6 +195,7 @@ const sidebar = ref({
       component: markRaw(ModListPanel),
       text: '模块',
     },
+  ],
 });
 </script>
 
