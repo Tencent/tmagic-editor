@@ -18,11 +18,11 @@
     "build:ds:event": "vite build --config build.vite.config.ts --mode ds:event"
   },
   "dependencies": {
-    "@tmagic/data-source": "1.4.7",
     "@tmagic/core": "1.4.7",
-    "@tmagic/ui": "1.4.7",
+    "@tmagic/data-source": "1.4.7",
     "@tmagic/schema": "1.4.7",
     "@tmagic/stage": "1.4.7",
+    "@tmagic/ui": "1.4.7",
     "@tmagic/utils": "1.4.7",
     "@tmagic/vue-runtime-help": "^0.0.3",
     "axios": "^0.25.0",

@@ -58,10 +58,10 @@ export default defineConfig(({ mode }) => {
       plugins: [
         vue(),
         vueJsx(),
+        externalGlobals({ 'vue-demi': 'VueDemi', vue: 'Vue' }, { exclude: [`./${mode}/index.html`] }),
         legacy({
           targets: ['defaults', 'not IE 11'],
         }),
-        externalGlobals({ vue: 'Vue' }, { exclude: [`./${mode}/index.html`] }),
       ],
 
       root: `./${mode}/`,
@@ -70,17 +70,17 @@ export default defineConfig(({ mode }) => {
 
       base: `/tmagic-editor/playground/runtime/vue3/${mode}`,
 
+      optimizeDeps: {
+        exclude: ['vue-demi'],
+      },
+
       build: {
         emptyOutDir: true,
         sourcemap: true,
         outDir: path.resolve(process.cwd(), `../../playground/public/runtime/vue3/${mode}`),
-      },
-
-      resolve: {
-        alias: [
-          { find: /^vue$/, replacement: path.join(__dirname, 'node_modules/vue/dist/vue.esm-bundler.js') },
-          { find: /^vue-demi$/, replacement: path.join(__dirname, 'node_modules/vue/dist/vue.esm-bundler.js') },
-        ],
+        rollupOptions: {
+          external: ['vue', 'vue-demi'],
+        },
       },
     };
   }
