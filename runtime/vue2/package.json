@@ -19,7 +19,6 @@
     "build:ds:event": "vite build --config build.vite.config.ts --mode ds:event"
   },
   "dependencies": {
-    "@tmagic/cli": "1.4.6",
     "@tmagic/core": "1.4.6",
     "@tmagic/data-source": "1.4.6",
     "@tmagic/ui-vue2": "1.4.6",
@@ -31,6 +30,7 @@
     "vue": "^2.7.4"
   },
   "devDependencies": {
+    "@tmagic/cli": "1.4.6",
     "@types/events": "^3.0.0",
     "axios": "^0.27.2",
     "rollup": "^4.17.2",

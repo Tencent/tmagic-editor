@@ -36,7 +36,11 @@ const app: Core | undefined = inject('app');
 const style = computed(() => app?.transformStyle(props.config.style || {}));
 
 const configs = computed(() => {
-  const { iteratorData = [] } = props.config;
+  let { iteratorData = [] } = props.config;
+
+  if (!Array.isArray(iteratorData)) {
+    iteratorData = [];
+  }
 
   if (app?.platform === 'editor' && !iteratorData.length) {
     iteratorData.push({});

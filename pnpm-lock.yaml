@@ -115,7 +115,7 @@ importers:
         version: 5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0)
       vitepress:
         specifier: 1.2.2
-        version: 1.2.2(@algolia/client-search@4.23.3)(@types/node@18.19.3)(@types/react@17.0.37)(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.5)))(async-validator@4.2.5)(axios@0.25.0)(postcss@8.4.38)(qrcode@1.5.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.77.0)(search-insights@2.9.0)(sortablejs@1.15.2)(terser@5.31.0)(typescript@5.4.5)
+        version: 1.2.2(@algolia/client-search@4.23.3)(@types/node@18.19.3)(@types/react@18.3.3)(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.5)))(async-validator@4.2.5)(axios@0.25.0)(postcss@8.4.38)(qrcode@1.5.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.0)(search-insights@2.9.0)(sortablejs@1.15.2)(terser@5.31.0)(typescript@5.4.5)
       vitest:
         specifier: ^1.6.0
         version: 1.6.0(@types/node@18.19.3)(jsdom@19.0.0)(sass@1.77.0)(terser@5.31.0)
@@ -624,14 +624,14 @@ importers:
   packages/ui:
     dependencies:
       '@tmagic/core':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.11)
+        specifier: workspace:*
+        version: link:../core
       '@tmagic/schema':
-        specifier: 1.4.4
-        version: 1.4.4
+        specifier: workspace:*
+        version: link:../schema
       '@tmagic/utils':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.11)
+        specifier: workspace:*
+        version: link:../utils
       delegate:
         specifier: ^3.2.0
         version: 3.2.0
@@ -641,8 +641,11 @@ importers:
       tiny-emitter:
         specifier: ^2.1.0
         version: 2.1.0
+      typescript:
+        specifier: '*'
+        version: 5.4.5
       vue:
-        specifier: ^3.4.27
+        specifier: '>=3.4.27'
         version: 3.4.27(typescript@5.4.5)
     devDependencies:
       '@testing-library/vue':
@@ -661,51 +664,54 @@ importers:
   packages/ui-react:
     dependencies:
       '@tmagic/core':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.11)
+        specifier: workspace:*
+        version: link:../core
       '@tmagic/schema':
-        specifier: 1.4.4
-        version: 1.4.4
+        specifier: workspace:*
+        version: link:../schema
       '@tmagic/utils':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.11)
+        specifier: workspace:*
+        version: link:../utils
       qrcode:
         specifier: ^1.5.0
         version: 1.5.0
       react:
-        specifier: ^17.0.0
-        version: 17.0.2
+        specifier: '>=18.3.1'
+        version: 18.3.1
       react-dom:
-        specifier: ^17.0.0
-        version: 17.0.2(react@17.0.2)
+        specifier: '>=18.3.1'
+        version: 18.3.1(react@18.3.1)
+      typescript:
+        specifier: '*'
+        version: 5.4.5
     devDependencies:
       '@types/react':
-        specifier: ^17.0.37
-        version: 17.0.37
+        specifier: ^18.3.3
+        version: 18.3.3
       '@types/react-dom':
-        specifier: ^17.0.11
-        version: 17.0.11
-      typescript:
-        specifier: ^5.4.5
-        version: 5.4.5
+        specifier: ^18.3.0
+        version: 18.3.0
 
   packages/ui-vue2:
     dependencies:
       '@tmagic/core':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.11)
+        specifier: workspace:*
+        version: link:../core
       '@tmagic/schema':
-        specifier: 1.4.4
-        version: 1.4.4
+        specifier: workspace:*
+        version: link:../schema
       '@tmagic/utils':
-        specifier: 1.4.4
-        version: 1.4.4(dayjs@1.11.11)
+        specifier: workspace:*
+        version: link:../utils
       qrcode:
         specifier: ^1.5.0
         version: 1.5.0
+      typescript:
+        specifier: '*'
+        version: 5.4.5
       vue:
-        specifier: ^2.7.4
-        version: 2.7.4
+        specifier: '>=2.7.4'
+        version: 3.4.27(typescript@5.4.5)
     devDependencies:
       vue-template-compiler:
         specifier: ^2.7.4
@@ -832,9 +838,6 @@ importers:
 
   runtime/react:
     dependencies:
-      '@tmagic/cli':
-        specifier: 1.4.6
-        version: 1.4.6(typescript@5.4.5)
       '@tmagic/core':
         specifier: 1.4.6
         version: 1.4.6(@tmagic/data-source@1.4.6(@tmagic/schema@1.4.6(typescript@5.4.5))(@tmagic/utils@1.4.6(@tmagic/schema@1.4.6(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5))(@tmagic/schema@1.4.6(typescript@5.4.5))(@tmagic/utils@1.4.6(@tmagic/schema@1.4.6(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5)
@@ -849,7 +852,7 @@ importers:
         version: 1.4.6(@tmagic/core@1.4.6(@tmagic/data-source@1.4.6(@tmagic/schema@1.4.6(typescript@5.4.5))(@tmagic/utils@1.4.6(@tmagic/schema@1.4.6(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5))(@tmagic/schema@1.4.6(typescript@5.4.5))(@tmagic/utils@1.4.6(@tmagic/schema@1.4.6(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5))(@tmagic/schema@1.4.6(typescript@5.4.5))(@tmagic/utils@1.4.6(@tmagic/schema@1.4.6(typescript@5.4.5))(typescript@5.4.5))(scenejs@1.9.4)(typescript@5.4.5)
       '@tmagic/ui-react':
         specifier: 1.4.6
-        version: 1.4.6(dayjs@1.11.11)(qrcode@1.5.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        version: 1.4.6(dayjs@1.11.11)(qrcode@1.5.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tmagic/utils':
         specifier: 1.4.6
         version: 1.4.6(@tmagic/schema@1.4.6(typescript@5.4.5))(typescript@5.4.5)
@@ -860,24 +863,27 @@ importers:
         specifier: ^4.17.21
         version: 4.17.21
       react:
-        specifier: ^17.0.2
-        version: 17.0.2
+        specifier: ^18.3.1
+        version: 18.3.1
       react-dom:
-        specifier: ^17.0.2
-        version: 17.0.2(react@17.0.2)
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
       terser:
         specifier: ^5.31.0
         version: 5.31.0
     devDependencies:
+      '@tmagic/cli':
+        specifier: 1.4.6
+        version: 1.4.6(typescript@5.4.5)
       '@types/lodash-es':
         specifier: ^4.17.4
         version: 4.17.4
       '@types/react':
-        specifier: ^17.0.37
-        version: 17.0.37
+        specifier: ^18.3.3
+        version: 18.3.3
       '@types/react-dom':
-        specifier: ^17.0.11
-        version: 17.0.11
+        specifier: ^18.3.0
+        version: 18.3.0
       '@vitejs/plugin-legacy':
         specifier: ^5.4.0
         version: 5.4.0(terser@5.31.0)(vite@5.2.11(@types/node@18.19.3)(sass@1.77.0)(terser@5.31.0))
@@ -979,9 +985,6 @@ importers:
 
   runtime/vue2:
     dependencies:
-      '@tmagic/cli':
-        specifier: 1.4.6
-        version: 1.4.6(typescript@5.4.5)
       '@tmagic/core':
         specifier: 1.4.6
         version: 1.4.6(@tmagic/data-source@1.4.6(@tmagic/schema@1.4.6(typescript@5.4.5))(@tmagic/utils@1.4.6(@tmagic/schema@1.4.6(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5))(@tmagic/schema@1.4.6(typescript@5.4.5))(@tmagic/utils@1.4.6(@tmagic/schema@1.4.6(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5)
@@ -1010,6 +1013,9 @@ importers:
         specifier: ^2.7.4
         version: 2.7.4
     devDependencies:
+      '@tmagic/cli':
+        specifier: 1.4.6
+        version: 1.4.6(typescript@5.4.5)
       '@types/events':
         specifier: ^3.0.0
         version: 3.0.0
@@ -3009,14 +3015,11 @@ packages:
   '@types/qrcode@1.4.2':
     resolution: {integrity: sha512-7uNT9L4WQTNJejHTSTdaJhfBSCN73xtXaHFyBJ8TSwiLhe4PRuTue7Iph0s2nG9R/ifUaSnGhLUOZavlBEqDWQ==}
 
-  '@types/react-dom@17.0.11':
-    resolution: {integrity: sha512-f96K3k+24RaLGVu/Y2Ng3e1EbZ8/cVJvypZWd7cy0ofCBaf2lcM46xNhycMZ2xGwbBjRql7hOlZ+e2WlJ5MH3Q==}
+  '@types/react-dom@18.3.0':
+    resolution: {integrity: sha512-EhwApuTmMBmXuFOikhQLIBUn6uFg81SwLMOAUgodJF14SOBOCMdU04gDoYi0WOJJHD144TL32z4yDqCW3dnkQg==}
 
-  '@types/react@17.0.37':
-    resolution: {integrity: sha512-2FS1oTqBGcH/s0E+CjrCCR9+JMpsu9b69RTFO+40ua43ZqP5MmQ4iUde/dMjWR909KxZwmOQIFq6AV6NjEG5xg==}
-
-  '@types/scheduler@0.16.3':
-    resolution: {integrity: sha512-5cJ8CB4yAx7BH1oMvdU0Jh9lrEXyPkar6F9G/ERswkCuvP4KQZfZkSjcMbAICCpQTN4OuZn8tz0HiKv9TGZgrQ==}
+  '@types/react@18.3.3':
+    resolution: {integrity: sha512-hti/R0pS0q1/xx+TsI73XIqk26eBsISZ2R0wUijXIngRK9R/e7Xw/cXVxQK7R5JjW+SV4zGcn5hXjudkN/pLIw==}
 
   '@types/semver@7.3.13':
     resolution: {integrity: sha512-21cFJr9z3g5dW8B0CVI9g2O9beqaThGQ6ZFBqHfwhzLDKUxaqTIy3vnfah/UPkfOiF2pLq+tGz+W8RyCskuslw==}
@@ -5213,10 +5216,6 @@ packages:
   nwsapi@2.2.3:
     resolution: {integrity: sha512-jscxIO4/VKScHlbmFBdV1Z6LXnLO+ZR4VMtypudUdfwtKxUN3TQcNFIHLwKtrUbDyHN4/GycY9+oRGZ2XMXYPw==}
 
-  object-assign@4.1.1:
-    resolution: {integrity: sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg==}
-    engines: {node: '>=0.10.0'}
-
   object-inspect@1.12.3:
     resolution: {integrity: sha512-geUvdk7c+eizMNUDkRpW1wJwgfOiOeHbxBR/hLXK1aT6zmVSO0jsQcs7fj6MGw89jC/cjGfLcNOrtMYtGqm81g==}
 
@@ -5468,10 +5467,10 @@ packages:
   react-css-styled@1.1.9:
     resolution: {integrity: sha512-M7fJZ3IWFaIHcZEkoFOnkjdiUFmwd8d+gTh2bpqMOcnxy/0Gsykw4dsL4QBiKsxcGow6tETUa4NAUcmJF+/nfw==}
 
-  react-dom@17.0.2:
-    resolution: {integrity: sha512-s4h96KtLDUQlsENhMn1ar8t2bEa+q/YAtj8pPPdIjPDGBDIVNsrD9aXNWqspUe6AzKCIG0C1HZZLqLV7qpOBGA==}
+  react-dom@18.3.1:
+    resolution: {integrity: sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw==}
     peerDependencies:
-      react: 17.0.2
+      react: ^18.3.1
 
   react-is@17.0.2:
     resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
@@ -5489,8 +5488,8 @@ packages:
   react-selecto@1.26.0:
     resolution: {integrity: sha512-aBTZEYA68uE+o8TytNjTb2GpIn4oKEv0U4LIow3cspJQlF/PdAnBwkq9UuiKVuFluu5kfLQ7Keu3S2Tihlmw0g==}
 
-  react@17.0.2:
-    resolution: {integrity: sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA==}
+  react@18.3.1:
+    resolution: {integrity: sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==}
     engines: {node: '>=0.10.0'}
 
   read-pkg-up@10.1.0:
@@ -5662,8 +5661,8 @@ packages:
   scenejs@1.9.4:
     resolution: {integrity: sha512-/DajsY2fwaOgWKOPNV2nP/eE2+zF+q2tE4aYOSteg7JWrzHPXTXG1ds4Ah09nImznJ5rPnZOm1/gX451we2WvQ==}
 
-  scheduler@0.20.2:
-    resolution: {integrity: sha512-2eWfGgAqqWFGqtdMmcL5zCMK1U8KlXv8SQFGglL3CEtd0aDVDWgeF/YoCmvln55m5zSk3J/20hTaSBeSObsQDQ==}
+  scheduler@0.23.2:
+    resolution: {integrity: sha512-UOShsPwz7NrMUqhR6t0hWjFduvOzbtv7toDH1/hIrfRNIDBnnBWd0CwJTGvTpngVlmwGCdP9/Zl/tVrDqcuYzQ==}
 
   scule@1.0.0:
     resolution: {integrity: sha512-4AsO/FrViE/iDNEPaAQlb77tf0csuq27EsVpy6ett584EcRTp6pTDLoGWVxCD77y5iU5FauOvhsI4o1APwPoSQ==}
@@ -7781,9 +7780,9 @@ snapshots:
 
   '@docsearch/css@3.6.0': {}
 
-  '@docsearch/js@3.6.0(@algolia/client-search@4.23.3)(@types/react@17.0.37)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(search-insights@2.9.0)':
+  '@docsearch/js@3.6.0(@algolia/client-search@4.23.3)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(search-insights@2.9.0)':
     dependencies:
-      '@docsearch/react': 3.6.0(@algolia/client-search@4.23.3)(@types/react@17.0.37)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(search-insights@2.9.0)
+      '@docsearch/react': 3.6.0(@algolia/client-search@4.23.3)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(search-insights@2.9.0)
       preact: 10.13.2
     transitivePeerDependencies:
       - '@algolia/client-search'
@@ -7792,16 +7791,16 @@ snapshots:
       - react-dom
       - search-insights
 
-  '@docsearch/react@3.6.0(@algolia/client-search@4.23.3)(@types/react@17.0.37)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(search-insights@2.9.0)':
+  '@docsearch/react@3.6.0(@algolia/client-search@4.23.3)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(search-insights@2.9.0)':
     dependencies:
       '@algolia/autocomplete-core': 1.9.3(@algolia/client-search@4.23.3)(algoliasearch@4.20.0)(search-insights@2.9.0)
       '@algolia/autocomplete-preset-algolia': 1.9.3(@algolia/client-search@4.23.3)(algoliasearch@4.20.0)
       '@docsearch/css': 3.6.0
       algoliasearch: 4.20.0
     optionalDependencies:
-      '@types/react': 17.0.37
-      react: 17.0.2
-      react-dom: 17.0.2(react@17.0.2)
+      '@types/react': 18.3.3
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
       search-insights: 2.9.0
     transitivePeerDependencies:
       - '@algolia/client-search'
@@ -8410,14 +8409,14 @@ snapshots:
       - '@tmagic/data-source'
       - typescript
 
-  '@tmagic/ui-react@1.4.6(dayjs@1.11.11)(qrcode@1.5.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)':
+  '@tmagic/ui-react@1.4.6(dayjs@1.11.11)(qrcode@1.5.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@tmagic/core': 1.4.4(dayjs@1.11.11)
       '@tmagic/schema': 1.4.4
       '@tmagic/utils': 1.4.4(dayjs@1.11.11)
       qrcode: 1.5.0
-      react: 17.0.2
-      react-dom: 17.0.2(react@17.0.2)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
     transitivePeerDependencies:
       - dayjs
 
@@ -8555,17 +8554,14 @@ snapshots:
     dependencies:
       '@types/node': 18.19.3
 
-  '@types/react-dom@17.0.11':
+  '@types/react-dom@18.3.0':
     dependencies:
-      '@types/react': 17.0.37
+      '@types/react': 18.3.3
 
-  '@types/react@17.0.37':
+  '@types/react@18.3.3':
     dependencies:
       '@types/prop-types': 15.7.5
-      '@types/scheduler': 0.16.3
-      csstype: 3.1.2
-
-  '@types/scheduler@0.16.3': {}
+      csstype: 3.1.3
 
   '@types/semver@7.3.13': {}
 
@@ -11165,8 +11161,6 @@ snapshots:
 
   nwsapi@2.2.3: {}
 
-  object-assign@4.1.1: {}
-
   object-inspect@1.12.3: {}
 
   object-keys@1.1.1: {}
@@ -11425,12 +11419,11 @@ snapshots:
       css-styled: 1.0.8
       framework-utils: 1.1.0
 
-  react-dom@17.0.2(react@17.0.2):
+  react-dom@18.3.1(react@18.3.1):
     dependencies:
       loose-envify: 1.4.0
-      object-assign: 4.1.1
-      react: 17.0.2
-      scheduler: 0.20.2
+      react: 18.3.1
+      scheduler: 0.23.2
 
   react-is@17.0.2: {}
 
@@ -11458,10 +11451,9 @@ snapshots:
     dependencies:
       selecto: 1.26.0
 
-  react@17.0.2:
+  react@18.3.1:
     dependencies:
       loose-envify: 1.4.0
-      object-assign: 4.1.1
 
   read-pkg-up@10.1.0:
     dependencies:
@@ -11673,10 +11665,9 @@ snapshots:
       css-styled: 1.0.8
       order-map: 0.2.2(@daybrush/utils@1.13.0)
 
-  scheduler@0.20.2:
+  scheduler@0.23.2:
     dependencies:
       loose-envify: 1.4.0
-      object-assign: 4.1.1
 
   scule@1.0.0: {}
 
@@ -12212,10 +12203,10 @@ snapshots:
       sass: 1.77.0
       terser: 5.31.0
 
-  vitepress@1.2.2(@algolia/client-search@4.23.3)(@types/node@18.19.3)(@types/react@17.0.37)(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.5)))(async-validator@4.2.5)(axios@0.25.0)(postcss@8.4.38)(qrcode@1.5.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(sass@1.77.0)(search-insights@2.9.0)(sortablejs@1.15.2)(terser@5.31.0)(typescript@5.4.5):
+  vitepress@1.2.2(@algolia/client-search@4.23.3)(@types/node@18.19.3)(@types/react@18.3.3)(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.5)))(async-validator@4.2.5)(axios@0.25.0)(postcss@8.4.38)(qrcode@1.5.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.0)(search-insights@2.9.0)(sortablejs@1.15.2)(terser@5.31.0)(typescript@5.4.5):
     dependencies:
       '@docsearch/css': 3.6.0
-      '@docsearch/js': 3.6.0(@algolia/client-search@4.23.3)(@types/react@17.0.37)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(search-insights@2.9.0)
+      '@docsearch/js': 3.6.0(@algolia/client-search@4.23.3)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(search-insights@2.9.0)
       '@shikijs/core': 1.6.0
       '@shikijs/transformers': 1.6.0
       '@types/markdown-it': 14.1.1

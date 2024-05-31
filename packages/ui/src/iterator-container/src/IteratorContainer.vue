@@ -36,7 +36,11 @@ const { app } = useApp({
 });
 
 const configs = computed(() => {
-  const { iteratorData = [] } = props.config;
+  let { iteratorData = [] } = props.config;
+
+  if (!Array.isArray(iteratorData)) {
+    iteratorData = [];
+  }
 
   if (app?.platform === 'editor' && !iteratorData.length) {
     iteratorData.push({});

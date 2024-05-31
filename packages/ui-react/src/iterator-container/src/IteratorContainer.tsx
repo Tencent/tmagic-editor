@@ -22,7 +22,11 @@ interface IteratorContainerProps extends MContainer {
 const IteratorContainer: React.FC<IteratorContainerProps> = ({ config, id }) => {
   const { app } = useApp({ config });
 
-  const { iteratorData = [] } = config;
+  let { iteratorData = [] } = config;
+
+  if (!Array.isArray(iteratorData)) {
+    iteratorData = [];
+  }
 
   if (app?.platform === 'editor' && !iteratorData.length) {
     iteratorData.push({});

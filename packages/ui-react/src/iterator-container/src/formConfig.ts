@@ -26,8 +26,13 @@ export default [
     checkStrictly: false,
     type: 'data-source-field-select',
     onChange: (vm: any, v: string[] = [], { model }: any) => {
-      const [dsId, ...keys] = v;
-      model.dsField = [dsId.replace(DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX, ''), ...keys];
+      if (Array.isArray(v)) {
+        const [dsId, ...keys] = v;
+        model.dsField = [dsId.replace(DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX, ''), ...keys];
+      } else {
+        model.dsField = [];
+      }
+
       return v;
     },
   },

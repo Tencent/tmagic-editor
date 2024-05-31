@@ -12,17 +12,21 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "@tmagic/core": "1.4.4",
-    "@tmagic/schema": "1.4.4",
-    "@tmagic/utils": "1.4.4",
     "delegate": "^3.2.0",
     "qrcode": "^1.5.0",
-    "tiny-emitter": "^2.1.0",
-    "vue": "^3.4.27"
+    "tiny-emitter": "^2.1.0"
   },
   "peerDependencies": {
-    "qrcode": "^1.5.0",
-    "vue": "^3.4.27"
+    "@tmagic/core": "workspace:*",
+    "@tmagic/schema": "workspace:*",
+    "@tmagic/utils": "workspace:*",
+    "vue": ">=3.4.27",
+    "typescript": "*"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@testing-library/vue": "^6.4.2",

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 import Core from '@tmagic/core';
 import { DataSourceManager } from '@tmagic/data-source';
@@ -31,6 +31,7 @@ import plugins from '../.tmagic/plugin-entry';
 import App from './App';
 
 import '@tmagic/utils/resetcss.css';
+
 declare global {
   interface Window {
     magicDSL: MApp[];
@@ -69,14 +70,14 @@ app.setDesignWidth(app.env.isWeb ? window.document.documentElement.getBoundingCl
 Object.keys(components).forEach((type: string) => app.registerComponent(type, components[type]));
 
 Object.values(plugins).forEach((plugin: any) => {
-  plugin.install(app);
+  plugin.install({ app });
 });
 
-ReactDOM.render(
+const root = createRoot(document.getElementById('root')!);
+root.render(
   <React.StrictMode>
     <AppContent.Provider value={app}>
       <App />
     </AppContent.Provider>
   </React.StrictMode>,
-  document.getElementById('root'),
 );
