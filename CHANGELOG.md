@@ -1,3 +1,29 @@
+## [1.4.7](https://github.com/Tencent/tmagic-editor/compare/v1.4.6...v1.4.7) (2024-05-31)
+
+
+### Bug Fixes
+
+* **editor:** 修复pad大屏模式下粘贴位置计算错误偏移问题 ([#612](https://github.com/Tencent/tmagic-editor/issues/612)) ([d98029d](https://github.com/Tencent/tmagic-editor/commit/d98029d5e79c2579bf106d5670c74ad520c17267))
+* **editor:** 已选组件树中如果出现items不是数组会导致节点渲染失败 ([7fb4d96](https://github.com/Tencent/tmagic-editor/commit/7fb4d96cb0c66a8f4c1010764ec2f986abec1cf4))
+* **editor:** 数据源模板输入框输入数字索引后浏览器卡死 ([a66da8d](https://github.com/Tencent/tmagic-editor/commit/a66da8de9e40b76bc6415e0aea6556e07bddf163)), closes [#611](https://github.com/Tencent/tmagic-editor/issues/611)
+* **playground:** tmagic-form样式丢失 ([49e9d5b](https://github.com/Tencent/tmagic-editor/commit/49e9d5b9856dc4e7bd59ef383b9f52b6529db70c)), closes [#610](https://github.com/Tencent/tmagic-editor/issues/610)
+* **ui,runtime:** 迭代器容器迭代数据兼容 ([94db430](https://github.com/Tencent/tmagic-editor/commit/94db430b85e85a98db5eea3f88b490c8c22ed235)), closes [#613](https://github.com/Tencent/tmagic-editor/issues/613)
+
+
+### Features
+
+* **core,editor,form:** 页面片容器支持配置容器内组件的事件 ([2d133f4](https://github.com/Tencent/tmagic-editor/commit/2d133f47f13d8d3ea557e0b14028588cf37884b0))
+* **dep,editor,data-source,schema:** 优化编辑器中依赖收集性能 ([ee26991](https://github.com/Tencent/tmagic-editor/commit/ee269917f8acd7d32a124bc090ba38192e2c8d92))
+* **editor:** 复制组件时收集依赖性能优化改造 ([cd191f6](https://github.com/Tencent/tmagic-editor/commit/cd191f68154e63c0eaceed4e2bd695d4fa25e013))
+* **playground:** 设置配置表单的label-width ([50d238a](https://github.com/Tencent/tmagic-editor/commit/50d238a48cf99961498effb3dc0dc815797d4da9))
+
+
+### Reverts
+
+* Revert "build: 发布时在更版本号后执行reinstall来生成新lock" ([4670ada](https://github.com/Tencent/tmagic-editor/commit/4670adadc005faa658e632ff2245629fbfda76a8))
+
+
+
 ## [1.4.6](https://github.com/Tencent/tmagic-editor/compare/v1.4.5...v1.4.6) (2024-05-27)
 
 

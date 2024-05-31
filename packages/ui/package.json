@@ -1,5 +1,5 @@
 {
-  "version": "1.4.6",
+  "version": "1.4.7",
   "name": "@tmagic/ui",
   "type": "module",
   "main": "src/index.ts",
