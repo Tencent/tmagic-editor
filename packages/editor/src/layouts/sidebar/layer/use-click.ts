@@ -56,9 +56,12 @@ export const useClick = (
 
   const throttleTime = 300;
   // 鼠标在组件树移动触发高亮
-  const highlightHandler = throttle((event: MouseEvent, data: TreeNodeData) => {
-    highlight(data);
-  }, throttleTime);
+  const highlightHandler: (event: MouseEvent, data: TreeNodeData) => void = throttle(
+    (event: MouseEvent, data: TreeNodeData) => {
+      highlight(data);
+    },
+    throttleTime,
+  );
 
   // 触发画布高亮
   const highlight = (data: TreeNodeData) => {
@@ -67,7 +70,7 @@ export const useClick = (
     services?.stageOverlayService?.get('stage')?.highlight(data.id);
   };
 
-  const nodeClickHandler = (event: MouseEvent, data: TreeNodeData) => {
+  const nodeClickHandler = (event: MouseEvent, data: TreeNodeData): void => {
     if (!nodeStatusMap?.value) return;
 
     if (services?.uiService.get('uiSelectMode')) {
@@ -94,7 +97,7 @@ export const useClick = (
 
     nodeClickHandler,
 
-    nodeContentMenuHandler(event: MouseEvent, data: TreeNodeData) {
+    nodeContentMenuHandler(event: MouseEvent, data: TreeNodeData): void {
       event.preventDefault();
 
       const nodes = services?.editorService.get('nodes') || [];

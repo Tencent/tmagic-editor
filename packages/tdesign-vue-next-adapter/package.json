@@ -46,8 +46,8 @@
     "@vue/compiler-sfc": "^3.4.27",
     "@types/node": "^18.19.0",
     "rimraf": "^3.0.2",
-    "vite": "^5.2.11",
-    "vue-tsc": "^2.0.16"
+    "vite": "^5.2.12",
+    "vue-tsc": "^2.0.19"
   },
   "peerDependencies": {
     "@tmagic/design": "workspace:*",

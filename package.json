@@ -53,7 +53,7 @@
     "conventional-changelog-cli": "^4.1.0",
     "cosmiconfig": "^8.3.6",
     "cz-conventional-changelog": "^3.3.0",
-    "element-plus": "^2.6.1",
+    "element-plus": "^2.7.4",
     "enquirer": "^2.3.6",
     "eslint": "^8.38.0",
     "eslint-config-tencent": "^1.0.4",
@@ -75,7 +75,7 @@
     "serialize-javascript": "^6.0.0",
     "shx": "^0.3.4",
     "typescript": "^5.4.5",
-    "vite": "^5.2.11",
+    "vite": "^5.2.12",
     "vitepress": "1.2.2",
     "vitest": "^1.6.0",
     "vue": "^3.4.27"

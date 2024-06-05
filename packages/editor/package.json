@@ -75,8 +75,8 @@
     "sass": "^1.77.0",
     "tsc-alias": "^1.8.5",
     "type-fest": "^4.10.3",
-    "vite": "^5.2.11",
-    "vue-tsc": "^2.0.16"
+    "vite": "^5.2.12",
+    "vue-tsc": "^2.0.19"
   },
   "peerDependencies": {
     "@tmagic/core": "workspace:*",
