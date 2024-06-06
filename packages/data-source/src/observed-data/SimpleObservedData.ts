@@ -12,6 +12,7 @@ export class SimpleObservedData extends ObservedData {
     super();
     this.data = initialData;
   }
+
   update(data: any, path?: string): void {
     if (path) {
       setValueByKeyPath(path, data, this.data);
@@ -23,16 +24,25 @@ export class SimpleObservedData extends ObservedData {
       updateData: data,
       path: path ?? '',
     };
-    this.event.emit(path ?? '', changeEvent);
+
+    if (path) {
+      this.event.emit(path, changeEvent);
+    }
+
+    this.event.emit('', changeEvent);
   }
+
   on(path: string, callback: (newVal: any) => void): void {
     this.event.on(path, callback);
   }
+
   off(path: string, callback: (newVal: any) => void): void {
     this.event.off(path, callback);
   }
+
   getData(path: string) {
     return path ? getValueByKeyPath(path, this.data) : this.data;
   }
+
   destroy(): void {}
 }
