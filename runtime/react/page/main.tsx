@@ -19,7 +19,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 
 import Core from '@tmagic/core';
-import { DataSourceManager } from '@tmagic/data-source';
+import { DataSourceManager, DeepObservedData } from '@tmagic/data-source';
 import type { MApp } from '@tmagic/schema';
 import { AppContent } from '@tmagic/ui-react';
 import { getUrlParam } from '@tmagic/utils';
@@ -40,6 +40,8 @@ declare global {
     magicPresetValues: any;
   }
 }
+
+DataSourceManager.registerObservedData(DeepObservedData);
 
 const getLocalConfig = (): MApp[] => {
   const configStr = localStorage.getItem('magicDSL');

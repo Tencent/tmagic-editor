@@ -19,7 +19,7 @@
 import Vue from 'vue';
 
 import Core from '@tmagic/core';
-import { DataSourceManager, registerDataSourceOnDemand } from '@tmagic/data-source';
+import { DataSourceManager, DeepObservedData， registerDataSourceOnDemand } from '@tmagic/data-source';
 import { getUrlParam } from '@tmagic/utils';
 
 import asyncDataSources from '../.tmagic/async-datasource-entry';
@@ -31,6 +31,8 @@ import AppComponent from './App.vue';
 import { getLocalConfig } from './utils';
 
 import '@tmagic/utils/resetcss.css';
+
+DataSourceManager.registerObservedData(DeepObservedData);
 
 Vue.use(request);
 

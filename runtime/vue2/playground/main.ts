@@ -19,11 +19,13 @@
 import Vue from 'vue';
 
 import Core from '@tmagic/core';
-import { DataSourceManager } from '@tmagic/data-source';
+import { DataSourceManager, DeepObservedData } from '@tmagic/data-source';
 
 import App from './App.vue';
 
 import '@tmagic/utils/resetcss.css';
+
+DataSourceManager.registerObservedData(DeepObservedData);
 
 Promise.all([
   import('../.tmagic/comp-entry'),
