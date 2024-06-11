@@ -5,9 +5,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { onBeforeUnmount, ref } from 'vue';
 
-import type { MContainer, MNode } from '@tmagic/schema';
+import type { MContainer, MNode, MPage } from '@tmagic/schema';
 
 import useApp from '../../useApp';
 
@@ -41,11 +41,24 @@ const { app, node } = useApp({
   },
 });
 
-app?.page?.on('editor:select', (info, path) => {
+const editorSelectHandler = (
+  info: {
+    node: MNode;
+    page: MPage;
+    parent: MContainer;
+  },
+  path: MNode[],
+) => {
   if (path.find((node: MNode) => node.id === props.config.id)) {
     node?.instance.openOverlay();
   } else {
     node?.instance.closeOverlay();
   }
+};
+
+app?.page?.on('editor:select', editorSelectHandler);
+
+onBeforeUnmount(() => {
+  app?.page?.off('editor:select', editorSelectHandler);
 });
 </script>

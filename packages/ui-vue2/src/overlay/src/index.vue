@@ -4,10 +4,10 @@
   </magic-ui-container>
 </template>
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, onBeforeUnmount, ref } from 'vue';
 
 import Core from '@tmagic/core';
-import type { MNode } from '@tmagic/schema';
+import type { MContainer, MNode, MPage } from '@tmagic/schema';
 
 import useApp from '../../useApp';
 
@@ -43,12 +43,25 @@ export default defineComponent({
       }
     };
 
-    app?.page?.on('editor:select', (info, path) => {
+    const editorSelectHandler = (
+      info: {
+        node: MNode;
+        page: MPage;
+        parent: MContainer;
+      },
+      path: MNode[],
+    ) => {
       if (path.find((node: MNode) => node.id === props.config.id)) {
         openOverlay();
       } else {
         closeOverlay();
       }
+    };
+
+    app?.page?.on('editor:select', editorSelectHandler);
+
+    onBeforeUnmount(() => {
+      app?.page?.off('editor:select', editorSelectHandler);
     });
 
     return {
