@@ -144,7 +144,13 @@ export const useDrag = (services: Services | undefined) => {
         targetIndex += 1;
       }
 
-      services?.editorService.dragTo(node, targetParent, targetIndex);
+      const selectedNodes = services.editorService.get('nodes');
+
+      if (selectedNodes.find((n) => `${n.id}` === `${node.id}`)) {
+        services.editorService.dragTo(selectedNodes, targetParent, targetIndex);
+      } else {
+        services.editorService.dragTo([node], targetParent, targetIndex);
+      }
     }
 
     dragState.dragOverNodeId = '';

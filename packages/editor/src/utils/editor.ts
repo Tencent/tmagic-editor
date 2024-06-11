@@ -292,3 +292,22 @@ export const traverseNode = <T extends NodeItem = NodeItem>(
     });
   }
 };
+
+export const moveItemsInContainer = (sourceIndices: number[], parent: MContainer, targetIndex: number) => {
+  sourceIndices.sort((a, b) => a - b);
+  for (let i = sourceIndices.length - 1; i >= 0; i--) {
+    const sourceIndex = sourceIndices[i];
+    if (sourceIndex === targetIndex) {
+      continue;
+    }
+    const [item] = parent.items.splice(sourceIndex, 1);
+    parent.items.splice(sourceIndex < targetIndex ? targetIndex - 1 : targetIndex, 0, item);
+
+    // 更新后续源索引（因为数组已经改变）
+    for (let j = i - 1; j >= 0; j--) {
+      if (sourceIndices[j] >= targetIndex) {
+        sourceIndices[j] += 1;
+      }
+    }
+  }
+};
