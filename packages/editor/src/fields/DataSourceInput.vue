@@ -106,9 +106,17 @@ watch(
 );
 
 const mouseupHandler = async () => {
+  const selection = globalThis.document.getSelection();
+  const anchorOffset = selection?.anchorOffset || 0;
+  const focusOffset = selection?.focusOffset || 0;
+
   isFocused.value = true;
   await nextTick();
   autocomplete.value?.focus();
+
+  if (focusOffset && input.value) {
+    input.value.setSelectionRange(anchorOffset, focusOffset);
+  }
 };
 
 const blurHandler = () => {
