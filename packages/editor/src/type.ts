@@ -744,3 +744,6 @@ export interface EventBus extends EventEmitter {
   ): this;
   emit<Name extends keyof EventBusEvent, Param extends EventBusEvent[Name]>(eventName: Name, ...args: Param): boolean;
 }
+
+export type PropsFormConfigFunction = (data: { editorService: EditorService }) => FormConfig;
+export type PropsFormValueFunction = (data: { editorService: EditorService }) => Partial<MNode>;
