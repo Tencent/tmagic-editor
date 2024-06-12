@@ -5,6 +5,7 @@
 <script lang="ts">
 import { defineComponent, inject } from 'vue';
 
+import type Core from '@tmagic/core';
 import { useEditorDsl } from '@tmagic/vue-runtime-help';
 
 export default defineComponent({

@@ -18,7 +18,7 @@
 
 import React, { useContext } from 'react';
 
-import Core from '@tmagic/core';
+import type Core from '@tmagic/core';
 import type { MPage } from '@tmagic/schema';
 import { AppContent } from '@tmagic/ui-react';
 

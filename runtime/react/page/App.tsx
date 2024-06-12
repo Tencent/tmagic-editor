@@ -19,7 +19,7 @@
 import React, { useContext, useState } from 'react';
 import { cloneDeep } from 'lodash-es';
 
-import Core from '@tmagic/core';
+import type Core from '@tmagic/core';
 import type { ChangeEvent } from '@tmagic/data-source';
 import type { MNode } from '@tmagic/schema';
 import { AppContent } from '@tmagic/ui-react';

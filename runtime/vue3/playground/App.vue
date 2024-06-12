@@ -5,6 +5,7 @@
 <script lang="ts" setup>
 import { inject } from 'vue';
 
+import type Core from '@tmagic/core';
 import { useEditorDsl } from '@tmagic/vue-runtime-help';
 
 const app = inject<Core | undefined>('app');

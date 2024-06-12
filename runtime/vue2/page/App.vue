@@ -6,7 +6,7 @@
 import { defineComponent, inject } from 'vue';
 
 import type { Page } from '@tmagic/core';
-import Core from '@tmagic/core';
+import type Core from '@tmagic/core';
 import { addParamToUrl } from '@tmagic/utils';
 import { useDsl } from '@tmagic/vue-runtime-help';
 
