@@ -3,9 +3,21 @@
   "name": "@tmagic/ui",
   "type": "module",
   "main": "src/index.ts",
+  "types": "types/index.d.ts",
+  "exports": {
+    "./*": "./*"
+  },
   "files": [
-    "src"
+    "src",
+    "dist",
+    "types"
   ],
+  "scripts": {
+    "build": "rimraf ./dist && npm run build:type && node scripts/build.mjs",
+    "build:type": "npm run clear:type && vue-tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
+    "clear:type": "rimraf ./types",
+    "check:type": "vue-tsc --noEmit --project tsconfig.build.json"
+  },
   "engines": {
     "node": ">=18"
   },
@@ -15,14 +27,13 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "delegate": "^3.2.0",
-    "qrcode": "^1.5.0",
-    "tiny-emitter": "^2.1.0"
+    "qrcode": "^1.5.0"
   },
   "peerDependencies": {
     "@tmagic/core": "workspace:*",
     "@tmagic/schema": "workspace:*",
     "@tmagic/utils": "workspace:*",
+    "@tmagic/vue-runtime-help": ">=0.0.5",
     "vue": ">=3.4.27",
     "typescript": "*"
   },
@@ -32,9 +43,10 @@
     }
   },
   "devDependencies": {
-    "@testing-library/vue": "^6.4.2",
     "@types/qrcode": "^1.4.2",
     "@vue/compiler-sfc": "^3.4.27",
-    "@vue/test-utils": "^2.4.6"
+    "rimraf": "^3.0.2",
+    "vite": "^5.2.12",
+    "vue-tsc": "^2.0.19"
   }
 }

@@ -21,8 +21,7 @@ import { computed } from 'vue';
 
 import type { MContainer } from '@tmagic/schema';
 import { toLine } from '@tmagic/utils';
-
-import useApp from '../../useApp';
+import { useApp } from '@tmagic/vue-runtime-help';
 
 const props = withDefaults(
   defineProps<{

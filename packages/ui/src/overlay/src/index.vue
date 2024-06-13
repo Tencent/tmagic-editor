@@ -8,8 +8,7 @@
 import { onBeforeUnmount, ref } from 'vue';
 
 import type { MContainer, MNode, MPage } from '@tmagic/schema';
-
-import useApp from '../../useApp';
+import { useApp } from '@tmagic/vue-runtime-help';
 
 interface OverlaySchema extends MContainer {
   type: 'overlay';

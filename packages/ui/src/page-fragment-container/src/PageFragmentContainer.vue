@@ -8,9 +8,9 @@
 import { computed } from 'vue';
 
 import { type MComponent, type MNode, NodeType } from '@tmagic/schema';
+import { useApp } from '@tmagic/vue-runtime-help';
 
 import Container from '../../container';
-import useApp from '../../useApp';
 
 const props = withDefaults(
   defineProps<{

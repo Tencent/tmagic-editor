@@ -7,8 +7,7 @@ import { ref, watch } from 'vue';
 import QRCode from 'qrcode';
 
 import type { MComponent } from '@tmagic/schema';
-
-import useApp from '../../useApp';
+import { useApp } from '@tmagic/vue-runtime-help';
 
 const props = withDefaults(
   defineProps<{

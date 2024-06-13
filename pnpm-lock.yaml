@@ -632,15 +632,12 @@ importers:
       '@tmagic/utils':
         specifier: workspace:*
         version: link:../utils
-      delegate:
-        specifier: ^3.2.0
-        version: 3.2.0
+      '@tmagic/vue-runtime-help':
+        specifier: '>=0.0.5'
+        version: 0.0.5(@tmagic/core@packages+core)(@tmagic/data-source@1.4.7(@tmagic/schema@packages+schema)(@tmagic/utils@packages+utils)(typescript@5.4.5))(@tmagic/schema@packages+schema)(@tmagic/stage@1.4.7(@tmagic/core@packages+core)(@tmagic/schema@packages+schema)(@tmagic/utils@packages+utils)(typescript@5.4.5))(@tmagic/utils@packages+utils)(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.5)))(typescript@5.4.5)(vue@3.4.27(typescript@5.4.5))
       qrcode:
         specifier: ^1.5.0
         version: 1.5.3
-      tiny-emitter:
-        specifier: ^2.1.0
-        version: 2.1.0
       typescript:
         specifier: '*'
         version: 5.4.5
@@ -648,18 +645,21 @@ importers:
         specifier: '>=3.4.27'
         version: 3.4.27(typescript@5.4.5)
     devDependencies:
-      '@testing-library/vue':
-        specifier: ^6.4.2
-        version: 6.6.1(@vue/compiler-sfc@3.4.27)(vue@3.4.27(typescript@5.4.5))
       '@types/qrcode':
         specifier: ^1.4.2
         version: 1.5.5
       '@vue/compiler-sfc':
         specifier: ^3.4.27
         version: 3.4.27
-      '@vue/test-utils':
-        specifier: ^2.4.6
-        version: 2.4.6
+      rimraf:
+        specifier: ^3.0.2
+        version: 3.0.2
+      vite:
+        specifier: ^5.2.12
+        version: 5.2.12(@types/node@18.19.34)(sass@1.77.4)(terser@5.31.0)
+      vue-tsc:
+        specifier: ^2.0.19
+        version: 2.0.19(typescript@5.4.5)
 
   packages/ui-react:
     dependencies:
@@ -1065,8 +1065,8 @@ importers:
         specifier: 1.4.7
         version: 1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5)
       '@tmagic/vue-runtime-help':
-        specifier: ^0.0.3
-        version: 0.0.3(@tmagic/core@1.4.7(@tmagic/data-source@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5))(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5))(@tmagic/data-source@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5))(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/stage@1.4.7(@tmagic/core@1.4.7(@tmagic/data-source@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5))(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5))(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(scenejs@1.10.3)(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.5)))(typescript@5.4.5)(vue@3.4.27(typescript@5.4.5))
+        specifier: ^0.0.5
+        version: 0.0.5(@tmagic/core@1.4.7(@tmagic/data-source@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5))(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5))(@tmagic/data-source@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5))(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/stage@1.4.7(@tmagic/core@1.4.7(@tmagic/data-source@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5))(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5))(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(scenejs@1.10.3)(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.5)))(typescript@5.4.5)(vue@3.4.27(typescript@5.4.5))
       axios:
         specifier: ^0.25.0
         version: 0.25.0
@@ -2458,17 +2458,6 @@ packages:
   '@sxzz/popperjs-es@2.11.7':
     resolution: {integrity: sha512-Ccy0NlLkzr0Ex2FKvh2X+OyERHXJ88XJ1MXtsI9y9fGexlaXaVTPzBCRBwIxFkORuOb+uBqeu+RqnpgYTEZRUQ==}
 
-  '@testing-library/dom@8.20.1':
-    resolution: {integrity: sha512-/DiOQ5xBxgdYRC8LNk7U+RWat0S3qRLeIw3ZIkMQ9kkVlRmwD/Eg8k8CqIpD6GW7u20JIUOfMKbxtiLutpjQ4g==}
-    engines: {node: '>=12'}
-
-  '@testing-library/vue@6.6.1':
-    resolution: {integrity: sha512-vpyBPrHzKTwEGS7ehUC8/IXgnqTBEMk6jd52Gouf51arG2jUorPhmkbsxUwJOyxz6L0gj2ZcmWnznG1OJcTCDQ==}
-    engines: {node: '>=12'}
-    peerDependencies:
-      '@vue/compiler-sfc': '>= 3'
-      vue: '>= 3'
-
   '@tmagic/cli@1.4.5':
     resolution: {integrity: sha512-k+NMTXrQsuP+DZyxghCsh0fBkBVibu2pHquhfR9FW1lb9AkB4fHYwDmoxQo3vgenFXR3CeQQPrdLBX6tTtc9dg==}
     engines: {node: '>=18'}
@@ -2684,12 +2673,31 @@ packages:
       typescript:
         optional: true
 
+  '@tmagic/vue-runtime-help@0.0.5':
+    resolution: {integrity: sha512-9fgy55/zq/aWywUWNXI3NqCxQtosoqCBrMZrO7mE09QNn3A0QJqAri9P9JOpHG3SVfweRm6SUAIFuWv3t9BzCA==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@tmagic/core': 1.4.7
+      '@tmagic/data-source': 1.4.7
+      '@tmagic/schema': 1.4.7
+      '@tmagic/stage': 1.4.7
+      '@tmagic/utils': 1.4.7
+      '@vue/composition-api': '>=1.7.2'
+      typescript: '*'
+      vue: '>=2.0.0 || >=3.0.0'
+    peerDependenciesMeta:
+      '@tmagic/schema':
+        optional: true
+      '@tmagic/stage':
+        optional: true
+      '@vue/composition-api':
+        optional: true
+      typescript:
+        optional: true
+
   '@tootallnate/once@2.0.0':
     resolution: {integrity: sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==}
     engines: {node: '>= 10'}
-
-  '@types/aria-query@5.0.4':
-    resolution: {integrity: sha512-rfT93uj5s0PRL7EzccGMs3brplhcrghnDoV26NqKhCAS1hVo+WdNsPvE/yb6ilfr5hi2MEk6d5EWJTKdxg8jVw==}
 
   '@types/conventional-commits-parser@5.0.0':
     resolution: {integrity: sha512-loB369iXNmAZglwWATL+WRe+CRMmmBPtpolYzIebFaX4YA3x+BEfLqhUAV9WanycKI3TG1IMr5bMJDajDKLlUQ==}
@@ -3134,9 +3142,6 @@ packages:
 
   argparse@2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
-
-  aria-query@5.1.3:
-    resolution: {integrity: sha512-R5iJ5lkuHybztUfuOAznmboyjWq8O6sqNqtK7CLOqdydi54VNbORp49mb14KbWgG1QD3JFO9hJdZ+y4KutfdOQ==}
 
   array-buffer-byte-length@1.0.1:
     resolution: {integrity: sha512-ahC5W1xgou+KTXix4sAO8Ki12Q+jf4i0+tmk3sC+zgcynshkHxzpXdImBehiUYKKKDwvfFiJl1tZt6ewscS1Mg==}
@@ -3656,10 +3661,6 @@ packages:
     resolution: {integrity: sha512-WaEtAOpRA1MQ0eohqZjpGD8zdI0Ovsm8mmFhaDN8dvDZzyoUMcYDnf5Y6iu7HTXxf8JDS23qWa4a+hKCDyOPzw==}
     engines: {node: '>=6'}
 
-  deep-equal@2.2.3:
-    resolution: {integrity: sha512-ZIwpnevOurS8bpT4192sqAowWM76JDKSHYzMLty3BZGSswgq6pBaH3DhCSW5xVAZICZyKdOBPjwww5wfgT/6PA==}
-    engines: {node: '>= 0.4'}
-
   deep-is@0.1.4:
     resolution: {integrity: sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==}
 
@@ -3710,9 +3711,6 @@ packages:
   doctrine@3.0.0:
     resolution: {integrity: sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w==}
     engines: {node: '>=6.0.0'}
-
-  dom-accessibility-api@0.5.16:
-    resolution: {integrity: sha512-X7BJ2yElsnOJ30pZF4uIIDfBEVgF4XEBxL9Bxhy6dnrm5hkzqmsWHGTiHqRiITNhMyFLyAiWndIJP7Z1NTteDg==}
 
   domexception@4.0.0:
     resolution: {integrity: sha512-A2is4PLG+eeSfoTMA95/s4pvAoSo2mKtiM5jlHkAVewmiO8ISFTFKZjH7UAM1Atli/OT/7JHOrJRJiMKUZKYBw==}
@@ -3785,9 +3783,6 @@ packages:
   es-errors@1.3.0:
     resolution: {integrity: sha512-Zf5H2Kxt2xjTvbJvP2ZWLEICxA6j+hAmMzIlypy4xcBg1vKVnx89Wy0GbS+kf5cwCVFFzdCFh2XSCFNULS6csw==}
     engines: {node: '>= 0.4'}
-
-  es-get-iterator@1.1.3:
-    resolution: {integrity: sha512-sPZmqHBe6JIiTfN5q2pEi//TwxmAFHwj/XEuYjTuse78i8KxaqMTTzxPoFKuzRpDpTJ+0NAbpfenkmH2rePtuw==}
 
   es-object-atoms@1.0.0:
     resolution: {integrity: sha512-MZ4iQ6JwHOBQjahnjwaC1ZtIBH+2ohjamzAO3oaHcXYup7qxjF2fixyH+Q71voWHeOkI2q/TnJao/KfXYIZWbw==}
@@ -4376,10 +4371,6 @@ packages:
     resolution: {integrity: sha512-agE4QfB2Lkp9uICn7BAqoscw4SZP9kTE2hxiFI3jBPmXJfdqiahTbUuKGsMoN2GtqL9AxhYioAcVvgsb1HvRbA==}
     engines: {node: '>= 0.10'}
 
-  is-arguments@1.1.1:
-    resolution: {integrity: sha512-8Q7EARjzEnKpt/PCD7e1cgUS0a6X8u5tdSiMqXhojOdoV9TsMsiO+9VLC5vAmO8N7/GmXn7yjR8qnA6bVAEzfA==}
-    engines: {node: '>= 0.4'}
-
   is-array-buffer@3.0.4:
     resolution: {integrity: sha512-wcjaerHw0ydZwfhiKbXJWLDY8A7yV7KhjQOpb83hGgGfId/aQa4TOvwyzn2PuswW2gPCYEL/nEAiSVpdOj1lXw==}
     engines: {node: '>= 0.4'}
@@ -4432,10 +4423,6 @@ packages:
     resolution: {integrity: sha512-2HvIEKRoqS62guEC+qBjpvRubdX910WCMuJTZ+I9yvqKU2/12eSL549HMwtabb4oupdj2sMP50k+XJfB/8JE6w==}
     engines: {node: '>=8'}
 
-  is-map@2.0.3:
-    resolution: {integrity: sha512-1Qed0/Hr2m+YqxnM09CjA2d/i6YZNfF6R2oRAOj36eUdS6qIV/huPJNSEpKbupewFs+ZsJlxsjjPbc0/afW6Lw==}
-    engines: {node: '>= 0.4'}
-
   is-negative-zero@2.0.3:
     resolution: {integrity: sha512-5KoIu2Ngpyek75jXodFvnafB6DJgr3u8uuK0LEZJjrU19DrMD3EVERaR8sjz8CCGgpZvxPl9SuE1GMVPFHx1mw==}
     engines: {node: '>= 0.4'}
@@ -4478,10 +4465,6 @@ packages:
     resolution: {integrity: sha512-7zjFAPO4/gwyQAAgRRmqeEeyIICSdmCqa3tsVHMdBzaXXRiqopZL4Cyghg/XulGWrtABTpbnYYzzIRffLkP4oA==}
     engines: {node: '>=0.10.0'}
 
-  is-set@2.0.3:
-    resolution: {integrity: sha512-iPAjerrse27/ygGLxw+EBR9agv9Y6uLeYVJMu+QNCoouJ1/1ri0mGrcWpfCqFZuzzx3WjtwxG098X+n4OuRkPg==}
-    engines: {node: '>= 0.4'}
-
   is-shared-array-buffer@1.0.3:
     resolution: {integrity: sha512-nA2hv5XIhLR3uVzDDfCIknerhx8XUKnstuOERPNNIinXG7v9u+ohXF67vxm4TPTEPU6lm61ZkwP3c9PCB97rhg==}
     engines: {node: '>= 0.4'}
@@ -4517,16 +4500,8 @@ packages:
   is-utf8@0.2.1:
     resolution: {integrity: sha512-rMYPYvCzsXywIsldgLaSoPlw5PfoB/ssr7hY4pLfcodrA5M/eArza1a9VmTiNIBNMjOGr1Ow9mTyU2o69U6U9Q==}
 
-  is-weakmap@2.0.2:
-    resolution: {integrity: sha512-K5pXYOm9wqY1RgjpL3YTkF39tni1XajUIkawTLUo9EZEVUFga5gSQJF8nNS7ZwJQ02y+1YCNYcMh+HIf1ZqE+w==}
-    engines: {node: '>= 0.4'}
-
   is-weakref@1.0.2:
     resolution: {integrity: sha512-qctsuLZmIQ0+vSSMfoVvyFe2+GSEvnmZ2ezTup1SBse9+twCCeial6EEi3Nc2KFcf6+qz2FBPnjXsk8xhKSaPQ==}
-
-  is-weakset@2.0.3:
-    resolution: {integrity: sha512-LvIm3/KWzS9oRFHugab7d+M/GcBXuXX5xZkzPmN+NxihdQlZUQ4dWuSV1xR/sq6upL1TJEDrfBgRepHFdBtSNQ==}
-    engines: {node: '>= 0.4'}
 
   is-windows@1.0.2:
     resolution: {integrity: sha512-eXK1UInq2bPmjyX6e3VHIzMLobc4J94i4AWn+Hpq3OU5KkrRC96OAcR3PRJ/pGu6m8TRnBHP9dkXQVsT/COVIA==}
@@ -4773,10 +4748,6 @@ packages:
     resolution: {integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==}
     engines: {node: '>=10'}
 
-  lz-string@1.5.0:
-    resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
-    hasBin: true
-
   magic-string@0.27.0:
     resolution: {integrity: sha512-8UnnX2PeRAPZuN12svgR9j7M1uWMovg/CEnIwIG0LFkXSJJe4PdfUGiTGl8V9bsBHFUtfVINcSyYxd7q+kx9fA==}
     engines: {node: '>=12'}
@@ -4972,10 +4943,6 @@ packages:
 
   object-inspect@1.13.1:
     resolution: {integrity: sha512-5qoj1RUiKOMsCCNLV1CBiPYE10sziTsnmNxkAI/rZhiD63CF7IqdFGC/XzjWjpSgLf0LxXX3bDFIh0E18f6UhQ==}
-
-  object-is@1.1.6:
-    resolution: {integrity: sha512-F8cZ+KfGlSGi09lJT7/Nd6KJZ9ygtvYC0/UYYLI9nmQKLMnydpB9yvbv9K1uSkEu7FU9vYPmVwLg328tX+ot3Q==}
-    engines: {node: '>= 0.4'}
 
   object-keys@1.1.1:
     resolution: {integrity: sha512-NuAESUOUMrlIXOfHKzD6bpPu3tYt3xvjNdRIQ+FeT0lNb4K8WR70CaDxhuNguS2XG+GjkyMwOzsN5ZktImfhLA==}
@@ -5173,10 +5140,6 @@ packages:
     engines: {node: '>=10.13.0'}
     hasBin: true
 
-  pretty-format@27.5.1:
-    resolution: {integrity: sha512-Qb1gy5OrP5+zDf2Bvnzdl3jsTf1qXVMazbvCoKhtKqVs4/YK4ozX4gKQJJVyNe+cajNPn0KoC0MC3FUmaHWEmQ==}
-    engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
-
   pretty-format@29.7.0:
     resolution: {integrity: sha512-Pdlw/oPxN+aXdmM9R00JVC9WVFoCLTKJvDVLgmJ+qAffBMxsV85l/Lu7sNx4zSzPyoL2euImuEwHhOXdEgNFZQ==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
@@ -5223,9 +5186,6 @@ packages:
     resolution: {integrity: sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw==}
     peerDependencies:
       react: ^18.3.1
-
-  react-is@17.0.2:
-    resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
 
   react-is@18.3.1:
     resolution: {integrity: sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==}
@@ -5544,10 +5504,6 @@ packages:
 
   std-env@3.7.0:
     resolution: {integrity: sha512-JPbdCEQLj1w5GilpiHAx3qJvFndqybBysA3qUOnznweH4QbNYUsW/ea8QzSrnh0vNsezMMw5bcVool8lM0gwzg==}
-
-  stop-iteration-iterator@1.0.0:
-    resolution: {integrity: sha512-iCGQj+0l0HOdZ2AEeBADlsRC+vsnDsZsbdSiH1yNSjcfKM7fdpCMfqAL/dwF5BLiw/XhRft/Wax6zQbhq2BcjQ==}
-    engines: {node: '>= 0.4'}
 
   string-argv@0.3.1:
     resolution: {integrity: sha512-a1uQGz7IyVy9YwhqjZIZu1c8JO8dNIe20xBmSS6qu9kv++k3JGzCVmprbNN5Kn+BgzD5E7YYwg1CcjuJMRNsvg==}
@@ -6051,10 +6007,6 @@ packages:
 
   which-boxed-primitive@1.0.2:
     resolution: {integrity: sha512-bwZdv0AKLpplFY2KZRX6TvyuN7ojjr7lwkg6ml0roIy9YeuSr7JS372qlNW18UQYzgYK9ziGcerWqZOmEn9VNg==}
-
-  which-collection@1.0.2:
-    resolution: {integrity: sha512-K4jVyjnBdgvc86Y6BkaLZEN933SwYOuBFkdmBu9ZfkcAbdVbpITnDmjvZ/aQjRXQrv5EPkTnD1s39GiiqbngCw==}
-    engines: {node: '>= 0.4'}
 
   which-module@2.0.1:
     resolution: {integrity: sha512-iBdZ57RDvnOR9AGBhML2vFZf7h8vmBjhoaZqODJBFWHVtKkDmKuHai3cx5PgVMrX5YDNp27AofYbAwctSS+vhQ==}
@@ -7597,25 +7549,6 @@ snapshots:
 
   '@sxzz/popperjs-es@2.11.7': {}
 
-  '@testing-library/dom@8.20.1':
-    dependencies:
-      '@babel/code-frame': 7.24.6
-      '@babel/runtime': 7.24.6
-      '@types/aria-query': 5.0.4
-      aria-query: 5.1.3
-      chalk: 4.1.2
-      dom-accessibility-api: 0.5.16
-      lz-string: 1.5.0
-      pretty-format: 27.5.1
-
-  '@testing-library/vue@6.6.1(@vue/compiler-sfc@3.4.27)(vue@3.4.27(typescript@5.4.5))':
-    dependencies:
-      '@babel/runtime': 7.24.6
-      '@testing-library/dom': 8.20.1
-      '@vue/compiler-sfc': 3.4.27
-      '@vue/test-utils': 2.4.6
-      vue: 3.4.27(typescript@5.4.5)
-
   '@tmagic/cli@1.4.5':
     dependencies:
       cac: 6.7.14
@@ -7659,10 +7592,28 @@ snapshots:
     optionalDependencies:
       typescript: 5.4.5
 
+  '@tmagic/data-source@1.4.7(@tmagic/schema@packages+schema)(@tmagic/utils@packages+utils)(typescript@5.4.5)':
+    dependencies:
+      '@tmagic/dep': 1.4.7(@tmagic/schema@packages+schema)(@tmagic/utils@packages+utils)(typescript@5.4.5)
+      '@tmagic/schema': link:packages/schema
+      '@tmagic/utils': link:packages/utils
+      deep-state-observer: 5.5.13
+      events: 3.3.0
+      lodash-es: 4.17.21
+    optionalDependencies:
+      typescript: 5.4.5
+
   '@tmagic/dep@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5)':
     dependencies:
       '@tmagic/schema': 1.4.7(typescript@5.4.5)
       '@tmagic/utils': 1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5)
+    optionalDependencies:
+      typescript: 5.4.5
+
+  '@tmagic/dep@1.4.7(@tmagic/schema@packages+schema)(@tmagic/utils@packages+utils)(typescript@5.4.5)':
+    dependencies:
+      '@tmagic/schema': link:packages/schema
+      '@tmagic/utils': link:packages/utils
     optionalDependencies:
       typescript: 5.4.5
 
@@ -7734,6 +7685,23 @@ snapshots:
       typescript: 5.4.5
     transitivePeerDependencies:
       - scenejs
+
+  '@tmagic/stage@1.4.7(@tmagic/core@packages+core)(@tmagic/schema@packages+schema)(@tmagic/utils@packages+utils)(typescript@5.4.5)':
+    dependencies:
+      '@scena/guides': 0.29.2
+      '@tmagic/core': link:packages/core
+      '@tmagic/schema': link:packages/schema
+      '@tmagic/utils': link:packages/utils
+      events: 3.3.0
+      keycon: 1.4.0
+      lodash-es: 4.17.21
+      moveable: 0.53.0
+      moveable-helper: 0.4.0(scenejs@1.10.3)
+    optionalDependencies:
+      typescript: 5.4.5
+    transitivePeerDependencies:
+      - scenejs
+    optional: true
 
   '@tmagic/table@1.4.7(@tmagic/design@1.4.7(typescript@5.4.5)(vue@3.4.27(typescript@5.4.5)))(@tmagic/form@1.4.7(@tmagic/design@1.4.7(typescript@5.4.5)(vue@3.4.27(typescript@5.4.5)))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5)(vue@3.4.27(typescript@5.4.5)))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5)(vue@3.4.27(typescript@5.4.5))':
     dependencies:
@@ -7812,7 +7780,7 @@ snapshots:
       '@vue/composition-api': 1.7.2(vue@2.7.16)
       typescript: 5.4.5
 
-  ? '@tmagic/vue-runtime-help@0.0.3(@tmagic/core@1.4.7(@tmagic/data-source@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5))(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5))(@tmagic/data-source@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5))(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/stage@1.4.7(@tmagic/core@1.4.7(@tmagic/data-source@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5))(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5))(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(scenejs@1.10.3)(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.5)))(typescript@5.4.5)(vue@3.4.27(typescript@5.4.5))'
+  ? '@tmagic/vue-runtime-help@0.0.5(@tmagic/core@1.4.7(@tmagic/data-source@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5))(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5))(@tmagic/data-source@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5))(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/stage@1.4.7(@tmagic/core@1.4.7(@tmagic/data-source@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5))(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5))(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(scenejs@1.10.3)(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.5)))(typescript@5.4.5)(vue@3.4.27(typescript@5.4.5))'
   : dependencies:
       '@tmagic/core': 1.4.7(@tmagic/data-source@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5))(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5)
       '@tmagic/data-source': 1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(@tmagic/utils@1.4.7(@tmagic/schema@1.4.7(typescript@5.4.5))(typescript@5.4.5))(typescript@5.4.5)
@@ -7825,9 +7793,20 @@ snapshots:
       '@vue/composition-api': 1.7.2(vue@3.4.27(typescript@5.4.5))
       typescript: 5.4.5
 
-  '@tootallnate/once@2.0.0': {}
+  '@tmagic/vue-runtime-help@0.0.5(@tmagic/core@packages+core)(@tmagic/data-source@1.4.7(@tmagic/schema@packages+schema)(@tmagic/utils@packages+utils)(typescript@5.4.5))(@tmagic/schema@packages+schema)(@tmagic/stage@1.4.7(@tmagic/core@packages+core)(@tmagic/schema@packages+schema)(@tmagic/utils@packages+utils)(typescript@5.4.5))(@tmagic/utils@packages+utils)(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.5)))(typescript@5.4.5)(vue@3.4.27(typescript@5.4.5))':
+    dependencies:
+      '@tmagic/core': link:packages/core
+      '@tmagic/data-source': 1.4.7(@tmagic/schema@packages+schema)(@tmagic/utils@packages+utils)(typescript@5.4.5)
+      '@tmagic/utils': link:packages/utils
+      vue: 3.4.27(typescript@5.4.5)
+      vue-demi: 0.14.8(@vue/composition-api@1.7.2(vue@3.4.27(typescript@5.4.5)))(vue@3.4.27(typescript@5.4.5))
+    optionalDependencies:
+      '@tmagic/schema': link:packages/schema
+      '@tmagic/stage': 1.4.7(@tmagic/core@packages+core)(@tmagic/schema@packages+schema)(@tmagic/utils@packages+utils)(typescript@5.4.5)
+      '@vue/composition-api': 1.7.2(vue@3.4.27(typescript@5.4.5))
+      typescript: 5.4.5
 
-  '@types/aria-query@5.0.4': {}
+  '@tootallnate/once@2.0.0': {}
 
   '@types/conventional-commits-parser@5.0.0':
     dependencies:
@@ -8390,10 +8369,6 @@ snapshots:
       picomatch: 2.3.1
 
   argparse@2.0.1: {}
-
-  aria-query@5.1.3:
-    dependencies:
-      deep-equal: 2.2.3
 
   array-buffer-byte-length@1.0.1:
     dependencies:
@@ -9021,27 +8996,6 @@ snapshots:
     dependencies:
       type-detect: 4.0.8
 
-  deep-equal@2.2.3:
-    dependencies:
-      array-buffer-byte-length: 1.0.1
-      call-bind: 1.0.7
-      es-get-iterator: 1.1.3
-      get-intrinsic: 1.2.4
-      is-arguments: 1.1.1
-      is-array-buffer: 3.0.4
-      is-date-object: 1.0.5
-      is-regex: 1.1.4
-      is-shared-array-buffer: 1.0.3
-      isarray: 2.0.5
-      object-is: 1.1.6
-      object-keys: 1.1.1
-      object.assign: 4.1.5
-      regexp.prototype.flags: 1.5.2
-      side-channel: 1.0.6
-      which-boxed-primitive: 1.0.2
-      which-collection: 1.0.2
-      which-typed-array: 1.1.15
-
   deep-is@0.1.4: {}
 
   deep-state-observer@5.5.13: {}
@@ -9085,8 +9039,6 @@ snapshots:
   doctrine@3.0.0:
     dependencies:
       esutils: 2.0.3
-
-  dom-accessibility-api@0.5.16: {}
 
   domexception@4.0.0:
     dependencies:
@@ -9216,18 +9168,6 @@ snapshots:
       get-intrinsic: 1.2.4
 
   es-errors@1.3.0: {}
-
-  es-get-iterator@1.1.3:
-    dependencies:
-      call-bind: 1.0.7
-      get-intrinsic: 1.2.4
-      has-symbols: 1.0.3
-      is-arguments: 1.1.1
-      is-map: 2.0.3
-      is-set: 2.0.3
-      is-string: 1.0.7
-      isarray: 2.0.5
-      stop-iteration-iterator: 1.0.0
 
   es-object-atoms@1.0.0:
     dependencies:
@@ -9946,11 +9886,6 @@ snapshots:
 
   interpret@1.4.0: {}
 
-  is-arguments@1.1.1:
-    dependencies:
-      call-bind: 1.0.7
-      has-tostringtag: 1.0.2
-
   is-array-buffer@3.0.4:
     dependencies:
       call-bind: 1.0.7
@@ -9997,8 +9932,6 @@ snapshots:
 
   is-interactive@1.0.0: {}
 
-  is-map@2.0.3: {}
-
   is-negative-zero@2.0.3: {}
 
   is-number-object@1.0.7:
@@ -10028,8 +9961,6 @@ snapshots:
 
   is-regexp@1.0.0: {}
 
-  is-set@2.0.3: {}
-
   is-shared-array-buffer@1.0.3:
     dependencies:
       call-bind: 1.0.7
@@ -10058,16 +9989,9 @@ snapshots:
 
   is-utf8@0.2.1: {}
 
-  is-weakmap@2.0.2: {}
-
   is-weakref@1.0.2:
     dependencies:
       call-bind: 1.0.7
-
-  is-weakset@2.0.3:
-    dependencies:
-      call-bind: 1.0.7
-      get-intrinsic: 1.2.4
 
   is-windows@1.0.2: {}
 
@@ -10327,8 +10251,6 @@ snapshots:
     dependencies:
       yallist: 4.0.0
 
-  lz-string@1.5.0: {}
-
   magic-string@0.27.0:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.4.15
@@ -10514,11 +10436,6 @@ snapshots:
   nwsapi@2.2.10: {}
 
   object-inspect@1.13.1: {}
-
-  object-is@1.1.6:
-    dependencies:
-      call-bind: 1.0.7
-      define-properties: 1.2.1
 
   object-keys@1.1.1: {}
 
@@ -10716,12 +10633,6 @@ snapshots:
 
   prettier@2.8.8: {}
 
-  pretty-format@27.5.1:
-    dependencies:
-      ansi-regex: 5.0.1
-      ansi-styles: 5.2.0
-      react-is: 17.0.2
-
   pretty-format@29.7.0:
     dependencies:
       '@jest/schemas': 29.6.3
@@ -10768,8 +10679,6 @@ snapshots:
       loose-envify: 1.4.0
       react: 18.3.1
       scheduler: 0.23.2
-
-  react-is@17.0.2: {}
 
   react-is@18.3.1: {}
 
@@ -11149,10 +11058,6 @@ snapshots:
   stackback@0.0.2: {}
 
   std-env@3.7.0: {}
-
-  stop-iteration-iterator@1.0.0:
-    dependencies:
-      internal-slot: 1.0.7
 
   string-argv@0.3.1: {}
 
@@ -11737,13 +11642,6 @@ snapshots:
       is-number-object: 1.0.7
       is-string: 1.0.7
       is-symbol: 1.0.4
-
-  which-collection@1.0.2:
-    dependencies:
-      is-map: 2.0.3
-      is-set: 2.0.3
-      is-weakmap: 2.0.2
-      is-weakset: 2.0.3
 
   which-module@2.0.1: {}
 

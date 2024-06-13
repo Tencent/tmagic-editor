@@ -4,9 +4,9 @@
 
 <script lang="ts" setup>
 import type { MPageFragment } from '@tmagic/schema';
+import { useApp } from '@tmagic/vue-runtime-help';
 
 import MContainer from '../../container';
-import useApp from '../../useApp';
 
 const props = withDefaults(
   defineProps<{

@@ -190,6 +190,18 @@ const getAssertionTokenByTraverse = (ast: any) => {
       variableDeclarations.push(p.node);
       this.traverse(p);
     },
+    visitExportNamedDeclaration(p) {
+      const { node } = p;
+      const { specifiers } = node;
+
+      const specifier = specifiers?.find((specifier) => specifier.exported.name === 'default');
+
+      if (specifier?.local) {
+        exportDefaultName = `${specifier.local.name}`;
+      }
+
+      this.traverse(p);
+    },
     visitExportDefaultDeclaration(p) {
       const { node } = p;
       const { declaration } = node;

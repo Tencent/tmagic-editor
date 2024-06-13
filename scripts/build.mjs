@@ -21,6 +21,7 @@ const main = async () => {
     'stage',
     'editor',
     'cli',
+    'ui',
   ];
 
   for (const pkg of packages) {

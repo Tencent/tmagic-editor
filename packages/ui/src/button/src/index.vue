@@ -8,8 +8,7 @@
 
 <script lang="ts" setup>
 import type { MComponent } from '@tmagic/schema';
-
-import useApp from '../../useApp';
+import { useApp } from '@tmagic/vue-runtime-help';
 
 interface ButtonSchema extends MComponent {
   type: 'button';

@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-import { computed, inject, onBeforeUnmount, onMounted } from 'vue';
+import { computed, inject, onBeforeUnmount, onMounted } from 'vue-demi';
 
-import Core from '@tmagic/core';
+import type Core from '@tmagic/core';
 import type { MNode } from '@tmagic/schema';
 
 interface UseAppOptions<T extends MNode = MNode> {

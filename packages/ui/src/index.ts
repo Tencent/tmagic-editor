@@ -27,6 +27,17 @@ import PageFragmentContainer from './page-fragment-container';
 import QRcode from './qrcode';
 import Text from './text';
 
+export { default as TMagicUiButton } from './button';
+export { default as TMagicUiContainer } from './container';
+export { default as TMagicUiImg } from './img';
+export { default as TMagicUiIteratorContainer } from './iterator-container';
+export { default as TMagicUiOverlay } from './overlay';
+export { default as TMagicUiPage } from './page';
+export { default as TMagicUiPageFragment } from './page-fragment';
+export { default as TMagicUiPageFragmentContainer } from './page-fragment-container';
+export { default as TMagicUiQRcode } from './qrcode';
+export { default as TMagicUiText } from './text';
+
 const ui: Record<string, any> = {
   page: Page,
   container: Container,

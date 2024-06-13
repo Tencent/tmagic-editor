@@ -24,7 +24,7 @@
     "@tmagic/stage": "1.4.7",
     "@tmagic/ui": "1.4.7",
     "@tmagic/utils": "1.4.7",
-    "@tmagic/vue-runtime-help": "^0.0.3",
+    "@tmagic/vue-runtime-help": "^0.0.5",
     "axios": "^0.25.0",
     "vue": "^3.4.27"
   },
