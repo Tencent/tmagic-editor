@@ -59,9 +59,11 @@ export const createDataSourceManager = (app: AppCore, useMock?: boolean, initial
 
       const nodeIds = union([...Object.keys(condDep), ...Object.keys(dep)]);
 
+      const pages = app.page?.data && app.platform !== 'editor' ? [app.page.data] : dsl.items;
+
       dataSourceManager.emit(
         'update-data',
-        getNodes(nodeIds, dsl.items).map((node) => {
+        getNodes(nodeIds, pages).map((node) => {
           if (app.platform !== 'editor') {
             node.condResult = dataSourceManager.compliedConds(node);
           }
