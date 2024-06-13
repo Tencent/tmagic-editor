@@ -74,21 +74,32 @@ class DataSourceManager extends EventEmitter {
     });
 
     const dataSourceList = Array.from(this.dataSourceMap);
-    Promise.allSettled<Record<string, any>>(dataSourceList.map(([, ds]) => this.init(ds))).then((values) => {
-      const data: DataSourceManagerData = {};
-      const errors: Record<string, Error> = {};
 
-      values.forEach((value, index) => {
-        const dsId = dataSourceList[index][0];
-        if (value.status === 'fulfilled') {
-          data[dsId] = this.data[dsId];
-        } else if (value.status === 'rejected') {
-          errors[dsId] = value.reason;
-        }
+    if (typeof Promise.allSettled === 'function') {
+      Promise.allSettled<Record<string, any>>(dataSourceList.map(([, ds]) => this.init(ds))).then((values) => {
+        const data: DataSourceManagerData = {};
+        const errors: Record<string, Error> = {};
+
+        values.forEach((value, index) => {
+          const dsId = dataSourceList[index][0];
+          if (value.status === 'fulfilled') {
+            data[dsId] = this.data[dsId];
+          } else if (value.status === 'rejected') {
+            errors[dsId] = value.reason;
+          }
+        });
+
+        this.emit('init', data, errors);
       });
-
-      this.emit('init', data, errors);
-    });
+    } else {
+      Promise.all<Record<string, any>>(dataSourceList.map(([, ds]) => this.init(ds)))
+        .then(() => {
+          this.emit('init', this.data);
+        })
+        .catch(() => {
+          this.emit('init', this.data);
+        });
+    }
   }
 
   public async init(ds: DataSource) {
