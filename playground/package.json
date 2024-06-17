@@ -18,7 +18,7 @@
     "@tmagic/editor": "1.4.8",
     "@tmagic/element-plus-adapter": "1.4.8",
     "@tmagic/form": "1.4.8",
-    "@tmagic/tmagic-form-runtime": "1.0.2",
+    "@tmagic/tmagic-form-runtime": "1.0.11",
     "@tmagic/schema": "1.4.8",
     "@tmagic/stage": "1.4.8",
     "@tmagic/utils": "1.4.8",

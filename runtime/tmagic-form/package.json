@@ -1,5 +1,5 @@
 {
-  "version": "1.0.9",
+  "version": "1.0.11",
   "name": "@tmagic/tmagic-form-runtime",
   "type": "module",
   "main": "dist/tmagic-form-runtime.umd.cjs",
