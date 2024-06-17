@@ -18,7 +18,8 @@
   },
   "files": [
     "dist",
-    "types"
+    "types",
+    "src"
   ],
   "license": "Apache-2.0",
   "scripts": {

@@ -14,7 +14,8 @@
   },
   "files": [
     "bin",
-    "lib"
+    "lib",
+    "src"
   ],
   "engines": {
     "node": ">=18"

@@ -187,6 +187,17 @@ async function main() {
     }
   }
 
+  if (!skipGit) {
+    const { stdout } = await run('git', ['diff'], { stdio: 'pipe' });
+    if (stdout) {
+      step('\nCommitting changes...');
+      await runIfNotDry('git', ['add', '-A']);
+      await runIfNotDry('git', ['commit', '-m', `chore: release v${targetVersion}`, '--verify']);
+    } else {
+      console.log('No changes to commit.');
+    }
+  }
+
   // publish packages
   step('\nPublishing packages...');
 
@@ -194,7 +205,9 @@ async function main() {
   if (isDryRun) {
     additionalPublishFlags.push('--dry-run');
   }
-
+  if (isDryRun || skipGit) {
+    additionalPublishFlags.push('--no-git-checks');
+  }
   // bypass the pnpm --publish-branch restriction which isn't too useful to us
   // otherwise it leads to a prompt and blocks the release script
   const branch = await getBranch();
@@ -215,7 +228,7 @@ async function main() {
     if (stdout) {
       step('\nCommitting changes...');
       await runIfNotDry('git', ['add', '-A']);
-      await runIfNotDry('git', ['commit', '-m', `chore: release v${targetVersion}`, '--verify']);
+      await runIfNotDry('git', ['commit', '-m', `chore: update lockfile v${targetVersion}`, '--verify']);
     } else {
       console.log('No changes to commit.');
     }
@@ -362,14 +375,7 @@ async function publishPackage(pkgName, version, additionalFlags) {
     // workspace:* deps
     await run(
       'pnpm',
-      [
-        'publish',
-        ...(releaseTag ? ['--tag', releaseTag] : []),
-        '--access',
-        'public',
-        '--no-git-checks',
-        ...additionalFlags,
-      ],
+      ['publish', ...(releaseTag ? ['--tag', releaseTag] : []), '--access', 'public', ...additionalFlags],
       {
         cwd: getPkgRoot(pkgName),
         stdio: 'pipe',

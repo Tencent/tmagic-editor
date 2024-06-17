@@ -2,9 +2,6 @@
   "version": "1.4.8",
   "name": "@tmagic/core",
   "type": "module",
-  "sideEffects": [
-    "dist/*"
-  ],
   "main": "dist/tmagic-core.umd.cjs",
   "module": "dist/tmagic-core.js",
   "types": "types/index.d.ts",
@@ -22,7 +19,8 @@
   },
   "files": [
     "dist",
-    "types"
+    "types",
+    "src"
   ],
   "license": "Apache-2.0",
   "scripts": {

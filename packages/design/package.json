@@ -2,9 +2,6 @@
   "version": "1.4.8",
   "name": "@tmagic/design",
   "type": "module",
-  "sideEffects": [
-    "dist/*"
-  ],
   "main": "dist/tmagic-design.umd.cjs",
   "module": "dist/tmagic-design.js",
   "types": "types/index.d.ts",
@@ -18,7 +15,8 @@
   },
   "files": [
     "dist",
-    "types"
+    "types",
+    "src"
   ],
   "license": "Apache-2.0",
   "scripts": {

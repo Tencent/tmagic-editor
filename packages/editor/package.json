@@ -3,7 +3,6 @@
   "name": "@tmagic/editor",
   "type": "module",
   "sideEffects": [
-    "dist/*",
     "src/theme/*"
   ],
   "main": "dist/tmagic-editor.umd.cjs",
@@ -24,7 +23,8 @@
   },
   "files": [
     "dist",
-    "types"
+    "types",
+    "src"
   ],
   "license": "Apache-2.0",
   "scripts": {

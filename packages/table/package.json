@@ -2,9 +2,6 @@
   "version": "1.4.8",
   "name": "@tmagic/table",
   "type": "module",
-  "sideEffects": [
-    "dist/*"
-  ],
   "main": "dist/tmagic-table.umd.cjs",
   "module": "dist/tmagic-table.js",
   "types": "types/index.d.ts",
@@ -22,7 +19,8 @@
   },
   "files": [
     "dist",
-    "types"
+    "types",
+    "src"
   ],
   "license": "Apache-2.0",
   "scripts": {

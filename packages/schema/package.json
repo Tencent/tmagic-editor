@@ -2,7 +2,6 @@
   "version": "1.4.8",
   "name": "@tmagic/schema",
   "type": "module",
-  "sideEffects": false,
   "main": "dist/tmagic-schema.umd.cjs",
   "module": "dist/tmagic-schema.js",
   "types": "types/index.d.ts",
@@ -16,7 +15,8 @@
   },
   "files": [
     "dist",
-    "types"
+    "types",
+    "src"
   ],
   "scripts": {
     "build": "npm run build:type && vite build",

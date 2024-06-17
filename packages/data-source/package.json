@@ -2,9 +2,6 @@
   "version": "1.4.8",
   "name": "@tmagic/data-source",
   "type": "module",
-  "sideEffects": [
-    "dist/*"
-  ],
   "main": "dist/tmagic-data-source.umd.cjs",
   "module": "dist/tmagic-data-source.js",
   "types": "types/index.d.ts",
@@ -18,7 +15,8 @@
   },
   "files": [
     "dist",
-    "types"
+    "types",
+    "src"
   ],
   "license": "Apache-2.0",
   "scripts": {
