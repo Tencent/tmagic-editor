@@ -44,11 +44,11 @@
   "devDependencies": {
     "@types/node": "^18.19.0",
     "rimraf": "^3.0.2",
-    "vite": "^5.2.12"
+    "vite": "^5.3.1"
   },
   "peerDependencies": {
     "@tmagic/design": "workspace:*",
-    "element-plus": "^2.7.4",
+    "element-plus": "^2.7.5",
     "typescript": "*"
   },
   "peerDependenciesMeta": {
