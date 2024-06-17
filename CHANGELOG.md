@@ -1,3 +1,26 @@
+## [1.4.8](https://github.com/Tencent/tmagic-editor/compare/v1.4.7...v1.4.8) (2024-06-17)
+
+
+### Bug Fixes
+
+* **data-source:** 兼容Promise.allSettled ([7ee7f53](https://github.com/Tencent/tmagic-editor/commit/7ee7f53938c99a47631b5fe1835a13c4bed4c3ed))
+* **data-source:** 多页面时数据源依赖中可能包含其他页面的，导致更新时失败 ([5c43fbf](https://github.com/Tencent/tmagic-editor/commit/5c43fbfd964897a373d29d7e9e60713f1f2209a2))
+* **data-source:** 默认事件处理支持path为空字符串 ([ac7bb93](https://github.com/Tencent/tmagic-editor/commit/ac7bb93a3795d196a201cef93881027bddca2156))
+* **editor,runtime:** 编辑器中，依赖收集改成异步以后，可能出现配置更新了，但是依赖信息还未更新，导致渲染出来的组件不对 ([78e9a0a](https://github.com/Tencent/tmagic-editor/commit/78e9a0ab15d2f68a89f0670818fe77bb81362276))
+* **runtime:** 使用vue-demi cdn ([0cd8382](https://github.com/Tencent/tmagic-editor/commit/0cd83825b783ae54dc9e34868032a4230fb5a6e3))
+* **ui:** overlay销毁需要异常page上的事件 ([094635c](https://github.com/Tencent/tmagic-editor/commit/094635cc0eaa71d1130089c0326bec2a4c62d3a5))
+* **vue-runtime-help:** inject app 无效 ([aa25aa6](https://github.com/Tencent/tmagic-editor/commit/aa25aa6d854f6daf08abb554e490d4a0d21cad8b))
+
+
+### Features
+
+* **editor:** 支持数据源模板输入宽选中文本后编辑（在有数据源变量时还有问题） ([a30e8a3](https://github.com/Tencent/tmagic-editor/commit/a30e8a3eeaf61168eebe1d46cb02b2473228e3e2))
+* **editor:** 组件树中支持多选拖动 ([5ac768f](https://github.com/Tencent/tmagic-editor/commit/5ac768f15be33526dcbec4a69f969e9dcf36cbc5))
+* **editor:** 组件表单配置支持函数 ([9eb99ed](https://github.com/Tencent/tmagic-editor/commit/9eb99ed1768def2817718da3e54d4e8424ee0aaf))
+* **ui,runtime:** vue-runtime-help中添加use-app方法 ([948c194](https://github.com/Tencent/tmagic-editor/commit/948c194a601ec7dbbf433c8165d5bc266e8cc175))
+
+
+
 ## [1.4.7](https://github.com/Tencent/tmagic-editor/compare/v1.4.6...v1.4.7) (2024-05-31)
 
 

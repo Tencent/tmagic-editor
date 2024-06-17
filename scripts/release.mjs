@@ -187,6 +187,25 @@ async function main() {
     }
   }
 
+  // publish packages
+  step('\nPublishing packages...');
+
+  const additionalPublishFlags = [];
+  if (isDryRun) {
+    additionalPublishFlags.push('--dry-run');
+  }
+
+  // bypass the pnpm --publish-branch restriction which isn't too useful to us
+  // otherwise it leads to a prompt and blocks the release script
+  const branch = await getBranch();
+  if (branch !== 'master') {
+    additionalPublishFlags.push('--publish-branch', branch);
+  }
+
+  for (const pkg of packages) {
+    await publishPackage(pkg, targetVersion, additionalPublishFlags);
+  }
+
   // update pnpm-lock.yaml
   step('\nUpdating lockfile...');
   await run(`pnpm`, ['install', '--prefer-offline']);
@@ -200,27 +219,6 @@ async function main() {
     } else {
       console.log('No changes to commit.');
     }
-  }
-
-  // publish packages
-  step('\nPublishing packages...');
-
-  const additionalPublishFlags = [];
-  if (isDryRun) {
-    additionalPublishFlags.push('--dry-run');
-  }
-  if (isDryRun || skipGit) {
-    additionalPublishFlags.push('--no-git-checks');
-  }
-  // bypass the pnpm --publish-branch restriction which isn't too useful to us
-  // otherwise it leads to a prompt and blocks the release script
-  const branch = await getBranch();
-  if (branch !== 'master') {
-    additionalPublishFlags.push('--publish-branch', branch);
-  }
-
-  for (const pkg of packages) {
-    await publishPackage(pkg, targetVersion, additionalPublishFlags);
   }
 
   // push to GitHub
@@ -364,7 +362,14 @@ async function publishPackage(pkgName, version, additionalFlags) {
     // workspace:* deps
     await run(
       'pnpm',
-      ['publish', ...(releaseTag ? ['--tag', releaseTag] : []), '--access', 'public', ...additionalFlags],
+      [
+        'publish',
+        ...(releaseTag ? ['--tag', releaseTag] : []),
+        '--access',
+        'public',
+        '--no-git-checks',
+        ...additionalFlags,
+      ],
       {
         cwd: getPkgRoot(pkgName),
         stdio: 'pipe',
