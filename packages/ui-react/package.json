@@ -1,6 +1,6 @@
 {
   "name": "@tmagic/ui-react",
-  "version": "1.4.8",
+  "version": "1.4.9",
   "type": "module",
   "main": "src/index.ts",
   "files": [

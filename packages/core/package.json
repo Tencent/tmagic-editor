@@ -1,5 +1,5 @@
 {
-  "version": "1.4.8",
+  "version": "1.4.9",
   "name": "@tmagic/core",
   "type": "module",
   "main": "dist/tmagic-core.umd.cjs",
