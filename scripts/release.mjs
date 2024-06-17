@@ -187,6 +187,10 @@ async function main() {
     }
   }
 
+  // update pnpm-lock.yaml
+  step('\nUpdating lockfile...');
+  await run(`pnpm`, ['install', '--prefer-offline']);
+
   if (!skipGit) {
     const { stdout } = await run('git', ['diff'], { stdio: 'pipe' });
     if (stdout) {
