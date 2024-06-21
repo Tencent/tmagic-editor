@@ -39,7 +39,7 @@ export const datetimeFormatter = (
   format = 'YYYY-MM-DD HH:mm:ss',
 ): string | number => {
   if (v) {
-    let time = null;
+    let time: string | number;
     if (['x', 'timestamp'].includes(format)) {
       time = dayjs(v).valueOf();
     } else if ((typeof v === 'string' && v.includes('Z')) || v.constructor === Date) {
@@ -50,7 +50,6 @@ export const datetimeFormatter = (
       time = dayjs(v).format(format);
     }
 
-    // 格式化为北京时间
     if (time !== 'Invalid Date') {
       return time;
     }
