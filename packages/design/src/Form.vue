@@ -1,5 +1,11 @@
 <template>
-  <component class="tmagic-design-form" ref="form" :is="uiComponent" v-bind="uiProps">
+  <component
+    class="tmagic-design-form"
+    :class="{ 'tmagic-design-form-inline': inline }"
+    ref="form"
+    :is="uiComponent"
+    v-bind="uiProps"
+  >
     <slot></slot>
   </component>
 </template>
