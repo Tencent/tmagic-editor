@@ -20,11 +20,12 @@ import type { Component } from 'vue';
 import type EventEmitter from 'events';
 import type { PascalCasedProperties } from 'type-fest';
 
-import type { ChildConfig, ColumnConfig, FilterFunction, FormConfig, FormItem, Input } from '@tmagic/form';
+import type { ChildConfig, ColumnConfig, FilterFunction, FormConfig, FormItem, FormState, Input } from '@tmagic/form';
 import type {
   CodeBlockContent,
   CodeBlockDSL,
   DataSourceFieldType,
+  DataSourceSchema,
   Id,
   MApp,
   MContainer,
@@ -646,13 +647,27 @@ export interface DataSourceMethodSelectConfig extends FormItem {
 
 export interface DataSourceFieldSelectConfig extends FormItem {
   type: 'data-source-field-select';
-  /** 是否要编译成数据源的data。
+  /**
+   * 是否要编译成数据源的data。
    * key: 不编译，就是要数据源id和field name;
    * value: 要编译（数据源data[`${filed}`]）
    * */
   value?: 'key' | 'value';
   /** 是否严格的遵守父子节点不互相关联 */
-  checkStrictly?: boolean;
+  checkStrictly?:
+    | boolean
+    | ((
+        mForm: FormState | undefined,
+        data: {
+          model: Record<any, any>;
+          values: Record<any, any>;
+          parent?: Record<any, any>;
+          formValue: Record<any, any>;
+          prop: string;
+          config: DataSourceFieldSelectConfig;
+          dataSource?: DataSourceSchema;
+        },
+      ) => boolean);
   dataSourceFieldType?: DataSourceFieldType[];
   fieldConfig?: ChildConfig;
   /** 是否可以编辑数据源，disable表示的是是否可以选择数据源 */

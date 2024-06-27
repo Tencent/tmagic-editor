@@ -1,0 +1,16 @@
+.m-fields-data-source-field-select {
+  width: 100%;
+  .m-editor-data-source-field-select {
+    display: flex;
+    width: 100%;
+
+    .tmagic-design-select {
+      flex: 1;
+      margin-right: 10px;
+    }
+
+    .tmagic-design-cascader {
+      flex: 2;
+    }
+  }
+}

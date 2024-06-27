@@ -1,6 +1,6 @@
 import { CascaderOption, FormConfig, FormState } from '@tmagic/form';
 import { DataSchema, DataSourceFieldType, DataSourceSchema } from '@tmagic/schema';
-import { isNumber } from '@tmagic/utils';
+import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX, isNumber } from '@tmagic/utils';
 
 import BaseFormConfig from './formConfigs/base';
 import HttpFormConfig from './formConfigs/http';
@@ -218,7 +218,7 @@ export const getCascaderOptionsFromFields = (
     const children = getCascaderOptionsFromFields(field.fields, dataSourceFieldType);
 
     const item = {
-      label: field.title || field.name,
+      label: `${field.title || field.name}(${field.type})`,
       value: field.name,
       children,
     };
@@ -241,3 +241,6 @@ export const getCascaderOptionsFromFields = (
   });
   return child;
 };
+
+export const removeDataSourceFieldPrefix = (id?: string) =>
+  id?.replace(DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX, '') || '';
