@@ -346,6 +346,9 @@ importers:
       serialize-javascript:
         specifier: ^6.0.0
         version: 6.0.2
+      sortablejs:
+        specifier: ^1.15.2
+        version: 1.15.2
       typescript:
         specifier: '*'
         version: 5.4.5
@@ -365,6 +368,9 @@ importers:
       '@types/serialize-javascript':
         specifier: ^5.0.1
         version: 5.0.4
+      '@types/sortablejs':
+        specifier: ^1.15.8
+        version: 1.15.8
       '@vitejs/plugin-vue':
         specifier: ^5.0.4
         version: 5.0.5(vite@5.3.1(@types/node@18.19.34)(sass@1.77.5)(terser@5.31.1))(vue@3.4.29(typescript@5.4.5))

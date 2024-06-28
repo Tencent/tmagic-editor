@@ -61,13 +61,15 @@
     "keycon": "^1.4.0",
     "lodash-es": "^4.17.21",
     "moveable": "^0.53.0",
-    "serialize-javascript": "^6.0.0"
+    "serialize-javascript": "^6.0.0",
+    "sortablejs": "^1.15.2"
   },
   "devDependencies": {
     "@types/events": "^3.0.0",
     "@types/lodash-es": "^4.17.4",
     "@types/node": "^18.19.0",
     "@types/serialize-javascript": "^5.0.1",
+    "@types/sortablejs": "^1.15.8",
     "@vitejs/plugin-vue": "^5.0.4",
     "@vue/compiler-sfc": "^3.4.27",
     "@vue/test-utils": "^2.4.6",
@@ -86,8 +88,8 @@
     "@tmagic/stage": "workspace:*",
     "@tmagic/utils": "workspace:*",
     "monaco-editor": "^0.48.0",
-    "vue": "^3.4.27",
-    "typescript": "*"
+    "typescript": "*",
+    "vue": "^3.4.27"
   },
   "peerDependenciesMeta": {
     "typescript": {

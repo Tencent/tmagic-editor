@@ -17,6 +17,7 @@ import type {
   MenuBarData,
   MenuButton,
   MenuComponent,
+  PageBarSortOptions,
   SideBarData,
   StageRect,
 } from './type';
@@ -90,6 +91,8 @@ export interface EditorProps {
   /** 用于自定义组件树与画布的右键菜单 */
   customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
   extendFormState?: (state: FormState) => Record<string, any> | Promise<Record<string, any>>;
+  /** 页面顺序拖拽配置参数 */
+  pageBarSortOptions?: PageBarSortOptions;
 }
 
 export const defaultEditorProps = {

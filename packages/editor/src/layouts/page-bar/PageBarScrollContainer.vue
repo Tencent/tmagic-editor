@@ -34,11 +34,12 @@ import {
   type WatchStopHandle,
 } from 'vue';
 import { ArrowLeftBold, ArrowRightBold } from '@element-plus/icons-vue';
+import Sortable, { SortableEvent } from 'sortablejs';
 
-import { NodeType } from '@tmagic/schema';
+import { Id, NodeType } from '@tmagic/schema';
 
 import Icon from '@editor/components/Icon.vue';
-import type { Services } from '@editor/type';
+import type { PageBarSortOptions, Services } from '@editor/type';
 
 defineOptions({
   name: 'MEditorPageBarScrollContainer',
@@ -46,23 +47,29 @@ defineOptions({
 
 const props = defineProps<{
   type: NodeType.PAGE | NodeType.PAGE_FRAGMENT;
+  pageBarSortOptions?: PageBarSortOptions;
 }>();
 
 const services = inject<Services>('services');
 const editorService = services?.editorService;
 const uiService = services?.uiService;
 
-const itemsContainer = ref<HTMLDivElement>();
+const itemsContainer = ref<HTMLElement>();
 const canScroll = ref(false);
 
 const showAddPageButton = computed(() => uiService?.get('showAddPageButton'));
+const showPageListButton = computed(() => uiService?.get('showPageListButton'));
 
 const itemsContainerWidth = ref(0);
 
 const setCanScroll = () => {
   // 减去新增、左移、右移三个按钮的宽度
   // 37 = icon width 16 + padding 10 * 2 + border-right 1
-  itemsContainerWidth.value = (pageBar.value?.clientWidth || 0) - 37 * 2 - (showAddPageButton.value ? 37 : 21);
+  itemsContainerWidth.value =
+    (pageBar.value?.clientWidth || 0) -
+    37 * 2 -
+    (showAddPageButton.value ? 37 : 21) -
+    (showPageListButton.value ? 37 : 0);
 
   nextTick(() => {
     if (itemsContainer.value) {
@@ -125,6 +132,35 @@ const crateWatchLength = (length: ComputedRef<number>) =>
           scroll('start');
         } else {
           scroll('end');
+        }
+        if (length > 1) {
+          const el = document.querySelector('.m-editor-page-bar-items') as HTMLElement;
+          let beforeDragList: Id[] = [];
+          const options = {
+            ...{
+              dataIdAttr: 'page-id', // 获取排序后的数据
+              onStart: async (event: SortableEvent) => {
+                if (typeof props.pageBarSortOptions?.beforeStart === 'function') {
+                  await props.pageBarSortOptions.beforeStart(event, sortable);
+                }
+                beforeDragList = sortable.toArray();
+              },
+              onUpdate: async (event: SortableEvent) => {
+                await editorService?.sort(
+                  beforeDragList[event.oldIndex as number],
+                  beforeDragList[event.newIndex as number],
+                );
+                if (typeof props.pageBarSortOptions?.afterUpdate === 'function') {
+                  await props.pageBarSortOptions.afterUpdate(event, sortable);
+                }
+              },
+            },
+            ...{
+              ...(props.pageBarSortOptions ? props.pageBarSortOptions : {}),
+            },
+          };
+          if (!el) return;
+          const sortable = new Sortable(el, options);
         }
       });
     },

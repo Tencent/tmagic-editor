@@ -18,6 +18,19 @@
   }
 }
 
+.m-editor-page-list-item {
+  display: flex;
+  width: 100%;
+  height: $--page-bar-height;
+  line-height: $--page-bar-height;
+  color: $--font-color;
+  z-index: 2;
+  overflow: hidden;
+  &:hover {
+    background-color: $--hover-color;
+  }
+}
+
 .m-editor-page-bar {
   display: flex;
   width: 100%;

@@ -2,15 +2,19 @@
   <div class="m-editor-page-bar-tabs">
     <SwitchTypeButton v-if="!disabledPageFragment" v-model="active" />
 
-    <PageBarScrollContainer :type="active">
+    <PageBarScrollContainer :type="active" :page-bar-sort-options="pageBarSortOptions">
       <template #prepend>
         <AddButton :type="active"></AddButton>
+        <PageList :list="list">
+          <template #page-list-popover="{ list }"><slot name="page-list-popover" :list="list"></slot></template>
+        </PageList>
       </template>
 
       <div
         v-for="item in list"
         class="m-editor-page-bar-item"
         :key="item.id"
+        :page-id="item.id"
         :class="{ active: page?.id === item.id }"
         @click="switchPage(item.id)"
       >
@@ -61,11 +65,12 @@ import { Id, type MPage, type MPageFragment, NodeType } from '@tmagic/schema';
 import { isPage, isPageFragment } from '@tmagic/utils';
 
 import ToolButton from '@editor/components/ToolButton.vue';
-import type { Services } from '@editor/type';
+import type { PageBarSortOptions, Services } from '@editor/type';
 import { getPageFragmentList, getPageList } from '@editor/utils';
 
 import AddButton from './AddButton.vue';
 import PageBarScrollContainer from './PageBarScrollContainer.vue';
+import PageList from './PageList.vue';
 import SwitchTypeButton from './SwitchTypeButton.vue';
 
 defineOptions({
@@ -74,6 +79,7 @@ defineOptions({
 
 defineProps<{
   disabledPageFragment: boolean;
+  pageBarSortOptions?: PageBarSortOptions;
 }>();
 
 const active = ref<NodeType.PAGE | NodeType.PAGE_FRAGMENT>(NodeType.PAGE);
