@@ -5,6 +5,8 @@ import Guides, { type GuidesEvents, type GuidesOptions } from '@scena/guides';
 import { GuidesType } from './const';
 import type { RuleOptions } from './types';
 
+const guidesClass = 'tmagic-stage-guides';
+
 export default class Rule extends EventEmitter {
   public hGuides: Guides;
   public vGuides: Guides;
@@ -84,12 +86,11 @@ export default class Rule extends EventEmitter {
    * @param show 是否显示
    */
   public showRule(show = true) {
-    // 当尺子隐藏时发现大小变化，显示后会变形，所以这里做重新初始化处理
+    // 当尺子隐藏时发生大小变化，显示后会变形，所以这里做重新初始化处理
     if (show) {
-      this.hGuides.destroy();
-      this.hGuides = this.createGuides(GuidesType.HORIZONTAL, this.horizontalGuidelines);
+      this.destroyGuides();
 
-      this.vGuides.destroy();
+      this.hGuides = this.createGuides(GuidesType.HORIZONTAL, this.horizontalGuidelines);
       this.vGuides = this.createGuides(GuidesType.VERTICAL, this.verticalGuidelines);
     } else {
       this.hGuides.setState({
@@ -115,10 +116,20 @@ export default class Rule extends EventEmitter {
   }
 
   public destroy(): void {
+    this.destroyGuides();
     this.hGuides.off('changeGuides', this.hGuidesChangeGuidesHandler);
     this.vGuides.off('changeGuides', this.vGuidesChangeGuidesHandler);
     this.containerResizeObserver.disconnect();
     this.removeAllListeners();
+  }
+
+  public destroyGuides(): void {
+    this.hGuides.destroy();
+    this.vGuides.destroy();
+
+    this.container.querySelectorAll(`.${guidesClass}`).forEach((el) => {
+      el.remove();
+    });
   }
 
   private getGuidesStyle = (type: GuidesType) => ({
@@ -135,6 +146,7 @@ export default class Rule extends EventEmitter {
       type,
       defaultGuides,
       displayDragPos: true,
+      className: guidesClass,
       backgroundColor: '#fff',
       lineColor: '#000',
       textColor: '#000',
