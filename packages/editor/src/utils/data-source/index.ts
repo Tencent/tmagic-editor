@@ -215,7 +215,10 @@ export const getCascaderOptionsFromFields = (
       dataSourceFieldType.push('any');
     }
 
-    const children = getCascaderOptionsFromFields(field.fields, dataSourceFieldType);
+    let children: CascaderOption[] = [];
+    if (field.type && ['any', 'array', 'object'].includes(field.type)) {
+      children = getCascaderOptionsFromFields(field.fields, dataSourceFieldType);
+    }
 
     const item = {
       label: `${field.title || field.name}(${field.type})`,

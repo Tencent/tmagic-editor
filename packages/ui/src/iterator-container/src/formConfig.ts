@@ -44,6 +44,13 @@ export default [
     name: 'itemConfig',
     items: [
       {
+        type: 'display-conds',
+        name: 'displayConds',
+        titlePrefix: '条件组',
+        parentFields: (formState: any, { formValue }: any) => formValue.dsField,
+        defaultValue: [],
+      },
+      {
         name: 'layout',
         text: '容器布局',
         type: 'select',

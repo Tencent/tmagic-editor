@@ -20,13 +20,13 @@ import EventEmitter from 'events';
 
 import { cloneDeep } from 'lodash-es';
 
-import type { AppCore, DataSourceSchema, Id, MNode } from '@tmagic/schema';
+import type { AppCore, DataSourceSchema, DisplayCond, Id, MNode } from '@tmagic/schema';
 import { compiledNode } from '@tmagic/utils';
 
 import { SimpleObservedData } from './observed-data/SimpleObservedData';
 import { DataSource, HttpDataSource } from './data-sources';
 import type { ChangeEvent, DataSourceManagerData, DataSourceManagerOptions, ObservedDataClass } from './types';
-import { compiledNodeField, compliedConditions, compliedIteratorItems } from './utils';
+import { compiledNodeField, compliedConditions, compliedIteratorItemConditions, compliedIteratorItems } from './utils';
 
 class DataSourceManager extends EventEmitter {
   private static dataSourceClassMap = new Map<string, typeof DataSource>();
@@ -212,6 +212,10 @@ class DataSourceManager extends EventEmitter {
 
   public compliedConds(node: MNode) {
     return compliedConditions(node, this.data);
+  }
+
+  public compliedIteratorItemConds(itemData: any, displayConds: DisplayCond[] = []) {
+    return compliedIteratorItemConditions(displayConds, itemData);
   }
 
   public compliedIteratorItems(itemData: any, items: MNode[], dataSourceField: string[] = []) {

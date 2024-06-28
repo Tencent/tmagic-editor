@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
@@ -18,19 +19,17 @@
 
 import type { FormConfig, FormState, TabPaneConfig } from '@tmagic/form';
 
-import dataSourceService from '@editor/services/dataSource';
-
-const arrayOptions = [
+export const arrayOptions = [
   { text: '包含', value: 'include' },
   { text: '不包含', value: 'not_include' },
 ];
 
-const eqOptions = [
+export const eqOptions = [
   { text: '等于', value: '=' },
   { text: '不等于', value: '!=' },
 ];
 
-const numberOptions = [
+export const numberOptions = [
   { text: '大于', value: '>' },
   { text: '大于等于', value: '>=' },
   { text: '小于', value: '<' },
@@ -359,106 +358,10 @@ export const displayTabConfig: TabPaneConfig = {
   display: (vm: FormState, { model }: any) => model.type !== 'page',
   items: [
     {
-      type: 'groupList',
+      type: 'display-conds',
       name: 'displayConds',
       titlePrefix: '条件组',
-      expandAll: true,
-      items: [
-        {
-          type: 'table',
-          name: 'cond',
-          items: [
-            {
-              type: 'data-source-field-select',
-              name: 'field',
-              value: 'key',
-              label: '字段',
-              checkStrictly: false,
-              dataSourceFieldType: ['string', 'number', 'boolean', 'any'],
-            },
-            {
-              type: 'select',
-              options: (mForm, { model }) => {
-                const [id, ...fieldNames] = model.field;
-
-                const ds = dataSourceService.getDataSourceById(id);
-
-                let fields = ds?.fields || [];
-                let type = '';
-                (fieldNames || []).forEach((fieldName: string) => {
-                  const field = fields.find((f) => f.name === fieldName);
-                  fields = field?.fields || [];
-                  type = field?.type || '';
-                });
-
-                if (type === 'array') {
-                  return arrayOptions;
-                }
-
-                if (type === 'boolean') {
-                  return [
-                    { text: '是', value: 'is' },
-                    { text: '不是', value: 'not' },
-                  ];
-                }
-
-                if (type === 'number') {
-                  return [...eqOptions, ...numberOptions];
-                }
-
-                if (type === 'string') {
-                  return [...arrayOptions, ...eqOptions];
-                }
-
-                return [...arrayOptions, ...eqOptions, ...numberOptions];
-              },
-              label: '条件',
-              name: 'op',
-            },
-            {
-              label: '值',
-              items: [
-                {
-                  name: 'value',
-                  type: (mForm, { model }) => {
-                    const [id, ...fieldNames] = model.field;
-
-                    const ds = dataSourceService.getDataSourceById(id);
-
-                    let fields = ds?.fields || [];
-                    let type = '';
-                    (fieldNames || []).forEach((fieldName: string) => {
-                      const field = fields.find((f) => f.name === fieldName);
-                      fields = field?.fields || [];
-                      type = field?.type || '';
-                    });
-
-                    if (type === 'number') {
-                      return 'number';
-                    }
-
-                    if (type === 'boolean') {
-                      return 'select';
-                    }
-
-                    return 'text';
-                  },
-                  options: [
-                    { text: 'true', value: true },
-                    { text: 'false', value: false },
-                  ],
-                  display: (vm, { model }) => !['between', 'not_between'].includes(model.op),
-                },
-                {
-                  name: 'range',
-                  type: 'number-range',
-                  display: (vm, { model }) => ['between', 'not_between'].includes(model.op),
-                },
-              ],
-            },
-          ],
-        },
-      ],
+      defaultValue: [],
     },
   ],
 };

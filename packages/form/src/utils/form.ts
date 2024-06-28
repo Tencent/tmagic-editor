@@ -24,6 +24,7 @@ import {
   ChildConfig,
   ContainerCommonConfig,
   DaterangeConfig,
+  FilterFunction,
   FormConfig,
   FormState,
   FormValue,
@@ -181,20 +182,24 @@ const getDefaultValue = function (mForm: FormState | undefined, { defaultValue, 
   return '';
 };
 
-export const filterFunction = <T = any>(mForm: FormState | undefined, config: T, props: any) => {
-  if (typeof config !== 'function') {
-    return config;
+export const filterFunction = <T = any>(
+  mForm: FormState | undefined,
+  config: T | FilterFunction<T> | undefined,
+  props: any,
+) => {
+  if (typeof config === 'function') {
+    return (config as FilterFunction<T>)(mForm, {
+      values: mForm?.initValues || {},
+      model: props.model,
+      parent: mForm?.parentValues || {},
+      formValue: mForm?.values || props.model,
+      prop: props.prop,
+      config: props.config,
+      index: props.index,
+    });
   }
 
-  return config(mForm, {
-    values: mForm?.initValues || {},
-    model: props.model,
-    parent: mForm?.parentValues || {},
-    formValue: mForm?.values || props.model,
-    prop: props.prop,
-    config: props.config,
-    index: props.index,
-  });
+  return config;
 };
 
 export const display = function (mForm: FormState | undefined, config: any, props: any) {

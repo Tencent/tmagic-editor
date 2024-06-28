@@ -129,10 +129,20 @@ const checkStrictly = computed(() => {
 });
 
 const onChangeHandler = (value: string[]) => {
+  if (!Array.isArray(value)) {
+    emit('change', value);
+    return;
+  }
+
   const [dsId, ...keys] = value;
   const dataSource = dataSources.value.find((ds) => ds.id === removeDataSourceFieldPrefix(dsId));
 
-  let fields = dataSource?.fields || [];
+  if (!dataSource) {
+    emit('change', value);
+    return;
+  }
+
+  let fields = dataSource.fields || [];
   let field: DataSchema | undefined;
   (keys || []).forEach((key) => {
     field = fields.find((f) => f.name === key);
@@ -145,7 +155,6 @@ const onChangeHandler = (value: string[]) => {
   }
 
   if (
-    !dsId ||
     !keys.length ||
     (field?.type &&
       (field.type === 'any' || dataSourceFieldType.includes('any') || dataSourceFieldType.includes(field.type)))

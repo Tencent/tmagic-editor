@@ -677,6 +677,11 @@ export interface DataSourceFieldSelectConfig extends FormItem {
   notEditable?: boolean | FilterFunction;
 }
 
+export interface CondOpSelectConfig extends FormItem {
+  type: 'cond-op';
+  parentFields?: string[];
+}
+
 /** 可新增的数据源类型选项 */
 export interface DatasourceTypeOption {
   /** 数据源类型 */

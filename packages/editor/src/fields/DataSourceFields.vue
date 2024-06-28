@@ -172,6 +172,12 @@ const dataSourceFieldsConfig: FormConfig = [
       { text: 'null', value: 'null' },
       { text: 'any', value: 'any' },
     ],
+    onChange: (formState, v: string, { model }) => {
+      if (!['any', 'array', 'object'].includes(v)) {
+        model.fields = [];
+      }
+      return v;
+    },
   },
   {
     name: 'name',

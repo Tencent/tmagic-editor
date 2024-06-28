@@ -49,7 +49,7 @@ const options = ref<CascaderOption[]>([]);
 const remoteData = ref<any>(null);
 
 const checkStrictly = computed(() => filterFunction(mForm, props.config.checkStrictly, props));
-const valueSeparator = computed(() => filterFunction(mForm, props.config.valueSeparator, props));
+const valueSeparator = computed(() => filterFunction<string>(mForm, props.config.valueSeparator, props));
 
 const value = computed({
   get() {

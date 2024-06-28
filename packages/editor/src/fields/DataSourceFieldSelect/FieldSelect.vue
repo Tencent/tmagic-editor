@@ -137,7 +137,7 @@ const dsChangeHandler = (v: string) => {
   emit('change', modelValue.value);
 };
 
-const fieldChangeHandler = (v: string[]) => {
+const fieldChangeHandler = (v: string[] = []) => {
   modelValue.value = [selectDataSourceId.value, ...v];
   emit('change', modelValue.value);
 };
