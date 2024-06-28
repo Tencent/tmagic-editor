@@ -1,5 +1,5 @@
 {
-  "version": "1.4.9",
+  "version": "1.4.10",
   "name": "@tmagic/data-source",
   "type": "module",
   "main": "dist/tmagic-data-source.umd.cjs",

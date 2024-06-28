@@ -1,3 +1,20 @@
+## [1.4.10](https://github.com/Tencent/tmagic-editor/compare/v1.4.9...v1.4.10) (2024-06-28)
+
+
+### Bug Fixes
+
+* **form,design:** 支持行内表单 ([77f13fa](https://github.com/Tencent/tmagic-editor/commit/77f13fa8981c16e9596856e46c8397adee7cf51a))
+* **stage:** 标尺销毁后没有移除对应的dom ([0796799](https://github.com/Tencent/tmagic-editor/commit/079679997aed97bb28c8dc03f53565be93abf3fe)), closes [#617](https://github.com/Tencent/tmagic-editor/issues/617)
+
+
+### Features
+
+* **dats-source,editor,form,schema,ui:** 迭代器容器支持配置子项显示条件 ([a164e2b](https://github.com/Tencent/tmagic-editor/commit/a164e2be62a34bbf4a9896becd738adf72dd2fd4))
+* **editor:** 优化数据源字段选择器交互 ([0ffc223](https://github.com/Tencent/tmagic-editor/commit/0ffc223459c9aee06ba557d13e79f8f21087f726))
+* **editor:** 支持拖拽调整页面顺序 ([0c5485b](https://github.com/Tencent/tmagic-editor/commit/0c5485b1d0c073e19f142e88574f086e695e77c9))
+
+
+
 ## [1.4.9](https://github.com/Tencent/tmagic-editor/compare/v1.4.8...v1.4.9) (2024-06-17)
 
 

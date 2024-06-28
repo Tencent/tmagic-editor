@@ -1,5 +1,5 @@
 {
-  "version": "1.4.9",
+  "version": "1.4.10",
   "name": "@tmagic/stage",
   "type": "module",
   "main": "dist/tmagic-stage.umd.cjs",
