@@ -103,7 +103,7 @@ const config = computed<GroupListConfig>(() => ({
             {
               name: 'value',
               type: (mForm, { model }) => {
-                const [id, ...fieldNames] = model.field;
+                const [id, ...fieldNames] = [...parentFields.value, ...model.field];
 
                 const ds = dataSourceService?.getDataSourceById(id);
 

@@ -774,7 +774,7 @@ export type PropsFormValueFunction = (data: { editorService: EditorService }) =>
 export type PartSortableOptions = Omit<Options, 'onStart' | 'onUpdate'>;
 export interface PageBarSortOptions extends PartSortableOptions {
   /** 在onUpdate之后调用 */
-  afterUpdate: (event: SortableEvent, sortable: Sortable) => void;
+  afterUpdate?: (event: SortableEvent, sortable: Sortable) => void;
   /** 在onStart之前调用 */
-  beforeStart: (event: SortableEvent, sortable: Sortable) => void;
+  beforeStart?: (event: SortableEvent, sortable: Sortable) => void;
 }
