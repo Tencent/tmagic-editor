@@ -105,6 +105,7 @@ const addHandler = async () => {
   });
 
   props.model[props.name].push(groupValue);
+  changeHandler();
 };
 
 const removeHandler = (index: number) => {
