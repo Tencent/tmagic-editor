@@ -177,11 +177,18 @@ export const compiledNodeField = (value: any, data: DataSourceManagerData) => {
   return value;
 };
 
-export const compliedIteratorItems = (itemData: any, items: MNode[], dsId: string, keys: string[] = []) => {
+export const compliedIteratorItems = (
+  itemData: any,
+  items: MNode[],
+  dsId: string,
+  keys: string[] = [],
+  inEditor = false,
+) => {
   const watcher = new Watcher();
   watcher.addTarget(
     new Target({
       id: dsId,
+      type: 'data-source',
       isTarget: (key: string | number, value: any) => {
         if (`${key}`.startsWith(DSL_NODE_KEY_COPY_PREFIX)) {
           return false;
@@ -192,23 +199,44 @@ export const compliedIteratorItems = (itemData: any, items: MNode[], dsId: strin
     }),
   );
 
+  watcher.addTarget(
+    new Target({
+      id: dsId,
+      type: 'cond',
+      isTarget: (key, value) => {
+        // 使用data-source-field-select value: 'key' 可以配置出来
+        if (!Array.isArray(value) || value[0] !== dsId || !`${key}`.startsWith('displayConds')) return false;
+        return true;
+      },
+    }),
+  );
+
   watcher.collect(items, {}, true);
 
-  const { deps } = watcher.getTarget(dsId);
-  if (!Object.keys(deps).length) {
+  const { deps } = watcher.getTarget(dsId, 'data-source');
+  const { deps: condDeps } = watcher.getTarget(dsId, 'cond');
+
+  if (!Object.keys(deps).length && !Object.keys(condDeps).length) {
     return items;
   }
 
   return items.map((item) => {
+    const ctxData = createIteratorContentData(itemData, dsId, keys);
+
+    if (condDeps[item.id]?.keys.length) {
+      item.condResult = compliedConditions(item, ctxData);
+    }
+
     if (!deps[item.id]?.keys.length) {
       return item;
     }
 
+    if (!inEditor) {
+      item.condResult = compliedConditions(item, itemData);
+    }
+
     return compiledNode(
-      (value: any) => {
-        const ctxData = createIteratorContentData(itemData, dsId, keys);
-        return compiledNodeField(value, ctxData);
-      },
+      (value: any) => compiledNodeField(value, ctxData),
       cloneDeep(item),
       {
         [dsId]: deps,
