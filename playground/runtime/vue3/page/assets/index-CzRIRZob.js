@@ -1,0 +1,2 @@
+import{u as i}from"./useApp-khRuD069.js";const s=["src"],l=Vue.defineComponent({__name:"index",props:{config:{},model:{default:()=>({})}},setup(e){const o=e,c=()=>{o.config.url&&(window.location.href=o.config.url)};return i({config:o.config,methods:{}}),(n,r)=>(Vue.openBlock(),Vue.createElementBlock("img",{class:"magic-ui-img",src:n.config.src,onClick:c},null,8,s))}});export{l as default};
+//# sourceMappingURL=index-CzRIRZob.js.map

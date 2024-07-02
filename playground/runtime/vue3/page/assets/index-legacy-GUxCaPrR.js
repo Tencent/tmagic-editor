@@ -1,0 +1,2 @@
+System.register(["./useApp-legacy-DUlYpSwJ.js"],(function(e,t){"use strict";var n;return{setters:[e=>{n=e.u}],execute:function(){e("default",Vue.defineComponent({__name:"index",props:{config:{},model:{default:()=>({})}},setup:e=>(n({config:e.config,methods:{}}),(e,t)=>(Vue.openBlock(),Vue.createElementBlock("p",null,Vue.toDisplayString(e.config.text),1)))}))}}}));
+//# sourceMappingURL=index-legacy-GUxCaPrR.js.map

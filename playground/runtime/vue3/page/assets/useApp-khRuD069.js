@@ -1,0 +1,2 @@
+const d=({methods:i,config:s})=>{var r;const e=VueDemi.inject("app"),t=(r=e==null?void 0:e.page)==null?void 0:r.getNode(s.id||""),a=VueDemi.computed(()=>e?e.transformStyle(s.style||{}):s.style),n={config:s,...i},l=o=>{if(o.visible===!1||o.condResult===!1)return!1;const u=o.display;return typeof u=="function"?u(e):u!==!1};return t&&(t.emit("created",n),VueDemi.onMounted(()=>{t.emit("mounted",n)}),VueDemi.onBeforeUnmount(()=>{t.emit("destroy",n)})),{app:e,node:t,style:a,display:l}};export{d as u};
+//# sourceMappingURL=useApp-khRuD069.js.map

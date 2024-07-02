@@ -1,0 +1,2 @@
+System.register(["./useApp-legacy-DUlYpSwJ.js"],(function(e,n){"use strict";var c;return{setters:[e=>{c=e.u}],execute:function(){const n=["src"];e("default",Vue.defineComponent({__name:"index",props:{config:{},model:{default:()=>({})}},setup(e){const o=e,t=()=>{o.config.url&&(window.location.href=o.config.url)};return c({config:o.config,methods:{}}),(e,c)=>(Vue.openBlock(),Vue.createElementBlock("img",{class:"magic-ui-img",src:e.config.src,onClick:t},null,8,n))}}))}}}));
+//# sourceMappingURL=index-legacy-NQxyBf3k.js.map

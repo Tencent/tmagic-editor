@@ -1,0 +1,2 @@
+import{u as n}from"./useApp-khRuD069.js";const s={class:"magic-ui-button"},r=Vue.defineComponent({__name:"index",props:{config:{},model:{default:()=>({})}},setup(t){return n({config:t.config,methods:{}}),(e,c)=>(Vue.openBlock(),Vue.createElementBlock("button",s,[Vue.renderSlot(e.$slots,"default",{},()=>{var o;return[Vue.createElementVNode("p",null,Vue.toDisplayString(((o=e.config)==null?void 0:o.text)||""),1)]})]))}});export{r as default};
+//# sourceMappingURL=index-DmhHaABp.js.map

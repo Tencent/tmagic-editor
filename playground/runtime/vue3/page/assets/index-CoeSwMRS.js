@@ -1,0 +1,2 @@
+import{_ as i}from"./Container.vue_vue_type_script_setup_true_lang-cMFEiBjW.js";import{u as r}from"./useApp-khRuD069.js";import"./index-C40sEkw7.js";const p=Vue.defineComponent({__name:"index",props:{config:{},model:{default:()=>({})}},setup(o){const e=o,n=()=>{window.location.reload()};return r({config:e.config,methods:{refresh:n}}),(c,s)=>(Vue.openBlock(),Vue.createBlock(Vue.unref(i),{class:"magic-ui-page",config:c.config},null,8,["config"]))}});export{p as default};
+//# sourceMappingURL=index-CoeSwMRS.js.map

@@ -1,0 +1,2 @@
+System.register(["./useApp-legacy-DUlYpSwJ.js"],(function(e,t){"use strict";var n;return{setters:[e=>{n=e.u}],execute:function(){const t={class:"magic-ui-button"};e("default",Vue.defineComponent({__name:"index",props:{config:{},model:{default:()=>({})}},setup:e=>(n({config:e.config,methods:{}}),(e,n)=>(Vue.openBlock(),Vue.createElementBlock("button",t,[Vue.renderSlot(e.$slots,"default",{},(()=>[Vue.createElementVNode("p",null,Vue.toDisplayString(e.config?.text||""),1)]))])))}))}}}));
+//# sourceMappingURL=index-legacy-zesVL7OQ.js.map
