@@ -1,44 +1,60 @@
 <template>
   <div class="m-editor-data-source-field-select">
-    <TMagicSelect
-      :model-value="selectDataSourceId"
-      clearable
-      filterable
-      :size="size"
-      :disabled="disabled"
-      @change="dsChangeHandler"
-    >
-      <component
-        v-for="option in dataSourcesOptions"
-        class="tmagic-design-option"
-        :key="option.value"
-        :is="optionComponent?.component || 'el-option'"
-        v-bind="
-          optionComponent?.props({
-            label: option.text,
-            value: option.value,
-            disabled: option.disabled,
-          }) || {
-            label: option.text,
-            value: option.value,
-            disabled: option.disabled,
-          }
-        "
+    <template v-if="checkStrictly">
+      <TMagicSelect
+        :model-value="selectDataSourceId"
+        clearable
+        filterable
+        :size="size"
+        :disabled="disabled"
+        @change="dsChangeHandler"
       >
-      </component>
-    </TMagicSelect>
+        <component
+          v-for="option in dataSourcesOptions"
+          class="tmagic-design-option"
+          :key="option.value"
+          :is="optionComponent?.component || 'el-option'"
+          v-bind="
+            optionComponent?.props({
+              label: option.text,
+              value: option.value,
+              disabled: option.disabled,
+            }) || {
+              label: option.text,
+              value: option.value,
+              disabled: option.disabled,
+            }
+          "
+        >
+        </component>
+      </TMagicSelect>
+
+      <TMagicCascader
+        :model-value="selectFieldsId"
+        clearable
+        filterable
+        :size="size"
+        :disabled="disabled"
+        :options="fieldsOptions"
+        :props="{
+          checkStrictly,
+        }"
+        @change="fieldChangeHandler"
+      ></TMagicCascader>
+    </template>
 
     <TMagicCascader
-      :model-value="selectFieldsId"
+      v-else
       clearable
       filterable
-      :size="size"
+      :model-value="modelValue"
       :disabled="disabled"
-      :options="fieldsOptions"
+      :size="size"
+      :options="cascaderOptions"
       :props="{
         checkStrictly,
       }"
-      @change="fieldChangeHandler"
+      @change="onChangeHandler"
     ></TMagicCascader>
 
     <TMagicButton
@@ -132,6 +148,16 @@ const fieldsOptions = computed(() => {
   return getCascaderOptionsFromFields(ds.fields, props.dataSourceFieldType);
 });
 
+const cascaderOptions = computed(() => {
+  const options =
+    dataSources.value?.map((ds) => ({
+      label: ds.title || ds.id,
+      value: valueIsKey.value ? ds.id : `${DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX}${ds.id}`,
+      children: getCascaderOptionsFromFields(ds.fields, props.dataSourceFieldType),
+    })) || [];
+  return options.filter((option) => option.children.length);
+});
+
 const dsChangeHandler = (v: string) => {
   modelValue.value = [v];
   emit('change', modelValue.value);
@@ -140,6 +166,11 @@ const dsChangeHandler = (v: string) => {
 const fieldChangeHandler = (v: string[] = []) => {
   modelValue.value = [selectDataSourceId.value, ...v];
   emit('change', modelValue.value);
+};
+
+const onChangeHandler = (v: string[] = []) => {
+  modelValue.value = v;
+  emit('change', v);
 };
 
 const hasDataSourceSidePanel = computed(() =>
