@@ -1,5 +1,5 @@
 {
-  "version": "1.4.11",
+  "version": "1.4.12",
   "name": "@tmagic/utils",
   "type": "module",
   "main": "dist/tmagic-utils.umd.cjs",

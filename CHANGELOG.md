@@ -1,3 +1,13 @@
+## [1.4.12](https://github.com/Tencent/tmagic-editor/compare/v1.4.11...v1.4.12) (2024-07-02)
+
+
+### Bug Fixes
+
+* **dep:** 数据源源方法依赖收集，数据源类内定义的方法需要被收集 ([c8870c5](https://github.com/Tencent/tmagic-editor/commit/c8870c5c129736c85fb005191501efd6a60665bb))
+* **editor:** 更新容器后，需要将容器内的依赖重新收集 ([aabca93](https://github.com/Tencent/tmagic-editor/commit/aabca93c27a73baf051c4d650224e09553b28f8f))
+
+
+
 ## [1.4.11](https://github.com/Tencent/tmagic-editor/compare/v1.4.10...v1.4.11) (2024-07-02)
 
 
