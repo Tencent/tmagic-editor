@@ -362,7 +362,7 @@ export const initServiceEvents = (
 
   // 节点更新，收集依赖
   const nodeUpdateHandler = (nodes: MNode[]) => {
-    collectIdle(nodes, false);
+    collectIdle(nodes, true);
   };
 
   // 节点删除，清除对齐的依赖收集
