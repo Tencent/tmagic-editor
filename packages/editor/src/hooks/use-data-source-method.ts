@@ -41,7 +41,7 @@ export const useDataSourceMethod = () => {
         return;
       }
 
-      let codeContent = method.content;
+      let codeContent = method.content || `({ params, dataSource, app }) => {\n  // place your code here\n}`;
 
       if (typeof codeContent !== 'string') {
         codeContent = codeContent.toString();

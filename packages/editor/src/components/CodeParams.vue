@@ -44,7 +44,17 @@ const getFormConfig = (items: FormConfig = []) => [
   },
 ];
 
-const codeParamsConfig = computed(() => getFormConfig(props.paramsConfig));
+const codeParamsConfig = computed(() =>
+  getFormConfig(
+    props.paramsConfig.map(({ name, text, extra, ...config }) => ({
+      type: 'data-source-field-select',
+      name,
+      text,
+      extra,
+      fieldConfig: config,
+    })),
+  ),
+);
 
 /**
  * 参数值修改更新
