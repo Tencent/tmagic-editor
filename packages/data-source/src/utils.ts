@@ -223,16 +223,12 @@ export const compliedIteratorItems = (
   return items.map((item) => {
     const ctxData = createIteratorContentData(itemData, dsId, keys);
 
-    if (condDeps[item.id]?.keys.length) {
+    if (condDeps[item.id]?.keys.length && !inEditor) {
       item.condResult = compliedConditions(item, ctxData);
     }
 
     if (!deps[item.id]?.keys.length) {
       return item;
-    }
-
-    if (!inEditor) {
-      item.condResult = compliedConditions(item, itemData);
     }
 
     return compiledNode(

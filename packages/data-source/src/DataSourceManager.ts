@@ -222,7 +222,7 @@ class DataSourceManager extends EventEmitter {
     const [dsId, ...keys] = dataSourceField;
     const ds = this.get(dsId);
     if (!ds) return items;
-    return compliedIteratorItems(itemData, items, dsId, keys, this.app.platform !== 'editor');
+    return compliedIteratorItems(itemData, items, dsId, keys, this.app.platform === 'editor');
   }
 
   public destroy() {
