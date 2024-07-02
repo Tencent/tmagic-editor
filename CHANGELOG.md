@@ -1,3 +1,19 @@
+## [1.4.11](https://github.com/Tencent/tmagic-editor/compare/v1.4.10...v1.4.11) (2024-07-02)
+
+
+### Bug Fixes
+
+* **editor:** 迭代器容器子项条件配置中值输入类型 ([022c10f](https://github.com/Tencent/tmagic-editor/commit/022c10f2df9bc8ac904487ac9bc7b431873b8588))
+* **form:** 修复 grouplist 添加项时没有调用 changeHandler 的问题 ([c089ada](https://github.com/Tencent/tmagic-editor/commit/c089adae9e377d49d62adec23394e32a737cbb6e))
+
+
+### Features
+
+* **data-source:** 迭代器容器内容支持显示条件配置 ([ecfaff2](https://github.com/Tencent/tmagic-editor/commit/ecfaff2e0d4a14e41cf7fe4f2cc51377da401f52))([882d222](https://github.com/Tencent/tmagic-editor/commit/882d222800c532dd70f343f1b5b13c994d02551c))
+* **editor:** 优化数据源字段选择器交互 ([ef04fd3](https://github.com/Tencent/tmagic-editor/commit/ef04fd31f0a348070c5e42b5c7c5caa724066b21)) ([6cdeaa0](https://github.com/Tencent/tmagic-editor/commit/6cdeaa0c1bd8b5c379153dd32136e4244c7e2a2b))
+
+
+
 ## [1.4.10](https://github.com/Tencent/tmagic-editor/compare/v1.4.9...v1.4.10) (2024-06-28)
 
 
