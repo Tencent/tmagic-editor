@@ -189,7 +189,7 @@ export const createDataSourceMethodTarget = (ds: DataSourceSchema, initialDeps: 
       // 使用data-source-method-select 可以配置出来
       if (!Array.isArray(value) || value[0] !== ds.id) return false;
 
-      return Boolean(ds?.methods?.find((method) => method.name === value[1]));
+      return true;
     },
   });
 
