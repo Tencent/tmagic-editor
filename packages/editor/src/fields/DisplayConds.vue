@@ -8,6 +8,7 @@
     :last-values="lastValues"
     :prop="prop"
     :size="size"
+    @change="changeHandler"
   ></MGroupList>
 </template>
 
@@ -22,6 +23,7 @@ import {
   type GroupListConfig,
   MGroupList,
 } from '@tmagic/form';
+import type { DisplayCond } from '@tmagic/schema';
 
 import type { Services } from '@editor/type';
 import { getCascaderOptionsFromFields } from '@editor/utils';
@@ -29,6 +31,10 @@ import { getCascaderOptionsFromFields } from '@editor/utils';
 defineOptions({
   name: 'm-fields-display-conds',
 });
+
+const emit = defineEmits<{
+  change: [value: DisplayCond[]];
+}>();
 
 const props = withDefaults(
   defineProps<
@@ -93,12 +99,12 @@ const config = computed<GroupListConfig>(() => ({
           type: 'cond-op-select',
           parentFields: parentFields.value,
           label: '条件',
-          width: 100,
+          width: 160,
           name: 'op',
         },
         {
           label: '值',
-          width: 100,
+          width: 160,
           items: [
             {
               name: 'value',
@@ -142,4 +148,8 @@ const config = computed<GroupListConfig>(() => ({
     },
   ],
 }));
+
+const changeHandler = (v: DisplayCond[]) => {
+  emit('change', v);
+};
 </script>
