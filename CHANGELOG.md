@@ -1,3 +1,13 @@
+## [1.4.13](https://github.com/Tencent/tmagic-editor/compare/v1.4.12...v1.4.13) (2024-07-04)
+
+
+### Bug Fixes
+
+* **data-source:** 按需加载数据源时需要分享数据源方法依赖 ([1e93e9b](https://github.com/Tencent/tmagic-editor/commit/1e93e9bacce4ec52c96b82c9af1433b6e1f17195))
+* **editor:** 修复新增第一个显示条件时会重置表单状态 ([eb376b2](https://github.com/Tencent/tmagic-editor/commit/eb376b261baa0dd6bee1f63c02c4d52fbf93cb41))
+
+
+
 ## [1.4.12](https://github.com/Tencent/tmagic-editor/compare/v1.4.11...v1.4.12) (2024-07-02)
 
 

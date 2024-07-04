@@ -1,5 +1,5 @@
 {
-  "version": "1.4.12",
+  "version": "1.4.13",
   "name": "@tmagic/ui-vue2",
   "type": "module",
   "main": "src/index.ts",
