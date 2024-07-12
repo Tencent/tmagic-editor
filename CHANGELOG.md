@@ -1,3 +1,12 @@
+## [1.4.14](https://github.com/Tencent/tmagic-editor/compare/v1.4.13...v1.4.14) (2024-07-12)
+
+
+### Bug Fixes
+
+* **data-source:** 迭代条件条件组编译逻辑不对 ([1fc04b4](https://github.com/Tencent/tmagic-editor/commit/1fc04b44641df1c478fb6bf5236752e43ead830f))
+
+
+
 ## [1.4.13](https://github.com/Tencent/tmagic-editor/compare/v1.4.12...v1.4.13) (2024-07-04)
 
 
