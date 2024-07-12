@@ -85,7 +85,9 @@ export const compliedIteratorItemConditions = (displayConds: DisplayCond[] = [],
       }
     }
 
-    return result;
+    if (result) {
+      return result;
+    }
   }
 
   return false;
