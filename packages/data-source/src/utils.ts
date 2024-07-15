@@ -1,7 +1,7 @@
 import { cloneDeep, template } from 'lodash-es';
 
 import { isDataSourceTemplate, isUseDataSourceField, Target, Watcher } from '@tmagic/dep';
-import type { DisplayCond, DisplayCondItem, MApp, MNode, MPage, MPageFragment } from '@tmagic/schema';
+import type { DepData, DisplayCond, DisplayCondItem, MApp, MNode, MPage, MPageFragment } from '@tmagic/schema';
 import {
   compiledCond,
   compiledNode,
@@ -109,8 +109,14 @@ export const updateNode = (node: MNode, dsl: MApp) => {
  * @param fields dsl节点字段，如a.b.c
  * @returns 数据上下文
  */
-export const createIteratorContentData = (itemData: any, dsId: string, fields: string[] = []) => {
+export const createIteratorContentData = (
+  itemData: any,
+  dsId: string,
+  fields: string[] = [],
+  dsData: DataSourceManagerData = {},
+) => {
   const data = {
+    ...dsData,
     [dsId]: {},
   };
 
@@ -184,6 +190,7 @@ export const compliedIteratorItems = (
   items: MNode[],
   dsId: string,
   keys: string[] = [],
+  data: DataSourceManagerData,
   inEditor = false,
 ) => {
   const watcher = new Watcher();
@@ -222,26 +229,67 @@ export const compliedIteratorItems = (
     return items;
   }
 
-  return items.map((item) => {
-    const ctxData = createIteratorContentData(itemData, dsId, keys);
+  return items.map((item) => compliedIteratorItem({ itemData, data, dsId, keys, inEditor, condDeps, item, deps }));
+};
 
-    if (condDeps[item.id]?.keys.length && !inEditor) {
-      item.condResult = compliedConditions(item, ctxData);
+const compliedIteratorItem = ({
+  itemData,
+  data,
+  dsId,
+  keys,
+  inEditor,
+  condDeps,
+  item,
+  deps,
+}: {
+  itemData: any;
+  data: DataSourceManagerData;
+  dsId: string;
+  keys: string[];
+  inEditor: boolean;
+  condDeps: DepData;
+  item: MNode;
+  deps: DepData;
+}) => {
+  const { items, ...node } = item;
+  const newNode = cloneDeep(node);
+
+  if (items && !item.iteratorData) {
+    newNode.items = Array.isArray(items)
+      ? items.map((item) => compliedIteratorItem({ itemData, data, dsId, keys, inEditor, condDeps, item, deps }))
+      : items;
+  }
+
+  if (Array.isArray(items) && items.length) {
+    if (item.iteratorData) {
+      newNode.items = items;
+    } else {
+      newNode.items = items.map((item) =>
+        compliedIteratorItem({ itemData, data, dsId, keys, inEditor, condDeps, item, deps }),
+      );
     }
+  } else {
+    newNode.items = items;
+  }
 
-    if (!deps[item.id]?.keys.length) {
-      return item;
-    }
+  const ctxData = createIteratorContentData(itemData, dsId, keys, data);
 
-    return compiledNode(
-      (value: any) => compiledNodeField(value, ctxData),
-      cloneDeep(item),
-      {
-        [dsId]: deps,
-      },
-      dsId,
-    );
-  });
+  if (condDeps[newNode.id]?.keys.length && !inEditor) {
+    newNode.condResult = compliedConditions(newNode, ctxData);
+  }
+
+  if (!deps[newNode.id]?.keys.length) {
+    return newNode;
+  }
+
+  return compiledNode(
+    (value: any) => compiledNodeField(value, ctxData),
+    newNode,
+    {
+      [dsId]: deps,
+    },
+    dsId,
+  );
 };
 
 /**
