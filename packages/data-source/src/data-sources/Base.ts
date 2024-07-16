@@ -122,6 +122,10 @@ export default class DataSource<T extends DataSourceSchema = DataSourceSchema> e
     this.emit('change', changeEvent);
   }
 
+  public setValue(path: string, data: any) {
+    return this.setData(data, path);
+  }
+
   public onDataChange(path: string, callback: (newVal: any) => void) {
     this.#observedData.on(path, callback);
   }
