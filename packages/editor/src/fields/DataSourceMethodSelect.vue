@@ -91,7 +91,7 @@ const getParamItemsConfig = ([dataSourceId, methodName]: [Id, string] = ['', '']
   }));
 };
 
-const paramsConfig = ref<CodeParamStatement[]>(getParamItemsConfig(props.model.dataSourceMethod));
+const paramsConfig = ref<CodeParamStatement[]>(getParamItemsConfig(props.model[props.name || 'dataSourceMethod']));
 
 const setParamsConfig = (dataSourceMethod: [Id, string], formState: any = {}) => {
   // 通过下拉框选择的codeId变化后修正model的值，避免写入其他codeId的params
