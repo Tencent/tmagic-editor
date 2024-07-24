@@ -162,6 +162,15 @@
   </template>
 </demo-block>
 
+同时在 `src/main.ts` 中需要自定义实现请求
+```typescript 
+app.use(MagicForm, {
+      request: async (options: any) =>  {
+           // 自定义请求实现
+      },
+});
+```
+
 :::tip
 如果 Select 的绑定值为对象类型，请务必指定 valueKey 作为它的唯一性标识。
 :::
