@@ -10,6 +10,7 @@ const dragState: {
   dragOverNodeId: Id;
   dropType: NodeDropType | '';
   container: HTMLElement | null;
+  nodeId?: Id;
 } = {
   dragOverNodeId: '',
   dropType: '',
@@ -50,6 +51,7 @@ export const useDrag = (services: Services | undefined) => {
     if (!targetEl || targetEl !== event.currentTarget) return;
 
     event.dataTransfer.effectAllowed = 'move';
+    dragState.nodeId = targetEl.dataset.nodeId;
 
     try {
       event.dataTransfer.setData(
@@ -70,30 +72,52 @@ export const useDrag = (services: Services | undefined) => {
     const labelEl = targetEl.children[0];
     if (!labelEl) return;
 
+    removeClassName(labelEl, 'drag-before', 'drag-after', 'drag-inner');
+
     const { top: targetTop, height: targetHeight } = labelEl.getBoundingClientRect();
 
     const distance = event.clientY - targetTop;
     const isContainer = targetEl.dataset.isContainer === 'true';
 
+    const targetNodeId = targetEl.dataset.nodeId;
+    const { nodeId } = dragState;
+    const parentsId = targetEl.dataset.parentsId?.split(',');
+
+    if (!targetNodeId) {
+      return;
+    }
+
+    // 如果是悬浮在拖动的节点上方，则不响应
+    if (parentsId) {
+      let targetIdIndex = -1;
+      for (let i = 0, l = parentsId.length; i < l; i++) {
+        const id = parentsId[i];
+        if (nodeId === id) {
+          targetIdIndex = i;
+        }
+
+        if (parentsId.includes(`${nodeId}`) && i >= targetIdIndex) {
+          return;
+        }
+      }
+    }
+
     if (distance < targetHeight / 3) {
       dragState.dropType = 'before';
       addClassName(labelEl, globalThis.document, 'drag-before');
-      removeClassName(labelEl, 'drag-after', 'drag-inner');
     } else if (distance > (targetHeight * 2) / 3) {
       dragState.dropType = 'after';
       addClassName(labelEl, globalThis.document, 'drag-after');
-      removeClassName(labelEl, 'drag-before', 'drag-inner');
     } else if (isContainer) {
       dragState.dropType = 'inner';
       addClassName(labelEl, globalThis.document, 'drag-inner');
-      removeClassName(labelEl, 'drag-before', 'drag-after');
     }
 
     if (!dragState.dropType) {
       return;
     }
 
-    dragState.dragOverNodeId = targetEl.dataset.nodeId || '';
+    dragState.dragOverNodeId = targetNodeId;
     dragState.container = event.currentTarget as HTMLElement;
 
     event.preventDefault();

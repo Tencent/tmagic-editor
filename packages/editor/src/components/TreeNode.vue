@@ -4,6 +4,8 @@
     class="m-editor-tree-node"
     :draggable="draggable"
     :data-node-id="data.id"
+    :data-parent-id="parent?.id"
+    :data-parents-id="parentsId"
     :data-is-container="Array.isArray(data.items)"
     @dragstart="handleDragStart"
     @dragleave="handleDragLeave"
@@ -40,6 +42,8 @@
         v-for="item in data.items"
         :key="item.id"
         :data="item"
+        :parent="data"
+        :parentsId="[...parentsId, data.id]"
         :node-status-map="nodeStatusMap"
         :indent="indent + 11"
       >
@@ -91,11 +95,14 @@ const treeEmit = inject<typeof emit>('treeEmit');
 const props = withDefaults(
   defineProps<{
     data: TreeNodeData;
+    parent?: TreeNodeData;
+    parentsId?: Id[];
     nodeStatusMap: Map<Id, LayerNodeStatus>;
     indent?: number;
   }>(),
   {
     indent: 0,
+    parentsId: () => [],
   },
 );
 

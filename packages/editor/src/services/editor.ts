@@ -899,9 +899,20 @@ class Editor extends BaseService {
 
     const newLayout = await this.getLayout(targetParent);
 
-    for (const config of configs) {
+    // eslint-disable-next-line no-restricted-syntax
+    forConfigs: for (const config of configs) {
       const { parent, node: curNode } = this.getNodeInfo(config.id, false);
-      if (!parent || !curNode) throw new Error('找不要删除的节点');
+      if (!parent || !curNode) {
+        continue;
+      }
+
+      const path = getNodePath(curNode.id, parent.items);
+
+      for (const node of path) {
+        if (targetParent.id === node.id) {
+          continue forConfigs;
+        }
+      }
 
       const index = getNodeIndex(curNode.id, parent);
 
