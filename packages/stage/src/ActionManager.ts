@@ -567,6 +567,7 @@ export default class ActionManager extends EventEmitter {
       if (!this.disabledMultiSelect) {
         this.isMultiSelectStatus = false;
       }
+      this.isAltKeydown = false;
     });
     KeyController.global.keyup(ctrl, (e) => {
       e.inputEvent.preventDefault();
