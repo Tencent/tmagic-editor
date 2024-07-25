@@ -2,31 +2,34 @@
   <TMagicScrollbar>
     <slot name="component-list-panel-header"></slot>
 
-    <TMagicCollapse class="ui-component-panel" :model-value="collapseValue">
-      <SearchInput @search="filterTextChangeHandler"></SearchInput>
-      <template v-for="(group, index) in list">
-        <TMagicCollapseItem v-if="group.items && group.items.length" :key="index" :name="`${index}`">
-          <template #title><MIcon :icon="Grid"></MIcon>{{ group.title }}</template>
-          <div
-            v-for="item in group.items"
-            class="component-item"
-            draggable="true"
-            :key="item.type"
-            @click="appendComponent(item)"
-            @dragstart="dragstartHandler(item, $event)"
-            @dragend="dragendHandler"
-            @drag="dragHandler"
-          >
-            <slot name="component-list-item" :component="item">
-              <TMagicTooltip placement="right" :disabled="!Boolean(item.desc)" :content="item.desc">
-                <MIcon :icon="item.icon"></MIcon>
-              </TMagicTooltip>
-              <span :title="item.text">{{ item.text }}</span>
-            </slot>
-          </div>
-        </TMagicCollapseItem>
-      </template>
-    </TMagicCollapse>
+    <SearchInput @search="filterTextChangeHandler"></SearchInput>
+
+    <slot name="component-list" :component-group-list="list">
+      <TMagicCollapse class="ui-component-panel" :model-value="collapseValue">
+        <template v-for="(group, index) in list">
+          <TMagicCollapseItem v-if="group.items && group.items.length" :key="index" :name="`${index}`">
+            <template #title><MIcon :icon="Grid"></MIcon>{{ group.title }}</template>
+            <div
+              v-for="item in group.items"
+              class="component-item"
+              draggable="true"
+              :key="item.type"
+              @click="appendComponent(item)"
+              @dragstart="dragstartHandler(item, $event)"
+              @dragend="dragendHandler"
+              @drag="dragHandler"
+            >
+              <slot name="component-list-item" :component="item">
+                <TMagicTooltip placement="right" :disabled="!Boolean(item.desc)" :content="item.desc">
+                  <MIcon :icon="item.icon"></MIcon>
+                </TMagicTooltip>
+                <span :title="item.text">{{ item.text }}</span>
+              </slot>
+            </div>
+          </TMagicCollapseItem>
+        </template>
+      </TMagicCollapse>
+    </slot>
   </TMagicScrollbar>
 </template>
 
@@ -65,8 +68,8 @@ const services = inject<Services>('services');
 const stageOptions = inject<StageOptions>('stageOptions');
 
 const stage = computed(() => services?.editorService.get('stage'));
-const list = computed(() =>
-  services?.componentListService.getList().map((group: ComponentGroup) => ({
+const list = computed<ComponentGroup[]>(() =>
+  (services?.componentListService.getList() || []).map((group: ComponentGroup) => ({
     ...group,
     items: group.items.filter((item: ComponentItem) => item.text.includes(searchText.value)),
   })),

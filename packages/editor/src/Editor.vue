@@ -33,6 +33,10 @@
             <slot name="layer-node-tool" :data="data"></slot>
           </template>
 
+          <template #component-list="{ componentGroupList }">
+            <slot name="component-list" :component-group-list="componentGroupList"></slot>
+          </template>
+
           <template #component-list-panel-header>
             <slot name="component-list-panel-header"></slot>
           </template>

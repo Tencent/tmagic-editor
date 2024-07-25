@@ -30,6 +30,18 @@
         v-on="config?.listeners || {}"
       >
         <template
+          #component-list="{ componentGroupList }"
+          v-if="config.$key === 'component-list' || config.slots?.componentList"
+        >
+          <slot
+            v-if="config.$key === 'component-list'"
+            name="component-list"
+            :component-group-list="componentGroupList"
+          ></slot>
+          <component v-else-if="config.slots?.componentList" :is="config.slots.componentList" />
+        </template>
+
+        <template
           #component-list-panel-header
           v-if="config.$key === 'component-list' || config.slots?.componentListPanelHeader"
         >

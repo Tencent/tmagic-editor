@@ -81,6 +81,7 @@ export interface WorkspaceSlots {
 
 export interface ComponentListPanelSlots {
   'component-list-panel-header'(props: {}): any;
+  'component-list'(props: { componentGroupList: ComponentGroup[] }): any;
   'component-list-item'(props: { component: ComponentItem }): any;
 }
 
