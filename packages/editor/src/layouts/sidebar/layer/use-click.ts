@@ -2,6 +2,7 @@ import { computed, type ComputedRef, nextTick, type Ref, ref } from 'vue';
 import { throttle } from 'lodash-es';
 
 import { Id, MNode } from '@tmagic/schema';
+import { isPage, isPageFragment } from '@tmagic/utils';
 
 import { LayerNodeStatus, Services, TreeNodeData, UI_SELECT_MODE_EVENT_NAME } from '@editor/type';
 import { updateStatus } from '@editor/utils/tree';
@@ -31,6 +32,10 @@ export const useClick = (
   };
 
   const multiSelect = async (data: MNode) => {
+    if (isPage(data) || isPageFragment(data)) {
+      return;
+    }
+
     const nodes = services?.editorService.get('nodes') || [];
 
     const newNodes: Id[] = [];
@@ -38,6 +43,10 @@ export const useClick = (
     nodes.forEach((node) => {
       if (node.id === data.id) {
         isCancel = true;
+        return;
+      }
+
+      if (isPage(node) || isPageFragment(node)) {
         return;
       }
 
