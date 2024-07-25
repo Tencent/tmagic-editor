@@ -385,6 +385,10 @@ export interface SideComponent extends MenuComponent {
   icon?: any;
   /** slide 唯一标识 key */
   $key: string;
+  /** 是否可以将面板拖出，默认为true */
+  draggable?: boolean;
+  /** 点击切换tab前调用，返回false阻止切换 */
+  beforeClick?: (config: SideComponent) => boolean | Promise<boolean>;
 
   /** 组件扩展参数 */
   boxComponentConfig?: {

@@ -53,7 +53,7 @@ import type { MNode } from '@tmagic/schema';
 import SearchInput from '@editor/components/SearchInput.vue';
 import Tree from '@editor/components/Tree.vue';
 import { useFilter } from '@editor/hooks/use-filter';
-import { LayerPanelSlots, MenuButton, MenuComponent, Services, TreeNodeData } from '@editor/type';
+import type { LayerPanelSlots, MenuButton, MenuComponent, Services, TreeNodeData } from '@editor/type';
 
 import LayerMenu from './LayerMenu.vue';
 import LayerNodeTool from './LayerNodeTool.vue';
