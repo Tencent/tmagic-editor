@@ -57,13 +57,11 @@
       @change="onChangeHandler"
     ></TMagicCascader>
 
-    <TMagicButton
-      v-if="selectDataSourceId && hasDataSourceSidePanel"
-      class="m-fields-select-action-button"
-      :size="size"
-      @click="editHandler(selectDataSourceId)"
-      ><MIcon :icon="!notEditable ? Edit : View"></MIcon
-    ></TMagicButton>
+    <TMagicTooltip v-if="selectDataSourceId && hasDataSourceSidePanel" :content="notEditable ? '查看' : '编辑'">
+      <TMagicButton class="m-fields-select-action-button" :size="size" @click="editHandler(selectDataSourceId)"
+        ><MIcon :icon="!notEditable ? Edit : View"></MIcon
+      ></TMagicButton>
+    </TMagicTooltip>
   </div>
 </template>
 
@@ -71,7 +69,13 @@
 import { computed, inject, ref, watch } from 'vue';
 import { Edit, View } from '@element-plus/icons-vue';
 
-import { getConfig as getDesignConfig, TMagicButton, TMagicCascader, TMagicSelect } from '@tmagic/design';
+import {
+  getConfig as getDesignConfig,
+  TMagicButton,
+  TMagicCascader,
+  TMagicSelect,
+  TMagicTooltip,
+} from '@tmagic/design';
 import { type FilterFunction, filterFunction, type FormState, type SelectOption } from '@tmagic/form';
 import { DataSourceFieldType } from '@tmagic/schema';
 import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX } from '@tmagic/utils';

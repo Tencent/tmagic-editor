@@ -11,13 +11,11 @@
       @change="changeHandler"
     ></MSelect>
 
-    <TMagicButton
-      v-if="model[name] && hasDataSourceSidePanel"
-      class="m-fields-select-action-button"
-      :size="size"
-      @click="editHandler"
-      ><MIcon :icon="!notEditable ? Edit : View"></MIcon
-    ></TMagicButton>
+    <TMagicTooltip v-if="model[name] && hasDataSourceSidePanel" :content="notEditable ? '查看' : '编辑'">
+      <TMagicButton class="m-fields-select-action-button" :size="size" @click="editHandler"
+        ><MIcon :icon="!notEditable ? Edit : View"></MIcon
+      ></TMagicButton>
+    </TMagicTooltip>
   </div>
 </template>
 
@@ -25,7 +23,7 @@
 import { computed, inject } from 'vue';
 import { Edit, View } from '@element-plus/icons-vue';
 
-import { TMagicButton } from '@tmagic/design';
+import { TMagicButton, TMagicTooltip } from '@tmagic/design';
 import { type FieldProps, filterFunction, type FormState, MSelect, type SelectConfig } from '@tmagic/form';
 
 import MIcon from '@editor/components/Icon.vue';

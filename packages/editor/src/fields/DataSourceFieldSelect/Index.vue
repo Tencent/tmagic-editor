@@ -26,14 +26,15 @@
       @change="onChangeHandler"
     ></component>
 
-    <TMagicButton
-      v-if="config.fieldConfig"
-      style="margin-left: 5px"
-      :type="showDataSourceFieldSelect ? 'primary' : 'default'"
-      :size="size"
-      @click="showDataSourceFieldSelect = !showDataSourceFieldSelect"
-      ><MIcon :icon="Coin"></MIcon
-    ></TMagicButton>
+    <TMagicTooltip v-if="config.fieldConfig" :disabled="showDataSourceFieldSelect" content="选择数据源">
+      <TMagicButton
+        style="margin-left: 5px"
+        :type="showDataSourceFieldSelect ? 'primary' : 'default'"
+        :size="size"
+        @click="showDataSourceFieldSelect = !showDataSourceFieldSelect"
+        ><MIcon :icon="Coin"></MIcon
+      ></TMagicButton>
+    </TMagicTooltip>
   </div>
 </template>
 
@@ -41,7 +42,7 @@
 import { computed, inject, ref, resolveComponent, watch } from 'vue';
 import { Coin } from '@element-plus/icons-vue';
 
-import { TMagicButton, tMagicMessage } from '@tmagic/design';
+import { TMagicButton, tMagicMessage, TMagicTooltip } from '@tmagic/design';
 import type { FieldProps, FormState } from '@tmagic/form';
 import { DataSchema } from '@tmagic/schema';
 import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX } from '@tmagic/utils';

@@ -9,14 +9,14 @@
         @change="onChangeHandler"
       ></MContainer>
 
-      <TMagicButton
+      <TMagicTooltip
         v-if="model[name] && isCustomMethod && hasDataSourceSidePanel"
-        class="m-fields-select-action-button"
-        :size="size"
-        @click="editCodeHandler"
+        :content="notEditable ? '查看' : '编辑'"
       >
-        <MIcon :icon="!notEditable ? Edit : View"></MIcon>
-      </TMagicButton>
+        <TMagicButton class="m-fields-select-action-button" :size="size" @click="editCodeHandler">
+          <MIcon :icon="!notEditable ? Edit : View"></MIcon>
+        </TMagicButton>
+      </TMagicTooltip>
     </div>
 
     <CodeParams
@@ -35,7 +35,7 @@
 import { computed, inject, ref } from 'vue';
 import { Edit, View } from '@element-plus/icons-vue';
 
-import { TMagicButton } from '@tmagic/design';
+import { TMagicButton, TMagicTooltip } from '@tmagic/design';
 import { createValues, type FieldProps, filterFunction, type FormState, MContainer } from '@tmagic/form';
 import type { Id } from '@tmagic/schema';
 
