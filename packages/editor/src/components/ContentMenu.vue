@@ -38,6 +38,8 @@
 <script lang="ts" setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 
+import { useZIndex } from '@tmagic/design';
+
 import { MenuButton, MenuComponent } from '@editor/type';
 
 import ToolButton from './ToolButton.vue';
@@ -71,6 +73,8 @@ const buttons = ref<InstanceType<typeof ToolButton>[]>();
 const subMenu = ref<any>();
 const visible = ref(false);
 const subMenuData = ref<(MenuButton | MenuComponent)[]>([]);
+const zIndex = useZIndex();
+const curZIndex = ref<number>(0);
 
 const menuPosition = ref({
   left: 0,
@@ -80,6 +84,7 @@ const menuPosition = ref({
 const menuStyle = computed(() => ({
   top: `${menuPosition.value.top}px`,
   left: `${menuPosition.value.left}px`,
+  zIndex: curZIndex.value,
 }));
 
 const contains = (el: HTMLElement) => menu.value?.contains(el) || subMenu.value?.contains(el);
@@ -127,12 +132,14 @@ const setPosition = (e: { clientY: number; clientX: number }) => {
 };
 
 const show = (e?: { clientY: number; clientX: number }) => {
-  // 加settimeout是以为，如果菜单中的按钮监听的是mouseup，那么菜单显示出来时鼠标如果正好在菜单上就会马上触发按钮的mouseup
+  // 加setTimeout是以为，如果菜单中的按钮监听的是mouseup，那么菜单显示出来时鼠标如果正好在菜单上就会马上触发按钮的mouseup
   setTimeout(() => {
     visible.value = true;
 
     nextTick(() => {
       e && setPosition(e);
+
+      curZIndex.value = zIndex.nextZIndex();
 
       emit('show');
     });
