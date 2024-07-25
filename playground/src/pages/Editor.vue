@@ -59,7 +59,7 @@ import {
   type Services,
   TMagicEditor,
 } from '@tmagic/editor';
-import type { MContainer, MNode } from '@tmagic/schema';
+import type { MApp, MContainer, MNode } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 import type { CustomizeMoveableOptionsCallbackConfig } from '@tmagic/stage';
 import { asyncLoadJs, calcValueByFontsize } from '@tmagic/utils';
@@ -78,7 +78,7 @@ const editor = ref<InstanceType<typeof TMagicEditor>>();
 const deviceGroup = ref<InstanceType<typeof DeviceGroup>>();
 const iframe = ref<HTMLIFrameElement>();
 const previewVisible = ref(false);
-const value = ref(dsl);
+const value = ref<MApp>(dsl);
 const defaultSelected = ref(dsl.items[0].id);
 const propsValues = ref<Record<string, any>>({});
 const propsConfigs = ref<Record<string, any>>({});
@@ -101,6 +101,7 @@ const previewUrl = computed(
 );
 
 const collectorOptions = {
+  id: '',
   name: '蒙层',
   isTarget: (key: string | number, value: any) =>
     typeof key === 'string' && typeof value === 'string' && key.includes('events') && value.startsWith('overlay_'),

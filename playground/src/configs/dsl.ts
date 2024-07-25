@@ -16,11 +16,12 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-export default {
-  id: '75f0extui9d7yksklx27hff8xg',
+import { ActionType, type MApp, NodeType } from '@tmagic/schema';
+
+const dsl: MApp = {
+  id: '1',
   name: 'test',
-  type: 'app',
+  type: NodeType.ROOT,
   codeBlocks: {
     code_5336: {
       name: 'getData',
@@ -50,7 +51,7 @@ export default {
   },
   items: [
     {
-      type: 'page',
+      type: NodeType.PAGE,
       id: 'page_299',
       name: 'index',
       title: '',
@@ -76,7 +77,7 @@ export default {
           name: 'magic:common:events:click', // 事件名
           actions: [
             {
-              actionType: 'code', // 联动动作类型
+              actionType: ActionType.CODE, // 联动动作类型
               codeId: 'code_5336', // 代码块id
               params: {
                 age: 12, // 参数
@@ -88,7 +89,7 @@ export default {
           name: 'magic:common:events:click', // 事件名
           actions: [
             {
-              actionType: 'code', // 联动动作类型
+              actionType: ActionType.CODE, // 联动动作类型
               codeId: 'code_5316', // 代码块id
               params: {},
             },
@@ -220,7 +221,7 @@ export default {
               name: 'magic:common:events:click',
               actions: [
                 {
-                  actionType: 'comp',
+                  actionType: ActionType.COMP,
                   to: 'overlay_2159',
                   method: 'openOverlay',
                 },
@@ -421,7 +422,7 @@ export default {
         },
       ],
       methods: [],
-      events: '',
+      events: [],
       mocks: [],
       beforeRequest: '',
       afterResponse: '',
@@ -456,7 +457,7 @@ export default {
           },
         },
       ],
-      events: '',
+      events: [],
       mocks: [],
       beforeRequest: '',
       afterResponse: '',
@@ -471,3 +472,5 @@ export default {
     },
   },
 };
+
+export default dsl;
