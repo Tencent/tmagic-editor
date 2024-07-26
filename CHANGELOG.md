@@ -1,3 +1,26 @@
+## [1.4.15](https://github.com/Tencent/tmagic-editor/compare/v1.4.14...v1.4.15) (2024-07-26)
+
+
+### Bug Fixes
+
+* **data-source:** 迭代器数据编译支持容器嵌套 ([e209aa3](https://github.com/Tencent/tmagic-editor/commit/e209aa36e88ff567932e6374cae37097c19b6883))
+* **editor:** 在组件树中多选时不能选中页面 ([c456798](https://github.com/Tencent/tmagic-editor/commit/c45679875162069033096b307c06320346798d76))
+* **editor:** 数据源方法配置，设置后再次修改参数配置不显示 ([059c005](https://github.com/Tencent/tmagic-editor/commit/059c0056c4e9d3ef7f247e3ed19c3c02fd84b65f))
+* **editor:** 组件树中将容器拖入自身中会导致容器丢失 ([16d4eff](https://github.com/Tencent/tmagic-editor/commit/16d4eff3859923c44cb9662210538c5ff47d793d)), closes [#622](https://github.com/Tencent/tmagic-editor/issues/622)
+* **editor:** 组件树右键菜单在组件树面板拖出时被面板遮挡 ([72a7c15](https://github.com/Tencent/tmagic-editor/commit/72a7c151e9d5f40393f94870d550a917adac41c8)), closes [#624](https://github.com/Tencent/tmagic-editor/issues/624)
+* **stage:** 页面失焦时将alt键按下状态重置 ([96224b4](https://github.com/Tencent/tmagic-editor/commit/96224b4d9254b6584dd0bb48ae1acc144cc00783))
+
+
+### Features
+
+* **data-source:** 数据源新增setValue方法 ([8d111ea](https://github.com/Tencent/tmagic-editor/commit/8d111ea976c397e70b6040e034ed6f85a49bc4b3))
+* **editor:** 优化编辑器左边栏拖出体验，需要拖出一定距离才行 ([b249563](https://github.com/Tencent/tmagic-editor/commit/b249563f9442023d66180f5396649277889cf69c))
+* **editor:** 数据源选择器编辑按钮添加tooltip ([3fa21fd](https://github.com/Tencent/tmagic-editor/commit/3fa21fd3eb91882e40e84a59b8b5e541876b9c92))
+* **editor:** 添加component-list slot，用于自定义组件列表 ([0bbf7c5](https://github.com/Tencent/tmagic-editor/commit/0bbf7c564394a56bb6c99572240bba23b4e2919d)), closes [#621](https://github.com/Tencent/tmagic-editor/issues/621)
+* **editor:** 编辑器左边栏支持配置不可拖出，支持before-click函数配置 ([837daf6](https://github.com/Tencent/tmagic-editor/commit/837daf6cabcaa6110b99b020288097f25d8c05b9))
+
+
+
 ## [1.4.14](https://github.com/Tencent/tmagic-editor/compare/v1.4.13...v1.4.14) (2024-07-12)
 
 

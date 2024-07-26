@@ -1,6 +1,6 @@
 {
   "name": "runtime-vue2",
-  "version": "1.4.14",
+  "version": "1.4.15",
   "type": "module",
   "private": true,
   "scripts": {
@@ -19,12 +19,12 @@
     "build:ds:event": "vite build --config build.vite.config.ts --mode ds:event"
   },
   "dependencies": {
-    "@tmagic/core": "1.4.14",
-    "@tmagic/data-source": "1.4.14",
-    "@tmagic/ui-vue2": "1.4.14",
-    "@tmagic/schema": "1.4.14",
-    "@tmagic/stage": "1.4.14",
-    "@tmagic/utils": "1.4.14",
+    "@tmagic/core": "1.4.15",
+    "@tmagic/data-source": "1.4.15",
+    "@tmagic/ui-vue2": "1.4.15",
+    "@tmagic/schema": "1.4.15",
+    "@tmagic/stage": "1.4.15",
+    "@tmagic/utils": "1.4.15",
     "@tmagic/vue-runtime-help": "^0.0.7",
     "axios": "^0.25.0",
     "terser": "^5.31.0",
