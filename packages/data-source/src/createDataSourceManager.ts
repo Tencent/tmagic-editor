@@ -17,7 +17,7 @@
  */
 import { union } from 'lodash-es';
 
-import type { AppCore } from '@tmagic/schema';
+import type { TMagicApp } from '@tmagic/schema';
 import { getDepNodeIds, getNodes, isPage } from '@tmagic/utils';
 
 import DataSourceManager from './DataSourceManager';
@@ -26,12 +26,12 @@ import { updateNode } from './utils';
 
 /**
  * 创建数据源管理器
- * @param app AppCore
- * @param useMock 是否使用mock数据
- * @param initialData 初始化数据，ssr数据可以由此传入
- * @returns DataSourceManager | undefined
+ * @param {TMagicApp} app
+ * @param {boolean} useMock 是否使用mock数据
+ * @param {DataSourceManagerData} initialData 初始化数据，ssr数据可以由此传入
+ * @returns {DataSourceManager | undefined}
  */
-export const createDataSourceManager = (app: AppCore, useMock?: boolean, initialData?: DataSourceManagerData) => {
+export const createDataSourceManager = (app: TMagicApp, useMock?: boolean, initialData?: DataSourceManagerData) => {
   const { dsl, platform } = app;
   if (!dsl?.dataSources) return;
 

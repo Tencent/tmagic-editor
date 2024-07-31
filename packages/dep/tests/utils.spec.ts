@@ -70,11 +70,11 @@ describe('utils', () => {
   });
 
   test('isDataSourceTemplate', () => {
-    expect(utils.isDataSourceTemplate('xxx${dsId.field}xxx${dsId.field}', 'dsId')).toBeTruthy();
-    expect(utils.isDataSourceTemplate('${dsId.field}', 'dsId')).toBeTruthy();
-    expect(utils.isDataSourceTemplate('${dsId}', 'dsId')).toBeTruthy();
-    expect(utils.isDataSourceTemplate('${dsId.field}', 'dsId1')).toBeFalsy();
-    expect(utils.isDataSourceTemplate('${dsId.field', 'dsId')).toBeFalsy();
+    expect(utils.isDataSourceTemplate('xxx${dsId.field}xxx${dsId.field}', { id: 'dsId', fields: [] })).toBeTruthy();
+    expect(utils.isDataSourceTemplate('${dsId.field}', { id: 'dsId', fields: [] })).toBeTruthy();
+    expect(utils.isDataSourceTemplate('${dsId}', { id: 'dsId', fields: [] })).toBeTruthy();
+    expect(utils.isDataSourceTemplate('${dsId.field}', { id: 'dsId1', fields: [] })).toBeFalsy();
+    expect(utils.isDataSourceTemplate('${dsId.field', { id: 'dsId', fields: [] })).toBeFalsy();
   });
 
   test('isSpecificDataSourceTemplate', () => {
@@ -139,6 +139,7 @@ describe('utils', () => {
         id: 'dsId',
         methods: [],
         fields: arrayFields,
+        events: [],
       }),
     ).toBeTruthy();
 
@@ -148,6 +149,7 @@ describe('utils', () => {
         id: 'dsId',
         methods: [],
         fields: [...arrayFields, ...objectFields],
+        events: [],
       }),
     ).toBeTruthy();
 
@@ -157,6 +159,7 @@ describe('utils', () => {
         id: 'dsId',
         methods: [],
         fields: [...arrayFields, ...objectFields],
+        events: [],
       }),
     ).toBeFalsy();
 
@@ -166,6 +169,7 @@ describe('utils', () => {
         id: 'dsId',
         methods: [],
         fields: arrayFields,
+        events: [],
       }),
     ).toBeFalsy();
 
@@ -175,6 +179,7 @@ describe('utils', () => {
         id: 'dsId',
         methods: [],
         fields: arrayFields,
+        events: [],
       }),
     ).toBeFalsy();
 
@@ -184,6 +189,7 @@ describe('utils', () => {
         id: 'dsId',
         methods: [],
         fields: arrayFields,
+        events: [],
       }),
     ).toBeTruthy();
   });

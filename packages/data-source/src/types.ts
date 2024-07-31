@@ -1,4 +1,4 @@
-import type { AppCore, DataSourceSchema, HttpOptions, RequestFunction } from '@tmagic/schema';
+import type { DataSourceSchema, HttpOptions, RequestFunction, TMagicApp } from '@tmagic/schema';
 
 import type DataSource from './data-sources/Base';
 import type HttpDataSource from './data-sources/Http';
@@ -8,7 +8,7 @@ export type ObservedDataClass = new (...args: any[]) => ObservedData;
 
 export interface DataSourceOptions<T extends DataSourceSchema = DataSourceSchema> {
   schema: T;
-  app: AppCore;
+  app: TMagicApp;
   initialData?: Record<string, any>;
   useMock?: boolean;
   request?: RequestFunction;
@@ -25,14 +25,14 @@ export interface HttpDataSourceSchema extends DataSourceSchema {
   autoFetch?: boolean;
   beforeRequest:
     | string
-    | ((options: HttpOptions, content: { app: AppCore; dataSource: HttpDataSource }) => HttpOptions);
+    | ((options: HttpOptions, content: { app: TMagicApp; dataSource: HttpDataSource }) => HttpOptions);
   afterResponse:
     | string
-    | ((response: any, content: { app: AppCore; dataSource: HttpDataSource; options: Partial<HttpOptions> }) => any);
+    | ((response: any, content: { app: TMagicApp; dataSource: HttpDataSource; options: Partial<HttpOptions> }) => any);
 }
 
 export interface DataSourceManagerOptions {
-  app: AppCore;
+  app: TMagicApp;
   /** 初始化数据，ssr数据可以由此传入 */
   initialData?: DataSourceManagerData;
   /** 是否使用mock数据 */

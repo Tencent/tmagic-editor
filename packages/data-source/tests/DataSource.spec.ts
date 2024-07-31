@@ -10,8 +10,14 @@ describe('DataSource', () => {
         id: '1',
         fields: [{ name: 'name' }],
         methods: [],
+        events: [],
       },
-      app: {},
+      app: {
+        platform: '',
+        jsEngine: '',
+        pageFragmentContainerType: new Set(),
+        iteratorContainerType: new Set(),
+      },
     });
 
     expect(ds).toBeInstanceOf(DataSource);
@@ -25,8 +31,14 @@ describe('DataSource', () => {
         id: '1',
         fields: [{ name: 'name' }],
         methods: [],
+        events: [],
       },
-      app: {},
+      app: {
+        platform: '',
+        jsEngine: '',
+        pageFragmentContainerType: new Set(),
+        iteratorContainerType: new Set(),
+      },
     });
 
     ds.init();
@@ -43,8 +55,14 @@ describe('DataSource setData', () => {
         id: '1',
         fields: [{ name: 'name', defaultValue: 'name' }],
         methods: [],
+        events: [],
       },
-      app: {},
+      app: {
+        platform: '',
+        jsEngine: '',
+        pageFragmentContainerType: new Set(),
+        iteratorContainerType: new Set(),
+      },
     });
 
     ds.init();
@@ -74,8 +92,14 @@ describe('DataSource setData', () => {
           },
         ],
         methods: [],
+        events: [],
       },
-      app: {},
+      app: {
+        platform: '',
+        jsEngine: '',
+        pageFragmentContainerType: new Set(),
+        iteratorContainerType: new Set(),
+      },
     });
 
     ds.init();

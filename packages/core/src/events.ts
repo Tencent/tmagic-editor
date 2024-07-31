@@ -20,8 +20,7 @@
  * 通用的事件处理
  */
 
-import App from './App';
-import Node from './Node';
+import type { TMagicApp, TMagicNode } from '@tmagic/schema';
 
 export interface EventOption {
   label: string;
@@ -49,7 +48,7 @@ export const getCommonEventName = (commonEventName: string) => {
 export const isCommonMethod = (methodName: string) => methodName.startsWith(COMMON_METHOD_PREFIX);
 
 // 点击在组件内的某个元素上，需要向上寻找到当前组件
-const getDirectComponent = (element: HTMLElement | null, app: App): Node | Boolean => {
+const getDirectComponent = (element: HTMLElement | null, app: TMagicApp): TMagicNode | Boolean => {
   if (!element) {
     return false;
   }
@@ -66,7 +65,7 @@ const getDirectComponent = (element: HTMLElement | null, app: App): Node | Boole
   return node;
 };
 
-const commonClickEventHandler = (app: App, eventName: string, e: any) => {
+const commonClickEventHandler = (app: TMagicApp, eventName: string, e: any) => {
   const node = getDirectComponent(e.target, app);
 
   if (node) {
@@ -74,7 +73,7 @@ const commonClickEventHandler = (app: App, eventName: string, e: any) => {
   }
 };
 
-export const bindCommonEventListener = (app: App) => {
+export const bindCommonEventListener = (app: TMagicApp) => {
   if (app.jsEngine !== 'browser') return;
 
   window.document.body.addEventListener('click', (e: any) => {
@@ -90,7 +89,7 @@ export const bindCommonEventListener = (app: App) => {
   );
 };
 
-export const triggerCommonMethod = (methodName: string, node: Node) => {
+export const triggerCommonMethod = (methodName: string, node: TMagicNode) => {
   const { instance } = node;
 
   if (!instance) return;

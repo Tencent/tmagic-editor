@@ -19,20 +19,20 @@
 import { EventEmitter } from 'events';
 
 import { DataSource } from '@tmagic/data-source';
-import type { AppCore, EventConfig, MComponent, MContainer, MNode, MPage, MPageFragment } from '@tmagic/schema';
+import type { EventConfig, MNode, TMagicApp, TMagicNode } from '@tmagic/schema';
 import { HookCodeType, HookType } from '@tmagic/schema';
 
-import type App from './App';
 import type Page from './Page';
 import Store from './Store';
 
-interface NodeOptions {
+export interface NodeOptions {
   config: MNode;
   page?: Page;
-  parent?: Node;
-  app: App;
+  parent?: TMagicNode;
+  app: TMagicApp;
 }
-class Node extends EventEmitter {
+
+class Node extends EventEmitter implements TMagicNode {
   public data!: MNode;
   public style!: {
     [key: string]: any;
@@ -40,8 +40,8 @@ class Node extends EventEmitter {
   public events: EventConfig[] = [];
   public instance?: any;
   public page?: Page;
-  public parent?: Node;
-  public app: App;
+  public parent?: TMagicNode;
+  public app: TMagicApp;
   public store = new Store();
 
   constructor(options: NodeOptions) {
@@ -54,12 +54,12 @@ class Node extends EventEmitter {
     this.listenLifeSafe();
   }
 
-  public setData(data: MComponent | MContainer | MPage | MPageFragment) {
+  public setData(data: MNode) {
     this.data = data;
     const { events, style } = data;
     this.events = events || [];
     this.style = style || {};
-    this.emit('update-data');
+    this.emit('update-data', data);
   }
 
   public destroy() {
@@ -120,7 +120,7 @@ class Node extends EventEmitter {
       const { codeType = HookCodeType.CODE, codeId, params = {} } = item;
 
       let functionContent: ((...args: any[]) => any) | string | undefined;
-      const functionParams: { app: AppCore; params: Record<string, any>; dataSource?: DataSource } = {
+      const functionParams: { app: TMagicApp; params: Record<string, any>; dataSource?: DataSource } = {
         app: this.app,
         params,
       };
@@ -128,7 +128,7 @@ class Node extends EventEmitter {
       if (codeType === HookCodeType.CODE && typeof codeId === 'string' && this.app.codeDsl?.[codeId]) {
         functionContent = this.app.codeDsl[codeId].content;
       } else if (codeType === HookCodeType.DATA_SOURCE_METHOD && Array.isArray(codeId) && codeId.length > 1) {
-        const dataSource = this.app.dataSourceManager?.get(codeId[0]);
+        const dataSource: DataSource = this.app.dataSourceManager?.get(codeId[0]);
         functionContent = dataSource?.methods.find((method) => method.name === codeId[1])?.content;
         functionParams.dataSource = dataSource;
       }

@@ -35,17 +35,39 @@ export type RequestFunction = <T = any>(options: HttpOptions) => Promise<T>;
 
 export type JsEngine = 'browser' | 'hippy' | 'nodejs';
 
-export interface AppCore {
+export interface TMagicNode {
+  data: MNode;
+  app: TMagicApp;
+  instance?: any;
+  events: EventConfig[];
+  setData: <T extends MNode = MNode>(data: T) => void;
+  destroy: () => void;
+}
+
+export interface TMagicIteratorContainer extends TMagicNode {
+  data: MIteratorContainer;
+  dataSourceDeps: DepData;
+  dataSourceCondDeps: DepData;
+  resetNodes: () => void;
+  setNodes: (nodes: MNode[], index: number) => void;
+}
+
+export interface TMagicApp {
   /** 页面配置描述 */
   dsl?: MApp;
   /** 允许平台，editor: 编辑器中，mobile: 手机端，tv: 电视端, pc: 电脑端 */
-  platform?: 'editor' | 'mobile' | 'tv' | 'pc' | string;
+  platform: 'editor' | 'mobile' | 'tv' | 'pc' | string;
   /** 代码运行环境 */
-  jsEngine?: JsEngine | string;
+  jsEngine: JsEngine | string;
+  pageFragmentContainerType: Set<string>;
+  iteratorContainerType: Set<string>;
   /** 网络请求函数 */
   request?: RequestFunction;
+  getNode: <T extends TMagicNode = TMagicNode>(id: Id, dataIteratorContainerId?: Id[], dataIteratorIndex?: number[]) => T | undefined;
   [key: string]: any;
 }
+
+export type AppCore = TMagicApp;
 
 export enum NodeType {
   /** 容器 */
@@ -57,6 +79,8 @@ export enum NodeType {
   /** 页面片 */
   PAGE_FRAGMENT = 'page-fragment',
 }
+
+export const NODE_CONDS_KEY = 'displayConds';
 
 export type Id = string | number;
 
@@ -139,7 +163,7 @@ export interface MComponent {
   style?: {
     [key: string]: any;
   };
-  displayConds?: DisplayCond[];
+  [NODE_CONDS_KEY]?: DisplayCond[];
   [key: string]: any;
 }
 
@@ -148,6 +172,17 @@ export interface MContainer extends MComponent {
   type?: NodeType.CONTAINER | string;
   /** 容器子元素 */
   items: (MComponent | MContainer)[];
+}
+
+export interface MIteratorContainer extends MContainer {
+  type: 'iterator-container';
+  iteratorData: any[];
+  dsField: string[];
+  itemConfig: {
+    layout: string;
+    [NODE_CONDS_KEY]: DisplayCond[];
+    style: Record<string, string | number>;
+  };
 }
 
 export interface MPage extends MContainer {
@@ -203,7 +238,7 @@ export interface PastePosition {
   top?: number;
 }
 
-export type MNode = MComponent | MContainer | MPage | MApp | MPageFragment;
+export type MNode = MComponent | MContainer | MIteratorContainer | MPage | MApp | MPageFragment;
 
 export enum HookType {
   /** 代码块钩子标识 */

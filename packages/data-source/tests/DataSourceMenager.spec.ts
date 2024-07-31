@@ -6,6 +6,10 @@ import { DataSource, DataSourceManager } from '@data-source/index';
 
 class Core {
   public dsl?: MApp;
+  platform = '';
+  jsEngine = '';
+  pageFragmentContainerType = new Set<string>();
+  iteratorContainerType = new Set<string>();
 
   constructor(options: any) {
     this.dsl = options.config;
@@ -72,6 +76,7 @@ describe('DataSourceManager', () => {
         id: '1',
         fields: [{ name: 'name1' }],
         methods: [],
+        events: [],
       },
     ]);
     const ds = dsm.get('1');
@@ -89,6 +94,7 @@ describe('DataSourceManager', () => {
       id: '1',
       fields: [{ name: 'name' }],
       methods: [],
+      events: [],
     });
     expect(dsm.get('1')).toBeInstanceOf(DataSource);
   });

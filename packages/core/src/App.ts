@@ -23,7 +23,6 @@ import { has, isArray, isEmpty } from 'lodash-es';
 import { createDataSourceManager, DataSource, DataSourceManager, ObservedDataClass } from '@tmagic/data-source';
 import {
   ActionType,
-  type AppCore,
   type CodeBlockDSL,
   type CodeItemConfig,
   type CompItemConfig,
@@ -34,6 +33,8 @@ import {
   type JsEngine,
   type MApp,
   type RequestFunction,
+  type TMagicApp,
+  type TMagicNode,
 } from '@tmagic/schema';
 import { DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX } from '@tmagic/utils';
 
@@ -52,6 +53,8 @@ interface AppOptionsConfig {
   designWidth?: number;
   curPage?: Id;
   useMock?: boolean;
+  pageFragmentContainerType?: string | string[];
+  iteratorContainerType?: string | string[];
   transformStyle?: (style: Record<string, any>) => Record<string, any>;
   request?: RequestFunction;
   DataSourceObservedData?: ObservedDataClass;
@@ -63,11 +66,13 @@ interface EventCache {
   args: any[];
 }
 
-class App extends EventEmitter implements AppCore {
+class App extends EventEmitter implements TMagicApp {
   public env: Env = new Env();
   public dsl?: MApp;
   public codeDsl?: CodeBlockDSL;
   public dataSourceManager?: DataSourceManager;
+  public pageFragmentContainerType = new Set(['page-fragment-container']);
+  public iteratorContainerType = new Set(['iterator-container']);
 
   public page?: Page;
 
@@ -83,7 +88,7 @@ class App extends EventEmitter implements AppCore {
 
   public flexible?: Flexible;
 
-  private eventList = new Map<(fromCpt: Node, ...args: any[]) => void, string>();
+  private eventList = new Map<(fromCpt: TMagicNode, ...args: any[]) => void, string>();
   private dataSourceEventList = new Map<string, Map<string, (...args: any[]) => void>>();
 
   constructor(options: AppOptionsConfig) {
@@ -94,6 +99,24 @@ class App extends EventEmitter implements AppCore {
     this.codeDsl = options.config?.codeBlocks;
     options.platform && (this.platform = options.platform);
     options.jsEngine && (this.jsEngine = options.jsEngine);
+
+    if (options.pageFragmentContainerType) {
+      const pageFragmentContainerType = Array.isArray(options.pageFragmentContainerType)
+        ? options.pageFragmentContainerType
+        : [options.pageFragmentContainerType];
+      pageFragmentContainerType.forEach((type) => {
+        this.pageFragmentContainerType.add(type);
+      });
+    }
+
+    if (options.iteratorContainerType) {
+      const iteratorContainerType = Array.isArray(options.iteratorContainerType)
+        ? options.iteratorContainerType
+        : [options.iteratorContainerType];
+      iteratorContainerType.forEach((type) => {
+        this.iteratorContainerType.add(type);
+      });
+    }
 
     if (typeof options.useMock === 'boolean') {
       this.useMock = options.useMock;
@@ -200,6 +223,10 @@ class App extends EventEmitter implements AppCore {
     }
   }
 
+  public getNode<T extends TMagicNode = TMagicNode>(id: Id, iteratorContainerId?: Id[], iteratorIndex?: number[]) {
+    return this.page?.getNode<T>(id, iteratorContainerId, iteratorIndex);
+  }
+
   public registerComponent(type: string, Component: any) {
     this.components.set(type, Component);
   }
@@ -225,7 +252,7 @@ class App extends EventEmitter implements AppCore {
     for (const [, value] of this.page.nodes) {
       value.events?.forEach((event, index) => {
         let eventName = `${event.name}_${value.data.id}`;
-        let eventHandler = (fromCpt: Node, ...args: any[]) => {
+        let eventHandler = (fromCpt: TMagicNode, ...args: any[]) => {
           this.eventHandler(index, fromCpt, args);
         };
 
@@ -233,7 +260,7 @@ class App extends EventEmitter implements AppCore {
         const eventNames = event.name.split('.');
         if (eventNames.length > 1) {
           eventName = `${eventNames[1]}_${eventNames[0]}`;
-          eventHandler = (fromCpt: Node, ...args: any[]) => {
+          eventHandler = (fromCpt: TMagicNode, ...args: any[]) => {
             this.eventHandler(index, value, args);
           };
         }
@@ -272,7 +299,7 @@ class App extends EventEmitter implements AppCore {
    * @param eventConfig 联动组件的配置
    * @returns void
    */
-  public async compActionHandler(eventConfig: CompItemConfig, fromCpt: Node | DataSource, args: any[]) {
+  public async compActionHandler(eventConfig: CompItemConfig, fromCpt: TMagicNode | DataSource, args: any[]) {
     if (!this.page) throw new Error('当前没有页面');
 
     let { method: methodName, to } = eventConfig;
@@ -368,7 +395,7 @@ class App extends EventEmitter implements AppCore {
     });
   }
 
-  private async actionHandler(actionItem: EventActionItem, fromCpt: Node | DataSource, args: any[]) {
+  private async actionHandler(actionItem: EventActionItem, fromCpt: TMagicNode | DataSource, args: any[]) {
     if (actionItem.actionType === ActionType.COMP) {
       // 组件动作
       await this.compActionHandler(actionItem as CompItemConfig, fromCpt, args);
@@ -386,23 +413,23 @@ class App extends EventEmitter implements AppCore {
    * @param fromCpt 触发事件的组件
    * @param args 事件参数
    */
-  private async eventHandler(config: EventConfig | number, fromCpt: Node | DataSource | undefined, args: any[]) {
-    const eventConfig = typeof config === 'number' ? (fromCpt as Node).events[config] : config;
+  private async eventHandler(config: EventConfig | number, fromCpt: TMagicNode | DataSource | undefined, args: any[]) {
+    const eventConfig = typeof config === 'number' ? (fromCpt as TMagicNode).events[config] : config;
     if (has(eventConfig, 'actions')) {
       // EventConfig类型
       const { actions } = eventConfig as EventConfig;
       for (let i = 0; i < actions.length; i++) {
         if (typeof config === 'number') {
           // 事件响应中可能会有修改数据源数据的，会更新dsl，所以这里需要重新获取
-          const actionItem = ((fromCpt as Node).events[config] as EventConfig).actions[i];
-          this.actionHandler(actionItem, fromCpt as Node, args);
+          const actionItem = ((fromCpt as TMagicNode).events[config] as EventConfig).actions[i];
+          this.actionHandler(actionItem, fromCpt as TMagicNode, args);
         } else {
           this.actionHandler(actions[i], fromCpt as DataSource, args);
         }
       }
     } else {
       // 兼容DeprecatedEventConfig类型 组件动作
-      await this.compActionHandler(eventConfig as unknown as CompItemConfig, fromCpt as Node, args);
+      await this.compActionHandler(eventConfig as unknown as CompItemConfig, fromCpt as TMagicNode, args);
     }
   }
 

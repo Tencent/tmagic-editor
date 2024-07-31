@@ -19,7 +19,7 @@ import EventEmitter from 'events';
 
 import { cloneDeep } from 'lodash-es';
 
-import type { AppCore, CodeBlockContent, DataSchema, DataSourceSchema } from '@tmagic/schema';
+import type { CodeBlockContent, DataSchema, DataSourceSchema, TMagicApp } from '@tmagic/schema';
 import { getDefaultValueFromFields } from '@tmagic/utils';
 
 import { ObservedData } from '@data-source/observed-data/ObservedData';
@@ -33,7 +33,7 @@ export default class DataSource<T extends DataSourceSchema = DataSourceSchema> e
   public isInit = false;
 
   /** @tmagic/core 实例 */
-  public app: AppCore;
+  public app: TMagicApp;
 
   protected mockData?: Record<string | number, any>;
 

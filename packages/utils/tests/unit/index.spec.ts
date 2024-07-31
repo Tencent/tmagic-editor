@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { describe, expect, test } from 'vitest';
+import { assert, describe, expect, test } from 'vitest';
 
 import type { DataSchema } from '@tmagic/schema';
 
@@ -354,17 +354,23 @@ describe('getValueByKeyPath', () => {
   });
 
   test('error', () => {
-    const value = util.getValueByKeyPath('a.b.c.d', {
-      a: {},
+    assert.throws(() => {
+      util.getValueByKeyPath('a.b.c.d', {
+        a: {},
+      });
     });
 
-    expect(value).toBeUndefined();
-
-    const value1 = util.getValueByKeyPath('a.b.c', {
-      a: {},
+    assert.throws(() => {
+      util.getValueByKeyPath('a.b.c', {
+        a: {},
+      });
     });
 
-    expect(value1).toBeUndefined();
+    assert.doesNotThrow(() => {
+      util.getValueByKeyPath('a', {
+        a: {},
+      });
+    });
   });
 });
 
