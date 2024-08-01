@@ -27,6 +27,7 @@ class Env {
   isMqq = false;
   isWechat = false;
   isWeb = false;
+  isOpenHarmony = false;
 
   constructor(ua = globalThis.navigator.userAgent, options: Record<string, boolean | string> = {}) {
     this.isIphone = ua.indexOf('iPhone') >= 0;
@@ -47,7 +48,9 @@ class Env {
 
     this.isWechat = ua.indexOf('MicroMessenger') >= 0 && ua.indexOf('wxwork') < 0;
 
-    this.isWeb = !this.isIos && !this.isAndroid && !/(WebOS|BlackBerry)/.test(ua);
+    this.isOpenHarmony = ua.includes('OpenHarmony');
+
+    this.isWeb = !this.isIos && !this.isAndroid && !this.isOpenHarmony && !/(WebOS|BlackBerry)/.test(ua);
 
     Object.entries(options).forEach(([key, value]) => {
       (this as any)[key] = value;

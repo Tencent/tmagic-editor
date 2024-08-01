@@ -115,9 +115,3 @@ export const transformStyle = (style: Record<string, any> | string, jsEngine: Js
 
   return results;
 };
-
-export const calcFontsize = (designWidth: number) => {
-  const { width } = document.documentElement.getBoundingClientRect();
-  const fontSize = width / (designWidth / 100);
-  document.documentElement.style.fontSize = `${fontSize}px`;
-};

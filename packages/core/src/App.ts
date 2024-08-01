@@ -39,9 +39,10 @@ import { DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX } from '@tmagic/utils';
 
 import Env from './Env';
 import { bindCommonEventListener, isCommonMethod, triggerCommonMethod } from './events';
+import Flexible from './Flexible';
 import Node from './Node';
 import Page from './Page';
-import { calcFontsize, transformStyle as defaultTransformStyle } from './utils';
+import { transformStyle as defaultTransformStyle } from './utils';
 
 interface AppOptionsConfig {
   ua?: string;
@@ -73,13 +74,14 @@ class App extends EventEmitter implements AppCore {
   public useMock = false;
   public platform = 'mobile';
   public jsEngine: JsEngine = 'browser';
-  public designWidth = 375;
   public request?: RequestFunction;
 
   public components = new Map();
 
   public eventQueueMap: Record<string, EventCache[]> = {};
   public transformStyle: (style: Record<string, any>) => Record<string, any>;
+
+  public flexible?: Flexible;
 
   private eventList = new Map<(fromCpt: Node, ...args: any[]) => void, string>();
   private dataSourceEventList = new Map<string, Map<string, (...args: any[]) => void>>();
@@ -97,8 +99,8 @@ class App extends EventEmitter implements AppCore {
       this.useMock = options.useMock;
     }
 
-    if (typeof options.designWidth !== 'undefined') {
-      this.setDesignWidth(options.designWidth);
+    if (this.jsEngine === 'browser') {
+      this.flexible = new Flexible({ designWidth: options.designWidth });
     }
 
     this.transformStyle =
@@ -120,13 +122,7 @@ class App extends EventEmitter implements AppCore {
   }
 
   public setDesignWidth(width: number) {
-    this.designWidth = width;
-    // 根据屏幕大小计算出跟节点的font-size，用于rem样式的适配
-    if (this.jsEngine === 'browser') {
-      this.calcFontsize();
-      globalThis.removeEventListener('resize', this.calcFontsize);
-      globalThis.addEventListener('resize', this.calcFontsize);
-    }
+    this.flexible?.setDesignWidth(width);
   }
 
   /**
@@ -331,9 +327,8 @@ class App extends EventEmitter implements AppCore {
     this.removeAllListeners();
     this.page = undefined;
 
-    if (this.jsEngine === 'browser') {
-      globalThis.removeEventListener('resize', this.calcFontsize);
-    }
+    this.flexible?.destroy();
+    this.flexible = undefined;
   }
 
   private bindDataSourceEvents() {
@@ -417,10 +412,6 @@ class App extends EventEmitter implements AppCore {
     } else {
       this.eventQueueMap[event.eventConfig.to] = [event];
     }
-  }
-
-  private calcFontsize() {
-    calcFontsize(this.designWidth);
   }
 }
 
