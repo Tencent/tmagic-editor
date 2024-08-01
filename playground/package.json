@@ -22,26 +22,26 @@
     "@tmagic/schema": "1.4.15",
     "@tmagic/stage": "1.4.15",
     "@tmagic/utils": "1.4.15",
-    "element-plus": "^2.7.5",
+    "element-plus": "^2.7.8",
     "lodash-es": "^4.17.21",
     "monaco-editor": "^0.48.0",
     "serialize-javascript": "^6.0.0",
-    "vue": "^3.4.27",
+    "vue": "^3.4.35",
     "vue-router": "^4.0.10"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.4",
     "@types/node": "^18.19.0",
     "@types/serialize-javascript": "^5.0.1",
-    "@vitejs/plugin-legacy": "^5.4.0",
-    "@vitejs/plugin-vue": "^5.0.4",
-    "@vitejs/plugin-vue-jsx": "^3.1.0",
-    "@vue/compiler-sfc": "^3.4.27",
+    "@vitejs/plugin-legacy": "^5.4.1",
+    "@vitejs/plugin-vue": "^5.1.1",
+    "@vitejs/plugin-vue-jsx": "^4.0.0",
+    "@vue/compiler-sfc": "^3.4.35",
     "sass": "^1.77.0",
-    "terser": "^5.31.0",
+    "terser": "^5.31.3",
     "typescript": "^5.4.5",
     "unplugin-auto-import": "^0.12.0",
     "unplugin-vue-components": "^0.22.11",
-    "vite": "^5.3.1"
+    "vite": "^5.3.5"
   }
 }

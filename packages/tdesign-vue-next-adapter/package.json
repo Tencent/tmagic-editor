@@ -40,17 +40,17 @@
     "typescript"
   ],
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.0.4",
+    "@vitejs/plugin-vue": "^5.1.1",
     "@vue/compiler-sfc": "^3.4.27",
     "@types/node": "^18.19.0",
     "rimraf": "^3.0.2",
-    "vite": "^5.3.1",
+    "vite": "^5.3.5",
     "vue-tsc": "^2.0.19"
   },
   "peerDependencies": {
     "@tmagic/design": "workspace:*",
     "tdesign-vue-next": "^1.8.1",
-    "vue": "^3.4.27",
+    "vue": "^3.4.35",
     "typescript": "*"
   },
   "peerDependenciesMeta": {

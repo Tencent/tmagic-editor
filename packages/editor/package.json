@@ -70,14 +70,14 @@
     "@types/node": "^18.19.0",
     "@types/serialize-javascript": "^5.0.1",
     "@types/sortablejs": "^1.15.8",
-    "@vitejs/plugin-vue": "^5.0.4",
+    "@vitejs/plugin-vue": "^5.1.1",
     "@vue/compiler-sfc": "^3.4.27",
     "@vue/test-utils": "^2.4.6",
     "rimraf": "^3.0.2",
     "sass": "^1.77.0",
     "tsc-alias": "^1.8.5",
     "type-fest": "^4.10.3",
-    "vite": "^5.3.1",
+    "vite": "^5.3.5",
     "vue-tsc": "^2.0.19"
   },
   "peerDependencies": {
@@ -89,7 +89,7 @@
     "@tmagic/utils": "workspace:*",
     "monaco-editor": "^0.48.0",
     "typescript": "*",
-    "vue": "^3.4.27"
+    "vue": "^3.4.35"
   },
   "peerDependenciesMeta": {
     "typescript": {
