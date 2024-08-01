@@ -1,5 +1,5 @@
 <template>
-  <div v-if="display(config)" :id="`${config.id}`" :class="className" :style="style">
+  <div v-if="display(config)" :id="`${config.id}`" :class="className" :style="app?.transformStyle(config.style || {})">
     <slot>
       <template v-for="item in config.items">
         <component
@@ -27,7 +27,7 @@ const props = withDefaults(defineProps<UiComponentProps<MContainer>>(), {
   model: () => ({}),
 });
 
-const { style, display, app } = useApp({
+const { display, app } = useApp({
   config: props.config,
   methods: {},
 });
