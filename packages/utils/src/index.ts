@@ -249,7 +249,8 @@ export const replaceChildNode = (newNode: MNode, data?: MNode[], parentId?: Id) 
   parent.items.splice(index, 1, newNode);
 };
 
-export const DSL_NODE_KEY_COPY_PREFIX = '__magic__';
+export const DSL_NODE_KEY_COPY_PREFIX = '__tmagic__';
+export const IS_DSL_NODE_KEY = '__tmagic__dslNode';
 
 export const compiledNode = (
   compile: (value: any) => any,

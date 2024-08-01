@@ -9,7 +9,7 @@
           :id="item.id"
           :class="`${item.className || ''}`"
           :style="app?.transformStyle(item.style || {})"
-          :config="item"
+          :config="{ ...item, [IS_DSL_NODE_KEY]: true }"
         ></component>
       </template>
     </slot>
@@ -19,19 +19,13 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
 
-import type { MContainer } from '@tmagic/schema';
-import { toLine } from '@tmagic/utils';
+import type { MContainer, UiComponentProps } from '@tmagic/schema';
+import { IS_DSL_NODE_KEY, toLine } from '@tmagic/utils';
 import { useApp } from '@tmagic/vue-runtime-help';
 
-const props = withDefaults(
-  defineProps<{
-    config: MContainer;
-    model?: any;
-  }>(),
-  {
-    model: () => ({}),
-  },
-);
+const props = withDefaults(defineProps<UiComponentProps<MContainer>>(), {
+  model: () => ({}),
+});
 
 const { style, display, app } = useApp({
   config: props.config,

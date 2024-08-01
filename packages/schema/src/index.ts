@@ -297,3 +297,8 @@ export interface DisplayCondItem {
 export interface DisplayCond {
   cond: DisplayCondItem[];
 }
+
+export interface UiComponentProps<T extends MNode = MNode> {
+  config: T;
+  model?: any;
+}
