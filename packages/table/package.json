@@ -1,5 +1,5 @@
 {
-  "version": "1.4.15",
+  "version": "1.4.16",
   "name": "@tmagic/table",
   "type": "module",
   "main": "dist/tmagic-table.umd.cjs",

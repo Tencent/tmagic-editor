@@ -1,3 +1,17 @@
+## [1.4.16](https://github.com/Tencent/tmagic-editor/compare/v1.4.15...v1.4.16) (2024-08-02)
+
+
+### Bug Fixes
+
+* **ui:** 页面style没有响应式了 ([81a221e](https://github.com/Tencent/tmagic-editor/commit/81a221e56171c299d9599f4440557e822c2fc186))
+
+
+### Features
+
+* **core:** 完善屏幕大小自动适配 ([59f0527](https://github.com/Tencent/tmagic-editor/commit/59f05270ae019d4baa04d7c2ce86a5c88e05e16b))
+
+
+
 ## [1.4.15](https://github.com/Tencent/tmagic-editor/compare/v1.4.14...v1.4.15) (2024-07-26)
 
 
