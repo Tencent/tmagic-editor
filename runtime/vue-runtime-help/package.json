@@ -1,5 +1,5 @@
 {
-  "version": "0.0.7",
+  "version": "0.1.0",
   "name": "@tmagic/vue-runtime-help",
   "type": "module",
   "sideEffects": false,
@@ -32,11 +32,11 @@
     "vue-demi": "^0.14.7"
   },
   "peerDependencies": {
-    "@tmagic/core": ">=1.4.8",
-    "@tmagic/data-source": ">=1.4.8",
-    "@tmagic/schema": ">=1.4.8",
-    "@tmagic/stage": ">=1.4.8",
-    "@tmagic/utils": ">=1.4.8",
+    "@tmagic/core": ">=1.4.16",
+    "@tmagic/data-source": ">=1.4.16",
+    "@tmagic/schema": ">=1.4.16",
+    "@tmagic/stage": ">=1.4.16",
+    "@tmagic/utils": ">=1.4.16",
     "@vue/composition-api": ">=1.7.2",
     "typescript": "*",
     "vue": ">=2.0.0 || >=3.0.0"
