@@ -478,6 +478,9 @@ importers:
 
   packages/schema:
     dependencies:
+      '@types/events':
+        specifier: ^3.0.0
+        version: 3.0.3
       typescript:
         specifier: '*'
         version: 5.5.4
@@ -521,6 +524,9 @@ importers:
       moveable-helper:
         specifier: ^0.4.0
         version: 0.4.0(scenejs@1.10.3)
+      scenejs:
+        specifier: ^1.10.3
+        version: 1.10.3
       typescript:
         specifier: '*'
         version: 5.5.4

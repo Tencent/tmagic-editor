@@ -84,8 +84,12 @@ class Page extends Node {
 
     if (Array.isArray(iteratorContainerId) && iteratorContainerId.length && Array.isArray(iteratorIndex)) {
       let iteratorContainer = this.nodes.get(iteratorContainerId[0]) as IteratorContainer;
+
       for (let i = 1, l = iteratorContainerId.length; i < l; i++) {
-        iteratorContainer = iteratorContainer?.getNode(iteratorContainerId[i], iteratorIndex[i]) as IteratorContainer;
+        iteratorContainer = iteratorContainer?.getNode(
+          iteratorContainerId[i],
+          iteratorIndex[i - 1],
+        ) as IteratorContainer;
       }
 
       return iteratorContainer?.getNode(id, iteratorIndex[iteratorIndex.length - 1]) as T;

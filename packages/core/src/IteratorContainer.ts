@@ -87,6 +87,11 @@ class IteratorContainer extends Node {
   public getNode(id: Id, index: number) {
     return this.nodes[index]?.get(id);
   }
+
+  public destroy(): void {
+    super.destroy();
+    this.resetNodes();
+  }
 }
 
 export default IteratorContainer;

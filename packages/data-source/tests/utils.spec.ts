@@ -43,7 +43,26 @@ describe('template', () => {
 
 describe('createIteratorContentData', () => {
   test('createIteratorContentData', () => {
-    const ctxData: any = createIteratorContentData({ b: 1 }, 'ds', ['a', 'b'], { ds: { a: [{ b: 1 }] } });
+    const ctxData: any = createIteratorContentData({ b: 1 }, 'ds', ['a'], { ds: { a: [{ b: 1 }] } });
     expect(ctxData.ds.a.b).toBe(1);
+  });
+  test('混用', () => {
+    const ctxData: any = createIteratorContentData({ b: 1 }, 'ds', ['a'], { ds: { a: [{ b: 1 }], b: 2 } });
+    expect(ctxData.ds.b).toBe(2);
+  });
+
+  test('二维数组', () => {
+    const ctxData: any = createIteratorContentData({ a: 1 }, 'ds', ['a', 'c'], {
+      ds: {
+        a: [
+          {
+            b: 0,
+            c: [{ a: 1 }],
+          },
+        ],
+        b: 2,
+      },
+    });
+    expect(ctxData.ds.a.c.a).toBe(1);
   });
 });

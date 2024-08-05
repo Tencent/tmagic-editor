@@ -15,6 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { EventEmitter } from 'events';
+
 export type Method = 'get' | 'GET' | 'delete' | 'DELETE' | 'post' | 'POST' | 'put' | 'PUT';
 
 export interface HttpOptions {
@@ -35,7 +37,7 @@ export type RequestFunction = <T = any>(options: HttpOptions) => Promise<T>;
 
 export type JsEngine = 'browser' | 'hippy' | 'nodejs';
 
-export interface TMagicNode {
+export interface TMagicNode extends EventEmitter {
   data: MNode;
   app: TMagicApp;
   instance?: any;
@@ -45,6 +47,7 @@ export interface TMagicNode {
 }
 
 export interface TMagicIteratorContainer extends TMagicNode {
+  nodes: Map<Id, TMagicNode>[];
   data: MIteratorContainer;
   dataSourceDeps: DepData;
   dataSourceCondDeps: DepData;
@@ -63,7 +66,11 @@ export interface TMagicApp {
   iteratorContainerType: Set<string>;
   /** 网络请求函数 */
   request?: RequestFunction;
-  getNode: <T extends TMagicNode = TMagicNode>(id: Id, dataIteratorContainerId?: Id[], dataIteratorIndex?: number[]) => T | undefined;
+  getNode: <T extends TMagicNode = TMagicNode>(
+    id: Id,
+    dataIteratorContainerId?: Id[],
+    dataIteratorIndex?: number[],
+  ) => T | undefined;
   [key: string]: any;
 }
 
