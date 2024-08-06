@@ -39,7 +39,7 @@ const getFormConfig = (items: FormConfig = []) => [
     type: 'fieldset',
     items,
     legend: '参数',
-    labelWidth: '70px',
+    labelWidth: '120px',
     name: props.name,
   },
 ];
