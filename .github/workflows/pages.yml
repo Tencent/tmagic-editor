@@ -2,7 +2,7 @@ name: pages
 
 on:
   push:
-    branches: [master]
+    branches: [dev]
   workflow_dispatch:
 
 jobs:
@@ -13,6 +13,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+          ref: dev
 
       - name: Install pnpm
         uses: pnpm/action-setup@v2
