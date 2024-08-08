@@ -16,27 +16,27 @@
  * limitations under the License.
  */
 
-import Button from './button';
-import Container from './container';
-import Img from './img';
-import IteratorContainer from './iterator-container';
-import Overlay from './overlay';
-import Page from './page';
-import PageFragment from './page-fragment';
-import PageFragmentContainer from './page-fragment-container';
-import QRcode from './qrcode';
-import Text from './text';
+import Button from '@tmagic/vue-button';
+import Container from '@tmagic/vue-container';
+import Img from '@tmagic/vue-img';
+import IteratorContainer from '@tmagic/vue-iterator-container';
+import Overlay from '@tmagic/vue-overlay';
+import Page from '@tmagic/vue-page';
+import PageFragment from '@tmagic/vue-page-fragment';
+import PageFragmentContainer from '@tmagic/vue-page-fragment-container';
+import QRcode from '@tmagic/vue-qrcode';
+import Text from '@tmagic/vue-text';
 
-export { default as TMagicUiButton } from './button';
-export { default as TMagicUiContainer } from './container';
-export { default as TMagicUiImg } from './img';
-export { default as TMagicUiIteratorContainer } from './iterator-container';
-export { default as TMagicUiOverlay } from './overlay';
-export { default as TMagicUiPage } from './page';
-export { default as TMagicUiPageFragment } from './page-fragment';
-export { default as TMagicUiPageFragmentContainer } from './page-fragment-container';
-export { default as TMagicUiQRcode } from './qrcode';
-export { default as TMagicUiText } from './text';
+export { default as TMagicUiButton } from '@tmagic/vue-button';
+export { default as TMagicUiContainer } from '@tmagic/vue-container';
+export { default as TMagicUiImg } from '@tmagic/vue-img';
+export { default as TMagicUiIteratorContainer } from '@tmagic/vue-iterator-container';
+export { default as TMagicUiOverlay } from '@tmagic/vue-overlay';
+export { default as TMagicUiPage } from '@tmagic/vue-page';
+export { default as TMagicUiPageFragment } from '@tmagic/vue-page-fragment';
+export { default as TMagicUiPageFragmentContainer } from '@tmagic/vue-page-fragment-container';
+export { default as TMagicUiQRcode } from '@tmagic/vue-qrcode';
+export { default as TMagicUiText } from '@tmagic/vue-text';
 
 const ui: Record<string, any> = {
   page: Page,

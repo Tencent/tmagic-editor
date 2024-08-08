@@ -21,7 +21,6 @@
   "dependencies": {
     "@tmagic/core": "1.4.16",
     "@tmagic/data-source": "1.4.16",
-    "@tmagic/ui-vue2": "1.4.16",
     "@tmagic/schema": "1.4.16",
     "@tmagic/stage": "1.4.16",
     "@tmagic/utils": "1.4.16",
@@ -31,7 +30,7 @@
     "vue": "^2.7.4"
   },
   "devDependencies": {
-    "@tmagic/cli": "1.4.6",
+    "@tmagic/cli": "workspace:*",
     "@types/events": "^3.0.0",
     "axios": "^0.27.2",
     "rollup": "^4.17.2",
