@@ -31,7 +31,7 @@
     "vue": "^2.7.4"
   },
   "devDependencies": {
-    "@tmagic/cli": "1.4.6",
+    "@tmagic/cli": "workspace:*",
     "@types/events": "^3.0.0",
     "axios": "^0.27.2",
     "rollup": "^4.17.2",

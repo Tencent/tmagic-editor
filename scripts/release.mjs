@@ -327,6 +327,7 @@ function updatePackage(pkgRoot, version, getNewPackageName, updateDep = false) {
   if (updateDep) {
     updateDeps(pkg, 'dependencies', version);
     updateDeps(pkg, 'peerDependencies', version);
+    updateDeps(pkg, 'devDependencies', version);
   }
 
   fs.writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
