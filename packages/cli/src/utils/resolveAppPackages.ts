@@ -2,7 +2,7 @@ import { execSync } from 'child_process';
 import path from 'path';
 import { exit } from 'process';
 
-import fs from 'fs-extra';
+import fs, { existsSync } from 'fs-extra';
 import * as recast from 'recast';
 
 import type App from '../Core';
@@ -271,10 +271,16 @@ const getComponentPackageImports = function ({
     });
 
     if (propertyMatch) {
+      let file = getIndexPath(path.resolve(path.dirname(indexPath), propertyMatch.source.value));
+
+      if (!existsSync(file)) {
+        file = propertyMatch.source.value;
+      }
+
       result.imports.push({
         type: property.key.name ?? property.key.value,
         name: propertyMatch.specifiers[0].local.name,
-        indexPath: getIndexPath(path.resolve(path.dirname(indexPath), propertyMatch.source.value)),
+        indexPath: file,
       });
     }
   });
@@ -452,9 +458,9 @@ const getDependencies = (dependencies: Record<string, string>, packagePath: stri
   dependencies[moduleName] = version;
 };
 
-const setPackages = (packages: ModuleMainFilePath, app: App, packagePath: string, key?: string) => {
+const setPackages = (packages: ModuleMainFilePath, app: App, packagePath: string, cwd: string, key?: string) => {
   const { options } = app;
-  const { temp, source, componentFileAffix, datasoucreSuperClass } = options;
+  const { temp, componentFileAffix, datasoucreSuperClass } = options;
 
   let { name: moduleName } = splitNameVersion(packagePath);
 
@@ -474,7 +480,7 @@ const setPackages = (packages: ModuleMainFilePath, app: App, packagePath: string
 
   // 获取完整路径
   const indexPath = execSync(`node -e "console.log(require.resolve('${moduleName.replace(/\\/g, '/')}'))"`, {
-    cwd: source,
+    cwd,
   })
     .toString()
     .replace('\n', '');
@@ -486,7 +492,7 @@ const setPackages = (packages: ModuleMainFilePath, app: App, packagePath: string
   // 组件&插件&数据源包
   if (result.type === PackageType.COMPONENT_PACKAGE) {
     result.imports.forEach((i) => {
-      setPackages(packages, app, i.indexPath, i.type);
+      setPackages(packages, app, i.indexPath, moduleName!, i.type);
     });
 
     return;
@@ -570,7 +576,7 @@ export const resolveAppPackages = (app: App): ModuleMainFilePath => {
     dsValueMap: {},
   };
 
-  packagePaths.forEach(([packagePath, key]) => setPackages(packagesMap, app, packagePath, key));
+  packagePaths.forEach(([packagePath, key]) => setPackages(packagesMap, app, packagePath, source, key));
 
   return packagesMap;
 };

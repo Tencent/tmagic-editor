@@ -34,7 +34,6 @@ export const scripts = (defaultAppConfig: UserConfig) => {
       },
     };
 
-    // create vuepress app
     const app = new App(appConfig);
 
     // clean temp and cache
