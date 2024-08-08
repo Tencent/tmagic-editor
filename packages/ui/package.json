@@ -12,9 +12,6 @@
     "dist",
     "types"
   ],
-  "scripts": {
-    "build": "node scripts/build.mjs"
-  },
   "engines": {
     "node": ">=18"
   },
@@ -24,14 +21,18 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "qrcode": "^1.5.0"
+    "@tmagic/vue-button": "workspace:*",
+    "@tmagic/vue-container": "workspace:*",
+    "@tmagic/vue-img": "workspace:*",
+    "@tmagic/vue-iterator-container": "workspace:*",
+    "@tmagic/vue-overlay": "workspace:*",
+    "@tmagic/vue-page": "workspace:*",
+    "@tmagic/vue-page-fragment": "workspace:*",
+    "@tmagic/vue-page-fragment-container": "workspace:*",
+    "@tmagic/vue-qrcode": "workspace:*",
+    "@tmagic/vue-text": "workspace:*"
   },
   "peerDependencies": {
-    "@tmagic/core": "workspace:*",
-    "@tmagic/schema": "workspace:*",
-    "@tmagic/utils": "workspace:*",
-    "@tmagic/vue-runtime-help": "workspace:*",
-    "vue": ">=3.4.27",
     "typescript": "*"
   },
   "peerDependenciesMeta": {
@@ -40,8 +41,6 @@
     }
   },
   "devDependencies": {
-    "@types/qrcode": "^1.4.2",
-    "@vue/compiler-sfc": "^3.4.27",
     "rimraf": "^3.0.2",
     "vite": "^5.3.5"
   }
