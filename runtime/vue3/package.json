@@ -4,6 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "tmagic": "tmagic entry",
     "dev": "vite --config dev.vite.config.ts",
     "build": "npm run build:libs && npm run build:page && npm run build:playground",
     "build:page": "vite build --config build.vite.config.ts --mode page",
@@ -22,14 +23,13 @@
     "@tmagic/data-source": "1.4.16",
     "@tmagic/schema": "1.4.16",
     "@tmagic/stage": "1.4.16",
-    "@tmagic/ui": "1.4.16",
     "@tmagic/utils": "1.4.16",
     "@tmagic/vue-runtime-help": "^0.1.0",
     "axios": "^0.25.0",
     "vue": "^3.4.35"
   },
   "devDependencies": {
-    "@tmagic/cli": "1.4.5",
+    "@tmagic/cli": "workspace:*",
     "@types/node": "^18.19.0",
     "@vitejs/plugin-legacy": "^5.4.0",
     "@vitejs/plugin-vue": "^5.1.1",
