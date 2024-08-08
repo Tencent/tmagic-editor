@@ -19,10 +19,7 @@
     "src"
   ],
   "scripts": {
-    "build": "npm run build:type && vite build",
-    "build:type": "npm run clear:type && tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
-    "clear:type": "rimraf ./types",
-    "check:type": "tsc --noEmit --project tsconfig.build.json"
+    "build": "vite build"
   },
   "engines": {
     "node": ">=18"
@@ -38,7 +35,6 @@
     "vite": "^5.3.5"
   },
   "peerDependencies": {
-    "@types/events": "^3.0.0",
     "typescript": "*"
   },
   "peerDependenciesMeta": {
