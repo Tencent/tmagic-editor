@@ -14,6 +14,9 @@ importers:
       '@commitlint/config-conventional':
         specifier: ^18.1.0
         version: 18.6.3
+      '@rollup/plugin-alias':
+        specifier: ^5.1.0
+        version: 5.1.0(rollup@4.19.2)
       '@types/node':
         specifier: ^18.19.0
         version: 18.19.42
@@ -98,6 +101,12 @@ importers:
       rimraf:
         specifier: ^3.0.2
         version: 3.0.2
+      rollup:
+        specifier: ^4.17.2
+        version: 4.19.2
+      rollup-plugin-dts:
+        specifier: ^6.1.1
+        version: 6.1.1(rollup@4.19.2)(typescript@5.5.4)
       semver:
         specifier: ^7.3.7
         version: 7.6.3
@@ -122,6 +131,9 @@ importers:
       vue:
         specifier: ^3.4.35
         version: 3.4.35(typescript@5.5.4)
+      vue-tsc:
+        specifier: ^2.0.19
+        version: 2.0.29(typescript@5.5.4)
 
   packages/cli:
     dependencies:
@@ -196,6 +208,9 @@ importers:
 
   packages/data-source:
     dependencies:
+      '@tmagic/core':
+        specifier: workspace:*
+        version: link:../core
       '@tmagic/dep':
         specifier: workspace:*
         version: link:../dep
@@ -283,9 +298,6 @@ importers:
       vite:
         specifier: ^5.3.5
         version: 5.3.5(@types/node@18.19.42)(sass@1.77.8)(terser@5.31.3)
-      vue-tsc:
-        specifier: ^2.0.19
-        version: 2.0.29(typescript@5.5.4)
 
   packages/editor:
     dependencies:
@@ -395,9 +407,6 @@ importers:
       vite:
         specifier: ^5.3.5
         version: 5.3.5(@types/node@18.19.42)(sass@1.77.8)(terser@5.31.3)
-      vue-tsc:
-        specifier: ^2.0.19
-        version: 2.0.29(typescript@5.5.4)
 
   packages/element-plus-adapter:
     dependencies:
@@ -475,15 +484,9 @@ importers:
       vite:
         specifier: ^5.3.5
         version: 5.3.5(@types/node@18.19.42)(sass@1.77.8)(terser@5.31.3)
-      vue-tsc:
-        specifier: ^2.0.19
-        version: 2.0.29(typescript@5.5.4)
 
   packages/schema:
     dependencies:
-      '@types/events':
-        specifier: ^3.0.0
-        version: 3.0.3
       typescript:
         specifier: '*'
         version: 5.5.4
@@ -598,9 +601,6 @@ importers:
       vite:
         specifier: ^5.3.5
         version: 5.3.5(@types/node@18.19.42)(sass@1.77.8)(terser@5.31.3)
-      vue-tsc:
-        specifier: ^2.0.19
-        version: 2.0.29(typescript@5.5.4)
 
   packages/tdesign-vue-next-adapter:
     dependencies:
@@ -608,7 +608,7 @@ importers:
         specifier: workspace:*
         version: link:../design
       tdesign-vue-next:
-        specifier: ^1.8.1
+        specifier: ^1.9.8
         version: 1.9.8(vue@3.4.35(typescript@5.5.4))
       typescript:
         specifier: '*'
@@ -632,9 +632,6 @@ importers:
       vite:
         specifier: ^5.3.5
         version: 5.3.5(@types/node@18.19.42)(sass@1.77.8)(terser@5.31.3)
-      vue-tsc:
-        specifier: ^2.0.19
-        version: 2.0.29(typescript@5.5.4)
 
   packages/ui:
     dependencies:
@@ -672,9 +669,6 @@ importers:
       vite:
         specifier: ^5.3.5
         version: 5.3.5(@types/node@18.19.42)(sass@1.77.8)(terser@5.31.3)
-      vue-tsc:
-        specifier: ^2.0.19
-        version: 2.0.29(typescript@5.5.4)
 
   packages/ui-react:
     dependencies:
@@ -2205,6 +2199,15 @@ packages:
 
   '@popperjs/core@2.11.8':
     resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
+
+  '@rollup/plugin-alias@5.1.0':
+    resolution: {integrity: sha512-lpA3RZ9PdIG7qqhEfv79tBffNaoDuukFDrmhLqg9ifv99u/ehn+lOg30x2zmhf8AQqQUZaMk/B9fZraQ6/acDQ==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
 
   '@rollup/pluginutils@4.2.1':
     resolution: {integrity: sha512-iKnFXr7NkdZAIHiIWE+BX5ULi/ucVFYWD6TbAV+rZctiRTY2PL6tsIKhoIOaoskiWAkgu+VsbXgUVDNLHf+InQ==}
@@ -5264,6 +5267,13 @@ packages:
     deprecated: Rimraf versions prior to v4 are no longer supported
     hasBin: true
 
+  rollup-plugin-dts@6.1.1:
+    resolution: {integrity: sha512-aSHRcJ6KG2IHIioYlvAOcEq6U99sVtqDDKVhnwt70rW6tsz3tv5OSjEiWcgzfsHdLyGXZ/3b/7b/+Za3Y6r1XA==}
+    engines: {node: '>=16'}
+    peerDependencies:
+      rollup: ^3.29.4 || ^4
+      typescript: ^4.5 || ^5.0
+
   rollup-plugin-external-globals@0.10.0:
     resolution: {integrity: sha512-RXlupZrmn97AaaS5dWnktkjM+Iy+od0E+8L0mUkMIs3iuoUXNJebueQocQKV7Ircd54fSGGmkBaXwNzY05J1yQ==}
     peerDependencies:
@@ -5398,6 +5408,10 @@ packages:
   slash@3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
+
+  slash@4.0.0:
+    resolution: {integrity: sha512-3dOsAHXXUkQTpOYcoAxLIorMTp4gIQr5IW3iVb7A7lFIp0VHhnynm9izx6TssdrIcVIESAlVjtnO2K8bg+Coew==}
+    engines: {node: '>=12'}
 
   slice-ansi@3.0.0:
     resolution: {integrity: sha512-pSyv7bSTC7ig9Dcgbw9AuRNUb5k5V6oDudjZoMBSr13qpLBG7tB+zgCkARjq7xIUgdz5P1Qe8u+rSGdouOOIyQ==}
@@ -7378,6 +7392,12 @@ snapshots:
     optional: true
 
   '@popperjs/core@2.11.8': {}
+
+  '@rollup/plugin-alias@5.1.0(rollup@4.19.2)':
+    dependencies:
+      slash: 4.0.0
+    optionalDependencies:
+      rollup: 4.19.2
 
   '@rollup/pluginutils@4.2.1':
     dependencies:
@@ -10812,6 +10832,14 @@ snapshots:
     dependencies:
       glob: 7.2.3
 
+  rollup-plugin-dts@6.1.1(rollup@4.19.2)(typescript@5.5.4):
+    dependencies:
+      magic-string: 0.30.11
+      rollup: 4.19.2
+      typescript: 5.5.4
+    optionalDependencies:
+      '@babel/code-frame': 7.24.7
+
   rollup-plugin-external-globals@0.10.0(rollup@4.19.2):
     dependencies:
       '@rollup/pluginutils': 5.1.0(rollup@4.19.2)
@@ -10982,6 +11010,8 @@ snapshots:
       is-arrayish: 0.3.2
 
   slash@3.0.0: {}
+
+  slash@4.0.0: {}
 
   slice-ansi@3.0.0:
     dependencies:

@@ -37,7 +37,6 @@ import {
   Tag as TTag,
   TimePicker as TTimePicker,
   Tooltip as TTooltip,
-  TreeNodeModel,
   Upload as TUpload,
 } from 'tdesign-vue-next';
 
@@ -80,7 +79,6 @@ import type {
   TagProps,
   TimePickerProps,
   TooltipProps,
-  TreeProps,
   UploadProps,
 } from '@tmagic/design';
 
@@ -90,7 +88,6 @@ import Input from './Input.vue';
 import Popover from './Popover.vue';
 import Scrollbar from './Scrollbar.vue';
 import TableColumn from './TableColumn.vue';
-import Tree from './Tree.vue';
 
 const adapter: any = {
   message: MessagePlugin,
@@ -485,32 +482,6 @@ const adapter: any = {
         placement: props.placement,
         content: props.content,
       }),
-    },
-
-    tree: {
-      component: Tree,
-      props: (props: TreeProps) => ({
-        ...props,
-        data: props.data,
-        draggable: props.draggable,
-        activable: props.highlightCurrent,
-        activeMultiple: props.highlightCurrent,
-        defaultActived: props.defaultCheckedKeys,
-        checkable: props.showCheckbox,
-        empty: props.emptyText,
-        expandAll: props.defaultExpandAll,
-        checkStrictly: props.checkStrictly,
-        load: props.load,
-        keys: props.props,
-      }),
-      listeners: {
-        click(context: { node: TreeNodeModel<any>; e: MouseEvent }) {
-          return {
-            node: context.node,
-            data: context.node.data,
-          };
-        },
-      },
     },
 
     upload: {

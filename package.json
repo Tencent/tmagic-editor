@@ -6,7 +6,7 @@
   "packageManager": "pnpm@9.6.0",
   "scripts": {
     "bootstrap": "pnpm i && pnpm build",
-    "clean:top": "rimraf */**/dist */**/types */dist coverage dwt*",
+    "clean:top": "rimraf */**/dist */**/types */dist coverage dwt* temp",
     "clean:modules": "rimraf node_modules **/node_modules **/**/node_modules",
     "clean:all": "pnpm clean:top && pnpm clean:modules",
     "lint": "eslint . --ext .js,.vue,.ts,.tsx",
@@ -17,7 +17,9 @@
     "pg:vue2": "pnpm playground:vue2",
     "playground:react": "pnpm --filter \"runtime-react\" build:libs && pnpm --filter \"runtime-react\" --filter \"tmagic-playground\" dev:react",
     "pg:react": "pnpm playground:react",
-    "build": "node scripts/build.mjs",
+    "build": "pnpm build:dst && pnpm --filter \"@tmagic/*\" build",
+    "build:dst": "pnpm --filter \"@tmagic/cli\" build && tsc -p tsconfig.build-browser.json && vue-tsc --declaration --emitDeclarationOnly --project tsconfig.build-vue.json && rollup -c rollup.dts.config.js && rimraf temp",
+    "check:type": "tsc --incremental --noEmit -p tsconfig.check.json",
     "build:playground": "pnpm --filter \"runtime-vue3\" build && pnpm --filter \"tmagic-playground\" build",
     "docs:dev": "vitepress dev docs",
     "docs:serve": "vitepress serve docs",
@@ -43,6 +45,7 @@
   "devDependencies": {
     "@commitlint/cli": "^18.2.0",
     "@commitlint/config-conventional": "^18.1.0",
+    "@rollup/plugin-alias": "^5.1.0",
     "@types/node": "^18.19.0",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
@@ -71,6 +74,8 @@
     "prettier": "^2.8.7",
     "recast": "^0.20.4",
     "rimraf": "^3.0.2",
+    "rollup": "^4.17.2",
+    "rollup-plugin-dts": "^6.1.1",
     "semver": "^7.3.7",
     "serialize-javascript": "^6.0.0",
     "shx": "^0.3.4",
@@ -78,7 +83,8 @@
     "vite": "^5.3.5",
     "vitepress": "1.2.2",
     "vitest": "^2.0.3",
-    "vue": "^3.4.35"
+    "vue": "^3.4.35",
+    "vue-tsc": "^2.0.19"
   },
   "config": {
     "commitizen": {
