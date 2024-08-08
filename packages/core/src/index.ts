@@ -18,10 +18,12 @@
 
 import App from './App';
 
-export * from './events';
+export { default as EventHelper } from './EventHelper';
+export * from './utils';
 
 export { default as Env } from './Env';
 export { default as Page } from './Page';
 export { default as Node } from './Node';
+export { default as IteratorContainer } from './IteratorContainer';
 
 export default App;

@@ -19,19 +19,26 @@
 import { EventEmitter } from 'events';
 
 import { DataSource } from '@tmagic/data-source';
-import type { AppCore, EventConfig, MComponent, MContainer, MNode, MPage, MPageFragment } from '@tmagic/schema';
+import type { EventConfig, MNode } from '@tmagic/schema';
 import { HookCodeType, HookType } from '@tmagic/schema';
 
-import type App from './App';
+import type { default as TMagicApp } from './App';
 import type Page from './Page';
 import Store from './Store';
 
-interface NodeOptions {
+interface EventCache {
+  method: string;
+  fromCpt: any;
+  args: any[];
+}
+
+export interface NodeOptions {
   config: MNode;
   page?: Page;
   parent?: Node;
-  app: App;
+  app: TMagicApp;
 }
+
 class Node extends EventEmitter {
   public data!: MNode;
   public style!: {
@@ -41,8 +48,11 @@ class Node extends EventEmitter {
   public instance?: any;
   public page?: Page;
   public parent?: Node;
-  public app: App;
+  public app: TMagicApp;
   public store = new Store();
+  public eventKeys = new Map<string, symbol>();
+
+  private eventQueue: EventCache[] = [];
 
   constructor(options: NodeOptions) {
     super();
@@ -54,12 +64,16 @@ class Node extends EventEmitter {
     this.listenLifeSafe();
   }
 
-  public setData(data: MComponent | MContainer | MPage | MPageFragment) {
+  public setData(data: MNode) {
     this.data = data;
     const { events, style } = data;
     this.events = events || [];
     this.style = style || {};
-    this.emit('update-data');
+    this.emit('update-data', data);
+  }
+
+  public addEventToQueue(event: EventCache) {
+    this.eventQueue.push(event);
   }
 
   public destroy() {
@@ -84,10 +98,10 @@ class Node extends EventEmitter {
     this.once('mounted', async (instance: any) => {
       this.instance = instance;
 
-      const eventConfigQueue = this.app.eventQueueMap[instance.config.id] || [];
-
-      for (let eventConfig = eventConfigQueue.shift(); eventConfig; eventConfig = eventConfigQueue.shift()) {
-        this.app.compActionHandler(eventConfig.eventConfig, eventConfig.fromCpt, eventConfig.args);
+      for (let eventConfig = this.eventQueue.shift(); eventConfig; eventConfig = this.eventQueue.shift()) {
+        if (typeof instance[eventConfig.method] === 'function') {
+          await instance[eventConfig.method](eventConfig.fromCpt, ...eventConfig.args);
+        }
       }
 
       await this.runHookCode('mounted');
@@ -120,7 +134,7 @@ class Node extends EventEmitter {
       const { codeType = HookCodeType.CODE, codeId, params = {} } = item;
 
       let functionContent: ((...args: any[]) => any) | string | undefined;
-      const functionParams: { app: AppCore; params: Record<string, any>; dataSource?: DataSource } = {
+      const functionParams: { app: TMagicApp; params: Record<string, any>; dataSource?: DataSource } = {
         app: this.app,
         params,
       };

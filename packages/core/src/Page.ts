@@ -19,6 +19,8 @@
 import type { Id, MComponent, MContainer, MPage, MPageFragment } from '@tmagic/schema';
 
 import type App from './App';
+import IteratorContainer from './IteratorContainer';
+import type { default as TMagicNode } from './Node';
 import Node from './Node';
 interface ConfigOptions {
   config: MPage | MPageFragment;
@@ -26,7 +28,7 @@ interface ConfigOptions {
 }
 
 class Page extends Node {
-  public nodes = new Map<Id, Node>();
+  public nodes = new Map<Id, TMagicNode>();
 
   constructor(options: ConfigOptions) {
     super(options);
@@ -37,7 +39,20 @@ class Page extends Node {
     });
   }
 
-  public initNode(config: MComponent | MContainer, parent: Node) {
+  public initNode(config: MComponent | MContainer, parent: TMagicNode) {
+    if (config.type && this.app.iteratorContainerType.has(config.type)) {
+      this.setNode(
+        config.id,
+        new IteratorContainer({
+          config,
+          parent,
+          page: this,
+          app: this.app,
+        }),
+      );
+      return;
+    }
+
     const node = new Node({
       config,
       parent,
@@ -47,7 +62,7 @@ class Page extends Node {
 
     this.setNode(config.id, node);
 
-    if (config.type === 'page-fragment-container' && config.pageFragmentId) {
+    if (config.type && this.app.pageFragmentContainerType.has(config.type) && config.pageFragmentId) {
       const pageFragment = this.app.dsl?.items?.find((page) => page.id === config.pageFragmentId);
       if (pageFragment) {
         config.items = [pageFragment];
@@ -59,11 +74,30 @@ class Page extends Node {
     });
   }
 
-  public getNode(id: Id) {
-    return this.nodes.get(id);
+  public getNode<T extends TMagicNode = TMagicNode>(
+    id: Id,
+    iteratorContainerId?: Id[],
+    iteratorIndex?: number[],
+  ): T | undefined {
+    if (this.nodes.has(id)) {
+      return this.nodes.get(id) as T;
+    }
+
+    if (Array.isArray(iteratorContainerId) && iteratorContainerId.length && Array.isArray(iteratorIndex)) {
+      let iteratorContainer = this.nodes.get(iteratorContainerId[0]) as IteratorContainer;
+
+      for (let i = 1, l = iteratorContainerId.length; i < l; i++) {
+        iteratorContainer = iteratorContainer?.getNode(
+          iteratorContainerId[i],
+          iteratorIndex[i - 1],
+        ) as IteratorContainer;
+      }
+
+      return iteratorContainer?.getNode(id, iteratorIndex[iteratorIndex.length - 1]) as T;
+    }
   }
 
-  public setNode(id: Id, node: Node) {
+  public setNode(id: Id, node: TMagicNode) {
     this.nodes.set(id, node);
   }
 

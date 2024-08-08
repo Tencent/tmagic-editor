@@ -192,6 +192,54 @@ export const initServiceEvents = (
     ((event: 'update:modelValue', value: MApp | null) => void),
   { editorService, codeBlockService, dataSourceService, depService }: Services,
 ) => {
+  const rootChangeHandler = async (value: MApp | null, preValue?: MApp | null) => {
+    if (!value) return;
+
+    value.codeBlocks = value.codeBlocks || {};
+    value.dataSources = value.dataSources || [];
+
+    codeBlockService.setCodeDsl(value.codeBlocks);
+    dataSourceService.set('dataSources', value.dataSources);
+
+    depService.removeTargets(DepTargetType.CODE_BLOCK);
+
+    Object.entries(value.codeBlocks).forEach(([id, code]) => {
+      depService.addTarget(createCodeBlockTarget(id, code));
+    });
+
+    dataSourceService.get('dataSources').forEach((ds) => {
+      initDataSourceDepTarget(ds);
+    });
+
+    if (Array.isArray(value.items)) {
+      collectIdle(value.items, true);
+    } else {
+      depService.clear();
+      delete value.dataSourceDeps;
+      delete value.dataSourceCondDeps;
+    }
+
+    const nodeId = editorService.get('node')?.id || props.defaultSelected;
+    let node;
+    if (nodeId) {
+      node = editorService.getNodeById(nodeId);
+    }
+
+    if (node && node !== value) {
+      await editorService.select(node.id);
+    } else if (value.items?.length) {
+      await editorService.select(value.items[0]);
+    } else if (value.id) {
+      editorService.set('nodes', [value]);
+      editorService.set('parent', null);
+      editorService.set('page', null);
+    }
+
+    if (toRaw(value) !== toRaw(preValue)) {
+      emit('update:modelValue', value);
+    }
+  };
+
   const getApp = () => {
     const stage = editorService.get('stage');
     return stage?.renderer.runtime?.getApp?.();
@@ -292,55 +340,6 @@ export const initServiceEvents = (
     depService.addTarget(createDataSourceCondTarget(ds, reactive({})));
   };
 
-  const rootChangeHandler = async (value: MApp | null, preValue?: MApp | null) => {
-    if (!value) return;
-
-    value.codeBlocks = value.codeBlocks || {};
-    value.dataSources = value.dataSources || [];
-
-    codeBlockService.setCodeDsl(value.codeBlocks);
-    dataSourceService.set('dataSources', value.dataSources);
-
-    depService.removeTargets(DepTargetType.CODE_BLOCK);
-
-    Object.entries(value.codeBlocks).forEach(([id, code]) => {
-      depService.addTarget(createCodeBlockTarget(id, code));
-    });
-
-    dataSourceService.get('dataSources').forEach((ds) => {
-      initDataSourceDepTarget(ds);
-    });
-
-    if (Array.isArray(value.items)) {
-      value.items.forEach((page) => {
-        depService.collectIdle([page], { pageId: page.id }, true);
-      });
-    } else {
-      depService.clear();
-      delete value.dataSourceDeps;
-    }
-
-    const nodeId = editorService.get('node')?.id || props.defaultSelected;
-    let node;
-    if (nodeId) {
-      node = editorService.getNodeById(nodeId);
-    }
-
-    if (node && node !== value) {
-      await editorService.select(node.id);
-    } else if (value.items?.length) {
-      await editorService.select(value.items[0]);
-    } else if (value.id) {
-      editorService.set('nodes', [value]);
-      editorService.set('parent', null);
-      editorService.set('page', null);
-    }
-
-    if (toRaw(value) !== toRaw(preValue)) {
-      emit('update:modelValue', value);
-    }
-  };
-
   const collectIdle = (nodes: MNode[], deep: boolean) => {
     nodes.forEach((node) => {
       let pageId: Id | undefined;
@@ -372,7 +371,7 @@ export const initServiceEvents = (
 
   // 由于历史记录变化是更新整个page，所以历史记录变化时，需要重新收集依赖
   const historyChangeHandler = (page: MPage | MPageFragment) => {
-    depService.collectIdle([page], { pageId: page.id }, true);
+    collectIdle([page], true);
   };
 
   editorService.on('history-change', historyChangeHandler);
@@ -407,9 +406,7 @@ export const initServiceEvents = (
     removeDataSourceTarget(config.id);
     initDataSourceDepTarget(config);
 
-    (root?.items || []).forEach((page) => {
-      depService.collectIdle([page], { pageId: page.id }, true);
-    });
+    collectIdle(root?.items || [], true);
   };
 
   const removeDataSourceTarget = (id: string) => {

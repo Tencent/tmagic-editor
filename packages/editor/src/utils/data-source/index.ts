@@ -1,6 +1,11 @@
 import { CascaderOption, FormConfig, FormState } from '@tmagic/form';
 import { DataSchema, DataSourceFieldType, DataSourceSchema } from '@tmagic/schema';
-import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX, isNumber } from '@tmagic/utils';
+import {
+  DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX,
+  dataSourceTemplateRegExp,
+  getKeysArray,
+  isNumber,
+} from '@tmagic/utils';
 
 import BaseFormConfig from './formConfigs/base';
 import HttpFormConfig from './formConfigs/http';
@@ -118,7 +123,7 @@ export const getFormValue = (type: string, values: Partial<DataSourceSchema>): P
    * context：上下文对象
    *
    * interface Content {
-   *  app: AppCore;
+   *  app: TMagicApp;
    *  dataSource: HttpDataSource;
    * }
    *
@@ -135,7 +140,7 @@ export const getFormValue = (type: string, values: Partial<DataSourceSchema>): P
     * context：上下文对象
     *
     * interface Content {
-    *  app: AppCore;
+    *  app: TMagicApp;
     *  dataSource: HttpDataSource;
     * }
     *
@@ -152,7 +157,7 @@ export const getDisplayField = (dataSources: DataSourceSchema[], key: string) =>
   const displayState: { value: string; type: 'var' | 'text' }[] = [];
 
   // 匹配es6字符串模块
-  const matches = key.matchAll(/\$\{([\s\S]+?)\}/g);
+  const matches = key.matchAll(dataSourceTemplateRegExp);
   let index = 0;
   for (const match of matches) {
     if (typeof match.index === 'undefined') break;
@@ -167,25 +172,22 @@ export const getDisplayField = (dataSources: DataSourceSchema[], key: string) =>
     let ds: DataSourceSchema | undefined;
     let fields: DataSchema[] | undefined;
     // 将模块解析成数据源对应的值
-    match[1]
-      .replaceAll(/\[(\d+)\]/g, '.$1')
-      .split('.')
-      .forEach((item, index) => {
-        if (index === 0) {
-          ds = dataSources.find((ds) => ds.id === item);
-          dsText += ds?.title || item;
-          fields = ds?.fields;
-          return;
-        }
+    getKeysArray(match[1]).forEach((item, index) => {
+      if (index === 0) {
+        ds = dataSources.find((ds) => ds.id === item);
+        dsText += ds?.title || item;
+        fields = ds?.fields;
+        return;
+      }
 
-        if (isNumber(item)) {
-          dsText += `[${item}]`;
-        } else {
-          const field = fields?.find((field) => field.name === item);
-          fields = field?.fields;
-          dsText += `.${field?.title || item}`;
-        }
-      });
+      if (isNumber(item)) {
+        dsText += `[${item}]`;
+      } else {
+        const field = fields?.find((field) => field.name === item);
+        fields = field?.fields;
+        dsText += `.${field?.title || item}`;
+      }
+    });
 
     displayState.push({
       type: 'var',
