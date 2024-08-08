@@ -19,7 +19,7 @@
 import Vue from 'vue';
 
 import Core from '@tmagic/core';
-import { DataSourceManager, DeepObservedData， registerDataSourceOnDemand } from '@tmagic/data-source';
+import { DataSourceManager, DeepObservedData, registerDataSourceOnDemand } from '@tmagic/data-source';
 import { getUrlParam } from '@tmagic/utils';
 
 import asyncDataSources from '../.tmagic/async-datasource-entry';
