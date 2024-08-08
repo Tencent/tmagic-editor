@@ -13,10 +13,7 @@
     "types"
   ],
   "scripts": {
-    "build": "rimraf ./dist && npm run build:type && node scripts/build.mjs",
-    "build:type": "npm run clear:type && vue-tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
-    "clear:type": "rimraf ./types",
-    "check:type": "vue-tsc --noEmit --project tsconfig.build.json"
+    "build": "node scripts/build.mjs"
   },
   "engines": {
     "node": ">=18"
@@ -46,7 +43,6 @@
     "@types/qrcode": "^1.4.2",
     "@vue/compiler-sfc": "^3.4.27",
     "rimraf": "^3.0.2",
-    "vite": "^5.3.5",
-    "vue-tsc": "^2.0.19"
+    "vite": "^5.3.5"
   }
 }
