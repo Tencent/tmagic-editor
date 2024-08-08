@@ -23,10 +23,7 @@
   ],
   "license": "Apache-2.0",
   "scripts": {
-    "build": "rimraf ./dist && npm run build:type && vite build --mode=es && vite build --mode=umd",
-    "build:type": "npm run clear:type && tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
-    "clear:type": "rimraf ./types",
-    "check:type": "tsc --noEmit --project tsconfig.build.json"
+    "build": "vite build --mode=es && vite build --mode=umd"
   },
   "engines": {
     "node": ">=18"
