@@ -82,7 +82,7 @@ export const useEditorDsl = (app: Core | undefined, win = window) => {
       const newNode = app.dataSourceManager?.compiledNode(config, undefined, true) || config;
       replaceChildNode(reactive(newNode), [root.value], parentId);
 
-      const nodeInstance = app.page?.getNode(config.id);
+      const nodeInstance = app.getNode(config.id);
       if (nodeInstance) {
         nodeInstance.setData(newNode);
       }

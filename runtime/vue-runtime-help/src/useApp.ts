@@ -18,12 +18,14 @@
 
 import { inject, onBeforeUnmount, onMounted } from 'vue-demi';
 
-import type Core from '@tmagic/core';
-import type { MNode } from '@tmagic/schema';
+import type TMagicApp from '@tmagic/core';
+import type { Id, MNode } from '@tmagic/schema';
 import { IS_DSL_NODE_KEY } from '@tmagic/utils';
 
 interface UseAppOptions<T extends MNode = MNode> {
   config: T;
+  iteratorContainerId?: Id[];
+  iteratorIndex?: number[];
   methods?: {
     [key: string]: Function;
   };
@@ -31,8 +33,8 @@ interface UseAppOptions<T extends MNode = MNode> {
 
 const isDslNode = (config: MNode) => typeof config[IS_DSL_NODE_KEY] === 'undefined' || config[IS_DSL_NODE_KEY] === true;
 
-export default ({ methods, config }: UseAppOptions) => {
-  const app: Core | undefined = inject('app');
+export default ({ methods, config, iteratorContainerId, iteratorIndex }: UseAppOptions) => {
+  const app: TMagicApp | undefined = inject('app');
 
   const emitData = {
     config,
@@ -52,7 +54,7 @@ export default ({ methods, config }: UseAppOptions) => {
     return displayCfg !== false;
   };
 
-  const node = isDslNode(config) ? app?.page?.getNode(config.id || '') : undefined;
+  const node = isDslNode(config) ? app?.getNode(config.id || '', iteratorContainerId, iteratorIndex) : undefined;
 
   if (node) {
     node.emit('created', emitData);
