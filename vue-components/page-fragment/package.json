@@ -1,0 +1,30 @@
+{
+  "version": "0.0.1",
+  "name": "@tmagic/vue-page-fragment",
+  "type": "module",
+  "main": "src/index.ts",
+  "files": [
+    "src"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tencent/tmagic-editor.git"
+  },
+  "dependencies": {
+    "vue-demi": "^0.14.10"
+  },
+  "peerDependencies": {
+    "@tmagic/schema": "workspace:*",
+    "@tmagic/vue-container": "workspace:*",
+    "@tmagic/vue-runtime-help": "workspace:*",
+    "typescript": "*"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
+  }
+}

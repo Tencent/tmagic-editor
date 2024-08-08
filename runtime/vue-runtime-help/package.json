@@ -29,7 +29,7 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "vue-demi": "^0.14.7"
+    "vue-demi": "^0.14.10"
   },
   "peerDependencies": {
     "@tmagic/core": "workspace:*",

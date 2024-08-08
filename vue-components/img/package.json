@@ -1,0 +1,37 @@
+{
+  "version": "0.0.1",
+  "name": "@tmagic/vue-img",
+  "type": "module",
+  "main": "src/index.ts",
+  "files": [
+    "src"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tencent/tmagic-editor.git"
+  },
+  "dependencies": {
+    "vue-demi": "^0.14.10"
+  },
+  "peerDependencies": {
+    "@tmagic/schema": "workspace:*",
+    "@tmagic/vue-runtime-help": "workspace:*",
+    "@vue/composition-api": ">=1.7.2",
+    "typescript": "*",
+    "vue": ">=2.0.0 || >=3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@vue/composition-api": {
+      "optional": true
+    },
+    "@tmagic/schema": {
+      "optional": true
+    },
+    "typescript": {
+      "optional": true
+    }
+  }
+}
