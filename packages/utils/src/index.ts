@@ -163,18 +163,26 @@ export const guid = (digit = 8): string =>
     return v.toString(16);
   });
 
+export const getKeysArray = (keys: string | number) =>
+  // 将 array[0] 转成 array.0
+  `${keys}`.replaceAll(/\[(\d+)\]/g, '.$1').split('.');
+
 export const getValueByKeyPath = (
   keys: number | string | string[] = '',
   data: Record<string | number, any> = {},
 ): any => {
   // 将 array[0] 转成 array.0
-  const keyArray = Array.isArray(keys) ? keys : `${keys}`.replaceAll(/\[(\d+)\]/g, '.$1').split('.');
+  const keyArray = Array.isArray(keys) ? keys : getKeysArray(keys);
   return keyArray.reduce((accumulator, currentValue: any) => {
-    if (isObject(accumulator) || Array.isArray(accumulator)) {
+    if (isObject(accumulator)) {
       return accumulator[currentValue];
     }
 
-    return void 0;
+    if (Array.isArray(accumulator) && /^\d*$/.test(`${currentValue}`)) {
+      return accumulator[currentValue];
+    }
+
+    throw new Error(`${data}中不存在${keys}`);
   }, data);
 };
 
@@ -267,7 +275,7 @@ export const compiledNode = (
   }
 
   keys.forEach((key) => {
-    const keys = `${key}`.replaceAll(/\[(\d+)\]/g, '.$1').split('.');
+    const keys = getKeysArray(key);
 
     const cacheKey = keys.map((key, index) => {
       if (index < keys.length - 1) {
@@ -276,12 +284,16 @@ export const compiledNode = (
       return `${DSL_NODE_KEY_COPY_PREFIX}${key}`;
     });
 
-    const value = getValueByKeyPath(key, node);
     let templateValue = getValueByKeyPath(cacheKey, node);
-
     if (typeof templateValue === 'undefined') {
-      setValueByKeyPath(cacheKey.join('.'), value, node);
-      templateValue = value;
+      try {
+        const value = getValueByKeyPath(key, node);
+        setValueByKeyPath(cacheKey.join('.'), value, node);
+        templateValue = value;
+      } catch (e) {
+        console.warn(e);
+        return;
+      }
     }
 
     let newValue;
@@ -435,3 +447,5 @@ export const addParamToUrl = (obj: Record<string, any>, global = globalThis, nee
     global.history.pushState({}, '', url);
   }
 };
+
+export const dataSourceTemplateRegExp = /\$\{([\s\S]+?)\}/g;
