@@ -1,5 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
+import App from '@tmagic/core';
+
 import { DataSource } from '@data-source/index';
 
 describe('DataSource', () => {
@@ -12,12 +14,7 @@ describe('DataSource', () => {
         methods: [],
         events: [],
       },
-      app: {
-        platform: '',
-        jsEngine: '',
-        pageFragmentContainerType: new Set(),
-        iteratorContainerType: new Set(),
-      },
+      app: new App({}),
     });
 
     expect(ds).toBeInstanceOf(DataSource);
@@ -33,12 +30,7 @@ describe('DataSource', () => {
         methods: [],
         events: [],
       },
-      app: {
-        platform: '',
-        jsEngine: '',
-        pageFragmentContainerType: new Set(),
-        iteratorContainerType: new Set(),
-      },
+      app: new App({}),
     });
 
     ds.init();
@@ -57,12 +49,7 @@ describe('DataSource setData', () => {
         methods: [],
         events: [],
       },
-      app: {
-        platform: '',
-        jsEngine: '',
-        pageFragmentContainerType: new Set(),
-        iteratorContainerType: new Set(),
-      },
+      app: new App({}),
     });
 
     ds.init();
@@ -94,12 +81,7 @@ describe('DataSource setData', () => {
         methods: [],
         events: [],
       },
-      app: {
-        platform: '',
-        jsEngine: '',
-        pageFragmentContainerType: new Set(),
-        iteratorContainerType: new Set(),
-      },
+      app: new App({}),
     });
 
     ds.init();

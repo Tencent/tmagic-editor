@@ -20,15 +20,8 @@ import EventEmitter from 'events';
 
 import { cloneDeep } from 'lodash-es';
 
-import type {
-  DataSourceSchema,
-  DisplayCond,
-  Id,
-  MNode,
-  NODE_CONDS_KEY,
-  TMagicApp,
-  TMagicIteratorContainer,
-} from '@tmagic/schema';
+import type { default as TMagicApp, IteratorContainer as TMagicIteratorContainer } from '@tmagic/core';
+import type { DataSourceSchema, DisplayCond, Id, MNode, NODE_CONDS_KEY } from '@tmagic/schema';
 import { compiledNode } from '@tmagic/utils';
 
 import { SimpleObservedData } from './observed-data/SimpleObservedData';
@@ -44,13 +37,6 @@ class DataSourceManager extends EventEmitter {
 
   public static register<T extends typeof DataSource = typeof DataSource>(type: string, dataSource: T) {
     DataSourceManager.dataSourceClassMap.set(type, dataSource);
-  }
-
-  /**
-   * @deprecated
-   */
-  public static registe<T extends typeof DataSource = typeof DataSource>(type: string, dataSource: T) {
-    DataSourceManager.register(type, dataSource);
   }
 
   public static getDataSourceClass(type: string) {

@@ -15,9 +15,10 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 
-import { type Id, type MIteratorContainer, NodeType, TMagicIteratorContainer } from '@tmagic/schema';
+import type { IteratorContainer as TMagicIteratorContainer } from '@tmagic/core';
+import { type Id, type MIteratorContainer, NodeType } from '@tmagic/schema';
 import { useApp } from '@tmagic/vue-runtime-help';
 
 import Container from '../../container';
@@ -34,14 +35,12 @@ const props = withDefaults(
   },
 );
 
-const { app, node } = useApp({
+const { app } = useApp({
   config: props.config,
   iteratorContainerId: props.dataIteratorContainerId,
   iteratorIndex: props.dataIteratorIndex,
   methods: {},
 });
-
-const iteratorContainerNode = node as unknown as TMagicIteratorContainer;
 
 const configs = computed(() => {
   let { iteratorData = [] } = props.config;
@@ -55,9 +54,7 @@ const configs = computed(() => {
     iteratorData.push({});
   }
 
-  iteratorContainerNode?.resetNodes();
-
-  return iteratorData.map((itemData, index) => {
+  return iteratorData.map((itemData) => {
     const condResult =
       app?.platform !== 'editor'
         ? app?.dataSourceManager?.compliedIteratorItemConds(itemData, itemConfig, dsField) ?? true
@@ -73,8 +70,6 @@ const configs = computed(() => {
         props.dataIteratorIndex,
       ) ?? items;
 
-    iteratorContainerNode?.setNodes(newItems, index);
-
     return {
       items: newItems,
       id: '',
@@ -89,4 +84,28 @@ const configs = computed(() => {
     };
   });
 });
+
+watch(
+  configs,
+  (configs) => {
+    const iteratorContainerNode = app?.getNode<TMagicIteratorContainer>(
+      props.config.id,
+      props.dataIteratorContainerId,
+      props.dataIteratorIndex,
+    );
+
+    if (!iteratorContainerNode) {
+      return;
+    }
+
+    iteratorContainerNode.resetNodes();
+
+    configs.forEach((config, index) => {
+      iteratorContainerNode.setNodes(config.items, index);
+    });
+  },
+  {
+    immediate: true,
+  },
+);
 </script>

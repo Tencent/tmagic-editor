@@ -19,7 +19,8 @@ import EventEmitter from 'events';
 
 import { cloneDeep } from 'lodash-es';
 
-import type { CodeBlockContent, DataSchema, DataSourceSchema, TMagicApp } from '@tmagic/schema';
+import type { default as TMagicApp } from '@tmagic/core';
+import type { CodeBlockContent, DataSchema, DataSourceSchema } from '@tmagic/schema';
 import { getDefaultValueFromFields } from '@tmagic/utils';
 
 import { ObservedData } from '@data-source/observed-data/ObservedData';

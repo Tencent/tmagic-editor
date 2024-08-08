@@ -16,10 +16,11 @@
  * limitations under the License.
  */
 
-import type { Id, MComponent, MContainer, MPage, MPageFragment, TMagicNode } from '@tmagic/schema';
+import type { Id, MComponent, MContainer, MPage, MPageFragment } from '@tmagic/schema';
 
 import type App from './App';
 import IteratorContainer from './IteratorContainer';
+import type { default as TMagicNode } from './Node';
 import Node from './Node';
 interface ConfigOptions {
   config: MPage | MPageFragment;

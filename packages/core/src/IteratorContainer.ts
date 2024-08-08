@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-import type { Id, MNode, TMagicNode } from '@tmagic/schema';
+import type { Id, MNode } from '@tmagic/schema';
 
+import type { default as TMagicNode } from './Node';
 import Node from './Node';
 
 class IteratorContainer extends Node {
@@ -40,16 +41,20 @@ class IteratorContainer extends Node {
   }
 
   public initNode(config: MNode, parent: TMagicNode, map: Map<Id, TMagicNode>) {
+    if (map.has(config.id)) {
+      map.get(config.id)?.destroy();
+    }
+
     if (config.type && this.app.iteratorContainerType.has(config.type)) {
-      map.set(
-        config.id,
-        new IteratorContainer({
-          config,
-          parent,
-          page: this.page,
-          app: this.app,
-        }),
-      );
+      const iteratorContainer = new IteratorContainer({
+        config,
+        parent,
+        page: this.page,
+        app: this.app,
+      });
+      map.set(config.id, iteratorContainer);
+
+      this.app.eventHelper?.bindNodeEvents(iteratorContainer);
       return;
     }
 
@@ -59,6 +64,8 @@ class IteratorContainer extends Node {
       page: this.page,
       app: this.app,
     });
+
+    this.app.eventHelper?.bindNodeEvents(node);
 
     map.set(config.id, node);
 

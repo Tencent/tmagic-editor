@@ -1,8 +1,9 @@
-import type { DataSourceSchema, HttpOptions, RequestFunction, TMagicApp } from '@tmagic/schema';
+import type { default as TMagicApp } from '@tmagic/core';
+import type { DataSourceSchema, HttpOptions, RequestFunction } from '@tmagic/schema';
 
 import type DataSource from './data-sources/Base';
 import type HttpDataSource from './data-sources/Http';
-import { ObservedData } from './observed-data/ObservedData';
+import type { ObservedData } from './observed-data/ObservedData';
 
 export type ObservedDataClass = new (...args: any[]) => ObservedData;
 

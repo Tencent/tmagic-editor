@@ -15,8 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { EventEmitter } from 'events';
-
 export type Method = 'get' | 'GET' | 'delete' | 'DELETE' | 'post' | 'POST' | 'put' | 'PUT';
 
 export interface HttpOptions {
@@ -36,45 +34,6 @@ export interface HttpOptions {
 export type RequestFunction = <T = any>(options: HttpOptions) => Promise<T>;
 
 export type JsEngine = 'browser' | 'hippy' | 'nodejs';
-
-export interface TMagicNode extends EventEmitter {
-  data: MNode;
-  app: TMagicApp;
-  instance?: any;
-  events: EventConfig[];
-  setData: <T extends MNode = MNode>(data: T) => void;
-  destroy: () => void;
-}
-
-export interface TMagicIteratorContainer extends TMagicNode {
-  nodes: Map<Id, TMagicNode>[];
-  data: MIteratorContainer;
-  dataSourceDeps: DepData;
-  dataSourceCondDeps: DepData;
-  resetNodes: () => void;
-  setNodes: (nodes: MNode[], index: number) => void;
-}
-
-export interface TMagicApp {
-  /** 页面配置描述 */
-  dsl?: MApp;
-  /** 允许平台，editor: 编辑器中，mobile: 手机端，tv: 电视端, pc: 电脑端 */
-  platform: 'editor' | 'mobile' | 'tv' | 'pc' | string;
-  /** 代码运行环境 */
-  jsEngine: JsEngine | string;
-  pageFragmentContainerType: Set<string>;
-  iteratorContainerType: Set<string>;
-  /** 网络请求函数 */
-  request?: RequestFunction;
-  getNode: <T extends TMagicNode = TMagicNode>(
-    id: Id,
-    dataIteratorContainerId?: Id[],
-    dataIteratorIndex?: number[],
-  ) => T | undefined;
-  [key: string]: any;
-}
-
-export type AppCore = TMagicApp;
 
 export enum NodeType {
   /** 容器 */
@@ -128,7 +87,7 @@ export interface CodeItemConfig {
   /** 代码ID */
   codeId: Id;
   /** 代码参数 */
-  params?: object;
+  params?: Record<string, any>;
 }
 
 export interface CompItemConfig {

@@ -140,7 +140,7 @@ export const compliedDataSourceField = (value: any, data: DataSourceManagerData)
     try {
       return getValueByKeyPath(fields.join('.'), dsData);
     } catch (e) {
-      return void 0;
+      return value;
     }
   }
 

@@ -18,7 +18,8 @@
 
 import { inject, onBeforeUnmount, onMounted } from 'vue-demi';
 
-import type { Id, MNode, TMagicApp } from '@tmagic/schema';
+import type TMagicApp from '@tmagic/core';
+import type { Id, MNode } from '@tmagic/schema';
 import { IS_DSL_NODE_KEY } from '@tmagic/utils';
 
 interface UseAppOptions<T extends MNode = MNode> {
