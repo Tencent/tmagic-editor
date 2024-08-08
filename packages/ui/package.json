@@ -33,7 +33,7 @@
     "@tmagic/core": "workspace:*",
     "@tmagic/schema": "workspace:*",
     "@tmagic/utils": "workspace:*",
-    "@tmagic/vue-runtime-help": ">=0.0.7",
+    "@tmagic/vue-runtime-help": "workspace:*",
     "vue": ">=3.4.27",
     "typescript": "*"
   },

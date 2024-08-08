@@ -18,6 +18,7 @@
  */
 
 import type { FormConfig, FormState, TabPaneConfig } from '@tmagic/form';
+import { NODE_CONDS_KEY } from '@tmagic/schema';
 
 export const arrayOptions = [
   { text: '包含', value: 'include' },
@@ -359,7 +360,7 @@ export const displayTabConfig: TabPaneConfig = {
   items: [
     {
       type: 'display-conds',
-      name: 'displayConds',
+      name: NODE_CONDS_KEY,
       titlePrefix: '条件组',
       defaultValue: [],
     },
