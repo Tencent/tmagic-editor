@@ -5,6 +5,7 @@ types
 
 .temp
 .cache
+temp
 
 # local env files
 .env.local

@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "temp",
     "target": "ESNext",
     "module": "ESNext",
     "strict": true,
@@ -14,7 +16,6 @@
     "resolveJsonModule": true,
     "sourceMap": true,
     "useDefineForClassFields": true,
-    "baseUrl": ".",
     "lib": ["ESNext", "DOM"],
     "paths": {
       // 内部模块都指向 src/index.ts, 会有更好的代码跳转体验.
@@ -28,6 +29,7 @@
     "types": [
       "node",
       "vite/client",
+      "./shims-vue",
     ],
   },
   "exclude": [

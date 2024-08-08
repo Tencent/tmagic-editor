@@ -231,7 +231,7 @@ export interface PopoverProps {
   content?: string;
   disabled?: boolean;
   popperClass?: string;
-  visible?: boolean | null;
+  visible?: boolean;
 }
 
 export interface RadioProps {

@@ -3,4 +3,4 @@
 
 npx lint-staged
 
-pnpm --filter "@tmagic/*" check:type
+pnpm check:type
