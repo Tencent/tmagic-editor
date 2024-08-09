@@ -16,8 +16,6 @@
  * limitations under the License.
  */
 
-import path from 'path';
-
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 
@@ -25,16 +23,6 @@ import pkg from './package.json';
 
 export default defineConfig({
   plugins: [vue()],
-
-  resolve: {
-    alias:
-      process.env.NODE_ENV === 'production'
-        ? []
-        : [
-            { find: /^@tmagic\/utils/, replacement: path.join(__dirname, '../utils/src/index.ts') },
-            { find: /^@tmagic\/design/, replacement: path.join(__dirname, '../design/src/index.ts') },
-          ],
-  },
 
   build: {
     cssCodeSplit: false,
