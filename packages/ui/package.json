@@ -15,6 +15,9 @@
   "engines": {
     "node": ">=18"
   },
+  "scripts": {
+    "build": "vite build"
+  },
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
