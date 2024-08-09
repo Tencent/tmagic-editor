@@ -1,0 +1,1 @@
+import{ax as s,q as i,p as a,aS as n}from"./chunks/framework.C60Cdrhl.js";const c=JSON.parse('{"title":"快速开始","description":"","frontmatter":{},"headers":[],"relativePath":"guide/index.md","filePath":"guide/index.md"}'),p={name:"guide/index.md"},t=n("",36),l=[t];function h(e,k,r,E,d,g){return a(),i("div",null,l)}const y=s(p,[["render",h]]);export{c as __pageData,y as default};

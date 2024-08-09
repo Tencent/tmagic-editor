@@ -1,0 +1,2 @@
+import{u as t,_ as o}from"./_plugin-vue_export-helper-B_rbF49s.js";import"./index-Du7PLgy3.js";const n=VueDemi.defineComponent({props:{config:{type:Object,required:!0},model:{type:Object,default:()=>({})}},setup(e){t({config:e.config,methods:{}})}});function p(e,r,c,s,i,u){return Vue.openBlock(),Vue.createElementBlock("p",null,Vue.toDisplayString(e.config.text),1)}const d=o(n,[["render",p]]);export{d as default};
+//# sourceMappingURL=index-Cg9OYB_P.js.map

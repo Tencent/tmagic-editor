@@ -1,0 +1,2 @@
+System.register(["./_plugin-vue_export-helper-legacy-BgsHE6Sz.js","./index-legacy-DCaTpI5T.js"],(function(e,t){"use strict";var n,u;return{setters:[e=>{n=e.u,u=e._},null],execute:function(){const t=VueDemi.defineComponent({props:{config:{type:Object,required:!0},model:{type:Object,default:()=>({})}},setup(e){n({config:e.config,methods:{}})}});e("default",u(t,[["render",function(e,t,n,u,c,o){return Vue.openBlock(),Vue.createElementBlock("p",null,Vue.toDisplayString(e.config.text),1)}]]))}}}));
+//# sourceMappingURL=index-legacy-DvxOiv77.js.map
