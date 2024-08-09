@@ -24,14 +24,6 @@ import pkg from './package.json';
 export default defineConfig({
   plugins: [vue()],
 
-  optimizeDeps: {
-    esbuildOptions: {
-      define: {
-        global: 'globalThis',
-      },
-    },
-  },
-
   build: {
     cssCodeSplit: false,
     sourcemap: false,
