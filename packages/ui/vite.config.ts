@@ -17,13 +17,10 @@
  */
 
 import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
 
 import pkg from './package.json';
 
 export default defineConfig({
-  plugins: [vue()],
-
   build: {
     cssCodeSplit: false,
     sourcemap: false,
@@ -32,8 +29,8 @@ export default defineConfig({
 
     lib: {
       entry: 'src/index.ts',
-      name: 'TMagicTable',
-      fileName: 'tmagic-table',
+      name: 'TMagicUi',
+      fileName: 'tmagic-ui',
     },
 
     rollupOptions: {
@@ -43,14 +40,6 @@ export default defineConfig({
           ...pkg.dependencies,
           ...pkg.peerDependencies,
         }).some((k) => new RegExp(`^${k}`).test(id));
-      },
-
-      output: {
-        // 在 UMD 构建模式下为这些外部化的依赖提供一个全局变量
-        globals: {
-          vue: 'Vue',
-          'element-plus': 'ElementPlus',
-        },
       },
     },
   },

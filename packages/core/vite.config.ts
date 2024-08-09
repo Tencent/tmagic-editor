@@ -16,23 +16,11 @@
  * limitations under the License.
  */
 
-import path from 'path';
-
 import { defineConfig } from 'vite';
 
 import pkg from './package.json';
 
 export default defineConfig({
-  resolve: {
-    alias:
-      process.env.NODE_ENV === 'production'
-        ? []
-        : [
-            { find: /^@tmagic\/schema/, replacement: path.join(__dirname, '../schema/src/index.ts') },
-            { find: /^@tmagic\/data-source/, replacement: path.join(__dirname, '../data-source/src/index.ts') },
-          ],
-  },
-
   build: {
     cssCodeSplit: false,
     sourcemap: false,
