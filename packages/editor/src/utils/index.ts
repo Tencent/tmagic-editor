@@ -22,3 +22,7 @@ export * from './logger';
 export * from './editor';
 export * from './operator';
 export * from './data-source';
+export * from './idle-task';
+export * from './scroll-viewer';
+export * from './tree';
+export * from './undo-redo';

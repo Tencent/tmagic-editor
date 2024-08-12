@@ -54,7 +54,7 @@ const Page: React.FC<PageProps> = ({ config }) => {
 
         return (
           <MagicUiComp
-            id={`${item.id || ''}`}
+            data-tmagic-id={`${item.id || ''}`}
             key={item.id}
             config={item}
             className={`magic-ui-component${config.className ? ` ${config.className}` : ''}`}

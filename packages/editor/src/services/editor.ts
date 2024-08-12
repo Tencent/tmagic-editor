@@ -23,7 +23,7 @@ import { Writable } from 'type-fest';
 import { Target, type TargetOptions, Watcher } from '@tmagic/dep';
 import type { Id, MApp, MComponent, MContainer, MNode, MPage, MPageFragment } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
-import { calcValueByFontsize, getNodePath, isNumber, isPage, isPageFragment, isPop } from '@tmagic/utils';
+import { calcValueByFontsize, getElById, getNodePath, isNumber, isPage, isPageFragment, isPop } from '@tmagic/utils';
 
 import BaseService from '@editor/services//BaseService';
 import propsService from '@editor/services//props';
@@ -759,7 +759,7 @@ class Editor extends BaseService {
     const doc = stage?.renderer.contentWindow?.document;
 
     if (doc) {
-      const el = doc.getElementById(`${node.id}`);
+      const el = getElById()(doc, node.id);
       const parentEl = layout === Layout.FIXED ? doc.body : el?.offsetParent;
       if (parentEl && el) {
         node.style.left = calcValueByFontsize(doc, (parentEl.clientWidth - el.clientWidth) / 2);

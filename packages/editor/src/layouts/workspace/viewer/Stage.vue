@@ -46,7 +46,7 @@ import { cloneDeep } from 'lodash-es';
 
 import type { MApp, MContainer } from '@tmagic/schema';
 import StageCore, { getOffset, Runtime } from '@tmagic/stage';
-import { calcValueByFontsize } from '@tmagic/utils';
+import { calcValueByFontsize, getIdFromEl } from '@tmagic/utils';
 
 import ScrollViewer from '@editor/components/ScrollViewer.vue';
 import { useStage } from '@editor/hooks/use-stage';
@@ -200,8 +200,9 @@ const dropHandler = async (e: DragEvent) => {
   const parentEl: HTMLElement | null | undefined = doc?.querySelector(`.${stageOptions?.containerHighlightClassName}`);
 
   let parent: MContainer | undefined | null = page.value;
-  if (parentEl) {
-    parent = services?.editorService.getNodeById(parentEl.id, false) as MContainer;
+  const parentId = getIdFromEl()(parentEl);
+  if (parentId) {
+    parent = services?.editorService.getNodeById(parentId, false) as MContainer;
   }
 
   if (parent && stageContainer.value && stage) {

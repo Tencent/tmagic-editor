@@ -42,7 +42,7 @@ const Img: React.FC<ImgProps> = ({ config }) => {
     <img
       className="magic-ui-img"
       style={app.transformStyle(config.style || {})}
-      id={`${config.id}`}
+      data-tmagic-id={`${config.id}`}
       src={config.src}
       onClick={clickHandler}
     />

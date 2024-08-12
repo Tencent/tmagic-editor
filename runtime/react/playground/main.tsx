@@ -25,7 +25,7 @@ import { DataSourceManager, DeepObservedData } from '@tmagic/data-source';
 import type { MApp } from '@tmagic/schema';
 import type { RemoveData, SortEventData, UpdateData } from '@tmagic/stage';
 import { AppContent } from '@tmagic/ui-react';
-import { replaceChildNode } from '@tmagic/utils';
+import { getElById, replaceChildNode } from '@tmagic/utils';
 
 import components from '../.tmagic/comp-entry';
 import dataSources from '../.tmagic/datasource-entry';
@@ -101,12 +101,12 @@ const operations = {
   },
 
   select(id: string) {
-    const el = document.getElementById(id);
+    const el = getElById()(id);
     if (el) return el;
     // 未在当前文档下找到目标元素，可能是还未渲染，等待渲染完成后再尝试获取
     return new Promise((resolve) => {
       setTimeout(() => {
-        resolve(document.getElementById(id));
+        resolve(getElById()(document, id));
       }, 0);
     });
   },

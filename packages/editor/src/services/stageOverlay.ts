@@ -2,6 +2,7 @@ import { reactive } from 'vue';
 import type { Writable } from 'type-fest';
 
 import StageCore from '@tmagic/stage';
+import { getIdFromEl } from '@tmagic/utils';
 
 import { useStage } from '@editor/hooks/use-stage';
 import BaseService from '@editor/services//BaseService';
@@ -169,7 +170,8 @@ class StageOverlay extends BaseService {
     });
 
     if (await stageOptions?.canSelect?.(contentEl)) {
-      subStage?.select(contentEl.id);
+      const id = getIdFromEl()(contentEl);
+      id && subStage?.select(id);
     }
   }
 
