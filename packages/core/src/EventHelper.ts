@@ -32,7 +32,7 @@ import {
   type EventActionItem,
   type EventConfig,
 } from '@tmagic/schema';
-import { DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX } from '@tmagic/utils';
+import { DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX, getIdFromEl } from '@tmagic/utils';
 
 import type { default as TMagicApp } from './App';
 import type { default as TMagicNode } from './Node';
@@ -49,14 +49,16 @@ const getDirectComponent = (element: HTMLElement | null, app: TMagicApp): TMagic
     return;
   }
 
-  if (!element.id) {
+  const id = getIdFromEl()(element);
+
+  if (!id) {
     return getDirectComponent(element.parentElement, app);
   }
 
   const node = app.getNode(
-    element.id,
-    element.dataset.iteratorContainerId?.split(','),
-    element.dataset.iteratorIndex?.split(',').map((i) => globalThis.parseInt(i, 10)),
+    id,
+    element.dataset.tmagicIteratorContainerId?.split(','),
+    element.dataset.tmagicIteratorIndex?.split(',').map((i) => globalThis.parseInt(i, 10)),
   );
 
   return node;

@@ -4,7 +4,7 @@ import Core from '@tmagic/core';
 import { type FormConfig, initValue, MForm } from '@tmagic/form';
 import type { Id, MApp, MNode } from '@tmagic/schema';
 import type { RemoveData, UpdateData } from '@tmagic/stage';
-import { getNodePath, replaceChildNode } from '@tmagic/utils';
+import { getElById, getNodePath, replaceChildNode } from '@tmagic/utils';
 
 import { AppProps } from './types';
 
@@ -67,10 +67,10 @@ export const useFormConfig = (props: AppProps) => {
           this.updatePageId?.(id);
         }
 
-        const el = document.getElementById(`${id}`);
+        const el = getElById()(document, `${id}`);
         if (el) return el;
         // 未在当前文档下找到目标元素，可能是还未渲染，等待渲染完成后再尝试获取
-        return nextTick().then(() => document.getElementById(`${id}`) as HTMLElement);
+        return nextTick().then(() => getElById()(document, `${id}`) as HTMLElement);
       },
 
       add({ config, parentId }: UpdateData) {

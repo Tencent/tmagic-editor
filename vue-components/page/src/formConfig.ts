@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+import { getElById } from '@tmagic/utils';
+
 export default [
   {
     text: '页面标识',
@@ -42,7 +44,7 @@ export default [
       if (v === 'relative') {
         model.style.height = 'auto';
       } else {
-        const el = formState.stage?.renderer?.contentWindow.document.getElementById(model.id);
+        const el = getElById()(formState.stage?.renderer?.contentWindow.document, model.id);
         if (el) {
           model.style.height = el.getBoundingClientRect().height;
         }

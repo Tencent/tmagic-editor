@@ -1,9 +1,9 @@
 <template>
   <div
     v-if="display(config)"
-    :id="`${config.id}`"
-    :data-iterator-index="iteratorIndex"
-    :data-iterator-container-id="iteratorContainerId"
+    :data-tmagic-id="`${config.id}`"
+    :data-tmagic-iterator-index="iteratorIndex"
+    :data-tmagic-iterator-container-id="iteratorContainerId"
     :class="className"
     :style="app?.transformStyle(config.style || {})"
   >
@@ -13,10 +13,10 @@
           v-if="display(item)"
           :key="item.id"
           :is="`magic-ui-${toLine(item.type)}`"
-          :id="item.id"
-          :data-container-index="index"
-          :data-iterator-index="iteratorIndex"
-          :data-iterator-container-id="iteratorContainerId"
+          :data-tmagic-id="item.id"
+          :data-tmagic-container-index="index"
+          :data-tmagic-iterator-index="iteratorIndex"
+          :data-tmagic-iterator-container-id="iteratorContainerId"
           :class="`${item.className || ''}`"
           :style="app?.transformStyle(item.style || {})"
           :config="{ ...item, [IS_DSL_NODE_KEY]: true }"

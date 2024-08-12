@@ -3,7 +3,7 @@ import { computed, nextTick, reactive, ref, watch } from 'vue-demi';
 import Core from '@tmagic/core';
 import type { Id, MApp, MNode } from '@tmagic/schema';
 import type { Magic, RemoveData, UpdateData } from '@tmagic/stage';
-import { getNodePath, replaceChildNode } from '@tmagic/utils';
+import { getElById, getNodePath, replaceChildNode } from '@tmagic/utils';
 
 declare global {
   interface Window {
@@ -48,10 +48,10 @@ export const useEditorDsl = (app: Core | undefined, win = window) => {
         this.updatePageId?.(id);
       }
 
-      const el = document.getElementById(`${id}`);
+      const el = getElById()(document, `${id}`);
       if (el) return el;
       // 未在当前文档下找到目标元素，可能是还未渲染，等待渲染完成后再尝试获取
-      return nextTick().then(() => document.getElementById(`${id}`) as HTMLElement);
+      return nextTick().then(() => getElById()(document, `${id}`));
     },
 
     add({ config, parentId }: UpdateData) {
