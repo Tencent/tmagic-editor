@@ -36,7 +36,7 @@ const IteratorContainer: React.FC<IteratorContainerProps> = ({ config, id }) => 
   const MagicUiComp = app?.resolveComponent('container');
   return (
     <div
-      id={`${id || config.id || ''}`}
+      data-tmagic-id={`${id || config.id || ''}`}
       className="magic-ui-iterator-container"
       style={app?.transformStyle(config.style || {})}
     >

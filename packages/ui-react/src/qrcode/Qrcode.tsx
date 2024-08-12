@@ -44,7 +44,12 @@ const Qrcode: React.FC<QrcodeProps> = ({ config }) => {
   }, [config.url]);
 
   return (
-    <img className="magic-ui-qrcode" style={app.transformStyle(config.style || {})} id={`${config.id}`} src={imgSrc} />
+    <img
+      className="magic-ui-qrcode"
+      style={app.transformStyle(config.style || {})}
+      data-tmagic-id={`${config.id}`}
+      src={imgSrc}
+    />
   );
 };
 

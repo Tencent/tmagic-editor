@@ -2,6 +2,7 @@ import { computed, watch } from 'vue';
 
 import type { MNode } from '@tmagic/schema';
 import StageCore, { GuidesType, RemoveEventData, SortEventData, UpdateEventData } from '@tmagic/stage';
+import { getIdFromEl } from '@tmagic/utils';
 
 import editorService from '@editor/services/editor';
 import uiService from '@editor/services/ui';
@@ -71,27 +72,32 @@ export const useStage = (stageOptions: StageOptions) => {
   });
 
   stage.on('select', (el: HTMLElement) => {
-    if (`${editorService.get('node')?.id}` === el.id && editorService.get('nodes').length === 1) return;
-    editorService.select(el.id);
+    const id = getIdFromEl()(el);
+    if (`${editorService.get('node')?.id}` === id && editorService.get('nodes').length === 1) return;
+    id && editorService.select(id);
   });
 
   stage.on('highlight', (el: HTMLElement) => {
-    editorService.highlight(el.id);
+    const id = getIdFromEl()(el);
+    id && editorService.highlight(id);
   });
 
   stage.on('multi-select', (els: HTMLElement[]) => {
-    editorService.multiSelect(els.map((el) => el.id));
+    const ids = els.map((el) => getIdFromEl()(el)).filter((id) => Boolean(id)) as string[];
+    editorService.multiSelect(ids);
   });
 
   stage.on('update', (ev: UpdateEventData) => {
     if (ev.parentEl) {
       for (const data of ev.data) {
-        editorService.moveToContainer({ id: data.el.id, style: data.style }, ev.parentEl.id);
+        const id = getIdFromEl()(data.el);
+        const pId = getIdFromEl()(ev.parentEl);
+        id && pId && editorService.moveToContainer({ id, style: data.style }, pId);
       }
       return;
     }
 
-    editorService.update(ev.data.map((data) => ({ id: data.el.id, style: data.style })));
+    editorService.update(ev.data.map((data) => ({ id: getIdFromEl()(data.el) || '', style: data.style })));
   });
 
   stage.on('sort', (ev: SortEventData) => {
@@ -99,7 +105,7 @@ export const useStage = (stageOptions: StageOptions) => {
   });
 
   stage.on('remove', (ev: RemoveEventData) => {
-    const nodes = ev.data.map(({ el }) => editorService.getNodeById(el.id));
+    const nodes = ev.data.map(({ el }) => editorService.getNodeById(getIdFromEl()(el) || ''));
     editorService.remove(nodes.filter((node) => Boolean(node)) as MNode[]);
   });
 
