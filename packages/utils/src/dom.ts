@@ -122,3 +122,12 @@ export const calcValueByFontsize = (doc: Document | undefined, value: number) =>
 
   return value;
 };
+
+export const getIdFromEl = () => (el?: HTMLElement | SVGElement | null) => el?.dataset?.tmagicId;
+
+export const getElById = () => (doc?: Document, id?: string | number) =>
+  doc?.querySelector(`[data-tmagic-id=${id}]`) as HTMLElement;
+
+export const setIdToEl = () => (el: HTMLElement | SVGElement, id: string | number) => {
+  el.dataset.tmagicId = `${id}`;
+};

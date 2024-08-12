@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { guid } from '@tmagic/utils';
+import { getElById, getIdFromEl, guid, setIdToEl } from '@tmagic/utils';
 
 import { Mode, ZIndex } from './const';
 import type { TargetElement as ShadowElement, TargetShadowConfig, UpdateDragEl } from './types';
@@ -93,7 +93,7 @@ export default class TargetShadow {
   private updateEl(target: ShadowElement, src?: ShadowElement): ShadowElement {
     const el = src || globalThis.document.createElement('div');
 
-    el.id = `${this.idPrefix}_${target.id}`;
+    setIdToEl()(el, `${this.idPrefix}_${getIdFromEl()(target)}`);
 
     el.style.cssText = getTargetElStyle(target, this.zIndex);
 
@@ -108,7 +108,7 @@ export default class TargetShadow {
       el.style.transform = `translate3d(${-this.scrollLeft}px, ${-this.scrollTop}px, 0)`;
     }
 
-    if (!globalThis.document.getElementById(el.id)) {
+    if (!getElById()(globalThis.document, getIdFromEl()(el))) {
       this.container.append(el);
     }
 

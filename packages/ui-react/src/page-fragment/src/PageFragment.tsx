@@ -17,7 +17,7 @@ const PageFragment: React.FC<PageFragmentProps> = ({ config }) => {
 
   return (
     <div
-      id={`${config.id || ''}`}
+      data-tmagic-id={`${config.id || ''}`}
       className={`magic-ui-page-fragment magic-ui-container magic-layout-${config.layout}${
         config.className ? ` ${config.className}` : ''
       }`}
@@ -33,7 +33,7 @@ const PageFragment: React.FC<PageFragmentProps> = ({ config }) => {
 
         return (
           <MagicUiComp
-            id={`${item.id || ''}`}
+            data-tmagic-id={`${item.id || ''}`}
             key={item.id}
             config={item}
             className={`magic-ui-component${config.className ? ` ${config.className}` : ''}`}

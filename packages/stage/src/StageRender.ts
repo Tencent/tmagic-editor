@@ -19,7 +19,7 @@
 import { EventEmitter } from 'events';
 
 import { Id } from '@tmagic/schema';
-import { getHost, injectStyle, isSameDomain } from '@tmagic/utils';
+import { getElById, getHost, injectStyle, isSameDomain } from '@tmagic/utils';
 
 import { DEFAULT_ZOOM, RenderType } from './const';
 import style from './style.css?raw';
@@ -152,7 +152,7 @@ export default class StageRender extends EventEmitter {
   }
 
   public getTargetElement(id: Id): HTMLElement | null {
-    return this.getDocument()?.getElementById(`${id}`) || null;
+    return getElById()(this.getDocument(), id);
   }
 
   /**
