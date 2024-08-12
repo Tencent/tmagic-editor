@@ -1,13 +1,13 @@
 <template>
   <div
     class="magic-ui-iterator-container"
-    :data-iterator-index="dataIteratorIndex"
-    :data-iterator-container-id="dataIteratorContainerId"
+    :data-iterator-index="dataTmagicIteratorIndex"
+    :data-iterator-container-id="dataTmagicIteratorContainerId"
   >
     <TMagicContainer
       v-for="(item, index) in configs"
-      :iterator-index="[...(dataIteratorIndex || []), index]"
-      :iterator-container-id="[...(dataIteratorContainerId || []), config.id]"
+      :iterator-index="[...(dataTmagicIteratorIndex || []), index]"
+      :iterator-container-id="[...(dataTmagicIteratorContainerId || []), config.id]"
       :key="index"
       :config="item"
     ></TMagicContainer>
@@ -32,8 +32,8 @@ export default defineComponent({
       type: Object as PropType<MIteratorContainer>,
       required: true,
     },
-    dataIteratorIndex: Array as PropType<number[]>,
-    dataIteratorContainerId: Array as PropType<Id[]>,
+    dataTmagicIteratorIndex: Array as PropType<number[]>,
+    dataTmagicIteratorContainerId: Array as PropType<Id[]>,
     model: {
       type: Object,
       default: () => ({}),
@@ -43,8 +43,8 @@ export default defineComponent({
   setup(props) {
     const { app } = useApp({
       config: props.config,
-      iteratorContainerId: props.dataIteratorContainerId,
-      iteratorIndex: props.dataIteratorIndex,
+      iteratorContainerId: props.dataTmagicIteratorContainerId,
+      iteratorIndex: props.dataTmagicIteratorIndex,
       methods: {},
     });
 
@@ -72,8 +72,8 @@ export default defineComponent({
             itemData,
             items,
             dsField,
-            props.dataIteratorContainerId,
-            props.dataIteratorIndex,
+            props.dataTmagicIteratorContainerId,
+            props.dataTmagicIteratorIndex,
           ) ?? items;
 
         return {
@@ -96,8 +96,8 @@ export default defineComponent({
       (configs) => {
         const iteratorContainerNode = app?.getNode<TMagicIteratorContainer>(
           props.config.id,
-          props.dataIteratorContainerId,
-          props.dataIteratorIndex,
+          props.dataTmagicIteratorContainerId,
+          props.dataTmagicIteratorIndex,
         );
 
         if (!iteratorContainerNode) {

@@ -48,8 +48,9 @@ import { throttle } from 'lodash-es';
 import { TMagicButton, TMagicTooltip } from '@tmagic/design';
 import type { FieldProps, FormItem, FormState } from '@tmagic/form';
 import type { Id } from '@tmagic/schema';
+import { getIdFromEl } from '@tmagic/utils';
 
-import { Services, UI_SELECT_MODE_EVENT_NAME } from '@editor/type';
+import { type Services, UI_SELECT_MODE_EVENT_NAME } from '@editor/type';
 
 defineOptions({
   name: 'MFieldsUISelect',
@@ -71,11 +72,12 @@ const cancelHandler = () => {
   globalThis.document.removeEventListener(UI_SELECT_MODE_EVENT_NAME, clickHandler as EventListener);
 };
 
-const clickHandler = ({ detail }: Event & { detail: any }) => {
-  if (detail.id) {
-    props.model[props.name] = detail.id;
-    emit('change', detail.id);
-    mForm?.$emit('field-change', props.prop, detail.id);
+const clickHandler = ({ detail }: Event & { detail: HTMLElement }) => {
+  const id = getIdFromEl()(detail);
+  if (id) {
+    props.model[props.name] = id;
+    emit('change', id);
+    mForm?.$emit('field-change', props.prop, id);
   }
 
   if (cancelHandler) {
@@ -104,21 +106,24 @@ const deleteHandler = () => {
 };
 
 const selectNode = async (id: Id) => {
-  await services?.editorService.select(id);
-  services?.editorService.get('stage')?.select(id);
-  services?.stageOverlayService.get('stage')?.select(id);
+  if (!services) return;
+  await services.editorService.select(id);
+  services.editorService.get('stage')?.select(id);
+  services.stageOverlayService.get('stage')?.select(id);
 };
 
 const highlight = throttle((id: Id) => {
-  services?.editorService.highlight(id);
-  services?.editorService.get('stage')?.highlight(id);
-  services?.stageOverlayService.get('stage')?.highlight(id);
+  if (!services) return;
+  services.editorService.highlight(id);
+  services.editorService.get('stage')?.highlight(id);
+  services.stageOverlayService.get('stage')?.highlight(id);
 }, 150);
 
 const unhighlight = () => {
-  services?.editorService.set('highlightNode', null);
-  services?.editorService.get('stage')?.clearHighlight();
-  services?.stageOverlayService.get('stage')?.clearHighlight();
+  if (!services) return;
+  services.editorService.set('highlightNode', null);
+  services.editorService.get('stage')?.clearHighlight();
+  services.stageOverlayService.get('stage')?.clearHighlight();
 };
 </script>
 

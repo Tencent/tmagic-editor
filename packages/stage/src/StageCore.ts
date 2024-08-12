@@ -21,6 +21,7 @@ import { EventEmitter } from 'events';
 import type { MoveableOptions, OnDragStart } from 'moveable';
 
 import type { Id } from '@tmagic/schema';
+import { getIdFromEl } from '@tmagic/utils';
 
 import ActionManager from './ActionManager';
 import { DEFAULT_ZOOM } from './const';
@@ -336,13 +337,14 @@ export default class StageCore extends EventEmitter {
   private initActionManagerEvent(): void {
     this.actionManager
       .on('before-select', (el: HTMLElement, event?: MouseEvent) => {
-        this.select(el.id, event);
+        const id = getIdFromEl()(el);
+        id && this.select(id, event);
       })
       .on('select', (selectedEl: HTMLElement, event: MouseEvent) => {
         this.emit('select', selectedEl, event);
       })
       .on('before-multi-select', (els: HTMLElement[]) => {
-        this.multiSelect(els.map((el) => el.id));
+        this.multiSelect(els.map((el) => getIdFromEl()(el)).filter((id) => Boolean(id)) as string[]);
       })
       .on('multi-select', (selectedElList: HTMLElement[], event: MouseEvent) => {
         this.emit('multi-select', selectedElList, event);

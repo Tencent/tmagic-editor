@@ -21,9 +21,10 @@ import serialize from 'serialize-javascript';
 import type { Id, MApp, MContainer, MNode, MPage, MPageFragment } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 import type StageCore from '@tmagic/stage';
-import { calcValueByFontsize, getNodePath, isNumber, isPage, isPageFragment, isPop } from '@tmagic/utils';
+import { calcValueByFontsize, getElById, getNodePath, isNumber, isPage, isPageFragment, isPop } from '@tmagic/utils';
 
 import { Layout } from '@editor/type';
+
 export const COPY_STORAGE_KEY = '$MagicEditorCopyData';
 export const COPY_CODE_STORAGE_KEY = '$MagicEditorCopyCode';
 export const COPY_DS_STORAGE_KEY = '$MagicEditorCopyDataSource';
@@ -239,8 +240,8 @@ export const getGuideLineFromCache = (key: string): number[] => {
 export const fixNodeLeft = (config: MNode, parent: MContainer, doc?: Document) => {
   if (!doc || !config.style || !isNumber(config.style.left)) return config.style?.left;
 
-  const el = doc.getElementById(`${config.id}`);
-  const parentEl = doc.getElementById(`${parent.id}`);
+  const el = getElById()(doc, `${config.id}`);
+  const parentEl = getElById()(doc, `${parent.id}`);
 
   const left = Number(config.style?.left) || 0;
   if (el && parentEl) {

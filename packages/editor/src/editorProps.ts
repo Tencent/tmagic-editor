@@ -10,6 +10,7 @@ import StageCore, {
   RenderType,
   type UpdateDragEl,
 } from '@tmagic/stage';
+import { getIdFromEl } from '@tmagic/utils';
 
 import type {
   ComponentGroup,
@@ -114,7 +115,7 @@ export const defaultEditorProps = {
   eventMethodList: () => ({}),
   datasourceValues: () => ({}),
   datasourceConfigs: () => ({}),
-  canSelect: (el: HTMLElement) => Boolean(el.id),
+  canSelect: (el: HTMLElement) => Boolean(getIdFromEl()(el)),
   isContainer: (el: HTMLElement) => el.classList.contains('magic-ui-container'),
   codeOptions: () => ({}),
 };
