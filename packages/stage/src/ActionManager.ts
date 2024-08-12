@@ -23,7 +23,7 @@ import type { MoveableOptions, OnDragStart } from 'moveable';
 
 import { Env } from '@tmagic/core';
 import type { Id } from '@tmagic/schema';
-import { addClassName, getDocument, removeClassNameByClassName } from '@tmagic/utils';
+import { addClassName, getDocument, getIdFromEl, removeClassNameByClassName } from '@tmagic/utils';
 
 import {
   AbleActionEventType,
@@ -99,13 +99,14 @@ export default class ActionManager extends EventEmitter {
     }
 
     const el = await this.getElementFromPoint(event);
-    if (!el) {
+    const id = getIdFromEl()(el);
+    if (!id) {
       this.clearHighlight();
       return;
     }
 
     this.emit('mousemove', event);
-    this.highlight(el.id);
+    this.highlight(id);
   }, throttleTime);
 
   constructor(config: ActionManagerConfig) {
@@ -118,7 +119,7 @@ export default class ActionManager extends EventEmitter {
     this.disabledMultiSelect = config.disabledMultiSelect ?? false;
     this.getTargetElement = config.getTargetElement;
     this.getElementsFromPoint = config.getElementsFromPoint;
-    this.canSelect = config.canSelect || ((el: HTMLElement) => !!el.id);
+    this.canSelect = config.canSelect || ((el: HTMLElement) => Boolean(getIdFromEl()(el)));
     this.getRenderDocument = config.getRenderDocument;
     this.isContainer = config.isContainer;
 
@@ -187,7 +188,7 @@ export default class ActionManager extends EventEmitter {
    */
   public isSelectedEl(el: HTMLElement): boolean {
     // 有可能dom已经重新渲染，不再是原来的dom了，所以这里判断id，而不是判断el === this.selectedDom
-    return el.id === this.selectedEl?.id;
+    return getIdFromEl()(el) === getIdFromEl()(this.selectedEl);
   }
 
   public setSelectedEl(el: HTMLElement | null): void {
@@ -224,7 +225,7 @@ export default class ActionManager extends EventEmitter {
     let stopped = false;
     const stop = () => (stopped = true);
     for (const el of els) {
-      if (!el.id.startsWith(GHOST_EL_ID_PREFIX) && (await this.isElCanSelect(el, event, stop))) {
+      if (!getIdFromEl()(el)?.startsWith(GHOST_EL_ID_PREFIX) && (await this.isElCanSelect(el, event, stop))) {
         if (stopped) break;
         return el;
       }
@@ -344,7 +345,11 @@ export default class ActionManager extends EventEmitter {
     const els = this.getElementsFromPoint(event);
 
     for (const el of els) {
-      if (!el.id.startsWith(GHOST_EL_ID_PREFIX) && (await this.isContainer?.(el)) && !excludeElList.includes(el)) {
+      if (
+        !getIdFromEl()(el)?.startsWith(GHOST_EL_ID_PREFIX) &&
+        (await this.isContainer?.(el)) &&
+        !excludeElList.includes(el)
+      ) {
         addClassName(el, doc, this.containerHighlightClassName);
         break;
       }
@@ -477,9 +482,9 @@ export default class ActionManager extends EventEmitter {
         if (typeof options === 'function') {
           const cfg: CustomizeMoveableOptionsCallbackConfig = {
             targetEl: this.selectedEl,
-            targetElId: this.selectedEl?.id,
+            targetElId: getIdFromEl()(this.selectedEl),
             targetEls: this.selectedElList,
-            targetElIds: this.selectedElList?.map((item) => item.id),
+            targetElIds: this.selectedElList?.map((item) => getIdFromEl()(item) || ''),
             isMulti,
             document: this.getRenderDocument(),
           };
@@ -507,7 +512,7 @@ export default class ActionManager extends EventEmitter {
     }
 
     // 判断元素是否已在多选列表
-    const existIndex = this.selectedElList.findIndex((selectedDom) => selectedDom.id === el.id);
+    const existIndex = this.selectedElList.findIndex((selectedDom) => getIdFromEl()(selectedDom) === getIdFromEl()(el));
     if (existIndex !== -1) {
       // 再次点击取消选中
       if (this.selectedElList.length > 1) {

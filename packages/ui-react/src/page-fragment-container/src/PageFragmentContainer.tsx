@@ -38,7 +38,7 @@ const PageFragmentContainer: React.FC<PageFragmentContainerProps> = ({ config })
 
   return (
     <div
-      id={`${config.id || ''}`}
+      data-tmagic-id={`${config.id || ''}`}
       className="magic-ui-page-fragment-container"
       style={app.transformStyle(config.style || {})}
     >

@@ -32,12 +32,14 @@ import type {
 } from 'moveable';
 import MoveableHelper from 'moveable-helper';
 
-import { calcValueByFontsize } from '@tmagic/utils';
+import { calcValueByFontsize, getIdFromEl, setIdToEl } from '@tmagic/utils';
 
 import { DRAG_EL_ID_PREFIX, GHOST_EL_ID_PREFIX, Mode, ZIndex } from './const';
 import TargetShadow from './TargetShadow';
 import type { DragResizeHelperConfig, Rect, TargetElement } from './types';
 import { getAbsolutePosition, getBorderWidth, getMarginValue, getOffset } from './util';
+
+const getId = getIdFromEl();
 
 /**
  * 拖拽/改变大小等操作发生时，moveable会抛出各种状态事件，DragResizeHelper负责响应这些事件，对目标节点target和拖拽节点targetShadow进行修改；
@@ -239,15 +241,15 @@ export default class DragResizeHelper {
     events.forEach((ev) => {
       const { width, height, beforeTranslate } = ev.drag;
       const frameSnapShot = this.framesSnapShot.find(
-        (frameItem) => frameItem.id === ev.target.id.replace(DRAG_EL_ID_PREFIX, ''),
+        (frameItem) => frameItem.id === getId(ev.target)?.replace(DRAG_EL_ID_PREFIX, ''),
       );
       if (!frameSnapShot) return;
       const targeEl = this.targetList.find(
-        (targetItem) => targetItem.id === ev.target.id.replace(DRAG_EL_ID_PREFIX, ''),
+        (targetItem) => targetItem.id === getId(ev.target)?.replace(DRAG_EL_ID_PREFIX, ''),
       );
       if (!targeEl) return;
       // 元素与其所属组同时加入多选列表时，只更新父元素
-      const isParentIncluded = this.targetList.find((targetItem) => targetItem.id === targeEl.parentElement?.id);
+      const isParentIncluded = this.targetList.find((targetItem) => getId(targetItem) === getId(targeEl.parentElement));
 
       if (!isParentIncluded) {
         // 更新页面元素位置
@@ -277,15 +279,18 @@ export default class DragResizeHelper {
     // 拖动过程更新
     events.forEach((ev) => {
       const frameSnapShot = this.framesSnapShot.find(
-        (frameItem) => ev.target.id.startsWith(DRAG_EL_ID_PREFIX) && ev.target.id.endsWith(frameItem.id),
+        (frameItem) => getId(ev.target)?.startsWith(DRAG_EL_ID_PREFIX) && getId(ev.target)?.endsWith(frameItem.id),
       );
       if (!frameSnapShot) return;
       const targeEl = this.targetList.find(
-        (targetItem) => ev.target.id.startsWith(DRAG_EL_ID_PREFIX) && ev.target.id.endsWith(targetItem.id),
+        (targetItem) =>
+          getId(ev.target)?.startsWith(DRAG_EL_ID_PREFIX) &&
+          getId(targetItem) &&
+          getId(ev.target)?.endsWith(getId(targetItem)!),
       );
       if (!targeEl) return;
       // 元素与其所属组同时加入多选列表时，只更新父元素
-      const isParentIncluded = this.targetList.find((targetItem) => targetItem.id === targeEl.parentElement?.id);
+      const isParentIncluded = this.targetList.find((targetItem) => getId(targetItem) === getId(targeEl.parentElement));
       if (!isParentIncluded) {
         // 更新页面元素位置
         const { marginLeft, marginTop } = getMarginValue(targeEl);
@@ -312,7 +317,7 @@ export default class DragResizeHelper {
     const shadowEls = this.getShadowEls();
 
     if (shadowEls.length) {
-      shadowEl = shadowEls.find((item) => item.id.endsWith(el.id));
+      shadowEl = shadowEls.find((item) => getId(item)?.endsWith(getId(el) || ''));
     }
 
     if (parentEl && this.mode === Mode.ABSOLUTE && shadowEl) {
@@ -348,14 +353,18 @@ export default class DragResizeHelper {
     events.forEach((ev) => {
       // 实际目标元素
       const matchEventTarget = this.targetList.find(
-        (targetItem) => ev.target.id.startsWith(DRAG_EL_ID_PREFIX) && ev.target.id.endsWith(targetItem.id),
+        (targetItem) =>
+          getId(ev.target)?.startsWith(DRAG_EL_ID_PREFIX) && getId(ev.target)?.endsWith(getId(targetItem) || ''),
       );
       if (!matchEventTarget) return;
-      this.framesSnapShot.push({
-        left: matchEventTarget.offsetLeft,
-        top: matchEventTarget.offsetTop,
-        id: matchEventTarget.id,
-      });
+
+      const id = getId(matchEventTarget);
+      id &&
+        this.framesSnapShot.push({
+          left: matchEventTarget.offsetLeft,
+          top: matchEventTarget.offsetTop,
+          id,
+        });
     });
   }
 
@@ -370,7 +379,7 @@ export default class DragResizeHelper {
     const ghostEl = el.cloneNode(true) as HTMLElement;
     this.setGhostElChildrenId(ghostEl);
     const { top, left } = getAbsolutePosition(el, getOffset(el));
-    ghostEl.id = `${GHOST_EL_ID_PREFIX}${el.id}`;
+    setIdToEl()(ghostEl, `${GHOST_EL_ID_PREFIX}${getId(el)}`);
     ghostEl.style.zIndex = ZIndex.GHOST_EL;
     ghostEl.style.opacity = '.5';
     ghostEl.style.position = 'absolute';
@@ -384,8 +393,10 @@ export default class DragResizeHelper {
 
   private setGhostElChildrenId(el: Element): void {
     for (const child of Array.from(el.children)) {
-      if (child.id) {
-        child.id = `${GHOST_EL_ID_PREFIX}${child.id}`;
+      const el = child as HTMLElement;
+      const id = getId(el);
+      if (id) {
+        setIdToEl()(el, `${GHOST_EL_ID_PREFIX}${id}`);
       }
 
       if (child.children.length) {

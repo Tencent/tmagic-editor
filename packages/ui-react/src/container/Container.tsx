@@ -36,7 +36,7 @@ const Container: React.FC<ContainerProps> = ({ config, id }) => {
 
   return (
     <div
-      id={`${id || config.id || ''}`}
+      data-tmagic-id={`${id || config.id || ''}`}
       className={`magic-ui-container magic-layout-${config.layout}${config.className ? ` ${config.className}` : ''}`}
       style={app.transformStyle(config.style || {})}
     >
@@ -50,7 +50,7 @@ const Container: React.FC<ContainerProps> = ({ config, id }) => {
 
         return (
           <MagicUiComp
-            id={`${item.id || ''}`}
+            data-tmagic-id={`${item.id || ''}`}
             key={item.id}
             config={item}
             className={`magic-ui-component${config.className ? ` ${config.className}` : ''}`}
