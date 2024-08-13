@@ -1,17 +1,18 @@
 <template>
-  <img class="magic-ui-img" :src="config.src" @click="clickHandler" />
+  <img :src="config.src" @click="clickHandler" />
 </template>
 
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue-demi';
 
-import type { MComponent } from '@tmagic/schema';
+import type { Id, MComponent } from '@tmagic/schema';
 import { useApp } from '@tmagic/vue-runtime-help';
 
-interface ImgSchema extends MComponent {
-  type: 'img';
+interface ImgSchema extends Omit<MComponent, 'id'> {
+  id?: Id;
+  type?: 'img';
   src: string;
-  url: string;
+  url?: string;
 }
 
 export default defineComponent({
@@ -20,6 +21,8 @@ export default defineComponent({
       type: Object as PropType<ImgSchema>,
       required: true,
     },
+    iteratorIndex: Array as PropType<number[]>,
+    iteratorContainerId: Array as PropType<Id[]>,
     model: {
       type: Object,
       default: () => ({}),
@@ -33,6 +36,8 @@ export default defineComponent({
 
     useApp({
       config: props.config,
+      iteratorContainerId: props.iteratorContainerId,
+      iteratorIndex: props.iteratorIndex,
       methods: {},
     });
 

@@ -1,20 +1,28 @@
 <template>
-  <img class="magic-ui-qrcode" :src="imgUrl" />
+  <img :src="imgUrl" />
 </template>
 
 <script lang="ts">
 import { defineComponent, type PropType, ref, watch } from 'vue-demi';
 import QRCode from 'qrcode';
 
-import type { MComponent } from '@tmagic/schema';
+import type { Id, MComponent } from '@tmagic/schema';
 import { useApp } from '@tmagic/vue-runtime-help';
+
+interface QrCodeSchema extends Omit<MComponent, 'id'> {
+  id?: Id;
+  type?: 'qrcode';
+  url: string;
+}
 
 export default defineComponent({
   props: {
     config: {
-      type: Object as PropType<MComponent>,
+      type: Object as PropType<QrCodeSchema>,
       required: true,
     },
+    iteratorIndex: Array as PropType<number[]>,
+    iteratorContainerId: Array as PropType<Id[]>,
     model: {
       type: Object,
       default: () => ({}),
@@ -40,6 +48,8 @@ export default defineComponent({
     useApp({
       config: props.config,
       methods: {},
+      iteratorContainerId: props.iteratorContainerId,
+      iteratorIndex: props.iteratorIndex,
     });
 
     return {
