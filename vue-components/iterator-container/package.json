@@ -20,7 +20,6 @@
     "@tmagic/core": "workspace:*",
     "@tmagic/schema": "workspace:*",
     "@tmagic/utils": "workspace:*",
-    "@tmagic/vue-container": "workspace:*",
     "@tmagic/vue-runtime-help": "workspace:*",
     "@vue/composition-api": ">=1.7.2",
     "typescript": "*",

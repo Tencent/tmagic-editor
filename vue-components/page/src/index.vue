@@ -1,19 +1,14 @@
 <template>
-  <TMagicContainer class="magic-ui-page" :config="config"></TMagicContainer>
+  <magic-ui-container class="magic-ui-page" :data-tmagic-id="config.id" :config="config"></magic-ui-container>
 </template>
 
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue-demi';
 
 import type { MPage } from '@tmagic/schema';
-import TMagicContainer from '@tmagic/vue-container';
 import { useApp } from '@tmagic/vue-runtime-help';
 
 export default defineComponent({
-  components: {
-    TMagicContainer,
-  },
-
   props: {
     config: {
       type: Object as PropType<MPage>,
@@ -30,10 +25,14 @@ export default defineComponent({
       window.location.reload();
     };
 
-    useApp({
+    const { app } = useApp({
       config: props.config,
       methods: { refresh },
     });
+
+    return {
+      app,
+    };
   },
 });
 </script>
