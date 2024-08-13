@@ -1,7 +1,7 @@
 <template>
-  <button class="magic-ui-button">
+  <button>
     <slot>
-      <p>{{ config?.text || '' }}</p>
+      {{ config?.text || '' }}
     </slot>
   </button>
 </template>
@@ -9,11 +9,12 @@
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue-demi';
 
-import type { MComponent } from '@tmagic/schema';
+import type { Id, MComponent } from '@tmagic/schema';
 import { useApp } from '@tmagic/vue-runtime-help';
 
-interface ButtonSchema extends MComponent {
-  type: 'button';
+interface ButtonSchema extends Omit<MComponent, 'id'> {
+  id?: Id;
+  type?: 'button';
   text: string;
 }
 
@@ -23,6 +24,8 @@ export default defineComponent({
       type: Object as PropType<ButtonSchema>,
       required: true,
     },
+    iteratorIndex: Array as PropType<number[]>,
+    iteratorContainerId: Array as PropType<Id[]>,
     model: {
       type: Object,
       default: () => ({}),
@@ -33,6 +36,8 @@ export default defineComponent({
     useApp({
       config: props.config,
       methods: {},
+      iteratorContainerId: props.iteratorContainerId,
+      iteratorIndex: props.iteratorIndex,
     });
   },
 });

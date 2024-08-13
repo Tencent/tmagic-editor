@@ -6,6 +6,7 @@ export default {
     top: 0,
     left: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    zIndex: 100,
   },
   items: [],
 };
