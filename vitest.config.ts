@@ -21,7 +21,6 @@ export default defineConfig({
         './packages/*/tests/**',
         './packages/cli/lib/**',
         './packages/ui/**',
-        './packages/ui-vue2/**',
         './packages/ui-react/**',
         './packages/design/**',
         './packages/element-plus-adapter/**',

@@ -14,5 +14,6 @@
     "packages/utils/src",
     "packages/element-plus-adapter/src",
     "packages/ui/src",
+    "packages/ui-react/src",
   ]
 }

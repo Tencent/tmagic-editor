@@ -3,3 +3,4 @@ packages:
   - 'playground'
   - 'runtime/*'
   - 'vue-components/*'
+  - 'react-components/*'

@@ -20,8 +20,8 @@ import { createRoot } from 'react-dom/client';
 
 import Core from '@tmagic/core';
 import { DataSourceManager, DeepObservedData } from '@tmagic/data-source';
+import { AppContent } from '@tmagic/react-runtime-help';
 import type { MApp } from '@tmagic/schema';
-import { AppContent } from '@tmagic/ui-react';
 import { getUrlParam } from '@tmagic/utils';
 
 import components from '../.tmagic/comp-entry';
