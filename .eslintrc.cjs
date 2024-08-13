@@ -33,6 +33,7 @@ module.exports = {
     'vue/no-mutating-props': 'off',
     'vue/multi-word-component-names': 'off',
     'no-param-reassign': 'off',
+    '@typescript-eslint/naming-convention': 'off',
     '@typescript-eslint/no-require-imports': 'off',
     "@typescript-eslint/no-misused-promises": [
       "error",

@@ -1,0 +1,61 @@
+{
+  "version": "0.0.1",
+  "name": "@tmagic/react-runtime-help",
+  "type": "module",
+  "sideEffects": false,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./*": "./*"
+  },
+  "files": [
+    "dist"
+  ],
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "pnpm clean && tsc -b tsconfig.build.json",
+    "clean": "rimraf dist *.tsbuildinfo",
+    "check:type": "tsc --noEmit --project tsconfig.build.json"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tencent/tmagic-editor.git"
+  },
+  "dependencies": {
+    "lodash-es": "^4.17.21"
+  },
+  "peerDependencies": {
+    "lodash-es": "^4.17.21",
+    "@tmagic/core": "workspace:*",
+    "@tmagic/data-source": "workspace:*",
+    "@tmagic/schema": "workspace:*",
+    "@tmagic/stage": "workspace:*",
+    "@tmagic/utils": "workspace:*",
+    "react": ">=18.3.1",
+    "typescript": "*"
+  },
+  "peerDependenciesMeta": {
+    "@tmagic/schema": {
+      "optional": true
+    },
+    "@tmagic/stage": {
+      "optional": true
+    },
+    "typescript": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.4",
+    "@types/node": "^18.19.0",
+    "@types/react": "^18.3.3",
+    "rimraf": "^3.0.2"
+  }
+}

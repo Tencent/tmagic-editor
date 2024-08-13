@@ -675,34 +675,46 @@ importers:
 
   packages/ui-react:
     dependencies:
-      '@tmagic/core':
+      '@tmagic/react-button':
         specifier: workspace:*
-        version: link:../core
-      '@tmagic/schema':
+        version: link:../../react-components/button
+      '@tmagic/react-container':
         specifier: workspace:*
-        version: link:../schema
-      '@tmagic/utils':
+        version: link:../../react-components/container
+      '@tmagic/react-img':
         specifier: workspace:*
-        version: link:../utils
-      qrcode:
-        specifier: ^1.5.0
-        version: 1.5.3
-      react:
-        specifier: '>=18.3.1'
-        version: 18.3.1
-      react-dom:
-        specifier: '>=18.3.1'
-        version: 18.3.1(react@18.3.1)
+        version: link:../../react-components/img
+      '@tmagic/react-iterator-container':
+        specifier: workspace:*
+        version: link:../../react-components/iterator-container
+      '@tmagic/react-overlay':
+        specifier: workspace:*
+        version: link:../../react-components/overlay
+      '@tmagic/react-page':
+        specifier: workspace:*
+        version: link:../../react-components/page
+      '@tmagic/react-page-fragment':
+        specifier: workspace:*
+        version: link:../../react-components/page-fragment
+      '@tmagic/react-page-fragment-container':
+        specifier: workspace:*
+        version: link:../../react-components/page-fragment-container
+      '@tmagic/react-qrcode':
+        specifier: workspace:*
+        version: link:../../react-components/qrcode
+      '@tmagic/react-text':
+        specifier: workspace:*
+        version: link:../../react-components/text
       typescript:
         specifier: '*'
         version: 5.5.4
     devDependencies:
-      '@types/react':
-        specifier: ^18.3.3
-        version: 18.3.3
-      '@types/react-dom':
-        specifier: ^18.3.0
-        version: 18.3.0
+      rimraf:
+        specifier: ^3.0.2
+        version: 3.0.2
+      vite:
+        specifier: ^5.3.5
+        version: 5.3.5(@types/node@18.19.42)(sass@1.77.8)(terser@5.31.3)
 
   packages/utils:
     dependencies:
@@ -823,32 +835,297 @@ importers:
         specifier: ^5.3.5
         version: 5.3.5(@types/node@18.19.42)(sass@1.77.8)(terser@5.31.3)
 
+  react-components/button:
+    dependencies:
+      '@tmagic/react-runtime-help':
+        specifier: workspace:*
+        version: link:../../runtime/react-runtime-help
+      '@tmagic/schema':
+        specifier: workspace:*
+        version: link:../../packages/schema
+      react:
+        specifier: '>=18.3.1'
+        version: 18.3.1
+      react-dom:
+        specifier: '>=18.3.1'
+        version: 18.3.1(react@18.3.1)
+      typescript:
+        specifier: '*'
+        version: 5.5.4
+    devDependencies:
+      '@types/react':
+        specifier: ^18.3.3
+        version: 18.3.3
+      '@types/react-dom':
+        specifier: ^18.3.0
+        version: 18.3.0
+
+  react-components/container:
+    dependencies:
+      '@tmagic/react-runtime-help':
+        specifier: workspace:*
+        version: link:../../runtime/react-runtime-help
+      '@tmagic/schema':
+        specifier: workspace:*
+        version: link:../../packages/schema
+      '@tmagic/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
+      react:
+        specifier: '>=18.3.1'
+        version: 18.3.1
+      react-dom:
+        specifier: '>=18.3.1'
+        version: 18.3.1(react@18.3.1)
+      typescript:
+        specifier: '*'
+        version: 5.5.4
+    devDependencies:
+      '@types/react':
+        specifier: ^18.3.3
+        version: 18.3.3
+      '@types/react-dom':
+        specifier: ^18.3.0
+        version: 18.3.0
+
+  react-components/img:
+    dependencies:
+      '@tmagic/react-runtime-help':
+        specifier: workspace:*
+        version: link:../../runtime/react-runtime-help
+      '@tmagic/schema':
+        specifier: workspace:*
+        version: link:../../packages/schema
+      react:
+        specifier: '>=18.3.1'
+        version: 18.3.1
+      react-dom:
+        specifier: '>=18.3.1'
+        version: 18.3.1(react@18.3.1)
+      typescript:
+        specifier: '*'
+        version: 5.5.4
+    devDependencies:
+      '@types/react':
+        specifier: ^18.3.3
+        version: 18.3.3
+      '@types/react-dom':
+        specifier: ^18.3.0
+        version: 18.3.0
+
+  react-components/iterator-container:
+    dependencies:
+      '@tmagic/react-runtime-help':
+        specifier: workspace:*
+        version: link:../../runtime/react-runtime-help
+      '@tmagic/schema':
+        specifier: workspace:*
+        version: link:../../packages/schema
+      '@tmagic/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
+      react:
+        specifier: '>=18.3.1'
+        version: 18.3.1
+      react-dom:
+        specifier: '>=18.3.1'
+        version: 18.3.1(react@18.3.1)
+      typescript:
+        specifier: '*'
+        version: 5.5.4
+    devDependencies:
+      '@types/react':
+        specifier: ^18.3.3
+        version: 18.3.3
+      '@types/react-dom':
+        specifier: ^18.3.0
+        version: 18.3.0
+
+  react-components/overlay:
+    dependencies:
+      '@tmagic/react-runtime-help':
+        specifier: workspace:*
+        version: link:../../runtime/react-runtime-help
+      '@tmagic/schema':
+        specifier: workspace:*
+        version: link:../../packages/schema
+      react:
+        specifier: '>=18.3.1'
+        version: 18.3.1
+      react-dom:
+        specifier: '>=18.3.1'
+        version: 18.3.1(react@18.3.1)
+      typescript:
+        specifier: '*'
+        version: 5.5.4
+    devDependencies:
+      '@types/react':
+        specifier: ^18.3.3
+        version: 18.3.3
+      '@types/react-dom':
+        specifier: ^18.3.0
+        version: 18.3.0
+
+  react-components/page:
+    dependencies:
+      '@tmagic/react-runtime-help':
+        specifier: workspace:*
+        version: link:../../runtime/react-runtime-help
+      '@tmagic/schema':
+        specifier: workspace:*
+        version: link:../../packages/schema
+      '@tmagic/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
+      react:
+        specifier: '>=18.3.1'
+        version: 18.3.1
+      react-dom:
+        specifier: '>=18.3.1'
+        version: 18.3.1(react@18.3.1)
+      typescript:
+        specifier: '*'
+        version: 5.5.4
+    devDependencies:
+      '@types/react':
+        specifier: ^18.3.3
+        version: 18.3.3
+      '@types/react-dom':
+        specifier: ^18.3.0
+        version: 18.3.0
+
+  react-components/page-fragment:
+    dependencies:
+      '@tmagic/react-runtime-help':
+        specifier: workspace:*
+        version: link:../../runtime/react-runtime-help
+      '@tmagic/schema':
+        specifier: workspace:*
+        version: link:../../packages/schema
+      '@tmagic/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
+      react:
+        specifier: '>=18.3.1'
+        version: 18.3.1
+      react-dom:
+        specifier: '>=18.3.1'
+        version: 18.3.1(react@18.3.1)
+      typescript:
+        specifier: '*'
+        version: 5.5.4
+    devDependencies:
+      '@types/react':
+        specifier: ^18.3.3
+        version: 18.3.3
+      '@types/react-dom':
+        specifier: ^18.3.0
+        version: 18.3.0
+
+  react-components/page-fragment-container:
+    dependencies:
+      '@tmagic/react-runtime-help':
+        specifier: workspace:*
+        version: link:../../runtime/react-runtime-help
+      '@tmagic/schema':
+        specifier: workspace:*
+        version: link:../../packages/schema
+      react:
+        specifier: '>=18.3.1'
+        version: 18.3.1
+      react-dom:
+        specifier: '>=18.3.1'
+        version: 18.3.1(react@18.3.1)
+      typescript:
+        specifier: '*'
+        version: 5.5.4
+    devDependencies:
+      '@types/react':
+        specifier: ^18.3.3
+        version: 18.3.3
+      '@types/react-dom':
+        specifier: ^18.3.0
+        version: 18.3.0
+
+  react-components/qrcode:
+    dependencies:
+      '@tmagic/react-runtime-help':
+        specifier: workspace:*
+        version: link:../../runtime/react-runtime-help
+      '@tmagic/schema':
+        specifier: workspace:*
+        version: link:../../packages/schema
+      qrcode:
+        specifier: ^1.5.0
+        version: 1.5.3
+      react:
+        specifier: '>=18.3.1'
+        version: 18.3.1
+      react-dom:
+        specifier: '>=18.3.1'
+        version: 18.3.1(react@18.3.1)
+      typescript:
+        specifier: '*'
+        version: 5.5.4
+    devDependencies:
+      '@types/qrcode':
+        specifier: ^1.4.2
+        version: 1.5.5
+      '@types/react':
+        specifier: ^18.3.3
+        version: 18.3.3
+      '@types/react-dom':
+        specifier: ^18.3.0
+        version: 18.3.0
+
+  react-components/text:
+    dependencies:
+      '@tmagic/react-runtime-help':
+        specifier: workspace:*
+        version: link:../../runtime/react-runtime-help
+      '@tmagic/schema':
+        specifier: workspace:*
+        version: link:../../packages/schema
+      react:
+        specifier: '>=18.3.1'
+        version: 18.3.1
+      react-dom:
+        specifier: '>=18.3.1'
+        version: 18.3.1(react@18.3.1)
+      typescript:
+        specifier: '*'
+        version: 5.5.4
+    devDependencies:
+      '@types/react':
+        specifier: ^18.3.3
+        version: 18.3.3
+      '@types/react-dom':
+        specifier: ^18.3.0
+        version: 18.3.0
+
   runtime/react:
     dependencies:
       '@tmagic/core':
-        specifier: 1.4.16
-        version: 1.4.16(@tmagic/data-source@1.4.16(@tmagic/schema@1.4.16(typescript@5.5.4))(@tmagic/utils@1.4.16(@tmagic/schema@1.4.16(typescript@5.5.4))(typescript@5.5.4))(typescript@5.5.4))(@tmagic/schema@1.4.16(typescript@5.5.4))(@tmagic/utils@1.4.16(@tmagic/schema@1.4.16(typescript@5.5.4))(typescript@5.5.4))(typescript@5.5.4)
+        specifier: workspace:*
+        version: link:../../packages/core
       '@tmagic/data-source':
-        specifier: 1.4.16
-        version: 1.4.16(@tmagic/schema@1.4.16(typescript@5.5.4))(@tmagic/utils@1.4.16(@tmagic/schema@1.4.16(typescript@5.5.4))(typescript@5.5.4))(typescript@5.5.4)
+        specifier: workspace:*
+        version: link:../../packages/data-source
+      '@tmagic/react-runtime-help':
+        specifier: workspace:*
+        version: link:../react-runtime-help
       '@tmagic/schema':
-        specifier: 1.4.16
-        version: 1.4.16(typescript@5.5.4)
+        specifier: workspace:*
+        version: link:../../packages/schema
       '@tmagic/stage':
-        specifier: 1.4.16
-        version: 1.4.16(@tmagic/core@1.4.16(@tmagic/data-source@1.4.16(@tmagic/schema@1.4.16(typescript@5.5.4))(@tmagic/utils@1.4.16(@tmagic/schema@1.4.16(typescript@5.5.4))(typescript@5.5.4))(typescript@5.5.4))(@tmagic/schema@1.4.16(typescript@5.5.4))(@tmagic/utils@1.4.16(@tmagic/schema@1.4.16(typescript@5.5.4))(typescript@5.5.4))(typescript@5.5.4))(@tmagic/schema@1.4.16(typescript@5.5.4))(@tmagic/utils@1.4.16(@tmagic/schema@1.4.16(typescript@5.5.4))(typescript@5.5.4))(scenejs@1.10.3)(typescript@5.5.4)
-      '@tmagic/ui-react':
-        specifier: 1.4.16
-        version: 1.4.16(@tmagic/core@1.4.16(@tmagic/data-source@1.4.16(@tmagic/schema@1.4.16(typescript@5.5.4))(@tmagic/utils@1.4.16(@tmagic/schema@1.4.16(typescript@5.5.4))(typescript@5.5.4))(typescript@5.5.4))(@tmagic/schema@1.4.16(typescript@5.5.4))(@tmagic/utils@1.4.16(@tmagic/schema@1.4.16(typescript@5.5.4))(typescript@5.5.4))(typescript@5.5.4))(@tmagic/schema@1.4.16(typescript@5.5.4))(@tmagic/utils@1.4.16(@tmagic/schema@1.4.16(typescript@5.5.4))(typescript@5.5.4))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.5.4)
+        specifier: workspace:*
+        version: link:../../packages/stage
       '@tmagic/utils':
-        specifier: 1.4.16
-        version: 1.4.16(@tmagic/schema@1.4.16(typescript@5.5.4))(typescript@5.5.4)
+        specifier: workspace:*
+        version: link:../../packages/utils
       axios:
         specifier: ^0.25.0
         version: 0.25.0
-      lodash-es:
-        specifier: ^4.17.21
-        version: 4.17.21
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -862,9 +1139,6 @@ importers:
       '@tmagic/cli':
         specifier: workspace:*
         version: link:../../packages/cli
-      '@types/lodash-es':
-        specifier: ^4.17.4
-        version: 4.17.12
       '@types/react':
         specifier: ^18.3.3
         version: 18.3.3
@@ -883,6 +1157,46 @@ importers:
       vite:
         specifier: ^5.2.11
         version: 5.3.5(@types/node@18.19.42)(sass@1.77.8)(terser@5.31.3)
+
+  runtime/react-runtime-help:
+    dependencies:
+      '@tmagic/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@tmagic/data-source':
+        specifier: workspace:*
+        version: link:../../packages/data-source
+      '@tmagic/schema':
+        specifier: workspace:*
+        version: link:../../packages/schema
+      '@tmagic/stage':
+        specifier: workspace:*
+        version: link:../../packages/stage
+      '@tmagic/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
+      react:
+        specifier: '>=18.3.1'
+        version: 18.3.1
+      typescript:
+        specifier: '*'
+        version: 5.5.4
+    devDependencies:
+      '@types/lodash-es':
+        specifier: ^4.17.4
+        version: 4.17.12
+      '@types/node':
+        specifier: ^18.19.0
+        version: 18.19.42
+      '@types/react':
+        specifier: ^18.3.3
+        version: 18.3.3
+      rimraf:
+        specifier: ^3.0.2
+        version: 3.0.2
 
   runtime/tmagic-form:
     dependencies:
@@ -1172,9 +1486,6 @@ importers:
       '@tmagic/utils':
         specifier: workspace:*
         version: link:../../packages/utils
-      '@tmagic/vue-container':
-        specifier: workspace:*
-        version: link:../container
       '@tmagic/vue-runtime-help':
         specifier: workspace:*
         version: link:../../runtime/vue-runtime-help
@@ -1196,9 +1507,6 @@ importers:
       '@tmagic/schema':
         specifier: workspace:*
         version: link:../../packages/schema
-      '@tmagic/vue-container':
-        specifier: workspace:*
-        version: link:../container
       '@tmagic/vue-runtime-help':
         specifier: workspace:*
         version: link:../../runtime/vue-runtime-help
@@ -1217,9 +1525,6 @@ importers:
       '@tmagic/utils':
         specifier: workspace:*
         version: link:../../packages/utils
-      '@tmagic/vue-container':
-        specifier: workspace:*
-        version: link:../container
       '@tmagic/vue-runtime-help':
         specifier: workspace:*
         version: link:../../runtime/vue-runtime-help
@@ -1238,9 +1543,6 @@ importers:
       '@tmagic/utils':
         specifier: workspace:*
         version: link:../../packages/utils
-      '@tmagic/vue-container':
-        specifier: workspace:*
-        version: link:../container
       '@tmagic/vue-runtime-help':
         specifier: workspace:*
         version: link:../../runtime/vue-runtime-help
@@ -1256,9 +1558,6 @@ importers:
       '@tmagic/schema':
         specifier: workspace:*
         version: link:../../packages/schema
-      '@tmagic/vue-container':
-        specifier: workspace:*
-        version: link:../container
       '@tmagic/vue-runtime-help':
         specifier: workspace:*
         version: link:../../runtime/vue-runtime-help
@@ -2654,20 +2953,6 @@ packages:
       '@tmagic/utils': '>=1.4.8'
       element-plus: '>=2.7.5'
       vue: '>=3.4.27'
-
-  '@tmagic/ui-react@1.4.16':
-    resolution: {integrity: sha512-WwK9yUmt+Qw4h/Ux+p1hlE84743y8TatUmzoGxmM0rAE19pCalJls/zl78erewkntp5mHicR927xsw32vBsS7A==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      '@tmagic/core': 1.4.16
-      '@tmagic/schema': 1.4.16
-      '@tmagic/utils': 1.4.16
-      react: '>=18.3.1'
-      react-dom: '>=18.3.1'
-      typescript: '*'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
 
   '@tmagic/utils@1.4.16':
     resolution: {integrity: sha512-bljMgc6a9DvbvCc1yawgCOzMqml6K5qgw4OBYVcxr06d+fT2pWfwCNrwZ5o8I2w6i0YcDMmKBr4ADy2Zb+cr6Q==}
@@ -7678,17 +7963,6 @@ snapshots:
       '@tmagic/utils': 1.4.16(@tmagic/schema@1.4.16(typescript@5.5.4))(typescript@5.5.4)
       element-plus: 2.7.8(@vue/composition-api@1.7.2(vue@3.4.35(typescript@5.5.4)))(vue@3.4.35(typescript@5.5.4))
       vue: 3.4.35(typescript@5.5.4)
-
-  '@tmagic/ui-react@1.4.16(@tmagic/core@1.4.16(@tmagic/data-source@1.4.16(@tmagic/schema@1.4.16(typescript@5.5.4))(@tmagic/utils@1.4.16(@tmagic/schema@1.4.16(typescript@5.5.4))(typescript@5.5.4))(typescript@5.5.4))(@tmagic/schema@1.4.16(typescript@5.5.4))(@tmagic/utils@1.4.16(@tmagic/schema@1.4.16(typescript@5.5.4))(typescript@5.5.4))(typescript@5.5.4))(@tmagic/schema@1.4.16(typescript@5.5.4))(@tmagic/utils@1.4.16(@tmagic/schema@1.4.16(typescript@5.5.4))(typescript@5.5.4))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.5.4)':
-    dependencies:
-      '@tmagic/core': 1.4.16(@tmagic/data-source@1.4.16(@tmagic/schema@1.4.16(typescript@5.5.4))(@tmagic/utils@1.4.16(@tmagic/schema@1.4.16(typescript@5.5.4))(typescript@5.5.4))(typescript@5.5.4))(@tmagic/schema@1.4.16(typescript@5.5.4))(@tmagic/utils@1.4.16(@tmagic/schema@1.4.16(typescript@5.5.4))(typescript@5.5.4))(typescript@5.5.4)
-      '@tmagic/schema': 1.4.16(typescript@5.5.4)
-      '@tmagic/utils': 1.4.16(@tmagic/schema@1.4.16(typescript@5.5.4))(typescript@5.5.4)
-      qrcode: 1.5.3
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-    optionalDependencies:
-      typescript: 5.5.4
 
   '@tmagic/utils@1.4.16(@tmagic/schema@1.4.16(typescript@5.5.4))(typescript@5.5.4)':
     dependencies:

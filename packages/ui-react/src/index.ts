@@ -16,31 +16,38 @@
  * limitations under the License.
  */
 
-import Button from './button';
-import Container from './container';
-import Img from './img';
-import IteratorContainer from './iterator-container';
-import Overlay from './overlay';
-import Page from './page';
-import pageFragment from './page-fragment';
-import pageFragmentContainer from './page-fragment-container';
-import Qrcode from './qrcode';
-import Text from './text';
-export { default as AppContent } from './AppContent';
-export { default as useApp } from './useApp';
+import Button from '@tmagic/react-button';
+import Container from '@tmagic/react-container';
+import Img from '@tmagic/react-img';
+import IteratorContainer from '@tmagic/react-iterator-container';
+import Overlay from '@tmagic/react-overlay';
+import Page from '@tmagic/react-page';
+import PageFragment from '@tmagic/react-page-fragment';
+import PageFragmentContainer from '@tmagic/react-page-fragment-container';
+import QRcode from '@tmagic/react-qrcode';
+import Text from '@tmagic/react-text';
 
-export const MagicUiPage = Page;
+export { default as TMagicUiButton } from '@tmagic/react-button';
+export { default as TMagicUiContainer } from '@tmagic/react-container';
+export { default as TMagicUiImg } from '@tmagic/react-img';
+export { default as TMagicUiIteratorContainer } from '@tmagic/react-iterator-container';
+export { default as TMagicUiOverlay } from '@tmagic/react-overlay';
+export { default as TMagicUiPage } from '@tmagic/react-page';
+export { default as TMagicUiPageFragment } from '@tmagic/react-page-fragment';
+export { default as TMagicUiPageFragmentContainer } from '@tmagic/react-page-fragment-container';
+export { default as TMagicUiQRcode } from '@tmagic/react-qrcode';
+export { default as TMagicUiText } from '@tmagic/react-text';
 
 const ui: Record<string, any> = {
   page: Page,
   container: Container,
   button: Button,
-  img: Img,
   text: Text,
-  qrcode: Qrcode,
+  img: Img,
+  qrcode: QRcode,
   overlay: Overlay,
-  'page-fragment': pageFragment,
-  'page-fragment-container': pageFragmentContainer,
+  'page-fragment-container': PageFragmentContainer,
+  'page-fragment': PageFragment,
   'iterator-container': IteratorContainer,
 };
 
