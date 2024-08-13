@@ -19,21 +19,19 @@
     "build:ds:event": "vite build --config build.vite.config.ts --mode ds:event"
   },
   "dependencies": {
-    "@tmagic/core": "1.4.16",
-    "@tmagic/data-source": "1.4.16",
-    "@tmagic/ui-react": "1.4.16",
-    "@tmagic/schema": "1.4.16",
-    "@tmagic/stage": "1.4.16",
-    "@tmagic/utils": "1.4.16",
+    "@tmagic/core": "workspace:*",
+    "@tmagic/data-source": "workspace:*",
+    "@tmagic/react-runtime-help": "workspace:*",
+    "@tmagic/schema": "workspace:*",
+    "@tmagic/stage": "workspace:*",
+    "@tmagic/utils": "workspace:*",
     "axios": "^0.25.0",
-    "lodash-es": "^4.17.21",
     "terser": "^5.31.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@tmagic/cli": "workspace:*",
-    "@types/lodash-es": "^4.17.4",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-legacy": "^5.4.0",

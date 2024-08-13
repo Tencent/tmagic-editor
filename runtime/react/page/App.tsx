@@ -16,46 +16,19 @@
  * limitations under the License.
  */
 
-import React, { useContext, useState } from 'react';
-import { cloneDeep } from 'lodash-es';
+import React, { useContext } from 'react';
 
-import type Core from '@tmagic/core';
-import type { ChangeEvent } from '@tmagic/data-source';
-import type { MNode } from '@tmagic/schema';
-import { AppContent } from '@tmagic/ui-react';
-import { isPage, replaceChildNode } from '@tmagic/utils';
+import type TMagicApp from '@tmagic/core';
+import { AppContent, useDsl } from '@tmagic/react-runtime-help';
 
 function App() {
-  const app = useContext<Core | undefined>(AppContent);
+  const app = useContext<TMagicApp | undefined>(AppContent);
 
-  if (!app?.page) return null;
+  const { pageConfig } = useDsl(app);
 
-  const [config, setConfig] = useState(app.page.data);
+  const MagicUiPage = app?.resolveComponent('page');
 
-  app.dataSourceManager?.on('update-data', (nodes: MNode[], sourceId: string, event: ChangeEvent) => {
-    let pageConfig = config;
-    nodes.forEach((node) => {
-      if (isPage(node)) {
-        pageConfig = node;
-      } else {
-        replaceChildNode(node, [pageConfig]);
-      }
-    });
-
-    setConfig(cloneDeep(pageConfig));
-
-    setTimeout(() => {
-      app.emit('replaced-node', {
-        ...event,
-        nodes,
-        sourceId,
-      });
-    }, 0);
-  });
-
-  const MagicUiPage = app.resolveComponent('page');
-
-  return <MagicUiPage config={config}></MagicUiPage>;
+  return <MagicUiPage config={pageConfig}></MagicUiPage>;
 }
 
 export default App;

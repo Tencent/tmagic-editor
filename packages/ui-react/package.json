@@ -2,7 +2,8 @@
   "name": "@tmagic/ui-react",
   "version": "1.4.16",
   "type": "module",
-  "main": "src/index.ts",
+  "main": "dist/tmagic-ui-react.js",
+  "types": "types/index.d.ts",
   "files": [
     "src"
   ],
@@ -14,26 +15,30 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "scripts": {
-    "react:build": "tsc && vite build"
+    "build": "vite build"
   },
   "dependencies": {
-    "qrcode": "^1.5.0"
-  },
-  "devDependencies": {
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0"
+    "@tmagic/react-button": "workspace:*",
+    "@tmagic/react-container": "workspace:*",
+    "@tmagic/react-img": "workspace:*",
+    "@tmagic/react-iterator-container": "workspace:*",
+    "@tmagic/react-overlay": "workspace:*",
+    "@tmagic/react-page": "workspace:*",
+    "@tmagic/react-page-fragment": "workspace:*",
+    "@tmagic/react-page-fragment-container": "workspace:*",
+    "@tmagic/react-qrcode": "workspace:*",
+    "@tmagic/react-text": "workspace:*"
   },
   "peerDependencies": {
-    "@tmagic/core": "workspace:*",
-    "@tmagic/schema": "workspace:*",
-    "@tmagic/utils": "workspace:*",
-    "react": ">=18.3.1",
-    "react-dom": ">=18.3.1",
     "typescript": "*"
   },
   "peerDependenciesMeta": {
     "typescript": {
       "optional": true
     }
+  },
+  "devDependencies": {
+    "rimraf": "^3.0.2",
+    "vite": "^5.3.5"
   }
 }

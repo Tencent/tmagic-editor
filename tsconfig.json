@@ -22,6 +22,7 @@
       "@tmagic/*": ["packages/*/src"],
       "@tmagic/tmagic-form-runtime": ["runtime/tmagic-form/src"],
       "@tmagic/vue-runtime-help": ["runtime/vue-runtime-help/src"],
+      "@tmagic/react-runtime-help": ["runtime/react-runtime-help/src"],
       "@editor/*": ["packages/editor/src/*"],
       "@form/*": ["packages/form/src/*"],
       "@data-source/*": ["packages/data-source/src/*"],
