@@ -206,6 +206,11 @@ export interface PastePosition {
 
 export type MNode = MComponent | MContainer | MIteratorContainer | MPage | MApp | MPageFragment;
 
+export interface MNodeInstance extends Omit<MNode, 'id'> {
+  id?: Id;
+  type?: string;
+}
+
 export enum HookType {
   /** 代码块钩子标识 */
   CODE = 'code',

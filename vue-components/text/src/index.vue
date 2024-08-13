@@ -5,15 +5,23 @@
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue-demi';
 
-import type { MComponent } from '@tmagic/schema';
+import type { Id, MComponent } from '@tmagic/schema';
 import { useApp } from '@tmagic/vue-runtime-help';
+
+interface TextSchema extends Omit<MComponent, 'id'> {
+  id?: Id;
+  type?: 'text';
+  text: string;
+}
 
 export default defineComponent({
   props: {
     config: {
-      type: Object as PropType<MComponent & { type: 'text'; text: string }>,
+      type: Object as PropType<TextSchema>,
       required: true,
     },
+    iteratorIndex: Array as PropType<number[]>,
+    iteratorContainerId: Array as PropType<Id[]>,
     model: {
       type: Object,
       default: () => ({}),
@@ -24,6 +32,8 @@ export default defineComponent({
     useApp({
       config: props.config,
       methods: {},
+      iteratorContainerId: props.iteratorContainerId,
+      iteratorIndex: props.iteratorIndex,
     });
   },
 });
