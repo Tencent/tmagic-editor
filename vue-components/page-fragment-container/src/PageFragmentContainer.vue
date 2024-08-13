@@ -1,26 +1,28 @@
 <template>
-  <div :id="`${config.id || ''}`" class="magic-ui-page-fragment-container">
-    <TMagicContainer :config="containerConfig" :model="model"></TMagicContainer>
+  <div>
+    <magic-ui-container
+      :iterator-index="iteratorIndex"
+      :iterator-container-id="iteratorContainerId"
+      :config="containerConfig"
+      :model="model"
+    ></magic-ui-container>
   </div>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, type PropType } from 'vue-demi';
 
-import { type MComponent, type MNode, NodeType } from '@tmagic/schema';
-import TMagicContainer from '@tmagic/vue-container';
+import { type Id, type MComponent, type MNode, NodeType } from '@tmagic/schema';
 import { useApp } from '@tmagic/vue-runtime-help';
 
 export default defineComponent({
-  components: {
-    TMagicContainer,
-  },
-
   props: {
     config: {
       type: Object as PropType<MComponent>,
       required: true,
     },
+    iteratorIndex: Array as PropType<number[]>,
+    iteratorContainerId: Array as PropType<Id[]>,
     model: {
       type: Object,
       default: () => ({}),
@@ -31,6 +33,8 @@ export default defineComponent({
     const { app } = useApp({
       config: props.config,
       methods: {},
+      iteratorContainerId: props.iteratorContainerId,
+      iteratorIndex: props.iteratorIndex,
     });
 
     const fragment = computed(() => app?.dsl?.items?.find((page) => page.id === props.config.pageFragmentId));
@@ -42,7 +46,6 @@ export default defineComponent({
       const itemsWithoutId = items.map((item: MNode) => {
         const { id, ...otherConfig } = item;
         return {
-          id: '',
           ...otherConfig,
         };
       });
@@ -51,16 +54,12 @@ export default defineComponent({
         return {
           ...others,
           items: itemsWithoutId,
-          id: '',
-          type: NodeType.CONTAINER,
         };
       }
 
       return {
         ...others,
         items,
-        id: '',
-        type: NodeType.CONTAINER,
       };
     });
 

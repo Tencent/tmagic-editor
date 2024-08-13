@@ -1,30 +1,28 @@
 <template>
-  <TMagicContainer v-if="visible" class="magic-ui-overlay" :config="{ items: config.items }">
+  <magic-ui-container v-if="visible" :config="{ items: config.items }">
     <slot></slot>
-  </TMagicContainer>
+  </magic-ui-container>
 </template>
 
 <script lang="ts">
 import { defineComponent, onBeforeUnmount, type PropType, ref } from 'vue-demi';
 
-import type { MContainer, MNode, MPage } from '@tmagic/schema';
-import TMagicContainer from '@tmagic/vue-container';
+import type { Id, MContainer, MNode, MPage } from '@tmagic/schema';
 import { useApp } from '@tmagic/vue-runtime-help';
 
-interface OverlaySchema extends MContainer {
-  type: 'overlay';
+interface OverlaySchema extends Omit<MContainer, 'id'> {
+  id?: Id;
+  type?: 'overlay';
 }
 
 export default defineComponent({
-  components: {
-    TMagicContainer,
-  },
-
   props: {
     config: {
       type: Object as PropType<OverlaySchema>,
       required: true,
     },
+    iteratorIndex: Array as PropType<number[]>,
+    iteratorContainerId: Array as PropType<Id[]>,
     model: {
       type: Object,
       default: () => ({}),
@@ -36,6 +34,8 @@ export default defineComponent({
 
     const { app, node } = useApp({
       config: props.config,
+      iteratorContainerId: props.iteratorContainerId,
+      iteratorIndex: props.iteratorIndex,
       methods: {
         openOverlay() {
           visible.value = true;

@@ -19,10 +19,10 @@
 import { inject, onBeforeUnmount, onMounted } from 'vue-demi';
 
 import type TMagicApp from '@tmagic/core';
-import type { Id, MNode } from '@tmagic/schema';
-import { IS_DSL_NODE_KEY } from '@tmagic/utils';
+import type { Id, MNodeInstance } from '@tmagic/schema';
+import { isDslNode } from '@tmagic/utils';
 
-interface UseAppOptions<T extends MNode = MNode> {
+interface UseAppOptions<T extends MNodeInstance = MNodeInstance> {
   config: T;
   iteratorContainerId?: Id[];
   iteratorIndex?: number[];
@@ -31,9 +31,7 @@ interface UseAppOptions<T extends MNode = MNode> {
   };
 }
 
-const isDslNode = (config: MNode) => typeof config[IS_DSL_NODE_KEY] === 'undefined' || config[IS_DSL_NODE_KEY] === true;
-
-export default ({ methods, config, iteratorContainerId, iteratorIndex }: UseAppOptions) => {
+export const useApp = ({ methods = {}, config, iteratorContainerId, iteratorIndex }: UseAppOptions) => {
   const app: TMagicApp | undefined = inject('app');
 
   const emitData = {
@@ -41,7 +39,7 @@ export default ({ methods, config, iteratorContainerId, iteratorIndex }: UseAppO
     ...methods,
   };
 
-  const display = <T extends MNode>(config: T) => {
+  const display = <T extends MNodeInstance>(config: T) => {
     if (config.visible === false) return false;
     if (config.condResult === false) return false;
 
@@ -54,7 +52,7 @@ export default ({ methods, config, iteratorContainerId, iteratorIndex }: UseAppO
     return displayCfg !== false;
   };
 
-  const node = isDslNode(config) ? app?.getNode(config.id || '', iteratorContainerId, iteratorIndex) : undefined;
+  const node = isDslNode(config) && config.id ? app?.getNode(config.id, iteratorContainerId, iteratorIndex) : undefined;
 
   if (node) {
     node.emit('created', emitData);
