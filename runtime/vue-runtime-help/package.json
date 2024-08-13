@@ -7,7 +7,7 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
     "./*": "./*"

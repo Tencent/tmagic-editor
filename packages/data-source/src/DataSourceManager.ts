@@ -20,7 +20,7 @@ import EventEmitter from 'events';
 
 import { cloneDeep } from 'lodash-es';
 
-import type { default as TMagicApp, IteratorContainer as TMagicIteratorContainer } from '@tmagic/core';
+import type { default as TMagicApp } from '@tmagic/core';
 import type { DataSourceSchema, DisplayCond, Id, MNode, NODE_CONDS_KEY } from '@tmagic/schema';
 import { compiledNode } from '@tmagic/utils';
 
@@ -227,7 +227,7 @@ class DataSourceManager extends EventEmitter {
    * @returns {boolean}是否显示
    */
   public compliedIteratorItemConds(
-    itemData: any[],
+    itemData: any,
     node: { [NODE_CONDS_KEY]?: DisplayCond[] },
     dataSourceField: string[] = [],
   ) {
@@ -239,23 +239,10 @@ class DataSourceManager extends EventEmitter {
     return compliedConditions(node, ctxData);
   }
 
-  public compliedIteratorItems(
-    nodeId: Id,
-    itemData: any,
-    nodes: MNode[],
-    dataSourceField: string[] = [],
-    dataIteratorContainerId?: Id[],
-    dataIteratorIndex?: number[],
-  ) {
-    const iteratorContainer = this.app.getNode<TMagicIteratorContainer>(
-      nodeId,
-      dataIteratorContainerId,
-      dataIteratorIndex,
-    );
-
+  public compliedIteratorItems(itemData: any, nodes: MNode[], dataSourceField: string[] = []): MNode[] {
     const [dsId, ...keys] = dataSourceField;
     const ds = this.get(dsId);
-    if (!ds || !iteratorContainer) return nodes;
+    if (!ds) return nodes;
 
     const ctxData = createIteratorContentData(itemData, ds.id, keys, this.data);
 

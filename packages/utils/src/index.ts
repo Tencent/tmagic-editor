@@ -20,7 +20,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { cloneDeep, set as objectSet } from 'lodash-es';
 
-import type { DataSchema, DataSourceDeps, Id, MComponent, MNode } from '@tmagic/schema';
+import type { DataSchema, DataSourceDeps, Id, MComponent, MNode, MNodeInstance } from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 
 export * from './dom';
@@ -449,3 +449,6 @@ export const addParamToUrl = (obj: Record<string, any>, global = globalThis, nee
 };
 
 export const dataSourceTemplateRegExp = /\$\{([\s\S]+?)\}/g;
+
+export const isDslNode = (config: MNodeInstance) =>
+  typeof config[IS_DSL_NODE_KEY] === 'undefined' || config[IS_DSL_NODE_KEY] === true;

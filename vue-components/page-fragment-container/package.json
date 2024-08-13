@@ -18,7 +18,6 @@
   },
   "peerDependencies": {
     "@tmagic/schema": "workspace:*",
-    "@tmagic/vue-container": "workspace:*",
     "@tmagic/vue-runtime-help": "workspace:*",
     "typescript": "*"
   },

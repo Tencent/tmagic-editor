@@ -1,12 +1,5 @@
 <template>
-  <div
-    v-if="display(config)"
-    :data-tmagic-id="`${config.id}`"
-    :data-tmagic-iterator-index="iteratorIndex"
-    :data-tmagic-iterator-container-id="iteratorContainerId"
-    :class="className"
-    :style="app?.transformStyle(config.style || {})"
-  >
+  <div v-if="display(config)" :class="className" :style="style">
     <slot>
       <template v-for="(item, index) in config.items">
         <component
@@ -14,12 +7,15 @@
           :key="item.id"
           :is="`magic-ui-${toLine(item.type)}`"
           :data-tmagic-id="item.id"
-          :data-tmagic-container-index="index"
           :data-tmagic-iterator-index="iteratorIndex"
           :data-tmagic-iterator-container-id="iteratorContainerId"
-          :class="`${item.className || ''}`"
+          :data-container-index="index"
+          :class="item.className ? `${item.className} magic-ui-${toLine(item.type)}` : `magic-ui-${toLine(item.type)}`"
           :style="app?.transformStyle(item.style || {})"
           :config="{ ...item, [IS_DSL_NODE_KEY]: true }"
+          :container-index="index"
+          :iterator-index="iteratorIndex"
+          :iterator-container-id="iteratorContainerId"
         ></component>
       </template>
     </slot>
@@ -33,10 +29,15 @@ import type { Id, MContainer } from '@tmagic/schema';
 import { IS_DSL_NODE_KEY, toLine } from '@tmagic/utils';
 import { useApp } from '@tmagic/vue-runtime-help';
 
+interface ContainerSchema extends Omit<MContainer, 'id'> {
+  id?: Id;
+  type?: 'container';
+}
+
 export default defineComponent({
   props: {
     config: {
-      type: Object as PropType<MContainer>,
+      type: Object as PropType<ContainerSchema>,
       required: true,
     },
     iteratorIndex: Array as PropType<number[]>,
@@ -50,6 +51,8 @@ export default defineComponent({
   setup(props) {
     const { display, app } = useApp({
       config: props.config,
+      iteratorContainerId: props.iteratorContainerId,
+      iteratorIndex: props.iteratorIndex,
       methods: {},
     });
 
@@ -64,9 +67,17 @@ export default defineComponent({
       return list.join(' ');
     });
 
+    const style = computed(() => {
+      if (props.config[IS_DSL_NODE_KEY]) {
+        return {};
+      }
+      return app?.transformStyle(props.config.style || {});
+    });
+
     return {
       app,
       className,
+      style,
       IS_DSL_NODE_KEY,
 
       display,
