@@ -36,7 +36,7 @@ export default class StageRender extends EventEmitter {
   private runtimeUrl?: string;
   private zoom = DEFAULT_ZOOM;
   private renderType: RenderType;
-  private customizedRender?: () => Promise<HTMLElement | null>;
+  private customizedRender?: () => Promise<HTMLElement | null | void>;
 
   constructor({ runtimeUrl, zoom, customizedRender, renderType = RenderType.IFRAME }: StageRenderConfig) {
     super();
