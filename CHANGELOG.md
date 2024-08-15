@@ -1,3 +1,25 @@
+# [1.5.0-beta.0](https://github.com/Tencent/tmagic-editor/compare/v1.4.16...v1.5.0-beta.0) (2024-08-15)
+
+
+### Bug Fixes
+
+* **data-source:** 编辑器的runtime不能对数据源的mock配置有影响 ([fa2d00b](https://github.com/Tencent/tmagic-editor/commit/fa2d00ba3689b9b336a5a2d44c731a3fa4ce61f6))
+* 迭代器内的组件配置了声明周期代码块无效 ([fb6f806](https://github.com/Tencent/tmagic-editor/commit/fb6f8068cef90a7aac66038f94fd0937637909c2))
+
+
+### Features
+
+* **cli:** 组件库支持import npm包组件 ([e82591e](https://github.com/Tencent/tmagic-editor/commit/e82591ee23c5b2e1c3efb6e21ec6f879631e5d67))
+* **design,element-plus-adapter,tdesign-vue-next-adapter:** 重新实现Popover组件，不再使用element-plus或tdesign组件 ([677a193](https://github.com/Tencent/tmagic-editor/commit/677a1938a44c2defc4691e888e40b26eb44bdaa5))
+* dsl id渲染到dom上的data-tamgic-id,不再是id属性 ([47a037a](https://github.com/Tencent/tmagic-editor/commit/47a037a8a5595b844f3a74dead876a0cebcf7eb6))
+* **uitls:** 只是自定义dsl与dom el的关联关系函数 ([16b8948](https://github.com/Tencent/tmagic-editor/commit/16b8948e4d3d935df89c41ee69d983846f8d0f6c))
+* **vue-runtime-help:** 只有dsl中的组件才触发生命周期hook ([69f3cb2](https://github.com/Tencent/tmagic-editor/commit/69f3cb2f12d8b2e18ac957caa5f655024cbc8577))
+* 完善迭代器嵌套使用问题，重构事件配置处理代码 ([f7d5a4f](https://github.com/Tencent/tmagic-editor/commit/f7d5a4ffd6b275dbf3449fc358d2310b8205bca9))
+* 将ui-react中的组件独立成包 ([df9b581](https://github.com/Tencent/tmagic-editor/commit/df9b581623ee138a316d19c7b0c11d76b80effc2))
+* 统一vue ui组件,将ui中的组件独立成包 ([ac3cb74](https://github.com/Tencent/tmagic-editor/commit/ac3cb74693f32ba857797a11b549f34aaefc9cf6))
+
+
+
 ## [1.4.16](https://github.com/Tencent/tmagic-editor/compare/v1.4.15...v1.4.16) (2024-08-02)
 
 
