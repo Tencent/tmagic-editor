@@ -30,7 +30,7 @@ export type TargetElement = HTMLElement | SVGElement;
 
 export type CanSelect = (el: HTMLElement, event: MouseEvent, stop: () => boolean) => boolean | Promise<boolean>;
 export type IsContainer = (el: HTMLElement) => boolean | Promise<boolean>;
-export type CustomizeRender = (renderer: StageCore) => Promise<HTMLElement> | HTMLElement;
+export type CustomizeRender = (renderer: StageCore) => Promise<HTMLElement | void> | HTMLElement | void;
 /** 业务方自定义的moveableOptions，可以是配置，也可以是回调函数 */
 export type CustomizeMoveableOptions =
   | ((config?: CustomizeMoveableOptionsCallbackConfig) => MoveableOptions)
@@ -60,7 +60,7 @@ export interface StageCoreConfig {
   moveableOptions?: CustomizeMoveableOptions;
   /** runtime 的HTML地址，可以是一个HTTP地址，如果和编辑器不同域，需要设置跨域，也可以是一个相对或绝对路径 */
   runtimeUrl?: string;
-  render?: (renderer: StageCore) => Promise<HTMLElement> | HTMLElement;
+  render?: CustomizeRender;
   autoScrollIntoView?: boolean;
   updateDragEl?: UpdateDragEl;
   disabledDragStart?: boolean;
@@ -105,7 +105,7 @@ export interface StageRenderConfig {
   runtimeUrl?: string;
   zoom: number | undefined;
   renderType?: RenderType;
-  customizedRender?: () => Promise<HTMLElement | null>;
+  customizedRender?: () => Promise<HTMLElement | null | void>;
 }
 
 export interface StageMaskConfig {
