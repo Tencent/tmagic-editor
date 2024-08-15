@@ -1,6 +1,6 @@
 {
   "name": "runtime-vue3",
-  "version": "1.4.19",
+  "version": "1.5.0-beta.0",
   "type": "module",
   "private": true,
   "scripts": {
@@ -19,18 +19,17 @@
     "build:ds:event": "vite build --config build.vite.config.ts --mode ds:event"
   },
   "dependencies": {
-    "@tmagic/core": "1.4.19",
-    "@tmagic/data-source": "1.4.19",
-    "@tmagic/schema": "1.4.19",
-    "@tmagic/stage": "1.4.19",
-    "@tmagic/ui": "1.4.19",
-    "@tmagic/utils": "1.4.19",
-    "@tmagic/vue-runtime-help": "^0.0.7",
+    "@tmagic/core": "1.5.0-beta.0",
+    "@tmagic/data-source": "1.5.0-beta.0",
+    "@tmagic/schema": "1.5.0-beta.0",
+    "@tmagic/stage": "1.5.0-beta.0",
+    "@tmagic/utils": "1.5.0-beta.0",
+    "@tmagic/vue-runtime-help": "^0.1.0",
     "axios": "^0.25.0",
     "vue": "^3.4.35"
   },
   "devDependencies": {
-    "@tmagic/cli": "workspace:*",
+    "@tmagic/cli": "1.5.0-beta.0",
     "@types/node": "^18.19.0",
     "@vitejs/plugin-legacy": "^5.4.0",
     "@vitejs/plugin-vue": "^5.1.1",
