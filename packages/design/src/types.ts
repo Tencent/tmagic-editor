@@ -1,4 +1,5 @@
 import { ComputedRef, DefineComponent, Directive, Ref } from 'vue';
+import type { Placement } from '@popperjs/core';
 
 export type FieldSize = 'large' | 'default' | 'small';
 
@@ -223,15 +224,12 @@ export interface PaginationProps {
 }
 
 export interface PopoverProps {
-  placement?: string;
+  placement?: Placement;
   width?: string | number;
-  title?: string;
-  trigger?: string;
-  effect?: string;
-  content?: string;
+  trigger?: 'hover' | 'click';
   disabled?: boolean;
-  popperClass?: string;
   visible?: boolean;
+  popperClass?: string;
 }
 
 export interface RadioProps {
@@ -568,11 +566,6 @@ export interface Components {
   pagination: {
     component: DefineComponent<PaginationProps, {}, any> | string;
     props: (props: PaginationProps) => PaginationProps;
-  };
-
-  popover: {
-    component: DefineComponent<PopoverProps, {}, any> | string;
-    props: (props: PopoverProps) => PopoverProps;
   };
 
   radio: {
