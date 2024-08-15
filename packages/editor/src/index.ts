@@ -85,6 +85,8 @@ export { default as SplitView } from './components/SplitView.vue';
 export { default as Resizer } from './components/Resizer.vue';
 export { default as CodeBlockEditor } from './components/CodeBlockEditor.vue';
 export { default as FloatingBox } from './components/FloatingBox.vue';
+export { default as Tree } from './components/Tree.vue';
+export { default as TreeNode } from './components/TreeNode.vue';
 export { default as PageFragmentSelect } from './fields/PageFragmentSelect.vue';
 export { default as DisplayConds } from './fields/DisplayConds.vue';
 export { default as CondOpSelect } from './fields/CondOpSelect.vue';
