@@ -1,5 +1,5 @@
 {
-  "version": "1.4.17",
+  "version": "1.5.0-beta.0",
   "name": "@tmagic/element-plus-adapter",
   "type": "module",
   "main": "dist/tmagic-element-plus-adapter.umd.cjs",
