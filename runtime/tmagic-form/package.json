@@ -38,7 +38,7 @@
     "@tmagic/utils": "workspace:*",
     "@tmagic/schema": "workspace:*",
     "@tmagic/stage": "workspace:*",
-    "element-plus": ">=2.7.5",
+    "element-plus": ">=2.8.0",
     "vue": ">=3.4.27"
   },
   "devDependencies": {
