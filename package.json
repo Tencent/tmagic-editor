@@ -56,7 +56,7 @@
     "conventional-changelog-cli": "^4.1.0",
     "cosmiconfig": "^8.3.6",
     "cz-conventional-changelog": "^3.3.0",
-    "element-plus": "^2.7.8",
+    "element-plus": "^2.8.0",
     "enquirer": "^2.3.6",
     "eslint": "^8.38.0",
     "eslint-config-tencent": "^1.0.4",
