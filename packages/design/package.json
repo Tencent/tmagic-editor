@@ -36,6 +36,9 @@
     "vue3",
     "typescript"
   ],
+  "dependencies": {
+    "@popperjs/core": "npm:@sxzz/popperjs-es@^2.11.7"
+  },
   "devDependencies": {
     "@types/node": "^18.19.0",
     "@vitejs/plugin-vue": "^5.1.1",

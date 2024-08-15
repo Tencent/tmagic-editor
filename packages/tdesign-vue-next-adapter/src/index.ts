@@ -64,7 +64,6 @@ import type {
   OptionGroupProps,
   OptionProps,
   PaginationProps,
-  PopoverProps,
   RadioButtonProps,
   RadioGroupProps,
   RadioProps,
@@ -85,7 +84,6 @@ import type {
 import DatePicker from './DatePicker.vue';
 import Icon from './Icon.vue';
 import Input from './Input.vue';
-import Popover from './Popover.vue';
 import Scrollbar from './Scrollbar.vue';
 import TableColumn from './TableColumn.vue';
 
@@ -346,11 +344,6 @@ const adapter: any = {
         pageSize: props.pagesize,
         total: props.total,
       }),
-    },
-
-    popover: {
-      component: Popover,
-      props: (props: PopoverProps) => props,
     },
 
     radio: {
