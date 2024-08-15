@@ -39,8 +39,6 @@ const props = withDefaults(defineProps<PopoverProps>(), {
   visible: undefined,
 });
 
-const zIndex = useZIndex();
-const curZIndex = ref<number>(2);
 const popoverVisible = ref(false);
 
 const visibleWatch = watch(
@@ -85,11 +83,12 @@ onMounted(() => {
   referenceElementRef.value = getCurrentInstance()?.proxy?.$el.nextElementSibling;
 });
 
+const zIndex = useZIndex();
 watch([referenceElementRef, popperElementRef], ([referenceElement, popperElement]) => {
   destroy();
   if (!referenceElement || !popperElement) return;
 
-  popperElement.style.zIndex = `${curZIndex.value}`;
+  popperElement.style.zIndex = `${zIndex.nextZIndex()}`;
   popperElement.focus();
 
   instanceRef.value = createPopper(referenceElement, popperElement, {
@@ -132,7 +131,7 @@ const mouseleaveHandler = () => {
 
   timer = setTimeout(() => {
     popoverVisible.value = false;
-  }, 300);
+  }, 500);
 };
 
 if (props.trigger === 'click' && typeof props.visible === 'undefined') {
@@ -169,21 +168,6 @@ if (props.trigger === 'hover' && typeof props.visible === 'undefined') {
     prevEl?.removeEventListener('mouseleave', mouseleaveHandler);
   });
 }
-
-watch(
-  popoverVisible,
-  (popoverVisible) => {
-    if (!popoverVisible) {
-      return;
-    }
-    nextTick().then(() => {
-      curZIndex.value = zIndex.nextZIndex();
-    });
-  },
-  {
-    immediate: true,
-  },
-);
 
 const destroy = () => {
   if (!instanceRef.value) return;
