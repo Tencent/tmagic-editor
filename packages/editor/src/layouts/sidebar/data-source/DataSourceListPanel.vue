@@ -2,23 +2,21 @@
   <TMagicScrollbar class="data-source-list-panel m-editor-layer-panel">
     <div class="search-wrapper">
       <SearchInput @search="filterTextChangeHandler"></SearchInput>
-      <TMagicPopover v-if="editable" placement="right">
+      <TMagicPopover v-if="editable" placement="right" trigger="hover" popper-class="data-source-list-panel-add-menu">
         <template #reference>
           <TMagicButton type="primary" size="small">新增</TMagicButton>
         </template>
-        <div class="data-source-list-panel-add-menu">
-          <ToolButton
-            v-for="(item, index) in datasourceTypeList"
-            :data="{
-              type: 'button',
-              text: item.text,
-              handler: () => {
-                addHandler(item.type);
-              },
-            }"
-            :key="index"
-          ></ToolButton>
-        </div>
+        <ToolButton
+          v-for="(item, index) in datasourceTypeList"
+          :data="{
+            type: 'button',
+            text: item.text,
+            handler: () => {
+              addHandler(item.type);
+            },
+          }"
+          :key="index"
+        ></ToolButton>
       </TMagicPopover>
 
       <slot name="data-source-panel-search"></slot>
