@@ -48,8 +48,8 @@ importers:
         specifier: ^3.3.0
         version: 3.3.0(@types/node@18.19.42)(typescript@5.5.4)
       element-plus:
-        specifier: ^2.7.8
-        version: 2.7.8(@vue/composition-api@1.7.2(vue@3.4.35(typescript@5.5.4)))(vue@3.4.35(typescript@5.5.4))
+        specifier: ^2.8.0
+        version: 2.8.1(@vue/composition-api@1.7.2(vue@3.4.35(typescript@5.5.4)))(vue@3.4.35(typescript@5.5.4))
       enquirer:
         specifier: ^2.3.6
         version: 2.4.1
@@ -273,6 +273,9 @@ importers:
 
   packages/design:
     dependencies:
+      '@popperjs/core':
+        specifier: npm:@sxzz/popperjs-es@^2.11.7
+        version: '@sxzz/popperjs-es@2.11.7'
       typescript:
         specifier: '*'
         version: 5.5.4
@@ -414,8 +417,8 @@ importers:
         specifier: workspace:*
         version: link:../design
       element-plus:
-        specifier: '>=2.7.8'
-        version: 2.7.8(@vue/composition-api@1.7.2(vue@3.4.35(typescript@5.5.4)))(vue@3.4.35(typescript@5.5.4))
+        specifier: '>=2.8.0'
+        version: 2.8.1(@vue/composition-api@1.7.2(vue@3.4.35(typescript@5.5.4)))(vue@3.4.35(typescript@5.5.4))
       typescript:
         specifier: '*'
         version: 5.5.4
@@ -1222,8 +1225,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/utils
       element-plus:
-        specifier: '>=2.7.5'
-        version: 2.7.8(@vue/composition-api@1.7.2(vue@3.4.35(typescript@5.5.4)))(vue@3.4.35(typescript@5.5.4))
+        specifier: '>=2.8.0'
+        version: 2.8.1(@vue/composition-api@1.7.2(vue@3.4.35(typescript@5.5.4)))(vue@3.4.35(typescript@5.5.4))
       vue:
         specifier: '>=3.4.27'
         version: 3.4.35(typescript@5.5.4)
@@ -4086,6 +4089,11 @@ packages:
 
   element-plus@2.7.8:
     resolution: {integrity: sha512-h6dx2XihAbQaud0v+6O7Fy0b0G3YNplNVH7QnK3csTcvQd4y4raiyMRQpf9EKbRbTMdNrFsqAZrs9ok9DMcJHg==}
+    peerDependencies:
+      vue: ^3.2.0
+
+  element-plus@2.8.1:
+    resolution: {integrity: sha512-p11/6w/O0+hGvPhiN3jrcgh+XG+eg5jZlLdQVYvcPHZYhhCh3J3YeZWW1JO/REPES1vevkboT6VAi+9wHA8Dsg==}
     peerDependencies:
       vue: ^3.2.0
 
@@ -9351,6 +9359,27 @@ snapshots:
   electron-to-chromium@1.5.4: {}
 
   element-plus@2.7.8(@vue/composition-api@1.7.2(vue@3.4.35(typescript@5.5.4)))(vue@3.4.35(typescript@5.5.4)):
+    dependencies:
+      '@ctrl/tinycolor': 3.6.1
+      '@element-plus/icons-vue': 2.3.1(vue@3.4.35(typescript@5.5.4))
+      '@floating-ui/dom': 1.6.8
+      '@popperjs/core': '@sxzz/popperjs-es@2.11.7'
+      '@types/lodash': 4.17.7
+      '@types/lodash-es': 4.17.12
+      '@vueuse/core': 9.13.0(@vue/composition-api@1.7.2(vue@3.4.35(typescript@5.5.4)))(vue@3.4.35(typescript@5.5.4))
+      async-validator: 4.2.5
+      dayjs: 1.11.12
+      escape-html: 1.0.3
+      lodash: 4.17.21
+      lodash-es: 4.17.21
+      lodash-unified: 1.0.3(@types/lodash-es@4.17.12)(lodash-es@4.17.21)(lodash@4.17.21)
+      memoize-one: 6.0.0
+      normalize-wheel-es: 1.2.0
+      vue: 3.4.35(typescript@5.5.4)
+    transitivePeerDependencies:
+      - '@vue/composition-api'
+
+  element-plus@2.8.1(@vue/composition-api@1.7.2(vue@3.4.35(typescript@5.5.4)))(vue@3.4.35(typescript@5.5.4)):
     dependencies:
       '@ctrl/tinycolor': 3.6.1
       '@element-plus/icons-vue': 2.3.1(vue@3.4.35(typescript@5.5.4))
