@@ -46,7 +46,6 @@ const popoverVisible = ref(false);
 const visibleWatch = watch(
   () => props.visible,
   (visible) => {
-    console.log(visible);
     if (typeof visible === 'undefined') {
       nextTick(() => {
         visibleWatch();
