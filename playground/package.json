@@ -18,7 +18,7 @@
     "@tmagic/editor": "1.5.0-beta.1",
     "@tmagic/element-plus-adapter": "1.5.0-beta.1",
     "@tmagic/form": "1.5.0-beta.1",
-    "@tmagic/tmagic-form-runtime": "1.0.11",
+    "@tmagic/tmagic-form-runtime": "1.1.1",
     "@tmagic/schema": "1.5.0-beta.1",
     "@tmagic/stage": "1.5.0-beta.1",
     "@tmagic/utils": "1.5.0-beta.1",
