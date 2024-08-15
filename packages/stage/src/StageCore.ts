@@ -65,7 +65,7 @@ export default class StageCore extends EventEmitter {
       runtimeUrl: config.runtimeUrl,
       zoom: config.zoom,
       renderType: config.renderType,
-      customizedRender: async (): Promise<HTMLElement | null> => {
+      customizedRender: async (): Promise<HTMLElement | null | void> => {
         if (this?.customizedRender) {
           return await this.customizedRender(this);
         }
