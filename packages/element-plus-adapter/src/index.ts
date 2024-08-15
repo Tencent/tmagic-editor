@@ -27,7 +27,6 @@ import {
   ElOption,
   ElOptionGroup,
   ElPagination,
-  ElPopover,
   ElRadio,
   ElRadioButton,
   ElRadioGroup,
@@ -76,7 +75,6 @@ import type {
   OptionProps,
   PaginationProps,
   PluginOptions,
-  PopoverProps,
   RadioButtonProps,
   RadioGroupProps,
   RadioProps,
@@ -228,11 +226,6 @@ const adapter: PluginOptions = {
     pagination: {
       component: ElPagination as any,
       props: (props: PaginationProps) => props,
-    },
-
-    popover: {
-      component: ElPopover as any,
-      props: (props: PopoverProps) => props,
     },
 
     radio: {
