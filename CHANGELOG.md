@@ -1,3 +1,17 @@
+# [1.5.0-beta.1](https://github.com/Tencent/tmagic-editor/compare/v1.5.0-beta.0...v1.5.0-beta.1) (2024-08-15)
+
+
+### Bug Fixes
+
+* **design:** popover zindex不生效 ([547fbda](https://github.com/Tencent/tmagic-editor/commit/547fbda53c6abf92a47882d85886b196ae4f1d02))
+
+
+### Features
+
+* **editor:** export tree组件 ([f61492b](https://github.com/Tencent/tmagic-editor/commit/f61492be84b019bbbebcfcb8b6517fe4c451242c))
+
+
+
 # [1.5.0-beta.0](https://github.com/Tencent/tmagic-editor/compare/v1.4.16...v1.5.0-beta.0) (2024-08-15)
 
 
