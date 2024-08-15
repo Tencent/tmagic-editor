@@ -1,6 +1,6 @@
 {
   "name": "runtime-react",
-  "version": "1.4.18",
+  "version": "1.5.0-beta.0",
   "type": "module",
   "private": true,
   "scripts": {
@@ -19,19 +19,19 @@
     "build:ds:event": "vite build --config build.vite.config.ts --mode ds:event"
   },
   "dependencies": {
-    "@tmagic/core": "1.4.18",
-    "@tmagic/data-source": "1.4.18",
-    "@tmagic/ui-react": "1.4.18",
-    "@tmagic/schema": "1.4.18",
-    "@tmagic/stage": "1.4.18",
-    "@tmagic/utils": "1.4.18",
+    "@tmagic/core": "1.5.0-beta.0",
+    "@tmagic/data-source": "1.5.0-beta.0",
+    "@tmagic/react-runtime-help": "workspace:*",
+    "@tmagic/schema": "1.5.0-beta.0",
+    "@tmagic/stage": "1.5.0-beta.0",
+    "@tmagic/utils": "1.5.0-beta.0",
     "axios": "^0.25.0",
     "terser": "^5.31.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@tmagic/cli": "workspace:*",
+    "@tmagic/cli": "1.5.0-beta.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-legacy": "^5.4.0",
