@@ -32,7 +32,6 @@ import { compiledNodeField, compliedConditions, compliedIteratorItem, createIter
 
 class DataSourceManager extends EventEmitter {
   private static dataSourceClassMap = new Map<string, typeof DataSource>();
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   private static ObservedDataClass: ObservedDataClass = SimpleObservedData;
 
   public static register<T extends typeof DataSource = typeof DataSource>(type: string, dataSource: T) {
@@ -130,7 +129,6 @@ class DataSourceManager extends EventEmitter {
   public async addDataSource(config?: DataSourceSchema) {
     if (!config) return;
 
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     const DataSourceClass = DataSourceManager.dataSourceClassMap.get(config.type) || DataSource;
 
     const ds = new DataSourceClass({
