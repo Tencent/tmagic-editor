@@ -33,6 +33,7 @@ import App from './App.vue';
 import router from './route';
 
 import 'element-plus/dist/index.css';
+import '@tmagic/design/dist/style.css';
 import '@tmagic/editor/dist/style.css';
 import '@tmagic/form/dist/style.css';
 import '@tmagic/table/dist/style.css';
