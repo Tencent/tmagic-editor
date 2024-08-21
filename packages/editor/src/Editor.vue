@@ -141,7 +141,15 @@ import uiService from './services/ui';
 import keybindingConfig from './utils/keybinding-config';
 import { defaultEditorProps, EditorProps } from './editorProps';
 import { initServiceEvents, initServiceState } from './initService';
-import type { EventBus, FrameworkSlots, PropsPanelSlots, Services, SidebarSlots, WorkspaceSlots } from './type';
+import type {
+  EventBus,
+  FrameworkSlots,
+  PropsPanelSlots,
+  Services,
+  SidebarSlots,
+  StageOptions,
+  WorkspaceSlots,
+} from './type';
 
 defineSlots<
   FrameworkSlots &
@@ -186,7 +194,7 @@ initServiceState(props, services);
 keybindingService.register(keybindingConfig);
 keybindingService.registerEl('global');
 
-const stageOptions = {
+const stageOptions: StageOptions = {
   runtimeUrl: props.runtimeUrl,
   autoScrollIntoView: props.autoScrollIntoView,
   render: props.render,
