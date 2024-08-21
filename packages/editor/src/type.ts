@@ -145,7 +145,7 @@ export interface StageOptions {
   containerHighlightDuration?: number;
   containerHighlightType?: ContainerHighlightType;
   disabledDragStart?: boolean;
-  render?: (stage: StageCore) => HTMLDivElement | Promise<HTMLDivElement>;
+  render?: (stage: StageCore) => HTMLDivElement | void | Promise<HTMLDivElement | void>;
   moveableOptions?: MoveableOptions | ((config?: CustomizeMoveableOptionsCallbackConfig) => MoveableOptions);
   canSelect?: (el: HTMLElement) => boolean | Promise<boolean>;
   isContainer?: (el: HTMLElement) => boolean | Promise<boolean>;
