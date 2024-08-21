@@ -24,7 +24,13 @@
           </slot>
         </div>
 
-        <TMagicPopover popper-class="page-bar-popover" placement="top" :width="160" trigger="hover">
+        <TMagicPopover
+          popper-class="page-bar-popover"
+          placement="top"
+          trigger="hover"
+          :width="160"
+          :destroy-on-close="true"
+        >
           <div>
             <slot name="page-bar-popover" :page="item">
               <ToolButton

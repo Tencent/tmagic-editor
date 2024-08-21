@@ -50,7 +50,7 @@ export interface ColumnConfig<T = any> {
   table?: ColumnConfig[];
   formatter?: 'datetime' | ((item: any, row: T) => any);
   popover?: {
-    placement:
+    placement?:
       | 'auto'
       | 'auto-start'
       | 'auto-end'
@@ -66,9 +66,10 @@ export interface ColumnConfig<T = any> {
       | 'right-end'
       | 'left-start'
       | 'left-end';
-    width: string | number;
-    trigger: 'hover' | 'click';
-    tableEmbed: boolean;
+    width?: string | number;
+    trigger?: 'hover' | 'click';
+    tableEmbed?: boolean;
+    destroyOnClose?: boolean;
   };
   sortable?: boolean | 'custom';
   action?: 'tip' | 'actionLink' | 'img' | 'link' | 'tag';

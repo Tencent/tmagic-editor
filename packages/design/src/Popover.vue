@@ -2,12 +2,14 @@
   <slot name="reference"></slot>
   <Teleport to="body">
     <div
-      v-if="popoverVisible"
+      v-if="popoverVisible || !destroyOnClose"
+      v-show="popoverVisible"
       class="tmagic-design-popper"
-      tabindex="-1"
       ref="popperElementRef"
+      :tabindex="tabindex"
       :class="popperClass"
       :style="style"
+      @mouseenter.once="popperMouseenterHandler"
     >
       <slot></slot>
       <span class="tmagic-design-popper-arrow" data-popper-arrow></span>
@@ -24,7 +26,9 @@ import { useZIndex } from './index';
 import type { PopoverProps } from './types';
 
 defineSlots<{
+  /** 触发 Popover 显示的 HTML 元素 */
   reference(props: {}): any;
+  /** Popover 内嵌 HTML 文本 */
   default(props: {}): any;
 }>();
 
@@ -37,6 +41,8 @@ const props = withDefaults(defineProps<PopoverProps>(), {
   trigger: 'hover',
   disabled: false,
   visible: undefined,
+  tabindex: 0,
+  destroyOnClose: false,
 });
 
 const popoverVisible = ref(false);
@@ -84,12 +90,11 @@ onMounted(() => {
 });
 
 const zIndex = useZIndex();
-watch([referenceElementRef, popperElementRef], ([referenceElement, popperElement]) => {
+watch([referenceElementRef, popperElementRef, popoverVisible], ([referenceElement, popperElement, popoverVisible]) => {
   destroy();
-  if (!referenceElement || !popperElement) return;
+  if (!referenceElement || !popperElement || !popoverVisible) return;
 
   popperElement.style.zIndex = `${zIndex.nextZIndex()}`;
-  popperElement.focus();
 
   instanceRef.value = createPopper(referenceElement, popperElement, {
     placement: props.placement || 'bottom',
@@ -104,6 +109,10 @@ watch([referenceElementRef, popperElementRef], ([referenceElement, popperElement
     ],
   });
 });
+
+const popperMouseenterHandler = () => {
+  popperElementRef.value?.focus();
+};
 
 const clickHandler = () => {
   if (props.disabled) return;
@@ -129,9 +138,9 @@ const mouseleaveHandler = () => {
     clearTimeout(timer);
   }
 
-  timer = setTimeout(() => {
+  timer = globalThis.setTimeout(() => {
     popoverVisible.value = false;
-  }, 500);
+  }, 350);
 };
 
 if (props.trigger === 'click' && typeof props.visible === 'undefined') {
