@@ -1,5 +1,5 @@
 <template>
-  <TMagicPopover :visible="popoverVisible" width="220px">
+  <TMagicPopover width="220px" :visible="popoverVisible" :destroy-on-close="true">
     <template #reference>
       <TMagicInput
         v-model="model[name]"

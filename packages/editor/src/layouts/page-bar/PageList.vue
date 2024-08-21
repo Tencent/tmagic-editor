@@ -4,7 +4,13 @@
     id="m-editor-page-bar-list-icon"
     class="m-editor-page-bar-item m-editor-page-bar-item-icon"
   >
-    <TMagicPopover popper-class="page-bar-popover" placement="top" :width="160" trigger="hover">
+    <TMagicPopover
+      popper-class="page-bar-popover"
+      placement="top"
+      trigger="hover"
+      :width="160"
+      :destroy-on-close="true"
+    >
       <div>
         <slot name="page-list-popover" :list="list">
           <ToolButton
