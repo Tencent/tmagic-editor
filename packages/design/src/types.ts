@@ -230,6 +230,8 @@ export interface PopoverProps {
   disabled?: boolean;
   visible?: boolean;
   popperClass?: string;
+  tabindex?: number;
+  destroyOnClose?: boolean;
 }
 
 export interface RadioProps {
