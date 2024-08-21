@@ -82,7 +82,7 @@ export interface EditorProps {
   /** 禁用属性配置面板右下角显示源码的按钮 */
   disabledShowSrc?: boolean;
   /** 中间工作区域中画布渲染的内容 */
-  render?: (stage: StageCore) => HTMLDivElement | Promise<HTMLDivElement>;
+  render?: (stage: StageCore) => HTMLDivElement | void | Promise<HTMLDivElement | void>;
   /** 选中时会在画布上复制出一个大小相同的dom，实际拖拽的是这个dom，此方法用于干预这个dom的生成方式 */
   updateDragEl?: UpdateDragEl;
   /** 用于设置画布上的dom是否可以被选中 */
