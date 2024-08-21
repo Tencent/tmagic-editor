@@ -22,7 +22,7 @@
       :last-values="lastValues"
       :init-values="initValues"
       :values="values"
-      :prop="`${prop}${prop ? '.' : ''}${name}`"
+      :prop="prop"
       @change="onChangeHandler"
     ></component>
 

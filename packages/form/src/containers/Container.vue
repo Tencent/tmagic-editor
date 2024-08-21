@@ -45,6 +45,7 @@
         <template #label><span v-html="type === 'checkbox' ? '' : text" :title="config.labelTitle"></span></template>
         <TMagicTooltip v-if="tooltip">
           <component
+            :data-tmagic-form-item-prop="itemProp"
             :key="key(config)"
             :size="size"
             :is="tagName"
@@ -64,6 +65,7 @@
 
         <component
           v-else
+          :data-tmagic-form-item-prop="itemProp"
           :key="key(config)"
           :size="size"
           :is="tagName"
