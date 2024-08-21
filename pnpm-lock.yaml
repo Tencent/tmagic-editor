@@ -1167,19 +1167,19 @@ importers:
   runtime/react-runtime-help:
     dependencies:
       '@tmagic/core':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/core
       '@tmagic/data-source':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/data-source
       '@tmagic/schema':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/schema
       '@tmagic/stage':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/stage
       '@tmagic/utils':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/utils
       lodash-es:
         specifier: ^4.17.21
@@ -1207,22 +1207,22 @@ importers:
   runtime/tmagic-form:
     dependencies:
       '@tmagic/core':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/core
       '@tmagic/editor':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/editor
       '@tmagic/form':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/form
       '@tmagic/schema':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/schema
       '@tmagic/stage':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/stage
       '@tmagic/utils':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/utils
       element-plus:
         specifier: '>=2.8.0'
@@ -1256,19 +1256,19 @@ importers:
   runtime/vue-runtime-help:
     dependencies:
       '@tmagic/core':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/core
       '@tmagic/data-source':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/data-source
       '@tmagic/schema':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/schema
       '@tmagic/stage':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/stage
       '@tmagic/utils':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/utils
       '@vue/composition-api':
         specifier: '>=1.7.2'
