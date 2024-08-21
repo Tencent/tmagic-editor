@@ -6,6 +6,7 @@
         :placement="config.popover.placement"
         :width="config.popover.width"
         :trigger="config.popover.trigger"
+        :destroy-on-close="config.popover.destroyOnClose ?? true"
       >
         <MTable
           v-if="config.popover.tableEmbed"
