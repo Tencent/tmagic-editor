@@ -24,6 +24,21 @@
 
 * **vue-runtime-help:** 只有dsl中的组件才触发生命周期hook ([69f3cb2](https://github.com/Tencent/tmagic-editor/commit/69f3cb2f12d8b2e18ac957caa5f655024cbc8577))
 
+
+# [1.5.0-beta.2](https://github.com/Tencent/tmagic-editor/compare/v1.5.0-beta.1...v1.5.0-beta.2) (2024-08-21)
+
+
+### Bug Fixes
+
+* **data-source:** http数据源中mock配置中关闭启用后，不会执行request ([18fa541](https://github.com/Tencent/tmagic-editor/commit/18fa541a3c7f0b39820b2ab09c31bea65b36222f))
+
+
+### Features
+
+* **design:** popover 添加destroyOnClose props ([8b1c639](https://github.com/Tencent/tmagic-editor/commit/8b1c63995306ad00baed3153247f6abf703643ce))
+* **form:** 添加tmagicFormItemProp ([c81a7b4](https://github.com/Tencent/tmagic-editor/commit/c81a7b46e252577823824637a847e1601a0db0a7))
+
+
 # [1.5.0-beta.1](https://github.com/Tencent/tmagic-editor/compare/v1.5.0-beta.0...v1.5.0-beta.1) (2024-08-15)
 
 
@@ -35,7 +50,6 @@
 ### Features
 
 * **editor:** export tree组件 ([f61492b](https://github.com/Tencent/tmagic-editor/commit/f61492be84b019bbbebcfcb8b6517fe4c451242c))
-
 
 
 # [1.5.0-beta.0](https://github.com/Tencent/tmagic-editor/compare/v1.4.16...v1.5.0-beta.0) (2024-08-15)
