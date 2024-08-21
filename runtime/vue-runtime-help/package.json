@@ -32,11 +32,11 @@
     "vue-demi": "^0.14.10"
   },
   "peerDependencies": {
-    "@tmagic/core": "workspace:*",
-    "@tmagic/data-source": "workspace:*",
-    "@tmagic/schema": "workspace:*",
-    "@tmagic/stage": "workspace:*",
-    "@tmagic/utils": "workspace:*",
+    "@tmagic/core": "workspace:^",
+    "@tmagic/data-source": "workspace:^",
+    "@tmagic/schema": "workspace:^",
+    "@tmagic/stage": "workspace:^",
+    "@tmagic/utils": "workspace:^",
     "@vue/composition-api": ">=1.7.2",
     "typescript": "*",
     "vue": ">=2.0.0 || >=3.0.0"
