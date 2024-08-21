@@ -68,8 +68,8 @@ export default class DataSource<T extends DataSourceSchema = DataSourceSchema> e
       data = cloneDeep(this.mockData);
     } else if (typeof options.useMock === 'boolean' && options.useMock) {
       // 设置了使用mock就使用mock数据
-      this.mockData = options.schema.mocks?.find((mock) => mock.enable)?.data || this.getDefaultData();
-      data = this.mockData;
+      this.mockData = options.schema.mocks?.find((mock) => mock.enable)?.data;
+      data = this.mockData || this.getDefaultData();
     } else if (!options.initialData) {
       data = this.getDefaultData();
     } else {
