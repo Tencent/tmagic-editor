@@ -1,3 +1,18 @@
+# [1.5.0-beta.2](https://github.com/Tencent/tmagic-editor/compare/v1.5.0-beta.1...v1.5.0-beta.2) (2024-08-21)
+
+
+### Bug Fixes
+
+* **data-source:** http数据源中mock配置中关闭启用后，不会执行request ([18fa541](https://github.com/Tencent/tmagic-editor/commit/18fa541a3c7f0b39820b2ab09c31bea65b36222f))
+
+
+### Features
+
+* **design:** popover 添加destroyOnClose props ([8b1c639](https://github.com/Tencent/tmagic-editor/commit/8b1c63995306ad00baed3153247f6abf703643ce))
+* **form:** 添加tmagicFormItemProp ([c81a7b4](https://github.com/Tencent/tmagic-editor/commit/c81a7b46e252577823824637a847e1601a0db0a7))
+
+
+
 # [1.5.0-beta.1](https://github.com/Tencent/tmagic-editor/compare/v1.5.0-beta.0...v1.5.0-beta.1) (2024-08-15)
 
 
