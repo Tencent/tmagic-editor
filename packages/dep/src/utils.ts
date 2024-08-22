@@ -237,7 +237,7 @@ export const isDataSourceCondTarget = (
     if (hasArray) {
       return includeArray;
     }
-    return true;
+    return !includeArray;
   }
 
   return false;
