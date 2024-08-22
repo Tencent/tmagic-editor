@@ -267,7 +267,7 @@ class Editor extends BaseService {
 
     if (node?.id) {
       this.get('stage')
-        ?.renderer.runtime?.getApp?.()
+        ?.renderer?.runtime?.getApp?.()
         ?.page?.emit(
           'editor:select',
           {
@@ -737,7 +737,7 @@ class Editor extends BaseService {
 
   public async doPaste(config: MNode[], position: PastePosition = {}): Promise<MNode[]> {
     propsService.clearRelateId();
-    const doc = this.get('stage')?.renderer.contentWindow?.document;
+    const doc = this.get('stage')?.renderer?.contentWindow?.document;
     const pasteConfigs = beforePaste(position, cloneDeep(config), doc);
     return pasteConfigs;
   }
@@ -756,7 +756,7 @@ class Editor extends BaseService {
     if (!node.style) return config;
 
     const stage = this.get('stage');
-    const doc = stage?.renderer.contentWindow?.document;
+    const doc = stage?.renderer?.contentWindow?.document;
 
     if (doc) {
       const el = getElById()(doc, node.id);

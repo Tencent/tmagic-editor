@@ -34,7 +34,7 @@ const style = computed(() => ({
 watch(stage, (stage) => {
   if (stage) {
     stage.on('dblclick', async (event: MouseEvent) => {
-      const el = await stage.actionManager.getElementFromPoint(event);
+      const el = (await stage.actionManager?.getElementFromPoint(event)) || null;
       services?.stageOverlayService.openOverlay(el);
     });
   } else {
@@ -53,8 +53,8 @@ watch(stageOverlay, (stageOverlay) => {
 
     const { mask, renderer } = subStage;
 
-    const { contentWindow } = renderer;
-    mask.showRule(false);
+    const { contentWindow } = renderer!;
+    mask?.showRule(false);
 
     services?.stageOverlayService.updateOverlay();
 
