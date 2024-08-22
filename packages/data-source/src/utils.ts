@@ -191,17 +191,29 @@ export const compliedIteratorItem = ({
   dsId,
   item,
   deps,
+  condDeps,
+  inEditor,
+  ctxData,
 }: {
   compile: (value: any) => any;
   dsId: string;
   item: MNode;
   deps: DepData;
+  condDeps: DepData;
+  inEditor: boolean;
+  ctxData: DataSourceManagerData;
 }) => {
   const { items, ...node } = item;
   const newNode = cloneDeep(node);
 
+  if (condDeps[node.id]?.keys.length && !inEditor) {
+    newNode.condResult = compliedConditions(node, ctxData);
+  }
+
   if (Array.isArray(items) && items.length) {
-    newNode.items = items.map((item) => compliedIteratorItem({ compile, dsId, item, deps }));
+    newNode.items = items.map((item) =>
+      compliedIteratorItem({ compile, dsId, item, deps, condDeps, inEditor, ctxData }),
+    );
   } else if (items) {
     newNode.items = items;
   }
