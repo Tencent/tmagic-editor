@@ -81,6 +81,7 @@ export default class StageHighlight extends EventEmitter {
    * 销毁实例
    */
   public destroy(): void {
+    this.target = undefined;
     this.moveable?.destroy();
     this.targetShadow?.destroy();
     this.moveable = undefined;

@@ -125,6 +125,7 @@ export default class StageDragResize extends MoveableOptionsManager {
    * 销毁实例
    */
   public destroy(): void {
+    this.target = null;
     this.moveable?.destroy();
     this.dragResizeHelper.destroy();
     this.dragStatus = StageDragStatus.END;

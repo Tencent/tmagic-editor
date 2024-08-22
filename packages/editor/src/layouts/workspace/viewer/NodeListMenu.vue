@@ -61,7 +61,7 @@ const unWatch = watch(
     nextTick(() => unWatch());
 
     stage.on('select', (el: HTMLElement, event: MouseEvent) => {
-      const els = stage.renderer.getElementsFromPoint(event) || [];
+      const els = stage.renderer?.getElementsFromPoint(event) || [];
       const ids = els.map((el) => getIdFromEl()(el)).filter((id) => Boolean(id)) as string[];
 
       buttonVisible.value = ids.length > 3;
