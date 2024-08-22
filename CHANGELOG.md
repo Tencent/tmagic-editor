@@ -16,6 +16,14 @@
 * **vue-runtime-help:** 只有dsl中的组件才触发生命周期hook ([69f3cb2](https://github.com/Tencent/tmagic-editor/commit/69f3cb2f12d8b2e18ac957caa5f655024cbc8577))
 
 
+# [1.5.0-beta.3](https://github.com/Tencent/tmagic-editor/compare/v1.5.0-beta.2...v1.5.0-beta.3) (2024-08-22)
+
+
+### Bug Fixes
+
+* **dep:** 数据源条件依赖收集默认不收集迭代器内部组件的依赖 ([2d285d2](https://github.com/Tencent/tmagic-editor/commit/2d285d22926b443d59f52657ef0cbf86eeae3ffe))
+
+
 # [1.5.0-beta.2](https://github.com/Tencent/tmagic-editor/compare/v1.5.0-beta.1...v1.5.0-beta.2) (2024-08-21)
 
 
