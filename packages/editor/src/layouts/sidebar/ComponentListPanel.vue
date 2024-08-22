@@ -111,7 +111,7 @@ const dragendHandler = () => {
     globalThis.clearTimeout(timeout);
     timeout = undefined;
   }
-  const doc = stage.value?.renderer.getDocument();
+  const doc = stage.value?.renderer?.getDocument();
   if (doc && stageOptions?.containerHighlightClassName) {
     removeClassNameByClassName(doc, stageOptions.containerHighlightClassName);
   }

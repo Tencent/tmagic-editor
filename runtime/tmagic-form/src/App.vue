@@ -23,8 +23,8 @@ const { mForm, formConfig, config, values } = useFormConfig(props);
 
 watch(formConfig, async () => {
   setTimeout(() => {
-    const page = props.stage.renderer.getDocument()?.querySelector<HTMLElement>('.m-form');
-    page && props.stage.renderer.contentWindow?.magic.onPageElUpdate(page);
+    const page = props.stage.renderer?.getDocument()?.querySelector<HTMLElement>('.m-form');
+    page && props.stage.renderer?.contentWindow?.magic.onPageElUpdate(page);
   });
 });
 </script>
