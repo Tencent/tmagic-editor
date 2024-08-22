@@ -250,20 +250,17 @@ class DataSourceManager extends EventEmitter {
       return nodes;
     }
 
-    return nodes.map((item) => {
-      const node = compliedIteratorItem({
+    return nodes.map((item) =>
+      compliedIteratorItem({
         compile: (value: any) => compiledNodeField(value, ctxData),
         dsId: ds.id,
         item,
         deps,
-      });
-
-      if (condDeps[node.id]?.keys.length && this.app.platform !== 'editor') {
-        node.condResult = compliedConditions(node, ctxData);
-      }
-
-      return node;
-    });
+        condDeps,
+        inEditor: this.app.platform === 'editor',
+        ctxData,
+      }),
+    );
   }
 
   public destroy() {
