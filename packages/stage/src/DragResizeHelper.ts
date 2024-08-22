@@ -50,7 +50,7 @@ export default class DragResizeHelper {
   /** 目标节点在蒙层上的占位节点，用于跟鼠标交互，避免鼠标事件直接作用到目标节点 */
   private targetShadow: TargetShadow;
   /** 要操作的原始目标节点 */
-  private target!: HTMLElement;
+  private target: HTMLElement | null = null;
   /** 多选:目标节点组 */
   private targetList: HTMLElement[] = [];
   /** 响应拖拽的状态事件，修改绝对定位布局下targetShadow的dom。
@@ -84,6 +84,8 @@ export default class DragResizeHelper {
   }
 
   public destroy(): void {
+    this.target = null;
+    this.targetList = [];
     this.targetShadow.destroy();
     this.destroyGhostEl();
     this.moveableHelper.clear();
@@ -114,8 +116,8 @@ export default class DragResizeHelper {
   public onResizeStart(e: OnResizeStart): void {
     this.moveableHelper.onResizeStart(e);
 
-    this.frameSnapShot.top = this.target.offsetTop;
-    this.frameSnapShot.left = this.target.offsetLeft;
+    this.frameSnapShot.top = this.target!.offsetTop;
+    this.frameSnapShot.left = this.target!.offsetLeft;
   }
 
   public onResize(e: OnResize): void {
@@ -123,33 +125,33 @@ export default class DragResizeHelper {
     const { beforeTranslate } = drag;
     // 流式布局
     if (this.mode === Mode.SORTABLE) {
-      this.target.style.top = '0px';
+      this.target!.style.top = '0px';
       if (this.targetShadow.el) {
         this.targetShadow.el.style.width = `${width}px`;
         this.targetShadow.el.style.height = `${height}px`;
       }
     } else {
       this.moveableHelper.onResize(e);
-      const { marginLeft, marginTop } = getMarginValue(this.target);
-      this.target.style.left = `${this.frameSnapShot.left + beforeTranslate[0] - marginLeft}px`;
-      this.target.style.top = `${this.frameSnapShot.top + beforeTranslate[1] - marginTop}px`;
+      const { marginLeft, marginTop } = getMarginValue(this.target!);
+      this.target!.style.left = `${this.frameSnapShot.left + beforeTranslate[0] - marginLeft}px`;
+      this.target!.style.top = `${this.frameSnapShot.top + beforeTranslate[1] - marginTop}px`;
     }
 
-    const { borderLeftWidth, borderRightWidth, borderTopWidth, borderBottomWidth } = getBorderWidth(this.target);
+    const { borderLeftWidth, borderRightWidth, borderTopWidth, borderBottomWidth } = getBorderWidth(this.target!);
 
-    this.target.style.width = `${width + borderLeftWidth + borderRightWidth}px`;
-    this.target.style.height = `${height + borderTopWidth + borderBottomWidth}px`;
+    this.target!.style.width = `${width + borderLeftWidth + borderRightWidth}px`;
+    this.target!.style.height = `${height + borderTopWidth + borderBottomWidth}px`;
   }
 
   public onDragStart(e: OnDragStart): void {
     this.moveableHelper.onDragStart(e);
 
     if (this.mode === Mode.SORTABLE) {
-      this.ghostEl = this.generateGhostEl(this.target);
+      this.ghostEl = this.generateGhostEl(this.target!);
     }
 
-    this.frameSnapShot.top = this.target.offsetTop;
-    this.frameSnapShot.left = this.target.offsetLeft;
+    this.frameSnapShot.top = this.target!.offsetTop;
+    this.frameSnapShot.left = this.target!.offsetLeft;
   }
 
   public onDrag(e: OnDrag): void {
@@ -161,10 +163,10 @@ export default class DragResizeHelper {
 
     this.moveableHelper.onDrag(e);
 
-    const { marginLeft, marginTop } = getMarginValue(this.target);
+    const { marginLeft, marginTop } = getMarginValue(this.target!);
 
-    this.target.style.left = `${this.frameSnapShot.left + e.beforeTranslate[0] - marginLeft}px`;
-    this.target.style.top = `${this.frameSnapShot.top + e.beforeTranslate[1] - marginTop}px`;
+    this.target!.style.left = `${this.frameSnapShot.left + e.beforeTranslate[0] - marginLeft}px`;
+    this.target!.style.top = `${this.frameSnapShot.top + e.beforeTranslate[1] - marginTop}px`;
   }
 
   public onRotateStart(e: OnRotateStart): void {
@@ -174,7 +176,7 @@ export default class DragResizeHelper {
   public onRotate(e: OnRotate): void {
     this.moveableHelper.onRotate(e);
     const frame = this.moveableHelper.getFrame(e.target);
-    this.target.style.transform = frame?.toCSSObject().transform || '';
+    this.target!.style.transform = frame?.toCSSObject().transform || '';
   }
 
   public onScaleStart(e: OnScaleStart): void {
@@ -184,7 +186,7 @@ export default class DragResizeHelper {
   public onScale(e: OnScale): void {
     this.moveableHelper.onScale(e);
     const frame = this.moveableHelper.getFrame(e.target);
-    this.target.style.transform = frame?.toCSSObject().transform || '';
+    this.target!.style.transform = frame?.toCSSObject().transform || '';
   }
 
   public getGhostEl(): HTMLElement | undefined {
