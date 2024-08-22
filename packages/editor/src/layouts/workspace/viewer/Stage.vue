@@ -196,7 +196,7 @@ const dropHandler = async (e: DragEvent) => {
 
   e.preventDefault();
 
-  const doc = stage?.renderer.contentWindow?.document;
+  const doc = stage?.renderer?.contentWindow?.document;
   const parentEl: HTMLElement | null | undefined = doc?.querySelector(`.${stageOptions?.containerHighlightClassName}`);
 
   let parent: MContainer | undefined | null = page.value;
@@ -209,7 +209,7 @@ const dropHandler = async (e: DragEvent) => {
     const layout = await services?.editorService.getLayout(parent);
 
     const containerRect = stageContainer.value.getBoundingClientRect();
-    const { scrollTop, scrollLeft } = stage.mask;
+    const { scrollTop, scrollLeft } = stage.mask!;
     const { style = {} } = config.data;
 
     let top = 0;

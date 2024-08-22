@@ -9,7 +9,7 @@ import { getElById, getNodePath, replaceChildNode } from '@tmagic/utils';
 import { AppProps } from './types';
 
 export const useFormConfig = (props: AppProps) => {
-  const { contentWindow } = props.stage.renderer;
+  const { contentWindow } = props.stage.renderer!;
   const mForm = ref<InstanceType<typeof MForm>>();
 
   const root = ref<MApp>();

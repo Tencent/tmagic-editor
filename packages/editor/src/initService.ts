@@ -242,7 +242,7 @@ export const initServiceEvents = (
 
   const getApp = () => {
     const stage = editorService.get('stage');
-    return stage?.renderer.runtime?.getApp?.();
+    return stage?.renderer?.runtime?.getApp?.();
   };
 
   const updateDataSourceSchema = () => {

@@ -109,12 +109,16 @@ const getMiddleTop = (node: MNode, parentNode: MNode, stage: StageCore | null) =
   }
 
   const { height: parentHeight } = parentNode.style;
-  // wrapperHeight 是未 calcValue的高度, 所以要将其calcValueByFontsize一下, 否则在pad or pc端计算的结果有误
-  const { scrollTop = 0, wrapperHeight } = stage.mask;
-  const wrapperHeightDeal = calcValueByFontsize(stage.renderer.getDocument()!, wrapperHeight);
-  const scrollTopDeal = calcValueByFontsize(stage.renderer.getDocument()!, scrollTop);
-  if (isPage(parentNode)) {
-    return (wrapperHeightDeal - height) / 2 + scrollTopDeal;
+
+  let wrapperHeightDeal = parentHeight;
+  if (stage.mask && stage.renderer) {
+    // wrapperHeight 是未 calcValue的高度, 所以要将其calcValueByFontsize一下, 否则在pad or pc端计算的结果有误
+    const { scrollTop = 0, wrapperHeight } = stage.mask;
+    wrapperHeightDeal = calcValueByFontsize(stage.renderer.getDocument()!, wrapperHeight);
+    const scrollTopDeal = calcValueByFontsize(stage.renderer.getDocument()!, scrollTop);
+    if (isPage(parentNode)) {
+      return (wrapperHeightDeal - height) / 2 + scrollTopDeal;
+    }
   }
 
   // 如果容器的元素高度大于当前视口高度的2倍, 添加的元素居中位置也会看不见, 所以要取最小值计算
@@ -263,7 +267,7 @@ export const fixNodePosition = (config: MNode, parent: MContainer, stage: StageC
   return {
     ...(config.style || {}),
     top: getMiddleTop(config, parent, stage),
-    left: fixNodeLeft(config, parent, stage?.renderer.contentWindow?.document),
+    left: fixNodeLeft(config, parent, stage?.renderer?.contentWindow?.document),
   };
 };
 

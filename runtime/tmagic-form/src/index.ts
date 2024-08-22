@@ -24,21 +24,25 @@ export const useRuntime = ({
   fillConfig?: (config: FormConfig, mForm: any) => FormConfig;
 } = {}) => {
   const render = (stage: StageCore) => {
-    injectStyle(stage.renderer.getDocument()!, cssStyle);
-    injectStyle(
-      stage.renderer.getDocument()!,
-      `html,
-        body,
-        #app {
-          width: 100%;
-          height: 100%;
-          margin: 0;
-        }
-        ::-webkit-scrollbar {
-          width: 0;
-        }
-      `,
-    );
+    const doc = stage.renderer?.getDocument();
+
+    if (doc) {
+      injectStyle(doc, cssStyle);
+      injectStyle(
+        doc,
+        `html,
+          body,
+          #app {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+          }
+          ::-webkit-scrollbar {
+            width: 0;
+          }
+        `,
+      );
+    }
 
     const el: HTMLDivElement = globalThis.document.createElement('div');
     el.id = 'app';
