@@ -32,6 +32,7 @@ const filterTextChangeHandler = () => {
   timer && clearTimeout(timer);
   timer = setTimeout(() => {
     emit('search', filterText.value);
+    timer = null;
   }, 300);
 };
 </script>

@@ -140,6 +140,7 @@ const mouseleaveHandler = () => {
 
   timer = globalThis.setTimeout(() => {
     popoverVisible.value = false;
+    timer = null;
   }, 350);
 };
 
