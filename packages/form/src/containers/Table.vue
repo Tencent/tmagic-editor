@@ -500,6 +500,7 @@ const upHandler = (index: number) => {
 
   timer = setTimeout(() => {
     swapArray(index, index - 1);
+    timer = undefined;
   }, 300);
 };
 
@@ -525,6 +526,7 @@ const downHandler = (index: number) => {
 
   timer = setTimeout(() => {
     swapArray(index, index + 1);
+    timer = undefined;
   }, 300);
 };
 
