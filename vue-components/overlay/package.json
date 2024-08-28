@@ -1,5 +1,5 @@
 {
-  "version": "0.0.1",
+  "version": "0.0.2",
   "name": "@tmagic/vue-overlay",
   "type": "module",
   "main": "src/index.ts",
@@ -17,8 +17,8 @@
     "vue-demi": "^0.14.10"
   },
   "peerDependencies": {
-    "@tmagic/schema": "workspace:*",
-    "@tmagic/vue-runtime-help": "workspace:*",
+    "@tmagic/schema": "workspace:^",
+    "@tmagic/vue-runtime-help": "workspace:^",
     "vue-demi": ">=0.14.7",
     "typescript": "*"
   },
