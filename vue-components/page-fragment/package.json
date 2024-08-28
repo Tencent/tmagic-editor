@@ -1,5 +1,5 @@
 {
-  "version": "0.0.1",
+  "version": "0.0.2",
   "name": "@tmagic/vue-page-fragment",
   "type": "module",
   "main": "src/index.ts",
@@ -17,9 +17,9 @@
     "vue-demi": "^0.14.10"
   },
   "peerDependencies": {
-    "@tmagic/utils": "workspace:*",
-    "@tmagic/schema": "workspace:*",
-    "@tmagic/vue-runtime-help": "workspace:*",
+    "@tmagic/utils": "workspace:^",
+    "@tmagic/schema": "workspace:^",
+    "@tmagic/vue-runtime-help": "workspace:^",
     "typescript": "*"
   },
   "peerDependenciesMeta": {

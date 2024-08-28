@@ -844,10 +844,10 @@ importers:
   react-components/button:
     dependencies:
       '@tmagic/react-runtime-help':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../runtime/react-runtime-help
       '@tmagic/schema':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/schema
       react:
         specifier: '>=18.3.1'
@@ -869,13 +869,13 @@ importers:
   react-components/container:
     dependencies:
       '@tmagic/react-runtime-help':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../runtime/react-runtime-help
       '@tmagic/schema':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/schema
       '@tmagic/utils':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/utils
       react:
         specifier: '>=18.3.1'
@@ -897,10 +897,10 @@ importers:
   react-components/img:
     dependencies:
       '@tmagic/react-runtime-help':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../runtime/react-runtime-help
       '@tmagic/schema':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/schema
       react:
         specifier: '>=18.3.1'
@@ -922,13 +922,13 @@ importers:
   react-components/iterator-container:
     dependencies:
       '@tmagic/react-runtime-help':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../runtime/react-runtime-help
       '@tmagic/schema':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/schema
       '@tmagic/utils':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/utils
       react:
         specifier: '>=18.3.1'
@@ -950,10 +950,10 @@ importers:
   react-components/overlay:
     dependencies:
       '@tmagic/react-runtime-help':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../runtime/react-runtime-help
       '@tmagic/schema':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/schema
       react:
         specifier: '>=18.3.1'
@@ -975,13 +975,13 @@ importers:
   react-components/page:
     dependencies:
       '@tmagic/react-runtime-help':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../runtime/react-runtime-help
       '@tmagic/schema':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/schema
       '@tmagic/utils':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/utils
       react:
         specifier: '>=18.3.1'
@@ -1003,13 +1003,13 @@ importers:
   react-components/page-fragment:
     dependencies:
       '@tmagic/react-runtime-help':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../runtime/react-runtime-help
       '@tmagic/schema':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/schema
       '@tmagic/utils':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/utils
       react:
         specifier: '>=18.3.1'
@@ -1031,10 +1031,10 @@ importers:
   react-components/page-fragment-container:
     dependencies:
       '@tmagic/react-runtime-help':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../runtime/react-runtime-help
       '@tmagic/schema':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/schema
       react:
         specifier: '>=18.3.1'
@@ -1056,10 +1056,10 @@ importers:
   react-components/qrcode:
     dependencies:
       '@tmagic/react-runtime-help':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../runtime/react-runtime-help
       '@tmagic/schema':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/schema
       qrcode:
         specifier: ^1.5.0
@@ -1087,10 +1087,10 @@ importers:
   react-components/text:
     dependencies:
       '@tmagic/react-runtime-help':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../runtime/react-runtime-help
       '@tmagic/schema':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/schema
       react:
         specifier: '>=18.3.1'
@@ -1418,10 +1418,10 @@ importers:
   vue-components/button:
     dependencies:
       '@tmagic/schema':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/schema
       '@tmagic/vue-runtime-help':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
       '@vue/composition-api':
         specifier: '>=1.7.2'
@@ -1439,13 +1439,13 @@ importers:
   vue-components/container:
     dependencies:
       '@tmagic/schema':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/schema
       '@tmagic/utils':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/utils
       '@tmagic/vue-runtime-help':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
       '@vue/composition-api':
         specifier: '>=1.7.2'
@@ -1463,10 +1463,10 @@ importers:
   vue-components/img:
     dependencies:
       '@tmagic/schema':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/schema
       '@tmagic/vue-runtime-help':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
       '@vue/composition-api':
         specifier: '>=1.7.2'
@@ -1484,16 +1484,16 @@ importers:
   vue-components/iterator-container:
     dependencies:
       '@tmagic/core':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/core
       '@tmagic/schema':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/schema
       '@tmagic/utils':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/utils
       '@tmagic/vue-runtime-help':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
       '@vue/composition-api':
         specifier: '>=1.7.2'
@@ -1511,10 +1511,10 @@ importers:
   vue-components/overlay:
     dependencies:
       '@tmagic/schema':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/schema
       '@tmagic/vue-runtime-help':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
       typescript:
         specifier: '*'
@@ -1526,13 +1526,13 @@ importers:
   vue-components/page:
     dependencies:
       '@tmagic/schema':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/schema
       '@tmagic/utils':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/utils
       '@tmagic/vue-runtime-help':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
       typescript:
         specifier: '*'
@@ -1544,13 +1544,13 @@ importers:
   vue-components/page-fragment:
     dependencies:
       '@tmagic/schema':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/schema
       '@tmagic/utils':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/utils
       '@tmagic/vue-runtime-help':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
       typescript:
         specifier: '*'
@@ -1562,10 +1562,10 @@ importers:
   vue-components/page-fragment-container:
     dependencies:
       '@tmagic/schema':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/schema
       '@tmagic/vue-runtime-help':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
       typescript:
         specifier: '*'
@@ -1577,10 +1577,10 @@ importers:
   vue-components/qrcode:
     dependencies:
       '@tmagic/schema':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/schema
       '@tmagic/vue-runtime-help':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
       '@vue/composition-api':
         specifier: '>=1.7.2'
@@ -1605,10 +1605,10 @@ importers:
   vue-components/text:
     dependencies:
       '@tmagic/schema':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../packages/schema
       '@tmagic/vue-runtime-help':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
       '@vue/composition-api':
         specifier: '>=1.7.2'
