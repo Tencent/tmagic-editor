@@ -1,5 +1,5 @@
 {
-  "version": "0.0.1",
+  "version": "0.0.2",
   "name": "@tmagic/react-img",
   "type": "module",
   "main": "src/index.ts",
@@ -14,8 +14,8 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "peerDependencies": {
-    "@tmagic/schema": "workspace:*",
-    "@tmagic/react-runtime-help": "workspace:*",
+    "@tmagic/schema": "workspace:^",
+    "@tmagic/react-runtime-help": "workspace:^",
     "react": ">=18.3.1",
     "react-dom": ">=18.3.1",
     "typescript": "*"
