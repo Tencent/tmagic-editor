@@ -1,3 +1,18 @@
+## [1.4.17](https://github.com/Tencent/tmagic-editor/compare/v1.4.16...v1.4.17) (2024-08-30)
+
+
+### Bug Fixes
+
+* **data-source:** 编辑器的runtime不能对数据源的mock配置有影响 ([fa2d00b](https://github.com/Tencent/tmagic-editor/commit/fa2d00ba3689b9b336a5a2d44c731a3fa4ce61f6))
+* **form:** date相关的field,在没有配置valueFormat的情况下与默认的valueFormat不符 ([883e227](https://github.com/Tencent/tmagic-editor/commit/883e227d54c7f07b13bb190bc5f97a9e63671193))
+
+
+### Features
+
+* **vue-runtime-help:** 只有dsl中的组件才触发生命周期hook ([69f3cb2](https://github.com/Tencent/tmagic-editor/commit/69f3cb2f12d8b2e18ac957caa5f655024cbc8577))
+
+
+
 ## [1.4.16](https://github.com/Tencent/tmagic-editor/compare/v1.4.15...v1.4.16) (2024-08-02)
 
 
