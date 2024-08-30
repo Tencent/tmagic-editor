@@ -17,7 +17,6 @@
 import { ref, watch } from 'vue';
 
 import { TMagicTimePicker } from '@tmagic/design';
-import { datetimeFormatter } from '@tmagic/utils';
 
 import type { DaterangeConfig, FieldProps } from '../schema';
 import { useAddField } from '../utils/useAddField';
@@ -59,7 +58,7 @@ const setValue = (v: Date[] | Date) => {
       return;
     }
     if (Array.isArray(v)) {
-      props.model[item] = datetimeFormatter(v[index]?.toString(), '');
+      props.model[item] = v[index];
     } else {
       props.model[item] = undefined;
     }

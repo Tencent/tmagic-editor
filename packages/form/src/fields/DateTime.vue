@@ -37,7 +37,11 @@ if (props.model) {
   if (value === 'Invalid Date') {
     props.model[props.name] = '';
   } else {
-    props.model[props.name] = datetimeFormatter(props.model[props.name], '', props.config.valueFormat);
+    props.model[props.name] = datetimeFormatter(
+      props.model[props.name],
+      '',
+      props.config.valueFormat || 'YYYY/MM/DD HH:mm:ss',
+    );
   }
 }
 

@@ -53,7 +53,7 @@ describe('Date', () => {
     expect(date.exists()).toBe(true);
 
     const value = await (wrapper.vm as any).submitForm();
-    expect(value.date).toMatch('2021-01-01 00:00:00');
+    expect(value.date).toMatch('2021/01/01');
   });
 
   test('输入', async () => {
@@ -74,7 +74,7 @@ describe('Date', () => {
     await input.trigger('blur');
 
     const value = await (wrapper.vm as any).submitForm();
-    expect(input.element.value).toMatch('2021-07-28');
+    expect(input.element.value).toMatch('2021/07/28');
     expect(value.date).toMatch('2021-07-28');
   });
 

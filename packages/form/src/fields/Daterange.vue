@@ -9,6 +9,9 @@
     :unlink-panels="true"
     :disabled="disabled"
     :default-time="config.defaultTime"
+    :value-format="config.valueFormat || 'YYYY/MM/DD HH:mm:ss'"
+    :date-format="config.dateFormat || 'YYYY/MM/DD'"
+    :time-format="config.timeFormat || 'HH:mm:ss'"
     @change="changeHandler"
   ></TMagicDatePicker>
 </template>
@@ -71,7 +74,11 @@ const setValue = (v: Date[] | Date) => {
       return;
     }
     if (Array.isArray(v)) {
-      props.model[item] = datetimeFormatter(v[index]?.toString(), '');
+      props.model[item] = datetimeFormatter(
+        v[index]?.toString(),
+        '',
+        props.config.valueFormat || 'YYYY/MM/DD HH:mm:ss',
+      );
     } else {
       props.model[item] = undefined;
     }
@@ -85,7 +92,7 @@ const changeHandler = (v: Date[]) => {
     emit(
       'change',
       value.map((item?: Date) => {
-        if (item) return datetimeFormatter(item, '');
+        if (item) return datetimeFormatter(item, '', props.config.valueFormat || 'YYYY/MM/DD HH:mm:ss');
         return undefined;
       }),
     );

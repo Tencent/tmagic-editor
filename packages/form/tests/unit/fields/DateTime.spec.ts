@@ -53,7 +53,7 @@ describe('DateTime', () => {
     expect(datetime.exists()).toBe(true);
 
     const value = await (wrapper.vm as any).submitForm();
-    expect(value.datetime).toMatch('2021-01-01 12:00:00');
+    expect(value.datetime).toMatch('2021/01/01 12:00:00');
   });
 
   test('错误类型初始化初始化', async () => {

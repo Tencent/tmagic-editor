@@ -5,8 +5,8 @@
     :size="size"
     :placeholder="config.placeholder"
     :disabled="disabled"
-    :format="config.format"
-    :value-format="config.valueFormat || 'YYYY/MM/DD HH:mm:ss'"
+    :format="config.format || 'YYYY/MM/DD'"
+    :value-format="config.valueFormat || 'YYYY/MM/DD'"
     @change="changeHandler"
   ></TMagicDatePicker>
 </template>
@@ -30,7 +30,7 @@ const emit = defineEmits<{
 
 useAddField(props.prop);
 
-props.model[props.name] = datetimeFormatter(props.model[props.name], '');
+props.model[props.name] = datetimeFormatter(props.model[props.name], '', 'YYYY/MM/DD');
 
 const changeHandler = (v: string) => {
   emit('change', v);

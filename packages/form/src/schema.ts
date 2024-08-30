@@ -296,6 +296,9 @@ export interface DaterangeConfig extends FormItem {
   type: 'daterange';
   defaultTime?: Date[];
   names?: string[];
+  valueFormat?: string;
+  dateFormat?: string;
+  timeFormat?: string;
 }
 
 /**
