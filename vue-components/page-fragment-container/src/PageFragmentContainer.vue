@@ -1,11 +1,12 @@
 <template>
   <div>
-    <magic-ui-container
+    <component
+      :is="containerComponent"
       :iterator-index="iteratorIndex"
       :iterator-container-id="iteratorContainerId"
       :config="containerConfig"
       :model="model"
-    ></magic-ui-container>
+    ></component>
   </div>
 </template>
 
@@ -13,7 +14,7 @@
 import { computed, defineComponent, type PropType } from 'vue-demi';
 
 import { type Id, type MComponent, type MNode, NodeType } from '@tmagic/schema';
-import { useApp } from '@tmagic/vue-runtime-help';
+import { useApp, useComponent } from '@tmagic/vue-runtime-help';
 
 export default defineComponent({
   props: {
@@ -36,6 +37,8 @@ export default defineComponent({
       iteratorContainerId: props.iteratorContainerId,
       iteratorIndex: props.iteratorIndex,
     });
+
+    const containerComponent = useComponent({ componentType: 'container', app });
 
     const fragment = computed(() => app?.dsl?.items?.find((page) => page.id === props.config.pageFragmentId));
 
@@ -64,6 +67,7 @@ export default defineComponent({
     });
 
     return {
+      containerComponent,
       containerConfig,
     };
   },

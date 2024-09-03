@@ -1,14 +1,14 @@
 <template>
-  <magic-ui-container v-if="visible" :config="{ items: config.items }">
+  <component v-if="visible" :is="containerComponent" :config="{ items: config.items }">
     <slot></slot>
-  </magic-ui-container>
+  </component>
 </template>
 
 <script lang="ts">
 import { defineComponent, onBeforeUnmount, type PropType, ref } from 'vue-demi';
 
 import type { Id, MContainer, MNode, MPage } from '@tmagic/schema';
-import { useApp } from '@tmagic/vue-runtime-help';
+import { useApp, useComponent } from '@tmagic/vue-runtime-help';
 
 interface OverlaySchema extends Omit<MContainer, 'id'> {
   id?: Id;
@@ -48,6 +48,8 @@ export default defineComponent({
       },
     });
 
+    const containerComponent = useComponent({ componentType: 'container', app });
+
     const editorSelectHandler = (
       info: {
         node: MNode;
@@ -70,6 +72,7 @@ export default defineComponent({
     });
 
     return {
+      containerComponent,
       visible,
     };
   },

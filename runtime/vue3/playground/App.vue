@@ -1,13 +1,14 @@
 <template>
-  <magic-ui-page v-if="pageConfig" :key="pageConfig.id" :config="pageConfig"></magic-ui-page>
+  <component v-if="pageConfig" :is="pageComponent" :key="pageConfig.id" :config="pageConfig"></component>
 </template>
 
 <script lang="ts" setup>
 import { inject } from 'vue';
 
 import type Core from '@tmagic/core';
-import { useEditorDsl } from '@tmagic/vue-runtime-help';
+import { useComponent, useEditorDsl } from '@tmagic/vue-runtime-help';
 
 const app = inject<Core | undefined>('app');
 const { pageConfig } = useEditorDsl(app);
+const pageComponent = useComponent('page');
 </script>
