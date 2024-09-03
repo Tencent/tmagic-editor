@@ -1,11 +1,24 @@
-import { MoveableManagerInterface, Renderer } from 'moveable';
+import type { MoveableManagerInterface, Renderer } from 'moveable';
 
 import { AbleActionEventType } from './const';
 import ableCss from './moveable-able.css?raw';
 
-export default (handler: (type: AbleActionEventType) => void) => ({
+export interface AbleCustomizedButton {
+  props: {
+    className?: string;
+    onClick?(e: MouseEvent): void;
+    [key: string]: any;
+  };
+  children: ReturnType<Renderer['createElement']>[];
+}
+
+export default (
+  handler: (type: AbleActionEventType) => void,
+  customizedButton: ((react: Renderer) => AbleCustomizedButton)[] = [],
+) => ({
   name: 'actions',
   props: [],
+  always: true,
   events: [],
   render(moveable: MoveableManagerInterface<any, any>, React: Renderer) {
     const rect = moveable.getRect();
@@ -33,10 +46,17 @@ export default (handler: (type: AbleActionEventType) => void) => ({
       {
         className: 'moveable-editable',
         style: {
-          transform: `translate(${pos2[0] - 60}px, ${pos2[1] - 28}px) rotate(${rect.rotation}deg)`,
+          transform: `translate(${pos2[0] - (customizedButton.length + 3) * 20}px, ${pos2[1] - 28}px) rotate(${
+            rect.rotation
+          }deg)`,
         },
       },
       [
+        ...customizedButton.map((buttonRenderer) => {
+          const options = buttonRenderer(React);
+          return React.createElement('button', options.props || {}, ...(options.children || []));
+        }),
+
         React.createElement(
           'button',
           {
