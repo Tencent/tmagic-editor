@@ -57,6 +57,7 @@
   },
   "devDependencies": {
     "@types/node": "^18.19.0",
+    "@vue/test-utils": "^2.4.6",
     "rimraf": "^3.0.2"
   }
 }

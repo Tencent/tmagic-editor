@@ -1,12 +1,13 @@
 <template>
   <div>
-    <magic-ui-container
+    <component
+      :is="containerComponent"
       v-for="(item, index) in configs"
       :iterator-index="[...(iteratorIndex || []), index]"
       :iterator-container-id="[...(iteratorContainerId || []), config.id]"
       :key="index"
       :config="item"
-    ></magic-ui-container>
+    ></component>
   </div>
 </template>
 
@@ -15,7 +16,7 @@ import { computed, defineComponent, type PropType, watch } from 'vue-demi';
 
 import type { IteratorContainer as TMagicIteratorContainer } from '@tmagic/core';
 import type { Id, MIteratorContainer, MNode } from '@tmagic/schema';
-import { useApp } from '@tmagic/vue-runtime-help';
+import { useApp, useComponent } from '@tmagic/vue-runtime-help';
 
 interface IteratorContainerSchema extends Omit<MIteratorContainer, 'id'> {
   id?: Id;
@@ -51,6 +52,8 @@ export default defineComponent({
       iteratorIndex: props.iteratorIndex,
       methods: {},
     });
+
+    const containerComponent = useComponent({ componentType: 'container', app });
 
     const configs = computed<IteratorItemSchema[]>(() => {
       let { iteratorData = [] } = props.config;
@@ -115,6 +118,7 @@ export default defineComponent({
 
     return {
       configs,
+      containerComponent,
     };
   },
 });

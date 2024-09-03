@@ -42,7 +42,7 @@ Promise.all([
   }
 
   Object.entries(components.default).forEach(([type, component]: [string, any]) => {
-    Vue.component(`magic-ui-${type}`, component);
+    app.registerComponent(type, component);
   });
 
   Object.entries(dataSources).forEach(([type, ds]: [string, any]) => {
