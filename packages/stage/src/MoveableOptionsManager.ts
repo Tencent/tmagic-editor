@@ -112,9 +112,10 @@ export default class MoveableOptionsManager extends EventEmitter {
    */
   protected getOptions(isMultiSelect: boolean, runtimeOptions: MoveableOptions = {}): MoveableOptions {
     const defaultOptions = this.getDefaultOptions(isMultiSelect);
-    const customizedOptions = this.getCustomizeOptions();
+    const customizedOptions = this.getCustomizeOptions() || {};
 
     this.options = merge(defaultOptions, customizedOptions, runtimeOptions);
+
     return this.options;
   }
 
