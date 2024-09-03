@@ -5,7 +5,7 @@
         <component
           v-if="display(item)"
           :key="item.id"
-          :is="`magic-ui-${toLine(item.type)}`"
+          :is="useComponent({ componentType: item.type, app })"
           :data-tmagic-id="item.id"
           :data-tmagic-iterator-index="iteratorIndex"
           :data-tmagic-iterator-container-id="iteratorContainerId"
@@ -27,7 +27,7 @@ import { computed, defineComponent, type PropType } from 'vue-demi';
 
 import type { Id, MContainer } from '@tmagic/schema';
 import { IS_DSL_NODE_KEY, toLine } from '@tmagic/utils';
-import { useApp } from '@tmagic/vue-runtime-help';
+import { useApp, useComponent } from '@tmagic/vue-runtime-help';
 
 interface ContainerSchema extends Omit<MContainer, 'id'> {
   id?: Id;
@@ -82,6 +82,7 @@ export default defineComponent({
 
       display,
       toLine,
+      useComponent,
     };
   },
 });

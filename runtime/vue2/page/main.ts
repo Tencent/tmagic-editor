@@ -48,8 +48,8 @@ const app = new Core({
 
 app.setDesignWidth(app.env.isWeb ? window.document.documentElement.getBoundingClientRect().width : 375);
 
-Object.keys(components).forEach((type: string) => {
-  Vue.component(`magic-ui-${type}`, components[type]);
+Object.entries(components).forEach(([type, component]: [string, any]) => {
+  app.registerComponent(type, component);
 });
 
 Object.values(plugins).forEach((plugin: any) => {
