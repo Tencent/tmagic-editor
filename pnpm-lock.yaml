@@ -1283,6 +1283,9 @@ importers:
       '@types/node':
         specifier: ^18.19.0
         version: 18.19.42
+      '@vue/test-utils':
+        specifier: ^2.4.6
+        version: 2.4.6
       rimraf:
         specifier: ^3.0.2
         version: 3.0.2

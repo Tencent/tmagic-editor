@@ -9,7 +9,7 @@ export default defineConfig({
   plugins: [Vue()],
 
   test: {
-    include: ['./packages/*/tests/**'],
+    include: ['./packages/*/tests/**', './runtime/*/tests/**'],
     environment: 'jsdom',
     environmentMatchGlobs: [['packages/cli/**', 'node']],
     coverage: {

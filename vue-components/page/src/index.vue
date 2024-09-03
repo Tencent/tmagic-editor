@@ -1,12 +1,12 @@
 <template>
-  <magic-ui-container class="magic-ui-page" :data-tmagic-id="config.id" :config="config"></magic-ui-container>
+  <component :is="containerComponent" class="magic-ui-page" :data-tmagic-id="config.id" :config="config"></component>
 </template>
 
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue-demi';
 
 import type { MPage } from '@tmagic/schema';
-import { useApp } from '@tmagic/vue-runtime-help';
+import { useApp, useComponent } from '@tmagic/vue-runtime-help';
 
 export default defineComponent({
   props: {
@@ -30,8 +30,10 @@ export default defineComponent({
       methods: { refresh },
     });
 
+    const containerComponent = useComponent({ componentType: 'container', app });
+
     return {
-      app,
+      containerComponent,
     };
   },
 });
