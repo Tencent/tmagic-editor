@@ -1,5 +1,5 @@
 <template>
-  <magic-ui-page :config="pageConfig"></magic-ui-page>
+  <component :is="pageComponent" :config="pageConfig"></component>
 </template>
 
 <script lang="ts">
@@ -8,7 +8,7 @@ import { defineComponent, inject } from 'vue';
 import type { Page } from '@tmagic/core';
 import type Core from '@tmagic/core';
 import { addParamToUrl } from '@tmagic/utils';
-import { useDsl } from '@tmagic/vue-runtime-help';
+import { useComponent, useDsl } from '@tmagic/vue-runtime-help';
 
 export default defineComponent({
   name: 'App',
@@ -16,6 +16,7 @@ export default defineComponent({
   setup() {
     const app = inject<Core | undefined>('app');
     const { pageConfig } = useDsl(app);
+    const pageComponent = useComponent('page');
 
     app?.on('page-change', (page?: Page) => {
       if (!page) {
@@ -25,6 +26,7 @@ export default defineComponent({
     });
 
     return {
+      pageComponent,
       pageConfig,
     };
   },

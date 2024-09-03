@@ -1,17 +1,18 @@
 <template>
-  <magic-ui-container
+  <component
+    :is="containerComponent"
     class="magic-ui-page-fragment"
     :data-tmagic-id="config.id"
     :config="config"
     :style="app?.transformStyle(config.style || {})"
-  ></magic-ui-container>
+  ></component>
 </template>
 
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue-demi';
 
 import type { MPageFragment } from '@tmagic/schema';
-import { useApp } from '@tmagic/vue-runtime-help';
+import { useApp, useComponent } from '@tmagic/vue-runtime-help';
 
 export default defineComponent({
   props: {
@@ -31,8 +32,11 @@ export default defineComponent({
       methods: {},
     });
 
+    const containerComponent = useComponent({ componentType: 'container', app });
+
     return {
       app,
+      containerComponent,
     };
   },
 });
