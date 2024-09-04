@@ -29,7 +29,13 @@
     </div>
 
     <!-- 数据源列表 -->
-    <DataSourceList ref="dataSourceList" @edit="editHandler" @remove="removeHandler"></DataSourceList>
+    <DataSourceList
+      ref="dataSourceList"
+      :indent="indent"
+      :next-level-indent-increment="nextLevelIndentIncrement"
+      @edit="editHandler"
+      @remove="removeHandler"
+    ></DataSourceList>
   </TMagicScrollbar>
 
   <DataSourceConfigPanel
@@ -60,6 +66,11 @@ defineSlots<DataSourceListSlots>();
 defineOptions({
   name: 'MEditorDataSourceListPanel',
 });
+
+defineProps<{
+  indent?: number;
+  nextLevelIndentIncrement?: number;
+}>();
 
 const eventBus = inject<EventBus>('eventBus');
 const { dataSourceService } = inject<Services>('services') || {};
