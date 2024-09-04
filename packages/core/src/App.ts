@@ -38,6 +38,7 @@ interface AppOptionsConfig {
   designWidth?: number;
   curPage?: Id;
   useMock?: boolean;
+  disabledFlexible?: boolean;
   pageFragmentContainerType?: string | string[];
   iteratorContainerType?: string | string[];
   transformStyle?: (style: Record<string, any>) => Record<string, any>;
@@ -94,7 +95,7 @@ class App extends EventEmitter {
       this.useMock = options.useMock;
     }
 
-    if (this.jsEngine === 'browser') {
+    if (this.jsEngine === 'browser' && !options.disabledFlexible) {
       this.flexible = new Flexible({ designWidth: options.designWidth });
     }
 
