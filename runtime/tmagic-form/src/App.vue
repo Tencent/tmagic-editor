@@ -1,12 +1,5 @@
 <template>
-  <MForm
-    ref="mForm"
-    :key="config?.id"
-    :id="config?.id"
-    :data-magic-id="config?.id"
-    :config="formConfig"
-    :init-values="values"
-  ></MForm>
+  <MForm ref="mForm" :key="config?.id" :data-tmagic-id="config?.id" :config="formConfig" :init-values="values"></MForm>
 </template>
 
 <script setup lang="ts">

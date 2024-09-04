@@ -1,8 +1,7 @@
 <template>
   <div
     v-if="config"
-    :id="config.id"
-    :data-magic-id="config.id"
+    :data-tmagic-id="config.id"
     :style="config.tip ? 'display: flex;align-items: baseline;' : ''"
     :class="`m-form-container m-container-${type || ''} ${config.className || ''}`"
   >
