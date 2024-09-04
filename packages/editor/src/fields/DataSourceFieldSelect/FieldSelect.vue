@@ -69,15 +69,9 @@
 import { computed, inject, ref, watch } from 'vue';
 import { Edit, View } from '@element-plus/icons-vue';
 
-import {
-  getConfig as getDesignConfig,
-  TMagicButton,
-  TMagicCascader,
-  TMagicSelect,
-  TMagicTooltip,
-} from '@tmagic/design';
+import { DataSourceFieldType } from '@tmagic/core';
+import { getDesignConfig, TMagicButton, TMagicCascader, TMagicSelect, TMagicTooltip } from '@tmagic/design';
 import { type FilterFunction, filterFunction, type FormState, type SelectOption } from '@tmagic/form';
-import { DataSourceFieldType } from '@tmagic/schema';
 import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX } from '@tmagic/utils';
 
 import MIcon from '@editor/components/Icon.vue';

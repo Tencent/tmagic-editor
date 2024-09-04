@@ -22,7 +22,7 @@
 import { inject, toRaw } from 'vue';
 import { Plus } from '@element-plus/icons-vue';
 
-import { NodeType } from '@tmagic/schema';
+import { NodeType } from '@tmagic/core';
 
 import MIcon from '@editor/components/Icon.vue';
 import type { Services } from '@editor/type';

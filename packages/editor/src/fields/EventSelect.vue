@@ -53,11 +53,11 @@ import { computed, inject } from 'vue';
 import { Delete } from '@element-plus/icons-vue';
 import { has } from 'lodash-es';
 
-import type { EventOption } from '@tmagic/core';
+import type { EventOption, MComponent, MContainer } from '@tmagic/core';
+import { ActionType } from '@tmagic/core';
 import { TMagicButton } from '@tmagic/design';
 import type { CascaderOption, ChildConfig, FieldProps, FormState, PanelConfig } from '@tmagic/form';
 import { MContainer as MFormContainer, MPanel } from '@tmagic/form';
-import { ActionType, type MComponent, type MContainer } from '@tmagic/schema';
 import { DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX } from '@tmagic/utils';
 
 import type { CodeSelectColConfig, DataSourceMethodSelectConfig, EventSelectConfig, Services } from '@editor/type';

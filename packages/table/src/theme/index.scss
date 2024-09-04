@@ -1,0 +1,15 @@
+.m-table {
+  .el-button.action-btn + .el-button.action-btn {
+    margin-left: 0;
+  }
+  .keep-all {
+    word-break: keep-all;
+  }
+  .el-table .cell > div {
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .el-table__row.el-table__row--level-1 {
+    color: #999;
+  }
+}

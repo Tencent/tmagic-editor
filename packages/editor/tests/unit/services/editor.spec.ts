@@ -19,15 +19,15 @@
 import { beforeAll, describe, expect, test } from 'vitest';
 import { cloneDeep } from 'lodash-es';
 
-import type { MApp } from '@tmagic/schema';
-import { NodeType } from '@tmagic/schema';
+import type { MApp } from '@tmagic/core';
+import { NodeType } from '@tmagic/core';
 
 import editorService from '@editor/services/editor';
 import historyService from '@editor/services/history';
 import storageService from '@editor/services/storage';
-import { COPY_STORAGE_KEY, setConfig } from '@editor/utils';
+import { COPY_STORAGE_KEY, setEditorConfig } from '@editor/utils';
 
-setConfig({
+setEditorConfig({
   // eslint-disable-next-line no-eval
   parseDSL: (dsl: string) => eval(dsl),
 });

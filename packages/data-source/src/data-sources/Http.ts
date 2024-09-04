@@ -15,8 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { HttpOptions, RequestFunction } from '@tmagic/schema';
-import { getValueByKeyPath } from '@tmagic/utils';
+import type { HttpOptions, RequestFunction } from '@tmagic/core';
+import { getValueByKeyPath } from '@tmagic/core';
 
 import { DataSourceOptions, HttpDataSourceSchema } from '@data-source/types';
 

@@ -13,7 +13,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { CardProps } from './types';
 
 defineOptions({
@@ -22,7 +22,7 @@ defineOptions({
 
 const props = defineProps<CardProps>();
 
-const ui = getConfig('components')?.card;
+const ui = getDesignConfig('components')?.card;
 
 const uiComponent = ui?.component || 'el-card';
 

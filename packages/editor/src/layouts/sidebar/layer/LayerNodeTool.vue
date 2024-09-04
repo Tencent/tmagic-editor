@@ -9,7 +9,7 @@
 import { inject } from 'vue';
 import { Hide, View } from '@element-plus/icons-vue';
 
-import type { MNode } from '@tmagic/schema';
+import type { MNode } from '@tmagic/core';
 
 import MIcon from '@editor/components/Icon.vue';
 import { Services } from '@editor/type';

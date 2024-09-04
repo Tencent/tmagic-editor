@@ -15,6 +15,7 @@
 <script lang="ts" setup>
 import { computed, inject } from 'vue';
 
+import type { DisplayCond } from '@tmagic/core';
 import {
   type FieldProps,
   type FilterFunction,
@@ -23,7 +24,6 @@ import {
   type GroupListConfig,
   MGroupList,
 } from '@tmagic/form';
-import type { DisplayCond } from '@tmagic/schema';
 
 import type { Services } from '@editor/type';
 import { getCascaderOptionsFromFields } from '@editor/utils';

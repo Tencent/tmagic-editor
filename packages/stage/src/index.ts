@@ -18,14 +18,16 @@
 
 import StageCore from './StageCore';
 
+export * from 'moveable';
 export type { GuidesOptions } from '@scena/guides';
+
 export { default as StageRender } from './StageRender';
 export { default as StageMask } from './StageMask';
 export { default as StageDragResize } from './StageDragResize';
-export * from 'moveable';
 export * from './types';
 export * from './const';
 export * from './util';
 export * from './MoveableActionsAble';
 export { default as MoveableActionsAble } from './MoveableActionsAble';
+
 export default StageCore;

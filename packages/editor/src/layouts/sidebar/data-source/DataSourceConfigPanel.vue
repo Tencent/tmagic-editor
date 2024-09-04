@@ -24,9 +24,9 @@
 <script setup lang="ts">
 import { inject, Ref, ref, watchEffect } from 'vue';
 
+import { DataSourceSchema } from '@tmagic/core';
 import { tMagicMessage } from '@tmagic/design';
 import { FormConfig, MFormBox } from '@tmagic/form';
-import { DataSourceSchema } from '@tmagic/schema';
 
 import FloatingBox from '@editor/components/FloatingBox.vue';
 import { useEditorContentHeight } from '@editor/hooks';

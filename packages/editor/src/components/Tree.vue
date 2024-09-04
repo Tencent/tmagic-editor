@@ -24,7 +24,7 @@
 <script setup lang="ts">
 import { provide } from 'vue';
 
-import type { Id } from '@tmagic/schema';
+import type { Id } from '@tmagic/core';
 
 import type { LayerNodeStatus, TreeNodeData } from '@editor/type';
 

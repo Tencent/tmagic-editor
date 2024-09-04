@@ -6,15 +6,15 @@
 import { defineComponent, inject } from 'vue';
 
 import type { Page } from '@tmagic/core';
-import type Core from '@tmagic/core';
-import { addParamToUrl } from '@tmagic/utils';
+import type TMagicApp from '@tmagic/core';
+import { addParamToUrl } from '@tmagic/core';
 import { useComponent, useDsl } from '@tmagic/vue-runtime-help';
 
 export default defineComponent({
   name: 'App',
 
   setup() {
-    const app = inject<Core | undefined>('app');
+    const app = inject<TMagicApp>('app');
     const { pageConfig } = useDsl(app);
     const pageComponent = useComponent('page');
 

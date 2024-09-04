@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-import { InstallOptions } from '@editor/type';
+import { EditorInstallOptions } from '@editor/type';
 
-let $TMAGIC_EDITOR: InstallOptions = {} as any;
+let $TMAGIC_EDITOR: EditorInstallOptions = {} as any;
 
-const setConfig = (option: InstallOptions): void => {
+const setEditorConfig = (option: EditorInstallOptions): void => {
   $TMAGIC_EDITOR = option;
 };
 
-const getConfig = <K extends keyof InstallOptions>(key: K): InstallOptions[K] => $TMAGIC_EDITOR[key];
+const getEditorConfig = <K extends keyof EditorInstallOptions>(key: K): EditorInstallOptions[K] => $TMAGIC_EDITOR[key];
 
-export { getConfig, setConfig };
+export { getEditorConfig, setEditorConfig };

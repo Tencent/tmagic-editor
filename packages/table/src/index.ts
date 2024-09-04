@@ -20,6 +20,8 @@ import { App } from 'vue';
 
 import Table from './Table.vue';
 
+import './theme/index.scss';
+
 export { default as MagicTable } from './Table.vue';
 export * from './schema';
 export * from './utils';

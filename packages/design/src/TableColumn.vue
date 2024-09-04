@@ -10,7 +10,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { TableColumnProps } from './types';
 
 defineOptions({
@@ -19,7 +19,7 @@ defineOptions({
 
 const props = defineProps<TableColumnProps>();
 
-const ui = getConfig('components')?.tableColumn;
+const ui = getDesignConfig('components')?.tableColumn;
 
 const uiComponent = ui?.component || 'el-table-column';
 

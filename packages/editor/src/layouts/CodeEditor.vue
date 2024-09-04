@@ -23,7 +23,7 @@ import serialize from 'serialize-javascript';
 import { TMagicButton } from '@tmagic/design';
 
 import MIcon from '@editor/components/Icon.vue';
-import { getConfig } from '@editor/utils/config';
+import { getEditorConfig } from '@editor/utils/config';
 import monaco from '@editor/utils/monaco-editor';
 
 defineOptions({
@@ -76,7 +76,7 @@ const toString = (v: string | any, language: string): string => {
   return value;
 };
 
-const parse = (v: string | any, language: string): any => {
+const parseCode = (v: string | any, language: string): any => {
   if (typeof v !== 'string') {
     return v;
   }
@@ -85,7 +85,7 @@ const parse = (v: string | any, language: string): any => {
     return JSON.parse(v);
   }
 
-  return getConfig('parseDSL')(v);
+  return getEditorConfig('parseDSL')(v);
 };
 
 let vsEditor: monaco.editor.IStandaloneCodeEditor | null = null;
@@ -149,7 +149,7 @@ const init = async () => {
       e.stopPropagation();
       const newValue = getEditorValue();
       values.value = newValue;
-      emit('save', props.parse ? parse(newValue, props.language) : newValue);
+      emit('save', props.parse ? parseCode(newValue, props.language) : newValue);
     }
   });
 
@@ -158,7 +158,7 @@ const init = async () => {
       const newValue = getEditorValue();
       if (values.value !== newValue) {
         values.value = newValue;
-        emit('save', props.parse ? parse(newValue, props.language) : newValue);
+        emit('save', props.parse ? parseCode(newValue, props.language) : newValue);
       }
     });
   }

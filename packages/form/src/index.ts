@@ -91,14 +91,14 @@ export { default as MDynamicField } from './fields/DynamicField.vue';
 
 export const createForm = <T extends [] = []>(config: FormConfig | T) => config;
 
-export interface InstallOptions {
+export interface FormInstallOptions {
   [key: string]: any;
 }
 
-const defaultInstallOpt: InstallOptions = {};
+const defaultInstallOpt: FormInstallOptions = {};
 
 export default {
-  install(app: App, opt: InstallOptions = {}) {
+  install(app: App, opt: FormInstallOptions = {}) {
     const option = Object.assign(defaultInstallOpt, opt);
 
     // eslint-disable-next-line no-param-reassign

@@ -15,9 +15,9 @@
 
 <script lang="ts" setup>
 import { TMagicDatePicker } from '@tmagic/design';
-import { datetimeFormatter } from '@tmagic/utils';
 
 import type { DateTimeConfig, FieldProps } from '../schema';
+import { datetimeFormatter } from '../utils/form';
 import { useAddField } from '../utils/useAddField';
 
 defineOptions({

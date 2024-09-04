@@ -16,8 +16,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 
-import { TMagicButton, TMagicIcon } from '@tmagic/design';
-import { MenuButton } from '@tmagic/editor';
+import { MenuButton, TMagicButton, TMagicIcon } from '@tmagic/editor';
 
 export default defineComponent({
   name: 'nav-menu',

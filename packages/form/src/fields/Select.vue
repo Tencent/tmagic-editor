@@ -80,7 +80,7 @@
 <script lang="ts" setup>
 import { inject, nextTick, onBeforeMount, ref, watch, watchEffect } from 'vue';
 
-import { getConfig as getDesignConfig, TMagicSelect } from '@tmagic/design';
+import { getDesignConfig, TMagicSelect } from '@tmagic/design';
 import { getValueByKeyPath } from '@tmagic/utils';
 
 import type { FieldProps, FormState, SelectConfig, SelectGroupOption, SelectOption } from '../schema';

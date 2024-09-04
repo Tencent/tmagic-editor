@@ -1,10 +1,9 @@
 import { computed, nextTick, onBeforeUnmount, reactive, ref } from 'vue';
 
-import Core from '@tmagic/core';
-import { type FormConfig, initValue, MForm } from '@tmagic/form';
-import type { Id, MApp, MNode } from '@tmagic/schema';
-import type { RemoveData, UpdateData } from '@tmagic/stage';
-import { getElById, getNodePath, replaceChildNode } from '@tmagic/utils';
+import type { Id, MApp, MNode } from '@tmagic/core';
+import TMagicApp from '@tmagic/core';
+import type { FormConfig, MForm, RemoveData, UpdateData } from '@tmagic/editor';
+import { getElById, getNodePath, initValue, replaceChildNode } from '@tmagic/editor';
 
 import { AppProps } from './types';
 
@@ -23,7 +22,7 @@ export const useFormConfig = (props: AppProps) => {
   // @ts-ignore
   const formConfig = computed(() => props.fillConfig((config.value?.items || []) as FormConfig, mForm));
 
-  let app: Core | undefined = new Core({
+  let app: TMagicApp | undefined = new TMagicApp({
     ua: contentWindow?.navigator.userAgent,
     platform: 'editor',
   });
@@ -137,6 +136,7 @@ export const useFormConfig = (props: AppProps) => {
   contentWindow?.addEventListener('message', runtimeReadyHandler);
 
   onBeforeUnmount(() => {
+    app?.destroy();
     app = undefined;
     contentWindow?.removeEventListener('message', runtimeReadyHandler);
   });

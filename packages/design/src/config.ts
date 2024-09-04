@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-import { PluginOptions } from './types';
+import { DesignPluginOptions } from './types';
 
-let $MAGIC_DESIGN: PluginOptions = {};
+let $MAGIC_DESIGN: DesignPluginOptions = {};
 
-const setConfig = (options: PluginOptions): void => {
+const setDesignConfig = (options: DesignPluginOptions): void => {
   $MAGIC_DESIGN = options;
 };
 
-const getConfig = <K extends keyof PluginOptions>(key: K) => $MAGIC_DESIGN[key];
+const getDesignConfig = <K extends keyof DesignPluginOptions>(key: K) => $MAGIC_DESIGN[key];
 
-export { getConfig, setConfig };
+export { getDesignConfig, setDesignConfig };

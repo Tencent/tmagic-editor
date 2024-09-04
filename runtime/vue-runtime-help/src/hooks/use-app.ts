@@ -19,8 +19,8 @@
 import { inject, onBeforeUnmount, onMounted } from 'vue-demi';
 
 import type TMagicApp from '@tmagic/core';
-import type { Id, MNodeInstance } from '@tmagic/schema';
-import { isDslNode } from '@tmagic/utils';
+import type { Id, MNodeInstance } from '@tmagic/core';
+import { isDslNode } from '@tmagic/core';
 
 interface UseAppOptions<T extends MNodeInstance = MNodeInstance> {
   config: T;
@@ -32,7 +32,7 @@ interface UseAppOptions<T extends MNodeInstance = MNodeInstance> {
 }
 
 export const useApp = ({ methods = {}, config, iteratorContainerId, iteratorIndex }: UseAppOptions) => {
-  const app: TMagicApp | undefined = inject('app');
+  const app = inject<TMagicApp>('app');
 
   const emitData = {
     config,

@@ -1,6 +1,6 @@
 import { type Ref, ref } from 'vue';
 
-import type { Id, MNode } from '@tmagic/schema';
+import type { Id, MNode } from '@tmagic/core';
 
 import type { LayerNodeStatus, TreeNodeData } from '@editor/type';
 import { traverseNode } from '@editor/utils';

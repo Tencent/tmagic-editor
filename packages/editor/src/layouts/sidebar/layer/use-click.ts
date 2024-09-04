@@ -1,7 +1,7 @@
 import { computed, type ComputedRef, nextTick, type Ref, ref } from 'vue';
 import { throttle } from 'lodash-es';
 
-import { Id, MNode } from '@tmagic/schema';
+import { Id, MNode } from '@tmagic/core';
 import { isPage, isPageFragment } from '@tmagic/utils';
 
 import { LayerNodeStatus, Services, TreeNodeData, UI_SELECT_MODE_EVENT_NAME } from '@editor/type';

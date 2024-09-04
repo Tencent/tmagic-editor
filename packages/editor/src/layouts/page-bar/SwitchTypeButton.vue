@@ -13,8 +13,8 @@
 </template>
 
 <script setup lang="ts">
+import { NodeType } from '@tmagic/core';
 import { TMagicButton } from '@tmagic/design';
-import { NodeType } from '@tmagic/schema';
 
 defineOptions({
   name: 'MEditorPageBarSwitchTypeButton',

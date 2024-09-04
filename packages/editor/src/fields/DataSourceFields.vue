@@ -49,9 +49,9 @@
 <script setup lang="ts">
 import { inject, Ref, ref } from 'vue';
 
+import type { DataSchema } from '@tmagic/core';
 import { TMagicButton, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
 import { type FieldProps, type FormConfig, type FormState, MFormBox } from '@tmagic/form';
-import type { DataSchema } from '@tmagic/schema';
 import { type ColumnConfig, MagicTable } from '@tmagic/table';
 import { getDefaultValueFromFields } from '@tmagic/utils';
 
