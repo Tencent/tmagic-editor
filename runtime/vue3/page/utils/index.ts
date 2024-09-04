@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import type { MApp } from '@tmagic/schema';
+import type { MApp } from '@tmagic/core';
 
 export const getLocalConfig = (): MApp[] => {
   const configStr = localStorage.getItem('magicDSL');

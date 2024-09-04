@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { InputProps } from './types';
 
 defineOptions({
@@ -35,7 +35,7 @@ defineOptions({
 
 const props = defineProps<InputProps>();
 
-const ui = getConfig('components')?.input;
+const ui = getDesignConfig('components')?.input;
 
 const uiComponent = ui?.component || 'el-input';
 

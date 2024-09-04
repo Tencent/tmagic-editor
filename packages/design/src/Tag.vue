@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { TagProps } from './types';
 
 defineOptions({
@@ -16,7 +16,7 @@ defineOptions({
 
 const props = defineProps<TagProps>();
 
-const ui = getConfig('components')?.tag;
+const ui = getDesignConfig('components')?.tag;
 
 const uiComponent = ui?.component || 'el-tag';
 

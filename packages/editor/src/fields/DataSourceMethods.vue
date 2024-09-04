@@ -21,9 +21,9 @@
 </template>
 
 <script setup lang="ts">
+import type { CodeBlockContent } from '@tmagic/core';
 import { TMagicButton } from '@tmagic/design';
 import type { FieldProps } from '@tmagic/form';
-import type { CodeBlockContent } from '@tmagic/schema';
 import { type ColumnConfig, MagicTable } from '@tmagic/table';
 
 import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';

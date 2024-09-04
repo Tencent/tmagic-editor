@@ -1,4 +1,4 @@
-import type { Id } from '@tmagic/schema';
+import type { Id } from '@tmagic/core';
 import { getKeys } from '@tmagic/utils';
 
 import type { LayerNodeStatus } from '@editor/type';

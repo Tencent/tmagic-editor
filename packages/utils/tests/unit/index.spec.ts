@@ -22,37 +22,6 @@ import type { DataSchema } from '@tmagic/schema';
 
 import * as util from '../../src';
 
-describe('datetimeFormatter', () => {
-  // Date会将时间转为UTC
-  const date = new Date('2021-07-17T15:37:00');
-  const dateValue = '2021-07-17 15:37:00';
-  const defaultValue = '默认值';
-
-  test('v为空且未设置默认时间', () => {
-    expect(util.datetimeFormatter('')).toBe('-');
-  });
-
-  test('v是字符串且未设置了默认时间', () => {
-    expect(util.datetimeFormatter('abc', defaultValue)).toMatch(defaultValue);
-  });
-
-  test('v是日期字符串', () => {
-    expect(util.datetimeFormatter(date.toISOString(), defaultValue)).toMatch(dateValue);
-  });
-
-  test('v是Date对象', () => {
-    expect(util.datetimeFormatter(date)).toMatch(dateValue);
-  });
-
-  test('v是UTC字符串', () => {
-    expect(util.datetimeFormatter(date.toUTCString())).toMatch(dateValue);
-  });
-
-  test('format是x', () => {
-    expect(util.datetimeFormatter(date.toISOString(), defaultValue, 'timestamp')).toBe(date.getTime());
-  });
-});
-
 describe('asyncLoadJs', () => {
   const url = 'https://m.film.qq.com/magic-ui/production/1/1625056093304/magic/magic-ui.umd.min.js';
 

@@ -35,9 +35,9 @@
 import { computed, inject, ref } from 'vue';
 import { Edit, View } from '@element-plus/icons-vue';
 
+import type { Id } from '@tmagic/core';
 import { TMagicButton, TMagicTooltip } from '@tmagic/design';
 import { createValues, type FieldProps, filterFunction, type FormState, MContainer } from '@tmagic/form';
-import type { Id } from '@tmagic/schema';
 
 import CodeParams from '@editor/components/CodeParams.vue';
 import MIcon from '@editor/components/Icon.vue';

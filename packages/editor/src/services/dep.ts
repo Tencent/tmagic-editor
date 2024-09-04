@@ -17,8 +17,8 @@
  */
 import { reactive } from 'vue';
 
-import { type DepExtendedData, DepTargetType, type Target, type TargetNode, Watcher } from '@tmagic/dep';
-import type { Id, MNode } from '@tmagic/schema';
+import type { DepExtendedData, Id, MNode, Target, TargetNode } from '@tmagic/core';
+import { DepTargetType, Watcher } from '@tmagic/core';
 import { isPage } from '@tmagic/utils';
 
 import { IdleTask } from '@editor/utils/idle-task';

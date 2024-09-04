@@ -1,6 +1,6 @@
 import { computed, onBeforeUnmount, watch } from 'vue';
 
-import type { MNode } from '@tmagic/schema';
+import type { MNode } from '@tmagic/core';
 import StageCore, { GuidesType, RemoveEventData, SortEventData, UpdateEventData } from '@tmagic/stage';
 import { getIdFromEl } from '@tmagic/utils';
 

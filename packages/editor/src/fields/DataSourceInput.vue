@@ -1,12 +1,12 @@
 <template>
   <component
     v-if="disabled || isFocused"
-    :is="getConfig('components')?.autocomplete.component || 'el-autocomplete'"
+    :is="getDesignConfig('components')?.autocomplete.component || 'el-autocomplete'"
     class="tmagic-design-auto-complete"
     ref="autocomplete"
     v-model="state"
     v-bind="
-      getConfig('components')?.autocomplete.props({
+      getDesignConfig('components')?.autocomplete.props({
         disabled,
         size,
         fetchSuggestions: querySearch,
@@ -51,9 +51,9 @@
 import { computed, inject, nextTick, ref, watch } from 'vue';
 import { Coin } from '@element-plus/icons-vue';
 
-import { getConfig, TMagicAutocomplete, TMagicTag } from '@tmagic/design';
+import type { DataSchema, DataSourceSchema } from '@tmagic/core';
+import { getDesignConfig, TMagicAutocomplete, TMagicTag } from '@tmagic/design';
 import type { FieldProps, FormItem } from '@tmagic/form';
-import type { DataSchema, DataSourceSchema } from '@tmagic/schema';
 import { getKeysArray, isNumber } from '@tmagic/utils';
 
 import Icon from '@editor/components/Icon.vue';

@@ -11,9 +11,9 @@
       "import": "./dist/tmagic-core.js",
       "require": "./dist/tmagic-core.umd.cjs"
     },
-    "./dist/style.css": {
-      "import": "./dist/style.css",
-      "require": "./dist/style.css"
+    "./resetcss.css": {
+      "import": "./resetcss.css",
+      "require": "./resetcss.css"
     },
     "./*": "./*"
   },
@@ -37,6 +37,10 @@
     "vue"
   ],
   "dependencies": {
+    "@tmagic/data-source": "workspace:*",
+    "@tmagic/dep": "workspace:*",
+    "@tmagic/schema": "workspace:*",
+    "@tmagic/utils": "workspace:*",
     "events": "^3.3.0",
     "lodash-es": "^4.17.21"
   },
@@ -48,9 +52,6 @@
     "vite": "^5.3.5"
   },
   "peerDependencies": {
-    "@tmagic/data-source": "workspace:*",
-    "@tmagic/schema": "workspace:*",
-    "@tmagic/utils": "workspace:*",
     "typescript": "*"
   },
   "peerDependenciesMeta": {

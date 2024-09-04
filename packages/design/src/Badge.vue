@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { BadgeProps } from './types';
 
 defineOptions({
@@ -16,7 +16,7 @@ defineOptions({
 
 const props = defineProps<BadgeProps>();
 
-const ui = getConfig('components')?.badge;
+const ui = getDesignConfig('components')?.badge;
 const uiComponent = ui?.component || 'el-badge';
 
 const uiProps = computed(() => ui?.props(props) || props);

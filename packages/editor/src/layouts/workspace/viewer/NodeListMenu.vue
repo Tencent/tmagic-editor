@@ -24,8 +24,8 @@
 <script lang="ts" setup>
 import { computed, inject, nextTick, ref, watch } from 'vue';
 
+import type { MNode } from '@tmagic/core';
 import { TMagicTooltip } from '@tmagic/design';
-import type { MNode } from '@tmagic/schema';
 import { getIdFromEl } from '@tmagic/utils';
 
 import FloatingBox from '@editor/components/FloatingBox.vue';

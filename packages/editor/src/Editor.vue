@@ -119,7 +119,7 @@ import { EventEmitter } from 'events';
 
 import { provide } from 'vue';
 
-import type { MApp } from '@tmagic/schema';
+import type { MApp } from '@tmagic/core';
 
 import Framework from './layouts/Framework.vue';
 import TMagicNavMenu from './layouts/NavMenu.vue';

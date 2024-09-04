@@ -1,11 +1,10 @@
 import { describe, expect, test } from 'vitest';
 
-import App from '@tmagic/core';
-import { NodeType } from '@tmagic/schema';
+import TMagicApp, { NodeType } from '@tmagic/core';
 
 import { DataSource, DataSourceManager } from '@data-source/index';
 
-const app = new App({
+const app = new TMagicApp({
   config: {
     type: NodeType.ROOT,
     id: '1',

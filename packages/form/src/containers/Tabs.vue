@@ -73,7 +73,7 @@
 import { computed, inject, ref, watchEffect } from 'vue';
 import { cloneDeep, isEmpty } from 'lodash-es';
 
-import { getConfig, TMagicBadge } from '@tmagic/design';
+import { getDesignConfig, TMagicBadge } from '@tmagic/design';
 
 import { FormState, TabConfig, TabPaneConfig } from '../schema';
 import { display as displayFunc, filterFunction } from '../utils/form';
@@ -88,8 +88,8 @@ type DiffCount = {
   [tabIndex: number]: number;
 };
 
-const tabPaneComponent = getConfig('components')?.tabPane;
-const tabsComponent = getConfig('components')?.tabs;
+const tabPaneComponent = getDesignConfig('components')?.tabPane;
+const tabsComponent = getDesignConfig('components')?.tabs;
 
 const getActive = (mForm: FormState | undefined, props: any, activeTabName: string) => {
   const { config, model, prop } = props;

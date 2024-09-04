@@ -1,11 +1,11 @@
 import { nextTick, ref } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
+import type { CodeBlockContent, DataSourceSchema } from '@tmagic/core';
 import { tMagicMessage } from '@tmagic/design';
-import type { CodeBlockContent, DataSourceSchema } from '@tmagic/schema';
 
 import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
-import { getConfig } from '@editor/utils/config';
+import { getEditorConfig } from '@editor/utils/config';
 
 export const useDataSourceMethod = () => {
   const codeConfig = ref<CodeBlockContent>();
@@ -81,7 +81,7 @@ export const useDataSourceMethod = () => {
 
       if (values.content) {
         // 在保存的时候转换代码内容
-        const parseDSL = getConfig('parseDSL');
+        const parseDSL = getEditorConfig('parseDSL');
         if (typeof values.content === 'string') {
           values.content = parseDSL<(...args: any[]) => any>(values.content);
         }

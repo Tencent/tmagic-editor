@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { CheckboxProps } from './types';
 
 defineOptions({
@@ -27,7 +27,7 @@ const props = withDefaults(defineProps<CheckboxProps>(), {
   falseValue: undefined,
 });
 
-const ui = getConfig('components')?.checkbox;
+const ui = getDesignConfig('components')?.checkbox;
 
 const uiComponent = ui?.component || 'el-checkbox';
 

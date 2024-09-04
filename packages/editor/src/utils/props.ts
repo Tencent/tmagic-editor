@@ -17,8 +17,8 @@
  * limitations under the License.
  */
 
+import { NODE_CONDS_KEY } from '@tmagic/core';
 import type { FormConfig, FormState, TabPaneConfig } from '@tmagic/form';
-import { NODE_CONDS_KEY } from '@tmagic/schema';
 
 export const arrayOptions = [
   { text: '包含', value: 'include' },

@@ -18,11 +18,11 @@
 
 import { reactive } from 'vue';
 import { cloneDeep, mergeWith } from 'lodash-es';
-import { Writable } from 'type-fest';
+import type { Writable } from 'type-fest';
 
-import { Target, type TargetOptions, Watcher } from '@tmagic/dep';
+import type { Id, MComponent, MNode, TargetOptions } from '@tmagic/core';
+import { Target, Watcher } from '@tmagic/core';
 import type { FormConfig } from '@tmagic/form';
-import type { Id, MComponent, MNode } from '@tmagic/schema';
 import { getNodePath, getValueByKeyPath, guid, setValueByKeyPath, toLine } from '@tmagic/utils';
 
 import editorService from '@editor/services/editor';

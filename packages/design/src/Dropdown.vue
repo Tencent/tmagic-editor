@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { DropdownProps } from './types';
 
 defineOptions({
@@ -20,7 +20,7 @@ defineOptions({
 
 const props = defineProps<DropdownProps>();
 
-const ui = getConfig('components')?.dropdown;
+const ui = getDesignConfig('components')?.dropdown;
 
 const uiComponent = ui?.component || 'el-dropdown';
 

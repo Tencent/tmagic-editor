@@ -1,7 +1,8 @@
 import { toRaw } from 'vue';
 import { isEmpty } from 'lodash-es';
 
-import { Id, MContainer, MNode, NodeType } from '@tmagic/schema';
+import type { Id, MContainer, MNode } from '@tmagic/core';
+import { NodeType } from '@tmagic/core';
 import { calcValueByFontsize, getElById, isPage, isPageFragment } from '@tmagic/utils';
 
 import editorService from '@editor/services/editor';

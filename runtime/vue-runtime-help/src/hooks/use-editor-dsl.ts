@@ -1,9 +1,9 @@
 import { computed, nextTick, reactive, ref, watch } from 'vue-demi';
 
-import Core from '@tmagic/core';
-import type { Id, MApp, MNode } from '@tmagic/schema';
+import type TMagicApp from '@tmagic/core';
+import type { Id, MApp, MNode } from '@tmagic/core';
+import { getElById, getNodePath, replaceChildNode } from '@tmagic/core';
 import type { Magic, RemoveData, UpdateData } from '@tmagic/stage';
-import { getElById, getNodePath, replaceChildNode } from '@tmagic/utils';
 
 declare global {
   interface Window {
@@ -11,7 +11,7 @@ declare global {
   }
 }
 
-export const useEditorDsl = (app: Core | undefined, win = window) => {
+export const useEditorDsl = (app: TMagicApp | undefined, win = window) => {
   const root = ref<MApp>();
   const curPageId = ref<Id>();
   const selectedId = ref<Id>();

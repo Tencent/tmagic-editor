@@ -1,5 +1,5 @@
+import { DataSchema, DataSourceFieldType, DataSourceSchema } from '@tmagic/core';
 import { CascaderOption, FormConfig, FormState } from '@tmagic/form';
-import { DataSchema, DataSourceFieldType, DataSourceSchema } from '@tmagic/schema';
 import {
   DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX,
   dataSourceTemplateRegExp,

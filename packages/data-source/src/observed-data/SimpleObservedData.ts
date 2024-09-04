@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 
-import { getValueByKeyPath, setValueByKeyPath } from '@tmagic/utils';
+import { getValueByKeyPath, setValueByKeyPath } from '@tmagic/core';
 
 import { ObservedData } from './ObservedData';
 

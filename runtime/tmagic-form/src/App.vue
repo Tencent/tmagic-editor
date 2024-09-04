@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import { watch } from 'vue';
 
-import { MForm } from '@tmagic/form';
+import { MForm } from '@tmagic/editor';
 
 import { AppProps } from './types';
 import { useFormConfig } from './useFormConfig';

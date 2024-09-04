@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { NodeType } from '@tmagic/schema';
+import { NodeType } from '@tmagic/core';
 
 import props from '@editor/services/props';
 
