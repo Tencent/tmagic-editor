@@ -12,8 +12,6 @@ export * from './component-group-list';
 
 export const propsConfigs = formConfigs;
 
-export const canSelect = (el: HTMLElement) => Boolean(el.dataset.magicId);
-
 export const useRuntime = ({
   plugins = [],
   fillConfig = (config) => config,
