@@ -1,4 +1,4 @@
-import { computed, onBeforeUnmount, watch } from 'vue';
+import { computed, watch } from 'vue';
 
 import type { MNode } from '@tmagic/core';
 import StageCore, { GuidesType, RemoveEventData, SortEventData, UpdateEventData } from '@tmagic/stage';
@@ -129,10 +129,6 @@ export const useStage = (stageOptions: StageOptions) => {
     } else {
       globalThis.localStorage.removeItem(storageKey);
     }
-  });
-
-  onBeforeUnmount(() => {
-    stage.destroy();
   });
 
   return stage;

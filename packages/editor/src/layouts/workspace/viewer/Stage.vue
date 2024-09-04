@@ -123,6 +123,10 @@ watchEffect(() => {
   });
 });
 
+onBeforeUnmount(() => {
+  stage?.destroy();
+});
+
 watch(zoom, (zoom) => {
   if (!stage || !zoom) return;
   stage.setZoom(zoom);
