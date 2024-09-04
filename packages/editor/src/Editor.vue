@@ -16,7 +16,13 @@
 
     <template #sidebar>
       <slot name="sidebar" :editorService="editorService">
-        <Sidebar :data="sidebar" :layer-content-menu="layerContentMenu" :custom-content-menu="customContentMenu">
+        <Sidebar
+          :data="sidebar"
+          :layer-content-menu="layerContentMenu"
+          :custom-content-menu="customContentMenu"
+          :indent="indent"
+          :next-level-indent-increment="nextLevelIndentIncrement"
+        >
           <template #layer-panel-header>
             <slot name="layer-panel-header"></slot>
           </template>

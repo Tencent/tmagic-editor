@@ -1,5 +1,11 @@
 <template>
-  <Tree :data="codeList" :node-status-map="nodeStatusMap" @node-click="clickHandler">
+  <Tree
+    :data="codeList"
+    :node-status-map="nodeStatusMap"
+    :indent="indent"
+    :next-level-indent-increment="nextLevelIndentIncrement"
+    @node-click="clickHandler"
+  >
     <template #tree-node-label="{ data }">
       <div
         :class="{
@@ -45,6 +51,8 @@ defineOptions({
 });
 
 const props = defineProps<{
+  indent?: number;
+  nextLevelIndentIncrement?: number;
   customError?: (id: Id, errorType: CodeDeleteErrorType) => any;
 }>();
 
