@@ -10,6 +10,8 @@
       ref="tree"
       :data="nodeData"
       :node-status-map="nodeStatusMap"
+      :indent="indent"
+      :next-level-indent-increment="nextLevelIndentIncrement"
       @node-dragover="handleDragOver"
       @node-dragstart="handleDragStart"
       @node-dragleave="handleDragLeave"
@@ -70,6 +72,8 @@ defineOptions({
 
 defineProps<{
   layerContentMenu: (MenuButton | MenuComponent)[];
+  indent?: number;
+  nextLevelIndentIncrement?: number;
   customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
 }>();
 

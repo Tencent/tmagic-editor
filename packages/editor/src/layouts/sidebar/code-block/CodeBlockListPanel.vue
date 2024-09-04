@@ -11,7 +11,14 @@
     </slot>
 
     <!-- 代码块列表 -->
-    <CodeBlockList ref="codeBlockList" :custom-error="customError" @edit="editCode" @remove="deleteCode">
+    <CodeBlockList
+      ref="codeBlockList"
+      :custom-error="customError"
+      :indent="indent"
+      :next-level-indent-increment="nextLevelIndentIncrement"
+      @edit="editCode"
+      @remove="deleteCode"
+    >
       <template #code-block-panel-tool="{ id, data }">
         <slot name="code-block-panel-tool" :id="id" :data="data"></slot>
       </template>
@@ -47,6 +54,8 @@ defineOptions({
 });
 
 defineProps<{
+  indent?: number;
+  nextLevelIndentIncrement?: number;
   customError?: (id: Id, errorType: CodeDeleteErrorType) => any;
 }>();
 

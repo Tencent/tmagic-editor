@@ -182,6 +182,8 @@ const props = withDefaults(
   defineProps<{
     data: SideBarData;
     layerContentMenu: (MenuButton | MenuComponent)[];
+    indent?: number;
+    nextLevelIndentIncrement?: number;
     customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
   }>(),
   {
@@ -234,6 +236,8 @@ const getItemConfig = (data: SideItem): SideComponent => {
       props: {
         layerContentMenu: props.layerContentMenu,
         customContentMenu: props.customContentMenu,
+        indent: props.indent,
+        nextLevelIndentIncrement: props.nextLevelIndentIncrement,
       },
       component: LayerPanel,
       slots: {},
@@ -244,6 +248,10 @@ const getItemConfig = (data: SideItem): SideComponent => {
       icon: EditPen,
       text: '代码编辑',
       component: CodeBlockListPanel,
+      props: {
+        indent: props.indent,
+        nextLevelIndentIncrement: props.nextLevelIndentIncrement,
+      },
       slots: {},
     },
     [SideItemKey.DATA_SOURCE]: {
@@ -252,6 +260,10 @@ const getItemConfig = (data: SideItem): SideComponent => {
       icon: Coin,
       text: '数据源',
       component: DataSourceListPanel,
+      props: {
+        indent: props.indent,
+        nextLevelIndentIncrement: props.nextLevelIndentIncrement,
+      },
       slots: {},
     },
   };
