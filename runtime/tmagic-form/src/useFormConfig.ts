@@ -24,6 +24,7 @@ export const useFormConfig = (props: AppProps) => {
 
   let app: TMagicApp | undefined = new TMagicApp({
     ua: contentWindow?.navigator.userAgent,
+    disabledFlexible: true,
     platform: 'editor',
   });
 

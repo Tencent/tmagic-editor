@@ -6,7 +6,6 @@
     :component-group-list="componentGroupList"
     :props-configs="propsConfigs"
     :render="render"
-    :can-select="canSelect"
     :disabled-page-fragment="true"
     :disabled-stage-overlay="true"
     :stage-rect="{ width: 'calc(100% - 70px)', height: '100%' }"
@@ -25,12 +24,7 @@ import { Document } from '@element-plus/icons-vue';
 
 import { guid, type MApp, NodeType } from '@tmagic/core';
 import { MenuBarData, SideBarData, TMagicEditor, traverseNode } from '@tmagic/editor';
-import {
-  canSelect,
-  COMPONENT_GROUP_LIST as componentGroupList,
-  propsConfigs,
-  useRuntime,
-} from '@tmagic/tmagic-form-runtime';
+import { COMPONENT_GROUP_LIST as componentGroupList, propsConfigs, useRuntime } from '@tmagic/tmagic-form-runtime';
 
 import formDsl from '../configs/formDsl';
 
