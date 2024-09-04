@@ -16,7 +16,7 @@
     "@tmagic/core": "1.5.0-beta.5",
     "@tmagic/editor": "1.5.0-beta.5",
     "@tmagic/element-plus-adapter": "1.5.0-beta.5",
-    "@tmagic/tmagic-form-runtime": "1.1.1",
+    "@tmagic/tmagic-form-runtime": "1.1.3",
     "element-plus": "^2.8.0",
     "lodash-es": "^4.17.21",
     "monaco-editor": "^0.48.0",
