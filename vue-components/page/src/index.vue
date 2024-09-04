@@ -5,7 +5,7 @@
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue-demi';
 
-import type { MPage } from '@tmagic/schema';
+import type { MPage } from '@tmagic/core';
 import { useApp, useComponent } from '@tmagic/vue-runtime-help';
 
 export default defineComponent({
