@@ -6,7 +6,7 @@
 import { defineComponent, type PropType, ref, watch } from 'vue-demi';
 import QRCode from 'qrcode';
 
-import type { Id, MComponent } from '@tmagic/schema';
+import type { Id, MComponent } from '@tmagic/core';
 import { useApp } from '@tmagic/vue-runtime-help';
 
 interface QrCodeSchema extends Omit<MComponent, 'id'> {

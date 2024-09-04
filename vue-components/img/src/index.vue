@@ -5,7 +5,7 @@
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue-demi';
 
-import type { Id, MComponent } from '@tmagic/schema';
+import type { Id, MComponent } from '@tmagic/core';
 import { useApp } from '@tmagic/vue-runtime-help';
 
 interface ImgSchema extends Omit<MComponent, 'id'> {
