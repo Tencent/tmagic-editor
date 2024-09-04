@@ -1,5 +1,11 @@
 <template>
-  <Tree :data="list" :node-status-map="nodeStatusMap" @node-click="clickHandler">
+  <Tree
+    :data="list"
+    :node-status-map="nodeStatusMap"
+    :indent="indent"
+    :next-level-indent-increment="nextLevelIndentIncrement"
+    @node-click="clickHandler"
+  >
     <template #tree-node-label="{ data }">
       <div
         :class="{
@@ -41,6 +47,11 @@ defineSlots<DataSourceListSlots>();
 defineOptions({
   name: 'MEditorDataSourceList',
 });
+
+defineProps<{
+  indent?: number;
+  nextLevelIndentIncrement?: number;
+}>();
 
 const emit = defineEmits<{
   edit: [id: string];

@@ -45,7 +45,7 @@
         :parent="data"
         :parentsId="[...parentsId, data.id]"
         :node-status-map="nodeStatusMap"
-        :indent="indent + 11"
+        :indent="indent + nextLevelIndentIncrement"
       >
         <template #tree-node-content="{ data: nodeData }">
           <slot name="tree-node-content" :data="nodeData"> </slot>
@@ -99,9 +99,11 @@ const props = withDefaults(
     parentsId?: Id[];
     nodeStatusMap: Map<Id, LayerNodeStatus>;
     indent?: number;
+    nextLevelIndentIncrement?: number;
   }>(),
   {
     indent: 0,
+    nextLevelIndentIncrement: 11,
     parentsId: () => [],
   },
 );
