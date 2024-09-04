@@ -18,8 +18,8 @@
 
 import serialize from 'serialize-javascript';
 
-import type { Id, MApp, MContainer, MNode, MPage, MPageFragment } from '@tmagic/schema';
-import { NodeType } from '@tmagic/schema';
+import type { Id, MApp, MContainer, MNode, MPage, MPageFragment } from '@tmagic/core';
+import { NodeType } from '@tmagic/core';
 import type StageCore from '@tmagic/stage';
 import { calcValueByFontsize, getElById, getNodePath, isNumber, isPage, isPageFragment, isPop } from '@tmagic/utils';
 
@@ -80,12 +80,6 @@ export const generatePageName = (pageNameList: string[], type: NodeType.PAGE | N
  */
 export const generatePageNameByApp = (app: MApp, type: NodeType.PAGE | NodeType.PAGE_FRAGMENT): string =>
   generatePageName(getPageNameList(type === 'page' ? getPageList(app) : getPageFragmentList(app)), type);
-
-/**
- * @param {Object} node
- * @returns {boolean}
- */
-export const isFixed = (node: MNode): boolean => node.style?.position === 'fixed';
 
 export const getNodeIndex = (id: Id, parent: MContainer | MApp): number => {
   const items = parent?.items || [];

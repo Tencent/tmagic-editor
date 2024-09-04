@@ -1,9 +1,9 @@
 import { cloneDeep } from 'lodash-es';
 
-import Core from '@tmagic/core';
-import type { Id, MApp } from '@tmagic/schema';
+import type { Id, MApp } from '@tmagic/core';
+import type TMagicApp from '@tmagic/core';
+import { getElById, replaceChildNode } from '@tmagic/core';
 import type { Magic, RemoveData, SortEventData, UpdateData } from '@tmagic/stage';
-import { getElById, replaceChildNode } from '@tmagic/utils';
 
 declare global {
   interface Window {
@@ -11,7 +11,7 @@ declare global {
   }
 }
 
-export const useEditorDsl = (app: Core | undefined, renderDom: () => void) => {
+export const useEditorDsl = (app: TMagicApp | undefined, renderDom: () => void) => {
   let curPageId: Id = '';
 
   const updateConfig = (root: MApp) => {

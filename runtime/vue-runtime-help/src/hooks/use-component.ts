@@ -18,14 +18,14 @@
 
 import { inject } from 'vue-demi';
 
-import type Core from '@tmagic/core';
-import { toLine } from '@tmagic/utils';
+import type TMagicApp from '@tmagic/core';
+import { toLine } from '@tmagic/core';
 
 interface UseComponentOptions {
   /** 组件类型 */
   componentType?: string;
   /** App 实例 */
-  app?: Core;
+  app?: TMagicApp;
 }
 
 /**
@@ -35,7 +35,7 @@ interface UseComponentOptions {
  */
 export function useComponent<Component = any>(options: string | UseComponentOptions = '') {
   let componentType: string | undefined;
-  let app: Core | undefined;
+  let app: TMagicApp | undefined;
   let component: Component | undefined;
 
   if (typeof options === 'string') {
@@ -48,7 +48,7 @@ export function useComponent<Component = any>(options: string | UseComponentOpti
     componentType = 'container';
   }
   if (!app) {
-    app = inject('app');
+    app = inject<TMagicApp>('app');
   }
 
   component = resolveComponent({ componentType, app });

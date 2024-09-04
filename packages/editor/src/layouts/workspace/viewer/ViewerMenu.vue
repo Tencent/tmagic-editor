@@ -6,7 +6,7 @@
 import { computed, inject, markRaw, ref, watch } from 'vue';
 import { Bottom, Top } from '@element-plus/icons-vue';
 
-import { NodeType } from '@tmagic/schema';
+import { NodeType } from '@tmagic/core';
 import { isPage, isPageFragment } from '@tmagic/utils';
 
 import ContentMenu from '@editor/components/ContentMenu.vue';

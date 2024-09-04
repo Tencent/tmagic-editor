@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { ColProps } from './types';
 
 defineOptions({
@@ -16,7 +16,7 @@ defineOptions({
 
 const props = defineProps<ColProps>();
 
-const ui = getConfig('components')?.col;
+const ui = getDesignConfig('components')?.col;
 
 const uiComponent = ui?.component || 'el-col';
 

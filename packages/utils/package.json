@@ -10,10 +10,6 @@
       "types": "./types/index.d.ts",
       "import": "./dist/tmagic-utils.js",
       "require": "./dist/tmagic-utils.umd.cjs"
-    },
-    "./resetcss.css": {
-      "import": "./src/resetcss.css",
-      "require": "./src/resetcss.css"
     }
   },
   "files": [
@@ -33,7 +29,6 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "dayjs": "^1.11.11",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {

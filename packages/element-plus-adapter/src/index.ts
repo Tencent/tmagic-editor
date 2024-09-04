@@ -61,6 +61,7 @@ import type {
   ColorPickerProps,
   ColProps,
   DatePickerProps,
+  DesignPluginOptions,
   DialogProps,
   DividerProps,
   DrawerProps,
@@ -74,7 +75,6 @@ import type {
   OptionGroupProps,
   OptionProps,
   PaginationProps,
-  PluginOptions,
   RadioButtonProps,
   RadioGroupProps,
   RadioProps,
@@ -93,7 +93,7 @@ import type {
   UploadProps,
 } from '@tmagic/design';
 
-const adapter: PluginOptions = {
+const adapter: DesignPluginOptions = {
   useZIndex,
   message: ElMessage,
   messageBox: ElMessageBox,

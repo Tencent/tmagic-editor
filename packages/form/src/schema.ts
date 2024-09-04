@@ -635,7 +635,7 @@ export interface PanelConfig extends FormItem, ContainerCommonConfig {
   schematic?: string;
 }
 
-export interface ColumnConfig extends FormItem {
+export interface TableColumnConfig extends FormItem {
   name?: string;
   label: string;
   width?: string | number;
@@ -648,9 +648,9 @@ export interface ColumnConfig extends FormItem {
  */
 export interface TableConfig extends FormItem {
   type: 'table' | 'groupList' | 'group-list';
-  items: ColumnConfig[];
-  tableItems?: ColumnConfig[];
-  groupItems?: ColumnConfig[];
+  items: TableColumnConfig[];
+  tableItems?: TableColumnConfig[];
+  groupItems?: TableColumnConfig[];
   enableToggleMode?: boolean;
   /** 最大行数 */
   max?: number;

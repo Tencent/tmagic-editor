@@ -65,7 +65,7 @@ import { TMagicScrollbar } from '@tmagic/design';
 
 import SplitView from '@editor/components/SplitView.vue';
 import type { FrameworkSlots, GetColumnWidth, PageBarSortOptions, Services } from '@editor/type';
-import { getConfig } from '@editor/utils/config';
+import { getEditorConfig } from '@editor/utils/config';
 
 import PageBar from './page-bar/PageBar.vue';
 import AddPageBox from './AddPageBox.vue';
@@ -156,7 +156,7 @@ onBeforeUnmount(() => {
 
 const saveCode = (value: string) => {
   try {
-    const parseDSL = getConfig('parseDSL');
+    const parseDSL = getEditorConfig('parseDSL');
     editorService?.set('root', parseDSL(value));
   } catch (e: any) {
     console.error(e);

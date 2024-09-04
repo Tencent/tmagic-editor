@@ -29,7 +29,7 @@ import plugins from '../.tmagic/plugin-entry';
 
 import App from './App';
 
-import '@tmagic/utils/resetcss.css';
+import '@tmagic/core/resetcss.css';
 
 declare global {
   interface Window {

@@ -1,10 +1,8 @@
 import { createApp, onBeforeUnmount, Plugin } from 'vue';
 import cssStyle from 'element-plus/dist/index.css?raw';
 
-import { editorService, Layout, propsService, uiService } from '@tmagic/editor';
-import MagicForm, { type FormConfig } from '@tmagic/form';
-import type StageCore from '@tmagic/stage';
-import { injectStyle } from '@tmagic/utils';
+import type { FormConfig, StageCore } from '@tmagic/editor';
+import { editorService, formPlugin, injectStyle, Layout, propsService, uiService } from '@tmagic/editor';
 
 import commonConfig from './form-config/common';
 import App from './App.vue';
@@ -52,7 +50,7 @@ export const useRuntime = ({
       stage,
       fillConfig,
     });
-    vueApp.use(MagicForm);
+    vueApp.use(formPlugin);
     plugins.forEach((plugin) => vueApp.use(plugin));
     vueApp.mount(el);
 

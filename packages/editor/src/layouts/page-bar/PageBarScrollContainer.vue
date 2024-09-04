@@ -36,7 +36,7 @@ import {
 import { ArrowLeftBold, ArrowRightBold } from '@element-plus/icons-vue';
 import Sortable, { SortableEvent } from 'sortablejs';
 
-import { Id, NodeType } from '@tmagic/schema';
+import { Id, NodeType } from '@tmagic/core';
 
 import Icon from '@editor/components/Icon.vue';
 import type { PageBarSortOptions, Services } from '@editor/type';

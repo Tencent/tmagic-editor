@@ -5,12 +5,12 @@
 <script lang="ts">
 import { defineComponent, inject } from 'vue';
 
-import type Core from '@tmagic/core';
+import type TMagicApp from '@tmagic/core';
 import { useComponent, useEditorDsl } from '@tmagic/vue-runtime-help';
 
 export default defineComponent({
   setup() {
-    const app = inject<Core | undefined>('app');
+    const app = inject<TMagicApp>('app');
     const { pageConfig } = useEditorDsl(app);
     const pageComponent = useComponent('page');
 

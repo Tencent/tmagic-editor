@@ -88,13 +88,13 @@ export const getAbsolutePosition = (el: HTMLElement, { top, left }: Offset) => {
   return { left, top };
 };
 
-export const isAbsolute = (style: CSSStyleDeclaration): boolean => style.position === 'absolute';
+export const isAbsolute = (style: { position?: string }): boolean => style.position === 'absolute';
 
-export const isRelative = (style: CSSStyleDeclaration): boolean => style.position === 'relative';
+export const isRelative = (style: { position?: string }): boolean => style.position === 'relative';
 
-export const isStatic = (style: CSSStyleDeclaration): boolean => style.position === 'static';
+export const isStatic = (style: { position?: string }): boolean => style.position === 'static';
 
-export const isFixed = (style: CSSStyleDeclaration): boolean => style.position === 'fixed';
+export const isFixed = (style: { position?: string }): boolean => style.position === 'fixed';
 
 export const isFixedParent = (el: Element) => {
   let fixed = false;

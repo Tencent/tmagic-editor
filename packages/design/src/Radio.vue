@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { RadioProps } from './types';
 
 defineOptions({
@@ -16,7 +16,7 @@ defineOptions({
 
 const props = defineProps<RadioProps>();
 
-const ui = getConfig('components')?.radio;
+const ui = getDesignConfig('components')?.radio;
 
 const uiComponent = ui?.component || 'el-radio';
 

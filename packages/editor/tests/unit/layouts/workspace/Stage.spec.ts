@@ -18,7 +18,7 @@
 import { describe, expect, test, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 
-import { NodeType } from '@tmagic/schema';
+import { NodeType } from '@tmagic/core';
 
 import Stage from '@editor/layouts/workspace/viewer/Stage.vue';
 

@@ -18,12 +18,11 @@
 
 import { createApp } from 'vue';
 
-import Core from '@tmagic/core';
-import { DataSourceManager, DeepObservedData } from '@tmagic/data-source';
+import TMagicApp, { DataSourceManager, DeepObservedData } from '@tmagic/core';
 
 import App from './App.vue';
 
-import '@tmagic/utils/resetcss.css';
+import '@tmagic/core/resetcss.css';
 
 DataSourceManager.registerObservedData(DeepObservedData);
 
@@ -34,7 +33,7 @@ Promise.all([
 ]).then(([components, plugins, dataSources]) => {
   const vueApp = createApp(App);
 
-  const app = new Core({
+  const app = new TMagicApp({
     ua: window.navigator.userAgent,
     platform: 'editor',
   });

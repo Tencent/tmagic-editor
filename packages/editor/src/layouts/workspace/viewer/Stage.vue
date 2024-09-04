@@ -44,14 +44,14 @@
 import { computed, inject, markRaw, nextTick, onBeforeUnmount, onMounted, ref, toRaw, watch, watchEffect } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
-import type { MApp, MContainer } from '@tmagic/schema';
+import type { MApp, MContainer } from '@tmagic/core';
 import StageCore, { getOffset, Runtime } from '@tmagic/stage';
 import { calcValueByFontsize, getIdFromEl } from '@tmagic/utils';
 
 import ScrollViewer from '@editor/components/ScrollViewer.vue';
 import { useStage } from '@editor/hooks/use-stage';
 import { DragType, Layout, type MenuButton, type MenuComponent, type Services, type StageOptions } from '@editor/type';
-import { getConfig } from '@editor/utils/config';
+import { getEditorConfig } from '@editor/utils/config';
 import { KeyBindingContainerKey } from '@editor/utils/keybinding-config';
 
 import NodeListMenu from './NodeListMenu.vue';
@@ -170,7 +170,7 @@ onBeforeUnmount(() => {
   services?.editorService.off('root-change', rootChangeHandler);
 });
 
-const parseDSL = getConfig('parseDSL');
+const parseDSL = getEditorConfig('parseDSL');
 
 const contextmenuHandler = (e: MouseEvent) => {
   e.preventDefault();

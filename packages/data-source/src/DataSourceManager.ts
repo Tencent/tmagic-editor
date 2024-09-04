@@ -20,9 +20,8 @@ import EventEmitter from 'events';
 
 import { cloneDeep } from 'lodash-es';
 
-import type { default as TMagicApp } from '@tmagic/core';
-import type { DataSourceSchema, DisplayCond, Id, MNode, NODE_CONDS_KEY } from '@tmagic/schema';
-import { compiledNode } from '@tmagic/utils';
+import type { DataSourceSchema, default as TMagicApp, DisplayCond, Id, MNode, NODE_CONDS_KEY } from '@tmagic/core';
+import { compiledNode } from '@tmagic/core';
 
 import { SimpleObservedData } from './observed-data/SimpleObservedData';
 import { DataSource, HttpDataSource } from './data-sources';

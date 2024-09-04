@@ -18,6 +18,11 @@
 
 import App from './App';
 
+export * from '@tmagic/data-source';
+export * from '@tmagic/dep';
+export * from '@tmagic/schema';
+export * from '@tmagic/utils';
+
 export { default as EventHelper } from './EventHelper';
 export * from './utils';
 

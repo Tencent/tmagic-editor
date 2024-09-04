@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue';
 
-import type { DataSourceSchema } from '@tmagic/schema';
+import type { DataSourceSchema } from '@tmagic/core';
 
 import DataSourceConfigPanel from '@editor/layouts/sidebar/data-source/DataSourceConfigPanel.vue';
 import type { DataSourceService } from '@editor/services/dataSource';

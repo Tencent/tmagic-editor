@@ -206,7 +206,7 @@ import {
 } from '@tmagic/design';
 import { asyncLoadJs, sleep } from '@tmagic/utils';
 
-import { ColumnConfig, FormState, SortProp, TableConfig } from '../schema';
+import { FormState, SortProp, TableColumnConfig, TableConfig } from '../schema';
 import { display as displayFunc, initValue } from '../utils/form';
 
 import Container from './Container.vue';
@@ -484,7 +484,7 @@ const toggleRowSelection = (row: any, selected: boolean) => {
   tMagicTable.value?.toggleRowSelection.call(tMagicTable.value, row, selected);
 };
 
-const makeConfig = (config: ColumnConfig, row: any) => {
+const makeConfig = (config: TableColumnConfig, row: any) => {
   const newConfig = cloneDeep(config);
   if (typeof config.itemsFunction === 'function') {
     newConfig.items = config.itemsFunction(row);

@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { RadioButtonProps } from './types';
 
 defineOptions({
@@ -16,7 +16,7 @@ defineOptions({
 
 const props = defineProps<RadioButtonProps>();
 
-const ui = getConfig('components')?.radioButton;
+const ui = getDesignConfig('components')?.radioButton;
 
 const uiComponent = ui?.component || 'el-radio-button';
 

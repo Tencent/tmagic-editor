@@ -34,19 +34,23 @@
   "peerDependencies": {
     "@tmagic/core": "workspace:^",
     "@tmagic/editor": "workspace:^",
-    "@tmagic/form": "workspace:^",
-    "@tmagic/utils": "workspace:^",
-    "@tmagic/schema": "workspace:^",
-    "@tmagic/stage": "workspace:^",
     "element-plus": ">=2.8.0",
-    "vue": ">=3.4.27"
+    "vue": ">=3.4.27",
+    "typescript": "*"
+  },
+  "peerDependenciesMeta": {
+    "@tmagic/core": {
+      "optional": true
+    },
+    "typescript": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/node": "^18.19.0",
     "@vitejs/plugin-vue": "^5.1.1",
     "@vue/compiler-sfc": "^3.4.27",
     "rimraf": "^3.0.2",
-    "typescript": "^5.4.5",
     "vite": "^5.3.5",
     "vue-tsc": "^2.0.19"
   }

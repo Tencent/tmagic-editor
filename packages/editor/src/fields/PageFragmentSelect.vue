@@ -19,8 +19,8 @@
 import { computed, inject } from 'vue';
 import { Edit } from '@element-plus/icons-vue';
 
+import { Id, NodeType } from '@tmagic/core';
 import { FieldProps } from '@tmagic/form';
-import { Id, NodeType } from '@tmagic/schema';
 
 import Icon from '@editor/components/Icon.vue';
 import type { PageFragmentSelectConfig, Services } from '@editor/type';

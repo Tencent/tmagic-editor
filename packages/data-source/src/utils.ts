@@ -1,7 +1,6 @@
 import { cloneDeep } from 'lodash-es';
 
-import type { DepData, DisplayCond, DisplayCondItem, MApp, MNode, MPage, MPageFragment } from '@tmagic/schema';
-import { NODE_CONDS_KEY } from '@tmagic/schema';
+import type { DepData, DisplayCond, DisplayCondItem, MApp, MNode, MPage, MPageFragment } from '@tmagic/core';
 import {
   compiledCond,
   compiledNode,
@@ -10,8 +9,9 @@ import {
   getValueByKeyPath,
   isPage,
   isPageFragment,
+  NODE_CONDS_KEY,
   replaceChildNode,
-} from '@tmagic/utils';
+} from '@tmagic/core';
 
 import type { AsyncDataSourceResolveResult, DataSourceManagerData } from './types';
 

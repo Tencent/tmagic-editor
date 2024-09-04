@@ -13,7 +13,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { FormProps } from './types';
 
 defineOptions({
@@ -22,7 +22,7 @@ defineOptions({
 
 const props = defineProps<FormProps>();
 
-const ui = getConfig('components')?.form;
+const ui = getDesignConfig('components')?.form;
 
 const uiComponent = ui?.component || 'el-form';
 

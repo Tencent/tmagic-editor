@@ -18,7 +18,7 @@
 import { union } from 'lodash-es';
 
 import type { default as TMagicApp } from '@tmagic/core';
-import { getDepNodeIds, getNodes, isPage } from '@tmagic/utils';
+import { getDepNodeIds, getNodes, isPage } from '@tmagic/core';
 
 import DataSourceManager from './DataSourceManager';
 import type { ChangeEvent, DataSourceManagerData } from './types';

@@ -17,7 +17,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { TabsProps } from './types';
 
 defineOptions({
@@ -26,7 +26,7 @@ defineOptions({
 
 const props = defineProps<TabsProps>();
 
-const ui = getConfig('components')?.tabs;
+const ui = getDesignConfig('components')?.tabs;
 
 const uiComponent = ui?.component || 'el-tabs';
 

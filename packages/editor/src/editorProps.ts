@@ -1,6 +1,5 @@
-import type { EventOption } from '@tmagic/core';
+import type { DataSourceSchema, EventOption, Id, MApp, MNode } from '@tmagic/core';
 import type { FormConfig, FormState } from '@tmagic/form';
-import type { DataSourceSchema, Id, MApp, MNode } from '@tmagic/schema';
 import StageCore, {
   CONTAINER_HIGHLIGHT_CLASS_NAME,
   ContainerHighlightType,

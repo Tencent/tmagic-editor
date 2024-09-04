@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ActionType, type MApp, NodeType } from '@tmagic/schema';
+import { ActionType, type MApp, NodeType } from '@tmagic/core';
 
 const dsl: MApp = {
   id: '1',
