@@ -1,5 +1,5 @@
 {
-  "version": "0.0.2",
+  "version": "0.0.3",
   "name": "@tmagic/vue-iterator-container",
   "type": "module",
   "main": "src/index.ts",
@@ -18,8 +18,6 @@
   },
   "peerDependencies": {
     "@tmagic/core": "workspace:^",
-    "@tmagic/schema": "workspace:^",
-    "@tmagic/utils": "workspace:^",
     "@tmagic/vue-runtime-help": "workspace:^",
     "@vue/composition-api": ">=1.7.2",
     "typescript": "*",
@@ -27,9 +25,6 @@
   },
   "peerDependenciesMeta": {
     "@vue/composition-api": {
-      "optional": true
-    },
-    "@tmagic/schema": {
       "optional": true
     },
     "typescript": {

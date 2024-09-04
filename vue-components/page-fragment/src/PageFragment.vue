@@ -11,7 +11,7 @@
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue-demi';
 
-import type { MPageFragment } from '@tmagic/schema';
+import type { MPageFragment } from '@tmagic/core';
 import { useApp, useComponent } from '@tmagic/vue-runtime-help';
 
 export default defineComponent({

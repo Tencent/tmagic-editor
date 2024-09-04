@@ -25,8 +25,8 @@
 <script lang="ts">
 import { computed, defineComponent, type PropType } from 'vue-demi';
 
-import type { Id, MContainer } from '@tmagic/schema';
-import { IS_DSL_NODE_KEY, toLine } from '@tmagic/utils';
+import type { Id, MContainer } from '@tmagic/core';
+import { IS_DSL_NODE_KEY, toLine } from '@tmagic/core';
 import { useApp, useComponent } from '@tmagic/vue-runtime-help';
 
 interface ContainerSchema extends Omit<MContainer, 'id'> {

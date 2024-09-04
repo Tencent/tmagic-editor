@@ -7,7 +7,7 @@
 <script lang="ts">
 import { defineComponent, onBeforeUnmount, type PropType, ref } from 'vue-demi';
 
-import type { Id, MContainer, MNode, MPage } from '@tmagic/schema';
+import type { Id, MContainer, MNode, MPage } from '@tmagic/core';
 import { useApp, useComponent } from '@tmagic/vue-runtime-help';
 
 interface OverlaySchema extends Omit<MContainer, 'id'> {
