@@ -1342,9 +1342,9 @@ importers:
 
   vue-components/button:
     dependencies:
-      '@tmagic/schema':
+      '@tmagic/core':
         specifier: workspace:^
-        version: link:../../packages/schema
+        version: link:../../packages/core
       '@tmagic/vue-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
@@ -1363,12 +1363,9 @@ importers:
 
   vue-components/container:
     dependencies:
-      '@tmagic/schema':
+      '@tmagic/core':
         specifier: workspace:^
-        version: link:../../packages/schema
-      '@tmagic/utils':
-        specifier: workspace:^
-        version: link:../../packages/utils
+        version: link:../../packages/core
       '@tmagic/vue-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
@@ -1387,9 +1384,9 @@ importers:
 
   vue-components/img:
     dependencies:
-      '@tmagic/schema':
+      '@tmagic/core':
         specifier: workspace:^
-        version: link:../../packages/schema
+        version: link:../../packages/core
       '@tmagic/vue-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
@@ -1411,12 +1408,6 @@ importers:
       '@tmagic/core':
         specifier: workspace:^
         version: link:../../packages/core
-      '@tmagic/schema':
-        specifier: workspace:^
-        version: link:../../packages/schema
-      '@tmagic/utils':
-        specifier: workspace:^
-        version: link:../../packages/utils
       '@tmagic/vue-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
@@ -1435,9 +1426,9 @@ importers:
 
   vue-components/overlay:
     dependencies:
-      '@tmagic/schema':
+      '@tmagic/core':
         specifier: workspace:^
-        version: link:../../packages/schema
+        version: link:../../packages/core
       '@tmagic/vue-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
@@ -1450,12 +1441,9 @@ importers:
 
   vue-components/page:
     dependencies:
-      '@tmagic/schema':
+      '@tmagic/core':
         specifier: workspace:^
-        version: link:../../packages/schema
-      '@tmagic/utils':
-        specifier: workspace:^
-        version: link:../../packages/utils
+        version: link:../../packages/core
       '@tmagic/vue-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
@@ -1468,12 +1456,9 @@ importers:
 
   vue-components/page-fragment:
     dependencies:
-      '@tmagic/schema':
+      '@tmagic/core':
         specifier: workspace:^
-        version: link:../../packages/schema
-      '@tmagic/utils':
-        specifier: workspace:^
-        version: link:../../packages/utils
+        version: link:../../packages/core
       '@tmagic/vue-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
@@ -1486,9 +1471,9 @@ importers:
 
   vue-components/page-fragment-container:
     dependencies:
-      '@tmagic/schema':
+      '@tmagic/core':
         specifier: workspace:^
-        version: link:../../packages/schema
+        version: link:../../packages/core
       '@tmagic/vue-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
@@ -1501,9 +1486,9 @@ importers:
 
   vue-components/qrcode:
     dependencies:
-      '@tmagic/schema':
+      '@tmagic/core':
         specifier: workspace:^
-        version: link:../../packages/schema
+        version: link:../../packages/core
       '@tmagic/vue-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
@@ -1529,9 +1514,9 @@ importers:
 
   vue-components/text:
     dependencies:
-      '@tmagic/schema':
+      '@tmagic/core':
         specifier: workspace:^
-        version: link:../../packages/schema
+        version: link:../../packages/core
       '@tmagic/vue-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/vue-runtime-help

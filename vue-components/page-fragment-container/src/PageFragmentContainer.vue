@@ -13,7 +13,7 @@
 <script lang="ts">
 import { computed, defineComponent, type PropType } from 'vue-demi';
 
-import { type Id, type MComponent, type MNode, NodeType } from '@tmagic/schema';
+import { type Id, type MComponent, type MNode, NodeType } from '@tmagic/core';
 import { useApp, useComponent } from '@tmagic/vue-runtime-help';
 
 export default defineComponent({

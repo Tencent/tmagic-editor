@@ -14,8 +14,7 @@
 <script lang="ts">
 import { computed, defineComponent, type PropType, watch } from 'vue-demi';
 
-import type { IteratorContainer as TMagicIteratorContainer } from '@tmagic/core';
-import type { Id, MIteratorContainer, MNode } from '@tmagic/schema';
+import type { Id, IteratorContainer as TMagicIteratorContainer, MIteratorContainer, MNode } from '@tmagic/core';
 import { useApp, useComponent } from '@tmagic/vue-runtime-help';
 
 interface IteratorContainerSchema extends Omit<MIteratorContainer, 'id'> {

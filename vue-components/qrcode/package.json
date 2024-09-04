@@ -1,5 +1,5 @@
 {
-  "version": "0.0.2",
+  "version": "0.0.3",
   "name": "@tmagic/vue-qrcode",
   "type": "module",
   "main": "src/index.ts",
@@ -18,7 +18,7 @@
     "vue-demi": "^0.14.10"
   },
   "peerDependencies": {
-    "@tmagic/schema": "workspace:^",
+    "@tmagic/core": "workspace:^",
     "@tmagic/vue-runtime-help": "workspace:^",
     "@vue/composition-api": ">=1.7.2",
     "typescript": "*",
