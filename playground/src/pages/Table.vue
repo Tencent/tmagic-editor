@@ -19,9 +19,8 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { tMagicMessage, TMagicTabPane, TMagicTabs } from '@tmagic/design';
-import { MenuButton, TMagicCodeEditor } from '@tmagic/editor';
-import { type ColumnConfig, MagicTable } from '@tmagic/table';
+import type { ColumnConfig } from '@tmagic/editor';
+import { MagicTable, MenuButton, TMagicCodeEditor, tMagicMessage, TMagicTabPane, TMagicTabs } from '@tmagic/editor';
 
 import NavMenu from '../components/NavMenu.vue';
 

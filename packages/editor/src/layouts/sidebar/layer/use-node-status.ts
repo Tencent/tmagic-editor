@@ -1,6 +1,6 @@
 import { computed, ref, watch } from 'vue';
 
-import type { Id, MNode, MPage, MPageFragment } from '@tmagic/schema';
+import type { Id, MNode, MPage, MPageFragment } from '@tmagic/core';
 import { getNodePath, isPage, isPageFragment } from '@tmagic/utils';
 
 import { LayerNodeStatus, Services } from '@editor/type';

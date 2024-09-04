@@ -1,8 +1,10 @@
 import type { App, Ref } from 'vue';
 import { computed, ref, unref } from 'vue';
 
-import { setConfig } from './config';
-import { PluginOptions, TMagicMessage, TMagicMessageBox } from './types';
+import { setDesignConfig } from './config';
+import { DesignPluginOptions, TMagicMessage, TMagicMessageBox } from './types';
+
+import './theme/index.scss';
 
 export * from './types';
 export * from './config';
@@ -107,7 +109,7 @@ export let useZIndex = (zIndexOverrides?: Ref<number>) => {
 };
 
 export default {
-  install(app: App, options: PluginOptions) {
+  install(app: App, options: DesignPluginOptions) {
     if (options.message) {
       tMagicMessage.error = options.message?.error;
       tMagicMessage.success = options.message?.success;
@@ -132,6 +134,6 @@ export default {
     }
 
     app.config.globalProperties.$MAGIC_DESIGN = options;
-    setConfig(options);
+    setDesignConfig(options);
   },
 };

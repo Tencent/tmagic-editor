@@ -46,23 +46,28 @@ import { Coin, Connection, CopyDocument, Document, DocumentCopy } from '@element
 import { cloneDeep } from 'lodash-es';
 import serialize from 'serialize-javascript';
 
-import { TMagicDialog, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
+import type { MApp, MContainer, MNode } from '@tmagic/core';
+import { NodeType } from '@tmagic/core';
+import type {
+  CustomizeMoveableOptionsCallbackConfig,
+  DatasourceTypeOption,
+  MenuBarData,
+  MenuButton,
+  MoveableOptions,
+  Services,
+} from '@tmagic/editor';
 import {
+  asyncLoadJs,
+  calcValueByFontsize,
   ContentMenu,
   COPY_STORAGE_KEY,
-  type DatasourceTypeOption,
   editorService,
-  type MenuBarData,
-  type MenuButton,
-  type MoveableOptions,
   propsService,
-  type Services,
+  TMagicDialog,
   TMagicEditor,
+  tMagicMessage,
+  tMagicMessageBox,
 } from '@tmagic/editor';
-import type { MApp, MContainer, MNode } from '@tmagic/schema';
-import { NodeType } from '@tmagic/schema';
-import type { CustomizeMoveableOptionsCallbackConfig } from '@tmagic/stage';
-import { asyncLoadJs, calcValueByFontsize } from '@tmagic/utils';
 
 import DeviceGroup from '../components/DeviceGroup.vue';
 import componentGroupList from '../configs/componentGroupList';
@@ -122,10 +127,10 @@ const usePasteMenu = (menu?: Ref<InstanceType<typeof ContentMenu> | undefined>):
       const rect = menu.value.$el.getBoundingClientRect();
       const parentRect = stage?.container?.getBoundingClientRect();
       const initialLeft =
-        calcValueByFontsize(stage?.renderer.getDocument(), (rect.left || 0) - (parentRect?.left || 0)) /
+        calcValueByFontsize(stage?.renderer?.getDocument(), (rect.left || 0) - (parentRect?.left || 0)) /
         services.uiService.get('zoom');
       const initialTop =
-        calcValueByFontsize(stage?.renderer.getDocument(), (rect.top || 0) - (parentRect?.top || 0)) /
+        calcValueByFontsize(stage?.renderer?.getDocument(), (rect.top || 0) - (parentRect?.top || 0)) /
         services.uiService.get('zoom');
       services?.editorService?.paste({ left: initialLeft, top: initialTop }, collectorOptions);
     } else {

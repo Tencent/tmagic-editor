@@ -65,7 +65,7 @@
 import { computed, inject } from 'vue';
 import { ArrowDown, ArrowRight } from '@element-plus/icons-vue';
 
-import type { Id } from '@tmagic/schema';
+import type { Id } from '@tmagic/core';
 
 import MIcon from '@editor/components/Icon.vue';
 import type { LayerNodeStatus, TreeNodeData } from '@editor/type';

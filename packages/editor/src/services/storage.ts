@@ -2,7 +2,7 @@ import serialize from 'serialize-javascript';
 import type { Writable } from 'type-fest';
 
 import type { SyncHookPlugin } from '@editor/type';
-import { getConfig } from '@editor/utils/config';
+import { getEditorConfig } from '@editor/utils/config';
 
 import BaseService from './BaseService';
 
@@ -76,7 +76,7 @@ export class WebStorage extends BaseService {
 
     switch (protocol) {
       case Protocol.OBJECT:
-        return getConfig('parseDSL')(`(${item})`);
+        return getEditorConfig('parseDSL')(`(${item})`);
       case Protocol.JSON:
         return JSON.parse(item);
       case Protocol.NUMBER:

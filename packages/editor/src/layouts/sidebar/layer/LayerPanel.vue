@@ -47,8 +47,8 @@
 <script setup lang="ts">
 import { computed, inject, ref } from 'vue';
 
+import type { MNode } from '@tmagic/core';
 import { TMagicScrollbar } from '@tmagic/design';
-import type { MNode } from '@tmagic/schema';
 
 import SearchInput from '@editor/components/SearchInput.vue';
 import Tree from '@editor/components/Tree.vue';

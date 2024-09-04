@@ -30,9 +30,7 @@ import { markRaw, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { Coin } from '@element-plus/icons-vue';
 
-import { TMagicDialog, tMagicMessage } from '@tmagic/design';
-import { MenuButton } from '@tmagic/editor';
-import { MForm } from '@tmagic/form';
+import { MenuButton, MForm, TMagicDialog, tMagicMessage } from '@tmagic/editor';
 
 import NavMenu from '../components/NavMenu.vue';
 import formDsl from '../configs/formDsl';

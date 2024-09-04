@@ -13,7 +13,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { CollapseProps } from './types';
 
 defineOptions({
@@ -22,7 +22,7 @@ defineOptions({
 
 const props = defineProps<CollapseProps>();
 
-const ui = getConfig('components')?.collapse;
+const ui = getDesignConfig('components')?.collapse;
 
 const uiComponent = ui?.component || 'el-collapse';
 

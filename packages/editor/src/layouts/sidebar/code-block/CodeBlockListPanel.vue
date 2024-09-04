@@ -30,8 +30,8 @@
 <script setup lang="ts">
 import { computed, inject, ref } from 'vue';
 
+import type { Id } from '@tmagic/core';
 import { TMagicButton, TMagicScrollbar } from '@tmagic/design';
-import type { Id } from '@tmagic/schema';
 
 import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
 import SearchInput from '@editor/components/SearchInput.vue';

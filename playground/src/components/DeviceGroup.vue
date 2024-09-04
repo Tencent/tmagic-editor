@@ -9,10 +9,9 @@
 <script lang="ts" setup>
 import { computed, inject, nextTick, ref } from 'vue';
 
-import Core from '@tmagic/core';
-import { TMagicRadioButton, TMagicRadioGroup } from '@tmagic/design';
+import type Core from '@tmagic/core';
 import type { Services } from '@tmagic/editor';
-import { convertToNumber } from '@tmagic/utils';
+import { convertToNumber, TMagicRadioButton, TMagicRadioGroup } from '@tmagic/editor';
 
 import { DeviceType, uaMap } from '../const';
 
@@ -49,7 +48,7 @@ const stageContainerRect = computed(() => services?.uiService.get('stageContaine
 const calcFontsize = () => {
   if (!services) return;
 
-  const iframe = services.editorService.get('stage')?.renderer.iframe;
+  const iframe = services.editorService.get('stage')?.renderer?.iframe;
   if (!iframe?.contentWindow) return;
 
   const app: Core = (iframe.contentWindow as any).appInstance;

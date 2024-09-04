@@ -18,7 +18,7 @@
 
 import { reactive } from 'vue';
 
-import type { MPage, MPageFragment } from '@tmagic/schema';
+import type { MPage, MPageFragment } from '@tmagic/core';
 
 import type { HistoryState, StepValue } from '@editor/type';
 import { UndoRedo } from '@editor/utils/undo-redo';

@@ -45,9 +45,9 @@ import { computed, inject, ref } from 'vue';
 import { Close, Delete } from '@element-plus/icons-vue';
 import { throttle } from 'lodash-es';
 
+import type { Id } from '@tmagic/core';
 import { TMagicButton, TMagicTooltip } from '@tmagic/design';
 import type { FieldProps, FormItem, FormState } from '@tmagic/form';
-import type { Id } from '@tmagic/schema';
 import { getIdFromEl } from '@tmagic/utils';
 
 import { type Services, UI_SELECT_MODE_EVENT_NAME } from '@editor/type';

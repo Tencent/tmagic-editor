@@ -18,11 +18,11 @@
 
 import { reactive, toRaw } from 'vue';
 import { cloneDeep, get, isObject, mergeWith, uniq } from 'lodash-es';
-import { Writable } from 'type-fest';
+import type { Writable } from 'type-fest';
 
-import { Target, type TargetOptions, Watcher } from '@tmagic/dep';
-import type { Id, MApp, MComponent, MContainer, MNode, MPage, MPageFragment } from '@tmagic/schema';
-import { NodeType } from '@tmagic/schema';
+import type { Id, MApp, MComponent, MContainer, MNode, MPage, MPageFragment, TargetOptions } from '@tmagic/core';
+import { NodeType, Target, Watcher } from '@tmagic/core';
+import { isFixed } from '@tmagic/stage';
 import { calcValueByFontsize, getElById, getNodePath, isNumber, isPage, isPageFragment, isPop } from '@tmagic/utils';
 
 import BaseService from '@editor/services//BaseService';
@@ -48,7 +48,6 @@ import {
   getNodeIndex,
   getPageFragmentList,
   getPageList,
-  isFixed,
   moveItemsInContainer,
   setChildrenLayout,
   setLayout,
@@ -234,7 +233,7 @@ class Editor extends BaseService {
    * 只有容器拥有布局
    */
   public async getLayout(parent: MNode, node?: MNode | null): Promise<Layout> {
-    if (node && typeof node !== 'function' && isFixed(node)) return Layout.FIXED;
+    if (node && typeof node !== 'function' && isFixed(node.style || {})) return Layout.FIXED;
 
     if (parent.layout) {
       return parent.layout;
@@ -1106,9 +1105,9 @@ class Editor extends BaseService {
     const newConfig = cloneDeep(dist);
 
     if (!isPop(src) && newConfig.style?.position) {
-      if (isFixed(newConfig) && !isFixed(src)) {
+      if (isFixed(newConfig.style) && !isFixed(src.style || {})) {
         newConfig.style = change2Fixed(newConfig, root);
-      } else if (!isFixed(newConfig) && isFixed(src)) {
+      } else if (!isFixed(newConfig.style) && isFixed(src.style || {})) {
         newConfig.style = await Fixed2Other(newConfig, root, this.getLayout);
       }
     }

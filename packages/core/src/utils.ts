@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { JsEngine } from '@tmagic/schema';
+import { isNumber } from '@tmagic/utils';
 
 import type { default as TMagicNode } from './Node';
 
@@ -56,8 +57,6 @@ export const fillBackgroundImage = (value: string) => {
   }
   return value;
 };
-
-export const isNumber = (value: string) => /^(-?\d+)(\.\d+)?$/.test(value);
 
 export const getTransform = (value: Record<string, string>, jsEngine: JsEngine) => {
   if (!value) return [];

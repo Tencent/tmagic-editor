@@ -8,7 +8,7 @@ import serialize from 'serialize-javascript';
 
 import type { FieldProps, FormItem } from '@tmagic/form';
 
-import { getConfig } from '@editor/utils/config';
+import { getEditorConfig } from '@editor/utils/config';
 
 defineOptions({
   name: 'MFieldsCodeLink',
@@ -70,7 +70,7 @@ const changeHandler = (v: Record<string, any>) => {
   if (!props.name || !props.model) return;
 
   try {
-    const parseDSL = getConfig('parseDSL');
+    const parseDSL = getEditorConfig('parseDSL');
     props.model[props.name] = parseDSL(`(${v[props.name]})`);
     emit('change', props.model[props.name]);
   } catch (e) {

@@ -22,7 +22,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { TreeProps } from './types';
 
 defineOptions({
@@ -31,7 +31,7 @@ defineOptions({
 
 const props = defineProps<TreeProps>();
 
-const ui = getConfig('components')?.tree;
+const ui = getDesignConfig('components')?.tree;
 
 const uiComponent = ui?.component || 'el-tree';
 

@@ -1,11 +1,10 @@
 import { nextTick, onBeforeUnmount, reactive, ref } from 'vue-demi';
 
-import Core from '@tmagic/core';
-import type { ChangeEvent } from '@tmagic/data-source';
-import type { MNode } from '@tmagic/schema';
-import { isPage, replaceChildNode } from '@tmagic/utils';
+import type TMagicCore from '@tmagic/core';
+import type { ChangeEvent, MNode } from '@tmagic/core';
+import { isPage, replaceChildNode } from '@tmagic/core';
 
-export const useDsl = (app: Core | undefined) => {
+export const useDsl = (app?: TMagicCore) => {
   const pageConfig = ref(app?.page?.data || {});
 
   const updateDataHandler = (nodes: MNode[], sourceId: string, changeEvent: ChangeEvent) => {

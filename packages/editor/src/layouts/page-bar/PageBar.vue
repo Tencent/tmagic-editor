@@ -66,8 +66,8 @@
 import { computed, inject, ref, watch } from 'vue';
 import { CaretBottom, Delete, DocumentCopy } from '@element-plus/icons-vue';
 
+import { type Id, type MPage, type MPageFragment, NodeType } from '@tmagic/core';
 import { TMagicIcon, TMagicPopover } from '@tmagic/design';
-import { Id, type MPage, type MPageFragment, NodeType } from '@tmagic/schema';
 import { isPage, isPageFragment } from '@tmagic/utils';
 
 import ToolButton from '@editor/components/ToolButton.vue';

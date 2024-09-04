@@ -41,10 +41,10 @@
 import { computed, getCurrentInstance, inject, onBeforeUnmount, onMounted, ref, watchEffect } from 'vue';
 import { Document as DocumentIcon } from '@element-plus/icons-vue';
 
+import type { MNode } from '@tmagic/core';
 import { TMagicButton } from '@tmagic/design';
 import type { FormState, FormValue } from '@tmagic/form';
 import { MForm } from '@tmagic/form';
-import type { MNode } from '@tmagic/schema';
 
 import MIcon from '@editor/components/Icon.vue';
 import { useEditorContentHeight } from '@editor/hooks/use-editor-content-height';

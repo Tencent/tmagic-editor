@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { InputNumberProps } from './types';
 
 defineOptions({
@@ -21,7 +21,7 @@ defineOptions({
 
 const props = defineProps<InputNumberProps>();
 
-const ui = getConfig('components')?.inputNumber;
+const ui = getDesignConfig('components')?.inputNumber;
 
 const uiComponent = ui?.component || 'el-input-number';
 

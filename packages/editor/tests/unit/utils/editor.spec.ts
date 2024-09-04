@@ -17,7 +17,7 @@
  */
 import { describe, expect, test } from 'vitest';
 
-import { NodeType } from '@tmagic/schema';
+import { NodeType } from '@tmagic/core';
 
 import * as editor from '@editor/utils/editor';
 
@@ -57,40 +57,6 @@ describe('util form', () => {
     const name = editor.generatePageName(['index', 'page_2'], NodeType.PAGE);
     // 第二个页面
     expect(name).toBe('page_3');
-  });
-});
-
-describe('isFixed', () => {
-  test('true', () => {
-    expect(
-      editor.isFixed({
-        type: 'text',
-        id: 1,
-        style: {
-          position: 'fixed',
-        },
-      }),
-    ).toBeTruthy();
-  });
-
-  test('false', () => {
-    expect(
-      editor.isFixed({
-        type: 'text',
-        id: 1,
-        style: {
-          position: 'absolute',
-        },
-      }),
-    ).toBeFalsy();
-
-    expect(
-      editor.isFixed({
-        type: 'text',
-        id: 1,
-        style: {},
-      }),
-    ).toBeFalsy();
   });
 });
 

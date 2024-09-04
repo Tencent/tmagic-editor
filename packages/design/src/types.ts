@@ -46,7 +46,7 @@ export interface CascaderProps {
   disabled?: boolean;
   clearable?: boolean;
   filterable?: boolean;
-  options?: CascaderOption[];
+  options?: CascaderPropsOption[];
   size?: FieldSize;
   /** 弹出内容的自定义类名 */
   popperClass?: string;
@@ -372,13 +372,13 @@ export interface UploadProps {
   disabled?: boolean;
 }
 
-export interface CascaderOption {
+export interface CascaderPropsOption {
   /** 指定选项的值为选项对象的某个属性值 */
   value: any;
   /** 指定选项标签为选项对象的某个属性值 */
   label: string;
   /** 指定选项的子选项为选项对象的某个属性值 */
-  children?: CascaderOption[];
+  children?: CascaderPropsOption[];
 }
 
 export interface IconProps {
@@ -706,7 +706,7 @@ export interface Components {
   };
 }
 
-export interface PluginOptions {
+export interface DesignPluginOptions {
   message?: TMagicMessage;
   messageBox?: TMagicMessageBox;
   components?: Components;

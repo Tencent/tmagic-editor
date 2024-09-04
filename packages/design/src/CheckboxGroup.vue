@@ -13,7 +13,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { CheckboxGroupProps } from './types';
 
 defineOptions({
@@ -22,7 +22,7 @@ defineOptions({
 
 const props = defineProps<CheckboxGroupProps>();
 
-const ui = getConfig('components')?.checkboxGroup;
+const ui = getDesignConfig('components')?.checkboxGroup;
 
 const uiComponent = ui?.component || 'el-checkbox-group';
 

@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import { computed, inject } from 'vue';
 
-import { getConfig as getDesignConfig, TMagicSelect } from '@tmagic/design';
+import { getDesignConfig, TMagicSelect } from '@tmagic/design';
 import type { FieldProps } from '@tmagic/form';
 
 import type { CondOpSelectConfig, Services } from '@editor/type';
