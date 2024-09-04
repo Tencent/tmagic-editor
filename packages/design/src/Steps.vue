@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { StepsProps } from './types';
 
 defineOptions({
@@ -16,7 +16,7 @@ defineOptions({
 
 const props = defineProps<StepsProps>();
 
-const ui = getConfig('components')?.steps;
+const ui = getDesignConfig('components')?.steps;
 
 const uiComponent = ui?.component || 'el-steps';
 

@@ -1,7 +1,7 @@
 import { computed, markRaw, Ref } from 'vue';
 import { CopyDocument, Delete, DocumentCopy } from '@element-plus/icons-vue';
 
-import { Id, MContainer, NodeType } from '@tmagic/schema';
+import { Id, MContainer, NodeType } from '@tmagic/core';
 import { calcValueByFontsize, isPage, isPageFragment } from '@tmagic/utils';
 
 import ContentMenu from '@editor/components/ContentMenu.vue';

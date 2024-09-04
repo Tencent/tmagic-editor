@@ -10,8 +10,8 @@
 <script setup lang="ts">
 import { computed, inject } from 'vue';
 
+import type { MNode } from '@tmagic/core';
 import { TMagicButton } from '@tmagic/design';
-import type { MNode } from '@tmagic/schema';
 import { getNodePath } from '@tmagic/utils';
 
 import type { Services } from '@editor/type';

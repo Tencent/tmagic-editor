@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { PaginationProps } from './types';
 
 defineOptions({
@@ -23,7 +23,7 @@ const props = defineProps<PaginationProps>();
 
 const emit = defineEmits(['size-change', 'current-change']);
 
-const ui = getConfig('components')?.pagination;
+const ui = getDesignConfig('components')?.pagination;
 
 const uiComponent = ui?.component || 'el-pagination';
 

@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { DatePickerProps } from './types';
 
 defineOptions({
@@ -23,7 +23,7 @@ const props = withDefaults(defineProps<DatePickerProps>(), {
   type: 'date',
 });
 
-const ui = getConfig('components')?.datePicker;
+const ui = getDesignConfig('components')?.datePicker;
 
 const uiComponent = ui?.component || 'el-date-picker';
 

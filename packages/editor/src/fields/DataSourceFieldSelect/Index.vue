@@ -42,9 +42,9 @@
 import { computed, inject, ref, resolveComponent, watch } from 'vue';
 import { Coin } from '@element-plus/icons-vue';
 
+import { DataSchema } from '@tmagic/core';
 import { TMagicButton, tMagicMessage, TMagicTooltip } from '@tmagic/design';
 import type { FieldProps, FormState } from '@tmagic/form';
-import { DataSchema } from '@tmagic/schema';
 import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX } from '@tmagic/utils';
 
 import MIcon from '@editor/components/Icon.vue';

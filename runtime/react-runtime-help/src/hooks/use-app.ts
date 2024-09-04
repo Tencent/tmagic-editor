@@ -19,8 +19,8 @@
 import { useContext, useEffect, useState } from 'react';
 
 import type TMagicApp from '@tmagic/core';
-import type { Id, MNodeInstance } from '@tmagic/schema';
-import { isDslNode } from '@tmagic/utils';
+import type { Id, MNodeInstance } from '@tmagic/core';
+import { isDslNode } from '@tmagic/core';
 
 import AppContent from '../AppContent';
 

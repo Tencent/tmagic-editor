@@ -18,20 +18,19 @@
   </TMagicEditor>
 </template>
 
-<script setup lang="tsx">
+<script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { Document } from '@element-plus/icons-vue';
 
+import { guid, type MApp, NodeType } from '@tmagic/core';
 import { MenuBarData, SideBarData, TMagicEditor, traverseNode } from '@tmagic/editor';
-import { type MApp, NodeType } from '@tmagic/schema';
 import {
   canSelect,
   COMPONENT_GROUP_LIST as componentGroupList,
   propsConfigs,
   useRuntime,
 } from '@tmagic/tmagic-form-runtime';
-import { guid } from '@tmagic/utils';
 
 import formDsl from '../configs/formDsl';
 

@@ -135,3 +135,23 @@ describe('getAbsolutePosition', () => {
     expect(offset.top).toBe(100);
   });
 });
+
+describe('isFixed', () => {
+  test('true', () => {
+    expect(
+      util.isFixed({
+        position: 'fixed',
+      }),
+    ).toBeTruthy();
+  });
+
+  test('false', () => {
+    expect(
+      util.isFixed({
+        position: 'absolute',
+      }),
+    ).toBeFalsy();
+
+    expect(util.isFixed({})).toBeFalsy();
+  });
+});

@@ -28,9 +28,9 @@
 import { computed, inject } from 'vue';
 import { Close, Edit, View } from '@element-plus/icons-vue';
 
-import { DepTargetType } from '@tmagic/dep';
+import type { Id, MNode } from '@tmagic/core';
+import { DepTargetType } from '@tmagic/core';
 import { tMagicMessage, tMagicMessageBox, TMagicTooltip } from '@tmagic/design';
-import type { Id, MNode } from '@tmagic/schema';
 
 import Icon from '@editor/components/Icon.vue';
 import Tree from '@editor/components/Tree.vue';

@@ -17,7 +17,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { DialogProps } from './types';
 
 defineOptions({
@@ -28,7 +28,7 @@ const props = defineProps<DialogProps>();
 
 const emit = defineEmits(['close', 'update:modelValue']);
 
-const ui = getConfig('components')?.dialog;
+const ui = getDesignConfig('components')?.dialog;
 
 const uiComponent = ui?.component || 'el-dialog';
 

@@ -10,7 +10,7 @@
 import { computed, inject, markRaw, onBeforeUnmount, onMounted, ref } from 'vue';
 import { Back, Delete, FullScreen, Grid, Memo, Right, ScaleToOriginal, ZoomIn, ZoomOut } from '@element-plus/icons-vue';
 
-import { NodeType } from '@tmagic/schema';
+import { NodeType } from '@tmagic/core';
 
 import ToolButton from '@editor/components/ToolButton.vue';
 import { ColumnLayout, MenuBarData, MenuButton, MenuComponent, MenuItem, Services } from '@editor/type';

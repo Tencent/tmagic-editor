@@ -37,8 +37,8 @@
 import { computed, inject } from 'vue';
 import { Files } from '@element-plus/icons-vue';
 
+import { Id, MPage, MPageFragment } from '@tmagic/core';
 import { TMagicIcon, TMagicPopover } from '@tmagic/design';
-import { Id, MPage, MPageFragment } from '@tmagic/schema';
 
 import ToolButton from '@editor/components/ToolButton.vue';
 import type { Services } from '@editor/type';

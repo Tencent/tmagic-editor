@@ -18,6 +18,8 @@
 
 /* eslint-disable no-param-reassign */
 import { toRaw } from 'vue';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 import { cloneDeep } from 'lodash-es';
 
 import {
@@ -270,4 +272,29 @@ export const initValue = async (
   }
 
   return valuesTmp || {};
+};
+
+export const datetimeFormatter = (
+  v: string | Date,
+  defaultValue = '-',
+  format = 'YYYY-MM-DD HH:mm:ss',
+): string | number => {
+  if (v) {
+    let time: string | number;
+    if (['x', 'timestamp'].includes(format)) {
+      time = dayjs(v).valueOf();
+    } else if ((typeof v === 'string' && v.includes('Z')) || v.constructor === Date) {
+      dayjs.extend(utc);
+      // UTC字符串时间或Date对象格式化为北京时间
+      time = dayjs(v).utcOffset(8).format(format);
+    } else {
+      time = dayjs(v).format(format);
+    }
+
+    if (time !== 'Invalid Date') {
+      return time;
+    }
+    return defaultValue;
+  }
+  return defaultValue;
 };

@@ -1,4 +1,4 @@
-import type { Id, MContainer, MNode } from '@tmagic/schema';
+import type { Id, MContainer, MNode } from '@tmagic/core';
 import { addClassName, removeClassName } from '@tmagic/utils';
 
 import { DragType, type Services } from '@editor/type';

@@ -1,6 +1,6 @@
 import { ComputedRef, ref, watch } from 'vue';
 
-import type { Id, MNode } from '@tmagic/schema';
+import type { Id, MNode } from '@tmagic/core';
 
 import { LayerNodeStatus, TreeNodeData } from '@editor/type';
 import { traverseNode } from '@editor/utils';

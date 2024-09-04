@@ -1,6 +1,5 @@
-import { isDataSourceCondTarget, isDataSourceTarget, Target, Watcher } from '@tmagic/dep';
-import type { DataSourceSchema, MNode } from '@tmagic/schema';
-import { DSL_NODE_KEY_COPY_PREFIX } from '@tmagic/utils';
+import type { DataSourceSchema, MNode } from '@tmagic/core';
+import { DSL_NODE_KEY_COPY_PREFIX, isDataSourceCondTarget, isDataSourceTarget, Target, Watcher } from '@tmagic/core';
 
 const cache = new Map();
 

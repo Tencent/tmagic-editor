@@ -19,10 +19,10 @@
 import { computed, inject, watch } from 'vue';
 import { isEmpty } from 'lodash-es';
 
+import { HookCodeType, HookType } from '@tmagic/core';
 import { TMagicCard } from '@tmagic/design';
 import type { FieldProps, FormItem } from '@tmagic/form';
 import { FormState, MContainer } from '@tmagic/form';
-import { HookCodeType, HookType } from '@tmagic/schema';
 
 import type { Services } from '@editor/type';
 

@@ -66,7 +66,7 @@
 import { computed, ref } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
-import { getConfig, TMagicTable } from '@tmagic/design';
+import { getDesignConfig, TMagicTable } from '@tmagic/design';
 
 import ActionsColumn from './ActionsColumn.vue';
 import ComponentColumn from './ComponentColumn.vue';
@@ -121,7 +121,7 @@ const tMagicTable = ref<InstanceType<typeof TMagicTable>>();
 
 const editState = ref([]);
 
-const tableColumnComponent = getConfig('components')?.tableColumn;
+const tableColumnComponent = getDesignConfig('components')?.tableColumn;
 const selectionColumn = computed(() => {
   const column = props.columns.filter((item) => item.selection);
   return column.length ? column[0] : null;
@@ -198,21 +198,3 @@ defineExpose({
   clearSelection,
 });
 </script>
-
-<style lang="scss">
-.m-table {
-  .el-button.action-btn + .el-button.action-btn {
-    margin-left: 0;
-  }
-  .keep-all {
-    word-break: keep-all;
-  }
-  .el-table .cell > div {
-    display: inline-block;
-    vertical-align: middle;
-  }
-  .el-table__row.el-table__row--level-1 {
-    color: #999;
-  }
-}
-</style>

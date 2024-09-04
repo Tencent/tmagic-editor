@@ -24,19 +24,14 @@ import HtmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 import TsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 
-import TMagicDesign from '@tmagic/design';
-import MagicEditor from '@tmagic/editor';
+import editorPlugin from '@tmagic/editor';
 import MagicElementPlusAdapter from '@tmagic/element-plus-adapter';
-import MagicForm from '@tmagic/form';
 
 import App from './App.vue';
 import router from './route';
 
 import 'element-plus/dist/index.css';
-import '@tmagic/design/dist/style.css';
 import '@tmagic/editor/dist/style.css';
-import '@tmagic/form/dist/style.css';
-import '@tmagic/table/dist/style.css';
 
 // @ts-ignore
 globalThis.MonacoEnvironment = {
@@ -61,7 +56,5 @@ monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
 
 const app = createApp(App);
 app.use(router);
-app.use(TMagicDesign, MagicElementPlusAdapter);
-app.use(MagicEditor);
-app.use(MagicForm);
+app.use(editorPlugin, MagicElementPlusAdapter);
 app.mount('#app');

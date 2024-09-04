@@ -17,8 +17,8 @@
  */
 
 import { describe, expect, test } from 'vitest';
-import { FormState } from '@form/index';
-import { display, filterFunction, getRules, initValue } from '@form/utils/form';
+import type { FormState } from '@form/index';
+import { datetimeFormatter, display, filterFunction, getRules, initValue } from '@form/utils/form';
 
 // form state mock 数据
 const mForm: FormState = {
@@ -26,6 +26,8 @@ const mForm: FormState = {
   initValues: {},
   parentValues: {},
   values: {},
+  lastValues: {},
+  isCompare: false,
   $emit: (event: string) => event,
   setField: (prop: string, field: any) => field,
   getField: (prop: string) => prop,
@@ -304,5 +306,36 @@ describe('initValue', () => {
     const values = await initValue(mForm, { initValues, config });
     expect(values.table).toHaveLength(1);
     expect(values.table[0].a).toBe(1);
+  });
+});
+
+describe('datetimeFormatter', () => {
+  // Date会将时间转为UTC
+  const date = new Date('2021-07-17T15:37:00');
+  const dateValue = '2021-07-17 15:37:00';
+  const defaultValue = '默认值';
+
+  test('v为空且未设置默认时间', () => {
+    expect(datetimeFormatter('')).toBe('-');
+  });
+
+  test('v是字符串且未设置了默认时间', () => {
+    expect(datetimeFormatter('abc', defaultValue)).toMatch(defaultValue);
+  });
+
+  test('v是日期字符串', () => {
+    expect(datetimeFormatter(date.toISOString(), defaultValue)).toMatch(dateValue);
+  });
+
+  test('v是Date对象', () => {
+    expect(datetimeFormatter(date)).toMatch(dateValue);
+  });
+
+  test('v是UTC字符串', () => {
+    expect(datetimeFormatter(date.toUTCString())).toMatch(dateValue);
+  });
+
+  test('format是x', () => {
+    expect(datetimeFormatter(date.toISOString(), defaultValue, 'timestamp')).toBe(date.getTime());
   });
 });

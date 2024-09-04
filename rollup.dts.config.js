@@ -13,6 +13,8 @@ if (!existsSync('temp')) {
 
 removeScss('temp/editor/src/index.d.ts');
 removeScss('temp/form/src/index.d.ts');
+removeScss('temp/design/src/index.d.ts');
+removeScss('temp/table/src/index.d.ts');
 
 const packages = readdirSync('temp');
 const targets = process.env.TARGETS ? process.env.TARGETS.split(',') : null;

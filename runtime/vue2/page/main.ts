@@ -18,9 +18,7 @@
 
 import Vue from 'vue';
 
-import Core from '@tmagic/core';
-import { DataSourceManager, DeepObservedData, registerDataSourceOnDemand } from '@tmagic/data-source';
-import { getUrlParam } from '@tmagic/utils';
+import TMagicApp, { DataSourceManager, DeepObservedData, getUrlParam, registerDataSourceOnDemand } from '@tmagic/core';
 
 import asyncDataSources from '../.tmagic/async-datasource-entry';
 import components from '../.tmagic/comp-entry';
@@ -30,7 +28,7 @@ import request, { service } from './utils/request';
 import AppComponent from './App.vue';
 import { getLocalConfig } from './utils';
 
-import '@tmagic/utils/resetcss.css';
+import '@tmagic/core/resetcss.css';
 
 DataSourceManager.registerObservedData(DeepObservedData);
 
@@ -38,7 +36,7 @@ Vue.use(request);
 
 const dsl = ((getUrlParam('localPreview') ? getLocalConfig() : window.magicDSL) || [])[0] || {};
 
-const app = new Core({
+const app = new TMagicApp({
   ua: window.navigator.userAgent,
   config: dsl,
   request: service,

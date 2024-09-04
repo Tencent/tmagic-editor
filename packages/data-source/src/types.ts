@@ -1,5 +1,4 @@
-import type { default as TMagicApp } from '@tmagic/core';
-import type { DataSourceSchema, HttpOptions, RequestFunction } from '@tmagic/schema';
+import type { DataSourceSchema, default as TMagicApp, HttpOptions, RequestFunction } from '@tmagic/core';
 
 import type DataSource from './data-sources/Base';
 import type HttpDataSource from './data-sources/Http';

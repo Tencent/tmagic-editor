@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { ColorPickerProps } from './types';
 
 defineOptions({
@@ -24,7 +24,7 @@ const props = withDefaults(defineProps<ColorPickerProps>(), {
   disabled: false,
 });
 
-const ui = getConfig('components')?.colorPicker;
+const ui = getDesignConfig('components')?.colorPicker;
 
 const uiComponent = ui?.component || 'el-color-picker';
 

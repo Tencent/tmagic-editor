@@ -50,16 +50,16 @@ export default defineConfig({
         replacement: path.join(__dirname, '../packages/editor/src/theme/index.scss'),
       },
       {
-        find: /^@tmagic\/form\/dist\/style.css/,
+        find: /^@tmagic\/form\/src\/theme\/index.scss/,
         replacement: path.join(__dirname, '../packages/form/src/theme/index.scss'),
       },
       {
-        find: /^@tmagic\/table\/dist\/style.css/,
-        replacement: path.join(__dirname, '../packages/table/dist/style.css'),
+        find: /^@tmagic\/table\/src\/theme\/index.scss/,
+        replacement: path.join(__dirname, '../packages/table/src/theme/index.scss'),
       },
       {
-        find: /^@tmagic\/design\/dist\/style.css/,
-        replacement: path.join(__dirname, '../packages/design/dist/style.css'),
+        find: /^@tmagic\/design\/src\/theme\/index.scss/,
+        replacement: path.join(__dirname, '../packages/design/src/theme/index.scss'),
       },
       { find: /^@tmagic\/core/, replacement: path.join(__dirname, '../packages/core/src/index.ts') },
       { find: /^@editor/, replacement: path.join(__dirname, '../packages/editor/src/') },

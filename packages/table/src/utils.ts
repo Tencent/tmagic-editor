@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { datetimeFormatter } from '@tmagic/utils';
+import { datetimeFormatter } from '@tmagic/form';
 
 import { ColumnConfig } from './schema';
 

@@ -20,11 +20,8 @@
   },
   "dependencies": {
     "@tmagic/core": "1.5.0-beta.4",
-    "@tmagic/data-source": "1.5.0-beta.4",
-    "@tmagic/schema": "1.5.0-beta.4",
     "@tmagic/stage": "1.5.0-beta.4",
-    "@tmagic/utils": "1.5.0-beta.4",
-    "@tmagic/vue-runtime-help": "^0.1.2",
+    "@tmagic/vue-runtime-help": "^0.1.3",
     "axios": "^0.25.0",
     "vue": "^3.4.35"
   },

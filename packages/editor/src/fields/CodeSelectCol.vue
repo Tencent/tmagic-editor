@@ -39,9 +39,9 @@ import { computed, inject, ref, watch } from 'vue';
 import { Edit, View } from '@element-plus/icons-vue';
 import { isEmpty, map } from 'lodash-es';
 
+import type { Id } from '@tmagic/core';
 import { TMagicButton } from '@tmagic/design';
 import { createValues, type FieldProps, filterFunction, type FormState, MContainer } from '@tmagic/form';
-import type { Id } from '@tmagic/schema';
 
 import CodeParams from '@editor/components/CodeParams.vue';
 import MIcon from '@editor/components/Icon.vue';

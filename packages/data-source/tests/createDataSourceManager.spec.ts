@@ -1,16 +1,8 @@
 import { describe, expect, test } from 'vitest';
 
-import { MApp, NodeType } from '@tmagic/schema';
+import TMagicApp, { type MApp, NodeType } from '@tmagic/core';
 
 import { createDataSourceManager, DataSourceManager } from '@data-source/index';
-
-class Core {
-  public dsl?: MApp;
-
-  constructor(options: any) {
-    this.dsl = options.config;
-  }
-}
 
 const dsl: MApp = {
   type: NodeType.ROOT,
@@ -46,13 +38,14 @@ const dsl: MApp = {
         },
       ],
       methods: [],
+      events: [],
     },
   ],
 };
 
 describe('createDataSourceManager', () => {
   test('instance', () => {
-    const manager = createDataSourceManager(new Core({ config: dsl }));
+    const manager = createDataSourceManager(new TMagicApp({ config: dsl }));
     expect(manager).toBeInstanceOf(DataSourceManager);
   });
 });

@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { UploadProps } from './types';
 
 defineOptions({
@@ -25,7 +25,7 @@ const emit = defineEmits(['change']);
 const changeHandler = (...args: any[]) => {
   emit('change', ...args);
 };
-const ui = getConfig('components')?.upload;
+const ui = getDesignConfig('components')?.upload;
 
 const uiComponent = ui?.component || 'el-upload';
 

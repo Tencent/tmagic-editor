@@ -9,7 +9,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { ButtonProps } from './types';
 
 defineOptions({
@@ -18,7 +18,7 @@ defineOptions({
 
 const props = defineProps<ButtonProps>();
 
-const ui = getConfig('components')?.button;
+const ui = getDesignConfig('components')?.button;
 
 const uiComponent = ui?.component || 'el-button';
 

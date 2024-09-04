@@ -1,7 +1,16 @@
 import { onBeforeUnmount, reactive, toRaw, watch } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
-import type { EventOption } from '@tmagic/core';
+import type {
+  CodeBlockContent,
+  DataSourceSchema,
+  EventOption,
+  Id,
+  MApp,
+  MNode,
+  MPage,
+  MPageFragment,
+} from '@tmagic/core';
 import {
   createCodeBlockTarget,
   createDataSourceCondTarget,
@@ -9,8 +18,7 @@ import {
   createDataSourceTarget,
   DepTargetType,
   Target,
-} from '@tmagic/dep';
-import type { CodeBlockContent, DataSourceSchema, Id, MApp, MNode, MPage, MPageFragment } from '@tmagic/schema';
+} from '@tmagic/core';
 import { isPage } from '@tmagic/utils';
 
 import PropsPanel from './layouts/PropsPanel.vue';
