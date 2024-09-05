@@ -30,7 +30,7 @@ const emit = defineEmits<{
 
 useAddField(props.prop);
 
-props.model[props.name] = datetimeFormatter(props.model[props.name], '', 'YYYY/MM/DD');
+props.model[props.name] = datetimeFormatter(props.model[props.name], '', props.config.valueFormat || 'YYYY/MM/DD');
 
 const changeHandler = (v: string) => {
   emit('change', v);
