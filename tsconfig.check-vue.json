@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "packages/design/src",
+    "packages/editor/src",
+    "packages/form/src",
+    "packages/table/src",
+    "packages/tdesign-vue-next-adapter/src",
+  ]
+}

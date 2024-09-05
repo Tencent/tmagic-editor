@@ -23,8 +23,8 @@
     "@tmagic/stage": "1.5.0-beta.6",
     "@tmagic/vue-runtime-help": "^0.1.4",
     "axios": "^0.25.0",
-    "terser": "^5.31.0",
-    "vue": "^2.7.4"
+    "terser": "^5.31.6",
+    "vue": "^2.7.16"
   },
   "devDependencies": {
     "@tmagic/cli": "1.5.0-beta.6",
@@ -32,9 +32,9 @@
     "axios": "^0.27.2",
     "rollup": "^4.17.2",
     "rollup-plugin-external-globals": "^0.10.0",
-    "sass": "^1.77.0",
-    "vite": "^5.3.5",
-    "@vitejs/plugin-legacy": "^5.4.0",
+    "sass": "^1.78.0",
+    "vite": "^5.4.3",
+    "@vitejs/plugin-legacy": "^5.4.2",
     "@vitejs/plugin-vue2": "^2.3.1",
     "vue-template-compiler": "^2.7.4"
   }
