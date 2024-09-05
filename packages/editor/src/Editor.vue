@@ -20,8 +20,8 @@
           :data="sidebar"
           :layer-content-menu="layerContentMenu"
           :custom-content-menu="customContentMenu"
-          :indent="indent"
-          :next-level-indent-increment="nextLevelIndentIncrement"
+          :indent="treeIndent"
+          :next-level-indent-increment="treeNextLevelIndentIncrement"
         >
           <template #layer-panel-header>
             <slot name="layer-panel-header"></slot>
