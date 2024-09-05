@@ -107,6 +107,8 @@ export interface DatePickerProps {
   startPlaceholder?: string;
   endPlaceholder?: string;
   format?: string;
+  dateFormat?: string;
+  timeFormat?: string;
   /** 可选，绑定值的格式。 不指定则绑定值为 Date 对象 */
   valueFormat?: string;
   /** 在范围选择器里取消两个日期面板之间的联动 */

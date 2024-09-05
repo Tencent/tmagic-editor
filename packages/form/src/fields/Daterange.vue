@@ -22,7 +22,6 @@ import { ref, watch } from 'vue';
 import { TMagicDatePicker } from '@tmagic/design';
 
 import type { DaterangeConfig, FieldProps } from '../schema';
-import { datetimeFormatter } from '../utils/form';
 import { useAddField } from '../utils/useAddField';
 
 defineOptions({
@@ -35,7 +34,6 @@ const emit = defineEmits(['change']);
 
 useAddField(props.prop);
 
-// eslint-disable-next-line vue/no-setup-props-destructure
 const { names } = props.config;
 const value = ref<(Date | undefined)[] | null>([]);
 
@@ -48,8 +46,8 @@ if (props.model !== undefined) {
           value.value = [];
         }
         if (!start || !end) value.value = [];
-        if (start !== preStart) value.value[0] = new Date(start);
-        if (end !== preEnd) value.value[1] = new Date(end);
+        if (start !== preStart) value.value[0] = start;
+        if (end !== preEnd) value.value[1] = end;
       },
       {
         immediate: true,
@@ -58,8 +56,8 @@ if (props.model !== undefined) {
   } else if (props.name && props.model[props.name]) {
     watch(
       () => props.model[props.name],
-      (start, preStart) => {
-        if (start !== preStart) value.value = start.map((item: string) => (item ? new Date(item) : undefined));
+      (start) => {
+        value.value = start;
       },
       {
         immediate: true,
@@ -74,11 +72,7 @@ const setValue = (v: Date[] | Date) => {
       return;
     }
     if (Array.isArray(v)) {
-      props.model[item] = datetimeFormatter(
-        v[index]?.toString(),
-        '',
-        props.config.valueFormat || 'YYYY/MM/DD HH:mm:ss',
-      );
+      props.model[item] = v[index];
     } else {
       props.model[item] = undefined;
     }
@@ -89,18 +83,12 @@ const changeHandler = (v: Date[]) => {
   const value = v || [];
 
   if (props.name) {
-    emit(
-      'change',
-      value.map((item?: Date) => {
-        if (item) return datetimeFormatter(item, '', props.config.valueFormat || 'YYYY/MM/DD HH:mm:ss');
-        return undefined;
-      }),
-    );
+    emit('change', value);
   } else {
     if (names?.length) {
       setValue(value);
     }
-    emit('change', value);
+    emit('change', props.model);
   }
 };
 </script>
