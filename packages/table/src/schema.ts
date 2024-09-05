@@ -19,7 +19,7 @@
 import { FormConfig, FormValue } from '@tmagic/form';
 
 export interface ColumnActionConfig {
-  type?: 'delete' | 'copy' | 'edit';
+  type?: 'delete' | 'copy' | 'edit' | string;
   buttonType?: string;
   display?: (row: any) => boolean;
   text?: string | ((row: any) => string);
