@@ -8,10 +8,5 @@
     "packages/stage/src",
     "packages/utils/src",
     "packages/element-plus-adapter/src",
-    "packages/design/src",
-    "packages/editor/src",
-    "packages/form/src",
-    "packages/table/src",
-    "packages/tdesign-vue-next-adapter/src",
   ]
 }
