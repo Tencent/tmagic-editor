@@ -15,8 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { NODE_CONDS_KEY } from '@tmagic/schema';
-import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX } from '@tmagic/utils';
+import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX, NODE_CONDS_KEY } from '@tmagic/core';
 
 export default [
   {

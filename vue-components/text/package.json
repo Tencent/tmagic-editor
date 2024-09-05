@@ -29,9 +29,6 @@
     },
     "@vue/composition-api": {
       "optional": true
-    },
-    "@tmagic/schema": {
-      "optional": true
     }
   }
 }

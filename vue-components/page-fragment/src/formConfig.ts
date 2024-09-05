@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { getElById } from '@tmagic/utils';
+import { getElById } from '@tmagic/core';
 
 export default [
   {
