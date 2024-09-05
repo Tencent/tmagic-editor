@@ -10,6 +10,15 @@
 ## [1.4.18](https://github.com/Tencent/tmagic-editor/compare/v1.4.17...v1.4.18) (2024-09-14)
 
 
+# [1.5.0-beta.6](https://github.com/Tencent/tmagic-editor/compare/v1.5.0-beta.5...v1.5.0-beta.6) (2024-09-05)
+
+
+### Features
+
+* **table:** 新增createColumns函数 ([de0e386](https://github.com/Tencent/tmagic-editor/commit/de0e386acc86303122ec7ba8cdc1f37b9490f880))
+
+
+
 # [1.5.0-beta.5](https://github.com/Tencent/tmagic-editor/compare/v1.4.17...v1.5.0-beta.5) (2024-09-04)
 
 
