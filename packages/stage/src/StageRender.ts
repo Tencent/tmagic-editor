@@ -155,6 +155,19 @@ export default class StageRender extends EventEmitter {
     return getElById()(this.getDocument(), id);
   }
 
+  public postTmagicRuntimeReady() {
+    this.contentWindow = this.iframe?.contentWindow as RuntimeWindow;
+
+    this.contentWindow.magic = this.getMagicApi();
+
+    this.contentWindow.postMessage(
+      {
+        tmagicRuntimeReady: true,
+      },
+      '*',
+    );
+  }
+
   /**
    * 销毁实例
    */
@@ -236,17 +249,4 @@ export default class StageRender extends EventEmitter {
 
     injectStyle(this.contentWindow.document, style);
   };
-
-  private postTmagicRuntimeReady() {
-    this.contentWindow = this.iframe?.contentWindow as RuntimeWindow;
-
-    this.contentWindow.magic = this.getMagicApi();
-
-    this.contentWindow.postMessage(
-      {
-        tmagicRuntimeReady: true,
-      },
-      '*',
-    );
-  }
 }
