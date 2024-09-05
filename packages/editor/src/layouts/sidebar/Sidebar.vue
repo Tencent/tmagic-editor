@@ -180,7 +180,7 @@ defineOptions({
 
 const props = withDefaults(
   defineProps<{
-    data: SideBarData;
+    data?: SideBarData;
     layerContentMenu: (MenuButton | MenuComponent)[];
     indent?: number;
     nextLevelIndentIncrement?: number;

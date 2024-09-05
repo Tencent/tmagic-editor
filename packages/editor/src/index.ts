@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { App } from 'vue';
+import type { App } from 'vue';
 
 import type { DesignPluginOptions } from '@tmagic/design';
 import designPlugin from '@tmagic/design';

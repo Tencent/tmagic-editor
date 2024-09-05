@@ -19,7 +19,7 @@
     "pg:react": "pnpm playground:react",
     "build": "pnpm build:dts && pnpm --filter \"@tmagic/*\" build",
     "build:dts": "pnpm --filter \"@tmagic/cli\" build && tsc -p tsconfig.build-browser.json && vue-tsc --declaration --emitDeclarationOnly --project tsconfig.build-vue.json && rollup -c rollup.dts.config.js && rimraf temp",
-    "check:type": "tsc --incremental --noEmit -p tsconfig.check.json",
+    "check:type": "tsc --incremental --noEmit -p tsconfig.check.json && vue-tsc --noEmit -p tsconfig.check-vue.json",
     "build:playground": "pnpm --filter \"runtime-vue3\" build && pnpm --filter \"tmagic-playground\" build",
     "docs:dev": "vitepress dev docs",
     "docs:serve": "vitepress serve docs",
@@ -49,7 +49,7 @@
     "@types/node": "^18.19.0",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
-    "@vitejs/plugin-vue": "^5.1.1",
+    "@vitejs/plugin-vue": "^5.1.3",
     "@vitest/coverage-v8": "^2.0.5",
     "c8": "^7.11.3",
     "commitizen": "^4.3.0",
@@ -79,12 +79,12 @@
     "semver": "^7.3.7",
     "serialize-javascript": "^6.0.0",
     "shx": "^0.3.4",
-    "typescript": "^5.4.5",
-    "vite": "^5.3.5",
-    "vitepress": "1.2.2",
-    "vitest": "^2.0.3",
-    "vue": "^3.4.35",
-    "vue-tsc": "^2.0.19"
+    "typescript": "^5.5.4",
+    "vite": "^5.4.3",
+    "vitepress": "^1.3.4",
+    "vitest": "^2.0.5",
+    "vue": "^3.5.0",
+    "vue-tsc": "^2.1.6"
   },
   "config": {
     "commitizen": {
