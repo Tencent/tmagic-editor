@@ -1,3 +1,13 @@
+# [1.5.0-beta.7](https://github.com/Tencent/tmagic-editor/compare/v1.5.0-beta.6...v1.5.0-beta.7) (2024-09-05)
+
+
+### Bug Fixes
+
+* **form:** date组件初始化时不显示值 ([f90822d](https://github.com/Tencent/tmagic-editor/commit/f90822dccebf66a2c64569ce4f95243b2a822402))
+* **vue-component:** 从core中获取utils的方法 ([db6f208](https://github.com/Tencent/tmagic-editor/commit/db6f2080acbd58433a52b3bac8c502f0d5cded6d))
+
+
+
 # [1.5.0-beta.6](https://github.com/Tencent/tmagic-editor/compare/v1.5.0-beta.5...v1.5.0-beta.6) (2024-09-05)
 
 
