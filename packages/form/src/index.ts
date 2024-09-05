@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { App } from 'vue';
+import type { App } from 'vue';
 
 import Container from './containers/Container.vue';
 import Fieldset from './containers/Fieldset.vue';
@@ -98,8 +98,8 @@ export interface FormInstallOptions {
 const defaultInstallOpt: FormInstallOptions = {};
 
 export default {
-  install(app: App, opt: FormInstallOptions = {}) {
-    const option = Object.assign(defaultInstallOpt, opt);
+  install(app: App, opt?: FormInstallOptions) {
+    const option = Object.assign(defaultInstallOpt, opt || {});
 
     // eslint-disable-next-line no-param-reassign
     app.config.globalProperties.$MAGIC_FORM = option;
