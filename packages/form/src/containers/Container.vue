@@ -2,6 +2,7 @@
   <div
     v-if="config"
     :data-tmagic-id="config.id"
+    :data-tmagic-form-item-prop="itemProp"
     :style="config.tip ? 'display: flex;align-items: baseline;' : ''"
     :class="`m-form-container m-container-${type || ''} ${config.className || ''}`"
   >
@@ -44,7 +45,6 @@
         <template #label><span v-html="type === 'checkbox' ? '' : text" :title="config.labelTitle"></span></template>
         <TMagicTooltip v-if="tooltip">
           <component
-            :data-tmagic-form-item-prop="itemProp"
             :key="key(config)"
             :size="size"
             :is="tagName"
@@ -64,7 +64,6 @@
 
         <component
           v-else
-          :data-tmagic-form-item-prop="itemProp"
           :key="key(config)"
           :size="size"
           :is="tagName"

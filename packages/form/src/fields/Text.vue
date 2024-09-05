@@ -4,7 +4,6 @@
       <TMagicInput
         v-model="model[name]"
         clearable
-        :data-tmagic-form-item-prop="prop"
         :size="size"
         :placeholder="config.placeholder"
         :disabled="disabled"
