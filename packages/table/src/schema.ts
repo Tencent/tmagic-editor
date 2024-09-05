@@ -46,6 +46,7 @@ export interface ColumnConfig<T = any> {
   type?: 'popover' | 'expand' | 'component' | string | ((value: any, row: T) => string);
   text?: string;
   prop?: string;
+  name?: string;
   showHeader?: boolean;
   table?: ColumnConfig[];
   formatter?: 'datetime' | ((item: any, row: T) => any);
