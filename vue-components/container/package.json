@@ -1,5 +1,5 @@
 {
-  "version": "0.0.5",
+  "version": "0.0.6",
   "name": "@tmagic/vue-container",
   "type": "module",
   "main": "src/index.ts",
@@ -28,9 +28,6 @@
       "optional": true
     },
     "@vue/composition-api": {
-      "optional": true
-    },
-    "@tmagic/schema": {
       "optional": true
     }
   }
