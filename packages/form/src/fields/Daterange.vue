@@ -22,6 +22,7 @@ import { ref, watch } from 'vue';
 import { TMagicDatePicker } from '@tmagic/design';
 
 import type { DaterangeConfig, FieldProps } from '../schema';
+import { datetimeFormatter } from '../utils/form';
 import { useAddField } from '../utils/useAddField';
 
 defineOptions({
@@ -35,7 +36,7 @@ const emit = defineEmits(['change']);
 useAddField(props.prop);
 
 const { names } = props.config;
-const value = ref<(Date | undefined)[] | null>([]);
+const value = ref<(Date | string | undefined)[] | null>([]);
 
 if (props.model !== undefined) {
   if (names?.length) {
@@ -45,9 +46,11 @@ if (props.model !== undefined) {
         if (!value.value) {
           value.value = [];
         }
+
+        const format = `${props.config.dateFormat || 'YYYY/MM/DD'} ${props.config.timeFormat || 'HH:mm:ss'}`;
         if (!start || !end) value.value = [];
-        if (start !== preStart) value.value[0] = start;
-        if (end !== preEnd) value.value[1] = end;
+        if (start !== preStart) value.value[0] = datetimeFormatter(start, '', format) as string;
+        if (end !== preEnd) value.value[1] = datetimeFormatter(end, '', format) as string;
       },
       {
         immediate: true,
@@ -56,8 +59,13 @@ if (props.model !== undefined) {
   } else if (props.name && props.model[props.name]) {
     watch(
       () => props.model[props.name],
-      (start) => {
-        value.value = start;
+      (start, preStart) => {
+        const format = `${props.config.dateFormat || 'YYYY/MM/DD'} ${props.config.timeFormat || 'HH:mm:ss'}`;
+
+        if (start !== preStart)
+          value.value = start.map((item: string) =>
+            item ? (datetimeFormatter(item, '', format) as string) : undefined,
+          );
       },
       {
         immediate: true,
