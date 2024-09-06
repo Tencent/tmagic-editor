@@ -1,3 +1,12 @@
+# [1.5.0-beta.8](https://github.com/Tencent/tmagic-editor/compare/v1.5.0-beta.7...v1.5.0-beta.8) (2024-09-06)
+
+
+### Bug Fixes
+
+* **form:** datarange组件如果传入utc时间,显示会出错 ([c77c0db](https://github.com/Tencent/tmagic-editor/commit/c77c0db0de69eeac29b52e8d55bb61dae7c6e750))
+
+
+
 # [1.5.0-beta.7](https://github.com/Tencent/tmagic-editor/compare/v1.5.0-beta.6...v1.5.0-beta.7) (2024-09-05)
 
 
