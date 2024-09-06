@@ -30,7 +30,7 @@ import Node from './Node';
 import Page from './Page';
 import { transformStyle as defaultTransformStyle } from './utils';
 
-interface AppOptionsConfig {
+export interface AppOptionsConfig {
   ua?: string;
   config?: MApp;
   platform?: 'editor' | 'mobile' | 'tv' | 'pc';
