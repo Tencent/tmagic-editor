@@ -39,8 +39,6 @@ import TargetShadow from './TargetShadow';
 import type { DragResizeHelperConfig, Rect, TargetElement } from './types';
 import { getAbsolutePosition, getBorderWidth, getMarginValue, getOffset } from './util';
 
-const getId = getIdFromEl();
-
 /**
  * 拖拽/改变大小等操作发生时，moveable会抛出各种状态事件，DragResizeHelper负责响应这些事件，对目标节点target和拖拽节点targetShadow进行修改；
  * 其中目标节点是DragResizeHelper直接改的，targetShadow作为直接被操作的拖拽框，是调用moveableHelper改的；
@@ -243,15 +241,17 @@ export default class DragResizeHelper {
     events.forEach((ev) => {
       const { width, height, beforeTranslate } = ev.drag;
       const frameSnapShot = this.framesSnapShot.find(
-        (frameItem) => frameItem.id === getId(ev.target)?.replace(DRAG_EL_ID_PREFIX, ''),
+        (frameItem) => frameItem.id === getIdFromEl()(ev.target)?.replace(DRAG_EL_ID_PREFIX, ''),
       );
       if (!frameSnapShot) return;
       const targeEl = this.targetList.find(
-        (targetItem) => targetItem.id === getId(ev.target)?.replace(DRAG_EL_ID_PREFIX, ''),
+        (targetItem) => getIdFromEl()(targetItem) === getIdFromEl()(ev.target)?.replace(DRAG_EL_ID_PREFIX, ''),
       );
       if (!targeEl) return;
       // 元素与其所属组同时加入多选列表时，只更新父元素
-      const isParentIncluded = this.targetList.find((targetItem) => getId(targetItem) === getId(targeEl.parentElement));
+      const isParentIncluded = this.targetList.find(
+        (targetItem) => getIdFromEl()(targetItem) === getIdFromEl()(targeEl.parentElement),
+      );
 
       if (!isParentIncluded) {
         // 更新页面元素位置
@@ -281,18 +281,21 @@ export default class DragResizeHelper {
     // 拖动过程更新
     events.forEach((ev) => {
       const frameSnapShot = this.framesSnapShot.find(
-        (frameItem) => getId(ev.target)?.startsWith(DRAG_EL_ID_PREFIX) && getId(ev.target)?.endsWith(frameItem.id),
+        (frameItem) =>
+          getIdFromEl()(ev.target)?.startsWith(DRAG_EL_ID_PREFIX) && getIdFromEl()(ev.target)?.endsWith(frameItem.id),
       );
       if (!frameSnapShot) return;
       const targeEl = this.targetList.find(
         (targetItem) =>
-          getId(ev.target)?.startsWith(DRAG_EL_ID_PREFIX) &&
-          getId(targetItem) &&
-          getId(ev.target)?.endsWith(getId(targetItem)!),
+          getIdFromEl()(ev.target)?.startsWith(DRAG_EL_ID_PREFIX) &&
+          getIdFromEl()(targetItem) &&
+          getIdFromEl()(ev.target)?.endsWith(getIdFromEl()(targetItem)!),
       );
       if (!targeEl) return;
       // 元素与其所属组同时加入多选列表时，只更新父元素
-      const isParentIncluded = this.targetList.find((targetItem) => getId(targetItem) === getId(targeEl.parentElement));
+      const isParentIncluded = this.targetList.find(
+        (targetItem) => getIdFromEl()(targetItem) === getIdFromEl()(targeEl.parentElement),
+      );
       if (!isParentIncluded) {
         // 更新页面元素位置
         const { marginLeft, marginTop } = getMarginValue(targeEl);
@@ -319,7 +322,7 @@ export default class DragResizeHelper {
     const shadowEls = this.getShadowEls();
 
     if (shadowEls.length) {
-      shadowEl = shadowEls.find((item) => getId(item)?.endsWith(getId(el) || ''));
+      shadowEl = shadowEls.find((item) => getIdFromEl()(item)?.endsWith(getIdFromEl()(el) || ''));
     }
 
     if (parentEl && this.mode === Mode.ABSOLUTE && shadowEl) {
@@ -356,11 +359,12 @@ export default class DragResizeHelper {
       // 实际目标元素
       const matchEventTarget = this.targetList.find(
         (targetItem) =>
-          getId(ev.target)?.startsWith(DRAG_EL_ID_PREFIX) && getId(ev.target)?.endsWith(getId(targetItem) || ''),
+          getIdFromEl()(ev.target)?.startsWith(DRAG_EL_ID_PREFIX) &&
+          getIdFromEl()(ev.target)?.endsWith(getIdFromEl()(targetItem) || ''),
       );
       if (!matchEventTarget) return;
 
-      const id = getId(matchEventTarget);
+      const id = getIdFromEl()(matchEventTarget);
       id &&
         this.framesSnapShot.push({
           left: matchEventTarget.offsetLeft,
@@ -378,25 +382,31 @@ export default class DragResizeHelper {
       this.destroyGhostEl();
     }
 
-    const ghostEl = el.cloneNode(true) as HTMLElement;
-    this.setGhostElChildrenId(ghostEl);
+    const ghostEl = document.createElement('div') as HTMLElement;
     const { top, left } = getAbsolutePosition(el, getOffset(el));
-    setIdToEl()(ghostEl, `${GHOST_EL_ID_PREFIX}${getId(el)}`);
-    ghostEl.style.zIndex = ZIndex.GHOST_EL;
-    ghostEl.style.opacity = '.5';
-    ghostEl.style.position = 'absolute';
-    ghostEl.style.left = `${left}px`;
-    ghostEl.style.top = `${top}px`;
-    ghostEl.style.marginLeft = '0';
-    ghostEl.style.marginTop = '0';
+
+    setIdToEl()(ghostEl, `${GHOST_EL_ID_PREFIX}${getIdFromEl()(el)}`);
+
+    ghostEl.style.cssText = `
+      z-index: ${ZIndex.GHOST_EL};
+      opacity: .6;
+      position: absolute;
+      left: ${left}px;
+      top: ${top}px;
+      margin: 0;
+      background: blue;
+      width: ${el.clientWidth}px;
+      height: ${el.clientHeight}px;
+    `;
     el.after(ghostEl);
+
     return ghostEl;
   }
 
   private setGhostElChildrenId(el: Element): void {
     for (const child of Array.from(el.children)) {
       const el = child as HTMLElement;
-      const id = getId(el);
+      const id = getIdFromEl()(el);
       if (id) {
         setIdToEl()(el, `${GHOST_EL_ID_PREFIX}${id}`);
       }
