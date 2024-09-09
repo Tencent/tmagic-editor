@@ -22,7 +22,7 @@ import Moveable, { MoveableOptions } from 'moveable';
 import { getIdFromEl } from '@tmagic/utils';
 
 import { Mode, StageDragStatus } from './const';
-import DragResizeHelper from './DragResizeHelper';
+import type DragResizeHelper from './DragResizeHelper';
 import MoveableOptionsManager from './MoveableOptionsManager';
 import type {
   DelayedMarkContainer,
