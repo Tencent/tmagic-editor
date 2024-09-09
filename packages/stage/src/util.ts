@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { removeClassName } from '@tmagic/utils';
+import { getIdFromEl, removeClassName } from '@tmagic/utils';
 
 import { GHOST_EL_ID_PREFIX, Mode, SELECTED_CLASS, ZIndex } from './const';
 import type { Offset, SortEventData, TargetElement } from './types';
@@ -170,7 +170,7 @@ export const down = (deltaTop: number, target: TargetElement): SortEventData => 
   let swapIndex = 0;
   let addUpH = target.clientHeight;
   const brothers = Array.from(target.parentNode?.children || []).filter(
-    (node) => !node.id.startsWith(GHOST_EL_ID_PREFIX),
+    (child) => !getIdFromEl()(child as HTMLElement)?.startsWith(GHOST_EL_ID_PREFIX),
   );
   const index = brothers.indexOf(target);
   // 往下移动
@@ -189,9 +189,12 @@ export const down = (deltaTop: number, target: TargetElement): SortEventData => 
     addUpH += ele.clientHeight / 2;
     swapIndex = i;
   }
+
+  const src = getIdFromEl()(target) || '';
+
   return {
-    src: target.id,
-    dist: downEls.length && swapIndex > -1 ? downEls[swapIndex].id : target.id,
+    src,
+    dist: downEls.length && swapIndex > -1 ? getIdFromEl()(downEls[swapIndex]) || '' : src,
   };
 };
 
@@ -204,7 +207,7 @@ export const down = (deltaTop: number, target: TargetElement): SortEventData => 
  */
 export const up = (deltaTop: number, target: TargetElement): SortEventData => {
   const brothers = Array.from(target.parentNode?.children || []).filter(
-    (node) => !node.id.startsWith(GHOST_EL_ID_PREFIX),
+    (child) => !getIdFromEl()(child as HTMLElement)?.startsWith(GHOST_EL_ID_PREFIX),
   );
   const index = brothers.indexOf(target);
   // 往上移动
@@ -225,9 +228,12 @@ export const up = (deltaTop: number, target: TargetElement): SortEventData => {
 
     swapIndex = i;
   }
+
+  const src = getIdFromEl()(target) || '';
+
   return {
-    src: target.id,
-    dist: upEls.length && swapIndex > -1 ? upEls[swapIndex].id : target.id,
+    src,
+    dist: upEls.length && swapIndex > -1 ? getIdFromEl()(upEls[swapIndex]) || '' : src,
   };
 };
 
