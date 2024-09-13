@@ -9,6 +9,16 @@
 # [1.4.18](https://github.com/Tencent/tmagic-editor/compare/v1.4.17...v1.4.18) (2024-09-14)
 
 
+# [1.5.0-beta.9](https://github.com/Tencent/tmagic-editor/compare/v1.5.0-beta.8...v1.5.0-beta.9) (2024-09-13)
+
+
+### Bug Fixes
+
+* **data-source:** manager初始化数据源时，如果失败了要把data中对应的数据删掉，不然在ssr中会导致客户端不会重新尝试请求 ([35e099c](https://github.com/Tencent/tmagic-editor/commit/35e099c26cf09e1cfd2becb339635130382206b0))
+* **stage:** 流水布局拖动无效 ([3d3ae5b](https://github.com/Tencent/tmagic-editor/commit/3d3ae5b028d794d357214cbab6d7ccdc76c02214))
+
+
+
 # [1.5.0-beta.8](https://github.com/Tencent/tmagic-editor/compare/v1.5.0-beta.7...v1.5.0-beta.8) (2024-09-06)
 
 
