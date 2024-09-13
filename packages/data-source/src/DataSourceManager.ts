@@ -76,8 +76,13 @@ class DataSourceManager extends EventEmitter {
         values.forEach((value, index) => {
           const dsId = dataSourceList[index][0];
           if (value.status === 'fulfilled') {
-            data[dsId] = this.data[dsId];
+            if (this.data[dsId]) {
+              data[dsId] = this.data[dsId];
+            } else {
+              delete data[dsId];
+            }
           } else if (value.status === 'rejected') {
+            delete data[dsId];
             errors[dsId] = value.reason;
           }
         });
