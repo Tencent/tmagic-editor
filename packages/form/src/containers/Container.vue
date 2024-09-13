@@ -1,8 +1,8 @@
 <template>
   <div
     v-if="config"
-    :id="config.id"
-    :data-magic-id="config.id"
+    :data-tmagic-id="config.id"
+    :data-tmagic-form-item-prop="itemProp"
     :style="config.tip ? 'display: flex;align-items: baseline;' : ''"
     :class="`m-form-container m-container-${type || ''} ${config.className || ''}`"
   >
@@ -37,7 +37,7 @@
     <template v-else-if="type && display && !showDiff">
       <TMagicFormItem
         :style="config.tip ? 'flex: 1' : ''"
-        :class="{ hidden: `${itemLabelWidth}` === '0' || !text }"
+        :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text }"
         :prop="itemProp"
         :label-width="itemLabelWidth"
         :rules="rule"
@@ -93,7 +93,7 @@
       <!-- 上次内容 -->
       <TMagicFormItem
         :style="config.tip ? 'flex: 1' : ''"
-        :class="{ hidden: `${itemLabelWidth}` === '0' || !text }"
+        :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text }"
         :prop="itemProp"
         :label-width="itemLabelWidth"
         :rules="rule"
@@ -142,7 +142,7 @@
       <!-- 当前内容 -->
       <TMagicFormItem
         :style="config.tip ? 'flex: 1' : ''"
-        :class="{ hidden: `${itemLabelWidth}` === '0' || !text }"
+        :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text }"
         :prop="itemProp"
         :label-width="itemLabelWidth"
         :rules="rule"
