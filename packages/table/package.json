@@ -3,7 +3,8 @@
   "name": "@tmagic/table",
   "type": "module",
   "sideEffects": [
-    "dist/style.css"
+    "dist/style.css",
+    "src/theme/*"
   ],
   "main": "dist/tmagic-table.umd.cjs",
   "module": "dist/tmagic-table.js",
