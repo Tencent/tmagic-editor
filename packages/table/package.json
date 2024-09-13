@@ -2,6 +2,9 @@
   "version": "1.4.17",
   "name": "@tmagic/table",
   "type": "module",
+  "sideEffects": [
+    "dist/style.css"
+  ],
   "main": "dist/tmagic-table.umd.cjs",
   "module": "dist/tmagic-table.js",
   "types": "types/index.d.ts",

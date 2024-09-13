@@ -3,6 +3,7 @@
   "name": "@tmagic/form",
   "type": "module",
   "sideEffects": [
+    "dist/style.css",
     "src/theme/*"
   ],
   "main": "dist/tmagic-form.umd.cjs",
