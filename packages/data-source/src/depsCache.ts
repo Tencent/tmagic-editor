@@ -1,10 +1,30 @@
-import type { DataSourceSchema, MNode } from '@tmagic/core';
-import { DSL_NODE_KEY_COPY_PREFIX, isDataSourceCondTarget, isDataSourceTarget, Target, Watcher } from '@tmagic/core';
+import type { DataSourceSchema, Id, MNode } from '@tmagic/core';
+import {
+  DSL_NODE_KEY_COPY_PREFIX,
+  isDataSourceCondTarget,
+  isDataSourceTarget,
+  Target,
+  traverseNode,
+  Watcher,
+} from '@tmagic/core';
 
 const cache = new Map();
 
-export const getDeps = (ds: DataSourceSchema, nodes: MNode[]) => {
-  const cacheKey = `${ds.id}:${nodes.map((node) => node.id).join(':')}`;
+export const getDeps = (ds: DataSourceSchema, nodes: MNode[], inEditor: boolean) => {
+  let cacheKey: string;
+
+  if (inEditor) {
+    const ids: Id[] = [];
+    nodes.forEach((node) => {
+      traverseNode(node, (node) => {
+        ids.push(node.id);
+      });
+    });
+
+    cacheKey = `${ds.id}:${ids.join(':')}`;
+  } else {
+    cacheKey = `${ds.id}:${nodes.map((node) => node.id).join(':')}`;
+  }
 
   if (cache.has(cacheKey)) {
     return cache.get(cacheKey);

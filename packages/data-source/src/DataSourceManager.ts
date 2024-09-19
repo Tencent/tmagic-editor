@@ -246,9 +246,11 @@ class DataSourceManager extends EventEmitter {
     const ds = this.get(dsId);
     if (!ds) return nodes;
 
+    const inEditor = this.app.platform === 'editor';
+
     const ctxData = createIteratorContentData(itemData, ds.id, keys, this.data);
 
-    const { deps = {}, condDeps = {} } = getDeps(ds.schema, nodes);
+    const { deps = {}, condDeps = {} } = getDeps(ds.schema, nodes, inEditor);
 
     if (!Object.keys(deps).length && !Object.keys(condDeps).length) {
       return nodes;
@@ -261,7 +263,7 @@ class DataSourceManager extends EventEmitter {
         item,
         deps,
         condDeps,
-        inEditor: this.app.platform === 'editor',
+        inEditor,
         ctxData,
       }),
     );
