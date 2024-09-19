@@ -137,7 +137,7 @@ export default class HttpDataSource extends DataSource<HttpDataSourceSchema> {
       }
 
       if (typeof this.schema.beforeRequest === 'function') {
-        reqOptions = this.schema.beforeRequest(reqOptions, { app: this.app, dataSource: this });
+        reqOptions = await this.schema.beforeRequest(reqOptions, { app: this.app, dataSource: this });
       }
 
       // 注意：在编辑器中mockData不会为空，至少是默认值，不会发起请求
@@ -148,7 +148,7 @@ export default class HttpDataSource extends DataSource<HttpDataSourceSchema> {
       }
 
       if (typeof this.schema.afterResponse === 'function') {
-        res = this.schema.afterResponse(res, { app: this.app, dataSource: this, options: reqOptions });
+        res = await this.schema.afterResponse(res, { app: this.app, dataSource: this, options: reqOptions });
       }
 
       if (this.schema.responseOptions?.dataPath) {
