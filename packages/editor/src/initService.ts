@@ -1,5 +1,5 @@
 import { onBeforeUnmount, reactive, toRaw, watch } from 'vue';
-import { cloneDeep } from 'lodash-es';
+import { cloneDeep, debounce } from 'lodash-es';
 
 import type {
   CodeBlockContent,
@@ -19,12 +19,11 @@ import {
   DepTargetType,
   Target,
 } from '@tmagic/core';
-import { isPage } from '@tmagic/utils';
+import { isPage, traverseNode } from '@tmagic/utils';
 
 import PropsPanel from './layouts/PropsPanel.vue';
 import { EditorProps } from './editorProps';
 import { Services } from './type';
-import { traverseNode } from './utils';
 
 export declare type LooseRequired<T> = {
   [P in string & keyof T]: T[P];
@@ -292,7 +291,7 @@ export const initServiceEvents = (
     }
   };
 
-  const collectedHandler = (nodes: MNode[], deep: boolean) => {
+  const collectedHandler = debounce((nodes: MNode[], deep: boolean) => {
     const root = editorService.get('root');
     const stage = editorService.get('stage');
 
@@ -336,7 +335,7 @@ export const initServiceEvents = (
           });
       });
     });
-  };
+  }, 300);
 
   depService.on('add-target', targetAddHandler);
   depService.on('remove-target', targetRemoveHandler);
