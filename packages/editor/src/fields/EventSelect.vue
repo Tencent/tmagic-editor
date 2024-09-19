@@ -58,10 +58,10 @@ import { ActionType } from '@tmagic/core';
 import { TMagicButton } from '@tmagic/design';
 import type { CascaderOption, ChildConfig, FieldProps, FormState, PanelConfig } from '@tmagic/form';
 import { MContainer as MFormContainer, MPanel } from '@tmagic/form';
-import { DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX } from '@tmagic/utils';
+import { DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX, traverseNode } from '@tmagic/utils';
 
 import type { CodeSelectColConfig, DataSourceMethodSelectConfig, EventSelectConfig, Services } from '@editor/type';
-import { getCascaderOptionsFromFields, traverseNode } from '@editor/utils';
+import { getCascaderOptionsFromFields } from '@editor/utils';
 
 defineOptions({
   name: 'MFieldsEventSelect',

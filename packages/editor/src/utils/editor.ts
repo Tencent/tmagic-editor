@@ -272,26 +272,6 @@ export const serializeConfig = (config: any) =>
     unsafe: true,
   }).replace(/"(\w+)":\s/g, '$1: ');
 
-export interface NodeItem {
-  items?: NodeItem[];
-  [key: string]: any;
-}
-
-export const traverseNode = <T extends NodeItem = NodeItem>(
-  node: T,
-  cb: (node: T, parents: T[]) => void,
-  parents: T[] = [],
-) => {
-  cb(node, parents);
-
-  if (Array.isArray(node.items) && node.items.length) {
-    parents.push(node);
-    node.items.forEach((item) => {
-      traverseNode(item as T, cb, [...parents]);
-    });
-  }
-};
-
 export const moveItemsInContainer = (sourceIndices: number[], parent: MContainer, targetIndex: number) => {
   sourceIndices.sort((a, b) => a - b);
   for (let i = sourceIndices.length - 1; i >= 0; i--) {
