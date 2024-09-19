@@ -425,3 +425,23 @@ export const dataSourceTemplateRegExp = /\$\{([\s\S]+?)\}/g;
 
 export const isDslNode = (config: MNodeInstance) =>
   typeof config[IS_DSL_NODE_KEY] === 'undefined' || config[IS_DSL_NODE_KEY] === true;
+
+export interface NodeItem {
+  items?: NodeItem[];
+  [key: string]: any;
+}
+
+export const traverseNode = <T extends NodeItem = NodeItem>(
+  node: T,
+  cb: (node: T, parents: T[]) => void,
+  parents: T[] = [],
+) => {
+  cb(node, parents);
+
+  if (Array.isArray(node.items) && node.items.length) {
+    parents.push(node);
+    node.items.forEach((item) => {
+      traverseNode(item as T, cb, [...parents]);
+    });
+  }
+};

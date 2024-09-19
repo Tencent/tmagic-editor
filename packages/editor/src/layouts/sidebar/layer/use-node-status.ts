@@ -1,10 +1,9 @@
 import { computed, ref, watch } from 'vue';
 
 import type { Id, MNode, MPage, MPageFragment } from '@tmagic/core';
-import { getNodePath, isPage, isPageFragment } from '@tmagic/utils';
+import { getNodePath, isPage, isPageFragment, traverseNode } from '@tmagic/utils';
 
-import { LayerNodeStatus, Services } from '@editor/type';
-import { traverseNode } from '@editor/utils';
+import type { LayerNodeStatus, Services } from '@editor/type';
 import { updateStatus } from '@editor/utils/tree';
 
 const createPageNodeStatus = (page: MPage | MPageFragment, initialLayerNodeStatus?: Map<Id, LayerNodeStatus>) => {
