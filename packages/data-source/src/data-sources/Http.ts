@@ -15,8 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { cloneDeep } from 'lodash-es';
-
 import type { HttpOptions, RequestFunction } from '@tmagic/core';
 import { getValueByKeyPath } from '@tmagic/core';
 
@@ -141,21 +139,25 @@ export default class HttpDataSource extends DataSource<HttpDataSourceSchema> {
       }
 
       // 注意：在编辑器中mockData不会为空，至少是默认值，不会发起请求
-      let res = this.mockData ? cloneDeep(this.mockData) : await this.#fetch?.(reqOptions);
-
-      for (const method of this.#afterRequest) {
-        await method({ res, options: reqOptions, params: {}, dataSource: this, app: this.app });
-      }
-
-      if (typeof this.schema.afterResponse === 'function') {
-        res = await this.schema.afterResponse(res, { app: this.app, dataSource: this, options: reqOptions });
-      }
-
-      if (this.schema.responseOptions?.dataPath) {
-        const data = getValueByKeyPath(this.schema.responseOptions.dataPath, res);
-        this.setData(data);
+      if (this.mockData) {
+        this.setData(this.mockData);
       } else {
-        this.setData(res);
+        let res = await this.#fetch?.(reqOptions);
+
+        for (const method of this.#afterRequest) {
+          await method({ res, options: reqOptions, params: {}, dataSource: this, app: this.app });
+        }
+
+        if (typeof this.schema.afterResponse === 'function') {
+          res = await this.schema.afterResponse(res, { app: this.app, dataSource: this, options: reqOptions });
+        }
+
+        if (this.schema.responseOptions?.dataPath) {
+          const data = getValueByKeyPath(this.schema.responseOptions.dataPath, res);
+          this.setData(data);
+        } else {
+          this.setData(res);
+        }
       }
 
       this.error = undefined;
