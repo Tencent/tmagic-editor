@@ -6,6 +6,15 @@
 * **form:** text组件配置了tooltip无效 ([3a7bfef](https://github.com/Tencent/tmagic-editor/commit/3a7bfef5cf7b7aeb46d93f1e739c7f310bc53cd6))
 
 
+# [1.5.0-beta.11](https://github.com/Tencent/tmagic-editor/compare/v1.5.0-beta.10...v1.5.0-beta.11) (2024-09-20)
+
+
+### Bug Fixes
+
+* **data-source:** http数据源中mock数据应该是数据源定义好的数据，不再是请求的数据源 ([9ff36ea](https://github.com/Tencent/tmagic-editor/commit/9ff36eae5477903709fe207321c2d557fa8c86ea))
+
+
+
 # [1.5.0-beta.10](https://github.com/Tencent/tmagic-editor/compare/v1.4.18...v1.5.0-beta.10) (2024-09-19)
 
 
