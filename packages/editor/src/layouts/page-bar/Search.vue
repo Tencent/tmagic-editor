@@ -18,8 +18,8 @@
 import { ref } from 'vue';
 import { Search } from '@element-plus/icons-vue';
 
+import { NodeType } from '@tmagic/core';
 import { createForm, MForm } from '@tmagic/form';
-import { NodeType } from '@tmagic/schema';
 
 import Icon from '@editor/components/Icon.vue';
 
