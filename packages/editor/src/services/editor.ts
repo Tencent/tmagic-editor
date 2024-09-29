@@ -20,10 +20,19 @@ import { reactive, toRaw } from 'vue';
 import { cloneDeep, get, isObject, mergeWith, uniq } from 'lodash-es';
 import type { Writable } from 'type-fest';
 
-import type { Id, MApp, MComponent, MContainer, MNode, MPage, MPageFragment, TargetOptions } from '@tmagic/core';
+import type { Id, MApp, MContainer, MNode, MPage, MPageFragment, TargetOptions } from '@tmagic/core';
 import { NodeType, Target, Watcher } from '@tmagic/core';
 import { isFixed } from '@tmagic/stage';
-import { calcValueByFontsize, getElById, getNodePath, isNumber, isPage, isPageFragment, isPop } from '@tmagic/utils';
+import {
+  calcValueByFontsize,
+  getElById,
+  getNodeInfo,
+  getNodePath,
+  isNumber,
+  isPage,
+  isPageFragment,
+  isPop,
+} from '@tmagic/utils';
 
 import BaseService from '@editor/services//BaseService';
 import propsService from '@editor/services//props';
@@ -175,36 +184,7 @@ class Editor extends BaseService {
       root = toRaw(root);
     }
 
-    const info: EditorNodeInfo = {
-      node: null,
-      parent: null,
-      page: null,
-    };
-
-    if (!root) return info;
-
-    if (id === root.id) {
-      info.node = root;
-      return info;
-    }
-
-    const path = getNodePath(id, root.items);
-
-    if (!path.length) return info;
-
-    path.unshift(root);
-
-    info.node = path[path.length - 1] as MComponent;
-    info.parent = path[path.length - 2] as MContainer;
-
-    path.forEach((item) => {
-      if (isPage(item) || isPageFragment(item)) {
-        info.page = item as MPage | MPageFragment;
-        return;
-      }
-    });
-
-    return info;
+    return getNodeInfo(id, root);
   }
 
   /**
@@ -586,11 +566,7 @@ class Editor extends BaseService {
     nodes.splice(targetIndex, 1, newConfig);
     this.set('nodes', [...nodes]);
 
-    this.get('stage')?.update({
-      config: cloneDeep(newConfig),
-      parentId: parent.id,
-      root: cloneDeep(root),
-    });
+    // update后会触发依赖收集，收集完后会掉stage.update方法
 
     if (isPage(newConfig) || isPageFragment(newConfig)) {
       this.set('page', newConfig as MPage | MPageFragment);
@@ -875,7 +851,11 @@ class Editor extends BaseService {
       await stage.select(targetId);
 
       const targetParent = this.getParentById(target.id);
-      await stage.update({ config: cloneDeep(target), parentId: targetParent?.id, root: cloneDeep(root) });
+      await stage.update({
+        config: cloneDeep(target),
+        parentId: targetParent?.id,
+        root: cloneDeep(root),
+      });
 
       await this.select(newConfig);
       stage.select(newConfig.id);

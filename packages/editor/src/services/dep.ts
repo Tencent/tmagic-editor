@@ -92,8 +92,11 @@ class Dep extends BaseService {
       );
     });
 
-    idleTask.once('finish', () => {
-      this.emit('collected', nodes, deep);
+    return new Promise<void>((resolve) => {
+      idleTask.once('finish', () => {
+        this.emit('collected', nodes, deep);
+        resolve();
+      });
     });
   }
 
