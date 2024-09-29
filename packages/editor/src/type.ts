@@ -77,9 +77,10 @@ export interface FrameworkSlots {
   'props-panel'(props: {}): any;
   'footer'(props: {}): any;
   'page-bar'(props: {}): any;
+  'page-bar-add-button'(props: {}): any;
   'page-bar-title'(props: { page: MPage | MPageFragment }): any;
   'page-bar-popover'(props: { page: MPage | MPageFragment }): any;
-  'page-list-popover'(props: { list: MPage[] | MPageFragment[] }): any;
+  'page-list-popover'(props: { list: (MPage | MPageFragment)[] }): any;
 }
 
 export interface WorkspaceSlots {
