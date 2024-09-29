@@ -6,12 +6,7 @@
       <Icon :icon="ArrowLeftBold"></Icon>
     </div>
 
-    <div
-      v-if="(type === NodeType.PAGE && pageLength) || (type === NodeType.PAGE_FRAGMENT && pageFragmentLength)"
-      class="m-editor-page-bar-items"
-      ref="itemsContainer"
-      :style="`width: ${itemsContainerWidth}px`"
-    >
+    <div v-if="length" class="m-editor-page-bar-items" ref="itemsContainer" :style="`width: ${itemsContainerWidth}px`">
       <slot></slot>
     </div>
 
@@ -22,21 +17,11 @@
 </template>
 
 <script setup lang="ts">
-import {
-  computed,
-  type ComputedRef,
-  inject,
-  nextTick,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-  watch,
-  type WatchStopHandle,
-} from 'vue';
+import { computed, inject, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { ArrowLeftBold, ArrowRightBold } from '@element-plus/icons-vue';
-import Sortable, { SortableEvent } from 'sortablejs';
+import Sortable, { type SortableEvent } from 'sortablejs';
 
-import { Id, NodeType } from '@tmagic/core';
+import type { Id } from '@tmagic/core';
 
 import Icon from '@editor/components/Icon.vue';
 import type { PageBarSortOptions, Services } from '@editor/type';
@@ -46,8 +31,8 @@ defineOptions({
 });
 
 const props = defineProps<{
-  type: NodeType.PAGE | NodeType.PAGE_FRAGMENT;
   pageBarSortOptions?: PageBarSortOptions;
+  length: number;
 }>();
 
 const services = inject<Services>('services');
@@ -63,11 +48,12 @@ const showPageListButton = computed(() => uiService?.get('showPageListButton'));
 const itemsContainerWidth = ref(0);
 
 const setCanScroll = () => {
-  // 减去新增、左移、右移三个按钮的宽度
+  // 减去新增、搜索、页面列表、左移、右移5个按钮的宽度
   // 37 = icon width 16 + padding 10 * 2 + border-right 1
   itemsContainerWidth.value =
     (pageBar.value?.clientWidth || 0) -
     37 * 2 -
+    37 -
     (showAddPageButton.value ? 37 : 21) -
     (showPageListButton.value ? 37 : 0);
 
@@ -119,71 +105,46 @@ const scroll = (type: 'left' | 'right' | 'start' | 'end') => {
   itemsContainer.value.style.transform = `translate(${translateLeft}px, 0px)`;
 };
 
-const pageLength = computed(() => editorService?.get('pageLength') || 0);
-const pageFragmentLength = computed(() => editorService?.get('pageFragmentLength') || 0);
-
-const crateWatchLength = (length: ComputedRef<number>) =>
-  watch(
-    length,
-    (length = 0, preLength = 0) => {
-      setTimeout(() => {
-        setCanScroll();
-        if (length < preLength) {
-          scroll('start');
-        } else {
-          scroll('end');
-        }
-        if (length > 1) {
-          const el = document.querySelector('.m-editor-page-bar-items') as HTMLElement;
-          let beforeDragList: Id[] = [];
-          const options = {
-            ...{
-              dataIdAttr: 'page-id', // 获取排序后的数据
-              onStart: async (event: SortableEvent) => {
-                if (typeof props.pageBarSortOptions?.beforeStart === 'function') {
-                  await props.pageBarSortOptions.beforeStart(event, sortable);
-                }
-                beforeDragList = sortable.toArray();
-              },
-              onUpdate: async (event: SortableEvent) => {
-                await editorService?.sort(
-                  beforeDragList[event.oldIndex as number],
-                  beforeDragList[event.newIndex as number],
-                );
-                if (typeof props.pageBarSortOptions?.afterUpdate === 'function') {
-                  await props.pageBarSortOptions.afterUpdate(event, sortable);
-                }
-              },
-            },
-            ...{
-              ...(props.pageBarSortOptions ? props.pageBarSortOptions : {}),
-            },
-          };
-          if (!el) return;
-          const sortable = new Sortable(el, options);
-        }
-      });
-    },
-    {
-      immediate: true,
-    },
-  );
-
-let unWatchPageLength: WatchStopHandle | null;
-let unWatchPageFragmentLength: WatchStopHandle | null;
-
 watch(
-  () => props.type,
-  (type) => {
-    if (type === NodeType.PAGE) {
-      unWatchPageFragmentLength?.();
-      unWatchPageFragmentLength = null;
-      unWatchPageLength = crateWatchLength(pageLength);
-    } else {
-      unWatchPageLength?.();
-      unWatchPageLength = null;
-      unWatchPageFragmentLength = crateWatchLength(pageFragmentLength);
-    }
+  () => props.length,
+  (length = 0, preLength = 0) => {
+    setTimeout(() => {
+      setCanScroll();
+      if (length < preLength) {
+        scroll('start');
+      } else {
+        scroll('end');
+      }
+      if (length > 1) {
+        const el = document.querySelector('.m-editor-page-bar-items') as HTMLElement;
+        let beforeDragList: Id[] = [];
+        const options = {
+          ...{
+            dataIdAttr: 'page-id', // 获取排序后的数据
+            onStart: async (event: SortableEvent) => {
+              if (typeof props.pageBarSortOptions?.beforeStart === 'function') {
+                await props.pageBarSortOptions.beforeStart(event, sortable);
+              }
+              beforeDragList = sortable.toArray();
+            },
+            onUpdate: async (event: SortableEvent) => {
+              await editorService?.sort(
+                beforeDragList[event.oldIndex as number],
+                beforeDragList[event.newIndex as number],
+              );
+              if (typeof props.pageBarSortOptions?.afterUpdate === 'function') {
+                await props.pageBarSortOptions.afterUpdate(event, sortable);
+              }
+            },
+          },
+          ...{
+            ...(props.pageBarSortOptions ? props.pageBarSortOptions : {}),
+          },
+        };
+        if (!el) return;
+        const sortable = new Sortable(el, options);
+      }
+    });
   },
   {
     immediate: true,

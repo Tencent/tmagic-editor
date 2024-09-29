@@ -47,7 +47,7 @@ defineOptions({
 });
 
 defineProps<{
-  list: MPage[] | MPageFragment[];
+  list: (MPage | MPageFragment)[];
 }>();
 
 const services = inject<Services>('services');

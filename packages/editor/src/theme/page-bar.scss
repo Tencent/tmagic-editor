@@ -3,19 +3,13 @@
   bottom: 0;
   left: 0;
   width: 100%;
+  user-select: none;
+}
 
-  .tmagic-design-button.m-editor-page-bar-switch-type-button {
-    margin-left: 10px;
-    position: relative;
-    top: 1px;
-    border-radius: 3px 3px 0 0;
-    border: 1px solid $--border-color;
-    border-bottom: 1px solid transparent;
-    padding: 5px 10px;
-
-    &.active {
-      background-color: #f3f3f3;
-    }
+.m-editor-page-bar-item-icon {
+  .icon-active {
+    font-weight: bold;
+    color: $--theme-color;
   }
 }
 
@@ -99,5 +93,18 @@
     &:hover {
       background-color: $--hover-color;
     }
+  }
+}
+
+.m-editor-page-bar-search-panel {
+  position: absolute;
+  bottom: $--page-bar-height;
+  border: 1px solid $--border-color;
+  padding: 6px 10px;
+  width: 100%;
+  box-sizing: border-box;
+
+  .tmagic-design-form-item {
+    margin-bottom: 0;
   }
 }
