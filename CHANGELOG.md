@@ -1,3 +1,17 @@
+# [1.5.0-beta.12](https://github.com/Tencent/tmagic-editor/compare/v1.5.0-beta.11...v1.5.0-beta.12) (2024-09-29)
+
+
+### Bug Fixes
+
+* **editor:** 修复修改页面配置后可能改造页面卡死问题 ([2337448](https://github.com/Tencent/tmagic-editor/commit/23374487466ca513b363060fa3a3b1adc5b72528))
+
+
+### Features
+
+* **editor:** 页面/页面片不再使用tab分开显示，新增搜索页面 ([a88ad84](https://github.com/Tencent/tmagic-editor/commit/a88ad845c8820be6c9959329a064ffa9278b74d9))
+
+
+
 # [1.5.0-beta.11](https://github.com/Tencent/tmagic-editor/compare/v1.5.0-beta.10...v1.5.0-beta.11) (2024-09-20)
 
 
