@@ -56,13 +56,14 @@ export class IdleTask<T = any> extends EventEmitter {
   }
 
   private runTaskQueue(deadline: IdleDeadline) {
-    while ((deadline.timeRemaining() > 15 || deadline.didTimeout) && this.taskList.length) {
+    // 动画会占用空闲时间,当任务一直无法执行时，看看是否有动画正在播放
+    while ((deadline.timeRemaining() > 10 || deadline.didTimeout) && this.taskList.length) {
       const task = this.taskList.shift();
       task!.handler(task!.data);
     }
 
     if (this.taskList.length) {
-      this.taskHandle = globalThis.requestIdleCallback(this.runTaskQueue.bind(this), { timeout: 10000 });
+      this.taskHandle = globalThis.requestIdleCallback(this.runTaskQueue.bind(this), { timeout: 300 });
     } else {
       this.taskHandle = 0;
 

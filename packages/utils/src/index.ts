@@ -18,8 +18,21 @@
 
 import { cloneDeep, set as objectSet } from 'lodash-es';
 
-import type { DataSchema, DataSourceDeps, Id, MComponent, MNode, MNodeInstance } from '@tmagic/schema';
+import type {
+  DataSchema,
+  DataSourceDeps,
+  Id,
+  MApp,
+  MComponent,
+  MContainer,
+  MNode,
+  MNodeInstance,
+  MPage,
+  MPageFragment,
+} from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
+
+import type { EditorNodeInfo } from '@editor/type';
 
 export * from './dom';
 
@@ -76,6 +89,39 @@ export const getNodePath = (id: Id, data: MNode[] = []): MNode[] => {
   get(id, data);
 
   return path;
+};
+
+export const getNodeInfo = (id: Id, root: MApp | null) => {
+  const info: EditorNodeInfo = {
+    node: null,
+    parent: null,
+    page: null,
+  };
+
+  if (!root) return info;
+
+  if (id === root.id) {
+    info.node = root;
+    return info;
+  }
+
+  const path = getNodePath(id, root.items);
+
+  if (!path.length) return info;
+
+  path.unshift(root);
+
+  info.node = path[path.length - 1] as MComponent;
+  info.parent = path[path.length - 2] as MContainer;
+
+  path.forEach((item) => {
+    if (isPage(item) || isPageFragment(item)) {
+      info.page = item as MPage | MPageFragment;
+      return;
+    }
+  });
+
+  return info;
 };
 
 export const filterXSS = (str: string) =>
