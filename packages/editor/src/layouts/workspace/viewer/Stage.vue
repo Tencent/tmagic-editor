@@ -132,9 +132,20 @@ watch(zoom, (zoom) => {
   stage.setZoom(zoom);
 });
 
+let timeoutId: NodeJS.Timeout | null = null;
 watch(page, (page) => {
   if (runtime && page) {
     services?.editorService.set('stageLoading', true);
+
+    if (timeoutId) {
+      globalThis.clearTimeout(timeoutId);
+    }
+
+    timeoutId = globalThis.setTimeout(() => {
+      services?.editorService.set('stageLoading', false);
+      timeoutId = null;
+    }, 3000);
+
     runtime.updatePageId?.(page.id);
     nextTick(() => {
       stage?.select(page.id);
