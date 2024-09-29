@@ -39,6 +39,7 @@
 
         <slot name="page-bar">
           <PageBar :disabled-page-fragment="disabledPageFragment" :page-bar-sort-options="pageBarSortOptions">
+            <template #page-bar-add-button><slot name="page-bar-add-button"></slot></template>
             <template #page-bar-title="{ page }"><slot name="page-bar-title" :page="page"></slot></template>
             <template #page-bar-popover="{ page }"><slot name="page-bar-popover" :page="page"></slot></template>
             <template #page-list-popover="{ list }"><slot name="page-list-popover" :list="list"></slot></template>

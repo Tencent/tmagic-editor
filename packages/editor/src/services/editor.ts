@@ -474,11 +474,11 @@ class Editor extends BaseService {
     if (isPage(node)) {
       this.state.pageLength -= 1;
 
-      await selectDefault(getPageList(root));
+      await selectDefault(rootItems);
     } else if (isPageFragment(node)) {
       this.state.pageFragmentLength -= 1;
 
-      await selectDefault(getPageFragmentList(root));
+      await selectDefault(rootItems);
     } else {
       await this.select(parent);
       stage?.select(parent.id);
