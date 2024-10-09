@@ -38,7 +38,11 @@
         </slot>
 
         <slot name="page-bar">
-          <PageBar :disabled-page-fragment="disabledPageFragment" :page-bar-sort-options="pageBarSortOptions">
+          <PageBar
+            :disabled-page-fragment="disabledPageFragment"
+            :page-bar-sort-options="pageBarSortOptions"
+            :filter-function="pageFilterFunction"
+          >
             <template #page-bar-add-button><slot name="page-bar-add-button"></slot></template>
             <template #page-bar-title="{ page }"><slot name="page-bar-title" :page="page"></slot></template>
             <template #page-bar-popover="{ page }"><slot name="page-bar-popover" :page="page"></slot></template>
@@ -62,6 +66,7 @@
 <script lang="ts" setup>
 import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
+import type { MPage, MPageFragment } from '@tmagic/core';
 import { TMagicScrollbar } from '@tmagic/design';
 
 import SplitView from '@editor/components/SplitView.vue';
@@ -81,6 +86,7 @@ defineOptions({
 defineProps<{
   disabledPageFragment: boolean;
   pageBarSortOptions?: PageBarSortOptions;
+  pageFilterFunction?: (page: MPage | MPageFragment, keyword: string) => boolean;
 }>();
 
 const DEFAULT_LEFT_COLUMN_WIDTH = 310;

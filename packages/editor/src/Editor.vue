@@ -1,5 +1,9 @@
 <template>
-  <Framework :disabled-page-fragment="disabledPageFragment" :page-bar-sort-options="pageBarSortOptions">
+  <Framework
+    :disabled-page-fragment="disabledPageFragment"
+    :page-bar-sort-options="pageBarSortOptions"
+    :page-filter-function="pageFilterFunction"
+  >
     <template #header>
       <slot name="header"></slot>
     </template>
