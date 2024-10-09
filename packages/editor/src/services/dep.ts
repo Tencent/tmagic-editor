@@ -79,7 +79,9 @@ class Dep extends BaseService {
   }
 
   public collectIdle(nodes: MNode[], depExtendedData: DepExtendedData = {}, deep = false, type?: DepTargetType) {
+    let startTask = false;
     this.watcher.collectByCallback(nodes, type, ({ node, target }) => {
+      startTask = true;
       idleTask.enqueueTask(
         ({ node, deep, target }) => {
           this.collectNode(node, target, depExtendedData, deep);
@@ -93,6 +95,11 @@ class Dep extends BaseService {
     });
 
     return new Promise<void>((resolve) => {
+      if (!startTask) {
+        this.emit('collected', nodes, deep);
+        resolve();
+        return;
+      }
       idleTask.once('finish', () => {
         this.emit('collected', nodes, deep);
         resolve();
