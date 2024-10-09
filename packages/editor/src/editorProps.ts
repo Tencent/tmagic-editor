@@ -1,4 +1,4 @@
-import type { DataSourceSchema, EventOption, Id, MApp, MNode } from '@tmagic/core';
+import type { DataSourceSchema, EventOption, Id, MApp, MNode, MPage, MPageFragment } from '@tmagic/core';
 import type { FormConfig, FormState } from '@tmagic/form';
 import StageCore, {
   CONTAINER_HIGHLIGHT_CLASS_NAME,
@@ -97,6 +97,8 @@ export interface EditorProps {
   extendFormState?: (state: FormState) => Record<string, any> | Promise<Record<string, any>>;
   /** 页面顺序拖拽配置参数 */
   pageBarSortOptions?: PageBarSortOptions;
+  /** 页面搜索函数 */
+  pageFilterFunction?: (page: MPage | MPageFragment, keyword: string) => boolean;
 }
 
 export const defaultEditorProps = {

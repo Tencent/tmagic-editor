@@ -8,6 +8,7 @@
         :inline="true"
         :config="formConfig"
         :init-values="query"
+        :prevent-submit-default="true"
         @change="onFormChange"
       ></MForm>
     </Teleport>
@@ -51,7 +52,9 @@ const formConfig = createForm([
   },
   {
     name: 'keyword',
+    type: 'text',
     placeholder: '请输入关键字',
+    clearable: true,
   },
 ]);
 
