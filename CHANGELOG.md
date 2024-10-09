@@ -6,6 +6,21 @@
 * **form:** text组件配置了tooltip无效 ([3a7bfef](https://github.com/Tencent/tmagic-editor/commit/3a7bfef5cf7b7aeb46d93f1e739c7f310bc53cd6))
 
 
+# [1.5.0-beta.13](https://github.com/Tencent/tmagic-editor/compare/v1.5.0-beta.12...v1.5.0-beta.13) (2024-10-09)
+
+
+### Bug Fixes
+
+* **editor:** 更新组件配置后，如果当前没有任何依赖，不会触发收集，导致画布不更新 ([c03de90](https://github.com/Tencent/tmagic-editor/commit/c03de90970a233259f3f0471ab2d28aa029f1b2c))
+
+
+### Features
+
+* **editor:** 支持配置页面过滤函数 ([7a536e4](https://github.com/Tencent/tmagic-editor/commit/7a536e497acf4e0f8e4ee214e6fbe5dc12c48075))
+* **form:** 支持配置阻止默认的submit行为 ([e8ef1fb](https://github.com/Tencent/tmagic-editor/commit/e8ef1fb52b53e8ead9ad1507fb15a35e9b1de1dd))
+
+
+
 # [1.5.0-beta.12](https://github.com/Tencent/tmagic-editor/compare/v1.5.0-beta.11...v1.5.0-beta.12) (2024-09-29)
 
 
