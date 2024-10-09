@@ -7,6 +7,7 @@
     :style="`height: ${height}`"
     :inline="inline"
     :label-position="labelPosition"
+    @submit="submitHandler"
   >
     <template v-if="initialized && Array.isArray(config)">
       <Container
@@ -61,6 +62,7 @@ const props = withDefaults(
     labelPosition?: string;
     keyProp?: string;
     popperClass?: string;
+    preventSubmitDefault?: boolean;
     extendState?: (state: FormState) => Record<string, any> | Promise<Record<string, any>>;
   }>(),
   {
@@ -107,8 +109,8 @@ const formState: FormState = reactive<FormState>({
   post: (options: any) => {
     if (requestFuc) {
       return requestFuc({
-        ...options,
         method: 'POST',
+        ...options,
       });
     }
   },
@@ -165,6 +167,12 @@ watch(
 
 const changeHandler = () => {
   emit('change', values.value);
+};
+
+const submitHandler = (e: SubmitEvent) => {
+  if (props.preventSubmitDefault) {
+    e.preventDefault();
+  }
 };
 
 defineExpose({
