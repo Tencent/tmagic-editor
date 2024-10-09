@@ -81,10 +81,16 @@ defineOptions({
   name: 'MEditorPageBar',
 });
 
-defineProps<{
-  disabledPageFragment: boolean;
-  pageBarSortOptions?: PageBarSortOptions;
-}>();
+const props = withDefaults(
+  defineProps<{
+    disabledPageFragment: boolean;
+    pageBarSortOptions?: PageBarSortOptions;
+    filterFunction?: (page: MPage | MPageFragment, keyword: string) => boolean;
+  }>(),
+  {
+    filterFunction: (page, keyword) => page.name?.includes(keyword) || `${page.id}`.includes(keyword),
+  },
+);
 
 const services = inject<Services>('services');
 const editorService = services?.editorService;
@@ -109,7 +115,7 @@ const list = computed(() => {
   return (root.value?.items || []).filter((item) => {
     if (pageType.includes(item.type)) {
       if (keyword) {
-        return item.name?.includes(keyword);
+        return props.filterFunction(item, keyword);
       }
       return true;
     }
