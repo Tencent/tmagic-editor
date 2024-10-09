@@ -12,6 +12,7 @@
           :label-width="labelWidth"
           :label-position="labelPosition"
           :inline="inline"
+          :prevent-submit-default="preventSubmitDefault"
           @change="changeHandler"
         ></Form>
         <slot></slot>
@@ -58,6 +59,7 @@ const props = withDefaults(
     confirmText?: string;
     inline?: boolean;
     labelPosition?: string;
+    preventSubmitDefault?: boolean;
   }>(),
   {
     config: () => [],
