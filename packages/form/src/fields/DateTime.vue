@@ -32,9 +32,9 @@ const emit = defineEmits<{
 
 useAddField(props.prop);
 
-const value = props.model?.[props.name].toString();
+const value = props.model?.[props.name]?.toString();
 if (props.model) {
-  if (value === 'Invalid Date') {
+  if (!value || value === 'Invalid Date') {
     props.model[props.name] = '';
   } else {
     props.model[props.name] = datetimeFormatter(
