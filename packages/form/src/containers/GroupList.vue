@@ -25,7 +25,7 @@
       @addDiffCount="onAddDiffCount()"
     ></MFieldsGroupListItem>
 
-    <TMagicButton @click="addHandler" size="small" :disabled="disabled" v-if="addable">新增</TMagicButton>
+    <TMagicButton @click="addHandler" type="primary" :disabled="disabled" v-if="addable">新增</TMagicButton>
 
     <TMagicButton :icon="Grid" size="small" @click="toggleMode" v-if="config.enableToggleMode">切换为表格</TMagicButton>
   </div>

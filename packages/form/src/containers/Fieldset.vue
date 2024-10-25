@@ -1,9 +1,5 @@
 <template>
-  <fieldset
-    v-if="name ? model[name] : model"
-    class="m-fieldset"
-    :style="show ? 'padding: 15px 15px 0 5px;' : 'border: 0'"
-  >
+  <fieldset v-if="name ? model[name] : model" class="m-fieldset" :style="show ? 'padding: 15px' : 'border: 0'">
     <component v-if="name && config.checkbox" :is="!show ? 'div' : 'legend'">
       <TMagicCheckbox
         v-model="model[name].value"
