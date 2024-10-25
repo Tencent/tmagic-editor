@@ -6,6 +6,15 @@
 * **form:** text组件配置了tooltip无效 ([3a7bfef](https://github.com/Tencent/tmagic-editor/commit/3a7bfef5cf7b7aeb46d93f1e739c7f310bc53cd6))
 
 
+# [1.5.0-beta.14](https://github.com/Tencent/tmagic-editor/compare/v1.5.0-beta.13...v1.5.0-beta.14) (2024-10-25)
+
+
+### Bug Fixes
+
+* **form:** datatime没有初始值时异常 ([f265abc](https://github.com/Tencent/tmagic-editor/commit/f265abcb3233b0c5a3cc7a315f87e62c572f1655))
+
+
+
 # [1.5.0-beta.13](https://github.com/Tencent/tmagic-editor/compare/v1.5.0-beta.12...v1.5.0-beta.13) (2024-10-09)
 
 
