@@ -95,5 +95,5 @@ export const makeCamelCase = function (name: string): string {
   if (typeof name !== 'string') {
     return '';
   }
-  return name.replace(/-(\w)/g, ($0, $1) => $1.toUpperCase());
+  return name.replace(/-(\w)/g, (_$0, $1) => $1.toUpperCase());
 };

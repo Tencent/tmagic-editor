@@ -1,4 +1,5 @@
 <template>
+  <!-- @ts-nocheck -->
   <TMagicTableColumn type="expand" :width="config.width" :fixed="config.fixed">
     <template #default="scope">
       <MTable

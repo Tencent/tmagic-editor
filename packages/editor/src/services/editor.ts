@@ -839,7 +839,7 @@ class Editor extends BaseService {
 
       const layout = await this.getLayout(target);
 
-      const newConfig = mergeWith(cloneDeep(node), config, (objValue, srcValue) => {
+      const newConfig = mergeWith(cloneDeep(node), config, (_objValue, srcValue) => {
         if (Array.isArray(srcValue)) {
           return srcValue;
         }

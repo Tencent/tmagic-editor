@@ -58,7 +58,7 @@ const fillConfig = (config: FormConfig): FormConfig => [
       },
       {
         title: '请求参数裁剪',
-        display: (formState: FormState, { model }: any) => model.type === 'http',
+        display: (_formState: FormState, { model }: any) => model.type === 'http',
         items: [
           {
             name: 'beforeRequest',
@@ -70,7 +70,7 @@ const fillConfig = (config: FormConfig): FormConfig => [
       },
       {
         title: '响应数据裁剪',
-        display: (formState: FormState, { model }: any) => model.type === 'http',
+        display: (_formState: FormState, { model }: any) => model.type === 'http',
         items: [
           {
             name: 'afterResponse',

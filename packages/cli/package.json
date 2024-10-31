@@ -21,21 +21,22 @@
     "node": ">=18"
   },
   "repository": {
+    "directory": "packages/cli",
     "type": "git",
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
     "cac": "^6.7.14",
     "chokidar": "^3.6.0",
-    "esbuild": "^0.21.1",
+    "esbuild": "^0.21.5",
     "fs-extra": "^11.2.0",
-    "picocolors": "^1.0.0",
-    "recast": "^0.23.6",
-    "tslib": "^2.6.2"
+    "picocolors": "^1.1.1",
+    "recast": "^0.23.9",
+    "tslib": "^2.8.0"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
-    "@types/node": "^18.19.0"
+    "@types/node": "^18.19.61"
   },
   "peerDependencies": {
     "typescript": "*"

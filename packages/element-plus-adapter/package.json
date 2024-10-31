@@ -26,6 +26,7 @@
     "node": ">=18"
   },
   "repository": {
+    "directory": "packages/element-plus-adapter",
     "type": "git",
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
@@ -39,7 +40,7 @@
   "devDependencies": {
     "@types/node": "^18.19.0",
     "rimraf": "^3.0.2",
-    "vite": "^5.4.3"
+    "vite": "^5.4.10"
   },
   "peerDependencies": {
     "@tmagic/design": "workspace:*",

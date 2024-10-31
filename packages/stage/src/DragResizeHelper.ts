@@ -402,18 +402,4 @@ export default class DragResizeHelper {
 
     return ghostEl;
   }
-
-  private setGhostElChildrenId(el: Element): void {
-    for (const child of Array.from(el.children)) {
-      const el = child as HTMLElement;
-      const id = getIdFromEl()(el);
-      if (id) {
-        setIdToEl()(el, `${GHOST_EL_ID_PREFIX}${id}`);
-      }
-
-      if (child.children.length) {
-        this.setGhostElChildrenId(child);
-      }
-    }
-  }
 }

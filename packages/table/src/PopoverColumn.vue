@@ -1,4 +1,5 @@
 <template>
+  <!-- @ts-nocheck -->
   <TMagicTableColumn :label="config.label" :width="config.width" :fixed="config.fixed">
     <template v-slot="scope">
       <TMagicPopover

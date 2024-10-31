@@ -69,7 +69,7 @@ export const tMagicMessage = {
   info: (msg: string) => {
     console.info(msg);
   },
-  closeAll: (msg: string) => {},
+  closeAll: (_msg: string) => {},
 } as unknown as TMagicMessage;
 
 export const tMagicMessageBox = {

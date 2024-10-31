@@ -102,7 +102,7 @@ export default class EventHelper extends EventEmitter {
         node.eventKeys.set(eventNameKey, eventName);
       }
 
-      const eventHandler = (fromCpt: TMagicNode, ...args: any[]) => {
+      const eventHandler = (_fromCpt: TMagicNode, ...args: any[]) => {
         this.eventHandler(index, node, args);
       };
 

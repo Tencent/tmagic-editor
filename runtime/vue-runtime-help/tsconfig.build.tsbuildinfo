@@ -1,0 +1,1 @@
+{"root":["./src/index.ts","./src/hooks/use-app.ts","./src/hooks/use-component.ts","./src/hooks/use-dsl.ts","./src/hooks/use-editor-dsl.ts"],"version":"5.6.3"}
