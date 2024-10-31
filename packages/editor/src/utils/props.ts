@@ -81,7 +81,7 @@ export const styleTabConfig: TabPaneConfig = {
               fieldConfig: {
                 type: 'text',
               },
-              disabled: (vm: FormState, { model }: any) =>
+              disabled: (_vm: FormState, { model }: any) =>
                 model.position === 'fixed' && model._magic_position === 'fixedBottom',
             },
             {
@@ -103,7 +103,7 @@ export const styleTabConfig: TabPaneConfig = {
               fieldConfig: {
                 type: 'text',
               },
-              disabled: (vm: FormState, { model }: any) =>
+              disabled: (_vm: FormState, { model }: any) =>
                 model.position === 'fixed' && model._magic_position === 'fixedTop',
             },
           ],
@@ -356,7 +356,7 @@ export const advancedTabConfig: TabPaneConfig = {
 
 export const displayTabConfig: TabPaneConfig = {
   title: '显示条件',
-  display: (vm: FormState, { model }: any) => model.type !== 'page',
+  display: (_vm: FormState, { model }: any) => model.type !== 'page',
   items: [
     {
       type: 'display-conds',

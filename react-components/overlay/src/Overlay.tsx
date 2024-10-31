@@ -65,7 +65,7 @@ const Overlay: React.FC<OverlayProps> = ({
   }
 
   const editorSelectHandler = (
-    info: {
+    _info: {
       node: MNode;
       page: MPage;
       parent: MContainer;

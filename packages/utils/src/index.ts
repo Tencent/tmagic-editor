@@ -47,7 +47,7 @@ export const sleep = (ms: number): Promise<void> =>
 // 驼峰转换横线
 export const toLine = (name = '') => name.replace(/\B([A-Z])/g, '-$1').toLowerCase();
 
-export const toHump = (name = ''): string => name.replace(/-(\w)/g, (all, letter) => letter.toUpperCase());
+export const toHump = (name = ''): string => name.replace(/-(\w)/g, (_all, letter) => letter.toUpperCase());
 
 export const emptyFn = (): any => undefined;
 

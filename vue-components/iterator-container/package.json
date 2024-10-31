@@ -21,7 +21,7 @@
     "@tmagic/vue-runtime-help": "workspace:^",
     "@vue/composition-api": ">=1.7.2",
     "typescript": "*",
-    "vue": ">=2.0.0 || >=3.0.0"
+    "vue": ">=2.6.0 || >=3.5.0"
   },
   "peerDependenciesMeta": {
     "@vue/composition-api": {

@@ -24,7 +24,7 @@ export const createCodeBlockTarget = (id: Id, codeBlock: CodeBlockContent, initi
     id,
     initialDeps,
     name: codeBlock.name,
-    isTarget: (key: string | number, value: any) => {
+    isTarget: (_key: string | number, value: any) => {
       if (id === value) {
         return true;
       }
@@ -264,7 +264,7 @@ export const createDataSourceMethodTarget = (ds: Pick<DataSourceSchema, 'id' | '
     type: DepTargetType.DATA_SOURCE_METHOD,
     id: ds.id,
     initialDeps,
-    isTarget: (key: string | number, value: any) => {
+    isTarget: (_key: string | number, value: any) => {
       // 使用data-source-method-select 可以配置出来
       if (!Array.isArray(value) || !ds) {
         return false;

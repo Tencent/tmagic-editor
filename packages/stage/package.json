@@ -26,6 +26,7 @@
     "node": ">=18"
   },
   "repository": {
+    "directory": "packages/stage",
     "type": "git",
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
@@ -44,7 +45,7 @@
     "@types/node": "^18.19.0",
     "rimraf": "^3.0.2",
     "sass": "^1.78.0",
-    "vite": "^5.4.3"
+    "vite": "^5.4.10"
   },
   "peerDependencies": {
     "@tmagic/core": "workspace:*",
