@@ -43,6 +43,7 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
+    "@popperjs/core": "^2.11.8",
     "lodash-es": "^4.17.21",
     "sortablejs": "^1.15.2"
   },
@@ -61,8 +62,8 @@
   "peerDependencies": {
     "@tmagic/design": "workspace:*",
     "@tmagic/utils": "workspace:*",
-    "vue": "^3.4.35",
-    "typescript": "*"
+    "typescript": "*",
+    "vue": "^3.4.35"
   },
   "peerDependenciesMeta": {
     "typescript": {
