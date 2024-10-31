@@ -1,3 +1,12 @@
+## [1.4.19](https://github.com/Tencent/tmagic-editor/compare/v1.4.18...v1.4.19) (2024-10-31)
+
+
+### Bug Fixes
+
+* **form:** text组件配置了tooltip无效 ([3a7bfef](https://github.com/Tencent/tmagic-editor/commit/3a7bfef5cf7b7aeb46d93f1e739c7f310bc53cd6))
+
+
+
 ## [1.4.18](https://github.com/Tencent/tmagic-editor/compare/v1.4.17...v1.4.18) (2024-09-14)
 
 
