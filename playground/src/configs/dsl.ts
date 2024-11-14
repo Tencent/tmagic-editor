@@ -48,6 +48,22 @@ const dsl: MApp = {
       },
       params: [],
     },
+    code_5317: {
+      name: 'code1',
+      content: ({ flowState }) => {
+        console.log('code1: set flowState.name=lisa');
+        flowState.name = 'lisa';
+      },
+      params: [],
+    },
+    code_5318: {
+      name: 'code2',
+      content: ({ flowState }) => {
+        console.log('print flowState.name', flowState.name);
+        flowState.abort();
+      },
+      params: [],
+    },
   },
   items: [
     {

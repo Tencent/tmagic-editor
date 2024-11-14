@@ -21,7 +21,7 @@ export const useCodeBlockEdit = (codeBlockService?: CodeBlockService) => {
 
     codeConfig.value = {
       name: '',
-      content: `({app, params}) => {\n  // place your code here\n}`,
+      content: `({app, params, flowState}) => {\n  // place your code here\n}`,
       params: [],
     };
 

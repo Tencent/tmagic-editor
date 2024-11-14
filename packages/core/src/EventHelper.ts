@@ -35,6 +35,7 @@ import {
 import { DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX, getIdFromEl } from '@tmagic/utils';
 
 import type { default as TMagicApp } from './App';
+import FlowState from './FlowState';
 import type { default as TMagicNode } from './Node';
 import { COMMON_EVENT_PREFIX, isCommonMethod, triggerCommonMethod } from './utils';
 
@@ -176,26 +177,35 @@ export default class EventHelper extends EventEmitter {
    * @param args 事件参数
    */
   private async eventHandler(config: EventConfig | number, fromCpt: TMagicNode | DataSource | undefined, args: any[]) {
+    console.log('eventHandler', config, fromCpt);
     const eventConfig = typeof config === 'number' ? (fromCpt as TMagicNode).events[config] : config;
     if (has(eventConfig, 'actions')) {
       // EventConfig类型
+      const flowState = new FlowState();
       const { actions } = eventConfig as EventConfig;
       for (let i = 0; i < actions.length; i++) {
+        if (flowState?.isAbort) break;
         if (typeof config === 'number') {
           // 事件响应中可能会有修改数据源数据的，会更新dsl，所以这里需要重新获取
           const actionItem = ((fromCpt as TMagicNode).events[config] as EventConfig).actions[i];
-          this.actionHandler(actionItem, fromCpt as TMagicNode, args);
+          this.actionHandler(actionItem, fromCpt as TMagicNode, args, flowState);
         } else {
-          this.actionHandler(actions[i], fromCpt as DataSource, args);
+          this.actionHandler(actions[i], fromCpt as DataSource, args, flowState);
         }
       }
+      flowState.reset();
     } else {
       // 兼容DeprecatedEventConfig类型 组件动作
       await this.compActionHandler(eventConfig as unknown as CompItemConfig, fromCpt as TMagicNode, args);
     }
   }
 
-  private async actionHandler(actionItem: EventActionItem, fromCpt: TMagicNode | DataSource, args: any[]) {
+  private async actionHandler(
+    actionItem: EventActionItem,
+    fromCpt: TMagicNode | DataSource,
+    args: any[],
+    flowState: FlowState,
+  ) {
     if (actionItem.actionType === ActionType.COMP) {
       const compActionItem = actionItem as CompItemConfig;
       // 组件动作
@@ -203,13 +213,13 @@ export default class EventHelper extends EventEmitter {
     } else if (actionItem.actionType === ActionType.CODE) {
       const codeActionItem = actionItem as CodeItemConfig;
       // 执行代码块
-      await this.app.runCode(codeActionItem.codeId, codeActionItem.params || {}, args);
+      await this.app.runCode(codeActionItem.codeId, codeActionItem.params || {}, args, flowState);
     } else if (actionItem.actionType === ActionType.DATA_SOURCE) {
       const dataSourceActionItem = actionItem as DataSourceItemConfig;
 
       const [dsId, methodName] = dataSourceActionItem.dataSourceMethod;
 
-      await this.app.runDataSourceMethod(dsId, methodName, dataSourceActionItem.params || {}, args);
+      await this.app.runDataSourceMethod(dsId, methodName, dataSourceActionItem.params || {}, args, flowState);
     }
   }
 
