@@ -21,7 +21,7 @@ export const useDataSourceMethod = () => {
     createCode: async (model: DataSourceSchema) => {
       codeConfig.value = {
         name: '',
-        content: `({ params, dataSource, app }) => {\n  // place your code here\n}`,
+        content: `({ params, dataSource, app, flowState }) => {\n  // place your code here\n}`,
         params: [],
       };
 

@@ -26,6 +26,7 @@ import type { CodeBlockDSL, Id, JsEngine, MApp, RequestFunction } from '@tmagic/
 import Env from './Env';
 import EventHelper from './EventHelper';
 import Flexible from './Flexible';
+import FlowState from './FlowState';
 import Node from './Node';
 import Page from './Page';
 import { transformStyle as defaultTransformStyle } from './utils';
@@ -227,15 +228,21 @@ class App extends EventEmitter {
    * @param eventConfig 代码动作的配置
    * @returns void
    */
-  public async runCode(codeId: Id, params: Record<string, any>, args: any[]) {
+  public async runCode(codeId: Id, params: Record<string, any>, args: any[], flowState: FlowState) {
     if (!codeId || isEmpty(this.codeDsl)) return;
     const content = this.codeDsl?.[codeId]?.content;
     if (typeof content === 'function') {
-      await content({ app: this, params, eventParams: args });
+      await content({ app: this, params, eventParams: args, flowState });
     }
   }
 
-  public async runDataSourceMethod(dsId: string, methodName: string, params: Record<string, any>, args: any[]) {
+  public async runDataSourceMethod(
+    dsId: string,
+    methodName: string,
+    params: Record<string, any>,
+    args: any[],
+    flowState: FlowState,
+  ) {
     if (!dsId || !methodName) return;
 
     const dataSource = this.dataSourceManager?.get(dsId);
@@ -249,7 +256,7 @@ class App extends EventEmitter {
     if (!method) return;
 
     if (typeof method.content === 'function') {
-      await method.content({ app: this, params, dataSource, eventParams: args });
+      await method.content({ app: this, params, dataSource, eventParams: args, flowState });
     }
   }
 
