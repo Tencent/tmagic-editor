@@ -177,7 +177,6 @@ export default class EventHelper extends EventEmitter {
    * @param args 事件参数
    */
   private async eventHandler(config: EventConfig | number, fromCpt: TMagicNode | DataSource | undefined, args: any[]) {
-    console.log('eventHandler', config, fromCpt);
     const eventConfig = typeof config === 'number' ? (fromCpt as TMagicNode).events[config] : config;
     if (has(eventConfig, 'actions')) {
       // EventConfig类型
