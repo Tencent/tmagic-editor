@@ -1,16 +1,23 @@
 <template>
   <div class="m-editor-page-bar" ref="pageBar">
     <slot name="prepend"></slot>
-
-    <div v-if="canScroll" class="m-editor-page-bar-item m-editor-page-bar-item-icon" @click="scroll('left')">
-      <Icon :icon="ArrowLeftBold"></Icon>
-    </div>
-
-    <div v-if="length" class="m-editor-page-bar-items" ref="itemsContainer" :style="`width: ${itemsContainerWidth}px`">
+    <div v-if="length" class="m-editor-page-bar-items" ref="itemsContainer">
       <slot></slot>
     </div>
 
-    <div v-if="canScroll" class="m-editor-page-bar-item m-editor-page-bar-item-icon" @click="scroll('right')">
+    <div
+      v-if="canScroll"
+      class="m-editor-page-bar-item m-editor-page-bar-item-icon m-editor-page-bar-item-left-icon"
+      @click="scroll('left')"
+    >
+      <Icon :icon="ArrowLeftBold"></Icon>
+    </div>
+
+    <div
+      v-if="canScroll"
+      class="m-editor-page-bar-item m-editor-page-bar-item-icon m-editor-page-bar-item-right-icon"
+      @click="scroll('right')"
+    >
       <Icon :icon="ArrowRightBold"></Icon>
     </div>
   </div>
@@ -80,18 +87,18 @@ onBeforeUnmount(() => {
 let translateLeft = 0;
 
 const scroll = (type: 'left' | 'right' | 'start' | 'end') => {
-  if (!itemsContainer.value) return;
+  if (!itemsContainer.value || !canScroll.value) return;
 
   const maxScrollLeft = itemsContainer.value.scrollWidth - itemsContainerWidth.value;
 
   if (type === 'left') {
-    translateLeft += 100;
+    translateLeft += 200;
 
     if (translateLeft > 0) {
       translateLeft = 0;
     }
   } else if (type === 'right') {
-    translateLeft -= 100;
+    translateLeft -= 200;
 
     if (-translateLeft > maxScrollLeft) {
       translateLeft = -maxScrollLeft;
@@ -110,11 +117,13 @@ watch(
   (length = 0, preLength = 0) => {
     setTimeout(() => {
       setCanScroll();
-      if (length < preLength) {
-        scroll('start');
-      } else {
-        scroll('end');
-      }
+      nextTick(() => {
+        if (length < preLength || preLength === 0) {
+          scroll('start');
+        } else {
+          scroll('end');
+        }
+      });
       if (length > 1) {
         const el = document.querySelector('.m-editor-page-bar-items') as HTMLElement;
         let beforeDragList: Id[] = [];
