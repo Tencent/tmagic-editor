@@ -7,7 +7,7 @@
         :config="selectConfig"
         :model="model"
         :size="size"
-        @change="onParamsChangeHandler"
+        @change="onCodeIdChangeHandler"
       ></MContainer>
 
       <!-- 查看/编辑按钮 -->
@@ -41,7 +41,14 @@ import { isEmpty, map } from 'lodash-es';
 
 import type { Id } from '@tmagic/core';
 import { TMagicButton } from '@tmagic/design';
-import { createValues, type FieldProps, filterFunction, type FormState, MContainer } from '@tmagic/form';
+import {
+  type ContainerChangeEventData,
+  createValues,
+  type FieldProps,
+  filterFunction,
+  type FormState,
+  MContainer,
+} from '@tmagic/form';
 
 import CodeParams from '@editor/components/CodeParams.vue';
 import MIcon from '@editor/components/Icon.vue';
@@ -55,7 +62,9 @@ defineOptions({
 const mForm = inject<FormState | undefined>('mForm');
 const services = inject<Services>('services');
 const eventBus = inject<EventBus>('eventBus');
-const emit = defineEmits(['change']);
+const emit = defineEmits<{
+  change: [v: any, eventData: ContainerChangeEventData];
+}>();
 
 const props = withDefaults(defineProps<FieldProps<CodeSelectColConfig>>(), {
   disabled: false,
@@ -125,12 +134,30 @@ const selectConfig = {
   },
 };
 
+const onCodeIdChangeHandler = (value: any) => {
+  props.model.params = value.params;
+  emit('change', props.model, {
+    changeRecords: [
+      {
+        propPath: props.prop,
+        value: value[props.name],
+      },
+    ],
+  });
+};
+
 /**
  * 参数值修改更新
  */
-const onParamsChangeHandler = (value: any) => {
+const onParamsChangeHandler = (value: any, eventData: ContainerChangeEventData) => {
   props.model.params = value.params;
-  emit('change', props.model);
+  emit('change', props.model, {
+    ...eventData,
+    changeRecords: (eventData.changeRecords || []).map((item) => ({
+      prop: `${props.prop.replace(props.name, '')}${item.propPath}`,
+      value: item.value,
+    })),
+  });
 };
 
 const editCode = (id: string) => {

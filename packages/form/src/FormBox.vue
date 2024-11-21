@@ -40,7 +40,7 @@ import { computed, ref, watchEffect } from 'vue';
 import { TMagicButton, TMagicScrollbar } from '@tmagic/design';
 
 import Form from './Form.vue';
-import type { FormConfig } from './schema';
+import type { ContainerChangeEventData, FormConfig, FormValue } from './schema';
 
 defineOptions({
   name: 'MFormBox',
@@ -68,7 +68,11 @@ const props = withDefaults(
   },
 );
 
-const emit = defineEmits(['submit', 'change', 'error']);
+const emit = defineEmits<{
+  change: [v: any, eventData: ContainerChangeEventData];
+  submit: [v: any, eventData: ContainerChangeEventData];
+  error: [e: any];
+}>();
 
 const footerHeight = 60;
 
@@ -98,14 +102,14 @@ watchEffect(() => {
 const submitHandler = async () => {
   try {
     const values = await form.value?.submitForm();
-    emit('submit', values);
+    emit('submit', values, { changeRecords: form.value?.changeRecords });
   } catch (e) {
     emit('error', e);
   }
 };
 
-const changeHandler = (value: any) => {
-  emit('change', value);
+const changeHandler = (value: FormValue, eventData: ContainerChangeEventData) => {
+  emit('change', value, eventData);
 };
 
 const show = () => {};

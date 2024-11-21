@@ -113,7 +113,7 @@
                     :lastValues="lastData[scope.$index]"
                     :is-compare="isCompare"
                     :size="size"
-                    @change="$emit('change', model[modelName])"
+                    @change="changeHandler"
                     @addDiffCount="onAddDiffCount()"
                   ></Container>
                 </template>
@@ -206,7 +206,7 @@ import {
 } from '@tmagic/design';
 import { asyncLoadJs, sleep } from '@tmagic/utils';
 
-import { FormState, SortProp, TableColumnConfig, TableConfig } from '../schema';
+import type { ContainerChangeEventData, FormState, SortProp, TableColumnConfig, TableConfig } from '../schema';
 import { display as displayFunc, initValue } from '../utils/form';
 
 import Container from './Container.vue';
@@ -395,7 +395,15 @@ const newHandler = async (row?: any) => {
   }
 
   props.model[modelName.value].push(inputs);
-  emit('change', props.model[modelName.value]);
+
+  emit('change', props.model[modelName.value], {
+    changeRecords: [
+      {
+        propPath: `${props.prop}.${props.model[modelName.value].length - 1}`,
+        value: inputs,
+      },
+    ],
+  });
 };
 
 onMounted(() => {
@@ -643,6 +651,10 @@ const getProp = (index: number) => {
 };
 
 const onAddDiffCount = () => emit('addDiffCount');
+
+const changeHandler = (v: any, eventData: ContainerChangeEventData) => {
+  emit('change', props.model, eventData);
+};
 
 defineExpose({
   toggleRowSelection,

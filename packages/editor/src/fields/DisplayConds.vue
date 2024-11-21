@@ -17,6 +17,7 @@ import { computed, inject } from 'vue';
 
 import type { DisplayCond } from '@tmagic/core';
 import {
+  type ContainerChangeEventData,
   type FieldProps,
   type FilterFunction,
   filterFunction,
@@ -33,7 +34,7 @@ defineOptions({
 });
 
 const emit = defineEmits<{
-  change: [value: DisplayCond[]];
+  change: [value: DisplayCond[], eventData?: ContainerChangeEventData];
 }>();
 
 const props = withDefaults(
@@ -149,7 +150,11 @@ const config = computed<GroupListConfig>(() => ({
   ],
 }));
 
-const changeHandler = (v: DisplayCond[]) => {
-  emit('change', v);
+const changeHandler = (v: DisplayCond[], eventData?: ContainerChangeEventData) => {
+  if (!Array.isArray(props.model[props.name])) {
+    props.model[props.name] = [];
+  }
+
+  emit('change', v, eventData);
 };
 </script>

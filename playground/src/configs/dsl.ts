@@ -152,6 +152,7 @@ const dsl: MApp = {
           text: 'Tmagic editor 营销活动编辑器',
           multiple: true,
           events: [],
+          displayConds: [],
         },
         {
           type: 'qrcode',
@@ -176,6 +177,7 @@ const dsl: MApp = {
           url: 'https://github.com/Tencent/tmagic-editor',
           events: [],
           created: [],
+          displayConds: [],
         },
         {
           type: 'img',
@@ -201,6 +203,7 @@ const dsl: MApp = {
           url: '',
           events: [],
           created: [],
+          displayConds: [],
         },
         {
           type: 'button',
@@ -245,6 +248,7 @@ const dsl: MApp = {
             },
           ],
           created: [],
+          displayConds: [],
         },
         {
           type: 'overlay',
@@ -479,14 +483,6 @@ const dsl: MApp = {
       afterResponse: '',
     },
   ],
-  dataSourceDeps: {
-    ds_b64c92b5: {
-      button_430: {
-        name: '按钮',
-        keys: ['text'],
-      },
-    },
-  },
 };
 
 export default dsl;

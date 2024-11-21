@@ -24,7 +24,7 @@ import { inject } from 'vue';
 
 import { TMagicRow } from '@tmagic/design';
 
-import { FormState, RowConfig } from '../schema';
+import type { ContainerChangeEventData, FormState, RowConfig } from '../schema';
 
 import Col from './Col.vue';
 
@@ -45,10 +45,15 @@ const props = defineProps<{
   disabled?: boolean;
 }>();
 
-const emit = defineEmits(['change', 'addDiffCount']);
+const emit = defineEmits<{
+  change: [v: any, eventData: ContainerChangeEventData];
+  addDiffCount: [];
+}>();
 
 const mForm = inject<FormState | undefined>('mForm');
 
-const changeHandler = () => emit('change', props.name ? props.model[props.name] : props.model);
+const changeHandler = (v: any, eventData: ContainerChangeEventData) => {
+  emit('change', props.name ? props.model[props.name] : props.model, eventData);
+};
 const onAddDiffCount = () => emit('addDiffCount');
 </script>

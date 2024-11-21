@@ -190,6 +190,25 @@ export default createForm([
     ],
   },
   {
+    type: 'tab',
+    name: 'tab',
+    editable: true,
+    dynamic: true,
+    active: '0',
+    tabType: 'border-card',
+    items: [
+      {
+        name: 'xx',
+        items: [
+          {
+            name: 'text',
+            text: 'text',
+          },
+        ],
+      },
+    ],
+  },
+  {
     type: 'table',
     name: 'table',
     defautSort: { prop: 'name', order: 'descending' },

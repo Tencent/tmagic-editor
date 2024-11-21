@@ -21,7 +21,7 @@ import { computed, inject } from 'vue';
 
 import { TMagicCol } from '@tmagic/design';
 
-import { ChildConfig, FormState } from '../schema';
+import type { ChildConfig, ContainerChangeEventData, FormState } from '../schema';
 import { display as displayFunction } from '../utils/form';
 
 import Container from './Container.vue';
@@ -43,10 +43,13 @@ const props = defineProps<{
   disabled?: boolean;
 }>();
 
-const emit = defineEmits(['change', 'addDiffCount']);
+const emit = defineEmits<{
+  change: [v: any, eventData: ContainerChangeEventData];
+  addDiffCount: [];
+}>();
 
 const mForm = inject<FormState | undefined>('mForm');
 const display = computed(() => displayFunction(mForm, props.config.display, props));
-const changeHandler = () => emit('change', props.model);
+const changeHandler = (v: any, eventData: ContainerChangeEventData) => emit('change', v, eventData);
 const onAddDiffCount = () => emit('addDiffCount');
 </script>

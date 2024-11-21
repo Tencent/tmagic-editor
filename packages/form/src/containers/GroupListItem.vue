@@ -48,7 +48,7 @@ import { CaretBottom, CaretRight, CaretTop, Delete } from '@element-plus/icons-v
 
 import { TMagicButton, TMagicIcon } from '@tmagic/design';
 
-import { FormState, GroupListConfig } from '../schema';
+import type { ContainerChangeEventData, FormState, GroupListConfig } from '../schema';
 import { filterFunction } from '../utils/form';
 
 import Container from './Container.vue';
@@ -103,7 +103,9 @@ const itemExtra = computed(() => filterFunction(mForm, props.config.itemExtra, p
 
 const removeHandler = () => emit('remove-item', props.index);
 
-const changeHandler = () => emit('change');
+const changeHandler = (v: any, eventData: ContainerChangeEventData) => {
+  emit('change', props.model, eventData);
+};
 
 const expandHandler = () => {
   expand.value = !expand.value;

@@ -37,7 +37,7 @@ import { inject, ref, watchEffect } from 'vue';
 
 import { TMagicStep, TMagicSteps } from '@tmagic/design';
 
-import { FormState, StepConfig } from '../schema';
+import type { ContainerChangeEventData, FormState, StepConfig } from '../schema';
 
 import Container from './Container.vue';
 
@@ -48,6 +48,7 @@ defineOptions({
 const props = withDefaults(
   defineProps<{
     model: any;
+    name?: string;
     lastValues?: any;
     isCompare?: boolean;
     config: StepConfig;
@@ -61,7 +62,10 @@ const props = withDefaults(
   },
 );
 
-const emit = defineEmits(['change', 'addDiffCount']);
+const emit = defineEmits<{
+  change: [v: any, eventData: ContainerChangeEventData];
+  addDiffCount: [];
+}>();
 
 const mForm = inject<FormState | undefined>('mForm');
 const active = ref(1);
@@ -75,8 +79,9 @@ const stepClick = (index: number) => {
   mForm?.$emit('update:stepActive', active.value);
 };
 
-const changeHandler = () => {
-  emit('change', props.model);
+const changeHandler = (v: any, eventData: ContainerChangeEventData) => {
+  emit('change', props.model, eventData);
 };
+
 const onAddDiffCount = () => emit('addDiffCount');
 </script>

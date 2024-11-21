@@ -86,7 +86,9 @@ const props = withDefaults(
   },
 );
 
-const emit = defineEmits<(e: 'change', value: Record<string, any>) => void>();
+const emit = defineEmits<{
+  change: [value: Record<string, any>];
+}>();
 
 const records = ref<[string, string][]>([]);
 const showCode = ref(false);

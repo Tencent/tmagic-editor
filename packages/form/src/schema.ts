@@ -21,6 +21,16 @@ export interface ValidateError {
   field: string;
 }
 
+export interface ChangeRecord {
+  propPath?: string;
+  value: any;
+}
+
+export interface ContainerChangeEventData {
+  modifyKey?: string;
+  changeRecords?: ChangeRecord[];
+}
+
 export interface FieldProps<T = any> {
   config: T;
   model: any;
@@ -157,34 +167,34 @@ export interface Input {
 export type TypeFunction = (
   mForm: FormState | undefined,
   data: {
-    model: Record<any, any>;
+    model: FormValue;
   },
 ) => string;
 
 export type FilterFunction<T = boolean> = (
   mForm: FormState | undefined,
   data: {
-    model: Record<any, any>;
-    values: Record<any, any>;
-    parent?: Record<any, any>;
-    formValue: Record<any, any>;
+    model: FormValue;
+    values: FormValue;
+    parent?: FormValue;
+    formValue: FormValue;
     prop: string;
     config: any;
     index?: number;
   },
 ) => T;
 
-type OnChangeHandler = (
-  mForm: FormState | undefined,
-  value: any,
-  data: {
-    model: Record<any, any>;
-    values: Record<any, any>;
-    parent?: Record<any, any>;
-    formValue: Record<any, any>;
-    config: any;
-  },
-) => any;
+export interface OnChangeHandlerData {
+  model: FormValue;
+  values?: FormValue;
+  parent?: FormValue;
+  formValue?: FormValue;
+  config: any;
+  prop: string;
+  changeRecords: ChangeRecord[];
+}
+
+export type OnChangeHandler = (mForm: FormState | undefined, value: any, data: OnChangeHandlerData) => any;
 
 type DefaultValueFunction = (mForm: FormState | undefined) => any;
 

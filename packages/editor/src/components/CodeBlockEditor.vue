@@ -63,7 +63,13 @@ import { computed, inject, Ref, ref } from 'vue';
 
 import type { CodeBlockContent } from '@tmagic/core';
 import { TMagicButton, TMagicDialog, tMagicMessage, tMagicMessageBox, TMagicTag } from '@tmagic/design';
-import { type FormConfig, type FormState, MFormBox, type TableColumnConfig } from '@tmagic/form';
+import {
+  type ContainerChangeEventData,
+  type FormConfig,
+  type FormState,
+  MFormBox,
+  type TableColumnConfig,
+} from '@tmagic/form';
 
 import FloatingBox from '@editor/components/FloatingBox.vue';
 import { useEditorContentHeight } from '@editor/hooks/use-editor-content-height';
@@ -88,7 +94,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  submit: [values: CodeBlockContent];
+  submit: [values: CodeBlockContent, eventData: ContainerChangeEventData];
 }>();
 
 const services = inject<Services>('services');
@@ -209,9 +215,9 @@ const functionConfig = computed<FormConfig>(() => [
   },
 ]);
 
-const submitForm = (values: CodeBlockContent) => {
+const submitForm = (values: CodeBlockContent, data: ContainerChangeEventData) => {
   changedValue.value = undefined;
-  emit('submit', values);
+  emit('submit', values, data);
 };
 
 const errorHandler = (error: any) => {
@@ -238,7 +244,7 @@ const beforeClose = (done: (cancel?: boolean) => void) => {
       distinguishCancelAndClose: true,
     })
     .then(() => {
-      changedValue.value && submitForm(changedValue.value);
+      changedValue.value && submitForm(changedValue.value, { changeRecords: formBox.value?.form?.changeRecords });
       done();
     })
     .catch((action: string) => {
