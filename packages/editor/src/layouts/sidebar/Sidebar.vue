@@ -19,6 +19,7 @@
     </div>
     <div
       class="m-editor-sidebar-content"
+      :class="{ 'm-editor-dep-collecting': collecting }"
       v-for="(config, index) in sideBarItems"
       :key="config.$key ?? index"
       v-show="[config.text, config.$key, `${index}`].includes(activeTabName)"
@@ -196,6 +197,8 @@ const props = withDefaults(
 );
 
 const services = inject<Services>('services');
+
+const collecting = computed(() => services?.depService.get('collecting'));
 
 const columnLeftWidth = computed(() => services?.uiService.get('columnWidth')[ColumnLayout.LEFT] || 0);
 const { height: editorContentHeight } = useEditorContentHeight();

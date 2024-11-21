@@ -3,6 +3,8 @@
     class="m-editor-stage"
     ref="stageWrap"
     tabindex="-1"
+    v-loading="stageLoading"
+    element-loading-text="Runtime 加载中..."
     :width="stageRect?.width"
     :height="stageRect?.height"
     :wrap-width="stageContainerRect?.width"
@@ -78,6 +80,8 @@ let runtime: Runtime | null = null;
 
 const services = inject<Services>('services');
 const stageOptions = inject<StageOptions>('stageOptions');
+
+const stageLoading = computed(() => services?.editorService.get('stageLoading') || false);
 
 const stageWrap = ref<InstanceType<typeof ScrollViewer>>();
 const stageContainer = ref<HTMLDivElement>();

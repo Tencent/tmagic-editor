@@ -31,10 +31,28 @@ export interface DepEvents {
   collected: [nodes: MNode[], deep: boolean];
 }
 
+interface State {
+  collecting: boolean;
+}
+
+type StateKey = keyof State;
+
 const idleTask = new IdleTask<{ node: TargetNode; deep: boolean; target: Target }>();
 
 class Dep extends BaseService {
+  private state = reactive<State>({
+    collecting: false,
+  });
+
   private watcher = new Watcher({ initialTargets: reactive({}) });
+
+  public set<K extends StateKey, T extends State[K]>(name: K, value: T) {
+    this.state[name] = value;
+  }
+
+  public get<K extends StateKey>(name: K): State[K] {
+    return this.state[name];
+  }
 
   public removeTargets(type: string = DepTargetType.DEFAULT) {
     this.watcher.removeTargets(type);
@@ -71,43 +89,40 @@ class Dep extends BaseService {
   }
 
   public collect(nodes: MNode[], depExtendedData: DepExtendedData = {}, deep = false, type?: DepTargetType) {
+    this.set('collecting', true);
     this.watcher.collectByCallback(nodes, type, ({ node, target }) => {
       this.collectNode(node, target, depExtendedData, deep);
     });
+    this.set('collecting', false);
 
     this.emit('collected', nodes, deep);
   }
 
   public collectIdle(nodes: MNode[], depExtendedData: DepExtendedData = {}, deep = false, type?: DepTargetType) {
+    this.set('collecting', true);
     let startTask = false;
     this.watcher.collectByCallback(nodes, type, ({ node, target }) => {
       startTask = true;
-      idleTask.enqueueTask(
-        ({ node, deep, target }) => {
-          this.collectNode(node, target, depExtendedData, deep);
-        },
-        {
-          node,
-          deep,
-          target,
-        },
-      );
+
+      this.enqueueTask(node, target, depExtendedData, deep);
     });
 
     return new Promise<void>((resolve) => {
       if (!startTask) {
         this.emit('collected', nodes, deep);
+        this.set('collecting', false);
         resolve();
         return;
       }
       idleTask.once('finish', () => {
         this.emit('collected', nodes, deep);
+        this.set('collecting', false);
         resolve();
       });
     });
   }
 
-  collectNode(node: MNode, target: Target, depExtendedData: DepExtendedData = {}, deep = false) {
+  public collectNode(node: MNode, target: Target, depExtendedData: DepExtendedData = {}, deep = false) {
     // 先删除原有依赖，重新收集
     if (isPage(node)) {
       Object.entries(target.deps).forEach(([depKey, dep]) => {
@@ -138,6 +153,10 @@ class Dep extends BaseService {
     return this.watcher.hasSpecifiedTypeTarget(type);
   }
 
+  public clearIdleTasks() {
+    idleTask.clearTasks();
+  }
+
   public on<Name extends keyof DepEvents, Param extends DepEvents[Name]>(
     eventName: Name,
     listener: (...args: Param) => void | Promise<void>,
@@ -154,6 +173,25 @@ class Dep extends BaseService {
 
   public emit<Name extends keyof DepEvents, Param extends DepEvents[Name]>(eventName: Name, ...args: Param) {
     return super.emit(eventName, ...args);
+  }
+
+  private enqueueTask(node: MNode, target: Target, depExtendedData: DepExtendedData, deep: boolean) {
+    idleTask.enqueueTask(
+      ({ node, deep, target }) => {
+        this.collectNode(node, target, depExtendedData, deep);
+      },
+      {
+        node,
+        deep: false,
+        target,
+      },
+    );
+
+    if (deep && Array.isArray(node.items) && node.items.length) {
+      node.items.forEach((item) => {
+        this.enqueueTask(item, target, depExtendedData, deep);
+      });
+    }
   }
 }
 

@@ -17,7 +17,6 @@
  */
 
 export * from './use-code-block-edit';
-export * from './use-data-source-method';
 export * from './use-stage';
 export * from './use-float-box';
 export * from './use-window-rect';

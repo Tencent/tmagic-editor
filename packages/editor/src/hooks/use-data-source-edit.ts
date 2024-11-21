@@ -1,6 +1,7 @@
 import { computed, ref } from 'vue';
 
 import type { DataSourceSchema } from '@tmagic/core';
+import type { ContainerChangeEventData } from '@tmagic/form';
 
 import DataSourceConfigPanel from '@editor/layouts/sidebar/data-source/DataSourceConfigPanel.vue';
 import type { DataSourceService } from '@editor/services/dataSource';
@@ -24,9 +25,9 @@ export const useDataSourceEdit = (dataSourceService?: DataSourceService) => {
     editDialog.value.show();
   };
 
-  const submitDataSourceHandler = (value: DataSourceSchema) => {
+  const submitDataSourceHandler = (value: DataSourceSchema, eventData: ContainerChangeEventData) => {
     if (value.id) {
-      dataSourceService?.update(value);
+      dataSourceService?.update(value, { changeRecords: eventData.changeRecords });
     } else {
       dataSourceService?.add(value);
     }
