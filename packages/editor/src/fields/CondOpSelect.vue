@@ -39,7 +39,10 @@ defineOptions({
   name: 'MFieldsCondOpSelect',
 });
 
-const emit = defineEmits(['change']);
+const emit = defineEmits<{
+  change: [value: string];
+}>();
+
 const { dataSourceService } = inject<Services>('services') || {};
 
 const props = defineProps<FieldProps<CondOpSelectConfig>>();
@@ -81,7 +84,7 @@ const options = computed(() => {
   return [...arrayOptions, ...eqOptions, ...numberOptions];
 });
 
-const fieldChangeHandler = (v: string[]) => {
+const fieldChangeHandler = (v: string) => {
   emit('change', v);
 };
 </script>

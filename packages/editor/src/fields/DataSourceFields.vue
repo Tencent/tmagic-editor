@@ -51,7 +51,13 @@ import { inject, Ref, ref } from 'vue';
 
 import type { DataSchema } from '@tmagic/core';
 import { TMagicButton, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
-import { type FieldProps, type FormConfig, type FormState, MFormBox } from '@tmagic/form';
+import {
+  type ContainerChangeEventData,
+  type FieldProps,
+  type FormConfig,
+  type FormState,
+  MFormBox,
+} from '@tmagic/form';
 import { type ColumnConfig, MagicTable } from '@tmagic/table';
 import { getDefaultValueFromFields } from '@tmagic/utils';
 
@@ -75,7 +81,9 @@ const props = withDefaults(
   },
 );
 
-const emit = defineEmits(['change']);
+const emit = defineEmits<{
+  change: [v: any, eventData?: ContainerChangeEventData];
+}>();
 
 const services = inject<Services>('services');
 
@@ -91,16 +99,29 @@ const newHandler = () => {
   addDialogVisible.value = true;
 };
 
-const fieldChange = ({ index, ...value }: Record<string, any>) => {
-  if (index > -1) {
-    props.model[props.name][index] = value;
-  } else {
-    props.model[props.name].push(value);
-  }
-
+const fieldChange = ({ index, ...value }: Record<string, any>, data: ContainerChangeEventData) => {
   addDialogVisible.value = false;
 
-  emit('change', props.model[props.name]);
+  if (index > -1) {
+    emit('change', value, {
+      modifyKey: index,
+      changeRecords: (data.changeRecords || []).map((item) => ({
+        propPath: `${props.prop}.${index}.${item.propPath}`,
+        value: item.value,
+      })),
+    });
+  } else {
+    const modifyKey = props.model[props.name].length;
+    emit('change', value, {
+      modifyKey,
+      changeRecords: [
+        {
+          propPath: `${props.prop}.${modifyKey}`,
+          value,
+        },
+      ],
+    });
+  }
 };
 
 const fieldColumns: ColumnConfig[] = [
@@ -310,11 +331,9 @@ const addFromJsonFromChange = ({ data }: { data: string }) => {
   try {
     const value = JSON.parse(data);
 
-    props.model[props.name] = getFieldsConfig(value, props.model[props.name]);
-
     addFromJsonDialogVisible.value = false;
 
-    emit('change', props.model[props.name]);
+    emit('change', getFieldsConfig(value, props.model[props.name]));
   } catch (e: any) {
     tMagicMessage.error(e.message);
   }

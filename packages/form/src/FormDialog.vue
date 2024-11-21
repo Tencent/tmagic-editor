@@ -65,7 +65,7 @@ import { computed, ref } from 'vue';
 import { TMagicButton, TMagicCol, TMagicDialog, TMagicRow } from '@tmagic/design';
 
 import Form from './Form.vue';
-import { FormConfig, StepConfig } from './schema';
+import { ContainerChangeEventData, FormConfig, FormValue, StepConfig } from './schema';
 
 defineOptions({
   name: 'MFormDialog',
@@ -132,7 +132,7 @@ const closeHandler = () => {
 const save = async () => {
   try {
     const values = await form.value?.submitForm();
-    emit('submit', values);
+    emit('submit', values, { changeRecords: form.value?.changeRecords });
   } catch (e) {
     emit('error', e);
   }
@@ -146,8 +146,8 @@ const nextStep = () => {
   stepActive.value += 1;
 };
 
-const changeHandler = (value: any) => {
-  emit('change', value);
+const changeHandler = (value: FormValue, eventData: ContainerChangeEventData) => {
+  emit('change', value, eventData);
 };
 
 const show = () => {

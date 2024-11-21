@@ -6,7 +6,7 @@
         :prop="`${prop}${prop ? '.' : ''}${config.name}.value`"
         :true-value="1"
         :false-value="0"
-        @update:modelValue="change"
+        @update:modelValue="valueChangeHandler"
         ><span v-html="config.legend"></span><span v-if="config.extra" v-html="config.extra" class="m-form-tip"></span
       ></TMagicCheckbox>
     </component>
@@ -29,7 +29,7 @@
           :disabled="disabled"
           :labelWidth="lWidth"
           :size="size"
-          @change="change"
+          @change="changeHandler"
           @add-diff-count="onAddDiffCount()"
         ></Container>
       </div>
@@ -50,7 +50,7 @@
         :labelWidth="lWidth"
         :size="size"
         :disabled="disabled"
-        @change="change"
+        @change="changeHandler"
         @addDiffCount="onAddDiffCount()"
       ></Container>
     </template>
@@ -62,7 +62,7 @@ import { computed, inject } from 'vue';
 
 import { TMagicCheckbox } from '@tmagic/design';
 
-import { FieldsetConfig, FormState } from '../schema';
+import { ContainerChangeEventData, FieldsetConfig, FormState } from '../schema';
 
 import Container from './Container.vue';
 
@@ -90,7 +90,10 @@ const props = withDefaults(
   },
 );
 
-const emit = defineEmits(['change', 'addDiffCount']);
+const emit = defineEmits<{
+  change: [v: any, eventData: ContainerChangeEventData];
+  addDiffCount: [];
+}>();
 
 const mForm = inject<FormState | undefined>('mForm');
 
@@ -110,9 +113,11 @@ const lWidth = computed(() => {
   return props.config.labelWidth || props.labelWidth || (props.config.text ? undefined : '0');
 });
 
-const change = () => {
-  emit('change', props.model);
+const valueChangeHandler = (value: number | boolean) => {
+  emit('change', value, { modifyKey: 'value' });
 };
+
+const changeHandler = (v: any, eventData: ContainerChangeEventData) => emit('change', v, eventData);
 
 const key = (item: any, index: number) => item[mForm?.keyProp || '__key'] ?? index;
 

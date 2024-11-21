@@ -71,12 +71,12 @@
 
 <script setup lang="ts">
 import { computed, inject, ref, watchEffect } from 'vue';
-import { cloneDeep, isEmpty } from 'lodash-es';
+import { isEmpty } from 'lodash-es';
 
 import { getDesignConfig, TMagicBadge } from '@tmagic/design';
 
-import { FormState, TabConfig, TabPaneConfig } from '../schema';
-import { display as displayFunc, filterFunction } from '../utils/form';
+import type { ContainerChangeEventData, FormState, TabConfig, TabPaneConfig } from '../schema';
+import { display as displayFunc, filterFunction, initValue } from '../utils/form';
 
 import Container from './Container.vue';
 
@@ -137,7 +137,10 @@ const props = withDefaults(
   },
 );
 
-const emit = defineEmits(['change', 'addDiffCount']);
+const emit = defineEmits<{
+  change: [v: any, eventData?: ContainerChangeEventData];
+  addDiffCount: [];
+}>();
 
 const mForm = inject<FormState | undefined>('mForm');
 const activeTabName = ref(getActive(mForm, props, ''));
@@ -166,8 +169,8 @@ const tabItems = (tab: TabPaneConfig) => (props.config.dynamic ? props.config.it
 
 const tabClickHandler = (tab: any) => tabClick(mForm, tab, props);
 
-const onTabAdd = () => {
-  if (!props.config.name) throw new Error('dynamic tab 必须配置name');
+const onTabAdd = async () => {
+  if (!props.name) throw new Error('dynamic tab 必须配置name');
 
   if (typeof props.config.onTabAdd === 'function') {
     props.config.onTabAdd(mForm, {
@@ -175,17 +178,32 @@ const onTabAdd = () => {
       prop: props.prop,
       config: props.config,
     });
-  } else if (tabs.value.length > 0) {
-    const newObj = cloneDeep(tabs.value[0]);
+    emit('change', props.model);
+  } else {
+    const newObj = await initValue(mForm, {
+      config: props.config.items,
+      initValues: {},
+    });
+
     newObj.title = `标签${tabs.value.length + 1}`;
-    props.model[props.config.name].push(newObj);
+
+    props.model[props.name].push(newObj);
+
+    emit('change', props.model[props.name], {
+      changeRecords: [
+        {
+          propPath: `${props.prop}.${props.model[props.name].length - 1}`,
+          value: newObj,
+        },
+      ],
+    });
   }
-  emit('change', props.model);
-  mForm?.$emit('field-change', props.prop, props.model[props.config.name]);
+
+  mForm?.$emit('field-change', props.prop, props.model[props.name]);
 };
 
 const onTabRemove = (tabName: string) => {
-  if (!props.config.name) throw new Error('dynamic tab 必须配置name');
+  if (!props.name) throw new Error('dynamic tab 必须配置name');
 
   if (typeof props.config.onTabRemove === 'function') {
     props.config.onTabRemove(mForm, tabName, {
@@ -194,23 +212,20 @@ const onTabRemove = (tabName: string) => {
       config: props.config,
     });
   } else {
-    props.model[props.config.name].splice(+tabName, 1);
+    props.model[props.name].splice(+tabName, 1);
 
     // 防止删除后没有选中的问题
-    if (tabName < activeTabName.value || activeTabName.value >= props.model[props.config.name].length) {
+    if (tabName < activeTabName.value || activeTabName.value >= props.model[props.name].length) {
       activeTabName.value = (+activeTabName.value - 1).toString();
       tabClick(mForm, { name: activeTabName.value }, props);
     }
   }
   emit('change', props.model);
-  mForm?.$emit('field-change', props.prop, props.model[props.config.name]);
+  mForm?.$emit('field-change', props.prop, props.model[props.name]);
 };
 
-const changeHandler = () => {
-  emit('change', props.model);
-  if (typeof props.config.onChange === 'function') {
-    props.config.onChange(mForm, { model: props.model, prop: props.prop, config: props.config });
-  }
+const changeHandler = (v: any, eventData: ContainerChangeEventData) => {
+  emit('change', props.model, eventData);
 };
 
 // 在tabs组件中收集事件触发次数，即该tab下的差异数

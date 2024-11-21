@@ -25,7 +25,7 @@ const emit = defineEmits<{
   change: [value: string | any];
 }>();
 
-const props = withDefaults(
+withDefaults(
   defineProps<
     FieldProps<
       {
@@ -44,7 +44,6 @@ const props = withDefaults(
 );
 
 const save = (v: string | any) => {
-  props.model[props.name] = v;
   emit('change', v);
 };
 </script>

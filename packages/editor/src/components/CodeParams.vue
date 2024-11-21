@@ -13,7 +13,7 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
 
-import { FormConfig, MForm } from '@tmagic/form';
+import { type ContainerChangeEventData, type FormConfig, type FormValue, MForm } from '@tmagic/form';
 
 import type { CodeParamStatement } from '@editor/type';
 import { error } from '@editor/utils';
@@ -59,10 +59,10 @@ const codeParamsConfig = computed(() =>
 /**
  * 参数值修改更新
  */
-const onParamsChangeHandler = async () => {
+const onParamsChangeHandler = async (v: FormValue, eventData: ContainerChangeEventData) => {
   try {
     const value = await form.value?.submitForm(true);
-    emit('change', value);
+    emit('change', value, eventData);
   } catch (e) {
     error(e);
   }

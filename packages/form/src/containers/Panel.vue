@@ -63,7 +63,7 @@ import { CaretBottom, CaretRight } from '@element-plus/icons-vue';
 
 import { TMagicButton, TMagicCard } from '@tmagic/design';
 
-import { FormState, PanelConfig } from '../schema';
+import type { ContainerChangeEventData, FormState, PanelConfig } from '../schema';
 import { filterFunction } from '../utils/form';
 
 import Container from './Container.vue';
@@ -84,7 +84,10 @@ const props = defineProps<{
   disabled?: boolean;
 }>();
 
-const emit = defineEmits(['change', 'addDiffCount']);
+const emit = defineEmits<{
+  change: [v: any, eventData: ContainerChangeEventData];
+  addDiffCount: [];
+}>();
 
 const mForm = inject<FormState | undefined>('mForm');
 
@@ -94,6 +97,8 @@ const items = computed(() => props.config.items);
 
 const filter = (config: any) => filterFunction(mForm, config, props);
 
-const changeHandler = () => emit('change', props.model);
+const changeHandler = (v: any, eventData: ContainerChangeEventData) => {
+  emit('change', props.model, eventData);
+};
 const onAddDiffCount = () => emit('addDiffCount');
 </script>
