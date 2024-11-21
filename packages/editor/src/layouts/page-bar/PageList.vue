@@ -18,6 +18,7 @@
             :data="{
               type: 'button',
               text: item.devconfig?.tabName || item.name || item.id,
+              className: item.id === page?.id ? 'active' : '',
               handler: () => switchPage(item.id),
             }"
             :key="index"
@@ -55,6 +56,7 @@ const uiService = services?.uiService;
 const editorService = services?.editorService;
 
 const showPageListButton = computed(() => uiService?.get('showPageListButton'));
+const page = computed(() => editorService?.get('page'));
 const switchPage = (id: Id) => {
   editorService?.select(id);
 };

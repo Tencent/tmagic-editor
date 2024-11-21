@@ -6,13 +6,6 @@
   user-select: none;
 }
 
-.m-editor-page-bar-item-icon {
-  .icon-active {
-    font-weight: bold;
-    color: $--theme-color;
-  }
-}
-
 .m-editor-page-list-item {
   display: flex;
   width: 100%;
@@ -64,6 +57,11 @@
     &-icon {
       position: relative;
       z-index: 1;
+
+      .icon-active {
+        font-weight: bold;
+        color: $--theme-color;
+      }
     }
 
     &-title {
@@ -71,6 +69,18 @@
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
+    }
+
+    &-left-icon,
+    &-right-icon {
+      position: absolute;
+      right: 0;
+      top: 0;
+      height: 100%;
+    }
+
+    &-left-icon {
+      right: 34px;
     }
   }
 }
@@ -85,13 +95,18 @@
     transition: all 0.2s ease 0s;
     padding: 5px 14px;
 
-    .el-button--text,
-    i {
+    .tmagic-design-button {
       color: $--font-color;
     }
 
     &:hover {
       background-color: $--hover-color;
+    }
+
+    &.active {
+      .tmagic-design-button {
+        color: $--theme-color;
+      }
     }
   }
 }
