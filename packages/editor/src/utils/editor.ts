@@ -16,12 +16,23 @@
  * limitations under the License.
  */
 
+import { detailedDiff } from 'deep-object-diff';
+import { isObject } from 'lodash-es';
 import serialize from 'serialize-javascript';
 
 import type { Id, MApp, MContainer, MNode, MPage, MPageFragment } from '@tmagic/core';
-import { NodeType } from '@tmagic/core';
+import { NODE_CONDS_KEY, NodeType } from '@tmagic/core';
 import type StageCore from '@tmagic/stage';
-import { calcValueByFontsize, getElById, getNodePath, isNumber, isPage, isPageFragment, isPop } from '@tmagic/utils';
+import {
+  calcValueByFontsize,
+  DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX,
+  getElById,
+  getNodePath,
+  isNumber,
+  isPage,
+  isPageFragment,
+  isPop,
+} from '@tmagic/utils';
 
 import { Layout } from '@editor/type';
 
@@ -289,4 +300,85 @@ export const moveItemsInContainer = (sourceIndices: number[], parent: MContainer
       }
     }
   }
+};
+
+export const isValueIncludeDataSource = (value: any) => {
+  if (typeof value === 'string' && /\$\{([\s\S]+?)\}/.test(value)) {
+    return true;
+  }
+  if (Array.isArray(value) && `${value[0]}`.startsWith(DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX)) {
+    return true;
+  }
+  if (value?.isBindDataSource && value.dataSourceId) {
+    return true;
+  }
+  if (value?.isBindDataSourceField && value.dataSourceId) {
+    return true;
+  }
+  return false;
+};
+
+const isIncludeDataSourceByDiffAddResult = (diffResult: any) => {
+  for (const value of Object.values(diffResult)) {
+    const result = isValueIncludeDataSource(value);
+
+    if (result) {
+      return true;
+    }
+
+    if (isObject(value)) {
+      return isIncludeDataSourceByDiffAddResult(value);
+    }
+  }
+  return false;
+};
+
+const isIncludeDataSourceByDiffUpdatedResult = (diffResult: any, oldNode: any) => {
+  for (const [key, value] of Object.entries<any>(diffResult)) {
+    if (isValueIncludeDataSource(value)) {
+      return true;
+    }
+
+    if (isValueIncludeDataSource(oldNode[key])) {
+      return true;
+    }
+
+    if (isObject(value)) {
+      return isIncludeDataSourceByDiffUpdatedResult(value, oldNode[key]);
+    }
+  }
+  return false;
+};
+
+export const isIncludeDataSource = (node: MNode, oldNode: MNode) => {
+  const diffResult = detailedDiff(oldNode, node);
+
+  let isIncludeDataSource = false;
+
+  if (diffResult.updated) {
+    // 修改了显示条件
+    if ((diffResult.updated as any)[NODE_CONDS_KEY]) {
+      return true;
+    }
+
+    isIncludeDataSource = isIncludeDataSourceByDiffUpdatedResult(diffResult.updated, oldNode);
+    if (isIncludeDataSource) return true;
+  }
+
+  if (diffResult.added) {
+    isIncludeDataSource = isIncludeDataSourceByDiffAddResult(diffResult.added);
+    if (isIncludeDataSource) return true;
+  }
+
+  if (diffResult.deleted) {
+    // 删除了显示条件
+    if ((diffResult.deleted as any)[NODE_CONDS_KEY]) {
+      return true;
+    }
+
+    isIncludeDataSource = isIncludeDataSourceByDiffAddResult(diffResult.deleted);
+    if (isIncludeDataSource) return true;
+  }
+
+  return isIncludeDataSource;
 };

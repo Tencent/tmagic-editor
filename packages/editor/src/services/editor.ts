@@ -22,6 +22,7 @@ import type { Writable } from 'type-fest';
 
 import type { Id, MApp, MContainer, MNode, MPage, MPageFragment, TargetOptions } from '@tmagic/core';
 import { NodeType, Target, Watcher } from '@tmagic/core';
+import type { ChangeRecord } from '@tmagic/form';
 import { isFixed } from '@tmagic/stage';
 import {
   calcValueByFontsize,
@@ -68,7 +69,7 @@ export interface EditorEvents {
   select: [node: MNode | null];
   add: [nodes: MNode[]];
   remove: [nodes: MNode[]];
-  update: [nodes: MNode[]];
+  update: [nodes: { newNode: MNode; oldNode: MNode; changeRecords?: ChangeRecord[] }[]];
   'move-layer': [offset: number | LayerOffset];
   'drag-to': [data: { targetIndex: number; configs: MNode | MNode[]; targetParent: MContainer }];
   'history-change': [data: MPage | MPageFragment];
@@ -509,7 +510,10 @@ class Editor extends BaseService {
     this.emit('remove', nodes);
   }
 
-  public async doUpdate(config: MNode) {
+  public async doUpdate(
+    config: MNode,
+    { changeRecords = [] }: { changeRecords?: ChangeRecord[] } = {},
+  ): Promise<{ newNode: MNode; oldNode: MNode; changeRecords?: ChangeRecord[] }> {
     const root = this.get('root');
     if (!root) throw new Error('root为空');
 
@@ -519,7 +523,7 @@ class Editor extends BaseService {
 
     if (!info.node) throw new Error(`获取不到id为${config.id}的节点`);
 
-    const node = cloneDeep(toRaw(info.node));
+    const node = toRaw(info.node);
 
     let newConfig = await this.toggleFixedPosition(toRaw(config), node, root);
 
@@ -541,7 +545,11 @@ class Editor extends BaseService {
 
     if (newConfig.type === NodeType.ROOT) {
       this.set('root', newConfig as MApp);
-      return newConfig;
+      return {
+        oldNode: node,
+        newNode: newConfig,
+        changeRecords,
+      };
     }
 
     const { parent } = info;
@@ -574,7 +582,11 @@ class Editor extends BaseService {
 
     this.addModifiedNodeId(newConfig.id);
 
-    return newConfig;
+    return {
+      oldNode: node,
+      newNode: newConfig,
+      changeRecords,
+    };
   }
 
   /**
@@ -582,17 +594,20 @@ class Editor extends BaseService {
    * @param config 新的节点配置，配置中需要有id信息
    * @returns 更新后的节点配置
    */
-  public async update(config: MNode | MNode[]): Promise<MNode | MNode[]> {
+  public async update(
+    config: MNode | MNode[],
+    data: { changeRecords?: ChangeRecord[] } = {},
+  ): Promise<MNode | MNode[]> {
     const nodes = Array.isArray(config) ? config : [config];
 
-    const newNodes = await Promise.all(nodes.map((node) => this.doUpdate(node)));
+    const updateData = await Promise.all(nodes.map((node) => this.doUpdate(node, data)));
 
-    if (newNodes[0]?.type !== NodeType.ROOT) {
+    if (updateData[0].oldNode?.type !== NodeType.ROOT) {
       this.pushHistoryState();
     }
 
-    this.emit('update', newNodes);
-    return Array.isArray(config) ? newNodes : newNodes[0];
+    this.emit('update', updateData);
+    return Array.isArray(config) ? updateData.map((item) => item.newNode) : updateData[0].newNode;
   }
 
   /**

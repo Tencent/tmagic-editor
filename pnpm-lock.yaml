@@ -322,6 +322,9 @@ importers:
       color:
         specifier: ^3.1.3
         version: 3.2.1
+      deep-object-diff:
+        specifier: ^1.1.9
+        version: 1.1.9
       emmet-monaco-es:
         specifier: ^5.3.0
         version: 5.5.0(monaco-editor@0.48.0)
@@ -4015,6 +4018,9 @@ packages:
 
   deep-is@0.1.4:
     resolution: {integrity: sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==}
+
+  deep-object-diff@1.1.9:
+    resolution: {integrity: sha512-Rn+RuwkmkDwCi2/oXOFS9Gsr5lJZu/yTGpK7wAaAIE75CC+LCGEZHpY6VQJa/RoJcrmaA/docWJZvYohlNkWPA==}
 
   deep-state-observer@5.5.13:
     resolution: {integrity: sha512-Ai55DB6P/k/EBgC4jNlYqIgp8e6Mzl7E/4vzIDMfrJ+TnCFmeA7TySaa3BapioDz4Cr6dYamVI4Mx2FMtpfM4w==}
@@ -9526,6 +9532,8 @@ snapshots:
   deep-eql@5.0.2: {}
 
   deep-is@0.1.4: {}
+
+  deep-object-diff@1.1.9: {}
 
   deep-state-observer@5.5.13: {}
 

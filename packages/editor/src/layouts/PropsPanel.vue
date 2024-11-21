@@ -43,7 +43,7 @@ import { Document as DocumentIcon } from '@element-plus/icons-vue';
 
 import type { MNode } from '@tmagic/core';
 import { TMagicButton } from '@tmagic/design';
-import type { FormState, FormValue } from '@tmagic/form';
+import type { ContainerChangeEventData, FormState, FormValue } from '@tmagic/form';
 import { MForm } from '@tmagic/form';
 
 import MIcon from '@editor/components/Icon.vue';
@@ -110,10 +110,10 @@ watchEffect(() => {
   }
 });
 
-const submit = async () => {
+const submit = async (v: FormValue, eventData: ContainerChangeEventData) => {
   try {
     const values = await configForm.value?.submitForm();
-    services?.editorService.update(values);
+    services?.editorService.update(values, { changeRecords: eventData.changeRecords });
   } catch (e: any) {
     emit('submit-error', e);
   }

@@ -24,9 +24,9 @@
 <script setup lang="ts">
 import { inject, Ref, ref, watchEffect } from 'vue';
 
-import { DataSourceSchema } from '@tmagic/core';
+import type { DataSourceSchema } from '@tmagic/core';
 import { tMagicMessage } from '@tmagic/design';
-import { FormConfig, MFormBox } from '@tmagic/form';
+import { type ContainerChangeEventData, type FormConfig, MFormBox } from '@tmagic/form';
 
 import FloatingBox from '@editor/components/FloatingBox.vue';
 import { useEditorContentHeight } from '@editor/hooks';
@@ -46,7 +46,9 @@ const props = defineProps<{
 const boxVisible = defineModel<boolean>('visible', { default: false });
 const width = defineModel<number>('width', { default: 670 });
 
-const emit = defineEmits(['submit']);
+const emit = defineEmits<{
+  submit: [v: any, eventData: ContainerChangeEventData];
+}>();
 
 const services = inject<Services>('services');
 
@@ -63,8 +65,8 @@ watchEffect(() => {
   dataSourceConfig.value = services?.dataSourceService.getFormConfig(initValues.value.type) || [];
 });
 
-const submitHandler = (values: any) => {
-  emit('submit', values);
+const submitHandler = (values: any, data: ContainerChangeEventData) => {
+  emit('submit', values, data);
 };
 
 const errorHandler = (error: any) => {

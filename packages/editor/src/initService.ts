@@ -17,11 +17,14 @@ import {
   createDataSourceMethodTarget,
   createDataSourceTarget,
   DepTargetType,
+  NODE_CONDS_KEY,
   Target,
 } from '@tmagic/core';
+import { ChangeRecord } from '@tmagic/form';
 import { getNodes, isPage, traverseNode } from '@tmagic/utils';
 
 import PropsPanel from './layouts/PropsPanel.vue';
+import { isIncludeDataSource, isValueIncludeDataSource } from './utils/editor';
 import { EditorProps } from './editorProps';
 import { Services } from './type';
 
@@ -219,6 +222,7 @@ export const initServiceEvents = (
     });
 
     if (Array.isArray(value.items)) {
+      depService.clearIdleTasks();
       collectIdle(value.items, true);
     } else {
       depService.clear();
@@ -302,10 +306,6 @@ export const initServiceEvents = (
     const root = editorService.get('root');
     if (!root) return;
     const stage = editorService.get('stage');
-    const app = getApp();
-    if (app?.dsl) {
-      app.dsl.dataSourceDeps = root.dataSourceDeps;
-    }
     for (const node of nodes) {
       stage?.update({
         config: cloneDeep(node),
@@ -348,8 +348,18 @@ export const initServiceEvents = (
     }
   };
 
+  const depCollectedHandler = () => {
+    const root = editorService.get('root');
+    if (!root) return;
+    const app = getApp();
+    if (app?.dsl) {
+      app.dsl.dataSourceDeps = root.dataSourceDeps;
+    }
+  };
+
   depService.on('add-target', targetAddHandler);
   depService.on('remove-target', targetRemoveHandler);
+  depService.on('collected', depCollectedHandler);
 
   const initDataSourceDepTarget = (ds: DataSourceSchema) => {
     depService.addTarget(createDataSourceTarget(ds, reactive({})));
@@ -380,10 +390,39 @@ export const initServiceEvents = (
   };
 
   // 节点更新，收集依赖
-  const nodeUpdateHandler = (nodes: MNode[]) => {
-    collectIdle(nodes, true).then(() => {
-      afterUpdateNodes(nodes);
+  // 仅当修改到数据源相关的才收集
+  const nodeUpdateHandler = (data: { newNode: MNode; oldNode: MNode; changeRecords?: ChangeRecord[] }[]) => {
+    const needRecollectNodes: MNode[] = [];
+    const normalNodes: MNode[] = [];
+    data.forEach(({ newNode, oldNode, changeRecords }) => {
+      if (changeRecords?.length) {
+        for (const record of changeRecords) {
+          // NODE_CONDS_KEY为显示条件key
+          if (
+            !record.propPath ||
+            new RegExp(`${NODE_CONDS_KEY}.(\\d)+.cond`).test(record.propPath) ||
+            new RegExp(`${NODE_CONDS_KEY}.(\\d)+.cond.(\\d)+.value`).test(record.propPath) ||
+            record.propPath === NODE_CONDS_KEY ||
+            isValueIncludeDataSource(record.value)
+          ) {
+            needRecollectNodes.push(newNode);
+            break;
+          }
+        }
+      } else if (isIncludeDataSource(newNode, oldNode)) {
+        needRecollectNodes.push(newNode);
+      } else {
+        normalNodes.push(newNode);
+      }
     });
+
+    if (needRecollectNodes.length) {
+      collectIdle(needRecollectNodes, true).then(() => {
+        afterUpdateNodes(needRecollectNodes);
+      });
+    } else if (normalNodes.length) {
+      afterUpdateNodes(normalNodes);
+    }
   };
 
   // 节点删除，清除对齐的依赖收集
@@ -425,14 +464,41 @@ export const initServiceEvents = (
     getApp()?.dataSourceManager?.addDataSource(config);
   };
 
-  const dataSourceUpdateHandler = (config: DataSourceSchema) => {
-    const root = editorService.get('root');
-    removeDataSourceTarget(config.id);
-    initDataSourceDepTarget(config);
+  const dataSourceUpdateHandler = (config: DataSourceSchema, { changeRecords }: { changeRecords: ChangeRecord[] }) => {
+    let needRecollectDep = false;
+    for (const changeRecord of changeRecords) {
+      if (!changeRecord.propPath) {
+        continue;
+      }
 
-    collectIdle(root?.items || [], true).then(() => {
-      updateDataSourceSchema(root?.items || [], true);
-    });
+      needRecollectDep =
+        changeRecord.propPath === 'fields' ||
+        changeRecord.propPath === 'methods' ||
+        /fields.(\d)+.name/.test(changeRecord.propPath) ||
+        /fields.(\d)+$/.test(changeRecord.propPath) ||
+        /methods.(\d)+.name/.test(changeRecord.propPath) ||
+        /methods.(\d)+$/.test(changeRecord.propPath);
+
+      if (needRecollectDep) {
+        break;
+      }
+    }
+
+    const root = editorService.get('root');
+    if (needRecollectDep) {
+      if (Array.isArray(root?.items)) {
+        depService.clearIdleTasks();
+
+        removeDataSourceTarget(config.id);
+        initDataSourceDepTarget(config);
+
+        collectIdle(root.items, true).then(() => {
+          updateDataSourceSchema(root?.items || [], true);
+        });
+      }
+    } else if (root?.dataSources) {
+      getApp()?.dataSourceManager?.updateSchema(root.dataSources);
+    }
   };
 
   const removeDataSourceTarget = (id: string) => {
@@ -459,6 +525,7 @@ export const initServiceEvents = (
   onBeforeUnmount(() => {
     depService.off('add-target', targetAddHandler);
     depService.off('remove-target', targetRemoveHandler);
+    depService.off('collected', depCollectedHandler);
 
     editorService.off('history-change', historyChangeHandler);
     editorService.off('root-change', rootChangeHandler);
