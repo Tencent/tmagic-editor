@@ -39,7 +39,7 @@
       v-if="config.advanced && showCode"
       height="200px"
       :init-values="model[name]"
-      language="json"
+      language="javascript"
       :options="{
         readOnly: disabled,
       }"
@@ -94,16 +94,19 @@ const records = ref<[string, string][]>([]);
 const showCode = ref(false);
 
 watchEffect(() => {
-  const initValues: [string, any][] = Object.entries(props.model[props.name] || {});
+  if (typeof props.model[props.name] === 'function') {
+    showCode.value = true;
+  } else {
+    const initValues: [string, any][] = Object.entries(props.model[props.name] || {});
 
-  for (const [, value] of initValues) {
-    if (typeof value !== 'string') {
-      showCode.value = true;
-      break;
+    for (const [, value] of initValues) {
+      if (typeof value !== 'string') {
+        showCode.value = true;
+        break;
+      }
     }
+    records.value = initValues;
   }
-
-  records.value = initValues;
 });
 
 const getValue = () => {
