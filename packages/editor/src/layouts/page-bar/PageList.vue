@@ -57,7 +57,7 @@ const editorService = services?.editorService;
 
 const showPageListButton = computed(() => uiService?.get('showPageListButton'));
 const page = computed(() => editorService?.get('page'));
-const switchPage = (id: Id) => {
-  editorService?.select(id);
+const switchPage = async (id: Id) => {
+  await editorService?.select(id);
 };
 </script>
