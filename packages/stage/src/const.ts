@@ -77,6 +77,7 @@ export const SELECTED_CLASS = 'tmagic-stage-selected-area';
 export enum AbleActionEventType {
   SELECT_PARENT = 'select-parent',
   REMOVE = 'remove',
+  RERENDER = 'rerender',
 }
 
 /** 将组件添加到容器的方式 */

@@ -106,3 +106,8 @@
   top: 50%;;
 }
 
+.moveable-rerender-button img {
+  position: absolute;
+  left: 2px;
+  top: 2px;
+}

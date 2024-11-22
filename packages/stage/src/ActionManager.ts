@@ -445,6 +445,9 @@ export default class ActionManager extends EventEmitter {
         };
         this.emit('remove', data);
       })
+      .on(AbleActionEventType.RERENDER, () => {
+        this.emit('rerender');
+      })
       .on('drag-start', (e: OnDragStart) => {
         this.emit('drag-start', e);
       });

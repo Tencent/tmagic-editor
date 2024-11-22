@@ -1,4 +1,5 @@
 import { computed, watch } from 'vue';
+import { cloneDeep } from 'lodash-es';
 
 import type { MNode } from '@tmagic/core';
 import StageCore, { GuidesType, RemoveEventData, SortEventData, UpdateEventData } from '@tmagic/stage';
@@ -129,6 +130,18 @@ export const useStage = (stageOptions: StageOptions) => {
     } else {
       globalThis.localStorage.removeItem(storageKey);
     }
+  });
+
+  stage.on('rerender', () => {
+    const node = editorService.get('node');
+
+    if (!node || !root.value) return;
+
+    stage.update({
+      config: cloneDeep(node),
+      parentId: editorService.getParentById(node.id)?.id,
+      root: cloneDeep(root.value),
+    });
   });
 
   return stage;

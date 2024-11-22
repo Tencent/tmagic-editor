@@ -251,6 +251,7 @@ export interface CoreEvents {
   update: [data: UpdateEventData];
   sort: [data: SortEventData];
   'select-parent': [];
+  rerender: [];
   remove: [data: RemoveEventData];
   highlight: [highlightEl: HTMLElement];
   mousemove: [event: MouseEvent];
@@ -283,6 +284,7 @@ export interface ActionManagerEvents {
   sort: [data: SortEventData];
   remove: [data: RemoveEventData];
   select: [selectedEl: HTMLElement | null, event: MouseEvent];
+  rerender: [];
   'select-parent': [];
   'drag-start': [event: OnDragStart];
   'multi-update': [data: UpdateEventData];
@@ -297,6 +299,7 @@ export interface DrEvents {
   'update-moveable': [];
   [AbleActionEventType.REMOVE]: [];
   [AbleActionEventType.SELECT_PARENT]: [];
+  [AbleActionEventType.RERENDER]: [];
   'drag-start': [event: OnDragStart];
   update: [data: UpdateEventData];
   sort: [data: SortEventData];
