@@ -40,6 +40,7 @@ export default [
         name: 'params',
         type: 'key-value',
         defaultValue: {},
+        advanced: true,
         text: '参数',
       },
       {
@@ -53,6 +54,7 @@ export default [
         name: 'headers',
         type: 'key-value',
         defaultValue: {},
+        advanced: true,
         text: '请求头',
       },
     ],

@@ -18,7 +18,7 @@
 import type { HttpOptions, RequestFunction } from '@tmagic/core';
 import { getValueByKeyPath } from '@tmagic/core';
 
-import { DataSourceOptions, HttpDataSourceSchema } from '@data-source/types';
+import type { DataSourceOptions, HttpDataSourceSchema, HttpOptionsSchema } from '@data-source/types';
 
 import DataSource from './Base';
 
@@ -74,7 +74,7 @@ export default class HttpDataSource extends DataSource<HttpDataSourceSchema> {
     code?: string | number;
   };
   /** 请求配置 */
-  public httpOptions: HttpOptions;
+  public httpOptions: HttpOptionsSchema;
 
   /** 请求函数 */
   #fetch?: RequestFunction;
@@ -115,7 +115,7 @@ export default class HttpDataSource extends DataSource<HttpDataSourceSchema> {
 
   public async init() {
     if (this.schema.autoFetch) {
-      await this.request(this.httpOptions);
+      await this.request();
     }
 
     super.init();
@@ -124,8 +124,14 @@ export default class HttpDataSource extends DataSource<HttpDataSourceSchema> {
   public async request(options: Partial<HttpOptions> = {}) {
     this.isLoading = true;
 
-    let reqOptions = {
-      ...this.httpOptions,
+    const { url, params, data, headers, ...otherHttpOptions } = this.httpOptions;
+
+    let reqOptions: HttpOptions = {
+      url: typeof url === 'function' ? url({ app: this.app, dataSource: this }) : url,
+      params: typeof params === 'function' ? params({ app: this.app, dataSource: this }) : params,
+      data: typeof data === 'function' ? data({ app: this.app, dataSource: this }) : data,
+      headers: typeof headers === 'function' ? headers({ app: this.app, dataSource: this }) : headers,
+      ...otherHttpOptions,
       ...options,
     };
 

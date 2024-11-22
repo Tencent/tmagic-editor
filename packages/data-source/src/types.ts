@@ -1,4 +1,4 @@
-import type { DataSourceSchema, default as TMagicApp, HttpOptions, RequestFunction } from '@tmagic/core';
+import type { DataSourceSchema, default as TMagicApp, HttpOptions, Method, RequestFunction } from '@tmagic/core';
 
 import type DataSource from './data-sources/Base';
 import type HttpDataSource from './data-sources/Http';
@@ -16,9 +16,23 @@ export interface DataSourceOptions<T extends DataSourceSchema = DataSourceSchema
   [key: string]: any;
 }
 
+export interface HttpOptionsSchema {
+  /** 请求链接 */
+  url: string | ((data: { app: TMagicApp; dataSource: HttpDataSource }) => string);
+  /** query参数 */
+  params?: Record<string, string> | ((data: { app: TMagicApp; dataSource: HttpDataSource }) => Record<string, string>);
+  /** body数据 */
+  data?: Record<string, any> | ((data: { app: TMagicApp; dataSource: HttpDataSource }) => Record<string, string>);
+  /** 请求头 */
+  headers?: Record<string, string> | ((data: { app: TMagicApp; dataSource: HttpDataSource }) => Record<string, string>);
+  /** 请求方法 GET/POST */
+  method?: Method;
+  [key: string]: any;
+}
+
 export interface HttpDataSourceSchema extends DataSourceSchema {
   type: 'http';
-  options: HttpOptions;
+  options: HttpOptionsSchema;
   responseOptions?: {
     dataPath?: string;
   };
