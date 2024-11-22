@@ -60,6 +60,21 @@ export default (
         React.createElement(
           'button',
           {
+            className: 'moveable-button moveable-rerender-button',
+            title: '重新渲染',
+            onClick: () => {
+              handler(AbleActionEventType.RERENDER);
+            },
+          },
+          React.createElement('img', {
+            src: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGNsYXNzPSJpY29uIGljb24tdGFibGVyIGljb24tdGFibGVyLXJlcGxhY2UiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZT0iI2ZmZmZmZiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KICA8cGF0aCBzdHJva2U9Im5vbmUiIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz4KICA8cmVjdCB4PSIzIiB5PSIzIiB3aWR0aD0iNiIgaGVpZ2h0PSI2IiByeD0iMSIgLz4KICA8cmVjdCB4PSIxNSIgeT0iMTUiIHdpZHRoPSI2IiBoZWlnaHQ9IjYiIHJ4PSIxIiAvPgogIDxwYXRoIGQ9Ik0yMSAxMXYtM2EyIDIgMCAwIDAgLTIgLTJoLTZsMyAzbTAgLTZsLTMgMyIgLz4KICA8cGF0aCBkPSJNMyAxM3YzYTIgMiAwIDAgMCAyIDJoNmwtMyAtM20wIDZsMyAtMyIgLz4KPC9zdmc+CgoK',
+            width: '16',
+            height: '16',
+          }),
+        ),
+        React.createElement(
+          'button',
+          {
             className: 'moveable-button',
             title: '选中父组件',
             onClick: () => {

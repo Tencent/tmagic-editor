@@ -64,8 +64,9 @@ defineOptions({
   name: 'MEditorStage',
 });
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
+    stageOptions: StageOptions;
     stageContentMenu: (MenuButton | MenuComponent)[];
     disabledStageOverlay?: boolean;
     customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
@@ -79,7 +80,6 @@ let stage: StageCore | null = null;
 let runtime: Runtime | null = null;
 
 const services = inject<Services>('services');
-const stageOptions = inject<StageOptions>('stageOptions');
 
 const stageLoading = computed(() => services?.editorService.get('stageLoading') || false);
 
@@ -100,9 +100,9 @@ watchEffect(() => {
   if (stage || !page.value) return;
 
   if (!stageContainer.value) return;
-  if (!(stageOptions?.runtimeUrl || stageOptions?.render) || !root.value) return;
+  if (!(props.stageOptions?.runtimeUrl || props.stageOptions?.render) || !root.value) return;
 
-  stage = useStage(stageOptions);
+  stage = useStage(props.stageOptions);
 
   stage.on('select', () => {
     stageWrap.value?.container?.focus();
@@ -129,6 +129,7 @@ watchEffect(() => {
 
 onBeforeUnmount(() => {
   stage?.destroy();
+  services?.editorService.set('stage', null);
 });
 
 watch(zoom, (zoom) => {
@@ -216,7 +217,9 @@ const dropHandler = async (e: DragEvent) => {
   e.preventDefault();
 
   const doc = stage?.renderer?.contentWindow?.document;
-  const parentEl: HTMLElement | null | undefined = doc?.querySelector(`.${stageOptions?.containerHighlightClassName}`);
+  const parentEl: HTMLElement | null | undefined = doc?.querySelector(
+    `.${props.stageOptions?.containerHighlightClassName}`,
+  );
 
   let parent: MContainer | undefined | null = page.value;
   const parentId = getIdFromEl()(parentEl);

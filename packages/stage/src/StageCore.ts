@@ -373,6 +373,9 @@ export default class StageCore extends EventEmitter {
       .on('select-parent', () => {
         this.emit('select-parent');
       })
+      .on('rerender', () => {
+        this.emit('rerender');
+      })
       .on('remove', (data: RemoveEventData) => {
         this.emit('remove', data);
       });
