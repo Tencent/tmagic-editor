@@ -1,6 +1,10 @@
 <template>
   <div class="m-editor-page-bar-tabs">
-    <PageBarScrollContainer :page-bar-sort-options="pageBarSortOptions" :length="list.length">
+    <PageBarScrollContainer
+      ref="pageBarScrollContainer"
+      :page-bar-sort-options="pageBarSortOptions"
+      :length="list.length"
+    >
       <template #prepend>
         <slot name="page-bar-add-button"><AddButton></AddButton></slot>
 
@@ -13,8 +17,9 @@
       <div
         v-for="item in list"
         class="m-editor-page-bar-item"
+        ref="pageBarItems"
         :key="item.id"
-        :page-id="item.id"
+        :data-page-id="item.id"
         :class="{ active: page?.id === item.id }"
         @click="switchPage(item.id)"
       >
@@ -63,7 +68,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, ref } from 'vue';
+import { computed, inject, ref, watch } from 'vue';
 import { CaretBottom, Delete, DocumentCopy } from '@element-plus/icons-vue';
 
 import { type Id, type MPage, type MPageFragment, NodeType } from '@tmagic/core';
@@ -138,4 +143,42 @@ const copy = (node: MPage | MPageFragment) => {
 const remove = (node: MPage | MPageFragment) => {
   editorService?.remove(node);
 };
+
+const pageBarScrollContainer = ref<InstanceType<typeof PageBarScrollContainer>>();
+const pageBarItems = ref<HTMLDivElement[]>();
+watch(page, (page) => {
+  if (
+    !page ||
+    !pageBarScrollContainer.value?.itemsContainerWidth ||
+    !pageBarItems.value ||
+    pageBarItems.value.length < 2
+  ) {
+    return;
+  }
+
+  const firstItem = pageBarItems.value[0];
+  const lastItem = pageBarItems.value[pageBarItems.value.length - 1];
+
+  if (page.id === firstItem.dataset.pageId) {
+    pageBarScrollContainer.value.scroll('start');
+  } else if (page.id === lastItem.dataset.pageId) {
+    pageBarScrollContainer.value.scroll('end');
+  } else {
+    const pageItem = pageBarItems.value.find((item) => item.dataset.pageId === page.id);
+    if (!pageItem) {
+      return;
+    }
+
+    const pageItemRect = pageItem.getBoundingClientRect();
+    const offsetLeft = pageItemRect.left - firstItem.getBoundingClientRect().left;
+    const { itemsContainerWidth } = pageBarScrollContainer.value;
+
+    const left = itemsContainerWidth - offsetLeft - pageItemRect.width;
+
+    const translateLeft = pageBarScrollContainer.value.getTranslateLeft();
+    if (offsetLeft + translateLeft < 0 || offsetLeft + pageItemRect.width > itemsContainerWidth - translateLeft) {
+      pageBarScrollContainer.value.scrollTo(left);
+    }
+  }
+});
 </script>

@@ -92,22 +92,29 @@ const scroll = (type: 'left' | 'right' | 'start' | 'end') => {
   const maxScrollLeft = itemsContainer.value.scrollWidth - itemsContainerWidth.value;
 
   if (type === 'left') {
-    translateLeft += 200;
-
-    if (translateLeft > 0) {
-      translateLeft = 0;
-    }
+    scrollTo(translateLeft + 200);
   } else if (type === 'right') {
-    translateLeft -= 200;
-
-    if (-translateLeft > maxScrollLeft) {
-      translateLeft = -maxScrollLeft;
-    }
+    scrollTo(translateLeft - 200);
   } else if (type === 'start') {
-    translateLeft = 0;
+    scrollTo(0);
   } else if (type === 'end') {
-    translateLeft = -maxScrollLeft;
+    scrollTo(-maxScrollLeft);
   }
+};
+
+const scrollTo = (value: number) => {
+  if (!itemsContainer.value || !canScroll.value) return;
+  const maxScrollLeft = itemsContainer.value.scrollWidth - itemsContainerWidth.value;
+
+  if (value >= 0) {
+    value = 0;
+  }
+
+  if (-value > maxScrollLeft) {
+    value = -maxScrollLeft;
+  }
+
+  translateLeft = value;
 
   itemsContainer.value.style.transform = `translate(${translateLeft}px, 0px)`;
 };
@@ -159,4 +166,13 @@ watch(
     immediate: true,
   },
 );
+
+defineExpose({
+  itemsContainerWidth,
+  scroll,
+  scrollTo,
+  getTranslateLeft() {
+    return translateLeft;
+  },
+});
 </script>
