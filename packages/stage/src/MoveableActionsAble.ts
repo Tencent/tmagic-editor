@@ -61,7 +61,7 @@ export default (
           'button',
           {
             className: 'moveable-button moveable-rerender-button',
-            title: '重新渲染',
+            title: '重新收集依赖后渲染',
             onClick: () => {
               handler(AbleActionEventType.RERENDER);
             },

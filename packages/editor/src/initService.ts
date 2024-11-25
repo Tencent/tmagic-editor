@@ -1,4 +1,4 @@
-import { onBeforeUnmount, reactive, toRaw, watch } from 'vue';
+import { computed, onBeforeUnmount, reactive, toRaw, watch } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
 import type {
@@ -251,10 +251,25 @@ export const initServiceEvents = (
     }
   };
 
-  const getApp = () => {
-    const stage = editorService.get('stage');
-    return stage?.renderer?.runtime?.getApp?.();
-  };
+  const stage = computed(() => editorService.get('stage'));
+
+  watch(stage, (stage) => {
+    if (!stage) {
+      return;
+    }
+
+    stage.on('rerender', () => {
+      const node = editorService.get('node');
+
+      if (!node) return;
+
+      collectIdle([node], true).then(() => {
+        afterUpdateNodes([node]);
+      });
+    });
+  });
+
+  const getApp = () => stage.value?.renderer?.runtime?.getApp?.();
 
   const updateDataSourceSchema = (nodes: MNode[], deep: boolean) => {
     const root = editorService.get('root');
@@ -270,9 +285,7 @@ export const initServiceEvents = (
       getApp()?.dataSourceManager?.updateSchema(root.dataSources);
     }
 
-    const stage = editorService.get('stage');
-
-    if (!root || !stage) return;
+    if (!root || !stage.value) return;
 
     const allNodes: MNode[] = [];
 
@@ -293,7 +306,7 @@ export const initServiceEvents = (
       Object.keys(dep).forEach((id) => {
         const node = allNodes.find((node) => node.id === id);
         node &&
-          stage.update({
+          stage.value?.update({
             config: cloneDeep(node),
             parentId: editorService.getParentById(node.id)?.id,
             root: cloneDeep(root),
@@ -305,9 +318,8 @@ export const initServiceEvents = (
   const afterUpdateNodes = (nodes: MNode[]) => {
     const root = editorService.get('root');
     if (!root) return;
-    const stage = editorService.get('stage');
     for (const node of nodes) {
-      stage?.update({
+      stage.value?.update({
         config: cloneDeep(node),
         parentId: editorService.getParentById(node.id)?.id,
         root: cloneDeep(root),
