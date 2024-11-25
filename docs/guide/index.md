@@ -2,7 +2,33 @@
 
 tmagic-editor的编辑器我们已经封装成一个 npm 包，可以直接安装使用。编辑器是使用 vue3 开发的(仅支持vue3)，但使用编辑器的业务(runtime)可以不限框架，可以用 vue2、react 等开发业务组件。
 
-## 安装
+::: code-group
+
+```bash [npm]
+$ npm create tmagic@latest
+```
+
+```bash [pnpm]
+$ pnpm create tmagic
+```
+:::
+
+按照提示操作可以创建`6`中项目：
+
+* runtime:运行时（DSL渲染）
+* admin-client:管理端（编辑器）
+* components:组件库(组件/插件/数据源)
+* component:组件
+* data-source:数据源
+* plugin:插件
+
+至少需要一个runtime与admin-client后，就可以运行起一个最简单的项目了。
+
+后续还需要新增组件、插件、数据源等，可以继续添加后面几种类型的项目。
+
+新增好一个组件/插件/数据源后可以到runtime/tmagic.config.ts中配置到packages中
+
+## 手动安装
 
 node.js >= 18
 
@@ -11,13 +37,13 @@ node.js >= 18
 > 使用Vue CLI生成的项目需要在vue.config.js中加上配置：transpileDependencies: [/@tmagic/]
 
 ```bash
-$ npm install @tmagic/editor @tmagic/form -S
+$ npm install @tmagic/editor -S
 ```
 
 由于在实际应用中项目常常会用到例如[element-plus](https://element-plus.org/)、[tdesign-vue-next](https://tdesign.tencent.com/vue-next/overview)等UI组件库。为了能让使用者能够选择不同UI库，[@tmagic/editor](https://github.com/Tencent/tmagic-editor/tree/master/packages/editor)将其中使用到的UI组件封装到[@tmagic/design](https://github.com/Tencent/tmagic-editor/tree/master/packages/design)中，然后通过不同的adapter来指定使用具体的对应的UI库，我们提供了[@tmagic/element-plus-adapter](https://github.com/Tencent/tmagic-editor/tree/master/packages/element-plus-adapter)来支持[element-plus](https://element-plus.org/)，所以还需要安装相关的依赖。
 
 ```bash
-$ npm install @tmagic/element-plus-adapter @tmagic/design element-plus -S
+$ npm install @tmagic/element-plus-adapter element-plus -S
 ```
 
 editor 中还包含了[monaco-editor](https://microsoft.github.io/monaco-editor/)，所以还需安装monaco-editor，可以参考 monaco-editor 的[配置指引](https://github.com/microsoft/monaco-editor/blob/main/docs/integrate-esm.md)。
@@ -37,25 +63,21 @@ import { createApp } from 'vue';
 import ElementPlus from 'element-plus';
 import zhCn from 'element-plus/es/locale/lang/zh-cn';
 
-import TMagicDesign from '@tmagic/design';
-import MagicEditor from '@tmagic/editor';
+import editorPlugin from '@tmagic/editor';
 import MagicElementPlusAdapter from '@tmagic/element-plus-adapter';
-import MagicForm from '@tmagic/form';
 
 import App from './App.vue';
 
 import 'element-plus/dist/index.css';
 import '@tmagic/editor/dist/style.css';
-import '@tmagic/form/dist/style.css';
 
 const app = createApp(App);
 app.use(ElementPlus, {
   locale: zhCn,
 });
-app.use(TMagicDesign, MagicElementPlusAdapter);
-app.use(MagicEditor);
-app.use(MagicForm);
-app.mount("#app");
+app.use(router);
+app.use(editorPlugin, MagicElementPlusAdapter);
+app.mount('#app');
 ```
 
 以上代码便完成了 @tmagic/editor 的引入。需要注意的是，样式文件需要单独引入。
