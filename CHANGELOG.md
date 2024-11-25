@@ -1,3 +1,60 @@
+# [1.5.0-beta.15](https://github.com/Tencent/tmagic-editor/compare/v1.4.19...v1.5.0-beta.15) (2024-11-25)
+
+
+### Bug Fixes
+
+* **data-source:** http数据源中mock数据应该是数据源定义好的数据，不再是请求的数据源 ([1dc4fa9](https://github.com/Tencent/tmagic-editor/commit/1dc4fa92a581f7469714214234324bc39dfd3b80))
+* **data-source:** http数据源中mock配置中关闭启用后，不会执行request ([e153ab1](https://github.com/Tencent/tmagic-editor/commit/e153ab1602e0c4df716fd4783f25483c5c5c31c0))
+* **data-source:** manager初始化数据源时，如果失败了要把data中对应的数据删掉，不然在ssr中会导致客户端不会重新尝试请求 ([d844f59](https://github.com/Tencent/tmagic-editor/commit/d844f59dc67ee45af4aa902b0c1457bc4366f8d3))
+* **data-source:** 编辑器中迭代器容器中的容器添加组件并关联数据源后没有编译 ([43e0341](https://github.com/Tencent/tmagic-editor/commit/43e0341b1274dc3ca5af7eda0791b3de427d3ebc))
+* **data-source:** 迭代内容多层嵌套下子组件条件配置不生效 ([aff000f](https://github.com/Tencent/tmagic-editor/commit/aff000f250f4ae54b555b1d83176c705542141eb))
+* **data-source:** 避免http数据源在编辑器中的响应裁剪中修改到mock配置的数据 ([9b05670](https://github.com/Tencent/tmagic-editor/commit/9b056703354b4423b81e929a2862d2a6f2d1c546))
+* **dep:** 数据源条件依赖收集默认不收集迭代器内部组件的依赖 ([a4ff865](https://github.com/Tencent/tmagic-editor/commit/a4ff865f63ca2c7c6dbb2e6c77a3e3e0ef21ae38))
+* **design:** popover zindex不生效 ([44c0e1f](https://github.com/Tencent/tmagic-editor/commit/44c0e1fb298d9ec50f6657b93b961bd9efaa219b))
+* **editor:** stage销毁问题 ([c4ac397](https://github.com/Tencent/tmagic-editor/commit/c4ac397f46fa440be0127aa28c3a95a8c273c8c2))
+* **editor:** 修复修改页面配置后可能改造页面卡死问题 ([0faa260](https://github.com/Tencent/tmagic-editor/commit/0faa260f526a10dda5bc0d3b604a5e5396e6da58))
+* **editor:** 更新组件配置后，如果当前没有任何依赖，不会触发收集，导致画布不更新 ([44a6760](https://github.com/Tencent/tmagic-editor/commit/44a676053af0797ad7fceab256280a741f4bb5a7))
+* **form:** datarange组件如果传入utc时间,显示会出错 ([0bdfee2](https://github.com/Tencent/tmagic-editor/commit/0bdfee28d3d5d4e53aae868731b1ff5b0d9b8167))
+* **form:** datatime没有初始值时异常 ([45502b2](https://github.com/Tencent/tmagic-editor/commit/45502b2ef17e26260ad97efab3aa9cd77266823c))
+* **form:** date组件初始化时不显示值 ([0d60542](https://github.com/Tencent/tmagic-editor/commit/0d605425d87d201f57bfc1ae84062326b32d95d5))
+* **stage:** 流水布局拖动无效 ([a0853ae](https://github.com/Tencent/tmagic-editor/commit/a0853aee8b8a29a88c12e62d94dc445ba7648522))
+* **tmagic-form-runtime:** 画布无法点击选中组件 ([95b8248](https://github.com/Tencent/tmagic-editor/commit/95b824839e737a7d8d2546b62469f33c561e7b16))
+* **vue-component:** 从core中获取utils的方法 ([5f6550f](https://github.com/Tencent/tmagic-editor/commit/5f6550f9620fde53f5439932530035acabf49b06))
+* 迭代器内的组件配置了声明周期代码块无效 ([8c7a408](https://github.com/Tencent/tmagic-editor/commit/8c7a408f63bb8e2065d0a94842b9d497bb2870f2))
+
+
+### Features
+
+* **cli:** 组件库支持import npm包组件 ([53e83c8](https://github.com/Tencent/tmagic-editor/commit/53e83c872db56c13e0f40efefcdc07bd4c3c3c54))
+* **data-source,editor:** http数据源params,data,headers支持函数配置 ([b7c59c9](https://github.com/Tencent/tmagic-editor/commit/b7c59c9c0e85b16360dae54ba721388754dec658))
+* **data-source:** http数据源参数裁剪与响应裁剪支持异步函数配置 ([aa6bff5](https://github.com/Tencent/tmagic-editor/commit/aa6bff525dfca7169e4824a0311b216f170a3d88))
+* **design,element-plus-adapter,tdesign-vue-next-adapter:** 重新实现Popover组件，不再使用element-plus或tdesign组件 ([468849c](https://github.com/Tencent/tmagic-editor/commit/468849cfe098100a90c7c3e692d440e012dd53cd))
+* **design:** popover 添加destroyOnClose props ([f7a5b16](https://github.com/Tencent/tmagic-editor/commit/f7a5b164ef82a530423ab50f6c8290ef366a9923))
+* dsl id渲染到dom上的data-tamgic-id,不再是id属性 ([35aa916](https://github.com/Tencent/tmagic-editor/commit/35aa916e769dcee3c31dc981ab669ddb66cdbe9b))
+* **editor:** export tree组件 ([b7d3115](https://github.com/Tencent/tmagic-editor/commit/b7d31152fe094a96756efc6db17ce2bbfa019ccd))
+* **editor:** 事件流支持上下文对象传递和abort方法中断 ([cc2cea5](https://github.com/Tencent/tmagic-editor/commit/cc2cea586c4aebc50aeee7ce1948da80008eb486))
+* **editor:** 代码块与数据源列表节点中新增依赖收集中tag ([8a8ccae](https://github.com/Tencent/tmagic-editor/commit/8a8ccae7ed78afd60be6859bfbe5b3b024d3e6dc))
+* **editor:** 优化依赖收集体验，减小收集任务粒度，修改配置时识别是否需要触发重新收集 ([3889888](https://github.com/Tencent/tmagic-editor/commit/38898889c411a918369869b64a86d0774c329126))
+* **editor:** 支持配置页面过滤函数 ([d599334](https://github.com/Tencent/tmagic-editor/commit/d59933439e2a94e6031e9650d0423b0e4092741f))
+* **editor:** 新增已选组件、代码编辑、数据源及其子节点增量缩进配置 ([dc63ea1](https://github.com/Tencent/tmagic-editor/commit/dc63ea1a9f654f0d81e531358c122d36e1659c01))
+* **editor:** 选中页面后页面列表自动滚动到选中项 ([1d95224](https://github.com/Tencent/tmagic-editor/commit/1d952248dc4083dbdf04e6ff09b0438005611ea2))
+* **editor:** 页面/页面片不再使用tab分开显示，新增搜索页面 ([cda915d](https://github.com/Tencent/tmagic-editor/commit/cda915d6f8d638e7ce50c65d6119ad32a600e0c8))
+* **edtior,stage:** 重新渲染改成重新收集依赖后渲染 ([a0dd484](https://github.com/Tencent/tmagic-editor/commit/a0dd48446c2219ef0a3a77d83510f226e2f86a4b))
+* **form,editor:** 表单新增修改数据记录 ([71cfd5b](https://github.com/Tencent/tmagic-editor/commit/71cfd5bfacb1eddd271384ccc307753545fc1f56))
+* **form:** 支持配置阻止默认的submit行为 ([37bc386](https://github.com/Tencent/tmagic-editor/commit/37bc3867ebec37ed4572982263f8ddb85a8f679d))
+* **form:** 添加tmagicFormItemProp ([86c092e](https://github.com/Tencent/tmagic-editor/commit/86c092eadb509fa9c2999a5e92d7fb0970fea6a3))
+* **stage,editor:** 在选中框新增支持触发画布中组件重新渲染 ([19599bc](https://github.com/Tencent/tmagic-editor/commit/19599bc414792c3098e53219b55634e37780ba9e))
+* **stage:** export MoveableActionsAble; 在选中框上面自定义按钮 ([ca0cb21](https://github.com/Tencent/tmagic-editor/commit/ca0cb218f65f5d6e00e5ab1dd7f6b6fe3706caeb))
+* **table:** expand支持width fixed配置 ([61c8bbe](https://github.com/Tencent/tmagic-editor/commit/61c8bbea180188b35fe467947aac856a0576b449))
+* **table:** 新增createColumns函数 ([b5a81e2](https://github.com/Tencent/tmagic-editor/commit/b5a81e2121a6818df6e02c20792fe73203f8dde6))
+* **uitls:** 只是自定义dsl与dom el的关联关系函数 ([25bf011](https://github.com/Tencent/tmagic-editor/commit/25bf011afe53414074599e76c4a9d388a61c015d))
+* **vue-component, runtime:** 使用 app.resolveComponent 获取组件 ([#631](https://github.com/Tencent/tmagic-editor/issues/631)) ([4004c42](https://github.com/Tencent/tmagic-editor/commit/4004c424f6f99dac3150229431d511bfdacd4108))
+* 完善迭代器嵌套使用问题，重构事件配置处理代码 ([f6dec31](https://github.com/Tencent/tmagic-editor/commit/f6dec31ef4e1cf51b9e1ad23c8134293dd529083))
+* 将ui-react中的组件独立成包 ([dbb7cde](https://github.com/Tencent/tmagic-editor/commit/dbb7cde48a60ff580a23cb0b37f48f3aa081d745))
+* 统一vue ui组件,将ui中的组件独立成包 ([7a0d99e](https://github.com/Tencent/tmagic-editor/commit/7a0d99e3b5c383a55e8aba67aeebdfe5c52d7bce))
+
+
+
 ## [1.4.19](https://github.com/Tencent/tmagic-editor/compare/v1.4.18...v1.4.19) (2024-10-31)
 
 
