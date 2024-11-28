@@ -33,6 +33,15 @@ export const useEditorDsl = (app: TMagicApp | undefined, win = window) => {
 
     updateRootConfig(config: MApp) {
       root.value = config;
+
+      if (typeof curPageId.value === 'undefined') {
+        curPageId.value = config.items?.[0]?.id;
+      }
+
+      if (typeof selectedId.value === 'undefined') {
+        selectedId.value = curPageId.value;
+      }
+
       app?.setConfig(config, curPageId.value);
     },
 
