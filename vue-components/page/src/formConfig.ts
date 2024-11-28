@@ -28,7 +28,6 @@ export default [
   {
     text: '页面标题',
     name: 'title',
-    type: 'data-source-input',
   },
   {
     name: 'layout',
@@ -50,5 +49,34 @@ export default [
         }
       }
     },
+  },
+  {
+    name: 'jsFiles',
+    text: 'js',
+    type: 'table',
+    items: [
+      {
+        name: 'url',
+        label: '链接',
+      },
+    ],
+  },
+  {
+    name: 'cssFiles',
+    text: 'css',
+    type: 'table',
+    items: [
+      {
+        name: 'url',
+        label: '链接',
+      },
+    ],
+  },
+  {
+    text: 'css',
+    name: 'css',
+    type: 'code',
+    language: 'css',
+    height: '500px',
   },
 ];

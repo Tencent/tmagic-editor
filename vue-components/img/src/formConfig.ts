@@ -18,6 +18,11 @@
 
 export default [
   {
+    name: 'className',
+    type: 'data-source-input',
+    text: 'class',
+  },
+  {
     text: '图片',
     name: 'src',
     type: 'data-source-input',
