@@ -145,8 +145,10 @@ class App extends EventEmitter {
     this.codeDsl = config.codeBlocks;
     this.setPage(curPage || this.page?.data?.id);
 
-    const dataSourceList = Array.from(this.dataSourceManager!.dataSourceMap.values());
-    this.eventHelper?.bindDataSourceEvents(dataSourceList);
+    if (this.dataSourceManager) {
+      const dataSourceList = Array.from(this.dataSourceManager.dataSourceMap.values());
+      this.eventHelper?.bindDataSourceEvents(dataSourceList);
+    }
   }
 
   public setPage(id?: Id) {
