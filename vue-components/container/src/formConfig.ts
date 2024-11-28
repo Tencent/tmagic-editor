@@ -20,6 +20,11 @@ import { getElById } from '@tmagic/core';
 
 export default [
   {
+    name: 'className',
+    type: 'data-source-input',
+    text: 'class',
+  },
+  {
     name: 'layout',
     text: '容器布局',
     type: 'select',

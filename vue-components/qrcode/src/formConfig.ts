@@ -18,6 +18,11 @@
 
 export default [
   {
+    name: 'className',
+    type: 'data-source-input',
+    text: 'class',
+  },
+  {
     text: '链接',
     name: 'url',
     type: 'data-source-input',

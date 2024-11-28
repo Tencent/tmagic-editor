@@ -18,6 +18,11 @@
 
 export default [
   {
+    name: 'className',
+    type: 'data-source-input',
+    text: 'class',
+  },
+  {
     name: 'text',
     text: '文本',
     type: 'data-source-input',

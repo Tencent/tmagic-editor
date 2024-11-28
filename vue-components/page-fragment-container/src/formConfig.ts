@@ -18,6 +18,11 @@
 
 export default [
   {
+    name: 'className',
+    type: 'data-source-input',
+    text: 'class',
+  },
+  {
     name: 'pageFragmentId',
     text: '页面片ID',
     type: 'page-fragment-select',

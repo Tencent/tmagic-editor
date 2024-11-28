@@ -19,6 +19,11 @@ import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX, NODE_CONDS_KEY } from '@tmagic/
 
 export default [
   {
+    name: 'className',
+    type: 'data-source-input',
+    text: 'class',
+  },
+  {
     name: 'iteratorData',
     text: '数据源数据',
     value: 'value',
