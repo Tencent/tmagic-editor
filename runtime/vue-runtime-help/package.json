@@ -1,5 +1,5 @@
 {
-  "version": "0.1.4",
+  "version": "0.1.5",
   "name": "@tmagic/vue-runtime-help",
   "type": "module",
   "sideEffects": false,
