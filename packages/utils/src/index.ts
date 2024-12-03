@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
@@ -35,6 +36,23 @@ import { NodeType } from '@tmagic/schema';
 import type { EditorNodeInfo } from '@editor/type';
 
 export * from './dom';
+
+// for typeof global checks without @types/node
+declare let global: {};
+
+let _globalThis: any;
+export const getGlobalThis = (): any =>
+  _globalThis ||
+  (_globalThis =
+    typeof globalThis !== 'undefined'
+      ? globalThis
+      : typeof self !== 'undefined'
+      ? self
+      : typeof window !== 'undefined'
+      ? window
+      : typeof global !== 'undefined'
+      ? global
+      : {});
 
 export const sleep = (ms: number): Promise<void> =>
   new Promise((resolve) => {
