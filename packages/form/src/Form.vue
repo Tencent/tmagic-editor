@@ -31,7 +31,7 @@
 import { provide, reactive, ref, shallowRef, toRaw, watch, watchEffect } from 'vue';
 import { cloneDeep, isEqual } from 'lodash-es';
 
-import { TMagicForm } from '@tmagic/design';
+import { TMagicForm, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
 
 import Container from './containers/Container.vue';
 import { getConfig } from './utils/config';
@@ -106,6 +106,8 @@ const formState: FormState = reactive<FormState>({
   setField: (prop: string, field: any) => fields.set(prop, field),
   getField: (prop: string) => fields.get(prop),
   deleteField: (prop: string) => fields.delete(prop),
+  $messageBox: tMagicMessageBox,
+  $message: tMagicMessage,
   post: (options: any) => {
     if (requestFuc) {
       return requestFuc({
