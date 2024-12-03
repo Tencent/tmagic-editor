@@ -112,18 +112,18 @@ class DataSourceManager extends EventEmitter {
     for (const method of ds.methods) {
       if (typeof method.content !== 'function') return;
       if (method.timing === 'beforeInit') {
-        method.content({ params: {}, dataSource: ds, app: this.app });
+        await method.content({ params: {}, dataSource: ds, app: this.app });
       }
     }
 
     await ds.init();
 
-    ds.methods.forEach((method) => {
+    for (const method of ds.methods) {
       if (typeof method.content !== 'function') return;
       if (method.timing === 'afterInit') {
-        method.content({ params: {}, dataSource: ds, app: this.app });
+        await method.content({ params: {}, dataSource: ds, app: this.app });
       }
-    });
+    }
   }
 
   public get(id: string) {
