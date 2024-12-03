@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+import type { TMagicMessage, TMagicMessageBox } from '@tmagic/design';
+
 export interface ValidateError {
   message: string;
   field: string;
@@ -59,6 +61,8 @@ export type FormState = {
   setField: (prop: string, field: any) => void;
   getField: (prop: string) => any;
   deleteField: (prop: string) => any;
+  $messageBox: TMagicMessageBox;
+  $message: TMagicMessage;
   [key: string]: any;
 };
 
