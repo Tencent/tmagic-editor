@@ -61,6 +61,7 @@ export default class Flexible {
     clearTimeout(this.tid);
     this.tid = setTimeout(() => {
       this.refreshRem();
+      this.tid = undefined;
     }, 300);
   };
 
