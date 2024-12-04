@@ -1,3 +1,23 @@
+# [1.5.0-beta.16](https://github.com/Tencent/tmagic-editor/compare/v1.5.0-beta.15...v1.5.0-beta.16) (2024-12-04)
+
+
+### Bug Fixes
+
+* **core:** 没有数据源配置时，不初始化数据源事件 ([383b9c9](https://github.com/Tencent/tmagic-editor/commit/383b9c926d1d3e5b176fdf5b1fb9056116854c93))
+* **data-source:** 执行时机函数需要await ([64a692b](https://github.com/Tencent/tmagic-editor/commit/64a692b32a1d26e03d0ede0c25b6d679dd8a0110))
+* **editor:** 修改未包含数据源的配置，画布中没有实时更新 ([b3733fe](https://github.com/Tencent/tmagic-editor/commit/b3733feb969cf4f2222b0202ad38856496c7354c))
+* **vue-runtime-help:** 更新dsl时，设置默认选中项与默认页面 ([a38a0a2](https://github.com/Tencent/tmagic-editor/commit/a38a0a2f4ee85ffe700048ef48c50c461c5375a1))
+
+
+### Features
+
+* **core:** 新增调试api ([ff076f2](https://github.com/Tencent/tmagic-editor/commit/ff076f2ee38ad387587498c694c813f9124a718c))
+* **form:** formState现在， ([29a9670](https://github.com/Tencent/tmagic-editor/commit/29a967046185c5cbb6b4b3a8b01b2c20f950434d))
+* **utils:** 新增getGlobalThis方法 ([da12ef9](https://github.com/Tencent/tmagic-editor/commit/da12ef9d8df1522353e8f9f60566154fe12b8bd9))
+* **vue-components:** 添加className配置，page新增css、cssFile、jsFile配置 ([c7b1f5d](https://github.com/Tencent/tmagic-editor/commit/c7b1f5d925ef5a82c07a02ba58cf542ca6f94f0a))
+
+
+
 # [1.5.0-beta.15](https://github.com/Tencent/tmagic-editor/compare/v1.4.19...v1.5.0-beta.15) (2024-11-25)
 
 
