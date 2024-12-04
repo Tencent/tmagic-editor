@@ -21,10 +21,10 @@ import {
   Target,
 } from '@tmagic/core';
 import { ChangeRecord } from '@tmagic/form';
-import { getNodes, isPage, traverseNode } from '@tmagic/utils';
+import { getNodes, isPage, isValueIncludeDataSource, traverseNode } from '@tmagic/utils';
 
 import PropsPanel from './layouts/PropsPanel.vue';
-import { isIncludeDataSource, isValueIncludeDataSource } from './utils/editor';
+import { isIncludeDataSource } from './utils/editor';
 import { EditorProps } from './editorProps';
 import { Services } from './type';
 
@@ -418,7 +418,8 @@ export const initServiceEvents = (
             isValueIncludeDataSource(record.value)
           ) {
             needRecollectNodes.push(newNode);
-            break;
+          } else {
+            normalNodes.push(newNode);
           }
         }
       } else if (isIncludeDataSource(newNode, oldNode)) {

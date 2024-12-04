@@ -25,13 +25,13 @@ import { NODE_CONDS_KEY, NodeType } from '@tmagic/core';
 import type StageCore from '@tmagic/stage';
 import {
   calcValueByFontsize,
-  DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX,
   getElById,
   getNodePath,
   isNumber,
   isPage,
   isPageFragment,
   isPop,
+  isValueIncludeDataSource,
 } from '@tmagic/utils';
 
 import { Layout } from '@editor/type';
@@ -300,22 +300,6 @@ export const moveItemsInContainer = (sourceIndices: number[], parent: MContainer
       }
     }
   }
-};
-
-export const isValueIncludeDataSource = (value: any) => {
-  if (typeof value === 'string' && /\$\{([\s\S]+?)\}/.test(value)) {
-    return true;
-  }
-  if (Array.isArray(value) && `${value[0]}`.startsWith(DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX)) {
-    return true;
-  }
-  if (value?.isBindDataSource && value.dataSourceId) {
-    return true;
-  }
-  if (value?.isBindDataSourceField && value.dataSourceId) {
-    return true;
-  }
-  return false;
 };
 
 const isIncludeDataSourceByDiffAddResult = (diffResult: any) => {
