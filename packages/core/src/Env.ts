@@ -17,6 +17,7 @@
  */
 
 class Env {
+  [x: string]: any;
   isIos = false;
   isIphone = false;
   isIpad = false;
