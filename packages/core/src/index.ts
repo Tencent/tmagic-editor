@@ -18,6 +18,8 @@
 
 import App from './App';
 
+export { cloneDeep } from 'lodash-es';
+
 export * from '@tmagic/data-source';
 export * from '@tmagic/dep';
 export * from '@tmagic/schema';
@@ -32,5 +34,6 @@ export { default as Page } from './Page';
 export { default as Node } from './Node';
 export { default as IteratorContainer } from './IteratorContainer';
 export { default as FlowState } from './FlowState';
+export { default as DevtoolApi } from './DevtoolApi';
 
 export default App;

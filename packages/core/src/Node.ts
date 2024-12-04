@@ -76,6 +76,51 @@ class Node extends EventEmitter {
     this.eventQueue.push(event);
   }
 
+  public async runHookCode(hook: string, params?: Record<string, any>) {
+    if (typeof this.data[hook] === 'function') {
+      // 兼容旧的数据格式
+      await this.data[hook](this);
+      return;
+    }
+
+    const hookData = this.data[hook] as {
+      /** 钩子类型 */
+      hookType: HookType;
+      hookData: {
+        /** 函数类型 */
+        codeType?: HookCodeType;
+        /** 函数id, 代码块为string, 数据源为[数据源id, 方法名称] */
+        codeId: string | [string, string];
+        /** 参数配置 */
+        params: Record<string, any>;
+      }[];
+    };
+
+    if (hookData?.hookType !== HookType.CODE) return;
+
+    for (const item of hookData.hookData) {
+      const { codeType = HookCodeType.CODE, codeId, params: itemParams = {} } = item;
+
+      let functionContent: ((...args: any[]) => any) | string | undefined;
+      const functionParams: { app: TMagicApp; params: Record<string, any>; dataSource?: DataSource } = {
+        app: this.app,
+        params: params || itemParams,
+      };
+
+      if (codeType === HookCodeType.CODE && typeof codeId === 'string' && this.app.codeDsl?.[codeId]) {
+        functionContent = this.app.codeDsl[codeId].content;
+      } else if (codeType === HookCodeType.DATA_SOURCE_METHOD && Array.isArray(codeId) && codeId.length > 1) {
+        const dataSource = this.app.dataSourceManager?.get(codeId[0]);
+        functionContent = dataSource?.methods.find((method) => method.name === codeId[1])?.content;
+        functionParams.dataSource = dataSource;
+      }
+
+      if (functionContent && typeof functionContent === 'function') {
+        await functionContent(functionParams);
+      }
+    }
+  }
+
   public destroy() {
     this.removeAllListeners();
   }
@@ -106,51 +151,6 @@ class Node extends EventEmitter {
 
       await this.runHookCode('mounted');
     });
-  }
-
-  private async runHookCode(hook: string) {
-    if (typeof this.data[hook] === 'function') {
-      // 兼容旧的数据格式
-      await this.data[hook](this);
-      return;
-    }
-
-    const hookData = this.data[hook] as {
-      /** 钩子类型 */
-      hookType: HookType;
-      hookData: {
-        /** 函数类型 */
-        codeType?: HookCodeType;
-        /** 函数id, 代码块为string, 数据源为[数据源id, 方法名称] */
-        codeId: string | [string, string];
-        /** 参数配置 */
-        params: Record<string, any>;
-      }[];
-    };
-
-    if (hookData?.hookType !== HookType.CODE) return;
-
-    for (const item of hookData.hookData) {
-      const { codeType = HookCodeType.CODE, codeId, params = {} } = item;
-
-      let functionContent: ((...args: any[]) => any) | string | undefined;
-      const functionParams: { app: TMagicApp; params: Record<string, any>; dataSource?: DataSource } = {
-        app: this.app,
-        params,
-      };
-
-      if (codeType === HookCodeType.CODE && typeof codeId === 'string' && this.app.codeDsl?.[codeId]) {
-        functionContent = this.app.codeDsl[codeId].content;
-      } else if (codeType === HookCodeType.DATA_SOURCE_METHOD && Array.isArray(codeId) && codeId.length > 1) {
-        const dataSource = this.app.dataSourceManager?.get(codeId[0]);
-        functionContent = dataSource?.methods.find((method) => method.name === codeId[1])?.content;
-        functionParams.dataSource = dataSource;
-      }
-
-      if (functionContent && typeof functionContent === 'function') {
-        await functionContent(functionParams);
-      }
-    }
   }
 }
 

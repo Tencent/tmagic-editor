@@ -109,7 +109,7 @@ export const getNodePath = (id: Id, data: MNode[] = []): MNode[] => {
   return path;
 };
 
-export const getNodeInfo = (id: Id, root: MApp | null) => {
+export const getNodeInfo = (id: Id, root: Pick<MApp, 'id' | 'items'> | null) => {
   const info: EditorNodeInfo = {
     node: null,
     parent: null,

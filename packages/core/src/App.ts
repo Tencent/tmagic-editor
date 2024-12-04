@@ -48,6 +48,7 @@ export interface AppOptionsConfig {
 }
 
 class App extends EventEmitter {
+  [x: string]: any;
   public env: Env = new Env();
   public dsl?: MApp;
   public codeDsl?: CodeBlockDSL;
@@ -230,7 +231,7 @@ class App extends EventEmitter {
    * @param eventConfig 代码动作的配置
    * @returns void
    */
-  public async runCode(codeId: Id, params: Record<string, any>, args: any[], flowState: FlowState) {
+  public async runCode(codeId: Id, params: Record<string, any>, args: any[], flowState?: FlowState) {
     if (!codeId || isEmpty(this.codeDsl)) return;
     const content = this.codeDsl?.[codeId]?.content;
     if (typeof content === 'function') {
@@ -243,7 +244,7 @@ class App extends EventEmitter {
     methodName: string,
     params: Record<string, any>,
     args: any[],
-    flowState: FlowState,
+    flowState?: FlowState,
   ) {
     if (!dsId || !methodName) return;
 

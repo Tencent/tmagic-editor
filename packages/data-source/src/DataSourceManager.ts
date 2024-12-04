@@ -47,7 +47,7 @@ class DataSourceManager extends EventEmitter {
 
   public app: TMagicApp;
 
-  public dataSourceMap = new Map<string, DataSource>();
+  public dataSourceMap = new Map<string, DataSource & Record<string, any>>();
 
   public data: DataSourceManagerData = {};
   public useMock?: boolean = false;
