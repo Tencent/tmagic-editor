@@ -45,7 +45,7 @@ import { computed, inject, ref } from 'vue';
 import { Close, Delete } from '@element-plus/icons-vue';
 import { throttle } from 'lodash-es';
 
-import type { Id } from '@tmagic/core';
+import type { Id, MNode } from '@tmagic/core';
 import { TMagicButton, TMagicTooltip } from '@tmagic/design';
 import type { FieldProps, FormItem, FormState } from '@tmagic/form';
 import { getIdFromEl } from '@tmagic/utils';
@@ -72,8 +72,11 @@ const cancelHandler = () => {
   globalThis.document.removeEventListener(UI_SELECT_MODE_EVENT_NAME, clickHandler as EventListener);
 };
 
-const clickHandler = ({ detail }: Event & { detail: HTMLElement }) => {
-  const id = getIdFromEl()(detail);
+const clickHandler = ({ detail }: Event & { detail: HTMLElement | MNode }) => {
+  let { id } = detail;
+  if (detail.nodeType) {
+    id = getIdFromEl()(detail as HTMLElement) || id;
+  }
   if (id) {
     props.model[props.name] = id;
     emit('change', id);
