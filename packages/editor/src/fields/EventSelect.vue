@@ -119,7 +119,7 @@ const eventNameConfig = computed(() => {
           if (pageFragment) {
             events = [
               {
-                label: pageFragment.name || '迭代器容器',
+                label: pageFragment.name || '页面片容器',
                 value: pageFragment.id,
                 children: events,
               },
