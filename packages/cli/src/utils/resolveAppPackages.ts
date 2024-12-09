@@ -8,6 +8,7 @@ import * as recast from 'recast';
 import type App from '../Core';
 import { EntryType, ModuleMainFilePath, NpmConfig, PackageType } from '../types';
 
+import { backupLock, backupPackageJson, restoreLock, restorePackageJson } from './backupPackageFile';
 import { error, execInfo, info } from './logger';
 
 type Ast = any;
@@ -549,18 +550,13 @@ export const resolveAppPackages = (app: App): ModuleMainFilePath => {
     if (!npmConfig.keepPackageJsonClean) {
       npmInstall(dependencies, source, npmConfig);
     } else {
-      const packageFile = path.join(source, 'package.json');
-      const packageBakFile = path.join(source, 'package.json.bak');
-      if (fs.existsSync(packageFile)) {
-        fs.copyFileSync(packageFile, packageBakFile);
-      }
+      backupLock(source, npmConfig.client || 'npm');
+      backupPackageJson(source);
 
       npmInstall(dependencies, source, npmConfig);
 
-      if (fs.existsSync(packageBakFile)) {
-        fs.unlinkSync(packageFile);
-        fs.renameSync(packageBakFile, packageFile);
-      }
+      restoreLock(source, npmConfig.client || 'npm');
+      restorePackageJson(source);
     }
   }
 
