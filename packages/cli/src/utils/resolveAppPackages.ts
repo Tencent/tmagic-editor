@@ -1,6 +1,6 @@
-import { execSync } from 'child_process';
-import path from 'path';
-import { exit } from 'process';
+import { execSync } from 'node:child_process';
+import path from 'node:path';
+import { exit } from 'node:process';
 
 import fs, { existsSync } from 'fs-extra';
 import * as recast from 'recast';
@@ -290,7 +290,7 @@ const getComponentPackageImports = function ({
 };
 
 const getIndexPath = function (entry: string) {
-  for (const affix of ['', '.js', '.ts']) {
+  for (const affix of ['', '.js', '.cjs', 'mjs', '.ts']) {
     const filePath = `${entry}${affix}`;
     if (isFile(filePath)) {
       return filePath;
@@ -469,7 +469,7 @@ const setPackages = (packages: ModuleMainFilePath, app: App, packagePath: string
 
   if (isDirectory(moduleName)) {
     if (!fs.existsSync(path.join(moduleName, './package.json'))) {
-      ['index.js', 'index.ts'].forEach((index) => {
+      ['index.js', 'index.ts', 'index.cjs', 'index.mjs', 'index.json'].forEach((index) => {
         const indexFile = path.join(moduleName!, `./${index}`);
         if (fs.existsSync(indexFile)) {
           moduleName = indexFile;
@@ -493,7 +493,17 @@ const setPackages = (packages: ModuleMainFilePath, app: App, packagePath: string
   // 组件&插件&数据源包
   if (result.type === PackageType.COMPONENT_PACKAGE) {
     result.imports.forEach((i) => {
-      setPackages(packages, app, i.indexPath, moduleName!, i.type);
+      if (!moduleName) {
+        return;
+      }
+
+      let componentCwd = moduleName;
+
+      if (!isDirectory(moduleName)) {
+        componentCwd = path.join(cwd, `node_modules/${moduleName}`);
+      }
+
+      setPackages(packages, app, i.indexPath, componentCwd, i.type);
     });
 
     return;
