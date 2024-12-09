@@ -38,7 +38,7 @@ const getRelativePath = (str: string, base: string) => (path.isAbsolute(str) ? p
 
 const npmInstall = function (dependencies: Record<string, string>, cwd: string, npmConfig: NpmConfig = {}) {
   try {
-    const { client = 'npm', registry } = npmConfig;
+    const { client = 'npm', registry, installArgs = '' } = npmConfig;
     const install = {
       npm: 'install',
       yarn: 'add',
@@ -49,7 +49,9 @@ const npmInstall = function (dependencies: Record<string, string>, cwd: string, 
       .map(([name, version]) => (version ? `${name}@${version}` : name))
       .join(' ');
 
-    const command = `${client} ${install} ${packages}${registry ? ` --registry ${registry}` : ''}`;
+    const installArgsString = `${installArgs ? ` ${installArgs}` : ''}`;
+    const registryString = `${registry ? ` --registry ${registry}` : ''}`;
+    const command = `${client} ${install}${installArgsString} ${packages}${registryString}`;
 
     execInfo(cwd);
     execInfo(command);
