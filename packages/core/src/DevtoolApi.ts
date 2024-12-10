@@ -106,12 +106,14 @@ export default class DevToolApi {
     }
 
     const newCode = cloneDeep(code);
+    // eslint-disable-next-line prefer-const
+    let fuc = value;
     if (path === 'content' && typeof value === 'string' && (value.includes('function') || value.includes('=>'))) {
       // eslint-disable-next-line no-eval
-      value = eval(value);
+      eval(`fuc = ${value})`);
     }
 
-    setValueByKeyPath(path, value, newCode);
+    setValueByKeyPath(path, fuc, newCode);
 
     codeBlocks[codeId] = newCode;
   }
