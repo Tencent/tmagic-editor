@@ -1,0 +1,2 @@
+import"./index-DZWDE13t.js";import{t as r}from"./_plugin-vue_export-helper-BZEVhP0O.js";function f(i=""){let e,n,t;return typeof i=="string"?e=i:{componentType:e,app:n}=i,(!e||e==="")&&(e="container"),n||(n=VueDemi.inject("app")),t=o({componentType:e,app:n}),!t&&!e.startsWith("magic-ui-")&&(e="magic-ui-".concat(r(e)),t=o({componentType:e,app:n})),t!=null?t:e}function o({componentType:i,app:e}){return e==null?void 0:e.resolveComponent(i)}export{f as u};
+//# sourceMappingURL=use-component-BiHVBvWg.js.map
