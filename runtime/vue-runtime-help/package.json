@@ -32,8 +32,8 @@
     "vue-demi": "^0.14.10"
   },
   "peerDependencies": {
-    "@tmagic/core": ">=1.5.0-beta.14",
-    "@tmagic/stage": ">=1.5.0-beta.14",
+    "@tmagic/core": ">=1.5.0",
+    "@tmagic/stage": ">=1.5.0",
     "@vue/composition-api": ">=1.7.2",
     "typescript": "*",
     "vue": ">=2.6.0 || >=3.5.0"

@@ -32,8 +32,8 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "peerDependencies": {
-    "@tmagic/core": ">=1.5.0-beta.14",
-    "@tmagic/editor": ">=1.5.0-beta.14",
+    "@tmagic/core": ">=1.5.0",
+    "@tmagic/editor": ">=1.5.0",
     "element-plus": ">=2.8.0",
     "vue": ">=3.5.0",
     "typescript": "*"
@@ -48,10 +48,10 @@
   },
   "devDependencies": {
     "@types/node": "^18.19.0",
-    "@vitejs/plugin-vue": "^5.1.3",
+    "@vitejs/plugin-vue": "^5.2.1",
     "@vue/compiler-sfc": "^3.5.12",
     "rimraf": "^3.0.2",
-    "vite": "^5.4.10",
+    "vite": "^6.0.3",
     "vue-tsc": "^2.1.8"
   }
 }
