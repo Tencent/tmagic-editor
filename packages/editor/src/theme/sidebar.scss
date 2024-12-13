@@ -1,9 +1,11 @@
+@use "common/var" as *;
+
 .m-editor-sidebar {
   display: flex;
   height: 100%;
 
   .m-editor-sidebar-header {
-    background: $--sidebar-heder-background-color;
+    background: $sidebar-heder-background-color;
     height: 100%;
     width: 40px;
 
@@ -16,7 +18,7 @@
       cursor: pointer;
 
       &.is-active {
-        background: $--sidebar-content-background-color;
+        background: $sidebar-content-background-color;
 
         i {
           color: #353140;

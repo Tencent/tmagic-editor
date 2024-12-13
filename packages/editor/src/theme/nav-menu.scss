@@ -1,3 +1,5 @@
+@use "common/var" as *;
+
 .m-editor-nav-menu {
   display: flex;
   z-index: 5;
@@ -5,13 +7,13 @@
   justify-content: space-between;
   -webkit-box-align: center;
   align-items: center;
-  background-color: $--nav--background-color;
+  background-color: $nav--background-color;
   font-size: 19.2px;
-  color: $--nav-color;
+  color: $nav-color;
   font-weight: 400;
   box-sizing: border-box;
   margin: 0px;
-  flex: 0 0 $--nav-height;
+  flex: 0 0 $nav-height;
   border-bottom: 1px solid #d8dee8;
 
   > div {
@@ -54,7 +56,7 @@
     }
 
     .is-text > i {
-      color: $--font-color;
+      color: $font-color;
     }
 
     .icon {
@@ -66,7 +68,7 @@
     }
 
     .menu-item-text {
-      color: $--nav-color;
+      color: $nav-color;
     }
 
     &.rule {

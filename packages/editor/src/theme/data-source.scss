@@ -1,3 +1,5 @@
+@use "common/var" as *;
+
 .data-source-list-panel {
   .list-container {
     .list-item {
@@ -25,7 +27,7 @@
     padding: 5px 14px;
 
     &:hover {
-      background-color: $--hover-color;
+      background-color: $hover-color;
     }
   }
 }

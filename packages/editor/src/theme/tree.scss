@@ -1,6 +1,8 @@
+@use "common/var" as *;
+
 .m-editor-tree {
-  $--node-height: 22px;
-  color: $--font-color;
+  $node-height: 22px;
+  color: $font-color;
   font-size: 13px;
 
   .m-editor-tree-node {
@@ -12,31 +14,31 @@
       align-items: center;
 
       &:hover {
-        background-color: $--hover-color;
-        color: $--font-color;
+        background-color: $hover-color;
+        color: $font-color;
       }
 
       &.selected {
-        background-color: $--theme-color;
-        color: $--hover-color;
+        background-color: $theme-color;
+        color: $hover-color;
       }
 
       &.drag-inner {
         .tree-node-content {
-          background-color: rgba($color: $--theme-color, $alpha: 0.5);
-          color: $--hover-color;
+          background-color: rgba($color: $theme-color, $alpha: 0.5);
+          color: $hover-color;
         }
       }
 
       &.drag-before {
         .tree-node-content {
-          border-top-color: rgba($color: $--theme-color, $alpha: 0.5);
+          border-top-color: rgba($color: $theme-color, $alpha: 0.5);
         }
       }
 
       &.drag-after {
         .tree-node-content {
-          border-bottom-color: rgba($color: $--theme-color, $alpha: 0.5);
+          border-bottom-color: rgba($color: $theme-color, $alpha: 0.5);
         }
       }
 
@@ -50,11 +52,11 @@
         display: flex;
         flex: 1;
         justify-content: space-between;
-        height: $--node-height;
+        height: $node-height;
         border-top: 2px solid transparent;
         border-bottom: 2px solid transparent;
         .tree-node-label {
-          line-height: $--node-height;
+          line-height: $node-height;
           flex: 1;
           width: 100px;
           overflow: hidden;

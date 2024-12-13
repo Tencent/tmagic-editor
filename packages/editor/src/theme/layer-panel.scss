@@ -1,5 +1,7 @@
+@use "common/var" as *;
+
 .m-editor-layer-panel {
-  background: $--sidebar-content-background-color;
+  background: $sidebar-content-background-color;
 
   .m-editor-tree {
     padding-top: 48px;

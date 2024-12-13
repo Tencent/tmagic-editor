@@ -1,8 +1,10 @@
+@use "common/var" as *;
+
 .m-editor-float-box {
   position: absolute;
   background-color: #fff;
   z-index: 100;
-  border: 1px solid $--border-color;
+  border: 1px solid $border-color;
   display: flex;
   flex-direction: column;
   max-height: 100%;
@@ -17,7 +19,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid $--border-color;
+    border-bottom: 1px solid $border-color;
   }
 
   .m-editor-float-box-body {

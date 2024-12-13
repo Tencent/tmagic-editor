@@ -1,20 +1,22 @@
+@use "common/var" as *;
+
 .ui-component-panel {
   &.tmagic-design-collapse {
     border-top: 0 !important;
     margin-top: 48px;
-    background-color: $--sidebar-content-background-color;
+    background-color: $sidebar-content-background-color;
 
     .tmagic-design-collapse-item {
       > div:first-of-type {
-        border-bottom: 1px solid $--border-color;
+        border-bottom: 1px solid $border-color;
         margin-bottom: 10px;
       }
     }
 
     .el-collapse-item__header,
     .t-collapse-panel__header {
-      background: $--sidebar-content-background-color;
-      color: $--font-color;
+      background: $sidebar-content-background-color;
+      color: $font-color;
       height: 25px;
       line-height: 25px;
       padding-left: 10px;
@@ -28,7 +30,7 @@
 
     .el-collapse-item__wrap,
     .t-collapse-panel__body {
-      background: $--sidebar-content-background-color;
+      background: $sidebar-content-background-color;
       border-bottom: 0;
 
       .el-collapse-item__content,
@@ -44,7 +46,7 @@
         text-overflow: ellipsis;
         margin: 5px 10px;
         box-sizing: border-box;
-        color: $--font-color;
+        color: $font-color;
         flex-direction: column;
         width: 42px;
         cursor: pointer;
@@ -57,7 +59,7 @@
           line-height: 40px;
           border-radius: 5px;
           color: #909090;
-          border: 1px solid $--border-color;
+          border: 1px solid $border-color;
           display: flex;
           justify-content: space-evenly;
           align-items: center;

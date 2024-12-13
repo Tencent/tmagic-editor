@@ -1,3 +1,5 @@
+@use "common/var" as *;
+
 .magic-editor-content-menu {
   position: fixed;
   font-size: 12px;
@@ -29,7 +31,7 @@
 
     .el-button--text,
     i {
-      color: $--font-color;
+      color: $font-color;
     }
 
     .magic-editor-icon {
@@ -46,20 +48,20 @@
 
     &.button {
       &:hover {
-        background-color: $--hover-color;
+        background-color: $hover-color;
         .tmagic-design-button,
         .tmagic-design-button:active,
         .tmagic-design-button:focus {
-          color: $--font-color;
+          color: $font-color;
         }
 
         &.menu-item i {
-          color: $--font-color;
+          color: $font-color;
         }
       }
 
       &.active {
-        background-color: $--theme-color;
+        background-color: $theme-color;
         .tmagic-design-button,
         .tmagic-design-button:active,
         .tmagic-design-button:focus {
