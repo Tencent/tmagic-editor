@@ -51,7 +51,7 @@ cd hello-world
 ## 添加依赖
 
 ```bash
-npm install --save @tmagic/editor @tmagic/form @tmagic/stage @tmagic/design @tmagic/element-plus-adapter element-plus
+npm install --save @tmagic/editor @tmagic/element-plus-adapter element-plus
 ```
 
 ## 注册组件
@@ -61,25 +61,19 @@ npm install --save @tmagic/editor @tmagic/form @tmagic/stage @tmagic/design @tma
 ```ts
 import 'element-plus/dist/index.css';
 import '@tmagic/editor/dist/style.css';
-import '@tmagic/form/dist/style.css';
 
 import { createApp } from 'vue';
 import ElementPlus from 'element-plus';
 
-import TMagicDesign from '@tmagic/design';
 import TMagicEditor from '@tmagic/editor';
 import TMagicElementPlusAdapter from '@tmagic/element-plus-adapter';
-import TMagicForm from '@tmagic/form';
 
 import App from './App.vue';
 
 createApp(App)
   .use(ElementPlus)
-  .use(TMagicDesign, TMagicElementPlusAdapter)
-  .use(TMagicEditor)
-  .use(TMagicForm)
+  .use(TMagicEditor, TMagicElementPlusAdapter)
   .mount('#app');
-
 ```
 
 ## 渲染编辑器
@@ -185,7 +179,7 @@ const render = () => {
 
   createApp(
     {
-      template: '<p v-for="node in config.items" :key="node.id" :id="node.id">hello world</p>',
+      template: '<p v-for="node in config.items" :key="node.id" :data-tmagic-id="node.id">hello world</p>',
       props: ['config'],
     },
     {
@@ -249,7 +243,7 @@ const render = async ({ renderer }: StageCore) => {
 
   createApp(
     {
-      template: '<div v-for="node in config.items" :key="node.id" :id="node.id">hello world</div>',
+      template: '<div v-for="node in config.items" :key="node.id" :data-tmagic-id="node.id">hello world</div>',
       props: ['config'],
     },
     {

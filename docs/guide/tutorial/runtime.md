@@ -22,7 +22,7 @@ cd editor-runtime
 按钮需要用的ts types依赖
 
 ```bash
-npm install --save @tmagic/schema @tmagic/stage
+npm install --save @tmagic/core @tmagic/stage
 ```
 
 ## 实现runtime
@@ -33,8 +33,8 @@ npm install --save @tmagic/schema @tmagic/stage
 
 ```vue
 <template>
-  <div v-if="config" :id="config.id" :style="style">
-    <div v-for="node in config.items" :key="node.id" :id="node.id">hello world</div>
+  <div v-if="config" :data-tmagic-id="config.id" :style="style">
+    <div v-for="node in config.items" :key="node.id" :data-tmagic-id="node.id">hello world</div>
   </div>
 </template>
 
@@ -179,8 +179,8 @@ declare global {
 ```
 
 ```ts
+import type { Id, MApp, MNode } from '@tmagic/core';
 import type { RemoveData, UpdateData } from '@tmagic/stage';
-import type { Id, MApp, MNode } from '@tmagic/schema';
 
 const root = ref<MApp>();
 
