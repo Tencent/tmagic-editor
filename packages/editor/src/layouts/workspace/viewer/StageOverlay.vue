@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, onBeforeUnmount, ref, watch } from 'vue';
+import { computed, inject, onBeforeUnmount, useTemplateRef, watch } from 'vue';
 import { CloseBold } from '@element-plus/icons-vue';
 
 import { TMagicIcon } from '@tmagic/design';
@@ -19,7 +19,7 @@ const services = inject<Services>('services');
 
 const stageOptions = inject<StageOptions>('stageOptions');
 
-const stageOverlay = ref<HTMLDivElement>();
+const stageOverlay = useTemplateRef<HTMLDivElement>('stageOverlay');
 
 const stageOverlayVisible = computed(() => services?.stageOverlayService.get('stageOverlayVisible'));
 const wrapWidth = computed(() => services?.stageOverlayService.get('wrapWidth') || 0);

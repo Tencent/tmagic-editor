@@ -35,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref } from 'vue';
+import { computed, inject, useTemplateRef } from 'vue';
 
 import type { Id } from '@tmagic/core';
 import { TMagicButton, TMagicScrollbar } from '@tmagic/design';
@@ -67,7 +67,7 @@ const editable = computed(() => codeBlockService?.getEditStatus());
 const { codeBlockEditor, codeConfig, editCode, deleteCode, createCodeBlock, submitCodeBlockHandler } =
   useCodeBlockEdit(codeBlockService);
 
-const codeBlockList = ref<InstanceType<typeof CodeBlockList>>();
+const codeBlockList = useTemplateRef<InstanceType<typeof CodeBlockList>>('codeBlockList');
 
 const filterTextChangeHandler = (val: string) => {
   codeBlockList.value?.filter(val);

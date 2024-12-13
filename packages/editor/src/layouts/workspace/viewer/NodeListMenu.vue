@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, nextTick, ref, watch } from 'vue';
+import { computed, inject, nextTick, ref, useTemplateRef, watch } from 'vue';
 
 import type { MNode } from '@tmagic/core';
 import { TMagicTooltip } from '@tmagic/design';
@@ -39,8 +39,8 @@ const editorService = services?.editorService;
 
 const visible = ref(false);
 const buttonVisible = ref(false);
-const button = ref<HTMLDivElement>();
-const box = ref<InstanceType<typeof FloatingBox>>();
+const button = useTemplateRef<HTMLDivElement>('button');
+const box = useTemplateRef<InstanceType<typeof FloatingBox>>('box');
 
 const stage = computed(() => editorService?.get('stage'));
 const page = computed(() => editorService?.get('page'));

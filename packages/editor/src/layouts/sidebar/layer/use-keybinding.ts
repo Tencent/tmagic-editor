@@ -1,4 +1,4 @@
-import { type Ref, ref, watchEffect } from 'vue';
+import { ref, type ShallowRef, watchEffect } from 'vue';
 
 import Tree from '@editor/components/Tree.vue';
 import type { Services } from '@editor/type';
@@ -6,7 +6,7 @@ import { KeyBindingContainerKey } from '@editor/utils/keybinding-config';
 
 export const useKeybinding = (
   services: Services | undefined,
-  container: Ref<InstanceType<typeof Tree> | undefined>,
+  container: ShallowRef<InstanceType<typeof Tree> | null>,
 ) => {
   const keybindingService = services?.keybindingService;
 

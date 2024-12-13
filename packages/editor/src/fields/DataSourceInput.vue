@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, nextTick, ref, watch } from 'vue';
+import { computed, inject, nextTick, ref, useTemplateRef, watch } from 'vue';
 import { Coin } from '@element-plus/icons-vue';
 
 import type { DataSchema, DataSourceSchema } from '@tmagic/core';
@@ -83,7 +83,7 @@ const emit = defineEmits<{
 
 const { dataSourceService } = inject<Services>('services') || {};
 
-const autocomplete = ref<InstanceType<typeof TMagicAutocomplete>>();
+const autocomplete = useTemplateRef<InstanceType<typeof TMagicAutocomplete>>('autocomplete');
 const isFocused = ref(false);
 const state = ref('');
 const displayState = ref<{ value: string; type: 'var' | 'text' }[]>([]);

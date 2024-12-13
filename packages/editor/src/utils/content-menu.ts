@@ -1,4 +1,4 @@
-import { computed, markRaw, Ref } from 'vue';
+import { computed, markRaw, type ShallowRef } from 'vue';
 import { CopyDocument, Delete, DocumentCopy } from '@element-plus/icons-vue';
 
 import { Id, MContainer, NodeType } from '@tmagic/core';
@@ -33,7 +33,7 @@ export const useCopyMenu = (): MenuButton => ({
   },
 });
 
-export const usePasteMenu = (menu?: Ref<InstanceType<typeof ContentMenu> | undefined>): MenuButton => ({
+export const usePasteMenu = (menu?: ShallowRef<InstanceType<typeof ContentMenu> | null>): MenuButton => ({
   type: 'button',
   text: '粘贴',
   icon: markRaw(DocumentCopy),

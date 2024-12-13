@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, onMounted, ref, watchEffect } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef, watchEffect } from 'vue';
 import { OnDrag } from 'gesto';
 
 import Resizer from './Resizer.vue';
@@ -51,7 +51,7 @@ const props = withDefaults(
   },
 );
 
-const el = ref<HTMLElement>();
+const el = useTemplateRef<HTMLElement>('el');
 
 const hasLeft = computed(() => typeof props.left !== 'undefined');
 const hasRight = computed(() => typeof props.right !== 'undefined');

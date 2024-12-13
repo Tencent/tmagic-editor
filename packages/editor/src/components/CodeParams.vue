@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, useTemplateRef } from 'vue';
 
 import { type ContainerChangeEventData, type FormConfig, type FormValue, MForm } from '@tmagic/form';
 
@@ -32,7 +32,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['change']);
 
-const form = ref<InstanceType<typeof MForm>>();
+const form = useTemplateRef<InstanceType<typeof MForm>>('form');
 
 const getFormConfig = (items: FormConfig = []) => [
   {

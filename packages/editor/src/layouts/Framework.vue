@@ -62,7 +62,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, inject, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue';
 
 import type { MPage, MPageFragment } from '@tmagic/core';
 import { TMagicScrollbar } from '@tmagic/design';
@@ -93,8 +93,8 @@ const DEFAULT_RIGHT_COLUMN_WIDTH = 480;
 const codeOptions = inject('codeOptions', {});
 const { editorService, uiService } = inject<Services>('services') || {};
 
-const content = ref<HTMLDivElement>();
-const splitView = ref<InstanceType<typeof SplitView>>();
+const content = useTemplateRef<HTMLDivElement>('content');
+const splitView = useTemplateRef<InstanceType<typeof SplitView>>('splitView');
 
 const root = computed(() => editorService?.get('root'));
 const page = computed(() => editorService?.get('page'));

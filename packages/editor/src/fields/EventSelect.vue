@@ -2,7 +2,6 @@
   <div class="m-fields-event-select">
     <m-form-table
       v-if="isOldVersion"
-      ref="eventForm"
       name="events"
       :size="size"
       :disabled="disabled"

@@ -38,7 +38,16 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, getCurrentInstance, inject, onBeforeUnmount, onMounted, ref, watchEffect } from 'vue';
+import {
+  computed,
+  getCurrentInstance,
+  inject,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  useTemplateRef,
+  watchEffect,
+} from 'vue';
 import { Document as DocumentIcon } from '@element-plus/icons-vue';
 
 import type { MNode } from '@tmagic/core';
@@ -71,7 +80,7 @@ const showSrc = ref(false);
 
 const internalInstance = getCurrentInstance();
 const values = ref<FormValue>({});
-const configForm = ref<InstanceType<typeof MForm>>();
+const configForm = useTemplateRef<InstanceType<typeof MForm>>('configForm');
 // ts类型应该是FormConfig， 但是打包时会出错，所以暂时用any
 const curFormConfig = ref<any>([]);
 const services = inject<Services>('services');

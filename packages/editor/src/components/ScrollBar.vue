@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, useTemplateRef } from 'vue';
 import Gesto from 'gesto';
 
 defineOptions({
@@ -21,8 +21,8 @@ const props = defineProps<{
 
 const emit = defineEmits(['scroll']);
 
-const bar = ref<HTMLDivElement>();
-const thumb = ref<HTMLDivElement>();
+const bar = useTemplateRef<HTMLDivElement>('bar');
+const thumb = useTemplateRef<HTMLDivElement>('thumb');
 
 const thumbSize = computed(() => props.size * (props.size / props.scrollSize));
 const thumbPos = computed(() => (props.pos / props.scrollSize) * props.size);

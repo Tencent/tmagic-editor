@@ -3,7 +3,7 @@
   display: flex;
   justify-self: space-between;
 
-  &:has(.m-editor-resizer-draging) {
+  &:has(.m-editor-resizer-dragging) {
     overflow: hidden;
   }
 }

@@ -1,11 +1,11 @@
 <template>
-  <span ref="target" class="m-editor-resizer" :class="{ 'm-editor-resizer-draging': isDraging }">
+  <span ref="target" class="m-editor-resizer" :class="{ 'm-editor-resizer-dragging': isDragging }">
     <slot></slot>
   </span>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { useTemplateRef } from 'vue';
 import type { OnDrag } from 'gesto';
 
 import { useGetSo } from '@editor/hooks/use-getso';
@@ -18,6 +18,6 @@ const emit = defineEmits<{
   change: [e: OnDrag];
 }>();
 
-const target = ref<HTMLSpanElement>();
-const { isDraging } = useGetSo(target, emit);
+const target = useTemplateRef<HTMLSpanElement>('target');
+const { isDragging } = useGetSo(target, emit);
 </script>

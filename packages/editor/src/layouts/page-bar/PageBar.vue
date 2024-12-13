@@ -68,7 +68,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, ref, watch } from 'vue';
+import { computed, inject, ref, useTemplateRef, watch } from 'vue';
 import { CaretBottom, Delete, DocumentCopy } from '@element-plus/icons-vue';
 
 import { type Id, type MPage, type MPageFragment, NodeType } from '@tmagic/core';
@@ -144,8 +144,8 @@ const remove = (node: MPage | MPageFragment) => {
   editorService?.remove(node);
 };
 
-const pageBarScrollContainer = ref<InstanceType<typeof PageBarScrollContainer>>();
-const pageBarItems = ref<HTMLDivElement[]>();
+const pageBarScrollContainer = useTemplateRef<InstanceType<typeof PageBarScrollContainer>>('pageBarScrollContainer');
+const pageBarItems = useTemplateRef<HTMLDivElement[]>('pageBarItems');
 watch(page, (page) => {
   if (
     !page ||

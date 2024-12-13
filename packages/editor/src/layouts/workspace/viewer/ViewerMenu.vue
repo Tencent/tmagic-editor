@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, markRaw, ref, watch } from 'vue';
+import { computed, inject, markRaw, ref, useTemplateRef, watch } from 'vue';
 import { Bottom, Top } from '@element-plus/icons-vue';
 
 import { NodeType } from '@tmagic/core';
@@ -33,7 +33,7 @@ const props = withDefaults(
 
 const services = inject<Services>('services');
 const editorService = services?.editorService;
-const menu = ref<InstanceType<typeof ContentMenu>>();
+const menu = useTemplateRef<InstanceType<typeof ContentMenu>>('menu');
 const canCenter = ref(false);
 
 const node = computed(() => editorService?.get('node'));

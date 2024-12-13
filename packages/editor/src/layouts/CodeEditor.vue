@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue';
 import { FullScreen } from '@element-plus/icons-vue';
 import { throttle } from 'lodash-es';
 import serialize from 'serialize-javascript';
@@ -93,7 +93,7 @@ let vsDiffEditor: monaco.editor.IStandaloneDiffEditor | null = null;
 
 const values = ref('');
 const loading = ref(false);
-const codeEditor = ref<HTMLDivElement>();
+const codeEditor = useTemplateRef<HTMLDivElement>('codeEditor');
 
 const resizeObserver = new globalThis.ResizeObserver(
   throttle((): void => {

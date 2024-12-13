@@ -36,7 +36,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue';
 
 import { useZIndex } from '@tmagic/design';
 
@@ -68,9 +68,9 @@ const emit = defineEmits<{
   mouseenter: [];
 }>();
 
-const menu = ref<HTMLDivElement>();
-const buttons = ref<InstanceType<typeof ToolButton>[]>();
-const subMenu = ref<any>();
+const menu = useTemplateRef<HTMLDivElement>('menu');
+const buttons = useTemplateRef<InstanceType<typeof ToolButton>[]>('buttons');
+const subMenu = useTemplateRef<any>('subMenu');
 const visible = ref(false);
 const subMenuData = ref<(MenuButton | MenuComponent)[]>([]);
 const zIndex = useZIndex();

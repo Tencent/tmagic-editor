@@ -1,4 +1,4 @@
-import { nextTick, ref } from 'vue';
+import { nextTick, ref, useTemplateRef } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
 import type { CodeBlockContent } from '@tmagic/core';
@@ -10,7 +10,7 @@ import type { CodeBlockService } from '@editor/services/codeBlock';
 export const useCodeBlockEdit = (codeBlockService?: CodeBlockService) => {
   const codeConfig = ref<CodeBlockContent>();
   const codeId = ref<string>();
-  const codeBlockEditor = ref<InstanceType<typeof CodeBlockEditor>>();
+  const codeBlockEditor = useTemplateRef<InstanceType<typeof CodeBlockEditor>>('codeBlockEditor');
 
   // 新增代码块
   const createCodeBlock = async () => {

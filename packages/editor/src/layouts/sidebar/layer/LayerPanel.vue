@@ -47,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref } from 'vue';
+import { computed, inject, useTemplateRef } from 'vue';
 
 import type { MNode } from '@tmagic/core';
 import { TMagicScrollbar } from '@tmagic/design';
@@ -80,7 +80,7 @@ defineProps<{
 const services = inject<Services>('services');
 const editorService = services?.editorService;
 
-const tree = ref<InstanceType<typeof Tree>>();
+const tree = useTemplateRef<InstanceType<typeof Tree>>('tree');
 
 const page = computed(() => editorService?.get('page'));
 const nodeData = computed<TreeNodeData[]>(() => (!page.value ? [] : [page.value]));

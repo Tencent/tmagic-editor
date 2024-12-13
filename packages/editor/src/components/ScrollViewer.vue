@@ -25,7 +25,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue';
 
 import { isNumber } from '@tmagic/utils';
 
@@ -63,8 +63,8 @@ const props = withDefaults(
   },
 );
 
-const container = ref<HTMLDivElement>();
-const el = ref<HTMLDivElement>();
+const container = useTemplateRef<HTMLDivElement>('container');
+const el = useTemplateRef<HTMLDivElement>('el');
 const style = computed(
   () => `
         width: ${isNumber(`${props.width}`) ? `${props.width}px` : props.width};

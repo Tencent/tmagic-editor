@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, markRaw, ref } from 'vue';
+import { computed, inject, markRaw, useTemplateRef } from 'vue';
 import { Files, Plus } from '@element-plus/icons-vue';
 
 import { isPage, isPageFragment } from '@tmagic/utils';
@@ -33,7 +33,7 @@ const emit = defineEmits<{
 }>();
 
 const services = inject<Services>('services');
-const menu = ref<InstanceType<typeof ContentMenu>>();
+const menu = useTemplateRef<InstanceType<typeof ContentMenu>>('menu');
 const node = computed(() => services?.editorService.get('node'));
 const nodes = computed(() => services?.editorService.get('nodes'));
 const componentList = computed(() => services?.componentListService.getList() || []);

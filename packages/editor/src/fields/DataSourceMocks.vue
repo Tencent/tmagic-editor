@@ -15,7 +15,6 @@
     >
       <template #body>
         <MFormBox
-          ref="addDialog"
           label-width="120px"
           :config="formConfig"
           :values="formValues"

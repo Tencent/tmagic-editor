@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref } from 'vue';
+import { nextTick, ref, useTemplateRef } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
 import type { CodeBlockContent } from '@tmagic/core';
@@ -51,7 +51,7 @@ const props = withDefaults(
 const emit = defineEmits(['change']);
 
 const codeConfig = ref<CodeBlockContent>();
-const codeBlockEditor = ref<InstanceType<typeof CodeBlockEditor>>();
+const codeBlockEditor = useTemplateRef<InstanceType<typeof CodeBlockEditor>>('codeBlockEditor');
 
 let editIndex = -1;
 

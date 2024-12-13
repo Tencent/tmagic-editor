@@ -1,4 +1,4 @@
-import { computed, type ComputedRef, nextTick, type Ref, ref } from 'vue';
+import { computed, type ComputedRef, nextTick, type Ref, useTemplateRef } from 'vue';
 import { throttle } from 'lodash-es';
 
 import { Id, MNode } from '@tmagic/core';
@@ -99,7 +99,7 @@ export const useClick = (
   };
 
   // 右键菜单
-  const menu = ref<InstanceType<typeof LayerMenu>>();
+  const menu = useTemplateRef<InstanceType<typeof LayerMenu>>('menu');
 
   return {
     menu,

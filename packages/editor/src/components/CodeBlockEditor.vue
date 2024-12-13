@@ -59,7 +59,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, Ref, ref } from 'vue';
+import { computed, inject, Ref, ref, useTemplateRef } from 'vue';
 
 import type { CodeBlockContent } from '@tmagic/core';
 import { TMagicButton, TMagicDialog, tMagicMessage, tMagicMessageBox, TMagicTag } from '@tmagic/design';
@@ -104,7 +104,7 @@ const { height: codeBlockEditorHeight } = useEditorContentHeight();
 const difVisible = ref(false);
 const { rect: windowRect } = useWindowRect();
 
-const magicVsEditor = ref<InstanceType<typeof CodeEditor>>();
+const magicVsEditor = useTemplateRef<InstanceType<typeof CodeEditor>>('magicVsEditor');
 
 const diffChange = () => {
   if (!magicVsEditor.value || !formBox.value?.form) {
@@ -224,7 +224,7 @@ const errorHandler = (error: any) => {
   tMagicMessage.error(error.message);
 };
 
-const formBox = ref<InstanceType<typeof MFormBox>>();
+const formBox = useTemplateRef<InstanceType<typeof MFormBox>>('formBox');
 
 const changedValue = ref<CodeBlockContent>();
 const changeHandler = (values: CodeBlockContent) => {

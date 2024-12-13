@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, nextTick, onBeforeUnmount, provide, ref, watch } from 'vue';
+import { computed, inject, nextTick, onBeforeUnmount, provide, ref, useTemplateRef, watch } from 'vue';
 import { Close } from '@element-plus/icons-vue';
 import VanillaMoveable from 'moveable';
 
@@ -47,8 +47,8 @@ const props = withDefaults(
   },
 );
 
-const target = ref<HTMLDivElement>();
-const titleEl = ref<HTMLDivElement>();
+const target = useTemplateRef<HTMLDivElement>('target');
+const titleEl = useTemplateRef<HTMLDivElement>('titleEl');
 
 const zIndex = useZIndex();
 const curZIndex = ref<number>(0);

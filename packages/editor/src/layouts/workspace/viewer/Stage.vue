@@ -43,7 +43,18 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, markRaw, nextTick, onBeforeUnmount, onMounted, ref, toRaw, watch, watchEffect } from 'vue';
+import {
+  computed,
+  inject,
+  markRaw,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  toRaw,
+  useTemplateRef,
+  watch,
+  watchEffect,
+} from 'vue';
 import { cloneDeep } from 'lodash-es';
 
 import type { MApp, MContainer } from '@tmagic/core';
@@ -83,9 +94,9 @@ const services = inject<Services>('services');
 
 const stageLoading = computed(() => services?.editorService.get('stageLoading') || false);
 
-const stageWrap = ref<InstanceType<typeof ScrollViewer>>();
-const stageContainer = ref<HTMLDivElement>();
-const menu = ref<InstanceType<typeof ViewerMenu>>();
+const stageWrap = useTemplateRef<InstanceType<typeof ScrollViewer>>('stageWrap');
+const stageContainer = useTemplateRef<HTMLDivElement>('stageContainer');
+const menu = useTemplateRef<InstanceType<typeof ViewerMenu>>('menu');
 
 const nodes = computed(() => services?.editorService.get('nodes') || []);
 const isMultiSelect = computed(() => nodes.value.length > 1);

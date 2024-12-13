@@ -1,9 +1,9 @@
-import { onBeforeUnmount, onMounted, type Ref, ref } from 'vue';
+import { onBeforeUnmount, onMounted, ref, type ShallowRef } from 'vue';
 import Gesto, { type OnDrag } from 'gesto';
 
-export const useGetSo = (target: Ref<HTMLElement | undefined>, emit: (evt: 'change', e: OnDrag<Gesto>) => void) => {
+export const useGetSo = (target: ShallowRef<HTMLElement | null>, emit: (evt: 'change', e: OnDrag<Gesto>) => void) => {
   let getso: Gesto;
-  const isDraging = ref(false);
+  const isDragging = ref(false);
 
   onMounted(() => {
     if (!target.value) return;
@@ -17,19 +17,19 @@ export const useGetSo = (target: Ref<HTMLElement | undefined>, emit: (evt: 'chan
         emit('change', e);
       })
       .on('dragStart', () => {
-        isDraging.value = true;
+        isDragging.value = true;
       })
       .on('dragEnd', () => {
-        isDraging.value = false;
+        isDragging.value = false;
       });
   });
 
   onBeforeUnmount(() => {
     getso?.unset();
-    isDraging.value = false;
+    isDragging.value = false;
   });
 
   return {
-    isDraging,
+    isDragging,
   };
 };
