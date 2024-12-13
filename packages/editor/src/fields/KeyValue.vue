@@ -9,7 +9,7 @@
           :size="size"
           @change="keyChangeHandler"
         ></TMagicInput>
-        <span class="m-fileds-key-value-delimiter">:</span>
+        <span class="m-fields-key-value-delimiter">:</span>
         <TMagicInput
           placeholder="value"
           v-model="records[index][1]"
@@ -19,7 +19,7 @@
         ></TMagicInput>
 
         <TMagicButton
-          class="m-fileds-key-value-delete"
+          class="m-fields-key-value-delete"
           type="danger"
           :size="size"
           :disabled="disabled"
