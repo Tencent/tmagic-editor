@@ -131,7 +131,8 @@ const mousedownHandler = (item: MenuButton | MenuComponent, event: MouseEvent) =
 
 const mouseupHandler = (item: MenuButton | MenuComponent, event: MouseEvent) => {
   if (props.eventType !== 'mouseup') return;
-  if (item.type === 'button') {
+
+  if (item.type === 'button' && event.button === 0) {
     buttonHandler(item, event);
   }
 };

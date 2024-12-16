@@ -13,6 +13,7 @@ import { getIdFromEl } from '@tmagic/utils';
 
 import type {
   ComponentGroup,
+  CustomContentMenuFunction,
   DatasourceTypeOption,
   MenuBarData,
   MenuButton,
@@ -93,7 +94,7 @@ export interface EditorProps {
   /** 用于设置画布上的dom是否可以被拖入其中 */
   isContainer?: (el: HTMLElement) => boolean | Promise<boolean>;
   /** 用于自定义组件树与画布的右键菜单 */
-  customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
+  customContentMenu?: CustomContentMenuFunction;
   extendFormState?: (state: FormState) => Record<string, any> | Promise<Record<string, any>>;
   /** 页面顺序拖拽配置参数 */
   pageBarSortOptions?: PageBarSortOptions;
@@ -123,4 +124,5 @@ export const defaultEditorProps = {
   canSelect: (el: HTMLElement) => Boolean(getIdFromEl()(el)),
   isContainer: (el: HTMLElement) => el.classList.contains('magic-ui-container'),
   codeOptions: () => ({}),
+  customContentMenu: (menus: (MenuButton | MenuComponent)[]) => menus,
 };

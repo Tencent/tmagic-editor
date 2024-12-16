@@ -35,6 +35,7 @@
       :next-level-indent-increment="nextLevelIndentIncrement"
       @edit="editHandler"
       @remove="removeHandler"
+      @node-contextmenu="nodeContentMenuHandler"
     ></DataSourceList>
   </TMagicScrollbar>
 
@@ -45,21 +46,40 @@
     :title="dialogTitle"
     @submit="submitDataSourceHandler"
   ></DataSourceConfigPanel>
+
+  <Teleport to="body">
+    <ContentMenu
+      v-if="menuData.length"
+      :menu-data="menuData"
+      ref="menu"
+      style="overflow: initial"
+      @hide="contentMenuHideHandler"
+    ></ContentMenu>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
 import { computed, inject, ref } from 'vue';
 import { mergeWith } from 'lodash-es';
 
-import { TMagicButton, TMagicPopover, TMagicScrollbar } from '@tmagic/design';
+import { TMagicButton, tMagicMessageBox, TMagicPopover, TMagicScrollbar } from '@tmagic/design';
 
+import ContentMenu from '@editor/components/ContentMenu.vue';
 import SearchInput from '@editor/components/SearchInput.vue';
 import ToolButton from '@editor/components/ToolButton.vue';
 import { useDataSourceEdit } from '@editor/hooks/use-data-source-edit';
-import type { DataSourceListSlots, EventBus, Services } from '@editor/type';
+import type {
+  CustomContentMenuFunction,
+  DataSourceListSlots,
+  EventBus,
+  MenuButton,
+  MenuComponent,
+  Services,
+} from '@editor/type';
 
 import DataSourceConfigPanel from './DataSourceConfigPanel.vue';
 import DataSourceList from './DataSourceList.vue';
+import { useContentMenu } from './useContentMenu';
 
 defineSlots<DataSourceListSlots>();
 
@@ -67,9 +87,10 @@ defineOptions({
   name: 'MEditorDataSourceListPanel',
 });
 
-defineProps<{
+const props = defineProps<{
   indent?: number;
   nextLevelIndentIncrement?: number;
+  customContentMenu: CustomContentMenuFunction;
 }>();
 
 const eventBus = inject<EventBus>('eventBus');
@@ -105,7 +126,13 @@ const addHandler = (type: string) => {
   editDialog.value.show();
 };
 
-const removeHandler = (id: string) => {
+const removeHandler = async (id: string) => {
+  await tMagicMessageBox.confirm('确定删除?', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  });
+
   dataSourceService?.remove(id);
 };
 
@@ -118,4 +145,13 @@ const filterTextChangeHandler = (val: string) => {
 eventBus?.on('edit-data-source', (id: string) => {
   editHandler(id);
 });
+
+eventBus?.on('remove-data-source', (id: string) => {
+  removeHandler(id);
+});
+
+const { nodeContentMenuHandler, menuData: contentMenuData, contentMenuHideHandler } = useContentMenu();
+const menuData = computed<(MenuButton | MenuComponent)[]>(() =>
+  props.customContentMenu(contentMenuData, 'data-source'),
+);
 </script>

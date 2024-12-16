@@ -19,7 +19,14 @@
 <script lang="ts" setup>
 import { computed, inject } from 'vue';
 
-import type { MenuButton, MenuComponent, Services, StageOptions, WorkspaceSlots } from '@editor/type';
+import type {
+  CustomContentMenuFunction,
+  MenuButton,
+  MenuComponent,
+  Services,
+  StageOptions,
+  WorkspaceSlots,
+} from '@editor/type';
 
 import MagicStage from './viewer/Stage.vue';
 import Breadcrumb from './Breadcrumb.vue';
@@ -34,7 +41,7 @@ withDefaults(
   defineProps<{
     stageContentMenu: (MenuButton | MenuComponent)[];
     disabledStageOverlay?: boolean;
-    customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
+    customContentMenu: CustomContentMenuFunction;
   }>(),
   {
     disabledStageOverlay: false,

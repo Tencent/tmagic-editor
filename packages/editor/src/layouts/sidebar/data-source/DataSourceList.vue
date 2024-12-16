@@ -5,6 +5,7 @@
     :indent="indent"
     :next-level-indent-increment="nextLevelIndentIncrement"
     @node-click="clickHandler"
+    @node-contextmenu="nodeContentMenuHandler"
   >
     <template #tree-node-label="{ data }">
       <div
@@ -37,13 +38,13 @@ import { computed, inject } from 'vue';
 import { Close, Edit, View } from '@element-plus/icons-vue';
 
 import { DepData, DepTargetType, Id, MNode } from '@tmagic/core';
-import { tMagicMessageBox, TMagicTag, TMagicTooltip } from '@tmagic/design';
+import { TMagicTag, TMagicTooltip } from '@tmagic/design';
 
 import Icon from '@editor/components/Icon.vue';
 import Tree from '@editor/components/Tree.vue';
 import { useFilter } from '@editor/hooks/use-filter';
 import { useNodeStatus } from '@editor/hooks/use-node-status';
-import type { DataSourceListSlots, Services } from '@editor/type';
+import type { DataSourceListSlots, Services, TreeNodeData } from '@editor/type';
 
 defineSlots<DataSourceListSlots>();
 
@@ -59,6 +60,7 @@ defineProps<{
 const emit = defineEmits<{
   edit: [id: string];
   remove: [id: string];
+  'node-contextmenu': [event: MouseEvent, data: TreeNodeData];
 }>();
 
 const { depService, editorService, dataSourceService } = inject<Services>('services') || {};
@@ -159,12 +161,6 @@ const editHandler = (id: string) => {
 };
 
 const removeHandler = async (id: string) => {
-  await tMagicMessageBox.confirm('确定删除?', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning',
-  });
-
   emit('remove', id);
 };
 
@@ -179,6 +175,10 @@ const clickHandler = (event: MouseEvent, data: any) => {
   if (data.type === 'node') {
     selectComp(data.key);
   }
+};
+
+const nodeContentMenuHandler = (event: MouseEvent, data: TreeNodeData) => {
+  emit('node-contextmenu', event, data);
 };
 
 defineExpose({

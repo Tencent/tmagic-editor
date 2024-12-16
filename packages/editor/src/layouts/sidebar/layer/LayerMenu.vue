@@ -10,23 +10,17 @@ import { isPage, isPageFragment } from '@tmagic/utils';
 
 import ContentMenu from '@editor/components/ContentMenu.vue';
 import FolderMinusIcon from '@editor/icons/FolderMinusIcon.vue';
-import type { ComponentGroup, MenuButton, MenuComponent, Services } from '@editor/type';
+import type { ComponentGroup, CustomContentMenuFunction, MenuButton, MenuComponent, Services } from '@editor/type';
 import { useCopyMenu, useDeleteMenu, useMoveToMenu, usePasteMenu } from '@editor/utils/content-menu';
 
 defineOptions({
   name: 'MEditorLayerMenu',
 });
 
-const props = withDefaults(
-  defineProps<{
-    layerContentMenu: (MenuButton | MenuComponent)[];
-    customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
-  }>(),
-  {
-    layerContentMenu: () => [],
-    customContentMenu: (menus: (MenuButton | MenuComponent)[]) => menus,
-  },
-);
+const props = defineProps<{
+  layerContentMenu: (MenuButton | MenuComponent)[];
+  customContentMenu: CustomContentMenuFunction;
+}>();
 
 const emit = defineEmits<{
   'collapse-all': [];

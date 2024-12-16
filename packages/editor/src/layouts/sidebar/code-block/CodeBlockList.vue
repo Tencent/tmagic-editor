@@ -5,6 +5,7 @@
     :indent="indent"
     :next-level-indent-increment="nextLevelIndentIncrement"
     @node-click="clickHandler"
+    @node-contextmenu="nodeContentMenuHandler"
   >
     <template #tree-node-label="{ data }">
       <div
@@ -62,6 +63,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   edit: [id: string];
   remove: [id: string];
+  'node-contextmenu': [event: MouseEvent, data: TreeNodeData];
 }>();
 
 const services = inject<Services>('services');
@@ -162,12 +164,21 @@ const deleteCode = async (id: string) => {
     if (typeof props.customError === 'function') {
       props.customError(id, existBinds ? CodeDeleteErrorType.BIND : CodeDeleteErrorType.UNDELETEABLE);
     } else {
-      tMagicMessage.error('代码块删除失败');
+      if (existBinds) {
+        tMagicMessage.error('代码块存在绑定关系，不可删除');
+      } else {
+        tMagicMessage.error('代码块不可删除');
+      }
     }
   }
 };
 
+const nodeContentMenuHandler = (event: MouseEvent, data: TreeNodeData) => {
+  emit('node-contextmenu', event, data);
+};
+
 defineExpose({
   filter: filterTextChangeHandler,
+  deleteCode,
 });
 </script>

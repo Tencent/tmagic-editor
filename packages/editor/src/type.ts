@@ -766,6 +766,7 @@ export type SyncHookPlugin<
 
 export interface EventBusEvent {
   'edit-data-source': [id: string];
+  'remove-data-source': [id: string];
   'edit-code': [id: string];
 }
 
@@ -787,3 +788,8 @@ export interface PageBarSortOptions extends PartSortableOptions {
   /** 在onStart之前调用 */
   beforeStart?: (event: SortableEvent, sortable: Sortable) => void | Promise<void>;
 }
+
+export type CustomContentMenuFunction = (
+  menus: (MenuButton | MenuComponent)[],
+  type: 'layer' | 'data-source' | 'viewer' | 'code-block',
+) => (MenuButton | MenuComponent)[];

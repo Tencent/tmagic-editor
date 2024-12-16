@@ -55,7 +55,14 @@ import { TMagicScrollbar } from '@tmagic/design';
 import SearchInput from '@editor/components/SearchInput.vue';
 import Tree from '@editor/components/Tree.vue';
 import { useFilter } from '@editor/hooks/use-filter';
-import type { LayerPanelSlots, MenuButton, MenuComponent, Services, TreeNodeData } from '@editor/type';
+import type {
+  CustomContentMenuFunction,
+  LayerPanelSlots,
+  MenuButton,
+  MenuComponent,
+  Services,
+  TreeNodeData,
+} from '@editor/type';
 
 import LayerMenu from './LayerMenu.vue';
 import LayerNodeTool from './LayerNodeTool.vue';
@@ -74,7 +81,7 @@ defineProps<{
   layerContentMenu: (MenuButton | MenuComponent)[];
   indent?: number;
   nextLevelIndentIncrement?: number;
-  customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
+  customContentMenu: CustomContentMenuFunction;
 }>();
 
 const services = inject<Services>('services');

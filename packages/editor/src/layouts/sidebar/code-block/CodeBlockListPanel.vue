@@ -18,6 +18,7 @@
       :next-level-indent-increment="nextLevelIndentIncrement"
       @edit="editCode"
       @remove="deleteCode"
+      @node-contextmenu="nodeContentMenuHandler"
     >
       <template #code-block-panel-tool="{ id, data }">
         <slot name="code-block-panel-tool" :id="id" :data="data"></slot>
@@ -32,6 +33,16 @@
     :content="codeConfig"
     @submit="submitCodeBlockHandler"
   ></CodeBlockEditor>
+
+  <Teleport to="body">
+    <ContentMenu
+      v-if="menuData.length"
+      :menu-data="menuData"
+      ref="menu"
+      style="overflow: initial"
+      @hide="contentMenuHideHandler"
+    ></ContentMenu>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
@@ -41,11 +52,21 @@ import type { Id } from '@tmagic/core';
 import { TMagicButton, TMagicScrollbar } from '@tmagic/design';
 
 import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
+import ContentMenu from '@editor/components/ContentMenu.vue';
 import SearchInput from '@editor/components/SearchInput.vue';
 import { useCodeBlockEdit } from '@editor/hooks/use-code-block-edit';
-import type { CodeBlockListPanelSlots, CodeDeleteErrorType, EventBus, Services } from '@editor/type';
+import type {
+  CodeBlockListPanelSlots,
+  CodeDeleteErrorType,
+  CustomContentMenuFunction,
+  EventBus,
+  MenuButton,
+  MenuComponent,
+  Services,
+} from '@editor/type';
 
 import CodeBlockList from './CodeBlockList.vue';
+import { useContentMenu } from './useContentMenu';
 
 defineSlots<CodeBlockListPanelSlots>();
 
@@ -53,10 +74,11 @@ defineOptions({
   name: 'MEditorCodeBlockListPanel',
 });
 
-defineProps<{
+const props = defineProps<{
   indent?: number;
   nextLevelIndentIncrement?: number;
   customError?: (id: Id, errorType: CodeDeleteErrorType) => any;
+  customContentMenu: CustomContentMenuFunction;
 }>();
 
 const eventBus = inject<EventBus>('eventBus');
@@ -76,4 +98,13 @@ const filterTextChangeHandler = (val: string) => {
 eventBus?.on('edit-code', (id: string) => {
   editCode(id);
 });
+
+const {
+  nodeContentMenuHandler,
+  menuData: contentMenuData,
+  contentMenuHideHandler,
+} = useContentMenu((id: string) => {
+  codeBlockList.value?.deleteCode(id);
+});
+const menuData = computed<(MenuButton | MenuComponent)[]>(() => props.customContentMenu(contentMenuData, 'code-block'));
 </script>

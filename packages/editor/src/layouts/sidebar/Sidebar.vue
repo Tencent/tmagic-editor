@@ -158,6 +158,7 @@ import { useEditorContentHeight } from '@editor/hooks/use-editor-content-height'
 import { useFloatBox } from '@editor/hooks/use-float-box';
 import {
   ColumnLayout,
+  CustomContentMenuFunction,
   type MenuButton,
   type MenuComponent,
   type Services,
@@ -185,7 +186,7 @@ const props = withDefaults(
     layerContentMenu: (MenuButton | MenuComponent)[];
     indent?: number;
     nextLevelIndentIncrement?: number;
-    customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
+    customContentMenu: CustomContentMenuFunction;
   }>(),
   {
     data: () => ({
@@ -254,6 +255,7 @@ const getItemConfig = (data: SideItem): SideComponent => {
       props: {
         indent: props.indent,
         nextLevelIndentIncrement: props.nextLevelIndentIncrement,
+        customContentMenu: props.customContentMenu,
       },
       slots: {},
     },
@@ -266,6 +268,7 @@ const getItemConfig = (data: SideItem): SideComponent => {
       props: {
         indent: props.indent,
         nextLevelIndentIncrement: props.nextLevelIndentIncrement,
+        customContentMenu: props.customContentMenu,
       },
       slots: {},
     },

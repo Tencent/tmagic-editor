@@ -11,7 +11,7 @@ import { isPage, isPageFragment } from '@tmagic/utils';
 
 import ContentMenu from '@editor/components/ContentMenu.vue';
 import CenterIcon from '@editor/icons/CenterIcon.vue';
-import { LayerOffset, Layout, MenuButton, MenuComponent, Services } from '@editor/type';
+import { CustomContentMenuFunction, LayerOffset, Layout, MenuButton, MenuComponent, Services } from '@editor/type';
 import { useCopyMenu, useDeleteMenu, useMoveToMenu, usePasteMenu } from '@editor/utils/content-menu';
 
 defineOptions({
@@ -22,12 +22,10 @@ const props = withDefaults(
   defineProps<{
     isMultiSelect?: boolean;
     stageContentMenu: (MenuButton | MenuComponent)[];
-    customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
+    customContentMenu: CustomContentMenuFunction;
   }>(),
   {
     isMultiSelect: false,
-    stageContentMenu: () => [],
-    customContentMenu: (menus: (MenuButton | MenuComponent)[]) => menus,
   },
 );
 
