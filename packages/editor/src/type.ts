@@ -231,6 +231,8 @@ export interface UiState {
   uiSelectMode: boolean;
   /** 是否显示整个配置源码， true: 显示， false: 不显示，默认为false */
   showSrc: boolean;
+  /** 是否将样式配置单独一列显示， true: 显示， false: 不显示，默认为true */
+  showStylePanel: boolean;
   /** 画布显示放大倍数，默认为 1 */
   zoom: number;
   /** 画布容器的宽高 */

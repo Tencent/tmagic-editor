@@ -1,10 +1,90 @@
+@use "common/var" as *;
+
 .m-editor-props-panel {
-  padding: 0 10px 50px 10px;
+  height: 100%;
+  position: relative;
+
+  --props-style-panel-width: 300px;
+
+  .m-editor-props-form-panel {
+    padding-bottom: 10px;
+    position: relative;
+    height: 100%;
+    box-sizing: border-box;
+
+    .tmagic-design-scrollbar {
+      height: 100%;
+    }
+  }
+
+  .m-editor-props-property-panel {
+    &.show-style-panel {
+      padding-right: var(--props-style-panel-width);
+
+      .m-editor-props-panel-src-icon {
+        right: calc(15px + var(--props-style-panel-width));
+      }
+    }
+
+    .tmagic-design-form {
+      padding-right: 10px;
+      padding-left: 10px;
+
+      > .m-container-tab {
+        > .tmagic-design-tabs {
+          > .el-tabs__content {
+            padding-top: 55px;
+          }
+          > .el-tabs__header.is-top {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            background: #fff;
+            z-index: 2;
+          }
+        }
+      }
+    }
+  }
+
+  .m-editor-props-style-panel {
+    position: absolute;
+    width: var(--props-style-panel-width);
+    right: 0;
+    top: 0;
+    background: #fff;
+    z-index: 12;
+
+    $style-panel-title-height: 38px;
+
+    .tmagic-design-scrollbar {
+      height: calc(100% - $style-panel-title-height - 1px);
+    }
+
+    .m-editor-props-style-panel-title {
+      text-align: center;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 0 5px;
+      height: $style-panel-title-height;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid $border-color;
+    }
+  }
 
   .m-editor-props-panel-src-icon {
     position: absolute;
     right: 15px;
     bottom: 15px;
+    z-index: 30;
+  }
+
+  .m-editor-props-panel-style-icon {
+    position: absolute;
+    right: 15px;
+    bottom: 60px;
     z-index: 30;
   }
 

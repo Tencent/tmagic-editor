@@ -134,7 +134,7 @@ import type { MApp } from '@tmagic/core';
 
 import Framework from './layouts/Framework.vue';
 import TMagicNavMenu from './layouts/NavMenu.vue';
-import PropsPanel from './layouts/PropsPanel.vue';
+import PropsPanel from './layouts/props-panel/PropsPanel.vue';
 import Sidebar from './layouts/sidebar/Sidebar.vue';
 import Workspace from './layouts/workspace/Workspace.vue';
 import codeBlockService from './services/codeBlock';

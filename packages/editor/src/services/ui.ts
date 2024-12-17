@@ -29,6 +29,7 @@ import BaseService from './BaseService';
 const state = reactive<UiState>({
   uiSelectMode: false,
   showSrc: false,
+  showStylePanel: true,
   zoom: 1,
   stageContainerRect: {
     width: 0,

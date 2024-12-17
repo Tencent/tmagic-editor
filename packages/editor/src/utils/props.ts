@@ -18,6 +18,7 @@
  */
 
 import { NODE_CONDS_KEY } from '@tmagic/core';
+import { tMagicMessage } from '@tmagic/design';
 import type { FormConfig, FormState, TabPaneConfig } from '@tmagic/form';
 
 export const arrayOptions = [
@@ -41,6 +42,7 @@ export const numberOptions = [
 
 export const styleTabConfig: TabPaneConfig = {
   title: '样式',
+  display: ({ services }: any) => !(services.uiService.get('showStylePanel') ?? true),
   items: [
     {
       name: 'style',
@@ -53,6 +55,7 @@ export const styleTabConfig: TabPaneConfig = {
               type: 'data-source-field-select',
               name: 'position',
               text: '固定定位',
+              labelPosition: 'left',
               checkStrictly: false,
               dataSourceFieldType: ['string'],
               fieldConfig: {
@@ -213,7 +216,7 @@ export const styleTabConfig: TabPaneConfig = {
               checkStrictly: false,
               dataSourceFieldType: ['string'],
               fieldConfig: {
-                type: 'text',
+                type: 'img-upload',
               },
             },
             {
@@ -344,11 +347,13 @@ export const advancedTabConfig: TabPaneConfig = {
     {
       name: 'created',
       text: 'created',
+      labelPosition: 'top',
       type: 'code-select',
     },
     {
       name: 'mounted',
       text: 'mounted',
+      labelPosition: 'top',
       type: 'code-select',
     },
   ],
@@ -389,8 +394,21 @@ export const fillConfig = (config: FormConfig = [], labelWidth = '80px'): FormCo
           // 组件id，必须要有
           {
             name: 'id',
-            type: 'display',
-            text: 'id',
+            text: 'ID',
+            type: 'text',
+            disabled: true,
+            append: {
+              type: 'button',
+              text: '复制',
+              handler: async (vm, { model }) => {
+                try {
+                  await navigator.clipboard.writeText(`${model.id}`);
+                  tMagicMessage.success('已复制');
+                } catch (err) {
+                  tMagicMessage.error('复制失败');
+                }
+              },
+            },
           },
           {
             name: 'name',

@@ -82,7 +82,8 @@ export class WebStorage extends BaseService {
       case Protocol.NUMBER:
         return Number(item);
       case Protocol.BOOLEAN:
-        return Boolean(item);
+        if (item === 'true') return true;
+        if (item === 'false') return false;
       default:
         return item;
     }

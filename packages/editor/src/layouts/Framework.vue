@@ -20,7 +20,7 @@
       v-model:left="columnWidth.left"
       v-model:right="columnWidth.right"
       :min-left="65"
-      :min-right="20"
+      :min-right="320"
       :min-center="100"
       :width="frameworkRect?.width || 0"
       @change="columnWidthChange"
@@ -50,9 +50,7 @@
       </template>
 
       <template v-if="page" #right>
-        <TMagicScrollbar>
-          <slot name="props-panel"></slot>
-        </TMagicScrollbar>
+        <slot name="props-panel"></slot>
       </template>
     </SplitView>
 
@@ -65,7 +63,6 @@
 import { computed, inject, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue';
 
 import type { MPage, MPageFragment } from '@tmagic/core';
-import { TMagicScrollbar } from '@tmagic/design';
 
 import SplitView from '@editor/components/SplitView.vue';
 import type { FrameworkSlots, GetColumnWidth, PageBarSortOptions, Services } from '@editor/type';
