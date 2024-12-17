@@ -116,6 +116,7 @@ export default {
     app.component('m-form-table', Table);
     app.component('m-form-tab', Tabs);
     app.component('m-fields-text', Text);
+    app.component('m-fields-img-upload', Text);
     app.component('m-fields-number', Number);
     app.component('m-fields-number-range', NumberRange);
     app.component('m-fields-textarea', Textarea);

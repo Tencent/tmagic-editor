@@ -40,6 +40,7 @@
         :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text }"
         :prop="itemProp"
         :label-width="itemLabelWidth"
+        :label-position="config.labelPosition"
         :rules="rule"
       >
         <template #label><span v-html="type === 'checkbox' ? '' : text" :title="config.labelTitle"></span></template>
@@ -96,6 +97,7 @@
         :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text }"
         :prop="itemProp"
         :label-width="itemLabelWidth"
+        :label-position="config.labelPosition"
         :rules="rule"
         style="background: #f7dadd"
       >
@@ -145,6 +147,7 @@
         :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text }"
         :prop="itemProp"
         :label-width="itemLabelWidth"
+        :label-position="config.labelPosition"
         :rules="rule"
         style="background: #def7da"
       >
