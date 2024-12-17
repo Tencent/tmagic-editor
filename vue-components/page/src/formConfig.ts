@@ -75,7 +75,7 @@ export default [
   {
     text: 'css',
     name: 'css',
-    type: 'code',
+    type: 'vs-code',
     language: 'css',
     height: '500px',
   },

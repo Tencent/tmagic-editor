@@ -18,9 +18,14 @@
 
 export default [
   {
-    text: '图片',
+    type: 'data-source-field-select',
     name: 'src',
-    type: 'data-source-input',
+    text: '图片',
+    checkStrictly: false,
+    dataSourceFieldType: ['string'],
+    fieldConfig: {
+      type: 'img-upload',
+    },
   },
   {
     text: '链接',

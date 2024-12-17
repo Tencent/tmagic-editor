@@ -1,5 +1,5 @@
 {
-  "version": "0.0.6",
+  "version": "0.0.7",
   "name": "@tmagic/vue-page",
   "type": "module",
   "main": "src/index.ts",
