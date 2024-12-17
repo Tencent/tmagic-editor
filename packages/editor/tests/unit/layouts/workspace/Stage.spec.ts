@@ -64,6 +64,7 @@ describe('Stage.vue', () => {
       page,
       node: page,
       uiSelectMode: false,
+      customContentMenu: (menu: any) => menu,
     },
   });
 
