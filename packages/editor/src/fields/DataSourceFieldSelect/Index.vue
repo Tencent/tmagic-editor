@@ -44,7 +44,7 @@ import { Coin } from '@element-plus/icons-vue';
 
 import { DataSchema } from '@tmagic/core';
 import { TMagicButton, tMagicMessage, TMagicTooltip } from '@tmagic/design';
-import type { FieldProps, FormState } from '@tmagic/form';
+import type { ContainerChangeEventData, FieldProps, FormState } from '@tmagic/form';
 import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX } from '@tmagic/utils';
 
 import MIcon from '@editor/components/Icon.vue';
@@ -129,9 +129,9 @@ const checkStrictly = computed(() => {
   return value ?? props.config.value === 'key';
 });
 
-const onChangeHandler = (value: string[]) => {
+const onChangeHandler = (value: string[], eventData?: ContainerChangeEventData) => {
   if (!Array.isArray(value)) {
-    emit('change', value);
+    emit('change', value, eventData);
     return;
   }
 
@@ -139,7 +139,7 @@ const onChangeHandler = (value: string[]) => {
   const dataSource = dataSources.value.find((ds) => ds.id === removeDataSourceFieldPrefix(dsId));
 
   if (!dataSource) {
-    emit('change', value);
+    emit('change', value, eventData);
     return;
   }
 
@@ -160,10 +160,10 @@ const onChangeHandler = (value: string[]) => {
     (field?.type &&
       (field.type === 'any' || dataSourceFieldType.includes('any') || dataSourceFieldType.includes(field.type)))
   ) {
-    emit('change', value);
+    emit('change', value, eventData);
   } else {
     tMagicMessage.error(`请选择类型为${dataSourceFieldType.join('或')}的字段`);
-    emit('change', [dsId]);
+    emit('change', [dsId], eventData);
   }
 };
 </script>
