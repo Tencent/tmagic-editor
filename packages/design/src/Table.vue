@@ -4,6 +4,8 @@
     ref="table"
     :is="uiComponent"
     v-bind="uiProps"
+    row-class-name="tmagic-design-table-row"
+    cell-class-name="tmagic-design-table-cell"
     @select="selectHandler"
     @sort-change="sortChangeHandler"
     @expand-change="expandChangeHandler"
