@@ -34,6 +34,7 @@ export default defineConfig({
       entry: 'src/index.ts',
       name: 'TMagicForm',
       fileName: 'tmagic-form',
+      cssFileName: 'style',
     },
 
     rollupOptions: {

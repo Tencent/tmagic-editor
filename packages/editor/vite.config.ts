@@ -40,6 +40,7 @@ export default defineConfig({
       entry: 'src/index.ts',
       name: 'TMagicEditor',
       fileName: 'tmagic-editor',
+      cssFileName: 'style',
     },
 
     rollupOptions: {

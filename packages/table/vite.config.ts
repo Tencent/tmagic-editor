@@ -34,6 +34,7 @@ export default defineConfig({
       entry: 'src/index.ts',
       name: 'TMagicTable',
       fileName: 'tmagic-table',
+      cssFileName: 'style',
     },
 
     rollupOptions: {
