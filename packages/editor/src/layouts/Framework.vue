@@ -20,7 +20,7 @@
       v-model:left="columnWidth.left"
       v-model:right="columnWidth.right"
       :min-left="65"
-      :min-right="320"
+      :min-right="420"
       :min-center="100"
       :width="frameworkRect?.width || 0"
       @change="columnWidthChange"

@@ -117,6 +117,27 @@ export const styleTabConfig: TabPaneConfig = {
           items: [
             {
               type: 'data-source-field-select',
+              name: 'display',
+              text: 'display',
+              checkStrictly: false,
+              dataSourceFieldType: ['string'],
+              fieldConfig: {
+                type: 'select',
+                clearable: true,
+                allowCreate: true,
+                options: [
+                  { text: 'block', value: 'block' },
+                  { text: 'flex', value: 'flex' },
+                  { text: 'none', value: 'none' },
+                  { text: 'inline-block', value: 'inline-block' },
+                  { text: 'grid', value: 'grid' },
+                  { text: 'inline', value: 'inline' },
+                  { text: 'initial', value: 'initial' },
+                ],
+              },
+            },
+            {
+              type: 'data-source-field-select',
               name: 'width',
               text: '宽度',
               checkStrictly: false,
@@ -143,6 +164,8 @@ export const styleTabConfig: TabPaneConfig = {
               dataSourceFieldType: ['string'],
               fieldConfig: {
                 type: 'select',
+                clearable: true,
+                allowCreate: true,
                 options: [
                   { text: 'visible', value: 'visible' },
                   { text: 'hidden', value: 'hidden' },
@@ -150,6 +173,7 @@ export const styleTabConfig: TabPaneConfig = {
                   { text: 'scroll', value: 'scroll' },
                   { text: 'auto', value: 'auto' },
                   { text: 'overlay', value: 'overlay' },
+                  { text: 'initial', value: 'initial' },
                 ],
               },
             },
