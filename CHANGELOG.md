@@ -1,3 +1,22 @@
+## [1.5.1](https://github.com/Tencent/tmagic-editor/compare/v1.5.0...v1.5.1) (2024-12-18)
+
+
+### Bug Fixes
+
+* **form:** table 开启dropSort后，多次拖动row后会报错 ([957b0d9](https://github.com/Tencent/tmagic-editor/commit/957b0d9b40fbf5786d5cbbc35db50d12775ae502))
+
+
+### Features
+
+* **design:** table添加row/cell class name ([432f1f5](https://github.com/Tencent/tmagic-editor/commit/432f1f5a559429352258736105cc865b310dbda9))
+* **editor:** 数据源/代码编辑列表新增右键菜单 ([74f76d0](https://github.com/Tencent/tmagic-editor/commit/74f76d0ba31881cbff93dfe967e6ef38e69f96e9))
+* **editor:** 样式添加display配置，右侧边栏最小值设置成420 ([712e317](https://github.com/Tencent/tmagic-editor/commit/712e317e40ea171c920a3ba9f0cad5b0b0161440))
+* **editor:** 组件配置中的样式支持单独一列显示 ([5cd6d21](https://github.com/Tencent/tmagic-editor/commit/5cd6d21b2e14eb846313c7af6c859934c187a446))
+* **form:** 新增labelPosition配置 ([7a8da68](https://github.com/Tencent/tmagic-editor/commit/7a8da68edb2ccc1dcbe876dff96695513965e6a2))
+* **vue-components,react-components:** 组件表单配置修改 ([e421a58](https://github.com/Tencent/tmagic-editor/commit/e421a58f4ea14bd9b6b9ef12e743fb018fead1b6))
+
+
+
 # [1.5.0](https://github.com/Tencent/tmagic-editor/compare/v1.4.18...v1.5.0) (2024-12-10)
 
 
