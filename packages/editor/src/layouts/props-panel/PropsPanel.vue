@@ -76,7 +76,11 @@ defineProps<{
   extendState?: (state: FormState) => Record<string, any> | Promise<Record<string, any>>;
 }>();
 
-const emit = defineEmits(['mounted', 'submit-error', 'form-error']);
+const emit = defineEmits<{
+  'submit-error': [e: any];
+  'form-error': [e: any];
+  mounted: [internalInstance: InstanceType<typeof FormPanel>];
+}>();
 
 const services = inject<Services>('services');
 
@@ -126,13 +130,13 @@ const errorHandler = (e: any) => {
   emit('form-error', e);
 };
 
-const mountedHandler = (e: any) => {
+const mountedHandler = (e: InstanceType<typeof FormPanel>) => {
   emit('mounted', e);
 };
 
 const { showStylePanel, showStylePanelHandler, closeStylePanelHandler } = useStylePanel(services);
 
-const propertyFormPanelRef = useTemplateRef('propertyFormPanel');
+const propertyFormPanelRef = useTemplateRef<InstanceType<typeof FormPanel>>('propertyFormPanel');
 defineExpose({
   getFormState() {
     return propertyFormPanelRef.value?.configForm?.formState;

@@ -96,9 +96,9 @@
         <PropsPanel
           :extend-state="extendFormState"
           :disabled-show-src="disabledShowSrc"
-          @mounted="(instance: any) => $emit('props-panel-mounted', instance)"
-          @form-error="(e: any) => $emit('props-form-error', e)"
-          @submit-error="(e: any) => $emit('props-submit-error', e)"
+          @mounted="propsPanelMountedHandler"
+          @form-error="propsPanelFormErrorHandler"
+          @submit-error="propsPanelSubmitErrorHandler"
         >
           <template #props-panel-header>
             <slot name="props-panel-header"></slot>
@@ -134,6 +134,7 @@ import type { MApp } from '@tmagic/core';
 
 import Framework from './layouts/Framework.vue';
 import TMagicNavMenu from './layouts/NavMenu.vue';
+import FormPanel from './layouts/props-panel/FormPanel.vue';
 import PropsPanel from './layouts/props-panel/PropsPanel.vue';
 import Sidebar from './layouts/sidebar/Sidebar.vue';
 import Workspace from './layouts/workspace/Workspace.vue';
@@ -177,7 +178,7 @@ defineOptions({
 });
 
 const emit = defineEmits<{
-  'props-panel-mounted': [instance: InstanceType<typeof PropsPanel>];
+  'props-panel-mounted': [instance: InstanceType<typeof FormPanel>];
   'update:modelValue': [value: MApp | null];
   'props-form-error': [e: any];
   'props-submit-error': [e: any];
@@ -230,6 +231,18 @@ provide('codeOptions', props.codeOptions);
 provide('stageOptions', stageOptions);
 
 provide<EventBus>('eventBus', new EventEmitter());
+
+const propsPanelMountedHandler = (e: InstanceType<typeof FormPanel>) => {
+  emit('props-panel-mounted', e);
+};
+
+const propsPanelSubmitErrorHandler = (e: any) => {
+  emit('props-submit-error', e);
+};
+
+const propsPanelFormErrorHandler = (e: any) => {
+  emit('props-form-error', e);
+};
 
 defineExpose(services);
 </script>
