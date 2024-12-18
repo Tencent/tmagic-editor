@@ -1,3 +1,12 @@
+## [1.5.2](https://github.com/Tencent/tmagic-editor/compare/v1.5.1...v1.5.2) (2024-12-18)
+
+
+### Bug Fixes
+
+* **editor:** data-source-field-select透传eventData ([d48d40a](https://github.com/Tencent/tmagic-editor/commit/d48d40a2b75da06ebac5e4d9a6d3d351e3a966f5))
+
+
+
 ## [1.5.1](https://github.com/Tencent/tmagic-editor/compare/v1.5.0...v1.5.1) (2024-12-18)
 
 
