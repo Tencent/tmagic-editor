@@ -18,7 +18,7 @@
             @select="selectHandle"
             @sort-change="sortChange"
           >
-            <TMagicTableColumn v-if="config.itemExtra" :fixed="'left'" width="30" type="expand">
+            <TMagicTableColumn v-if="config.itemExtra && !config.dropSort" :fixed="'left'" width="30" type="expand">
               <template v-slot="scope">
                 <span v-html="itemExtra(config.itemExtra, scope.$index)" class="m-form-tip"></span>
               </template>
@@ -204,7 +204,7 @@ import {
   TMagicUpload,
   useZIndex,
 } from '@tmagic/design';
-import { asyncLoadJs, sleep } from '@tmagic/utils';
+import { asyncLoadJs } from '@tmagic/utils';
 
 import type { ContainerChangeEventData, FormState, SortProp, TableColumnConfig, TableConfig } from '../schema';
 import { display as displayFunc, initValue } from '../utils/form';
@@ -286,11 +286,6 @@ const sortChange = ({ prop, order }: SortProp) => {
   }
 };
 
-const foreUpdate = () => {
-  updateKey.value += 1;
-  setTimeout(() => rowDrop());
-};
-
 const swapArray = (index1: number, index2: number) => {
   props.model[modelName.value].splice(index1, 0, props.model[modelName.value].splice(index2, 1)[0]);
 
@@ -302,32 +297,25 @@ const swapArray = (index1: number, index2: number) => {
   mForm?.$emit('field-change', props.prop, props.model[modelName.value]);
 };
 
+let sortable: Sortable | undefined;
 const rowDrop = () => {
+  sortable?.destroy();
   const tableEl = tMagicTable.value?.instance.$el;
   const tBodyEl = tableEl?.querySelector('.el-table__body > tbody');
-  if (tBodyEl) {
-    // eslint-disable-next-line prefer-destructuring
-    const sortable = Sortable.create(tBodyEl, {
-      onEnd: ({ newIndex, oldIndex }: SortableEvent) => {
-        if (typeof newIndex === 'undefined') return;
-        if (typeof oldIndex === 'undefined') return;
-        swapArray(newIndex, oldIndex);
-        emit('change', props.model[modelName.value]);
-        foreUpdate();
-        sortable.destroy();
-        mForm?.$emit('field-change', props.prop, props.model[modelName.value]);
-        sleep(1000).then(() => {
-          const elTrs = tableEl.querySelectorAll('.el-table__body > tbody > tr');
-          if (elTrs?.[newIndex]) {
-            elTrs[newIndex].style.backgroundColor = 'rgba(243, 89, 59, 0.2)';
-            sleep(1000).then(() => {
-              elTrs[newIndex].style.backgroundColor = '';
-            });
-          }
-        });
-      },
-    });
+  if (!tBodyEl) {
+    return;
   }
+  sortable = Sortable.create(tBodyEl, {
+    draggable: '.tmagic-design-table-row',
+    direction: 'vertical',
+    onEnd: ({ newIndex, oldIndex }: SortableEvent) => {
+      if (typeof newIndex === 'undefined') return;
+      if (typeof oldIndex === 'undefined') return;
+      swapArray(newIndex, oldIndex);
+      emit('change', props.model[modelName.value]);
+      mForm?.$emit('field-change', props.prop, props.model[modelName.value]);
+    },
+  });
 };
 
 const newHandler = async (row?: any) => {
