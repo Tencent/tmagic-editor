@@ -1,0 +1,2 @@
+import{u as t,_ as r}from"./_plugin-vue_export-helper-WuZCg5qx.js";import"./index-Ca7bsSTH.js";const o=VueDemi.defineComponent({props:{config:{type:Object,required:!0},iteratorIndex:Array,iteratorContainerId:Array,model:{type:Object,default:()=>({})}},setup(e){t({config:e.config,methods:{},iteratorContainerId:e.iteratorContainerId,iteratorIndex:e.iteratorIndex})}});function n(e,i,a,c,d,p){return Vue.openBlock(),Vue.createElementBlock("p",null,Vue.toDisplayString(e.config.text),1)}const f=r(o,[["render",n]]);export{f as default};
+//# sourceMappingURL=index-CjIPComq.js.map

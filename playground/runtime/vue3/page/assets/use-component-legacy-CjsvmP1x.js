@@ -1,0 +1,2 @@
+System.register(["./index-legacy-CnMBLb-Z.js","./_plugin-vue_export-helper-legacy-l05TGV4T.js"],(function(e,t){"use strict";var n;return{setters:[null,e=>{n=e.t}],execute:function(){function t({componentType:e,app:t}){return t?.resolveComponent(e)}e("u",(function(e=""){let p,o,i;return"string"==typeof e?p=e:({componentType:p,app:o}=e),p&&""!==p||(p="container"),o||(o=VueDemi.inject("app")),i=t({componentType:p,app:o}),i||p.startsWith("magic-ui-")||(p=`magic-ui-${n(p)}`,i=t({componentType:p,app:o})),i??p}))}}}));
+//# sourceMappingURL=use-component-legacy-CjsvmP1x.js.map
