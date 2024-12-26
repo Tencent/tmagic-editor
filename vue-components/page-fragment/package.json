@@ -1,5 +1,5 @@
 {
-  "version": "0.0.4",
+  "version": "0.0.5",
   "name": "@tmagic/vue-page-fragment",
   "type": "module",
   "main": "src/index.ts",
