@@ -76,14 +76,18 @@ export default class EventHelper extends EventEmitter {
 
     this.app = app;
 
-    globalThis.document.body.addEventListener('click', this.commonClickEventHandler);
+    if (app.jsEngine === 'browser') {
+      globalThis.document.body.addEventListener('click', this.commonClickEventHandler);
+    }
   }
 
   public destroy() {
     this.removeNodeEvents();
     this.removeAllListeners();
 
-    globalThis.document.body.removeEventListener('click', this.commonClickEventHandler);
+    if (this.app.jsEngine === 'browser') {
+      globalThis.document.body.removeEventListener('click', this.commonClickEventHandler);
+    }
   }
 
   public bindNodeEvents(node: TMagicNode) {
