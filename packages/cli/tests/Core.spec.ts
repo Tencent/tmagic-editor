@@ -1,5 +1,6 @@
-import { describe, expect, test } from 'vitest';
 import path from 'node:path';
+
+import { describe, expect, test } from 'vitest';
 
 import Core from '../src/Core';
 

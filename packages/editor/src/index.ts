@@ -39,6 +39,7 @@ import DisplayConds from './fields/DisplayConds.vue';
 import EventSelect from './fields/EventSelect.vue';
 import KeyValue from './fields/KeyValue.vue';
 import PageFragmentSelect from './fields/PageFragmentSelect.vue';
+import StyleSetter from './fields/StyleSetter/Index.vue';
 import uiSelect from './fields/UISelect.vue';
 import CodeEditor from './layouts/CodeEditor.vue';
 import { setEditorConfig } from './utils/config';
@@ -106,6 +107,7 @@ export { default as TreeNode } from './components/TreeNode.vue';
 export { default as PageFragmentSelect } from './fields/PageFragmentSelect.vue';
 export { default as DisplayConds } from './fields/DisplayConds.vue';
 export { default as CondOpSelect } from './fields/CondOpSelect.vue';
+export { default as StyleSetter } from './fields/StyleSetter/Index.vue';
 
 const defaultInstallOpt: EditorInstallOptions = {
   // eslint-disable-next-line no-eval
@@ -143,5 +145,6 @@ export default {
     app.component('m-fields-page-fragment-select', PageFragmentSelect);
     app.component('m-fields-display-conds', DisplayConds);
     app.component('m-fields-cond-op-select', CondOpSelect);
+    app.component('m-form-style-setter', StyleSetter);
   },
 };

@@ -1,7 +1,8 @@
-import alias from '@rollup/plugin-alias';
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import alias from '@rollup/plugin-alias';
 import dts from 'rollup-plugin-dts';
 
 if (!existsSync('temp')) {

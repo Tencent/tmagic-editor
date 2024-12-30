@@ -1,0 +1,113 @@
+.background-position-container {
+  display: flex;
+  width: 100%;
+  .presets-value-list {
+    display: flex;
+    flex-wrap: wrap;
+    width: 80px;
+    height: auto;
+    .el-button {
+      & + .el-button {
+        margin-left: 2px;
+      }
+      &:nth-child(3n + 1) {
+        margin-left: 0 !important;
+      }
+    }
+
+    .position-icon {
+      position: relative;
+      width: 14px;
+      height: 14px;
+      border: 1px solid #1d1f24;
+      &.active {
+        background-color: var(--el-color-primary);
+        &::after {
+          border: 1px solid #fff;
+        }
+      }
+      &::after {
+        position: absolute;
+        content: "";
+        border: 1px solid #1d1f24;
+        box-sizing: border-box;
+      }
+      &.left-top {
+        &::after {
+          top: 1px;
+          left: 1px;
+          width: 6px;
+          height: 6px;
+        }
+      }
+      &.center-top {
+        &::after {
+          top: 1px;
+          left: 1px;
+          width: 12px;
+          height: 6px;
+        }
+      }
+      &.right-top {
+        &::after {
+          top: 1px;
+          right: 1px;
+          width: 6px;
+          height: 6px;
+        }
+      }
+      &.left-center {
+        &::after {
+          top: 1px;
+          left: 1px;
+          width: 6px;
+          height: 12px;
+        }
+      }
+      &.center-center {
+        &::after {
+          top: 1px;
+          left: 1px;
+          width: 12px;
+          height: 12px;
+        }
+      }
+      &.right-center {
+        &::after {
+          top: 1px;
+          right: 1px;
+          width: 6px;
+          height: 12px;
+        }
+      }
+      &.left-bottom {
+        &::after {
+          bottom: 1px;
+          left: 1px;
+          width: 6px;
+          height: 6px;
+        }
+      }
+      &.center-bottom {
+        &::after {
+          bottom: 1px;
+          left: 1px;
+          width: 12px;
+          height: 6px;
+        }
+      }
+      &.right-bottom {
+        &::after {
+          bottom: 1px;
+          right: 1px;
+          width: 6px;
+          height: 6px;
+        }
+      }
+    }
+  }
+  .custom-value {
+    position: relative;
+    flex: 1;
+  }
+}

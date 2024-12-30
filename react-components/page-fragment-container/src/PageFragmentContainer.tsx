@@ -13,13 +13,15 @@ interface PageFragmentContainerProps {
   iteratorContainerId: Id[];
 }
 
-const PageFragmentContainer: React.FC<PageFragmentContainerProps> = ({   config,
+const PageFragmentContainer: React.FC<PageFragmentContainerProps> = ({
+  config,
   id,
   style,
   className,
   containerIndex,
   iteratorIndex,
-  iteratorContainerId, }) => {
+  iteratorContainerId,
+}) => {
   const { app } = useApp({
     config,
     methods: {},

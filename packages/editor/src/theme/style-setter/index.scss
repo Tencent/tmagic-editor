@@ -1,0 +1,16 @@
+@use "./border.scss";
+@use "./layout.scss";
+@use "./background.scss";
+
+.m-fields-style-setter {
+  width: 100%;
+}
+
+.text-align-list {
+  display: flex;
+  height: 100%;
+
+  .btn-active {
+    color: var(--el-color-primary) !important;
+  }
+}

@@ -438,9 +438,12 @@ export interface SwitchConfig extends FormItem {
  */
 export interface RadioGroupConfig extends FormItem {
   type: 'radio-group';
+  childType?: 'default' | 'button';
   options: {
     value: string | number | boolean;
     text: string;
+    icon?: any;
+    tooltip?: string;
   }[];
 }
 

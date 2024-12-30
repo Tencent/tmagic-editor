@@ -306,7 +306,12 @@ const itemProp = computed(() => {
   return `${n}`;
 });
 
-const tagName = computed(() => `m-${items.value ? 'form' : 'fields'}-${type.value}`);
+const tagName = computed(() => {
+  if (type.value === 'component') {
+    return props.config.component;
+  }
+  return `m-${items.value ? 'form' : 'fields'}-${type.value}`;
+});
 
 const disabled = computed(() => props.disabled || filterFunction(mForm, props.config.disabled, props));
 

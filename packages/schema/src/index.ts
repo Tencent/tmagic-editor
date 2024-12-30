@@ -126,9 +126,7 @@ export interface MComponent {
   /** 显示条件中配置的数据源条件的编译结果 */
   condResult?: boolean;
   /** 组件根Dom的style */
-  style?: {
-    [key: string]: any;
-  };
+  style?: StyleSchema;
   [NODE_CONDS_KEY]?: DisplayCond[];
   [key: string]: any;
 }
@@ -307,4 +305,8 @@ export interface DisplayCond {
 export interface UiComponentProps<T extends MNode = MNode> {
   config: T;
   model?: any;
+}
+
+export interface StyleSchema {
+  [key: string]: any;
 }
