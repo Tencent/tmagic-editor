@@ -72,6 +72,11 @@
       align-items: center;
       border-bottom: 2px solid $border-color;
     }
+
+    .tmagic-design-form {
+      padding-right: 10px;
+      padding-left: 10px;
+    }
   }
 
   .m-editor-props-panel-src-icon {
@@ -93,6 +98,14 @@
     left: 0;
     top: 0;
     z-index: 10;
+  }
+
+  .m-editor-resizer {
+    position: absolute;
+    display: block;
+    top: 0;
+    right: var(--props-style-panel-width);
+    z-index: 13;
   }
 
   &.small {

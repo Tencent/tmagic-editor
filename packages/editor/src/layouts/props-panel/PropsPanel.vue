@@ -1,5 +1,5 @@
 <template>
-  <div class="m-editor-props-panel" v-show="nodes.length === 1">
+  <div ref="propsPanel" class="m-editor-props-panel" v-show="nodes.length === 1">
     <slot name="props-panel-header"></slot>
     <FormPanel
       ref="propertyFormPanel"
@@ -14,6 +14,8 @@
       @form-error="errorHandler"
       @mounted="mountedHandler"
     ></FormPanel>
+
+    <Resizer v-if="showStylePanel" @change="widthChange"></Resizer>
 
     <FormPanel
       v-if="showStylePanel"
@@ -53,12 +55,14 @@
 <script lang="ts" setup>
 import { computed, inject, onBeforeUnmount, ref, useTemplateRef, watchEffect } from 'vue';
 import { Close, Sugar } from '@element-plus/icons-vue';
+import type { OnDrag } from 'gesto';
 
 import type { MNode } from '@tmagic/core';
 import { TMagicButton } from '@tmagic/design';
 import type { ContainerChangeEventData, FormState, FormValue } from '@tmagic/form';
 
 import MIcon from '@editor/components/Icon.vue';
+import Resizer from '@editor/components/Resizer.vue';
 import type { PropsPanelSlots, Services } from '@editor/type';
 import { styleTabConfig } from '@editor/utils';
 
@@ -132,6 +136,18 @@ const errorHandler = (e: any) => {
 
 const mountedHandler = (e: InstanceType<typeof FormPanel>) => {
   emit('mounted', e);
+};
+
+const propsPanelEl = useTemplateRef('propsPanel');
+const widthChange = ({ deltaX }: OnDrag) => {
+  if (!propsPanelEl.value) {
+    return;
+  }
+
+  const width = globalThis.parseFloat(
+    getComputedStyle(propsPanelEl.value).getPropertyValue('--props-style-panel-width'),
+  );
+  propsPanelEl.value.style.setProperty('--props-style-panel-width', `${width - deltaX}px`);
 };
 
 const { showStylePanel, showStylePanelHandler, closeStylePanelHandler } = useStylePanel(services);

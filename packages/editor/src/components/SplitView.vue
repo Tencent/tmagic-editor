@@ -22,7 +22,7 @@
 
 <script lang="ts" setup>
 import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef, watchEffect } from 'vue';
-import { OnDrag } from 'gesto';
+import type { OnDrag } from 'gesto';
 
 import Resizer from './Resizer.vue';
 
