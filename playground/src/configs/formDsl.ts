@@ -211,6 +211,7 @@ export default createForm([
   {
     type: 'table',
     name: 'table',
+    copyable: true,
     defautSort: { prop: 'name', order: 'descending' },
     extra: 'extra',
     itemExtra: (vm: any, { model }: any): any => `${model.text}itemExtra`,
@@ -232,6 +233,8 @@ export default createForm([
     type: 'groupList',
     name: 'groupList',
     extra: '分组xxxxxxxxxxxx',
+    copyable: true,
+    moveSpecifyLocation: true,
     itemExtra: (vm: any, { model }: any) => `${model.name}extra`,
     items: [
       {

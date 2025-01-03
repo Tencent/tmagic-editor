@@ -684,6 +684,7 @@ export interface TableConfig extends FormItem {
   addable?: (mForm: FormState | undefined, data: any) => boolean | 'undefined' | boolean;
   /** 是否显示删除按钮 */
   delete?: (model: any, index: number, values: any) => boolean | boolean;
+  copyable?: (model: any, data: any) => boolean | boolean;
   /** 是否显示导入按钮 */
   importable?: (mForm: FormState | undefined, data: any) => boolean | 'undefined' | boolean;
   /** 是否显示checkbox */
@@ -718,12 +719,14 @@ export interface GroupListConfig extends FormItem {
   addable?: (mForm: FormState | undefined, data: any) => boolean | 'undefined' | boolean;
   defaultAdd?: (mForm: FormState | undefined, data: any) => any;
   delete?: (model: any, index: number | string | symbol, values: any) => boolean | boolean;
+  copyable?: FilterFunction<boolean>;
   movable?: (
     mForm: FormState | undefined,
     index: number | string | symbol,
     model: any,
     groupModel: any,
   ) => boolean | boolean;
+  moveSpecifyLocation?: boolean;
   [key: string]: any;
 }
 

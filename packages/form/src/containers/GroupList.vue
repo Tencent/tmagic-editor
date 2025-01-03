@@ -20,6 +20,7 @@
       :disabled="disabled"
       :group-model="model[name]"
       @remove-item="removeHandler"
+      @copy-item="copyHandler"
       @swap-item="swapHandler"
       @change="changeHandler"
       @addDiffCount="onAddDiffCount()"
@@ -41,6 +42,7 @@
 <script setup lang="ts">
 import { computed, inject } from 'vue';
 import { Grid } from '@element-plus/icons-vue';
+import { cloneDeep } from 'lodash-es';
 
 import { TMagicButton } from '@tmagic/design';
 
@@ -131,11 +133,17 @@ const removeHandler = (index: number) => {
   emit('change', props.model[props.name]);
 };
 
+const copyHandler = (index: number) => {
+  props.model[props.name].push(cloneDeep(props.model[props.name][index]));
+};
+
 const swapHandler = (idx1: number, idx2: number) => {
   if (!props.name) return false;
 
+  const { length } = props.model[props.name];
+
   const [currRow] = props.model[props.name].splice(idx1, 1);
-  props.model[props.name].splice(idx2, 0, currRow);
+  props.model[props.name].splice(Math.min(Math.max(idx2, 0), length - 1), 0, currRow);
   emit('change', props.model[props.name]);
 };
 

@@ -26,18 +26,32 @@
 
             <TMagicTableColumn
               label="操作"
-              :width="config.operateColWidth || 55"
+              :width="config.operateColWidth || 100"
               align="center"
               :fixed="config.fixed === false ? undefined : 'left'"
             >
               <template v-slot="scope">
                 <slot name="operateCol" :scope="scope"></slot>
-                <TMagicIcon
+                <TMagicButton
                   v-show="showDelete(scope.$index + 1 + pagecontext * pagesize - 1)"
-                  class="m-table-delete-icon"
+                  size="small"
+                  type="danger"
+                  link
+                  title="删除"
+                  :icon="Delete"
                   @click="removeHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
-                  ><Delete
-                /></TMagicIcon>
+                ></TMagicButton>
+
+                <TMagicButton
+                  v-if="copyable(scope.$index + 1 + pagecontext * pagesize - 1)"
+                  link
+                  size="small"
+                  type="primary"
+                  title="复制"
+                  :icon="DocumentCopy"
+                  :disabled="disabled"
+                  @click="copyHandler(scope.$index + 1 + pagecontext * pagesize - 1)"
+                ></TMagicButton>
               </template>
             </TMagicTableColumn>
 
@@ -189,13 +203,12 @@
 
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, toRefs, watchEffect } from 'vue';
-import { ArrowDown, ArrowUp, Delete, FullScreen, Grid } from '@element-plus/icons-vue';
+import { ArrowDown, ArrowUp, Delete, DocumentCopy, FullScreen, Grid } from '@element-plus/icons-vue';
 import { cloneDeep } from 'lodash-es';
 import Sortable, { SortableEvent } from 'sortablejs';
 
 import {
   TMagicButton,
-  TMagicIcon,
   tMagicMessage,
   TMagicPagination,
   TMagicTable,
@@ -550,6 +563,22 @@ const showDelete = (index: number) => {
   return true;
 };
 
+const copyable = (index: number) => {
+  const copyableFunc = props.config.copyable;
+  if (copyableFunc && typeof copyableFunc === 'function') {
+    return copyableFunc(mForm, {
+      values: mForm?.initValues || {},
+      model: props.model,
+      parent: mForm?.parentValues || {},
+      formValue: mForm?.values || props.model,
+      prop: props.prop,
+      config: props.config,
+      index,
+    });
+  }
+  return true;
+};
+
 const clearHandler = () => {
   const len = props.model[modelName.value].length;
   props.model[modelName.value].splice(0, len);
@@ -592,6 +621,10 @@ const handleSizeChange = (val: number) => {
 
 const handleCurrentChange = (val: number) => {
   pagecontext.value = val - 1;
+};
+
+const copyHandler = (index: number) => {
+  props.model[modelName.value].push(cloneDeep(props.model[modelName.value][index]));
 };
 
 const toggleMode = () => {
