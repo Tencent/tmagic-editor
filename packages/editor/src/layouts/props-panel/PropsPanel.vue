@@ -124,7 +124,21 @@ const submit = async (v: MNode, eventData?: ContainerChangeEventData) => {
     if (!v.id) {
       v.id = values.value.id;
     }
-    services?.editorService.update(v, { changeRecords: eventData?.changeRecords });
+
+    const newValue: MNode = {
+      ...v,
+      style: {},
+    };
+
+    if (v.style) {
+      Object.entries(v.style).forEach(([key, value]) => {
+        if (value !== '' && newValue.style) {
+          newValue.style[key] = value;
+        }
+      });
+    }
+
+    services?.editorService.update(newValue, { changeRecords: eventData?.changeRecords });
   } catch (e: any) {
     emit('submit-error', e);
   }
