@@ -3,7 +3,12 @@
     <div v-for="(item, index) in list" :key="index" :class="item.class">
       <span class="help-txt" v-if="item.text">{{ item.text }}</span>
       <span class="next-input">
-        <input v-model="model[item.name]" @change="change($event, item.name)" placeholder="0" />
+        <input
+          v-model="model[item.name]"
+          :title="model[item.name]"
+          @change="change($event, item.name)"
+          placeholder="0"
+        />
       </span>
     </div>
   </div>

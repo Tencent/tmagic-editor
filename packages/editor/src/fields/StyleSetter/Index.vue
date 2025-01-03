@@ -40,16 +40,16 @@ const list = [
     component: Layout,
   },
   {
-    title: '文字',
-    component: Font,
+    title: '位置',
+    component: Position,
   },
   {
     title: '背景',
     component: Background,
   },
   {
-    title: '位置',
-    component: Position,
+    title: '文字',
+    component: Font,
   },
   {
     title: '边框与圆角',

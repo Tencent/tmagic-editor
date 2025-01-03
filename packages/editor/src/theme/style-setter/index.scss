@@ -4,6 +4,18 @@
 
 .m-fields-style-setter {
   width: 100%;
+
+  .tmagic-design-collapse-item {
+    > .el-collapse-item__header {
+      background-color: #f2f3f7;
+      height: 36px;
+      padding: 10px;
+    }
+
+    .el-collapse-item__wrap {
+      padding: 0 10px;
+    }
+  }
 }
 
 .text-align-list {

@@ -2,7 +2,12 @@
   <div class="layout-box-container">
     <div v-for="(item, index) in list" :key="index" :class="item.class">
       <span class="next-input">
-        <input v-model="model[item.name]" @change="change($event, item.name)" placeholder="0" />
+        <input
+          v-model="model[item.name]"
+          :title="model[item.name]"
+          @change="change($event, item.name)"
+          placeholder="0"
+        />
       </span>
     </div>
   </div>
