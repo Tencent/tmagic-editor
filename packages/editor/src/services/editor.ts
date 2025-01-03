@@ -527,8 +527,8 @@ class Editor extends BaseService {
 
     let newConfig = await this.toggleFixedPosition(toRaw(config), node, root);
 
-    newConfig = mergeWith(cloneDeep(node), newConfig, (objValue, srcValue, key) => {
-      if (typeof srcValue === 'undefined' && Object.hasOwn(newConfig, key)) {
+    newConfig = mergeWith(cloneDeep(node), newConfig, (objValue, srcValue, key, object: any, source: any) => {
+      if (typeof srcValue === 'undefined' && Object.hasOwn(source, key)) {
         return '';
       }
 
