@@ -148,8 +148,10 @@ const errorHandler = (e: any) => {
   emit('form-error', e);
 };
 
-const mountedHandler = (e: InstanceType<typeof FormPanel>) => {
-  emit('mounted', e);
+const mountedHandler = () => {
+  if (propertyFormPanelRef.value) {
+    emit('mounted', propertyFormPanelRef.value);
+  }
 };
 
 const propsPanelEl = useTemplateRef('propsPanel');
