@@ -99,7 +99,7 @@ watchEffect(() => {
 
 const internalInstance = getCurrentInstance();
 onMounted(() => {
-  emit('mounted', internalInstance);
+  emit('mounted', internalInstance?.proxy);
 });
 
 const submit = async (v: FormValue, eventData: ContainerChangeEventData) => {
