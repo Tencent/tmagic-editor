@@ -63,7 +63,8 @@ const config = computed<GroupListConfig>(() => ({
     {
       type: 'table',
       name: 'cond',
-      operateColWidth: 50,
+      operateColWidth: 100,
+      enableToggleMode: false,
       items: [
         parentFields.value.length
           ? {
