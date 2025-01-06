@@ -229,14 +229,7 @@ import { isEqual } from 'lodash-es';
 
 import { TMagicButton, TMagicFormItem, TMagicIcon, TMagicTooltip } from '@tmagic/design';
 
-import type {
-  ChildConfig,
-  ContainerChangeEventData,
-  ContainerCommonConfig,
-  FormState,
-  FormValue,
-  TypeFunction,
-} from '../schema';
+import type { ChildConfig, ContainerChangeEventData, ContainerCommonConfig, FormState, FormValue } from '../schema';
 import { display as displayFunction, filterFunction, getRules } from '../utils/form';
 
 defineOptions({
@@ -307,7 +300,7 @@ const itemProp = computed(() => {
 });
 
 const tagName = computed(() => {
-  if (type.value === 'component') {
+  if (type.value === 'component' && props.config.component) {
     return props.config.component;
   }
   return `m-${items.value ? 'form' : 'fields'}-${type.value}`;
@@ -325,7 +318,7 @@ const rule = computed(() => getRules(mForm, props.config.rules, props));
 
 const type = computed((): string => {
   let { type } = props.config;
-  type = type && (filterFunction<string | TypeFunction>(mForm, type, props) as string);
+  type = type && filterFunction<string>(mForm, type, props);
   if (type === 'form') return '';
   if (type === 'container') return '';
   return type?.replace(/([A-Z])/g, '-$1').toLowerCase() || (items.value ? '' : 'text');
