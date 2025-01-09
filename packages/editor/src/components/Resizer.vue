@@ -18,6 +18,6 @@ const emit = defineEmits<{
   change: [e: OnDrag];
 }>();
 
-const target = useTemplateRef<HTMLSpanElement>('target');
-const { isDragging } = useGetSo(target, emit);
+const targetEl = useTemplateRef<HTMLSpanElement>('target');
+const { isDragging } = useGetSo(targetEl, emit);
 </script>

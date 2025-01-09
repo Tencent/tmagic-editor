@@ -39,8 +39,8 @@ const editorService = services?.editorService;
 
 const visible = ref(false);
 const buttonVisible = ref(false);
-const button = useTemplateRef<HTMLDivElement>('button');
-const box = useTemplateRef<InstanceType<typeof FloatingBox>>('box');
+const buttonEl = useTemplateRef<HTMLDivElement>('button');
+const boxRef = useTemplateRef<InstanceType<typeof FloatingBox>>('box');
 
 const stage = computed(() => editorService?.get('stage'));
 const page = computed(() => editorService?.get('page'));
@@ -99,14 +99,14 @@ const menuPosition = ref({
 });
 
 watch(visible, async (visible) => {
-  if (!button.value || !visible) {
+  if (!buttonEl.value || !visible) {
     return;
   }
 
   await nextTick();
 
-  const rect = button.value.getBoundingClientRect();
-  const height = box.value?.target?.clientHeight || 0;
+  const rect = buttonEl.value.getBoundingClientRect();
+  const height = boxRef.value?.target?.clientHeight || 0;
 
   menuPosition.value = {
     left: rect.left + rect.width + 5,

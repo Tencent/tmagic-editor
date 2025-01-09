@@ -31,7 +31,7 @@ const props = withDefaults(
 
 const services = inject<Services>('services');
 const editorService = services?.editorService;
-const menu = useTemplateRef<InstanceType<typeof ContentMenu>>('menu');
+const menuRef = useTemplateRef<InstanceType<typeof ContentMenu>>('menu');
 const canCenter = ref(false);
 
 const node = computed(() => editorService?.get('node'));
@@ -52,7 +52,7 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() =>
         },
       },
       useCopyMenu(),
-      usePasteMenu(menu),
+      usePasteMenu(menuRef),
       {
         type: 'divider',
         direction: 'horizontal',
@@ -136,7 +136,7 @@ watch(
 );
 
 const show = (e: MouseEvent) => {
-  menu.value?.show(e);
+  menuRef.value?.show(e);
 };
 
 defineExpose({ show });

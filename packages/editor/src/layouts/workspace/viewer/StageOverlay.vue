@@ -19,7 +19,7 @@ const services = inject<Services>('services');
 
 const stageOptions = inject<StageOptions>('stageOptions');
 
-const stageOverlay = useTemplateRef<HTMLDivElement>('stageOverlay');
+const stageOverlayEl = useTemplateRef<HTMLDivElement>('stageOverlay');
 
 const stageOverlayVisible = computed(() => services?.stageOverlayService.get('stageOverlayVisible'));
 const wrapWidth = computed(() => services?.stageOverlayService.get('wrapWidth') || 0);
@@ -42,7 +42,7 @@ watch(stage, (stage) => {
   }
 });
 
-watch(stageOverlay, (stageOverlay) => {
+watch(stageOverlayEl, (stageOverlay) => {
   if (!services) return;
 
   const subStage = services.stageOverlayService.createStage(stageOptions);

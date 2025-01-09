@@ -104,14 +104,14 @@ const { height: codeBlockEditorHeight } = useEditorContentHeight();
 const difVisible = ref(false);
 const { rect: windowRect } = useWindowRect();
 
-const magicVsEditor = useTemplateRef<InstanceType<typeof CodeEditor>>('magicVsEditor');
+const magicVsEditorRef = useTemplateRef<InstanceType<typeof CodeEditor>>('magicVsEditor');
 
 const diffChange = () => {
-  if (!magicVsEditor.value || !formBox.value?.form) {
+  if (!magicVsEditorRef.value || !formBox.value?.form) {
     return;
   }
 
-  formBox.value.form.values.content = magicVsEditor.value.getEditorValue();
+  formBox.value.form.values.content = magicVsEditorRef.value.getEditorValue();
 
   difVisible.value = false;
 };

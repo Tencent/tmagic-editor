@@ -10,7 +10,7 @@ import type { CodeBlockService } from '@editor/services/codeBlock';
 export const useCodeBlockEdit = (codeBlockService?: CodeBlockService) => {
   const codeConfig = ref<CodeBlockContent>();
   const codeId = ref<string>();
-  const codeBlockEditor = useTemplateRef<InstanceType<typeof CodeBlockEditor>>('codeBlockEditor');
+  const codeBlockEditorRef = useTemplateRef<InstanceType<typeof CodeBlockEditor>>('codeBlockEditor');
 
   // 新增代码块
   const createCodeBlock = async () => {
@@ -29,7 +29,7 @@ export const useCodeBlockEdit = (codeBlockService?: CodeBlockService) => {
 
     await nextTick();
 
-    codeBlockEditor.value?.show();
+    codeBlockEditorRef.value?.show();
   };
 
   // 编辑代码块
@@ -54,7 +54,7 @@ export const useCodeBlockEdit = (codeBlockService?: CodeBlockService) => {
     codeId.value = id;
 
     await nextTick();
-    codeBlockEditor.value?.show();
+    codeBlockEditorRef.value?.show();
   };
 
   // 删除代码块
@@ -67,13 +67,13 @@ export const useCodeBlockEdit = (codeBlockService?: CodeBlockService) => {
 
     await codeBlockService?.setCodeDslById(codeId.value, values);
 
-    codeBlockEditor.value?.hide();
+    codeBlockEditorRef.value?.hide();
   };
 
   return {
     codeId,
     codeConfig,
-    codeBlockEditor,
+    codeBlockEditor: codeBlockEditorRef,
 
     createCodeBlock,
     editCode,

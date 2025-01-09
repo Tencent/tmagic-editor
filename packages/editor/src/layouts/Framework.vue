@@ -90,8 +90,8 @@ const DEFAULT_RIGHT_COLUMN_WIDTH = 480;
 const codeOptions = inject('codeOptions', {});
 const { editorService, uiService } = inject<Services>('services') || {};
 
-const content = useTemplateRef<HTMLDivElement>('content');
-const splitView = useTemplateRef<InstanceType<typeof SplitView>>('splitView');
+const contentEl = useTemplateRef<HTMLDivElement>('content');
+const splitViewRef = useTemplateRef<InstanceType<typeof SplitView>>('splitView');
 
 const root = computed(() => editorService?.get('root'));
 const page = computed(() => editorService?.get('page'));
@@ -115,7 +115,7 @@ const columnWidth = ref<Partial<GetColumnWidth>>({
 });
 
 watch(pageLength, () => {
-  splitView.value?.updateWidth();
+  splitViewRef.value?.updateWidth();
 });
 
 watch(
@@ -146,8 +146,8 @@ const resizerObserver = new ResizeObserver((entries) => {
 });
 
 onMounted(() => {
-  if (content.value) {
-    resizerObserver.observe(content.value);
+  if (contentEl.value) {
+    resizerObserver.observe(contentEl.value);
   }
 });
 

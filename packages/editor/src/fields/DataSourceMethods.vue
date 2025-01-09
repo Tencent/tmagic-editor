@@ -51,7 +51,7 @@ const props = withDefaults(
 const emit = defineEmits(['change']);
 
 const codeConfig = ref<CodeBlockContent>();
-const codeBlockEditor = useTemplateRef<InstanceType<typeof CodeBlockEditor>>('codeBlockEditor');
+const codeBlockEditorRef = useTemplateRef<InstanceType<typeof CodeBlockEditor>>('codeBlockEditor');
 
 let editIndex = -1;
 
@@ -94,7 +94,7 @@ const methodColumns: ColumnConfig[] = [
           editIndex = index;
 
           nextTick(() => {
-            codeBlockEditor.value?.show();
+            codeBlockEditorRef.value?.show();
           });
         },
       },
@@ -121,7 +121,7 @@ const createCodeHandler = () => {
   editIndex = -1;
 
   nextTick(() => {
-    codeBlockEditor.value?.show();
+    codeBlockEditorRef.value?.show();
   });
 };
 
@@ -157,6 +157,6 @@ const submitCodeHandler = (value: CodeBlockContent, data: ContainerChangeEventDa
   editIndex = -1;
   codeConfig.value = void 0;
 
-  codeBlockEditor.value?.hide();
+  codeBlockEditorRef.value?.hide();
 };
 </script>

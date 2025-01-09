@@ -32,7 +32,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['change']);
 
-const form = useTemplateRef<InstanceType<typeof MForm>>('form');
+const formRef = useTemplateRef<InstanceType<typeof MForm>>('form');
 
 const getFormConfig = (items: FormConfig = []) => [
   {
@@ -61,7 +61,7 @@ const codeParamsConfig = computed(() =>
  */
 const onParamsChangeHandler = async (v: FormValue, eventData: ContainerChangeEventData) => {
   try {
-    const value = await form.value?.submitForm(true);
+    const value = await formRef.value?.submitForm(true);
     emit('change', value, eventData);
   } catch (e) {
     error(e);

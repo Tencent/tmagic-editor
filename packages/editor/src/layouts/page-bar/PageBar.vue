@@ -144,40 +144,40 @@ const remove = (node: MPage | MPageFragment) => {
   editorService?.remove(node);
 };
 
-const pageBarScrollContainer = useTemplateRef<InstanceType<typeof PageBarScrollContainer>>('pageBarScrollContainer');
-const pageBarItems = useTemplateRef<HTMLDivElement[]>('pageBarItems');
+const pageBarScrollContainerRef = useTemplateRef<InstanceType<typeof PageBarScrollContainer>>('pageBarScrollContainer');
+const pageBarItemEls = useTemplateRef<HTMLDivElement[]>('pageBarItems');
 watch(page, (page) => {
   if (
     !page ||
-    !pageBarScrollContainer.value?.itemsContainerWidth ||
-    !pageBarItems.value ||
-    pageBarItems.value.length < 2
+    !pageBarScrollContainerRef.value?.itemsContainerWidth ||
+    !pageBarItemEls.value ||
+    pageBarItemEls.value.length < 2
   ) {
     return;
   }
 
-  const firstItem = pageBarItems.value[0];
-  const lastItem = pageBarItems.value[pageBarItems.value.length - 1];
+  const firstItem = pageBarItemEls.value[0];
+  const lastItem = pageBarItemEls.value[pageBarItemEls.value.length - 1];
 
   if (page.id === firstItem.dataset.pageId) {
-    pageBarScrollContainer.value.scroll('start');
+    pageBarScrollContainerRef.value.scroll('start');
   } else if (page.id === lastItem.dataset.pageId) {
-    pageBarScrollContainer.value.scroll('end');
+    pageBarScrollContainerRef.value.scroll('end');
   } else {
-    const pageItem = pageBarItems.value.find((item) => item.dataset.pageId === page.id);
+    const pageItem = pageBarItemEls.value.find((item) => item.dataset.pageId === page.id);
     if (!pageItem) {
       return;
     }
 
     const pageItemRect = pageItem.getBoundingClientRect();
     const offsetLeft = pageItemRect.left - firstItem.getBoundingClientRect().left;
-    const { itemsContainerWidth } = pageBarScrollContainer.value;
+    const { itemsContainerWidth } = pageBarScrollContainerRef.value;
 
     const left = itemsContainerWidth - offsetLeft - pageItemRect.width;
 
-    const translateLeft = pageBarScrollContainer.value.getTranslateLeft();
+    const translateLeft = pageBarScrollContainerRef.value.getTranslateLeft();
     if (offsetLeft + translateLeft < 0 || offsetLeft + pageItemRect.width > itemsContainerWidth - translateLeft) {
-      pageBarScrollContainer.value.scrollTo(left);
+      pageBarScrollContainerRef.value.scrollTo(left);
     }
   }
 });

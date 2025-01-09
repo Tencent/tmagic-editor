@@ -14,7 +14,7 @@
       width: 60,
       height: 50,
     }"
-    @click="stageWrap?.container?.focus()"
+    @click="stageWrapRef?.container?.focus()"
   >
     <div
       class="m-editor-stage-container"
@@ -95,9 +95,9 @@ const services = inject<Services>('services');
 
 const stageLoading = computed(() => services?.editorService.get('stageLoading') || false);
 
-const stageWrap = useTemplateRef<InstanceType<typeof ScrollViewer>>('stageWrap');
-const stageContainer = useTemplateRef<HTMLDivElement>('stageContainer');
-const menu = useTemplateRef<InstanceType<typeof ViewerMenu>>('menu');
+const stageWrapRef = useTemplateRef<InstanceType<typeof ScrollViewer>>('stageWrap');
+const stageContainerEl = useTemplateRef<HTMLDivElement>('stageContainer');
+const menuRef = useTemplateRef<InstanceType<typeof ViewerMenu>>('menu');
 
 const nodes = computed(() => services?.editorService.get('nodes') || []);
 const isMultiSelect = computed(() => nodes.value.length > 1);
@@ -111,18 +111,18 @@ const node = computed(() => services?.editorService.get('node'));
 watchEffect(() => {
   if (stage || !page.value) return;
 
-  if (!stageContainer.value) return;
+  if (!stageContainerEl.value) return;
   if (!(props.stageOptions?.runtimeUrl || props.stageOptions?.render) || !root.value) return;
 
   stage = useStage(props.stageOptions);
 
   stage.on('select', () => {
-    stageWrap.value?.container?.focus();
+    stageWrapRef.value?.container?.focus();
   });
 
   services?.editorService.set('stage', markRaw(stage));
 
-  stage.mount(stageContainer.value);
+  stage.mount(stageContainerEl.value);
 
   if (!node.value?.id) {
     return;
@@ -188,9 +188,9 @@ const resizeObserver = new ResizeObserver((entries) => {
 });
 
 onMounted(() => {
-  if (stageWrap.value?.container) {
-    resizeObserver.observe(stageWrap.value.container);
-    services?.keybindingService.registerEl(KeyBindingContainerKey.STAGE, stageWrap.value.container);
+  if (stageWrapRef.value?.container) {
+    resizeObserver.observe(stageWrapRef.value.container);
+    services?.keybindingService.registerEl(KeyBindingContainerKey.STAGE, stageWrapRef.value.container);
   }
 });
 
@@ -206,7 +206,7 @@ const parseDSL = getEditorConfig('parseDSL');
 
 const contextmenuHandler = (e: MouseEvent) => {
   e.preventDefault();
-  menu.value?.show(e);
+  menuRef.value?.show(e);
 };
 
 const dragoverHandler = (e: DragEvent) => {
@@ -239,10 +239,10 @@ const dropHandler = async (e: DragEvent) => {
     parent = services?.editorService.getNodeById(parentId, false) as MContainer;
   }
 
-  if (parent && stageContainer.value && stage) {
+  if (parent && stageContainerEl.value && stage) {
     const layout = await services?.editorService.getLayout(parent);
 
-    const containerRect = stageContainer.value.getBoundingClientRect();
+    const containerRect = stageContainerEl.value.getBoundingClientRect();
     const { scrollTop, scrollLeft } = stage.mask!;
     const { style = {} } = config.data;
 

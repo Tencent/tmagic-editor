@@ -1,5 +1,5 @@
 <template>
-  <div ref="el" class="m-editor-layout" :style="`min-width: ${props.minCenter + props.minLeft + props.minRight}px`">
+  <div ref="target" class="m-editor-layout" :style="`min-width: ${props.minCenter + props.minLeft + props.minRight}px`">
     <template v-if="hasLeft && $slots.left">
       <div class="m-editor-layout-left" :class="leftClass" :style="`width: ${left}px`">
         <slot name="left"></slot>
@@ -51,7 +51,7 @@ const props = withDefaults(
   },
 );
 
-const el = useTemplateRef<HTMLElement>('el');
+const el = useTemplateRef<HTMLElement>('target');
 
 const hasLeft = computed(() => typeof props.left !== 'undefined');
 const hasRight = computed(() => typeof props.right !== 'undefined');

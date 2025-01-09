@@ -179,8 +179,10 @@ const buttons = computed(() => {
   return data;
 });
 
+const navMenuEl = useTemplateRef<HTMLDivElement>('navMenu');
+
 const resizeObserver = new ResizeObserver(() => {
-  const rect = navMenu.value?.getBoundingClientRect();
+  const rect = navMenuEl.value?.getBoundingClientRect();
   if (rect) {
     uiService?.set('navMenuRect', {
       left: rect.left,
@@ -190,10 +192,11 @@ const resizeObserver = new ResizeObserver(() => {
     });
   }
 });
-const navMenu = useTemplateRef<HTMLDivElement>('navMenu');
+
 onMounted(() => {
-  navMenu.value && resizeObserver.observe(navMenu.value);
+  navMenuEl.value && resizeObserver.observe(navMenuEl.value);
 });
+
 onBeforeUnmount(() => {
   resizeObserver.disconnect();
 });

@@ -21,8 +21,8 @@ const props = defineProps<{
 
 const emit = defineEmits(['scroll']);
 
-const bar = useTemplateRef<HTMLDivElement>('bar');
-const thumb = useTemplateRef<HTMLDivElement>('thumb');
+const barEl = useTemplateRef<HTMLDivElement>('bar');
+const thumbEl = useTemplateRef<HTMLDivElement>('thumb');
 
 const thumbSize = computed(() => props.size * (props.size / props.scrollSize));
 const thumbPos = computed(() => (props.pos / props.scrollSize) * props.size);
@@ -35,9 +35,8 @@ const thumbStyle = computed(() => ({
 let gesto: Gesto;
 
 onMounted(() => {
-  if (!thumb.value) return;
-  const thumbEl = thumb.value;
-  gesto = new Gesto(thumbEl, {
+  if (!thumbEl.value) return;
+  gesto = new Gesto(thumbEl.value, {
     container: window,
   });
 
@@ -50,12 +49,12 @@ onMounted(() => {
       scrollBy(getDelta(e));
     });
 
-  bar.value?.addEventListener('wheel', wheelHandler, false);
+  barEl.value?.addEventListener('wheel', wheelHandler, false);
 });
 
 onBeforeUnmount(() => {
   if (gesto) gesto.off();
-  bar.value?.removeEventListener('wheel', wheelHandler, false);
+  barEl.value?.removeEventListener('wheel', wheelHandler, false);
 });
 
 const wheelHandler = (e: WheelEvent) => {

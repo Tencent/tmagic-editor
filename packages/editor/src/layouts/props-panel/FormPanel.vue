@@ -88,12 +88,12 @@ const propsPanelSize = computed(() => services?.uiService.get('propsPanelSize') 
 const { height: editorContentHeight } = useEditorContentHeight();
 const stage = computed(() => services?.editorService.get('stage'));
 
-const configForm = useTemplateRef<InstanceType<typeof MForm>>('configForm');
+const configFormRef = useTemplateRef<InstanceType<typeof MForm>>('configForm');
 
 watchEffect(() => {
-  if (configForm.value) {
-    configForm.value.formState.stage = stage.value;
-    configForm.value.formState.services = services;
+  if (configFormRef.value) {
+    configFormRef.value.formState.stage = stage.value;
+    configFormRef.value.formState.services = services;
   }
 });
 
@@ -104,7 +104,7 @@ onMounted(() => {
 
 const submit = async (v: FormValue, eventData: ContainerChangeEventData) => {
   try {
-    const values = await configForm.value?.submitForm();
+    const values = await configFormRef.value?.submitForm();
     emit('submit', values, eventData);
   } catch (e: any) {
     emit('submit-error', e);
@@ -119,5 +119,5 @@ const saveCode = (values: any) => {
   emit('submit', props.codeValueKey ? { [props.codeValueKey]: values } : values);
 };
 
-defineExpose({ configForm, submit });
+defineExpose({ configForm: configFormRef, submit });
 </script>

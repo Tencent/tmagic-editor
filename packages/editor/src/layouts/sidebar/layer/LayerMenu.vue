@@ -27,7 +27,7 @@ const emit = defineEmits<{
 }>();
 
 const services = inject<Services>('services');
-const menu = useTemplateRef<InstanceType<typeof ContentMenu>>('menu');
+const menuRef = useTemplateRef<InstanceType<typeof ContentMenu>>('menu');
 const node = computed(() => services?.editorService.get('node'));
 const nodes = computed(() => services?.editorService.get('nodes'));
 const componentList = computed(() => services?.componentListService.getList() || []);
@@ -113,7 +113,7 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() =>
 );
 
 const show = (e: MouseEvent) => {
-  menu.value?.show(e);
+  menuRef.value?.show(e);
 };
 
 defineExpose({

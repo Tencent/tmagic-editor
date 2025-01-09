@@ -83,12 +83,12 @@ const emit = defineEmits<{
 
 const { dataSourceService } = inject<Services>('services') || {};
 
-const autocomplete = useTemplateRef<InstanceType<typeof TMagicAutocomplete>>('autocomplete');
+const autocompleteRef = useTemplateRef<InstanceType<typeof TMagicAutocomplete>>('autocomplete');
 const isFocused = ref(false);
 const state = ref('');
 const displayState = ref<{ value: string; type: 'var' | 'text' }[]>([]);
 
-const input = computed<HTMLInputElement>(() => autocomplete.value?.inputRef?.input);
+const input = computed<HTMLInputElement>(() => autocompleteRef.value?.inputRef?.input);
 const dataSources = computed(() => dataSourceService?.get('dataSources') || []);
 
 const setDisplayState = () => {
@@ -112,7 +112,7 @@ const mouseupHandler = async () => {
 
   isFocused.value = true;
   await nextTick();
-  autocomplete.value?.focus();
+  autocompleteRef.value?.focus();
 
   if (focusOffset && input.value) {
     input.value.setSelectionRange(anchorOffset, focusOffset);

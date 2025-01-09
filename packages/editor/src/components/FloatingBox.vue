@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body" v-if="visible">
     <div ref="target" class="m-editor-float-box" :style="{ ...style, zIndex: curZIndex }" @mousedown="nextZIndex">
-      <div ref="titleEl" class="m-editor-float-box-title">
+      <div ref="title" class="m-editor-float-box-title">
         <slot name="title">
           <span>{{ title }}</span>
         </slot>
@@ -47,8 +47,8 @@ const props = withDefaults(
   },
 );
 
-const target = useTemplateRef<HTMLDivElement>('target');
-const titleEl = useTemplateRef<HTMLDivElement>('titleEl');
+const targetEl = useTemplateRef<HTMLDivElement>('target');
+const titleEl = useTemplateRef<HTMLDivElement>('title');
 
 const zIndex = useZIndex();
 const curZIndex = ref<number>(0);
@@ -59,8 +59,8 @@ const bodyHeight = computed(() => {
     return height.value - titleHeight.value;
   }
 
-  if (target.value) {
-    return target.value.clientHeight - titleHeight.value;
+  if (targetEl.value) {
+    return targetEl.value.clientHeight - titleHeight.value;
   }
 
   return 'auto';
@@ -87,7 +87,7 @@ let moveable: VanillaMoveable | null = null;
 const initMoveable = () => {
   moveable = new VanillaMoveable(globalThis.document.body, {
     className: 'm-editor-floating-box-moveable',
-    target: target.value,
+    target: targetEl.value,
     draggable: true,
     resizable: true,
     edge: true,
@@ -126,7 +126,7 @@ watch(
       await nextTick();
       curZIndex.value = zIndex.nextZIndex();
 
-      const targetRect = target.value?.getBoundingClientRect();
+      const targetRect = targetEl.value?.getBoundingClientRect();
       if (targetRect) {
         width.value = targetRect.width;
         height.value = targetRect.height;
@@ -168,11 +168,11 @@ const nextZIndex = () => {
   curZIndex.value = zIndex.nextZIndex();
 };
 
-provide('parentFloating', target);
+provide('parentFloating', targetEl);
 
 defineExpose({
   bodyHeight,
-  target,
+  target: targetEl,
   titleEl,
 });
 </script>

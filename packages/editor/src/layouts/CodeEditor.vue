@@ -93,7 +93,7 @@ let vsDiffEditor: monaco.editor.IStandaloneDiffEditor | null = null;
 
 const values = ref('');
 const loading = ref(false);
-const codeEditor = useTemplateRef<HTMLDivElement>('codeEditor');
+const codeEditorEl = useTemplateRef<HTMLDivElement>('codeEditor');
 
 const resizeObserver = new globalThis.ResizeObserver(
   throttle((): void => {
@@ -122,7 +122,7 @@ const getEditorValue = () =>
   (props.type === 'diff' ? vsDiffEditor?.getModifiedEditor().getValue() : vsEditor?.getValue()) || '';
 
 const init = async () => {
-  if (!codeEditor.value) return;
+  if (!codeEditorEl.value) return;
 
   const options = {
     value: values.value,
@@ -132,9 +132,9 @@ const init = async () => {
   };
 
   if (props.type === 'diff') {
-    vsDiffEditor = monaco.editor.createDiffEditor(codeEditor.value, options);
+    vsDiffEditor = monaco.editor.createDiffEditor(codeEditorEl.value, options);
   } else {
-    vsEditor = monaco.editor.create(codeEditor.value, options);
+    vsEditor = monaco.editor.create(codeEditorEl.value, options);
   }
 
   setEditorValue(props.initValues, props.modifiedValues);
@@ -143,7 +143,7 @@ const init = async () => {
 
   emit('initd', vsEditor);
 
-  codeEditor.value.addEventListener('keydown', (e) => {
+  codeEditorEl.value.addEventListener('keydown', (e) => {
     if (e.keyCode === 83 && (navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey)) {
       e.preventDefault();
       e.stopPropagation();
@@ -163,7 +163,7 @@ const init = async () => {
     });
   }
 
-  resizeObserver.observe(codeEditor.value);
+  resizeObserver.observe(codeEditorEl.value);
 };
 
 watch(

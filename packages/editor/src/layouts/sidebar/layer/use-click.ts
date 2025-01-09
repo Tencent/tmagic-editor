@@ -1,4 +1,4 @@
-import { computed, type ComputedRef, nextTick, type Ref, useTemplateRef } from 'vue';
+import { computed, type ComputedRef, nextTick, type Ref, type ShallowRef } from 'vue';
 import { throttle } from 'lodash-es';
 
 import { Id, MNode } from '@tmagic/core';
@@ -13,6 +13,7 @@ export const useClick = (
   services: Services | undefined,
   isCtrlKeyDown: Ref<boolean>,
   nodeStatusMap: ComputedRef<Map<Id, LayerNodeStatus> | undefined>,
+  menuRef: ShallowRef<InstanceType<typeof LayerMenu> | null>,
 ) => {
   const isMultiSelect = computed(() => isCtrlKeyDown.value && !services?.editorService.get('disabledMultiSelect'));
 
@@ -98,11 +99,8 @@ export const useClick = (
     });
   };
 
-  // 右键菜单
-  const menu = useTemplateRef<InstanceType<typeof LayerMenu>>('menu');
-
   return {
-    menu,
+    menuRef,
 
     nodeClickHandler,
 
@@ -114,7 +112,7 @@ export const useClick = (
         nodeClickHandler(event, data);
       }
 
-      menu.value?.show(event);
+      menuRef.value?.show(event);
     },
 
     highlightHandler,

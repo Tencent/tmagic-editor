@@ -87,13 +87,13 @@ defineProps<{
 const services = inject<Services>('services');
 const editorService = services?.editorService;
 
-const tree = useTemplateRef<InstanceType<typeof Tree>>('tree');
+const treeRef = useTemplateRef<InstanceType<typeof Tree>>('tree');
 
 const page = computed(() => editorService?.get('page'));
 const nodeData = computed<TreeNodeData[]>(() => (!page.value ? [] : [page.value]));
 
 const { nodeStatusMap } = useNodeStatus(services);
-const { isCtrlKeyDown } = useKeybinding(services, tree);
+const { isCtrlKeyDown } = useKeybinding(services, treeRef);
 
 const filterNodeMethod = (v: string, data: MNode): boolean => {
   let name = '';
@@ -121,10 +121,11 @@ const collapseAllHandler = () => {
 
 const { handleDragStart, handleDragEnd, handleDragLeave, handleDragOver } = useDrag(services);
 
+// 右键菜单
+const menuRef = useTemplateRef<InstanceType<typeof LayerMenu>>('menu');
 const {
-  menu,
   nodeClickHandler,
   nodeContentMenuHandler,
   highlightHandler: mouseenterHandler,
-} = useClick(services, isCtrlKeyDown, nodeStatusMap);
+} = useClick(services, isCtrlKeyDown, nodeStatusMap, menuRef);
 </script>

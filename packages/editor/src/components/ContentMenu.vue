@@ -69,9 +69,9 @@ const emit = defineEmits<{
   mouseenter: [];
 }>();
 
-const menu = useTemplateRef<HTMLDivElement>('menu');
-const buttons = useTemplateRef<InstanceType<typeof ToolButton>[]>('buttons');
-const subMenu = useTemplateRef<any>('subMenu');
+const menuEl = useTemplateRef<HTMLDivElement>('menu');
+const buttonRefs = useTemplateRef<InstanceType<typeof ToolButton>[]>('buttons');
+const subMenuRef = useTemplateRef<any>('subMenu');
 const visible = ref(false);
 const subMenuData = ref<(MenuButton | MenuComponent)[]>([]);
 const zIndex = useZIndex();
@@ -88,13 +88,13 @@ const menuStyle = computed(() => ({
   zIndex: curZIndex.value,
 }));
 
-const contains = (el: HTMLElement) => menu.value?.contains(el) || subMenu.value?.contains(el);
+const contains = (el: HTMLElement) => menuEl.value?.contains(el) || subMenuRef.value?.contains(el);
 
 const hide = () => {
   if (!visible.value) return;
 
   visible.value = false;
-  subMenu.value?.hide();
+  subMenuRef.value?.hide();
 
   emit('hide');
 };
@@ -121,7 +121,7 @@ const outsideClickHideHandler = (e: MouseEvent) => {
 };
 
 const setPosition = (e: { clientY: number; clientX: number }) => {
-  const menuHeight = menu.value?.clientHeight || 0;
+  const menuHeight = menuEl.value?.clientHeight || 0;
 
   let top = e.clientY;
   if (menuHeight + e.clientY > document.body.clientHeight) {
@@ -158,15 +158,15 @@ const showSubMenu = (item: MenuButton | MenuComponent, index: number) => {
       return;
     }
 
-    if (menu.value) {
+    if (menuEl.value) {
       // 将子菜单放置在按钮右侧，与按钮齐平
-      let y = menu.value.offsetTop;
-      if (buttons.value?.[index].$el) {
-        const rect = buttons.value?.[index].$el.getBoundingClientRect();
+      let y = menuEl.value.offsetTop;
+      if (buttonRefs.value?.[index].$el) {
+        const rect = buttonRefs.value?.[index].$el.getBoundingClientRect();
         y = rect.top;
       }
-      subMenu.value?.show({
-        clientX: menu.value.offsetLeft + menu.value.clientWidth - 2,
+      subMenuRef.value?.show({
+        clientX: menuEl.value.offsetLeft + menuEl.value.clientWidth - 2,
         clientY: y,
       });
     }
@@ -190,7 +190,7 @@ onBeforeUnmount(() => {
 });
 
 defineExpose({
-  menu,
+  menu: menuEl,
   menuPosition,
   hide,
   show,

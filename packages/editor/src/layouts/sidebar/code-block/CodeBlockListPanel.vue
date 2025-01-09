@@ -89,10 +89,10 @@ const editable = computed(() => codeBlockService?.getEditStatus());
 const { codeBlockEditor, codeConfig, editCode, deleteCode, createCodeBlock, submitCodeBlockHandler } =
   useCodeBlockEdit(codeBlockService);
 
-const codeBlockList = useTemplateRef<InstanceType<typeof CodeBlockList>>('codeBlockList');
+const codeBlockListRef = useTemplateRef<InstanceType<typeof CodeBlockList>>('codeBlockList');
 
 const filterTextChangeHandler = (val: string) => {
-  codeBlockList.value?.filter(val);
+  codeBlockListRef.value?.filter(val);
 };
 
 eventBus?.on('edit-code', (id: string) => {
@@ -104,7 +104,7 @@ const {
   menuData: contentMenuData,
   contentMenuHideHandler,
 } = useContentMenu((id: string) => {
-  codeBlockList.value?.deleteCode(id);
+  codeBlockListRef.value?.deleteCode(id);
 });
 const menuData = computed<(MenuButton | MenuComponent)[]>(() => props.customContentMenu(contentMenuData, 'code-block'));
 </script>
