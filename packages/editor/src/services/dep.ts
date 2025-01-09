@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { reactive } from 'vue';
+import { reactive, shallowReactive } from 'vue';
 
 import type { DepExtendedData, Id, MNode, Target, TargetNode } from '@tmagic/core';
 import { DepTargetType, Watcher } from '@tmagic/core';
@@ -40,7 +40,7 @@ type StateKey = keyof State;
 const idleTask = new IdleTask<{ node: TargetNode; deep: boolean; target: Target }>();
 
 class Dep extends BaseService {
-  private state = reactive<State>({
+  private state = shallowReactive<State>({
     collecting: false,
   });
 

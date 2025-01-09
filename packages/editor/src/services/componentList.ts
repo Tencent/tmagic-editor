@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-import { reactive } from 'vue';
+import { shallowReactive } from 'vue';
 
 import type { ComponentGroup, ComponentGroupState } from '@editor/type';
 
 import BaseService from './BaseService';
 
 class ComponentList extends BaseService {
-  private state = reactive<ComponentGroupState>({
+  private state = shallowReactive<ComponentGroupState>({
     list: [],
   });
 

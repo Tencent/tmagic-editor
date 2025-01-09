@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { reactive } from 'vue';
+import { shallowReactive } from 'vue';
 import type { Writable } from 'type-fest';
 
 import { convertToNumber } from '@tmagic/utils';
@@ -26,7 +26,7 @@ import type { AsyncHookPlugin, StageRect, UiState } from '@editor/type';
 
 import BaseService from './BaseService';
 
-const state = reactive<UiState>({
+const state = shallowReactive<UiState>({
   uiSelectMode: false,
   showSrc: false,
   showStylePanel: true,

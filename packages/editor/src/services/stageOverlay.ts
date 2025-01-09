@@ -1,4 +1,4 @@
-import { reactive } from 'vue';
+import { shallowReactive } from 'vue';
 import type { Writable } from 'type-fest';
 
 import StageCore from '@tmagic/stage';
@@ -17,7 +17,7 @@ const canUsePluginMethods = {
 type SyncMethodName = Writable<(typeof canUsePluginMethods)['sync']>;
 
 class StageOverlay extends BaseService {
-  private state: StageOverlayState = reactive({
+  private state: StageOverlayState = shallowReactive({
     wrapDiv: document.createElement('div'),
     sourceEl: null,
     contentEl: null,
