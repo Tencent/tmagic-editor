@@ -22,6 +22,7 @@ import {
   ElIcon,
   ElInput,
   ElInputNumber,
+  ElLoading,
   ElMessage,
   ElMessageBox,
   ElOption,
@@ -318,6 +319,7 @@ const adapter: DesignPluginOptions = {
       props: (props: UploadProps) => props,
     },
   },
+  loading: ElLoading.directive,
 };
 
 export default adapter;
