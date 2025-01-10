@@ -2,7 +2,13 @@ import { EventEmitter } from 'events';
 
 export interface IdleTaskEvents {
   finish: [];
+  'hight-level-finish': [];
 }
+
+type TaskList<T> = {
+  handler: (data: T) => void;
+  data: T;
+}[];
 
 globalThis.requestIdleCallback =
   globalThis.requestIdleCallback ||
@@ -19,10 +25,9 @@ globalThis.requestIdleCallback =
   };
 
 export class IdleTask<T = any> extends EventEmitter {
-  private taskList: {
-    handler: (data: T) => void;
-    data: T;
-  }[] = [];
+  private taskList: TaskList<T> = [];
+
+  private hightLevelTaskList: TaskList<T> = [];
 
   private taskHandle: number | null = null;
 
@@ -31,8 +36,8 @@ export class IdleTask<T = any> extends EventEmitter {
     this.setMaxListeners(1000);
   }
 
-  public enqueueTask(taskHandler: (data: T) => void, taskData: T) {
-    this.taskList.push({
+  public enqueueTask(taskHandler: (data: T) => void, taskData: T, isHightLevel = false) {
+    (isHightLevel ? this.hightLevelTaskList : this.taskList).push({
       handler: taskHandler,
       data: taskData,
     });
@@ -43,6 +48,11 @@ export class IdleTask<T = any> extends EventEmitter {
   }
 
   public clearTasks() {
+    if (this.taskHandle) {
+      globalThis.cancelIdleCallback(this.taskHandle);
+    }
+
+    this.hightLevelTaskList = [];
     this.taskList = [];
   }
 
@@ -65,10 +75,12 @@ export class IdleTask<T = any> extends EventEmitter {
   }
 
   private runTaskQueue(deadline: IdleDeadline) {
+    const { hightLevelTaskList, taskList } = this;
+
     // 动画会占用空闲时间,当任务一直无法执行时，看看是否有动画正在播放
     // 根据空闲时间的多少来决定执行的任务数，保证页面不卡死的情况下尽量多执行任务，不然当任务数巨大时，执行时间会很久
     // 执行不完不会影响配置，但是会影响画布渲染
-    while (deadline.timeRemaining() > 0 && this.taskList.length) {
+    while (deadline.timeRemaining() > 0 && taskList.length) {
       const timeRemaining = deadline.timeRemaining();
       let times = 0;
       if (timeRemaining <= 5) {
@@ -82,18 +94,22 @@ export class IdleTask<T = any> extends EventEmitter {
       }
 
       for (let i = 0; i < times; i++) {
-        const task = this.taskList.shift();
+        const task = hightLevelTaskList.length > 0 ? hightLevelTaskList.shift() : taskList.shift();
         if (task) {
           task.handler(task.data);
         }
 
-        if (this.taskList.length === 0) {
+        if (hightLevelTaskList.length === 0 && taskList.length === 0) {
           break;
         }
       }
     }
 
-    if (this.taskList.length) {
+    if (!hightLevelTaskList.length) {
+      this.emit('hight-level-finish');
+    }
+
+    if (hightLevelTaskList.length || taskList.length) {
       this.taskHandle = globalThis.requestIdleCallback(this.runTaskQueue.bind(this), { timeout: 300 });
     } else {
       this.taskHandle = 0;

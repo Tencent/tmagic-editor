@@ -29,6 +29,7 @@ export interface DepEvents {
   'add-target': [target: Target];
   'remove-target': [id: string | number];
   collected: [nodes: MNode[], deep: boolean];
+  'ds-collected': [nodes: MNode[], deep: boolean];
 }
 
 interface State {
@@ -96,6 +97,7 @@ class Dep extends BaseService {
     this.set('collecting', false);
 
     this.emit('collected', nodes, deep);
+    this.emit('ds-collected', nodes, deep);
   }
 
   public collectIdle(nodes: MNode[], depExtendedData: DepExtendedData = {}, deep = false, type?: DepTargetType) {
@@ -118,6 +120,9 @@ class Dep extends BaseService {
         this.emit('collected', nodes, deep);
         this.set('collecting', false);
         resolve();
+      });
+      idleTask.once('hight-level-finish', () => {
+        this.emit('ds-collected', nodes, deep);
       });
     });
   }
@@ -185,6 +190,7 @@ class Dep extends BaseService {
         deep: false,
         target,
       },
+      target.type === DepTargetType.DATA_SOURCE,
     );
 
     if (deep && Array.isArray(node.items) && node.items.length) {
