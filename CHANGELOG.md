@@ -1,3 +1,13 @@
+## [1.5.4](https://github.com/Tencent/tmagic-editor/compare/v1.5.3...v1.5.4) (2025-01-10)
+
+
+### Bug Fixes
+
+* **element-plus-adapter:** 只有当前没注册loading指令时才注册 ([8b12016](https://github.com/Tencent/tmagic-editor/commit/8b1201626dd2ff410e919da2baec58b0c332303d))
+* **element-plus-adapter:** 增加loading指令 ([1bcefdb](https://github.com/Tencent/tmagic-editor/commit/1bcefdb1e8ca851bdd322de860546a906298b02b))
+
+
+
 ## [1.5.3](https://github.com/Tencent/tmagic-editor/compare/v1.5.2...v1.5.3) (2025-01-06)
 
 
