@@ -499,14 +499,21 @@ export const traverseNode = <T extends NodeItem = NodeItem>(
   node: T,
   cb: (node: T, parents: T[]) => void,
   parents: T[] = [],
+  evalCbAfter = false,
 ) => {
-  cb(node, parents);
+  if (!evalCbAfter) {
+    cb(node, parents);
+  }
 
   if (Array.isArray(node.items) && node.items.length) {
     parents.push(node);
     node.items.forEach((item) => {
       traverseNode(item as T, cb, [...parents]);
     });
+  }
+
+  if (evalCbAfter) {
+    cb(node, parents);
   }
 };
 

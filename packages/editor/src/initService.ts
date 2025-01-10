@@ -1,6 +1,7 @@
 import { computed, onBeforeUnmount, reactive, toRaw, watch } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
+import type TMagicCore from '@tmagic/core';
 import type {
   CodeBlockContent,
   DataSourceSchema,
@@ -263,67 +264,46 @@ export const initServiceEvents = (
 
       if (!node) return;
 
-      collectIdle([node], true).then(() => {
-        afterUpdateNodes([node]);
-      });
+      collectIdle([node], true);
+      updateStage([node]);
     });
   });
 
-  const getApp = () => stage.value?.renderer?.runtime?.getApp?.();
-
-  const updateDataSourceSchema = (nodes: MNode[], deep: boolean) => {
-    const root = editorService.get('root');
-    const app = getApp();
-
-    if (root && app?.dsl) {
-      app.dsl.dataSourceDeps = root.dataSourceDeps;
-      app.dsl.dataSourceCondDeps = root.dataSourceCondDeps;
-      app.dsl.dataSources = root.dataSources;
+  const getApp = () => {
+    const renderer = stage.value?.renderer;
+    if (!renderer) {
+      return undefined;
     }
 
-    if (root?.dataSources) {
-      getApp()?.dataSourceManager?.updateSchema(root.dataSources);
+    if (renderer.runtime) {
+      return renderer.runtime.getApp?.();
     }
 
-    if (!root || !stage.value) return;
+    return new Promise<TMagicCore | undefined>((resolve) => {
+      const timeout = globalThis.setTimeout(() => {
+        resolve(undefined);
+      }, 10000);
 
-    const allNodes: MNode[] = [];
-
-    if (deep) {
-      nodes.forEach((node) => {
-        traverseNode<MNode>(node, (node) => {
-          if (!allNodes.includes(node)) {
-            allNodes.push(node);
-          }
-        });
-      });
-    } else {
-      allNodes.push(...nodes);
-    }
-
-    const deps = Object.values(root.dataSourceDeps || {});
-    deps.forEach((dep) => {
-      Object.keys(dep).forEach((id) => {
-        const node = allNodes.find((node) => node.id === id);
-        node &&
-          stage.value?.update({
-            config: cloneDeep(node),
-            parentId: editorService.getParentById(node.id)?.id,
-            root: cloneDeep(root),
-          });
+      renderer.on('runtime-ready', () => {
+        if (timeout) {
+          globalThis.clearTimeout(timeout);
+        }
+        resolve(renderer.runtime?.getApp?.());
       });
     });
   };
 
-  const afterUpdateNodes = (nodes: MNode[]) => {
+  const updateDataSourceSchema = async () => {
     const root = editorService.get('root');
-    if (!root) return;
-    for (const node of nodes) {
-      stage.value?.update({
-        config: cloneDeep(node),
-        parentId: editorService.getParentById(node.id)?.id,
-        root: cloneDeep(root),
-      });
+    const app = await getApp();
+
+    if (root && app?.dsl) {
+      app.dsl.dataSourceDeps = root.dataSourceDeps;
+      app.dsl.dataSources = root.dataSources;
+    }
+
+    if (root?.dataSources) {
+      app?.dataSourceManager?.updateSchema(root.dataSources);
     }
   };
 
@@ -360,18 +340,72 @@ export const initServiceEvents = (
     }
   };
 
-  const depCollectedHandler = () => {
+  /**
+   * 修改dsl后会执行依赖收集并调用此方法
+   * 所以这个方法是会被执行两次，当时updateStage应当时一次，所以通过inDeps参数来区分调用时机
+   * inDeps为true是则更新依赖收集到的节点，否则则更新没有依赖的节点
+   * @param nodes 需要更新的节点
+   * @param inDeps 是否依赖收集完成事件中执行的
+   * @returns
+   */
+  const updateStage = (nodes: MNode[], inDeps = false) => {
     const root = editorService.get('root');
     if (!root) return;
-    const app = getApp();
+
+    const update = (node: MNode) =>
+      stage.value?.update({
+        config: cloneDeep(node),
+        parentId: editorService.getParentById(node.id)?.id,
+        root: cloneDeep(root),
+      });
+
+    nodes.forEach((node) => {
+      const inDepsNodeId: Id[] = [];
+      const deps = Object.values(root.dataSourceDeps || {});
+      deps.forEach((dep) => {
+        Object.keys(dep).forEach((id) => {
+          inDepsNodeId.push(id);
+        });
+      });
+
+      if (inDeps) {
+        if (inDepsNodeId.includes(node.id)) {
+          update(node);
+        }
+      } else {
+        if (!inDepsNodeId.includes(node.id)) {
+          update(node);
+        }
+      }
+    });
+  };
+
+  const dsDepCollectedHandler = async (nodes: MNode[], deep: boolean) => {
+    const root = editorService.get('root');
+    if (!root) return;
+    const app = await getApp();
     if (app?.dsl) {
       app.dsl.dataSourceDeps = root.dataSourceDeps;
+    }
+    if (deep) {
+      nodes.forEach((node) => {
+        traverseNode<MNode>(
+          node,
+          (node) => {
+            updateStage([node], true);
+          },
+          [],
+          true,
+        );
+      });
+    } else {
+      updateStage(nodes, true);
     }
   };
 
   depService.on('add-target', targetAddHandler);
   depService.on('remove-target', targetRemoveHandler);
-  depService.on('collected', depCollectedHandler);
+  depService.on('ds-collected', dsDepCollectedHandler);
 
   const initDataSourceDepTarget = (ds: DataSourceSchema) => {
     depService.addTarget(createDataSourceTarget(ds, reactive({})));
@@ -396,9 +430,9 @@ export const initServiceEvents = (
 
   // 新增节点，收集依赖
   const nodeAddHandler = (nodes: MNode[]) => {
-    collectIdle(nodes, true).then(() => {
-      afterUpdateNodes(nodes);
-    });
+    collectIdle(nodes, true);
+
+    updateStage(nodes);
   };
 
   // 节点更新，收集依赖
@@ -430,11 +464,10 @@ export const initServiceEvents = (
     });
 
     if (needRecollectNodes.length) {
-      collectIdle(needRecollectNodes, true).then(() => {
-        afterUpdateNodes(needRecollectNodes);
-      });
+      collectIdle(needRecollectNodes, true);
+      updateStage(needRecollectNodes);
     } else if (normalNodes.length) {
-      afterUpdateNodes(normalNodes);
+      updateStage(normalNodes);
     }
   };
 
@@ -446,7 +479,7 @@ export const initServiceEvents = (
   // 由于历史记录变化是更新整个page，所以历史记录变化时，需要重新收集依赖
   const historyChangeHandler = (page: MPage | MPageFragment) => {
     collectIdle([page], true).then(() => {
-      updateDataSourceSchema([page], true);
+      updateDataSourceSchema();
     });
   };
 
@@ -472,12 +505,16 @@ export const initServiceEvents = (
   codeBlockService.on('addOrUpdate', codeBlockAddOrUpdateHandler);
   codeBlockService.on('remove', codeBlockRemoveHandler);
 
-  const dataSourceAddHandler = (config: DataSourceSchema) => {
+  const dataSourceAddHandler = async (config: DataSourceSchema) => {
     initDataSourceDepTarget(config);
-    getApp()?.dataSourceManager?.addDataSource(config);
+    const app = await getApp();
+    app?.dataSourceManager?.addDataSource(config);
   };
 
-  const dataSourceUpdateHandler = (config: DataSourceSchema, { changeRecords }: { changeRecords: ChangeRecord[] }) => {
+  const dataSourceUpdateHandler = async (
+    config: DataSourceSchema,
+    { changeRecords }: { changeRecords: ChangeRecord[] },
+  ) => {
     let needRecollectDep = false;
     for (const changeRecord of changeRecords) {
       if (!changeRecord.propPath) {
@@ -506,11 +543,12 @@ export const initServiceEvents = (
         initDataSourceDepTarget(config);
 
         collectIdle(root.items, true).then(() => {
-          updateDataSourceSchema(root?.items || [], true);
+          updateDataSourceSchema();
         });
       }
     } else if (root?.dataSources) {
-      getApp()?.dataSourceManager?.updateSchema(root.dataSources);
+      const app = await getApp();
+      app?.dataSourceManager?.updateSchema(root.dataSources);
     }
   };
 
@@ -525,7 +563,7 @@ export const initServiceEvents = (
     const nodeIds = Object.keys(root?.dataSourceDeps?.[id] || {});
     const nodes = getNodes(nodeIds, root?.items);
     collectIdle(nodes, false).then(() => {
-      updateDataSourceSchema(nodes, false);
+      updateDataSourceSchema();
     });
 
     removeDataSourceTarget(id);
@@ -538,7 +576,7 @@ export const initServiceEvents = (
   onBeforeUnmount(() => {
     depService.off('add-target', targetAddHandler);
     depService.off('remove-target', targetRemoveHandler);
-    depService.off('collected', depCollectedHandler);
+    depService.off('ds-collected', dsDepCollectedHandler);
 
     editorService.off('history-change', historyChangeHandler);
     editorService.off('root-change', rootChangeHandler);
