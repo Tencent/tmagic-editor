@@ -125,7 +125,7 @@ export default {
       tMagicMessageBox.close = options.messageBox?.close;
     }
 
-    if (options.loading) {
+    if (options.loading && !app.directive('loading')) {
       app.directive('loading', options.loading);
     }
 
