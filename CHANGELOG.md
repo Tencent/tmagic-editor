@@ -1,3 +1,13 @@
+## [1.5.5](https://github.com/Tencent/tmagic-editor/compare/v1.5.4...v1.5.5) (2025-01-14)
+
+
+### Features
+
+* **dep:** 性能优化，收集时节点配置中id与name不需要做判断 ([b215062](https://github.com/Tencent/tmagic-editor/commit/b215062177a607ae53e9ef10ffad092f4f506f82))
+* **editor:** 优化依赖收集，数据源代码块分开收集 ([040b787](https://github.com/Tencent/tmagic-editor/commit/040b787e8f138759e2acfed4071ffa7cf70eea59))
+
+
+
 ## [1.5.4](https://github.com/Tencent/tmagic-editor/compare/v1.5.3...v1.5.4) (2025-01-10)
 
 
