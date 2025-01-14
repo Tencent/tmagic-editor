@@ -508,7 +508,7 @@ export const traverseNode = <T extends NodeItem = NodeItem>(
   if (Array.isArray(node.items) && node.items.length) {
     parents.push(node);
     node.items.forEach((item) => {
-      traverseNode(item as T, cb, [...parents]);
+      traverseNode(item as T, cb, [...parents], evalCbAfter);
     });
   }
 

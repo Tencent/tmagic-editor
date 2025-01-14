@@ -119,10 +119,10 @@ class Dep extends BaseService {
       idleTask.once('finish', () => {
         this.emit('collected', nodes, deep);
         this.set('collecting', false);
-        resolve();
       });
       idleTask.once('hight-level-finish', () => {
         this.emit('ds-collected', nodes, deep);
+        resolve();
       });
     });
   }
@@ -130,11 +130,11 @@ class Dep extends BaseService {
   public collectNode(node: MNode, target: Target, depExtendedData: DepExtendedData = {}, deep = false) {
     // 先删除原有依赖，重新收集
     if (isPage(node)) {
-      Object.entries(target.deps).forEach(([depKey, dep]) => {
+      for (const [depKey, dep] of Object.entries(target.deps)) {
         if (dep.data?.pageId && dep.data.pageId === depExtendedData.pageId) {
           delete target.deps[depKey];
         }
-      });
+      }
     } else {
       this.watcher.removeTargetDep(target, node);
     }

@@ -80,7 +80,7 @@ export class IdleTask<T = any> extends EventEmitter {
     // 动画会占用空闲时间,当任务一直无法执行时，看看是否有动画正在播放
     // 根据空闲时间的多少来决定执行的任务数，保证页面不卡死的情况下尽量多执行任务，不然当任务数巨大时，执行时间会很久
     // 执行不完不会影响配置，但是会影响画布渲染
-    while (deadline.timeRemaining() > 0 && taskList.length) {
+    while (deadline.timeRemaining() > 0 && (taskList.length || hightLevelTaskList.length)) {
       const timeRemaining = deadline.timeRemaining();
       let times = 0;
       if (timeRemaining <= 5) {
