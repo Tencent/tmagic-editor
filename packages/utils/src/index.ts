@@ -279,6 +279,9 @@ export const getDepNodeIds = (dataSourceDeps: DataSourceDeps = {}) =>
  * @param parentId 父节点 id
  */
 export const replaceChildNode = (newNode: MNode, data?: MNode[], parentId?: Id) => {
+  if(newNode.id==="1"){
+    return;
+  }
   const path = getNodePath(newNode.id, data);
   const node = path.pop();
   let parent = path.pop();
