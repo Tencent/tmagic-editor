@@ -103,9 +103,9 @@ export default class Watcher {
    * 删除所有target
    */
   public clearTargets() {
-    Object.keys(this.targetsList).forEach((key) => {
+    for (const key of Object.keys(this.targetsList)) {
       delete this.targetsList[key];
-    });
+    }
   }
 
   /**
@@ -137,9 +137,9 @@ export default class Watcher {
         if (!type && !target.isCollectByDefault) {
           return;
         }
-        nodes.forEach((node) => {
+        for (const node of nodes) {
           cb({ node, target });
-        });
+        }
       },
       type,
     );
@@ -161,7 +161,7 @@ export default class Watcher {
     const clearedItemsNodeIds: (string | number)[] = [];
     traverseTarget(targetsList, (target) => {
       if (nodes) {
-        nodes.forEach((node) => {
+        for (const node of nodes) {
           target.removeDep(node[this.idProp]);
 
           if (
@@ -172,7 +172,7 @@ export default class Watcher {
             clearedItemsNodeIds.push(node[this.idProp]);
             this.clear(node[this.childrenProp]);
           }
-        });
+        }
       } else {
         target.removeDep();
       }
@@ -202,26 +202,29 @@ export default class Watcher {
             key: fullKey,
           });
         } else if (!keyIsItems && Array.isArray(value)) {
-          value.forEach((item, index) => {
+          for (let i = 0, l = value.length; i < l; i++) {
+            const item = value[i];
             if (isObject(item)) {
-              collectTarget(item, `${fullKey}[${index}]`);
+              collectTarget(item, `${fullKey}[${i}]`);
             }
-          });
+          }
         } else if (isObject(value)) {
           collectTarget(value, fullKey);
         }
 
         if (keyIsItems && deep && Array.isArray(value)) {
-          value.forEach((child) => {
+          for (const child of value) {
             this.collectItem(child, target, depExtendedData, deep);
-          });
+          }
         }
       };
 
-      Object.entries(config).forEach(([key, value]) => {
-        if (typeof value === 'undefined' || value === '') return;
+      for (const [key, value] of Object.entries(config)) {
+        if (typeof value === 'undefined' || value === '') continue;
+
+        if (key === 'id' || key === 'name') continue;
         doCollect(key, value);
-      });
+      }
     };
 
     collectTarget(node);
@@ -230,9 +233,9 @@ export default class Watcher {
   public removeTargetDep(target: Target, node: TargetNode, key?: string | number) {
     target.removeDep(node[this.idProp], key);
     if (typeof key === 'undefined' && Array.isArray(node[this.childrenProp]) && node[this.childrenProp].length) {
-      node[this.childrenProp].forEach((item: TargetNode) => {
+      for (const item of node[this.childrenProp] as TargetNode[]) {
         this.removeTargetDep(target, item, key);
-      });
+      }
     }
   }
 }

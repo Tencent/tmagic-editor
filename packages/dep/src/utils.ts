@@ -185,6 +185,10 @@ export const isDataSourceTarget = (
   value: any,
   hasArray = false,
 ) => {
+  if (!value || !['string', 'object'].includes(typeof value)) {
+    return false;
+  }
+
   if (`${key}`.startsWith(NODE_CONDS_KEY)) {
     return false;
   }
@@ -285,12 +289,12 @@ export const traverseTarget = (
   cb: (target: Target) => void,
   type?: DepTargetType | string,
 ) => {
-  Object.values(targetsList).forEach((targets) => {
-    Object.values(targets).forEach((target) => {
+  for (const targets of Object.values(targetsList)) {
+    for (const target of Object.values(targets)) {
       if (type && target.type !== type) {
-        return;
+        continue;
       }
       cb(target);
-    });
-  });
+    }
+  }
 };
