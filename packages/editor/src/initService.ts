@@ -265,10 +265,6 @@ export const initServiceEvents = (
     if (app.dsl) {
       app.dsl.dataSources = root.dataSources;
     }
-
-    if (root.dataSources) {
-      app.dataSourceManager?.updateSchema(root.dataSources);
-    }
   };
 
   const dsDepCollectedHandler = async () => {
@@ -459,13 +455,39 @@ export const initServiceEvents = (
   const dataSourceAddHandler = async (config: DataSourceSchema) => {
     initDataSourceDepTarget(config);
     const app = await getTMagicApp();
-    app?.dataSourceManager?.addDataSource(config);
+
+    if (!app?.dataSourceManager) {
+      return;
+    }
+
+    app.dataSourceManager.addDataSource(config);
+
+    const newDs = app.dataSourceManager.get(config.id);
+
+    if (newDs) {
+      app.dataSourceManager.init(newDs);
+    }
   };
 
   const dataSourceUpdateHandler = async (
     config: DataSourceSchema,
     { changeRecords }: { changeRecords: ChangeRecord[] },
   ) => {
+    const updateDsData = async () => {
+      const app = await getTMagicApp();
+
+      if (!app?.dataSourceManager) {
+        return;
+      }
+
+      const ds = app.dataSourceManager.get(config.id);
+
+      if (!ds) return;
+
+      ds.setFields(config.fields);
+      ds.setData(config.mocks?.find((mock) => mock.useInEditor)?.data || ds.getDefaultData());
+    };
+
     let needRecollectDep = false;
     let isModifyField = false;
     let isModifyMock = false;
@@ -515,12 +537,12 @@ export const initServiceEvents = (
         }
         Promise.all(collectIdlePromises).then(() => {
           updateDataSourceSchema();
+          updateDsData();
           updateStageNodes(root.items);
         });
       }
     } else if (root?.dataSources) {
-      const app = await getTMagicApp();
-      app?.dataSourceManager?.updateSchema(root.dataSources);
+      updateDsData();
     }
   };
 
@@ -530,20 +552,28 @@ export const initServiceEvents = (
     depService.removeTarget(id, DepTargetType.DATA_SOURCE_METHOD);
   };
 
-  const dataSourceRemoveHandler = (id: string) => {
+  const dataSourceRemoveHandler = async (id: string) => {
     const root = editorService.get('root');
-    const nodeIds = Object.keys(root?.dataSourceDeps?.[id] || {});
-    const nodes = getNodes(nodeIds, root?.items);
 
-    Promise.all([
+    if (!root) {
+      return;
+    }
+
+    const nodeIds = Object.keys(root.dataSourceDeps?.[id] || {});
+    const nodes = getNodes(nodeIds, root.items);
+
+    await Promise.all([
       collectIdle(nodes, false, DepTargetType.DATA_SOURCE),
       collectIdle(nodes, false, DepTargetType.DATA_SOURCE_COND),
       collectIdle(nodes, false, DepTargetType.DATA_SOURCE_METHOD),
-    ]).then(() => {
-      updateDataSourceSchema();
-      updateStageNodes(nodes);
-    });
+    ]);
 
+    updateDataSourceSchema();
+
+    const app = await getTMagicApp();
+    app?.dataSourceManager?.removeDataSource(id);
+
+    updateStageNodes(nodes);
     removeDataSourceTarget(id);
   };
 
