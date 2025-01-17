@@ -27,7 +27,7 @@ defineOptions({
   name: 'MFieldsStyleSetter',
 });
 
-defineProps<FieldProps<StyleSchema>>();
+const props = defineProps<FieldProps<StyleSchema>>();
 
 const emit = defineEmits<{
   change: [v: any, eventData: ContainerChangeEventData];
@@ -64,6 +64,9 @@ const collapseValue = shallowRef(
 );
 
 const change = (v: any, eventData: ContainerChangeEventData) => {
+  eventData.changeRecords?.forEach((record) => {
+    record.propPath = `${props.name}.${record.propPath}`;
+  });
   emit('change', v, eventData);
 };
 </script>

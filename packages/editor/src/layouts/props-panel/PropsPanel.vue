@@ -57,9 +57,10 @@ import { computed, inject, onBeforeUnmount, ref, useTemplateRef, watchEffect } f
 import { Close, Sugar } from '@element-plus/icons-vue';
 import type { OnDrag } from 'gesto';
 
-import type { MNode } from '@tmagic/core';
+import { type MNode } from '@tmagic/core';
 import { TMagicButton } from '@tmagic/design';
 import type { ContainerChangeEventData, FormState, FormValue } from '@tmagic/form';
+import { setValueByKeyPath } from '@tmagic/utils';
 
 import MIcon from '@editor/components/Icon.vue';
 import Resizer from '@editor/components/Resizer.vue';
@@ -134,6 +135,12 @@ const submit = async (v: MNode, eventData?: ContainerChangeEventData) => {
       Object.entries(v.style).forEach(([key, value]) => {
         if (value !== '' && newValue.style) {
           newValue.style[key] = value;
+        }
+      });
+
+      eventData?.changeRecords?.forEach((record) => {
+        if (record.propPath?.startsWith('style') && record.value === '') {
+          setValueByKeyPath(record.propPath, record.value, newValue);
         }
       });
     }

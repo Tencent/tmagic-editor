@@ -1,15 +1,12 @@
 <template>
   <MContainer :config="config" :model="values" @change="change"></MContainer>
-  <Position v-show="values['position'] !== 'static'" :model="values" @change="change"></Position>
 </template>
 
 <script lang="ts" setup>
 import { ContainerChangeEventData, MContainer } from '@tmagic/form';
 import type { StyleSchema } from '@tmagic/schema';
 
-import Position from '../components/Position.vue';
-
-defineProps<{ values: Partial<StyleSchema> }>();
+const props = defineProps<{ values: Partial<StyleSchema> }>();
 
 const emit = defineEmits<{
   change: [v: string | StyleSchema, eventData: ContainerChangeEventData];
@@ -29,6 +26,52 @@ const config = {
           text: item,
         })),
       },
+    },
+    {
+      type: 'row',
+      labelWidth: '68px',
+      display: () => props.values.position !== 'static',
+      items: [
+        {
+          name: 'left',
+          type: 'data-source-field-select',
+          text: 'left',
+          fieldConfig: {
+            type: 'text',
+          },
+        },
+        {
+          name: 'top',
+          type: 'data-source-field-select',
+          text: 'top',
+          fieldConfig: {
+            type: 'text',
+          },
+        },
+      ],
+    },
+    {
+      type: 'row',
+      labelWidth: '68px',
+      display: () => props.values.position !== 'static',
+      items: [
+        {
+          name: 'right',
+          type: 'data-source-field-select',
+          text: 'right',
+          fieldConfig: {
+            type: 'text',
+          },
+        },
+        {
+          name: 'bottom',
+          type: 'data-source-field-select',
+          text: 'bottom',
+          fieldConfig: {
+            type: 'text',
+          },
+        },
+      ],
     },
     {
       labelWidth: '68px',

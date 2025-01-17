@@ -1,6 +1,6 @@
 <template>
   <MContainer :config="config" :model="values" @change="change"></MContainer>
-  <Box :model="values" @change="change"></Box>
+  <Box v-show="!['fixed', 'absolute'].includes(values.position)" :model="values" @change="change"></Box>
 </template>
 
 <script lang="ts" setup>
@@ -125,7 +125,7 @@ const config = {
         },
         {
           name: 'height',
-          text: '宽度',
+          text: '高度',
           labelWidth: '68px',
           type: 'data-source-field-select',
           fieldConfig: {
@@ -135,25 +135,41 @@ const config = {
       ],
     },
     {
-      type: 'data-source-field-select',
-      text: 'overflow',
-      name: 'overflow',
-      checkStrictly: false,
-      dataSourceFieldType: ['string'],
-      fieldConfig: {
-        type: 'select',
-        clearable: true,
-        allowCreate: true,
-        options: [
-          { text: 'visible', value: 'visible' },
-          { text: 'hidden', value: 'hidden' },
-          { text: 'clip', value: 'clip' },
-          { text: 'scroll', value: 'scroll' },
-          { text: 'auto', value: 'auto' },
-          { text: 'overlay', value: 'overlay' },
-          { text: 'initial', value: 'initial' },
-        ],
-      },
+      type: 'row',
+      items: [
+        {
+          type: 'data-source-field-select',
+          text: 'overflow',
+          name: 'overflow',
+          labelWidth: '68px',
+          checkStrictly: false,
+          dataSourceFieldType: ['string'],
+          fieldConfig: {
+            type: 'select',
+            clearable: true,
+            allowCreate: true,
+            options: [
+              { text: 'visible', value: 'visible' },
+              { text: 'hidden', value: 'hidden' },
+              { text: 'clip', value: 'clip' },
+              { text: 'scroll', value: 'scroll' },
+              { text: 'auto', value: 'auto' },
+              { text: 'overlay', value: 'overlay' },
+              { text: 'initial', value: 'initial' },
+            ],
+          },
+        },
+        {
+          type: 'data-source-field-select',
+          text: '透明度',
+          name: 'opacity',
+          labelWidth: '68px',
+          dataSourceFieldType: ['string', 'number'],
+          fieldConfig: {
+            type: 'text',
+          },
+        },
+      ],
     },
   ],
 };
