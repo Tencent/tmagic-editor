@@ -45,6 +45,7 @@ export const initServiceState = (
     codeBlockService,
     keybindingService,
     dataSourceService,
+    depService,
   }: Services,
 ) => {
   // 初始值变化，重新设置节点信息
@@ -203,6 +204,7 @@ export const initServiceState = (
     componentListService.resetState();
     codeBlockService.resetState();
     keybindingService.reset();
+    depService.reset();
   });
 };
 

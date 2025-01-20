@@ -176,6 +176,23 @@ class Dep extends BaseService {
     return super.once(eventName, listener as any);
   }
 
+  public reset() {
+    idleTask.removeAllListeners();
+    idleTask.clearTasks();
+
+    for (const type of Object.keys(this.watcher.getTargetsList())) {
+      this.removeTargets(type);
+    }
+
+    this.set('collecting', false);
+  }
+
+  public destroy() {
+    this.removeAllListeners();
+    this.reset();
+    this.removeAllPlugins();
+  }
+
   public emit<Name extends keyof DepEvents, Param extends DepEvents[Name]>(eventName: Name, ...args: Param) {
     return super.emit(eventName, ...args);
   }

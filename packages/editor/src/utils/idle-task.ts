@@ -54,6 +54,7 @@ export class IdleTask<T = any> extends EventEmitter {
 
     this.hightLevelTaskList = [];
     this.taskList = [];
+    this.taskHandle = null;
   }
 
   public on<Name extends keyof IdleTaskEvents, Param extends IdleTaskEvents[Name]>(
