@@ -177,7 +177,7 @@ class DataSourceManager extends EventEmitter {
 
       this.removeDataSource(schema.id);
 
-      this.addDataSource(schema);
+      this.addDataSource(cloneDeep(schema));
       const newDs = this.get(schema.id);
       if (newDs) {
         this.init(newDs);

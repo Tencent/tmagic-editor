@@ -62,13 +62,15 @@ export default class DataSource<T extends DataSourceSchema = DataSourceSchema> e
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const ObservedDataClass = options.ObservedDataClass || SimpleObservedData;
     if (this.app.platform === 'editor') {
+      const mocks = cloneDeep(options.schema.mocks || []);
       // 编辑器中有mock使用mock，没有使用默认值
-      this.mockData = options.schema.mocks?.find((mock) => mock.useInEditor)?.data || this.getDefaultData();
+      this.mockData = mocks.find((mock) => mock.useInEditor)?.data || this.getDefaultData();
       data = cloneDeep(this.mockData);
     } else if (typeof options.useMock === 'boolean' && options.useMock) {
+      const mocks = cloneDeep(options.schema.mocks || []);
       // 设置了使用mock就使用mock数据
-      this.mockData = options.schema.mocks?.find((mock) => mock.enable)?.data;
-      data = this.mockData || this.getDefaultData();
+      this.mockData = mocks.find((mock) => mock.enable)?.data;
+      data = cloneDeep(this.mockData) || this.getDefaultData();
     } else if (!options.initialData) {
       data = this.getDefaultData();
     } else {

@@ -1,8 +1,9 @@
 import { describe, expect, test } from 'vitest';
 
-import { MApp, NodeType, TMagicIteratorContainer } from '@tmagic/schema';
+import { MApp, NodeType } from '@tmagic/schema';
 
 import App from '../src/App';
+import TMagicIteratorContainer from '../src/IteratorContainer';
 
 const createAppDsl = (pageLength: number, nodeLength = 0) => {
   const dsl: MApp = {
