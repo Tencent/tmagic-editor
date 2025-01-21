@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { getElById, getIdFromEl, guid, setIdToEl } from '@tmagic/utils';
+import { getElById, getIdFromEl, guid, setIdToEl } from '@tmagic/core';
 
 import { Mode, ZIndex } from './const';
 import type { TargetElement as ShadowElement, TargetShadowConfig, UpdateDragEl } from './types';

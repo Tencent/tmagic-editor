@@ -19,9 +19,6 @@
     "src"
   ],
   "license": "Apache-2.0",
-  "scripts": {
-    "build": "vite build --mode=es && vite build --mode=umd"
-  },
   "engines": {
     "node": ">=18"
   },
@@ -49,9 +46,6 @@
   },
   "devDependencies": {
     "@types/events": "^3.0.0",
-    "@types/lodash-es": "^4.17.4",
-    "@types/node": "^18.19.0",
-    "tsc-alias": "^1.8.5",
-    "vite": "^6.0.9"
+    "@types/lodash-es": "^4.17.4"
   }
 }

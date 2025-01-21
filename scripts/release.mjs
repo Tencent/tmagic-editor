@@ -1,11 +1,12 @@
 // @ts-check
-import enquirer from 'enquirer';
-import execa from 'execa';
-import minimist from 'minimist';
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import enquirer from 'enquirer';
+import execa from 'execa';
+import minimist from 'minimist';
 import pico from 'picocolors';
 import semver from 'semver';
 
@@ -35,7 +36,8 @@ const args = minimist(process.argv.slice(2), {
 const preId = args.preid || semver.prerelease(currentVersion)?.[0];
 const isDryRun = args.dry;
 /** @type {boolean | undefined} */
-let { skipTests } = args;
+// eslint-disable-next-line prefer-destructuring
+let skipTests = args.skipTests;
 const { skipBuild } = args;
 const skipPrompts = args.skipPrompts || args.canary;
 const skipGit = args.skipGit || args.canary;
@@ -335,7 +337,7 @@ function updatePackage(pkgRoot, version, getNewPackageName, updateDep = false) {
 
 /**
  * @param {Package} pkg
- * @param {'dependencies' | 'peerDependencies'} depType
+ * @param {'dependencies' | 'peerDependencies' | 'devDependencies'} depType
  * @param {string} version
  */
 function updateDeps(pkg, depType, version) {

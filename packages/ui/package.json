@@ -12,9 +12,6 @@
   "engines": {
     "node": ">=18"
   },
-  "scripts": {
-    "build": "vite build"
-  },
   "license": "Apache-2.0",
   "repository": {
     "directory": "packages/ui",
@@ -40,9 +37,5 @@
     "typescript": {
       "optional": true
     }
-  },
-  "devDependencies": {
-    "rimraf": "^3.0.2",
-    "vite": "^6.0.9"
   }
 }

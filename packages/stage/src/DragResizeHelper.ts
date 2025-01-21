@@ -32,7 +32,7 @@ import type {
 } from 'moveable';
 import MoveableHelper from 'moveable-helper';
 
-import { calcValueByFontsize, getIdFromEl, setIdToEl } from '@tmagic/utils';
+import { calcValueByFontsize, getIdFromEl, setIdToEl } from '@tmagic/core';
 
 import { DRAG_EL_ID_PREFIX, GHOST_EL_ID_PREFIX, Mode, ZIndex } from './const';
 import TargetShadow from './TargetShadow';

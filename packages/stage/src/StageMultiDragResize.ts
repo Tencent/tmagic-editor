@@ -18,7 +18,7 @@
 
 import Moveable from 'moveable';
 
-import { getIdFromEl } from '@tmagic/utils';
+import { getIdFromEl } from '@tmagic/core';
 
 import { DRAG_EL_ID_PREFIX, Mode, StageDragStatus } from './const';
 import DragResizeHelper from './DragResizeHelper';

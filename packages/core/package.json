@@ -24,9 +24,6 @@
     "resetcss.css"
   ],
   "license": "Apache-2.0",
-  "scripts": {
-    "build": "vite build"
-  },
   "engines": {
     "node": ">=18"
   },
@@ -35,9 +32,6 @@
     "type": "git",
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
-  "keywords": [
-    "vue"
-  ],
   "dependencies": {
     "@tmagic/data-source": "workspace:*",
     "@tmagic/dep": "workspace:*",
@@ -48,10 +42,7 @@
   },
   "devDependencies": {
     "@types/events": "^3.0.0",
-    "@types/lodash-es": "^4.17.4",
-    "@types/node": "^18.19.0",
-    "rimraf": "^3.0.2",
-    "vite": "^6.0.9"
+    "@types/lodash-es": "^4.17.4"
   },
   "peerDependencies": {
     "typescript": "*"

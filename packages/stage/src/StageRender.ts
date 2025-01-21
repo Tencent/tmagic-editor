@@ -18,8 +18,8 @@
 
 import { EventEmitter } from 'events';
 
-import { Id } from '@tmagic/schema';
-import { getElById, getHost, injectStyle, isSameDomain } from '@tmagic/utils';
+import type { Id } from '@tmagic/core';
+import { getElById, getHost, injectStyle, isSameDomain } from '@tmagic/core';
 
 import { DEFAULT_ZOOM, RenderType } from './const';
 import style from './style.css?raw';

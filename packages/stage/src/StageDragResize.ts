@@ -19,7 +19,7 @@
 /* eslint-disable no-param-reassign */
 import Moveable, { MoveableOptions } from 'moveable';
 
-import { getIdFromEl } from '@tmagic/utils';
+import { getIdFromEl } from '@tmagic/core';
 
 import { Mode, StageDragStatus } from './const';
 import type DragResizeHelper from './DragResizeHelper';

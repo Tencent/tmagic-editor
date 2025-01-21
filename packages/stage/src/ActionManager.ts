@@ -21,9 +21,8 @@ import KeyController from 'keycon';
 import { throttle } from 'lodash-es';
 import type { MoveableOptions, OnDragStart } from 'moveable';
 
-import { Env } from '@tmagic/core';
-import type { Id } from '@tmagic/schema';
-import { addClassName, getDocument, getIdFromEl, removeClassNameByClassName } from '@tmagic/utils';
+import type { Id } from '@tmagic/core';
+import { addClassName, Env, getDocument, getIdFromEl, removeClassNameByClassName } from '@tmagic/core';
 
 import {
   AbleActionEventType,

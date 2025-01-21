@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { getIdFromEl, removeClassName } from '@tmagic/utils';
+import { getIdFromEl, removeClassName } from '@tmagic/core';
 
 import { GHOST_EL_ID_PREFIX, Mode, SELECTED_CLASS, ZIndex } from './const';
 import type { Offset, SortEventData, TargetElement } from './types';

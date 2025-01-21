@@ -30,11 +30,6 @@
     "type": "git",
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
-  "devDependencies": {
-    "@types/node": "^18.19.0",
-    "rimraf": "^3.0.2",
-    "vite": "^6.0.9"
-  },
   "peerDependencies": {
     "typescript": "*"
   },

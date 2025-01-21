@@ -20,8 +20,8 @@ import { EventEmitter } from 'events';
 
 import type { MoveableOptions, OnDragStart } from 'moveable';
 
-import type { Id } from '@tmagic/schema';
-import { getIdFromEl } from '@tmagic/utils';
+import type { Id } from '@tmagic/core';
+import { getIdFromEl } from '@tmagic/core';
 
 import ActionManager from './ActionManager';
 import { DEFAULT_ZOOM } from './const';

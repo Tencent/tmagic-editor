@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { createDiv, getDocument, injectStyle } from '@tmagic/utils';
+import { createDiv, getDocument, injectStyle } from '@tmagic/core';
 
 import { Mode, ZIndex } from './const';
 import Rule from './Rule';
