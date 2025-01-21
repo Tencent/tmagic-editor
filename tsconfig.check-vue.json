@@ -6,5 +6,6 @@
     "packages/form/src",
     "packages/table/src",
     "packages/tdesign-vue-next-adapter/src",
+    "runtime/tmagic-form/src",
   ]
 }

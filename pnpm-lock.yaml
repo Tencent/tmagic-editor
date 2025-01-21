@@ -977,15 +977,9 @@ importers:
       '@types/lodash-es':
         specifier: ^4.17.4
         version: 4.17.12
-      '@types/node':
-        specifier: ^18.19.0
-        version: 18.19.61
       '@types/react':
         specifier: ^18.3.3
         version: 18.3.18
-      rimraf:
-        specifier: ^3.0.2
-        version: 3.0.2
 
   runtime/tmagic-form:
     dependencies:
@@ -1004,25 +998,6 @@ importers:
       vue:
         specifier: '>=3.5.0'
         version: 3.5.13(typescript@5.7.3)
-    devDependencies:
-      '@types/node':
-        specifier: ^18.19.0
-        version: 18.19.61
-      '@vitejs/plugin-vue':
-        specifier: ^5.2.1
-        version: 5.2.1(vite@6.0.10(@types/node@18.19.61)(jiti@2.4.2)(sass@1.83.4)(terser@5.37.0))(vue@3.5.13(typescript@5.7.3))
-      '@vue/compiler-sfc':
-        specifier: ^3.5.13
-        version: 3.5.13
-      rimraf:
-        specifier: ^3.0.2
-        version: 3.0.2
-      vite:
-        specifier: ^6.0.10
-        version: 6.0.10(@types/node@18.19.61)(jiti@2.4.2)(sass@1.83.4)(terser@5.37.0)
-      vue-tsc:
-        specifier: ^2.2.0
-        version: 2.2.0(typescript@5.7.3)
 
   runtime/vue-runtime-help:
     dependencies:
@@ -1045,15 +1020,9 @@ importers:
         specifier: ^0.14.10
         version: 0.14.10(@vue/composition-api@1.7.2(vue@3.5.13(typescript@5.7.3)))(vue@3.5.13(typescript@5.7.3))
     devDependencies:
-      '@types/node':
-        specifier: ^18.19.0
-        version: 18.19.61
       '@vue/test-utils':
         specifier: ^2.4.6
         version: 2.4.6
-      rimraf:
-        specifier: ^3.0.2
-        version: 3.0.2
 
   runtime/vue2:
     dependencies:

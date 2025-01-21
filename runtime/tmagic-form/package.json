@@ -18,12 +18,6 @@
     "types"
   ],
   "license": "Apache-2.0",
-  "scripts": {
-    "build": "npm run build:type && vite build",
-    "build:type": "npm run clear:type && vue-tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
-    "clear:type": "rimraf ./types",
-    "type:check": "vue-tsc --noEmit"
-  },
   "engines": {
     "node": ">=18"
   },
@@ -45,13 +39,5 @@
     "typescript": {
       "optional": true
     }
-  },
-  "devDependencies": {
-    "@types/node": "^18.19.0",
-    "@vitejs/plugin-vue": "^5.2.1",
-    "@vue/compiler-sfc": "^3.5.13",
-    "rimraf": "^3.0.2",
-    "vite": "^6.0.10",
-    "vue-tsc": "^2.2.0"
   }
 }

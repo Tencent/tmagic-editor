@@ -6,7 +6,7 @@
   "packageManager": "pnpm@9.15.4",
   "scripts": {
     "bootstrap": "pnpm i && pnpm build",
-    "clean:top": "rimraf */**/dist */**/types */dist coverage dwt* temp",
+    "clean:top": "rimraf */**/dist */**/types */dist coverage dwt* temp packages/cli/lib",
     "clean:modules": "rimraf node_modules **/node_modules **/**/node_modules",
     "clean:all": "pnpm clean:top && pnpm clean:modules",
     "lint": "eslint . --ext .js,.vue,.ts,.tsx",
@@ -17,7 +17,7 @@
     "pg:vue2": "pnpm playground:vue2",
     "playground:react": "pnpm --filter \"runtime-react\" build:libs && pnpm --filter \"runtime-react\" --filter \"tmagic-playground\" dev:react",
     "pg:react": "pnpm playground:react",
-    "build": "pnpm build:dts && pnpm --filter \"@tmagic/cli\" build && node scripts/build.mjs",
+    "build": "pnpm build:dts && node scripts/build.mjs",
     "build:dts": "pnpm --filter \"@tmagic/cli\" build && tsc -p tsconfig.build-browser.json && vue-tsc --declaration --emitDeclarationOnly --project tsconfig.build-vue.json && rollup -c rollup.dts.config.js && rimraf temp",
     "check:type": "tsc --incremental --noEmit -p tsconfig.check.json && vue-tsc --noEmit -p tsconfig.check-vue.json",
     "build:playground": "pnpm --filter \"runtime-vue3\" build && pnpm --filter \"tmagic-playground\" build",

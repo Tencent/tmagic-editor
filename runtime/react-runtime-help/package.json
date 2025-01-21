@@ -3,24 +3,22 @@
   "name": "@tmagic/react-runtime-help",
   "type": "module",
   "sideEffects": false,
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/tmagic-react-runtime-help.umd.cjs",
+  "module": "dist/tmagic-react-runtime-help.js",
+  "types": "types/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "types": "./types/index.d.ts",
+      "import": "./dist/tmagic-react-runtime-help.js",
+      "require": "./dist/tmagic-react-runtime-help.umd.cjs"
     },
     "./*": "./*"
   },
   "files": [
-    "dist"
+    "dist",
+    "types"
   ],
   "license": "Apache-2.0",
-  "scripts": {
-    "build": "pnpm clean && tsc -b tsconfig.build.json",
-    "clean": "rimraf dist *.tsbuildinfo",
-    "check:type": "tsc --noEmit --project tsconfig.build.json"
-  },
   "engines": {
     "node": ">=18"
   },
@@ -51,8 +49,6 @@
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.4",
-    "@types/node": "^18.19.0",
-    "@types/react": "^18.3.3",
-    "rimraf": "^3.0.2"
+    "@types/react": "^18.3.3"
   }
 }

@@ -3,24 +3,22 @@
   "name": "@tmagic/vue-runtime-help",
   "type": "module",
   "sideEffects": false,
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/tmagic-vue-runtime-help.umd.cjs",
+  "module": "dist/tmagic-vue-runtime-help.js",
+  "types": "types/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "types": "./types/index.d.ts",
+      "import": "./dist/tmagic-vue-runtime-help.js",
+      "require": "./dist/tmagic-vue-runtime-help.umd.cjs"
     },
     "./*": "./*"
   },
   "files": [
-    "dist"
+    "dist",
+    "types"
   ],
   "license": "Apache-2.0",
-  "scripts": {
-    "build": "pnpm clean && tsc -b tsconfig.build.json",
-    "clean": "rimraf dist *.tsbuildinfo",
-    "check:type": "tsc --noEmit --project tsconfig.build.json"
-  },
   "engines": {
     "node": ">=18"
   },
@@ -53,8 +51,6 @@
     }
   },
   "devDependencies": {
-    "@types/node": "^18.19.0",
-    "@vue/test-utils": "^2.4.6",
-    "rimraf": "^3.0.2"
+    "@vue/test-utils": "^2.4.6"
   }
 }

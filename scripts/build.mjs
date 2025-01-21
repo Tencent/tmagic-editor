@@ -14,6 +14,7 @@ const toPascalCase = (str) => str.replace(/(^\w|-\w)/g, (text) => text.replace(/
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const packagesDir = path.resolve(__dirname, '../packages');
+const runtimeDir = path.resolve(__dirname, '../runtime');
 
 if (args.package) {
   const pkgRoot = path.resolve(packagesDir, args.package);
@@ -24,26 +25,27 @@ if (args.package) {
     build({ packageName: args.package, format: 'umd' });
   }
 } else {
-  const packages = fs.readdirSync(packagesDir).filter((p) => {
-    const pkgRoot = path.resolve(packagesDir, p);
-    if (fs.statSync(pkgRoot).isDirectory()) {
-      const pkg = JSON.parse(fs.readFileSync(path.resolve(pkgRoot, 'package.json'), 'utf-8'));
-      return !pkg.private && !pkg.bin;
-    }
-    return false;
-  });
+  const packages = getPackageNames(packagesDir);
+  const runtimeHelpers = getPackageNames(runtimeDir);
 
   for (const packageName of packages) {
     rimraf.sync(path.resolve(packagesDir, `./${packageName}/dist`));
+    const pkg = createRequire(import.meta.url)(`../packages/${packageName}/package.json`);
 
-    build({ packageName, format: 'es' });
-    build({ packageName, format: 'umd' });
+    build({ packageName, format: 'es', pkg, packagesDir });
+    build({ packageName, format: 'umd', pkg, packagesDir });
+  }
+
+  for (const packageName of runtimeHelpers) {
+    rimraf.sync(path.resolve(runtimeDir, `./${packageName}/dist`));
+    const pkg = createRequire(import.meta.url)(`../runtime/${packageName}/package.json`);
+
+    build({ packageName, format: 'es', pkg, packagesDir: runtimeDir });
+    build({ packageName, format: 'umd', pkg, packagesDir: runtimeDir });
   }
 }
 
-async function build({ packageName, format }) {
-  const pkg = createRequire(import.meta.url)(`../packages/${packageName}/package.json`);
-
+async function build({ packageName, format, pkg, packagesDir }) {
   await buildVite({
     root: path.resolve(packagesDir, `./${packageName}`),
     clearScreen: false,
@@ -92,5 +94,16 @@ async function build({ packageName, format }) {
         { find: /^@editor/, replacement: path.join(packagesDir, './editor/src') },
       ],
     },
+  });
+}
+
+function getPackageNames(packagesDir) {
+  return fs.readdirSync(packagesDir).filter((p) => {
+    const pkgRoot = path.resolve(packagesDir, p);
+    if (fs.statSync(pkgRoot).isDirectory()) {
+      const pkg = JSON.parse(fs.readFileSync(path.resolve(pkgRoot, 'package.json'), 'utf-8'));
+      return !pkg.private && !pkg.bin;
+    }
+    return false;
   });
 }

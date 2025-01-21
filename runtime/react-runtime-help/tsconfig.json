@@ -1,9 +1,0 @@
-{
-  "extends": "../../tsconfig.json",
-  "compilerOptions": {
-    "baseUrl": "./",
-    "jsx": "react",
-    "forceConsistentCasingInFileNames": true,
-    "types": ["node"],
-  },
-}

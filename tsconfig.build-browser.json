@@ -15,5 +15,7 @@
     "packages/element-plus-adapter/src",
     "packages/ui/src",
     "packages/ui-react/src",
+    "runtime/react-runtime-help/src",
+    "runtime/vue-runtime-help/src",
   ]
 }
