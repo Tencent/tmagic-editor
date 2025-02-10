@@ -45,7 +45,7 @@ const props = withDefaults(
     centerClass?: string;
   }>(),
   {
-    minLeft: 46,
+    minLeft: 1,
     minRight: 1,
     minCenter: 5,
   },
@@ -65,12 +65,21 @@ const getCenterWidth = (l = 0, r = 0) => {
   let center = clientWidth - left - right;
 
   if (center < props.minCenter) {
+    const diff = props.minCenter - center;
+
     center = props.minCenter;
-    if (right > center + props.minRight) {
-      right = clientWidth - left - center;
-    } else {
+
+    if (right - diff < props.minRight) {
       right = props.minRight;
-      left = clientWidth - right - center;
+    } else {
+      right -= diff;
+    }
+
+    left = clientWidth - right - center;
+
+    if (left < props.minLeft) {
+      left -= diff / 2;
+      right -= diff / 2;
     }
   }
   return {
@@ -86,8 +95,8 @@ const widthChange = (width: number) => {
   }
 
   clientWidth = width;
-  let left = props.left || 0;
-  let right = props.right || 0;
+  let left = props.left || props.minLeft || 0;
+  let right = props.right || props.minRight || 0;
 
   if (left > clientWidth) {
     left = clientWidth / 3;

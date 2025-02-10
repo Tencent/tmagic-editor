@@ -8,14 +8,24 @@ export const useStylePanel = (services?: Services) => {
   const showStylePanelStorageValue = services?.storageService.getItem(showStylePanelStorageKey, {
     protocol: Protocol.BOOLEAN,
   });
+
   if (typeof showStylePanelStorageValue === 'boolean') {
     services?.uiService.set('showStylePanel', showStylePanelStorageValue);
   }
-  const showStylePanel = computed(() => services?.uiService.get('showStylePanel') ?? true);
+
+  const showStylePanel = computed(
+    () => showStylePanelToggleButton.value && (services?.uiService.get('showStylePanel') ?? true),
+  );
+
+  const showStylePanelToggleButton = computed(
+    () => !(services && services.uiService.get('frameworkRect').width < 1280),
+  );
+
   const showStylePanelHandler = () => {
     services?.uiService.set('showStylePanel', true);
     services?.storageService.setItem(showStylePanelStorageKey, true, { protocol: Protocol.BOOLEAN });
   };
+
   const closeStylePanelHandler = () => {
     services?.uiService.set('showStylePanel', false);
     services?.storageService.setItem(showStylePanelStorageKey, false, { protocol: Protocol.BOOLEAN });
@@ -23,6 +33,7 @@ export const useStylePanel = (services?: Services) => {
 
   return {
     showStylePanel,
+    showStylePanelToggleButton,
     showStylePanelHandler,
     closeStylePanelHandler,
   };

@@ -41,10 +41,9 @@
     </FormPanel>
 
     <TMagicButton
-      v-if="!showStylePanel"
+      v-if="showStylePanelToggleButton && !showStylePanel"
       class="m-editor-props-panel-style-icon"
       circle
-      :type="showStylePanel ? 'primary' : ''"
       @click="showStylePanelHandler"
     >
       <MIcon :icon="Sugar"></MIcon>
@@ -53,7 +52,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, onBeforeUnmount, ref, useTemplateRef, watchEffect } from 'vue';
+import { computed, inject, onBeforeUnmount, ref, useTemplateRef, watch, watchEffect } from 'vue';
 import { Close, Sugar } from '@element-plus/icons-vue';
 import type { OnDrag } from 'gesto';
 
@@ -66,6 +65,7 @@ import MIcon from '@editor/components/Icon.vue';
 import Resizer from '@editor/components/Resizer.vue';
 import type { PropsPanelSlots, Services } from '@editor/type';
 import { styleTabConfig } from '@editor/utils';
+import { RIGHT_COLUMN_WIDTH_STORAGE_KEY } from '@editor/utils/const';
 
 import FormPanel from './FormPanel.vue';
 import { useStylePanel } from './use-style-panel';
@@ -163,17 +163,55 @@ const mountedHandler = () => {
 
 const propsPanelEl = useTemplateRef('propsPanel');
 const widthChange = ({ deltaX }: OnDrag) => {
-  if (!propsPanelEl.value) {
+  if (!propsPanelEl.value || !services) {
     return;
   }
 
   const width = globalThis.parseFloat(
     getComputedStyle(propsPanelEl.value).getPropertyValue('--props-style-panel-width'),
   );
-  propsPanelEl.value.style.setProperty('--props-style-panel-width', `${width - deltaX}px`);
+
+  let value = width - deltaX;
+  if (value > services.uiService.get('columnWidth').right) {
+    value = services.uiService.get('columnWidth').right - 40;
+  }
+  propsPanelEl.value.style.setProperty('--props-style-panel-width', `${value}px`);
 };
 
-const { showStylePanel, showStylePanelHandler, closeStylePanelHandler } = useStylePanel(services);
+const { showStylePanel, showStylePanelToggleButton, showStylePanelHandler, closeStylePanelHandler } =
+  useStylePanel(services);
+
+watch(showStylePanel, (showStylePanel) => {
+  if (!propsPanelEl.value || !services) {
+    return;
+  }
+
+  const columnWidth = {
+    ...services.uiService.get('columnWidth'),
+  };
+
+  const width = globalThis.parseFloat(
+    getComputedStyle(propsPanelEl.value).getPropertyValue('--props-style-panel-width'),
+  );
+
+  if (showStylePanel) {
+    columnWidth.right += width;
+    columnWidth.center -= width;
+  } else {
+    columnWidth.right -= width;
+    columnWidth.center += width;
+  }
+
+  if (columnWidth.center < 0) {
+    columnWidth.right = columnWidth.right + columnWidth.center - 400;
+    columnWidth.center = 400;
+
+    propsPanelEl.value.style.setProperty('--props-style-panel-width', `${columnWidth.right / 2}px`);
+  }
+
+  globalThis.localStorage.setItem(RIGHT_COLUMN_WIDTH_STORAGE_KEY, `${columnWidth.right}`);
+  services.uiService.set('columnWidth', columnWidth);
+});
 
 const propertyFormPanelRef = useTemplateRef<InstanceType<typeof FormPanel>>('propertyFormPanel');
 defineExpose({

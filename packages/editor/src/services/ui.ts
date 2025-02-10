@@ -23,6 +23,12 @@ import { convertToNumber } from '@tmagic/utils';
 
 import editorService from '@editor/services/editor';
 import type { AsyncHookPlugin, StageRect, UiState } from '@editor/type';
+import {
+  DEFAULT_LEFT_COLUMN_WIDTH,
+  DEFAULT_RIGHT_COLUMN_WIDTH,
+  LEFT_COLUMN_WIDTH_STORAGE_KEY,
+  RIGHT_COLUMN_WIDTH_STORAGE_KEY,
+} from '@editor/utils/const';
 
 import BaseService from './BaseService';
 
@@ -40,9 +46,9 @@ const state = shallowReactive<UiState>({
     height: 817,
   },
   columnWidth: {
-    left: 0,
-    right: 0,
+    left: Number(globalThis.localStorage.getItem(LEFT_COLUMN_WIDTH_STORAGE_KEY)) || DEFAULT_LEFT_COLUMN_WIDTH,
     center: 0,
+    right: Number(globalThis.localStorage.getItem(RIGHT_COLUMN_WIDTH_STORAGE_KEY)) || DEFAULT_RIGHT_COLUMN_WIDTH,
   },
   showGuides: true,
   showRule: true,
