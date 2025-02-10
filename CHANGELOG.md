@@ -1,3 +1,20 @@
+## [1.5.6](https://github.com/Tencent/tmagic-editor/compare/v1.5.5...v1.5.6) (2025-02-10)
+
+
+### Bug Fixes
+
+* **core:** deep-state-observer update 的data与初始化时相同，导致get data为空 ([701a9d6](https://github.com/Tencent/tmagic-editor/commit/701a9d6f3043f77048f6b9be3bc2305adb14d57e))
+* **editor:** 修改数据源可能造成页面卡死 ([e9c6a3b](https://github.com/Tencent/tmagic-editor/commit/e9c6a3bb2fd5b3b4cecffcedef47a020dba0fde2))
+* **editor:** 已经配置了的样式无法删除 ([e8461f9](https://github.com/Tencent/tmagic-editor/commit/e8461f91e62031f87dbc976f41e873f2bcc3c00c))
+* **editor:** 编辑器组件销毁后重置依赖收集 ([51ca1e6](https://github.com/Tencent/tmagic-editor/commit/51ca1e60af1ca89e6b5966825e6c0ed3707f4582))
+
+
+### Features
+
+* **editor:** 优化浏览器变小时各列大小变化 ([877a4ea](https://github.com/Tencent/tmagic-editor/commit/877a4eaa49b6826e04426e162049db14f6a4f15e))
+
+
+
 ## [1.5.5](https://github.com/Tencent/tmagic-editor/compare/v1.5.4...v1.5.5) (2025-01-14)
 
 
