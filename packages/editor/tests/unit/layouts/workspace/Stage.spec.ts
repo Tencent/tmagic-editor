@@ -21,6 +21,11 @@ import { mount } from '@vue/test-utils';
 import { NodeType } from '@tmagic/core';
 
 import Stage from '@editor/layouts/workspace/viewer/Stage.vue';
+import editorService from '@editor/services/editor';
+import keybindingService from '@editor/services/keybinding';
+import stageOverlayService from '@editor/services/stageOverlay';
+import storageService from '@editor/services/storage';
+import uiService from '@editor/services/ui';
 
 globalThis.ResizeObserver =
   globalThis.ResizeObserver ||
@@ -53,6 +58,18 @@ describe('Stage.vue', () => {
   };
 
   const wrapper = mount(Stage as any, {
+    global: {
+      provide: {
+        services: {
+          editorService,
+          uiService,
+          stageOverlayService,
+          storageService,
+          keybindingService,
+        },
+      },
+    },
+
     props: {
       runtimeUrl: '',
       root: {
