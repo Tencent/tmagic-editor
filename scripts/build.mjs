@@ -64,6 +64,7 @@ async function build({ packageName, format, pkg, packagesDir }) {
         name: `TMagic${toPascalCase(packageName)}`,
         fileName: `tmagic-${packageName}`,
         formats: [format],
+        cssFileName: 'style',
       },
 
       rollupOptions: {
