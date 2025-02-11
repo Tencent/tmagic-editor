@@ -1,3 +1,17 @@
+## [1.5.8](https://github.com/Tencent/tmagic-editor/compare/v1.5.7...v1.5.8) (2025-02-11)
+
+
+### Bug Fixes
+
+* **editor:** 组件配置列大小缓存不生效 ([6d82c0f](https://github.com/Tencent/tmagic-editor/commit/6d82c0f730ff0ad7dc36b39b7c0d2534672b05c3))
+
+
+### Features
+
+* **editor:** 优化依赖收集状态显示，新增剩余任务数量显示 ([413134b](https://github.com/Tencent/tmagic-editor/commit/413134b21d3966bf7f1dbb1da6e2596f2c582bff))
+
+
+
 ## [1.5.7](https://github.com/Tencent/tmagic-editor/compare/v1.5.6...v1.5.7) (2025-02-11)
 
 
