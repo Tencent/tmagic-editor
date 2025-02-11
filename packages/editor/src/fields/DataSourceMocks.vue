@@ -38,8 +38,8 @@ import { getDefaultValueFromFields } from '@tmagic/utils';
 
 import FloatingBox from '@editor/components/FloatingBox.vue';
 import { useNextFloatBoxPosition } from '@editor/hooks/use-next-float-box-position';
+import { useServices } from '@editor/hooks/use-services';
 import CodeEditor from '@editor/layouts/CodeEditor.vue';
-import { Services } from '@editor/type';
 
 import { useEditorContentHeight } from '..';
 
@@ -60,7 +60,7 @@ const props = withDefaults(
 
 const emit = defineEmits(['change']);
 
-const services = inject<Services>('services');
+const { uiService } = useServices();
 const width = defineModel<number>('width', { default: 670 });
 
 const drawerTitle = ref('');
@@ -250,5 +250,5 @@ const toggleValue = (row: MockSchema, key: 'enable' | 'useInEditor', value: bool
 const addDialogVisible = defineModel<boolean>('visible', { default: false });
 const { height: editorHeight } = useEditorContentHeight();
 const parentFloating = inject<Ref<HTMLDivElement | null>>('parentFloating', ref(null));
-const { boxPosition, calcBoxPosition } = useNextFloatBoxPosition(services?.uiService, parentFloating);
+const { boxPosition, calcBoxPosition } = useNextFloatBoxPosition(uiService, parentFloating);
 </script>

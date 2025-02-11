@@ -28,3 +28,4 @@ export * from './use-next-float-box-position';
 export * from './use-node-status';
 export * from './use-stage';
 export * from './use-window-rect';
+export * from './use-services';

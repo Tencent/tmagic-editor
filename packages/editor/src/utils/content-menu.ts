@@ -13,13 +13,13 @@ export const useDeleteMenu = (): MenuButton => ({
   type: 'button',
   text: '删除',
   icon: Delete,
-  display: (services) => {
-    const node = services?.editorService?.get('node');
+  display: ({ editorService }) => {
+    const node = editorService.get('node');
     return node?.type !== NodeType.ROOT && !isPage(node) && !isPageFragment(node);
   },
-  handler: (services) => {
-    const nodes = services?.editorService?.get('nodes');
-    nodes && services?.editorService?.remove(nodes);
+  handler: ({ editorService }) => {
+    const nodes = editorService.get('nodes');
+    nodes && editorService.remove(nodes);
   },
 });
 
@@ -27,9 +27,9 @@ export const useCopyMenu = (): MenuButton => ({
   type: 'button',
   text: '复制',
   icon: markRaw(CopyDocument),
-  handler: (services) => {
-    const nodes = services?.editorService?.get('nodes');
-    nodes && services?.editorService?.copy(nodes);
+  handler: ({ editorService }) => {
+    const nodes = editorService?.get('nodes');
+    nodes && editorService?.copy(nodes);
   },
 });
 
@@ -37,57 +37,55 @@ export const usePasteMenu = (menu?: ShallowRef<InstanceType<typeof ContentMenu> 
   type: 'button',
   text: '粘贴',
   icon: markRaw(DocumentCopy),
-  display: (services) => !!services?.storageService?.getItem(COPY_STORAGE_KEY),
-  handler: (services) => {
-    const nodes = services?.editorService?.get('nodes');
+  display: ({ storageService }) => !!storageService.getItem(COPY_STORAGE_KEY),
+  handler: ({ editorService, uiService }) => {
+    const nodes = editorService?.get('nodes');
     if (!nodes || nodes.length === 0) return;
 
     if (menu?.value?.$el) {
-      const stage = services?.editorService?.get('stage');
+      const stage = editorService.get('stage');
       const rect = menu.value.$el.getBoundingClientRect();
       const parentRect = stage?.container?.getBoundingClientRect();
       const initialLeft =
         calcValueByFontsize(stage?.renderer?.getDocument(), (rect.left || 0) - (parentRect?.left || 0)) /
-        services.uiService.get('zoom');
+        uiService.get('zoom');
       const initialTop =
         calcValueByFontsize(stage?.renderer?.getDocument(), (rect.top || 0) - (parentRect?.top || 0)) /
-        services.uiService.get('zoom');
-      services?.editorService?.paste({ left: initialLeft, top: initialTop });
+        uiService.get('zoom');
+      editorService.paste({ left: initialLeft, top: initialTop });
     } else {
-      services?.editorService?.paste();
+      editorService.paste();
     }
   },
 });
 
-const moveTo = (id: Id, services?: Services) => {
-  if (!services?.editorService) return;
-
-  const nodes = services.editorService.get('nodes') || [];
-  const parent = services.editorService.getNodeById(id) as MContainer;
+const moveTo = (id: Id, { editorService }: Services) => {
+  const nodes = editorService.get('nodes') || [];
+  const parent = editorService.getNodeById(id) as MContainer;
 
   if (!parent) return;
 
-  services?.editorService.add(nodes, parent);
-  services?.editorService.remove(nodes);
+  editorService.add(nodes, parent);
+  editorService.remove(nodes);
 };
 
-export const useMoveToMenu = (services?: Services): MenuButton => {
-  const root = computed(() => services?.editorService?.get('root'));
+export const useMoveToMenu = ({ editorService }: Services): MenuButton => {
+  const root = computed(() => editorService.get('root'));
 
   return {
     type: 'button',
     text: '移动至',
-    display: (services) => {
-      const node = services?.editorService?.get('node');
-      const pageLength = services?.editorService?.get('pageLength') || 0;
+    display: ({ editorService }) => {
+      const node = editorService.get('node');
+      const pageLength = editorService.get('pageLength');
       return !isPage(node) && pageLength > 1;
     },
     items: (root.value?.items || [])
-      .filter((page) => page.id !== services?.editorService?.get('page')?.id)
+      .filter((page) => page.id !== editorService.get('page')?.id)
       .map((page) => ({
         text: `${page.name}(${page.id})`,
         type: 'button',
-        handler: (services?: Services) => {
+        handler: (services: Services) => {
           moveTo(page.id, services);
         },
       })),

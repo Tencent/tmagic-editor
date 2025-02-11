@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, nextTick, ref, useTemplateRef, watch } from 'vue';
+import { computed, nextTick, ref, useTemplateRef, watch } from 'vue';
 import { Coin } from '@element-plus/icons-vue';
 
 import type { DataSchema, DataSourceSchema } from '@tmagic/core';
@@ -57,7 +57,7 @@ import type { FieldProps, FormItem } from '@tmagic/form';
 import { getKeysArray, isNumber } from '@tmagic/utils';
 
 import Icon from '@editor/components/Icon.vue';
-import type { Services } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
 import { getDisplayField } from '@editor/utils/data-source';
 
 defineOptions({
@@ -81,7 +81,7 @@ const emit = defineEmits<{
   change: [value: string];
 }>();
 
-const { dataSourceService } = inject<Services>('services') || {};
+const { dataSourceService } = useServices();
 
 const autocompleteRef = useTemplateRef<InstanceType<typeof TMagicAutocomplete>>('autocomplete');
 const isFocused = ref(false);
@@ -89,7 +89,7 @@ const state = ref('');
 const displayState = ref<{ value: string; type: 'var' | 'text' }[]>([]);
 
 const input = computed<HTMLInputElement>(() => autocompleteRef.value?.inputRef?.input);
-const dataSources = computed(() => dataSourceService?.get('dataSources') || []);
+const dataSources = computed(() => dataSourceService.get('dataSources'));
 
 const setDisplayState = () => {
   displayState.value = getDisplayField(dataSources.value, state.value);

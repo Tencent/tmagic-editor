@@ -55,6 +55,7 @@ import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
 import ContentMenu from '@editor/components/ContentMenu.vue';
 import SearchInput from '@editor/components/SearchInput.vue';
 import { useCodeBlockEdit } from '@editor/hooks/use-code-block-edit';
+import { useServices } from '@editor/hooks/use-services';
 import type {
   CodeBlockListPanelSlots,
   CodeDeleteErrorType,
@@ -62,7 +63,6 @@ import type {
   EventBus,
   MenuButton,
   MenuComponent,
-  Services,
 } from '@editor/type';
 
 import CodeBlockList from './CodeBlockList.vue';
@@ -82,9 +82,10 @@ const props = defineProps<{
 }>();
 
 const eventBus = inject<EventBus>('eventBus');
-const { codeBlockService } = inject<Services>('services') || {};
 
-const editable = computed(() => codeBlockService?.getEditStatus());
+const { codeBlockService } = useServices();
+
+const editable = computed(() => codeBlockService.getEditStatus());
 
 const { codeBlockEditor, codeConfig, editCode, deleteCode, createCodeBlock, submitCodeBlockHandler } =
   useCodeBlockEdit(codeBlockService);

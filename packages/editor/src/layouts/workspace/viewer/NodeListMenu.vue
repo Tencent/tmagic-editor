@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, nextTick, ref, useTemplateRef, watch } from 'vue';
+import { computed, nextTick, ref, useTemplateRef, watch } from 'vue';
 
 import type { MNode } from '@tmagic/core';
 import { TMagicTooltip } from '@tmagic/design';
@@ -31,20 +31,21 @@ import { getIdFromEl } from '@tmagic/utils';
 import FloatingBox from '@editor/components/FloatingBox.vue';
 import Tree from '@editor/components/Tree.vue';
 import { useFilter } from '@editor/hooks/use-filter';
+import { useServices } from '@editor/hooks/use-services';
 import { useNodeStatus } from '@editor/layouts/sidebar/layer/use-node-status';
-import type { Services, TreeNodeData } from '@editor/type';
+import type { TreeNodeData } from '@editor/type';
 
-const services = inject<Services>('services');
-const editorService = services?.editorService;
+const services = useServices();
+const { editorService } = services;
 
 const visible = ref(false);
 const buttonVisible = ref(false);
 const buttonEl = useTemplateRef<HTMLDivElement>('button');
 const boxRef = useTemplateRef<InstanceType<typeof FloatingBox>>('box');
 
-const stage = computed(() => editorService?.get('stage'));
-const page = computed(() => editorService?.get('page'));
-const nodes = computed(() => editorService?.get('nodes') || []);
+const stage = computed(() => editorService.get('stage'));
+const page = computed(() => editorService.get('page'));
+const nodes = computed(() => editorService.get('nodes'));
 const nodeData = computed<TreeNodeData[]>(() => (!page.value ? [] : [page.value]));
 
 const { nodeStatusMap } = useNodeStatus(services);
@@ -89,7 +90,7 @@ watch(
 );
 
 const clickHandler = async (event: MouseEvent, data: TreeNodeData) => {
-  await editorService?.select(data.id);
+  await editorService.select(data.id);
   stage.value?.select(data.id);
 };
 

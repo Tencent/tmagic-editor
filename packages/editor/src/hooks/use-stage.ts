@@ -6,12 +6,8 @@ import { getIdFromEl } from '@tmagic/utils';
 
 import editorService from '@editor/services/editor';
 import uiService from '@editor/services/ui';
-import {
-  H_GUIDE_LINE_STORAGE_KEY,
-  StageOptions,
-  UI_SELECT_MODE_EVENT_NAME,
-  V_GUIDE_LINE_STORAGE_KEY,
-} from '@editor/type';
+import type { StageOptions } from '@editor/type';
+import { H_GUIDE_LINE_STORAGE_KEY, UI_SELECT_MODE_EVENT_NAME, V_GUIDE_LINE_STORAGE_KEY } from '@editor/utils/const';
 import { getGuideLineFromCache } from '@editor/utils/editor';
 
 const root = computed(() => editorService.get('root'));

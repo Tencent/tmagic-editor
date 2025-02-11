@@ -6,24 +6,20 @@
 </template>
 
 <script setup lang="ts">
-import { inject } from 'vue';
 import { Hide, View } from '@element-plus/icons-vue';
 
 import type { MNode } from '@tmagic/core';
 
 import MIcon from '@editor/components/Icon.vue';
-import { Services } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
 
 const props = defineProps<{
   data: MNode;
 }>();
 
-const services = inject<Services>('services');
-const editorService = services?.editorService;
+const { editorService } = useServices();
 
 const setNodeVisible = (visible: boolean) => {
-  if (!editorService) return;
-
   editorService.update({
     id: props.data.id,
     visible,

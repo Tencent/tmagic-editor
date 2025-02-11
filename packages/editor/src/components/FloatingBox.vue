@@ -17,14 +17,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, nextTick, onBeforeUnmount, provide, ref, useTemplateRef, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, provide, ref, useTemplateRef, watch } from 'vue';
 import { Close } from '@element-plus/icons-vue';
 import VanillaMoveable from 'moveable';
 
 import { TMagicButton, useZIndex } from '@tmagic/design';
 
 import MIcon from '@editor/components/Icon.vue';
-import type { Services } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
 
 interface Position {
   left: number;
@@ -66,8 +66,8 @@ const bodyHeight = computed(() => {
   return 'auto';
 });
 
-const services = inject<Services>('services');
-const frameworkWidth = computed(() => services?.uiService.get('frameworkRect').width || 0);
+const { uiService } = useServices();
+const frameworkWidth = computed(() => uiService.get('frameworkRect').width || 0);
 const style = computed(() => {
   let { left } = props.position;
   if (width.value) {

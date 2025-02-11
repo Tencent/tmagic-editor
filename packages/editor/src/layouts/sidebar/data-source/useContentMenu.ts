@@ -3,7 +3,7 @@ import { CopyDocument, Delete, Edit } from '@element-plus/icons-vue';
 import { cloneDeep } from 'lodash-es';
 
 import ContentMenu from '@editor/components/ContentMenu.vue';
-import type { EventBus, MenuButton, MenuComponent, Services, TreeNodeData } from '@editor/type';
+import type { EventBus, MenuButton, MenuComponent, TreeNodeData } from '@editor/type';
 
 export const useContentMenu = () => {
   const eventBus = inject<EventBus>('eventBus');
@@ -16,7 +16,7 @@ export const useContentMenu = () => {
       type: 'button',
       text: '编辑',
       icon: Edit,
-      display: (services) => services?.dataSourceService?.get('editable') ?? true,
+      display: ({ dataSourceService }) => dataSourceService.get('editable'),
       handler: () => {
         if (!selectId) {
           return;
@@ -29,7 +29,7 @@ export const useContentMenu = () => {
       type: 'button',
       text: '复制并粘贴至当前',
       icon: markRaw(CopyDocument),
-      handler: ({ dataSourceService }: Services) => {
+      handler: ({ dataSourceService }) => {
         if (!selectId) {
           return;
         }

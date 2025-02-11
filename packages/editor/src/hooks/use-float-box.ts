@@ -1,6 +1,6 @@
-import { computed, ComputedRef, inject, onBeforeUnmount, ref, watch } from 'vue';
+import { computed, ComputedRef, onBeforeUnmount, ref, watch } from 'vue';
 
-import type { Services } from '@editor/type';
+import { useServices } from './use-services';
 
 interface State {
   status: boolean;
@@ -9,7 +9,7 @@ interface State {
 }
 
 export const useFloatBox = (slideKeys: ComputedRef<string[]>) => {
-  const services = inject<Services>('services');
+  const { uiService } = useServices();
 
   const floatBoxStates = ref<{
     [key in (typeof slideKeys.value)[number]]: State;
@@ -57,10 +57,10 @@ export const useFloatBox = (slideKeys: ComputedRef<string[]>) => {
       Math.abs(startOffset.x - e.clientX) > effectiveDistance ||
       Math.abs(startOffset.y - e.clientY) > effectiveDistance
     ) {
-      const navMenuRect = services?.uiService?.get('navMenuRect');
+      const navMenuRect = uiService.get('navMenuRect');
       floatBoxStates.value[key] = {
         left: e.clientX,
-        top: (navMenuRect?.top ?? 0) + (navMenuRect?.height ?? 0),
+        top: navMenuRect.top + navMenuRect.height,
         status: true,
       };
     }

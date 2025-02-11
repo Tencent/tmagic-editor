@@ -52,7 +52,8 @@ import {
 
 import CodeParams from '@editor/components/CodeParams.vue';
 import MIcon from '@editor/components/Icon.vue';
-import type { CodeParamStatement, CodeSelectColConfig, EventBus, Services } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
+import type { CodeParamStatement, CodeSelectColConfig, EventBus } from '@editor/type';
 import { SideItemKey } from '@editor/type';
 
 defineOptions({
@@ -60,7 +61,7 @@ defineOptions({
 });
 
 const mForm = inject<FormState | undefined>('mForm');
-const services = inject<Services>('services');
+const { codeBlockService, uiService } = useServices();
 const eventBus = inject<EventBus>('eventBus');
 const emit = defineEmits<{
   change: [v: any, eventData: ContainerChangeEventData];
@@ -73,7 +74,7 @@ const props = withDefaults(defineProps<FieldProps<CodeSelectColConfig>>(), {
 const notEditable = computed(() => filterFunction(mForm, props.config.notEditable, props));
 
 const hasCodeBlockSidePanel = computed(() =>
-  (services?.uiService.get('sideBarItems') || []).find((item) => item.$key === SideItemKey.CODE_BLOCK),
+  (uiService.get('sideBarItems') || []).find((item) => item.$key === SideItemKey.CODE_BLOCK),
 );
 
 /**
@@ -94,7 +95,7 @@ const getParamItemsConfig = (codeId?: Id): CodeParamStatement[] => {
   }));
 };
 
-const codeDsl = computed(() => services?.codeBlockService.getCodeDsl());
+const codeDsl = computed(() => codeBlockService.getCodeDsl());
 const paramsConfig = ref<CodeParamStatement[]>(getParamItemsConfig(props.model[props.name]));
 
 watch(

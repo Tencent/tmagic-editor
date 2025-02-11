@@ -4,18 +4,19 @@ import { throttle } from 'lodash-es';
 import { Id, MNode } from '@tmagic/core';
 import { isPage, isPageFragment } from '@tmagic/utils';
 
-import { LayerNodeStatus, Services, TreeNodeData, UI_SELECT_MODE_EVENT_NAME } from '@editor/type';
+import type { LayerNodeStatus, Services, TreeNodeData } from '@editor/type';
+import { UI_SELECT_MODE_EVENT_NAME } from '@editor/utils/const';
 import { updateStatus } from '@editor/utils/tree';
 
 import LayerMenu from './LayerMenu.vue';
 
 export const useClick = (
-  services: Services | undefined,
+  { editorService, stageOverlayService, uiService }: Services,
   isCtrlKeyDown: Ref<boolean>,
   nodeStatusMap: ComputedRef<Map<Id, LayerNodeStatus> | undefined>,
   menuRef: ShallowRef<InstanceType<typeof LayerMenu> | null>,
 ) => {
-  const isMultiSelect = computed(() => isCtrlKeyDown.value && !services?.editorService.get('disabledMultiSelect'));
+  const isMultiSelect = computed(() => isCtrlKeyDown.value && !editorService.get('disabledMultiSelect'));
 
   // 触发画布选中
   const select = async (data: MNode) => {
@@ -26,9 +27,9 @@ export const useClick = (
     if (isMultiSelect.value) {
       multiSelect(data);
     } else {
-      await services?.editorService.select(data);
-      services?.editorService.get('stage')?.select(data.id);
-      services?.stageOverlayService.get('stage')?.select(data.id);
+      await editorService.select(data);
+      editorService.get('stage')?.select(data.id);
+      stageOverlayService.get('stage')?.select(data.id);
     }
   };
 
@@ -37,7 +38,7 @@ export const useClick = (
       return;
     }
 
-    const nodes = services?.editorService.get('nodes') || [];
+    const nodes = editorService.get('nodes') || [];
 
     const newNodes: Id[] = [];
     let isCancel = false;
@@ -59,9 +60,9 @@ export const useClick = (
       newNodes.push(data.id);
     }
 
-    await services?.editorService.multiSelect(newNodes);
-    services?.editorService.get('stage')?.multiSelect(newNodes);
-    services?.stageOverlayService.get('stage')?.multiSelect(newNodes);
+    await editorService.multiSelect(newNodes);
+    editorService.get('stage')?.multiSelect(newNodes);
+    stageOverlayService.get('stage')?.multiSelect(newNodes);
   };
 
   const throttleTime = 300;
@@ -75,15 +76,15 @@ export const useClick = (
 
   // 触发画布高亮
   const highlight = (data: TreeNodeData) => {
-    services?.editorService?.highlight(data);
-    services?.editorService?.get('stage')?.highlight(data.id);
-    services?.stageOverlayService?.get('stage')?.highlight(data.id);
+    editorService.highlight(data);
+    editorService.get('stage')?.highlight(data.id);
+    stageOverlayService.get('stage')?.highlight(data.id);
   };
 
   const nodeClickHandler = (event: MouseEvent, data: TreeNodeData): void => {
     if (!nodeStatusMap?.value) return;
 
-    if (services?.uiService.get('uiSelectMode')) {
+    if (uiService.get('uiSelectMode')) {
       document.dispatchEvent(new CustomEvent(UI_SELECT_MODE_EVENT_NAME, { detail: data }));
       return;
     }
@@ -107,7 +108,7 @@ export const useClick = (
     nodeContentMenuHandler(event: MouseEvent, data: TreeNodeData): void {
       event.preventDefault();
 
-      const nodes = services?.editorService.get('nodes') || [];
+      const nodes = editorService.get('nodes') || [];
       if (nodes.length < 2 || !nodes.includes(data)) {
         nodeClickHandler(event, data);
       }

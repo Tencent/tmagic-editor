@@ -5,11 +5,9 @@ import type { Services } from '@editor/type';
 import { KeyBindingContainerKey } from '@editor/utils/keybinding-config';
 
 export const useKeybinding = (
-  services: Services | undefined,
+  { keybindingService }: Services,
   container: ShallowRef<InstanceType<typeof Tree> | null>,
 ) => {
-  const keybindingService = services?.keybindingService;
-
   // 是否多选
   const isCtrlKeyDown = ref(false);
 
@@ -17,15 +15,15 @@ export const useKeybinding = (
     isCtrlKeyDown.value = false;
   };
 
-  keybindingService?.registerCommand('layer-panel-global-keyup', () => {
+  keybindingService.registerCommand('layer-panel-global-keyup', () => {
     isCtrlKeyDown.value = false;
   });
 
-  keybindingService?.registerCommand('layer-panel-global-keydown', () => {
+  keybindingService.registerCommand('layer-panel-global-keydown', () => {
     isCtrlKeyDown.value = true;
   });
 
-  keybindingService?.register([
+  keybindingService.register([
     {
       command: 'layer-panel-global-keydown',
       keybinding: 'ctrl',
@@ -41,10 +39,10 @@ export const useKeybinding = (
   watchEffect(() => {
     if (container.value) {
       globalThis.addEventListener('blur', windowBlurHandler);
-      keybindingService?.registerEl(KeyBindingContainerKey.LAYER_PANEL, container.value.$el);
+      keybindingService.registerEl(KeyBindingContainerKey.LAYER_PANEL, container.value.$el);
     } else {
       globalThis.removeEventListener('blur', windowBlurHandler);
-      keybindingService?.unregisterEl(KeyBindingContainerKey.LAYER_PANEL);
+      keybindingService.unregisterEl(KeyBindingContainerKey.LAYER_PANEL);
     }
   });
 

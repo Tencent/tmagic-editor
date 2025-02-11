@@ -69,13 +69,14 @@
 import { computed, inject, ref, watch } from 'vue';
 import { Edit, View } from '@element-plus/icons-vue';
 
-import { DataSourceFieldType } from '@tmagic/core';
+import type { DataSourceFieldType } from '@tmagic/core';
 import { getDesignConfig, TMagicButton, TMagicCascader, TMagicSelect, TMagicTooltip } from '@tmagic/design';
 import { type FilterFunction, filterFunction, type FormState, type SelectOption } from '@tmagic/form';
 import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX } from '@tmagic/utils';
 
 import MIcon from '@editor/components/Icon.vue';
-import { type EventBus, type Services, SideItemKey } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
+import { type EventBus, SideItemKey } from '@editor/type';
 import { getCascaderOptionsFromFields, removeDataSourceFieldPrefix } from '@editor/utils';
 
 const props = defineProps<{
@@ -101,11 +102,11 @@ const modelValue = defineModel<string[] | any>('modelValue', { default: [] });
 
 const optionComponent = getDesignConfig('components')?.option;
 
-const services = inject<Services>('services');
+const { dataSourceService, uiService } = useServices();
 const mForm = inject<FormState | undefined>('mForm');
 const eventBus = inject<EventBus>('eventBus');
 
-const dataSources = computed(() => services?.dataSourceService.get('dataSources') || []);
+const dataSources = computed(() => dataSourceService.get('dataSources') || []);
 
 const valueIsKey = computed(() => props.value === 'key');
 const notEditable = computed(() => filterFunction(mForm, props.notEditable, props));
@@ -172,7 +173,7 @@ const onChangeHandler = (v: string[] = []) => {
 };
 
 const hasDataSourceSidePanel = computed(() =>
-  (services?.uiService.get('sideBarItems') || []).find((item) => item.$key === SideItemKey.DATA_SOURCE),
+  uiService.get('sideBarItems').find((item) => item.$key === SideItemKey.DATA_SOURCE),
 );
 
 const editHandler = (id: string) => {

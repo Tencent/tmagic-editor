@@ -13,18 +13,19 @@ import { CloseBold } from '@element-plus/icons-vue';
 
 import { TMagicIcon } from '@tmagic/design';
 
-import type { Services, StageOptions } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
+import type { StageOptions } from '@editor/type';
 
-const services = inject<Services>('services');
+const { stageOverlayService, editorService } = useServices();
 
 const stageOptions = inject<StageOptions>('stageOptions');
 
 const stageOverlayEl = useTemplateRef<HTMLDivElement>('stageOverlay');
 
-const stageOverlayVisible = computed(() => services?.stageOverlayService.get('stageOverlayVisible'));
-const wrapWidth = computed(() => services?.stageOverlayService.get('wrapWidth') || 0);
-const wrapHeight = computed(() => services?.stageOverlayService.get('wrapHeight') || 0);
-const stage = computed(() => services?.editorService.get('stage'));
+const stageOverlayVisible = computed(() => stageOverlayService.get('stageOverlayVisible'));
+const wrapWidth = computed(() => stageOverlayService.get('wrapWidth'));
+const wrapHeight = computed(() => stageOverlayService.get('wrapHeight'));
+const stage = computed(() => editorService.get('stage'));
 
 const style = computed(() => ({
   width: `${wrapWidth.value}px`,
@@ -35,18 +36,16 @@ watch(stage, (stage) => {
   if (stage) {
     stage.on('dblclick', async (event: MouseEvent) => {
       const el = (await stage.actionManager?.getElementFromPoint(event)) || null;
-      services?.stageOverlayService.openOverlay(el);
+      stageOverlayService.openOverlay(el);
     });
   } else {
-    services?.stageOverlayService.closeOverlay();
+    stageOverlayService.closeOverlay();
   }
 });
 
 watch(stageOverlayEl, (stageOverlay) => {
-  if (!services) return;
-
-  const subStage = services.stageOverlayService.createStage(stageOptions);
-  services?.stageOverlayService.set('stage', subStage);
+  const subStage = stageOverlayService.createStage(stageOptions);
+  stageOverlayService.set('stage', subStage);
 
   if (stageOverlay && subStage) {
     subStage.mount(stageOverlay);
@@ -56,18 +55,18 @@ watch(stageOverlayEl, (stageOverlay) => {
     const { contentWindow } = renderer!;
     mask?.showRule(false);
 
-    services?.stageOverlayService.updateOverlay();
+    stageOverlayService.updateOverlay();
 
     contentWindow?.magic.onRuntimeReady({});
   }
 });
 
 onBeforeUnmount(() => {
-  services?.stageOverlayService.get('stage')?.destroy();
-  services?.stageOverlayService.set('stage', null);
+  stageOverlayService.get('stage')?.destroy();
+  stageOverlayService.set('stage', null);
 });
 
 const closeOverlayHandler = () => {
-  services?.stageOverlayService.closeOverlay();
+  stageOverlayService.closeOverlay();
 };
 </script>

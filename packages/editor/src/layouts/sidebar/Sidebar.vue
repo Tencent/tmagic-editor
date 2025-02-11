@@ -149,19 +149,19 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, nextTick, ref, watch } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import { Coin, EditPen, Goods, List } from '@element-plus/icons-vue';
 
 import FloatingBox from '@editor/components/FloatingBox.vue';
 import MIcon from '@editor/components/Icon.vue';
 import { useEditorContentHeight } from '@editor/hooks/use-editor-content-height';
 import { useFloatBox } from '@editor/hooks/use-float-box';
+import { useServices } from '@editor/hooks/use-services';
 import {
   ColumnLayout,
   CustomContentMenuFunction,
   type MenuButton,
   type MenuComponent,
-  type Services,
   type SideBarData,
   type SidebarSlots,
   type SideComponent,
@@ -197,11 +197,11 @@ const props = withDefaults(
   },
 );
 
-const services = inject<Services>('services');
+const { depService, uiService } = useServices();
 
-const collecting = computed(() => services?.depService.get('collecting'));
+const collecting = computed(() => depService.get('collecting'));
 
-const columnLeftWidth = computed(() => services?.uiService.get('columnWidth')[ColumnLayout.LEFT] || 0);
+const columnLeftWidth = computed(() => uiService.get('columnWidth')[ColumnLayout.LEFT]);
 const { height: editorContentHeight } = useEditorContentHeight();
 const columnLeftHeight = ref(0);
 
@@ -282,7 +282,7 @@ const sideBarItems = computed(() => props.data.items.map((item) => getItemConfig
 watch(
   sideBarItems,
   (items) => {
-    services?.uiService.set('sideBarItems', items);
+    uiService.set('sideBarItems', items);
   },
   {
     immediate: true,
@@ -310,10 +310,10 @@ watch(
     const nextSlideBarItem = sideBarItems.value.find((sideBarItem) => !showingBoxKeys.value.includes(sideBarItem.$key));
     if (!nextSlideBarItem) {
       activeTabName.value = '';
-      services?.uiService.set('hideSlideBar', true);
+      uiService.set('hideSlideBar', true);
       return;
     }
-    services?.uiService.set('hideSlideBar', false);
+    uiService.set('hideSlideBar', false);
     activeTabName.value = nextSlideBarItem?.text;
   },
 );

@@ -42,7 +42,7 @@ const removeStatusClass = (el: HTMLElement | null) => {
  * dragover 属于目标节点
  * 这些方法并不是同一个dom事件触发的
  */
-export const useDrag = (services: Services | undefined) => {
+export const useDrag = ({ editorService }: Services) => {
   const handleDragStart = (event: DragEvent) => {
     if (!event.dataTransfer || !event.target || !event.currentTarget) return;
 
@@ -144,12 +144,12 @@ export const useDrag = (services: Services | undefined) => {
 
     removeStatusClass(dragState.container);
 
-    if (node && dragState.dragOverNodeId && dragState.dropType && services) {
+    if (node && dragState.dragOverNodeId && dragState.dropType) {
       if (dragState.dragOverNodeId === node.id) {
         return;
       }
 
-      const targetInfo = services.editorService.getNodeInfo(dragState.dragOverNodeId, false);
+      const targetInfo = editorService.getNodeInfo(dragState.dragOverNodeId, false);
       const targetNode = targetInfo.node;
       let targetParent = targetInfo.parent;
 
@@ -168,12 +168,12 @@ export const useDrag = (services: Services | undefined) => {
         targetIndex += 1;
       }
 
-      const selectedNodes = services.editorService.get('nodes');
+      const selectedNodes = editorService.get('nodes');
 
       if (selectedNodes.find((n) => `${n.id}` === `${node.id}`)) {
-        services.editorService.dragTo(selectedNodes, targetParent, targetIndex);
+        editorService.dragTo(selectedNodes, targetParent, targetIndex);
       } else {
-        services.editorService.dragTo([node], targetParent, targetIndex);
+        editorService.dragTo([node], targetParent, targetIndex);
       }
     }
 

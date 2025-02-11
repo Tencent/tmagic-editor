@@ -43,12 +43,12 @@ import { removeClassNameByClassName } from '@tmagic/utils';
 
 import MIcon from '@editor/components/Icon.vue';
 import SearchInput from '@editor/components/SearchInput.vue';
+import { useServices } from '@editor/hooks/use-services';
 import {
   type ComponentGroup,
   type ComponentItem,
   ComponentListPanelSlots,
   DragType,
-  type Services,
   type StageOptions,
 } from '@editor/type';
 
@@ -64,12 +64,12 @@ const filterTextChangeHandler = (v: string) => {
   searchText.value = v;
 };
 
-const services = inject<Services>('services');
+const { editorService, componentListService } = useServices();
 const stageOptions = inject<StageOptions>('stageOptions');
 
-const stage = computed(() => services?.editorService.get('stage'));
+const stage = computed(() => editorService.get('stage'));
 const list = computed<ComponentGroup[]>(() =>
-  (services?.componentListService.getList() || []).map((group: ComponentGroup) => ({
+  componentListService.getList().map((group: ComponentGroup) => ({
     ...group,
     items: group.items.filter((item: ComponentItem) => item.text.includes(searchText.value)),
   })),
@@ -85,7 +85,7 @@ let clientX: number;
 let clientY: number;
 
 const appendComponent = ({ text, type, data = {} }: ComponentItem): void => {
-  services?.editorService.add({
+  editorService.add({
     name: text,
     type,
     ...data,

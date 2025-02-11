@@ -51,7 +51,7 @@ import { MForm } from '@tmagic/form';
 
 import MIcon from '@editor/components/Icon.vue';
 import { useEditorContentHeight } from '@editor/hooks/use-editor-content-height';
-import type { Services } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
 
 import CodeEditor from '../CodeEditor.vue';
 
@@ -80,13 +80,15 @@ const emit = defineEmits<{
   mounted: [internalInstance: any];
 }>();
 
-const services = inject<Services>('services');
+const services = useServices();
+const { editorService, uiService } = services;
+
 const codeOptions = inject('codeOptions', {});
 
 const showSrc = ref(false);
-const propsPanelSize = computed(() => services?.uiService.get('propsPanelSize') || 'small');
+const propsPanelSize = computed(() => uiService.get('propsPanelSize') || 'small');
 const { height: editorContentHeight } = useEditorContentHeight();
-const stage = computed(() => services?.editorService.get('stage'));
+const stage = computed(() => editorService.get('stage'));
 
 const configFormRef = useTemplateRef<InstanceType<typeof MForm>>('configForm');
 

@@ -26,7 +26,7 @@ import {
   MGroupList,
 } from '@tmagic/form';
 
-import type { Services } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
 import { getCascaderOptionsFromFields } from '@editor/utils';
 
 defineOptions({
@@ -49,7 +49,7 @@ const props = withDefaults(
   },
 );
 
-const { dataSourceService } = inject<Services>('services') || {};
+const { dataSourceService } = useServices();
 const mForm = inject<FormState | undefined>('mForm');
 
 const parentFields = computed(() => filterFunction<string[]>(mForm, props.config.parentFields, props) || []);
@@ -71,7 +71,7 @@ const config = computed<GroupListConfig>(() => ({
               type: 'cascader',
               options: () => {
                 const [dsId, ...keys] = parentFields.value;
-                const ds = dataSourceService?.getDataSourceById(dsId);
+                const ds = dataSourceService.getDataSourceById(dsId);
                 if (!ds) {
                   return [];
                 }
@@ -113,7 +113,7 @@ const config = computed<GroupListConfig>(() => ({
               type: (mForm, { model }) => {
                 const [id, ...fieldNames] = [...parentFields.value, ...model.field];
 
-                const ds = dataSourceService?.getDataSourceById(id);
+                const ds = dataSourceService.getDataSourceById(id);
 
                 let fields = ds?.fields || [];
                 let type = '';

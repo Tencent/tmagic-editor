@@ -15,7 +15,7 @@
       class="tree-node"
       :class="{ selected, expanded }"
       :style="`padding-left: ${indent}px`"
-      @contextmenu="nodeContentmenuHandler"
+      @contextmenu="nodeContextmenuHandler"
       @mouseenter="mouseenterHandler"
     >
       <MIcon
@@ -139,7 +139,7 @@ const handleDragEnd = (event: DragEvent) => {
   treeEmit?.('node-dragend', event, props.data);
 };
 
-const nodeContentmenuHandler = (event: MouseEvent) => {
+const nodeContextmenuHandler = (event: MouseEvent) => {
   treeEmit?.('node-contextmenu', event, props.data);
 };
 

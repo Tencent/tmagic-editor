@@ -7,13 +7,14 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, markRaw, onBeforeUnmount, onMounted, useTemplateRef } from 'vue';
+import { computed, markRaw, onBeforeUnmount, onMounted, useTemplateRef } from 'vue';
 import { Back, Delete, FullScreen, Grid, Memo, Right, ScaleToOriginal, ZoomIn, ZoomOut } from '@element-plus/icons-vue';
 
 import { NodeType } from '@tmagic/core';
 
 import ToolButton from '@editor/components/ToolButton.vue';
-import { ColumnLayout, MenuBarData, MenuButton, MenuComponent, MenuItem, Services } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
+import { ColumnLayout, MenuBarData, MenuButton, MenuComponent, MenuItem } from '@editor/type';
 
 defineOptions({
   name: 'MEditorNavMenu',
@@ -30,15 +31,14 @@ const props = withDefaults(
   },
 );
 
-const services = inject<Services>('services');
-const uiService = services?.uiService;
+const { uiService, editorService, historyService } = useServices();
 
-const columnWidth = computed(() => services?.uiService.get('columnWidth'));
+const columnWidth = computed(() => uiService.get('columnWidth'));
 const keys = Object.values(ColumnLayout);
 
-const showGuides = computed((): boolean => uiService?.get('showGuides') ?? true);
-const showRule = computed((): boolean => uiService?.get('showRule') ?? true);
-const zoom = computed((): number => uiService?.get('zoom') ?? 1);
+const showGuides = computed((): boolean => uiService.get('showGuides'));
+const showRule = computed((): boolean => uiService.get('showRule'));
+const zoom = computed((): number => uiService.get('zoom'));
 
 const isMac = /mac os x/.test(navigator.userAgent.toLowerCase());
 const ctrl = isMac ? 'Command' : 'Ctrl';
@@ -70,10 +70,10 @@ const getConfig = (item: MenuItem): (MenuButton | MenuComponent)[] => {
         className: 'delete',
         icon: markRaw(Delete),
         tooltip: `刪除(Delete)`,
-        disabled: () => services?.editorService.get('node')?.type === NodeType.PAGE,
+        disabled: () => editorService.get('node')?.type === NodeType.PAGE,
         handler: () => {
-          const node = services?.editorService.get('node');
-          node && services?.editorService.remove(node);
+          const node = editorService.get('node');
+          node && editorService.remove(node);
         },
       });
       break;
@@ -83,8 +83,8 @@ const getConfig = (item: MenuItem): (MenuButton | MenuComponent)[] => {
         className: 'undo',
         icon: markRaw(Back),
         tooltip: `后退(${ctrl}+z)`,
-        disabled: () => !services?.historyService.state.canUndo,
-        handler: () => services?.editorService.undo(),
+        disabled: () => !historyService.state.canUndo,
+        handler: () => editorService.undo(),
       });
       break;
     case 'redo':
@@ -93,8 +93,8 @@ const getConfig = (item: MenuItem): (MenuButton | MenuComponent)[] => {
         className: 'redo',
         icon: markRaw(Right),
         tooltip: `前进(${ctrl}+Shift+z)`,
-        disabled: () => !services?.historyService.state.canRedo,
-        handler: () => services?.editorService.redo(),
+        disabled: () => !historyService.state.canRedo,
+        handler: () => editorService.redo(),
       });
       break;
     case 'zoom-in':
@@ -184,7 +184,7 @@ const navMenuEl = useTemplateRef<HTMLDivElement>('navMenu');
 const resizeObserver = new ResizeObserver(() => {
   const rect = navMenuEl.value?.getBoundingClientRect();
   if (rect) {
-    uiService?.set('navMenuRect', {
+    uiService.set('navMenuRect', {
       left: rect.left,
       top: rect.top,
       width: rect.width,

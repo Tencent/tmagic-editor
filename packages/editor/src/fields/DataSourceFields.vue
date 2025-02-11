@@ -64,7 +64,7 @@ import { getDefaultValueFromFields } from '@tmagic/utils';
 import FloatingBox from '@editor/components/FloatingBox.vue';
 import { useEditorContentHeight } from '@editor/hooks';
 import { useNextFloatBoxPosition } from '@editor/hooks/use-next-float-box-position';
-import type { Services } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
 
 defineOptions({
   name: 'MFieldsDataSourceFields',
@@ -85,7 +85,7 @@ const emit = defineEmits<{
   change: [v: any, eventData?: ContainerChangeEventData];
 }>();
 
-const services = inject<Services>('services');
+const { uiService } = useServices();
 
 const fieldValues = ref<Record<string, any>>({});
 const fieldTitle = ref('');
@@ -344,5 +344,5 @@ const addFromJsonDialogVisible = defineModel<boolean>('visible1', { default: fal
 const { height: editorHeight } = useEditorContentHeight();
 
 const parentFloating = inject<Ref<HTMLDivElement | null>>('parentFloating', ref(null));
-const { boxPosition, calcBoxPosition } = useNextFloatBoxPosition(services?.uiService, parentFloating);
+const { boxPosition, calcBoxPosition } = useNextFloatBoxPosition(uiService, parentFloating);
 </script>

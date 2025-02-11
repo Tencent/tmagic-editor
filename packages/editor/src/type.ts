@@ -321,9 +321,9 @@ export interface MenuButton {
   /** Vue组件或url */
   icon?: string | Component<{}, {}, any>;
   /** 是否置灰，默认为false */
-  disabled?: boolean | ((data?: Services) => boolean);
+  disabled?: boolean | ((data: Services) => boolean);
   /** 是否显示，默认为true */
-  display?: boolean | ((data?: Services) => boolean);
+  display?: boolean | ((data: Services) => boolean);
   /** type为button/dropdown时点击运行的方法 */
   handler?: (data: Services, event: MouseEvent) => Promise<any> | any;
   className?: string;
@@ -344,7 +344,7 @@ export interface MenuComponent {
   slots?: Record<string, any>;
   /** 是否显示，默认为true */
   className?: string;
-  display?: boolean | ((data?: Services) => Promise<boolean> | boolean);
+  display?: boolean | ((data: Services) => Promise<boolean> | boolean);
   [key: string]: any;
 }
 
@@ -472,9 +472,6 @@ export enum Layout {
 export enum Keys {
   ESCAPE = 'Space',
 }
-
-export const H_GUIDE_LINE_STORAGE_KEY = '$MagicStageHorizontalGuidelinesData';
-export const V_GUIDE_LINE_STORAGE_KEY = '$MagicStageVerticalGuidelinesData';
 
 export interface ScrollViewerEvent {
   scrollLeft: number;
@@ -720,9 +717,6 @@ export enum DragType {
   /** 拖动组件树节点 */
   LAYER_TREE = 'layer-tree',
 }
-
-/** 当uiService.get('uiSelectMode')为true,点击组件（包括任何形式，组件树/画布）时触发的事件名 */
-export const UI_SELECT_MODE_EVENT_NAME = 'ui-select';
 
 export interface TreeNodeData {
   id: Id;

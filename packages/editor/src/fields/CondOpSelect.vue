@@ -27,12 +27,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject } from 'vue';
+import { computed } from 'vue';
 
 import { getDesignConfig, TMagicSelect } from '@tmagic/design';
 import type { FieldProps } from '@tmagic/form';
 
-import type { CondOpSelectConfig, Services } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
+import type { CondOpSelectConfig } from '@editor/type';
 import { arrayOptions, eqOptions, numberOptions } from '@editor/utils';
 
 defineOptions({
@@ -43,7 +44,7 @@ const emit = defineEmits<{
   change: [value: string];
 }>();
 
-const { dataSourceService } = inject<Services>('services') || {};
+const { dataSourceService } = useServices();
 
 const props = defineProps<FieldProps<CondOpSelectConfig>>();
 
@@ -52,7 +53,7 @@ const optionComponent = getDesignConfig('components')?.option;
 const options = computed(() => {
   const [id, ...fieldNames] = [...(props.config.parentFields || []), ...props.model.field];
 
-  const ds = dataSourceService?.getDataSourceById(id);
+  const ds = dataSourceService.getDataSourceById(id);
 
   let fields = ds?.fields || [];
   let type = '';

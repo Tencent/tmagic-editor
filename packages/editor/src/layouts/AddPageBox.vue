@@ -19,13 +19,13 @@
 </template>
 
 <script lang="ts" setup>
-import { inject, toRaw } from 'vue';
+import { toRaw } from 'vue';
 import { Plus } from '@element-plus/icons-vue';
 
 import { NodeType } from '@tmagic/core';
 
 import MIcon from '@editor/components/Icon.vue';
-import type { Services } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
 import { generatePageNameByApp } from '@editor/utils';
 
 defineOptions({
@@ -36,13 +36,9 @@ defineProps<{
   disabledPageFragment: boolean;
 }>();
 
-const services = inject<Services>('services');
+const { editorService } = useServices();
 
 const clickHandler = (type: NodeType.PAGE | NodeType.PAGE_FRAGMENT) => {
-  const { editorService } = services || {};
-
-  if (!editorService) return;
-
   const root = toRaw(editorService.get('root'));
   if (!root) throw new Error('root 不能为空');
 

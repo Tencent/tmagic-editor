@@ -19,14 +19,8 @@
 <script lang="ts" setup>
 import { computed, inject } from 'vue';
 
-import type {
-  CustomContentMenuFunction,
-  MenuButton,
-  MenuComponent,
-  Services,
-  StageOptions,
-  WorkspaceSlots,
-} from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
+import type { CustomContentMenuFunction, MenuButton, MenuComponent, StageOptions, WorkspaceSlots } from '@editor/type';
 
 import MagicStage from './viewer/Stage.vue';
 import Breadcrumb from './Breadcrumb.vue';
@@ -50,7 +44,7 @@ withDefaults(
 
 const stageOptions = inject<StageOptions>('stageOptions');
 
-const services = inject<Services>('services');
+const { editorService } = useServices();
 
-const page = computed(() => services?.editorService.get('page'));
+const page = computed(() => editorService.get('page'));
 </script>

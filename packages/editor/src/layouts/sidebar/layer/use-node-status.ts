@@ -1,4 +1,4 @@
-import { computed, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, ref, watch } from 'vue';
 
 import type { Id, MNode, MPage, MPageFragment } from '@tmagic/core';
 import { getNodePath, isPage, isPageFragment, traverseNode } from '@tmagic/utils';
@@ -33,9 +33,9 @@ const createPageNodeStatus = (page: MPage | MPageFragment, initialLayerNodeStatu
   return map;
 };
 
-export const useNodeStatus = (services: Services | undefined) => {
-  const page = computed(() => services?.editorService.get('page'));
-  const nodes = computed(() => services?.editorService.get('nodes') || []);
+export const useNodeStatus = ({ editorService }: Services) => {
+  const page = computed(() => editorService.get('page'));
+  const nodes = computed(() => editorService.get('nodes'));
 
   /** 所有页面的节点状态 */
   const nodeStatusMaps = ref(new Map<Id, Map<Id, LayerNodeStatus>>());
@@ -83,7 +83,7 @@ export const useNodeStatus = (services: Services | undefined) => {
     },
   );
 
-  services?.editorService.on('add', (newNodes: MNode[]) => {
+  const addHandler = (newNodes: MNode[]) => {
     newNodes.forEach((node) => {
       if (isPage(node) || isPageFragment(node)) return;
 
@@ -96,14 +96,23 @@ export const useNodeStatus = (services: Services | undefined) => {
         });
       });
     });
-  });
+  };
 
-  services?.editorService.on('remove', (nodes: MNode[]) => {
+  editorService.on('add', addHandler);
+
+  const removeHandler = (nodes: MNode[]) => {
     nodes.forEach((node) => {
       traverseNode(node, (node: MNode) => {
         nodeStatusMap.value?.delete(node.id);
       });
     });
+  };
+
+  editorService.on('remove', removeHandler);
+
+  onBeforeUnmount(() => {
+    editorService.off('remove', removeHandler);
+    editorService.off('add', addHandler);
   });
 
   return {

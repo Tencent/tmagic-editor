@@ -65,7 +65,8 @@ import { computed, inject, onBeforeUnmount, onMounted, useTemplateRef, watch } f
 import type { MPage, MPageFragment } from '@tmagic/core';
 
 import SplitView from '@editor/components/SplitView.vue';
-import type { FrameworkSlots, GetColumnWidth, PageBarSortOptions, Services } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
+import type { FrameworkSlots, GetColumnWidth, PageBarSortOptions } from '@editor/type';
 import { getEditorConfig } from '@editor/utils/config';
 import {
   DEFAULT_LEFT_COLUMN_WIDTH,
@@ -90,34 +91,27 @@ defineProps<{
 }>();
 
 const codeOptions = inject('codeOptions', {});
-const { editorService, uiService } = inject<Services>('services') || {};
+const { editorService, uiService } = useServices();
 
 const contentEl = useTemplateRef<HTMLDivElement>('content');
 const splitViewRef = useTemplateRef<InstanceType<typeof SplitView>>('splitView');
 
-const root = computed(() => editorService?.get('root'));
-const page = computed(() => editorService?.get('page'));
+const root = computed(() => editorService.get('root'));
+const page = computed(() => editorService.get('page'));
 
-const pageLength = computed(() => editorService?.get('pageLength') || 0);
-const showSrc = computed(() => uiService?.get('showSrc'));
+const pageLength = computed(() => editorService.get('pageLength') || 0);
+const showSrc = computed(() => uiService.get('showSrc'));
 
-const columnWidth = computed(
-  () =>
-    uiService?.get('columnWidth') || {
-      left: 0,
-      center: 0,
-      right: 0,
-    },
-);
+const columnWidth = computed(() => uiService.get('columnWidth'));
 
 watch(pageLength, () => {
   splitViewRef.value?.updateWidth();
 });
 
 watch(
-  () => uiService?.get('hideSlideBar'),
+  () => uiService.get('hideSlideBar'),
   (hideSlideBar) => {
-    uiService?.set('columnWidth', {
+    uiService.set('columnWidth', {
       ...columnWidth.value,
       left: hideSlideBar
         ? 0
@@ -129,14 +123,14 @@ watch(
 const columnWidthChange = (columnW: GetColumnWidth) => {
   globalThis.localStorage.setItem(LEFT_COLUMN_WIDTH_STORAGE_KEY, `${columnW.left}`);
   globalThis.localStorage.setItem(RIGHT_COLUMN_WIDTH_STORAGE_KEY, `${columnW.right}`);
-  uiService?.set('columnWidth', columnW);
+  uiService.set('columnWidth', columnW);
 };
 
-const frameworkRect = computed(() => uiService?.get('frameworkRect'));
+const frameworkRect = computed(() => uiService.get('frameworkRect'));
 
 const resizerObserver = new ResizeObserver((entries) => {
   const { contentRect } = entries[0];
-  uiService?.set('frameworkRect', {
+  uiService.set('frameworkRect', {
     width: contentRect.width,
     height: contentRect.height,
     left: contentRect.left,
@@ -157,7 +151,7 @@ onBeforeUnmount(() => {
 const saveCode = (value: string) => {
   try {
     const parseDSL = getEditorConfig('parseDSL');
-    editorService?.set('root', parseDSL(value));
+    editorService.set('root', parseDSL(value));
   } catch (e: any) {
     console.error(e);
   }

@@ -52,7 +52,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, onBeforeUnmount, ref, useTemplateRef, watch, watchEffect } from 'vue';
+import { computed, onBeforeUnmount, ref, useTemplateRef, watch, watchEffect } from 'vue';
 import { Close, Sugar } from '@element-plus/icons-vue';
 import type { OnDrag } from 'gesto';
 
@@ -63,7 +63,8 @@ import { setValueByKeyPath } from '@tmagic/utils';
 
 import MIcon from '@editor/components/Icon.vue';
 import Resizer from '@editor/components/Resizer.vue';
-import type { PropsPanelSlots, Services } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
+import type { PropsPanelSlots } from '@editor/type';
 import { styleTabConfig } from '@editor/utils';
 import { RIGHT_COLUMN_WIDTH_STORAGE_KEY } from '@editor/utils/const';
 
@@ -87,13 +88,13 @@ const emit = defineEmits<{
   mounted: [internalInstance: InstanceType<typeof FormPanel>];
 }>();
 
-const services = inject<Services>('services');
+const { editorService, uiService, propsService, storageService } = useServices();
 
 const values = ref<FormValue>({});
 // ts类型应该是FormConfig， 但是打包时会出错，所以暂时用any
 const curFormConfig = ref<any>([]);
-const node = computed(() => services?.editorService.get('node'));
-const nodes = computed(() => services?.editorService.get('nodes') || []);
+const node = computed(() => editorService.get('node'));
+const nodes = computed(() => editorService.get('nodes'));
 
 const styleFormConfig = [
   {
@@ -109,15 +110,15 @@ const init = async () => {
   }
 
   const type = node.value.type || (node.value.items ? 'container' : 'text');
-  curFormConfig.value = (await services?.propsService.getPropsConfig(type)) || [];
+  curFormConfig.value = await propsService.getPropsConfig(type);
   values.value = node.value;
 };
 
 watchEffect(init);
-services?.propsService.on('props-configs-change', init);
+propsService.on('props-configs-change', init);
 
 onBeforeUnmount(() => {
-  services?.propsService.off('props-configs-change', init);
+  propsService.off('props-configs-change', init);
 });
 
 const submit = async (v: MNode, eventData?: ContainerChangeEventData) => {
@@ -145,7 +146,7 @@ const submit = async (v: MNode, eventData?: ContainerChangeEventData) => {
       });
     }
 
-    services?.editorService.update(newValue, { changeRecords: eventData?.changeRecords });
+    editorService.update(newValue, { changeRecords: eventData?.changeRecords });
   } catch (e: any) {
     emit('submit-error', e);
   }
@@ -163,7 +164,7 @@ const mountedHandler = () => {
 
 const propsPanelEl = useTemplateRef('propsPanel');
 const widthChange = ({ deltaX }: OnDrag) => {
-  if (!propsPanelEl.value || !services) {
+  if (!propsPanelEl.value) {
     return;
   }
 
@@ -172,22 +173,24 @@ const widthChange = ({ deltaX }: OnDrag) => {
   );
 
   let value = width - deltaX;
-  if (value > services.uiService.get('columnWidth').right) {
-    value = services.uiService.get('columnWidth').right - 40;
+  if (value > uiService.get('columnWidth').right) {
+    value = uiService.get('columnWidth').right - 40;
   }
   propsPanelEl.value.style.setProperty('--props-style-panel-width', `${value}px`);
 };
 
-const { showStylePanel, showStylePanelToggleButton, showStylePanelHandler, closeStylePanelHandler } =
-  useStylePanel(services);
+const { showStylePanel, showStylePanelToggleButton, showStylePanelHandler, closeStylePanelHandler } = useStylePanel({
+  storageService,
+  uiService,
+});
 
 watch(showStylePanel, (showStylePanel) => {
-  if (!propsPanelEl.value || !services) {
+  if (!propsPanelEl.value) {
     return;
   }
 
   const columnWidth = {
-    ...services.uiService.get('columnWidth'),
+    ...uiService.get('columnWidth'),
   };
 
   const width = globalThis.parseFloat(
@@ -210,7 +213,7 @@ watch(showStylePanel, (showStylePanel) => {
   }
 
   globalThis.localStorage.setItem(RIGHT_COLUMN_WIDTH_STORAGE_KEY, `${columnWidth.right}`);
-  services.uiService.set('columnWidth', columnWidth);
+  uiService.set('columnWidth', columnWidth);
 });
 
 const propertyFormPanelRef = useTemplateRef<InstanceType<typeof FormPanel>>('propertyFormPanel');

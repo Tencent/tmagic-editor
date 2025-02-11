@@ -45,7 +45,6 @@
 <script lang="ts" setup>
 import {
   computed,
-  inject,
   markRaw,
   nextTick,
   onBeforeUnmount,
@@ -62,8 +61,9 @@ import StageCore, { getOffset, Runtime } from '@tmagic/stage';
 import { calcValueByFontsize, getIdFromEl } from '@tmagic/utils';
 
 import ScrollViewer from '@editor/components/ScrollViewer.vue';
+import { useServices } from '@editor/hooks';
 import { useStage } from '@editor/hooks/use-stage';
-import type { CustomContentMenuFunction, MenuButton, MenuComponent, Services, StageOptions } from '@editor/type';
+import type { CustomContentMenuFunction, MenuButton, MenuComponent, StageOptions } from '@editor/type';
 import { DragType, Layout } from '@editor/type';
 import { getEditorConfig } from '@editor/utils/config';
 import { KeyBindingContainerKey } from '@editor/utils/keybinding-config';
@@ -91,22 +91,22 @@ const props = withDefaults(
 let stage: StageCore | null = null;
 let runtime: Runtime | null = null;
 
-const services = inject<Services>('services');
+const { editorService, uiService, keybindingService } = useServices();
 
-const stageLoading = computed(() => services?.editorService.get('stageLoading') || false);
+const stageLoading = computed(() => editorService.get('stageLoading'));
 
 const stageWrapRef = useTemplateRef<InstanceType<typeof ScrollViewer>>('stageWrap');
 const stageContainerEl = useTemplateRef<HTMLDivElement>('stageContainer');
 const menuRef = useTemplateRef<InstanceType<typeof ViewerMenu>>('menu');
 
-const nodes = computed(() => services?.editorService.get('nodes') || []);
+const nodes = computed(() => editorService.get('nodes'));
 const isMultiSelect = computed(() => nodes.value.length > 1);
-const stageRect = computed(() => services?.uiService.get('stageRect'));
-const stageContainerRect = computed(() => services?.uiService.get('stageContainerRect'));
-const root = computed(() => services?.editorService.get('root'));
-const page = computed(() => services?.editorService.get('page'));
-const zoom = computed(() => services?.uiService.get('zoom') || 1);
-const node = computed(() => services?.editorService.get('node'));
+const stageRect = computed(() => uiService.get('stageRect'));
+const stageContainerRect = computed(() => uiService.get('stageContainerRect'));
+const root = computed(() => editorService.get('root'));
+const page = computed(() => editorService.get('page'));
+const zoom = computed(() => uiService.get('zoom'));
+const node = computed(() => editorService.get('node'));
 
 watchEffect(() => {
   if (stage || !page.value) return;
@@ -120,7 +120,7 @@ watchEffect(() => {
     stageWrapRef.value?.container?.focus();
   });
 
-  services?.editorService.set('stage', markRaw(stage));
+  editorService.set('stage', markRaw(stage));
 
   stage.mount(stageContainerEl.value);
 
@@ -141,7 +141,7 @@ watchEffect(() => {
 
 onBeforeUnmount(() => {
   stage?.destroy();
-  services?.editorService.set('stage', null);
+  editorService.set('stage', null);
 });
 
 watch(zoom, (zoom) => {
@@ -152,14 +152,14 @@ watch(zoom, (zoom) => {
 let timeoutId: NodeJS.Timeout | null = null;
 watch(page, (page) => {
   if (runtime && page) {
-    services?.editorService.set('stageLoading', true);
+    editorService.set('stageLoading', true);
 
     if (timeoutId) {
       globalThis.clearTimeout(timeoutId);
     }
 
     timeoutId = globalThis.setTimeout(() => {
-      services?.editorService.set('stageLoading', false);
+      editorService.set('stageLoading', false);
       timeoutId = null;
     }, 3000);
 
@@ -176,11 +176,11 @@ const rootChangeHandler = (root: MApp) => {
   }
 };
 
-services?.editorService.on('root-change', rootChangeHandler);
+editorService.on('root-change', rootChangeHandler);
 
 const resizeObserver = new ResizeObserver((entries) => {
   for (const { contentRect } of entries) {
-    services?.uiService.set('stageContainerRect', {
+    uiService.set('stageContainerRect', {
       width: contentRect.width,
       height: contentRect.height,
     });
@@ -190,16 +190,16 @@ const resizeObserver = new ResizeObserver((entries) => {
 onMounted(() => {
   if (stageWrapRef.value?.container) {
     resizeObserver.observe(stageWrapRef.value.container);
-    services?.keybindingService.registerEl(KeyBindingContainerKey.STAGE, stageWrapRef.value.container);
+    keybindingService.registerEl(KeyBindingContainerKey.STAGE, stageWrapRef.value.container);
   }
 });
 
 onBeforeUnmount(() => {
   stage?.destroy();
   resizeObserver.disconnect();
-  services?.editorService.set('stage', null);
-  services?.keybindingService.unregisterEl('stage');
-  services?.editorService.off('root-change', rootChangeHandler);
+  editorService.set('stage', null);
+  keybindingService.unregisterEl('stage');
+  editorService.off('root-change', rootChangeHandler);
 });
 
 const parseDSL = getEditorConfig('parseDSL');
@@ -236,11 +236,11 @@ const dropHandler = async (e: DragEvent) => {
   let parent: MContainer | undefined | null = page.value;
   const parentId = getIdFromEl()(parentEl);
   if (parentId) {
-    parent = services?.editorService.getNodeById(parentId, false) as MContainer;
+    parent = editorService.getNodeById(parentId, false) as MContainer;
   }
 
   if (parent && stageContainerEl.value && stage) {
-    const layout = await services?.editorService.getLayout(parent);
+    const layout = await editorService.getLayout(parent);
 
     const containerRect = stageContainerEl.value.getBoundingClientRect();
     const { scrollTop, scrollLeft } = stage.mask!;
@@ -275,7 +275,7 @@ const dropHandler = async (e: DragEvent) => {
 
     config.data.inputEvent = e;
 
-    services?.editorService.add(config.data, parent);
+    editorService.add(config.data, parent);
   }
 };
 </script>

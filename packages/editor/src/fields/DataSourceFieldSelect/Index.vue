@@ -48,7 +48,8 @@ import type { ContainerChangeEventData, FieldProps, FormState } from '@tmagic/fo
 import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX } from '@tmagic/utils';
 
 import MIcon from '@editor/components/Icon.vue';
-import type { DataSourceFieldSelectConfig, Services } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
+import type { DataSourceFieldSelectConfig } from '@editor/type';
 import { removeDataSourceFieldPrefix } from '@editor/utils';
 
 import FieldSelect from './FieldSelect.vue';
@@ -83,10 +84,10 @@ watch(
   },
 );
 
-const services = inject<Services>('services');
+const { dataSourceService } = useServices();
 const mForm = inject<FormState | undefined>('mForm');
 
-const dataSources = computed(() => services?.dataSourceService.get('dataSources') || []);
+const dataSources = computed(() => dataSourceService.get('dataSources') || []);
 
 const type = computed((): string => {
   let type = props.config.fieldConfig?.type;

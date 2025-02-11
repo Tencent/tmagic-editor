@@ -24,14 +24,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue';
 import { ArrowLeftBold, ArrowRightBold } from '@element-plus/icons-vue';
 import Sortable, { type SortableEvent } from 'sortablejs';
 
 import type { Id } from '@tmagic/core';
 
 import Icon from '@editor/components/Icon.vue';
-import type { PageBarSortOptions, Services } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
+import type { PageBarSortOptions } from '@editor/type';
 
 defineOptions({
   name: 'MEditorPageBarScrollContainer',
@@ -42,15 +43,13 @@ const props = defineProps<{
   length: number;
 }>();
 
-const services = inject<Services>('services');
-const editorService = services?.editorService;
-const uiService = services?.uiService;
+const { editorService, uiService } = useServices();
 
 const itemsContainerEl = useTemplateRef<HTMLElement>('itemsContainer');
 const canScroll = ref(false);
 
-const showAddPageButton = computed(() => uiService?.get('showAddPageButton'));
-const showPageListButton = computed(() => uiService?.get('showPageListButton'));
+const showAddPageButton = computed(() => uiService.get('showAddPageButton'));
+const showPageListButton = computed(() => uiService.get('showPageListButton'));
 
 const itemsContainerWidth = ref(0);
 
@@ -145,7 +144,7 @@ watch(
               beforeDragList = sortable.toArray();
             },
             onUpdate: async (event: SortableEvent) => {
-              await editorService?.sort(
+              await editorService.sort(
                 beforeDragList[event.oldIndex as number],
                 beforeDragList[event.newIndex as number],
               );

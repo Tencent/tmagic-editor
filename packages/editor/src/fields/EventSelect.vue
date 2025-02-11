@@ -50,7 +50,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject } from 'vue';
+import { computed } from 'vue';
 import { Delete } from '@element-plus/icons-vue';
 import { has } from 'lodash-es';
 
@@ -68,7 +68,8 @@ import type {
 import { MContainer as MFormContainer, MPanel } from '@tmagic/form';
 import { DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX, traverseNode } from '@tmagic/utils';
 
-import type { CodeSelectColConfig, DataSourceMethodSelectConfig, EventSelectConfig, Services } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
+import type { CodeSelectColConfig, DataSourceMethodSelectConfig, EventSelectConfig } from '@editor/type';
 import { getCascaderOptionsFromFields } from '@editor/utils';
 
 defineOptions({
@@ -81,12 +82,7 @@ const emit = defineEmits<{
   change: [v: any, eventData?: ContainerChangeEventData];
 }>();
 
-const services = inject<Services>('services');
-
-const editorService = services?.editorService;
-const dataSourceService = services?.dataSourceService;
-const eventsService = services?.eventsService;
-const codeBlockService = services?.codeBlockService;
+const { editorService, dataSourceService, eventsService, codeBlockService } = useServices();
 
 // 事件名称下拉框表单配置
 const eventNameConfig = computed(() => {
@@ -108,13 +104,11 @@ const eventNameConfig = computed(() => {
     options: (mForm: FormState, { formValue }: any) => {
       let events: EventOption[] | CascaderOption[] = [];
 
-      if (!eventsService || !dataSourceService) return events;
-
       if (props.config.src === 'component') {
         events = eventsService.getEvent(formValue.type);
 
         if (formValue.type === 'page-fragment-container' && formValue.pageFragmentId) {
-          const pageFragment = editorService?.get('root')?.items?.find((page) => page.id === formValue.pageFragmentId);
+          const pageFragment = editorService.get('root')?.items?.find((page) => page.id === formValue.pageFragmentId);
           if (pageFragment) {
             events = [
               {
@@ -185,7 +179,7 @@ const actionTypeConfig = computed(() => {
       {
         text: '代码',
         label: '代码',
-        disabled: !Object.keys(codeBlockService?.getCodeDsl() || {}).length,
+        disabled: !Object.keys(codeBlockService.getCodeDsl() || {}).length,
         value: ActionType.CODE,
       },
       {
@@ -193,7 +187,7 @@ const actionTypeConfig = computed(() => {
         label: '数据源',
         disabled: !dataSourceService
           ?.get('dataSources')
-          ?.filter((ds) => ds.methods?.length || dataSourceService?.getFormMethod(ds.type).length).length,
+          ?.filter((ds) => ds.methods?.length || dataSourceService.getFormMethod(ds.type).length).length,
         value: ActionType.DATA_SOURCE,
       },
     ],
@@ -222,7 +216,7 @@ const compActionConfig = computed(() => {
     name: 'method',
     text: '动作',
     type: (mForm, { model }: any) => {
-      const to = editorService?.getNodeById(model.to);
+      const to = editorService.getNodeById(model.to);
 
       if (to && to.type === 'page-fragment-container' && to.pageFragmentId) {
         return 'cascader';
@@ -233,20 +227,20 @@ const compActionConfig = computed(() => {
     checkStrictly: () => props.config.src !== 'component',
     display: (mForm, { model }: any) => model.actionType === ActionType.COMP,
     options: (mForm: FormState, { model }: any) => {
-      const node = editorService?.getNodeById(model.to);
+      const node = editorService.getNodeById(model.to);
       if (!node?.type) return [];
 
       let methods: EventOption[] | CascaderOption[] = [];
 
-      methods = eventsService?.getMethod(node.type) || [];
+      methods = eventsService.getMethod(node.type);
 
       if (node.type === 'page-fragment-container' && node.pageFragmentId) {
-        const pageFragment = editorService?.get('root')?.items?.find((page) => page.id === node.pageFragmentId);
+        const pageFragment = editorService.get('root')?.items?.find((page) => page.id === node.pageFragmentId);
         if (pageFragment) {
           methods = [];
           pageFragment.items.forEach((node: MComponent | MContainer) => {
             traverseNode<MComponent | MContainer>(node, (node) => {
-              const nodeMethods = (node.type && eventsService?.getMethod(node.type)) || [];
+              const nodeMethods = (node.type && eventsService.getMethod(node.type)) || [];
 
               if (nodeMethods.length) {
                 methods.push({
@@ -277,7 +271,7 @@ const codeActionConfig = computed(() => {
     type: 'code-select-col',
     text: '代码块',
     name: 'codeId',
-    notEditable: () => !codeBlockService?.getEditStatus(),
+    notEditable: () => !codeBlockService.getEditStatus(),
     display: (mForm, { model }) => model.actionType === ActionType.CODE,
   };
   return { ...defaultCodeActionConfig, ...props.config.codeActionConfig };
@@ -289,7 +283,7 @@ const dataSourceActionConfig = computed(() => {
     type: 'data-source-method-select',
     text: '数据源方法',
     name: 'dataSourceMethod',
-    notEditable: () => !services?.dataSourceService.get('editable'),
+    notEditable: () => !dataSourceService.get('editable'),
     display: (mForm, { model }) => model.actionType === ActionType.DATA_SOURCE,
   };
   return { ...defaultDataSourceActionConfig, ...props.config.dataSourceActionConfig };
@@ -305,7 +299,7 @@ const tableConfig = computed(() => ({
       label: '事件名',
       type: eventNameConfig.value.type,
       options: (mForm: FormState, { formValue }: any) =>
-        eventsService?.getEvent(formValue.type).map((option: any) => ({
+        eventsService.getEvent(formValue.type).map((option: any) => ({
           text: option.label,
           value: option.value,
         })),
@@ -320,10 +314,10 @@ const tableConfig = computed(() => ({
       label: '动作',
       type: compActionConfig.value.type,
       options: (mForm: FormState, { model }: any) => {
-        const node = editorService?.getNodeById(model.to);
+        const node = editorService.getNodeById(model.to);
         if (!node?.type) return [];
 
-        return eventsService?.getMethod(node.type).map((option: any) => ({
+        return eventsService.getMethod(node.type).map((option: any) => ({
           text: option.label,
           value: option.value,
         }));

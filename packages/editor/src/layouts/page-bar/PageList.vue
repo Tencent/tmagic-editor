@@ -35,14 +35,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject } from 'vue';
+import { computed } from 'vue';
 import { Files } from '@element-plus/icons-vue';
 
 import { Id, MPage, MPageFragment } from '@tmagic/core';
 import { TMagicIcon, TMagicPopover } from '@tmagic/design';
 
 import ToolButton from '@editor/components/ToolButton.vue';
-import type { Services } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
 defineOptions({
   name: 'MEditorPageList',
 });
@@ -51,13 +51,11 @@ defineProps<{
   list: (MPage | MPageFragment)[];
 }>();
 
-const services = inject<Services>('services');
-const uiService = services?.uiService;
-const editorService = services?.editorService;
+const { editorService, uiService } = useServices();
 
-const showPageListButton = computed(() => uiService?.get('showPageListButton'));
-const page = computed(() => editorService?.get('page'));
+const showPageListButton = computed(() => uiService.get('showPageListButton'));
+const page = computed(() => editorService.get('page'));
 const switchPage = async (id: Id) => {
-  await editorService?.select(id);
+  await editorService.select(id);
 };
 </script>

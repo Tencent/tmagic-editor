@@ -16,27 +16,28 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject } from 'vue';
+import { computed } from 'vue';
 import { Edit } from '@element-plus/icons-vue';
 
 import { Id, NodeType } from '@tmagic/core';
 import { FieldProps } from '@tmagic/form';
 
 import Icon from '@editor/components/Icon.vue';
-import type { PageFragmentSelectConfig, Services } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
+import type { PageFragmentSelectConfig } from '@editor/type';
 
 defineOptions({
   name: 'MFieldsPageFragmentSelect',
 });
 
-const services = inject<Services>('services');
+const { editorService } = useServices();
 const emit = defineEmits(['change']);
 
 const props = withDefaults(defineProps<FieldProps<PageFragmentSelectConfig>>(), {
   disabled: false,
 });
 const pageList = computed(() =>
-  services?.editorService.get('root')?.items.filter((item) => item.type === NodeType.PAGE_FRAGMENT),
+  editorService.get('root')?.items.filter((item) => item.type === NodeType.PAGE_FRAGMENT),
 );
 
 const selectConfig = {
@@ -58,6 +59,6 @@ const changeHandler = async () => {
 };
 
 const editPageFragment = (id: Id) => {
-  services?.editorService.select(id);
+  editorService.select(id);
 };
 </script>

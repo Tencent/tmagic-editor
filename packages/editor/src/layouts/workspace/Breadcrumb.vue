@@ -8,28 +8,27 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject } from 'vue';
+import { computed } from 'vue';
 
 import type { MNode } from '@tmagic/core';
 import { TMagicButton } from '@tmagic/design';
 import { getNodePath } from '@tmagic/utils';
 
-import type { Services } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
 
 defineOptions({
   name: 'MEditorBreadcrumb',
 });
 
-const services = inject<Services>('services');
-const editorService = services?.editorService;
+const { editorService } = useServices();
 
-const node = computed(() => editorService?.get('node'));
-const nodes = computed(() => editorService?.get('nodes') || []);
-const root = computed(() => editorService?.get('root'));
+const node = computed(() => editorService.get('node'));
+const nodes = computed(() => editorService.get('nodes'));
+const root = computed(() => editorService.get('root'));
 const path = computed(() => getNodePath(node.value?.id || '', root.value?.items || []));
 
 const select = async (node: MNode) => {
-  await editorService?.select(node);
-  editorService?.get('stage')?.select(node.id);
+  await editorService.select(node);
+  editorService.get('stage')?.select(node.id);
 };
 </script>

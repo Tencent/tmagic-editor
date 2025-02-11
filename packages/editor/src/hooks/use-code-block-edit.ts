@@ -5,20 +5,15 @@ import type { CodeBlockContent } from '@tmagic/core';
 import { tMagicMessage } from '@tmagic/design';
 
 import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
-import type { CodeBlockService } from '@editor/services/codeBlock';
+import type { Services } from '@editor/type';
 
-export const useCodeBlockEdit = (codeBlockService?: CodeBlockService) => {
+export const useCodeBlockEdit = (codeBlockService: Services['codeBlockService']) => {
   const codeConfig = ref<CodeBlockContent>();
   const codeId = ref<string>();
   const codeBlockEditorRef = useTemplateRef<InstanceType<typeof CodeBlockEditor>>('codeBlockEditor');
 
   // 新增代码块
   const createCodeBlock = async () => {
-    if (!codeBlockService) {
-      tMagicMessage.error('新增代码块失败');
-      return;
-    }
-
     codeConfig.value = {
       name: '',
       content: `({app, params, flowState}) => {\n  // place your code here\n}`,
@@ -34,7 +29,7 @@ export const useCodeBlockEdit = (codeBlockService?: CodeBlockService) => {
 
   // 编辑代码块
   const editCode = async (id: string) => {
-    const codeBlock = await codeBlockService?.getCodeContentById(id);
+    const codeBlock = await codeBlockService.getCodeContentById(id);
 
     if (!codeBlock) {
       tMagicMessage.error('获取代码块内容失败');
@@ -59,13 +54,13 @@ export const useCodeBlockEdit = (codeBlockService?: CodeBlockService) => {
 
   // 删除代码块
   const deleteCode = async (key: string) => {
-    codeBlockService?.deleteCodeDslByIds([key]);
+    codeBlockService.deleteCodeDslByIds([key]);
   };
 
   const submitCodeBlockHandler = async (values: CodeBlockContent) => {
     if (!codeId.value) return;
 
-    await codeBlockService?.setCodeDslById(codeId.value, values);
+    await codeBlockService.setCodeDslById(codeId.value, values);
 
     codeBlockEditorRef.value?.hide();
   };

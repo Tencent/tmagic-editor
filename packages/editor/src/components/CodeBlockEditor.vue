@@ -74,9 +74,9 @@ import {
 import FloatingBox from '@editor/components/FloatingBox.vue';
 import { useEditorContentHeight } from '@editor/hooks/use-editor-content-height';
 import { useNextFloatBoxPosition } from '@editor/hooks/use-next-float-box-position';
+import { useServices } from '@editor/hooks/use-services';
 import { useWindowRect } from '@editor/hooks/use-window-rect';
 import CodeEditor from '@editor/layouts/CodeEditor.vue';
-import type { Services } from '@editor/type';
 import { getEditorConfig } from '@editor/utils/config';
 
 defineOptions({
@@ -97,7 +97,7 @@ const emit = defineEmits<{
   submit: [values: CodeBlockContent, eventData: ContainerChangeEventData];
 }>();
 
-const services = inject<Services>('services');
+const { codeBlockService, uiService } = useServices();
 
 const { height: codeBlockEditorHeight } = useEditorContentHeight();
 
@@ -192,7 +192,7 @@ const functionConfig = computed<FormConfig>(() => [
         label: '描述',
         name: 'extra',
       },
-      services?.codeBlockService.getParamsColConfig() || defaultParamColConfig,
+      codeBlockService.getParamsColConfig() || defaultParamColConfig,
     ],
   },
   {
@@ -259,7 +259,7 @@ const closedHandler = () => {
 };
 
 const parentFloating = inject<Ref<HTMLDivElement | null>>('parentFloating', ref(null));
-const { boxPosition, calcBoxPosition } = useNextFloatBoxPosition(services?.uiService, parentFloating);
+const { boxPosition, calcBoxPosition } = useNextFloatBoxPosition(uiService, parentFloating);
 
 defineExpose({
   async show() {

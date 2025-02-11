@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, toRaw } from 'vue';
+import { computed, toRaw } from 'vue';
 import { Plus } from '@element-plus/icons-vue';
 
 import { NodeType } from '@tmagic/core';
@@ -41,21 +41,18 @@ import { TMagicPopover } from '@tmagic/design';
 
 import Icon from '@editor/components/Icon.vue';
 import ToolButton from '@editor/components/ToolButton.vue';
-import type { Services } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
 import { generatePageNameByApp } from '@editor/utils/editor';
 
 defineOptions({
   name: 'MEditorPageBarAddButton',
 });
 
-const services = inject<Services>('services');
-const uiService = services?.uiService;
-const editorService = services?.editorService;
+const { editorService, uiService } = useServices();
 
-const showAddPageButton = computed(() => uiService?.get('showAddPageButton'));
+const showAddPageButton = computed(() => uiService.get('showAddPageButton'));
 
 const addPage = (type: NodeType.PAGE | NodeType.PAGE_FRAGMENT) => {
-  if (!editorService) return;
   const root = toRaw(editorService.get('root'));
   if (!root) throw new Error('root 不能为空');
   const pageConfig = {
