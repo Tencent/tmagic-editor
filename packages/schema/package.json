@@ -1,5 +1,5 @@
 {
-  "version": "1.5.6",
+  "version": "1.5.7",
   "name": "@tmagic/schema",
   "type": "module",
   "main": "dist/tmagic-schema.umd.cjs",

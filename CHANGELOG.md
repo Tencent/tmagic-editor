@@ -1,3 +1,7 @@
+## [1.5.7](https://github.com/Tencent/tmagic-editor/compare/v1.5.6...v1.5.7) (2025-02-11)
+
+
+
 ## [1.5.6](https://github.com/Tencent/tmagic-editor/compare/v1.5.5...v1.5.6) (2025-02-10)
 
 
