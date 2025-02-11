@@ -20,9 +20,6 @@
     </template>
 
     <template #tree-node-tool="{ data }">
-      <TMagicTag v-if="collecting && data.type === 'code'" type="info" size="small" style="margin-right: 5px"
-        >依赖收集中</TMagicTag
-      >
       <TMagicTooltip v-if="data.type === 'code'" effect="dark" :content="editable ? '编辑' : '查看'" placement="bottom">
         <Icon :icon="editable ? Edit : View" class="edit-icon" @click.stop="editCode(`${data.key}`)"></Icon>
       </TMagicTooltip>
@@ -40,7 +37,7 @@ import { Close, Edit, View } from '@element-plus/icons-vue';
 
 import type { Id, MNode } from '@tmagic/core';
 import { DepTargetType } from '@tmagic/core';
-import { tMagicMessage, tMagicMessageBox, TMagicTag, TMagicTooltip } from '@tmagic/design';
+import { tMagicMessage, tMagicMessageBox, TMagicTooltip } from '@tmagic/design';
 
 import Icon from '@editor/components/Icon.vue';
 import Tree from '@editor/components/Tree.vue';
@@ -68,8 +65,6 @@ const emit = defineEmits<{
 }>();
 
 const { codeBlockService, depService, editorService } = useServices();
-
-const collecting = computed(() => depService.get('collecting'));
 
 // 代码块列表
 const codeList = computed<TreeNodeData[]>(() =>

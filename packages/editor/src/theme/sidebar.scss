@@ -3,11 +3,12 @@
 .m-editor-sidebar {
   display: flex;
   height: 100%;
+  position: relative;
 
   .m-editor-sidebar-header {
     background: $sidebar-heder-background-color;
     height: 100%;
-    width: 40px;
+    width: $sidebar-heder-width;
 
     .m-editor-sidebar-header-item {
       line-height: 15px;
@@ -50,6 +51,24 @@
     height: 100%;
     width: calc(100% - 40px);
     overflow: auto;
+  }
+
+  .m-editor-sidebar-tips {
+    position: absolute;
+    bottom: 0;
+    left: $sidebar-heder-width;
+    width: calc(100% - #{$sidebar-heder-width});
+    text-align: center;
+    background-color: rgba(252.5, 245.7, 235.5, 0.9);
+    color: #e6a23c;
+    padding: 5px 0;
+    font-size: 12px;
+
+    .close-icon {
+      cursor: pointer;
+      position: absolute;
+      right: 15px;
+    }
   }
 
   .fold-icon {

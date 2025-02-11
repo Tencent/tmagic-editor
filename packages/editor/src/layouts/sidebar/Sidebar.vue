@@ -117,6 +117,10 @@
         </template>
       </component>
     </div>
+    <div class="m-editor-sidebar-tips" v-if="tipsBarVisible && collecting && taskLength > 0">
+      <span>依赖收集中(剩余任务：{{ taskLength }})</span>
+      <MIcon :icon="Close" class="close-icon" @click.stop="tipsBarVisible = false"></MIcon>
+    </div>
   </div>
 
   <Teleport to="body">
@@ -150,7 +154,7 @@
 
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue';
-import { Coin, EditPen, Goods, List } from '@element-plus/icons-vue';
+import { Close, Coin, EditPen, Goods, List } from '@element-plus/icons-vue';
 
 import FloatingBox from '@editor/components/FloatingBox.vue';
 import MIcon from '@editor/components/Icon.vue';
@@ -200,6 +204,8 @@ const props = withDefaults(
 const { depService, uiService } = useServices();
 
 const collecting = computed(() => depService.get('collecting'));
+const taskLength = computed(() => depService.get('taskLength'));
+const tipsBarVisible = ref(true);
 
 const columnLeftWidth = computed(() => uiService.get('columnWidth')[ColumnLayout.LEFT]);
 const { height: editorContentHeight } = useEditorContentHeight();

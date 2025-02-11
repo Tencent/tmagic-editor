@@ -3,6 +3,7 @@ import { EventEmitter } from 'events';
 export interface IdleTaskEvents {
   finish: [];
   'hight-level-finish': [];
+  'update-task-length': [{ length: number; hightLevelLength: number }];
 }
 
 type TaskList<T> = {
@@ -55,6 +56,11 @@ export class IdleTask<T = any> extends EventEmitter {
     this.hightLevelTaskList = [];
     this.taskList = [];
     this.taskHandle = null;
+
+    this.emit('update-task-length', {
+      length: this.taskList.length + this.hightLevelTaskList.length,
+      hightLevelLength: this.hightLevelTaskList.length,
+    });
   }
 
   public on<Name extends keyof IdleTaskEvents, Param extends IdleTaskEvents[Name]>(
@@ -117,5 +123,10 @@ export class IdleTask<T = any> extends EventEmitter {
 
       this.emit('finish');
     }
+
+    this.emit('update-task-length', {
+      length: taskList.length + hightLevelTaskList.length,
+      hightLevelLength: hightLevelTaskList.length,
+    });
   }
 }

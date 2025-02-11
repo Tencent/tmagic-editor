@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { reactive, shallowReactive } from 'vue';
+import { throttle } from 'lodash-es';
 
 import type { DepExtendedData, Id, MNode, Target, TargetNode } from '@tmagic/core';
 import { DepTargetType, Watcher } from '@tmagic/core';
@@ -34,18 +35,31 @@ export interface DepEvents {
 
 interface State {
   collecting: boolean;
+  taskLength: number;
 }
 
 type StateKey = keyof State;
 
-const idleTask = new IdleTask<{ node: TargetNode; deep: boolean; target: Target }>();
-
 class Dep extends BaseService {
   private state = shallowReactive<State>({
     collecting: false,
+    taskLength: 0,
   });
 
+  private idleTask = new IdleTask<{ node: TargetNode; deep: boolean; target: Target }>();
+
   private watcher = new Watcher({ initialTargets: reactive({}) });
+
+  constructor() {
+    super();
+
+    this.idleTask.on(
+      'update-task-length',
+      throttle(({ length }) => {
+        this.set('taskLength', length);
+      }, 1000),
+    );
+  }
 
   public set<K extends StateKey, T extends State[K]>(name: K, value: T) {
     this.state[name] = value;
@@ -116,11 +130,11 @@ class Dep extends BaseService {
         resolve();
         return;
       }
-      idleTask.once('finish', () => {
+      this.idleTask.once('finish', () => {
         this.emit('collected', nodes, deep);
         this.set('collecting', false);
       });
-      idleTask.once('hight-level-finish', () => {
+      this.idleTask.once('hight-level-finish', () => {
         this.emit('ds-collected', nodes, deep);
         resolve();
       });
@@ -159,7 +173,7 @@ class Dep extends BaseService {
   }
 
   public clearIdleTasks() {
-    idleTask.clearTasks();
+    this.idleTask.clearTasks();
   }
 
   public on<Name extends keyof DepEvents, Param extends DepEvents[Name]>(
@@ -177,8 +191,8 @@ class Dep extends BaseService {
   }
 
   public reset() {
-    idleTask.removeAllListeners();
-    idleTask.clearTasks();
+    this.idleTask.removeAllListeners();
+    this.idleTask.clearTasks();
 
     for (const type of Object.keys(this.watcher.getTargetsList())) {
       this.removeTargets(type);
@@ -191,6 +205,7 @@ class Dep extends BaseService {
     this.removeAllListeners();
     this.reset();
     this.removeAllPlugins();
+    this.idleTask.removeAllListeners();
   }
 
   public emit<Name extends keyof DepEvents, Param extends DepEvents[Name]>(eventName: Name, ...args: Param) {
@@ -198,7 +213,7 @@ class Dep extends BaseService {
   }
 
   private enqueueTask(node: MNode, target: Target, depExtendedData: DepExtendedData, deep: boolean) {
-    idleTask.enqueueTask(
+    this.idleTask.enqueueTask(
       ({ node, deep, target }) => {
         this.collectNode(node, target, depExtendedData, deep);
       },
