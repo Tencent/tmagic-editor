@@ -19,10 +19,10 @@
       right-class="m-editor-framework-right"
       :left="columnWidth.left"
       :right="columnWidth.right"
-      :min-left="200"
-      :min-right="300"
-      :min-center="400"
-      :width="frameworkRect?.width || 0"
+      :min-left="MIN_LEFT_COLUMN_WIDTH"
+      :min-right="MIN_RIGHT_COLUMN_WIDTH"
+      :min-center="MIN_CENTER_COLUMN_WIDTH"
+      :width="frameworkRect.width"
       @change="columnWidthChange"
     >
       <template #left>
@@ -66,11 +66,15 @@ import type { MPage, MPageFragment } from '@tmagic/core';
 
 import SplitView from '@editor/components/SplitView.vue';
 import { useServices } from '@editor/hooks/use-services';
+import { Protocol } from '@editor/services/storage';
 import type { FrameworkSlots, GetColumnWidth, PageBarSortOptions } from '@editor/type';
 import { getEditorConfig } from '@editor/utils/config';
 import {
   DEFAULT_LEFT_COLUMN_WIDTH,
   LEFT_COLUMN_WIDTH_STORAGE_KEY,
+  MIN_CENTER_COLUMN_WIDTH,
+  MIN_LEFT_COLUMN_WIDTH,
+  MIN_RIGHT_COLUMN_WIDTH,
   RIGHT_COLUMN_WIDTH_STORAGE_KEY,
 } from '@editor/utils/const';
 
@@ -91,7 +95,7 @@ defineProps<{
 }>();
 
 const codeOptions = inject('codeOptions', {});
-const { editorService, uiService } = useServices();
+const { editorService, uiService, storageService } = useServices();
 
 const contentEl = useTemplateRef<HTMLDivElement>('content');
 const splitViewRef = useTemplateRef<InstanceType<typeof SplitView>>('splitView');
@@ -115,14 +119,16 @@ watch(
       ...columnWidth.value,
       left: hideSlideBar
         ? 0
-        : Number(globalThis.localStorage.getItem(LEFT_COLUMN_WIDTH_STORAGE_KEY)) || DEFAULT_LEFT_COLUMN_WIDTH,
+        : storageService.getItem(LEFT_COLUMN_WIDTH_STORAGE_KEY, { protocol: Protocol.NUMBER }) ||
+          DEFAULT_LEFT_COLUMN_WIDTH,
     });
   },
 );
 
 const columnWidthChange = (columnW: GetColumnWidth) => {
-  globalThis.localStorage.setItem(LEFT_COLUMN_WIDTH_STORAGE_KEY, `${columnW.left}`);
-  globalThis.localStorage.setItem(RIGHT_COLUMN_WIDTH_STORAGE_KEY, `${columnW.right}`);
+  storageService.setItem(LEFT_COLUMN_WIDTH_STORAGE_KEY, columnW.left, { protocol: Protocol.NUMBER });
+  storageService.setItem(RIGHT_COLUMN_WIDTH_STORAGE_KEY, columnW.right, { protocol: Protocol.NUMBER });
+
   uiService.set('columnWidth', columnW);
 };
 

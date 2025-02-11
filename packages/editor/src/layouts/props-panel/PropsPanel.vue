@@ -34,7 +34,9 @@
         <div class="m-editor-props-style-panel-title">
           <span>样式</span>
           <div>
-            <TMagicButton link size="small" @click="closeStylePanelHandler"><MIcon :icon="Close"></MIcon></TMagicButton>
+            <TMagicButton link size="small" @click="toggleStylePanel(false)"
+              ><MIcon :icon="Close"></MIcon
+            ></TMagicButton>
           </div>
         </div>
       </template>
@@ -44,7 +46,7 @@
       v-if="showStylePanelToggleButton && !showStylePanel"
       class="m-editor-props-panel-style-icon"
       circle
-      @click="showStylePanelHandler"
+      @click="toggleStylePanel(true)"
     >
       <MIcon :icon="Sugar"></MIcon>
     </TMagicButton>
@@ -52,7 +54,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, ref, useTemplateRef, watch, watchEffect } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef, watch, watchEffect } from 'vue';
 import { Close, Sugar } from '@element-plus/icons-vue';
 import type { OnDrag } from 'gesto';
 
@@ -64,9 +66,10 @@ import { setValueByKeyPath } from '@tmagic/utils';
 import MIcon from '@editor/components/Icon.vue';
 import Resizer from '@editor/components/Resizer.vue';
 import { useServices } from '@editor/hooks/use-services';
+import { Protocol } from '@editor/services/storage';
 import type { PropsPanelSlots } from '@editor/type';
 import { styleTabConfig } from '@editor/utils';
-import { RIGHT_COLUMN_WIDTH_STORAGE_KEY } from '@editor/utils/const';
+import { PROPS_PANEL_WIDTH_STORAGE_KEY } from '@editor/utils/const';
 
 import FormPanel from './FormPanel.vue';
 import { useStylePanel } from './use-style-panel';
@@ -163,6 +166,14 @@ const mountedHandler = () => {
 };
 
 const propsPanelEl = useTemplateRef('propsPanel');
+const propsPanelWidth = ref(
+  storageService.getItem(PROPS_PANEL_WIDTH_STORAGE_KEY, { protocol: Protocol.NUMBER }) || 300,
+);
+
+onMounted(() => {
+  propsPanelEl.value?.style.setProperty('--props-style-panel-width', `${propsPanelWidth.value}px`);
+});
+
 const widthChange = ({ deltaX }: OnDrag) => {
   if (!propsPanelEl.value) {
     return;
@@ -176,45 +187,21 @@ const widthChange = ({ deltaX }: OnDrag) => {
   if (value > uiService.get('columnWidth').right) {
     value = uiService.get('columnWidth').right - 40;
   }
-  propsPanelEl.value.style.setProperty('--props-style-panel-width', `${value}px`);
+  propsPanelWidth.value = value;
 };
 
-const { showStylePanel, showStylePanelToggleButton, showStylePanelHandler, closeStylePanelHandler } = useStylePanel({
-  storageService,
-  uiService,
+watch(propsPanelWidth, (value) => {
+  propsPanelEl.value?.style.setProperty('--props-style-panel-width', `${value}px`);
+  storageService.setItem(PROPS_PANEL_WIDTH_STORAGE_KEY, value, { protocol: Protocol.NUMBER });
 });
 
-watch(showStylePanel, (showStylePanel) => {
-  if (!propsPanelEl.value) {
-    return;
-  }
-
-  const columnWidth = {
-    ...uiService.get('columnWidth'),
-  };
-
-  const width = globalThis.parseFloat(
-    getComputedStyle(propsPanelEl.value).getPropertyValue('--props-style-panel-width'),
-  );
-
-  if (showStylePanel) {
-    columnWidth.right += width;
-    columnWidth.center -= width;
-  } else {
-    columnWidth.right -= width;
-    columnWidth.center += width;
-  }
-
-  if (columnWidth.center < 0) {
-    columnWidth.right = columnWidth.right + columnWidth.center - 400;
-    columnWidth.center = 400;
-
-    propsPanelEl.value.style.setProperty('--props-style-panel-width', `${columnWidth.right / 2}px`);
-  }
-
-  globalThis.localStorage.setItem(RIGHT_COLUMN_WIDTH_STORAGE_KEY, `${columnWidth.right}`);
-  uiService.set('columnWidth', columnWidth);
-});
+const { showStylePanel, showStylePanelToggleButton, toggleStylePanel } = useStylePanel(
+  {
+    storageService,
+    uiService,
+  },
+  propsPanelWidth,
+);
 
 const propertyFormPanelRef = useTemplateRef<InstanceType<typeof FormPanel>>('propertyFormPanel');
 defineExpose({

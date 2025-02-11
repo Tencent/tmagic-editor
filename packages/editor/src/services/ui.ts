@@ -31,6 +31,7 @@ import {
 } from '@editor/utils/const';
 
 import BaseService from './BaseService';
+import storageService, { Protocol } from './storage';
 
 const state = shallowReactive<UiState>({
   uiSelectMode: false,
@@ -46,9 +47,12 @@ const state = shallowReactive<UiState>({
     height: 817,
   },
   columnWidth: {
-    left: Number(globalThis.localStorage.getItem(LEFT_COLUMN_WIDTH_STORAGE_KEY)) || DEFAULT_LEFT_COLUMN_WIDTH,
+    left:
+      storageService.getItem(LEFT_COLUMN_WIDTH_STORAGE_KEY, { protocol: Protocol.NUMBER }) || DEFAULT_LEFT_COLUMN_WIDTH,
     center: 0,
-    right: Number(globalThis.localStorage.getItem(RIGHT_COLUMN_WIDTH_STORAGE_KEY)) || DEFAULT_RIGHT_COLUMN_WIDTH,
+    right:
+      storageService.getItem(RIGHT_COLUMN_WIDTH_STORAGE_KEY, { protocol: Protocol.NUMBER }) ||
+      DEFAULT_RIGHT_COLUMN_WIDTH,
   },
   showGuides: true,
   showRule: true,
