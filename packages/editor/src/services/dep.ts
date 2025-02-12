@@ -191,7 +191,6 @@ class Dep extends BaseService {
   }
 
   public reset() {
-    this.idleTask.removeAllListeners();
     this.idleTask.clearTasks();
 
     for (const type of Object.keys(this.watcher.getTargetsList())) {
@@ -202,6 +201,8 @@ class Dep extends BaseService {
   }
 
   public destroy() {
+    this.idleTask.removeAllListeners();
+
     this.removeAllListeners();
     this.reset();
     this.removeAllPlugins();
