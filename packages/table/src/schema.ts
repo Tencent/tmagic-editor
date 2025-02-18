@@ -34,6 +34,8 @@ export interface ColumnActionConfig {
 }
 
 export interface ColumnConfig<T = any> {
+  pageIndex?: number;
+  pageSize?: number;
   form?: FormConfig;
   rules?: any;
   values?: FormValue;
@@ -43,7 +45,7 @@ export interface ColumnConfig<T = any> {
   fixed?: 'left' | 'right' | boolean;
   width?: number | string;
   actions?: ColumnActionConfig[];
-  type?: 'popover' | 'expand' | 'component' | string | ((value: any, row: T) => string);
+  type?: 'popover' | 'expand' | 'component' | 'index' | string | ((value: any, row: T) => string);
   text?: string;
   prop?: string;
   name?: string;

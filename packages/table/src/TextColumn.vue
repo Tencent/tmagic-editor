@@ -8,7 +8,12 @@
     :prop="config.prop"
   >
     <template v-slot="scope">
-      <TMagicForm v-if="config.type && editState[scope.$index]" label-width="0" :model="editState[scope.$index]">
+      <div v-if="config.type === 'index'">
+        {{
+          config.pageIndex && config.pageSize ? config.pageIndex * config.pageSize + scope.$index + 1 : scope.$index + 1
+        }}
+      </div>
+      <TMagicForm v-else-if="config.type && editState[scope.$index]" label-width="0" :model="editState[scope.$index]">
         <m-form-container
           :prop="config.prop"
           :rules="config.rules"
