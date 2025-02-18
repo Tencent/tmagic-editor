@@ -20,7 +20,7 @@ import { datetimeFormatter } from '@tmagic/form';
 
 import type { ColumnConfig } from './schema';
 
-export const formatter = (item: ColumnConfig, row: any) => {
+export const formatter = (item: ColumnConfig, row: any, data: { index: number }) => {
   if (!item.prop) return '';
 
   if (item.formatter) {
@@ -29,7 +29,7 @@ export const formatter = (item: ColumnConfig, row: any) => {
       item.formatter = (value: string) => datetimeFormatter(value);
     }
     try {
-      return item.formatter(row[item.prop], row);
+      return item.formatter(row[item.prop], row, data);
     } catch (e) {
       return row[item.prop];
     }

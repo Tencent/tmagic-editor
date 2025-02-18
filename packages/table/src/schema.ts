@@ -51,7 +51,7 @@ export interface ColumnConfig<T = any> {
   name?: string;
   showHeader?: boolean;
   table?: ColumnConfig[];
-  formatter?: 'datetime' | ((item: any, row: T) => any);
+  formatter?: 'datetime' | ((item: any, row: T, data: { index: number }) => any);
   popover?: {
     placement?:
       | 'auto'
