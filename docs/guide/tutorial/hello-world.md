@@ -51,7 +51,7 @@ cd hello-world
 ## 添加依赖
 
 ```bash
-npm install --save @tmagic/editor @tmagic/element-plus-adapter element-plus
+npm install --save @tmagic/editor @tmagic/stage @tmagic/element-plus-adapter element-plus
 ```
 
 ## 注册组件
@@ -169,6 +169,8 @@ const value = ref({
 api详情：[render](../../api/editor/props.md#render)
 
 ```ts
+import { createApp } from 'vue';
+
 const render = () => {
   const root = window.document.createElement('div');
   const page = value.value.items[0];
@@ -208,9 +210,9 @@ configureWebpack: {
 
 ```ts
 import { editorService } from '@tmagic/editor';
-import type { MPage } from '@tmagic/schema';
+import { computed } from 'vue';
 
-const page = computed(() => editorService.get<MPage>('page'))
+const page = computed(() => editorService.get('page'));
 ```
 
 到这已经能渲染出HelloWorld组件了，但是会发现无法选中，因为这时并不知道画布中的Dom已经发生变化，所以需要通知编辑器
@@ -226,6 +228,8 @@ renderer.iframe.contentWindow.magic?.onPageElUpdate(root);
 最终完整的render函数实现
 
 ```ts
+import { createApp } from 'vue';
+import { editorService } from '@tmagic/editor';
 import type StageCore from '@tmagic/stage';
 
 const render = async ({ renderer }: StageCore) => {
