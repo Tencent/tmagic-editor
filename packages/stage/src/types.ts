@@ -210,6 +210,7 @@ export interface Runtime {
   update?: (data: UpdateData) => void;
   sortNode?: (data: SortEventData) => void;
   remove?: (data: RemoveData) => void;
+  [key: string]: any;
 }
 
 export interface Magic {
