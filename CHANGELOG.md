@@ -1,3 +1,18 @@
+## [1.5.9](https://github.com/Tencent/tmagic-editor/compare/v1.5.8...v1.5.9) (2025-02-20)
+
+
+### Bug Fixes
+
+* **editor:** 编辑器销毁不应该移除依赖收集任务的事件监听 ([6e2b5ae](https://github.com/Tencent/tmagic-editor/commit/6e2b5aea47cc1059d4b92a85b9801d7af4f9b3b9))
+
+
+### Features
+
+* **table:** formatter添加index信息 ([4d77b66](https://github.com/Tencent/tmagic-editor/commit/4d77b669baf68f3346aa64d52dea6f75712b1af4))
+* **table:** 支持type: index的序号列 ([6f2c6b1](https://github.com/Tencent/tmagic-editor/commit/6f2c6b151d59aca8899742c724c44dbde7d01a89))
+
+
+
 ## [1.5.8](https://github.com/Tencent/tmagic-editor/compare/v1.5.7...v1.5.8) (2025-02-11)
 
 

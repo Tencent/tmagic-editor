@@ -1,5 +1,5 @@
 {
-  "version": "1.5.8",
+  "version": "1.5.9",
   "name": "@tmagic/ui",
   "type": "module",
   "main": "dist/tmagic-ui.js",
