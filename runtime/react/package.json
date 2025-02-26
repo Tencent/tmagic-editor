@@ -20,11 +20,8 @@
   },
   "dependencies": {
     "@tmagic/core": "1.5.9",
-    "@tmagic/data-source": "1.5.9",
-    "@tmagic/react-runtime-help": "0.0.3",
-    "@tmagic/schema": "1.5.9",
+    "@tmagic/react-runtime-help": "0.0.4",
     "@tmagic/stage": "1.5.9",
-    "@tmagic/utils": "1.5.9",
     "axios": "^0.25.0",
     "terser": "^5.31.6",
     "react": "^18.3.1",

@@ -19,8 +19,8 @@
 import React, { useContext } from 'react';
 
 import type Core from '@tmagic/core';
+import type { MPage } from '@tmagic/core';
 import { AppContent } from '@tmagic/react-runtime-help';
-import type { MPage } from '@tmagic/schema';
 
 function App() {
   const app = useContext<Core | undefined>(AppContent);

@@ -38,6 +38,7 @@ export default defineConfig({
       { find: /^@data-source/, replacement: path.join(__dirname, '../../packages/data-source/src') },
       { find: /^@tmagic\/data-source/, replacement: path.join(__dirname, '../../packages/data-source/src/index.ts') },
       { find: /^@tmagic\/dep/, replacement: path.join(__dirname, '../../packages/dep/src/index.ts') },
+      { find: /^@tmagic\/react-runtime-help/, replacement: path.join(__dirname, '../react-runtime-help/src/index.ts') },
     ],
   },
 

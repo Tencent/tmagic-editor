@@ -18,11 +18,9 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 
-import Core from '@tmagic/core';
-import { DataSourceManager, DeepObservedData } from '@tmagic/data-source';
+import type { MApp } from '@tmagic/core';
+import Core, { DataSourceManager, DeepObservedData, getUrlParam } from '@tmagic/core';
 import { AppContent } from '@tmagic/react-runtime-help';
-import type { MApp } from '@tmagic/schema';
-import { getUrlParam } from '@tmagic/utils';
 
 import components from '../.tmagic/comp-entry';
 import dataSources from '../.tmagic/datasource-entry';

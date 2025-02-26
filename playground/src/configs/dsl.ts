@@ -64,6 +64,21 @@ const dsl: MApp = {
       },
       params: [],
     },
+    code_6778: {
+      name: 'toOtherPage',
+      desc: '',
+      timing: '',
+      params: [
+        {
+          name: 'pageId',
+          extra: '',
+          type: '',
+        },
+      ],
+      content: ({ app, params }) => {
+        app.setPage(params.pageId);
+      },
+    },
   },
   items: [
     {
@@ -251,6 +266,37 @@ const dsl: MApp = {
           displayConds: [],
         },
         {
+          id: 'button_1cb163ad',
+          text: '前往page2',
+          multiple: true,
+          style: {
+            width: '270',
+            height: '37.5',
+            border: 0,
+            backgroundColor: '#fb6f00',
+            position: 'absolute',
+            left: 56,
+            top: 266,
+          },
+          type: 'button',
+          name: '按钮',
+          events: [
+            {
+              name: 'magic:common:events:click',
+              actions: [
+                {
+                  actionType: ActionType.CODE,
+                  codeId: 'code_6778',
+                  params: {
+                    pageId: 'page_171ff161',
+                  },
+                },
+              ],
+            },
+          ],
+          displayConds: [],
+        },
+        {
           type: 'overlay',
           id: 'overlay_2159',
           style: {
@@ -375,6 +421,53 @@ const dsl: MApp = {
           ],
         },
       ],
+    },
+    {
+      id: 'page_171ff161',
+      items: [
+        {
+          id: 'button_80ca1076',
+          text: '返回',
+          multiple: true,
+          style: {
+            width: '270',
+            height: '37.5',
+            border: 0,
+            backgroundColor: '#fb6f00',
+            position: 'absolute',
+            left: 48,
+            top: 297,
+          },
+          type: 'button',
+          name: '按钮',
+          events: [
+            {
+              name: 'magic:common:events:click',
+              actions: [
+                {
+                  actionType: ActionType.CODE,
+                  codeId: 'code_6778',
+                  params: {
+                    pageId: 'page_299',
+                  },
+                },
+              ],
+            },
+          ],
+          displayConds: [],
+        },
+      ],
+      style: {
+        width: '100%',
+        height: '100%',
+        position: 'relative',
+        top: 0,
+        left: 0,
+      },
+      type: NodeType.PAGE,
+      name: 'page2',
+      title: '',
+      layout: 'absolute',
     },
   ],
   dataSources: [

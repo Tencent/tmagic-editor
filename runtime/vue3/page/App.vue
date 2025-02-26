@@ -3,25 +3,16 @@
 </template>
 
 <script lang="ts" setup>
-import { inject, reactive } from 'vue';
+import { reactive } from 'vue';
 
-import type { Id, MPage, Page } from '@tmagic/core';
-import type TMagicApp from '@tmagic/core';
-import { addParamToUrl, cloneDeep, DevtoolApi, getNodeInfo, replaceChildNode, setValueByKeyPath } from '@tmagic/core';
+import type { Id, MPage } from '@tmagic/core';
+import { cloneDeep, DevtoolApi, getNodeInfo, replaceChildNode, setValueByKeyPath } from '@tmagic/core';
 import { useComponent, useDsl } from '@tmagic/vue-runtime-help';
 
-const app = inject<TMagicApp>('app');
-const { pageConfig } = useDsl(app);
+const { pageConfig, app } = useDsl();
 const pageComponent = useComponent('page');
 
-app?.on('page-change', (page?: Page) => {
-  if (!page) {
-    throw new Error(`页面不存在`);
-  }
-  addParamToUrl({ page: page.data.id }, window);
-});
-
-if (import.meta.env.DEV && app) {
+if (import.meta.env.DEV) {
   app.devtools = new (class extends DevtoolApi {
     public updateDsl(nodeId: Id, data: any, path: string) {
       if (!app.dsl) {

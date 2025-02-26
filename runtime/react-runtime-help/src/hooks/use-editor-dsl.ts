@@ -11,11 +11,11 @@ declare global {
   }
 }
 
-export const useEditorDsl = (app: TMagicApp | undefined, renderDom: () => void) => {
+export const useEditorDsl = (app: TMagicApp, renderDom: () => void) => {
   let curPageId: Id = '';
 
   const updateConfig = (root: MApp) => {
-    app?.setConfig(root, curPageId);
+    app.setConfig(root, curPageId);
     renderDom();
   };
 
@@ -30,7 +30,7 @@ export const useEditorDsl = (app: TMagicApp | undefined, renderDom: () => void) 
 
     updatePageId(id: Id) {
       curPageId = id;
-      app?.setPage(curPageId);
+      app.setPage(curPageId);
       renderDom();
     },
 

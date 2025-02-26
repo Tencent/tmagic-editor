@@ -19,8 +19,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 
-import Core from '@tmagic/core';
-import { DataSourceManager, DeepObservedData } from '@tmagic/data-source';
+import Core, { DataSourceManager, DeepObservedData } from '@tmagic/core';
 import { AppContent, useEditorDsl } from '@tmagic/react-runtime-help';
 
 import components from '../.tmagic/comp-entry';

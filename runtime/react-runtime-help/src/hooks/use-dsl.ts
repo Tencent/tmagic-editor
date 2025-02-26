@@ -6,9 +6,11 @@ import type TMagicApp from '@tmagic/core';
 import { isPage, replaceChildNode } from '@tmagic/core';
 
 export const useDsl = (app: TMagicApp | undefined) => {
-  if (!app?.page) return null;
+  const [pageConfig, setPageConfig] = useState(app?.page?.data);
 
-  const [pageConfig, setPageConfig] = useState(app.page.data);
+  app?.on('page-change', () => {
+    setPageConfig(app.page?.data);
+  });
 
   const updateDataHandler = (nodes: MNode[], sourceId: string, event: ChangeEvent) => {
     let config = pageConfig;
@@ -16,14 +18,14 @@ export const useDsl = (app: TMagicApp | undefined) => {
       if (isPage(node)) {
         config = node;
       } else {
-        replaceChildNode(node, [config]);
+        config && replaceChildNode(node, [config]);
       }
     });
 
     setPageConfig(cloneDeep(config));
 
     setTimeout(() => {
-      app.emit('replaced-node', {
+      app?.emit('replaced-node', {
         ...event,
         nodes,
         sourceId,
@@ -32,10 +34,10 @@ export const useDsl = (app: TMagicApp | undefined) => {
   };
 
   useEffect(() => {
-    app.dataSourceManager?.on('update-data', updateDataHandler);
+    app?.dataSourceManager?.on('update-data', updateDataHandler);
 
     return () => {
-      app.dataSourceManager?.off('update-data', updateDataHandler);
+      app?.dataSourceManager?.off('update-data', updateDataHandler);
     };
   }, []);
 

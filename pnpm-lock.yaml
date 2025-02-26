@@ -906,21 +906,12 @@ importers:
       '@tmagic/core':
         specifier: 1.5.9
         version: 1.5.9(typescript@5.7.3)
-      '@tmagic/data-source':
-        specifier: 1.5.9
-        version: 1.5.9(@tmagic/core@1.5.9(typescript@5.7.3))(typescript@5.7.3)
       '@tmagic/react-runtime-help':
-        specifier: 0.0.3
-        version: 0.0.3(@tmagic/core@1.5.9(typescript@5.7.3))(@tmagic/data-source@1.5.9(@tmagic/core@1.5.9(typescript@5.7.3))(typescript@5.7.3))(@tmagic/schema@1.5.9(typescript@5.7.3))(@tmagic/stage@1.5.9(@tmagic/core@1.5.9(typescript@5.7.3))(typescript@5.7.3))(@tmagic/utils@1.5.9(@tmagic/schema@1.5.9(typescript@5.7.3))(typescript@5.7.3))(lodash-es@4.17.21)(react@18.3.1)(typescript@5.7.3)
-      '@tmagic/schema':
-        specifier: 1.5.9
-        version: 1.5.9(typescript@5.7.3)
+        specifier: 0.0.4
+        version: 0.0.4(@tmagic/core@1.5.9(typescript@5.7.3))(@tmagic/stage@1.5.9(@tmagic/core@1.5.9(typescript@5.7.3))(typescript@5.7.3))(lodash-es@4.17.21)(react@18.3.1)(typescript@5.7.3)
       '@tmagic/stage':
         specifier: 1.5.9
         version: 1.5.9(@tmagic/core@1.5.9(typescript@5.7.3))(typescript@5.7.3)
-      '@tmagic/utils':
-        specifier: 1.5.9
-        version: 1.5.9(@tmagic/schema@1.5.9(typescript@5.7.3))(typescript@5.7.3)
       axios:
         specifier: ^0.25.0
         version: 0.25.0
@@ -1033,8 +1024,8 @@ importers:
         specifier: 1.5.9
         version: 1.5.9(@tmagic/core@1.5.9(typescript@5.7.3))(typescript@5.7.3)
       '@tmagic/vue-runtime-help':
-        specifier: ^0.1.4
-        version: 0.1.5(@tmagic/core@1.5.9(typescript@5.7.3))(@tmagic/stage@1.5.9(@tmagic/core@1.5.9(typescript@5.7.3))(typescript@5.7.3))(@vue/composition-api@1.7.2(vue@2.7.16))(typescript@5.7.3)(vue@2.7.16)
+        specifier: ^1.0.0
+        version: 1.0.0(@tmagic/core@1.5.9(typescript@5.7.3))(@tmagic/stage@1.5.9(@tmagic/core@1.5.9(typescript@5.7.3))(typescript@5.7.3))(@vue/composition-api@1.7.2(vue@2.7.16))(typescript@5.7.3)(vue@2.7.16)
       axios:
         specifier: ^0.25.0
         version: 0.25.0
@@ -1082,13 +1073,13 @@ importers:
         specifier: 1.5.9
         version: 1.5.9(@tmagic/core@1.5.9(typescript@5.7.3))(typescript@5.7.3)
       '@tmagic/vue-runtime-help':
-        specifier: ^0.1.4
-        version: 0.1.5(@tmagic/core@1.5.9(typescript@5.7.3))(@tmagic/stage@1.5.9(@tmagic/core@1.5.9(typescript@5.7.3))(typescript@5.7.3))(@vue/composition-api@1.7.2(vue@3.5.13(typescript@5.7.3)))(typescript@5.7.3)(vue@3.5.13(typescript@5.7.3))
+        specifier: ^1.0.0
+        version: 1.0.0(@tmagic/core@1.5.9(typescript@5.7.3))(@tmagic/stage@1.5.9(@tmagic/core@1.5.9(typescript@5.7.3))(typescript@5.7.3))(@vue/composition-api@1.7.2(vue@3.5.13(typescript@5.7.3)))(typescript@5.7.3)(vue@3.5.13(typescript@5.7.3))
       axios:
         specifier: ^0.25.0
         version: 0.25.0
       vue:
-        specifier: '>=3.5.0'
+        specifier: ^3.5.0
         version: 3.5.13(typescript@5.7.3)
     devDependencies:
       '@tmagic/cli':
@@ -2866,20 +2857,17 @@ packages:
       typescript:
         optional: true
 
-  '@tmagic/react-runtime-help@0.0.3':
-    resolution: {integrity: sha512-ZxoxTO+NEk8pVzgAysQW3B790rYY8HVXXE6JlhSZeF/P+vL9PWGZjZDImRiuHxR+EMLNq5lUrf5iWF9Tg4ho+w==}
+  '@tmagic/react-runtime-help@0.0.4':
+    resolution: {integrity: sha512-H6WnitSMQUjZ4ArkO/a70l0GIqmTP+n+416PIvbCEVaVb5M8cBk72h3rTvwVp3CGFptLo/OYooyw7hO1ofVmCw==}
     engines: {node: '>=18'}
     peerDependencies:
-      '@tmagic/core': ^1.5.0-beta.4
-      '@tmagic/data-source': ^1.5.0-beta.4
-      '@tmagic/schema': ^1.5.0-beta.4
-      '@tmagic/stage': ^1.5.0-beta.4
-      '@tmagic/utils': ^1.5.0-beta.4
+      '@tmagic/core': '>=1.5.0'
+      '@tmagic/stage': '>=1.5.0'
       lodash-es: ^4.17.21
       react: '>=18.3.1'
       typescript: '*'
     peerDependenciesMeta:
-      '@tmagic/schema':
+      '@tmagic/core':
         optional: true
       '@tmagic/stage':
         optional: true
@@ -2985,12 +2973,12 @@ packages:
       typescript:
         optional: true
 
-  '@tmagic/vue-runtime-help@0.1.5':
-    resolution: {integrity: sha512-cBKqJYCND8I3DiNz8ENHa0kER+5zeuWhGISimglCddGcrAcg9+eloXZnFA8p4c4VzOrM8tqw+30gYUKMVZJ/UQ==}
+  '@tmagic/vue-runtime-help@1.0.0':
+    resolution: {integrity: sha512-dRNW56m7t9e+fDHVOgONz8xBI60rgCY+gxekyVP3oBq0JU8Sviuv8KVhM2YiMiTja6C/xTwBENSQLocYLV2UOw==}
     engines: {node: '>=18'}
     peerDependencies:
-      '@tmagic/core': '>=1.5.0-beta.14'
-      '@tmagic/stage': '>=1.5.0-beta.14'
+      '@tmagic/core': '>=1.5.0'
+      '@tmagic/stage': '>=1.5.0'
       '@vue/composition-api': '>=1.7.2'
       typescript: '*'
       vue: '>=2.6.0 || >=3.5.0'
@@ -8450,15 +8438,12 @@ snapshots:
     optionalDependencies:
       typescript: 5.7.3
 
-  '@tmagic/react-runtime-help@0.0.3(@tmagic/core@1.5.9(typescript@5.7.3))(@tmagic/data-source@1.5.9(@tmagic/core@1.5.9(typescript@5.7.3))(typescript@5.7.3))(@tmagic/schema@1.5.9(typescript@5.7.3))(@tmagic/stage@1.5.9(@tmagic/core@1.5.9(typescript@5.7.3))(typescript@5.7.3))(@tmagic/utils@1.5.9(@tmagic/schema@1.5.9(typescript@5.7.3))(typescript@5.7.3))(lodash-es@4.17.21)(react@18.3.1)(typescript@5.7.3)':
+  '@tmagic/react-runtime-help@0.0.4(@tmagic/core@1.5.9(typescript@5.7.3))(@tmagic/stage@1.5.9(@tmagic/core@1.5.9(typescript@5.7.3))(typescript@5.7.3))(lodash-es@4.17.21)(react@18.3.1)(typescript@5.7.3)':
     dependencies:
-      '@tmagic/core': 1.5.9(typescript@5.7.3)
-      '@tmagic/data-source': 1.5.9(@tmagic/core@1.5.9(typescript@5.7.3))(typescript@5.7.3)
-      '@tmagic/utils': 1.5.9(@tmagic/schema@1.5.9(typescript@5.7.3))(typescript@5.7.3)
       lodash-es: 4.17.21
       react: 18.3.1
     optionalDependencies:
-      '@tmagic/schema': 1.5.9(typescript@5.7.3)
+      '@tmagic/core': 1.5.9(typescript@5.7.3)
       '@tmagic/stage': 1.5.9(@tmagic/core@1.5.9(typescript@5.7.3))(typescript@5.7.3)
       typescript: 5.7.3
 
@@ -8576,7 +8561,7 @@ snapshots:
     optionalDependencies:
       typescript: 5.7.3
 
-  '@tmagic/vue-runtime-help@0.1.5(@tmagic/core@1.5.9(typescript@5.7.3))(@tmagic/stage@1.5.9(@tmagic/core@1.5.9(typescript@5.7.3))(typescript@5.7.3))(@vue/composition-api@1.7.2(vue@2.7.16))(typescript@5.7.3)(vue@2.7.16)':
+  '@tmagic/vue-runtime-help@1.0.0(@tmagic/core@1.5.9(typescript@5.7.3))(@tmagic/stage@1.5.9(@tmagic/core@1.5.9(typescript@5.7.3))(typescript@5.7.3))(@vue/composition-api@1.7.2(vue@2.7.16))(typescript@5.7.3)(vue@2.7.16)':
     dependencies:
       vue: 2.7.16
       vue-demi: 0.14.10(@vue/composition-api@1.7.2(vue@2.7.16))(vue@2.7.16)
@@ -8586,7 +8571,7 @@ snapshots:
       '@vue/composition-api': 1.7.2(vue@2.7.16)
       typescript: 5.7.3
 
-  '@tmagic/vue-runtime-help@0.1.5(@tmagic/core@1.5.9(typescript@5.7.3))(@tmagic/stage@1.5.9(@tmagic/core@1.5.9(typescript@5.7.3))(typescript@5.7.3))(@vue/composition-api@1.7.2(vue@3.5.13(typescript@5.7.3)))(typescript@5.7.3)(vue@3.5.13(typescript@5.7.3))':
+  '@tmagic/vue-runtime-help@1.0.0(@tmagic/core@1.5.9(typescript@5.7.3))(@tmagic/stage@1.5.9(@tmagic/core@1.5.9(typescript@5.7.3))(typescript@5.7.3))(@vue/composition-api@1.7.2(vue@3.5.13(typescript@5.7.3)))(typescript@5.7.3)(vue@3.5.13(typescript@5.7.3))':
     dependencies:
       vue: 3.5.13(typescript@5.7.3)
       vue-demi: 0.14.10(@vue/composition-api@1.7.2(vue@3.5.13(typescript@5.7.3)))(vue@3.5.13(typescript@5.7.3))
