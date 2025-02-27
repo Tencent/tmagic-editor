@@ -263,7 +263,7 @@ const moveableOptions = (config?: CustomizeMoveableOptionsCallbackConfig): Movea
 
 const save = () => {
   localStorage.setItem(
-    'magicDSL2',
+    'magicDSL',
     serialize(toRaw(value.value), {
       space: 2,
       unsafe: true,
@@ -290,7 +290,7 @@ asyncLoadJs(`${VITE_ENTRY_PATH}/ds-value/index.umd.cjs`).then(() => {
 
 try {
   // eslint-disable-next-line no-eval
-  const magicDSL = eval(`(${localStorage.getItem('magicDSL2')})`);
+  const magicDSL = eval(`(${localStorage.getItem('magicDSL')})`);
   if (!magicDSL) {
     save();
   } else {
