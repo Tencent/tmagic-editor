@@ -2,21 +2,14 @@
   <div v-if="display(config)" :class="className" :style="style">
     <slot>
       <template v-for="(item, index) in config.items">
-        <component
+        <ItemComponent
           v-if="display(item)"
           :key="item.id"
-          :is="useComponent({ componentType: item.type, app })"
-          :data-tmagic-id="item.id"
-          :data-tmagic-iterator-index="iteratorIndex"
-          :data-tmagic-iterator-container-id="iteratorContainerId"
-          :data-container-index="index"
-          :class="item.className ? `${item.className} magic-ui-${toLine(item.type)}` : `magic-ui-${toLine(item.type)}`"
-          :style="app?.transformStyle(item.style || {})"
-          :config="{ ...item, [IS_DSL_NODE_KEY]: true }"
-          :container-index="index"
+          :config="item"
+          :index="index"
           :iterator-index="iteratorIndex"
           :iterator-container-id="iteratorContainerId"
-        ></component>
+        ></ItemComponent>
       </template>
     </slot>
   </div>
@@ -26,8 +19,10 @@
 import { computed, defineComponent, type PropType } from 'vue-demi';
 
 import type { Id, MContainer } from '@tmagic/core';
-import { IS_DSL_NODE_KEY, toLine } from '@tmagic/core';
-import { useApp, useComponent } from '@tmagic/vue-runtime-help';
+import { IS_DSL_NODE_KEY } from '@tmagic/core';
+import { useApp } from '@tmagic/vue-runtime-help';
+
+import ItemComponent from './Component';
 
 interface ContainerSchema extends Omit<MContainer, 'id'> {
   id?: Id;
@@ -35,18 +30,28 @@ interface ContainerSchema extends Omit<MContainer, 'id'> {
 }
 
 export default defineComponent({
+  name: 'tmagic-container',
+
   props: {
     config: {
       type: Object as PropType<ContainerSchema>,
       required: true,
     },
-    iteratorIndex: Array as PropType<number[]>,
-    iteratorContainerId: Array as PropType<Id[]>,
+    iteratorIndex: {
+      type: Array as PropType<number[]>,
+      default: () => [],
+    },
+    iteratorContainerId: {
+      type: Array as PropType<Id[]>,
+      default: () => [],
+    },
     model: {
       type: Object,
       default: () => ({}),
     },
   },
+
+  components: { ItemComponent },
 
   setup(props) {
     const { display, app } = useApp({
@@ -78,11 +83,8 @@ export default defineComponent({
       app,
       className,
       style,
-      IS_DSL_NODE_KEY,
 
       display,
-      toLine,
-      useComponent,
     };
   },
 });
