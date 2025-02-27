@@ -19,6 +19,7 @@
 import Vue from 'vue';
 
 import TMagicApp, { DataSourceManager, DeepObservedData } from '@tmagic/core';
+import type { userRenderFunctionOptions } from '@tmagic/vue-runtime-help';
 
 import App from './App.vue';
 
@@ -61,6 +62,10 @@ Promise.all([
     render: (h) => h(App),
     provide: {
       app,
+      userRender: ({ h, type, props, attrs, style, className }: userRenderFunctionOptions) =>
+        // class作为保留字符，android 4.4以下不能直接使用, 需要加引号
+        // eslint-disable-next-line prettier/prettier
+        h(type, { props, attrs, style, 'class': className }),
     },
     el: '#app',
   });

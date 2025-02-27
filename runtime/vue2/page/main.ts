@@ -19,6 +19,7 @@
 import Vue from 'vue';
 
 import TMagicApp, { DataSourceManager, DeepObservedData, getUrlParam, registerDataSourceOnDemand } from '@tmagic/core';
+import type { userRenderFunctionOptions } from '@tmagic/vue-runtime-help';
 
 import asyncDataSources from '../.tmagic/async-datasource-entry';
 import components from '../.tmagic/comp-entry';
@@ -64,6 +65,10 @@ registerDataSourceOnDemand(dsl, asyncDataSources).then((dataSources) => {
   const vueApp = new Vue({
     provide: {
       app,
+      userRender: ({ h, type, props, attrs, style, className }: userRenderFunctionOptions) =>
+        // class作为保留字符，android 4.4以下不能直接使用, 需要加引号
+        // eslint-disable-next-line prettier/prettier
+        h(type, { props, attrs, style, 'class': className }),
     },
 
     render: (h) => h(AppComponent),
