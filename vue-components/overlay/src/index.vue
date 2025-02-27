@@ -16,6 +16,8 @@ interface OverlaySchema extends Omit<MContainer, 'id'> {
 }
 
 export default defineComponent({
+  name: 'tmagic-overlay',
+
   props: {
     config: {
       type: Object as PropType<OverlaySchema>,

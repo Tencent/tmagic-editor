@@ -17,6 +17,8 @@ import { type Id, type MComponent, type MNode, NodeType } from '@tmagic/core';
 import { useApp, useComponent } from '@tmagic/vue-runtime-help';
 
 export default defineComponent({
+  name: 'tmagic-page-fragment-container',
+
   props: {
     config: {
       type: Object as PropType<MComponent>,

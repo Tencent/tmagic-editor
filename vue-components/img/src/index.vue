@@ -16,6 +16,8 @@ interface ImgSchema extends Omit<MComponent, 'id'> {
 }
 
 export default defineComponent({
+  name: 'tmagic-img',
+
   props: {
     config: {
       type: Object as PropType<ImgSchema>,

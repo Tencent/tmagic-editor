@@ -19,6 +19,8 @@ interface ButtonSchema extends Omit<MComponent, 'id'> {
 }
 
 export default defineComponent({
+  name: 'tmagic-button',
+
   props: {
     config: {
       type: Object as PropType<ButtonSchema>,

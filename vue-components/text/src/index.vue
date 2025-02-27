@@ -15,6 +15,8 @@ interface TextSchema extends Omit<MComponent, 'id'> {
 }
 
 export default defineComponent({
+  name: 'tmagic-text',
+
   props: {
     config: {
       type: Object as PropType<TextSchema>,

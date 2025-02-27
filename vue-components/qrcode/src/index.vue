@@ -16,6 +16,8 @@ interface QrCodeSchema extends Omit<MComponent, 'id'> {
 }
 
 export default defineComponent({
+  name: 'tmagic-qrcode',
+
   props: {
     config: {
       type: Object as PropType<QrCodeSchema>,

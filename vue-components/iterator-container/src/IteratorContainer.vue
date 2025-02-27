@@ -31,6 +31,8 @@ interface IteratorItemSchema {
 }
 
 export default defineComponent({
+  name: 'tmagic-iterator-container',
+
   props: {
     config: {
       type: Object as PropType<IteratorContainerSchema>,

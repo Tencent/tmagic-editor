@@ -15,6 +15,8 @@ import type { MPageFragment } from '@tmagic/core';
 import { useApp, useComponent } from '@tmagic/vue-runtime-help';
 
 export default defineComponent({
+  name: 'tmagic-page-fragment',
+
   props: {
     config: {
       type: Object as PropType<MPageFragment>,

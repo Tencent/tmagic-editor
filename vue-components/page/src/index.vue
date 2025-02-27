@@ -31,6 +31,8 @@ const createJs = (config: MPage) => {
 };
 
 export default defineComponent({
+  name: 'tmagic-page',
+
   props: {
     config: {
       type: Object as PropType<MPage>,
