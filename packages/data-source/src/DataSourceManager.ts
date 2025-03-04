@@ -32,9 +32,15 @@ import { compiledNodeField, compliedConditions, compliedIteratorItem, createIter
 class DataSourceManager extends EventEmitter {
   private static dataSourceClassMap = new Map<string, typeof DataSource>();
   private static ObservedDataClass: ObservedDataClass = SimpleObservedData;
+  private static waitInitSchemaList = new Map<DataSourceManager, DataSourceSchema[]>();
 
   public static register<T extends typeof DataSource = typeof DataSource>(type: string, dataSource: T) {
     DataSourceManager.dataSourceClassMap.set(type, dataSource);
+    DataSourceManager.waitInitSchemaList?.forEach((list, app) => {
+      for (let config = list.shift(); config; config = list.shift()) {
+        app.addDataSource(config);
+      }
+    });
   }
 
   public static getDataSourceClass(type: string) {
@@ -54,6 +60,8 @@ class DataSourceManager extends EventEmitter {
 
   constructor({ app, useMock, initialData }: DataSourceManagerOptions) {
     super();
+
+    DataSourceManager.waitInitSchemaList.set(this, []);
 
     this.app = app;
     this.useMock = useMock;
@@ -133,7 +141,12 @@ class DataSourceManager extends EventEmitter {
   public async addDataSource(config?: DataSourceSchema) {
     if (!config) return;
 
-    const DataSourceClass = DataSourceManager.dataSourceClassMap.get(config.type) || DataSource;
+    const DataSourceClass = DataSourceManager.dataSourceClassMap.get(config.type);
+
+    if (!DataSourceClass) {
+      DataSourceManager.waitInitSchemaList.get(this)?.push(config);
+      return;
+    }
 
     const ds = new DataSourceClass({
       app: this.app,
@@ -276,6 +289,7 @@ class DataSourceManager extends EventEmitter {
       ds.destroy();
     });
     this.dataSourceMap.clear();
+    DataSourceManager.waitInitSchemaList.delete(this);
   }
 
   public onDataChange(id: string, path: string, callback: (newVal: any) => void) {
@@ -288,5 +302,6 @@ class DataSourceManager extends EventEmitter {
 }
 
 DataSourceManager.register('http', HttpDataSource as any);
+DataSourceManager.register('base', DataSource as any);
 
 export default DataSourceManager;
