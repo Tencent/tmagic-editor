@@ -1,4 +1,4 @@
-import { computed, type Ref } from 'vue';
+import { computed, type Ref, watch } from 'vue';
 
 import { Protocol } from '@editor/services/storage';
 import { Services } from '@editor/type';
@@ -20,6 +20,15 @@ export const useStylePanel = (
   const showStylePanel = computed(() => showStylePanelToggleButton.value && (uiService.get('showStylePanel') ?? true));
 
   const showStylePanelToggleButton = computed(() => uiService.get('frameworkRect').width >= 1280);
+
+  watch(
+    () => uiService.get('frameworkRect').width,
+    () => {
+      if (uiService.get('columnWidth').right < propsPanelWidth.value) {
+        toggleStylePanel(false);
+      }
+    },
+  );
 
   const toggleStylePanel = (showStylePanel: boolean) => {
     uiService.set('showStylePanel', showStylePanel);

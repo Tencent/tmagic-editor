@@ -171,7 +171,7 @@ const propsPanelWidth = ref(
 );
 
 onMounted(() => {
-  propsPanelEl.value?.style.setProperty('--props-style-panel-width', `${propsPanelWidth.value}px`);
+  propsPanelEl.value?.style.setProperty('--props-style-panel-width', `${Math.max(propsPanelWidth.value, 0)}px`);
 });
 
 const widthChange = ({ deltaX }: OnDrag) => {
@@ -187,7 +187,7 @@ const widthChange = ({ deltaX }: OnDrag) => {
   if (value > uiService.get('columnWidth').right) {
     value = uiService.get('columnWidth').right - 40;
   }
-  propsPanelWidth.value = value;
+  propsPanelWidth.value = Math.max(value, 0);
 };
 
 watch(propsPanelWidth, (value) => {
