@@ -102,8 +102,9 @@ class Node extends EventEmitter {
       const { codeType = HookCodeType.CODE, codeId, params: itemParams = {} } = item;
 
       let functionContent: ((...args: any[]) => any) | string | undefined;
-      const functionParams: { app: TMagicApp; params: Record<string, any>; dataSource?: DataSource } = {
+      const functionParams: { app: TMagicApp; node: Node; params: Record<string, any>; dataSource?: DataSource } = {
         app: this.app,
+        node: this,
         params: params || itemParams,
       };
 
