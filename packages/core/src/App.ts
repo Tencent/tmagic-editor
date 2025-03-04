@@ -144,7 +144,12 @@ class App extends EventEmitter {
     this.dataSourceManager = createDataSourceManager(this, this.useMock);
 
     this.codeDsl = config.codeBlocks;
-    this.setPage(curPage || this.page?.data?.id);
+
+    const pageId = curPage || this.page?.data?.id;
+
+    super.emit('dsl-change', { dsl: config, curPage: pageId });
+
+    this.setPage(pageId);
 
     if (this.dataSourceManager) {
       const dataSourceList = Array.from(this.dataSourceManager.dataSourceMap.values());
@@ -162,19 +167,22 @@ class App extends EventEmitter {
       return;
     }
 
-    if (pageConfig === this.page?.data) return;
-
-    this.page?.destroy();
+    if (this.page) {
+      if (pageConfig === this.page.data) return;
+      this.page.destroy();
+    }
 
     this.page = new Page({
       config: pageConfig,
       app: this,
     });
 
-    this.eventHelper?.removeNodeEvents();
-    this.page.nodes.forEach((node) => {
-      this.eventHelper?.bindNodeEvents(node);
-    });
+    if (this.eventHelper) {
+      this.eventHelper.removeNodeEvents();
+      for (const [, node] of this.page.nodes) {
+        this.eventHelper.bindNodeEvents(node);
+      }
+    }
 
     super.emit('page-change', this.page);
   }
