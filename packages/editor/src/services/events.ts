@@ -19,10 +19,8 @@
 import { reactive } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
-import { DEFAULT_EVENTS, DEFAULT_METHODS, EventOption } from '@tmagic/core';
+import { type EventOption } from '@tmagic/core';
 import { toLine } from '@tmagic/utils';
-
-import type { ComponentGroup } from '@editor/type';
 
 import BaseService from './BaseService';
 
@@ -34,20 +32,6 @@ class Events extends BaseService {
     super([]);
   }
 
-  public init(componentGroupList: ComponentGroup[]) {
-    componentGroupList.forEach((group) => {
-      group.items.forEach((element) => {
-        const type = toLine(element.type);
-        if (!this.getEvent(type)) {
-          this.setEvent(type, DEFAULT_EVENTS);
-        }
-        if (!this.getMethod(type)) {
-          this.setMethod(type, DEFAULT_METHODS);
-        }
-      });
-    });
-  }
-
   public setEvents(events: Record<string, EventOption[]>) {
     Object.keys(events).forEach((type: string) => {
       this.setEvent(toLine(type), events[type] || []);
@@ -55,11 +39,11 @@ class Events extends BaseService {
   }
 
   public setEvent(type: string, events: EventOption[]) {
-    eventMap[toLine(type)] = [...DEFAULT_EVENTS, ...events];
+    eventMap[toLine(type)] = [...events];
   }
 
   public getEvent(type: string): EventOption[] {
-    return cloneDeep(eventMap[toLine(type)] || DEFAULT_EVENTS);
+    return cloneDeep(eventMap[toLine(type)]) || [];
   }
 
   public setMethods(methods: Record<string, EventOption[]>) {
@@ -69,11 +53,11 @@ class Events extends BaseService {
   }
 
   public setMethod(type: string, method: EventOption[]) {
-    methodMap[toLine(type)] = [...DEFAULT_METHODS, ...method];
+    methodMap[toLine(type)] = [...method];
   }
 
   public getMethod(type: string) {
-    return cloneDeep(methodMap[toLine(type)] || DEFAULT_METHODS);
+    return cloneDeep(methodMap[toLine(type)]);
   }
 
   public resetState() {

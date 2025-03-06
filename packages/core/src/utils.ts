@@ -18,8 +18,6 @@
 import { JsEngine } from '@tmagic/schema';
 import { isNumber } from '@tmagic/utils';
 
-import type { default as TMagicNode } from './Node';
-
 export const style2Obj = (style: string) => {
   if (typeof style !== 'string') {
     return style;
@@ -119,47 +117,7 @@ export const transformStyle = (style: Record<string, any> | string, jsEngine: Js
 export const COMMON_EVENT_PREFIX = 'magic:common:events:';
 export const COMMON_METHOD_PREFIX = 'magic:common:actions:';
 
-export const CommonMethod = {
-  SHOW: 'show',
-  HIDE: 'hide',
-  SCROLL_TO_VIEW: 'scrollIntoView',
-  SCROLL_TO_TOP: 'scrollToTop',
-};
-
-export const isCommonMethod = (methodName: string) => methodName.startsWith(COMMON_METHOD_PREFIX);
-
-export const triggerCommonMethod = (methodName: string, node: TMagicNode) => {
-  const { instance } = node;
-
-  if (!instance) return;
-
-  switch (methodName.replace(COMMON_METHOD_PREFIX, '')) {
-    case CommonMethod.SHOW:
-      instance.show();
-      break;
-
-    case CommonMethod.HIDE:
-      instance.hide();
-      break;
-
-    case CommonMethod.SCROLL_TO_VIEW:
-      instance.$el?.scrollIntoView({ behavior: 'smooth' });
-      break;
-
-    case CommonMethod.SCROLL_TO_TOP:
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      break;
-
-    default:
-      break;
-  }
-};
-
 export interface EventOption {
   label: string;
   value: string;
 }
-
-export const DEFAULT_EVENTS: EventOption[] = [{ label: '点击', value: `${COMMON_EVENT_PREFIX}click` }];
-
-export const DEFAULT_METHODS: EventOption[] = [];

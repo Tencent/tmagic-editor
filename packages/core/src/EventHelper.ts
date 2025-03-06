@@ -32,38 +32,11 @@ import {
   type EventActionItem,
   type EventConfig,
 } from '@tmagic/schema';
-import { DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX, getIdFromEl } from '@tmagic/utils';
+import { DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX } from '@tmagic/utils';
 
 import type { default as TMagicApp } from './App';
 import FlowState from './FlowState';
 import type { default as TMagicNode } from './Node';
-import { COMMON_EVENT_PREFIX, isCommonMethod, triggerCommonMethod } from './utils';
-
-const getCommonEventName = (commonEventName: string) => {
-  if (commonEventName.startsWith(COMMON_EVENT_PREFIX)) return commonEventName;
-  return `${COMMON_EVENT_PREFIX}${commonEventName}`;
-};
-
-// 点击在组件内的某个元素上，需要向上寻找到当前组件
-const getDirectComponent = (element: HTMLElement | null, app: TMagicApp): TMagicNode | undefined => {
-  if (!element) {
-    return;
-  }
-
-  const id = getIdFromEl()(element);
-
-  if (!id) {
-    return getDirectComponent(element.parentElement, app);
-  }
-
-  const node = app.getNode(
-    id,
-    element.dataset.tmagicIteratorContainerId?.split(','),
-    element.dataset.tmagicIteratorIndex?.split(',').map((i) => globalThis.parseInt(i, 10)),
-  );
-
-  return node;
-};
 
 export default class EventHelper extends EventEmitter {
   public app: TMagicApp;
@@ -75,19 +48,11 @@ export default class EventHelper extends EventEmitter {
     super();
 
     this.app = app;
-
-    if (app.jsEngine === 'browser') {
-      globalThis.document.body.addEventListener('click', this.commonClickEventHandler);
-    }
   }
 
   public destroy() {
     this.removeNodeEvents();
     this.removeAllListeners();
-
-    if (this.app.jsEngine === 'browser') {
-      globalThis.document.body.removeEventListener('click', this.commonClickEventHandler);
-    }
   }
 
   public bindNodeEvents(node: TMagicNode) {
@@ -243,10 +208,6 @@ export default class EventHelper extends EventEmitter {
     const toNode = this.app.getNode(to);
     if (!toNode) throw `ID为${to}的组件不存在`;
 
-    if (isCommonMethod(methodName)) {
-      return triggerCommonMethod(methodName, toNode);
-    }
-
     if (toNode.instance) {
       if (typeof toNode.instance[methodName] === 'function') {
         await toNode.instance[methodName](fromCpt, ...args);
@@ -259,17 +220,4 @@ export default class EventHelper extends EventEmitter {
       });
     }
   }
-
-  private commonClickEventHandler = (e: MouseEvent) => {
-    if (!e.target) {
-      return;
-    }
-
-    const node = getDirectComponent(e.target as HTMLElement, this.app);
-
-    const eventName = `${getCommonEventName('click')}_${node?.data.id}`;
-    if (node?.eventKeys.has(eventName)) {
-      this.emit(node.eventKeys.get(eventName)!, node);
-    }
-  };
 }
