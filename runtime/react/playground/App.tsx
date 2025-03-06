@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 
 import type Core from '@tmagic/core';
 import type { MPage } from '@tmagic/core';
@@ -31,7 +31,12 @@ function App() {
 
   const MagicUiPage = app.resolveComponent('page');
 
-  return <MagicUiPage config={app?.page?.data as MPage}></MagicUiPage>;
+  useEffect(() => {
+    const page = document.querySelector(`div[data-tmagic-id=${app.page?.data.id}]`);
+    page && window.magic?.onPageElUpdate(page as HTMLElement);
+  });
+
+  return <MagicUiPage config={app.page.data as MPage}></MagicUiPage>;
 }
 
 export default App;

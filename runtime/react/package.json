@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@tmagic/core": "1.5.9",
-    "@tmagic/react-runtime-help": "0.0.4",
+    "@tmagic/react-runtime-help": "0.1.0",
     "@tmagic/stage": "1.5.9",
     "axios": "^0.25.0",
     "terser": "^5.31.6",
