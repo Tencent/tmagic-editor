@@ -19,6 +19,7 @@
 import React, { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 
+import { COMMON_EVENT_PREFIX } from '@tmagic/core';
 import { useApp } from '@tmagic/react-runtime-help';
 import type { Id, MComponent } from '@tmagic/schema';
 
@@ -47,7 +48,7 @@ const QrCode: React.FC<QrCodeProps> = ({
   iteratorIndex,
   iteratorContainerId,
 }) => {
-  const { app } = useApp({ config });
+  const { app, node } = useApp({ config });
 
   if (!app) return null;
 
@@ -60,6 +61,12 @@ const QrCode: React.FC<QrCodeProps> = ({
     });
   }, [config.url]);
 
+  const clickHandler = () => {
+    if (node && app) {
+      app.emit(`${COMMON_EVENT_PREFIX}click`, node);
+    }
+  };
+
   return (
     <img
       className={className}
@@ -69,6 +76,7 @@ const QrCode: React.FC<QrCodeProps> = ({
       data-tmagic-iterator-index={iteratorIndex}
       data-tmagic-iterator-container-id={iteratorContainerId}
       src={imgSrc}
+      onClick={clickHandler}
     />
   );
 };

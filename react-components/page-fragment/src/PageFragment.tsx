@@ -1,7 +1,7 @@
 import React from 'react';
 
+import { IS_DSL_NODE_KEY, type MPageFragment } from '@tmagic/core';
 import { useApp } from '@tmagic/react-runtime-help';
-import type { MPageFragment } from '@tmagic/schema';
 
 interface PageFragmentProps {
   config: MPageFragment;
@@ -21,7 +21,13 @@ const PageFragment: React.FC<PageFragmentProps> = ({ config }) => {
     classNames.push(config.className);
   }
 
-  return <MagicUiComp config={config} id={config.id} className={classNames.join(' ')}></MagicUiComp>;
+  return (
+    <MagicUiComp
+      config={{ ...config, [IS_DSL_NODE_KEY]: false }}
+      id={config.id}
+      className={classNames.join(' ')}
+    ></MagicUiComp>
+  );
 };
 
 PageFragment.displayName = 'magic-ui-page-fragment';

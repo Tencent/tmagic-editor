@@ -18,8 +18,9 @@
 
 import React from 'react';
 
-import { useApp } from '@tmagic/react-runtime-help';
-import type { MPage } from '@tmagic/schema';
+import type { MPage } from '@tmagic/core';
+import { IS_DSL_NODE_KEY } from '@tmagic/core';
+import { useApp, useComponentStatus } from '@tmagic/react-runtime-help';
 
 interface PageProps {
   config: MPage;
@@ -27,7 +28,7 @@ interface PageProps {
 
 const Page: React.FC<PageProps> = ({ config }) => {
   const { app } = useApp({
-    config,
+    config: { ...config, [IS_DSL_NODE_KEY]: true },
     methods: {
       refresh: () => window.location.reload(),
     },
@@ -37,12 +38,16 @@ const Page: React.FC<PageProps> = ({ config }) => {
 
   const MagicUiComp = app.resolveComponent('container');
 
-  const classNames = ['magic-ui-page'];
-  if (config.className) {
-    classNames.push(config.className);
-  }
+  const { style, className } = useComponentStatus({ config });
 
-  return <MagicUiComp config={config} id={config.id} className={classNames.join(' ')}></MagicUiComp>;
+  return (
+    <MagicUiComp
+      config={{ ...config, [IS_DSL_NODE_KEY]: false }}
+      id={config.id}
+      className={className}
+      style={style}
+    ></MagicUiComp>
+  );
 };
 
 Page.displayName = 'magic-ui-page';

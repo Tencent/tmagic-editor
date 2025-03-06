@@ -18,8 +18,8 @@
 
 import React, { useEffect, useState } from 'react';
 
+import { type Id, IS_DSL_NODE_KEY, type MComponent, type MContainer, type MNode, type MPage } from '@tmagic/core';
 import { useApp } from '@tmagic/react-runtime-help';
-import type { Id, MComponent, MContainer, MNode, MPage } from '@tmagic/schema';
 
 interface OverlayProps {
   config: MComponent;
@@ -93,11 +93,11 @@ const Overlay: React.FC<OverlayProps> = ({
 
   return (
     <MagicUiComp
-      id={id}
+      data-tmagic-id={`${id || config.id || ''}`}
       containerIndex={containerIndex}
       iteratorIndex={iteratorIndex}
       iteratorContainerId={iteratorContainerId}
-      config={config}
+      config={{ ...config, [IS_DSL_NODE_KEY]: false }}
       className={className}
       style={style}
     ></MagicUiComp>

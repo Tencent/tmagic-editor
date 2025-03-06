@@ -1,10 +1,8 @@
 <template>
-  <div v-if="display(config)" :class="className" :style="style">
+  <div @click="clickHandler">
     <slot>
-      <template v-for="(item, index) in config.items">
+      <template v-for="(item, index) in config.items" :key="item.id">
         <ItemComponent
-          v-if="display(item)"
-          :key="item.id"
           :config="item"
           :index="index"
           :iterator-index="iteratorIndex"
@@ -16,11 +14,11 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, type PropType } from 'vue-demi';
+import { defineComponent, inject, type PropType } from 'vue-demi';
 
-import type { Id, MContainer } from '@tmagic/core';
-import { IS_DSL_NODE_KEY } from '@tmagic/core';
-import { useApp } from '@tmagic/vue-runtime-help';
+import type TMagicApp from '@tmagic/core';
+import { COMMON_EVENT_PREFIX, type Id, type MContainer } from '@tmagic/core';
+import { registerNodeHooks, useNode } from '@tmagic/vue-runtime-help';
 
 import ItemComponent from './Component';
 
@@ -45,6 +43,7 @@ export default defineComponent({
       type: Array as PropType<Id[]>,
       default: () => [],
     },
+    containerIndex: Number,
     model: {
       type: Object,
       default: () => ({}),
@@ -54,37 +53,18 @@ export default defineComponent({
   components: { ItemComponent },
 
   setup(props) {
-    const { display, app } = useApp({
-      config: props.config,
-      iteratorContainerId: props.iteratorContainerId,
-      iteratorIndex: props.iteratorIndex,
-      methods: {},
-    });
+    const app = inject<TMagicApp>('app');
+    const node = useNode(props, app);
+    registerNodeHooks(node);
 
-    const className = computed(() => {
-      const list = ['magic-ui-container'];
-      if (props.config.layout) {
-        list.push(`magic-layout-${props.config.layout}`);
+    const clickHandler = () => {
+      if (app && node) {
+        app.emit(`${COMMON_EVENT_PREFIX}click`, node);
       }
-      if (props.config.className) {
-        list.push(props.config.className);
-      }
-      return list.join(' ');
-    });
-
-    const style = computed(() => {
-      if (props.config[IS_DSL_NODE_KEY]) {
-        return {};
-      }
-      return app?.transformStyle(props.config.style || {});
-    });
+    };
 
     return {
-      app,
-      className,
-      style,
-
-      display,
+      clickHandler,
     };
   },
 });

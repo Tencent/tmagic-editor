@@ -1,8 +1,13 @@
 import React from 'react';
 
-import type { IteratorContainer as TMagicIteratorContainer } from '@tmagic/core';
+import {
+  COMMON_EVENT_PREFIX,
+  type Id,
+  type IteratorContainer as TMagicIteratorContainer,
+  type MIteratorContainer,
+  type MNode,
+} from '@tmagic/core';
 import { useApp } from '@tmagic/react-runtime-help';
-import type { Id, MIteratorContainer, MNode } from '@tmagic/schema';
 
 interface IteratorContainerSchema extends Omit<MIteratorContainer, 'id'> {
   id?: Id;
@@ -36,7 +41,7 @@ const IteratorContainer: React.FC<IteratorContainerProps> = ({
   iteratorIndex,
   iteratorContainerId,
 }) => {
-  const { app } = useApp({ config, iteratorIndex, iteratorContainerId });
+  const { app, node } = useApp({ config, iteratorIndex, iteratorContainerId });
 
   let { iteratorData = [] } = config;
   const { itemConfig, dsField, items } = config;
@@ -81,6 +86,12 @@ const IteratorContainer: React.FC<IteratorContainerProps> = ({
     };
   });
 
+  const clickHandler = () => {
+    if (node && app) {
+      app.emit(`${COMMON_EVENT_PREFIX}click`, node);
+    }
+  };
+
   return (
     <div
       className={className}
@@ -89,6 +100,7 @@ const IteratorContainer: React.FC<IteratorContainerProps> = ({
       data-container-index={containerIndex}
       data-iterator-index={iteratorIndex}
       data-iterator-container-id={iteratorContainerId}
+      onClick={clickHandler}
     >
       {configs.map((config: any, index: number) => (
         <MagicUiComp

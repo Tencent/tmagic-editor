@@ -6,7 +6,7 @@
 import { defineComponent, type PropType } from 'vue-demi';
 
 import type { Id, MComponent } from '@tmagic/core';
-import { useApp } from '@tmagic/vue-runtime-help';
+import { registerNodeHooks, useNode } from '@tmagic/vue-runtime-help';
 
 interface ImgSchema extends Omit<MComponent, 'id'> {
   id?: Id;
@@ -25,6 +25,7 @@ export default defineComponent({
     },
     iteratorIndex: Array as PropType<number[]>,
     iteratorContainerId: Array as PropType<Id[]>,
+    containerIndex: Number,
     model: {
       type: Object,
       default: () => ({}),
@@ -36,12 +37,8 @@ export default defineComponent({
       if (props.config.url) window.location.href = props.config.url;
     };
 
-    useApp({
-      config: props.config,
-      iteratorContainerId: props.iteratorContainerId,
-      iteratorIndex: props.iteratorIndex,
-      methods: {},
-    });
+    const node = useNode(props);
+    registerNodeHooks(node);
 
     return {
       clickHandler,

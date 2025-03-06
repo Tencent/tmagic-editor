@@ -18,8 +18,9 @@
 
 import React from 'react';
 
+import type { Id, MComponent } from '@tmagic/core';
+import { COMMON_EVENT_PREFIX } from '@tmagic/core';
 import { useApp } from '@tmagic/react-runtime-help';
-import type { Id, MComponent } from '@tmagic/schema';
 
 interface ButtonSchema extends Omit<MComponent, 'id'> {
   id?: Id;
@@ -35,6 +36,7 @@ interface ButtonProps {
   containerIndex: number;
   iteratorIndex?: number[];
   iteratorContainerId?: Id[];
+  onClick: any;
 }
 
 const Page: React.FC<ButtonProps> = ({
@@ -46,9 +48,15 @@ const Page: React.FC<ButtonProps> = ({
   iteratorIndex,
   iteratorContainerId,
 }) => {
-  const { app } = useApp({ config, iteratorIndex, iteratorContainerId });
+  const { app, node } = useApp({ config, iteratorIndex, iteratorContainerId });
 
   if (!app) return null;
+
+  const clickHandler = () => {
+    if (node && app) {
+      app.emit(`${COMMON_EVENT_PREFIX}click`, node);
+    }
+  };
 
   return (
     <button
@@ -58,6 +66,7 @@ const Page: React.FC<ButtonProps> = ({
       data-tmagic-container-index={containerIndex}
       data-tmagic-iterator-index={iteratorIndex}
       data-tmagic-iterator-container-id={iteratorContainerId}
+      onClick={clickHandler}
     >
       {config.text || ''}
     </button>

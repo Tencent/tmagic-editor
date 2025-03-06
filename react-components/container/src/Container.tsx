@@ -18,9 +18,11 @@
 
 import React from 'react';
 
+import type { Id, MContainer, MNode } from '@tmagic/core';
+import { COMMON_EVENT_PREFIX } from '@tmagic/core';
 import { useApp } from '@tmagic/react-runtime-help';
-import type { Id, MContainer, MNode } from '@tmagic/schema';
-import { IS_DSL_NODE_KEY } from '@tmagic/utils';
+
+import Component from './Component';
 
 interface ContainerSchema extends Omit<MContainer, 'id'> {
   id?: Id;
@@ -28,71 +30,53 @@ interface ContainerSchema extends Omit<MContainer, 'id'> {
 }
 
 interface ContainerProps {
+  id?: Id;
   config: ContainerSchema;
   className: string;
   style: Record<string, any>;
-  id: string;
   containerIndex: number;
   iteratorIndex: number[];
   iteratorContainerId: Id[];
 }
 
 const Container: React.FC<ContainerProps> = ({
-  config,
   id,
-  style,
+  config,
   className,
   containerIndex,
+  style,
   iteratorIndex,
   iteratorContainerId,
 }) => {
-  const { app, display } = useApp({ config });
+  const { app, node } = useApp({ config });
 
   if (!app) return null;
 
-  const classNames = config[IS_DSL_NODE_KEY] ? [] : ['magic-ui-container'];
-  if (config.layout) {
-    classNames.push(`magic-layout-${config.layout}`);
-  }
-  if (className) {
-    classNames.push(className);
-  }
+  const clickHandler = () => {
+    if (node && app) {
+      app.emit(`${COMMON_EVENT_PREFIX}click`, node);
+    }
+  };
 
   return (
     <div
-      data-tmagic-id={`${id || ''}`}
+      data-tmagic-id={`${id || config.id || ''}`}
       data-container-index={containerIndex}
       data-tmagic-iterator-index={iteratorIndex}
       data-tmagic-iterator-container-id={iteratorContainerId}
-      className={classNames.join(' ')}
-      style={config[IS_DSL_NODE_KEY] ? style : app.transformStyle(config.style || {})}
+      className={className}
+      style={style}
+      onClick={clickHandler}
     >
-      {config.items?.map((item: MNode, index: number) => {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        const MagicUiComp = app.resolveComponent(item.type || 'container');
-
-        if (!MagicUiComp) return null;
-
-        if (!display(item)) return null;
-
-        const itemClassName = [`magic-ui-${item.type}`];
-        if (item.className) {
-          itemClassName.push(item.className);
-        }
-
-        return (
-          <MagicUiComp
-            id={`${item.id || ''}`}
-            containerIndex={index}
-            iteratorIndex={iteratorIndex}
-            iteratorContainerId={iteratorContainerId}
-            key={item.id ?? index}
-            config={{ ...item, [IS_DSL_NODE_KEY]: true }}
-            className={itemClassName.join(' ')}
-            style={app.transformStyle(item.style || {})}
-          ></MagicUiComp>
-        );
-      })}
+      {config.items?.map((item: MNode, index: number) => (
+        <Component
+          key={item.id ?? index}
+          config={item}
+          index={index}
+          iteratorIndex={iteratorIndex}
+          iteratorContainerId={iteratorContainerId}
+        />
+      ))}
     </div>
   );
 };

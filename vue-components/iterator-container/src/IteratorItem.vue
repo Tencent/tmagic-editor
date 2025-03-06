@@ -1,10 +1,11 @@
 <template>
   <component
     :is="containerComponent"
-    :class="className"
     :style="style"
-    :data-tmagic-id="config.id"
-    :config="{ ...config, [IS_DSL_NODE_KEY]: false }"
+    :class="className"
+    :config="config"
+    :iterator-index="iteratorIndex"
+    :iterator-container-id="iteratorContainerId"
   ></component>
 </template>
 
@@ -12,17 +13,23 @@
 import { defineComponent, inject, type PropType } from 'vue-demi';
 
 import type TMagicApp from '@tmagic/core';
-import { IS_DSL_NODE_KEY, type MPageFragment } from '@tmagic/core';
-import { registerNodeHooks, useComponent, useComponentStatus, useNode } from '@tmagic/vue-runtime-help';
+import type { Id } from '@tmagic/core';
+import { useComponent, useComponentStatus } from '@tmagic/vue-runtime-help';
+
+import { IteratorItemSchema } from './type';
 
 export default defineComponent({
-  name: 'tmagic-page-fragment',
+  name: 'tmagic-iterator-container-item',
 
   props: {
     config: {
-      type: Object as PropType<MPageFragment>,
+      type: Object as PropType<IteratorItemSchema>,
       required: true,
     },
+    iteratorIndex: Array as PropType<number[]>,
+    iteratorContainerId: Array as PropType<Id[]>,
+    containerIndex: Number,
+    index: Number,
     model: {
       type: Object,
       default: () => ({}),
@@ -31,16 +38,15 @@ export default defineComponent({
 
   setup(props) {
     const app = inject<TMagicApp>('app');
-    const node = useNode(props, app);
-    registerNodeHooks(node);
 
     const containerComponent = useComponent({ componentType: 'container', app });
+
     const { style, className } = useComponentStatus(props);
+
     return {
       style,
       className,
       containerComponent,
-      IS_DSL_NODE_KEY,
     };
   },
 });

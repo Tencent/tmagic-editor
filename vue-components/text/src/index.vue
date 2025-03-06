@@ -1,12 +1,15 @@
 <template>
-  <p>{{ config.text }}</p>
+  <p @click="clickHandler">
+    <slot>{{ config.text }}</slot>
+  </p>
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue-demi';
+import { defineComponent, inject, type PropType } from 'vue-demi';
 
-import type { Id, MComponent } from '@tmagic/core';
-import { useApp } from '@tmagic/vue-runtime-help';
+import type TMagicApp from '@tmagic/core';
+import { COMMON_EVENT_PREFIX, type Id, type MComponent } from '@tmagic/core';
+import { registerNodeHooks, useNode } from '@tmagic/vue-runtime-help';
 
 interface TextSchema extends Omit<MComponent, 'id'> {
   id?: Id;
@@ -24,6 +27,7 @@ export default defineComponent({
     },
     iteratorIndex: Array as PropType<number[]>,
     iteratorContainerId: Array as PropType<Id[]>,
+    containerIndex: Number,
     model: {
       type: Object,
       default: () => ({}),
@@ -31,12 +35,19 @@ export default defineComponent({
   },
 
   setup(props) {
-    useApp({
-      config: props.config,
-      methods: {},
-      iteratorContainerId: props.iteratorContainerId,
-      iteratorIndex: props.iteratorIndex,
-    });
+    const app = inject<TMagicApp>('app');
+    const node = useNode(props);
+    registerNodeHooks(node);
+
+    const clickHandler = () => {
+      if (app && node) {
+        app.emit(`${COMMON_EVENT_PREFIX}click`, node);
+      }
+    };
+
+    return {
+      clickHandler,
+    };
   },
 });
 </script>

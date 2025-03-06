@@ -18,8 +18,9 @@
 
 import React from 'react';
 
+import type { Id, MComponent } from '@tmagic/core';
+import { COMMON_EVENT_PREFIX } from '@tmagic/core';
 import { useApp } from '@tmagic/react-runtime-help';
-import type { Id, MComponent } from '@tmagic/schema';
 
 interface TextSchema extends Omit<MComponent, 'id'> {
   id?: Id;
@@ -46,18 +47,25 @@ const Text: React.FC<TextProps> = ({
   iteratorIndex,
   iteratorContainerId,
 }) => {
-  const { app } = useApp({ config, iteratorIndex, iteratorContainerId });
+  const { app, node } = useApp({ config, iteratorIndex, iteratorContainerId });
 
   if (!app) return null;
+
+  const clickHandler = () => {
+    if (node && app) {
+      app.emit(`${COMMON_EVENT_PREFIX}click`, node);
+    }
+  };
 
   return (
     <p
       className={className}
       style={style}
-      data-tmagic-id={id}
+      data-tmagic-id={`${id || config.id || ''}`}
       data-tmagic-container-index={containerIndex}
       data-tmagic-iterator-index={iteratorIndex}
       data-tmagic-iterator-container-id={iteratorContainerId}
+      onClick={clickHandler}
     >
       {config.text}
     </p>

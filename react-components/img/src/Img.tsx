@@ -18,8 +18,8 @@
 
 import React from 'react';
 
+import type { Id, MComponent } from '@tmagic/core';
 import { useApp } from '@tmagic/react-runtime-help';
-import type { Id, MComponent } from '@tmagic/schema';
 
 interface ImgSchema extends Omit<MComponent, 'id'> {
   id?: Id;

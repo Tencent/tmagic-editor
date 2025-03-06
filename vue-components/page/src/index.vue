@@ -1,12 +1,19 @@
 <template>
-  <component :is="containerComponent" class="magic-ui-page" :data-tmagic-id="config.id" :config="config"></component>
+  <component
+    :is="containerComponent"
+    :class="className"
+    :style="style"
+    :data-tmagic-id="config.id"
+    :config="{ ...config, [IS_DSL_NODE_KEY]: false }"
+  ></component>
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue-demi';
+import { defineComponent, inject, nextTick, type PropType, watch } from 'vue-demi';
 
-import { asyncLoadCss, asyncLoadJs, type MPage } from '@tmagic/core';
-import { useApp, useComponent } from '@tmagic/vue-runtime-help';
+import type TMagicApp from '@tmagic/core';
+import { asyncLoadCss, asyncLoadJs, IS_DSL_NODE_KEY, type MPage } from '@tmagic/core';
+import { useComponent, useComponentStatus, useNode } from '@tmagic/vue-runtime-help';
 
 const createCss = (config: MPage) => {
   if (config.cssFile) {
@@ -45,14 +52,7 @@ export default defineComponent({
   },
 
   setup(props) {
-    const refresh = () => {
-      window.location.reload();
-    };
-
-    const { app } = useApp({
-      config: props.config,
-      methods: { refresh },
-    });
+    const app = inject<TMagicApp>('app');
 
     if (app?.jsEngine === 'browser') {
       createCss(props.config);
@@ -61,8 +61,39 @@ export default defineComponent({
 
     const containerComponent = useComponent({ componentType: 'container', app });
 
+    const { style, className } = useComponentStatus(props);
+
+    const refresh = () => {
+      window.location.reload();
+    };
+
+    watch(
+      () => props.config,
+      async (config, preConfig) => {
+        const node = useNode({ config: { ...config, [IS_DSL_NODE_KEY]: true } }, app);
+
+        if (config.id !== preConfig?.id) {
+          node?.registerMethod({ refresh });
+          node?.emit('created');
+        }
+        await nextTick();
+
+        if (config.id !== preConfig?.id) {
+          node?.emit('mounted');
+          const preNode = useNode({ config: { ...preConfig, [IS_DSL_NODE_KEY]: true } }, app);
+          preNode?.emit('destroy');
+        }
+      },
+      {
+        immediate: true,
+      },
+    );
+
     return {
+      style,
+      className,
       containerComponent,
+      IS_DSL_NODE_KEY,
     };
   },
 });
