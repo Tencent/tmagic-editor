@@ -56,6 +56,10 @@ export default class StageRender extends EventEmitter {
   public getMagicApi = () => ({
     onPageElUpdate: (el: HTMLElement) => this.emit('page-el-update', el),
     onRuntimeReady: (runtime: Runtime) => {
+      if (this.runtime) {
+        return;
+      }
+
       this.runtime = runtime;
       // @ts-ignore
       globalThis.runtime = runtime;
