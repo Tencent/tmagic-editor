@@ -19,27 +19,74 @@
 import { useContext, useEffect, useState } from 'react';
 
 import type TMagicApp from '@tmagic/core';
-import type { Id, MNodeInstance } from '@tmagic/core';
+import type { Id, MNodeInstance, Node as TMagicNode } from '@tmagic/core';
 import { isDslNode } from '@tmagic/core';
 
 import AppContent from '../AppContent';
 
-interface UseAppOptions<T extends MNodeInstance = MNodeInstance> {
+interface Methods {
+  [key: string]: (...args: any[]) => any;
+}
+
+export interface UseAppOptions<T extends MNodeInstance = MNodeInstance> {
   config: T;
   iteratorContainerId?: Id[];
   iteratorIndex?: number[];
   methods?: {
-    [key: string]: Function;
+    [key: string]: (...args: any[]) => any;
   };
 }
+
+export const useNode = (
+  props: Pick<UseAppOptions, 'config' | 'iteratorContainerId' | 'iteratorIndex'>,
+  app = useContext(AppContent),
+) =>
+  isDslNode(props.config) && props.config.id
+    ? app?.getNode(props.config.id, props.iteratorContainerId, props.iteratorIndex)
+    : undefined;
+
+export const registerNodeHooks = (node?: TMagicNode, methods: Methods = {}) => {
+  if (!node) {
+    return;
+  }
+
+  const emitData = {
+    config: node.data,
+    ...methods,
+  };
+
+  const [created, setCreated] = useState(false);
+
+  if (!created) {
+    // 只需要触发一次 created
+    setCreated(true);
+    node?.emit('created', emitData);
+  }
+
+  useEffect(() => {
+    node?.emit('mounted', emitData);
+
+    return () => {
+      node?.emit('destroy', emitData);
+    };
+  }, []);
+};
 
 export const useApp = ({ methods = {}, config, iteratorContainerId, iteratorIndex }: UseAppOptions) => {
   const app: TMagicApp | undefined = useContext(AppContent);
 
-  const emitData = {
-    config,
-    ...methods,
-  };
+  const node = useNode(
+    {
+      config,
+      iteratorContainerId,
+      iteratorIndex,
+    },
+    app,
+  );
+
+  if (node) {
+    registerNodeHooks(node, methods);
+  }
 
   const display = <T extends MNodeInstance>(config: T) => {
     if (config.visible === false) return false;
@@ -48,30 +95,11 @@ export const useApp = ({ methods = {}, config, iteratorContainerId, iteratorInde
     const displayCfg = config.display;
 
     if (typeof displayCfg === 'function') {
-      return displayCfg(app);
+      return displayCfg({ app, node });
     }
 
     return displayCfg !== false;
   };
-
-  const node = isDslNode(config) && config.id ? app?.getNode(config.id, iteratorContainerId, iteratorIndex) : undefined;
-  const [created, setCreated] = useState(false);
-
-  if (node) {
-    if (!created) {
-      // 只需要触发一次 created
-      setCreated(true);
-      node?.emit('created', emitData);
-    }
-
-    useEffect(() => {
-      node?.emit('mounted', emitData);
-
-      return () => {
-        node?.emit('destroy', emitData);
-      };
-    }, []);
-  }
 
   return { app, node, display };
 };
