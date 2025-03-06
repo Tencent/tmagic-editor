@@ -32,6 +32,10 @@ interface EventCache {
   args: any[];
 }
 
+interface Methods {
+  [key: string]: (...args: any[]) => any;
+}
+
 export interface NodeOptions {
   config: MNode;
   page?: Page;
@@ -45,7 +49,7 @@ class Node extends EventEmitter {
     [key: string]: any;
   };
   public events: EventConfig[] = [];
-  public instance?: any;
+  public instance?: any = {};
   public page?: Page;
   public parent?: Node;
   public app: TMagicApp;
@@ -69,11 +73,28 @@ class Node extends EventEmitter {
     const { events, style } = data;
     this.events = events || [];
     this.style = style || {};
+    this.instance.config = data;
     this.emit('update-data', data);
   }
 
   public addEventToQueue(event: EventCache) {
     this.eventQueue.push(event);
+  }
+
+  public registerMethod(methods: Methods) {
+    if (!methods) {
+      return;
+    }
+
+    if (!this.instance) {
+      this.instance = {};
+    }
+
+    for (const [key, fn] of Object.entries(methods)) {
+      if (typeof fn === 'function') {
+        this.instance[key] = fn;
+      }
+    }
   }
 
   public async runHookCode(hook: string, params?: Record<string, any>) {
@@ -137,12 +158,23 @@ class Node extends EventEmitter {
         this.listenLifeSafe();
       });
 
-      this.instance = instance;
+      if (instance) {
+        this.registerMethod(instance);
+        if (instance.config) {
+          this.setData(instance.config);
+        }
+      }
+
       await this.runHookCode('created');
     });
 
     this.once('mounted', async (instance: any) => {
-      this.instance = instance;
+      if (instance) {
+        this.registerMethod(instance);
+        if (instance.config) {
+          this.setData(instance.config);
+        }
+      }
 
       for (let eventConfig = this.eventQueue.shift(); eventConfig; eventConfig = this.eventQueue.shift()) {
         if (typeof instance[eventConfig.method] === 'function') {
