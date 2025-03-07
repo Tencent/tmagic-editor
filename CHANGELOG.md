@@ -1,3 +1,27 @@
+## [1.5.10](https://github.com/Tencent/tmagic-editor/compare/v1.5.9...v1.5.10) (2025-03-07)
+
+
+### Bug Fixes
+
+* **data-source:** 处理异步动态加载数据源时，初始化数据源还未加载完毕的情况 ([3c66319](https://github.com/Tencent/tmagic-editor/commit/3c66319b03c42305c66b0c6a87307fe747d9f90e))
+* **editor:** 样式配置宽度不能为负 ([775fcf5](https://github.com/Tencent/tmagic-editor/commit/775fcf5693eef051e5899aceae7873c1afa0e60c))
+* **stage:** 防止runtime重复注册 ([63fe6ec](https://github.com/Tencent/tmagic-editor/commit/63fe6ec68be444082cb16aac76d6b2fe9ee5724f))
+
+
+### Features
+
+* **core:**  hook函数调用添加node参数 ([5ba2a73](https://github.com/Tencent/tmagic-editor/commit/5ba2a73c7035d84688be0b0f1c0b4467558518c3))
+* **core, editor:** 删除公共的点击事件实现，由组件自行添加 ([c8e1cff](https://github.com/Tencent/tmagic-editor/commit/c8e1cffca9b12c124c34d75ee9187a03c6f61599))
+* **core:** app添加dsl-change事件 ([a4d021d](https://github.com/Tencent/tmagic-editor/commit/a4d021d2fb1fec113496733380d99e0f9deb132f))
+* **core:** node新增registerMethod方法，用于组件注册供其他组件通过事件配置调用 ([ff07147](https://github.com/Tencent/tmagic-editor/commit/ff0714727044c41148babcec977ca89058169501))
+* **reate-runtime-help,vue-runtime-help:** 新增组件状态hook ([6f5bb84](https://github.com/Tencent/tmagic-editor/commit/6f5bb84c04f9b4b5b2145ce6c559445563a60e6c))
+* **runtime:** vue2 h传参与vue3不一样，需要自定义render ([90abde5](https://github.com/Tencent/tmagic-editor/commit/90abde57cc01218b483c94faf29f88996fb75c20))
+* **runtime:** 支持页面切换 ([4026c0c](https://github.com/Tencent/tmagic-editor/commit/4026c0c305937b060de21ec74355a1be46e25dbf))
+* **vue-components,react-components:** 增加点击事件，使用组件状态hook ([0736646](https://github.com/Tencent/tmagic-editor/commit/0736646c63067b3b19125b356f462d658673eaa7))
+* **vue-container:** 支持自定义render ([91cde30](https://github.com/Tencent/tmagic-editor/commit/91cde30d75de866ade3f48f48b2c0d1251fe2b36))
+
+
+
 ## [1.5.9](https://github.com/Tencent/tmagic-editor/compare/v1.5.8...v1.5.9) (2025-02-20)
 
 
