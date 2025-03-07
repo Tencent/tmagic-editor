@@ -1,12 +1,10 @@
 import { inject, nextTick, onBeforeUnmount, reactive, ref } from 'vue-demi';
 
-import type TMagicCore from '@tmagic/core';
+import type TMagicApp from '@tmagic/core';
 import type { ChangeEvent, MNode } from '@tmagic/core';
 import { isPage, replaceChildNode } from '@tmagic/core';
 
-export const useDsl = () => {
-  const app = inject<TMagicCore>('app');
-
+export const useDsl = (app = inject<TMagicApp>('app')) => {
   if (!app) {
     throw new Error('useDsl must be used after MagicApp is created');
   }

@@ -11,9 +11,7 @@ declare global {
   }
 }
 
-export const useEditorDsl = (win = window) => {
-  const app = inject<TMagicApp>('app');
-
+export const useEditorDsl = (app = inject<TMagicApp>('app'), win = window) => {
   const root = ref<MApp>();
   const curPageId = ref<Id>();
   const selectedId = ref<Id>();
