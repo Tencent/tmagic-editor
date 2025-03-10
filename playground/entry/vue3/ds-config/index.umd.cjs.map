@@ -1,0 +1,1 @@
+{"version":3,"file":"index.umd.cjs","sources":["../../../../../runtime/vue3/.tmagic/ds-config-entry.ts"],"sourcesContent":["const dsConfigs: Record<string, any> = {};\nexport default dsConfigs;"],"names":[],"mappings":";;;;;;AAAA,OAAM,YAAiC;;;;;;;;"}

@@ -1,0 +1,1 @@
+{"version":3,"file":"datasource-entry-legacy-Du67ziIl.js","sources":["../../../../../../runtime/vue3/.tmagic/datasource-entry.ts"],"sourcesContent":["const datasources: Record<string, any> = {};\nexport default datasources;"],"names":["exports"],"mappings":"yEAAyCA,EAAA,UAAA,CAAA"}
