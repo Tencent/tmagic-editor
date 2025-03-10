@@ -222,7 +222,6 @@ export default class Watcher {
       for (const [key, value] of Object.entries(config)) {
         if (typeof value === 'undefined' || value === '') continue;
 
-        if (key === 'id' || key === 'name') continue;
         doCollect(key, value);
       }
     };
