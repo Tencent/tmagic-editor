@@ -1,3 +1,18 @@
+## [1.5.11](https://github.com/Tencent/tmagic-editor/compare/v1.5.10...v1.5.11) (2025-03-11)
+
+
+### Bug Fixes
+
+* **dep:** 依赖收集不能过滤id/name ([0c207c7](https://github.com/Tencent/tmagic-editor/commit/0c207c7b834ae25c16038a8ca431154afb4ccda1))
+* **dep:** 数据源方法收集判断 ([72108e0](https://github.com/Tencent/tmagic-editor/commit/72108e00193698c8e7087b115f36e10216a0f386))
+
+
+### Features
+
+* **vue-runtime-help:** useDsl/useEditorDsl添加app默认参数 ([f671c67](https://github.com/Tencent/tmagic-editor/commit/f671c670db84631abb1f7d9e4fbf432637de2947))
+
+
+
 ## [1.5.10](https://github.com/Tencent/tmagic-editor/compare/v1.5.9...v1.5.10) (2025-03-07)
 
 
