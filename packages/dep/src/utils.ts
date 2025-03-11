@@ -263,20 +263,20 @@ export const createDataSourceCondTarget = (ds: Pick<DataSourceSchema, 'id' | 'fi
     isTarget: (key: string | number, value: any) => isDataSourceCondTarget(ds, key, value),
   });
 
-export const createDataSourceMethodTarget = (ds: Pick<DataSourceSchema, 'id' | 'fields'>, initialDeps: DepData = {}) =>
+export const createDataSourceMethodTarget = (ds: Pick<DataSourceSchema, 'id' | 'methods'>, initialDeps: DepData = {}) =>
   new Target({
     type: DepTargetType.DATA_SOURCE_METHOD,
     id: ds.id,
     initialDeps,
     isTarget: (_key: string | number, value: any) => {
       // 使用data-source-method-select 可以配置出来
-      if (!Array.isArray(value) || !ds) {
+      if (!Array.isArray(value) || !ds?.methods) {
         return false;
       }
 
-      const [dsId, ...keys] = value;
+      const [dsId, methodName] = value;
 
-      if (dsId !== ds.id || ds.fields?.find((field) => field.name === keys[0])) {
+      if (!methodName || dsId !== ds.id || !ds.methods.find((field) => field.name === methodName)) {
         return false;
       }
 
