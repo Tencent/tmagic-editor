@@ -502,6 +502,7 @@ export const initServiceEvents = (
       isModifyField =
         changeRecord.propPath === 'fields' ||
         /fields.(\d)+.name/.test(changeRecord.propPath) ||
+        /fields.(\d)+.defaultValue/.test(changeRecord.propPath) ||
         /fields.(\d)+$/.test(changeRecord.propPath);
 
       isModifyMock = changeRecord.propPath === 'mocks';
@@ -523,25 +524,35 @@ export const initServiceEvents = (
       if (Array.isArray(root?.items)) {
         depService.clearIdleTasks();
 
-        removeDataSourceTarget(config.id);
-        initDataSourceDepTarget(config);
-
         let collectIdlePromises: Promise<void[]>[] = [];
         if (isModifyField) {
+          depService.removeTarget(config.id, DepTargetType.DATA_SOURCE);
+          depService.removeTarget(config.id, DepTargetType.DATA_SOURCE_COND);
+
+          depService.addTarget(createDataSourceTarget(config, reactive({})));
+          depService.addTarget(createDataSourceCondTarget(config, reactive({})));
+
           collectIdlePromises = [
             collectIdle(root.items, true, DepTargetType.DATA_SOURCE),
             collectIdle(root.items, true, DepTargetType.DATA_SOURCE_COND),
           ];
         } else if (isModifyMock) {
+          depService.removeTarget(config.id, DepTargetType.DATA_SOURCE);
+
+          depService.addTarget(createDataSourceTarget(config, reactive({})));
+
           collectIdlePromises = [collectIdle(root.items, true, DepTargetType.DATA_SOURCE)];
         } else if (isModifyMethod) {
+          depService.removeTarget(config.id, DepTargetType.DATA_SOURCE_METHOD);
+
+          depService.addTarget(createDataSourceMethodTarget(config, reactive({})));
+
           collectIdlePromises = [collectIdle(root.items, true, DepTargetType.DATA_SOURCE_METHOD)];
         }
-        Promise.all(collectIdlePromises).then(() => {
-          updateDataSourceSchema();
-          updateDsData();
-          updateStageNodes(root.items);
-        });
+        Promise.all(collectIdlePromises)
+          .then(() => updateDataSourceSchema())
+          .then(() => updateDsData())
+          .then(() => updateStageNodes(root.items));
       }
     } else if (root?.dataSources) {
       updateDsData();
@@ -616,19 +627,30 @@ export const initServiceEvents = (
       }
       root.dataSourceCondDeps[target.id] = target.deps;
     }
+
+    if (target.type === DepTargetType.DATA_SOURCE_METHOD) {
+      if (!root.dataSourceMethodDeps) {
+        root.dataSourceMethodDeps = {};
+      }
+      root.dataSourceMethodDeps[target.id] = target.deps;
+    }
   };
 
-  const targetRemoveHandler = (id: string | number) => {
+  const targetRemoveHandler = (id: string | number, type: DepTargetType) => {
     const root = editorService.get('root');
 
     if (!root) return;
 
-    if (root.dataSourceDeps) {
+    if (root.dataSourceDeps && type === DepTargetType.DATA_SOURCE) {
       delete root.dataSourceDeps[id];
     }
 
-    if (root.dataSourceCondDeps) {
+    if (root.dataSourceCondDeps && type === DepTargetType.DATA_SOURCE_COND) {
       delete root.dataSourceCondDeps[id];
+    }
+
+    if (root.dataSourceMethodDeps && type === DepTargetType.DATA_SOURCE_METHOD) {
+      delete root.dataSourceMethodDeps[id];
     }
   };
 

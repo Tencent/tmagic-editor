@@ -28,7 +28,7 @@ import BaseService from './BaseService';
 
 export interface DepEvents {
   'add-target': [target: Target];
-  'remove-target': [id: string | number];
+  'remove-target': [id: string | number, type: string | DepTargetType];
   collected: [nodes: MNode[], deep: boolean];
   'ds-collected': [nodes: MNode[], deep: boolean];
 }
@@ -77,7 +77,7 @@ class Dep extends BaseService {
     if (!targets) return;
 
     for (const target of Object.values(targets)) {
-      this.emit('remove-target', target.id);
+      this.emit('remove-target', target.id, type);
     }
   }
 
@@ -96,7 +96,7 @@ class Dep extends BaseService {
 
   public removeTarget(id: Id, type: string = DepTargetType.DEFAULT) {
     this.watcher.removeTarget(id, type);
-    this.emit('remove-target', id);
+    this.emit('remove-target', id, type);
   }
 
   public clearTargets() {
