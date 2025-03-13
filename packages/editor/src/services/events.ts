@@ -57,7 +57,7 @@ class Events extends BaseService {
   }
 
   public getMethod(type: string) {
-    return cloneDeep(methodMap[toLine(type)]);
+    return cloneDeep(methodMap[toLine(type)]) || [];
   }
 
   public resetState() {
