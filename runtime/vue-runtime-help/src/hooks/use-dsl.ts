@@ -9,10 +9,10 @@ export const useDsl = (app = inject<TMagicApp>('app')) => {
     throw new Error('useDsl must be used after MagicApp is created');
   }
 
-  const pageConfig = ref(app.page?.data || {});
+  const pageConfig = ref<MNode | undefined>(app.page?.data);
 
   app.on('page-change', () => {
-    pageConfig.value = app.page?.data || {};
+    pageConfig.value = app.page?.data;
   });
 
   const updateDataHandler = (nodes: MNode[], sourceId: string, changeEvent: ChangeEvent) => {

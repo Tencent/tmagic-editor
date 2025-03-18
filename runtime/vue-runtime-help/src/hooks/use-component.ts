@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { inject } from 'vue-demi';
+import { ConcreteComponent, inject } from 'vue-demi';
 
 import type TMagicApp from '@tmagic/core';
 import { toLine } from '@tmagic/core';
@@ -33,10 +33,12 @@ interface UseComponentOptions {
  * @param options 若为字符串则为组件类型，若为对象则为参数选项
  * @returns 得到的组件，若未找到则返回带 magic-ui- 前缀的组件类型
  */
-export function useComponent<Component = any>(options: string | UseComponentOptions = '') {
+export function useComponent<C extends ConcreteComponent = ConcreteComponent>(
+  options: string | UseComponentOptions = '',
+) {
   let componentType: string | undefined;
   let app: TMagicApp | undefined;
-  let component: Component | undefined;
+  let component: C | undefined;
 
   if (typeof options === 'string') {
     componentType = options;
@@ -47,21 +49,17 @@ export function useComponent<Component = any>(options: string | UseComponentOpti
   if (!componentType || componentType === '') {
     componentType = 'container';
   }
+
   if (!app) {
     app = inject<TMagicApp>('app');
   }
 
-  component = resolveComponent({ componentType, app });
+  component = app?.resolveComponent(componentType);
+
   if (!component && !componentType.startsWith('magic-ui-')) {
     componentType = `magic-ui-${toLine(componentType)}`;
-    component = resolveComponent({ componentType, app });
+    component = app?.resolveComponent(componentType);
   }
 
   return component ?? componentType;
-}
-
-type resolveComponentOptions = Required<Pick<UseComponentOptions, 'componentType'>> & UseComponentOptions;
-
-function resolveComponent<Component = any>({ componentType, app }: resolveComponentOptions): Component | undefined {
-  return app?.resolveComponent(componentType);
 }
