@@ -7,10 +7,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, inject, type PropType } from 'vue-demi';
+import { defineComponent, type PropType } from 'vue-demi';
 
 import { COMMON_EVENT_PREFIX, type Id, type MComponent } from '@tmagic/core';
-import { useApp, useComponentStatus } from '@tmagic/vue-runtime-help';
+import { useApp } from '@tmagic/vue-runtime-help';
 
 interface ButtonSchema extends Omit<MComponent, 'id'> {
   id?: Id;
@@ -36,10 +36,6 @@ export default defineComponent({
   },
 
   setup(props) {
-    const { setStatus } = inject<ReturnType<typeof useComponentStatus>>('componentStatusStore')!;
-
-    setStatus('disabled');
-
     const { app, node } = useApp(props);
 
     const clickHandler = () => {

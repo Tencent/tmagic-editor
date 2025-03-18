@@ -1,7 +1,5 @@
 <template>
-  <p @click="clickHandler">
-    <slot>{{ config.text }}</slot>
-  </p>
+  <p @click="clickHandler" v-html="config.text"></p>
 </template>
 
 <script lang="ts">
