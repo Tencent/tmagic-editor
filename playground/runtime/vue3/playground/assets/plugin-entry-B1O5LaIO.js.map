@@ -1,0 +1,1 @@
+{"version":3,"file":"plugin-entry-B1O5LaIO.js","sources":["../../../../../../runtime/vue3/.tmagic/plugin-entry.ts"],"sourcesContent":["const plugins: Record<string, any> = {};\nexport default plugins;"],"names":["plugins"],"mappings":"AAAA,MAAMA,EAA+B,CAAA"}
