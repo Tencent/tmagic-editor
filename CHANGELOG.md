@@ -1,3 +1,20 @@
+## [1.5.12](https://github.com/Tencent/tmagic-editor/compare/v1.5.11...v1.5.12) (2025-03-27)
+
+
+### Bug Fixes
+
+* **design:** card没有slots时隐藏对应slot ([4ddc55a](https://github.com/Tencent/tmagic-editor/commit/4ddc55aa6de4bafb978a621ab9b69af1e0c36d78))
+* **editor:** 数据源修改后，依赖重新收集不准确 ([9c7d711](https://github.com/Tencent/tmagic-editor/commit/9c7d711c167c5e8ee1e9d8a8e89d66d245070dee))
+* **editor:** 获取关联组件的方法默认值 ([f5742c1](https://github.com/Tencent/tmagic-editor/commit/f5742c107a68389c0828de991e7f5e9745e20d67))
+* **vue-components:** button删除调试代码，text支持富文本 ([2a714ae](https://github.com/Tencent/tmagic-editor/commit/2a714ae9cc89b7c88528c8afe9270ad774d7755d))
+
+
+### Features
+
+* **cli:** 如果识别不要组件文件，则默认从npm包的default导入 ([b715a87](https://github.com/Tencent/tmagic-editor/commit/b715a87f409856ed396b3e35eb4102776329531e))
+
+
+
 ## [1.5.11](https://github.com/Tencent/tmagic-editor/compare/v1.5.10...v1.5.11) (2025-03-11)
 
 
