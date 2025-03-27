@@ -6,7 +6,7 @@
     @update:modelValue="updateModelValue"
     @change="changeHandler"
   >
-    <template #default>
+    <template #default v-if="$slots.default">
       <slot></slot>
     </template>
   </component>
