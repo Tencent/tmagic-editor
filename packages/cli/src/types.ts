@@ -54,11 +54,14 @@ export interface NpmConfig {
 }
 
 export interface ModuleMainFilePath {
+  componentPackage: Record<string, string>;
   componentMap: Record<string, string>;
+  pluginPakcage: Record<string, string>;
   pluginMap: Record<string, string>;
   configMap: Record<string, string>;
   valueMap: Record<string, string>;
   eventMap: Record<string, string>;
+  datasourcePackage: Record<string, string>;
   datasourceMap: Record<string, string>;
   dsConfigMap: Record<string, string>;
   dsValueMap: Record<string, string>;

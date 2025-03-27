@@ -5,33 +5,84 @@ import { EntryType } from '../types';
 
 export const prepareEntryFile = async (app: App) => {
   const { moduleMainFilePath, options } = app;
-  const { componentFileAffix, dynamicImport, hooks, useTs = true } = options;
+  const { dynamicImport, hooks, useTs = true } = options;
 
   let contentMap: Record<string, string> = {
-    'comp-entry': generateContent(useTs, EntryType.COMPONENT, moduleMainFilePath.componentMap, componentFileAffix),
+    'comp-entry': generateContent(
+      useTs,
+      EntryType.COMPONENT,
+      moduleMainFilePath.componentPackage,
+      moduleMainFilePath.componentMap,
+    ),
     'async-comp-entry': generateContent(
       useTs,
       EntryType.COMPONENT,
+      moduleMainFilePath.componentPackage,
       moduleMainFilePath.componentMap,
-      componentFileAffix,
       dynamicImport,
     ),
-    'plugin-entry': generateContent(useTs, EntryType.PLUGIN, moduleMainFilePath.pluginMap),
-    'async-plugin-entry': generateContent(useTs, EntryType.PLUGIN, moduleMainFilePath.pluginMap, '', dynamicImport),
-    'config-entry': generateContent(useTs, EntryType.CONFIG, moduleMainFilePath.configMap),
-    'value-entry': generateContent(useTs, EntryType.VALUE, moduleMainFilePath.valueMap),
-    'event-entry': generateContent(useTs, EntryType.EVENT, moduleMainFilePath.eventMap),
-    'datasource-entry': generateContent(useTs, EntryType.DATASOURCE, moduleMainFilePath.datasourceMap),
+    'plugin-entry': generateContent(
+      useTs,
+      EntryType.PLUGIN,
+      moduleMainFilePath.pluginPakcage,
+      moduleMainFilePath.pluginMap,
+    ),
+    'async-plugin-entry': generateContent(
+      useTs,
+      EntryType.PLUGIN,
+      moduleMainFilePath.pluginPakcage,
+      moduleMainFilePath.pluginMap,
+      dynamicImport,
+    ),
+    'config-entry': generateContent(
+      useTs,
+      EntryType.CONFIG,
+      moduleMainFilePath.componentPackage,
+      moduleMainFilePath.configMap,
+    ),
+    'value-entry': generateContent(
+      useTs,
+      EntryType.VALUE,
+      moduleMainFilePath.componentPackage,
+      moduleMainFilePath.valueMap,
+    ),
+    'event-entry': generateContent(
+      useTs,
+      EntryType.EVENT,
+      moduleMainFilePath.componentPackage,
+      moduleMainFilePath.eventMap,
+    ),
+    'datasource-entry': generateContent(
+      useTs,
+      EntryType.DATASOURCE,
+      moduleMainFilePath.datasourcePackage,
+      moduleMainFilePath.datasourceMap,
+    ),
     'async-datasource-entry': generateContent(
       useTs,
       EntryType.DATASOURCE,
+      moduleMainFilePath.datasourcePackage,
       moduleMainFilePath.datasourceMap,
-      '',
       dynamicImport,
     ),
-    'ds-config-entry': generateContent(useTs, EntryType.DS_CONFIG, moduleMainFilePath.dsConfigMap),
-    'ds-value-entry': generateContent(useTs, EntryType.DS_VALUE, moduleMainFilePath.dsValueMap),
-    'ds-event-entry': generateContent(useTs, EntryType.DS_EVENT, moduleMainFilePath.dsEventMap),
+    'ds-config-entry': generateContent(
+      useTs,
+      EntryType.DS_CONFIG,
+      moduleMainFilePath.datasourcePackage,
+      moduleMainFilePath.dsConfigMap,
+    ),
+    'ds-value-entry': generateContent(
+      useTs,
+      EntryType.DS_VALUE,
+      moduleMainFilePath.datasourcePackage,
+      moduleMainFilePath.dsValueMap,
+    ),
+    'ds-event-entry': generateContent(
+      useTs,
+      EntryType.DS_EVENT,
+      moduleMainFilePath.datasourcePackage,
+      moduleMainFilePath.dsEventMap,
+    ),
   };
 
   if (typeof hooks?.beforeWriteEntry === 'function') {
@@ -53,8 +104,8 @@ export const prepareEntryFile = async (app: App) => {
 export const generateContent = (
   useTs: boolean,
   type: EntryType,
+  packageMap: Record<string, string> = {},
   map: Record<string, string> = {},
-  componentFileAffix = '',
   dynamicImport = false,
 ) => {
   const list: string[] = [];
@@ -62,14 +113,14 @@ export const generateContent = (
 
   Object.entries(map).forEach(([key, packagePath]) => {
     const name = makeCamelCase(key);
-    if (dynamicImport) {
-      list.push(
-        `'${key}': () => import('${packagePath}${packagePath.endsWith(componentFileAffix) ? '' : componentFileAffix}')`,
-      );
+
+    if ([EntryType.CONFIG, EntryType.EVENT, EntryType.VALUE].includes(type) && packagePath === packageMap[key]) {
+      importDeclarations.push(`import { ${type} as ${name} } from '${packageMap[key]}'`);
+      list.push(`'${key}': ${name}`);
+    } else if (dynamicImport) {
+      list.push(`'${key}': () => import('${packagePath}')`);
     } else {
-      importDeclarations.push(
-        `import ${name} from '${packagePath}${packagePath.endsWith(componentFileAffix) ? '' : componentFileAffix}'`,
-      );
+      importDeclarations.push(`import ${name} from '${packagePath}'`);
       list.push(`'${key}': ${name}`);
     }
   });

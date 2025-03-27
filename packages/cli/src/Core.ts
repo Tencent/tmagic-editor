@@ -11,11 +11,14 @@ export default class Core {
   public options: UserConfig;
 
   public moduleMainFilePath: ModuleMainFilePath = {
+    componentPackage: {},
     componentMap: {},
+    pluginPakcage: {},
     pluginMap: {},
     configMap: {},
     valueMap: {},
     eventMap: {},
+    datasourcePackage: {},
     datasourceMap: {},
     dsConfigMap: {},
     dsValueMap: {},
