@@ -20,5 +20,5 @@ const ui = getDesignConfig('components')?.dropdownItem;
 
 const uiComponent = ui?.component || 'el-dropdown-item';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<DropdownItemProps>(() => ui?.props(props) || props);
 </script>

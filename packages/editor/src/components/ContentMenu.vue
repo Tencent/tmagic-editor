@@ -37,7 +37,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, type Ref, ref, useTemplateRef } from 'vue';
 
 import { useZIndex } from '@tmagic/design';
 
@@ -73,7 +73,7 @@ const menuEl = useTemplateRef<HTMLDivElement>('menu');
 const buttonRefs = useTemplateRef<InstanceType<typeof ToolButton>[]>('buttons');
 const subMenuRef = useTemplateRef<any>('subMenu');
 const visible = ref(false);
-const subMenuData = ref<(MenuButton | MenuComponent)[]>([]);
+const subMenuData: Ref<(MenuButton | MenuComponent)[]> = ref<(MenuButton | MenuComponent)[]>([]);
 const zIndex = useZIndex();
 const curZIndex = ref<number>(0);
 

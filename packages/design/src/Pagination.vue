@@ -27,7 +27,7 @@ const ui = getDesignConfig('components')?.pagination;
 
 const uiComponent = ui?.component || 'el-pagination';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<PaginationProps>(() => ui?.props(props) || props);
 
 const handleSizeChange = (...args: any[]) => {
   emit('size-change', ...args);

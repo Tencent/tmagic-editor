@@ -26,5 +26,5 @@ const ui = getDesignConfig('components')?.card;
 
 const uiComponent = ui?.component || 'el-card';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<CardProps>(() => ui?.props(props) || props);
 </script>

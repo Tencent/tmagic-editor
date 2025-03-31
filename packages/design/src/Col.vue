@@ -20,5 +20,5 @@ const ui = getDesignConfig('components')?.col;
 
 const uiComponent = ui?.component || 'el-col';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<ColProps>(() => ui?.props(props) || props);
 </script>

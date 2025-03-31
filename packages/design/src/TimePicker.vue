@@ -25,7 +25,7 @@ const ui = getDesignConfig('components')?.timePicker;
 
 const uiComponent = ui?.component || 'el-time-picker';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<TimePickerProps>(() => ui?.props(props) || props);
 
 const emit = defineEmits(['change', 'update:modelValue']);
 

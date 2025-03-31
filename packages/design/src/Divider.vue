@@ -20,5 +20,5 @@ const ui = getDesignConfig('components')?.divider;
 
 const uiComponent = ui?.component || 'el-divider';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<DividerProps>(() => ui?.props(props) || props);
 </script>

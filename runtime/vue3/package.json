@@ -29,14 +29,14 @@
     "@tmagic/cli": "1.5.12",
     "@types/node": "^18.19.0",
     "@vitejs/plugin-legacy": "^6.0.0",
-    "@vitejs/plugin-vue": "5.2.1",
+    "@vitejs/plugin-vue": "5.2.3",
     "@vitejs/plugin-vue-jsx": "^3.1.0",
     "@vue/compiler-sfc": "^3.5.13",
-    "rollup": "^4.31.0",
+    "rollup": "^4.38.0",
     "rollup-plugin-external-globals": "^0.10.0",
     "sass": "^1.83.0",
     "terser": "^5.31.6",
-    "typescript": "^5.7.3",
-    "vite": "^6.2.3"
+    "typescript": "^5.8.2",
+    "vite": "^6.2.4"
   }
 }

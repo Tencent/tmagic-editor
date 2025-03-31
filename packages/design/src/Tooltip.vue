@@ -23,5 +23,5 @@ const ui = getDesignConfig('components')?.tooltip;
 
 const uiComponent = ui?.component || 'el-tooltip';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<TooltipProps>(() => ui?.props(props) || props);
 </script>

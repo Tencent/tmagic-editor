@@ -32,7 +32,7 @@ const ui = getDesignConfig('components')?.dialog;
 
 const uiComponent = ui?.component || 'el-dialog';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<DialogProps>(() => ui?.props(props) || props);
 
 const closeHandler = (...args: any[]) => {
   emit('close', ...args);

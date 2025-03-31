@@ -31,7 +31,7 @@ const ui = getDesignConfig('components')?.checkbox;
 
 const uiComponent = ui?.component || 'el-checkbox';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<CheckboxProps>(() => ui?.props(props) || props);
 
 const emit = defineEmits(['change', 'update:modelValue']);
 

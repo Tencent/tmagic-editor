@@ -20,5 +20,5 @@ const ui = getDesignConfig('components')?.radio;
 
 const uiComponent = ui?.component || 'el-radio';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<RadioProps>(() => ui?.props(props) || props);
 </script>

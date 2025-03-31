@@ -42,7 +42,7 @@ const ui = getDesignConfig('components')?.autocomplete;
 
 const uiComponent = ui?.component || 'el-autocomplete';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<AutocompleteProps>(() => ui?.props(props) || props);
 
 const emit = defineEmits(['change', 'select', 'update:modelValue']);
 

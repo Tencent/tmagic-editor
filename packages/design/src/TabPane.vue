@@ -26,5 +26,5 @@ const ui = getDesignConfig('components')?.tabPane;
 
 const uiComponent = ui?.component || 'el-tab-pane';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<TabPaneProps>(() => ui?.props(props) || props);
 </script>

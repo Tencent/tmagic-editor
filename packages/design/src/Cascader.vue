@@ -25,7 +25,7 @@ const ui = getDesignConfig('components')?.cascader;
 
 const uiComponent = ui?.component || 'el-cascader';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<CascaderProps>(() => ui?.props(props) || props);
 
 const cascader = ref<any>();
 

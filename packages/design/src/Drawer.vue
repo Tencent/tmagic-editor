@@ -40,7 +40,7 @@ const ui = getDesignConfig('components')?.drawer;
 
 const uiComponent = ui?.component || 'el-drawer';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<DrawerProps>(() => ui?.props(props) || props);
 
 const drawer = ref<any>();
 

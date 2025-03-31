@@ -23,5 +23,5 @@ const ui = getDesignConfig('components')?.formItem;
 
 const uiComponent = ui?.component || 'el-form-item';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<FormItemProps>(() => ui?.props(props) || props);
 </script>

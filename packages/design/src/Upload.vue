@@ -29,7 +29,7 @@ const ui = getDesignConfig('components')?.upload;
 
 const uiComponent = ui?.component || 'el-upload';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<UploadProps>(() => ui?.props(props) || props);
 
 const upload = ref<any>();
 

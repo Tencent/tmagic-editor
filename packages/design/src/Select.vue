@@ -31,7 +31,7 @@ const ui = getDesignConfig('components')?.select;
 
 const uiComponent = ui?.component || 'el-select';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<SelectProps>(() => ui?.props(props) || props);
 
 const select = ref<any>();
 

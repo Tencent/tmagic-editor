@@ -17,5 +17,5 @@ defineOptions({
 const ui = getDesignConfig('components')?.icon;
 const uiComponent = ui?.component || 'el-icon';
 const props = defineProps<IconProps>();
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<IconProps>(() => ui?.props(props) || props);
 </script>

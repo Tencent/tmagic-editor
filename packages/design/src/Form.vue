@@ -26,7 +26,7 @@ const ui = getDesignConfig('components')?.form;
 
 const uiComponent = ui?.component || 'el-form';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<FormProps>(() => ui?.props(props) || props);
 
 const form = ref<any>();
 
