@@ -49,6 +49,12 @@ export interface AppOptionsConfig {
 
 class App extends EventEmitter {
   [x: string]: any;
+  static nodeClassMap = new Map<string, typeof Node>();
+
+  public static registerNode<T extends typeof Node = typeof Node>(type: string, NodeClass: T) {
+    App.nodeClassMap.set(type, NodeClass);
+  }
+
   public env: Env = new Env();
   public dsl?: MApp;
   public codeDsl?: CodeBlockDSL;

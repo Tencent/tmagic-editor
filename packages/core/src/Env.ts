@@ -30,7 +30,11 @@ class Env {
   isWeb = false;
   isOpenHarmony = false;
 
-  constructor(ua = globalThis.navigator.userAgent, options: Record<string, boolean | string> = {}) {
+  constructor(ua = globalThis.navigator?.userAgent ?? '', options: Record<string, boolean | string> = {}) {
+    if (!ua) {
+      return;
+    }
+
     this.isIphone = ua.indexOf('iPhone') >= 0;
 
     this.isIpad = /(iPad).*OS\s([\d_]+)/.test(ua);
