@@ -32,11 +32,12 @@ import { compiledNodeField, compliedConditions, compliedIteratorItem, createIter
 class DataSourceManager extends EventEmitter {
   private static dataSourceClassMap = new Map<string, typeof DataSource>();
   private static ObservedDataClass: ObservedDataClass = SimpleObservedData;
-  private static waitInitSchemaList = new Map<DataSourceManager, DataSourceSchema[]>();
+  private static waitInitSchemaList = new Map<DataSourceManager, Record<string, DataSourceSchema[]>>();
 
   public static register<T extends typeof DataSource = typeof DataSource>(type: string, dataSource: T) {
     DataSourceManager.dataSourceClassMap.set(type, dataSource);
-    DataSourceManager.waitInitSchemaList?.forEach((list, app) => {
+    DataSourceManager.waitInitSchemaList?.forEach((listMap, app) => {
+      const list = listMap[type] || [];
       for (let config = list.shift(); config; config = list.shift()) {
         app.addDataSource(config);
       }
@@ -61,7 +62,7 @@ class DataSourceManager extends EventEmitter {
   constructor({ app, useMock, initialData }: DataSourceManagerOptions) {
     super();
 
-    DataSourceManager.waitInitSchemaList.set(this, []);
+    DataSourceManager.waitInitSchemaList.set(this, {});
 
     this.app = app;
     this.useMock = useMock;
@@ -144,7 +145,19 @@ class DataSourceManager extends EventEmitter {
     const DataSourceClass = DataSourceManager.dataSourceClassMap.get(config.type);
 
     if (!DataSourceClass) {
-      DataSourceManager.waitInitSchemaList.get(this)?.push(config);
+      let listMap = DataSourceManager.waitInitSchemaList.get(this);
+
+      if (!listMap) {
+        listMap = {};
+        DataSourceManager.waitInitSchemaList.set(this, listMap);
+      }
+
+      if (listMap[config.type]) {
+        listMap[config.type].push(config);
+      } else {
+        listMap[config.type] = [config];
+      }
+
       return;
     }
 
