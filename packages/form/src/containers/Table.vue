@@ -320,6 +320,8 @@ const rowDrop = () => {
   }
   sortable = Sortable.create(tBodyEl, {
     draggable: '.tmagic-design-table-row',
+    filter: 'input', // 表单组件选字操作和触发拖拽会冲突，优先保证选字操作
+    preventOnFilter: false, // 允许选字
     direction: 'vertical',
     onEnd: ({ newIndex, oldIndex }: SortableEvent) => {
       if (typeof newIndex === 'undefined') return;
