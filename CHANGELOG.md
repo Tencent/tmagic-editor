@@ -1,3 +1,20 @@
+## [1.5.13](https://github.com/Tencent/tmagic-editor/compare/v1.5.12...v1.5.13) (2025-04-10)
+
+
+### Bug Fixes
+
+* **data-source:** 数据源初始化时机比注册早回出现死循环 ([840c2c3](https://github.com/Tencent/tmagic-editor/commit/840c2c3c7d267f999e229f7720cbbdc1bf5e2436))
+* 修复表格拖拽排序与表单选字操作冲突的问题 ([f91eb41](https://github.com/Tencent/tmagic-editor/commit/f91eb415dbdf23c8f05bc21617de67aef7bd524c))
+
+
+### Features
+
+* **core:** 支持传入env ([0bcd7d0](https://github.com/Tencent/tmagic-editor/commit/0bcd7d075518523809b639e8128583c87b90aa89))
+* **core:** 支持自定义Node类 ([18524d8](https://github.com/Tencent/tmagic-editor/commit/18524d89fb8086a34307ed17e54da520db92add2))
+* **editor:** 编辑代码块/数据源时高亮列表中对应的项 ([54e00f2](https://github.com/Tencent/tmagic-editor/commit/54e00f28524e546cecd0691d19fbcb0bee4af35e))
+
+
+
 ## [1.5.12](https://github.com/Tencent/tmagic-editor/compare/v1.5.11...v1.5.12) (2025-03-27)
 
 
