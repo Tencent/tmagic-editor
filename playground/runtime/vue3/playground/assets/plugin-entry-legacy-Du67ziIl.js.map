@@ -1,0 +1,1 @@
+{"version":3,"file":"plugin-entry-legacy-Du67ziIl.js","sources":["../../../../../../runtime/vue3/.tmagic/plugin-entry.ts"],"sourcesContent":["const plugins: Record<string, any> = {};\nexport default plugins;"],"names":["exports"],"mappings":"yEAAqCA,EAAA,UAAA,CAAA"}

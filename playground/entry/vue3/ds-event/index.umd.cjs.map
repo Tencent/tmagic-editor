@@ -1,0 +1,1 @@
+{"version":3,"file":"index.umd.cjs","sources":["../../../../../runtime/vue3/.tmagic/ds-event-entry.ts"],"sourcesContent":["const dsEvents: Record<string, any> = {};\nexport default dsEvents;"],"names":[],"mappings":";;;;;;AAAA,OAAM,WAAgC;;;;;;;;"}
