@@ -33,6 +33,7 @@ import { transformStyle as defaultTransformStyle } from './utils';
 
 export interface AppOptionsConfig {
   ua?: string;
+  env?: Env;
   config?: MApp;
   platform?: 'editor' | 'mobile' | 'tv' | 'pc';
   jsEngine?: JsEngine;
@@ -55,7 +56,7 @@ class App extends EventEmitter {
     App.nodeClassMap.set(type, NodeClass);
   }
 
-  public env: Env = new Env();
+  public env!: Env;
   public dsl?: MApp;
   public codeDsl?: CodeBlockDSL;
   public dataSourceManager?: DataSourceManager;
@@ -75,7 +76,12 @@ class App extends EventEmitter {
   constructor(options: AppOptionsConfig) {
     super();
 
-    this.setEnv(options.ua);
+    if (options.env) {
+      this.setEnv(options.env);
+    } else {
+      this.setEnv(options.ua);
+    }
+
     // 代码块描述内容在dsl codeBlocks字段
     this.codeDsl = options.config?.codeBlocks;
     options.platform && (this.platform = options.platform);
@@ -123,8 +129,12 @@ class App extends EventEmitter {
     }
   }
 
-  public setEnv(ua?: string) {
-    this.env = new Env(ua);
+  public setEnv<T extends Env>(ua?: string | T) {
+    if (!ua || typeof ua === 'string') {
+      this.env = new Env(ua);
+    } else {
+      this.env = ua;
+    }
   }
 
   public setDesignWidth(width: number) {
