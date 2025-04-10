@@ -32,6 +32,8 @@
     :disabled="!editable"
     :content="codeConfig"
     @submit="submitCodeBlockHandler"
+    @close="editDialogCloseHandler"
+    @open="editDialogOpenHandler"
   ></CodeBlockEditor>
 
   <Teleport to="body">
@@ -87,7 +89,7 @@ const { codeBlockService } = useServices();
 
 const editable = computed(() => codeBlockService.getEditStatus());
 
-const { codeBlockEditor, codeConfig, editCode, deleteCode, createCodeBlock, submitCodeBlockHandler } =
+const { codeId, codeBlockEditor, codeConfig, editCode, deleteCode, createCodeBlock, submitCodeBlockHandler } =
   useCodeBlockEdit(codeBlockService);
 
 const codeBlockListRef = useTemplateRef<InstanceType<typeof CodeBlockList>>('codeBlockList');
@@ -99,6 +101,22 @@ const filterTextChangeHandler = (val: string) => {
 eventBus?.on('edit-code', (id: string) => {
   editCode(id);
 });
+
+const editDialogOpenHandler = () => {
+  if (codeBlockListRef.value) {
+    for (const [statusId, status] of codeBlockListRef.value.nodeStatusMap.entries()) {
+      status.selected = statusId === codeId.value;
+    }
+  }
+};
+
+const editDialogCloseHandler = () => {
+  if (codeBlockListRef.value) {
+    for (const [, status] of codeBlockListRef.value.nodeStatusMap.entries()) {
+      status.selected = false;
+    }
+  }
+};
 
 const {
   nodeContentMenuHandler,

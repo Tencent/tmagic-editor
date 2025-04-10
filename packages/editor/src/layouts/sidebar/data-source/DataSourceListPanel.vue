@@ -45,6 +45,8 @@
     :values="dataSourceValues"
     :title="dialogTitle"
     @submit="submitDataSourceHandler"
+    @close="editDialogCloseHandler"
+    @open="editDialogOpenHandler"
   ></DataSourceConfigPanel>
 
   <Teleport to="body">
@@ -92,6 +94,22 @@ const { dataSourceService } = useServices();
 
 const { editDialog, dataSourceValues, dialogTitle, editable, editHandler, submitDataSourceHandler } =
   useDataSourceEdit(dataSourceService);
+
+const editDialogOpenHandler = (id: string) => {
+  if (dataSourceList.value) {
+    for (const [statusId, status] of dataSourceList.value.nodeStatusMap.entries()) {
+      status.selected = statusId === id;
+    }
+  }
+};
+
+const editDialogCloseHandler = () => {
+  if (dataSourceList.value) {
+    for (const [, status] of dataSourceList.value.nodeStatusMap.entries()) {
+      status.selected = false;
+    }
+  }
+};
 
 const datasourceTypeList = computed(() =>
   [

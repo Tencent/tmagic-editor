@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { inject, Ref, ref, watchEffect } from 'vue';
+import { inject, nextTick, Ref, ref, watch, watchEffect } from 'vue';
 
 import type { DataSourceSchema } from '@tmagic/core';
 import { tMagicMessage } from '@tmagic/design';
@@ -48,6 +48,8 @@ const width = defineModel<number>('width', { default: 670 });
 
 const emit = defineEmits<{
   submit: [v: any, eventData: ContainerChangeEventData];
+  close: [];
+  open: [id: string];
 }>();
 
 const { uiService, dataSourceService } = useServices();
@@ -72,6 +74,16 @@ const submitHandler = (values: any, data: ContainerChangeEventData) => {
 const errorHandler = (error: any) => {
   tMagicMessage.error(error.message);
 };
+
+watch(boxVisible, (visible) => {
+  nextTick(() => {
+    if (!visible) {
+      emit('close');
+    } else if (initValues.value?.id) {
+      emit('open', initValues.value.id);
+    }
+  });
+});
 
 defineExpose({
   show() {

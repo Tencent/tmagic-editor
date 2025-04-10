@@ -59,7 +59,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, Ref, ref, useTemplateRef } from 'vue';
+import { computed, inject, nextTick, Ref, ref, useTemplateRef, watch } from 'vue';
 
 import type { CodeBlockContent } from '@tmagic/core';
 import { TMagicButton, TMagicDialog, tMagicMessage, tMagicMessageBox, TMagicTag } from '@tmagic/design';
@@ -95,6 +95,8 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   submit: [values: CodeBlockContent, eventData: ContainerChangeEventData];
+  close: [];
+  open: [];
 }>();
 
 const { codeBlockService, uiService } = useServices();
@@ -260,6 +262,16 @@ const closedHandler = () => {
 
 const parentFloating = inject<Ref<HTMLDivElement | null>>('parentFloating', ref(null));
 const { boxPosition, calcBoxPosition } = useNextFloatBoxPosition(uiService, parentFloating);
+
+watch(boxVisible, (visible) => {
+  nextTick(() => {
+    if (!visible) {
+      emit('close');
+    } else {
+      emit('open');
+    }
+  });
+});
 
 defineExpose({
   async show() {

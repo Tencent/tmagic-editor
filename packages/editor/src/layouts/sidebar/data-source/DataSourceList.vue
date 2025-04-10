@@ -178,6 +178,7 @@ const nodeContentMenuHandler = (event: MouseEvent, data: TreeNodeData) => {
 };
 
 defineExpose({
+  nodeStatusMap,
   filter: filterTextChangeHandler,
 });
 </script>
