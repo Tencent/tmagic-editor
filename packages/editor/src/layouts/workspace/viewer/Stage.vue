@@ -149,7 +149,7 @@ watch(zoom, (zoom) => {
   stage.setZoom(zoom);
 });
 
-let timeoutId: NodeJS.Timeout | null = null;
+let timeoutId: ReturnType<typeof setTimeout> | null = null;
 watch(page, (page) => {
   if (runtime && page) {
     editorService.set('stageLoading', true);

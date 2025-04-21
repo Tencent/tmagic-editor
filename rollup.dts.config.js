@@ -22,7 +22,7 @@ const runtimes = readdirSync('temp/runtime');
 const targets = process.env.TARGETS ? process.env.TARGETS.split(',') : null;
 const targetPackages = targets ? packages.filter((pkg) => targets.includes(pkg)) : packages;
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function rollupConfig(pkg, base) {
   return {
@@ -34,9 +34,9 @@ function rollupConfig(pkg, base) {
     plugins: [
       alias({
         entries: [
-          { find: /^@form/, replacement: path.join(__dirname, `./temp/packages/form/src`) },
-          { find: /^@editor/, replacement: path.join(__dirname, `./temp/packages/editor/src`) },
-          { find: /^@data-source/, replacement: path.join(__dirname, `./temp/packages/data-source/src`) },
+          { find: /^@form/, replacement: path.join(dirname, './temp/packages/form/src') },
+          { find: /^@editor/, replacement: path.join(dirname, './temp/packages/editor/src') },
+          { find: /^@data-source/, replacement: path.join(dirname, './temp/packages/data-source/src') },
         ],
       }),
       dts(),
@@ -57,5 +57,5 @@ export default [
 ];
 
 function removeScss(path) {
-  writeFileSync(path, readFileSync(path).toString().replace(`import './theme/index.scss';`, ''));
+  writeFileSync(path, readFileSync(path).toString().replace("import './theme/index.scss';", ''));
 }

@@ -82,7 +82,7 @@ defineOptions({
 
 defineProps<{
   disabledShowSrc?: boolean;
-  extendState?: (state: FormState) => Record<string, any> | Promise<Record<string, any>>;
+  extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
 }>();
 
 const emit = defineEmits<{

@@ -79,7 +79,7 @@ export default defineComponent({
       return iteratorData.map((itemData: any) => {
         const condResult =
           app?.platform !== 'editor'
-            ? app?.dataSourceManager?.compliedIteratorItemConds(itemData, itemConfig, dsField) ?? true
+            ? (app?.dataSourceManager?.compliedIteratorItemConds(itemData, itemConfig, dsField) ?? true)
             : true;
 
         const newItems = app?.dataSourceManager?.compliedIteratorItems(itemData, items, dsField) ?? items;

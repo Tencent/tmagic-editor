@@ -9,7 +9,6 @@ import './theme/index.scss';
 export * from './types';
 export * from './config';
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
 export { default as TMagicAutocomplete } from './Autocomplete.vue';
 export { default as TMagicBadge } from './Badge.vue';
 export { default as TMagicButton } from './Button.vue';

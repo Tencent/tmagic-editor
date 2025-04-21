@@ -101,7 +101,6 @@ export default {
   install(app: App, opt: FormInstallOptions = {}) {
     const option = Object.assign(defaultInstallOpt, opt);
 
-    // eslint-disable-next-line no-param-reassign
     app.config.globalProperties.$MAGIC_FORM = option;
     setConfig(option);
 

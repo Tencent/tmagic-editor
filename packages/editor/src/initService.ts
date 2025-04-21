@@ -269,13 +269,13 @@ export const initServiceEvents = (
     }
   };
 
-  const dsDepCollectedHandler = async () => {
+  const dsDepCollectedHandler = () => {
     const root = editorService.get('root');
-    const app = await getTMagicApp();
-
-    if (root && app?.dsl) {
-      app.dsl.dataSourceDeps = root.dataSourceDeps;
-    }
+    getTMagicApp()?.then((app?: TMagicCore) => {
+      if (root && app?.dsl) {
+        app.dsl.dataSourceDeps = root.dataSourceDeps;
+      }
+    });
   };
 
   const collectIdle = (nodes: MComponent[], deep: boolean, type?: DepTargetType) =>
@@ -317,7 +317,7 @@ export const initServiceEvents = (
     depService.addTarget(createDataSourceCondTarget(ds, reactive({})));
   };
 
-  const rootChangeHandler = async (value: MApp | null, preValue?: MApp | null) => {
+  const rootChangeHandler = (value: MApp | null, preValue?: MApp | null) => {
     if (!value) return;
 
     value.codeBlocks = value.codeBlocks || {};
@@ -347,39 +347,40 @@ export const initServiceEvents = (
       delete value.dataSourceCondDeps;
     }
 
-    const nodeId = editorService.get('node')?.id || props.defaultSelected;
-    let node;
-    if (nodeId) {
-      node = editorService.getNodeById(nodeId);
-    }
+    const handler = async () => {
+      const nodeId = editorService.get('node')?.id || props.defaultSelected;
+      let node;
+      if (nodeId) {
+        node = editorService.getNodeById(nodeId);
+      }
+      if (node && node !== value) {
+        await editorService.select(node.id);
+      } else if (value.items?.length) {
+        await editorService.select(value.items[0]);
+      } else if (value.id) {
+        editorService.set('nodes', [value]);
+        editorService.set('parent', null);
+        editorService.set('page', null);
+      }
 
-    if (node && node !== value) {
-      await editorService.select(node.id);
-    } else if (value.items?.length) {
-      await editorService.select(value.items[0]);
-    } else if (value.id) {
-      editorService.set('nodes', [value]);
-      editorService.set('parent', null);
-      editorService.set('page', null);
-    }
+      if (toRaw(value) !== toRaw(preValue)) {
+        emit('update:modelValue', value);
+      }
+    };
 
-    if (toRaw(value) !== toRaw(preValue)) {
-      emit('update:modelValue', value);
-    }
+    handler();
   };
 
   // 新增节点，收集依赖
-  const nodeAddHandler = async (nodes: MComponent[]) => {
-    await collectIdle(nodes, true);
-
-    updateStageNodes(nodes);
+  const nodeAddHandler = (nodes: MComponent[]) => {
+    collectIdle(nodes, true).then(() => {
+      updateStageNodes(nodes);
+    });
   };
 
   // 节点更新，收集依赖
   // 仅当修改到数据源相关的才收集
-  const nodeUpdateHandler = async (
-    data: { newNode: MComponent; oldNode: MComponent; changeRecords?: ChangeRecord[] }[],
-  ) => {
+  const nodeUpdateHandler = (data: { newNode: MComponent; oldNode: MComponent; changeRecords?: ChangeRecord[] }[]) => {
     const needRecollectNodes: MComponent[] = [];
     const normalNodes: MComponent[] = [];
     for (const { newNode, oldNode, changeRecords } of data) {
@@ -424,9 +425,12 @@ export const initServiceEvents = (
 
     if (needRecollectNodes.length) {
       // 有数据源依赖，需要等依赖重新收集完才更新stage
-      await collectIdle(needRecollectNodes, true, DepTargetType.DATA_SOURCE);
-      await collectIdle(needRecollectNodes, true, DepTargetType.DATA_SOURCE_COND);
-      updateStageNodes(needRecollectNodes);
+      const handler = async () => {
+        await collectIdle(needRecollectNodes, true, DepTargetType.DATA_SOURCE);
+        await collectIdle(needRecollectNodes, true, DepTargetType.DATA_SOURCE_COND);
+        updateStageNodes(needRecollectNodes);
+      };
+      handler();
     } else {
       updateStageNodes(normalNodes);
       // 在上面判断是否需要收集数据源依赖中已经更新stage
@@ -443,9 +447,10 @@ export const initServiceEvents = (
   };
 
   // 由于历史记录变化是更新整个page，所以历史记录变化时，需要重新收集依赖
-  const historyChangeHandler = async (page: MPage | MPageFragment) => {
-    await collectIdle([page], true);
-    updateStageNode(page);
+  const historyChangeHandler = (page: MPage | MPageFragment) => {
+    collectIdle([page], true).then(() => {
+      updateStageNode(page);
+    });
   };
 
   editorService.on('history-change', historyChangeHandler);
@@ -454,27 +459,28 @@ export const initServiceEvents = (
   editorService.on('remove', nodeRemoveHandler);
   editorService.on('update', nodeUpdateHandler);
 
-  const dataSourceAddHandler = async (config: DataSourceSchema) => {
-    initDataSourceDepTarget(config);
-    const app = await getTMagicApp();
+  const dataSourceAddHandler = (config: DataSourceSchema) => {
+    const handler = async () => {
+      initDataSourceDepTarget(config);
+      const app = await getTMagicApp();
 
-    if (!app?.dataSourceManager) {
-      return;
-    }
+      if (!app?.dataSourceManager) {
+        return;
+      }
 
-    app.dataSourceManager.addDataSource(config);
+      app.dataSourceManager.addDataSource(config);
 
-    const newDs = app.dataSourceManager.get(config.id);
+      const newDs = app.dataSourceManager.get(config.id);
 
-    if (newDs) {
-      app.dataSourceManager.init(newDs);
-    }
+      if (newDs) {
+        app.dataSourceManager.init(newDs);
+      }
+    };
+
+    handler();
   };
 
-  const dataSourceUpdateHandler = async (
-    config: DataSourceSchema,
-    { changeRecords }: { changeRecords: ChangeRecord[] },
-  ) => {
+  const dataSourceUpdateHandler = (config: DataSourceSchema, { changeRecords }: { changeRecords: ChangeRecord[] }) => {
     const updateDsData = async () => {
       const app = await getTMagicApp();
 
@@ -565,29 +571,33 @@ export const initServiceEvents = (
     depService.removeTarget(id, DepTargetType.DATA_SOURCE_METHOD);
   };
 
-  const dataSourceRemoveHandler = async (id: string) => {
+  const dataSourceRemoveHandler = (id: string) => {
     const root = editorService.get('root');
 
     if (!root) {
       return;
     }
 
-    const nodeIds = Object.keys(root.dataSourceDeps?.[id] || {});
-    const nodes = getNodes(nodeIds, root.items);
+    const handler = async () => {
+      const nodeIds = Object.keys(root.dataSourceDeps?.[id] || {});
+      const nodes = getNodes(nodeIds, root.items);
 
-    await Promise.all([
-      collectIdle(nodes, false, DepTargetType.DATA_SOURCE),
-      collectIdle(nodes, false, DepTargetType.DATA_SOURCE_COND),
-      collectIdle(nodes, false, DepTargetType.DATA_SOURCE_METHOD),
-    ]);
+      await Promise.all([
+        collectIdle(nodes, false, DepTargetType.DATA_SOURCE),
+        collectIdle(nodes, false, DepTargetType.DATA_SOURCE_COND),
+        collectIdle(nodes, false, DepTargetType.DATA_SOURCE_METHOD),
+      ]);
 
-    updateDataSourceSchema();
+      updateDataSourceSchema();
 
-    const app = await getTMagicApp();
-    app?.dataSourceManager?.removeDataSource(id);
+      const app = await getTMagicApp();
+      app?.dataSourceManager?.removeDataSource(id);
 
-    updateStageNodes(nodes);
-    removeDataSourceTarget(id);
+      updateStageNodes(nodes);
+      removeDataSourceTarget(id);
+    };
+
+    handler();
   };
 
   dataSourceService.on('add', dataSourceAddHandler);

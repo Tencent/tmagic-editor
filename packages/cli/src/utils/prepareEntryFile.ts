@@ -95,7 +95,7 @@ export const prepareEntryFile = async (app: App) => {
       app.writeTemp(fileName, content);
     } else {
       fileName = `${file}.js`;
-      app.writeTemp(`${file}.d.ts`, `const type: Record<string, any>;\n\nexport default type;`);
+      app.writeTemp(`${file}.d.ts`, 'const type: Record<string, any>;\n\nexport default type;');
     }
     app.writeTemp(fileName, content);
   });
@@ -136,6 +136,7 @@ export const generateContent = (
 };
 
 export const prettyCode = (code: string) =>
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   recast.prettyPrint(recast.parse(code.replace(/\\/g, '/'), { parser: require('recast/parsers/typescript') }), {
     tabWidth: 2,
     trailingComma: true,

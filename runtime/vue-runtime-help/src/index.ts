@@ -8,7 +8,7 @@ export * from './hooks/use-app';
 export * from './hooks/use-component-status';
 export { useComponent } from './hooks/use-component';
 
-export interface userRenderFunctionOptions {
+export interface UserRenderFunctionOptions {
   h: typeof h;
   type: Parameters<typeof h>[0];
   props?: {
@@ -26,4 +26,4 @@ export interface userRenderFunctionOptions {
   directives?: { name: string; value: any; modifiers: any }[];
 }
 
-export type UserRenderFunction = (options: userRenderFunctionOptions) => any;
+export type UserRenderFunction = (options: UserRenderFunctionOptions) => any;

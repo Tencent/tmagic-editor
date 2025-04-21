@@ -27,9 +27,9 @@ import type { PopoverProps } from './types';
 
 defineSlots<{
   /** 触发 Popover 显示的 HTML 元素 */
-  reference(props: {}): any;
+  reference(_props: {}): any;
   /** Popover 内嵌 HTML 文本 */
-  default(props: {}): any;
+  default(_props: {}): any;
 }>();
 
 defineOptions({
@@ -130,7 +130,7 @@ const mouseenterHandler = () => {
   popoverVisible.value = true;
 };
 
-let timer: NodeJS.Timeout | null = null;
+let timer: ReturnType<typeof setTimeout> | null = null;
 const mouseleaveHandler = () => {
   if (props.disabled) return;
 

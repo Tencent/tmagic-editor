@@ -142,7 +142,7 @@ import codeBlockService from './services/codeBlock';
 import componentListService from './services/componentList';
 import dataSourceService from './services/dataSource';
 import depService from './services/dep';
-import editorService, { type EditorService } from './services/editor';
+import editorService from './services/editor';
 import eventsService from './services/events';
 import historyService from './services/history';
 import keybindingService from './services/keybinding';
@@ -153,25 +153,9 @@ import uiService from './services/ui';
 import keybindingConfig from './utils/keybinding-config';
 import { defaultEditorProps, EditorProps } from './editorProps';
 import { initServiceEvents, initServiceState } from './initService';
-import type {
-  EventBus,
-  FrameworkSlots,
-  PropsPanelSlots,
-  Services,
-  SidebarSlots,
-  StageOptions,
-  WorkspaceSlots,
-} from './type';
+import type { EditorSlots, EventBus, Services, StageOptions } from './type';
 
-defineSlots<
-  FrameworkSlots &
-    WorkspaceSlots &
-    SidebarSlots &
-    PropsPanelSlots & {
-      workspace(props: { editorService: EditorService }): any;
-      'workspace-content'(props: { editorService: EditorService }): any;
-    }
->();
+defineSlots<EditorSlots>();
 
 defineOptions({
   name: 'MEditor',

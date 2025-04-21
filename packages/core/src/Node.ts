@@ -148,7 +148,7 @@ class Node extends EventEmitter {
   }
 
   private listenLifeSafe() {
-    this.once('created', async (instance: any) => {
+    this.once('created', (instance: any) => {
       this.once('destroy', () => {
         this.instance = null;
         if (typeof this.data.destroy === 'function') {
@@ -165,24 +165,27 @@ class Node extends EventEmitter {
         }
       }
 
-      await this.runHookCode('created');
+      this.runHookCode('created');
     });
 
-    this.once('mounted', async (instance: any) => {
-      if (instance) {
-        this.registerMethod(instance);
-        if (instance.config) {
-          this.setData(instance.config);
+    this.once('mounted', (instance: any) => {
+      const handler = async () => {
+        if (instance) {
+          this.registerMethod(instance);
+          if (instance.config) {
+            this.setData(instance.config);
+          }
         }
-      }
 
-      for (let eventConfig = this.eventQueue.shift(); eventConfig; eventConfig = this.eventQueue.shift()) {
-        if (typeof instance[eventConfig.method] === 'function') {
-          await instance[eventConfig.method](eventConfig.fromCpt, ...eventConfig.args);
+        for (let eventConfig = this.eventQueue.shift(); eventConfig; eventConfig = this.eventQueue.shift()) {
+          if (typeof instance[eventConfig.method] === 'function') {
+            await instance[eventConfig.method](eventConfig.fromCpt, ...eventConfig.args);
+          }
         }
-      }
 
-      await this.runHookCode('mounted');
+        this.runHookCode('mounted');
+      };
+      handler();
     });
   }
 }

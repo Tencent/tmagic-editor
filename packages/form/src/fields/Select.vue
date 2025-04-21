@@ -21,7 +21,7 @@
   >
     <template v-if="config.group">
       <component
-        v-for="(group, index) in (options as SelectGroupOption[])"
+        v-for="(group, index) in options as SelectGroupOption[]"
         :key="index"
         :is="optionGroupComponent?.component || 'el-option-group'"
         v-bind="
@@ -55,7 +55,7 @@
     </template>
     <template v-else>
       <component
-        v-for="option in (options as SelectOption[])"
+        v-for="option in options as SelectOption[]"
         class="tmagic-design-option"
         :key="config.valueKey ? option.value[config.valueKey] : option.value"
         :is="optionComponent?.component || 'el-option'"

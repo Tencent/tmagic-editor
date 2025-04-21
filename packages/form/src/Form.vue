@@ -63,7 +63,7 @@ const props = withDefaults(
     keyProp?: string;
     popperClass?: string;
     preventSubmitDefault?: boolean;
-    extendState?: (state: FormState) => Record<string, any> | Promise<Record<string, any>>;
+    extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
   }>(),
   {
     config: () => [],
@@ -101,7 +101,7 @@ const formState: FormState = reactive<FormState>({
   parentValues: props.parentValues,
   values,
   lastValuesProcessed,
-  $emit: emit as (event: string, ...args: any[]) => void,
+  $emit: emit as (_event: string, ..._args: any[]) => void,
   fields,
   setField: (prop: string, field: any) => fields.set(prop, field),
   getField: (prop: string) => fields.get(prop),

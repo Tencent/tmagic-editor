@@ -79,7 +79,7 @@ defineOptions({
 const props = defineProps<{
   indent?: number;
   nextLevelIndentIncrement?: number;
-  customError?: (id: Id, errorType: CodeDeleteErrorType) => any;
+  customError?: (_id: Id, _errorType: CodeDeleteErrorType) => any;
   customContentMenu: CustomContentMenuFunction;
 }>();
 

@@ -13,7 +13,6 @@ defineOptions({
 const props = defineProps<FieldProps<DisplayConfig>>();
 
 if (props.config.initValue && props.model) {
-  // eslint-disable-next-line vue/no-setup-props-destructure
   props.model[props.name] = props.config.initValue;
 }
 

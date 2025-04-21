@@ -93,7 +93,9 @@ const scrollBy = (delta: number) => {
   position: absolute;
   background-color: transparent;
   opacity: 0.3;
-  transition: background-color 0.2s linear, opacity 0.2s linear;
+  transition:
+    background-color 0.2s linear,
+    opacity 0.2s linear;
 
   .m-editor-scroll-bar-thumb {
     background-color: #aaa;
@@ -108,7 +110,9 @@ const scrollBy = (delta: number) => {
 
     .m-editor-scroll-bar-thumb {
       height: 6px;
-      transition: background-color 0.2s linear, height 0.2s ease-in-out;
+      transition:
+        background-color 0.2s linear,
+        height 0.2s ease-in-out;
       bottom: 2px;
     }
   }
@@ -120,7 +124,9 @@ const scrollBy = (delta: number) => {
 
     .m-editor-scroll-bar-thumb {
       width: 6px;
-      transition: background-color 0.2s linear, width 0.2s ease-in-out;
+      transition:
+        background-color 0.2s linear,
+        width 0.2s ease-in-out;
       right: 2px;
     }
   }

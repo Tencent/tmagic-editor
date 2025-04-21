@@ -41,21 +41,21 @@
           config.dynamic
             ? (name ? model[name] : model)[tabIndex]
             : tab.name
-            ? (name ? model[name] : model)[tab.name]
-            : name
-            ? model[name]
-            : model
+              ? (name ? model[name] : model)[tab.name]
+              : name
+                ? model[name]
+                : model
         "
         :last-values="
           isEmpty(lastValues)
             ? {}
             : config.dynamic
-            ? (name ? lastValues[name] : lastValues)[tabIndex]
-            : tab.name
-            ? (name ? lastValues[name] : lastValues)[tab.name]
-            : name
-            ? lastValues[name]
-            : lastValues
+              ? (name ? lastValues[name] : lastValues)[tabIndex]
+              : tab.name
+                ? (name ? lastValues[name] : lastValues)[tab.name]
+                : name
+                  ? lastValues[name]
+                  : lastValues
         "
         :is-compare="isCompare"
         :prop="config.dynamic ? `${prop}${prop ? '.' : ''}${String(tabIndex)}` : prop"

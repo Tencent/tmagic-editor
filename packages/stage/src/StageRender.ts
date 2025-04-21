@@ -235,22 +235,26 @@ export default class StageRender extends EventEmitter {
     }
   }
 
-  private iframeLoadHandler = async () => {
-    if (!this.contentWindow?.magic) {
-      this.postTmagicRuntimeReady();
-    }
-
-    if (!this.contentWindow) return;
-
-    if (this.customizedRender) {
-      const el = await this.customizedRender();
-      if (el) {
-        this.contentWindow.document?.body?.appendChild(el);
+  private iframeLoadHandler = () => {
+    const handler = async () => {
+      if (!this.contentWindow?.magic) {
+        this.postTmagicRuntimeReady();
       }
-    }
 
-    this.emit('onload');
+      if (!this.contentWindow) return;
 
-    injectStyle(this.contentWindow.document, style);
+      if (this.customizedRender) {
+        const el = await this.customizedRender();
+        if (el) {
+          this.contentWindow.document?.body?.appendChild(el);
+        }
+      }
+
+      this.emit('onload');
+
+      injectStyle(this.contentWindow.document, style);
+    };
+
+    handler();
   };
 }

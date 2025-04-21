@@ -56,7 +56,7 @@ import { useServices } from '@editor/hooks/use-services';
 import CodeEditor from '../CodeEditor.vue';
 
 defineSlots<{
-  'props-form-panel-header'(props: {}): any;
+  'props-form-panel-header'(_props: {}): any;
 }>();
 
 defineOptions({
@@ -70,7 +70,7 @@ const props = defineProps<{
   labelWidth?: string;
   codeValueKey?: string;
   labelPosition?: string;
-  extendState?: (state: FormState) => Record<string, any> | Promise<Record<string, any>>;
+  extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
 }>();
 
 const emit = defineEmits<{

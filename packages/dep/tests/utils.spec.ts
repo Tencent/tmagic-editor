@@ -125,7 +125,7 @@ describe('utils', () => {
   test('isUseDataSourceField', () => {
     expect(utils.isUseDataSourceField([`${DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX}dsID`, 'field'], 'dsID')).toBeTruthy();
     expect(utils.isUseDataSourceField([`${DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX}dsID`, 'field'], 'dsID1')).toBeFalsy();
-    expect(utils.isUseDataSourceField([`abcdsID`, 'field'], 'dsID')).toBeFalsy();
+    expect(utils.isUseDataSourceField(['abcdsID', 'field'], 'dsID')).toBeFalsy();
     expect(utils.isUseDataSourceField([123, 'field'], 123)).toBeFalsy();
   });
 

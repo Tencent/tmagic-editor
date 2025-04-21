@@ -29,6 +29,7 @@ export const cli = (defaultAppConfig: UserConfig): void => {
   const program = cac('tmagic');
 
   // display core version and cli version
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const versionCli = require('../package.json').version;
   program.version(`tmagic/cli@${versionCli}`);
 

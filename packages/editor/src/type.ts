@@ -65,6 +65,15 @@ import type { StageOverlayService } from './services/stageOverlay';
 import type { StorageService } from './services/storage';
 import type { UiService } from './services/ui';
 import type { UndoRedo } from './utils/undo-redo';
+
+export type EditorSlots = FrameworkSlots &
+  WorkspaceSlots &
+  SidebarSlots &
+  PropsPanelSlots & {
+    workspace(props: { editorService: EditorService }): any;
+    'workspace-content'(props: { editorService: EditorService }): any;
+  };
+
 export interface FrameworkSlots {
   header(props: {}): any;
   nav(props: {}): any;

@@ -196,6 +196,7 @@ export interface OnChangeHandlerData {
   config: any;
   prop: string;
   changeRecords: ChangeRecord[];
+  setModel: (prop: string, value: any) => void;
 }
 
 export type OnChangeHandler = (mForm: FormState | undefined, value: any, data: OnChangeHandlerData) => any;

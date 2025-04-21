@@ -31,7 +31,6 @@ const emit = defineEmits(['change']);
 
 useAddField(props.prop);
 
-// eslint-disable-next-line vue/no-setup-props-destructure
 const { names } = props.config;
 const value = ref<(Date | undefined)[] | null>([]);
 

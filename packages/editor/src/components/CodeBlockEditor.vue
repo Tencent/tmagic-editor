@@ -233,7 +233,7 @@ const changeHandler = (values: CodeBlockContent) => {
   changedValue.value = values;
 };
 
-const beforeClose = (done: (cancel?: boolean) => void) => {
+const beforeClose = (done: (_cancel?: boolean) => void) => {
   if (!changedValue.value) {
     done();
     return;

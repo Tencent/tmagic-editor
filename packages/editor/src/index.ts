@@ -122,7 +122,6 @@ export default {
     app.use(formPlugin, opt || {});
     app.use(tablePlugin);
 
-    // eslint-disable-next-line no-param-reassign
     app.config.globalProperties.$TMAGIC_EDITOR = option;
     setEditorConfig(option);
 

@@ -1,5 +1,4 @@
-module.exports = {
-  plugins: ['prettier'],
+export default {
   rules: {
     'wrap-iife': 'off',
     'template-curly-spacing': 'off',

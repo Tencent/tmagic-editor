@@ -61,7 +61,7 @@ Object.defineProperties(globalThis.HTMLElement.prototype, {
 
 const createElement = () => {
   const el = globalThis.document.createElement('div');
-  el.style.cssText = `width: 100px; height: 100px; position: absolute; left: 100px; top: 100px;`;
+  el.style.cssText = 'width: 100px; height: 100px; position: absolute; left: 100px; top: 100px;';
   return el;
 };
 
@@ -78,7 +78,7 @@ describe('getOffset', () => {
   });
 
   test('没有offsetParent， 没有left、top', () => {
-    div.style.cssText = `width: 100px; height: 100px`;
+    div.style.cssText = 'width: 100px; height: 100px';
     root.appendChild(div);
     const offset = util.getOffset(div);
     expect(offset.left).toBe(0);
@@ -95,7 +95,7 @@ describe('getOffset', () => {
 
   test('有offsetParent， 没有left、top', () => {
     const parent = createElement();
-    div.style.cssText = `width: 100px; height: 100px`;
+    div.style.cssText = 'width: 100px; height: 100px';
     parent.appendChild(div);
     root.appendChild(parent);
 
@@ -119,7 +119,7 @@ describe('getAbsolutePosition', () => {
 
   test('有offsetParent', () => {
     const parent = createElement();
-    div.style.cssText = `width: 100px; height: 100px`;
+    div.style.cssText = 'width: 100px; height: 100px';
     parent.appendChild(div);
     root.appendChild(parent);
     const offset = util.getAbsolutePosition(div, { left: 100, top: 100 });

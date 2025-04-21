@@ -9,8 +9,8 @@
     "clean:top": "rimraf */**/dist */**/types */dist coverage dwt* temp packages/cli/lib",
     "clean:modules": "rimraf node_modules **/node_modules **/**/node_modules",
     "clean:all": "pnpm clean:top && pnpm clean:modules",
-    "lint": "eslint . --ext .js,.vue,.ts,.tsx",
-    "lint-fix": "eslint . --fix --ext .vue,.js,.ts,.tsx",
+    "lint": "eslint --cache .",
+    "lint-fix": "eslint --fix --cache .",
     "playground": "pnpm --filter \"runtime-vue3\" build:libs && pnpm --filter \"runtime-vue3\" --filter \"tmagic-playground\" dev",
     "pg": "pnpm playground",
     "playground:vue2": "pnpm --filter \"runtime-vue2\" build:libs && pnpm --filter \"runtime-vue2\" --filter \"tmagic-playground\" dev:vue2",
@@ -46,9 +46,8 @@
     "@commitlint/cli": "^18.6.1",
     "@commitlint/config-conventional": "^18.6.3",
     "@rollup/plugin-alias": "^5.1.1",
+    "@tmagic/eslint-config": "workspace: ^*",
     "@types/node": "18.19.61",
-    "@typescript-eslint/eslint-plugin": "^5.62.0",
-    "@typescript-eslint/parser": "^5.62.0",
     "@vitejs/plugin-vue": "^5.2.3",
     "@vitest/coverage-v8": "^2.1.9",
     "@vue/compiler-sfc": "^3.5.13",
@@ -59,12 +58,7 @@
     "cz-conventional-changelog": "^3.3.0",
     "element-plus": "^2.9.7",
     "enquirer": "^2.4.1",
-    "eslint": "^8.57.1",
-    "eslint-config-tencent": "^1.1.2",
-    "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "eslint-plugin-simple-import-sort": "^10.0.0",
-    "eslint-plugin-vue": "^9.33.0",
+    "eslint": "^9.25.0",
     "execa": "^4.1.0",
     "highlight.js": "^11.11.1",
     "husky": "^7.0.4",
@@ -72,7 +66,7 @@
     "lint-staged": "^11.2.6",
     "minimist": "^1.2.8",
     "picocolors": "^1.1.1",
-    "prettier": "^2.8.8",
+    "prettier": "^3.5.3",
     "recast": "^0.23.11",
     "rimraf": "^3.0.2",
     "rollup": "^4.38.0",
@@ -93,7 +87,7 @@
     }
   },
   "lint-staged": {
-    "*.{js,ts,vue}": "eslint --fix",
+    "*.{js,ts,vue}": "eslint --fix --cache",
     "*.scss": "prettier --write"
   }
 }

@@ -91,7 +91,7 @@ const props = withDefaults(
   defineProps<{
     disabledPageFragment: boolean;
     pageBarSortOptions?: PageBarSortOptions;
-    filterFunction?: (page: MPage | MPageFragment, keyword: string) => boolean;
+    filterFunction?: (_page: MPage | MPageFragment, _keyword: string) => boolean;
   }>(),
   {
     filterFunction: (page, keyword) => page.name?.includes(keyword) || `${page.id}`.includes(keyword),

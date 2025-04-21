@@ -40,6 +40,7 @@ export * from './dom';
 // for typeof global checks without @types/node
 declare let global: {};
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 let _globalThis: any;
 export const getGlobalThis = (): any =>
   _globalThis ||
@@ -47,12 +48,12 @@ export const getGlobalThis = (): any =>
     typeof globalThis !== 'undefined'
       ? globalThis
       : typeof self !== 'undefined'
-      ? self
-      : typeof window !== 'undefined'
-      ? window
-      : typeof global !== 'undefined'
-      ? global
-      : {});
+        ? self
+        : typeof window !== 'undefined'
+          ? window
+          : typeof global !== 'undefined'
+            ? global
+            : {});
 
 export const sleep = (ms: number): Promise<void> =>
   new Promise((resolve) => {
@@ -410,6 +411,7 @@ export const getDefaultValueFromFields = (fields: DataSchema[]) => {
             data[field.name] = JSON.parse(field.defaultValue);
           } catch (e) {
             data[field.name] = defaultValue.object;
+            console.warn('defaultValue 解析失败', field.defaultValue, e);
           }
           return;
         }

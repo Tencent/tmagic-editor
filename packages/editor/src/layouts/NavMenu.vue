@@ -69,7 +69,7 @@ const getConfig = (item: MenuItem): (MenuButton | MenuComponent)[] => {
         type: 'button',
         className: 'delete',
         icon: markRaw(Delete),
-        tooltip: `刪除(Delete)`,
+        tooltip: '刪除(Delete)',
         disabled: () => editorService.get('node')?.type === NodeType.PAGE,
         handler: () => {
           const node = editorService.get('node');

@@ -12,9 +12,9 @@ const args = minimist(process.argv.slice(2));
 
 const toPascalCase = (str) => str.replace(/(^\w|-\w)/g, (text) => text.replace(/-/, '').toUpperCase());
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const packagesDir = path.resolve(__dirname, '../packages');
-const runtimeDir = path.resolve(__dirname, '../runtime');
+const dirname = path.dirname(fileURLToPath(import.meta.url));
+const packagesDir = path.resolve(dirname, '../packages');
+const runtimeDir = path.resolve(dirname, '../runtime');
 
 if (args.package) {
   const pkgRoot = path.resolve(packagesDir, args.package);

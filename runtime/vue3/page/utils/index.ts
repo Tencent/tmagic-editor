@@ -25,6 +25,7 @@ export const getLocalConfig = (): MApp[] => {
     // eslint-disable-next-line no-eval
     return [eval(`(${configStr})`)];
   } catch (err) {
+    console.error('Error parsing localStorage magicDSL:', err);
     return [];
   }
 };

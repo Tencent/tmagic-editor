@@ -84,7 +84,7 @@ const props = withDefaults(
     data: any[];
     columns?: ColumnConfig[];
     /** 合并行或列的计算方法 */
-    spanMethod?: (data: { row: any; column: any; rowIndex: number; columnIndex: number }) => [number, number];
+    spanMethod?: (_data: { row: any; column: any; rowIndex: number; columnIndex: number }) => [number, number];
     loading?: boolean;
     /** Table 的最大高度。合法的值为数字或者单位为 px 的高度 */
     bodyHeight?: string | number;

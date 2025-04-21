@@ -179,13 +179,15 @@ export const fillConfig = (config: FormConfig = [], labelWidth = '80px'): FormCo
             append: {
               type: 'button',
               text: '复制',
-              handler: async (vm, { model }) => {
-                try {
-                  await navigator.clipboard.writeText(`${model.id}`);
-                  tMagicMessage.success('已复制');
-                } catch (err) {
-                  tMagicMessage.error('复制失败');
-                }
+              handler: (vm, { model }) => {
+                navigator.clipboard
+                  .writeText(`${model.id}`)
+                  .then(() => {
+                    tMagicMessage.success('已复制');
+                  })
+                  .catch(() => {
+                    tMagicMessage.error('复制失败');
+                  });
               },
             },
           },

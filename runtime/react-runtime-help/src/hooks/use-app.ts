@@ -37,13 +37,15 @@ export interface UseAppOptions<T extends MNodeInstance = MNodeInstance> {
   };
 }
 
-export const useNode = (
+export const useNode = <T extends TMagicNode = TMagicNode>(
   props: Pick<UseAppOptions, 'config' | 'iteratorContainerId' | 'iteratorIndex'>,
   app = useContext(AppContent),
-) =>
-  isDslNode(props.config) && props.config.id
-    ? app?.getNode(props.config.id, props.iteratorContainerId, props.iteratorIndex)
-    : undefined;
+): T | undefined => {
+  if (isDslNode(props.config) && props.config.id) {
+    app?.getNode(props.config.id, props.iteratorContainerId, props.iteratorIndex);
+  }
+  return void 0;
+};
 
 export const registerNodeHooks = (node?: TMagicNode, methods: Methods = {}) => {
   if (!node) {

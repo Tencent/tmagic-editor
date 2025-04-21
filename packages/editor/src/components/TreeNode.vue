@@ -72,9 +72,9 @@ import type { LayerNodeStatus, TreeNodeData } from '@editor/type';
 import { updateStatus } from '@editor/utils/tree';
 
 defineSlots<{
-  'tree-node-label'(props: { data: TreeNodeData }): any;
-  'tree-node-tool'(props: { data: TreeNodeData }): any;
-  'tree-node-content'(props: { data: TreeNodeData }): any;
+  'tree-node-label'(_props: { data: TreeNodeData }): any;
+  'tree-node-tool'(_props: { data: TreeNodeData }): any;
+  'tree-node-content'(_props: { data: TreeNodeData }): any;
 }>();
 
 defineOptions({

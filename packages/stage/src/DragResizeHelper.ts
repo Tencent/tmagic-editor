@@ -285,13 +285,18 @@ export default class DragResizeHelper {
           getIdFromEl()(ev.target)?.startsWith(DRAG_EL_ID_PREFIX) && getIdFromEl()(ev.target)?.endsWith(frameItem.id),
       );
       if (!frameSnapShot) return;
-      const targeEl = this.targetList.find(
-        (targetItem) =>
-          getIdFromEl()(ev.target)?.startsWith(DRAG_EL_ID_PREFIX) &&
-          getIdFromEl()(targetItem) &&
-          getIdFromEl()(ev.target)?.endsWith(getIdFromEl()(targetItem)!),
-      );
+
+      const findTargetElFuctin = (targetItem: HTMLElement) => {
+        const getId = getIdFromEl();
+        const targetId = getId(ev.target);
+        const targetItemId = getId(targetItem);
+        return targetId?.startsWith(DRAG_EL_ID_PREFIX) && targetItemId && targetId?.endsWith(targetItemId);
+      };
+
+      const targeEl = this.targetList.find(findTargetElFuctin);
+
       if (!targeEl) return;
+
       // 元素与其所属组同时加入多选列表时，只更新父元素
       const isParentIncluded = this.targetList.find(
         (targetItem) => getIdFromEl()(targetItem) === getIdFromEl()(targeEl.parentElement),

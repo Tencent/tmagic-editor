@@ -82,7 +82,7 @@ withDefaults(
     labelPosition?: string;
     preventSubmitDefault?: boolean;
     /** 关闭前的回调，会暂停 Drawer 的关闭; done 是个 function type 接受一个 boolean 参数, 执行 done 使用 true 参数或不提供参数将会终止关闭 */
-    beforeClose?: (done: (cancel?: boolean) => void) => void;
+    beforeClose?: (_done: (_cancel?: boolean) => void) => void;
   }>(),
   {
     closeOnPressEscape: true,

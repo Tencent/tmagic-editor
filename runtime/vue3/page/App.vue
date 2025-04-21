@@ -1,5 +1,5 @@
 <template>
-  <component :is="pageComponent" :config="(pageConfig as MPage)"></component>
+  <component :is="pageComponent" :config="pageConfig as MPage"></component>
 </template>
 
 <script lang="ts" setup>

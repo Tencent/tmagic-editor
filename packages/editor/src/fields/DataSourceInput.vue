@@ -179,7 +179,11 @@ const curCharIsDot = (dotIndex: number) => dotIndex > -1 && dotIndex === getSele
  * @param leftCurlyBracketIndex 左大括号字符索引
  * @param cb 建议的方法
  */
-const dsQuerySearch = (queryString: string, leftCurlyBracketIndex: number, cb: (data: { value: string }[]) => void) => {
+const dsQuerySearch = (
+  queryString: string,
+  leftCurlyBracketIndex: number,
+  cb: (_data: { value: string }[]) => void,
+) => {
   let result: DataSourceSchema[] = [];
 
   if (curCharIsLeftCurlyBracket(leftCurlyBracketIndex)) {
@@ -211,7 +215,7 @@ const fieldQuerySearch = (
   queryString: string,
   leftAngleIndex: number,
   dotIndex: number,
-  cb: (data: { value: string }[]) => void,
+  cb: (_data: { value: string }[]) => void,
 ) => {
   let result: DataSchema[] = [];
 
@@ -272,7 +276,7 @@ const fieldQuerySearch = (
  * @param queryString 当前输入框内的字符串
  * @param cb 建议回调
  */
-const querySearch = (queryString: string, cb: (data: { value: string }[]) => void) => {
+const querySearch = (queryString: string, cb: (_data: { value: string }[]) => void) => {
   inputText = queryString;
 
   const selectionStart = getSelectionStart();

@@ -449,7 +449,6 @@ const onChangeHandler = async function (v: any, eventData: ContainerChangeEventD
     valueProp = valueProp ? `${valueProp}.${eventData.modifyKey}` : eventData.modifyKey!;
 
     // 需要清除掉modifyKey，不然往上层抛出后还会被认为需要修改
-    // eslint-disable-next-line no-param-reassign
     delete eventData.modifyKey;
   } else if (isValidName() && props.model !== value && (v !== value || props.model[name.value] !== value)) {
     // field内容下包含field-link时，model===value, 这里避免循环引用

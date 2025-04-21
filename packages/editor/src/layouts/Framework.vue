@@ -91,7 +91,7 @@ defineOptions({
 defineProps<{
   disabledPageFragment: boolean;
   pageBarSortOptions?: PageBarSortOptions;
-  pageFilterFunction?: (page: MPage | MPageFragment, keyword: string) => boolean;
+  pageFilterFunction?: (_page: MPage | MPageFragment, _keyword: string) => boolean;
 }>();
 
 const codeOptions = inject('codeOptions', {});

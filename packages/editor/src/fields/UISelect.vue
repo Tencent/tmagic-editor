@@ -70,7 +70,7 @@ const uiSelectMode = ref(false);
 const cancelHandler = () => {
   uiService.set('uiSelectMode', false);
   uiSelectMode.value = false;
-  globalThis.document.removeEventListener(UI_SELECT_MODE_EVENT_NAME, clickHandler as EventListener);
+  globalThis.document.removeEventListener(UI_SELECT_MODE_EVENT_NAME, clickHandler as any);
 };
 
 const clickHandler = ({ detail }: Event & { detail: HTMLElement | MNode }) => {
@@ -97,7 +97,7 @@ const toName = computed(() => {
 const startSelect = () => {
   uiService.set('uiSelectMode', true);
   uiSelectMode.value = true;
-  globalThis.document.addEventListener(UI_SELECT_MODE_EVENT_NAME, clickHandler as EventListener);
+  globalThis.document.addEventListener(UI_SELECT_MODE_EVENT_NAME, clickHandler as any);
 };
 
 const deleteHandler = () => {

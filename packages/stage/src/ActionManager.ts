@@ -92,20 +92,24 @@ export default class ActionManager extends EventEmitter {
   private disabledMultiSelect = false;
   private config: ActionManagerConfig;
 
-  private mouseMoveHandler = throttle(async (event: MouseEvent): Promise<void> => {
-    if ((event.target as HTMLDivElement)?.classList?.contains('moveable-direction')) {
-      return;
-    }
+  private mouseMoveHandler = throttle((event: MouseEvent): void => {
+    const handler = async () => {
+      if ((event.target as HTMLDivElement)?.classList?.contains('moveable-direction')) {
+        return;
+      }
 
-    const el = await this.getElementFromPoint(event);
-    const id = getIdFromEl()(el);
-    if (!id) {
-      this.clearHighlight();
-      return;
-    }
+      const el = await this.getElementFromPoint(event);
+      const id = getIdFromEl()(el);
+      if (!id) {
+        this.clearHighlight();
+        return;
+      }
 
-    this.emit('mousemove', event);
-    this.highlight(id);
+      this.emit('mousemove', event);
+      this.highlight(id);
+    };
+
+    handler();
   }, throttleTime);
 
   constructor(config: ActionManagerConfig) {
@@ -299,6 +303,7 @@ export default class ActionManager extends EventEmitter {
       el = this.getTargetElement(id);
     } catch (error) {
       this.clearHighlight();
+      console.warn('getTargetElement error:', error);
       return;
     }
 
@@ -606,29 +611,33 @@ export default class ActionManager extends EventEmitter {
   /**
    * 在down事件中集中cpu处理画布中选中操作渲染，在up事件中再通知外面的编辑器更新
    */
-  private mouseDownHandler = async (event: MouseEvent): Promise<void> => {
-    this.clearHighlight();
-    event.stopImmediatePropagation();
-    event.stopPropagation();
+  private mouseDownHandler = (event: MouseEvent): void => {
+    const handler = async () => {
+      this.clearHighlight();
+      event.stopImmediatePropagation();
+      event.stopPropagation();
 
-    if (this.isStopTriggerSelect(event)) return;
+      if (this.isStopTriggerSelect(event)) return;
 
-    // 点击状态下不触发高亮事件
-    this.container.removeEventListener('mousemove', this.mouseMoveHandler);
+      // 点击状态下不触发高亮事件
+      this.container.removeEventListener('mousemove', this.mouseMoveHandler);
 
-    // 判断触发多选还是单选
-    if (this.isMultiSelectStatus) {
-      await this.beforeMultiSelect(event);
-      if (this.selectedElList.length > 0) {
-        this.emit('before-multi-select', this.selectedElList);
+      // 判断触发多选还是单选
+      if (this.isMultiSelectStatus) {
+        await this.beforeMultiSelect(event);
+        if (this.selectedElList.length > 0) {
+          this.emit('before-multi-select', this.selectedElList);
+        }
+      } else {
+        const el = await this.getElementFromPoint(event);
+        if (!el) return;
+        this.emit('before-select', el, event);
       }
-    } else {
-      const el = await this.getElementFromPoint(event);
-      if (!el) return;
-      this.emit('before-select', el, event);
-    }
 
-    getDocument().addEventListener('mouseup', this.mouseUpHandler);
+      getDocument().addEventListener('mouseup', this.mouseUpHandler);
+    };
+
+    handler();
   };
 
   private isStopTriggerSelect(event: MouseEvent): boolean {

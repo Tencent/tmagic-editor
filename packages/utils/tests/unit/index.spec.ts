@@ -172,8 +172,8 @@ describe('filterXSS', () => {
     expect(value).toBe('&lt;div&gt;&lt;/div&gt;');
   });
 
-  test(`'"`, () => {
-    const value = util.filterXSS(`'div'"span"`);
+  test('\'"', () => {
+    const value = util.filterXSS('\'div\'"span"');
     expect(value).toBe('&apos;div&apos;&quot;span&quot;');
   });
 });

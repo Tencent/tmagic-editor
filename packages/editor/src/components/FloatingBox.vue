@@ -39,7 +39,7 @@ const props = withDefaults(
   defineProps<{
     position?: Position;
     title?: string;
-    beforeClose?: (done: (cancel?: boolean) => void) => void;
+    beforeClose?: (_done: (_cancel?: boolean) => void) => void;
   }>(),
   {
     title: '',

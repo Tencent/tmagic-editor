@@ -16,7 +16,7 @@ export const useCodeBlockEdit = (codeBlockService: Services['codeBlockService'])
   const createCodeBlock = async () => {
     codeConfig.value = {
       name: '',
-      content: `({app, params, flowState}) => {\n  // place your code here\n}`,
+      content: '({app, params, flowState}) => {\n  // place your code here\n}',
       params: [],
     };
 

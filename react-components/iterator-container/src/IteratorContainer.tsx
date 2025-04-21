@@ -67,7 +67,7 @@ const IteratorContainer: React.FC<IteratorContainerProps> = ({
   const configs: IteratorItemSchema[] = iteratorData.map((itemData: any, index: number) => {
     const condResult =
       app?.platform !== 'editor'
-        ? app?.dataSourceManager?.compliedIteratorItemConds(itemData, itemConfig, dsField) ?? true
+        ? (app?.dataSourceManager?.compliedIteratorItemConds(itemData, itemConfig, dsField) ?? true)
         : true;
 
     const newItems = app?.dataSourceManager?.compliedIteratorItems(itemData, items, dsField) ?? items;

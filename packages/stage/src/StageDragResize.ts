@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-/* eslint-disable no-param-reassign */
 import Moveable, { MoveableOptions } from 'moveable';
 
 import { getIdFromEl } from '@tmagic/core';

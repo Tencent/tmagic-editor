@@ -23,7 +23,7 @@ let versionUpdated = false;
 
 const { prompt } = enquirer;
 const currentVersion = createRequire(import.meta.url)('../package.json').version;
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 const args = minimist(process.argv.slice(2), {
   alias: {
     skipBuild: 'skip-build',
@@ -42,12 +42,13 @@ const { skipBuild } = args;
 const skipPrompts = args.skipPrompts || args.canary;
 const skipGit = args.skipGit || args.canary;
 
-const packages = fs.readdirSync(path.resolve(__dirname, '../packages')).filter((p) => {
-  const pkgRoot = path.resolve(__dirname, '../packages', p);
+const packages = fs.readdirSync(path.resolve(dirname, '../packages')).filter((p) => {
+  const pkgRoot = path.resolve(dirname, '../packages', p);
   if (fs.statSync(pkgRoot).isDirectory()) {
     const pkg = JSON.parse(fs.readFileSync(path.resolve(pkgRoot, 'package.json'), 'utf-8'));
     return !pkg.private;
   }
+  return false;
 });
 
 const keepThePackageName = (/** @type {string} */ pkgName) => pkgName;
@@ -77,14 +78,14 @@ const dryRun = async (
 const runIfNotDry = isDryRun ? dryRun : run;
 const getPkgRoot = (/** @type {string} */ pkg) => path.resolve(__dirname, `../packages/${pkg}`);
 const getRunTimeRoot = (pkg) => path.resolve(__dirname, `../runtime/${pkg}`);
-const getPlayground = () => path.resolve(__dirname, `../playground`);
+const getPlayground = () => path.resolve(__dirname, '../playground');
 const step = (/** @type {string} */ msg) => console.log(pico.cyan(msg));
 
 async function main() {
   if (!(await isInSyncWithRemote())) {
     return;
   }
-  console.log(`${pico.green(`✓`)} commit is up-to-date with remote.\n`);
+  console.log(`${pico.green('✓')} commit is up-to-date with remote.\n`);
 
   let targetVersion = args._[0];
 
@@ -141,7 +142,7 @@ async function main() {
       const { yes: promptSkipTests } = await prompt({
         type: 'confirm',
         name: 'yes',
-        message: `CI for this commit passed. Skip local tests?`,
+        message: 'CI for this commit passed. Skip local tests?',
       });
 
       skipTests = promptSkipTests;
@@ -153,7 +154,7 @@ async function main() {
     if (!isDryRun) {
       await run('pnpm', ['run', 'test', '--run']);
     } else {
-      console.log(`Skipped (dry run)`);
+      console.log('Skipped (dry run)');
     }
   } else {
     step('Tests skipped.');
@@ -169,19 +170,19 @@ async function main() {
   if (!skipBuild && !isDryRun) {
     await run('pnpm', ['run', 'build']);
   } else {
-    console.log(`(skipped)`);
+    console.log('(skipped)');
   }
 
   // generate changelog
   step('\nGenerating changelog...');
-  await run(`pnpm`, ['run', 'changelog']);
+  await run('pnpm', ['run', 'changelog']);
 
   if (!skipPrompts) {
     /** @type {{ yes: boolean }} */
     const { yes: changelogOk } = await prompt({
       type: 'confirm',
       name: 'yes',
-      message: `Changelog generated. Does it look good?`,
+      message: 'Changelog generated. Does it look good?',
     });
 
     if (!changelogOk) {
@@ -223,7 +224,7 @@ async function main() {
 
   // update pnpm-lock.yaml
   step('\nUpdating lockfile...');
-  await run(`pnpm`, ['install', '--prefer-offline']);
+  await run('pnpm', ['install', '--prefer-offline']);
 
   if (!skipGit) {
     const { stdout } = await run('git', ['diff'], { stdio: 'pipe' });
@@ -245,7 +246,7 @@ async function main() {
   }
 
   if (isDryRun) {
-    console.log(`\nDry run finished - run git diff to see package changes.`);
+    console.log('\nDry run finished - run git diff to see package changes.');
   }
 
   if (skippedPackages.length) {
@@ -260,8 +261,7 @@ async function getCIResult() {
   try {
     const sha = await getSha();
     const res = await fetch(
-      `https://api.github.com/repos/vuejs/core/actions/runs?head_sha=${sha}` +
-        `&status=success&exclude_pull_requests=true`,
+      `https://api.github.com/repos/vuejs/core/actions/runs?head_sha=${sha}&status=success&exclude_pull_requests=true`,
     );
     const data = await res.json();
     return data.workflow_runs.length > 0;
@@ -283,7 +283,7 @@ async function isInSyncWithRemote() {
     const { yes } = await prompt({
       type: 'confirm',
       name: 'yes',
-      message: pico.red(`Local HEAD is not up-to-date with remote. Are you sure you want to continue?`),
+      message: pico.red('Local HEAD is not up-to-date with remote. Are you sure you want to continue?'),
     });
     return yes;
   } catch {

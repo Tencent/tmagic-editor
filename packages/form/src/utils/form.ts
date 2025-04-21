@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-/* eslint-disable no-param-reassign */
 import { toRaw } from 'vue';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';

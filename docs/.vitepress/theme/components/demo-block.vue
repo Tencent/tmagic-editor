@@ -17,11 +17,7 @@
         <slot name="highlight"></slot>
       </div>
     </div>
-    <div
-      class="demo-block-control"
-      ref="control"
-      @click="isExpanded = !isExpanded"
-    >
+    <div class="demo-block-control" ref="control" @click="isExpanded = !isExpanded">
       <transition name="arrow-slide">
         <i :class="[iconClass, hovering]"></i>
       </transition>
@@ -30,23 +26,14 @@
       </transition>
       <el-tooltip effect="dark" :content="'前往 codepen.io 运行此示例'" placement="right">
         <transition name="text-slide">
-          <el-button
-            size="small"
-            type="primary"
-            text
-            class="control-button"
-            @click.stop="goCodepen"
-          >
-            {{type === 'form' ? '查看结果' : '在线运行'}}
+          <el-button size="small" type="primary" text class="control-button" @click.stop="goCodepen">
+            {{ type === 'form' ? '查看结果' : '在线运行' }}
           </el-button>
         </transition>
       </el-tooltip>
     </div>
 
-    <el-dialog
-      v-model="resultVisible"
-      title="result"
-    >
+    <el-dialog v-model="resultVisible" title="result">
       <pre><code class="language-javascript hljs" v-html="result"></code></pre>
     </el-dialog>
   </div>
@@ -60,7 +47,9 @@
   transition: 0.2s;
 
   &.hover {
-    box-shadow: 0 0 8px 0 rgba(232, 237, 250, 0.6), 0 2px 4px 0 rgba(232, 237, 250, 0.5);
+    box-shadow:
+      0 0 8px 0 rgba(232, 237, 250, 0.6),
+      0 2px 4px 0 rgba(232, 237, 250, 0.5);
   }
 
   code {
@@ -219,9 +208,7 @@ export function stripTemplate(content) {
 }
 
 export default {
-  props: [
-    'type', 'config'
-  ],
+  props: ['type', 'config'],
 
   data() {
     return {
@@ -293,12 +280,15 @@ export default {
     },
 
     text() {
-      return this.isStringConfig ?
-        hljs.highlight('js', this.config).value :
-        hljs.highlight('js', serialize(this.config, {
-          space: 2,
-          unsafe: true,
-        }).replace(/"(\w+)":\s/g, '$1: ')).value;
+      return this.isStringConfig
+        ? hljs.highlight('js', this.config).value
+        : hljs.highlight(
+            'js',
+            serialize(this.config, {
+              space: 2,
+              unsafe: true,
+            }).replace(/"(\w+)":\s/g, '$1: '),
+          ).value;
     },
 
     formConfig() {
@@ -307,7 +297,7 @@ export default {
 
     isStringConfig() {
       return typeof this.config === 'string';
-    }
+    },
   },
 
   watch: {
@@ -356,7 +346,7 @@ export default {
     });
   },
 
-  beforeDestroy() {
+  beforeUnmount() {
     this.removeScrollHandler();
   },
 };

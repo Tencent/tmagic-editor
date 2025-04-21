@@ -80,7 +80,7 @@ const collapseValue = computed(() =>
     .map((x, i) => `${i}`),
 );
 
-let timeout: NodeJS.Timeout | undefined;
+let timeout: ReturnType<typeof setTimeout> | undefined;
 let clientX: number;
 let clientY: number;
 

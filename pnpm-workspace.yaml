@@ -4,3 +4,5 @@ packages:
   - 'runtime/*'
   - 'vue-components/*'
   - 'react-components/*'
+  - 'eslint-config'
+  

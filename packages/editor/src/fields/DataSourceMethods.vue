@@ -80,7 +80,7 @@ const methodColumns: ColumnConfig[] = [
       {
         text: '编辑',
         handler: (method: CodeBlockContent, index: number) => {
-          let codeContent = method.content || `({ params, dataSource, app }) => {\n  // place your code here\n}`;
+          let codeContent = method.content || '({ params, dataSource, app }) => {\n  // place your code here\n}';
 
           if (typeof codeContent !== 'string') {
             codeContent = codeContent.toString();
@@ -114,7 +114,7 @@ const methodColumns: ColumnConfig[] = [
 const createCodeHandler = () => {
   codeConfig.value = {
     name: '',
-    content: `({ params, dataSource, app, flowState }) => {\n  // place your code here\n}`,
+    content: '({ params, dataSource, app, flowState }) => {\n  // place your code here\n}',
     params: [],
   };
 
@@ -130,7 +130,7 @@ const submitCodeHandler = (value: CodeBlockContent, data: ContainerChangeEventDa
     // 在保存的时候转换代码内容
     const parseDSL = getEditorConfig('parseDSL');
     if (typeof value.content === 'string') {
-      value.content = parseDSL<(...args: any[]) => any>(value.content);
+      value.content = parseDSL<(..._args: any[]) => any>(value.content);
     }
   }
   if (editIndex > -1) {

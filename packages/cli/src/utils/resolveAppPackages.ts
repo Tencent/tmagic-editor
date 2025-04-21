@@ -127,6 +127,7 @@ const typeAssertion = function ({
 
       if (isFile(defaultFile)) {
         const defaultCode = fs.readFileSync(defaultFile, { encoding: 'utf-8', flag: 'r' });
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         const ast = recast.parse(defaultCode, { parser: require('recast/parsers/typescript') });
         if (
           isDatasource(
@@ -518,6 +519,7 @@ const setPackages = (packages: ModuleMainFilePath, app: App, packagePath: string
     .replace('\n', '');
 
   const indexCode = fs.readFileSync(indexPath, { encoding: 'utf-8', flag: 'r' });
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const ast: Ast = recast.parse(indexCode, { parser: require('recast/parsers/typescript') });
   const result = typeAssertion({ ast, indexPath, componentFileAffix, datasoucreSuperClass });
 
