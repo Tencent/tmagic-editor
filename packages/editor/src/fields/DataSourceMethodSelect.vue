@@ -37,7 +37,14 @@ import { Edit, View } from '@element-plus/icons-vue';
 
 import type { Id } from '@tmagic/core';
 import { TMagicButton, TMagicTooltip } from '@tmagic/design';
-import { createValues, type FieldProps, filterFunction, type FormState, MContainer } from '@tmagic/form';
+import {
+  createValues,
+  type FieldProps,
+  filterFunction,
+  type FormState,
+  MContainer,
+  type OnChangeHandlerData,
+} from '@tmagic/form';
 
 import CodeParams from '@editor/components/CodeParams.vue';
 import MIcon from '@editor/components/Icon.vue';
@@ -92,14 +99,18 @@ const getParamItemsConfig = ([dataSourceId, methodName]: [Id, string] = ['', '']
 
 const paramsConfig = ref<CodeParamStatement[]>(getParamItemsConfig(props.model[props.name || 'dataSourceMethod']));
 
-const setParamsConfig = (dataSourceMethod: [Id, string], formState: any = {}) => {
+const setParamsConfig = (
+  dataSourceMethod: [Id, string],
+  formState: any = {},
+  setModel: OnChangeHandlerData['setModel'],
+) => {
   // 通过下拉框选择的codeId变化后修正model的值，避免写入其他codeId的params
   paramsConfig.value = dataSourceMethod ? getParamItemsConfig(dataSourceMethod) : [];
 
   if (paramsConfig.value.length) {
-    props.model.params = createValues(formState, paramsConfig.value, {}, props.model.params);
+    setModel('params', createValues(formState, paramsConfig.value, {}, props.model.params));
   } else {
-    props.model.params = {};
+    setModel('params', {});
   }
 };
 
@@ -125,8 +136,8 @@ const cascaderConfig = computed(() => ({
   name: props.name,
   options: methodsOptions.value,
   disable: props.disabled,
-  onChange: (formState: any, dataSourceMethod: [Id, string]) => {
-    setParamsConfig(dataSourceMethod, formState);
+  onChange: (formState: any, dataSourceMethod: [Id, string], { setModel }: OnChangeHandlerData) => {
+    setParamsConfig(dataSourceMethod, formState, setModel);
 
     return dataSourceMethod;
   },

@@ -121,24 +121,28 @@ const selectConfig = {
     }
     return [];
   },
-  onChange: (formState: any, codeId: Id, { model }: any) => {
+  onChange: (formState: any, codeId: Id, { setModel, model }: any) => {
     // 通过下拉框选择的codeId变化后修正model的值，避免写入其他codeId的params
     paramsConfig.value = getParamItemsConfig(codeId);
 
     if (paramsConfig.value.length) {
-      model.params = createValues(formState, paramsConfig.value, {}, model.params);
+      setModel('params', createValues(formState, paramsConfig.value, {}, model.params));
     } else {
-      model.params = {};
+      setModel('params', {});
     }
 
     return codeId;
   },
 };
 
-const onCodeIdChangeHandler = (value: any) => {
+const onCodeIdChangeHandler = (value: any, eventData: ContainerChangeEventData) => {
   props.model.params = value.params;
+
   emit('change', props.model, {
-    changeRecords: [
+    changeRecords: eventData.changeRecords?.map((item) => ({
+      prop: `${props.prop.replace(props.name, '')}${item.propPath}`,
+      value: item.value,
+    })) || [
       {
         propPath: props.prop,
         value: value[props.name],

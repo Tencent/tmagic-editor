@@ -25,12 +25,12 @@ export default [
     dataSourceFieldType: ['array'],
     checkStrictly: true,
     type: 'data-source-field-select',
-    onChange: (_vm: any, v: string[] = [], { model }: any) => {
+    onChange: (_vm: any, v: string[] = [], { setModel }: any) => {
       if (Array.isArray(v) && v.length > 1) {
         const [dsId, ...keys] = v;
-        model.dsField = [dsId.replace(DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX, ''), ...keys];
+        setModel('dsField', [dsId.replace(DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX, ''), ...keys]);
       } else {
-        model.dsField = [];
+        setModel('dsField', []);
       }
     },
   },

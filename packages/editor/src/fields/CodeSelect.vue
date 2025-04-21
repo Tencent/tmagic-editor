@@ -80,13 +80,11 @@ const codeConfig = computed<GroupListConfig>(() => ({
             { value: HookCodeType.DATA_SOURCE_METHOD, text: '数据源方法' },
           ],
           defaultValue: 'code',
-          onChange: (mForm, v: HookCodeType, { model, prop, changeRecords }) => {
+          onChange: (_mForm, v: HookCodeType, { setModel }) => {
             if (v === HookCodeType.DATA_SOURCE_METHOD) {
-              model.codeId = [];
-              changeRecords.push({ propPath: prop.replace('codeType', 'codeId'), value: [] });
+              setModel('codeId', []);
             } else {
-              model.codeId = '';
-              changeRecords.push({ propPath: prop.replace('codeType', 'codeId'), value: '' });
+              setModel('codeId', '');
             }
 
             return v;
@@ -97,7 +95,7 @@ const codeConfig = computed<GroupListConfig>(() => ({
           name: 'codeId',
           span: 18,
           labelWidth: 0,
-          display: (mForm, { model }) => model.codeType !== HookCodeType.DATA_SOURCE_METHOD,
+          display: (_mForm, { model }) => model.codeType !== HookCodeType.DATA_SOURCE_METHOD,
           notEditable: () => !codeBlockService.getEditStatus(),
         },
         {
@@ -105,7 +103,7 @@ const codeConfig = computed<GroupListConfig>(() => ({
           name: 'codeId',
           span: 18,
           labelWidth: 0,
-          display: (mForm, { model }) => model.codeType === HookCodeType.DATA_SOURCE_METHOD,
+          display: (_mForm, { model }) => model.codeType === HookCodeType.DATA_SOURCE_METHOD,
           notEditable: () => !dataSourceService.get('editable'),
         },
       ],

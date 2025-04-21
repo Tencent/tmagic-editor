@@ -65,6 +65,7 @@ import FloatingBox from '@editor/components/FloatingBox.vue';
 import { useEditorContentHeight } from '@editor/hooks';
 import { useNextFloatBoxPosition } from '@editor/hooks/use-next-float-box-position';
 import { useServices } from '@editor/hooks/use-services';
+import { error } from '@editor/utils/logger';
 
 defineOptions({
   name: 'MFieldsDataSourceFields',
@@ -144,6 +145,7 @@ const fieldColumns: ColumnConfig[] = [
       try {
         return JSON.stringify(row.defaultValue);
       } catch (e) {
+        error(e);
         return row.defaultValue;
       }
     },
@@ -193,9 +195,9 @@ const dataSourceFieldsConfig: FormConfig = [
       { text: 'null', value: 'null' },
       { text: 'any', value: 'any' },
     ],
-    onChange: (formState, v: string, { model }) => {
+    onChange: (_formState, v: string, { setModel }) => {
       if (!['any', 'array', 'object'].includes(v)) {
-        model.fields = [];
+        setModel('fields', []);
       }
       return v;
     },

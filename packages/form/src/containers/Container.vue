@@ -228,6 +228,7 @@ import { WarningFilled } from '@element-plus/icons-vue';
 import { isEqual } from 'lodash-es';
 
 import { TMagicButton, TMagicFormItem, TMagicIcon, TMagicTooltip } from '@tmagic/design';
+import { setValueByKeyPath } from '@tmagic/utils';
 
 import type { ChildConfig, ContainerChangeEventData, ContainerCommonConfig, FormState, FormValue } from '../schema';
 import { display as displayFunction, filterFunction, getRules } from '../utils/form';
@@ -423,6 +424,12 @@ const onChangeHandler = async function (v: any, eventData: ContainerChangeEventD
           prop: itemProp.value,
           config: props.config,
           changeRecords: newChangeRecords,
+          setModel: (key: string, value: any) => {
+            setValueByKeyPath(key, value, props.model);
+            if (props.config.name) {
+              newChangeRecords.push({ propPath: itemProp.value.replace(`${props.config.name}`, key), value });
+            }
+          },
         })) ?? value;
     }
     value = trimHandler(trim, value) ?? value;
@@ -442,10 +449,10 @@ const onChangeHandler = async function (v: any, eventData: ContainerChangeEventD
     valueProp = valueProp ? `${valueProp}.${eventData.modifyKey}` : eventData.modifyKey!;
 
     // 需要清除掉modifyKey，不然往上层抛出后还会被认为需要修改
+    // eslint-disable-next-line no-param-reassign
     delete eventData.modifyKey;
   } else if (isValidName() && props.model !== value && (v !== value || props.model[name.value] !== value)) {
     // field内容下包含field-link时，model===value, 这里避免循环引用
-    // eslint-disable-next-line vue/no-mutating-props
     props.model[name.value] = value;
   }
 

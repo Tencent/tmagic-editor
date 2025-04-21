@@ -63,6 +63,7 @@ import type {
   ContainerChangeEventData,
   FieldProps,
   FormState,
+  OnChangeHandlerData,
   PanelConfig,
 } from '@tmagic/form';
 import { MContainer as MFormContainer, MPanel } from '@tmagic/form';
@@ -202,8 +203,8 @@ const targetCompConfig = computed(() => {
     text: '联动组件',
     type: 'ui-select',
     display: (mForm: FormState, { model }: { model: Record<any, any> }) => model.actionType === ActionType.COMP,
-    onChange: (MForm: FormState, v: string, { model }: any) => {
-      model.method = '';
+    onChange: (MForm: FormState, v: string, { setModel }: OnChangeHandlerData) => {
+      setModel('method', '');
       return v;
     },
   };
