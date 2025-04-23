@@ -65,12 +65,16 @@ export const registerNodeHooks = (node?: TMagicNode, methods: Methods = {}) => {
 };
 
 export const useApp = <T extends TMagicApp = TMagicApp>({
-  methods = {},
+  methods,
   config,
   iteratorContainerId,
   iteratorIndex,
 }: UseAppOptions) => {
   const app = inject<T>('app');
+
+  if (!app) {
+    throw new Error(`component ${config.type}: app is not injected`);
+  }
 
   const node = useNode(
     {
@@ -81,7 +85,7 @@ export const useApp = <T extends TMagicApp = TMagicApp>({
     app,
   );
 
-  if (node) {
+  if (node && methods) {
     registerNodeHooks(node, methods);
   }
 
