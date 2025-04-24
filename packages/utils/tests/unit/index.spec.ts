@@ -23,7 +23,7 @@ import type { DataSchema } from '@tmagic/schema';
 import * as util from '../../src';
 
 describe('asyncLoadJs', () => {
-  const url = 'https://m.film.qq.com/magic-ui/production/1/1625056093304/magic/magic-ui.umd.min.js';
+  const url = 'https://m.www.tmagic.com/magic-ui/production/1/1625056093304/magic/magic-ui.umd.min.js';
 
   test('第一次加载asyncLoadJs带url与crossorigin参数', () => {
     const crossOrigin = 'anonymous';
@@ -57,7 +57,7 @@ describe('asyncLoadJs', () => {
 });
 
 describe('asyncLoadCss', () => {
-  const url = 'https://beta.m.film.qq.com/magic-act/css/BuyGift.75d837d2b3fd.css?max_age=864000';
+  const url = 'https://beta.m.www.tmagic.com/magic-act/css/BuyGift.75d837d2b3fd.css?max_age=864000';
 
   test('第一次加载asyncLoadCss', () => {
     const load = util.asyncLoadCss(url);
@@ -180,21 +180,44 @@ describe('filterXSS', () => {
 
 describe('getUrlParam', () => {
   test('正常', () => {
-    const url = 'http://film.qq.com?a=b';
+    const url = 'http://www.tmagic.com?a=b';
     const value = util.getUrlParam('a', url);
     expect(value).toBe('b');
   });
 
   test('null', () => {
-    const url = 'http://film.qq.com';
+    const url = 'http://www.tmagic.com';
     const value = util.getUrlParam('a', url);
     expect(value).toBe('');
   });
 
   test('emprty', () => {
-    const url = 'http://film.qq.com?a=';
+    const url = 'http://www.tmagic.com?a=';
     const value = util.getUrlParam('a', url);
     expect(value).toBe('');
+  });
+});
+
+describe('setUrlParam', () => {
+  test('正常', () => {
+    expect(util.setUrlParam('a', '1', 'https://www.tmagic.com')).toBe('https://www.tmagic.com?a=1');
+
+    expect(util.setUrlParam('a', '1', 'https://www.tmagic.com?c&d')).toBe('https://www.tmagic.com?c&d&a=1');
+    expect(util.setUrlParam('a', '1', 'https://www.tmagic.com?b=1')).toBe('https://www.tmagic.com?b=1&a=1');
+  });
+});
+
+describe('getSearchObj', () => {
+  test('正常', () => {
+    expect(util.getSearchObj('a=1&b=2')).toEqual({ a: '1', b: '2' });
+  });
+});
+
+describe('delQueStr', () => {
+  test('正常', () => {
+    expect(util.delQueStr('https://www.tmagic.com?a=1', 'a')).toBe('https://www.tmagic.com');
+    expect(util.delQueStr('https://www.tmagic.com?a=1&b=2', ['a', 'b'])).toBe('https://www.tmagic.com');
+    expect(util.delQueStr('https://www.tmagic.com?a=1&b=2', ['a'])).toBe('https://www.tmagic.com?b=2');
   });
 });
 
@@ -250,24 +273,24 @@ describe('isPage', () => {
 
 describe('getHost', () => {
   test('正常', () => {
-    const host = util.getHost('https://film.qq.com/index.html');
-    expect(host).toBe('film.qq.com');
+    const host = util.getHost('https://www.tmagic.com/index.html');
+    expect(host).toBe('www.tmagic.com');
   });
 });
 
 describe('isSameDomain', () => {
   test('正常', () => {
-    const flag = util.isSameDomain('https://film.qq.com/index.html', 'film.qq.com');
+    const flag = util.isSameDomain('https://www.tmagic.com/index.html', 'www.tmagic.com');
     expect(flag).toBeTruthy();
   });
 
   test('不正常', () => {
-    const flag = util.isSameDomain('https://film.qq.com/index.html', 'test.film.qq.com');
+    const flag = util.isSameDomain('https://www.tmagic.com/index.html', 'test.www.tmagic.com');
     expect(flag).toBeFalsy();
   });
 
   test('不是http', () => {
-    const flag = util.isSameDomain('ftp://film.qq.com/index.html', 'test.film.qq.com');
+    const flag = util.isSameDomain('ftp://www.tmagic.com/index.html', 'test.www.tmagic.com');
     expect(flag).toBeTruthy();
   });
 });
