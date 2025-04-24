@@ -76,9 +76,9 @@ const dryRun = async (
   /** @type {import('execa').Options} */ opts = {},
 ) => console.log(pico.blue(`[dryrun] ${bin} ${args.join(' ')}`), opts);
 const runIfNotDry = isDryRun ? dryRun : run;
-const getPkgRoot = (/** @type {string} */ pkg) => path.resolve(__dirname, `../packages/${pkg}`);
-const getRunTimeRoot = (pkg) => path.resolve(__dirname, `../runtime/${pkg}`);
-const getPlayground = () => path.resolve(__dirname, '../playground');
+const getPkgRoot = (/** @type {string} */ pkg) => path.resolve(dirname, `../packages/${pkg}`);
+const getRunTimeRoot = (pkg) => path.resolve(dirname, `../runtime/${pkg}`);
+const getPlayground = () => path.resolve(dirname, '../playground');
 const step = (/** @type {string} */ msg) => console.log(pico.cyan(msg));
 
 async function main() {
@@ -306,7 +306,7 @@ async function getBranch() {
  */
 function updateVersions(version, getNewPackageName = keepThePackageName) {
   // 1. update root package.json
-  updatePackage(path.resolve(__dirname, '..'), version, getNewPackageName);
+  updatePackage(path.resolve(dirname, '..'), version, getNewPackageName);
   // 2. update all packages
   packages.forEach((p) => updatePackage(getPkgRoot(p), version, getNewPackageName));
 
