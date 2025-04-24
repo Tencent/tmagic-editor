@@ -1,3 +1,20 @@
+## [1.5.14](https://github.com/Tencent/tmagic-editor/compare/v1.5.13...v1.5.14) (2025-04-24)
+
+
+### Bug Fixes
+
+* **dep:** 配置了数据源内部方法无法收集到依赖 ([0e91133](https://github.com/Tencent/tmagic-editor/commit/0e911337b8f88e5e88fecf072395c38d2de1bc08))
+* **editor:** 编辑数据源/代码块时，列表高亮 ([de52ff4](https://github.com/Tencent/tmagic-editor/commit/de52ff4fe100cb11b73865703b03a0cbcc4e92e7))
+
+
+### Features
+
+* **form:** onChange添加setModel参数，用于修改model并添加至修改记录中 ([5e0e776](https://github.com/Tencent/tmagic-editor/commit/5e0e776d4004c9a4ad2ae53d7146353dc088a478))
+* **utils:** 添加设置删除获取url参数的方法 ([105de9d](https://github.com/Tencent/tmagic-editor/commit/105de9d2c6ba69eb9e7ca9777f16441e5aa4c1f0))
+* **vue-runtime-help:** app不存在时抛异常，保证app一定存在，避免多余的可选链 ([fd7e737](https://github.com/Tencent/tmagic-editor/commit/fd7e737e8c4f4958c8d59d5f844f40cf1509724f))
+
+
+
 ## [1.5.13](https://github.com/Tencent/tmagic-editor/compare/v1.5.12...v1.5.13) (2025-04-10)
 
 
