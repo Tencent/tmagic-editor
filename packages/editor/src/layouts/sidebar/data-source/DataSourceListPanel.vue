@@ -46,7 +46,6 @@
     :title="dialogTitle"
     @submit="submitDataSourceHandler"
     @close="editDialogCloseHandler"
-    @open="editDialogOpenHandler"
   ></DataSourceConfigPanel>
 
   <Teleport to="body">
@@ -61,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref } from 'vue';
+import { computed, inject, useTemplateRef, watch } from 'vue';
 import { mergeWith } from 'lodash-es';
 
 import { TMagicButton, tMagicMessageBox, TMagicPopover, TMagicScrollbar } from '@tmagic/design';
@@ -95,21 +94,21 @@ const { dataSourceService } = useServices();
 const { editDialog, dataSourceValues, dialogTitle, editable, editHandler, submitDataSourceHandler } =
   useDataSourceEdit(dataSourceService);
 
-const editDialogOpenHandler = (id: string) => {
-  if (dataSourceList.value) {
-    for (const [statusId, status] of dataSourceList.value.nodeStatusMap.entries()) {
-      status.selected = statusId === id;
-    }
-  }
-};
-
 const editDialogCloseHandler = () => {
-  if (dataSourceList.value) {
-    for (const [, status] of dataSourceList.value.nodeStatusMap.entries()) {
+  if (dataSourceListRef.value) {
+    for (const [, status] of dataSourceListRef.value.nodeStatusMap.entries()) {
       status.selected = false;
     }
   }
 };
+
+watch(dataSourceValues, (dataSourceValues) => {
+  if (dataSourceListRef.value && dataSourceValues.id) {
+    for (const [statusId, status] of dataSourceListRef.value.nodeStatusMap.entries()) {
+      status.selected = statusId === dataSourceValues.id;
+    }
+  }
+});
 
 const datasourceTypeList = computed(() =>
   [
@@ -148,10 +147,10 @@ const removeHandler = async (id: string) => {
   dataSourceService.remove(id);
 };
 
-const dataSourceList = ref<InstanceType<typeof DataSourceList>>();
+const dataSourceListRef = useTemplateRef<InstanceType<typeof DataSourceList>>('dataSourceList');
 
 const filterTextChangeHandler = (val: string) => {
-  dataSourceList.value?.filter(val);
+  dataSourceListRef.value?.filter(val);
 };
 
 eventBus?.on('edit-data-source', (id: string) => {

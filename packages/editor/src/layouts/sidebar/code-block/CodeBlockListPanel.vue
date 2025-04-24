@@ -33,7 +33,6 @@
     :content="codeConfig"
     @submit="submitCodeBlockHandler"
     @close="editDialogCloseHandler"
-    @open="editDialogOpenHandler"
   ></CodeBlockEditor>
 
   <Teleport to="body">
@@ -48,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, useTemplateRef } from 'vue';
+import { computed, inject, useTemplateRef, watch } from 'vue';
 
 import type { Id } from '@tmagic/core';
 import { TMagicButton, TMagicScrollbar } from '@tmagic/design';
@@ -102,13 +101,13 @@ eventBus?.on('edit-code', (id: string) => {
   editCode(id);
 });
 
-const editDialogOpenHandler = () => {
+watch(codeId, () => {
   if (codeBlockListRef.value) {
     for (const [statusId, status] of codeBlockListRef.value.nodeStatusMap.entries()) {
       status.selected = statusId === codeId.value;
     }
   }
-};
+});
 
 const editDialogCloseHandler = () => {
   if (codeBlockListRef.value) {
