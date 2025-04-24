@@ -263,20 +263,32 @@ export const createDataSourceCondTarget = (ds: Pick<DataSourceSchema, 'id' | 'fi
     isTarget: (key: string | number, value: any) => isDataSourceCondTarget(ds, key, value),
   });
 
-export const createDataSourceMethodTarget = (ds: Pick<DataSourceSchema, 'id' | 'methods'>, initialDeps: DepData = {}) =>
+export const createDataSourceMethodTarget = (
+  ds: Pick<DataSourceSchema, 'id' | 'methods' | 'fields'>,
+  initialDeps: DepData = {},
+) =>
   new Target({
     type: DepTargetType.DATA_SOURCE_METHOD,
     id: ds.id,
     initialDeps,
     isTarget: (_key: string | number, value: any) => {
       // 使用data-source-method-select 可以配置出来
-      if (!Array.isArray(value) || !ds?.methods) {
+      if (!Array.isArray(value)) {
         return false;
       }
 
       const [dsId, methodName] = value;
 
-      if (!methodName || dsId !== ds.id || !ds.methods.find((field) => field.name === methodName)) {
+      if (!methodName || dsId !== ds.id) {
+        return false;
+      }
+
+      if (ds.methods?.find((method) => method.name === methodName)) {
+        return true;
+      }
+
+      // 配置的方法名称可能会是数据源类中定义的，并不存在于methods中，所以这里判断如果methodName如果是字段名称，就表示配置的不是方法
+      if (ds.fields?.find((field) => field.name === methodName)) {
         return false;
       }
 
