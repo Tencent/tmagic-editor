@@ -1,3 +1,12 @@
+## [1.5.15](https://github.com/Tencent/tmagic-editor/compare/v1.5.14...v1.5.15) (2025-04-25)
+
+
+### Bug Fixes
+
+* **editor:** getTMagicApp返回类型错误 ([ba05ecb](https://github.com/Tencent/tmagic-editor/commit/ba05ecbf608785d97c60adbdd6b7381597e6cb6f))
+
+
+
 ## [1.5.14](https://github.com/Tencent/tmagic-editor/compare/v1.5.13...v1.5.14) (2025-04-24)
 
 
