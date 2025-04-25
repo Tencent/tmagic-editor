@@ -214,20 +214,20 @@ export const initServiceEvents = (
     ((event: 'update:modelValue', value: MApp | null) => void),
   { editorService, codeBlockService, dataSourceService, depService }: Services,
 ) => {
-  const getTMagicApp = () => {
+  const getTMagicApp = (): Promise<TMagicCore | undefined> => {
     const renderer = editorService.get('stage')?.renderer;
     if (!renderer) {
-      return undefined;
+      return Promise.resolve(void 0);
     }
 
     if (renderer.runtime) {
-      return renderer.runtime.getApp?.();
+      return Promise.resolve(renderer.runtime.getApp?.());
     }
 
     return new Promise<TMagicCore | undefined>((resolve) => {
       // 设置 10s 超时
       const timeout = globalThis.setTimeout(() => {
-        resolve(undefined);
+        resolve(void 0);
       }, 10000);
 
       renderer.on('runtime-ready', () => {
