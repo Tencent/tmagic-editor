@@ -40,7 +40,10 @@ class DataSourceManager extends EventEmitter {
     DataSourceManager.waitInitSchemaList?.forEach((listMap, app) => {
       const list = listMap[type] || [];
       for (let config = list.shift(); config; config = list.shift()) {
-        app.addDataSource(config);
+        const ds = app.addDataSource(config);
+        if (ds) {
+          app.init(ds);
+        }
       }
     });
   }
@@ -140,7 +143,7 @@ class DataSourceManager extends EventEmitter {
     return this.dataSourceMap.get(id);
   }
 
-  public async addDataSource(config?: DataSourceSchema) {
+  public addDataSource(config?: DataSourceSchema) {
     if (!config) return;
 
     const DataSourceClass = DataSourceManager.dataSourceClassMap.get(config.type);
@@ -178,6 +181,8 @@ class DataSourceManager extends EventEmitter {
     ds.on('change', (changeEvent: ChangeEvent) => {
       this.setData(ds, changeEvent);
     });
+
+    return ds;
   }
 
   public setData(ds: DataSource, changeEvent: ChangeEvent) {
