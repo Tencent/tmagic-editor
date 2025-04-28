@@ -73,7 +73,11 @@ class Node extends EventEmitter {
     const { events, style } = data;
     this.events = events || [];
     this.style = style || {};
-    this.instance.config = data;
+    try {
+      this.instance.config = data;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (e: any) {}
+
     this.emit('update-data', data);
   }
 
@@ -81,6 +85,9 @@ class Node extends EventEmitter {
     this.eventQueue.push(event);
   }
 
+  /**
+   * @deprecated use setInstance instead
+   */
   public registerMethod(methods: Methods) {
     if (!methods) {
       return;
@@ -95,6 +102,10 @@ class Node extends EventEmitter {
         this.instance[key] = fn;
       }
     }
+  }
+
+  public setInstance(instance: any) {
+    this.instance = instance;
   }
 
   public async runHookCode(hook: string, params?: Record<string, any>) {
@@ -144,6 +155,10 @@ class Node extends EventEmitter {
   }
 
   public destroy() {
+    this.eventQueue.length = 0;
+    this.instance = null;
+    this.events = [];
+    this.style = {};
     this.removeAllListeners();
   }
 
@@ -159,10 +174,7 @@ class Node extends EventEmitter {
       });
 
       if (instance) {
-        this.registerMethod(instance);
-        if (instance.config) {
-          this.setData(instance.config);
-        }
+        this.setInstance(instance);
       }
 
       this.runHookCode('created');
@@ -171,10 +183,7 @@ class Node extends EventEmitter {
     this.once('mounted', (instance: any) => {
       const handler = async () => {
         if (instance) {
-          this.registerMethod(instance);
-          if (instance.config) {
-            this.setData(instance.config);
-          }
+          this.setInstance(instance);
         }
 
         for (let eventConfig = this.eventQueue.shift(); eventConfig; eventConfig = this.eventQueue.shift()) {

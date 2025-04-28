@@ -73,7 +73,7 @@ export default defineComponent({
         const node = useNode({ config: { ...config, [IS_DSL_NODE_KEY]: true } }, app);
 
         if (config.id !== preConfig?.id) {
-          node?.registerMethod({ refresh });
+          node?.setInstance({ config: props.config, refresh });
           node?.emit('created');
         }
         await nextTick();

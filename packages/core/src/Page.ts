@@ -106,9 +106,16 @@ class Page extends Node {
   }
 
   public destroy(): void {
-    super.destroy();
+    this.nodes.forEach((node) => {
+      if (node === this) {
+        return;
+      }
+      node.destroy();
+    });
 
     this.nodes.clear();
+
+    super.destroy();
   }
 }
 
