@@ -53,6 +53,8 @@ export default class EventHelper extends EventEmitter {
   public destroy() {
     this.removeNodeEvents();
     this.removeAllListeners();
+    this.nodeEventList.clear();
+    this.dataSourceEventList.clear();
   }
 
   public bindNodeEvents(node: TMagicNode) {
@@ -147,6 +149,7 @@ export default class EventHelper extends EventEmitter {
    */
   private async eventHandler(config: EventConfig | number, fromCpt: TMagicNode | DataSource | undefined, args: any[]) {
     const eventConfig = typeof config === 'number' ? (fromCpt as TMagicNode).events[config] : config;
+
     if (has(eventConfig, 'actions')) {
       // EventConfig类型
       const flowState = new FlowState();
@@ -163,8 +166,16 @@ export default class EventHelper extends EventEmitter {
       }
       flowState.reset();
     } else {
-      // 兼容DeprecatedEventConfig类型 组件动作
-      await this.compActionHandler(eventConfig as unknown as CompItemConfig, fromCpt as TMagicNode, args);
+      try {
+        // 兼容DeprecatedEventConfig类型 组件动作
+        await this.compActionHandler(eventConfig as unknown as CompItemConfig, fromCpt as TMagicNode, args);
+      } catch (e: any) {
+        if (this.app.errorHandler) {
+          this.app.errorHandler(e, fromCpt, { type: 'action-handler', config: eventConfig, ...args });
+        } else {
+          throw e;
+        }
+      }
     }
   }
 
@@ -174,20 +185,28 @@ export default class EventHelper extends EventEmitter {
     args: any[],
     flowState: FlowState,
   ) {
-    if (actionItem.actionType === ActionType.COMP) {
-      const compActionItem = actionItem as CompItemConfig;
-      // 组件动作
-      await this.compActionHandler(compActionItem, fromCpt, args);
-    } else if (actionItem.actionType === ActionType.CODE) {
-      const codeActionItem = actionItem as CodeItemConfig;
-      // 执行代码块
-      await this.app.runCode(codeActionItem.codeId, codeActionItem.params || {}, args, flowState);
-    } else if (actionItem.actionType === ActionType.DATA_SOURCE) {
-      const dataSourceActionItem = actionItem as DataSourceItemConfig;
+    try {
+      if (actionItem.actionType === ActionType.COMP) {
+        const compActionItem = actionItem as CompItemConfig;
+        // 组件动作
+        await this.compActionHandler(compActionItem, fromCpt, args);
+      } else if (actionItem.actionType === ActionType.CODE) {
+        const codeActionItem = actionItem as CodeItemConfig;
+        // 执行代码块
+        await this.app.runCode(codeActionItem.codeId, codeActionItem.params || {}, args, flowState);
+      } else if (actionItem.actionType === ActionType.DATA_SOURCE) {
+        const dataSourceActionItem = actionItem as DataSourceItemConfig;
 
-      const [dsId, methodName] = dataSourceActionItem.dataSourceMethod;
+        const [dsId, methodName] = dataSourceActionItem.dataSourceMethod;
 
-      await this.app.runDataSourceMethod(dsId, methodName, dataSourceActionItem.params || {}, args, flowState);
+        await this.app.runDataSourceMethod(dsId, methodName, dataSourceActionItem.params || {}, args, flowState);
+      }
+    } catch (e: any) {
+      if (this.app.errorHandler) {
+        this.app.errorHandler(e, fromCpt, { type: 'action-handler', config: actionItem, flowState, ...args });
+      } else {
+        throw e;
+      }
     }
   }
 
@@ -206,7 +225,7 @@ export default class EventHelper extends EventEmitter {
     }
 
     const toNode = this.app.getNode(to);
-    if (!toNode) throw `ID为${to}的组件不存在`;
+    if (!toNode) throw new Error(`ID为${to}的组件不存在`);
 
     if (toNode.instance) {
       if (typeof toNode.instance[methodName] === 'function') {

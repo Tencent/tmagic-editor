@@ -20,8 +20,8 @@ import { EventEmitter } from 'events';
 
 import { isEmpty } from 'lodash-es';
 
-import { createDataSourceManager, DataSourceManager, ObservedDataClass } from '@tmagic/data-source';
-import type { CodeBlockDSL, Id, JsEngine, MApp, RequestFunction } from '@tmagic/schema';
+import { createDataSourceManager, type DataSource, DataSourceManager, ObservedDataClass } from '@tmagic/data-source';
+import type { CodeBlockDSL, DataSourceSchema, Id, JsEngine, MApp, RequestFunction } from '@tmagic/schema';
 
 import Env from './Env';
 import EventHelper from './EventHelper';
@@ -30,6 +30,12 @@ import FlowState from './FlowState';
 import Node from './Node';
 import Page from './Page';
 import { transformStyle as defaultTransformStyle } from './utils';
+
+export type ErrorHandler = (
+  err: Error,
+  node: DataSource<DataSourceSchema> | Node | undefined,
+  info: Record<string, any>,
+) => void;
 
 export interface AppOptionsConfig {
   ua?: string;
@@ -46,6 +52,7 @@ export interface AppOptionsConfig {
   transformStyle?: (style: Record<string, any>) => Record<string, any>;
   request?: RequestFunction;
   DataSourceObservedData?: ObservedDataClass;
+  errorHandler?: ErrorHandler;
 }
 
 class App extends EventEmitter {
@@ -70,6 +77,7 @@ class App extends EventEmitter {
   public request?: RequestFunction;
   public transformStyle: (style: Record<string, any>) => Record<string, any>;
   public eventHelper?: EventHelper;
+  public errorHandler?: ErrorHandler;
 
   private flexible?: Flexible;
 
@@ -81,6 +89,8 @@ class App extends EventEmitter {
     } else {
       this.setEnv(options.ua);
     }
+
+    this.errorHandler = options.errorHandler;
 
     // 代码块描述内容在dsl codeBlocks字段
     this.codeDsl = options.config?.codeBlocks;
@@ -259,7 +269,15 @@ class App extends EventEmitter {
     if (!codeId || isEmpty(this.codeDsl)) return;
     const content = this.codeDsl?.[codeId]?.content;
     if (typeof content === 'function') {
-      await content({ app: this, params, eventParams: args, flowState });
+      try {
+        await content({ app: this, params, eventParams: args, flowState });
+      } catch (e: any) {
+        if (this.errorHandler) {
+          this.errorHandler(e, undefined, { type: 'run-code', codeId, params, eventParams: args, flowState });
+        } else {
+          throw e;
+        }
+      }
     }
   }
 
@@ -283,7 +301,15 @@ class App extends EventEmitter {
     if (!method) return;
 
     if (typeof method.content === 'function') {
-      await method.content({ app: this, params, dataSource, eventParams: args, flowState });
+      try {
+        await method.content({ app: this, params, dataSource, eventParams: args, flowState });
+      } catch (e: any) {
+        if (this.errorHandler) {
+          this.errorHandler(e, dataSource, { type: 'data-source-method', params, eventParams: args, flowState });
+        } else {
+          throw e;
+        }
+      }
     }
   }
 
@@ -295,6 +321,13 @@ class App extends EventEmitter {
     this.flexible = undefined;
 
     this.eventHelper?.destroy();
+
+    this.dsl = undefined;
+
+    this.dataSourceManager?.destroy();
+    this.dataSourceManager = undefined;
+    this.codeDsl = undefined;
+    this.components.clear();
   }
 }
 
