@@ -1,3 +1,19 @@
+## [1.5.16](https://github.com/Tencent/tmagic-editor/compare/v1.5.15...v1.5.16) (2025-04-28)
+
+
+### Bug Fixes
+
+* **data-source:** 异步加载数据源后，数据源未初始化 ([378c756](https://github.com/Tencent/tmagic-editor/commit/378c75658d1b50454ceb8cf4072b09beffb86067))
+
+
+### Features
+
+* **core:** instance设定不再限制只有方法 ([e5bcd76](https://github.com/Tencent/tmagic-editor/commit/e5bcd762b290a6b58bfd6486628c828207e30c37))
+* **core:** 添加error hander配置 ([6dc0073](https://github.com/Tencent/tmagic-editor/commit/6dc007388bb28e6501bcb026fce1e2881b87bd82))
+* **editor:** 组件默认的名称，id配置只要在业务不提供时才加入 ([2dc0bbc](https://github.com/Tencent/tmagic-editor/commit/2dc0bbc679a7ab1ee1b7d368973bcb4abed2c0bb))
+
+
+
 ## [1.5.15](https://github.com/Tencent/tmagic-editor/compare/v1.5.14...v1.5.15) (2025-04-25)
 
 
