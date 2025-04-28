@@ -156,52 +156,63 @@ export const displayTabConfig: TabPaneConfig = {
  * @param config 组件属性配置
  * @returns Object
  */
-export const fillConfig = (config: FormConfig = [], labelWidth = '80px'): FormConfig => [
-  {
-    type: 'tab',
-    labelWidth,
-    items: [
-      {
-        title: '属性',
-        items: [
-          // 组件类型，必须要有
-          {
-            text: 'type',
-            name: 'type',
-            type: 'hidden',
-          },
-          // 组件id，必须要有
-          {
-            name: 'id',
-            text: 'ID',
-            type: 'text',
-            disabled: true,
-            append: {
-              type: 'button',
-              text: '复制',
-              handler: (vm, { model }) => {
-                navigator.clipboard
-                  .writeText(`${model.id}`)
-                  .then(() => {
-                    tMagicMessage.success('已复制');
-                  })
-                  .catch(() => {
-                    tMagicMessage.error('复制失败');
-                  });
-              },
-            },
-          },
-          {
-            name: 'name',
-            text: '组件名称',
-          },
-          ...config,
-        ],
+export const fillConfig = (config: FormConfig = [], labelWidth = '80px'): FormConfig => {
+  const propsConfig: FormConfig = [];
+
+  // 组件类型，必须要有
+  if (!config.find((item) => item.name === 'type')) {
+    propsConfig.push({
+      text: 'type',
+      name: 'type',
+      type: 'hidden',
+    });
+  }
+
+  if (!config.find((item) => item.name === 'id')) {
+    // 组件id，必须要有
+    propsConfig.push({
+      name: 'id',
+      text: 'ID',
+      type: 'text',
+      disabled: true,
+      append: {
+        type: 'button',
+        text: '复制',
+        handler: (vm, { model }) => {
+          navigator.clipboard
+            .writeText(`${model.id}`)
+            .then(() => {
+              tMagicMessage.success('已复制');
+            })
+            .catch(() => {
+              tMagicMessage.error('复制失败');
+            });
+        },
       },
-      { ...styleTabConfig },
-      { ...eventTabConfig },
-      { ...advancedTabConfig },
-      { ...displayTabConfig },
-    ],
-  },
-];
+    });
+  }
+
+  if (!config.find((item) => item.name === 'name')) {
+    propsConfig.push({
+      name: 'name',
+      text: '组件名称',
+    });
+  }
+
+  return [
+    {
+      type: 'tab',
+      labelWidth,
+      items: [
+        {
+          title: '属性',
+          items: [...propsConfig, ...config],
+        },
+        { ...styleTabConfig },
+        { ...eventTabConfig },
+        { ...advancedTabConfig },
+        { ...displayTabConfig },
+      ],
+    },
+  ];
+};
