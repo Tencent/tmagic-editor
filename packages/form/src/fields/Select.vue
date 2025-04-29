@@ -191,6 +191,9 @@ const getOptions = async () => {
     postOptions = option.beforeRequest(mForm, postOptions, {
       model: props.model,
       formValue: mForm?.values,
+      formValues: mForm?.values,
+      prop: props.prop,
+      config: props.config,
     });
   }
 
@@ -206,6 +209,7 @@ const getOptions = async () => {
       formValue: mForm?.values,
       formValues: mForm?.values,
       config: props.config,
+      prop: props.prop,
       postOptions,
     });
   }
@@ -315,6 +319,9 @@ const getInitOption = async () => {
     postOptions = option.beforeInitRequest(mForm, postOptions, {
       model: props.model,
       formValue: mForm?.values,
+      formValues: mForm?.values,
+      config: props.config,
+      prop: props.prop,
     });
   }
 
@@ -331,6 +338,7 @@ const getInitOption = async () => {
       formValue: mForm?.values,
       formValues: mForm?.values,
       config: props.config,
+      prop: props.prop,
       postOptions,
     });
   }

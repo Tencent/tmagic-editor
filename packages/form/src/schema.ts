@@ -279,7 +279,7 @@ type RemoteSelectOptionBodyFunction = (
   },
 ) => Record<string, any>;
 
-type RemoteSelectOptionRequestFunction = (
+type RemoteSelectOptionAfterRequestFunction = (
   mForm: FormState | undefined,
   res: any,
   data: {
@@ -287,9 +287,22 @@ type RemoteSelectOptionRequestFunction = (
     formValue: any;
     formValues: any;
     config: any;
+    prop: string;
     postOptions: Record<string, any>;
   },
 ) => any;
+
+type RemoteSelectOptionBeforeRequestFunction = (
+  mForm: FormState | undefined,
+  postOptions: Record<string, any>,
+  data: {
+    model: any;
+    formValue: any;
+    formValues: any;
+    config: any;
+    prop: string;
+  },
+) => Record<string, any>;
 
 type RemoteSelectOptionItemFunction = (optionsData: Record<string, any>) => SelectOption[] | SelectGroupOption[];
 type SelectOptionValueFunction = (item: Record<string, any>) => any;
@@ -496,14 +509,10 @@ export interface SelectConfig extends FormItem, Input {
     body?: Record<string, any> | RemoteSelectOptionBodyFunction;
     initBody?: Record<string, any> | RemoteSelectOptionBodyFunction;
     jsonpCallback?: 'callback' | string;
-    afterRequest?: RemoteSelectOptionRequestFunction;
-    afterInitRequest?: RemoteSelectOptionRequestFunction;
-    beforeRequest?: (mForm: FormState | undefined, postOptions: Record<string, any>, data: any) => Record<string, any>;
-    beforeInitRequest?: (
-      mForm: FormState | undefined,
-      postOptions: Record<string, any>,
-      data: any,
-    ) => Record<string, any>;
+    afterRequest?: RemoteSelectOptionAfterRequestFunction;
+    afterInitRequest?: RemoteSelectOptionAfterRequestFunction;
+    beforeRequest?: RemoteSelectOptionBeforeRequestFunction;
+    beforeInitRequest?: RemoteSelectOptionBeforeRequestFunction;
     root?: string;
     totalKey?: string;
     initRoot?: string;
