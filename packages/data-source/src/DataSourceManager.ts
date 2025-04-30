@@ -21,8 +21,8 @@ import EventEmitter from 'events';
 
 import { cloneDeep } from 'lodash-es';
 
-import type { DataSourceSchema, default as TMagicApp, DisplayCond, Id, MNode, NODE_CONDS_KEY } from '@tmagic/core';
-import { compiledNode } from '@tmagic/core';
+import type { DataSourceSchema, default as TMagicApp, DisplayCond, Id, MNode } from '@tmagic/core';
+import { compiledNode, NODE_CONDS_KEY } from '@tmagic/core';
 
 import { SimpleObservedData } from './observed-data/SimpleObservedData';
 import { DataSource, HttpDataSource } from './data-sources';
@@ -31,7 +31,10 @@ import type { ChangeEvent, DataSourceManagerData, DataSourceManagerOptions, Obse
 import { compiledNodeField, compliedConditions, compliedIteratorItem, createIteratorContentData } from './utils';
 
 class DataSourceManager extends EventEmitter {
-  private static dataSourceClassMap = new Map<string, typeof DataSource>();
+  private static dataSourceClassMap = new Map<string, any>([
+    ['base', DataSource],
+    ['http', HttpDataSource],
+  ]);
   private static ObservedDataClass: ObservedDataClass = SimpleObservedData;
   private static waitInitSchemaList = new Map<DataSourceManager, Record<string, DataSourceSchema[]>>();
 
@@ -50,6 +53,12 @@ class DataSourceManager extends EventEmitter {
 
   public static getDataSourceClass(type: string) {
     return DataSourceManager.dataSourceClassMap.get(type);
+  }
+
+  public static clearDataSourceClass() {
+    DataSourceManager.dataSourceClassMap.clear();
+    DataSourceManager.dataSourceClassMap.set('base', DataSource);
+    DataSourceManager.dataSourceClassMap.set('http', HttpDataSource);
   }
 
   public static registerObservedData(ObservedDataClass: ObservedDataClass) {
@@ -319,8 +328,5 @@ class DataSourceManager extends EventEmitter {
     return this.get(id)?.offDataChange(path, callback);
   }
 }
-
-DataSourceManager.register('http', HttpDataSource as any);
-DataSourceManager.register('base', DataSource as any);
 
 export default DataSourceManager;

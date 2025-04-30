@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest';
+import { afterAll, describe, expect, test } from 'vitest';
 
 import TMagicApp, { NodeType } from '@tmagic/core';
 
@@ -26,6 +26,10 @@ const app = new TMagicApp({
       },
     ],
   },
+});
+
+afterAll(async () => {
+  DataSourceManager.clearDataSourceClass();
 });
 
 describe('DataSourceManager', () => {

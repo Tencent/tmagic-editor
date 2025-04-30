@@ -47,5 +47,7 @@ describe('createDataSourceManager', () => {
   test('instance', () => {
     const manager = createDataSourceManager(new TMagicApp({ config: dsl }));
     expect(manager).toBeInstanceOf(DataSourceManager);
+
+    DataSourceManager.clearDataSourceClass();
   });
 });
