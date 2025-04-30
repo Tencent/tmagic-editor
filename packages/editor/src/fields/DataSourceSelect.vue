@@ -24,11 +24,18 @@ import { computed, inject } from 'vue';
 import { Edit, View } from '@element-plus/icons-vue';
 
 import { TMagicButton, TMagicTooltip } from '@tmagic/design';
-import { type FieldProps, filterFunction, type FormState, MSelect, type SelectConfig } from '@tmagic/form';
+import {
+  type DataSourceSelect,
+  type FieldProps,
+  filterFunction,
+  type FormState,
+  MSelect,
+  type SelectConfig,
+} from '@tmagic/form';
 
 import MIcon from '@editor/components/Icon.vue';
 import { useServices } from '@editor/hooks/use-services';
-import type { DataSourceSelect, EventBus } from '@editor/type';
+import type { EventBus } from '@editor/type';
 import { SideItemKey } from '@editor/type';
 
 defineOptions({

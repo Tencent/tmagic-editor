@@ -32,7 +32,7 @@ import { inject, Ref, ref } from 'vue';
 
 import type { MockSchema } from '@tmagic/core';
 import { TMagicButton, tMagicMessageBox, TMagicSwitch } from '@tmagic/design';
-import { type FieldProps, type FormConfig, type FormState, MFormBox } from '@tmagic/form';
+import { type DataSourceMocksConfig, type FieldProps, type FormConfig, type FormState, MFormBox } from '@tmagic/form';
 import { type ColumnConfig, MagicTable } from '@tmagic/table';
 import { getDefaultValueFromFields } from '@tmagic/utils';
 
@@ -47,16 +47,9 @@ defineOptions({
   name: 'MFieldsDataSourceMocks',
 });
 
-const props = withDefaults(
-  defineProps<
-    FieldProps<{
-      type: 'data-source-mocks';
-    }>
-  >(),
-  {
-    disabled: false,
-  },
-);
+const props = withDefaults(defineProps<FieldProps<DataSourceMocksConfig>>(), {
+  disabled: false,
+});
 
 const emit = defineEmits(['change']);
 

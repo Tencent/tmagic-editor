@@ -2,7 +2,7 @@
   <TMagicRow :gutter="10">
     <Col
       v-for="(col, index) in config.items"
-      :key="col[mForm?.keyProp || '__key'] ?? index"
+      :key="(col as Record<string, any>)[mForm?.keyProp || '__key'] ?? index"
       :span="col.span || config.span || 24 / config.items.length"
       :config="col"
       :labelWidth="config.labelWidth || labelWidth"

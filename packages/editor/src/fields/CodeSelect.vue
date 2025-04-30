@@ -21,7 +21,7 @@ import { isEmpty } from 'lodash-es';
 
 import { HookCodeType, HookType } from '@tmagic/core';
 import { TMagicCard } from '@tmagic/design';
-import type { ContainerChangeEventData, FieldProps, FormItem, GroupListConfig } from '@tmagic/form';
+import type { CodeSelectConfig, ContainerChangeEventData, FieldProps, GroupListConfig } from '@tmagic/form';
 import { MContainer } from '@tmagic/form';
 
 import { useServices } from '@editor/hooks/use-services';
@@ -36,16 +36,7 @@ const emit = defineEmits<{
 
 const { dataSourceService, codeBlockService } = useServices();
 
-const props = withDefaults(
-  defineProps<
-    FieldProps<
-      {
-        className?: string;
-      } & FormItem
-    >
-  >(),
-  {},
-);
+const props = withDefaults(defineProps<FieldProps<CodeSelectConfig>>(), {});
 
 const codeConfig = computed<GroupListConfig>(() => ({
   type: 'group-list',

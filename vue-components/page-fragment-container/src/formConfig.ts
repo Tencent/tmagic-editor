@@ -16,7 +16,9 @@
  * limitations under the License.
  */
 
-export default [
+import { defineFormConfig } from '@tmagic/form-schema';
+
+export default defineFormConfig([
   {
     name: 'className',
     type: 'data-source-input',
@@ -27,4 +29,4 @@ export default [
     text: '页面片ID',
     type: 'page-fragment-select',
   },
-];
+]);

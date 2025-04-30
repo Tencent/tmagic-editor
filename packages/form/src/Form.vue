@@ -13,7 +13,7 @@
       <Container
         v-for="(item, index) in config"
         :disabled="disabled"
-        :key="item[keyProp] ?? index"
+        :key="(item as Record<string, any>)[keyProp] ?? index"
         :config="item"
         :model="values"
         :last-values="lastValuesProcessed"

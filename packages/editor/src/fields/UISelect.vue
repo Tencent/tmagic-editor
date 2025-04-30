@@ -47,7 +47,7 @@ import { throttle } from 'lodash-es';
 
 import type { Id, MNode } from '@tmagic/core';
 import { TMagicButton, TMagicTooltip } from '@tmagic/design';
-import type { FieldProps, FormItem, FormState } from '@tmagic/form';
+import type { FieldProps, FormState, UISelectConfig } from '@tmagic/form';
 import { getIdFromEl } from '@tmagic/utils';
 
 import { useServices } from '@editor/hooks/use-services';
@@ -57,7 +57,7 @@ defineOptions({
   name: 'MFieldsUISelect',
 });
 
-const props = defineProps<FieldProps<{ type: 'ui-select' } & FormItem>>();
+const props = defineProps<FieldProps<UISelectConfig>>();
 
 const emit = defineEmits(['change']);
 

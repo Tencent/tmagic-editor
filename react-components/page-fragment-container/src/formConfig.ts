@@ -16,10 +16,12 @@
  * limitations under the License.
  */
 
-export default [
+import { defineFormConfig } from '@tmagic/form-schema';
+
+export default defineFormConfig([
   {
     name: 'pageFragmentId',
     text: '页面片ID',
     type: 'page-fragment-select',
   },
-];
+]);

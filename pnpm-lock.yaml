@@ -387,6 +387,9 @@ importers:
       '@tmagic/design':
         specifier: workspace:*
         version: link:../design
+      '@tmagic/form-schema':
+        specifier: workspace:*
+        version: link:../form-schema
       '@tmagic/utils':
         specifier: workspace:*
         version: link:../utils
@@ -415,6 +418,15 @@ importers:
       '@vue/test-utils':
         specifier: ^2.4.6
         version: 2.4.6
+
+  packages/form-schema:
+    dependencies:
+      '@tmagic/schema':
+        specifier: workspace:*
+        version: link:../schema
+      typescript:
+        specifier: '*'
+        version: 5.8.2
 
   packages/schema:
     dependencies:
@@ -665,6 +677,9 @@ importers:
       '@tmagic/core':
         specifier: workspace:^
         version: link:../../packages/core
+      '@tmagic/form-schema':
+        specifier: workspace:^
+        version: link:../../packages/form-schema
       '@tmagic/react-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/react-runtime-help
@@ -690,6 +705,9 @@ importers:
       '@tmagic/core':
         specifier: workspace:^
         version: link:../../packages/core
+      '@tmagic/form-schema':
+        specifier: workspace:^
+        version: link:../../packages/form-schema
       '@tmagic/react-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/react-runtime-help
@@ -715,6 +733,9 @@ importers:
       '@tmagic/core':
         specifier: workspace:^
         version: link:../../packages/core
+      '@tmagic/form-schema':
+        specifier: workspace:^
+        version: link:../../packages/form-schema
       '@tmagic/react-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/react-runtime-help
@@ -740,6 +761,9 @@ importers:
       '@tmagic/core':
         specifier: workspace:^
         version: link:../../packages/core
+      '@tmagic/form-schema':
+        specifier: workspace:^
+        version: link:../../packages/form-schema
       '@tmagic/react-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/react-runtime-help
@@ -765,6 +789,9 @@ importers:
       '@tmagic/core':
         specifier: workspace:^
         version: link:../../packages/core
+      '@tmagic/form-schema':
+        specifier: workspace:^
+        version: link:../../packages/form-schema
       '@tmagic/react-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/react-runtime-help
@@ -790,6 +817,9 @@ importers:
       '@tmagic/core':
         specifier: workspace:^
         version: link:../../packages/core
+      '@tmagic/form-schema':
+        specifier: workspace:^
+        version: link:../../packages/form-schema
       '@tmagic/react-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/react-runtime-help
@@ -815,6 +845,9 @@ importers:
       '@tmagic/core':
         specifier: workspace:^
         version: link:../../packages/core
+      '@tmagic/form-schema':
+        specifier: workspace:^
+        version: link:../../packages/form-schema
       '@tmagic/react-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/react-runtime-help
@@ -840,6 +873,9 @@ importers:
       '@tmagic/core':
         specifier: workspace:^
         version: link:../../packages/core
+      '@tmagic/form-schema':
+        specifier: workspace:^
+        version: link:../../packages/form-schema
       '@tmagic/react-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/react-runtime-help
@@ -865,6 +901,9 @@ importers:
       '@tmagic/core':
         specifier: workspace:^
         version: link:../../packages/core
+      '@tmagic/form-schema':
+        specifier: workspace:^
+        version: link:../../packages/form-schema
       '@tmagic/react-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/react-runtime-help
@@ -896,6 +935,9 @@ importers:
       '@tmagic/core':
         specifier: workspace:^
         version: link:../../packages/core
+      '@tmagic/form-schema':
+        specifier: workspace:^
+        version: link:../../packages/form-schema
       '@tmagic/react-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/react-runtime-help
@@ -1139,6 +1181,9 @@ importers:
       '@tmagic/core':
         specifier: workspace:^
         version: link:../../packages/core
+      '@tmagic/form-schema':
+        specifier: workspace:^
+        version: link:../../packages/form-schema
       '@tmagic/vue-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
@@ -1160,6 +1205,9 @@ importers:
       '@tmagic/core':
         specifier: workspace:^
         version: link:../../packages/core
+      '@tmagic/form-schema':
+        specifier: workspace:^
+        version: link:../../packages/form-schema
       '@tmagic/vue-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
@@ -1181,6 +1229,9 @@ importers:
       '@tmagic/core':
         specifier: workspace:^
         version: link:../../packages/core
+      '@tmagic/form-schema':
+        specifier: workspace:^
+        version: link:../../packages/form-schema
       '@tmagic/vue-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
@@ -1202,6 +1253,9 @@ importers:
       '@tmagic/core':
         specifier: workspace:^
         version: link:../../packages/core
+      '@tmagic/form-schema':
+        specifier: workspace:^
+        version: link:../../packages/form-schema
       '@tmagic/vue-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
@@ -1223,6 +1277,9 @@ importers:
       '@tmagic/core':
         specifier: workspace:^
         version: link:../../packages/core
+      '@tmagic/form-schema':
+        specifier: workspace:^
+        version: link:../../packages/form-schema
       '@tmagic/vue-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
@@ -1238,6 +1295,9 @@ importers:
       '@tmagic/core':
         specifier: workspace:^
         version: link:../../packages/core
+      '@tmagic/form-schema':
+        specifier: workspace:^
+        version: link:../../packages/form-schema
       '@tmagic/vue-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
@@ -1253,6 +1313,9 @@ importers:
       '@tmagic/core':
         specifier: workspace:^
         version: link:../../packages/core
+      '@tmagic/form-schema':
+        specifier: workspace:^
+        version: link:../../packages/form-schema
       '@tmagic/vue-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
@@ -1268,6 +1331,9 @@ importers:
       '@tmagic/core':
         specifier: workspace:^
         version: link:../../packages/core
+      '@tmagic/form-schema':
+        specifier: workspace:^
+        version: link:../../packages/form-schema
       '@tmagic/vue-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
@@ -1283,6 +1349,9 @@ importers:
       '@tmagic/core':
         specifier: workspace:^
         version: link:../../packages/core
+      '@tmagic/form-schema':
+        specifier: workspace:^
+        version: link:../../packages/form-schema
       '@tmagic/vue-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
@@ -1311,6 +1380,9 @@ importers:
       '@tmagic/core':
         specifier: workspace:^
         version: link:../../packages/core
+      '@tmagic/form-schema':
+        specifier: workspace:^
+        version: link:../../packages/form-schema
       '@tmagic/vue-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/vue-runtime-help

@@ -64,6 +64,7 @@ export default defineConfig({
       { find: /^@tmagic\/core/, replacement: path.join(__dirname, '../packages/core/src/index.ts') },
       { find: /^@editor/, replacement: path.join(__dirname, '../packages/editor/src/') },
       { find: /^@tmagic\/editor/, replacement: path.join(__dirname, '../packages/editor/src/index.ts') },
+      { find: /^@tmagic\/form-schema/, replacement: path.join(__dirname, '../packages/form-schema/src/index.ts') },
       { find: /^@tmagic\/schema/, replacement: path.join(__dirname, '../packages/schema/src/index.ts') },
       { find: /^@tmagic\/form/, replacement: path.join(__dirname, '../packages/form/src/index.ts') },
       {

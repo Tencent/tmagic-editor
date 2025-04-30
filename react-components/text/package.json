@@ -13,6 +13,9 @@
     "type": "git",
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
+  "dependencies": {
+    "@tmagic/form-schema": "workspace:^"
+  },
   "peerDependencies": {
     "@tmagic/core": "workspace:^",
     "@tmagic/react-runtime-help": "workspace:^",

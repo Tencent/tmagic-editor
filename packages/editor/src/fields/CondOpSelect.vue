@@ -30,10 +30,9 @@
 import { computed } from 'vue';
 
 import { getDesignConfig, TMagicSelect } from '@tmagic/design';
-import type { FieldProps } from '@tmagic/form';
+import type { CondOpSelectConfig, FieldProps } from '@tmagic/form';
 
 import { useServices } from '@editor/hooks/use-services';
-import type { CondOpSelectConfig } from '@editor/type';
 import { arrayOptions, eqOptions, numberOptions } from '@editor/utils';
 
 defineOptions({

@@ -16,10 +16,12 @@
  * limitations under the License.
  */
 
-export default [
+import { defineFormConfig } from '@tmagic/form-schema';
+
+export default defineFormConfig([
   {
     text: '文本',
     name: 'text',
     type: 'data-source-input',
   },
-];
+]);

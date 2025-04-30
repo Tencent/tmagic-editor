@@ -26,7 +26,7 @@ import { cloneDeep } from 'lodash-es';
 
 import type { CodeBlockContent } from '@tmagic/core';
 import { TMagicButton, tMagicMessageBox } from '@tmagic/design';
-import type { ContainerChangeEventData, FieldProps } from '@tmagic/form';
+import type { ContainerChangeEventData, DataSourceMethodsConfig, FieldProps } from '@tmagic/form';
 import { type ColumnConfig, MagicTable } from '@tmagic/table';
 
 import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
@@ -37,16 +37,9 @@ defineOptions({
   name: 'MFieldsDataSourceMethods',
 });
 
-const props = withDefaults(
-  defineProps<
-    FieldProps<{
-      type: 'data-source-methods';
-    }>
-  >(),
-  {
-    disabled: false,
-  },
-);
+const props = withDefaults(defineProps<FieldProps<DataSourceMethodsConfig>>(), {
+  disabled: false,
+});
 
 const emit = defineEmits(['change']);
 

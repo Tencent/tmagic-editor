@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX, NODE_CONDS_KEY } from '@tmagic/core';
+import { defineFormConfig } from '@tmagic/form-schema';
 
-export default [
+export default defineFormConfig([
   {
     name: 'iteratorData',
     text: '数据源数据',
@@ -116,4 +117,4 @@ export default [
       },
     ],
   },
-];
+]);

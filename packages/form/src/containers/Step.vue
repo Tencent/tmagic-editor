@@ -15,7 +15,7 @@
         <Container
           v-if="item"
           v-show="active - 1 === index"
-          :key="item[mForm?.keyProp || '__key']"
+          :key="(item as Record<string, any>)[mForm?.keyProp || '__key']"
           :config="item"
           :model="step.name ? model[step.name] : model"
           :lastValues="step.name ? lastValues[step.name] : lastValues"

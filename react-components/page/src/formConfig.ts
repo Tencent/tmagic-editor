@@ -17,8 +17,9 @@
  */
 
 import { getElById } from '@tmagic/core';
+import { defineFormConfig } from '@tmagic/form-schema';
 
-export default [
+export default defineFormConfig([
   {
     text: '页面标识',
     name: 'name',
@@ -51,4 +52,4 @@ export default [
       }
     },
   },
-];
+]);

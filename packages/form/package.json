@@ -51,6 +51,7 @@
   "peerDependencies": {
     "@tmagic/design": "workspace:*",
     "@tmagic/utils": "workspace:*",
+    "@tmagic/form-schema": "workspace:*",
     "vue": ">=3.5.0",
     "typescript": "*"
   },

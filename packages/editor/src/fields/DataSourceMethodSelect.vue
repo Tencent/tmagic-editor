@@ -39,6 +39,7 @@ import type { Id } from '@tmagic/core';
 import { TMagicButton, TMagicTooltip } from '@tmagic/design';
 import {
   createValues,
+  type DataSourceMethodSelectConfig,
   type FieldProps,
   filterFunction,
   type FormState,
@@ -49,7 +50,7 @@ import {
 import CodeParams from '@editor/components/CodeParams.vue';
 import MIcon from '@editor/components/Icon.vue';
 import { useServices } from '@editor/hooks/use-services';
-import type { CodeParamStatement, DataSourceMethodSelectConfig, EventBus } from '@editor/type';
+import type { CodeParamStatement, EventBus } from '@editor/type';
 import { SideItemKey } from '@editor/type';
 
 defineOptions({

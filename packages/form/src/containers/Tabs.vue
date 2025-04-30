@@ -34,7 +34,7 @@
       </template>
       <Container
         v-for="item in tabItems(tab)"
-        :key="item[mForm?.keyProp || '__key']"
+        :key="(item as Record<string, any>)[mForm?.keyProp || '__key']"
         :config="item"
         :disabled="disabled"
         :model="

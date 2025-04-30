@@ -16,7 +16,9 @@
  * limitations under the License.
  */
 
-export default [
+import { defineFormConfig } from '@tmagic/form-schema';
+
+export default defineFormConfig([
   {
     name: 'className',
     type: 'data-source-input',
@@ -32,4 +34,4 @@ export default [
     text: '多行文本',
     type: 'switch',
   },
-];
+]);

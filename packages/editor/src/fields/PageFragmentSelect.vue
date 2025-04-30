@@ -20,11 +20,10 @@ import { computed } from 'vue';
 import { Edit } from '@element-plus/icons-vue';
 
 import { Id, NodeType } from '@tmagic/core';
-import { FieldProps } from '@tmagic/form';
+import { FieldProps, type PageFragmentSelectConfig } from '@tmagic/form';
 
 import Icon from '@editor/components/Icon.vue';
 import { useServices } from '@editor/hooks/use-services';
-import type { PageFragmentSelectConfig } from '@editor/type';
 
 defineOptions({
   name: 'MFieldsPageFragmentSelect',

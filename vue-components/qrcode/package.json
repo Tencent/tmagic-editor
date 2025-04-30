@@ -14,6 +14,7 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
+    "@tmagic/form-schema": "workspace:^",
     "qrcode": "^1.5.0",
     "vue-demi": "^0.14.10"
   },

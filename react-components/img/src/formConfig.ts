@@ -16,7 +16,9 @@
  * limitations under the License.
  */
 
-export default [
+import { defineFormConfig } from '@tmagic/form-schema';
+
+export default defineFormConfig([
   {
     type: 'data-source-field-select',
     name: 'src',
@@ -32,4 +34,4 @@ export default [
     name: 'url',
     type: 'data-source-input',
   },
-];
+]);

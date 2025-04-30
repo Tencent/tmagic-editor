@@ -42,6 +42,7 @@ import { isEmpty, map } from 'lodash-es';
 import type { Id } from '@tmagic/core';
 import { TMagicButton } from '@tmagic/design';
 import {
+  type CodeSelectColConfig,
   type ContainerChangeEventData,
   createValues,
   type FieldProps,
@@ -53,7 +54,7 @@ import {
 import CodeParams from '@editor/components/CodeParams.vue';
 import MIcon from '@editor/components/Icon.vue';
 import { useServices } from '@editor/hooks/use-services';
-import type { CodeParamStatement, CodeSelectColConfig, EventBus } from '@editor/type';
+import type { CodeParamStatement, EventBus } from '@editor/type';
 import { SideItemKey } from '@editor/type';
 
 defineOptions({

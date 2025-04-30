@@ -53,6 +53,7 @@ import type { DataSchema } from '@tmagic/core';
 import { TMagicButton, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
 import {
   type ContainerChangeEventData,
+  type DataSourceFieldsConfig,
   type FieldProps,
   type FormConfig,
   type FormState,
@@ -71,16 +72,9 @@ defineOptions({
   name: 'MFieldsDataSourceFields',
 });
 
-const props = withDefaults(
-  defineProps<
-    FieldProps<{
-      type: 'data-source-fields';
-    }>
-  >(),
-  {
-    disabled: false,
-  },
-);
+const props = withDefaults(defineProps<FieldProps<DataSourceFieldsConfig>>(), {
+  disabled: false,
+});
 
 const emit = defineEmits<{
   change: [v: any, eventData?: ContainerChangeEventData];

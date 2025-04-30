@@ -60,7 +60,10 @@ import { TMagicButton } from '@tmagic/design';
 import type {
   CascaderOption,
   ChildConfig,
+  CodeSelectColConfig,
   ContainerChangeEventData,
+  DataSourceMethodSelectConfig,
+  EventSelectConfig,
   FieldProps,
   FormState,
   OnChangeHandlerData,
@@ -70,7 +73,6 @@ import { MContainer as MFormContainer, MPanel } from '@tmagic/form';
 import { DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX, traverseNode } from '@tmagic/utils';
 
 import { useServices } from '@editor/hooks/use-services';
-import type { CodeSelectColConfig, DataSourceMethodSelectConfig, EventSelectConfig } from '@editor/type';
 import { getCascaderOptionsFromFields } from '@editor/utils';
 
 defineOptions({

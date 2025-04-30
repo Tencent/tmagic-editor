@@ -1,6 +1,6 @@
-import { FormConfig } from '@tmagic/form';
+import { defineFormConfig } from '@tmagic/form';
 
-export default [
+export default defineFormConfig([
   {
     name: 'autoFetch',
     text: '自动请求',
@@ -59,4 +59,4 @@ export default [
       },
     ],
   },
-] as FormConfig;
+]);

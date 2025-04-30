@@ -53,7 +53,7 @@ import { Coin } from '@element-plus/icons-vue';
 
 import type { DataSchema, DataSourceSchema } from '@tmagic/core';
 import { getDesignConfig, TMagicAutocomplete, TMagicTag } from '@tmagic/design';
-import type { FieldProps, FormItem } from '@tmagic/form';
+import type { DataSourceInputConfig, FieldProps } from '@tmagic/form';
 import { getKeysArray, isNumber } from '@tmagic/utils';
 
 import Icon from '@editor/components/Icon.vue';
@@ -64,18 +64,9 @@ defineOptions({
   name: 'MFieldsDataSourceInput',
 });
 
-const props = withDefaults(
-  defineProps<
-    FieldProps<
-      {
-        type: 'data-source-input';
-      } & FormItem
-    >
-  >(),
-  {
-    disabled: false,
-  },
-);
+const props = withDefaults(defineProps<FieldProps<DataSourceInputConfig>>(), {
+  disabled: false,
+});
 
 const emit = defineEmits<{
   change: [value: string];

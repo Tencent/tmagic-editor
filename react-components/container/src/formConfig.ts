@@ -17,8 +17,9 @@
  */
 
 import { getElById } from '@tmagic/core';
+import { defineFormConfig } from '@tmagic/form-schema';
 
-export default [
+export default defineFormConfig([
   {
     name: 'layout',
     text: '容器布局',
@@ -40,4 +41,4 @@ export default [
       }
     },
   },
-];
+]);

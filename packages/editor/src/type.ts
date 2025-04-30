@@ -21,27 +21,8 @@ import type EventEmitter from 'events';
 import Sortable, { type Options, type SortableEvent } from 'sortablejs';
 import type { PascalCasedProperties } from 'type-fest';
 
-import type {
-  CodeBlockContent,
-  CodeBlockDSL,
-  DataSourceFieldType,
-  DataSourceSchema,
-  Id,
-  MApp,
-  MContainer,
-  MNode,
-  MPage,
-  MPageFragment,
-} from '@tmagic/core';
-import type {
-  ChildConfig,
-  FilterFunction,
-  FormConfig,
-  FormItem,
-  FormState,
-  Input,
-  TableColumnConfig,
-} from '@tmagic/form';
+import type { CodeBlockContent, CodeBlockDSL, Id, MApp, MContainer, MNode, MPage, MPageFragment } from '@tmagic/core';
+import type { FormConfig, TableColumnConfig } from '@tmagic/form';
 import type StageCore from '@tmagic/stage';
 import type {
   ContainerHighlightType,
@@ -562,25 +543,6 @@ export interface HistoryState {
   canUndo: boolean;
 }
 
-export interface EventSelectConfig {
-  name: string;
-  type: 'event-select';
-  src: 'datasource' | 'component';
-  labelWidth?: string;
-  /** 事件名称表单配置 */
-  eventNameConfig?: FormItem;
-  /** 动作类型配置 */
-  actionTypeConfig?: FormItem;
-  /** 联动组件配置 */
-  targetCompConfig?: FormItem;
-  /** 联动组件动作配置 */
-  compActionConfig?: FormItem;
-  /** 联动代码配置 */
-  codeActionConfig?: FormItem;
-  /** 联动数据源配置 */
-  dataSourceActionConfig?: FormItem;
-}
-
 export enum KeyBindingCommand {
   /** 复制 */
   COPY_NODE = 'tmagic-system-copy-node',
@@ -634,69 +596,6 @@ export interface KeyBindingCacheItem {
   keybinding?: string | string[];
   eventType: 'keyup' | 'keydown';
   bound: boolean;
-}
-
-export interface CodeSelectColConfig extends FormItem {
-  type: 'code-select-col';
-  /** 是否可以编辑代码块，disable表示的是是否可以选择代码块 */
-  notEditable?: boolean | FilterFunction;
-}
-
-export interface PageFragmentSelectConfig extends FormItem {
-  type: 'page-fragment-select';
-}
-
-export interface DataSourceSelect extends FormItem, Input {
-  type: 'data-source-select';
-  /** 数据源类型: base、http... */
-  dataSourceType?: string;
-  /** 是否要编译成数据源的data。
-   * id: 不编译，就是要数据源id;
-   * value: 要编译（数据源data）
-   * */
-  value?: 'id' | 'value';
-  /** 是否可以编辑数据源，disable表示的是是否可以选择数据源 */
-  notEditable?: boolean | FilterFunction;
-}
-
-export interface DataSourceMethodSelectConfig extends FormItem {
-  type: 'data-source-method-select';
-  /** 是否可以编辑数据源，disable表示的是是否可以选择数据源 */
-  notEditable?: boolean | FilterFunction;
-}
-
-export interface DataSourceFieldSelectConfig extends FormItem {
-  type: 'data-source-field-select';
-  /**
-   * 是否要编译成数据源的data。
-   * key: 不编译，就是要数据源id和field name;
-   * value: 要编译（数据源data[`${filed}`]）
-   * */
-  value?: 'key' | 'value';
-  /** 是否严格的遵守父子节点不互相关联 */
-  checkStrictly?:
-    | boolean
-    | ((
-        mForm: FormState | undefined,
-        data: {
-          model: Record<any, any>;
-          values: Record<any, any>;
-          parent?: Record<any, any>;
-          formValue: Record<any, any>;
-          prop: string;
-          config: DataSourceFieldSelectConfig;
-          dataSource?: DataSourceSchema;
-        },
-      ) => boolean);
-  dataSourceFieldType?: DataSourceFieldType[];
-  fieldConfig?: ChildConfig;
-  /** 是否可以编辑数据源，disable表示的是是否可以选择数据源 */
-  notEditable?: boolean | FilterFunction;
-}
-
-export interface CondOpSelectConfig extends FormItem {
-  type: 'cond-op';
-  parentFields?: string[];
 }
 
 /** 可新增的数据源类型选项 */

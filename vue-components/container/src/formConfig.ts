@@ -17,8 +17,9 @@
  */
 
 import { getElById } from '@tmagic/core';
+import { defineFormConfig } from '@tmagic/form-schema';
 
-export default [
+export default defineFormConfig([
   {
     name: 'className',
     type: 'data-source-input',
@@ -45,4 +46,4 @@ export default [
       }
     },
   },
-];
+]);

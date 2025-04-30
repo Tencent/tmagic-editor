@@ -18,8 +18,8 @@ import { computed, inject } from 'vue';
 import type { DisplayCond } from '@tmagic/core';
 import {
   type ContainerChangeEventData,
+  type DisplayCondsConfig,
   type FieldProps,
-  type FilterFunction,
   filterFunction,
   type FormState,
   type GroupListConfig,
@@ -37,17 +37,9 @@ const emit = defineEmits<{
   change: [value: DisplayCond[], eventData?: ContainerChangeEventData];
 }>();
 
-const props = withDefaults(
-  defineProps<
-    FieldProps<{
-      titlePrefix?: string;
-      parentFields?: string[] | FilterFunction<string[]>;
-    }>
-  >(),
-  {
-    disabled: false,
-  },
-);
+const props = withDefaults(defineProps<FieldProps<DisplayCondsConfig>>(), {
+  disabled: false,
+});
 
 const { dataSourceService } = useServices();
 const mForm = inject<FormState | undefined>('mForm');

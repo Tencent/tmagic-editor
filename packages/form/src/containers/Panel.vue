@@ -20,7 +20,7 @@
         <div style="flex: 1">
           <Container
             v-for="(item, index) in items"
-            :key="item[mForm?.keyProp || '__key'] ?? index"
+            :key="(item as Record<string, any>)[mForm?.keyProp || '__key'] ?? index"
             :config="item"
             :model="name ? model[name] : model"
             :lastValues="name ? lastValues[name] : lastValues"
@@ -40,7 +40,7 @@
       <template v-else>
         <Container
           v-for="(item, index) in items"
-          :key="item[mForm?.keyProp || '__key'] ?? index"
+          :key="(item as Record<string, any>)[mForm?.keyProp || '__key'] ?? index"
           :config="item"
           :model="name ? model[name] : model"
           :lastValues="name ? lastValues[name] : lastValues"
