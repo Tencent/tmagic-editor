@@ -5,7 +5,7 @@ import { EntryType } from '../types';
 
 export const prepareEntryFile = async (app: App) => {
   const { moduleMainFilePath, options } = app;
-  const { dynamicImport, hooks, useTs = true } = options;
+  const { dynamicImport, dynamicIgnore, hooks, useTs = true } = options;
 
   let contentMap: Record<string, string> = {
     'comp-entry': generateContent(
@@ -20,6 +20,7 @@ export const prepareEntryFile = async (app: App) => {
       moduleMainFilePath.componentPackage,
       moduleMainFilePath.componentMap,
       dynamicImport,
+      dynamicIgnore,
     ),
     'plugin-entry': generateContent(
       useTs,
@@ -107,6 +108,7 @@ export const generateContent = (
   packageMap: Record<string, string> = {},
   map: Record<string, string> = {},
   dynamicImport = false,
+  dynamicIgnore: string[] = [],
 ) => {
   const list: string[] = [];
   const importDeclarations: string[] = [];
@@ -117,7 +119,7 @@ export const generateContent = (
     if ([EntryType.CONFIG, EntryType.EVENT, EntryType.VALUE].includes(type) && packagePath === packageMap[key]) {
       importDeclarations.push(`import { ${type} as ${name} } from '${packageMap[key]}'`);
       list.push(`'${key}': ${name}`);
-    } else if (dynamicImport) {
+    } else if (dynamicImport && !dynamicIgnore.includes(key)) {
       list.push(`'${key}': () => import('${packagePath}')`);
     } else {
       importDeclarations.push(`import ${name} from '${packagePath}'`);

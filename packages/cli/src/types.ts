@@ -84,6 +84,8 @@ export interface UserConfig {
   npmConfig?: NpmConfig;
   /** 是否使用import()加载组件 */
   dynamicImport?: boolean;
+  /** 指定组件不使用动态加载，dynamicImport为true时有效 */
+  dynamicIgnore?: string[];
   hooks?: {
     beforeWriteEntry?: (genContentMap: Record<string, string>, app: Core) => Promise<Record<string, string>>;
   };
