@@ -278,20 +278,21 @@ export const initServiceEvents = (
     });
   };
 
-  const collectIdle = (nodes: MComponent[], deep: boolean, type?: DepTargetType) =>
-    Promise.all(
-      nodes.map((node) => {
-        let pageId: Id | undefined;
+  const getPageIdByNode = (node: MComponent) => {
+    let pageId: Id | undefined;
 
-        if (isPage(node)) {
-          pageId = node.id;
-        } else {
-          const info = editorService.getNodeInfo(node.id);
-          pageId = info.page?.id;
-        }
-        return depService.collectIdle([node], { pageId }, deep, type);
-      }),
-    );
+    if (isPage(node)) {
+      pageId = node.id;
+    } else {
+      const info = editorService.getNodeInfo(node.id);
+      pageId = info.page?.id;
+    }
+
+    return pageId;
+  };
+
+  const collectIdle = (nodes: MComponent[], deep: boolean, type?: DepTargetType) =>
+    Promise.all(nodes.map((node) => depService.collectIdle([node], { pageId: getPageIdByNode(node) }, deep, type)));
 
   watch(
     () => editorService.get('stage'),
@@ -338,7 +339,8 @@ export const initServiceEvents = (
 
     if (Array.isArray(value.items)) {
       depService.clearIdleTasks();
-      collectIdle(value.items, true).then(() => {
+
+      (typeof Worker === 'undefined' ? collectIdle(value.items, true) : depService.collectByWorker(value)).then(() => {
         updateStageNodes(value.items);
       });
     } else {
@@ -629,16 +631,12 @@ export const initServiceEvents = (
         root.dataSourceDeps = {};
       }
       root.dataSourceDeps[target.id] = target.deps;
-    }
-
-    if (target.type === DepTargetType.DATA_SOURCE_COND) {
+    } else if (target.type === DepTargetType.DATA_SOURCE_COND) {
       if (!root.dataSourceCondDeps) {
         root.dataSourceCondDeps = {};
       }
       root.dataSourceCondDeps[target.id] = target.deps;
-    }
-
-    if (target.type === DepTargetType.DATA_SOURCE_METHOD) {
+    } else if (target.type === DepTargetType.DATA_SOURCE_METHOD) {
       if (!root.dataSourceMethodDeps) {
         root.dataSourceMethodDeps = {};
       }

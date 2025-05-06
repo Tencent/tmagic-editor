@@ -17,12 +17,14 @@
  */
 import { reactive, shallowReactive } from 'vue';
 import { throttle } from 'lodash-es';
+import serialize from 'serialize-javascript';
 
-import type { DepExtendedData, Id, MNode, Target, TargetNode } from '@tmagic/core';
-import { DepTargetType, Watcher } from '@tmagic/core';
+import type { DepData, DepExtendedData, Id, MApp, MNode, Target, TargetNode } from '@tmagic/core';
+import { DepTargetType, traverseTarget, Watcher } from '@tmagic/core';
 import { isPage } from '@tmagic/utils';
 
-import { IdleTask } from '@editor/utils/idle-task';
+import { IdleTask } from '@editor/utils/dep/idle-task';
+import Work from '@editor/utils/dep/worker.ts?worker&inline';
 
 import BaseService from './BaseService';
 
@@ -49,6 +51,8 @@ class Dep extends BaseService {
   private idleTask = new IdleTask<{ node: TargetNode; deep: boolean; target: Target }>();
 
   private watcher = new Watcher({ initialTargets: reactive({}) });
+
+  private waitingWorker?: Promise<void>;
 
   constructor() {
     super();
@@ -114,7 +118,11 @@ class Dep extends BaseService {
     this.emit('ds-collected', nodes, deep);
   }
 
-  public collectIdle(nodes: MNode[], depExtendedData: DepExtendedData = {}, deep = false, type?: DepTargetType) {
+  public async collectIdle(nodes: MNode[], depExtendedData: DepExtendedData = {}, deep = false, type?: DepTargetType) {
+    if (this.waitingWorker) {
+      await this.waitingWorker;
+    }
+
     this.set('collecting', true);
     let startTask = false;
     this.watcher.collectByCallback(nodes, type, ({ node, target }) => {
@@ -138,6 +146,48 @@ class Dep extends BaseService {
         this.emit('ds-collected', nodes, deep);
         resolve();
       });
+    });
+  }
+
+  public collectByWorker(dsl: MApp) {
+    this.set('collecting', true);
+
+    const { promise, resolve: waitingResolve } = Promise.withResolvers<void>();
+
+    this.waitingWorker = promise;
+
+    return new Promise<Record<string, Record<string, DepData>>>((resolve) => {
+      const worker = new Work();
+      worker.postMessage({
+        dsl: serialize(dsl),
+      });
+      worker.onmessage = (e) => {
+        resolve(e.data);
+      };
+      worker.onerror = () => {
+        resolve({});
+      };
+    }).then((depsData) => {
+      traverseTarget(this.watcher.getTargetsList(), (target) => {
+        if (depsData[target.type]?.[target.id]) {
+          target.deps = reactive(depsData[target.type][target.id]);
+
+          if (target.type === DepTargetType.DATA_SOURCE && dsl.dataSourceDeps) {
+            dsl.dataSourceDeps[target.id] = target.deps;
+          } else if (target.type === DepTargetType.DATA_SOURCE_COND && dsl.dataSourceCondDeps) {
+            dsl.dataSourceCondDeps[target.id] = target.deps;
+          } else if (target.type === DepTargetType.DATA_SOURCE_METHOD) {
+            dsl.dataSourceMethodDeps[target.id] = target.deps;
+          }
+        }
+      });
+
+      this.set('collecting', false);
+      this.emit('collected', dsl.items, true);
+      this.emit('ds-collected', dsl.items, true);
+      waitingResolve();
+
+      return depsData;
     });
   }
 
