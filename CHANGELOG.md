@@ -1,3 +1,15 @@
+## [1.5.17](https://github.com/Tencent/tmagic-editor/compare/v1.5.16...v1.5.17) (2025-05-06)
+
+
+### Features
+
+* **cli:** 指定组件不使用动态加载，dynamicImport为true时有效 ([85284e5](https://github.com/Tencent/tmagic-editor/commit/85284e54f5874d2c7afe08e401b26ae6b21a153f))
+* **editor,form,form-schema:** 新增form-schema，将表单schema放入其中 ([50b74d1](https://github.com/Tencent/tmagic-editor/commit/50b74d10e6e52f14ac46547292eaba8fe9bbae11))
+* **editor:** dsl初始化时收集依赖使用worker ([179b797](https://github.com/Tencent/tmagic-editor/commit/179b797c5c8b4cbcf76a1d32ec3e899efb32ae2a))
+* **form:** select before/after request函数配置中增加prop字段 ([ed01cfc](https://github.com/Tencent/tmagic-editor/commit/ed01cfca870c726117c33478907f55d9fe66085b))
+
+
+
 ## [1.5.16](https://github.com/Tencent/tmagic-editor/compare/v1.5.15...v1.5.16) (2025-04-28)
 
 
