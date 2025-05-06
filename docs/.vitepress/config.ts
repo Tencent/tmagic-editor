@@ -402,6 +402,7 @@ export default defineConfig({
     },
     resolve: {
       alias:[
+        { find: /^@tmagic\/form-schema/, replacement: path.join(__dirname, '../../packages/form-schema/src/index.ts') },
         { find: /^@tmagic\/form/, replacement: path.join(__dirname, '../../packages/form/src/index.ts') },
         { find: /^@tmagic\/utils/, replacement: path.join(__dirname, '../../packages/utils/src/index.ts') },
         { find: /^@tmagic\/schema/, replacement: path.join(__dirname, '../../packages/schema/src/index.ts') },
