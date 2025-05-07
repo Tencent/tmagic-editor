@@ -103,7 +103,7 @@ export interface DisplayCondsConfig extends FormItem {
   parentFields?: string[] | FilterFunction<string[]>;
 }
 
-export interface EventSelectConfig {
+export interface EventSelectConfig extends FormItem {
   name: string;
   type: 'event-select';
   src: 'datasource' | 'component';
