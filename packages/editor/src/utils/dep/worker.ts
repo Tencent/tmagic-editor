@@ -26,6 +26,8 @@ onmessage = (e) => {
       postMessage({});
     }
 
+    watcher.clearTargets();
+
     if (mApp.codeBlocks) {
       for (const [id, code] of Object.entries(mApp.codeBlocks)) {
         watcher.addTarget(createCodeBlockTarget(id, code));

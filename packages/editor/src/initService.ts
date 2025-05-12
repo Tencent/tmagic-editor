@@ -19,6 +19,7 @@ import {
   createDataSourceTarget,
   DepTargetType,
   NODE_CONDS_KEY,
+  NodeType,
   Target,
 } from '@tmagic/core';
 import { ChangeRecord } from '@tmagic/form';
@@ -292,7 +293,14 @@ export const initServiceEvents = (
   };
 
   const collectIdle = (nodes: MComponent[], deep: boolean, type?: DepTargetType) =>
-    Promise.all(nodes.map((node) => depService.collectIdle([node], { pageId: getPageIdByNode(node) }, deep, type)));
+    Promise.all(
+      nodes.map((node) => {
+        if (node.type === NodeType.ROOT) {
+          return Promise.resolve();
+        }
+        return depService.collectIdle([node], { pageId: getPageIdByNode(node) }, deep, type);
+      }),
+    );
 
   watch(
     () => editorService.get('stage'),
@@ -327,7 +335,7 @@ export const initServiceEvents = (
     codeBlockService.setCodeDsl(value.codeBlocks);
     dataSourceService.set('dataSources', value.dataSources);
 
-    depService.removeTargets(DepTargetType.CODE_BLOCK);
+    depService.clearTargets();
 
     for (const [id, code] of Object.entries(value.codeBlocks)) {
       depService.addTarget(createCodeBlockTarget(id, code));
@@ -386,7 +394,9 @@ export const initServiceEvents = (
     const needRecollectNodes: MComponent[] = [];
     const normalNodes: MComponent[] = [];
     for (const { newNode, oldNode, changeRecords } of data) {
-      if (changeRecords?.length) {
+      if (newNode.type === NodeType.ROOT) {
+        normalNodes.push(newNode);
+      } else if (changeRecords?.length) {
         // eslint-disable-next-line no-restricted-syntax
         forChangeRecords: for (const record of changeRecords) {
           if (!record.propPath) {
@@ -435,6 +445,7 @@ export const initServiceEvents = (
       handler();
     } else {
       updateStageNodes(normalNodes);
+
       // 在上面判断是否需要收集数据源依赖中已经更新stage
       Promise.all([
         collectIdle(normalNodes, true, DepTargetType.CODE_BLOCK),
