@@ -18,18 +18,32 @@
 
 import { reactive } from 'vue';
 import { cloneDeep } from 'lodash-es';
+import type { Writable } from 'type-fest';
 
 import { type EventOption } from '@tmagic/core';
 import { toLine } from '@tmagic/utils';
 
+import type { AsyncHookPlugin, SyncHookPlugin } from '@editor/type';
+
 import BaseService from './BaseService';
+
+const canUsePluginMethods = {
+  async: [] as const,
+  sync: ['setEvent', 'getEvent', 'setMethod', 'getMethod'] as const,
+};
+
+type AsyncMethodName = Writable<(typeof canUsePluginMethods)['async']>;
+type SyncMethodName = Writable<(typeof canUsePluginMethods)['sync']>;
 
 let eventMap: Record<string, EventOption[]> = reactive({});
 let methodMap: Record<string, EventOption[]> = reactive({});
 
 class Events extends BaseService {
   constructor() {
-    super([]);
+    super([
+      ...canUsePluginMethods.async.map((methodName) => ({ name: methodName, isAsync: true })),
+      ...canUsePluginMethods.sync.map((methodName) => ({ name: methodName, isAsync: false })),
+    ]);
   }
 
   public setEvents(events: Record<string, EventOption[]>) {
@@ -69,6 +83,10 @@ class Events extends BaseService {
     this.resetState();
     this.removeAllListeners();
     this.removeAllPlugins();
+  }
+
+  public usePlugin(options: AsyncHookPlugin<AsyncMethodName, Events> & SyncHookPlugin<SyncMethodName, Events>): void {
+    super.usePlugin(options);
   }
 }
 
