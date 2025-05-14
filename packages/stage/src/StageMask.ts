@@ -158,8 +158,17 @@ export default class StageMask extends Rule {
     // 不可以有横向滚动
     if (!this.page || el.getBoundingClientRect().left >= this.page.scrollWidth) return;
 
+    const scrollParent = getScrollParent(el as HTMLElement);
+
+    if (scrollParent && scrollParent !== this.pageScrollParent) {
+      this.scrollIntoView(scrollParent);
+      return;
+    }
+
     el.scrollIntoView();
+
     if (!this.pageScrollParent) return;
+
     this.scrollLeft = this.pageScrollParent.scrollLeft;
     this.scrollTop = this.pageScrollParent.scrollTop;
 
