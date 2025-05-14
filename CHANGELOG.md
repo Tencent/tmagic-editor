@@ -1,3 +1,20 @@
+## [1.5.18](https://github.com/Tencent/tmagic-editor/compare/v1.5.17...v1.5.18) (2025-05-14)
+
+
+### Bug Fixes
+
+* **editor:** 根节点修改在update事件中不要触发依赖收集 ([6b481c4](https://github.com/Tencent/tmagic-editor/commit/6b481c447309abefbf9ea12f80fa4f874c7ff2a0))
+* **editor:** 选中组件时，如果组件处于所在容器可视范围外，不要将组件滚动至可视范围，而是滚动组件容器至可视范围 ([936eb08](https://github.com/Tencent/tmagic-editor/commit/936eb08a94ef8e237f55d2c9c7f0408f9bfb4f8e))
+
+
+### Features
+
+* **core:** 新增数据源初始数据配置字段 ([d1e99a4](https://github.com/Tencent/tmagic-editor/commit/d1e99a46a7a25e2ddef152aef634589361e39194))
+* **editor:** eventsServic支持插件扩展 ([054d126](https://github.com/Tencent/tmagic-editor/commit/054d12601b243a02f54af5f8776d74b5c5497858))
+* **editor:** 组件高级配置中添加display ([e0d5efb](https://github.com/Tencent/tmagic-editor/commit/e0d5efb02261069b48823cd8ce24232ea6f24b08))
+
+
+
 ## [1.5.17](https://github.com/Tencent/tmagic-editor/compare/v1.5.16...v1.5.17) (2025-05-06)
 
 

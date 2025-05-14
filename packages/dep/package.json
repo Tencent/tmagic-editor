@@ -1,5 +1,5 @@
 {
-  "version": "1.5.17",
+  "version": "1.5.18",
   "name": "@tmagic/dep",
   "type": "module",
   "main": "dist/tmagic-dep.umd.cjs",

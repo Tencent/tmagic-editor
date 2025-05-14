@@ -1,5 +1,5 @@
 {
-  "version": "1.5.17",
+  "version": "1.5.18",
   "name": "@tmagic/tdesign-vue-next-adapter",
   "type": "module",
   "main": "dist/tmagic-tdesign-vue-next-adapter.umd.cjs",
