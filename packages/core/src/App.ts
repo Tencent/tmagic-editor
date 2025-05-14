@@ -20,7 +20,13 @@ import { EventEmitter } from 'events';
 
 import { isEmpty } from 'lodash-es';
 
-import { createDataSourceManager, type DataSource, DataSourceManager, ObservedDataClass } from '@tmagic/data-source';
+import {
+  createDataSourceManager,
+  type DataSource,
+  DataSourceManager,
+  type DataSourceManagerData,
+  ObservedDataClass,
+} from '@tmagic/data-source';
 import type { CodeBlockDSL, DataSourceSchema, Id, JsEngine, MApp, RequestFunction } from '@tmagic/schema';
 
 import Env from './Env';
@@ -52,6 +58,7 @@ export interface AppOptionsConfig {
   transformStyle?: (style: Record<string, any>) => Record<string, any>;
   request?: RequestFunction;
   DataSourceObservedData?: ObservedDataClass;
+  dataSourceManagerInitialData?: DataSourceManagerData;
   errorHandler?: ErrorHandler;
 }
 
@@ -135,7 +142,7 @@ class App extends EventEmitter {
     }
 
     if (options.config) {
-      this.setConfig(options.config, options.curPage);
+      this.setConfig(options.config, options.curPage, options.dataSourceManagerInitialData);
     }
   }
 
@@ -155,8 +162,9 @@ class App extends EventEmitter {
    * 设置dsl
    * @param config dsl跟节点
    * @param curPage 当前页面id
+   * @param initialData 数据源初始数据源
    */
-  public setConfig(config: MApp, curPage?: Id) {
+  public setConfig(config: MApp, curPage?: Id, initialData?: DataSourceManagerData) {
     this.dsl = config;
 
     if (!curPage && config.items.length) {
@@ -167,7 +175,7 @@ class App extends EventEmitter {
       this.dataSourceManager.destroy();
     }
 
-    this.dataSourceManager = createDataSourceManager(this, this.useMock);
+    this.dataSourceManager = createDataSourceManager(this, this.useMock, initialData);
 
     this.codeDsl = config.codeBlocks;
 
