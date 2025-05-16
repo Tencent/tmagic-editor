@@ -188,9 +188,6 @@ const actionTypeConfig = computed(() => {
       {
         text: '数据源',
         label: '数据源',
-        disabled: !dataSourceService
-          ?.get('dataSources')
-          ?.filter((ds) => ds.methods?.length || dataSourceService.getFormMethod(ds.type).length).length,
         value: ActionType.DATA_SOURCE,
       },
     ],
