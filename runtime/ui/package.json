@@ -14,7 +14,7 @@
   },
   "license": "Apache-2.0",
   "repository": {
-    "directory": "packages/ui",
+    "directory": "runtime/ui",
     "type": "git",
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
