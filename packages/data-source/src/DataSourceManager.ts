@@ -76,6 +76,7 @@ class DataSourceManager extends EventEmitter {
   public dataSourceMap = new Map<string, DataSource & Record<string, any>>();
 
   public data: DataSourceManagerData = {};
+  public initialData: DataSourceManagerData = {};
   public useMock?: boolean = false;
 
   constructor({ app, useMock, initialData }: DataSourceManagerOptions) {
@@ -87,6 +88,7 @@ class DataSourceManager extends EventEmitter {
     this.useMock = useMock;
 
     if (initialData) {
+      this.initialData = initialData;
       this.data = initialData;
     }
 
@@ -178,7 +180,7 @@ class DataSourceManager extends EventEmitter {
       }
 
       // 保证初始化时的第一次编译有值
-      this.data[config.id] = getDefaultValueFromFields(config.fields);
+      this.data[config.id] = this.initialData[config.id] ?? getDefaultValueFromFields(config.fields);
 
       return;
     }
@@ -188,7 +190,7 @@ class DataSourceManager extends EventEmitter {
       schema: config,
       request: this.app.request,
       useMock: this.useMock,
-      initialData: this.data[config.id],
+      initialData: this.initialData[config.id],
       ObservedDataClass: DataSourceManager.ObservedDataClass,
     });
 
@@ -322,6 +324,7 @@ class DataSourceManager extends EventEmitter {
   public destroy() {
     this.removeAllListeners();
     this.data = {};
+    this.initialData = {};
     this.dataSourceMap.forEach((ds) => {
       ds.destroy();
     });
