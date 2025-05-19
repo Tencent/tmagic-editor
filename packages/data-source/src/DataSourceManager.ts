@@ -22,12 +22,18 @@ import EventEmitter from 'events';
 import { cloneDeep } from 'lodash-es';
 
 import type { DataSourceSchema, default as TMagicApp, DisplayCond, Id, MNode } from '@tmagic/core';
-import { compiledNode, NODE_CONDS_KEY } from '@tmagic/core';
+import { compiledNode, getDefaultValueFromFields, NODE_CONDS_KEY } from '@tmagic/core';
 
 import { SimpleObservedData } from './observed-data/SimpleObservedData';
 import { DataSource, HttpDataSource } from './data-sources';
 import { getDeps } from './depsCache';
-import type { ChangeEvent, DataSourceManagerData, DataSourceManagerOptions, ObservedDataClass } from './types';
+import type {
+  ChangeEvent,
+  DataSourceManagerData,
+  DataSourceManagerOptions,
+  ObservedDataClass,
+  SchemaListMap,
+} from './types';
 import { compiledNodeField, compliedConditions, compliedIteratorItem, createIteratorContentData } from './utils';
 
 class DataSourceManager extends EventEmitter {
@@ -36,7 +42,7 @@ class DataSourceManager extends EventEmitter {
     ['http', HttpDataSource],
   ]);
   private static ObservedDataClass: ObservedDataClass = SimpleObservedData;
-  private static waitInitSchemaList = new Map<DataSourceManager, Record<string, DataSourceSchema[]>>();
+  private static waitInitSchemaList = new Map<DataSourceManager, SchemaListMap>();
 
   public static register<T extends typeof DataSource = typeof DataSource>(type: string, dataSource: T) {
     DataSourceManager.dataSourceClassMap.set(type, dataSource);
@@ -170,6 +176,9 @@ class DataSourceManager extends EventEmitter {
       } else {
         listMap[config.type] = [config];
       }
+
+      // 保证初始化时的第一次编译有值
+      this.data[config.id] = getDefaultValueFromFields(config.fields);
 
       return;
     }

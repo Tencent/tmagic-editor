@@ -65,3 +65,7 @@ export interface ChangeEvent {
 export type AsyncDataSourceResolveResult<T = typeof DataSource> = {
   default: T;
 };
+
+export interface SchemaListMap {
+  [key: string]: DataSourceSchema[];
+}
