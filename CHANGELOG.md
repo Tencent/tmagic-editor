@@ -1,3 +1,19 @@
+## [1.5.19](https://github.com/Tencent/tmagic-editor/compare/v1.5.18...v1.5.19) (2025-05-20)
+
+
+### Bug Fixes
+
+* **data-source:** 异步加载数据源时，初始化第一次编译时数据源可能未加载，需要优先设置数据源默认值 ([d628ffa](https://github.com/Tencent/tmagic-editor/commit/d628ffad26f897ee6144b3981bdcd11cb8dd5e9d))
+* **data-source:** 异步加载数据源时，初始化第一次编译时数据源可能未加载，需要优先设置数据源默认值 ([fc88671](https://github.com/Tencent/tmagic-editor/commit/fc886715c7b465d7f5e18eb5bcd904963f6dd4a9))
+* **editor:** 由于数据源可能有内部方法，所以去掉事件联动中数据源选项置灰的逻辑 ([1444eb6](https://github.com/Tencent/tmagic-editor/commit/1444eb6ae7455dc9abaf3d05ed8db02b410875e7))
+
+
+### Features
+
+* **core:** 支持统一设置node.store的初始值 ([abe27db](https://github.com/Tencent/tmagic-editor/commit/abe27db47afbedf997affcd9593c9a9e8e0a4a14))
+
+
+
 ## [1.5.18](https://github.com/Tencent/tmagic-editor/compare/v1.5.17...v1.5.18) (2025-05-14)
 
 
