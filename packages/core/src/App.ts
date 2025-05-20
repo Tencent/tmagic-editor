@@ -59,6 +59,7 @@ export interface AppOptionsConfig {
   request?: RequestFunction;
   DataSourceObservedData?: ObservedDataClass;
   dataSourceManagerInitialData?: DataSourceManagerData;
+  nodeStoreInitialData?: () => any;
   errorHandler?: ErrorHandler;
 }
 
@@ -85,6 +86,7 @@ class App extends EventEmitter {
   public transformStyle: (style: Record<string, any>) => Record<string, any>;
   public eventHelper?: EventHelper;
   public errorHandler?: ErrorHandler;
+  public nodeStoreInitialData?: () => any;
 
   private flexible?: Flexible;
 
@@ -103,6 +105,7 @@ class App extends EventEmitter {
     this.codeDsl = options.config?.codeBlocks;
     options.platform && (this.platform = options.platform);
     options.jsEngine && (this.jsEngine = options.jsEngine);
+    options.nodeStoreInitialData && (this.nodeStoreInitialData = options.nodeStoreInitialData);
 
     if (options.pageFragmentContainerType) {
       const pageFragmentContainerType = Array.isArray(options.pageFragmentContainerType)
@@ -336,6 +339,8 @@ class App extends EventEmitter {
     this.dataSourceManager = undefined;
     this.codeDsl = undefined;
     this.components.clear();
+
+    this.nodeStoreInitialData = undefined;
   }
 }
 

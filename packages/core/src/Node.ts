@@ -53,7 +53,7 @@ class Node extends EventEmitter {
   public page?: Page;
   public parent?: Node;
   public app: TMagicApp;
-  public store = new Store();
+  public store;
   public eventKeys = new Map<string, symbol>();
 
   private eventQueue: EventCache[] = [];
@@ -61,6 +61,7 @@ class Node extends EventEmitter {
   constructor(options: NodeOptions) {
     super();
 
+    this.store = new Store({ initialData: options.app.nodeStoreInitialData?.() || {} });
     this.page = options.page;
     this.parent = options.parent;
     this.app = options.app;
