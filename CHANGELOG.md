@@ -1,3 +1,20 @@
+## [1.5.20](https://github.com/Tencent/tmagic-editor/compare/v1.5.19...v1.5.20) (2025-05-21)
+
+
+### Bug Fixes
+
+* **editor:** getTMagicApp中对runtime-ready可能存在多次事件监听 ([4448584](https://github.com/Tencent/tmagic-editor/commit/444858491da47c168ea2540cd718fabdca027781))
+* **editor:** 新增数据源时，由于方法列表为空出现的报错 ([1e396d4](https://github.com/Tencent/tmagic-editor/commit/1e396d4a8d202c0324d7f4128b80fd476bdb4e65))
+
+
+### Features
+
+* **core:** 新增事件处理前后的钩子函数配置 ([b78d2fd](https://github.com/Tencent/tmagic-editor/commit/b78d2fda1fe474b7004db038a51773c326b24f4e))
+* **data-source:** 新增判断所有数据源加载完成的方法 ([dc37d4e](https://github.com/Tencent/tmagic-editor/commit/dc37d4e8bd35d473c3c74a7b10b3d9e6af00d759))
+* **data-source:** 由于存在异步加载数据源，新增所有数据源加载完毕事件 ([a35789c](https://github.com/Tencent/tmagic-editor/commit/a35789c0cf1c740df9fb16bc302cf1aec50cdf2b))
+
+
+
 ## [1.5.19](https://github.com/Tencent/tmagic-editor/compare/v1.5.18...v1.5.19) (2025-05-20)
 
 
