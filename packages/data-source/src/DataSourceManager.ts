@@ -203,7 +203,7 @@ class DataSourceManager extends EventEmitter {
       this.setData(ds, changeEvent);
     });
 
-    if (!this.app.dsl?.dataSources || this.dataSourceMap.size === this.app.dsl.dataSources.length) {
+    if (this.isAllDataSourceRegistered()) {
       this.emit('registered-all');
     }
 
@@ -326,6 +326,10 @@ class DataSourceManager extends EventEmitter {
         ctxData,
       }),
     );
+  }
+
+  public isAllDataSourceRegistered() {
+    return !this.app.dsl?.dataSources?.length || this.dataSourceMap.size === this.app.dsl.dataSources.length;
   }
 
   public destroy() {
