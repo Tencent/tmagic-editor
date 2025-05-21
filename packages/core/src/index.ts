@@ -28,7 +28,7 @@ export * from '@tmagic/utils';
 export { default as EventHelper } from './EventHelper';
 export * from './utils';
 
-export { type AppOptionsConfig } from './App';
+export * from './type';
 export { default as Env } from './Env';
 export { default as Page } from './Page';
 export { default as Node } from './Node';

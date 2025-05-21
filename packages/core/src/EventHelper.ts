@@ -37,16 +37,29 @@ import { DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX } from '@tmagic/utils';
 import type { default as TMagicApp } from './App';
 import FlowState from './FlowState';
 import type { default as TMagicNode } from './Node';
+import { AfterEventHandler, BeforeEventHandler } from './type';
 
 export default class EventHelper extends EventEmitter {
   public app: TMagicApp;
 
   private nodeEventList = new Map<(fromCpt: TMagicNode, ...args: any[]) => void, symbol>();
   private dataSourceEventList = new Map<string, Map<string, (...args: any[]) => void>>();
+  private beforeEventHandler?: BeforeEventHandler;
+  private afterEventHandler?: AfterEventHandler;
 
-  constructor({ app }: { app: TMagicApp }) {
+  constructor({
+    app,
+    beforeEventHandler,
+    afterEventHandler,
+  }: {
+    app: TMagicApp;
+    beforeEventHandler?: BeforeEventHandler;
+    afterEventHandler?: AfterEventHandler;
+  }) {
     super();
 
+    this.beforeEventHandler = beforeEventHandler;
+    this.afterEventHandler = afterEventHandler;
     this.app = app;
   }
 
@@ -59,6 +72,10 @@ export default class EventHelper extends EventEmitter {
 
   public bindNodeEvents(node: TMagicNode) {
     node.events?.forEach((event, index) => {
+      if (!event.name) {
+        return;
+      }
+
       let eventNameKey = `${event.name}_${node.data.id}`;
 
       // 页面片容器可以配置页面片内组件的事件，形式为“${nodeId}.${eventName}”
@@ -150,6 +167,10 @@ export default class EventHelper extends EventEmitter {
   private async eventHandler(config: EventConfig | number, fromCpt: TMagicNode | DataSource | undefined, args: any[]) {
     const eventConfig = typeof config === 'number' ? (fromCpt as TMagicNode).events[config] : config;
 
+    if (typeof this.beforeEventHandler === 'function') {
+      this.beforeEventHandler({ eventConfig, source: fromCpt, args });
+    }
+
     if (has(eventConfig, 'actions')) {
       // EventConfig类型
       const flowState = new FlowState();
@@ -176,6 +197,10 @@ export default class EventHelper extends EventEmitter {
           throw e;
         }
       }
+    }
+
+    if (typeof this.afterEventHandler === 'function') {
+      this.afterEventHandler({ eventConfig, source: fromCpt, args });
     }
   }
 

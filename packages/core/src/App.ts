@@ -20,14 +20,8 @@ import { EventEmitter } from 'events';
 
 import { isEmpty } from 'lodash-es';
 
-import {
-  createDataSourceManager,
-  type DataSource,
-  DataSourceManager,
-  type DataSourceManagerData,
-  ObservedDataClass,
-} from '@tmagic/data-source';
-import type { CodeBlockDSL, DataSourceSchema, Id, JsEngine, MApp, RequestFunction } from '@tmagic/schema';
+import { createDataSourceManager, DataSourceManager, type DataSourceManagerData } from '@tmagic/data-source';
+import type { CodeBlockDSL, Id, JsEngine, MApp, RequestFunction } from '@tmagic/schema';
 
 import Env from './Env';
 import EventHelper from './EventHelper';
@@ -35,33 +29,8 @@ import Flexible from './Flexible';
 import FlowState from './FlowState';
 import Node from './Node';
 import Page from './Page';
+import { AppOptionsConfig, ErrorHandler } from './type';
 import { transformStyle as defaultTransformStyle } from './utils';
-
-export type ErrorHandler = (
-  err: Error,
-  node: DataSource<DataSourceSchema> | Node | undefined,
-  info: Record<string, any>,
-) => void;
-
-export interface AppOptionsConfig {
-  ua?: string;
-  env?: Env;
-  config?: MApp;
-  platform?: 'editor' | 'mobile' | 'tv' | 'pc';
-  jsEngine?: JsEngine;
-  designWidth?: number;
-  curPage?: Id;
-  useMock?: boolean;
-  disabledFlexible?: boolean;
-  pageFragmentContainerType?: string | string[];
-  iteratorContainerType?: string | string[];
-  transformStyle?: (style: Record<string, any>) => Record<string, any>;
-  request?: RequestFunction;
-  DataSourceObservedData?: ObservedDataClass;
-  dataSourceManagerInitialData?: DataSourceManagerData;
-  nodeStoreInitialData?: () => any;
-  errorHandler?: ErrorHandler;
-}
 
 class App extends EventEmitter {
   [x: string]: any;
@@ -134,7 +103,11 @@ class App extends EventEmitter {
     }
 
     if (this.platform !== 'editor') {
-      this.eventHelper = new EventHelper({ app: this });
+      this.eventHelper = new EventHelper({
+        app: this,
+        beforeEventHandler: options.beforeEventHandler,
+        afterEventHandler: options.afterEventHandler,
+      });
     }
 
     this.transformStyle =
