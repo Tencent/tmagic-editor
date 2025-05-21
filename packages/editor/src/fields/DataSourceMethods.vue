@@ -64,7 +64,7 @@ const methodColumns: ColumnConfig[] = [
   {
     label: '参数',
     prop: 'params',
-    formatter: (params: CodeParamStatement[]) => params.map((item) => item.name).join(', '),
+    formatter: (params: CodeParamStatement[] = []) => params.map((item) => item.name).join(', '),
   },
   {
     label: '操作',
