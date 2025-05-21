@@ -89,45 +89,46 @@ class DataSourceManager extends EventEmitter {
 
     if (initialData) {
       this.initialData = initialData;
-      this.data = initialData;
+      this.data = { ...initialData };
     }
 
     app.dsl?.dataSources?.forEach((config) => {
       this.addDataSource(config);
     });
 
-    const dataSourceList = Array.from(this.dataSourceMap);
+    this.on('registered-all', () => {
+      const dataSourceList = Array.from(this.dataSourceMap);
+      if (typeof Promise.allSettled === 'function') {
+        Promise.allSettled<Record<string, any>>(dataSourceList.map(([, ds]) => this.init(ds))).then((values) => {
+          const data: DataSourceManagerData = {};
+          const errors: Record<string, Error> = {};
 
-    if (typeof Promise.allSettled === 'function') {
-      Promise.allSettled<Record<string, any>>(dataSourceList.map(([, ds]) => this.init(ds))).then((values) => {
-        const data: DataSourceManagerData = {};
-        const errors: Record<string, Error> = {};
-
-        values.forEach((value, index) => {
-          const dsId = dataSourceList[index][0];
-          if (value.status === 'fulfilled') {
-            if (this.data[dsId]) {
-              data[dsId] = this.data[dsId];
-            } else {
+          values.forEach((value, index) => {
+            const dsId = dataSourceList[index][0];
+            if (value.status === 'fulfilled') {
+              if (this.data[dsId]) {
+                data[dsId] = this.data[dsId];
+              } else {
+                delete data[dsId];
+              }
+            } else if (value.status === 'rejected') {
               delete data[dsId];
+              errors[dsId] = value.reason;
             }
-          } else if (value.status === 'rejected') {
-            delete data[dsId];
-            errors[dsId] = value.reason;
-          }
-        });
+          });
 
-        this.emit('init', data, errors);
-      });
-    } else {
-      Promise.all<Record<string, any>>(dataSourceList.map(([, ds]) => this.init(ds)))
-        .then(() => {
-          this.emit('init', this.data);
-        })
-        .catch(() => {
-          this.emit('init', this.data);
+          this.emit('init', data, errors);
         });
-    }
+      } else {
+        Promise.all<Record<string, any>>(dataSourceList.map(([, ds]) => this.init(ds)))
+          .then(() => {
+            this.emit('init', this.data);
+          })
+          .catch(() => {
+            this.emit('init', this.data);
+          });
+      }
+    });
   }
 
   public async init(ds: DataSource) {
@@ -202,6 +203,10 @@ class DataSourceManager extends EventEmitter {
       this.setData(ds, changeEvent);
     });
 
+    if (!this.app.dsl?.dataSources || this.dataSourceMap.size === this.app.dsl.dataSources.length) {
+      this.emit('registered-all');
+    }
+
     return ds;
   }
 
@@ -221,20 +226,22 @@ class DataSourceManager extends EventEmitter {
    * @param {DataSourceSchema[]} schemas 所有数据源配置
    */
   public updateSchema(schemas: DataSourceSchema[]) {
-    schemas.forEach((schema) => {
+    for (const schema of schemas) {
       const ds = this.get(schema.id);
       if (!ds) {
         return;
       }
 
       this.removeDataSource(schema.id);
+    }
 
+    for (const schema of schemas) {
       this.addDataSource(cloneDeep(schema));
       const newDs = this.get(schema.id);
       if (newDs) {
         this.init(newDs);
       }
-    });
+    }
   }
 
   /**
