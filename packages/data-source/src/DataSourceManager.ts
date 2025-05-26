@@ -96,39 +96,13 @@ class DataSourceManager extends EventEmitter {
       this.addDataSource(config);
     });
 
-    this.on('registered-all', () => {
-      const dataSourceList = Array.from(this.dataSourceMap);
-      if (typeof Promise.allSettled === 'function') {
-        Promise.allSettled<Record<string, any>>(dataSourceList.map(([, ds]) => this.init(ds))).then((values) => {
-          const data: DataSourceManagerData = {};
-          const errors: Record<string, Error> = {};
-
-          values.forEach((value, index) => {
-            const dsId = dataSourceList[index][0];
-            if (value.status === 'fulfilled') {
-              if (this.data[dsId]) {
-                data[dsId] = this.data[dsId];
-              } else {
-                delete data[dsId];
-              }
-            } else if (value.status === 'rejected') {
-              delete data[dsId];
-              errors[dsId] = value.reason;
-            }
-          });
-
-          this.emit('init', data, errors);
-        });
-      } else {
-        Promise.all<Record<string, any>>(dataSourceList.map(([, ds]) => this.init(ds)))
-          .then(() => {
-            this.emit('init', this.data);
-          })
-          .catch(() => {
-            this.emit('init', this.data);
-          });
-      }
-    });
+    if (this.isAllDataSourceRegistered()) {
+      this.callDsInit();
+    } else {
+      this.on('registered-all', () => {
+        this.callDsInit();
+      });
+    }
   }
 
   public async init(ds: DataSource) {
@@ -349,6 +323,40 @@ class DataSourceManager extends EventEmitter {
 
   public offDataChange(id: string, path: string, callback: (newVal: any) => void) {
     return this.get(id)?.offDataChange(path, callback);
+  }
+
+  private callDsInit() {
+    const dataSourceList = Array.from(this.dataSourceMap);
+    if (typeof Promise.allSettled === 'function') {
+      Promise.allSettled<Record<string, any>>(dataSourceList.map(([, ds]) => this.init(ds))).then((values) => {
+        const data: DataSourceManagerData = {};
+        const errors: Record<string, Error> = {};
+
+        values.forEach((value, index) => {
+          const dsId = dataSourceList[index][0];
+          if (value.status === 'fulfilled') {
+            if (this.data[dsId]) {
+              data[dsId] = this.data[dsId];
+            } else {
+              delete data[dsId];
+            }
+          } else if (value.status === 'rejected') {
+            delete data[dsId];
+            errors[dsId] = value.reason;
+          }
+        });
+
+        this.emit('init', data, errors);
+      });
+    } else {
+      Promise.all<Record<string, any>>(dataSourceList.map(([, ds]) => this.init(ds)))
+        .then(() => {
+          this.emit('init', this.data);
+        })
+        .catch(() => {
+          this.emit('init', this.data);
+        });
+    }
   }
 }
 
