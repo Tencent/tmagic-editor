@@ -188,7 +188,7 @@ const getOptions = async () => {
   const requestFuc = getConfig('request') as Function;
 
   if (typeof option.beforeRequest === 'function') {
-    postOptions = option.beforeRequest(mForm, postOptions, {
+    postOptions = await option.beforeRequest(mForm, postOptions, {
       model: props.model,
       formValue: mForm?.values,
       formValues: mForm?.values,
@@ -204,7 +204,7 @@ const getOptions = async () => {
   let res = await requestFuc(postOptions);
 
   if (typeof option.afterRequest === 'function') {
-    res = option.afterRequest(mForm, res, {
+    res = await option.afterRequest(mForm, res, {
       model: props.model,
       formValue: mForm?.values,
       formValues: mForm?.values,
@@ -270,6 +270,7 @@ const getInitLocalOption = async () => {
   if (config.multiple && value.findIndex) {
     return (localOptions.value as any[]).filter((item) => value.findIndex((v: any) => equalValue(item.value, v)) > -1);
   }
+
   return (localOptions.value as any[]).filter((item) => equalValue(item.value, value));
 };
 
@@ -316,7 +317,7 @@ const getInitOption = async () => {
   };
 
   if (typeof option.beforeInitRequest === 'function') {
-    postOptions = option.beforeInitRequest(mForm, postOptions, {
+    postOptions = await option.beforeInitRequest(mForm, postOptions, {
       model: props.model,
       formValue: mForm?.values,
       formValues: mForm?.values,
@@ -333,7 +334,7 @@ const getInitOption = async () => {
   let res = await requestFuc(postOptions);
 
   if (typeof option.afterRequest === 'function') {
-    res = option.afterRequest(mForm, res, {
+    res = await option.afterRequest(mForm, res, {
       model: props.model,
       formValue: mForm?.values,
       formValues: mForm?.values,
@@ -359,6 +360,10 @@ const getInitOption = async () => {
   return options;
 };
 
+const setOptions = (data: SelectOption[] | SelectGroupOption[]) => {
+  options.value = data;
+};
+
 if (typeof props.config.options === 'function') {
   watchEffect(() => {
     typeof props.config.options === 'function' &&
@@ -371,12 +376,12 @@ if (typeof props.config.options === 'function') {
           config: props.config,
         }),
       ).then((data) => {
-        options.value = data;
+        setOptions(data);
       });
   });
 } else if (Array.isArray(props.config.options)) {
   watchEffect(() => {
-    options.value = props.config.options as SelectOption[] | SelectGroupOption[];
+    setOptions(props.config.options as SelectOption[] | SelectGroupOption[]);
   });
 } else if (props.config.option) {
   onBeforeMount(() => {
@@ -384,7 +389,7 @@ if (typeof props.config.options === 'function') {
     const v = props.model[props.name];
     if (Array.isArray(v) ? v.length : typeof v !== 'undefined') {
       getInitOption().then((data) => {
-        options.value = data;
+        setOptions(data);
       });
     }
   });
@@ -413,7 +418,7 @@ if (props.config.remote) {
         }
         moreLoadingVisible.value = true;
         pgIndex.value += 1;
-        options.value = await getOptions();
+        setOptions(await getOptions());
         moreLoadingVisible.value = false;
       });
     },
@@ -438,7 +443,7 @@ const visibleHandler = async (visible: boolean) => {
     tMagicSelect.value.setPreviousQuery(query.value);
     tMagicSelect.value.setSelectedLabel(query.value);
   } else if (options.value.length <= (props.config.multiple ? props.model?.[props.name].length : 1)) {
-    options.value = await getOptions();
+    setOptions(await getOptions());
   }
 };
 
@@ -446,7 +451,7 @@ const remoteMethod = async (q: string) => {
   if (!localOptions.value.length) {
     query.value = q;
     pgIndex.value = 0;
-    options.value = await getOptions();
+    setOptions(await getOptions());
     // 多选时如果过滤选项会导致已选好的标签异常，需要重新刷新一下el-select的状态
     if (props.config.multiple)
       setTimeout(() => {
@@ -454,4 +459,9 @@ const remoteMethod = async (q: string) => {
       }, 0);
   }
 };
+
+defineExpose({
+  options,
+  setOptions,
+});
 </script>

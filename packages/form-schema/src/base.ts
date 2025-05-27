@@ -283,7 +283,7 @@ type RemoteSelectOptionAfterRequestFunction = (
     prop: string;
     postOptions: Record<string, any>;
   },
-) => any;
+) => any | Promise<any>;
 
 type RemoteSelectOptionBeforeRequestFunction = (
   mForm: FormState | undefined,
@@ -295,7 +295,7 @@ type RemoteSelectOptionBeforeRequestFunction = (
     config: any;
     prop: string;
   },
-) => Record<string, any>;
+) => Record<string, any> | Promise<Record<string, any>>;
 
 type RemoteSelectOptionItemFunction = (optionsData: Record<string, any>) => SelectOption[] | SelectGroupOption[];
 type SelectOptionValueFunction = (item: Record<string, any>) => any;
