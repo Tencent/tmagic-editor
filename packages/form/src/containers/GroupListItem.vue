@@ -133,7 +133,8 @@ const props = defineProps<{
 const emit = defineEmits(['swap-item', 'remove-item', 'change', 'addDiffCount', 'copy-item']);
 
 const mForm = inject<FormState | undefined>('mForm');
-const expand = ref(props.config.expandAll || !props.index);
+// const expand = ref(props.config.expandAll || !props.index);
+const expand = ref(props.config.expandAll ||props.model.expand); //解决每次变更值都收缩的问题
 
 const rowConfig = computed(() => ({
   type: 'row',
@@ -164,11 +165,14 @@ const itemExtra = computed(() => filterFunction(mForm, props.config.itemExtra, p
 const removeHandler = () => emit('remove-item', props.index);
 
 const changeHandler = (v: any, eventData: ContainerChangeEventData) => {
+  props.model.expand=expand.value;
   emit('change', props.model, eventData);
 };
 
 const expandHandler = () => {
   expand.value = !expand.value;
+  props.model.expand=expand.value;
+  emit('change', props.model);
 };
 
 // 希望支持单行可控制是否显示删除按钮，不会影响现有逻辑

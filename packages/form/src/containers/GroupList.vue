@@ -15,6 +15,7 @@
       :config="config"
       :prop="prop"
       :index="index"
+      :expand="item.expand"
       :label-width="labelWidth"
       :size="size"
       :disabled="disabled"
