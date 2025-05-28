@@ -232,7 +232,7 @@ const compActionConfig = computed(() => {
 
       let methods: EventOption[] | CascaderOption[] = [];
 
-      methods = eventsService.getMethod(node.type);
+      methods = eventsService.getMethod(node.type, model.to);
 
       if (node.type === 'page-fragment-container' && node.pageFragmentId) {
         const pageFragment = editorService.get('root')?.items?.find((page) => page.id === node.pageFragmentId);
@@ -240,7 +240,7 @@ const compActionConfig = computed(() => {
           methods = [];
           pageFragment.items.forEach((node: MComponent | MContainer) => {
             traverseNode<MComponent | MContainer>(node, (node) => {
-              const nodeMethods = (node.type && eventsService.getMethod(node.type)) || [];
+              const nodeMethods = (node.type && eventsService.getMethod(node.type, node.id)) || [];
 
               if (nodeMethods.length) {
                 methods.push({
@@ -317,7 +317,7 @@ const tableConfig = computed(() => ({
         const node = editorService.getNodeById(model.to);
         if (!node?.type) return [];
 
-        return eventsService.getMethod(node.type).map((option: any) => ({
+        return eventsService.getMethod(node.type, model.to).map((option: any) => ({
           text: option.label,
           value: option.value,
         }));
