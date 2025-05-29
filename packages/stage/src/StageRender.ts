@@ -172,14 +172,31 @@ export default class StageRender extends EventEmitter {
     );
   }
 
-  /**
-   * 销毁实例
-   */
-  public destroy(): void {
+  public reloadIframe(url: string) {
+    if (this.renderType !== RenderType.IFRAME) return;
+
+    const el = this.iframe?.parentElement;
+    this.destroyIframe();
+    this.runtimeUrl = url;
+    this.createIframe();
+    this.mount(el as HTMLDivElement);
+    this.runtime = null;
+  }
+
+  public destroyIframe() {
     this.iframe?.removeEventListener('load', this.iframeLoadHandler);
     this.contentWindow = null;
     this.iframe?.remove();
     this.iframe = undefined;
+  }
+
+  /**
+   * 销毁实例
+   */
+  public destroy(): void {
+    this.destroyIframe();
+    // @ts-ignore
+    globalThis.runtime = undefined;
     this.removeAllListeners();
   }
 

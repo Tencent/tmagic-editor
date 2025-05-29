@@ -236,6 +236,10 @@ export default class StageCore extends EventEmitter {
     this.actionManager?.enableMultiSelect();
   }
 
+  public reloadIframe(url: string) {
+    this.renderer?.reloadIframe(url);
+  }
+
   /**
    * 销毁实例
    */
