@@ -22,7 +22,7 @@ export default {
           ['^(@tencent)(/.*|$)'],
           ['^(@tmagic)(/.*|$)'],
           // Internal packages.
-          ['^(@|@editor|@data-source)(/.*|$)'],
+          ['^(@|src|editor-page|@editor|@data-source)(/.*|$)'],
           // Side effect imports.
           ['^\\u0000'],
           // Parent imports. Put `..` last.
