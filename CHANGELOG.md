@@ -1,3 +1,19 @@
+## [1.5.21](https://github.com/Tencent/tmagic-editor/compare/v1.5.20...v1.5.21) (2025-06-04)
+
+
+### Bug Fixes
+
+* **data-source:** 没有异步加载数据源的情况下，数据源init方法没有执行 ([c7b2734](https://github.com/Tencent/tmagic-editor/commit/c7b27340901c9728195084ca88525b9102fc4855))
+
+
+### Features
+
+* **editor,stage:** 支持切换runtimeUrl ([92534fc](https://github.com/Tencent/tmagic-editor/commit/92534fc9159b408f93e194ce119b45ff5cd5f95f))
+* **editor:** 获取联动组件的方法函数中添加组件id参数 ([0196eb3](https://github.com/Tencent/tmagic-editor/commit/0196eb343ac782ca2ab7a9a69f09ab273a38fa8e))
+* **form:** select before/after request配置函数支持异步 ([8142a7a](https://github.com/Tencent/tmagic-editor/commit/8142a7ab6da9503540070b443b24e3344a069858))
+
+
+
 ## [1.5.20](https://github.com/Tencent/tmagic-editor/compare/v1.5.19...v1.5.20) (2025-05-21)
 
 
