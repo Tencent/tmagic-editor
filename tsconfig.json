@@ -18,6 +18,7 @@
     "useDefineForClassFields": true,
     "lib": ["ESNext", "DOM"],
     "paths": {
+      "vue": ["./node_modules/vue"],
       // 内部模块都指向 src/index.ts, 会有更好的代码跳转体验.
       "@tmagic/*": ["./packages/*/src"],
       "@tmagic/tmagic-form-runtime": ["./runtime/tmagic-form/src"],

@@ -5,4 +5,10 @@ packages:
   - 'vue-components/*'
   - 'react-components/*'
   - 'eslint-config'
+
+catalog:
+  vue: ^3.5.16
+  '@vue/compiler-sfc': ^3.5.16
+  vite: ^6.3.5
+  typescript: "^5.8.3"
   
