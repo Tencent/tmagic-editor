@@ -19,7 +19,7 @@
 import { EventEmitter } from 'events';
 
 import type { Id } from '@tmagic/core';
-import { getElById, getHost, injectStyle, isSameDomain } from '@tmagic/core';
+import { getElById, getHost, guid, injectStyle, isSameDomain } from '@tmagic/core';
 
 import { DEFAULT_ZOOM, RenderType } from './const';
 import style from './style.css?raw';
@@ -54,7 +54,10 @@ export default class StageRender extends EventEmitter {
   }
 
   public getMagicApi = () => ({
-    onPageElUpdate: (el: HTMLElement) => this.emit('page-el-update', el),
+    id: guid(),
+    onPageElUpdate: (el: HTMLElement) => {
+      this.emit('page-el-update', el);
+    },
     onRuntimeReady: (runtime: Runtime) => {
       if (this.runtime) {
         return;

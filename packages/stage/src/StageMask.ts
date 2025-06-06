@@ -236,6 +236,12 @@ export default class StageMask extends Rule {
         const { clientHeight, clientWidth } = entry.target;
         this.wrapperHeight = clientHeight;
         this.wrapperWidth = clientWidth;
+
+        if (this.mode === Mode.FIXED) {
+          this.content.style.width = `${this.wrapperWidth}px`;
+          this.content.style.height = `${this.wrapperHeight}px`;
+        }
+
         this.setMaxScrollLeft();
         this.setMaxScrollTop();
       });
@@ -286,7 +292,9 @@ export default class StageMask extends Rule {
   private setHeight(height: number): void {
     this.height = height;
     this.setMaxScrollTop();
-    this.content.style.height = `${height}px`;
+    if (this.mode !== Mode.FIXED) {
+      this.content.style.height = `${height}px`;
+    }
   }
 
   /**
@@ -296,7 +304,9 @@ export default class StageMask extends Rule {
   private setWidth(width: number): void {
     this.width = width;
     this.setMaxScrollLeft();
-    this.content.style.width = `${width}px`;
+    if (this.mode !== Mode.FIXED) {
+      this.content.style.width = `${width}px`;
+    }
   }
 
   /**

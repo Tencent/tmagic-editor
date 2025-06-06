@@ -164,9 +164,23 @@ watch(page, (page) => {
     }, 3000);
 
     runtime.updatePageId?.(page.id);
-    nextTick(() => {
-      stage?.select(page.id);
-    });
+
+    const unWatch = watch(
+      stageLoading,
+      () => {
+        if (stageLoading.value) {
+          return;
+        }
+
+        nextTick(() => {
+          stage?.select(page.id);
+          unWatch();
+        });
+      },
+      {
+        immediate: true,
+      },
+    );
   }
 });
 

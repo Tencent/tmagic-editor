@@ -214,6 +214,7 @@ export interface Runtime {
 }
 
 export interface Magic {
+  id: string;
   /** 当前页面的根节点变化时调用该方法，编辑器会同步该el和stage的大小，该方法由stage注入到iframe.contentWindow中 */
   onPageElUpdate: (el: HTMLElement) => void;
 
