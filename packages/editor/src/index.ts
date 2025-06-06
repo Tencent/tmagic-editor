@@ -112,6 +112,9 @@ export { default as StyleSetter } from './fields/StyleSetter/Index.vue';
 const defaultInstallOpt: EditorInstallOptions = {
   // eslint-disable-next-line no-eval
   parseDSL: (dsl: string) => eval(dsl),
+  customCreateMonacoEditor: (monaco, codeEditorEl, options) => monaco.editor.create(codeEditorEl, options),
+  customCreateMonacoDiffEditor: (monaco, codeEditorEl, options) =>
+    monaco.editor.createDiffEditor(codeEditorEl, options),
 };
 
 export default {

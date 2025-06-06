@@ -33,6 +33,8 @@ import type {
   UpdateDragEl,
 } from '@tmagic/stage';
 
+import Monaco from '@editor/utils/monaco-editor';
+
 import type { CodeBlockService } from './services/codeBlock';
 import type { ComponentListService } from './services/componentList';
 import type { DataSourceService } from './services/dataSource';
@@ -119,6 +121,16 @@ export type GetConfig = (config: FormConfig) => Promise<FormConfig> | FormConfig
 
 export interface EditorInstallOptions {
   parseDSL: <T = any>(dsl: string) => T;
+  customCreateMonacoEditor: (
+    monaco: typeof Monaco,
+    codeEditorEl: HTMLElement,
+    options: Monaco.editor.IStandaloneEditorConstructionOptions,
+  ) => Monaco.editor.IStandaloneCodeEditor;
+  customCreateMonacoDiffEditor: (
+    monaco: typeof Monaco,
+    codeEditorEl: HTMLElement,
+    options: Monaco.editor.IStandaloneEditorConstructionOptions,
+  ) => Monaco.editor.IStandaloneDiffEditor;
   [key: string]: any;
 }
 

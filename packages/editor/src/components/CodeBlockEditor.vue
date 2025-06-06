@@ -32,20 +32,20 @@
   </FloatingBox>
 
   <Teleport to="body">
-    <TMagicDialog title="查看修改" v-model="difVisible" fullscreen>
+    <TMagicDialog title="查看修改" v-model="difVisible" fullscreen destroy-on-close>
       <div style="display: flex; margin-bottom: 10px">
         <div style="flex: 1"><TMagicTag size="small" type="info">修改前</TMagicTag></div>
         <div style="flex: 1"><TMagicTag size="small" type="success">修改后</TMagicTag></div>
       </div>
 
       <CodeEditor
-        v-if="difVisible"
         ref="magicVsEditor"
         type="diff"
         language="json"
+        :disabled-full-screen="true"
         :initValues="content.content"
         :modifiedValues="formBox?.form?.values.content"
-        :style="`height: ${windowRect.height - 150}px`"
+        :height="`${windowRect.height - 150}px`"
       ></CodeEditor>
 
       <template #footer>

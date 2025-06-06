@@ -5,7 +5,12 @@
         :class="`magic-code-editor-wrapper${fullScreen ? ' full-screen' : ''}`"
         :style="!fullScreen && height ? `height: ${height}` : '100%'"
       >
-        <TMagicButton class="magic-code-editor-full-screen-icon" circle size="small" @click="fullScreenHandler"
+        <TMagicButton
+          v-if="!disabledFullScreen"
+          class="magic-code-editor-full-screen-icon"
+          circle
+          size="small"
+          @click="fullScreenHandler"
           ><MIcon :icon="FullScreen"></MIcon
         ></TMagicButton>
         <div ref="codeEditor" class="magic-code-editor-content"></div>
@@ -15,7 +20,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue';
+import { nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue';
 import { FullScreen } from '@element-plus/icons-vue';
 import { throttle } from 'lodash-es';
 import serialize from 'serialize-javascript';
@@ -36,12 +41,11 @@ const props = withDefaults(
     modifiedValues?: any;
     type?: 'diff';
     language?: string;
-    options?: {
-      [key: string]: any;
-    };
+    options?: monaco.editor.IStandaloneEditorConstructionOptions;
     height?: string;
     autoSave?: boolean;
     parse?: boolean;
+    disabledFullScreen?: boolean;
   }>(),
   {
     initValues: '',
@@ -51,6 +55,7 @@ const props = withDefaults(
       tabSize: 2,
     }),
     parse: false,
+    disabledFullScreen: false,
   },
 );
 
@@ -124,6 +129,10 @@ const getEditorValue = () =>
 const init = async () => {
   if (!codeEditorEl.value) return;
 
+  if (codeEditorEl.value.clientHeight === 0) {
+    await nextTick();
+  }
+
   const options = {
     value: values.value,
     language: props.language,
@@ -132,14 +141,12 @@ const init = async () => {
   };
 
   if (props.type === 'diff') {
-    vsDiffEditor = monaco.editor.createDiffEditor(codeEditorEl.value, options);
+    vsDiffEditor = getEditorConfig('customCreateMonacoDiffEditor')(monaco, codeEditorEl.value, options);
   } else {
-    vsEditor = monaco.editor.create(codeEditorEl.value, options);
+    vsEditor = getEditorConfig('customCreateMonacoEditor')(monaco, codeEditorEl.value, options);
   }
 
   setEditorValue(props.initValues, props.modifiedValues);
-
-  loading.value = false;
 
   emit('initd', vsEditor);
 
@@ -179,14 +186,33 @@ watch(
   },
 );
 
+watch(
+  () => props.options,
+  (v) => {
+    vsEditor?.updateOptions(v);
+    vsDiffEditor?.updateOptions(v);
+  },
+  {
+    deep: true,
+  },
+);
+
 onMounted(async () => {
   loading.value = true;
 
-  init();
+  await init();
+
+  loading.value = false;
 });
 
 onBeforeUnmount(() => {
   resizeObserver.disconnect();
+
+  vsEditor?.dispose();
+  vsDiffEditor?.dispose();
+
+  vsEditor = null;
+  vsDiffEditor = null;
 });
 
 const fullScreen = ref(false);

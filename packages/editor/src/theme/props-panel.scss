@@ -84,6 +84,11 @@
     right: 15px;
     bottom: 15px;
     z-index: 30;
+    opacity: 0.5;
+
+    &:hover {
+      opacity: 1;
+    }
   }
 
   .m-editor-props-panel-style-icon {
@@ -91,6 +96,11 @@
     right: 15px;
     bottom: 60px;
     z-index: 30;
+    opacity: 0.5;
+
+    &:hover {
+      opacity: 1;
+    }
   }
 
   .m-editor-props-panel-src-code.magic-code-editor {

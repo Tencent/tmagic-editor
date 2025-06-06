@@ -31,8 +31,13 @@
 
   .magic-code-editor-full-screen-icon {
     position: absolute;
-    top: 5px;
-    right: 0;
+    top: 20px;
+    right: 10px;
     z-index: 11;
+    opacity: 0.3;
+
+    &:hover {
+      opacity: 1;
+    }
   }
 }
