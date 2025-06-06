@@ -22,7 +22,9 @@ export const useEditorDsl = (app = inject<TMagicApp>('app'), win = window) => {
 
   watch(pageConfig, async () => {
     await nextTick();
-    const page = document.querySelector<HTMLElement>('.magic-ui-page');
+    const page =
+      document.querySelector<HTMLElement>('.magic-ui-page') ||
+      document.querySelector<HTMLElement>('.magic-ui-page-fragment');
     page && win.magic?.onPageElUpdate(page);
   });
 
