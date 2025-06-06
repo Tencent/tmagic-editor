@@ -133,7 +133,9 @@ const props = defineProps<{
 const emit = defineEmits(['swap-item', 'remove-item', 'change', 'addDiffCount', 'copy-item']);
 
 const mForm = inject<FormState | undefined>('mForm');
-const expand = ref(props.config.expandAll || !props.index);
+
+const defaultExpandQuantity = props.config.defaultExpandQuantity ?? 7;
+const expand = ref(props.config.expandAll || defaultExpandQuantity > props.index);
 
 const rowConfig = computed(() => ({
   type: 'row',

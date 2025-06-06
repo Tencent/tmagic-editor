@@ -720,6 +720,12 @@ export interface GroupListConfig extends FormItem {
   title?: string | FilterFunction<string>;
   itemExtra?: string | FilterFunction<string>;
   expandAll?: boolean;
+  /**
+   * 默认展开的数量，用于控制分组列表默认展示的项数
+   * 当设置为数字时，表示默认展开指定数量的项
+   * 当未设置时，默认展开第一项
+   */
+  defaultExpandQuantity?: number;
   addable?: (mForm: FormState | undefined, data: any) => boolean | 'undefined' | boolean;
   defaultAdd?: (mForm: FormState | undefined, data: any) => any;
   delete?: (model: any, index: number | string | symbol, values: any) => boolean | boolean;
