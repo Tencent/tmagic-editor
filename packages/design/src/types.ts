@@ -126,6 +126,7 @@ export interface DialogProps {
   fullscreen?: boolean;
   closeOnClickModal?: boolean;
   closeOnPressEscape?: boolean;
+  destroyOnClose?: boolean;
 }
 
 export interface DividerProps {
