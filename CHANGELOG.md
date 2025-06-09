@@ -1,3 +1,23 @@
+## [1.5.22](https://github.com/Tencent/tmagic-editor/compare/v1.5.21...v1.5.22) (2025-06-09)
+
+
+### Bug Fixes
+
+* **data-source,utils:** 不使用replaceAll,安卓10不支持 ([b1f020d](https://github.com/Tencent/tmagic-editor/commit/b1f020d53242981751c4e941a0fde9d61e9d6060))
+* **vue-runtime-help:** 修复页面片中组件拖动位置异常问题 ([b72f4da](https://github.com/Tencent/tmagic-editor/commit/b72f4dae28961fd8246101998a2f4e78775dd996))
+
+
+### Features
+
+* **design:** dialog支持配置destroyOnClose ([cd4656e](https://github.com/Tencent/tmagic-editor/commit/cd4656e54f3627429427973525b9fc5bf10a7139))
+* **editor:** 支持禁用数据源与代码块 ([6152a78](https://github.com/Tencent/tmagic-editor/commit/6152a78467b9fc96760da3b9a2bd4cc8cb8457b8))
+* **editor:** 支持配置自定义创建Monaco editor函数 ([3097e8e](https://github.com/Tencent/tmagic-editor/commit/3097e8eddb61331cc249d1b18d74560bc8bfbefe))
+* **editor:** 样式中的position选项加上中文 ([1614b62](https://github.com/Tencent/tmagic-editor/commit/1614b62d2a2bea8393386538ac57f0909bb06032))
+* **eslint-conft:** 添加import-sort的本地目录 ([e01ce21](https://github.com/Tencent/tmagic-editor/commit/e01ce2128e98b512b3c3611615da4f97b1b9d356))
+* **form,form-schema:** group list支持配置默认展开数量 ([6b4ca4b](https://github.com/Tencent/tmagic-editor/commit/6b4ca4b83a1a0a36ff94c30feb1845d957377b47))
+
+
+
 ## [1.5.21](https://github.com/Tencent/tmagic-editor/compare/v1.5.20...v1.5.21) (2025-06-04)
 
 
