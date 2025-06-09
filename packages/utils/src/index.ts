@@ -296,7 +296,7 @@ export const guid = (digit = 8): string =>
 
 export const getKeysArray = (keys: string | number) =>
   // 将 array[0] 转成 array.0
-  `${keys}`.replaceAll(/\[(\d+)\]/g, '.$1').split('.');
+  `${keys}`.replace(/\[(\d+)\]/g, '.$1').split('.');
 
 export const getValueByKeyPath = (
   keys: number | string | string[] = '',

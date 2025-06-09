@@ -697,3 +697,69 @@ describe('compiledCond', () => {
     expect(util.compiledCond('is', NaN, undefined)).toBeFalsy();
   });
 });
+
+describe('getKeysArray', () => {
+  // 测试普通数组索引转换
+  test('应该将array[0]转换为["array", "0"]', () => {
+    const input = 'array[0]';
+    const expected = ['array', '0'];
+    const result = util.getKeysArray(input);
+    expect(result).toEqual(expected);
+  });
+
+  // 测试多层数组索引转换
+  test('应该将array[0][1]转换为["array", "0", "1"]', () => {
+    const input = 'array[0][1]';
+    const expected = ['array', '0', '1'];
+    const result = util.getKeysArray(input);
+    expect(result).toEqual(expected);
+  });
+
+  // 测试数字输入
+  test('应该将数字123转换为["123"]', () => {
+    const input = 123;
+    const expected = ['123'];
+    const result = util.getKeysArray(input);
+    expect(result).toEqual(expected);
+  });
+
+  // 测试不含数组索引的字符串
+  test('应该将普通字符串按点号分割', () => {
+    const input = 'a.b.c';
+    const expected = ['a', 'b', 'c'];
+    const result = util.getKeysArray(input);
+    expect(result).toEqual(expected);
+  });
+
+  // 测试空字符串
+  test('应该正确处理空字符串', () => {
+    const input = '';
+    const expected = [''];
+    const result = util.getKeysArray(input);
+    expect(result).toEqual(expected);
+  });
+
+  // 测试混合格式
+  test('应该正确处理混合格式的字符串', () => {
+    const input = 'obj.array[0].prop[1]';
+    const expected = ['obj', 'array', '0', 'prop', '1'];
+    const result = util.getKeysArray(input);
+    expect(result).toEqual(expected);
+  });
+
+  // 测试特殊字符情况
+  test('应该正确处理包含特殊字符的字符串', () => {
+    const input = 'obj.array[0].prop-with-dash[1]';
+    const expected = ['obj', 'array', '0', 'prop-with-dash', '1'];
+    const result = util.getKeysArray(input);
+    expect(result).toEqual(expected);
+  });
+
+  // 测试只有数组索引的情况
+  test('应该正确处理只有数组索引的情况', () => {
+    const input = '[0][1]';
+    const expected = ['', '0', '1'];
+    const result = util.getKeysArray(input);
+    expect(result).toEqual(expected);
+  });
+});

@@ -149,7 +149,7 @@ export const compliedDataSourceField = (value: any, data: DataSourceManagerData)
 };
 
 export const template = (value: string, data?: DataSourceManagerData) =>
-  value.replaceAll(dataSourceTemplateRegExp, (match, $1) => {
+  value.replace(dataSourceTemplateRegExp, (match, $1) => {
     try {
       return getValueByKeyPath($1, data);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
