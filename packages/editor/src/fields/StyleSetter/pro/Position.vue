@@ -12,6 +12,14 @@ const emit = defineEmits<{
   change: [v: string | StyleSchema, eventData: ContainerChangeEventData];
 }>();
 
+const positionText: Record<string, string> = {
+  static: '不定位',
+  relative: '相对定位',
+  absolute: '绝对定位',
+  fixed: '固定定位',
+  sticky: '粘性定位',
+};
+
 const config = {
   items: [
     {
@@ -21,9 +29,9 @@ const config = {
       type: 'data-source-field-select',
       fieldConfig: {
         type: 'select',
-        options: ['static', 'relative', 'absolute', 'fixed', 'sticky'].map((item) => ({
+        options: Object.keys(positionText).map((item) => ({
           value: item,
-          text: item,
+          text: `${item}(${positionText[item]})`,
         })),
       },
     },
