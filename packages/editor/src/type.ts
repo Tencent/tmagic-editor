@@ -188,6 +188,10 @@ export interface PropsState {
   propsConfigMap: Record<string, FormConfig>;
   propsValueMap: Record<string, Partial<MNode>>;
   relateIdMap: Record<Id, Id>;
+  /** 禁用数据源 */
+  disabledDataSource: boolean;
+  /** 禁用代码块 */
+  disabledCodeBlock: boolean;
 }
 
 export interface StageOverlayState {

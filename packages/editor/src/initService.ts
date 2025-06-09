@@ -197,6 +197,22 @@ export const initServiceState = (
     },
   );
 
+  watch(
+    () => props.disabledCodeBlock,
+    (disabledCodeBlock) => propsService.setDisabledCodeBlock(disabledCodeBlock ?? false),
+    {
+      immediate: true,
+    },
+  );
+
+  watch(
+    () => props.disabledDataSource,
+    (disabledDataSource) => propsService.setDisabledDataSource(disabledDataSource ?? false),
+    {
+      immediate: true,
+    },
+  );
+
   onBeforeUnmount(() => {
     editorService.resetState();
     historyService.resetState();

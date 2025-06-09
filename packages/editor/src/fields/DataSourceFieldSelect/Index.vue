@@ -1,7 +1,7 @@
 <template>
   <div class="m-fields-data-source-field-select">
     <FieldSelect
-      v-if="showDataSourceFieldSelect || !config.fieldConfig"
+      v-if="!disabledDataSource && (showDataSourceFieldSelect || !config.fieldConfig)"
       :model-value="model[name]"
       :disabled="disabled"
       :size="size"
@@ -26,7 +26,11 @@
       @change="onChangeHandler"
     ></component>
 
-    <TMagicTooltip v-if="config.fieldConfig" :disabled="showDataSourceFieldSelect" content="选择数据源">
+    <TMagicTooltip
+      v-if="config.fieldConfig && !disabledDataSource"
+      :disabled="showDataSourceFieldSelect"
+      content="选择数据源"
+    >
       <TMagicButton
         style="margin-left: 5px"
         :type="showDataSourceFieldSelect ? 'primary' : 'default'"
@@ -83,10 +87,11 @@ watch(
   },
 );
 
-const { dataSourceService } = useServices();
+const { dataSourceService, propsService } = useServices();
 const mForm = inject<FormState | undefined>('mForm');
 
 const dataSources = computed(() => dataSourceService.get('dataSources') || []);
+const disabledDataSource = computed(() => propsService.getDisabledDataSource());
 
 const type = computed((): string => {
   let type = props.config.fieldConfig?.type;

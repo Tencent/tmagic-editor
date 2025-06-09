@@ -415,6 +415,26 @@ const renderFunction = async (stage) => {
 </script>
 ```
 
+## renderType
+
+- **详情：**
+  
+  是用iframe渲染还是直接渲染
+
+- **默认值：** `iframe`
+
+- **类型：** `string`
+  
+  'iframe' | 'native'
+
+- **示例：**
+
+```html
+<template>
+  <m-editor render-type="native"></m-editor>
+</template>
+```
+
 ## autoScrollIntoView
 
 - **详情：**
@@ -943,3 +963,87 @@ const updateDragEl = (el, target) => {
 </template>
 ```
   
+## guidesOptions
+
+- **详情：**
+  
+标尺配置
+
+- **类型：** `Partial<GuidesOptions>`
+  
+
+## disabledPageFragment
+
+- **详情：**
+  
+禁用页面片
+
+- **类型：** `boolean`
+  
+## disabledStageOverlay
+
+- **详情：**
+  
+禁用双击在浮层中单独编辑选中组件
+
+- **类型：** `boolean`
+  
+## disabledShowSrc
+
+- **详情：**
+  
+禁用属性配置面板右下角显示源码的按钮
+
+- **类型：** `boolean`
+
+## disabledDataSource
+
+- **详情：**
+  
+禁用数据源
+
+- **类型：** `boolean`
+
+## disabledCodeBlock
+
+- **详情：**
+  
+禁用代码块
+
+- **类型：** `boolean`
+
+## treeIndent
+
+- **详情：**
+  
+已选组件、代码编辑、数据源缩进配置
+
+- **类型：** `number`
+
+## treeNextLevelIndentIncrement
+
+- **详情：**
+  
+已选组件、代码编辑、数据源子节点缩进增量配置
+
+- **类型：** `number`
+
+## customContentMenu
+
+- **详情：**
+  
+用于自定义组件树与画布的右键菜单
+
+- **类型：** `function`
+
+## pageBarSortOptions
+
+- **详情：**
+  
+页面顺序拖拽配置参数
+
+## pageFilterFunction
+
+- **详情：**
+  
+页面搜索函数

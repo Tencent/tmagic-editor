@@ -81,6 +81,10 @@ export interface EditorProps {
   disabledStageOverlay?: boolean;
   /** 禁用属性配置面板右下角显示源码的按钮 */
   disabledShowSrc?: boolean;
+  /** 禁用数据源 */
+  disabledDataSource?: boolean;
+  /** 禁用代码块 */
+  disabledCodeBlock?: boolean;
   /** 已选组件、代码编辑、数据源缩进配置 */
   treeIndent?: number;
   /** 已选组件、代码编辑、数据源子节点缩进增量配置 */
@@ -111,6 +115,8 @@ export const defaultEditorProps = {
   containerHighlightDuration: 800,
   containerHighlightType: ContainerHighlightType.DEFAULT,
   disabledShowSrc: false,
+  disabledDataSource: false,
+  disabledCodeBlock: false,
   componentGroupList: () => [],
   datasourceList: () => [],
   menu: () => ({ left: [], right: [] }),

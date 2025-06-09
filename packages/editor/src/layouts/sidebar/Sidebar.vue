@@ -201,7 +201,7 @@ const props = withDefaults(
   },
 );
 
-const { depService, uiService } = useServices();
+const { depService, uiService, propsService } = useServices();
 
 const collecting = computed(() => depService.get('collecting'));
 const taskLength = computed(() => depService.get('taskLength'));
@@ -283,7 +283,19 @@ const getItemConfig = (data: SideItem): SideComponent => {
   return typeof data === 'string' ? map[data] : data;
 };
 
-const sideBarItems = computed(() => props.data.items.map((item) => getItemConfig(item)));
+const sideBarItems = computed(() =>
+  props.data.items
+    .map((item) => getItemConfig(item))
+    .filter((item) => {
+      if (item.$key === SideItemKey.DATA_SOURCE) {
+        return !propsService.getDisabledDataSource();
+      }
+      if (item.$key === SideItemKey.CODE_BLOCK) {
+        return !propsService.getDisabledCodeBlock();
+      }
+      return true;
+    }),
+);
 
 watch(
   sideBarItems,

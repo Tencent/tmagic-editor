@@ -19,7 +19,7 @@
 
 import { NODE_CONDS_KEY } from '@tmagic/core';
 import { tMagicMessage } from '@tmagic/design';
-import type { FormConfig, FormState, TabPaneConfig } from '@tmagic/form';
+import type { FormConfig, FormState, TabConfig, TabPaneConfig } from '@tmagic/form';
 
 export const arrayOptions = [
   { text: '包含', value: 'include' },
@@ -165,7 +165,14 @@ export const displayTabConfig: TabPaneConfig = {
  * @param config 组件属性配置
  * @returns Object
  */
-export const fillConfig = (config: FormConfig = [], labelWidth = '80px'): FormConfig => {
+export const fillConfig = (
+  config: FormConfig = [],
+  {
+    labelWidth = '80px',
+    disabledDataSource = false,
+    disabledCodeBlock = false,
+  }: { labelWidth?: string; disabledDataSource?: boolean; disabledCodeBlock?: boolean } = {},
+): FormConfig => {
   const propsConfig: FormConfig = [];
 
   // 组件类型，必须要有
@@ -208,20 +215,34 @@ export const fillConfig = (config: FormConfig = [], labelWidth = '80px'): FormCo
     });
   }
 
-  return [
-    {
-      type: 'tab',
-      labelWidth,
-      items: [
-        {
-          title: '属性',
-          items: [...propsConfig, ...config],
-        },
-        { ...styleTabConfig },
-        { ...eventTabConfig },
-        { ...advancedTabConfig },
-        { ...displayTabConfig },
-      ],
-    },
-  ];
+  const noCodeAdvancedTabItems = advancedTabConfig.items.filter((item) => item.type !== 'code-select');
+
+  if (noCodeAdvancedTabItems.length > 0 && disabledCodeBlock) {
+    advancedTabConfig.items = noCodeAdvancedTabItems;
+  }
+
+  const tabConfig: TabConfig = {
+    type: 'tab',
+    labelWidth,
+    items: [
+      {
+        title: '属性',
+        items: [...propsConfig, ...config],
+      },
+      { ...styleTabConfig },
+      { ...eventTabConfig },
+    ],
+  };
+
+  if (!disabledCodeBlock) {
+    tabConfig.items.push({ ...advancedTabConfig });
+  } else if (noCodeAdvancedTabItems.length > 0) {
+    tabConfig.items.push({ ...advancedTabConfig });
+  }
+
+  if (!disabledDataSource) {
+    tabConfig.items.push({ ...displayTabConfig });
+  }
+
+  return [tabConfig];
 };

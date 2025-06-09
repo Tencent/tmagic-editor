@@ -85,7 +85,7 @@ const emit = defineEmits<{
   change: [v: any, eventData?: ContainerChangeEventData];
 }>();
 
-const { editorService, dataSourceService, eventsService, codeBlockService } = useServices();
+const { editorService, dataSourceService, eventsService, codeBlockService, propsService } = useServices();
 
 // 事件名称下拉框表单配置
 const eventNameConfig = computed(() => {
@@ -173,24 +173,39 @@ const actionTypeConfig = computed(() => {
     text: '联动类型',
     type: 'select',
     defaultValue: ActionType.COMP,
-    options: () => [
-      {
-        text: '组件',
-        label: '组件',
-        value: ActionType.COMP,
-      },
-      {
-        text: '代码',
-        label: '代码',
-        disabled: !Object.keys(codeBlockService.getCodeDsl() || {}).length,
-        value: ActionType.CODE,
-      },
-      {
-        text: '数据源',
-        label: '数据源',
-        value: ActionType.DATA_SOURCE,
-      },
-    ],
+    options: () => {
+      const o: {
+        text: string;
+        label: string;
+        value: string;
+        disabled?: boolean;
+      }[] = [
+        {
+          text: '组件',
+          label: '组件',
+          value: ActionType.COMP,
+        },
+      ];
+
+      if (!propsService.getDisabledCodeBlock()) {
+        o.push({
+          text: '代码',
+          label: '代码',
+          disabled: !Object.keys(codeBlockService.getCodeDsl() || {}).length,
+          value: ActionType.CODE,
+        });
+      }
+
+      if (!propsService.getDisabledDataSource()) {
+        o.push({
+          text: '数据源',
+          label: '数据源',
+          value: ActionType.DATA_SOURCE,
+        });
+      }
+
+      return o;
+    },
   };
   return { ...defaultActionTypeConfig, ...props.config.actionTypeConfig };
 });

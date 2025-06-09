@@ -1,6 +1,14 @@
 <template>
+  <TMagicInput
+    v-if="disabledDataSource"
+    v-model="state"
+    :disabled="disabled"
+    :size="size"
+    :clearable="true"
+    @change="changeHandler"
+  ></TMagicInput>
   <component
-    v-if="disabled || isFocused"
+    v-else-if="disabled || isFocused"
     :is="getDesignConfig('components')?.autocomplete.component || 'el-autocomplete'"
     class="tmagic-design-auto-complete"
     ref="autocomplete"
@@ -52,7 +60,7 @@ import { computed, nextTick, ref, useTemplateRef, watch } from 'vue';
 import { Coin } from '@element-plus/icons-vue';
 
 import type { DataSchema, DataSourceSchema } from '@tmagic/core';
-import { getDesignConfig, TMagicAutocomplete, TMagicTag } from '@tmagic/design';
+import { getDesignConfig, TMagicAutocomplete, TMagicInput, TMagicTag } from '@tmagic/design';
 import type { DataSourceInputConfig, FieldProps } from '@tmagic/form';
 import { getKeysArray, isNumber } from '@tmagic/utils';
 
@@ -72,7 +80,7 @@ const emit = defineEmits<{
   change: [value: string];
 }>();
 
-const { dataSourceService } = useServices();
+const { dataSourceService, propsService } = useServices();
 
 const autocompleteRef = useTemplateRef<InstanceType<typeof TMagicAutocomplete>>('autocomplete');
 const isFocused = ref(false);
@@ -81,6 +89,7 @@ const displayState = ref<{ value: string; type: 'var' | 'text' }[]>([]);
 
 const input = computed<HTMLInputElement>(() => autocompleteRef.value?.inputRef?.input);
 const dataSources = computed(() => dataSourceService.get('dataSources'));
+const disabledDataSource = computed(() => propsService.getDisabledDataSource());
 
 const setDisplayState = () => {
   displayState.value = getDisplayField(dataSources.value, state.value);

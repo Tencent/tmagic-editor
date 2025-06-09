@@ -57,6 +57,10 @@ class Props extends BaseService {
     propsConfigMap: {},
     propsValueMap: {},
     relateIdMap: {},
+    /** 禁用数据源 */
+    disabledDataSource: false,
+    /** 禁用代码块 */
+    disabledCodeBlock: false,
   });
 
   constructor() {
@@ -64,6 +68,22 @@ class Props extends BaseService {
       ...canUsePluginMethods.async.map((methodName) => ({ name: methodName, isAsync: true })),
       ...canUsePluginMethods.sync.map((methodName) => ({ name: methodName, isAsync: false })),
     ]);
+  }
+
+  public setDisabledDataSource(disabled: boolean) {
+    this.state.disabledDataSource = disabled;
+  }
+
+  public setDisabledCodeBlock(disabled: boolean) {
+    this.state.disabledCodeBlock = disabled;
+  }
+
+  public getDisabledDataSource(): boolean {
+    return this.state.disabledDataSource;
+  }
+
+  public getDisabledCodeBlock(): boolean {
+    return this.state.disabledCodeBlock;
   }
 
   public setPropsConfigs(configs: Record<string, FormConfig | PropsFormConfigFunction>) {
@@ -74,7 +94,11 @@ class Props extends BaseService {
   }
 
   public async fillConfig(config: FormConfig, labelWidth?: string) {
-    return fillConfig(config, typeof labelWidth !== 'function' ? labelWidth : '80px');
+    return fillConfig(config, {
+      labelWidth: typeof labelWidth !== 'function' ? labelWidth : '80px',
+      disabledDataSource: this.getDisabledDataSource(),
+      disabledCodeBlock: this.getDisabledCodeBlock(),
+    });
   }
 
   public async setPropsConfig(type: string, config: FormConfig | PropsFormConfigFunction) {
