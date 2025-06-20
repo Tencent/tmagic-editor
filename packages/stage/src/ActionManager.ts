@@ -380,6 +380,11 @@ export default class ActionManager extends EventEmitter {
     return this.dr?.getDragStatus();
   }
 
+  public updateMoveableOptions(): void {
+    this.dr?.updateMoveable();
+    this.multiDr?.updateMoveable();
+  }
+
   public destroy(): void {
     this.container.removeEventListener('mousedown', this.mouseDownHandler);
     this.container.removeEventListener('mousemove', this.mouseMoveHandler);
