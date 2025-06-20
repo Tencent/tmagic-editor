@@ -74,6 +74,7 @@ export default class StageCore extends EventEmitter {
     });
     this.mask = new StageMask({
       guidesOptions: config.guidesOptions,
+      disabledRule: config.disabledRule,
     });
     this.actionManager = new ActionManager(this.getActionManagerConfig(config));
 

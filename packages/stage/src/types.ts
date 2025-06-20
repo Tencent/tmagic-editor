@@ -67,6 +67,7 @@ export interface StageCoreConfig {
   renderType?: RenderType;
   guidesOptions?: Partial<GuidesOptions>;
   disabledMultiSelect?: boolean;
+  disabledRule?: boolean;
 }
 
 export interface ActionManagerConfig {
@@ -240,6 +241,7 @@ export interface TargetShadowConfig {
 
 export interface RuleOptions {
   guidesOptions?: Partial<GuidesOptions>;
+  disabledRule?: boolean;
 }
 
 export interface CoreEvents {
