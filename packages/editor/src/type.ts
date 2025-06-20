@@ -164,6 +164,7 @@ export interface StageOptions {
   renderType?: RenderType;
   guidesOptions?: Partial<GuidesOptions>;
   disabledMultiSelect?: boolean;
+  disabledRule?: boolean;
   zoom?: number;
 }
 

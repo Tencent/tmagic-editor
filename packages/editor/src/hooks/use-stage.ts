@@ -45,6 +45,7 @@ export const useStage = (stageOptions: StageOptions) => {
     updateDragEl: stageOptions.updateDragEl,
     guidesOptions: stageOptions.guidesOptions,
     disabledMultiSelect: stageOptions.disabledMultiSelect,
+    disabledRule: stageOptions.disabledRule,
   });
 
   watch(

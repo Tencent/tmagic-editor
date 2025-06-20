@@ -97,9 +97,9 @@ class StageOverlay extends BaseService {
   public createStage(stageOptions: StageOptions = {}) {
     return useStage({
       ...stageOptions,
-      zoom: 1,
       runtimeUrl: '',
       autoScrollIntoView: false,
+      disabledRule: true,
       render: async (stage: StageCore) => {
         this.copyDocumentElement();
 

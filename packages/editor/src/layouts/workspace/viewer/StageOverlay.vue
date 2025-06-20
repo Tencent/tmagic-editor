@@ -1,9 +1,19 @@
 <template>
-  <div v-if="stageOverlayVisible" class="m-editor-stage-overlay" @click="closeOverlayHandler">
-    <TMagicIcon class="m-editor-stage-overlay-close" :size="'20'" @click="closeOverlayHandler"
+  <div v-if="stageOverlayVisible" class="m-editor-stage-overlay">
+    <TMagicIcon class="m-editor-stage-overlay-close" :size="'30'" @click="closeOverlayHandler"
       ><CloseBold
     /></TMagicIcon>
-    <div ref="stageOverlay" class="m-editor-stage-overlay-container" :style="style" @click.stop></div>
+
+    <ScrollViewer
+      class="m-editor-stage"
+      :width="wrapWidth"
+      :height="wrapHeight"
+      :wrap-width="columnWidth.center"
+      :wrap-height="frameworkRect.height"
+      :zoom="zoom"
+    >
+      <div ref="stageOverlay" class="m-editor-stage-container" :style="style"></div>
+    </ScrollViewer>
   </div>
 </template>
 
@@ -13,10 +23,11 @@ import { CloseBold } from '@element-plus/icons-vue';
 
 import { TMagicIcon } from '@tmagic/design';
 
+import ScrollViewer from '@editor/components/ScrollViewer.vue';
 import { useServices } from '@editor/hooks/use-services';
 import type { StageOptions } from '@editor/type';
 
-const { stageOverlayService, editorService } = useServices();
+const { stageOverlayService, editorService, uiService } = useServices();
 
 const stageOptions = inject<StageOptions>('stageOptions');
 
@@ -26,10 +37,12 @@ const stageOverlayVisible = computed(() => stageOverlayService.get('stageOverlay
 const wrapWidth = computed(() => stageOverlayService.get('wrapWidth'));
 const wrapHeight = computed(() => stageOverlayService.get('wrapHeight'));
 const stage = computed(() => editorService.get('stage'));
+const zoom = computed(() => uiService.get('zoom'));
+const columnWidth = computed(() => uiService.get('columnWidth'));
+const frameworkRect = computed(() => uiService.get('frameworkRect'));
 
 const style = computed(() => ({
-  width: `${wrapWidth.value}px`,
-  height: `${wrapHeight.value}px`,
+  transform: `scale(${zoom.value})`,
 }));
 
 watch(stage, (stage) => {
@@ -41,6 +54,12 @@ watch(stage, (stage) => {
   } else {
     stageOverlayService.closeOverlay();
   }
+});
+
+watch(zoom, (zoom) => {
+  const stage = stageOverlayService.get('stage');
+  if (!stage || !zoom) return;
+  stage.setZoom(zoom);
 });
 
 watch(stageOverlayEl, (stageOverlay) => {

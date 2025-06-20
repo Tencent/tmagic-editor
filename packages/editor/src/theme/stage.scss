@@ -35,22 +35,15 @@
   width: 100%;
   height: 100%;
   background-color: #fff;
-  display: flex;
   z-index: 20;
-  overflow: auto;
-}
-
-.m-editor-stage-overlay-container {
-  position: relative;
-  flex-shrink: 0;
-  margin: auto;
-  box-shadow: rgba(0, 0, 0, 0.04) 0px 3px 5px;
 }
 
 .m-editor-stage-overlay-close.tmagic-design-icon {
   position: fixed;
   right: 20px;
   top: 10px;
+  cursor: pointer;
+  z-index: 1;
 }
 
 .m-editor-stage-float-button {
@@ -66,8 +59,10 @@
   background-color: #ffffff;
   transition: background-color 0.2s;
   color: rgba(0, 0, 0, 0.88);
-  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08),
-    0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 6px 16px 0 rgba(0, 0, 0, 0.08),
+    0 3px 6px -4px rgba(0, 0, 0, 0.12),
+    0 9px 28px 8px rgba(0, 0, 0, 0.05);
 }
 
 .m-editor-node-list-menu {
