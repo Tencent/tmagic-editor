@@ -90,7 +90,13 @@ export const useEditorDsl = (app = inject<TMagicApp>('app'), win = window) => {
     update({ config, parentId }: UpdateData) {
       if (!root.value || !app) throw new Error('error');
 
+      if (config.type === 'app') {
+        this.updateRootConfig?.(config as MApp);
+        return;
+      }
+
       const newNode = app.dataSourceManager?.compiledNode(config, undefined, true) || config;
+
       replaceChildNode(reactive(newNode), [root.value], parentId);
 
       const nodeInstance = app.getNode(config.id);

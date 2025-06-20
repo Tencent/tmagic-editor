@@ -50,7 +50,13 @@ export const useEditorDsl = (app: TMagicApp, renderDom: () => void) => {
     },
 
     update({ config, root, parentId }: UpdateData) {
+      if (config.type === 'app') {
+        this.updateRootConfig?.(config as MApp);
+        return;
+      }
+
       const newNode = app?.dataSourceManager?.compiledNode(config, undefined, true) || config;
+
       replaceChildNode(newNode, [root], parentId);
       updateConfig(cloneDeep(root));
     },

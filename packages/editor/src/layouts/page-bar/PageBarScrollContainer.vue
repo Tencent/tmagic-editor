@@ -136,7 +136,7 @@ watch(
         let beforeDragList: Id[] = [];
         const options = {
           ...{
-            dataIdAttr: 'page-id', // 获取排序后的数据
+            dataIdAttr: 'data-page-id', // 获取排序后的数据
             onStart: async (event: SortableEvent) => {
               if (typeof props.pageBarSortOptions?.beforeStart === 'function') {
                 await props.pageBarSortOptions.beforeStart(event, sortable);
