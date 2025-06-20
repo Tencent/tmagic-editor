@@ -1,6 +1,6 @@
 import { h } from 'vue-demi';
 
-import type { MComponent, StyleSchema } from '@tmagic/core';
+import type { Id, MComponent, StyleSchema } from '@tmagic/core';
 
 export * from './hooks/use-editor-dsl';
 export * from './hooks/use-dsl';
@@ -27,3 +27,12 @@ export interface UserRenderFunctionOptions {
 }
 
 export type UserRenderFunction = (options: UserRenderFunctionOptions) => any;
+
+export interface ComponentProps<T extends Omit<MComponent, 'id'> = MComponent> {
+  config: T;
+  iteratorIndex?: number[];
+  iteratorContainerId?: Id[];
+  containerIndex?: number;
+  model?: any;
+  disabled?: boolean;
+}
