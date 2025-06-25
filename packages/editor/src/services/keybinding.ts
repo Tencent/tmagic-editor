@@ -145,6 +145,18 @@ class Keybinding extends BaseService {
       for (const [type = '', eventType = 'keydown'] of when) {
         const cacheItem: KeyBindingCacheItem = { type, command, keybinding, eventType, bound: false };
 
+        if (
+          this.bindingList.find(
+            (item) =>
+              item.command === command &&
+              item.eventType === eventType &&
+              item.type === type &&
+              item.keybinding === keybinding,
+          )
+        ) {
+          continue;
+        }
+
         this.bindingList.push(cacheItem);
       }
     }
