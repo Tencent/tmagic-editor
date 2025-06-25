@@ -44,8 +44,7 @@ import { computed, onBeforeUnmount, ref, shallowRef, toRaw } from 'vue';
 import serialize from 'serialize-javascript';
 
 import type { MApp, MContainer, MNode } from '@tmagic/core';
-import { NodeType } from '@tmagic/core';
-import type { CustomizeMoveableOptionsCallbackConfig, DatasourceTypeOption, MoveableOptions } from '@tmagic/editor';
+import type { DatasourceTypeOption } from '@tmagic/editor';
 import { editorService, propsService, TMagicDialog, TMagicEditor, tMagicMessage } from '@tmagic/editor';
 
 import DeviceGroup from '../components/DeviceGroup.vue';
@@ -54,6 +53,7 @@ import dsl from '../configs/dsl';
 
 import { useEditorContentMenuData } from './composables/use-editor-content-menu-data';
 import { useEditorMenu } from './composables/use-editor-menu';
+import { useEditorMoveableOptions } from './composables/use-editor-moveable-options';
 import { useEditorRes } from './composables/use-editor-res';
 
 const { VITE_RUNTIME_PATH } = import.meta.env;
@@ -78,37 +78,7 @@ const previewUrl = computed(
   () => `${VITE_RUNTIME_PATH}/page/index.html?localPreview=1&page=${editor.value?.editorService.get('page')?.id}`,
 );
 
-const moveableOptions = (config?: CustomizeMoveableOptionsCallbackConfig): MoveableOptions => {
-  const options: MoveableOptions = {};
-
-  if (!editor.value) return options;
-
-  const page = editor.value.editorService.get('page');
-
-  const ids = config?.targetElIds || [];
-  let isPage = page && ids.includes(`${page.id}`);
-
-  if (!isPage) {
-    const id = config?.targetElId;
-    if (id) {
-      const node = editor.value.editorService.getNodeById(id);
-      isPage = node?.type === NodeType.PAGE;
-    }
-  }
-
-  options.draggable = !isPage;
-  options.resizable = !isPage;
-  options.rotatable = !isPage;
-
-  // 双击后在弹层中编辑时，根组件不能拖拽
-  if (config?.targetEl?.parentElement?.classList.contains('tmagic-editor-sub-stage-wrap')) {
-    options.draggable = false;
-    options.resizable = false;
-    options.rotatable = false;
-  }
-
-  return options;
-};
+const { moveableOptions } = useEditorMoveableOptions(editor);
 
 const save = () => {
   localStorage.setItem(
