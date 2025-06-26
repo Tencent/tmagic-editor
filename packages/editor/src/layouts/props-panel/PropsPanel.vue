@@ -13,6 +13,7 @@
       @submit-error="errorHandler"
       @form-error="errorHandler"
       @mounted="mountedHandler"
+      @unmounted="unmountedHandler"
     ></FormPanel>
 
     <Resizer v-if="showStylePanel" @change="widthChange"></Resizer>
@@ -89,6 +90,7 @@ const emit = defineEmits<{
   'submit-error': [e: any];
   'form-error': [e: any];
   mounted: [internalInstance: InstanceType<typeof FormPanel>];
+  unmounted: [];
 }>();
 
 const { editorService, uiService, propsService, storageService } = useServices();
@@ -163,6 +165,10 @@ const mountedHandler = () => {
   if (propertyFormPanelRef.value) {
     emit('mounted', propertyFormPanelRef.value);
   }
+};
+
+const unmountedHandler = () => {
+  emit('unmounted');
 };
 
 const propsPanelEl = useTemplateRef('propsPanel');

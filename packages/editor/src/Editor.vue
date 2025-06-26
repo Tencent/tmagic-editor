@@ -97,6 +97,7 @@
           :extend-state="extendFormState"
           :disabled-show-src="disabledShowSrc"
           @mounted="propsPanelMountedHandler"
+          @unmounted="propsPanelUnmountedHandler"
           @form-error="propsPanelFormErrorHandler"
           @submit-error="propsPanelSubmitErrorHandler"
         >
@@ -163,6 +164,7 @@ defineOptions({
 
 const emit = defineEmits<{
   'props-panel-mounted': [instance: InstanceType<typeof FormPanel>];
+  'props-panel-unmounted': [];
   'update:modelValue': [value: MApp | null];
   'props-form-error': [e: any];
   'props-submit-error': [e: any];
@@ -234,6 +236,9 @@ provide<EventBus>('eventBus', new EventEmitter());
 
 const propsPanelMountedHandler = (e: InstanceType<typeof FormPanel>) => {
   emit('props-panel-mounted', e);
+};
+const propsPanelUnmountedHandler = () => {
+  emit('props-panel-unmounted');
 };
 
 const propsPanelSubmitErrorHandler = (e: any) => {

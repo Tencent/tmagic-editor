@@ -42,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, getCurrentInstance, inject, onMounted, ref, useTemplateRef, watchEffect } from 'vue';
+import { computed, getCurrentInstance, inject, onMounted, onUnmounted, ref, useTemplateRef, watchEffect } from 'vue';
 import { Document as DocumentIcon } from '@element-plus/icons-vue';
 
 import { TMagicButton, TMagicScrollbar } from '@tmagic/design';
@@ -78,6 +78,7 @@ const emit = defineEmits<{
   'submit-error': [e: any];
   'form-error': [e: any];
   mounted: [internalInstance: any];
+  unmounted: [];
 }>();
 
 const services = useServices();
@@ -102,6 +103,10 @@ watchEffect(() => {
 const internalInstance = getCurrentInstance();
 onMounted(() => {
   emit('mounted', internalInstance?.proxy);
+});
+
+onUnmounted(() => {
+  emit('unmounted');
 });
 
 const submit = async (v: FormValue, eventData: ContainerChangeEventData) => {
