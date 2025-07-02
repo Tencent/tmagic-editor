@@ -32,10 +32,12 @@ export const useFilter = (
         const visible = filterIsMatch(text, node);
         if (visible && parents.length) {
           parents.forEach((parent) => {
-            updateStatus(nodeStatusMap.value!, parent.id, {
-              visible,
-              expand: true,
-            });
+            if (text || text.length) {
+              updateStatus(nodeStatusMap.value!, parent.id, {
+                visible,
+                expand: true,
+              });
+            }
           });
         }
 
