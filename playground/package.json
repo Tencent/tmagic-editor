@@ -26,17 +26,17 @@
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.4",
-    "@types/node": "^18.19.0",
+    "@types/node": "^24.0.10",
     "@types/serialize-javascript": "^5.0.4",
-    "@vitejs/plugin-legacy": "^6.0.0",
-    "@vitejs/plugin-vue": "^5.2.3",
-    "@vitejs/plugin-vue-jsx": "^4.0.1",
+    "@vitejs/plugin-legacy": "^7.0.0",
+    "@vitejs/plugin-vue": "^6.0.0",
+    "@vitejs/plugin-vue-jsx": "^5.0.1",
     "@vue/compiler-sfc": "catalog:",
-    "sass": "^1.83.0",
-    "terser": "^5.31.6",
+    "sass": "^1.89.2",
+    "terser": "^5.43.1",
     "typescript": "catalog:",
-    "unplugin-auto-import": "^0.12.0",
-    "unplugin-vue-components": "^0.22.11",
+    "unplugin-auto-import": "^19.3.0",
+    "unplugin-vue-components": "^28.8.0",
     "vite": "catalog:"
   }
 }

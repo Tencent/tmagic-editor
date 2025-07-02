@@ -65,7 +65,7 @@
     "sortablejs": "^1.15.6"
   },
   "devDependencies": {
-    "@types/events": "^3.0.0",
+    "@types/events": "^3.0.3",
     "@types/lodash-es": "^4.17.4",
     "@types/serialize-javascript": "^5.0.4",
     "@types/sortablejs": "^1.15.8",

@@ -45,7 +45,7 @@
     }
   },
   "devDependencies": {
-    "@types/events": "^3.0.0",
+    "@types/events": "^3.0.3",
     "@types/lodash-es": "^4.17.4"
   }
 }

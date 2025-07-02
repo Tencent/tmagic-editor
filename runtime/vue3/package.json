@@ -27,15 +27,15 @@
   },
   "devDependencies": {
     "@tmagic/cli": "1.5.22",
-    "@types/node": "^18.19.0",
-    "@vitejs/plugin-legacy": "^6.0.0",
-    "@vitejs/plugin-vue": "5.2.3",
-    "@vitejs/plugin-vue-jsx": "^3.1.0",
+    "@types/node": "^24.0.10",
+    "@vitejs/plugin-legacy": "^7.0.0",
+    "@vitejs/plugin-vue": "^6.0.0",
+    "@vitejs/plugin-vue-jsx": "^5.0.1",
     "@vue/compiler-sfc": "catalog:",
-    "rollup": "^4.38.0",
-    "rollup-plugin-external-globals": "^0.10.0",
-    "sass": "^1.83.0",
-    "terser": "^5.31.6",
+    "rollup": "^4.44.1",
+    "rollup-plugin-external-globals": "^0.13.0",
+    "sass": "^1.89.2",
+    "terser": "^ 5.43.1",
     "typescript": "catalog:",
     "vite": "catalog:"
   }
