@@ -21,8 +21,8 @@
   "dependencies": {
     "@tmagic/core": "1.5.22",
     "@tmagic/stage": "1.5.22",
-    "@tmagic/vue-runtime-help": "^1.1.0",
-    "axios": "^0.25.0",
+    "@tmagic/vue-runtime-help": "^1.1.5",
+    "axios": "^1.10.0",
     "vue": "catalog:"
   },
   "devDependencies": {

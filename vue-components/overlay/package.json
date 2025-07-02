@@ -21,7 +21,7 @@
     "@tmagic/core": "workspace:^",
     "@tmagic/vue-runtime-help": "workspace:^",
     "vue-demi": ">=0.14.7",
-    "typescript": "*"
+    "typescript": "catalog:"
   },
   "peerDependenciesMeta": {
     "typescript": {

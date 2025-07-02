@@ -28,7 +28,7 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "peerDependencies": {
-    "typescript": "*"
+    "typescript": "catalog:"
   },
   "peerDependenciesMeta": {
     "typescript": {

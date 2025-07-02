@@ -28,7 +28,7 @@
     "@tmagic/react-text": "workspace:*"
   },
   "peerDependencies": {
-    "typescript": "*"
+    "typescript": "catalog:"
   },
   "peerDependenciesMeta": {
     "typescript": {

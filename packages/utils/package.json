@@ -34,7 +34,7 @@
   },
   "peerDependencies": {
     "@tmagic/schema": "workspace:*",
-    "typescript": "*"
+    "typescript": "catalog:"
   },
   "peerDependenciesMeta": {
     "typescript": {

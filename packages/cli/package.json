@@ -39,7 +39,7 @@
     "@types/node": "^24.0.10"
   },
   "peerDependencies": {
-    "typescript": "*"
+    "typescript": "catalog:"
   },
   "peerDependenciesMeta": {
     "typescript": {

@@ -33,7 +33,7 @@
     "@tmagic/core": ">=1.5.0",
     "@tmagic/stage": ">=1.5.0",
     "@vue/composition-api": ">=1.7.2",
-    "typescript": "*",
+    "typescript": "catalog:",
     "vue": ">=2.6.0 || >=3.5.0"
   },
   "peerDependenciesMeta": {

@@ -36,8 +36,8 @@
   ],
   "peerDependencies": {
     "@tmagic/design": "workspace:*",
-    "element-plus": ">=2.8.0",
-    "typescript": "*"
+    "element-plus": ">=2.9.0",
+    "typescript": "catalog:"
   },
   "peerDependenciesMeta": {
     "typescript": {

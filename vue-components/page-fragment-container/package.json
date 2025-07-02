@@ -20,7 +20,7 @@
   "peerDependencies": {
     "@tmagic/core": "workspace:^",
     "@tmagic/vue-runtime-help": "workspace:^",
-    "typescript": "*"
+    "typescript": "catalog:"
   },
   "peerDependenciesMeta": {
     "typescript": {

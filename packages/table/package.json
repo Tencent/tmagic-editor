@@ -44,8 +44,8 @@
   "peerDependencies": {
     "@tmagic/design": "workspace:*",
     "@tmagic/form": "workspace:*",
-    "vue": ">=3.5.0",
-    "typescript": "*"
+    "vue": "catalog:",
+    "typescript": "catalog:"
   },
   "peerDependenciesMeta": {
     "typescript": {

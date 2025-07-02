@@ -29,8 +29,8 @@
     "@tmagic/core": ">=1.5.0",
     "@tmagic/editor": ">=1.5.0",
     "element-plus": ">=2.8.0",
-    "vue": ">=3.5.0",
-    "typescript": "*"
+    "vue": "catalog:",
+    "typescript": "catalog:"
   },
   "peerDependenciesMeta": {
     "@tmagic/core": {

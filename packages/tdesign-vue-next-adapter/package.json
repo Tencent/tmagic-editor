@@ -40,8 +40,8 @@
   "peerDependencies": {
     "@tmagic/design": "workspace:*",
     "tdesign-vue-next": "^1.9.8",
-    "vue": ">=3.5.0",
-    "typescript": "*"
+    "vue": "catalog:",
+    "typescript": "catalog:"
   },
   "peerDependenciesMeta": {
     "typescript": {
