@@ -1,3 +1,4 @@
+import { NODE_NO_CODE_BLOCK_KEY, NODE_NO_DATA_SOURCE_KEY } from '@tmagic/schema';
 import { isObject } from '@tmagic/utils';
 
 import type Target from './Target';
@@ -189,6 +190,19 @@ export default class Watcher {
   }
 
   public collectItem(node: TargetNode, target: Target, depExtendedData: DepExtendedData = {}, deep = false) {
+    const dataSourceTargetTypes: string[] = [
+      DepTargetType.DATA_SOURCE,
+      DepTargetType.DATA_SOURCE_COND,
+      DepTargetType.DATA_SOURCE_METHOD,
+    ];
+    if (node[NODE_NO_DATA_SOURCE_KEY] && dataSourceTargetTypes.includes(target.type)) {
+      return;
+    }
+
+    if (node[NODE_NO_CODE_BLOCK_KEY] && target.type === DepTargetType.CODE_BLOCK) {
+      return;
+    }
+
     const collectTarget = (config: Record<string | number, any>, prop = '') => {
       const doCollect = (key: string, value: any) => {
         const keyIsItems = key === this.childrenProp;
