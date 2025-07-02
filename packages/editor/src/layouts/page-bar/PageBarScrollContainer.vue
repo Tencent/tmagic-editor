@@ -78,6 +78,7 @@ const resizeObserver = new ResizeObserver(() => {
 
 onMounted(() => {
   pageBarEl.value && resizeObserver.observe(pageBarEl.value);
+  itemsContainerEl.value && resizeObserver.observe(itemsContainerEl.value);
 });
 
 onBeforeUnmount(() => {
