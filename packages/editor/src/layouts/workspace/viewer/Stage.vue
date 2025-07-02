@@ -43,20 +43,9 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  computed,
-  markRaw,
-  nextTick,
-  onBeforeUnmount,
-  onMounted,
-  toRaw,
-  useTemplateRef,
-  watch,
-  watchEffect,
-} from 'vue';
-import { cloneDeep } from 'lodash-es';
+import { computed, markRaw, nextTick, onBeforeUnmount, onMounted, useTemplateRef, watch, watchEffect } from 'vue';
 
-import type { MApp, MContainer } from '@tmagic/core';
+import type { MContainer } from '@tmagic/core';
 import StageCore, { getOffset, Runtime } from '@tmagic/stage';
 import { calcValueByFontsize, getIdFromEl } from '@tmagic/utils';
 
@@ -130,12 +119,6 @@ watchEffect(() => {
 
   stage.on('runtime-ready', (rt) => {
     runtime = rt;
-    // toRaw返回的值是一个引用而非快照，需要cloneDeep
-    root.value && runtime?.updateRootConfig?.(cloneDeep(toRaw(root.value)));
-    page.value?.id && runtime?.updatePageId?.(page.value.id);
-    setTimeout(() => {
-      node.value && stage?.select(toRaw(node.value.id));
-    });
   });
 });
 
@@ -184,14 +167,6 @@ watch(page, (page) => {
   }
 });
 
-const rootChangeHandler = (root: MApp) => {
-  if (runtime && root) {
-    runtime.updateRootConfig?.(cloneDeep(toRaw(root)));
-  }
-};
-
-editorService.on('root-change', rootChangeHandler);
-
 const resizeObserver = new ResizeObserver((entries) => {
   for (const { contentRect } of entries) {
     uiService.set('stageContainerRect', {
@@ -210,10 +185,10 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   stage?.destroy();
+  stage = null;
   resizeObserver.disconnect();
   editorService.set('stage', null);
   keybindingService.unregisterEl('stage');
-  editorService.off('root-change', rootChangeHandler);
 });
 
 const parseDSL = getEditorConfig('parseDSL');

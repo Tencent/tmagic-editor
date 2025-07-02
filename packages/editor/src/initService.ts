@@ -1,4 +1,4 @@
-import { onBeforeUnmount, reactive, toRaw, watch } from 'vue';
+import { nextTick, onBeforeUnmount, reactive, toRaw, watch } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
 import type TMagicCore from '@tmagic/core';
@@ -21,9 +21,11 @@ import {
   NODE_CONDS_KEY,
   NodeType,
   Target,
+  updateNode,
 } from '@tmagic/core';
 import { ChangeRecord } from '@tmagic/form';
-import { getNodes, isPage, isValueIncludeDataSource } from '@tmagic/utils';
+import StageCore from '@tmagic/stage';
+import { getDepNodeIds, getNodes, isPage, isValueIncludeDataSource } from '@tmagic/utils';
 
 import PropsPanel from './layouts/PropsPanel.vue';
 import { isIncludeDataSource } from './utils/editor';
@@ -233,14 +235,15 @@ export const initServiceEvents = (
 ) => {
   let getTMagicAppPrimise: Promise<TMagicCore | undefined> | null = null;
 
-  const getTMagicApp = (): Promise<TMagicCore | undefined> => {
-    const renderer = editorService.get('stage')?.renderer;
+  const getTMagicApp = async (): Promise<TMagicCore | undefined> => {
+    const stage = await getStage();
+    const { renderer } = stage;
     if (!renderer) {
-      return Promise.resolve(void 0);
+      return void 0;
     }
 
     if (renderer.runtime) {
-      return Promise.resolve(renderer.runtime.getApp?.());
+      return renderer.runtime.getApp?.();
     }
 
     if (getTMagicAppPrimise) {
@@ -344,6 +347,60 @@ export const initServiceEvents = (
     },
   );
 
+  const getStage = (): Promise<StageCore> => {
+    const stage = editorService.get('stage');
+    if (stage) {
+      return Promise.resolve(stage);
+    }
+
+    return new Promise<StageCore>((resolve) => {
+      const unWatch = watch(
+        () => editorService.get('stage'),
+        (stage) => {
+          if (stage) {
+            resolve(stage);
+            nextTick(() => {
+              unWatch();
+            });
+          }
+        },
+      );
+    });
+  };
+
+  const updateStageDsl = async (value: MApp | null) => {
+    const dsl = cloneDeep(toRaw(value));
+
+    const stage = await getStage();
+
+    const runtime = await stage.renderer?.getRuntime();
+    const app = await getTMagicApp();
+
+    if (!app?.dataSourceManager) {
+      runtime?.updateRootConfig?.(dsl!);
+    }
+
+    const page = editorService.get('page');
+    const node = editorService.get('node');
+    page?.id && runtime?.updatePageId?.(page.id);
+    setTimeout(() => {
+      node && stage?.select(toRaw(node.id));
+    });
+
+    if (value) {
+      depService.clearIdleTasks();
+      await (typeof Worker === 'undefined' ? collectIdle(value.items, true) : depService.collectByWorker(value));
+
+      if (value.dataSources && value.dataSourceDeps && app?.dataSourceManager) {
+        for (const node of getNodes(getDepNodeIds(value.dataSourceDeps), value.items)) {
+          updateNode(app.dataSourceManager.compiledNode(node), value);
+        }
+      }
+
+      runtime?.updateRootConfig?.(cloneDeep(value));
+    }
+  };
+
   const initDataSourceDepTarget = (ds: DataSourceSchema) => {
     depService.addTarget(createDataSourceTarget(ds, reactive({})));
     depService.addTarget(createDataSourceMethodTarget(ds, reactive({})));
@@ -370,11 +427,7 @@ export const initServiceEvents = (
     }
 
     if (Array.isArray(value.items)) {
-      depService.clearIdleTasks();
-
-      (typeof Worker === 'undefined' ? collectIdle(value.items, true) : depService.collectByWorker(value)).then(() => {
-        updateStageNodes(value.items);
-      });
+      updateStageDsl(value);
     } else {
       depService.clear();
       delete value.dataSourceDeps;
