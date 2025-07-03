@@ -1,3 +1,28 @@
+## [1.5.23](https://github.com/Tencent/tmagic-editor/compare/v1.5.22...v1.5.23) (2025-07-03)
+
+
+### Bug Fixes
+
+* **editor,react-runtime-help,vue-runtime-help:** 修复拖动页面顺序失效问题 ([b6a2604](https://github.com/Tencent/tmagic-editor/commit/b6a260471d9369e9b911f35d16ff0fca82a7d4fe))
+* **editor:** 树组件搜索后不展开所有节点 ([c984c1a](https://github.com/Tencent/tmagic-editor/commit/c984c1a0cf0c934d41e5affb471d2ff2efa4bb97))
+* **editor:** 防止快捷键重复注册 ([18e8df4](https://github.com/Tencent/tmagic-editor/commit/18e8df4a557cb845a8f1d2868ea4e8833a75941d))
+* **editor:** 页面列表滚动条 ([727af10](https://github.com/Tencent/tmagic-editor/commit/727af1058d23e0843482536133954243c9f208d5))
+
+
+### Features
+
+* **core,data-source,dep,editor,schema:** 新增组件禁用代码块/数据源的配置开关 ([2f4a7a3](https://github.com/Tencent/tmagic-editor/commit/2f4a7a33b85015bfe5368bd10bf562514f07299c))
+* **dep,schema:** 添加组件没用数据源或者代码块的配置key ([3f7d039](https://github.com/Tencent/tmagic-editor/commit/3f7d03959cdbafacc439df2bf3a61aa1e21cb8c2))
+* **editor:** service新增removePlugin方法 ([8d6da37](https://github.com/Tencent/tmagic-editor/commit/8d6da3712efdc269cbaa47b003bf667bbce00ae7))
+* **editor:** stage overlay 支持放大缩小 ([3268196](https://github.com/Tencent/tmagic-editor/commit/32681964b340fc8e68f8b6a6eb420043fd569b78))
+* **editor:** 数据源属性/方法表格可以拖动列宽 ([222a96e](https://github.com/Tencent/tmagic-editor/commit/222a96e4652003b908c5c75378e5ddf2029fdd65))
+* **editor:** 新增props-panel-unmounted事件 ([9e590c5](https://github.com/Tencent/tmagic-editor/commit/9e590c5cf73c9925f7aad562409f31c1ff273b18))
+* **playground:** 新增按比例拖动组件大小快捷键 ([b78ef20](https://github.com/Tencent/tmagic-editor/commit/b78ef206022d69a8c3f81c55a301e5a4b5147641))
+* **stage:** 新增禁用标尺配置 ([95d6263](https://github.com/Tencent/tmagic-editor/commit/95d6263f42ad13c2ac0560704695408634e55d91))
+* **stage:** 添加updateMoveableOptions api，用于更新选中框状态 ([bdd59cf](https://github.com/Tencent/tmagic-editor/commit/bdd59cff9b378461f905b04e250f8ad7f6ed21a0))
+
+
+
 ## [1.5.22](https://github.com/Tencent/tmagic-editor/compare/v1.5.21...v1.5.22) (2025-06-09)
 
 
