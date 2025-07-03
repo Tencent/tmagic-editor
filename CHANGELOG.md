@@ -1,3 +1,12 @@
+## [1.5.24](https://github.com/Tencent/tmagic-editor/compare/v1.5.23...v1.5.24) (2025-07-03)
+
+
+### Bug Fixes
+
+* **editor:** 初始化收集依赖后编译数据源不能使用源数据 ([84bf9ba](https://github.com/Tencent/tmagic-editor/commit/84bf9ba2f96829ba8e88b278bd49f2cb454605aa))
+
+
+
 ## [1.5.23](https://github.com/Tencent/tmagic-editor/compare/v1.5.22...v1.5.23) (2025-07-03)
 
 
