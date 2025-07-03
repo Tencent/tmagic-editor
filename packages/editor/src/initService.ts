@@ -369,15 +369,13 @@ export const initServiceEvents = (
   };
 
   const updateStageDsl = async (value: MApp | null) => {
-    const dsl = cloneDeep(toRaw(value));
-
     const stage = await getStage();
 
     const runtime = await stage.renderer?.getRuntime();
     const app = await getTMagicApp();
 
     if (!app?.dataSourceManager) {
-      runtime?.updateRootConfig?.(dsl!);
+      runtime?.updateRootConfig?.(cloneDeep(toRaw(value))!);
     }
 
     const page = editorService.get('page');
@@ -389,15 +387,18 @@ export const initServiceEvents = (
 
     if (value) {
       depService.clearIdleTasks();
-      await (typeof Worker === 'undefined' ? collectIdle(value.items, true) : depService.collectByWorker(value));
 
-      if (value.dataSources && value.dataSourceDeps && app?.dataSourceManager) {
-        for (const node of getNodes(getDepNodeIds(value.dataSourceDeps), value.items)) {
-          updateNode(app.dataSourceManager.compiledNode(node), value);
+      const dsl = cloneDeep(toRaw(value));
+
+      await (typeof Worker === 'undefined' ? collectIdle(dsl.items, true) : depService.collectByWorker(dsl));
+
+      if (dsl.dataSources && dsl.dataSourceDeps && app?.dataSourceManager) {
+        for (const node of getNodes(getDepNodeIds(dsl.dataSourceDeps), dsl.items)) {
+          updateNode(app.dataSourceManager.compiledNode(node), dsl);
         }
       }
 
-      runtime?.updateRootConfig?.(cloneDeep(value));
+      runtime?.updateRootConfig?.(dsl);
     }
   };
 
