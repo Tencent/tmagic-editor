@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-import { NODE_CONDS_KEY } from '@tmagic/core';
+import { NODE_CONDS_KEY, NODE_DISABLE_CODE_BLOCK_KEY, NODE_DISABLE_DATA_SOURCE_KEY } from '@tmagic/core';
 import { tMagicMessage } from '@tmagic/design';
 import type { FormConfig, FormState, TabConfig, TabPaneConfig } from '@tmagic/form';
 
@@ -123,6 +123,20 @@ export const advancedTabConfig: TabPaneConfig = {
   title: '高级',
   lazy: true,
   items: [
+    {
+      name: NODE_DISABLE_CODE_BLOCK_KEY,
+      text: '禁用代码块',
+      type: 'switch',
+      defaultValue: false,
+      extra: '开启后，配置的代码块将不会被执行',
+    },
+    {
+      name: NODE_DISABLE_DATA_SOURCE_KEY,
+      text: '禁用数据源',
+      type: 'switch',
+      defaultValue: false,
+      extra: '开启后，组件内配置的数据源相关配置将不会被编译，显隐条件将失效',
+    },
     {
       name: 'created',
       text: 'created',

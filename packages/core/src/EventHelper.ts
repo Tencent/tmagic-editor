@@ -31,6 +31,8 @@ import {
   type DataSourceItemConfig,
   type EventActionItem,
   type EventConfig,
+  NODE_DISABLE_CODE_BLOCK_KEY,
+  NODE_DISABLE_DATA_SOURCE_KEY,
 } from '@tmagic/schema';
 import { DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX } from '@tmagic/utils';
 
@@ -216,10 +218,17 @@ export default class EventHelper extends EventEmitter {
         // 组件动作
         await this.compActionHandler(compActionItem, fromCpt, args);
       } else if (actionItem.actionType === ActionType.CODE) {
+        if (fromCpt.data[NODE_DISABLE_CODE_BLOCK_KEY]) {
+          return;
+        }
         const codeActionItem = actionItem as CodeItemConfig;
         // 执行代码块
         await this.app.runCode(codeActionItem.codeId, codeActionItem.params || {}, args, flowState);
       } else if (actionItem.actionType === ActionType.DATA_SOURCE) {
+        if (fromCpt.data[NODE_DISABLE_DATA_SOURCE_KEY]) {
+          return;
+        }
+
         const dataSourceActionItem = actionItem as DataSourceItemConfig;
 
         const [dsId, methodName] = dataSourceActionItem.dataSourceMethod;

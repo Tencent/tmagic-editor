@@ -20,7 +20,7 @@ import { EventEmitter } from 'events';
 
 import { DataSource } from '@tmagic/data-source';
 import type { EventConfig, MNode } from '@tmagic/schema';
-import { HookCodeType, HookType } from '@tmagic/schema';
+import { HookCodeType, HookType, NODE_DISABLE_CODE_BLOCK_KEY } from '@tmagic/schema';
 
 import type { default as TMagicApp } from './App';
 import type Page from './Page';
@@ -167,8 +167,8 @@ class Node extends EventEmitter {
     this.once('created', (instance: any) => {
       this.once('destroy', () => {
         this.instance = null;
-        if (typeof this.data.destroy === 'function') {
-          this.data.destroy(this);
+        if (this.data[NODE_DISABLE_CODE_BLOCK_KEY] !== true) {
+          this.runHookCode('destroy');
         }
 
         this.listenLifeSafe();
@@ -178,7 +178,9 @@ class Node extends EventEmitter {
         this.setInstance(instance);
       }
 
-      this.runHookCode('created');
+      if (this.data[NODE_DISABLE_CODE_BLOCK_KEY] !== true) {
+        this.runHookCode('created');
+      }
     });
 
     this.once('mounted', (instance: any) => {
@@ -193,7 +195,9 @@ class Node extends EventEmitter {
           }
         }
 
-        this.runHookCode('mounted');
+        if (this.data[NODE_DISABLE_CODE_BLOCK_KEY] !== true) {
+          this.runHookCode('mounted');
+        }
       };
       handler();
     });

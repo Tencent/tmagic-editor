@@ -47,8 +47,8 @@ export enum NodeType {
 }
 
 export const NODE_CONDS_KEY = 'displayConds';
-export const NODE_NO_DATA_SOURCE_KEY = '__tmagic_node_no_data_source';
-export const NODE_NO_CODE_BLOCK_KEY = '__tmagic_node_no_code_block';
+export const NODE_DISABLE_DATA_SOURCE_KEY = '_tmagic_node_disabled_data_source';
+export const NODE_DISABLE_CODE_BLOCK_KEY = '_tmagic_node_disabled_code_block';
 
 export type Id = string | number;
 

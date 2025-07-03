@@ -22,7 +22,7 @@ import EventEmitter from 'events';
 import { cloneDeep } from 'lodash-es';
 
 import type { DataSourceSchema, default as TMagicApp, DisplayCond, Id, MNode } from '@tmagic/core';
-import { compiledNode, getDefaultValueFromFields, NODE_CONDS_KEY } from '@tmagic/core';
+import { compiledNode, getDefaultValueFromFields, NODE_CONDS_KEY, NODE_DISABLE_DATA_SOURCE_KEY } from '@tmagic/core';
 
 import { SimpleObservedData } from './observed-data/SimpleObservedData';
 import { DataSource, HttpDataSource } from './data-sources';
@@ -225,7 +225,12 @@ class DataSourceManager extends EventEmitter {
    * @param {boolean} deep 是否编译子项（items)，默认为false
    * @returns {MNode} 编译后的组件dsl
    */
-  public compiledNode({ items, ...node }: MNode, sourceId?: Id, deep = false) {
+  public compiledNode(n: MNode, sourceId?: Id, deep = false) {
+    if (n[NODE_DISABLE_DATA_SOURCE_KEY]) {
+      return n;
+    }
+
+    const { items, ...node } = n;
     const newNode = cloneDeep(node);
 
     if (items) {
@@ -250,7 +255,10 @@ class DataSourceManager extends EventEmitter {
    * @param {{ [NODE_CONDS_KEY]?: DisplayCond[] }} node 显示条件组配置
    * @returns {boolean} 是否显示
    */
-  public compliedConds(node: { [NODE_CONDS_KEY]?: DisplayCond[] }) {
+  public compliedConds(node: { [NODE_CONDS_KEY]?: DisplayCond[]; [NODE_DISABLE_DATA_SOURCE_KEY]?: boolean }) {
+    if (node[NODE_DISABLE_DATA_SOURCE_KEY]) {
+      return true;
+    }
     return compliedConditions(node, this.data);
   }
 

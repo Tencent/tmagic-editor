@@ -1,4 +1,4 @@
-import { NODE_NO_CODE_BLOCK_KEY, NODE_NO_DATA_SOURCE_KEY } from '@tmagic/schema';
+import { NODE_DISABLE_CODE_BLOCK_KEY, NODE_DISABLE_DATA_SOURCE_KEY } from '@tmagic/schema';
 import { isObject } from '@tmagic/utils';
 
 import type Target from './Target';
@@ -195,11 +195,11 @@ export default class Watcher {
       DepTargetType.DATA_SOURCE_COND,
       DepTargetType.DATA_SOURCE_METHOD,
     ];
-    if (node[NODE_NO_DATA_SOURCE_KEY] && dataSourceTargetTypes.includes(target.type)) {
+    if (node[NODE_DISABLE_DATA_SOURCE_KEY] && dataSourceTargetTypes.includes(target.type)) {
       return;
     }
 
-    if (node[NODE_NO_CODE_BLOCK_KEY] && target.type === DepTargetType.CODE_BLOCK) {
+    if (node[NODE_DISABLE_CODE_BLOCK_KEY] && target.type === DepTargetType.CODE_BLOCK) {
       return;
     }
 
