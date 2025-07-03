@@ -1,6 +1,6 @@
 <template>
   <div class="m-editor-data-source-fields">
-    <MagicTable :data="model[name]" :columns="fieldColumns"></MagicTable>
+    <MagicTable :data="model[name]" :columns="fieldColumns" :border="true"></MagicTable>
 
     <div class="m-editor-data-source-fields-footer">
       <TMagicButton size="small" :disabled="disabled" plain @click="newFromJsonHandler()">快速添加</TMagicButton>

@@ -1,6 +1,6 @@
 <template>
   <div class="m-editor-data-source-methods">
-    <MagicTable :data="model[name]" :columns="methodColumns"></MagicTable>
+    <MagicTable :data="model[name]" :columns="methodColumns" :border="true"></MagicTable>
 
     <div class="m-editor-data-source-methods-footer">
       <TMagicButton size="small" type="primary" :disabled="disabled" plain @click="createCodeHandler"
