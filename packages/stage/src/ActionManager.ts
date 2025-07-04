@@ -427,7 +427,7 @@ export default class ActionManager extends EventEmitter {
     const dr = new StageDragResize({
       container: config.container,
       disabledDragStart: config.disabledDragStart,
-      moveableOptions: this.changeCallback(config.moveableOptions, false),
+      moveableOptions: config.moveableOptions && this.changeCallback(config.moveableOptions, false),
       dragResizeHelper: createDrHelper(),
       getRootContainer: config.getRootContainer,
       getRenderDocument: config.getRenderDocument,
@@ -472,7 +472,7 @@ export default class ActionManager extends EventEmitter {
       });
     const multiDr = new StageMultiDragResize({
       container: config.container,
-      moveableOptions: this.changeCallback(config.moveableOptions, true),
+      moveableOptions: config.moveableOptions && this.changeCallback(config.moveableOptions, true),
       dragResizeHelper: createDrHelper(),
       getRootContainer: config.getRootContainer,
       getRenderDocument: config.getRenderDocument,
@@ -493,7 +493,10 @@ export default class ActionManager extends EventEmitter {
     return multiDr;
   }
 
-  private changeCallback(options: CustomizeMoveableOptions, isMulti: boolean): CustomizeMoveableOptions {
+  private changeCallback(
+    options: CustomizeMoveableOptions,
+    isMulti: boolean,
+  ): MoveableOptions | (() => MoveableOptions) {
     // 在actionManager才能获取到各种参数，在这里传好参数有比较好的扩展性
     if (typeof options === 'function') {
       return () => {

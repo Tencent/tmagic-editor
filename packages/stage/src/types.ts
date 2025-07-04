@@ -31,11 +31,11 @@ export type TargetElement = HTMLElement | SVGElement;
 export type CanSelect = (el: HTMLElement, event: MouseEvent, stop: () => boolean) => boolean | Promise<boolean>;
 export type IsContainer = (el: HTMLElement) => boolean | Promise<boolean>;
 export type CustomizeRender = (renderer: StageCore) => Promise<HTMLElement | void> | HTMLElement | void;
+
+export type CustomizeMoveableOptionsFunction = (config: CustomizeMoveableOptionsCallbackConfig) => MoveableOptions;
+
 /** 业务方自定义的moveableOptions，可以是配置，也可以是回调函数 */
-export type CustomizeMoveableOptions =
-  | ((config?: CustomizeMoveableOptionsCallbackConfig) => MoveableOptions)
-  | MoveableOptions
-  | undefined;
+export type CustomizeMoveableOptions = CustomizeMoveableOptionsFunction | MoveableOptions;
 /** render提供给的接口，id转成el */
 export type GetTargetElement = (id: Id) => HTMLElement | null;
 /** render提供的接口，通过坐标获得坐标下所有HTML元素数组 */
@@ -89,7 +89,7 @@ export interface ActionManagerConfig {
 
 export interface MoveableOptionsManagerConfig {
   container: HTMLElement;
-  moveableOptions?: CustomizeMoveableOptions;
+  moveableOptions?: MoveableOptions | (() => MoveableOptions);
   getRootContainer: GetRootContainer;
 }
 
@@ -113,22 +113,16 @@ export interface StageMaskConfig {
   core: StageCore;
 }
 
-export interface StageDragResizeConfig {
-  container: HTMLElement;
+export interface StageDragResizeConfig extends MoveableOptionsManagerConfig {
   dragResizeHelper: DragResizeHelper;
-  moveableOptions?: CustomizeMoveableOptions;
   disabledDragStart?: boolean;
-  getRootContainer: GetRootContainer;
   getRenderDocument: GetRenderDocument;
   markContainerEnd: MarkContainerEnd;
   delayedMarkContainer: DelayedMarkContainer;
 }
 
-export interface StageMultiDragResizeConfig {
-  container: HTMLElement;
+export interface StageMultiDragResizeConfig extends MoveableOptionsManagerConfig {
   dragResizeHelper: DragResizeHelper;
-  moveableOptions?: CustomizeMoveableOptions;
-  getRootContainer: GetRootContainer;
   getRenderDocument: GetRenderDocument;
   markContainerEnd: MarkContainerEnd;
   delayedMarkContainer: DelayedMarkContainer;

@@ -3,9 +3,8 @@ import type { FormConfig, FormState } from '@tmagic/form';
 import StageCore, {
   CONTAINER_HIGHLIGHT_CLASS_NAME,
   ContainerHighlightType,
-  type CustomizeMoveableOptionsCallbackConfig,
+  type CustomizeMoveableOptions,
   type GuidesOptions,
-  type MoveableOptions,
   RenderType,
   type UpdateDragEl,
 } from '@tmagic/stage';
@@ -56,7 +55,7 @@ export interface EditorProps {
   datasourceConfigs?: Record<string, FormConfig>;
   datasourceEventMethodList?: Record<string, { events: EventOption[]; methods: EventOption[] }>;
   /** 画布中组件选中框的移动范围 */
-  moveableOptions?: MoveableOptions | ((config?: CustomizeMoveableOptionsCallbackConfig) => MoveableOptions);
+  moveableOptions?: CustomizeMoveableOptions;
   /** 编辑器初始化时默认选中的组件ID */
   defaultSelected?: Id;
   /** 拖入画布中容器时，识别到容器后给容器根dom加上的class */

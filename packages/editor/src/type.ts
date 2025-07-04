@@ -26,9 +26,8 @@ import type { FormConfig, TableColumnConfig } from '@tmagic/form';
 import type StageCore from '@tmagic/stage';
 import type {
   ContainerHighlightType,
-  CustomizeMoveableOptionsCallbackConfig,
+  CustomizeMoveableOptions,
   GuidesOptions,
-  MoveableOptions,
   RenderType,
   UpdateDragEl,
 } from '@tmagic/stage';
@@ -157,7 +156,7 @@ export interface StageOptions {
   containerHighlightType?: ContainerHighlightType;
   disabledDragStart?: boolean;
   render?: (stage: StageCore) => HTMLDivElement | void | Promise<HTMLDivElement | void>;
-  moveableOptions?: MoveableOptions | ((config?: CustomizeMoveableOptionsCallbackConfig) => MoveableOptions);
+  moveableOptions?: CustomizeMoveableOptions;
   canSelect?: (el: HTMLElement) => boolean | Promise<boolean>;
   isContainer?: (el: HTMLElement) => boolean | Promise<boolean>;
   updateDragEl?: UpdateDragEl;

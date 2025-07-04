@@ -675,7 +675,7 @@ const datasourceConfigs = {
 
 - **默认值：** `{}`
 
-- **类型：** ((config?: [CustomizeMoveableOptionsCallbackConfig](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/stage/src/types.ts#L97-L109)) => MoveableOptions) | [MoveableOptions](https://daybrush.com/moveable/release/latest/doc/)
+- **类型：** ((config: [CustomizeMoveableOptionsCallbackConfig](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/stage/src/types.ts#L97-L109)) => MoveableOptions) | [MoveableOptions](https://daybrush.com/moveable/release/latest/doc/)
 
 - **示例：**
 

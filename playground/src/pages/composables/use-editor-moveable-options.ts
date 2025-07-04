@@ -1,23 +1,23 @@
 import { onMounted, type ShallowRef } from 'vue';
 
 import { NodeType } from '@tmagic/core';
-import type { CustomizeMoveableOptionsCallbackConfig, MoveableOptions, TMagicEditor } from '@tmagic/editor';
+import type { CustomizeMoveableOptionsFunction, MoveableOptions, TMagicEditor } from '@tmagic/editor';
 
 export const useEditorMoveableOptions = (editor: ShallowRef<InstanceType<typeof TMagicEditor> | undefined>) => {
   let keepRatio = false;
 
-  const moveableOptions = (config?: CustomizeMoveableOptionsCallbackConfig): MoveableOptions => {
+  const moveableOptions: CustomizeMoveableOptionsFunction = (config) => {
     const options: MoveableOptions = {};
 
     if (!editor.value) return options;
 
     const page = editor.value.editorService.get('page');
 
-    const ids = config?.targetElIds || [];
+    const ids = config.targetElIds || [];
     let isPage = page && ids.includes(`${page.id}`);
 
     if (!isPage) {
-      const id = config?.targetElId;
+      const id = config.targetElId;
       if (id) {
         const node = editor.value.editorService.getNodeById(id);
         isPage = node?.type === NodeType.PAGE;
