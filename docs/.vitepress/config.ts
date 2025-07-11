@@ -24,7 +24,7 @@ export default defineConfig({
 
     footer: {
       message: 'Powered by 腾讯视频会员平台技术中心',
-      copyright: 'Copyright (C) 2023 THL A29 Limited, a Tencent company.'
+      copyright: 'Copyright (C) 2025 Tencent.'
     },
 
     nav: [
