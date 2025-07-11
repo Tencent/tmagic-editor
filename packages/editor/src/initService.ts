@@ -388,10 +388,9 @@ export const initServiceEvents = (
     if (value) {
       depService.clearIdleTasks();
 
+      await (typeof Worker === 'undefined' ? collectIdle(value.items, true) : depService.collectByWorker(value));
+
       const dsl = cloneDeep(toRaw(value));
-
-      await (typeof Worker === 'undefined' ? collectIdle(dsl.items, true) : depService.collectByWorker(dsl));
-
       if (dsl.dataSources && dsl.dataSourceDeps && app?.dataSourceManager) {
         for (const node of getNodes(getDepNodeIds(dsl.dataSourceDeps), dsl.items)) {
           updateNode(app.dataSourceManager.compiledNode(node), dsl);
