@@ -258,19 +258,34 @@ export default class EventHelper extends EventEmitter {
       [to, methodName] = methodName;
     }
 
+    const toNodes = [];
     const toNode = this.app.getNode(to);
-    if (!toNode) throw new Error(`ID为${to}的组件不存在`);
-
-    if (toNode.instance) {
-      if (typeof toNode.instance[methodName] === 'function') {
-        await toNode.instance[methodName](fromCpt, ...args);
-      }
-    } else {
-      toNode.addEventToQueue({
-        method: methodName,
-        fromCpt,
-        args,
-      });
+    if (toNode) {
+      toNodes.push(toNode);
     }
+
+    for (const [, page] of this.app.pageFragments) {
+      const node = page.getNode(to);
+      if (node) {
+        toNodes.push(node);
+      }
+    }
+
+    const instanceMethodPropmise = [];
+    for (const node of toNodes) {
+      if (node.instance) {
+        if (typeof node.instance[methodName] === 'function') {
+          instanceMethodPropmise.push(node.instance[methodName](fromCpt, ...args));
+        }
+      } else {
+        node.addEventToQueue({
+          method: methodName,
+          fromCpt,
+          args,
+        });
+      }
+    }
+
+    await Promise.all(instanceMethodPropmise);
   }
 }

@@ -18,7 +18,7 @@
 import { union } from 'lodash-es';
 
 import type { default as TMagicApp } from '@tmagic/core';
-import { getDepNodeIds, getNodes, isPage } from '@tmagic/core';
+import { getDepNodeIds, getNodes, isPage, isPageFragment } from '@tmagic/core';
 
 import DataSourceManager from './DataSourceManager';
 import type { ChangeEvent, DataSourceManagerData } from './types';
@@ -52,18 +52,19 @@ export const createDataSourceManager = (app: TMagicApp, useMock?: boolean, initi
 
   // ssr环境下，数据应该是提前准备好的（放到initialData中），不应该发生变化，无需监听
   // 有initialData不一定是在ssr环境下
-  if (app.jsEngine !== 'nodejs') {
-    dataSourceManager.on('change', (sourceId: string, changeEvent: ChangeEvent) => {
-      const dep = dsl.dataSourceDeps?.[sourceId] || {};
-      const condDep = dsl.dataSourceCondDeps?.[sourceId] || {};
+  if (app.jsEngine === 'nodejs') {
+    return dataSourceManager;
+  }
 
-      const nodeIds = union([...Object.keys(condDep), ...Object.keys(dep)]);
+  dataSourceManager.on('change', (sourceId: string, changeEvent: ChangeEvent) => {
+    const dep = dsl.dataSourceDeps?.[sourceId] || {};
+    const condDep = dsl.dataSourceCondDeps?.[sourceId] || {};
 
-      const pages = app.page?.data && app.platform !== 'editor' ? [app.page.data] : dsl.items;
+    const nodeIds = union([...Object.keys(condDep), ...Object.keys(dep)]);
 
-      dataSourceManager.emit(
-        'update-data',
-        getNodes(nodeIds, pages).map((node) => {
+    for (const page of dsl.items) {
+      if (app.platform === 'editor' || (isPage(page) && page.id === app.page?.data.id) || isPageFragment(page)) {
+        const newNodes = getNodes(nodeIds, [page]).map((node) => {
           if (app.platform !== 'editor') {
             node.condResult = dataSourceManager.compliedConds(node);
           }
@@ -73,19 +74,26 @@ export const createDataSourceManager = (app: TMagicApp, useMock?: boolean, initi
           if (typeof app.page?.setData === 'function') {
             if (isPage(newNode)) {
               app.page.setData(newNode);
+            } else if (isPageFragment(newNode)) {
+              for (const [, page] of app.pageFragments) {
+                if (page.data.id === node.id) {
+                  page.setData(newNode);
+                }
+              }
             } else {
-              const n = app.page.getNode(node.id);
-              n?.setData(newNode);
+              app.getNode(node.id)?.setData(newNode);
             }
           }
 
           return newNode;
-        }),
-        sourceId,
-        changeEvent,
-      );
-    });
-  }
+        });
+
+        if (newNodes.length) {
+          dataSourceManager.emit('update-data', newNodes, sourceId, changeEvent, page.id);
+        }
+      }
+    }
+  });
 
   return dataSourceManager;
 };

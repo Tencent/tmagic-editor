@@ -75,7 +75,13 @@ class Node extends EventEmitter {
     this.events = events || [];
     this.style = style || {};
     try {
-      this.instance.config = data;
+      if (
+        this.instance &&
+        !Object.isFrozen(this.instance) &&
+        Object.getOwnPropertyDescriptor(this.instance, 'config')?.writable !== false
+      ) {
+        this.instance.config = data;
+      }
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e: any) {}
 

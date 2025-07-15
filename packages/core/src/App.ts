@@ -29,7 +29,7 @@ import Flexible from './Flexible';
 import FlowState from './FlowState';
 import Node from './Node';
 import Page from './Page';
-import { AppOptionsConfig, ErrorHandler } from './type';
+import { AppOptionsConfig, ErrorHandler, GetNodeOptions } from './type';
 import { transformStyle as defaultTransformStyle } from './utils';
 
 class App extends EventEmitter {
@@ -45,6 +45,7 @@ class App extends EventEmitter {
   public codeDsl?: CodeBlockDSL;
   public dataSourceManager?: DataSourceManager;
   public page?: Page;
+  public pageFragments: Map<Id, Page> = new Map();
   public useMock = false;
   public platform = 'mobile';
   public jsEngine: JsEngine = 'browser';
@@ -159,6 +160,10 @@ class App extends EventEmitter {
 
     super.emit('dsl-change', { dsl: config, curPage: pageId });
 
+    this.pageFragments.forEach((page) => {
+      page.destroy();
+    });
+    this.pageFragments.clear();
     this.setPage(pageId);
 
     if (this.dataSourceManager) {
@@ -192,6 +197,11 @@ class App extends EventEmitter {
       for (const [, node] of this.page.nodes) {
         this.eventHelper.bindNodeEvents(node);
       }
+      for (const [, page] of this.pageFragments) {
+        for (const [, node] of page.nodes) {
+          this.eventHelper.bindNodeEvents(node);
+        }
+      }
     }
 
     super.emit('page-change', this.page);
@@ -215,8 +225,8 @@ class App extends EventEmitter {
     }
   }
 
-  public getNode<T extends Node = Node>(id: Id, iteratorContainerId?: Id[], iteratorIndex?: number[]) {
-    return this.page?.getNode<T>(id, iteratorContainerId, iteratorIndex);
+  public getNode<T extends Node = Node>(id: Id, options?: GetNodeOptions) {
+    return this.page?.getNode<T>(id, options);
   }
 
   public registerComponent(type: string, Component: any) {
@@ -299,7 +309,12 @@ class App extends EventEmitter {
 
   public destroy() {
     this.removeAllListeners();
+    this.page?.destroy();
     this.page = undefined;
+    this.pageFragments.forEach((page) => {
+      page.destroy();
+    });
+    this.pageFragments.clear();
 
     this.flexible?.destroy();
     this.flexible = undefined;

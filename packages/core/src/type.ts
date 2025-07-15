@@ -43,3 +43,9 @@ export type AfterEventHandler = (args: {
   source: TMagicNode | DataSource | undefined;
   args: any[];
 }) => void;
+
+export interface GetNodeOptions {
+  iteratorContainerId?: Id[];
+  iteratorIndex?: number[];
+  pageFragmentContainerId?: Id;
+}

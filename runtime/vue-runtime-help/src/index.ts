@@ -33,6 +33,7 @@ export interface ComponentProps<T extends Omit<MComponent, 'id'> = MComponent> {
   iteratorIndex?: number[];
   iteratorContainerId?: Id[];
   containerIndex?: number;
+  pageFragmentContainerId?: Id;
   model?: any;
   disabled?: boolean;
 }

@@ -328,12 +328,11 @@ export const getNodes = (ids: Id[], data: MNode[] = []): MNode[] => {
       return;
     }
 
-    for (let i = 0, l = data.length; i < l; i++) {
-      const item = data[i];
+    for (const item of data) {
       const index = ids.findIndex((id: Id) => `${id}` === `${item.id}`);
 
       if (index > -1) {
-        ids.slice(index, 1);
+        ids.splice(index, 1);
         nodes.push(item);
       }
 
@@ -372,7 +371,7 @@ export const getDepNodeIds = (dataSourceDeps: DataSourceDeps = {}) =>
  * @param data 需要修改的数据
  * @param parentId 父节点 id
  */
-export const replaceChildNode = (newNode: MNode, data?: MNode[], parentId?: Id) => {
+export const replaceChildNode = (newNode: MNode, data?: MNode[], parentId?: Id): void => {
   const path = getNodePath(newNode.id, data);
   const node = path.pop();
   let parent = path.pop();
@@ -390,6 +389,7 @@ export const replaceChildNode = (newNode: MNode, data?: MNode[], parentId?: Id) 
 
 export const DSL_NODE_KEY_COPY_PREFIX = '__tmagic__';
 export const IS_DSL_NODE_KEY = '__tmagic__dslNode';
+export const PAGE_FRAGMENT_CONTAINER_ID_KEY = 'tmagic-page-fragment-container-id';
 
 export const compiledNode = (
   compile: (value: any) => any,

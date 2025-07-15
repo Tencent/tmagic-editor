@@ -32,17 +32,22 @@ export interface UseAppOptions<T extends MNodeInstance = MNodeInstance> {
   config: T;
   iteratorContainerId?: Id[];
   iteratorIndex?: number[];
+  pageFragmentContainerId?: Id;
   methods?: {
     [key: string]: (...args: any[]) => any;
   };
 }
 
 export const useNode = <T extends TMagicNode = TMagicNode>(
-  props: Pick<UseAppOptions, 'config' | 'iteratorContainerId' | 'iteratorIndex'>,
+  props: Pick<UseAppOptions, 'config' | 'iteratorContainerId' | 'iteratorIndex' | 'pageFragmentContainerId'>,
   app = useContext(AppContent),
 ): T | undefined => {
   if (isDslNode(props.config) && props.config.id) {
-    app?.getNode(props.config.id, props.iteratorContainerId, props.iteratorIndex);
+    app?.getNode(props.config.id, {
+      iteratorContainerId: props.iteratorContainerId,
+      iteratorIndex: props.iteratorIndex,
+      pageFragmentContainerId: props.pageFragmentContainerId,
+    });
   }
   return void 0;
 };

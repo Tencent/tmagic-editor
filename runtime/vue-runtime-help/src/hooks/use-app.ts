@@ -30,15 +30,20 @@ interface UseAppOptions<T extends MNodeInstance = MNodeInstance> {
   config: T;
   iteratorContainerId?: Id[];
   iteratorIndex?: number[];
+  pageFragmentContainerId?: Id;
   methods?: Methods;
 }
 
 export const useNode = <T extends TMagicNode = TMagicNode>(
-  props: Pick<UseAppOptions, 'config' | 'iteratorContainerId' | 'iteratorIndex'>,
+  props: Pick<UseAppOptions, 'config' | 'iteratorContainerId' | 'iteratorIndex' | 'pageFragmentContainerId'>,
   app = inject<TMagicApp>('app'),
 ): T | undefined => {
   if (isDslNode(props.config) && props.config.id) {
-    return app?.getNode(props.config.id, props.iteratorContainerId, props.iteratorIndex);
+    return app?.getNode(props.config.id, {
+      iteratorContainerId: props.iteratorContainerId,
+      iteratorIndex: props.iteratorIndex,
+      pageFragmentContainerId: props.pageFragmentContainerId,
+    });
   }
   return void 0;
 };

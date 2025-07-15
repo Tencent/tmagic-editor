@@ -168,15 +168,21 @@ describe('App', () => {
       1,
     );
 
-    expect(app.getNode('text', ['iterator-container_1'], [0])?.data.text).toBe('1');
-    expect(app.getNode('text', ['iterator-container_1'], [1])?.data.text).toBe('2');
-    expect(app.getNode('text_page_fragment', ['iterator-container_1'], [0])?.data.text).toBe('text_page_fragment');
+    expect(app.getNode('text', { iteratorContainerId: ['iterator-container_1'], iteratorIndex: [0] })?.data.text).toBe(
+      '1',
+    );
+    expect(app.getNode('text', { iteratorContainerId: ['iterator-container_1'], iteratorIndex: [1] })?.data.text).toBe(
+      '2',
+    );
+    expect(
+      app.getNode('text_page_fragment', { iteratorContainerId: ['iterator-container_1'], iteratorIndex: [0] })?.data
+        .text,
+    ).toBe('text_page_fragment');
 
-    const ic1 = app.getNode(
-      'iterator-container_11',
-      ['iterator-container_1'],
-      [0],
-    ) as unknown as TMagicIteratorContainer;
+    const ic1 = app.getNode('iterator-container_11', {
+      iteratorContainerId: ['iterator-container_1'],
+      iteratorIndex: [0],
+    }) as unknown as TMagicIteratorContainer;
 
     ic1?.setNodes(
       [
@@ -200,11 +206,10 @@ describe('App', () => {
       1,
     );
 
-    const ic2 = app.getNode(
-      'iterator-container_11',
-      ['iterator-container_1'],
-      [1],
-    ) as unknown as TMagicIteratorContainer;
+    const ic2 = app.getNode('iterator-container_11', {
+      iteratorContainerId: ['iterator-container_1'],
+      iteratorIndex: [1],
+    }) as unknown as TMagicIteratorContainer;
 
     ic2?.setNodes(
       [
@@ -228,10 +233,30 @@ describe('App', () => {
       1,
     );
 
-    expect(app.getNode('text', ['iterator-container_1', 'iterator-container_11'], [0, 0])?.data.text).toBe('111');
-    expect(app.getNode('text', ['iterator-container_1', 'iterator-container_11'], [0, 1])?.data.text).toBe('222');
-    expect(app.getNode('text', ['iterator-container_1', 'iterator-container_11'], [1, 0])?.data.text).toBe('11');
-    expect(app.getNode('text', ['iterator-container_1', 'iterator-container_11'], [1, 1])?.data.text).toBe('22');
+    expect(
+      app.getNode('text', {
+        iteratorContainerId: ['iterator-container_1', 'iterator-container_11'],
+        iteratorIndex: [0, 0],
+      })?.data.text,
+    ).toBe('111');
+    expect(
+      app.getNode('text', {
+        iteratorContainerId: ['iterator-container_1', 'iterator-container_11'],
+        iteratorIndex: [0, 1],
+      })?.data.text,
+    ).toBe('222');
+    expect(
+      app.getNode('text', {
+        iteratorContainerId: ['iterator-container_1', 'iterator-container_11'],
+        iteratorIndex: [1, 0],
+      })?.data.text,
+    ).toBe('11');
+    expect(
+      app.getNode('text', {
+        iteratorContainerId: ['iterator-container_1', 'iterator-container_11'],
+        iteratorIndex: [1, 1],
+      })?.data.text,
+    ).toBe('22');
 
     ic.resetNodes();
 

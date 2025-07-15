@@ -22,6 +22,7 @@ import App from './App';
 import IteratorContainer from './IteratorContainer';
 import type { default as TMagicNode } from './Node';
 import Node from './Node';
+import { GetNodeOptions } from './type';
 interface ConfigOptions {
   config: MPage | MPageFragment;
   app: App;
@@ -64,8 +65,15 @@ class Page extends Node {
 
     if (config.type && this.app.pageFragmentContainerType.has(config.type) && config.pageFragmentId) {
       const pageFragment = this.app.dsl?.items?.find((page) => page.id === config.pageFragmentId);
+
       if (pageFragment) {
-        config.items = [pageFragment];
+        this.app.pageFragments.set(
+          config.id,
+          new Page({
+            config: pageFragment,
+            app: this.app,
+          }),
+        );
       }
     }
 
@@ -76,11 +84,14 @@ class Page extends Node {
 
   public getNode<T extends TMagicNode = TMagicNode>(
     id: Id,
-    iteratorContainerId?: Id[],
-    iteratorIndex?: number[],
+    { iteratorContainerId, iteratorIndex, pageFragmentContainerId }: GetNodeOptions = {},
   ): T | undefined {
     if (this.nodes.has(id)) {
       return this.nodes.get(id) as T;
+    }
+
+    if (pageFragmentContainerId) {
+      return this.app.pageFragments.get(pageFragmentContainerId)?.getNode(id, { iteratorContainerId, iteratorIndex });
     }
 
     if (Array.isArray(iteratorContainerId) && iteratorContainerId.length && Array.isArray(iteratorIndex)) {
