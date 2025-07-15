@@ -13,9 +13,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, inject, type PropType, watch } from 'vue-demi';
+import { computed, defineComponent, type PropType, watch } from 'vue-demi';
 
-import type TMagicApp from '@tmagic/core';
 import {
   COMMON_EVENT_PREFIX,
   type Id,
@@ -23,7 +22,7 @@ import {
   type MIteratorContainer,
   type MNode,
 } from '@tmagic/core';
-import { registerNodeHooks, useNode } from '@tmagic/vue-runtime-help';
+import { registerNodeHooks, useApp } from '@tmagic/vue-runtime-help';
 
 import IteratorItem from './IteratorItem.vue';
 
@@ -53,6 +52,7 @@ export default defineComponent({
     iteratorIndex: Array as PropType<number[]>,
     iteratorContainerId: Array as PropType<Id[]>,
     containerIndex: Number,
+    pageFragmentContainerId: [String, Number] as PropType<Id>,
     model: {
       type: Object,
       default: () => ({}),
@@ -60,8 +60,7 @@ export default defineComponent({
   },
 
   setup(props) {
-    const app = inject<TMagicApp>('app');
-    const node = useNode(props, app);
+    const { app, node } = useApp(props);
     registerNodeHooks(node);
 
     const configs = computed<IteratorItemSchema[]>(() => {
@@ -104,11 +103,11 @@ export default defineComponent({
           return;
         }
 
-        const iteratorContainerNode = app?.getNode<TMagicIteratorContainer>(
-          props.config.id,
-          props.iteratorContainerId,
-          props.iteratorIndex,
-        );
+        const iteratorContainerNode = app?.getNode<TMagicIteratorContainer>(props.config.id, {
+          iteratorContainerId: props.iteratorContainerId,
+          iteratorIndex: props.iteratorIndex,
+          pageFragmentContainerId: props.pageFragmentContainerId,
+        });
 
         if (!iteratorContainerNode) {
           return;

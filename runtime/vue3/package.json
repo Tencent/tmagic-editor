@@ -21,7 +21,7 @@
   "dependencies": {
     "@tmagic/core": "1.6.0-beta.0",
     "@tmagic/stage": "1.6.0-beta.0",
-    "@tmagic/vue-runtime-help": "^1.1.5",
+    "@tmagic/vue-runtime-help": "^1.2.0",
     "axios": "^1.10.0",
     "vue": "catalog:"
   },
@@ -32,7 +32,7 @@
     "@vitejs/plugin-vue": "^6.0.0",
     "@vitejs/plugin-vue-jsx": "^5.0.1",
     "@vue/compiler-sfc": "catalog:",
-    "rollup": "^4.44.1",
+    "rollup": "^4.45.0",
     "rollup-plugin-external-globals": "^0.13.0",
     "sass": "^1.89.2",
     "terser": "^ 5.43.1",

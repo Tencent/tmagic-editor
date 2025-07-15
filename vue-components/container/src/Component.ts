@@ -1,4 +1,4 @@
-import { defineComponent, h, inject, type PropType, provide, resolveDirective, withDirectives } from 'vue-demi';
+import { defineComponent, h, inject, type PropType, provide } from 'vue-demi';
 
 import type TMagicApp from '@tmagic/core';
 import { Id, IS_DSL_NODE_KEY, MComponent } from '@tmagic/core';
@@ -21,12 +21,16 @@ export default defineComponent({
       type: Array as PropType<Id[]>,
       default: () => [],
     },
+    pageFragmentContainerId: {
+      type: [String, Number] as PropType<Id>,
+      default: '',
+    },
   },
 
   setup(props) {
     const userRender = inject<UserRenderFunction>(
       'userRender',
-      ({ h, type, props = {}, attrs = {}, style, className, on, directives = [] }) => {
+      ({ h, type, props = {}, attrs = {}, style, className, on }) => {
         const options: Record<string, any> = {
           ...props,
           ...attrs,
@@ -38,14 +42,6 @@ export default defineComponent({
             options[`on${key[0].toLocaleUpperCase()}${key.substring(1)}`] = handler;
           }
         }
-
-        if (directives.length) {
-          return withDirectives(
-            h(type, options),
-            directives.map((directive) => [resolveDirective(directive.name), directive.value, directive.modifiers]),
-          );
-        }
-
         return h(type, options);
       },
     );
@@ -78,12 +74,14 @@ export default defineComponent({
           containerIndex: props.index,
           iteratorIndex: props.iteratorIndex,
           iteratorContainerId: props.iteratorContainerId,
+          pageFragmentContainerId: props.pageFragmentContainerId,
         },
         attrs: {
           'data-tmagic-id': props.config.id,
           'data-tmagic-iterator-index': props.iteratorIndex.join(',') || undefined,
           'data-tmagic-iterator-container-id': props.iteratorContainerId.join(',') || undefined,
-          'data-container-index': props.index,
+          'data-tmagic-container-index': props.index,
+          'data-tmagic-page-fragment-container-id': props.pageFragmentContainerId || undefined,
         },
       });
     };

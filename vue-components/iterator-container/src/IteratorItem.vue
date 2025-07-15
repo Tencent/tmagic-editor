@@ -13,7 +13,7 @@
 import { defineComponent, inject, type PropType } from 'vue-demi';
 
 import type TMagicApp from '@tmagic/core';
-import type { Id } from '@tmagic/core';
+import { type Id } from '@tmagic/core';
 import { useComponent, useComponentStatus } from '@tmagic/vue-runtime-help';
 
 import { IteratorItemSchema } from './type';

@@ -1,14 +1,15 @@
 <template>
   <div @click="clickHandler">
     <slot>
-      <template v-for="(item, index) in config.items" :key="item.id">
-        <ItemComponent
-          :config="item"
-          :index="index"
-          :iterator-index="iteratorIndex"
-          :iterator-container-id="iteratorContainerId"
-        ></ItemComponent>
-      </template>
+      <ItemComponent
+        v-for="(item, index) in config.items"
+        :key="item.id"
+        :config="item"
+        :index="index"
+        :iterator-index="iteratorIndex"
+        :iterator-container-id="iteratorContainerId"
+        :page-fragment-container-id="pageFragmentContainerId"
+      ></ItemComponent>
     </slot>
   </div>
 </template>
@@ -44,6 +45,7 @@ export default defineComponent({
       default: () => [],
     },
     containerIndex: Number,
+    pageFragmentContainerId: [String, Number] as PropType<Id>,
     model: {
       type: Object,
       default: () => ({}),

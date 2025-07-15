@@ -4,6 +4,7 @@
       :is="containerComponent"
       :iterator-index="iteratorIndex"
       :iterator-container-id="iteratorContainerId"
+      :page-fragment-container-id="config.id"
       :config="containerConfig"
       :model="model"
     ></component>
@@ -11,11 +12,18 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, inject, type PropType } from 'vue-demi';
+import { computed, defineComponent, type PropType, provide } from 'vue-demi';
 
-import type TMagicApp from '@tmagic/core';
-import { cloneDeep, type Id, IS_DSL_NODE_KEY, type MComponent, NodeType, traverseNode } from '@tmagic/core';
-import { registerNodeHooks, useComponent, useNode } from '@tmagic/vue-runtime-help';
+import {
+  cloneDeep,
+  type Id,
+  IS_DSL_NODE_KEY,
+  type MComponent,
+  NodeType,
+  PAGE_FRAGMENT_CONTAINER_ID_KEY,
+  traverseNode,
+} from '@tmagic/core';
+import { registerNodeHooks, useApp, useComponent, useDsl } from '@tmagic/vue-runtime-help';
 
 export default defineComponent({
   name: 'tmagic-page-fragment-container',
@@ -28,6 +36,7 @@ export default defineComponent({
     iteratorIndex: Array as PropType<number[]>,
     iteratorContainerId: Array as PropType<Id[]>,
     containerIndex: Number,
+    pageFragmentContainerId: [String, Number] as PropType<Id>,
     model: {
       type: Object,
       default: () => ({}),
@@ -35,13 +44,14 @@ export default defineComponent({
   },
 
   setup(props) {
-    const app = inject<TMagicApp>('app');
-    const node = useNode(props, app);
+    provide(PAGE_FRAGMENT_CONTAINER_ID_KEY, props.config.id);
+
+    const { app, node } = useApp(props);
     registerNodeHooks(node);
 
     const containerComponent = useComponent({ componentType: 'container', app });
 
-    const fragment = computed(() => app?.dsl?.items?.find((page) => page.id === props.config.pageFragmentId));
+    const { pageConfig: fragment } = useDsl(app, props.config.id);
 
     const containerConfig = computed(() => {
       if (!fragment.value) return { items: [], id: '', type: NodeType.CONTAINER };

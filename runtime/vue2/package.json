@@ -21,20 +21,20 @@
   "dependencies": {
     "@tmagic/core": "1.6.0-beta.0",
     "@tmagic/stage": "1.6.0-beta.0",
-    "@tmagic/vue-runtime-help": "^1.1.5",
+    "@tmagic/vue-runtime-help": "^1.2.0",
     "axios": "^1.10.0",
     "vue": "^2.7.16"
   },
   "devDependencies": {
     "@tmagic/cli": "1.6.0-beta.0",
     "@types/events": "^3.0.3",
-    "rollup": "^4.44.1",
+    "rollup": "^4.45.0",
     "rollup-plugin-external-globals": "^0.13.0",
     "sass": "^1.89.2",
     "terser": "^5.43.1",
     "vite": "catalog:",
-    "@vitejs/plugin-legacy": "^6.0.0",
-    "@vitejs/plugin-vue2": "^2.3.1",
-    "vue-template-compiler": "^2.7.4"
+    "@vitejs/plugin-legacy": "^7.0.0",
+    "@vitejs/plugin-vue2": "^2.3.3",
+    "vue-template-compiler": "^2.7.16"
   }
 }

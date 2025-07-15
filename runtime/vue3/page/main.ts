@@ -16,9 +16,10 @@
  * limitations under the License.
  */
 
-import { createApp, defineAsyncComponent } from 'vue';
+import { createApp, defineAsyncComponent, resolveDirective, withDirectives } from 'vue';
 
 import TMagicApp, { DataSourceManager, DeepObservedData, getUrlParam, registerDataSourceOnDemand } from '@tmagic/core';
+import { UserRenderFunctionOptions } from '@tmagic/vue-runtime-help';
 
 import components from '../.tmagic/async-comp-entry';
 import asyncDataSources from '../.tmagic/async-datasource-entry';
@@ -55,6 +56,32 @@ Object.entries(components).forEach(([type, component]: [string, any]) => {
 Object.values(plugins).forEach((plugin: any) => {
   vueApp.use(plugin, { app });
 });
+
+vueApp.provide(
+  'userRender',
+  ({ h, type, props = {}, attrs = {}, style, className, on, directives = [] }: UserRenderFunctionOptions) => {
+    const options: Record<string, any> = {
+      ...props,
+      ...attrs,
+      style,
+      class: className,
+    };
+    if (on) {
+      for (const [key, handler] of Object.entries(on)) {
+        options[`on${key[0].toLocaleUpperCase()}${key.substring(1)}`] = handler;
+      }
+    }
+
+    if (directives.length) {
+      return withDirectives(
+        h(type, options),
+        directives.map((directive) => [resolveDirective(directive.name), directive.value, directive.modifiers]),
+      );
+    }
+
+    return h(type, options);
+  },
+);
 
 registerDataSourceOnDemand(dsl, asyncDataSources).then((dataSources) => {
   Object.entries(dataSources).forEach(([type, ds]: [string, any]) => {
