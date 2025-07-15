@@ -17,7 +17,6 @@ import { computed, defineComponent, type PropType, provide } from 'vue-demi';
 import {
   cloneDeep,
   type Id,
-  IS_DSL_NODE_KEY,
   type MComponent,
   NodeType,
   PAGE_FRAGMENT_CONTAINER_ID_KEY,
@@ -61,10 +60,10 @@ export default defineComponent({
         traverseNode(fragmentConfigWithoutId, (node) => {
           node.id = '';
         });
-        return { ...fragmentConfigWithoutId, [IS_DSL_NODE_KEY]: false };
+        return fragmentConfigWithoutId;
       }
 
-      return { ...fragment.value, [IS_DSL_NODE_KEY]: false };
+      return fragment.value;
     });
 
     return {
