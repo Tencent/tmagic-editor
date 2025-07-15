@@ -1,3 +1,17 @@
+# [1.6.0-beta.0](https://github.com/Tencent/tmagic-editor/compare/v1.5.24...v1.6.0-beta.0) (2025-07-15)
+
+
+### Bug Fixes
+
+* **editor:** 依赖收集后没有同步到dsl中 ([aaf8046](https://github.com/Tencent/tmagic-editor/commit/aaf8046c63949ae733719409eb12109ef17b2cf1))
+
+
+### Features
+
+* **core,data-source,utils,react-runtime-help,vue-runtime-help:** 新增对页面片节点的管理 ([6a54720](https://github.com/Tencent/tmagic-editor/commit/6a547200681991ae8abefd0e3d72a603d21f12d4))
+
+
+
 ## [1.5.24](https://github.com/Tencent/tmagic-editor/compare/v1.5.23...v1.5.24) (2025-07-03)
 
 
