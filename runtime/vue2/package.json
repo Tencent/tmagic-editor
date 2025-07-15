@@ -28,7 +28,7 @@
   "devDependencies": {
     "@tmagic/cli": "1.6.0-beta.0",
     "@types/events": "^3.0.3",
-    "rollup": "^4.45.0",
+    "rollup": "4.44.1",
     "rollup-plugin-external-globals": "^0.13.0",
     "sass": "^1.89.2",
     "terser": "^5.43.1",

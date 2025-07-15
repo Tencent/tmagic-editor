@@ -44,7 +44,7 @@ export default defineConfig({
   base: '/tmagic-editor/playground/',
 
   resolve: {
-    alias: [
+    alias: process.env.NODE_ENV === 'development' ? [
       {
         find: /^@tmagic\/editor\/dist\/style.css/,
         replacement: path.join(__dirname, '../packages/editor/src/theme/index.scss'),
@@ -85,7 +85,7 @@ export default defineConfig({
         find: /^@tmagic\/element-plus-adapter/,
         replacement: path.join(__dirname, '../packages/element-plus-adapter/src/index.ts'),
       },
-    ],
+    ] : [],
   },
 
   optimizeDeps: {

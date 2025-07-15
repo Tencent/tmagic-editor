@@ -68,7 +68,7 @@
     "prettier": "^3.5.3",
     "recast": "^0.23.11",
     "rimraf": "^3.0.2",
-    "rollup": "^4.45.0",
+    "rollup": "4.44.1",
     "rollup-plugin-dts": "^6.2.1",
     "semver": "^7.7.1",
     "serialize-javascript": "^6.0.2",
