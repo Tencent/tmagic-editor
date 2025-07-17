@@ -14,14 +14,7 @@
 <script lang="ts">
 import { computed, defineComponent, type PropType, provide } from 'vue-demi';
 
-import {
-  cloneDeep,
-  type Id,
-  type MComponent,
-  NodeType,
-  PAGE_FRAGMENT_CONTAINER_ID_KEY,
-  traverseNode,
-} from '@tmagic/core';
+import { type Id, type MComponent, NodeType, PAGE_FRAGMENT_CONTAINER_ID_KEY } from '@tmagic/core';
 import { registerNodeHooks, useApp, useComponent, useDsl } from '@tmagic/vue-runtime-help';
 
 export default defineComponent({
@@ -50,18 +43,14 @@ export default defineComponent({
 
     const containerComponent = useComponent({ componentType: 'container', app });
 
+    if (!props.config.id) {
+      throw new Error('page-fragment-container must have id');
+    }
+
     const { pageConfig: fragment } = useDsl(app, props.config.id);
 
     const containerConfig = computed(() => {
       if (!fragment.value) return { items: [], id: '', type: NodeType.CONTAINER };
-
-      if (app?.platform === 'editor') {
-        const fragmentConfigWithoutId = cloneDeep(fragment.value);
-        traverseNode(fragmentConfigWithoutId, (node) => {
-          node.id = '';
-        });
-        return fragmentConfigWithoutId;
-      }
 
       return fragment.value;
     });
