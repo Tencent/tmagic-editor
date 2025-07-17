@@ -8,6 +8,7 @@
       :iterator-container-id="
         config.id ? [...(iteratorContainerId || []), config.id] : [...(iteratorContainerId || [])]
       "
+      :page-fragment-container-id="pageFragmentContainerId"
     ></IteratorItem>
   </div>
 </template>

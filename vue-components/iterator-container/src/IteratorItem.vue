@@ -6,6 +6,7 @@
     :config="config"
     :iterator-index="iteratorIndex"
     :iterator-container-id="iteratorContainerId"
+    :page-fragment-container-id="pageFragmentContainerId"
   ></component>
 </template>
 
@@ -29,6 +30,7 @@ export default defineComponent({
     iteratorIndex: Array as PropType<number[]>,
     iteratorContainerId: Array as PropType<Id[]>,
     containerIndex: Number,
+    pageFragmentContainerId: [String, Number] as PropType<Id>,
     index: Number,
     model: {
       type: Object,
