@@ -1,0 +1,1 @@
+{"version":3,"file":"datasource-entry-yoD6TSFD.js","sources":["../../../../../../runtime/vue3/.tmagic/datasource-entry.ts"],"sourcesContent":["const datasources: Record<string, any> = {};\nexport default datasources;"],"names":["datasources"],"mappings":"AAAA,MAAMA,EAAmC,CAAA"}
