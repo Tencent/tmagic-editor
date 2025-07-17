@@ -49,7 +49,7 @@ class Node extends EventEmitter {
     [key: string]: any;
   };
   public events: EventConfig[] = [];
-  public instance?: any = {};
+  public instance?: any = null;
   public page?: Page;
   public parent?: Node;
   public app: TMagicApp;
@@ -78,7 +78,8 @@ class Node extends EventEmitter {
       if (
         this.instance &&
         !Object.isFrozen(this.instance) &&
-        Object.getOwnPropertyDescriptor(this.instance, 'config')?.writable !== false
+        Object.getOwnPropertyDescriptor(this.instance, 'config')?.writable !== false &&
+        !this.instance.__isVue
       ) {
         this.instance.config = data;
       }
