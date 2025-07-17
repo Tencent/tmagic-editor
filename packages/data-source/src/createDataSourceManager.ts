@@ -18,7 +18,7 @@
 import { union } from 'lodash-es';
 
 import type { default as TMagicApp } from '@tmagic/core';
-import { getDepNodeIds, getNodes, isPage, isPageFragment } from '@tmagic/core';
+import { getDepNodeIds, getNodes, isPage, isPageFragment, replaceChildNode } from '@tmagic/core';
 
 import DataSourceManager from './DataSourceManager';
 import type { ChangeEvent, DataSourceManagerData } from './types';
@@ -74,14 +74,21 @@ export const createDataSourceManager = (app: TMagicApp, useMock?: boolean, initi
           if (typeof app.page?.setData === 'function') {
             if (isPage(newNode)) {
               app.page.setData(newNode);
-            } else if (isPageFragment(newNode)) {
-              for (const [, page] of app.pageFragments) {
-                if (page.data.id === node.id) {
-                  page.setData(newNode);
+            } else if (page.id === app.page.data.id && !app.page.instance) {
+              replaceChildNode(newNode, [app.page.data]);
+            }
+
+            app.getNode(node.id)?.setData(newNode);
+
+            for (const [, pageFragment] of app.pageFragments) {
+              if (pageFragment.data.id === newNode.id) {
+                pageFragment.setData(newNode);
+              } else if (pageFragment.data.id === page.id) {
+                pageFragment.getNode(newNode.id)?.setData(newNode);
+                if (!pageFragment.instance) {
+                  replaceChildNode(newNode, [pageFragment.data]);
                 }
               }
-            } else {
-              app.getNode(node.id)?.setData(newNode);
             }
           }
 
