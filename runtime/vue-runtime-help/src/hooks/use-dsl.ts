@@ -4,7 +4,7 @@ import type TMagicApp from '@tmagic/core';
 import type { ChangeEvent, Id, MNode } from '@tmagic/core';
 import { isPage, isPageFragment, replaceChildNode } from '@tmagic/core';
 
-export const useDsl = (app = inject<TMagicApp>('app'), pageFragmentConstainerId: Id) => {
+export const useDsl = (app = inject<TMagicApp>('app'), pageFragmentConstainerId?: Id) => {
   if (!app) {
     throw new Error('useDsl must be used after MagicApp is created');
   }
