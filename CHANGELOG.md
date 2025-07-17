@@ -1,3 +1,22 @@
+# [1.6.0-beta.1](https://github.com/Tencent/tmagic-editor/compare/v1.6.0-beta.0...v1.6.0-beta.1) (2025-07-17)
+
+
+### Bug Fixes
+
+* **data-source:** 页面未初始化好之前，数据源数据变化后需要修改page.data ([305ea46](https://github.com/Tencent/tmagic-editor/commit/305ea4619fe15efbae069ef3f289c8742e8d51ee))
+* **vue-components:** iterator-container 传递 page-fragment-contianer-id 参数 ([7799a5d](https://github.com/Tencent/tmagic-editor/commit/7799a5da618b0136f4b3c12315c69d21b27a5965))
+* **vue-components:** page-fragment-container不标记为不是node节点 ([bf9fad1](https://github.com/Tencent/tmagic-editor/commit/bf9fad18b64521a9075a60f7e6e662b01d37f66f))
+
+
+### Features
+
+* **core:** Node中的instance初始为null，用于判断是否与组件产生关联 ([291de20](https://github.com/Tencent/tmagic-editor/commit/291de2005de54b8eeba818de67ab3506885f5057))
+* **editor:** 页面片容器内的组件不允许选中 ([ded24c8](https://github.com/Tencent/tmagic-editor/commit/ded24c8b4ff2c203260ec7633fc85325c98a565c))
+* **vue-components:** page-fragment-container编辑器中不去除内部组件id，不然会导致无法从app中获取dsl ([34bc223](https://github.com/Tencent/tmagic-editor/commit/34bc223f0241d9eef39450ebcef8a92b23c63f37))
+* **vue-components:** 添加页面片容器id prop ([a43825c](https://github.com/Tencent/tmagic-editor/commit/a43825caa27695fcd85cc4b5351a00080fefcec0))
+
+
+
 # [1.6.0-beta.0](https://github.com/Tencent/tmagic-editor/compare/v1.5.24...v1.6.0-beta.0) (2025-07-15)
 
 
