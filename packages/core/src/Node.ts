@@ -202,6 +202,25 @@ class Node extends EventEmitter {
           }
         }
 
+        if (this.app.eventHelper) {
+          for (const eventConfig of this.app.eventHelper.getEventQueue()) {
+            for (const [, page] of this.app.pageFragments) {
+              const node = page.getNode(eventConfig.toId);
+              if (node && node === this) {
+                if (typeof instance[eventConfig.method] === 'function') {
+                  await instance[eventConfig.method](eventConfig.fromCpt, ...eventConfig.args);
+                }
+
+                eventConfig.handled = true;
+              }
+            }
+          }
+
+          this.app.eventHelper.eventQueue = this.app.eventHelper
+            .getEventQueue()
+            .filter((eventConfig) => !eventConfig.handled);
+        }
+
         if (this.data[NODE_DISABLE_CODE_BLOCK_KEY] !== true) {
           this.runHookCode('mounted');
         }

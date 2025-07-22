@@ -31,6 +31,7 @@ import {
   type DataSourceItemConfig,
   type EventActionItem,
   type EventConfig,
+  Id,
   NODE_DISABLE_CODE_BLOCK_KEY,
   NODE_DISABLE_DATA_SOURCE_KEY,
 } from '@tmagic/schema';
@@ -41,8 +42,17 @@ import FlowState from './FlowState';
 import type { default as TMagicNode } from './Node';
 import { AfterEventHandler, BeforeEventHandler } from './type';
 
+interface EventCache {
+  toId: Id;
+  method: string;
+  fromCpt: any;
+  args: any[];
+  handled?: boolean;
+}
+
 export default class EventHelper extends EventEmitter {
   public app: TMagicApp;
+  public eventQueue: EventCache[] = [];
 
   private nodeEventList = new Map<(fromCpt: TMagicNode, ...args: any[]) => void, symbol>();
   private dataSourceEventList = new Map<string, Map<string, (...args: any[]) => void>>();
@@ -160,6 +170,14 @@ export default class EventHelper extends EventEmitter {
     this.dataSourceEventList.clear();
   }
 
+  public getEventQueue() {
+    return this.eventQueue;
+  }
+
+  public addEventToQueue(event: EventCache) {
+    this.eventQueue.push(event);
+  }
+
   /**
    * 事件联动处理函数
    * @param eventsConfigIndex 事件配置索引，可以通过此索引从node.event中获取最新事件配置
@@ -269,6 +287,16 @@ export default class EventHelper extends EventEmitter {
       if (node) {
         toNodes.push(node);
       }
+    }
+
+    if (toNodes.length === 0) {
+      this.addEventToQueue({
+        toId: to,
+        method: methodName,
+        fromCpt,
+        args,
+      });
+      return;
     }
 
     const instanceMethodPropmise = [];
