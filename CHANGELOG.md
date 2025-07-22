@@ -1,3 +1,13 @@
+# [1.6.0-beta.2](https://github.com/Tencent/tmagic-editor/compare/v1.6.0-beta.1...v1.6.0-beta.2) (2025-07-22)
+
+
+### Features
+
+* **core:** 异步加载dsl片段下，事件触发时node可能不存在 ([01b88db](https://github.com/Tencent/tmagic-editor/commit/01b88dba251a1f7cc29947c2a80e15839e50fcca))
+* **utile:** replaceChildNode找不多目标不报错 ([2605011](https://github.com/Tencent/tmagic-editor/commit/2605011df481d9edba5503d2ee3b3c9d4b76d0a3))
+
+
+
 # [1.6.0-beta.1](https://github.com/Tencent/tmagic-editor/compare/v1.6.0-beta.0...v1.6.0-beta.1) (2025-07-17)
 
 
