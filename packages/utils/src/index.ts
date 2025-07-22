@@ -380,8 +380,15 @@ export const replaceChildNode = (newNode: MNode, data?: MNode[], parentId?: Id):
     parent = getNodePath(parentId, data).pop();
   }
 
-  if (!node) throw new Error('未找到目标节点');
-  if (!parent) throw new Error('未找到父节点');
+  if (!node) {
+    console.warn(`未找到目标节点(${newNode.id})`);
+    return;
+  }
+
+  if (!parent) {
+    console.warn(`未找到父节点(${newNode.id})`);
+    return;
+  }
 
   const index = parent.items?.findIndex((child: MNode) => child.id === node.id);
   parent.items.splice(index, 1, newNode);
