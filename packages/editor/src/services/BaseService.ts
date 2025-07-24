@@ -206,7 +206,9 @@ export default class extends EventEmitter {
 
   public usePlugin(options: Record<string, Function>) {
     for (const [methodName, method] of Object.entries(options)) {
-      if (typeof method === 'function') this.pluginOptionsList[methodName].push(method);
+      if (typeof method === 'function' && !this.pluginOptionsList[methodName].includes(method)) {
+        this.pluginOptionsList[methodName].push(method);
+      }
     }
   }
 
