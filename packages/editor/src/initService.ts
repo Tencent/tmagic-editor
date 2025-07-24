@@ -363,6 +363,12 @@ export const initServiceEvents = (
 
       stage.renderer?.once('runtime-ready', (runtime) => {
         runtime.updateRootConfig?.(cloneDeep(toRaw(editorService.get('root')))!);
+        const page = editorService.get('page');
+        const node = editorService.get('node');
+        page?.id && runtime?.updatePageId?.(page.id);
+        setTimeout(() => {
+          node && stage?.select(toRaw(node.id));
+        });
       });
     },
   );
