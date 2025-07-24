@@ -1,3 +1,13 @@
+# [1.6.0-beta.3](https://github.com/Tencent/tmagic-editor/compare/v1.6.0-beta.2...v1.6.0-beta.3) (2025-07-24)
+
+
+### Bug Fixes
+
+* **editor:** runtimeUrl更新后需要重新设置runtime的dsl ([d31a544](https://github.com/Tencent/tmagic-editor/commit/d31a544a2312b4d78ae74eb600760df450946db8))
+* **editor:** 修复代码块编辑器的更新内容后按下ctrl+s光标会偏移的问题 ([07b8f5f](https://github.com/Tencent/tmagic-editor/commit/07b8f5fe8303bad57490c7dd0eba00e435fbfad5))
+
+
+
 # [1.6.0-beta.2](https://github.com/Tencent/tmagic-editor/compare/v1.6.0-beta.1...v1.6.0-beta.2) (2025-07-22)
 
 
