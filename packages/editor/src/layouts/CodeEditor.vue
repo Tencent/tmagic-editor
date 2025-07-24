@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue';
+import { nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
 import { FullScreen } from '@element-plus/icons-vue';
 import { throttle } from 'lodash-es';
 import serialize from 'serialize-javascript';
@@ -62,7 +62,7 @@ const props = withDefaults(
 const emit = defineEmits(['initd', 'save']);
 
 const toString = (v: string | any, language: string): string => {
-  let value = '';
+  let value: string;
   if (typeof v !== 'string') {
     if (language === 'json') {
       value = JSON.stringify(v, null, 2);
@@ -113,19 +113,40 @@ const setEditorValue = (v: string | any, m: string | any) => {
   if (props.type === 'diff') {
     const originalModel = monaco.editor.createModel(values.value, 'text/javascript');
     const modifiedModel = monaco.editor.createModel(toString(m, props.language), 'text/javascript');
-
-    return vsDiffEditor?.setModel({
+    const position = vsDiffEditor?.getPosition();
+    const result = vsDiffEditor?.setModel({
       original: originalModel,
       modified: modifiedModel,
     });
+    if (position) {
+      vsDiffEditor?.setPosition(position);
+      vsDiffEditor?.focus();
+    }
+    return result;
   }
-
-  return vsEditor?.setValue(values.value);
+  // 保存当前光标位置
+  const position = vsEditor?.getPosition();
+  const result = vsEditor?.setValue(values.value);
+  // 恢复光标位置
+  if (position) {
+    vsEditor?.setPosition(position);
+    vsEditor?.focus();
+  }
+  return result;
 };
 
 const getEditorValue = () =>
   (props.type === 'diff' ? vsDiffEditor?.getModifiedEditor().getValue() : vsEditor?.getValue()) || '';
 
+const handleKeyDown = (e: KeyboardEvent) => {
+  if (e.keyCode === 83 && (navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey)) {
+    e.preventDefault();
+    e.stopPropagation();
+    const newValue = getEditorValue();
+    values.value = newValue;
+    emit('save', props.parse ? parseCode(newValue, props.language) : newValue);
+  }
+};
 const init = async () => {
   if (!codeEditorEl.value) return;
 
@@ -149,16 +170,7 @@ const init = async () => {
   setEditorValue(props.initValues, props.modifiedValues);
 
   emit('initd', vsEditor);
-
-  codeEditorEl.value.addEventListener('keydown', (e) => {
-    if (e.keyCode === 83 && (navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey)) {
-      e.preventDefault();
-      e.stopPropagation();
-      const newValue = getEditorValue();
-      values.value = newValue;
-      emit('save', props.parse ? parseCode(newValue, props.language) : newValue);
-    }
-  });
+  codeEditorEl.value.addEventListener('keydown', handleKeyDown);
 
   if (props.type !== 'diff' && props.autoSave) {
     vsEditor?.onDidBlurEditorWidget(() => {
@@ -214,7 +226,9 @@ onBeforeUnmount(() => {
   vsEditor = null;
   vsDiffEditor = null;
 });
-
+onUnmounted(() => {
+  codeEditorEl.value?.removeEventListener('keydown', handleKeyDown);
+});
 const fullScreen = ref(false);
 const fullScreenHandler = () => {
   fullScreen.value = !fullScreen.value;
