@@ -129,7 +129,7 @@
 <script lang="ts" setup>
 import { EventEmitter } from 'events';
 
-import { provide, watch } from 'vue';
+import { provide } from 'vue';
 
 import type { MApp } from '@tmagic/core';
 
@@ -210,22 +210,6 @@ const stageOptions: StageOptions = {
 };
 
 stageOverlayService.set('stageOptions', stageOptions);
-
-watch(
-  () => props.runtimeUrl,
-  (url) => {
-    if (!url) {
-      return;
-    }
-
-    const stage = editorService.get('stage');
-    if (!stage) {
-      return;
-    }
-
-    stage.reloadIframe(url);
-  },
-);
 
 provide('services', services);
 

@@ -347,6 +347,26 @@ export const initServiceEvents = (
     },
   );
 
+  watch(
+    () => props.runtimeUrl,
+    (url) => {
+      if (!url) {
+        return;
+      }
+
+      const stage = editorService.get('stage');
+      if (!stage) {
+        return;
+      }
+
+      stage.reloadIframe(url);
+
+      stage.renderer?.once('runtime-ready', (runtime) => {
+        runtime.updateRootConfig?.(cloneDeep(toRaw(editorService.get('root')))!);
+      });
+    },
+  );
+
   const getStage = (): Promise<StageCore> => {
     const stage = editorService.get('stage');
     if (stage) {
@@ -434,7 +454,7 @@ export const initServiceEvents = (
       delete value.dataSourceCondDeps;
     }
 
-    const handler = async () => {
+    (async () => {
       const nodeId = editorService.get('node')?.id || props.defaultSelected;
       let node;
       if (nodeId) {
@@ -453,9 +473,7 @@ export const initServiceEvents = (
       if (toRaw(value) !== toRaw(preValue)) {
         emit('update:modelValue', value);
       }
-    };
-
-    handler();
+    })();
   };
 
   // 新增节点，收集依赖
