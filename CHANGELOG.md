@@ -1,3 +1,13 @@
+# [1.6.0-beta.4](https://github.com/Tencent/tmagic-editor/compare/v1.6.0-beta.3...v1.6.0-beta.4) (2025-07-24)
+
+
+### Bug Fixes
+
+* **editor:** runtime url更新后恢复当前选中状态 ([c2830fc](https://github.com/Tencent/tmagic-editor/commit/c2830fca6b21648b51a486650caba3f9eb753c91))
+* **editor:** 避免services plugin重复添加 ([cdb07df](https://github.com/Tencent/tmagic-editor/commit/cdb07dfaea13a1813caddd59ba7e8efbdb374b3c))
+
+
+
 # [1.6.0-beta.3](https://github.com/Tencent/tmagic-editor/compare/v1.6.0-beta.2...v1.6.0-beta.3) (2025-07-24)
 
 
