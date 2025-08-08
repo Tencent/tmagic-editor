@@ -200,9 +200,9 @@ export default class EventHelper extends EventEmitter {
         if (typeof config === 'number') {
           // 事件响应中可能会有修改数据源数据的，会更新dsl，所以这里需要重新获取
           const actionItem = ((fromCpt as TMagicNode).events[config] as EventConfig).actions[i];
-          this.actionHandler(actionItem, fromCpt as TMagicNode, args, flowState);
+          await this.actionHandler(actionItem, fromCpt as TMagicNode, args, flowState);
         } else {
-          this.actionHandler(actions[i], fromCpt as DataSource, args, flowState);
+          await this.actionHandler(actions[i], fromCpt as DataSource, args, flowState);
         }
       }
       flowState.reset();
