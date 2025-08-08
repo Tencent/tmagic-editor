@@ -1,3 +1,12 @@
+# [1.6.0-beta.5](https://github.com/Tencent/tmagic-editor/compare/v1.6.0-beta.4...v1.6.0-beta.5) (2025-08-08)
+
+
+### Bug Fixes
+
+* **core:** 事件行为应该为串行执行 ([fc1c9fe](https://github.com/Tencent/tmagic-editor/commit/fc1c9feafd337ad8fa8a9b5b3501278779d32410))
+
+
+
 # [1.6.0-beta.4](https://github.com/Tencent/tmagic-editor/compare/v1.6.0-beta.3...v1.6.0-beta.4) (2025-07-24)
 
 
