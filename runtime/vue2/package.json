@@ -1,6 +1,6 @@
 {
   "name": "runtime-vue2",
-  "version": "1.6.0-beta.5",
+  "version": "1.6.0-beta.6",
   "type": "module",
   "private": true,
   "scripts": {
@@ -19,14 +19,14 @@
     "build:ds:event": "vite build --config build.vite.config.ts --mode ds:event"
   },
   "dependencies": {
-    "@tmagic/core": "1.6.0-beta.5",
-    "@tmagic/stage": "1.6.0-beta.5",
+    "@tmagic/core": "1.6.0-beta.6",
+    "@tmagic/stage": "1.6.0-beta.6",
     "@tmagic/vue-runtime-help": "^1.2.0",
     "axios": "^1.10.0",
     "vue": "^2.7.16"
   },
   "devDependencies": {
-    "@tmagic/cli": "1.6.0-beta.5",
+    "@tmagic/cli": "1.6.0-beta.6",
     "@types/events": "^3.0.3",
     "rollup": "4.44.1",
     "rollup-plugin-external-globals": "^0.13.0",

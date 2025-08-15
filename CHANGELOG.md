@@ -1,3 +1,12 @@
+# [1.6.0-beta.6](https://github.com/Tencent/tmagic-editor/compare/v1.6.0-beta.5...v1.6.0-beta.6) (2025-08-15)
+
+
+### Features
+
+* **core:** 事件支持关联数据源自身方法 ([4c6118f](https://github.com/Tencent/tmagic-editor/commit/4c6118f50f8e78e8db157f9b32c49f5f068e3e9a))
+
+
+
 # [1.6.0-beta.5](https://github.com/Tencent/tmagic-editor/compare/v1.6.0-beta.4...v1.6.0-beta.5) (2025-08-08)
 
 
