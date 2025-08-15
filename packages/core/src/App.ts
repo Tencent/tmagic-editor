@@ -288,21 +288,20 @@ class App extends EventEmitter {
 
     if (!dataSource) return;
 
-    const methods = dataSource.methods || [];
+    try {
+      const methods = dataSource.methods || [];
 
-    const method = methods.find((item) => item.name === methodName);
-
-    if (!method) return;
-
-    if (typeof method.content === 'function') {
-      try {
+      const method = methods.find((item) => item.name === methodName);
+      if (method && typeof method.content === 'function') {
         await method.content({ app: this, params, dataSource, eventParams: args, flowState });
-      } catch (e: any) {
-        if (this.errorHandler) {
-          this.errorHandler(e, dataSource, { type: 'data-source-method', params, eventParams: args, flowState });
-        } else {
-          throw e;
-        }
+      } else if (typeof dataSource[methodName] === 'function') {
+        await dataSource[methodName]();
+      }
+    } catch (e: any) {
+      if (this.errorHandler) {
+        this.errorHandler(e, dataSource, { type: 'data-source-method', params, eventParams: args, flowState });
+      } else {
+        throw e;
       }
     }
   }
