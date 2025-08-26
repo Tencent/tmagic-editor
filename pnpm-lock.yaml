@@ -1145,8 +1145,8 @@ importers:
         specifier: ^1.2.0
         version: 1.2.1(@tmagic/core@1.6.0-beta.6(typescript@5.9.2))(@tmagic/stage@1.6.0-beta.6(@tmagic/core@1.6.0-beta.6(typescript@5.9.2))(typescript@5.9.2))(@vue/composition-api@1.7.2(vue@3.5.20(typescript@5.9.2)))(typescript@5.9.2)(vue@3.5.20(typescript@5.9.2))
       axios:
-        specifier: ^1.10.0
-        version: 1.10.0
+        specifier: ^1.11.0
+        version: 1.11.0
       vue:
         specifier: 'catalog:'
         version: 3.5.20(typescript@5.9.2)
@@ -1154,6 +1154,9 @@ importers:
       '@tmagic/cli':
         specifier: 1.6.0-beta.6
         version: 1.6.0-beta.6(typescript@5.9.2)
+      '@types/fs-extra':
+        specifier: ^11.0.4
+        version: 11.0.4
       '@types/node':
         specifier: ^24.0.10
         version: 24.0.10
@@ -1169,6 +1172,12 @@ importers:
       '@vue/compiler-sfc':
         specifier: 'catalog:'
         version: 3.5.20
+      fs-extra:
+        specifier: ^11.3.1
+        version: 11.3.1
+      minimist:
+        specifier: ^1.2.8
+        version: 1.2.8
       rollup:
         specifier: 4.44.1
         version: 4.44.1
@@ -1179,7 +1188,7 @@ importers:
         specifier: ^1.91.0
         version: 1.91.0
       terser:
-        specifier: ^ 5.43.1
+        specifier: ^5.43.1
         version: 5.43.1
       typescript:
         specifier: 'catalog:'
@@ -4930,6 +4939,10 @@ packages:
 
   fs-extra@11.3.0:
     resolution: {integrity: sha512-Z4XaCL6dUDHfP/jT25jJKMmtxvuwbkrD1vNSMFlo9lNLY2c5FHYSQgHPRZUjAB26TpDEoW9HCOgplrdbaPV/ew==}
+    engines: {node: '>=14.14'}
+
+  fs-extra@11.3.1:
+    resolution: {integrity: sha512-eXvGGwZ5CL17ZSwHWd3bbgk7UUpF6IFHtP57NYYakPvHOs8GDgDe5KJI36jIJzDkJ6eJjuzRA8eBQb6SkKue0g==}
     engines: {node: '>=14.14'}
 
   fs-extra@9.1.0:
@@ -11230,6 +11243,12 @@ snapshots:
   framework-utils@1.1.0: {}
 
   fs-extra@11.3.0:
+    dependencies:
+      graceful-fs: 4.2.11
+      jsonfile: 6.1.0
+      universalify: 2.0.1
+
+  fs-extra@11.3.1:
     dependencies:
       graceful-fs: 4.2.11
       jsonfile: 6.1.0

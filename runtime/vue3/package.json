@@ -8,37 +8,33 @@
   },
   "scripts": {
     "tmagic": "tmagic entry",
-    "dev": "vite --config dev.vite.config.ts",
-    "build": "npm run build:libs && npm run build:page && npm run build:playground",
-    "build:page": "vite build --config build.vite.config.ts --mode page",
-    "build:playground": "vite build --config build.vite.config.ts --mode playground",
-    "build:libs": "tmagic entry && npm run build:config && npm run build:value && npm run build:event && npm run build:ds:libs",
-    "build:ds:libs": "npm run build:ds:config && npm run build:ds:value && npm run build:ds:event",
-    "build:config": "vite build --config build.vite.config.ts --mode config",
-    "build:value": "vite build --config build.vite.config.ts --mode value",
-    "build:event": "vite build --config build.vite.config.ts --mode event",
-    "build:ds:config": "vite build --config build.vite.config.ts --mode ds:config",
-    "build:ds:value": "vite build --config build.vite.config.ts --mode ds:value",
-    "build:ds:event": "vite build --config build.vite.config.ts --mode ds:event"
+    "dev": "vite --force",
+    "serve": "vite preview",
+    "build": "rm -rf ./dist && node scripts/build.mjs --type=all && npm run build:client",
+    "build:libs": "tmagic entry && node scripts/build.mjs --type=res",
+    "build:client": "vite build --config ./page/vite.config.ts && vite build --config ./playground/vite.config.ts"
   },
   "dependencies": {
     "@tmagic/core": "1.6.0-beta.6",
     "@tmagic/stage": "1.6.0-beta.6",
     "@tmagic/vue-runtime-help": "^1.2.0",
-    "axios": "^1.10.0",
+    "axios": "^1.11.0",
     "vue": "catalog:"
   },
   "devDependencies": {
     "@tmagic/cli": "1.6.0-beta.6",
+    "@types/fs-extra": "^11.0.4",
     "@types/node": "^24.0.10",
     "@vitejs/plugin-legacy": "^7.2.1",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vitejs/plugin-vue-jsx": "^5.1.0",
     "@vue/compiler-sfc": "catalog:",
+    "fs-extra": "^11.3.1",
+    "minimist": "^1.2.8",
     "rollup": "4.44.1",
     "rollup-plugin-external-globals": "^0.13.0",
     "sass": "^1.91.0",
-    "terser": "^ 5.43.1",
+    "terser": "^5.43.1",
     "typescript": "catalog:",
     "vite": "catalog:"
   }

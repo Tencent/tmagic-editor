@@ -16,18 +16,25 @@
  * limitations under the License.
  */
 
-import path from 'path';
+import path from 'node:path';
 
 import { defineConfig } from 'vite';
+import legacy from '@vitejs/plugin-legacy';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
 
 export default defineConfig({
-  plugins: [vue(), vueJsx()],
+  plugins: [
+    vue(),
+    vueJsx(),
+    legacy({
+      targets: ['defaults', 'not IE 11'],
+    })
+  ],
 
   resolve: {
     alias: [
-      { find: /^vue$/, replacement: path.join(__dirname, 'node_modules/vue/dist/vue.esm-bundler.js') },
+      { find: /^vue$/, replacement: path.join(__dirname, 'node_modules/vue') },
       {
         find: /^@tmagic\/core\/resetcss.css/,
         replacement: path.join(__dirname, '../../packages/core/resetcss.css'),
@@ -44,7 +51,7 @@ export default defineConfig({
 
   root: './',
 
-  base: '/tmagic-editor/playground/runtime/vue3/',
+  base: '/tmagic-editor/playground/runtime/vue3',
 
   publicDir: 'public',
 
@@ -56,5 +63,14 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 8078,
     strictPort: true,
+  },
+
+  build: {
+    rollupOptions: {
+      input: {
+        page: path.resolve(__dirname, './page/index.html'),
+        playground: path.resolve(__dirname, './playground/index.html'),
+      },
+    },
   },
 });
