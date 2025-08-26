@@ -12,12 +12,12 @@
     "serve": "vite preview"
   },
   "dependencies": {
-    "@element-plus/icons-vue": "^2.3.1",
+    "@element-plus/icons-vue": "^2.3.2",
     "@tmagic/core": "1.6.0-beta.6",
     "@tmagic/editor": "1.6.0-beta.6",
     "@tmagic/element-plus-adapter": "1.6.0-beta.6",
     "@tmagic/tmagic-form-runtime": "1.1.3",
-    "element-plus": "^2.9.11",
+    "element-plus": "^2.11.1",
     "lodash-es": "^4.17.21",
     "monaco-editor": "^0.52.2",
     "serialize-javascript": "^6.0.2",
@@ -28,15 +28,15 @@
     "@types/lodash-es": "^4.17.4",
     "@types/node": "^24.0.10",
     "@types/serialize-javascript": "^5.0.4",
-    "@vitejs/plugin-legacy": "^7.0.0",
-    "@vitejs/plugin-vue": "^6.0.0",
-    "@vitejs/plugin-vue-jsx": "^5.0.1",
+    "@vitejs/plugin-legacy": "^7.2.1",
+    "@vitejs/plugin-vue": "^6.0.1",
+    "@vitejs/plugin-vue-jsx": "^5.1.0",
     "@vue/compiler-sfc": "catalog:",
-    "sass": "^1.89.2",
+    "sass": "^1.91.0",
     "terser": "^5.43.1",
     "typescript": "catalog:",
-    "unplugin-auto-import": "^19.3.0",
-    "unplugin-vue-components": "^28.8.0",
+    "unplugin-auto-import": "^20.0.0",
+    "unplugin-vue-components": "^29.0.0",
     "vite": "catalog:"
   }
 }

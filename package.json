@@ -32,7 +32,7 @@
     "release": "node scripts/release.mjs"
   },
   "engines": {
-    "node": ">=20"
+    "node": "^20.19.0 || >=22.12.0"
   },
   "workspaces": [
     "packages/*"
@@ -57,7 +57,7 @@
     "cz-conventional-changelog": "^3.3.0",
     "element-plus": "^2.9.11",
     "enquirer": "^2.4.1",
-    "eslint": "^9.28.0",
+    "eslint": "^9.34.0",
     "execa": "^4.1.0",
     "highlight.js": "^11.11.1",
     "husky": "^9.1.7",
@@ -65,7 +65,7 @@
     "lint-staged": "^16.1.0",
     "minimist": "^1.2.8",
     "picocolors": "^1.1.1",
-    "prettier": "^3.5.3",
+    "prettier": "^3.6.2",
     "recast": "^0.23.11",
     "rimraf": "^3.0.2",
     "rollup": "4.44.1",
@@ -75,10 +75,10 @@
     "shx": "^0.3.4",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vitepress": "^1.6.3",
-    "vitest": "^3.2.1",
+    "vitepress": "^1.6.4",
+    "vitest": "^3.2.4",
     "vue": "catalog:",
-    "vue-tsc": "^3.0.0"
+    "vue-tsc": "^3.0.6"
   },
   "config": {
     "commitizen": {

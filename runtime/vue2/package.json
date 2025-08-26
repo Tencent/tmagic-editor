@@ -3,6 +3,9 @@
   "version": "1.6.0-beta.6",
   "type": "module",
   "private": true,
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
   "scripts": {
     "dev:vue2": "vite --config dev.vite.config.ts",
     "dev:playground": "vite --config dev.vite.config.ts",
@@ -22,7 +25,7 @@
     "@tmagic/core": "1.6.0-beta.6",
     "@tmagic/stage": "1.6.0-beta.6",
     "@tmagic/vue-runtime-help": "^1.2.0",
-    "axios": "^1.10.0",
+    "axios": "^1.11.0",
     "vue": "^2.7.16"
   },
   "devDependencies": {
@@ -30,10 +33,10 @@
     "@types/events": "^3.0.3",
     "rollup": "4.44.1",
     "rollup-plugin-external-globals": "^0.13.0",
-    "sass": "^1.89.2",
+    "sass": "^1.91.0",
     "terser": "^5.43.1",
     "vite": "catalog:",
-    "@vitejs/plugin-legacy": "^7.0.0",
+    "@vitejs/plugin-legacy": "^7.2.1",
     "@vitejs/plugin-vue2": "^2.3.3",
     "vue-template-compiler": "^2.7.16"
   }

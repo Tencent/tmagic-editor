@@ -1,6 +1,5 @@
 import js from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
-import stylisticTs from '@stylistic/eslint-plugin-ts';
 import parserTs from '@typescript-eslint/parser';
 import { defineConfig } from 'eslint/config';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
@@ -21,7 +20,6 @@ export default (tsconfigRootDir) =>
     ...tseslint.config(tencentEslintBaseConfig, tencentEslintImportexport, tseslint.configs.base, {
       plugins: {
         '@stylistic': stylistic,
-        '@stylistic/ts': stylisticTs,
       },
       languageOptions: {
         parser: parserTs,

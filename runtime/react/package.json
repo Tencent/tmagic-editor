@@ -3,6 +3,9 @@
   "version": "1.6.0-beta.6",
   "type": "module",
   "private": true,
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
   "scripts": {
     "dev:react": "vite --config dev.vite.config.ts",
     "dev:playground": "vite --config dev.vite.config.ts",
@@ -30,7 +33,7 @@
     "@tmagic/cli": "1.6.0-beta.6",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-legacy": "^7.0.0",
+    "@vitejs/plugin-legacy": "^7.2.1",
     "@vitejs/plugin-react-refresh": "^1.3.6",
     "typescript": "catalog:",
     "terser": "^5.43.1",
