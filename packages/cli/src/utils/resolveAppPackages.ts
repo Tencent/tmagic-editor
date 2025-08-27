@@ -601,10 +601,20 @@ const flattenPackagesConfig = (packages: (string | Record<string, string>)[]) =>
   const packagesConfig: ([string] | [string, string])[] = [];
   packages.forEach((item) => {
     if (typeof item === 'object') {
-      Object.entries(item).forEach(([key, packagePath]) => {
-        packagesConfig.push([packagePath, key]);
-      });
+      for (const [key, packagePath] of Object.entries(item)) {
+        const index = packagesConfig.findIndex(([, k]) => {
+          return k === key;
+        });
+        if (index > -1) {
+          packagesConfig[index] = [packagePath, key];
+        } else {
+          packagesConfig.push([packagePath, key]);
+        }
+      }
     } else if (typeof item === 'string') {
+      if (packagesConfig.find(([k]) => k === item)) {
+        return;
+      }
       packagesConfig.push([item]);
     }
   });

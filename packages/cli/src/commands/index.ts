@@ -1,6 +1,8 @@
 import path from 'node:path';
 
 import fs from 'fs-extra';
+// @ts-ignore
+import mergeOptions from 'merge-options';
 
 import App from '../Core';
 import { UserConfig } from '../types';
@@ -22,18 +24,29 @@ export const scripts = (defaultAppConfig: UserConfig) => {
       path.resolve(defaultAppConfig.temp, 'config.cjs'),
     ].find((item) => fs.pathExistsSync(item));
 
-    const { npmConfig = {}, ...userConfig } = await loadUserConfig(userConfigPath);
+    const localUserConfigPath = [
+      path.resolve(defaultAppConfig.source, 'tmagic.config.local.ts'),
+      path.resolve(defaultAppConfig.source, 'tmagic.config.local.js'),
+      path.resolve(defaultAppConfig.source, 'tmagic.config.local.cjs'),
+      path.resolve(defaultAppConfig.temp, 'config.local.ts'),
+      path.resolve(defaultAppConfig.temp, 'config.local.js'),
+      path.resolve(defaultAppConfig.temp, 'config.local.cjs'),
+    ].find((item) => fs.pathExistsSync(item));
+
+    let userConfig = await loadUserConfig(userConfigPath);
+
+    if (localUserConfigPath) {
+      const localUserConfig = await loadUserConfig(localUserConfigPath);
+
+      if (localUserConfig.packages?.length) {
+        localUserConfig.packages = [...(userConfig.packages || []), ...localUserConfig.packages];
+      }
+
+      userConfig = mergeOptions(userConfig, localUserConfig);
+    }
 
     // resolve the final app config to use
-    const appConfig = {
-      ...defaultAppConfig,
-      ...userConfig,
-      npmConfig: {
-        ...(defaultAppConfig.npmConfig || {}),
-        ...npmConfig,
-      },
-    };
-
+    const appConfig = mergeOptions(defaultAppConfig, userConfig);
     const app = new App(appConfig);
 
     // clean temp and cache

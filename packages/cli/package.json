@@ -30,6 +30,7 @@
     "chokidar": "^3.6.0",
     "esbuild": "^0.21.5",
     "fs-extra": "^11.2.0",
+    "merge-options": "^3.0.4",
     "picocolors": "^1.1.1",
     "recast": "^0.23.11",
     "tslib": "^2.8.0"
