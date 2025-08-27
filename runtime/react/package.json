@@ -10,9 +10,10 @@
     "tmagic": "tmagic entry",
     "dev:react": "vite --force",
     "serve": "vite preview",
-    "build": "rimraf ./dist && node scripts/build.mjs --type=all && npm run build:client",
-    "build:libs": "npm run tmagic && node scripts/build.mjs --type=res",
-    "build:client": "vite build --config ./page/vite.config.ts && vite build --config ./playground/vite.config.ts"
+    "build": "rimraf ./dist && node scripts/build.mjs --type=all",
+    "build:libs": "node scripts/build.mjs --type=res",
+    "build:page": "node scripts/build.mjs --type=page",
+    "build:playground": "node scripts/build.mjs --type=playground"
   },
   "dependencies": {
     "@tmagic/core": "1.6.0-beta.6",

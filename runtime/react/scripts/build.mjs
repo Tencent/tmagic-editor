@@ -1,3 +1,4 @@
+import { execSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -11,21 +12,49 @@ const args = minimist(process.argv.slice(2));
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const buildList = [];
+fse.removeSync(path.resolve(dirname, '../.tmagic'));
+
+execSync('tmagic entry', {
+  stdio: 'inherit',
+  cwd: path.resolve(dirname, '../'),
+});
 
 if (args.type === 'res' || args.type === 'all') {
   fse.removeSync(path.resolve(dirname, '../dist/entry'));
-
   for (const mode of ['value', 'config', 'event', 'ds:value', 'ds:config', 'ds:event']) {
-    buildList.push(
-      buildVite({
-        root: path.resolve(dirname, '../'),
-        clearScreen: false,
-        configFile: false,
-        ...resViteConfig(mode),
-      }),
-    );
+    const fileName = mode.replace(':', '-');
+
+    buildVite({
+      root: path.resolve(dirname, '../'),
+      clearScreen: false,
+      configFile: false,
+      ...resViteConfig(mode),
+    }).then(() => {
+      fse.copySync(
+        path.resolve(dirname, '../dist/entry', fileName),
+        path.resolve(dirname, '../../../playground/public/entry/vue/', fileName),
+      );
+    });
   }
 }
 
-Promise.all(buildList);
+const buildRuntime = (type) => {
+  fse.removeSync(path.resolve(dirname, '../dist', type));
+
+  buildVite({
+    root: path.resolve(dirname, '../', type),
+    clearScreen: false,
+    configFile: path.resolve(dirname, '../', type, 'vite.config.ts'),
+  }).then(() => {
+    const clientFile = path.resolve(dirname, '../dist', type);
+    fse.copySync(clientFile, path.resolve(dirname, '../../../playground/public/runtime/react', type));
+  });
+};
+
+if (args.type === 'page' || args.type === 'all') {
+  buildRuntime('page');
+}
+
+if (args.type === 'playground' || args.type === 'all') {
+  buildRuntime('playground');
+}
