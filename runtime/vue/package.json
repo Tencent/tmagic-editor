@@ -10,7 +10,7 @@
     "tmagic": "tmagic entry",
     "dev": "vite --force",
     "serve": "vite preview",
-    "build": "rm -rf ./dist && node scripts/build.mjs --type=all && npm run build:client",
+    "build": "rimraf ./dist && node scripts/build.mjs --type=all && npm run build:client",
     "build:libs": "tmagic entry && node scripts/build.mjs --type=res",
     "build:client": "vite build --config ./page/vite.config.ts && vite build --config ./playground/vite.config.ts"
   },
@@ -31,6 +31,7 @@
     "@vue/compiler-sfc": "catalog:",
     "fs-extra": "^11.3.1",
     "minimist": "^1.2.8",
+    "rimraf": "^3.0.2",
     "rollup": "4.44.1",
     "rollup-plugin-external-globals": "^0.13.0",
     "sass": "^1.91.0",
