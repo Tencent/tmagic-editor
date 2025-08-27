@@ -910,8 +910,11 @@ importers:
         specifier: 1.6.0-beta.6
         version: 1.6.0-beta.6(@tmagic/core@1.6.0-beta.6(typescript@5.9.2))(typescript@5.9.2)
       axios:
-        specifier: ^1.10.0
-        version: 1.10.0
+        specifier: ^1.11.0
+        version: 1.11.0
+      qrcode:
+        specifier: ^1.5.0
+        version: 1.5.4
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -922,6 +925,9 @@ importers:
       '@tmagic/cli':
         specifier: 1.6.0-beta.6
         version: 1.6.0-beta.6(typescript@5.9.2)
+      '@types/fs-extra':
+        specifier: ^11.0.4
+        version: 11.0.4
       '@types/react':
         specifier: ^18.3.3
         version: 18.3.18
@@ -934,6 +940,9 @@ importers:
       '@vitejs/plugin-react-refresh':
         specifier: ^1.3.6
         version: 1.3.6
+      fs-extra:
+        specifier: ^11.3.1
+        version: 11.3.1
       terser:
         specifier: ^5.43.1
         version: 5.43.1
@@ -943,6 +952,9 @@ importers:
       vite:
         specifier: 'catalog:'
         version: 7.1.3(@types/node@24.0.10)(jiti@2.4.2)(sass@1.91.0)(terser@5.43.1)(yaml@2.8.0)
+      vite-plugin-commonjs:
+        specifier: ^0.10.4
+        version: 0.10.4
 
   runtime/react-runtime-help:
     dependencies:
@@ -986,78 +998,6 @@ importers:
       vue:
         specifier: 'catalog:'
         version: 3.5.20(typescript@5.9.2)
-
-  runtime/ui:
-    dependencies:
-      '@tmagic/vue-button':
-        specifier: workspace:*
-        version: link:../../vue-components/button
-      '@tmagic/vue-container':
-        specifier: workspace:*
-        version: link:../../vue-components/container
-      '@tmagic/vue-img':
-        specifier: workspace:*
-        version: link:../../vue-components/img
-      '@tmagic/vue-iterator-container':
-        specifier: workspace:*
-        version: link:../../vue-components/iterator-container
-      '@tmagic/vue-overlay':
-        specifier: workspace:*
-        version: link:../../vue-components/overlay
-      '@tmagic/vue-page':
-        specifier: workspace:*
-        version: link:../../vue-components/page
-      '@tmagic/vue-page-fragment':
-        specifier: workspace:*
-        version: link:../../vue-components/page-fragment
-      '@tmagic/vue-page-fragment-container':
-        specifier: workspace:*
-        version: link:../../vue-components/page-fragment-container
-      '@tmagic/vue-qrcode':
-        specifier: workspace:*
-        version: link:../../vue-components/qrcode
-      '@tmagic/vue-text':
-        specifier: workspace:*
-        version: link:../../vue-components/text
-      typescript:
-        specifier: 'catalog:'
-        version: 5.9.2
-
-  runtime/ui-react:
-    dependencies:
-      '@tmagic/react-button':
-        specifier: workspace:*
-        version: link:../../react-components/button
-      '@tmagic/react-container':
-        specifier: workspace:*
-        version: link:../../react-components/container
-      '@tmagic/react-img':
-        specifier: workspace:*
-        version: link:../../react-components/img
-      '@tmagic/react-iterator-container':
-        specifier: workspace:*
-        version: link:../../react-components/iterator-container
-      '@tmagic/react-overlay':
-        specifier: workspace:*
-        version: link:../../react-components/overlay
-      '@tmagic/react-page':
-        specifier: workspace:*
-        version: link:../../react-components/page
-      '@tmagic/react-page-fragment':
-        specifier: workspace:*
-        version: link:../../react-components/page-fragment
-      '@tmagic/react-page-fragment-container':
-        specifier: workspace:*
-        version: link:../../react-components/page-fragment-container
-      '@tmagic/react-qrcode':
-        specifier: workspace:*
-        version: link:../../react-components/qrcode
-      '@tmagic/react-text':
-        specifier: workspace:*
-        version: link:../../react-components/text
-      typescript:
-        specifier: 'catalog:'
-        version: 5.9.2
 
   runtime/vue:
     dependencies:
@@ -3890,9 +3830,6 @@ packages:
     resolution: {integrity: sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==}
     engines: {node: '>= 0.4'}
 
-  axios@1.10.0:
-    resolution: {integrity: sha512-/1xYAC4MP/HEG+3duIhFr4ZQXR4sQXOIe+o6sdqzeykGLx6Upp/1p8MHqhINOvGeP7xyNHe7tsiJByc4SSVUxw==}
-
   axios@1.11.0:
     resolution: {integrity: sha512-1Lx3WLFQWm3ooKDYZD1eXmoGO9fxYQjrycfHFC8P0sCfQVXyROp0p9PFWBehewBOdCwHc+f/b8I0fMto5eSfwA==}
 
@@ -6702,6 +6639,12 @@ packages:
     resolution: {integrity: sha512-EbKSKh+bh1E1IFxeO0pg1n4dvoOTt0UDiXMd/qn++r98+jPO1xtJilvXldeuQ8giIB5IkpjCgMleHMNEsGH6pg==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
+
+  vite-plugin-commonjs@0.10.4:
+    resolution: {integrity: sha512-eWQuvQKCcx0QYB5e5xfxBNjQKyrjEWZIR9UOkOV6JAgxVhtbZvCOF+FNC2ZijBJ3U3Px04ZMMyyMyFBVWIJ5+g==}
+
+  vite-plugin-dynamic-import@1.6.0:
+    resolution: {integrity: sha512-TM0sz70wfzTIo9YCxVFwS8OA9lNREsh+0vMHGSkWDTZ7bgd1Yjs5RV8EgB634l/91IsXJReg0xtmuQqP0mf+rg==}
 
   vite@5.4.16:
     resolution: {integrity: sha512-Y5gnfp4NemVfgOTDQAunSD4346fal44L9mszGGY/e+qxsRT5y1sMlS/8tiQ8AFAp+MFgYNSINdfEchJiPm41vQ==}
@@ -9844,14 +9787,6 @@ snapshots:
   available-typed-arrays@1.0.7:
     dependencies:
       possible-typed-array-names: 1.1.0
-
-  axios@1.10.0:
-    dependencies:
-      follow-redirects: 1.15.9
-      form-data: 4.0.2
-      proxy-from-env: 1.1.0
-    transitivePeerDependencies:
-      - debug
 
   axios@1.11.0:
     dependencies:
@@ -13159,6 +13094,19 @@ snapshots:
       - terser
       - tsx
       - yaml
+
+  vite-plugin-commonjs@0.10.4:
+    dependencies:
+      acorn: 8.15.0
+      magic-string: 0.30.17
+      vite-plugin-dynamic-import: 1.6.0
+
+  vite-plugin-dynamic-import@1.6.0:
+    dependencies:
+      acorn: 8.15.0
+      es-module-lexer: 1.7.0
+      fast-glob: 3.3.3
+      magic-string: 0.30.17
 
   vite@5.4.16(@types/node@24.0.10)(sass@1.91.0)(terser@5.43.1):
     dependencies:

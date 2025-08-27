@@ -17,7 +17,7 @@ export default defineConfig({
       enforce: 'post',
       closeBundle() {
         const clientFile = path.resolve(__dirname, '../dist/page')
-        fse.copySync(clientFile, path.resolve(__dirname, '../../../playground/public/runtime/vue/page'))
+        fse.copySync(clientFile, path.resolve(__dirname, '../../../playground/public/runtime/react/page'))
       },
     }
   ],

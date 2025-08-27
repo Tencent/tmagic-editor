@@ -5,9 +5,9 @@
   "private": true,
   "scripts": {
     "clean:top": "rimraf dist",
-    "dev": "vite --mode vue",
+    "dev": "vite --mode vue3",
     "dev:react": "vite --mode react",
-    "build": "npm run clean:top && node --max_old_space_size=8192 node_modules/vite/bin/vite.js build --mode vue",
+    "build": "npm run clean:top && node --max_old_space_size=8192 node_modules/vite/bin/vite.js build --mode vue3",
     "serve": "vite preview"
   },
   "dependencies": {

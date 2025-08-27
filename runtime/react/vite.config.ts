@@ -16,13 +16,28 @@
  * limitations under the License.
  */
 
-import path from 'path';
+import path from 'node:path';
 
 import { defineConfig } from 'vite';
+import legacy from '@vitejs/plugin-legacy';
 import reactRefresh from '@vitejs/plugin-react-refresh';
+import commonjs from 'vite-plugin-commonjs';
 
 export default defineConfig({
-  plugins: [reactRefresh()],
+  plugins: [
+    commonjs({
+      filter: (id) => {
+        if (id.includes('qrcode')) {
+          return true;
+        }
+        return false;
+      },
+    }),
+    reactRefresh(),
+    legacy({
+      targets: ['defaults', 'not IE 11'],
+    })
+  ],
 
   resolve: {
     alias: [
@@ -34,17 +49,18 @@ export default defineConfig({
       },
       { find: /^@tmagic\/utils/, replacement: path.join(__dirname, '../../packages/utils/src/index.ts') },
       { find: /^@tmagic\/core/, replacement: path.join(__dirname, '../../packages/core/src/index.ts') },
-      { find: /^@tmagic\/schema/, replacement: path.join(__dirname, '../../packages/schema/src/index.ts') },
-      { find: /^@data-source/, replacement: path.join(__dirname, '../../packages/data-source/src') },
       { find: /^@tmagic\/data-source/, replacement: path.join(__dirname, '../../packages/data-source/src/index.ts') },
       { find: /^@tmagic\/dep/, replacement: path.join(__dirname, '../../packages/dep/src/index.ts') },
-      { find: /^@tmagic\/react-runtime-help/, replacement: path.join(__dirname, '../react-runtime-help/src/index.ts') },
+      { find: /^@data-source/, replacement: path.join(__dirname, '../../packages/data-source/src') },
+      { find: /^@tmagic\/schema/, replacement: path.join(__dirname, '../../packages/schema/src/index.ts') },
+      { find: /^@tmagic\/vue-runtime-help/, replacement: path.join(__dirname, '../vue-runtime-help/src/index.ts') },
+      { find: /^qrcode/, replacement: path.join(__dirname, './node_modules/qrcode') },
     ],
   },
 
   root: './',
 
-  base: '/tmagic-editor/playground/runtime/react/',
+  base: '/tmagic-editor/playground/runtime/react',
 
   publicDir: 'public',
 
@@ -55,17 +71,10 @@ export default defineConfig({
   },
 
   build: {
-    sourcemap: true,
-
-    cssCodeSplit: false,
-
     rollupOptions: {
       input: {
-        page: './page/index.html',
-        playground: './playground/index.html',
-      },
-      output: {
-        entryFileNames: 'assets/[name].js',
+        page: path.resolve(__dirname, './page/index.html'),
+        playground: path.resolve(__dirname, './playground/index.html'),
       },
     },
   },

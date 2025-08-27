@@ -1,7 +1,6 @@
 import path from 'node:path';
 
 import { defineConfig } from 'vite';
-
 import fse from 'fs-extra';
 
 import baseConfig from '../vite.config';
@@ -16,21 +15,21 @@ export default defineConfig({
       apply: 'build',
       enforce: 'post',
       closeBundle() {
-        const clientFile = path.resolve(__dirname, '../dist/page')
-        fse.copySync(clientFile, path.resolve(__dirname, '../../../playground/public/runtime/vue/page'))
+        const clientFile = path.resolve(__dirname, '../dist/playground')
+        fse.copySync(clientFile, path.resolve(__dirname, '../../../playground/public/runtime/react/playground'))
       },
     }
   ],
 
-  root: './page',
+  root: './playground',
 
   publicDir: '../public',
 
-  base: `${baseConfig.base}/page`,
+  base: `${baseConfig.base}/playground`,
 
   build: {
     emptyOutDir: false,
     sourcemap: true,
-    outDir: '../dist/page',
+    outDir: '../dist/playground',
   },
 });

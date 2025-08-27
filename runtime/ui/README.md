@@ -1,1 +1,0 @@
-# [文档](https://tencent.github.io/tmagic-editor/docs/)
