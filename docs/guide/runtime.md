@@ -14,8 +14,7 @@ runtime 的 `page` 部分，就是真实项目页面的渲染环境。发布出�
 - 加载第三方全局组件/插件等
 
 具体的 page 实现示例，可以参考
-- [vue3 runtime](https://github.com/Tencent/tmagic-editor/blob/master/runtime/vue3/page)
-- [vue2 runtime](https://github.com/Tencent/tmagic-editor/blob/master/runtime/vue2/page)
+- [vue runtime](https://github.com/Tencent/tmagic-editor/blob/master/runtime/vue/page)
 - [react runtime](https://github.com/Tencent/tmagic-editor/blob/master/runtime/react/page)
 
 ### playground
@@ -45,8 +44,7 @@ window.magic.onPageElUpdate(document.querySelector('.magic-ui-page'));
 |sortNode| 组件在容器间排序 |{ `src` , `dist`, `root` }: `SortEventData`  |
 
 runtime 的实现示例，可以参考tmagic-editor提供的：
-- [vue3 runtime](https://github.com/Tencent/tmagic-editor/blob/master/runtime/vue3)
-- [vue2 runtime](https://github.com/Tencent/tmagic-editor/blob/master/runtime/vue2)
+- [vue runtime](https://github.com/Tencent/tmagic-editor/blob/master/runtime/vue)
 - [react runtime](https://github.com/Tencent/tmagic-editor/blob/master/runtime/react)
 
 ### 页面发布

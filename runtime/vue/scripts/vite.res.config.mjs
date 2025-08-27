@@ -24,7 +24,7 @@ export default defineConfig((mode) => {
         apply: 'build',
         enforce: 'post',
         closeBundle() {
-          fse.copySync(publicPath, path.resolve(dirname, `../../../playground/public/entry/vue3/${fileName}`));
+          fse.copySync(publicPath, path.resolve(dirname, `../../../playground/public/entry/vue/${fileName}`));
         },
       },
     ],

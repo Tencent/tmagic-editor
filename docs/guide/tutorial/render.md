@@ -1,6 +1,6 @@
 # 3.[DSL](../conception.md#dsl) 解析渲染
 
-tmagic 提供了 vue3/vue2/react 三个版本的解析渲染组件，可以直接使用
+tmagic 提供了 vue/react 两个个版本的解析渲染组件，可以直接使用
 
 [@tmagic/ui](https://www.npmjs.com/package/@tmagic/ui)
 

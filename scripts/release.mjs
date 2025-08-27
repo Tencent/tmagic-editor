@@ -310,7 +310,7 @@ function updateVersions(version, getNewPackageName = keepThePackageName) {
   // 2. update all packages
   packages.forEach((p) => updatePackage(getPkgRoot(p), version, getNewPackageName));
 
-  ['vue3', 'react', 'vue2'].forEach((p) => updatePackage(getRunTimeRoot(p), version, getNewPackageName, true));
+  ['vue', 'react'].forEach((p) => updatePackage(getRunTimeRoot(p), version, getNewPackageName, true));
   updatePackage(getPlayground(), version, getNewPackageName, true);
 }
 

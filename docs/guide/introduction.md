@@ -36,9 +36,6 @@ tmagic-editor可视化开源项目是从魔方平台演化而来的开源项目�
 - **@tmagic/core** 实现对组件进行跨框架管理与一些通用复杂逻辑的实现。
 - **@tmagic/data-source** 实现数据源的管理与编译。
 - **@tmagic/stage** 实现在编辑器中对组件的位置拖动与大小拖拉。
-- **@tmagic/ui** 提供一些vue3基础组件。
-- **@tmagic/ui-vue2** 提供一些vue2基础组件。
-- **@tmagic/ui-react** 提供一些react基础组件。
 - **runtime** 实现在编辑器中对使用不同框架的组件的渲染。
 
 可以查阅 tmagic 的[源代码](https://github.com/Tencent/tmagic-editor)，与文档描述内容可以逐一对应上，希望文档内容可以为开发者带来比较好的开发体验。

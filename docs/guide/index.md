@@ -125,7 +125,7 @@ app.mount('#app');
           // 初始化页面数据
         }),
 
-        runtimeUrl: "/runtime/vue3/playground/index.html",
+        runtimeUrl: "/runtime/vue/playground/index.html",
 
         propsConfigs: [
           // 组件属性列表
@@ -208,10 +208,10 @@ npm install sass -D
 
 ```javascript
 setup() {
-  asyncLoadJs(`/runtime/vue3/assets/config.js`).then(() => {
+  asyncLoadJs(`/runtime/vue/assets/config.js`).then(() => {
     propsConfigs.value = window.magicPresetConfigs;
   });
-  asyncLoadJs(`/runtime/vue3/assets/value.js`).then(() => {
+  asyncLoadJs(`/runtime/vue/assets/value.js`).then(() => {
     propsValues.value = window.magicPresetValues;
   });
 }

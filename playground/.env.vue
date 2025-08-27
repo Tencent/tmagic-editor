@@ -1,0 +1,1 @@
+VITE_RUNTIME_PATH=/tmagic-editor/playground/runtime/vue VITE_ENTRY_PATH=./entry/vue

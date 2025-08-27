@@ -2,14 +2,14 @@
 tmagic-editor支持业务方进行自定义组件开发。在tmagic-editor中，组件是以 npm 包形式存在的，组件和插件只要按照规范开发，就可以在tmagic-editor的 runtime 中被加入并正确渲染组件。
 
 ## 组件开发
-以 vue3 的组件开发为例。运行项目中的 playground 示例，会自动加载 vue3 的 runtime。runtime会加载[@tmagic/ui](https://github.com/Tencent/tmagic-editor/tree/master/packages/ui)
+以 vue 的组件开发为例。运行项目中的 playground 示例，会自动加载 vue 的 runtime。runtime会加载[@tmagic/ui](https://github.com/Tencent/tmagic-editor/tree/master/packages/ui)
 
 ## 组件注册
 在 [playground](https://tencent.github.io/tmagic-editor/playground/index.html#/) 中，我们可以尝试点击添加一个组件，在模拟器区域里，就会出现这个组件。其中就涉及到组件注册。
 
 这一步需要开发者基于tmagic-editor搭建了平台后，实现组件列表的注册、获取机制，tmagic-editor组件注册其实就是保存好组件 `type` 的映射关系。`type` 可以参考[组件介绍](../guide/conception.html#组件)。
 
-可以参考 vue3 版本的 @tmagic/ui 中，[组件渲染](../guide/advanced/page.html#组件渲染)逻辑里，type 会作为组件名进入渲染。所以在 vue3 的组件开发中，我们也需要在为 vue 组件声明 name 字段时，和 type 值对应起来，才能正确渲染组件。
+可以参考 vue 版本的 @tmagic/ui 中，[组件渲染](../guide/advanced/page.html#组件渲染)逻辑里，type 会作为组件名进入渲染。所以在 vue 的组件开发中，我们也需要在为 vue 组件声明 name 字段时，和 type 值对应起来，才能正确渲染组件。
 
 ### 组件规范
 组件的基础形式，需要有四个文件
@@ -22,7 +22,7 @@ tmagic-editor支持业务方进行自定义组件开发。在tmagic-editor中，
 @tmagic/ui 中的 button/text 就是基础的组件示例。我们要求声明 index 入口，因为我们希望在后续的配套打包工具实现上，可以有一个统一规范入口。
 
 ### 1. 创建组件
-在项目中，如 runtime vue3 目录中，创建一个名为 test-component 的组件目录，其中包含上面四个规范文件。
+在项目中，如 runtime  目录中，创建一个名为 test-component 的组件目录，其中包含上面四个规范文件。
 ```javascript
 // index.js
 // vue
@@ -69,7 +69,7 @@ export default {
 };
 ```
 
-vue3 版本的组件代码示例
+ 版本的组件代码示例
 ```vue
 <!-- Test.vue -->
 <template>
@@ -119,7 +119,7 @@ export default Test;
 ```
 
 ### 2. 使用tmagic-cli
-在 runtime vue3 中，我们已经提供好一份示例。在 tmagic.config.ts 文件中。只需要在 packages 加入你创建的组件的路径（如果是个 npm 包，则将路径替换为包名即可），打包工具就会自动识别到你的组件。
+在 runtime vue 中，我们已经提供好一份示例。在 tmagic.config.ts 文件中。只需要在 packages 加入你创建的组件的路径（如果是个 npm 包，则将路径替换为包名即可），打包工具就会自动识别到你的组件。
 
 ### 3. 启动 playground
 在上面的步骤完成后，在 playground/src/configs/componentGroupList 中。找到组件栏的基础组件列表，在其中加入你的开发组件
@@ -155,7 +155,7 @@ npm run playground
 <img src="https://image.video.qpic.cn/oa_fd3c9c-3_548108267_1636719045199471">
 
 ### 4. 启动 runtime
-在完成开发中组件在编辑器中的实现后，我们将编辑器中的 DSL 源码📄 打开，复制 DSL。并在 runtime/vue3/src/page 下。创建一个 page-config.js 文件。将 DSL 作为配置导出。
+在完成开发中组件在编辑器中的实现后，我们将编辑器中的 DSL 源码📄 打开，复制 DSL。并在 runtime/vue/src/page 下。创建一个 page-config.js 文件。将 DSL 作为配置导出。
 
 ```javascript
 window.magicDSL = [
@@ -168,7 +168,7 @@ window.magicDSL = [
 import './page-config.js';
 ```
 
-然后执行在 runtime/vue3 目录下执行
+然后执行在 runtime/ 目录下执行
 ```
 npm run build:libs
 npm run dev

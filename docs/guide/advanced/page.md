@@ -60,6 +60,5 @@ export default defineComponent({
 
 ## 渲染器示例
 在tmagic-editor的示例项目中，我们提供了三个版本的 @tmagic/ui。可以参考对应前端框架的渲染器实现。
-- [vue3 渲染器](https://github.com/Tencent/tmagic-editor/blob/master/packages/ui/src/container/src/Container.vue)
-- [vue2 渲染器](https://github.com/Tencent/tmagic-editor/blob/master/packages/ui-vue2/src/container/Container.vue)
-- [react 渲染器](https://github.com/Tencent/tmagic-editor/blob/master/packages/ui-react/src/container/Container.tsx)
+- [vue 渲染器](https://github.com/Tencent/tmagic-editor/blob/master/vue-components/container/src/Container.vue)
+- [react 渲染器](https://github.com/Tencent/tmagic-editor/blob/master/react-components/container/src/Container.tsx)

@@ -375,7 +375,7 @@ const stageContentMenu = ref([
 ```html
 <template>
   <m-editor
-    runtime-url="https://tencent.github.io/tmagic-editor/playground/runtime/vue3/playground/index.html"
+    runtime-url="https://tencent.github.io/tmagic-editor/playground/runtime/vue/playground/index.html"
   ></m-editor>
 </template>
 ```

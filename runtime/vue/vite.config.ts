@@ -16,26 +16,34 @@
  * limitations under the License.
  */
 
-import path from 'path';
+import path from 'node:path';
 
 import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue2';
+import legacy from '@vitejs/plugin-legacy';
+import vue from '@vitejs/plugin-vue';
+import vueJsx from '@vitejs/plugin-vue-jsx';
 
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    vue(),
+    vueJsx(),
+    legacy({
+      targets: ['defaults', 'not IE 11'],
+    })
+  ],
 
   resolve: {
     alias: [
-      { find: /^vue$/, replacement: path.join(__dirname, 'node_modules/vue/dist/vue.esm.js') },
+      { find: /^vue$/, replacement: path.join(__dirname, 'node_modules/vue') },
       {
         find: /^@tmagic\/core\/resetcss.css/,
         replacement: path.join(__dirname, '../../packages/core/resetcss.css'),
       },
       { find: /^@tmagic\/utils/, replacement: path.join(__dirname, '../../packages/utils/src/index.ts') },
       { find: /^@tmagic\/core/, replacement: path.join(__dirname, '../../packages/core/src/index.ts') },
-      { find: /^@data-source/, replacement: path.join(__dirname, '../../packages/data-source/src') },
       { find: /^@tmagic\/data-source/, replacement: path.join(__dirname, '../../packages/data-source/src/index.ts') },
       { find: /^@tmagic\/dep/, replacement: path.join(__dirname, '../../packages/dep/src/index.ts') },
+      { find: /^@data-source/, replacement: path.join(__dirname, '../../packages/data-source/src') },
       { find: /^@tmagic\/schema/, replacement: path.join(__dirname, '../../packages/schema/src/index.ts') },
       { find: /^@tmagic\/vue-runtime-help/, replacement: path.join(__dirname, '../vue-runtime-help/src/index.ts') },
     ],
@@ -43,7 +51,7 @@ export default defineConfig({
 
   root: './',
 
-  base: '/tmagic-editor/playground/runtime/vue2/',
+  base: '/tmagic-editor/playground/runtime/vue',
 
   publicDir: 'public',
 
@@ -55,5 +63,14 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 8078,
     strictPort: true,
+  },
+
+  build: {
+    rollupOptions: {
+      input: {
+        page: path.resolve(__dirname, './page/index.html'),
+        playground: path.resolve(__dirname, './playground/index.html'),
+      },
+    },
   },
 });
