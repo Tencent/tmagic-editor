@@ -11,7 +11,7 @@
     "dev": "vite --force",
     "serve": "vite preview",
     "build": "rimraf ./dist && node scripts/build.mjs --type=all && npm run build:client",
-    "build:libs": "tmagic entry && node scripts/build.mjs --type=res",
+    "build:libs": "npm run tmagic && node scripts/build.mjs --type=res",
     "build:client": "vite build --config ./page/vite.config.ts && vite build --config ./playground/vite.config.ts"
   },
   "dependencies": {

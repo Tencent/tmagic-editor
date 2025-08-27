@@ -14,9 +14,6 @@ export default defineConfig((mode) => {
 
   const fileName = mode.replace(':', '-');
 
-  const publicPath = path.resolve(dirname, '../dist/entry', fileName);
-  fse.removeSync(publicPath);
-
   return {
     plugins: [
       {
@@ -24,7 +21,10 @@ export default defineConfig((mode) => {
         apply: 'build',
         enforce: 'post',
         closeBundle() {
-          fse.copySync(publicPath, path.resolve(dirname, `../../../playground/public/entry/react/${fileName}`));
+          fse.copySync(
+            path.resolve(dirname, '../dist/entry', fileName),
+            path.resolve(dirname, '../../../playground/public/entry/react/', fileName),
+          );
         },
       },
     ],

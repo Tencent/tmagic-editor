@@ -1,2 +1,4 @@
 .tmagic
 dist
+*.local
+*.local.*

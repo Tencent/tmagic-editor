@@ -2,6 +2,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { build as buildVite } from 'vite';
+import fse from 'fs-extra';
 import minimist from 'minimist';
 
 import resViteConfig from './vite.res.config.mjs';
@@ -12,9 +13,9 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const buildList = [];
 
-const buildRes = args.type === 'res' || args.type === 'all';
+if (args.type === 'res' || args.type === 'all') {
+  fse.removeSync(path.resolve(dirname, '../dist/entry'));
 
-if (buildRes) {
   for (const mode of ['value', 'config', 'event', 'ds:value', 'ds:config', 'ds:event']) {
     buildList.push(
       buildVite({

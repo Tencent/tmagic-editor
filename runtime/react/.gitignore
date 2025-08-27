@@ -1,2 +1,4 @@
 .tmagic
-entry-dist
+dist
+*.local
+*.local.*
