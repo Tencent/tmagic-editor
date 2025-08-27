@@ -1,3 +1,17 @@
+# [1.6.0](https://github.com/Tencent/tmagic-editor/compare/v1.6.0-beta.6...v1.6.0) (2025-08-27)
+
+
+### Bug Fixes
+
+* **cli:** 在pnpm工作空间中的项目，保持package.json不受配置中的packages影响 ([a10f9d2](https://github.com/Tencent/tmagic-editor/commit/a10f9d230d93064c28ff82f2c3aba2679f8fe495))
+
+
+### Features
+
+* **cli:** 支持tmagic.config.local配置文件，会与tmagic.config配置合并，可用于本地开发时的临时配置 ([9f35054](https://github.com/Tencent/tmagic-editor/commit/9f350541bf84a634499a9af53449015f34da26b5))
+
+
+
 # [1.6.0-beta.6](https://github.com/Tencent/tmagic-editor/compare/v1.6.0-beta.5...v1.6.0-beta.6) (2025-08-15)
 
 
