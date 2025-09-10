@@ -18,7 +18,6 @@
 
 import { EventEmitter } from 'events';
 
-import { DataSource } from '@tmagic/data-source';
 import type { EventConfig, MNode } from '@tmagic/schema';
 import { HookCodeType, HookType, NODE_DISABLE_CODE_BLOCK_KEY } from '@tmagic/schema';
 
@@ -141,23 +140,10 @@ class Node extends EventEmitter {
     for (const item of hookData.hookData) {
       const { codeType = HookCodeType.CODE, codeId, params: itemParams = {} } = item;
 
-      let functionContent: ((...args: any[]) => any) | string | undefined;
-      const functionParams: { app: TMagicApp; node: Node; params: Record<string, any>; dataSource?: DataSource } = {
-        app: this.app,
-        node: this,
-        params: params || itemParams,
-      };
-
-      if (codeType === HookCodeType.CODE && typeof codeId === 'string' && this.app.codeDsl?.[codeId]) {
-        functionContent = this.app.codeDsl[codeId].content;
+      if (codeType === HookCodeType.CODE && typeof codeId === 'string') {
+        await this.app.runCode(codeId, params || itemParams, [], undefined, this);
       } else if (codeType === HookCodeType.DATA_SOURCE_METHOD && Array.isArray(codeId) && codeId.length > 1) {
-        const dataSource = this.app.dataSourceManager?.get(codeId[0]);
-        functionContent = dataSource?.methods.find((method) => method.name === codeId[1])?.content;
-        functionParams.dataSource = dataSource;
-      }
-
-      if (functionContent && typeof functionContent === 'function') {
-        await functionContent(functionParams);
+        await this.app.runDataSourceMethod(codeId[0], codeId[1], params || itemParams, [], undefined, this);
       }
     }
   }

@@ -259,15 +259,15 @@ class App extends EventEmitter {
    * @param eventConfig 代码动作的配置
    * @returns void
    */
-  public async runCode(codeId: Id, params: Record<string, any>, args: any[], flowState?: FlowState) {
+  public async runCode(codeId: Id, params: Record<string, any>, args: any[], flowState?: FlowState, node?: Node) {
     if (!codeId || isEmpty(this.codeDsl)) return;
     const content = this.codeDsl?.[codeId]?.content;
     if (typeof content === 'function') {
       try {
-        await content({ app: this, params, eventParams: args, flowState });
+        await content({ app: this, params, eventParams: args, flowState, node });
       } catch (e: any) {
         if (this.errorHandler) {
-          this.errorHandler(e, undefined, { type: 'run-code', codeId, params, eventParams: args, flowState });
+          this.errorHandler(e, undefined, { type: 'run-code', codeId, params, eventParams: args, flowState, node });
         } else {
           throw e;
         }
@@ -281,6 +281,7 @@ class App extends EventEmitter {
     params: Record<string, any>,
     args: any[],
     flowState?: FlowState,
+    node?: Node,
   ) {
     if (!dsId || !methodName) return;
 
@@ -293,13 +294,13 @@ class App extends EventEmitter {
 
       const method = methods.find((item) => item.name === methodName);
       if (method && typeof method.content === 'function') {
-        await method.content({ app: this, params, dataSource, eventParams: args, flowState });
+        await method.content({ app: this, params, dataSource, eventParams: args, flowState, node });
       } else if (typeof dataSource[methodName] === 'function') {
         await dataSource[methodName]();
       }
     } catch (e: any) {
       if (this.errorHandler) {
-        this.errorHandler(e, dataSource, { type: 'data-source-method', params, eventParams: args, flowState });
+        this.errorHandler(e, dataSource, { type: 'data-source-method', params, eventParams: args, flowState, node });
       } else {
         throw e;
       }
