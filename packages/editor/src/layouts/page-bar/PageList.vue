@@ -11,19 +11,21 @@
       :width="160"
       :destroy-on-close="true"
     >
-      <div>
-        <slot name="page-list-popover" :list="list">
-          <ToolButton
-            v-for="(item, index) in list"
-            :data="{
-              type: 'button',
-              text: item.devconfig?.tabName || item.name || item.id,
-              className: item.id === page?.id ? 'active' : '',
-              handler: () => switchPage(item.id),
-            }"
-            :key="index"
-          ></ToolButton>
-        </slot>
+      <div class="page-bar-popover-wrapper">
+        <div class="page-bar-popover-inner">
+          <slot name="page-list-popover" :list="list">
+            <ToolButton
+              v-for="(item, index) in list"
+              :data="{
+                type: 'button',
+                text: item.devconfig?.tabName || item.name || item.id,
+                className: item.id === page?.id ? 'active' : '',
+                handler: () => switchPage(item.id),
+              }"
+              :key="index"
+            ></ToolButton>
+          </slot>
+        </div>
       </div>
       <template #reference>
         <TMagicIcon class="m-editor-page-list-menu-icon">

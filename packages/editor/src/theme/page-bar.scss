@@ -92,6 +92,11 @@
     padding: 4px 0;
   }
 
+  .page-bar-popover-wrapper {
+    max-height: calc(100vh - $page-bar-height - 20px);
+    overflow: auto;
+  }
+
   .menu-item {
     cursor: pointer;
     transition: all 0.2s ease 0s;
