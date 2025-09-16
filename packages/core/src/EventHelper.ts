@@ -121,7 +121,9 @@ export default class EventHelper extends EventEmitter {
     this.nodeEventList.clear();
   }
 
-  public bindDataSourceEvents(dataSourceList: DataSource[]) {
+  public bindDataSourceEvents() {
+    const dataSourceList = Array.from(this.app.dataSourceManager?.dataSourceMap.values() || []);
+
     this.removeDataSourceEvents(dataSourceList);
 
     dataSourceList.forEach((dataSource) => {

@@ -167,8 +167,13 @@ class App extends EventEmitter {
     this.setPage(pageId);
 
     if (this.dataSourceManager) {
-      const dataSourceList = Array.from(this.dataSourceManager.dataSourceMap.values());
-      this.eventHelper?.bindDataSourceEvents(dataSourceList);
+      if (this.dataSourceManager.isAllDataSourceRegistered()) {
+        this.eventHelper?.bindDataSourceEvents();
+      } else {
+        this.dataSourceManager.once('registered-all', () => {
+          this.eventHelper?.bindDataSourceEvents();
+        });
+      }
     }
   }
 
