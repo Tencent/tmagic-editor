@@ -32,7 +32,10 @@ export class SimpleObservedData extends ObservedData {
     this.event.emit('', changeEvent);
   }
 
-  on(path: string, callback: (newVal: any) => void): void {
+  on(path: string, callback: (newVal: any) => void, options?: { immediate?: boolean }): void {
+    if (options?.immediate) {
+      callback(this.getData(path));
+    }
     this.event.on(path, callback);
   }
 

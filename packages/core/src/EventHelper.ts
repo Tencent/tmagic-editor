@@ -113,10 +113,10 @@ export default class EventHelper extends EventEmitter {
   }
 
   public removeNodeEvents() {
-    Array.from(this.nodeEventList.keys()).forEach((handler) => {
+    for (const handler of Array.from(this.nodeEventList.keys())) {
       const name = this.nodeEventList.get(handler);
       name && this.off(name, handler);
-    });
+    }
 
     this.nodeEventList.clear();
   }
@@ -126,10 +126,10 @@ export default class EventHelper extends EventEmitter {
 
     this.removeDataSourceEvents(dataSourceList);
 
-    dataSourceList.forEach((dataSource) => {
+    for (const dataSource of dataSourceList) {
       const dataSourceEvent = this.dataSourceEventList.get(dataSource.id) ?? new Map<string, (args: any) => void>();
 
-      (dataSource.schema.events || []).forEach((event) => {
+      for (const event of dataSource.schema.events || []) {
         const [prefix, ...path] = event.name?.split('.') || [];
         if (!prefix) return;
         const handler = (...args: any[]) => {
@@ -143,9 +143,9 @@ export default class EventHelper extends EventEmitter {
           // 数据源自定义事件
           dataSource.on(prefix, handler);
         }
-      });
+      }
       this.dataSourceEventList.set(dataSource.id, dataSourceEvent);
-    });
+    }
   }
 
   public removeDataSourceEvents(dataSourceList: DataSource[]) {
@@ -154,20 +154,20 @@ export default class EventHelper extends EventEmitter {
     }
 
     // 先清掉之前注册的事件，重新注册
-    dataSourceList.forEach((dataSource) => {
+    for (const dataSource of dataSourceList) {
       const dataSourceEvent = this.dataSourceEventList.get(dataSource.id)!;
 
       if (!dataSourceEvent) return;
 
-      Array.from(dataSourceEvent.keys()).forEach((eventName) => {
+      for (const eventName of Array.from(dataSourceEvent.keys())) {
         const [prefix, ...path] = eventName.split('.');
         if (prefix === DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX) {
           dataSource.offDataChange(path.join('.'), dataSourceEvent.get(eventName)!);
         } else {
           dataSource.off(prefix, dataSourceEvent.get(eventName)!);
         }
-      });
-    });
+      }
+    }
 
     this.dataSourceEventList.clear();
   }
