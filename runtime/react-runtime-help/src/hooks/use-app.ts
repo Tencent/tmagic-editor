@@ -20,7 +20,7 @@ import { useContext, useEffect, useState } from 'react';
 
 import type TMagicApp from '@tmagic/core';
 import type { Id, MNodeInstance, Node as TMagicNode } from '@tmagic/core';
-import { isDslNode } from '@tmagic/core';
+import { isDslNode, NODE_CONDS_RESULT_KEY } from '@tmagic/core';
 
 import AppContent from '../AppContent';
 
@@ -96,8 +96,13 @@ export const useApp = ({ methods = {}, config, iteratorContainerId, iteratorInde
   }
 
   const display = <T extends MNodeInstance>(config: T) => {
-    if (config.visible === false) return false;
-    if (config.condResult === false) return false;
+    if (
+      config.visible === false ||
+      config.condResult === false ||
+      (typeof config.condResult === 'undefined' && config[NODE_CONDS_RESULT_KEY])
+    ) {
+      return false;
+    }
 
     const displayCfg = config.display;
 

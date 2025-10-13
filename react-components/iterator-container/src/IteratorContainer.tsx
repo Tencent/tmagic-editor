@@ -56,11 +56,10 @@ const IteratorContainer: React.FC<IteratorContainerProps> = ({
 
   const MagicUiComp = app?.resolveComponent('container');
 
-  const iteratorContainerNode = app?.getNode<TMagicIteratorContainer>(
-    id || config.id || '',
+  const iteratorContainerNode = app?.getNode<TMagicIteratorContainer>(id || config.id || '', {
     iteratorContainerId,
     iteratorIndex,
-  );
+  });
 
   iteratorContainerNode?.resetNodes();
 

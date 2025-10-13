@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
@@ -17,7 +16,12 @@
  * limitations under the License.
  */
 
-import { NODE_CONDS_KEY, NODE_DISABLE_CODE_BLOCK_KEY, NODE_DISABLE_DATA_SOURCE_KEY } from '@tmagic/core';
+import {
+  NODE_CONDS_KEY,
+  NODE_CONDS_RESULT_KEY,
+  NODE_DISABLE_CODE_BLOCK_KEY,
+  NODE_DISABLE_DATA_SOURCE_KEY,
+} from '@tmagic/core';
 import { tMagicMessage } from '@tmagic/design';
 import type { FormConfig, FormState, TabConfig, TabPaneConfig } from '@tmagic/form';
 
@@ -163,8 +167,20 @@ export const advancedTabConfig: TabPaneConfig = {
 
 export const displayTabConfig: TabPaneConfig = {
   title: '显示条件',
-  display: (_vm: FormState, { model }: any) => model.type !== 'page',
+  display: (_state: FormState, { model }: any) => model.type !== 'page',
   items: [
+    {
+      name: NODE_CONDS_RESULT_KEY,
+      type: 'select',
+      text: '条件成立时',
+      defaultValue: false,
+      options: [
+        { text: '显示', value: false },
+        { text: '隐藏', value: true },
+      ],
+      extra: (_state, { model }) =>
+        `条件成立时${model[NODE_CONDS_RESULT_KEY] ? '隐藏' : '显示'}，不成立时${model[NODE_CONDS_RESULT_KEY] ? '显示' : '隐藏'}；<br />同一条件组内的所有条件配置同时成立时表示该条件组成立，任意一个条件组成立时表示条件成立(条件组内为且的关系，条件组间为或的关系)；<br />条件为空时表示成立；`,
+    },
     {
       type: 'display-conds',
       name: NODE_CONDS_KEY,

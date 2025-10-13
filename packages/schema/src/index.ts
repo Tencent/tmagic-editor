@@ -47,6 +47,8 @@ export enum NodeType {
 }
 
 export const NODE_CONDS_KEY = 'displayConds';
+export const NODE_CONDS_RESULT_KEY = 'displayCondsResultReverse';
+
 export const NODE_DISABLE_DATA_SOURCE_KEY = '_tmagic_node_disabled_data_source';
 export const NODE_DISABLE_CODE_BLOCK_KEY = '_tmagic_node_disabled_code_block';
 
@@ -130,6 +132,7 @@ export interface MComponent {
   /** 组件根Dom的style */
   style?: StyleSchema;
   [NODE_CONDS_KEY]?: DisplayCond[];
+  [NODE_CONDS_RESULT_KEY]?: boolean;
   [key: string]: any;
 }
 

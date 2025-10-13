@@ -22,7 +22,13 @@ import EventEmitter from 'events';
 import { cloneDeep } from 'lodash-es';
 
 import type { DataSourceSchema, default as TMagicApp, DisplayCond, Id, MNode } from '@tmagic/core';
-import { compiledNode, getDefaultValueFromFields, NODE_CONDS_KEY, NODE_DISABLE_DATA_SOURCE_KEY } from '@tmagic/core';
+import {
+  compiledNode,
+  getDefaultValueFromFields,
+  NODE_CONDS_KEY,
+  NODE_CONDS_RESULT_KEY,
+  NODE_DISABLE_DATA_SOURCE_KEY,
+} from '@tmagic/core';
 
 import { SimpleObservedData } from './observed-data/SimpleObservedData';
 import { DataSource, HttpDataSource } from './data-sources';
@@ -238,8 +244,9 @@ class DataSourceManager extends EventEmitter {
         Array.isArray(items) && deep ? items.map((item) => this.compiledNode(item, sourceId, deep)) : items;
     }
 
-    if (node.condResult === false) return newNode;
-    if (node.visible === false) return newNode;
+    if (node.condResult === false || (typeof node.condResult === 'undefined' && node[NODE_CONDS_RESULT_KEY])) {
+      return newNode;
+    }
 
     // 编译函数这里作为参数，方便后续支持自定义编译
     return compiledNode(
@@ -255,11 +262,24 @@ class DataSourceManager extends EventEmitter {
    * @param {{ [NODE_CONDS_KEY]?: DisplayCond[] }} node 显示条件组配置
    * @returns {boolean} 是否显示
    */
-  public compliedConds(node: { [NODE_CONDS_KEY]?: DisplayCond[]; [NODE_DISABLE_DATA_SOURCE_KEY]?: boolean }) {
+  public compliedConds(
+    node: {
+      [NODE_CONDS_KEY]?: DisplayCond[];
+      [NODE_CONDS_RESULT_KEY]?: boolean;
+      [NODE_DISABLE_DATA_SOURCE_KEY]?: boolean;
+    },
+    data = this.data,
+  ) {
     if (node[NODE_DISABLE_DATA_SOURCE_KEY]) {
       return true;
     }
-    return compliedConditions(node, this.data);
+
+    const result = compliedConditions(node, data);
+
+    if (!node[NODE_CONDS_RESULT_KEY]) {
+      return result;
+    }
+    return !result;
   }
 
   /**
@@ -271,7 +291,11 @@ class DataSourceManager extends EventEmitter {
    */
   public compliedIteratorItemConds(
     itemData: any,
-    node: { [NODE_CONDS_KEY]?: DisplayCond[] },
+    node: {
+      [NODE_CONDS_KEY]?: DisplayCond[];
+      [NODE_CONDS_RESULT_KEY]?: boolean;
+      [NODE_DISABLE_DATA_SOURCE_KEY]?: boolean;
+    },
     dataSourceField: string[] = [],
   ) {
     const [dsId, ...keys] = dataSourceField;
@@ -279,7 +303,7 @@ class DataSourceManager extends EventEmitter {
     if (!ds) return true;
 
     const ctxData = createIteratorContentData(itemData, ds.id, keys, this.data);
-    return compliedConditions(node, ctxData);
+    return this.compliedConds(node, ctxData);
   }
 
   public compliedIteratorItems(itemData: any, nodes: MNode[], dataSourceField: string[] = []): MNode[] {

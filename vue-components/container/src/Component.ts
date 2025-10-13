@@ -1,7 +1,7 @@
 import { defineComponent, h, inject, type PropType, provide } from 'vue-demi';
 
 import type TMagicApp from '@tmagic/core';
-import { Id, IS_DSL_NODE_KEY, MComponent } from '@tmagic/core';
+import { Id, IS_DSL_NODE_KEY, MComponent, NODE_CONDS_RESULT_KEY } from '@tmagic/core';
 import { useComponent, useComponentStatus, useNode, type UserRenderFunction } from '@tmagic/vue-runtime-help';
 
 export default defineComponent({
@@ -56,10 +56,13 @@ export default defineComponent({
     const { style, className } = componentStatusStore;
 
     return () => {
-      if (props.config.visible === false) return null;
-      if (props.config.condResult === false) return null;
-
-      if (typeof props.config.display === 'function' && props.config.display({ app, node }) === false) {
+      if (
+        props.config.visible === false ||
+        props.config.condResult === false ||
+        // 没有配置条件时，不会编译出condResult，所以这里是undefined
+        (typeof props.config.condResult === 'undefined' && props.config[NODE_CONDS_RESULT_KEY]) ||
+        (typeof props.config.display === 'function' && props.config.display({ app, node }) === false)
+      ) {
         return null;
       }
 
