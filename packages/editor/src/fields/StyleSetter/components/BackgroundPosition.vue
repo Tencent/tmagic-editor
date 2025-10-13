@@ -6,13 +6,21 @@
         :key="index"
         link
         :class="model[name] === item.value && 'btn-active'"
+        :disabled="disabled"
         @click="changeHandler(item.value)"
       >
         <div :class="['position-icon', item.class, model[name] === item.value && 'active']"></div>
       </TMagicButton>
     </div>
     <div class="custom-value">
-      <TMagicInput v-model="model[name]" size="small" placeholder="自定义背景位置" clearable @change="changeHandler">
+      <TMagicInput
+        v-model="model[name]"
+        placeholder="自定义背景位置"
+        clearable
+        :size="size"
+        :disabled="disabled"
+        @change="changeHandler"
+      >
       </TMagicInput>
     </div>
   </div>

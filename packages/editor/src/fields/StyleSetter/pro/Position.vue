@@ -1,12 +1,16 @@
 <template>
-  <MContainer :config="config" :model="values" @change="change"></MContainer>
+  <MContainer :config="config" :model="values" :size="size" :disabled="disabled" @change="change"></MContainer>
 </template>
 
 <script lang="ts" setup>
 import { ContainerChangeEventData, MContainer } from '@tmagic/form';
 import type { StyleSchema } from '@tmagic/schema';
 
-const props = defineProps<{ values: Partial<StyleSchema> }>();
+const props = defineProps<{
+  values: Partial<StyleSchema>;
+  disabled?: boolean;
+  size?: 'large' | 'default' | 'small';
+}>();
 
 const emit = defineEmits<{
   change: [v: string | StyleSchema, eventData: ContainerChangeEventData];

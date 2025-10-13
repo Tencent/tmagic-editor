@@ -30,7 +30,7 @@
       </div>
     </div>
     <div class="border-value-container">
-      <MContainer :config="config" :model="model" @change="change"></MContainer>
+      <MContainer :config="config" :model="model" :size="size" :disabled="disabled" @change="change"></MContainer>
     </div>
   </div>
 </template>
@@ -67,7 +67,6 @@ const config = computed(() => ({
     {
       name: `border${direction.value}Style`,
       text: '边框样式',
-
       labelWidth: '68px',
       type: 'data-source-field-select',
       fieldConfig: {
@@ -90,6 +89,8 @@ const emit = defineEmits<{
 withDefaults(
   defineProps<{
     model: FormValue;
+    disabled?: boolean;
+    size?: 'large' | 'default' | 'small';
   }>(),
   {},
 );

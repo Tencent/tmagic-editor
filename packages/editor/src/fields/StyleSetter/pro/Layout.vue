@@ -1,6 +1,12 @@
 <template>
-  <MContainer :config="config" :model="values" @change="change"></MContainer>
-  <Box v-show="!['fixed', 'absolute'].includes(values.position)" :model="values" @change="change"></Box>
+  <MContainer :config="config" :model="values" :size="size" :disabled="disabled" @change="change"></MContainer>
+  <Box
+    v-show="!['fixed', 'absolute'].includes(values.position)"
+    :model="values"
+    :size="size"
+    :disabled="disabled"
+    @change="change"
+  ></Box>
 </template>
 
 <script lang="ts" setup>
@@ -28,6 +34,8 @@ import {
 
 defineProps<{
   values: Partial<StyleSchema>;
+  disabled?: boolean;
+  size?: 'large' | 'default' | 'small';
 }>();
 
 const emit = defineEmits<{

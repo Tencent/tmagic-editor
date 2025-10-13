@@ -32,7 +32,6 @@
       content="选择数据源"
     >
       <TMagicButton
-        style="margin-left: 5px"
         :type="showDataSourceFieldSelect ? 'primary' : 'default'"
         :size="size"
         @click="showDataSourceFieldSelect = !showDataSourceFieldSelect"

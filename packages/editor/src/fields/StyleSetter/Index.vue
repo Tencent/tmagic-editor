@@ -1,14 +1,19 @@
 <template>
-  <div class="m-fields-style-setter">
-    <TMagicCollapse :model-value="collapseValue">
-      <template v-for="(item, index) in list" :key="index">
-        <TMagicCollapseItem :name="`${index}`">
-          <template #title><MIcon :icon="Grid"></MIcon>{{ item.title }}</template>
-          <component v-if="item.component" :is="item.component" :values="model[name]" @change="change"></component>
-        </TMagicCollapseItem>
-      </template>
-    </TMagicCollapse>
-  </div>
+  <TMagicCollapse class="m-fields-style-setter" :model-value="collapseValue">
+    <template v-for="(item, index) in list" :key="index">
+      <TMagicCollapseItem :name="`${index}`">
+        <template #title><MIcon :icon="Grid"></MIcon>{{ item.title }}</template>
+        <component
+          v-if="item.component"
+          :is="item.component"
+          :values="model[name]"
+          :size="size"
+          :disabled="disabled"
+          @change="change"
+        ></component>
+      </TMagicCollapseItem>
+    </template>
+  </TMagicCollapse>
 </template>
 
 <script setup lang="ts">

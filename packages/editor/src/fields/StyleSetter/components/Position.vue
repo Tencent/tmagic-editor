@@ -4,9 +4,10 @@
       <span class="next-input">
         <input
           v-model="model[item.name]"
-          :title="model[item.name]"
-          @change="change($event, item.name)"
           placeholder="0"
+          :title="model[item.name]"
+          :disabled="disabled"
+          @change="change($event, item.name)"
         />
       </span>
     </div>
@@ -42,6 +43,8 @@ const emit = defineEmits<{
 withDefaults(
   defineProps<{
     model: FormValue;
+    disabled?: boolean;
+    size?: 'large' | 'default' | 'small';
   }>(),
   {},
 );

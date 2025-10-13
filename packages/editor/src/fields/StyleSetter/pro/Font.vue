@@ -1,5 +1,5 @@
 <template>
-  <MContainer :config="config" :model="values" @change="change"></MContainer>
+  <MContainer :config="config" :model="values" :size="size" :disabled="disabled" @change="change"></MContainer>
 </template>
 
 <script lang="ts" setup>
@@ -10,7 +10,11 @@ import type { StyleSchema } from '@tmagic/schema';
 
 import { AlignCenter, AlignLeft, AlignRight } from '../icons/text-align';
 
-defineProps<{ values: Partial<StyleSchema> }>();
+defineProps<{
+  values: Partial<StyleSchema>;
+  disabled?: boolean;
+  size?: 'large' | 'default' | 'small';
+}>();
 
 const emit = defineEmits<{
   change: [v: StyleSchema, eventData: ContainerChangeEventData];
