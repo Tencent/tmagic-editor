@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 100%">
+  <div class="m-fields-text">
     <TMagicInput
       v-model="model[name]"
       ref="input"

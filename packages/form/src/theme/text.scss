@@ -1,3 +1,9 @@
+.m-fields-text {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
 .m-form-validate__warning {
   color: var(--el-color-warning);
   font-size: 12px;
