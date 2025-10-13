@@ -3,7 +3,7 @@
   "name": "tmagic",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@10.11.1",
+  "packageManager": "pnpm@10.18.2",
   "scripts": {
     "bootstrap": "pnpm i && pnpm build",
     "clean:top": "rimraf */**/dist */**/types */dist coverage dwt* temp packages/cli/lib",
@@ -47,7 +47,7 @@
     "@types/node": "24.0.10",
     "@vitejs/plugin-vue": "^5.2.3",
     "@vitest/coverage-v8": "^2.1.9",
-    "@vue/compiler-sfc": "^3.5.13",
+    "@vue/compiler-sfc": "catalog:",
     "c8": "^7.14.0",
     "commitizen": "^4.3.1",
     "conventional-changelog-cli": "^5.0.0",
@@ -55,7 +55,7 @@
     "cz-conventional-changelog": "^3.3.0",
     "element-plus": "^2.9.11",
     "enquirer": "^2.4.1",
-    "eslint": "^9.35.0",
+    "eslint": "^9.37.0",
     "execa": "^4.1.0",
     "highlight.js": "^11.11.1",
     "husky": "^9.1.7",
@@ -76,7 +76,7 @@
     "vitepress": "^1.6.4",
     "vitest": "^3.2.4",
     "vue": "catalog:",
-    "vue-tsc": "^3.0.7"
+    "vue-tsc": "^3.1.1"
   },
   "config": {
     "commitizen": {

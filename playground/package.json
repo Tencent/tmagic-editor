@@ -31,7 +31,7 @@
     "@vitejs/plugin-vue": "^6.0.1",
     "@vitejs/plugin-vue-jsx": "^5.1.0",
     "@vue/compiler-sfc": "catalog:",
-    "sass": "^1.91.0",
+    "lightningcss": "^1.30.2",
     "terser": "^5.43.1",
     "typescript": "catalog:",
     "unplugin-auto-import": "^20.0.0",

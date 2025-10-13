@@ -32,10 +32,10 @@
     "@vue/compiler-sfc": "catalog:",
     "fs-extra": "^11.3.1",
     "minimist": "^1.2.8",
+    "lightningcss": "^1.30.2",
     "rimraf": "^3.0.2",
     "rollup": "4.44.1",
     "rollup-plugin-external-globals": "^0.13.0",
-    "sass": "^1.91.0",
     "terser": "^5.43.1",
     "typescript": "catalog:",
     "vite": "catalog:"
