@@ -9,12 +9,12 @@
     >
       <TMagicTooltip v-if="option.tooltip" placement="top-start" :content="option.tooltip">
         <div>
-          <TMagicIcon v-if="option.icon" :size="'16'"><component :is="option.icon"></component></TMagicIcon>
+          <TMagicIcon v-if="option.icon" :size="iconSize"><component :is="option.icon"></component></TMagicIcon>
           <span>{{ option.text }}</span>
         </div>
       </TMagicTooltip>
       <div v-else>
-        <TMagicIcon v-if="option.icon" :size="'16'"><component :is="option.icon"></component></TMagicIcon>
+        <TMagicIcon v-if="option.icon" :size="iconSize"><component :is="option.icon"></component></TMagicIcon>
         <span>{{ option.text }}</span>
       </div>
     </component>
@@ -49,4 +49,14 @@ const clickHandler = (item: any) => {
 };
 
 useAddField(props.prop);
+
+const iconSize = computed(() => {
+  if (props.size === 'small') {
+    return '12';
+  }
+  if (props.size === 'large') {
+    return '16';
+  }
+  return '14';
+});
 </script>
