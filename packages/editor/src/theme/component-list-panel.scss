@@ -11,6 +11,17 @@
         border-bottom: 1px solid $border-color;
         margin-bottom: 10px;
       }
+
+      > .el-collapse-item__header {
+        padding: 0 10px;
+        box-sizing: border-box;
+      }
+    }
+
+    .el-collapse-item__title {
+      display: flex;
+      align-items: center;
+      gap: 3px;
     }
 
     .el-collapse-item__header,
