@@ -1,5 +1,5 @@
 {
-  "version": "1.6.0",
+  "version": "1.6.1",
   "name": "@tmagic/form-schema",
   "type": "module",
   "main": "dist/tmagic-form-schema.umd.cjs",

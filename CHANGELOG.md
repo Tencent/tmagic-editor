@@ -1,3 +1,21 @@
+## [1.6.1](https://github.com/Tencent/tmagic-editor/compare/v1.6.0...v1.6.1) (2025-10-14)
+
+
+### Bug Fixes
+
+* **core:** 异步加载数据源时，数据源事件配置失效 ([1031595](https://github.com/Tencent/tmagic-editor/commit/1031595a976b33f8e5e3a71d8c00944d4777beb1))
+* **form:** text与同行元素不对齐问题 ([cae11dc](https://github.com/Tencent/tmagic-editor/commit/cae11dce1290b9ea314c07daee30f1eb6f400681))
+* 组件声明周期函数配置中配置数据源自有方法生效 ([e400175](https://github.com/Tencent/tmagic-editor/commit/e400175ffe89ab3105e50d2ffcd702d9d2a12970))
+
+
+### Features
+
+* **data-source, editor, schema, react-runtime-help, vue-components:** 新增条件成立时隐藏的配置功能 ([51f95ae](https://github.com/Tencent/tmagic-editor/commit/51f95aef6f649851222e09e7234648f4985d1ad8))
+* **data-source:** 数据源数据变化事件监听响应支持立即执行 ([849b561](https://github.com/Tencent/tmagic-editor/commit/849b561933d74bcc68f75f15d67e0d252c5a8468))
+* **editor:** 属性配置中的样式面板样式优化 ([81aa8f1](https://github.com/Tencent/tmagic-editor/commit/81aa8f151d765bf08d2f88c334ff7c58b38aab56))
+
+
+
 # [1.6.0](https://github.com/Tencent/tmagic-editor/compare/v1.6.0-beta.6...v1.6.0) (2025-08-27)
 
 
