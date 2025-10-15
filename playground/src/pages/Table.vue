@@ -2,7 +2,7 @@
   <div style="width: 100%">
     <NavMenu :data="menu"></NavMenu>
     <div class="table-content">
-      <MagicTable class="left-panel" :columns="columns" :data="data" :show-header="true"></MagicTable>
+      <MagicTable class="left-panel" :columns="columns" :data="data" :show-header="true" rowkey-name="a"></MagicTable>
       <TMagicTabs class="right-panel" modelValue="columns">
         <TMagicTabPane label="columns" name="columns">
           <TMagicCodeEditor class="code-editor-content" :init-values="columns" @save="change"></TMagicCodeEditor>
@@ -41,6 +41,21 @@ const columns = ref<ColumnConfig[]>([
     prop: 'a',
     label: '1231',
   },
+  {
+    label: '操作',
+    actions: [
+      {
+        type: 'delete',
+        buttonType: 'danger',
+        disabled: (row) => row.a === 'a1',
+        display: (row) => row.a !== 'b1',
+        text: '删除',
+        handler: (row) => {
+          console.log(row);
+        },
+      },
+    ],
+  },
 ]);
 
 const data = ref([
@@ -49,6 +64,22 @@ const data = ref([
     b: [
       {
         a: 1,
+      },
+    ],
+  },
+  {
+    a: 'b1',
+    b: [
+      {
+        a: 2,
+      },
+    ],
+  },
+  {
+    a: 'c2',
+    b: [
+      {
+        a: 3,
       },
     ],
   },

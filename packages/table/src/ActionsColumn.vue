@@ -15,6 +15,7 @@
           size="small"
           :type="action.buttonType || 'primary'"
           :icon="action.icon"
+          :disabled="disabled(action.disabled, scope.row)"
           @click="actionHandler(action, scope.row, scope.$index)"
           ><span v-html="formatter(action.text, scope.row)"></span
         ></TMagicButton>
@@ -71,7 +72,20 @@ const display = (fuc: boolean | Function | undefined, row: any) => {
   if (typeof fuc === 'function') {
     return fuc(row);
   }
+  if (typeof fuc === 'boolean') {
+    return fuc;
+  }
   return true;
+};
+
+const disabled = (fuc: boolean | Function | undefined, row: any) => {
+  if (typeof fuc === 'function') {
+    return fuc(row);
+  }
+  if (typeof fuc === 'boolean') {
+    return fuc;
+  }
+  return false;
 };
 
 const formatter = (fuc: string | Function | undefined, row: any) => {
