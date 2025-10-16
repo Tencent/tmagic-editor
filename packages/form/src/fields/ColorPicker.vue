@@ -1,10 +1,10 @@
 <template>
   <TMagicColorPicker
-    v-model="model[name]"
+    :model-value="model[name]"
     :size="size"
     :disabled="disabled"
     :showAlpha="true"
-    @change="changeHandler"
+    @update:model-value="changeHandler"
   ></TMagicColorPicker>
 </template>
 

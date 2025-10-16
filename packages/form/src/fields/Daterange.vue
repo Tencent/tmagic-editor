@@ -1,6 +1,6 @@
 <template>
   <TMagicDatePicker
-    v-model="value"
+    :model-value="value"
     type="datetimerange"
     range-separator="-"
     start-placeholder="开始日期"
@@ -12,7 +12,7 @@
     :value-format="config.valueFormat || 'YYYY/MM/DD HH:mm:ss'"
     :date-format="config.dateFormat || 'YYYY/MM/DD'"
     :time-format="config.timeFormat || 'HH:mm:ss'"
-    @change="changeHandler"
+    @update:model-value="changeHandler"
   ></TMagicDatePicker>
 </template>
 

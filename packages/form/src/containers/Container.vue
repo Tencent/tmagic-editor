@@ -1,32 +1,18 @@
 <template>
   <div
-    v-if="config"
     :data-tmagic-id="config.id"
     :data-tmagic-form-item-prop="itemProp"
-    :style="config.tip ? 'display: flex;align-items: baseline;' : ''"
-    :class="`m-form-container m-container-${type || ''} ${config.className || ''}`"
+    :class="`m-form-container m-container-${type || ''} ${config.className || ''}${config.tip ? ' has-tip' : ''}`"
   >
-    <m-fields-hidden
-      v-if="type === 'hidden'"
-      :model="model"
-      :config="config"
-      :name="config.name"
-      :disabled="disabled"
-      :prop="itemProp"
-    ></m-fields-hidden>
+    <m-fields-hidden v-if="type === 'hidden'" v-bind="fieldsProps" :model="model"></m-fields-hidden>
 
     <component
       v-else-if="items && !text && type && display"
-      :key="key(config)"
-      :size="size"
+      v-bind="fieldsProps"
       :is="tagName"
       :model="model"
       :last-values="lastValues"
       :is-compare="isCompare"
-      :config="config"
-      :disabled="disabled"
-      :name="name"
-      :prop="itemProp"
       :step-active="stepActive"
       :expand-more="expand"
       :label-width="itemLabelWidth"
@@ -35,45 +21,28 @@
     ></component>
 
     <template v-else-if="type && display && !showDiff">
-      <TMagicFormItem
-        :style="config.tip ? 'flex: 1' : ''"
-        :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text }"
-        :prop="itemProp"
-        :label-width="itemLabelWidth"
-        :label-position="config.labelPosition"
-        :rules="rule"
-      >
+      <TMagicFormItem v-bind="formItemProps" :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text }">
         <template #label><span v-html="type === 'checkbox' ? '' : text" :title="config.labelTitle"></span></template>
         <TMagicTooltip v-if="tooltip">
           <component
-            :key="key(config)"
-            :size="size"
+            v-bind="fieldsProps"
             :is="tagName"
             :model="model"
             :last-values="lastValues"
-            :config="config"
-            :name="name"
-            :disabled="disabled"
-            :prop="itemProp"
             @change="onChangeHandler"
             @addDiffCount="onAddDiffCount"
           ></component>
-          <template #content>
+          <template #content v-if="tooltip">
             <div v-html="tooltip"></div>
           </template>
         </TMagicTooltip>
 
         <component
           v-else
-          :key="key(config)"
-          :size="size"
+          v-bind="fieldsProps"
           :is="tagName"
           :model="model"
           :last-values="lastValues"
-          :config="config"
-          :name="name"
-          :disabled="disabled"
-          :prop="itemProp"
           @change="onChangeHandler"
           @addDiffCount="onAddDiffCount"
         ></component>
@@ -93,44 +62,18 @@
     <template v-else-if="type && display && showDiff">
       <!-- 上次内容 -->
       <TMagicFormItem
-        :style="config.tip ? 'flex: 1' : ''"
-        :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text }"
-        :prop="itemProp"
-        :label-width="itemLabelWidth"
-        :label-position="config.labelPosition"
-        :rules="rule"
-        style="background: #f7dadd"
+        v-bind="formItemProps"
+        :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text, 'show-diff': true }"
       >
         <template #label><span v-html="type === 'checkbox' ? '' : text" :title="config.labelTitle"></span></template>
         <TMagicTooltip v-if="tooltip">
-          <component
-            :key="key(config)"
-            :size="size"
-            :is="tagName"
-            :model="lastValues"
-            :config="config"
-            :name="name"
-            :disabled="disabled"
-            :prop="itemProp"
-            @change="onChangeHandler"
-          ></component>
-          <template #content>
+          <component v-bind="fieldsProps" :is="tagName" :model="lastValues" @change="onChangeHandler"></component>
+          <template #content v-if="tooltip">
             <div v-html="tooltip"></div>
           </template>
         </TMagicTooltip>
 
-        <component
-          v-else
-          :key="key(config)"
-          :size="size"
-          :is="tagName"
-          :model="lastValues"
-          :config="config"
-          :name="name"
-          :disabled="disabled"
-          :prop="itemProp"
-          @change="onChangeHandler"
-        ></component>
+        <component v-else v-bind="fieldsProps" :is="tagName" :model="lastValues" @change="onChangeHandler"></component>
 
         <div v-if="extra" v-html="extra" class="m-form-tip"></div>
       </TMagicFormItem>
@@ -141,46 +84,22 @@
           <div v-html="config.tip"></div>
         </template>
       </TMagicTooltip>
+
       <!-- 当前内容 -->
       <TMagicFormItem
+        v-bind="formItemProps"
         :style="config.tip ? 'flex: 1' : ''"
-        :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text }"
-        :prop="itemProp"
-        :label-width="itemLabelWidth"
-        :label-position="config.labelPosition"
-        :rules="rule"
-        style="background: #def7da"
+        :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text, 'show-diff': true }"
       >
         <template #label><span v-html="type === 'checkbox' ? '' : text" :title="config.labelTitle"></span></template>
         <TMagicTooltip v-if="tooltip">
-          <component
-            :key="key(config)"
-            :size="size"
-            :is="tagName"
-            :model="model"
-            :config="config"
-            :name="name"
-            :disabled="disabled"
-            :prop="itemProp"
-            @change="onChangeHandler"
-          ></component>
+          <component v-bind="fieldsProps" :is="tagName" :model="model" @change="onChangeHandler"></component>
           <template #content>
             <div v-html="tooltip"></div>
           </template>
         </TMagicTooltip>
 
-        <component
-          v-else
-          :key="key(config)"
-          :size="size"
-          :is="tagName"
-          :model="model"
-          :config="config"
-          :name="name"
-          :disabled="disabled"
-          :prop="itemProp"
-          @change="onChangeHandler"
-        ></component>
+        <component v-else v-bind="fieldsProps" :is="tagName" :model="model" @change="onChangeHandler"></component>
 
         <div v-if="extra" v-html="extra" class="m-form-tip"></div>
       </TMagicFormItem>
@@ -223,12 +142,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref, toRaw, watch, watchEffect } from 'vue';
+import { computed, inject, readonly, ref, toRaw, watch, watchEffect } from 'vue';
 import { WarningFilled } from '@element-plus/icons-vue';
 import { isEqual } from 'lodash-es';
 
 import { TMagicButton, TMagicFormItem, TMagicIcon, TMagicTooltip } from '@tmagic/design';
-import { setValueByKeyPath } from '@tmagic/utils';
 
 import type { ChildConfig, ContainerChangeEventData, ContainerCommonConfig, FormState, FormValue } from '../schema';
 import { display as displayFunction, filterFunction, getRules } from '../utils/form';
@@ -334,6 +252,22 @@ const display = computed((): boolean => {
   return value;
 });
 
+const fieldsProps = computed(() => ({
+  size: props.size,
+  config: props.config,
+  name: name.value,
+  disabled: disabled.value,
+  prop: itemProp.value,
+  key: props.config[mForm?.keyProps],
+}));
+
+const formItemProps = computed(() => ({
+  prop: itemProp.value,
+  labelWidth: itemLabelWidth.value,
+  labelPosition: props.config.labelPosition,
+  rules: rule.value,
+}));
+
 const itemLabelWidth = computed(() => props.config.labelWidth ?? props.labelWidth);
 
 watchEffect(() => {
@@ -406,8 +340,29 @@ const isValidName = () => {
   return true;
 };
 
+const createModelProxy = (
+  target: any,
+  setModelFn: (_key: string, _value: any) => void,
+  pathPrefix: string = '',
+): any => {
+  return new Proxy(target, {
+    get: (obj, key: string) => {
+      const value = obj[key];
+      if (value && typeof value === 'object') {
+        const newPath = pathPrefix ? `${pathPrefix}.${key}` : key;
+        return createModelProxy(value, setModelFn, newPath);
+      }
+      return value;
+    },
+    set: (obj, key: string, value) => {
+      setModelFn(pathPrefix ? `${pathPrefix}.${key}` : key, value);
+      return true;
+    },
+  });
+};
+
 const onChangeHandler = async function (v: any, eventData: ContainerChangeEventData = {}) {
-  const { filter, onChange, trim, dynamicKey } = props.config as any;
+  const { filter, onChange, trim } = props.config as any;
   let value: FormValue | number | string | any[] = toRaw(v);
   const changeRecords = eventData.changeRecords || [];
   const newChangeRecords = [...changeRecords];
@@ -416,20 +371,28 @@ const onChangeHandler = async function (v: any, eventData: ContainerChangeEventD
     value = filterHandler(filter, v);
 
     if (typeof onChange === 'function') {
+      const setModel = (key: string, value: any) => {
+        if (props.config.name) {
+          newChangeRecords.push({ propPath: itemProp.value.replace(`${props.config.name}`, key), value });
+        } else {
+          newChangeRecords.push({ propPath: itemProp.value, value });
+        }
+      };
+
+      const setFormValue = (key: string, value: any) => {
+        newChangeRecords.push({ propPath: key, value });
+      };
+
       value =
         (await onChange(mForm, value, {
-          model: props.model,
-          values: mForm?.initValues,
-          formValue: mForm?.values,
+          model: createModelProxy(props.model, setModel),
+          values: mForm ? readonly(mForm.initValues) : null,
+          formValue: createModelProxy(mForm?.values || {}, setFormValue),
           prop: itemProp.value,
           config: props.config,
           changeRecords: newChangeRecords,
-          setModel: (key: string, value: any) => {
-            setValueByKeyPath(key, value, props.model);
-            if (props.config.name) {
-              newChangeRecords.push({ propPath: itemProp.value.replace(`${props.config.name}`, key), value });
-            }
-          },
+          setModel,
+          setFormValue,
         })) ?? value;
     }
     value = trimHandler(trim, value) ?? value;
@@ -440,19 +403,10 @@ const onChangeHandler = async function (v: any, eventData: ContainerChangeEventD
   let valueProp = itemProp.value;
 
   if (hasModifyKey(eventData)) {
-    if (dynamicKey) {
-      props.model[eventData.modifyKey!] = value;
-    } else if (isValidName()) {
-      props.model[name.value][eventData.modifyKey!] = value;
-    }
-
     valueProp = valueProp ? `${valueProp}.${eventData.modifyKey}` : eventData.modifyKey!;
 
     // 需要清除掉modifyKey，不然往上层抛出后还会被认为需要修改
     delete eventData.modifyKey;
-  } else if (isValidName() && props.model !== value && (v !== value || props.model[name.value] !== value)) {
-    // field内容下包含field-link时，model===value, 这里避免循环引用
-    props.model[name.value] = value;
   }
 
   if (changeRecords.length === 0) {

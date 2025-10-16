@@ -1,13 +1,13 @@
 <template>
   <TMagicDatePicker
-    v-model="model[name]"
+    :model-value="model[name]"
     type="date"
     :size="size"
     :placeholder="config.placeholder"
     :disabled="disabled"
     :format="config.format || 'YYYY/MM/DD'"
     :value-format="config.valueFormat || 'YYYY/MM/DD'"
-    @change="changeHandler"
+    @update:model-value="changeHandler"
   ></TMagicDatePicker>
 </template>
 

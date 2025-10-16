@@ -1,11 +1,11 @@
 <template>
   <TMagicSwitch
-    v-model="model[name]"
+    :model-value="model[name]"
     :size="size"
     :activeValue="activeValue"
     :inactiveValue="inactiveValue"
     :disabled="disabled"
-    @change="changeHandler"
+    @update:model-value="changeHandler"
   ></TMagicSwitch>
 </template>
 

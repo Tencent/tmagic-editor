@@ -1,22 +1,18 @@
 <template>
-  <TMagicRadioGroup v-if="model" v-model="model[name]" :size="size" :disabled="disabled">
+  <TMagicRadioGroup v-if="model" :model-value="model[name]" :size="size" :disabled="disabled">
     <component
-      :is="itemComponent"
       v-for="option in config.options"
+      :is="itemComponent"
       :value="option.value"
       :key="`${option.value}`"
       @click.prevent="clickHandler(option.value)"
     >
-      <TMagicTooltip v-if="option.tooltip" placement="top-start" :content="option.tooltip">
+      <TMagicTooltip :disabled="!Boolean(option.tooltip)" placement="top-start" :content="option.tooltip">
         <div>
           <TMagicIcon v-if="option.icon" :size="iconSize"><component :is="option.icon"></component></TMagicIcon>
           <span>{{ option.text }}</span>
         </div>
       </TMagicTooltip>
-      <div v-else>
-        <TMagicIcon v-if="option.icon" :size="iconSize"><component :is="option.icon"></component></TMagicIcon>
-        <span>{{ option.text }}</span>
-      </div>
     </component>
   </TMagicRadioGroup>
 </template>
@@ -39,13 +35,9 @@ const itemComponent = computed(() => (props.config.childType === 'button' ? TMag
 
 const emit = defineEmits(['change']);
 
-const changeHandler = (value: number) => {
-  emit('change', value);
-};
-
-const clickHandler = (item: any) => {
-  props.model[props.name] = props.model[props.name] === item ? '' : item;
-  changeHandler(props.model[props.name]);
+const clickHandler = (item: string | number | boolean) => {
+  // 再次点击取消选中
+  emit('change', props.model[props.name] === item ? '' : item);
 };
 
 useAddField(props.prop);

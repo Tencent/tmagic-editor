@@ -1,5 +1,5 @@
 <template>
-  <TMagicCheckboxGroup v-model="model[name]" :size="size" :disabled="disabled" @change="changeHandler">
+  <TMagicCheckboxGroup :model-value="model[name]" :size="size" :disabled="disabled" @update:model-value="changeHandler">
     <TMagicCheckbox v-for="option in options" :value="option.value" :key="option.value" :disabled="option.disabled"
       >{{ option.text }}
     </TMagicCheckbox>

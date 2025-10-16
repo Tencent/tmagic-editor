@@ -1,19 +1,19 @@
 <template>
   <div class="m-fields-number-range">
     <TMagicInput
-      v-model="model[name][0]"
-      clearable
+      :model-value="model[name][0]"
+      :clearable="config.clearable ?? true"
       :size="size"
       :disabled="disabled"
-      @change="minChangeHandler"
+      @update:model-value="minChangeHandler"
     ></TMagicInput>
     <span class="split-tag">-</span>
     <TMagicInput
-      v-model="model[name][1]"
-      clearable
+      :model-value="model[name][1]"
+      :clearable="config.clearable ?? true"
       :size="size"
       :disabled="disabled"
-      @change="maxChangeHandler"
+      @update:model-value="maxChangeHandler"
     ></TMagicInput>
   </div>
 </template>

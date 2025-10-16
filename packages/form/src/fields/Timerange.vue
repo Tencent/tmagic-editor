@@ -1,6 +1,6 @@
 <template>
   <TMagicTimePicker
-    v-model="value"
+    :model-value="value"
     is-range
     range-separator="-"
     start-placeholder="开始时间"
@@ -9,7 +9,7 @@
     :unlink-panels="true"
     :disabled="disabled"
     :default-time="config.defaultTime"
-    @change="changeHandler"
+    @update:model-value="changeHandler"
   ></TMagicTimePicker>
 </template>
 

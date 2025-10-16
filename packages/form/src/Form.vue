@@ -32,6 +32,7 @@ import { provide, reactive, ref, shallowRef, toRaw, watch, watchEffect } from 'v
 import { cloneDeep, isEqual } from 'lodash-es';
 
 import { TMagicForm, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
+import { setValueByKeyPath } from '@tmagic/utils';
 
 import Container from './containers/Container.vue';
 import { getConfig } from './utils/config';
@@ -173,7 +174,18 @@ watch(
 
 const changeHandler = (v: FormValue, eventData: ContainerChangeEventData) => {
   if (eventData.changeRecords?.length) {
-    changeRecords.value.push(...eventData.changeRecords);
+    for (const record of eventData.changeRecords) {
+      if (record.propPath) {
+        const index = changeRecords.value.findIndex((item) => item.propPath === record.propPath);
+        if (index > -1) {
+          changeRecords.value[index] = record;
+        } else {
+          changeRecords.value.push(record);
+        }
+
+        setValueByKeyPath(record.propPath, record.value, values.value);
+      }
+    }
   }
   emit('change', values.value, eventData);
 };
@@ -201,6 +213,7 @@ defineExpose({
   submitForm: async (native?: boolean): Promise<any> => {
     try {
       await tMagicForm.value?.validate();
+      changeRecords.value = [];
       return native ? values.value : cloneDeep(toRaw(values.value));
     } catch (invalidFields: any) {
       emit('error', invalidFields);
