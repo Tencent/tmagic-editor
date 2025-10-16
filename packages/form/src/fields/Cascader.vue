@@ -1,6 +1,6 @@
 <template>
   <TMagicCascader
-    v-model="value"
+    :model-value="value"
     ref="tMagicCascader"
     style="width: 100%"
     clearable
@@ -15,6 +15,7 @@
       emitPath: config.emitPath ?? true,
       checkStrictly: checkStrictly ?? false,
     }"
+    @update:model-value="updateModelValueHandler"
     @change="changeHandler"
   ></TMagicCascader>
 </template>
@@ -51,21 +52,30 @@ const remoteData = ref<any>(null);
 const checkStrictly = computed(() => filterFunction(mForm, props.config.checkStrictly, props));
 const valueSeparator = computed(() => filterFunction<string>(mForm, props.config.valueSeparator, props));
 
-const value = computed({
-  get() {
-    if (typeof props.model[props.name] === 'string' && valueSeparator.value) {
-      return props.model[props.name].split(valueSeparator.value);
-    }
-    return props.model[props.name];
-  },
-  set(value) {
-    let result = value;
-    if (valueSeparator.value) {
-      result = value.join(valueSeparator.value);
-    }
-    props.model[props.name] = result;
-  },
+const value = computed(() => {
+  if (typeof props.model[props.name] === 'string' && valueSeparator.value) {
+    return props.model[props.name].split(valueSeparator.value);
+  }
+  return props.model[props.name];
 });
+
+const updateModelValueHandler = (value: string[] | number[] | any) => {
+  let result = value;
+  if (valueSeparator.value) {
+    result = value.join(valueSeparator.value);
+  }
+
+  if (typeof result === 'undefined') {
+    if (Array.isArray(props.model[props.name])) {
+      emit('change', []);
+    } else if (typeof props.model[props.name] === 'string') {
+      emit('change', '');
+    } else if (typeof props.model[props.name] === 'object') {
+      emit('change', null);
+    }
+  }
+  emit('change', result);
+};
 
 const setRemoteOptions = async function () {
   const { config } = props;
@@ -126,6 +136,5 @@ const changeHandler = () => {
   if (!tMagicCascader.value) return;
   tMagicCascader.value.setQuery('');
   tMagicCascader.value.setPreviousQuery(null);
-  emit('change', props.model[props.name]);
 };
 </script>

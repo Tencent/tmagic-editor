@@ -2,7 +2,7 @@
   <fieldset v-if="name ? model[name] : model" class="m-fieldset" :style="show ? 'padding: 15px' : 'border: 0'">
     <component v-if="name && config.checkbox" :is="!show ? 'div' : 'legend'">
       <TMagicCheckbox
-        v-model="model[name].value"
+        :model-value="model[name].value"
         :prop="`${prop}${prop ? '.' : ''}${config.name}.value`"
         :true-value="1"
         :false-value="0"

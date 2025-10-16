@@ -1,7 +1,7 @@
 <template>
   <TMagicSelect
     v-if="model"
-    v-model="model[name]"
+    :model-value="model[name]"
     v-loading="loading"
     class="m-select"
     ref="tMagicSelect"
@@ -16,7 +16,7 @@
     :allow-create="config.allowCreate"
     :disabled="disabled"
     :remote-method="config.remote && remoteMethod"
-    @change="changeHandler"
+    @update:model-value="changeHandler"
     @visible-change="visibleHandler"
   >
     <template v-if="config.group">

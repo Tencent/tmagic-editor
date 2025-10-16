@@ -1,7 +1,7 @@
 <template>
   <TMagicInputNumber
     v-if="model"
-    v-model="model[name]"
+    :model-value="model[name]"
     clearable
     controls-position="right"
     :size="size"
@@ -10,7 +10,7 @@
     :step="config.step"
     :placeholder="config.placeholder"
     :disabled="disabled"
-    @change="changeHandler"
+    @update:model-value="changeHandler"
     @input="inputHandler"
   ></TMagicInputNumber>
 </template>

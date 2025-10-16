@@ -1,12 +1,12 @@
 <template>
   <TMagicInput
-    v-model="model[name]"
+    :model-value="model[name]"
     type="textarea"
     :size="size"
     clearable
     :placeholder="config.placeholder"
     :disabled="disabled"
-    @change="changeHandler"
+    @update:model-value="changeHandler"
     @input="inputHandler"
   >
   </TMagicInput>

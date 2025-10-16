@@ -15,13 +15,14 @@ export interface ChangeRecord {
 
 export interface OnChangeHandlerData {
   model: FormValue;
-  values?: FormValue;
+  values?: Readonly<FormValue>;
   parent?: FormValue;
   formValue?: FormValue;
-  config: any;
+  config: Readonly<any>;
   prop: string;
   changeRecords: ChangeRecord[];
   setModel: (prop: string, value: any) => void;
+  setFromValue: (prop: string, value: any) => void;
 }
 
 export type FormValue = Record<string | number, any>;
@@ -385,6 +386,7 @@ export interface NumberConfig extends FormItem {
  */
 export interface NumberRangeConfig extends FormItem {
   type?: 'number-range';
+  clearable?: boolean;
 }
 
 /**

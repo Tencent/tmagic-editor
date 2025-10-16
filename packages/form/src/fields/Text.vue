@@ -1,13 +1,13 @@
 <template>
   <div class="m-fields-text">
     <TMagicInput
-      v-model="model[name]"
+      :model-value="model[name]"
       ref="input"
       clearable
       :size="size"
       :placeholder="config.placeholder"
       :disabled="disabled"
-      @change="changeHandler"
+      @update:model-value="changeHandler"
       @input="inputHandler"
       @keyup="keyUpHandler($event)"
     >

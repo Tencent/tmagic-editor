@@ -1,11 +1,11 @@
 <template>
   <TMagicCheckbox
-    v-model="model[name]"
+    :model-value="model[name]"
     :size="size"
     :trueValue="activeValue"
     :falseValue="inactiveValue"
     :disabled="disabled"
-    @change="changeHandler"
+    @update:model-value="changeHandler"
     >{{ config.text }}</TMagicCheckbox
   >
 </template>

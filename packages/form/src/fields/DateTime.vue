@@ -1,6 +1,6 @@
 <template>
   <TMagicDatePicker
-    v-model="model[name]"
+    :model-value="model[name]"
     popper-class="magic-datetime-picker-popper"
     type="datetime"
     :size="size"
@@ -9,7 +9,7 @@
     :format="config.format || 'YYYY/MM/DD HH:mm:ss'"
     :value-format="config.valueFormat || 'YYYY/MM/DD HH:mm:ss'"
     :default-time="config.defaultTime"
-    @change="changeHandler"
+    @update:model-value="changeHandler"
   ></TMagicDatePicker>
 </template>
 
