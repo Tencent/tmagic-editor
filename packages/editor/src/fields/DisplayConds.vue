@@ -55,7 +55,7 @@ const config = computed<GroupListConfig>(() => ({
     {
       type: 'table',
       name: 'cond',
-      operateColWidth: 100,
+      operateColWidth: 80,
       enableToggleMode: false,
       items: [
         parentFields.value.length
@@ -93,7 +93,7 @@ const config = computed<GroupListConfig>(() => ({
           type: 'cond-op-select',
           parentFields: parentFields.value,
           label: '条件',
-          width: 160,
+          width: 140,
           name: 'op',
         },
         {
