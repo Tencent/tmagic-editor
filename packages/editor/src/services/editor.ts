@@ -574,8 +574,6 @@ class Editor extends BaseService {
     nodes.splice(targetIndex, 1, newConfig);
     this.set('nodes', [...nodes]);
 
-    // update后会触发依赖收集，收集完后会掉stage.update方法
-
     if (isPage(newConfig) || isPageFragment(newConfig)) {
       this.set('page', newConfig as MPage | MPageFragment);
     }
@@ -591,6 +589,7 @@ class Editor extends BaseService {
 
   /**
    * 更新节点
+   * update后会触发依赖收集，收集完后会掉stage.update方法
    * @param config 新的节点配置，配置中需要有id信息
    * @returns 更新后的节点配置
    */

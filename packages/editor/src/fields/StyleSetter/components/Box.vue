@@ -4,7 +4,7 @@
       <span class="help-txt" v-if="item.text">{{ item.text }}</span>
       <span class="next-input">
         <input
-          v-model="model[item.name]"
+          :model-value="model[item.name]"
           placeholder="0"
           :title="model[item.name]"
           :disabled="disabled"
