@@ -700,6 +700,7 @@ export interface TableConfig extends FormItem {
   onSelect?: (mForm: FormState | undefined, data: any) => any;
   defautSort?: SortProp;
   defaultSort?: SortProp;
+  /** 是否支持拖拽排序 */
   dropSort?: boolean;
   /** 是否显示全屏按钮 */
   enableFullscreen?: boolean;

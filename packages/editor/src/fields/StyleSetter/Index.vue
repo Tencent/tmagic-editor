@@ -1,5 +1,5 @@
 <template>
-  <TMagicCollapse class="m-fields-style-setter" :model-value="collapseValue">
+  <TMagicCollapse class="m-fields-style-setter" v-model="collapseValue">
     <template v-for="(item, index) in list" :key="index">
       <TMagicCollapseItem :name="`${index}`">
         <template #title><MIcon :icon="Grid"></MIcon>{{ item.title }}</template>

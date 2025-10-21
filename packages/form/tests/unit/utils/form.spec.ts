@@ -18,7 +18,7 @@
 
 import { describe, expect, test } from 'vitest';
 import type { FormState } from '@form/index';
-import { datetimeFormatter, display, filterFunction, getRules, initValue } from '@form/utils/form';
+import { datetimeFormatter, display, filterFunction, getRules, initValue, sortArray } from '@form/utils/form';
 
 // form state mock 数据
 const mForm: FormState = {
@@ -32,6 +32,19 @@ const mForm: FormState = {
   setField: (prop: string, field: any) => field,
   getField: (prop: string) => prop,
   deleteField: (prop: string) => prop,
+  $messageBox: {
+    alert: () => Promise.resolve(),
+    confirm: () => Promise.resolve(),
+    prompt: () => Promise.resolve(),
+    close: () => undefined,
+  },
+  $message: {
+    success: () => undefined,
+    warning: () => undefined,
+    info: () => undefined,
+    error: () => undefined,
+    closeAll: () => undefined,
+  },
 };
 
 describe('filterFunction', () => {
@@ -337,5 +350,73 @@ describe('datetimeFormatter', () => {
 
   test('format是x', () => {
     expect(datetimeFormatter(date.toISOString(), defaultValue, 'timestamp')).toBe(date.getTime());
+  });
+});
+
+describe('sortArray', () => {
+  test('索引相同时不执行任何操作', () => {
+    const data = [1, 2, 3, 4, 5];
+
+    expect(sortArray(data, 2, 2)).toEqual(data);
+  });
+
+  test('正常交换两个元素的位置', () => {
+    const data = [1, 2, 3, 4, 5];
+
+    expect(sortArray(data, 0, 3)).toEqual([4, 1, 2, 3, 5]);
+  });
+
+  test('从后往前移动元素', () => {
+    const data = [1, 2, 3, 4, 5];
+
+    expect(sortArray(data, 3, 1)).toEqual([1, 3, 4, 2, 5]);
+  });
+
+  test('使用sortKey参数重新排序', () => {
+    const data = [
+      { id: 1, order: 0 },
+      { id: 2, order: 1 },
+      { id: 3, order: 2 },
+      { id: 4, order: 3 },
+    ];
+
+    expect(sortArray(data, 0, 2, 'order')).toEqual([
+      { id: 3, order: 3 },
+      { id: 1, order: 2 },
+      { id: 2, order: 1 },
+      { id: 4, order: 0 },
+    ]);
+  });
+
+  test('移动第一个元素到最后', () => {
+    const data = [1, 2, 3, 4, 5];
+
+    expect(sortArray(data, 4, 0)).toEqual([2, 3, 4, 5, 1]);
+  });
+
+  test('移动最后一个元素到第一个', () => {
+    const data = [1, 2, 3, 4, 5];
+
+    expect(sortArray(data, 0, 4)).toEqual([5, 1, 2, 3, 4]);
+  });
+
+  test('空数组不执行任何操作', () => {
+    const data: any[] = [];
+
+    expect(sortArray(data, 0, 1)).toEqual([]);
+  });
+
+  test('只有一个元素的数组不执行任何操作', () => {
+    const data = [1];
+
+    expect(sortArray(data, 0, 0)).toEqual([1]);
+  });
+
+  test('索引超出范围时正常处理', () => {
+    const data = [1, 2, 3];
+
+    // 索引超出范围应该由调用方处理，这里测试函数的行为
+    expect(sortArray(data, 5, 1)).toEqual(data);
+    expect(sortArray(data, 1, 5)).toEqual(data);
   });
 });

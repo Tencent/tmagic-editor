@@ -1,10 +1,11 @@
 <template>
   <TMagicTable
-    tooltip-effect="dark"
-    :tooltip-options="{ popperOptions: { strategy: 'absolute' } }"
+    v-loading="loading"
     class="m-table"
     ref="tMagicTable"
-    v-loading="loading"
+    :show-overflow-tooltip="true"
+    tooltip-effect="dark"
+    :tooltip-options="{ popperOptions: { strategy: 'absolute' } }"
     :data="tableData"
     :show-header="showHeader"
     :max-height="bodyHeight"
@@ -14,59 +15,21 @@
     :tree-props="{ children: 'children' }"
     :empty-text="emptyText || '暂无数据'"
     :span-method="objectSpanMethod"
+    :columns="tableColumns"
     @sort-change="sortChange"
     @select="selectHandler"
     @select-all="selectAllHandler"
     @selection-change="selectionChangeHandler"
     @cell-click="cellClickHandler"
     @expand-change="expandChange"
-  >
-    <template v-for="(item, columnIndex) in columns">
-      <template v-if="item.type === 'expand'">
-        <ExpandColumn :config="item" :key="columnIndex"></ExpandColumn>
-      </template>
-
-      <template v-else-if="item.type === 'component'">
-        <ComponentColumn :config="item" :key="columnIndex"></ComponentColumn>
-      </template>
-
-      <template v-else-if="item.selection">
-        <component
-          width="40"
-          type="selection"
-          :is="tableColumnComponent?.component || 'el-table-column'"
-          :key="columnIndex"
-          :selectable="item.selectable"
-        ></component>
-      </template>
-
-      <template v-else-if="item.actions">
-        <ActionsColumn
-          :columns="columns"
-          :config="item"
-          :rowkey-name="rowkeyName"
-          :edit-state="editState"
-          :key="columnIndex"
-          @after-action="$emit('after-action')"
-        ></ActionsColumn>
-      </template>
-
-      <template v-else-if="item.type === 'popover'">
-        <PopoverColumn :key="columnIndex" :config="item"></PopoverColumn>
-      </template>
-
-      <template v-else>
-        <TextColumn :key="columnIndex" :config="item" :edit-state="editState"></TextColumn>
-      </template>
-    </template>
-  </TMagicTable>
+  ></TMagicTable>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, h, ref, useTemplateRef } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
-import { getDesignConfig, TMagicTable } from '@tmagic/design';
+import { TMagicTable } from '@tmagic/design';
 
 import ActionsColumn from './ActionsColumn.vue';
 import ComponentColumn from './ComponentColumn.vue';
@@ -117,11 +80,72 @@ const emit = defineEmits([
   'cell-click',
 ]);
 
-const tMagicTable = ref<InstanceType<typeof TMagicTable>>();
+const cellRender = (config: ColumnConfig, { row = {}, $index }: any) => {
+  if (config.type === 'expand') {
+    return h(ExpandColumn, {
+      config,
+      row,
+    });
+  }
+  if (config.type === 'component') {
+    return h(ComponentColumn, {
+      config,
+      row,
+      index: $index,
+    });
+  }
+  if (config.actions) {
+    return h(ActionsColumn, {
+      config,
+      row,
+      index: $index,
+      rowkeyName: props.rowkeyName,
+      editState: editState.value,
+      columns: props.columns,
+    });
+  }
+  if (config.type === 'popover') {
+    return h(PopoverColumn, {
+      config,
+      row,
+      index: $index,
+    });
+  }
+  return h(TextColumn, {
+    config,
+    row,
+    index: $index,
+    editState: editState.value,
+  });
+};
+
+const tableColumns = computed(() =>
+  props.columns.map((item) => {
+    let type: 'default' | 'selection' | 'index' | 'expand' = 'default';
+    if (item.type === 'expand') {
+      type = 'expand';
+    } else if (item.selection) {
+      type = 'selection';
+    }
+
+    return {
+      props: {
+        label: item.label,
+        fixed: item.fixed,
+        width: item.width ?? (item.selection ? 40 : undefined),
+        prop: item.prop,
+        type,
+        selectable: item.selectable,
+      },
+      cell: type === 'selection' ? undefined : ({ row, $index }: any) => cellRender(item, { row, $index }),
+    };
+  }),
+);
+
+const tMagicTableRef = useTemplateRef('tMagicTable');
 
 const editState = ref([]);
 
-const tableColumnComponent = getDesignConfig('components')?.tableColumn;
 const selectionColumn = computed(() => {
   const column = props.columns.filter((item) => item.selection);
   return column.length ? column[0] : null;
@@ -171,15 +195,15 @@ const expandChange = (...args: any[]) => {
 };
 
 const toggleRowSelection = (row: any, selected: boolean) => {
-  tMagicTable.value?.toggleRowSelection(row, selected);
+  tMagicTableRef.value?.toggleRowSelection(row, selected);
 };
 
 const toggleRowExpansion = (row: any, expanded: boolean) => {
-  tMagicTable.value?.toggleRowExpansion(row, expanded);
+  tMagicTableRef.value?.toggleRowExpansion(row, expanded);
 };
 
 const clearSelection = () => {
-  tMagicTable.value?.clearSelection();
+  tMagicTableRef.value?.clearSelection();
 };
 
 const objectSpanMethod = (data: any) => {

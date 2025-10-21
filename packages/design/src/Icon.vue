@@ -19,3 +19,16 @@ const uiComponent = ui?.component || 'el-icon';
 const props = defineProps<IconProps>();
 const uiProps = computed<IconProps>(() => ui?.props(props) || props);
 </script>
+
+<style lang="scss">
+.t-t-design-adapter-icon {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+
+  svg {
+    width: 1em;
+    height: 1em;
+  }
+}
+</style>

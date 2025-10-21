@@ -1,0 +1,84 @@
+<template>
+  <slot name="operateCol" :scope="{ $index: index, row: row }"></slot>
+  <TMagicButton
+    v-show="showDelete(index + 1 + currentPage * pageSize - 1)"
+    size="small"
+    type="danger"
+    link
+    title="删除"
+    :icon="Delete"
+    @click="removeHandler(index + 1 + currentPage * pageSize - 1)"
+  ></TMagicButton>
+
+  <TMagicButton
+    v-if="copyable(index + 1 + currentPage * pageSize - 1)"
+    link
+    size="small"
+    type="primary"
+    title="复制"
+    :icon="DocumentCopy"
+    :disabled="disabled"
+    @click="copyHandler(index + 1 + currentPage * pageSize - 1)"
+  ></TMagicButton>
+</template>
+
+<script setup lang="ts">
+import { inject } from 'vue';
+import { Delete, DocumentCopy } from '@element-plus/icons-vue';
+import { cloneDeep } from 'lodash-es';
+
+import { TMagicButton } from '@tmagic/design';
+
+import type { FormState, TableConfig } from '../schema';
+
+const emit = defineEmits(['change']);
+
+const props = defineProps<{
+  config: TableConfig;
+  model: any;
+  name: string | number;
+  disabled?: boolean;
+  currentPage: number;
+  pageSize: number;
+  index: number;
+  row: any;
+  prop?: string;
+}>();
+
+const mForm = inject<FormState | undefined>('mForm');
+
+const removeHandler = (index: number) => {
+  if (props.disabled) return;
+  props.model[props.name].splice(index, 1);
+  emit('change', props.model[props.name]);
+};
+
+const copyHandler = (index: number) => {
+  props.model[props.name].push(cloneDeep(props.model[props.name][index]));
+};
+
+// 希望支持单行可控制是否显示删除按钮，不会影响现有逻辑
+const showDelete = (index: number) => {
+  const deleteFunc = props.config.delete;
+  if (deleteFunc && typeof deleteFunc === 'function') {
+    return deleteFunc(props.model[props.name], index, mForm?.values);
+  }
+  return true;
+};
+
+const copyable = (index: number) => {
+  const copyableFunc = props.config.copyable;
+  if (copyableFunc && typeof copyableFunc === 'function') {
+    return copyableFunc(mForm, {
+      values: mForm?.initValues || {},
+      model: props.model,
+      parent: mForm?.parentValues || {},
+      formValue: mForm?.values || props.model,
+      prop: props.prop,
+      config: props.config,
+      index,
+    });
+  }
+  return true;
+};
+</script>

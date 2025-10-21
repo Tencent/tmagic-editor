@@ -1,15 +1,10 @@
 <template>
   <div class="m-editor-nav-menu">
-    <TMagicButton
-      v-for="(item, index) in data"
-      class="menu-item button"
-      :key="index"
-      size="small"
-      link
-      @click="item.handler"
-    >
-      <TMagicIcon><component :is="item.icon"></component></TMagicIcon><span>{{ item.text }}</span>
-    </TMagicButton>
+    <div v-for="(item, index) in data" :key="index" class="menu-item button">
+      <TMagicButton size="small" link @click="item.handler">
+        <TMagicIcon><component :is="item.icon"></component></TMagicIcon><span>{{ item.text }}</span>
+      </TMagicButton>
+    </div>
   </div>
 </template>
 

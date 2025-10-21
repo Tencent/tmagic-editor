@@ -31,6 +31,7 @@ import {
   FormValue,
   HtmlField,
   Rule,
+  SortProp,
   TabPaneConfig,
   TypeFunction,
 } from '../schema';
@@ -135,6 +136,18 @@ const initValueItem = function (
   }
 
   setValue(mForm, value, initValue, item);
+
+  if (type === 'table') {
+    if (item.defautSort) {
+      sortChange(value[name], item.defautSort);
+    } else if (item.defaultSort) {
+      sortChange(value[name], item.defaultSort);
+    }
+
+    if (item.sort && item.sortKey) {
+      value[name].sort((a: any, b: any) => b[item.sortKey] - a[item.sortKey]);
+    }
+  }
 
   return value;
 };
@@ -296,4 +309,37 @@ export const datetimeFormatter = (
     return defaultValue;
   }
   return defaultValue;
+};
+
+export const getDataByPage = (data: any[] = [], pagecontext: number, pagesize: number) =>
+  data.filter(
+    (item: any, index: number) => index >= pagecontext * pagesize && index + 1 <= (pagecontext + 1) * pagesize,
+  );
+
+export const sortArray = (data: any[], newIndex: number, oldIndex: number, sortKey?: string) => {
+  if (newIndex === oldIndex) {
+    return data;
+  }
+
+  if (newIndex < 0 || newIndex >= data.length || oldIndex < 0 || oldIndex >= data.length) {
+    return data;
+  }
+
+  const newData = data.toSpliced(newIndex, 0, ...data.splice(oldIndex, 1));
+
+  if (sortKey) {
+    for (let i = newData.length - 1, v = 0; i >= 0; i--, v++) {
+      newData[v][sortKey] = i;
+    }
+  }
+
+  return newData;
+};
+
+export const sortChange = (data: any[], { prop, order }: SortProp) => {
+  if (order === 'ascending') {
+    data = data.sort((a: any, b: any) => a[prop] - b[prop]);
+  } else if (order === 'descending') {
+    data = data.sort((a: any, b: any) => b[prop] - a[prop]);
+  }
 };

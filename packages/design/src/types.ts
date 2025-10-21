@@ -182,6 +182,7 @@ export interface FormItemProps {
   prop?: string;
   labelWidth?: string | number;
   rules?: any;
+  extra?: string;
 }
 
 export interface InputProps {
@@ -295,17 +296,36 @@ export interface SwitchProps {
 }
 
 export interface TableProps {
+  columns?: TableColumnOptions[];
   data?: any[];
   border?: boolean;
   maxHeight?: number | string;
   defaultExpandAll?: boolean;
+  showHeader?: boolean;
+  rowKey?: string;
+  treeProps?: Record<string, any>;
+  emptyText?: string;
+  tooltipEffect?: string;
+  tooltipOptions?: any;
+  showOverflowTooltip?: boolean;
+  spanMethod?: (data: any) => any;
 }
 
-export interface TableColumnProps {
-  label?: string;
-  align?: string;
-  fixed?: string | boolean;
-  width?: string | number;
+export interface TableColumnOptions<T = any> {
+  props: {
+    class?: string;
+    label?: string;
+    fixed?: 'left' | 'right' | boolean;
+    width?: number | string;
+    type?: 'default' | 'selection' | 'index' | 'expand';
+    prop?: string;
+    align?: string;
+    headerAlign?: string;
+    sortable?: boolean;
+    sortOrders?: Array<'ascending' | 'descending'>;
+    selectable?: (row: T, index: number) => boolean;
+  };
+  cell?: (scope: { row: T; $index: number }) => any;
 }
 
 export interface TabPaneProps {
@@ -340,33 +360,6 @@ export interface TooltipProps {
   effect?: string;
   transition?: string;
   offset?: number;
-}
-
-export interface TreeProps {
-  data?: any[];
-  emptyText?: string;
-  nodeKey?: string;
-  props?: any;
-  renderAfterExpand?: boolean;
-  load?: any;
-  renderContent?: any;
-  highlightCurrent?: boolean;
-  defaultExpandAll?: boolean;
-  checkOnClickNode?: boolean;
-  autoExpandParent?: boolean;
-  defaultExpandedKeys?: any[];
-  showCheckbox?: boolean;
-  checkStrictly?: boolean;
-  defaultCheckedKeys?: any[];
-  currentNodeKey?: string | number;
-  filterNodeMethod?: (value: any, data: any, node: any) => boolean;
-  accordion?: boolean;
-  indent?: number;
-  icon?: any;
-  lazy?: boolean;
-  draggable?: boolean;
-  allowDrag?: (node: any) => boolean;
-  allowDrop?: any;
 }
 
 export interface UploadProps {
@@ -635,8 +628,8 @@ export interface Components {
       | DefineComponent<
           TableProps,
           {
-            instance: any;
-            $el: HTMLDivElement | undefined;
+            getEl: () => HTMLElement | undefined;
+            getTableRef: () => any;
             clearSelection: (...args: any[]) => void;
             toggleRowSelection: (...args: any[]) => void;
             toggleRowExpansion: (...args: any[]) => void;
@@ -645,11 +638,6 @@ export interface Components {
         >
       | string;
     props: (props: TableProps) => TableProps;
-  };
-
-  tableColumn: {
-    component: DefineComponent<TableColumnProps, {}, any> | string;
-    props: (props: TableColumnProps) => TableColumnProps;
   };
 
   tabPane: {
@@ -675,24 +663,6 @@ export interface Components {
   tooltip: {
     component: DefineComponent<TooltipProps, {}, any> | string;
     props: (props: TooltipProps) => TooltipProps;
-  };
-
-  tree: {
-    component:
-      | DefineComponent<
-          TreeProps,
-          {
-            getData: () => TreeProps['data'];
-            getStore: () => any;
-            filter: (...args: any[]) => any;
-            getNode: (...args: any[]) => any;
-            setCheckedKeys: (...args: any[]) => any;
-            setCurrentKey: (...args: any[]) => any;
-          },
-          any
-        >
-      | string;
-    props: (props: TreeProps) => TreeProps;
   };
 
   upload: {

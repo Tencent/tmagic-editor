@@ -85,6 +85,10 @@ export default defineConfig({
         find: /^@tmagic\/element-plus-adapter/,
         replacement: path.join(__dirname, '../packages/element-plus-adapter/src/index.ts'),
       },
+      {
+        find: /^@tmagic\/tdesign-vue-next-adapter/,
+        replacement: path.join(__dirname, '../packages/tdesign-vue-next-adapter/src/index.ts'),
+      },
     ] : [],
   },
 

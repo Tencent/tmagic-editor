@@ -18,7 +18,6 @@ import {
   ElDropdownItem,
   ElDropdownMenu,
   ElForm,
-  ElFormItem,
   ElIcon,
   ElInput,
   ElInputNumber,
@@ -37,14 +36,11 @@ import {
   ElStep,
   ElSteps,
   ElSwitch,
-  ElTable,
-  ElTableColumn,
   ElTabPane,
   ElTabs,
   ElTag,
   ElTimePicker,
   ElTooltip,
-  ElTree,
   ElUpload,
   useZIndex,
 } from 'element-plus';
@@ -83,16 +79,17 @@ import type {
   StepProps,
   StepsProps,
   SwitchProps,
-  TableColumnProps,
   TableProps,
   TabPaneProps,
   TabsProps,
   TagProps,
   TimePickerProps,
   TooltipProps,
-  TreeProps,
   UploadProps,
 } from '@tmagic/design';
+
+import FormItem from './FormItem.vue';
+import Table from './Table.vue';
 
 const adapter: DesignPluginOptions = {
   useZIndex,
@@ -195,7 +192,7 @@ const adapter: DesignPluginOptions = {
     },
 
     formItem: {
-      component: ElFormItem as any,
+      component: FormItem as any,
       props: (props: FormItemProps) => props,
     },
 
@@ -275,13 +272,8 @@ const adapter: DesignPluginOptions = {
     },
 
     table: {
-      component: ElTable as any,
+      component: Table as any,
       props: (props: TableProps) => props,
-    },
-
-    tableColumn: {
-      component: ElTableColumn as any,
-      props: (props: TableColumnProps) => props,
     },
 
     tabPane: {
@@ -307,11 +299,6 @@ const adapter: DesignPluginOptions = {
     tooltip: {
       component: ElTooltip as any,
       props: (props: TooltipProps) => props,
-    },
-
-    tree: {
-      component: ElTree as any,
-      props: (props: TreeProps) => props,
     },
 
     upload: {

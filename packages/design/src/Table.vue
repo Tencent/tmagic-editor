@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watchEffect } from 'vue';
+import { computed, useTemplateRef } from 'vue';
 
 import { getDesignConfig } from './config';
 import type { TableProps } from './types';
@@ -37,7 +37,7 @@ const uiProps = computed<TableProps>(() => ui?.props(props) || props);
 
 const emit = defineEmits(['select', 'sort-change', 'expand-change', 'cell-click']);
 
-const table = ref<any>();
+const tableRef = useTemplateRef('table');
 
 const selectHandler = (...args: any[]) => {
   emit('select', ...args);
@@ -55,27 +55,21 @@ const cellClickHandler = (...args: any[]) => {
   emit('cell-click', ...args);
 };
 
-let $el: HTMLDivElement | undefined;
-
-watchEffect(() => {
-  $el = table.value?.$el;
-});
-
 defineExpose({
-  instance: table,
+  getEl: () => tableRef.value?.getTableRef().$el,
 
-  $el,
+  getTableRef: () => tableRef.value.getTableRef(),
 
   clearSelection(...args: any[]) {
-    return table.value?.clearSelection(...args);
+    return tableRef.value?.clearSelection(...args);
   },
 
   toggleRowSelection(...args: any[]) {
-    return table.value?.toggleRowSelection(...args);
+    return tableRef.value?.toggleRowSelection(...args);
   },
 
   toggleRowExpansion(...args: any[]) {
-    return table.value?.toggleRowExpansion(...args);
+    return tableRef.value?.toggleRowExpansion(...args);
   },
 });
 </script>

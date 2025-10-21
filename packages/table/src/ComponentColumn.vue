@@ -1,25 +1,12 @@
 <template>
-  <TMagicTableColumn
-    show-overflow-tooltip
-    :label="config.label"
-    :width="config.width"
-    :fixed="config.fixed"
-    :sortable="config.sortable"
-    :prop="config.prop"
-  >
-    <template v-slot="scope">
-      <component
-        :is="config.component"
-        v-bind="componentProps(scope.row, scope.$index)"
-        v-on="componentListeners(scope.row, scope.$index)"
-      ></component>
-    </template>
-  </TMagicTableColumn>
+  <component
+    :is="config.component"
+    v-bind="componentProps(row, index)"
+    v-on="componentListeners(row, index)"
+  ></component>
 </template>
 
 <script lang="ts" setup>
-import { TMagicTableColumn } from '@tmagic/design';
-
 import { ColumnConfig } from './schema';
 
 defineOptions({
@@ -29,6 +16,8 @@ defineOptions({
 const props = withDefaults(
   defineProps<{
     config: ColumnConfig;
+    row: any;
+    index: number;
   }>(),
   {
     config: () => ({}),

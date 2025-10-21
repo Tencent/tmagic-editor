@@ -46,13 +46,11 @@ export { default as TMagicStep } from './Step.vue';
 export { default as TMagicSteps } from './Steps.vue';
 export { default as TMagicSwitch } from './Switch.vue';
 export { default as TMagicTable } from './Table.vue';
-export { default as TMagicTableColumn } from './TableColumn.vue';
 export { default as TMagicTabPane } from './TabPane.vue';
 export { default as TMagicTabs } from './Tabs.vue';
 export { default as TMagicTag } from './Tag.vue';
 export { default as TMagicTimePicker } from './TimePicker.vue';
 export { default as TMagicTooltip } from './Tooltip.vue';
-export { default as TMagicTree } from './Tree.vue';
 export { default as TMagicUpload } from './Upload.vue';
 
 export const tMagicMessage = {
