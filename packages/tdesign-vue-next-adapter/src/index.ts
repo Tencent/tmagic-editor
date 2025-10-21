@@ -4,13 +4,11 @@ import {
   Button as TButton,
   Card as TCard,
   Cascader as TCascader,
-  Checkbox as TCheckbox,
   CheckboxGroup as TCheckboxGroup,
   Col as TCol,
   Collapse as TCollapse,
   CollapsePanel as TCollapsePanel,
   ColorPicker as TColorPicker,
-  Dialog as TDialog,
   DialogPlugin,
   Divider as TDivider,
   Drawer as TDrawer,
@@ -23,15 +21,12 @@ import {
   Option as TOption,
   OptionGroup as TOptionGroup,
   Pagination as TPagination,
-  Radio as TRadio,
-  RadioButton as TRadioButton,
   RadioGroup as TRadioGroup,
   Row as TRow,
   Select as TSelect,
   StepItem as TStepItem,
   Steps as TSteps,
   Switch as TSwitch,
-  Table as TTable,
   TabPanel as TTabPanel,
   Tabs as TTabs,
   Tag as TTag,
@@ -71,7 +66,6 @@ import type {
   StepProps,
   StepsProps,
   SwitchProps,
-  TableColumnProps,
   TableProps,
   TabPaneProps,
   TabsProps,
@@ -81,11 +75,15 @@ import type {
   UploadProps,
 } from '@tmagic/design';
 
+import Checkbox from './Checkbox.vue';
 import DatePicker from './DatePicker.vue';
+import Dialog from './Dialog.vue';
 import Icon from './Icon.vue';
 import Input from './Input.vue';
+import Radio from './Radio.vue';
+import RadioButton from './RadioButton.vue';
 import Scrollbar from './Scrollbar.vue';
-import TableColumn from './TableColumn.vue';
+import Table from './Table.vue';
 
 const adapter: any = {
   message: MessagePlugin,
@@ -119,7 +117,7 @@ const adapter: any = {
       props: (props: ButtonProps) => ({
         theme: props.type,
         size: props.size === 'default' ? 'medium' : props.size,
-        icon: () => (props.icon ? h(props.icon) : null),
+        icon: () => (props.icon ? h(Icon, null, { default: () => h(props.icon) }) : null),
         variant: props.link || props.text ? 'text' : 'base',
         shape: props.circle ? 'circle' : 'rectangle',
       }),
@@ -153,13 +151,8 @@ const adapter: any = {
     },
 
     checkbox: {
-      component: TCheckbox,
-      props: (props: CheckboxProps) => ({
-        modelValue: props.modelValue,
-        label: props.label,
-        value: props.value,
-        disabled: props.disabled,
-      }),
+      component: Checkbox,
+      props: (props: CheckboxProps) => props,
     },
 
     checkboxGroup: {
@@ -174,14 +167,14 @@ const adapter: any = {
     col: {
       component: TCol,
       props: (props: ColProps) => ({
-        span: props.span,
+        span: props.span ? props.span / 2 : 12,
       }),
     },
 
     collapse: {
       component: TCollapse,
       props: (props: CollapseProps) => ({
-        value: props.modelValue,
+        modelValue: props.modelValue,
         expandIconPlacement: 'right',
       }),
     },
@@ -212,15 +205,8 @@ const adapter: any = {
     },
 
     dialog: {
-      component: TDialog,
-      props: (props: DialogProps) => ({
-        visible: props.modelValue,
-        attach: props.appendToBody ? 'body' : '',
-        header: props.title,
-        width: props.width,
-        mode: props.fullscreen ? 'full-screen' : 'modal',
-        closeOnOverlayClick: props.closeOnClickModal,
-      }),
+      component: Dialog,
+      props: (props: DialogProps) => props,
     },
 
     divider: {
@@ -295,6 +281,7 @@ const adapter: any = {
         labelWidth: props.labelWidth,
         name: props.prop,
         rules: props.rules,
+        help: props.extra,
       }),
     },
 
@@ -347,18 +334,13 @@ const adapter: any = {
     },
 
     radio: {
-      component: TRadio,
-      props: (props: RadioProps) => ({
-        label: props.label,
-        value: props.value,
-      }),
+      component: Radio,
+      props: (props: RadioProps) => props,
     },
 
     radioButton: {
-      component: TRadioButton,
-      props: (props: RadioButtonProps) => ({
-        label: props.label,
-      }),
+      component: RadioButton,
+      props: (props: RadioButtonProps) => props,
     },
 
     radioGroup: {
@@ -424,13 +406,8 @@ const adapter: any = {
     },
 
     table: {
-      component: TTable,
+      component: Table,
       props: (props: TableProps) => props,
-    },
-
-    tableColumn: {
-      component: TableColumn,
-      props: (props: TableColumnProps) => props,
     },
 
     tabPane: {

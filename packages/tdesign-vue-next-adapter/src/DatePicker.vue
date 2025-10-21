@@ -8,7 +8,7 @@
     :size="size === 'default' ? 'medium' : size"
     :separator="rangeSeparator"
     :format="format"
-    :valueType="valueFormat === 's' ? 'time-stamp' : valueFormat"
+    :valueType="valueType"
     @change="changeHandler"
     @update:modelValue="updateModelValue"
   />
@@ -21,7 +21,7 @@
     :size="size === 'default' ? 'medium' : size"
     :format="format"
     :enableTimePicker="type.includes('time')"
-    :valueType="valueFormat === 's' ? 'time-stamp' : valueFormat"
+    :valueType="valueType"
     @change="changeHandler"
     @update:modelValue="updateModelValue"
   />
@@ -53,6 +53,8 @@ const mode = computed(() => {
   };
   return map[props.type] || props.type;
 });
+
+const valueType = computed(() => (props.valueFormat === 's' ? 'time-stamp' : props.valueFormat.replace(/\//g, '-')));
 
 const emit = defineEmits(['change', 'update:modelValue']);
 

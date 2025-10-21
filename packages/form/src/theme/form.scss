@@ -19,17 +19,21 @@
     height: 100%;
   }
 
-  .el-table {
+  .tmagic-design-table {
     .cell > div.m-form-container {
       display: block;
+
+      &.has-tip {
+        display: flex;
+      }
     }
   }
 
-  .el-tabs {
+  .tmagic-design-tabs {
     margin-bottom: 10px;
   }
 
-  .el-form-item.tmagic-form-hidden {
+  .tmagic-design-form-item.tmagic-form-hidden {
     > .el-form-item__label {
       display: none;
     }
@@ -38,6 +42,10 @@
   .t-form__item.tmagic-form-hidden {
     > .t-form__label {
       display: none;
+    }
+
+    > .t-form__controls {
+      margin-left: 0 !important;
     }
   }
 }

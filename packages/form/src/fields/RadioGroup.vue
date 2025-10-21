@@ -5,7 +5,7 @@
       :is="itemComponent"
       :value="option.value"
       :key="`${option.value}`"
-      @click.prevent="clickHandler(option.value)"
+      @click="clickHandler(option.value)"
     >
       <TMagicTooltip :disabled="!Boolean(option.tooltip)" placement="top-start" :content="option.tooltip">
         <div>

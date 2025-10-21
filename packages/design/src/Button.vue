@@ -30,3 +30,11 @@ const clickHandler = (...args: any[]) => {
   emit('click', ...args);
 };
 </script>
+
+<style lang="scss">
+.tmagic-design-button {
+  .t-button__text {
+    align-items: center;
+  }
+}
+</style>

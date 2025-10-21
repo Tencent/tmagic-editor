@@ -46,8 +46,6 @@
           @change="onChangeHandler"
           @addDiffCount="onAddDiffCount"
         ></component>
-
-        <div v-if="extra && type !== 'table'" v-html="extra" class="m-form-tip"></div>
       </TMagicFormItem>
 
       <TMagicTooltip v-if="config.tip" placement="left">
@@ -74,8 +72,6 @@
         </TMagicTooltip>
 
         <component v-else v-bind="fieldsProps" :is="tagName" :model="lastValues" @change="onChangeHandler"></component>
-
-        <div v-if="extra" v-html="extra" class="m-form-tip"></div>
       </TMagicFormItem>
 
       <TMagicTooltip v-if="config.tip" placement="left">
@@ -100,8 +96,6 @@
         </TMagicTooltip>
 
         <component v-else v-bind="fieldsProps" :is="tagName" :model="model" @change="onChangeHandler"></component>
-
-        <div v-if="extra" v-html="extra" class="m-form-tip"></div>
       </TMagicFormItem>
 
       <TMagicTooltip v-if="config.tip" placement="left">
@@ -231,8 +225,6 @@ const text = computed(() => filterFunction(mForm, props.config.text, props));
 
 const tooltip = computed(() => filterFunction(mForm, props.config.tooltip, props));
 
-const extra = computed(() => filterFunction(mForm, props.config.extra, props));
-
 const rule = computed(() => getRules(mForm, props.config.rules, props));
 
 const type = computed((): string => {
@@ -266,6 +258,7 @@ const formItemProps = computed(() => ({
   labelWidth: itemLabelWidth.value,
   labelPosition: props.config.labelPosition,
   rules: rule.value,
+  extra: filterFunction(mForm, props.config.extra, props),
 }));
 
 const itemLabelWidth = computed(() => props.config.labelWidth ?? props.labelWidth);

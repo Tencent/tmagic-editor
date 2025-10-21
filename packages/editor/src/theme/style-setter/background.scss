@@ -1,3 +1,5 @@
+@use "../common/var" as *;
+
 .background-position-container {
   display: flex;
   width: 100%;
@@ -6,13 +8,18 @@
     flex-wrap: wrap;
     width: 80px;
     height: auto;
-    .el-button {
-      & + .el-button {
+    .tmagic-design-button {
+      & + .tmagic-design-button {
         margin-left: 2px;
       }
       &:nth-child(3n + 1) {
         margin-left: 0 !important;
       }
+    }
+
+    .t-button--variant-text {
+      padding-left: 2px;
+      padding-right: 2px;
     }
 
     .position-icon {
@@ -21,7 +28,7 @@
       height: 14px;
       border: 1px solid #1d1f24;
       &.active {
-        background-color: var(--el-color-primary);
+        background-color: var($theme-color);
         &::after {
           border: 1px solid #fff;
         }

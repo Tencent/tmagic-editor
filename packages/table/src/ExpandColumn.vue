@@ -1,26 +1,20 @@
 <template>
-  <!-- @ts-nocheck -->
-  <TMagicTableColumn type="expand" :width="config.width" :fixed="config.fixed">
-    <template #default="scope">
-      <MTable
-        v-if="config.table"
-        :show-header="false"
-        :columns="config.table"
-        :data="(config.prop && scope.row[config.prop]) || []"
-      ></MTable>
-      <MForm
-        v-if="config.form"
-        :config="config.form"
-        :init-values="config.values || (config.prop && scope.row[config.prop]) || {}"
-      ></MForm>
-      <div v-if="config.expandContent" v-html="config.expandContent(scope.row, config.prop)"></div>
-      <component v-if="config.component" :is="config.component" v-bind="componentProps(scope.row)"></component>
-    </template>
-  </TMagicTableColumn>
+  <MTable
+    v-if="config.table"
+    :show-header="false"
+    :columns="config.table"
+    :data="(config.prop && row[config.prop]) || []"
+  ></MTable>
+  <MForm
+    v-if="config.form"
+    :config="config.form"
+    :init-values="config.values || (config.prop && row[config.prop]) || {}"
+  ></MForm>
+  <div v-if="config.expandContent" v-html="config.expandContent(row, config.prop)"></div>
+  <component v-if="config.component" :is="config.component" v-bind="componentProps(row)"></component>
 </template>
 
 <script lang="ts" setup>
-import { TMagicTableColumn } from '@tmagic/design';
 import { MForm } from '@tmagic/form';
 
 import { ColumnConfig } from './schema';
@@ -33,6 +27,7 @@ defineOptions({
 const props = withDefaults(
   defineProps<{
     config: ColumnConfig;
+    row: any;
   }>(),
   {
     config: () => ({}),

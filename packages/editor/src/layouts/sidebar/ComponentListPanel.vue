@@ -5,7 +5,7 @@
     <SearchInput @search="filterTextChangeHandler"></SearchInput>
 
     <slot name="component-list" :component-group-list="list">
-      <TMagicCollapse class="ui-component-panel" :model-value="collapseValue">
+      <TMagicCollapse class="ui-component-panel" v-model="collapseValue">
         <template v-for="(group, index) in list">
           <TMagicCollapseItem v-if="group.items && group.items.length" :key="index" :name="`${index}`">
             <template #title><MIcon :icon="Grid"></MIcon>{{ group.title }}</template>
@@ -34,7 +34,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, ref } from 'vue';
+import { computed, inject, ref, watch } from 'vue';
 import { Grid } from '@element-plus/icons-vue';
 import serialize from 'serialize-javascript';
 
@@ -74,10 +74,19 @@ const list = computed<ComponentGroup[]>(() =>
     items: group.items.filter((item: ComponentItem) => item.text.includes(searchText.value)),
   })),
 );
-const collapseValue = computed(() =>
-  Array(list.value?.length)
-    .fill(1)
-    .map((x, i) => `${i}`),
+
+const collapseValue = ref();
+
+watch(
+  list,
+  () => {
+    collapseValue.value = Array(list.value?.length)
+      .fill(1)
+      .map((x, i) => `${i}`);
+  },
+  {
+    immediate: true,
+  },
 );
 
 let timeout: ReturnType<typeof setTimeout> | undefined;
