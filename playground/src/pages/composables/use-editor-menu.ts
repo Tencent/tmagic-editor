@@ -5,6 +5,7 @@ import { Coin, Connection, Document } from '@element-plus/icons-vue';
 import type { MApp } from '@tmagic/core';
 import { type MenuBarData, tMagicMessage, tMagicMessageBox } from '@tmagic/editor';
 
+import AdapterSelect from '../../components/AdapterSelect.vue';
 import DeviceGroup from '../../components/DeviceGroup.vue';
 import { uaMap } from '../../const';
 
@@ -20,6 +21,10 @@ export const useEditorMenu = (value: Ref<MApp>, save: () => void) => {
       {
         type: 'text',
         text: '魔方',
+      },
+      {
+        type: 'component',
+        component: AdapterSelect,
       },
     ],
     center: ['delete', 'undo', 'redo', 'guides', 'rule', 'zoom'],

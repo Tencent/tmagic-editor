@@ -26,6 +26,7 @@ import { guid, type MApp, NodeType } from '@tmagic/core';
 import { MenuBarData, SideBarData, TMagicEditor, traverseNode } from '@tmagic/editor';
 import { COMPONENT_GROUP_LIST as componentGroupList, propsConfigs, useRuntime } from '@tmagic/tmagic-form-runtime';
 
+import AdapterSelect from '../components/AdapterSelect.vue';
 import formDsl from '../configs/formDsl';
 
 formDsl.forEach((item) => {
@@ -55,6 +56,10 @@ const menu: MenuBarData = {
     {
       type: 'text',
       text: '魔方',
+    },
+    {
+      type: 'component',
+      component: AdapterSelect,
     },
   ],
   center: ['delete', 'undo', 'redo', 'zoom'],
