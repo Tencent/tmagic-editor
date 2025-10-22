@@ -18,6 +18,7 @@
 
   > div {
     display: flex;
+    gap: 3px;
     height: 100%;
     z-index: 1;
     align-items: center;
@@ -75,6 +76,11 @@
       .el-icon {
         transform: rotate(-90deg);
       }
+    }
+
+    .t-button {
+      padding-left: 1px;
+      padding-right: 1px;
     }
   }
 }
