@@ -1,5 +1,6 @@
 <template>
   <div class="m-editor-nav-menu">
+    <AdapterSelect></AdapterSelect>
     <div v-for="(item, index) in data" :key="index" class="menu-item button">
       <TMagicButton size="small" link @click="item.handler">
         <TMagicIcon><component :is="item.icon"></component></TMagicIcon><span>{{ item.text }}</span>
@@ -8,21 +9,14 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from 'vue';
-
+<script lang="ts" setup>
 import { MenuButton, TMagicButton, TMagicIcon } from '@tmagic/editor';
 
-export default defineComponent({
-  name: 'nav-menu',
-  props: {
-    data: {
-      type: Array as PropType<MenuButton[]>,
-      default: () => [],
-    },
-  },
-  components: { TMagicIcon, TMagicButton },
-});
+import AdapterSelect from './AdapterSelect.vue';
+
+defineProps<{
+  data: MenuButton[];
+}>();
 </script>
 
 <style lang="scss" scoped>
