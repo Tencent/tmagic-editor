@@ -1,5 +1,8 @@
 <template>
   <component class="tmagic-design-button" :is="uiComponent" v-bind="uiProps" @click="clickHandler">
+    <template #icon v-if="$slots.icon">
+      <slot name="icon"></slot>
+    </template>
     <template #default v-if="$slots.default">
       <slot></slot>
     </template>

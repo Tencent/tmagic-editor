@@ -1,5 +1,5 @@
 <template>
-  <i class="t-t-design-adapter-icon">
+  <i class="t-t-design-adapter-icon t-icon">
     <slot></slot>
   </i>
 </template>

@@ -117,7 +117,7 @@ const adapter: any = {
       props: (props: ButtonProps) => ({
         theme: props.type,
         size: props.size === 'default' ? 'medium' : props.size,
-        icon: () => (props.icon ? h(Icon, null, { default: () => h(props.icon) }) : null),
+        icon: props.icon ? () => h(Icon, null, { default: () => h(props.icon) }) : undefined,
         variant: props.link || props.text ? 'text' : 'base',
         shape: props.circle ? 'circle' : 'rectangle',
       }),
@@ -449,7 +449,7 @@ const adapter: any = {
       component: TTooltip,
       props: (props: TooltipProps) => ({
         ...props,
-        placement: props.placement,
+        placement: props.placement?.replace(/\B([A-Z])/g, '-$1').toLowerCase(),
         content: props.content,
       }),
     },
