@@ -11,6 +11,9 @@
       @input="inputHandler"
       @keyup="keyUpHandler($event)"
     >
+      <template #prepend v-if="config.prepend">
+        <span>{{ config.prepend }}</span>
+      </template>
       <template #append v-if="appendConfig">
         <TMagicButton
           v-if="appendConfig.type === 'button'"
@@ -20,6 +23,7 @@
         >
           {{ appendConfig.text }}
         </TMagicButton>
+        <span v-else>{{ appendConfig.text }}</span>
       </template>
     </TMagicInput>
 
@@ -66,18 +70,26 @@ const mForm = inject<FormState | undefined>('mForm');
 const appendConfig = computed(() => {
   if (typeof props.config.append === 'string') {
     return {
+      type: 'text',
       text: props.config.append,
-      type: 'button',
       handler: undefined,
     };
   }
-
-  if (props.config.append && typeof props.config.append === 'object') {
-    if (props.config.append.value === 0) {
-      return false;
+  if (typeof props.config.append === 'object') {
+    if (typeof props.config.append?.handler === 'function') {
+      return {
+        type: 'button',
+        text: props.config.append.text,
+        handler: props.config.append.handler,
+      };
     }
+    if (props.config.append) {
+      if (props.config.append.value === 0) {
+        return false;
+      }
 
-    return props.config.append;
+      return props.config.append;
+    }
   }
 
   return false;
