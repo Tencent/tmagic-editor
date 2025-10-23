@@ -91,7 +91,7 @@ export const useTableColumns = (
       props: {
         label: '操作',
         fixed: props.config.fixed === false ? undefined : 'left',
-        width: props.config.operateColWidth || 100,
+        width: props.config.operateColWidth || 112,
         align: 'center',
       },
       cell: ({ row, $index }: any) =>
@@ -102,6 +102,7 @@ export const useTableColumns = (
           config: props.config,
           prop: props.prop,
           disabled: props.disabled,
+          sortKey: props.sortKey,
           name: modelName.value,
           currentPage: currentPage.value,
           pageSize: pageSize.value,
