@@ -2,10 +2,10 @@
   <fieldset v-if="name ? model[name] : model" class="m-fieldset" :style="show ? 'padding: 15px' : 'border: 0'">
     <component v-if="name && config.checkbox" :is="!show ? 'div' : 'legend'">
       <TMagicCheckbox
-        :model-value="model[name].value"
-        :prop="`${prop}${prop ? '.' : ''}${config.name}.value`"
-        :true-value="1"
-        :false-value="0"
+        :model-value="(name ? model[name] : model)[checkboxName]"
+        :prop="`${prop}${prop ? '.' : ''}${config.name}.${checkboxName}`"
+        :true-value="checkboxTrueValue"
+        :false-value="checkboxFalseValue"
         @update:modelValue="valueChangeHandler"
         ><span v-html="config.legend"></span><span v-if="config.extra" v-html="config.extra" class="m-form-tip"></span
       ></TMagicCheckbox>
@@ -99,9 +99,33 @@ const mForm = inject<FormState | undefined>('mForm');
 
 const name = computed(() => props.config.name || '');
 
+const checkboxName = computed(() => {
+  if (typeof props.config.checkbox === 'object' && typeof props.config.checkbox.name === 'string') {
+    return props.config.checkbox.name;
+  }
+
+  return 'value';
+});
+
+const checkboxTrueValue = computed(() => {
+  if (typeof props.config.checkbox === 'object' && typeof props.config.checkbox.trueValue !== 'undefined') {
+    return props.config.checkbox.trueValue;
+  }
+
+  return 1;
+});
+
+const checkboxFalseValue = computed(() => {
+  if (typeof props.config.checkbox === 'object' && typeof props.config.checkbox.falseValue !== 'undefined') {
+    return props.config.checkbox.falseValue;
+  }
+
+  return 0;
+});
+
 const show = computed(() => {
-  if (props.config.expand && name.value) {
-    return props.model[name.value]?.value;
+  if (props.config.expand && checkboxName.value) {
+    return (name.value ? props.model[name.value] : props.model)?.[checkboxName.value] === checkboxTrueValue.value;
   }
   return true;
 });
@@ -114,7 +138,7 @@ const lWidth = computed(() => {
 });
 
 const valueChangeHandler = (value: number | boolean) => {
-  emit('change', value, { modifyKey: 'value' });
+  emit('change', value, { modifyKey: checkboxName.value });
 };
 
 const changeHandler = (v: any, eventData: ContainerChangeEventData) => emit('change', v, eventData);
