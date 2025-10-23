@@ -43,18 +43,31 @@ const props = defineProps<{
   index: number;
   row: any;
   prop?: string;
+  sortKey?: string;
 }>();
 
 const mForm = inject<FormState | undefined>('mForm');
 
 const removeHandler = (index: number) => {
   if (props.disabled) return;
-  props.model[props.name].splice(index, 1);
-  emit('change', props.model[props.name]);
+  emit('change', props.model[props.name].toSpliced(index, 1));
 };
 
 const copyHandler = (index: number) => {
-  props.model[props.name].push(cloneDeep(props.model[props.name][index]));
+  const inputs = cloneDeep(props.model[props.name][index]);
+  const { length } = props.model[props.name];
+  if (props.sortKey && length) {
+    inputs[props.sortKey] = props.model[props.name][length - 1][props.sortKey] - 1;
+  }
+
+  emit('change', [...props.model[props.name], inputs], {
+    changeRecords: [
+      {
+        propPath: `${props.prop}.${props.model[props.name].length}`,
+        value: inputs,
+      },
+    ],
+  });
 };
 
 // 希望支持单行可控制是否显示删除按钮，不会影响现有逻辑
@@ -63,7 +76,7 @@ const showDelete = (index: number) => {
   if (deleteFunc && typeof deleteFunc === 'function') {
     return deleteFunc(props.model[props.name], index, mForm?.values);
   }
-  return true;
+  return props.config.delete ?? true;
 };
 
 const copyable = (index: number) => {
@@ -79,6 +92,6 @@ const copyable = (index: number) => {
       index,
     });
   }
-  return true;
+  return props.config.copyable ?? true;
 };
 </script>
