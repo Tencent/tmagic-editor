@@ -52,6 +52,7 @@ export { default as TMagicTag } from './Tag.vue';
 export { default as TMagicTimePicker } from './TimePicker.vue';
 export { default as TMagicTooltip } from './Tooltip.vue';
 export { default as TMagicUpload } from './Upload.vue';
+export { default as TMagicPopconfirm } from './Popconfirm.vue';
 
 export const tMagicMessage = {
   error: (msg: string) => {

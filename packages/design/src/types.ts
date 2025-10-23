@@ -227,6 +227,23 @@ export interface PaginationProps {
   total?: number;
 }
 
+export interface PopconfirmProps {
+  title?: string;
+  placement?:
+    | 'top'
+    | 'left'
+    | 'right'
+    | 'bottom'
+    | 'top-left'
+    | 'top-right'
+    | 'bottom-left'
+    | 'bottom-right'
+    | 'left-top'
+    | 'left-bottom'
+    | 'right-top'
+    | 'right-bottom';
+}
+
 export interface PopoverProps {
   placement?: Placement;
   width?: string | number;
@@ -676,6 +693,11 @@ export interface Components {
         >
       | string;
     props: (props: UploadProps) => UploadProps;
+  };
+
+  popconfirm: {
+    component: DefineComponent<PopconfirmProps, {}, any> | string;
+    props: (props: PopconfirmProps) => PopconfirmProps;
   };
 }
 

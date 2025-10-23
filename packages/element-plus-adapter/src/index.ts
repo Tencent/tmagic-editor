@@ -27,6 +27,7 @@ import {
   ElOption,
   ElOptionGroup,
   ElPagination,
+  ElPopconfirm,
   ElRadio,
   ElRadioButton,
   ElRadioGroup,
@@ -72,6 +73,7 @@ import type {
   OptionGroupProps,
   OptionProps,
   PaginationProps,
+  PopconfirmProps,
   RadioButtonProps,
   RadioGroupProps,
   RadioProps,
@@ -304,6 +306,11 @@ const adapter: DesignPluginOptions = {
     upload: {
       component: ElUpload as any,
       props: (props: UploadProps) => props,
+    },
+
+    popconfirm: {
+      component: ElPopconfirm as any,
+      props: (props: PopconfirmProps) => props,
     },
   },
   loading: ElLoading.directive,
