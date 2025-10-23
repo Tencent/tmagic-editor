@@ -3,6 +3,7 @@
     :data-tmagic-id="config.id"
     :data-tmagic-form-item-prop="itemProp"
     :class="`m-form-container m-container-${type || ''} ${config.className || ''}${config.tip ? ' has-tip' : ''}`"
+    :style="config.style"
   >
     <m-fields-hidden v-if="type === 'hidden'" v-bind="fieldsProps" :model="model"></m-fields-hidden>
 
@@ -16,14 +17,17 @@
       :step-active="stepActive"
       :expand-more="expand"
       :label-width="itemLabelWidth"
+      :style="config.fieldStyle"
       @change="onChangeHandler"
       @addDiffCount="onAddDiffCount"
     ></component>
 
     <template v-else-if="type && display && !showDiff">
       <TMagicFormItem v-bind="formItemProps" :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text }">
-        <template #label><span v-html="type === 'checkbox' ? '' : text" :title="config.labelTitle"></span></template>
-        <TMagicTooltip v-if="tooltip">
+        <template #label
+          ><span v-html="type === 'checkbox' && !config.useLabel ? '' : text" :title="config.labelTitle"></span
+        ></template>
+        <TMagicTooltip v-if="tooltip.text" :placement="tooltip.placement">
           <component
             v-bind="fieldsProps"
             :is="tagName"
@@ -32,8 +36,8 @@
             @change="onChangeHandler"
             @addDiffCount="onAddDiffCount"
           ></component>
-          <template #content v-if="tooltip">
-            <div v-html="tooltip"></div>
+          <template #content>
+            <div v-html="tooltip.text"></div>
           </template>
         </TMagicTooltip>
 
@@ -64,10 +68,10 @@
         :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text, 'show-diff': true }"
       >
         <template #label><span v-html="type === 'checkbox' ? '' : text" :title="config.labelTitle"></span></template>
-        <TMagicTooltip v-if="tooltip">
+        <TMagicTooltip v-if="tooltip.text" :placement="tooltip.placement">
           <component v-bind="fieldsProps" :is="tagName" :model="lastValues" @change="onChangeHandler"></component>
-          <template #content v-if="tooltip">
-            <div v-html="tooltip"></div>
+          <template #content>
+            <div v-html="tooltip.text"></div>
           </template>
         </TMagicTooltip>
 
@@ -88,10 +92,10 @@
         :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text, 'show-diff': true }"
       >
         <template #label><span v-html="type === 'checkbox' ? '' : text" :title="config.labelTitle"></span></template>
-        <TMagicTooltip v-if="tooltip">
+        <TMagicTooltip v-if="tooltip.text" :placement="tooltip.placement">
           <component v-bind="fieldsProps" :is="tagName" :model="model" @change="onChangeHandler"></component>
           <template #content>
-            <div v-html="tooltip"></div>
+            <div v-html="tooltip.text"></div>
           </template>
         </TMagicTooltip>
 
@@ -141,8 +145,16 @@ import { WarningFilled } from '@element-plus/icons-vue';
 import { isEqual } from 'lodash-es';
 
 import { TMagicButton, TMagicFormItem, TMagicIcon, TMagicTooltip } from '@tmagic/design';
+import { getValueByKeyPath } from '@tmagic/utils';
 
-import type { ChildConfig, ContainerChangeEventData, ContainerCommonConfig, FormState, FormValue } from '../schema';
+import type {
+  ChildConfig,
+  ContainerChangeEventData,
+  ContainerCommonConfig,
+  FormState,
+  FormValue,
+  ToolTipConfigType,
+} from '../schema';
 import { display as displayFunction, filterFunction, getRules } from '../utils/form';
 
 defineOptions({
@@ -223,7 +235,20 @@ const disabled = computed(() => props.disabled || filterFunction(mForm, props.co
 
 const text = computed(() => filterFunction(mForm, props.config.text, props));
 
-const tooltip = computed(() => filterFunction(mForm, props.config.tooltip, props));
+const tooltip = computed(() => {
+  const config = filterFunction<ToolTipConfigType>(mForm, props.config.tooltip, props);
+  if (typeof config === 'string') {
+    return {
+      text: config,
+      placement: 'top',
+    };
+  }
+
+  return {
+    text: config?.text,
+    placement: config?.placement || 'top',
+  };
+});
 
 const rule = computed(() => getRules(mForm, props.config.rules, props));
 
@@ -251,6 +276,7 @@ const fieldsProps = computed(() => ({
   disabled: disabled.value,
   prop: itemProp.value,
   key: props.config[mForm?.keyProps],
+  style: props.config.fieldStyle,
 }));
 
 const formItemProps = computed(() => ({
@@ -294,6 +320,7 @@ const filterHandler = (filter: any, value: FormValue | number | string) => {
       formValue: mForm?.values,
       prop: itemProp.value,
       config: props.config,
+      getFormValue: (prop: string) => getValueByKeyPath(prop, mForm?.values || props.model),
     });
   }
 
@@ -386,6 +413,7 @@ const onChangeHandler = async function (v: any, eventData: ContainerChangeEventD
           changeRecords: newChangeRecords,
           setModel,
           setFormValue,
+          getFormValue: (prop: string) => getValueByKeyPath(prop, mForm?.values || props.model),
         })) ?? value;
     }
     value = trimHandler(trim, value) ?? value;

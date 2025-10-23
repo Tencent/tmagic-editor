@@ -6,7 +6,7 @@
     :falseValue="inactiveValue"
     :disabled="disabled"
     @update:model-value="changeHandler"
-    >{{ config.text }}</TMagicCheckbox
+    ><template #default v-if="!config.useLabel">{{ config.text }}</template></TMagicCheckbox
   >
 </template>
 
