@@ -167,7 +167,17 @@ watchEffect(() => {
 
 const tabItems = (tab: TabPaneConfig) => (props.config.dynamic ? props.config.items : tab.items);
 
-const tabClickHandler = (tab: any) => tabClick(mForm, tab, props);
+const tabClickHandler = (tab: any) => {
+  if (typeof tab === 'object') {
+    tabClick(mForm, tab, props);
+  } else {
+    let item = tabs.value.find((tab: any) => tab.status === tab);
+    if (!item) {
+      item = tabs.value[tab];
+    }
+    tabClick(mForm, item, props);
+  }
+};
 
 const onTabAdd = async () => {
   if (!props.name) throw new Error('dynamic tab 必须配置name');

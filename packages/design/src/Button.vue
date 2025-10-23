@@ -39,5 +39,9 @@ const clickHandler = (...args: any[]) => {
   .t-button__text {
     align-items: center;
   }
+
+  + .tmagic-design-button {
+    margin-left: 12px;
+  }
 }
 </style>
