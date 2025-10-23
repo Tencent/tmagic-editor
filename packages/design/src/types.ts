@@ -32,6 +32,7 @@ export interface ButtonProps {
   text?: boolean;
   circle?: boolean;
   icon?: any;
+  variant?: string;
 }
 
 export interface CardProps {
@@ -193,6 +194,7 @@ export interface InputProps {
   rows?: number;
   type?: string;
   size?: FieldSize;
+  row?: number;
 }
 
 export interface InputNumberProps {
@@ -354,7 +356,7 @@ export interface TabPaneProps {
 export interface TabsProps {
   type?: string;
   editable?: boolean;
-  tabPosition?: string;
+  tabPosition?: 'left' | 'right' | 'top' | 'bottom';
   modelValue?: string | number;
 }
 

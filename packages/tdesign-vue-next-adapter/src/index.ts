@@ -17,6 +17,7 @@ import {
   Form as TForm,
   FormItem as TFormItem,
   InputNumber as TInputNumber,
+  LoadingDirective,
   MessagePlugin,
   Option as TOption,
   OptionGroup as TOptionGroup,
@@ -28,7 +29,6 @@ import {
   Steps as TSteps,
   Switch as TSwitch,
   TabPanel as TTabPanel,
-  Tabs as TTabs,
   Tag as TTag,
   TimePicker as TTimePicker,
   Tooltip as TTooltip,
@@ -59,6 +59,7 @@ import type {
   OptionGroupProps,
   OptionProps,
   PaginationProps,
+  PopconfirmProps,
   RadioButtonProps,
   RadioGroupProps,
   RadioProps,
@@ -80,22 +81,46 @@ import DatePicker from './DatePicker.vue';
 import Dialog from './Dialog.vue';
 import Icon from './Icon.vue';
 import Input from './Input.vue';
+import Popconfirm from './Popconfirm.vue';
 import Radio from './Radio.vue';
 import RadioButton from './RadioButton.vue';
 import Scrollbar from './Scrollbar.vue';
 import Table from './Table.vue';
+import Tabs from './Tabs.vue';
 
 const adapter: any = {
   message: MessagePlugin,
   messageBox: {
-    alert: (msg: string) => {
-      DialogPlugin.alert({
-        body: msg,
+    alert: (msg: string, title?: string) => {
+      return new Promise((resolve, reject) => {
+        const dia = DialogPlugin.alert({
+          header: title,
+          body: msg,
+          onConfirm: (e) => {
+            dia.hide();
+            resolve(e);
+          },
+          onClose: (e) => {
+            dia.hide();
+            reject(e);
+          },
+        });
       });
     },
-    confirm: (msg: string) => {
-      DialogPlugin.confirm({
-        body: msg,
+    confirm: (msg: string, title?: string) => {
+      return new Promise((resolve, reject) => {
+        const dia = DialogPlugin.confirm({
+          header: title,
+          body: msg,
+          onConfirm: (e) => {
+            dia.hide();
+            resolve(e);
+          },
+          onClose: (e) => {
+            dia.hide();
+            reject(e);
+          },
+        });
       });
     },
     close: (msg: string) => {
@@ -118,7 +143,7 @@ const adapter: any = {
         theme: props.type,
         size: props.size === 'default' ? 'medium' : props.size,
         icon: props.icon ? () => h(Icon, null, { default: () => h(props.icon) }) : undefined,
-        variant: props.link || props.text ? 'text' : 'base',
+        variant: props.link || props.text ? 'text' : props.variant || 'base',
         shape: props.circle ? 'circle' : 'rectangle',
       }),
     },
@@ -129,6 +154,8 @@ const adapter: any = {
         shadow: props.shadow !== 'never',
         hoverShadow: props.shadow === 'hover',
         header: props.header,
+        bodyStyle: props.bodyStyle,
+        headerBordered: true,
       }),
     },
 
@@ -419,13 +446,8 @@ const adapter: any = {
     },
 
     tabs: {
-      component: TTabs,
-      props: (props: TabsProps) => ({
-        addable: props.editable,
-        theme: props.type === 'card' ? 'card' : 'normal',
-        placement: props.tabPosition,
-        value: props.modelValue,
-      }),
+      component: Tabs,
+      props: (props: TabsProps) => props,
     },
 
     tag: {
@@ -462,7 +484,13 @@ const adapter: any = {
         autoUpload: props.autoUpload,
       }),
     },
+
+    popconfirm: {
+      component: Popconfirm,
+      props: (props: PopconfirmProps) => props,
+    },
   },
+  loading: LoadingDirective,
 };
 
 export default adapter;

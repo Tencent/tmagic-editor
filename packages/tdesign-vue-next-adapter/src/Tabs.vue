@@ -1,39 +1,33 @@
 <template>
-  <component
-    class="tmagic-design-tabs"
-    :is="uiComponent"
-    v-bind="uiProps"
-    @tab-click="tabClickHandler"
-    @tab-add="onTabAdd"
-    @tab-remove="onTabRemove"
+  <TTabs
+    :model-value="modelValue"
+    :addable="editable"
+    :theme="type === 'card' ? 'card' : 'normal'"
+    :placement="tabPosition"
+    @add="onTabAdd"
+    @change="tabClickHandler"
+    @remove="onTabRemove"
     @update:model-value="updateModelName"
   >
-    <template #add-icon v-if="$slots['add-icon']">
+    <template #action v-if="$slots['add-icon']">
       <slot name="add-icon"></slot>
     </template>
     <template #default>
       <slot></slot>
     </template>
-  </component>
+  </TTabs>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { Tabs as TTabs } from 'tdesign-vue-next';
 
-import { getDesignConfig } from './config';
-import type { TabsProps } from './types';
+import type { TabsProps } from '@tmagic/design';
 
 defineOptions({
-  name: 'TMTabs',
+  name: 'TTDesignAdapterTabs',
 });
 
-const props = defineProps<TabsProps>();
-
-const ui = getDesignConfig('components')?.tabs;
-
-const uiComponent = ui?.component || 'el-tabs';
-
-const uiProps = computed<TabsProps>(() => ui?.props(props) || props);
+defineProps<TabsProps>();
 
 const emit = defineEmits(['tab-click', 'tab-add', 'tab-remove', 'update:model-value']);
 
