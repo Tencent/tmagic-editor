@@ -761,6 +761,10 @@ export interface ComponentConfig extends FormItem {
   display: any;
 }
 
+export interface FlexLayoutConfig extends FormItem, ContainerCommonConfig {
+  type: 'flex-layout';
+}
+
 export type ChildConfig =
   | FormItem
   | TabConfig

@@ -20,6 +20,7 @@ import type { App } from 'vue';
 
 import Container from './containers/Container.vue';
 import Fieldset from './containers/Fieldset.vue';
+import FlexLayout from './containers/FlexLayout.vue';
 import GroupList from './containers/GroupList.vue';
 import Panel from './containers/Panel.vue';
 import Row from './containers/Row.vue';
@@ -63,6 +64,7 @@ export { default as MFormDrawer } from './FormDrawer.vue';
 export { default as MFormBox } from './FormBox.vue';
 export { default as MContainer } from './containers/Container.vue';
 export { default as MFieldset } from './containers/Fieldset.vue';
+export { default as MFlexLayout } from './containers/FlexLayout.vue';
 export { default as MPanel } from './containers/Panel.vue';
 export { default as MRow } from './containers/Row.vue';
 export { default as MTabs } from './containers/Tabs.vue';
@@ -114,6 +116,7 @@ export default {
     app.component('m-form-step', MStep);
     app.component('m-form-table', Table);
     app.component('m-form-tab', Tabs);
+    app.component('m-form-flex-layout', FlexLayout);
     app.component('m-fields-text', Text);
     app.component('m-fields-img-upload', Text);
     app.component('m-fields-number', Number);
