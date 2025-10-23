@@ -1,3 +1,25 @@
+# [1.7.0-beta.0](https://github.com/Tencent/tmagic-editor/compare/v1.6.1...v1.7.0-beta.0) (2025-10-23)
+
+
+### Bug Fixes
+
+* **form:** tabel复制行不生效 ([6a2436f](https://github.com/Tencent/tmagic-editor/commit/6a2436fb99f15cdf662f39fd86952955fb78a9d2))
+
+
+### Features
+
+* **design, element-plus-adapter, tdesign-vue-next-adapter:** 新增popconfirm组件 ([3181f32](https://github.com/Tencent/tmagic-editor/commit/3181f32b389325ca1524c42af25279ceab0a9a09))
+* **design, form, tdesign-vue-next-adapter:** 完善tdesign适配 ([8ce5f71](https://github.com/Tencent/tmagic-editor/commit/8ce5f71aa26ea3fb1516aa020fa65fefdaa9cc55))
+* **design,editor,element-plus-adapter,form,table,tdesign-vue-next-adapter:** 重构table组件,适配tdesign ([5b16ec0](https://github.com/Tencent/tmagic-editor/commit/5b16ec00e1de45ed50f1c206de10ad48f9d71275))
+* **form:** fieldset中checkbox新增name,trueValue,falseValue配置 ([3435661](https://github.com/Tencent/tmagic-editor/commit/3435661348efce00390d0a79361073e8fea8af33))
+* **form:** text新增prepend, append不默认使用button ([cea6569](https://github.com/Tencent/tmagic-editor/commit/cea65690204dbe8ccf178f92fa7c47ad6fd24a8c))
+* **form:** 新增flex-layout组件 ([3e76d34](https://github.com/Tencent/tmagic-editor/commit/3e76d34f59343b5c3e833d32a35fad152a5bf7fd))
+* **form:** 新增style,fieldStyle配置;tooltip支持配置placement;配置中的函数新增getFormValue方法 ([1eeabc8](https://github.com/Tencent/tmagic-editor/commit/1eeabc8220649405746558d09bd648d2b650854d))
+* **playground:** 支持UI组件库切换 ([dd3e901](https://github.com/Tencent/tmagic-editor/commit/dd3e901a3d4122e6f4043521ff776fc0df478f98))
+* **table:** action支持配置disabled ([8809351](https://github.com/Tencent/tmagic-editor/commit/88093515373e1b431c83c0da9c28a2688421d151))
+
+
+
 ## [1.6.1](https://github.com/Tencent/tmagic-editor/compare/v1.6.0...v1.6.1) (2025-10-14)
 
 
