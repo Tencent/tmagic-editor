@@ -547,6 +547,9 @@ importers:
       '@tmagic/core':
         specifier: 1.7.0-beta.0
         version: 1.7.0-beta.0(typescript@5.9.3)
+      '@tmagic/design':
+        specifier: 1.7.0-beta.0
+        version: 1.7.0-beta.0(typescript@5.9.3)(vue@3.5.22(typescript@5.9.3))
       '@tmagic/editor':
         specifier: 1.7.0-beta.0
         version: 1.7.0-beta.0(@tmagic/core@1.7.0-beta.0(typescript@5.9.3))(@tmagic/form-schema@1.7.0-beta.0(typescript@5.9.3))(@tmagic/schema@1.7.0-beta.0(typescript@5.9.3))(monaco-editor@0.52.2)(typescript@5.9.3)(vue@3.5.22(typescript@5.9.3))
