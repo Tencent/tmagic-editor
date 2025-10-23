@@ -90,8 +90,13 @@ const setValue = (mForm: FormState | undefined, value: FormValue, initValue: For
 
   // 如果fieldset配置checkbox，checkbox的值保存在value中
   if (type === 'fieldset' && checkbox) {
-    if (typeof value[name] === 'object') {
-      value[name].value = typeof initValue[name] === 'object' ? initValue[name].value || 0 : 0;
+    const checkboxName = typeof checkbox === 'object' && typeof checkbox.name === 'string' ? checkbox.name : 'value';
+    const checkboxFalseValue =
+      typeof checkbox === 'object' && typeof checkbox.falseValue !== 'undefined' ? checkbox.falseValue : 0;
+
+    if (name && typeof value[name] === 'object') {
+      value[name][checkboxName] =
+        typeof initValue[name] === 'object' ? initValue[name][checkboxName] || checkboxFalseValue : checkboxFalseValue;
     }
   }
 };
