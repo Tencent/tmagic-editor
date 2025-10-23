@@ -28,7 +28,7 @@
       height: 14px;
       border: 1px solid #1d1f24;
       &.active {
-        background-color: var($theme-color);
+        background-color: $theme-color;
         &::after {
           border: 1px solid #fff;
         }
