@@ -84,6 +84,8 @@ export interface SortProp {
   order: 'ascending' | 'descending';
 }
 
+export type ToolTipConfigType = string | { text?: string; placement?: string };
+
 export interface FormItem {
   /** vnode的key值，默认是遍历数组时的index */
   __key?: string | number;
@@ -99,7 +101,7 @@ export interface FormItem {
   /** 额外的提示信息，和 help 类似，当提示文案同时出现时，可以使用这个。 */
   extra?: string | FilterFunction<string>;
   /** 配置提示信息 */
-  tooltip?: string | FilterFunction<string>;
+  tooltip?: ToolTipConfigType | FilterFunction<ToolTipConfigType>;
   /** 是否置灰 */
   disabled?: boolean | FilterFunction;
   /** 使用表单中的值作为key，例如配置了text，则使用model.text作为key */
@@ -124,6 +126,8 @@ export interface FormItem {
   dynamicKey?: string;
   /** 是否需要显示`展开更多配置` */
   expand?: boolean;
+  style?: Record<string, any>;
+  fieldStyle?: Record<string, any>;
   [key: string]: any;
 }
 
@@ -194,6 +198,7 @@ export type FilterFunction<T = boolean> = (
     prop: string;
     config: any;
     index?: number;
+    getFormValue: (prop: string) => any;
   },
 ) => T;
 
@@ -344,6 +349,7 @@ export interface DisplayConfig extends FormItem {
 export interface TextConfig extends FormItem, Input {
   type?: 'text';
   tooltip?: string;
+  prepend?: string;
   /** 后置元素，一般为标签或按钮 */
   append?:
     | string
@@ -431,6 +437,7 @@ export interface CheckboxConfig extends FormItem {
   type: 'checkbox';
   activeValue?: number | string;
   inactiveValue?: number | string;
+  useLabel?: boolean;
 }
 
 /**
@@ -642,7 +649,13 @@ export interface TabConfig extends FormItem, ContainerCommonConfig {
  */
 export interface FieldsetConfig extends FormItem, ContainerCommonConfig {
   type: 'fieldset';
-  checkbox?: boolean;
+  checkbox?:
+    | boolean
+    | {
+        name: string;
+        trueValue?: string | number;
+        falseValue?: string | number;
+      };
   expand?: boolean;
   legend?: string;
   schematic?: string;

@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { provide, reactive, ref, shallowRef, toRaw, watch, watchEffect } from 'vue';
+import { provide, reactive, ref, shallowRef, toRaw, useTemplateRef, watch, watchEffect } from 'vue';
 import { cloneDeep, isEqual } from 'lodash-es';
 
 import { TMagicForm, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
@@ -84,7 +84,7 @@ const props = withDefaults(
 
 const emit = defineEmits(['change', 'error', 'field-input', 'field-change', 'update:stepActive']);
 
-const tMagicForm = ref<InstanceType<typeof TMagicForm>>();
+const tMagicFormRef = useTemplateRef('tMagicForm');
 const initialized = ref(false);
 const values = ref<FormValue>({});
 const lastValuesProcessed = ref<FormValue>({});
@@ -206,13 +206,13 @@ defineExpose({
   changeHandler,
 
   resetForm: () => {
-    tMagicForm.value?.resetFields();
+    tMagicFormRef.value?.resetFields();
     changeRecords.value = [];
   },
 
   submitForm: async (native?: boolean): Promise<any> => {
     try {
-      await tMagicForm.value?.validate();
+      await tMagicFormRef.value?.validate();
       changeRecords.value = [];
       return native ? values.value : cloneDeep(toRaw(values.value));
     } catch (invalidFields: any) {

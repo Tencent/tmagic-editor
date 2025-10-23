@@ -21,6 +21,8 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { cloneDeep } from 'lodash-es';
 
+import { getValueByKeyPath } from '@tmagic/utils';
+
 import {
   ChildConfig,
   ContainerCommonConfig,
@@ -215,6 +217,7 @@ export const filterFunction = <T = any>(
       prop: props.prop,
       config: props.config,
       index: props.index,
+      getFormValue: (prop: string) => getValueByKeyPath(prop, mForm?.values || props.model),
     });
   }
 
