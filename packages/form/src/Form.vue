@@ -196,6 +196,46 @@ const submitHandler = (e: SubmitEvent) => {
   }
 };
 
+/**
+ * 通过 name 从 config 中查找对应的 text
+ * @param name - 字段名，支持点分隔的路径格式，如 'a.b.c'
+ * @param config - 表单配置数组
+ * @returns 找到的 text 值，如果未找到则返回 undefined
+ */
+const getTextByName = (name: string, config: FormConfig = props.config): string | undefined => {
+  if (!name || !Array.isArray(config)) return undefined;
+
+  const nameParts = name.split('.');
+
+  const findInConfig = (configs: FormConfig, parts: string[]): string | undefined => {
+    if (parts.length === 0) return undefined;
+
+    const [currentPart, ...remainingParts] = parts;
+
+    for (const item of configs) {
+      if (item.name === currentPart) {
+        if (remainingParts.length === 0) {
+          return typeof item.text === 'string' ? item.text : undefined;
+        }
+
+        if (item.items && Array.isArray(item.items)) {
+          const result = findInConfig(item.items, remainingParts);
+          if (result !== undefined) return result;
+        }
+      }
+
+      if (item.items && Array.isArray(item.items)) {
+        const result = findInConfig(item.items, parts);
+        if (result !== undefined) return result;
+      }
+    }
+
+    return undefined;
+  };
+
+  return findInConfig(config, nameParts);
+};
+
 defineExpose({
   values,
   lastValuesProcessed,
@@ -212,7 +252,12 @@ defineExpose({
 
   submitForm: async (native?: boolean): Promise<any> => {
     try {
-      await tMagicFormRef.value?.validate();
+      const result = await tMagicFormRef.value?.validate();
+      // tdesign 错误通过返回值返回
+      // element-plus 通过throw error
+      if (result !== true) {
+        throw result;
+      }
       changeRecords.value = [];
       return native ? values.value : cloneDeep(toRaw(values.value));
     } catch (invalidFields: any) {
@@ -220,16 +265,19 @@ defineExpose({
 
       const error: string[] = [];
 
-      Object.entries(invalidFields).forEach(([, ValidateError]) => {
+      Object.entries(invalidFields).forEach(([prop, ValidateError]) => {
         (ValidateError as ValidateError[]).forEach(({ field, message }) => {
-          if (field && message) error.push(`${field} -> ${message}`);
-          if (field && !message) error.push(`${field} -> 出现错误`);
-          if (!field && message) error.push(`${message}`);
+          const name = field || prop;
+          const text = getTextByName(name, props.config) || name;
+
+          error.push(`${text} -> ${message}`);
         });
       });
 
       throw new Error(error.join('<br>'));
     }
   },
+
+  getTextByName,
 });
 </script>
