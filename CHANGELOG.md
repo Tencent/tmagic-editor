@@ -1,3 +1,13 @@
+# [1.7.0-beta.1](https://github.com/Tencent/tmagic-editor/compare/v1.7.0-beta.0...v1.7.0-beta.1) (2025-10-24)
+
+
+### Features
+
+* **design, form, form-schema, tdesign-vue-next-adapter:** textarea支持rows配置 ([c717472](https://github.com/Tencent/tmagic-editor/commit/c7174726b3f017afb5666f9ccc343a0c98d8d1fa))
+* **form:** 表单校验后的错误信息将name转换成text ([b247490](https://github.com/Tencent/tmagic-editor/commit/b2474909cff049b0800da5be3293ad35309c1b1e))
+
+
+
 # [1.7.0-beta.0](https://github.com/Tencent/tmagic-editor/compare/v1.6.1...v1.7.0-beta.0) (2025-10-23)
 
 
