@@ -194,7 +194,6 @@ export interface InputProps {
   rows?: number;
   type?: string;
   size?: FieldSize;
-  row?: number;
 }
 
 export interface InputNumberProps {
