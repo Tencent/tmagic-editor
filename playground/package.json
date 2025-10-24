@@ -37,8 +37,6 @@
     "lightningcss": "^1.30.2",
     "terser": "^5.43.1",
     "typescript": "catalog:",
-    "unplugin-auto-import": "^20.0.0",
-    "unplugin-vue-components": "^29.0.0",
     "vite": "catalog:"
   }
 }
