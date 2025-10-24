@@ -6,6 +6,7 @@
     clearable
     :placeholder="config.placeholder"
     :disabled="disabled"
+    :rows="config.rows"
     @update:model-value="changeHandler"
     @input="inputHandler"
   >

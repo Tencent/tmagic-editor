@@ -373,6 +373,7 @@ export interface TextConfig extends FormItem, Input {
 export interface TextareaConfig extends FormItem {
   type: 'textarea';
   placeholder?: string;
+  rows?: number;
 }
 
 /**
