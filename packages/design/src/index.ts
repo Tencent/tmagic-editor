@@ -54,21 +54,8 @@ export { default as TMagicTooltip } from './Tooltip.vue';
 export { default as TMagicUpload } from './Upload.vue';
 export { default as TMagicPopconfirm } from './Popconfirm.vue';
 
-export const tMagicMessage = {
-  error: (msg: string) => {
-    console.error(msg);
-  },
-  success: (msg: string) => {
-    console.log(msg);
-  },
-  warning: (msg: string) => {
-    console.warn(msg);
-  },
-  info: (msg: string) => {
-    console.info(msg);
-  },
-  closeAll: (_msg: string) => {},
-} as unknown as TMagicMessage;
+// eslint-disable-next-line import/no-mutable-exports
+export let tMagicMessage: TMagicMessage;
 
 export const tMagicMessageBox = {
   alert: (msg: string) => {
@@ -108,13 +95,23 @@ export let useZIndex = (zIndexOverrides?: Ref<number>) => {
 
 export default {
   install(app: App, options: DesignPluginOptions) {
-    if (options.message) {
-      tMagicMessage.error = options.message?.error;
-      tMagicMessage.success = options.message?.success;
-      tMagicMessage.warning = options.message?.warning;
-      tMagicMessage.info = options.message?.info;
-      tMagicMessage.closeAll = options.message?.closeAll;
-    }
+    tMagicMessage =
+      options.message ||
+      ({
+        error: (msg: string) => {
+          console.error(msg);
+        },
+        success: (msg: string) => {
+          console.log(msg);
+        },
+        warning: (msg: string) => {
+          console.warn(msg);
+        },
+        info: (msg: string) => {
+          console.info(msg);
+        },
+        closeAll: (_msg: string) => {},
+      } as unknown as TMagicMessage);
 
     if (options.messageBox) {
       tMagicMessageBox.alert = options.messageBox?.alert;

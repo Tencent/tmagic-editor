@@ -224,8 +224,9 @@ export interface PaginationProps {
   hideOnSinglePage?: boolean;
   curPage?: number;
   pageSizes?: number[];
-  pagesize?: number;
+  pageSize?: number;
   total?: number;
+  size?: 'large' | 'default' | 'small';
 }
 
 export interface PopconfirmProps {
@@ -399,13 +400,21 @@ export interface IconProps {
   size?: string;
 }
 
-export interface TMagicMessage {
+interface ExtraApi {
   success: (msg: string) => void;
   warning: (msg: string) => void;
   info: (msg: string) => void;
   error: (msg: string) => void;
   closeAll: () => void;
 }
+
+export type TMagicMessage = ExtraApi &
+  ((options: {
+    type?: 'info' | 'success' | 'warning' | 'error';
+    message?: string;
+    dangerouslyUseHTMLString?: boolean;
+    duration?: number;
+  }) => void);
 
 export type ElMessageBoxShortcutMethod = ((
   message: string,

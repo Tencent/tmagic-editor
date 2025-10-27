@@ -4,8 +4,9 @@
     :is="uiComponent"
     v-bind="uiProps"
     @size-change="handleSizeChange"
-    @page-size-change="handleSizeChange"
     @current-change="handleCurrentChange"
+    @update:current-page="updateCurrentPage"
+    @update:page-size="updatePageSize"
   ></component>
 </template>
 
@@ -21,7 +22,7 @@ defineOptions({
 
 const props = defineProps<PaginationProps>();
 
-const emit = defineEmits(['size-change', 'current-change']);
+const emit = defineEmits(['size-change', 'current-change', 'update:current-page', 'update:page-size']);
 
 const ui = getDesignConfig('components')?.pagination;
 
@@ -34,5 +35,11 @@ const handleSizeChange = (...args: any[]) => {
 };
 const handleCurrentChange = (...args: any[]) => {
   emit('current-change', ...args);
+};
+const updateCurrentPage = (...args: any[]) => {
+  emit('update:current-page', ...args);
+};
+const updatePageSize = (...args: any[]) => {
+  emit('update:page-size', ...args);
 };
 </script>
