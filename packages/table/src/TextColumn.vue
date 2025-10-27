@@ -29,12 +29,12 @@
     row[config.prop]
   }}</a>
 
-  <el-tooltip v-else-if="config.action === 'tip'" placement="left">
+  <TMagicTooltip v-else-if="config.action === 'tip'" placement="left">
     <template #content>
       <div>{{ formatter(config, row, { index: index }) }}</div>
     </template>
     <TMagicButton link type="primary">{{ config.buttonText || '扩展配置' }}</TMagicButton>
-  </el-tooltip>
+  </TMagicTooltip>
 
   <TMagicTag
     v-else-if="config.action === 'tag' && config.prop"
@@ -46,7 +46,7 @@
 </template>
 
 <script lang="ts" setup>
-import { TMagicButton, TMagicForm, TMagicTag } from '@tmagic/design';
+import { TMagicButton, TMagicForm, TMagicTag, TMagicTooltip } from '@tmagic/design';
 
 import { ColumnConfig } from './schema';
 import { formatter } from './utils';

@@ -3,6 +3,9 @@
     <NavMenu :data="menu"></NavMenu>
     <div class="table-content">
       <MagicTable class="left-panel" :columns="columns" :data="data" :show-header="true" rowkey-name="a"></MagicTable>
+
+      <TMagicPagination class="pagination" :total="100" :page-size="10" :current-page="1"></TMagicPagination>
+
       <TMagicTabs class="right-panel" modelValue="columns">
         <TMagicTabPane label="columns" name="columns">
           <TMagicCodeEditor class="code-editor-content" :init-values="columns" @save="change"></TMagicCodeEditor>
@@ -20,7 +23,15 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import type { ColumnConfig } from '@tmagic/editor';
-import { MagicTable, MenuButton, TMagicCodeEditor, tMagicMessage, TMagicTabPane, TMagicTabs } from '@tmagic/editor';
+import {
+  MagicTable,
+  MenuButton,
+  TMagicCodeEditor,
+  tMagicMessage,
+  TMagicPagination,
+  TMagicTabPane,
+  TMagicTabs,
+} from '@tmagic/editor';
 
 import NavMenu from '../components/NavMenu.vue';
 

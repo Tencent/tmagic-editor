@@ -21,7 +21,6 @@ import {
   MessagePlugin,
   Option as TOption,
   OptionGroup as TOptionGroup,
-  Pagination as TPagination,
   RadioGroup as TRadioGroup,
   Row as TRow,
   Select as TSelect,
@@ -81,6 +80,7 @@ import DatePicker from './DatePicker.vue';
 import Dialog from './Dialog.vue';
 import Icon from './Icon.vue';
 import Input from './Input.vue';
+import Pagination from './Pagination.vue';
 import Popconfirm from './Popconfirm.vue';
 import Radio from './Radio.vue';
 import RadioButton from './RadioButton.vue';
@@ -88,8 +88,24 @@ import Scrollbar from './Scrollbar.vue';
 import Table from './Table.vue';
 import Tabs from './Tabs.vue';
 
+const messageBox = (options: {
+  type?: 'info' | 'success' | 'warning' | 'error';
+  message?: string;
+  dangerouslyUseHTMLString?: boolean;
+  duration?: number;
+}) =>
+  MessagePlugin(options.type || 'info', {
+    duration: options.duration || 3000,
+    content: options.message,
+  });
+
+messageBox.success = MessagePlugin.success;
+messageBox.error = MessagePlugin.error;
+messageBox.warning = MessagePlugin.warning;
+messageBox.info = MessagePlugin.info;
+
 const adapter: any = {
-  message: MessagePlugin,
+  message: messageBox,
   messageBox: {
     alert: (msg: string, title?: string) => {
       return new Promise((resolve, reject) => {
@@ -351,13 +367,8 @@ const adapter: any = {
     },
 
     pagination: {
-      component: TPagination,
-      props: (props: PaginationProps) => ({
-        current: props.curPage,
-        pageSizeOptions: props.pageSizes,
-        pageSize: props.pagesize,
-        total: props.total,
-      }),
+      component: Pagination,
+      props: (props: PaginationProps) => props,
     },
 
     radio: {

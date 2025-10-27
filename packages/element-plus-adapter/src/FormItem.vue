@@ -10,6 +10,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { ElFormItem } from 'element-plus';
 
 import { FormItemProps } from '@tmagic/design';
 
