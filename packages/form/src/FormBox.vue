@@ -101,8 +101,9 @@ watchEffect(() => {
 
 const submitHandler = async () => {
   try {
+    const changeRecords = form.value?.changeRecords;
     const values = await form.value?.submitForm();
-    emit('submit', values, { changeRecords: form.value?.changeRecords });
+    emit('submit', values, { changeRecords });
   } catch (e) {
     emit('error', e);
   }
