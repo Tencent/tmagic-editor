@@ -94,6 +94,7 @@ import FormItem from './FormItem.vue';
 import Table from './Table.vue';
 
 const adapter: DesignPluginOptions = {
+  adapterType: 'element-plus',
   useZIndex,
   message: ElMessage,
   messageBox: ElMessageBox,

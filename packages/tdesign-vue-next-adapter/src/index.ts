@@ -1,4 +1,4 @@
-import { h } from 'vue';
+import { computed, h, Ref, ref, unref } from 'vue';
 import {
   Badge as TBadge,
   Button as TButton,
@@ -104,7 +104,31 @@ messageBox.error = MessagePlugin.error;
 messageBox.warning = MessagePlugin.warning;
 messageBox.info = MessagePlugin.info;
 
+const zIndex = ref(0);
+const DEFAULT_INITIAL_Z_INDEX = 2500;
+
+const useZIndex = (zIndexOverrides?: Ref<number>) => {
+  const zIndexInjection = zIndexOverrides;
+  const initialZIndex = computed(() => {
+    const zIndexFromInjection = unref(zIndexInjection);
+    return zIndexFromInjection ?? DEFAULT_INITIAL_Z_INDEX;
+  });
+  const currentZIndex = computed(() => initialZIndex.value + zIndex.value);
+
+  const nextZIndex = () => {
+    zIndex.value += 1;
+    return currentZIndex.value;
+  };
+
+  return {
+    initialZIndex,
+    currentZIndex,
+    nextZIndex,
+  };
+};
+
 const adapter: any = {
+  adapterType: 'tdesign-vue-next',
   message: messageBox,
   messageBox: {
     alert: (msg: string, title?: string) => {
@@ -502,6 +526,7 @@ const adapter: any = {
     },
   },
   loading: LoadingDirective,
+  useZIndex,
 };
 
 export default adapter;
