@@ -1,3 +1,19 @@
+# [1.7.0-beta.2](https://github.com/Tencent/tmagic-editor/compare/v1.7.0-beta.1...v1.7.0-beta.2) (2025-10-28)
+
+
+### Bug Fixes
+
+* **form:** daterange 配置names后配置失效 ([d22e520](https://github.com/Tencent/tmagic-editor/commit/d22e520fbf6fc95c2c9600f02107d987b3a46fa7))
+* **form:** dialog submit event获取到的changeRecords为空 ([02e1c7f](https://github.com/Tencent/tmagic-editor/commit/02e1c7f479e5370ba6ea2153b9547bbb0c090431))
+
+
+### Features
+
+* **design, element-plus-adapter, tdesign-vue-next-adapter:** 添加adapterType, 完善tdesign useZIndex ([b312b5a](https://github.com/Tencent/tmagic-editor/commit/b312b5a5bc827a8199d5a7b36418f0ad933be081))
+* **design, tdesign-vue-next-adapter, table, element-plus-adapter:** 完善tdesign适配 ([fa20837](https://github.com/Tencent/tmagic-editor/commit/fa208372ab5c204b6cb34ff977cd133156513fda))
+
+
+
 # [1.7.0-beta.1](https://github.com/Tencent/tmagic-editor/compare/v1.7.0-beta.0...v1.7.0-beta.1) (2025-10-24)
 
 
