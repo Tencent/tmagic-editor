@@ -208,10 +208,7 @@ const items = computed(() => (props.config as ContainerCommonConfig).items);
 
 const itemProp = computed(() => {
   let n: string | number = '';
-  const { names } = props.config as any;
-  if (names?.[0]) {
-    [n] = names;
-  } else if (name.value) {
+  if (name.value) {
     n = name.value;
   } else {
     return props.prop;

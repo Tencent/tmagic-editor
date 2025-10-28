@@ -56,8 +56,8 @@ export default createForm([
   {
     type: 'daterange',
     text: '日期范围',
-    name: 'daterange',
-    // names: ['one', 'two'],
+    // name: 'daterange',
+    names: ['one', 'two'],
   },
   {
     type: 'time',
