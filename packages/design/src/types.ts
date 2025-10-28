@@ -712,6 +712,7 @@ export interface Components {
 }
 
 export interface DesignPluginOptions {
+  adapterType?: string;
   message?: TMagicMessage;
   messageBox?: TMagicMessageBox;
   components?: Components;
