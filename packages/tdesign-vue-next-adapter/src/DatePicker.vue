@@ -1,6 +1,9 @@
 <template>
   <TDateRangePicker
     v-if="type.endsWith('range')"
+    allow-input
+    clearable
+    enable-time-picker
     :modelValue="modelValue"
     :mode="mode"
     :placeholder="[startPlaceholder || '', endPlaceholder || '']"
@@ -14,6 +17,7 @@
   />
   <TDatePicker
     v-else
+    clearable
     :modelValue="modelValue"
     :mode="mode"
     :placeholder="placeholder"
