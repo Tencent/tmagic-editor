@@ -24,15 +24,11 @@
         <slot></slot>
 
         <div style="display: flex; justify-content: space-between; margin: 10px 0">
-          <TMagicButton v-if="addable" size="small" type="primary" :disabled="disabled" plain @click="newHandler()"
-            >新增一行</TMagicButton
-          >
-
           <div style="display: flex">
             <TMagicButton
               :icon="Grid"
               size="small"
-              type="primary"
+              type="defalut"
               @click="toggleMode"
               v-if="enableToggleMode && config.enableToggleMode !== false && !isFullscreen"
               >展开配置</TMagicButton
@@ -40,7 +36,7 @@
             <TMagicButton
               :icon="FullScreen"
               size="small"
-              type="primary"
+              type="defalut"
               @click="toggleFullscreen"
               v-if="config.enableFullscreen !== false"
             >
@@ -61,6 +57,9 @@
               >清空</TMagicButton
             >
           </div>
+          <TMagicButton v-if="addable" size="small" type="primary" :disabled="disabled" plain @click="newHandler()"
+            >新增一行</TMagicButton
+          >
         </div>
 
         <div class="bottom" style="text-align: right" v-if="config.pagination">
