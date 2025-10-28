@@ -42,7 +42,7 @@
         </TMagicCol>
         <TMagicCol :span="12">
           <slot name="footer">
-            <TMagicButton @click="cancel" size="small">取 消</TMagicButton>
+            <TMagicButton type="default" @click="cancel" size="small">取 消</TMagicButton>
             <TMagicButton v-if="hasStep && stepActive > 1" type="info" size="small" @click="preStep"
               >上一步</TMagicButton
             >
@@ -131,8 +131,9 @@ const closeHandler = () => {
 
 const save = async () => {
   try {
+    const changeRecords = form.value?.changeRecords;
     const values = await form.value?.submitForm();
-    emit('submit', values, { changeRecords: form.value?.changeRecords });
+    emit('submit', values, { changeRecords });
   } catch (e) {
     emit('error', e);
   }

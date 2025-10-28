@@ -42,7 +42,7 @@
         </TMagicCol>
         <TMagicCol :span="12">
           <slot name="footer">
-            <TMagicButton @click="handleClose">关闭</TMagicButton>
+            <TMagicButton type="default" @click="handleClose">关闭</TMagicButton>
             <TMagicButton type="primary" :disabled="disabled" :loading="saveFetch" @click="submitHandler">{{
               confirmText
             }}</TMagicButton>
@@ -109,8 +109,9 @@ watchEffect(() => {
 
 const submitHandler = async () => {
   try {
+    const changeRecords = form.value?.changeRecords;
     const values = await form.value?.submitForm();
-    emit('submit', values, { changeRecords: form.value?.changeRecords });
+    emit('submit', values, { changeRecords });
   } catch (e) {
     emit('error', e);
   }
