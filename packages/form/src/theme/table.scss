@@ -1,9 +1,6 @@
 .m-fields-table-wrap {
   width: 100%;
-}
 
-.m-fields-table {
-  width: 100%;
   &.fixed {
     position: fixed;
     height: 100%;
@@ -14,6 +11,8 @@
     bottom: 0;
     z-index: 100;
     background: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    display: flex;
 
     & > .el-form-item__content {
       z-index: 101;
@@ -25,6 +24,10 @@
       width: 95vw !important;
     }
   }
+}
+
+.m-fields-table {
+  width: 100%;
 
   th {
     background-color: #f2f2f2 !important;
