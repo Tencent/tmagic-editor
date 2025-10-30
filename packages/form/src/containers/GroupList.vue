@@ -2,7 +2,7 @@
   <div class="m-fields-group-list">
     <div v-if="config.extra" v-html="config.extra" style="color: rgba(0, 0, 0, 0.45)"></div>
     <div v-if="!model[name] || !model[name].length" class="el-table__empty-block">
-      <span class="el-table__empty-text">暂无数据</span>
+      <span class="el-table__empty-text t-table__empty">暂无数据</span>
     </div>
 
     <MFieldsGroupListItem
@@ -26,16 +26,21 @@
       @addDiffCount="onAddDiffCount()"
     ></MFieldsGroupListItem>
 
-    <TMagicButton
-      v-if="addable"
-      type="primary"
-      :size="config.enableToggleMode ? 'small' : 'default'"
-      :disabled="disabled"
-      @click="addHandler"
-      >新增</TMagicButton
-    >
-
-    <TMagicButton :icon="Grid" size="small" @click="toggleMode" v-if="config.enableToggleMode">切换为表格</TMagicButton>
+    <div class="m-fields-group-list-footer">
+      <TMagicButton v-if="config.enableToggleMode" :icon="Grid" size="small" @click="toggleMode"
+        >切换为表格</TMagicButton
+      >
+      <div style="display: flex; justify-content: flex-end; flex: 1">
+        <TMagicButton
+          v-if="addable"
+          type="primary"
+          :size="config.enableToggleMode ? 'small' : 'default'"
+          :disabled="disabled"
+          @click="addHandler"
+          >新增</TMagicButton
+        >
+      </div>
+    </div>
   </div>
 </template>
 

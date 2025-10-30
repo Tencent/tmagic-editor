@@ -1,90 +1,92 @@
 <template>
-  <div class="m-fields-group-list-item">
-    <div>
-      <TMagicButton link :disabled="disabled" @click="expandHandler">
-        <TMagicIcon><CaretBottom v-if="expand" /><CaretRight v-else /></TMagicIcon>{{ title }}
-      </TMagicButton>
+  <TMagicCard class="m-fields-group-list-item" :body-style="{ display: expand ? 'block' : 'none' }">
+    <template #header>
+      <div>
+        <TMagicButton link :disabled="disabled" @click="expandHandler">
+          <TMagicIcon><CaretBottom v-if="expand" /><CaretRight v-else /></TMagicIcon>{{ title }}
+        </TMagicButton>
 
-      <TMagicButton
-        v-show="showDelete"
-        type="danger"
-        size="small"
-        link
-        :icon="Delete"
-        :disabled="disabled"
-        @click="removeHandler"
-      ></TMagicButton>
-
-      <TMagicButton
-        v-if="copyable"
-        link
-        size="small"
-        type="primary"
-        :icon="DocumentCopy"
-        :disabled="disabled"
-        @click="copyHandler"
-        >复制</TMagicButton
-      >
-
-      <template v-if="movable">
         <TMagicButton
-          v-show="index !== 0"
+          v-show="showDelete"
+          type="danger"
+          size="small"
+          link
+          :icon="Delete"
+          :disabled="disabled"
+          @click="removeHandler"
+        ></TMagicButton>
+
+        <TMagicButton
+          v-if="copyable"
           link
           size="small"
+          type="primary"
+          :icon="DocumentCopy"
           :disabled="disabled"
-          :icon="CaretTop"
-          @click="changeOrder(-1)"
-          >上移</TMagicButton
+          @click="copyHandler"
+          >复制</TMagicButton
         >
-        <TMagicButton
-          v-show="index !== length - 1"
-          link
-          size="small"
-          :disabled="disabled"
-          :icon="CaretBottom"
-          @click="changeOrder(1)"
-          >下移</TMagicButton
-        >
-      </template>
 
-      <TMagicPopover
-        v-if="config.moveSpecifyLocation"
-        trigger="click"
-        placement="top"
-        width="200"
-        :visible="moveSpecifyLocationVisible"
-      >
-        <template #reference>
+        <template v-if="movable">
           <TMagicButton
+            v-show="index !== 0"
             link
             size="small"
-            type="primary"
-            :icon="Position"
             :disabled="disabled"
-            @click="moveSpecifyLocationVisible = true"
-            >移动至</TMagicButton
+            :icon="CaretTop"
+            @click="changeOrder(-1)"
+            >上移</TMagicButton
+          >
+          <TMagicButton
+            v-show="index !== length - 1"
+            link
+            size="small"
+            :disabled="disabled"
+            :icon="CaretBottom"
+            @click="changeOrder(1)"
+            >下移</TMagicButton
           >
         </template>
-        <div>
-          <div>
-            第<TMagicInputNumber
-              style="margin: 0 5px"
-              v-model="moveSpecifyLocationIndex"
-              size="small"
-              :min="1"
-              :disabled="disabled"
-            ></TMagicInputNumber
-            >行
-          </div>
-          <div style="text-align: right; margin-top: 20px">
-            <TMagicButton size="small" text @click="moveSpecifyLocationVisible = false">取消</TMagicButton>
-            <TMagicButton size="small" type="primary" @click="moveSpecifyLocationHandler">确认</TMagicButton>
-          </div>
-        </div>
-      </TMagicPopover>
 
-      <span v-if="itemExtra" v-html="itemExtra" class="m-form-tip"></span>
-    </div>
+        <TMagicPopover
+          v-if="config.moveSpecifyLocation"
+          trigger="click"
+          placement="top"
+          width="200"
+          :visible="moveSpecifyLocationVisible"
+        >
+          <template #reference>
+            <TMagicButton
+              link
+              size="small"
+              type="primary"
+              :icon="Position"
+              :disabled="disabled"
+              @click="moveSpecifyLocationVisible = true"
+              >移动至</TMagicButton
+            >
+          </template>
+          <div>
+            <div>
+              第<TMagicInputNumber
+                style="margin: 0 5px"
+                v-model="moveSpecifyLocationIndex"
+                size="small"
+                :min="1"
+                :disabled="disabled"
+              ></TMagicInputNumber
+              >行
+            </div>
+            <div style="text-align: right; margin-top: 20px">
+              <TMagicButton size="small" text @click="moveSpecifyLocationVisible = false">取消</TMagicButton>
+              <TMagicButton size="small" type="primary" @click="moveSpecifyLocationHandler">确认</TMagicButton>
+            </div>
+          </div>
+        </TMagicPopover>
+
+        <span v-if="itemExtra" v-html="itemExtra" class="m-form-tip"></span>
+      </div>
+    </template>
 
     <Container
       v-if="expand"
@@ -99,14 +101,14 @@
       @change="changeHandler"
       @addDiffCount="onAddDiffCount()"
     ></Container>
-  </div>
+  </TMagicCard>
 </template>
 
 <script setup lang="ts">
 import { computed, inject, ref } from 'vue';
 import { CaretBottom, CaretRight, CaretTop, Delete, DocumentCopy, Position } from '@element-plus/icons-vue';
 
-import { TMagicButton, TMagicIcon, TMagicInputNumber, TMagicPopover } from '@tmagic/design';
+import { TMagicButton, TMagicCard, TMagicIcon, TMagicInputNumber, TMagicPopover } from '@tmagic/design';
 
 import type { ContainerChangeEventData, FormState, GroupListConfig } from '../schema';
 import { filterFunction } from '../utils/form';
