@@ -78,6 +78,7 @@ export const useAdd = (
       if (typeof props.config.defaultAdd === 'function') {
         inputs = await props.config.defaultAdd(mForm, {
           model: props.model[modelName],
+          prop: props.prop,
           formValue: mForm?.values,
         });
       } else if (props.config.defaultAdd) {

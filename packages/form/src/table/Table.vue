@@ -1,7 +1,12 @@
 <template>
-  <div class="m-fields-table-wrap">
-    <teleport to="body" :disabled="!isFullscreen">
-      <div ref="mTable" class="m-fields-table" :class="{ 'm-fields-table-item-extra': config.itemExtra }">
+  <teleport to="body" :disabled="!isFullscreen">
+    <div
+      v-bind="$attrs"
+      class="m-fields-table-wrap"
+      :class="{ fixed: isFullscreen }"
+      :style="isFullscreen ? `z-index: ${nextZIndex()}` : ''"
+    >
+      <div class="m-fields-table" :class="{ 'm-fields-table-item-extra': config.itemExtra }">
         <span v-if="config.extra" style="color: rgba(0, 0, 0, 0.45)" v-html="config.extra"></span>
         <TMagicTooltip content="拖拽可排序" placement="left-start" :disabled="config.dropSort !== true">
           <TMagicTable
@@ -28,7 +33,6 @@
             <TMagicButton
               :icon="Grid"
               size="small"
-              type="defalut"
               @click="toggleMode"
               v-if="enableToggleMode && config.enableToggleMode !== false && !isFullscreen"
               >展开配置</TMagicButton
@@ -36,7 +40,6 @@
             <TMagicButton
               :icon="FullScreen"
               size="small"
-              type="defalut"
               @click="toggleFullscreen"
               v-if="config.enableFullscreen !== false"
             >
@@ -76,15 +79,15 @@
           </TMagicPagination>
         </div>
       </div>
-    </teleport>
-  </div>
+    </div>
+  </teleport>
 </template>
 
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue';
 import { FullScreen, Grid } from '@element-plus/icons-vue';
 
-import { TMagicButton, TMagicPagination, TMagicTable, TMagicTooltip, TMagicUpload } from '@tmagic/design';
+import { TMagicButton, TMagicPagination, TMagicTable, TMagicTooltip, TMagicUpload, useZIndex } from '@tmagic/design';
 
 import type { SortProp } from '../schema';
 import { sortChange } from '../utils/form';
@@ -120,6 +123,8 @@ const { pageSize, currentPage, paginationData, handleSizeChange, handleCurrentCh
   props,
   modelName,
 );
+
+const { nextZIndex } = useZIndex();
 
 const { addable, newHandler } = useAdd(props, emit);
 const { columns } = useTableColumns(props, emit, currentPage, pageSize, modelName);
