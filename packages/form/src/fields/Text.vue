@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, ref, shallowRef, watch } from 'vue';
+import { computed, inject, readonly, ref, shallowRef, watch } from 'vue';
 import type { Instance } from '@popperjs/core';
 import { createPopper } from '@popperjs/core';
 import { debounce } from 'lodash-es';
@@ -49,7 +49,7 @@ import { debounce } from 'lodash-es';
 import { TMagicButton, TMagicInput } from '@tmagic/design';
 import { isNumber } from '@tmagic/utils';
 
-import type { FieldProps, FormState, TextConfig } from '../schema';
+import type { ChangeRecord, ContainerChangeEventData, FieldProps, FormState, TextConfig } from '../schema';
 import { useAddField } from '../utils/useAddField';
 
 defineOptions({
@@ -59,7 +59,7 @@ defineOptions({
 const props = defineProps<FieldProps<TextConfig>>();
 
 const emit = defineEmits<{
-  change: [value: string];
+  change: [value: string, eventData?: ContainerChangeEventData];
   input: [value: string];
 }>();
 
@@ -121,10 +121,28 @@ const inputHandler = (v: string) => {
 const buttonClickHandler = () => {
   if (!appendConfig.value) return;
   if (typeof appendConfig.value.handler === 'function') {
+    const newChangeRecords: ChangeRecord[] = [];
+    const setModel = (key: string, value: any) => {
+      newChangeRecords.push({ propPath: props.prop.replace(`${props.name}`, key), value });
+    };
+
+    const setFormValue = (key: string, value: any) => {
+      newChangeRecords.push({ propPath: key, value });
+    };
+
     appendConfig.value.handler(mForm, {
       model: props.model,
-      values: mForm?.values,
+      values: mForm ? readonly(mForm.initValues) : null,
+      formValue: props.values || {},
+      setModel,
+      setFormValue,
     });
+
+    if (newChangeRecords.length > 0) {
+      emit('change', props.model[props.name], {
+        changeRecords: newChangeRecords,
+      });
+    }
   }
 };
 

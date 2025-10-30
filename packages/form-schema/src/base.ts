@@ -15,14 +15,14 @@ export interface ChangeRecord {
 
 export interface OnChangeHandlerData {
   model: FormValue;
-  values?: Readonly<FormValue>;
+  values?: Readonly<FormValue> | null;
   parent?: FormValue;
   formValue?: FormValue;
   config: Readonly<any>;
   prop: string;
   changeRecords: ChangeRecord[];
   setModel: (prop: string, value: any) => void;
-  setFromValue: (prop: string, value: any) => void;
+  setFormValue: (prop: string, value: any) => void;
 }
 
 export type FormValue = Record<string | number, any>;
@@ -361,7 +361,10 @@ export interface TextConfig extends FormItem, Input {
           mForm: FormState | undefined,
           data: {
             model: any;
-            values: any;
+            values?: Readonly<FormValue> | null;
+            formValue?: FormValue;
+            setModel: (prop: string, value: any) => void;
+            setFormValue: (prop: string, value: any) => void;
           },
         ) => void;
       };
@@ -553,7 +556,8 @@ export interface LinkConfig extends FormItem {
         mForm: FormState | undefined,
         data: {
           model: Record<any, any>;
-          values: Record<any, any>;
+          values?: Readonly<FormValue> | null;
+          formValue?: FormValue;
         },
       ) => FormConfig);
   fullscreen?: boolean;
