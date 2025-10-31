@@ -1,3 +1,19 @@
+# [1.7.0-beta.3](https://github.com/Tencent/tmagic-editor/compare/v1.7.0-beta.2...v1.7.0-beta.3) (2025-10-31)
+
+
+### Bug Fixes
+
+* **editor:** 表单组件保持单向数据流 ([09663c8](https://github.com/Tencent/tmagic-editor/commit/09663c8320829dc52a4d4ffb65c73fe147a3f5fc))
+
+
+### Features
+
+* **design,tdesign-vue,next-adapter:** textarea支持autosize ([be75ac9](https://github.com/Tencent/tmagic-editor/commit/be75ac994f0c03a9bdae05bc433513278d32c905))
+* **element-plus-adapter, from, tdesign-vue-adapter:** button兼容type=default和type为空的情况 ([2a29971](https://github.com/Tencent/tmagic-editor/commit/2a2997131873a4836303ac2411371dd78726f6f9))
+* **form:** text组件配置的append.hander函数添加setModel/setFormValue方法 ([57a634a](https://github.com/Tencent/tmagic-editor/commit/57a634a687c53132f521a8ed35a649edec488738))
+
+
+
 # [1.7.0-beta.2](https://github.com/Tencent/tmagic-editor/compare/v1.7.0-beta.1...v1.7.0-beta.2) (2025-10-28)
 
 

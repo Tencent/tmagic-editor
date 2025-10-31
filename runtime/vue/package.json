@@ -1,6 +1,6 @@
 {
   "name": "runtime-vue",
-  "version": "1.7.0-beta.2",
+  "version": "1.7.0-beta.3",
   "type": "module",
   "private": true,
   "engines": {
@@ -16,14 +16,14 @@
     "build:playground": "node scripts/build.mjs --type=playground"
   },
   "dependencies": {
-    "@tmagic/core": "1.7.0-beta.2",
-    "@tmagic/stage": "1.7.0-beta.2",
+    "@tmagic/core": "1.7.0-beta.3",
+    "@tmagic/stage": "1.7.0-beta.3",
     "@tmagic/vue-runtime-help": "^1.2.0",
     "axios": "^1.11.0",
     "vue": "catalog:"
   },
   "devDependencies": {
-    "@tmagic/cli": "1.7.0-beta.2",
+    "@tmagic/cli": "1.7.0-beta.3",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^24.0.10",
     "@vitejs/plugin-legacy": "^7.2.1",
