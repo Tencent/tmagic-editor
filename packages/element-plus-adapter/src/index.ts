@@ -111,7 +111,12 @@ const adapter: DesignPluginOptions = {
 
     button: {
       component: ElButton as any,
-      props: (props: ButtonProps) => props,
+      props: (props: ButtonProps) => {
+        return {
+          ...props,
+          type: props.type === 'default' ? '' : props.type,
+        };
+      },
     },
 
     card: {

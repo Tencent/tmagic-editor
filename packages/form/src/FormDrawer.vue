@@ -42,7 +42,7 @@
         </TMagicCol>
         <TMagicCol :span="12">
           <slot name="footer">
-            <TMagicButton type="default" @click="handleClose">关闭</TMagicButton>
+            <TMagicButton @click="handleClose">关闭</TMagicButton>
             <TMagicButton type="primary" :disabled="disabled" :loading="saveFetch" @click="submitHandler">{{
               confirmText
             }}</TMagicButton>

@@ -180,7 +180,7 @@ const adapter: any = {
     button: {
       component: TButton,
       props: (props: ButtonProps) => ({
-        theme: props.type,
+        theme: props.type ? props.type : 'default',
         size: props.size === 'default' ? 'medium' : props.size,
         icon: props.icon ? () => h(Icon, null, { default: () => h(props.icon) }) : undefined,
         variant: props.link || props.text ? 'text' : props.variant || 'base',
