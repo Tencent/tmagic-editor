@@ -24,15 +24,12 @@ import HtmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 import TsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 
-import editorPlugin, { type DesignPluginOptions } from '@tmagic/editor';
-import MagicElementPlusAdapter from '@tmagic/element-plus-adapter';
-import MagicTdesignAdapter from '@tmagic/tdesign-vue-next-adapter';
+import editorPlugin from '@tmagic/editor';
 
 import App from './App.vue';
 import router from './route';
 
 import 'element-plus/dist/index.css';
-import 'tdesign-vue-next/es/style/index.css';
 import '@tmagic/editor/dist/style.css';
 
 // @ts-ignore
@@ -58,12 +55,19 @@ monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
 
 const adpter = sessionStorage.getItem('tmagic-playground-ui-adapter') || 'element-plus';
 
-const adpterMap: Record<string, DesignPluginOptions> = {
-  'element-plus': MagicElementPlusAdapter,
-  'tdesign-vue-next': MagicTdesignAdapter,
-};
+let adpterModule;
 
-const app = createApp(App);
-app.use(router);
-app.use(editorPlugin, adpterMap[adpter] || MagicElementPlusAdapter);
-app.mount('#app');
+if (adpter === 'tdesign-vue-next') {
+  import('tdesign-vue-next/es/style/index.css');
+  adpterModule = import('@tmagic/tdesign-vue-next-adapter');
+} else {
+  import('element-plus/dist/index.css');
+  adpterModule = import('@tmagic/element-plus-adapter');
+}
+
+adpterModule.then((module: any) => {
+  const app = createApp(App);
+  app.use(router);
+  app.use(editorPlugin, module.default);
+  app.mount('#app');
+});
