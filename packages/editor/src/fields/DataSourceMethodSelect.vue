@@ -1,13 +1,16 @@
 <template>
   <div class="m-fields-data-source-method-select">
     <div class="data-source-method-select-container">
-      <MContainer
+      <MCascader
         class="select"
         :config="cascaderConfig"
         :model="model"
+        :name="name"
         :size="size"
+        :disabled="disabled"
+        :prop="prop"
         @change="onChangeHandler"
-      ></MContainer>
+      ></MCascader>
 
       <TMagicTooltip
         v-if="model[name] && isCustomMethod && hasDataSourceSidePanel"
@@ -22,11 +25,12 @@
     <CodeParams
       v-if="paramsConfig.length"
       name="params"
+      :key="model[name]"
       :model="model"
       :size="size"
       :disabled="disabled"
       :params-config="paramsConfig"
-      @change="onChangeHandler"
+      @change="onParamsChangeHandler"
     ></CodeParams>
   </div>
 </template>
@@ -38,13 +42,14 @@ import { Edit, View } from '@element-plus/icons-vue';
 import type { Id } from '@tmagic/core';
 import { TMagicButton, TMagicTooltip } from '@tmagic/design';
 import {
+  type CascaderConfig,
+  type ContainerChangeEventData,
   createValues,
   type DataSourceMethodSelectConfig,
   type FieldProps,
   filterFunction,
   type FormState,
-  MContainer,
-  type OnChangeHandlerData,
+  MCascader,
 } from '@tmagic/form';
 
 import CodeParams from '@editor/components/CodeParams.vue';
@@ -100,21 +105,6 @@ const getParamItemsConfig = ([dataSourceId, methodName]: [Id, string] = ['', '']
 
 const paramsConfig = ref<CodeParamStatement[]>(getParamItemsConfig(props.model[props.name || 'dataSourceMethod']));
 
-const setParamsConfig = (
-  dataSourceMethod: [Id, string],
-  formState: any = {},
-  setModel: OnChangeHandlerData['setModel'],
-) => {
-  // 通过下拉框选择的codeId变化后修正model的值，避免写入其他codeId的params
-  paramsConfig.value = dataSourceMethod ? getParamItemsConfig(dataSourceMethod) : [];
-
-  if (paramsConfig.value.length) {
-    setModel('params', createValues(formState, paramsConfig.value, {}, props.model.params));
-  } else {
-    setModel('params', {});
-  }
-};
-
 const methodsOptions = computed(
   () =>
     dataSources.value
@@ -132,24 +122,42 @@ const methodsOptions = computed(
       })) || [],
 );
 
-const cascaderConfig = computed(() => ({
+const cascaderConfig = computed<CascaderConfig>(() => ({
   type: 'cascader',
-  name: props.name,
   options: methodsOptions.value,
-  disable: props.disabled,
-  onChange: (formState: any, dataSourceMethod: [Id, string], { setModel }: OnChangeHandlerData) => {
-    setParamsConfig(dataSourceMethod, formState, setModel);
-
-    return dataSourceMethod;
-  },
 }));
 
 /**
  * 参数值修改更新
  */
 const onChangeHandler = (value: any) => {
-  props.model.params = value.params;
-  emit('change', props.model);
+  paramsConfig.value = getParamItemsConfig(value);
+
+  const changeRecords = [
+    {
+      propPath: props.prop,
+      value,
+    },
+  ];
+
+  changeRecords.push({
+    propPath: props.prop.replace(`${props.name}`, 'params'),
+    value: paramsConfig.value.length ? createValues(mForm, paramsConfig.value, {}, props.model.params) : {},
+  });
+
+  emit('change', value, {
+    changeRecords,
+  });
+};
+
+/**
+ * 参数值修改更新
+ */
+const onParamsChangeHandler = (value: any, eventData: ContainerChangeEventData) => {
+  eventData.changeRecords?.forEach((record) => {
+    record.propPath = `${props.prop.replace(`${props.name}`, '')}${record.propPath}`;
+  });
+  emit('change', props.model[props.name], eventData);
 };
 
 const editCodeHandler = () => {

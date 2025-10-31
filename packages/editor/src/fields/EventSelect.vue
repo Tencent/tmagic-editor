@@ -219,7 +219,6 @@ const targetCompConfig = computed(() => {
     display: (mForm: FormState, { model }: { model: Record<any, any> }) => model.actionType === ActionType.COMP,
     onChange: (MForm: FormState, v: string, { setModel }: OnChangeHandlerData) => {
       setModel('method', '');
-      return v;
     },
   };
   return { ...defaultTargetCompConfig, ...props.config.targetCompConfig };

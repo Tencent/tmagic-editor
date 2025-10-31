@@ -2,13 +2,15 @@
   <div class="m-fields-code-select-col">
     <div class="code-select-container">
       <!-- 代码块下拉框 -->
-      <MContainer
+      <MSelect
         class="select"
         :config="selectConfig"
+        :name="name"
         :model="model"
         :size="size"
+        :prop="prop"
         @change="onCodeIdChangeHandler"
-      ></MContainer>
+      ></MSelect>
 
       <!-- 查看/编辑按钮 -->
       <TMagicButton
@@ -28,6 +30,7 @@
       :key="model[name]"
       :model="model"
       :size="size"
+      :disabled="disabled"
       :params-config="paramsConfig"
       @change="onParamsChangeHandler"
     ></CodeParams>
@@ -48,7 +51,8 @@ import {
   type FieldProps,
   filterFunction,
   type FormState,
-  MContainer,
+  MSelect,
+  type SelectConfig,
 } from '@tmagic/form';
 
 import CodeParams from '@editor/components/CodeParams.vue';
@@ -108,7 +112,7 @@ watch(
   },
 );
 
-const selectConfig = {
+const selectConfig: SelectConfig = {
   type: 'select',
   name: props.name,
   disable: props.disabled,
@@ -122,33 +126,26 @@ const selectConfig = {
     }
     return [];
   },
-  onChange: (formState: any, codeId: Id, { setModel, model }: any) => {
-    // 通过下拉框选择的codeId变化后修正model的值，避免写入其他codeId的params
-    paramsConfig.value = getParamItemsConfig(codeId);
-
-    if (paramsConfig.value.length) {
-      setModel('params', createValues(formState, paramsConfig.value, {}, model.params));
-    } else {
-      setModel('params', {});
-    }
-
-    return codeId;
-  },
 };
 
-const onCodeIdChangeHandler = (value: any, eventData: ContainerChangeEventData) => {
-  props.model.params = value.params;
+const onCodeIdChangeHandler = (value: any) => {
+  // 通过下拉框选择的codeId变化后修正model的值，避免写入其他codeId的params
+  paramsConfig.value = getParamItemsConfig(value);
 
-  emit('change', props.model, {
-    changeRecords: eventData.changeRecords?.map((item) => ({
-      prop: `${props.prop.replace(props.name, '')}${item.propPath}`,
-      value: item.value,
-    })) || [
-      {
-        propPath: props.prop,
-        value: value[props.name],
-      },
-    ],
+  const changeRecords = [
+    {
+      propPath: props.prop,
+      value,
+    },
+  ];
+
+  changeRecords.push({
+    propPath: props.prop.replace(`${props.name}`, 'params'),
+    value: paramsConfig.value.length ? createValues(mForm, paramsConfig.value, {}, props.model.params) : {},
+  });
+
+  emit('change', value, {
+    changeRecords,
   });
 };
 
@@ -156,14 +153,10 @@ const onCodeIdChangeHandler = (value: any, eventData: ContainerChangeEventData) 
  * 参数值修改更新
  */
 const onParamsChangeHandler = (value: any, eventData: ContainerChangeEventData) => {
-  props.model.params = value.params;
-  emit('change', props.model, {
-    ...eventData,
-    changeRecords: (eventData.changeRecords || []).map((item) => ({
-      prop: `${props.prop.replace(props.name, '')}${item.propPath}`,
-      value: item.value,
-    })),
+  eventData.changeRecords?.forEach((record) => {
+    record.propPath = `${props.prop.replace(`${props.name}`, '')}${record.propPath}`;
   });
+  emit('change', props.model[props.name], eventData);
 };
 
 const editCode = (id: string) => {
