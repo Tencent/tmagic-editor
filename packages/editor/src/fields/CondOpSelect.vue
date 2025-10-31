@@ -1,6 +1,6 @@
 <template>
   <TMagicSelect
-    v-model="model[name]"
+    :model-value="model[name]"
     clearable
     filterable
     :size="size"

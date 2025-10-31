@@ -79,7 +79,6 @@ const clickHandler = ({ detail }: Event & { detail: HTMLElement | MNode }) => {
     id = getIdFromEl()(detail as HTMLElement) || id;
   }
   if (id) {
-    props.model[props.name] = id;
     emit('change', id);
     mForm?.$emit('field-change', props.prop, id);
   }
@@ -102,7 +101,6 @@ const startSelect = () => {
 
 const deleteHandler = () => {
   if (props.model) {
-    props.model[props.name] = '';
     emit('change', '');
     mForm?.$emit('field-change', props.prop, '');
   }
