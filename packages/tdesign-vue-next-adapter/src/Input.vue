@@ -7,6 +7,7 @@
     :disabled="disabled"
     :placeholder="placeholder"
     :rows="rows"
+    :autosize="autosize"
     @keypress="inputHandler"
     @change="changeHandler"
     @blur="blurHandler"

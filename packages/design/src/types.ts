@@ -194,6 +194,7 @@ export interface InputProps {
   rows?: number;
   type?: string;
   size?: FieldSize;
+  autosize?: boolean | { minRows: number; maxRows: number };
 }
 
 export interface InputNumberProps {
