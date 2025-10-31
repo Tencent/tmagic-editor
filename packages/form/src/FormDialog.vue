@@ -42,7 +42,7 @@
         </TMagicCol>
         <TMagicCol :span="12">
           <slot name="footer">
-            <TMagicButton type="default" @click="cancel" size="small">取 消</TMagicButton>
+            <TMagicButton @click="cancel" size="small">取 消</TMagicButton>
             <TMagicButton v-if="hasStep && stepActive > 1" type="info" size="small" @click="preStep"
               >上一步</TMagicButton
             >
