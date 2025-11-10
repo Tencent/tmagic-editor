@@ -9,6 +9,7 @@
     @update:modelValue="updateModelValue"
     @blur="blurHandler"
     @focus="focusHandler"
+    @click="clickHandler"
   >
     <template #prepend v-if="$slots.prepend">
       <slot name="prepend"></slot>
@@ -43,7 +44,7 @@ const uiComponent = ui?.component || 'el-input';
 
 const uiProps = computed<InputProps>(() => ui?.props(props) || props);
 
-const emit = defineEmits(['change', 'input', 'blur', 'focus', 'update:modelValue']);
+const emit = defineEmits(['change', 'input', 'blur', 'focus', 'click', 'update:modelValue']);
 
 const instance = ref<any>();
 
@@ -65,6 +66,10 @@ const blurHandler = (...args: any[]) => {
 
 const focusHandler = (...args: any[]) => {
   emit('focus', ...args);
+};
+
+const clickHandler = (...args: any[]) => {
+  emit('click', ...args);
 };
 
 defineExpose({

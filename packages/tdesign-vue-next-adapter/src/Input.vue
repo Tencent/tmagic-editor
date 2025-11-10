@@ -12,6 +12,7 @@
     @change="changeHandler"
     @blur="blurHandler"
     @focus="focusHandler"
+    @click="clickHandler"
     @update:modelValue="updateModelValue"
   ></TTextarea>
   <TInputAdornment v-else>
@@ -31,6 +32,7 @@
       @change="changeHandler"
       @blur="blurHandler"
       @focus="focusHandler"
+      @click="clickHandler"
       @update:modelValue="updateModelValue"
     >
       <template #prefix-icon v-if="$slots.prefix">
@@ -59,7 +61,7 @@ const props = defineProps<
   }
 >();
 
-const emit = defineEmits(['change', 'input', 'blur', 'focus', 'update:modelValue']);
+const emit = defineEmits(['change', 'input', 'blur', 'focus', 'click', 'update:modelValue']);
 
 const textareaRef = useTemplateRef('textarea');
 
@@ -90,6 +92,10 @@ const blurHandler = (...args: any[]) => {
 
 const focusHandler = (...args: any[]) => {
   emit('focus', ...args);
+};
+
+const clickHandler = (...args: any[]) => {
+  emit('click', ...args);
 };
 
 const updateModelValue = (...args: any[]) => {
