@@ -434,6 +434,7 @@ const adapter: any = {
         multiple: props.multiple,
         valueType: props.valueKey,
         remoteMethod: props.onSearch,
+        creatable: props.allowCreate,
         size: props.size === 'default' ? 'medium' : props.size,
         popupProps: {
           overlayClassName: props.popperClass,
