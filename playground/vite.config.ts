@@ -80,7 +80,9 @@ export default defineConfig({
         find: /^@tmagic\/tdesign-vue-next-adapter/,
         replacement: path.join(__dirname, '../packages/tdesign-vue-next-adapter/src/index.ts'),
       },
-    ] : [],
+    ] : [
+      { find: 'vue', replacement: path.join(__dirname, './node_modules/vue') },
+    ],
   },
 
   optimizeDeps: {
