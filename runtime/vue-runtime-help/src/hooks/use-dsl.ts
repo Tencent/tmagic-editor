@@ -4,38 +4,48 @@ import type TMagicApp from '@tmagic/core';
 import type { ChangeEvent, Id, MNode } from '@tmagic/core';
 import { isPage, isPageFragment, replaceChildNode } from '@tmagic/core';
 
-export const useDsl = (app = inject<TMagicApp>('app'), pageFragmentConstainerId?: Id) => {
+export const useDsl = (app = inject<TMagicApp>('app'), pageFragmentContainerId?: Id) => {
   if (!app) {
     throw new Error('useDsl must be used after MagicApp is created');
   }
 
-  const pageFragment = pageFragmentConstainerId ? app.pageFragments.get(pageFragmentConstainerId) : null;
+  const pageFragment = pageFragmentContainerId ? app.pageFragments.get(pageFragmentContainerId) : null;
 
-  const pageConfig = ref<MNode | undefined>(pageFragmentConstainerId ? pageFragment?.data : app.page?.data);
+  const pageConfig = ref<MNode | undefined>(pageFragmentContainerId ? pageFragment?.data : app.page?.data);
 
-  if (pageFragmentConstainerId) {
-    app.on('dsl-change', () => {
+  if (pageFragmentContainerId) {
+    const setPageConfig = () => {
       pageConfig.value = pageFragment?.data;
+    };
+    app.on('dsl-change', setPageConfig);
+
+    onBeforeUnmount(() => {
+      app.off('dsl-change', setPageConfig);
     });
   } else {
-    app.on('page-change', () => {
+    const setPageConfig = () => {
       pageConfig.value = app.page?.data;
+    };
+    app.on('page-change', setPageConfig);
+
+    onBeforeUnmount(() => {
+      app.off('page-change', setPageConfig);
     });
   }
 
   const updateDataHandler = (nodes: MNode[], sourceId: string, changeEvent: ChangeEvent, pageId: Id) => {
     if (
       !nodes.length ||
-      (pageFragmentConstainerId && pageFragment?.data.id !== pageId) ||
-      (!pageFragmentConstainerId && app.page?.data.id !== pageId)
+      (pageFragmentContainerId && pageFragment?.data.id !== pageId) ||
+      (!pageFragmentContainerId && app.page?.data.id !== pageId)
     ) {
       return;
     }
 
     for (const node of nodes) {
       if (
-        (isPage(node) && !pageFragmentConstainerId && node.id === pageId) ||
-        (isPageFragment(node) && pageFragmentConstainerId)
+        (isPage(node) && !pageFragmentContainerId && node.id === pageId) ||
+        (isPageFragment(node) && pageFragmentContainerId)
       ) {
         pageConfig.value = node;
       } else {
