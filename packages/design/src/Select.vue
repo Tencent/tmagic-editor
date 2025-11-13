@@ -25,7 +25,7 @@ defineOptions({
 
 const props = defineProps<SelectProps>();
 
-const emit = defineEmits(['change', 'update:modelValue', 'visibleHandler']);
+const emit = defineEmits(['change', 'update:modelValue', 'visible-change']);
 
 const ui = getDesignConfig('components')?.select;
 
@@ -44,7 +44,7 @@ const updateModelValue = (...args: any[]) => {
 };
 
 const visibleHandler = (...args: any[]) => {
-  emit('visibleHandler', ...args);
+  emit('visible-change', ...args);
 };
 
 const scrollbarWrap = ref<HTMLDivElement | undefined>();
