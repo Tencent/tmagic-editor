@@ -349,6 +349,7 @@ const adapter: any = {
         name: props.prop,
         rules: props.rules,
         help: props.extra,
+        labelAlign: props.labelPosition,
       }),
     },
 

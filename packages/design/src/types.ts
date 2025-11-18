@@ -184,6 +184,7 @@ export interface FormItemProps {
   labelWidth?: string | number;
   rules?: any;
   extra?: string;
+  labelPosition?: string;
 }
 
 export interface InputProps {
