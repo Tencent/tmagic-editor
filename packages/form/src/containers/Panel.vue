@@ -9,7 +9,9 @@
         <TMagicButton style="padding: 0" link :icon="expand ? CaretBottom : CaretRight" @click="expand = !expand">
         </TMagicButton>
         <span v-if="config && config.extra" v-html="config.extra" class="m-form-tip"></span>
-        <slot name="header">{{ filter(config.title) }}</slot>
+        <slot name="header">
+          <span style="cursor: pointer" @click="expand = !expand">{{ filter(config.title) }}</span>
+        </slot>
       </div>
     </template>
 
