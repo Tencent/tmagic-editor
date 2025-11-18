@@ -1,13 +1,13 @@
 <template>
   <div class="m-fields-text">
     <TMagicInput
-      :model-value="model[name]"
+      v-model="value"
       ref="input"
       clearable
       :size="size"
       :placeholder="config.placeholder"
       :disabled="disabled"
-      @update:model-value="changeHandler"
+      @change="changeHandler"
       @input="inputHandler"
       @keyup="keyUpHandler($event)"
     >
@@ -66,6 +66,18 @@ const emit = defineEmits<{
 useAddField(props.prop);
 
 const mForm = inject<FormState | undefined>('mForm');
+
+const value = ref('');
+
+watch(
+  () => props.model[props.name],
+  (v) => {
+    value.value = v;
+  },
+  {
+    immediate: true,
+  },
+);
 
 const appendConfig = computed(() => {
   if (typeof props.config.append === 'string') {
