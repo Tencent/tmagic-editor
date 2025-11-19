@@ -103,4 +103,12 @@ const changeHandler = (v: any, eventData: ContainerChangeEventData) => {
   emit('change', props.model, eventData);
 };
 const onAddDiffCount = () => emit('addDiffCount');
+
+defineExpose({
+  getExpand: () => expand.value,
+
+  setExpand: (v: boolean) => {
+    expand.value = v;
+  },
+});
 </script>

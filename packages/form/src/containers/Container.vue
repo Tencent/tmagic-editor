@@ -24,9 +24,16 @@
 
     <template v-else-if="type && display && !showDiff">
       <TMagicFormItem v-bind="formItemProps" :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text }">
-        <template #label
-          ><span v-html="type === 'checkbox' && !config.useLabel ? '' : text" :title="config.labelTitle"></span
-        ></template>
+        <template #label>
+          <FormLabel
+            :tip="config.tip"
+            :type="type"
+            :use-label="config.useLabel"
+            :label-title="config.labelTitle"
+            :text="text"
+          ></FormLabel>
+        </template>
+
         <TMagicTooltip v-if="tooltip.text" :placement="tooltip.placement">
           <component
             v-bind="fieldsProps"
@@ -52,7 +59,7 @@
         ></component>
       </TMagicFormItem>
 
-      <TMagicTooltip v-if="config.tip" placement="left">
+      <TMagicTooltip v-if="config.tip && type === 'checkbox' && !config.useLabel" placement="top">
         <TMagicIcon style="line-height: 40px; margin-left: 5px"><warning-filled /></TMagicIcon>
         <template #content>
           <div v-html="config.tip"></div>
@@ -67,7 +74,15 @@
         v-bind="formItemProps"
         :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text, 'show-diff': true }"
       >
-        <template #label><span v-html="type === 'checkbox' ? '' : text" :title="config.labelTitle"></span></template>
+        <template #label>
+          <FormLabel
+            :tip="config.tip"
+            :type="type"
+            :use-label="config.useLabel"
+            :label-title="config.labelTitle"
+            :text="text"
+          ></FormLabel>
+        </template>
         <TMagicTooltip v-if="tooltip.text" :placement="tooltip.placement">
           <component v-bind="fieldsProps" :is="tagName" :model="lastValues" @change="onChangeHandler"></component>
           <template #content>
@@ -78,7 +93,7 @@
         <component v-else v-bind="fieldsProps" :is="tagName" :model="lastValues" @change="onChangeHandler"></component>
       </TMagicFormItem>
 
-      <TMagicTooltip v-if="config.tip" placement="left">
+      <TMagicTooltip v-if="config.tip && type === 'checkbox' && !config.useLabel" placement="top">
         <TMagicIcon style="line-height: 40px; margin-left: 5px"><warning-filled /></TMagicIcon>
         <template #content>
           <div v-html="config.tip"></div>
@@ -91,7 +106,15 @@
         :style="config.tip ? 'flex: 1' : ''"
         :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text, 'show-diff': true }"
       >
-        <template #label><span v-html="type === 'checkbox' ? '' : text" :title="config.labelTitle"></span></template>
+        <template #label>
+          <FormLabel
+            :tip="config.tip"
+            :type="type"
+            :use-label="config.useLabel"
+            :label-title="config.labelTitle"
+            :text="text"
+          ></FormLabel>
+        </template>
         <TMagicTooltip v-if="tooltip.text" :placement="tooltip.placement">
           <component v-bind="fieldsProps" :is="tagName" :model="model" @change="onChangeHandler"></component>
           <template #content>
@@ -102,7 +125,7 @@
         <component v-else v-bind="fieldsProps" :is="tagName" :model="model" @change="onChangeHandler"></component>
       </TMagicFormItem>
 
-      <TMagicTooltip v-if="config.tip" placement="left">
+      <TMagicTooltip v-if="config.tip && type === 'checkbox' && !config.useLabel" placement="top">
         <TMagicIcon style="line-height: 40px; margin-left: 5px"><warning-filled /></TMagicIcon>
         <template #content>
           <div v-html="config.tip"></div>
@@ -156,6 +179,8 @@ import type {
   ToolTipConfigType,
 } from '../schema';
 import { display as displayFunction, filterFunction, getRules } from '../utils/form';
+
+import FormLabel from './FormLabel.vue';
 
 defineOptions({
   name: 'MFormContainer',
