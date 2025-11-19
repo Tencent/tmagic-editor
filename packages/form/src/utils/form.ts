@@ -341,7 +341,7 @@ export const sortArray = (data: any[], newIndex: number, oldIndex: number, sortK
     }
   }
 
-  return newData;
+  return cloneDeep(newData);
 };
 
 export const sortChange = (data: any[], { prop, order }: SortProp) => {

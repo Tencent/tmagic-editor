@@ -20,7 +20,7 @@ export const useSortable = (
   const rowDrop = () => {
     sortable?.destroy();
     const tableEl = tMagicTableRef.value?.getEl();
-    const tBodyEl = tableEl?.querySelector('.el-table__body > tbody');
+    const tBodyEl = tableEl?.querySelector('.el-table__body > tbody') || tableEl?.querySelector('.t-table__body');
     if (!tBodyEl) {
       return;
     }
