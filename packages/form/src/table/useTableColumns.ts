@@ -1,7 +1,8 @@
 import { computed, h, inject, type Ref } from 'vue';
+import { WarningFilled } from '@element-plus/icons-vue';
 import { cloneDeep } from 'lodash-es';
 
-import type { TableColumnOptions } from '@tmagic/design';
+import { type TableColumnOptions, TMagicIcon, TMagicTooltip } from '@tmagic/design';
 import type { FormState, TableColumnConfig } from '@tmagic/form-schema';
 
 import Container from '../containers/Container.vue';
@@ -37,6 +38,19 @@ export const useTableColumns = (
         formValue: mForm ? mForm.values : props.model,
         prop: props.prop,
         index,
+      });
+    }
+
+    return fuc;
+  };
+
+  const titleTip = (fuc: any) => {
+    if (typeof fuc === 'function') {
+      return fuc(mForm, {
+        values: mForm?.initValues,
+        model: props.model,
+        formValue: mForm ? mForm.values : props.model,
+        prop: props.prop,
       });
     }
 
@@ -158,6 +172,8 @@ export const useTableColumns = (
 
     for (const column of props.config.items) {
       if (column.type !== 'hidden' && display(column.display)) {
+        const titleTipValue = titleTip(column.titleTip);
+
         columns.push({
           props: {
             prop: column.name,
@@ -181,6 +197,31 @@ export const useTableColumns = (
               onChange: changeHandler,
               onAddDiffCount,
             }),
+          title: titleTipValue
+            ? () =>
+                h(
+                  TMagicTooltip,
+                  { placement: 'top' },
+                  {
+                    default: () =>
+                      h(
+                        'span',
+                        {
+                          style: {
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                          },
+                        },
+                        [h('span', column.label), h(TMagicIcon, {}, { default: () => h(WarningFilled) })],
+                      ),
+                    content: () =>
+                      h('div', {
+                        innerHTML: titleTipValue,
+                      }),
+                  },
+                )
+            : undefined,
         });
       }
     }

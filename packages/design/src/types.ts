@@ -347,6 +347,7 @@ export interface TableColumnOptions<T = any> {
     selectable?: (row: T, index: number) => boolean;
   };
   cell?: (scope: { row: T; $index: number }) => any;
+  title?: (scope?: any) => any;
 }
 
 export interface TabPaneProps {

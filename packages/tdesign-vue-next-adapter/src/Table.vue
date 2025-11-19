@@ -67,6 +67,12 @@ const tableColumns = computed(() => {
       };
     }
 
+    if (item.title) {
+      column.title = (h: any, data: any) => {
+        return item.title?.(data);
+      };
+    }
+
     columns.push(column);
   }
 

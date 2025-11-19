@@ -22,6 +22,9 @@
   >
     <template v-for="(item, columnIndex) in columns" :key="columnIndex">
       <ElTableColumn v-bind="item.props || {}">
+        <template #header="scope" v-if="item.title">
+          <component :is="item.title(scope)"></component>
+        </template>
         <template #default="scope" v-if="item.cell">
           <component :is="item.cell(scope)"></component>
         </template>
