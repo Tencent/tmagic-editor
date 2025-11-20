@@ -728,6 +728,10 @@ export interface TableConfig extends FormItem {
   rowKey?: string;
   /** table 新增行时前置回调 */
   beforeAddRow?: (mForm: FormState | undefined, data: any) => boolean;
+  addButtonConfig?: {
+    props?: Record<string, any>;
+    text?: string;
+  };
 }
 
 export interface GroupListConfig extends FormItem {
