@@ -722,7 +722,7 @@ export interface TableConfig extends FormItem {
   dropSort?: boolean;
   /** 是否显示全屏按钮 */
   enableFullscreen?: boolean;
-  fixed?: boolean;
+  fixed?: boolean | 'left' | 'right';
   itemExtra?: string | FilterFunction<string>;
   titleTip?: FilterFunction<string>;
   rowKey?: string;

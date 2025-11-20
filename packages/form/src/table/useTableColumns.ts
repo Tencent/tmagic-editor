@@ -101,10 +101,16 @@ export const useTableColumns = (
       });
     }
 
-    columns.push({
+    let actionFixed: 'left' | 'right' | undefined = props.config.fixed === false ? undefined : 'left';
+
+    if (typeof props.config.fixed === 'string' && ['left', 'right'].includes(props.config.fixed)) {
+      actionFixed = props.config.fixed;
+    }
+
+    const actionClumn = {
       props: {
         label: '操作',
-        fixed: props.config.fixed === false ? undefined : 'left',
+        fixed: actionFixed,
         width: props.config.operateColWidth || 112,
         align: 'center',
       },
@@ -124,7 +130,11 @@ export const useTableColumns = (
             emit('change', v);
           },
         }),
-    });
+    };
+
+    if (actionFixed !== 'right') {
+      columns.push(actionClumn);
+    }
 
     if (props.sort && props.model[modelName.value] && props.model[modelName.value].length > 1) {
       columns.push({
@@ -224,6 +234,10 @@ export const useTableColumns = (
             : undefined,
         });
       }
+    }
+
+    if (actionFixed === 'right') {
+      columns.push(actionClumn);
     }
 
     return columns;
