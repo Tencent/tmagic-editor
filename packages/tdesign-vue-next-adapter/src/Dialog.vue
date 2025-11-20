@@ -5,6 +5,7 @@
     :header="title"
     :width="width"
     :mode="fullscreen ? 'full-screen' : 'modal'"
+    :close-btn="showClose"
     :close-on-overlay-click="closeOnClickModal"
     :close-on-esc-keydown="closeOnPressEscape"
     :destroy-on-close="destroyOnClose"

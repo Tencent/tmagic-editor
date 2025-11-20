@@ -128,6 +128,7 @@ export interface DialogProps {
   closeOnClickModal?: boolean;
   closeOnPressEscape?: boolean;
   destroyOnClose?: boolean;
+  showClose?: boolean;
 }
 
 export interface DividerProps {

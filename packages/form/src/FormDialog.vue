@@ -11,6 +11,7 @@
     :close-on-click-modal="closeOnClickModal"
     :close-on-press-escape="closeOnPressEscape"
     :destroy-on-close="destroyOnClose"
+    :show-close="showClose"
     @close="closeHandler"
   >
     <div
@@ -44,7 +45,7 @@
         </TMagicCol>
         <TMagicCol :span="12">
           <slot name="footer">
-            <TMagicButton @click="cancel" size="small">取 消</TMagicButton>
+            <TMagicButton v-if="showCancel" @click="cancel" size="small">取 消</TMagicButton>
             <TMagicButton v-if="hasStep && stepActive > 1" type="info" size="small" @click="preStep"
               >上一步</TMagicButton
             >
@@ -92,6 +93,8 @@ const props = withDefaults(
     closeOnClickModal?: boolean;
     closeOnPressEscape?: boolean;
     destroyOnClose?: boolean;
+    showClose?: boolean;
+    showCancel?: boolean;
   }>(),
   {
     config: () => [],
@@ -100,6 +103,8 @@ const props = withDefaults(
     closeOnClickModal: false,
     closeOnPressEscape: false,
     destroyOnClose: false,
+    showClose: true,
+    showCancel: true,
   },
 );
 
