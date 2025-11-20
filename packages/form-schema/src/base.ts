@@ -41,6 +41,7 @@ export interface FieldProps<T = any> {
   disabled?: boolean;
   size?: 'large' | 'default' | 'small';
   lastValues?: Record<string, any>;
+  isCompare?: boolean;
 }
 
 /**
@@ -763,6 +764,10 @@ export interface GroupListConfig extends FormItem {
     groupModel: any,
   ) => boolean | boolean;
   moveSpecifyLocation?: boolean;
+  addButtonConfig?: {
+    props?: Record<string, any>;
+    text?: string;
+  };
   [key: string]: any;
 }
 

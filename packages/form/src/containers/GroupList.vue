@@ -33,11 +33,12 @@
       <div style="display: flex; justify-content: flex-end; flex: 1">
         <TMagicButton
           v-if="addable"
-          type="primary"
           :size="config.enableToggleMode ? 'small' : 'default'"
+          :icon="Plus"
+          v-bind="config.addButtonConfig?.props || { type: 'primary' }"
           :disabled="disabled"
           @click="addHandler"
-          >新增</TMagicButton
+          >{{ config.addButtonConfig?.text || '新增' }}</TMagicButton
         >
       </div>
     </div>
@@ -46,7 +47,7 @@
 
 <script setup lang="ts">
 import { computed, inject } from 'vue';
-import { Grid } from '@element-plus/icons-vue';
+import { Grid, Plus } from '@element-plus/icons-vue';
 import { cloneDeep } from 'lodash-es';
 
 import { TMagicButton } from '@tmagic/design';

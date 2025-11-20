@@ -40,6 +40,7 @@
             :is="tagName"
             :model="model"
             :last-values="lastValues"
+            :is-compare="isCompare"
             @change="onChangeHandler"
             @addDiffCount="onAddDiffCount"
           ></component>
@@ -54,6 +55,7 @@
           :is="tagName"
           :model="model"
           :last-values="lastValues"
+          :is-compare="isCompare"
           @change="onChangeHandler"
           @addDiffCount="onAddDiffCount"
         ></component>

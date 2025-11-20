@@ -64,10 +64,10 @@
             v-if="addable"
             class="m-form-table-add-button"
             size="small"
-            v-bind="config.addButtonConfig?.props || { type: 'primary' }"
-            :disabled="disabled"
             plain
             :icon="Plus"
+            v-bind="config.addButtonConfig?.props || { type: 'primary' }"
+            :disabled="disabled"
             @click="newHandler()"
             >{{ config.addButtonConfig?.text || '新增一行' }}</TMagicButton
           >
