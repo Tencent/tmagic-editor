@@ -8,7 +8,9 @@
     :width="width"
     :zIndex="zIndex"
     :fullscreen="fullscreen"
-    :close-on-click-modal="false"
+    :close-on-click-modal="closeOnClickModal"
+    :close-on-press-escape="closeOnPressEscape"
+    :destroy-on-close="destroyOnClose"
     @close="closeHandler"
   >
     <div
@@ -87,11 +89,17 @@ const props = withDefaults(
     size?: 'small' | 'default' | 'large';
     confirmText?: string;
     preventSubmitDefault?: boolean;
+    closeOnClickModal?: boolean;
+    closeOnPressEscape?: boolean;
+    destroyOnClose?: boolean;
   }>(),
   {
     config: () => [],
     values: () => ({}),
     confirmText: '确定',
+    closeOnClickModal: false,
+    closeOnPressEscape: false,
+    destroyOnClose: false,
   },
 );
 
