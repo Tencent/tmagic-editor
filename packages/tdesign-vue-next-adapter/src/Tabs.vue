@@ -4,6 +4,7 @@
     :addable="editable"
     :theme="type === 'card' ? 'card' : 'normal'"
     :placement="tabPosition"
+    scroll-position="auto"
     @add="onTabAdd"
     @change="tabClickHandler"
     @remove="onTabRemove"

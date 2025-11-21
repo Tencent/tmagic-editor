@@ -1,5 +1,5 @@
 <template>
-  <span style="display: inline-flex; align-items: center">
+  <span v-if="tip" style="display: inline-flex; align-items: center">
     <span v-html="type === 'checkbox' && !useLabel ? '' : text" :title="labelTitle"></span>
     <TMagicTooltip v-if="tip && (type !== 'checkbox' || useLabel)" placement="top">
       <TMagicIcon style="margin-left: 5px; display: flex"><warning-filled /></TMagicIcon>
@@ -8,6 +8,7 @@
       </template>
     </TMagicTooltip>
   </span>
+  <span v-else v-html="type === 'checkbox' && !useLabel ? '' : text" :title="labelTitle"></span>
 </template>
 
 <script setup lang="ts">
