@@ -66,7 +66,6 @@ export default defineConfig({
   },
 
   build: {
-    cssMinify: 'lightningcss',
     rollupOptions: {
       input: {
         page: path.resolve(__dirname, './page/index.html'),

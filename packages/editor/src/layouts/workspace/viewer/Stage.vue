@@ -167,7 +167,7 @@ watch(page, (page) => {
   }
 });
 
-const resizeObserver = new ResizeObserver((entries) => {
+const resizeObserver = new globalThis.ResizeObserver((entries) => {
   for (const { contentRect } of entries) {
     uiService.set('stageContainerRect', {
       width: contentRect.width,

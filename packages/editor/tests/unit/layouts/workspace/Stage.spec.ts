@@ -29,11 +29,11 @@ import uiService from '@editor/services/ui';
 
 globalThis.ResizeObserver =
   globalThis.ResizeObserver ||
-  vi.fn().mockImplementation(() => ({
-    disconnect: vi.fn(),
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-  }));
+  class ResizeObserver {
+    disconnect = vi.fn();
+    observe = vi.fn();
+    unobserve = vi.fn();
+  };
 
 describe('Stage.vue', () => {
   (global as any).fetch = vi.fn(() =>

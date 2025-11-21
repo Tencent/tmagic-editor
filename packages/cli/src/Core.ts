@@ -2,8 +2,9 @@ import path from 'node:path';
 
 import fs from 'fs-extra';
 
+import { prepareEntryFile } from './utils/prepareEntryFile';
+import { resolveAppPackages } from './utils/resolveAppPackages';
 import { ModuleMainFilePath, UserConfig } from './types';
-import { prepareEntryFile, resolveAppPackages } from './utils';
 
 export default class Core {
   // eslint-disable-next-line @typescript-eslint/no-require-imports

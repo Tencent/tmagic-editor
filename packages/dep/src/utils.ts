@@ -55,8 +55,7 @@ export const isIncludeArrayField = (keys: string[], fields: DataSchema[]) => {
 
     // 字段类型为数组并且后面没有数字索引
     return (
-      field &&
-      field.type === 'array' &&
+      field?.type === 'array' &&
       // 不是整数
       /^(?!\d+$).*$/.test(`${keys[index + 1]}`) &&
       index < keys.length - 1

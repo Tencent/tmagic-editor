@@ -50,7 +50,7 @@ Object.defineProperties(globalThis.HTMLElement.prototype, {
     get() {
       let parent = this.parentNode;
       while (parent) {
-        if (parent.style && parent.style.position === 'absolute') {
+        if (parent.style?.position === 'absolute') {
           return parent;
         }
         parent = parent.parentNode;

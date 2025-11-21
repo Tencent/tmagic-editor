@@ -37,15 +37,15 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "@element-plus/icons-vue": "^2.3.1",
+    "@element-plus/icons-vue": "^2.3.2",
     "@popperjs/core": "^2.11.8",
-    "dayjs": "^1.11.11",
+    "dayjs": "^1.11.19",
     "lodash-es": "^4.17.21",
-    "sortablejs": "^1.15.2"
+    "sortablejs": "^1.15.6"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.4",
-    "@types/sortablejs": "^1.15.8",
+    "@types/sortablejs": "^1.15.9",
     "@vue/test-utils": "^2.4.6"
   },
   "peerDependencies": {

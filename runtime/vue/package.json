@@ -18,8 +18,8 @@
   "dependencies": {
     "@tmagic/core": "1.7.0-beta.3",
     "@tmagic/stage": "1.7.0-beta.3",
-    "@tmagic/vue-runtime-help": "^1.2.0",
-    "axios": "^1.11.0",
+    "@tmagic/vue-runtime-help": "^1.2.3",
+    "axios": "^1.13.2",
     "vue": "catalog:"
   },
   "devDependencies": {
@@ -27,16 +27,15 @@
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^24.0.10",
     "@vitejs/plugin-legacy": "^7.2.1",
-    "@vitejs/plugin-vue": "^6.0.1",
-    "@vitejs/plugin-vue-jsx": "^5.1.0",
+    "@vitejs/plugin-vue": "^6.0.2",
+    "@vitejs/plugin-vue-jsx": "^5.1.2",
     "@vue/compiler-sfc": "catalog:",
     "fs-extra": "^11.3.1",
     "minimist": "^1.2.8",
-    "lightningcss": "^1.30.2",
     "rimraf": "^3.0.2",
     "rollup": "4.44.1",
     "rollup-plugin-external-globals": "^0.13.0",
-    "terser": "^5.43.1",
+    "terser": "^5.44.1",
     "typescript": "catalog:",
     "vite": "catalog:"
   }
