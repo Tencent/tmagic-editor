@@ -128,6 +128,10 @@ export default {
       useZIndex = options.useZIndex;
     }
 
+    if (options.adapterType && globalThis.document?.documentElement) {
+      globalThis.document.documentElement.classList.add(`tmagic-adapter-${options.adapterType}`);
+    }
+
     app.config.globalProperties.$MAGIC_DESIGN = options;
     setDesignConfig(options);
   },
