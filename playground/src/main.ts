@@ -50,19 +50,19 @@ globalThis.MonacoEnvironment = {
   },
 };
 
-const adpter = sessionStorage.getItem('tmagic-playground-ui-adapter') || 'element-plus';
+const adapter = sessionStorage.getItem('tmagic-playground-ui-adapter') || 'element-plus';
 
-let adpterModule;
+let adapterModule;
 
-if (adpter === 'tdesign-vue-next') {
+if (adapter === 'tdesign-vue-next') {
   import('tdesign-vue-next/es/style/index.css');
-  adpterModule = import('@tmagic/tdesign-vue-next-adapter');
+  adapterModule = import('@tmagic/tdesign-vue-next-adapter');
 } else {
   import('element-plus/dist/index.css');
-  adpterModule = import('@tmagic/element-plus-adapter');
+  adapterModule = import('@tmagic/element-plus-adapter');
 }
 
-adpterModule.then((module: any) => {
+adapterModule.then((module: any) => {
   const app = createApp(App);
   app.use(router);
   app.use(editorPlugin, module.default);

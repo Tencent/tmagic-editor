@@ -37,6 +37,7 @@
   "peerDependencies": {
     "@tmagic/design": "workspace:*",
     "element-plus": ">=2.9.0",
+    "vue": "catalog:",
     "typescript": "catalog:"
   },
   "peerDependenciesMeta": {
