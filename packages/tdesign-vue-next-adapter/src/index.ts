@@ -354,7 +354,7 @@ const adapter: any = {
         labelWidth: props.labelWidth,
         name: props.prop,
         rules: props.rules,
-        help: () => h('div', { innerHTML: props.extra }),
+        help: props.extra ? () => h('div', { innerHTML: props.extra }) : undefined,
         labelAlign: props.labelPosition,
       }),
     },
