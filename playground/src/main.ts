@@ -17,7 +17,6 @@
  */
 
 import { createApp } from 'vue';
-import * as monaco from 'monaco-editor';
 import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import CssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
 import HtmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
@@ -50,8 +49,6 @@ globalThis.MonacoEnvironment = {
     return new EditorWorker();
   },
 };
-
-monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
 
 const adpter = sessionStorage.getItem('tmagic-playground-ui-adapter') || 'element-plus';
 

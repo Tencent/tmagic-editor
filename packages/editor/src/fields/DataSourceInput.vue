@@ -38,12 +38,29 @@
     </template>
   </component>
   <div
-    :class="`tmagic-data-source-input-text el-input t-input t-size-${size?.[0]} el-input--${size}`"
-    @mouseup="mouseupHandler"
     v-else
+    :class="{
+      'tmagic-data-source-input-text': true,
+      'el-input': adapterType === 'element-plus',
+      [`el-input--${size}`]: adapterType === 'element-plus',
+      't-input': adapterType === 'tdesign-vue-next',
+      [`t-size-${size?.[0]}`]: adapterType === 'tdesign-vue-next',
+    }"
+    @mouseup="mouseupHandler"
   >
-    <div :class="`tmagic-data-source-input-text-wrapper el-input__wrapper ${isFocused ? ' is-focus' : ''}`">
-      <div class="el-input__inner t-input__inner">
+    <div
+      :class="{
+        'tmagic-data-source-input-text-wrapper': true,
+        'el-input__wrapper': adapterType === 'element-plus',
+        'is-focus': isFocused,
+      }"
+    >
+      <div
+        :class="{
+          'el-input__inner': adapterType === 'element-plus',
+          input__inner: adapterType === 'tdesign-vue-next',
+        }"
+      >
         <template v-for="(item, index) in displayState">
           <span :key="index" v-if="item.type === 'text'" style="margin-right: 2px">{{ item.value }}</span>
           <TMagicTag :key="index" :size="size" v-if="item.type === 'var'">{{ item.value }}</TMagicTag>
@@ -79,6 +96,8 @@ const props = withDefaults(defineProps<FieldProps<DataSourceInputConfig>>(), {
 const emit = defineEmits<{
   change: [value: string];
 }>();
+
+const adapterType = getDesignConfig('adapterType');
 
 const { dataSourceService, propsService } = useServices();
 

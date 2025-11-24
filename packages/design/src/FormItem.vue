@@ -3,7 +3,11 @@
     <template #label>
       <slot name="label"></slot>
     </template>
-    <slot></slot>
+
+    <template #default>
+      <slot></slot>
+      <div v-if="adapterType === 'element-plus' && extra" v-html="extra" class="m-form-tip"></div>
+    </template>
   </component>
 </template>
 
@@ -23,5 +27,10 @@ const ui = getDesignConfig('components')?.formItem;
 
 const uiComponent = ui?.component || 'el-form-item';
 
-const uiProps = computed<FormItemProps>(() => ui?.props(props) || props);
+const adapterType = getDesignConfig('adapterType');
+
+const uiProps = computed<FormItemProps>(() => {
+  const { extra, ...rest } = ui?.props(props) || props;
+  return rest;
+});
 </script>

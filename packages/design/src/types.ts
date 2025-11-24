@@ -6,7 +6,6 @@ export type FieldSize = 'large' | 'default' | 'small';
 export interface AutocompleteProps {
   modelValue?: string;
   placeholder?: string;
-  label?: string;
   clearable?: boolean;
   disabled?: boolean;
   triggerOnFocus?: boolean;
@@ -185,7 +184,7 @@ export interface FormItemProps {
   labelWidth?: string | number;
   rules?: any;
   extra?: string;
-  labelPosition?: string;
+  labelPosition?: 'top' | 'left' | 'right';
 }
 
 export interface InputProps {

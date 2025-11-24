@@ -26,7 +26,14 @@
       </template>
     </TMagicEditor>
 
-    <TMagicDialog v-model="previewVisible" destroy-on-close class="pre-viewer" title="预览" :width="stageRect?.width">
+    <TMagicDialog
+      v-model="previewVisible"
+      close-onClick-modal
+      destroy-on-close
+      class="pre-viewer"
+      title="预览"
+      :width="stageRect?.width"
+    >
       <iframe
         v-if="previewVisible"
         ref="iframe"

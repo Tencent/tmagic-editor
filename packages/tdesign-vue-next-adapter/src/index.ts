@@ -35,6 +35,7 @@ import {
 } from 'tdesign-vue-next';
 
 import type {
+  AutocompleteProps,
   BadgeProps,
   ButtonProps,
   CardProps,
@@ -75,6 +76,7 @@ import type {
   UploadProps,
 } from '@tmagic/design';
 
+import AutoComplete from './AutoComplete.vue';
 import Checkbox from './Checkbox.vue';
 import DatePicker from './DatePicker.vue';
 import Dialog from './Dialog.vue';
@@ -168,6 +170,10 @@ const adapter: any = {
     },
   },
   components: {
+    autocomplete: {
+      component: AutoComplete,
+      props: (props: AutocompleteProps) => props,
+    },
     badge: {
       component: TBadge,
       props: (props: BadgeProps) => ({
@@ -348,7 +354,7 @@ const adapter: any = {
         labelWidth: props.labelWidth,
         name: props.prop,
         rules: props.rules,
-        help: props.extra,
+        help: () => h('div', { innerHTML: props.extra }),
         labelAlign: props.labelPosition,
       }),
     },

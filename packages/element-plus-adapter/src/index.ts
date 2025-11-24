@@ -18,6 +18,7 @@ import {
   ElDropdownItem,
   ElDropdownMenu,
   ElForm,
+  ElFormItem,
   ElIcon,
   ElInput,
   ElInputNumber,
@@ -90,7 +91,6 @@ import type {
   UploadProps,
 } from '@tmagic/design';
 
-import FormItem from './FormItem.vue';
 import Table from './Table.vue';
 
 const adapter: DesignPluginOptions = {
@@ -200,7 +200,7 @@ const adapter: DesignPluginOptions = {
     },
 
     formItem: {
-      component: FormItem as any,
+      component: ElFormItem as any,
       props: (props: FormItemProps) => props,
     },
 
