@@ -1,3 +1,54 @@
+# [1.7.0-beta.4](https://github.com/Tencent/tmagic-editor/compare/v1.6.1...v1.7.0-beta.4) (2025-11-24)
+
+
+### Bug Fixes
+
+* **design,editro,element-plus-adapter,tdesign-vue-next-adapter:** elememt-plus表单渲染失败 ([9364025](https://github.com/Tencent/tmagic-editor/commit/93640257e90e6aa4708184a2513b80149887b0b9))
+* **design:** select visible-change事件名写错 ([27555d6](https://github.com/Tencent/tmagic-editor/commit/27555d6b2f3c4c2022f77504bb4d8faf7c6f3e55))
+* **editor:** 表单组件保持单向数据流 ([564a7f4](https://github.com/Tencent/tmagic-editor/commit/564a7f4271b9adb345d679f85929506e952c9cb3))
+* **form:** daterange 配置names后配置失效 ([0f3dfcf](https://github.com/Tencent/tmagic-editor/commit/0f3dfcf5118e1247f351357a9eb05bfbdc7cc43b))
+* **form:** dialog submit event获取到的changeRecords为空 ([cbec529](https://github.com/Tencent/tmagic-editor/commit/cbec52936db52d5c57c454468a11bea1dbbcd058))
+* **form:** tabel复制行不生效 ([68c69ac](https://github.com/Tencent/tmagic-editor/commit/68c69ac4058bbe7adf00a73b21df2ec7adb713cc))
+* **form:** 文本输入change出发太频繁 ([55a2869](https://github.com/Tencent/tmagic-editor/commit/55a28698183998e6dec73d8d41d5e5f029d17e7a))
+* **playgournd:** 存在多个vue版本问题 ([da98846](https://github.com/Tencent/tmagic-editor/commit/da9884645fe51d3de65e461c2e434d3e221e56b5))
+* **tdesign-vue-next-adapter:** select支持allowCreate ([1a08b16](https://github.com/Tencent/tmagic-editor/commit/1a08b16a399dae00e4b0d62d9d930514c84f669d))
+* **vue-runtime-hlep:** 页面片销毁后需要取消app的事件监听 ([e36da82](https://github.com/Tencent/tmagic-editor/commit/e36da82d2928af6617c280939b02b6bc9f534b70))
+
+
+### Features
+
+* **core:** getNode未指定页面片容器id时取获得到的第一个 ([5dbe1fb](https://github.com/Tencent/tmagic-editor/commit/5dbe1fb6555188bb17aa5b3dd1d7205b8c4d9824))
+* **design, element-plus-adapter, tdesign-vue-next-adapter:** 新增popconfirm组件 ([507e51a](https://github.com/Tencent/tmagic-editor/commit/507e51a2dc91defb67087a539d786d01ef95b9ad))
+* **design, element-plus-adapter, tdesign-vue-next-adapter:** 添加adapterType, 完善tdesign useZIndex ([12e6dd1](https://github.com/Tencent/tmagic-editor/commit/12e6dd18b47c4e6a11f273cbbb138c5d0e33f0ca))
+* **design, form, form-schema, tdesign-vue-next-adapter:** textarea支持rows配置 ([38192a6](https://github.com/Tencent/tmagic-editor/commit/38192a6d4854904d7c1303556ad6ef4b76b7cd21))
+* **design, form, tdesign-vue-next-adapter:** 完善tdesign适配 ([ca0f8fc](https://github.com/Tencent/tmagic-editor/commit/ca0f8fc9887d9fcff31052239b396d02f258d1b4))
+* **design, tdesign-vue-next-adapter, table, element-plus-adapter:** 完善tdesign适配 ([979b834](https://github.com/Tencent/tmagic-editor/commit/979b834facbabf50d711b76ca5180f07b319b432))
+* **design, tdesign-vue-next-adapter:** formItem新增labelAlign prop ([0ecc116](https://github.com/Tencent/tmagic-editor/commit/0ecc11665235c136a2d9e7b361fe2ecab33ff5e3))
+* **design,editor,element-plus-adapter,form,table,tdesign-vue-next-adapter:** 重构table组件,适配tdesign ([08b476e](https://github.com/Tencent/tmagic-editor/commit/08b476e04f36154ef58f1f3388bc2516742e37d8))
+* **design,tdesign-vue-next-adapter:** input添加click事件 ([a96ca80](https://github.com/Tencent/tmagic-editor/commit/a96ca8092c51d1700943e58e197a5d1584297d76))
+* **design,tdesign-vue,next-adapter:** textarea支持autosize ([acda22d](https://github.com/Tencent/tmagic-editor/commit/acda22d5cb4905ae5d1f4bd70efb38ee5820baeb))
+* **design:** 在html中添加adapter类型class ([09dfaad](https://github.com/Tencent/tmagic-editor/commit/09dfaad2ccf9cd50491a8352e33416c7a17027c4))
+* **element-plus-adapter, from, tdesign-vue-adapter:** button兼容type=default和type为空的情况 ([d017902](https://github.com/Tencent/tmagic-editor/commit/d0179028fbab5b485cb0b970d8d558da4f22d869))
+* **form, design, form-schema:** table支持自定义title,table 表单组件支持配置title tip ([e418130](https://github.com/Tencent/tmagic-editor/commit/e418130a66c54b7fed533977b1558e7206d729fb))
+* **form:** fieldset中checkbox新增name,trueValue,falseValue配置 ([51e9732](https://github.com/Tencent/tmagic-editor/commit/51e973289473af7fae14f56e3d2fed5db838c797))
+* **form:** form dialog新增props ([bf6598c](https://github.com/Tencent/tmagic-editor/commit/bf6598c8718d5f2e3d276029bf924a7de7cb458b))
+* **form:** form dialog新增show close/show cancel 配置 ([310054b](https://github.com/Tencent/tmagic-editor/commit/310054b7d63e688c349142c9b7767fc5f8a2f766))
+* **form:** group list新增添加按钮配置 ([3b913c1](https://github.com/Tencent/tmagic-editor/commit/3b913c1af48aa6a47e632725b008061d7faca204))
+* **form:** panel点击标题可以展开或者收缩内容 ([310aa47](https://github.com/Tencent/tmagic-editor/commit/310aa47c1df9a88304f264325c697b85e09287df))
+* **form:** table操作列支持配置固定在左边还是右边 ([fa0e10f](https://github.com/Tencent/tmagic-editor/commit/fa0e10f6872ade5599957051e2e6923fa2d4ca66))
+* **form:** table新增新增按钮配置 ([6a7f80c](https://github.com/Tencent/tmagic-editor/commit/6a7f80c48de0e85587c27f67fe0f132f7dfee000))
+* **form:** text新增prepend, append不默认使用button ([5fe57cd](https://github.com/Tencent/tmagic-editor/commit/5fe57cd389e6c955049c2ee81f62c37c7a86930f))
+* **form:** text组件配置的append.hander函数添加setModel/setFormValue方法 ([6f0498a](https://github.com/Tencent/tmagic-editor/commit/6f0498a9e7ee633310b4a08374409b3f1b7607b9))
+* **form:** tip图标放到label中去 ([97affb2](https://github.com/Tencent/tmagic-editor/commit/97affb2bff856b271136b50dccd45d95e17abd6a))
+* **form:** 新增flex-layout组件 ([630301b](https://github.com/Tencent/tmagic-editor/commit/630301bce213e3ff28a7fb50e9cc9b8bb0c2b756))
+* **form:** 新增style,fieldStyle配置;tooltip支持配置placement;配置中的函数新增getFormValue方法 ([3a9c94a](https://github.com/Tencent/tmagic-editor/commit/3a9c94a6a6529a63e022955b2f7eee23bf125d81))
+* **form:** 表单校验后的错误信息将name转换成text ([ec479b9](https://github.com/Tencent/tmagic-editor/commit/ec479b9296d5dbea0df121a4702a123518808e58))
+* **form:** 表格拖动支持tdesign ([e2708b8](https://github.com/Tencent/tmagic-editor/commit/e2708b868b2fbb126f1d8d846e25335b6005cd86))
+* **playground:** 支持UI组件库切换 ([11d2560](https://github.com/Tencent/tmagic-editor/commit/11d25603a8b5f8bc3d9abbbeedf9c298ca0e2c72))
+* **table:** action支持配置disabled ([8809351](https://github.com/Tencent/tmagic-editor/commit/88093515373e1b431c83c0da9c28a2688421d151))
+
+
+
 # [1.7.0-beta.3](https://github.com/Tencent/tmagic-editor/compare/v1.7.0-beta.2...v1.7.0-beta.3) (2025-10-31)
 
 

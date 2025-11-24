@@ -5,7 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import enquirer from 'enquirer';
-import execa from 'execa';
+import { execa } from 'execa';
 import minimist from 'minimist';
 import pico from 'picocolors';
 import semver from 'semver';
