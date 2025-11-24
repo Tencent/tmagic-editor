@@ -1,3 +1,13 @@
+# [1.7.0-beta.5](https://github.com/Tencent/tmagic-editor/compare/v1.7.0-beta.4...v1.7.0-beta.5) (2025-11-24)
+
+
+### Bug Fixes
+
+* **element-plus-adapter:** 构建时将vue源码构建入目标代码中,导致页面存在多个版本vue ([bb7ec0a](https://github.com/Tencent/tmagic-editor/commit/bb7ec0aa1b55f83f68d7021fb98090d8e555ed65))
+* **tdesign-vue-next-adapter:** 没有extra时form item不渲染help节点 ([849b4dc](https://github.com/Tencent/tmagic-editor/commit/849b4dc319b03a54dc1cfcccc1f505e61e1ccd5b))
+
+
+
 # [1.7.0-beta.4](https://github.com/Tencent/tmagic-editor/compare/v1.6.1...v1.7.0-beta.4) (2025-11-24)
 
 
