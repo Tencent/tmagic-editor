@@ -106,6 +106,14 @@ class Page extends Node {
 
       return iteratorContainer?.getNode(id, iteratorIndex[iteratorIndex.length - 1]) as T;
     }
+
+    if (this.app.pageFragments.size) {
+      for (const [, pageFragment] of this.app.pageFragments) {
+        if (pageFragment.nodes.has(id)) {
+          return pageFragment.nodes.get(id) as T;
+        }
+      }
+    }
   }
 
   public setNode(id: Id, node: TMagicNode) {
