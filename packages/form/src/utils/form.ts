@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-import { toRaw } from 'vue';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { cloneDeep } from 'lodash-es';
@@ -121,12 +120,12 @@ const initValueItem = function (
   asyncLoadConfig(value, initValue, item as HtmlField);
 
   // 这种情况比较多，提前结束
-  if (name && !items && typeof initValue[name] !== 'undefined') {
+  if (name && !items && typeof initValue?.[name] !== 'undefined') {
     if (typeof value[name] === 'undefined') {
       if (type === 'number') {
         value[name] = Number(initValue[name]);
       } else {
-        value[name] = typeof initValue[name] === 'object' ? cloneDeep(initValue[name]) : initValue[name];
+        value[name] = typeof initValue[name] === 'object' ? initValue[name] : initValue[name];
       }
     }
 
@@ -281,13 +280,15 @@ export const initValue = async (
 ) => {
   if (!Array.isArray(config)) throw new Error('config应该为数组');
 
-  let valuesTmp = createValues(mForm, config, toRaw(initValues), {});
+  const initValuesCopy = cloneDeep(initValues);
+
+  let valuesTmp = createValues(mForm, config, initValuesCopy, {});
 
   const [firstForm] = config as [ContainerCommonConfig];
   if (firstForm && typeof firstForm.onInitValue === 'function') {
     valuesTmp = await firstForm.onInitValue(mForm, {
       formValue: valuesTmp,
-      initValue: initValues,
+      initValue: initValuesCopy,
     });
   }
 
