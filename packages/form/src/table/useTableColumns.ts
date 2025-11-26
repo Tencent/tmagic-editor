@@ -107,7 +107,7 @@ export const useTableColumns = (
       actionFixed = props.config.fixed;
     }
 
-    const actionClumn = {
+    const actionColumn = {
       props: {
         label: '操作',
         fixed: actionFixed,
@@ -133,7 +133,7 @@ export const useTableColumns = (
     };
 
     if (actionFixed !== 'right') {
-      columns.push(actionClumn);
+      columns.push(actionColumn);
     }
 
     if (props.sort && props.model[modelName.value] && props.model[modelName.value].length > 1) {
@@ -237,7 +237,7 @@ export const useTableColumns = (
     }
 
     if (actionFixed === 'right') {
-      columns.push(actionClumn);
+      columns.push(actionColumn);
     }
 
     return columns;

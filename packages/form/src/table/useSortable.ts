@@ -1,4 +1,4 @@
-import { inject, type Ref, type ShallowRef, watchEffect } from 'vue';
+import { inject, nextTick, type Ref, type ShallowRef, watchEffect } from 'vue';
 import Sortable, { type SortableEvent } from 'sortablejs';
 
 import { type TMagicTable } from '@tmagic/design';
@@ -13,6 +13,7 @@ export const useSortable = (
   emit: (event: 'select' | 'change' | 'addDiffCount', ...args: any[]) => void,
   tMagicTableRef: ShallowRef<InstanceType<typeof TMagicTable> | null>,
   modelName: Ref<string | number>,
+  updateKey: Ref<number>,
 ) => {
   const mForm = inject<FormState | undefined>('mForm');
 
@@ -36,6 +37,13 @@ export const useSortable = (
 
         emit('change', newData);
         mForm?.$emit('field-change', newData);
+
+        sortable?.destroy();
+        sortable = undefined;
+
+        nextTick(() => {
+          updateKey.value += 1;
+        });
       },
     });
   };

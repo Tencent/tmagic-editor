@@ -133,15 +133,14 @@ const { pageSize, currentPage, paginationData, handleSizeChange, handleCurrentCh
 );
 
 const { nextZIndex } = useZIndex();
+const updateKey = ref(1);
 
 const { addable, newHandler } = useAdd(props, emit);
 const { columns } = useTableColumns(props, emit, currentPage, pageSize, modelName);
-useSortable(props, emit, tMagicTableRef, modelName);
+useSortable(props, emit, tMagicTableRef, modelName, updateKey);
 const { isFullscreen, toggleFullscreen } = useFullscreen();
 const { importable, excelHandler, clearHandler } = useImport(props, emit, newHandler);
 const { selectHandle, toggleRowSelection } = useSelection(props, emit, tMagicTableRef);
-
-const updateKey = ref(1);
 
 const data = computed(() => (props.config.pagination ? paginationData.value : props.model[modelName.value]));
 
