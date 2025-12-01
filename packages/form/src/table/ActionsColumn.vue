@@ -1,6 +1,14 @@
 <template>
   <slot name="operateCol" :scope="{ $index: index, row: row }"></slot>
   <TMagicButton
+    v-if="config.dropSort && config.dropSortHandle"
+    :class="{ 'tmagic-form-table-drag-target': config.dropSortHandle }"
+    :icon="Sort"
+    link
+    size="small"
+    title="拖动排序"
+  ></TMagicButton>
+  <TMagicButton
     v-show="showDelete(index + 1 + currentPage * pageSize - 1)"
     size="small"
     type="danger"
@@ -24,7 +32,7 @@
 
 <script setup lang="ts">
 import { inject } from 'vue';
-import { Delete, DocumentCopy } from '@element-plus/icons-vue';
+import { Delete, DocumentCopy, Sort } from '@element-plus/icons-vue';
 import { cloneDeep } from 'lodash-es';
 
 import { TMagicButton } from '@tmagic/design';

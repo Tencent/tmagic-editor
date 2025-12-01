@@ -30,6 +30,7 @@ export const useSortable = (
       filter: 'input', // 表单组件选字操作和触发拖拽会冲突，优先保证选字操作
       preventOnFilter: false, // 允许选字
       direction: 'vertical',
+      handle: props.config.dropSortHandle ? '.tmagic-form-table-drag-target' : undefined,
       onEnd: ({ newIndex, oldIndex }: SortableEvent) => {
         if (typeof newIndex === 'undefined') return;
         if (typeof oldIndex === 'undefined') return;

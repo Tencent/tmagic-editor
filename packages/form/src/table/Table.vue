@@ -8,7 +8,11 @@
     >
       <div class="m-fields-table" :class="{ 'm-fields-table-item-extra': config.itemExtra }">
         <span v-if="config.extra" style="color: rgba(0, 0, 0, 0.45)" v-html="config.extra"></span>
-        <TMagicTooltip content="拖拽可排序" placement="left-start" :disabled="config.dropSort !== true">
+        <TMagicTooltip
+          content="拖拽可排序"
+          placement="left-start"
+          :disabled="config.dropSort !== true && !config.dropSortHandle"
+        >
           <TMagicTable
             v-if="model[modelName]"
             ref="tMagicTable"

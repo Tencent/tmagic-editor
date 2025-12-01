@@ -111,7 +111,7 @@ export const useTableColumns = (
       props: {
         label: '操作',
         fixed: actionFixed,
-        width: props.config.operateColWidth || 112,
+        width: props.config.operateColWidth ?? (props.config.dropSortHandle && props.config.dropSort ? 132 : 112),
         align: 'center',
       },
       cell: ({ row, $index }: any) =>
