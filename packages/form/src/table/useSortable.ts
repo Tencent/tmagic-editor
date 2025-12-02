@@ -39,10 +39,9 @@ export const useSortable = (
         emit('change', newData);
         mForm?.$emit('field-change', newData);
 
-        sortable?.destroy();
-        sortable = undefined;
-
         nextTick(() => {
+          sortable?.destroy();
+          sortable = undefined;
           updateKey.value += 1;
         });
       },

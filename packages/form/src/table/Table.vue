@@ -11,7 +11,7 @@
         <TMagicTooltip
           content="拖拽可排序"
           placement="left-start"
-          :disabled="config.dropSort !== true && !config.dropSortHandle"
+          :disabled="config.dropSort !== true || config.dropSortHandle"
         >
           <TMagicTable
             v-if="model[modelName]"

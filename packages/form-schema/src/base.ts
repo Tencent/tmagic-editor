@@ -722,6 +722,9 @@ export interface TableConfig extends FormItem {
   /** 是否支持拖拽排序 */
   dropSort?: boolean;
   dropSortHandle?: boolean;
+  dropActionButtonIcon?: any;
+  copyActionButtonIcon?: any;
+  deleteActionButtonIcon?: any;
   /** 是否显示全屏按钮 */
   enableFullscreen?: boolean;
   fixed?: boolean | 'left' | 'right';
