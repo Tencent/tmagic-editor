@@ -39,6 +39,10 @@ export interface CodeConfig extends FormItem {
   };
   height?: string;
   parse?: boolean;
+  autosize?: {
+    minRows?: number;
+    maxRows?: number;
+  };
 }
 
 export interface CodeLinkConfig extends FormItem {

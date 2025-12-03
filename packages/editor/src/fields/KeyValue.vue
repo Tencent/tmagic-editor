@@ -37,11 +37,14 @@
 
     <MagicCodeEditor
       v-if="config.advanced && showCode"
-      height="200px"
       :init-values="model[name]"
       language="javascript"
       :options="{
         readOnly: disabled,
+      }"
+      :autosize="{
+        minRows: 1,
+        maxRows: 20,
       }"
       :parse="true"
       @save="save"

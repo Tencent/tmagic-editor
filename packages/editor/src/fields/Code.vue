@@ -7,6 +7,7 @@
       ...config.options,
       readOnly: disabled,
     }"
+    :autosize="config.autosize"
     :parse="config.parse"
     @save="save"
   ></MagicCodeEditor>

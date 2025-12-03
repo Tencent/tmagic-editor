@@ -201,7 +201,7 @@ const functionConfig = computed<FormConfig>(() => [
     name: 'content',
     type: 'vs-code',
     options: inject('codeOptions', {}),
-    height: '500px',
+    autosize: { minRows: 10, maxRows: 30 },
     onChange: (formState: FormState | undefined, code: string) => {
       try {
         // 检测js代码是否存在语法错误

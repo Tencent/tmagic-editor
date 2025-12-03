@@ -1,10 +1,7 @@
 <template>
   <div :class="`magic-code-editor`">
     <Teleport to="body" :disabled="!fullScreen">
-      <div
-        :class="`magic-code-editor-wrapper${fullScreen ? ' full-screen' : ''}`"
-        :style="!fullScreen && height ? `height: ${height}` : '100%'"
-      >
+      <div :class="{ 'magic-code-editor-wrapper': true, 'full-screen': fullScreen }" :style="{ height: computeHeight }">
         <TMagicButton
           v-if="!disabledFullScreen"
           class="magic-code-editor-full-screen-icon"
@@ -20,7 +17,7 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
 import { FullScreen } from '@element-plus/icons-vue';
 import { throttle } from 'lodash-es';
 import serialize from 'serialize-javascript';
@@ -46,6 +43,10 @@ const props = withDefaults(
     autoSave?: boolean;
     parse?: boolean;
     disabledFullScreen?: boolean;
+    autosize?: {
+      minRows?: number;
+      maxRows?: number;
+    };
   }>(),
   {
     initValues: '',
@@ -60,6 +61,58 @@ const props = withDefaults(
 );
 
 const emit = defineEmits(['initd', 'save']);
+
+const autoHeight = ref<string>('');
+
+const computeHeight = computed(() => {
+  if (fullScreen.value) {
+    return '100%';
+  }
+
+  if (props.height) {
+    return props.height;
+  }
+
+  if (props.autosize) {
+    return autoHeight.value;
+  }
+
+  return '100%';
+});
+
+const setAutoHeight = (v = '') => {
+  let lines = Math.max(v.split('\n').length, props.autosize?.minRows || 1);
+  if (v) {
+    if (props.autosize?.maxRows) {
+      lines = Math.min(lines, props.autosize.maxRows);
+    }
+  }
+
+  // 获取编辑器实际行高，如果编辑器还未初始化则使用默认值
+  let lineHeight = 20;
+  if (vsEditor) {
+    const editorOptions = vsEditor.getOptions();
+    lineHeight = editorOptions.get(monaco.editor.EditorOption.lineHeight) || 20;
+  }
+
+  const newHeight = `${lines * lineHeight + 10}px`;
+
+  // 只有当高度真正改变时才更新
+  if (autoHeight.value !== newHeight) {
+    autoHeight.value = newHeight;
+
+    // 高度变化后需要重新布局编辑器
+    nextTick(() => {
+      vsEditor?.layout();
+
+      // 确保内容在可视区域内，滚动到顶部
+      if (vsEditor) {
+        vsEditor.setScrollTop(0);
+        vsEditor.revealLine(1);
+      }
+    });
+  }
+};
 
 const toString = (v: string | any, language: string): string => {
   let value: string;
@@ -110,6 +163,8 @@ const resizeObserver = new globalThis.ResizeObserver(
 const setEditorValue = (v: string | any, m: string | any) => {
   values.value = toString(v, props.language.toLocaleLowerCase());
 
+  setAutoHeight(values.value);
+
   if (props.type === 'diff') {
     const originalModel = monaco.editor.createModel(values.value, 'text/javascript');
     const modifiedModel = monaco.editor.createModel(toString(m, props.language), 'text/javascript');
@@ -147,6 +202,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
     emit('save', props.parse ? parseCode(newValue, props.language) : newValue);
   }
 };
+
 const init = async () => {
   if (!codeEditorEl.value) return;
 
@@ -163,8 +219,24 @@ const init = async () => {
 
   if (props.type === 'diff') {
     vsDiffEditor = getEditorConfig('customCreateMonacoDiffEditor')(monaco, codeEditorEl.value, options);
+
+    // 监听diff编辑器内容变化
+    vsDiffEditor.getModifiedEditor().onDidChangeModelContent(() => {
+      // 如果使用 autosize，内容变化时重新计算高度
+      if (props.autosize) {
+        setAutoHeight(getEditorValue());
+      }
+    });
   } else {
     vsEditor = getEditorConfig('customCreateMonacoEditor')(monaco, codeEditorEl.value, options);
+
+    // 监听编辑器内容变化
+    vsEditor.onDidChangeModelContent(() => {
+      // 如果使用 autosize，内容变化时重新计算高度
+      if (props.autosize) {
+        setAutoHeight(getEditorValue());
+      }
+    });
   }
 
   setEditorValue(props.initValues, props.modifiedValues);

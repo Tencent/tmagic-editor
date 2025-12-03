@@ -233,7 +233,6 @@ const dataSourceFieldsConfig: FormConfig = [
   {
     name: 'defaultValue',
     text: '默认值',
-    height: '200px',
     parse: true,
     type: (mForm: FormState | undefined, { model }: any) => {
       if (model.type === 'number') return 'number';
@@ -242,6 +241,7 @@ const dataSourceFieldsConfig: FormConfig = [
 
       return 'vs-code';
     },
+    autosize: { minRows: 1, maxRows: 30 },
     options: [
       { text: 'true', value: true },
       { text: 'false', value: false },
@@ -267,7 +267,7 @@ const jsonFromConfig: FormConfig = [
     type: 'vs-code',
     labelWidth: '0',
     language: 'json',
-    height: '600px',
+    autosize: { minRows: 30, maxRows: 50 },
     options: inject('codeOptions', {}),
   },
 ];

@@ -96,7 +96,7 @@ const formConfig: FormConfig = [
     language: 'json',
     options: inject('codeOptions', {}),
     defaultValue: '{}',
-    height: '400px',
+    autosize: { minRows: 30, maxRows: 50 },
     onChange: (formState: FormState | undefined, v: string | any) => {
       if (typeof v !== 'string') return v;
       return JSON.parse(v);
