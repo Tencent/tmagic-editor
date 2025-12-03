@@ -24,7 +24,11 @@ defineOptions({
   name: 'TMDialog',
 });
 
-const props = defineProps<DialogProps>();
+const props = withDefaults(defineProps<DialogProps>(), {
+  closeOnClickModal: true,
+  closeOnPressEscape: true,
+  showClose: true,
+});
 
 const emit = defineEmits(['close', 'update:modelValue']);
 
