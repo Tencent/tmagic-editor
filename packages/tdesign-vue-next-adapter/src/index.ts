@@ -439,7 +439,6 @@ const adapter: any = {
         disabled: props.disabled,
         placeholder: props.placeholder,
         multiple: props.multiple,
-        valueType: props.valueKey,
         remoteMethod: props.onSearch,
         creatable: props.allowCreate,
         size: props.size === 'default' ? 'medium' : props.size,
