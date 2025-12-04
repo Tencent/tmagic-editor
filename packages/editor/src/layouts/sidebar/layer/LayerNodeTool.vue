@@ -1,7 +1,12 @@
 <template>
   <template v-if="data.type !== 'page'">
-    <MIcon v-if="data.visible === false" :icon="Hide" @click.stop="setNodeVisible(true)" title="点击显示"></MIcon>
-    <MIcon v-else :icon="View" @click.stop="setNodeVisible(false)" class="node-lock" title="点击隐藏"></MIcon>
+    <TMagicButton
+      link
+      :type="data.visible === false ? 'primary' : 'default'"
+      :icon="data.visible === false ? Hide : View"
+      :title="data.visible === false ? '点击显示' : '点击隐藏'"
+      @click.stop="setNodeVisible(data.visible === false)"
+    ></TMagicButton>
   </template>
 </template>
 
@@ -9,8 +14,8 @@
 import { Hide, View } from '@element-plus/icons-vue';
 
 import type { MNode } from '@tmagic/core';
+import { TMagicButton } from '@tmagic/design';
 
-import MIcon from '@editor/components/Icon.vue';
 import { useServices } from '@editor/hooks/use-services';
 
 const props = defineProps<{

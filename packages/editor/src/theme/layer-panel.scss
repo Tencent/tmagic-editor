@@ -5,6 +5,22 @@
 
   .m-editor-tree {
     padding-top: 48px;
+
+    .tree-node-tool {
+      padding-right: 10px;
+
+      .tmagic-design-button + .tmagic-design-button {
+        margin-left: 2px;
+      }
+    }
+
+    .tree-node.selected {
+      .tree-node-tool {
+        .tmagic-design-button {
+          color: #fff;
+        }
+      }
+    }
   }
 
   .search-wrapper {
