@@ -1,3 +1,22 @@
+# [1.7.0](https://github.com/Tencent/tmagic-editor/compare/v1.7.0-beta.5...v1.7.0) (2025-12-04)
+
+
+### Bug Fixes
+
+* **design:** dialog 默认参数 ([8d7c8fa](https://github.com/Tencent/tmagic-editor/commit/8d7c8fa725dba507c3a4874f879989ad9c050603))
+* **form:** datetime如果设置为时间戳，然后初始值是一个字符串的数字显示不正确 ([7e71c07](https://github.com/Tencent/tmagic-editor/commit/7e71c070f1ee9857fd5610000188ef1a222fade1))
+* **form:** table拖拽排序后重新渲染组件 ([2667981](https://github.com/Tencent/tmagic-editor/commit/2667981e4c0c451ded88e06f412dd4bcb5ec41dc))
+* **form:** 生成表单values时将initValus深拷贝,避免修改到传入的对象 ([b536eba](https://github.com/Tencent/tmagic-editor/commit/b536eba81c33f8e532179b69072ea7c5d4033235))
+
+
+### Features
+
+* **editor:** 代码编辑器支持配置自动高度 ([8d55d0c](https://github.com/Tencent/tmagic-editor/commit/8d55d0cd8d1059dcbca86fc5b72ec82f22c35d9c))
+* **form:** table支持配置拖动操作中的按钮排序而不是拖动整行 ([69ac90f](https://github.com/Tencent/tmagic-editor/commit/69ac90fe22778fedb9e35b95595428395fd65cc5))
+* **form:** table支持配置操作按钮的icon ([0dd7f54](https://github.com/Tencent/tmagic-editor/commit/0dd7f54ebc3518404653d6e43ee428e05566dd28))
+
+
+
 # [1.7.0-beta.5](https://github.com/Tencent/tmagic-editor/compare/v1.7.0-beta.4...v1.7.0-beta.5) (2025-11-24)
 
 
