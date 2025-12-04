@@ -303,7 +303,7 @@ export const datetimeFormatter = (
   if (v) {
     let time: string | number;
     if (['x', 'timestamp'].includes(format)) {
-      time = dayjs(v).valueOf();
+      time = dayjs(Number.isNaN(Number(v)) ? v : Number(v)).valueOf();
     } else if ((typeof v === 'string' && v.includes('Z')) || v.constructor === Date) {
       dayjs.extend(utc);
       // UTC字符串时间或Date对象格式化为北京时间
