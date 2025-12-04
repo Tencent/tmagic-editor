@@ -2,28 +2,13 @@
   <TMagicScrollbar class="data-source-list-panel m-editor-layer-panel">
     <div class="search-wrapper">
       <SearchInput @search="filterTextChangeHandler"></SearchInput>
-      <TMagicPopover
+      <DataSourceAddButton
         v-if="editable"
-        placement="right"
-        trigger="hover"
-        popper-class="data-source-list-panel-add-menu"
-        :destroy-on-close="true"
-      >
-        <template #reference>
-          <TMagicButton type="primary" size="small">新增</TMagicButton>
-        </template>
-        <ToolButton
-          v-for="(item, index) in datasourceTypeList"
-          :data="{
-            type: 'button',
-            text: item.text,
-            handler: () => {
-              addHandler(item.type);
-            },
-          }"
-          :key="index"
-        ></ToolButton>
-      </TMagicPopover>
+        add-button-text="新增"
+        :add-button-config="{ type: 'primary', size: 'small' }"
+        :datasource-type-list="datasourceTypeList"
+        @add="addHandler"
+      ></DataSourceAddButton>
 
       <slot name="data-source-panel-search"></slot>
     </div>
@@ -63,15 +48,15 @@
 import { computed, inject, useTemplateRef, watch } from 'vue';
 import { mergeWith } from 'lodash-es';
 
-import { TMagicButton, tMagicMessageBox, TMagicPopover, TMagicScrollbar } from '@tmagic/design';
+import { tMagicMessageBox, TMagicScrollbar } from '@tmagic/design';
 
 import ContentMenu from '@editor/components/ContentMenu.vue';
 import SearchInput from '@editor/components/SearchInput.vue';
-import ToolButton from '@editor/components/ToolButton.vue';
 import { useDataSourceEdit } from '@editor/hooks/use-data-source-edit';
 import { useServices } from '@editor/hooks/use-services';
 import type { CustomContentMenuFunction, DataSourceListSlots, EventBus, MenuButton, MenuComponent } from '@editor/type';
 
+import DataSourceAddButton from './DataSourceAddButton.vue';
 import DataSourceConfigPanel from './DataSourceConfigPanel.vue';
 import DataSourceList from './DataSourceList.vue';
 import { useContentMenu } from './useContentMenu';
