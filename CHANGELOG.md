@@ -1,3 +1,20 @@
+## [1.7.1](https://github.com/Tencent/tmagic-editor/compare/v1.7.0...v1.7.1) (2025-12-09)
+
+
+### Bug Fixes
+
+* **core:** getNode 添加stict参数来表示必须知道页面片容器id才会返回页面内的节点 ([83664cd](https://github.com/Tencent/tmagic-editor/commit/83664cd44019c3b5f05d2ad60bbb8fcf751f6b35))
+* **form:** tabs组件子项配置了name后,配置生成的数据出错 ([b3ce1a3](https://github.com/Tencent/tmagic-editor/commit/b3ce1a3b930e9cbfc74b72bfb7dd9268fe341626))
+* **tmagic-form:** runtime刷新导致root丢失 ([d039cee](https://github.com/Tencent/tmagic-editor/commit/d039cee9136e7e892161dafe25ff34ee95bce958))
+
+
+### Features
+
+* **vue-components:** 不再兼容vue2 ([756612e](https://github.com/Tencent/tmagic-editor/commit/756612eda51fa8079420203eaca585175b039e8b))
+* **vue-runtime-help:** 去掉vue2的兼容 ([2a7ab4e](https://github.com/Tencent/tmagic-editor/commit/2a7ab4e916444a68c7cc05af4fa57ddd59994393))
+
+
+
 # [1.7.0](https://github.com/Tencent/tmagic-editor/compare/v1.7.0-beta.5...v1.7.0) (2025-12-04)
 
 
