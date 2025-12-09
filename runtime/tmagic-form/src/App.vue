@@ -12,7 +12,7 @@ import { useFormConfig } from './useFormConfig';
 
 const props = defineProps<AppProps>();
 
-const { mForm, formConfig, config, values } = useFormConfig(props);
+const { formConfig, config, values } = useFormConfig(props);
 
 watch(formConfig, async () => {
   setTimeout(() => {

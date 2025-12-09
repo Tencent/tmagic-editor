@@ -73,8 +73,15 @@ export const useFormConfig = (props: AppProps) => {
         return nextTick().then(() => getElById()(document, `${id}`) as HTMLElement);
       },
 
-      add({ config, parentId }: UpdateData) {
-        if (!root.value) throw new Error('error');
+      add({ config, parentId, root: appConfig }: UpdateData) {
+        if (!root.value) {
+          if (appConfig) {
+            root.value = appConfig;
+            resetValues();
+            return;
+          }
+          throw new Error('error');
+        }
         if (!selectedId.value) throw new Error('error');
         if (!parentId) throw new Error('error');
 
@@ -97,8 +104,17 @@ export const useFormConfig = (props: AppProps) => {
         resetValues();
       },
 
-      update({ config, parentId }: UpdateData) {
-        if (!root.value || !app) throw new Error('error');
+      update({ config, parentId, root: appConfig }: UpdateData) {
+        if (!root.value) {
+          if (appConfig) {
+            root.value = appConfig;
+            resetValues();
+            return;
+          }
+          throw new Error('error');
+        }
+
+        if (!app) throw new Error('error');
 
         const newNode = app.dataSourceManager?.compiledNode(config) || config;
         replaceChildNode(reactive(newNode), [root.value], parentId);
