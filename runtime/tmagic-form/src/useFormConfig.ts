@@ -82,7 +82,7 @@ export const useFormConfig = (props: AppProps) => {
         if (!parent) throw new Error('未找到父节点');
 
         if (config.type !== 'page') {
-          const parentNode = app?.page?.getNode(parent.id);
+          const parentNode = app?.page?.getNode(parent.id, { strict: true });
           parentNode && app?.page?.initNode(config, parentNode);
         }
 
@@ -103,7 +103,7 @@ export const useFormConfig = (props: AppProps) => {
         const newNode = app.dataSourceManager?.compiledNode(config) || config;
         replaceChildNode(reactive(newNode), [root.value], parentId);
 
-        const nodeInstance = app.page?.getNode(config.id);
+        const nodeInstance = app.page?.getNode(config.id, { strict: true });
         if (nodeInstance) {
           nodeInstance.setData(config);
         }

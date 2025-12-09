@@ -191,7 +191,7 @@ class Node extends EventEmitter {
         if (this.app.eventHelper) {
           for (const eventConfig of this.app.eventHelper.getEventQueue()) {
             for (const [, page] of this.app.pageFragments) {
-              const node = page.getNode(eventConfig.toId);
+              const node = page.getNode(eventConfig.toId, { strict: true });
               if (node && node === this) {
                 if (typeof instance[eventConfig.method] === 'function') {
                   await instance[eventConfig.method](eventConfig.fromCpt, ...eventConfig.args);

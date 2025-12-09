@@ -48,4 +48,6 @@ export interface GetNodeOptions {
   iteratorContainerId?: Id[];
   iteratorIndex?: number[];
   pageFragmentContainerId?: Id;
+  /** 严格模式，如果为true，页面片中的节点必须指定pageFragmentContainerId，为false时，没有pageFragmentContainerId的时候获得第一个页面片容器中的节点 */
+  strict?: boolean;
 }

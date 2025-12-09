@@ -84,14 +84,16 @@ class Page extends Node {
 
   public getNode<T extends TMagicNode = TMagicNode>(
     id: Id,
-    { iteratorContainerId, iteratorIndex, pageFragmentContainerId }: GetNodeOptions = {},
+    { iteratorContainerId, iteratorIndex, pageFragmentContainerId, strict }: GetNodeOptions = {},
   ): T | undefined {
     if (this.nodes.has(id)) {
       return this.nodes.get(id) as T;
     }
 
     if (pageFragmentContainerId) {
-      return this.app.pageFragments.get(pageFragmentContainerId)?.getNode(id, { iteratorContainerId, iteratorIndex });
+      return this.app.pageFragments
+        .get(pageFragmentContainerId)
+        ?.getNode(id, { iteratorContainerId, iteratorIndex, strict: true });
     }
 
     if (Array.isArray(iteratorContainerId) && iteratorContainerId.length && Array.isArray(iteratorIndex)) {
@@ -107,7 +109,7 @@ class Page extends Node {
       return iteratorContainer?.getNode(id, iteratorIndex[iteratorIndex.length - 1]) as T;
     }
 
-    if (this.app.pageFragments.size) {
+    if (!strict && this.app.pageFragments.size) {
       for (const [, pageFragment] of this.app.pageFragments) {
         if (pageFragment.nodes.has(id)) {
           return pageFragment.nodes.get(id) as T;

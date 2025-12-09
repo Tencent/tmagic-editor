@@ -43,6 +43,7 @@ export const useNode = <T extends TMagicNode = TMagicNode>(
       iteratorContainerId: props.iteratorContainerId,
       iteratorIndex: props.iteratorIndex,
       pageFragmentContainerId: props.pageFragmentContainerId,
+      strict: true,
     });
   }
   return void 0;

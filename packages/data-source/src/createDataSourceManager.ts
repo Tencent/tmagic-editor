@@ -78,13 +78,13 @@ export const createDataSourceManager = (app: TMagicApp, useMock?: boolean, initi
               replaceChildNode(newNode, [app.page.data]);
             }
 
-            app.getNode(node.id)?.setData(newNode);
+            app.getNode(node.id, { strict: true })?.setData(newNode);
 
             for (const [, pageFragment] of app.pageFragments) {
               if (pageFragment.data.id === newNode.id) {
                 pageFragment.setData(newNode);
               } else if (pageFragment.data.id === page.id) {
-                pageFragment.getNode(newNode.id)?.setData(newNode);
+                pageFragment.getNode(newNode.id, { strict: true })?.setData(newNode);
                 if (!pageFragment.instance) {
                   replaceChildNode(newNode, [pageFragment.data]);
                 }

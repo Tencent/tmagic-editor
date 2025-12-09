@@ -279,13 +279,13 @@ export default class EventHelper extends EventEmitter {
     }
 
     const toNodes = [];
-    const toNode = this.app.getNode(to);
+    const toNode = this.app.getNode(to, { strict: true });
     if (toNode) {
       toNodes.push(toNode);
     }
 
     for (const [, page] of this.app.pageFragments) {
-      const node = page.getNode(to);
+      const node = page.getNode(to, { strict: true });
       if (node) {
         toNodes.push(node);
       }
