@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { defineComponent, isVue3, provide } from 'vue-demi';
+import { defineComponent, provide } from 'vue';
 import { mount } from '@vue/test-utils';
 
 import Core from '@tmagic/core';
@@ -34,7 +34,7 @@ describe('useComponent', () => {
   });
 
   // node_modules中的vue版本不是3.0.0，所以跳过
-  test.runIf(isVue3).skip('auto inject and empty para', () => {
+  test('auto inject and empty para', () => {
     const child = defineComponent({
       setup() {
         const component = useComponent();

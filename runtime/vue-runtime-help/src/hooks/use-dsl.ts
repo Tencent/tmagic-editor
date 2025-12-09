@@ -1,4 +1,4 @@
-import { inject, nextTick, onBeforeUnmount, reactive, ref } from 'vue-demi';
+import { inject, nextTick, onBeforeUnmount, reactive, ref } from 'vue';
 
 import type TMagicApp from '@tmagic/core';
 import type { ChangeEvent, Id, MNode } from '@tmagic/core';

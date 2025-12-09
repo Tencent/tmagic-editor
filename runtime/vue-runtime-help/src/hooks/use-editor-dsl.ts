@@ -1,4 +1,4 @@
-import { computed, inject, nextTick, reactive, ref, watch } from 'vue-demi';
+import { computed, inject, nextTick, reactive, ref, watch } from 'vue';
 
 import type TMagicApp from '@tmagic/core';
 import type { Id, MApp, MNode } from '@tmagic/core';

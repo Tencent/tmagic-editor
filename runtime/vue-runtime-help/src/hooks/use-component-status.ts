@@ -1,4 +1,4 @@
-import { computed, inject, onScopeDispose, ref, shallowReactive, watchEffect } from 'vue-demi';
+import { computed, inject, onScopeDispose, ref, shallowReactive, watchEffect } from 'vue';
 
 import type TMagicCore from '@tmagic/core';
 import { type MComponent, type StyleSchema, toLine } from '@tmagic/core';

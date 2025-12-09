@@ -1,4 +1,4 @@
-import { h } from 'vue-demi';
+import { h } from 'vue';
 
 import type { Id, MComponent, StyleSchema } from '@tmagic/core';
 

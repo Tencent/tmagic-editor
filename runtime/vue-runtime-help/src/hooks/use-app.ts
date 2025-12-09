@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { inject, onBeforeUnmount, onMounted } from 'vue-demi';
+import { inject, onBeforeUnmount, onMounted } from 'vue';
 
 import type TMagicApp from '@tmagic/core';
 import type { Id, MNodeInstance, Node as TMagicNode } from '@tmagic/core';

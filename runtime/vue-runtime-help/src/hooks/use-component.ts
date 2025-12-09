@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ConcreteComponent, inject } from 'vue-demi';
+import { ConcreteComponent, inject } from 'vue';
 
 import type TMagicApp from '@tmagic/core';
 import { toLine } from '@tmagic/core';
