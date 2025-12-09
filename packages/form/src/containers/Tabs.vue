@@ -58,7 +58,13 @@
                   : lastValues
         "
         :is-compare="isCompare"
-        :prop="config.dynamic ? `${prop}${prop ? '.' : ''}${String(tabIndex)}` : prop"
+        :prop="
+          config.dynamic
+            ? `${prop}${prop ? '.' : ''}${String(tabIndex)}`
+            : tab.name
+              ? `${prop}${prop ? '.' : ''}${tab.name}`
+              : prop
+        "
         :size="size"
         :label-width="tab.labelWidth || labelWidth"
         :expand-more="expandMore"
@@ -87,6 +93,26 @@ defineOptions({
 type DiffCount = {
   [tabIndex: number]: number;
 };
+
+const props = withDefaults(
+  defineProps<{
+    model: any;
+    lastValues?: any;
+    isCompare?: boolean;
+    config: TabConfig;
+    name: string;
+    size?: string;
+    labelWidth?: string;
+    prop?: string;
+    expandMore?: boolean;
+    disabled?: boolean;
+  }>(),
+  {
+    lastValues: () => ({}),
+    isCompare: false,
+    prop: '',
+  },
+);
 
 const tabPaneComponent = getDesignConfig('components')?.tabPane;
 const tabsComponent = getDesignConfig('components')?.tabs;
@@ -117,25 +143,6 @@ const tabClick = (mForm: FormState | undefined, tab: any, props: any) => {
     tabConfig.onTabClick(mForm, tab, { model, formValue: mForm?.values, prop, config });
   }
 };
-
-const props = withDefaults(
-  defineProps<{
-    model: any;
-    lastValues?: any;
-    isCompare?: boolean;
-    config: TabConfig;
-    name: string;
-    size?: string;
-    labelWidth?: string;
-    prop?: string;
-    expandMore?: boolean;
-    disabled?: boolean;
-  }>(),
-  {
-    lastValues: () => ({}),
-    isCompare: false,
-  },
-);
 
 const emit = defineEmits<{
   change: [v: any, eventData?: ContainerChangeEventData];
