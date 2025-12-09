@@ -1,15 +1,15 @@
 {
-  "version": "1.1.4",
+  "version": "1.1.6",
   "name": "@tmagic/tmagic-form-runtime",
   "type": "module",
-  "main": "dist/tmagic-form-runtime.umd.cjs",
-  "module": "dist/tmagic-form-runtime.js",
+  "main": "dist/tmagic-tmagic-form.umd.cjs",
+  "module": "dist/tmagic-tmagic-form.js",
   "types": "types/index.d.ts",
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
-      "import": "./dist/tmagic-form-runtime.js",
-      "require": "./dist/tmagic-form.umd-runtime.cjs"
+      "import": "./dist/tmagic-tmagic-form.js",
+      "require": "./dist/tmagic-tmagic-form.umd.cjs"
     },
     "./*": "./*"
   },
@@ -26,8 +26,8 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "peerDependencies": {
-    "@tmagic/core": ">=1.5.0",
-    "@tmagic/editor": ">=1.5.0",
+    "@tmagic/core": ">=1.7.0",
+    "@tmagic/editor": ">=1.7.0",
     "element-plus": ">=2.8.0",
     "vue": "catalog:",
     "typescript": "catalog:"
