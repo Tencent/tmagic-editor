@@ -1,5 +1,5 @@
 {
-  "version": "0.2.1",
+  "version": "1.0.0",
   "name": "@tmagic/vue-iterator-container",
   "type": "module",
   "main": "src/index.ts",
@@ -14,20 +14,15 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "@tmagic/form-schema": "workspace:^",
-    "vue-demi": "^0.14.10"
+    "@tmagic/form-schema": "workspace:^"
   },
   "peerDependencies": {
     "@tmagic/core": "workspace:^",
     "@tmagic/vue-runtime-help": "workspace:^",
-    "@vue/composition-api": ">=1.7.2",
     "typescript": "catalog:",
-    "vue": ">=2.6.0 || >=3.5.0"
+    "vue": ">=3.5.0"
   },
   "peerDependenciesMeta": {
-    "@vue/composition-api": {
-      "optional": true
-    },
     "typescript": {
       "optional": true
     }

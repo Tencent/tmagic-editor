@@ -78,6 +78,9 @@ export default defineFormConfig([
     name: 'css',
     type: 'vs-code',
     language: 'css',
-    height: '500px',
+    autosize: {
+      minRows: 3,
+      maxRows: 20,
+    },
   },
 ]);

@@ -55,10 +55,6 @@ export default defineConfig({
 
   publicDir: 'public',
 
-  optimizeDeps: {
-    exclude: ['vue-demi'],
-  },
-
   server: {
     host: '0.0.0.0',
     port: 8078,

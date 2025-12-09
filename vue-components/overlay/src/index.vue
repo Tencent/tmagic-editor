@@ -4,84 +4,72 @@
   </component>
 </template>
 
-<script lang="ts">
-import { defineComponent, inject, onBeforeUnmount, type PropType, ref } from 'vue-demi';
+<script lang="ts" setup>
+import { inject, onBeforeUnmount, ref } from 'vue';
 
 import type TMagicApp from '@tmagic/core';
 import { type Id, IS_DSL_NODE_KEY, type MContainer, type MNode, type MPage } from '@tmagic/core';
-import { registerNodeHooks, useComponent, useNode } from '@tmagic/vue-runtime-help';
+import { type ComponentProps, registerNodeHooks, useComponent, useNode } from '@tmagic/vue-runtime-help';
 
 interface OverlaySchema extends Omit<MContainer, 'id'> {
   id?: Id;
   type?: 'overlay';
 }
 
-export default defineComponent({
+defineOptions({
   name: 'tmagic-overlay',
+});
 
-  props: {
-    config: {
-      type: Object as PropType<OverlaySchema>,
-      required: true,
-    },
-    iteratorIndex: Array as PropType<number[]>,
-    iteratorContainerId: Array as PropType<Id[]>,
-    containerIndex: Number,
-    pageFragmentContainerId: [String, Number] as PropType<Id>,
-    model: {
-      type: Object,
-      default: () => ({}),
-    },
+const props = defineProps<ComponentProps<OverlaySchema>>();
+
+const visible = ref(false);
+
+const app = inject<TMagicApp>('app');
+const containerComponent = useComponent({ componentType: 'container', app });
+
+const openOverlay = () => {
+  visible.value = true;
+  app?.emit('overlay:open', node);
+};
+
+const closeOverlay = () => {
+  visible.value = false;
+  app?.emit('overlay:close', node);
+};
+
+const editorSelectHandler = (
+  _info: {
+    node: MNode;
+    page: MPage;
+    parent: MContainer;
   },
+  path: MNode[],
+) => {
+  if (path.find((node: MNode) => node.id === props.config.id)) {
+    openOverlay();
+  } else {
+    closeOverlay();
+  }
+};
 
-  setup(props) {
-    const visible = ref(false);
+app?.page?.on('editor:select', editorSelectHandler);
 
-    const app = inject<TMagicApp>('app');
-    const containerComponent = useComponent({ componentType: 'container', app });
+app?.on('page-change', () => {
+  app?.page?.on('editor:select', editorSelectHandler);
+});
 
-    const openOverlay = () => {
-      visible.value = true;
-      app?.emit('overlay:open', node);
-    };
+onBeforeUnmount(() => {
+  app?.page?.off('editor:select', editorSelectHandler);
+});
 
-    const closeOverlay = () => {
-      visible.value = false;
-      app?.emit('overlay:close', node);
-    };
+const node = useNode(props, app);
+registerNodeHooks(node, {
+  openOverlay,
+  closeOverlay,
+});
 
-    const editorSelectHandler = (
-      info: {
-        node: MNode;
-        page: MPage;
-        parent: MContainer;
-      },
-      path: MNode[],
-    ) => {
-      if (path.find((node: MNode) => node.id === props.config.id)) {
-        openOverlay();
-      } else {
-        closeOverlay();
-      }
-    };
-
-    app?.page?.on('editor:select', editorSelectHandler);
-
-    onBeforeUnmount(() => {
-      app?.page?.off('editor:select', editorSelectHandler);
-    });
-
-    const node = useNode(props, app);
-    registerNodeHooks(node, {
-      openOverlay,
-      closeOverlay,
-    });
-
-    return {
-      containerComponent,
-      visible,
-      IS_DSL_NODE_KEY,
-    };
-  },
+defineExpose({
+  openOverlay,
+  closeOverlay,
 });
 </script>

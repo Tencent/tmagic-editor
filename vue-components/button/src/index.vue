@@ -6,11 +6,9 @@
   </button>
 </template>
 
-<script lang="ts">
-import { defineComponent, type PropType } from 'vue-demi';
-
+<script lang="ts" setup>
 import { COMMON_EVENT_PREFIX, type Id, type MComponent } from '@tmagic/core';
-import { useApp } from '@tmagic/vue-runtime-help';
+import { type ComponentProps, useApp } from '@tmagic/vue-runtime-help';
 
 interface ButtonSchema extends Omit<MComponent, 'id'> {
   id?: Id;
@@ -18,36 +16,16 @@ interface ButtonSchema extends Omit<MComponent, 'id'> {
   text: string;
 }
 
-export default defineComponent({
+defineOptions({
   name: 'tmagic-button',
-
-  props: {
-    config: {
-      type: Object as PropType<ButtonSchema>,
-      required: true,
-    },
-    iteratorIndex: Array as PropType<number[]>,
-    iteratorContainerId: Array as PropType<Id[]>,
-    containerIndex: Number,
-    pageFragmentContainerId: [String, Number] as PropType<Id>,
-    model: {
-      type: Object,
-      default: () => ({}),
-    },
-  },
-
-  setup(props) {
-    const { app, node } = useApp(props);
-
-    const clickHandler = () => {
-      if (app && node) {
-        app.emit(`${COMMON_EVENT_PREFIX}click`, node);
-      }
-    };
-
-    return {
-      clickHandler,
-    };
-  },
 });
+
+const props = defineProps<ComponentProps<ButtonSchema>>();
+
+const { app, node } = useApp(props);
+const clickHandler = () => {
+  if (app && node) {
+    app.emit(`${COMMON_EVENT_PREFIX}click`, node);
+  }
+};
 </script>

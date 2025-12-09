@@ -2,12 +2,12 @@
   <p @click="clickHandler" v-html="config.text"></p>
 </template>
 
-<script lang="ts">
-import { defineComponent, inject, type PropType } from 'vue-demi';
+<script lang="ts" setup>
+import { inject } from 'vue';
 
 import type TMagicApp from '@tmagic/core';
 import { COMMON_EVENT_PREFIX, type Id, type MComponent } from '@tmagic/core';
-import { registerNodeHooks, useNode } from '@tmagic/vue-runtime-help';
+import { type ComponentProps, registerNodeHooks, useNode } from '@tmagic/vue-runtime-help';
 
 interface TextSchema extends Omit<MComponent, 'id'> {
   id?: Id;
@@ -15,38 +15,19 @@ interface TextSchema extends Omit<MComponent, 'id'> {
   text: string;
 }
 
-export default defineComponent({
+defineOptions({
   name: 'tmagic-text',
-
-  props: {
-    config: {
-      type: Object as PropType<TextSchema>,
-      required: true,
-    },
-    iteratorIndex: Array as PropType<number[]>,
-    iteratorContainerId: Array as PropType<Id[]>,
-    containerIndex: Number,
-    pageFragmentContainerId: [String, Number] as PropType<Id>,
-    model: {
-      type: Object,
-      default: () => ({}),
-    },
-  },
-
-  setup(props) {
-    const app = inject<TMagicApp>('app');
-    const node = useNode(props);
-    registerNodeHooks(node);
-
-    const clickHandler = () => {
-      if (app && node) {
-        app.emit(`${COMMON_EVENT_PREFIX}click`, node);
-      }
-    };
-
-    return {
-      clickHandler,
-    };
-  },
 });
+
+const props = defineProps<ComponentProps<TextSchema>>();
+
+const app = inject<TMagicApp>('app');
+const node = useNode(props);
+registerNodeHooks(node);
+
+const clickHandler = () => {
+  if (app && node) {
+    app.emit(`${COMMON_EVENT_PREFIX}click`, node);
+  }
+};
 </script>

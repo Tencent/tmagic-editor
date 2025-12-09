@@ -965,11 +965,11 @@ importers:
   runtime/react-runtime-help:
     dependencies:
       '@tmagic/core':
-        specifier: '>=1.6.0-beta.0'
-        version: 1.6.1(typescript@5.9.3)
+        specifier: '>=1.7.0'
+        version: 1.7.0(typescript@5.9.3)
       '@tmagic/stage':
-        specifier: '>=1.6.0-beta.0'
-        version: 1.6.1(@tmagic/core@1.6.1(typescript@5.9.3))(typescript@5.9.3)
+        specifier: '>=1.7.0'
+        version: 1.7.0(@tmagic/core@1.7.0(typescript@5.9.3))(typescript@5.9.3)
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -1072,23 +1072,17 @@ importers:
   runtime/vue-runtime-help:
     dependencies:
       '@tmagic/core':
-        specifier: '>=1.6.0-beta.0'
-        version: 1.6.1(typescript@5.9.3)
+        specifier: '>=1.7.0'
+        version: 1.7.0(typescript@5.9.3)
       '@tmagic/stage':
-        specifier: '>=1.6.0-beta.0'
-        version: 1.6.1(@tmagic/core@1.6.1(typescript@5.9.3))(typescript@5.9.3)
-      '@vue/composition-api':
-        specifier: '>=1.7.2'
-        version: 1.7.2(vue@3.5.24(typescript@5.9.3))
+        specifier: '>=1.7.0'
+        version: 1.7.0(@tmagic/core@1.7.0(typescript@5.9.3))(typescript@5.9.3)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
       vue:
-        specifier: '>=2.6.0 || >=3.5.0'
+        specifier: '>=3.5.0'
         version: 3.5.24(typescript@5.9.3)
-      vue-demi:
-        specifier: ^0.14.10
-        version: 0.14.10(@vue/composition-api@1.7.2(vue@3.5.24(typescript@5.9.3)))(vue@3.5.24(typescript@5.9.3))
     devDependencies:
       '@vue/test-utils':
         specifier: ^2.4.6
@@ -1105,18 +1099,12 @@ importers:
       '@tmagic/vue-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
-      '@vue/composition-api':
-        specifier: '>=1.7.2'
-        version: 1.7.2(vue@3.5.24(typescript@5.9.3))
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
       vue:
-        specifier: '>=2.6.0 || >=3.5.0'
+        specifier: '>=3.5.0'
         version: 3.5.24(typescript@5.9.3)
-      vue-demi:
-        specifier: ^0.14.10
-        version: 0.14.10(@vue/composition-api@1.7.2(vue@3.5.24(typescript@5.9.3)))(vue@3.5.24(typescript@5.9.3))
 
   vue-components/container:
     dependencies:
@@ -1129,18 +1117,12 @@ importers:
       '@tmagic/vue-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
-      '@vue/composition-api':
-        specifier: '>=1.7.2'
-        version: 1.7.2(vue@3.5.24(typescript@5.9.3))
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
       vue:
-        specifier: '>=2.6.0 || >=3.5.0'
+        specifier: '>=3.5.0'
         version: 3.5.24(typescript@5.9.3)
-      vue-demi:
-        specifier: ^0.14.10
-        version: 0.14.10(@vue/composition-api@1.7.2(vue@3.5.24(typescript@5.9.3)))(vue@3.5.24(typescript@5.9.3))
 
   vue-components/img:
     dependencies:
@@ -1153,18 +1135,12 @@ importers:
       '@tmagic/vue-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
-      '@vue/composition-api':
-        specifier: '>=1.7.2'
-        version: 1.7.2(vue@3.5.24(typescript@5.9.3))
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
       vue:
-        specifier: '>=2.6.0 || >=3.5.0'
+        specifier: '>=3.5.0'
         version: 3.5.24(typescript@5.9.3)
-      vue-demi:
-        specifier: ^0.14.10
-        version: 0.14.10(@vue/composition-api@1.7.2(vue@3.5.24(typescript@5.9.3)))(vue@3.5.24(typescript@5.9.3))
 
   vue-components/iterator-container:
     dependencies:
@@ -1177,18 +1153,12 @@ importers:
       '@tmagic/vue-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
-      '@vue/composition-api':
-        specifier: '>=1.7.2'
-        version: 1.7.2(vue@3.5.24(typescript@5.9.3))
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
       vue:
-        specifier: '>=2.6.0 || >=3.5.0'
+        specifier: '>=3.5.0'
         version: 3.5.24(typescript@5.9.3)
-      vue-demi:
-        specifier: ^0.14.10
-        version: 0.14.10(@vue/composition-api@1.7.2(vue@3.5.24(typescript@5.9.3)))(vue@3.5.24(typescript@5.9.3))
 
   vue-components/overlay:
     dependencies:
@@ -1204,9 +1174,9 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      vue-demi:
-        specifier: ^0.14.10
-        version: 0.14.10(@vue/composition-api@1.7.2(vue@3.5.24(typescript@5.9.3)))(vue@3.5.24(typescript@5.9.3))
+      vue:
+        specifier: '>=3.5.0'
+        version: 3.5.24(typescript@5.9.3)
 
   vue-components/page:
     dependencies:
@@ -1222,9 +1192,9 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      vue-demi:
-        specifier: ^0.14.10
-        version: 0.14.10(@vue/composition-api@1.7.2(vue@3.5.24(typescript@5.9.3)))(vue@3.5.24(typescript@5.9.3))
+      vue:
+        specifier: '>=3.5.0'
+        version: 3.5.24(typescript@5.9.3)
 
   vue-components/page-fragment:
     dependencies:
@@ -1240,9 +1210,9 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      vue-demi:
-        specifier: ^0.14.10
-        version: 0.14.10(@vue/composition-api@1.7.2(vue@3.5.24(typescript@5.9.3)))(vue@3.5.24(typescript@5.9.3))
+      vue:
+        specifier: '>=3.5.0'
+        version: 3.5.24(typescript@5.9.3)
 
   vue-components/page-fragment-container:
     dependencies:
@@ -1258,9 +1228,9 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      vue-demi:
-        specifier: ^0.14.10
-        version: 0.14.10(@vue/composition-api@1.7.2(vue@3.5.24(typescript@5.9.3)))(vue@3.5.24(typescript@5.9.3))
+      vue:
+        specifier: '>=3.5.0'
+        version: 3.5.24(typescript@5.9.3)
 
   vue-components/qrcode:
     dependencies:
@@ -1273,9 +1243,6 @@ importers:
       '@tmagic/vue-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
-      '@vue/composition-api':
-        specifier: '>=1.7.2'
-        version: 1.7.2(vue@3.5.24(typescript@5.9.3))
       qrcode:
         specifier: ^1.5.0
         version: 1.5.4
@@ -1283,11 +1250,8 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
       vue:
-        specifier: '>=2.6.0 || >=3.5.0'
+        specifier: '>=3.5.0'
         version: 3.5.24(typescript@5.9.3)
-      vue-demi:
-        specifier: ^0.14.10
-        version: 0.14.10(@vue/composition-api@1.7.2(vue@3.5.24(typescript@5.9.3)))(vue@3.5.24(typescript@5.9.3))
     devDependencies:
       '@types/qrcode':
         specifier: ^1.4.2
@@ -1304,18 +1268,12 @@ importers:
       '@tmagic/vue-runtime-help':
         specifier: workspace:^
         version: link:../../runtime/vue-runtime-help
-      '@vue/composition-api':
-        specifier: '>=1.7.2'
-        version: 1.7.2(vue@3.5.24(typescript@5.9.3))
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
       vue:
-        specifier: '>=2.6.0 || >=3.5.0'
+        specifier: '>=3.5.0'
         version: 3.5.24(typescript@5.9.3)
-      vue-demi:
-        specifier: ^0.14.10
-        version: 0.14.10(@vue/composition-api@1.7.2(vue@3.5.24(typescript@5.9.3)))(vue@3.5.24(typescript@5.9.3))
 
 packages:
 
@@ -8277,7 +8235,7 @@ snapshots:
   '@tmagic/core@1.6.1(typescript@5.9.3)':
     dependencies:
       '@tmagic/data-source': 1.6.1(@tmagic/core@1.6.1(typescript@5.9.3))(typescript@5.9.3)
-      '@tmagic/dep': 1.6.1(@tmagic/schema@1.6.1(typescript@5.9.3))(@tmagic/utils@1.6.1(@tmagic/schema@1.6.1(typescript@5.9.3))(typescript@5.9.3))(typescript@5.9.3)
+      '@tmagic/dep': 1.6.1(@tmagic/schema@1.6.1(typescript@5.9.3))(@tmagic/utils@1.6.1(@tmagic/schema@1.7.0(typescript@5.9.3))(typescript@5.9.3))(typescript@5.9.3)
       '@tmagic/schema': 1.6.1(typescript@5.9.3)
       '@tmagic/utils': 1.6.1(@tmagic/schema@1.6.1(typescript@5.9.3))(typescript@5.9.3)
       events: 3.3.0
@@ -8314,10 +8272,10 @@ snapshots:
     optionalDependencies:
       typescript: 5.9.3
 
-  '@tmagic/dep@1.6.1(@tmagic/schema@1.6.1(typescript@5.9.3))(@tmagic/utils@1.6.1(@tmagic/schema@1.6.1(typescript@5.9.3))(typescript@5.9.3))(typescript@5.9.3)':
+  '@tmagic/dep@1.6.1(@tmagic/schema@1.6.1(typescript@5.9.3))(@tmagic/utils@1.6.1(@tmagic/schema@1.7.0(typescript@5.9.3))(typescript@5.9.3))(typescript@5.9.3)':
     dependencies:
       '@tmagic/schema': 1.6.1(typescript@5.9.3)
-      '@tmagic/utils': 1.6.1(@tmagic/schema@1.6.1(typescript@5.9.3))(typescript@5.9.3)
+      '@tmagic/utils': 1.6.1(@tmagic/schema@1.7.0(typescript@5.9.3))(typescript@5.9.3)
     optionalDependencies:
       typescript: 5.9.3
 
@@ -8918,6 +8876,7 @@ snapshots:
   '@vue/composition-api@1.7.2(vue@3.5.24(typescript@5.9.3))':
     dependencies:
       vue: 3.5.24(typescript@5.9.3)
+    optional: true
 
   '@vue/devtools-api@6.6.4': {}
 

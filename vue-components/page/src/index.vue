@@ -8,8 +8,8 @@
   ></component>
 </template>
 
-<script lang="ts">
-import { defineComponent, inject, nextTick, type PropType, watch } from 'vue-demi';
+<script lang="ts" setup>
+import { inject, nextTick, watch } from 'vue';
 
 import type TMagicApp from '@tmagic/core';
 import { asyncLoadCss, asyncLoadJs, IS_DSL_NODE_KEY, type MPage } from '@tmagic/core';
@@ -37,64 +37,54 @@ const createJs = (config: MPage) => {
   }
 };
 
-export default defineComponent({
+defineOptions({
   name: 'tmagic-page',
-
-  props: {
-    config: {
-      type: Object as PropType<MPage>,
-      required: true,
-    },
-    model: {
-      type: Object,
-      default: () => ({}),
-    },
-  },
-
-  setup(props) {
-    const app = inject<TMagicApp>('app');
-
-    if (app?.jsEngine === 'browser') {
-      createCss(props.config);
-      createJs(props.config);
-    }
-
-    const containerComponent = useComponent({ componentType: 'container', app });
-
-    const { style, className } = useComponentStatus(props);
-
-    const refresh = () => {
-      window.location.reload();
-    };
-
-    watch(
-      () => props.config,
-      async (config, preConfig) => {
-        const node = useNode({ config: { ...config, [IS_DSL_NODE_KEY]: true } }, app);
-
-        if (config.id !== preConfig?.id) {
-          node?.setInstance({ config: props.config, refresh });
-          node?.emit('created');
-        }
-        await nextTick();
-
-        if (config.id !== preConfig?.id) {
-          node?.emit('mounted');
-          const preNode = useNode({ config: { ...preConfig, [IS_DSL_NODE_KEY]: true } }, app);
-          preNode?.emit('destroy');
-        }
-      },
-      {
-        immediate: true,
-      },
-    );
-
-    return {
-      style,
-      className,
-      containerComponent,
-      IS_DSL_NODE_KEY,
-    };
-  },
 });
+
+const props = withDefaults(
+  defineProps<{
+    config: MPage;
+    model?: Record<string, any>;
+  }>(),
+  {
+    model: () => ({}),
+  },
+);
+
+const app = inject<TMagicApp>('app');
+
+if (app?.jsEngine === 'browser') {
+  createCss(props.config);
+  createJs(props.config);
+}
+
+const containerComponent = useComponent({ componentType: 'container', app });
+
+const { style, className } = useComponentStatus(props);
+
+const refresh = () => {
+  window.location.reload();
+};
+
+watch(
+  () => props.config,
+  async (config, preConfig) => {
+    const node = useNode({ config: { ...config, [IS_DSL_NODE_KEY]: true } }, app);
+
+    if (config.id !== preConfig?.id) {
+      node?.setInstance({ config: props.config, refresh });
+      node?.emit('created');
+    }
+    await nextTick();
+
+    if (config.id !== preConfig?.id) {
+      node?.emit('mounted');
+      const preNode = useNode({ config: { ...preConfig, [IS_DSL_NODE_KEY]: true } }, app);
+      preNode?.emit('destroy');
+    }
+  },
+  {
+    immediate: true,
+  },
+);
 </script>

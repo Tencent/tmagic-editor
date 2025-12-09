@@ -1,4 +1,4 @@
-import { defineComponent, h, inject, type PropType, provide } from 'vue-demi';
+import { defineComponent, h, inject, type PropType, provide } from 'vue';
 
 import type TMagicApp from '@tmagic/core';
 import { Id, IS_DSL_NODE_KEY, MComponent, NODE_CONDS_RESULT_KEY } from '@tmagic/core';

@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0",
+  "version": "1.0.0",
   "name": "@tmagic/vue-page-fragment",
   "type": "module",
   "main": "src/index.ts",
@@ -14,13 +14,13 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "@tmagic/form-schema": "workspace:^",
-    "vue-demi": "^0.14.10"
+    "@tmagic/form-schema": "workspace:^"
   },
   "peerDependencies": {
     "@tmagic/core": "workspace:^",
     "@tmagic/vue-runtime-help": "workspace:^",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vue": ">=3.5.0"
   },
   "peerDependenciesMeta": {
     "typescript": {

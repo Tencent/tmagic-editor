@@ -8,40 +8,29 @@
   ></component>
 </template>
 
-<script lang="ts">
-import { defineComponent, inject, type PropType } from 'vue-demi';
+<script lang="ts" setup>
+import { inject } from 'vue';
 
 import type TMagicApp from '@tmagic/core';
 import { IS_DSL_NODE_KEY, type MPageFragment } from '@tmagic/core';
-import { registerNodeHooks, useComponent, useComponentStatus, useNode } from '@tmagic/vue-runtime-help';
+import {
+  type ComponentProps,
+  registerNodeHooks,
+  useComponent,
+  useComponentStatus,
+  useNode,
+} from '@tmagic/vue-runtime-help';
 
-export default defineComponent({
+defineOptions({
   name: 'tmagic-page-fragment',
-
-  props: {
-    config: {
-      type: Object as PropType<MPageFragment>,
-      required: true,
-    },
-    model: {
-      type: Object,
-      default: () => ({}),
-    },
-  },
-
-  setup(props) {
-    const app = inject<TMagicApp>('app');
-    const node = useNode(props, app);
-    registerNodeHooks(node);
-
-    const containerComponent = useComponent({ componentType: 'container', app });
-    const { style, className } = useComponentStatus(props);
-    return {
-      style,
-      className,
-      containerComponent,
-      IS_DSL_NODE_KEY,
-    };
-  },
 });
+
+const props = defineProps<ComponentProps<MPageFragment>>();
+
+const app = inject<TMagicApp>('app');
+const node = useNode(props, app);
+registerNodeHooks(node);
+
+const containerComponent = useComponent({ componentType: 'container', app });
+const { style, className } = useComponentStatus(props);
 </script>

@@ -2,11 +2,9 @@
   <img :src="config.src" @click="clickHandler" />
 </template>
 
-<script lang="ts">
-import { defineComponent, type PropType } from 'vue-demi';
-
+<script lang="ts" setup>
 import type { Id, MComponent } from '@tmagic/core';
-import { registerNodeHooks, useNode } from '@tmagic/vue-runtime-help';
+import { type ComponentProps, registerNodeHooks, useNode } from '@tmagic/vue-runtime-help';
 
 interface ImgSchema extends Omit<MComponent, 'id'> {
   id?: Id;
@@ -15,35 +13,16 @@ interface ImgSchema extends Omit<MComponent, 'id'> {
   url?: string;
 }
 
-export default defineComponent({
+defineOptions({
   name: 'tmagic-img',
-
-  props: {
-    config: {
-      type: Object as PropType<ImgSchema>,
-      required: true,
-    },
-    iteratorIndex: Array as PropType<number[]>,
-    iteratorContainerId: Array as PropType<Id[]>,
-    containerIndex: Number,
-    pageFragmentContainerId: [String, Number] as PropType<Id>,
-    model: {
-      type: Object,
-      default: () => ({}),
-    },
-  },
-
-  setup(props) {
-    const clickHandler = () => {
-      if (props.config.url) window.location.href = props.config.url;
-    };
-
-    const node = useNode(props);
-    registerNodeHooks(node);
-
-    return {
-      clickHandler,
-    };
-  },
 });
+
+const props = defineProps<ComponentProps<ImgSchema>>();
+
+const clickHandler = () => {
+  if (props.config.url) window.location.href = props.config.url;
+};
+
+const node = useNode(props);
+registerNodeHooks(node);
 </script>
