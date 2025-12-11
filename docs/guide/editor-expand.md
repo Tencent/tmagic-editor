@@ -62,6 +62,59 @@ MenuButton 的[定义](https://github.com/Tencent/tmagic-editor/blob/239b5d3efea
 
 ### 二、左侧菜单栏
 
+左侧菜单栏主要展示组件列表、组件树、代码块、数据源等内容。可以通过 `m-editor` 组件的 [sidebar](/api/editor/props.html#sidebar) `prop` 来进行配置。
+
+#### 1. 自定义左侧面板
+
+可以使用 `sidebar` slot 来完全自定义左侧面板：
+
+```html
+<m-editor>
+  <template #sidebar>
+    <your-sidebar></your-sidebar>
+  </template>
+</m-editor>
+```
+
+#### 2. 扩展组件列表
+
+通过 [componentGroupList](/api/editor/props.html#componentgrouplist) prop 配置组件分组和列表：
+
+```js
+const componentGroupList = [
+  {
+    title: '基础组件',
+    items: [
+      {
+        text: '文本',
+        type: 'text',
+        icon: 'text-icon'
+      },
+      {
+        text: '按钮',
+        type: 'button',
+        icon: 'button-icon'
+      }
+    ]
+  },
+  {
+    title: '业务组件',
+    items: [
+      // 自定义业务组件
+    ]
+  }
+]
+```
+
+#### 3. 组件树扩展
+
+组件树会自动根据页面配置生成，可以通过 `editorService` 监听组件树相关事件：
+
+```js
+editorService.on('select', (node) => {
+  console.log('选中组件:', node);
+});
+```
 
 ### 三、右侧属性配置栏
 
@@ -118,6 +171,50 @@ propsService.usePlugin({
 </m-editor>
 ```
 
-### 四、中间工作区域
-
 ## 行为扩展
+
+### 二、服务扩展
+
+可以通过监听事件和使用插件来扩展 EditorService：
+
+```js
+// 监听编辑器事件
+editorService.on('add', (node) => {
+  console.log('添加组件:', node);
+});
+
+// 使用插件扩展
+editorService.usePlugin({
+  beforeAdd(node) {
+    // 在添加组件前执行
+    return node;
+  },
+  afterAdd(node) {
+    // 在添加组件后执行
+    return node;
+  }
+});
+```
+
+#### 2. PropsService 扩展
+
+自定义属性配置的处理逻辑：
+
+```js
+propsService.usePlugin({
+  // 修改属性配置
+  beforeGetPropsConfig(type) {
+    console.log('获取配置前:', type);
+  },
+  
+  afterGetPropsConfig(config, type) {
+    // 添加自定义配置
+    return config;
+  },
+  
+  // 自定义配置填充逻辑
+  afterFillConfig(config, type) {
+    return config;
+  }
+});
+```

@@ -967,83 +967,316 @@ const updateDragEl = (el, target) => {
 
 - **详情：**
   
-标尺配置
+  画布标尺和参考线的配置选项
+
+- **默认值：** `undefined`
 
 - **类型：** `Partial<GuidesOptions>`
-  
+
+- **示例：**
+
+```html
+<template>
+  <m-editor :guides-options="guidesOptions"></m-editor>
+</template>
+
+<script setup>
+const guidesOptions = {
+  // 标尺刻度单位
+  unit: 1,
+  // 标尺背景色
+  backgroundColor: '#f0f0f0',
+  // 标尺文字颜色
+  textColor: '#333',
+  // 参考线颜色
+  lineColor: '#ff0000',
+};
+</script>
+```
 
 ## disabledPageFragment
 
 - **详情：**
   
-禁用页面片
+  禁用页面片功能
+
+  页面片是可以在多个页面中复用的组件集合
+
+- **默认值：** `false`
 
 - **类型：** `boolean`
-  
+
+- **示例：**
+
+```html
+<template>
+  <m-editor :disabled-page-fragment="true"></m-editor>
+</template>
+```
+
 ## disabledStageOverlay
 
 - **详情：**
   
-禁用双击在浮层中单独编辑选中组件
+  禁用双击在浮层中单独编辑选中组件的功能
+
+  启用时，双击组件可以在浮层中单独编辑，避免其他组件干扰
+
+- **默认值：** `false`
 
 - **类型：** `boolean`
-  
+
+- **示例：**
+
+```html
+<template>
+  <m-editor :disabled-stage-overlay="true"></m-editor>
+</template>
+```
+
 ## disabledShowSrc
 
 - **详情：**
   
-禁用属性配置面板右下角显示源码的按钮
+  禁用属性配置面板右下角"显示源码"的按钮
+
+  该按钮可以查看和编辑组件的 JSON 配置
+
+- **默认值：** `false`
 
 - **类型：** `boolean`
+
+- **示例：**
+
+```html
+<template>
+  <m-editor :disabled-show-src="true"></m-editor>
+</template>
+```
 
 ## disabledDataSource
 
 - **详情：**
   
-禁用数据源
+  禁用数据源功能
+
+  禁用后，左侧面板将不显示数据源选项卡
+
+- **默认值：** `false`
 
 - **类型：** `boolean`
+
+- **示例：**
+
+```html
+<template>
+  <m-editor :disabled-data-source="true"></m-editor>
+</template>
+```
 
 ## disabledCodeBlock
 
 - **详情：**
   
-禁用代码块
+  禁用代码块功能
+
+  禁用后，左侧面板将不显示代码块选项卡
+
+- **默认值：** `false`
 
 - **类型：** `boolean`
+
+- **示例：**
+
+```html
+<template>
+  <m-editor :disabled-code-block="true"></m-editor>
+</template>
+```
 
 ## treeIndent
 
 - **详情：**
   
-已选组件、代码编辑、数据源缩进配置
+  组件树、代码块列表、数据源列表的缩进配置（单位：px）
+
+- **默认值：** `undefined`
 
 - **类型：** `number`
+
+- **示例：**
+
+```html
+<template>
+  <m-editor :tree-indent="20"></m-editor>
+</template>
+```
 
 ## treeNextLevelIndentIncrement
 
 - **详情：**
   
-已选组件、代码编辑、数据源子节点缩进增量配置
+  组件树、代码块列表、数据源列表子节点缩进增量配置（单位：px）
+
+  每一级子节点会在父节点缩进基础上增加该值
+
+- **默认值：** `undefined`
 
 - **类型：** `number`
+
+- **示例：**
+
+```html
+<template>
+  <!-- 第一级缩进20px，第二级缩进35px，第三级缩进50px -->
+  <m-editor :tree-indent="20" :tree-next-level-indent-increment="15"></m-editor>
+</template>
+```
 
 ## customContentMenu
 
 - **详情：**
   
-用于自定义组件树与画布的右键菜单
+  用于自定义组件树与画布的右键菜单
 
-- **类型：** `function`
+  该函数会在显示右键菜单前被调用，接收默认菜单项作为参数，返回最终显示的菜单项
+
+- **默认值：** `(menus) => menus`
+
+- **类型：** `(menus: (MenuButton | MenuComponent)[], data: { node?: MNode; page?: MPage; parent?: MContainer; stage?: StageCore }) => (MenuButton | MenuComponent)[]`
+
+- **示例：**
+
+```html
+<template>
+  <m-editor :custom-content-menu="customContentMenu"></m-editor>
+</template>
+
+<script setup>
+const customContentMenu = (menus, { node }) => {
+  // 为特定类型的组件添加自定义菜单
+  if (node?.type === 'container') {
+    menus.push({
+      type: 'button',
+      text: '清空容器',
+      handler: () => {
+        // 清空容器的逻辑
+      },
+    });
+  }
+  
+  // 可以过滤掉某些菜单项
+  return menus.filter(menu => menu.text !== '删除');
+};
+</script>
+```
+
+## extendFormState
+
+- **详情：**
+  
+  扩展表单状态
+
+  用于在属性表单中注入自定义的状态数据，这些数据可以在表单配置的各个字段为函数时的第一个参数中获取
+
+- **默认值：** `undefined`
+
+- **类型：** `(state: FormState) => Record<string, any> | Promise<Record<string, any>>`
+
+- **示例：**
+
+```html
+<template>
+  <m-editor :extend-form-state="extendFormState"></m-editor>
+</template>
+
+<script setup>
+const extendFormState = async (state) => {
+  // 返回自定义的状态数据
+  return {
+    // 可以是同步数据
+    currentUser: {
+      name: 'Admin',
+      role: 'admin',
+    },
+    // 也可以是异步获取的数据
+    projectConfig: await fetchProjectConfig(),
+  };
+};
+</script>
+```
+
+:::tip
+扩展的状态可以在表单配置中通过 `state` 访问，例如：
+
+```js
+{
+  name: 'title',
+  text: '标题',
+  // 根据扩展的状态动态设置
+  disabled: (state) => state.currentUser.role !== 'admin',
+}
+```
+:::
 
 ## pageBarSortOptions
 
 - **详情：**
   
-页面顺序拖拽配置参数
+  页面标签栏的拖拽排序配置参数
+
+  用于配置页面标签的拖拽排序行为
+
+- **默认值：** `undefined`
+
+- **类型：** [PageBarSortOptions](https://github.com/Tencent/tmagic-editor/blob/master/packages/editor/src/type.ts)
+
+- **示例：**
+
+```html
+<template>
+  <m-editor :page-bar-sort-options="sortOptions"></m-editor>
+</template>
+
+<script setup>
+const sortOptions = {
+  // 是否启用拖拽排序
+  animation: 150,
+  // 拖拽手柄的class
+  handle: '.page-bar-item',
+  // 其他 sortablejs 配置
+};
+</script>
+```
 
 ## pageFilterFunction
 
 - **详情：**
   
-页面搜索函数
+  页面搜索/过滤函数
+
+  用于自定义页面的搜索逻辑，在页面列表中输入关键词时会调用该函数进行过滤
+
+- **默认值：** `undefined`
+
+- **类型：** `(page: MPage | MPageFragment, keyword: string) => boolean`
+
+- **示例：**
+
+```html
+<template>
+  <m-editor :page-filter-function="pageFilterFunction"></m-editor>
+</template>
+
+<script setup>
+const pageFilterFunction = (page, keyword) => {
+  // 自定义搜索逻辑
+  // 不仅搜索页面名称，还搜索页面的其他属性
+  return (
+    page.name?.includes(keyword) ||
+    page.title?.includes(keyword) ||
+    page.id?.includes(keyword)
+  );
+};
+</script>
+```
