@@ -519,14 +519,31 @@ class Editor extends BaseService {
 
     if (!config?.id) throw new Error('没有配置或者配置缺少id值');
 
-    const info = this.getNodeInfo(config.id, false);
+    let info = this.getNodeInfo(config.id, false);
 
     if (!info.node) throw new Error(`获取不到id为${config.id}的节点`);
 
-    const node = toRaw(info.node);
+    let node = toRaw(info.node);
+    let tempConfig = config;
+    if (config._innerModuleEditingInfo) {
+      // 如果是组件内嵌模块的属性修改，则找到组件node进行修改（只能是组件内一层的结构 -- 只找了一个parent）
+      const moduleKey = config._innerModuleEditingInfo.name;
+      const parentNode = toRaw(info.parent);
 
-    let newConfig = await this.toggleFixedPosition(toRaw(config), node, root);
+      const nodeSubModule = (node as any)[moduleKey];
+      if (nodeSubModule) {
+        const newObj: Record<string, any> = {};
+        Object.keys(nodeSubModule).forEach((key) => {
+          newObj[key] = (config as any)[key];
+        });
+        (parentNode as any)[moduleKey] = newObj;
+        tempConfig = parentNode!;
+        node = toRaw(info.parent)!;
+        info = this.getNodeInfo(parentNode!.id, true);
+      }
+    }
 
+    let newConfig = await this.toggleFixedPosition(toRaw(tempConfig), node, root);
     newConfig = mergeWith(cloneDeep(node), newConfig, (objValue, srcValue, key, object: any, source: any) => {
       if (typeof srcValue === 'undefined' && Object.hasOwn(source, key)) {
         return '';
@@ -542,6 +559,14 @@ class Editor extends BaseService {
     });
 
     if (!newConfig.type) throw new Error('配置缺少type值');
+    if (config._innerModuleEditingInfo) {
+      // 如果是组件内嵌模块的属性修改, 不做后面的更新
+      return {
+        oldNode: node,
+        newNode: newConfig,
+        changeRecords,
+      };
+    }
 
     if (newConfig.type === NodeType.ROOT) {
       this.set('root', newConfig as MApp);

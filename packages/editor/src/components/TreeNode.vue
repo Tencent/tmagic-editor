@@ -154,6 +154,12 @@ const expandHandler = () => {
 };
 
 const nodeClickHandler = (event: MouseEvent) => {
+  const { data, parent } = props;
+  if (data.comInnerModule) {
+    data[data.comInnerModule] = parent?.[data.comInnerModule];
+    data.parentId = parent?.id;
+    data.type = parent?.type;
+  }
   treeEmit?.('node-click', event, props.data);
 };
 </script>
