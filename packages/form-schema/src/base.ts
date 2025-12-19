@@ -716,6 +716,7 @@ export interface TableConfig extends FormItem {
   selection?: (mForm: FormState | undefined, data: any) => boolean | boolean | 'single';
   /** 新增的默认行 */
   defaultAdd?: (mForm: FormState | undefined, data: any) => any;
+  copyHandler?: (mForm: FormState | undefined, data: any) => any;
   onSelect?: (mForm: FormState | undefined, data: any) => any;
   defautSort?: SortProp;
   defaultSort?: SortProp;

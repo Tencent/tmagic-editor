@@ -63,7 +63,18 @@ const removeHandler = (index: number) => {
 };
 
 const copyHandler = (index: number) => {
-  const inputs = cloneDeep(props.model[props.name][index]);
+  let inputs = cloneDeep(props.model[props.name][index]);
+
+  if (typeof props.config.copyHandler === 'function') {
+    const modelName = props.name || props.config.name || '';
+    inputs = props.config.copyHandler(mForm, {
+      model: props.model[modelName],
+      prop: props.prop,
+      formValue: mForm?.values,
+      inputs,
+    });
+  }
+
   const { length } = props.model[props.name];
   if (props.sortKey && length) {
     inputs[props.sortKey] = props.model[props.name][length - 1][props.sortKey] - 1;

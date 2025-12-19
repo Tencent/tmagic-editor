@@ -60,6 +60,10 @@ const tableColumns = computed(() => {
       align: item.props?.align,
     };
 
+    if (item.props.type === 'selection') {
+      column.type = 'multiple';
+    }
+
     // 处理自定义单元格渲染
     if (item.cell) {
       column.cell = (h: any, { row, rowIndex }: any) => {

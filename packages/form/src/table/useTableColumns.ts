@@ -101,6 +101,17 @@ export const useTableColumns = (
       });
     }
 
+    if (selection.value) {
+      columns.push({
+        props: {
+          align: 'center',
+          headerAlign: 'center',
+          type: 'selection',
+          width: 45,
+        },
+      });
+    }
+
     let actionFixed: 'left' | 'right' | undefined = props.config.fixed === false ? undefined : 'left';
 
     if (typeof props.config.fixed === 'string' && ['left', 'right'].includes(props.config.fixed)) {
@@ -156,17 +167,6 @@ export const useTableColumns = (
               mForm?.$emit('field-change', newData);
             },
           }),
-      });
-    }
-
-    if (selection.value) {
-      columns.push({
-        props: {
-          align: 'center',
-          headerAlign: 'center',
-          type: 'selection',
-          width: 45,
-        },
       });
     }
 
