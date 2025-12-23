@@ -3,7 +3,7 @@
     <TMagicInput
       v-model="value"
       ref="input"
-      clearable
+      :clearable="config.clearable ?? true"
       :size="size"
       :placeholder="config.placeholder"
       :disabled="disabled"
