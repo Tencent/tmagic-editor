@@ -56,6 +56,13 @@ const codeConfig = computed<GroupListConfig>(() => ({
 
       return Array.isArray(model.codeId) ? model.codeId.join('/') : index;
     }
+
+    const codeContent = codeBlockService.getCodeContentById(model.codeId);
+
+    if (codeContent) {
+      return codeContent.name;
+    }
+
     return model.codeId || index;
   },
   items: [
