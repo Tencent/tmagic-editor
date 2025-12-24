@@ -3,7 +3,7 @@
     <template #header>
       <div>
         <TMagicButton link :disabled="disabled" @click="expandHandler">
-          <TMagicIcon><CaretBottom v-if="expand" /><CaretRight v-else /></TMagicIcon>{{ title }}
+          <TMagicIcon><CaretBottom v-if="expand" /><CaretRight v-else /></TMagicIcon><span v-html="title"></span>
         </TMagicButton>
 
         <TMagicButton
