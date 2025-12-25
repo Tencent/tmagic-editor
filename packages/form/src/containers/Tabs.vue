@@ -26,8 +26,8 @@
         <span>
           {{ filter(tab.title)
           }}<TMagicBadge
-            :hidden="!diffCount[tabIndex]"
-            :value="diffCount[tabIndex]"
+            :hidden="!diffCount[Number(tabIndex)]"
+            :value="diffCount[Number(tabIndex)]"
             class="diff-count-badge"
           ></TMagicBadge>
         </span>
@@ -69,7 +69,7 @@
         :label-width="tab.labelWidth || labelWidth"
         :expand-more="expandMore"
         @change="changeHandler"
-        @addDiffCount="onAddDiffCount(tabIndex)"
+        @addDiffCount="onAddDiffCount(Number(tabIndex))"
       ></Container>
     </component>
   </component>
@@ -195,7 +195,7 @@ const onTabAdd = async () => {
       prop: props.prop,
       config: props.config,
     });
-    emit('change', props.model);
+    emit('change', props.model[props.name]);
   } else {
     const newObj = await initValue(mForm, {
       config: props.config.items,
@@ -237,12 +237,12 @@ const onTabRemove = (tabName: string) => {
       tabClick(mForm, { name: activeTabName.value }, props);
     }
   }
-  emit('change', props.model);
+  emit('change', props.model[props.name]);
   mForm?.$emit('field-change', props.prop, props.model[props.name]);
 };
 
 const changeHandler = (v: any, eventData: ContainerChangeEventData) => {
-  emit('change', props.model, eventData);
+  emit('change', props.name ? props.model[props.name] : props.model, eventData);
 };
 
 // 在tabs组件中收集事件触发次数，即该tab下的差异数
