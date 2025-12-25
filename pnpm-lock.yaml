@@ -497,6 +497,9 @@ importers:
       '@tmagic/form':
         specifier: workspace:*
         version: link:../form
+      '@tmagic/utils':
+        specifier: workspace:*
+        version: link:../utils
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
