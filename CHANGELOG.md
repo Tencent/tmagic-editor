@@ -1,3 +1,21 @@
+## [1.7.3](https://github.com/Tencent/tmagic-editor/compare/v1.7.2...v1.7.3) (2025-12-25)
+
+
+### Bug Fixes
+
+* **editor:** cose-select无法删除 ([b0d8c53](https://github.com/Tencent/tmagic-editor/commit/b0d8c5383b47d5724c8f34501a0376c046f03db1))
+* **form:** 动态tab自定义onTabAdd后出错 ([9d4324d](https://github.com/Tencent/tmagic-editor/commit/9d4324dd6b4656f4b8129bff4ad22eaf4e43a6a2))
+* **table:** 行内编辑无法修改表单 ([98c2e2f](https://github.com/Tencent/tmagic-editor/commit/98c2e2ff1fdd18cbb6a245e55eb6a32f0e2ea164))
+
+
+### Features
+
+* **form,tdesign-vue-next-adapter:** table 多选框放到默认的操作前面,支持配置copy的干预函数 ([5fe91e8](https://github.com/Tencent/tmagic-editor/commit/5fe91e89b77f151f66548e86643eeb45ddac6060))
+* **form:** groud-list title支持html ([2630f00](https://github.com/Tencent/tmagic-editor/commit/2630f00f137ff75de2f84d516067b98c0fb5aefc))
+* **form:** text组件支持配置cleareable ([f0a3966](https://github.com/Tencent/tmagic-editor/commit/f0a39667e19e6fa90f929579024ecee0e16d8d54))
+
+
+
 ## [1.7.2](https://github.com/Tencent/tmagic-editor/compare/v1.7.1...v1.7.2) (2025-12-09)
 
 
