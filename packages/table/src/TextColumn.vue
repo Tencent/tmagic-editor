@@ -2,15 +2,13 @@
   <div v-if="config.type === 'index'">
     {{ config.pageIndex && config.pageSize ? config.pageIndex * config.pageSize + index + 1 : index + 1 }}
   </div>
-  <TMagicForm v-else-if="config.type && editState[index]" label-width="0" :model="editState[index]">
-    <m-form-container
-      :prop="config.prop"
-      :rules="config.rules"
-      :config="config"
-      :name="config.prop"
-      :model="editState[index]"
-    ></m-form-container>
-  </TMagicForm>
+  <MForm
+    v-else-if="(config.type || config.editInlineFormConfig) && editState[index]"
+    label-width="0"
+    :config="config.editInlineFormConfig ?? [config]"
+    :init-values="editState[index]"
+    @change="formChangeHandler"
+  ></MForm>
 
   <TMagicButton
     v-else-if="config.action === 'actionLink' && config.prop"
@@ -46,7 +44,10 @@
 </template>
 
 <script lang="ts" setup>
-import { TMagicButton, TMagicForm, TMagicTag, TMagicTooltip } from '@tmagic/design';
+import { TMagicButton, TMagicTag, TMagicTooltip } from '@tmagic/design';
+import { type ContainerChangeEventData, MForm } from '@tmagic/form';
+import type { FormValue } from '@tmagic/form-schema';
+import { setValueByKeyPath } from '@tmagic/utils';
 
 import { ColumnConfig } from './schema';
 import { formatter } from './utils';
@@ -55,7 +56,7 @@ defineOptions({
   name: 'MTableColumn',
 });
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     config: ColumnConfig;
     editState?: any;
@@ -67,4 +68,14 @@ withDefaults(
     editState: () => ({}),
   },
 );
+
+const formChangeHandler = (v: FormValue, eventData: ContainerChangeEventData) => {
+  if (eventData.changeRecords?.length) {
+    for (const record of eventData.changeRecords) {
+      if (record.propPath) {
+        setValueByKeyPath(record.propPath, record.value, props.editState[props.index]);
+      }
+    }
+  }
+};
 </script>

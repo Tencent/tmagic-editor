@@ -32,14 +32,16 @@
     class="action-btn"
     v-show="editState[index]"
     link
-    type="primary"
+    type="danger"
     size="small"
-    @click="editState[index] = undefined"
+    @click="cancel(index, config)"
     >取消</TMagicButton
   >
 </template>
 
 <script lang="ts" setup>
+import { cloneDeep } from 'lodash-es';
+
 import { TMagicButton, tMagicMessage, TMagicTooltip } from '@tmagic/design';
 
 import { ColumnActionConfig, ColumnConfig } from './schema';
@@ -65,7 +67,10 @@ const props = withDefaults(
   },
 );
 
-const emit = defineEmits(['after-action']);
+const emit = defineEmits<{
+  'after-action': [{ index: number }];
+  'after-action-cancel': [{ index: number }];
+}>();
 
 const display = (fuc: boolean | Function | undefined, row: any) => {
   if (typeof fuc === 'function') {
@@ -97,7 +102,7 @@ const formatter = (fuc: string | Function | undefined, row: any) => {
 const actionHandler = async (action: ColumnActionConfig, row: any, index: number) => {
   await action.before?.(row, index);
   if (action.type === 'edit') {
-    props.editState[index] = row;
+    props.editState[index] = cloneDeep(row);
   } else {
     await action.handler?.(row, index);
   }
@@ -108,31 +113,31 @@ const save = async (index: number, config: ColumnConfig) => {
   const action = config.actions?.find((item) => item.type === 'edit')?.action;
   if (!action) return;
 
-  const data: any = {};
-  const row = props.editState[index];
-  props.columns
-    .filter((item) => item.type)
-    .forEach((column) => {
-      if (column.prop) {
-        data[column.prop] = row[column.prop];
-      }
-    });
-
   const res: any = await action({
-    data,
+    data: props.editState[index],
+    index,
   });
 
   if (res) {
     if (res.ret === 0) {
       tMagicMessage.success('保存成功');
       props.editState[index] = undefined;
-      emit('after-action');
+      emit('after-action', { index });
     } else {
       tMagicMessage.error(res.msg || '保存失败');
     }
   } else {
     props.editState[index] = undefined;
-    emit('after-action');
+    emit('after-action', { index });
   }
+};
+
+const cancel = async (index: number, config: ColumnConfig) => {
+  props.editState[index] = undefined;
+  const cancel = config.actions?.find((item) => item.type === 'edit')?.cancel;
+  if (cancel) {
+    await cancel({ index });
+  }
+  emit('after-action-cancel', { index });
 };
 </script>

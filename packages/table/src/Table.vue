@@ -73,6 +73,7 @@ const props = withDefaults(
 const emit = defineEmits([
   'sort-change',
   'after-action',
+  'after-action-cancel',
   'select',
   'select-all',
   'selection-change',
@@ -102,6 +103,8 @@ const cellRender = (config: ColumnConfig, { row = {}, $index }: any) => {
       rowkeyName: props.rowkeyName,
       editState: editState.value,
       columns: props.columns,
+      onAfterAction: (payload: { index: number }) => emit('after-action', payload),
+      onAfterActionCancel: (payload: { index: number }) => emit('after-action-cancel', payload),
     });
   }
   if (config.type === 'popover') {

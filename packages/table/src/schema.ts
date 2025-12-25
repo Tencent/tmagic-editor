@@ -31,7 +31,8 @@ export interface ColumnActionConfig {
   handler?: (row: any, index: number) => Promise<any> | any;
   before?: (row: any, index: number) => Promise<void> | void;
   after?: (row: any, index: number) => Promise<void> | void;
-  action?: (data: { data: any }) => Promise<void> | void;
+  action?: (data: { data: any; index: number }) => Promise<void> | void;
+  cancel?: (data: { index: number }) => Promise<void> | void;
 }
 
 export interface ColumnConfig<T = any> {
@@ -52,6 +53,7 @@ export interface ColumnConfig<T = any> {
   name?: string;
   showHeader?: boolean;
   table?: ColumnConfig[];
+  editInlineFormConfig?: FormConfig;
   formatter?: 'datetime' | ((item: any, row: T, data: { index: number }) => any);
   popover?: {
     placement?:
