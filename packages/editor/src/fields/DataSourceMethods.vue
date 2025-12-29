@@ -31,7 +31,6 @@ import { type ColumnConfig, MagicTable } from '@tmagic/table';
 
 import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
 import type { CodeParamStatement } from '@editor/type';
-import { getEditorConfig } from '@editor/utils/config';
 
 defineOptions({
   name: 'MFieldsDataSourceMethods',
@@ -119,13 +118,6 @@ const createCodeHandler = () => {
 };
 
 const submitCodeHandler = (value: CodeBlockContent, data: ContainerChangeEventData) => {
-  if (value.content) {
-    // 在保存的时候转换代码内容
-    const parseDSL = getEditorConfig('parseDSL');
-    if (typeof value.content === 'string') {
-      value.content = parseDSL<(..._args: any[]) => any>(value.content);
-    }
-  }
   if (editIndex > -1) {
     emit('change', value, {
       modifyKey: editIndex,

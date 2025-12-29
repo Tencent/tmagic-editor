@@ -217,9 +217,38 @@ const functionConfig = computed<FormConfig>(() => [
   },
 ]);
 
+const parseContent = (content: any) => {
+  if (typeof content === 'string') {
+    // 如果是字符串则转换为函数
+    const parseDSL = getEditorConfig('parseDSL');
+    return parseDSL<(..._args: any[]) => any>(content);
+  }
+  return content;
+};
+
 const submitForm = (values: CodeBlockContent, data: ContainerChangeEventData) => {
   changedValue.value = undefined;
-  emit('submit', values, data);
+
+  emit(
+    'submit',
+    {
+      ...values,
+      content: parseContent(values.content),
+    },
+    {
+      ...data,
+      changeRecords: data.changeRecords?.map((record) => {
+        let { value } = record;
+        if (record.propPath === 'content' && typeof value === 'string') {
+          value = parseContent(value);
+        }
+        return {
+          ...record,
+          value,
+        };
+      }),
+    },
+  );
 };
 
 const errorHandler = (error: any) => {
