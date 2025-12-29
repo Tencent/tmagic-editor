@@ -33,3 +33,4 @@ components.d.ts
 docs/.vitepress/cache
 
 .eslintcache
+.npmrc

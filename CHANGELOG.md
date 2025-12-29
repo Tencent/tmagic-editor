@@ -1,3 +1,12 @@
+## [1.7.4](https://github.com/Tencent/tmagic-editor/compare/v1.7.3...v1.7.4) (2025-12-29)
+
+
+### Bug Fixes
+
+* **editor:** 数据源方法编辑后content变成字符串 ([03b6180](https://github.com/Tencent/tmagic-editor/commit/03b6180a029eda97cdc22654b6da232a17912b49))
+
+
+
 ## [1.7.3](https://github.com/Tencent/tmagic-editor/compare/v1.7.2...v1.7.3) (2025-12-25)
 
 
