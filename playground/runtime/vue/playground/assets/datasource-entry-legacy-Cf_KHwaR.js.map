@@ -1,0 +1,1 @@
+{"version":3,"file":"datasource-entry-legacy-Cf_KHwaR.js","sources":["../../../.tmagic/datasource-entry.ts"],"sourcesContent":["const datasources: Record<string, any> = {};\nexport default datasources;"],"names":[],"mappings":"oFAAyC,CAAA"}
