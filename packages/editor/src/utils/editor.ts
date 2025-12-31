@@ -177,21 +177,45 @@ export const setLayout = (node: MNode, layout: Layout) => {
 };
 
 export const change2Fixed = (node: MNode, root: MApp) => {
+  const style = {
+    ...(node.style || {}),
+  };
+
   const path = getNodePath(node.id, root.items);
   const offset = {
     left: 0,
     top: 0,
   };
 
-  path.forEach((value) => {
-    offset.left = offset.left + globalThis.parseFloat(value.style?.left || 0);
-    offset.top = offset.top + globalThis.parseFloat(value.style?.top || 0);
-  });
+  if (!node.style?.right && isNumber(node.style?.left || 0)) {
+    for (const value of path) {
+      if (value.style?.right || !isNumber(value.style?.left || 0)) {
+        offset.left = 0;
+        break;
+      }
+      offset.left = offset.left + Number(value.style?.left || 0);
+    }
+  }
 
-  return {
-    ...(node.style || {}),
-    ...offset,
-  };
+  if (!node.style?.bottom && isNumber(node.style?.top || 0)) {
+    for (const value of path) {
+      if (value.style?.bottom || !isNumber(value.style?.top || 0)) {
+        offset.top = 0;
+        break;
+      }
+      offset.top = offset.top + Number(value.style?.top || 0);
+    }
+  }
+
+  if (offset.left) {
+    style.left = offset.left;
+  }
+
+  if (offset.top) {
+    style.top = offset.top;
+  }
+
+  return style;
 };
 
 export const Fixed2Other = async (
@@ -204,14 +228,28 @@ export const Fixed2Other = async (
   const offset = {
     left: cur?.style?.left || 0,
     top: cur?.style?.top || 0,
-    right: '',
-    bottom: '',
   };
 
-  path.forEach((value) => {
-    offset.left = offset.left - globalThis.parseFloat(value.style?.left || 0);
-    offset.top = offset.top - globalThis.parseFloat(value.style?.top || 0);
-  });
+  if (!node.style?.right && isNumber(node.style?.left || 0)) {
+    for (const value of path) {
+      if (value.style?.right || !isNumber(value.style?.left || 0)) {
+        offset.left = 0;
+        break;
+      }
+      offset.left = offset.left - Number(value.style?.left || 0);
+    }
+  }
+
+  if (!node.style?.bottom && isNumber(node.style?.top || 0)) {
+    for (const value of path) {
+      if (value.style?.bottom || !isNumber(value.style?.top || 0)) {
+        offset.top = 0;
+        break;
+      }
+      offset.top = offset.top - Number(value.style?.top || 0);
+    }
+  }
+
   const style = node.style || {};
 
   const parent = path.pop();
@@ -221,9 +259,16 @@ export const Fixed2Other = async (
 
   const layout = await getLayout(parent);
   if (layout !== Layout.RELATIVE) {
+    if (offset.left) {
+      style.left = offset.left;
+    }
+
+    if (offset.top) {
+      style.top = offset.top;
+    }
+
     return {
       ...style,
-      ...offset,
       position: 'absolute',
     };
   }
