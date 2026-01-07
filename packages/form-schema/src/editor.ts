@@ -43,6 +43,7 @@ export interface CodeConfig extends FormItem {
     minRows?: number;
     maxRows?: number;
   };
+  mFormItemType?: string;
 }
 
 export interface CodeLinkConfig extends FormItem {

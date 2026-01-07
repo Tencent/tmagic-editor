@@ -32,6 +32,7 @@
     <CodeEditor
       v-if="showSrc"
       class="m-editor-props-panel-src-code"
+      editor-custom-type="m-editor-props-panel-src-code"
       :height="`${editorContentHeight}px`"
       :init-values="codeValueKey ? values[codeValueKey] : values"
       :options="codeOptions"

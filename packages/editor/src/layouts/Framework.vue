@@ -7,7 +7,13 @@
     <slot name="content-before"></slot>
 
     <slot name="src-code" v-if="showSrc">
-      <CodeEditor class="m-editor-content" :init-values="root" :options="codeOptions" @save="saveCode"></CodeEditor>
+      <CodeEditor
+        class="m-editor-content"
+        editor-custom-type="m-editor-content"
+        :init-values="root"
+        :options="codeOptions"
+        @save="saveCode"
+      ></CodeEditor>
     </slot>
 
     <SplitView

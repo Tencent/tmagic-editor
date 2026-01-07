@@ -1,5 +1,5 @@
 <template>
-  <div :class="`magic-code-editor`">
+  <div class="magic-code-editor">
     <Teleport to="body" :disabled="!fullScreen">
       <div :class="{ 'magic-code-editor-wrapper': true, 'full-screen': fullScreen }" :style="{ height: computeHeight }">
         <TMagicButton
@@ -47,6 +47,7 @@ const props = withDefaults(
       minRows?: number;
       maxRows?: number;
     };
+    editorCustomType?: string;
   }>(),
   {
     initValues: '',
@@ -63,6 +64,7 @@ const props = withDefaults(
 const emit = defineEmits(['initd', 'save']);
 
 const autoHeight = ref<string>('');
+let cachedExtraHeight: number | null = null;
 
 const computeHeight = computed(() => {
   if (fullScreen.value) {
@@ -80,6 +82,41 @@ const computeHeight = computed(() => {
   return '100%';
 });
 
+const calculateExtraHeight = (): number => {
+  let extraHeight = 10; // 默认值
+
+  if (vsEditor && codeEditorEl.value) {
+    try {
+      // 获取编辑器容器的总高度和内容区域高度
+      const editorElement = codeEditorEl.value.querySelector('.monaco-editor');
+      const scrollableElement = codeEditorEl.value.querySelector('.monaco-scrollable-element');
+
+      if (editorElement && scrollableElement) {
+        const editorRect = editorElement.getBoundingClientRect();
+        const scrollableRect = scrollableElement.getBoundingClientRect();
+
+        // 计算编辑器的边框、内边距等额外高度
+        extraHeight = Math.max(editorRect.height - scrollableRect.height, 0);
+
+        // 如果无法获取到有效的差值，使用编辑器配置中的相关选项
+        if (extraHeight === 0) {
+          const editorOptions = vsEditor.getOptions();
+          const scrollBeyondLastLine = editorOptions.get(monaco.editor.EditorOption.scrollBeyondLastLine);
+          const padding = editorOptions.get(monaco.editor.EditorOption.padding);
+          const lineHeight = editorOptions.get(monaco.editor.EditorOption.lineHeight) || 20;
+
+          extraHeight = (scrollBeyondLastLine ? lineHeight : 0) + (padding?.top || 0) + (padding?.bottom || 0) + 10; // 基础边距
+        }
+      }
+    } catch (error) {
+      // 如果获取失败，保持默认值
+      console.warn('Failed to calculate editor extra height:', error);
+    }
+  }
+
+  return extraHeight;
+};
+
 const setAutoHeight = (v = '') => {
   let lines = Math.max(v.split('\n').length, props.autosize?.minRows || 1);
   if (v) {
@@ -95,7 +132,12 @@ const setAutoHeight = (v = '') => {
     lineHeight = editorOptions.get(monaco.editor.EditorOption.lineHeight) || 20;
   }
 
-  const newHeight = `${lines * lineHeight + 10}px`;
+  // 获取缓存的额外高度，如果没有缓存则计算并缓存
+  if (cachedExtraHeight === null) {
+    cachedExtraHeight = calculateExtraHeight();
+  }
+
+  const newHeight = `${lines * lineHeight + cachedExtraHeight}px`;
 
   // 只有当高度真正改变时才更新
   if (autoHeight.value !== newHeight) {
@@ -210,10 +252,14 @@ const init = async () => {
     await nextTick();
   }
 
+  // 重置缓存的额外高度，因为编辑器重新初始化
+  cachedExtraHeight = null;
+
   const options = {
     value: values.value,
     language: props.language,
     theme: 'vs-dark',
+    editorCustomType: props.editorCustomType,
     ...props.options,
   };
 
@@ -297,6 +343,9 @@ onBeforeUnmount(() => {
 
   vsEditor = null;
   vsDiffEditor = null;
+
+  // 重置缓存
+  cachedExtraHeight = null;
 });
 onUnmounted(() => {
   codeEditorEl.value?.removeEventListener('keydown', handleKeyDown);

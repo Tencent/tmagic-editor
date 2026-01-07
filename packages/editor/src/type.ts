@@ -123,12 +123,12 @@ export interface EditorInstallOptions {
   customCreateMonacoEditor: (
     monaco: typeof Monaco,
     codeEditorEl: HTMLElement,
-    options: Monaco.editor.IStandaloneEditorConstructionOptions,
+    options: Monaco.editor.IStandaloneEditorConstructionOptions & { editorCustomType?: string },
   ) => Monaco.editor.IStandaloneCodeEditor;
   customCreateMonacoDiffEditor: (
     monaco: typeof Monaco,
     codeEditorEl: HTMLElement,
-    options: Monaco.editor.IStandaloneEditorConstructionOptions,
+    options: Monaco.editor.IStandaloneEditorConstructionOptions & { editorCustomType?: string },
   ) => Monaco.editor.IStandaloneDiffEditor;
   [key: string]: any;
 }

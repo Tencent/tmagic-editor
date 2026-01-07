@@ -9,6 +9,7 @@
     }"
     :autosize="config.autosize"
     :parse="config.parse"
+    :editor-custom-type="config.mFormItemType"
     @save="save"
   ></MagicCodeEditor>
 </template>

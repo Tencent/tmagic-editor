@@ -37,8 +37,9 @@
 
     <MagicCodeEditor
       v-if="config.advanced && showCode"
-      :init-values="model[name]"
+      editor-custom-type="m-fields-key-value"
       language="javascript"
+      :init-values="model[name]"
       :options="{
         readOnly: disabled,
       }"

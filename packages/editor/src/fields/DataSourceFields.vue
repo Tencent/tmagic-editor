@@ -234,6 +234,7 @@ const dataSourceFieldsConfig: FormConfig = [
     name: 'defaultValue',
     text: '默认值',
     parse: true,
+    mFormItemType: 'data-source-field-defaultValue',
     type: (mForm: FormState | undefined, { model }: any) => {
       if (model.type === 'number') return 'number';
       if (model.type === 'boolean') return 'select';
