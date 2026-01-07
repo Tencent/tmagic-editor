@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { readonly } from 'vue';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { cloneDeep } from 'lodash-es';
@@ -209,10 +210,10 @@ export const filterFunction = <T = any>(
 ) => {
   if (typeof config === 'function') {
     return (config as FilterFunction<T>)(mForm, {
-      values: mForm?.initValues || {},
-      model: props.model,
-      parent: mForm?.parentValues || {},
-      formValue: mForm?.values || props.model,
+      values: readonly(mForm?.initValues || {}),
+      model: readonly(props.model),
+      parent: readonly(mForm?.parentValues || {}),
+      formValue: readonly(mForm?.values || props.model),
       prop: props.prop,
       config: props.config,
       index: props.index,
