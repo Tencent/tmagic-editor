@@ -43,6 +43,7 @@ interface DefaultItem {
   type: string;
   filter: string;
   multiple: boolean;
+  names?: string[];
 }
 
 const isTableSelect = (type?: string | TypeFunction) =>
@@ -174,7 +175,10 @@ export const createValues = function (
   return value;
 };
 
-const getDefaultValue = function (mForm: FormState | undefined, { defaultValue, type, filter, multiple }: DefaultItem) {
+const getDefaultValue = function (
+  mForm: FormState | undefined,
+  { defaultValue, type, filter, multiple, names }: DefaultItem,
+) {
   if (typeof defaultValue === 'function') {
     return defaultValue(mForm);
   }
@@ -197,6 +201,10 @@ const getDefaultValue = function (mForm: FormState | undefined, { defaultValue, 
   }
 
   if (multiple || type === 'number-range') {
+    return [];
+  }
+
+  if (type === 'daterange' && !names) {
     return [];
   }
 
