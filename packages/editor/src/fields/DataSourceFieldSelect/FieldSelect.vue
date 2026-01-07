@@ -72,12 +72,12 @@ import { Edit, View } from '@element-plus/icons-vue';
 import type { DataSourceFieldType } from '@tmagic/core';
 import { getDesignConfig, TMagicButton, TMagicCascader, TMagicSelect, TMagicTooltip } from '@tmagic/design';
 import { type FilterFunction, filterFunction, type FormState, type SelectOption } from '@tmagic/form';
-import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX } from '@tmagic/utils';
+import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX, removeDataSourceFieldPrefix } from '@tmagic/utils';
 
 import MIcon from '@editor/components/Icon.vue';
 import { useServices } from '@editor/hooks/use-services';
 import { type EventBus, SideItemKey } from '@editor/type';
-import { getCascaderOptionsFromFields, removeDataSourceFieldPrefix } from '@editor/utils';
+import { getCascaderOptionsFromFields } from '@editor/utils';
 
 const props = defineProps<{
   /**

@@ -344,6 +344,7 @@ export interface HtmlField extends FormItem {
 export interface DisplayConfig extends FormItem {
   type: 'display';
   initValue?: string | number | boolean;
+  displayText: FilterFunction<string> | string;
 }
 
 /** 文本输入框 */

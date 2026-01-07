@@ -27,7 +27,7 @@ import {
 } from '@tmagic/form';
 
 import { useServices } from '@editor/hooks/use-services';
-import { getCascaderOptionsFromFields } from '@editor/utils';
+import { getCascaderOptionsFromFields, getFieldType } from '@editor/utils';
 
 defineOptions({
   name: 'm-fields-display-conds',
@@ -45,6 +45,22 @@ const { dataSourceService } = useServices();
 const mForm = inject<FormState | undefined>('mForm');
 
 const parentFields = computed(() => filterFunction<string[]>(mForm, props.config.parentFields, props) || []);
+
+const fieldOnChange = (_formState: FormState | undefined, v: string[], { model }: { model: Record<string, any> }) => {
+  const [id, ...fieldNames] = [...parentFields.value, ...v];
+  const ds = dataSourceService.getDataSourceById(id);
+  const type = getFieldType(ds, fieldNames);
+  if (type === 'number') {
+    model.value = Number(model.value);
+  } else if (type === 'boolean') {
+    model.value = Boolean(model.value);
+  } else if (type === 'null') {
+    model.value = null;
+  } else {
+    model.value = `${model.value}`;
+  }
+  return v;
+};
 
 const config = computed<GroupListConfig>(() => ({
   type: 'groupList',
@@ -80,6 +96,7 @@ const config = computed<GroupListConfig>(() => ({
               value: 'key',
               label: '字段',
               checkStrictly: false,
+              onChange: fieldOnChange,
             }
           : {
               type: 'data-source-field-select',
@@ -88,6 +105,7 @@ const config = computed<GroupListConfig>(() => ({
               label: '字段',
               checkStrictly: false,
               dataSourceFieldType: ['string', 'number', 'boolean', 'any'],
+              onChange: fieldOnChange,
             },
         {
           type: 'cond-op-select',
@@ -102,18 +120,10 @@ const config = computed<GroupListConfig>(() => ({
           items: [
             {
               name: 'value',
-              type: (mForm, { model }) => {
+              type: (_mForm, { model }) => {
                 const [id, ...fieldNames] = [...parentFields.value, ...model.field];
-
                 const ds = dataSourceService.getDataSourceById(id);
-
-                let fields = ds?.fields || [];
-                let type = '';
-                (fieldNames || []).forEach((fieldName: string) => {
-                  const field = fields.find((f) => f.name === fieldName);
-                  fields = field?.fields || [];
-                  type = field?.type || '';
-                });
+                const type = getFieldType(ds, fieldNames);
 
                 if (type === 'number') {
                   return 'number';
@@ -123,13 +133,23 @@ const config = computed<GroupListConfig>(() => ({
                   return 'select';
                 }
 
+                if (type === 'null') {
+                  return 'display';
+                }
+
                 return 'text';
               },
               options: [
                 { text: 'true', value: true },
                 { text: 'false', value: false },
               ],
-              display: (vm, { model }) => !['between', 'not_between'].includes(model.op),
+              display: (_mForm, { model }) => !['between', 'not_between'].includes(model.op),
+              displayText: (_mForm: FormState | undefined, { model }: any) => {
+                if (model.value === null) {
+                  return 'null';
+                }
+                return model.value;
+              },
             },
             {
               name: 'range',

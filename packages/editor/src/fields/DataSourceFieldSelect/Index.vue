@@ -48,11 +48,10 @@ import { Coin } from '@element-plus/icons-vue';
 import { DataSchema } from '@tmagic/core';
 import { TMagicButton, tMagicMessage, TMagicTooltip } from '@tmagic/design';
 import type { ContainerChangeEventData, DataSourceFieldSelectConfig, FieldProps, FormState } from '@tmagic/form';
-import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX } from '@tmagic/utils';
+import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX, removeDataSourceFieldPrefix } from '@tmagic/utils';
 
 import MIcon from '@editor/components/Icon.vue';
 import { useServices } from '@editor/hooks/use-services';
-import { removeDataSourceFieldPrefix } from '@editor/utils';
 
 import FieldSelect from './FieldSelect.vue';
 

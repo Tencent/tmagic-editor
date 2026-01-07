@@ -1,11 +1,6 @@
 import { DataSchema, DataSourceFieldType, DataSourceSchema } from '@tmagic/core';
 import { CascaderOption, FormConfig, FormState } from '@tmagic/form';
-import {
-  DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX,
-  dataSourceTemplateRegExp,
-  getKeysArray,
-  isNumber,
-} from '@tmagic/utils';
+import { dataSourceTemplateRegExp, getKeysArray, isNumber } from '@tmagic/utils';
 
 import BaseFormConfig from './formConfigs/base';
 import HttpFormConfig from './formConfigs/http';
@@ -211,41 +206,44 @@ export const getCascaderOptionsFromFields = (
   fields: DataSchema[] = [],
   dataSourceFieldType: DataSourceFieldType[] = ['any'],
 ): CascaderOption[] => {
-  const child: CascaderOption[] = [];
-  fields.forEach((field) => {
-    if (!dataSourceFieldType.length) {
-      dataSourceFieldType.push('any');
-    }
+  const typeSet = new Set(dataSourceFieldType.length ? dataSourceFieldType : ['any']);
+  const includesAny = typeSet.has('any');
 
-    let children: CascaderOption[] = [];
-    if (field.type && ['any', 'array', 'object'].includes(field.type)) {
-      children = getCascaderOptionsFromFields(field.fields, dataSourceFieldType);
-    }
+  const result: CascaderOption[] = [];
 
-    const item = {
-      label: `${field.title || field.name}(${field.type})`,
-      value: field.name,
-      children,
-    };
-
+  for (const field of fields) {
     const fieldType = field.type || 'any';
-    if (dataSourceFieldType.includes('any') || dataSourceFieldType.includes(fieldType)) {
-      child.push(item);
-      return;
-    }
+    const isContainerType = fieldType === 'any' || fieldType === 'array' || fieldType === 'object';
 
-    if (!dataSourceFieldType.includes(fieldType) && !['array', 'object', 'any'].includes(fieldType)) {
-      return;
-    }
+    const children = isContainerType ? getCascaderOptionsFromFields(field.fields, dataSourceFieldType) : [];
 
-    if (!children.length && ['object', 'array', 'any'].includes(field.type || '')) {
-      return;
-    }
+    const matchesType = includesAny || typeSet.has(fieldType);
 
-    child.push(item);
-  });
-  return child;
+    if (matchesType || (isContainerType && children.length)) {
+      result.push({
+        label: `${field.title || field.name}(${field.type})`,
+        value: field.name,
+        children,
+      });
+    }
+  }
+
+  return result;
 };
 
-export const removeDataSourceFieldPrefix = (id?: string) =>
-  id?.replace(DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX, '') || '';
+export const getFieldType = (ds: DataSourceSchema | undefined, fieldNames: string[]) => {
+  let fields = ds?.fields;
+  let type = '';
+
+  for (const fieldName of fieldNames) {
+    if (!fields?.length) return '';
+
+    const field = fields.find((f) => f.name === fieldName);
+    if (!field) return '';
+
+    type = field.type || '';
+    fields = field.fields;
+  }
+
+  return type;
+};

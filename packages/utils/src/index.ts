@@ -635,3 +635,6 @@ export const isValueIncludeDataSource = (value: any) => {
   }
   return false;
 };
+
+export const removeDataSourceFieldPrefix = (id?: string) =>
+  id?.replace(DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX, '') || '';

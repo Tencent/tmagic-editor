@@ -33,7 +33,7 @@ import { getDesignConfig, TMagicSelect } from '@tmagic/design';
 import type { CondOpSelectConfig, FieldProps } from '@tmagic/form';
 
 import { useServices } from '@editor/hooks/use-services';
-import { arrayOptions, eqOptions, numberOptions } from '@editor/utils';
+import { arrayOptions, eqOptions, getFieldType, numberOptions } from '@editor/utils';
 
 defineOptions({
   name: 'MFieldsCondOpSelect',
@@ -54,19 +54,13 @@ const options = computed(() => {
 
   const ds = dataSourceService.getDataSourceById(id);
 
-  let fields = ds?.fields || [];
-  let type = '';
-  (fieldNames || []).forEach((fieldName: string) => {
-    const field = fields.find((f) => f.name === fieldName);
-    fields = field?.fields || [];
-    type = field?.type || '';
-  });
+  const type = getFieldType(ds, fieldNames);
 
   if (type === 'array') {
     return arrayOptions;
   }
 
-  if (type === 'boolean') {
+  if (type === 'boolean' || type === 'null') {
     return [
       { text: '是', value: 'is' },
       { text: '不是', value: 'not' },

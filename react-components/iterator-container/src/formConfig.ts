@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX, NODE_CONDS_KEY } from '@tmagic/core';
+import { NODE_CONDS_KEY, removeDataSourceFieldPrefix } from '@tmagic/core';
 import { defineFormConfig } from '@tmagic/form-schema';
 
 export default defineFormConfig([
@@ -29,7 +29,7 @@ export default defineFormConfig([
     onChange: (_vm: any, v: string[] = [], { setModel }: any) => {
       if (Array.isArray(v) && v.length > 1) {
         const [dsId, ...keys] = v;
-        setModel('dsField', [dsId.replace(DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX, ''), ...keys]);
+        setModel('dsField', [removeDataSourceFieldPrefix(dsId), ...keys]);
       } else {
         setModel('dsField', []);
       }
