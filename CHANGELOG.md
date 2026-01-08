@@ -1,3 +1,21 @@
+## [1.7.5](https://github.com/Tencent/tmagic-editor/compare/v1.7.4...v1.7.5) (2026-01-08)
+
+
+### Bug Fixes
+
+* **editor:** 切换固定定位后坐标转换仅支持left,top为数字的情况 ([3cfec95](https://github.com/Tencent/tmagic-editor/commit/3cfec956126e55974f12d16215a354cba0de2d5a))
+* **editor:** 显示条件中选中的字段类型发生时,值对应做类型转换 ([5267381](https://github.com/Tencent/tmagic-editor/commit/5267381ebf1600467332d7d07f0eed8caf1a3b3b))
+* **form:** daterange默认值 ([5f57d62](https://github.com/Tencent/tmagic-editor/commit/5f57d620da58de85e7b38883c3e1ad0087a9760a))
+* **form:** 初始值为0时会丢失 ([8956035](https://github.com/Tencent/tmagic-editor/commit/8956035e4171a5faff7a75bd89a868e3e2b5d831))
+
+
+### Features
+
+* **editor:** customCreateMonacoEditor options中新增editorCustomType,可以用于创建不同的editor ([cfaaaad](https://github.com/Tencent/tmagic-editor/commit/cfaaaad66e47450f822a31159c75e1bb25f60838))
+* **form:** type配置为函数时,参数中的model等对象设置层readonly ([df61157](https://github.com/Tencent/tmagic-editor/commit/df611571c7643d8e5ca7402fb42aee85d265bc0c))
+
+
+
 ## [1.7.4](https://github.com/Tencent/tmagic-editor/compare/v1.7.3...v1.7.4) (2025-12-29)
 
 
