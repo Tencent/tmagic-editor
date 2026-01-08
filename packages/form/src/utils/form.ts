@@ -46,8 +46,8 @@ interface DefaultItem {
   names?: string[];
 }
 
-const isTableSelect = (type?: string | TypeFunction) =>
-  typeof type === 'string' && ['table-select', 'tableSelect'].includes(type);
+const TABLE_SELECT_TYPES = new Set(['table-select', 'tableSelect']);
+const isTableSelect = (type?: string | TypeFunction) => typeof type === 'string' && TABLE_SELECT_TYPES.has(type);
 
 const asyncLoadConfig = (value: FormValue, initValue: FormValue, { asyncLoad, name, type }: HtmlField) => {
   // 富文本配置了异步加载
@@ -57,9 +57,15 @@ const asyncLoadConfig = (value: FormValue, initValue: FormValue, { asyncLoad, na
   }
 };
 
-const isMultipleValue = (type?: string | TypeFunction) =>
-  typeof type === 'string' &&
-  ['checkbox-group', 'checkboxGroup', 'table', 'cascader', 'group-list', 'groupList'].includes(type);
+const MULTIPLE_VALUE_TYPES = new Set([
+  'checkbox-group',
+  'checkboxGroup',
+  'table',
+  'cascader',
+  'group-list',
+  'groupList',
+]);
+const isMultipleValue = (type?: string | TypeFunction) => typeof type === 'string' && MULTIPLE_VALUE_TYPES.has(type);
 
 const initItemsValue = (
   mForm: FormState | undefined,
@@ -309,7 +315,8 @@ export const datetimeFormatter = (
     let time: string | number;
     if (['x', 'timestamp'].includes(format)) {
       time = dayjs(Number.isNaN(Number(v)) ? v : Number(v)).valueOf();
-    } else if ((typeof v === 'string' && v.includes('Z')) || v.constructor === Date) {
+    } else if ((typeof v === 'string' && v.includes('Z')) || v instanceof Date) {
+      // dayjs.extend 内部有防重复机制 (plugin.$i)，无需额外判断
       dayjs.extend(utc);
       // UTC字符串时间或Date对象格式化为北京时间
       time = dayjs(v).utcOffset(8).format(format);
@@ -325,10 +332,10 @@ export const datetimeFormatter = (
   return defaultValue;
 };
 
-export const getDataByPage = (data: any[] = [], pagecontext: number, pagesize: number) =>
-  data.filter(
-    (item: any, index: number) => index >= pagecontext * pagesize && index + 1 <= (pagecontext + 1) * pagesize,
-  );
+export const getDataByPage = (data: any[] = [], pagecontext: number, pagesize: number) => {
+  const start = pagecontext * pagesize;
+  return data.slice(start, start + pagesize);
+};
 
 export const sortArray = (data: any[], newIndex: number, oldIndex: number, sortKey?: string) => {
   if (newIndex === oldIndex) {
@@ -339,7 +346,9 @@ export const sortArray = (data: any[], newIndex: number, oldIndex: number, sortK
     return data;
   }
 
-  const newData = data.toSpliced(newIndex, 0, ...data.splice(oldIndex, 1));
+  // 先取出要移动的元素，再使用 toSpliced 避免修改原数组
+  const item = data[oldIndex];
+  const newData = data.toSpliced(oldIndex, 1).toSpliced(newIndex, 0, item);
 
   if (sortKey) {
     for (let i = newData.length - 1, v = 0; i >= 0; i--, v++) {
@@ -352,8 +361,8 @@ export const sortArray = (data: any[], newIndex: number, oldIndex: number, sortK
 
 export const sortChange = (data: any[], { prop, order }: SortProp) => {
   if (order === 'ascending') {
-    data = data.sort((a: any, b: any) => a[prop] - b[prop]);
+    data.sort((a: any, b: any) => a[prop] - b[prop]);
   } else if (order === 'descending') {
-    data = data.sort((a: any, b: any) => b[prop] - a[prop]);
+    data.sort((a: any, b: any) => b[prop] - a[prop]);
   }
 };

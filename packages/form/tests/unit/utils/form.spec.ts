@@ -18,7 +18,17 @@
 
 import { describe, expect, test } from 'vitest';
 import type { FormState } from '@form/index';
-import { datetimeFormatter, display, filterFunction, getRules, initValue, sortArray } from '@form/utils/form';
+import {
+  createValues,
+  datetimeFormatter,
+  display,
+  filterFunction,
+  getDataByPage,
+  getRules,
+  initValue,
+  sortArray,
+  sortChange,
+} from '@form/utils/form';
 
 // form state mock 数据
 const mForm: FormState = {
@@ -69,6 +79,10 @@ describe('display', () => {
     expect(display(mForm, () => true, {})).toBe(true);
     expect(display(mForm, () => false, {})).toBe(false);
     expect(display(mForm, () => 1, {})).toBe(1);
+  });
+
+  test('config 为 expand', () => {
+    expect(display(mForm, 'expand', {})).toBe('expand');
   });
 });
 
@@ -418,5 +432,137 @@ describe('sortArray', () => {
     // 索引超出范围应该由调用方处理，这里测试函数的行为
     expect(sortArray(data, 5, 1)).toEqual(data);
     expect(sortArray(data, 1, 5)).toEqual(data);
+  });
+
+  test('不修改原数组', () => {
+    const data = [1, 2, 3, 4, 5];
+    const original = [...data];
+
+    sortArray(data, 0, 3);
+
+    expect(data).toEqual(original);
+  });
+
+  test('返回的新数组与原数组不是同一引用', () => {
+    const data = [1, 2, 3, 4, 5];
+
+    const result = sortArray(data, 0, 3);
+
+    expect(result).not.toBe(data);
+  });
+});
+
+describe('getDataByPage', () => {
+  test('获取第一页数据', () => {
+    const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+    expect(getDataByPage(data, 0, 3)).toEqual([1, 2, 3]);
+  });
+
+  test('获取中间页数据', () => {
+    const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+    expect(getDataByPage(data, 1, 3)).toEqual([4, 5, 6]);
+  });
+
+  test('获取最后一页数据（不足一页）', () => {
+    const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+    expect(getDataByPage(data, 3, 3)).toEqual([10]);
+  });
+
+  test('页码超出范围返回空数组', () => {
+    const data = [1, 2, 3, 4, 5];
+
+    expect(getDataByPage(data, 10, 3)).toEqual([]);
+  });
+
+  test('空数组返回空数组', () => {
+    expect(getDataByPage([], 0, 10)).toEqual([]);
+  });
+
+  test('不修改原数组', () => {
+    const data = [1, 2, 3, 4, 5];
+    const original = [...data];
+
+    getDataByPage(data, 0, 2);
+
+    expect(data).toEqual(original);
+  });
+
+  test('默认空数组参数', () => {
+    expect(getDataByPage(undefined as any, 0, 10)).toEqual([]);
+  });
+});
+
+describe('sortChange', () => {
+  test('升序排序', () => {
+    const data = [{ value: 3 }, { value: 1 }, { value: 2 }];
+
+    sortChange(data, { prop: 'value', order: 'ascending' });
+
+    expect(data).toEqual([{ value: 1 }, { value: 2 }, { value: 3 }]);
+  });
+
+  test('降序排序', () => {
+    const data = [{ value: 1 }, { value: 3 }, { value: 2 }];
+
+    sortChange(data, { prop: 'value', order: 'descending' });
+
+    expect(data).toEqual([{ value: 3 }, { value: 2 }, { value: 1 }]);
+  });
+
+  test('无效的order不进行排序', () => {
+    const data = [{ value: 3 }, { value: 1 }, { value: 2 }];
+    const original = [{ value: 3 }, { value: 1 }, { value: 2 }];
+
+    sortChange(data, { prop: 'value', order: '' as any });
+
+    expect(data).toEqual(original);
+  });
+
+  test('空数组不报错', () => {
+    const data: any[] = [];
+
+    expect(() => sortChange(data, { prop: 'value', order: 'ascending' })).not.toThrow();
+  });
+
+  test('原地修改数组', () => {
+    const data = [{ value: 2 }, { value: 1 }];
+
+    sortChange(data, { prop: 'value', order: 'ascending' });
+
+    expect(data[0].value).toBe(1);
+    expect(data[1].value).toBe(2);
+  });
+});
+
+describe('createValues', () => {
+  test('config为空数组返回空对象', () => {
+    expect(createValues(mForm, [], {})).toEqual({});
+  });
+
+  test('config不是数组返回传入的value', () => {
+    const value = { a: 1 };
+
+    expect(createValues(mForm, undefined as any, {}, value)).toEqual(value);
+  });
+
+  test('处理简单的text配置', () => {
+    const config = [{ type: 'text', name: 'field1' }];
+    const initValues = { field1: 'hello' };
+
+    const result = createValues(mForm, config, initValues, {});
+
+    expect(result.field1).toBe('hello');
+  });
+
+  test('处理number类型转换', () => {
+    const config = [{ type: 'number', name: 'num' }];
+    const initValues = { num: '123' };
+
+    const result = createValues(mForm, config, initValues, {});
+
+    expect(result.num).toBe(123);
   });
 });
