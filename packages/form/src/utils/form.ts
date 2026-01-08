@@ -115,7 +115,7 @@ const initValueItem = function (
   const { type, name } = item as ChildConfig;
 
   if (isTableSelect(type) && name) {
-    value[name] = initValue[name] || '';
+    value[name] = initValue[name] ?? '';
     return value;
   }
 
@@ -124,18 +124,14 @@ const initValueItem = function (
   // 这种情况比较多，提前结束
   if (name && !items && typeof initValue?.[name] !== 'undefined') {
     if (typeof value[name] === 'undefined') {
-      if (type === 'number') {
-        value[name] = Number(initValue[name]);
-      } else {
-        value[name] = typeof initValue[name] === 'object' ? initValue[name] : initValue[name];
-      }
+      value[name] = type === 'number' ? Number(initValue[name]) : initValue[name];
     }
 
     return value;
   }
 
   if (names) {
-    return names.forEach((n: string) => (value[n] = initValue[n] || ''));
+    return names.forEach((n: string) => (value[n] = initValue[n] ?? ''));
   }
 
   if (!name) {
