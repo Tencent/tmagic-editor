@@ -411,3 +411,28 @@ export const isIncludeDataSource = (node: MNode, oldNode: MNode) => {
 
   return isIncludeDataSource;
 };
+
+export const buildChangeRecords = (value: any, basePath: string) => {
+  const changeRecords: { propPath: string; value: any }[] = [];
+
+  // 递归构建 changeRecords
+  const buildChangeRecords = (obj: any, basePath: string) => {
+    Object.entries(obj).forEach(([key, value]) => {
+      if (value !== undefined) {
+        const currentPath = basePath ? `${basePath}.${key}` : key;
+
+        if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+          // 递归处理嵌套对象
+          buildChangeRecords(value, currentPath);
+        } else {
+          // 处理基础类型值
+          changeRecords.push({ propPath: currentPath, value });
+        }
+      }
+    });
+  };
+
+  buildChangeRecords(value, basePath);
+
+  return changeRecords;
+};

@@ -8,7 +8,7 @@ import editorService from '@editor/services/editor';
 import uiService from '@editor/services/ui';
 import type { StageOptions } from '@editor/type';
 import { H_GUIDE_LINE_STORAGE_KEY, UI_SELECT_MODE_EVENT_NAME, V_GUIDE_LINE_STORAGE_KEY } from '@editor/utils/const';
-import { getGuideLineFromCache } from '@editor/utils/editor';
+import { buildChangeRecords, getGuideLineFromCache } from '@editor/utils/editor';
 
 const root = computed(() => editorService.get('root'));
 const page = computed(() => editorService.get('page'));
@@ -94,7 +94,15 @@ export const useStage = (stageOptions: StageOptions) => {
       return;
     }
 
-    editorService.update(ev.data.map((data) => ({ id: getIdFromEl()(data.el) || '', style: data.style })));
+    // 为每个元素单独更新，确保 changeRecords 与对应的元素关联
+    ev.data.forEach((data) => {
+      const id = getIdFromEl()(data.el);
+      if (!id) return;
+
+      const { style = {} } = data;
+
+      editorService.update({ id, style }, { changeRecords: buildChangeRecords(style, 'style') });
+    });
   });
 
   stage.on('sort', (ev: SortEventData) => {
