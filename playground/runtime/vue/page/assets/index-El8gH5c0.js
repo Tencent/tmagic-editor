@@ -1,0 +1,2 @@
+import{a as t,r as c}from"./use-app-DMGj3VFD.js";import{d as a,c as i,o as s}from"./index-iP0eXIbZ.js";const d=["src"],p=a({name:"tmagic-img",__name:"index",props:{config:{},iteratorIndex:{},iteratorContainerId:{},containerIndex:{},pageFragmentContainerId:{},model:{},disabled:{type:Boolean}},setup(o){const e=o,n=()=>{e.config.url&&(window.location.href=e.config.url)},r=t(e);return c(r),(l,m)=>(s(),i("img",{src:o.config.src,onClick:n},null,8,d))}});export{p as default};
+//# sourceMappingURL=index-El8gH5c0.js.map
