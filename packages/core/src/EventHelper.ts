@@ -82,6 +82,22 @@ export default class EventHelper extends EventEmitter {
     this.dataSourceEventList.clear();
   }
 
+  public initEvents() {
+    this.removeNodeEvents();
+
+    if (this.app.page) {
+      for (const [, node] of this.app.page.nodes) {
+        this.bindNodeEvents(node);
+      }
+    }
+
+    for (const [, page] of this.app.pageFragments) {
+      for (const [, node] of page.nodes) {
+        this.bindNodeEvents(node);
+      }
+    }
+  }
+
   public bindNodeEvents(node: TMagicNode) {
     node.events?.forEach((event, index) => {
       if (!event.name) {
@@ -301,11 +317,11 @@ export default class EventHelper extends EventEmitter {
       return;
     }
 
-    const instanceMethodPropmise = [];
+    const instanceMethodPromise = [];
     for (const node of toNodes) {
       if (node.instance) {
         if (typeof node.instance[methodName] === 'function') {
-          instanceMethodPropmise.push(node.instance[methodName](fromCpt, ...args));
+          instanceMethodPromise.push(node.instance[methodName](fromCpt, ...args));
         }
       } else {
         node.addEventToQueue({
@@ -316,6 +332,6 @@ export default class EventHelper extends EventEmitter {
       }
     }
 
-    await Promise.all(instanceMethodPropmise);
+    await Promise.all(instanceMethodPromise);
   }
 }

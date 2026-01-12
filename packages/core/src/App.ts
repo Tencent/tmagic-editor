@@ -197,17 +197,7 @@ class App extends EventEmitter {
       app: this,
     });
 
-    if (this.eventHelper) {
-      this.eventHelper.removeNodeEvents();
-      for (const [, node] of this.page.nodes) {
-        this.eventHelper.bindNodeEvents(node);
-      }
-      for (const [, page] of this.pageFragments) {
-        for (const [, node] of page.nodes) {
-          this.eventHelper.bindNodeEvents(node);
-        }
-      }
-    }
+    this.eventHelper?.initEvents();
 
     super.emit('page-change', this.page);
   }
@@ -254,7 +244,7 @@ class App extends EventEmitter {
       node.data?.id &&
       node.eventKeys.has(`${String(name)}_${node.data.id}`)
     ) {
-      return this.eventHelper?.emit(node.eventKeys.get(`${String(name)}_${node.data.id}`)!, node, ...otherArgs);
+      return this.eventHelper.emit(node.eventKeys.get(`${String(name)}_${node.data.id}`)!, node, ...otherArgs);
     }
     return super.emit(name, ...args);
   }
@@ -265,8 +255,12 @@ class App extends EventEmitter {
    * @returns void
    */
   public async runCode(codeId: Id, params: Record<string, any>, args: any[], flowState?: FlowState, node?: Node) {
-    if (!codeId || isEmpty(this.codeDsl)) return;
+    if (!codeId || isEmpty(this.codeDsl)) {
+      return;
+    }
+
     const content = this.codeDsl?.[codeId]?.content;
+
     if (typeof content === 'function') {
       try {
         await content({ app: this, params, eventParams: args, flowState, node });
