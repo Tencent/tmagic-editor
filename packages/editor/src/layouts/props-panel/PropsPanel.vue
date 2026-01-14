@@ -100,7 +100,7 @@ const values = ref<FormValue>({});
 const curFormConfig = ref<any>([]);
 const node = computed(() => editorService.get('node'));
 const nodes = computed(() => editorService.get('nodes'));
-
+let innerModuleEditingInfo: { name: string; parentId: string; id: string } | null = null;
 const styleFormConfig = [
   {
     tabPosition: 'right',
@@ -116,7 +116,36 @@ const init = async () => {
 
   const type = node.value.type || (node.value.items ? 'container' : 'text');
   curFormConfig.value = await propsService.getPropsConfig(type);
-  values.value = node.value;
+  innerModuleEditingInfo = null;
+  if (node.value.comInnerModule) {
+    // 从左侧点击进入子模块配置
+    innerModuleEditingInfo = {
+      name: node.value.comInnerModule,
+      parentId: node.value.parentId,
+      id: String(node.value.id),
+    };
+  }
+
+  if (innerModuleEditingInfo) {
+    const { name } = innerModuleEditingInfo;
+    const curFormConfigItems = curFormConfig.value[0].items;
+    const { length } = curFormConfigItems;
+    for (let i = 0; i < length; i++) {
+      if (curFormConfigItems[i].title !== '属性') {
+        continue;
+      }
+      const len2 = curFormConfigItems[i].items.length;
+      for (let j = 0; j < len2; j++) {
+        if (curFormConfigItems[i].items[j].name === name) {
+          curFormConfigItems[i].items = curFormConfigItems[i].items[j].items;
+          break;
+        }
+      }
+    }
+    values.value = node.value[name] || {};
+  } else {
+    values.value = node.value;
+  }
 };
 
 watchEffect(init);
@@ -128,6 +157,10 @@ onBeforeUnmount(() => {
 
 const submit = async (v: MNode, eventData?: ContainerChangeEventData) => {
   try {
+    if (innerModuleEditingInfo !== null) {
+      v._innerModuleEditingInfo = innerModuleEditingInfo;
+      v.id = innerModuleEditingInfo.id;
+    }
     if (!v.id) {
       v.id = values.value.id;
     }
