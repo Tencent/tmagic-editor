@@ -180,7 +180,7 @@ import type {
   FormValue,
   ToolTipConfigType,
 } from '../schema';
-import { display as displayFunction, filterFunction, getRules } from '../utils/form';
+import { createObjectProp, display as displayFunction, filterFunction, getRules } from '../utils/form';
 
 import FormLabel from './FormLabel.vue';
 
@@ -416,11 +416,7 @@ const onChangeHandler = async function (v: any, eventData: ContainerChangeEventD
 
     if (typeof onChange === 'function') {
       const setModel = (key: string, value: any) => {
-        if (props.config.name) {
-          newChangeRecords.push({ propPath: itemProp.value.replace(`${props.config.name}`, key), value });
-        } else {
-          newChangeRecords.push({ propPath: itemProp.value, value });
-        }
+        newChangeRecords.push({ propPath: createObjectProp(itemProp.value, key, props.config.name), value });
       };
 
       const setFormValue = (key: string, value: any) => {

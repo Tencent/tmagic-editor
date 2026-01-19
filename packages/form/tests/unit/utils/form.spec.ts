@@ -19,6 +19,7 @@
 import { describe, expect, test } from 'vitest';
 import type { FormState } from '@form/index';
 import {
+  createObjectProp,
   createValues,
   datetimeFormatter,
   display,
@@ -65,6 +66,66 @@ describe('filterFunction', () => {
   test('config 为函数', () => {
     expect(filterFunction(mForm, () => 2, {})).toBe(2);
   });
+
+  test('config 为undefined', () => {
+    expect(filterFunction(mForm, undefined, {})).toBe(undefined);
+  });
+
+  test('config 为null', () => {
+    expect(filterFunction(mForm, null, {})).toBe(null);
+  });
+
+  test('config 为空字符串', () => {
+    expect(filterFunction(mForm, '', {})).toBe('');
+  });
+
+  test('config 函数接收正确参数', () => {
+    const mockForm: FormState = {
+      ...mForm,
+      initValues: { init: 'initValue' },
+      parentValues: { parent: 'parentValue' },
+      values: { form: 'formValue' },
+    };
+    const props = {
+      model: { model: 'modelValue' },
+      prop: 'testProp',
+      config: { type: 'text' },
+      index: 5,
+    };
+
+    let receivedArgs: any = null;
+    filterFunction(
+      mockForm,
+      (_mForm, args) => {
+        receivedArgs = args;
+        return 'result';
+      },
+      props,
+    );
+
+    expect(receivedArgs.prop).toBe('testProp');
+    expect(receivedArgs.index).toBe(5);
+    expect(receivedArgs.config).toEqual({ type: 'text' });
+  });
+
+  test('config 函数getFormValue正确获取值', () => {
+    const mockForm: FormState = {
+      ...mForm,
+      values: { nested: { deep: 'deepValue' } },
+    };
+
+    let result: any = null;
+    filterFunction(
+      mockForm,
+      (_mForm: FormState | undefined, args: any) => {
+        result = args.getFormValue('nested.deep');
+        return result;
+      },
+      { model: {} },
+    );
+
+    expect(result).toBe('deepValue');
+  });
 });
 
 describe('display', () => {
@@ -97,6 +158,87 @@ describe('getRules', () => {
     };
     const newRules: any = getRules(mForm, rules, props);
     expect(newRules[0].validator({} as any, {} as any, {})).toBe(1);
+  });
+
+  test('rules为数组', () => {
+    const rules: any = [
+      { required: true, message: '必填' },
+      { min: 3, message: '最少3个字符' },
+    ];
+    const props = { config: {} };
+    const newRules = getRules(mForm, rules, props);
+
+    expect(newRules).toHaveLength(2);
+    expect(newRules[0].required).toBe(true);
+    expect((newRules[1] as any).min).toBe(3);
+  });
+
+  test('rules为空数组', () => {
+    const rules: any = [];
+    const props = { config: {} };
+    const newRules = getRules(mForm, rules, props);
+
+    expect(newRules).toHaveLength(0);
+  });
+
+  test('validator函数接收正确参数', () => {
+    let receivedParams: any = null;
+    const rules: any = {
+      validator: (params: any, context: any) => {
+        receivedParams = { params, context };
+        return true;
+      },
+    };
+    const mockForm: FormState = {
+      ...mForm,
+      initValues: { init: 'initValue' },
+      parentValues: { parent: 'parentValue' },
+      values: { form: 'formValue' },
+    };
+    const props = {
+      config: { type: 'text' },
+      model: { field: 'value' },
+      prop: 'testProp',
+    };
+
+    const newRules: any = getRules(mockForm, rules, props);
+    newRules[0].validator('rule', 'value', 'callback', 'source', 'options');
+
+    expect(receivedParams.params.rule).toBe('rule');
+    expect(receivedParams.params.value).toBe('value');
+    expect(receivedParams.params.callback).toBe('callback');
+    expect(receivedParams.context.prop).toBe('testProp');
+    expect(receivedParams.context.model).toEqual({ field: 'value' });
+  });
+
+  test('config有names时validator接收model作为value', () => {
+    let receivedValue: any = null;
+    const rules: any = {
+      validator: (params: any) => {
+        receivedValue = params.value;
+        return true;
+      },
+    };
+    const props = {
+      config: { names: ['start', 'end'] },
+      model: { start: '2021-01-01', end: '2021-12-31' },
+      prop: 'dateRange',
+    };
+
+    const newRules: any = getRules(mForm, rules, props);
+    newRules[0].validator('rule', 'singleValue', 'callback', 'source', 'options');
+
+    expect(receivedValue).toEqual({ start: '2021-01-01', end: '2021-12-31' });
+  });
+
+  test('不修改原始rules对象', () => {
+    const originalValidator = () => 'original';
+    const rules: any = { validator: originalValidator };
+    const props = { config: {} };
+
+    getRules(mForm, rules, props);
+
+    expect(rules.validator).toBe(originalValidator);
   });
 });
 
@@ -334,6 +476,114 @@ describe('initValue', () => {
     expect(values.table).toHaveLength(1);
     expect(values.table[0].a).toBe(1);
   });
+
+  test('table with defautSort (typo version)', async () => {
+    const config = [
+      {
+        type: 'table',
+        name: 'table',
+        defautSort: { prop: 'order', order: 'ascending' },
+        items: [{ name: 'order' }],
+      },
+    ];
+    const initValues = {
+      table: [{ order: 3 }, { order: 1 }, { order: 2 }],
+    };
+
+    const values = await initValue(mForm, { initValues, config });
+    expect(values.table[0].order).toBe(1);
+    expect(values.table[1].order).toBe(2);
+    expect(values.table[2].order).toBe(3);
+  });
+
+  test('table with defaultSort', async () => {
+    const config = [
+      {
+        type: 'table',
+        name: 'table',
+        defaultSort: { prop: 'order', order: 'descending' },
+        items: [{ name: 'order' }],
+      },
+    ];
+    const initValues = {
+      table: [{ order: 1 }, { order: 3 }, { order: 2 }],
+    };
+
+    const values = await initValue(mForm, { initValues, config });
+    expect(values.table[0].order).toBe(3);
+    expect(values.table[1].order).toBe(2);
+    expect(values.table[2].order).toBe(1);
+  });
+
+  test('table with sort and sortKey', async () => {
+    const config = [
+      {
+        type: 'table',
+        name: 'table',
+        sort: true,
+        sortKey: 'priority',
+        items: [{ name: 'priority' }],
+      },
+    ];
+    const initValues = {
+      table: [{ priority: 1 }, { priority: 3 }, { priority: 2 }],
+    };
+
+    const values = await initValue(mForm, { initValues, config });
+    // sort + sortKey 会按 sortKey 降序排序
+    expect(values.table[0].priority).toBe(3);
+    expect(values.table[1].priority).toBe(2);
+    expect(values.table[2].priority).toBe(1);
+  });
+
+  test('config不是数组抛出错误', async () => {
+    await expect(initValue(mForm, { initValues: {}, config: {} as any })).rejects.toThrow('config应该为数组');
+  });
+
+  test('onInitValue返回null时返回空对象', async () => {
+    const config = [
+      {
+        type: 'text',
+        name: 'a',
+        onInitValue: () => null,
+      },
+    ];
+    const values = await initValue(mForm, { initValues: { a: 1 }, config });
+    expect(values).toEqual({});
+  });
+
+  test('fieldset checkbox 自定义name和falseValue', async () => {
+    const config = [
+      {
+        type: 'fieldset',
+        name: 'fieldset',
+        checkbox: { name: 'enabled', falseValue: false },
+        items: [{ name: 'a' }],
+      },
+    ];
+    const initValues = {};
+
+    const values = await initValue(mForm, { initValues, config });
+    expect(values.fieldset.enabled).toBe(false);
+  });
+
+  test('fieldset checkbox initValue有值', async () => {
+    const config = [
+      {
+        type: 'fieldset',
+        name: 'fieldset',
+        checkbox: true,
+        items: [{ name: 'a' }],
+      },
+    ];
+    const initValues = {
+      fieldset: { value: 1, a: 'test' },
+    };
+
+    const values = await initValue(mForm, { initValues, config });
+    expect(values.fieldset.value).toBe(1);
+    expect(values.fieldset.a).toBe('test');
+  });
 });
 
 describe('datetimeFormatter', () => {
@@ -363,7 +613,29 @@ describe('datetimeFormatter', () => {
   });
 
   test('format是x', () => {
+    expect(datetimeFormatter(date.toISOString(), defaultValue, 'x')).toBe(date.getTime());
+  });
+
+  test('format是timestamp', () => {
     expect(datetimeFormatter(date.toISOString(), defaultValue, 'timestamp')).toBe(date.getTime());
+  });
+
+  test('v是数字时间戳字符串', () => {
+    const timestamp = date.getTime();
+    expect(datetimeFormatter(String(timestamp), defaultValue, 'x')).toBe(timestamp);
+  });
+
+  test('v是数字时间戳', () => {
+    const timestamp = date.getTime();
+    expect(datetimeFormatter(String(timestamp), defaultValue, 'timestamp')).toBe(timestamp);
+  });
+
+  test('自定义format格式', () => {
+    expect(datetimeFormatter(date, defaultValue, 'YYYY/MM/DD')).toBe('2021/07/17');
+  });
+
+  test('自定义format只显示时间', () => {
+    expect(datetimeFormatter(date, defaultValue, 'HH:mm:ss')).toBe('15:37:00');
   });
 });
 
@@ -449,6 +721,21 @@ describe('sortArray', () => {
     const result = sortArray(data, 0, 3);
 
     expect(result).not.toBe(data);
+  });
+
+  test('负数索引时返回原数组', () => {
+    const data = [1, 2, 3];
+
+    expect(sortArray(data, -1, 1)).toEqual(data);
+    expect(sortArray(data, 1, -1)).toEqual(data);
+    expect(sortArray(data, -1, -1)).toEqual(data);
+  });
+
+  test('两个元素数组交换', () => {
+    const data = [1, 2];
+
+    expect(sortArray(data, 0, 1)).toEqual([2, 1]);
+    expect(sortArray(data, 1, 0)).toEqual([2, 1]);
   });
 });
 
@@ -564,5 +851,166 @@ describe('createValues', () => {
     const result = createValues(mForm, config, initValues, {});
 
     expect(result.num).toBe(123);
+  });
+
+  test('处理checkboxGroup类型初始化空数组', () => {
+    // checkboxGroup 需要在 initValue 函数中通过 config 处理
+    const config = [{ type: 'checkboxGroup', name: 'checkboxGroup' }];
+    const initValues = {};
+
+    const result = createValues(mForm, config, initValues, {});
+
+    // 当没有 items 配置时，使用 getDefaultValue 返回空字符串
+    expect(result.checkboxGroup).toBe('');
+  });
+
+  test('处理tab dynamic类型', () => {
+    const config = [
+      {
+        type: 'tab',
+        name: 'dynamicTab',
+        dynamic: true,
+        items: [{ title: 'Tab1', items: [{ name: 'field' }] }],
+      },
+    ];
+    const initValues = {};
+
+    const result = createValues(mForm, config, initValues, {});
+
+    // dynamic tab 会初始化为空数组，但因为有 items 配置，会处理 items
+    expect(Array.isArray(result.dynamicTab)).toBe(true);
+    expect(result.dynamicTab).toHaveLength(0);
+  });
+
+  test('处理tab dynamic类型有初始值', () => {
+    const config = [
+      {
+        type: 'tab',
+        name: 'dynamicTab',
+        dynamic: true,
+        items: [{ title: 'Tab1', items: [{ name: 'field' }] }],
+      },
+    ];
+    const initValues = { dynamicTab: [{ id: 1 }] };
+
+    const result = createValues(mForm, config, initValues, {});
+
+    // 有初始值时会递归处理每个元素，并补充 items 中定义的字段
+    expect(result.dynamicTab).toHaveLength(1);
+    expect(result.dynamicTab[0].id).toBe(1);
+    expect(result.dynamicTab[0].field).toBe('');
+  });
+
+  test('处理html类型的asyncLoad配置', () => {
+    const config = [
+      {
+        type: 'html',
+        name: 'htmlField',
+        asyncLoad: { url: '/api/load' },
+      },
+    ];
+    const initValues = { htmlField: 'content' };
+
+    const result = createValues(mForm, config, initValues, {});
+
+    expect(result.asyncLoad.name).toBe('htmlField');
+    expect(result.asyncLoad.url).toBe('/api/load');
+  });
+
+  test('处理html类型的asyncLoad配置-initValue已有asyncLoad', () => {
+    const config = [
+      {
+        type: 'html',
+        name: 'htmlField',
+        asyncLoad: { url: '/api/load' },
+      },
+    ];
+    const initValues = { htmlField: 'content', asyncLoad: { url: '/api/existing', name: 'existing' } };
+
+    const result = createValues(mForm, config, initValues, {});
+
+    expect(result.asyncLoad.url).toBe('/api/existing');
+    expect(result.asyncLoad.name).toBe('existing');
+  });
+
+  test('处理table-select类型', () => {
+    const config = [{ type: 'table-select', name: 'tableSelect' }];
+    const initValues = { tableSelect: 'selected' };
+
+    const result = createValues(mForm, config, initValues, {});
+
+    expect(result.tableSelect).toBe('selected');
+  });
+
+  test('处理table-select类型无初始值', () => {
+    const config = [{ type: 'table-select', name: 'tableSelect' }];
+    const initValues = {};
+
+    const result = createValues(mForm, config, initValues, {});
+
+    expect(result.tableSelect).toBe('');
+  });
+
+  test('处理daterange类型', () => {
+    const config = [{ type: 'daterange', name: 'dateRange' }];
+    const initValues = {};
+
+    const result = createValues(mForm, config, initValues, {});
+
+    expect(result.dateRange).toEqual([]);
+  });
+
+  test('处理number-range类型', () => {
+    const config = [{ type: 'number-range', name: 'numberRange' }];
+    const initValues = {};
+
+    const result = createValues(mForm, config, initValues, {});
+
+    expect(result.numberRange).toEqual([]);
+  });
+
+  test('value已存在时不覆盖', () => {
+    const config = [{ type: 'text', name: 'field' }];
+    const initValues = { field: 'new' };
+    const value = { field: 'existing' };
+
+    const result = createValues(mForm, config, initValues, value);
+
+    expect(result.field).toBe('existing');
+  });
+});
+
+describe('createObjectProp', () => {
+  test('基本路径拼接', () => {
+    // 注意：无name参数时，实际返回数组转字符串格式
+    expect(createObjectProp('form.field', 'subKey')).toBe('form.field.subKey');
+  });
+
+  test('单层路径', () => {
+    expect(createObjectProp('field', 'key')).toBe('field.key');
+  });
+
+  test('带name参数且name匹配最后一段', () => {
+    expect(createObjectProp('form.field.target', 'newKey', 'target')).toBe('form.field.newKey');
+  });
+
+  test('带name参数但name不匹配最后一段', () => {
+    expect(createObjectProp('form.field.other', 'newKey', 'target')).toBe('form.field.other.newKey');
+  });
+
+  test('空字符串路径', () => {
+    expect(createObjectProp('', 'key')).toBe('key');
+  });
+
+  test('多层嵌套路径', () => {
+    expect(createObjectProp('a.b.c.d', 'e')).toBe('a.b.c.d.e');
+  });
+
+  test('带name参数且路径只有一段且匹配', () => {
+    expect(createObjectProp('field', 'newKey', 'field')).toBe('newKey');
+  });
+
+  test('带name参数且路径多段且最后一段匹配', () => {
+    expect(createObjectProp('a.b.c', 'newKey', 'c')).toBe('a.b.newKey');
   });
 });

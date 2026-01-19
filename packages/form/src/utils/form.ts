@@ -366,3 +366,18 @@ export const sortChange = (data: any[], { prop, order }: SortProp) => {
     data.sort((a: any, b: any) => b[prop] - a[prop]);
   }
 };
+
+export const createObjectProp = (prop: string, key: string, name?: string | number) => {
+  if (prop === '') {
+    return key;
+  }
+
+  const itemPath = `${prop}`.split('.');
+
+  if (name) {
+    if (`${itemPath[itemPath.length - 1]}` === `${name}`) {
+      return `${[...itemPath.slice(0, -1), key].join('.')}`;
+    }
+  }
+  return `${[...itemPath, key].join('.')}`;
+};
