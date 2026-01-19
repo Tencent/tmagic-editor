@@ -1,5 +1,5 @@
 {
-  "version": "1.7.5",
+  "version": "1.7.6",
   "name": "@tmagic/table",
   "type": "module",
   "sideEffects": [

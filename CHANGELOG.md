@@ -1,3 +1,12 @@
+## [1.7.6](https://github.com/Tencent/tmagic-editor/compare/v1.7.5...v1.7.6) (2026-01-19)
+
+
+### Bug Fixes
+
+* **form:** onChange中修改model的key中有重复的key会出错 ([6cf2f38](https://github.com/Tencent/tmagic-editor/commit/6cf2f381949cb3db89aa48130eb6870b65a195ff))
+
+
+
 ## [1.7.5](https://github.com/Tencent/tmagic-editor/compare/v1.7.4...v1.7.5) (2026-01-08)
 
 

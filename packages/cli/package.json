@@ -1,5 +1,5 @@
 {
-  "version": "1.7.5",
+  "version": "1.7.6",
   "name": "@tmagic/cli",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
