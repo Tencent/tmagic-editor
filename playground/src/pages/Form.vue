@@ -21,7 +21,7 @@
   </div>
 
   <TMagicDialog v-model="resultVisible" title="result" append-to-body>
-    <pre><code class="language-javascript hljs" v-html="result"></code></pre>
+    <TMagicCodeEditor :init-values="result" readonly height="60vh"></TMagicCodeEditor>
   </TMagicDialog>
 </template>
 
@@ -30,7 +30,7 @@ import { markRaw, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { Coin } from '@element-plus/icons-vue';
 
-import { MenuButton, MForm, TMagicDialog, tMagicMessage } from '@tmagic/editor';
+import { MenuButton, MForm, TMagicCodeEditor, TMagicDialog, tMagicMessage } from '@tmagic/editor';
 
 import NavMenu from '../components/NavMenu.vue';
 import formDsl from '../configs/formDsl';
