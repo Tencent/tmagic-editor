@@ -30,6 +30,7 @@ export default defineConfig({
     nav: [
       { text: '文档', link: '/guide/', activeMatch: '/guide/' },
       { text: 'API', link: '/api/editor/props', activeMatch: '/api/' },
+      { text: 'Runtime API', link: '/runtime-api/core/app', activeMatch: '/runtime-api/' },
       { text: '表单配置', link: '/form-config/fields/text', activeMatch: '/form-config/' },
       { text: '更新日志', link: 'https://github.com/Tencent/tmagic-editor/releases' },
       { text: 'Playground', link: 'https://tencent.github.io/tmagic-editor/playground/index.html' },
@@ -477,6 +478,74 @@ export default defineConfig({
             }
           ]
         }
+      ],
+      '/runtime-api/': [
+        {
+          text: '@tmagic/core',
+          items: [
+            {
+              text: 'App',
+              link: '/runtime-api/core/app',
+            },
+            {
+              text: 'Node',
+              link: '/runtime-api/core/node',
+            },
+            {
+              text: 'Page',
+              link: '/runtime-api/core/page',
+            },
+            {
+              text: 'EventHelper',
+              link: '/runtime-api/core/eventHelper',
+            },
+            {
+              text: 'Env',
+              link: '/runtime-api/core/env',
+            },
+            {
+              text: 'IteratorContainer',
+              link: '/runtime-api/core/iteratorContainer',
+            },
+            {
+              text: 'FlowState',
+              link: '/runtime-api/core/flowState',
+            },
+            {
+              text: 'DevtoolApi',
+              link: '/runtime-api/core/devtoolApi',
+            },
+            {
+              text: '工具函数',
+              link: '/runtime-api/core/utils',
+            },
+          ],
+        },
+        {
+          text: '@tmagic/data-source',
+          items: [
+            {
+              text: 'DataSourceManager',
+              link: '/runtime-api/data-source/dataSourceManager',
+            },
+            {
+              text: 'DataSource',
+              link: '/runtime-api/data-source/dataSource',
+            },
+            {
+              text: 'HttpDataSource',
+              link: '/runtime-api/data-source/httpDataSource',
+            },
+            {
+              text: '观察者数据类',
+              link: '/runtime-api/data-source/observedData',
+            },
+            {
+              text: '工具函数',
+              link: '/runtime-api/data-source/utils',
+            },
+          ],
+        },
       ]
     },
   },

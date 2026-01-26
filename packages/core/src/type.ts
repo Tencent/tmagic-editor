@@ -1,4 +1,4 @@
-import type { DataSource, DataSourceManagerData, ObservedDataClass } from '@tmagic/data-source';
+import type { DataSource, DataSourceManagerData } from '@tmagic/data-source';
 import type { DataSourceSchema, EventConfig, Id, JsEngine, MApp, RequestFunction } from '@tmagic/schema';
 
 import type Env from './Env';
@@ -24,7 +24,6 @@ export interface AppOptionsConfig {
   iteratorContainerType?: string | string[];
   transformStyle?: (style: Record<string, any>) => Record<string, any>;
   request?: RequestFunction;
-  DataSourceObservedData?: ObservedDataClass;
   dataSourceManagerInitialData?: DataSourceManagerData;
   nodeStoreInitialData?: () => any;
   errorHandler?: ErrorHandler;
