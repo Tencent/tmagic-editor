@@ -110,15 +110,16 @@
 | 参数      | 说明    | 类型      | 可选值       | 默认值   |
 |---------- |-------- |---------- |-------------  |-------- |
 | name | 绑定值 | string | — | — |
-| placeholder  | 输入框占位文本   | string |       —        |      —   |
 | text     | 表单标签   | string |       —        |      —   |
+| placeholder  | 输入框占位文本   | string |       —        |      —   |
 | disabled  | 是否禁用    | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | false   |
-| tooltip  | 输入时显示内容    | boolean   | — | false   |
-| placeholder   | 输入框占位文本   | string          | — | — |
+| clearable  | 是否可清空    | boolean   | — | true   |
+| tooltip  | 输入时显示内容    | string   | — | —   |
 | trim  | 是否去掉首尾空格  | boolean   | — | false  |
 | filter  | 过滤值  | string / Function   | number | -  |
-| onChange  | 值变化时触发的函数  | [OnChangeHandler ](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | -   |
+| prepend  | 前置内容  | string   | — | -   |
 | append  | 后置内容  | string / Object   | — | -   |
+| onChange  | 值变化时触发的函数  | [OnChangeHandler](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | -   |
 
 ## append Attributes
 | 参数      | 说明    | 类型      | 可选值       | 默认值   |

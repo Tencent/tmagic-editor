@@ -195,6 +195,9 @@ npm install sass -D
 ## runtimeUrl
 
 该配置涉及到 [runtime 概念](runtime.md)，tmagic-editor编辑器中心的模拟器画布，是一个 iframe（这里的 `runtimeUrl` 配置的，就是你提供的 iframe 的 url），其中渲染了一个 runtime，用来响应编辑器中的组件增删改等操作。
+:::tip
+可以使用`npm create tmagic` 来快速创建一个runtime项目。
+:::
 
 ## componentGroupList
 

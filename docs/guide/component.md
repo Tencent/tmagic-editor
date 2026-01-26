@@ -1,28 +1,27 @@
 # 如何开发一个组件
 tmagic-editor支持业务方进行自定义组件开发。在tmagic-editor中，组件是以 npm 包形式存在的，组件和插件只要按照规范开发，就可以在tmagic-editor的 runtime 中被加入并正确渲染组件。
 
-## 组件开发
-以 vue 的组件开发为例。运行项目中的 playground 示例，会自动加载 vue 的 runtime。runtime会加载[@tmagic/ui](https://github.com/Tencent/tmagic-editor/tree/master/packages/ui)
-
-## 组件注册
-在 [playground](https://tencent.github.io/tmagic-editor/playground/index.html#/) 中，我们可以尝试点击添加一个组件，在模拟器区域里，就会出现这个组件。其中就涉及到组件注册。
-
-这一步需要开发者基于tmagic-editor搭建了平台后，实现组件列表的注册、获取机制，tmagic-editor组件注册其实就是保存好组件 `type` 的映射关系。`type` 可以参考[组件介绍](../guide/conception.html#组件)。
-
-可以参考 vue 版本的 @tmagic/ui 中，[组件渲染](../guide/advanced/page.html#组件渲染)逻辑里，type 会作为组件名进入渲染。所以在 vue 的组件开发中，我们也需要在为 vue 组件声明 name 字段时，和 type 值对应起来，才能正确渲染组件。
-
 ### 组件规范
 组件的基础形式，需要有四个文件
 - index 入口文件，引入下面几个文件
-- formConfig 表单配置描述
-- initValue 表单初始值
+- form-config 表单配置描述
+- init-value 表单初始值
 - event 定义联动事件，具体可以参考[组件联动](../guide/advanced/coupling.html#组件联动)
 - component.{vue,jsx} 组件样式、逻辑代码
 
-@tmagic/ui 中的 button/text 就是基础的组件示例。我们要求声明 index 入口，因为我们希望在后续的配套打包工具实现上，可以有一个统一规范入口。
-
 ### 1. 创建组件
-在项目中，如 runtime  目录中，创建一个名为 test-component 的组件目录，其中包含上面四个规范文件。
+
+可以使用`npm create tmagic` 选择 `components:组件库(组件/插件/数据源)` 来快速创建一个组件库。
+
+然后继续使用`npm create tmagic` 选择 `component:组件` 来快速创建一个组件。
+
+:::tip
+
+组件库并不是必须，组件如何管理可以根据具体情况来选择。直接放到 runtime 目录中也是一个不错的选择，如果选择放到runtime中可以在runtime中的package.json添加`"tmagicComponentsPath": "./components"` 来指定组件库的路径。这样在使用`npm create tmagic` 来创建组件时，会自动将组件添加到组件库中。
+
+:::
+
+手动创建组件，可以在项目中，如 runtime  目录中，创建一个名为 test-component 的组件目录，其中包含上面四个规范文件。
 ```javascript
 // index.js
 // vue
@@ -30,14 +29,18 @@ import Test from './Test.vue';
 // react 
 import Test from './Test.tsx';
 
-export { default as config } from './formConfig';
-export { default as value } from './initValue';
+export { default as config } from './form-config';
+export { default as value } from './init-value';
 
 export default Test;
 ```
 
+:::tip
+如果在runtime中使用了@tmagic/cli，则必须保持此规范；不使用则可以自由书写。 
+:::
+
 ```javascript
-// formConfig.js
+// form-config.js
 export default [
   {
     type: 'select',
@@ -61,15 +64,40 @@ export default [
 ];
 ```
 
+:::tip
+配置内容必须是一个数组，每个元素是一个对象，包含 type、text、name 等属性，每个对象代表一个表单项。
+
+type 是表单项的类型
+
+text 是表单项的文本
+
+name 是表单项值的key。
+
+上述实例对应生成的值为
+```json
+{
+  "color": "red",
+  "text": "一段文字",
+}
+```
+
+type 在@tmagic/form 和 @tmagic/editor 中默认提供了种，@tmagic/form提供的可以前往[表单配置](/form-config/fields/text.html)查看。
+:::
+
+
 ```javascript
-// initValue.js
+// init-value.js
 export default {
   color: 'red',
   text: '一段文字',
 };
 ```
 
- 版本的组件代码示例
+:::tip
+在编辑器中添加组件时使用，作为初始值。
+:::
+
+Vue版本的组件代码示例
 ```vue
 <!-- Test.vue -->
 <template>
@@ -79,21 +107,23 @@ export default {
   </div>
 </template>
 
-<script>
-export default {
+<script setup>
+defineOptions({
   name: 'magic-ui-test',
+});
 
-  props: {
-    config: {
-      type: Object,
-      default: () => ({}),
-    },
+defineProps({
+  config: {
+    type: Object,
+    default: () => ({}),
   },
-
-  setup() {},
-};
+}):
 </script>
 ```
+
+:::tip
+编辑器中配置的 config 对象，会作为 props 传入组件中。
+:::
 
 react 版本组件代码示例
 ```javascript
@@ -118,84 +148,52 @@ export default Test;
 
 ```
 
-### 2. 使用tmagic-cli
-在 runtime vue 中，我们已经提供好一份示例。在 tmagic.config.ts 文件中。只需要在 packages 加入你创建的组件的路径（如果是个 npm 包，则将路径替换为包名即可），打包工具就会自动识别到你的组件。
+## 插件开发
+插件开发和组件开发形式类似，但是插件开发不需要有组件的规范。
 
-### 3. 启动 playground
-在上面的步骤完成后，在 playground/src/configs/componentGroupList 中。找到组件栏的基础组件列表，在其中加入你的开发组件
+我们只需要在插件中提供一个入口文件。插件需要提供一个 install 方法。
+
 ```javascript
-{
-  title: '基础组件',
-  items: [
+// 在Vue的runtime中
+export default {
+  install(vueApp, { app: tmagicApp }) {}
+}
+```
+
+```javascript
+// 在React的runtime中
+export default {
+  install({ app: tmagicApp }) {}
+}
+```
+
+在插件中开发者可以自由实现需要的业务逻辑。
+
+## 集成到runtime中
+
+### 使用@tmagic/cli
+
+在使用`npm create tmagic` 创建的runtime中，自动集成了@tmagic/cli，将组件集成到此runtime中只需要在`tmagic.config.ts`中的packages字段中添加
+```javascript
+import { defineConfig } from '@tmagic/cli';
+
+export default defineConfig({
+  // other config
+  packages: [
     {
-      text: '文本',
-      type: 'text',
-    },
-    {
-      text: '按钮',
-      type: 'button',
-    },
-    // 加入这个测试组件
-    {
-      text: '测试',
-      type: 'test',
+      '组件type': '组件目录或者npm包名',
     },
   ],
-}
-```
-
-然后，在 magic 项目根目录中，运行
+});
 
 ```
-npm run playground
-```
 
-至此，我们打开 playground 后，就能添加开发的中的组件，并且得到这个开发中的组件**在编辑器中的表现**了。
+:::tip
+组件type需要与[componentGroupList](../api/editor/props.html#componentgrouplist)中的type对应。
+:::
 
-<img src="https://image.video.qpic.cn/oa_fd3c9c-3_548108267_1636719045199471">
 
-### 4. 启动 runtime
-在完成开发中组件在编辑器中的实现后，我们将编辑器中的 DSL 源码📄 打开，复制 DSL。并在 runtime/vue/src/page 下。创建一个 page-config.js 文件。将 DSL 作为配置导出。
+配置到packages字段中后，执行`npm run tmagic`来创建组件库的入口文件。
 
-```javascript
-window.magicDSL = [
-  // DSL
-]
-```
+然后使用`npm run build:libs`命令来构建用于编辑器中的组件配置、组件初始值、组件事件联动的资源文件。
 
-在 page/main.ts 中，将这份配置读入
-```javascript
-import './page-config.js';
-```
-
-然后执行在 runtime/ 目录下执行
-```
-npm run build:libs
-npm run dev
-```
-
-至此，我们就可以得到这个开发中组件在编辑器中进行了配置并保存后，在真实页面中应该有的样子。
-
-<img src="https://image.video.qpic.cn/oa_fd3c9c-3_1731965034_1636719708671597?imageView2/q/70" width="50%">
-
-## 插件开发
-插件开发和组件开发形式类似，但是插件开发不需要有组件的规范。在以 vue 为基础的 ui 和 runtime 中，插件其实就是一个 vue 插件。
-
-我们只需要在插件中提供一个入口文件，其中包含 vue 的 install 方法即可。
-
-```javascript
-export default {
-  install() {}
-}
-```
-
-在插件中开发者可以自由实现需要的业务逻辑。插件和组件一样，只需要在 units.js 中，加入导出的 units 对象里即可。
-
-## 业务定制
-上述的步骤，如
-1. 组件/插件初始化
-2. 编辑器中的组件调试
-3. 真实页面的组件调试
-4. 编辑器中的 DSL 同步至本地调试页面
-
-等许多步骤，都可以交由业务方进行定制，开发业务自定义的脚手架工具，或者如示例中一样，使用打包脚本来处理。
