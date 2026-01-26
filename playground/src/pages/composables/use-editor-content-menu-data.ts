@@ -2,7 +2,7 @@ import { computed, markRaw, type Ref } from 'vue';
 import { CopyDocument, DocumentCopy } from '@element-plus/icons-vue';
 
 import { cloneDeep } from '@tmagic/core';
-import { calcValueByFontsize, ContentMenu, COPY_STORAGE_KEY, type MenuButton, Services } from '@tmagic/editor';
+import { calcValueByFontsize, ContentMenu, COPY_STORAGE_KEY, type MenuButton, type Services } from '@tmagic/editor';
 
 export const useEditorContentMenuData = () => {
   const collectorOptions = {
