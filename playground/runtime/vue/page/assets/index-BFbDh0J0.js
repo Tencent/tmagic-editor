@@ -1,0 +1,2 @@
+import{d as i,c as r,i as c,o as s,C as d}from"./index-CB05xkW7.js";import{a as p,r as l}from"./use-app-BjZx0Alq.js";const m=["innerHTML"],k=i({name:"tmagic-text",__name:"index",props:{config:{},iteratorIndex:{},iteratorContainerId:{},containerIndex:{},pageFragmentContainerId:{},model:{},disabled:{type:Boolean}},setup(n){const t=n,o=c("app"),e=p(t);l(e);const a=()=>{o&&e&&o.emit("".concat(d,"click"),e)};return(f,_)=>(s(),r("p",{onClick:a,innerHTML:n.config.text},null,8,m))}});export{k as default};
+//# sourceMappingURL=index-BFbDh0J0.js.map
