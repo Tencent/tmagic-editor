@@ -29,7 +29,7 @@ export default defineConfig({
 
     nav: [
       { text: '文档', link: '/guide/', activeMatch: '/guide/' },
-      { text: 'API', link: '/api/editor/props', activeMatch: '/api/' },
+      { text: 'Editor API', link: '/api/editor/props', activeMatch: '/api/' },
       { text: 'Runtime API', link: '/runtime-api/core/app', activeMatch: '/runtime-api/' },
       { text: '表单配置', link: '/form-config/fields/text', activeMatch: '/form-config/' },
       { text: '更新日志', link: 'https://github.com/Tencent/tmagic-editor/releases' },

@@ -81,7 +81,7 @@ name 是表单项值的key。
 }
 ```
 
-type 在@tmagic/form 和 @tmagic/editor 中默认提供了种，@tmagic/form提供的可以前往[表单配置](/form-config/fields/text.html)查看。
+type 在@tmagic/form 和 @tmagic/editor 中默认提供了一些，@tmagic/form提供的可以前往[表单配置](/form-config/fields/text.html)查看。
 :::
 
 
