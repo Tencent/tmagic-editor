@@ -17,9 +17,30 @@ tmagic-editor支持业务方进行自定义组件开发。在tmagic-editor中，
 
 :::tip
 
-组件库并不是必须，组件如何管理可以根据具体情况来选择。直接放到 runtime 目录中也是一个不错的选择，如果选择放到runtime中可以在runtime中的package.json添加`"tmagicComponentsPath": "./components"` 来指定组件库的路径。这样在使用`npm create tmagic` 来创建组件时，会自动将组件添加到组件库中。
-
+组件库并不是必须，组件如何管理可以根据具体情况来选择。直接放到 runtime 目录中也是一个不错的选择，如果选择放到runtime中可以在runtime中的package.json添加
+```json
+{
+  "createTmagic": {
+    "componentsPath": "./components",
+    "pluginsPath": "./plugins",
+    "dataSourcesPath": "./dataSources"
+  }
+}
+```
+来指定组件库的路径。这样在使用`npm create tmagic` 来创建组件时，会自动将组件添加到组件库中。
 :::
+
+:::tip
+如需为组件添加npm scope name，可以在runtime中的package.json中添加
+```json
+{
+  "createTmagic": {
+     "npmScopeName": "@tmagic"
+  }
+}
+```
+:::
+
 
 手动创建组件，可以在项目中，如 runtime  目录中，创建一个名为 test-component 的组件目录，其中包含上面四个规范文件。
 ```javascript
