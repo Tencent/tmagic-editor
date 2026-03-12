@@ -1,3 +1,21 @@
+## [1.7.7](https://github.com/Tencent/tmagic-editor/compare/v1.7.6...v1.7.7) (2026-03-12)
+
+
+### Bug Fixes
+
+* **editor:** 显示源码后再显示回编辑器画布空了 ([67d93ec](https://github.com/Tencent/tmagic-editor/commit/67d93ec35f2d8819c438450fcb808b496de229c0))
+* **form:** timerange新增value format配置,默认为HH:mm:ss ([b4c2c65](https://github.com/Tencent/tmagic-editor/commit/b4c2c65ccb1a59b2d8ff090fbf1b15922e28605f))
+* **vue-runtime-help:** useApp获取不到页面片中的node ([ecaa0f5](https://github.com/Tencent/tmagic-editor/commit/ecaa0f5f288894d4df50d3d7f17a168ae8d14d91))
+
+
+### Features
+
+* **cli:** packages配置不做去重处理,因为组件type与数据源type可能相同 ([084ff6f](https://github.com/Tencent/tmagic-editor/commit/084ff6ff68b51c357842a381a7b1ad10bcc390ec))
+* **data-source:** 事件监听添加立即执行配置 ([0d698b2](https://github.com/Tencent/tmagic-editor/commit/0d698b20e72f58962f758c602d0f11596b1ffb52))
+* **editor:** monaco-editor改成异步加载 ([71d6dd9](https://github.com/Tencent/tmagic-editor/commit/71d6dd9e38f9de6750018d1aff2836fe52bd7bc4))
+
+
+
 ## [1.7.6](https://github.com/Tencent/tmagic-editor/compare/v1.7.5...v1.7.6) (2026-01-19)
 
 
