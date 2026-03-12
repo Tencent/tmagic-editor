@@ -327,8 +327,8 @@ importers:
         specifier: ^1.1.9
         version: 1.1.9
       emmet-monaco-es:
-        specifier: ^5.6.1
-        version: 5.6.1(monaco-editor@0.48.0)
+        specifier: ^5.7.0
+        version: 5.7.0(monaco-editor@0.48.0)
       events:
         specifier: ^3.3.0
         version: 3.3.0
@@ -4166,8 +4166,8 @@ packages:
     peerDependencies:
       vue: ^3.2.0
 
-  emmet-monaco-es@5.6.1:
-    resolution: {integrity: sha512-Bdh0CJaG2NvcwCgRYQMBqtIiDI9/BwYNTFUnYd68OXC8DXNcAVLsIKIEnDhOGYtEO60Knf2OgMrL7UDQ5zh1yA==}
+  emmet-monaco-es@5.7.0:
+    resolution: {integrity: sha512-q8jtgsEWWaXHnAJ6HAcwMB7WHraRtf032TWpeOpN6SGLtwxr7hd6RgF3Kbj2rPxb6Q19fYVVafAFODYRYUS8NQ==}
     peerDependencies:
       monaco-editor: '>=0.22.0'
 
@@ -8380,7 +8380,7 @@ snapshots:
       '@tmagic/utils': 1.7.2(@tmagic/schema@1.7.6(typescript@5.9.3))(typescript@5.9.3)
       buffer: 6.0.3
       deep-object-diff: 1.1.9
-      emmet-monaco-es: 5.6.1(monaco-editor@0.55.1)
+      emmet-monaco-es: 5.7.0(monaco-editor@0.55.1)
       events: 3.3.0
       gesto: 1.19.4
       keycon: 1.4.0
@@ -8407,7 +8407,7 @@ snapshots:
       '@tmagic/utils': 1.7.6(@tmagic/schema@1.7.6(typescript@5.9.3))(typescript@5.9.3)
       buffer: 6.0.3
       deep-object-diff: 1.1.9
-      emmet-monaco-es: 5.6.1(monaco-editor@0.55.1)
+      emmet-monaco-es: 5.7.0(monaco-editor@0.55.1)
       events: 3.3.0
       gesto: 1.19.4
       keycon: 1.4.0
@@ -9848,12 +9848,12 @@ snapshots:
     transitivePeerDependencies:
       - '@vue/composition-api'
 
-  emmet-monaco-es@5.6.1(monaco-editor@0.48.0):
+  emmet-monaco-es@5.7.0(monaco-editor@0.48.0):
     dependencies:
       emmet: 2.4.11
       monaco-editor: 0.48.0
 
-  emmet-monaco-es@5.6.1(monaco-editor@0.55.1):
+  emmet-monaco-es@5.7.0(monaco-editor@0.55.1):
     dependencies:
       emmet: 2.4.11
       monaco-editor: 0.55.1

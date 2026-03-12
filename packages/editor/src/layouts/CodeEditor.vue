@@ -20,13 +20,14 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
 import { FullScreen } from '@element-plus/icons-vue';
 import { throttle } from 'lodash-es';
+import type * as Monaco from 'monaco-editor';
 import serialize from 'serialize-javascript';
 
 import { TMagicButton } from '@tmagic/design';
 
 import MIcon from '@editor/components/Icon.vue';
 import { getEditorConfig } from '@editor/utils/config';
-import monaco from '@editor/utils/monaco-editor';
+import loadMonaco from '@editor/utils/monaco-editor';
 
 defineOptions({
   name: 'MEditorCodeEditor',
@@ -38,7 +39,7 @@ const props = withDefaults(
     modifiedValues?: any;
     type?: 'diff';
     language?: string;
-    options?: monaco.editor.IStandaloneEditorConstructionOptions;
+    options?: Monaco.editor.IStandaloneEditorConstructionOptions;
     height?: string;
     autoSave?: boolean;
     parse?: boolean;
@@ -99,7 +100,7 @@ const calculateExtraHeight = (): number => {
         extraHeight = Math.max(editorRect.height - scrollableRect.height, 0);
 
         // 如果无法获取到有效的差值，使用编辑器配置中的相关选项
-        if (extraHeight === 0) {
+        if (extraHeight === 0 && monaco) {
           const editorOptions = vsEditor.getOptions();
           const scrollBeyondLastLine = editorOptions.get(monaco.editor.EditorOption.scrollBeyondLastLine);
           const padding = editorOptions.get(monaco.editor.EditorOption.padding);
@@ -127,7 +128,7 @@ const setAutoHeight = (v = '') => {
 
   // 获取编辑器实际行高，如果编辑器还未初始化则使用默认值
   let lineHeight = 20;
-  if (vsEditor) {
+  if (vsEditor && monaco) {
     const editorOptions = vsEditor.getOptions();
     lineHeight = editorOptions.get(monaco.editor.EditorOption.lineHeight) || 20;
   }
@@ -188,8 +189,9 @@ const parseCode = (v: string | any, language: string): any => {
   return getEditorConfig('parseDSL')(v);
 };
 
-let vsEditor: monaco.editor.IStandaloneCodeEditor | null = null;
-let vsDiffEditor: monaco.editor.IStandaloneDiffEditor | null = null;
+let monaco: typeof import('monaco-editor') | null = null;
+let vsEditor: Monaco.editor.IStandaloneCodeEditor | null = null;
+let vsDiffEditor: Monaco.editor.IStandaloneDiffEditor | null = null;
 
 const values = ref('');
 const loading = ref(false);
@@ -206,6 +208,8 @@ const setEditorValue = (v: string | any, m: string | any) => {
   values.value = toString(v, props.language.toLocaleLowerCase());
 
   setAutoHeight(values.value);
+
+  if (!monaco) return;
 
   if (props.type === 'diff') {
     const originalModel = monaco.editor.createModel(values.value, 'text/javascript');
@@ -255,6 +259,8 @@ const init = async () => {
   // 重置缓存的额外高度，因为编辑器重新初始化
   cachedExtraHeight = null;
 
+  monaco = await loadMonaco();
+
   const options = {
     value: values.value,
     language: props.language,
@@ -264,7 +270,7 @@ const init = async () => {
   };
 
   if (props.type === 'diff') {
-    vsDiffEditor = getEditorConfig('customCreateMonacoDiffEditor')(monaco, codeEditorEl.value, options);
+    vsDiffEditor = await getEditorConfig('customCreateMonacoDiffEditor')(monaco!, codeEditorEl.value, options);
 
     // 监听diff编辑器内容变化
     vsDiffEditor.getModifiedEditor().onDidChangeModelContent(() => {
@@ -274,7 +280,7 @@ const init = async () => {
       }
     });
   } else {
-    vsEditor = getEditorConfig('customCreateMonacoEditor')(monaco, codeEditorEl.value, options);
+    vsEditor = await getEditorConfig('customCreateMonacoEditor')(monaco!, codeEditorEl.value, options);
 
     // 监听编辑器内容变化
     vsEditor.onDidChangeModelContent(() => {
@@ -343,6 +349,7 @@ onBeforeUnmount(() => {
 
   vsEditor = null;
   vsDiffEditor = null;
+  monaco = null;
 
   // 重置缓存
   cachedExtraHeight = null;

@@ -18,6 +18,7 @@
 
 import type { Component } from 'vue';
 import type EventEmitter from 'events';
+import type * as Monaco from 'monaco-editor';
 import Sortable, { type Options, type SortableEvent } from 'sortablejs';
 import type { PascalCasedProperties } from 'type-fest';
 
@@ -31,8 +32,6 @@ import type {
   RenderType,
   UpdateDragEl,
 } from '@tmagic/stage';
-
-import Monaco from '@editor/utils/monaco-editor';
 
 import type { CodeBlockService } from './services/codeBlock';
 import type { ComponentListService } from './services/componentList';
@@ -121,15 +120,15 @@ export type GetConfig = (config: FormConfig) => Promise<FormConfig> | FormConfig
 export interface EditorInstallOptions {
   parseDSL: <T = any>(dsl: string) => T;
   customCreateMonacoEditor: (
-    monaco: typeof Monaco,
+    monaco: typeof import('monaco-editor'),
     codeEditorEl: HTMLElement,
     options: Monaco.editor.IStandaloneEditorConstructionOptions & { editorCustomType?: string },
-  ) => Monaco.editor.IStandaloneCodeEditor;
+  ) => Promise<Monaco.editor.IStandaloneCodeEditor> | Monaco.editor.IStandaloneCodeEditor;
   customCreateMonacoDiffEditor: (
-    monaco: typeof Monaco,
+    monaco: typeof import('monaco-editor'),
     codeEditorEl: HTMLElement,
     options: Monaco.editor.IStandaloneEditorConstructionOptions & { editorCustomType?: string },
-  ) => Monaco.editor.IStandaloneDiffEditor;
+  ) => Promise<Monaco.editor.IStandaloneDiffEditor> | Monaco.editor.IStandaloneDiffEditor;
   [key: string]: any;
 }
 

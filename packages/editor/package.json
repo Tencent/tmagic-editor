@@ -54,7 +54,7 @@
     "@tmagic/utils": "workspace:*",
     "buffer": "^6.0.3",
     "deep-object-diff": "^1.1.9",
-    "emmet-monaco-es": "^5.6.1",
+    "emmet-monaco-es": "^5.7.0",
     "events": "^3.3.0",
     "gesto": "^1.19.4",
     "keycon": "^1.4.0",

@@ -47,6 +47,7 @@ export const numberOptions = [
 
 export const styleTabConfig: TabPaneConfig = {
   title: '样式',
+  lazy: true,
   display: ({ services }: any) => !(services.uiService.get('showStylePanel') ?? true),
   items: [
     {
@@ -114,6 +115,7 @@ export const styleTabConfig: TabPaneConfig = {
 
 export const eventTabConfig: TabPaneConfig = {
   title: '事件',
+  lazy: true,
   items: [
     {
       name: 'events',

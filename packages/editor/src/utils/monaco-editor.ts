@@ -1,8 +1,15 @@
-import { emmetCSS, emmetHTML } from 'emmet-monaco-es';
-import * as monaco from 'monaco-editor';
+let cached: Promise<typeof import('monaco-editor')> | undefined;
 
-// 注册emmet插件
-emmetHTML(monaco);
-emmetCSS(monaco, ['css', 'scss']);
+export default () => {
+  if (!cached) {
+    cached = Promise.all([import('emmet-monaco-es'), import('monaco-editor')]).then(([emmet, monaco]) => {
+      const { emmetHTML, emmetCSS } = emmet;
+      emmetHTML(monaco);
+      emmetCSS(monaco, ['css', 'scss']);
 
-export default monaco;
+      return monaco;
+    });
+  }
+
+  return cached;
+};
