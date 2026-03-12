@@ -349,8 +349,8 @@ class DataSourceManager extends EventEmitter {
     DataSourceManager.waitInitSchemaList.delete(this);
   }
 
-  public onDataChange(id: string, path: string, callback: (newVal: any) => void) {
-    return this.get(id)?.onDataChange(path, callback);
+  public onDataChange(id: string, path: string, callback: (newVal: any) => void, options?: { immediate?: boolean }) {
+    return this.get(id)?.onDataChange(path, callback, options);
   }
 
   public offDataChange(id: string, path: string, callback: (newVal: any) => void) {
