@@ -17,7 +17,7 @@
     </slot>
 
     <SplitView
-      v-else
+      v-show="!showSrc"
       ref="splitView"
       class="m-editor-content"
       left-class="m-editor-framework-left"
