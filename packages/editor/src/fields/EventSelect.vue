@@ -41,7 +41,7 @@
             :icon="Delete"
             :disabled="disabled"
             :size="size"
-            @click="removeEvent(index)"
+            @click="removeEvent(Number(index))"
           ></TMagicButton>
         </template>
       </MPanel>
