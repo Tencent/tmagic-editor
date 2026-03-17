@@ -608,9 +608,6 @@ importers:
       '@vue/compiler-sfc':
         specifier: 'catalog:'
         version: 3.5.24
-      terser:
-        specifier: ^5.44.1
-        version: 5.44.1
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -949,9 +946,6 @@ importers:
       fs-extra:
         specifier: ^11.3.1
         version: 11.3.2
-      terser:
-        specifier: ^5.44.1
-        version: 5.44.1
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -1053,9 +1047,6 @@ importers:
       rimraf:
         specifier: ^3.0.2
         version: 3.0.2
-      terser:
-        specifier: ^5.44.1
-        version: 5.44.1
       typescript:
         specifier: 'catalog:'
         version: 5.9.3

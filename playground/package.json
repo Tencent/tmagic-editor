@@ -34,7 +34,6 @@
     "@vitejs/plugin-vue": "^6.0.5",
     "@vitejs/plugin-vue-jsx": "^5.1.5",
     "@vue/compiler-sfc": "catalog:",
-    "terser": "^5.44.1",
     "typescript": "catalog:",
     "vite": "catalog:"
   }

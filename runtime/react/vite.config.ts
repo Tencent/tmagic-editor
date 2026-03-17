@@ -64,6 +64,12 @@ export default defineConfig({
 
   publicDir: 'public',
 
+  css: {
+    lightningcss: {
+      errorRecovery: true,
+    },
+  },
+
   server: {
     host: '0.0.0.0',
     port: 8078,
