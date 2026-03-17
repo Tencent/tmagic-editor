@@ -67,7 +67,7 @@ async function build({ packageName, format, pkg, packagesDir }) {
         cssFileName: 'style',
       },
 
-      rollupOptions: {
+      rolldownOptions: {
         // 确保外部化处理那些你不想打包进库的依赖
         external(id) {
           if (format === 'umd' && id === 'lodash-es') {

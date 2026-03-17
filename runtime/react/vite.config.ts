@@ -71,7 +71,7 @@ export default defineConfig({
   },
 
   build: {
-    rollupOptions: {
+    rolldownOptions: {
       input: {
         page: path.resolve(__dirname, './page/index.html'),
         playground: path.resolve(__dirname, './playground/index.html'),

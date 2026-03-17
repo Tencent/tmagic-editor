@@ -552,9 +552,11 @@ export default defineConfig({
 
   vite: {
     optimizeDeps: {
-      esbuildOptions: {
-        define: {
-          global: 'globalThis',
+      rolldownOptions: {
+        transform: {
+          define: {
+            global: 'globalThis',
+          },
         },
       },
     },

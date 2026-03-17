@@ -2,8 +2,7 @@ import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import alias from '@rollup/plugin-alias';
-import dts from 'rollup-plugin-dts';
+import { dts } from 'rolldown-plugin-dts';
 
 if (!existsSync('temp')) {
   console.warn(
@@ -24,36 +23,45 @@ const targetPackages = targets ? packages.filter((pkg) => targets.includes(pkg))
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
-function rollupConfig(pkg, base) {
+const aliasEntries = [
+  { find: /^@form\//, replacement: `${path.join(dirname, './temp/packages/form/src')}/` },
+  { find: /^@editor\//, replacement: `${path.join(dirname, './temp/packages/editor/src')}/` },
+  { find: /^@data-source\//, replacement: `${path.join(dirname, './temp/packages/data-source/src')}/` },
+];
+
+function aliasPlugin() {
+  return {
+    name: 'dts-alias',
+    resolveId(source) {
+      for (const { find, replacement } of aliasEntries) {
+        if (find.test(source)) {
+          return source.replace(find, replacement);
+        }
+      }
+    },
+  };
+}
+
+function rolldownConfig(pkg, base) {
   return {
     input: `./temp/${base}/${pkg}/src/index.d.ts`,
+    external: (id) =>
+      !id.startsWith('.') &&
+      !id.startsWith('/') &&
+      !id.startsWith('@editor/') &&
+      !id.startsWith('@form/') &&
+      !id.startsWith('@data-source/'),
+    plugins: [aliasPlugin(), ...dts({ dtsInput: true, tsconfig: false })],
     output: {
       file: `${base}/${pkg}/types/index.d.ts`,
       format: 'es',
-    },
-    plugins: [
-      alias({
-        entries: [
-          { find: /^@form/, replacement: path.join(dirname, './temp/packages/form/src') },
-          { find: /^@editor/, replacement: path.join(dirname, './temp/packages/editor/src') },
-          { find: /^@data-source/, replacement: path.join(dirname, './temp/packages/data-source/src') },
-        ],
-      }),
-      dts(),
-    ],
-    onwarn(warning, warn) {
-      // during dts rollup, everything is externalized by default
-      if (warning.code === 'UNRESOLVED_IMPORT' && !warning.exporter?.startsWith('.')) {
-        return;
-      }
-      warn(warning);
     },
   };
 }
 
 export default [
-  ...targetPackages.map((pkg) => rollupConfig(pkg, 'packages')),
-  ...runtimes.map((pkg) => rollupConfig(pkg, 'runtime')),
+  ...targetPackages.map((pkg) => rolldownConfig(pkg, 'packages')),
+  ...runtimes.map((pkg) => rolldownConfig(pkg, 'runtime')),
 ];
 
 function removeScss(path) {
