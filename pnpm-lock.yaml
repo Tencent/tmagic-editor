@@ -350,6 +350,9 @@ importers:
       sortablejs:
         specifier: ^1.15.6
         version: 1.15.6
+      type-fest:
+        specifier: ^5.2.0
+        version: 5.2.0
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -372,9 +375,6 @@ importers:
       '@vue/test-utils':
         specifier: ^2.4.6
         version: 2.4.6
-      type-fest:
-        specifier: ^5.2.0
-        version: 5.2.0
 
   packages/element-plus-adapter:
     dependencies:

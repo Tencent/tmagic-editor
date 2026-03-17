@@ -68,17 +68,20 @@
     "@types/lodash-es": "^4.17.4",
     "@types/serialize-javascript": "^5.0.4",
     "@types/sortablejs": "^1.15.9",
-    "@vue/test-utils": "^2.4.6",
-    "type-fest": "^5.2.0"
+    "@vue/test-utils": "^2.4.6"
   },
   "peerDependencies": {
     "@tmagic/core": "workspace:*",
     "monaco-editor": "^0.48.0",
+    "type-fest": "^5.2.0",
     "typescript": "catalog:",
     "vue": "catalog:"
   },
   "peerDependenciesMeta": {
     "typescript": {
+      "optional": true
+    },
+    "type-fest": {
       "optional": true
     }
   }
