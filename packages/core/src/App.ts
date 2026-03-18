@@ -293,9 +293,11 @@ class App extends EventEmitter {
 
       const method = methods.find((item) => item.name === methodName);
       if (method && typeof method.content === 'function') {
-        await method.content({ app: this, params, dataSource, eventParams: args, flowState, node });
-      } else if (typeof dataSource[methodName] === 'function') {
-        await dataSource[methodName]();
+        return await method.content({ app: this, params, dataSource, eventParams: args, flowState, node });
+      }
+
+      if (typeof dataSource[methodName] === 'function') {
+        return await dataSource[methodName]();
       }
     } catch (e: any) {
       if (this.errorHandler) {
