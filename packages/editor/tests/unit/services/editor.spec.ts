@@ -30,6 +30,9 @@ import { COPY_STORAGE_KEY, setEditorConfig } from '@editor/utils';
 setEditorConfig({
   // eslint-disable-next-line no-eval
   parseDSL: (dsl: string) => eval(dsl),
+  customCreateMonacoEditor: (monaco, codeEditorEl, options) => monaco.editor.create(codeEditorEl, options),
+  customCreateMonacoDiffEditor: (monaco, codeEditorEl, options) =>
+    monaco.editor.createDiffEditor(codeEditorEl, options),
 });
 
 // mock window.localStage

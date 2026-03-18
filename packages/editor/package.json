@@ -73,7 +73,7 @@
   },
   "peerDependencies": {
     "@tmagic/core": "workspace:*",
-    "monaco-editor": "^0.48.0",
+    "monaco-editor": "^0.55.1 ",
     "type-fest": "^5.2.0",
     "typescript": "catalog:",
     "vue": "catalog:"

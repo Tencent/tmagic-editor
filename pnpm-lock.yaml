@@ -328,7 +328,7 @@ importers:
         version: 1.1.9
       emmet-monaco-es:
         specifier: ^5.7.0
-        version: 5.7.0(monaco-editor@0.48.0)
+        version: 5.7.0(monaco-editor@0.55.1)
       events:
         specifier: ^3.3.0
         version: 3.3.0
@@ -342,8 +342,8 @@ importers:
         specifier: ^4.17.21
         version: 4.17.21
       monaco-editor:
-        specifier: ^0.48.0
-        version: 0.48.0
+        specifier: '^0.55.1 '
+        version: 0.55.1
       moveable:
         specifier: ^0.53.0
         version: 0.53.0
@@ -5431,9 +5431,6 @@ packages:
   mitt@3.0.1:
     resolution: {integrity: sha512-vKivATfr97l2/QBCYAkXYDbrIWPM2IIKEl7YPhjCvKlG3kE2gm+uBo6nEXK3M5/Ffh/FLpKExzOQ3JJoJGFKBw==}
 
-  monaco-editor@0.48.0:
-    resolution: {integrity: sha512-goSDElNqFfw7iDHMg8WDATkfcyeLTNpBHQpO8incK6p5qZt5G/1j41X0xdGzpIkGojGXM+QiRQyLjnfDVvrpwA==}
-
   monaco-editor@0.55.1:
     resolution: {integrity: sha512-jz4x+TJNFHwHtwuV9vA9rMujcZRb0CEilTEwG2rRSpe/A7Jdkuj8xPKttCgOh+v/lkHy7HsZ64oj+q3xoAFl9A==}
 
@@ -10123,11 +10120,6 @@ snapshots:
     transitivePeerDependencies:
       - '@vue/composition-api'
 
-  emmet-monaco-es@5.7.0(monaco-editor@0.48.0):
-    dependencies:
-      emmet: 2.4.11
-      monaco-editor: 0.48.0
-
   emmet-monaco-es@5.7.0(monaco-editor@0.55.1):
     dependencies:
       emmet: 2.4.11
@@ -11391,8 +11383,6 @@ snapshots:
   minisearch@7.2.0: {}
 
   mitt@3.0.1: {}
-
-  monaco-editor@0.48.0: {}
 
   monaco-editor@0.55.1:
     dependencies:
