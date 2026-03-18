@@ -2,13 +2,14 @@
   "version": "1.7.7",
   "name": "@tmagic/utils",
   "type": "module",
+  "sideEffects": false,
   "main": "dist/tmagic-utils.umd.cjs",
-  "module": "dist/tmagic-utils.js",
+  "module": "dist/es/index.js",
   "types": "types/index.d.ts",
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
-      "import": "./dist/tmagic-utils.js",
+      "import": "./dist/es/index.js",
       "require": "./dist/tmagic-utils.umd.cjs"
     }
   },

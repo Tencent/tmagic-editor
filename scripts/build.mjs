@@ -53,6 +53,7 @@ async function build({ packageName, format, pkg, packagesDir }) {
     plugins: [vue()],
 
     build: {
+      outDir: format === 'es' ? 'dist/es' : 'dist',
       emptyOutDir: false,
       cssCodeSplit: false,
       sourcemap: false,
@@ -85,6 +86,14 @@ async function build({ packageName, format, pkg, packagesDir }) {
             vue: 'Vue',
             'element-plus': 'ElementPlus',
           },
+          // ES 格式保留模块结构，让消费者的 bundler 按模块粒度 tree-shake
+          ...(format === 'es'
+            ? {
+                preserveModules: true,
+                preserveModulesRoot: 'src',
+                entryFileNames: '[name].js',
+              }
+            : {}),
         },
       },
     },

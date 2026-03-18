@@ -2,13 +2,14 @@
   "version": "1.7.7",
   "name": "@tmagic/element-plus-adapter",
   "type": "module",
+  "sideEffects": false,
   "main": "dist/tmagic-element-plus-adapter.umd.cjs",
-  "module": "dist/tmagic-element-plus-adapter.js",
+  "module": "dist/es/index.js",
   "types": "types/index.d.ts",
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
-      "import": "./dist/tmagic-element-plus-adapter.js",
+      "import": "./dist/es/index.js",
       "require": "./dist/tmagic-element-plus-adapter.umd.cjs"
     },
     "./*": "./*"

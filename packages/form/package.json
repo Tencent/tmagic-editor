@@ -4,16 +4,17 @@
   "type": "module",
   "sideEffects": [
     "dist/style.css",
+    "dist/es/style.css",
     "src/theme/*"
   ],
   "main": "dist/tmagic-form.umd.cjs",
-  "module": "dist/tmagic-form.js",
+  "module": "dist/es/index.js",
   "style": "dist/style.css",
   "types": "types/index.d.ts",
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
-      "import": "./dist/tmagic-form.js",
+      "import": "./dist/es/index.js",
       "require": "./dist/tmagic-form.umd.cjs"
     },
     "./dist/style.css": {

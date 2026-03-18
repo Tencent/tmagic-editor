@@ -3,12 +3,12 @@
   "name": "@tmagic/tmagic-form-runtime",
   "type": "module",
   "main": "dist/tmagic-tmagic-form.umd.cjs",
-  "module": "dist/tmagic-tmagic-form.js",
+  "module": "dist/es/index.js",
   "types": "types/index.d.ts",
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
-      "import": "./dist/tmagic-tmagic-form.js",
+      "import": "./dist/es/index.js",
       "require": "./dist/tmagic-tmagic-form.umd.cjs"
     },
     "./*": "./*"

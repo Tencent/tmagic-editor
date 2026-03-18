@@ -4,12 +4,12 @@
   "type": "module",
   "sideEffects": false,
   "main": "dist/tmagic-vue-runtime-help.umd.cjs",
-  "module": "dist/tmagic-vue-runtime-help.js",
+  "module": "dist/es/index.js",
   "types": "types/index.d.ts",
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
-      "import": "./dist/tmagic-vue-runtime-help.js",
+      "import": "./dist/es/index.js",
       "require": "./dist/tmagic-vue-runtime-help.umd.cjs"
     },
     "./*": "./*"

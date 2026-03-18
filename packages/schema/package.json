@@ -2,13 +2,14 @@
   "version": "1.7.7",
   "name": "@tmagic/schema",
   "type": "module",
+  "sideEffects": false,
   "main": "dist/tmagic-schema.umd.cjs",
-  "module": "dist/tmagic-schema.js",
+  "module": "dist/es/index.js",
   "types": "types/index.d.ts",
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
-      "import": "./dist/tmagic-schema.js",
+      "import": "./dist/es/index.js",
       "require": "./dist/tmagic-schema.umd.cjs"
     },
     "./*": "./*"

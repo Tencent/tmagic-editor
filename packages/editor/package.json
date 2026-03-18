@@ -4,16 +4,17 @@
   "type": "module",
   "sideEffects": [
     "dist/style.css",
+    "dist/es/style.css",
     "src/theme/*"
   ],
   "main": "dist/tmagic-editor.umd.cjs",
-  "module": "dist/tmagic-editor.js",
+  "module": "dist/es/index.js",
   "style": "dist/style.css",
   "types": "types/index.d.ts",
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
-      "import": "./dist/tmagic-editor.js",
+      "import": "./dist/es/index.js",
       "require": "./dist/tmagic-editor.umd.cjs"
     },
     "./dist/style.css": {
