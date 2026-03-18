@@ -27,3 +27,4 @@ export * from './scroll-viewer';
 export * from './tree';
 export * from './undo-redo';
 export * from './const';
+export { default as loadMonaco } from './monaco-editor';

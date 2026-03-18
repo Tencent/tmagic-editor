@@ -19,7 +19,7 @@
 import type { Component } from 'vue';
 import type EventEmitter from 'events';
 import type * as Monaco from 'monaco-editor';
-import Sortable, { type Options, type SortableEvent } from 'sortablejs';
+import type { default as Sortable, Options, SortableEvent } from 'sortablejs';
 import type { PascalCasedProperties } from 'type-fest';
 
 import type { CodeBlockContent, CodeBlockDSL, Id, MApp, MContainer, MNode, MPage, MPageFragment } from '@tmagic/core';

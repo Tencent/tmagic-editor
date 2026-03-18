@@ -5,7 +5,7 @@
     :class="`m-form-container m-container-${type || ''} ${config.className || ''}${config.tip ? ' has-tip' : ''}`"
     :style="config.style"
   >
-    <m-fields-hidden v-if="type === 'hidden'" v-bind="fieldsProps" :model="model"></m-fields-hidden>
+    <MHidden v-if="type === 'hidden'" :name="`${name}`" :prop="itemProp" :model="model"></MHidden>
 
     <component
       v-else-if="items && !text && type && display"
@@ -172,6 +172,7 @@ import { isEqual } from 'lodash-es';
 import { TMagicButton, TMagicFormItem, TMagicIcon, TMagicTooltip } from '@tmagic/design';
 import { getValueByKeyPath } from '@tmagic/utils';
 
+import MHidden from '../fields/Hidden.vue';
 import type {
   ChildConfig,
   ContainerChangeEventData,
@@ -180,6 +181,7 @@ import type {
   FormValue,
   ToolTipConfigType,
 } from '../schema';
+import { getField } from '../utils/config';
 import { createObjectProp, display as displayFunction, filterFunction, getRules } from '../utils/form';
 
 import FormLabel from './FormLabel.vue';
@@ -248,11 +250,23 @@ const itemProp = computed(() => {
   return `${n}`;
 });
 
+const type = computed((): string => {
+  let { type } = props.config;
+  type = type && filterFunction<string>(mForm, type, props);
+  if (type === 'form') return '';
+  if (type === 'container') return '';
+  return type?.replace(/([A-Z])/g, '-$1').toLowerCase() || (items.value ? '' : 'text');
+});
+
 const tagName = computed(() => {
   if (type.value === 'component' && props.config.component) {
     return props.config.component;
   }
-  return `m-${items.value ? 'form' : 'fields'}-${type.value}`;
+
+  if (!getField(type.value || 'container')) {
+    console.log(type.value, 'type.value');
+  }
+  return getField(type.value || 'container') || `m-${items.value ? 'form' : 'fields'}-${type.value}`;
 });
 
 const disabled = computed(() => props.disabled || filterFunction(mForm, props.config.disabled, props));
@@ -275,14 +289,6 @@ const tooltip = computed(() => {
 });
 
 const rule = computed(() => getRules(mForm, props.config.rules, props));
-
-const type = computed((): string => {
-  let { type } = props.config;
-  type = type && filterFunction<string>(mForm, type, props);
-  if (type === 'form') return '';
-  if (type === 'container') return '';
-  return type?.replace(/([A-Z])/g, '-$1').toLowerCase() || (items.value ? '' : 'text');
-});
 
 const display = computed((): boolean => {
   const value = displayFunction(mForm, props.config.display, props);

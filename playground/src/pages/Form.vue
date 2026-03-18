@@ -3,7 +3,7 @@
     <nav-menu :data="menu"></nav-menu>
     <div class="diff-form">
       <div>开启表单对比功能</div>
-      <m-form
+      <MForm
         ref="form"
         :config="diffFormConfig"
         :is-compare="true"
@@ -11,12 +11,12 @@
         :last-values="lastVersion"
         size="small"
         height="100%"
-      ></m-form>
+      ></MForm>
     </div>
     <div class="title">表单字段展示</div>
     <div class="form-content">
-      <m-form ref="form" :config="config" :init-values="initValue" size="small" height="100%"></m-form>
-      <magic-code-editor class="code-editor-content" :init-values="config" @save="change"></magic-code-editor>
+      <MForm ref="form" :config="config" :init-values="initValue" size="small" height="100%"></MForm>
+      <TMagicCodeEditor class="code-editor-content" :init-values="config" @save="change"></TMagicCodeEditor>
     </div>
   </div>
 

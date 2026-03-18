@@ -1,12 +1,12 @@
 <template>
-  <m-fields-link :config="formConfig" :model="modelValue" name="form" @change="changeHandler"></m-fields-link>
+  <MLink :config="formConfig" :model="modelValue" name="form" @change="changeHandler"></MLink>
 </template>
 
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 import serialize from 'serialize-javascript';
 
-import type { CodeLinkConfig, FieldProps } from '@tmagic/form';
+import type { CodeLinkConfig, FieldProps, MLink } from '@tmagic/form';
 
 import { getEditorConfig } from '@editor/utils/config';
 

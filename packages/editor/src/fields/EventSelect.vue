@@ -1,6 +1,6 @@
 <template>
   <div class="m-fields-event-select">
-    <m-form-table
+    <MTable
       v-if="isOldVersion"
       name="events"
       :size="size"
@@ -8,7 +8,7 @@
       :model="model"
       :config="tableConfig"
       @change="onChangeHandler"
-    ></m-form-table>
+    ></MTable>
 
     <div v-else class="fullWidth">
       <TMagicButton class="create-button" type="primary" :size="size" :disabled="disabled" @click="addEvent()"
@@ -68,8 +68,9 @@ import type {
   FormState,
   OnChangeHandlerData,
   PanelConfig,
+  TableConfig,
 } from '@tmagic/form';
-import { MContainer as MFormContainer, MPanel } from '@tmagic/form';
+import { MContainer as MFormContainer, MPanel, MTable } from '@tmagic/form';
 import { DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX, traverseNode } from '@tmagic/utils';
 
 import { useServices } from '@editor/hooks/use-services';
@@ -304,7 +305,7 @@ const dataSourceActionConfig = computed(() => {
 });
 
 // 兼容旧的数据格式
-const tableConfig = computed(() => ({
+const tableConfig = computed<TableConfig>(() => ({
   type: 'table',
   name: 'events',
   items: [

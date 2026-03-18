@@ -189,6 +189,8 @@
 import hljs from 'highlight.js';
 import serialize from 'serialize-javascript';
 
+import { MForm } from '@tmagic/form';
+
 export function stripScript(content) {
   const result = content.match(/<(script)>([\s\S]+)<\/\1>/);
   return result && result[2] ? result[2].trim() : '';
@@ -209,6 +211,10 @@ export function stripTemplate(content) {
 
 export default {
   props: ['type', 'config'],
+
+  components: {
+    MForm,
+  },
 
   data() {
     return {
