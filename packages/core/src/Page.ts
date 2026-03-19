@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+import { cloneDeep } from 'lodash-es';
+
 import type { Id, MComponent, MContainer, MPage, MPageFragment } from '@tmagic/schema';
 
 import App from './App';
@@ -70,7 +72,7 @@ class Page extends Node {
         this.app.pageFragments.set(
           config.id,
           new Page({
-            config: pageFragment,
+            config: cloneDeep(pageFragment),
             app: this.app,
           }),
         );

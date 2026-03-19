@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { union } from 'lodash-es';
+import { cloneDeep, union } from 'lodash-es';
 
 import type { default as TMagicApp } from '@tmagic/core';
 import { getDepNodeIds, getNodes, isPage, isPageFragment, replaceChildNode } from '@tmagic/core';
@@ -82,11 +82,11 @@ export const createDataSourceManager = (app: TMagicApp, useMock?: boolean, initi
 
             for (const [, pageFragment] of app.pageFragments) {
               if (pageFragment.data.id === newNode.id) {
-                pageFragment.setData(newNode);
+                pageFragment.setData(cloneDeep(newNode));
               } else if (pageFragment.data.id === page.id) {
-                pageFragment.getNode(newNode.id, { strict: true })?.setData(newNode);
+                pageFragment.getNode(newNode.id, { strict: true })?.setData(cloneDeep(newNode));
                 if (!pageFragment.instance) {
-                  replaceChildNode(newNode, [pageFragment.data]);
+                  replaceChildNode(cloneDeep(newNode), [pageFragment.data]);
                 }
               }
             }
