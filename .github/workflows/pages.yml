@@ -41,6 +41,9 @@ jobs:
       - name: move to dist
         run: mv docs/.vitepress/dist/* dist/docs && mv playground/dist/* dist/playground
 
+      - name: Bypass Jekyll on GitHub Pages
+        run: touch dist/.nojekyll
+
       - name: Deploy to GitHub Pages
         uses: crazy-max/ghaction-github-pages@v2
         with:
