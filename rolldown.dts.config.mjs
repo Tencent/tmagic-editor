@@ -35,7 +35,16 @@ function aliasPlugin() {
     resolveId(source) {
       for (const { find, replacement } of aliasEntries) {
         if (find.test(source)) {
-          return source.replace(find, replacement);
+          let resolved = source.replace(find, replacement);
+          resolved = resolved.replace(/\/\//g, '/');
+          resolved = resolved.replace(/\.js$/, '');
+          if (existsSync(`${resolved}.d.ts`)) {
+            return `${resolved}.d.ts`;
+          }
+          if (existsSync(resolved)) {
+            return resolved;
+          }
+          return `${resolved}.d.ts`;
         }
       }
     },
