@@ -28,7 +28,6 @@ import editorPlugin from '@tmagic/editor';
 import App from './App.vue';
 import router from './route';
 
-import 'element-plus/dist/index.css';
 import '@tmagic/editor/dist/style.css';
 
 // @ts-ignore
