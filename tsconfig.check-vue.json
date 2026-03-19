@@ -1,5 +1,10 @@
 {
   "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "incremental": true,
+    "tsBuildInfoFile": "./node_modules/.cache/tscheck/check-vue.tsbuildinfo",
+    "sourceMap": false
+  },
   "include": [
     "packages/design/src",
     "packages/editor/src",

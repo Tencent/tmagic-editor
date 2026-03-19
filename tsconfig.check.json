@@ -1,5 +1,10 @@
 {
   "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "incremental": true,
+    "tsBuildInfoFile": "./node_modules/.cache/tscheck/check.tsbuildinfo",
+    "sourceMap": false
+  },
   "include": [
     "packages/core/src",
     "packages/data-source/src",

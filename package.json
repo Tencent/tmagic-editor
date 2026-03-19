@@ -17,7 +17,7 @@
     "pg:react": "pnpm playground:react",
     "build": "pnpm build:dts && node scripts/build.mjs",
     "build:dts": "pnpm --filter \"@tmagic/cli\" build && tsc -p tsconfig.build-browser.json && vue-tsc --declaration --emitDeclarationOnly --project tsconfig.build-vue.json && rolldown -c rolldown.dts.config.mjs && rimraf temp",
-    "check:type": "tsc --incremental --noEmit -p tsconfig.check.json && vue-tsc --noEmit -p tsconfig.check-vue.json",
+    "check:type": "node scripts/check-type.mjs",
     "build:playground": "pnpm --filter \"runtime-vue\" build && pnpm --filter \"tmagic-playground\" build",
     "docs:dev": "vitepress dev docs",
     "docs:serve": "vitepress serve docs",
