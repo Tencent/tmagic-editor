@@ -18,6 +18,8 @@ import {
 import Target from './Target';
 import { DepTargetType, type TargetList } from './types';
 
+const INTEGER_REGEXP = /^\d+$/;
+
 export const createCodeBlockTarget = (id: Id, codeBlock: CodeBlockContent, initialDeps: DepData = {}) =>
   new Target({
     type: DepTargetType.CODE_BLOCK,
@@ -30,8 +32,7 @@ export const createCodeBlockTarget = (id: Id, codeBlock: CodeBlockContent, initi
       }
 
       if (value?.hookType === HookType.CODE && Array.isArray(value.hookData)) {
-        const index = value.hookData.findIndex((item: HookData) => item.codeId === id);
-        return Boolean(index > -1);
+        return value.hookData.some((item: HookData) => item.codeId === id);
       }
 
       return false;
@@ -54,12 +55,7 @@ export const isIncludeArrayField = (keys: string[], fields: DataSchema[]) => {
     f = field?.fields || [];
 
     // 字段类型为数组并且后面没有数字索引
-    return (
-      field?.type === 'array' &&
-      // 不是整数
-      /^(?!\d+$).*$/.test(`${keys[index + 1]}`) &&
-      index < keys.length - 1
-    );
+    return field?.type === 'array' && index < keys.length - 1 && !INTEGER_REGEXP.test(keys[index + 1]);
   });
 };
 
@@ -78,33 +74,25 @@ export const isDataSourceTemplate = (value: any, ds: Pick<DataSourceSchema, 'id'
     return false;
   }
 
-  const arrayFieldTemplates = [];
-  const fieldTemplates = [];
-
-  templates.forEach((tpl) => {
+  for (const tpl of templates) {
     // 将${dsId.xxxx} 转成 dsId.xxxx
     const expression = tpl.substring(2, tpl.length - 1);
     const keys = getKeysArray(expression);
     const dsId = keys.shift();
 
     if (!dsId || dsId !== ds.id) {
-      return;
+      continue;
     }
 
     // ${dsId.array} ${dsId.array[0]} ${dsId.array[0].a} 这种是依赖
     // ${dsId.array.a} 这种不是依赖，这种需要再迭代器容器中的组件才能使用，依赖由迭代器处理
-    if (isIncludeArrayField(keys, ds.fields)) {
-      arrayFieldTemplates.push(tpl);
-    } else {
-      fieldTemplates.push(tpl);
+    const includesArray = isIncludeArrayField(keys, ds.fields);
+    if (hasArray === includesArray) {
+      return true;
     }
-  });
-
-  if (hasArray) {
-    return arrayFieldTemplates.length > 0;
   }
 
-  return fieldTemplates.length > 0;
+  return false;
 };
 
 /**
@@ -184,7 +172,12 @@ export const isDataSourceTarget = (
   value: any,
   hasArray = false,
 ) => {
-  if (!value || !['string', 'object'].includes(typeof value)) {
+  if (!value) {
+    return false;
+  }
+
+  const valueType = typeof value;
+  if (valueType !== 'string' && valueType !== 'object') {
     return false;
   }
 
@@ -193,13 +186,13 @@ export const isDataSourceTarget = (
   }
 
   // 或者在模板在使用数据源
-  if (typeof value === 'string') {
+  if (valueType === 'string') {
     return isDataSourceTemplate(value, ds, hasArray);
   }
 
   // 关联数据源对象,如：{ isBindDataSource: true, dataSourceId: 'xxx'}
   // 使用data-source-select value: 'value' 可以配置出来
-  if (isObject(value) && value?.isBindDataSource && value.dataSourceId && value.dataSourceId === ds.id) {
+  if (isObject(value) && value.isBindDataSource && value.dataSourceId === ds.id) {
     return true;
   }
 
@@ -210,10 +203,7 @@ export const isDataSourceTarget = (
   if (isUseDataSourceField(value, ds.id)) {
     const [, ...keys] = value;
     const includeArray = isIncludeArrayField(keys, ds.fields);
-    if (hasArray) {
-      return includeArray;
-    }
-    return !includeArray;
+    return hasArray ? includeArray : !includeArray;
   }
 
   return false;
@@ -235,12 +225,9 @@ export const isDataSourceCondTarget = (
     return false;
   }
 
-  if (ds.fields?.find((field) => field.name === keys[0])) {
+  if (ds.fields?.some((field) => field.name === keys[0])) {
     const includeArray = isIncludeArrayField(keys, ds.fields);
-    if (hasArray) {
-      return includeArray;
-    }
-    return !includeArray;
+    return hasArray ? includeArray : !includeArray;
   }
 
   return false;
@@ -282,12 +269,12 @@ export const createDataSourceMethodTarget = (
         return false;
       }
 
-      if (ds.methods?.find((method) => method.name === methodName)) {
+      if (ds.methods?.some((method) => method.name === methodName)) {
         return true;
       }
 
       // 配置的方法名称可能会是数据源类中定义的，并不存在于methods中，所以这里判断如果methodName如果是字段名称，就表示配置的不是方法
-      if (ds.fields?.find((field) => field.name === methodName)) {
+      if (ds.fields?.some((field) => field.name === methodName)) {
         return false;
       }
 
@@ -300,11 +287,18 @@ export const traverseTarget = (
   cb: (target: Target) => void,
   type?: DepTargetType | string,
 ) => {
+  if (type) {
+    const targets = targetsList[type];
+    if (targets) {
+      for (const target of Object.values(targets)) {
+        cb(target);
+      }
+    }
+    return;
+  }
+
   for (const targets of Object.values(targetsList)) {
     for (const target of Object.values(targets)) {
-      if (type && target.type !== type) {
-        continue;
-      }
       cb(target);
     }
   }

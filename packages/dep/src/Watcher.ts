@@ -5,6 +5,12 @@ import type Target from './Target';
 import { type DepExtendedData, DepTargetType, type TargetList, TargetNode } from './types';
 import { traverseTarget } from './utils';
 
+const DATA_SOURCE_TARGET_TYPES: Set<string> = new Set([
+  DepTargetType.DATA_SOURCE,
+  DepTargetType.DATA_SOURCE_COND,
+  DepTargetType.DATA_SOURCE_METHOD,
+]);
+
 export default class Watcher {
   private targetsList: TargetList = {};
   private childrenProp = 'items';
@@ -159,7 +165,7 @@ export default class Watcher {
       };
     }
 
-    const clearedItemsNodeIds: (string | number)[] = [];
+    const clearedItemsNodeIds = new Set<string | number>();
     traverseTarget(targetsList, (target) => {
       if (nodes) {
         for (const node of nodes) {
@@ -168,9 +174,9 @@ export default class Watcher {
           if (
             Array.isArray(node[this.childrenProp]) &&
             node[this.childrenProp].length &&
-            !clearedItemsNodeIds.includes(node[this.idProp])
+            !clearedItemsNodeIds.has(node[this.idProp])
           ) {
-            clearedItemsNodeIds.push(node[this.idProp]);
+            clearedItemsNodeIds.add(node[this.idProp]);
             this.clear(node[this.childrenProp]);
           }
         }
@@ -190,12 +196,7 @@ export default class Watcher {
   }
 
   public collectItem(node: TargetNode, target: Target, depExtendedData: DepExtendedData = {}, deep = false) {
-    const dataSourceTargetTypes: string[] = [
-      DepTargetType.DATA_SOURCE,
-      DepTargetType.DATA_SOURCE_COND,
-      DepTargetType.DATA_SOURCE_METHOD,
-    ];
-    if (node[NODE_DISABLE_DATA_SOURCE_KEY] && dataSourceTargetTypes.includes(target.type)) {
+    if (node[NODE_DISABLE_DATA_SOURCE_KEY] && DATA_SOURCE_TARGET_TYPES.has(target.type)) {
       return;
     }
 
