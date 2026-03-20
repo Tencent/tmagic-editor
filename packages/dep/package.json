@@ -1,5 +1,5 @@
 {
-  "version": "1.7.8-beta.4",
+  "version": "1.7.8",
   "name": "@tmagic/dep",
   "type": "module",
   "sideEffects": false,

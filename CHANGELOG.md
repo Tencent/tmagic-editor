@@ -1,3 +1,12 @@
+## [1.7.8](https://github.com/Tencent/tmagic-editor/compare/v1.7.8-beta.4...v1.7.8) (2026-03-20)
+
+
+### Bug Fixes
+
+* **editor:** 组件配置样式显示出错 ([9b56223](https://github.com/Tencent/tmagic-editor/commit/9b56223359f4ce826597f8f5d440626869e8b650))
+
+
+
 ## [1.7.8-beta.4](https://github.com/Tencent/tmagic-editor/compare/v1.7.8-beta.3...v1.7.8-beta.4) (2026-03-20)
 
 
