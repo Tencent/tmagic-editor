@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type ContainerChangeEventData, defineFormItem, type MContainer } from '@tmagic/form';
+import { type ContainerChangeEventData, defineFormItem, MContainer } from '@tmagic/form';
 import type { StyleSchema } from '@tmagic/schema';
 
 const props = defineProps<{

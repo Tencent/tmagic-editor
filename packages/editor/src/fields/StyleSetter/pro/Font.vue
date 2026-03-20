@@ -5,7 +5,7 @@
 <script lang="ts" setup>
 import { markRaw } from 'vue';
 
-import { type ContainerChangeEventData, defineFormItem, type MContainer } from '@tmagic/form';
+import { type ContainerChangeEventData, defineFormItem, MContainer } from '@tmagic/form';
 import type { StyleSchema } from '@tmagic/schema';
 
 import { AlignCenter, AlignLeft, AlignRight } from '../icons/text-align';

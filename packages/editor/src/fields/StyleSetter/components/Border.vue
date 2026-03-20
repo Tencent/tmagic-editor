@@ -39,7 +39,7 @@
 import { computed, ref } from 'vue';
 
 import type { ContainerChangeEventData, FormValue } from '@tmagic/form';
-import { defineFormItem, type MContainer } from '@tmagic/form';
+import { defineFormItem, MContainer } from '@tmagic/form';
 import type { StyleSchema } from '@tmagic/schema';
 
 const direction = ref('');
