@@ -1,3 +1,12 @@
+## [1.7.8-beta.4](https://github.com/Tencent/tmagic-editor/compare/v1.7.8-beta.3...v1.7.8-beta.4) (2026-03-20)
+
+
+### Bug Fixes
+
+* **form-schema:** 表单 schema 中 display 与 component 部分字段改为可选 ([e36d8d7](https://github.com/Tencent/tmagic-editor/commit/e36d8d7cf874fe5e307eee5f3906499a86337b85))
+
+
+
 ## [1.7.8-beta.3](https://github.com/Tencent/tmagic-editor/compare/v1.7.8-beta.2...v1.7.8-beta.3) (2026-03-20)
 
 
