@@ -4,7 +4,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type ContainerChangeEventData, MContainer } from '@tmagic/form';
+import { type ContainerChangeEventData, defineFormItem, type MContainer } from '@tmagic/form';
 import type { StyleSchema } from '@tmagic/schema';
 
 import Border from '../components/Border.vue';
@@ -19,7 +19,7 @@ const emit = defineEmits<{
   change: [v: StyleSchema, eventData: ContainerChangeEventData];
 }>();
 
-const config = {
+const config = defineFormItem({
   items: [
     {
       labelWidth: '68px',
@@ -31,7 +31,7 @@ const config = {
       },
     },
   ],
-};
+});
 
 const change = (value: StyleSchema, eventData: ContainerChangeEventData) => {
   emit('change', value, eventData);

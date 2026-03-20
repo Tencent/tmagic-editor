@@ -24,7 +24,7 @@ import {
   NODE_DISABLE_DATA_SOURCE_KEY,
 } from '@tmagic/core';
 import { tMagicMessage } from '@tmagic/design';
-import type { ChildConfig, FormConfig, TabConfig, TabPaneConfig } from '@tmagic/form';
+import type { ChildConfig, DisplayCondsConfig, FormConfig, TabConfig, TabPaneConfig } from '@tmagic/form';
 
 export const arrayOptions = [
   { text: '包含', value: 'include' },
@@ -168,7 +168,7 @@ export const advancedTabConfig: TabPaneConfig = {
   ],
 };
 
-export const displayTabConfig: TabPaneConfig = {
+export const displayTabConfig: TabPaneConfig<DisplayCondsConfig> = {
   title: '显示条件',
   display: (_state, { model }) => model.type !== 'page',
   items: [

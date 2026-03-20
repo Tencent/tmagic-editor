@@ -117,19 +117,25 @@ const stepActive = ref(1);
 const bodyHeight = ref(`${document.body.clientHeight - 194}px`);
 
 const stepCount = computed(() => {
-  const { length } = props.config;
-  for (let index = 0; index < length; index++) {
-    if (props.config[index].type === 'step') {
-      return (props.config[index] as StepConfig).items.length;
+  if (!Array.isArray(props.config)) {
+    return 0;
+  }
+
+  for (const item of props.config) {
+    if ('type' in item && item.type === 'step') {
+      return (item as StepConfig).items.length;
     }
   }
   return 0;
 });
 
 const hasStep = computed(() => {
-  const { length } = props.config;
-  for (let index = 0; index < length; index++) {
-    if (props.config[index].type === 'step') {
+  if (!Array.isArray(props.config)) {
+    return false;
+  }
+
+  for (const item of props.config) {
+    if ('type' in item && item.type === 'step') {
       return true;
     }
   }

@@ -5,7 +5,7 @@
   <MForm
     v-else-if="(config.type || config.editInlineFormConfig) && editState[index]"
     label-width="0"
-    :config="config.editInlineFormConfig ?? [config]"
+    :config="config.editInlineFormConfig ?? [config as FormItemConfig]"
     :init-values="editState[index]"
     @change="formChangeHandler"
   ></MForm>
@@ -46,7 +46,7 @@
 <script lang="ts" setup>
 import { TMagicButton, TMagicTag, TMagicTooltip } from '@tmagic/design';
 import { type ContainerChangeEventData, MForm } from '@tmagic/form';
-import type { FormValue } from '@tmagic/form-schema';
+import type { FormItemConfig, FormValue } from '@tmagic/form-schema';
 import { setValueByKeyPath } from '@tmagic/utils';
 
 import { ColumnConfig } from './schema';

@@ -1,7 +1,7 @@
 import { computed, inject } from 'vue';
 
 import { tMagicMessage } from '@tmagic/design';
-import type { FormState } from '@tmagic/form-schema';
+import type { FormConfig, FormState } from '@tmagic/form-schema';
 
 import { initValue } from '../utils/form';
 
@@ -86,7 +86,7 @@ export const useAdd = (
       }
 
       inputs = await initValue(mForm, {
-        config: columns,
+        config: columns as FormConfig,
         initValues: inputs,
       });
     }

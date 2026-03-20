@@ -98,7 +98,9 @@ const dataSources = computed(() => dataSourceService.get('dataSources') || []);
 const disabledDataSource = computed(() => propsService.getDisabledDataSource());
 
 const type = computed((): string => {
-  let type = props.config.fieldConfig?.type;
+  if (!props.config.fieldConfig) return '';
+
+  let type = 'type' in props.config.fieldConfig ? props.config.fieldConfig.type : '';
   if (typeof type === 'function') {
     type = type(mForm, {
       model: props.model,

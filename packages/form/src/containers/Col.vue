@@ -1,5 +1,5 @@
 <template>
-  <TMagicCol v-show="display && config.type !== 'hidden'" :span="span">
+  <TMagicCol v-show="display && 'type' in config && config.type !== 'hidden'" :span="span">
     <Container
       :model="model"
       :lastValues="lastValues"
@@ -21,7 +21,7 @@ import { computed, inject } from 'vue';
 
 import { TMagicCol } from '@tmagic/design';
 
-import type { ChildConfig, ContainerChangeEventData, FormState } from '../schema';
+import type { ContainerChangeEventData, FormItemConfig, FormState } from '../schema';
 import { display as displayFunction } from '../utils/form';
 
 import Container from './Container.vue';
@@ -34,8 +34,8 @@ const props = defineProps<{
   model: any;
   lastValues?: any;
   isCompare?: boolean;
-  config: ChildConfig;
-  labelWidth?: string;
+  config: FormItemConfig;
+  labelWidth?: string | number;
   expandMore?: boolean;
   span?: number;
   size?: string;

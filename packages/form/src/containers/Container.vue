@@ -175,10 +175,10 @@ import { getValueByKeyPath } from '@tmagic/utils';
 import MHidden from '../fields/Hidden.vue';
 import type {
   CheckboxConfig,
-  ChildConfig,
   ComponentConfig,
   ContainerChangeEventData,
   ContainerCommonConfig,
+  FormItemConfig,
   FormState,
   FormValue,
   ToolTipConfigType,
@@ -198,10 +198,10 @@ const props = withDefaults(
     model: FormValue;
     /** 需对比的值（开启对比模式时传入） */
     lastValues?: FormValue;
-    config: ChildConfig;
+    config: FormItemConfig;
     prop?: string;
     disabled?: boolean;
-    labelWidth?: string;
+    labelWidth?: string | number;
     expandMore?: boolean;
     stepActive?: string | number;
     size?: string;
@@ -253,7 +253,7 @@ const itemProp = computed(() => {
 });
 
 const type = computed((): string => {
-  let { type } = props.config;
+  let type = 'type' in props.config ? props.config.type : '';
   type = type && filterFunction<string>(mForm, type, props);
   if (type === 'form') return '';
   if (type === 'container') return '';

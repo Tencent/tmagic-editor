@@ -13,7 +13,7 @@
 <script lang="ts" setup>
 import { computed, useTemplateRef } from 'vue';
 
-import { type ContainerChangeEventData, type FormConfig, type FormValue, MForm } from '@tmagic/form';
+import { type ContainerChangeEventData, type FormItemConfig, type FormValue, MForm } from '@tmagic/form';
 
 import type { CodeParamStatement } from '@editor/type';
 import { error } from '@editor/utils';
@@ -34,7 +34,7 @@ const emit = defineEmits(['change']);
 
 const formRef = useTemplateRef<InstanceType<typeof MForm>>('form');
 
-const getFormConfig = (items: FormConfig = []) => [
+const getFormConfig = (items: FormItemConfig[] = []) => [
   {
     type: 'fieldset',
     items,
@@ -51,7 +51,7 @@ const codeParamsConfig = computed(() =>
       name,
       text,
       extra,
-      fieldConfig: config,
+      fieldConfig: config as FormItemConfig,
     })),
   ),
 );

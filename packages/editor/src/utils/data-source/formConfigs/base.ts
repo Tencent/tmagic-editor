@@ -1,6 +1,6 @@
-import { defineFormConfig } from '@tmagic/form';
+import { defineFormConfig, type FormConfig } from '@tmagic/form';
 
-export default () =>
+export default (): FormConfig =>
   defineFormConfig([
     {
       name: 'id',

@@ -1,11 +1,11 @@
-import { DataSchema, DataSourceFieldType, DataSourceSchema } from '@tmagic/core';
-import { CascaderOption, FormConfig, FormState } from '@tmagic/form';
+import type { DataSchema, DataSourceFieldType, DataSourceSchema } from '@tmagic/core';
+import { type CascaderOption, defineFormItem, type FormConfig } from '@tmagic/form';
 import { dataSourceTemplateRegExp, getKeysArray, isNumber } from '@tmagic/utils';
 
 import BaseFormConfig from './formConfigs/base';
 import HttpFormConfig from './formConfigs/http';
 
-const dataSourceFormConfig = {
+const dataSourceFormConfig = defineFormItem({
   type: 'tab',
   items: [
     {
@@ -50,7 +50,7 @@ const dataSourceFormConfig = {
     },
     {
       title: '请求参数裁剪',
-      display: (_formState: FormState, { model }: any) => model.type === 'http',
+      display: (_formState, { model }) => model.type === 'http',
       items: [
         {
           name: 'beforeRequest',
@@ -62,7 +62,7 @@ const dataSourceFormConfig = {
     },
     {
       title: '响应数据裁剪',
-      display: (_formState: FormState, { model }: any) => model.type === 'http',
+      display: (_formStat, { model }) => model.type === 'http',
       items: [
         {
           name: 'afterResponse',
@@ -73,7 +73,7 @@ const dataSourceFormConfig = {
       ],
     },
   ],
-};
+});
 
 const fillConfig = (config: FormConfig): FormConfig => [...BaseFormConfig(), ...config, dataSourceFormConfig];
 

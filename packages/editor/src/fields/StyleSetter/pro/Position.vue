@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ContainerChangeEventData, MContainer } from '@tmagic/form';
+import { type ContainerChangeEventData, defineFormItem, type MContainer } from '@tmagic/form';
 import type { StyleSchema } from '@tmagic/schema';
 
 const props = defineProps<{
@@ -24,7 +24,7 @@ const positionText: Record<string, string> = {
   sticky: '粘性定位',
 };
 
-const config = {
+const config = defineFormItem({
   items: [
     {
       name: 'position',
@@ -95,7 +95,7 @@ const config = {
       },
     },
   ],
-};
+});
 
 const change = (value: string | StyleSchema, eventData: ContainerChangeEventData) => {
   emit('change', value, eventData);

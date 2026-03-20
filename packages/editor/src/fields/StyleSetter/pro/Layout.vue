@@ -12,7 +12,7 @@
 <script lang="ts" setup>
 import { markRaw } from 'vue';
 
-import type { ContainerChangeEventData } from '@tmagic/form';
+import type { ChildConfig, ContainerChangeEventData } from '@tmagic/form';
 import { defineFormItem, MContainer } from '@tmagic/form';
 import type { StyleSchema } from '@tmagic/schema';
 
@@ -180,7 +180,7 @@ const config = defineFormItem({
       ],
     },
   ],
-});
+}) as ChildConfig;
 
 const change = (value: string | StyleSchema, eventData: ContainerChangeEventData) => {
   emit('change', value, eventData);

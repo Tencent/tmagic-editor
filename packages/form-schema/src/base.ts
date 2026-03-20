@@ -91,12 +91,10 @@ export interface FormItem {
   /** vnode的key值，默认是遍历数组时的index */
   __key?: string | number;
   /** 表单域标签的的宽度，例如 '50px'。支持 auto。 */
-  labelWidth?: string;
+  labelWidth?: string | number;
   /** label 标签的title属性 */
   labelTitle?: string;
   className?: string;
-  /** 表单组件类型 */
-  type?: string | TypeFunction;
   /** 字段名 */
   name?: string | number;
   /** 额外的提示信息，和 help 类似，当提示文案同时出现时，可以使用这个。 */
@@ -132,7 +130,12 @@ export interface FormItem {
   labelPosition?: 'top' | 'left' | 'right';
 }
 
-export interface ContainerCommonConfig<T extends Record<string, any> = never> {
+export interface DynamicTypeConfig extends FormItem {
+  type: TypeFunction;
+  [key: string]: any;
+}
+
+export interface ContainerCommonConfig<T = never> extends FormItem {
   items: FormConfig<T>;
   onInitValue?: (
     mForm: FormState | undefined,
@@ -182,12 +185,12 @@ export interface Input {
   placeholder?: string;
 }
 
-export type TypeFunction = (
+export type TypeFunction<T extends string = string> = (
   mForm: FormState | undefined,
   data: {
     model: FormValue;
   },
-) => string;
+) => T;
 
 export type FilterFunction<T = boolean> = (
   mForm: FormState | undefined,
@@ -208,6 +211,7 @@ export type FilterFunction<T = boolean> = (
  */
 export interface SelectConfigOption {
   /** 选项的标签 */
+  label?: string | SelectOptionTextFunction;
   text: string | SelectOptionTextFunction;
   /** 选项的值 */
   value: any | SelectOptionValueFunction;
@@ -499,7 +503,7 @@ export interface CheckboxGroupOption {
  * 多选框组
  */
 export interface CheckboxGroupConfig extends FormItem {
-  type: 'checkbox-group';
+  type: 'checkbox-group' | 'checkboxGroup';
   options: CheckboxGroupOption[] | FilterFunction<CheckboxGroupOption[]>;
 }
 
@@ -546,7 +550,7 @@ export interface SelectConfig extends FormItem, Input {
 /**
  * 链接
  */
-export interface LinkConfig<T extends Record<string, any> = never> extends FormItem {
+export interface LinkConfig<T = never> extends FormItem {
   type: 'link';
   href?: string | ((model: Record<string, any>) => string);
   css?: {
@@ -615,7 +619,7 @@ export interface CascaderConfig extends FormItem, Input {
 }
 
 export interface DynamicFieldConfig extends FormItem {
-  type: 'dynamic-field';
+  type: 'dynamic-field' | 'dynamicField';
   returnFields: (
     config: DynamicFieldConfig,
     model: Record<any, any>,
@@ -631,16 +635,16 @@ export interface DynamicFieldConfig extends FormItem {
 /**
  * 分组容器
  */
-export interface RowConfig<T extends Record<string, any> = never> extends FormItem {
+export interface RowConfig<T = never> extends FormItem {
   type: 'row';
   span: number;
-  items: ({ span?: number } & (ChildConfig<T> | EditorChildConfig | NoInfer<T>))[];
+  items: ({ span?: number } & (ChildConfig<T> | EditorChildConfig | T))[];
 }
 
 /**
  * 标签页容器
  */
-export interface TabPaneConfig<T extends Record<string, any> = never> {
+export interface TabPaneConfig<T = never> {
   status?: string;
   /** 标签页名称，用于关联 model 中的数据 */
   name?: string | number;
@@ -652,7 +656,7 @@ export interface TabPaneConfig<T extends Record<string, any> = never> {
   onTabClick?: (mForm: FormState | undefined, tab: any, data: any) => void;
 }
 
-export interface TabConfig<T extends Record<string, any> = never> extends FormItem, ContainerCommonConfig<T> {
+export interface TabConfig<T = never> extends FormItem, ContainerCommonConfig<T> {
   type: 'tab' | 'dynamic-tab';
   tabType?: string;
   editable?: boolean;
@@ -673,7 +677,7 @@ export interface TabConfig<T extends Record<string, any> = never> extends FormIt
 /**
  * 分组
  */
-export interface FieldsetConfig<T extends Record<string, any> = never> extends FormItem, ContainerCommonConfig<T> {
+export interface FieldsetConfig<T = never> extends FormItem, ContainerCommonConfig<T> {
   type: 'fieldset';
   checkbox?:
     | boolean
@@ -690,7 +694,7 @@ export interface FieldsetConfig<T extends Record<string, any> = never> extends F
 /**
  * 面板容器
  */
-export interface PanelConfig<T extends Record<string, any> = never> extends FormItem, ContainerCommonConfig<T> {
+export interface PanelConfig<T = never> extends FormItem, ContainerCommonConfig<T> {
   type: 'panel';
   expand?: boolean;
   title?: string;
@@ -705,6 +709,7 @@ export interface TableColumnConfig extends FormItem {
   items?: FormConfig;
   itemsFunction?: (row: any) => FormConfig;
   titleTip?: FilterFunction<string>;
+  type?: string;
 }
 
 /**
@@ -765,7 +770,7 @@ export interface TableConfig extends FormItem {
   sortKey?: string;
 }
 
-export interface GroupListConfig<T extends Record<string, any> = never> extends FormItem {
+export interface GroupListConfig<T = never> extends FormItem {
   type: 'table' | 'groupList' | 'group-list';
   span?: number;
   enableToggleMode?: boolean;
@@ -801,11 +806,11 @@ export interface GroupListConfig<T extends Record<string, any> = never> extends 
   };
 }
 
-interface StepItemConfig<T extends Record<string, any> = never> extends FormItem, ContainerCommonConfig<T> {
+interface StepItemConfig<T = never> extends FormItem, ContainerCommonConfig<T> {
   title: string;
 }
 
-export interface StepConfig<T extends Record<string, any> = never> extends FormItem {
+export interface StepConfig<T = never> extends FormItem {
   type: 'step';
   /** 每个 step 的间距，不填写将自适应间距。支持百分比。 */
   space?: string | number;
@@ -820,14 +825,14 @@ export interface ComponentConfig extends FormItem {
   component: any;
 }
 
-export interface FlexLayoutConfig<T extends Record<string, any> = never> extends FormItem, ContainerCommonConfig<T> {
+export interface FlexLayoutConfig<T = never> extends FormItem, ContainerCommonConfig<T> {
   type: 'flex-layout';
   /** flex 子项间距，默认 '16px' */
   gap?: string;
 }
 
-export type ChildConfig<T extends Record<string, any> = never> =
-  | (FormItem & Partial<ContainerCommonConfig<T>>)
+export type ChildConfig<T = never> =
+  | ContainerCommonConfig<T>
   | TabConfig<T>
   | RowConfig<T>
   | FieldsetConfig<T>
@@ -859,6 +864,6 @@ export type ChildConfig<T extends Record<string, any> = never> =
   | ComponentConfig
   | FlexLayoutConfig<T>;
 
-export type FormItemConfig<T extends Record<string, any> = never> = ChildConfig<T> | EditorChildConfig<T> | NoInfer<T>;
+export type FormItemConfig<T = never> = ChildConfig<T> | DynamicTypeConfig | EditorChildConfig<T> | T;
 
-export type FormConfig<T extends Record<string, any> = never> = FormItemConfig<T>[];
+export type FormConfig<T = never> = FormItemConfig<T>[];

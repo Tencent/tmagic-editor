@@ -50,6 +50,7 @@ import {
   createValues,
   type FieldProps,
   filterFunction,
+  type FormItemConfig,
   type FormState,
   MSelect,
   type SelectConfig,
@@ -141,7 +142,9 @@ const onCodeIdChangeHandler = (value: any) => {
 
   changeRecords.push({
     propPath: props.prop.replace(`${props.name}`, 'params'),
-    value: paramsConfig.value.length ? createValues(mForm, paramsConfig.value, {}, props.model.params) : {},
+    value: paramsConfig.value.length
+      ? createValues(mForm, paramsConfig.value as unknown as FormItemConfig[], {}, props.model.params)
+      : {},
   });
 
   emit('change', value, {

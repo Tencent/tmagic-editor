@@ -3,7 +3,7 @@ import { WarningFilled } from '@element-plus/icons-vue';
 import { cloneDeep } from 'lodash-es';
 
 import { type TableColumnOptions, TMagicIcon, TMagicTooltip } from '@tmagic/design';
-import type { FormState, TableColumnConfig } from '@tmagic/form-schema';
+import type { FormItemConfig, FormState, TableColumnConfig } from '@tmagic/form-schema';
 
 import Container from '../containers/Container.vue';
 import type { ContainerChangeEventData } from '../schema';
@@ -68,7 +68,7 @@ export const useTableColumns = (
     return `${props.prop}${props.prop ? '.' : ''}${index + 1 + currentPage.value * pageSize.value - 1}`;
   };
 
-  const makeConfig = (config: TableColumnConfig, row: any) => {
+  const makeConfig = (config: TableColumnConfig, row: any): TableColumnConfig => {
     const newConfig = cloneDeep(config);
     if (typeof config.itemsFunction === 'function') {
       newConfig.items = config.itemsFunction(row);
@@ -199,7 +199,7 @@ export const useTableColumns = (
               disabled: props.disabled,
               prop: getProp($index),
               rules: column.rules,
-              config: makeConfig(column, row),
+              config: makeConfig(column, row) as FormItemConfig,
               model: row,
               lastValues: lastData.value[$index],
               isCompare: props.isCompare,

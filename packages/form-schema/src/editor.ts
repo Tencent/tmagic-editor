@@ -2,7 +2,7 @@ import type { DataSourceFieldType, DataSourceSchema } from '@tmagic/schema';
 
 import type { FilterFunction, FormItem, FormItemConfig, FormState, Input } from './base';
 
-export interface DataSourceFieldSelectConfig<T extends Record<string, any> = never> extends FormItem {
+export interface DataSourceFieldSelectConfig<T = never> extends FormItem {
   type: 'data-source-field-select';
   /**
    * 是否要编译成数据源的data。
@@ -104,6 +104,7 @@ export interface DataSourceSelect extends FormItem, Input {
 }
 
 export interface DisplayCondsConfig extends FormItem {
+  type: 'display-conds';
   titlePrefix?: string;
   parentFields?: string[] | FilterFunction<string[]>;
 }
@@ -144,7 +145,7 @@ export interface StyleSetterConfig extends FormItem {
   type: 'style-setter';
 }
 
-export type EditorChildConfig<T extends Record<string, any> = never> =
+export type EditorChildConfig<T = never> =
   | DataSourceFieldSelectConfig<T>
   | CodeConfig
   | CodeLinkConfig

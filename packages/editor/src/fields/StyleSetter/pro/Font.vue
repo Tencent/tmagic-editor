@@ -5,7 +5,7 @@
 <script lang="ts" setup>
 import { markRaw } from 'vue';
 
-import { ContainerChangeEventData, MContainer } from '@tmagic/form';
+import { type ContainerChangeEventData, defineFormItem, type MContainer } from '@tmagic/form';
 import type { StyleSchema } from '@tmagic/schema';
 
 import { AlignCenter, AlignLeft, AlignRight } from '../icons/text-align';
@@ -20,7 +20,7 @@ const emit = defineEmits<{
   change: [v: StyleSchema, eventData: ContainerChangeEventData];
 }>();
 
-const config = {
+const config = defineFormItem({
   items: [
     {
       type: 'row',
@@ -86,7 +86,7 @@ const config = {
       ],
     },
   ],
-};
+});
 
 const change = (value: StyleSchema, eventData: ContainerChangeEventData) => {
   emit('change', value, eventData);

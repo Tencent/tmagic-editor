@@ -23,13 +23,12 @@ import { cloneDeep } from 'lodash-es';
 
 import { getValueByKeyPath } from '@tmagic/utils';
 
-import {
+import type {
   ChildConfig,
   ContainerCommonConfig,
   DaterangeConfig,
   FilterFunction,
   FormConfig,
-  FormItem,
   FormState,
   FormValue,
   HtmlField,
@@ -120,7 +119,8 @@ const initValueItem = function (
 ) {
   const { items } = item as ContainerCommonConfig;
   const { names } = item as DaterangeConfig;
-  const { type, name } = item as FormItem;
+  const type = 'type' in item ? item.type : '';
+  const { name } = item;
 
   if (isTableSelect(type) && name) {
     value[name] = initValue[name] ?? '';
@@ -172,8 +172,8 @@ export const createValues = function (
   value: FormValue = {},
 ) {
   if (Array.isArray(config)) {
-    config.forEach((item: ChildConfig | TabPaneConfig) => {
-      initValueItem(mForm, item, initValue, value);
+    config.forEach((item) => {
+      initValueItem(mForm, item as ChildConfig | TabPaneConfig, initValue, value);
     });
   }
 

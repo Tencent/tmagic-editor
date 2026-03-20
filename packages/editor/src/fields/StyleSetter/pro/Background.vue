@@ -5,7 +5,7 @@
 <script lang="ts" setup>
 import { markRaw } from 'vue';
 
-import { ContainerChangeEventData, MContainer } from '@tmagic/form';
+import { type ContainerChangeEventData, defineFormItem, type MContainer } from '@tmagic/form';
 import type { StyleSchema } from '@tmagic/schema';
 
 import BackgroundPosition from '../components/BackgroundPosition.vue';
@@ -21,7 +21,7 @@ const emit = defineEmits<{
   change: [v: StyleSchema, eventData: ContainerChangeEventData];
 }>();
 
-const config = {
+const config = defineFormItem({
   items: [
     {
       name: 'backgroundColor',
@@ -39,7 +39,7 @@ const config = {
       type: 'data-source-field-select',
       fieldConfig: {
         type: 'img-upload',
-      },
+      } as any,
     },
     {
       name: 'backgroundSize',
@@ -74,7 +74,7 @@ const config = {
       labelWidth: '68px',
     },
   ],
-};
+});
 
 const change = (value: StyleSchema, eventData: ContainerChangeEventData) => {
   emit('change', value, eventData);

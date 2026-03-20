@@ -63,7 +63,14 @@ import { computed, inject, nextTick, Ref, ref, useTemplateRef, watch } from 'vue
 
 import type { CodeBlockContent } from '@tmagic/core';
 import { TMagicButton, TMagicDialog, tMagicMessage, tMagicMessageBox, TMagicTag } from '@tmagic/design';
-import { type ContainerChangeEventData, type FormConfig, type FormState, MFormBox } from '@tmagic/form';
+import {
+  type ContainerChangeEventData,
+  defineFormConfig,
+  defineFormItem,
+  type FormConfig,
+  MFormBox,
+  type TableColumnConfig,
+} from '@tmagic/form';
 
 import FloatingBox from '@editor/components/FloatingBox.vue';
 import { useEditorContentHeight } from '@editor/hooks/use-editor-content-height';
@@ -112,7 +119,7 @@ const diffChange = () => {
   difVisible.value = false;
 };
 
-const defaultParamColConfig = {
+const defaultParamColConfig = defineFormItem<TableColumnConfig>({
   type: 'row',
   label: '参数类型',
   items: [
@@ -140,76 +147,79 @@ const defaultParamColConfig = {
       ],
     },
   ],
-};
+});
 
-const functionConfig = computed<FormConfig>(() => [
-  {
-    text: '名称',
-    name: 'name',
-    rules: [{ required: true, message: '请输入名称', trigger: 'blur' }],
-  },
-  {
-    text: '描述',
-    name: 'desc',
-  },
-  {
-    text: '执行时机',
-    name: 'timing',
-    type: 'select',
-    options: () => {
-      const options = [
-        { text: '初始化前', value: 'beforeInit' },
-        { text: '初始化后', value: 'afterInit' },
-      ];
-      if (props.dataSourceType !== 'base') {
-        options.push({ text: '请求前', value: 'beforeRequest' });
-        options.push({ text: '请求后', value: 'afterRequest' });
-      }
-      return options;
-    },
-    display: () => props.isDataSource,
-  },
-  {
-    type: 'table',
-    border: true,
-    text: '参数',
-    enableFullscreen: false,
-    enableToggleMode: false,
-    name: 'params',
-    dropSort: false,
-    items: [
+const functionConfig = computed(
+  () =>
+    defineFormConfig([
       {
-        type: 'text',
-        label: '参数名',
+        text: '名称',
         name: 'name',
+        rules: [{ required: true, message: '请输入名称', trigger: 'blur' }],
       },
       {
-        type: 'text',
-        label: '描述',
-        name: 'extra',
+        text: '描述',
+        name: 'desc',
       },
-      codeBlockService.getParamsColConfig() || defaultParamColConfig,
-    ],
-  },
-  {
-    name: 'content',
-    type: 'vs-code',
-    options: inject('codeOptions', {}),
-    autosize: { minRows: 10, maxRows: 30 },
-    onChange: (formState: FormState | undefined, code: string) => {
-      try {
-        // 检测js代码是否存在语法错误
-        getEditorConfig('parseDSL')(code);
+      {
+        text: '执行时机',
+        name: 'timing',
+        type: 'select',
+        options: () => {
+          const options = [
+            { text: '初始化前', value: 'beforeInit' },
+            { text: '初始化后', value: 'afterInit' },
+          ];
+          if (props.dataSourceType !== 'base') {
+            options.push({ text: '请求前', value: 'beforeRequest' });
+            options.push({ text: '请求后', value: 'afterRequest' });
+          }
+          return options;
+        },
+        display: () => props.isDataSource,
+      },
+      {
+        type: 'table',
+        border: true,
+        text: '参数',
+        enableFullscreen: false,
+        enableToggleMode: false,
+        name: 'params',
+        dropSort: false,
+        items: [
+          {
+            type: 'text',
+            label: '参数名',
+            name: 'name',
+          },
+          {
+            type: 'text',
+            label: '描述',
+            name: 'extra',
+          },
+          codeBlockService.getParamsColConfig() || defaultParamColConfig,
+        ],
+      },
+      {
+        name: 'content',
+        type: 'vs-code',
+        options: inject('codeOptions', {}),
+        autosize: { minRows: 10, maxRows: 30 },
+        onChange: (_formState, code: string) => {
+          try {
+            // 检测js代码是否存在语法错误
+            getEditorConfig('parseDSL')(code);
 
-        return code;
-      } catch (error: any) {
-        tMagicMessage.error(error.message);
+            return code;
+          } catch (error: any) {
+            tMagicMessage.error(error.message);
 
-        throw error;
-      }
-    },
-  },
-]);
+            throw error;
+          }
+        },
+      },
+    ]) as FormConfig,
+);
 
 const parseContent = (content: any) => {
   if (typeof content === 'string') {

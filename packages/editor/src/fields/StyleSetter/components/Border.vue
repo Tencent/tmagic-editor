@@ -39,46 +39,48 @@
 import { computed, ref } from 'vue';
 
 import type { ContainerChangeEventData, FormValue } from '@tmagic/form';
-import { MContainer } from '@tmagic/form';
+import { defineFormItem, type MContainer } from '@tmagic/form';
 import type { StyleSchema } from '@tmagic/schema';
 
 const direction = ref('');
 
-const config = computed(() => ({
-  items: [
-    {
-      name: `border${direction.value}Width`,
-      text: '边框宽度',
-      labelWidth: '68px',
-      type: 'data-source-field-select',
-      fieldConfig: {
-        type: 'text',
+const config = computed(() =>
+  defineFormItem({
+    items: [
+      {
+        name: `border${direction.value}Width`,
+        text: '边框宽度',
+        labelWidth: '68px',
+        type: 'data-source-field-select',
+        fieldConfig: {
+          type: 'text',
+        },
       },
-    },
-    {
-      name: `border${direction.value}Color`,
-      text: '边框颜色',
-      labelWidth: '68px',
-      type: 'data-source-field-select',
-      fieldConfig: {
-        type: 'colorPicker',
+      {
+        name: `border${direction.value}Color`,
+        text: '边框颜色',
+        labelWidth: '68px',
+        type: 'data-source-field-select',
+        fieldConfig: {
+          type: 'colorPicker',
+        },
       },
-    },
-    {
-      name: `border${direction.value}Style`,
-      text: '边框样式',
-      labelWidth: '68px',
-      type: 'data-source-field-select',
-      fieldConfig: {
-        type: 'select',
-        options: ['solid', 'dashed', 'dotted'].map((item) => ({
-          value: item,
-          text: item,
-        })),
+      {
+        name: `border${direction.value}Style`,
+        text: '边框样式',
+        labelWidth: '68px',
+        type: 'data-source-field-select',
+        fieldConfig: {
+          type: 'select',
+          options: ['solid', 'dashed', 'dotted'].map((item) => ({
+            value: item,
+            text: item,
+          })),
+        },
       },
-    },
-  ],
-}));
+    ],
+  }),
+);
 
 const selectDirection = (d?: string) => (direction.value = d || '');
 

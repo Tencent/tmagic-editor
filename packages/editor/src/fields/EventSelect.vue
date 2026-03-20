@@ -62,14 +62,15 @@ import type {
   CodeSelectColConfig,
   ContainerChangeEventData,
   DataSourceMethodSelectConfig,
+  DynamicTypeConfig,
   EventSelectConfig,
   FieldProps,
   FormState,
-  OnChangeHandlerData,
   PanelConfig,
   TableConfig,
+  UISelectConfig,
 } from '@tmagic/form';
-import { MContainer as MFormContainer, MPanel, MTable } from '@tmagic/form';
+import { defineFormItem, MContainer as MFormContainer, MPanel, MTable } from '@tmagic/form';
 import { DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX, traverseNode } from '@tmagic/utils';
 
 import { useServices } from '@editor/hooks/use-services';
@@ -212,12 +213,12 @@ const actionTypeConfig = computed(() => {
 
 // 联动组件配置
 const targetCompConfig = computed(() => {
-  const defaultTargetCompConfig = {
+  const defaultTargetCompConfig: UISelectConfig = {
     name: 'to',
     text: '联动组件',
     type: 'ui-select',
-    display: (mForm: FormState, { model }: { model: Record<any, any> }) => model.actionType === ActionType.COMP,
-    onChange: (MForm: FormState, v: string, { setModel }: OnChangeHandlerData) => {
+    display: (_mForm, { model }) => model.actionType === ActionType.COMP,
+    onChange: (_MForm, _v, { setModel }) => {
       setModel('method', '');
     },
   };
@@ -226,7 +227,7 @@ const targetCompConfig = computed(() => {
 
 // 联动组件动作配置
 const compActionConfig = computed(() => {
-  const defaultCompActionConfig = {
+  const defaultCompActionConfig: DynamicTypeConfig = {
     name: 'method',
     text: '动作',
     type: (mForm: FormState | undefined, { model }: any) => {
@@ -304,62 +305,68 @@ const dataSourceActionConfig = computed(() => {
 });
 
 // 兼容旧的数据格式
-const tableConfig = computed<TableConfig>(() => ({
-  type: 'table',
-  name: 'events',
-  items: [
-    {
-      name: 'name',
-      label: '事件名',
-      type: eventNameConfig.value.type,
-      options: (mForm: FormState, { formValue }: any) =>
-        eventsService.getEvent(formValue.type).map((option: any) => ({
-          text: option.label,
-          value: option.value,
-        })),
-    },
-    {
-      name: 'to',
-      label: '联动组件',
-      type: 'ui-select',
-    },
-    {
-      name: 'method',
-      label: '动作',
-      type: compActionConfig.value.type,
-      options: (mForm: FormState, { model }: any) => {
-        const node = editorService.getNodeById(model.to);
-        if (!node?.type) return [];
+const tableConfig = computed(
+  () =>
+    defineFormItem({
+      type: 'table',
+      name: 'events',
+      items: [
+        {
+          name: 'name',
+          label: '事件名',
+          type: eventNameConfig.value.type,
+          options: (mForm: FormState, { formValue }: any) =>
+            eventsService.getEvent(formValue.type).map((option: any) => ({
+              text: option.label,
+              value: option.value,
+            })),
+        },
+        {
+          name: 'to',
+          label: '联动组件',
+          type: 'ui-select',
+        },
+        {
+          name: 'method',
+          label: '动作',
+          type: compActionConfig.value.type,
+          options: (mForm: FormState, { model }: any) => {
+            const node = editorService.getNodeById(model.to);
+            if (!node?.type) return [];
 
-        return eventsService.getMethod(node.type, model.to).map((option: any) => ({
-          text: option.label,
-          value: option.value,
-        }));
-      },
-    },
-  ],
-}));
+            return eventsService.getMethod(node.type, model.to).map((option: any) => ({
+              text: option.label,
+              value: option.value,
+            }));
+          },
+        },
+      ],
+    }) as TableConfig,
+);
 
 // 组件动作组表单配置
-const actionsConfig = computed<PanelConfig>(() => ({
-  type: 'panel',
-  items: [
-    {
-      type: 'group-list',
-      name: 'actions',
-      expandAll: true,
-      enableToggleMode: false,
-      titlePrefix: '动作',
+const actionsConfig = computed(
+  () =>
+    defineFormItem({
+      type: 'panel',
       items: [
-        actionTypeConfig.value,
-        targetCompConfig.value,
-        compActionConfig.value,
-        codeActionConfig.value,
-        dataSourceActionConfig.value,
+        {
+          type: 'group-list',
+          name: 'actions',
+          expandAll: true,
+          enableToggleMode: false,
+          titlePrefix: '动作',
+          items: [
+            actionTypeConfig.value,
+            targetCompConfig.value,
+            compActionConfig.value,
+            codeActionConfig.value,
+            dataSourceActionConfig.value,
+          ],
+        },
       ],
-    },
-  ],
-}));
+    }) as PanelConfig,
+);
 
 // 是否为旧的数据格式
 const isOldVersion = computed(() => {
