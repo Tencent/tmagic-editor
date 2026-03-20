@@ -52,12 +52,15 @@ import { inject, Ref, ref } from 'vue';
 import type { DataSchema } from '@tmagic/core';
 import { TMagicButton, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
 import {
+  type CodeConfig,
   type ContainerChangeEventData,
   type DataSourceFieldsConfig,
   type FieldProps,
   type FormConfig,
   type FormState,
   MFormBox,
+  type NumberConfig,
+  type TextConfig,
 } from '@tmagic/form';
 import { type ColumnConfig, MagicTable } from '@tmagic/table';
 import { getDefaultValueFromFields } from '@tmagic/utils';
@@ -247,7 +250,7 @@ const dataSourceFieldsConfig: FormConfig = [
       { text: 'true', value: true },
       { text: 'false', value: false },
     ],
-  },
+  } as unknown as CodeConfig | NumberConfig | TextConfig,
   {
     name: 'enable',
     text: '是否可用',

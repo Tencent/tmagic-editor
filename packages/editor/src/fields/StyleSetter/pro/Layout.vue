@@ -12,8 +12,8 @@
 <script lang="ts" setup>
 import { markRaw } from 'vue';
 
-import type { ContainerChangeEventData, FormState } from '@tmagic/form';
-import { MContainer } from '@tmagic/form';
+import type { ContainerChangeEventData } from '@tmagic/form';
+import { defineFormItem, MContainer } from '@tmagic/form';
 import type { StyleSchema } from '@tmagic/schema';
 
 import Box from '../components/Box.vue';
@@ -42,7 +42,7 @@ const emit = defineEmits<{
   change: [v: string | StyleSchema, eventData: ContainerChangeEventData];
 }>();
 
-const config = {
+const config = defineFormItem({
   items: [
     {
       name: 'display',
@@ -74,7 +74,7 @@ const config = {
           tooltip: '垂直方向 起点在下沿 column-reverse',
         },
       ],
-      display: (mForm: FormState, { model }: { model: Record<any, any> }) => model.display === 'flex',
+      display: (_mForm, { model }: { model: Record<any, any> }) => model.display === 'flex',
     },
     {
       name: 'justifyContent',
@@ -89,7 +89,7 @@ const config = {
         { value: 'space-between', icon: markRaw(JustifyContentSpaceBetween), tooltip: '两端对齐 space-between' },
         { value: 'space-around', icon: markRaw(JustifyContentSpaceAround), tooltip: '横向平分 space-around' },
       ],
-      display: (mForm: FormState, { model }: { model: Record<any, any> }) => model.display === 'flex',
+      display: (_mForm, { model }: { model: Record<any, any> }) => model.display === 'flex',
     },
     {
       name: 'alignItems',
@@ -104,7 +104,7 @@ const config = {
         { value: 'space-between', icon: markRaw(JustifyContentSpaceBetween), tooltip: '两端对齐 space-between' },
         { value: 'space-around', icon: markRaw(JustifyContentSpaceAround), tooltip: '横向平分 space-around' },
       ],
-      display: (mForm: FormState, { model }: { model: Record<any, any> }) => model.display === 'flex',
+      display: (_mForm, { model }: { model: Record<any, any> }) => model.display === 'flex',
     },
     {
       name: 'flexWrap',
@@ -117,7 +117,7 @@ const config = {
         { value: 'wrap', text: '正换行', tooltip: '第一行在上方 wrap' },
         { value: 'wrap-reverse', text: '逆换行', tooltip: '第一行在下方 wrap-reverse' },
       ],
-      display: (mForm: FormState, { model }: { model: Record<any, any> }) => model.display === 'flex',
+      display: (_mForm, { model }: { model: Record<any, any> }) => model.display === 'flex',
     },
     {
       type: 'row',
@@ -180,7 +180,7 @@ const config = {
       ],
     },
   ],
-};
+});
 
 const change = (value: string | StyleSchema, eventData: ContainerChangeEventData) => {
   emit('change', value, eventData);

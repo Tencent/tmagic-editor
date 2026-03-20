@@ -10,7 +10,7 @@
       <TMagicTooltip :disabled="!Boolean(option.tooltip)" placement="top-start" :content="option.tooltip">
         <div>
           <TMagicIcon v-if="option.icon" :size="iconSize"><component :is="option.icon"></component></TMagicIcon>
-          <span>{{ option.text }}</span>
+          <span v-if="option.text">{{ option.text }}</span>
         </div>
       </TMagicTooltip>
     </component>

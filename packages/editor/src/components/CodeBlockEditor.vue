@@ -63,13 +63,7 @@ import { computed, inject, nextTick, Ref, ref, useTemplateRef, watch } from 'vue
 
 import type { CodeBlockContent } from '@tmagic/core';
 import { TMagicButton, TMagicDialog, tMagicMessage, tMagicMessageBox, TMagicTag } from '@tmagic/design';
-import {
-  type ContainerChangeEventData,
-  type FormConfig,
-  type FormState,
-  MFormBox,
-  type TableColumnConfig,
-} from '@tmagic/form';
+import { type ContainerChangeEventData, type FormConfig, type FormState, MFormBox } from '@tmagic/form';
 
 import FloatingBox from '@editor/components/FloatingBox.vue';
 import { useEditorContentHeight } from '@editor/hooks/use-editor-content-height';
@@ -118,7 +112,7 @@ const diffChange = () => {
   difVisible.value = false;
 };
 
-const defaultParamColConfig: TableColumnConfig = {
+const defaultParamColConfig = {
   type: 'row',
   label: '参数类型',
   items: [

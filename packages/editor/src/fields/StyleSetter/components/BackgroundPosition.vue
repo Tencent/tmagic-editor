@@ -28,10 +28,10 @@
 
 <script lang="ts" setup>
 import { TMagicButton, TMagicInput } from '@tmagic/design';
-import type { FieldProps, FormItem } from '@tmagic/form';
+import type { FieldProps, StyleSetterConfig } from '@tmagic/form';
 
 const emit = defineEmits(['change']);
-defineProps<FieldProps<{ type: 'style-setter' } & FormItem>>();
+defineProps<FieldProps<StyleSetterConfig>>();
 
 const horizontalList = [
   {

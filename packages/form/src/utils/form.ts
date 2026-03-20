@@ -29,11 +29,13 @@ import {
   DaterangeConfig,
   FilterFunction,
   FormConfig,
+  FormItem,
   FormState,
   FormValue,
   HtmlField,
   Rule,
   SortProp,
+  TableConfig,
   TabPaneConfig,
   TypeFunction,
 } from '../schema';
@@ -118,7 +120,7 @@ const initValueItem = function (
 ) {
   const { items } = item as ContainerCommonConfig;
   const { names } = item as DaterangeConfig;
-  const { type, name } = item as ChildConfig;
+  const { type, name } = item as FormItem;
 
   if (isTableSelect(type) && name) {
     value[name] = initValue[name] ?? '';
@@ -148,14 +150,15 @@ const initValueItem = function (
   setValue(mForm, value, initValue, item);
 
   if (type === 'table') {
-    if (item.defautSort) {
-      sortChange(value[name], item.defautSort);
-    } else if (item.defaultSort) {
-      sortChange(value[name], item.defaultSort);
+    const tableConfig = item as TableConfig;
+    if (tableConfig.defautSort) {
+      sortChange(value[name], tableConfig.defautSort);
+    } else if (tableConfig.defaultSort) {
+      sortChange(value[name], tableConfig.defaultSort);
     }
 
-    if (item.sort && item.sortKey) {
-      value[name].sort((a: any, b: any) => b[item.sortKey] - a[item.sortKey]);
+    if (tableConfig.sort && tableConfig.sortKey) {
+      value[name].sort((a: any, b: any) => b[tableConfig.sortKey!] - a[tableConfig.sortKey!]);
     }
   }
 

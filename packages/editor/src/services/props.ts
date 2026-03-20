@@ -102,9 +102,11 @@ class Props extends BaseService {
   }
 
   public async setPropsConfig(type: string, config: FormConfig | PropsFormConfigFunction) {
-    let c = config;
+    let c: FormConfig;
     if (typeof config === 'function') {
       c = config({ editorService });
+    } else {
+      c = config;
     }
 
     this.state.propsConfigMap[toLine(type)] = await this.fillConfig(Array.isArray(c) ? c : [c]);

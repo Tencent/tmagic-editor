@@ -129,11 +129,11 @@ export interface FormItem {
   expand?: boolean;
   style?: Record<string, any>;
   fieldStyle?: Record<string, any>;
-  [key: string]: any;
+  labelPosition?: 'top' | 'left' | 'right';
 }
 
-export interface ContainerCommonConfig {
-  items: FormConfig;
+export interface ContainerCommonConfig<T extends Record<string, any> = never> {
+  items: FormConfig<T>;
   onInitValue?: (
     mForm: FormState | undefined,
     data: {
@@ -351,6 +351,8 @@ export interface DisplayConfig extends FormItem {
 export interface TextConfig extends FormItem, Input {
   type?: 'text';
   tooltip?: string;
+  /** 是否可清空 */
+  clearable?: boolean;
   prepend?: string;
   /** 后置元素，一般为标签或按钮 */
   append?:
@@ -437,6 +439,17 @@ export interface TimeConfig extends FormItem, Input {
 }
 
 /**
+ * 时间范围选择器
+ */
+export interface TimerangeConfig extends FormItem {
+  type: 'timerange';
+  names?: string[];
+  defaultTime?: Date[];
+  format?: 'HH:mm:ss' | string;
+  valueFormat?: 'HH:mm:ss' | string;
+}
+
+/**
  * 单个多选框
  */
 export interface CheckboxConfig extends FormItem {
@@ -459,11 +472,11 @@ export interface SwitchConfig extends FormItem {
  * 单选框
  */
 export interface RadioGroupConfig extends FormItem {
-  type: 'radio-group';
+  type: 'radio-group' | 'radioGroup';
   childType?: 'default' | 'button';
   options: {
     value: string | number | boolean;
-    text: string;
+    text?: string;
     icon?: any;
     tooltip?: string;
   }[];
@@ -533,7 +546,7 @@ export interface SelectConfig extends FormItem, Input {
 /**
  * 链接
  */
-export interface LinkConfig extends FormItem {
+export interface LinkConfig<T extends Record<string, any> = never> extends FormItem {
   type: 'link';
   href?: string | ((model: Record<string, any>) => string);
   css?: {
@@ -553,7 +566,7 @@ export interface LinkConfig extends FormItem {
       ) => string)
     | string;
   form:
-    | FormConfig
+    | FormConfig<T>
     | ((
         mForm: FormState | undefined,
         data: {
@@ -561,7 +574,7 @@ export interface LinkConfig extends FormItem {
           values?: Readonly<FormValue> | null;
           formValue?: FormValue;
         },
-      ) => FormConfig);
+      ) => FormConfig<T>);
   fullscreen?: boolean;
 }
 
@@ -618,32 +631,38 @@ export interface DynamicFieldConfig extends FormItem {
 /**
  * 分组容器
  */
-export interface RowConfig extends FormItem {
+export interface RowConfig<T extends Record<string, any> = never> extends FormItem {
   type: 'row';
   span: number;
-  items: ({ span?: number } & (ChildConfig | EditorChildConfig))[];
+  items: ({ span?: number } & (ChildConfig<T> | EditorChildConfig | NoInfer<T>))[];
 }
 
 /**
  * 标签页容器
  */
-export interface TabPaneConfig {
+export interface TabPaneConfig<T extends Record<string, any> = never> {
   status?: string;
+  /** 标签页名称，用于关联 model 中的数据 */
+  name?: string | number;
   title: string;
   lazy?: boolean;
   labelWidth?: string;
-  items: FormConfig;
+  items: FormConfig<T>;
+  display?: boolean | 'expand' | FilterFunction<boolean | 'expand'>;
   onTabClick?: (mForm: FormState | undefined, tab: any, data: any) => void;
-  [key: string]: any;
 }
 
-export interface TabConfig extends FormItem, ContainerCommonConfig {
+export interface TabConfig<T extends Record<string, any> = never> extends FormItem, ContainerCommonConfig<T> {
   type: 'tab' | 'dynamic-tab';
   tabType?: string;
   editable?: boolean;
   dynamic?: boolean;
   tabPosition?: 'top' | 'right' | 'bottom' | 'left';
-  items: TabPaneConfig[];
+  /** 当前激活的标签页，可以是固定值或动态函数 */
+  active?:
+    | string
+    | ((mForm: FormState | undefined, data: { model: FormValue; formValue?: FormValue; prop: string }) => string);
+  items: TabPaneConfig<T>[];
   onChange?: (mForm: FormState | undefined, data: any) => void;
   onTabAdd?: (mForm: FormState | undefined, data: any) => void;
   onTabRemove?: (mForm: FormState | undefined, tabName: string, data: any) => void;
@@ -654,7 +673,7 @@ export interface TabConfig extends FormItem, ContainerCommonConfig {
 /**
  * 分组
  */
-export interface FieldsetConfig extends FormItem, ContainerCommonConfig {
+export interface FieldsetConfig<T extends Record<string, any> = never> extends FormItem, ContainerCommonConfig<T> {
   type: 'fieldset';
   checkbox?:
     | boolean
@@ -671,7 +690,7 @@ export interface FieldsetConfig extends FormItem, ContainerCommonConfig {
 /**
  * 面板容器
  */
-export interface PanelConfig extends FormItem, ContainerCommonConfig {
+export interface PanelConfig<T extends Record<string, any> = never> extends FormItem, ContainerCommonConfig<T> {
   type: 'panel';
   expand?: boolean;
   title?: string;
@@ -683,7 +702,9 @@ export interface TableColumnConfig extends FormItem {
   label: string;
   width?: string | number;
   sortable?: boolean;
-  [key: string]: any;
+  items?: FormConfig;
+  itemsFunction?: (row: any) => FormConfig;
+  titleTip?: FilterFunction<string>;
 }
 
 /**
@@ -715,10 +736,11 @@ export interface TableConfig extends FormItem {
   importable?: (mForm: FormState | undefined, data: any) => boolean | 'undefined' | boolean;
   /** 是否显示checkbox */
   selection?: (mForm: FormState | undefined, data: any) => boolean | boolean | 'single';
-  /** 新增的默认行 */
-  defaultAdd?: (mForm: FormState | undefined, data: any) => any;
+  /** 新增的默认行，可以是函数动态生成或静态对象 */
+  defaultAdd?: ((mForm: FormState | undefined, data: any) => any) | Record<string, any>;
   copyHandler?: (mForm: FormState | undefined, data: any) => any;
   onSelect?: (mForm: FormState | undefined, data: any) => any;
+  /** @deprecated 请使用 defaultSort */
   defautSort?: SortProp;
   defaultSort?: SortProp;
   /** 是否支持拖拽排序 */
@@ -739,15 +761,17 @@ export interface TableConfig extends FormItem {
     props?: Record<string, any>;
     text?: string;
   };
+  sort?: boolean;
+  sortKey?: string;
 }
 
-export interface GroupListConfig extends FormItem {
+export interface GroupListConfig<T extends Record<string, any> = never> extends FormItem {
   type: 'table' | 'groupList' | 'group-list';
   span?: number;
   enableToggleMode?: boolean;
-  items: FormConfig;
-  groupItems?: FormConfig;
-  tableItems?: FormConfig;
+  items: FormConfig<T>;
+  groupItems?: FormConfig<T>;
+  tableItems?: FormConfig<T>;
   titleKey?: string;
   titlePrefix?: string;
   title?: string | FilterFunction<string>;
@@ -760,7 +784,8 @@ export interface GroupListConfig extends FormItem {
    */
   defaultExpandQuantity?: number;
   addable?: (mForm: FormState | undefined, data: any) => boolean | 'undefined' | boolean;
-  defaultAdd?: (mForm: FormState | undefined, data: any) => any;
+  /** 新增的默认值，可以是函数动态生成或静态对象 */
+  defaultAdd?: ((mForm: FormState | undefined, data: any) => any) | Record<string, any>;
   delete?: (model: any, index: number | string | symbol, values: any) => boolean | boolean;
   copyable?: FilterFunction<boolean>;
   movable?: (
@@ -774,18 +799,17 @@ export interface GroupListConfig extends FormItem {
     props?: Record<string, any>;
     text?: string;
   };
-  [key: string]: any;
 }
 
-interface StepItemConfig extends FormItem, ContainerCommonConfig {
+interface StepItemConfig<T extends Record<string, any> = never> extends FormItem, ContainerCommonConfig<T> {
   title: string;
 }
 
-export interface StepConfig extends FormItem {
+export interface StepConfig<T extends Record<string, any> = never> extends FormItem {
   type: 'step';
   /** 每个 step 的间距，不填写将自适应间距。支持百分比。 */
   space?: string | number;
-  items: StepItemConfig[];
+  items: StepItemConfig<T>[];
 }
 
 export interface ComponentConfig extends FormItem {
@@ -793,26 +817,32 @@ export interface ComponentConfig extends FormItem {
   id: string;
   extend: any;
   display: any;
+  component: any;
 }
 
-export interface FlexLayoutConfig extends FormItem, ContainerCommonConfig {
+export interface FlexLayoutConfig<T extends Record<string, any> = never> extends FormItem, ContainerCommonConfig<T> {
   type: 'flex-layout';
+  /** flex 子项间距，默认 '16px' */
+  gap?: string;
 }
 
-export type ChildConfig =
-  | FormItem
-  | TabConfig
-  | RowConfig
-  | FieldsetConfig
-  | PanelConfig
+export type ChildConfig<T extends Record<string, any> = never> =
+  | (FormItem & Partial<ContainerCommonConfig<T>>)
+  | TabConfig<T>
+  | RowConfig<T>
+  | FieldsetConfig<T>
+  | PanelConfig<T>
   | TableConfig
-  | GroupListConfig
-  | StepConfig
+  | GroupListConfig<T>
+  | StepConfig<T>
   | DisplayConfig
   | TextConfig
+  | NumberConfig
+  | NumberRangeConfig
   | HiddenConfig
-  | LinkConfig
+  | LinkConfig<T>
   | DaterangeConfig
+  | TimerangeConfig
   | SelectConfig
   | CascaderConfig
   | HtmlField
@@ -823,8 +853,12 @@ export type ChildConfig =
   | CheckboxConfig
   | SwitchConfig
   | RadioGroupConfig
+  | CheckboxGroupConfig
   | TextareaConfig
   | DynamicFieldConfig
-  | ComponentConfig;
+  | ComponentConfig
+  | FlexLayoutConfig<T>;
 
-export type FormConfig = (ChildConfig | EditorChildConfig)[];
+export type FormItemConfig<T extends Record<string, any> = never> = ChildConfig<T> | EditorChildConfig<T> | NoInfer<T>;
+
+export type FormConfig<T extends Record<string, any> = never> = FormItemConfig<T>[];

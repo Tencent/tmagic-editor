@@ -21,7 +21,7 @@ import dayjs from 'dayjs';
 
 import { TMagicTimePicker } from '@tmagic/design';
 
-import type { ChangeRecord, DaterangeConfig, FieldProps } from '../schema';
+import type { ChangeRecord, FieldProps, TimerangeConfig } from '../schema';
 import { datetimeFormatter } from '../utils/form';
 import { useAddField } from '../utils/useAddField';
 
@@ -29,7 +29,7 @@ defineOptions({
   name: 'MFormTimeRange',
 });
 
-const props = defineProps<FieldProps<DaterangeConfig>>();
+const props = defineProps<FieldProps<TimerangeConfig>>();
 
 const emit = defineEmits(['change']);
 

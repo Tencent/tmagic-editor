@@ -5,79 +5,77 @@ import { dataSourceTemplateRegExp, getKeysArray, isNumber } from '@tmagic/utils'
 import BaseFormConfig from './formConfigs/base';
 import HttpFormConfig from './formConfigs/http';
 
-const fillConfig = (config: FormConfig): FormConfig => [
-  ...BaseFormConfig(),
-  ...config,
-  {
-    type: 'tab',
-    items: [
-      {
-        title: '数据定义',
-        items: [
-          {
-            name: 'fields',
-            type: 'data-source-fields',
-            defaultValue: () => [],
-          },
-        ],
-      },
-      {
-        title: '方法定义',
-        items: [
-          {
-            name: 'methods',
-            type: 'data-source-methods',
-            defaultValue: () => [],
-          },
-        ],
-      },
-      {
-        title: '事件配置',
-        items: [
-          {
-            name: 'events',
-            src: 'datasource',
-            type: 'event-select',
-          },
-        ],
-      },
-      {
-        title: 'mock数据',
-        items: [
-          {
-            name: 'mocks',
-            type: 'data-source-mocks',
-            defaultValue: () => [],
-          },
-        ],
-      },
-      {
-        title: '请求参数裁剪',
-        display: (_formState: FormState, { model }: any) => model.type === 'http',
-        items: [
-          {
-            name: 'beforeRequest',
-            type: 'vs-code',
-            parse: true,
-            autosize: { minRows: 10, maxRows: 30 },
-          },
-        ],
-      },
-      {
-        title: '响应数据裁剪',
-        display: (_formState: FormState, { model }: any) => model.type === 'http',
-        items: [
-          {
-            name: 'afterResponse',
-            type: 'vs-code',
-            parse: true,
-            autosize: { minRows: 10, maxRows: 30 },
-          },
-        ],
-      },
-    ],
-  },
-];
+const dataSourceFormConfig = {
+  type: 'tab',
+  items: [
+    {
+      title: '数据定义',
+      items: [
+        {
+          name: 'fields',
+          type: 'data-source-fields',
+          defaultValue: () => [],
+        },
+      ],
+    },
+    {
+      title: '方法定义',
+      items: [
+        {
+          name: 'methods',
+          type: 'data-source-methods',
+          defaultValue: () => [],
+        },
+      ],
+    },
+    {
+      title: '事件配置',
+      items: [
+        {
+          name: 'events',
+          src: 'datasource',
+          type: 'event-select',
+        },
+      ],
+    },
+    {
+      title: 'mock数据',
+      items: [
+        {
+          name: 'mocks',
+          type: 'data-source-mocks',
+          defaultValue: () => [],
+        },
+      ],
+    },
+    {
+      title: '请求参数裁剪',
+      display: (_formState: FormState, { model }: any) => model.type === 'http',
+      items: [
+        {
+          name: 'beforeRequest',
+          type: 'vs-code',
+          parse: true,
+          autosize: { minRows: 10, maxRows: 30 },
+        },
+      ],
+    },
+    {
+      title: '响应数据裁剪',
+      display: (_formState: FormState, { model }: any) => model.type === 'http',
+      items: [
+        {
+          name: 'afterResponse',
+          type: 'vs-code',
+          parse: true,
+          autosize: { minRows: 10, maxRows: 30 },
+        },
+      ],
+    },
+  ],
+};
+
+const fillConfig = (config: FormConfig): FormConfig => [...BaseFormConfig(), ...config, dataSourceFormConfig];
 
 export const getFormConfig = (type: string, configs: Record<string, FormConfig>): FormConfig => {
   switch (type) {

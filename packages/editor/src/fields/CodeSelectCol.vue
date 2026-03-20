@@ -115,7 +115,7 @@ watch(
 const selectConfig: SelectConfig = {
   type: 'select',
   name: props.name,
-  disable: props.disabled,
+  disabled: props.disabled,
   options: () => {
     if (codeDsl.value) {
       return map(codeDsl.value, (value, key) => ({

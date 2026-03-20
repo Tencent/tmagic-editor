@@ -24,7 +24,7 @@ import {
   NODE_DISABLE_DATA_SOURCE_KEY,
 } from '@tmagic/core';
 import { tMagicMessage } from '@tmagic/design';
-import type { FormConfig, FormState, TabConfig, TabPaneConfig } from '@tmagic/form';
+import type { ChildConfig, FormConfig, TabConfig, TabPaneConfig } from '@tmagic/form';
 
 export const arrayOptions = [
   { text: '包含', value: 'include' },
@@ -107,7 +107,7 @@ export const styleTabConfig: TabPaneConfig = {
             'borderStyle',
             'borderColor',
           ],
-        },
+        } as unknown as ChildConfig,
       ],
     },
   ],
@@ -170,7 +170,7 @@ export const advancedTabConfig: TabPaneConfig = {
 
 export const displayTabConfig: TabPaneConfig = {
   title: '显示条件',
-  display: (_state: FormState, { model }: any) => model.type !== 'page',
+  display: (_state, { model }) => model.type !== 'page',
   items: [
     {
       name: NODE_CONDS_RESULT_KEY,
@@ -209,7 +209,7 @@ export const fillConfig = (
   const propsConfig: FormConfig = [];
 
   // 组件类型，必须要有
-  if (!config.find((item) => item.name === 'type')) {
+  if (!config.find((item) => 'name' in item && item.name === 'type')) {
     propsConfig.push({
       text: 'type',
       name: 'type',
@@ -217,7 +217,7 @@ export const fillConfig = (
     });
   }
 
-  if (!config.find((item) => item.name === 'id')) {
+  if (!config.find((item) => 'name' in item && item.name === 'id')) {
     // 组件id，必须要有
     propsConfig.push({
       name: 'id',
@@ -241,14 +241,16 @@ export const fillConfig = (
     });
   }
 
-  if (!config.find((item) => item.name === 'name')) {
+  if (!config.find((item) => 'name' in item && item.name === 'name')) {
     propsConfig.push({
       name: 'name',
       text: '组件名称',
     });
   }
 
-  const noCodeAdvancedTabItems = advancedTabConfig.items.filter((item) => item.type !== 'code-select');
+  const noCodeAdvancedTabItems = advancedTabConfig.items.filter(
+    (item) => 'type' in item && item.type !== 'code-select',
+  );
 
   if (noCodeAdvancedTabItems.length > 0 && disabledCodeBlock) {
     advancedTabConfig.items = noCodeAdvancedTabItems;

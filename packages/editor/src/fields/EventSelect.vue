@@ -59,7 +59,6 @@ import { ActionType } from '@tmagic/core';
 import { TMagicButton } from '@tmagic/design';
 import type {
   CascaderOption,
-  ChildConfig,
   CodeSelectColConfig,
   ContainerChangeEventData,
   DataSourceMethodSelectConfig,
@@ -90,10 +89,10 @@ const { editorService, dataSourceService, eventsService, codeBlockService, props
 
 // 事件名称下拉框表单配置
 const eventNameConfig = computed(() => {
-  const defaultEventNameConfig: ChildConfig = {
+  const defaultEventNameConfig = {
     name: 'name',
     text: '事件',
-    type: (mForm, { formValue }: any) => {
+    type: (mForm: FormState | undefined, { formValue }: any) => {
       if (
         props.config.src !== 'component' ||
         (formValue.type === 'page-fragment-container' && formValue.pageFragmentId)
@@ -227,10 +226,10 @@ const targetCompConfig = computed(() => {
 
 // 联动组件动作配置
 const compActionConfig = computed(() => {
-  const defaultCompActionConfig: ChildConfig = {
+  const defaultCompActionConfig = {
     name: 'method',
     text: '动作',
-    type: (mForm, { model }: any) => {
+    type: (mForm: FormState | undefined, { model }: any) => {
       const to = editorService.getNodeById(model.to);
 
       if (to && to.type === 'page-fragment-container' && to.pageFragmentId) {
@@ -240,7 +239,7 @@ const compActionConfig = computed(() => {
       return 'select';
     },
     checkStrictly: () => props.config.src !== 'component',
-    display: (mForm, { model }: any) => model.actionType === ActionType.COMP,
+    display: (mForm: FormState | undefined, { model }: any) => model.actionType === ActionType.COMP,
     options: (mForm: FormState, { model }: any) => {
       const node = editorService.getNodeById(model.to);
       if (!node?.type) return [];

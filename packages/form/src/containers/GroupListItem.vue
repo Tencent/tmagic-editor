@@ -144,7 +144,9 @@ const rowConfig = computed(() => ({
   span: props.config.span || 24,
   items: props.config.items,
   labelWidth: props.config.labelWidth,
-  [mForm?.keyProp || '__key']: `${props.config[mForm?.keyProp || '__key']}${String(props.index)}`,
+  [mForm?.keyProp || '__key']: `${(props.config as Record<string, any>)[mForm?.keyProp || '__key']}${String(
+    props.index,
+  )}`,
 }));
 
 const title = computed(() => {

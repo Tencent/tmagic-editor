@@ -1,8 +1,8 @@
 import type { DataSourceFieldType, DataSourceSchema } from '@tmagic/schema';
 
-import type { ChildConfig, FilterFunction, FormItem, FormState, Input } from './base';
+import type { FilterFunction, FormItem, FormItemConfig, FormState, Input } from './base';
 
-export interface DataSourceFieldSelectConfig extends FormItem {
+export interface DataSourceFieldSelectConfig<T extends Record<string, any> = never> extends FormItem {
   type: 'data-source-field-select';
   /**
    * 是否要编译成数据源的data。
@@ -26,13 +26,13 @@ export interface DataSourceFieldSelectConfig extends FormItem {
         },
       ) => boolean);
   dataSourceFieldType?: DataSourceFieldType[];
-  fieldConfig?: ChildConfig;
+  fieldConfig?: FormItemConfig<T>;
   /** 是否可以编辑数据源，disable表示的是是否可以选择数据源 */
   notEditable?: boolean | FilterFunction;
 }
 
 export interface CodeConfig extends FormItem {
-  type: 'code';
+  type: 'vs-code';
   language?: string;
   options?: {
     [key: string]: any;
@@ -140,8 +140,12 @@ export interface UISelectConfig extends FormItem {
   type: 'ui-select';
 }
 
-export type EditorChildConfig =
-  | DataSourceFieldSelectConfig
+export interface StyleSetterConfig extends FormItem {
+  type: 'style-setter';
+}
+
+export type EditorChildConfig<T extends Record<string, any> = never> =
+  | DataSourceFieldSelectConfig<T>
   | CodeConfig
   | CodeLinkConfig
   | CodeSelectConfig
@@ -157,4 +161,5 @@ export type EditorChildConfig =
   | EventSelectConfig
   | KeyValueConfig
   | PageFragmentSelectConfig
-  | UISelectConfig;
+  | UISelectConfig
+  | StyleSetterConfig;

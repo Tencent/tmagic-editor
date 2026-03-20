@@ -106,13 +106,18 @@ const type = computed((): string => {
   }
   if (type === 'form') return '';
   if (type === 'container') return '';
-  return type?.replace(/([A-Z])/g, '-$1').toLowerCase() || (props.config.items ? '' : 'text');
+  return (
+    type?.replace(/([A-Z])/g, '-$1').toLowerCase() ||
+    (props.config.fieldConfig && 'items' in props.config.fieldConfig ? '' : 'text')
+  );
 });
 
 const tagName = computed(() => {
   const component =
     getFormField(type.value || 'container') ||
-    resolveComponent(`m-${props.config.items ? 'form' : 'fields'}-${type.value}`);
+    resolveComponent(
+      `m-${props.config.fieldConfig && 'items' in props.config.fieldConfig ? 'form' : 'fields'}-${type.value}`,
+    );
   if (typeof component !== 'string') return component;
   return 'm-fields-text';
 });

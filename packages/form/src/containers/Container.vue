@@ -1,6 +1,6 @@
 <template>
   <div
-    :data-tmagic-id="config.id"
+    :data-tmagic-id="(config as Record<string, any>).id"
     :data-tmagic-form-item-prop="itemProp"
     :class="`m-form-container m-container-${type || ''} ${config.className || ''}${config.tip ? ' has-tip' : ''}`"
     :style="config.style"
@@ -28,7 +28,7 @@
           <FormLabel
             :tip="config.tip"
             :type="type"
-            :use-label="config.useLabel"
+            :use-label="(config as CheckboxConfig).useLabel"
             :label-title="config.labelTitle"
             :text="text"
           ></FormLabel>
@@ -61,7 +61,7 @@
         ></component>
       </TMagicFormItem>
 
-      <TMagicTooltip v-if="config.tip && type === 'checkbox' && !config.useLabel" placement="top">
+      <TMagicTooltip v-if="config.tip && type === 'checkbox' && !(config as CheckboxConfig).useLabel" placement="top">
         <TMagicIcon style="line-height: 40px; margin-left: 5px"><warning-filled /></TMagicIcon>
         <template #content>
           <div v-html="config.tip"></div>
@@ -80,7 +80,7 @@
           <FormLabel
             :tip="config.tip"
             :type="type"
-            :use-label="config.useLabel"
+            :use-label="(config as CheckboxConfig).useLabel"
             :label-title="config.labelTitle"
             :text="text"
           ></FormLabel>
@@ -95,7 +95,7 @@
         <component v-else v-bind="fieldsProps" :is="tagName" :model="lastValues" @change="onChangeHandler"></component>
       </TMagicFormItem>
 
-      <TMagicTooltip v-if="config.tip && type === 'checkbox' && !config.useLabel" placement="top">
+      <TMagicTooltip v-if="config.tip && type === 'checkbox' && !(config as CheckboxConfig).useLabel" placement="top">
         <TMagicIcon style="line-height: 40px; margin-left: 5px"><warning-filled /></TMagicIcon>
         <template #content>
           <div v-html="config.tip"></div>
@@ -112,7 +112,7 @@
           <FormLabel
             :tip="config.tip"
             :type="type"
-            :use-label="config.useLabel"
+            :use-label="(config as CheckboxConfig).useLabel"
             :label-title="config.labelTitle"
             :text="text"
           ></FormLabel>
@@ -127,7 +127,7 @@
         <component v-else v-bind="fieldsProps" :is="tagName" :model="model" @change="onChangeHandler"></component>
       </TMagicFormItem>
 
-      <TMagicTooltip v-if="config.tip && type === 'checkbox' && !config.useLabel" placement="top">
+      <TMagicTooltip v-if="config.tip && type === 'checkbox' && !(config as CheckboxConfig).useLabel" placement="top">
         <TMagicIcon style="line-height: 40px; margin-left: 5px"><warning-filled /></TMagicIcon>
         <template #content>
           <div v-html="config.tip"></div>
@@ -174,7 +174,9 @@ import { getValueByKeyPath } from '@tmagic/utils';
 
 import MHidden from '../fields/Hidden.vue';
 import type {
+  CheckboxConfig,
   ChildConfig,
+  ComponentConfig,
   ContainerChangeEventData,
   ContainerCommonConfig,
   FormState,
@@ -259,13 +261,10 @@ const type = computed((): string => {
 });
 
 const tagName = computed(() => {
-  if (type.value === 'component' && props.config.component) {
-    return props.config.component;
+  if (type.value === 'component' && (props.config as ComponentConfig).component) {
+    return (props.config as ComponentConfig).component;
   }
 
-  if (!getField(type.value || 'container')) {
-    console.log(type.value, 'type.value');
-  }
   return getField(type.value || 'container') || `m-${items.value ? 'form' : 'fields'}-${type.value}`;
 });
 
@@ -305,7 +304,7 @@ const fieldsProps = computed(() => ({
   name: name.value,
   disabled: disabled.value,
   prop: itemProp.value,
-  key: props.config[mForm?.keyProps],
+  key: (props.config as Record<string, any>)[mForm?.keyProps],
   style: props.config.fieldStyle,
 }));
 

@@ -218,13 +218,13 @@ const getTextByName = (name: string, config: FormConfig = props.config): string 
           return typeof item.text === 'string' ? item.text : undefined;
         }
 
-        if (item.items && Array.isArray(item.items)) {
+        if ('items' in item && Array.isArray(item.items)) {
           const result = findInConfig(item.items, remainingParts);
           if (result !== undefined) return result;
         }
       }
 
-      if (item.items && Array.isArray(item.items)) {
+      if ('items' in item && Array.isArray(item.items)) {
         const result = findInConfig(item.items, parts);
         if (result !== undefined) return result;
       }
