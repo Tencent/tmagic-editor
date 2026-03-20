@@ -348,7 +348,7 @@ export interface HtmlField extends FormItem {
 export interface DisplayConfig extends FormItem {
   type: 'display';
   initValue?: string | number | boolean;
-  displayText: FilterFunction<string> | string;
+  displayText?: FilterFunction<string> | string;
 }
 
 /** 文本输入框 */
@@ -820,9 +820,9 @@ export interface StepConfig<T = never> extends FormItem {
 export interface ComponentConfig extends FormItem {
   type: 'component';
   id: string;
-  extend: any;
-  display: any;
-  component: any;
+  extend?: any;
+  display?: any;
+  component?: any;
 }
 
 export interface FlexLayoutConfig<T = never> extends FormItem, ContainerCommonConfig<T> {
