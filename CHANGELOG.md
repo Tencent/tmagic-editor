@@ -1,3 +1,12 @@
+## [1.7.8-beta.3](https://github.com/Tencent/tmagic-editor/compare/v1.7.8-beta.2...v1.7.8-beta.3) (2026-03-20)
+
+
+### Features
+
+* **form-schema,form,editor,table:** 完善表单配置类型 ([e8714c9](https://github.com/Tencent/tmagic-editor/commit/e8714c96c9f3ae4644d830d232b2732adbcd05fa))
+
+
+
 ## [1.7.8-beta.2](https://github.com/Tencent/tmagic-editor/compare/v1.7.8-beta.1...v1.7.8-beta.2) (2026-03-20)
 
 
