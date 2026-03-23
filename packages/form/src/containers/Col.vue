@@ -1,5 +1,5 @@
 <template>
-  <TMagicCol v-show="display && 'type' in config && config.type !== 'hidden'" :span="span">
+  <TMagicCol v-show="display && type !== 'hidden'" :span="span">
     <Container
       :model="model"
       :lastValues="lastValues"
@@ -52,4 +52,6 @@ const mForm = inject<FormState | undefined>('mForm');
 const display = computed(() => displayFunction(mForm, props.config.display, props));
 const changeHandler = (v: any, eventData: ContainerChangeEventData) => emit('change', v, eventData);
 const onAddDiffCount = () => emit('addDiffCount');
+
+const type = computed(() => (props.config as any).type);
 </script>
