@@ -1,3 +1,12 @@
+## [1.7.9](https://github.com/Tencent/tmagic-editor/compare/v1.7.8...v1.7.9) (2026-03-23)
+
+
+### Bug Fixes
+
+* **form:** row容器中如果配置没有type显示异常 ([711af79](https://github.com/Tencent/tmagic-editor/commit/711af79d72c202a7bc961b0639ce62c318952ee6))
+
+
+
 ## [1.7.8](https://github.com/Tencent/tmagic-editor/compare/v1.7.8-beta.4...v1.7.8) (2026-03-20)
 
 
