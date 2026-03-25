@@ -1,7 +1,7 @@
 <template>
   <TMagicInputNumber
     v-if="model"
-    v-model="model[name]"
+    v-model="value"
     clearable
     controls-position="right"
     :size="size"
@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts" setup>
-import { inject } from 'vue';
+import { inject, ref, watch } from 'vue';
 
 import { TMagicInputNumber } from '@tmagic/design';
 
@@ -33,6 +33,18 @@ const emit = defineEmits<{
   change: [values: number];
   input: [values: number];
 }>();
+
+const value = ref<number>();
+
+watch(
+  () => props.model[props.name],
+  (v) => {
+    value.value = v;
+  },
+  {
+    immediate: true,
+  },
+);
 
 useAddField(props.prop);
 

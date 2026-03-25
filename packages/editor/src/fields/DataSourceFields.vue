@@ -1,6 +1,6 @@
 <template>
   <div class="m-editor-data-source-fields">
-    <MagicTable :data="model[name]" :columns="fieldColumns"></MagicTable>
+    <MagicTable :data="model[name]" :columns="fieldColumns" :border="true"></MagicTable>
 
     <div class="m-editor-data-source-fields-footer">
       <TMagicButton size="small" :disabled="disabled" plain @click="newFromJsonHandler()">快速添加</TMagicButton>
@@ -49,35 +49,41 @@
 <script setup lang="ts">
 import { inject, Ref, ref } from 'vue';
 
+import type { DataSchema } from '@tmagic/core';
 import { TMagicButton, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
-import { type FieldProps, type FormConfig, type FormState, MFormBox } from '@tmagic/form';
-import type { DataSchema } from '@tmagic/schema';
+import {
+  type CodeConfig,
+  type ContainerChangeEventData,
+  type DataSourceFieldsConfig,
+  type FieldProps,
+  type FormConfig,
+  type FormState,
+  MFormBox,
+  type NumberConfig,
+  type TextConfig,
+} from '@tmagic/form';
 import { type ColumnConfig, MagicTable } from '@tmagic/table';
 import { getDefaultValueFromFields } from '@tmagic/utils';
 
 import FloatingBox from '@editor/components/FloatingBox.vue';
 import { useEditorContentHeight } from '@editor/hooks';
 import { useNextFloatBoxPosition } from '@editor/hooks/use-next-float-box-position';
-import type { Services } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
+import { error } from '@editor/utils/logger';
 
 defineOptions({
   name: 'MFieldsDataSourceFields',
 });
 
-const props = withDefaults(
-  defineProps<
-    FieldProps<{
-      type: 'data-source-fields';
-    }>
-  >(),
-  {
-    disabled: false,
-  },
-);
+const props = withDefaults(defineProps<FieldProps<DataSourceFieldsConfig>>(), {
+  disabled: false,
+});
 
-const emit = defineEmits(['change']);
+const emit = defineEmits<{
+  change: [v: any, eventData?: ContainerChangeEventData];
+}>();
 
-const services = inject<Services>('services');
+const { uiService } = useServices();
 
 const fieldValues = ref<Record<string, any>>({});
 const fieldTitle = ref('');
@@ -91,16 +97,29 @@ const newHandler = () => {
   addDialogVisible.value = true;
 };
 
-const fieldChange = ({ index, ...value }: Record<string, any>) => {
-  if (index > -1) {
-    props.model[props.name][index] = value;
-  } else {
-    props.model[props.name].push(value);
-  }
-
+const fieldChange = ({ index, ...value }: Record<string, any>, data: ContainerChangeEventData) => {
   addDialogVisible.value = false;
 
-  emit('change', props.model[props.name]);
+  if (index > -1) {
+    emit('change', value, {
+      modifyKey: index,
+      changeRecords: (data.changeRecords || []).map((item) => ({
+        propPath: `${props.prop}.${index}.${item.propPath}`,
+        value: item.value,
+      })),
+    });
+  } else {
+    const modifyKey = props.model[props.name].length;
+    emit('change', value, {
+      modifyKey,
+      changeRecords: [
+        {
+          propPath: `${props.prop}.${modifyKey}`,
+          value,
+        },
+      ],
+    });
+  }
 };
 
 const fieldColumns: ColumnConfig[] = [
@@ -123,6 +142,7 @@ const fieldColumns: ColumnConfig[] = [
       try {
         return JSON.stringify(row.defaultValue);
       } catch (e) {
+        error(e);
         return row.defaultValue;
       }
     },
@@ -172,6 +192,12 @@ const dataSourceFieldsConfig: FormConfig = [
       { text: 'null', value: 'null' },
       { text: 'any', value: 'any' },
     ],
+    onChange: (_formState, v: string, { setModel }) => {
+      if (!['any', 'array', 'object'].includes(v)) {
+        setModel('fields', []);
+      }
+      return v;
+    },
   },
   {
     name: 'name',
@@ -210,8 +236,8 @@ const dataSourceFieldsConfig: FormConfig = [
   {
     name: 'defaultValue',
     text: '默认值',
-    height: '200px',
     parse: true,
+    mFormItemType: 'data-source-field-defaultValue',
     type: (mForm: FormState | undefined, { model }: any) => {
       if (model.type === 'number') return 'number';
       if (model.type === 'boolean') return 'select';
@@ -219,11 +245,12 @@ const dataSourceFieldsConfig: FormConfig = [
 
       return 'vs-code';
     },
+    autosize: { minRows: 1, maxRows: 30 },
     options: [
       { text: 'true', value: true },
       { text: 'false', value: false },
     ],
-  },
+  } as unknown as CodeConfig | NumberConfig | TextConfig,
   {
     name: 'enable',
     text: '是否可用',
@@ -244,7 +271,7 @@ const jsonFromConfig: FormConfig = [
     type: 'vs-code',
     labelWidth: '0',
     language: 'json',
-    height: '600px',
+    autosize: { minRows: 30, maxRows: 50 },
     options: inject('codeOptions', {}),
   },
 ];
@@ -304,11 +331,9 @@ const addFromJsonFromChange = ({ data }: { data: string }) => {
   try {
     const value = JSON.parse(data);
 
-    props.model[props.name] = getFieldsConfig(value, props.model[props.name]);
-
     addFromJsonDialogVisible.value = false;
 
-    emit('change', props.model[props.name]);
+    emit('change', getFieldsConfig(value, props.model[props.name]));
   } catch (e: any) {
     tMagicMessage.error(e.message);
   }
@@ -319,5 +344,5 @@ const addFromJsonDialogVisible = defineModel<boolean>('visible1', { default: fal
 const { height: editorHeight } = useEditorContentHeight();
 
 const parentFloating = inject<Ref<HTMLDivElement | null>>('parentFloating', ref(null));
-const { boxPosition, calcBoxPosition } = useNextFloatBoxPosition(services?.uiService, parentFloating);
+const { boxPosition, calcBoxPosition } = useNextFloatBoxPosition(uiService, parentFloating);
 </script>

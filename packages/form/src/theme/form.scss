@@ -19,25 +19,37 @@
     height: 100%;
   }
 
-  .el-table {
+  .tmagic-design-table {
     .cell > div.m-form-container {
       display: block;
+
+      &.has-tip {
+        display: flex;
+      }
     }
   }
 
-  .el-tabs {
+  .tmagic-design-tabs {
     margin-bottom: 10px;
   }
 
-  .el-form-item.hidden {
+  .tmagic-design-form-item.tmagic-form-hidden {
     > .el-form-item__label {
       display: none;
     }
   }
 
-  .t-form__item.hidden {
+  .t-form__item.tmagic-form-hidden {
     > .t-form__label {
       display: none;
     }
+
+    > .t-form__controls {
+      margin-left: 0 !important;
+    }
+  }
+
+  &.t-form:not(.t-form-inline) .t-form__item:last-of-type {
+    margin-bottom: var(--td-comp-margin-xxl);
   }
 }

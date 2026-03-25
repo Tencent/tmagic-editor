@@ -5,11 +5,11 @@
 </template>
 
 <script setup lang="ts">
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 
 defineOptions({
   name: 'TMRow',
 });
 
-const uiComponent = getConfig('components')?.row.component || 'el-row';
+const uiComponent = getDesignConfig('components')?.row.component || 'el-row';
 </script>

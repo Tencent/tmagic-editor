@@ -1,4 +1,4 @@
-import { createForm } from '@tmagic/form';
+import { createForm } from '@tmagic/editor';
 
 export default createForm([
   {
@@ -56,8 +56,8 @@ export default createForm([
   {
     type: 'daterange',
     text: '日期范围',
-    name: 'daterange',
-    // names: ['one', 'two'],
+    // name: 'daterange',
+    names: ['one', 'two'],
   },
   {
     type: 'time',
@@ -190,8 +190,28 @@ export default createForm([
     ],
   },
   {
+    type: 'tab',
+    name: 'tab',
+    editable: true,
+    dynamic: true,
+    active: '0',
+    tabType: 'border-card',
+    items: [
+      {
+        name: 'xx',
+        items: [
+          {
+            name: 'text',
+            text: 'text',
+          },
+        ],
+      },
+    ],
+  },
+  {
     type: 'table',
     name: 'table',
+    copyable: true,
     defautSort: { prop: 'name', order: 'descending' },
     extra: 'extra',
     itemExtra: (vm: any, { model }: any): any => `${model.text}itemExtra`,
@@ -213,6 +233,8 @@ export default createForm([
     type: 'groupList',
     name: 'groupList',
     extra: '分组xxxxxxxxxxxx',
+    copyable: true,
+    moveSpecifyLocation: true,
     itemExtra: (vm: any, { model }: any) => `${model.name}extra`,
     items: [
       {

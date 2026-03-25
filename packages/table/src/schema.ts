@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,10 @@
 import { FormConfig, FormValue } from '@tmagic/form';
 
 export interface ColumnActionConfig {
-  type?: 'delete' | 'copy' | 'edit';
+  type?: 'delete' | 'copy' | 'edit' | string;
   buttonType?: string;
-  display?: (row: any) => boolean;
+  display?: boolean | ((row: any) => boolean);
+  disabled?: boolean | ((row: any) => boolean);
   text?: string | ((row: any) => string);
   name?: string;
   tooltip?: string;
@@ -30,10 +31,13 @@ export interface ColumnActionConfig {
   handler?: (row: any, index: number) => Promise<any> | any;
   before?: (row: any, index: number) => Promise<void> | void;
   after?: (row: any, index: number) => Promise<void> | void;
-  action?: (data: { data: any }) => Promise<void> | void;
+  action?: (data: { data: any; index: number }) => Promise<void> | void;
+  cancel?: (data: { index: number }) => Promise<void> | void;
 }
 
 export interface ColumnConfig<T = any> {
+  pageIndex?: number;
+  pageSize?: number;
   form?: FormConfig;
   rules?: any;
   values?: FormValue;
@@ -43,17 +47,35 @@ export interface ColumnConfig<T = any> {
   fixed?: 'left' | 'right' | boolean;
   width?: number | string;
   actions?: ColumnActionConfig[];
-  type?: 'popover' | 'expand' | 'component' | string | ((value: any, row: T) => string);
+  type?: 'popover' | 'expand' | 'component' | 'index' | string | ((value: any, row: T) => string);
   text?: string;
   prop?: string;
+  name?: string;
   showHeader?: boolean;
   table?: ColumnConfig[];
-  formatter?: 'datetime' | ((item: any, row: T) => any);
+  editInlineFormConfig?: FormConfig;
+  formatter?: 'datetime' | ((item: any, row: T, data: { index: number }) => any);
   popover?: {
-    placement: string;
-    width: string;
-    trigger: string;
-    tableEmbed: boolean;
+    placement?:
+      | 'auto'
+      | 'auto-start'
+      | 'auto-end'
+      | 'left'
+      | 'right'
+      | 'top'
+      | 'bottom'
+      | 'top-start'
+      | 'top-end'
+      | 'bottom-start'
+      | 'bottom-end'
+      | 'right-start'
+      | 'right-end'
+      | 'left-start'
+      | 'left-end';
+    width?: string | number;
+    trigger?: 'hover' | 'click';
+    tableEmbed?: boolean;
+    destroyOnClose?: boolean;
   };
   sortable?: boolean | 'custom';
   action?: 'tip' | 'actionLink' | 'img' | 'link' | 'tag';

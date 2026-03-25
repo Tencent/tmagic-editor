@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import { CascaderProps } from './types';
 
 defineOptions({
@@ -21,11 +21,11 @@ defineOptions({
 
 const props = defineProps<CascaderProps>();
 
-const ui = getConfig('components')?.cascader;
+const ui = getDesignConfig('components')?.cascader;
 
 const uiComponent = ui?.component || 'el-cascader';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<CascaderProps>(() => ui?.props(props) || props);
 
 const cascader = ref<any>();
 

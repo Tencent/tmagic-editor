@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,21 @@
 
 import { reactive } from 'vue';
 import { cloneDeep, mergeWith } from 'lodash-es';
-import { Writable } from 'type-fest';
+import type { Writable } from 'type-fest';
 
-import { Target, type TargetOptions, Watcher } from '@tmagic/dep';
+import type { Id, MComponent, MNode, TargetOptions } from '@tmagic/core';
+import { Target, Watcher } from '@tmagic/core';
 import type { FormConfig } from '@tmagic/form';
-import type { Id, MComponent, MNode } from '@tmagic/schema';
 import { getNodePath, getValueByKeyPath, guid, setValueByKeyPath, toLine } from '@tmagic/utils';
 
 import editorService from '@editor/services/editor';
-import type { AsyncHookPlugin, PropsState, SyncHookPlugin } from '@editor/type';
+import type {
+  AsyncHookPlugin,
+  PropsFormConfigFunction,
+  PropsFormValueFunction,
+  PropsState,
+  SyncHookPlugin,
+} from '@editor/type';
 import { fillConfig } from '@editor/utils/props';
 
 import BaseService from './BaseService';
@@ -51,6 +57,10 @@ class Props extends BaseService {
     propsConfigMap: {},
     propsValueMap: {},
     relateIdMap: {},
+    /** 禁用数据源 */
+    disabledDataSource: false,
+    /** 禁用代码块 */
+    disabledCodeBlock: false,
   });
 
   constructor() {
@@ -60,7 +70,23 @@ class Props extends BaseService {
     ]);
   }
 
-  public setPropsConfigs(configs: Record<string, FormConfig>) {
+  public setDisabledDataSource(disabled: boolean) {
+    this.state.disabledDataSource = disabled;
+  }
+
+  public setDisabledCodeBlock(disabled: boolean) {
+    this.state.disabledCodeBlock = disabled;
+  }
+
+  public getDisabledDataSource(): boolean {
+    return this.state.disabledDataSource;
+  }
+
+  public getDisabledCodeBlock(): boolean {
+    return this.state.disabledCodeBlock;
+  }
+
+  public setPropsConfigs(configs: Record<string, FormConfig | PropsFormConfigFunction>) {
     Object.keys(configs).forEach((type: string) => {
       this.setPropsConfig(toLine(type), configs[type]);
     });
@@ -68,11 +94,22 @@ class Props extends BaseService {
   }
 
   public async fillConfig(config: FormConfig, labelWidth?: string) {
-    return fillConfig(config, typeof labelWidth !== 'function' ? labelWidth : '80px');
+    return fillConfig(config, {
+      labelWidth: typeof labelWidth !== 'function' ? labelWidth : '80px',
+      disabledDataSource: this.getDisabledDataSource(),
+      disabledCodeBlock: this.getDisabledCodeBlock(),
+    });
   }
 
-  public async setPropsConfig(type: string, config: FormConfig) {
-    this.state.propsConfigMap[toLine(type)] = await this.fillConfig(Array.isArray(config) ? config : [config]);
+  public async setPropsConfig(type: string, config: FormConfig | PropsFormConfigFunction) {
+    let c: FormConfig;
+    if (typeof config === 'function') {
+      c = config({ editorService });
+    } else {
+      c = config;
+    }
+
+    this.state.propsConfigMap[toLine(type)] = await this.fillConfig(Array.isArray(c) ? c : [c]);
   }
 
   /**
@@ -88,7 +125,7 @@ class Props extends BaseService {
     return cloneDeep(this.state.propsConfigMap[toLine(type)] || (await this.fillConfig([])));
   }
 
-  public setPropsValues(values: Record<string, Partial<MNode>>) {
+  public setPropsValues(values: Record<string, Partial<MNode> | PropsFormValueFunction>) {
     Object.keys(values).forEach((type: string) => {
       this.setPropsValue(toLine(type), values[type]);
     });
@@ -99,8 +136,12 @@ class Props extends BaseService {
    * @param type 组件类型
    * @param value 组件初始值
    */
-  public async setPropsValue(type: string, value: Partial<MNode>) {
-    this.state.propsValueMap[toLine(type)] = value;
+  public async setPropsValue(type: string, value: Partial<MNode> | PropsFormValueFunction) {
+    let v = value;
+    if (typeof value === 'function') {
+      v = value({ editorService });
+    }
+    this.state.propsValueMap[toLine(type)] = v;
   }
 
   /**

@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,18 +35,6 @@ export type RequestFunction = <T = any>(options: HttpOptions) => Promise<T>;
 
 export type JsEngine = 'browser' | 'hippy' | 'nodejs';
 
-export interface AppCore {
-  /** 页面配置描述 */
-  dsl?: MApp;
-  /** 允许平台，editor: 编辑器中，mobile: 手机端，tv: 电视端, pc: 电脑端 */
-  platform?: 'editor' | 'mobile' | 'tv' | 'pc' | string;
-  /** 代码运行环境 */
-  jsEngine?: JsEngine | string;
-  /** 网络请求函数 */
-  request?: RequestFunction;
-  [key: string]: any;
-}
-
 export enum NodeType {
   /** 容器 */
   CONTAINER = 'container',
@@ -57,6 +45,12 @@ export enum NodeType {
   /** 页面片 */
   PAGE_FRAGMENT = 'page-fragment',
 }
+
+export const NODE_CONDS_KEY = 'displayConds';
+export const NODE_CONDS_RESULT_KEY = 'displayCondsResultReverse';
+
+export const NODE_DISABLE_DATA_SOURCE_KEY = '_tmagic_node_disabled_data_source';
+export const NODE_DISABLE_CODE_BLOCK_KEY = '_tmagic_node_disabled_code_block';
 
 export type Id = string | number;
 
@@ -97,7 +91,7 @@ export interface CodeItemConfig {
   /** 代码ID */
   codeId: Id;
   /** 代码参数 */
-  params?: object;
+  params?: Record<string, any>;
 }
 
 export interface CompItemConfig {
@@ -136,9 +130,9 @@ export interface MComponent {
   /** 显示条件中配置的数据源条件的编译结果 */
   condResult?: boolean;
   /** 组件根Dom的style */
-  style?: {
-    [key: string]: any;
-  };
+  style?: StyleSchema;
+  [NODE_CONDS_KEY]?: DisplayCond[];
+  [NODE_CONDS_RESULT_KEY]?: boolean;
   [key: string]: any;
 }
 
@@ -147,6 +141,17 @@ export interface MContainer extends MComponent {
   type?: NodeType.CONTAINER | string;
   /** 容器子元素 */
   items: (MComponent | MContainer)[];
+}
+
+export interface MIteratorContainer extends MContainer {
+  type: 'iterator-container';
+  iteratorData: any[];
+  dsField: string[];
+  itemConfig: {
+    layout: string;
+    [NODE_CONDS_KEY]: DisplayCond[];
+    style: Record<string, string | number>;
+  };
 }
 
 export interface MPage extends MContainer {
@@ -202,7 +207,12 @@ export interface PastePosition {
   top?: number;
 }
 
-export type MNode = MComponent | MContainer | MPage | MApp | MPageFragment;
+export type MNode = MComponent | MContainer | MIteratorContainer | MPage | MApp | MPageFragment;
+
+export interface MNodeInstance extends Omit<MNode, 'id'> {
+  id?: Id;
+  type?: string;
+}
 
 export enum HookType {
   /** 代码块钩子标识 */
@@ -285,3 +295,23 @@ export type HookData = {
   /** 参数 */
   params?: object;
 };
+
+export interface DisplayCondItem {
+  field: string[];
+  op: string;
+  value?: any;
+  range?: [number, number];
+}
+
+export interface DisplayCond {
+  cond: DisplayCondItem[];
+}
+
+export interface UiComponentProps<T extends MNode = MNode> {
+  config: T;
+  model?: any;
+}
+
+export interface StyleSchema {
+  [key: string]: any;
+}

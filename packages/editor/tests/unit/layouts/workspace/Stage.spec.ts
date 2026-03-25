@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,22 @@
 import { describe, expect, test, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 
-import { NodeType } from '@tmagic/schema';
+import { NodeType } from '@tmagic/core';
 
 import Stage from '@editor/layouts/workspace/viewer/Stage.vue';
+import editorService from '@editor/services/editor';
+import keybindingService from '@editor/services/keybinding';
+import stageOverlayService from '@editor/services/stageOverlay';
+import storageService from '@editor/services/storage';
+import uiService from '@editor/services/ui';
 
 globalThis.ResizeObserver =
   globalThis.ResizeObserver ||
-  vi.fn().mockImplementation(() => ({
-    disconnect: vi.fn(),
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-  }));
+  class ResizeObserver {
+    disconnect = vi.fn();
+    observe = vi.fn();
+    unobserve = vi.fn();
+  };
 
 describe('Stage.vue', () => {
   (global as any).fetch = vi.fn(() =>
@@ -53,6 +58,18 @@ describe('Stage.vue', () => {
   };
 
   const wrapper = mount(Stage as any, {
+    global: {
+      provide: {
+        services: {
+          editorService,
+          uiService,
+          stageOverlayService,
+          storageService,
+          keybindingService,
+        },
+      },
+    },
+
     props: {
       runtimeUrl: '',
       root: {
@@ -64,6 +81,7 @@ describe('Stage.vue', () => {
       page,
       node: page,
       uiSelectMode: false,
+      customContentMenu: (menu: any) => menu,
     },
   });
 

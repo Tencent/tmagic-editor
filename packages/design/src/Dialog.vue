@@ -17,22 +17,26 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { DialogProps } from './types';
 
 defineOptions({
   name: 'TMDialog',
 });
 
-const props = defineProps<DialogProps>();
+const props = withDefaults(defineProps<DialogProps>(), {
+  closeOnClickModal: true,
+  closeOnPressEscape: true,
+  showClose: true,
+});
 
 const emit = defineEmits(['close', 'update:modelValue']);
 
-const ui = getConfig('components')?.dialog;
+const ui = getDesignConfig('components')?.dialog;
 
 const uiComponent = ui?.component || 'el-dialog';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<DialogProps>(() => ui?.props(props) || props);
 
 const closeHandler = (...args: any[]) => {
   emit('close', ...args);

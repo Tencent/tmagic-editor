@@ -1,12 +1,12 @@
 <template>
   <TMagicCheckbox
-    v-model="model[name]"
+    :model-value="model[name]"
     :size="size"
     :trueValue="activeValue"
     :falseValue="inactiveValue"
     :disabled="disabled"
-    @change="changeHandler"
-    >{{ config.text }}</TMagicCheckbox
+    @update:model-value="changeHandler"
+    ><template #default v-if="!config.useLabel">{{ config.text }}</template></TMagicCheckbox
   >
 </template>
 

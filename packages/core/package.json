@@ -1,62 +1,52 @@
 {
-  "version": "1.4.7",
+  "version": "1.7.8",
   "name": "@tmagic/core",
   "type": "module",
-  "sideEffects": [
-    "dist/*"
-  ],
+  "sideEffects": false,
   "main": "dist/tmagic-core.umd.cjs",
-  "module": "dist/tmagic-core.js",
+  "module": "dist/es/index.js",
   "types": "types/index.d.ts",
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
-      "import": "./dist/tmagic-core.js",
+      "import": "./dist/es/index.js",
       "require": "./dist/tmagic-core.umd.cjs"
     },
-    "./dist/style.css": {
-      "import": "./dist/style.css",
-      "require": "./dist/style.css"
+    "./resetcss.css": {
+      "import": "./resetcss.css",
+      "require": "./resetcss.css"
     },
     "./*": "./*"
   },
   "files": [
     "dist",
-    "types"
+    "types",
+    "src",
+    "resetcss.css"
   ],
   "license": "Apache-2.0",
-  "scripts": {
-    "build": "npm run build:type && vite build",
-    "build:type": "npm run clear:type && tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
-    "check:type": "tsc --noEmit --project tsconfig.build.json",
-    "clear:type": "rimraf ./types"
-  },
   "engines": {
     "node": ">=18"
   },
   "repository": {
+    "directory": "packages/core",
     "type": "git",
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
-  "keywords": [
-    "vue"
-  ],
   "dependencies": {
+    "@tmagic/data-source": "workspace:*",
+    "@tmagic/dep": "workspace:*",
+    "@tmagic/schema": "workspace:*",
+    "@tmagic/utils": "workspace:*",
     "events": "^3.3.0",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
-    "@types/events": "^3.0.0",
-    "@types/lodash-es": "^4.17.4",
-    "@types/node": "^18.19.0",
-    "rimraf": "^3.0.2",
-    "vite": "^5.2.12"
+    "@types/events": "^3.0.3",
+    "@types/lodash-es": "^4.17.4"
   },
   "peerDependencies": {
-    "@tmagic/data-source": "workspace:*",
-    "@tmagic/schema": "workspace:*",
-    "@tmagic/utils": "workspace:*",
-    "typescript": "*"
+    "typescript": "catalog:"
   },
   "peerDependenciesMeta": {
     "typescript": {

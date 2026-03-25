@@ -1,24 +1,14 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "ESNext",
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "allowJs": false,
-    "skipLibCheck": false,
-    "esModuleInterop": false,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "module": "ESNext",
-    "moduleResolution": "Node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
+    "baseUrl": "./",
     "jsx": "react",
-    "baseUrl": ".",
+    "forceConsistentCasingInFileNames": true,
+    "types": ["node"],
     "paths": {
       // 内部模块都指向 src/index.ts, 会有更好的代码跳转体验.
-      "@tmagic/*": ["../packages/*"],
+      "@tmagic/*": ["../../packages/*/src"],
+      "@tmagic/react-runtime-help": ["../react-runtime-help/src"],
     },
   },
-  "include": ["./page", "./playground"]
 }

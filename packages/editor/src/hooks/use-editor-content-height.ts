@@ -1,11 +1,11 @@
-import { computed, inject, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
-import type { Services } from '@editor/type';
+import { useServices } from './use-services';
 
 export const useEditorContentHeight = () => {
-  const services = inject<Services>('services');
-  const frameworkHeight = computed(() => services?.uiService.get('frameworkRect').height || 0);
-  const navMenuHeight = computed(() => services?.uiService.get('navMenuRect').height || 0);
+  const { uiService } = useServices();
+  const frameworkHeight = computed(() => uiService.get('frameworkRect').height);
+  const navMenuHeight = computed(() => uiService.get('navMenuRect').height);
   const editorContentHeight = computed(() => frameworkHeight.value - navMenuHeight.value);
 
   const height = ref(0);

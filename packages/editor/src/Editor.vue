@@ -1,5 +1,9 @@
 <template>
-  <Framework :disabled-page-fragment="disabledPageFragment">
+  <Framework
+    :disabled-page-fragment="disabledPageFragment"
+    :page-bar-sort-options="pageBarSortOptions"
+    :page-filter-function="pageFilterFunction"
+  >
     <template #header>
       <slot name="header"></slot>
     </template>
@@ -16,7 +20,13 @@
 
     <template #sidebar>
       <slot name="sidebar" :editorService="editorService">
-        <Sidebar :data="sidebar" :layer-content-menu="layerContentMenu" :custom-content-menu="customContentMenu">
+        <Sidebar
+          :data="sidebar"
+          :layer-content-menu="layerContentMenu"
+          :custom-content-menu="customContentMenu"
+          :indent="treeIndent"
+          :next-level-indent-increment="treeNextLevelIndentIncrement"
+        >
           <template #layer-panel-header>
             <slot name="layer-panel-header"></slot>
           </template>
@@ -31,6 +41,10 @@
 
           <template #layer-node-tool="{ data }">
             <slot name="layer-node-tool" :data="data"></slot>
+          </template>
+
+          <template #component-list="{ componentGroupList }">
+            <slot name="component-list" :component-group-list="componentGroupList"></slot>
           </template>
 
           <template #component-list-panel-header>
@@ -82,9 +96,10 @@
         <PropsPanel
           :extend-state="extendFormState"
           :disabled-show-src="disabledShowSrc"
-          @mounted="(instance: any) => $emit('props-panel-mounted', instance)"
-          @form-error="(e: any) => $emit('props-form-error', e)"
-          @submit-error="(e: any) => $emit('props-submit-error', e)"
+          @mounted="propsPanelMountedHandler"
+          @unmounted="propsPanelUnmountedHandler"
+          @form-error="propsPanelFormErrorHandler"
+          @submit-error="propsPanelSubmitErrorHandler"
         >
           <template #props-panel-header>
             <slot name="props-panel-header"></slot>
@@ -104,8 +119,10 @@
     </template>
 
     <template #page-bar><slot name="page-bar"></slot></template>
+    <template #page-bar-add-button><slot name="page-bar-add-button"></slot></template>
     <template #page-bar-title="{ page }"><slot name="page-bar-title" :page="page"></slot></template>
     <template #page-bar-popover="{ page }"><slot name="page-bar-popover" :page="page"></slot></template>
+    <template #page-list-popover="{ list }"><slot name="page-list-popover" :list="list"></slot></template>
   </Framework>
 </template>
 
@@ -114,18 +131,19 @@ import { EventEmitter } from 'events';
 
 import { provide } from 'vue';
 
-import type { MApp } from '@tmagic/schema';
+import type { MApp } from '@tmagic/core';
 
 import Framework from './layouts/Framework.vue';
 import TMagicNavMenu from './layouts/NavMenu.vue';
-import PropsPanel from './layouts/PropsPanel.vue';
+import FormPanel from './layouts/props-panel/FormPanel.vue';
+import PropsPanel from './layouts/props-panel/PropsPanel.vue';
 import Sidebar from './layouts/sidebar/Sidebar.vue';
 import Workspace from './layouts/workspace/Workspace.vue';
 import codeBlockService from './services/codeBlock';
 import componentListService from './services/componentList';
 import dataSourceService from './services/dataSource';
 import depService from './services/dep';
-import editorService, { type EditorService } from './services/editor';
+import editorService from './services/editor';
 import eventsService from './services/events';
 import historyService from './services/history';
 import keybindingService from './services/keybinding';
@@ -136,24 +154,17 @@ import uiService from './services/ui';
 import keybindingConfig from './utils/keybinding-config';
 import { defaultEditorProps, EditorProps } from './editorProps';
 import { initServiceEvents, initServiceState } from './initService';
-import type { EventBus, FrameworkSlots, PropsPanelSlots, Services, SidebarSlots, WorkspaceSlots } from './type';
+import type { EditorSlots, EventBus, Services, StageOptions } from './type';
 
-defineSlots<
-  FrameworkSlots &
-    WorkspaceSlots &
-    SidebarSlots &
-    PropsPanelSlots & {
-      workspace(props: { editorService: EditorService }): any;
-      'workspace-content'(props: { editorService: EditorService }): any;
-    }
->();
+defineSlots<EditorSlots>();
 
 defineOptions({
   name: 'MEditor',
 });
 
 const emit = defineEmits<{
-  'props-panel-mounted': [instance: InstanceType<typeof PropsPanel>];
+  'props-panel-mounted': [instance: InstanceType<typeof FormPanel>];
+  'props-panel-unmounted': [];
   'update:modelValue': [value: MApp | null];
   'props-form-error': [e: any];
   'props-submit-error': [e: any];
@@ -181,7 +192,7 @@ initServiceState(props, services);
 keybindingService.register(keybindingConfig);
 keybindingService.registerEl('global');
 
-const stageOptions = {
+const stageOptions: StageOptions = {
   runtimeUrl: props.runtimeUrl,
   autoScrollIntoView: props.autoScrollIntoView,
   render: props.render,
@@ -206,6 +217,21 @@ provide('codeOptions', props.codeOptions);
 provide('stageOptions', stageOptions);
 
 provide<EventBus>('eventBus', new EventEmitter());
+
+const propsPanelMountedHandler = (e: InstanceType<typeof FormPanel>) => {
+  emit('props-panel-mounted', e);
+};
+const propsPanelUnmountedHandler = () => {
+  emit('props-panel-unmounted');
+};
+
+const propsPanelSubmitErrorHandler = (e: any) => {
+  emit('props-submit-error', e);
+};
+
+const propsPanelFormErrorHandler = (e: any) => {
+  emit('props-form-error', e);
+};
 
 defineExpose(services);
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <div ref="el" class="m-editor-layout" :style="`min-width: ${props.minCenter + props.minLeft + props.minRight}px`">
+  <div ref="target" class="m-editor-layout" :style="`min-width: ${props.minCenter + props.minLeft + props.minRight}px`">
     <template v-if="hasLeft && $slots.left">
       <div class="m-editor-layout-left" :class="leftClass" :style="`width: ${left}px`">
         <slot name="left"></slot>
@@ -21,8 +21,8 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, onMounted, ref, watchEffect } from 'vue';
-import { OnDrag } from 'gesto';
+import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef, watchEffect } from 'vue';
+import type { OnDrag } from 'gesto';
 
 import Resizer from './Resizer.vue';
 
@@ -45,13 +45,13 @@ const props = withDefaults(
     centerClass?: string;
   }>(),
   {
-    minLeft: 46,
+    minLeft: 1,
     minRight: 1,
     minCenter: 5,
   },
 );
 
-const el = ref<HTMLElement>();
+const el = useTemplateRef<HTMLElement>('target');
 
 const hasLeft = computed(() => typeof props.left !== 'undefined');
 const hasRight = computed(() => typeof props.right !== 'undefined');
@@ -65,12 +65,21 @@ const getCenterWidth = (l = 0, r = 0) => {
   let center = clientWidth - left - right;
 
   if (center < props.minCenter) {
+    const diff = props.minCenter - center;
+
     center = props.minCenter;
-    if (right > center + props.minRight) {
-      right = clientWidth - left - center;
-    } else {
+
+    if (right - diff < props.minRight) {
       right = props.minRight;
-      left = clientWidth - right - center;
+    } else {
+      right -= diff;
+    }
+
+    left = clientWidth - right - center;
+
+    if (left < props.minLeft) {
+      left -= diff / 2;
+      right -= diff / 2;
     }
   }
   return {
@@ -86,8 +95,8 @@ const widthChange = (width: number) => {
   }
 
   clientWidth = width;
-  let left = props.left || 0;
-  let right = props.right || 0;
+  let left = props.left || props.minLeft || 0;
+  let right = props.right || props.minRight || 0;
 
   if (left > clientWidth) {
     left = clientWidth / 3;

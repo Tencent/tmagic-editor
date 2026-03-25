@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,45 +16,14 @@
  * limitations under the License.
  */
 
-import { describe, expect, test } from 'vitest';
+import { assert, describe, expect, test } from 'vitest';
 
 import type { DataSchema } from '@tmagic/schema';
 
 import * as util from '../../src';
 
-describe('datetimeFormatter', () => {
-  // Date会将时间转为UTC
-  const date = new Date('2021-07-17T15:37:00');
-  const dateValue = '2021-07-17 15:37:00';
-  const defaultValue = '默认值';
-
-  test('v为空且未设置默认时间', () => {
-    expect(util.datetimeFormatter('')).toBe('-');
-  });
-
-  test('v是字符串且未设置了默认时间', () => {
-    expect(util.datetimeFormatter('abc', defaultValue)).toMatch(defaultValue);
-  });
-
-  test('v是日期字符串', () => {
-    expect(util.datetimeFormatter(date.toISOString(), defaultValue)).toMatch(dateValue);
-  });
-
-  test('v是Date对象', () => {
-    expect(util.datetimeFormatter(date)).toMatch(dateValue);
-  });
-
-  test('v是UTC字符串', () => {
-    expect(util.datetimeFormatter(date.toUTCString())).toMatch(dateValue);
-  });
-
-  test('format是x', () => {
-    expect(util.datetimeFormatter(date.toISOString(), defaultValue, 'timestamp')).toBe(date.getTime());
-  });
-});
-
 describe('asyncLoadJs', () => {
-  const url = 'https://m.film.qq.com/magic-ui/production/1/1625056093304/magic/magic-ui.umd.min.js';
+  const url = 'https://m.www.tmagic.com/magic-ui/production/1/1625056093304/magic/magic-ui.umd.min.js';
 
   test('第一次加载asyncLoadJs带url与crossorigin参数', () => {
     const crossOrigin = 'anonymous';
@@ -88,7 +57,7 @@ describe('asyncLoadJs', () => {
 });
 
 describe('asyncLoadCss', () => {
-  const url = 'https://beta.m.film.qq.com/magic-act/css/BuyGift.75d837d2b3fd.css?max_age=864000';
+  const url = 'https://beta.m.www.tmagic.com/magic-act/css/BuyGift.75d837d2b3fd.css?max_age=864000';
 
   test('第一次加载asyncLoadCss', () => {
     const load = util.asyncLoadCss(url);
@@ -203,29 +172,52 @@ describe('filterXSS', () => {
     expect(value).toBe('&lt;div&gt;&lt;/div&gt;');
   });
 
-  test(`'"`, () => {
-    const value = util.filterXSS(`'div'"span"`);
+  test('\'"', () => {
+    const value = util.filterXSS('\'div\'"span"');
     expect(value).toBe('&apos;div&apos;&quot;span&quot;');
   });
 });
 
 describe('getUrlParam', () => {
   test('正常', () => {
-    const url = 'http://film.qq.com?a=b';
+    const url = 'http://www.tmagic.com?a=b';
     const value = util.getUrlParam('a', url);
     expect(value).toBe('b');
   });
 
   test('null', () => {
-    const url = 'http://film.qq.com';
+    const url = 'http://www.tmagic.com';
     const value = util.getUrlParam('a', url);
     expect(value).toBe('');
   });
 
   test('emprty', () => {
-    const url = 'http://film.qq.com?a=';
+    const url = 'http://www.tmagic.com?a=';
     const value = util.getUrlParam('a', url);
     expect(value).toBe('');
+  });
+});
+
+describe('setUrlParam', () => {
+  test('正常', () => {
+    expect(util.setUrlParam('a', '1', 'https://www.tmagic.com')).toBe('https://www.tmagic.com?a=1');
+
+    expect(util.setUrlParam('a', '1', 'https://www.tmagic.com?c&d')).toBe('https://www.tmagic.com?c&d&a=1');
+    expect(util.setUrlParam('a', '1', 'https://www.tmagic.com?b=1')).toBe('https://www.tmagic.com?b=1&a=1');
+  });
+});
+
+describe('getSearchObj', () => {
+  test('正常', () => {
+    expect(util.getSearchObj('a=1&b=2')).toEqual({ a: '1', b: '2' });
+  });
+});
+
+describe('delQueStr', () => {
+  test('正常', () => {
+    expect(util.delQueStr('https://www.tmagic.com?a=1', 'a')).toBe('https://www.tmagic.com');
+    expect(util.delQueStr('https://www.tmagic.com?a=1&b=2', ['a', 'b'])).toBe('https://www.tmagic.com');
+    expect(util.delQueStr('https://www.tmagic.com?a=1&b=2', ['a'])).toBe('https://www.tmagic.com?b=2');
   });
 });
 
@@ -281,24 +273,24 @@ describe('isPage', () => {
 
 describe('getHost', () => {
   test('正常', () => {
-    const host = util.getHost('https://film.qq.com/index.html');
-    expect(host).toBe('film.qq.com');
+    const host = util.getHost('https://www.tmagic.com/index.html');
+    expect(host).toBe('www.tmagic.com');
   });
 });
 
 describe('isSameDomain', () => {
   test('正常', () => {
-    const flag = util.isSameDomain('https://film.qq.com/index.html', 'film.qq.com');
+    const flag = util.isSameDomain('https://www.tmagic.com/index.html', 'www.tmagic.com');
     expect(flag).toBeTruthy();
   });
 
   test('不正常', () => {
-    const flag = util.isSameDomain('https://film.qq.com/index.html', 'test.film.qq.com');
+    const flag = util.isSameDomain('https://www.tmagic.com/index.html', 'test.www.tmagic.com');
     expect(flag).toBeFalsy();
   });
 
   test('不是http', () => {
-    const flag = util.isSameDomain('ftp://film.qq.com/index.html', 'test.film.qq.com');
+    const flag = util.isSameDomain('ftp://www.tmagic.com/index.html', 'test.www.tmagic.com');
     expect(flag).toBeTruthy();
   });
 });
@@ -354,17 +346,23 @@ describe('getValueByKeyPath', () => {
   });
 
   test('error', () => {
-    const value = util.getValueByKeyPath('a.b.c.d', {
-      a: {},
+    assert.throws(() => {
+      util.getValueByKeyPath('a.b.c.d', {
+        a: {},
+      });
     });
 
-    expect(value).toBeUndefined();
-
-    const value1 = util.getValueByKeyPath('a.b.c', {
-      a: {},
+    assert.throws(() => {
+      util.getValueByKeyPath('a.b.c', {
+        a: {},
+      });
     });
 
-    expect(value1).toBeUndefined();
+    assert.doesNotThrow(() => {
+      util.getValueByKeyPath('a', {
+        a: {},
+      });
+    });
   });
 });
 
@@ -697,5 +695,71 @@ describe('compiledCond', () => {
     expect(util.compiledCond('is', '1', 1)).toBeFalsy();
     expect(util.compiledCond('is', NaN, 1)).toBeFalsy();
     expect(util.compiledCond('is', NaN, undefined)).toBeFalsy();
+  });
+});
+
+describe('getKeysArray', () => {
+  // 测试普通数组索引转换
+  test('应该将array[0]转换为["array", "0"]', () => {
+    const input = 'array[0]';
+    const expected = ['array', '0'];
+    const result = util.getKeysArray(input);
+    expect(result).toEqual(expected);
+  });
+
+  // 测试多层数组索引转换
+  test('应该将array[0][1]转换为["array", "0", "1"]', () => {
+    const input = 'array[0][1]';
+    const expected = ['array', '0', '1'];
+    const result = util.getKeysArray(input);
+    expect(result).toEqual(expected);
+  });
+
+  // 测试数字输入
+  test('应该将数字123转换为["123"]', () => {
+    const input = 123;
+    const expected = ['123'];
+    const result = util.getKeysArray(input);
+    expect(result).toEqual(expected);
+  });
+
+  // 测试不含数组索引的字符串
+  test('应该将普通字符串按点号分割', () => {
+    const input = 'a.b.c';
+    const expected = ['a', 'b', 'c'];
+    const result = util.getKeysArray(input);
+    expect(result).toEqual(expected);
+  });
+
+  // 测试空字符串
+  test('应该正确处理空字符串', () => {
+    const input = '';
+    const expected = [''];
+    const result = util.getKeysArray(input);
+    expect(result).toEqual(expected);
+  });
+
+  // 测试混合格式
+  test('应该正确处理混合格式的字符串', () => {
+    const input = 'obj.array[0].prop[1]';
+    const expected = ['obj', 'array', '0', 'prop', '1'];
+    const result = util.getKeysArray(input);
+    expect(result).toEqual(expected);
+  });
+
+  // 测试特殊字符情况
+  test('应该正确处理包含特殊字符的字符串', () => {
+    const input = 'obj.array[0].prop-with-dash[1]';
+    const expected = ['obj', 'array', '0', 'prop-with-dash', '1'];
+    const result = util.getKeysArray(input);
+    expect(result).toEqual(expected);
+  });
+
+  // 测试只有数组索引的情况
+  test('应该正确处理只有数组索引的情况', () => {
+    const input = '[0][1]';
+    const expected = ['', '0', '1'];
+    const result = util.getKeysArray(input);
+    expect(result).toEqual(expected);
   });
 });

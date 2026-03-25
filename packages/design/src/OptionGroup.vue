@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { OptionGroupProps } from './types';
 
 defineOptions({
@@ -16,11 +16,11 @@ defineOptions({
 
 const props = defineProps<OptionGroupProps>();
 
-const ui = getConfig('components')?.optionGroup;
+const ui = getDesignConfig('components')?.optionGroup;
 
 const uiComponent = ui?.component || 'el-option-group';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<OptionGroupProps>(() => ui?.props(props) || props);
 
 const optionGroup = ref<any>();
 </script>

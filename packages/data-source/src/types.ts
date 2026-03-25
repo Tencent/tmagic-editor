@@ -1,14 +1,14 @@
-import type { AppCore, DataSourceSchema, HttpOptions, RequestFunction } from '@tmagic/schema';
+import type { DataSourceSchema, default as TMagicApp, HttpOptions, Method, RequestFunction } from '@tmagic/core';
 
 import type DataSource from './data-sources/Base';
 import type HttpDataSource from './data-sources/Http';
-import { ObservedData } from './observed-data/ObservedData';
+import type { ObservedData } from './observed-data/ObservedData';
 
 export type ObservedDataClass = new (...args: any[]) => ObservedData;
 
 export interface DataSourceOptions<T extends DataSourceSchema = DataSourceSchema> {
   schema: T;
-  app: AppCore;
+  app: TMagicApp;
   initialData?: Record<string, any>;
   useMock?: boolean;
   request?: RequestFunction;
@@ -16,23 +16,37 @@ export interface DataSourceOptions<T extends DataSourceSchema = DataSourceSchema
   [key: string]: any;
 }
 
+export interface HttpOptionsSchema {
+  /** 请求链接 */
+  url: string | ((data: { app: TMagicApp; dataSource: HttpDataSource }) => string);
+  /** query参数 */
+  params?: Record<string, string> | ((data: { app: TMagicApp; dataSource: HttpDataSource }) => Record<string, string>);
+  /** body数据 */
+  data?: Record<string, any> | ((data: { app: TMagicApp; dataSource: HttpDataSource }) => Record<string, string>);
+  /** 请求头 */
+  headers?: Record<string, string> | ((data: { app: TMagicApp; dataSource: HttpDataSource }) => Record<string, string>);
+  /** 请求方法 GET/POST */
+  method?: Method;
+  [key: string]: any;
+}
+
 export interface HttpDataSourceSchema extends DataSourceSchema {
   type: 'http';
-  options: HttpOptions;
+  options: HttpOptionsSchema;
   responseOptions?: {
     dataPath?: string;
   };
   autoFetch?: boolean;
   beforeRequest:
     | string
-    | ((options: HttpOptions, content: { app: AppCore; dataSource: HttpDataSource }) => HttpOptions);
+    | ((options: HttpOptions, content: { app: TMagicApp; dataSource: HttpDataSource }) => HttpOptions);
   afterResponse:
     | string
-    | ((response: any, content: { app: AppCore; dataSource: HttpDataSource; options: Partial<HttpOptions> }) => any);
+    | ((response: any, content: { app: TMagicApp; dataSource: HttpDataSource; options: Partial<HttpOptions> }) => any);
 }
 
 export interface DataSourceManagerOptions {
-  app: AppCore;
+  app: TMagicApp;
   /** 初始化数据，ssr数据可以由此传入 */
   initialData?: DataSourceManagerData;
   /** 是否使用mock数据 */
@@ -51,3 +65,7 @@ export interface ChangeEvent {
 export type AsyncDataSourceResolveResult<T = typeof DataSource> = {
   default: T;
 };
+
+export interface SchemaListMap {
+  [key: string]: DataSourceSchema[];
+}

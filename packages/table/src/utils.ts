@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,24 +16,26 @@
  * limitations under the License.
  */
 
-import { datetimeFormatter } from '@tmagic/utils';
+import { datetimeFormatter } from '@tmagic/form';
 
-import { ColumnConfig } from './schema';
+import type { ColumnConfig } from './schema';
 
-export const formatter = (item: ColumnConfig, row: any) => {
+export const formatter = (item: ColumnConfig, row: any, data: { index: number }) => {
   if (!item.prop) return '';
 
   if (item.formatter) {
     if (item.formatter === 'datetime') {
-      // eslint-disable-next-line no-param-reassign
       item.formatter = (value: string) => datetimeFormatter(value);
     }
     try {
-      return item.formatter(row[item.prop], row);
+      return item.formatter(row[item.prop], row, data);
     } catch (e) {
+      console.error('Formatter error:', e);
       return row[item.prop];
     }
   } else {
     return row[item.prop];
   }
 };
+
+export const createColumns = (columns: ColumnConfig[]) => columns;

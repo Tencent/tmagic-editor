@@ -45,37 +45,42 @@ import { computed, inject, ref } from 'vue';
 import { Close, Delete } from '@element-plus/icons-vue';
 import { throttle } from 'lodash-es';
 
+import type { Id, MNode } from '@tmagic/core';
 import { TMagicButton, TMagicTooltip } from '@tmagic/design';
-import type { FieldProps, FormItem, FormState } from '@tmagic/form';
-import type { Id } from '@tmagic/schema';
+import type { FieldProps, FormState, UISelectConfig } from '@tmagic/form';
+import { getIdFromEl } from '@tmagic/utils';
 
-import { Services, UI_SELECT_MODE_EVENT_NAME } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
+import { UI_SELECT_MODE_EVENT_NAME } from '@editor/utils/const';
 
 defineOptions({
   name: 'MFieldsUISelect',
 });
 
-const props = defineProps<FieldProps<{ type: 'ui-select' } & FormItem>>();
+const props = defineProps<FieldProps<UISelectConfig>>();
 
 const emit = defineEmits(['change']);
 
-const services = inject<Services>('services');
+const { editorService, uiService, stageOverlayService } = useServices();
 const mForm = inject<FormState>('mForm');
+
 const val = computed(() => props.model[props.name]);
 const uiSelectMode = ref(false);
 
 const cancelHandler = () => {
-  if (!services?.uiService) return;
-  services.uiService.set('uiSelectMode', false);
+  uiService.set('uiSelectMode', false);
   uiSelectMode.value = false;
-  globalThis.document.removeEventListener(UI_SELECT_MODE_EVENT_NAME, clickHandler as EventListener);
+  globalThis.document.removeEventListener(UI_SELECT_MODE_EVENT_NAME, clickHandler as any);
 };
 
-const clickHandler = ({ detail }: Event & { detail: any }) => {
-  if (detail.id) {
-    props.model[props.name] = detail.id;
-    emit('change', detail.id);
-    mForm?.$emit('field-change', props.prop, detail.id);
+const clickHandler = ({ detail }: Event & { detail: HTMLElement | MNode }) => {
+  let { id } = detail;
+  if (detail.nodeType) {
+    id = getIdFromEl()(detail as HTMLElement) || id;
+  }
+  if (id) {
+    emit('change', id);
+    mForm?.$emit('field-change', props.prop, id);
   }
 
   if (cancelHandler) {
@@ -84,41 +89,39 @@ const clickHandler = ({ detail }: Event & { detail: any }) => {
 };
 
 const toName = computed(() => {
-  const config = services?.editorService.getNodeById(val.value);
+  const config = editorService.getNodeById(val.value);
   return config?.name || '';
 });
 
 const startSelect = () => {
-  if (!services?.uiService) return;
-  services.uiService.set('uiSelectMode', true);
+  uiService.set('uiSelectMode', true);
   uiSelectMode.value = true;
-  globalThis.document.addEventListener(UI_SELECT_MODE_EVENT_NAME, clickHandler as EventListener);
+  globalThis.document.addEventListener(UI_SELECT_MODE_EVENT_NAME, clickHandler as any);
 };
 
 const deleteHandler = () => {
   if (props.model) {
-    props.model[props.name] = '';
     emit('change', '');
     mForm?.$emit('field-change', props.prop, '');
   }
 };
 
 const selectNode = async (id: Id) => {
-  await services?.editorService.select(id);
-  services?.editorService.get('stage')?.select(id);
-  services?.stageOverlayService.get('stage')?.select(id);
+  await editorService.select(id);
+  editorService.get('stage')?.select(id);
+  stageOverlayService.get('stage')?.select(id);
 };
 
 const highlight = throttle((id: Id) => {
-  services?.editorService.highlight(id);
-  services?.editorService.get('stage')?.highlight(id);
-  services?.stageOverlayService.get('stage')?.highlight(id);
+  editorService.highlight(id);
+  editorService.get('stage')?.highlight(id);
+  stageOverlayService.get('stage')?.highlight(id);
 }, 150);
 
 const unhighlight = () => {
-  services?.editorService.set('highlightNode', null);
-  services?.editorService.get('stage')?.clearHighlight();
-  services?.stageOverlayService.get('stage')?.clearHighlight();
+  editorService.set('highlightNode', null);
+  editorService.get('stage')?.clearHighlight();
+  stageOverlayService.get('stage')?.clearHighlight();
 };
 </script>
 

@@ -1,4 +1,4 @@
-import type { FormConfig } from '@tmagic/form';
+import type { FormConfig } from '@tmagic/editor';
 
 import checkbox from './checkbox';
 import display from './display';

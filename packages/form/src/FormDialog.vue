@@ -8,7 +8,10 @@
     :width="width"
     :zIndex="zIndex"
     :fullscreen="fullscreen"
-    :close-on-click-modal="false"
+    :close-on-click-modal="closeOnClickModal"
+    :close-on-press-escape="closeOnPressEscape"
+    :destroy-on-close="destroyOnClose"
+    :show-close="showClose"
     @close="closeHandler"
   >
     <div
@@ -27,6 +30,7 @@
         :label-width="labelWidth"
         :label-position="labelPosition"
         :inline="inline"
+        :prevent-submit-default="preventSubmitDefault"
         @change="changeHandler"
       ></Form>
       <slot></slot>
@@ -41,7 +45,7 @@
         </TMagicCol>
         <TMagicCol :span="12">
           <slot name="footer">
-            <TMagicButton @click="cancel" size="small">取 消</TMagicButton>
+            <TMagicButton v-if="showCancel" @click="cancel" size="small">取 消</TMagicButton>
             <TMagicButton v-if="hasStep && stepActive > 1" type="info" size="small" @click="preStep"
               >上一步</TMagicButton
             >
@@ -64,7 +68,7 @@ import { computed, ref } from 'vue';
 import { TMagicButton, TMagicCol, TMagicDialog, TMagicRow } from '@tmagic/design';
 
 import Form from './Form.vue';
-import { FormConfig, StepConfig } from './schema';
+import { ContainerChangeEventData, FormConfig, FormValue, StepConfig } from './schema';
 
 defineOptions({
   name: 'MFormDialog',
@@ -85,11 +89,22 @@ const props = withDefaults(
     zIndex?: number;
     size?: 'small' | 'default' | 'large';
     confirmText?: string;
+    preventSubmitDefault?: boolean;
+    closeOnClickModal?: boolean;
+    closeOnPressEscape?: boolean;
+    destroyOnClose?: boolean;
+    showClose?: boolean;
+    showCancel?: boolean;
   }>(),
   {
     config: () => [],
     values: () => ({}),
     confirmText: '确定',
+    closeOnClickModal: false,
+    closeOnPressEscape: false,
+    destroyOnClose: false,
+    showClose: true,
+    showCancel: true,
   },
 );
 
@@ -102,19 +117,25 @@ const stepActive = ref(1);
 const bodyHeight = ref(`${document.body.clientHeight - 194}px`);
 
 const stepCount = computed(() => {
-  const { length } = props.config;
-  for (let index = 0; index < length; index++) {
-    if (props.config[index].type === 'step') {
-      return (props.config[index] as StepConfig).items.length;
+  if (!Array.isArray(props.config)) {
+    return 0;
+  }
+
+  for (const item of props.config) {
+    if ('type' in item && item.type === 'step') {
+      return (item as StepConfig).items.length;
     }
   }
   return 0;
 });
 
 const hasStep = computed(() => {
-  const { length } = props.config;
-  for (let index = 0; index < length; index++) {
-    if (props.config[index].type === 'step') {
+  if (!Array.isArray(props.config)) {
+    return false;
+  }
+
+  for (const item of props.config) {
+    if ('type' in item && item.type === 'step') {
       return true;
     }
   }
@@ -129,8 +150,9 @@ const closeHandler = () => {
 
 const save = async () => {
   try {
+    const changeRecords = form.value?.changeRecords;
     const values = await form.value?.submitForm();
-    emit('submit', values);
+    emit('submit', values, { changeRecords });
   } catch (e) {
     emit('error', e);
   }
@@ -144,8 +166,8 @@ const nextStep = () => {
   stepActive.value += 1;
 };
 
-const changeHandler = (value: any) => {
-  emit('change', value);
+const changeHandler = (value: FormValue, eventData: ContainerChangeEventData) => {
+  emit('change', value, eventData);
 };
 
 const show = () => {

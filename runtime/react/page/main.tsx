@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,9 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 
-import Core from '@tmagic/core';
-import { DataSourceManager, DeepObservedData } from '@tmagic/data-source';
-import type { MApp } from '@tmagic/schema';
-import { AppContent } from '@tmagic/ui-react';
-import { getUrlParam } from '@tmagic/utils';
+import type { MApp } from '@tmagic/core';
+import Core, { DataSourceManager, DeepObservedData, getUrlParam } from '@tmagic/core';
+import { AppContent } from '@tmagic/react-runtime-help';
 
 import components from '../.tmagic/comp-entry';
 import dataSources from '../.tmagic/datasource-entry';
@@ -30,7 +28,7 @@ import plugins from '../.tmagic/plugin-entry';
 
 import App from './App';
 
-import '@tmagic/utils/resetcss.css';
+import '@tmagic/core/resetcss.css';
 
 declare global {
   interface Window {
@@ -50,6 +48,7 @@ const getLocalConfig = (): MApp[] => {
     // eslint-disable-next-line no-eval
     return [eval(`(${configStr})`)];
   } catch (err) {
+    console.error('Error parsing localStorage magicDSL:', err);
     return [];
   }
 };

@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,3 +22,9 @@ export * from './logger';
 export * from './editor';
 export * from './operator';
 export * from './data-source';
+export * from './dep/idle-task';
+export * from './scroll-viewer';
+export * from './tree';
+export * from './undo-redo';
+export * from './const';
+export { default as loadMonaco } from './monaco-editor';

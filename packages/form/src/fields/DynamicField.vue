@@ -59,7 +59,7 @@ const changeFieldMap = async () => {
     let oldVal = props.model?.[v.name] || '';
     if (!oldVal && v.defaultValue !== undefined) {
       oldVal = v.defaultValue;
-      emit('change', oldVal, v.name);
+      emit('change', oldVal, { modifyKey: v.name });
     }
     fieldMap.value[v.name] = oldVal;
     fieldLabelMap.value[v.name] = v.label || '';
@@ -85,6 +85,8 @@ onBeforeUnmount(() => {
 });
 
 const inputChangeHandler = (key: string) => {
-  emit('change', fieldMap.value[key], key);
+  emit('change', fieldMap.value[key], {
+    modifyKey: key,
+  });
 };
 </script>

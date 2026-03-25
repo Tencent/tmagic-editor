@@ -122,3 +122,27 @@ export const calcValueByFontsize = (doc: Document | undefined, value: number) =>
 
   return value;
 };
+
+const dslDomRelateConfig = {
+  getIdFromEl: (el?: HTMLElement | SVGElement | null) => el?.dataset?.tmagicId,
+  getElById: (doc?: Document, id?: string | number) => doc?.querySelector(`[data-tmagic-id="${id}"]`) as HTMLElement,
+  setIdToEl: (el: HTMLElement | SVGElement, id: string | number) => {
+    el.dataset.tmagicId = `${id}`;
+  },
+};
+
+export const setDslDomRelateConfig = <
+  K extends keyof typeof dslDomRelateConfig,
+  T extends (typeof dslDomRelateConfig)[K],
+>(
+  name: K,
+  value: T,
+) => {
+  dslDomRelateConfig[name] = value;
+};
+
+export const getIdFromEl = () => dslDomRelateConfig.getIdFromEl;
+
+export const getElById = () => dslDomRelateConfig.getElById;
+
+export const setIdToEl = () => dslDomRelateConfig.setIdToEl;

@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-import { InstallOptions } from '@editor/type';
+import { EditorInstallOptions } from '@editor/type';
 
-let $TMAGIC_EDITOR: InstallOptions = {} as any;
+let $TMAGIC_EDITOR: EditorInstallOptions = {} as any;
 
-const setConfig = (option: InstallOptions): void => {
+const setEditorConfig = (option: EditorInstallOptions): void => {
   $TMAGIC_EDITOR = option;
 };
 
-const getConfig = <K extends keyof InstallOptions>(key: K): InstallOptions[K] => $TMAGIC_EDITOR[key];
+const getEditorConfig = <K extends keyof EditorInstallOptions>(key: K): EditorInstallOptions[K] => $TMAGIC_EDITOR[key];
 
-export { getConfig, setConfig };
+export { getEditorConfig, setEditorConfig };

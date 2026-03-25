@@ -1,5 +1,12 @@
 <template>
-  <Tree :data="list" :node-status-map="nodeStatusMap" @node-click="clickHandler">
+  <Tree
+    :data="list"
+    :node-status-map="nodeStatusMap"
+    :indent="indent"
+    :next-level-indent-increment="nextLevelIndentIncrement"
+    @node-click="clickHandler"
+    @node-contextmenu="nodeContentMenuHandler"
+  >
     <template #tree-node-label="{ data }">
       <div
         :class="{
@@ -24,18 +31,18 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject } from 'vue';
+import { computed } from 'vue';
 import { Close, Edit, View } from '@element-plus/icons-vue';
 
-import { DepTargetType } from '@tmagic/dep';
-import { tMagicMessageBox, TMagicTooltip } from '@tmagic/design';
-import { DepData, Id, MNode } from '@tmagic/schema';
+import { DepData, DepTargetType, Id, MNode } from '@tmagic/core';
+import { TMagicTooltip } from '@tmagic/design';
 
 import Icon from '@editor/components/Icon.vue';
 import Tree from '@editor/components/Tree.vue';
 import { useFilter } from '@editor/hooks/use-filter';
 import { useNodeStatus } from '@editor/hooks/use-node-status';
-import type { DataSourceListSlots, Services } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
+import type { DataSourceListSlots, TreeNodeData } from '@editor/type';
 
 defineSlots<DataSourceListSlots>();
 
@@ -43,20 +50,26 @@ defineOptions({
   name: 'MEditorDataSourceList',
 });
 
+defineProps<{
+  indent?: number;
+  nextLevelIndentIncrement?: number;
+}>();
+
 const emit = defineEmits<{
   edit: [id: string];
   remove: [id: string];
+  'node-contextmenu': [event: MouseEvent, data: TreeNodeData];
 }>();
 
-const { depService, editorService, dataSourceService } = inject<Services>('services') || {};
+const { depService, editorService, dataSourceService } = useServices();
 
-const editable = computed(() => dataSourceService?.get('editable') ?? true);
+const editable = computed(() => dataSourceService.get('editable'));
 
-const dataSources = computed(() => dataSourceService?.get('dataSources') || []);
+const dataSources = computed(() => dataSourceService.get('dataSources'));
 
-const dsDep = computed(() => depService?.getTargets(DepTargetType.DATA_SOURCE) || {});
-const dsMethodDep = computed(() => depService?.getTargets(DepTargetType.DATA_SOURCE_METHOD) || {});
-const dsCondDep = computed(() => depService?.getTargets(DepTargetType.DATA_SOURCE_COND) || {});
+const dsDep = computed(() => depService.getTargets(DepTargetType.DATA_SOURCE));
+const dsMethodDep = computed(() => depService.getTargets(DepTargetType.DATA_SOURCE_METHOD));
+const dsCondDep = computed(() => depService.getTargets(DepTargetType.DATA_SOURCE_COND));
 
 const getKeyTreeConfig = (dep: DepData[string], type?: string, parentKey?: Id) =>
   dep.keys.map((key) => ({
@@ -105,7 +118,7 @@ const list = computed(() =>
     const dsCondDeps = dsCondDep.value[ds.id]?.deps || {};
 
     const items =
-      editorService?.get('root')?.items.map((page) => ({
+      editorService.get('root')?.items.map((page) => ({
         name: page.devconfig?.tabName || page.name,
         type: 'node',
         id: `${ds.id}_${page.id}`,
@@ -144,19 +157,13 @@ const editHandler = (id: string) => {
 };
 
 const removeHandler = async (id: string) => {
-  await tMagicMessageBox.confirm('确定删除?', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning',
-  });
-
   emit('remove', id);
 };
 
 // 选中组件
 const selectComp = (compId: Id) => {
-  const stage = editorService?.get('stage');
-  editorService?.select(compId);
+  const stage = editorService.get('stage');
+  editorService.select(compId);
   stage?.select(compId);
 };
 
@@ -166,7 +173,12 @@ const clickHandler = (event: MouseEvent, data: any) => {
   }
 };
 
+const nodeContentMenuHandler = (event: MouseEvent, data: TreeNodeData) => {
+  emit('node-contextmenu', event, data);
+};
+
 defineExpose({
+  nodeStatusMap,
   filter: filterTextChangeHandler,
 });
 </script>

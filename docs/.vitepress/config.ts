@@ -24,12 +24,13 @@ export default defineConfig({
 
     footer: {
       message: 'Powered by 腾讯视频会员平台技术中心',
-      copyright: 'Copyright (C) 2023 THL A29 Limited, a Tencent company.'
+      copyright: 'Copyright (C) 2025 Tencent.'
     },
 
     nav: [
       { text: '文档', link: '/guide/', activeMatch: '/guide/' },
-      { text: 'API', link: '/api/editor/props', activeMatch: '/api/' },
+      { text: 'Editor API', link: '/api/editor/props', activeMatch: '/api/' },
+      { text: 'Runtime API', link: '/runtime-api/core/app', activeMatch: '/runtime-api/' },
       { text: '表单配置', link: '/form-config/fields/text', activeMatch: '/form-config/' },
       { text: '更新日志', link: 'https://github.com/Tencent/tmagic-editor/releases' },
       { text: 'Playground', link: 'https://tencent.github.io/tmagic-editor/playground/index.html' },
@@ -49,14 +50,6 @@ export default defineConfig({
               link: '/guide/'
             },
             {
-              text: '基础概念',
-              link: '/guide/conception.md',
-            },
-            {
-              text: '页面发布',
-              link: '/guide/publish.md'
-            },
-            {
               text: 'RUNTIME',
               link: '/guide/runtime.md'
             },
@@ -65,8 +58,20 @@ export default defineConfig({
               link: '/guide/component.md'
             },
             {
+              text: '基础概念',
+              link: '/guide/conception.md',
+            },
+            {
+              text: '页面发布',
+              link: '/guide/publish.md'
+            },
+            {
               text: '编辑器扩展',
               link: '/guide/editor-expand.md'
+            },
+            {
+              text: '升级到1.5.x',
+              link: '/guide/migration.md'
             },
           ]
         },
@@ -308,6 +313,10 @@ export default defineConfig({
               link: '/form-config/fields/number.md'
             },
             {
+              text: 'NumberRange数字范围',
+              link: '/form-config/fields/number-range.md'
+            },
+            {
               text: 'Display只读文本',
               link: '/form-config/fields/display.md'
             },
@@ -348,14 +357,99 @@ export default defineConfig({
               link: '/form-config/fields/date-picker.md'
             },
             {
+              text: 'DateRangePick日期范围选择器',
+              link: '/form-config/fields/daterange-picker.md'
+            },
+            {
               text: 'DatetimePick日期时间选择器',
               link: '/form-config/fields/datetime-picker.md'
             },
             {
               text: 'TimePick时间选择器',
               link: '/form-config/fields/time-picker.md'
+            },
+            {
+              text: 'TimeRangePick时间范围选择器',
+              link: '/form-config/fields/timerange-picker.md'
+            },
+            {
+              text: 'DynamicField动态表单',
+              link: '/form-config/fields/dynamic-field.md'
             }
           ]
+        },
+        {
+          text: '编辑器中可用配置',
+          items: [
+            {
+              text: 'Code代码编辑器',
+              link: '/form-config/editor-fields/code.md'
+            },
+            {
+              text: 'CodeLink代码链接',
+              link: '/form-config/editor-fields/code-link.md'
+            },
+            {
+              text: 'CodeSelect代码块选择器',
+              link: '/form-config/editor-fields/code-select.md'
+            },
+            {
+              text: 'CodeSelectCol代码块选择列',
+              link: '/form-config/editor-fields/code-select-col.md'
+            },
+            {
+              text: 'DataSourceSelect数据源选择器',
+              link: '/form-config/editor-fields/data-source-select.md'
+            },
+            {
+              text: 'DataSourceFieldSelect数据源字段选择器',
+              link: '/form-config/editor-fields/data-source-field-select.md'
+            },
+            {
+              text: 'DataSourceMethodSelect数据源方法选择器',
+              link: '/form-config/editor-fields/data-source-method-select.md'
+            },
+            {
+              text: 'DataSourceFields数据源字段配置',
+              link: '/form-config/editor-fields/data-source-fields.md'
+            },
+            {
+              text: 'DataSourceInput数据源输入框',
+              link: '/form-config/editor-fields/data-source-input.md'
+            },
+            {
+              text: 'DataSourceMethods数据源方法配置',
+              link: '/form-config/editor-fields/data-source-methods.md'
+            },
+            {
+              text: 'DataSourceMocks数据源Mock配置',
+              link: '/form-config/editor-fields/data-source-mocks.md'
+            },
+            {
+              text: 'UISelect组件选择器',
+              link: '/form-config/editor-fields/ui-select.md'
+            },
+            {
+              text: 'KeyValue键值对',
+              link: '/form-config/editor-fields/key-value.md'
+            },
+            {
+              text: 'PageFragmentSelect页面片选择器',
+              link: '/form-config/editor-fields/page-fragment-select.md'
+            },
+            {
+              text: 'EventSelect事件选择器',
+              link: '/form-config/editor-fields/event-select.md'
+            },
+            {
+              text: 'DisplayConds显示条件配置',
+              link: '/form-config/editor-fields/display-conds.md'
+            },
+            {
+              text: 'CondOpSelect条件操作选择器',
+              link: '/form-config/editor-fields/cond-op-select.md'
+            }
+          ],
         },
         {
           text: '布局配置',
@@ -384,20 +478,91 @@ export default defineConfig({
             }
           ]
         }
+      ],
+      '/runtime-api/': [
+        {
+          text: '@tmagic/core',
+          items: [
+            {
+              text: 'App',
+              link: '/runtime-api/core/app',
+            },
+            {
+              text: 'Node',
+              link: '/runtime-api/core/node',
+            },
+            {
+              text: 'Page',
+              link: '/runtime-api/core/page',
+            },
+            {
+              text: 'EventHelper',
+              link: '/runtime-api/core/eventHelper',
+            },
+            {
+              text: 'Env',
+              link: '/runtime-api/core/env',
+            },
+            {
+              text: 'IteratorContainer',
+              link: '/runtime-api/core/iteratorContainer',
+            },
+            {
+              text: 'FlowState',
+              link: '/runtime-api/core/flowState',
+            },
+            {
+              text: 'DevtoolApi',
+              link: '/runtime-api/core/devtoolApi',
+            },
+            {
+              text: '工具函数',
+              link: '/runtime-api/core/utils',
+            },
+          ],
+        },
+        {
+          text: '@tmagic/data-source',
+          items: [
+            {
+              text: 'DataSourceManager',
+              link: '/runtime-api/data-source/dataSourceManager',
+            },
+            {
+              text: 'DataSource',
+              link: '/runtime-api/data-source/dataSource',
+            },
+            {
+              text: 'HttpDataSource',
+              link: '/runtime-api/data-source/httpDataSource',
+            },
+            {
+              text: '观察者数据类',
+              link: '/runtime-api/data-source/observedData',
+            },
+            {
+              text: '工具函数',
+              link: '/runtime-api/data-source/utils',
+            },
+          ],
+        },
       ]
     },
   },
 
   vite: {
     optimizeDeps: {
-      esbuildOptions: {
-        define: {
-          global: 'globalThis',
+      rolldownOptions: {
+        transform: {
+          define: {
+            global: 'globalThis',
+          },
         },
       },
     },
     resolve: {
       alias:[
+        { find: /^@tmagic\/form-schema/, replacement: path.join(__dirname, '../../packages/form-schema/src/index.ts') },
         { find: /^@tmagic\/form/, replacement: path.join(__dirname, '../../packages/form/src/index.ts') },
         { find: /^@tmagic\/utils/, replacement: path.join(__dirname, '../../packages/utils/src/index.ts') },
         { find: /^@tmagic\/schema/, replacement: path.join(__dirname, '../../packages/schema/src/index.ts') },

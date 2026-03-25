@@ -1,27 +1,22 @@
-import { nextTick, ref } from 'vue';
+import { nextTick, ref, useTemplateRef } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
+import type { CodeBlockContent } from '@tmagic/core';
 import { tMagicMessage } from '@tmagic/design';
-import type { CodeBlockContent } from '@tmagic/schema';
 
 import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
-import type { CodeBlockService } from '@editor/services/codeBlock';
+import type { Services } from '@editor/type';
 
-export const useCodeBlockEdit = (codeBlockService?: CodeBlockService) => {
+export const useCodeBlockEdit = (codeBlockService: Services['codeBlockService']) => {
   const codeConfig = ref<CodeBlockContent>();
   const codeId = ref<string>();
-  const codeBlockEditor = ref<InstanceType<typeof CodeBlockEditor>>();
+  const codeBlockEditorRef = useTemplateRef<InstanceType<typeof CodeBlockEditor>>('codeBlockEditor');
 
   // 新增代码块
   const createCodeBlock = async () => {
-    if (!codeBlockService) {
-      tMagicMessage.error('新增代码块失败');
-      return;
-    }
-
     codeConfig.value = {
       name: '',
-      content: `({app, params}) => {\n  // place your code here\n}`,
+      content: '({app, params, flowState}) => {\n  // place your code here\n}',
       params: [],
     };
 
@@ -29,12 +24,12 @@ export const useCodeBlockEdit = (codeBlockService?: CodeBlockService) => {
 
     await nextTick();
 
-    codeBlockEditor.value?.show();
+    codeBlockEditorRef.value?.show();
   };
 
   // 编辑代码块
   const editCode = async (id: string) => {
-    const codeBlock = await codeBlockService?.getCodeContentById(id);
+    const codeBlock = await codeBlockService.getCodeContentById(id);
 
     if (!codeBlock) {
       tMagicMessage.error('获取代码块内容失败');
@@ -54,26 +49,26 @@ export const useCodeBlockEdit = (codeBlockService?: CodeBlockService) => {
     codeId.value = id;
 
     await nextTick();
-    codeBlockEditor.value?.show();
+    codeBlockEditorRef.value?.show();
   };
 
   // 删除代码块
   const deleteCode = async (key: string) => {
-    codeBlockService?.deleteCodeDslByIds([key]);
+    codeBlockService.deleteCodeDslByIds([key]);
   };
 
   const submitCodeBlockHandler = async (values: CodeBlockContent) => {
     if (!codeId.value) return;
 
-    await codeBlockService?.setCodeDslById(codeId.value, values);
+    await codeBlockService.setCodeDslById(codeId.value, values);
 
-    codeBlockEditor.value?.hide();
+    codeBlockEditorRef.value?.hide();
   };
 
   return {
     codeId,
     codeConfig,
-    codeBlockEditor,
+    codeBlockEditor: codeBlockEditorRef,
 
     createCodeBlock,
     editCode,

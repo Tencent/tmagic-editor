@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { CollapseItemProps } from './types';
 
 defineOptions({
@@ -28,11 +28,11 @@ defineOptions({
 
 const props = defineProps<CollapseItemProps>();
 
-const ui = getConfig('components')?.collapseItem;
+const ui = getDesignConfig('components')?.collapseItem;
 
 const uiComponent = ui?.component || 'el-collapse-item';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<CollapseItemProps>(() => ui?.props(props) || props);
 
 const emit = defineEmits(['change', 'update:modelValue']);
 

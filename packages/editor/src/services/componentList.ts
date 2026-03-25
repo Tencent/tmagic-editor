@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-import { reactive } from 'vue';
+import { shallowReactive } from 'vue';
 
 import type { ComponentGroup, ComponentGroupState } from '@editor/type';
 
 import BaseService from './BaseService';
 
 class ComponentList extends BaseService {
-  private state = reactive<ComponentGroupState>({
+  private state = shallowReactive<ComponentGroupState>({
     list: [],
   });
 

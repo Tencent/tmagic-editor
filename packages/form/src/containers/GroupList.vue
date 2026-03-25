@@ -2,7 +2,7 @@
   <div class="m-fields-group-list">
     <div v-if="config.extra" v-html="config.extra" style="color: rgba(0, 0, 0, 0.45)"></div>
     <div v-if="!model[name] || !model[name].length" class="el-table__empty-block">
-      <span class="el-table__empty-text">暂无数据</span>
+      <span class="el-table__empty-text t-table__empty">暂无数据</span>
     </div>
 
     <MFieldsGroupListItem
@@ -10,34 +10,49 @@
       v-for="(item, index) in model[name]"
       :key="index"
       :model="item"
-      :lastValues="getLastValues(lastValues[name], index)"
+      :lastValues="getLastValues(lastValues[name], Number(index))"
       :is-compare="isCompare"
       :config="config"
       :prop="prop"
-      :index="index"
+      :index="Number(index)"
       :label-width="labelWidth"
       :size="size"
       :disabled="disabled"
       :group-model="model[name]"
       @remove-item="removeHandler"
+      @copy-item="copyHandler"
       @swap-item="swapHandler"
       @change="changeHandler"
       @addDiffCount="onAddDiffCount()"
     ></MFieldsGroupListItem>
 
-    <TMagicButton @click="addHandler" size="small" :disabled="disabled" v-if="addable">新增</TMagicButton>
-
-    <TMagicButton :icon="Grid" size="small" @click="toggleMode" v-if="config.enableToggleMode">切换为表格</TMagicButton>
+    <div class="m-fields-group-list-footer">
+      <TMagicButton v-if="config.enableToggleMode" :icon="Grid" size="small" @click="toggleMode"
+        >切换为表格</TMagicButton
+      >
+      <div style="display: flex; justify-content: flex-end; flex: 1">
+        <TMagicButton
+          v-if="addable"
+          :size="config.enableToggleMode ? 'small' : 'default'"
+          :icon="Plus"
+          v-bind="config.addButtonConfig?.props || { type: 'primary' }"
+          :disabled="disabled"
+          @click="addHandler"
+          >{{ config.addButtonConfig?.text || '新增' }}</TMagicButton
+        >
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, inject } from 'vue';
-import { Grid } from '@element-plus/icons-vue';
+import { Grid, Plus } from '@element-plus/icons-vue';
+import { cloneDeep } from 'lodash-es';
 
 import { TMagicButton } from '@tmagic/design';
 
-import { FormState, GroupListConfig } from '../schema';
+import type { ContainerChangeEventData, FormState, GroupListConfig } from '../schema';
 import { initValue } from '../utils/form';
 
 import MFieldsGroupListItem from './GroupListItem.vue';
@@ -58,7 +73,10 @@ const props = defineProps<{
   disabled?: boolean;
 }>();
 
-const emit = defineEmits(['change', 'addDiffCount']);
+const emit = defineEmits<{
+  change: [v: any, eventData?: ContainerChangeEventData];
+  addDiffCount: [];
+}>();
 
 const mForm = inject<FormState | undefined>('mForm');
 
@@ -77,10 +95,8 @@ const addable = computed(() => {
   return typeof props.config.addable === 'undefined' ? true : props.config.addable;
 });
 
-const changeHandler = () => {
-  if (!props.name) return false;
-
-  emit('change', props.model[props.name]);
+const changeHandler = (v: any, eventData: ContainerChangeEventData) => {
+  emit('change', props.model, eventData);
 };
 
 const addHandler = async () => {
@@ -105,21 +121,36 @@ const addHandler = async () => {
   });
 
   props.model[props.name].push(groupValue);
+
+  emit('change', props.model[props.name], {
+    changeRecords: [
+      {
+        propPath: `${props.prop}.${props.model[props.name].length - 1}`,
+        value: groupValue,
+      },
+    ],
+  });
 };
 
 const removeHandler = (index: number) => {
   if (!props.name) return false;
 
   props.model[props.name].splice(index, 1);
-  changeHandler();
+  emit('change', props.model[props.name]);
+};
+
+const copyHandler = (index: number) => {
+  props.model[props.name].push(cloneDeep(props.model[props.name][index]));
 };
 
 const swapHandler = (idx1: number, idx2: number) => {
   if (!props.name) return false;
 
+  const { length } = props.model[props.name];
+
   const [currRow] = props.model[props.name].splice(idx1, 1);
-  props.model[props.name].splice(idx2, 0, currRow);
-  changeHandler();
+  props.model[props.name].splice(Math.min(Math.max(idx2, 0), length - 1), 0, currRow);
+  emit('change', props.model[props.name]);
 };
 
 const toggleMode = () => {

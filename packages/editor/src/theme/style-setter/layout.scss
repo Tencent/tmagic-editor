@@ -1,0 +1,199 @@
+// 盒子模型
+.layout-box-container {
+  position: relative;
+  width: 100%;
+  height: 130px;
+
+  .help-txt {
+    float: left;
+    margin-left: -10px;
+    transform: scale(0.75);
+  }
+
+  .outer-top-border,
+  .inner-top-border,
+  .outer-right-border,
+  .inner-right-border,
+  .outer-bottom-border,
+  .inner-bottom-border,
+  .outer-left-border,
+  .inner-left-border {
+    position: absolute;
+    transition: all 0.3s ease;
+    .next-input {
+      position: absolute;
+      height: 20px;
+      input {
+        padding: 0;
+        width: 100%;
+        border: none;
+        outline: none;
+        margin: 0;
+        font-weight: 400;
+        vertical-align: top;
+        background-color: transparent;
+        color: #333;
+        text-align: center;
+        line-height: 20px;
+        height: 20px;
+      }
+    }
+  }
+
+  // top
+  .outer-top-border,
+  .inner-top-border {
+    height: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-top: 20px solid #d6e4ff;
+    .next-input {
+      left: 0;
+      right: 0;
+      top: -20px;
+    }
+  }
+
+  .outer-top-border {
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+
+  .inner-top-border {
+    top: 25px;
+    left: 25px;
+    right: 25px;
+  }
+
+  .outer-top-border,
+  .inner-top-border {
+    &:hover {
+      border-top: 20px solid #bfd4fb;
+    }
+  }
+
+  // right
+  .outer-right-border,
+  .inner-right-border {
+    width: 0;
+    border-top: 20px solid transparent;
+    border-bottom: 20px solid transparent;
+    border-right: 20px solid #d6e4ff;
+
+    .next-input {
+      top: 0;
+      bottom: 0;
+      right: -20px;
+      width: 20px;
+      margin: auto;
+      input {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        margin: auto;
+        width: 20px;
+      }
+    }
+  }
+
+  .outer-right-border {
+    top: 5px;
+    bottom: 5px;
+    right: 0;
+  }
+
+  .inner-right-border {
+    top: 30px;
+    bottom: 30px;
+    right: 25px;
+  }
+
+  .outer-right-border,
+  .inner-right-border {
+    &:hover {
+      border-right: 20px solid #bfd4fb;
+    }
+  }
+
+  // bottom
+  .outer-bottom-border,
+  .inner-bottom-border {
+    height: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-bottom: 20px solid #d6e4ff;
+
+    .next-input {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -20px;
+    }
+  }
+
+  .outer-bottom-border {
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+
+  .inner-bottom-border {
+    bottom: 25px;
+    left: 25px;
+    right: 25px;
+  }
+
+  .outer-bottom-border,
+  .inner-bottom-border {
+    &:hover {
+      border-bottom: 20px solid #bfd4fb;
+    }
+  }
+
+  // left
+  .outer-left-border,
+  .inner-left-border {
+    width: 0;
+    border-top: 20px solid transparent;
+    border-bottom: 20px solid transparent;
+    border-left: 20px solid #d6e4ff;
+
+    .next-input {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -20px;
+      width: 20px;
+      margin: auto;
+      input {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        margin: auto;
+        width: 20px;
+      }
+    }
+  }
+
+  .outer-left-border {
+    top: 5px;
+    bottom: 5px;
+    left: 0;
+  }
+
+  .inner-left-border {
+    top: 30px;
+    bottom: 30px;
+    left: 25px;
+  }
+
+  .outer-left-border,
+  .inner-left-border {
+    &:hover {
+      border-left: 20px solid #bfd4fb;
+    }
+  }
+}

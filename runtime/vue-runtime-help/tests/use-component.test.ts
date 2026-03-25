@@ -1,0 +1,56 @@
+import { describe, expect, test } from 'vitest';
+import { defineComponent, provide } from 'vue';
+import { mount } from '@vue/test-utils';
+
+import Core from '@tmagic/core';
+
+import { useComponent } from '../src';
+
+describe('useComponent', () => {
+  const app = new Core({});
+  const fooComponent = 'foo-component';
+  app.registerComponent('foo', fooComponent);
+  const containerComponent = {};
+  app.registerComponent('magic-ui-container', containerComponent);
+
+  test('string para', () => {
+    const component = useComponent('foo');
+    expect(component).toEqual('magic-ui-foo');
+  });
+
+  test('object para and can find component', () => {
+    const component = useComponent({ componentType: 'foo', app });
+    expect(component).toEqual(fooComponent);
+  });
+
+  test('without app and can not find component', () => {
+    const component = useComponent({ componentType: 'foo' });
+    expect(component).toEqual('magic-ui-foo');
+  });
+
+  test('with magic-ui- componentType and can not find component', () => {
+    const component = useComponent({ componentType: 'magic-ui-foo', app });
+    expect(component).toEqual('magic-ui-foo');
+  });
+
+  // node_modules中的vue版本不是3.0.0，所以跳过
+  test('auto inject and empty para', () => {
+    const child = defineComponent({
+      setup() {
+        const component = useComponent();
+        expect(component).toEqual(containerComponent);
+      },
+    });
+
+    const parent = defineComponent({
+      template: '<child-com></child-com>',
+      components: { 'child-com': child },
+      setup() {
+        provide('app', app);
+      },
+    });
+
+    const vueApp = mount(parent);
+    vueApp.unmount();
+  });
+});

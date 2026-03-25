@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { InputNumberProps } from './types';
 
 defineOptions({
@@ -21,11 +21,11 @@ defineOptions({
 
 const props = defineProps<InputNumberProps>();
 
-const ui = getConfig('components')?.inputNumber;
+const ui = getDesignConfig('components')?.inputNumber;
 
 const uiComponent = ui?.component || 'el-input-number';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<InputNumberProps>(() => ui?.props(props) || props);
 
 const emit = defineEmits(['change', 'input', 'update:modelValue']);
 

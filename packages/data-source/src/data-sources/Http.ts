@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { HttpOptions, RequestFunction } from '@tmagic/schema';
-import { getValueByKeyPath } from '@tmagic/utils';
+import type { HttpOptions, RequestFunction } from '@tmagic/core';
+import { getValueByKeyPath } from '@tmagic/core';
 
-import { DataSourceOptions, HttpDataSourceSchema } from '@data-source/types';
+import type { DataSourceOptions, HttpDataSourceSchema, HttpOptionsSchema } from '@data-source/types';
 
 import DataSource from './Base';
 
@@ -74,7 +74,7 @@ export default class HttpDataSource extends DataSource<HttpDataSourceSchema> {
     code?: string | number;
   };
   /** 请求配置 */
-  public httpOptions: HttpOptions;
+  public httpOptions: HttpOptionsSchema;
 
   /** 请求函数 */
   #fetch?: RequestFunction;
@@ -115,7 +115,7 @@ export default class HttpDataSource extends DataSource<HttpDataSourceSchema> {
 
   public async init() {
     if (this.schema.autoFetch) {
-      await this.request(this.httpOptions);
+      await this.request();
     }
 
     super.init();
@@ -124,8 +124,14 @@ export default class HttpDataSource extends DataSource<HttpDataSourceSchema> {
   public async request(options: Partial<HttpOptions> = {}) {
     this.isLoading = true;
 
-    let reqOptions = {
-      ...this.httpOptions,
+    const { url, params, data, headers, ...otherHttpOptions } = this.httpOptions;
+
+    let reqOptions: HttpOptions = {
+      url: typeof url === 'function' ? url({ app: this.app, dataSource: this }) : url,
+      params: typeof params === 'function' ? params({ app: this.app, dataSource: this }) : params,
+      data: typeof data === 'function' ? data({ app: this.app, dataSource: this }) : data,
+      headers: typeof headers === 'function' ? headers({ app: this.app, dataSource: this }) : headers,
+      ...otherHttpOptions,
       ...options,
     };
 
@@ -135,25 +141,29 @@ export default class HttpDataSource extends DataSource<HttpDataSourceSchema> {
       }
 
       if (typeof this.schema.beforeRequest === 'function') {
-        reqOptions = this.schema.beforeRequest(reqOptions, { app: this.app, dataSource: this });
+        reqOptions = await this.schema.beforeRequest(reqOptions, { app: this.app, dataSource: this });
       }
 
       // 注意：在编辑器中mockData不会为空，至少是默认值，不会发起请求
-      let res = this.mockData ? this.mockData : await this.#fetch?.(reqOptions);
-
-      for (const method of this.#afterRequest) {
-        await method({ res, options: reqOptions, params: {}, dataSource: this, app: this.app });
-      }
-
-      if (typeof this.schema.afterResponse === 'function') {
-        res = this.schema.afterResponse(res, { app: this.app, dataSource: this, options: reqOptions });
-      }
-
-      if (this.schema.responseOptions?.dataPath) {
-        const data = getValueByKeyPath(this.schema.responseOptions.dataPath, res);
-        this.setData(data);
+      if (this.mockData) {
+        this.setData(this.mockData);
       } else {
-        this.setData(res);
+        let res = await this.#fetch?.(reqOptions);
+
+        for (const method of this.#afterRequest) {
+          await method({ res, options: reqOptions, params: {}, dataSource: this, app: this.app });
+        }
+
+        if (typeof this.schema.afterResponse === 'function') {
+          res = await this.schema.afterResponse(res, { app: this.app, dataSource: this, options: reqOptions });
+        }
+
+        if (this.schema.responseOptions?.dataPath) {
+          const data = getValueByKeyPath(this.schema.responseOptions.dataPath, res);
+          this.setData(data);
+        } else {
+          this.setData(res);
+        }
       }
 
       this.error = undefined;

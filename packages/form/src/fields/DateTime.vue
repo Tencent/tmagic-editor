@@ -1,6 +1,6 @@
 <template>
   <TMagicDatePicker
-    v-model="model[name]"
+    :model-value="model[name]"
     popper-class="magic-datetime-picker-popper"
     type="datetime"
     :size="size"
@@ -9,15 +9,15 @@
     :format="config.format || 'YYYY/MM/DD HH:mm:ss'"
     :value-format="config.valueFormat || 'YYYY/MM/DD HH:mm:ss'"
     :default-time="config.defaultTime"
-    @change="changeHandler"
+    @update:model-value="changeHandler"
   ></TMagicDatePicker>
 </template>
 
 <script lang="ts" setup>
 import { TMagicDatePicker } from '@tmagic/design';
-import { datetimeFormatter } from '@tmagic/utils';
 
 import type { DateTimeConfig, FieldProps } from '../schema';
+import { datetimeFormatter } from '../utils/form';
 import { useAddField } from '../utils/useAddField';
 
 defineOptions({
@@ -32,12 +32,16 @@ const emit = defineEmits<{
 
 useAddField(props.prop);
 
-const value = props.model?.[props.name].toString();
+const value = props.model?.[props.name]?.toString();
 if (props.model) {
-  if (value === 'Invalid Date') {
+  if (!value || value === 'Invalid Date') {
     props.model[props.name] = '';
   } else {
-    props.model[props.name] = datetimeFormatter(props.model[props.name], '', props.config.valueFormat);
+    props.model[props.name] = datetimeFormatter(
+      props.model[props.name],
+      '',
+      props.config.valueFormat || 'YYYY/MM/DD HH:mm:ss',
+    );
   }
 }
 

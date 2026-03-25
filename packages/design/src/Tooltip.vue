@@ -10,7 +10,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { TooltipProps } from './types';
 
 defineOptions({
@@ -19,9 +19,9 @@ defineOptions({
 
 const props = defineProps<TooltipProps>();
 
-const ui = getConfig('components')?.tooltip;
+const ui = getDesignConfig('components')?.tooltip;
 
 const uiComponent = ui?.component || 'el-tooltip';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<TooltipProps>(() => ui?.props(props) || props);
 </script>

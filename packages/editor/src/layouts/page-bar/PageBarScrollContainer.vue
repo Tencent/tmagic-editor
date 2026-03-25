@@ -1,72 +1,73 @@
 <template>
   <div class="m-editor-page-bar" ref="pageBar">
     <slot name="prepend"></slot>
+    <div v-if="length" class="m-editor-page-bar-items" ref="itemsContainer">
+      <slot></slot>
+    </div>
 
-    <div v-if="canScroll" class="m-editor-page-bar-item m-editor-page-bar-item-icon" @click="scroll('left')">
+    <div
+      v-if="canScroll"
+      class="m-editor-page-bar-item m-editor-page-bar-item-icon m-editor-page-bar-item-left-icon"
+      @click="scroll('left')"
+    >
       <Icon :icon="ArrowLeftBold"></Icon>
     </div>
 
     <div
-      v-if="(type === NodeType.PAGE && pageLength) || (type === NodeType.PAGE_FRAGMENT && pageFragmentLength)"
-      class="m-editor-page-bar-items"
-      ref="itemsContainer"
-      :style="`width: ${itemsContainerWidth}px`"
+      v-if="canScroll"
+      class="m-editor-page-bar-item m-editor-page-bar-item-icon m-editor-page-bar-item-right-icon"
+      @click="scroll('right')"
     >
-      <slot></slot>
-    </div>
-
-    <div v-if="canScroll" class="m-editor-page-bar-item m-editor-page-bar-item-icon" @click="scroll('right')">
       <Icon :icon="ArrowRightBold"></Icon>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import {
-  computed,
-  type ComputedRef,
-  inject,
-  nextTick,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-  watch,
-  type WatchStopHandle,
-} from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue';
 import { ArrowLeftBold, ArrowRightBold } from '@element-plus/icons-vue';
+import Sortable, { type SortableEvent } from 'sortablejs';
 
-import { NodeType } from '@tmagic/schema';
+import type { Id } from '@tmagic/core';
 
 import Icon from '@editor/components/Icon.vue';
-import type { Services } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
+import type { PageBarSortOptions } from '@editor/type';
 
 defineOptions({
   name: 'MEditorPageBarScrollContainer',
 });
 
 const props = defineProps<{
-  type: NodeType.PAGE | NodeType.PAGE_FRAGMENT;
+  pageBarSortOptions?: PageBarSortOptions;
+  length: number;
 }>();
 
-const services = inject<Services>('services');
-const editorService = services?.editorService;
-const uiService = services?.uiService;
+const { editorService, uiService } = useServices();
 
-const itemsContainer = ref<HTMLDivElement>();
+const itemsContainerEl = useTemplateRef<HTMLElement>('itemsContainer');
 const canScroll = ref(false);
 
-const showAddPageButton = computed(() => uiService?.get('showAddPageButton'));
+const showAddPageButton = computed(() => uiService.get('showAddPageButton'));
+const showPageListButton = computed(() => uiService.get('showPageListButton'));
 
 const itemsContainerWidth = ref(0);
 
+const pageBarEl = useTemplateRef<HTMLDivElement>('pageBar');
+
 const setCanScroll = () => {
-  // 减去新增、左移、右移三个按钮的宽度
+  // 减去新增、搜索、页面列表、左移、右移5个按钮的宽度
   // 37 = icon width 16 + padding 10 * 2 + border-right 1
-  itemsContainerWidth.value = (pageBar.value?.clientWidth || 0) - 37 * 2 - (showAddPageButton.value ? 37 : 21);
+  itemsContainerWidth.value =
+    (pageBarEl.value?.clientWidth || 0) -
+    37 * 2 -
+    37 -
+    (showAddPageButton.value ? 37 : 21) -
+    (showPageListButton.value ? 37 : 0);
 
   nextTick(() => {
-    if (itemsContainer.value) {
-      canScroll.value = itemsContainer.value.scrollWidth - itemsContainerWidth.value > 1;
+    if (itemsContainerEl.value) {
+      canScroll.value = itemsContainerEl.value.scrollWidth - itemsContainerWidth.value > 1;
     }
   });
 };
@@ -75,9 +76,9 @@ const resizeObserver = new ResizeObserver(() => {
   setCanScroll();
 });
 
-const pageBar = ref<HTMLDivElement>();
 onMounted(() => {
-  pageBar.value && resizeObserver.observe(pageBar.value);
+  pageBarEl.value && resizeObserver.observe(pageBarEl.value);
+  itemsContainerEl.value && resizeObserver.observe(itemsContainerEl.value);
 });
 
 onBeforeUnmount(() => {
@@ -87,70 +88,92 @@ onBeforeUnmount(() => {
 let translateLeft = 0;
 
 const scroll = (type: 'left' | 'right' | 'start' | 'end') => {
-  if (!itemsContainer.value) return;
+  if (!itemsContainerEl.value || !canScroll.value) return;
 
-  const maxScrollLeft = itemsContainer.value.scrollWidth - itemsContainerWidth.value;
+  const maxScrollLeft = itemsContainerEl.value.scrollWidth - itemsContainerWidth.value;
 
   if (type === 'left') {
-    translateLeft += 100;
-
-    if (translateLeft > 0) {
-      translateLeft = 0;
-    }
+    scrollTo(translateLeft + 200);
   } else if (type === 'right') {
-    translateLeft -= 100;
-
-    if (-translateLeft > maxScrollLeft) {
-      translateLeft = -maxScrollLeft;
-    }
+    scrollTo(translateLeft - 200);
   } else if (type === 'start') {
-    translateLeft = 0;
+    scrollTo(0);
   } else if (type === 'end') {
-    translateLeft = -maxScrollLeft;
+    scrollTo(-maxScrollLeft);
   }
-
-  itemsContainer.value.style.transform = `translate(${translateLeft}px, 0px)`;
 };
 
-const pageLength = computed(() => editorService?.get('pageLength') || 0);
-const pageFragmentLength = computed(() => editorService?.get('pageFragmentLength') || 0);
+const scrollTo = (value: number) => {
+  if (!itemsContainerEl.value || !canScroll.value) return;
+  const maxScrollLeft = itemsContainerEl.value.scrollWidth - itemsContainerWidth.value;
 
-const crateWatchLength = (length: ComputedRef<number>) =>
-  watch(
-    length,
-    (length = 0, preLength = 0) => {
-      setTimeout(() => {
-        setCanScroll();
-        if (length < preLength) {
+  if (value >= 0) {
+    value = 0;
+  }
+
+  if (-value > maxScrollLeft) {
+    value = -maxScrollLeft;
+  }
+
+  translateLeft = value;
+
+  itemsContainerEl.value.style.transform = `translate(${translateLeft}px, 0px)`;
+};
+
+watch(
+  () => props.length,
+  (length = 0, preLength = 0) => {
+    setTimeout(() => {
+      setCanScroll();
+      nextTick(() => {
+        if (length < preLength || preLength === 0) {
           scroll('start');
         } else {
           scroll('end');
         }
       });
-    },
-    {
-      immediate: true,
-    },
-  );
-
-let unWatchPageLength: WatchStopHandle | null;
-let unWatchPageFragmentLength: WatchStopHandle | null;
-
-watch(
-  () => props.type,
-  (type) => {
-    if (type === NodeType.PAGE) {
-      unWatchPageFragmentLength?.();
-      unWatchPageFragmentLength = null;
-      unWatchPageLength = crateWatchLength(pageLength);
-    } else {
-      unWatchPageLength?.();
-      unWatchPageLength = null;
-      unWatchPageFragmentLength = crateWatchLength(pageFragmentLength);
-    }
+      if (length > 1) {
+        const el = document.querySelector('.m-editor-page-bar-items') as HTMLElement;
+        let beforeDragList: Id[] = [];
+        const options = {
+          ...{
+            dataIdAttr: 'data-page-id', // 获取排序后的数据
+            onStart: async (event: SortableEvent) => {
+              if (typeof props.pageBarSortOptions?.beforeStart === 'function') {
+                await props.pageBarSortOptions.beforeStart(event, sortable);
+              }
+              beforeDragList = sortable.toArray();
+            },
+            onUpdate: async (event: SortableEvent) => {
+              await editorService.sort(
+                beforeDragList[event.oldIndex as number],
+                beforeDragList[event.newIndex as number],
+              );
+              if (typeof props.pageBarSortOptions?.afterUpdate === 'function') {
+                await props.pageBarSortOptions.afterUpdate(event, sortable);
+              }
+            },
+          },
+          ...{
+            ...(props.pageBarSortOptions ? props.pageBarSortOptions : {}),
+          },
+        };
+        if (!el) return;
+        const sortable = new Sortable(el, options);
+      }
+    });
   },
   {
     immediate: true,
   },
 );
+
+defineExpose({
+  itemsContainerWidth,
+  scroll,
+  scrollTo,
+  getTranslateLeft() {
+    return translateLeft;
+  },
+});
 </script>

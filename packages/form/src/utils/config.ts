@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+import type { Component } from 'vue';
+
 let $MAGIC_FORM = {} as any;
 
 const setConfig = (option: any): void => {
@@ -24,4 +26,17 @@ const setConfig = (option: any): void => {
 
 const getConfig = <T = unknown>(key: string): T => $MAGIC_FORM[key];
 
-export { getConfig, setConfig };
+const fieldRegistry = new Map<string, Component>();
+
+const registerField = (tagName: string, component: Component): void => {
+  if (fieldRegistry.has(tagName)) {
+    return;
+  }
+  fieldRegistry.set(tagName, component);
+};
+
+const getField = (tagName: string): Component | undefined => fieldRegistry.get(tagName);
+
+const deleteField = (tagName: string): boolean => fieldRegistry.delete(tagName);
+
+export { deleteField, getConfig, getField, registerField, setConfig };

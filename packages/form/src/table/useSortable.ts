@@ -1,0 +1,60 @@
+import { inject, nextTick, type Ref, type ShallowRef, watchEffect } from 'vue';
+import type { default as SortableType, SortableEvent } from 'sortablejs';
+
+import { type TMagicTable } from '@tmagic/design';
+import type { FormState } from '@tmagic/form-schema';
+
+import { sortArray } from '../utils/form';
+
+import type { TableProps } from './type';
+
+let SortablePromise: Promise<typeof SortableType> | undefined;
+const loadSortable = () => (SortablePromise ??= import('sortablejs').then((m) => m.default));
+
+export const useSortable = (
+  props: TableProps,
+  emit: (event: 'select' | 'change' | 'addDiffCount', ...args: any[]) => void,
+  tMagicTableRef: ShallowRef<InstanceType<typeof TMagicTable> | null>,
+  modelName: Ref<string | number>,
+  updateKey: Ref<number>,
+) => {
+  const mForm = inject<FormState | undefined>('mForm');
+
+  let sortable: SortableType | undefined;
+  const rowDrop = async () => {
+    sortable?.destroy();
+    const tableEl = tMagicTableRef.value?.getEl();
+    const tBodyEl = tableEl?.querySelector('.el-table__body > tbody') || tableEl?.querySelector('.t-table__body');
+    if (!tBodyEl) {
+      return;
+    }
+
+    sortable = (await loadSortable()).create(tBodyEl, {
+      draggable: '.tmagic-design-table-row',
+      filter: 'input', // 表单组件选字操作和触发拖拽会冲突，优先保证选字操作
+      preventOnFilter: false, // 允许选字
+      direction: 'vertical',
+      handle: props.config.dropSortHandle ? '.tmagic-form-table-drag-target' : undefined,
+      onEnd: ({ newIndex, oldIndex }: SortableEvent) => {
+        if (typeof newIndex === 'undefined') return;
+        if (typeof oldIndex === 'undefined') return;
+        const newData = sortArray(props.model[modelName.value], newIndex, oldIndex, props.sortKey);
+
+        emit('change', newData);
+        mForm?.$emit('field-change', newData);
+
+        nextTick(() => {
+          sortable?.destroy();
+          sortable = undefined;
+          updateKey.value += 1;
+        });
+      },
+    });
+  };
+
+  watchEffect(() => {
+    if (props.config.dropSort) {
+      rowDrop();
+    }
+  });
+};

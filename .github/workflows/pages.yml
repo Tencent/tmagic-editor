@@ -2,7 +2,7 @@ name: pages
 
 on:
   push:
-    branches: [master]
+    branches: [dev]
   workflow_dispatch:
 
 jobs:
@@ -10,17 +10,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: dev
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
 
-      - name: Set node version to 18
-        uses: actions/setup-node@v2
+      - name: Set node version to 22
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
           cache: 'pnpm'
 
       - run: pnpm bootstrap
@@ -39,6 +40,9 @@ jobs:
 
       - name: move to dist
         run: mv docs/.vitepress/dist/* dist/docs && mv playground/dist/* dist/playground
+
+      - name: Bypass Jekyll on GitHub Pages
+        run: touch dist/.nojekyll
 
       - name: Deploy to GitHub Pages
         uses: crazy-max/ghaction-github-pages@v2

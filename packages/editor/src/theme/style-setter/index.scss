@@ -1,0 +1,41 @@
+@use "./border.scss";
+@use "./layout.scss";
+@use "./background.scss";
+
+.m-fields-style-setter {
+  width: 100%;
+
+  .tmagic-design-collapse-item {
+    > .el-collapse-item__header {
+      background-color: #f2f3f7;
+      height: 26px;
+      min-height: 26px;
+      line-height: 26px;
+      padding: 0 20px;
+      box-sizing: border-box;
+    }
+
+    .el-collapse-item__wrap {
+      padding: 10px 20px;
+    }
+
+    .el-collapse-item__title {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .el-collapse-item__content {
+      padding: 0;
+    }
+  }
+}
+
+.text-align-list {
+  display: flex;
+  height: 100%;
+
+  .btn-active {
+    color: var(--el-color-primary) !important;
+  }
+}

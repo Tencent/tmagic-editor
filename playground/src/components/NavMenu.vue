@@ -1,34 +1,22 @@
 <template>
   <div class="m-editor-nav-menu">
-    <TMagicButton
-      v-for="(item, index) in data"
-      class="menu-item button"
-      :key="index"
-      size="small"
-      link
-      @click="item.handler"
-    >
-      <TMagicIcon><component :is="item.icon"></component></TMagicIcon><span>{{ item.text }}</span>
-    </TMagicButton>
+    <AdapterSelect></AdapterSelect>
+    <div v-for="(item, index) in data" :key="index" class="menu-item button">
+      <TMagicButton size="small" link @click="item.handler">
+        <TMagicIcon><component :is="item.icon"></component></TMagicIcon><span>{{ item.text }}</span>
+      </TMagicButton>
+    </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from 'vue';
+<script lang="ts" setup>
+import { MenuButton, TMagicButton, TMagicIcon } from '@tmagic/editor';
 
-import { TMagicButton, TMagicIcon } from '@tmagic/design';
-import { MenuButton } from '@tmagic/editor';
+import AdapterSelect from './AdapterSelect.vue';
 
-export default defineComponent({
-  name: 'nav-menu',
-  props: {
-    data: {
-      type: Array as PropType<MenuButton[]>,
-      default: () => [],
-    },
-  },
-  components: { TMagicIcon, TMagicButton },
-});
+defineProps<{
+  data: MenuButton[];
+}>();
 </script>
 
 <style lang="scss" scoped>

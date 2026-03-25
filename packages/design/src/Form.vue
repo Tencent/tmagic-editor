@@ -1,5 +1,11 @@
 <template>
-  <component class="tmagic-design-form" ref="form" :is="uiComponent" v-bind="uiProps">
+  <component
+    class="tmagic-design-form"
+    :class="{ 'tmagic-design-form-inline': inline }"
+    ref="form"
+    :is="uiComponent"
+    v-bind="uiProps"
+  >
     <slot></slot>
   </component>
 </template>
@@ -7,7 +13,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { FormProps } from './types';
 
 defineOptions({
@@ -16,11 +22,11 @@ defineOptions({
 
 const props = defineProps<FormProps>();
 
-const ui = getConfig('components')?.form;
+const ui = getDesignConfig('components')?.form;
 
 const uiComponent = ui?.component || 'el-form';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<FormProps>(() => ui?.props(props) || props);
 
 const form = ref<any>();
 

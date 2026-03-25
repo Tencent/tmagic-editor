@@ -1,16 +1,25 @@
 <template>
   <div class="m-editor-page-bar-tabs">
-    <SwitchTypeButton v-if="!disabledPageFragment" v-model="active" />
-
-    <PageBarScrollContainer :type="active">
+    <PageBarScrollContainer
+      ref="pageBarScrollContainer"
+      :page-bar-sort-options="pageBarSortOptions"
+      :length="list.length"
+    >
       <template #prepend>
-        <AddButton :type="active"></AddButton>
+        <slot name="page-bar-add-button"><AddButton></AddButton></slot>
+
+        <Search v-model:query="query"></Search>
+        <PageList :list="list">
+          <template #page-list-popover="{ list }"><slot name="page-list-popover" :list="list"></slot></template>
+        </PageList>
       </template>
 
       <div
         v-for="item in list"
         class="m-editor-page-bar-item"
+        ref="pageBarItems"
         :key="item.id"
+        :data-page-id="item.id"
         :class="{ active: page?.id === item.id }"
         @click="switchPage(item.id)"
       >
@@ -20,7 +29,13 @@
           </slot>
         </div>
 
-        <TMagicPopover popper-class="page-bar-popover" placement="top" :width="160" trigger="hover">
+        <TMagicPopover
+          popper-class="page-bar-popover"
+          placement="top"
+          trigger="hover"
+          :width="160"
+          :destroy-on-close="true"
+        >
           <div>
             <slot name="page-bar-popover" :page="item">
               <ToolButton
@@ -53,107 +68,117 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, ref, watch } from 'vue';
+import { computed, ref, useTemplateRef, watch } from 'vue';
 import { CaretBottom, Delete, DocumentCopy } from '@element-plus/icons-vue';
 
+import { type Id, type MPage, type MPageFragment, NodeType } from '@tmagic/core';
 import { TMagicIcon, TMagicPopover } from '@tmagic/design';
-import { Id, type MPage, type MPageFragment, NodeType } from '@tmagic/schema';
-import { isPage, isPageFragment } from '@tmagic/utils';
 
 import ToolButton from '@editor/components/ToolButton.vue';
-import type { Services } from '@editor/type';
-import { getPageFragmentList, getPageList } from '@editor/utils';
+import { useServices } from '@editor/hooks/use-services';
+import type { PageBarSortOptions } from '@editor/type';
 
 import AddButton from './AddButton.vue';
 import PageBarScrollContainer from './PageBarScrollContainer.vue';
-import SwitchTypeButton from './SwitchTypeButton.vue';
+import PageList from './PageList.vue';
+import Search from './Search.vue';
 
 defineOptions({
   name: 'MEditorPageBar',
 });
 
-defineProps<{
-  disabledPageFragment: boolean;
-}>();
-
-const active = ref<NodeType.PAGE | NodeType.PAGE_FRAGMENT>(NodeType.PAGE);
-
-const services = inject<Services>('services');
-const editorService = services?.editorService;
-
-const root = computed(() => editorService?.get('root'));
-const page = computed(() => editorService?.get('page'));
-const pageList = computed(() => getPageList(root.value));
-const pageFragmentList = computed(() => getPageFragmentList(root.value));
-
-const list = computed(() => (active.value === NodeType.PAGE ? pageList.value : pageFragmentList.value));
-
-const activePage = ref<Id>('');
-const activePageFragment = ref<Id>('');
-
-watch(
-  page,
-  (page) => {
-    if (!page) {
-      if (active.value === NodeType.PAGE) {
-        activePage.value = '';
-      }
-      if (active.value === NodeType.PAGE_FRAGMENT) {
-        activePageFragment.value = '';
-      }
-      return;
-    }
-
-    if (isPage(page)) {
-      activePage.value = page?.id;
-      if (active.value !== NodeType.PAGE) {
-        active.value = NodeType.PAGE;
-      }
-    } else if (isPageFragment(page)) {
-      activePageFragment.value = page?.id;
-      if (active.value !== NodeType.PAGE_FRAGMENT) {
-        active.value = NodeType.PAGE_FRAGMENT;
-      }
-    }
-  },
+const props = withDefaults(
+  defineProps<{
+    disabledPageFragment: boolean;
+    pageBarSortOptions?: PageBarSortOptions;
+    filterFunction?: (_page: MPage | MPageFragment, _keyword: string) => boolean;
+  }>(),
   {
-    immediate: true,
+    filterFunction: (page, keyword) => page.name?.includes(keyword) || `${page.id}`.includes(keyword),
   },
 );
 
-watch(active, (active) => {
-  if (active === NodeType.PAGE) {
-    if (!activePage.value && !pageList.value.length) {
-      editorService?.selectRoot();
-      return;
-    }
-    switchPage(activePage.value);
-    return;
+const { editorService } = useServices();
+
+const root = computed(() => editorService.get('root'));
+const page = computed(() => editorService.get('page'));
+
+const query = ref<{
+  pageType: NodeType[];
+  keyword: string;
+}>({
+  pageType: [NodeType.PAGE, NodeType.PAGE_FRAGMENT],
+  keyword: '',
+});
+
+const list = computed(() => {
+  const { pageType, keyword } = query.value;
+  if (pageType.length === 0) {
+    return [];
   }
 
-  if (active === NodeType.PAGE_FRAGMENT) {
-    // 之前没有选中过页面片并且当前没有页面片
-    if (!activePageFragment.value && !pageFragmentList.value.length) {
-      editorService?.selectRoot();
-      return;
+  return (root.value?.items || []).filter((item) => {
+    if (pageType.includes(item.type)) {
+      if (keyword) {
+        return props.filterFunction(item, keyword);
+      }
+      return true;
     }
-    switchPage(activePageFragment.value || pageFragmentList.value[0].id);
-  }
+    return false;
+  });
 });
 
 const switchPage = (id: Id) => {
-  editorService?.select(id);
+  editorService.select(id);
 };
 
 const copy = (node: MPage | MPageFragment) => {
-  node && editorService?.copy(node);
-  editorService?.paste({
+  node && editorService.copy(node);
+  editorService.paste({
     left: 0,
     top: 0,
   });
 };
 
 const remove = (node: MPage | MPageFragment) => {
-  editorService?.remove(node);
+  editorService.remove(node);
 };
+
+const pageBarScrollContainerRef = useTemplateRef<InstanceType<typeof PageBarScrollContainer>>('pageBarScrollContainer');
+const pageBarItemEls = useTemplateRef<HTMLDivElement[]>('pageBarItems');
+watch(page, (page) => {
+  if (
+    !page ||
+    !pageBarScrollContainerRef.value?.itemsContainerWidth ||
+    !pageBarItemEls.value ||
+    pageBarItemEls.value.length < 2
+  ) {
+    return;
+  }
+
+  const firstItem = pageBarItemEls.value[0];
+  const lastItem = pageBarItemEls.value[pageBarItemEls.value.length - 1];
+
+  if (page.id === firstItem.dataset.pageId) {
+    pageBarScrollContainerRef.value.scroll('start');
+  } else if (page.id === lastItem.dataset.pageId) {
+    pageBarScrollContainerRef.value.scroll('end');
+  } else {
+    const pageItem = pageBarItemEls.value.find((item) => item.dataset.pageId === page.id);
+    if (!pageItem) {
+      return;
+    }
+
+    const pageItemRect = pageItem.getBoundingClientRect();
+    const offsetLeft = pageItemRect.left - firstItem.getBoundingClientRect().left;
+    const { itemsContainerWidth } = pageBarScrollContainerRef.value;
+
+    const left = itemsContainerWidth - offsetLeft - pageItemRect.width;
+
+    const translateLeft = pageBarScrollContainerRef.value.getTranslateLeft();
+    if (offsetLeft + translateLeft < 0 || offsetLeft + pageItemRect.width > itemsContainerWidth - translateLeft) {
+      pageBarScrollContainerRef.value.scrollTo(left);
+    }
+  }
+});
 </script>

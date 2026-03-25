@@ -1,7 +1,7 @@
-import type { FormConfig } from '@tmagic/form';
+import { defineFormConfig, type FormConfig } from '@tmagic/form';
 
-export default function (): FormConfig {
-  return [
+export default (): FormConfig =>
+  defineFormConfig([
     {
       name: 'id',
       type: 'hidden',
@@ -26,5 +26,4 @@ export default function (): FormConfig {
       name: 'description',
       text: '描述',
     },
-  ];
-}
+  ]);

@@ -178,3 +178,38 @@
     label: '配置1',
   }]
 }]"></demo-block>
+
+### step
+
+<demo-block type="form" :config="[{
+  type: 'step',
+  items: [{
+    title: '步骤1',
+    items: [{
+      name: 'text',
+      text: '配置1',
+    }]
+  }, {
+    title: '步骤2',
+    items: [{
+      name: 'text2',
+      text: '配置2',
+    }]
+  }]
+}]"></demo-block>
+
+### flex-layout
+
+<demo-block type="form" :config="[{
+  type: 'flex-layout',
+  gap: '20px',
+  items: [{
+    name: 'text',
+    text: '配置1',
+    span: 12
+  }, {
+    name: 'text2',
+    text: '配置2',
+    span: 12
+  }]
+}]"></demo-block>

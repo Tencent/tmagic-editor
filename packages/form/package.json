@@ -1,19 +1,20 @@
 {
-  "version": "1.4.7",
+  "version": "1.7.8",
   "name": "@tmagic/form",
   "type": "module",
   "sideEffects": [
-    "dist/*",
+    "dist/style.css",
+    "dist/es/style.css",
     "src/theme/*"
   ],
   "main": "dist/tmagic-form.umd.cjs",
-  "module": "dist/tmagic-form.js",
+  "module": "dist/es/index.js",
   "style": "dist/style.css",
   "types": "types/index.d.ts",
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
-      "import": "./dist/tmagic-form.js",
+      "import": "./dist/es/index.js",
       "require": "./dist/tmagic-form.umd.cjs"
     },
     "./dist/style.css": {
@@ -24,44 +25,36 @@
   },
   "files": [
     "dist",
-    "types"
+    "types",
+    "src"
   ],
   "license": "Apache-2.0",
-  "scripts": {
-    "build": "npm run build:type && vite build",
-    "build:type": "npm run clear:type && vue-tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
-    "clear:type": "rimraf ./types",
-    "check:type": "vue-tsc --noEmit --project tsconfig.build.json"
-  },
   "engines": {
     "node": ">=18"
   },
   "repository": {
+    "directory": "packages/form",
     "type": "git",
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
-    "@element-plus/icons-vue": "^2.3.1",
+    "@element-plus/icons-vue": "^2.3.2",
+    "@popperjs/core": "^2.11.8",
+    "dayjs": "^1.11.19",
     "lodash-es": "^4.17.21",
-    "sortablejs": "^1.15.2"
+    "sortablejs": "^1.15.6"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.4",
-    "@types/node": "^18.19.0",
-    "@types/sortablejs": "^1.15.8",
-    "@vitejs/plugin-vue": "^5.0.4",
-    "@vue/compiler-sfc": "^3.4.27",
-    "@vue/test-utils": "^2.4.6",
-    "rimraf": "^3.0.2",
-    "sass": "^1.77.0",
-    "vite": "^5.2.12",
-    "vue-tsc": "^2.0.19"
+    "@types/sortablejs": "^1.15.9",
+    "@vue/test-utils": "^2.4.6"
   },
   "peerDependencies": {
     "@tmagic/design": "workspace:*",
     "@tmagic/utils": "workspace:*",
-    "vue": "^3.4.27",
-    "typescript": "*"
+    "@tmagic/form-schema": "workspace:*",
+    "vue": "catalog:",
+    "typescript": "catalog:"
   },
   "peerDependenciesMeta": {
     "typescript": {

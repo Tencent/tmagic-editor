@@ -2,13 +2,15 @@
   <div class="m-fields-code-select-col">
     <div class="code-select-container">
       <!-- 代码块下拉框 -->
-      <MContainer
+      <MSelect
         class="select"
         :config="selectConfig"
+        :name="name"
         :model="model"
         :size="size"
-        @change="onParamsChangeHandler"
-      ></MContainer>
+        :prop="prop"
+        @change="onCodeIdChangeHandler"
+      ></MSelect>
 
       <!-- 查看/编辑按钮 -->
       <TMagicButton
@@ -28,6 +30,7 @@
       :key="model[name]"
       :model="model"
       :size="size"
+      :disabled="disabled"
       :params-config="paramsConfig"
       @change="onParamsChangeHandler"
     ></CodeParams>
@@ -39,13 +42,24 @@ import { computed, inject, ref, watch } from 'vue';
 import { Edit, View } from '@element-plus/icons-vue';
 import { isEmpty, map } from 'lodash-es';
 
+import type { Id } from '@tmagic/core';
 import { TMagicButton } from '@tmagic/design';
-import { createValues, type FieldProps, filterFunction, type FormState, MContainer } from '@tmagic/form';
-import type { Id } from '@tmagic/schema';
+import {
+  type CodeSelectColConfig,
+  type ContainerChangeEventData,
+  createValues,
+  type FieldProps,
+  filterFunction,
+  type FormItemConfig,
+  type FormState,
+  MSelect,
+  type SelectConfig,
+} from '@tmagic/form';
 
 import CodeParams from '@editor/components/CodeParams.vue';
 import MIcon from '@editor/components/Icon.vue';
-import type { CodeParamStatement, CodeSelectColConfig, EventBus, Services } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
+import type { CodeParamStatement, EventBus } from '@editor/type';
 import { SideItemKey } from '@editor/type';
 
 defineOptions({
@@ -53,9 +67,11 @@ defineOptions({
 });
 
 const mForm = inject<FormState | undefined>('mForm');
-const services = inject<Services>('services');
+const { codeBlockService, uiService } = useServices();
 const eventBus = inject<EventBus>('eventBus');
-const emit = defineEmits(['change']);
+const emit = defineEmits<{
+  change: [v: any, eventData: ContainerChangeEventData];
+}>();
 
 const props = withDefaults(defineProps<FieldProps<CodeSelectColConfig>>(), {
   disabled: false,
@@ -64,7 +80,7 @@ const props = withDefaults(defineProps<FieldProps<CodeSelectColConfig>>(), {
 const notEditable = computed(() => filterFunction(mForm, props.config.notEditable, props));
 
 const hasCodeBlockSidePanel = computed(() =>
-  (services?.uiService.get('sideBarItems') || []).find((item) => item.$key === SideItemKey.CODE_BLOCK),
+  (uiService.get('sideBarItems') || []).find((item) => item.$key === SideItemKey.CODE_BLOCK),
 );
 
 /**
@@ -85,7 +101,7 @@ const getParamItemsConfig = (codeId?: Id): CodeParamStatement[] => {
   }));
 };
 
-const codeDsl = computed(() => services?.codeBlockService.getCodeDsl());
+const codeDsl = computed(() => codeBlockService.getCodeDsl());
 const paramsConfig = ref<CodeParamStatement[]>(getParamItemsConfig(props.model[props.name]));
 
 watch(
@@ -97,10 +113,10 @@ watch(
   },
 );
 
-const selectConfig = {
+const selectConfig: SelectConfig = {
   type: 'select',
   name: props.name,
-  disable: props.disabled,
+  disabled: props.disabled,
   options: () => {
     if (codeDsl.value) {
       return map(codeDsl.value, (value, key) => ({
@@ -111,26 +127,39 @@ const selectConfig = {
     }
     return [];
   },
-  onChange: (formState: any, codeId: Id, { model }: any) => {
-    // 通过下拉框选择的codeId变化后修正model的值，避免写入其他codeId的params
-    paramsConfig.value = getParamItemsConfig(codeId);
+};
 
-    if (paramsConfig.value.length) {
-      model.params = createValues(formState, paramsConfig.value, {}, model.params);
-    } else {
-      model.params = {};
-    }
+const onCodeIdChangeHandler = (value: any) => {
+  // 通过下拉框选择的codeId变化后修正model的值，避免写入其他codeId的params
+  paramsConfig.value = getParamItemsConfig(value);
 
-    return codeId;
-  },
+  const changeRecords = [
+    {
+      propPath: props.prop,
+      value,
+    },
+  ];
+
+  changeRecords.push({
+    propPath: props.prop.replace(`${props.name}`, 'params'),
+    value: paramsConfig.value.length
+      ? createValues(mForm, paramsConfig.value as unknown as FormItemConfig[], {}, props.model.params)
+      : {},
+  });
+
+  emit('change', value, {
+    changeRecords,
+  });
 };
 
 /**
  * 参数值修改更新
  */
-const onParamsChangeHandler = (value: any) => {
-  props.model.params = value.params;
-  emit('change', props.model);
+const onParamsChangeHandler = (value: any, eventData: ContainerChangeEventData) => {
+  eventData.changeRecords?.forEach((record) => {
+    record.propPath = `${props.prop.replace(`${props.name}`, '')}${record.propPath}`;
+  });
+  emit('change', props.model[props.name], eventData);
 };
 
 const editCode = (id: string) => {

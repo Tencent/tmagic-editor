@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { SwitchProps } from './types';
 
 defineOptions({
@@ -24,11 +24,11 @@ defineOptions({
 
 const props = defineProps<SwitchProps>();
 
-const ui = getConfig('components')?.switch;
+const ui = getDesignConfig('components')?.switch;
 
 const uiComponent = ui?.component || 'el-switch';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<SwitchProps>(() => ui?.props(props) || props);
 
 const emit = defineEmits(['change', 'update:modelValue']);
 

@@ -22,16 +22,16 @@
 </template>
 
 <script setup lang="ts">
-import { inject, Ref, ref, watchEffect } from 'vue';
+import { inject, nextTick, Ref, ref, watch, watchEffect } from 'vue';
 
+import type { DataSourceSchema } from '@tmagic/core';
 import { tMagicMessage } from '@tmagic/design';
-import { FormConfig, MFormBox } from '@tmagic/form';
-import { DataSourceSchema } from '@tmagic/schema';
+import { type ContainerChangeEventData, type FormConfig, MFormBox } from '@tmagic/form';
 
 import FloatingBox from '@editor/components/FloatingBox.vue';
-import { useEditorContentHeight } from '@editor/hooks';
+import { useEditorContentHeight } from '@editor/hooks/use-editor-content-height';
 import { useNextFloatBoxPosition } from '@editor/hooks/use-next-float-box-position';
-import type { Services } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
 
 defineOptions({
   name: 'MEditorDataSourceConfigPanel',
@@ -46,9 +46,13 @@ const props = defineProps<{
 const boxVisible = defineModel<boolean>('visible', { default: false });
 const width = defineModel<number>('width', { default: 670 });
 
-const emit = defineEmits(['submit']);
+const emit = defineEmits<{
+  submit: [v: any, eventData: ContainerChangeEventData];
+  close: [];
+  open: [id: string];
+}>();
 
-const services = inject<Services>('services');
+const { uiService, dataSourceService } = useServices();
 
 const initValues = ref<Partial<DataSourceSchema>>({});
 const dataSourceConfig = ref<FormConfig>([]);
@@ -56,20 +60,30 @@ const dataSourceConfig = ref<FormConfig>([]);
 const { height: editorHeight } = useEditorContentHeight();
 
 const parentFloating = inject<Ref<HTMLDivElement | null>>('parentFloating', ref(null));
-const { boxPosition, calcBoxPosition } = useNextFloatBoxPosition(services?.uiService, parentFloating);
+const { boxPosition, calcBoxPosition } = useNextFloatBoxPosition(uiService, parentFloating);
 
 watchEffect(() => {
   initValues.value = props.values;
-  dataSourceConfig.value = services?.dataSourceService.getFormConfig(initValues.value.type) || [];
+  dataSourceConfig.value = dataSourceService.getFormConfig(initValues.value.type);
 });
 
-const submitHandler = (values: any) => {
-  emit('submit', values);
+const submitHandler = (values: any, data: ContainerChangeEventData) => {
+  emit('submit', values, data);
 };
 
 const errorHandler = (error: any) => {
   tMagicMessage.error(error.message);
 };
+
+watch(boxVisible, (visible) => {
+  nextTick(() => {
+    if (!visible) {
+      emit('close');
+    } else if (initValues.value?.id) {
+      emit('open', initValues.value.id);
+    }
+  });
+});
 
 defineExpose({
   show() {

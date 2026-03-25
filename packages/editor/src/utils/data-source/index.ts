@@ -1,83 +1,81 @@
-import { CascaderOption, FormConfig, FormState } from '@tmagic/form';
-import { DataSchema, DataSourceFieldType, DataSourceSchema } from '@tmagic/schema';
-import { isNumber } from '@tmagic/utils';
+import type { DataSchema, DataSourceFieldType, DataSourceSchema } from '@tmagic/core';
+import { type CascaderOption, defineFormItem, type FormConfig } from '@tmagic/form';
+import { dataSourceTemplateRegExp, getKeysArray, isNumber } from '@tmagic/utils';
 
 import BaseFormConfig from './formConfigs/base';
 import HttpFormConfig from './formConfigs/http';
 
-const fillConfig = (config: FormConfig): FormConfig => [
-  ...BaseFormConfig(),
-  ...config,
-  {
-    type: 'tab',
-    items: [
-      {
-        title: '数据定义',
-        items: [
-          {
-            name: 'fields',
-            type: 'data-source-fields',
-            defaultValue: () => [],
-          },
-        ],
-      },
-      {
-        title: '方法定义',
-        items: [
-          {
-            name: 'methods',
-            type: 'data-source-methods',
-            defaultValue: () => [],
-          },
-        ],
-      },
-      {
-        title: '事件配置',
-        items: [
-          {
-            name: 'events',
-            src: 'datasource',
-            type: 'event-select',
-          },
-        ],
-      },
-      {
-        title: 'mock数据',
-        items: [
-          {
-            name: 'mocks',
-            type: 'data-source-mocks',
-            defaultValue: () => [],
-          },
-        ],
-      },
-      {
-        title: '请求参数裁剪',
-        display: (formState: FormState, { model }: any) => model.type === 'http',
-        items: [
-          {
-            name: 'beforeRequest',
-            type: 'vs-code',
-            parse: true,
-            height: '600px',
-          },
-        ],
-      },
-      {
-        title: '响应数据裁剪',
-        display: (formState: FormState, { model }: any) => model.type === 'http',
-        items: [
-          {
-            name: 'afterResponse',
-            type: 'vs-code',
-            parse: true,
-            height: '600px',
-          },
-        ],
-      },
-    ],
-  },
-];
+const dataSourceFormConfig = defineFormItem({
+  type: 'tab',
+  items: [
+    {
+      title: '数据定义',
+      items: [
+        {
+          name: 'fields',
+          type: 'data-source-fields',
+          defaultValue: () => [],
+        },
+      ],
+    },
+    {
+      title: '方法定义',
+      items: [
+        {
+          name: 'methods',
+          type: 'data-source-methods',
+          defaultValue: () => [],
+        },
+      ],
+    },
+    {
+      title: '事件配置',
+      items: [
+        {
+          name: 'events',
+          src: 'datasource',
+          type: 'event-select',
+        },
+      ],
+    },
+    {
+      title: 'mock数据',
+      items: [
+        {
+          name: 'mocks',
+          type: 'data-source-mocks',
+          defaultValue: () => [],
+        },
+      ],
+    },
+    {
+      title: '请求参数裁剪',
+      display: (_formState, { model }) => model.type === 'http',
+      items: [
+        {
+          name: 'beforeRequest',
+          type: 'vs-code',
+          parse: true,
+          autosize: { minRows: 10, maxRows: 30 },
+        },
+      ],
+    },
+    {
+      title: '响应数据裁剪',
+      display: (_formStat, { model }) => model.type === 'http',
+      items: [
+        {
+          name: 'afterResponse',
+          type: 'vs-code',
+          parse: true,
+          autosize: { minRows: 10, maxRows: 30 },
+        },
+      ],
+    },
+  ],
+});
+
+const fillConfig = (config: FormConfig): FormConfig => [...BaseFormConfig(), ...config, dataSourceFormConfig];
 
 export const getFormConfig = (type: string, configs: Record<string, FormConfig>): FormConfig => {
   switch (type) {
@@ -118,7 +116,7 @@ export const getFormValue = (type: string, values: Partial<DataSourceSchema>): P
    * context：上下文对象
    *
    * interface Content {
-   *  app: AppCore;
+   *  app: TMagicApp;
    *  dataSource: HttpDataSource;
    * }
    *
@@ -135,7 +133,7 @@ export const getFormValue = (type: string, values: Partial<DataSourceSchema>): P
     * context：上下文对象
     *
     * interface Content {
-    *  app: AppCore;
+    *  app: TMagicApp;
     *  dataSource: HttpDataSource;
     * }
     *
@@ -152,7 +150,7 @@ export const getDisplayField = (dataSources: DataSourceSchema[], key: string) =>
   const displayState: { value: string; type: 'var' | 'text' }[] = [];
 
   // 匹配es6字符串模块
-  const matches = key.matchAll(/\$\{([\s\S]+?)\}/g);
+  const matches = key.matchAll(dataSourceTemplateRegExp);
   let index = 0;
   for (const match of matches) {
     if (typeof match.index === 'undefined') break;
@@ -167,25 +165,22 @@ export const getDisplayField = (dataSources: DataSourceSchema[], key: string) =>
     let ds: DataSourceSchema | undefined;
     let fields: DataSchema[] | undefined;
     // 将模块解析成数据源对应的值
-    match[1]
-      .replaceAll(/\[(\d+)\]/g, '.$1')
-      .split('.')
-      .forEach((item, index) => {
-        if (index === 0) {
-          ds = dataSources.find((ds) => ds.id === item);
-          dsText += ds?.title || item;
-          fields = ds?.fields;
-          return;
-        }
+    getKeysArray(match[1]).forEach((item, index) => {
+      if (index === 0) {
+        ds = dataSources.find((ds) => ds.id === item);
+        dsText += ds?.title || item;
+        fields = ds?.fields;
+        return;
+      }
 
-        if (isNumber(item)) {
-          dsText += `[${item}]`;
-        } else {
-          const field = fields?.find((field) => field.name === item);
-          fields = field?.fields;
-          dsText += `.${field?.title || item}`;
-        }
-      });
+      if (isNumber(item)) {
+        dsText += `[${item}]`;
+      } else {
+        const field = fields?.find((field) => field.name === item);
+        fields = field?.fields;
+        dsText += `.${field?.title || item}`;
+      }
+    });
 
     displayState.push({
       type: 'var',
@@ -209,35 +204,44 @@ export const getCascaderOptionsFromFields = (
   fields: DataSchema[] = [],
   dataSourceFieldType: DataSourceFieldType[] = ['any'],
 ): CascaderOption[] => {
-  const child: CascaderOption[] = [];
-  fields.forEach((field) => {
-    if (!dataSourceFieldType.length) {
-      dataSourceFieldType.push('any');
-    }
+  const typeSet = new Set(dataSourceFieldType.length ? dataSourceFieldType : ['any']);
+  const includesAny = typeSet.has('any');
 
-    const children = getCascaderOptionsFromFields(field.fields, dataSourceFieldType);
+  const result: CascaderOption[] = [];
 
-    const item = {
-      label: field.title || field.name,
-      value: field.name,
-      children,
-    };
-
+  for (const field of fields) {
     const fieldType = field.type || 'any';
-    if (dataSourceFieldType.includes('any') || dataSourceFieldType.includes(fieldType)) {
-      child.push(item);
-      return;
-    }
+    const isContainerType = fieldType === 'any' || fieldType === 'array' || fieldType === 'object';
 
-    if (!dataSourceFieldType.includes(fieldType) && !['array', 'object', 'any'].includes(fieldType)) {
-      return;
-    }
+    const children = isContainerType ? getCascaderOptionsFromFields(field.fields, dataSourceFieldType) : [];
 
-    if (!children.length && ['object', 'array', 'any'].includes(field.type || '')) {
-      return;
-    }
+    const matchesType = includesAny || typeSet.has(fieldType);
 
-    child.push(item);
-  });
-  return child;
+    if (matchesType || (isContainerType && children.length)) {
+      result.push({
+        label: `${field.title || field.name}(${field.type})`,
+        value: field.name,
+        children,
+      });
+    }
+  }
+
+  return result;
+};
+
+export const getFieldType = (ds: DataSourceSchema | undefined, fieldNames: string[]) => {
+  let fields = ds?.fields;
+  let type = '';
+
+  for (const fieldName of fieldNames) {
+    if (!fields?.length) return '';
+
+    const field = fields.find((f) => f.name === fieldName);
+    if (!field) return '';
+
+    type = field.type || '';
+    fields = field.fields;
+  }
+
+  return type;
 };

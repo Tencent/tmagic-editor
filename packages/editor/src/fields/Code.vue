@@ -7,13 +7,15 @@
       ...config.options,
       readOnly: disabled,
     }"
+    :autosize="config.autosize"
     :parse="config.parse"
+    :editor-custom-type="config.mFormItemType"
     @save="save"
   ></MagicCodeEditor>
 </template>
 
 <script lang="ts" setup>
-import type { FieldProps, FormItem } from '@tmagic/form';
+import type { CodeConfig, FieldProps } from '@tmagic/form';
 
 import MagicCodeEditor from '@editor/layouts/CodeEditor.vue';
 
@@ -25,26 +27,11 @@ const emit = defineEmits<{
   change: [value: string | any];
 }>();
 
-const props = withDefaults(
-  defineProps<
-    FieldProps<
-      {
-        language?: string;
-        options?: {
-          [key: string]: any;
-        };
-        height?: string;
-        parse?: boolean;
-      } & FormItem
-    >
-  >(),
-  {
-    disabled: false,
-  },
-);
+withDefaults(defineProps<FieldProps<CodeConfig>>(), {
+  disabled: false,
+});
 
 const save = (v: string | any) => {
-  props.model[props.name] = v;
   emit('change', v);
 };
 </script>

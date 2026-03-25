@@ -5,11 +5,11 @@
         class="m-editor-sidebar-header-item"
         v-for="(config, index) in sideBarItems"
         v-show="!floatBoxStates[config.$key]?.status"
-        draggable="true"
+        :draggable="config.draggable ?? true"
         :key="config.$key ?? index"
         :class="{ 'is-active': activeTabName === config.text }"
         :style="config.tabStyle || {}"
-        @click="activeTabName = config.text || config.$key || `${index}`"
+        @click="headerItemClickHandler(config, index)"
         @dragstart="dragstartHandler"
         @dragend="dragendHandler(config.$key, $event)"
       >
@@ -19,16 +19,29 @@
     </div>
     <div
       class="m-editor-sidebar-content"
+      :class="{ 'm-editor-dep-collecting': collecting }"
       v-for="(config, index) in sideBarItems"
       :key="config.$key ?? index"
       v-show="[config.text, config.$key, `${index}`].includes(activeTabName)"
     >
       <component
-        v-if="config && !floatBoxStates[config.$key]?.status"
+        v-if="config?.component && !floatBoxStates[config.$key]?.status"
         :is="config.component"
         v-bind="config.props || {}"
         v-on="config?.listeners || {}"
       >
+        <template
+          #component-list="{ componentGroupList }"
+          v-if="config.$key === 'component-list' || config.slots?.componentList"
+        >
+          <slot
+            v-if="config.$key === 'component-list'"
+            name="component-list"
+            :component-group-list="componentGroupList"
+          ></slot>
+          <component v-else-if="config.slots?.componentList" :is="config.slots.componentList" />
+        </template>
+
         <template
           #component-list-panel-header
           v-if="config.$key === 'component-list' || config.slots?.componentListPanelHeader"
@@ -104,6 +117,10 @@
         </template>
       </component>
     </div>
+    <div class="m-editor-sidebar-tips" v-if="tipsBarVisible && collecting && taskLength > 0">
+      <span>依赖收集中(剩余任务：{{ taskLength }})</span>
+      <MIcon :icon="Close" class="close-icon" @click.stop="tipsBarVisible = false"></MIcon>
+    </div>
   </div>
 
   <Teleport to="body">
@@ -136,18 +153,19 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref, watch } from 'vue';
-import { Coin, EditPen, Goods, List } from '@element-plus/icons-vue';
+import { computed, nextTick, ref, watch } from 'vue';
+import { Close, Coin, EditPen, Goods, List } from '@element-plus/icons-vue';
 
 import FloatingBox from '@editor/components/FloatingBox.vue';
 import MIcon from '@editor/components/Icon.vue';
 import { useEditorContentHeight } from '@editor/hooks/use-editor-content-height';
 import { useFloatBox } from '@editor/hooks/use-float-box';
+import { useServices } from '@editor/hooks/use-services';
 import {
   ColumnLayout,
+  CustomContentMenuFunction,
   type MenuButton,
   type MenuComponent,
-  type Services,
   type SideBarData,
   type SidebarSlots,
   type SideComponent,
@@ -168,9 +186,11 @@ defineOptions({
 
 const props = withDefaults(
   defineProps<{
-    data: SideBarData;
+    data?: SideBarData;
     layerContentMenu: (MenuButton | MenuComponent)[];
-    customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
+    indent?: number;
+    nextLevelIndentIncrement?: number;
+    customContentMenu: CustomContentMenuFunction;
   }>(),
   {
     data: () => ({
@@ -181,10 +201,30 @@ const props = withDefaults(
   },
 );
 
-const services = inject<Services>('services');
+const { depService, uiService, propsService } = useServices();
 
-const columnLeftWidth = computed(() => services?.uiService.get('columnWidth')[ColumnLayout.LEFT] || 0);
-const { height: columnLeftHeight } = useEditorContentHeight();
+const collecting = computed(() => depService.get('collecting'));
+const taskLength = computed(() => depService.get('taskLength'));
+const tipsBarVisible = ref(true);
+
+const columnLeftWidth = computed(() => uiService.get('columnWidth')[ColumnLayout.LEFT]);
+const { height: editorContentHeight } = useEditorContentHeight();
+const columnLeftHeight = ref(0);
+
+const unWatchEditorContentHeight = watch(
+  editorContentHeight,
+  (height) => {
+    if (height) {
+      columnLeftHeight.value = height * 0.5;
+      nextTick().then(() => {
+        unWatchEditorContentHeight();
+      });
+    }
+  },
+  {
+    immediate: true,
+  },
+);
 
 const activeTabName = ref(props.data?.status);
 
@@ -206,6 +246,8 @@ const getItemConfig = (data: SideItem): SideComponent => {
       props: {
         layerContentMenu: props.layerContentMenu,
         customContentMenu: props.customContentMenu,
+        indent: props.indent,
+        nextLevelIndentIncrement: props.nextLevelIndentIncrement,
       },
       component: LayerPanel,
       slots: {},
@@ -216,6 +258,11 @@ const getItemConfig = (data: SideItem): SideComponent => {
       icon: EditPen,
       text: '代码编辑',
       component: CodeBlockListPanel,
+      props: {
+        indent: props.indent,
+        nextLevelIndentIncrement: props.nextLevelIndentIncrement,
+        customContentMenu: props.customContentMenu,
+      },
       slots: {},
     },
     [SideItemKey.DATA_SOURCE]: {
@@ -224,6 +271,11 @@ const getItemConfig = (data: SideItem): SideComponent => {
       icon: Coin,
       text: '数据源',
       component: DataSourceListPanel,
+      props: {
+        indent: props.indent,
+        nextLevelIndentIncrement: props.nextLevelIndentIncrement,
+        customContentMenu: props.customContentMenu,
+      },
       slots: {},
     },
   };
@@ -231,12 +283,24 @@ const getItemConfig = (data: SideItem): SideComponent => {
   return typeof data === 'string' ? map[data] : data;
 };
 
-const sideBarItems = computed(() => props.data.items.map((item) => getItemConfig(item)));
+const sideBarItems = computed(() =>
+  props.data.items
+    .map((item) => getItemConfig(item))
+    .filter((item) => {
+      if (item.$key === SideItemKey.DATA_SOURCE) {
+        return !propsService.getDisabledDataSource();
+      }
+      if (item.$key === SideItemKey.CODE_BLOCK) {
+        return !propsService.getDisabledCodeBlock();
+      }
+      return true;
+    }),
+);
 
 watch(
   sideBarItems,
   (items) => {
-    services?.uiService.set('sideBarItems', items);
+    uiService.set('sideBarItems', items);
   },
   {
     immediate: true,
@@ -264,13 +328,22 @@ watch(
     const nextSlideBarItem = sideBarItems.value.find((sideBarItem) => !showingBoxKeys.value.includes(sideBarItem.$key));
     if (!nextSlideBarItem) {
       activeTabName.value = '';
-      services?.uiService.set('hideSlideBar', true);
+      uiService.set('hideSlideBar', true);
       return;
     }
-    services?.uiService.set('hideSlideBar', false);
+    uiService.set('hideSlideBar', false);
     activeTabName.value = nextSlideBarItem?.text;
   },
 );
+
+const headerItemClickHandler = async (config: SideComponent, index: number) => {
+  if (typeof config.beforeClick === 'function') {
+    if ((await config.beforeClick(config)) === false) {
+      return;
+    }
+  }
+  activeTabName.value = config.text || config.$key || `${index}`;
+};
 
 defineExpose({
   activeTabName,

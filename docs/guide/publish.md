@@ -13,7 +13,7 @@ runtime 的概念，是理解tmagic-editor项目页运行的重要概念，runti
 
 所以更深入描述，runtime 是tmagic-editor页面的渲染环境，提供不同场景下的能力封装。如果理解了tmagic-editor的设计，阅读了tmagic-editor的源码，可以发现，runtime 只是对tmagic-editor的渲染器做了一层包装，在不同 runtime 中，tmagic-editor的渲染逻辑和组件代码都是相同的。
 
-并且，由于tmagic-editor在编辑器中的模拟器是通过 iframe 渲染的，和tmagic-editor平台本身可以做到框架解耦，所以 runtime 也可以用不同框架开发。目前tmagic-editor提供了 vue2/vue3 和 react 的 runtime 示例。
+并且，由于tmagic-editor在编辑器中的模拟器是通过 iframe 渲染的，和tmagic-editor平台本身可以做到框架解耦，所以 runtime 也可以用不同框架开发。目前tmagic-editor提供了 vue 和 react 的 runtime 示例。
 
 各个 runtime 的作用除了作为不同场景下的渲染环境，同时也是不同环境的打包构建载体。tmagic-editor示例代码中的打包就是基于 runtime 进行的。
 
@@ -21,8 +21,7 @@ runtime 的概念，是理解tmagic-editor项目页运行的重要概念，runti
 由于 runtime 是页面渲染的承载环境，其中会加载 @tmagic/ui 以及各个业务组件，业务发布项目页也是基于 runtime，所以在 runtime 中实现业务方的自定义逻辑是最合适的。runtime 可以提供一些全局 API，供业务组件调用。我们可以把下面的模拟器中的 runtime 视为一个业务方runtime。
 
 tmagic-editor提供了三个版本的 runtime 示例，可以参考：
-- [vue3 runtime](https://github.com/Tencent/tmagic-editor/blob/master/runtime/vue3)
-- [vue2 runtime](https://github.com/Tencent/tmagic-editor/blob/master/runtime/vue2)
+- [vue runtime](https://github.com/Tencent/tmagic-editor/blob/master/runtime/vue)
 - [react runtime](https://github.com/Tencent/tmagic-editor/blob/master/runtime/react)
 
 ### 真实页面渲染（Page）

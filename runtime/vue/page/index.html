@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <title>Vue Page</title>
+    <style>
+      html,
+      body,
+      #app {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      #app {
+        position: relative;
+        overflow: auto;
+      }
+
+      #app::-webkit-scrollbar {
+        width: 0 !important;
+        display: none;
+      }
+    </style>
+  </head>
+  <body style="font-size: 14px">
+    <div id="app"></div>
+
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

@@ -1,36 +1,30 @@
 {
-  "version": "1.4.7",
+  "version": "1.7.8",
   "name": "@tmagic/element-plus-adapter",
   "type": "module",
-  "sideEffects": [
-    "dist/*"
-  ],
+  "sideEffects": false,
   "main": "dist/tmagic-element-plus-adapter.umd.cjs",
-  "module": "dist/tmagic-element-plus-adapter.js",
+  "module": "dist/es/index.js",
   "types": "types/index.d.ts",
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
-      "import": "./dist/tmagic-element-plus-adapter.js",
+      "import": "./dist/es/index.js",
       "require": "./dist/tmagic-element-plus-adapter.umd.cjs"
     },
     "./*": "./*"
   },
   "files": [
     "dist",
-    "types"
+    "types",
+    "src"
   ],
   "license": "Apache-2.0",
-  "scripts": {
-    "build": "npm run build:type && vite build",
-    "build:type": "npm run clear:type && tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
-    "clear:type": "rimraf ./types",
-    "check:type": "tsc --noEmit --project tsconfig.build.json"
-  },
   "engines": {
     "node": ">=18"
   },
   "repository": {
+    "directory": "packages/element-plus-adapter",
     "type": "git",
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
@@ -41,15 +35,11 @@
     "vue3",
     "typescript"
   ],
-  "devDependencies": {
-    "@types/node": "^18.19.0",
-    "rimraf": "^3.0.2",
-    "vite": "^5.2.12"
-  },
   "peerDependencies": {
     "@tmagic/design": "workspace:*",
-    "element-plus": "^2.7.4",
-    "typescript": "*"
+    "element-plus": ">=2.9.0",
+    "vue": "catalog:",
+    "typescript": "catalog:"
   },
   "peerDependenciesMeta": {
     "typescript": {

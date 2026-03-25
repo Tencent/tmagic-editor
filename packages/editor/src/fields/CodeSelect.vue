@@ -16,53 +16,53 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, watch } from 'vue';
+import { computed, watch } from 'vue';
 import { isEmpty } from 'lodash-es';
 
+import { HookCodeType, HookType } from '@tmagic/core';
 import { TMagicCard } from '@tmagic/design';
-import type { FieldProps, FormItem } from '@tmagic/form';
-import { FormState, MContainer } from '@tmagic/form';
-import { HookCodeType, HookType } from '@tmagic/schema';
+import type { CodeSelectConfig, ContainerChangeEventData, FieldProps, GroupListConfig } from '@tmagic/form';
+import { MContainer } from '@tmagic/form';
 
-import type { Services } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
 
 defineOptions({
   name: 'MFieldsCodeSelect',
 });
 
-const emit = defineEmits(['change']);
+const emit = defineEmits<{
+  change: [v: any, eventData: ContainerChangeEventData];
+}>();
 
-const services = inject<Services>('services');
+const { dataSourceService, codeBlockService } = useServices();
 
-const props = withDefaults(
-  defineProps<
-    FieldProps<
-      {
-        className?: string;
-      } & FormItem
-    >
-  >(),
-  {},
-);
+const props = withDefaults(defineProps<FieldProps<CodeSelectConfig>>(), {});
 
-const codeConfig = computed(() => ({
+const codeConfig = computed<GroupListConfig>(() => ({
   type: 'group-list',
   name: 'hookData',
   enableToggleMode: false,
   expandAll: true,
-  title: (mForm: FormState, { model, index }: any) => {
+  title: (mForm, { model, index }: any) => {
     if (model.codeType === HookCodeType.DATA_SOURCE_METHOD) {
       if (Array.isArray(model.codeId)) {
         if (model.codeId.length < 2) {
           return index;
         }
 
-        const ds = services?.dataSourceService.getDataSourceById(model.codeId[0]);
+        const ds = dataSourceService.getDataSourceById(model.codeId[0]);
         return `${ds?.title} / ${model.codeId[1]}`;
       }
 
       return Array.isArray(model.codeId) ? model.codeId.join('/') : index;
     }
+
+    const codeContent = codeBlockService.getCodeContentById(model.codeId);
+
+    if (codeContent) {
+      return codeContent.name;
+    }
+
     return model.codeId || index;
   },
   items: [
@@ -72,17 +72,17 @@ const codeConfig = computed(() => ({
         {
           type: 'select',
           name: 'codeType',
-          span: 8,
+          span: 6,
           options: [
             { value: HookCodeType.CODE, text: '代码块' },
             { value: HookCodeType.DATA_SOURCE_METHOD, text: '数据源方法' },
           ],
           defaultValue: 'code',
-          onChange: (mForm: FormState, v: HookCodeType, { model }: any) => {
+          onChange: (_mForm, v: HookCodeType, { setModel }) => {
             if (v === HookCodeType.DATA_SOURCE_METHOD) {
-              model.codeId = [];
+              setModel('codeId', []);
             } else {
-              model.codeId = '';
+              setModel('codeId', '');
             }
 
             return v;
@@ -91,18 +91,18 @@ const codeConfig = computed(() => ({
         {
           type: 'code-select-col',
           name: 'codeId',
-          span: 16,
+          span: 18,
           labelWidth: 0,
-          display: (mForm: FormState, { model }: any) => model.codeType !== HookCodeType.DATA_SOURCE_METHOD,
-          notEditable: () => !services?.codeBlockService.getEditStatus(),
+          display: (_mForm, { model }) => model.codeType !== HookCodeType.DATA_SOURCE_METHOD,
+          notEditable: () => !codeBlockService.getEditStatus(),
         },
         {
           type: 'data-source-method-select',
           name: 'codeId',
-          span: 16,
+          span: 18,
           labelWidth: 0,
-          display: (mForm: FormState, { model }: any) => model.codeType === HookCodeType.DATA_SOURCE_METHOD,
-          notEditable: () => !services?.dataSourceService.get('editable'),
+          display: (_mForm, { model }) => model.codeType === HookCodeType.DATA_SOURCE_METHOD,
+          notEditable: () => !dataSourceService.get('editable'),
         },
       ],
     },
@@ -126,7 +126,5 @@ watch(
   },
 );
 
-const changeHandler = async () => {
-  emit('change', props.model[props.name]);
-};
+const changeHandler = (v: any, eventData: ContainerChangeEventData) => emit('change', v, eventData);
 </script>

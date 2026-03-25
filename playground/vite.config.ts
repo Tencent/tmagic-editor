@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,18 +22,9 @@ import { defineConfig } from 'vite';
 import legacy from '@vitejs/plugin-legacy';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
-import AutoImport from 'unplugin-auto-import/vite';
-import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
-import Components from 'unplugin-vue-components/vite';
 
 export default defineConfig({
   plugins: [
-    AutoImport({
-      resolvers: [ElementPlusResolver()],
-    }),
-    Components({
-      resolvers: [ElementPlusResolver()],
-    }),
     vue(),
     vueJsx(),
     legacy({
@@ -44,22 +35,27 @@ export default defineConfig({
   base: '/tmagic-editor/playground/',
 
   resolve: {
-    alias: [
+    alias: process.env.NODE_ENV === 'development' ? [
       {
         find: /^@tmagic\/editor\/dist\/style.css/,
         replacement: path.join(__dirname, '../packages/editor/src/theme/index.scss'),
       },
       {
-        find: /^@tmagic\/form\/dist\/style.css/,
+        find: /^@tmagic\/form\/src\/theme\/index.scss/,
         replacement: path.join(__dirname, '../packages/form/src/theme/index.scss'),
       },
       {
-        find: /^@tmagic\/table\/dist\/style.css/,
-        replacement: path.join(__dirname, '../packages/table/dist/style.css'),
+        find: /^@tmagic\/table\/src\/theme\/index.scss/,
+        replacement: path.join(__dirname, '../packages/table/src/theme/index.scss'),
+      },
+      {
+        find: /^@tmagic\/design\/src\/theme\/index.scss/,
+        replacement: path.join(__dirname, '../packages/design/src/theme/index.scss'),
       },
       { find: /^@tmagic\/core/, replacement: path.join(__dirname, '../packages/core/src/index.ts') },
       { find: /^@editor/, replacement: path.join(__dirname, '../packages/editor/src/') },
       { find: /^@tmagic\/editor/, replacement: path.join(__dirname, '../packages/editor/src/index.ts') },
+      { find: /^@tmagic\/form-schema/, replacement: path.join(__dirname, '../packages/form-schema/src/index.ts') },
       { find: /^@tmagic\/schema/, replacement: path.join(__dirname, '../packages/schema/src/index.ts') },
       { find: /^@tmagic\/form/, replacement: path.join(__dirname, '../packages/form/src/index.ts') },
       {
@@ -70,21 +66,38 @@ export default defineConfig({
       { find: /^@tmagic\/stage/, replacement: path.join(__dirname, '../packages/stage/src/index.ts') },
       { find: /^@tmagic\/utils/, replacement: path.join(__dirname, '../packages/utils/src/index.ts') },
       { find: /^@tmagic\/design/, replacement: path.join(__dirname, '../packages/design/src/index.ts') },
-      { find: /^@tmagic\/data-source/, replacement: path.join(__dirname, '../packages/data-source/src/index.ts') },
+      {
+        find: /^@tmagic\/data-source/,
+        replacement: path.join(__dirname, '../packages/data-source/src/index.ts'),
+      },
       { find: /^@tmagic\/dep/, replacement: path.join(__dirname, '../packages/dep/src/index.ts') },
       { find: /^@data-source/, replacement: path.join(__dirname, '../packages/data-source/src') },
       {
         find: /^@tmagic\/element-plus-adapter/,
         replacement: path.join(__dirname, '../packages/element-plus-adapter/src/index.ts'),
       },
+      {
+        find: /^@tmagic\/tdesign-vue-next-adapter/,
+        replacement: path.join(__dirname, '../packages/tdesign-vue-next-adapter/src/index.ts'),
+      },
+    ] : [
+      { find: 'vue', replacement: path.join(__dirname, './node_modules/vue') },
     ],
   },
 
   optimizeDeps: {
-    esbuildOptions: {
-      define: {
-        global: 'globalThis',
+    rolldownOptions: {
+      transform: {
+        define: {
+          global: 'globalThis',
+        },
       },
+    },
+  },
+
+  css: {
+    lightningcss: {
+      errorRecovery: true,
     },
   },
 

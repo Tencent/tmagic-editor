@@ -9,7 +9,7 @@
           :size="size"
           @change="keyChangeHandler"
         ></TMagicInput>
-        <span class="m-fileds-key-value-delimiter">:</span>
+        <span class="m-fields-key-value-delimiter">:</span>
         <TMagicInput
           placeholder="value"
           v-model="records[index][1]"
@@ -19,7 +19,7 @@
         ></TMagicInput>
 
         <TMagicButton
-          class="m-fileds-key-value-delete"
+          class="m-fields-key-value-delete"
           type="danger"
           :size="size"
           :disabled="disabled"
@@ -37,11 +37,15 @@
 
     <MagicCodeEditor
       v-if="config.advanced && showCode"
-      height="200px"
+      editor-custom-type="m-fields-key-value"
+      language="javascript"
       :init-values="model[name]"
-      language="json"
       :options="{
         readOnly: disabled,
+      }"
+      :autosize="{
+        minRows: 1,
+        maxRows: 20,
       }"
       :parse="true"
       @save="save"
@@ -63,7 +67,7 @@ import { ref, watchEffect } from 'vue';
 import { Delete, Plus } from '@element-plus/icons-vue';
 
 import { TMagicButton, TMagicInput } from '@tmagic/design';
-import type { FieldProps, FormItem } from '@tmagic/form';
+import type { FieldProps, KeyValueConfig } from '@tmagic/form';
 
 import CodeIcon from '@editor/icons/CodeIcon.vue';
 import MagicCodeEditor from '@editor/layouts/CodeEditor.vue';
@@ -72,36 +76,31 @@ defineOptions({
   name: 'MFieldsKeyValue',
 });
 
-const props = withDefaults(
-  defineProps<
-    FieldProps<
-      {
-        type: 'key-value';
-        advanced?: boolean;
-      } & FormItem
-    >
-  >(),
-  {
-    disabled: false,
-  },
-);
+const props = withDefaults(defineProps<FieldProps<KeyValueConfig>>(), {
+  disabled: false,
+});
 
-const emit = defineEmits<(e: 'change', value: Record<string, any>) => void>();
+const emit = defineEmits<{
+  change: [value: Record<string, any>];
+}>();
 
 const records = ref<[string, string][]>([]);
 const showCode = ref(false);
 
 watchEffect(() => {
-  const initValues: [string, any][] = Object.entries(props.model[props.name] || {});
+  if (typeof props.model[props.name] === 'function') {
+    showCode.value = true;
+  } else {
+    const initValues: [string, any][] = Object.entries(props.model[props.name] || {});
 
-  for (const [, value] of initValues) {
-    if (typeof value !== 'string') {
-      showCode.value = true;
-      break;
+    for (const [, value] of initValues) {
+      if (typeof value !== 'string') {
+        showCode.value = true;
+        break;
+      }
     }
+    records.value = initValues;
   }
-
-  records.value = initValues;
 });
 
 const getValue = () => {

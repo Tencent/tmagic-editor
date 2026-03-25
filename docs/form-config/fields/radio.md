@@ -5,8 +5,8 @@
 ## TS 定义
 
 ```typescript
-interface RedioGroup extends FormItem {
-  type: 'redioGroup';
+interface RadioGroup extends FormItem {
+  type: 'radio-group';
   options: {
     value: any;
     text: string;

@@ -1,16 +1,14 @@
-import { h } from 'vue';
+import { computed, h, Ref, ref, unref } from 'vue';
 import {
   Badge as TBadge,
   Button as TButton,
   Card as TCard,
   Cascader as TCascader,
-  Checkbox as TCheckbox,
   CheckboxGroup as TCheckboxGroup,
   Col as TCol,
   Collapse as TCollapse,
   CollapsePanel as TCollapsePanel,
   ColorPicker as TColorPicker,
-  Dialog as TDialog,
   DialogPlugin,
   Divider as TDivider,
   Drawer as TDrawer,
@@ -19,29 +17,25 @@ import {
   Form as TForm,
   FormItem as TFormItem,
   InputNumber as TInputNumber,
+  LoadingDirective,
   MessagePlugin,
   Option as TOption,
   OptionGroup as TOptionGroup,
-  Pagination as TPagination,
-  Radio as TRadio,
-  RadioButton as TRadioButton,
   RadioGroup as TRadioGroup,
   Row as TRow,
   Select as TSelect,
   StepItem as TStepItem,
   Steps as TSteps,
   Switch as TSwitch,
-  Table as TTable,
   TabPanel as TTabPanel,
-  Tabs as TTabs,
   Tag as TTag,
   TimePicker as TTimePicker,
   Tooltip as TTooltip,
-  TreeNodeModel,
   Upload as TUpload,
 } from 'tdesign-vue-next';
 
 import type {
+  AutocompleteProps,
   BadgeProps,
   ButtonProps,
   CardProps,
@@ -65,7 +59,7 @@ import type {
   OptionGroupProps,
   OptionProps,
   PaginationProps,
-  PopoverProps,
+  PopconfirmProps,
   RadioButtonProps,
   RadioGroupProps,
   RadioProps,
@@ -73,36 +67,102 @@ import type {
   StepProps,
   StepsProps,
   SwitchProps,
-  TableColumnProps,
   TableProps,
   TabPaneProps,
   TabsProps,
   TagProps,
   TimePickerProps,
   TooltipProps,
-  TreeProps,
   UploadProps,
 } from '@tmagic/design';
 
+import AutoComplete from './AutoComplete.vue';
+import Checkbox from './Checkbox.vue';
 import DatePicker from './DatePicker.vue';
+import Dialog from './Dialog.vue';
 import Icon from './Icon.vue';
 import Input from './Input.vue';
-import Popover from './Popover.vue';
+import Pagination from './Pagination.vue';
+import Popconfirm from './Popconfirm.vue';
+import Radio from './Radio.vue';
+import RadioButton from './RadioButton.vue';
 import Scrollbar from './Scrollbar.vue';
-import TableColumn from './TableColumn.vue';
-import Tree from './Tree.vue';
+import Table from './Table.vue';
+import Tabs from './Tabs.vue';
+
+const messageBox = (options: {
+  type?: 'info' | 'success' | 'warning' | 'error';
+  message?: string;
+  dangerouslyUseHTMLString?: boolean;
+  duration?: number;
+}) =>
+  MessagePlugin(options.type || 'info', {
+    duration: options.duration || 3000,
+    content: options.message,
+  });
+
+messageBox.success = MessagePlugin.success;
+messageBox.error = MessagePlugin.error;
+messageBox.warning = MessagePlugin.warning;
+messageBox.info = MessagePlugin.info;
+
+const zIndex = ref(0);
+const DEFAULT_INITIAL_Z_INDEX = 2500;
+
+const useZIndex = (zIndexOverrides?: Ref<number>) => {
+  const zIndexInjection = zIndexOverrides;
+  const initialZIndex = computed(() => {
+    const zIndexFromInjection = unref(zIndexInjection);
+    return zIndexFromInjection ?? DEFAULT_INITIAL_Z_INDEX;
+  });
+  const currentZIndex = computed(() => initialZIndex.value + zIndex.value);
+
+  const nextZIndex = () => {
+    zIndex.value += 1;
+    return currentZIndex.value;
+  };
+
+  return {
+    initialZIndex,
+    currentZIndex,
+    nextZIndex,
+  };
+};
 
 const adapter: any = {
-  message: MessagePlugin,
+  adapterType: 'tdesign-vue-next',
+  message: messageBox,
   messageBox: {
-    alert: (msg: string) => {
-      DialogPlugin.alert({
-        body: msg,
+    alert: (msg: string, title?: string) => {
+      return new Promise((resolve, reject) => {
+        const dia = DialogPlugin.alert({
+          header: title,
+          body: msg,
+          onConfirm: (e) => {
+            dia.hide();
+            resolve(e);
+          },
+          onClose: (e) => {
+            dia.hide();
+            reject(e);
+          },
+        });
       });
     },
-    confirm: (msg: string) => {
-      DialogPlugin.confirm({
-        body: msg,
+    confirm: (msg: string, title?: string) => {
+      return new Promise((resolve, reject) => {
+        const dia = DialogPlugin.confirm({
+          header: title,
+          body: msg,
+          onConfirm: (e) => {
+            dia.hide();
+            resolve(e);
+          },
+          onClose: (e) => {
+            dia.hide();
+            reject(e);
+          },
+        });
       });
     },
     close: (msg: string) => {
@@ -110,6 +170,10 @@ const adapter: any = {
     },
   },
   components: {
+    autocomplete: {
+      component: AutoComplete,
+      props: (props: AutocompleteProps) => props,
+    },
     badge: {
       component: TBadge,
       props: (props: BadgeProps) => ({
@@ -122,10 +186,10 @@ const adapter: any = {
     button: {
       component: TButton,
       props: (props: ButtonProps) => ({
-        theme: props.type,
+        theme: props.type ? props.type : 'default',
         size: props.size === 'default' ? 'medium' : props.size,
-        icon: () => (props.icon ? h(props.icon) : null),
-        variant: props.link || props.text ? 'text' : 'base',
+        icon: props.icon ? () => h(Icon, null, { default: () => h(props.icon) }) : undefined,
+        variant: props.link || props.text ? 'text' : props.variant || 'base',
         shape: props.circle ? 'circle' : 'rectangle',
       }),
     },
@@ -136,6 +200,8 @@ const adapter: any = {
         shadow: props.shadow !== 'never',
         hoverShadow: props.shadow === 'hover',
         header: props.header,
+        bodyStyle: props.bodyStyle,
+        headerBordered: true,
       }),
     },
 
@@ -158,13 +224,8 @@ const adapter: any = {
     },
 
     checkbox: {
-      component: TCheckbox,
-      props: (props: CheckboxProps) => ({
-        modelValue: props.modelValue,
-        label: props.label,
-        value: props.value,
-        disabled: props.disabled,
-      }),
+      component: Checkbox,
+      props: (props: CheckboxProps) => props,
     },
 
     checkboxGroup: {
@@ -179,14 +240,14 @@ const adapter: any = {
     col: {
       component: TCol,
       props: (props: ColProps) => ({
-        span: props.span,
+        span: props.span ? props.span / 2 : 12,
       }),
     },
 
     collapse: {
       component: TCollapse,
       props: (props: CollapseProps) => ({
-        value: props.modelValue,
+        modelValue: props.modelValue,
         expandIconPlacement: 'right',
       }),
     },
@@ -217,15 +278,8 @@ const adapter: any = {
     },
 
     dialog: {
-      component: TDialog,
-      props: (props: DialogProps) => ({
-        visible: props.modelValue,
-        attach: props.appendToBody ? 'body' : '',
-        header: props.title,
-        width: props.width,
-        mode: props.fullscreen ? 'full-screen' : 'modal',
-        closeOnOverlayClick: props.closeOnClickModal,
-      }),
+      component: Dialog,
+      props: (props: DialogProps) => props,
     },
 
     divider: {
@@ -300,6 +354,8 @@ const adapter: any = {
         labelWidth: props.labelWidth,
         name: props.prop,
         rules: props.rules,
+        help: props.extra ? () => h('div', { innerHTML: props.extra }) : undefined,
+        labelAlign: props.labelPosition,
       }),
     },
 
@@ -342,33 +398,18 @@ const adapter: any = {
     },
 
     pagination: {
-      component: TPagination,
-      props: (props: PaginationProps) => ({
-        current: props.curPage,
-        pageSizeOptions: props.pageSizes,
-        pageSize: props.pagesize,
-        total: props.total,
-      }),
-    },
-
-    popover: {
-      component: Popover,
-      props: (props: PopoverProps) => props,
+      component: Pagination,
+      props: (props: PaginationProps) => props,
     },
 
     radio: {
-      component: TRadio,
-      props: (props: RadioProps) => ({
-        label: props.label,
-        value: props.value,
-      }),
+      component: Radio,
+      props: (props: RadioProps) => props,
     },
 
     radioButton: {
-      component: TRadioButton,
-      props: (props: RadioButtonProps) => ({
-        label: props.label,
-      }),
+      component: RadioButton,
+      props: (props: RadioButtonProps) => props,
     },
 
     radioGroup: {
@@ -398,8 +439,8 @@ const adapter: any = {
         disabled: props.disabled,
         placeholder: props.placeholder,
         multiple: props.multiple,
-        valueType: props.valueKey,
         remoteMethod: props.onSearch,
+        creatable: props.allowCreate,
         size: props.size === 'default' ? 'medium' : props.size,
         popupProps: {
           overlayClassName: props.popperClass,
@@ -434,13 +475,8 @@ const adapter: any = {
     },
 
     table: {
-      component: TTable,
+      component: Table,
       props: (props: TableProps) => props,
-    },
-
-    tableColumn: {
-      component: TableColumn,
-      props: (props: TableColumnProps) => props,
     },
 
     tabPane: {
@@ -452,13 +488,8 @@ const adapter: any = {
     },
 
     tabs: {
-      component: TTabs,
-      props: (props: TabsProps) => ({
-        addable: props.editable,
-        theme: props.type === 'card' ? 'card' : 'normal',
-        placement: props.tabPosition,
-        value: props.modelValue,
-      }),
+      component: Tabs,
+      props: (props: TabsProps) => props,
     },
 
     tag: {
@@ -482,35 +513,9 @@ const adapter: any = {
       component: TTooltip,
       props: (props: TooltipProps) => ({
         ...props,
-        placement: props.placement,
+        placement: props.placement?.replace(/\B([A-Z])/g, '-$1').toLowerCase(),
         content: props.content,
       }),
-    },
-
-    tree: {
-      component: Tree,
-      props: (props: TreeProps) => ({
-        ...props,
-        data: props.data,
-        draggable: props.draggable,
-        activable: props.highlightCurrent,
-        activeMultiple: props.highlightCurrent,
-        defaultActived: props.defaultCheckedKeys,
-        checkable: props.showCheckbox,
-        empty: props.emptyText,
-        expandAll: props.defaultExpandAll,
-        checkStrictly: props.checkStrictly,
-        load: props.load,
-        keys: props.props,
-      }),
-      listeners: {
-        click(context: { node: TreeNodeModel<any>; e: MouseEvent }) {
-          return {
-            node: context.node,
-            data: context.node.data,
-          };
-        },
-      },
     },
 
     upload: {
@@ -521,7 +526,14 @@ const adapter: any = {
         autoUpload: props.autoUpload,
       }),
     },
+
+    popconfirm: {
+      component: Popconfirm,
+      props: (props: PopconfirmProps) => props,
+    },
   },
+  loading: LoadingDirective,
+  useZIndex,
 };
 
 export default adapter;

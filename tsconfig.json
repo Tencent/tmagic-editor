@@ -1,10 +1,12 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "temp",
     "target": "ESNext",
     "module": "ESNext",
     "strict": true,
     "jsx": "preserve",
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -14,19 +16,22 @@
     "resolveJsonModule": true,
     "sourceMap": true,
     "useDefineForClassFields": true,
-    "baseUrl": ".",
     "lib": ["ESNext", "DOM"],
     "paths": {
+      "vue": ["./node_modules/vue"],
       // 内部模块都指向 src/index.ts, 会有更好的代码跳转体验.
-      "@tmagic/*": ["packages/*/src"],
-      "@tmagic/tmagic-form-runtime": ["runtime/tmagic-form/src"],
-      "@editor/*": ["packages/editor/src/*"],
-      "@form/*": ["packages/form/src/*"],
-      "@data-source/*": ["packages/data-source/src/*"],
+      "@tmagic/*": ["./packages/*/src"],
+      "@tmagic/tmagic-form-runtime": ["./runtime/tmagic-form/src"],
+      "@tmagic/vue-runtime-help": ["./runtime/vue-runtime-help/src"],
+      "@tmagic/react-runtime-help": ["./runtime/react-runtime-help/src"],
+      "@editor/*": ["./packages/editor/src/*"],
+      "@form/*": ["./packages/form/src/*"],
+      "@data-source/*": ["./packages/data-source/src/*"],
     },
     "types": [
       "node",
       "vite/client",
+      "./shims-vue",
     ],
   },
   "exclude": [

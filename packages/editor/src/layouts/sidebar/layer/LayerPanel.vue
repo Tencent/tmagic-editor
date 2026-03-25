@@ -10,6 +10,8 @@
       ref="tree"
       :data="nodeData"
       :node-status-map="nodeStatusMap"
+      :indent="indent"
+      :next-level-indent-increment="nextLevelIndentIncrement"
       @node-dragover="handleDragOver"
       @node-dragstart="handleDragStart"
       @node-dragleave="handleDragLeave"
@@ -45,15 +47,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref } from 'vue';
+import { computed, useTemplateRef } from 'vue';
 
+import type { MNode } from '@tmagic/core';
 import { TMagicScrollbar } from '@tmagic/design';
-import type { MNode } from '@tmagic/schema';
 
 import SearchInput from '@editor/components/SearchInput.vue';
 import Tree from '@editor/components/Tree.vue';
 import { useFilter } from '@editor/hooks/use-filter';
-import { LayerPanelSlots, MenuButton, MenuComponent, Services, TreeNodeData } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
+import type { CustomContentMenuFunction, LayerPanelSlots, MenuButton, MenuComponent, TreeNodeData } from '@editor/type';
 
 import LayerMenu from './LayerMenu.vue';
 import LayerNodeTool from './LayerNodeTool.vue';
@@ -70,19 +73,21 @@ defineOptions({
 
 defineProps<{
   layerContentMenu: (MenuButton | MenuComponent)[];
-  customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
+  indent?: number;
+  nextLevelIndentIncrement?: number;
+  customContentMenu: CustomContentMenuFunction;
 }>();
 
-const services = inject<Services>('services');
-const editorService = services?.editorService;
+const services = useServices();
+const { editorService } = services;
 
-const tree = ref<InstanceType<typeof Tree>>();
+const treeRef = useTemplateRef<InstanceType<typeof Tree>>('tree');
 
-const page = computed(() => editorService?.get('page'));
+const page = computed(() => editorService.get('page'));
 const nodeData = computed<TreeNodeData[]>(() => (!page.value ? [] : [page.value]));
 
 const { nodeStatusMap } = useNodeStatus(services);
-const { isCtrlKeyDown } = useKeybinding(services, tree);
+const { isCtrlKeyDown } = useKeybinding(services, treeRef);
 
 const filterNodeMethod = (v: string, data: MNode): boolean => {
   let name = '';
@@ -110,10 +115,11 @@ const collapseAllHandler = () => {
 
 const { handleDragStart, handleDragEnd, handleDragLeave, handleDragOver } = useDrag(services);
 
+// 右键菜单
+const menuRef = useTemplateRef<InstanceType<typeof LayerMenu>>('menu');
 const {
-  menu,
   nodeClickHandler,
   nodeContentMenuHandler,
   highlightHandler: mouseenterHandler,
-} = useClick(services, isCtrlKeyDown, nodeStatusMap);
+} = useClick(services, isCtrlKeyDown, nodeStatusMap, menuRef);
 </script>

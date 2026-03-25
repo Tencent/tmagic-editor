@@ -2,13 +2,16 @@
   <div class="m-fields-page-fragment-select">
     <div class="page-fragment-select-container">
       <!-- 页面片下拉框 -->
-      <m-form-container
+      <MSelect
         class="select"
         :config="selectConfig"
         :model="model"
+        :name="name"
         :size="size"
+        :prop="prop"
+        :disabled="disabled"
         @change="changeHandler"
-      ></m-form-container>
+      ></MSelect>
       <!-- 编辑按钮 -->
       <Icon v-if="model[name]" class="icon" :icon="Edit" @click="editPageFragment(model[name])"></Icon>
     </div>
@@ -16,32 +19,32 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject } from 'vue';
+import { computed } from 'vue';
 import { Edit } from '@element-plus/icons-vue';
 
-import { FieldProps } from '@tmagic/form';
-import { Id, NodeType } from '@tmagic/schema';
+import { Id, NodeType } from '@tmagic/core';
+import { FieldProps, MSelect, type PageFragmentSelectConfig, type SelectConfig } from '@tmagic/form';
 
 import Icon from '@editor/components/Icon.vue';
-import type { PageFragmentSelectConfig, Services } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
 
 defineOptions({
   name: 'MFieldsPageFragmentSelect',
 });
 
-const services = inject<Services>('services');
+const { editorService } = useServices();
 const emit = defineEmits(['change']);
 
-const props = withDefaults(defineProps<FieldProps<PageFragmentSelectConfig>>(), {
+withDefaults(defineProps<FieldProps<PageFragmentSelectConfig>>(), {
   disabled: false,
 });
+
 const pageList = computed(() =>
-  services?.editorService.get('root')?.items.filter((item) => item.type === NodeType.PAGE_FRAGMENT),
+  editorService.get('root')?.items.filter((item) => item.type === NodeType.PAGE_FRAGMENT),
 );
 
-const selectConfig = {
+const selectConfig: SelectConfig = {
   type: 'select',
-  name: props.name,
   options: () => {
     if (pageList.value) {
       return pageList.value.map((item) => ({
@@ -53,11 +56,11 @@ const selectConfig = {
     return [];
   },
 };
-const changeHandler = async () => {
-  emit('change', props.model[props.name]);
+const changeHandler = (v: Id) => {
+  emit('change', v);
 };
 
 const editPageFragment = (id: Id) => {
-  services?.editorService.select(id);
+  editorService.select(id);
 };
 </script>

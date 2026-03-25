@@ -1,8 +1,9 @@
 import { toRaw } from 'vue';
 import { isEmpty } from 'lodash-es';
 
-import { Id, MContainer, MNode, NodeType } from '@tmagic/schema';
-import { calcValueByFontsize, isPage, isPageFragment } from '@tmagic/utils';
+import type { Id, MContainer, MNode } from '@tmagic/core';
+import { NodeType } from '@tmagic/core';
+import { calcValueByFontsize, getElById, isPage, isPageFragment } from '@tmagic/utils';
 
 import editorService from '@editor/services/editor';
 import propsService from '@editor/services/props';
@@ -73,7 +74,8 @@ export const beforePaste = (position: PastePosition, config: MNode[], doc?: Docu
  */
 export const getPositionInContainer = (position: PastePosition = {}, id: Id, doc?: Document) => {
   let { left = 0, top = 0 } = position;
-  const parentEl = editorService.get('stage')?.renderer?.contentWindow?.document.getElementById(`${id}`);
+  const stageDoc = editorService.get('stage')?.renderer?.contentWindow?.document;
+  const parentEl = stageDoc && getElById()(stageDoc, `${id}`);
   const parentElRect = parentEl?.getBoundingClientRect();
   left = left - calcValueByFontsize(doc, parentElRect?.left || 0);
   top = top - calcValueByFontsize(doc, parentElRect?.top || 0);

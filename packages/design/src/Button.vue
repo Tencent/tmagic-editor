@@ -1,5 +1,8 @@
 <template>
   <component class="tmagic-design-button" :is="uiComponent" v-bind="uiProps" @click="clickHandler">
+    <template #icon v-if="$slots.icon">
+      <slot name="icon"></slot>
+    </template>
     <template #default v-if="$slots.default">
       <slot></slot>
     </template>
@@ -9,7 +12,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { ButtonProps } from './types';
 
 defineOptions({
@@ -18,11 +21,11 @@ defineOptions({
 
 const props = defineProps<ButtonProps>();
 
-const ui = getConfig('components')?.button;
+const ui = getDesignConfig('components')?.button;
 
 const uiComponent = ui?.component || 'el-button';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<ButtonProps>(() => ui?.props(props) || props);
 
 const emit = defineEmits(['click']);
 
@@ -30,3 +33,15 @@ const clickHandler = (...args: any[]) => {
   emit('click', ...args);
 };
 </script>
+
+<style lang="scss">
+.tmagic-design-button {
+  .t-button__text {
+    align-items: center;
+  }
+
+  + .tmagic-design-button {
+    margin-left: 12px;
+  }
+}
+</style>

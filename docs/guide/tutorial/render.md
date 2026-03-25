@@ -1,14 +1,12 @@
 # 3.[DSL](../conception.md#dsl) 解析渲染
 
-tmagic 提供了 vue3/vue2/react 三个版本的解析渲染组件，可以直接使用
+tmagic 提供了 vue/react 两个个版本的解析渲染组件，可以直接使用
 
 [@tmagic/ui](https://www.npmjs.com/package/@tmagic/ui)
 
-[@tmagic/ui-vue2](https://www.npmjs.com/package/@tmagic/ui-vue2)
-
 [@tmagic/ui-react](https://www.npmjs.com/package/@tmagic/ui-react)
 
-接下来是以vue3为基础，来讲述如何实现一个[@tmagic/ui](https://www.npmjs.com/package/@tmagic/ui)
+接下来是以vue为基础，来讲述如何实现一个[@tmagic/ui](https://www.npmjs.com/package/@tmagic/ui)
 
 ## 准备工作
 
@@ -71,7 +69,7 @@ app.component('hello-world', HelloWorld);
 
 ```vue
 <template>
-  <component v-if="config" :is="type" :id="`${id}`" :style="style" :config="config"></component>
+  <component v-if="config" :is="type" :tmagic-data-id="`${id}`" :style="style" :config="config"></component>
 </template>
 
 <script lang=ts setup>

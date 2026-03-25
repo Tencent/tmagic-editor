@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { createDiv, getDocument, injectStyle } from '@tmagic/utils';
+import { createDiv, getDocument, injectStyle } from '@tmagic/core';
 
 import { Mode, ZIndex } from './const';
 import Rule from './Rule';
@@ -158,8 +158,17 @@ export default class StageMask extends Rule {
     // 不可以有横向滚动
     if (!this.page || el.getBoundingClientRect().left >= this.page.scrollWidth) return;
 
+    const scrollParent = getScrollParent(el as HTMLElement);
+
+    if (scrollParent && scrollParent !== this.pageScrollParent) {
+      this.scrollIntoView(scrollParent);
+      return;
+    }
+
     el.scrollIntoView();
+
     if (!this.pageScrollParent) return;
+
     this.scrollLeft = this.pageScrollParent.scrollLeft;
     this.scrollTop = this.pageScrollParent.scrollTop;
 
@@ -170,12 +179,12 @@ export default class StageMask extends Rule {
    * 销毁实例
    */
   public destroy(): void {
+    super.destroy();
+
     this.content?.remove();
     this.page = null;
     this.pageScrollParent = null;
     this.wrapperResizeObserver?.disconnect();
-
-    super.destroy();
   }
 
   public on<Name extends keyof MaskEvents, Param extends MaskEvents[Name]>(
@@ -227,6 +236,12 @@ export default class StageMask extends Rule {
         const { clientHeight, clientWidth } = entry.target;
         this.wrapperHeight = clientHeight;
         this.wrapperWidth = clientWidth;
+
+        if (this.mode === Mode.FIXED) {
+          this.content.style.width = `${this.wrapperWidth}px`;
+          this.content.style.height = `${this.wrapperHeight}px`;
+        }
+
         this.setMaxScrollLeft();
         this.setMaxScrollTop();
       });
@@ -277,7 +292,9 @@ export default class StageMask extends Rule {
   private setHeight(height: number): void {
     this.height = height;
     this.setMaxScrollTop();
-    this.content.style.height = `${height}px`;
+    if (this.mode !== Mode.FIXED) {
+      this.content.style.height = `${height}px`;
+    }
   }
 
   /**
@@ -287,7 +304,9 @@ export default class StageMask extends Rule {
   private setWidth(width: number): void {
     this.width = width;
     this.setMaxScrollLeft();
-    this.content.style.width = `${width}px`;
+    if (this.mode !== Mode.FIXED) {
+      this.content.style.width = `${width}px`;
+    }
   }
 
   /**

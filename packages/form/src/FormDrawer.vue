@@ -27,6 +27,7 @@
         :label-width="labelWidth"
         :label-position="labelPosition"
         :inline="inline"
+        :prevent-submit-default="preventSubmitDefault"
         @change="changeHandler"
       ></Form>
       <slot></slot>
@@ -58,7 +59,7 @@ import { ref, watchEffect } from 'vue';
 import { TMagicButton, TMagicCol, TMagicDrawer, TMagicRow } from '@tmagic/design';
 
 import Form from './Form.vue';
-import type { FormConfig } from './schema';
+import type { ContainerChangeEventData, FormConfig, FormValue } from './schema';
 
 defineOptions({
   name: 'MFormDialog',
@@ -79,8 +80,9 @@ withDefaults(
     confirmText?: string;
     inline?: boolean;
     labelPosition?: string;
+    preventSubmitDefault?: boolean;
     /** 关闭前的回调，会暂停 Drawer 的关闭; done 是个 function type 接受一个 boolean 参数, 执行 done 使用 true 参数或不提供参数将会终止关闭 */
-    beforeClose?: (done: (cancel?: boolean) => void) => void;
+    beforeClose?: (_done: (_cancel?: boolean) => void) => void;
   }>(),
   {
     closeOnPressEscape: true,
@@ -107,15 +109,16 @@ watchEffect(() => {
 
 const submitHandler = async () => {
   try {
+    const changeRecords = form.value?.changeRecords;
     const values = await form.value?.submitForm();
-    emit('submit', values);
+    emit('submit', values, { changeRecords });
   } catch (e) {
     emit('error', e);
   }
 };
 
-const changeHandler = (value: any) => {
-  emit('change', value);
+const changeHandler = (value: FormValue, eventData: ContainerChangeEventData) => {
+  emit('change', value, eventData);
 };
 
 const openHandler = () => {

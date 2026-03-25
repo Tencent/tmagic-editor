@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { removeClassName } from '@tmagic/utils';
+import { getIdFromEl, removeClassName } from '@tmagic/core';
 
 import { GHOST_EL_ID_PREFIX, Mode, SELECTED_CLASS, ZIndex } from './const';
 import type { Offset, SortEventData, TargetElement } from './types';
@@ -88,13 +88,13 @@ export const getAbsolutePosition = (el: HTMLElement, { top, left }: Offset) => {
   return { left, top };
 };
 
-export const isAbsolute = (style: CSSStyleDeclaration): boolean => style.position === 'absolute';
+export const isAbsolute = (style: { position?: string }): boolean => style.position === 'absolute';
 
-export const isRelative = (style: CSSStyleDeclaration): boolean => style.position === 'relative';
+export const isRelative = (style: { position?: string }): boolean => style.position === 'relative';
 
-export const isStatic = (style: CSSStyleDeclaration): boolean => style.position === 'static';
+export const isStatic = (style: { position?: string }): boolean => style.position === 'static';
 
-export const isFixed = (style: CSSStyleDeclaration): boolean => style.position === 'fixed';
+export const isFixed = (style: { position?: string }): boolean => style.position === 'fixed';
 
 export const isFixedParent = (el: Element) => {
   let fixed = false;
@@ -170,7 +170,7 @@ export const down = (deltaTop: number, target: TargetElement): SortEventData => 
   let swapIndex = 0;
   let addUpH = target.clientHeight;
   const brothers = Array.from(target.parentNode?.children || []).filter(
-    (node) => !node.id.startsWith(GHOST_EL_ID_PREFIX),
+    (child) => !getIdFromEl()(child as HTMLElement)?.startsWith(GHOST_EL_ID_PREFIX),
   );
   const index = brothers.indexOf(target);
   // 往下移动
@@ -189,9 +189,12 @@ export const down = (deltaTop: number, target: TargetElement): SortEventData => 
     addUpH += ele.clientHeight / 2;
     swapIndex = i;
   }
+
+  const src = getIdFromEl()(target) || '';
+
   return {
-    src: target.id,
-    dist: downEls.length && swapIndex > -1 ? downEls[swapIndex].id : target.id,
+    src,
+    dist: downEls.length && swapIndex > -1 ? getIdFromEl()(downEls[swapIndex]) || '' : src,
   };
 };
 
@@ -204,7 +207,7 @@ export const down = (deltaTop: number, target: TargetElement): SortEventData => 
  */
 export const up = (deltaTop: number, target: TargetElement): SortEventData => {
   const brothers = Array.from(target.parentNode?.children || []).filter(
-    (node) => !node.id.startsWith(GHOST_EL_ID_PREFIX),
+    (child) => !getIdFromEl()(child as HTMLElement)?.startsWith(GHOST_EL_ID_PREFIX),
   );
   const index = brothers.indexOf(target);
   // 往上移动
@@ -225,9 +228,12 @@ export const up = (deltaTop: number, target: TargetElement): SortEventData => {
 
     swapIndex = i;
   }
+
+  const src = getIdFromEl()(target) || '';
+
   return {
-    src: target.id,
-    dist: upEls.length && swapIndex > -1 ? upEls[swapIndex].id : target.id,
+    src,
+    dist: upEls.length && swapIndex > -1 ? getIdFromEl()(upEls[swapIndex]) || '' : src,
   };
 };
 

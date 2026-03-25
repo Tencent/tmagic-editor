@@ -1,10 +1,10 @@
 <template>
   <component class="tmagic-design-card" :is="uiComponent" v-bind="uiProps">
-    <template #header>
+    <template #header v-if="$slots.header">
       <slot name="header" class="header"></slot>
     </template>
 
-    <template #default>
+    <template #default v-if="$slots.default">
       <slot name="default"></slot>
     </template>
   </component>
@@ -13,7 +13,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { CardProps } from './types';
 
 defineOptions({
@@ -22,9 +22,9 @@ defineOptions({
 
 const props = defineProps<CardProps>();
 
-const ui = getConfig('components')?.card;
+const ui = getDesignConfig('components')?.card;
 
 const uiComponent = ui?.component || 'el-card';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<CardProps>(() => ui?.props(props) || props);
 </script>

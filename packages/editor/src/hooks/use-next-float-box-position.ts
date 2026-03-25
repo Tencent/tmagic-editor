@@ -1,24 +1,24 @@
-import { Ref, ref } from 'vue';
+import { type Ref, ref } from 'vue';
 
-import { UiService } from '@editor/services/ui';
+import type { Services } from '@editor/type';
 
-export const useNextFloatBoxPosition = (uiService?: UiService, parent?: Ref<HTMLDivElement | null>) => {
+export const useNextFloatBoxPosition = (uiService: Services['uiService'], parent?: Ref<HTMLDivElement | null>) => {
   const boxPosition = ref({
     left: 0,
     top: 0,
   });
 
   const calcBoxPosition = () => {
-    const columnWidth = uiService?.get('columnWidth');
-    const navMenuRect = uiService?.get('navMenuRect');
-    let left = columnWidth?.left ?? 0;
+    const columnWidth = uiService.get('columnWidth');
+    const navMenuRect = uiService.get('navMenuRect');
+    let left = columnWidth.left ?? 0;
     if (parent?.value) {
-      const rect = parent?.value?.getBoundingClientRect();
-      left = (rect?.left ?? 0) + (rect?.width ?? 0);
+      const rect = parent.value.getBoundingClientRect();
+      left = rect.left + rect.width;
     }
     boxPosition.value = {
       left,
-      top: (navMenuRect?.top ?? 0) + (navMenuRect?.height ?? 0),
+      top: navMenuRect.top + navMenuRect.height,
     };
   };
 

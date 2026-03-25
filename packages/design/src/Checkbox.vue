@@ -6,7 +6,7 @@
     @update:modelValue="updateModelValue"
     @change="changeHandler"
   >
-    <template #default>
+    <template #default v-if="$slots.default">
       <slot></slot>
     </template>
   </component>
@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { CheckboxProps } from './types';
 
 defineOptions({
@@ -27,11 +27,11 @@ const props = withDefaults(defineProps<CheckboxProps>(), {
   falseValue: undefined,
 });
 
-const ui = getConfig('components')?.checkbox;
+const ui = getDesignConfig('components')?.checkbox;
 
 const uiComponent = ui?.component || 'el-checkbox';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<CheckboxProps>(() => ui?.props(props) || props);
 
 const emit = defineEmits(['change', 'update:modelValue']);
 

@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { TimePickerProps } from './types';
 
 defineOptions({
@@ -21,11 +21,11 @@ defineOptions({
 
 const props = defineProps<TimePickerProps>();
 
-const ui = getConfig('components')?.timePicker;
+const ui = getDesignConfig('components')?.timePicker;
 
 const uiComponent = ui?.component || 'el-time-picker';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<TimePickerProps>(() => ui?.props(props) || props);
 
 const emit = defineEmits(['change', 'update:modelValue']);
 

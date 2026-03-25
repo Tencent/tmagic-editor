@@ -53,10 +53,11 @@
 | 参数      | 说明          | 类型      | 可选值                           | 默认值  |
 |----------|-------------- |----------|--------------------------------  |-------- |
 | name | 绑定值 | string | — | — |
-| placeholder  | 输入框占位文本   | string |       —        |      —   |
 | text     | 表单标签   | string |       —        |      —   |
+| placeholder  | 输入框占位文本   | string |       —        |      —   |
 | disabled  | 是否禁用    | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | false   |
 | min      | 设置计数器允许的最小值 | number | — | -Infinity |
 | max      | 设置计数器允许的最大值 | number | — | Infinity |
 | step     | 计数器步长           | number   | — | 1 |
+| tooltip  | 输入框提示信息 | string | — | — |
 | onChange  | 值变化时触发的函数  | [OnChangeHandler](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | -   |

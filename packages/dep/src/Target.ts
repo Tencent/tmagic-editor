@@ -71,7 +71,7 @@ export default class Target {
 
     this.deps[id] = dep;
 
-    if (dep.keys.indexOf(key) === -1) {
+    if (!dep.keys.includes(key)) {
       dep.keys.push(key);
     }
   }
@@ -115,7 +115,7 @@ export default class Target {
   public hasDep(id: string | number, key: string | number) {
     const dep = this.deps[id];
 
-    return Boolean(dep?.keys.find((d) => d === key));
+    return dep?.keys.includes(key) ?? false;
   }
 
   public destroy() {

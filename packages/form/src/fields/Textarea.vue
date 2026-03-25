@@ -1,11 +1,12 @@
 <template>
   <TMagicInput
-    v-model="model[name]"
+    v-model="value"
     type="textarea"
     :size="size"
     clearable
     :placeholder="config.placeholder"
     :disabled="disabled"
+    :rows="config.rows"
     @change="changeHandler"
     @input="inputHandler"
   >
@@ -13,7 +14,7 @@
 </template>
 
 <script lang="ts" setup>
-import { inject } from 'vue';
+import { inject, ref, watch } from 'vue';
 
 import { TMagicInput } from '@tmagic/design';
 
@@ -30,6 +31,18 @@ const emit = defineEmits<{
   change: [value: string];
   input: [value: string];
 }>();
+
+const value = ref('');
+
+watch(
+  () => props.model[props.name],
+  (v) => {
+    value.value = v;
+  },
+  {
+    immediate: true,
+  },
+);
 
 useAddField(props.prop);
 

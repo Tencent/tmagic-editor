@@ -1,6 +1,6 @@
 <template>
   <div class="m-editor-data-source-methods">
-    <MagicTable :data="model[name]" :columns="methodColumns"></MagicTable>
+    <MagicTable :data="model[name]" :columns="methodColumns" :border="true"></MagicTable>
 
     <div class="m-editor-data-source-methods-footer">
       <TMagicButton size="small" type="primary" :disabled="disabled" plain @click="createCodeHandler"
@@ -21,33 +21,31 @@
 </template>
 
 <script setup lang="ts">
-import { TMagicButton } from '@tmagic/design';
-import type { FieldProps } from '@tmagic/form';
-import type { CodeBlockContent } from '@tmagic/schema';
+import { nextTick, ref, useTemplateRef } from 'vue';
+import { cloneDeep } from 'lodash-es';
+
+import type { CodeBlockContent } from '@tmagic/core';
+import { TMagicButton, tMagicMessageBox } from '@tmagic/design';
+import type { ContainerChangeEventData, DataSourceMethodsConfig, FieldProps } from '@tmagic/form';
 import { type ColumnConfig, MagicTable } from '@tmagic/table';
 
 import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
-import { useDataSourceMethod } from '@editor/hooks/use-data-source-method';
 import type { CodeParamStatement } from '@editor/type';
 
 defineOptions({
   name: 'MFieldsDataSourceMethods',
 });
 
-const props = withDefaults(
-  defineProps<
-    FieldProps<{
-      type: 'data-source-methods';
-    }>
-  >(),
-  {
-    disabled: false,
-  },
-);
+const props = withDefaults(defineProps<FieldProps<DataSourceMethodsConfig>>(), {
+  disabled: false,
+});
 
 const emit = defineEmits(['change']);
 
-const { codeConfig, codeBlockEditor, createCode, editCode, deleteCode, submitCode } = useDataSourceMethod();
+const codeConfig = ref<CodeBlockContent>();
+const codeBlockEditorRef = useTemplateRef<InstanceType<typeof CodeBlockEditor>>('codeBlockEditor');
+
+let editIndex = -1;
 
 const methodColumns: ColumnConfig[] = [
   {
@@ -65,7 +63,7 @@ const methodColumns: ColumnConfig[] = [
   {
     label: '参数',
     prop: 'params',
-    formatter: (params: CodeParamStatement[]) => params.map((item) => item.name).join(', '),
+    formatter: (params: CodeParamStatement[] = []) => params.map((item) => item.name).join(', '),
   },
   {
     label: '操作',
@@ -73,16 +71,31 @@ const methodColumns: ColumnConfig[] = [
     actions: [
       {
         text: '编辑',
-        handler: (row: CodeBlockContent) => {
-          editCode(props.model, row.name);
-          emit('change', props.model[props.name]);
+        handler: (method: CodeBlockContent, index: number) => {
+          let codeContent = method.content || '({ params, dataSource, app }) => {\n  // place your code here\n}';
+
+          if (typeof codeContent !== 'string') {
+            codeContent = codeContent.toString();
+          }
+
+          codeConfig.value = {
+            ...cloneDeep(method),
+            content: codeContent,
+          };
+
+          editIndex = index;
+
+          nextTick(() => {
+            codeBlockEditorRef.value?.show();
+          });
         },
       },
       {
         text: '删除',
         buttonType: 'danger',
-        handler: (row: CodeBlockContent) => {
-          deleteCode(props.model, row.name);
+        handler: async (row: CodeBlockContent, index: number) => {
+          await tMagicMessageBox.confirm(`确定删除${row.name}?`, '提示');
+          props.model[props.name].splice(index, 1);
           emit('change', props.model[props.name]);
         },
       },
@@ -91,14 +104,44 @@ const methodColumns: ColumnConfig[] = [
 ];
 
 const createCodeHandler = () => {
-  createCode(props.model);
+  codeConfig.value = {
+    name: '',
+    content: '({ params, dataSource, app, flowState }) => {\n  // place your code here\n}',
+    params: [],
+  };
 
-  emit('change', props.model[props.name]);
+  editIndex = -1;
+
+  nextTick(() => {
+    codeBlockEditorRef.value?.show();
+  });
 };
 
-const submitCodeHandler = (values: CodeBlockContent) => {
-  submitCode(values);
+const submitCodeHandler = (value: CodeBlockContent, data: ContainerChangeEventData) => {
+  if (editIndex > -1) {
+    emit('change', value, {
+      modifyKey: editIndex,
+      changeRecords: (data.changeRecords || []).map((item) => ({
+        propPath: `${props.prop}.${editIndex}.${item.propPath}`,
+        value: item.value,
+      })),
+    });
+  } else {
+    const modifyKey = props.model[props.name].length;
+    emit('change', value, {
+      modifyKey,
+      changeRecords: [
+        {
+          propPath: `${props.prop}.${modifyKey}`,
+          value,
+        },
+      ],
+    });
+  }
 
-  emit('change', props.model[props.name]);
+  editIndex = -1;
+  codeConfig.value = void 0;
+
+  codeBlockEditorRef.value?.hide();
 };
 </script>

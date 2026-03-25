@@ -10,6 +10,7 @@
   font-weight: bold;
   margin-left: 2px;
   position: relative;
+  cursor: pointer;
 }
 .moveable-remove-button:before, .moveable-remove-button:after {
   content: "";
@@ -106,3 +107,8 @@
   top: 50%;;
 }
 
+.moveable-rerender-button img {
+  position: absolute;
+  left: 2px;
+  top: 2px;
+}

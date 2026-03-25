@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, ref } from 'vue';
+import { computed, inject, readonly, ref } from 'vue';
 
 import { TMagicButton } from '@tmagic/design';
 
@@ -54,7 +54,8 @@ const formConfig = computed(() => {
   if (typeof props.config.form === 'function') {
     return props.config.form(mForm, {
       model: props.model || {},
-      values: props.values || {},
+      values: mForm ? readonly(mForm.initValues) : null,
+      formValue: props.values || {},
     });
   }
   return props.config.form;

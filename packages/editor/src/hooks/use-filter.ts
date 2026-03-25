@@ -1,9 +1,9 @@
 import { type Ref, ref } from 'vue';
 
-import type { Id, MNode } from '@tmagic/schema';
+import type { Id, MNode } from '@tmagic/core';
+import { traverseNode } from '@tmagic/utils';
 
 import type { LayerNodeStatus, TreeNodeData } from '@editor/type';
-import { traverseNode } from '@editor/utils';
 import { updateStatus } from '@editor/utils/tree';
 
 export const useFilter = (
@@ -32,10 +32,12 @@ export const useFilter = (
         const visible = filterIsMatch(text, node);
         if (visible && parents.length) {
           parents.forEach((parent) => {
-            updateStatus(nodeStatusMap.value!, parent.id, {
-              visible,
-              expand: true,
-            });
+            if (text || text.length) {
+              updateStatus(nodeStatusMap.value!, parent.id, {
+                visible,
+                expand: true,
+              });
+            }
           });
         }
 

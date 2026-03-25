@@ -50,14 +50,18 @@ export interface NpmConfig {
   autoInstall?: boolean;
   /** 安装组件后，npm默认会将依赖写入package.json中，将该值设置为true，则不会写入，默认为true */
   keepPackageJsonClean?: boolean;
+  installArgs?: string;
 }
 
 export interface ModuleMainFilePath {
+  componentPackage: Record<string, string>;
   componentMap: Record<string, string>;
+  pluginPakcage: Record<string, string>;
   pluginMap: Record<string, string>;
   configMap: Record<string, string>;
   valueMap: Record<string, string>;
   eventMap: Record<string, string>;
+  datasourcePackage: Record<string, string>;
   datasourceMap: Record<string, string>;
   dsConfigMap: Record<string, string>;
   dsValueMap: Record<string, string>;
@@ -80,6 +84,8 @@ export interface UserConfig {
   npmConfig?: NpmConfig;
   /** 是否使用import()加载组件 */
   dynamicImport?: boolean;
+  /** 指定组件不使用动态加载，dynamicImport为true时有效 */
+  dynamicIgnore?: string[];
   hooks?: {
     beforeWriteEntry?: (genContentMap: Record<string, string>, app: Core) => Promise<Record<string, string>>;
   };

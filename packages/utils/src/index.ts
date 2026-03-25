@@ -1,7 +1,8 @@
+/* eslint-disable no-nested-ternary */
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +17,43 @@
  * limitations under the License.
  */
 
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
 import { cloneDeep, set as objectSet } from 'lodash-es';
 
-import type { DataSchema, DataSourceDeps, Id, MComponent, MNode } from '@tmagic/schema';
+import type {
+  DataSchema,
+  DataSourceDeps,
+  Id,
+  MApp,
+  MComponent,
+  MContainer,
+  MNode,
+  MNodeInstance,
+  MPage,
+  MPageFragment,
+} from '@tmagic/schema';
 import { NodeType } from '@tmagic/schema';
 
+import type { EditorNodeInfo } from '@editor/type';
+
 export * from './dom';
+
+// for typeof global checks without @types/node
+declare let global: {};
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+let _globalThis: any;
+export const getGlobalThis = (): any =>
+  _globalThis ||
+  (_globalThis =
+    typeof globalThis !== 'undefined'
+      ? globalThis
+      : typeof self !== 'undefined'
+        ? self
+        : typeof window !== 'undefined'
+          ? window
+          : typeof global !== 'undefined'
+            ? global
+            : {});
 
 export const sleep = (ms: number): Promise<void> =>
   new Promise((resolve) => {
@@ -33,36 +63,10 @@ export const sleep = (ms: number): Promise<void> =>
     }, ms);
   });
 
-export const datetimeFormatter = (
-  v: string | Date,
-  defaultValue = '-',
-  format = 'YYYY-MM-DD HH:mm:ss',
-): string | number => {
-  if (v) {
-    let time = null;
-    if (['x', 'timestamp'].includes(format)) {
-      time = dayjs(v).valueOf();
-    } else if ((typeof v === 'string' && v.includes('Z')) || v.constructor === Date) {
-      dayjs.extend(utc);
-      // UTC字符串时间或Date对象格式化为北京时间
-      time = dayjs(v).utcOffset(8).format(format);
-    } else {
-      time = dayjs(v).format(format);
-    }
-
-    // 格式化为北京时间
-    if (time !== 'Invalid Date') {
-      return time;
-    }
-    return defaultValue;
-  }
-  return defaultValue;
-};
-
 // 驼峰转换横线
 export const toLine = (name = '') => name.replace(/\B([A-Z])/g, '-$1').toLowerCase();
 
-export const toHump = (name = ''): string => name.replace(/-(\w)/g, (all, letter) => letter.toUpperCase());
+export const toHump = (name = ''): string => name.replace(/-(\w)/g, (_all, letter) => letter.toUpperCase());
 
 export const emptyFn = (): any => undefined;
 
@@ -106,6 +110,39 @@ export const getNodePath = (id: Id, data: MNode[] = []): MNode[] => {
   return path;
 };
 
+export const getNodeInfo = (id: Id, root: Pick<MApp, 'id' | 'items'> | null) => {
+  const info: EditorNodeInfo = {
+    node: null,
+    parent: null,
+    page: null,
+  };
+
+  if (!root) return info;
+
+  if (id === root.id) {
+    info.node = root;
+    return info;
+  }
+
+  const path = getNodePath(id, root.items);
+
+  if (!path.length) return info;
+
+  path.unshift(root);
+
+  info.node = path[path.length - 1] as MComponent;
+  info.parent = path[path.length - 2] as MContainer;
+
+  path.forEach((item) => {
+    if (isPage(item) || isPageFragment(item)) {
+      info.page = item as MPage | MPageFragment;
+      return;
+    }
+  });
+
+  return info;
+};
+
 export const filterXSS = (str: string) =>
   str.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 
@@ -126,6 +163,99 @@ export const getUrlParam = (param: string, url?: string) => {
   return '';
 };
 
+/**
+ * 设置url中指定的参数
+ *
+ * @param {string}
+ *          name [参数名]
+ * @param {string}
+ *          value [参数值]
+ * @param {string}
+ *          url [发生替换的url地址|默认为location.href]
+ * @return {string} [返回处理后的url]
+ */
+export const setUrlParam = (name: string, value: string, url = globalThis.location.href) => {
+  const reg = new RegExp(`[?&#]${name}=([^&#]*)`, 'gi');
+
+  const matches = url.match(reg);
+
+  const key = `{key${new Date().getTime()}}`;
+  let strArr;
+
+  if (matches && matches.length > 0) {
+    strArr = matches[matches.length - 1];
+  } else {
+    strArr = '';
+  }
+
+  const extra = `${name}=${value}`;
+
+  // 当原url中含有要替换的属性:value不为空时，仅对值做替换,为空时，直接把参数删除掉
+  if (strArr) {
+    const first = strArr.charAt(0);
+    url = url.replace(strArr, key);
+    url = url.replace(key, value ? first + extra : '');
+  } else if (value) {
+    // 当原url中不含有要替换的属性且value值不为空时,直接在url后面添加参数字符串
+    if (url.indexOf('?') > -1) {
+      url += `&${extra}`;
+    } else {
+      url += `?${extra}`;
+    }
+  }
+  // 其它情况直接返回原url
+  return url;
+};
+
+export const getSearchObj = (
+  search = globalThis.location.search ? globalThis.location.search.substring(1) : '',
+): Record<string, string> => {
+  return search.split('&').reduce((obj, item) => {
+    const [a, b = ''] = item.split('=');
+    return { ...obj, [a]: b };
+  }, {});
+};
+
+export const delQueStr = (url: string, ref: string[] | string) => {
+  let str = '';
+  if (url.indexOf('?') !== -1) {
+    str = url.substring(url.indexOf('?') + 1);
+  } else {
+    return url;
+  }
+  let arr = [];
+  let returnurl = '';
+
+  const isHit = Array.isArray(ref)
+    ? function (v: string) {
+        return ~ref.indexOf(v);
+      }
+    : function (v: string) {
+        return v === ref;
+      };
+
+  if (str.indexOf('&') !== -1) {
+    arr = str.split('&');
+    for (let i = 0, len = arr.length; i < len; i++) {
+      if (!isHit(arr[i].split('=')[0])) {
+        returnurl = `${returnurl + arr[i].split('=')[0]}=${arr[i].split('=')[1]}&`;
+      }
+    }
+
+    return returnurl
+      ? `${url.substr(0, url.indexOf('?'))}?${returnurl.substr(0, returnurl.length - 1)}`
+      : url.substr(0, url.indexOf('?'));
+  }
+
+  arr = str.split('=');
+
+  if (isHit(arr[0])) {
+    return url.substr(0, url.indexOf('?'));
+  }
+
+  return url;
+};
+
 export const isObject = (obj: any) => Object.prototype.toString.call(obj) === '[object Object]';
 
 export const isPop = (node: MComponent | null): boolean => Boolean(node?.type?.toLowerCase().endsWith('pop'));
@@ -140,7 +270,8 @@ export const isPageFragment = (node?: MComponent | null): boolean => {
   return Boolean(node.type?.toLowerCase() === NodeType.PAGE_FRAGMENT);
 };
 
-export const isNumber = (value: string) => /^(-?\d+)(\.\d+)?$/.test(value);
+export const isNumber = (value: any) =>
+  (typeof value === 'number' && !isNaN(value)) || /^(-?\d+)(\.\d+)?$/.test(`${value}`);
 
 export const getHost = (targetUrl: string) => targetUrl.match(/\/\/([^/]+)/)?.[1];
 
@@ -164,18 +295,26 @@ export const guid = (digit = 8): string =>
     return v.toString(16);
   });
 
+export const getKeysArray = (keys: string | number) =>
+  // 将 array[0] 转成 array.0
+  `${keys}`.replace(/\[(\d+)\]/g, '.$1').split('.');
+
 export const getValueByKeyPath = (
   keys: number | string | string[] = '',
   data: Record<string | number, any> = {},
 ): any => {
   // 将 array[0] 转成 array.0
-  const keyArray = Array.isArray(keys) ? keys : `${keys}`.replaceAll(/\[(\d+)\]/g, '.$1').split('.');
+  const keyArray = Array.isArray(keys) ? keys : getKeysArray(keys);
   return keyArray.reduce((accumulator, currentValue: any) => {
-    if (isObject(accumulator) || Array.isArray(accumulator)) {
+    if (isObject(accumulator)) {
       return accumulator[currentValue];
     }
 
-    return void 0;
+    if (Array.isArray(accumulator) && /^\d*$/.test(`${currentValue}`)) {
+      return accumulator[currentValue];
+    }
+
+    throw new Error(`${data}中不存在${keys}`);
   }, data);
 };
 
@@ -190,12 +329,11 @@ export const getNodes = (ids: Id[], data: MNode[] = []): MNode[] => {
       return;
     }
 
-    for (let i = 0, l = data.length; i < l; i++) {
-      const item = data[i];
+    for (const item of data) {
       const index = ids.findIndex((id: Id) => `${id}` === `${item.id}`);
 
       if (index > -1) {
-        ids.slice(index, 1);
+        ids.splice(index, 1);
         nodes.push(item);
       }
 
@@ -234,7 +372,7 @@ export const getDepNodeIds = (dataSourceDeps: DataSourceDeps = {}) =>
  * @param data 需要修改的数据
  * @param parentId 父节点 id
  */
-export const replaceChildNode = (newNode: MNode, data?: MNode[], parentId?: Id) => {
+export const replaceChildNode = (newNode: MNode, data?: MNode[], parentId?: Id): void => {
   const path = getNodePath(newNode.id, data);
   const node = path.pop();
   let parent = path.pop();
@@ -243,14 +381,23 @@ export const replaceChildNode = (newNode: MNode, data?: MNode[], parentId?: Id) 
     parent = getNodePath(parentId, data).pop();
   }
 
-  if (!node) throw new Error('未找到目标节点');
-  if (!parent) throw new Error('未找到父节点');
+  if (!node) {
+    console.warn(`未找到目标节点(${newNode.id})`);
+    return;
+  }
+
+  if (!parent) {
+    console.warn(`未找到父节点(${newNode.id})`);
+    return;
+  }
 
   const index = parent.items?.findIndex((child: MNode) => child.id === node.id);
   parent.items.splice(index, 1, newNode);
 };
 
-export const DSL_NODE_KEY_COPY_PREFIX = '__magic__';
+export const DSL_NODE_KEY_COPY_PREFIX = '__tmagic__';
+export const IS_DSL_NODE_KEY = '__tmagic__dslNode';
+export const PAGE_FRAGMENT_CONTAINER_ID_KEY = 'tmagic-page-fragment-container-id';
 
 export const compiledNode = (
   compile: (value: any) => any,
@@ -267,7 +414,7 @@ export const compiledNode = (
   }
 
   keys.forEach((key) => {
-    const keys = `${key}`.replaceAll(/\[(\d+)\]/g, '.$1').split('.');
+    const keys = getKeysArray(key);
 
     const cacheKey = keys.map((key, index) => {
       if (index < keys.length - 1) {
@@ -276,12 +423,16 @@ export const compiledNode = (
       return `${DSL_NODE_KEY_COPY_PREFIX}${key}`;
     });
 
-    const value = getValueByKeyPath(key, node);
     let templateValue = getValueByKeyPath(cacheKey, node);
-
     if (typeof templateValue === 'undefined') {
-      setValueByKeyPath(cacheKey.join('.'), value, node);
-      templateValue = value;
+      try {
+        const value = getValueByKeyPath(key, node);
+        setValueByKeyPath(cacheKey.join('.'), value, node);
+        templateValue = value;
+      } catch (e) {
+        console.warn(e);
+        return;
+      }
     }
 
     let newValue;
@@ -361,6 +512,7 @@ export const getDefaultValueFromFields = (fields: DataSchema[]) => {
             data[field.name] = JSON.parse(field.defaultValue);
           } catch (e) {
             data[field.name] = defaultValue.object;
+            console.warn('defaultValue 解析失败', field.defaultValue, e);
           }
           return;
         }
@@ -435,3 +587,54 @@ export const addParamToUrl = (obj: Record<string, any>, global = globalThis, nee
     global.history.pushState({}, '', url);
   }
 };
+
+export const dataSourceTemplateRegExp = /\$\{([\s\S]+?)\}/g;
+
+export const isDslNode = (config: MNodeInstance) =>
+  typeof config[IS_DSL_NODE_KEY] === 'undefined' || config[IS_DSL_NODE_KEY] === true;
+
+export interface NodeItem {
+  items?: NodeItem[];
+  [key: string]: any;
+}
+
+export const traverseNode = <T extends NodeItem = NodeItem>(
+  node: T,
+  cb: (node: T, parents: T[]) => void,
+  parents: T[] = [],
+  evalCbAfter = false,
+) => {
+  if (!evalCbAfter) {
+    cb(node, parents);
+  }
+
+  if (Array.isArray(node.items) && node.items.length) {
+    parents.push(node);
+    node.items.forEach((item) => {
+      traverseNode(item as T, cb, [...parents], evalCbAfter);
+    });
+  }
+
+  if (evalCbAfter) {
+    cb(node, parents);
+  }
+};
+
+export const isValueIncludeDataSource = (value: any) => {
+  if (typeof value === 'string' && /\$\{([\s\S]+?)\}/.test(value)) {
+    return true;
+  }
+  if (Array.isArray(value) && `${value[0]}`.startsWith(DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX)) {
+    return true;
+  }
+  if (value?.isBindDataSource && value.dataSourceId) {
+    return true;
+  }
+  if (value?.isBindDataSourceField && value.dataSourceId) {
+    return true;
+  }
+  return false;
+};
+
+export const removeDataSourceFieldPrefix = (id?: string) =>
+  id?.replace(DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX, '') || '';

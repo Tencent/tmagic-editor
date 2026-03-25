@@ -1,0 +1,35 @@
+{
+  "version": "0.1.0",
+  "name": "@tmagic/react-img",
+  "type": "module",
+  "main": "src/index.ts",
+  "files": [
+    "src"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tencent/tmagic-editor.git"
+  },
+  "dependencies": {
+    "@tmagic/form-schema": "workspace:^"
+  },
+  "peerDependencies": {
+    "@tmagic/core": "workspace:^",
+    "@tmagic/react-runtime-help": "workspace:^",
+    "react": ">=18.3.1",
+    "react-dom": ">=18.3.1",
+    "typescript": "catalog:"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0"
+  }
+}

@@ -1,6 +1,9 @@
 <template>
   <TDateRangePicker
     v-if="type.endsWith('range')"
+    allow-input
+    clearable
+    enable-time-picker
     :modelValue="modelValue"
     :mode="mode"
     :placeholder="[startPlaceholder || '', endPlaceholder || '']"
@@ -8,12 +11,13 @@
     :size="size === 'default' ? 'medium' : size"
     :separator="rangeSeparator"
     :format="format"
-    :valueType="valueFormat === 's' ? 'time-stamp' : valueFormat"
+    :valueType="valueType"
     @change="changeHandler"
     @update:modelValue="updateModelValue"
   />
   <TDatePicker
     v-else
+    clearable
     :modelValue="modelValue"
     :mode="mode"
     :placeholder="placeholder"
@@ -21,7 +25,7 @@
     :size="size === 'default' ? 'medium' : size"
     :format="format"
     :enableTimePicker="type.includes('time')"
-    :valueType="valueFormat === 's' ? 'time-stamp' : valueFormat"
+    :valueType="valueType"
     @change="changeHandler"
     @update:modelValue="updateModelValue"
   />
@@ -53,6 +57,8 @@ const mode = computed(() => {
   };
   return map[props.type] || props.type;
 });
+
+const valueType = computed(() => (props.valueFormat === 's' ? 'time-stamp' : props.valueFormat.replace(/\//g, '-')));
 
 const emit = defineEmits(['change', 'update:modelValue']);
 

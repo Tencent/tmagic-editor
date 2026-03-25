@@ -1,0 +1,39 @@
+{
+  "name": "runtime-vue",
+  "version": "1.7.8",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "scripts": {
+    "tmagic": "tmagic entry",
+    "dev": "vite --force",
+    "serve": "vite preview",
+    "build": "rimraf ./dist && node scripts/build.mjs --type=all",
+    "build:libs": "node scripts/build.mjs --type=res",
+    "build:page": "node scripts/build.mjs --type=page",
+    "build:playground": "node scripts/build.mjs --type=playground"
+  },
+  "dependencies": {
+    "@tmagic/core": "1.7.8",
+    "@tmagic/stage": "1.7.8",
+    "@tmagic/vue-runtime-help": "^2.0.0",
+    "axios": "^1.13.2",
+    "vue": "catalog:"
+  },
+  "devDependencies": {
+    "@tmagic/cli": "1.7.8",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^24.0.10",
+    "@vitejs/plugin-legacy": "^8.0.0",
+    "@vitejs/plugin-vue": "^6.0.5",
+    "@vitejs/plugin-vue-jsx": "^5.1.5",
+    "@vue/compiler-sfc": "catalog:",
+    "fs-extra": "^11.3.1",
+    "minimist": "^1.2.8",
+    "rimraf": "^3.0.2",
+    "typescript": "catalog:",
+    "vite": "catalog:"
+  }
+}

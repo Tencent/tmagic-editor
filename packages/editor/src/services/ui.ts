@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,27 @@
  * limitations under the License.
  */
 
-import { reactive } from 'vue';
+import { shallowReactive } from 'vue';
 import type { Writable } from 'type-fest';
 
 import { convertToNumber } from '@tmagic/utils';
 
 import editorService from '@editor/services/editor';
 import type { AsyncHookPlugin, StageRect, UiState } from '@editor/type';
+import {
+  DEFAULT_LEFT_COLUMN_WIDTH,
+  DEFAULT_RIGHT_COLUMN_WIDTH,
+  LEFT_COLUMN_WIDTH_STORAGE_KEY,
+  RIGHT_COLUMN_WIDTH_STORAGE_KEY,
+} from '@editor/utils/const';
 
 import BaseService from './BaseService';
+import storageService, { Protocol } from './storage';
 
-const state = reactive<UiState>({
+const state = shallowReactive<UiState>({
   uiSelectMode: false,
   showSrc: false,
+  showStylePanel: true,
   zoom: 1,
   stageContainerRect: {
     width: 0,
@@ -39,14 +47,18 @@ const state = reactive<UiState>({
     height: 817,
   },
   columnWidth: {
-    left: 0,
-    right: 0,
+    left:
+      storageService.getItem(LEFT_COLUMN_WIDTH_STORAGE_KEY, { protocol: Protocol.NUMBER }) || DEFAULT_LEFT_COLUMN_WIDTH,
     center: 0,
+    right:
+      storageService.getItem(RIGHT_COLUMN_WIDTH_STORAGE_KEY, { protocol: Protocol.NUMBER }) ||
+      DEFAULT_RIGHT_COLUMN_WIDTH,
   },
   showGuides: true,
   showRule: true,
   propsPanelSize: 'small',
   showAddPageButton: true,
+  showPageListButton: true,
   hideSlideBar: false,
   sideBarItems: [],
   navMenuRect: {

@@ -1,64 +1,53 @@
 <template>
-  <TMagicTableColumn
-    show-overflow-tooltip
-    :label="config.label"
-    :width="config.width"
-    :fixed="config.fixed"
-    :sortable="config.sortable"
-    :prop="config.prop"
+  <div v-if="config.type === 'index'">
+    {{ config.pageIndex && config.pageSize ? config.pageIndex * config.pageSize + index + 1 : index + 1 }}
+  </div>
+  <MForm
+    v-else-if="(config.type || config.editInlineFormConfig) && editState[index]"
+    label-width="0"
+    :config="config.editInlineFormConfig ?? [config as FormItemConfig]"
+    :init-values="editState[index]"
+    @change="formChangeHandler"
+  ></MForm>
+
+  <TMagicButton
+    v-else-if="config.action === 'actionLink' && config.prop"
+    link
+    type="primary"
+    @click="config.handler?.(row)"
   >
-    <template v-slot="scope">
-      <TMagicForm v-if="config.type && editState[scope.$index]" label-width="0" :model="editState[scope.$index]">
-        <m-form-container
-          :prop="config.prop"
-          :rules="config.rules"
-          :config="config"
-          :name="config.prop"
-          :model="editState[scope.$index]"
-        ></m-form-container>
-      </TMagicForm>
+    <span v-html="formatter(config, row, { index: index })"></span>
+  </TMagicButton>
 
-      <TMagicButton
-        v-else-if="config.action === 'actionLink' && config.prop"
-        link
-        type="primary"
-        @click="config.handler?.(scope.row)"
-      >
-        <span v-html="formatter(config, scope.row)"></span>
-      </TMagicButton>
+  <a v-else-if="config.action === 'img' && config.prop" target="_blank" :href="row[config.prop]"
+    ><img :src="row[config.prop]" height="50"
+  /></a>
 
-      <a v-else-if="config.action === 'img' && config.prop" target="_blank" :href="scope.row[config.prop]"
-        ><img :src="scope.row[config.prop]" height="50"
-      /></a>
+  <a v-else-if="config.action === 'link' && config.prop" target="_blank" :href="row[config.prop]" class="keep-all">{{
+    row[config.prop]
+  }}</a>
 
-      <a
-        v-else-if="config.action === 'link' && config.prop"
-        target="_blank"
-        :href="scope.row[config.prop]"
-        class="keep-all"
-        >{{ scope.row[config.prop] }}</a
-      >
-
-      <el-tooltip v-else-if="config.action === 'tip'" placement="left">
-        <template #content>
-          <div>{{ formatter(config, scope.row) }}</div>
-        </template>
-        <TMagicButton link type="primary">{{ config.buttonText || '扩展配置' }}</TMagicButton>
-      </el-tooltip>
-
-      <TMagicTag
-        v-else-if="config.action === 'tag' && config.prop"
-        :type="typeof config.type === 'function' ? config.type(scope.row[config.prop], scope.row) : config.type"
-        close-transition
-        >{{ formatter(config, scope.row) }}</TMagicTag
-      >
-      <div v-else v-html="formatter(config, scope.row)"></div>
+  <TMagicTooltip v-else-if="config.action === 'tip'" placement="left">
+    <template #content>
+      <div>{{ formatter(config, row, { index: index }) }}</div>
     </template>
-  </TMagicTableColumn>
+    <TMagicButton link type="primary">{{ config.buttonText || '扩展配置' }}</TMagicButton>
+  </TMagicTooltip>
+
+  <TMagicTag
+    v-else-if="config.action === 'tag' && config.prop"
+    :type="typeof config.type === 'function' ? config.type(row[config.prop], row) : config.type"
+    close-transition
+    >{{ formatter(config, row, { index: index }) }}</TMagicTag
+  >
+  <div v-else v-html="formatter(config, row, { index: index })"></div>
 </template>
 
 <script lang="ts" setup>
-import { TMagicButton, TMagicForm, TMagicTableColumn, TMagicTag } from '@tmagic/design';
+import { TMagicButton, TMagicTag, TMagicTooltip } from '@tmagic/design';
+import { type ContainerChangeEventData, MForm } from '@tmagic/form';
+import type { FormItemConfig, FormValue } from '@tmagic/form-schema';
+import { setValueByKeyPath } from '@tmagic/utils';
 
 import { ColumnConfig } from './schema';
 import { formatter } from './utils';
@@ -67,14 +56,26 @@ defineOptions({
   name: 'MTableColumn',
 });
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     config: ColumnConfig;
     editState?: any;
+    row: any;
+    index: number;
   }>(),
   {
     config: () => ({}),
     editState: () => ({}),
   },
 );
+
+const formChangeHandler = (v: FormValue, eventData: ContainerChangeEventData) => {
+  if (eventData.changeRecords?.length) {
+    for (const record of eventData.changeRecords) {
+      if (record.propPath) {
+        setValueByKeyPath(record.propPath, record.value, props.editState[props.index]);
+      }
+    }
+  }
+};
 </script>

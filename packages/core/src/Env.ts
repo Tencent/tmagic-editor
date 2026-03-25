@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
  */
 
 class Env {
+  [x: string]: any;
   isIos = false;
   isIphone = false;
   isIpad = false;
@@ -27,8 +28,13 @@ class Env {
   isMqq = false;
   isWechat = false;
   isWeb = false;
+  isOpenHarmony = false;
 
-  constructor(ua = globalThis.navigator.userAgent, options: Record<string, boolean | string> = {}) {
+  constructor(ua = globalThis.navigator?.userAgent ?? '', options: Record<string, boolean | string> = {}) {
+    if (!ua) {
+      return;
+    }
+
     this.isIphone = ua.indexOf('iPhone') >= 0;
 
     this.isIpad = /(iPad).*OS\s([\d_]+)/.test(ua);
@@ -47,7 +53,9 @@ class Env {
 
     this.isWechat = ua.indexOf('MicroMessenger') >= 0 && ua.indexOf('wxwork') < 0;
 
-    this.isWeb = !this.isIos && !this.isAndroid && !/(WebOS|BlackBerry)/.test(ua);
+    this.isOpenHarmony = ua.includes('OpenHarmony');
+
+    this.isWeb = !this.isIos && !this.isAndroid && !this.isOpenHarmony && !/(WebOS|BlackBerry)/.test(ua);
 
     Object.entries(options).forEach(([key, value]) => {
       (this as any)[key] = value;

@@ -1,31 +1,119 @@
-import execa from 'execa';
+import fs from 'node:fs';
+import { createRequire } from 'node:module';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import { build as buildVite } from 'vite';
+import vue from '@vitejs/plugin-vue';
 import minimist from 'minimist';
+import rimraf from 'rimraf';
 
-const { type } = minimist(process.argv.slice(2));
+const args = minimist(process.argv.slice(2));
 
-const run = (bin, args, opts = {}) => execa(bin, args, { stdio: 'inherit', ...opts });
+const toPascalCase = (str) => str.replace(/(^\w|-\w)/g, (text) => text.replace(/-/, '').toUpperCase());
 
-const main = async () => {
-  // 按照依赖顺序构建
-  const packages = [
-    'schema',
-    'utils',
-    'dep',
-    'data-source',
-    'core',
-    'design',
-    'element-plus-adapter',
-    'tdesign-vue-next-adapter',
-    'form',
-    'table',
-    'stage',
-    'editor',
-    'cli',
-  ];
+const dirname = path.dirname(fileURLToPath(import.meta.url));
+const packagesDir = path.resolve(dirname, '../packages');
+const runtimeDir = path.resolve(dirname, '../runtime');
 
-  for (const pkg of packages) {
-    await run('pnpm', ['--filter', `@tmagic/${pkg}`, type ? 'build:type' : 'build']);
+if (args.package) {
+  const pkgRoot = path.resolve(packagesDir, args.package);
+  if (fs.statSync(pkgRoot).isDirectory()) {
+    rimraf.sync(path.resolve(packagesDir, `./${args.package}/dist`));
+
+    build({ packageName: args.package, format: 'es' });
+    build({ packageName: args.package, format: 'umd' });
   }
-};
+} else {
+  const packages = getPackageNames(packagesDir);
+  const runtimeHelpers = getPackageNames(runtimeDir);
 
-main();
+  for (const packageName of packages) {
+    rimraf.sync(path.resolve(packagesDir, `./${packageName}/dist`));
+    const pkg = createRequire(import.meta.url)(`../packages/${packageName}/package.json`);
+
+    build({ packageName, format: 'es', pkg, packagesDir });
+    build({ packageName, format: 'umd', pkg, packagesDir });
+  }
+
+  for (const packageName of runtimeHelpers) {
+    rimraf.sync(path.resolve(runtimeDir, `./${packageName}/dist`));
+    const pkg = createRequire(import.meta.url)(`../runtime/${packageName}/package.json`);
+
+    build({ packageName, format: 'es', pkg, packagesDir: runtimeDir });
+    build({ packageName, format: 'umd', pkg, packagesDir: runtimeDir });
+  }
+}
+
+async function build({ packageName, format, pkg, packagesDir }) {
+  await buildVite({
+    root: path.resolve(packagesDir, `./${packageName}`),
+    clearScreen: false,
+    configFile: false,
+    plugins: [vue()],
+
+    build: {
+      outDir: format === 'es' ? 'dist/es' : 'dist',
+      emptyOutDir: false,
+      cssCodeSplit: false,
+      sourcemap: false,
+      minify: false,
+      target: 'esnext',
+
+      lib: {
+        entry: 'src/index.ts',
+        name: `TMagic${toPascalCase(packageName)}`,
+        fileName: `tmagic-${packageName}`,
+        formats: [format],
+        cssFileName: 'style',
+      },
+
+      rolldownOptions: {
+        // 确保外部化处理那些你不想打包进库的依赖
+        external(id) {
+          if (format === 'umd' && id === 'lodash-es') {
+            return false;
+          }
+          return Object.keys({
+            ...pkg.dependencies,
+            ...pkg.peerDependencies,
+          }).some((k) => new RegExp(`^${k}`).test(id));
+        },
+
+        output: {
+          // 在 UMD 构建模式下为这些外部化的依赖提供一个全局变量
+          globals: {
+            vue: 'Vue',
+            'element-plus': 'ElementPlus',
+          },
+          // ES 格式保留模块结构，让消费者的 bundler 按模块粒度 tree-shake
+          ...(format === 'es'
+            ? {
+                preserveModules: true,
+                preserveModulesRoot: 'src',
+                entryFileNames: '[name].js',
+              }
+            : {}),
+        },
+      },
+    },
+
+    resolve: {
+      alias: [
+        { find: /^@data-source/, replacement: path.join(packagesDir, '/data-source/src') },
+        { find: /^@editor/, replacement: path.join(packagesDir, './editor/src') },
+      ],
+    },
+  });
+}
+
+function getPackageNames(packagesDir) {
+  return fs.readdirSync(packagesDir).filter((p) => {
+    const pkgRoot = path.resolve(packagesDir, p);
+    if (fs.statSync(pkgRoot).isDirectory()) {
+      const pkg = JSON.parse(fs.readFileSync(path.resolve(pkgRoot, 'package.json'), 'utf-8'));
+      return !pkg.private && !pkg.bin;
+    }
+    return false;
+  });
+}

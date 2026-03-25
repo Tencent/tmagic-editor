@@ -1,22 +1,23 @@
-import type { EventOption } from '@tmagic/core';
+import type { DataSourceSchema, EventOption, Id, MApp, MNode, MPage, MPageFragment } from '@tmagic/core';
 import type { FormConfig, FormState } from '@tmagic/form';
-import type { DataSourceSchema, Id, MApp, MNode } from '@tmagic/schema';
 import StageCore, {
   CONTAINER_HIGHLIGHT_CLASS_NAME,
   ContainerHighlightType,
-  type CustomizeMoveableOptionsCallbackConfig,
+  type CustomizeMoveableOptions,
   type GuidesOptions,
-  type MoveableOptions,
   RenderType,
   type UpdateDragEl,
 } from '@tmagic/stage';
+import { getIdFromEl } from '@tmagic/utils';
 
 import type {
   ComponentGroup,
+  CustomContentMenuFunction,
   DatasourceTypeOption,
   MenuBarData,
   MenuButton,
   MenuComponent,
+  PageBarSortOptions,
   SideBarData,
   StageRect,
 } from './type';
@@ -54,7 +55,7 @@ export interface EditorProps {
   datasourceConfigs?: Record<string, FormConfig>;
   datasourceEventMethodList?: Record<string, { events: EventOption[]; methods: EventOption[] }>;
   /** 画布中组件选中框的移动范围 */
-  moveableOptions?: MoveableOptions | ((config?: CustomizeMoveableOptionsCallbackConfig) => MoveableOptions);
+  moveableOptions?: CustomizeMoveableOptions;
   /** 编辑器初始化时默认选中的组件ID */
   defaultSelected?: Id;
   /** 拖入画布中容器时，识别到容器后给容器根dom加上的class */
@@ -79,8 +80,16 @@ export interface EditorProps {
   disabledStageOverlay?: boolean;
   /** 禁用属性配置面板右下角显示源码的按钮 */
   disabledShowSrc?: boolean;
+  /** 禁用数据源 */
+  disabledDataSource?: boolean;
+  /** 禁用代码块 */
+  disabledCodeBlock?: boolean;
+  /** 已选组件、代码编辑、数据源缩进配置 */
+  treeIndent?: number;
+  /** 已选组件、代码编辑、数据源子节点缩进增量配置 */
+  treeNextLevelIndentIncrement?: number;
   /** 中间工作区域中画布渲染的内容 */
-  render?: (stage: StageCore) => HTMLDivElement | Promise<HTMLDivElement>;
+  render?: (stage: StageCore) => HTMLDivElement | void | Promise<HTMLDivElement | void>;
   /** 选中时会在画布上复制出一个大小相同的dom，实际拖拽的是这个dom，此方法用于干预这个dom的生成方式 */
   updateDragEl?: UpdateDragEl;
   /** 用于设置画布上的dom是否可以被选中 */
@@ -88,8 +97,12 @@ export interface EditorProps {
   /** 用于设置画布上的dom是否可以被拖入其中 */
   isContainer?: (el: HTMLElement) => boolean | Promise<boolean>;
   /** 用于自定义组件树与画布的右键菜单 */
-  customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
+  customContentMenu?: CustomContentMenuFunction;
   extendFormState?: (state: FormState) => Record<string, any> | Promise<Record<string, any>>;
+  /** 页面顺序拖拽配置参数 */
+  pageBarSortOptions?: PageBarSortOptions;
+  /** 页面搜索函数 */
+  pageFilterFunction?: (page: MPage | MPageFragment, keyword: string) => boolean;
 }
 
 export const defaultEditorProps = {
@@ -101,6 +114,8 @@ export const defaultEditorProps = {
   containerHighlightDuration: 800,
   containerHighlightType: ContainerHighlightType.DEFAULT,
   disabledShowSrc: false,
+  disabledDataSource: false,
+  disabledCodeBlock: false,
   componentGroupList: () => [],
   datasourceList: () => [],
   menu: () => ({ left: [], right: [] }),
@@ -111,7 +126,8 @@ export const defaultEditorProps = {
   eventMethodList: () => ({}),
   datasourceValues: () => ({}),
   datasourceConfigs: () => ({}),
-  canSelect: (el: HTMLElement) => Boolean(el.id),
+  canSelect: (el: HTMLElement) => Boolean(getIdFromEl()(el) && !el.dataset.tmagicPageFragmentContainerId),
   isContainer: (el: HTMLElement) => el.classList.contains('magic-ui-container'),
   codeOptions: () => ({}),
+  customContentMenu: (menus: (MenuButton | MenuComponent)[]) => menus,
 };

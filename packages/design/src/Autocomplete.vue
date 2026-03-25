@@ -27,9 +27,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watchEffect } from 'vue';
+import { computed, ref, useTemplateRef, watchEffect } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { AutocompleteProps } from './types';
 
 defineOptions({
@@ -38,11 +38,11 @@ defineOptions({
 
 const props = defineProps<AutocompleteProps>();
 
-const ui = getConfig('components')?.autocomplete;
+const ui = getDesignConfig('components')?.autocomplete;
 
 const uiComponent = ui?.component || 'el-autocomplete';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<AutocompleteProps>(() => ui?.props(props) || props);
 
 const emit = defineEmits(['change', 'select', 'update:modelValue']);
 
@@ -58,13 +58,13 @@ const updateModelValue = (...args: any[]) => {
   emit('update:modelValue', ...args);
 };
 
-const autocomplete = ref<any>();
+const autocompleteRef = useTemplateRef<any>('autocomplete');
 const input = ref<HTMLInputElement>();
 const inputRef = ref<any>();
 
 watchEffect(() => {
-  inputRef.value = autocomplete.value?.inputRef;
-  input.value = autocomplete.value?.inputRef.input;
+  inputRef.value = autocompleteRef.value?.inputRef;
+  input.value = autocompleteRef.value?.inputRef.input;
 });
 
 defineExpose({
@@ -72,10 +72,10 @@ defineExpose({
   input,
 
   blur: () => {
-    autocomplete.value?.blur();
+    autocompleteRef.value?.blur();
   },
   focus: () => {
-    autocomplete.value?.focus();
+    autocompleteRef.value?.focus();
   },
 });
 </script>

@@ -3,14 +3,18 @@
     <template #label>
       <slot name="label"></slot>
     </template>
-    <slot></slot>
+
+    <template #default>
+      <slot></slot>
+      <div v-if="adapterType === 'element-plus' && extra" v-html="extra" class="m-form-tip"></div>
+    </template>
   </component>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { FormItemProps } from './types';
 
 defineOptions({
@@ -19,9 +23,14 @@ defineOptions({
 
 const props = defineProps<FormItemProps>();
 
-const ui = getConfig('components')?.formItem;
+const ui = getDesignConfig('components')?.formItem;
 
 const uiComponent = ui?.component || 'el-form-item';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const adapterType = getDesignConfig('adapterType');
+
+const uiProps = computed<FormItemProps>(() => {
+  const { extra, ...rest } = ui?.props(props) || props;
+  return rest;
+});
 </script>

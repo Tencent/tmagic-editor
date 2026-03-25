@@ -4,15 +4,16 @@
     :is="uiComponent"
     v-bind="uiProps"
     @size-change="handleSizeChange"
-    @page-size-change="handleSizeChange"
     @current-change="handleCurrentChange"
+    @update:current-page="updateCurrentPage"
+    @update:page-size="updatePageSize"
   ></component>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { PaginationProps } from './types';
 
 defineOptions({
@@ -21,18 +22,24 @@ defineOptions({
 
 const props = defineProps<PaginationProps>();
 
-const emit = defineEmits(['size-change', 'current-change']);
+const emit = defineEmits(['size-change', 'current-change', 'update:current-page', 'update:page-size']);
 
-const ui = getConfig('components')?.pagination;
+const ui = getDesignConfig('components')?.pagination;
 
 const uiComponent = ui?.component || 'el-pagination';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<PaginationProps>(() => ui?.props(props) || props);
 
 const handleSizeChange = (...args: any[]) => {
   emit('size-change', ...args);
 };
 const handleCurrentChange = (...args: any[]) => {
   emit('current-change', ...args);
+};
+const updateCurrentPage = (...args: any[]) => {
+  emit('update:current-page', ...args);
+};
+const updatePageSize = (...args: any[]) => {
+  emit('update:page-size', ...args);
 };
 </script>

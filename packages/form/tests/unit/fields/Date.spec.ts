@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ describe('Date', () => {
     expect(date.exists()).toBe(true);
 
     const value = await (wrapper.vm as any).submitForm();
-    expect(value.date).toMatch('2021-01-01 00:00:00');
+    expect(value.date).toMatch('2021/01/01');
   });
 
   test('输入', async () => {
@@ -74,7 +74,7 @@ describe('Date', () => {
     await input.trigger('blur');
 
     const value = await (wrapper.vm as any).submitForm();
-    expect(input.element.value).toMatch('2021-07-28');
+    expect(input.element.value).toMatch('2021/07/28');
     expect(value.date).toMatch('2021-07-28');
   });
 

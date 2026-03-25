@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ Object.defineProperties(globalThis.HTMLElement.prototype, {
     get() {
       let parent = this.parentNode;
       while (parent) {
-        if (parent.style && parent.style.position === 'absolute') {
+        if (parent.style?.position === 'absolute') {
           return parent;
         }
         parent = parent.parentNode;
@@ -61,7 +61,7 @@ Object.defineProperties(globalThis.HTMLElement.prototype, {
 
 const createElement = () => {
   const el = globalThis.document.createElement('div');
-  el.style.cssText = `width: 100px; height: 100px; position: absolute; left: 100px; top: 100px;`;
+  el.style.cssText = 'width: 100px; height: 100px; position: absolute; left: 100px; top: 100px;';
   return el;
 };
 
@@ -78,7 +78,7 @@ describe('getOffset', () => {
   });
 
   test('没有offsetParent， 没有left、top', () => {
-    div.style.cssText = `width: 100px; height: 100px`;
+    div.style.cssText = 'width: 100px; height: 100px';
     root.appendChild(div);
     const offset = util.getOffset(div);
     expect(offset.left).toBe(0);
@@ -95,7 +95,7 @@ describe('getOffset', () => {
 
   test('有offsetParent， 没有left、top', () => {
     const parent = createElement();
-    div.style.cssText = `width: 100px; height: 100px`;
+    div.style.cssText = 'width: 100px; height: 100px';
     parent.appendChild(div);
     root.appendChild(parent);
 
@@ -119,7 +119,7 @@ describe('getAbsolutePosition', () => {
 
   test('有offsetParent', () => {
     const parent = createElement();
-    div.style.cssText = `width: 100px; height: 100px`;
+    div.style.cssText = 'width: 100px; height: 100px';
     parent.appendChild(div);
     root.appendChild(parent);
     const offset = util.getAbsolutePosition(div, { left: 100, top: 100 });
@@ -133,5 +133,25 @@ describe('getAbsolutePosition', () => {
     const offset = util.getAbsolutePosition(el, { left: 100, top: 100 });
     expect(offset.left).toBe(100);
     expect(offset.top).toBe(100);
+  });
+});
+
+describe('isFixed', () => {
+  test('true', () => {
+    expect(
+      util.isFixed({
+        position: 'fixed',
+      }),
+    ).toBeTruthy();
+  });
+
+  test('false', () => {
+    expect(
+      util.isFixed({
+        position: 'absolute',
+      }),
+    ).toBeFalsy();
+
+    expect(util.isFixed({})).toBeFalsy();
   });
 });

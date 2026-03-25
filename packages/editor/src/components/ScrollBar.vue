@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, useTemplateRef } from 'vue';
 import Gesto from 'gesto';
 
 defineOptions({
@@ -21,8 +21,8 @@ const props = defineProps<{
 
 const emit = defineEmits(['scroll']);
 
-const bar = ref<HTMLDivElement>();
-const thumb = ref<HTMLDivElement>();
+const barEl = useTemplateRef<HTMLDivElement>('bar');
+const thumbEl = useTemplateRef<HTMLDivElement>('thumb');
 
 const thumbSize = computed(() => props.size * (props.size / props.scrollSize));
 const thumbPos = computed(() => (props.pos / props.scrollSize) * props.size);
@@ -35,9 +35,8 @@ const thumbStyle = computed(() => ({
 let gesto: Gesto;
 
 onMounted(() => {
-  if (!thumb.value) return;
-  const thumbEl = thumb.value;
-  gesto = new Gesto(thumbEl, {
+  if (!thumbEl.value) return;
+  gesto = new Gesto(thumbEl.value, {
     container: window,
   });
 
@@ -50,12 +49,12 @@ onMounted(() => {
       scrollBy(getDelta(e));
     });
 
-  bar.value?.addEventListener('wheel', wheelHandler, false);
+  barEl.value?.addEventListener('wheel', wheelHandler, false);
 });
 
 onBeforeUnmount(() => {
   if (gesto) gesto.off();
-  bar.value?.removeEventListener('wheel', wheelHandler, false);
+  barEl.value?.removeEventListener('wheel', wheelHandler, false);
 });
 
 const wheelHandler = (e: WheelEvent) => {
@@ -94,7 +93,9 @@ const scrollBy = (delta: number) => {
   position: absolute;
   background-color: transparent;
   opacity: 0.3;
-  transition: background-color 0.2s linear, opacity 0.2s linear;
+  transition:
+    background-color 0.2s linear,
+    opacity 0.2s linear;
 
   .m-editor-scroll-bar-thumb {
     background-color: #aaa;
@@ -109,7 +110,9 @@ const scrollBy = (delta: number) => {
 
     .m-editor-scroll-bar-thumb {
       height: 6px;
-      transition: background-color 0.2s linear, height 0.2s ease-in-out;
+      transition:
+        background-color 0.2s linear,
+        height 0.2s ease-in-out;
       bottom: 2px;
     }
   }
@@ -121,7 +124,9 @@ const scrollBy = (delta: number) => {
 
     .m-editor-scroll-bar-thumb {
       width: 6px;
-      transition: background-color 0.2s linear, width 0.2s ease-in-out;
+      transition:
+        background-color 0.2s linear,
+        width 0.2s ease-in-out;
       right: 2px;
     }
   }

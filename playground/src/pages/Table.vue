@@ -2,7 +2,10 @@
   <div style="width: 100%">
     <NavMenu :data="menu"></NavMenu>
     <div class="table-content">
-      <MagicTable class="left-panel" :columns="columns" :data="data" :show-header="true"></MagicTable>
+      <MagicTable class="left-panel" :columns="columns" :data="data" :show-header="true" rowkey-name="a"></MagicTable>
+
+      <TMagicPagination class="pagination" :total="100" :page-size="10" :current-page="1"></TMagicPagination>
+
       <TMagicTabs class="right-panel" modelValue="columns">
         <TMagicTabPane label="columns" name="columns">
           <TMagicCodeEditor class="code-editor-content" :init-values="columns" @save="change"></TMagicCodeEditor>
@@ -19,9 +22,16 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { tMagicMessage, TMagicTabPane, TMagicTabs } from '@tmagic/design';
-import { MenuButton, TMagicCodeEditor } from '@tmagic/editor';
-import { type ColumnConfig, MagicTable } from '@tmagic/table';
+import type { ColumnConfig } from '@tmagic/editor';
+import {
+  MagicTable,
+  MenuButton,
+  TMagicCodeEditor,
+  tMagicMessage,
+  TMagicPagination,
+  TMagicTabPane,
+  TMagicTabs,
+} from '@tmagic/editor';
 
 import NavMenu from '../components/NavMenu.vue';
 
@@ -42,6 +52,21 @@ const columns = ref<ColumnConfig[]>([
     prop: 'a',
     label: '1231',
   },
+  {
+    label: '操作',
+    actions: [
+      {
+        type: 'delete',
+        buttonType: 'danger',
+        disabled: (row) => row.a === 'a1',
+        display: (row) => row.a !== 'b1',
+        text: '删除',
+        handler: (row) => {
+          console.log(row);
+        },
+      },
+    ],
+  },
 ]);
 
 const data = ref([
@@ -50,6 +75,22 @@ const data = ref([
     b: [
       {
         a: 1,
+      },
+    ],
+  },
+  {
+    a: 'b1',
+    b: [
+      {
+        a: 2,
+      },
+    ],
+  },
+  {
+    a: 'c2',
+    b: [
+      {
+        a: 3,
       },
     ],
   },

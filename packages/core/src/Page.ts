@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,22 @@
  * limitations under the License.
  */
 
+import { cloneDeep } from 'lodash-es';
+
 import type { Id, MComponent, MContainer, MPage, MPageFragment } from '@tmagic/schema';
 
-import type App from './App';
+import App from './App';
+import IteratorContainer from './IteratorContainer';
+import type { default as TMagicNode } from './Node';
 import Node from './Node';
+import { GetNodeOptions } from './type';
 interface ConfigOptions {
   config: MPage | MPageFragment;
   app: App;
 }
 
 class Page extends Node {
-  public nodes = new Map<Id, Node>();
+  public nodes = new Map<Id, TMagicNode>();
 
   constructor(options: ConfigOptions) {
     super(options);
@@ -37,8 +42,21 @@ class Page extends Node {
     });
   }
 
-  public initNode(config: MComponent | MContainer, parent: Node) {
-    const node = new Node({
+  public initNode(config: MComponent | MContainer, parent: TMagicNode) {
+    if (config.type && this.app.iteratorContainerType.has(config.type)) {
+      this.setNode(
+        config.id,
+        new IteratorContainer({
+          config,
+          parent,
+          page: this,
+          app: this.app,
+        }),
+      );
+      return;
+    }
+
+    const node = new ((config.type && App.nodeClassMap.get(config.type)) || Node)({
       config,
       parent,
       page: this,
@@ -47,10 +65,17 @@ class Page extends Node {
 
     this.setNode(config.id, node);
 
-    if (config.type === 'page-fragment-container' && config.pageFragmentId) {
+    if (config.type && this.app.pageFragmentContainerType.has(config.type) && config.pageFragmentId) {
       const pageFragment = this.app.dsl?.items?.find((page) => page.id === config.pageFragmentId);
+
       if (pageFragment) {
-        config.items = [pageFragment];
+        this.app.pageFragments.set(
+          config.id,
+          new Page({
+            config: cloneDeep(pageFragment),
+            app: this.app,
+          }),
+        );
       }
     }
 
@@ -59,11 +84,43 @@ class Page extends Node {
     });
   }
 
-  public getNode(id: Id) {
-    return this.nodes.get(id);
+  public getNode<T extends TMagicNode = TMagicNode>(
+    id: Id,
+    { iteratorContainerId, iteratorIndex, pageFragmentContainerId, strict }: GetNodeOptions = {},
+  ): T | undefined {
+    if (this.nodes.has(id)) {
+      return this.nodes.get(id) as T;
+    }
+
+    if (pageFragmentContainerId) {
+      return this.app.pageFragments
+        .get(pageFragmentContainerId)
+        ?.getNode(id, { iteratorContainerId, iteratorIndex, strict: true });
+    }
+
+    if (Array.isArray(iteratorContainerId) && iteratorContainerId.length && Array.isArray(iteratorIndex)) {
+      let iteratorContainer = this.nodes.get(iteratorContainerId[0]) as IteratorContainer;
+
+      for (let i = 1, l = iteratorContainerId.length; i < l; i++) {
+        iteratorContainer = iteratorContainer?.getNode(
+          iteratorContainerId[i],
+          iteratorIndex[i - 1],
+        ) as IteratorContainer;
+      }
+
+      return iteratorContainer?.getNode(id, iteratorIndex[iteratorIndex.length - 1]) as T;
+    }
+
+    if (!strict && this.app.pageFragments.size) {
+      for (const [, pageFragment] of this.app.pageFragments) {
+        if (pageFragment.nodes.has(id)) {
+          return pageFragment.nodes.get(id) as T;
+        }
+      }
+    }
   }
 
-  public setNode(id: Id, node: Node) {
+  public setNode(id: Id, node: TMagicNode) {
     this.nodes.set(id, node);
   }
 
@@ -72,9 +129,16 @@ class Page extends Node {
   }
 
   public destroy(): void {
-    super.destroy();
+    this.nodes.forEach((node) => {
+      if (node === this) {
+        return;
+      }
+      node.destroy();
+    });
 
     this.nodes.clear();
+
+    super.destroy();
   }
 }
 

@@ -1,28 +1,20 @@
 <template>
-  <m-fields-link :config="formConfig" :model="modelValue" name="form" @change="changeHandler"></m-fields-link>
+  <MLink :config="formConfig" :model="modelValue" name="form" @change="changeHandler"></MLink>
 </template>
 
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 import serialize from 'serialize-javascript';
 
-import type { FieldProps, FormItem } from '@tmagic/form';
+import type { CodeLinkConfig, FieldProps, MLink } from '@tmagic/form';
 
-import { getConfig } from '@editor/utils/config';
+import { getEditorConfig } from '@editor/utils/config';
 
 defineOptions({
   name: 'MFieldsCodeLink',
 });
 
-const props = defineProps<
-  FieldProps<
-    {
-      type: 'code-link';
-      formTitle?: string;
-      codeOptions?: Object;
-    } & FormItem
-  >
->();
+const props = defineProps<FieldProps<CodeLinkConfig>>();
 
 const emit = defineEmits(['change']);
 
@@ -70,7 +62,7 @@ const changeHandler = (v: Record<string, any>) => {
   if (!props.name || !props.model) return;
 
   try {
-    const parseDSL = getConfig('parseDSL');
+    const parseDSL = getEditorConfig('parseDSL');
     props.model[props.name] = parseDSL(`(${v[props.name]})`);
     emit('change', props.model[props.name]);
   } catch (e) {

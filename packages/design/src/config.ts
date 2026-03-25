@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-import { PluginOptions } from './types';
+import { DesignPluginOptions } from './types';
 
-let $MAGIC_DESIGN: PluginOptions = {};
+let $MAGIC_DESIGN: DesignPluginOptions = {};
 
-const setConfig = (options: PluginOptions): void => {
+const setDesignConfig = (options: DesignPluginOptions): void => {
   $MAGIC_DESIGN = options;
 };
 
-const getConfig = <K extends keyof PluginOptions>(key: K) => $MAGIC_DESIGN[key];
+const getDesignConfig = <K extends keyof DesignPluginOptions>(key: K) => $MAGIC_DESIGN[key];
 
-export { getConfig, setConfig };
+export { getDesignConfig, setDesignConfig };

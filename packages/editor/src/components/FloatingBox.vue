@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body" v-if="visible">
     <div ref="target" class="m-editor-float-box" :style="{ ...style, zIndex: curZIndex }" @mousedown="nextZIndex">
-      <div ref="titleEl" class="m-editor-float-box-title">
+      <div ref="title" class="m-editor-float-box-title">
         <slot name="title">
           <span>{{ title }}</span>
         </slot>
@@ -17,14 +17,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, nextTick, onBeforeUnmount, provide, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, provide, ref, useTemplateRef, watch } from 'vue';
 import { Close } from '@element-plus/icons-vue';
 import VanillaMoveable from 'moveable';
 
 import { TMagicButton, useZIndex } from '@tmagic/design';
 
 import MIcon from '@editor/components/Icon.vue';
-import type { Services } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
 
 interface Position {
   left: number;
@@ -39,7 +39,7 @@ const props = withDefaults(
   defineProps<{
     position?: Position;
     title?: string;
-    beforeClose?: (done: (cancel?: boolean) => void) => void;
+    beforeClose?: (_done: (_cancel?: boolean) => void) => void;
   }>(),
   {
     title: '',
@@ -47,8 +47,8 @@ const props = withDefaults(
   },
 );
 
-const target = ref<HTMLDivElement>();
-const titleEl = ref<HTMLDivElement>();
+const targetEl = useTemplateRef<HTMLDivElement>('target');
+const titleEl = useTemplateRef<HTMLDivElement>('title');
 
 const zIndex = useZIndex();
 const curZIndex = ref<number>(0);
@@ -59,15 +59,15 @@ const bodyHeight = computed(() => {
     return height.value - titleHeight.value;
   }
 
-  if (target.value) {
-    return target.value.clientHeight - titleHeight.value;
+  if (targetEl.value) {
+    return targetEl.value.clientHeight - titleHeight.value;
   }
 
   return 'auto';
 });
 
-const services = inject<Services>('services');
-const frameworkWidth = computed(() => services?.uiService.get('frameworkRect').width || 0);
+const { uiService } = useServices();
+const frameworkWidth = computed(() => uiService.get('frameworkRect').width || 0);
 const style = computed(() => {
   let { left } = props.position;
   if (width.value) {
@@ -87,7 +87,7 @@ let moveable: VanillaMoveable | null = null;
 const initMoveable = () => {
   moveable = new VanillaMoveable(globalThis.document.body, {
     className: 'm-editor-floating-box-moveable',
-    target: target.value,
+    target: targetEl.value,
     draggable: true,
     resizable: true,
     edge: true,
@@ -126,7 +126,7 @@ watch(
       await nextTick();
       curZIndex.value = zIndex.nextZIndex();
 
-      const targetRect = target.value?.getBoundingClientRect();
+      const targetRect = targetEl.value?.getBoundingClientRect();
       if (targetRect) {
         width.value = targetRect.width;
         height.value = targetRect.height;
@@ -168,11 +168,11 @@ const nextZIndex = () => {
   curZIndex.value = zIndex.nextZIndex();
 };
 
-provide('parentFloating', target);
+provide('parentFloating', targetEl);
 
 defineExpose({
   bodyHeight,
-  target,
+  target: targetEl,
   titleEl,
 });
 </script>

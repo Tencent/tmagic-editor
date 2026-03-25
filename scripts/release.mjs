@@ -1,11 +1,12 @@
 // @ts-check
-import enquirer from 'enquirer';
-import execa from 'execa';
-import minimist from 'minimist';
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import enquirer from 'enquirer';
+import { execa } from 'execa';
+import minimist from 'minimist';
 import pico from 'picocolors';
 import semver from 'semver';
 
@@ -22,7 +23,7 @@ let versionUpdated = false;
 
 const { prompt } = enquirer;
 const currentVersion = createRequire(import.meta.url)('../package.json').version;
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 const args = minimist(process.argv.slice(2), {
   alias: {
     skipBuild: 'skip-build',
@@ -35,17 +36,19 @@ const args = minimist(process.argv.slice(2), {
 const preId = args.preid || semver.prerelease(currentVersion)?.[0];
 const isDryRun = args.dry;
 /** @type {boolean | undefined} */
-let { skipTests } = args;
+// eslint-disable-next-line prefer-destructuring
+let skipTests = args.skipTests;
 const { skipBuild } = args;
 const skipPrompts = args.skipPrompts || args.canary;
 const skipGit = args.skipGit || args.canary;
 
-const packages = fs.readdirSync(path.resolve(__dirname, '../packages')).filter((p) => {
-  const pkgRoot = path.resolve(__dirname, '../packages', p);
+const packages = fs.readdirSync(path.resolve(dirname, '../packages')).filter((p) => {
+  const pkgRoot = path.resolve(dirname, '../packages', p);
   if (fs.statSync(pkgRoot).isDirectory()) {
     const pkg = JSON.parse(fs.readFileSync(path.resolve(pkgRoot, 'package.json'), 'utf-8'));
     return !pkg.private;
   }
+  return false;
 });
 
 const keepThePackageName = (/** @type {string} */ pkgName) => pkgName;
@@ -73,16 +76,16 @@ const dryRun = async (
   /** @type {import('execa').Options} */ opts = {},
 ) => console.log(pico.blue(`[dryrun] ${bin} ${args.join(' ')}`), opts);
 const runIfNotDry = isDryRun ? dryRun : run;
-const getPkgRoot = (/** @type {string} */ pkg) => path.resolve(__dirname, `../packages/${pkg}`);
-const getRunTimeRoot = (pkg) => path.resolve(__dirname, `../runtime/${pkg}`);
-const getPlayground = () => path.resolve(__dirname, `../playground`);
+const getPkgRoot = (/** @type {string} */ pkg) => path.resolve(dirname, `../packages/${pkg}`);
+const getRunTimeRoot = (pkg) => path.resolve(dirname, `../runtime/${pkg}`);
+const getPlayground = () => path.resolve(dirname, '../playground');
 const step = (/** @type {string} */ msg) => console.log(pico.cyan(msg));
 
 async function main() {
   if (!(await isInSyncWithRemote())) {
     return;
   }
-  console.log(`${pico.green(`✓`)} commit is up-to-date with remote.\n`);
+  console.log(`${pico.green('✓')} commit is up-to-date with remote.\n`);
 
   let targetVersion = args._[0];
 
@@ -139,7 +142,7 @@ async function main() {
       const { yes: promptSkipTests } = await prompt({
         type: 'confirm',
         name: 'yes',
-        message: `CI for this commit passed. Skip local tests?`,
+        message: 'CI for this commit passed. Skip local tests?',
       });
 
       skipTests = promptSkipTests;
@@ -151,7 +154,7 @@ async function main() {
     if (!isDryRun) {
       await run('pnpm', ['run', 'test', '--run']);
     } else {
-      console.log(`Skipped (dry run)`);
+      console.log('Skipped (dry run)');
     }
   } else {
     step('Tests skipped.');
@@ -167,19 +170,19 @@ async function main() {
   if (!skipBuild && !isDryRun) {
     await run('pnpm', ['run', 'build']);
   } else {
-    console.log(`(skipped)`);
+    console.log('(skipped)');
   }
 
   // generate changelog
   step('\nGenerating changelog...');
-  await run(`pnpm`, ['run', 'changelog']);
+  await run('pnpm', ['run', 'changelog']);
 
   if (!skipPrompts) {
     /** @type {{ yes: boolean }} */
     const { yes: changelogOk } = await prompt({
       type: 'confirm',
       name: 'yes',
-      message: `Changelog generated. Does it look good?`,
+      message: 'Changelog generated. Does it look good?',
     });
 
     if (!changelogOk) {
@@ -219,6 +222,21 @@ async function main() {
     await publishPackage(pkg, targetVersion, additionalPublishFlags);
   }
 
+  // update pnpm-lock.yaml
+  step('\nUpdating lockfile...');
+  await run('pnpm', ['install', '--prefer-offline']);
+
+  if (!skipGit) {
+    const { stdout } = await run('git', ['diff'], { stdio: 'pipe' });
+    if (stdout) {
+      step('\nCommitting changes...');
+      await runIfNotDry('git', ['add', '-A']);
+      await runIfNotDry('git', ['commit', '-m', `chore: update lockfile v${targetVersion}`, '--verify']);
+    } else {
+      console.log('No changes to commit.');
+    }
+  }
+
   // push to GitHub
   if (!skipGit) {
     step('\nPushing to GitHub...');
@@ -228,7 +246,7 @@ async function main() {
   }
 
   if (isDryRun) {
-    console.log(`\nDry run finished - run git diff to see package changes.`);
+    console.log('\nDry run finished - run git diff to see package changes.');
   }
 
   if (skippedPackages.length) {
@@ -243,8 +261,7 @@ async function getCIResult() {
   try {
     const sha = await getSha();
     const res = await fetch(
-      `https://api.github.com/repos/vuejs/core/actions/runs?head_sha=${sha}` +
-        `&status=success&exclude_pull_requests=true`,
+      `https://api.github.com/repos/vuejs/core/actions/runs?head_sha=${sha}&status=success&exclude_pull_requests=true`,
     );
     const data = await res.json();
     return data.workflow_runs.length > 0;
@@ -266,7 +283,7 @@ async function isInSyncWithRemote() {
     const { yes } = await prompt({
       type: 'confirm',
       name: 'yes',
-      message: pico.red(`Local HEAD is not up-to-date with remote. Are you sure you want to continue?`),
+      message: pico.red('Local HEAD is not up-to-date with remote. Are you sure you want to continue?'),
     });
     return yes;
   } catch {
@@ -289,11 +306,11 @@ async function getBranch() {
  */
 function updateVersions(version, getNewPackageName = keepThePackageName) {
   // 1. update root package.json
-  updatePackage(path.resolve(__dirname, '..'), version, getNewPackageName);
+  updatePackage(path.resolve(dirname, '..'), version, getNewPackageName);
   // 2. update all packages
   packages.forEach((p) => updatePackage(getPkgRoot(p), version, getNewPackageName));
 
-  ['vue3', 'react', 'vue2'].forEach((p) => updatePackage(getRunTimeRoot(p), version, getNewPackageName, true));
+  ['vue', 'react'].forEach((p) => updatePackage(getRunTimeRoot(p), version, getNewPackageName, true));
   updatePackage(getPlayground(), version, getNewPackageName, true);
 }
 
@@ -312,6 +329,7 @@ function updatePackage(pkgRoot, version, getNewPackageName, updateDep = false) {
   if (updateDep) {
     updateDeps(pkg, 'dependencies', version);
     updateDeps(pkg, 'peerDependencies', version);
+    updateDeps(pkg, 'devDependencies', version);
   }
 
   fs.writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
@@ -319,7 +337,7 @@ function updatePackage(pkgRoot, version, getNewPackageName, updateDep = false) {
 
 /**
  * @param {Package} pkg
- * @param {'dependencies' | 'peerDependencies'} depType
+ * @param {'dependencies' | 'peerDependencies' | 'devDependencies'} depType
  * @param {string} version
  */
 function updateDeps(pkg, depType, version) {

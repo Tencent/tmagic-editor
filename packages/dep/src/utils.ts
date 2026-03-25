@@ -6,11 +6,19 @@ import {
   type HookData,
   HookType,
   type Id,
+  NODE_CONDS_KEY,
 } from '@tmagic/schema';
-import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX } from '@tmagic/utils';
+import {
+  DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX,
+  dataSourceTemplateRegExp,
+  getKeysArray,
+  isObject,
+} from '@tmagic/utils';
 
 import Target from './Target';
 import { DepTargetType, type TargetList } from './types';
+
+const INTEGER_REGEXP = /^\d+$/;
 
 export const createCodeBlockTarget = (id: Id, codeBlock: CodeBlockContent, initialDeps: DepData = {}) =>
   new Target({
@@ -18,14 +26,13 @@ export const createCodeBlockTarget = (id: Id, codeBlock: CodeBlockContent, initi
     id,
     initialDeps,
     name: codeBlock.name,
-    isTarget: (key: string | number, value: any) => {
+    isTarget: (_key: string | number, value: any) => {
       if (id === value) {
         return true;
       }
 
       if (value?.hookType === HookType.CODE && Array.isArray(value.hookData)) {
-        const index = value.hookData.findIndex((item: HookData) => item.codeId === id);
-        return Boolean(index > -1);
+        return value.hookData.some((item: HookData) => item.codeId === id);
       }
 
       return false;
@@ -40,33 +47,53 @@ export const createCodeBlockTarget = (id: Id, codeBlock: CodeBlockContent, initi
  * @returns boolean
  */
 export const isIncludeArrayField = (keys: string[], fields: DataSchema[]) => {
-  let includeArray = false;
+  let f = fields;
 
-  keys.reduce((accumulator: DataSchema[], currentValue: string, currentIndex: number) => {
-    const field = accumulator.find(({ name }) => name === currentValue);
-    if (
-      field &&
-      field.type === 'array' &&
-      // 不是整数
-      /^(?!\d+$).*$/.test(`${keys[currentIndex + 1]}`) &&
-      currentIndex < keys.length - 1
-    ) {
-      includeArray = true;
-    }
-    return field?.fields || [];
-  }, fields);
+  return keys.some((key, index) => {
+    const field = f.find(({ name }) => name === key);
 
-  return includeArray;
+    f = field?.fields || [];
+
+    // 字段类型为数组并且后面没有数字索引
+    return field?.type === 'array' && index < keys.length - 1 && !INTEGER_REGEXP.test(keys[index + 1]);
+  });
 };
 
 /**
  * 判断模板(value)是不是使用数据源Id(dsId)，如：`xxx${dsId.field}xxx${dsId.field}`
  * @param value any
  * @param dsId string | number
+ * @param hasArray boolean true: 一定要包含有需要迭代的模板; false: 一定要包含普通模板;
  * @returns boolean
  */
-export const isDataSourceTemplate = (value: any, dsId: string | number) =>
-  typeof value === 'string' && value.includes(`${dsId}`) && /\$\{([\s\S]+?)\}/.test(value);
+export const isDataSourceTemplate = (value: any, ds: Pick<DataSourceSchema, 'id' | 'fields'>, hasArray = false) => {
+  // 模板中可能会存在多个表达式，将表达式从模板中提取出来
+  const templates: string[] = value.match(dataSourceTemplateRegExp) || [];
+
+  if (templates.length <= 0) {
+    return false;
+  }
+
+  for (const tpl of templates) {
+    // 将${dsId.xxxx} 转成 dsId.xxxx
+    const expression = tpl.substring(2, tpl.length - 1);
+    const keys = getKeysArray(expression);
+    const dsId = keys.shift();
+
+    if (!dsId || dsId !== ds.id) {
+      continue;
+    }
+
+    // ${dsId.array} ${dsId.array[0]} ${dsId.array[0].a} 这种是依赖
+    // ${dsId.array.a} 这种不是依赖，这种需要再迭代器容器中的组件才能使用，依赖由迭代器处理
+    const includesArray = isIncludeArrayField(keys, ds.fields);
+    if (hasArray === includesArray) {
+      return true;
+    }
+  }
+
+  return false;
+};
 
 /**
  * 指定数据源的字符串模板,如：{ isBindDataSourceField: true, dataSourceId: 'id', template: `xxx${field}xxx`}
@@ -83,11 +110,11 @@ export const isSpecificDataSourceTemplate = (value: any, dsId: string | number) 
 /**
  * 关联数据源字段，格式为 [前缀+数据源ID, 字段名]
  * 使用data-source-field-select value: 'value' 可以配置出来
- * @param value any
+ * @param value any[]
  * @param id string | number
  * @returns boolean
  */
-export const isUseDataSourceField = (value: any, id: string | number) => {
+export const isUseDataSourceField = (value: any[], id: string | number) => {
   if (!Array.isArray(value) || typeof value[0] !== 'string') {
     return false;
   }
@@ -107,20 +134,21 @@ export const isUseDataSourceField = (value: any, id: string | number) => {
 /**
  * 判断是否不包含${dsId.array.a}
  * @param value any
- * @param ds DataSourceSchema
+ * @param ds Pick<DataSourceSchema, 'id' | 'fields'>
  * @returns boolean
  */
-export const isDataSourceTemplateNotIncludeArrayField = (value: string, ds: DataSourceSchema): boolean => {
+export const isDataSourceTemplateNotIncludeArrayField = (
+  value: string,
+  ds: Pick<DataSourceSchema, 'id' | 'fields'>,
+): boolean => {
   // 模板中可能会存在多个表达式，将表达式从模板中提取出来
-  const templates = value.match(/\$\{([\s\S]+?)\}/g) || [];
+  const templates = value.match(dataSourceTemplateRegExp) || [];
 
+  let result = false;
   for (const tpl of templates) {
-    const keys = tpl
-      // 将${dsId.xxxx} 转成 dsId.xxxx
-      .substring(2, tpl.length - 1)
-      // 将 array[0] 转成 array.0
-      .replaceAll(/\[(\d+)\]/g, '.$1')
-      .split('.');
+    // 将${dsId.xxxx} 转成 dsId.xxxx
+    const expression = tpl.substring(2, tpl.length - 1);
+    const keys = getKeysArray(expression);
     const dsId = keys.shift();
 
     if (!dsId || dsId !== ds.id) {
@@ -132,64 +160,125 @@ export const isDataSourceTemplateNotIncludeArrayField = (value: string, ds: Data
     if (isIncludeArrayField(keys, ds.fields)) {
       return false;
     }
+    result = true;
   }
 
-  return true;
+  return result;
 };
 
-export const createDataSourceTarget = (ds: DataSourceSchema, initialDeps: DepData = {}) =>
+export const isDataSourceTarget = (
+  ds: Pick<DataSourceSchema, 'id' | 'fields'>,
+  key: string | number,
+  value: any,
+  hasArray = false,
+) => {
+  if (!value) {
+    return false;
+  }
+
+  const valueType = typeof value;
+  if (valueType !== 'string' && valueType !== 'object') {
+    return false;
+  }
+
+  if (`${key}`.startsWith(NODE_CONDS_KEY)) {
+    return false;
+  }
+
+  // 或者在模板在使用数据源
+  if (valueType === 'string') {
+    return isDataSourceTemplate(value, ds, hasArray);
+  }
+
+  // 关联数据源对象,如：{ isBindDataSource: true, dataSourceId: 'xxx'}
+  // 使用data-source-select value: 'value' 可以配置出来
+  if (isObject(value) && value.isBindDataSource && value.dataSourceId === ds.id) {
+    return true;
+  }
+
+  if (isSpecificDataSourceTemplate(value, ds.id)) {
+    return true;
+  }
+
+  if (isUseDataSourceField(value, ds.id)) {
+    const [, ...keys] = value;
+    const includeArray = isIncludeArrayField(keys, ds.fields);
+    return hasArray ? includeArray : !includeArray;
+  }
+
+  return false;
+};
+
+export const isDataSourceCondTarget = (
+  ds: Pick<DataSourceSchema, 'id' | 'fields'>,
+  key: string | number,
+  value: any,
+  hasArray = false,
+) => {
+  if (!Array.isArray(value) || !ds) {
+    return false;
+  }
+
+  const [dsId, ...keys] = value;
+  // 使用data-source-field-select value: 'key' 可以配置出来
+  if (dsId !== ds.id || !`${key}`.startsWith(NODE_CONDS_KEY)) {
+    return false;
+  }
+
+  if (ds.fields?.some((field) => field.name === keys[0])) {
+    const includeArray = isIncludeArrayField(keys, ds.fields);
+    return hasArray ? includeArray : !includeArray;
+  }
+
+  return false;
+};
+
+export const createDataSourceTarget = (ds: Pick<DataSourceSchema, 'id' | 'fields'>, initialDeps: DepData = {}) =>
   new Target({
     type: DepTargetType.DATA_SOURCE,
     id: ds.id,
     initialDeps,
-    isTarget: (key: string | number, value: any) => {
-      // 关联数据源对象,如：{ isBindDataSource: true, dataSourceId: 'xxx'}
-      // 使用data-source-select value: 'value' 可以配置出来
-
-      if (value?.isBindDataSource && value.dataSourceId && value.dataSourceId === ds.id) {
-        return true;
-      }
-
-      // 或者在模板在使用数据源
-      if (isDataSourceTemplate(value, ds.id)) {
-        return isDataSourceTemplateNotIncludeArrayField(value, ds);
-      }
-
-      if (isSpecificDataSourceTemplate(value, ds.id)) {
-        return true;
-      }
-
-      if (isUseDataSourceField(value, ds.id)) {
-        const [, ...keys] = value;
-        return !isIncludeArrayField(keys, ds.fields);
-      }
-
-      return false;
-    },
+    isTarget: (key: string | number, value: any) => isDataSourceTarget(ds, key, value),
   });
 
-export const createDataSourceCondTarget = (ds: DataSourceSchema, initialDeps: DepData = {}) =>
+export const createDataSourceCondTarget = (ds: Pick<DataSourceSchema, 'id' | 'fields'>, initialDeps: DepData = {}) =>
   new Target({
     type: DepTargetType.DATA_SOURCE_COND,
     id: ds.id,
     initialDeps,
-    isTarget: (key: string | number, value: any) => {
-      // 使用data-source-field-select value: 'key' 可以配置出来
-      if (!Array.isArray(value) || value[0] !== ds.id || !`${key}`.startsWith('displayConds')) return false;
-      return Boolean(ds?.fields?.find((field) => field.name === value[1]));
-    },
+    isTarget: (key: string | number, value: any) => isDataSourceCondTarget(ds, key, value),
   });
 
-export const createDataSourceMethodTarget = (ds: DataSourceSchema, initialDeps: DepData = {}) =>
+export const createDataSourceMethodTarget = (
+  ds: Pick<DataSourceSchema, 'id' | 'methods' | 'fields'>,
+  initialDeps: DepData = {},
+) =>
   new Target({
     type: DepTargetType.DATA_SOURCE_METHOD,
     id: ds.id,
     initialDeps,
-    isTarget: (key: string | number, value: any) => {
+    isTarget: (_key: string | number, value: any) => {
       // 使用data-source-method-select 可以配置出来
-      if (!Array.isArray(value) || value[0] !== ds.id) return false;
+      if (!Array.isArray(value)) {
+        return false;
+      }
 
-      return Boolean(ds?.methods?.find((method) => method.name === value[1]));
+      const [dsId, methodName] = value;
+
+      if (!methodName || dsId !== ds.id) {
+        return false;
+      }
+
+      if (ds.methods?.some((method) => method.name === methodName)) {
+        return true;
+      }
+
+      // 配置的方法名称可能会是数据源类中定义的，并不存在于methods中，所以这里判断如果methodName如果是字段名称，就表示配置的不是方法
+      if (ds.fields?.some((field) => field.name === methodName)) {
+        return false;
+      }
+
+      return true;
     },
   });
 
@@ -198,12 +287,19 @@ export const traverseTarget = (
   cb: (target: Target) => void,
   type?: DepTargetType | string,
 ) => {
-  Object.values(targetsList).forEach((targets) => {
-    Object.values(targets).forEach((target) => {
-      if (type && target.type !== type) {
-        return;
+  if (type) {
+    const targets = targetsList[type];
+    if (targets) {
+      for (const target of Object.values(targets)) {
+        cb(target);
       }
+    }
+    return;
+  }
+
+  for (const targets of Object.values(targetsList)) {
+    for (const target of Object.values(targets)) {
       cb(target);
-    });
-  });
+    }
+  }
 };

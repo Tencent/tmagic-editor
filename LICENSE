@@ -1,6 +1,6 @@
 Tencent is pleased to support the open source community by making TMagicEditor available. 
 
-Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved. 
+Copyright (C) 2025 Tencent.  All rights reserved. 
 
 TMagicEditor is licensed under the Apache License Version 2.0 except for the third-party components listed below.
 
@@ -73,15 +73,6 @@ Open Source Software Licensed under the Apache License Version 2.0:
 --------------------------------------------------------------------
 1. typescript
 Copyright (c) Microsoft Corporation. All rights reserved.
-
-2. log4js
-Copyright 2015 Gareth Jones (with contributions from many other people)
-
-3. reflect-metadata
-Copyright (c) Microsoft Corporation. All rights reserved. 
-
-4. xlsx
-Copyright (C) 2013-present SheetJS
 
 
 Terms of the Apache License Version 2.0:
@@ -355,8 +346,8 @@ Open Source Software Licensed under the BSD 2-Clause License:
 1. @typescript-eslint/parser
 Copyright JS Foundation and other contributors, https://js.foundation
 
-2. uglify-js
-Copyright 2012-2019 (c) Mihai Bazon <mihai.bazon@gmail.com>
+2. terser
+Copyright 2012-2018 (c) Mihai Bazon <mihai.bazon@gmail.com>
 
 
 Terms of the BSD 2-Clause License:
@@ -390,8 +381,8 @@ Open Source Software Licensed under the BSD 3-Clause License:
 Copyright 2014 Yahoo! Inc.
 All rights reserved.
 
-2. serialize-javascript
-Copyright 2014 Yahoo! Inc.
+2. highlight.js
+Copyright (c) 2006, Ivan Sagalaev.
 All rights reserved.
 
 
@@ -411,11 +402,14 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 Open Source Software Licensed under the ISC License:
 --------------------------------------------------------------------
-1. raiz
-Copyright raiz original authour and authors
+1. c8
+Copyright (c) 2017, Contributors
 
-2. axios-jsonp
-Copyright (c) Adonis
+2. picocolors
+Copyright (c) 2021 Alexey Raspopov, Kostiantyn Denysov, Anton Verinov
+
+3. semver
+Copyright (c) Isaac Z. Schlueter and Contributors
 
 
 Terms of the ISC License:
@@ -428,232 +422,239 @@ THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH RE
 
 Open Source Software Licensed under the MIT License:
 --------------------------------------------------------------------
-1. events
-Copyright Joyent, Inc. and other Node contributors.
-
-2. vite-plugin-dts
-Copyright (c) 2021-present qmhc
-
-3. color
-Copyright (c) 2012 Heather Arthur
-
-4. element-plus
-Copyright element-plus original authour and authors
-
-5. @types/node
-Copyright (c)  Microsoft TypeScript, DefinitelyTyped, Alberto Schiabel, Alvis HT Tang, Andrew Makarov, Benjamin Toueg, Chigozirim C., David Junger, Deividas Bakanas, Eugene Y. Q. Shen, Hannes Magnusson, Hoàng Văn Khải, Huw, Kelvin Jin, Klaus Meinhardt, Lishude, Mariusz Wiktorczyk, Mohsen Azimi, Nicolas Even, Nikita Galkin, Parambir Singh, Sebastian Silbermann, Simon Schick, Thomas den Hollander, Wilco Bakker, wwwy3y3, Zane Hannan AU, Samuel Ainsworth, Kyle Uehlein, Thanik Bhongbhibhat, Marcin Kopacz, Trivikram Kamat, Junxiao Shi, Ilia Baryshnikov, and ExE Boss.
-
-6. vue
-Copyright (c) 2018-present, Yuxi (Evan) You
-
-7. @vitejs/plugin-vue
-Copyright (c) 2019-present, Yuxi (Evan) You and contributors
-
-8. @vitejs/plugin-vue-jsx
-Copyright (c) 2019-present, Yuxi (Evan) You and Vite contributors
-
-9. @vue/compiler-sfc
-Copyright (c) 2018-present, Yuxi (Evan) You
-
-10. @vue/test-utils
-Copyright (c) 2021-present vuejs
-
-11. sass
-Copyright (c) 2016, Google Inc.
-
-12. vue-tsc
-Copyright (c) 2021-present Johnson Chu
-
-13. moment
-Copyright (c) JS Foundation and other contributors
-
-14. sortablejs
-Copyright (c) 2019 All contributors to Sortable
-
-15. @scena/guides
-Copyright (c) 2019 Daybrush
-
-16. moveable
-Copyright (c) 2019 Daybrush
-
-17. delegate
-Copyright (c) Zeno Rocha
-
-18. tiny-emitter
-Copyright (c) 2017 Scott Corgan
-
-19. @testing-library/vue
-Copyright (c) 2018 Daniel Cook
-Copyright (c) 2017 Kent C. Dodds
-
-20. react
-Copyright (c) Facebook, Inc. and its affiliates.
-
-21. react-dom
-Copyright (c) Facebook, Inc. and its affiliates.
-
-22. vue
-Copyright (c) 2013-present, Yuxi (Evan) You
-
-23. @vue/composition-api
-Copyright (c) 2019-present, liximomo(X.L)
-
-24. vite-plugin-vue2
-Copyright © underfin
-
-25. vue-template-compiler
-Copyright (c)-present, Yuxi (Evan) You
-
-26. rollup-plugin-external-globals
-Copyright (c) 2018 eight
-
-27. recast
-Copyright (c) 2012 Ben Newman <bn@cs.stanford.edu>
-
-28. @babel/preset-env
-Copyright (c) 2014-present Sebastian McKenzie and other contributors
-
-29. @vitejs/plugin-react-refresh
-Copyright (c) 2019-present, Yuxi (Evan) You and Vite contributors
-
-30. @commitlint/cli
+1. @commitlint/cli
 Copyright (c) 2016 - present Mario Nebl
 
-31. @commitlint/config-conventional
+2. @commitlint/config-conventional
 Copyright (c) 2016 - present Mario Nebl
 
-32. @typescript-eslint/eslint-plugin
+3. @element-plus/icons-vue
+Copyright (c) element-plus contributors
+
+4. @eslint/js
+Copyright OpenJS Foundation and other contributors
+
+5. @popperjs/core
+Copyright (c) 2019 Federico Zivolo
+
+6. @scena/guides
+Copyright (c) 2019 Daybrush
+
+7. @stylistic/eslint-plugin
+Copyright (c) Anthony Fu
+
+8. @types/events
+Copyright (c) Microsoft Corporation.
+
+9. @types/fs-extra
+Copyright (c) Microsoft Corporation.
+
+10. @types/lodash-es
+Copyright (c) Microsoft Corporation.
+
+11. @types/node
+Copyright (c) Microsoft Corporation.
+
+12. @types/qrcode
+Copyright (c) Microsoft Corporation.
+
+13. @types/react
+Copyright (c) Microsoft Corporation.
+
+14. @types/react-dom
+Copyright (c) Microsoft Corporation.
+
+15. @types/serialize-javascript
+Copyright (c) Microsoft Corporation.
+
+16. @types/sortablejs
+Copyright (c) Microsoft Corporation.
+
+17. @typescript-eslint/eslint-plugin
 Copyright (c) 2019 TypeScript ESLint and other contributors
 
-33. @vue/cli-plugin-babel
-Copyright (c) 2017-present, Yuxi (Evan) You
+18. @vitejs/plugin-legacy
+Copyright (c) 2019-present, Yuxi (Evan) You and Vite contributors
 
-34. @vue/cli-plugin-unit-jest
-Copyright (c) 2017-present, Yuxi (Evan) You
+19. @vitejs/plugin-react-refresh
+Copyright (c) 2019-present, Yuxi (Evan) You and Vite contributors
 
-35. babel-eslint
-Copyright (c) 2014-2016 Sebastian McKenzie <sebmck@gmail.com>
+20. @vitejs/plugin-vue
+Copyright (c) 2019-present, Yuxi (Evan) You and contributors
 
-36. cz-conventional-changelog
-Copyright (c) 2015-2018 Commitizen Contributors
+21. @vitejs/plugin-vue-jsx
+Copyright (c) 2019-present, Yuxi (Evan) You and Vite contributors
 
-37. eslint
-Copyright JS Foundation and other contributors, https://js.foundation
+22. @vitest/coverage-v8
+Copyright (c) 2021-present, Anthony Fu and Vitest contributors
 
-38. eslint-plugin-import
-Copyright (c) 2015 Ben Mosher
+23. @vue/compiler-sfc
+Copyright (c) 2018-present, Yuxi (Evan) You
 
-39. eslint-plugin-prettier
-Copyright © 2017 Andres Suarez and Teddy Katz
+24. @vue/test-utils
+Copyright (c) 2021-present vuejs
 
-40. eslint-plugin-simple-import-sort
-Copyright (c) 2018, 2019, 2020 Simon Lydell
-
-41. eslint-plugin-vue
-Copyright (c) 2017 Toru Nagashima
-
-42. husky
-Copyright (c) 2021 typicode
-
-43. lerna
-Copyright (c) 2015-present Lerna Contributors
-
-44. lint-staged
-Copyright (c) 2016 Andrey Okonetchnikov
-
-45. prettier
-Copyright © James Long and contributors
-
-46. vue-jest
-Copyright (c) 2017 Edd Yerburgh
-
-47. axios
+25. axios
 Copyright (c) 2014-present Matt Zabriskie
 
-48. core-js
-Copyright (c) 2014-2021 Denis Pushkarev
+26. buffer
+Copyright (c) Feross Aboukhadijeh, and other contributors
 
-49. js-cookie
-Copyright (c) 2018 Copyright 2018 Klaus Hartl, Fagner Brack, GitHub Contributors
+27. cac
+Copyright (c) egoist <0x142857@gmail.com>
 
-50. vue-router
-Copyright (c) 2020 Eduardo San Martin Morote
+28. chokidar
+Copyright (c) Paul Miller (https://paulmillr.com)
 
-51. koa
-Copyright (c) 2019 Koa contributors
+29. commitizen
+Copyright (c) 2015 Jim Cummins
 
-52. koa-bodyparser
-Copyright (c) 2014 dead_horse
+30. conventional-changelog-cli
+Copyright (c) Steve Mao
 
-53. koa-router
-Copyright (c) 2015 Alexander C. Mingoia
+31. cosmiconfig
+Copyright (c) 2015 David Clark
 
-54. koa-send
-Copyright (c) 2020 Koa contributors
+32. cz-conventional-changelog
+Copyright (c) 2015-2018 Commitizen Contributors
 
-55. module-alias
-Copyright (c) 2018, Nick Gavrilov
+33. dayjs
+Copyright (c) 2018-present, iamkun
 
-56. mysql2
-Copyright (c) 2016 Andrey Sidorov (sidorares@yandex.ru) and contributors
+34. deep-object-diff
+Copyright (c) 2017 Matt Phillips
 
-57. sequelize
-Copyright (c) 2014-present Sequelize contributors
+35. deep-state-observer
+Copyright (c) neuronet.io
 
-58. sequelize-typescript
-Copyright (c) 2017 Robin Buschmann
+36. element-plus
+Copyright element-plus original authour and authors
 
-59. lodash
-Copyright OpenJS Foundation and other contributors <https://openjsf.org/>
+37. emmet-monaco-es
+Copyright (c) Troy
 
-60. jest
-Copyright (c) Facebook, Inc. and its affiliates.
+38. enquirer
+Copyright (c) 2016-present, Jon Schlinkert
 
-61. fs-extra
+39. esbuild
+Copyright (c) 2020 Evan Wallace
+
+40. eslint
+Copyright JS Foundation and other contributors, https://js.foundation
+
+41. eslint-config-prettier
+Copyright (c) 2017 Simon Lydell
+
+42. eslint-plugin-import
+Copyright (c) 2015 Ben Mosher
+
+43. eslint-plugin-prettier
+Copyright © 2017 Andres Suarez and Teddy Katz
+
+44. eslint-plugin-simple-import-sort
+Copyright (c) 2018, 2019, 2020 Simon Lydell
+
+45. eslint-plugin-vue
+Copyright (c) 2017 Toru Nagashima
+
+46. events
+Copyright Joyent, Inc. and other Node contributors.
+
+47. execa
+Copyright (c) Sindre Sorhus <sindresorhus@gmail.com>
+
+48. fs-extra
 Copyright (c) 2011-2017 JP Richardson
 
-62. moment-timezone
-Copyright (c) JS Foundation and other contributors
+49. gesto
+Copyright (c) 2019 Daybrush
 
-63. nodemon
-Copyright (C) Remy Sharp
+50. globals
+Copyright (c) Sindre Sorhus <sindresorhus@gmail.com>
 
-64. ts-node
-Copyright (c) 2014 Blake Embrey (hello@blakeembrey.com)
+51. husky
+Copyright (c) 2021 typicode
 
-65. tsconfig-paths
-Copyright (c) 2016 Jonas Kello
+52. jsdom
+Copyright (c) 2010 Elijah Insua
 
-66. prettier
-Copyright © James Long and contributors
+53. keycon
+Copyright (c) 2019 Daybrush
 
-67. @babel/core
-Copyright (c) 2014-present Sebastian McKenzie and other contributors
+54. lint-staged
+Copyright (c) 2016 Andrey Okonetchnikov
 
-68. @babel/preset-typescript
-Copyright (c) 2014-present Sebastian McKenzie and other contributors
+55. merge-options
+Copyright (c) Michael Mayer
 
-69. @types/fs-extra
-Copyright (c) Microsoft Corporation.
+56. minimist
+Copyright (c) James Halliday
 
-70. @types/jest
-Copyright (c) Microsoft Corporation.
-
-71. @types/koa
-Copyright (C) DavidCai1993, jKey Lu, Brice Bernard, harryparkdotio, Wooram Jun, Christian Vaagland Tellnes, Piotr Kuczynski, and vnoder.
-
-72. @types/koa-bodyparser
-Copyright (C) Jerry Chin, Anup Kishore, Hiroshi Ioka, Alexi Maschas, and Pirasis Leelatanon.
-
-73. zepto
-Copyright (c) 2010-2016 Thomas Fuchs
-http://zeptojs.com/
-
-74. monaco-editor
+57. monaco-editor
 Copyright (c) 2016 - present Microsoft Corporation
 
-75. @types/koa-router
-Copyright (C) Jerry Chin, Pavel Ivanov, JounQin, Romain Faust, Guillaume Mayer, Andrea Gueugnaut, and Yves Kaufmann.
+58. moveable
+Copyright (c) 2019 Daybrush
+
+59. moveable-helper
+Copyright (c) 2019 Daybrush
+
+60. prettier
+Copyright © James Long and contributors
+
+61. qrcode
+Copyright (c) Ryan Day
+
+62. react
+Copyright (c) Facebook, Inc. and its affiliates.
+
+63. react-dom
+Copyright (c) Facebook, Inc. and its affiliates.
+
+64. recast
+Copyright (c) 2012 Ben Newman <bn@cs.stanford.edu>
+
+65. rolldown
+Copyright (c) 2023-present Rolldown contributors
+
+66. rolldown-plugin-dts
+Copyright (c) Kevin Deng
+
+67. sass-embedded
+Copyright (c) 2019 Google Inc.
+
+68. scenejs
+Copyright (c) 2019 Daybrush
+
+69. shx
+Copyright (c) ShellJS contributors
+
+70. sortablejs
+Copyright (c) 2019 All contributors to Sortable
+
+71. tdesign-vue-next
+Copyright (c) Tencent
+
+72. typescript-eslint
+Copyright (c) 2019 TypeScript ESLint and other contributors
+
+73. vite-plugin-commonjs
+Copyright (c) vite-plugin contributors
+
+74. vitepress
+Copyright (c) 2019-present, Yuxi (Evan) You
+
+75. vitest
+Copyright (c) 2021-present, Anthony Fu and Vitest contributors
+
+76. vue
+Copyright (c) 2018-present, Yuxi (Evan) You
+
+77. vue-router
+Copyright (c) 2020 Eduardo San Martin Morote
+
+78. vue-tsc
+Copyright (c) 2021-present Johnson Chu
 
 
 Terms of the MIT License:
@@ -5429,4 +5430,74 @@ Repository: github:eemeli/yaml
 > OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
 > TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
 > THIS SOFTWARE.
+
+
+
+Open Source Software Licensed under the Zero-Clause BSD License (0BSD):
+--------------------------------------------------------------------
+1. tslib
+Copyright (c) Microsoft Corp.
+
+
+Terms of the Zero-Clause BSD License (0BSD):
+--------------------------------------------------------------------
+Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+
+
+Open Source Software Licensed under the Blue Oak Model License 1.0.0:
+--------------------------------------------------------------------
+1. rimraf
+Copyright (c) Isaac Z. Schlueter and Contributors
+
+
+Terms of the Blue Oak Model License 1.0.0:
+--------------------------------------------------------------------
+Blue Oak Model License
+
+Version 1.0.0
+
+Purpose
+
+This license gives everyone as much permission to work with this software as possible, while protecting contributors from liability.
+
+Acceptance
+
+In order to receive this license, you must agree to its rules. The rules of this license are both obligations under that agreement and conditions to your license. You must not do anything with this software that triggers a rule that you cannot or will not follow.
+
+Copyright
+
+Each contributor licenses you to do everything with this software that would otherwise infringe that contributor's copyright in it.
+
+Notices
+
+You must ensure that everyone who gets a copy of any part of this software from you, with or without changes, also gets the text of this license or a link to https://blueoakcouncil.org/license/1.0.0.
+
+Excuse
+
+If anyone notifies you in writing that you have not complied with Notices, you can keep your license by taking all practical steps to comply within 30 days after the notice. If you do not do so, your license ends immediately.
+
+Patent
+
+Each contributor licenses you to do everything with this software that would otherwise infringe any patent claims they can license or become able to license.
+
+Reliability
+
+No contributor can revoke this license.
+
+No Liability
+
+As far as the law allows, this software comes as is, without any warranty or condition, and no contributor will be liable to anyone for any damages related to this software or this license, under any kind of legal claim.
+
+
+
+Open Source Software Licensed under the (MIT OR CC0-1.0) License:
+--------------------------------------------------------------------
+1. type-fest
+Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
+
+
+A copy of the MIT License is included in this file.
 

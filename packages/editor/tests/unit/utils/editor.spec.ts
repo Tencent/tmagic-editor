@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
  */
 import { describe, expect, test } from 'vitest';
 
-import { NodeType } from '@tmagic/schema';
+import { NodeType } from '@tmagic/core';
 
 import * as editor from '@editor/utils/editor';
 
@@ -57,40 +57,6 @@ describe('util form', () => {
     const name = editor.generatePageName(['index', 'page_2'], NodeType.PAGE);
     // 第二个页面
     expect(name).toBe('page_3');
-  });
-});
-
-describe('isFixed', () => {
-  test('true', () => {
-    expect(
-      editor.isFixed({
-        type: 'text',
-        id: 1,
-        style: {
-          position: 'fixed',
-        },
-      }),
-    ).toBeTruthy();
-  });
-
-  test('false', () => {
-    expect(
-      editor.isFixed({
-        type: 'text',
-        id: 1,
-        style: {
-          position: 'absolute',
-        },
-      }),
-    ).toBeFalsy();
-
-    expect(
-      editor.isFixed({
-        type: 'text',
-        id: 1,
-        style: {},
-      }),
-    ).toBeFalsy();
   });
 });
 
@@ -186,5 +152,156 @@ describe('moveItemsInContainer', () => {
     expect(container.items[0].id).toBe(2);
     expect(container.items[1].id).toBe(7);
     expect(container.items[2].id).toBe(3);
+  });
+});
+
+describe('buildChangeRecords', () => {
+  test('基础类型值', () => {
+    const value = {
+      name: 'test',
+      age: 25,
+      active: true,
+    };
+    const result = editor.buildChangeRecords(value, '');
+
+    expect(result).toEqual([
+      { propPath: 'name', value: 'test' },
+      { propPath: 'age', value: 25 },
+      { propPath: 'active', value: true },
+    ]);
+  });
+
+  test('嵌套对象', () => {
+    const value = {
+      user: {
+        name: 'John',
+        profile: {
+          age: 30,
+          city: 'Beijing',
+        },
+      },
+      settings: {
+        theme: 'dark',
+      },
+    };
+    const result = editor.buildChangeRecords(value, '');
+
+    expect(result).toEqual([
+      { propPath: 'user.name', value: 'John' },
+      { propPath: 'user.profile.age', value: 30 },
+      { propPath: 'user.profile.city', value: 'Beijing' },
+      { propPath: 'settings.theme', value: 'dark' },
+    ]);
+  });
+
+  test('带有basePath', () => {
+    const value = {
+      style: {
+        width: 100,
+        height: 200,
+      },
+    };
+    const result = editor.buildChangeRecords(value, 'node');
+
+    expect(result).toEqual([
+      { propPath: 'node.style.width', value: 100 },
+      { propPath: 'node.style.height', value: 200 },
+    ]);
+  });
+
+  test('包含数组', () => {
+    const value = {
+      items: [1, 2, 3],
+      config: {
+        list: ['a', 'b'],
+      },
+    };
+    const result = editor.buildChangeRecords(value, '');
+
+    expect(result).toEqual([
+      { propPath: 'items', value: [1, 2, 3] },
+      { propPath: 'config.list', value: ['a', 'b'] },
+    ]);
+  });
+
+  test('包含null值', () => {
+    const value = {
+      data: null,
+      info: {
+        value: null,
+        name: 'test',
+      },
+    };
+    const result = editor.buildChangeRecords(value, '');
+
+    expect(result).toEqual([
+      { propPath: 'data', value: null },
+      { propPath: 'info.value', value: null },
+      { propPath: 'info.name', value: 'test' },
+    ]);
+  });
+
+  test('跳过undefined值', () => {
+    const value = {
+      name: 'test',
+      age: undefined,
+      info: {
+        city: 'Beijing',
+        country: undefined,
+      },
+    };
+    const result = editor.buildChangeRecords(value, '');
+
+    expect(result).toEqual([
+      { propPath: 'name', value: 'test' },
+      { propPath: 'info.city', value: 'Beijing' },
+    ]);
+  });
+
+  test('空对象', () => {
+    const value = {};
+    const result = editor.buildChangeRecords(value, '');
+
+    expect(result).toEqual([]);
+  });
+
+  test('深层嵌套', () => {
+    const value = {
+      level1: {
+        level2: {
+          level3: {
+            level4: {
+              value: 'deep',
+            },
+          },
+        },
+      },
+    };
+    const result = editor.buildChangeRecords(value, 'root');
+
+    expect(result).toEqual([{ propPath: 'root.level1.level2.level3.level4.value', value: 'deep' }]);
+  });
+
+  test('混合类型', () => {
+    const value = {
+      string: 'text',
+      number: 42,
+      boolean: false,
+      array: [1, 2],
+      object: {
+        nested: 'value',
+      },
+      nullValue: null,
+    };
+    const result = editor.buildChangeRecords(value, 'mixed');
+
+    expect(result).toEqual([
+      { propPath: 'mixed.string', value: 'text' },
+      { propPath: 'mixed.number', value: 42 },
+      { propPath: 'mixed.boolean', value: false },
+      { propPath: 'mixed.array', value: [1, 2] },
+      { propPath: 'mixed.object.nested', value: 'value' },
+      { propPath: 'mixed.nullValue', value: null },
+    ]);
   });
 });

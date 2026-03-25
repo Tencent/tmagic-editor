@@ -5,13 +5,13 @@
 </template>
 
 <script setup lang="ts">
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 
 defineOptions({
   name: 'TMScrollbar',
 });
 
-const ui = getConfig('components')?.scrollbar;
+const ui = getDesignConfig('components')?.scrollbar;
 
 const uiComponent = ui?.component || 'el-scrollbar';
 </script>

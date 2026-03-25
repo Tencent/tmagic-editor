@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,22 @@
 
 import App from './App';
 
-export * from './events';
+export { cloneDeep } from 'lodash-es';
 
+export * from '@tmagic/data-source';
+export * from '@tmagic/dep';
+export * from '@tmagic/schema';
+export * from '@tmagic/utils';
+
+export { default as EventHelper } from './EventHelper';
+export * from './utils';
+
+export * from './type';
 export { default as Env } from './Env';
 export { default as Page } from './Page';
 export { default as Node } from './Node';
+export { default as IteratorContainer } from './IteratorContainer';
+export { default as FlowState } from './FlowState';
+export { default as DevtoolApi } from './DevtoolApi';
 
 export default App;

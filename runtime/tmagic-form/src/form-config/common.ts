@@ -1,4 +1,4 @@
-import { createForm } from '@tmagic/form';
+import { createForm } from '@tmagic/editor';
 
 export default createForm([
   {

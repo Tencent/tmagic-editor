@@ -1,31 +1,34 @@
+@use "common/var" as *;
+
 .m-editor-page-bar-tabs {
   position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
+  user-select: none;
+}
 
-  .tmagic-design-button.m-editor-page-bar-switch-type-button {
-    margin-left: 7px;
-    position: relative;
-    top: 1px;
-    border-radius: 3px 3px 0 0;
-    border: 1px solid $--border-color;
-    border-bottom: 1px solid transparent;
-
-    &.active {
-      background-color: #f3f3f3;
-    }
+.m-editor-page-list-item {
+  display: flex;
+  width: 100%;
+  height: $page-bar-height;
+  line-height: $page-bar-height;
+  color: $font-color;
+  z-index: 2;
+  overflow: hidden;
+  &:hover {
+    background-color: $hover-color;
   }
 }
 
 .m-editor-page-bar {
   display: flex;
   width: 100%;
-  height: $--page-bar-height;
-  line-height: $--page-bar-height;
-  color: $--font-color;
+  height: $page-bar-height;
+  line-height: $page-bar-height;
+  color: $font-color;
   background-color: #f3f3f3;
-  border-top: 1px solid $--border-color;
+  border-top: 1px solid $border-color;
   z-index: 2;
   overflow: hidden;
 
@@ -37,7 +40,7 @@
   &-item {
     padding: 0 10px;
     cursor: pointer;
-    border-right: 1px solid $--border-color;
+    border-right: 1px solid $border-color;
     display: flex;
     justify-items: center;
     align-items: center;
@@ -56,6 +59,11 @@
     &-icon {
       position: relative;
       z-index: 1;
+
+      .icon-active {
+        font-weight: bold;
+        color: $theme-color;
+      }
     }
 
     &-title {
@@ -64,12 +72,29 @@
       white-space: nowrap;
       overflow: hidden;
     }
+
+    &-left-icon,
+    &-right-icon {
+      position: absolute;
+      right: 0;
+      top: 0;
+      height: 100%;
+    }
+
+    &-left-icon {
+      right: 34px;
+    }
   }
 }
 
 .page-bar-popover {
-  &.el-popper.el-popover {
-    padding: 10px 0;
+  &.tmagic-design-popper {
+    padding: 4px 0;
+  }
+
+  .page-bar-popover-wrapper {
+    max-height: calc(100vh - $page-bar-height - 20px);
+    overflow: auto;
   }
 
   .menu-item {
@@ -77,13 +102,31 @@
     transition: all 0.2s ease 0s;
     padding: 5px 14px;
 
-    .el-button--text,
-    i {
-      color: $--font-color;
+    .tmagic-design-button {
+      color: $font-color;
     }
 
     &:hover {
-      background-color: $--hover-color;
+      background-color: $hover-color;
     }
+
+    &.active {
+      .tmagic-design-button {
+        color: $theme-color;
+      }
+    }
+  }
+}
+
+.m-editor-page-bar-search-panel {
+  position: absolute;
+  bottom: $page-bar-height;
+  border: 1px solid $border-color;
+  padding: 6px 10px;
+  width: 100%;
+  box-sizing: border-box;
+
+  .tmagic-design-form-item {
+    margin-bottom: 0;
   }
 }

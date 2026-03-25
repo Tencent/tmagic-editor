@@ -4,6 +4,8 @@
     ref="table"
     :is="uiComponent"
     v-bind="uiProps"
+    row-class-name="tmagic-design-table-row"
+    cell-class-name="tmagic-design-table-cell"
     @select="selectHandler"
     @sort-change="sortChangeHandler"
     @expand-change="expandChangeHandler"
@@ -14,9 +16,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watchEffect } from 'vue';
+import { computed, useTemplateRef } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { TableProps } from './types';
 
 defineOptions({
@@ -27,15 +29,15 @@ const props = withDefaults(defineProps<TableProps>(), {
   data: () => [],
 });
 
-const ui = getConfig('components')?.table;
+const ui = getDesignConfig('components')?.table;
 
 const uiComponent = ui?.component || 'el-table';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<TableProps>(() => ui?.props(props) || props);
 
 const emit = defineEmits(['select', 'sort-change', 'expand-change', 'cell-click']);
 
-const table = ref<any>();
+const tableRef = useTemplateRef('table');
 
 const selectHandler = (...args: any[]) => {
   emit('select', ...args);
@@ -53,27 +55,21 @@ const cellClickHandler = (...args: any[]) => {
   emit('cell-click', ...args);
 };
 
-let $el: HTMLDivElement | undefined;
-
-watchEffect(() => {
-  $el = table.value?.$el;
-});
-
 defineExpose({
-  instance: table,
+  getEl: () => tableRef.value?.getTableRef().$el,
 
-  $el,
+  getTableRef: () => tableRef.value.getTableRef(),
 
   clearSelection(...args: any[]) {
-    return table.value?.clearSelection(...args);
+    return tableRef.value?.clearSelection(...args);
   },
 
   toggleRowSelection(...args: any[]) {
-    return table.value?.toggleRowSelection(...args);
+    return tableRef.value?.toggleRowSelection(...args);
   },
 
   toggleRowExpansion(...args: any[]) {
-    return table.value?.toggleRowExpansion(...args);
+    return tableRef.value?.toggleRowExpansion(...args);
   },
 });
 </script>

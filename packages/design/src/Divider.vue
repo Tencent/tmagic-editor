@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { DividerProps } from './types';
 
 defineOptions({
@@ -16,9 +16,9 @@ defineOptions({
 
 const props = defineProps<DividerProps>();
 
-const ui = getConfig('components')?.divider;
+const ui = getDesignConfig('components')?.divider;
 
 const uiComponent = ui?.component || 'el-divider';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<DividerProps>(() => ui?.props(props) || props);
 </script>

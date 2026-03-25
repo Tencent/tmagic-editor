@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,10 @@
  */
 import EventEmitter from 'events';
 
-import type { AppCore, CodeBlockContent, DataSchema, DataSourceSchema } from '@tmagic/schema';
-import { getDefaultValueFromFields } from '@tmagic/utils';
+import { cloneDeep } from 'lodash-es';
+
+import type { CodeBlockContent, DataSchema, DataSourceSchema, default as TMagicApp } from '@tmagic/core';
+import { getDefaultValueFromFields } from '@tmagic/core';
 
 import { ObservedData } from '@data-source/observed-data/ObservedData';
 import { SimpleObservedData } from '@data-source/observed-data/SimpleObservedData';
@@ -31,7 +33,7 @@ export default class DataSource<T extends DataSourceSchema = DataSourceSchema> e
   public isInit = false;
 
   /** @tmagic/core 实例 */
-  public app: AppCore;
+  public app: TMagicApp;
 
   protected mockData?: Record<string | number, any>;
 
@@ -60,13 +62,15 @@ export default class DataSource<T extends DataSourceSchema = DataSourceSchema> e
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const ObservedDataClass = options.ObservedDataClass || SimpleObservedData;
     if (this.app.platform === 'editor') {
+      const mocks = cloneDeep(options.schema.mocks || []);
       // 编辑器中有mock使用mock，没有使用默认值
-      this.mockData = options.schema.mocks?.find((mock) => mock.useInEditor)?.data || this.getDefaultData();
-      data = this.mockData;
+      this.mockData = mocks.find((mock) => mock.useInEditor)?.data || this.getDefaultData();
+      data = cloneDeep(this.mockData);
     } else if (typeof options.useMock === 'boolean' && options.useMock) {
+      const mocks = cloneDeep(options.schema.mocks || []);
       // 设置了使用mock就使用mock数据
-      this.mockData = options.schema.mocks?.find((mock) => mock.enable)?.data || this.getDefaultData();
-      data = this.mockData;
+      this.mockData = mocks.find((mock) => mock.enable)?.data;
+      data = cloneDeep(this.mockData) || this.getDefaultData();
     } else if (!options.initialData) {
       data = this.getDefaultData();
     } else {
@@ -122,8 +126,12 @@ export default class DataSource<T extends DataSourceSchema = DataSourceSchema> e
     this.emit('change', changeEvent);
   }
 
-  public onDataChange(path: string, callback: (newVal: any) => void) {
-    this.#observedData.on(path, callback);
+  public setValue(path: string, data: any) {
+    return this.setData(data, path);
+  }
+
+  public onDataChange(path: string, callback: (newVal: any) => void, options?: { immediate?: boolean }) {
+    this.#observedData.on(path, callback, options);
   }
 
   public offDataChange(path: string, callback: (newVal: any) => void) {

@@ -1,8 +1,15 @@
+import { NODE_DISABLE_CODE_BLOCK_KEY, NODE_DISABLE_DATA_SOURCE_KEY } from '@tmagic/schema';
 import { isObject } from '@tmagic/utils';
 
 import type Target from './Target';
 import { type DepExtendedData, DepTargetType, type TargetList, TargetNode } from './types';
 import { traverseTarget } from './utils';
+
+const DATA_SOURCE_TARGET_TYPES: Set<string> = new Set([
+  DepTargetType.DATA_SOURCE,
+  DepTargetType.DATA_SOURCE_COND,
+  DepTargetType.DATA_SOURCE_METHOD,
+]);
 
 export default class Watcher {
   private targetsList: TargetList = {};
@@ -103,9 +110,9 @@ export default class Watcher {
    * 删除所有target
    */
   public clearTargets() {
-    Object.keys(this.targetsList).forEach((key) => {
+    for (const key of Object.keys(this.targetsList)) {
       delete this.targetsList[key];
-    });
+    }
   }
 
   /**
@@ -137,9 +144,9 @@ export default class Watcher {
         if (!type && !target.isCollectByDefault) {
           return;
         }
-        nodes.forEach((node) => {
+        for (const node of nodes) {
           cb({ node, target });
-        });
+        }
       },
       type,
     );
@@ -158,21 +165,21 @@ export default class Watcher {
       };
     }
 
-    const clearedItemsNodeIds: (string | number)[] = [];
+    const clearedItemsNodeIds = new Set<string | number>();
     traverseTarget(targetsList, (target) => {
       if (nodes) {
-        nodes.forEach((node) => {
+        for (const node of nodes) {
           target.removeDep(node[this.idProp]);
 
           if (
             Array.isArray(node[this.childrenProp]) &&
             node[this.childrenProp].length &&
-            !clearedItemsNodeIds.includes(node[this.idProp])
+            !clearedItemsNodeIds.has(node[this.idProp])
           ) {
-            clearedItemsNodeIds.push(node[this.idProp]);
+            clearedItemsNodeIds.add(node[this.idProp]);
             this.clear(node[this.childrenProp]);
           }
-        });
+        }
       } else {
         target.removeDep();
       }
@@ -189,6 +196,14 @@ export default class Watcher {
   }
 
   public collectItem(node: TargetNode, target: Target, depExtendedData: DepExtendedData = {}, deep = false) {
+    if (node[NODE_DISABLE_DATA_SOURCE_KEY] && DATA_SOURCE_TARGET_TYPES.has(target.type)) {
+      return;
+    }
+
+    if (node[NODE_DISABLE_CODE_BLOCK_KEY] && target.type === DepTargetType.CODE_BLOCK) {
+      return;
+    }
+
     const collectTarget = (config: Record<string | number, any>, prop = '') => {
       const doCollect = (key: string, value: any) => {
         const keyIsItems = key === this.childrenProp;
@@ -202,26 +217,28 @@ export default class Watcher {
             key: fullKey,
           });
         } else if (!keyIsItems && Array.isArray(value)) {
-          value.forEach((item, index) => {
+          for (let i = 0, l = value.length; i < l; i++) {
+            const item = value[i];
             if (isObject(item)) {
-              collectTarget(item, `${fullKey}[${index}]`);
+              collectTarget(item, `${fullKey}[${i}]`);
             }
-          });
+          }
         } else if (isObject(value)) {
           collectTarget(value, fullKey);
         }
 
         if (keyIsItems && deep && Array.isArray(value)) {
-          value.forEach((child) => {
+          for (const child of value) {
             this.collectItem(child, target, depExtendedData, deep);
-          });
+          }
         }
       };
 
-      Object.entries(config).forEach(([key, value]) => {
-        if (typeof value === 'undefined' || value === '') return;
+      for (const [key, value] of Object.entries(config)) {
+        if (typeof value === 'undefined' || value === '') continue;
+
         doCollect(key, value);
-      });
+      }
     };
 
     collectTarget(node);
@@ -230,9 +247,9 @@ export default class Watcher {
   public removeTargetDep(target: Target, node: TargetNode, key?: string | number) {
     target.removeDep(node[this.idProp], key);
     if (typeof key === 'undefined' && Array.isArray(node[this.childrenProp]) && node[this.childrenProp].length) {
-      node[this.childrenProp].forEach((item: TargetNode) => {
+      for (const item of node[this.childrenProp] as TargetNode[]) {
         this.removeTargetDep(target, item, key);
-      });
+      }
     }
   }
 }

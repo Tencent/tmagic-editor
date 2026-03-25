@@ -1,9 +1,9 @@
-import { computed, nextTick, reactive, ref, watch } from 'vue-demi';
+import { computed, inject, nextTick, reactive, ref, watch } from 'vue';
 
-import Core from '@tmagic/core';
-import type { Id, MApp, MNode } from '@tmagic/schema';
+import type TMagicApp from '@tmagic/core';
+import type { Id, MApp, MNode } from '@tmagic/core';
+import { getElById, getNodePath, replaceChildNode } from '@tmagic/core';
 import type { Magic, RemoveData, UpdateData } from '@tmagic/stage';
-import { getNodePath, replaceChildNode } from '@tmagic/utils';
 
 declare global {
   interface Window {
@@ -11,7 +11,7 @@ declare global {
   }
 }
 
-export const useEditorDsl = (app: Core | undefined, win = window) => {
+export const useEditorDsl = (app = inject<TMagicApp>('app'), win = window) => {
   const root = ref<MApp>();
   const curPageId = ref<Id>();
   const selectedId = ref<Id>();
@@ -22,7 +22,9 @@ export const useEditorDsl = (app: Core | undefined, win = window) => {
 
   watch(pageConfig, async () => {
     await nextTick();
-    const page = document.querySelector<HTMLElement>('.magic-ui-page');
+    const page =
+      document.querySelector<HTMLElement>('.magic-ui-page') ||
+      document.querySelector<HTMLElement>('.magic-ui-page-fragment');
     page && win.magic?.onPageElUpdate(page);
   });
 
@@ -33,6 +35,15 @@ export const useEditorDsl = (app: Core | undefined, win = window) => {
 
     updateRootConfig(config: MApp) {
       root.value = config;
+
+      if (typeof curPageId.value === 'undefined') {
+        curPageId.value = config.items?.[0]?.id;
+      }
+
+      if (typeof selectedId.value === 'undefined') {
+        selectedId.value = curPageId.value;
+      }
+
       app?.setConfig(config, curPageId.value);
     },
 
@@ -48,10 +59,10 @@ export const useEditorDsl = (app: Core | undefined, win = window) => {
         this.updatePageId?.(id);
       }
 
-      const el = document.getElementById(`${id}`);
+      const el = getElById()(document, `${id}`);
       if (el) return el;
       // 未在当前文档下找到目标元素，可能是还未渲染，等待渲染完成后再尝试获取
-      return nextTick().then(() => document.getElementById(`${id}`) as HTMLElement);
+      return nextTick().then(() => getElById()(document, `${id}`));
     },
 
     add({ config, parentId }: UpdateData) {
@@ -63,7 +74,7 @@ export const useEditorDsl = (app: Core | undefined, win = window) => {
       if (!parent) throw new Error('未找到父节点');
 
       if (config.type !== 'page') {
-        const parentNode = app?.page?.getNode(parent.id);
+        const parentNode = app?.page?.getNode(parent.id, { strict: true });
         parentNode && app?.page?.initNode(config, parentNode);
       }
 
@@ -79,10 +90,16 @@ export const useEditorDsl = (app: Core | undefined, win = window) => {
     update({ config, parentId }: UpdateData) {
       if (!root.value || !app) throw new Error('error');
 
+      if (config.type === 'app') {
+        this.updateRootConfig?.(config as MApp);
+        return;
+      }
+
       const newNode = app.dataSourceManager?.compiledNode(config, undefined, true) || config;
+
       replaceChildNode(reactive(newNode), [root.value], parentId);
 
-      const nodeInstance = app.page?.getNode(config.id);
+      const nodeInstance = app.getNode(config.id, { strict: true });
       if (nodeInstance) {
         nodeInstance.setData(newNode);
       }
@@ -114,5 +131,6 @@ export const useEditorDsl = (app: Core | undefined, win = window) => {
 
   return {
     pageConfig,
+    app,
   };
 };

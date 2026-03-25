@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,16 @@
 
 import StageCore from './StageCore';
 
-export type { MoveableOptions, OnDragStart } from 'moveable';
+export * from 'moveable';
 export type { GuidesOptions } from '@scena/guides';
+
 export { default as StageRender } from './StageRender';
 export { default as StageMask } from './StageMask';
 export { default as StageDragResize } from './StageDragResize';
 export * from './types';
 export * from './const';
 export * from './util';
+export * from './MoveableActionsAble';
+export { default as MoveableActionsAble } from './MoveableActionsAble';
+
 export default StageCore;

@@ -1,3 +1,5 @@
+@use "common/var" as *;
+
 .data-source-list-panel {
   .list-container {
     .list-item {
@@ -17,12 +19,15 @@
 }
 
 .data-source-list-panel-add-menu {
-  .tmagic-design-button {
-    width: 100%;
-    text-align: left;
+  padding: 4px 0;
 
-    span {
-      width: 100%;
+  .menu-item {
+    cursor: pointer;
+    transition: all 0.2s ease 0s;
+    padding: 5px 14px;
+
+    &:hover {
+      background-color: $hover-color;
     }
   }
 }

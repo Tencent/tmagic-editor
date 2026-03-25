@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { StepProps } from './types';
 
 defineOptions({
@@ -22,9 +22,9 @@ const clickHandler = (...args: any[]) => {
   emit('click', ...args);
 };
 
-const ui = getConfig('components')?.step;
+const ui = getDesignConfig('components')?.step;
 
 const uiComponent = ui?.component || 'el-step';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<StepProps>(() => ui?.props(props) || props);
 </script>

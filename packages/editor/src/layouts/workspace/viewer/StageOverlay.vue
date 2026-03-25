@@ -1,68 +1,91 @@
 <template>
-  <div v-if="stageOverlayVisible" class="m-editor-stage-overlay" @click="closeOverlayHandler">
-    <TMagicIcon class="m-editor-stage-overlay-close" :size="'20'" @click="closeOverlayHandler"
+  <div v-if="stageOverlayVisible" class="m-editor-stage-overlay">
+    <TMagicIcon class="m-editor-stage-overlay-close" :size="'30'" @click="closeOverlayHandler"
       ><CloseBold
     /></TMagicIcon>
-    <div ref="stageOverlay" class="m-editor-stage-overlay-container" :style="style" @click.stop></div>
+
+    <ScrollViewer
+      class="m-editor-stage"
+      :width="wrapWidth"
+      :height="wrapHeight"
+      :wrap-width="columnWidth.center"
+      :wrap-height="frameworkRect.height"
+      :zoom="zoom"
+    >
+      <div ref="stageOverlay" class="m-editor-stage-container" :style="style"></div>
+    </ScrollViewer>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref, watch } from 'vue';
+import { computed, inject, onBeforeUnmount, useTemplateRef, watch } from 'vue';
 import { CloseBold } from '@element-plus/icons-vue';
 
 import { TMagicIcon } from '@tmagic/design';
 
-import type { Services, StageOptions } from '@editor/type';
+import ScrollViewer from '@editor/components/ScrollViewer.vue';
+import { useServices } from '@editor/hooks/use-services';
+import type { StageOptions } from '@editor/type';
 
-const services = inject<Services>('services');
+const { stageOverlayService, editorService, uiService } = useServices();
 
 const stageOptions = inject<StageOptions>('stageOptions');
 
-const stageOverlay = ref<HTMLDivElement>();
+const stageOverlayEl = useTemplateRef<HTMLDivElement>('stageOverlay');
 
-const stageOverlayVisible = computed(() => services?.stageOverlayService.get('stageOverlayVisible'));
-const wrapWidth = computed(() => services?.stageOverlayService.get('wrapWidth') || 0);
-const wrapHeight = computed(() => services?.stageOverlayService.get('wrapHeight') || 0);
-const stage = computed(() => services?.editorService.get('stage'));
+const stageOverlayVisible = computed(() => stageOverlayService.get('stageOverlayVisible'));
+const wrapWidth = computed(() => stageOverlayService.get('wrapWidth'));
+const wrapHeight = computed(() => stageOverlayService.get('wrapHeight'));
+const stage = computed(() => editorService.get('stage'));
+const zoom = computed(() => uiService.get('zoom'));
+const columnWidth = computed(() => uiService.get('columnWidth'));
+const frameworkRect = computed(() => uiService.get('frameworkRect'));
 
 const style = computed(() => ({
-  width: `${wrapWidth.value}px`,
-  height: `${wrapHeight.value}px`,
+  transform: `scale(${zoom.value})`,
 }));
 
 watch(stage, (stage) => {
   if (stage) {
     stage.on('dblclick', async (event: MouseEvent) => {
-      const el = await stage.actionManager.getElementFromPoint(event);
-      services?.stageOverlayService.openOverlay(el);
+      const el = (await stage.actionManager?.getElementFromPoint(event)) || null;
+      stageOverlayService.openOverlay(el);
     });
   } else {
-    services?.stageOverlayService.closeOverlay();
+    stageOverlayService.closeOverlay();
   }
 });
 
-watch(stageOverlay, (stageOverlay) => {
-  if (!services) return;
+watch(zoom, (zoom) => {
+  const stage = stageOverlayService.get('stage');
+  if (!stage || !zoom) return;
+  stage.setZoom(zoom);
+});
 
-  const subStage = services.stageOverlayService.createStage(stageOptions);
-  services?.stageOverlayService.set('stage', subStage);
+watch(stageOverlayEl, (stageOverlay) => {
+  const subStage = stageOverlayService.createStage(stageOptions);
+  stageOverlayService.set('stage', subStage);
 
   if (stageOverlay && subStage) {
     subStage.mount(stageOverlay);
 
     const { mask, renderer } = subStage;
 
-    const { contentWindow } = renderer;
-    mask.showRule(false);
+    const { contentWindow } = renderer!;
+    mask?.showRule(false);
 
-    services?.stageOverlayService.updateOverlay();
+    stageOverlayService.updateOverlay();
 
     contentWindow?.magic.onRuntimeReady({});
   }
 });
 
+onBeforeUnmount(() => {
+  stageOverlayService.get('stage')?.destroy();
+  stageOverlayService.set('stage', null);
+});
+
 const closeOverlayHandler = () => {
-  services?.stageOverlayService.closeOverlay();
+  stageOverlayService.closeOverlay();
 };
 </script>

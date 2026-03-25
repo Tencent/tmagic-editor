@@ -10,6 +10,7 @@ export const hasExportDefault = <T = any>(mod: unknown): mod is { default: T } =
   isPlainObject(mod) && !!mod.__esModule && Object.prototype.hasOwnProperty.call(mod, 'default');
 
 export const loadUserConfigCjs: UserConfigLoader = async (userConfigPath) => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const required = require(userConfigPath);
   return hasExportDefault(required) ? required.default : required;
 };

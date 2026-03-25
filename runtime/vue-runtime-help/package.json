@@ -1,26 +1,24 @@
 {
-  "version": "0.0.3",
+  "version": "2.0.1",
   "name": "@tmagic/vue-runtime-help",
   "type": "module",
   "sideEffects": false,
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/tmagic-vue-runtime-help.umd.cjs",
+  "module": "dist/es/index.js",
+  "types": "types/index.d.ts",
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/es/index.js",
+      "require": "./dist/tmagic-vue-runtime-help.umd.cjs"
     },
     "./*": "./*"
   },
   "files": [
-    "dist"
+    "dist",
+    "types"
   ],
   "license": "Apache-2.0",
-  "scripts": {
-    "build": "pnpm clean && tsc -b tsconfig.build.json",
-    "clean": "rimraf dist *.tsbuildinfo",
-    "check:type": "tsc --noEmit --project tsconfig.build.json"
-  },
   "engines": {
     "node": ">=18"
   },
@@ -28,24 +26,14 @@
     "type": "git",
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
-  "dependencies": {
-    "vue-demi": "^0.14.7"
-  },
   "peerDependencies": {
-    "@tmagic/core": "workspace:*",
-    "@tmagic/data-source": "workspace:*",
-    "@tmagic/schema": "workspace:*",
-    "@tmagic/stage": "workspace:*",
-    "@tmagic/utils": "workspace:*",
-    "@vue/composition-api": ">=1.7.2",
-    "typescript": "*",
-    "vue": ">=2.0.0 || >=3.0.0"
+    "@tmagic/core": ">=1.7.0",
+    "@tmagic/stage": ">=1.7.0",
+    "typescript": "catalog:",
+    "vue": ">=3.5.0"
   },
   "peerDependenciesMeta": {
-    "@vue/composition-api": {
-      "optional": true
-    },
-    "@tmagic/schema": {
+    "@tmagic/core": {
       "optional": true
     },
     "@tmagic/stage": {
@@ -56,7 +44,6 @@
     }
   },
   "devDependencies": {
-    "@types/node": "^18.19.0",
-    "rimraf": "^3.0.2"
+    "@vue/test-utils": "^2.4.6"
   }
 }

@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,15 +20,15 @@ import { reactive } from 'vue';
 import { cloneDeep, get, keys, pick } from 'lodash-es';
 import type { Writable } from 'type-fest';
 
-import { Target, type TargetOptions, Watcher } from '@tmagic/dep';
-import type { ColumnConfig } from '@tmagic/form';
-import type { CodeBlockContent, CodeBlockDSL, Id, MNode } from '@tmagic/schema';
+import type { CodeBlockContent, CodeBlockDSL, Id, MNode, TargetOptions } from '@tmagic/core';
+import { Target, Watcher } from '@tmagic/core';
+import type { TableColumnConfig } from '@tmagic/form';
 
 import editorService from '@editor/services/editor';
 import storageService, { Protocol } from '@editor/services/storage';
 import type { AsyncHookPlugin, CodeState } from '@editor/type';
 import { CODE_DRAFT_STORAGE_KEY } from '@editor/type';
-import { getConfig } from '@editor/utils/config';
+import { getEditorConfig } from '@editor/utils/config';
 import { COPY_CODE_STORAGE_KEY } from '@editor/utils/editor';
 
 import BaseService from './BaseService';
@@ -117,7 +117,7 @@ class CodeBlock extends BaseService {
     const codeConfigProcessed = cloneDeep(codeConfig);
     if (codeConfigProcessed.content) {
       // 在保存的时候转换代码内容
-      const parseDSL = getConfig('parseDSL');
+      const parseDSL = getEditorConfig('parseDSL');
       if (typeof codeConfigProcessed.content === 'string') {
         codeConfigProcessed.content = parseDSL<(...args: any[]) => any>(codeConfigProcessed.content);
       }
@@ -231,11 +231,11 @@ class CodeBlock extends BaseService {
     });
   }
 
-  public setParamsColConfig(config: ColumnConfig): void {
+  public setParamsColConfig(config: TableColumnConfig): void {
     this.state.paramsColConfig = config;
   }
 
-  public getParamsColConfig(): ColumnConfig | undefined {
+  public getParamsColConfig(): TableColumnConfig | undefined {
     return this.state.paramsColConfig;
   }
 

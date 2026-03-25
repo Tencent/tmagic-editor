@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 
-import { getValueByKeyPath, setValueByKeyPath } from '@tmagic/utils';
+import { getValueByKeyPath, setValueByKeyPath } from '@tmagic/core';
 
 import { ObservedData } from './ObservedData';
 
@@ -32,7 +32,10 @@ export class SimpleObservedData extends ObservedData {
     this.event.emit('', changeEvent);
   }
 
-  on(path: string, callback: (newVal: any) => void): void {
+  on(path: string, callback: (newVal: any) => void, options?: { immediate?: boolean }): void {
+    if (options?.immediate) {
+      callback(this.getData(path));
+    }
     this.event.on(path, callback);
   }
 

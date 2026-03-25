@@ -7,12 +7,13 @@
     :style="`height: ${height}`"
     :inline="inline"
     :label-position="labelPosition"
+    @submit="submitHandler"
   >
     <template v-if="initialized && Array.isArray(config)">
       <Container
         v-for="(item, index) in config"
         :disabled="disabled"
-        :key="item[keyProp] ?? index"
+        :key="(item as Record<string, any>)[keyProp] ?? index"
         :config="item"
         :model="values"
         :last-values="lastValuesProcessed"
@@ -27,15 +28,16 @@
 </template>
 
 <script setup lang="ts">
-import { provide, reactive, ref, toRaw, watch, watchEffect } from 'vue';
+import { provide, reactive, ref, shallowRef, toRaw, useTemplateRef, watch, watchEffect } from 'vue';
 import { cloneDeep, isEqual } from 'lodash-es';
 
-import { TMagicForm } from '@tmagic/design';
+import { TMagicForm, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
+import { setValueByKeyPath } from '@tmagic/utils';
 
 import Container from './containers/Container.vue';
 import { getConfig } from './utils/config';
 import { initValue } from './utils/form';
-import type { FormConfig, FormState, FormValue, ValidateError } from './schema';
+import type { ChangeRecord, ContainerChangeEventData, FormConfig, FormState, FormValue, ValidateError } from './schema';
 
 defineOptions({
   name: 'MForm',
@@ -61,7 +63,8 @@ const props = withDefaults(
     labelPosition?: string;
     keyProp?: string;
     popperClass?: string;
-    extendState?: (state: FormState) => Record<string, any> | Promise<Record<string, any>>;
+    preventSubmitDefault?: boolean;
+    extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
   }>(),
   {
     config: () => [],
@@ -79,9 +82,9 @@ const props = withDefaults(
   },
 );
 
-const emit = defineEmits(['change', 'error', 'field-input', 'field-change']);
+const emit = defineEmits(['change', 'error', 'field-input', 'field-change', 'update:stepActive']);
 
-const tMagicForm = ref<InstanceType<typeof TMagicForm>>();
+const tMagicFormRef = useTemplateRef('tMagicForm');
 const initialized = ref(false);
 const values = ref<FormValue>({});
 const lastValuesProcessed = ref<FormValue>({});
@@ -99,16 +102,18 @@ const formState: FormState = reactive<FormState>({
   parentValues: props.parentValues,
   values,
   lastValuesProcessed,
-  $emit: emit as (event: string, ...args: any[]) => void,
+  $emit: emit as (_event: string, ..._args: any[]) => void,
   fields,
   setField: (prop: string, field: any) => fields.set(prop, field),
   getField: (prop: string) => fields.get(prop),
   deleteField: (prop: string) => fields.delete(prop),
+  $messageBox: tMagicMessageBox,
+  $message: tMagicMessage,
   post: (options: any) => {
     if (requestFuc) {
       return requestFuc({
-        ...options,
         method: 'POST',
+        ...options,
       });
     }
   },
@@ -133,9 +138,13 @@ watchEffect(async () => {
 
 provide('mForm', formState);
 
+const changeRecords = shallowRef<ChangeRecord[]>([]);
+
 watch(
   [() => props.config, () => props.initValues],
   ([config], [preConfig]) => {
+    changeRecords.value = [];
+
     if (!isEqual(toRaw(config), toRaw(preConfig))) {
       initialized.value = false;
     }
@@ -163,8 +172,68 @@ watch(
   { immediate: true },
 );
 
-const changeHandler = () => {
-  emit('change', values.value);
+const changeHandler = (v: FormValue, eventData: ContainerChangeEventData) => {
+  if (eventData.changeRecords?.length) {
+    for (const record of eventData.changeRecords) {
+      if (record.propPath) {
+        const index = changeRecords.value.findIndex((item) => item.propPath === record.propPath);
+        if (index > -1) {
+          changeRecords.value[index] = record;
+        } else {
+          changeRecords.value.push(record);
+        }
+
+        setValueByKeyPath(record.propPath, record.value, values.value);
+      }
+    }
+  }
+  emit('change', values.value, eventData);
+};
+
+const submitHandler = (e: SubmitEvent) => {
+  if (props.preventSubmitDefault) {
+    e.preventDefault();
+  }
+};
+
+/**
+ * 通过 name 从 config 中查找对应的 text
+ * @param name - 字段名，支持点分隔的路径格式，如 'a.b.c'
+ * @param config - 表单配置数组
+ * @returns 找到的 text 值，如果未找到则返回 undefined
+ */
+const getTextByName = (name: string, config: FormConfig = props.config): string | undefined => {
+  if (!name || !Array.isArray(config)) return undefined;
+
+  const nameParts = name.split('.');
+
+  const findInConfig = (configs: FormConfig, parts: string[]): string | undefined => {
+    if (parts.length === 0) return undefined;
+
+    const [currentPart, ...remainingParts] = parts;
+
+    for (const item of configs) {
+      if (item.name === currentPart) {
+        if (remainingParts.length === 0) {
+          return typeof item.text === 'string' ? item.text : undefined;
+        }
+
+        if ('items' in item && Array.isArray(item.items)) {
+          const result = findInConfig(item.items, remainingParts);
+          if (result !== undefined) return result;
+        }
+      }
+
+      if ('items' in item && Array.isArray(item.items)) {
+        const result = findInConfig(item.items, parts);
+        if (result !== undefined) return result;
+      }
+    }
+
+    return undefined;
+  };
+
+  return findInConfig(config, nameParts);
 };
 
 defineExpose({
@@ -172,30 +241,43 @@ defineExpose({
   lastValuesProcessed,
   formState,
   initialized,
+  changeRecords,
 
   changeHandler,
 
-  resetForm: () => tMagicForm.value?.resetFields(),
+  resetForm: () => {
+    tMagicFormRef.value?.resetFields();
+    changeRecords.value = [];
+  },
 
   submitForm: async (native?: boolean): Promise<any> => {
     try {
-      await tMagicForm.value?.validate();
+      const result = await tMagicFormRef.value?.validate();
+      // tdesign 错误通过返回值返回
+      // element-plus 通过throw error
+      if (result !== true) {
+        throw result;
+      }
+      changeRecords.value = [];
       return native ? values.value : cloneDeep(toRaw(values.value));
     } catch (invalidFields: any) {
       emit('error', invalidFields);
 
       const error: string[] = [];
 
-      Object.entries(invalidFields).forEach(([, ValidateError]) => {
+      Object.entries(invalidFields).forEach(([prop, ValidateError]) => {
         (ValidateError as ValidateError[]).forEach(({ field, message }) => {
-          if (field && message) error.push(`${field} -> ${message}`);
-          if (field && !message) error.push(`${field} -> 出现错误`);
-          if (!field && message) error.push(`${message}`);
+          const name = field || prop;
+          const text = getTextByName(name, props.config) || name;
+
+          error.push(`${text} -> ${message}`);
         });
       });
 
       throw new Error(error.join('<br>'));
     }
   },
+
+  getTextByName,
 });
 </script>

@@ -1,18 +1,10 @@
-import { describe, expect, test } from 'vitest';
+import { afterAll, describe, expect, test } from 'vitest';
 
-import { type MApp, NodeType } from '@tmagic/schema';
+import TMagicApp, { NodeType } from '@tmagic/core';
 
 import { DataSource, DataSourceManager } from '@data-source/index';
 
-class Core {
-  public dsl?: MApp;
-
-  constructor(options: any) {
-    this.dsl = options.config;
-  }
-}
-
-const app = new Core({
+const app = new TMagicApp({
   config: {
     type: NodeType.ROOT,
     id: '1',
@@ -23,15 +15,21 @@ const app = new Core({
         id: '1',
         fields: [{ name: 'name' }],
         methods: [],
+        events: [],
       },
       {
         type: 'http',
         id: '2',
         fields: [{ name: 'name' }],
         methods: [],
+        events: [],
       },
     ],
   },
+});
+
+afterAll(async () => {
+  DataSourceManager.clearDataSourceClass();
 });
 
 describe('DataSourceManager', () => {
@@ -45,10 +43,10 @@ describe('DataSourceManager', () => {
     expect(dsm.dataSourceMap.get('2')?.type).toBe('http');
   });
 
-  test('registe', () => {
+  test('register', () => {
     class TestDataSource extends DataSource {}
 
-    DataSourceManager.registe('test', TestDataSource as any);
+    DataSourceManager.register('test', TestDataSource as any);
     expect(DataSourceManager.getDataSourceClass('test')).toBe(TestDataSource);
   });
 
@@ -72,6 +70,7 @@ describe('DataSourceManager', () => {
         id: '1',
         fields: [{ name: 'name1' }],
         methods: [],
+        events: [],
       },
     ]);
     const ds = dsm.get('1');
@@ -89,6 +88,7 @@ describe('DataSourceManager', () => {
       id: '1',
       fields: [{ name: 'name' }],
       methods: [],
+      events: [],
     });
     expect(dsm.get('1')).toBeInstanceOf(DataSource);
   });

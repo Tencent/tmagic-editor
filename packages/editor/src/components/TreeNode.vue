@@ -4,6 +4,8 @@
     class="m-editor-tree-node"
     :draggable="draggable"
     :data-node-id="data.id"
+    :data-parent-id="parent?.id"
+    :data-parents-id="parentsId"
     :data-is-container="Array.isArray(data.items)"
     @dragstart="handleDragStart"
     @dragleave="handleDragLeave"
@@ -13,7 +15,7 @@
       class="tree-node"
       :class="{ selected, expanded }"
       :style="`padding-left: ${indent}px`"
-      @contextmenu="nodeContentmenuHandler"
+      @contextmenu="nodeContextmenuHandler"
       @mouseenter="mouseenterHandler"
     >
       <MIcon
@@ -40,8 +42,10 @@
         v-for="item in data.items"
         :key="item.id"
         :data="item"
+        :parent="data"
+        :parentsId="[...parentsId, data.id]"
         :node-status-map="nodeStatusMap"
-        :indent="indent + 11"
+        :indent="indent + nextLevelIndentIncrement"
       >
         <template #tree-node-content="{ data: nodeData }">
           <slot name="tree-node-content" :data="nodeData"> </slot>
@@ -61,16 +65,16 @@
 import { computed, inject } from 'vue';
 import { ArrowDown, ArrowRight } from '@element-plus/icons-vue';
 
-import type { Id } from '@tmagic/schema';
+import type { Id } from '@tmagic/core';
 
 import MIcon from '@editor/components/Icon.vue';
 import type { LayerNodeStatus, TreeNodeData } from '@editor/type';
 import { updateStatus } from '@editor/utils/tree';
 
 defineSlots<{
-  'tree-node-label'(props: { data: TreeNodeData }): any;
-  'tree-node-tool'(props: { data: TreeNodeData }): any;
-  'tree-node-content'(props: { data: TreeNodeData }): any;
+  'tree-node-label'(_props: { data: TreeNodeData }): any;
+  'tree-node-tool'(_props: { data: TreeNodeData }): any;
+  'tree-node-content'(_props: { data: TreeNodeData }): any;
 }>();
 
 defineOptions({
@@ -91,11 +95,16 @@ const treeEmit = inject<typeof emit>('treeEmit');
 const props = withDefaults(
   defineProps<{
     data: TreeNodeData;
+    parent?: TreeNodeData;
+    parentsId?: Id[];
     nodeStatusMap: Map<Id, LayerNodeStatus>;
     indent?: number;
+    nextLevelIndentIncrement?: number;
   }>(),
   {
     indent: 0,
+    nextLevelIndentIncrement: 11,
+    parentsId: () => [],
   },
 );
 
@@ -130,7 +139,7 @@ const handleDragEnd = (event: DragEvent) => {
   treeEmit?.('node-dragend', event, props.data);
 };
 
-const nodeContentmenuHandler = (event: MouseEvent) => {
+const nodeContextmenuHandler = (event: MouseEvent) => {
   treeEmit?.('node-contextmenu', event, props.data);
 };
 

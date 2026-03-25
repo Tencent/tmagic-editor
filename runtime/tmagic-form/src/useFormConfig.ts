@@ -1,15 +1,14 @@
 import { computed, nextTick, onBeforeUnmount, reactive, ref } from 'vue';
 
-import Core from '@tmagic/core';
-import { type FormConfig, initValue, MForm } from '@tmagic/form';
-import type { Id, MApp, MNode } from '@tmagic/schema';
-import type { RemoveData, UpdateData } from '@tmagic/stage';
-import { getNodePath, replaceChildNode } from '@tmagic/utils';
+import type { Id, MApp, MNode } from '@tmagic/core';
+import TMagicApp from '@tmagic/core';
+import type { FormConfig, MForm, RemoveData, UpdateData } from '@tmagic/editor';
+import { getElById, getNodePath, initValue, replaceChildNode } from '@tmagic/editor';
 
 import { AppProps } from './types';
 
 export const useFormConfig = (props: AppProps) => {
-  const { contentWindow } = props.stage.renderer;
+  const { contentWindow } = props.stage.renderer!;
   const mForm = ref<InstanceType<typeof MForm>>();
 
   const root = ref<MApp>();
@@ -23,8 +22,9 @@ export const useFormConfig = (props: AppProps) => {
   // @ts-ignore
   const formConfig = computed(() => props.fillConfig((config.value?.items || []) as FormConfig, mForm));
 
-  let app: Core | undefined = new Core({
+  let app: TMagicApp | undefined = new TMagicApp({
     ua: contentWindow?.navigator.userAgent,
+    disabledFlexible: true,
     platform: 'editor',
   });
 
@@ -67,14 +67,21 @@ export const useFormConfig = (props: AppProps) => {
           this.updatePageId?.(id);
         }
 
-        const el = document.getElementById(`${id}`);
+        const el = getElById()(document, `${id}`);
         if (el) return el;
         // 未在当前文档下找到目标元素，可能是还未渲染，等待渲染完成后再尝试获取
-        return nextTick().then(() => document.getElementById(`${id}`) as HTMLElement);
+        return nextTick().then(() => getElById()(document, `${id}`) as HTMLElement);
       },
 
-      add({ config, parentId }: UpdateData) {
-        if (!root.value) throw new Error('error');
+      add({ config, parentId, root: appConfig }: UpdateData) {
+        if (!root.value) {
+          if (appConfig) {
+            root.value = appConfig;
+            resetValues();
+            return;
+          }
+          throw new Error('error');
+        }
         if (!selectedId.value) throw new Error('error');
         if (!parentId) throw new Error('error');
 
@@ -82,7 +89,7 @@ export const useFormConfig = (props: AppProps) => {
         if (!parent) throw new Error('未找到父节点');
 
         if (config.type !== 'page') {
-          const parentNode = app?.page?.getNode(parent.id);
+          const parentNode = app?.page?.getNode(parent.id, { strict: true });
           parentNode && app?.page?.initNode(config, parentNode);
         }
 
@@ -97,13 +104,22 @@ export const useFormConfig = (props: AppProps) => {
         resetValues();
       },
 
-      update({ config, parentId }: UpdateData) {
-        if (!root.value || !app) throw new Error('error');
+      update({ config, parentId, root: appConfig }: UpdateData) {
+        if (!root.value) {
+          if (appConfig) {
+            root.value = appConfig;
+            resetValues();
+            return;
+          }
+          throw new Error('error');
+        }
+
+        if (!app) throw new Error('error');
 
         const newNode = app.dataSourceManager?.compiledNode(config) || config;
         replaceChildNode(reactive(newNode), [root.value], parentId);
 
-        const nodeInstance = app.page?.getNode(config.id);
+        const nodeInstance = app.page?.getNode(config.id, { strict: true });
         if (nodeInstance) {
           nodeInstance.setData(config);
         }
@@ -137,6 +153,7 @@ export const useFormConfig = (props: AppProps) => {
   contentWindow?.addEventListener('message', runtimeReadyHandler);
 
   onBeforeUnmount(() => {
+    app?.destroy();
     app = undefined;
     contentWindow?.removeEventListener('message', runtimeReadyHandler);
   });

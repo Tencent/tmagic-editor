@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,12 @@
  * limitations under the License.
  */
 
-// @ts-nocheck
-export default {
-  id: '75f0extui9d7yksklx27hff8xg',
+import { ActionType, type MApp, NodeType } from '@tmagic/core';
+
+const dsl: MApp = {
+  id: '1',
   name: 'test',
-  type: 'app',
+  type: NodeType.ROOT,
   codeBlocks: {
     code_5336: {
       name: 'getData',
@@ -47,10 +48,41 @@ export default {
       },
       params: [],
     },
+    code_5317: {
+      name: 'code1',
+      content: ({ flowState }) => {
+        console.log('code1: set flowState.name=lisa');
+        flowState.name = 'lisa';
+      },
+      params: [],
+    },
+    code_5318: {
+      name: 'code2',
+      content: ({ flowState }) => {
+        console.log('print flowState.name', flowState.name);
+        flowState.abort();
+      },
+      params: [],
+    },
+    code_6778: {
+      name: 'toOtherPage',
+      desc: '',
+      timing: '',
+      params: [
+        {
+          name: 'pageId',
+          extra: '',
+          type: '',
+        },
+      ],
+      content: ({ app, params }) => {
+        app.setPage(params.pageId);
+      },
+    },
   },
   items: [
     {
-      type: 'page',
+      type: NodeType.PAGE,
       id: 'page_299',
       name: 'index',
       title: '',
@@ -76,7 +108,7 @@ export default {
           name: 'magic:common:events:click', // 事件名
           actions: [
             {
-              actionType: 'code', // 联动动作类型
+              actionType: ActionType.CODE, // 联动动作类型
               codeId: 'code_5336', // 代码块id
               params: {
                 age: 12, // 参数
@@ -88,7 +120,7 @@ export default {
           name: 'magic:common:events:click', // 事件名
           actions: [
             {
-              actionType: 'code', // 联动动作类型
+              actionType: ActionType.CODE, // 联动动作类型
               codeId: 'code_5316', // 代码块id
               params: {},
             },
@@ -135,6 +167,7 @@ export default {
           text: 'Tmagic editor 营销活动编辑器',
           multiple: true,
           events: [],
+          displayConds: [],
         },
         {
           type: 'qrcode',
@@ -159,6 +192,7 @@ export default {
           url: 'https://github.com/Tencent/tmagic-editor',
           events: [],
           created: [],
+          displayConds: [],
         },
         {
           type: 'img',
@@ -184,6 +218,7 @@ export default {
           url: '',
           events: [],
           created: [],
+          displayConds: [],
         },
         {
           type: 'button',
@@ -220,7 +255,7 @@ export default {
               name: 'magic:common:events:click',
               actions: [
                 {
-                  actionType: 'comp',
+                  actionType: ActionType.COMP,
                   to: 'overlay_2159',
                   method: 'openOverlay',
                 },
@@ -228,6 +263,38 @@ export default {
             },
           ],
           created: [],
+          displayConds: [],
+        },
+        {
+          id: 'button_1cb163ad',
+          text: '前往page2',
+          multiple: true,
+          style: {
+            width: '270',
+            height: '37.5',
+            border: 0,
+            backgroundColor: '#fb6f00',
+            position: 'absolute',
+            left: 56,
+            top: 266,
+          },
+          type: 'button',
+          name: '按钮',
+          events: [
+            {
+              name: 'magic:common:events:click',
+              actions: [
+                {
+                  actionType: ActionType.CODE,
+                  codeId: 'code_6778',
+                  params: {
+                    pageId: 'page_171ff161',
+                  },
+                },
+              ],
+            },
+          ],
+          displayConds: [],
         },
         {
           type: 'overlay',
@@ -355,6 +422,53 @@ export default {
         },
       ],
     },
+    {
+      id: 'page_171ff161',
+      items: [
+        {
+          id: 'button_80ca1076',
+          text: '返回',
+          multiple: true,
+          style: {
+            width: '270',
+            height: '37.5',
+            border: 0,
+            backgroundColor: '#fb6f00',
+            position: 'absolute',
+            left: 48,
+            top: 297,
+          },
+          type: 'button',
+          name: '按钮',
+          events: [
+            {
+              name: 'magic:common:events:click',
+              actions: [
+                {
+                  actionType: ActionType.CODE,
+                  codeId: 'code_6778',
+                  params: {
+                    pageId: 'page_299',
+                  },
+                },
+              ],
+            },
+          ],
+          displayConds: [],
+        },
+      ],
+      style: {
+        width: '100%',
+        height: '100%',
+        position: 'relative',
+        top: 0,
+        left: 0,
+      },
+      type: NodeType.PAGE,
+      name: 'page2',
+      title: '',
+      layout: 'absolute',
+    },
   ],
   dataSources: [
     {
@@ -421,7 +535,7 @@ export default {
         },
       ],
       methods: [],
-      events: '',
+      events: [],
       mocks: [],
       beforeRequest: '',
       afterResponse: '',
@@ -456,18 +570,12 @@ export default {
           },
         },
       ],
-      events: '',
+      events: [],
       mocks: [],
       beforeRequest: '',
       afterResponse: '',
     },
   ],
-  dataSourceDeps: {
-    ds_b64c92b5: {
-      button_430: {
-        name: '按钮',
-        keys: ['text'],
-      },
-    },
-  },
 };
+
+export default dsl;

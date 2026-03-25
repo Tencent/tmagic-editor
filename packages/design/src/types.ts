@@ -1,11 +1,11 @@
 import { ComputedRef, DefineComponent, Directive, Ref } from 'vue';
+import type { Placement } from '@popperjs/core';
 
 export type FieldSize = 'large' | 'default' | 'small';
 
 export interface AutocompleteProps {
   modelValue?: string;
   placeholder?: string;
-  label?: string;
   clearable?: boolean;
   disabled?: boolean;
   triggerOnFocus?: boolean;
@@ -31,6 +31,7 @@ export interface ButtonProps {
   text?: boolean;
   circle?: boolean;
   icon?: any;
+  variant?: string;
 }
 
 export interface CardProps {
@@ -45,7 +46,7 @@ export interface CascaderProps {
   disabled?: boolean;
   clearable?: boolean;
   filterable?: boolean;
-  options?: CascaderOption[];
+  options?: CascaderPropsOption[];
   size?: FieldSize;
   /** 弹出内容的自定义类名 */
   popperClass?: string;
@@ -106,6 +107,8 @@ export interface DatePickerProps {
   startPlaceholder?: string;
   endPlaceholder?: string;
   format?: string;
+  dateFormat?: string;
+  timeFormat?: string;
   /** 可选，绑定值的格式。 不指定则绑定值为 Date 对象 */
   valueFormat?: string;
   /** 在范围选择器里取消两个日期面板之间的联动 */
@@ -123,6 +126,8 @@ export interface DialogProps {
   fullscreen?: boolean;
   closeOnClickModal?: boolean;
   closeOnPressEscape?: boolean;
+  destroyOnClose?: boolean;
+  showClose?: boolean;
 }
 
 export interface DividerProps {
@@ -178,6 +183,8 @@ export interface FormItemProps {
   prop?: string;
   labelWidth?: string | number;
   rules?: any;
+  extra?: string;
+  labelPosition?: 'top' | 'left' | 'right';
 }
 
 export interface InputProps {
@@ -188,6 +195,7 @@ export interface InputProps {
   rows?: number;
   type?: string;
   size?: FieldSize;
+  autosize?: boolean | { minRows: number; maxRows: number };
 }
 
 export interface InputNumberProps {
@@ -218,20 +226,37 @@ export interface PaginationProps {
   hideOnSinglePage?: boolean;
   curPage?: number;
   pageSizes?: number[];
-  pagesize?: number;
+  pageSize?: number;
   total?: number;
+  size?: 'large' | 'default' | 'small';
+}
+
+export interface PopconfirmProps {
+  title?: string;
+  placement?:
+    | 'top'
+    | 'left'
+    | 'right'
+    | 'bottom'
+    | 'top-left'
+    | 'top-right'
+    | 'bottom-left'
+    | 'bottom-right'
+    | 'left-top'
+    | 'left-bottom'
+    | 'right-top'
+    | 'right-bottom';
 }
 
 export interface PopoverProps {
-  placement?: string;
+  placement?: Placement;
   width?: string | number;
-  title?: string;
-  trigger?: string;
-  effect?: string;
-  content?: string;
+  trigger?: 'hover' | 'click';
   disabled?: boolean;
+  visible?: boolean;
   popperClass?: string;
-  visible?: boolean | null;
+  tabindex?: number;
+  destroyOnClose?: boolean;
 }
 
 export interface RadioProps {
@@ -292,17 +317,37 @@ export interface SwitchProps {
 }
 
 export interface TableProps {
+  columns?: TableColumnOptions[];
   data?: any[];
   border?: boolean;
   maxHeight?: number | string;
   defaultExpandAll?: boolean;
+  showHeader?: boolean;
+  rowKey?: string;
+  treeProps?: Record<string, any>;
+  emptyText?: string;
+  tooltipEffect?: string;
+  tooltipOptions?: any;
+  showOverflowTooltip?: boolean;
+  spanMethod?: (data: any) => any;
 }
 
-export interface TableColumnProps {
-  label?: string;
-  align?: string;
-  fixed?: string | boolean;
-  width?: string | number;
+export interface TableColumnOptions<T = any> {
+  props: {
+    class?: string;
+    label?: string;
+    fixed?: 'left' | 'right' | boolean;
+    width?: number | string;
+    type?: 'default' | 'selection' | 'index' | 'expand';
+    prop?: string;
+    align?: string;
+    headerAlign?: string;
+    sortable?: boolean;
+    sortOrders?: Array<'ascending' | 'descending'>;
+    selectable?: (row: T, index: number) => boolean;
+  };
+  cell?: (scope: { row: T; $index: number }) => any;
+  title?: (scope?: any) => any;
 }
 
 export interface TabPaneProps {
@@ -314,7 +359,7 @@ export interface TabPaneProps {
 export interface TabsProps {
   type?: string;
   editable?: boolean;
-  tabPosition?: string;
+  tabPosition?: 'left' | 'right' | 'top' | 'bottom';
   modelValue?: string | number;
 }
 
@@ -339,59 +384,40 @@ export interface TooltipProps {
   offset?: number;
 }
 
-export interface TreeProps {
-  data?: any[];
-  emptyText?: string;
-  nodeKey?: string;
-  props?: any;
-  renderAfterExpand?: boolean;
-  load?: any;
-  renderContent?: any;
-  highlightCurrent?: boolean;
-  defaultExpandAll?: boolean;
-  checkOnClickNode?: boolean;
-  autoExpandParent?: boolean;
-  defaultExpandedKeys?: any[];
-  showCheckbox?: boolean;
-  checkStrictly?: boolean;
-  defaultCheckedKeys?: any[];
-  currentNodeKey?: string | number;
-  filterNodeMethod?: (value: any, data: any, node: any) => boolean;
-  accordion?: boolean;
-  indent?: number;
-  icon?: any;
-  lazy?: boolean;
-  draggable?: boolean;
-  allowDrag?: (node: any) => boolean;
-  allowDrop?: any;
-}
-
 export interface UploadProps {
   action?: string;
   autoUpload?: boolean;
   disabled?: boolean;
 }
 
-export interface CascaderOption {
+export interface CascaderPropsOption {
   /** 指定选项的值为选项对象的某个属性值 */
   value: any;
   /** 指定选项标签为选项对象的某个属性值 */
   label: string;
   /** 指定选项的子选项为选项对象的某个属性值 */
-  children?: CascaderOption[];
+  children?: CascaderPropsOption[];
 }
 
 export interface IconProps {
   size?: string;
 }
 
-export interface TMagicMessage {
+interface ExtraApi {
   success: (msg: string) => void;
   warning: (msg: string) => void;
   info: (msg: string) => void;
   error: (msg: string) => void;
   closeAll: () => void;
 }
+
+export type TMagicMessage = ExtraApi &
+  ((options: {
+    type?: 'info' | 'success' | 'warning' | 'error';
+    message?: string;
+    dangerouslyUseHTMLString?: boolean;
+    duration?: number;
+  }) => void);
 
 export type ElMessageBoxShortcutMethod = ((
   message: string,
@@ -570,11 +596,6 @@ export interface Components {
     props: (props: PaginationProps) => PaginationProps;
   };
 
-  popover: {
-    component: DefineComponent<PopoverProps, {}, any> | string;
-    props: (props: PopoverProps) => PopoverProps;
-  };
-
   radio: {
     component: DefineComponent<RadioProps, {}, any> | string;
     props: (props: RadioProps) => RadioProps;
@@ -637,8 +658,8 @@ export interface Components {
       | DefineComponent<
           TableProps,
           {
-            instance: any;
-            $el: HTMLDivElement | undefined;
+            getEl: () => HTMLElement | undefined;
+            getTableRef: () => any;
             clearSelection: (...args: any[]) => void;
             toggleRowSelection: (...args: any[]) => void;
             toggleRowExpansion: (...args: any[]) => void;
@@ -647,11 +668,6 @@ export interface Components {
         >
       | string;
     props: (props: TableProps) => TableProps;
-  };
-
-  tableColumn: {
-    component: DefineComponent<TableColumnProps, {}, any> | string;
-    props: (props: TableColumnProps) => TableColumnProps;
   };
 
   tabPane: {
@@ -679,24 +695,6 @@ export interface Components {
     props: (props: TooltipProps) => TooltipProps;
   };
 
-  tree: {
-    component:
-      | DefineComponent<
-          TreeProps,
-          {
-            getData: () => TreeProps['data'];
-            getStore: () => any;
-            filter: (...args: any[]) => any;
-            getNode: (...args: any[]) => any;
-            setCheckedKeys: (...args: any[]) => any;
-            setCurrentKey: (...args: any[]) => any;
-          },
-          any
-        >
-      | string;
-    props: (props: TreeProps) => TreeProps;
-  };
-
   upload: {
     component:
       | DefineComponent<
@@ -709,9 +707,15 @@ export interface Components {
       | string;
     props: (props: UploadProps) => UploadProps;
   };
+
+  popconfirm: {
+    component: DefineComponent<PopconfirmProps, {}, any> | string;
+    props: (props: PopconfirmProps) => PopconfirmProps;
+  };
 }
 
-export interface PluginOptions {
+export interface DesignPluginOptions {
+  adapterType?: string;
   message?: TMagicMessage;
   messageBox?: TMagicMessageBox;
   components?: Components;

@@ -60,11 +60,6 @@ DSL 是编辑器搭建页面的最终产物（描述文件），其中包含了�
 ### runtime
 我们把页面统一称为 runtime，更具体的 runtime 概念可以查看[页面发布](./publish.html#runtime)。**runtime 是承载tmagic-editor项目页面的运行环境**。编辑器的工作区是 runtime 的一个具体实例，另一个就是我们发布上线后，用户访问的真实项目页面。
 
-### @tmagic/ui
-@tmagic/ui 包含了tmagic-editor的基础组件库，提供了容器、文本、按钮这样的基础组件。我们提供了不同语言框架的 @tmagic/ui，如 vue2 和 vue3。
-
-@tmagic/ui 和 runtime 是配套出现的，runtime 必须基于 @tmagic/ui 才可以实现渲染。因为 @tmagic/ui 需要提供 runtime 所需要的渲染器。
-
 ## 联动
 页面搭建过程中，会涉及到两种联动形式
 - 在编辑器中，组件的表单配置项之间需要联动。

@@ -32,20 +32,20 @@
   </FloatingBox>
 
   <Teleport to="body">
-    <TMagicDialog title="查看修改" v-model="difVisible" fullscreen>
+    <TMagicDialog title="查看修改" v-model="difVisible" fullscreen destroy-on-close>
       <div style="display: flex; margin-bottom: 10px">
         <div style="flex: 1"><TMagicTag size="small" type="info">修改前</TMagicTag></div>
         <div style="flex: 1"><TMagicTag size="small" type="success">修改后</TMagicTag></div>
       </div>
 
       <CodeEditor
-        v-if="difVisible"
         ref="magicVsEditor"
         type="diff"
         language="json"
+        :disabled-full-screen="true"
         :initValues="content.content"
         :modifiedValues="formBox?.form?.values.content"
-        :style="`height: ${windowRect.height - 150}px`"
+        :height="`${windowRect.height - 150}px`"
       ></CodeEditor>
 
       <template #footer>
@@ -59,19 +59,26 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, Ref, ref } from 'vue';
+import { computed, inject, nextTick, Ref, ref, useTemplateRef, watch } from 'vue';
 
+import type { CodeBlockContent } from '@tmagic/core';
 import { TMagicButton, TMagicDialog, tMagicMessage, tMagicMessageBox, TMagicTag } from '@tmagic/design';
-import { ColumnConfig, FormConfig, FormState, MFormBox } from '@tmagic/form';
-import type { CodeBlockContent } from '@tmagic/schema';
+import {
+  type ContainerChangeEventData,
+  defineFormConfig,
+  defineFormItem,
+  type FormConfig,
+  MFormBox,
+  type TableColumnConfig,
+} from '@tmagic/form';
 
 import FloatingBox from '@editor/components/FloatingBox.vue';
 import { useEditorContentHeight } from '@editor/hooks/use-editor-content-height';
 import { useNextFloatBoxPosition } from '@editor/hooks/use-next-float-box-position';
+import { useServices } from '@editor/hooks/use-services';
 import { useWindowRect } from '@editor/hooks/use-window-rect';
 import CodeEditor from '@editor/layouts/CodeEditor.vue';
-import type { Services } from '@editor/type';
-import { getConfig } from '@editor/utils/config';
+import { getEditorConfig } from '@editor/utils/config';
 
 defineOptions({
   name: 'MEditorCodeBlockEditor',
@@ -88,29 +95,31 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  submit: [values: CodeBlockContent];
+  submit: [values: CodeBlockContent, eventData: ContainerChangeEventData];
+  close: [];
+  open: [];
 }>();
 
-const services = inject<Services>('services');
+const { codeBlockService, uiService } = useServices();
 
 const { height: codeBlockEditorHeight } = useEditorContentHeight();
 
 const difVisible = ref(false);
 const { rect: windowRect } = useWindowRect();
 
-const magicVsEditor = ref<InstanceType<typeof CodeEditor>>();
+const magicVsEditorRef = useTemplateRef<InstanceType<typeof CodeEditor>>('magicVsEditor');
 
 const diffChange = () => {
-  if (!magicVsEditor.value || !formBox.value?.form) {
+  if (!magicVsEditorRef.value || !formBox.value?.form) {
     return;
   }
 
-  formBox.value.form.values.content = magicVsEditor.value.getEditorValue();
+  formBox.value.form.values.content = magicVsEditorRef.value.getEditorValue();
 
   difVisible.value = false;
 };
 
-const defaultParamColConfig: ColumnConfig = {
+const defaultParamColConfig = defineFormItem<TableColumnConfig>({
   type: 'row',
   label: '参数类型',
   items: [
@@ -138,94 +147,126 @@ const defaultParamColConfig: ColumnConfig = {
       ],
     },
   ],
+});
+
+const functionConfig = computed(
+  () =>
+    defineFormConfig([
+      {
+        text: '名称',
+        name: 'name',
+        rules: [{ required: true, message: '请输入名称', trigger: 'blur' }],
+      },
+      {
+        text: '描述',
+        name: 'desc',
+      },
+      {
+        text: '执行时机',
+        name: 'timing',
+        type: 'select',
+        options: () => {
+          const options = [
+            { text: '初始化前', value: 'beforeInit' },
+            { text: '初始化后', value: 'afterInit' },
+          ];
+          if (props.dataSourceType !== 'base') {
+            options.push({ text: '请求前', value: 'beforeRequest' });
+            options.push({ text: '请求后', value: 'afterRequest' });
+          }
+          return options;
+        },
+        display: () => props.isDataSource,
+      },
+      {
+        type: 'table',
+        border: true,
+        text: '参数',
+        enableFullscreen: false,
+        enableToggleMode: false,
+        name: 'params',
+        dropSort: false,
+        items: [
+          {
+            type: 'text',
+            label: '参数名',
+            name: 'name',
+          },
+          {
+            type: 'text',
+            label: '描述',
+            name: 'extra',
+          },
+          codeBlockService.getParamsColConfig() || defaultParamColConfig,
+        ],
+      },
+      {
+        name: 'content',
+        type: 'vs-code',
+        options: inject('codeOptions', {}),
+        autosize: { minRows: 10, maxRows: 30 },
+        onChange: (_formState, code: string) => {
+          try {
+            // 检测js代码是否存在语法错误
+            getEditorConfig('parseDSL')(code);
+
+            return code;
+          } catch (error: any) {
+            tMagicMessage.error(error.message);
+
+            throw error;
+          }
+        },
+      },
+    ]) as FormConfig,
+);
+
+const parseContent = (content: any) => {
+  if (typeof content === 'string') {
+    // 如果是字符串则转换为函数
+    const parseDSL = getEditorConfig('parseDSL');
+    return parseDSL<(..._args: any[]) => any>(content);
+  }
+  return content;
 };
 
-const functionConfig = computed<FormConfig>(() => [
-  {
-    text: '名称',
-    name: 'name',
-    rules: [{ required: true, message: '请输入名称', trigger: 'blur' }],
-  },
-  {
-    text: '描述',
-    name: 'desc',
-  },
-  {
-    text: '执行时机',
-    name: 'timing',
-    type: 'select',
-    options: () => {
-      const options = [
-        { text: '初始化前', value: 'beforeInit' },
-        { text: '初始化后', value: 'afterInit' },
-      ];
-      if (props.dataSourceType !== 'base') {
-        options.push({ text: '请求前', value: 'beforeRequest' });
-        options.push({ text: '请求后', value: 'afterRequest' });
-      }
-      return options;
-    },
-    display: () => props.isDataSource,
-  },
-  {
-    type: 'table',
-    border: true,
-    text: '参数',
-    enableFullscreen: false,
-    enableToggleMode: false,
-    name: 'params',
-    dropSort: false,
-    items: [
-      {
-        type: 'text',
-        label: '参数名',
-        name: 'name',
-      },
-      {
-        type: 'text',
-        label: '描述',
-        name: 'extra',
-      },
-      services?.codeBlockService.getParamsColConfig() || defaultParamColConfig,
-    ],
-  },
-  {
-    name: 'content',
-    type: 'vs-code',
-    options: inject('codeOptions', {}),
-    height: '500px',
-    onChange: (formState: FormState | undefined, code: string) => {
-      try {
-        // 检测js代码是否存在语法错误
-        getConfig('parseDSL')(code);
-
-        return code;
-      } catch (error: any) {
-        tMagicMessage.error(error.message);
-
-        throw error;
-      }
-    },
-  },
-]);
-
-const submitForm = (values: CodeBlockContent) => {
+const submitForm = (values: CodeBlockContent, data: ContainerChangeEventData) => {
   changedValue.value = undefined;
-  emit('submit', values);
+
+  emit(
+    'submit',
+    {
+      ...values,
+      content: parseContent(values.content),
+    },
+    {
+      ...data,
+      changeRecords: data.changeRecords?.map((record) => {
+        let { value } = record;
+        if (record.propPath === 'content' && typeof value === 'string') {
+          value = parseContent(value);
+        }
+        return {
+          ...record,
+          value,
+        };
+      }),
+    },
+  );
 };
 
 const errorHandler = (error: any) => {
   tMagicMessage.error(error.message);
 };
 
-const formBox = ref<InstanceType<typeof MFormBox>>();
+const formBox = useTemplateRef<InstanceType<typeof MFormBox>>('formBox');
 
 const changedValue = ref<CodeBlockContent>();
 const changeHandler = (values: CodeBlockContent) => {
   changedValue.value = values;
 };
 
-const beforeClose = (done: (cancel?: boolean) => void) => {
+const beforeClose = (done: (_cancel?: boolean) => void) => {
   if (!changedValue.value) {
     done();
     return;
@@ -238,7 +279,7 @@ const beforeClose = (done: (cancel?: boolean) => void) => {
       distinguishCancelAndClose: true,
     })
     .then(() => {
-      changedValue.value && submitForm(changedValue.value);
+      changedValue.value && submitForm(changedValue.value, { changeRecords: formBox.value?.form?.changeRecords });
       done();
     })
     .catch((action: string) => {
@@ -253,7 +294,17 @@ const closedHandler = () => {
 };
 
 const parentFloating = inject<Ref<HTMLDivElement | null>>('parentFloating', ref(null));
-const { boxPosition, calcBoxPosition } = useNextFloatBoxPosition(services?.uiService, parentFloating);
+const { boxPosition, calcBoxPosition } = useNextFloatBoxPosition(uiService, parentFloating);
+
+watch(boxVisible, (visible) => {
+  nextTick(() => {
+    if (!visible) {
+      emit('close');
+    } else {
+      emit('open');
+    }
+  });
+});
 
 defineExpose({
   async show() {

@@ -10,7 +10,7 @@ export const transformTsFileToCodeSync = (filename: string): string =>
     loader: 'ts',
     sourcefile: filename,
     sourcemap: 'inline',
-    target: 'node14',
+    target: 'node18',
   }).code;
 
 /**

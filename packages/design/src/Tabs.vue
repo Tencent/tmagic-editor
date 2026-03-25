@@ -8,6 +8,9 @@
     @tab-remove="onTabRemove"
     @update:model-value="updateModelName"
   >
+    <template #add-icon v-if="$slots['add-icon']">
+      <slot name="add-icon"></slot>
+    </template>
     <template #default>
       <slot></slot>
     </template>
@@ -17,7 +20,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { TabsProps } from './types';
 
 defineOptions({
@@ -26,11 +29,11 @@ defineOptions({
 
 const props = defineProps<TabsProps>();
 
-const ui = getConfig('components')?.tabs;
+const ui = getDesignConfig('components')?.tabs;
 
 const uiComponent = ui?.component || 'el-tabs';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<TabsProps>(() => ui?.props(props) || props);
 
 const emit = defineEmits(['tab-click', 'tab-add', 'tab-remove', 'update:model-value']);
 

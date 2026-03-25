@@ -12,13 +12,20 @@
 
     <template v-else-if="data.type === 'button'">
       <TMagicTooltip v-if="data.tooltip" effect="dark" placement="bottom-start" :content="data.tooltip">
-        <TMagicButton size="small" link :disabled="disabled"
-          ><MIcon v-if="data.icon" :icon="data.icon"></MIcon><span>{{ data.text }}</span></TMagicButton
-        >
+        <TMagicButton size="small" link :disabled="disabled">
+          <template #icon v-if="data.icon">
+            <MIcon :icon="data.icon"></MIcon>
+          </template>
+          <template #default v-if="data.text">{{ data.text }}</template>
+        </TMagicButton>
       </TMagicTooltip>
-      <TMagicButton v-else size="small" link :disabled="disabled" :title="data.text"
-        ><MIcon v-if="data.icon" :icon="data.icon"></MIcon><span>{{ data.text }}</span></TMagicButton
-      >
+
+      <TMagicButton v-else size="small" link :disabled="disabled" :title="data.text">
+        <template #icon v-if="data.icon">
+          <MIcon :icon="data.icon"></MIcon>
+        </template>
+        <template #default v-if="data.text">{{ data.text }}</template>
+      </TMagicButton>
     </template>
 
     <TMagicDropdown
@@ -49,7 +56,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject } from 'vue';
+import { computed } from 'vue';
 import { ArrowDown } from '@element-plus/icons-vue';
 
 import {
@@ -62,8 +69,10 @@ import {
   TMagicTooltip,
 } from '@tmagic/design';
 
+import { useServices } from '@editor/hooks/use-services';
+
 import MIcon from '../components/Icon.vue';
-import type { MenuButton, MenuComponent, Services } from '../type';
+import type { MenuButton, MenuComponent } from '../type';
 
 defineOptions({
   name: 'MEditorToolButton',
@@ -82,7 +91,7 @@ const props = withDefaults(
     eventType: 'click',
   },
 );
-const services = inject<Services>('services');
+const services = useServices();
 
 const disabled = computed(() => {
   if (typeof props.data === 'string') return false;
@@ -104,7 +113,7 @@ const display = computed(() => {
 
 const buttonHandler = (item: MenuButton | MenuComponent, event: MouseEvent) => {
   if (disabled.value) return;
-  if (typeof (item as MenuButton).handler === 'function' && services) {
+  if (typeof (item as MenuButton).handler === 'function') {
     (item as MenuButton).handler?.(services, event);
   }
 };
@@ -131,7 +140,8 @@ const mousedownHandler = (item: MenuButton | MenuComponent, event: MouseEvent) =
 
 const mouseupHandler = (item: MenuButton | MenuComponent, event: MouseEvent) => {
   if (props.eventType !== 'mouseup') return;
-  if (item.type === 'button') {
+
+  if (item.type === 'button' && event.button === 0) {
     buttonHandler(item, event);
   }
 };

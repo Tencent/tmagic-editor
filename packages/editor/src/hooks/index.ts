@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,15 @@
  */
 
 export * from './use-code-block-edit';
-export * from './use-data-source-method';
 export * from './use-stage';
 export * from './use-float-box';
 export * from './use-window-rect';
 export * from './use-editor-content-height';
+export * from './use-filter';
+export * from './use-float-box';
+export * from './use-getso';
+export * from './use-next-float-box-position';
+export * from './use-node-status';
+export * from './use-stage';
+export * from './use-window-rect';
+export * from './use-services';

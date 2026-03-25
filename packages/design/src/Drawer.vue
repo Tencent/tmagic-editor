@@ -25,7 +25,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { DrawerProps } from './types';
 
 defineOptions({
@@ -36,11 +36,11 @@ const props = defineProps<DrawerProps>();
 
 const emit = defineEmits(['open', 'opened', 'close', 'closed', 'update:modelValue']);
 
-const ui = getConfig('components')?.drawer;
+const ui = getDesignConfig('components')?.drawer;
 
 const uiComponent = ui?.component || 'el-drawer';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<DrawerProps>(() => ui?.props(props) || props);
 
 const drawer = ref<any>();
 

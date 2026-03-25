@@ -1,4 +1,4 @@
-import type { Id, MContainer, MNode } from '@tmagic/schema';
+import type { Id, MContainer, MNode } from '@tmagic/core';
 import { addClassName, removeClassName } from '@tmagic/utils';
 
 import { DragType, type Services } from '@editor/type';
@@ -10,6 +10,7 @@ const dragState: {
   dragOverNodeId: Id;
   dropType: NodeDropType | '';
   container: HTMLElement | null;
+  nodeId?: Id;
 } = {
   dragOverNodeId: '',
   dropType: '',
@@ -41,7 +42,7 @@ const removeStatusClass = (el: HTMLElement | null) => {
  * dragover 属于目标节点
  * 这些方法并不是同一个dom事件触发的
  */
-export const useDrag = (services: Services | undefined) => {
+export const useDrag = ({ editorService }: Services) => {
   const handleDragStart = (event: DragEvent) => {
     if (!event.dataTransfer || !event.target || !event.currentTarget) return;
 
@@ -50,6 +51,7 @@ export const useDrag = (services: Services | undefined) => {
     if (!targetEl || targetEl !== event.currentTarget) return;
 
     event.dataTransfer.effectAllowed = 'move';
+    dragState.nodeId = targetEl.dataset.nodeId;
 
     try {
       event.dataTransfer.setData(
@@ -70,30 +72,52 @@ export const useDrag = (services: Services | undefined) => {
     const labelEl = targetEl.children[0];
     if (!labelEl) return;
 
+    removeClassName(labelEl, 'drag-before', 'drag-after', 'drag-inner');
+
     const { top: targetTop, height: targetHeight } = labelEl.getBoundingClientRect();
 
     const distance = event.clientY - targetTop;
     const isContainer = targetEl.dataset.isContainer === 'true';
 
+    const targetNodeId = targetEl.dataset.nodeId;
+    const { nodeId } = dragState;
+    const parentsId = targetEl.dataset.parentsId?.split(',');
+
+    if (!targetNodeId) {
+      return;
+    }
+
+    // 如果是悬浮在拖动的节点上方，则不响应
+    if (parentsId) {
+      let targetIdIndex = -1;
+      for (let i = 0, l = parentsId.length; i < l; i++) {
+        const id = parentsId[i];
+        if (nodeId === id) {
+          targetIdIndex = i;
+        }
+
+        if (parentsId.includes(`${nodeId}`) && i >= targetIdIndex) {
+          return;
+        }
+      }
+    }
+
     if (distance < targetHeight / 3) {
       dragState.dropType = 'before';
       addClassName(labelEl, globalThis.document, 'drag-before');
-      removeClassName(labelEl, 'drag-after', 'drag-inner');
     } else if (distance > (targetHeight * 2) / 3) {
       dragState.dropType = 'after';
       addClassName(labelEl, globalThis.document, 'drag-after');
-      removeClassName(labelEl, 'drag-before', 'drag-inner');
     } else if (isContainer) {
       dragState.dropType = 'inner';
       addClassName(labelEl, globalThis.document, 'drag-inner');
-      removeClassName(labelEl, 'drag-before', 'drag-after');
     }
 
     if (!dragState.dropType) {
       return;
     }
 
-    dragState.dragOverNodeId = targetEl.dataset.nodeId || '';
+    dragState.dragOverNodeId = targetNodeId;
     dragState.container = event.currentTarget as HTMLElement;
 
     event.preventDefault();
@@ -120,12 +144,12 @@ export const useDrag = (services: Services | undefined) => {
 
     removeStatusClass(dragState.container);
 
-    if (node && dragState.dragOverNodeId && dragState.dropType && services) {
+    if (node && dragState.dragOverNodeId && dragState.dropType) {
       if (dragState.dragOverNodeId === node.id) {
         return;
       }
 
-      const targetInfo = services.editorService.getNodeInfo(dragState.dragOverNodeId, false);
+      const targetInfo = editorService.getNodeInfo(dragState.dragOverNodeId, false);
       const targetNode = targetInfo.node;
       let targetParent = targetInfo.parent;
 
@@ -144,12 +168,12 @@ export const useDrag = (services: Services | undefined) => {
         targetIndex += 1;
       }
 
-      const selectedNodes = services.editorService.get('nodes');
+      const selectedNodes = editorService.get('nodes');
 
       if (selectedNodes.find((n) => `${n.id}` === `${node.id}`)) {
-        services.editorService.dragTo(selectedNodes, targetParent, targetIndex);
+        editorService.dragTo(selectedNodes, targetParent, targetIndex);
       } else {
-        services.editorService.dragTo([node], targetParent, targetIndex);
+        editorService.dragTo([node], targetParent, targetIndex);
       }
     }
 

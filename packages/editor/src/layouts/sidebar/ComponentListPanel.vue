@@ -2,36 +2,39 @@
   <TMagicScrollbar>
     <slot name="component-list-panel-header"></slot>
 
-    <TMagicCollapse class="ui-component-panel" :model-value="collapseValue">
-      <SearchInput @search="filterTextChangeHandler"></SearchInput>
-      <template v-for="(group, index) in list">
-        <TMagicCollapseItem v-if="group.items && group.items.length" :key="index" :name="`${index}`">
-          <template #title><MIcon :icon="Grid"></MIcon>{{ group.title }}</template>
-          <div
-            v-for="item in group.items"
-            class="component-item"
-            draggable="true"
-            :key="item.type"
-            @click="appendComponent(item)"
-            @dragstart="dragstartHandler(item, $event)"
-            @dragend="dragendHandler"
-            @drag="dragHandler"
-          >
-            <slot name="component-list-item" :component="item">
-              <TMagicTooltip placement="right" :disabled="!Boolean(item.desc)" :content="item.desc">
-                <MIcon :icon="item.icon"></MIcon>
-              </TMagicTooltip>
-              <span :title="item.text">{{ item.text }}</span>
-            </slot>
-          </div>
-        </TMagicCollapseItem>
-      </template>
-    </TMagicCollapse>
+    <SearchInput @search="filterTextChangeHandler"></SearchInput>
+
+    <slot name="component-list" :component-group-list="list">
+      <TMagicCollapse class="ui-component-panel" v-model="collapseValue">
+        <template v-for="(group, index) in list">
+          <TMagicCollapseItem v-if="group.items && group.items.length" :key="index" :name="`${index}`">
+            <template #title><MIcon :icon="Grid"></MIcon>{{ group.title }}</template>
+            <div
+              v-for="item in group.items"
+              class="component-item"
+              draggable="true"
+              :key="item.type"
+              @click="appendComponent(item)"
+              @dragstart="dragstartHandler(item, $event)"
+              @dragend="dragendHandler"
+              @drag="dragHandler"
+            >
+              <slot name="component-list-item" :component="item">
+                <TMagicTooltip placement="right" :disabled="!Boolean(item.desc)" :content="item.desc">
+                  <MIcon :icon="item.icon"></MIcon>
+                </TMagicTooltip>
+                <span :title="item.text">{{ item.text }}</span>
+              </slot>
+            </div>
+          </TMagicCollapseItem>
+        </template>
+      </TMagicCollapse>
+    </slot>
   </TMagicScrollbar>
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, ref } from 'vue';
+import { computed, inject, ref, watch } from 'vue';
 import { Grid } from '@element-plus/icons-vue';
 import serialize from 'serialize-javascript';
 
@@ -40,12 +43,12 @@ import { removeClassNameByClassName } from '@tmagic/utils';
 
 import MIcon from '@editor/components/Icon.vue';
 import SearchInput from '@editor/components/SearchInput.vue';
+import { useServices } from '@editor/hooks/use-services';
 import {
   type ComponentGroup,
   type ComponentItem,
   ComponentListPanelSlots,
   DragType,
-  type Services,
   type StageOptions,
 } from '@editor/type';
 
@@ -61,28 +64,37 @@ const filterTextChangeHandler = (v: string) => {
   searchText.value = v;
 };
 
-const services = inject<Services>('services');
+const { editorService, componentListService } = useServices();
 const stageOptions = inject<StageOptions>('stageOptions');
 
-const stage = computed(() => services?.editorService.get('stage'));
-const list = computed(() =>
-  services?.componentListService.getList().map((group: ComponentGroup) => ({
+const stage = computed(() => editorService.get('stage'));
+const list = computed<ComponentGroup[]>(() =>
+  componentListService.getList().map((group: ComponentGroup) => ({
     ...group,
     items: group.items.filter((item: ComponentItem) => item.text.includes(searchText.value)),
   })),
 );
-const collapseValue = computed(() =>
-  Array(list.value?.length)
-    .fill(1)
-    .map((x, i) => `${i}`),
+
+const collapseValue = ref();
+
+watch(
+  list,
+  () => {
+    collapseValue.value = Array(list.value?.length)
+      .fill(1)
+      .map((x, i) => `${i}`);
+  },
+  {
+    immediate: true,
+  },
 );
 
-let timeout: NodeJS.Timeout | undefined;
+let timeout: ReturnType<typeof setTimeout> | undefined;
 let clientX: number;
 let clientY: number;
 
 const appendComponent = ({ text, type, data = {} }: ComponentItem): void => {
-  services?.editorService.add({
+  editorService.add({
     name: text,
     type,
     ...data,
@@ -108,7 +120,7 @@ const dragendHandler = () => {
     globalThis.clearTimeout(timeout);
     timeout = undefined;
   }
-  const doc = stage.value?.renderer.getDocument();
+  const doc = stage.value?.renderer?.getDocument();
   if (doc && stageOptions?.containerHighlightClassName) {
     removeClassNameByClassName(doc, stageOptions.containerHighlightClassName);
   }

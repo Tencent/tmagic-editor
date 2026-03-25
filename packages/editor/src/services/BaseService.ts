@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -198,24 +199,35 @@ export default class extends EventEmitter {
    * @deprecated 请使用usePlugin代替
    */
   public use(options: Record<string, Function>) {
-    Object.entries(options).forEach(([methodName, method]: [string, Function]) => {
+    for (const [methodName, method] of Object.entries(options)) {
       if (typeof method === 'function') this.middleware[methodName].push(method);
-    });
+    }
   }
 
   public usePlugin(options: Record<string, Function>) {
-    Object.entries(options).forEach(([methodName, method]: [string, Function]) => {
-      if (typeof method === 'function') this.pluginOptionsList[methodName].push(method);
-    });
+    for (const [methodName, method] of Object.entries(options)) {
+      if (typeof method === 'function' && !this.pluginOptionsList[methodName].includes(method)) {
+        this.pluginOptionsList[methodName].push(method);
+      }
+    }
+  }
+
+  public removePlugin(options: Record<string, Function>) {
+    for (const [methodName, method] of Object.entries(options)) {
+      if (Array.isArray(this.pluginOptionsList[methodName])) {
+        this.pluginOptionsList[methodName] = this.pluginOptionsList[methodName].filter((item) => item !== method);
+      }
+    }
   }
 
   public removeAllPlugins() {
-    Object.keys(this.pluginOptionsList).forEach((key) => {
+    for (const key of Object.keys(this.pluginOptionsList)) {
       this.pluginOptionsList[key] = [];
-    });
-    Object.keys(this.middleware).forEach((key) => {
+    }
+
+    for (const key of Object.keys(this.middleware)) {
       this.middleware[key] = [];
-    });
+    }
   }
 
   private async doTask() {

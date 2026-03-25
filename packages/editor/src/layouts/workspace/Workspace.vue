@@ -4,7 +4,8 @@
 
     <slot name="stage">
       <MagicStage
-        v-if="page"
+        v-if="page && (stageOptions?.render || stageOptions?.runtimeUrl)"
+        :stage-options="stageOptions"
         :disabled-stage-overlay="disabledStageOverlay"
         :stage-content-menu="stageContentMenu"
         :custom-content-menu="customContentMenu"
@@ -18,7 +19,8 @@
 <script lang="ts" setup>
 import { computed, inject } from 'vue';
 
-import type { MenuButton, MenuComponent, Services, WorkspaceSlots } from '@editor/type';
+import { useServices } from '@editor/hooks/use-services';
+import type { CustomContentMenuFunction, MenuButton, MenuComponent, StageOptions, WorkspaceSlots } from '@editor/type';
 
 import MagicStage from './viewer/Stage.vue';
 import Breadcrumb from './Breadcrumb.vue';
@@ -33,14 +35,16 @@ withDefaults(
   defineProps<{
     stageContentMenu: (MenuButton | MenuComponent)[];
     disabledStageOverlay?: boolean;
-    customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
+    customContentMenu: CustomContentMenuFunction;
   }>(),
   {
     disabledStageOverlay: false,
   },
 );
 
-const services = inject<Services>('services');
+const stageOptions = inject<StageOptions>('stageOptions');
 
-const page = computed(() => services?.editorService.get('page'));
+const { editorService } = useServices();
+
+const page = computed(() => editorService.get('page'));
 </script>

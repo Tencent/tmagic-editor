@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,20 @@
 import { beforeAll, describe, expect, test } from 'vitest';
 import { cloneDeep } from 'lodash-es';
 
-import type { MApp } from '@tmagic/schema';
-import { NodeType } from '@tmagic/schema';
+import type { MApp } from '@tmagic/core';
+import { NodeType } from '@tmagic/core';
 
 import editorService from '@editor/services/editor';
 import historyService from '@editor/services/history';
 import storageService from '@editor/services/storage';
-import { COPY_STORAGE_KEY, setConfig } from '@editor/utils';
+import { COPY_STORAGE_KEY, setEditorConfig } from '@editor/utils';
 
-setConfig({
+setEditorConfig({
   // eslint-disable-next-line no-eval
   parseDSL: (dsl: string) => eval(dsl),
+  customCreateMonacoEditor: (monaco, codeEditorEl, options) => monaco.editor.create(codeEditorEl, options),
+  customCreateMonacoDiffEditor: (monaco, codeEditorEl, options) =>
+    monaco.editor.createDiffEditor(codeEditorEl, options),
 });
 
 // mock window.localStage

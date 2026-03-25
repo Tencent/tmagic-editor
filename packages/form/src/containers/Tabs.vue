@@ -26,44 +26,50 @@
         <span>
           {{ filter(tab.title)
           }}<TMagicBadge
-            :hidden="!diffCount[tabIndex]"
-            :value="diffCount[tabIndex]"
+            :hidden="!diffCount[Number(tabIndex)]"
+            :value="diffCount[Number(tabIndex)]"
             class="diff-count-badge"
           ></TMagicBadge>
         </span>
       </template>
       <Container
         v-for="item in tabItems(tab)"
-        :key="item[mForm?.keyProp || '__key']"
+        :key="(item as Record<string, any>)[mForm?.keyProp || '__key']"
         :config="item"
         :disabled="disabled"
         :model="
           config.dynamic
             ? (name ? model[name] : model)[tabIndex]
             : tab.name
-            ? (name ? model[name] : model)[tab.name]
-            : name
-            ? model[name]
-            : model
+              ? (name ? model[name] : model)[tab.name]
+              : name
+                ? model[name]
+                : model
         "
         :last-values="
           isEmpty(lastValues)
             ? {}
             : config.dynamic
-            ? (name ? lastValues[name] : lastValues)[tabIndex]
-            : tab.name
-            ? (name ? lastValues[name] : lastValues)[tab.name]
-            : name
-            ? lastValues[name]
-            : lastValues
+              ? (name ? lastValues[name] : lastValues)[tabIndex]
+              : tab.name
+                ? (name ? lastValues[name] : lastValues)[tab.name]
+                : name
+                  ? lastValues[name]
+                  : lastValues
         "
         :is-compare="isCompare"
-        :prop="config.dynamic ? `${prop}${prop ? '.' : ''}${String(tabIndex)}` : prop"
+        :prop="
+          config.dynamic
+            ? `${prop}${prop ? '.' : ''}${String(tabIndex)}`
+            : tab.name
+              ? `${prop}${prop ? '.' : ''}${tab.name}`
+              : prop
+        "
         :size="size"
         :label-width="tab.labelWidth || labelWidth"
         :expand-more="expandMore"
         @change="changeHandler"
-        @addDiffCount="onAddDiffCount(tabIndex)"
+        @addDiffCount="onAddDiffCount(Number(tabIndex))"
       ></Container>
     </component>
   </component>
@@ -71,12 +77,12 @@
 
 <script setup lang="ts">
 import { computed, inject, ref, watchEffect } from 'vue';
-import { cloneDeep, isEmpty } from 'lodash-es';
+import { isEmpty } from 'lodash-es';
 
-import { getConfig, TMagicBadge } from '@tmagic/design';
+import { getDesignConfig, TMagicBadge } from '@tmagic/design';
 
-import { FormState, TabConfig, TabPaneConfig } from '../schema';
-import { display as displayFunc, filterFunction } from '../utils/form';
+import type { ContainerChangeEventData, FormState, TabConfig, TabPaneConfig } from '../schema';
+import { display as displayFunc, filterFunction, initValue } from '../utils/form';
 
 import Container from './Container.vue';
 
@@ -88,8 +94,28 @@ type DiffCount = {
   [tabIndex: number]: number;
 };
 
-const tabPaneComponent = getConfig('components')?.tabPane;
-const tabsComponent = getConfig('components')?.tabs;
+const props = withDefaults(
+  defineProps<{
+    model: any;
+    lastValues?: any;
+    isCompare?: boolean;
+    config: TabConfig;
+    name: string;
+    size?: string;
+    labelWidth?: string;
+    prop?: string;
+    expandMore?: boolean;
+    disabled?: boolean;
+  }>(),
+  {
+    lastValues: () => ({}),
+    isCompare: false,
+    prop: '',
+  },
+);
+
+const tabPaneComponent = getDesignConfig('components')?.tabPane;
+const tabsComponent = getDesignConfig('components')?.tabs;
 
 const getActive = (mForm: FormState | undefined, props: any, activeTabName: string) => {
   const { config, model, prop } = props;
@@ -118,26 +144,10 @@ const tabClick = (mForm: FormState | undefined, tab: any, props: any) => {
   }
 };
 
-const props = withDefaults(
-  defineProps<{
-    model: any;
-    lastValues?: any;
-    isCompare?: boolean;
-    config: TabConfig;
-    name: string;
-    size?: string;
-    labelWidth?: string;
-    prop?: string;
-    expandMore?: boolean;
-    disabled?: boolean;
-  }>(),
-  {
-    lastValues: () => ({}),
-    isCompare: false,
-  },
-);
-
-const emit = defineEmits(['change', 'addDiffCount']);
+const emit = defineEmits<{
+  change: [v: any, eventData?: ContainerChangeEventData];
+  addDiffCount: [];
+}>();
 
 const mForm = inject<FormState | undefined>('mForm');
 const activeTabName = ref(getActive(mForm, props, ''));
@@ -164,10 +174,20 @@ watchEffect(() => {
 
 const tabItems = (tab: TabPaneConfig) => (props.config.dynamic ? props.config.items : tab.items);
 
-const tabClickHandler = (tab: any) => tabClick(mForm, tab, props);
+const tabClickHandler = (tab: any) => {
+  if (typeof tab === 'object') {
+    tabClick(mForm, tab, props);
+  } else {
+    let item = tabs.value.find((tab: any) => tab.status === tab);
+    if (!item) {
+      item = tabs.value[tab];
+    }
+    tabClick(mForm, item, props);
+  }
+};
 
-const onTabAdd = () => {
-  if (!props.config.name) throw new Error('dynamic tab 必须配置name');
+const onTabAdd = async () => {
+  if (!props.name) throw new Error('dynamic tab 必须配置name');
 
   if (typeof props.config.onTabAdd === 'function') {
     props.config.onTabAdd(mForm, {
@@ -175,17 +195,32 @@ const onTabAdd = () => {
       prop: props.prop,
       config: props.config,
     });
-  } else if (tabs.value.length > 0) {
-    const newObj = cloneDeep(tabs.value[0]);
+    emit('change', props.model[props.name]);
+  } else {
+    const newObj = await initValue(mForm, {
+      config: props.config.items,
+      initValues: {},
+    });
+
     newObj.title = `标签${tabs.value.length + 1}`;
-    props.model[props.config.name].push(newObj);
+
+    props.model[props.name].push(newObj);
+
+    emit('change', props.model[props.name], {
+      changeRecords: [
+        {
+          propPath: `${props.prop}.${props.model[props.name].length - 1}`,
+          value: newObj,
+        },
+      ],
+    });
   }
-  emit('change', props.model);
-  mForm?.$emit('field-change', props.prop, props.model[props.config.name]);
+
+  mForm?.$emit('field-change', props.prop, props.model[props.name]);
 };
 
 const onTabRemove = (tabName: string) => {
-  if (!props.config.name) throw new Error('dynamic tab 必须配置name');
+  if (!props.name) throw new Error('dynamic tab 必须配置name');
 
   if (typeof props.config.onTabRemove === 'function') {
     props.config.onTabRemove(mForm, tabName, {
@@ -194,23 +229,20 @@ const onTabRemove = (tabName: string) => {
       config: props.config,
     });
   } else {
-    props.model[props.config.name].splice(+tabName, 1);
+    props.model[props.name].splice(+tabName, 1);
 
     // 防止删除后没有选中的问题
-    if (tabName < activeTabName.value || activeTabName.value >= props.model[props.config.name].length) {
+    if (tabName < activeTabName.value || activeTabName.value >= props.model[props.name].length) {
       activeTabName.value = (+activeTabName.value - 1).toString();
       tabClick(mForm, { name: activeTabName.value }, props);
     }
   }
-  emit('change', props.model);
-  mForm?.$emit('field-change', props.prop, props.model[props.config.name]);
+  emit('change', props.model[props.name]);
+  mForm?.$emit('field-change', props.prop, props.model[props.name]);
 };
 
-const changeHandler = () => {
-  emit('change', props.model);
-  if (typeof props.config.onChange === 'function') {
-    props.config.onChange(mForm, { model: props.model, prop: props.prop, config: props.config });
-  }
+const changeHandler = (v: any, eventData: ContainerChangeEventData) => {
+  emit('change', props.name ? props.model[props.name] : props.model, eventData);
 };
 
 // 在tabs组件中收集事件触发次数，即该tab下的差异数

@@ -1,11 +1,10 @@
 import { reactive } from 'vue';
 import { cloneDeep, get } from 'lodash-es';
-import { Writable } from 'type-fest';
+import type { Writable } from 'type-fest';
 
-import type { EventOption } from '@tmagic/core';
-import { Target, type TargetOptions, Watcher } from '@tmagic/dep';
-import type { FormConfig } from '@tmagic/form';
-import type { DataSourceSchema, Id, MNode } from '@tmagic/schema';
+import type { DataSourceSchema, EventOption, Id, MNode, TargetOptions } from '@tmagic/core';
+import { Target, Watcher } from '@tmagic/core';
+import type { ChangeRecord, FormConfig } from '@tmagic/form';
 import { guid, toLine } from '@tmagic/utils';
 
 import editorService from '@editor/services/editor';
@@ -116,15 +115,22 @@ class DataSource extends BaseService {
     return newConfig;
   }
 
-  public update(config: DataSourceSchema) {
+  public update(config: DataSourceSchema, { changeRecords = [] }: { changeRecords?: ChangeRecord[] } = {}) {
     const dataSources = this.get('dataSources');
 
     const index = dataSources.findIndex((ds) => ds.id === config.id);
-    dataSources[index] = cloneDeep(config);
 
-    this.emit('update', config);
+    const oldConfig = dataSources[index];
+    const newConfig = cloneDeep(config);
 
-    return config;
+    dataSources[index] = newConfig;
+
+    this.emit('update', newConfig, {
+      oldConfig,
+      changeRecords,
+    });
+
+    return newConfig;
   }
 
   public remove(id: string) {

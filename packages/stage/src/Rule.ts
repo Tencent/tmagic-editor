@@ -5,19 +5,25 @@ import Guides, { type GuidesEvents, type GuidesOptions } from '@scena/guides';
 import { GuidesType } from './const';
 import type { RuleOptions } from './types';
 
+const guidesClass = 'tmagic-stage-guides';
+
 export default class Rule extends EventEmitter {
-  public hGuides: Guides;
-  public vGuides: Guides;
+  public hGuides?: Guides;
+  public vGuides?: Guides;
   public horizontalGuidelines: number[] = [];
   public verticalGuidelines: number[] = [];
 
-  private container: HTMLDivElement;
-  private containerResizeObserver: ResizeObserver;
+  private container?: HTMLDivElement;
+  private containerResizeObserver?: ResizeObserver;
   private isShowGuides = true;
   private guidesOptions?: Partial<GuidesOptions>;
 
   constructor(container: HTMLDivElement, options?: RuleOptions) {
     super();
+
+    if (options?.disabledRule) {
+      return;
+    }
 
     this.guidesOptions = options?.guidesOptions || {};
 
@@ -26,8 +32,8 @@ export default class Rule extends EventEmitter {
     this.vGuides = this.createGuides(GuidesType.VERTICAL, this.verticalGuidelines);
 
     this.containerResizeObserver = new ResizeObserver(() => {
-      this.vGuides.resize();
-      this.hGuides.resize();
+      this.vGuides?.resize();
+      this.hGuides?.resize();
     });
 
     this.containerResizeObserver.observe(this.container);
@@ -40,11 +46,11 @@ export default class Rule extends EventEmitter {
   public showGuides(isShowGuides = true) {
     this.isShowGuides = isShowGuides;
 
-    this.hGuides.setState({
+    this.hGuides?.setState({
       showGuides: isShowGuides,
     });
 
-    this.vGuides.setState({
+    this.vGuides?.setState({
       showGuides: isShowGuides,
     });
   }
@@ -53,11 +59,11 @@ export default class Rule extends EventEmitter {
     this.horizontalGuidelines = hLines;
     this.verticalGuidelines = vLines;
 
-    this.hGuides.setState({
+    this.hGuides?.setState({
       defaultGuides: hLines,
     });
 
-    this.vGuides.setState({
+    this.vGuides?.setState({
       defaultGuides: vLines,
     });
 
@@ -84,21 +90,20 @@ export default class Rule extends EventEmitter {
    * @param show 是否显示
    */
   public showRule(show = true) {
-    // 当尺子隐藏时发现大小变化，显示后会变形，所以这里做重新初始化处理
+    // 当尺子隐藏时发生大小变化，显示后会变形，所以这里做重新初始化处理
     if (show) {
-      this.hGuides.destroy();
-      this.hGuides = this.createGuides(GuidesType.HORIZONTAL, this.horizontalGuidelines);
+      this.destroyGuides();
 
-      this.vGuides.destroy();
+      this.hGuides = this.createGuides(GuidesType.HORIZONTAL, this.horizontalGuidelines);
       this.vGuides = this.createGuides(GuidesType.VERTICAL, this.verticalGuidelines);
     } else {
-      this.hGuides.setState({
+      this.hGuides?.setState({
         rulerStyle: {
           visibility: 'hidden',
         },
       });
 
-      this.vGuides.setState({
+      this.vGuides?.setState({
         rulerStyle: {
           visibility: 'hidden',
         },
@@ -107,18 +112,32 @@ export default class Rule extends EventEmitter {
   }
 
   public scrollRule(scrollTop: number) {
-    this.hGuides.scrollGuides(scrollTop);
-    this.hGuides.scroll(0);
+    this.hGuides?.scrollGuides(scrollTop);
+    this.hGuides?.scroll(0);
 
-    this.vGuides.scrollGuides(0);
-    this.vGuides.scroll(scrollTop);
+    this.vGuides?.scrollGuides(0);
+    this.vGuides?.scroll(scrollTop);
   }
 
   public destroy(): void {
-    this.hGuides.off('changeGuides', this.hGuidesChangeGuidesHandler);
-    this.vGuides.off('changeGuides', this.vGuidesChangeGuidesHandler);
-    this.containerResizeObserver.disconnect();
+    this.destroyGuides();
+    this.hGuides?.off('changeGuides', this.hGuidesChangeGuidesHandler);
+    this.vGuides?.off('changeGuides', this.vGuidesChangeGuidesHandler);
+    this.containerResizeObserver?.disconnect();
     this.removeAllListeners();
+  }
+
+  public destroyGuides(): void {
+    this.hGuides?.destroy();
+    this.vGuides?.destroy();
+
+    this.container?.querySelectorAll(`.${guidesClass}`).forEach((el) => {
+      el.remove();
+    });
+
+    this.hGuides = undefined;
+    this.vGuides = undefined;
+    this.container = undefined;
   }
 
   private getGuidesStyle = (type: GuidesType) => ({
@@ -130,11 +149,16 @@ export default class Rule extends EventEmitter {
     height: type === GuidesType.HORIZONTAL ? '30px' : '100%',
   });
 
-  private createGuides = (type: GuidesType, defaultGuides: number[] = []): Guides => {
+  private createGuides = (type: GuidesType, defaultGuides: number[] = []): Guides | undefined => {
+    if (!this.container) {
+      return;
+    }
+
     const guides = new Guides(this.container, {
       type,
       defaultGuides,
       displayDragPos: true,
+      className: guidesClass,
       backgroundColor: '#fff',
       lineColor: '#000',
       textColor: '#000',

@@ -1,17 +1,14 @@
 import { computed, watch } from 'vue';
 
-import type { MNode } from '@tmagic/schema';
+import type { MNode } from '@tmagic/core';
 import StageCore, { GuidesType, RemoveEventData, SortEventData, UpdateEventData } from '@tmagic/stage';
+import { getIdFromEl } from '@tmagic/utils';
 
 import editorService from '@editor/services/editor';
 import uiService from '@editor/services/ui';
-import {
-  H_GUIDE_LINE_STORAGE_KEY,
-  StageOptions,
-  UI_SELECT_MODE_EVENT_NAME,
-  V_GUIDE_LINE_STORAGE_KEY,
-} from '@editor/type';
-import { getGuideLineFromCache } from '@editor/utils/editor';
+import type { StageOptions } from '@editor/type';
+import { H_GUIDE_LINE_STORAGE_KEY, UI_SELECT_MODE_EVENT_NAME, V_GUIDE_LINE_STORAGE_KEY } from '@editor/utils/const';
+import { buildChangeRecords, getGuideLineFromCache } from '@editor/utils/editor';
 
 const root = computed(() => editorService.get('root'));
 const page = computed(() => editorService.get('page'));
@@ -48,6 +45,7 @@ export const useStage = (stageOptions: StageOptions) => {
     updateDragEl: stageOptions.updateDragEl,
     guidesOptions: stageOptions.guidesOptions,
     disabledMultiSelect: stageOptions.disabledMultiSelect,
+    disabledRule: stageOptions.disabledRule,
   });
 
   watch(
@@ -61,7 +59,7 @@ export const useStage = (stageOptions: StageOptions) => {
     },
   );
 
-  stage.mask.setGuides([
+  stage.mask?.setGuides([
     getGuideLineFromCache(getGuideLineKey(H_GUIDE_LINE_STORAGE_KEY)),
     getGuideLineFromCache(getGuideLineKey(V_GUIDE_LINE_STORAGE_KEY)),
   ]);
@@ -71,27 +69,40 @@ export const useStage = (stageOptions: StageOptions) => {
   });
 
   stage.on('select', (el: HTMLElement) => {
-    if (`${editorService.get('node')?.id}` === el.id && editorService.get('nodes').length === 1) return;
-    editorService.select(el.id);
+    const id = getIdFromEl()(el);
+    if (`${editorService.get('node')?.id}` === id && editorService.get('nodes').length === 1) return;
+    id && editorService.select(id);
   });
 
   stage.on('highlight', (el: HTMLElement) => {
-    editorService.highlight(el.id);
+    const id = getIdFromEl()(el);
+    id && editorService.highlight(id);
   });
 
   stage.on('multi-select', (els: HTMLElement[]) => {
-    editorService.multiSelect(els.map((el) => el.id));
+    const ids = els.map((el) => getIdFromEl()(el)).filter((id) => Boolean(id)) as string[];
+    editorService.multiSelect(ids);
   });
 
   stage.on('update', (ev: UpdateEventData) => {
     if (ev.parentEl) {
       for (const data of ev.data) {
-        editorService.moveToContainer({ id: data.el.id, style: data.style }, ev.parentEl.id);
+        const id = getIdFromEl()(data.el);
+        const pId = getIdFromEl()(ev.parentEl);
+        id && pId && editorService.moveToContainer({ id, style: data.style }, pId);
       }
       return;
     }
 
-    editorService.update(ev.data.map((data) => ({ id: data.el.id, style: data.style })));
+    // 为每个元素单独更新，确保 changeRecords 与对应的元素关联
+    ev.data.forEach((data) => {
+      const id = getIdFromEl()(data.el);
+      if (!id) return;
+
+      const { style = {} } = data;
+
+      editorService.update({ id, style }, { changeRecords: buildChangeRecords(style, 'style') });
+    });
   });
 
   stage.on('sort', (ev: SortEventData) => {
@@ -99,7 +110,7 @@ export const useStage = (stageOptions: StageOptions) => {
   });
 
   stage.on('remove', (ev: RemoveEventData) => {
-    const nodes = ev.data.map(({ el }) => editorService.getNodeById(el.id));
+    const nodes = ev.data.map(({ el }) => editorService.getNodeById(getIdFromEl()(el) || ''));
     editorService.remove(nodes.filter((node) => Boolean(node)) as MNode[]);
   });
 

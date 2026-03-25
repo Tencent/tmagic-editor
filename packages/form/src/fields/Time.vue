@@ -1,12 +1,12 @@
 <template>
   <TMagicTimePicker
-    v-model="model[name]"
+    :model-value="model[name]"
     :value-format="config.valueFormat || 'HH:mm:ss'"
     :format="config.format || 'HH:mm:ss'"
     :size="size"
     :placeholder="config.placeholder"
     :disabled="disabled"
-    @change="changeHandler"
+    @update:model-value="changeHandler"
   ></TMagicTimePicker>
 </template>
 

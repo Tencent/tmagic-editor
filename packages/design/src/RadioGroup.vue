@@ -13,7 +13,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { RadioGroupProps } from './types';
 
 defineOptions({
@@ -22,11 +22,11 @@ defineOptions({
 
 const props = defineProps<RadioGroupProps>();
 
-const ui = getConfig('components')?.radioGroup;
+const ui = getDesignConfig('components')?.radioGroup;
 
 const uiComponent = ui?.component || 'el-radio-group';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<RadioGroupProps>(() => ui?.props(props) || props);
 
 const emit = defineEmits(['change', 'update:modelValue']);
 

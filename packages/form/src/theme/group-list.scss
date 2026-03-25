@@ -20,4 +20,19 @@
       border-bottom: 0;
     }
   }
+
+  .tmagic-design-card {
+    .el-card__header {
+      padding: 5px 20px;
+    }
+    .t-card__header {
+      padding: 5px 0;
+    }
+  }
+
+  .m-fields-group-list-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
 }

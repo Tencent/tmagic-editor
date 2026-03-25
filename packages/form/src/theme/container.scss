@@ -1,0 +1,22 @@
+.tmagic-design-form-inline {
+  .m-form-container {
+    display: inline-flex;
+  }
+}
+
+.m-form-container {
+  &.has-tip {
+    display: flex;
+    align-items: baseline;
+
+    .tmagic-design-form-item {
+      flex: 1;
+    }
+  }
+
+  .tmagic-design-form-item {
+    &.show-diff {
+      background: #f7dadd;
+    }
+  }
+}

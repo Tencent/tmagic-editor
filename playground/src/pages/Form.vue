@@ -3,7 +3,7 @@
     <nav-menu :data="menu"></nav-menu>
     <div class="diff-form">
       <div>开启表单对比功能</div>
-      <m-form
+      <MForm
         ref="form"
         :config="diffFormConfig"
         :is-compare="true"
@@ -11,17 +11,17 @@
         :last-values="lastVersion"
         size="small"
         height="100%"
-      ></m-form>
+      ></MForm>
     </div>
     <div class="title">表单字段展示</div>
     <div class="form-content">
-      <m-form ref="form" :config="config" :init-values="initValue" size="small" height="100%"></m-form>
-      <magic-code-editor class="code-editor-content" :init-values="config" @save="change"></magic-code-editor>
+      <MForm ref="form" :config="config" :init-values="initValue" size="small" height="100%"></MForm>
+      <TMagicCodeEditor class="code-editor-content" :init-values="config" @save="change"></TMagicCodeEditor>
     </div>
   </div>
 
   <TMagicDialog v-model="resultVisible" title="result" append-to-body>
-    <pre><code class="language-javascript hljs" v-html="result"></code></pre>
+    <TMagicCodeEditor :init-values="result" readonly height="60vh"></TMagicCodeEditor>
   </TMagicDialog>
 </template>
 
@@ -30,9 +30,7 @@ import { markRaw, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { Coin } from '@element-plus/icons-vue';
 
-import { TMagicDialog, tMagicMessage } from '@tmagic/design';
-import { MenuButton } from '@tmagic/editor';
-import { MForm } from '@tmagic/form';
+import { MenuButton, MForm, TMagicCodeEditor, TMagicDialog, tMagicMessage } from '@tmagic/editor';
 
 import NavMenu from '../components/NavMenu.vue';
 import formDsl from '../configs/formDsl';

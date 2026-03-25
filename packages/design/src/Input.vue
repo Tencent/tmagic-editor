@@ -7,6 +7,9 @@
     @change="changeHandler"
     @input="inputHandler"
     @update:modelValue="updateModelValue"
+    @blur="blurHandler"
+    @focus="focusHandler"
+    @click="clickHandler"
   >
     <template #prepend v-if="$slots.prepend">
       <slot name="prepend"></slot>
@@ -26,7 +29,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { InputProps } from './types';
 
 defineOptions({
@@ -35,13 +38,13 @@ defineOptions({
 
 const props = defineProps<InputProps>();
 
-const ui = getConfig('components')?.input;
+const ui = getDesignConfig('components')?.input;
 
 const uiComponent = ui?.component || 'el-input';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<InputProps>(() => ui?.props(props) || props);
 
-const emit = defineEmits(['change', 'input', 'update:modelValue']);
+const emit = defineEmits(['change', 'input', 'blur', 'focus', 'click', 'update:modelValue']);
 
 const instance = ref<any>();
 
@@ -57,13 +60,60 @@ const updateModelValue = (...args: any[]) => {
   emit('update:modelValue', ...args);
 };
 
+const blurHandler = (...args: any[]) => {
+  emit('blur', ...args);
+};
+
+const focusHandler = (...args: any[]) => {
+  emit('focus', ...args);
+};
+
+const clickHandler = (...args: any[]) => {
+  emit('click', ...args);
+};
+
 defineExpose({
   instance,
   getInput() {
-    return instance.value.input;
+    if (instance.value.input) {
+      return instance.value.input;
+    }
+    return instance.value?.$el?.querySelector('input');
   },
   getTextarea() {
-    return instance.value.textarea;
+    if (instance.value.textarea) {
+      return instance.value.textarea;
+    }
+    return instance.value?.$el?.querySelector('textarea');
   },
 });
 </script>
+
+<style lang="scss">
+.tmagic-design-input {
+  &.t-input-adornment {
+    .t-input-adornment__prepend {
+      > span {
+        border-radius: var(--td-radius-default) 0 0 var(--td-radius-default);
+      }
+    }
+    .t-input-adornment__append {
+      > span {
+        border-radius: 0 var(--td-radius-default) var(--td-radius-default) 0;
+      }
+    }
+    .t-input-adornment__prepend,
+    .t-input-adornment__append {
+      > span {
+        display: inline-flex;
+        height: 100%;
+        align-items: center;
+        box-sizing: border-box;
+        white-space: nowrap;
+        padding: 0 var(--td-comp-paddingLR-s);
+        border: 1px solid var(--td-border-level-2-color);
+      }
+    }
+  }
+}
+</style>

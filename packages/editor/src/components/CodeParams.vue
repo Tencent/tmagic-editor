@@ -11,9 +11,9 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, useTemplateRef } from 'vue';
 
-import { FormConfig, MForm } from '@tmagic/form';
+import { type ContainerChangeEventData, type FormItemConfig, type FormValue, MForm } from '@tmagic/form';
 
 import type { CodeParamStatement } from '@editor/type';
 import { error } from '@editor/utils';
@@ -32,27 +32,37 @@ const props = defineProps<{
 
 const emit = defineEmits(['change']);
 
-const form = ref<InstanceType<typeof MForm>>();
+const formRef = useTemplateRef<InstanceType<typeof MForm>>('form');
 
-const getFormConfig = (items: FormConfig = []) => [
+const getFormConfig = (items: FormItemConfig[] = []) => [
   {
     type: 'fieldset',
     items,
     legend: '参数',
-    labelWidth: '70px',
+    labelWidth: '120px',
     name: props.name,
   },
 ];
 
-const codeParamsConfig = computed(() => getFormConfig(props.paramsConfig));
+const codeParamsConfig = computed(() =>
+  getFormConfig(
+    props.paramsConfig.map(({ name, text, extra, ...config }) => ({
+      type: 'data-source-field-select',
+      name,
+      text,
+      extra,
+      fieldConfig: config as FormItemConfig,
+    })),
+  ),
+);
 
 /**
  * 参数值修改更新
  */
-const onParamsChangeHandler = async () => {
+const onParamsChangeHandler = async (v: FormValue, eventData: ContainerChangeEventData) => {
   try {
-    const value = await form.value?.submitForm(true);
-    emit('change', value);
+    const value = await formRef.value?.submitForm(true);
+    emit('change', value, eventData);
   } catch (e) {
     error(e);
   }

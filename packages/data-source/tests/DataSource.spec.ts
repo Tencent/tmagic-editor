@@ -1,5 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
+import App from '@tmagic/core';
+
 import { DataSource } from '@data-source/index';
 
 describe('DataSource', () => {
@@ -10,8 +12,9 @@ describe('DataSource', () => {
         id: '1',
         fields: [{ name: 'name' }],
         methods: [],
+        events: [],
       },
-      app: {},
+      app: new App({}),
     });
 
     expect(ds).toBeInstanceOf(DataSource);
@@ -25,8 +28,9 @@ describe('DataSource', () => {
         id: '1',
         fields: [{ name: 'name' }],
         methods: [],
+        events: [],
       },
-      app: {},
+      app: new App({}),
     });
 
     ds.init();
@@ -43,8 +47,9 @@ describe('DataSource setData', () => {
         id: '1',
         fields: [{ name: 'name', defaultValue: 'name' }],
         methods: [],
+        events: [],
       },
-      app: {},
+      app: new App({}),
     });
 
     ds.init();
@@ -74,8 +79,9 @@ describe('DataSource setData', () => {
           },
         ],
         methods: [],
+        events: [],
       },
-      app: {},
+      app: new App({}),
     });
 
     ds.init();

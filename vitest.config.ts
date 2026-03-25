@@ -9,9 +9,23 @@ export default defineConfig({
   plugins: [Vue()],
 
   test: {
-    include: ['./packages/*/tests/**'],
+    include: ['./packages/*/tests/**', './runtime/*/tests/**'],
     environment: 'jsdom',
+    environmentMatchGlobs: [['packages/cli/**', 'node']],
     coverage: {
+      exclude: [
+        './runtime/**',
+        './playground/**',
+        './docs/**',
+        './packages/*/types/**',
+        './packages/*/tests/**',
+        './packages/cli/lib/**',
+        './packages/ui/**',
+        './packages/ui-react/**',
+        './packages/design/**',
+        './packages/element-plus-adapter/**',
+        './packages/tdesign-vue-next-adapter/**',
+      ],
       extension: ['.ts', '.vue'],
     },
   },

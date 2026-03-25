@@ -3,6 +3,8 @@
     class="m-editor-stage"
     ref="stageWrap"
     tabindex="-1"
+    v-loading="stageLoading"
+    element-loading-text="Runtime 加载中..."
     :width="stageRect?.width"
     :height="stageRect?.height"
     :wrap-width="stageContainerRect?.width"
@@ -12,7 +14,7 @@
       width: 60,
       height: 50,
     }"
-    @click="stageWrap?.container?.focus()"
+    @click="stageWrapRef?.container?.focus()"
   >
     <div
       class="m-editor-stage-container"
@@ -41,17 +43,18 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, markRaw, nextTick, onBeforeUnmount, onMounted, ref, toRaw, watch, watchEffect } from 'vue';
-import { cloneDeep } from 'lodash-es';
+import { computed, markRaw, nextTick, onBeforeUnmount, onMounted, useTemplateRef, watch, watchEffect } from 'vue';
 
-import type { MApp, MContainer } from '@tmagic/schema';
+import type { MContainer } from '@tmagic/core';
 import StageCore, { getOffset, Runtime } from '@tmagic/stage';
-import { calcValueByFontsize } from '@tmagic/utils';
+import { calcValueByFontsize, getIdFromEl } from '@tmagic/utils';
 
 import ScrollViewer from '@editor/components/ScrollViewer.vue';
+import { useServices } from '@editor/hooks';
 import { useStage } from '@editor/hooks/use-stage';
-import { DragType, Layout, type MenuButton, type MenuComponent, type Services, type StageOptions } from '@editor/type';
-import { getConfig } from '@editor/utils/config';
+import type { CustomContentMenuFunction, MenuButton, MenuComponent, StageOptions } from '@editor/type';
+import { DragType, Layout } from '@editor/type';
+import { getEditorConfig } from '@editor/utils/config';
 import { KeyBindingContainerKey } from '@editor/utils/keybinding-config';
 
 import NodeListMenu from './NodeListMenu.vue';
@@ -62,11 +65,12 @@ defineOptions({
   name: 'MEditorStage',
 });
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
+    stageOptions: StageOptions;
     stageContentMenu: (MenuButton | MenuComponent)[];
     disabledStageOverlay?: boolean;
-    customContentMenu?: (menus: (MenuButton | MenuComponent)[], type: string) => (MenuButton | MenuComponent)[];
+    customContentMenu: CustomContentMenuFunction;
   }>(),
   {
     disabledStageOverlay: false,
@@ -76,37 +80,38 @@ withDefaults(
 let stage: StageCore | null = null;
 let runtime: Runtime | null = null;
 
-const services = inject<Services>('services');
-const stageOptions = inject<StageOptions>('stageOptions');
+const { editorService, uiService, keybindingService } = useServices();
 
-const stageWrap = ref<InstanceType<typeof ScrollViewer>>();
-const stageContainer = ref<HTMLDivElement>();
-const menu = ref<InstanceType<typeof ViewerMenu>>();
+const stageLoading = computed(() => editorService.get('stageLoading'));
 
-const nodes = computed(() => services?.editorService.get('nodes') || []);
+const stageWrapRef = useTemplateRef<InstanceType<typeof ScrollViewer>>('stageWrap');
+const stageContainerEl = useTemplateRef<HTMLDivElement>('stageContainer');
+const menuRef = useTemplateRef<InstanceType<typeof ViewerMenu>>('menu');
+
+const nodes = computed(() => editorService.get('nodes'));
 const isMultiSelect = computed(() => nodes.value.length > 1);
-const stageRect = computed(() => services?.uiService.get('stageRect'));
-const stageContainerRect = computed(() => services?.uiService.get('stageContainerRect'));
-const root = computed(() => services?.editorService.get('root'));
-const page = computed(() => services?.editorService.get('page'));
-const zoom = computed(() => services?.uiService.get('zoom') || 1);
-const node = computed(() => services?.editorService.get('node'));
+const stageRect = computed(() => uiService.get('stageRect'));
+const stageContainerRect = computed(() => uiService.get('stageContainerRect'));
+const root = computed(() => editorService.get('root'));
+const page = computed(() => editorService.get('page'));
+const zoom = computed(() => uiService.get('zoom'));
+const node = computed(() => editorService.get('node'));
 
 watchEffect(() => {
   if (stage || !page.value) return;
 
-  if (!stageContainer.value) return;
-  if (!(stageOptions?.runtimeUrl || stageOptions?.render) || !root.value) return;
+  if (!stageContainerEl.value) return;
+  if (!(props.stageOptions?.runtimeUrl || props.stageOptions?.render) || !root.value) return;
 
-  stage = useStage(stageOptions);
+  stage = useStage(props.stageOptions);
 
   stage.on('select', () => {
-    stageWrap.value?.container?.focus();
+    stageWrapRef.value?.container?.focus();
   });
 
-  services?.editorService.set('stage', markRaw(stage));
+  editorService.set('stage', markRaw(stage));
 
-  stage.mount(stageContainer.value);
+  stage.mount(stageContainerEl.value);
 
   if (!node.value?.id) {
     return;
@@ -114,13 +119,12 @@ watchEffect(() => {
 
   stage.on('runtime-ready', (rt) => {
     runtime = rt;
-    // toRaw返回的值是一个引用而非快照，需要cloneDeep
-    root.value && runtime?.updateRootConfig?.(cloneDeep(toRaw(root.value)));
-    page.value?.id && runtime?.updatePageId?.(page.value.id);
-    setTimeout(() => {
-      node.value && stage?.select(toRaw(node.value.id));
-    });
   });
+});
+
+onBeforeUnmount(() => {
+  stage?.destroy();
+  editorService.set('stage', null);
 });
 
 watch(zoom, (zoom) => {
@@ -128,27 +132,44 @@ watch(zoom, (zoom) => {
   stage.setZoom(zoom);
 });
 
+let timeoutId: ReturnType<typeof setTimeout> | null = null;
 watch(page, (page) => {
   if (runtime && page) {
-    services?.editorService.set('stageLoading', true);
+    editorService.set('stageLoading', true);
+
+    if (timeoutId) {
+      globalThis.clearTimeout(timeoutId);
+    }
+
+    timeoutId = globalThis.setTimeout(() => {
+      editorService.set('stageLoading', false);
+      timeoutId = null;
+    }, 3000);
+
     runtime.updatePageId?.(page.id);
-    nextTick(() => {
-      stage?.select(page.id);
-    });
+
+    const unWatch = watch(
+      stageLoading,
+      () => {
+        if (stageLoading.value) {
+          return;
+        }
+
+        nextTick(() => {
+          stage?.select(page.id);
+          unWatch();
+        });
+      },
+      {
+        immediate: true,
+      },
+    );
   }
 });
 
-const rootChangeHandler = (root: MApp) => {
-  if (runtime && root) {
-    runtime.updateRootConfig?.(cloneDeep(toRaw(root)));
-  }
-};
-
-services?.editorService.on('root-change', rootChangeHandler);
-
-const resizeObserver = new ResizeObserver((entries) => {
+const resizeObserver = new globalThis.ResizeObserver((entries) => {
   for (const { contentRect } of entries) {
-    services?.uiService.set('stageContainerRect', {
+    uiService.set('stageContainerRect', {
       width: contentRect.width,
       height: contentRect.height,
     });
@@ -156,25 +177,25 @@ const resizeObserver = new ResizeObserver((entries) => {
 });
 
 onMounted(() => {
-  if (stageWrap.value?.container) {
-    resizeObserver.observe(stageWrap.value.container);
-    services?.keybindingService.registerEl(KeyBindingContainerKey.STAGE, stageWrap.value.container);
+  if (stageWrapRef.value?.container) {
+    resizeObserver.observe(stageWrapRef.value.container);
+    keybindingService.registerEl(KeyBindingContainerKey.STAGE, stageWrapRef.value.container);
   }
 });
 
 onBeforeUnmount(() => {
   stage?.destroy();
+  stage = null;
   resizeObserver.disconnect();
-  services?.editorService.set('stage', null);
-  services?.keybindingService.unregisterEl('stage');
-  services?.editorService.off('root-change', rootChangeHandler);
+  editorService.set('stage', null);
+  keybindingService.unregisterEl('stage');
 });
 
-const parseDSL = getConfig('parseDSL');
+const parseDSL = getEditorConfig('parseDSL');
 
 const contextmenuHandler = (e: MouseEvent) => {
   e.preventDefault();
-  menu.value?.show(e);
+  menuRef.value?.show(e);
 };
 
 const dragoverHandler = (e: DragEvent) => {
@@ -196,19 +217,22 @@ const dropHandler = async (e: DragEvent) => {
 
   e.preventDefault();
 
-  const doc = stage?.renderer.contentWindow?.document;
-  const parentEl: HTMLElement | null | undefined = doc?.querySelector(`.${stageOptions?.containerHighlightClassName}`);
+  const doc = stage?.renderer?.contentWindow?.document;
+  const parentEl: HTMLElement | null | undefined = doc?.querySelector(
+    `.${props.stageOptions?.containerHighlightClassName}`,
+  );
 
   let parent: MContainer | undefined | null = page.value;
-  if (parentEl) {
-    parent = services?.editorService.getNodeById(parentEl.id, false) as MContainer;
+  const parentId = getIdFromEl()(parentEl);
+  if (parentId) {
+    parent = editorService.getNodeById(parentId, false) as MContainer;
   }
 
-  if (parent && stageContainer.value && stage) {
-    const layout = await services?.editorService.getLayout(parent);
+  if (parent && stageContainerEl.value && stage) {
+    const layout = await editorService.getLayout(parent);
 
-    const containerRect = stageContainer.value.getBoundingClientRect();
-    const { scrollTop, scrollLeft } = stage.mask;
+    const containerRect = stageContainerEl.value.getBoundingClientRect();
+    const { scrollTop, scrollLeft } = stage.mask!;
     const { style = {} } = config.data;
 
     let top = 0;
@@ -240,7 +264,7 @@ const dropHandler = async (e: DragEvent) => {
 
     config.data.inputEvent = e;
 
-    services?.editorService.add(config.data, parent);
+    editorService.add(config.data, parent);
   }
 };
 </script>

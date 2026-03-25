@@ -5,13 +5,13 @@
 </template>
 
 <script setup lang="ts">
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 
 defineOptions({
   name: 'TMDropdownMenu',
 });
 
-const ui = getConfig('components')?.dropdownMenu;
+const ui = getDesignConfig('components')?.dropdownMenu;
 
 const uiComponent = ui?.component || 'el-dropdown-menu';
 </script>

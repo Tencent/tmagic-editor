@@ -5,6 +5,7 @@ types
 
 .temp
 .cache
+temp
 
 # local env files
 .env.local
@@ -30,3 +31,6 @@ coverage
 auto-imports.d.ts
 components.d.ts
 docs/.vitepress/cache
+
+.eslintcache
+.npmrc

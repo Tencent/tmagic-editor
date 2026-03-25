@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { union } from 'lodash-es';
+import { cloneDeep, union } from 'lodash-es';
 
-import type { AppCore } from '@tmagic/schema';
-import { getDepNodeIds, getNodes, isPage } from '@tmagic/utils';
+import type { default as TMagicApp } from '@tmagic/core';
+import { getDepNodeIds, getNodes, isPage, isPageFragment, replaceChildNode } from '@tmagic/core';
 
 import DataSourceManager from './DataSourceManager';
 import type { ChangeEvent, DataSourceManagerData } from './types';
@@ -26,12 +26,12 @@ import { updateNode } from './utils';
 
 /**
  * 创建数据源管理器
- * @param app AppCore
- * @param useMock 是否使用mock数据
- * @param initialData 初始化数据，ssr数据可以由此传入
- * @returns DataSourceManager | undefined
+ * @param {TMagicApp} app
+ * @param {boolean} useMock 是否使用mock数据
+ * @param {DataSourceManagerData} initialData 初始化数据，ssr数据可以由此传入
+ * @returns {DataSourceManager | undefined}
  */
-export const createDataSourceManager = (app: AppCore, useMock?: boolean, initialData?: DataSourceManagerData) => {
+export const createDataSourceManager = (app: TMagicApp, useMock?: boolean, initialData?: DataSourceManagerData) => {
   const { dsl, platform } = app;
   if (!dsl?.dataSources) return;
 
@@ -52,16 +52,19 @@ export const createDataSourceManager = (app: AppCore, useMock?: boolean, initial
 
   // ssr环境下，数据应该是提前准备好的（放到initialData中），不应该发生变化，无需监听
   // 有initialData不一定是在ssr环境下
-  if (app.jsEngine !== 'nodejs') {
-    dataSourceManager.on('change', (sourceId: string, changeEvent: ChangeEvent) => {
-      const dep = dsl.dataSourceDeps?.[sourceId] || {};
-      const condDep = dsl.dataSourceCondDeps?.[sourceId] || {};
+  if (app.jsEngine === 'nodejs') {
+    return dataSourceManager;
+  }
 
-      const nodeIds = union([...Object.keys(condDep), ...Object.keys(dep)]);
+  dataSourceManager.on('change', (sourceId: string, changeEvent: ChangeEvent) => {
+    const dep = dsl.dataSourceDeps?.[sourceId] || {};
+    const condDep = dsl.dataSourceCondDeps?.[sourceId] || {};
 
-      dataSourceManager.emit(
-        'update-data',
-        getNodes(nodeIds, dsl.items).map((node) => {
+    const nodeIds = union([...Object.keys(condDep), ...Object.keys(dep)]);
+
+    for (const page of dsl.items) {
+      if (app.platform === 'editor' || (isPage(page) && page.id === app.page?.data.id) || isPageFragment(page)) {
+        const newNodes = getNodes(nodeIds, [page]).map((node) => {
           if (app.platform !== 'editor') {
             node.condResult = dataSourceManager.compliedConds(node);
           }
@@ -71,19 +74,33 @@ export const createDataSourceManager = (app: AppCore, useMock?: boolean, initial
           if (typeof app.page?.setData === 'function') {
             if (isPage(newNode)) {
               app.page.setData(newNode);
-            } else {
-              const n = app.page.getNode(node.id);
-              n?.setData(newNode);
+            } else if (page.id === app.page.data.id && !app.page.instance) {
+              replaceChildNode(newNode, [app.page.data]);
+            }
+
+            app.getNode(node.id, { strict: true })?.setData(newNode);
+
+            for (const [, pageFragment] of app.pageFragments) {
+              if (pageFragment.data.id === newNode.id) {
+                pageFragment.setData(cloneDeep(newNode));
+              } else if (pageFragment.data.id === page.id) {
+                pageFragment.getNode(newNode.id, { strict: true })?.setData(cloneDeep(newNode));
+                if (!pageFragment.instance) {
+                  replaceChildNode(cloneDeep(newNode), [pageFragment.data]);
+                }
+              }
             }
           }
 
           return newNode;
-        }),
-        sourceId,
-        changeEvent,
-      );
-    });
-  }
+        });
+
+        if (newNodes.length) {
+          dataSourceManager.emit('update-data', newNodes, sourceId, changeEvent, page.id);
+        }
+      }
+    }
+  });
 
   return dataSourceManager;
 };

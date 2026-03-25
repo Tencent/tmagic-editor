@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import { JsEngine } from '@tmagic/schema';
+import { isNumber } from '@tmagic/utils';
 
 export const style2Obj = (style: string) => {
   if (typeof style !== 'string') {
@@ -55,8 +55,6 @@ export const fillBackgroundImage = (value: string) => {
   }
   return value;
 };
-
-export const isNumber = (value: string) => /^(-?\d+)(\.\d+)?$/.test(value);
 
 export const getTransform = (value: Record<string, string>, jsEngine: JsEngine) => {
   if (!value) return [];
@@ -116,8 +114,10 @@ export const transformStyle = (style: Record<string, any> | string, jsEngine: Js
   return results;
 };
 
-export const calcFontsize = (designWidth: number) => {
-  const { width } = document.documentElement.getBoundingClientRect();
-  const fontSize = width / (designWidth / 100);
-  document.documentElement.style.fontSize = `${fontSize}px`;
-};
+export const COMMON_EVENT_PREFIX = 'magic:common:events:';
+export const COMMON_METHOD_PREFIX = 'magic:common:actions:';
+
+export interface EventOption {
+  label: string;
+  value: string;
+}

@@ -1,16 +1,16 @@
 <template>
   <div class="m-fields-number-range">
     <TMagicInput
-      v-model="model[name][0]"
-      clearable
+      v-model="firstValue"
+      :clearable="config.clearable ?? true"
       :size="size"
       :disabled="disabled"
       @change="minChangeHandler"
     ></TMagicInput>
     <span class="split-tag">-</span>
     <TMagicInput
-      v-model="model[name][1]"
-      clearable
+      v-model="secondValue"
+      :clearable="config.clearable ?? true"
       :size="size"
       :disabled="disabled"
       @change="maxChangeHandler"
@@ -19,6 +19,8 @@
 </template>
 
 <script lang="ts" setup>
+import { ref, watch } from 'vue';
+
 import { TMagicInput } from '@tmagic/design';
 
 import type { FieldProps, NumberRangeConfig } from '../schema';
@@ -33,6 +35,21 @@ const props = defineProps<FieldProps<NumberRangeConfig>>();
 const emit = defineEmits<{
   change: [values: [number, number]];
 }>();
+
+const firstValue = ref<number>();
+const secondValue = ref<number>();
+
+watch(
+  () => props.model[props.name],
+  ([first, second]) => {
+    firstValue.value = first;
+    secondValue.value = second;
+  },
+  {
+    immediate: true,
+    deep: true,
+  },
+);
 
 useAddField(props.prop);
 

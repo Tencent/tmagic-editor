@@ -13,7 +13,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { getConfig } from './config';
+import { getDesignConfig } from './config';
 import type { TabPaneProps } from './types';
 
 defineOptions({
@@ -22,9 +22,9 @@ defineOptions({
 
 const props = defineProps<TabPaneProps>();
 
-const ui = getConfig('components')?.tabPane;
+const ui = getDesignConfig('components')?.tabPane;
 
 const uiComponent = ui?.component || 'el-tab-pane';
 
-const uiProps = computed(() => ui?.props(props) || props);
+const uiProps = computed<TabPaneProps>(() => ui?.props(props) || props);
 </script>

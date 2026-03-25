@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
 import type { GuidesOptions } from '@scena/guides';
 import type { MoveableOptions, OnDragStart } from 'moveable';
 
+import type { Id, MApp, MContainer, MNode } from '@tmagic/core';
 import Core from '@tmagic/core';
-import type { Id, MApp, MContainer, MNode } from '@tmagic/schema';
 
 import { AbleActionEventType, ContainerHighlightType, GuidesType, RenderType, ZIndex } from './const';
 import DragResizeHelper from './DragResizeHelper';
@@ -30,12 +30,12 @@ export type TargetElement = HTMLElement | SVGElement;
 
 export type CanSelect = (el: HTMLElement, event: MouseEvent, stop: () => boolean) => boolean | Promise<boolean>;
 export type IsContainer = (el: HTMLElement) => boolean | Promise<boolean>;
-export type CustomizeRender = (renderer: StageCore) => Promise<HTMLElement> | HTMLElement;
+export type CustomizeRender = (renderer: StageCore) => Promise<HTMLElement | void> | HTMLElement | void;
+
+export type CustomizeMoveableOptionsFunction = (config: CustomizeMoveableOptionsCallbackConfig) => MoveableOptions;
+
 /** 业务方自定义的moveableOptions，可以是配置，也可以是回调函数 */
-export type CustomizeMoveableOptions =
-  | ((config?: CustomizeMoveableOptionsCallbackConfig) => MoveableOptions)
-  | MoveableOptions
-  | undefined;
+export type CustomizeMoveableOptions = CustomizeMoveableOptionsFunction | MoveableOptions;
 /** render提供给的接口，id转成el */
 export type GetTargetElement = (id: Id) => HTMLElement | null;
 /** render提供的接口，通过坐标获得坐标下所有HTML元素数组 */
@@ -60,13 +60,14 @@ export interface StageCoreConfig {
   moveableOptions?: CustomizeMoveableOptions;
   /** runtime 的HTML地址，可以是一个HTTP地址，如果和编辑器不同域，需要设置跨域，也可以是一个相对或绝对路径 */
   runtimeUrl?: string;
-  render?: (renderer: StageCore) => Promise<HTMLElement> | HTMLElement;
+  render?: CustomizeRender;
   autoScrollIntoView?: boolean;
   updateDragEl?: UpdateDragEl;
   disabledDragStart?: boolean;
   renderType?: RenderType;
   guidesOptions?: Partial<GuidesOptions>;
   disabledMultiSelect?: boolean;
+  disabledRule?: boolean;
 }
 
 export interface ActionManagerConfig {
@@ -88,7 +89,7 @@ export interface ActionManagerConfig {
 
 export interface MoveableOptionsManagerConfig {
   container: HTMLElement;
-  moveableOptions?: CustomizeMoveableOptions;
+  moveableOptions?: MoveableOptions | (() => MoveableOptions);
   getRootContainer: GetRootContainer;
 }
 
@@ -105,29 +106,23 @@ export interface StageRenderConfig {
   runtimeUrl?: string;
   zoom: number | undefined;
   renderType?: RenderType;
-  customizedRender?: () => Promise<HTMLElement | null>;
+  customizedRender?: () => Promise<HTMLElement | null | void>;
 }
 
 export interface StageMaskConfig {
   core: StageCore;
 }
 
-export interface StageDragResizeConfig {
-  container: HTMLElement;
+export interface StageDragResizeConfig extends MoveableOptionsManagerConfig {
   dragResizeHelper: DragResizeHelper;
-  moveableOptions?: CustomizeMoveableOptions;
   disabledDragStart?: boolean;
-  getRootContainer: GetRootContainer;
   getRenderDocument: GetRenderDocument;
   markContainerEnd: MarkContainerEnd;
   delayedMarkContainer: DelayedMarkContainer;
 }
 
-export interface StageMultiDragResizeConfig {
-  container: HTMLElement;
+export interface StageMultiDragResizeConfig extends MoveableOptionsManagerConfig {
   dragResizeHelper: DragResizeHelper;
-  moveableOptions?: CustomizeMoveableOptions;
-  getRootContainer: GetRootContainer;
   getRenderDocument: GetRenderDocument;
   markContainerEnd: MarkContainerEnd;
   delayedMarkContainer: DelayedMarkContainer;
@@ -210,9 +205,11 @@ export interface Runtime {
   update?: (data: UpdateData) => void;
   sortNode?: (data: SortEventData) => void;
   remove?: (data: RemoveData) => void;
+  [key: string]: any;
 }
 
 export interface Magic {
+  id: string;
   /** 当前页面的根节点变化时调用该方法，编辑器会同步该el和stage的大小，该方法由stage注入到iframe.contentWindow中 */
   onPageElUpdate: (el: HTMLElement) => void;
 
@@ -238,6 +235,7 @@ export interface TargetShadowConfig {
 
 export interface RuleOptions {
   guidesOptions?: Partial<GuidesOptions>;
+  disabledRule?: boolean;
 }
 
 export interface CoreEvents {
@@ -251,6 +249,7 @@ export interface CoreEvents {
   update: [data: UpdateEventData];
   sort: [data: SortEventData];
   'select-parent': [];
+  rerender: [];
   remove: [data: RemoveEventData];
   highlight: [highlightEl: HTMLElement];
   mousemove: [event: MouseEvent];
@@ -283,6 +282,7 @@ export interface ActionManagerEvents {
   sort: [data: SortEventData];
   remove: [data: RemoveEventData];
   select: [selectedEl: HTMLElement | null, event: MouseEvent];
+  rerender: [];
   'select-parent': [];
   'drag-start': [event: OnDragStart];
   'multi-update': [data: UpdateEventData];
@@ -297,6 +297,7 @@ export interface DrEvents {
   'update-moveable': [];
   [AbleActionEventType.REMOVE]: [];
   [AbleActionEventType.SELECT_PARENT]: [];
+  [AbleActionEventType.RERENDER]: [];
   'drag-start': [event: OnDragStart];
   update: [data: UpdateEventData];
   sort: [data: SortEventData];

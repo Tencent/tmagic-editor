@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,26 +18,17 @@
 
 import type { Component } from 'vue';
 import type EventEmitter from 'events';
+import type * as Monaco from 'monaco-editor';
+import type { default as Sortable, Options, SortableEvent } from 'sortablejs';
 import type { PascalCasedProperties } from 'type-fest';
 
-import type { ChildConfig, ColumnConfig, FilterFunction, FormConfig, FormItem, Input } from '@tmagic/form';
-import type {
-  CodeBlockContent,
-  CodeBlockDSL,
-  DataSourceFieldType,
-  Id,
-  MApp,
-  MContainer,
-  MNode,
-  MPage,
-  MPageFragment,
-} from '@tmagic/schema';
+import type { CodeBlockContent, CodeBlockDSL, Id, MApp, MContainer, MNode, MPage, MPageFragment } from '@tmagic/core';
+import type { FormConfig, TableColumnConfig } from '@tmagic/form';
 import type StageCore from '@tmagic/stage';
 import type {
   ContainerHighlightType,
-  CustomizeMoveableOptionsCallbackConfig,
+  CustomizeMoveableOptions,
   GuidesOptions,
-  MoveableOptions,
   RenderType,
   UpdateDragEl,
 } from '@tmagic/stage';
@@ -56,6 +47,14 @@ import type { StorageService } from './services/storage';
 import type { UiService } from './services/ui';
 import type { UndoRedo } from './utils/undo-redo';
 
+export type EditorSlots = FrameworkSlots &
+  WorkspaceSlots &
+  SidebarSlots &
+  PropsPanelSlots & {
+    workspace(props: { editorService: EditorService }): any;
+    'workspace-content'(props: { editorService: EditorService }): any;
+  };
+
 export interface FrameworkSlots {
   header(props: {}): any;
   nav(props: {}): any;
@@ -68,8 +67,10 @@ export interface FrameworkSlots {
   'props-panel'(props: {}): any;
   'footer'(props: {}): any;
   'page-bar'(props: {}): any;
+  'page-bar-add-button'(props: {}): any;
   'page-bar-title'(props: { page: MPage | MPageFragment }): any;
   'page-bar-popover'(props: { page: MPage | MPageFragment }): any;
+  'page-list-popover'(props: { list: (MPage | MPageFragment)[] }): any;
 }
 
 export interface WorkspaceSlots {
@@ -79,6 +80,7 @@ export interface WorkspaceSlots {
 
 export interface ComponentListPanelSlots {
   'component-list-panel-header'(props: {}): any;
+  'component-list'(props: { componentGroupList: ComponentGroup[] }): any;
   'component-list-item'(props: { component: ComponentItem }): any;
 }
 
@@ -115,8 +117,18 @@ export type SidebarSlots = LayerPanelSlots & CodeBlockListPanelSlots & Component
 export type BeforeAdd = (config: MNode, parent: MContainer) => Promise<MNode> | MNode;
 export type GetConfig = (config: FormConfig) => Promise<FormConfig> | FormConfig;
 
-export interface InstallOptions {
+export interface EditorInstallOptions {
   parseDSL: <T = any>(dsl: string) => T;
+  customCreateMonacoEditor: (
+    monaco: typeof import('monaco-editor'),
+    codeEditorEl: HTMLElement,
+    options: Monaco.editor.IStandaloneEditorConstructionOptions & { editorCustomType?: string },
+  ) => Promise<Monaco.editor.IStandaloneCodeEditor> | Monaco.editor.IStandaloneCodeEditor;
+  customCreateMonacoDiffEditor: (
+    monaco: typeof import('monaco-editor'),
+    codeEditorEl: HTMLElement,
+    options: Monaco.editor.IStandaloneEditorConstructionOptions & { editorCustomType?: string },
+  ) => Promise<Monaco.editor.IStandaloneDiffEditor> | Monaco.editor.IStandaloneDiffEditor;
   [key: string]: any;
 }
 
@@ -142,14 +154,15 @@ export interface StageOptions {
   containerHighlightDuration?: number;
   containerHighlightType?: ContainerHighlightType;
   disabledDragStart?: boolean;
-  render?: (stage: StageCore) => HTMLDivElement | Promise<HTMLDivElement>;
-  moveableOptions?: MoveableOptions | ((config?: CustomizeMoveableOptionsCallbackConfig) => MoveableOptions);
+  render?: (stage: StageCore) => HTMLDivElement | void | Promise<HTMLDivElement | void>;
+  moveableOptions?: CustomizeMoveableOptions;
   canSelect?: (el: HTMLElement) => boolean | Promise<boolean>;
   isContainer?: (el: HTMLElement) => boolean | Promise<boolean>;
   updateDragEl?: UpdateDragEl;
   renderType?: RenderType;
   guidesOptions?: Partial<GuidesOptions>;
   disabledMultiSelect?: boolean;
+  disabledRule?: boolean;
   zoom?: number;
 }
 
@@ -174,6 +187,10 @@ export interface PropsState {
   propsConfigMap: Record<string, FormConfig>;
   propsValueMap: Record<string, Partial<MNode>>;
   relateIdMap: Record<Id, Id>;
+  /** 禁用数据源 */
+  disabledDataSource: boolean;
+  /** 禁用代码块 */
+  disabledCodeBlock: boolean;
 }
 
 export interface StageOverlayState {
@@ -219,6 +236,8 @@ export interface UiState {
   uiSelectMode: boolean;
   /** 是否显示整个配置源码， true: 显示， false: 不显示，默认为false */
   showSrc: boolean;
+  /** 是否将样式配置单独一列显示， true: 显示， false: 不显示，默认为true */
+  showStylePanel: boolean;
   /** 画布显示放大倍数，默认为 1 */
   zoom: number;
   /** 画布容器的宽高 */
@@ -238,6 +257,8 @@ export interface UiState {
   propsPanelSize: 'large' | 'default' | 'small';
   /** 是否显示新增页面按钮 */
   showAddPageButton: boolean;
+  /** 是否在页面工具栏显示呼起页面列表按钮 */
+  showPageListButton: boolean;
   /** 是否隐藏侧边栏 */
   hideSlideBar: boolean;
   /** 侧边栏面板配置 */
@@ -305,9 +326,9 @@ export interface MenuButton {
   /** Vue组件或url */
   icon?: string | Component<{}, {}, any>;
   /** 是否置灰，默认为false */
-  disabled?: boolean | ((data?: Services) => boolean);
+  disabled?: boolean | ((data: Services) => boolean);
   /** 是否显示，默认为true */
-  display?: boolean | ((data?: Services) => boolean);
+  display?: boolean | ((data: Services) => boolean);
   /** type为button/dropdown时点击运行的方法 */
   handler?: (data: Services, event: MouseEvent) => Promise<any> | any;
   className?: string;
@@ -328,7 +349,7 @@ export interface MenuComponent {
   slots?: Record<string, any>;
   /** 是否显示，默认为true */
   className?: string;
-  display?: boolean | ((data?: Services) => Promise<boolean> | boolean);
+  display?: boolean | ((data: Services) => Promise<boolean> | boolean);
   [key: string]: any;
 }
 
@@ -380,6 +401,10 @@ export interface SideComponent extends MenuComponent {
   icon?: any;
   /** slide 唯一标识 key */
   $key: string;
+  /** 是否可以将面板拖出，默认为true */
+  draggable?: boolean;
+  /** 点击切换tab前调用，返回false阻止切换 */
+  beforeClick?: (config: SideComponent) => boolean | Promise<boolean>;
 
   /** 组件扩展参数 */
   boxComponentConfig?: {
@@ -436,11 +461,6 @@ export interface ComponentGroup {
   items: ComponentItem[];
 }
 
-export interface UpdateData {
-  id: Id;
-  [key: string]: any;
-}
-
 export enum LayerOffset {
   TOP = 'top',
   BOTTOM = 'bottom',
@@ -458,9 +478,6 @@ export enum Keys {
   ESCAPE = 'Space',
 }
 
-export const H_GUIDE_LINE_STORAGE_KEY = '$MagicStageHorizontalGuidelinesData';
-export const V_GUIDE_LINE_STORAGE_KEY = '$MagicStageVerticalGuidelinesData';
-
 export interface ScrollViewerEvent {
   scrollLeft: number;
   scrollTop: number;
@@ -477,7 +494,7 @@ export type CodeState = {
   combineIds: string[];
   /** 为业务逻辑预留的不可删除的代码块列表，由业务逻辑维护（如代码块上线后不可删除） */
   undeletableList: Id[];
-  paramsColConfig?: ColumnConfig;
+  paramsColConfig?: TableColumnConfig;
 };
 
 export type CodeRelation = {
@@ -541,25 +558,6 @@ export interface HistoryState {
   canUndo: boolean;
 }
 
-export interface EventSelectConfig {
-  name: string;
-  type: 'event-select';
-  src: 'datasource' | 'component';
-  labelWidth?: string;
-  /** 事件名称表单配置 */
-  eventNameConfig?: FormItem;
-  /** 动作类型配置 */
-  actionTypeConfig?: FormItem;
-  /** 联动组件配置 */
-  targetCompConfig?: FormItem;
-  /** 联动组件动作配置 */
-  compActionConfig?: FormItem;
-  /** 联动代码配置 */
-  codeActionConfig?: FormItem;
-  /** 联动数据源配置 */
-  dataSourceActionConfig?: FormItem;
-}
-
 export enum KeyBindingCommand {
   /** 复制 */
   COPY_NODE = 'tmagic-system-copy-node',
@@ -615,50 +613,6 @@ export interface KeyBindingCacheItem {
   bound: boolean;
 }
 
-export interface CodeSelectColConfig extends FormItem {
-  type: 'code-select-col';
-  /** 是否可以编辑代码块，disable表示的是是否可以选择代码块 */
-  notEditable?: boolean | FilterFunction;
-}
-
-export interface PageFragmentSelectConfig extends FormItem {
-  type: 'page-fragment-select';
-}
-
-export interface DataSourceSelect extends FormItem, Input {
-  type: 'data-source-select';
-  /** 数据源类型: base、http... */
-  dataSourceType?: string;
-  /** 是否要编译成数据源的data。
-   * id: 不编译，就是要数据源id;
-   * value: 要编译（数据源data）
-   * */
-  value?: 'id' | 'value';
-  /** 是否可以编辑数据源，disable表示的是是否可以选择数据源 */
-  notEditable?: boolean | FilterFunction;
-}
-
-export interface DataSourceMethodSelectConfig extends FormItem {
-  type: 'data-source-method-select';
-  /** 是否可以编辑数据源，disable表示的是是否可以选择数据源 */
-  notEditable?: boolean | FilterFunction;
-}
-
-export interface DataSourceFieldSelectConfig extends FormItem {
-  type: 'data-source-field-select';
-  /** 是否要编译成数据源的data。
-   * key: 不编译，就是要数据源id和field name;
-   * value: 要编译（数据源data[`${filed}`]）
-   * */
-  value?: 'key' | 'value';
-  /** 是否严格的遵守父子节点不互相关联 */
-  checkStrictly?: boolean;
-  dataSourceFieldType?: DataSourceFieldType[];
-  fieldConfig?: ChildConfig;
-  /** 是否可以编辑数据源，disable表示的是是否可以选择数据源 */
-  notEditable?: boolean | FilterFunction;
-}
-
 /** 可新增的数据源类型选项 */
 export interface DatasourceTypeOption {
   /** 数据源类型 */
@@ -686,9 +640,6 @@ export enum DragType {
   /** 拖动组件树节点 */
   LAYER_TREE = 'layer-tree',
 }
-
-/** 当uiService.get('uiSelectMode')为true,点击组件（包括任何形式，组件树/画布）时触发的事件名 */
-export const UI_SELECT_MODE_EVENT_NAME = 'ui-select';
 
 export interface TreeNodeData {
   id: Id;
@@ -734,6 +685,7 @@ export type SyncHookPlugin<
 
 export interface EventBusEvent {
   'edit-data-source': [id: string];
+  'remove-data-source': [id: string];
   'edit-code': [id: string];
 }
 
@@ -744,3 +696,19 @@ export interface EventBus extends EventEmitter {
   ): this;
   emit<Name extends keyof EventBusEvent, Param extends EventBusEvent[Name]>(eventName: Name, ...args: Param): boolean;
 }
+
+export type PropsFormConfigFunction = (data: { editorService: EditorService }) => FormConfig;
+export type PropsFormValueFunction = (data: { editorService: EditorService }) => Partial<MNode>;
+
+export type PartSortableOptions = Omit<Options, 'onStart' | 'onUpdate'>;
+export interface PageBarSortOptions extends PartSortableOptions {
+  /** 在onUpdate之后调用 */
+  afterUpdate?: (event: SortableEvent, sortable: Sortable) => void | Promise<void>;
+  /** 在onStart之前调用 */
+  beforeStart?: (event: SortableEvent, sortable: Sortable) => void | Promise<void>;
+}
+
+export type CustomContentMenuFunction = (
+  menus: (MenuButton | MenuComponent)[],
+  type: 'layer' | 'data-source' | 'viewer' | 'code-block',
+) => (MenuButton | MenuComponent)[];

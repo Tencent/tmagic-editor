@@ -1,7 +1,7 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2023 THL A29 Limited, a Tencent company.  All rights reserved.
+ * Copyright (C) 2025 Tencent.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,25 @@
  * limitations under the License.
  */
 
-/* eslint-disable no-param-reassign */
-import { toRaw } from 'vue';
+import { readonly } from 'vue';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 import { cloneDeep } from 'lodash-es';
 
-import {
+import { getValueByKeyPath } from '@tmagic/utils';
+
+import type {
   ChildConfig,
   ContainerCommonConfig,
   DaterangeConfig,
+  FilterFunction,
   FormConfig,
   FormState,
   FormValue,
   HtmlField,
   Rule,
+  SortProp,
+  TableConfig,
   TabPaneConfig,
   TypeFunction,
 } from '../schema';
@@ -38,10 +44,11 @@ interface DefaultItem {
   type: string;
   filter: string;
   multiple: boolean;
+  names?: string[];
 }
 
-const isTableSelect = (type?: string | TypeFunction) =>
-  typeof type === 'string' && ['table-select', 'tableSelect'].includes(type);
+const TABLE_SELECT_TYPES = new Set(['table-select', 'tableSelect']);
+const isTableSelect = (type?: string | TypeFunction) => typeof type === 'string' && TABLE_SELECT_TYPES.has(type);
 
 const asyncLoadConfig = (value: FormValue, initValue: FormValue, { asyncLoad, name, type }: HtmlField) => {
   // 富文本配置了异步加载
@@ -51,9 +58,15 @@ const asyncLoadConfig = (value: FormValue, initValue: FormValue, { asyncLoad, na
   }
 };
 
-const isMultipleValue = (type?: string | TypeFunction) =>
-  typeof type === 'string' &&
-  ['checkbox-group', 'checkboxGroup', 'table', 'cascader', 'group-list', 'groupList'].includes(type);
+const MULTIPLE_VALUE_TYPES = new Set([
+  'checkbox-group',
+  'checkboxGroup',
+  'table',
+  'cascader',
+  'group-list',
+  'groupList',
+]);
+const isMultipleValue = (type?: string | TypeFunction) => typeof type === 'string' && MULTIPLE_VALUE_TYPES.has(type);
 
 const initItemsValue = (
   mForm: FormState | undefined,
@@ -87,8 +100,13 @@ const setValue = (mForm: FormState | undefined, value: FormValue, initValue: For
 
   // 如果fieldset配置checkbox，checkbox的值保存在value中
   if (type === 'fieldset' && checkbox) {
-    if (typeof value[name] === 'object') {
-      value[name].value = typeof initValue[name] === 'object' ? initValue[name].value || 0 : 0;
+    const checkboxName = typeof checkbox === 'object' && typeof checkbox.name === 'string' ? checkbox.name : 'value';
+    const checkboxFalseValue =
+      typeof checkbox === 'object' && typeof checkbox.falseValue !== 'undefined' ? checkbox.falseValue : 0;
+
+    if (name && typeof value[name] === 'object') {
+      value[name][checkboxName] =
+        typeof initValue[name] === 'object' ? initValue[name][checkboxName] || checkboxFalseValue : checkboxFalseValue;
     }
   }
 };
@@ -101,30 +119,27 @@ const initValueItem = function (
 ) {
   const { items } = item as ContainerCommonConfig;
   const { names } = item as DaterangeConfig;
-  const { type, name } = item as ChildConfig;
+  const type = 'type' in item ? item.type : '';
+  const { name } = item;
 
   if (isTableSelect(type) && name) {
-    value[name] = initValue[name] || '';
+    value[name] = initValue[name] ?? '';
     return value;
   }
 
   asyncLoadConfig(value, initValue, item as HtmlField);
 
   // 这种情况比较多，提前结束
-  if (name && !items && typeof initValue[name] !== 'undefined') {
+  if (name && !items && typeof initValue?.[name] !== 'undefined') {
     if (typeof value[name] === 'undefined') {
-      if (type === 'number') {
-        value[name] = Number(initValue[name]);
-      } else {
-        value[name] = typeof initValue[name] === 'object' ? cloneDeep(initValue[name]) : initValue[name];
-      }
+      value[name] = type === 'number' ? Number(initValue[name]) : initValue[name];
     }
 
     return value;
   }
 
   if (names) {
-    return names.forEach((n: string) => (value[n] = initValue[n] || ''));
+    return names.forEach((n: string) => (value[n] = initValue[n] ?? ''));
   }
 
   if (!name) {
@@ -133,6 +148,19 @@ const initValueItem = function (
   }
 
   setValue(mForm, value, initValue, item);
+
+  if (type === 'table') {
+    const tableConfig = item as TableConfig;
+    if (tableConfig.defautSort) {
+      sortChange(value[name], tableConfig.defautSort);
+    } else if (tableConfig.defaultSort) {
+      sortChange(value[name], tableConfig.defaultSort);
+    }
+
+    if (tableConfig.sort && tableConfig.sortKey) {
+      value[name].sort((a: any, b: any) => b[tableConfig.sortKey!] - a[tableConfig.sortKey!]);
+    }
+  }
 
   return value;
 };
@@ -144,15 +172,18 @@ export const createValues = function (
   value: FormValue = {},
 ) {
   if (Array.isArray(config)) {
-    config.forEach((item: ChildConfig | TabPaneConfig) => {
-      initValueItem(mForm, item, initValue, value);
+    config.forEach((item) => {
+      initValueItem(mForm, item as ChildConfig | TabPaneConfig, initValue, value);
     });
   }
 
   return value;
 };
 
-const getDefaultValue = function (mForm: FormState | undefined, { defaultValue, type, filter, multiple }: DefaultItem) {
+const getDefaultValue = function (
+  mForm: FormState | undefined,
+  { defaultValue, type, filter, multiple, names }: DefaultItem,
+) {
   if (typeof defaultValue === 'function') {
     return defaultValue(mForm);
   }
@@ -178,23 +209,32 @@ const getDefaultValue = function (mForm: FormState | undefined, { defaultValue, 
     return [];
   }
 
+  if (type === 'daterange' && !names) {
+    return [];
+  }
+
   return '';
 };
 
-export const filterFunction = <T = any>(mForm: FormState | undefined, config: T, props: any) => {
-  if (typeof config !== 'function') {
-    return config;
+export const filterFunction = <T = any>(
+  mForm: FormState | undefined,
+  config: T | FilterFunction<T> | undefined,
+  props: any,
+) => {
+  if (typeof config === 'function') {
+    return (config as FilterFunction<T>)(mForm, {
+      values: readonly(mForm?.initValues || {}),
+      model: readonly(props.model),
+      parent: readonly(mForm?.parentValues || {}),
+      formValue: readonly(mForm?.values || props.model),
+      prop: props.prop,
+      config: props.config,
+      index: props.index,
+      getFormValue: (prop: string) => getValueByKeyPath(prop, mForm?.values || props.model),
+    });
   }
 
-  return config(mForm, {
-    values: mForm?.initValues || {},
-    model: props.model,
-    parent: mForm?.parentValues || {},
-    formValue: mForm?.values || props.model,
-    prop: props.prop,
-    config: props.config,
-    index: props.index,
-  });
+  return config;
 };
 
 export const display = function (mForm: FormState | undefined, config: any, props: any) {
@@ -254,15 +294,93 @@ export const initValue = async (
 ) => {
   if (!Array.isArray(config)) throw new Error('config应该为数组');
 
-  let valuesTmp = createValues(mForm, config, toRaw(initValues), {});
+  const initValuesCopy = cloneDeep(initValues);
+
+  let valuesTmp = createValues(mForm, config, initValuesCopy, {});
 
   const [firstForm] = config as [ContainerCommonConfig];
   if (firstForm && typeof firstForm.onInitValue === 'function') {
     valuesTmp = await firstForm.onInitValue(mForm, {
       formValue: valuesTmp,
-      initValue: initValues,
+      initValue: initValuesCopy,
     });
   }
 
   return valuesTmp || {};
+};
+
+export const datetimeFormatter = (
+  v: string | Date,
+  defaultValue = '-',
+  format = 'YYYY-MM-DD HH:mm:ss',
+): string | number => {
+  if (v) {
+    let time: string | number;
+    if (['x', 'timestamp'].includes(format)) {
+      time = dayjs(Number.isNaN(Number(v)) ? v : Number(v)).valueOf();
+    } else if ((typeof v === 'string' && v.includes('Z')) || v instanceof Date) {
+      // dayjs.extend 内部有防重复机制 (plugin.$i)，无需额外判断
+      dayjs.extend(utc);
+      // UTC字符串时间或Date对象格式化为北京时间
+      time = dayjs(v).utcOffset(8).format(format);
+    } else {
+      time = dayjs(v).format(format);
+    }
+
+    if (time !== 'Invalid Date') {
+      return time;
+    }
+    return defaultValue;
+  }
+  return defaultValue;
+};
+
+export const getDataByPage = (data: any[] = [], pagecontext: number, pagesize: number) => {
+  const start = pagecontext * pagesize;
+  return data.slice(start, start + pagesize);
+};
+
+export const sortArray = (data: any[], newIndex: number, oldIndex: number, sortKey?: string) => {
+  if (newIndex === oldIndex) {
+    return data;
+  }
+
+  if (newIndex < 0 || newIndex >= data.length || oldIndex < 0 || oldIndex >= data.length) {
+    return data;
+  }
+
+  // 先取出要移动的元素，再使用 toSpliced 避免修改原数组
+  const item = data[oldIndex];
+  const newData = data.toSpliced(oldIndex, 1).toSpliced(newIndex, 0, item);
+
+  if (sortKey) {
+    for (let i = newData.length - 1, v = 0; i >= 0; i--, v++) {
+      newData[v][sortKey] = i;
+    }
+  }
+
+  return cloneDeep(newData);
+};
+
+export const sortChange = (data: any[], { prop, order }: SortProp) => {
+  if (order === 'ascending') {
+    data.sort((a: any, b: any) => a[prop] - b[prop]);
+  } else if (order === 'descending') {
+    data.sort((a: any, b: any) => b[prop] - a[prop]);
+  }
+};
+
+export const createObjectProp = (prop: string, key: string, name?: string | number) => {
+  if (prop === '') {
+    return key;
+  }
+
+  const itemPath = `${prop}`.split('.');
+
+  if (name) {
+    if (`${itemPath[itemPath.length - 1]}` === `${name}`) {
+      return `${[...itemPath.slice(0, -1), key].join('.')}`;
+    }
+  }
+  return `${[...itemPath, key].join('.')}`;
 };
