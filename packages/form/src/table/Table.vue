@@ -1,11 +1,6 @@
 <template>
   <teleport to="body" :disabled="!isFullscreen">
-    <div
-      v-bind="$attrs"
-      class="m-fields-table-wrap"
-      :class="{ fixed: isFullscreen }"
-      :style="isFullscreen ? `z-index: ${nextZIndex()}` : ''"
-    >
+    <div v-bind="$attrs" class="m-fields-table-wrap" :class="{ fixed: isFullscreen }" :style="fullscreenZIndexStyle">
       <div class="m-fields-table" :class="{ 'm-fields-table-item-extra': config.itemExtra }">
         <span v-if="config.extra" style="color: rgba(0, 0, 0, 0.45)" v-html="config.extra"></span>
         <TMagicTooltip
@@ -96,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, useTemplateRef } from 'vue';
+import { computed, ref, useTemplateRef, watch } from 'vue';
 import { FullScreen, Grid, Plus } from '@element-plus/icons-vue';
 
 import { TMagicButton, TMagicPagination, TMagicTable, TMagicTooltip, TMagicUpload, useZIndex } from '@tmagic/design';
@@ -137,12 +132,24 @@ const { pageSize, currentPage, paginationData, handleSizeChange, handleCurrentCh
 );
 
 const { nextZIndex } = useZIndex();
+const fullscreenZIndex = ref<number | null>(null);
+const fullscreenZIndexStyle = computed(() =>
+  fullscreenZIndex.value != null ? `z-index: ${fullscreenZIndex.value}` : '',
+);
 const updateKey = ref(1);
 
 const { addable, newHandler } = useAdd(props, emit);
 const { columns } = useTableColumns(props, emit, currentPage, pageSize, modelName);
 useSortable(props, emit, tMagicTableRef, modelName, updateKey);
 const { isFullscreen, toggleFullscreen } = useFullscreen();
+
+watch(isFullscreen, (on) => {
+  if (on) {
+    fullscreenZIndex.value = nextZIndex();
+  } else {
+    fullscreenZIndex.value = null;
+  }
+});
 const { importable, excelHandler, clearHandler } = useImport(props, emit, newHandler);
 const { selectHandle, toggleRowSelection } = useSelection(props, emit, tMagicTableRef);
 
