@@ -124,6 +124,7 @@ export default class Rule extends EventEmitter {
     this.hGuides?.off('changeGuides', this.hGuidesChangeGuidesHandler);
     this.vGuides?.off('changeGuides', this.vGuidesChangeGuidesHandler);
     this.containerResizeObserver?.disconnect();
+    this.container = undefined;
     this.removeAllListeners();
   }
 
@@ -137,7 +138,6 @@ export default class Rule extends EventEmitter {
 
     this.hGuides = undefined;
     this.vGuides = undefined;
-    this.container = undefined;
   }
 
   private getGuidesStyle = (type: GuidesType) => ({
