@@ -560,7 +560,7 @@ export const initServiceEvents = (
     depService.clear(nodes);
   };
 
-  // 由于历史记录变化是更新整个page，所以历史记录变化时，需要重新收集依赖
+  // 历史记录变化时，需要重新收集依赖
   const historyChangeHandler = (page: MPage | MPageFragment) => {
     collectIdle([page], true).then(() => {
       updateStageNode(page);

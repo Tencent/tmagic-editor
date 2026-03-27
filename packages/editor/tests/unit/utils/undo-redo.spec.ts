@@ -21,60 +21,66 @@ import { UndoRedo } from '@editor/utils/undo-redo';
 
 describe('undo', () => {
   let undoRedo: UndoRedo;
-  const element = { a: 1 };
 
   beforeEach(() => {
     undoRedo = new UndoRedo();
-    undoRedo.pushElement(element);
   });
 
-  test('can no undo: empty list', () => {
+  test('can not undo: empty list', () => {
     expect(undoRedo.canUndo()).toBe(false);
     expect(undoRedo.undo()).toEqual(null);
   });
 
-  test('can undo', () => {
+  test('can undo after one push', () => {
+    undoRedo.pushElement({ a: 1 });
+    expect(undoRedo.canUndo()).toBe(true);
+    expect(undoRedo.undo()).toEqual({ a: 1 });
+    expect(undoRedo.canUndo()).toBe(false);
+  });
+
+  test('can undo returns the operation being undone', () => {
+    undoRedo.pushElement({ a: 1 });
     undoRedo.pushElement({ a: 2 });
     expect(undoRedo.canUndo()).toBe(true);
-    expect(undoRedo.undo()).toEqual(element);
+    expect(undoRedo.undo()).toEqual({ a: 2 });
+    expect(undoRedo.canUndo()).toBe(true);
+    expect(undoRedo.undo()).toEqual({ a: 1 });
+    expect(undoRedo.canUndo()).toBe(false);
   });
 });
 
 describe('redo', () => {
   let undoRedo: UndoRedo;
-  const element = { a: 1 };
 
   beforeEach(() => {
     undoRedo = new UndoRedo();
-    undoRedo.pushElement(element);
   });
 
-  test('can no redo: empty list', () => {
+  test('can not redo: empty list', () => {
     expect(undoRedo.canRedo()).toBe(false);
     expect(undoRedo.redo()).toBe(null);
   });
 
-  test('can no redo: no undo', () => {
+  test('can not redo: no undo', () => {
     for (let i = 0; i < 5; i++) {
-      undoRedo.pushElement(element);
+      undoRedo.pushElement({ a: i });
       expect(undoRedo.canRedo()).toBe(false);
       expect(undoRedo.redo()).toBe(null);
     }
   });
 
-  test('can no redo: undo and push', () => {
-    undoRedo.pushElement(element);
+  test('can not redo: undo and push', () => {
+    undoRedo.pushElement({ a: 1 });
+    undoRedo.pushElement({ a: 2 });
     undoRedo.undo();
-    undoRedo.pushElement(element);
+    undoRedo.pushElement({ a: 3 });
     expect(undoRedo.canRedo()).toBe(false);
     expect(undoRedo.redo()).toEqual(null);
   });
 
-  test('can no redo: redo end', () => {
-    const element1 = { a: 1 };
-    const element2 = { a: 2 };
-    undoRedo.pushElement(element1);
-    undoRedo.pushElement(element2);
+  test('can not redo: redo end', () => {
+    undoRedo.pushElement({ a: 1 });
+    undoRedo.pushElement({ a: 2 });
     undoRedo.undo();
     undoRedo.undo();
     undoRedo.redo();
@@ -85,23 +91,20 @@ describe('redo', () => {
   });
 
   test('can redo', () => {
-    const element1 = { a: 1 };
-    const element2 = { a: 2 };
-    undoRedo.pushElement(element1);
-    undoRedo.pushElement(element2);
+    undoRedo.pushElement({ a: 1 });
+    undoRedo.pushElement({ a: 2 });
     undoRedo.undo();
     undoRedo.undo();
 
     expect(undoRedo.canRedo()).toBe(true);
-    expect(undoRedo.redo()).toEqual(element1);
+    expect(undoRedo.redo()).toEqual({ a: 1 });
     expect(undoRedo.canRedo()).toBe(true);
-    expect(undoRedo.redo()).toEqual(element2);
+    expect(undoRedo.redo()).toEqual({ a: 2 });
   });
 });
 
 describe('get current element', () => {
   let undoRedo: UndoRedo;
-  const element = { a: 1 };
 
   beforeEach(() => {
     undoRedo = new UndoRedo();
@@ -112,44 +115,38 @@ describe('get current element', () => {
   });
 
   test('has element', () => {
-    undoRedo.pushElement(element);
-    expect(undoRedo.getCurrentElement()).toEqual(element);
+    undoRedo.pushElement({ a: 1 });
+    expect(undoRedo.getCurrentElement()).toEqual({ a: 1 });
   });
 });
 
 describe('list max size', () => {
   let undoRedo: UndoRedo;
   const listMaxSize = 100;
-  const element = { a: 1 };
 
   beforeEach(() => {
     undoRedo = new UndoRedo(listMaxSize);
-    undoRedo.pushElement(element);
   });
 
   test('reach max size', () => {
-    for (let i = 0; i < listMaxSize; i++) {
+    for (let i = 0; i <= listMaxSize; i++) {
       undoRedo.pushElement({ a: i });
     }
-    undoRedo.pushElement({ a: listMaxSize }); // 这个元素使得list达到maxSize，触发数据删除
 
     expect(undoRedo.getCurrentElement()).toEqual({ a: listMaxSize });
     expect(undoRedo.canRedo()).toBe(false);
     expect(undoRedo.canUndo()).toBe(true);
   });
 
-  test('reach max size, then undo', () => {
-    for (let i = 0; i < listMaxSize + 1; i++) {
+  test('reach max size, then undo all', () => {
+    for (let i = 0; i <= listMaxSize; i++) {
       undoRedo.pushElement({ a: i });
     }
-    for (let i = 0; i < listMaxSize - 1; i++) {
+    for (let i = 0; i < listMaxSize; i++) {
       undoRedo.undo();
     }
-    const ele = undoRedo.getCurrentElement();
-    undoRedo.undo();
 
-    expect(ele?.a).toBe(1); // 经过超过maxSize被删元素之后，原本a值为0的第一个元素已经被删除，现在第一个元素a值为1
     expect(undoRedo.canUndo()).toBe(false);
-    expect(undoRedo.getCurrentElement()).toEqual(element);
+    expect(undoRedo.getCurrentElement()).toEqual(null);
   });
 });

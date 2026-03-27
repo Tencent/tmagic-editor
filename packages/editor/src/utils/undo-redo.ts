@@ -23,7 +23,7 @@ export class UndoRedo<T = any> {
   private listCursor: number;
   private listMaxSize: number;
 
-  constructor(listMaxSize = 20) {
+  constructor(listMaxSize = 100) {
     const minListMaxSize = 2;
     this.elementList = [];
     this.listCursor = 0;
@@ -42,29 +42,30 @@ export class UndoRedo<T = any> {
   }
 
   public canUndo(): boolean {
-    return this.listCursor > 1;
+    return this.listCursor > 0;
   }
 
-  // 返回undo后的当前元素
+  /** 返回被撤销的操作 */
   public undo(): T | null {
     if (!this.canUndo()) {
       return null;
     }
     this.listCursor -= 1;
-    return this.getCurrentElement();
+    return cloneDeep(this.elementList[this.listCursor]);
   }
 
   public canRedo() {
     return this.elementList.length > this.listCursor;
   }
 
-  // 返回redo后的当前元素
+  /** 返回被重做的操作 */
   public redo(): T | null {
     if (!this.canRedo()) {
       return null;
     }
+    const element = cloneDeep(this.elementList[this.listCursor]);
     this.listCursor += 1;
-    return this.getCurrentElement();
+    return element;
   }
 
   public getCurrentElement(): T | null {

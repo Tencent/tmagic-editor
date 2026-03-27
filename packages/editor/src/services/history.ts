@@ -56,15 +56,7 @@ class History extends BaseService {
     this.state.pageId = page.id;
 
     if (!this.state.pageSteps[this.state.pageId]) {
-      const undoRedo = new UndoRedo<StepValue>();
-
-      undoRedo.pushElement({
-        data: page,
-        modifiedNodeIds: new Map(),
-        nodeId: page.id,
-      });
-
-      this.state.pageSteps[this.state.pageId] = undoRedo;
+      this.state.pageSteps[this.state.pageId] = new UndoRedo<StepValue>();
     }
 
     this.setCanUndoRedo();

@@ -545,10 +545,25 @@ export interface CodeParamStatement {
   [key: string]: any;
 }
 
+export type HistoryOpType = 'add' | 'remove' | 'update';
+
 export interface StepValue {
-  data: MPage | MPageFragment;
+  opType: HistoryOpType;
+  /** 操作前选中的节点 ID，用于撤销后恢复选择状态 */
+  selectedBefore: Id[];
+  /** 操作后选中的节点 ID，用于重做后恢复选择状态 */
+  selectedAfter: Id[];
   modifiedNodeIds: Map<Id, Id>;
-  nodeId: Id;
+  /** opType 'add': 新增的节点 */
+  nodes?: MNode[];
+  /** opType 'add': 父节点 ID */
+  parentId?: Id;
+  /** opType 'add': 每个新增节点在父节点 items 中的索引 */
+  indexMap?: Record<string, number>;
+  /** opType 'remove': 被删除的节点及其位置信息 */
+  removedItems?: { node: MNode; parentId: Id; index: number }[];
+  /** opType 'update': 变更前后的节点快照 */
+  updatedItems?: { oldNode: MNode; newNode: MNode }[];
 }
 
 export interface HistoryState {

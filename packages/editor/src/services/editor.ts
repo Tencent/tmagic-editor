@@ -43,6 +43,7 @@ import type {
   AddMNode,
   AsyncHookPlugin,
   EditorNodeInfo,
+  HistoryOpType,
   PastePosition,
   StepValue,
   StoreState,
@@ -121,6 +122,7 @@ class Editor extends BaseService {
     disabledMultiSelect: false,
   });
   private isHistoryStateChange = false;
+  private selectionBeforeOp: Id[] | null = null;
 
   constructor() {
     super(
@@ -390,6 +392,8 @@ class Editor extends BaseService {
    * @returns 添加后的节点
    */
   public async add(addNode: AddMNode | MNode[], parent?: MContainer | null): Promise<MNode | MNode[]> {
+    this.captureSelectionBeforeOp();
+
     const stage = this.get('stage');
 
     // 新增多个组件只存在于粘贴多个组件,粘贴的是一个完整的config,所以不再需要getPropsValue
@@ -435,7 +439,16 @@ class Editor extends BaseService {
     }
 
     if (!(isPage(newNodes[0]) || isPageFragment(newNodes[0]))) {
-      this.pushHistoryState();
+      this.pushOpHistory('add', {
+        nodes: newNodes.map((n) => cloneDeep(toRaw(n))),
+        parentId: (this.getParentById(newNodes[0].id, false) ?? this.get('root'))!.id,
+        indexMap: Object.fromEntries(
+          newNodes.map((n) => {
+            const p = this.getParentById(n.id, false) as MContainer;
+            return [n.id, p ? getNodeIndex(n.id, p) : -1];
+          }),
+        ),
+      });
     }
 
     this.emit('add', newNodes);
@@ -498,13 +511,29 @@ class Editor extends BaseService {
    * @param {Object} node
    */
   public async remove(nodeOrNodeList: MNode | MNode[]): Promise<void> {
+    this.captureSelectionBeforeOp();
+
     const nodes = Array.isArray(nodeOrNodeList) ? nodeOrNodeList : [nodeOrNodeList];
+
+    const removedItems: { node: MNode; parentId: Id; index: number }[] = [];
+    if (!(isPage(nodes[0]) || isPageFragment(nodes[0]))) {
+      for (const n of nodes) {
+        const { parent, node: curNode } = this.getNodeInfo(n.id, false);
+        if (parent && curNode) {
+          const idx = getNodeIndex(curNode.id, parent);
+          removedItems.push({
+            node: cloneDeep(toRaw(curNode)),
+            parentId: parent.id,
+            index: typeof idx === 'number' ? idx : -1,
+          });
+        }
+      }
+    }
 
     await Promise.all(nodes.map((node) => this.doRemove(node)));
 
-    if (!(isPage(nodes[0]) || isPageFragment(nodes[0]))) {
-      // 更新历史记录
-      this.pushHistoryState();
+    if (removedItems.length > 0) {
+      this.pushOpHistory('remove', { removedItems });
     }
 
     this.emit('remove', nodes);
@@ -597,12 +626,23 @@ class Editor extends BaseService {
     config: MNode | MNode[],
     data: { changeRecords?: ChangeRecord[] } = {},
   ): Promise<MNode | MNode[]> {
+    this.captureSelectionBeforeOp();
+
     const nodes = Array.isArray(config) ? config : [config];
 
     const updateData = await Promise.all(nodes.map((node) => this.doUpdate(node, data)));
 
     if (updateData[0].oldNode?.type !== NodeType.ROOT) {
-      this.pushHistoryState();
+      const curNodes = this.get('nodes');
+      if (!this.isHistoryStateChange && curNodes.length) {
+        this.pushOpHistory('update', {
+          updatedItems: updateData.map((d) => ({
+            oldNode: cloneDeep(d.oldNode),
+            newNode: cloneDeep(toRaw(d.newNode)),
+          })),
+        });
+      }
+      this.isHistoryStateChange = false;
     }
 
     this.emit('update', updateData);
@@ -616,6 +656,8 @@ class Editor extends BaseService {
    * @returns void
    */
   public async sort(id1: Id, id2: Id): Promise<void> {
+    this.captureSelectionBeforeOp();
+
     const root = this.get('root');
     if (!root) throw new Error('root为空');
 
@@ -640,9 +682,6 @@ class Editor extends BaseService {
       parentId: parent.id,
       root: cloneDeep(root),
     });
-
-    this.addModifiedNodeId(parent.id);
-    this.pushHistoryState();
   }
 
   /**
@@ -789,6 +828,8 @@ class Editor extends BaseService {
    * @param offset 偏移量
    */
   public async moveLayer(offset: number | LayerOffset): Promise<void> {
+    this.captureSelectionBeforeOp();
+
     const root = this.get('root');
     if (!root) throw new Error('root为空');
 
@@ -817,6 +858,9 @@ class Editor extends BaseService {
     if ((offsetIndex > 0 && offsetIndex > brothers.length) || offsetIndex < 0) {
       return;
     }
+
+    const oldParent = cloneDeep(toRaw(parent));
+
     brothers.splice(index, 1);
     brothers.splice(offsetIndex, 0, node);
 
@@ -829,7 +873,9 @@ class Editor extends BaseService {
     });
 
     this.addModifiedNodeId(parent.id);
-    this.pushHistoryState();
+    this.pushOpHistory('update', {
+      updatedItems: [{ oldNode: oldParent, newNode: cloneDeep(toRaw(parent)) }],
+    });
 
     this.emit('move-layer', offset);
   }
@@ -840,12 +886,17 @@ class Editor extends BaseService {
    * @param targetId 容器ID
    */
   public async moveToContainer(config: MNode, targetId: Id): Promise<MNode | undefined> {
+    this.captureSelectionBeforeOp();
+
     const root = this.get('root');
     const { node, parent } = this.getNodeInfo(config.id, false);
     const target = this.getNodeById(targetId, false) as MContainer;
 
     const stage = this.get('stage');
     if (root && node && parent && stage) {
+      const oldSourceParent = cloneDeep(toRaw(parent));
+      const oldTarget = cloneDeep(toRaw(target));
+
       const index = getNodeIndex(node.id, parent);
       parent.items?.splice(index, 1);
 
@@ -876,16 +927,35 @@ class Editor extends BaseService {
 
       this.addModifiedNodeId(target.id);
       this.addModifiedNodeId(parent.id);
-      this.pushHistoryState();
+      this.pushOpHistory('update', {
+        updatedItems: [
+          { oldNode: oldSourceParent, newNode: cloneDeep(toRaw(parent)) },
+          { oldNode: oldTarget, newNode: cloneDeep(toRaw(target)) },
+        ],
+      });
 
       return newConfig;
     }
   }
 
   public async dragTo(config: MNode | MNode[], targetParent: MContainer, targetIndex: number) {
+    this.captureSelectionBeforeOp();
+
     if (!targetParent || !Array.isArray(targetParent.items)) return;
 
     const configs = Array.isArray(config) ? config : [config];
+
+    const beforeSnapshots = new Map<string, MNode>();
+    // 收集所有受影响父节点的变更前快照
+    for (const cfg of configs) {
+      const { parent } = this.getNodeInfo(cfg.id, false);
+      if (parent && !beforeSnapshots.has(`${parent.id}`)) {
+        beforeSnapshots.set(`${parent.id}`, cloneDeep(toRaw(parent)));
+      }
+    }
+    if (!beforeSnapshots.has(`${targetParent.id}`)) {
+      beforeSnapshots.set(`${targetParent.id}`, cloneDeep(toRaw(targetParent)));
+    }
 
     const sourceIndicesInTargetParent: number[] = [];
     const sourceOutTargetParent: MNode[] = [];
@@ -946,28 +1016,39 @@ class Editor extends BaseService {
       });
     }
 
-    this.pushHistoryState();
+    const updatedItems: { oldNode: MNode; newNode: MNode }[] = [];
+    for (const oldNode of beforeSnapshots.values()) {
+      const newNode = this.getNodeById(oldNode.id, false);
+      if (newNode) {
+        updatedItems.push({ oldNode, newNode: cloneDeep(toRaw(newNode)) });
+      }
+    }
+    this.pushOpHistory('update', { updatedItems });
 
     this.emit('drag-to', { targetIndex, configs, targetParent });
   }
 
   /**
    * 撤销当前操作
-   * @returns 上一次数据
+   * @returns 被撤销的操作
    */
   public async undo(): Promise<StepValue | null> {
     const value = historyService.undo();
-    await this.changeHistoryState(value);
+    if (value) {
+      await this.applyHistoryOp(value, true);
+    }
     return value;
   }
 
   /**
    * 恢复到下一步
-   * @returns 下一步数据
+   * @returns 被恢复的操作
    */
   public async redo(): Promise<StepValue | null> {
     const value = historyService.redo();
-    await this.changeHistoryState(value);
+    if (value) {
+      await this.applyHistoryOp(value, false);
+    }
     return value;
   }
 
@@ -1068,32 +1149,145 @@ class Editor extends BaseService {
     }
   }
 
-  private pushHistoryState() {
-    const curNode = cloneDeep(toRaw(this.get('node')));
-    const page = this.get('page');
-    if (!this.isHistoryStateChange && curNode && page) {
-      historyService.push({
-        data: cloneDeep(toRaw(page)),
-        modifiedNodeIds: this.get('modifiedNodeIds'),
-        nodeId: curNode.id,
-      });
+  private captureSelectionBeforeOp() {
+    if (this.isHistoryStateChange || this.selectionBeforeOp) return;
+    this.selectionBeforeOp = this.get('nodes').map((n) => n.id);
+  }
+
+  private pushOpHistory(opType: HistoryOpType, extra: Partial<StepValue>) {
+    if (this.isHistoryStateChange) {
+      this.selectionBeforeOp = null;
+      return;
     }
+    const step: StepValue = {
+      opType,
+      selectedBefore: this.selectionBeforeOp ?? [],
+      selectedAfter: this.get('nodes').map((n) => n.id),
+      modifiedNodeIds: new Map(this.get('modifiedNodeIds')),
+      ...extra,
+    };
+    historyService.push(step);
+    this.selectionBeforeOp = null;
     this.isHistoryStateChange = false;
   }
 
-  private async changeHistoryState(value: StepValue | null) {
-    if (!value) return;
-
+  /**
+   * 应用历史操作（撤销 / 重做）
+   * @param step 操作记录
+   * @param reverse true = 撤销，false = 重做
+   */
+  private async applyHistoryOp(step: StepValue, reverse: boolean) {
     this.isHistoryStateChange = true;
-    await this.update(value.data);
-    this.set('modifiedNodeIds', value.modifiedNodeIds);
-    setTimeout(() => {
-      if (!value.nodeId) return;
-      this.select(value.nodeId).then(() => {
-        this.get('stage')?.select(value.nodeId);
-      });
-    }, 0);
-    this.emit('history-change', value.data);
+
+    const root = this.get('root');
+    const stage = this.get('stage');
+    if (!root) return;
+
+    switch (step.opType) {
+      case 'add': {
+        if (reverse) {
+          for (const node of step.nodes ?? []) {
+            const parent = this.getNodeById(step.parentId!, false) as MContainer;
+            if (!parent?.items) continue;
+            const idx = getNodeIndex(node.id, parent);
+            if (typeof idx === 'number' && idx !== -1) {
+              parent.items.splice(idx, 1);
+            }
+            await stage?.remove({ id: node.id, parentId: parent.id, root: cloneDeep(root) });
+          }
+        } else {
+          const parent = this.getNodeById(step.parentId!, false) as MContainer;
+          if (parent?.items) {
+            for (const node of step.nodes ?? []) {
+              const idx = step.indexMap?.[node.id] ?? parent.items.length;
+              parent.items.splice(idx, 0, cloneDeep(node));
+              await stage?.add({
+                config: cloneDeep(node),
+                parent: cloneDeep(parent),
+                parentId: parent.id,
+                root: cloneDeep(root),
+              });
+            }
+          }
+        }
+        break;
+      }
+
+      case 'remove': {
+        if (reverse) {
+          const sorted = [...(step.removedItems ?? [])].sort((a, b) => a.index - b.index);
+          for (const { node, parentId, index } of sorted) {
+            const parent = this.getNodeById(parentId, false) as MContainer;
+            if (!parent?.items) continue;
+            parent.items.splice(index, 0, cloneDeep(node));
+            await stage?.add({ config: cloneDeep(node), parent: cloneDeep(parent), parentId, root: cloneDeep(root) });
+          }
+        } else {
+          for (const { node, parentId } of step.removedItems ?? []) {
+            const parent = this.getNodeById(parentId, false) as MContainer;
+            if (!parent?.items) continue;
+            const idx = getNodeIndex(node.id, parent);
+            if (typeof idx === 'number' && idx !== -1) {
+              parent.items.splice(idx, 1);
+            }
+            await stage?.remove({ id: node.id, parentId, root: cloneDeep(root) });
+          }
+        }
+        break;
+      }
+
+      case 'update': {
+        const items = step.updatedItems ?? [];
+        for (const { oldNode, newNode } of items) {
+          const config = reverse ? oldNode : newNode;
+          if (config.type === NodeType.ROOT) {
+            this.set('root', cloneDeep(config) as MApp);
+            continue;
+          }
+          const info = this.getNodeInfo(config.id, false);
+          if (!info.parent) continue;
+          const idx = getNodeIndex(config.id, info.parent);
+          if (typeof idx !== 'number' || idx === -1) continue;
+          info.parent.items![idx] = cloneDeep(config);
+
+          if (isPage(config) || isPageFragment(config)) {
+            this.set('page', config as MPage | MPageFragment);
+          }
+        }
+
+        const curPage = this.get('page');
+        if (stage && curPage) {
+          await stage.update({
+            config: cloneDeep(toRaw(curPage)),
+            parentId: root.id,
+            root: cloneDeep(toRaw(root)),
+          });
+        }
+        break;
+      }
+    }
+
+    this.set('modifiedNodeIds', step.modifiedNodeIds);
+
+    const page = toRaw(this.get('page'));
+    if (page) {
+      const selectIds = reverse ? step.selectedBefore : step.selectedAfter;
+      setTimeout(() => {
+        if (!selectIds.length) return;
+
+        if (selectIds.length > 1) {
+          this.multiSelect(selectIds);
+          stage?.multiSelect(selectIds);
+        } else {
+          this.select(selectIds[0])
+            .then(() => stage?.select(selectIds[0]))
+            .catch(() => {});
+        }
+      }, 0);
+      this.emit('history-change', page as MPage | MPageFragment);
+    }
+
+    this.isHistoryStateChange = false;
   }
 
   private async toggleFixedPosition(dist: MNode, src: MNode, root: MApp) {
