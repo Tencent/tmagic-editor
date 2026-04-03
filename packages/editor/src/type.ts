@@ -20,10 +20,10 @@ import type { Component } from 'vue';
 import type EventEmitter from 'events';
 import type * as Monaco from 'monaco-editor';
 import type { default as Sortable, Options, SortableEvent } from 'sortablejs';
-import type { PascalCasedProperties } from 'type-fest';
+import type { PascalCasedProperties, Writable } from 'type-fest';
 
 import type { CodeBlockContent, CodeBlockDSL, Id, MApp, MContainer, MNode, MPage, MPageFragment } from '@tmagic/core';
-import type { FormConfig, TableColumnConfig } from '@tmagic/form';
+import type { ChangeRecord, FormConfig, TableColumnConfig } from '@tmagic/form';
 import type StageCore from '@tmagic/stage';
 import type {
   ContainerHighlightType,
@@ -727,3 +727,44 @@ export type CustomContentMenuFunction = (
   menus: (MenuButton | MenuComponent)[],
   type: 'layer' | 'data-source' | 'viewer' | 'code-block',
 ) => (MenuButton | MenuComponent)[];
+
+export interface EditorEvents {
+  'root-change': [value: StoreState['root'], preValue?: StoreState['root']];
+  select: [node: MNode | null];
+  add: [nodes: MNode[]];
+  remove: [nodes: MNode[]];
+  update: [nodes: { newNode: MNode; oldNode: MNode; changeRecords?: ChangeRecord[] }[]];
+  'move-layer': [offset: number | LayerOffset];
+  'drag-to': [data: { targetIndex: number; configs: MNode | MNode[]; targetParent: MContainer }];
+  'history-change': [data: MPage | MPageFragment];
+}
+
+export const canUsePluginMethods = {
+  async: [
+    'getLayout',
+    'highlight',
+    'select',
+    'multiSelect',
+    'doAdd',
+    'add',
+    'doRemove',
+    'remove',
+    'doUpdate',
+    'update',
+    'sort',
+    'copy',
+    'paste',
+    'doPaste',
+    'doAlignCenter',
+    'alignCenter',
+    'moveLayer',
+    'moveToContainer',
+    'dragTo',
+    'undo',
+    'redo',
+    'move',
+  ] as const,
+  sync: [],
+};
+
+export type AsyncMethodName = Writable<(typeof canUsePluginMethods)['async']>;
