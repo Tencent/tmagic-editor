@@ -207,6 +207,7 @@ const stageOptions: StageOptions = {
   renderType: props.renderType,
   guidesOptions: props.guidesOptions,
   disabledMultiSelect: props.disabledMultiSelect,
+  beforeDblclick: props.beforeDblclick,
 };
 
 stageOverlayService.set('stageOptions', stageOptions);

@@ -98,6 +98,8 @@ export interface EditorProps {
   isContainer?: (el: HTMLElement) => boolean | Promise<boolean>;
   /** 用于自定义组件树与画布的右键菜单 */
   customContentMenu?: CustomContentMenuFunction;
+  /** 画布双击前的钩子函数，返回 false 则阻止默认的双击行为 */
+  beforeDblclick?: (event: MouseEvent) => Promise<boolean | void> | boolean | void;
   extendFormState?: (state: FormState) => Record<string, any> | Promise<Record<string, any>>;
   /** 页面顺序拖拽配置参数 */
   pageBarSortOptions?: PageBarSortOptions;

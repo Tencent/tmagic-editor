@@ -164,10 +164,16 @@ watchEffect(() => {
   });
 
   stage.on('dblclick', async (event: MouseEvent) => {
+    if (props.stageOptions.beforeDblclick) {
+      const result = await props.stageOptions.beforeDblclick(event);
+      if (result === false) return;
+    }
+
     const el = (await stage?.actionManager?.getElementFromPoint(event)) || null;
     if (!el) return;
 
     const id = getIdFromEl()(el);
+
     if (id) {
       const node = editorService.getNodeById(id);
       if (node?.type === 'page-fragment-container' && node.pageFragmentId) {

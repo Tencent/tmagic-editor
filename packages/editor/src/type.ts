@@ -164,6 +164,8 @@ export interface StageOptions {
   disabledMultiSelect?: boolean;
   disabledRule?: boolean;
   zoom?: number;
+  /** 画布双击前的钩子函数，返回 false 则阻止默认的双击行为 */
+  beforeDblclick?: (event: MouseEvent) => Promise<boolean | void> | boolean | void;
 }
 
 export interface StoreState {
