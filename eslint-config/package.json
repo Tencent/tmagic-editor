@@ -10,17 +10,17 @@
   },
   "dependencies": {
     "@eslint/js": "^10.0.1",
-    "@typescript-eslint/parser": "^8.57.1",
-    "@typescript-eslint/eslint-plugin": "^8.57.1",
+    "@typescript-eslint/parser": "^8.58.0",
+    "@typescript-eslint/eslint-plugin": "^8.58.0",
     "@stylistic/eslint-plugin": "^5.10.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-simple-import-sort": "^13.0.0",
     "eslint-plugin-vue": "^10.8.0",
-    "vue-eslint-parser": "^10.3.0",
-    "eslint-plugin-prettier": "^5.5.4",
+    "vue-eslint-parser": "^10.4.0",
+    "eslint-plugin-prettier": "^5.5.5",
     "globals": "^17.4.0",
-    "typescript-eslint": "^8.57.1"
+    "typescript-eslint": "^8.58.0"
   },
   "peerDependencies": {
     "eslint": ">=10.0.0",

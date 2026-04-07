@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "outDir": "temp",
     "target": "ESNext",
     "module": "ESNext",

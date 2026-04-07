@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { cloneDeep } from 'lodash-es';
 
-import type { ChangeEvent, MNode } from '@tmagic/core';
 import type TMagicApp from '@tmagic/core';
+import type { ChangeEvent, MNode } from '@tmagic/core';
 import { isPage, replaceChildNode } from '@tmagic/core';
 
 export const useDsl = (app: TMagicApp | undefined) => {

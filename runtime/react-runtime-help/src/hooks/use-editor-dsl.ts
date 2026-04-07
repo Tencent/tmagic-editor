@@ -1,7 +1,7 @@
 import { cloneDeep } from 'lodash-es';
 
-import type { Id, MApp } from '@tmagic/core';
 import type TMagicApp from '@tmagic/core';
+import type { Id, MApp } from '@tmagic/core';
 import { getElById, replaceChildNode } from '@tmagic/core';
 import type { Magic, RemoveData, SortEventData, UpdateData } from '@tmagic/stage';
 

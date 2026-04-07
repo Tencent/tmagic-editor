@@ -2,8 +2,8 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-    "moduleResolution": "Node",
-    "module": "CommonJS",
+    "moduleResolution": "node16",
+    "module": "node16",
     "rootDir": "./src",
     "outDir": "./lib",
     "declaration": true,
