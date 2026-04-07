@@ -80,7 +80,7 @@ const props = withDefaults(
 let stage: StageCore | null = null;
 let runtime: Runtime | null = null;
 
-const { editorService, uiService, keybindingService } = useServices();
+const { editorService, uiService, keybindingService, stageOverlayService } = useServices();
 
 const stageLoading = computed(() => editorService.get('stageLoading'));
 
@@ -97,6 +97,60 @@ const page = computed(() => editorService.get('page'));
 const zoom = computed(() => uiService.get('zoom'));
 const node = computed(() => editorService.get('node'));
 
+/**
+ * 判断元素是否被非页面级的滚动容器裁剪（未完整显示）
+ *
+ * 从元素向上遍历祖先节点，跳过页面/页面片容器，
+ * 检查是否存在设置了 overflow 的滚动容器将该元素裁剪，
+ * 只有元素未被完整显示时才需要打开 overlay 以展示完整内容
+ */
+const isClippedByScrollContainer = (el: HTMLElement): boolean => {
+  const win = el.ownerDocument.defaultView;
+  if (!win) return false;
+
+  // 收集所有页面和页面片的 id
+  const root = editorService.get('root');
+  const pageIds = new Set(root?.items?.map((item) => `${item.id}`) ?? []);
+
+  // el 本身就是页面或页面片，无需判断
+  const elId = getIdFromEl()(el);
+  if (elId && pageIds.has(elId)) return false;
+
+  let parent = el.parentElement;
+
+  while (parent && parent !== el.ownerDocument.documentElement) {
+    const parentId = getIdFromEl()(parent);
+
+    // 到达页面或页面片层级，不再继续向上查找
+    if (parentId && pageIds.has(parentId)) {
+      return false;
+    }
+
+    const { overflowX, overflowY } = win.getComputedStyle(parent);
+
+    if (
+      ['auto', 'scroll', 'hidden'].includes(overflowX) ||
+      ['auto', 'scroll', 'hidden'].includes(overflowY) ||
+      parent.scrollWidth > parent.clientWidth ||
+      parent.scrollHeight > parent.clientHeight
+    ) {
+      // 比较元素与容器的可视区域，判断元素是否被裁剪
+      const elRect = el.getBoundingClientRect();
+      const containerRect = parent.getBoundingClientRect();
+      if (
+        elRect.top < containerRect.top ||
+        elRect.left < containerRect.left ||
+        elRect.bottom > containerRect.bottom ||
+        elRect.right > containerRect.right
+      ) {
+        return true;
+      }
+    }
+    parent = parent.parentElement;
+  }
+  return false;
+};
+
 watchEffect(() => {
   if (stage || !page.value) return;
 
@@ -107,6 +161,34 @@ watchEffect(() => {
 
   stage.on('select', () => {
     stageWrapRef.value?.container?.focus();
+  });
+
+  stage.on('dblclick', async (event: MouseEvent) => {
+    const el = (await stage?.actionManager?.getElementFromPoint(event)) || null;
+    if (!el) return;
+
+    const id = getIdFromEl()(el);
+    if (id) {
+      const node = editorService.getNodeById(id);
+      if (node?.type === 'page-fragment-container' && node.pageFragmentId) {
+        await editorService.select(node.pageFragmentId);
+        return;
+      }
+    }
+
+    if (!props.disabledStageOverlay && isClippedByScrollContainer(el)) {
+      stageOverlayService.openOverlay(el);
+      return;
+    }
+
+    const nextEl = (await stage?.actionManager?.getNextElementFromPoint(event)) || null;
+    if (nextEl) {
+      const nextId = getIdFromEl()(nextEl);
+      if (nextId) {
+        await editorService.select(nextId);
+        editorService.get('stage')?.select(nextId);
+      }
+    }
   });
 
   editorService.set('stage', markRaw(stage));

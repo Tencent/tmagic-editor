@@ -237,6 +237,30 @@ export default class ActionManager extends EventEmitter {
   }
 
   /**
+   * 获取鼠标下方第二个可选中元素（跳过最上层），用于双击穿透选中下方元素
+   * @param event 鼠标事件
+   * @returns 鼠标下方第二个可选中元素，不存在时返回 null
+   */
+  public async getNextElementFromPoint(event: MouseEvent): Promise<HTMLElement | null> {
+    const els = this.getElementsFromPoint(event as Point);
+
+    let stopped = false;
+    const stop = () => (stopped = true);
+    let skippedFirst = false;
+    for (const el of els) {
+      if (!getIdFromEl()(el)?.startsWith(GHOST_EL_ID_PREFIX) && (await this.isElCanSelect(el, event, stop))) {
+        if (stopped) break;
+        if (!skippedFirst) {
+          skippedFirst = true;
+          continue;
+        }
+        return el;
+      }
+    }
+    return null;
+  }
+
+  /**
    * 判断一个元素能否在当前场景被选中
    * @param el 被判断的元素
    * @param event 鼠标事件
