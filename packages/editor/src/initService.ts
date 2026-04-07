@@ -233,7 +233,7 @@ export const initServiceEvents = (
     ((event: 'update:modelValue', value: MApp | null) => void),
   { editorService, codeBlockService, dataSourceService, depService }: Services,
 ) => {
-  let getTMagicAppPrimise: Promise<TMagicCore | undefined> | null = null;
+  let getTMagicAppPromise: Promise<TMagicCore | undefined> | null = null;
 
   const getTMagicApp = async (): Promise<TMagicCore | undefined> => {
     const stage = await getStage();
@@ -246,11 +246,11 @@ export const initServiceEvents = (
       return renderer.runtime.getApp?.();
     }
 
-    if (getTMagicAppPrimise) {
-      return getTMagicAppPrimise;
+    if (getTMagicAppPromise) {
+      return getTMagicAppPromise;
     }
 
-    getTMagicAppPrimise = new Promise<TMagicCore | undefined>((resolve) => {
+    getTMagicAppPromise = new Promise<TMagicCore | undefined>((resolve) => {
       // 设置 10s 超时
       const timeout = globalThis.setTimeout(() => {
         resolve(void 0);
@@ -264,7 +264,7 @@ export const initServiceEvents = (
       });
     });
 
-    return getTMagicAppPrimise;
+    return getTMagicAppPromise;
   };
 
   const updateStageNodes = (nodes: MComponent[]) => {
