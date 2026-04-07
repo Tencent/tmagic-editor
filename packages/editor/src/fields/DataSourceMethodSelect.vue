@@ -52,12 +52,14 @@ import {
   type FormState,
   MCascader,
 } from '@tmagic/form';
+import { DATA_SOURCE_SET_DATA_METHOD_NAME } from '@tmagic/utils';
 
 import CodeParams from '@editor/components/CodeParams.vue';
 import MIcon from '@editor/components/Icon.vue';
 import { useServices } from '@editor/hooks/use-services';
 import type { CodeParamStatement, EventBus } from '@editor/type';
 import { SideItemKey } from '@editor/type';
+import { getFieldType } from '@editor/utils';
 
 defineOptions({
   name: 'MFieldsDataSourceMethodSelect',
@@ -92,6 +94,42 @@ const isCustomMethod = computed(() => {
 const getParamItemsConfig = ([dataSourceId, methodName]: [Id, string] = ['', '']): CodeParamStatement[] => {
   if (!dataSourceId) return [];
 
+  if (methodName === DATA_SOURCE_SET_DATA_METHOD_NAME) {
+    return [
+      {
+        name: 'field',
+        text: '字段',
+        type: 'data-source-field-select',
+        dataSourceId,
+      },
+      {
+        name: 'data',
+        text: '数据',
+        type: (_formState, { model }) => {
+          const fieldType = getFieldType(dataSourceService.getDataSourceById(`${dataSourceId}`), model.field);
+
+          let type = 'vs-code';
+
+          if (fieldType === 'number') {
+            type = 'number';
+          } else if (fieldType === 'string') {
+            type = 'text';
+          } else if (fieldType === 'boolean') {
+            type = 'switch';
+          }
+
+          return type;
+        },
+        language: 'javascript',
+        options: inject('codeOptions', {}),
+        autosize: {
+          minRows: 1,
+          maxRows: 10,
+        },
+      },
+    ];
+  }
+
   const paramStatements = dataSources.value
     ?.find((item) => item.id === dataSourceId)
     ?.methods?.find((item) => item.name === methodName)?.params;
@@ -114,6 +152,10 @@ const methodsOptions = computed(
         label: ds.title || ds.id,
         value: ds.id,
         children: [
+          {
+            label: '设置数据',
+            value: DATA_SOURCE_SET_DATA_METHOD_NAME,
+          },
           ...(dataSourceService?.getFormMethod(ds.type) || []),
           ...(ds.methods || []).map((method) => ({
             label: method.name,

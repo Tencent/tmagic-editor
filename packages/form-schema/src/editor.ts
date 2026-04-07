@@ -29,6 +29,8 @@ export interface DataSourceFieldSelectConfig<T = never> extends FormItem {
   fieldConfig?: FormItemConfig<T>;
   /** 是否可以编辑数据源，disable表示的是是否可以选择数据源 */
   notEditable?: boolean | FilterFunction;
+
+  dataSourceId?: string;
 }
 
 export interface CodeConfig extends FormItem {

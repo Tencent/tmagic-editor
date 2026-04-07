@@ -46,13 +46,29 @@ const getFormConfig = (items: FormItemConfig[] = []) => [
 
 const codeParamsConfig = computed(() =>
   getFormConfig(
-    props.paramsConfig.map(({ name, text, extra, ...config }) => ({
-      type: 'data-source-field-select',
-      name,
-      text,
-      extra,
-      fieldConfig: config as FormItemConfig,
-    })),
+    props.paramsConfig.map(({ name, text, extra, ...config }) => {
+      let { type } = config;
+      if (typeof type === 'function') {
+        type = type(undefined, {
+          model: props.model[props.name],
+        });
+      }
+      if (type && ['data-source-field-select', 'vs-code'].includes(type)) {
+        return {
+          ...config,
+          name,
+          text,
+          extra,
+        };
+      }
+      return {
+        type: 'data-source-field-select' as const,
+        name,
+        text,
+        extra,
+        fieldConfig: config,
+      };
+    }) as FormItemConfig[],
   ),
 );
 

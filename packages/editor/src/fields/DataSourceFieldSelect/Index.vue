@@ -8,6 +8,7 @@
       :value="config.value"
       :checkStrictly="checkStrictly"
       :dataSourceFieldType="config.dataSourceFieldType"
+      :dataSourceId="config.dataSourceId"
       @change="onChangeHandler"
     ></FieldSelect>
 

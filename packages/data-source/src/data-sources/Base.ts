@@ -20,7 +20,7 @@ import EventEmitter from 'events';
 import { cloneDeep } from 'lodash-es';
 
 import type { CodeBlockContent, DataSchema, DataSourceSchema, default as TMagicApp } from '@tmagic/core';
-import { getDefaultValueFromFields } from '@tmagic/core';
+import { DATA_SOURCE_SET_DATA_METHOD_NAME, getDefaultValueFromFields } from '@tmagic/core';
 
 import { ObservedData } from '@data-source/observed-data/ObservedData';
 import { SimpleObservedData } from '@data-source/observed-data/SimpleObservedData';
@@ -51,12 +51,18 @@ export default class DataSource<T extends DataSourceSchema = DataSourceSchema> e
     super();
 
     this.#id = options.schema.id;
+    this.#type = options.schema.type;
     this.#schema = options.schema;
 
     this.app = options.app;
 
     this.setFields(options.schema.fields);
     this.setMethods(options.schema.methods || []);
+
+    // @ts-ignore
+    this[DATA_SOURCE_SET_DATA_METHOD_NAME] = ({ params }: { params: { field?: string[]; data: any } }) => {
+      this.setData(params.data, params.field?.join('.'));
+    };
 
     let data = options.initialData;
     // eslint-disable-next-line @typescript-eslint/naming-convention

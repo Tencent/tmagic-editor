@@ -23,7 +23,7 @@ import type { default as Sortable, Options, SortableEvent } from 'sortablejs';
 import type { PascalCasedProperties, Writable } from 'type-fest';
 
 import type { CodeBlockContent, CodeBlockDSL, Id, MApp, MContainer, MNode, MPage, MPageFragment } from '@tmagic/core';
-import type { ChangeRecord, FormConfig, TableColumnConfig } from '@tmagic/form';
+import type { ChangeRecord, FormConfig, TableColumnConfig, TypeFunction } from '@tmagic/form';
 import type StageCore from '@tmagic/stage';
 import type {
   ContainerHighlightType,
@@ -541,7 +541,7 @@ export interface CodeParamStatement {
   /** 参数名称 */
   name: string;
   /** 参数类型 */
-  type?: string;
+  type?: string | TypeFunction<string>;
   [key: string]: any;
 }
 

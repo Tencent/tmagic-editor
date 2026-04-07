@@ -35,7 +35,11 @@ import { NodeType } from '@tmagic/schema';
 
 import type { EditorNodeInfo } from '@editor/type';
 
+import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX } from './const';
+
 export * from './dom';
+
+export * from './const';
 
 // for typeof global checks without @types/node
 declare let global: {};
@@ -541,10 +545,6 @@ export const getDefaultValueFromFields = (fields: DataSchema[]) => {
 
   return data;
 };
-
-export const DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX = 'ds-field::';
-
-export const DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX = 'ds-field-changed';
 
 export const getKeys = Object.keys as <T extends object>(obj: T) => Array<keyof T>;
 

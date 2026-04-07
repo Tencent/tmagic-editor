@@ -297,7 +297,7 @@ class App extends EventEmitter {
       }
 
       if (typeof dataSource[methodName] === 'function') {
-        return await dataSource[methodName]();
+        return await dataSource[methodName]({ params });
       }
     } catch (e: any) {
       if (this.errorHandler) {

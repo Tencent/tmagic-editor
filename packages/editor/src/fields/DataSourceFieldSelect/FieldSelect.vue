@@ -1,6 +1,21 @@
 <template>
   <div class="m-editor-data-source-field-select">
-    <template v-if="checkStrictly">
+    <template v-if="dataSourceId">
+      <TMagicCascader
+        :model-value="selectFieldsId"
+        clearable
+        filterable
+        :size="size"
+        :disabled="disabled"
+        :options="fieldsOptions"
+        :props="{
+          checkStrictly,
+        }"
+        @change="fieldChangeHandler"
+      ></TMagicCascader>
+    </template>
+
+    <template v-else-if="checkStrictly">
       <TMagicSelect
         :model-value="selectDataSourceId"
         clearable
@@ -92,6 +107,8 @@ const props = defineProps<{
   dataSourceFieldType?: DataSourceFieldType[];
   /** 是否可以编辑数据源，disable表示的是是否可以选择数据源 */
   notEditable?: boolean | FilterFunction;
+  /** 指定数据源ID，限定只能选择该数据源的字段 */
+  dataSourceId?: string;
 }>();
 
 const emit = defineEmits<{
@@ -106,7 +123,12 @@ const { dataSourceService, uiService } = useServices();
 const mForm = inject<FormState | undefined>('mForm');
 const eventBus = inject<EventBus>('eventBus');
 
-const dataSources = computed(() => dataSourceService.get('dataSources') || []);
+const allDataSources = computed(() => dataSourceService.get('dataSources') || []);
+
+const dataSources = computed(() => {
+  if (!props.dataSourceId) return allDataSources.value;
+  return allDataSources.value.filter((ds) => ds.id === props.dataSourceId);
+});
 
 const valueIsKey = computed(() => props.value === 'key');
 const notEditable = computed(() => filterFunction(mForm, props.notEditable, props));
@@ -125,7 +147,13 @@ const selectFieldsId = ref<string[]>([]);
 watch(
   modelValue,
   (value) => {
-    if (Array.isArray(value)) {
+    if (props.dataSourceId) {
+      const dsIdValue = valueIsKey.value
+        ? props.dataSourceId
+        : `${DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX}${props.dataSourceId}`;
+      selectDataSourceId.value = dsIdValue;
+      selectFieldsId.value = Array.isArray(value) ? value : [];
+    } else if (Array.isArray(value) && value.length) {
       const [dsId, ...fields] = value;
       selectDataSourceId.value = dsId;
       selectFieldsId.value = fields;
@@ -140,7 +168,7 @@ watch(
 );
 
 const fieldsOptions = computed(() => {
-  const ds = dataSources.value.find((ds) => ds.id === removeDataSourceFieldPrefix(selectDataSourceId.value));
+  const ds = allDataSources.value.find((ds) => ds.id === removeDataSourceFieldPrefix(selectDataSourceId.value));
 
   if (!ds) return [];
 
@@ -163,8 +191,13 @@ const dsChangeHandler = (v: string) => {
 };
 
 const fieldChangeHandler = (v: string[] = []) => {
-  modelValue.value = [selectDataSourceId.value, ...v];
-  emit('change', modelValue.value);
+  if (props.dataSourceId) {
+    modelValue.value = v;
+    emit('change', v);
+  } else {
+    modelValue.value = [selectDataSourceId.value, ...v];
+    emit('change', modelValue.value);
+  }
 };
 
 const onChangeHandler = (v: string[] = []) => {
