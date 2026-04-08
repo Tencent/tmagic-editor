@@ -550,6 +550,8 @@ export interface CodeParamStatement {
 export type HistoryOpType = 'add' | 'remove' | 'update';
 
 export interface StepValue {
+  /** 页面信息 */
+  data: { name: string; id: Id };
   opType: HistoryOpType;
   /** 操作前选中的节点 ID，用于撤销后恢复选择状态 */
   selectedBefore: Id[];

@@ -398,16 +398,21 @@ class Editor extends BaseService {
     }
 
     if (!(isPage(newNodes[0]) || isPageFragment(newNodes[0]))) {
-      this.pushOpHistory('add', {
-        nodes: newNodes.map((n) => cloneDeep(toRaw(n))),
-        parentId: (this.getParentById(newNodes[0].id, false) ?? this.get('root'))!.id,
-        indexMap: Object.fromEntries(
-          newNodes.map((n) => {
-            const p = this.getParentById(n.id, false) as MContainer;
-            return [n.id, p ? getNodeIndex(n.id, p) : -1];
-          }),
-        ),
-      });
+      const pageForOp = this.getNodeInfo(newNodes[0].id, false).page;
+      this.pushOpHistory(
+        'add',
+        {
+          nodes: newNodes.map((n) => cloneDeep(toRaw(n))),
+          parentId: (this.getParentById(newNodes[0].id, false) ?? this.get('root'))!.id,
+          indexMap: Object.fromEntries(
+            newNodes.map((n) => {
+              const p = this.getParentById(n.id, false) as MContainer;
+              return [n.id, p ? getNodeIndex(n.id, p) : -1];
+            }),
+          ),
+        },
+        { name: pageForOp?.name || '', id: pageForOp!.id },
+      );
     }
 
     this.emit('add', newNodes);
@@ -475,10 +480,14 @@ class Editor extends BaseService {
     const nodes = Array.isArray(nodeOrNodeList) ? nodeOrNodeList : [nodeOrNodeList];
 
     const removedItems: { node: MNode; parentId: Id; index: number }[] = [];
+    let pageForOp: { name: string; id: Id } | null = null;
     if (!(isPage(nodes[0]) || isPageFragment(nodes[0]))) {
       for (const n of nodes) {
-        const { parent, node: curNode } = this.getNodeInfo(n.id, false);
+        const { parent, node: curNode, page } = this.getNodeInfo(n.id, false);
         if (parent && curNode) {
+          if (!pageForOp && page) {
+            pageForOp = { name: page.name || '', id: page.id };
+          }
           const idx = getNodeIndex(curNode.id, parent);
           removedItems.push({
             node: cloneDeep(toRaw(curNode)),
@@ -491,8 +500,8 @@ class Editor extends BaseService {
 
     await Promise.all(nodes.map((node) => this.doRemove(node)));
 
-    if (removedItems.length > 0) {
-      this.pushOpHistory('remove', { removedItems });
+    if (removedItems.length > 0 && pageForOp) {
+      this.pushOpHistory('remove', { removedItems }, pageForOp);
     }
 
     this.emit('remove', nodes);
@@ -582,12 +591,17 @@ class Editor extends BaseService {
     if (updateData[0].oldNode?.type !== NodeType.ROOT) {
       const curNodes = this.get('nodes');
       if (!this.isHistoryStateChange && curNodes.length) {
-        this.pushOpHistory('update', {
-          updatedItems: updateData.map((d) => ({
-            oldNode: cloneDeep(d.oldNode),
-            newNode: cloneDeep(toRaw(d.newNode)),
-          })),
-        });
+        const pageForOp = this.getNodeInfo(nodes[0].id, false).page;
+        this.pushOpHistory(
+          'update',
+          {
+            updatedItems: updateData.map((d) => ({
+              oldNode: cloneDeep(d.oldNode),
+              newNode: cloneDeep(toRaw(d.newNode)),
+            })),
+          },
+          { name: pageForOp?.name || '', id: pageForOp!.id },
+        );
       }
       this.isHistoryStateChange = false;
     }
@@ -772,9 +786,14 @@ class Editor extends BaseService {
     });
 
     this.addModifiedNodeId(parent.id);
-    this.pushOpHistory('update', {
-      updatedItems: [{ oldNode: oldParent, newNode: cloneDeep(toRaw(parent)) }],
-    });
+    const pageForOp = this.getNodeInfo(node.id, false).page;
+    this.pushOpHistory(
+      'update',
+      {
+        updatedItems: [{ oldNode: oldParent, newNode: cloneDeep(toRaw(parent)) }],
+      },
+      { name: pageForOp?.name || '', id: pageForOp!.id },
+    );
 
     this.emit('move-layer', offset);
   }
@@ -788,7 +807,7 @@ class Editor extends BaseService {
     this.captureSelectionBeforeOp();
 
     const root = this.get('root');
-    const { node, parent } = this.getNodeInfo(config.id, false);
+    const { node, parent, page: pageForOp } = this.getNodeInfo(config.id, false);
     const target = this.getNodeById(targetId, false) as MContainer;
 
     const stage = this.get('stage');
@@ -826,12 +845,16 @@ class Editor extends BaseService {
 
       this.addModifiedNodeId(target.id);
       this.addModifiedNodeId(parent.id);
-      this.pushOpHistory('update', {
-        updatedItems: [
-          { oldNode: oldSourceParent, newNode: cloneDeep(toRaw(parent)) },
-          { oldNode: oldTarget, newNode: cloneDeep(toRaw(target)) },
-        ],
-      });
+      this.pushOpHistory(
+        'update',
+        {
+          updatedItems: [
+            { oldNode: oldSourceParent, newNode: cloneDeep(toRaw(parent)) },
+            { oldNode: oldTarget, newNode: cloneDeep(toRaw(target)) },
+          ],
+        },
+        { name: pageForOp?.name || '', id: pageForOp!.id },
+      );
 
       return newConfig;
     }
@@ -897,7 +920,8 @@ class Editor extends BaseService {
         updatedItems.push({ oldNode, newNode: cloneDeep(toRaw(newNode)) });
       }
     }
-    this.pushOpHistory('update', { updatedItems });
+    const pageForOp = this.getNodeInfo(configs[0].id, false).page;
+    this.pushOpHistory('update', { updatedItems }, { name: pageForOp?.name || '', id: pageForOp!.id });
 
     this.emit('drag-to', { targetIndex, configs, targetParent });
   }
@@ -991,12 +1015,14 @@ class Editor extends BaseService {
     this.selectionBeforeOp = this.get('nodes').map((n) => n.id);
   }
 
-  private pushOpHistory(opType: HistoryOpType, extra: Partial<StepValue>) {
+  private pushOpHistory(opType: HistoryOpType, extra: Partial<StepValue>, pageData: { name: string; id: Id }) {
     if (this.isHistoryStateChange) {
       this.selectionBeforeOp = null;
       return;
     }
+
     const step: StepValue = {
+      data: pageData,
       opType,
       selectedBefore: this.selectionBeforeOp ?? [],
       selectedAfter: this.get('nodes').map((n) => n.id),
