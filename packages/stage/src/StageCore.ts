@@ -18,6 +18,7 @@
 
 import { EventEmitter } from 'events';
 
+import { SnapdomOptions } from '@zumer/snapdom';
 import type { MoveableOptions, OnDragStart } from 'moveable';
 
 import type { Id } from '@tmagic/core';
@@ -270,6 +271,21 @@ export default class StageCore extends EventEmitter {
 
   public reloadIframe(url: string) {
     this.renderer?.reloadIframe(url);
+  }
+
+  /**
+   * 将指定id的dom元素生成为图片
+   */
+  public async getElementImage(
+    id: Id,
+    type: 'download' | 'raw' | 'svg' | 'canvas' | 'png' | 'jpeg' | 'webp' | 'blob' = 'png',
+    options: SnapdomOptions = {},
+  ) {
+    if (!this.renderer) {
+      throw new Error('Renderer is not initialized');
+    }
+
+    return this.renderer.getElementImage(id, type, options);
   }
 
   /**

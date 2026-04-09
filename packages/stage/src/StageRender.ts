@@ -18,6 +18,8 @@
 
 import { EventEmitter } from 'events';
 
+import { snapdom, SnapdomOptions } from '@zumer/snapdom';
+
 import type { Id } from '@tmagic/core';
 import { getElById, getHost, guid, injectStyle, isSameDomain } from '@tmagic/core';
 
@@ -160,6 +162,35 @@ export default class StageRender extends EventEmitter {
 
   public getTargetElement(id: Id): HTMLElement | null {
     return getElById()(this.getDocument(), id);
+  }
+
+  /**
+   * 将指定id的dom元素生成为图片
+   * @param id 目标元素的id
+   * @param options 图片生成选项
+   * @returns data URL 格式的图片数据
+   */
+  public async getElementImage(
+    id: Id,
+    type: 'download' | 'raw' | 'svg' | 'canvas' | 'png' | 'jpeg' | 'webp' | 'blob' = 'png',
+    options: SnapdomOptions = {},
+  ) {
+    const el = this.getTargetElement(id);
+    if (!el) {
+      throw new Error(`Element with id "${id}" not found`);
+    }
+
+    el.scrollIntoView();
+
+    const toFunc = `to${type.charAt(0).toUpperCase() + type.slice(1)}`;
+
+    const result = await snapdom(el, options);
+
+    if (toFunc in result) {
+      return result[toFunc]();
+    }
+
+    throw new Error(`Invalid type: ${type}`);
   }
 
   public postTmagicRuntimeReady() {

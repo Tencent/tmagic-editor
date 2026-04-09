@@ -460,6 +460,9 @@ importers:
       '@tmagic/core':
         specifier: workspace:*
         version: link:../core
+      '@zumer/snapdom':
+        specifier: ^2.8.0
+        version: 2.8.0
       events:
         specifier: ^3.3.0
         version: 3.3.0
@@ -3651,6 +3654,9 @@ packages:
 
   '@vueuse/shared@9.13.0':
     resolution: {integrity: sha512-UrnhU+Cnufu4S6JLCPZnkWh0WwZGUp72ktOF2DFptMlOs3TOdVv8xJN53zhHGARmVOsz5KqOls09+J1NR6sBKw==}
+
+  '@zumer/snapdom@2.8.0':
+    resolution: {integrity: sha512-NhztgFDNfOkFt8Ox9PIJ1IwggyMui5UDazysOgZD7FSGL0G7H8U+J3ft0iecxAS8daj5aC62i3blaTk7s2GcpA==}
 
   JSONStream@1.3.5:
     resolution: {integrity: sha512-E+iruNOY8VV9s4JEbe1aNEm6MiszPRr/UfcHMz0TQh1BXSxHK+ASV1R6W4HpjBhSeS+54PIsAMCBmwD06LLsqQ==}
@@ -9481,6 +9487,8 @@ snapshots:
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
+
+  '@zumer/snapdom@2.8.0': {}
 
   JSONStream@1.3.5:
     dependencies:

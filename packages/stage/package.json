@@ -31,6 +31,7 @@
   "dependencies": {
     "@scena/guides": "^0.29.2",
     "events": "^3.3.0",
+    "@zumer/snapdom": "^2.8.0",
     "keycon": "^1.4.0",
     "lodash-es": "^4.17.21",
     "moveable": "^0.53.0",
