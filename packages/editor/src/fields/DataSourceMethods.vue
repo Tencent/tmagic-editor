@@ -42,7 +42,7 @@ const props = withDefaults(defineProps<FieldProps<DataSourceMethodsConfig>>(), {
 
 const emit = defineEmits(['change']);
 
-const codeConfig = ref<CodeBlockContent>();
+const codeConfig = ref<Omit<CodeBlockContent, 'content'> & { content: string }>();
 const codeBlockEditorRef = useTemplateRef<InstanceType<typeof CodeBlockEditor>>('codeBlockEditor');
 
 let editIndex = -1;
@@ -72,10 +72,14 @@ const methodColumns: ColumnConfig[] = [
       {
         text: '编辑',
         handler: (method: CodeBlockContent, index: number) => {
-          let codeContent = method.content || '({ params, dataSource, app }) => {\n  // place your code here\n}';
+          let codeContent: string = '({ params, dataSource, app }) => {\n  // place your code here\n}';
 
-          if (typeof codeContent !== 'string') {
-            codeContent = codeContent.toString();
+          if (method.content) {
+            if (typeof method.content !== 'string') {
+              codeContent = method.content.toString();
+            } else {
+              codeContent = method.content;
+            }
           }
 
           codeConfig.value = {

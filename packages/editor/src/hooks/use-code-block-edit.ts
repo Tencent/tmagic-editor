@@ -8,7 +8,7 @@ import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
 import type { Services } from '@editor/type';
 
 export const useCodeBlockEdit = (codeBlockService: Services['codeBlockService']) => {
-  const codeConfig = ref<CodeBlockContent>();
+  const codeConfig = ref<Omit<CodeBlockContent, 'content'> & { content: string }>();
   const codeId = ref<string>();
   const codeBlockEditorRef = useTemplateRef<InstanceType<typeof CodeBlockEditor>>('codeBlockEditor');
 
@@ -36,10 +36,14 @@ export const useCodeBlockEdit = (codeBlockService: Services['codeBlockService'])
       return;
     }
 
-    let codeContent = codeBlock.content;
+    let codeContent = '';
 
-    if (typeof codeContent !== 'string') {
-      codeContent = codeContent.toString();
+    if (codeBlock.content) {
+      if (typeof codeBlock.content !== 'string') {
+        codeContent = codeBlock.content.toString();
+      } else {
+        codeContent = codeBlock.content;
+      }
     }
 
     codeConfig.value = {

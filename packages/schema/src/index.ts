@@ -186,7 +186,7 @@ export interface CodeBlockContent {
   /** 代码块名称 */
   name: string;
   /** 代码块内容 */
-  content: ((...args: any[]) => any) | string;
+  content: ((...args: any[]) => any) | Function;
   /** 参数定义 */
   params: CodeParam[] | [];
   /** 注释 */

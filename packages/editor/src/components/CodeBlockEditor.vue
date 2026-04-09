@@ -88,7 +88,7 @@ const width = defineModel<number>('width', { default: 670 });
 const boxVisible = defineModel<boolean>('visible', { default: false });
 
 const props = defineProps<{
-  content: CodeBlockContent;
+  content: Omit<CodeBlockContent, 'content'> & { content: string };
   disabled?: boolean;
   isDataSource?: boolean;
   dataSourceType?: string;

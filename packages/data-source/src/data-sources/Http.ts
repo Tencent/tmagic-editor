@@ -79,9 +79,9 @@ export default class HttpDataSource extends DataSource<HttpDataSourceSchema> {
   /** 请求函数 */
   #fetch?: RequestFunction;
   /** 请求前需要执行的函数队列 */
-  #beforeRequest: ((...args: any[]) => any)[] = [];
+  #beforeRequest: (Function | ((...args: any[]) => any))[] = [];
   /** 请求后需要执行的函数队列 */
-  #afterRequest: ((...args: any[]) => any)[] = [];
+  #afterRequest: (Function | ((...args: any[]) => any))[] = [];
 
   #type = 'http';
 
