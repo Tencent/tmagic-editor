@@ -88,7 +88,38 @@ export default class StageCore extends EventEmitter {
    * @param id 选中的id
    */
   public async select(id: Id, event?: MouseEvent): Promise<void> {
-    const el = this.renderer?.getTargetElement(id) || null;
+    if (!this.renderer) {
+      return;
+    }
+
+    let el = this.renderer.getTargetElement(id) || null;
+
+    if (!el) {
+      el = await new Promise<HTMLElement | null>((resolve) => {
+        const observer = new MutationObserver(() => {
+          const target = this.renderer?.getTargetElement(id);
+          if (target) {
+            observer.disconnect();
+            clearTimeout(timer);
+            resolve(target);
+          }
+        });
+
+        const body = this.renderer?.getDocument()?.body;
+        if (!body) {
+          resolve(null);
+          return;
+        }
+
+        observer.observe(body, { childList: true, subtree: true });
+
+        const timer = setTimeout(() => {
+          observer.disconnect();
+          resolve(this.renderer?.getTargetElement(id) || null);
+        }, 1000);
+      });
+    }
+
     if (el === this.actionManager?.getSelectedEl()) return;
 
     await this.renderer?.select([id]);
