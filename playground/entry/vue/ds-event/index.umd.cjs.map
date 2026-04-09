@@ -1,0 +1,1 @@
+{"version":3,"file":"index.umd.cjs","names":[],"sources":["../../../.tmagic/ds-event-entry.ts"],"sourcesContent":["const dsEvents: Record<string, any> = {};\nexport default dsEvents;"],"mappings":";;;;QAAsC,EAAE"}
