@@ -101,6 +101,7 @@ const getParamItemsConfig = ([dataSourceId, methodName]: [Id, string] = ['', '']
         text: '字段',
         type: 'data-source-field-select',
         dataSourceId,
+        checkStrictly: true,
       },
       {
         name: 'data',
@@ -146,23 +147,21 @@ const paramsConfig = ref<CodeParamStatement[]>(getParamItemsConfig(props.model[p
 
 const methodsOptions = computed(
   () =>
-    dataSources.value
-      ?.filter((ds) => ds.methods?.length || dataSourceService.getFormMethod(ds.type).length)
-      ?.map((ds) => ({
-        label: ds.title || ds.id,
-        value: ds.id,
-        children: [
-          {
-            label: '设置数据',
-            value: DATA_SOURCE_SET_DATA_METHOD_NAME,
-          },
-          ...(dataSourceService?.getFormMethod(ds.type) || []),
-          ...(ds.methods || []).map((method) => ({
-            label: method.name,
-            value: method.name,
-          })),
-        ],
-      })) || [],
+    dataSources.value?.map((ds) => ({
+      label: ds.title || ds.id,
+      value: ds.id,
+      children: [
+        {
+          label: '设置数据',
+          value: DATA_SOURCE_SET_DATA_METHOD_NAME,
+        },
+        ...(dataSourceService?.getFormMethod(ds.type) || []),
+        ...(ds.methods || []).map((method) => ({
+          label: method.name,
+          value: method.name,
+        })),
+      ],
+    })) || [],
 );
 
 const cascaderConfig = computed<CascaderConfig>(() => ({
