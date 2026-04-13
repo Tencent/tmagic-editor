@@ -3,3 +3,4 @@ export { default as Font } from './Font.vue';
 export { default as Layout } from './Layout.vue';
 export { default as Position } from './Position.vue';
 export { default as Border } from './Border.vue';
+export { default as Transform } from './Transform.vue';

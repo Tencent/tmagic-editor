@@ -26,7 +26,7 @@ import type { StyleSchema } from '@tmagic/schema';
 
 import MIcon from '@editor/components/Icon.vue';
 
-import { Background, Border, Font, Layout, Position } from './pro/';
+import { Background, Border, Font, Layout, Position, Transform } from './pro/';
 
 defineOptions({
   name: 'MFieldsStyleSetter',
@@ -59,6 +59,10 @@ const list = [
   {
     title: '边框与圆角',
     component: Border,
+  },
+  {
+    title: '变形',
+    component: Transform,
   },
 ];
 

@@ -108,6 +108,10 @@ export const styleTabConfig: TabPaneConfig = {
             'borderColor',
           ],
         } as unknown as ChildConfig,
+        {
+          name: 'transform',
+          defaultValue: () => ({}),
+        },
       ],
     },
   ],
