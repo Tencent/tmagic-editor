@@ -1,3 +1,26 @@
+## [1.7.10](https://github.com/Tencent/tmagic-editor/compare/v1.7.9...v1.7.10) (2026-04-13)
+
+
+### Bug Fixes
+
+* **editor:** 优化 StageOverlay 双击行为，仅在元素被滚动容器裁剪时打开 overlay ([df2d635](https://github.com/Tencent/tmagic-editor/commit/df2d635682034f2f478c575543ed63f94b7a291c))
+* **editor:** 修复 getTMagicAppPrimise 变量名拼写错误 ([99c8274](https://github.com/Tencent/tmagic-editor/commit/99c8274a1ee25c8e155498e43520c5d7ba99c4b1))
+* **editor:** 历史记录信息中添加页面信息 ([26dc70d](https://github.com/Tencent/tmagic-editor/commit/26dc70d70c329d9a83a671d92bbfaf77d7abbcef))
+* **editor:** 数据源方法选择器展示所有数据源并支持字段非叶子节点选择 ([31f4d2b](https://github.com/Tencent/tmagic-editor/commit/31f4d2b4e26f5a941041c41c0843828d70ed3cd8))
+* **stage:** 修复隐藏标尺后无法显示问题 ([6f2e8d8](https://github.com/Tencent/tmagic-editor/commit/6f2e8d8d74ed0d8a7ef1eefd0b39b08a90abc6e7))
+* **stage:** 新增组件后等待渲染完后选中 ([cfd5998](https://github.com/Tencent/tmagic-editor/commit/cfd5998242031f393bc1003c40b55cde35f3c515))
+
+
+### Features
+
+* **editor,data-source:** 数据源支持内置"设置数据"方法 ([f583c7d](https://github.com/Tencent/tmagic-editor/commit/f583c7daec76518bbb2e7044740337e0c15997e1))
+* **editor,stage:** 支持双击穿透选中鼠标下方的下一个可选中元素 ([172a7a1](https://github.com/Tencent/tmagic-editor/commit/172a7a1c92e85266114c628c0fc0534b6b76aca3))
+* **editor:** 样式配置添加变形项 ([fa09ab0](https://github.com/Tencent/tmagic-editor/commit/fa09ab0b301d9bc9f6a9462fc022418bbf21cee3))
+* **editor:** 添加 stage beforeDblclick 钩子，支持拦截默认双击行为 ([334569e](https://github.com/Tencent/tmagic-editor/commit/334569e2d784d708f4fde7e9f37f5cac50b2e396))
+* **stage:** 支持将指定id的dom生成图片 ([b3f4e42](https://github.com/Tencent/tmagic-editor/commit/b3f4e42716fe1d998d093e7556897bdb2e9037a9))
+
+
+
 ## [1.7.9](https://github.com/Tencent/tmagic-editor/compare/v1.7.8...v1.7.9) (2026-03-23)
 
 
