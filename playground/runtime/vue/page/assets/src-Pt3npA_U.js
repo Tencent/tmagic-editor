@@ -1,0 +1,2 @@
+import{A as e,O as t,P as n,n as r,w as i}from"./src-C64kAYZO.js";import{r as a,t as o}from"./use-app-C934o8x4.js";var s=[`innerHTML`],c=t({name:`tmagic-text`,__name:`index`,props:{config:{},iteratorIndex:{},iteratorContainerId:{},containerIndex:{},pageFragmentContainerId:{},model:{},disabled:{type:Boolean}},setup(t){let c=t,l=e(`app`),u=a(c);o(u);let d=()=>{l&&u&&l.emit(`${r}click`,u)};return(e,r)=>(n(),i(`p`,{onClick:d,innerHTML:t.config.text},null,8,s))}});export{c as default};
+//# sourceMappingURL=src-Pt3npA_U.js.map

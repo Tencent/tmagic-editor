@@ -1,0 +1,2 @@
+System.register(["./src-legacy-DHm6HhKH.js"],function(e,t){var n,o;return e("t",function(e=""){let t,r,i;return"string"==typeof e?t=e:({componentType:t,app:r}=e),t&&""!==t||(t="container"),r||(r=n("app")),i=r?.resolveComponent(t),i||t.startsWith("magic-ui-")||(t=`magic-ui-${o(t)}`,i=r?.resolveComponent(t)),i??t}),{setters:[function(e){n=e.A,o=e.u}],execute:function(){}}});
+//# sourceMappingURL=use-component-legacy-BDr9gaGK.js.map

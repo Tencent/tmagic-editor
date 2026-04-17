@@ -1,0 +1,2 @@
+import{A as e,u as t}from"./src-C64kAYZO.js";function n(n=``){let r,i,a;return typeof n==`string`?r=n:{componentType:r,app:i}=n,(!r||r===``)&&(r=`container`),i||(i=e(`app`)),a=i?.resolveComponent(r),!a&&!r.startsWith(`magic-ui-`)&&(r=`magic-ui-${t(r)}`,a=i?.resolveComponent(r)),a??r}export{n as t};
+//# sourceMappingURL=use-component-yW-4hcDG.js.map
