@@ -20,9 +20,10 @@ if (args.package) {
   const pkgRoot = path.resolve(packagesDir, args.package);
   if (fs.statSync(pkgRoot).isDirectory()) {
     rimraf.sync(path.resolve(packagesDir, `./${args.package}/dist`));
+    const pkg = createRequire(import.meta.url)(`../packages/${args.package}/package.json`);
 
-    build({ packageName: args.package, format: 'es' });
-    build({ packageName: args.package, format: 'umd' });
+    build({ packageName: args.package, format: 'es', pkg, packagesDir });
+    build({ packageName: args.package, format: 'umd', pkg, packagesDir });
   }
 } else {
   const packages = getPackageNames(packagesDir);
@@ -43,6 +44,30 @@ if (args.package) {
     build({ packageName, format: 'es', pkg, packagesDir: runtimeDir });
     build({ packageName, format: 'umd', pkg, packagesDir: runtimeDir });
   }
+}
+
+// rolldown 在 UMD 输出顶部会注入
+//   Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+// 当内联的依赖（如 lodash-es 的 _Symbol.js）声明 `var Symbol = root.Symbol;`
+// 时，由于 var hoisting，该局部 `Symbol` 会把上面一行引用到的全局 `Symbol`
+// 遮蔽掉（此时局部变量还未赋值），运行时抛出
+//   TypeError: Cannot read properties of undefined (reading 'toStringTag')
+// 这里通过后处理把该引用改为 `globalThis.Symbol.toStringTag`，绕开被 hoist
+// 的局部绑定。rolldown 修好前先用此 workaround。
+function fixUmdSymbolShadow() {
+  return {
+    name: 'tmagic:fix-umd-symbol-shadow',
+    generateBundle(outputOptions, bundle) {
+      if (outputOptions.format !== 'umd') return;
+      for (const file of Object.values(bundle)) {
+        if (file.type !== 'chunk' || typeof file.code !== 'string') continue;
+        file.code = file.code.replace(
+          /Object\.defineProperty\(exports,\s*Symbol\.toStringTag,/g,
+          'Object.defineProperty(exports, globalThis.Symbol.toStringTag,',
+        );
+      }
+    },
+  };
 }
 
 async function build({ packageName, format, pkg, packagesDir }) {
@@ -69,6 +94,7 @@ async function build({ packageName, format, pkg, packagesDir }) {
       },
 
       rolldownOptions: {
+        plugins: [fixUmdSymbolShadow()],
         // 确保外部化处理那些你不想打包进库的依赖
         external(id) {
           if (format === 'umd' && id === 'lodash-es') {

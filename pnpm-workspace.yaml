@@ -1,14 +1,13 @@
 packages:
-  - 'packages/*'
-  - 'playground'
-  - 'runtime/*'
-  - 'vue-components/*'
-  - 'react-components/*'
-  - 'eslint-config'
+  - "packages/*"
+  - "playground"
+  - "runtime/*"
+  - "vue-components/*"
+  - "react-components/*"
+  - "eslint-config"
 
 catalog:
   vue: ^3.5.24
-  '@vue/compiler-sfc': ^3.5.24
-  vite: ^8.0.3
+  "@vue/compiler-sfc": ^3.5.24
+  vite: ^8.0.8
   typescript: "^6.0.2"
-  
