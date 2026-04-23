@@ -59,10 +59,12 @@ export const useStage = (stageOptions: StageOptions) => {
     },
   );
 
-  stage.mask?.setGuides([
-    getGuideLineFromCache(getGuideLineKey(H_GUIDE_LINE_STORAGE_KEY)),
-    getGuideLineFromCache(getGuideLineKey(V_GUIDE_LINE_STORAGE_KEY)),
-  ]);
+  const hGuidesCache = getGuideLineFromCache(getGuideLineKey(H_GUIDE_LINE_STORAGE_KEY));
+  const vGuidesCache = getGuideLineFromCache(getGuideLineKey(V_GUIDE_LINE_STORAGE_KEY));
+
+  stage.mask?.setGuides([hGuidesCache, vGuidesCache]);
+
+  uiService.set('hasGuides', hGuidesCache.length > 0 || vGuidesCache.length > 0);
 
   stage.on('page-el-update', () => {
     editorService.set('stageLoading', false);
@@ -123,6 +125,11 @@ export const useStage = (stageOptions: StageOptions) => {
 
   stage.on('change-guides', (e) => {
     uiService.set('showGuides', true);
+
+    uiService.set(
+      'hasGuides',
+      (stage.mask?.horizontalGuidelines.length ?? 0) > 0 || (stage.mask?.verticalGuidelines.length ?? 0) > 0,
+    );
 
     if (!root.value || !page.value) return;
 

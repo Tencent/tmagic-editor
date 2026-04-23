@@ -253,6 +253,8 @@ export interface UiState {
   columnWidth: GetColumnWidth;
   /** 是否显示画布参考线，true: 显示，false: 不显示，默认为true */
   showGuides: boolean;
+  /** 画布上是否存在参考线 */
+  hasGuides: boolean;
   /** 是否显示标尺，true: 显示，false: 不显示，默认为true */
   showRule: boolean;
   /** 用于控制该属性配置表单内组件的尺寸 */

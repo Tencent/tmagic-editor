@@ -37,6 +37,7 @@ const columnWidth = computed(() => uiService.get('columnWidth'));
 const keys = Object.values(ColumnLayout);
 
 const showGuides = computed((): boolean => uiService.get('showGuides'));
+const hasGuides = computed((): boolean => uiService.get('hasGuides'));
 const showRule = computed((): boolean => uiService.get('showRule'));
 const zoom = computed((): number => uiService.get('zoom'));
 
@@ -143,6 +144,7 @@ const getConfig = (item: MenuItem): (MenuButton | MenuComponent)[] => {
       });
       break;
     case 'guides':
+      if (!hasGuides.value) break;
       config.push({
         type: 'button',
         className: 'guides',

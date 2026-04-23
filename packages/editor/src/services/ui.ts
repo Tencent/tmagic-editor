@@ -55,6 +55,7 @@ const state = shallowReactive<UiState>({
       DEFAULT_RIGHT_COLUMN_WIDTH,
   },
   showGuides: true,
+  hasGuides: false,
   showRule: true,
   propsPanelSize: 'small',
   showAddPageButton: true,
