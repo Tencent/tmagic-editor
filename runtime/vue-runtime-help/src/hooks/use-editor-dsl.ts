@@ -1,9 +1,9 @@
 import { computed, inject, nextTick, reactive, ref, watch } from 'vue';
 
 import type TMagicApp from '@tmagic/core';
-import type { Id, MApp, MNode } from '@tmagic/core';
-import { getElById, getNodePath, replaceChildNode } from '@tmagic/core';
-import type { Magic, RemoveData, UpdateData } from '@tmagic/stage';
+import type { Id, MApp, MNode, MPage, MPageFragment } from '@tmagic/core';
+import { asyncLoadCss, getElById, getNodePath, replaceChildNode } from '@tmagic/core';
+import type { Magic, RemoveData, Runtime, UpdateData } from '@tmagic/stage';
 
 declare global {
   interface Window {
@@ -11,7 +11,22 @@ declare global {
   }
 }
 
-export const useEditorDsl = (app = inject<TMagicApp>('app'), win = window) => {
+let styleEl: HTMLStyleElement | null = null;
+
+const createCss = async (config: MPage | MPageFragment) => {
+  if (config.cssFile) {
+    await asyncLoadCss(config.cssFile, window.document);
+  }
+  if (config.css) {
+    if (!styleEl) {
+      styleEl = window.document.createElement('style');
+      window.document.head.appendChild(styleEl);
+    }
+    styleEl.innerHTML = config.css;
+  }
+};
+
+export const useEditorDsl = (app = inject<TMagicApp>('app'), runtimeApi: Runtime = {}, win = window) => {
   const root = ref<MApp>();
   const curPageId = ref<Id>();
   const selectedId = ref<Id>();
@@ -20,31 +35,37 @@ export const useEditorDsl = (app = inject<TMagicApp>('app'), win = window) => {
     () => root.value?.items?.find((item: MNode) => item.id === curPageId.value) || root.value?.items?.[0],
   );
 
-  watch(pageConfig, async () => {
-    await nextTick();
-    const page =
-      document.querySelector<HTMLElement>('.magic-ui-page') ||
-      document.querySelector<HTMLElement>('.magic-ui-page-fragment');
-    page && win.magic?.onPageElUpdate(page);
+  watch(pageConfig, (config) => {
+    if (!config) return;
+
+    setTimeout(() => {
+      const page =
+        document.querySelector<HTMLElement>('.magic-ui-page') ||
+        document.querySelector<HTMLElement>('.magic-ui-page-fragment');
+      page && win.magic?.onPageElUpdate(page);
+    });
+
+    createCss(config);
   });
 
-  win.magic?.onRuntimeReady({
-    getApp() {
-      return app;
-    },
+  const updateRoot = (config: MApp) => {
+    root.value = config;
+    if (typeof curPageId.value === 'undefined') {
+      curPageId.value = config.items?.[0]?.id;
+    }
 
-    updateRootConfig(config: MApp) {
-      root.value = config;
+    if (typeof selectedId.value === 'undefined') {
+      selectedId.value = curPageId.value;
+    }
 
-      if (typeof curPageId.value === 'undefined') {
-        curPageId.value = config.items?.[0]?.id;
-      }
+    app?.setConfig(config, curPageId.value);
+  };
 
-      if (typeof selectedId.value === 'undefined') {
-        selectedId.value = curPageId.value;
-      }
+  window.magic?.onRuntimeReady({
+    getApp: () => app,
 
-      app?.setConfig(config, curPageId.value);
+    updateRootConfig: (config: MApp) => {
+      updateRoot(config);
     },
 
     updatePageId(id: Id) {
@@ -65,8 +86,14 @@ export const useEditorDsl = (app = inject<TMagicApp>('app'), win = window) => {
       return nextTick().then(() => getElById()(document, `${id}`));
     },
 
-    add({ config, parentId }: UpdateData) {
-      if (!root.value) throw new Error('error');
+    add: ({ config, parentId, root: appConfig }: UpdateData) => {
+      if (!root.value) {
+        if (appConfig) {
+          updateRoot(appConfig);
+          return;
+        }
+        throw new Error('error');
+      }
       if (!selectedId.value) throw new Error('error');
       if (!parentId) throw new Error('error');
 
@@ -87,13 +114,15 @@ export const useEditorDsl = (app = inject<TMagicApp>('app'), win = window) => {
       }
     },
 
-    update({ config, parentId }: UpdateData) {
-      if (!root.value || !app) throw new Error('error');
-
-      if (config.type === 'app') {
-        this.updateRootConfig?.(config as MApp);
-        return;
+    update: ({ config, parentId, root: appConfig }: UpdateData) => {
+      if (!root.value) {
+        if (appConfig) {
+          updateRoot(appConfig);
+          return;
+        }
+        throw new Error('error');
       }
+      if (!app) throw new Error('error');
 
       const newNode = app.dataSourceManager?.compiledNode(config, undefined, true) || config;
 
@@ -109,7 +138,7 @@ export const useEditorDsl = (app = inject<TMagicApp>('app'), win = window) => {
       }
     },
 
-    remove({ id, parentId }: RemoveData) {
+    remove: ({ id, parentId }: RemoveData) => {
       if (!root.value) throw new Error('error');
 
       const node = getNodePath(id, [root.value]).pop();
@@ -127,6 +156,8 @@ export const useEditorDsl = (app = inject<TMagicApp>('app'), win = window) => {
       const index = parent.items?.findIndex((child: MNode) => child.id === node.id);
       parent.items.splice(index, 1);
     },
+
+    ...runtimeApi,
   });
 
   return {
