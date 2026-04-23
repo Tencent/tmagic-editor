@@ -1,4 +1,4 @@
-import { computed, inject } from 'vue';
+import { inject } from 'vue';
 
 import { tMagicMessage } from '@tmagic/design';
 import type { FormConfig, FormState } from '@tmagic/form-schema';
@@ -12,21 +12,6 @@ export const useAdd = (
   emit: (event: 'select' | 'change' | 'addDiffCount', ...args: any[]) => void,
 ) => {
   const mForm = inject<FormState | undefined>('mForm');
-
-  const addable = computed(() => {
-    const modelName = props.name || props.config.name || '';
-    if (!props.model[modelName].length) {
-      return true;
-    }
-    if (typeof props.config.addable === 'function') {
-      return props.config.addable(mForm, {
-        model: props.model[modelName],
-        formValue: mForm?.values,
-        prop: props.prop,
-      });
-    }
-    return typeof props.config.addable === 'undefined' ? true : props.config.addable;
-  });
 
   const newHandler = async (row?: any) => {
     const modelName = props.name || props.config.name || '';
@@ -106,7 +91,6 @@ export const useAdd = (
   };
 
   return {
-    addable,
     newHandler,
   };
 };

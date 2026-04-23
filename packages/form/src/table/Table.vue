@@ -34,13 +34,7 @@
 
         <div style="display: flex; justify-content: space-between; margin: 10px 0">
           <div style="display: flex">
-            <TMagicButton
-              :icon="Grid"
-              size="small"
-              @click="toggleMode"
-              v-if="enableToggleMode && config.enableToggleMode !== false && !isFullscreen"
-              >展开配置</TMagicButton
-            >
+            <slot name="toggle-button" v-if="enableToggleMode && !isFullscreen"></slot>
             <TMagicButton
               :icon="FullScreen"
               size="small"
@@ -64,17 +58,7 @@
               >清空</TMagicButton
             >
           </div>
-          <TMagicButton
-            v-if="addable"
-            class="m-form-table-add-button"
-            size="small"
-            plain
-            :icon="Plus"
-            v-bind="config.addButtonConfig?.props || { type: 'primary' }"
-            :disabled="disabled"
-            @click="newHandler()"
-            >{{ config.addButtonConfig?.text || '新增一行' }}</TMagicButton
-          >
+          <slot name="add-button" :trigger="newHandler"></slot>
         </div>
 
         <div class="bottom" style="text-align: right" v-if="config.pagination">
@@ -97,7 +81,7 @@
 
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue';
-import { FullScreen, Grid, Plus } from '@element-plus/icons-vue';
+import { FullScreen } from '@element-plus/icons-vue';
 
 import { TMagicButton, TMagicPagination, TMagicTable, TMagicTooltip, TMagicUpload, useZIndex } from '@tmagic/design';
 
@@ -139,7 +123,7 @@ const { pageSize, currentPage, paginationData, handleSizeChange, handleCurrentCh
 const { nextZIndex } = useZIndex();
 const updateKey = ref(1);
 
-const { addable, newHandler } = useAdd(props, emit);
+const { newHandler } = useAdd(props, emit);
 const { columns } = useTableColumns(props, emit, currentPage, pageSize, modelName);
 useSortable(props, emit, tMagicTableRef, modelName, updateKey);
 const { isFullscreen, toggleFullscreen } = useFullscreen();
@@ -147,32 +131,6 @@ const { importable, excelHandler, clearHandler } = useImport(props, emit, newHan
 const { selectHandle, toggleRowSelection } = useSelection(props, emit, tMagicTableRef);
 
 const data = computed(() => (props.config.pagination ? paginationData.value : props.model[modelName.value]));
-
-const toggleMode = () => {
-  const calcLabelWidth = (label: string) => {
-    if (!label) return '0px';
-    const zhLength = label.match(/[^\x00-\xff]/g)?.length || 0;
-    const chLength = label.length - zhLength;
-    return `${Math.max(chLength * 8 + zhLength * 20, 80)}px`;
-  };
-
-  // 切换为groupList的形式
-  props.config.type = 'groupList';
-  props.config.enableToggleMode = true;
-  props.config.tableItems = props.config.items;
-  props.config.items =
-    props.config.groupItems ||
-    props.config.items.map((item: any) => {
-      const text = item.text || item.label;
-      const labelWidth = calcLabelWidth(text);
-      return {
-        ...item,
-        text,
-        labelWidth,
-        span: item.span || 12,
-      };
-    });
-};
 
 const sortChangeHandler = (sortOptions: SortProp) => {
   const modelName = props.name || props.config.name || '';

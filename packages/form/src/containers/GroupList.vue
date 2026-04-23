@@ -27,30 +27,19 @@
     ></MFieldsGroupListItem>
 
     <div class="m-fields-group-list-footer">
-      <TMagicButton v-if="config.enableToggleMode" :icon="Grid" size="small" @click="toggleMode"
-        >切换为表格</TMagicButton
-      >
+      <slot name="toggle-button"></slot>
       <div style="display: flex; justify-content: flex-end; flex: 1">
-        <TMagicButton
-          v-if="addable"
-          :size="config.enableToggleMode ? 'small' : 'default'"
-          :icon="Plus"
-          v-bind="config.addButtonConfig?.props || { type: 'primary' }"
-          :disabled="disabled"
-          @click="addHandler"
-          >{{ config.addButtonConfig?.text || '新增' }}</TMagicButton
-        >
+        <slot name="add-button" :trigger="addHandler"></slot>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, inject } from 'vue';
-import { Grid, Plus } from '@element-plus/icons-vue';
+import { inject } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
-import { TMagicButton, tMagicMessage } from '@tmagic/design';
+import { tMagicMessage } from '@tmagic/design';
 
 import type { ContainerChangeEventData, FormState, GroupListConfig } from '../schema';
 import { initValue } from '../utils/form';
@@ -79,21 +68,6 @@ const emit = defineEmits<{
 }>();
 
 const mForm = inject<FormState | undefined>('mForm');
-
-const addable = computed(() => {
-  if (!props.name) return false;
-
-  if (typeof props.config.addable === 'function') {
-    return props.config.addable(mForm, {
-      model: props.model[props.name],
-      formValue: mForm?.values,
-      prop: props.prop,
-      config: props.config,
-    });
-  }
-
-  return typeof props.config.addable === 'undefined' ? true : props.config.addable;
-});
 
 const changeHandler = (v: any, eventData: ContainerChangeEventData) => {
   emit('change', props.model, eventData);
@@ -165,17 +139,6 @@ const swapHandler = (idx1: number, idx2: number) => {
   const [currRow] = props.model[props.name].splice(idx1, 1);
   props.model[props.name].splice(Math.min(Math.max(idx2, 0), length - 1), 0, currRow);
   emit('change', props.model[props.name]);
-};
-
-const toggleMode = () => {
-  props.config.type = 'table';
-  props.config.groupItems = props.config.items;
-  props.config.items = (props.config.tableItems ||
-    props.config.items.map((item: any) => ({
-      ...item,
-      label: item.label || item.text,
-      text: null,
-    }))) as any;
 };
 
 const onAddDiffCount = () => emit('addDiffCount');
