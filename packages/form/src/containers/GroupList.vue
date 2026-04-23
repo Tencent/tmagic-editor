@@ -10,7 +10,7 @@
       v-for="(item, index) in model[name]"
       :key="index"
       :model="item"
-      :lastValues="getLastValues(lastValues[name], Number(index))"
+      :lastValues="getLastValues(lastValues?.[name], Number(index))"
       :is-compare="isCompare"
       :config="config"
       :prop="prop"
