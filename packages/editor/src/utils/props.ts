@@ -106,6 +106,7 @@ export const styleTabConfig: TabPaneConfig = {
             'borderWidth',
             'borderStyle',
             'borderColor',
+            'opacity',
           ],
         } as unknown as ChildConfig,
         {
