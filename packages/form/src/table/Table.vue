@@ -34,7 +34,7 @@
 
         <div style="display: flex; justify-content: space-between; margin: 10px 0">
           <div style="display: flex">
-            <slot name="toggle-button" v-if="enableToggleMode && !isFullscreen"></slot>
+            <slot name="toggle-button" v-if="!isFullscreen"></slot>
             <TMagicButton
               :icon="FullScreen"
               size="small"
@@ -104,7 +104,6 @@ defineOptions({
 const props = withDefaults(defineProps<TableProps>(), {
   prop: '',
   sortKey: '',
-  enableToggleMode: true,
   showIndex: true,
   lastValues: () => ({}),
   isCompare: false,

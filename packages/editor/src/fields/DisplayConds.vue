@@ -67,6 +67,7 @@ const config = computed<GroupListConfig>(() => ({
   name: props.name,
   titlePrefix: props.config.titlePrefix,
   expandAll: true,
+  enableToggleMode: false,
   items: [
     {
       type: 'table',

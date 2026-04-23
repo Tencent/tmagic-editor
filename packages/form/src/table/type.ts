@@ -13,6 +13,5 @@ export interface TableProps {
   sortKey?: string;
   text?: string;
   size?: string;
-  enableToggleMode?: boolean;
   showIndex?: boolean;
 }

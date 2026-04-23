@@ -60,6 +60,7 @@ const props = defineProps<{
   prop?: string;
   size?: string;
   disabled?: boolean;
+  showIndex?: boolean;
 }>();
 
 const emit = defineEmits<{

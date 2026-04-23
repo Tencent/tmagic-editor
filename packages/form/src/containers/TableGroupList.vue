@@ -11,12 +11,20 @@
     :last-values="lastValues"
     :prop="prop"
     :label-width="labelWidth"
+    :show-index="showIndex"
+    :sort-key="sortKey"
+    :sort="sort"
     @change="onChange"
     @select="onSelect"
     @addDiffCount="onAddDiffCount"
   >
     <template #toggle-button>
-      <TMagicButton v-if="config.enableToggleMode !== false" :icon="Grid" size="small" @click="toggleDisplayMode">
+      <TMagicButton
+        v-if="config.enableToggleMode || enableToggleMode"
+        :icon="Grid"
+        size="small"
+        @click="toggleDisplayMode"
+      >
         {{ displayMode === 'table' ? '展开配置' : '切换为表格' }}
       </TMagicButton>
     </template>
@@ -65,6 +73,10 @@ const props = defineProps<{
   labelWidth?: string;
   disabled?: boolean;
   size?: string;
+  enableToggleMode?: true;
+  showIndex?: boolean;
+  sortKey?: string;
+  sort?: boolean;
 }>();
 
 const emit = defineEmits(['change', 'select', 'addDiffCount']);

@@ -806,7 +806,7 @@ export interface GroupListConfig<T = never> extends FormItem {
   };
   /** 最大行数 */
   max?: number;
-  beforeAddRow?: (mForm: FormState | undefined, data: any) => boolean | Promise<boolean>;
+  beforeAddRow?: (mForm: FormState | undefined, data: any) => boolean;
 }
 
 interface StepItemConfig<T = never> extends FormItem, ContainerCommonConfig<T> {
