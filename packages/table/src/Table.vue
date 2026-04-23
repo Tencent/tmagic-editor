@@ -139,6 +139,7 @@ const tableColumns = computed(() =>
         prop: item.prop,
         type,
         selectable: item.selectable,
+        sortable: item.sortable,
       },
       cell: type === 'selection' ? undefined : ({ row, $index }: any) => cellRender(item, { row, $index }),
     };

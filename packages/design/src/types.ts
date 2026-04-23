@@ -342,7 +342,7 @@ export interface TableColumnOptions<T = any> {
     prop?: string;
     align?: string;
     headerAlign?: string;
-    sortable?: boolean;
+    sortable?: boolean | string;
     sortOrders?: Array<'ascending' | 'descending'>;
     selectable?: (row: T, index: number) => boolean;
   };
