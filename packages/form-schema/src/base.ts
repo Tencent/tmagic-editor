@@ -761,7 +761,7 @@ export interface TableConfig extends FormItem {
   titleTip?: FilterFunction<string>;
   rowKey?: string;
   /** table 新增行时前置回调 */
-  beforeAddRow?: (mForm: FormState | undefined, data: any) => boolean;
+  beforeAddRow?: (mForm: FormState | undefined, data: any) => boolean | Promise<boolean>;
   addButtonConfig?: {
     props?: Record<string, any>;
     text?: string;
@@ -804,6 +804,9 @@ export interface GroupListConfig<T = never> extends FormItem {
     props?: Record<string, any>;
     text?: string;
   };
+  /** 最大行数 */
+  max?: number;
+  beforeAddRow?: (mForm: FormState | undefined, data: any) => boolean | Promise<boolean>;
 }
 
 interface StepItemConfig<T = never> extends FormItem, ContainerCommonConfig<T> {

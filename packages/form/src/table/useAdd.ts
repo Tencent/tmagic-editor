@@ -37,7 +37,7 @@ export const useAdd = (
     }
 
     if (typeof props.config.beforeAddRow === 'function') {
-      const beforeCheckRes = props.config.beforeAddRow(mForm, {
+      const beforeCheckRes = await props.config.beforeAddRow(mForm, {
         model: props.model[modelName],
         formValue: mForm?.values,
         prop: props.prop,

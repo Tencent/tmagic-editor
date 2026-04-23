@@ -50,7 +50,7 @@ import { computed, inject } from 'vue';
 import { Grid, Plus } from '@element-plus/icons-vue';
 import { cloneDeep } from 'lodash-es';
 
-import { TMagicButton } from '@tmagic/design';
+import { TMagicButton, tMagicMessage } from '@tmagic/design';
 
 import type { ContainerChangeEventData, FormState, GroupListConfig } from '../schema';
 import { initValue } from '../utils/form';
@@ -101,6 +101,20 @@ const changeHandler = (v: any, eventData: ContainerChangeEventData) => {
 
 const addHandler = async () => {
   if (!props.name) return false;
+
+  if (props.config.max && props.model[props.name].length >= props.config.max) {
+    tMagicMessage.error(`最多新增配置不能超过${props.config.max}条`);
+    return;
+  }
+
+  if (typeof props.config.beforeAddRow === 'function') {
+    const beforeCheckRes = await props.config.beforeAddRow(mForm, {
+      model: props.model[props.name],
+      formValue: mForm?.values,
+      prop: props.prop,
+    });
+    if (!beforeCheckRes) return;
+  }
 
   let initValues = {};
 
