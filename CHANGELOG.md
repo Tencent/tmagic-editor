@@ -1,3 +1,22 @@
+## [1.7.11](https://github.com/Tencent/tmagic-editor/compare/v1.7.10...v1.7.11) (2026-04-23)
+
+
+### Bug Fixes
+
+* **form:** group-list lastValues 为空时兼容取值报错 ([7249b51](https://github.com/Tencent/tmagic-editor/commit/7249b5106eee06a4e22cc325e83fac4e09e146ba))
+* **form:** table 全屏每次进入重新获取 z-index ([9ba12e9](https://github.com/Tencent/tmagic-editor/commit/9ba12e97afccbca6bafcacc1b5e79f4d7fed3341)), closes [#672](https://github.com/Tencent/tmagic-editor/issues/672)
+* **vue-runtime-help:** 删除所有页面后,新增页面出错 ([6a4a4ed](https://github.com/Tencent/tmagic-editor/commit/6a4a4ed122ce19ece81d816cb9b7dfb473dc351a)), closes [#668](https://github.com/Tencent/tmagic-editor/issues/668)
+
+
+### Features
+
+* **editor:** 样式面板布局分组新增透明度配置 ([e106c08](https://github.com/Tencent/tmagic-editor/commit/e106c081c8fd6e0e8db9160605190e21ffccc1f7)), closes [#675](https://github.com/Tencent/tmagic-editor/issues/675)
+* **editor:** 没有参考线时不显示参考线切换按钮 ([b46b571](https://github.com/Tencent/tmagic-editor/commit/b46b5712142c85fc18533f68d52ae0958c2835e0))
+* **form:** group-list 支持 max 限制和 beforeAddRow 前置校验 ([ac755ac](https://github.com/Tencent/tmagic-editor/commit/ac755ac3d0328a2ca8e77d6f8b117b8b349e1bd0))
+* **table:** 支持列排序配置 ([4cd54d1](https://github.com/Tencent/tmagic-editor/commit/4cd54d13979da5189ecbd19ec732a4653a4f7d0a))
+
+
+
 ## [1.7.10](https://github.com/Tencent/tmagic-editor/compare/v1.7.9...v1.7.10) (2026-04-13)
 
 
