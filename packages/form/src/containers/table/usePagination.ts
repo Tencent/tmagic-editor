@@ -1,6 +1,6 @@
 import { computed, type Ref, ref } from 'vue';
 
-import { getDataByPage } from '../utils/form';
+import { getDataByPage } from '../../utils/form';
 
 import type { TableProps } from './type';
 

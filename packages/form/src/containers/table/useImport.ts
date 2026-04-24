@@ -8,8 +8,7 @@ import type { TableProps } from './type';
 
 export const useImport = (
   props: TableProps,
-  emit: (event: 'select' | 'change' | 'addDiffCount', ...args: any[]) => void,
-  newHandler: (row: any) => void,
+  emit: (event: 'select' | 'change' | 'addDiffCount' | 'add', ...args: any[]) => void,
 ) => {
   const mForm = inject<FormState | undefined>('mForm');
   const modelName = computed(() => props.name || props.config.name || '');
@@ -41,9 +40,7 @@ export const useImport = (
       pdata.SheetNames.forEach((sheetName: string) => {
         const arr = (globalThis as any).XLSX.utils.sheet_to_json(pdata.Sheets[sheetName], { header: 1 });
         if (arr?.[0]) {
-          arr.forEach((row: any) => {
-            newHandler(row);
-          });
+          emit('add', arr);
         }
         setTimeout(() => {
           excelBtn.value?.clearFiles();

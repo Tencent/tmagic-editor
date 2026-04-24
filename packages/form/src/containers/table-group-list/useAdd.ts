@@ -1,17 +1,42 @@
-import { inject } from 'vue';
+import { computed, inject } from 'vue';
 
 import { tMagicMessage } from '@tmagic/design';
-import type { FormConfig, FormState } from '@tmagic/form-schema';
+import type { FormConfig, FormState, TableConfig, TableGroupListCommonConfig } from '@tmagic/form-schema';
 
-import { initValue } from '../utils/form';
-
-import type { TableProps } from './type';
+import { initValue } from '../../utils/form';
+import type { TableProps } from '../table/type';
 
 export const useAdd = (
-  props: TableProps,
-  emit: (event: 'select' | 'change' | 'addDiffCount', ...args: any[]) => void,
+  props: Pick<TableProps, 'name' | 'model' | 'prop' | 'sortKey'> & {
+    config: Pick<TableGroupListCommonConfig, 'addable' | 'max' | 'beforeAddRow' | 'defaultAdd' | 'enum'> &
+      Pick<TableConfig, 'key' | 'name'> & {
+        items: { name?: string | number }[];
+      };
+  },
+  emit: (event: 'change', ...args: any[]) => void,
 ) => {
   const mForm = inject<FormState | undefined>('mForm');
+
+  const addable = computed(() => {
+    const modelName = props.name || props.config.name || '';
+
+    if (!modelName) return false;
+
+    if (!props.model[modelName].length) {
+      return true;
+    }
+
+    if (typeof props.config.addable === 'function') {
+      return props.config.addable(mForm, {
+        model: props.model[modelName],
+        formValue: mForm?.values,
+        prop: props.prop,
+        config: props.config,
+      });
+    }
+
+    return typeof props.config.addable === 'undefined' ? true : props.config.addable;
+  });
 
   const newHandler = async (row?: any) => {
     const modelName = props.name || props.config.name || '';
@@ -91,6 +116,7 @@ export const useAdd = (
   };
 
   return {
+    addable,
     newHandler,
   };
 };

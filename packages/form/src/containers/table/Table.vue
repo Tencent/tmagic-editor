@@ -58,7 +58,7 @@
               >清空</TMagicButton
             >
           </div>
-          <slot name="add-button" :trigger="newHandler"></slot>
+          <slot name="add-button"></slot>
         </div>
 
         <div class="bottom" style="text-align: right" v-if="config.pagination">
@@ -80,16 +80,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, useTemplateRef, watch } from 'vue';
+import { computed, ref, useTemplateRef } from 'vue';
 import { FullScreen } from '@element-plus/icons-vue';
 
-import { TMagicButton, TMagicPagination, TMagicTable, TMagicTooltip, TMagicUpload, useZIndex } from '@tmagic/design';
+import { TMagicButton, TMagicPagination, TMagicTable, TMagicTooltip, TMagicUpload } from '@tmagic/design';
 
-import type { SortProp } from '../schema';
-import { sortChange } from '../utils/form';
+import type { SortProp } from '../../schema';
+import { sortChange } from '../../utils/form';
 
 import type { TableProps } from './type';
-import { useAdd } from './useAdd';
 import { useFullscreen } from './useFullscreen';
 import { useImport } from './useImport';
 import { usePagination } from './usePagination';
@@ -109,7 +108,7 @@ const props = withDefaults(defineProps<TableProps>(), {
   isCompare: false,
 });
 
-const emit = defineEmits(['change', 'select', 'addDiffCount']);
+const emit = defineEmits(['change', 'select', 'addDiffCount', 'add']);
 
 const modelName = computed(() => props.name || props.config.name || '');
 const tMagicTableRef = useTemplateRef<InstanceType<typeof TMagicTable>>('tMagicTable');
@@ -119,22 +118,13 @@ const { pageSize, currentPage, paginationData, handleSizeChange, handleCurrentCh
   modelName,
 );
 
-const { nextZIndex } = useZIndex();
 const updateKey = ref(1);
-const fullscreenZIndex = ref(nextZIndex());
 
-const { newHandler } = useAdd(props, emit);
 const { columns } = useTableColumns(props, emit, currentPage, pageSize, modelName);
 useSortable(props, emit, tMagicTableRef, modelName, updateKey);
-const { isFullscreen, toggleFullscreen } = useFullscreen();
+const { isFullscreen, fullscreenZIndex, toggleFullscreen } = useFullscreen();
 
-watch(isFullscreen, (value) => {
-  if (value) {
-    fullscreenZIndex.value = nextZIndex();
-  }
-});
-
-const { importable, excelHandler, clearHandler } = useImport(props, emit, newHandler);
+const { importable, excelHandler, clearHandler } = useImport(props, emit);
 const { selectHandle, toggleRowSelection } = useSelection(props, emit, tMagicTableRef);
 
 const data = computed(() => (props.config.pagination ? paginationData.value : props.model[modelName.value]));

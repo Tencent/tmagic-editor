@@ -1,6 +1,7 @@
 <template>
   <component
     :is="displayMode === 'table' ? MFormTable : MFormGroupList"
+    ref="tableGroupList"
     v-bind="$attrs"
     :model="model"
     :name="`${name}`"
@@ -17,6 +18,7 @@
     @change="onChange"
     @select="onSelect"
     @addDiffCount="onAddDiffCount"
+    @add="onAdd"
   >
     <template #toggle-button>
       <TMagicButton
@@ -29,16 +31,15 @@
       </TMagicButton>
     </template>
 
-    <template #add-button="{ trigger }">
+    <template #add-button v-if="addable">
       <TMagicButton
-        v-if="addable"
         :class="displayMode === 'table' ? 'm-form-table-add-button' : ''"
         :size="addButtonSize"
         :plain="displayMode === 'table'"
         :icon="Plus"
         :disabled="disabled"
         v-bind="currentConfig.addButtonConfig?.props || { type: 'primary' }"
-        @click="trigger"
+        @click="newHandler"
       >
         {{ currentConfig.addButtonConfig?.text || (displayMode === 'table' ? '新增一行' : '新增') }}
       </TMagicButton>
@@ -47,16 +48,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref } from 'vue';
+import { computed, ref, useTemplateRef } from 'vue';
 import { Grid, Plus } from '@element-plus/icons-vue';
 
 import { TMagicButton } from '@tmagic/design';
-import type { FormState, GroupListConfig, TableConfig } from '@tmagic/form-schema';
+import type { GroupListConfig, TableConfig } from '@tmagic/form-schema';
 
-import type { ContainerChangeEventData } from '../schema';
+import type { ContainerChangeEventData } from '../../schema';
+import MFormGroupList from '../GroupList.vue';
 import MFormTable from '../table/Table.vue';
 
-import MFormGroupList from './GroupList.vue';
+import { useAdd } from './useAdd';
 
 defineOptions({
   name: 'MFormTableGroupList',
@@ -81,28 +83,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['change', 'select', 'addDiffCount']);
 
-const mForm = inject<FormState | undefined>('mForm');
-
-const addable = computed(() => {
-  const modelName = props.name || props.config.name || '';
-
-  if (!modelName) return false;
-
-  if (!props.model[modelName].length) {
-    return true;
-  }
-
-  if (typeof props.config.addable === 'function') {
-    return props.config.addable(mForm, {
-      model: props.model[modelName],
-      formValue: mForm?.values,
-      prop: props.prop,
-      config: props.config,
-    });
-  }
-
-  return typeof props.config.addable === 'undefined' ? true : props.config.addable;
-});
+const { addable, newHandler } = useAdd(props, emit);
 
 const isGroupListType = (type: string | undefined) => type === 'groupList' || type === 'group-list';
 
@@ -178,4 +159,15 @@ const toggleDisplayMode = () => {
 const onChange = (v: any, eventData?: ContainerChangeEventData) => emit('change', v, eventData);
 const onSelect = (...args: any[]) => emit('select', ...args);
 const onAddDiffCount = () => emit('addDiffCount');
+const onAdd = (rows: any[]) => {
+  rows.forEach((row: any) => {
+    newHandler(row);
+  });
+};
+
+const tableGroupListRef = useTemplateRef<InstanceType<typeof MFormTable>>('tableGroupList');
+
+defineExpose({
+  toggleRowSelection: (row: any, selected: boolean) => tableGroupListRef.value?.toggleRowSelection?.(row, selected),
+});
 </script>

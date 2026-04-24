@@ -1,11 +1,11 @@
 import type { DataSchema, DataSourceFieldType, DataSourceSchema } from '@tmagic/core';
-import { type CascaderOption, defineFormItem, type FormConfig } from '@tmagic/form';
+import { type CascaderOption, type FormConfig, type TabConfig } from '@tmagic/form';
 import { dataSourceTemplateRegExp, getKeysArray, isNumber } from '@tmagic/utils';
 
 import BaseFormConfig from './formConfigs/base';
 import HttpFormConfig from './formConfigs/http';
 
-const dataSourceFormConfig = defineFormItem({
+const dataSourceFormConfig: TabConfig = {
   type: 'tab',
   items: [
     {
@@ -73,9 +73,13 @@ const dataSourceFormConfig = defineFormItem({
       ],
     },
   ],
-});
+};
 
-const fillConfig = (config: FormConfig): FormConfig => [...BaseFormConfig(), ...config, dataSourceFormConfig];
+const fillConfig = <T = never>(config: FormConfig<T>): FormConfig<T> => [
+  ...BaseFormConfig(),
+  ...config,
+  dataSourceFormConfig,
+];
 
 export const getFormConfig = (type: string, configs: Record<string, FormConfig>): FormConfig => {
   switch (type) {

@@ -4,7 +4,7 @@ import type { default as SortableType, SortableEvent } from 'sortablejs';
 import { type TMagicTable } from '@tmagic/design';
 import type { FormState } from '@tmagic/form-schema';
 
-import { sortArray } from '../utils/form';
+import { sortArray } from '../../utils/form';
 
 import type { TableProps } from './type';
 

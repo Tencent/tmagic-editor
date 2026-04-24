@@ -24,7 +24,7 @@ import FlexLayout from './containers/FlexLayout.vue';
 import Panel from './containers/Panel.vue';
 import Row from './containers/Row.vue';
 import MStep from './containers/Step.vue';
-import TableGroupList from './containers/TableGroupList.vue';
+import TableGroupList from './containers/table-group-list/TableGroupList.vue';
 import Tabs from './containers/Tabs.vue';
 import Cascader from './fields/Cascader.vue';
 import Checkbox from './fields/Checkbox.vue';

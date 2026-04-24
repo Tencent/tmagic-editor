@@ -29,20 +29,16 @@
     <div class="m-fields-group-list-footer">
       <slot name="toggle-button"></slot>
       <div style="display: flex; justify-content: flex-end; flex: 1">
-        <slot name="add-button" :trigger="addHandler"></slot>
+        <slot name="add-button"></slot>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { inject } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
-import { tMagicMessage } from '@tmagic/design';
-
-import type { ContainerChangeEventData, FormState, GroupListConfig } from '../schema';
-import { initValue } from '../utils/form';
+import type { ContainerChangeEventData, GroupListConfig } from '../schema';
 
 import MFieldsGroupListItem from './GroupListItem.vue';
 
@@ -68,57 +64,8 @@ const emit = defineEmits<{
   addDiffCount: [];
 }>();
 
-const mForm = inject<FormState | undefined>('mForm');
-
 const changeHandler = (v: any, eventData: ContainerChangeEventData) => {
   emit('change', props.model, eventData);
-};
-
-const addHandler = async () => {
-  if (!props.name) return false;
-
-  if (props.config.max && props.model[props.name].length >= props.config.max) {
-    tMagicMessage.error(`最多新增配置不能超过${props.config.max}条`);
-    return;
-  }
-
-  if (typeof props.config.beforeAddRow === 'function') {
-    const beforeCheckRes = await props.config.beforeAddRow(mForm, {
-      model: props.model[props.name],
-      formValue: mForm?.values,
-      prop: props.prop,
-    });
-    if (!beforeCheckRes) return;
-  }
-
-  let initValues = {};
-
-  if (typeof props.config.defaultAdd === 'function') {
-    initValues = await props.config.defaultAdd(mForm, {
-      model: props.model[props.name],
-      formValue: mForm?.values,
-      prop: props.prop,
-      config: props.config,
-    });
-  } else if (props.config.defaultAdd) {
-    initValues = props.config.defaultAdd;
-  }
-
-  const groupValue = await initValue(mForm, {
-    config: props.config.items,
-    initValues,
-  });
-
-  props.model[props.name].push(groupValue);
-
-  emit('change', props.model[props.name], {
-    changeRecords: [
-      {
-        propPath: `${props.prop}.${props.model[props.name].length - 1}`,
-        value: groupValue,
-      },
-    ],
-  });
 };
 
 const removeHandler = (index: number) => {

@@ -5,9 +5,9 @@ import { cloneDeep } from 'lodash-es';
 import { type TableColumnOptions, TMagicIcon, TMagicTooltip } from '@tmagic/design';
 import type { FormItemConfig, FormState, TableColumnConfig } from '@tmagic/form-schema';
 
-import Container from '../containers/Container.vue';
-import type { ContainerChangeEventData } from '../schema';
-import { display as displayFunc, getDataByPage, sortArray } from '../utils/form';
+import type { ContainerChangeEventData } from '../../schema';
+import { display as displayFunc, getDataByPage, sortArray } from '../../utils/form';
+import Container from '../Container.vue';
 
 import ActionsColumn from './ActionsColumn.vue';
 import SortColumn from './SortColumn.vue';
@@ -187,7 +187,7 @@ export const useTableColumns = (
         columns.push({
           props: {
             prop: column.name,
-            label: column.label,
+            label: column.label || column.text,
             width: column.width,
             sortable: column.sortable,
             sortOrders: ['ascending', 'descending'],
@@ -223,7 +223,10 @@ export const useTableColumns = (
                             gap: '5px',
                           },
                         },
-                        [h('span', column.label), h(TMagicIcon, {}, { default: () => h(WarningFilled) })],
+                        [
+                          h('span', column.label || column.text),
+                          h(TMagicIcon, {}, { default: () => h(WarningFilled) }),
+                        ],
                       ),
                     content: () =>
                       h('div', {

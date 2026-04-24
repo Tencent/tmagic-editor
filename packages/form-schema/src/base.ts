@@ -701,28 +701,43 @@ export interface PanelConfig<T = never> extends FormItem, ContainerCommonConfig<
   schematic?: string;
 }
 
-export interface TableColumnConfig extends FormItem {
+export interface TableGroupListCommonConfig extends FormItem {
+  type: 'table' | 'groupList' | 'group-list';
+  enableToggleMode?: boolean;
+  /** 最大行数 */
+  max?: number;
+  enum?: any[];
+  /** 是否显示添加按钮 */
+  addable?: (mForm: FormState | undefined, data: any) => boolean | 'undefined' | boolean;
+  /** 新增的默认行，可以是函数动态生成或静态对象 */
+  defaultAdd?: ((mForm: FormState | undefined, data: any) => any) | Record<string, any>;
+  /** table 新增行时前置回调 */
+  beforeAddRow?: (mForm: FormState | undefined, data: any) => boolean | Promise<boolean>;
+}
+
+export interface TableColumnConfig<T = never> extends FormItem {
   name?: string;
-  label: string;
+  label?: string;
+  text?: string;
   width?: string | number;
   sortable?: boolean;
-  items?: FormConfig;
-  itemsFunction?: (row: any) => FormConfig;
+  items?: FormConfig<T>;
+  itemsFunction?: (row: any) => FormConfig<T>;
   titleTip?: FilterFunction<string>;
   type?: string;
+  addButtonConfig?: {
+    props?: Record<string, any>;
+    text?: string;
+  };
 }
 
 /**
  * 表格容器
  */
-export interface TableConfig extends FormItem {
-  type: 'table' | 'groupList' | 'group-list';
-  items: TableColumnConfig[];
-  tableItems?: TableColumnConfig[];
-  groupItems?: TableColumnConfig[];
-  enableToggleMode?: boolean;
-  /** 最大行数 */
-  max?: number;
+export interface TableConfig<T = never> extends TableGroupListCommonConfig {
+  items: TableColumnConfig<T>[];
+  tableItems?: TableColumnConfig<T>[];
+  groupItems?: TableColumnConfig<T>[];
   /** 最大高度 */
   maxHeight?: number | string;
   border?: boolean;
@@ -731,9 +746,6 @@ export interface TableConfig extends FormItem {
   /** 操作栏宽度 */
   operateColWidth?: number | string;
   pagination?: boolean;
-  enum?: any[];
-  /** 是否显示添加按钮 */
-  addable?: (mForm: FormState | undefined, data: any) => boolean | 'undefined' | boolean;
   /** 是否显示删除按钮 */
   delete?: (model: any, index: number, values: any) => boolean | boolean;
   copyable?: (model: any, data: any) => boolean | boolean;
@@ -741,8 +753,6 @@ export interface TableConfig extends FormItem {
   importable?: (mForm: FormState | undefined, data: any) => boolean | 'undefined' | boolean;
   /** 是否显示checkbox */
   selection?: (mForm: FormState | undefined, data: any) => boolean | boolean | 'single';
-  /** 新增的默认行，可以是函数动态生成或静态对象 */
-  defaultAdd?: ((mForm: FormState | undefined, data: any) => any) | Record<string, any>;
   copyHandler?: (mForm: FormState | undefined, data: any) => any;
   onSelect?: (mForm: FormState | undefined, data: any) => any;
   /** @deprecated 请使用 defaultSort */
@@ -760,20 +770,12 @@ export interface TableConfig extends FormItem {
   itemExtra?: string | FilterFunction<string>;
   titleTip?: FilterFunction<string>;
   rowKey?: string;
-  /** table 新增行时前置回调 */
-  beforeAddRow?: (mForm: FormState | undefined, data: any) => boolean | Promise<boolean>;
-  addButtonConfig?: {
-    props?: Record<string, any>;
-    text?: string;
-  };
   sort?: boolean;
   sortKey?: string;
 }
 
-export interface GroupListConfig<T = never> extends FormItem {
-  type: 'table' | 'groupList' | 'group-list';
+export interface GroupListConfig<T = never> extends TableGroupListCommonConfig {
   span?: number;
-  enableToggleMode?: boolean;
   items: FormConfig<T>;
   groupItems?: FormConfig<T>;
   tableItems?: FormConfig<T>;
@@ -788,9 +790,6 @@ export interface GroupListConfig<T = never> extends FormItem {
    * 当未设置时，默认展开第一项
    */
   defaultExpandQuantity?: number;
-  addable?: (mForm: FormState | undefined, data: any) => boolean | 'undefined' | boolean;
-  /** 新增的默认值，可以是函数动态生成或静态对象 */
-  defaultAdd?: ((mForm: FormState | undefined, data: any) => any) | Record<string, any>;
   delete?: (model: any, index: number | string | symbol, values: any) => boolean | boolean;
   copyable?: FilterFunction<boolean>;
   movable?: (
@@ -800,13 +799,6 @@ export interface GroupListConfig<T = never> extends FormItem {
     groupModel: any,
   ) => boolean | boolean;
   moveSpecifyLocation?: boolean;
-  addButtonConfig?: {
-    props?: Record<string, any>;
-    text?: string;
-  };
-  /** 最大行数 */
-  max?: number;
-  beforeAddRow?: (mForm: FormState | undefined, data: any) => boolean;
 }
 
 interface StepItemConfig<T = never> extends FormItem, ContainerCommonConfig<T> {
