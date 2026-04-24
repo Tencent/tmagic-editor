@@ -161,6 +161,7 @@ export const useEditorDsl = (app = inject<TMagicApp>('app'), runtimeApi: Runtime
   });
 
   return {
+    root,
     pageConfig,
     app,
   };
