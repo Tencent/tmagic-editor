@@ -1,5 +1,5 @@
 {
-  "version": "1.7.11",
+  "version": "1.7.12",
   "name": "@tmagic/stage",
   "type": "module",
   "sideEffects": false,
