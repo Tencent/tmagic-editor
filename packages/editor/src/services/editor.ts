@@ -509,7 +509,10 @@ class Editor extends BaseService {
 
   public async doUpdate(
     config: MNode,
-    { changeRecords = [] }: { changeRecords?: ChangeRecord[] } = {},
+    {
+      changeRecords = [],
+      selectedAfterUpdate = true,
+    }: { changeRecords?: ChangeRecord[]; selectedAfterUpdate?: boolean } = {},
   ): Promise<{ newNode: MNode; oldNode: MNode; changeRecords?: ChangeRecord[] }> {
     const root = this.get('root');
     if (!root) throw new Error('root为空');
@@ -554,10 +557,12 @@ class Editor extends BaseService {
     parentNodeItems[index] = newConfig;
 
     // 将update后的配置更新到nodes中
-    const nodes = this.get('nodes');
-    const targetIndex = nodes.findIndex((nodeItem: MNode) => `${nodeItem.id}` === `${newConfig.id}`);
-    nodes.splice(targetIndex, 1, newConfig);
-    this.set('nodes', [...nodes]);
+    if (selectedAfterUpdate) {
+      const nodes = this.get('nodes');
+      const targetIndex = nodes.findIndex((nodeItem: MNode) => `${nodeItem.id}` === `${newConfig.id}`);
+      nodes.splice(targetIndex, 1, newConfig);
+      this.set('nodes', [...nodes]);
+    }
 
     if (isPage(newConfig) || isPageFragment(newConfig)) {
       this.set('page', newConfig as MPage | MPageFragment);
@@ -580,7 +585,7 @@ class Editor extends BaseService {
    */
   public async update(
     config: MNode | MNode[],
-    data: { changeRecords?: ChangeRecord[] } = {},
+    data: { changeRecords?: ChangeRecord[]; selectedAfterUpdate?: boolean } = {},
   ): Promise<MNode | MNode[]> {
     this.captureSelectionBeforeOp();
 
