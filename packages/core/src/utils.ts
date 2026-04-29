@@ -56,8 +56,22 @@ export const fillBackgroundImage = (value: string) => {
   return value;
 };
 
-export const getTransform = (value: Record<string, string>, jsEngine: JsEngine) => {
-  if (!value) return [];
+export const getTransform = (value: Record<string, string> | string, jsEngine: JsEngine) => {
+  const isHippy = jsEngine === 'hippy';
+
+  if (!value) return isHippy ? [] : '';
+
+  if (typeof value === 'string') {
+    if (!isHippy) return value;
+
+    // Hippy 不支持 css transform 字符串，需要将 "rotate(90deg) scale(1.5)" 解析成 [{ rotate: '90deg' }, { scale: '1.5' }]
+    const transformArr: Record<string, string>[] = [];
+    value.replace(/(\w+)\(([^)]+)\)/g, (_, key, val) => {
+      transformArr.push({ [key]: val.trim() });
+      return '';
+    });
+    return transformArr;
+  }
 
   const transform = Object.entries(value).map(([transformKey, transformValue]) => {
     if (!transformValue.trim()) return '';
@@ -65,14 +79,14 @@ export const getTransform = (value: Record<string, string>, jsEngine: JsEngine) 
       transformValue = `${transformValue}deg`;
     }
 
-    return jsEngine !== 'hippy' ? `${transformKey}(${transformValue})` : { [transformKey]: transformValue };
+    return isHippy ? { [transformKey]: transformValue } : `${transformKey}(${transformValue})`;
   });
 
-  if (jsEngine === 'hippy') {
+  if (isHippy) {
     return transform;
   }
   const values = transform.join(' ');
-  return !values.trim() ? 'none' : values;
+  return values.trim();
 };
 
 /**
@@ -102,8 +116,11 @@ export const transformStyle = (style: Record<string, any> | string, jsEngine: Js
       results.transform = [{ scale: value }];
     } else if (key === 'backgroundImage' && !isHippy) {
       value && (results[key] = fillBackgroundImage(value));
-    } else if (key === 'transform' && typeof value !== 'string') {
-      results[key] = getTransform(value, jsEngine);
+    } else if (key === 'transform') {
+      const transform = getTransform(value, jsEngine);
+      if (transform) {
+        results[key] = transform;
+      }
     } else if (!whiteList.includes(key) && value && /^[-]?[0-9]*[.]?[0-9]*$/.test(value)) {
       results[key] = isHippy ? value : `${value / 100}rem`;
     } else {
