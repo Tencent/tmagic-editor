@@ -1,3 +1,17 @@
+## [1.7.13](https://github.com/Tencent/tmagic-editor/compare/v1.7.12...v1.7.13) (2026-04-29)
+
+
+### Bug Fixes
+
+* **core:** getTransform 支持 string 类型并适配 hippy ([96801e2](https://github.com/Tencent/tmagic-editor/commit/96801e2ccba1fb400007e988aebbda7195e8ff15))
+
+
+### Features
+
+* **editor:** update 支持 selectedAfterUpdate 参数控制是否更新 nodes ([26efa75](https://github.com/Tencent/tmagic-editor/commit/26efa75ff2cf03d4e27e3e77592d0304d343e44a))
+
+
+
 ## [1.7.12](https://github.com/Tencent/tmagic-editor/compare/v1.7.11...v1.7.12) (2026-04-24)
 
 
