@@ -12,7 +12,7 @@
 
 - **详情：**
 
-  将 CSS 样式字符串转换为对象格式。
+  将 CSS 样式字符串转换为对象格式。若入参不是字符串，则原样返回。
 
 - **示例：**
 
@@ -47,20 +47,20 @@ console.log(bg); // 'url(https://example.com/image.png)'
 ## getTransform
 
 - **参数：**
-  - `{object} value` transform 配置
+  - `{Record<string, string> | string} value` transform 配置（对象或 CSS 字符串）
   - `{JsEngine} jsEngine` JS 引擎类型
 
 - **返回：**
-  - `{string}` CSS transform 字符串
+  - `{string | Record<string, string>[]}` CSS transform 字符串；当 `jsEngine === 'hippy'` 时返回数组格式
 
 - **详情：**
 
-  根据配置生成 CSS transform 字符串，会根据 JS 引擎类型进行适配。
+  根据配置生成 CSS transform。当 `jsEngine === 'hippy'` 时，会将 `"rotate(90deg) scale(1.5)"` 这样的字符串解析成 `[{ rotate: '90deg' }, { scale: '1.5' }]` 形式以适配 Hippy；其它情况下返回标准 CSS transform 字符串。
 
 ## transformStyle
 
 - **参数：**
-  - `{object} style` 样式对象
+  - `{Record<string, any> | string} style` 样式对象或 CSS 字符串
   - `{JsEngine} jsEngine` JS 引擎类型
 
 - **返回：**
@@ -68,7 +68,7 @@ console.log(bg); // 'url(https://example.com/image.png)'
 
 - **详情：**
 
-  转换样式对象，将数值转换为 rem 单位（移动端适配）。
+  转换样式对象，将数值转换为 rem 单位（移动端适配）。当 `style` 为字符串时，会先用 `style2Obj` 解析为对象再处理。
 
 - **示例：**
 

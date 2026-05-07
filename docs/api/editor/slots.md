@@ -334,7 +334,7 @@
 
 - **详情：** 编辑器右侧属性配置
 
-- **默认：** [PropsPanel.vue](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/editor/src/layouts/PropsPanel.vue)
+- **默认：** [PropsPanel.vue](https://github.com/Tencent/tmagic-editor/blob/master/packages/editor/src/layouts/props-panel/PropsPanel.vue)
 
 ## props-panel-header
 

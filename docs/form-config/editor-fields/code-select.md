@@ -19,15 +19,17 @@
 ## 功能说明
 
 CodeSelect 组件支持：
+
 - 选择代码块
 - 选择数据源方法
 - 配置代码块参数
 
 ## Attributes
-| 参数      | 说明    | 类型      | 可选值       | 默认值   |
-|---------- |-------- |---------- |-------------  |-------- |
-| name | 绑定值 | string | — | — |
-| text     | 表单标签   | string |       —        |      —   |
-| disabled  | 是否禁用    | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | false   |
-| className  | 自定义类名    | string   | — | —   |
-| onChange  | 值变化时触发的函数  | [OnChangeHandler](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | -   |
+
+| 参数      | 说明               | 类型                                                                                                                                                     | 可选值 | 默认值 |
+| --------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------ |
+| name      | 绑定值             | string                                                                                                                                                   | —      | —      |
+| text      | 表单标签           | string                                                                                                                                                   | —      | —      |
+| disabled  | 是否禁用           | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L195) | —      | false  |
+| className | 自定义类名         | string                                                                                                                                                   | —      | —      |
+| onChange  | 值变化时触发的函数 | [OnChangeHandler](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L30)           | —      | -      |

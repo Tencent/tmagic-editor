@@ -14,7 +14,7 @@ new Node(options: NodeOptions)
 |------|------|------|
 | `config` | `MNode` | 节点配置 |
 | `parent` | `Node` | 父节点（可选） |
-| `page` | `Page` | 所属页面 |
+| `page` | `Page` | 所属页面（可选） |
 | `app` | `App` | 应用实例 |
 
 ## 属性
@@ -25,7 +25,7 @@ new Node(options: NodeOptions)
 | `style` | `object` | 节点样式 |
 | `events` | `EventConfig[]` | 事件配置 |
 | `instance` | `any` | 组件实例 |
-| `page` | `Page` | 所属页面 |
+| `page` | `Page \| undefined` | 所属页面 |
 | `parent` | `Node \| undefined` | 父节点 |
 | `app` | `App` | 应用实例 |
 | `store` | `Store` | 节点存储 |
@@ -59,14 +59,14 @@ node.setData({
 ### addEventToQueue
 
 - **参数：**
-  - `{EventConfig} event` 事件配置
+  - `{EventCache} event` 待处理事件项；类型为 `{ method: string, fromCpt: any, args: any[] }`
 
 - **返回：**
   - `{void}`
 
 - **详情：**
 
-  将事件添加到事件队列，等待绑定到组件实例。
+  将事件添加到节点内部的事件队列，等待组件实例 `mounted` 后再依次调用对应的方法（`instance[event.method](event.fromCpt, ...event.args)`）。
 
 ### setInstance
 
@@ -87,18 +87,37 @@ node.setData({
 node.setInstance(componentInstance);
 ```
 
-### runHookCode
+### registerMethod
+
+::: warning @deprecated
+该方法已废弃，请使用 `setInstance` 替代。
+:::
 
 - **参数：**
-  - `{'created' | 'mounted'} hook` 钩子名称
-  - `{object} params` 参数
+  - `{Methods} methods` 方法集合，形如 `{ [name: string]: (...args: any[]) => any }`
 
 - **返回：**
-  - `{Promise<any>}`
+  - `{void}`
 
 - **详情：**
 
-  执行节点的钩子代码。
+  将给定方法挂载到 `instance` 上。如果当前 `instance` 不存在，会先创建一个空对象再合并方法。
+
+### runHookCode
+
+- **参数：**
+  - `{string} hook` 钩子名称（如 `'created'`、`'mounted'`、`'destroy'` 等，由节点 schema 决定）
+  - `{object} params` 参数（可选）
+
+- **返回：**
+  - `{Promise<void>}`
+
+- **详情：**
+
+  执行节点的钩子代码。内部会根据节点 schema 中 `hook` 字段的实际形态进行处理：
+
+  - 兼容旧格式：当 `data[hook]` 直接是函数时，作为函数调用；
+  - 新格式：当 `data[hook]` 是 `{ hookType, hookData[] }` 且 `hookType === HookType.CODE` 时，按顺序遍历 `hookData`，根据 `codeType` 调用 `app.runCode` 或 `app.runDataSourceMethod`。
 
 - **示例：**
 

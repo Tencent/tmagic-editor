@@ -3,11 +3,9 @@
 ## get
 
 - **参数：**
-
   - `{StateKey}` name 状态键名
 
 - **返回：**
-
   - `{any}` 对应的状态值
 
 - **详情：**
@@ -26,21 +24,19 @@
 - **示例：**
 
 ```js
-import { dataSourceService } from '@tmagic/editor';
+import { dataSourceService } from "@tmagic/editor";
 
-const dataSources = dataSourceService.get('dataSources');
+const dataSources = dataSourceService.get("dataSources");
 console.log(dataSources);
 ```
 
 ## set
 
 - **参数：**
-
   - `{StateKey}` name 状态键名
   - `{any}` value 状态值
 
 - **返回：**
-
   - `{void}`
 
 - **详情：**
@@ -50,9 +46,9 @@ console.log(dataSources);
 - **示例：**
 
 ```js
-import { dataSourceService } from '@tmagic/editor';
+import { dataSourceService } from "@tmagic/editor";
 
-dataSourceService.set('editable', false);
+dataSourceService.set("editable", false);
 ```
 
 ## getFormConfig
@@ -60,12 +56,10 @@ dataSourceService.set('editable', false);
 - **[扩展支持](../../guide/editor-expand#行为扩展)：** 是
 
 - **参数：**
-
   - `{string}` type 数据源类型，默认为 'base'
 
 - **返回：**
-
-  - {[FormConfig](https://github.com/Tencent/tmagic-editor/blob/c143a5f7670ae61d80c1a2cfcc780cfb5259849d/packages/form/src/schema.ts#L706)} 表单配置
+  - {[FormConfig](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L864)} 表单配置
 
 - **详情：**
 
@@ -74,9 +68,9 @@ dataSourceService.set('editable', false);
 - **示例：**
 
 ```js
-import { dataSourceService } from '@tmagic/editor';
+import { dataSourceService } from "@tmagic/editor";
 
-const config = dataSourceService.getFormConfig('http');
+const config = dataSourceService.getFormConfig("http");
 console.log(config);
 ```
 
@@ -85,12 +79,10 @@ console.log(config);
 - **[扩展支持](../../guide/editor-expand#行为扩展)：** 是
 
 - **参数：**
-
   - `{string}` type 数据源类型
-  - {[FormConfig](https://github.com/Tencent/tmagic-editor/blob/c143a5f7670ae61d80c1a2cfcc780cfb5259849d/packages/form/src/schema.ts#L706)} config 表单配置
+  - {[FormConfig](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L864)} config 表单配置
 
 - **返回：**
-
   - `{void}`
 
 - **详情：**
@@ -100,21 +92,21 @@ console.log(config);
 - **示例：**
 
 ```js
-import { dataSourceService } from '@tmagic/editor';
+import { dataSourceService } from "@tmagic/editor";
 
-dataSourceService.setFormConfig('http', [
+dataSourceService.setFormConfig("http", [
   {
-    name: 'url',
-    text: '请求地址',
-    type: 'text',
+    name: "url",
+    text: "请求地址",
+    type: "text",
   },
   {
-    name: 'method',
-    text: '请求方法',
-    type: 'select',
+    name: "method",
+    text: "请求方法",
+    type: "select",
     options: [
-      { text: 'GET', value: 'GET' },
-      { text: 'POST', value: 'POST' },
+      { text: "GET", value: "GET" },
+      { text: "POST", value: "POST" },
     ],
   },
 ]);
@@ -125,11 +117,9 @@ dataSourceService.setFormConfig('http', [
 - **[扩展支持](../../guide/editor-expand#行为扩展)：** 是
 
 - **参数：**
-
   - `{string}` type 数据源类型，默认为 'base'
 
 - **返回：**
-
   - {Partial<[DataSourceSchema](https://github.com/Tencent/tmagic-editor/blob/5880dfbe15fcead63e9dc7c91900f8c4e7a574d8/packages/schema/src/index.ts#L221)>} 数据源默认值
 
 - **详情：**
@@ -139,9 +129,9 @@ dataSourceService.setFormConfig('http', [
 - **示例：**
 
 ```js
-import { dataSourceService } from '@tmagic/editor';
+import { dataSourceService } from "@tmagic/editor";
 
-const defaultValue = dataSourceService.getFormValue('http');
+const defaultValue = dataSourceService.getFormValue("http");
 console.log(defaultValue);
 ```
 
@@ -150,12 +140,10 @@ console.log(defaultValue);
 - **[扩展支持](../../guide/editor-expand#行为扩展)：** 是
 
 - **参数：**
-
   - `{string}` type 数据源类型
   - {Partial<[DataSourceSchema](https://github.com/Tencent/tmagic-editor/blob/5880dfbe15fcead63e9dc7c91900f8c4e7a574d8/packages/schema/src/index.ts#L221)>} value 数据源默认值
 
 - **返回：**
-
   - `{void}`
 
 - **详情：**
@@ -165,12 +153,12 @@ console.log(defaultValue);
 - **示例：**
 
 ```js
-import { dataSourceService } from '@tmagic/editor';
+import { dataSourceService } from "@tmagic/editor";
 
-dataSourceService.setFormValue('http', {
-  type: 'http',
-  method: 'GET',
-  url: '',
+dataSourceService.setFormValue("http", {
+  type: "http",
+  method: "GET",
+  url: "",
 });
 ```
 
@@ -179,11 +167,9 @@ dataSourceService.setFormValue('http', {
 - **[扩展支持](../../guide/editor-expand#行为扩展)：** 是
 
 - **参数：**
-
   - `{string}` type 数据源类型，默认为 'base'
 
 - **返回：**
-
   - {[EventOption](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/core/src/events.ts#L26-L29)[]} 事件列表
 
 - **详情：**
@@ -193,9 +179,9 @@ dataSourceService.setFormValue('http', {
 - **示例：**
 
 ```js
-import { dataSourceService } from '@tmagic/editor';
+import { dataSourceService } from "@tmagic/editor";
 
-const events = dataSourceService.getFormEvent('http');
+const events = dataSourceService.getFormEvent("http");
 console.log(events);
 ```
 
@@ -204,12 +190,10 @@ console.log(events);
 - **[扩展支持](../../guide/editor-expand#行为扩展)：** 是
 
 - **参数：**
-
   - `{string}` type 数据源类型
   - {[EventOption](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/core/src/events.ts#L26-L29)[]} value 事件列表
 
 - **返回：**
-
   - `{void}`
 
 - **详情：**
@@ -219,11 +203,11 @@ console.log(events);
 - **示例：**
 
 ```js
-import { dataSourceService } from '@tmagic/editor';
+import { dataSourceService } from "@tmagic/editor";
 
-dataSourceService.setFormEvent('http', [
-  { label: '请求成功', value: 'success' },
-  { label: '请求失败', value: 'error' },
+dataSourceService.setFormEvent("http", [
+  { label: "请求成功", value: "success" },
+  { label: "请求失败", value: "error" },
 ]);
 ```
 
@@ -232,11 +216,9 @@ dataSourceService.setFormEvent('http', [
 - **[扩展支持](../../guide/editor-expand#行为扩展)：** 是
 
 - **参数：**
-
   - `{string}` type 数据源类型，默认为 'base'
 
 - **返回：**
-
   - {[EventOption](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/core/src/events.ts#L26-L29)[]} 方法列表
 
 - **详情：**
@@ -246,9 +228,9 @@ dataSourceService.setFormEvent('http', [
 - **示例：**
 
 ```js
-import { dataSourceService } from '@tmagic/editor';
+import { dataSourceService } from "@tmagic/editor";
 
-const methods = dataSourceService.getFormMethod('http');
+const methods = dataSourceService.getFormMethod("http");
 console.log(methods);
 ```
 
@@ -257,12 +239,10 @@ console.log(methods);
 - **[扩展支持](../../guide/editor-expand#行为扩展)：** 是
 
 - **参数：**
-
   - `{string}` type 数据源类型
   - {[EventOption](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/core/src/events.ts#L26-L29)[]} value 方法列表
 
 - **返回：**
-
   - `{void}`
 
 - **详情：**
@@ -272,11 +252,11 @@ console.log(methods);
 - **示例：**
 
 ```js
-import { dataSourceService } from '@tmagic/editor';
+import { dataSourceService } from "@tmagic/editor";
 
-dataSourceService.setFormMethod('http', [
-  { label: '发起请求', value: 'request' },
-  { label: '重试', value: 'retry' },
+dataSourceService.setFormMethod("http", [
+  { label: "发起请求", value: "request" },
+  { label: "重试", value: "retry" },
 ]);
 ```
 
@@ -285,11 +265,9 @@ dataSourceService.setFormMethod('http', [
 - **[扩展支持](../../guide/editor-expand#行为扩展)：** 是
 
 - **参数：**
-
   - {[DataSourceSchema](https://github.com/Tencent/tmagic-editor/blob/5880dfbe15fcead63e9dc7c91900f8c4e7a574d8/packages/schema/src/index.ts#L221)} config 数据源配置
 
 - **返回：**
-
   - {[DataSourceSchema](https://github.com/Tencent/tmagic-editor/blob/5880dfbe15fcead63e9dc7c91900f8c4e7a574d8/packages/schema/src/index.ts#L221)} 添加后的数据源配置
 
 - **详情：**
@@ -299,13 +277,13 @@ dataSourceService.setFormMethod('http', [
 - **示例：**
 
 ```js
-import { dataSourceService } from '@tmagic/editor';
+import { dataSourceService } from "@tmagic/editor";
 
 const newDs = dataSourceService.add({
-  type: 'http',
-  title: '用户信息',
-  url: '/api/user',
-  method: 'GET',
+  type: "http",
+  title: "用户信息",
+  url: "/api/user",
+  method: "GET",
 });
 
 console.log(newDs.id); // 自动生成的id
@@ -316,13 +294,11 @@ console.log(newDs.id); // 自动生成的id
 - **[扩展支持](../../guide/editor-expand#行为扩展)：** 是
 
 - **参数：**
-
   - {[DataSourceSchema](https://github.com/Tencent/tmagic-editor/blob/5880dfbe15fcead63e9dc7c91900f8c4e7a574d8/packages/schema/src/index.ts#L221)} config 数据源配置
   - `{Object}` options 可选配置
     - {[ChangeRecord](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/form/src/schema.ts#L27-L39)[]} changeRecords 变更记录
 
 - **返回：**
-
   - {[DataSourceSchema](https://github.com/Tencent/tmagic-editor/blob/5880dfbe15fcead63e9dc7c91900f8c4e7a574d8/packages/schema/src/index.ts#L221)} 更新后的数据源配置
 
 - **详情：**
@@ -332,13 +308,13 @@ console.log(newDs.id); // 自动生成的id
 - **示例：**
 
 ```js
-import { dataSourceService } from '@tmagic/editor';
+import { dataSourceService } from "@tmagic/editor";
 
 const updatedDs = dataSourceService.update({
-  id: 'ds_123',
-  type: 'http',
-  title: '用户详情',
-  url: '/api/user/detail',
+  id: "ds_123",
+  type: "http",
+  title: "用户详情",
+  url: "/api/user/detail",
 });
 
 console.log(updatedDs);
@@ -349,11 +325,9 @@ console.log(updatedDs);
 - **[扩展支持](../../guide/editor-expand#行为扩展)：** 是
 
 - **参数：**
-
   - `{string}` id 数据源id
 
 - **返回：**
-
   - `{void}`
 
 - **详情：**
@@ -363,9 +337,9 @@ console.log(updatedDs);
 - **示例：**
 
 ```js
-import { dataSourceService } from '@tmagic/editor';
+import { dataSourceService } from "@tmagic/editor";
 
-dataSourceService.remove('ds_123');
+dataSourceService.remove("ds_123");
 ```
 
 ## createId
@@ -375,7 +349,6 @@ dataSourceService.remove('ds_123');
 - **参数：** 无
 
 - **返回：**
-
   - `{string}` 生成的唯一id
 
 - **详情：**
@@ -385,7 +358,7 @@ dataSourceService.remove('ds_123');
 - **示例：**
 
 ```js
-import { dataSourceService } from '@tmagic/editor';
+import { dataSourceService } from "@tmagic/editor";
 
 const id = dataSourceService.createId();
 console.log(id); // 'ds_xxx-xxx-xxx'
@@ -394,11 +367,9 @@ console.log(id); // 'ds_xxx-xxx-xxx'
 ## getDataSourceById
 
 - **参数：**
-
   - `{string}` id 数据源id
 
 - **返回：**
-
   - {[DataSourceSchema](https://github.com/Tencent/tmagic-editor/blob/5880dfbe15fcead63e9dc7c91900f8c4e7a574d8/packages/schema/src/index.ts#L221) | undefined} 数据源配置
 
 - **详情：**
@@ -408,21 +379,19 @@ console.log(id); // 'ds_xxx-xxx-xxx'
 - **示例：**
 
 ```js
-import { dataSourceService } from '@tmagic/editor';
+import { dataSourceService } from "@tmagic/editor";
 
-const ds = dataSourceService.getDataSourceById('ds_123');
+const ds = dataSourceService.getDataSourceById("ds_123");
 console.log(ds);
 ```
 
 ## copyWithRelated
 
 - **参数：**
-
-  - {[MNode](https://github.com/Tencent/tmagic-editor/blob/c143a5f7670ae61d80c1a2cfcc780cfb5259849d/packages/schema/src/index.ts#L99) | [MNode](https://github.com/Tencent/tmagic-editor/blob/c143a5f7670ae61d80c1a2cfcc780cfb5259849d/packages/schema/src/index.ts#L99)[]} config 组件节点配置
+  - {[MNode](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/schema/src/index.ts#L210) | [MNode](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/schema/src/index.ts#L210)[]} config 组件节点配置
   - `{TargetOptions}` collectorOptions 可选的收集器配置
 
 - **返回：**
-
   - `{void}`
 
 - **详情：**
@@ -432,9 +401,9 @@ console.log(ds);
 - **示例：**
 
 ```js
-import { dataSourceService, editorService } from '@tmagic/editor';
+import { dataSourceService, editorService } from "@tmagic/editor";
 
-const node = editorService.get('node');
+const node = editorService.get("node");
 dataSourceService.copyWithRelated(node);
 ```
 
@@ -443,19 +412,18 @@ dataSourceService.copyWithRelated(node);
 - **参数：** 无
 
 - **返回：**
-
   - `{void}`
 
 - **详情：**
 
   粘贴数据源，从 localStorage 中读取复制的数据源并添加到当前页面
-  
+
   如果数据源id已存在，则不会覆盖
 
 - **示例：**
 
 ```js
-import { dataSourceService } from '@tmagic/editor';
+import { dataSourceService } from "@tmagic/editor";
 
 dataSourceService.paste();
 ```
@@ -465,7 +433,6 @@ dataSourceService.paste();
 - **参数：** 无
 
 - **返回：**
-
   - `{void}`
 
 - **详情：**
@@ -475,7 +442,7 @@ dataSourceService.paste();
 - **示例：**
 
 ```js
-import { dataSourceService } from '@tmagic/editor';
+import { dataSourceService } from "@tmagic/editor";
 
 dataSourceService.resetState();
 ```
@@ -485,7 +452,6 @@ dataSourceService.resetState();
 - **参数：** 无
 
 - **返回：**
-
   - `{void}`
 
 - **详情：**
@@ -495,7 +461,7 @@ dataSourceService.resetState();
 - **示例：**
 
 ```js
-import { dataSourceService } from '@tmagic/editor';
+import { dataSourceService } from "@tmagic/editor";
 
 dataSourceService.destroy();
 ```
@@ -504,23 +470,23 @@ dataSourceService.destroy();
 
 - **详情：**
 
-相对于[use](#use), usePlugin支持更加灵活更加细致的扩展， 上述方法中标记有`扩展支持： 是`的方法都支持使用usePlugin扩展
+usePlugin支持更加灵活更加细致的扩展， 上述方法中标记有`扩展支持： 是`的方法都支持使用usePlugin扩展
 
 每个支持扩展的方法都支持定制before、after两个hook来干预原有方法的行为，before可以用于修改传入参数，after可以用于修改返回的值
 
 - **示例：**
 
 ```js
-import { dataSourceService } from '@tmagic/editor';
+import { dataSourceService } from "@tmagic/editor";
 
 dataSourceService.usePlugin({
   beforeAdd(config) {
-    console.log('添加前:', config);
+    console.log("添加前:", config);
     return [config];
   },
-  
+
   afterAdd(result, config) {
-    console.log('添加后:', result);
+    console.log("添加后:", result);
     return result;
   },
 });
@@ -535,7 +501,7 @@ dataSourceService.usePlugin({
 - **示例：**
 
 ```js
-import { dataSourceService } from '@tmagic/editor';
+import { dataSourceService } from "@tmagic/editor";
 
 dataSourceService.removeAllPlugins();
 ```

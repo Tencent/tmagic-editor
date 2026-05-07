@@ -11,8 +11,8 @@
 | 方法 | 参数 | 返回值 | 说明 |
 |------|------|--------|------|
 | `update` | `(data: any, path?: string)` | `void` | 更新数据 |
-| `on` | `(path: string, callback: Function, options?: { immediate?: boolean })` | `void` | 监听数据变化 |
-| `off` | `(path: string, callback: Function)` | `void` | 取消监听 |
+| `on` | `(path: string, callback: (payload: any) => void, options?: { immediate?: boolean })` | `void` | 监听数据变化。`payload` 的形态取决于具体实现：`SimpleObservedData` 路径回调收到 `{ updateData, path }`（仅 `immediate` 分支为「当前值」），`DeepObservedData` 更接近「值」语义 |
+| `off` | `(path: string, callback: (payload: any) => void)` | `void` | 取消监听 |
 | `getData` | `(path: string)` | `any` | 获取指定路径的数据 |
 | `destroy` | `()` | `void` | 销毁 |
 
@@ -27,9 +27,9 @@ import { SimpleObservedData } from '@tmagic/data-source';
 
 const observed = new SimpleObservedData({ name: 'test' });
 
-// 监听数据变化
-observed.on('name', (newVal) => {
-  console.log('name 变更为:', newVal);
+// 监听数据变化（SimpleObservedData 路径监听收到的是 { updateData, path }）
+observed.on('name', (payload) => {
+  console.log('name 变更，payload:', payload, '当前值:', observed.getData('name'));
 });
 
 // 更新数据
@@ -119,28 +119,28 @@ import { ObservedData } from '@tmagic/data-source';
 
 class CustomObservedData extends ObservedData {
   private data: any;
-  
+
   constructor(data: any) {
     super();
     this.data = data;
   }
-  
+
   update(data: any, path?: string): void {
     // 自定义更新逻辑
   }
-  
-  on(path: string, callback: Function, options?: { immediate?: boolean }): void {
+
+  on(path: string, callback: (payload: any) => void, options?: { immediate?: boolean }): void {
     // 自定义监听逻辑
   }
-  
-  off(path: string, callback: Function): void {
+
+  off(path: string, callback: (payload: any) => void): void {
     // 自定义取消监听逻辑
   }
-  
+
   getData(path: string): any {
     // 自定义获取数据逻辑
   }
-  
+
   destroy(): void {
     // 自定义销毁逻辑
   }

@@ -152,7 +152,7 @@ react 版本组件代码示例
 import React, { useContext } from 'react';
 
 import Core from '@tmagic/core';
-import { AppContent } from '@tmagic/ui-react';
+import { AppContent } from '@tmagic/react-runtime-help';
 
 function Test({ config }: { config: any }) {
   const app = useContext<Core | undefined>(AppContent);

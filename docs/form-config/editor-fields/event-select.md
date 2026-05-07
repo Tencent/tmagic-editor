@@ -29,21 +29,23 @@
 ```
 
 ## Attributes
-| 参数      | 说明    | 类型      | 可选值       | 默认值   |
-|---------- |-------- |---------- |-------------  |-------- |
-| name | 绑定值 | string | — | — |
-| text     | 表单标签   | string |       —        |      —   |
-| disabled  | 是否禁用    | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | false   |
-| src  | 事件来源    | string   | datasource/component | —   |
-| labelWidth  | 标签宽度    | string   | — | —   |
-| eventNameConfig  | 事件名称表单配置    | FormItem   | — | —   |
-| actionTypeConfig  | 动作类型配置    | FormItem   | — | —   |
-| targetCompConfig  | 联动组件配置    | FormItem   | — | —   |
-| compActionConfig  | 联动组件动作配置    | FormItem   | — | —   |
-| codeActionConfig  | 联动代码配置    | FormItem   | — | —   |
-| dataSourceActionConfig  | 联动数据源配置    | FormItem   | — | —   |
-| onChange  | 值变化时触发的函数  | [OnChangeHandler](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | -   |
+
+| 参数                   | 说明               | 类型                                                                                                                                                     | 可选值               | 默认值 |
+| ---------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- | ------ |
+| name                   | 绑定值             | string                                                                                                                                                   | —                    | —      |
+| text                   | 表单标签           | string                                                                                                                                                   | —                    | —      |
+| disabled               | 是否禁用           | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L195) | —                    | false  |
+| src                    | 事件来源           | string                                                                                                                                                   | datasource/component | —      |
+| labelWidth             | 标签宽度           | string                                                                                                                                                   | —                    | —      |
+| eventNameConfig        | 事件名称表单配置   | FormItem                                                                                                                                                 | —                    | —      |
+| actionTypeConfig       | 动作类型配置       | FormItem                                                                                                                                                 | —                    | —      |
+| targetCompConfig       | 联动组件配置       | FormItem                                                                                                                                                 | —                    | —      |
+| compActionConfig       | 联动组件动作配置   | FormItem                                                                                                                                                 | —                    | —      |
+| codeActionConfig       | 联动代码配置       | FormItem                                                                                                                                                 | —                    | —      |
+| dataSourceActionConfig | 联动数据源配置     | FormItem                                                                                                                                                 | —                    | —      |
+| onChange               | 值变化时触发的函数 | [OnChangeHandler](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L30)           | —                    | -      |
 
 ## src说明
+
 - `component`: 组件事件
 - `datasource`: 数据源事件

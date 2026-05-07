@@ -13,12 +13,15 @@ new EventHelper(options: EventHelperOptions)
 | 参数 | 类型 | 说明 |
 |------|------|------|
 | `app` | `App` | 应用实例 |
+| `beforeEventHandler` | `BeforeEventHandler` | 事件处理前钩子（可选），形如 `({ eventConfig, source, args }) => void` |
+| `afterEventHandler` | `AfterEventHandler` | 事件处理后钩子（可选），形如 `({ eventConfig, source, args }) => void` |
 
 ## 属性
 
 | 属性 | 类型 | 说明 |
 |------|------|------|
 | `app` | `App` | 应用实例 |
+| `eventQueue` | `EventCache[]` | 暂存的待处理事件队列（参见 `getEventQueue`） |
 
 ## 实例方法
 
@@ -76,28 +79,28 @@ eventHelper.bindNodeEvents(node);
 ### removeDataSourceEvents
 
 - **参数：**
-  - `{DataSourceSchema[]} dataSourceList` 数据源列表（可选）
+  - `{DataSource[]} dataSourceList` 数据源实例列表（必填）
 
 - **返回：**
   - `{void}`
 
 - **详情：**
 
-  移除数据源事件绑定。
+  移除给定数据源的事件绑定。内部根据已注册的事件名前缀，调用 `dataSource.offDataChange` 或 `dataSource.off` 注销监听，并清空 `dataSourceEventList`。
 
 ### getEventQueue
 
 - **返回：**
-  - `{EventConfig[]}`
+  - `{EventCache[]}` 事件缓存项数组，每项形如 `{ toId: Id, method: string, fromCpt: any, args: any[], handled?: boolean }`
 
 - **详情：**
 
-  获取当前事件队列。
+  获取当前事件队列。当目标节点尚未挂载时，联动事件会被缓存到此队列；目标节点 `mounted` 后，会消费匹配项并调用其 `instance` 上的对应方法。
 
 ### addEventToQueue
 
 - **参数：**
-  - `{EventConfig} event` 事件配置
+  - `{EventCache} event` 事件缓存项，形如 `{ toId: Id, method: string, fromCpt: any, args: any[] }`
 
 - **返回：**
   - `{void}`

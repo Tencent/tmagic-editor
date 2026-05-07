@@ -19,11 +19,11 @@
   activeValue: 'on',
   inactiveValue: 'off'
 }]">
-  <template #source>
-    <p>
-      设置 activeValue 和 inactiveValue 属性，接受 Boolean , String 或 Number 类型的值。
-    </p>
-  </template>
+<template #source>
+<p>
+设置 activeValue 和 inactiveValue 属性，接受 Boolean , String 或 Number 类型的值。
+</p>
+</template>
 </demo-block>
 
 ## 禁用状态
@@ -34,19 +34,18 @@
   text: '开关',
   disabled: true
 }]">
-  <template #source>
-    <p>
-      设置 disabled 属性，接受一个 Boolean，设置 true 即可禁用。
-    </p>
-  </template>
+<template #source>
+<p>
+设置 disabled 属性，接受一个 Boolean，设置 true 即可禁用。
+</p>
+</template>
 </demo-block>
-
 
 ## Attributes
 
-| 参数      | 说明    | 类型      | 可选值       | 默认值   |
-|---------- |-------- |---------- |-------------  |-------- |
-| name | 绑定值 | string | — | — |
-| disabled  | 是否禁用    | boolean / [Function](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | false   |
-| active-value  | switch 打开时的值    | boolean / string / number | — | true |
-| inactive-value  | switch 关闭时的值    | boolean / string / number | — | false |
+| 参数           | 说明              | 类型                                                                                                                                              | 可选值 | 默认值 |
+| -------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------ |
+| name           | 绑定值            | string                                                                                                                                            | —      | —      |
+| disabled       | 是否禁用          | boolean / [Function](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L90) | —      | false  |
+| active-value   | switch 打开时的值 | boolean / string / number                                                                                                                         | —      | true   |
+| inactive-value | switch 关闭时的值 | boolean / string / number                                                                                                                         | —      | false  |

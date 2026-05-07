@@ -8,7 +8,7 @@
 
 ### 一、顶部菜单栏定制
 
-通常使用 `m-editor` 组件的 [menu](/api/editor/props.html#menu) `prop` 来对齐进行设置；
+通常使用 `m-editor` 组件的 [menu](/api/editor/props.html#menu) `prop` 来对其进行设置；
 
 顶部菜单栏分为`左` `中` `右`三个部分组成，所以 [menu](/api/editor/props.html#menu) `prop`的数据格式如下：
 
@@ -16,7 +16,7 @@
 { left: [], center: [], right: [] }
 ```
 
-数组的内容可以有三种种形式：`内部定义好的字符串`、`其他字符串`、`MenuButton 或者 MenuComponent 对象`
+数组的内容可以有三种形式：`内部定义好的字符串`、`其他字符串`、`MenuButton 或者 MenuComponent 对象`
 
 #### 1. 内部定义好的字符串:
 ```ts
@@ -38,7 +38,7 @@ MenuButton 的[定义](https://github.com/Tencent/tmagic-editor/blob/239b5d3efea
 
 ```js
 {
-  type: 'buuton',
+  type: 'button',
   text: '返回',
   handler: () => window.history.back(),
 }
@@ -122,7 +122,7 @@ editorService.on('select', (node) => {
 
 默认的属性读取流程如下：
 
-组件中定义`formConfig` -> 通过`tamgic-cli`构建成 `runtime` 中 `/config/index.umd.cjs` -> `m-editor`中加载然后配置到[propsConfig](/api/editor/props.html#propsconfigs) prop中 -> `m-editor`保存到`propsService`中 -> 选中组件时`editorService`会去`propsService`调用`getPropsConfig`中读取
+组件中定义`formConfig` -> 通过`tmagic-cli`构建成 `runtime` 中 `/config/index.umd.cjs` -> `m-editor`中加载然后配置到[propsConfig](/api/editor/props.html#propsconfigs) prop中 -> `m-editor`保存到`propsService`中 -> 选中组件时`editorService`会去`propsService`调用`getPropsConfig`中读取
 
 `propsService.getPropsConfig`会调取`propsService.fillConfig`添加样式、事件、高级3个tab分页
 

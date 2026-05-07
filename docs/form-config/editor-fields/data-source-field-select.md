@@ -50,18 +50,20 @@
 ```
 
 ## Attributes
-| 参数      | 说明    | 类型      | 可选值       | 默认值   |
-|---------- |-------- |---------- |-------------  |-------- |
-| name | 绑定值 | string | — | — |
-| text     | 表单标签   | string |       —        |      —   |
-| disabled  | 是否禁用    | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | false   |
-| value  | 返回值类型    | string   | key/value | —   |
-| checkStrictly  | 是否严格遵守父子节点不互相关联    | boolean / Function   | — | —   |
-| dataSourceFieldType  | 允许选择的字段类型    | DataSourceFieldType[]   | — | —   |
-| fieldConfig  | 自定义字段配置    | ChildConfig   | — | —   |
-| notEditable  | 是否不可编辑数据源（disable控制是否可选择）    | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | false   |
-| onChange  | 值变化时触发的函数  | [OnChangeHandler](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | -   |
+
+| 参数                | 说明                                        | 类型                                                                                                                                                     | 可选值    | 默认值 |
+| ------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------ |
+| name                | 绑定值                                      | string                                                                                                                                                   | —         | —      |
+| text                | 表单标签                                    | string                                                                                                                                                   | —         | —      |
+| disabled            | 是否禁用                                    | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L195) | —         | false  |
+| value               | 返回值类型                                  | string                                                                                                                                                   | key/value | —      |
+| checkStrictly       | 是否严格遵守父子节点不互相关联              | boolean / Function                                                                                                                                       | —         | —      |
+| dataSourceFieldType | 允许选择的字段类型                          | DataSourceFieldType[]                                                                                                                                    | —         | —      |
+| fieldConfig         | 自定义字段配置                              | ChildConfig                                                                                                                                              | —         | —      |
+| notEditable         | 是否不可编辑数据源（disable控制是否可选择） | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L195) | —         | false  |
+| onChange            | 值变化时触发的函数                          | [OnChangeHandler](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L30)           | —         | -      |
 
 ## value说明
+
 - `key`: 不编译，返回数据源id和字段name
 - `value`: 编译后返回数据源data[field]

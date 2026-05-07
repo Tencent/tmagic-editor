@@ -60,16 +60,16 @@ iteratorContainer.setData({
   - `{Map<Id, Node>} map` 节点映射表
 
 - **返回：**
-  - `{Node}`
+  - `{void}`
 
 - **详情：**
 
-  在指定的节点映射表中初始化节点。
+  在指定的节点映射表中初始化节点。当节点类型属于 `app.iteratorContainerType` 时，会创建嵌套的 `IteratorContainer` 并直接返回（不再继续向下递归 `config.items`）；否则创建普通 `Node` 后会递归初始化 `config.items`。
 
 ### setNodes
 
 - **参数：**
-  - `{Map<Id, Node>} nodes` 节点映射表
+  - `{MNode[]} nodes` 节点配置数组
   - `{number} index` 迭代索引
 
 - **返回：**
@@ -77,26 +77,31 @@ iteratorContainer.setData({
 
 - **详情：**
 
-  设置指定索引的节点映射表。
+  按 `index` 在 `this.nodes[index]` 上构建/更新该迭代项对应的节点映射表，内部会对每个节点配置调用 `initNode`。
 
 - **示例：**
 
 ```typescript
-iteratorContainer.setNodes(nodesMap, 0);
+iteratorContainer.setNodes(
+  [
+    { id: 'text_1', type: 'text', text: 'hello' },
+  ],
+  0,
+);
 ```
 
 ### getNode
 
 - **参数：**
   - `{Id} id` 节点 ID
-  - `{number} index` 迭代索引（可选，默认为 0）
+  - `{number} index` 迭代索引
 
 - **返回：**
   - `{Node | undefined}`
 
 - **详情：**
 
-  获取指定迭代索引中的节点。
+  获取指定迭代索引中的节点。`index` 为必填参数。
 
 - **示例：**
 

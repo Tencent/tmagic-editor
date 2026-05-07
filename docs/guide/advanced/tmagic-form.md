@@ -21,7 +21,7 @@ $ npm install @tmagic/element-plus-adapter @tmagic/design element-plus -S
 
 ### 引入 @tmagic/form
 
-MagicForm 使用了 element-ui 库
+MagicForm 使用了 element-plus 组件库
 
 在 main.js 中写入以下内容：
 
@@ -46,9 +46,9 @@ app.mount("#app");
 ```
 
 
-以上代码便完成了 @tmagic/form 的引入。需要注意的是，ElementUI 的样式文件需要单独引入。
+以上代码便完成了 @tmagic/form 的引入。需要注意的是，Element Plus 的样式文件需要单独引入。
 
-在 App.Vue 中写入以下内容：
+在 App.vue 中写入以下内容：
 
 ```html
 <m-form :config="config" :init-values="initValue"></m-form>

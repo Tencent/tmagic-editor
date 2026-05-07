@@ -10,11 +10,11 @@
   - `{DataSourceManagerData} initialData` 初始数据（可选）
 
 - **返回：**
-  - `{DataSourceManager}` 数据源管理器实例
+  - `{DataSourceManager | undefined}` 数据源管理器实例；当 `app.dsl?.dataSources` 缺省时返回 `undefined`
 
 - **详情：**
 
-  创建数据源管理器的工厂函数，会自动设置数据变化监听。
+  创建数据源管理器的工厂函数，会自动设置数据变化监听并在 `change` 事件中向 `update-data` 转发受影响的节点。
 
 - **示例：**
 
@@ -27,15 +27,15 @@ const dsManager = createDataSourceManager(app, false, initialData);
 ## compiledCondition
 
 - **参数：**
-  - `{CondItem} cond` 条件项
-  - `{object} data` 数据上下文
+  - `{DisplayCondItem[]} conds` 条件项数组（同一组条件 AND 关系）
+  - `{DataSourceManagerData} data` 数据上下文
 
 - **返回：**
   - `{boolean}` 条件是否满足
 
 - **详情：**
 
-  编译单个显示条件。
+  编译一组显示条件，按 AND 语义返回是否全部满足。
 
 - **示例：**
 
@@ -43,8 +43,8 @@ const dsManager = createDataSourceManager(app, false, initialData);
 import { compiledCondition } from '@tmagic/data-source';
 
 const result = compiledCondition(
-  { field: 'user.age', op: '>', value: 18 },
-  { user: { age: 20 } }
+  [{ field: ['ds_1', 'user', 'age'], op: '>', value: 18 }],
+  { ds_1: { user: { age: 20 } } }
 );
 console.log(result); // true
 ```
@@ -52,21 +52,21 @@ console.log(result); // true
 ## compliedConditions
 
 - **参数：**
-  - `{MNode} node` 节点配置
-  - `{object} data` 数据上下文（可选）
+  - `{ { [NODE_CONDS_KEY]?: DisplayCond[] } } node` 带条件字段的结构
+  - `{DataSourceManagerData} data` 数据上下文
 
 - **返回：**
   - `{boolean}` 节点是否应该显示
 
 - **详情：**
 
-  编译条件组，支持 AND/OR 逻辑。
+  编译条件组（OR 语义：只要其中一组 `cond` 全部满足即返回 `true`）。
 
 ## compiledNodeField
 
 - **参数：**
   - `{any} value` 字段值
-  - `{object} data` 数据上下文
+  - `{DataSourceManagerData} data` 数据上下文
 
 - **返回：**
   - `{any}` 编译后的值
@@ -90,7 +90,7 @@ const compiled = compiledNodeField(
 
 - **参数：**
   - `{any} value` 字段值
-  - `{object} data` 数据上下文
+  - `{DataSourceManagerData} data` 数据上下文
 
 - **返回：**
   - `{any}` 编译后的值
@@ -103,7 +103,7 @@ const compiled = compiledNodeField(
 
 - **参数：**
   - `{string} value` 模板字符串
-  - `{object} data` 数据上下文
+  - `{DataSourceManagerData} data` 数据上下文
 
 - **返回：**
   - `{string}` 替换后的字符串
@@ -127,13 +127,13 @@ console.log(result); // '用户名：张三，年龄：20'
 ## createIteratorContentData
 
 - **参数：**
-  - `{object} itemData` 迭代项数据
+  - `{any} itemData` 迭代项数据
   - `{string} dsId` 数据源 ID
-  - `{DataSchema[]} fields` 字段配置
-  - `{object} dsData` 数据源数据
+  - `{string[]} fields` 字段路径，如 `['a', 'b', 'c']`
+  - `{DataSourceManagerData} dsData` 数据源数据（可选，默认 `{}`）
 
 - **返回：**
-  - `{object}` 迭代器数据上下文
+  - `{DataSourceManagerData}` 迭代器数据上下文
 
 - **详情：**
 
@@ -179,21 +179,21 @@ const newDsl = updateNode(
 
 - **参数：**
   - `{MApp} dsl` DSL 配置
-  - `{Record<string, () => Promise<any>>} modules` 数据源模块映射
+  - `{Record<string, () => Promise<any>>} dataSourceModules` 数据源模块映射
 
 - **返回：**
-  - `{Promise<void>}`
+  - `{Promise<Record<string, any>>}` 按需加载到的数据源模块表（key 为数据源 `type`，value 为模块的 `default` 导出）
 
 - **详情：**
 
-  按需加载数据源模块。根据 DSL 中使用的数据源类型动态加载对应模块。
+  按需加载数据源模块。根据 DSL 中实际依赖到的数据源类型动态加载对应模块，并以模块表形式返回。
 
 - **示例：**
 
 ```typescript
 import { registerDataSourceOnDemand } from '@tmagic/data-source';
 
-await registerDataSourceOnDemand(dsl, {
+const moduleMap = await registerDataSourceOnDemand(dsl, {
   custom: () => import('./CustomDataSource'),
   socket: () => import('./SocketDataSource')
 });

@@ -547,7 +547,7 @@ const propsValues = {
   组件属性配置中事件tab中的事件名与动作的下拉选项列表
 
   :::tip
-  该属性最终会设置到[eventsService](./eventsServiceMethods.md)中，所以也可直接调用[eventsService.setEvents()](./eventsServiceMethods.md#setEvents)与[eventsService.setMethods()](./eventsServiceMethods#setMethods)方法来配置
+  该属性最终会设置到[eventsService](./eventsServiceMethods.md)中，所以也可直接调用[eventsService.setEvents()](./eventsServiceMethods.md#setEvents)与[eventsService.setMethods()](./eventsServiceMethods.md#setMethods)方法来配置
   :::
 
 - **默认值：** `{}`

@@ -91,30 +91,22 @@ DataSourceManager.register('custom', CustomDataSource);
 ### init
 
 - **参数：**
-  - `{DataSourceSchema[]} ds` 数据源配置数组
+  - `{DataSource} ds` 单个数据源实例（必填）
 
 - **返回：**
   - `{Promise<void>}`
 
 - **详情：**
 
-  初始化数据源，会创建所有配置的数据源实例并初始化。
+  初始化单个数据源。会按 `methods` 中 `timing === 'beforeInit'` 的方法依次执行，再调用 `ds.init()`，最后执行 `timing === 'afterInit'` 的方法。当 `ds.isInit` 为 `true`，或当前 `app.jsEngine` 命中 `ds.schema.disabledInitInJsEngine` 时直接跳过。
 
 - **示例：**
 
 ```typescript
-await dataSourceManager.init([
-  {
-    id: 'ds_1',
-    type: 'base',
-    fields: [{ name: 'count', defaultValue: 0 }]
-  },
-  {
-    id: 'http_1',
-    type: 'http',
-    options: { url: '/api/data' }
-  }
-]);
+const ds = dataSourceManager.get('ds_1');
+if (ds) {
+  await dataSourceManager.init(ds);
+}
 ```
 
 ### get
@@ -138,14 +130,14 @@ const ds = dataSourceManager.get('ds_1');
 ### addDataSource
 
 - **参数：**
-  - `{DataSourceSchema} config` 数据源配置
+  - `{DataSourceSchema} config` 数据源配置（可选）
 
 - **返回：**
-  - `{DataSource}`
+  - `{DataSource | undefined}`
 
 - **详情：**
 
-  添加新的数据源。
+  添加新的数据源。当对应类型尚未注册（即 `dataSourceClassMap` 中无该类型）时，会将配置缓存到 `waitInitSchemaList`，并返回 `undefined`，待 `register` 时再补建实例。
 
 - **示例：**
 
@@ -172,15 +164,15 @@ const ds = dataSourceManager.addDataSource({
 ### setData
 
 - **参数：**
-  - `{DataSourceSchema} ds` 数据源配置
-  - `{ChangeEvent} changeEvent` 变化事件（可选）
+  - `{DataSource} ds` 数据源实例
+  - `{ChangeEvent} changeEvent` 变化事件，形如 `{ updateData, path? }`
 
 - **返回：**
   - `{void}`
 
 - **详情：**
 
-  设置数据源数据。
+  将 `ds.data` 同步到 `this.data[ds.id]`，并以 `(ds.id, changeEvent)` 触发 `change` 事件。
 
 ### updateSchema
 
@@ -188,11 +180,11 @@ const ds = dataSourceManager.addDataSource({
   - `{DataSourceSchema[]} schemas` 数据源配置数组
 
 - **返回：**
-  - `{Promise<void>}`
+  - `{void}`
 
 - **详情：**
 
-  更新数据源 DSL 配置，会自动处理新增、更新和删除。
+  同步更新数据源 DSL 配置：先按 `id` 移除已有数据源，再以 `cloneDeep` 重新 `addDataSource`，并对新建实例触发 `init`（异步执行，不会被该方法 `await`）。一般在编辑器中修改配置后调用。
 
 ### compiledNode
 
@@ -222,11 +214,11 @@ const compiledNode = dataSourceManager.compiledNode({
 ### compliedConds
 
 - **参数：**
-  - `{MNode} node` 节点配置
-  - `{object} data` 数据上下文（可选）
+  - `{ { [NODE_CONDS_KEY]?: DisplayCond[]; [NODE_CONDS_RESULT_KEY]?: boolean; [NODE_DISABLE_DATA_SOURCE_KEY]?: boolean } } node` 带条件字段的结构（不要求是完整的 MNode）
+  - `{DataSourceManagerData} data` 数据上下文（可选，默认使用 `this.data`）
 
 - **返回：**
-  - `{boolean}`
+  - `{boolean}` 节点是否应该显示
 
 - **详情：**
 
@@ -241,9 +233,9 @@ const shouldShow = dataSourceManager.compliedConds(node);
 ### compliedIteratorItemConds
 
 - **参数：**
-  - `{object} itemData` 迭代项数据
-  - `{MNode} node` 节点配置
-  - `{string} field` 条件字段名
+  - `{any} itemData` 迭代项数据
+  - `{ { [NODE_CONDS_KEY]?: DisplayCond[] } } node` 带条件字段的结构
+  - `{string[]} dataSourceField` 迭代数据在数据源中的字段路径，格式如 `['dsId', 'key1', 'key2']`（可选，默认 `[]`）
 
 - **返回：**
   - `{boolean}`
@@ -255,9 +247,9 @@ const shouldShow = dataSourceManager.compliedConds(node);
 ### compliedIteratorItems
 
 - **参数：**
-  - `{object} itemData` 迭代项数据
+  - `{any} itemData` 迭代项数据
   - `{MNode[]} nodes` 节点配置数组
-  - `{string} field` 字段名
+  - `{string[]} dataSourceField` 迭代数据在数据源中的字段路径（可选，默认 `[]`）
 
 - **返回：**
   - `{MNode[]}`
@@ -266,19 +258,33 @@ const shouldShow = dataSourceManager.compliedConds(node);
 
   编译迭代器项的节点配置。
 
+### isAllDataSourceRegistered
+
+- **返回：**
+  - `{boolean}`
+
+- **详情：**
+
+  判断 DSL 中声明的所有数据源是否都已注册并实例化（即 `dataSourceMap.size === dsl.dataSources.length`，或 DSL 未声明数据源）。
+
+  ::: tip `registered-all` 触发时机
+  `registered-all` 事件**仅**在 `addDataSource` 末尾、`isAllDataSourceRegistered()` 为真时触发。当 `dsl.dataSources` 为空数组时，构造函数不会进入任何一次 `addDataSource` 调用，因此**不会**触发该事件，但仍可能执行 `callDsInit()`。
+  :::
+
 ### onDataChange
 
 - **参数：**
   - `{string} id` 数据源 ID
   - `{string} path` 数据路径
-  - `{Function} callback` 回调函数
+  - `{(payload: any) => void} callback` 回调函数（具体入参取决于 `ObservedData` 实现，详见 [DataSource.onDataChange](./dataSource.md#ondatachange)）
+  - `{ { immediate?: boolean } } options` 选项（可选）
 
 - **返回：**
   - `{void}`
 
 - **详情：**
 
-  监听数据源数据变化。
+  监听数据源数据变化。`options.immediate` 为 `true` 时，订阅后立即用当前值触发一次回调（具体语义取决于 `ObservedData` 的实现）。
 
 - **示例：**
 
@@ -293,7 +299,7 @@ dataSourceManager.onDataChange('ds_1', 'user.name', (newVal) => {
 - **参数：**
   - `{string} id` 数据源 ID
   - `{string} path` 数据路径
-  - `{Function} callback` 回调函数
+  - `{(newVal: any) => void} callback` 回调函数
 
 - **返回：**
   - `{void}`
@@ -317,19 +323,19 @@ DataSourceManager 继承自 EventEmitter，支持以下事件：
 
 | 事件名 | 说明 | 回调参数 |
 |--------|------|----------|
-| `change` | 数据源数据变化 | `(dsId, path, newVal)` |
-| `init` | 所有数据源初始化完成 | 无 |
+| `change` | 单个数据源数据变化 | `(dsId: string, changeEvent: ChangeEvent)` |
+| `init` | 所有数据源初始化完成；现代分支携带 `(data, errors)`，旧 Promise.all 分支为 `(this.data)` | `(data, errors?)` |
 | `registered-all` | 所有数据源注册完成 | 无 |
-| `update-data` | 更新节点数据 | `(node, sourceId)` |
+| `update-data` | 由 `createDataSourceManager` 在数据变化后发出，用于通知节点重新渲染 | `(newNodes: MNode[], sourceId: string, changeEvent: ChangeEvent, pageId: Id)` |
 
 ### 事件监听示例
 
 ```typescript
-dataSourceManager.on('change', (dsId, path, newVal) => {
-  console.log(`数据源 ${dsId} 的 ${path} 变更为:`, newVal);
+dataSourceManager.on('change', (dsId, changeEvent) => {
+  console.log(`数据源 ${dsId} 变更:`, changeEvent);
 });
 
-dataSourceManager.on('init', () => {
-  console.log('所有数据源初始化完成');
+dataSourceManager.on('init', (data, errors) => {
+  console.log('所有数据源初始化完成', data, errors);
 });
 ```

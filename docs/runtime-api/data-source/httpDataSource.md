@@ -20,8 +20,8 @@ new HttpDataSource(options: DataSourceOptions<HttpDataSourceSchema>)
 | `options` | `HttpOptionsSchema` | HTTP 请求配置 |
 | `responseOptions` | `{ dataPath?: string }` | 响应数据配置（可选） |
 | `autoFetch` | `boolean` | 是否自动请求（可选） |
-| `beforeRequest` | `Function \| string` | 请求前钩子（可选） |
-| `afterResponse` | `Function \| string` | 响应后钩子（可选） |
+| `beforeRequest` | `string \| ((options: HttpOptions, content: { app, dataSource }) => HttpOptions)` | 请求前钩子。**运行时仅会调用函数形式**；字符串形式（代码块 ID）不会在 `HttpDataSource.request` 内被解析执行，需要由编辑器在导出 DSL 阶段或上层 `createDataSourceManager` 配置中将其转换为函数后挂到 schema 上 |
+| `afterResponse` | `string \| ((response: any, content: { app, dataSource, options }) => any)` | 响应后钩子。**运行时仅会调用函数形式**；字符串形式（代码块 ID）的解析逻辑同上 |
 
 ### HttpOptionsSchema
 
@@ -40,7 +40,7 @@ new HttpDataSource(options: DataSourceOptions<HttpDataSourceSchema>)
 | 属性 | 类型 | 说明 |
 |------|------|------|
 | `isLoading` | `boolean` | 是否正在请求 |
-| `error` | `{ msg?: string, code?: string }` | 错误信息 |
+| `error` | `{ msg?: string, code?: string \| number }` | 错误信息 |
 | `httpOptions` | `HttpOptionsSchema` | 请求配置 |
 
 ## 实例方法
@@ -48,10 +48,10 @@ new HttpDataSource(options: DataSourceOptions<HttpDataSourceSchema>)
 ### request
 
 - **参数：**
-  - `{HttpOptionsSchema} options` 请求选项（可选）
+  - `{Partial<HttpOptions>} options` 请求选项（可选，默认 `{}`）
 
 - **返回：**
-  - `{Promise<any>}` 响应数据
+  - `{Promise<void>}` 该方法不会显式返回数据；请求结果会通过 `setData` 写入 `data`，失败时通过 `error` 暴露并触发 `error` 事件。
 
 - **详情：**
 
@@ -61,30 +61,33 @@ new HttpDataSource(options: DataSourceOptions<HttpDataSourceSchema>)
 
 ```typescript
 // 使用默认配置请求
-const data = await httpDs.request();
+await httpDs.request();
 
 // 覆盖部分配置
-const data = await httpDs.request({
+await httpDs.request({
   params: { page: 1, size: 10 }
 });
+
+// 通过 ds.data 读取结果
+console.log(httpDs.data);
 ```
 
 ### get
 
 - **参数：**
-  - `{HttpOptionsSchema} options` 请求选项
+  - `{Partial<HttpOptions> & { url: string }} options` 请求选项（必须包含 `url`）
 
 - **返回：**
-  - `{Promise<any>}` 响应数据
+  - `{Promise<void>}`
 
 - **详情：**
 
-  发起 GET 请求。
+  发起 GET 请求，等价于 `request({ ...options, method: 'GET' })`。
 
 - **示例：**
 
 ```typescript
-const data = await httpDs.get({
+await httpDs.get({
   url: '/api/users',
   params: { id: 1 }
 });
@@ -93,21 +96,37 @@ const data = await httpDs.get({
 ### post
 
 - **参数：**
-  - `{HttpOptionsSchema} options` 请求选项
+  - `{Partial<HttpOptions> & { url: string }} options` 请求选项（必须包含 `url`）
 
 - **返回：**
-  - `{Promise<any>}` 响应数据
+  - `{Promise<void>}`
 
 - **详情：**
 
-  发起 POST 请求。
+  发起 POST 请求，等价于 `request({ ...options, method: 'POST' })`。
 
 - **示例：**
 
 ```typescript
-const data = await httpDs.post({
+await httpDs.post({
   url: '/api/users',
   data: { name: 'test' }
+});
+```
+
+## 事件
+
+继承自 [DataSource](./dataSource.md) 事件，额外包含：
+
+| 事件名 | 说明 | 回调参数 |
+|--------|------|----------|
+| `error` | 请求过程中捕获到异常时触发 | `(error: Error)` |
+
+### 示例
+
+```typescript
+httpDs.on('error', (error) => {
+  console.error('请求失败:', error);
 });
 ```
 

@@ -9,8 +9,8 @@
   name: 'type',
   text: '类型',
   options: [
-    { label: '类型A', value: 'a' },
-    { label: '类型B', value: 'b' }
+    { text: '类型A', value: 'a' },
+    { text: '类型B', value: 'b' }
   ]
 }, {
   type: 'dynamic-field',

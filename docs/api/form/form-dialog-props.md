@@ -2,60 +2,66 @@
 
 ## config
 
-- **详情：**  表单配置
+- **详情：** 表单配置
 
 - **默认值：** `[]`
 
-- **类型：** [FormConfig](https://github.com/Tencent/tmagic-editor/blob/c143a5f7670ae61d80c1a2cfcc780cfb5259849d/packages/form/src/schema.ts#L706)
+- **类型：** [FormConfig](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L864)
 
 - **示例：**
-  
+
 ```html
 <template>
   <m-form-dialog :config="config"></m-form-dialog>
 </template>
 
 <script setup>
-import { ref } from 'Vue';
+  import { ref } from "Vue";
 
-const config = ref([
-  {
-    name: 'text',
-    text: '文本',
-  },
-  {
-    name: 'multiple',
-    text: '多行文本',
-    type: 'switch',
-  },
-]);
+  const config = ref([
+    {
+      name: "text",
+      text: "文本",
+    },
+    {
+      name: "multiple",
+      text: "多行文本",
+      type: "switch",
+    },
+  ]);
 </script>
 ```
 
 ## values
 
-- **详情：**  表单初始化值
+- **详情：** 表单初始化值
 
 - **默认值：** `{}`
 
 - **类型：** `Object`
 
 - **示例：**
-  
+
 ```html
 <template>
   <m-form-dialog :values="values"></m-form-dialog>
 </template>
 
 <script setup>
-import { ref } from 'Vue';
+  import { ref } from 'Vue';
 
-const values = ref([
-  text: 'text',
-  multiply: true,
-]);
+  const values = ref([
+    text: 'text',
+    multiply: true,
+  ]);
 </script>
 ```
+
+## parentValues
+
+- **详情：** 父级表单值，会透传给内部 Form 组件
+
+- **类型：** `Object`
 
 ## width
 
@@ -65,29 +71,46 @@ const values = ref([
 
 ## labelWidth
 
-- **详情：** 
+- **详情：**
 
-表单域标签的宽度，例如 '50px'。 作为 Form 直接子元素的 form-item 会继承该值。 支持 auto
+表单域标签的宽度，例如 '50px'。 作为 Form 直接子元素的 form-item 会继承该值。 支持 auto。
 
 - **默认值：** `'200px'`
 
-- **类型：** `string | number`
+- **类型：** `string`
 
 ## fullscreen
 
-- **详情：** 弹出是否全屏
-  
+- **详情：** 是否全屏。
 - **默认值：** false
 
-- **类型：** boolean
+- **类型：** `boolean`
 
 ## disabled
 
-- **详情：** 是否禁用该表单内的所有组件。 若设置为 true，则表单内组件上的 disabled 属性不再生效
+- **详情：** 是否禁用该表单内的所有组件。 若设置为 true，则表单内组件上的 disabled 属性不再生效。
 
 - **默认值：** false
 
-- **类型：**  `boolean`
+- **类型：** `boolean`
+
+## inline
+
+- **详情：** 行内表单模式
+
+- **类型：** `boolean`
+
+## labelPosition
+
+- **详情：** 表单域标签的位置， 当设置为 left 或 right 时，则也需要设置 label-width 属性
+
+- **类型：** `string`
+
+## zIndex
+
+- **详情：** 弹窗的 z-index
+
+- **类型：** `number`
 
 ## title
 
@@ -108,3 +131,49 @@ const values = ref([
 - **默认值：** `'确定'`
 
 - **类型：** `string`
+
+## preventSubmitDefault
+
+- **详情：** 是否阻止内部 Form 原生 submit 事件的默认行为
+
+- **类型：** `boolean`
+
+## closeOnClickModal
+
+- **详情：** 是否可以通过点击 modal 关闭 Dialog
+
+- **默认值：** `false`
+
+- **类型：** `boolean`
+
+## closeOnPressEscape
+
+- **详情：** 是否可以通过按下 ESC 关闭 Dialog
+
+- **默认值：** `false`
+
+- **类型：** `boolean`
+
+## destroyOnClose
+
+- **详情：** 关闭时销毁 Dialog 中的元素
+
+- **默认值：** `false`
+
+- **类型：** `boolean`
+
+## showClose
+
+- **详情：** 是否显示关闭按钮
+
+- **默认值：** `true`
+
+- **类型：** `boolean`
+
+## showCancel
+
+- **详情：** 是否显示底部取消按钮
+
+- **默认值：** `true`
+
+- **类型：** `boolean`

@@ -13,7 +13,7 @@ $ pnpm create tmagic
 ```
 :::
 
-按照提示操作可以创建`6`中项目：
+按照提示操作可以创建`6`种项目：
 
 * runtime:运行时（DSL渲染）
 * admin-client:管理端（编辑器）
@@ -75,7 +75,6 @@ const app = createApp(App);
 app.use(ElementPlus, {
   locale: zhCn,
 });
-app.use(router);
 app.use(editorPlugin, MagicElementPlusAdapter);
 app.mount('#app');
 ```
@@ -166,7 +165,7 @@ app.mount('#app');
 
 关于 [@tmagic/editor](https://github.com/Tencent/tmagic-editor/tree/master/packages/editor) 组件，更多的属性配置详情请参考[编辑器 API](../api/editor/props.md)。
 
-其中，**有四个需要注意的属性配置项**：`runtimeUrl` `values` `configs` `componentGroupList`。这是能让我们的编辑器正常运行的关键。
+其中，**有四个需要注意的属性配置项**：`runtimeUrl` `propsValues` `propsConfigs` `componentGroupList`。这是能让我们的编辑器正常运行的关键。
 
 :::tip
 如果出现```Preprocessor dependency "sass" not found. Did you install it?```，那么需要install sass

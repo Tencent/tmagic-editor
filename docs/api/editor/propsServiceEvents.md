@@ -4,4 +4,4 @@
 
 - **详情：** [propsService.setPropsConfigs()](./propsServiceMethods.md#setPropsConfigs)后触发
 
-- **回调函数：** () => void
+- **事件回调函数：** () => void

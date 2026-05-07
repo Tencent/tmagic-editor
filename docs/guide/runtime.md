@@ -25,5 +25,5 @@ page用于生产环境
 playground用于编辑器中
 
 :::tip
-想要了解DSL的解析以及runtime与编辑器的通信，可以前往[教程](/guide/tutorial/index.md)
+想要了解DSL的解析以及runtime与编辑器的通信，可以前往[教程](/guide/tutorial/)
 :::

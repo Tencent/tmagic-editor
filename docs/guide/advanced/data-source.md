@@ -59,7 +59,7 @@ formConfig.js
 ```js
 [
   {
-    type: 'data-source-filed-select'
+    type: 'data-source-field-select'
   }
 ]
 ```

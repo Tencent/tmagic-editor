@@ -24,6 +24,7 @@
   - `stageRect`: 画布尺寸
   - `columnWidth`: 列宽度配置
   - `showGuides`: 是否显示参考线
+  - `hasGuides`: 画布上是否存在参考线
   - `showRule`: 是否显示标尺
   - `propsPanelSize`: 属性面板尺寸
   - `showAddPageButton`: 是否显示添加页面按钮

@@ -25,24 +25,31 @@ new Page(options: PageOptions)
 ### initNode
 
 - **参数：**
-  - `{MNode} config` 节点配置
-  - `{Node} parent` 父节点（可选）
+  - `{MComponent | MContainer} config` 节点配置
+  - `{Node} parent` 父节点
 
 - **返回：**
-  - `{Node}`
+  - `{void}`
 
 - **详情：**
 
-  初始化节点，根据配置创建节点实例并添加到页面。会递归初始化子节点。
+  初始化节点，根据配置创建节点实例并通过 `setNode` 添加到页面：
+
+  - 当节点类型属于 `app.iteratorContainerType` 时，会创建 `IteratorContainer` 并直接返回，**不会**继续递归 `config.items`（迭代容器内的子节点由 `IteratorContainer` 自身在每次迭代时按需初始化）。
+  - 当属于 `app.pageFragmentContainerType` 且配置了 `pageFragmentId` 时，会在 `app.pageFragments` 中创建对应的页面片段实例。
+  - 其他类型会创建普通节点后递归初始化 `config.items` 子节点。
 
 - **示例：**
 
 ```typescript
-const node = page.initNode({
-  id: 'button_1',
-  type: 'button',
-  style: { width: 100 }
-});
+page.initNode(
+  {
+    id: 'button_1',
+    type: 'button',
+    style: { width: 100 }
+  },
+  page,
+);
 ```
 
 ### getNode

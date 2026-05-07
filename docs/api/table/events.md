@@ -20,15 +20,30 @@
 ## after-action
 
 - **参数：**
-  - `action: string` - 操作类型
-  - `data: any` - 操作相关数据
+  - `payload: { index: number }` - 触发动作所在行的索引
 
-- **说明：** 表格操作完成后触发
+- **说明：** 表格行的编辑型动作（如 actions 中 `type: 'edit'` 的保存）执行结束后触发。
+
+  注意：`ActionsColumn` 在 handler 返回值为「假值」（如 `undefined`/`null`/未返回）时同样会派发该事件；**仅当**返回值为对象且 `res.ret !== 0` 时才视为失败、不派发。如果业务需要严格在「业务接口成功」后再处理，应在 handler 内显式 `return { ret: 0 }` 并在监听处自行判断 `res.ret`。
 
 - **示例：**
   ```js
-  const handleAfterAction = (action, data) => {
-    console.log('操作完成:', action, data);
+  const handleAfterAction = ({ index }) => {
+    console.log('操作完成，行索引:', index);
+  };
+  ```
+
+## after-action-cancel
+
+- **参数：**
+  - `payload: { index: number }` - 触发动作所在行的索引
+
+- **说明：** 表格行的编辑型动作被取消后触发
+
+- **示例：**
+  ```js
+  const handleAfterActionCancel = ({ index }) => {
+    console.log('操作取消，行索引:', index);
   };
   ```
 

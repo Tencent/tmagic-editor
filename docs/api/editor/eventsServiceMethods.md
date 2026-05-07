@@ -1,48 +1,5 @@
 # eventsService方法
 
-## init
-
-- **参数：**
-
-  - {Record<string, { events: [EventOption](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/core/src/events.ts#L26-L29)[]; methods: [EventOption](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/core/src/events.ts#L26-L29)[] }>} eventMethodList 事件方法列表配置
-
-- **返回：**
-
-  - `{void}`
-
-- **详情：**
-
-  初始化事件服务，设置所有组件的事件和方法列表
-
-  :::tip
-  该方法通常由编辑器内部调用，开发者可以通过 [m-editor 的 eventMethodList prop](./props.md#eventmethodlist) 来配置
-  :::
-
-- **示例：**
-
-```js
-import { eventsService } from '@tmagic/editor';
-
-eventsService.init({
-  page: {
-    events: [
-      { label: '页面加载', value: 'load' },
-      { label: '页面卸载', value: 'unload' },
-    ],
-    methods: [
-      { label: '刷新', value: 'refresh' },
-      { label: '返回', value: 'back' },
-    ],
-  },
-  button: {
-    events: [
-      { label: '点击', value: 'click' },
-    ],
-    methods: [],
-  },
-});
-```
-
 ## setEvents
 
 - **参数：**
@@ -185,6 +142,7 @@ eventsService.setMethod('video', [
 - **参数：**
 
   - `{string}` type 组件类型
+  - `{string | number}` _targetId 目标节点id（保留参数，便于扩展时按节点定制）
 
 - **返回：**
 
@@ -199,7 +157,7 @@ eventsService.setMethod('video', [
 ```js
 import { eventsService } from '@tmagic/editor';
 
-const methods = eventsService.getMethod('video');
+const methods = eventsService.getMethod('video', 'video_123');
 console.log(methods); // [{ label: '播放', value: 'play' }, ...]
 ```
 

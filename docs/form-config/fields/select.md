@@ -16,11 +16,12 @@
     { text: '选项2', value: 2 }
   ]
 }]">
-  <template #source>
-    <p>
-      type为'select'
-    </p>
-  </template>
+<template #source>
+
+<p>
+type为'select'
+</p>
+</template>
 </demo-block>
 
 ## 有禁用选项
@@ -35,11 +36,12 @@
     { text: '选项2', value: 2, disabled: true }
   ]
 }]">
-  <template #source>
-    <p>
-      在 opitons 选项配置中，设定 disabled 值为 true，即可禁用该选项
-    </p>
-  </template>
+<template #source>
+
+<p>
+在 options 选项配置中，设定 disabled 值为 true，即可禁用该选项
+</p>
+</template>
 </demo-block>
 
 ## 禁用状态
@@ -57,11 +59,12 @@
     { text: '选项2', value: 2 }
   ]
 }]">
-  <template #source>
-    <p>
-      为 el-select 设置 disabled 属性，则整个选择器不可用
-    </p>
-  </template>
+<template #source>
+
+<p>
+为 el-select 设置 disabled 属性，则整个选择器不可用
+</p>
+</template>
 </demo-block>
 
 ## 基础多选
@@ -110,11 +113,12 @@
     }
   ]
 }]">
-  <template #source>
-    <p>
-      配置group为true
-    </p>
-  </template>
+<template #source>
+
+<p>
+配置group为true
+</p>
+</template>
 </demo-block>
 
 ## 创建条目
@@ -155,19 +159,21 @@
     value: option => `${option.id}`,
   }
 }]">
-  <template #source>
-    <p>
-      配置remote为true，然后配置option，而不是options
-    </p>
-  </template>
+<template #source>
+
+<p>
+配置remote为true，然后配置option，而不是options
+</p>
+</template>
 </demo-block>
 
 同时在 `src/main.ts` 中需要自定义实现请求
-```typescript 
+
+```typescript
 app.use(MagicForm, {
-      request: async (options: any) =>  {
-           // 自定义请求实现
-      },
+  request: async (options: any) => {
+    // 自定义请求实现
+  },
 });
 ```
 
@@ -176,34 +182,37 @@ app.use(MagicForm, {
 :::
 
 ## Select Attributes
-| 参数      | 说明          | 类型      | 可选值                           | 默认值  |
-|---------- |-------------- |---------- |--------------------------------  |-------- |
-| name | 绑定值 | string | — | — |
-| placeholder  | 输入框占位文本   | string |       —        |      —   |
-| text     | 表单标签   | string |       —        |      —   |
-| disabled  | 是否禁用    | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | false   |
-| multiple | 是否多选 | boolean | — | false |
-| valueKey | 作为 value 唯一标识的键名，绑定值为对象类型时必填 | string | — | value |
-| allowCreate | 是否允许用户创建新条目 | boolean | — | false |
-| remote | 是否为远程搜索 | boolean | — | false |
-| group | 是否选择分组 | boolean | — | false |
-| onChange  | 值变化时触发的函数  | [OnChangeHandler ](https://github.com/Tencent/tmagic-editor/blob/master/packages/form/src/schema.ts)   | — | -   |
-| options  | 选项  | Array   | — | -   |
-| option  | 选项  | Object   | — | -   |
+
+| 参数        | 说明                                              | 类型                                                                                                                                                     | 可选值 | 默认值 |
+| ----------- | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------ |
+| name        | 绑定值                                            | string                                                                                                                                                   | —      | —      |
+| placeholder | 输入框占位文本                                    | string                                                                                                                                                   | —      | —      |
+| text        | 表单标签                                          | string                                                                                                                                                   | —      | —      |
+| disabled    | 是否禁用                                          | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L195) | —      | false  |
+| multiple    | 是否多选                                          | boolean                                                                                                                                                  | —      | false  |
+| valueKey    | 作为 value 唯一标识的键名，绑定值为对象类型时必填 | string                                                                                                                                                   | —      | value  |
+| allowCreate | 是否允许用户创建新条目                            | boolean                                                                                                                                                  | —      | false  |
+| remote      | 是否为远程搜索                                    | boolean                                                                                                                                                  | —      | false  |
+| group       | 是否选择分组                                      | boolean                                                                                                                                                  | —      | false  |
+| onChange    | 值变化时触发的函数                                | [OnChangeHandler ](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L90)          | —      | -      |
+| options     | 选项                                              | Array                                                                                                                                                    | —      | -      |
+| option      | 选项                                              | Object                                                                                                                                                   | —      | -      |
 
 ## options item
-| 参数      | 说明          | 类型      | 可选值                           | 默认值  |
-|---------- |-------------- |---------- |--------------------------------  |-------- |
-| text |  | 选项的标签 | string/number/object | — | — |
-| value | 选项的值	 | string | — | — |
-| disabled  | 是否禁用    | boolean | — | false   |
-| label |  string | — | — | — |
-| options | Array | — | — | — |
+
+| 参数     | 说明     | 类型       | 可选值               | 默认值 |
+| -------- | -------- | ---------- | -------------------- | ------ | --- |
+| text     |          | 选项的标签 | string/number/object | —      | —   |
+| value    | 选项的值 | string     | —                    | —      |
+| disabled | 是否禁用 | boolean    | —                    | false  |
+| label    | string   | —          | —                    | —      |
+| options  | Array    | —          | —                    | —      |
 
 ## option
-| 参数      | 说明          | 类型      | 可选值                           | 默认值  |
-|---------- |-------------- |---------- |--------------------------------  |-------- |
-| url | string | — | — | — |
-| root | string | — | — | — |
-| text | string / Function | — | — | — |
-| value | string / Function | — | — | — |
+
+| 参数  | 说明              | 类型 | 可选值 | 默认值 |
+| ----- | ----------------- | ---- | ------ | ------ |
+| url   | string            | —    | —      | —      |
+| root  | string            | —    | —      | —      |
+| text  | string / Function | —    | —      | —      |
+| value | string / Function | —    | —      | —      |

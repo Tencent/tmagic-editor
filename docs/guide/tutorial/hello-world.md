@@ -162,11 +162,13 @@ const value = ref({
 
 加上初始值后，点击新增页面就可以渲染出一个画布了，但是点击添加HelloWorld组件依然没有反应
 
-这是因为这时的编辑器并能理解HelloWorld是什么，需要在[render](../../api/editor/props.html#render)函数中处理
+这是因为这时的编辑器并不能理解HelloWorld是什么，需要在[render](../../api/editor/props.html#render)函数中处理
 
 ## 渲染
 
 api详情：[render](../../api/editor/props.md#render)
+
+> 以下片段省略了 `page` 的获取与完整定义，仅展示渲染思路；完整示例见下文「最终完整的render函数实现」。
 
 ```ts
 const render = () => {
@@ -279,10 +281,10 @@ const render = async ({ renderer }: StageCore) => {
 };
 ```
 
-以上就是一个简单的搭建编辑器的示例，安装上面的步骤完成后会发现，可以添加组件，也可选中组件，但是无法拖动，配置属性中的样式也无法生效，这是因为上述的render函数并不完整，没有处理dsl中style，下一节将详细介绍runtime的搭建，将不再使用render函数的方式而是使用[runtimeUrl](../../api/editor/props.md#runtimeurl)。
+以上就是一个简单的搭建编辑器的示例，按照上面的步骤完成后会发现，可以添加组件，也可选中组件，但是无法拖动，配置属性中的样式也无法生效，这是因为上述的render函数并不完整，没有处理dsl中style，下一节将详细介绍runtime的搭建，将不再使用render函数的方式而是使用[runtimeUrl](../../api/editor/props.md#runtimeurl)。
 
 ::: tip
-并不是render函数不好，但是从设计上将，render函数还是让渲染逻辑落到了编辑器中，@tmagic/editor的设计是希望做到渲染跟编辑器解耦
+并不是render函数不好，但是从设计上讲，render函数还是让渲染逻辑落到了编辑器中，@tmagic/editor的设计是希望做到渲染跟编辑器解耦
 :::
 
 [源码](https://github.com/vft-magic/tmagic-tutorial)
