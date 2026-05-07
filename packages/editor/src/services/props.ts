@@ -117,9 +117,9 @@ class Props extends BaseService {
    * @param type 组件类型
    * @returns 组件属性表单配置
    */
-  public async getPropsConfig(type: string): Promise<FormConfig> {
+  public async getPropsConfig(type: string, data?: { node?: MNode | null }): Promise<FormConfig> {
     if (type === 'area') {
-      return await this.getPropsConfig('button');
+      return await this.getPropsConfig('button', data);
     }
 
     return cloneDeep(this.state.propsConfigMap[toLine(type)] || (await this.fillConfig([])));

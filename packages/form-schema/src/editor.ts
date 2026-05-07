@@ -66,7 +66,7 @@ export interface CodeSelectColConfig extends FormItem {
 }
 
 export interface CondOpSelectConfig extends FormItem {
-  type: 'cond-op';
+  type: 'cond-op-select';
   parentFields?: string[];
 }
 

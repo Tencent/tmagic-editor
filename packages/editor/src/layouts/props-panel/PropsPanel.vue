@@ -115,7 +115,7 @@ const init = async () => {
   }
 
   const type = node.value.type || (node.value.items ? 'container' : 'text');
-  curFormConfig.value = await propsService.getPropsConfig(type);
+  curFormConfig.value = await propsService.getPropsConfig(type, { node: node.value });
   values.value = node.value;
 };
 
