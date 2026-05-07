@@ -3,4 +3,28 @@
   left: 5px;
   top: 5px;
   z-index: 10;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+
+  .m-editor-breadcrumb-item {
+    max-width: 100px;
+    min-width: 0;
+    overflow: hidden;
+
+    // Element Plus button 内部文本节点
+    > span {
+      display: block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .m-editor-breadcrumb-separator,
+  .m-editor-breadcrumb-ellipsis {
+    margin: 0 4px;
+    flex-shrink: 0;
+  }
 }
