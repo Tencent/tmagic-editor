@@ -150,7 +150,7 @@ const closeHandler = () => {
 
 const save = async () => {
   try {
-    const changeRecords = form.value?.changeRecords;
+    const changeRecords = [...(form.value?.changeRecords || [])];
     const values = await form.value?.submitForm();
     emit('submit', values, { changeRecords });
   } catch (e) {
