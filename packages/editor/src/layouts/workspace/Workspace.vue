@@ -9,7 +9,9 @@
         :disabled-stage-overlay="disabledStageOverlay"
         :stage-content-menu="stageContentMenu"
         :custom-content-menu="customContentMenu"
-      ></MagicStage>
+      >
+        <template #stage-top><slot name="stage-top"></slot></template>
+      </MagicStage>
     </slot>
 
     <slot name="workspace-content"></slot>

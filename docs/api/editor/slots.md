@@ -270,6 +270,28 @@
 
 - **默认：** [Stage.vue](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/editor/src/layouts/workspace/Stage.vue)
 
+## stage-top
+
+- **详情：** 画布上方位置，与画布共享同一个滚动容器，渲染在画布之前，可用于在画布顶部插入自定义元素，例如顶部工具条、提示信息等
+
+- **默认：** 无
+
+:::warning
+如设置了[stage](#stage)插槽，此插槽将失效
+:::
+
+- **示例：**
+
+```html
+<template>
+  <m-editor>
+    <template #stage-top>
+      <div class="custom-stage-top">画布顶部自定义内容</div>
+    </template>
+  </m-editor>
+</template>
+```
+
 ## workspace-content
 
 - **详情：** 编辑器中间区域内，画布上方位置

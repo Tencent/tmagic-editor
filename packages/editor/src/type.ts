@@ -73,7 +73,17 @@ export interface FrameworkSlots {
   'page-list-popover'(props: { list: (MPage | MPageFragment)[] }): any;
 }
 
-export interface WorkspaceSlots {
+export interface ScrollViewerSlots {
+  before(props: {}): any;
+  content(props: {}): any;
+  default(props: {}): any;
+}
+
+export interface StageSlots extends ScrollViewerSlots {
+  'stage-top'(props: {}): any;
+}
+
+export interface WorkspaceSlots extends StageSlots {
   stage(props: {}): any;
   'workspace-content'(props: {}): any;
 }

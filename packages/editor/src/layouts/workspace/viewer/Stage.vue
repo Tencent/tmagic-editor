@@ -27,6 +27,10 @@
 
     <NodeListMenu></NodeListMenu>
 
+    <template #before>
+      <slot name="stage-top"></slot>
+    </template>
+
     <template #content>
       <StageOverlay v-if="!disabledStageOverlay"></StageOverlay>
 
@@ -52,7 +56,7 @@ import { calcValueByFontsize, getIdFromEl } from '@tmagic/utils';
 import ScrollViewer from '@editor/components/ScrollViewer.vue';
 import { useServices } from '@editor/hooks';
 import { useStage } from '@editor/hooks/use-stage';
-import type { CustomContentMenuFunction, MenuButton, MenuComponent, StageOptions } from '@editor/type';
+import type { CustomContentMenuFunction, MenuButton, MenuComponent, StageOptions, StageSlots } from '@editor/type';
 import { DragType, Layout } from '@editor/type';
 import { getEditorConfig } from '@editor/utils/config';
 import { KeyBindingContainerKey } from '@editor/utils/keybinding-config';
@@ -64,6 +68,8 @@ import ViewerMenu from './ViewerMenu.vue';
 defineOptions({
   name: 'MEditorStage',
 });
+
+defineSlots<StageSlots>();
 
 const props = withDefaults(
   defineProps<{

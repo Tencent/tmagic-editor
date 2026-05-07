@@ -1,6 +1,7 @@
 <template>
   <div class="m-editor-scroll-viewer-container" ref="container">
     <div ref="target" :style="style">
+      <slot name="before"></slot>
       <slot></slot>
     </div>
 
@@ -29,7 +30,7 @@ import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from
 
 import { isNumber } from '@tmagic/utils';
 
-import type { ScrollViewerEvent } from '@editor/type';
+import type { ScrollViewerEvent, ScrollViewerSlots } from '@editor/type';
 import { ScrollViewer } from '@editor/utils/scroll-viewer';
 
 import ScrollBar from './ScrollBar.vue';
@@ -37,6 +38,8 @@ import ScrollBar from './ScrollBar.vue';
 defineOptions({
   name: 'MEditorScrollViewer',
 });
+
+defineSlots<ScrollViewerSlots>();
 
 const props = withDefaults(
   defineProps<{

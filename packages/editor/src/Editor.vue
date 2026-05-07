@@ -86,6 +86,7 @@
           :stage-content-menu="stageContentMenu"
           :custom-content-menu="customContentMenu"
         >
+          <template #stage-top><slot name="stage-top"></slot></template>
           <template #stage><slot name="stage"></slot></template>
           <template #workspace-content><slot name="workspace-content" :editorService="editorService"></slot></template>
         </Workspace>
