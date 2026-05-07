@@ -8,6 +8,7 @@
         :indent="indent"
         :next-level-indent-increment="nextLevelIndentIncrement"
         :node-status-map="nodeStatusMap"
+        :is-expandable="isExpandable"
       >
         <template #tree-node-content="{ data: nodeData }">
           <slot name="tree-node-content" :data="nodeData"> </slot>
@@ -33,7 +34,7 @@ import { provide } from 'vue';
 
 import type { Id } from '@tmagic/core';
 
-import type { LayerNodeStatus, TreeNodeData } from '@editor/type';
+import type { IsExpandableFunction, LayerNodeStatus, TreeNodeData } from '@editor/type';
 
 import TreeNode from './TreeNode.vue';
 
@@ -66,6 +67,8 @@ withDefaults(
     indent?: number;
     nextLevelIndentIncrement?: number;
     emptyText?: string;
+    /** 自定义判断节点是否可展开（即是否要展示为拥有子节点的形态）的函数 */
+    isExpandable?: IsExpandableFunction;
   }>(),
   {
     indent: 0,

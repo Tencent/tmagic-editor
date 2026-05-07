@@ -669,6 +669,9 @@ export interface TreeNodeData {
   [key: string]: any;
 }
 
+/** 判断组件树节点是否可展开（即是否要展示为拥有子节点的形态）的函数 */
+export type IsExpandableFunction = (_data: TreeNodeData, _nodeStatusMap: Map<Id, LayerNodeStatus>) => boolean;
+
 export type AsyncBeforeHook<Value extends Array<string>, C extends Record<Value[number], (...args: any) => any>> = {
   [K in Value[number]]?: (...args: Parameters<C[K]>) => Promise<Parameters<C[K]>> | Parameters<C[K]>;
 };

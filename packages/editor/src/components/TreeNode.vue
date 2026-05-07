@@ -20,7 +20,7 @@
     >
       <MIcon
         class="expand-icon"
-        :style="hasChildren ? '' : 'color: transparent; cursor: default'"
+        :style="isExpandable(data, nodeStatusMap) ? '' : 'color: transparent; cursor: default'"
         :icon="expanded ? ArrowDown : ArrowRight"
         @click="expandHandler"
       ></MIcon>
@@ -37,7 +37,7 @@
       </div>
     </div>
 
-    <div v-if="hasChildren && expanded" class="m-editor-tree-node-children">
+    <div v-if="isExpandable(data, nodeStatusMap) && expanded" class="m-editor-tree-node-children">
       <TreeNode
         v-for="item in data.items"
         :key="item.id"
@@ -46,6 +46,7 @@
         :parentsId="[...parentsId, data.id]"
         :node-status-map="nodeStatusMap"
         :indent="indent + nextLevelIndentIncrement"
+        :is-expandable="isExpandable"
       >
         <template #tree-node-content="{ data: nodeData }">
           <slot name="tree-node-content" :data="nodeData"> </slot>
@@ -68,8 +69,8 @@ import { ArrowDown, ArrowRight } from '@element-plus/icons-vue';
 import type { Id } from '@tmagic/core';
 
 import MIcon from '@editor/components/Icon.vue';
-import type { LayerNodeStatus, TreeNodeData } from '@editor/type';
-import { updateStatus } from '@editor/utils/tree';
+import type { IsExpandableFunction, LayerNodeStatus, TreeNodeData } from '@editor/type';
+import { defaultIsExpandable, updateStatus } from '@editor/utils/tree';
 
 defineSlots<{
   'tree-node-label'(_props: { data: TreeNodeData }): any;
@@ -100,11 +101,14 @@ const props = withDefaults(
     nodeStatusMap: Map<Id, LayerNodeStatus>;
     indent?: number;
     nextLevelIndentIncrement?: number;
+    /** 自定义判断节点是否可展开（即是否要展示为拥有子节点的形态）的函数 */
+    isExpandable?: IsExpandableFunction;
   }>(),
   {
     indent: 0,
     nextLevelIndentIncrement: 11,
     parentsId: () => [],
+    isExpandable: defaultIsExpandable,
   },
 );
 
@@ -122,10 +126,6 @@ const expanded = computed(() => nodeStatus.value.expand);
 const selected = computed(() => nodeStatus.value.selected);
 const visible = computed(() => nodeStatus.value.visible);
 const draggable = computed(() => nodeStatus.value.draggable);
-
-const hasChildren = computed(
-  () => Array.isArray(props.data.items) && props.data.items.some((item) => props.nodeStatusMap.get(item.id)?.visible),
-);
 
 const handleDragStart = (event: DragEvent) => {
   treeEmit?.('node-dragstart', event, props.data);

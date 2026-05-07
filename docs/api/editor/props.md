@@ -1171,6 +1171,46 @@ const customContentMenu = (menus, { node }) => {
 </script>
 ```
 
+## layerNodeIsExpandable
+
+- **详情：**
+
+  用于自定义判断"已选组件"面板中组件树节点是否可展开（即是否要展示为拥有子节点的形态）
+
+  该函数返回 `true` 时，节点会显示展开图标，并在展开后渲染子节点容器；返回 `false` 时，展开图标显示为透明占位，且不渲染子节点容器
+
+  默认行为：当节点的 `items` 中至少存在一个 `visible` 状态为 `true` 的子节点时认为可展开（被搜索过滤隐藏的子节点不会让父节点显示为可展开）
+
+- **默认值：** `defaultIsExpandable`
+
+- **类型：** `(data: TreeNodeData, nodeStatusMap: Map<Id, LayerNodeStatus>) => boolean`
+
+- **示例：**
+
+```html
+<template>
+  <m-editor :layer-node-is-expandable="layerNodeIsExpandable"></m-editor>
+</template>
+
+<script setup>
+import { defaultIsExpandable } from '@tmagic/editor';
+
+// 即使没有可见子节点，特定类型的容器节点也保持展开图标可见
+const layerNodeIsExpandable = (data, nodeStatusMap) => {
+  if (data.type === 'my-special-container') {
+    return true;
+  }
+  return defaultIsExpandable(data, nodeStatusMap);
+};
+</script>
+```
+
+::: tip
+该函数仅作用于"已选组件"面板的组件树节点，不影响代码块、数据源等其它面板内的树。
+
+第三方业务可从 `@tmagic/editor` 直接导入 `defaultIsExpandable` 复用默认逻辑作为兜底。
+:::
+
 ## extendFormState
 
 - **详情：**

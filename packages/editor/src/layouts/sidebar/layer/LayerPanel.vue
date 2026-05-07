@@ -12,6 +12,7 @@
       :node-status-map="nodeStatusMap"
       :indent="indent"
       :next-level-indent-increment="nextLevelIndentIncrement"
+      :is-expandable="isExpandable"
       @node-dragover="handleDragOver"
       @node-dragstart="handleDragStart"
       @node-dragleave="handleDragLeave"
@@ -56,7 +57,14 @@ import SearchInput from '@editor/components/SearchInput.vue';
 import Tree from '@editor/components/Tree.vue';
 import { useFilter } from '@editor/hooks/use-filter';
 import { useServices } from '@editor/hooks/use-services';
-import type { CustomContentMenuFunction, LayerPanelSlots, MenuButton, MenuComponent, TreeNodeData } from '@editor/type';
+import type {
+  CustomContentMenuFunction,
+  IsExpandableFunction,
+  LayerPanelSlots,
+  MenuButton,
+  MenuComponent,
+  TreeNodeData,
+} from '@editor/type';
 
 import LayerMenu from './LayerMenu.vue';
 import LayerNodeTool from './LayerNodeTool.vue';
@@ -76,6 +84,8 @@ defineProps<{
   indent?: number;
   nextLevelIndentIncrement?: number;
   customContentMenu: CustomContentMenuFunction;
+  /** 自定义判断组件树节点是否可展开（即是否要展示为拥有子节点的形态）的函数 */
+  isExpandable?: IsExpandableFunction;
 }>();
 
 const services = useServices();

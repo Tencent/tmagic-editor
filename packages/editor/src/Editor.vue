@@ -26,6 +26,7 @@
           :custom-content-menu="customContentMenu"
           :indent="treeIndent"
           :next-level-indent-increment="treeNextLevelIndentIncrement"
+          :layer-node-is-expandable="layerNodeIsExpandable"
         >
           <template #layer-panel-header>
             <slot name="layer-panel-header"></slot>

@@ -164,6 +164,7 @@ import { useServices } from '@editor/hooks/use-services';
 import {
   ColumnLayout,
   CustomContentMenuFunction,
+  type IsExpandableFunction,
   type MenuButton,
   type MenuComponent,
   type SideBarData,
@@ -191,6 +192,8 @@ const props = withDefaults(
     indent?: number;
     nextLevelIndentIncrement?: number;
     customContentMenu: CustomContentMenuFunction;
+    /** 自定义判断组件树节点是否可展开（即是否要展示为拥有子节点的形态）的函数 */
+    layerNodeIsExpandable?: IsExpandableFunction;
   }>(),
   {
     data: () => ({
@@ -248,6 +251,7 @@ const getItemConfig = (data: SideItem): SideComponent => {
         customContentMenu: props.customContentMenu,
         indent: props.indent,
         nextLevelIndentIncrement: props.nextLevelIndentIncrement,
+        isExpandable: props.layerNodeIsExpandable,
       },
       component: LayerPanel,
       slots: {},
