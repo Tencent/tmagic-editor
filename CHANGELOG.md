@@ -1,3 +1,20 @@
+## [1.7.13-beta.0](https://github.com/Tencent/tmagic-editor/compare/v1.7.13...v1.7.13-beta.0) (2026-05-08)
+
+
+### Bug Fixes
+
+* **form:** form-dialog save 时浅拷贝 changeRecords 避免引用被污染 ([c9cef3e](https://github.com/Tencent/tmagic-editor/commit/c9cef3e20cd3d54c5a1492fed5d2f15aad3cb4a1))
+
+
+### Features
+
+* **editor:** getPropsConfig 支持传入 node 参数并修正 CondOpSelectConfig 类型 ([a520626](https://github.com/Tencent/tmagic-editor/commit/a520626ef694299ce19a72243c967389774d3789))
+* **editor:** 支持自定义组件树节点是否可展开的判断函数 ([3cde69f](https://github.com/Tencent/tmagic-editor/commit/3cde69f6f96b6829fa8505511bfd706b4d4df2ff))
+* **editor:** 新增 stage-top 插槽用于在画布上方插入自定义元素 ([7ce6406](https://github.com/Tencent/tmagic-editor/commit/7ce640627df62377d8340f267ecb74fa1ef3ddbc))
+* **editor:** 面包屑超出父容器 80% 时折叠中间项并对单项打点 ([7b870e5](https://github.com/Tencent/tmagic-editor/commit/7b870e5908280ff0e25abc278a1c212015d603c3))
+
+
+
 ## [1.7.13](https://github.com/Tencent/tmagic-editor/compare/v1.7.12...v1.7.13) (2026-04-29)
 
 
