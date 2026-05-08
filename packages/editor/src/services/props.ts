@@ -93,6 +93,10 @@ class Props extends BaseService {
     this.emit('props-configs-change');
   }
 
+  public getPropsConfigs(): Record<string, FormConfig> {
+    return this.state.propsConfigMap;
+  }
+
   public async fillConfig(config: FormConfig, labelWidth?: string) {
     return fillConfig(config, {
       labelWidth: typeof labelWidth !== 'function' ? labelWidth : '80px',
@@ -125,10 +129,18 @@ class Props extends BaseService {
     return cloneDeep(this.state.propsConfigMap[toLine(type)] || (await this.fillConfig([])));
   }
 
+  public hasPropsConfig(type: string): boolean {
+    return !!this.state.propsConfigMap[toLine(type)];
+  }
+
   public setPropsValues(values: Record<string, Partial<MNode> | PropsFormValueFunction>) {
     Object.keys(values).forEach((type: string) => {
       this.setPropsValue(toLine(type), values[type]);
     });
+  }
+
+  public getPropsValues(): Record<string, Partial<MNode>> {
+    return this.state.propsValueMap;
   }
 
   /**
@@ -176,6 +188,10 @@ class Props extends BaseService {
       ...defaultPropsValue,
       ...mergeWith({}, cloneDeep(this.state.propsValueMap[type] || {}), data),
     };
+  }
+
+  public hasPropsValue(type: string): boolean {
+    return !!this.state.propsValueMap[toLine(type)];
   }
 
   public createId(type: string | number): string {
