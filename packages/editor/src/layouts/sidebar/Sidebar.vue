@@ -173,6 +173,7 @@ import {
   type SideComponent,
   type SideItem,
   SideItemKey,
+  type TreeNodeData,
 } from '@editor/type';
 
 import CodeBlockListPanel from './code-block/CodeBlockListPanel.vue';
@@ -186,6 +187,10 @@ defineOptions({
   name: 'MEditorSidebar',
 });
 
+const emit = defineEmits<{
+  'layer-node-dblclick': [event: MouseEvent, data: TreeNodeData];
+}>();
+
 const props = withDefaults(
   defineProps<{
     data?: SideBarData;
@@ -197,6 +202,8 @@ const props = withDefaults(
     layerNodeIsExpandable?: IsExpandableFunction;
     /** 自定义判断当前正在拖动的源是否可以拖入目标节点内部，详见 EditorProps.canDropIn */
     canDropIn?: CanDropInFunction;
+    /** 组件树节点双击前的钩子函数，返回 false 则阻止默认的双击行为 */
+    beforeLayerNodeDblclick?: (_event: MouseEvent, _data: TreeNodeData) => Promise<boolean | void> | boolean | void;
   }>(),
   {
     data: () => ({
@@ -256,6 +263,10 @@ const getItemConfig = (data: SideItem): SideComponent => {
         nextLevelIndentIncrement: props.nextLevelIndentIncrement,
         isExpandable: props.layerNodeIsExpandable,
         canDropIn: props.canDropIn,
+        beforeNodeDblclick: props.beforeLayerNodeDblclick,
+      },
+      listeners: {
+        'node-dblclick': (event: MouseEvent, nodeData: TreeNodeData) => emit('layer-node-dblclick', event, nodeData),
       },
       component: LayerPanel,
       slots: {},

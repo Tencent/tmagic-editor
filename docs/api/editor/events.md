@@ -31,3 +31,25 @@
 - **事件回调函数：** (e: any) => void
 
   注意：`Editor.vue` 中该 emit 的类型签名为 `[e: any]`，运行时通常为 `Error` 实例（来自 `submitForm` 抛错），但也可能是 element-plus 校验返回的 `invalidFields` 结构，业务侧消费时建议先做类型判断
+
+## layer-node-dblclick
+
+- **详情：** "已选组件"面板中组件树节点被双击时触发
+
+  默认行为（切换可展开节点的展开/收起状态）会先于该事件执行；可通过 [`beforeLayerNodeDblclick`](./props.md#beforelayernodedblclick) 钩子拦截，返回 `false` 时该事件不会被触发
+
+- **事件回调函数：** (event: MouseEvent, data: [TreeNodeData](https://github.com/Tencent/tmagic-editor/blob/master/packages/editor/src/type.ts)) => void
+
+- **示例：**
+
+```html
+<template>
+  <m-editor @layer-node-dblclick="onLayerNodeDblclick"></m-editor>
+</template>
+
+<script setup>
+const onLayerNodeDblclick = (event, data) => {
+  console.log('双击节点', data.id, data.type);
+};
+</script>
+```

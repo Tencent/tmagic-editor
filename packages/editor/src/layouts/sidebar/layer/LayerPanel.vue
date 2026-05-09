@@ -20,6 +20,7 @@
       @node-contextmenu="nodeContentMenuHandler"
       @node-mouseenter="mouseenterHandler"
       @node-click="nodeClickHandler"
+      @node-dblclick="dblclickHandler"
     >
       <template #tree-node-content="{ data: nodeData }">
         <slot name="layer-node-content" :data="nodeData"> </slot>
@@ -89,6 +90,12 @@ const props = defineProps<{
   isExpandable?: IsExpandableFunction;
   /** 自定义判断当前拖动节点是否可以拖入目标节点内部的函数，返回 false 则禁止拖入 */
   canDropIn?: CanDropInFunction;
+  /** 组件树节点双击前的钩子函数，返回 false 则阻止默认的双击行为 */
+  beforeNodeDblclick?: (_event: MouseEvent, _data: TreeNodeData) => Promise<boolean | void> | boolean | void;
+}>();
+
+const emit = defineEmits<{
+  'node-dblclick': [event: MouseEvent, data: TreeNodeData];
 }>();
 
 const services = useServices();
@@ -134,7 +141,19 @@ const { handleDragStart, handleDragEnd, handleDragLeave, handleDragOver } = useD
 const menuRef = useTemplateRef<InstanceType<typeof LayerMenu>>('menu');
 const {
   nodeClickHandler,
+  nodeDblclickHandler,
   nodeContentMenuHandler,
   highlightHandler: mouseenterHandler,
 } = useClick(services, isCtrlKeyDown, nodeStatusMap, menuRef);
+
+const dblclickHandler = async (event: MouseEvent, data: TreeNodeData) => {
+  if (props.beforeNodeDblclick) {
+    const result = await props.beforeNodeDblclick(event, data);
+    if (result === false) return;
+  }
+
+  nodeDblclickHandler(event, data);
+
+  emit('node-dblclick', event, data);
+};
 </script>

@@ -100,10 +100,26 @@ export const useClick = (
     });
   };
 
+  const nodeDblclickHandler = (event: MouseEvent, data: TreeNodeData): void => {
+    if (!nodeStatusMap?.value) return;
+
+    if (uiService.get('uiSelectMode')) return;
+
+    // 双击切换展开/收起状态
+    if (data.items && data.items.length > 0) {
+      const status = nodeStatusMap.value.get(data.id);
+      updateStatus(nodeStatusMap.value, data.id, {
+        expand: !status?.expand,
+      });
+    }
+  };
+
   return {
     menuRef,
 
     nodeClickHandler,
+
+    nodeDblclickHandler,
 
     nodeContentMenuHandler(event: MouseEvent, data: TreeNodeData): void {
       event.preventDefault();

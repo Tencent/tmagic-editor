@@ -28,6 +28,8 @@
           :next-level-indent-increment="treeNextLevelIndentIncrement"
           :layer-node-is-expandable="layerNodeIsExpandable"
           :can-drop-in="canDropIn"
+          :before-layer-node-dblclick="beforeLayerNodeDblclick"
+          @layer-node-dblclick="layerNodeDblclickHandler"
         >
           <template #layer-panel-header>
             <slot name="layer-panel-header"></slot>
@@ -157,6 +159,7 @@ import uiService from './services/ui';
 import keybindingConfig from './utils/keybinding-config';
 import { defaultEditorProps, EditorProps } from './editorProps';
 import { initServiceEvents, initServiceState } from './initService';
+import type { TreeNodeData } from './type';
 import type { EditorSlots, EventBus, Services, StageOptions } from './type';
 
 defineSlots<EditorSlots>();
@@ -171,6 +174,7 @@ const emit = defineEmits<{
   'update:modelValue': [value: MApp | null];
   'props-form-error': [e: any];
   'props-submit-error': [e: any];
+  'layer-node-dblclick': [event: MouseEvent, data: TreeNodeData];
 }>();
 
 const props = withDefaults(defineProps<EditorProps>(), defaultEditorProps);
@@ -240,6 +244,10 @@ const propsPanelSubmitErrorHandler = (e: any) => {
 
 const propsPanelFormErrorHandler = (e: any) => {
   emit('props-form-error', e);
+};
+
+const layerNodeDblclickHandler = (event: MouseEvent, data: TreeNodeData) => {
+  emit('layer-node-dblclick', event, data);
 };
 
 defineExpose(services);

@@ -25,7 +25,7 @@
         @click="expandHandler"
       ></MIcon>
 
-      <div class="tree-node-content" @click="nodeClickHandler">
+      <div class="tree-node-content" @click="nodeClickHandler" @dblclick="nodeDblclickHandler">
         <slot name="tree-node-content" :data="data">
           <div class="tree-node-label">
             <slot name="tree-node-label" :data="data">{{ `${data.name} (${data.id})` }}</slot>
@@ -89,6 +89,7 @@ const emit = defineEmits<{
   'node-contextmenu': [event: MouseEvent, data: TreeNodeData];
   'node-mouseenter': [event: MouseEvent, data: TreeNodeData];
   'node-click': [event: MouseEvent, data: TreeNodeData];
+  'node-dblclick': [event: MouseEvent, data: TreeNodeData];
 }>();
 
 const treeEmit = inject<typeof emit>('treeEmit');
@@ -155,5 +156,9 @@ const expandHandler = () => {
 
 const nodeClickHandler = (event: MouseEvent) => {
   treeEmit?.('node-click', event, props.data);
+};
+
+const nodeDblclickHandler = (event: MouseEvent) => {
+  treeEmit?.('node-dblclick', event, props.data);
 };
 </script>

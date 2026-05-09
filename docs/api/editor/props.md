@@ -1292,6 +1292,49 @@ const layerNodeIsExpandable = (data, nodeStatusMap) => {
 第三方业务可从 `@tmagic/editor` 直接导入 `defaultIsExpandable` 复用默认逻辑作为兜底。
 :::
 
+## beforeLayerNodeDblclick
+
+- **详情：**
+
+  "已选组件"面板组件树节点双击前的钩子函数
+
+  在用户双击组件树节点时，先于默认行为执行；返回 `false` 时阻止默认行为（默认行为是切换可展开节点的展开/收起状态）。返回其他值（包括 `true`、`undefined`、`Promise`）则继续执行默认行为，并向上抛出 [`layer-node-dblclick`](./events.md#layer-node-dblclick) 事件。
+
+  常见用途：拦截特定类型节点的双击行为，或在双击时执行业务自定义动作（如重命名、打开抽屉等）后阻断默认展开/收起。
+
+- **默认值：** `undefined`
+
+- **类型：** `(event: MouseEvent, data: TreeNodeData) => boolean | void | Promise<boolean | void>`
+
+- **示例：**
+
+```html
+<template>
+  <m-editor
+    :before-layer-node-dblclick="beforeLayerNodeDblclick"
+    @layer-node-dblclick="onLayerNodeDblclick"
+  ></m-editor>
+</template>
+
+<script setup>
+// 双击 page 节点时阻止默认的展开/收起行为
+const beforeLayerNodeDblclick = (event, data) => {
+  if (data.type === 'page') {
+    return false;
+  }
+};
+
+const onLayerNodeDblclick = (event, data) => {
+  console.log('双击节点', data.id);
+};
+</script>
+```
+
+::: tip
+- 该钩子仅作用于"已选组件"面板的组件树节点，不影响画布上的双击行为（画布双击请使用 [`beforeDblclick`](#beforedblclick)）。
+- 返回 `false` 时，会同时阻断默认的"展开/收起"行为以及向上抛出的 [`layer-node-dblclick`](./events.md#layer-node-dblclick) 事件；返回其他值则继续触发默认行为并抛出事件。
+:::
+
 ## extendFormState
 
 - **详情：**

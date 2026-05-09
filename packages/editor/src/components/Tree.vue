@@ -56,6 +56,7 @@ const emit = defineEmits<{
   'node-contextmenu': [event: MouseEvent, data: TreeNodeData];
   'node-mouseenter': [event: MouseEvent, data: TreeNodeData];
   'node-click': [event: MouseEvent, data: TreeNodeData];
+  'node-dblclick': [event: MouseEvent, data: TreeNodeData];
 }>();
 
 provide('treeEmit', emit);
