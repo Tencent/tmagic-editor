@@ -26,6 +26,7 @@ import type { CodeBlockContent, CodeBlockDSL, Id, MApp, MContainer, MNode, MPage
 import type { ChangeRecord, FormConfig, TableColumnConfig, TypeFunction } from '@tmagic/form';
 import type StageCore from '@tmagic/stage';
 import type {
+  CanDropIn,
   ContainerHighlightType,
   CustomizeMoveableOptions,
   GuidesOptions,
@@ -168,6 +169,14 @@ export interface StageOptions {
   moveableOptions?: CustomizeMoveableOptions;
   canSelect?: (el: HTMLElement) => boolean | Promise<boolean>;
   isContainer?: (el: HTMLElement) => boolean | Promise<boolean>;
+  /**
+   * 画布上拖入组件（包括从组件列表拖入新组件、画布上拖动已有组件）时，
+   * 对已通过 isContainer 命中的候选容器进行二次过滤；返回 false 时阻止该容器被高亮命中
+   * - 在画布上拖动已有组件时：sourceIds 为被拖动组件的 id 列表
+   * - 从组件列表拖入新组件时：sourceIds 为空数组（尚无 id，仅可依据 targetId 判断）
+   * 该选项会被透传给 StageCore 的 canDropIn
+   */
+  canDropIn?: CanDropIn;
   updateDragEl?: UpdateDragEl;
   renderType?: RenderType;
   guidesOptions?: Partial<GuidesOptions>;
@@ -681,6 +690,34 @@ export interface TreeNodeData {
 
 /** 判断组件树节点是否可展开（即是否要展示为拥有子节点的形态）的函数 */
 export type IsExpandableFunction = (_data: TreeNodeData, _nodeStatusMap: Map<Id, LayerNodeStatus>) => boolean;
+
+/** canDropIn 的调用场景 */
+export type CanDropInScene =
+  /** 在"已选组件"面板的组件树中拖动节点 */
+  | 'layer'
+  /** 在画布上拖动已有组件（被拖动组件本身已经存在于画布中，sourceIds 包含其 id） */
+  | 'stage-drag'
+  /** 从组件列表拖入新组件到画布（被拖入的组件尚不存在，sourceIds 为空数组） */
+  | 'stage-add';
+
+/**
+ * 判断当前正在拖动的源节点是否可以拖入目标节点内部的函数
+ * @param _sourceIds 当前正在拖动的源节点 id 列表
+ *   - `layer`：被拖动的组件树节点 id（单选时长度为 1）
+ *   - `stage-drag`：被拖动组件的 id 列表（多选拖动时为多个）
+ *   - `stage-add`：始终为空数组（从组件列表新增的组件尚无 id）
+ * @param _targetId 目标容器的节点 id
+ * @param _scene 调用场景：见 {@link CanDropInScene}
+ * @returns
+ *   - `false`：阻止该容器被视为合法拖入目标
+ *     - `layer`：禁用 inner 高亮（before/after 仍然可用）
+ *     - `stage-drag`：阻止该容器被高亮命中
+ *     - `stage-add`：阻止该容器被高亮命中并退化为放入当前页面
+ *   - `Id`（string | number）：将拖入目标重定向到该 id 对应的节点
+ *     （例如把命中的"卡片外壳"节点重定向到其内层"卡片内容"容器节点）
+ *   - 其他（`true` / `void` / `undefined`）：按原 targetId 正常拖入
+ */
+export type CanDropInFunction = (_sourceIds: Id[], _targetId: Id, _scene: CanDropInScene) => Id | boolean | void;
 
 export type AsyncBeforeHook<Value extends Array<string>, C extends Record<Value[number], (...args: any) => any>> = {
   [K in Value[number]]?: (...args: Parameters<C[K]>) => Promise<Parameters<C[K]>> | Parameters<C[K]>;

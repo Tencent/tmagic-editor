@@ -348,6 +348,7 @@ export default class StageCore extends EventEmitter {
       disabledMultiSelect: config.disabledMultiSelect,
       canSelect: config.canSelect,
       isContainer: config.isContainer,
+      canDropIn: config.canDropIn,
       updateDragEl: config.updateDragEl,
       getRootContainer: () => this.container,
       getRenderDocument: () => this.renderer!.getDocument(),

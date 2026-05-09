@@ -317,12 +317,34 @@ const dropHandler = async (e: DragEvent) => {
   );
 
   let parent: MContainer | undefined | null = page.value;
+  let resolvedParentEl: HTMLElement | null | undefined = parentEl;
   const parentId = getIdFromEl()(parentEl);
   if (parentId) {
     parent = editorService.getNodeById(parentId, false) as MContainer;
   }
 
   if (parent && stageContainerEl.value && stage) {
+    // 通过用户配置的钩子再次确认当前拖入的新组件是否允许放入命中的高亮容器，
+    // 防止 delayedMarkContainer 的延迟/异步未生效或残留高亮导致命中错误容器
+    //   - 返回 false：取消此次拖入
+    //   - 返回 Id  ：将父节点重定向到该 id 对应的节点（layout 坐标也基于其 DOM 重新计算）
+    //   - 其他    ：使用原命中节点
+    // 从组件列表拖入新组件时 sourceIds 为空数组（尚无 id）
+    if (props.stageOptions.canDropIn) {
+      const result = props.stageOptions.canDropIn([], parent.id);
+      if (result === false) {
+        return;
+      }
+      if (typeof result === 'string' || typeof result === 'number') {
+        const redirectedNode = editorService.getNodeById(result, false) as MContainer | undefined;
+        if (!redirectedNode) {
+          return;
+        }
+        parent = redirectedNode;
+        resolvedParentEl = stage.renderer?.getTargetElement(result) ?? null;
+      }
+    }
+
     const layout = await editorService.getLayout(parent);
 
     const containerRect = stageContainerEl.value.getBoundingClientRect();
@@ -342,8 +364,8 @@ const dropHandler = async (e: DragEvent) => {
       top = e.clientY - containerRect.top + scrollTop;
       left = e.clientX - containerRect.left + scrollLeft;
 
-      if (parentEl) {
-        const { left: parentLeft, top: parentTop } = getOffset(parentEl);
+      if (resolvedParentEl) {
+        const { left: parentLeft, top: parentTop } = getOffset(resolvedParentEl);
         left = left - parentLeft * zoom.value;
         top = top - parentTop * zoom.value;
       }

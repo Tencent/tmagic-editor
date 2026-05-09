@@ -793,6 +793,87 @@ const isContainer = (el) =>
 </script>
 ```
 
+## canDropIn
+
+- **详情：**
+
+  用于自定义判断当前正在拖动的源是否可以拖入目标节点内部。同时覆盖"组件树拖动"和"画布拖入"两类场景，通过第三个参数 `scene` 区分；返回值有 3 种语义。
+
+  **scene 取值：**
+
+  | scene | 触发场景 | `sourceIds` | `targetId` |
+  | --- | --- | --- | --- |
+  | `'layer'` | "已选组件"面板组件树拖动 | 被拖动节点 id（单选时长度为 1） | 目标节点 id |
+  | `'stage-drag'` | 画布上拖动已有组件 | 被拖动组件 id 列表（多选时为多个） | 候选容器节点 id |
+  | `'stage-add'` | 从左侧组件列表拖入新组件到画布 | 始终为空数组（尚无 id，可仅依据 `targetId` 判断） | 候选容器节点 id |
+
+  **返回值语义：**
+
+  | 返回值 | layer | stage-drag | stage-add |
+  | --- | --- | --- | --- |
+  | `false` | 禁用 inner；同时禁用所有"target 子节点的 before/after"（这些位置等价于放入 target，避免被绕过） | 阻止该容器被高亮命中 | 取消此次拖入 |
+  | `Id`（string \| number） | 将 inner 拖入目标重定向为该 id 对应的节点；与 `false` 一致禁用所有"target 子节点的 before/after" | 高亮命中切换到该 id 对应元素，最终拖入到该节点 | 直接将组件添加到该 id 对应节点（layout 坐标也基于其 DOM 重新计算） |
+  | `true` / `void` / `undefined` | 按原 targetId 正常拖入 | 同左 | 同左 |
+
+  `scene` 取 `'stage-drag'` 或 `'stage-add'` 时该函数会被透传给 `StageCore` 的 `canDropIn`，因此直接使用 `@tmagic/stage` 时同样生效
+
+  :::tip
+  - 可通过 `editorService.getNodeById(id, false)` 把 id 还原为 `MNode` 以便基于业务字段（`type`、`name` 等）做判断。
+  - 该函数为**同步**调用（拖动事件在浏览器中需要立即响应，不接受异步返回）。
+  - 重定向到一个不存在或非容器的目标 id 时会被忽略：layer/stage-add 场景会取消此次拖入；stage-drag 场景不会高亮。
+  :::
+
+- **默认值：** `undefined`
+
+- **类型：** `(sourceIds: Id[], targetId: Id, scene: 'layer' | 'stage-drag' | 'stage-add') => Id | boolean | void`
+
+- **示例 1：禁止某些组件拖入特定容器**
+
+```html
+<template>
+  <m-editor :can-drop-in="canDropIn"></m-editor>
+</template>
+
+<script setup>
+import { editorService } from '@tmagic/editor';
+
+// 禁止 button 类型的组件被拖入 list 容器内部，组件树拖动与画布拖入均生效
+const canDropIn = (sourceIds, targetId, scene) => {
+  const targetNode = editorService.getNodeById(targetId, false);
+  if (targetNode?.type !== 'list') return true;
+
+  // 从组件列表新增组件时直接放行
+  if (scene === 'stage-add') return true;
+
+  return sourceIds.every((id) => {
+    const node = editorService.getNodeById(id, false);
+    return node?.type !== 'button';
+  });
+};
+</script>
+```
+
+- **示例 2：将拖入"卡片外壳"重定向到"卡片内容"内层容器**
+
+```html
+<template>
+  <m-editor :can-drop-in="canDropIn"></m-editor>
+</template>
+
+<script setup>
+import { editorService } from '@tmagic/editor';
+
+// 当用户拖入到 card 节点时，自动改为放入其 card-content 内层容器
+const canDropIn = (sourceIds, targetId) => {
+  const targetNode = editorService.getNodeById(targetId, false);
+  if (targetNode?.type !== 'card') return true;
+
+  const innerContent = targetNode.items?.find((item) => item.type === 'card-content');
+  return innerContent?.id ?? true;
+};
+</script>
+```
+
 ## containerHighlightClassName
 
 - **详情：**

@@ -42,6 +42,7 @@ import StageMultiDragResize from './StageMultiDragResize';
 import type {
   ActionManagerConfig,
   ActionManagerEvents,
+  CanDropIn,
   CanSelect,
   CustomizeMoveableOptions,
   CustomizeMoveableOptionsCallbackConfig,
@@ -88,6 +89,8 @@ export default class ActionManager extends EventEmitter {
   private getElementsFromPoint: GetElementsFromPoint;
   private canSelect: CanSelect;
   private isContainer?: IsContainer;
+  /** 见 ActionManagerConfig.canDropIn */
+  private canDropIn?: CanDropIn;
   private getRenderDocument: GetRenderDocument;
   private disabledMultiSelect = false;
   private config: ActionManagerConfig;
@@ -125,6 +128,7 @@ export default class ActionManager extends EventEmitter {
     this.canSelect = config.canSelect || ((el: HTMLElement) => Boolean(getIdFromEl()(el)));
     this.getRenderDocument = config.getRenderDocument;
     this.isContainer = config.isContainer;
+    this.canDropIn = config.canDropIn;
 
     this.dr = this.createDr(config);
 
@@ -371,14 +375,28 @@ export default class ActionManager extends EventEmitter {
     if (!doc) return;
 
     const els = this.getElementsFromPoint(event);
+    // 取出源元素的节点 id 列表（多选拖动时为多个；从组件列表拖入时为空数组）
+    const sourceIds: Id[] = excludeElList
+      .map((el) => (el instanceof HTMLElement ? getIdFromEl()(el) : undefined))
+      .filter((id): id is string => Boolean(id));
 
     for (const el of els) {
-      if (
-        !getIdFromEl()(el)?.startsWith(GHOST_EL_ID_PREFIX) &&
-        (await this.isContainer?.(el)) &&
-        !excludeElList.includes(el)
-      ) {
-        addClassName(el, doc, this.containerHighlightClassName);
+      const targetId = getIdFromEl()(el);
+      if (!targetId?.startsWith(GHOST_EL_ID_PREFIX) && (await this.isContainer?.(el)) && !excludeElList.includes(el)) {
+        // 用户配置的钩子可以：
+        //   - 返回 false 阻止某些源拖入命中的容器（例如禁止 button 拖入 list）
+        //   - 返回 Id 将拖入目标重定向到另一个容器（例如把命中的 list 重定向到其内层的 list-content）
+        let highlightEl: HTMLElement = el;
+        if (targetId && this.canDropIn) {
+          const result = this.canDropIn(sourceIds, targetId);
+          if (result === false) continue;
+          if (typeof result === 'string' || typeof result === 'number') {
+            const redirectedEl = this.getTargetElement(result);
+            if (!redirectedEl) continue;
+            highlightEl = redirectedEl;
+          }
+        }
+        addClassName(highlightEl, doc, this.containerHighlightClassName);
         break;
       }
     }

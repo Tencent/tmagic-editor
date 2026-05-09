@@ -11,6 +11,7 @@ import StageCore, {
 import { getIdFromEl } from '@tmagic/utils';
 
 import type {
+  CanDropInFunction,
   ComponentGroup,
   CustomContentMenuFunction,
   DatasourceTypeOption,
@@ -101,6 +102,16 @@ export interface EditorProps {
   customContentMenu?: CustomContentMenuFunction;
   /** 用于自定义判断组件树节点是否可展开（即是否要展示为拥有子节点的形态） */
   layerNodeIsExpandable?: IsExpandableFunction;
+  /**
+   * 用于自定义判断当前正在拖动的源是否可以拖入目标节点内部
+   *
+   * 同时覆盖以下两类场景，通过第三个参数 scene 区分：
+   * - `'layer'` ："已选组件"面板组件树拖动（返回 false 时仅禁用 inner，不影响 before/after）
+   * - `'stage'`：画布拖入组件（返回 false 时阻止该容器被高亮命中；适用于"组件列表拖入新组件"和"画布上拖动已有组件"两种细分情况）
+   *
+   * 注意：layer 场景目前只识别同步返回值；返回 Promise 时会按 true 处理（即允许）
+   */
+  canDropIn?: CanDropInFunction;
   /** 画布双击前的钩子函数，返回 false 则阻止默认的双击行为 */
   beforeDblclick?: (event: MouseEvent) => Promise<boolean | void> | boolean | void;
   extendFormState?: (state: FormState) => Record<string, any> | Promise<Record<string, any>>;

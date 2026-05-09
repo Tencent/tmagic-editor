@@ -24,6 +24,7 @@ export const useStage = (stageOptions: StageOptions) => {
     zoom: stageOptions.zoom ?? zoom.value,
     autoScrollIntoView: stageOptions.autoScrollIntoView,
     isContainer: stageOptions.isContainer,
+    canDropIn: stageOptions.canDropIn,
     containerHighlightClassName: stageOptions.containerHighlightClassName,
     containerHighlightDuration: stageOptions.containerHighlightDuration,
     containerHighlightType: stageOptions.containerHighlightType,

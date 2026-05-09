@@ -27,6 +27,7 @@
           :indent="treeIndent"
           :next-level-indent-increment="treeNextLevelIndentIncrement"
           :layer-node-is-expandable="layerNodeIsExpandable"
+          :can-drop-in="canDropIn"
         >
           <template #layer-panel-header>
             <slot name="layer-panel-header"></slot>
@@ -202,6 +203,11 @@ const stageOptions: StageOptions = {
   canSelect: props.canSelect,
   updateDragEl: props.updateDragEl,
   isContainer: props.isContainer,
+  // sourceIds 为空表示从组件列表新增（尚无 id），否则是画布上拖动已有组件
+  canDropIn: props.canDropIn
+    ? (sourceIds, targetId) =>
+        props.canDropIn!(sourceIds, targetId, sourceIds.length === 0 ? 'stage-add' : 'stage-drag')
+    : undefined,
   containerHighlightClassName: props.containerHighlightClassName,
   containerHighlightDuration: props.containerHighlightDuration,
   containerHighlightType: props.containerHighlightType,

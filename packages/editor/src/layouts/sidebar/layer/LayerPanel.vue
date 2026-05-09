@@ -58,6 +58,7 @@ import Tree from '@editor/components/Tree.vue';
 import { useFilter } from '@editor/hooks/use-filter';
 import { useServices } from '@editor/hooks/use-services';
 import type {
+  CanDropInFunction,
   CustomContentMenuFunction,
   IsExpandableFunction,
   LayerPanelSlots,
@@ -79,13 +80,15 @@ defineOptions({
   name: 'MEditorLayerPanel',
 });
 
-defineProps<{
+const props = defineProps<{
   layerContentMenu: (MenuButton | MenuComponent)[];
   indent?: number;
   nextLevelIndentIncrement?: number;
   customContentMenu: CustomContentMenuFunction;
   /** 自定义判断组件树节点是否可展开（即是否要展示为拥有子节点的形态）的函数 */
   isExpandable?: IsExpandableFunction;
+  /** 自定义判断当前拖动节点是否可以拖入目标节点内部的函数，返回 false 则禁止拖入 */
+  canDropIn?: CanDropInFunction;
 }>();
 
 const services = useServices();
@@ -123,7 +126,9 @@ const collapseAllHandler = () => {
   }
 };
 
-const { handleDragStart, handleDragEnd, handleDragLeave, handleDragOver } = useDrag(services);
+const { handleDragStart, handleDragEnd, handleDragLeave, handleDragOver } = useDrag(services, {
+  canDropIn: (sourceIds, targetId) => props.canDropIn?.(sourceIds, targetId, 'layer'),
+});
 
 // 右键菜单
 const menuRef = useTemplateRef<InstanceType<typeof LayerMenu>>('menu');

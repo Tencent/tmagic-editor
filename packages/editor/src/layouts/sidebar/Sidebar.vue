@@ -162,6 +162,7 @@ import { useEditorContentHeight } from '@editor/hooks/use-editor-content-height'
 import { useFloatBox } from '@editor/hooks/use-float-box';
 import { useServices } from '@editor/hooks/use-services';
 import {
+  type CanDropInFunction,
   ColumnLayout,
   CustomContentMenuFunction,
   type IsExpandableFunction,
@@ -194,6 +195,8 @@ const props = withDefaults(
     customContentMenu: CustomContentMenuFunction;
     /** 自定义判断组件树节点是否可展开（即是否要展示为拥有子节点的形态）的函数 */
     layerNodeIsExpandable?: IsExpandableFunction;
+    /** 自定义判断当前正在拖动的源是否可以拖入目标节点内部，详见 EditorProps.canDropIn */
+    canDropIn?: CanDropInFunction;
   }>(),
   {
     data: () => ({
@@ -252,6 +255,7 @@ const getItemConfig = (data: SideItem): SideComponent => {
         indent: props.indent,
         nextLevelIndentIncrement: props.nextLevelIndentIncrement,
         isExpandable: props.layerNodeIsExpandable,
+        canDropIn: props.canDropIn,
       },
       component: LayerPanel,
       slots: {},

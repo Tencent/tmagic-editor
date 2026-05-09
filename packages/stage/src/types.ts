@@ -30,6 +30,18 @@ export type TargetElement = HTMLElement | SVGElement;
 
 export type CanSelect = (el: HTMLElement, event: MouseEvent, stop: () => boolean) => boolean | Promise<boolean>;
 export type IsContainer = (el: HTMLElement) => boolean | Promise<boolean>;
+/**
+ * 判断当前正在拖动的源是否可以拖入目标容器（用于画布上拖入组件时的容器高亮命中）
+ * @param sourceIds 当前正在拖动的源节点 id 列表
+ *   - 在画布上拖动已有组件时：为被拖动的组件 id（多选拖动时为多个）
+ *   - 从组件列表拖入新组件时：为空数组（此时尚无 id，可仅依据 targetId 判断）
+ * @param targetId 已通过 isContainer 命中的候选容器节点 id
+ * @returns
+ *   - `false`：阻止该容器被视为合法拖入目标（不会被高亮命中）
+ *   - `Id`（string | number）：将拖入目标重定向到该 id 对应的节点
+ *   - 其他（`true` / `void` / `undefined`）：按命中的 targetId 正常拖入
+ */
+export type CanDropIn = (sourceIds: Id[], targetId: Id) => Id | boolean | void;
 export type CustomizeRender = (renderer: StageCore) => Promise<HTMLElement | void> | HTMLElement | void;
 
 export type CustomizeMoveableOptionsFunction = (config: CustomizeMoveableOptionsCallbackConfig) => MoveableOptions;
@@ -54,6 +66,11 @@ export interface StageCoreConfig {
   zoom?: number;
   canSelect?: CanSelect;
   isContainer?: IsContainer;
+  /**
+   * 画布上拖动组件时，对已通过 isContainer 命中的候选容器进行二次过滤，
+   * 用于实现"某些源不允许拖入某些容器内部"的场景。返回 false 时阻止该容器被高亮命中
+   */
+  canDropIn?: CanDropIn;
   containerHighlightClassName?: string;
   containerHighlightDuration?: number;
   containerHighlightType?: ContainerHighlightType;
@@ -80,6 +97,8 @@ export interface ActionManagerConfig {
   disabledMultiSelect?: boolean;
   canSelect?: CanSelect;
   isContainer?: IsContainer;
+  /** 见 StageCoreConfig.canDropIn */
+  canDropIn?: CanDropIn;
   getRootContainer: GetRootContainer;
   getRenderDocument: GetRenderDocument;
   updateDragEl?: UpdateDragEl;
