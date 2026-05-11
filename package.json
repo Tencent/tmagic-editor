@@ -54,7 +54,7 @@
     "cz-conventional-changelog": "^3.3.0",
     "element-plus": "^2.11.8",
     "enquirer": "^2.4.1",
-    "eslint": "^10.2.1",
+    "eslint": "^10.3.0",
     "execa": "^9.6.0",
     "highlight.js": "^11.11.1",
     "husky": "^9.1.7",
@@ -65,8 +65,8 @@
     "prettier": "^3.8.3",
     "recast": "^0.23.11",
     "rimraf": "^3.0.2",
-    "rolldown": "^1.0.0-rc.17",
-    "rolldown-plugin-dts": "^0.23.2",
+    "rolldown": "^1.0.0",
+    "rolldown-plugin-dts": "^0.25.0",
     "sass-embedded": "^1.99.0",
     "semver": "^7.7.3",
     "serialize-javascript": "^7.0.0",
@@ -74,9 +74,9 @@
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitepress": "^1.6.4",
-    "vitest": "^4.1.0",
+    "vitest": "^4.1.5",
     "vue": "catalog:",
-    "vue-tsc": "^3.2.7"
+    "vue-tsc": "^3.2.8"
   },
   "config": {
     "commitizen": {
