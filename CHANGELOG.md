@@ -1,3 +1,15 @@
+## [1.7.14-beta.0](https://github.com/Tencent/tmagic-editor/compare/v1.7.13-beta.0...v1.7.14-beta.0) (2026-05-11)
+
+
+### Features
+
+* **editor:** props 服务新增配置/值的批量获取与存在性判断方法 ([d813362](https://github.com/Tencent/tmagic-editor/commit/d8133629b4887d31e12f4f91ee328a828f3b85bc))
+* **editor:** 新增 alwaysMultiSelect 配置开启常驻多选模式 ([aab7324](https://github.com/Tencent/tmagic-editor/commit/aab73249d1803219cc4b08b25662760fa0dfc129))
+* **editor:** 新增 canDropIn 配置统一控制 layer/stage 拖拽放入行为 ([5af9f6e](https://github.com/Tencent/tmagic-editor/commit/5af9f6e27a472de599a7aa99191f3d3c610803d4))
+* **editor:** 新增"已选组件"面板节点双击事件 layer-node-dblclick 与 beforeLayerNodeDblclick 钩子 ([2475a4f](https://github.com/Tencent/tmagic-editor/commit/2475a4f901e6340f149e24b4d1e1f865a75f99ed))
+
+
+
 ## [1.7.13-beta.0](https://github.com/Tencent/tmagic-editor/compare/v1.7.13...v1.7.13-beta.0) (2026-05-08)
 
 
