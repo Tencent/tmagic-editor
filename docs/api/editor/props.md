@@ -1043,7 +1043,26 @@ const updateDragEl = (el, target) => {
   <m-editor :disabled-multi-select="true"></m-editor>
 </template>
 ```
-  
+
+## alwaysMultiSelect
+
+- **详情：**
+
+  始终启用多选模式：开启后无需按住 `Ctrl/Meta` 键，组件树和画布上点击即多选。
+  当 [`disabledMultiSelect`](#disabledmultiselect) 为 `true` 时本配置失效。
+
+- **类型：** `boolean`
+
+- **默认值：** `false`
+
+- **示例：**
+
+```html
+<template>
+  <m-editor :always-multi-select="true"></m-editor>
+</template>
+```
+
 ## guidesOptions
 
 - **详情：**

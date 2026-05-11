@@ -181,6 +181,11 @@ export interface StageOptions {
   renderType?: RenderType;
   guidesOptions?: Partial<GuidesOptions>;
   disabledMultiSelect?: boolean;
+  /**
+   * 始终启用多选模式（无需按住 Ctrl/Meta），默认 false。
+   * 当 `disabledMultiSelect` 为 true 时本配置失效。
+   */
+  alwaysMultiSelect?: boolean;
   disabledRule?: boolean;
   zoom?: number;
   /** 画布双击前的钩子函数，返回 false 则阻止默认的双击行为 */
@@ -200,6 +205,8 @@ export interface StoreState {
   pageLength: number;
   pageFragmentLength: number;
   disabledMultiSelect: boolean;
+  /** 是否始终启用多选模式（无需按住 Ctrl/Meta） */
+  alwaysMultiSelect: boolean;
 }
 
 export type StoreStateKey = keyof StoreState;

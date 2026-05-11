@@ -46,6 +46,7 @@ export const useStage = (stageOptions: StageOptions) => {
     updateDragEl: stageOptions.updateDragEl,
     guidesOptions: stageOptions.guidesOptions,
     disabledMultiSelect: stageOptions.disabledMultiSelect,
+    alwaysMultiSelect: stageOptions.alwaysMultiSelect,
     disabledRule: stageOptions.disabledRule,
   });
 
@@ -57,6 +58,13 @@ export const useStage = (stageOptions: StageOptions) => {
       } else {
         stage.enableMultiSelect();
       }
+    },
+  );
+
+  watch(
+    () => editorService.get('alwaysMultiSelect'),
+    (alwaysMultiSelect) => {
+      stage.setAlwaysMultiSelect(Boolean(alwaysMultiSelect));
     },
   );
 

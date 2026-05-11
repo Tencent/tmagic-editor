@@ -79,6 +79,7 @@ class Editor extends BaseService {
     pageLength: 0,
     pageFragmentLength: 0,
     disabledMultiSelect: false,
+    alwaysMultiSelect: false,
   });
   private isHistoryStateChange = false;
   private selectionBeforeOp: Id[] | null = null;

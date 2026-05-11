@@ -84,6 +84,11 @@ export interface StageCoreConfig {
   renderType?: RenderType;
   guidesOptions?: Partial<GuidesOptions>;
   disabledMultiSelect?: boolean;
+  /**
+   * 始终启用多选模式（无需按住 Ctrl/Meta），默认 false。
+   * 当 `disabledMultiSelect` 为 true 时，本配置失效。
+   */
+  alwaysMultiSelect?: boolean;
   disabledRule?: boolean;
 }
 
@@ -95,6 +100,11 @@ export interface ActionManagerConfig {
   moveableOptions?: CustomizeMoveableOptions;
   disabledDragStart?: boolean;
   disabledMultiSelect?: boolean;
+  /**
+   * 始终启用多选模式（无需按住 Ctrl/Meta），默认 false。
+   * 当 `disabledMultiSelect` 为 true 时，本配置失效。
+   */
+  alwaysMultiSelect?: boolean;
   canSelect?: CanSelect;
   isContainer?: IsContainer;
   /** 见 StageCoreConfig.canDropIn */

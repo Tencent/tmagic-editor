@@ -127,6 +127,23 @@ describe('get', () => {
   });
 });
 
+describe('multiSelect 标志位', () => {
+  test('disabledMultiSelect 默认值为 false', () => {
+    expect(editorService.get('disabledMultiSelect')).toBe(false);
+  });
+
+  test('alwaysMultiSelect 默认值为 false', () => {
+    expect(editorService.get('alwaysMultiSelect')).toBe(false);
+  });
+
+  test('alwaysMultiSelect 可被 set 修改并通过 get 读取', () => {
+    editorService.set('alwaysMultiSelect', true);
+    expect(editorService.get('alwaysMultiSelect')).toBe(true);
+    editorService.set('alwaysMultiSelect', false);
+    expect(editorService.get('alwaysMultiSelect')).toBe(false);
+  });
+});
+
 describe('getNodeInfo', () => {
   beforeAll(() => editorService.set('root', cloneDeep(root)));
 

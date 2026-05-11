@@ -219,6 +219,7 @@ const stageOptions: StageOptions = {
   renderType: props.renderType,
   guidesOptions: props.guidesOptions,
   disabledMultiSelect: props.disabledMultiSelect,
+  alwaysMultiSelect: props.alwaysMultiSelect,
   beforeDblclick: props.beforeDblclick,
 };
 

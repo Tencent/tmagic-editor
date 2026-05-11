@@ -73,6 +73,16 @@ export const initServiceState = (
   );
 
   watch(
+    () => props.alwaysMultiSelect,
+    (alwaysMultiSelect) => {
+      editorService.set('alwaysMultiSelect', alwaysMultiSelect || false);
+    },
+    {
+      immediate: true,
+    },
+  );
+
+  watch(
     () => props.componentGroupList,
     (componentGroupList) => componentGroupList && componentListService.setList(componentGroupList),
     {

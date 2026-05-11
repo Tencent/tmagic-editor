@@ -93,6 +93,8 @@ export default class ActionManager extends EventEmitter {
   private canDropIn?: CanDropIn;
   private getRenderDocument: GetRenderDocument;
   private disabledMultiSelect = false;
+  /** 始终启用多选模式（无需按住 Ctrl/Meta），优先级低于 disabledMultiSelect */
+  private alwaysMultiSelect = false;
   private config: ActionManagerConfig;
 
   private mouseMoveHandler = throttle((event: MouseEvent): void => {
@@ -123,6 +125,7 @@ export default class ActionManager extends EventEmitter {
     this.containerHighlightDuration = config.containerHighlightDuration || defaultContainerHighlightDuration;
     this.containerHighlightType = config.containerHighlightType;
     this.disabledMultiSelect = config.disabledMultiSelect ?? false;
+    this.alwaysMultiSelect = config.alwaysMultiSelect ?? false;
     this.getTargetElement = config.getTargetElement;
     this.getElementsFromPoint = config.getElementsFromPoint;
     this.canSelect = config.canSelect || ((el: HTMLElement) => Boolean(getIdFromEl()(el)));
@@ -134,6 +137,9 @@ export default class ActionManager extends EventEmitter {
 
     if (!this.disabledMultiSelect) {
       this.multiDr = this.createMultiDr(config);
+      if (this.alwaysMultiSelect) {
+        this.isMultiSelectStatus = true;
+      }
     }
 
     this.highlightLayer = new StageHighlight({
@@ -148,6 +154,7 @@ export default class ActionManager extends EventEmitter {
 
   public disableMultiSelect() {
     this.disabledMultiSelect = true;
+    this.isMultiSelectStatus = false;
     if (this.multiDr) {
       this.multiDr.destroy();
       this.multiDr = null;
@@ -160,6 +167,20 @@ export default class ActionManager extends EventEmitter {
     if (!this.multiDr) {
       this.multiDr = this.createMultiDr(this.config);
     }
+
+    if (this.alwaysMultiSelect) {
+      this.isMultiSelectStatus = true;
+    }
+  }
+
+  /**
+   * 设置是否始终启用多选模式（无需按住 Ctrl/Meta），
+   * 当 `disabledMultiSelect` 为 true 时本方法不会启用多选。
+   */
+  public setAlwaysMultiSelect(value: boolean) {
+    this.alwaysMultiSelect = value;
+    if (this.disabledMultiSelect) return;
+    this.isMultiSelectStatus = value;
   }
 
   /**
@@ -633,14 +654,14 @@ export default class ActionManager extends EventEmitter {
     });
     // ctrl+tab切到其他窗口，需要将多选状态置为false
     KeyController.global.on('blur', () => {
-      if (!this.disabledMultiSelect) {
+      if (!this.disabledMultiSelect && !this.alwaysMultiSelect) {
         this.isMultiSelectStatus = false;
       }
       this.isAltKeydown = false;
     });
     KeyController.global.keyup(ctrl, (e) => {
       e.inputEvent.preventDefault();
-      if (!this.disabledMultiSelect) {
+      if (!this.disabledMultiSelect && !this.alwaysMultiSelect) {
         this.isMultiSelectStatus = false;
       }
     });

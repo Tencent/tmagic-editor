@@ -3,7 +3,7 @@
 ## get
 
 - **参数：**
-  - `{'root' | 'page' | 'parent' | 'node' | 'highlightNode' | 'nodes' | 'modifiedNodeIds' | 'pageLength' | 'pageFragmentLength' | 'stage' | 'stageLoading' | 'disabledMultiSelect'} name`
+  - `{'root' | 'page' | 'parent' | 'node' | 'highlightNode' | 'nodes' | 'modifiedNodeIds' | 'pageLength' | 'pageFragmentLength' | 'stage' | 'stageLoading' | 'disabledMultiSelect' | 'alwaysMultiSelect'} name`
 
 - **返回：**
   - `{any} value`
@@ -36,6 +36,8 @@
 
   'disabledMultiSelect': 是否禁用多选
 
+  'alwaysMultiSelect': 是否始终启用多选模式（无需按住 Ctrl/Meta）
+
 - **示例：**
 
 ```js
@@ -46,7 +48,7 @@ const node = editorService.get("node");
 
 ## set
 
-- `{'root' | 'page' | 'parent' | 'node' | 'highlightNode' | 'nodes' | 'modifiedNodeIds' | 'pageLength' | 'pageFragmentLength' | 'stage' | 'stageLoading' | 'disabledMultiSelect'} name`
+- `{'root' | 'page' | 'parent' | 'node' | 'highlightNode' | 'nodes' | 'modifiedNodeIds' | 'pageLength' | 'pageFragmentLength' | 'stage' | 'stageLoading' | 'disabledMultiSelect' | 'alwaysMultiSelect'} name`
 - `{any} value`
 
 - **详情：**

@@ -113,6 +113,13 @@
 - **类型**：`() => void`
 - **详情**：启用多选能力
 
+## setAlwaysMultiSelect
+
+- **类型**：`(value: boolean) => void`
+- **参数**：
+  - `value`：是否始终启用多选模式（无需按住 `Ctrl/Meta` 键）
+- **详情**：设置是否始终启用多选模式。当多选被 `disableMultiSelect` 禁用时，本方法不会启用多选
+
 ## reloadIframe
 
 - **类型**：`(url: string) => void`

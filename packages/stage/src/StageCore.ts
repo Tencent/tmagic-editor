@@ -269,6 +269,14 @@ export default class StageCore extends EventEmitter {
     this.actionManager?.enableMultiSelect();
   }
 
+  /**
+   * 设置是否始终启用多选模式（无需按住 Ctrl/Meta）。
+   * 当多选被 `disabledMultiSelect` 禁用时，本方法不会启用多选。
+   */
+  public setAlwaysMultiSelect(value: boolean) {
+    this.actionManager?.setAlwaysMultiSelect(value);
+  }
+
   public reloadIframe(url: string) {
     this.renderer?.reloadIframe(url);
   }
@@ -346,6 +354,7 @@ export default class StageCore extends EventEmitter {
       container: this.mask!.content,
       disabledDragStart: config.disabledDragStart,
       disabledMultiSelect: config.disabledMultiSelect,
+      alwaysMultiSelect: config.alwaysMultiSelect,
       canSelect: config.canSelect,
       isContainer: config.isContainer,
       canDropIn: config.canDropIn,

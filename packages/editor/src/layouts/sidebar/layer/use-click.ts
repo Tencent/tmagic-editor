@@ -2,7 +2,7 @@ import { computed, type ComputedRef, nextTick, type Ref, type ShallowRef } from 
 import { throttle } from 'lodash-es';
 
 import { Id, MNode } from '@tmagic/core';
-import { isPage, isPageFragment } from '@tmagic/utils';
+import { getElById, isPage, isPageFragment } from '@tmagic/utils';
 
 import type { LayerNodeStatus, Services, TreeNodeData } from '@editor/type';
 import { UI_SELECT_MODE_EVENT_NAME } from '@editor/utils/const';
@@ -16,7 +16,9 @@ export const useClick = (
   nodeStatusMap: ComputedRef<Map<Id, LayerNodeStatus> | undefined>,
   menuRef: ShallowRef<InstanceType<typeof LayerMenu> | null>,
 ) => {
-  const isMultiSelect = computed(() => isCtrlKeyDown.value && !editorService.get('disabledMultiSelect'));
+  const isMultiSelect = computed(
+    () => !editorService.get('disabledMultiSelect') && (isCtrlKeyDown.value || editorService.get('alwaysMultiSelect')),
+  );
 
   // 触发画布选中
   const select = async (data: MNode) => {
@@ -81,6 +83,19 @@ export const useClick = (
     stageOverlayService.get('stage')?.highlight(data.id);
   };
 
+  const isNodeCanSelect = async (data: TreeNodeData) => {
+    const canSelect = stageOverlayService.get('stageOptions')?.canSelect;
+    if (!canSelect) return true;
+
+    const doc = editorService.get('stage')?.renderer?.contentWindow?.document;
+    if (!doc) return true;
+
+    const el = getElById()(doc, data.id);
+    if (!el) return true;
+
+    return Boolean(await canSelect(el));
+  };
+
   const nodeClickHandler = (event: MouseEvent, data: TreeNodeData): void => {
     if (!nodeStatusMap?.value) return;
 
@@ -95,7 +110,9 @@ export const useClick = (
       });
     }
 
-    nextTick(() => {
+    nextTick(async () => {
+      if (!(await isNodeCanSelect(data))) return;
+
       select(data);
     });
   };

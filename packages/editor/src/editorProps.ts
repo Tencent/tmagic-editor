@@ -77,6 +77,11 @@ export interface EditorProps {
   guidesOptions?: Partial<GuidesOptions>;
   /** 禁止多选 */
   disabledMultiSelect?: boolean;
+  /**
+   * 始终启用多选模式：开启后无需按住 Ctrl/Meta，点击即多选；
+   * 默认 false。当 `disabledMultiSelect` 为 true 时本配置失效
+   */
+  alwaysMultiSelect?: boolean;
   /** 禁用页面片 */
   disabledPageFragment?: boolean;
   /** 禁用双击在浮层中单独编辑选中组件 */
@@ -127,6 +132,7 @@ export interface EditorProps {
 export const defaultEditorProps = {
   renderType: RenderType.IFRAME,
   disabledMultiSelect: false,
+  alwaysMultiSelect: false,
   disabledPageFragment: false,
   disabledStageOverlay: false,
   containerHighlightClassName: CONTAINER_HIGHLIGHT_CLASS_NAME,
