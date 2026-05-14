@@ -149,4 +149,15 @@ describe('list max size', () => {
     expect(undoRedo.canUndo()).toBe(false);
     expect(undoRedo.getCurrentElement()).toEqual(null);
   });
+
+  test('listMaxSize 小于最小值时回退到最小值 2', () => {
+    const small = new UndoRedo(1);
+    small.pushElement({ a: 1 });
+    small.pushElement({ a: 2 });
+    small.pushElement({ a: 3 });
+    expect(small.getCurrentElement()).toEqual({ a: 3 });
+    expect(small.undo()).toEqual({ a: 3 });
+    expect(small.undo()).toEqual({ a: 2 });
+    expect(small.canUndo()).toBe(false);
+  });
 });

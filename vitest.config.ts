@@ -10,13 +10,15 @@ export default defineConfig({
 
   test: {
     include: ['./packages/*/tests/**', './runtime/*/tests/**'],
-    environment: 'jsdom',
+    environment: 'happy-dom',
     environmentMatchGlobs: [['packages/cli/**', 'node']],
     coverage: {
+      include: ['packages/*/src/**'],
       exclude: [
         './runtime/**',
         './playground/**',
         './docs/**',
+        './packages/*/dist/**',
         './packages/*/types/**',
         './packages/*/tests/**',
         './packages/cli/lib/**',

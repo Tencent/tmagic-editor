@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import { getConfig, setConfig } from '@form/utils/config';
+import { deleteField, getConfig, getField, registerField, setConfig } from '@form/utils/config';
 
 describe('config.ts', () => {
   beforeEach(() => {
@@ -49,5 +49,18 @@ describe('config.ts', () => {
 
   test('在未设置时获取Config', () => {
     expect(getConfig('model')).toBeUndefined();
+  });
+
+  test('registerField/getField/deleteField 完整流程', () => {
+    const fakeComp: any = { name: 'fake' };
+    registerField('fake-field', fakeComp);
+    expect(getField('fake-field')).toBe(fakeComp);
+
+    registerField('fake-field', { name: 'other' } as any);
+    expect(getField('fake-field')).toBe(fakeComp);
+
+    expect(deleteField('fake-field')).toBe(true);
+    expect(getField('fake-field')).toBeUndefined();
+    expect(deleteField('fake-field')).toBe(false);
   });
 });

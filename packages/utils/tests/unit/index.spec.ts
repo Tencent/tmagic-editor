@@ -25,64 +25,101 @@ import * as util from '../../src';
 describe('asyncLoadJs', () => {
   const url = 'https://m.www.tmagic.com/magic-ui/production/1/1625056093304/magic/magic-ui.umd.min.js';
 
-  test('第一次加载asyncLoadJs带url与crossorigin参数', () => {
-    const crossOrigin = 'anonymous';
-    const load = util.asyncLoadJs(url, crossOrigin);
-    load.then(() => {
-      const script = document.getElementsByTagName('script')[0];
-      expect(script).not.toBeUndefined();
-      expect(script.type).toMatch('text/javascript');
-      // 设置了anonymous
-      expect(script.crossOrigin).toMatch(crossOrigin);
-      expect(script.src).toMatch(url);
-    });
-  });
-
-  test('第二次加载asyncLoadJs', () => {
-    util.asyncLoadJs(url, 'anonymous').then(() => {
-      util.asyncLoadJs(url, 'use-credentials').then(() => {
-        const scriptList = document.getElementsByTagName('script');
-        expect(scriptList.length).toBe(1);
-        expect(scriptList[0].crossOrigin).toMatch('anonymous');
-        expect(scriptList[0].src).toMatch(url);
+  // 在测试环境中，浏览器不会真的加载外部 script。
+  // 通过监听插入到 head 的 script 节点，手动派发 load 事件来驱动 Promise resolve。
+  const triggerScriptLoad = () => {
+    queueMicrotask(() => {
+      const scripts = document.getElementsByTagName('script');
+      Array.from(scripts).forEach((s) => {
+        if (typeof s.onload === 'function') {
+          (s.onload as any)(new Event('load'));
+        }
       });
     });
+  };
+
+  test('第一次加载asyncLoadJs带url与crossorigin参数', async () => {
+    const crossOrigin = 'anonymous';
+    const load = util.asyncLoadJs(url, crossOrigin);
+    triggerScriptLoad();
+    await load;
+    const script = document.getElementsByTagName('script')[0];
+    expect(script).not.toBeUndefined();
+    expect(script.type).toMatch('text/javascript');
+    expect(script.crossOrigin).toMatch(crossOrigin);
+    expect(script.src).toMatch(url);
   });
 
-  test('url无效', () => {
-    util.asyncLoadJs('123').catch((e: any) => {
-      expect(e).toMatch('error');
+  test('第二次加载asyncLoadJs', async () => {
+    const load1 = util.asyncLoadJs(url, 'anonymous');
+    triggerScriptLoad();
+    await load1;
+    await util.asyncLoadJs(url, 'use-credentials');
+    const scriptList = document.getElementsByTagName('script');
+    expect(scriptList.length).toBe(1);
+    expect(scriptList[0].crossOrigin).toMatch('anonymous');
+    expect(scriptList[0].src).toMatch(url);
+  });
+
+  test('url无效, onerror 触发后 reject', async () => {
+    const promise = util.asyncLoadJs('error-url');
+    queueMicrotask(() => {
+      const scripts = document.getElementsByTagName('script');
+      Array.from(scripts).forEach((s) => {
+        if (s.src.includes('error-url') && typeof s.onerror === 'function') {
+          (s.onerror as any)(new Event('error'));
+        }
+      });
     });
+    await expect(promise).rejects.toBeInstanceOf(Error);
   });
 });
 
 describe('asyncLoadCss', () => {
   const url = 'https://beta.m.www.tmagic.com/magic-act/css/BuyGift.75d837d2b3fd.css?max_age=864000';
 
-  test('第一次加载asyncLoadCss', () => {
-    const load = util.asyncLoadCss(url);
-    load.then(() => {
-      const link = document.getElementsByTagName('link')[0];
-      expect(link).not.toBeUndefined();
-      expect(link.rel).toMatch('stylesheet');
-      expect(link.href).toMatch(url);
-    });
-  });
-
-  test('第二次加载asyncLoadJs', () => {
-    util.asyncLoadCss(url).then(() => {
-      util.asyncLoadCss(url).then(() => {
-        const linkList = document.getElementsByTagName('link');
-        expect(linkList.length).toBe(1);
-        expect(linkList[0].href).toMatch(url);
+  const triggerLinkLoad = () => {
+    queueMicrotask(() => {
+      const links = document.getElementsByTagName('link');
+      Array.from(links).forEach((l) => {
+        if (typeof l.onload === 'function') {
+          (l.onload as any)(new Event('load'));
+        }
       });
     });
+  };
+
+  test('第一次加载asyncLoadCss', async () => {
+    const load = util.asyncLoadCss(url);
+    triggerLinkLoad();
+    await load;
+    const link = document.getElementsByTagName('link')[0];
+    expect(link).not.toBeUndefined();
+    expect(link.rel).toMatch('stylesheet');
+    expect(link.href).toMatch(url);
   });
 
-  test('url无效', () => {
-    util.asyncLoadCss('123').catch((e: any) => {
-      expect(e).toMatch('error');
+  test('第二次加载asyncLoadCss命中缓存', async () => {
+    const load1 = util.asyncLoadCss(url);
+    triggerLinkLoad();
+    await load1;
+    await util.asyncLoadCss(url);
+    const linkList = document.getElementsByTagName('link');
+    expect(linkList.length).toBe(1);
+    expect(linkList[0].href).toMatch(url);
+  });
+
+  test('url无效, onerror 触发后 reject', async () => {
+    const promise = util.asyncLoadCss('error-css');
+    queueMicrotask(() => {
+      const links = document.getElementsByTagName('link');
+      Array.from(links).forEach((l) => {
+        if (l.href.includes('error-css') && typeof l.onerror === 'function') {
+          (l.onerror as any)(new Event('error'));
+        }
+      });
     });
+    await expect(promise).rejects.toBeInstanceOf(Error);
   });
 });
 
@@ -612,6 +649,24 @@ describe('compiledNode', () => {
     );
 
     expect(node.text).toBe('');
+  });
+
+  test('compile 缓存命中时直接复用 cache value', () => {
+    const node: any = {
+      id: 61705611,
+      type: 'text',
+      [`${util.DSL_NODE_KEY_COPY_PREFIX}text`]: 'cached-template',
+      text: 'old-value',
+    };
+    const result = util.compiledNode((str: string) => `compiled-${str}`, node, {
+      ds_bebcb2d5: {
+        61705611: {
+          name: '文本',
+          keys: ['text'],
+        },
+      },
+    });
+    expect(result.text).toBe('compiled-cached-template');
   });
 });
 

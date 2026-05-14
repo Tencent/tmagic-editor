@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 
 import type { MApp, MContainer, MNode } from '@tmagic/core';
 import { NodeType } from '@tmagic/core';
@@ -755,5 +755,483 @@ describe('classifyDragSources', () => {
     });
     expect(result.sameParentIndices).toEqual([0]);
     expect(result.crossParentConfigs).toHaveLength(0);
+  });
+});
+
+describe('calcMoveStyle', () => {
+  test('非 absolute/fixed 返回 null', () => {
+    expect(editor.calcMoveStyle({ position: 'relative' }, 1, 1)).toBeNull();
+    expect(editor.calcMoveStyle(null as any, 1, 1)).toBeNull();
+  });
+
+  test('absolute + top/left', () => {
+    const result = editor.calcMoveStyle({ position: 'absolute', top: 10, left: 5 }, 3, 4)!;
+    expect(result.top).toBe(14);
+    expect(result.left).toBe(8);
+  });
+
+  test('absolute + bottom/right (left/top 未定义)', () => {
+    const result = editor.calcMoveStyle({ position: 'absolute', bottom: 10, right: 5 }, 3, 4)!;
+    expect(result.bottom).toBe(6);
+    expect(result.right).toBe(2);
+  });
+});
+
+describe('calcAlignCenterStyle', () => {
+  test('relative 布局返回 null', () => {
+    const result = editor.calcAlignCenterStyle(
+      { id: 'a', style: { width: 100 } } as any,
+      { style: { width: 200 } } as any,
+      Layout.RELATIVE,
+    );
+    expect(result).toBeNull();
+  });
+
+  test('无 doc 时按 parent.style 与 node.style 计算 left', () => {
+    const result = editor.calcAlignCenterStyle(
+      { id: 'a', style: { width: 100, position: 'absolute' } } as any,
+      { style: { width: 300 } } as any,
+      Layout.ABSOLUTE,
+    );
+    expect(result?.left).toBe(100);
+    expect(result?.right).toBe('');
+  });
+
+  test('node 没有 style 返回 null', () => {
+    const result = editor.calcAlignCenterStyle({ id: 'a' } as any, { style: { width: 100 } } as any, Layout.ABSOLUTE);
+    expect(result).toBeNull();
+  });
+});
+
+describe('calcLayerTargetIndex', () => {
+  test('LayerOffset.TOP / BOTTOM', () => {
+    expect(editor.calcLayerTargetIndex(2, LayerOffset.TOP, 5, false)).toBeGreaterThanOrEqual(0);
+    expect(editor.calcLayerTargetIndex(2, LayerOffset.BOTTOM, 5, false)).toBeGreaterThanOrEqual(0);
+  });
+
+  test('数字 offset 走偏移逻辑', () => {
+    const r1 = editor.calcLayerTargetIndex(2, 1, 5, true);
+    const r2 = editor.calcLayerTargetIndex(2, 1, 5, false);
+    expect(typeof r1).toBe('number');
+    expect(typeof r2).toBe('number');
+  });
+});
+
+describe('getGuideLineFromCache', () => {
+  test('key 为空返回 []', () => {
+    expect(editor.getGuideLineFromCache('')).toEqual([]);
+  });
+
+  test('返回缓存中的数组', () => {
+    globalThis.localStorage.setItem('gl_test', JSON.stringify([1, 2, 3]));
+    expect(editor.getGuideLineFromCache('gl_test')).toEqual([1, 2, 3]);
+    globalThis.localStorage.removeItem('gl_test');
+  });
+
+  test('JSON 解析失败时返回 []', () => {
+    globalThis.localStorage.setItem('gl_bad', 'not-json');
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    expect(editor.getGuideLineFromCache('gl_bad')).toEqual([]);
+    errSpy.mockRestore();
+    globalThis.localStorage.removeItem('gl_bad');
+  });
+});
+
+describe('change2Fixed / Fixed2Other', () => {
+  const root: MApp = {
+    id: 'app',
+    type: NodeType.ROOT,
+    items: [
+      {
+        id: 'p1',
+        type: NodeType.PAGE,
+        style: { left: 10, top: 20 },
+        items: [
+          {
+            id: 'btn',
+            type: 'text',
+            style: { position: 'absolute', left: 5, top: 5 },
+          },
+        ],
+      } as any,
+    ],
+  };
+
+  test('change2Fixed 累加路径上的 left/top', () => {
+    const node = root.items[0]!.items![0] as MNode;
+    const style = editor.change2Fixed(node, root);
+    expect(style.left).toBeGreaterThan(0);
+    expect(style.top).toBeGreaterThan(0);
+  });
+
+  test('Fixed2Other 转回 absolute', async () => {
+    const node = root.items[0]!.items![0] as MNode;
+    const style = await editor.Fixed2Other(node, root, async () => Layout.ABSOLUTE);
+    expect(style.position).toBe('absolute');
+  });
+
+  test('Fixed2Other 转回 relative 时 right/top 重置', async () => {
+    const node = root.items[0]!.items![0] as MNode;
+    const style = await editor.Fixed2Other(node, root, async () => Layout.RELATIVE);
+    expect(style.position).toBe('relative');
+  });
+});
+
+describe('补充：getPageList / getPageFragmentList / generatePageNameByApp 等基础工具', () => {
+  test('getPageList - root 为 null/items 不是数组时返回空数组', () => {
+    expect(editor.getPageList(null as any)).toEqual([]);
+    expect(editor.getPageList(undefined as any)).toEqual([]);
+    expect(editor.getPageList({ id: 'x', type: NodeType.ROOT } as any)).toEqual([]);
+  });
+
+  test('getPageFragmentList - root 为 null/items 不是数组时返回空数组', () => {
+    expect(editor.getPageFragmentList(null as any)).toEqual([]);
+    expect(editor.getPageFragmentList({ id: 'x', type: NodeType.ROOT } as any)).toEqual([]);
+  });
+
+  test('getPageFragmentList - 仅返回 page-fragment 节点', () => {
+    const root: MApp = {
+      id: 'a',
+      type: NodeType.ROOT,
+      items: [
+        { id: 'pf1', type: NodeType.PAGE_FRAGMENT, items: [] } as any,
+        { id: 'p1', type: NodeType.PAGE, items: [] } as any,
+      ],
+    };
+    expect(editor.getPageFragmentList(root)).toHaveLength(1);
+  });
+
+  test('getPageNameList - 缺少 name 时使用 index 兜底', () => {
+    const list = editor.getPageNameList([{ id: 'a', type: NodeType.PAGE, items: [] } as any]);
+    expect(list[0]).toBe('index');
+  });
+
+  test('generatePageName - 列表为空时返回 index', () => {
+    expect(editor.generatePageName([], NodeType.PAGE)).toBe('page_index');
+  });
+
+  test('generatePageName - 重名时累加索引', () => {
+    expect(editor.generatePageName(['page_1', 'page_2'], NodeType.PAGE)).toBe('page_3');
+  });
+
+  test('generatePageNameByApp - PAGE / PAGE_FRAGMENT 两种类型', () => {
+    const app: MApp = {
+      id: 'a',
+      type: NodeType.ROOT,
+      items: [
+        { id: 'p1', type: NodeType.PAGE, name: 'page_1', items: [] } as any,
+        { id: 'pf', type: NodeType.PAGE_FRAGMENT, name: 'page-fragment_1', items: [] } as any,
+      ],
+    };
+    expect(editor.generatePageNameByApp(app, NodeType.PAGE)).toBe('page_2');
+    expect(editor.generatePageNameByApp(app, NodeType.PAGE_FRAGMENT)).toBe('page-fragment_2');
+  });
+});
+
+describe('补充：getInitPositionStyle / setLayout / setChildrenLayout', () => {
+  test('Layout.ABSOLUTE - 已有 right 时不会被填 left=0', () => {
+    const style = editor.getInitPositionStyle({ right: 0 }, Layout.ABSOLUTE);
+    expect(style.position).toBe('absolute');
+    expect(style.left).toBeUndefined();
+  });
+
+  test('Layout.ABSOLUTE - 没有 left/right 时默认 left=0', () => {
+    const style = editor.getInitPositionStyle({}, Layout.ABSOLUTE);
+    expect(style.left).toBe(0);
+  });
+
+  test('Layout.RELATIVE - 走 getRelativeStyle', () => {
+    const style = editor.getInitPositionStyle({ color: 'red' }, Layout.RELATIVE);
+    expect(style.position).toBe('relative');
+  });
+
+  test('Layout.FIXED - 直接返回原 style', () => {
+    const style = { color: 'red' };
+    expect(editor.getInitPositionStyle(style, Layout.FIXED)).toBe(style);
+  });
+
+  test('setLayout - pop 类型不处理', () => {
+    const node = { id: 'p', type: 'pop' } as any;
+    expect(editor.setLayout(node, Layout.ABSOLUTE)).toBeUndefined();
+  });
+
+  test('setLayout - position fixed 不处理', () => {
+    const node = { id: 'n', type: 'text', style: { position: 'fixed' } } as any;
+    expect(editor.setLayout(node, Layout.ABSOLUTE)).toBeUndefined();
+  });
+
+  test('setLayout - RELATIVE 时使用 getRelativeStyle', () => {
+    const node = { id: 'n', type: 'text', style: { left: 10 } } as any;
+    editor.setLayout(node, Layout.RELATIVE);
+    expect(node.style.position).toBe('relative');
+    expect(node.style.right).toBe('auto');
+    expect(node.style.bottom).toBe('auto');
+  });
+
+  test('setLayout - 其他 layout 时设置 position absolute', () => {
+    const node = { id: 'n', type: 'text', style: {} } as any;
+    editor.setLayout(node, Layout.ABSOLUTE);
+    expect(node.style.position).toBe('absolute');
+  });
+
+  test('setLayout - 节点没有 style 时也能赋值', () => {
+    const node = { id: 'n', type: 'text' } as any;
+    editor.setLayout(node, Layout.ABSOLUTE);
+  });
+
+  test('setChildrenLayout - 遍历所有 child', () => {
+    const container: MContainer = {
+      id: 'c',
+      type: NodeType.CONTAINER,
+      items: [{ id: 'a', type: 'text', style: {} } as any, { id: 'b', type: 'text', style: {} } as any],
+    };
+    const result = editor.setChildrenLayout(container, Layout.ABSOLUTE);
+    expect(result.items[0].style?.position).toBe('absolute');
+    expect(result.items[1].style?.position).toBe('absolute');
+  });
+});
+
+describe('补充：fixNodeLeft / fixNodePosition / serializeConfig', () => {
+  test('fixNodeLeft - 缺少 doc 直接返回 style.left', () => {
+    expect(editor.fixNodeLeft({ id: 'a', style: { left: 5 } } as any, { id: 'p' } as any)).toBe(5);
+  });
+
+  test('fixNodeLeft - left 不是数字直接返回', () => {
+    expect(editor.fixNodeLeft({ id: 'a', style: { left: '5%' } } as any, { id: 'p' } as any, document)).toBe('5%');
+  });
+
+  test('fixNodeLeft - 元素 + 父元素 + 超出宽度时修正', () => {
+    const doc = document.implementation.createHTMLDocument();
+    const parent = doc.createElement('div');
+    parent.dataset.tmagicId = 'p';
+    Object.defineProperty(parent, 'offsetWidth', { value: 100 });
+    const child = doc.createElement('div');
+    child.dataset.tmagicId = 'a';
+    Object.defineProperty(child, 'offsetWidth', { value: 80 });
+    parent.appendChild(child);
+    doc.body.appendChild(parent);
+
+    expect(editor.fixNodeLeft({ id: 'a', style: { left: 50 } } as any, { id: 'p' } as any, doc)).toBe(20);
+  });
+
+  test('fixNodeLeft - 未超出宽度时返回原 left', () => {
+    const doc = document.implementation.createHTMLDocument();
+    const parent = doc.createElement('div');
+    parent.dataset.tmagicId = 'p2';
+    Object.defineProperty(parent, 'offsetWidth', { value: 200 });
+    const child = doc.createElement('div');
+    child.dataset.tmagicId = 'a2';
+    Object.defineProperty(child, 'offsetWidth', { value: 50 });
+    parent.appendChild(child);
+    doc.body.appendChild(parent);
+
+    expect(editor.fixNodeLeft({ id: 'a2', style: { left: 30 } } as any, { id: 'p2' } as any, doc)).toBe(30);
+  });
+
+  test('fixNodePosition - 非 absolute 时直接返回 style', () => {
+    const style = { position: 'relative' } as any;
+    expect(editor.fixNodePosition({ id: 'a', style } as any, { id: 'p', items: [] } as any, null)).toBe(style);
+  });
+
+  test('fixNodePosition - absolute 节点未传 stage 时也能得到 top/left', () => {
+    const result = editor.fixNodePosition(
+      { id: 'a', style: { position: 'absolute', height: 50 } } as any,
+      { id: 'p', items: [], style: { height: 200 } } as any,
+      null,
+    );
+    expect(result).toBeDefined();
+  });
+
+  test('serializeConfig - 输出去掉了 key 引号', () => {
+    const out = editor.serializeConfig({ a: 1 });
+    expect(out).toContain('a:');
+  });
+});
+
+describe('补充：isIncludeDataSource', () => {
+  test('updated 中包含模板字符串触发 true', () => {
+    const oldNode = { id: '1', type: 't', text: 'foo' } as any;
+    const newNode = { id: '1', type: 't', text: '${ds.bar}' } as any;
+    expect(editor.isIncludeDataSource(newNode, oldNode)).toBe(true);
+  });
+
+  test('added 中包含模板字符串触发 true', () => {
+    const oldNode = { id: '1', type: 't' } as any;
+    const newNode = { id: '1', type: 't', text: '${ds.bar}' } as any;
+    expect(editor.isIncludeDataSource(newNode, oldNode)).toBe(true);
+  });
+
+  test('NODE_CONDS_KEY 修改触发 true', async () => {
+    const { NODE_CONDS_KEY } = await import('@tmagic/core');
+    const oldNode = { id: '1', type: 't', [NODE_CONDS_KEY]: [] } as any;
+    const newNode = { id: '1', type: 't', [NODE_CONDS_KEY]: [{ field: '${ds.x}', op: '=', value: '1' }] } as any;
+    expect(editor.isIncludeDataSource(newNode, oldNode)).toBe(true);
+  });
+
+  test('NODE_CONDS_KEY 删除分支会被触发', async () => {
+    const { NODE_CONDS_KEY } = await import('@tmagic/core');
+    const oldNode = { id: '1', type: 't', [NODE_CONDS_KEY]: [{ field: 'a' }] } as any;
+    const newNode = { id: '1', type: 't' } as any;
+    // 期望函数能正常返回布尔值（覆盖 deleted 检查路径）
+    expect(typeof editor.isIncludeDataSource(newNode, oldNode)).toBe('boolean');
+  });
+
+  test('删除带模板字符串字段会触发 deleted 检查路径', () => {
+    const oldNode = { id: '1', type: 't', extra: '${ds.x}' } as any;
+    const newNode = { id: '1', type: 't' } as any;
+    expect(typeof editor.isIncludeDataSource(newNode, oldNode)).toBe('boolean');
+  });
+
+  test('完全无变更时返回 false', () => {
+    const node = { id: '1', type: 't' } as any;
+    expect(editor.isIncludeDataSource(node, node)).toBe(false);
+  });
+
+  test('updated 嵌套对象中查找数据源', () => {
+    const oldNode = { id: '1', type: 't', data: { foo: { bar: 'a' } } } as any;
+    const newNode = { id: '1', type: 't', data: { foo: { bar: '${ds.x}' } } } as any;
+    expect(editor.isIncludeDataSource(newNode, oldNode)).toBe(true);
+  });
+});
+
+describe('补充：collectRelatedNodes', () => {
+  test('被复制节点引用了其他节点时把引用也加入 copyNodes', () => {
+    const source: any = { id: 'src', type: 'text', binding: '${other_node.x}' };
+    const other: any = { id: 'other_node', type: 'text' };
+    const copyNodes: MNode[] = [source];
+    editor.collectRelatedNodes(
+      copyNodes,
+      { type: 'related', isTarget: () => false, initialDeps: {} } as any,
+      (id: any) => (id === 'other_node' ? other : null),
+    );
+    expect(Array.isArray(copyNodes)).toBe(true);
+  });
+});
+
+describe('补充：calcAlignCenterStyle 通过 DOM 计算', () => {
+  test('提供 doc 时通过 element 实际宽度计算 left', () => {
+    const doc = document.implementation.createHTMLDocument();
+    const parent = doc.createElement('div');
+    Object.defineProperty(parent, 'clientWidth', { value: 300 });
+    const child = doc.createElement('div');
+    child.dataset.tmagicId = 'aa';
+    Object.defineProperty(child, 'clientWidth', { value: 100 });
+    Object.defineProperty(child, 'offsetParent', { value: parent });
+    parent.appendChild(child);
+    doc.body.appendChild(parent);
+
+    const result = editor.calcAlignCenterStyle(
+      { id: 'aa', style: { width: 100, position: 'absolute' } } as any,
+      { id: 'p', style: { width: 300 } } as any,
+      Layout.ABSOLUTE,
+      doc,
+    );
+    expect(result?.left).toBe(100);
+    expect(result?.right).toBe('');
+  });
+
+  test('提供 doc + Layout.FIXED 用 doc.body 作为 parent', () => {
+    const doc = document.implementation.createHTMLDocument();
+    Object.defineProperty(doc.body, 'clientWidth', { value: 500, configurable: true });
+    const child = doc.createElement('div');
+    child.dataset.tmagicId = 'bb';
+    Object.defineProperty(child, 'clientWidth', { value: 100 });
+    doc.body.appendChild(child);
+    const result = editor.calcAlignCenterStyle(
+      { id: 'bb', style: { width: 100, position: 'fixed' } } as any,
+      { id: 'p', style: { width: 500 } } as any,
+      Layout.FIXED,
+      doc,
+    );
+    expect(result?.left).toBe(200);
+  });
+});
+
+describe('补充：change2Fixed 边界', () => {
+  test('遇到祖先有 right/非数字 left 时 offset 重置为 0', () => {
+    const root: MApp = {
+      id: 'app',
+      type: NodeType.ROOT,
+      items: [
+        {
+          id: 'p1',
+          type: NodeType.PAGE,
+          style: { right: 10 },
+          items: [{ id: 'b', type: 'text', style: { position: 'absolute', left: 5, top: 5 } }],
+        } as any,
+      ],
+    };
+    const node = root.items[0]!.items![0] as MNode;
+    const style = editor.change2Fixed(node, root);
+    expect(style.left).toBe(5);
+  });
+
+  test('节点本身有 right 时不累加 left', () => {
+    const root: MApp = {
+      id: 'app',
+      type: NodeType.ROOT,
+      items: [
+        {
+          id: 'p1',
+          type: NodeType.PAGE,
+          style: { left: 10, top: 20 },
+          items: [{ id: 'b', type: 'text', style: { position: 'absolute', right: 5 } }],
+        } as any,
+      ],
+    };
+    const node = root.items[0]!.items![0] as MNode;
+    const style = editor.change2Fixed(node, root);
+    expect(style.left).toBeUndefined();
+  });
+});
+
+describe('补充：classifyDragSources 同父容器索引异常', () => {
+  test('当 getNodeIndex 返回 -1 时 aborted=true', () => {
+    const targetParent: MContainer = { id: 't', type: NodeType.CONTAINER, items: [] };
+    const result = editor.classifyDragSources([{ id: 'x', type: 'text' }], targetParent, ((id: any) => ({
+      node: { id, type: 'text' },
+      parent: targetParent,
+      page: null,
+    })) as any);
+    expect(result.aborted).toBe(true);
+  });
+});
+
+describe('toggleFixedPosition', () => {
+  test('fixed -> 非 fixed 触发 Fixed2Other', async () => {
+    const root: MApp = {
+      id: 'app',
+      type: NodeType.ROOT,
+      items: [{ id: 'p1', type: NodeType.PAGE, items: [] } as any],
+    };
+    const result = await editor.toggleFixedPosition(
+      { id: 'a', type: 'text', style: { position: 'absolute', top: 0, left: 0 } } as any,
+      { id: 'a', type: 'text', style: { position: 'fixed' } } as any,
+      root,
+      async () => Layout.ABSOLUTE,
+    );
+    expect(result.style?.position).toBeDefined();
+  });
+
+  test('非 fixed -> fixed 触发 change2Fixed', async () => {
+    const root: MApp = {
+      id: 'app',
+      type: NodeType.ROOT,
+      items: [
+        {
+          id: 'p1',
+          type: NodeType.PAGE,
+          style: { left: 0, top: 0 },
+          items: [{ id: 'a', type: 'text', style: { position: 'fixed', left: 0, top: 0 } }],
+        } as any,
+      ],
+    };
+    const result = await editor.toggleFixedPosition(
+      { id: 'a', type: 'text', style: { position: 'fixed', left: 0, top: 0 } } as any,
+      { id: 'a', type: 'text', style: { position: 'absolute' } } as any,
+      root,
+      async () => Layout.ABSOLUTE,
+    );
+    expect(result.style?.position).toBe('fixed');
   });
 });

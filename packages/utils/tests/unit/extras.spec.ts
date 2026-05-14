@@ -200,6 +200,11 @@ describe('getDefaultValueFromFields 边界场景', () => {
     warnSpy.mockRestore();
   });
 
+  test('object 类型 defaultValue 既不是对象也不是字符串时退回 {}', () => {
+    const result = getDefaultValueFromFields([{ name: 'x', type: 'object', defaultValue: 123 } as any]);
+    expect(result.x).toEqual({});
+  });
+
   test('boolean / number 类型默认为 undefined', () => {
     const result = getDefaultValueFromFields([
       { name: 'b', type: 'boolean' },
@@ -407,6 +412,12 @@ describe('dom helpers', () => {
     doc.documentElement.style.fontSize = '50px';
     expect(calcValueByFontsize(doc, 100)).toBeCloseTo(200);
     doc.documentElement.style.fontSize = '';
+  });
+
+  test('calcValueByFontsize: 没有 fontSize 时直接返回原值', () => {
+    if (!doc) return;
+    doc.documentElement.style.fontSize = '';
+    expect(calcValueByFontsize(doc, 42)).toBe(42);
   });
 
   test('dslDomRelateConfig get/set/getId', () => {

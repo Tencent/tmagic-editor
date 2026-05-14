@@ -71,6 +71,9 @@ importers:
       execa:
         specifier: ^9.6.0
         version: 9.6.0
+      happy-dom:
+        specifier: ^20.9.0
+        version: 20.9.0
       highlight.js:
         specifier: ^11.11.1
         version: 11.11.1
@@ -127,7 +130,7 @@ importers:
         version: 1.6.4(@algolia/client-search@5.44.0)(@types/node@24.0.10)(@types/react@18.3.27)(async-validator@4.2.5)(axios@1.13.2)(lightningcss@1.32.0)(postcss@8.5.14)(qrcode@1.5.4)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass-embedded@1.99.0)(sass@1.99.0)(search-insights@2.17.3)(sortablejs@1.15.6)(terser@5.44.1)(typescript@6.0.3)
       vitest:
         specifier: ^4.1.5
-        version: 4.1.5(@types/node@24.0.10)(@vitest/coverage-v8@4.1.5)(jsdom@27.2.0)(vite@8.0.12(@types/node@24.0.10)(jiti@2.6.1)(sass-embedded@1.99.0)(sass@1.99.0)(terser@5.44.1)(yaml@2.8.1))
+        version: 4.1.5(@types/node@24.0.10)(@vitest/coverage-v8@4.1.5)(happy-dom@20.9.0)(jsdom@27.2.0)(vite@8.0.12(@types/node@24.0.10)(jiti@2.6.1)(sass-embedded@1.99.0)(sass@1.99.0)(terser@5.44.1)(yaml@2.8.1))
       vue:
         specifier: 'catalog:'
         version: 3.5.33(typescript@6.0.3)
@@ -3307,6 +3310,12 @@ packages:
   '@types/web-bluetooth@0.0.21':
     resolution: {integrity: sha512-oIQLCGWtcFZy2JW77j9k8nHzAOpqMHLQejDA48XXMWH6tjCQHz5RCFz1bzsmROyL6PUm+LLnUiI4BCn221inxA==}
 
+  '@types/whatwg-mimetype@3.0.2':
+    resolution: {integrity: sha512-c2AKvDT8ToxLIOUlN51gTiHXflsfIFisS4pO7pDPoKouJCESkhZnEy623gwP9laCy5lnLDAw1vAzu2vM2YLOrA==}
+
+  '@types/ws@8.18.1':
+    resolution: {integrity: sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==}
+
   '@typescript-eslint/eslint-plugin@8.58.0':
     resolution: {integrity: sha512-RLkVSiNuUP1C2ROIWfqX+YcUfLaSnxGE/8M+Y57lopVwg9VTYYfhuz15Yf1IzCKgZj6/rIbYTmJCUSqr76r0Wg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
@@ -4822,6 +4831,10 @@ packages:
     resolution: {integrity: sha512-vafaFqs8MZkRrSX7sFVUdo3ap/eNiLnb4IakshzvP56X5Nr1iGKAIqdX6tMlm6HcNRIkr6AxO5jFEoJzzpT8aQ==}
     engines: {node: '>=0.4.7'}
     hasBin: true
+
+  happy-dom@20.9.0:
+    resolution: {integrity: sha512-GZZ9mKe8r646NUAf/zemnGbjYh4Bt8/MqASJY+pSm5ZDtc3YQox+4gsLI7yi1hba6o+eCsGxpHn5+iEVn31/FQ==}
+    engines: {node: '>=20.0.0'}
 
   has-bigints@1.1.0:
     resolution: {integrity: sha512-R3pbpkcIqv2Pm3dUwgjclDRVmWpTJW2DcMzcIhEXEx1oh/CEMObMm3KLmRJOdvhM7o4uQBnwr8pzRK2sJWIqfg==}
@@ -6820,6 +6833,10 @@ packages:
   whatwg-encoding@3.1.1:
     resolution: {integrity: sha512-6qN4hJdMwfYBtE3YBTTHhoeuUrDBPZmbQaxWAqSALV/MeEnR5z1xd8UKud2RAkFoPkmB+hli1TZSnyi84xz1vQ==}
     engines: {node: '>=18'}
+
+  whatwg-mimetype@3.0.0:
+    resolution: {integrity: sha512-nt+N2dzIutVRxARx1nghPKGv1xHikU7HKdfafKkLNLindmPU/ch3U31NOCGGA/dmPcmb1VlofO0vnKAcsm0o/Q==}
+    engines: {node: '>=12'}
 
   whatwg-mimetype@4.0.0:
     resolution: {integrity: sha512-QaKxh0eNIi2mE9p2vEdzfagOKHCcj1pJ56EEHGQOVxp8r9/iszLUUV7v89x9O1p/T+NlTM5W7jW6+cz4Fq1YVg==}
@@ -9078,6 +9095,12 @@ snapshots:
 
   '@types/web-bluetooth@0.0.21': {}
 
+  '@types/whatwg-mimetype@3.0.2': {}
+
+  '@types/ws@8.18.1':
+    dependencies:
+      '@types/node': 24.0.10
+
   '@typescript-eslint/eslint-plugin@8.58.0(@typescript-eslint/parser@8.58.0(eslint@10.0.3(jiti@2.6.1))(typescript@6.0.3))(eslint@10.0.3(jiti@2.6.1))(typescript@6.0.3)':
     dependencies:
       '@eslint-community/regexpp': 4.12.2
@@ -9256,7 +9279,7 @@ snapshots:
       obug: 2.1.1
       std-env: 4.0.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.5(@types/node@24.0.10)(@vitest/coverage-v8@4.1.5)(jsdom@27.2.0)(vite@8.0.12(@types/node@24.0.10)(jiti@2.6.1)(sass-embedded@1.99.0)(sass@1.99.0)(terser@5.44.1)(yaml@2.8.1))
+      vitest: 4.1.5(@types/node@24.0.10)(@vitest/coverage-v8@4.1.5)(happy-dom@20.9.0)(jsdom@27.2.0)(vite@8.0.12(@types/node@24.0.10)(jiti@2.6.1)(sass-embedded@1.99.0)(sass@1.99.0)(terser@5.44.1)(yaml@2.8.1))
 
   '@vitest/expect@4.1.5':
     dependencies:
@@ -10996,6 +11019,18 @@ snapshots:
       wordwrap: 1.0.0
     optionalDependencies:
       uglify-js: 3.19.3
+
+  happy-dom@20.9.0:
+    dependencies:
+      '@types/node': 24.0.10
+      '@types/whatwg-mimetype': 3.0.2
+      '@types/ws': 8.18.1
+      entities: 7.0.1
+      whatwg-mimetype: 3.0.0
+      ws: 8.18.3
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
 
   has-bigints@1.1.0: {}
 
@@ -12927,7 +12962,7 @@ snapshots:
       - typescript
       - universal-cookie
 
-  vitest@4.1.5(@types/node@24.0.10)(@vitest/coverage-v8@4.1.5)(jsdom@27.2.0)(vite@8.0.12(@types/node@24.0.10)(jiti@2.6.1)(sass-embedded@1.99.0)(sass@1.99.0)(terser@5.44.1)(yaml@2.8.1)):
+  vitest@4.1.5(@types/node@24.0.10)(@vitest/coverage-v8@4.1.5)(happy-dom@20.9.0)(jsdom@27.2.0)(vite@8.0.12(@types/node@24.0.10)(jiti@2.6.1)(sass-embedded@1.99.0)(sass@1.99.0)(terser@5.44.1)(yaml@2.8.1)):
     dependencies:
       '@vitest/expect': 4.1.5
       '@vitest/mocker': 4.1.5(vite@8.0.12(@types/node@24.0.10)(jiti@2.6.1)(sass-embedded@1.99.0)(sass@1.99.0)(terser@5.44.1)(yaml@2.8.1))
@@ -12952,6 +12987,7 @@ snapshots:
     optionalDependencies:
       '@types/node': 24.0.10
       '@vitest/coverage-v8': 4.1.5(vitest@4.1.5)
+      happy-dom: 20.9.0
       jsdom: 27.2.0
     transitivePeerDependencies:
       - msw
@@ -13022,6 +13058,8 @@ snapshots:
   whatwg-encoding@3.1.1:
     dependencies:
       iconv-lite: 0.6.3
+
+  whatwg-mimetype@3.0.0: {}
 
   whatwg-mimetype@4.0.0: {}
 

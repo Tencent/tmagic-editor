@@ -1,0 +1,152 @@
+/*
+ * Tencent is pleased to support the open source community by making TMagicEditor available.
+ *
+ * Copyright (C) 2025 Tencent.
+ */
+import { describe, expect, test, vi } from 'vitest';
+import { defineComponent, h } from 'vue';
+import { mount } from '@vue/test-utils';
+
+import CodeSelect from '@editor/fields/CodeSelect.vue';
+
+const dataSourceService = {
+  get: vi.fn(() => true),
+  getDataSourceById: vi.fn(() => ({ title: 'DS1' })),
+};
+const codeBlockService = {
+  getCodeContentById: vi.fn(() => ({ name: 'code-name' })),
+  getEditStatus: vi.fn(() => true),
+};
+
+vi.mock('@editor/hooks/use-services', () => ({
+  useServices: () => ({ dataSourceService, codeBlockService }),
+}));
+
+vi.mock('@tmagic/form', async (importOriginal) => {
+  const actual = await importOriginal<any>();
+  return {
+    ...actual,
+    MContainer: defineComponent({
+      name: 'MContainer',
+      props: ['config', 'size', 'prop', 'disabled', 'lastValues', 'model'],
+      emits: ['change'],
+      setup() {
+        return () => h('div', { class: 'fake-container' });
+      },
+    }),
+  };
+});
+
+vi.mock('@tmagic/design', () => ({
+  TMagicCard: defineComponent({
+    name: 'TMagicCard',
+    setup(_p, { slots }) {
+      return () => h('div', { class: 'fake-card' }, slots.default?.());
+    },
+  }),
+}));
+
+const baseProps = (extra: any = {}) => ({
+  config: { type: 'code-select' },
+  name: 'cs',
+  prop: 'cs',
+  model: { cs: { hookType: 'code', hookData: [{ codeType: 'code', codeId: 'c1' }] } },
+  size: 'default',
+  ...extra,
+});
+
+describe('CodeSelect', () => {
+  test('change emit', async () => {
+    const wrapper = mount(CodeSelect, { props: baseProps() as any });
+    await wrapper.findComponent({ name: 'MContainer' }).vm.$emit('change', 'v', { modifyKey: 'a' });
+    const evts = wrapper.emitted('change');
+    expect(evts?.[0]?.[0]).toBe('v');
+  });
+
+  test('codeConfig.title 返回 codeBlock.name', () => {
+    const wrapper = mount(CodeSelect, { props: baseProps() as any });
+    const container = wrapper.findComponent({ name: 'MContainer' });
+    const config = container.props('config') as any;
+    const title = config.title(undefined, { model: { codeType: 'code', codeId: 'c1' }, index: 0 });
+    expect(title).toBe('code-name');
+  });
+
+  test('codeConfig.title 数据源方法返回 ds 名称/method', () => {
+    const wrapper = mount(CodeSelect, { props: baseProps() as any });
+    const container = wrapper.findComponent({ name: 'MContainer' });
+    const config = container.props('config') as any;
+    const title = config.title(undefined, {
+      model: { codeType: 'data-source-method', codeId: ['ds1', 'doFetch'] },
+      index: 0,
+    });
+    expect(title).toBe('DS1 / doFetch');
+  });
+
+  test('codeConfig.title 数据源方法 codeId 长度<2 返回 index', () => {
+    const wrapper = mount(CodeSelect, { props: baseProps() as any });
+    const container = wrapper.findComponent({ name: 'MContainer' });
+    const config = container.props('config') as any;
+    const title = config.title(undefined, {
+      model: { codeType: 'data-source-method', codeId: ['ds1'] },
+      index: 5,
+    });
+    expect(title).toBe(5);
+  });
+
+  test('codeConfig.title 找不到 codeContent 返回 codeId 或 index', () => {
+    codeBlockService.getCodeContentById.mockReturnValueOnce(null);
+    const wrapper = mount(CodeSelect, { props: baseProps() as any });
+    const container = wrapper.findComponent({ name: 'MContainer' });
+    const config = container.props('config') as any;
+    const title = config.title(undefined, { model: { codeType: 'code', codeId: 'unknown' }, index: 0 });
+    expect(title).toBe('unknown');
+  });
+
+  test('空 model 时初始化为 { hookType, hookData }', () => {
+    const props = baseProps({ model: { cs: undefined } });
+    mount(CodeSelect, { props: props as any });
+    expect((props.model.cs as any).hookData).toEqual([]);
+  });
+
+  test('codeType row items 配置正确', () => {
+    const wrapper = mount(CodeSelect, { props: baseProps() as any });
+    const container = wrapper.findComponent({ name: 'MContainer' });
+    const config = container.props('config') as any;
+    const row = config.items[0];
+    expect(row.type).toBe('row');
+    const codeTypeSelect = row.items[0];
+    expect(codeTypeSelect.name).toBe('codeType');
+    const setModel = vi.fn();
+    codeTypeSelect.onChange(undefined, 'data-source-method', { setModel });
+    expect(setModel).toHaveBeenCalledWith('codeId', []);
+    setModel.mockClear();
+    codeTypeSelect.onChange(undefined, 'code', { setModel });
+    expect(setModel).toHaveBeenCalledWith('codeId', '');
+  });
+
+  test('display 函数依据 model.codeType 返回 boolean', () => {
+    const wrapper = mount(CodeSelect, { props: baseProps() as any });
+    const container = wrapper.findComponent({ name: 'MContainer' });
+    const config = container.props('config') as any;
+    const row = config.items[0];
+    const codeIdCol = row.items[1];
+    const dsCol = row.items[2];
+    expect(codeIdCol.display(undefined, { model: { codeType: 'code' } })).toBe(true);
+    expect(codeIdCol.display(undefined, { model: { codeType: 'data-source-method' } })).toBe(false);
+    expect(dsCol.display(undefined, { model: { codeType: 'data-source-method' } })).toBe(true);
+    expect(dsCol.display(undefined, { model: { codeType: 'code' } })).toBe(false);
+  });
+
+  test('notEditable 调用各服务', () => {
+    codeBlockService.getEditStatus.mockReturnValue(false);
+    dataSourceService.get.mockReturnValue(false);
+    const wrapper = mount(CodeSelect, { props: baseProps() as any });
+    const container = wrapper.findComponent({ name: 'MContainer' });
+    const config = container.props('config') as any;
+    const row = config.items[0];
+    expect(row.items[1].notEditable()).toBe(true);
+    expect(row.items[2].notEditable()).toBe(true);
+    codeBlockService.getEditStatus.mockReturnValue(true);
+    dataSourceService.get.mockReturnValue(true);
+  });
+});

@@ -1,9 +1,10 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 
 import { MApp, NodeType } from '@tmagic/schema';
 
 import App from '../src/App';
 import TMagicIteratorContainer from '../src/IteratorContainer';
+import Node from '../src/Node';
 
 const createAppDsl = (pageLength: number, nodeLength = 0) => {
   const dsl: MApp = {
@@ -261,5 +262,186 @@ describe('App', () => {
     ic.resetNodes();
 
     expect(ic2?.nodes.length).toBe(0);
+  });
+});
+
+describe('App 配置/方法/组件注册', () => {
+  test('platform=editor 时不创建 eventHelper', () => {
+    const app = new App({ platform: 'editor' });
+    expect(app.eventHelper).toBeUndefined();
+    expect(app.platform).toBe('editor');
+  });
+
+  test('disabledFlexible 时不创建 flexible', () => {
+    const app = new App({ disabledFlexible: true });
+    expect((app as any).flexible).toBeUndefined();
+  });
+
+  test('设置自定义 iteratorContainerType / pageFragmentContainerType', () => {
+    const app = new App({
+      iteratorContainerType: ['my-iter', 'custom-iter'],
+      pageFragmentContainerType: 'my-frag',
+    });
+    expect(app.iteratorContainerType.has('my-iter')).toBe(true);
+    expect(app.iteratorContainerType.has('custom-iter')).toBe(true);
+    expect(app.pageFragmentContainerType.has('my-frag')).toBe(true);
+  });
+
+  test('useMock=true 透传到 DataSourceManager', () => {
+    const app = new App({ useMock: true });
+    expect(app.useMock).toBe(true);
+  });
+
+  test('registerComponent / resolveComponent / unregisterComponent', () => {
+    const app = new App({});
+    const comp = { tag: 'x' };
+    app.registerComponent('my', comp);
+    expect(app.resolveComponent('my')).toBe(comp);
+    app.unregisterComponent('my');
+    expect(app.resolveComponent('my')).toBeUndefined();
+  });
+
+  test('registerNode 静态方法存入 nodeClassMap', () => {
+    class Custom extends Node {}
+    App.registerNode('custom-type', Custom);
+    expect(App.nodeClassMap.get('custom-type')).toBe(Custom);
+  });
+
+  test('setEnv 接受字符串/Env 实例', () => {
+    const app = new App({});
+    app.setEnv();
+    expect(app.env).toBeDefined();
+    app.setEnv('Mozilla/5.0');
+    expect(app.env).toBeDefined();
+  });
+
+  test('getPage / getNode 默认返回当前 page', () => {
+    const app = new App({
+      config: {
+        type: NodeType.ROOT,
+        id: 'app',
+        items: [{ type: NodeType.PAGE, id: 'p1', items: [{ id: 'btn', type: 'button' }] }],
+      },
+    });
+    expect(app.getPage()).toBe(app.page);
+    expect(app.getPage('p1')).toBe(app.page);
+    expect(app.getPage('not-exist')).toBeUndefined();
+    expect(app.getNode('btn')?.data.id).toBe('btn');
+  });
+
+  test('setPage 不存在时清空当前 page', () => {
+    const app = new App({
+      config: {
+        type: NodeType.ROOT,
+        id: 'app',
+        items: [{ type: NodeType.PAGE, id: 'p1', items: [] }],
+      },
+    });
+    app.setPage('not-exist');
+    expect(app.page).toBeUndefined();
+  });
+
+  test('runCode 执行代码块', async () => {
+    const fn = vi.fn();
+    const app = new App({
+      config: {
+        type: NodeType.ROOT,
+        id: 'app',
+        items: [{ type: NodeType.PAGE, id: 'p1', items: [] }],
+        codeBlocks: { c1: { name: 'c1', content: fn, params: [] } },
+      },
+    });
+    await app.runCode('c1', { p: 1 }, []);
+    expect(fn).toHaveBeenCalled();
+  });
+
+  test('runCode 抛错时进入 errorHandler', async () => {
+    const errorHandler = vi.fn();
+    const app = new App({
+      errorHandler,
+      config: {
+        type: NodeType.ROOT,
+        id: 'app',
+        items: [{ type: NodeType.PAGE, id: 'p1', items: [] }],
+        codeBlocks: {
+          c1: {
+            name: 'c1',
+            content: () => {
+              throw new Error('boom');
+            },
+            params: [],
+          },
+        },
+      },
+    });
+    await app.runCode('c1', {}, []);
+    expect(errorHandler).toHaveBeenCalled();
+  });
+
+  test('runDataSourceMethod 调用 schema methods 中的 content', async () => {
+    const fn = vi.fn().mockResolvedValue('ok');
+    const app = new App({
+      config: {
+        type: NodeType.ROOT,
+        id: 'app',
+        items: [{ type: NodeType.PAGE, id: 'p1', items: [] }],
+        dataSources: [
+          {
+            type: 'base',
+            id: 'ds_1',
+            fields: [],
+            methods: [{ name: 'doIt', content: fn, params: [] }],
+            events: [],
+          },
+        ],
+      } as any,
+    });
+    await app.runDataSourceMethod('ds_1', 'doIt', { p: 1 }, []);
+    expect(fn).toHaveBeenCalled();
+  });
+
+  test('runDataSourceMethod 不存在的数据源直接返回', async () => {
+    const app = new App({
+      config: {
+        type: NodeType.ROOT,
+        id: 'app',
+        items: [{ type: NodeType.PAGE, id: 'p1', items: [] }],
+      },
+    });
+    await expect(app.runDataSourceMethod('not', 'm', {}, [])).resolves.toBeUndefined();
+    await expect(app.runDataSourceMethod('', '', {}, [])).resolves.toBeUndefined();
+  });
+
+  test('emit 触发 node 事件时走 eventHelper', () => {
+    const app = new App({
+      config: {
+        type: NodeType.ROOT,
+        id: 'app',
+        items: [
+          {
+            type: NodeType.PAGE,
+            id: 'p1',
+            items: [{ id: 'btn', type: 'button', events: [{ name: 'click', actions: [] }] }],
+          },
+        ],
+      } as any,
+    });
+    const node = app.getNode('btn')!;
+    const result = app.emit('click', node, 'arg1');
+    expect(typeof result).toBe('boolean');
+  });
+
+  test('destroy 清理所有资源', () => {
+    const app = new App({
+      config: {
+        type: NodeType.ROOT,
+        id: 'app',
+        items: [{ type: NodeType.PAGE, id: 'p1', items: [{ id: 'btn', type: 'button' }] }],
+      },
+    });
+    app.destroy();
+    expect(app.page).toBeUndefined();
+    expect(app.dsl).toBeUndefined();
+    expect(app.components.size).toBe(0);
   });
 });

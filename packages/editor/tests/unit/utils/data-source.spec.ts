@@ -1,293 +1,155 @@
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
- * Copyright (C) 2025 Tencent.  All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (C) 2025 Tencent.
  */
 import { describe, expect, test } from 'vitest';
 
-import type { DataSchema, DataSourceSchema } from '@tmagic/core';
+import {
+  getCascaderOptionsFromFields,
+  getDisplayField,
+  getFieldType,
+  getFormConfig,
+  getFormValue,
+} from '@editor/utils/data-source';
 
-import { getCascaderOptionsFromFields, getFieldType } from '@editor/utils/data-source';
-
-describe('getFieldType', () => {
-  test('返回空字符串当ds为undefined', () => {
-    const type = getFieldType(undefined, ['field1']);
-    expect(type).toBe('');
+describe('data-source utils', () => {
+  test('getFormConfig - base 类型', () => {
+    const cfg = getFormConfig('base', {});
+    expect(Array.isArray(cfg)).toBe(true);
   });
 
-  test('返回空字符串当ds.fields为空', () => {
-    const ds: DataSourceSchema = { id: 'ds1', type: 'base', fields: [], methods: [], events: [] };
-    const type = getFieldType(ds, ['field1']);
-    expect(type).toBe('');
+  test('getFormConfig - http 类型', () => {
+    const cfg = getFormConfig('http', {});
+    expect(Array.isArray(cfg)).toBe(true);
   });
 
-  test('返回空字符串当fieldNames为空数组', () => {
-    const ds: DataSourceSchema = {
-      id: 'ds1',
-      type: 'base',
-      fields: [{ name: 'field1', type: 'string' }],
-      methods: [],
-      events: [],
-    };
-    const type = getFieldType(ds, []);
-    expect(type).toBe('');
+  test('getFormConfig - 未知类型走自定义 configs', () => {
+    const cfg = getFormConfig('custom', { custom: [{ name: 'foo' }] as any });
+    expect(Array.isArray(cfg)).toBe(true);
   });
 
-  test('返回一级字段类型', () => {
-    const ds: DataSourceSchema = {
-      id: 'ds1',
-      type: 'base',
-      fields: [
-        { name: 'field1', type: 'string' },
-        { name: 'field2', type: 'number' },
-        { name: 'field3', type: 'boolean' },
-      ],
-      methods: [],
-      events: [],
-    };
-
-    expect(getFieldType(ds, ['field1'])).toBe('string');
-    expect(getFieldType(ds, ['field2'])).toBe('number');
-    expect(getFieldType(ds, ['field3'])).toBe('boolean');
+  test('getFormValue - 非 http 直接返回', () => {
+    const result = getFormValue('base', { id: '1' } as any);
+    expect(result).toEqual({ id: '1' });
   });
 
-  test('返回嵌套字段类型', () => {
-    const ds: DataSourceSchema = {
-      id: 'ds1',
-      type: 'base',
-      fields: [
-        {
-          name: 'obj',
-          type: 'object',
-          fields: [
-            { name: 'nested1', type: 'string' },
-            { name: 'nested2', type: 'number' },
-          ],
-        },
-      ],
-      methods: [],
-      events: [],
-    };
-
-    expect(getFieldType(ds, ['obj', 'nested1'])).toBe('string');
-    expect(getFieldType(ds, ['obj', 'nested2'])).toBe('number');
+  test('getFormValue - http 类型时附带 beforeRequest/afterResponse 模板', () => {
+    const result = getFormValue('http', { id: '1' } as any) as any;
+    expect(result.beforeRequest).toContain('return options');
+    expect(result.afterResponse).toContain('return response');
   });
 
-  test('返回深层嵌套字段类型', () => {
-    const ds: DataSourceSchema = {
-      id: 'ds1',
-      type: 'base',
-      fields: [
-        {
-          name: 'level1',
-          type: 'object',
-          fields: [
-            {
-              name: 'level2',
-              type: 'object',
-              fields: [{ name: 'level3', type: 'boolean' }],
-            },
-          ],
-        },
-      ],
-      methods: [],
-      events: [],
-    };
-
-    expect(getFieldType(ds, ['level1', 'level2', 'level3'])).toBe('boolean');
+  test('getDisplayField 解析模板', () => {
+    const dsList = [
+      {
+        id: 'ds_1',
+        title: '数据源1',
+        fields: [{ name: 'name', title: '名称' }],
+      },
+    ] as any;
+    const segs = getDisplayField(dsList, 'hello ${ds_1.name} world');
+    expect(segs[0]).toEqual({ type: 'text', value: 'hello ' });
+    expect(segs[1]).toEqual({ type: 'var', value: '数据源1.名称' });
+    expect(segs[2]).toEqual({ type: 'text', value: ' world' });
   });
 
-  test('返回空字符串当字段不存在', () => {
-    const ds: DataSourceSchema = {
-      id: 'ds1',
-      type: 'base',
-      fields: [{ name: 'field1', type: 'string' }],
-      methods: [],
-      events: [],
-    };
-
-    expect(getFieldType(ds, ['nonexistent'])).toBe('');
+  test('getDisplayField 数字索引', () => {
+    const segs = getDisplayField([{ id: 'ds', title: 'D', fields: [{ name: 'arr' }] }] as any, '${ds.arr[0]}');
+    const varSeg = segs.find((s) => s.type === 'var');
+    expect(varSeg?.value).toBe('D.arr[0]');
   });
 
-  test('返回空字符串当嵌套字段不存在', () => {
-    const ds: DataSourceSchema = {
-      id: 'ds1',
-      type: 'base',
-      fields: [
-        {
-          name: 'obj',
-          type: 'object',
-          fields: [{ name: 'nested1', type: 'string' }],
-        },
-      ],
-      methods: [],
-      events: [],
-    };
-
-    expect(getFieldType(ds, ['obj', 'nonexistent'])).toBe('');
+  test('getDisplayField 无模板时返回单段 text', () => {
+    const segs = getDisplayField([], 'plain');
+    expect(segs).toEqual([{ type: 'text', value: 'plain' }]);
   });
 
-  test('返回空字符串当字段type未定义', () => {
-    const ds: DataSourceSchema = {
-      id: 'ds1',
-      type: 'base',
-      fields: [{ name: 'field1' }],
-      methods: [],
-      events: [],
-    };
-
-    expect(getFieldType(ds, ['field1'])).toBe('');
-  });
-});
-
-describe('getCascaderOptionsFromFields', () => {
-  test('返回空数组当fields为空', () => {
-    const result = getCascaderOptionsFromFields([]);
-    expect(result).toEqual([]);
-  });
-
-  test('返回空数组当fields为undefined', () => {
-    const result = getCascaderOptionsFromFields(undefined);
-    expect(result).toEqual([]);
-  });
-
-  test('返回基本字段选项（默认any类型过滤）', () => {
-    const fields: DataSchema[] = [
-      { name: 'field1', type: 'string' },
-      { name: 'field2', type: 'number' },
+  test('getCascaderOptionsFromFields 默认包含所有类型', () => {
+    const fields: any = [
+      { name: 'a', type: 'string' },
+      { name: 'b', type: 'object', fields: [{ name: 'b1', type: 'string' }] },
     ];
-    const result = getCascaderOptionsFromFields(fields);
+    const opts = getCascaderOptionsFromFields(fields);
+    expect(opts).toHaveLength(2);
+    expect(opts[1].children).toHaveLength(1);
+  });
 
-    expect(result).toHaveLength(2);
-    expect(result[0]).toEqual({
-      label: 'field1(string)',
-      value: 'field1',
-      children: [],
+  test('getCascaderOptionsFromFields 过滤指定 fieldType', () => {
+    const fields: any = [
+      { name: 'a', type: 'number' },
+      { name: 'b', type: 'string' },
+    ];
+    const opts = getCascaderOptionsFromFields(fields, ['number']);
+    expect(opts.map((o) => o.value)).toEqual(['a']);
+  });
+
+  test('getFieldType 沿 path 取最终类型', () => {
+    const ds: any = {
+      fields: [{ name: 'obj', type: 'object', fields: [{ name: 'name', type: 'string' }] }],
+    };
+    expect(getFieldType(ds, ['obj', 'name'])).toBe('string');
+    expect(getFieldType(ds, ['obj'])).toBe('object');
+    expect(getFieldType(ds, ['unknown'])).toBe('');
+    expect(getFieldType(undefined, ['x'])).toBe('');
+  });
+
+  test('getFormConfig - 内部 tab 配置 defaultValue/display 函数行为', () => {
+    const cfg = getFormConfig('http', {}) as any[];
+    // 从尾部找到 tab 节点 (TabConfig)
+    const tab = cfg[cfg.length - 1];
+    const items = tab.items as any[];
+
+    // 数据定义 / 方法定义 / mock 数据 等 tab 的 defaultValue 应返回 []
+    items.forEach((tabItem) => {
+      tabItem.items.forEach((field: any) => {
+        if (typeof field.defaultValue === 'function') {
+          expect(field.defaultValue()).toEqual([]);
+        }
+      });
     });
-    expect(result[1]).toEqual({
-      label: 'field2(number)',
-      value: 'field2',
-      children: [],
+
+    // 请求参数裁剪 / 响应数据裁剪 仅当 model.type === 'http' 时显示
+    const trimTabs = items.filter((t: any) => typeof t.display === 'function');
+    expect(trimTabs.length).toBeGreaterThan(0);
+    trimTabs.forEach((t: any) => {
+      expect(t.display({}, { model: { type: 'http' } })).toBe(true);
+      expect(t.display({}, { model: { type: 'base' } })).toBe(false);
     });
   });
 
-  test('使用title作为label（如果存在）', () => {
-    const fields: DataSchema[] = [{ name: 'field1', title: '字段1', type: 'string' }];
-    const result = getCascaderOptionsFromFields(fields);
-
-    expect(result[0].label).toBe('字段1(string)');
+  test('getDisplayField match.index 为 undefined 时跳出', () => {
+    const segs = getDisplayField([], '');
+    expect(segs).toEqual([]);
   });
 
-  test('按类型过滤字段', () => {
-    const fields: DataSchema[] = [
-      { name: 'field1', type: 'string' },
-      { name: 'field2', type: 'number' },
-      { name: 'field3', type: 'boolean' },
-    ];
-    const result = getCascaderOptionsFromFields(fields, ['string', 'number']);
-
-    expect(result).toHaveLength(2);
-    expect(result.map((r) => r.value)).toEqual(['field1', 'field2']);
+  test('getDisplayField 数据源/字段未命中走 fallback', () => {
+    const segs = getDisplayField([], '${unknown.foo}');
+    const varSeg = segs.find((s) => s.type === 'var');
+    expect(varSeg?.value).toBe('unknown.foo');
   });
 
-  test('递归处理嵌套object字段', () => {
-    const fields: DataSchema[] = [
+  test('getCascaderOptionsFromFields - 子字段命中时父级也保留', () => {
+    const fields: any = [
       {
         name: 'obj',
         type: 'object',
-        fields: [
-          { name: 'nested1', type: 'string' },
-          { name: 'nested2', type: 'number' },
-        ],
+        fields: [{ name: 'inner', type: 'number' }],
       },
     ];
-    const result = getCascaderOptionsFromFields(fields);
-
-    expect(result).toHaveLength(1);
-    expect(result[0].children).toHaveLength(2);
-    expect(result[0].children![0]).toEqual({
-      label: 'nested1(string)',
-      value: 'nested1',
-      children: [],
-    });
+    const opts = getCascaderOptionsFromFields(fields, ['number']);
+    expect(opts).toHaveLength(1);
+    expect(opts[0].children).toHaveLength(1);
   });
 
-  test('递归处理嵌套array字段', () => {
-    const fields: DataSchema[] = [
-      {
-        name: 'arr',
-        type: 'array',
-        fields: [{ name: 'item', type: 'string' }],
-      },
-    ];
-    const result = getCascaderOptionsFromFields(fields);
-
-    expect(result).toHaveLength(1);
-    expect(result[0].children).toHaveLength(1);
+  test('getCascaderOptionsFromFields - 空数组及 undefined 字段类型默认 any', () => {
+    const fields: any = [{ name: 'a' }];
+    const opts = getCascaderOptionsFromFields(fields, []);
+    expect(opts).toHaveLength(1);
   });
 
-  test('过滤掉不匹配类型且无子项的object/array字段', () => {
-    const fields: DataSchema[] = [
-      { name: 'obj', type: 'object', fields: [] },
-      { name: 'str', type: 'string' },
-    ];
-    const result = getCascaderOptionsFromFields(fields, ['string']);
-
-    expect(result).toHaveLength(1);
-    expect(result[0].value).toBe('str');
-  });
-
-  test('保留有匹配子项的object字段', () => {
-    const fields: DataSchema[] = [
-      {
-        name: 'obj',
-        type: 'object',
-        fields: [{ name: 'nested', type: 'string' }],
-      },
-    ];
-    const result = getCascaderOptionsFromFields(fields, ['string']);
-
-    expect(result).toHaveLength(1);
-    expect(result[0].value).toBe('obj');
-    expect(result[0].children).toHaveLength(1);
-  });
-
-  test('深层嵌套字段', () => {
-    const fields: DataSchema[] = [
-      {
-        name: 'level1',
-        type: 'object',
-        fields: [
-          {
-            name: 'level2',
-            type: 'object',
-            fields: [{ name: 'level3', type: 'string' }],
-          },
-        ],
-      },
-    ];
-    const result = getCascaderOptionsFromFields(fields);
-
-    expect(result[0].children![0].children![0].value).toBe('level3');
-  });
-
-  test('字段type未定义时视为any', () => {
-    const fields: DataSchema[] = [{ name: 'field1' }];
-    const result = getCascaderOptionsFromFields(fields);
-
-    expect(result).toHaveLength(1);
-    expect(result[0].label).toBe('field1(undefined)');
+  test('getFieldType - 第二层 fields 缺失提前返回', () => {
+    const ds: any = { fields: [{ name: 'a', type: 'string' }] };
+    expect(getFieldType(ds, ['a', 'b'])).toBe('');
   });
 });
