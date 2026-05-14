@@ -1,3 +1,17 @@
+## [1.7.14-beta.1](https://github.com/Tencent/tmagic-editor/compare/v1.7.14-beta.0...v1.7.14-beta.1) (2026-05-14)
+
+
+### Bug Fixes
+
+* **editor:** 修复 StyleSetter 嵌套场景下 propPath 丢失上下文路径的问题 ([2ad5101](https://github.com/Tencent/tmagic-editor/commit/2ad51014719632b9b6b141f025ed54c3ad20921d))
+
+
+### Features
+
+* **form:** 支持 TextConfig handler 返回 Promise，buttonClickHandler 改为 async await ([54a5570](https://github.com/Tencent/tmagic-editor/commit/54a5570419690de6a42704187120e40c622edbf1))
+
+
+
 ## [1.7.14-beta.0](https://github.com/Tencent/tmagic-editor/compare/v1.7.13-beta.0...v1.7.14-beta.0) (2026-05-11)
 
 
