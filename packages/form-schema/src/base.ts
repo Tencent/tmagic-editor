@@ -374,7 +374,7 @@ export interface TextConfig extends FormItem, Input {
             setModel: (prop: string, value: any) => void;
             setFormValue: (prop: string, value: any) => void;
           },
-        ) => void;
+        ) => void | Promise<void>;
       };
 }
 

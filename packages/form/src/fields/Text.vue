@@ -130,7 +130,7 @@ const inputHandler = (v: string) => {
   mForm?.$emit('field-input', props.prop, v);
 };
 
-const buttonClickHandler = () => {
+const buttonClickHandler = async () => {
   if (!appendConfig.value) return;
   if (typeof appendConfig.value.handler === 'function') {
     const newChangeRecords: ChangeRecord[] = [];
@@ -142,7 +142,7 @@ const buttonClickHandler = () => {
       newChangeRecords.push({ propPath: key, value });
     };
 
-    appendConfig.value.handler(mForm, {
+    await appendConfig.value.handler(mForm, {
       model: props.model,
       values: mForm ? readonly(mForm.initValues) : null,
       formValue: props.values || {},
