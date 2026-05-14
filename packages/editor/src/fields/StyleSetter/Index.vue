@@ -74,7 +74,11 @@ const collapseValue = shallowRef(
 
 const change = (v: any, eventData: ContainerChangeEventData) => {
   eventData.changeRecords?.forEach((record) => {
-    record.propPath = `${props.name}.${record.propPath}`;
+    if (props.prop) {
+      record.propPath = `${props.prop}.${record.propPath}`;
+    } else if (props.name) {
+      record.propPath = `${props.name}.${record.propPath}`;
+    }
   });
   emit('change', v, eventData);
 };

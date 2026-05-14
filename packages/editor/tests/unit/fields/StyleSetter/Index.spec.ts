@@ -57,18 +57,78 @@ vi.mock('@editor/fields/StyleSetter/pro/index', () => {
 describe('StyleSetter Index', () => {
   test('渲染 6 个 collapse-item', () => {
     const wrapper = mount(StyleSetter, {
-      props: { model: { style: {} }, name: 'style' } as any,
+      props: { model: { style: {} }, name: 'style', prop: 'style' } as any,
     });
     expect(wrapper.findAll('.collapse-item').length).toBe(6);
   });
 
-  test('change 时为 propPath 添加 name 前缀', async () => {
+  test('change 时为 propPath 添加 prop 前缀', async () => {
     const wrapper = mount(StyleSetter, {
-      props: { model: { style: {} }, name: 'style' } as any,
+      props: { model: { style: {} }, name: 'style', prop: 'style' } as any,
     });
     await wrapper.find('.Layout').trigger('click');
     const events = wrapper.emitted('change');
     expect(events).toBeTruthy();
     expect((events?.[0]?.[1] as any).changeRecords[0].propPath).toBe('style.foo');
+  });
+
+  test('prop 与 name 不一致时，propPath 使用完整的 prop 路径而非 name', async () => {
+    const wrapper = mount(StyleSetter, {
+      props: { model: { style: {} }, name: 'style', prop: 'data.items.0.style' } as any,
+    });
+    await wrapper.find('.Position').trigger('click');
+    const events = wrapper.emitted('change');
+    expect(events).toBeTruthy();
+    expect((events?.[0]?.[1] as any).changeRecords[0].propPath).toBe('data.items.0.style.foo');
+  });
+
+  test('change 透传原始 value 并保留 changeRecords 其他字段', async () => {
+    const wrapper = mount(StyleSetter, {
+      props: { model: { style: {} }, name: 'style', prop: 'style' } as any,
+    });
+    await wrapper.find('.Background').trigger('click');
+    const events = wrapper.emitted('change');
+    expect(events).toBeTruthy();
+    const [value, eventData] = events![0] as any[];
+    expect(value).toEqual({ foo: 1 });
+    expect(eventData.changeRecords).toHaveLength(1);
+    expect(eventData.changeRecords[0]).toEqual({ propPath: 'style.foo', value: 1 });
+  });
+
+  test('eventData 无 changeRecords 时也能正常 emit', async () => {
+    const wrapper = mount(StyleSetter, {
+      props: { model: { style: {} }, name: 'style', prop: 'style' } as any,
+      global: {
+        stubs: {
+          Layout: defineComponent({
+            name: 'LayoutStub',
+            emits: ['change'],
+            setup(_p, { emit }) {
+              return () => h('div', { class: 'Layout-no-records', onClick: () => emit('change', { foo: 2 }, {}) });
+            },
+          }),
+        },
+      },
+    });
+    await wrapper.find('.Layout-no-records').trigger('click');
+    const events = wrapper.emitted('change');
+    expect(events).toBeTruthy();
+    expect((events?.[0]?.[1] as any).changeRecords).toBeUndefined();
+  });
+
+  test('values/size/disabled 正确透传到子组件', () => {
+    const wrapper = mount(StyleSetter, {
+      props: {
+        model: { style: { color: 'red' } },
+        name: 'style',
+        prop: 'style',
+        size: 'small',
+        disabled: true,
+      } as any,
+    });
+    const layout = wrapper.findComponent({ name: 'Layout' });
+    expect(layout.props('values')).toEqual({ color: 'red' });
+    expect(layout.props('size')).toBe('small');
+    expect(layout.props('disabled')).toBe(true);
   });
 });
