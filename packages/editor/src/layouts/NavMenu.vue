@@ -1,8 +1,12 @@
 <template>
   <div class="m-editor-nav-menu" :style="{ height: `${height}px` }" ref="navMenu">
-    <div v-for="key in keys" :class="`menu-${key}`" :key="key" :style="`width: ${columnWidth?.[key]}px`">
-      <ToolButton :data="item" v-for="(item, index) in buttons[key]" :key="index"></ToolButton>
-    </div>
+    <NavMenuColumn
+      v-for="key in keys"
+      :key="key"
+      :column-key="key"
+      :items="buttons[key]"
+      :width="columnWidth?.[key]"
+    ></NavMenuColumn>
   </div>
 </template>
 
@@ -12,9 +16,10 @@ import { Back, Delete, FullScreen, Grid, Memo, Right, ScaleToOriginal, ZoomIn, Z
 
 import { NodeType } from '@tmagic/core';
 
-import ToolButton from '@editor/components/ToolButton.vue';
 import { useServices } from '@editor/hooks/use-services';
 import { ColumnLayout, MenuBarData, MenuButton, MenuComponent, MenuItem } from '@editor/type';
+
+import NavMenuColumn from './NavMenuColumn.vue';
 
 defineOptions({
   name: 'MEditorNavMenu',

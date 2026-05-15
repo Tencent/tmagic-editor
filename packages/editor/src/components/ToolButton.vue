@@ -1,6 +1,7 @@
 <template>
   <div
     v-if="display"
+    ref="rootEl"
     class="menu-item"
     :class="`${data.type} ${data.className || ''}`"
     @click="clickHandler(data, $event)"
@@ -56,7 +57,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, useTemplateRef } from 'vue';
 import { ArrowDown } from '@element-plus/icons-vue';
 
 import {
@@ -92,6 +93,9 @@ const props = withDefaults(
   },
 );
 const services = useServices();
+
+const rootElRef = useTemplateRef<HTMLDivElement>('rootEl');
+const getElRef = () => rootElRef;
 
 const disabled = computed(() => {
   if (typeof props.data === 'string') return false;
@@ -145,4 +149,6 @@ const mouseupHandler = (item: MenuButton | MenuComponent, event: MouseEvent) => 
     buttonHandler(item, event);
   }
 };
+
+defineExpose({ getElRef });
 </script>

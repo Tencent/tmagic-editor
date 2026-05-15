@@ -32,6 +32,7 @@ export interface ButtonProps {
   circle?: boolean;
   icon?: any;
   variant?: string;
+  bg?: boolean;
 }
 
 export interface CardProps {

@@ -194,4 +194,31 @@ describe('ToolButton.vue', () => {
     await wrapper.find('.menu-item').trigger('click');
     expect(handler).not.toHaveBeenCalled();
   });
+
+  test('暴露 getElRef，可获取根元素引用', () => {
+    const wrapper = mount(ToolButton as any, {
+      ...provideServices(),
+      props: {
+        data: { type: 'button', text: 'x' } as any,
+      },
+    });
+    const exposed = wrapper.vm as any;
+    expect(typeof exposed.getElRef).toBe('function');
+
+    const elRef = exposed.getElRef();
+    expect(elRef).toBeDefined();
+    expect(elRef.value).toBe(wrapper.find('.menu-item').element);
+  });
+
+  test('display 为 false 时 getElRef 返回的 ref.value 为 null', () => {
+    const wrapper = mount(ToolButton as any, {
+      ...provideServices(),
+      props: {
+        data: { type: 'button', display: false, text: 'x' } as any,
+      },
+    });
+    const exposed = wrapper.vm as any;
+    const elRef = exposed.getElRef();
+    expect(elRef.value).toBeNull();
+  });
 });

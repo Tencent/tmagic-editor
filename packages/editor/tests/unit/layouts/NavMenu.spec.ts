@@ -4,7 +4,7 @@
  * Copyright (C) 2025 Tencent.
  */
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { defineComponent, h } from 'vue';
+import { defineComponent, h, ref } from 'vue';
 import { mount } from '@vue/test-utils';
 
 import NavMenu from '@editor/layouts/NavMenu.vue';
@@ -31,11 +31,14 @@ vi.mock('@editor/components/ToolButton.vue', () => ({
   default: defineComponent({
     name: 'ToolButton',
     props: ['data'],
-    setup(props) {
+    setup(props, { expose }) {
+      const rootEl = ref<HTMLElement | null>(null);
+      expose({ getElRef: () => rootEl });
       return () =>
         h(
           'button',
           {
+            ref: rootEl,
             class: ['tool-btn', (props.data as any).className],
             onClick: () => (props.data as any).handler?.(),
           },
@@ -56,6 +59,7 @@ class FakeResizeObserver {
     this.cb = cb;
   }
   observe() {}
+  unobserve() {}
   disconnect() {}
 }
 (globalThis as any).ResizeObserver = FakeResizeObserver;

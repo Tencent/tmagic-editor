@@ -22,6 +22,10 @@
     height: 100%;
     z-index: 1;
     align-items: center;
+    flex-wrap: nowrap;
+    overflow: hidden;
+    position: relative;
+    min-width: 0;
   }
 
   .menu-center {
@@ -32,8 +36,33 @@
     justify-content: flex-end;
   }
 
+  .m-editor-nav-menu-slot-hidden {
+    position: absolute;
+    left: -99999px;
+    top: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .m-editor-nav-menu-more-wrapper {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    height: 100%;
+
+    &.m-editor-nav-menu-more-wrapper-hidden {
+      visibility: hidden;
+      pointer-events: none;
+    }
+  }
+
+  .m-editor-nav-menu-more {
+    flex: 0 0 auto;
+  }
+
   .menu-item {
     flex-direction: row;
+    flex: 0 0 auto;
     -webkit-box-align: center;
     align-items: center;
     vertical-align: middle;
@@ -47,6 +76,7 @@
     transition: all 0.3s ease 0s;
     border-bottom: 2px solid transparent;
     margin: 0;
+    white-space: nowrap;
 
     .is-disabled {
       opacity: 0.5;
@@ -70,6 +100,7 @@
 
     .menu-item-text {
       color: $nav-color;
+      white-space: nowrap;
     }
 
     &.rule {
@@ -81,6 +112,36 @@
     .t-button {
       padding-left: 1px;
       padding-right: 1px;
+    }
+  }
+}
+
+.m-editor-nav-menu-popover {
+  .m-editor-nav-menu-overflow-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 4px 0;
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 4px 8px;
+      cursor: pointer;
+      border-radius: 4px;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+
+      &.divider {
+        padding: 0;
+        cursor: default;
+
+        &:hover {
+          background-color: transparent;
+        }
+      }
     }
   }
 }
