@@ -291,6 +291,14 @@ const getInitOption = async () => {
     return getInitLocalOption();
   }
 
+  if (
+    typeof props.model[props.name] === 'undefined' ||
+    props.model[props.name] === '' ||
+    props.model[props.name] === null
+  ) {
+    return [];
+  }
+
   if (typeof url === 'function') {
     url = await url(mForm, { model: props.model, formValue: mForm?.values });
   }
