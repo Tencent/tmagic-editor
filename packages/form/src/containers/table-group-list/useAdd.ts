@@ -22,7 +22,7 @@ export const useAdd = (
 
     if (!modelName) return false;
 
-    if (!props.model[modelName].length) {
+    if (!props.model[modelName]?.length) {
       return true;
     }
 
