@@ -214,24 +214,32 @@ const setEditorValue = (v: string | any, m: string | any) => {
   if (props.type === 'diff') {
     const originalModel = monaco.editor.createModel(values.value, 'text/javascript');
     const modifiedModel = monaco.editor.createModel(toString(m, props.language), 'text/javascript');
-    const position = vsDiffEditor?.getPosition();
+    // 保存视图状态（光标、选区、滚动、折叠等）
+    const viewState = vsDiffEditor?.saveViewState();
     const result = vsDiffEditor?.setModel({
       original: originalModel,
       modified: modifiedModel,
     });
-    if (position) {
-      vsDiffEditor?.setPosition(position);
-      vsDiffEditor?.focus();
+    // setAutoHeight 内部会在 nextTick 中将 scrollTop 重置为 0，这里也放到 nextTick 中
+    // 利用 Vue nextTick 队列的 FIFO 特性，保证恢复在重置之后执行
+    if (viewState) {
+      nextTick(() => {
+        vsDiffEditor?.restoreViewState(viewState);
+        vsDiffEditor?.focus();
+      });
     }
     return result;
   }
-  // 保存当前光标位置
-  const position = vsEditor?.getPosition();
+  // 保存视图状态（光标、选区、滚动、折叠等）
+  const viewState = vsEditor?.saveViewState();
   const result = vsEditor?.setValue(values.value);
-  // 恢复光标位置
-  if (position) {
-    vsEditor?.setPosition(position);
-    vsEditor?.focus();
+  // setAutoHeight 内部会在 nextTick 中将 scrollTop 重置为 0，这里也放到 nextTick 中
+  // 利用 Vue nextTick 队列的 FIFO 特性，保证恢复在重置之后执行
+  if (viewState) {
+    nextTick(() => {
+      vsEditor?.restoreViewState(viewState);
+      vsEditor?.focus();
+    });
   }
   return result;
 };

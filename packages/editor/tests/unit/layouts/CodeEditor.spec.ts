@@ -20,8 +20,8 @@ const {
   vsEditorInstance: {
     getValue: vi.fn(() => 'editor-value'),
     setValue: vi.fn(),
-    getPosition: vi.fn(() => ({ lineNumber: 1, column: 1 })),
-    setPosition: vi.fn(),
+    saveViewState: vi.fn(() => null),
+    restoreViewState: vi.fn(),
     focus: vi.fn(),
     layout: vi.fn(),
     setScrollTop: vi.fn(),
@@ -34,8 +34,8 @@ const {
   } as any,
   vsDiffEditorInstance: {
     getModifiedEditor: vi.fn(),
-    getPosition: vi.fn(() => null),
-    setPosition: vi.fn(),
+    saveViewState: vi.fn(() => null),
+    restoreViewState: vi.fn(),
     setModel: vi.fn(),
     focus: vi.fn(),
     layout: vi.fn(),
@@ -115,6 +115,9 @@ beforeEach(() => {
   vsEditorInstance.onDidBlurEditorWidget.mockImplementation((cb: any) => {
     blurHandlers.push(cb);
   });
+  // 默认无视图状态，避免上一个用例 mockReturnValue 渗透
+  vsEditorInstance.saveViewState.mockReturnValue(null);
+  vsDiffEditorInstance.saveViewState.mockReturnValue(null);
   const modifiedEditor = {
     getValue: vi.fn(() => 'modified-value'),
     onDidChangeModelContent: vi.fn((cb: any) => diffContentChangeHandlers.push(cb)),
@@ -228,6 +231,86 @@ describe('CodeEditor', () => {
     await wrapper.setProps({ initValues: 'xyz' } as any);
     await flush();
     expect(vsEditorInstance.setValue).toHaveBeenCalledWith('xyz');
+    wrapper.unmount();
+  });
+
+  test('setValue 后通过 saveViewState / restoreViewState 保留光标与滚动状态', async () => {
+    const fakeViewState = { __fake: true } as any;
+    vsEditorInstance.saveViewState.mockReturnValue(fakeViewState);
+
+    const wrapper = mount(CodeEditor, { props: { initValues: 'abc' } as any, attachTo: document.body });
+    await flush();
+    vsEditorInstance.restoreViewState.mockClear();
+    vsEditorInstance.focus.mockClear();
+
+    await wrapper.setProps({ initValues: 'xyz' } as any);
+    await flush();
+
+    expect(vsEditorInstance.saveViewState).toHaveBeenCalled();
+    expect(vsEditorInstance.restoreViewState).toHaveBeenCalledWith(fakeViewState);
+    expect(vsEditorInstance.focus).toHaveBeenCalled();
+    wrapper.unmount();
+  });
+
+  test('saveViewState 返回 null 时不调用 restoreViewState / focus', async () => {
+    vsEditorInstance.saveViewState.mockReturnValue(null);
+
+    const wrapper = mount(CodeEditor, { props: { initValues: 'abc' } as any, attachTo: document.body });
+    await flush();
+    vsEditorInstance.restoreViewState.mockClear();
+    vsEditorInstance.focus.mockClear();
+
+    await wrapper.setProps({ initValues: 'xyz' } as any);
+    await flush();
+
+    expect(vsEditorInstance.restoreViewState).not.toHaveBeenCalled();
+    expect(vsEditorInstance.focus).not.toHaveBeenCalled();
+    wrapper.unmount();
+  });
+
+  test('restoreViewState 在 setAutoHeight 的 setScrollTop 之后执行', async () => {
+    const fakeViewState = { __fake: true } as any;
+    vsEditorInstance.saveViewState.mockReturnValue(fakeViewState);
+
+    const wrapper = mount(CodeEditor, {
+      props: { initValues: 'a', autosize: { minRows: 1, maxRows: 10 } } as any,
+      attachTo: document.body,
+    });
+    await flush();
+    vsEditorInstance.setScrollTop.mockClear();
+    vsEditorInstance.restoreViewState.mockClear();
+
+    // 行数变化触发 setAutoHeight 的 nextTick（其中会调用 setScrollTop(0)）
+    await wrapper.setProps({ initValues: 'a\nb\nc\nd\ne' } as any);
+    await flush();
+
+    expect(vsEditorInstance.setScrollTop).toHaveBeenCalled();
+    expect(vsEditorInstance.restoreViewState).toHaveBeenCalledWith(fakeViewState);
+    const setScrollTopOrder = vsEditorInstance.setScrollTop.mock.invocationCallOrder[0];
+    const restoreOrder = vsEditorInstance.restoreViewState.mock.invocationCallOrder[0];
+    expect(setScrollTopOrder).toBeLessThan(restoreOrder);
+    wrapper.unmount();
+  });
+
+  test('diff 模式下保留视图状态', async () => {
+    const fakeViewState = { __fake_diff: true } as any;
+    vsDiffEditorInstance.saveViewState.mockReturnValue(fakeViewState);
+
+    const wrapper = mount(CodeEditor, {
+      props: { type: 'diff', initValues: 'a', modifiedValues: 'b' } as any,
+      attachTo: document.body,
+    });
+    await flush();
+    vsDiffEditorInstance.saveViewState.mockClear();
+    vsDiffEditorInstance.restoreViewState.mockClear();
+    vsDiffEditorInstance.focus.mockClear();
+
+    await wrapper.setProps({ initValues: 'x' } as any);
+    await flush();
+
+    expect(vsDiffEditorInstance.saveViewState).toHaveBeenCalled();
+    expect(vsDiffEditorInstance.restoreViewState).toHaveBeenCalledWith(fakeViewState);
+    expect(vsDiffEditorInstance.focus).toHaveBeenCalled();
     wrapper.unmount();
   });
 
