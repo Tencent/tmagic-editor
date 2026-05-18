@@ -1,3 +1,18 @@
+## [1.7.14-beta.2](https://github.com/Tencent/tmagic-editor/compare/v1.7.14-beta.1...v1.7.14-beta.2) (2026-05-18)
+
+
+### Bug Fixes
+
+* **editor:** 修复 CodeEditor setValue 时滚动位置与折叠等视图状态丢失 ([f1aedc4](https://github.com/Tencent/tmagic-editor/commit/f1aedc4ce7f93dd07cb4b7b3c1d39e459b504176))
+* **form:** 修复 Select 在 value 为空时仍发起 initUrl 请求的问题 ([e64d866](https://github.com/Tencent/tmagic-editor/commit/e64d86660d83769b498de05d221b900a8c9c5b3c))
+
+
+### Features
+
+* **editor:** 导航菜单支持菜单项溢出收纳，新增 NavMenuColumn 组件 ([df87900](https://github.com/Tencent/tmagic-editor/commit/df8790042fd1309a6599c2db45bae7c61e1a2600))
+
+
+
 ## [1.7.14-beta.1](https://github.com/Tencent/tmagic-editor/compare/v1.7.14-beta.0...v1.7.14-beta.1) (2026-05-14)
 
 
