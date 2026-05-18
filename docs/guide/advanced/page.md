@@ -1,5 +1,5 @@
 # 页面渲染
-tmagic-editor的页面渲染，是通过在载入编辑器中保存的 DSL 配置，通过 ui 渲染器渲染页面。在容器布局原理里我们提到过，容器和组件在配置中呈树状结构，所以渲染页面的时候，渲染器会递归配置内容，从而渲染出页面所有组件。
+tmagic-editor的页面渲染，是通过在载入编辑器中保存的 DSL 配置，通过基础渲染组件（vue 下为 `@tmagic/vue-container`，react 下为 `@tmagic/react-container`）渲染页面。在容器布局原理里我们提到过，容器和组件在配置中呈树状结构，所以渲染页面的时候，渲染器会递归配置内容，从而渲染出页面所有组件。
 
 <img src="https://vfiles.gtimg.cn/vupload/20211009/f4d3031633778551251.png">
 
@@ -25,7 +25,7 @@ export default {
 ```
 
 ## 组件渲染
-所有tmagic-editor组件，都通过一个tmagic-editor基础组件来渲染。这个基础组件会识别当前渲染组件的类型。如果当前渲染组件是普通组件（包括ui中提供的基础组件和业务开发的业务组件），则直接渲染；如果当前渲染组件是容器，则回到[容器渲染](#容器渲染)逻辑中。
+所有tmagic-editor组件，都通过一个tmagic-editor基础组件来渲染。这个基础组件会识别当前渲染组件的类型。如果当前渲染组件是普通组件（包括 `vue-components` / `react-components` 中提供的基础组件和业务开发的业务组件），则直接渲染；如果当前渲染组件是容器，则回到[容器渲染](#容器渲染)逻辑中。
 
 基础组件的具体形式为：
 ```vue
@@ -59,6 +59,6 @@ export default defineComponent({
 ```
 
 ## 渲染器示例
-在tmagic-editor的示例项目中，我们提供了三个版本的 @tmagic/ui。可以参考对应前端框架的渲染器实现。
-- [vue 渲染器](https://github.com/Tencent/tmagic-editor/blob/master/vue-components/container/src/Container.vue)
-- [react 渲染器](https://github.com/Tencent/tmagic-editor/blob/master/react-components/container/src/Container.tsx)
+在tmagic-editor的示例项目中，我们针对 vue 和 react 分别提供了基础渲染组件的实现，可以参考对应前端框架的渲染器实现。
+- [vue 渲染器（`@tmagic/vue-container`）](https://github.com/Tencent/tmagic-editor/blob/master/vue-components/container/src/Container.vue)
+- [react 渲染器（`@tmagic/react-container`）](https://github.com/Tencent/tmagic-editor/blob/master/react-components/container/src/Container.tsx)

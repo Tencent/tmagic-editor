@@ -59,7 +59,19 @@ dataSourceService.set("editable", false);
   - `{string}` type 数据源类型，默认为 'base'
 
 - **返回：**
-  - {[FormConfig](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L864)} 表单配置
+  - {`FormConfig`} 表单配置
+
+  ::: details 查看 FormConfig 及关联类型定义
+  <<< @/../packages/form-schema/src/base.ts#FormConfig{ts}
+
+  <<< @/../packages/form-schema/src/base.ts#FormItemConfig{ts}
+
+  <<< @/../packages/form-schema/src/base.ts#ChildConfig{ts}
+
+  <<< @/../packages/form-schema/src/base.ts#DynamicTypeConfig{ts}
+
+  <<< @/../packages/form-schema/src/base.ts#FormItem{ts}
+  :::
 
 - **详情：**
 
@@ -80,7 +92,7 @@ console.log(config);
 
 - **参数：**
   - `{string}` type 数据源类型
-  - {[FormConfig](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L864)} config 表单配置
+  - {`FormConfig`} config 表单配置
 
 - **返回：**
   - `{void}`
@@ -120,7 +132,23 @@ dataSourceService.setFormConfig("http", [
   - `{string}` type 数据源类型，默认为 'base'
 
 - **返回：**
-  - {Partial<[DataSourceSchema](https://github.com/Tencent/tmagic-editor/blob/5880dfbe15fcead63e9dc7c91900f8c4e7a574d8/packages/schema/src/index.ts#L221)>} 数据源默认值
+  - {Partial<`DataSourceSchema`>} 数据源默认值
+
+  ::: details 查看 DataSourceSchema 及关联类型定义
+  <<< @/../packages/schema/src/index.ts#DataSourceSchema{ts}
+
+  <<< @/../packages/schema/src/index.ts#DataSchema{ts}
+
+  <<< @/../packages/schema/src/index.ts#MockSchema{ts}
+
+  <<< @/../packages/schema/src/index.ts#CodeBlockContent{ts}
+
+  <<< @/../packages/schema/src/index.ts#CodeParam{ts}
+
+  <<< @/../packages/schema/src/index.ts#EventConfig{ts}
+
+  <<< @/../packages/schema/src/index.ts#JsEngine{ts}
+  :::
 
 - **详情：**
 
@@ -141,7 +169,7 @@ console.log(defaultValue);
 
 - **参数：**
   - `{string}` type 数据源类型
-  - {Partial<[DataSourceSchema](https://github.com/Tencent/tmagic-editor/blob/5880dfbe15fcead63e9dc7c91900f8c4e7a574d8/packages/schema/src/index.ts#L221)>} value 数据源默认值
+  - {Partial<`DataSourceSchema`>} value 数据源默认值
 
 - **返回：**
   - `{void}`
@@ -170,7 +198,11 @@ dataSourceService.setFormValue("http", {
   - `{string}` type 数据源类型，默认为 'base'
 
 - **返回：**
-  - {[EventOption](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/core/src/events.ts#L26-L29)[]} 事件列表
+  - {`EventOption`[]} 事件列表
+
+  ::: details 查看 EventOption 类型定义
+  <<< @/../packages/core/src/utils.ts#EventOption{ts}
+  :::
 
 - **详情：**
 
@@ -191,7 +223,7 @@ console.log(events);
 
 - **参数：**
   - `{string}` type 数据源类型
-  - {[EventOption](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/core/src/events.ts#L26-L29)[]} value 事件列表
+  - {`EventOption`[]} value 事件列表
 
 - **返回：**
   - `{void}`
@@ -219,7 +251,7 @@ dataSourceService.setFormEvent("http", [
   - `{string}` type 数据源类型，默认为 'base'
 
 - **返回：**
-  - {[EventOption](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/core/src/events.ts#L26-L29)[]} 方法列表
+  - {`EventOption`[]} 方法列表
 
 - **详情：**
 
@@ -240,7 +272,7 @@ console.log(methods);
 
 - **参数：**
   - `{string}` type 数据源类型
-  - {[EventOption](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/core/src/events.ts#L26-L29)[]} value 方法列表
+  - {`EventOption`[]} value 方法列表
 
 - **返回：**
   - `{void}`
@@ -265,10 +297,10 @@ dataSourceService.setFormMethod("http", [
 - **[扩展支持](../../guide/editor-expand#行为扩展)：** 是
 
 - **参数：**
-  - {[DataSourceSchema](https://github.com/Tencent/tmagic-editor/blob/5880dfbe15fcead63e9dc7c91900f8c4e7a574d8/packages/schema/src/index.ts#L221)} config 数据源配置
+  - {`DataSourceSchema`} config 数据源配置
 
 - **返回：**
-  - {[DataSourceSchema](https://github.com/Tencent/tmagic-editor/blob/5880dfbe15fcead63e9dc7c91900f8c4e7a574d8/packages/schema/src/index.ts#L221)} 添加后的数据源配置
+  - {`DataSourceSchema`} 添加后的数据源配置
 
 - **详情：**
 
@@ -294,12 +326,16 @@ console.log(newDs.id); // 自动生成的id
 - **[扩展支持](../../guide/editor-expand#行为扩展)：** 是
 
 - **参数：**
-  - {[DataSourceSchema](https://github.com/Tencent/tmagic-editor/blob/5880dfbe15fcead63e9dc7c91900f8c4e7a574d8/packages/schema/src/index.ts#L221)} config 数据源配置
+  - {`DataSourceSchema`} config 数据源配置
   - `{Object}` options 可选配置
-    - {[ChangeRecord](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/form/src/schema.ts#L27-L39)[]} changeRecords 变更记录
+    - {`ChangeRecord`[]} changeRecords 变更记录
+
+  ::: details 查看 ChangeRecord 类型定义
+  <<< @/../packages/form-schema/src/base.ts#ChangeRecord{ts}
+  :::
 
 - **返回：**
-  - {[DataSourceSchema](https://github.com/Tencent/tmagic-editor/blob/5880dfbe15fcead63e9dc7c91900f8c4e7a574d8/packages/schema/src/index.ts#L221)} 更新后的数据源配置
+  - {`DataSourceSchema`} 更新后的数据源配置
 
 - **详情：**
 
@@ -370,7 +406,7 @@ console.log(id); // 'ds_xxx-xxx-xxx'
   - `{string}` id 数据源id
 
 - **返回：**
-  - {[DataSourceSchema](https://github.com/Tencent/tmagic-editor/blob/5880dfbe15fcead63e9dc7c91900f8c4e7a574d8/packages/schema/src/index.ts#L221) | undefined} 数据源配置
+  - {`DataSourceSchema` | undefined} 数据源配置
 
 - **详情：**
 
@@ -388,8 +424,24 @@ console.log(ds);
 ## copyWithRelated
 
 - **参数：**
-  - {[MNode](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/schema/src/index.ts#L210) | [MNode](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/schema/src/index.ts#L210)[]} config 组件节点配置
+  - {`MNode` | `MNode`[]} config 组件节点配置
   - `{TargetOptions}` collectorOptions 可选的收集器配置
+
+  ::: details 查看 MNode 及关联类型定义
+  <<< @/../packages/schema/src/index.ts#MNode{ts}
+
+  <<< @/../packages/schema/src/index.ts#MComponent{ts}
+
+  <<< @/../packages/schema/src/index.ts#MContainer{ts}
+
+  <<< @/../packages/schema/src/index.ts#MIteratorContainer{ts}
+
+  <<< @/../packages/schema/src/index.ts#MPage{ts}
+
+  <<< @/../packages/schema/src/index.ts#MApp{ts}
+
+  <<< @/../packages/schema/src/index.ts#MPageFragment{ts}
+  :::
 
 - **返回：**
   - `{void}`
@@ -505,3 +557,4 @@ import { dataSourceService } from "@tmagic/editor";
 
 dataSourceService.removeAllPlugins();
 ```
+

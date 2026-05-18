@@ -2,6 +2,7 @@ import type { DataSourceFieldType, DataSourceSchema } from '@tmagic/schema';
 
 import type { FilterFunction, FormItem, FormItemConfig, FormState, Input } from './base';
 
+// #region DataSourceFieldSelectConfig
 export interface DataSourceFieldSelectConfig<T = never> extends FormItem {
   type: 'data-source-field-select';
   /**
@@ -32,7 +33,9 @@ export interface DataSourceFieldSelectConfig<T = never> extends FormItem {
 
   dataSourceId?: string;
 }
+// #endregion DataSourceFieldSelectConfig
 
+// #region CodeConfig
 export interface CodeConfig extends FormItem {
   type: 'vs-code';
   language?: string;
@@ -47,51 +50,71 @@ export interface CodeConfig extends FormItem {
   };
   mFormItemType?: string;
 }
+// #endregion CodeConfig
 
+// #region CodeLinkConfig
 export interface CodeLinkConfig extends FormItem {
   type: 'code-link';
   formTitle?: string;
   codeOptions?: Object;
 }
+// #endregion CodeLinkConfig
 
+// #region CodeSelectConfig
 export interface CodeSelectConfig extends FormItem {
   type: 'code-select';
   className?: string;
 }
+// #endregion CodeSelectConfig
 
+// #region CodeSelectColConfig
 export interface CodeSelectColConfig extends FormItem {
   type: 'code-select-col';
   /** 是否可以编辑代码块，disable表示的是是否可以选择代码块 */
   notEditable?: boolean | FilterFunction;
 }
+// #endregion CodeSelectColConfig
 
+// #region CondOpSelectConfig
 export interface CondOpSelectConfig extends FormItem {
   type: 'cond-op-select';
   parentFields?: string[];
 }
+// #endregion CondOpSelectConfig
 
+// #region DataSourceFieldsConfig
 export interface DataSourceFieldsConfig extends FormItem {
   type: 'data-source-fields';
 }
+// #endregion DataSourceFieldsConfig
 
+// #region DataSourceInputConfig
 export interface DataSourceInputConfig extends FormItem {
   type: 'data-source-input';
 }
+// #endregion DataSourceInputConfig
 
+// #region DataSourceMethodsConfig
 export interface DataSourceMethodsConfig extends FormItem {
   type: 'data-source-methods';
 }
+// #endregion DataSourceMethodsConfig
 
+// #region DataSourceMethodSelectConfig
 export interface DataSourceMethodSelectConfig extends FormItem {
   type: 'data-source-method-select';
   /** 是否可以编辑数据源，disable表示的是是否可以选择数据源 */
   notEditable?: boolean | FilterFunction;
 }
+// #endregion DataSourceMethodSelectConfig
 
+// #region DataSourceMocksConfig
 export interface DataSourceMocksConfig extends FormItem {
   type: 'data-source-mocks';
 }
+// #endregion DataSourceMocksConfig
 
+// #region DataSourceSelect
 export interface DataSourceSelect extends FormItem, Input {
   type: 'data-source-select';
   /** 数据源类型: base、http... */
@@ -104,13 +127,17 @@ export interface DataSourceSelect extends FormItem, Input {
   /** 是否可以编辑数据源，disable表示的是是否可以选择数据源 */
   notEditable?: boolean | FilterFunction;
 }
+// #endregion DataSourceSelect
 
+// #region DisplayCondsConfig
 export interface DisplayCondsConfig extends FormItem {
   type: 'display-conds';
   titlePrefix?: string;
   parentFields?: string[] | FilterFunction<string[]>;
 }
+// #endregion DisplayCondsConfig
 
+// #region EventSelectConfig
 export interface EventSelectConfig extends FormItem {
   name: string;
   type: 'event-select';
@@ -129,23 +156,32 @@ export interface EventSelectConfig extends FormItem {
   /** 联动数据源配置 */
   dataSourceActionConfig?: FormItem;
 }
+// #endregion EventSelectConfig
 
+// #region KeyValueConfig
 export interface KeyValueConfig extends FormItem {
   type: 'key-value';
   advanced?: boolean;
 }
+// #endregion KeyValueConfig
 
+// #region PageFragmentSelectConfig
 export interface PageFragmentSelectConfig extends FormItem {
   type: 'page-fragment-select';
 }
+// #endregion PageFragmentSelectConfig
 
+// #region UISelectConfig
 export interface UISelectConfig extends FormItem {
   type: 'ui-select';
 }
+// #endregion UISelectConfig
 
+// #region StyleSetterConfig
 export interface StyleSetterConfig extends FormItem {
   type: 'style-setter';
 }
+// #endregion StyleSetterConfig
 
 export type EditorChildConfig<T = never> =
   | DataSourceFieldSelectConfig<T>

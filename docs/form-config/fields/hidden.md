@@ -2,16 +2,6 @@
 
 改值体现于最终提交的表单中，用于例如编辑记录的id这种场景中
 
-## TS 定义
-
-```typescript
-interface Hidden extends FormItem {
-  type: "hidden";
-}
-```
-
-点击查看[FormItem](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L90)的定义
-
 ## 基础用法
 
 <demo-block type="form" :config="[{
@@ -30,3 +20,12 @@ interface Hidden extends FormItem {
 | 参数 | 说明   | 类型   | 可选值 | 默认值 |
 | ---- | ------ | ------ | ------ | ------ |
 | name | 绑定值 | string | —      | —      |
+
+## 配置类型
+
+::: details 查看 HiddenConfig 配置类型定义
+<<< @/../packages/form-schema/src/base.ts#HiddenConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FormItem{ts}
+
+:::

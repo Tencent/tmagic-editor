@@ -18,6 +18,7 @@
 
 import { cloneDeep } from 'lodash-es';
 
+// #region UndoRedo
 export class UndoRedo<T = any> {
   private elementList: T[];
   private listCursor: number;
@@ -75,3 +76,4 @@ export class UndoRedo<T = any> {
     return cloneDeep(this.elementList[this.listCursor - 1]);
   }
 }
+// #endregion UndoRedo

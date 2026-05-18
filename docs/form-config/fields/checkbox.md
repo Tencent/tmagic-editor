@@ -154,12 +154,36 @@ options 支持函数形式，可根据表单状态动态生成选项。
 |------|------|------|--------|--------|
 | name | 绑定值 | string | — | — |
 | text | 表单标签 | string | — | — |
-| disabled | 是否禁用 | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/master/packages/form-schema/src/base.ts) | — | false |
+| disabled | 是否禁用 | boolean / `FilterFunction` | — | false |
 | activeValue | 选中时的值 | string / number | — | true（filter 为 'number' 时默认 1） |
 | inactiveValue | 未选中时的值 | string / number | — | false（filter 为 'number' 时默认 0） |
 | useLabel | 是否使用外部 label 显示 | boolean | — | false |
 | filter | 值过滤器 | 'number' / Function | — | — |
-| onChange | 值变化时触发的函数 | [OnChangeHandler](https://github.com/Tencent/tmagic-editor/blob/master/packages/form-schema/src/base.ts) | — | — |
+| onChange | 值变化时触发的函数 | `OnChangeHandler` | — | — |
+
+::: details 查看 FilterFunction / OnChangeHandler 及关联类型定义
+<<< @/../packages/form-schema/src/base.ts#FilterFunction{ts}
+
+<<< @/../packages/form-schema/src/base.ts#OnChangeHandler{ts}
+
+<<< @/../packages/form-schema/src/base.ts#OnChangeHandlerData{ts}
+
+<<< @/../packages/form-schema/src/base.ts#ChangeRecord{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FormValue{ts}
+:::
+
+
+## 配置类型
+
+::: details 查看 CheckboxConfig / CheckboxGroupConfig 配置类型定义
+<<< @/../packages/form-schema/src/base.ts#CheckboxConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#CheckboxGroupConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FormItem{ts}
+
+:::
 
 ## CheckboxGroup Attributes
 
@@ -167,9 +191,9 @@ options 支持函数形式，可根据表单状态动态生成选项。
 |------|------|------|--------|--------|
 | name | 绑定值 | string | — | — |
 | text | 表单标签 | string | — | — |
-| disabled | 是否禁用 | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/master/packages/form-schema/src/base.ts) | — | false |
-| options | 选项列表 | Array / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/master/packages/form-schema/src/base.ts) | — | — |
-| onChange | 值变化时触发的函数 | [OnChangeHandler](https://github.com/Tencent/tmagic-editor/blob/master/packages/form-schema/src/base.ts) | — | — |
+| disabled | 是否禁用 | boolean / `FilterFunction` | — | false |
+| options | 选项列表 | Array / `FilterFunction` | — | — |
+| onChange | 值变化时触发的函数 | `OnChangeHandler` | — | — |
 
 ## options item
 

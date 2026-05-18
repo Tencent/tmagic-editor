@@ -3,7 +3,15 @@
 ## setCodeDsl
 
 - **参数：**
-  - {[CodeBlockDSL](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/schema/src/index.ts#L75)} codeDsl 代码块DSL
+  - {`CodeBlockDSL`} codeDsl 代码块DSL
+
+  ::: details 查看 CodeBlockDSL 及关联类型定义
+  <<< @/../packages/schema/src/index.ts#CodeBlockDSL{ts}
+
+  <<< @/../packages/schema/src/index.ts#CodeBlockContent{ts}
+
+  <<< @/../packages/schema/src/index.ts#CodeParam{ts}
+  :::
 
 - **返回：**
   - `{Promise<void>}`
@@ -15,7 +23,7 @@
 ## getCodeDsl
 
 - **返回：**
-  - {[CodeBlockDSL](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/schema/src/index.ts#L75) | null}
+  - {`CodeBlockDSL` | null}
 
 - **详情：**
 
@@ -27,7 +35,7 @@
   - `{string | number}` id 代码块id
 
 - **返回：**
-  - {[CodeBlockContent](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/schema/src/index.ts#L79) | null}
+  - {`CodeBlockContent` | null}
 
 - **详情：**
 
@@ -39,7 +47,7 @@
 
 - **参数：**
   - `{string | number}` id 代码块id
-  - {Partial<[CodeBlockContent](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/schema/src/index.ts#L79)>} codeConfig 代码块内容配置信息
+  - {Partial<`CodeBlockContent`>} codeConfig 代码块内容配置信息
 
 - **返回：**
   - `{Promise<void>}`
@@ -52,7 +60,7 @@
 
 - **参数：**
   - `{string | number}` id 代码块id
-  - {Partial<[CodeBlockContent](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/schema/src/index.ts#L79)>} codeConfig 代码块内容配置信息
+  - {Partial<`CodeBlockContent`>} codeConfig 代码块内容配置信息
   - `{boolean}` force 是否强制写入，默认 `true`；为 `false` 时若同 id 已存在则跳过
 
 - **返回：**
@@ -68,7 +76,7 @@
   - `{string[]}` ids 代码块id数组
 
 - **返回：**
-  - {[CodeBlockDSL](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/schema/src/index.ts#L75)} 命中的代码块dsl
+  - {`CodeBlockDSL`} 命中的代码块dsl
 
 - **详情：**
 
@@ -227,8 +235,24 @@
 ## copyWithRelated
 
 - **参数：**
-  - {[MNode](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/schema/src/index.ts#L210) | [MNode](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/schema/src/index.ts#L210)[]} config 组件节点配置
+  - {`MNode` | `MNode`[]} config 组件节点配置
   - `{TargetOptions}` collectorOptions 可选的依赖收集器配置
+
+  ::: details 查看 MNode 及关联类型定义
+  <<< @/../packages/schema/src/index.ts#MNode{ts}
+
+  <<< @/../packages/schema/src/index.ts#MComponent{ts}
+
+  <<< @/../packages/schema/src/index.ts#MContainer{ts}
+
+  <<< @/../packages/schema/src/index.ts#MIteratorContainer{ts}
+
+  <<< @/../packages/schema/src/index.ts#MPage{ts}
+
+  <<< @/../packages/schema/src/index.ts#MApp{ts}
+
+  <<< @/../packages/schema/src/index.ts#MPageFragment{ts}
+  :::
 
 - **返回：**
   - `{void}`
@@ -281,3 +305,4 @@
 - **详情：**
 
 删掉当前设置的所有扩展
+

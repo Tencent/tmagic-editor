@@ -41,8 +41,30 @@ type为'timerange'
 | name        | 绑定值（数组形式）       | string                                                                                                                                                   | —      | —        |
 | names       | 绑定值（拆分为两个字段） | string[]                                                                                                                                                 | —      | —        |
 | text        | 表单标签                 | string                                                                                                                                                   | —      | —        |
-| disabled    | 是否禁用                 | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L195) | —      | false    |
+| disabled    | 是否禁用                 | boolean / `FilterFunction` | —      | false    |
 | format      | 显示格式                 | string                                                                                                                                                   | —      | HH:mm:ss |
 | valueFormat | 绑定值的格式             | string                                                                                                                                                   | —      | HH:mm:ss |
 | defaultTime | 默认时间                 | Date[]                                                                                                                                                   | —      | —        |
-| onChange    | 值变化时触发的函数       | [OnChangeHandler](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L30)           | —      | -        |
+| onChange    | 值变化时触发的函数       | `OnChangeHandler`           | —      | -        |
+
+::: details 查看 FilterFunction / OnChangeHandler 及关联类型定义
+<<< @/../packages/form-schema/src/base.ts#FilterFunction{ts}
+
+<<< @/../packages/form-schema/src/base.ts#OnChangeHandler{ts}
+
+<<< @/../packages/form-schema/src/base.ts#OnChangeHandlerData{ts}
+
+<<< @/../packages/form-schema/src/base.ts#ChangeRecord{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FormValue{ts}
+:::
+
+
+## 配置类型
+
+::: details 查看 TimerangeConfig 配置类型定义
+<<< @/../packages/form-schema/src/base.ts#TimerangeConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FormItem{ts}
+
+:::

@@ -66,18 +66,18 @@
     "prettier": "^3.8.3",
     "recast": "^0.23.11",
     "rimraf": "^3.0.2",
-    "rolldown": "^1.0.0",
-    "rolldown-plugin-dts": "^0.25.0",
+    "rolldown": "^1.0.1",
+    "rolldown-plugin-dts": "^0.25.1",
     "sass-embedded": "^1.99.0",
     "semver": "^7.7.3",
     "serialize-javascript": "^7.0.0",
     "shx": "^0.3.4",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vitepress": "^1.6.4",
-    "vitest": "^4.1.5",
+    "vitepress": "^2.0.0-alpha.17",
+    "vitest": "^4.1.6",
     "vue": "catalog:",
-    "vue-tsc": "^3.2.8"
+    "vue-tsc": "^3.2.9"
   },
   "config": {
     "commitizen": {

@@ -8,11 +8,14 @@ type ElMessageBoxShortcutMethod = ((
 ) => Promise<any>) &
   ((message: string, options?: any, appContext?: any | null) => Promise<any>);
 
+// #region ChangeRecord
 export interface ChangeRecord {
   propPath?: string;
   value: any;
 }
+// #endregion ChangeRecord
 
+// #region OnChangeHandlerData
 export interface OnChangeHandlerData {
   model: FormValue;
   values?: Readonly<FormValue> | null;
@@ -24,10 +27,15 @@ export interface OnChangeHandlerData {
   setModel: (prop: string, value: any) => void;
   setFormValue: (prop: string, value: any) => void;
 }
+// #endregion OnChangeHandlerData
 
+// #region FormValue
 export type FormValue = Record<string | number, any>;
+// #endregion FormValue
 
+// #region OnChangeHandler
 export type OnChangeHandler = (mForm: FormState | undefined, value: any, data: OnChangeHandlerData) => any;
+// #endregion OnChangeHandler
 
 type DefaultValueFunction = (mForm: FormState | undefined) => any;
 
@@ -85,8 +93,11 @@ export interface SortProp {
   order: 'ascending' | 'descending';
 }
 
+// #region ToolTipConfigType
 export type ToolTipConfigType = string | { text?: string; placement?: string };
+// #endregion ToolTipConfigType
 
+// #region FormItem
 export interface FormItem {
   /** vnode的key值，默认是遍历数组时的index */
   __key?: string | number;
@@ -129,12 +140,16 @@ export interface FormItem {
   fieldStyle?: Record<string, any>;
   labelPosition?: 'top' | 'left' | 'right';
 }
+// #endregion FormItem
 
+// #region DynamicTypeConfig
 export interface DynamicTypeConfig extends FormItem {
   type: TypeFunction;
   [key: string]: any;
 }
+// #endregion DynamicTypeConfig
 
+// #region ContainerCommonConfig
 export interface ContainerCommonConfig<T = never> extends FormItem {
   items: FormConfig<T>;
   onInitValue?: (
@@ -146,6 +161,7 @@ export interface ContainerCommonConfig<T = never> extends FormItem {
   ) => FormValue;
   extensible?: boolean;
 }
+// #endregion ContainerCommonConfig
 
 export interface Rule {
   message?: string;
@@ -180,10 +196,12 @@ export interface Rule {
   ) => void;
 }
 
+// #region Input
 export interface Input {
   /** 输入框没有内容时显示的文案 */
   placeholder?: string;
 }
+// #endregion Input
 
 export type TypeFunction<T extends string = string> = (
   mForm: FormState | undefined,
@@ -192,6 +210,7 @@ export type TypeFunction<T extends string = string> = (
   },
 ) => T;
 
+// #region FilterFunction
 export type FilterFunction<T = boolean> = (
   mForm: FormState | undefined,
   data: {
@@ -205,6 +224,7 @@ export type FilterFunction<T = boolean> = (
     getFormValue: (prop: string) => any;
   },
 ) => T;
+// #endregion FilterFunction
 
 /**
  * 下拉选择器选项配置
@@ -324,6 +344,7 @@ export interface CascaderOption {
 /**
  * 日期范围
  */
+// #region DaterangeConfig
 export interface DaterangeConfig extends FormItem {
   type: 'daterange';
   defaultTime?: Date[];
@@ -332,6 +353,7 @@ export interface DaterangeConfig extends FormItem {
   dateFormat?: string;
   timeFormat?: string;
 }
+// #endregion DaterangeConfig
 
 /**
  * html编辑器
@@ -345,13 +367,16 @@ export interface HtmlField extends FormItem {
 }
 
 /** 展示文本，不可编辑 */
+// #region DisplayConfig
 export interface DisplayConfig extends FormItem {
   type: 'display';
   initValue?: string | number | boolean;
   displayText?: FilterFunction<string> | string;
 }
+// #endregion DisplayConfig
 
 /** 文本输入框 */
+// #region TextConfig
 export interface TextConfig extends FormItem, Input {
   type?: 'text';
   tooltip?: string;
@@ -377,19 +402,23 @@ export interface TextConfig extends FormItem, Input {
         ) => void | Promise<void>;
       };
 }
+// #endregion TextConfig
 
 /**
  * 文本域
  */
+// #region TextareaConfig
 export interface TextareaConfig extends FormItem {
   type: 'textarea';
   placeholder?: string;
   rows?: number;
 }
+// #endregion TextareaConfig
 
 /**
  * 计数器
  */
+// #region NumberConfig
 export interface NumberConfig extends FormItem {
   type?: 'number';
   tooltip?: string;
@@ -398,53 +427,65 @@ export interface NumberConfig extends FormItem {
   step?: number;
   placeholder?: string;
 }
+// #endregion NumberConfig
 
 /**
  * 数值范围
  */
+// #region NumberRangeConfig
 export interface NumberRangeConfig extends FormItem {
   type?: 'number-range';
   clearable?: boolean;
 }
+// #endregion NumberRangeConfig
 
 /**
  * 隐藏域
  */
+// #region HiddenConfig
 export interface HiddenConfig extends FormItem {
   type: 'hidden';
 }
+// #endregion HiddenConfig
 
 /**
  * 日期选择器
  */
+// #region DateConfig
 export interface DateConfig extends FormItem, Input {
   type: 'date';
   format?: 'YYYY-MM-dd HH:mm:ss' | string;
   valueFormat?: 'YYYY-MM-dd HH:mm:ss' | string;
 }
+// #endregion DateConfig
 
 /**
  * 日期时间选择器
  */
+// #region DateTimeConfig
 export interface DateTimeConfig extends FormItem, Input {
   type: 'datetime';
   defaultTime?: Date[];
   format?: 'YYYY-MM-dd HH:mm:ss' | string;
   valueFormat?: 'YYYY-MM-dd HH:mm:ss' | string;
 }
+// #endregion DateTimeConfig
 
 /**
  * 时间选择器
  */
+// #region TimeConfig
 export interface TimeConfig extends FormItem, Input {
   type: 'time';
   format?: 'HH:mm:ss' | string;
   valueFormat?: 'HH:mm:ss' | string;
 }
+// #endregion TimeConfig
 
 /**
  * 时间范围选择器
  */
+// #region TimerangeConfig
 export interface TimerangeConfig extends FormItem {
   type: 'timerange';
   names?: string[];
@@ -452,29 +493,35 @@ export interface TimerangeConfig extends FormItem {
   format?: 'HH:mm:ss' | string;
   valueFormat?: 'HH:mm:ss' | string;
 }
+// #endregion TimerangeConfig
 
 /**
  * 单个多选框
  */
+// #region CheckboxConfig
 export interface CheckboxConfig extends FormItem {
   type: 'checkbox';
   activeValue?: number | string;
   inactiveValue?: number | string;
   useLabel?: boolean;
 }
+// #endregion CheckboxConfig
 
 /**
  * 开关
  */
+// #region SwitchConfig
 export interface SwitchConfig extends FormItem {
   type: 'switch';
   activeValue?: boolean | number | string;
   inactiveValue?: boolean | number | string;
 }
+// #endregion SwitchConfig
 
 /**
  * 单选框
  */
+// #region RadioGroupConfig
 export interface RadioGroupConfig extends FormItem {
   type: 'radio-group' | 'radioGroup';
   childType?: 'default' | 'button';
@@ -485,13 +532,16 @@ export interface RadioGroupConfig extends FormItem {
     tooltip?: string;
   }[];
 }
+// #endregion RadioGroupConfig
 
 /**
  * 颜色选择器
  */
+// #region ColorPickConfig
 export interface ColorPickConfig extends FormItem {
   type: 'colorPicker';
 }
+// #endregion ColorPickConfig
 
 export interface CheckboxGroupOption {
   value: any;
@@ -502,14 +552,17 @@ export interface CheckboxGroupOption {
 /**
  * 多选框组
  */
+// #region CheckboxGroupConfig
 export interface CheckboxGroupConfig extends FormItem {
   type: 'checkbox-group' | 'checkboxGroup';
   options: CheckboxGroupOption[] | FilterFunction<CheckboxGroupOption[]>;
 }
+// #endregion CheckboxGroupConfig
 
 /**
  * 下拉选择器
  */
+// #region SelectConfig
 export interface SelectConfig extends FormItem, Input {
   type: 'select';
   clearable?: boolean;
@@ -546,10 +599,12 @@ export interface SelectConfig extends FormItem, Input {
     text?: string | SelectOptionTextFunction;
   };
 }
+// #endregion SelectConfig
 
 /**
  * 链接
  */
+// #region LinkConfig
 export interface LinkConfig<T = never> extends FormItem {
   type: 'link';
   href?: string | ((model: Record<string, any>) => string);
@@ -581,10 +636,12 @@ export interface LinkConfig<T = never> extends FormItem {
       ) => FormConfig<T>);
   fullscreen?: boolean;
 }
+// #endregion LinkConfig
 
 /**
  * 级联选择器
  */
+// #region CascaderConfig
 export interface CascaderConfig extends FormItem, Input {
   type: 'cascader';
   remote?: boolean;
@@ -617,7 +674,9 @@ export interface CascaderConfig extends FormItem, Input {
     item: (optionsData: Record<string, any>) => CascaderOption[];
   };
 }
+// #endregion CascaderConfig
 
+// #region DynamicFieldConfig
 export interface DynamicFieldConfig extends FormItem {
   type: 'dynamic-field' | 'dynamicField';
   returnFields: (
@@ -631,19 +690,23 @@ export interface DynamicFieldConfig extends FormItem {
   }[];
   dynamicKey: string;
 }
+// #endregion DynamicFieldConfig
 
 /**
  * 分组容器
  */
+// #region RowConfig
 export interface RowConfig<T = never> extends FormItem {
   type: 'row';
   span: number;
   items: ({ span?: number } & (ChildConfig<T> | EditorChildConfig | T))[];
 }
+// #endregion RowConfig
 
 /**
  * 标签页容器
  */
+// #region TabPaneConfig
 export interface TabPaneConfig<T = never> {
   status?: string;
   /** 标签页名称，用于关联 model 中的数据 */
@@ -655,7 +718,9 @@ export interface TabPaneConfig<T = never> {
   display?: boolean | 'expand' | FilterFunction<boolean | 'expand'>;
   onTabClick?: (mForm: FormState | undefined, tab: any, data: any) => void;
 }
+// #endregion TabPaneConfig
 
+// #region TabConfig
 export interface TabConfig<T = never> extends FormItem, ContainerCommonConfig<T> {
   type: 'tab' | 'dynamic-tab';
   tabType?: string;
@@ -673,10 +738,12 @@ export interface TabConfig<T = never> extends FormItem, ContainerCommonConfig<T>
   onTabClick?: (mForm: FormState | undefined, tab: any, data: any) => void;
   activeChange?: (mForm: FormState | undefined, tabName: string, data: any) => void;
 }
+// #endregion TabConfig
 
 /**
  * 分组
  */
+// #region FieldsetConfig
 export interface FieldsetConfig<T = never> extends FormItem, ContainerCommonConfig<T> {
   type: 'fieldset';
   checkbox?:
@@ -690,17 +757,21 @@ export interface FieldsetConfig<T = never> extends FormItem, ContainerCommonConf
   legend?: string;
   schematic?: string;
 }
+// #endregion FieldsetConfig
 
 /**
  * 面板容器
  */
+// #region PanelConfig
 export interface PanelConfig<T = never> extends FormItem, ContainerCommonConfig<T> {
   type: 'panel';
   expand?: boolean;
   title?: string;
   schematic?: string;
 }
+// #endregion PanelConfig
 
+// #region TableGroupListCommonConfig
 export interface TableGroupListCommonConfig extends FormItem {
   type: 'table' | 'groupList' | 'group-list';
   enableToggleMode?: boolean;
@@ -714,7 +785,9 @@ export interface TableGroupListCommonConfig extends FormItem {
   /** table 新增行时前置回调 */
   beforeAddRow?: (mForm: FormState | undefined, data: any) => boolean | Promise<boolean>;
 }
+// #endregion TableGroupListCommonConfig
 
+// #region TableColumnConfig
 export interface TableColumnConfig<T = never> extends FormItem {
   name?: string;
   label?: string;
@@ -730,10 +803,12 @@ export interface TableColumnConfig<T = never> extends FormItem {
     text?: string;
   };
 }
+// #endregion TableColumnConfig
 
 /**
  * 表格容器
  */
+// #region TableConfig
 export interface TableConfig<T = never> extends TableGroupListCommonConfig {
   items: TableColumnConfig<T>[];
   tableItems?: TableColumnConfig<T>[];
@@ -773,7 +848,9 @@ export interface TableConfig<T = never> extends TableGroupListCommonConfig {
   sort?: boolean;
   sortKey?: string;
 }
+// #endregion TableConfig
 
+// #region GroupListConfig
 export interface GroupListConfig<T = never> extends TableGroupListCommonConfig {
   span?: number;
   items: FormConfig<T>;
@@ -800,18 +877,22 @@ export interface GroupListConfig<T = never> extends TableGroupListCommonConfig {
   ) => boolean | boolean;
   moveSpecifyLocation?: boolean;
 }
+// #endregion GroupListConfig
 
 interface StepItemConfig<T = never> extends FormItem, ContainerCommonConfig<T> {
   title: string;
 }
 
+// #region StepConfig
 export interface StepConfig<T = never> extends FormItem {
   type: 'step';
   /** 每个 step 的间距，不填写将自适应间距。支持百分比。 */
   space?: string | number;
   items: StepItemConfig<T>[];
 }
+// #endregion StepConfig
 
+// #region ComponentConfig
 export interface ComponentConfig extends FormItem {
   type: 'component';
   id: string;
@@ -819,13 +900,17 @@ export interface ComponentConfig extends FormItem {
   display?: any;
   component?: any;
 }
+// #endregion ComponentConfig
 
+// #region FlexLayoutConfig
 export interface FlexLayoutConfig<T = never> extends FormItem, ContainerCommonConfig<T> {
   type: 'flex-layout';
   /** flex 子项间距，默认 '16px' */
   gap?: string;
 }
+// #endregion FlexLayoutConfig
 
+// #region ChildConfig
 export type ChildConfig<T = never> =
   | ContainerCommonConfig<T>
   | TabConfig<T>
@@ -858,7 +943,12 @@ export type ChildConfig<T = never> =
   | DynamicFieldConfig
   | ComponentConfig
   | FlexLayoutConfig<T>;
+// #endregion ChildConfig
 
+// #region FormItemConfig
 export type FormItemConfig<T = never> = ChildConfig<T> | DynamicTypeConfig | EditorChildConfig<T> | T;
+// #endregion FormItemConfig
 
+// #region FormConfig
 export type FormConfig<T = never> = FormItemConfig<T>[];
+// #endregion FormConfig

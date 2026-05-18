@@ -2,23 +2,6 @@
 
 在一组备选项中进行单选
 
-## TS 定义
-
-```typescript
-interface RadioGroup extends FormItem {
-  type: "radio-group";
-  childType?: "default" | "button";
-  options: {
-    value: any;
-    text?: string;
-    icon?: any;
-    tooltip?: string;
-  }[];
-}
-```
-
-点击查看[FormItem](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L90)的定义
-
 ## 基础用法
 
 由于选项默认可见，不宜过多，若选项过多，建议使用 Select 选择器。
@@ -68,10 +51,34 @@ interface RadioGroup extends FormItem {
 | --------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | ------- |
 | name      | 绑定值             | string                                                                                                                                                   | —                | —       |
 | text      | 表单标签           | string                                                                                                                                                   | —                | —       |
-| disabled  | 是否禁用           | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L195) | —                | false   |
+| disabled  | 是否禁用           | boolean / `FilterFunction` | —                | false   |
 | childType | 子项展示形式       | string                                                                                                                                                   | default / button | default |
 | options   | 选项               | Array                                                                                                                                                    | —                | -       |
-| onChange  | 值变化时触发的函数 | [OnChangeHandler ](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L30)          | —                | -       |
+| onChange  | 值变化时触发的函数 | `OnChangeHandler`          | —                | -       |
+
+::: details 查看 FormItem / FilterFunction / OnChangeHandler 及关联类型定义
+<<< @/../packages/form-schema/src/base.ts#FormItem{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FilterFunction{ts}
+
+<<< @/../packages/form-schema/src/base.ts#OnChangeHandler{ts}
+
+<<< @/../packages/form-schema/src/base.ts#OnChangeHandlerData{ts}
+
+<<< @/../packages/form-schema/src/base.ts#ChangeRecord{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FormValue{ts}
+:::
+
+
+## 配置类型
+
+::: details 查看 RadioGroupConfig 配置类型定义
+<<< @/../packages/form-schema/src/base.ts#RadioGroupConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FormItem{ts}
+
+:::
 
 ## options item
 

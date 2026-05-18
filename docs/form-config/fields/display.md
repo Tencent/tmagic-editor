@@ -2,16 +2,6 @@
 
 用于显示，不可编辑
 
-## TS 定义
-
-```typescript
-interface Display extends FormItem {
-  type: "display";
-}
-```
-
-点击查看[FormItem](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L90)的定义
-
 ## 基础用法
 
 <demo-block type="form" :config="[{
@@ -33,3 +23,12 @@ interface Display extends FormItem {
 | ---- | -------- | ------ | ------ | ------ |
 | name | 绑定值   | string | —      | —      |
 | text | 表单标签 | string | —      | —      |
+
+## 配置类型
+
+::: details 查看 DisplayConfig 配置类型定义
+<<< @/../packages/form-schema/src/base.ts#DisplayConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FormItem{ts}
+
+:::

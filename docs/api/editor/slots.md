@@ -22,7 +22,7 @@
 
 - **详情：** 编辑器顶部菜单栏
 
-- **默认：** [NavMenu.vue](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/editor/src/layouts/NavMenu.vue)
+- **默认：** [NavMenu.vue](https://github.com/Tencent/tmagic-editor/blob/master/packages/editor/src/layouts/NavMenu.vue)
 
 - **插槽 Props：**
   - `editorService`: editorService 实例
@@ -64,7 +64,7 @@
 
 - **详情：** 左边栏
 
-- **默认：** [Sidebar.vue](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/editor/src/layouts/sidebar/Sidebar.vue)
+- **默认：** [Sidebar.vue](https://github.com/Tencent/tmagic-editor/blob/master/packages/editor/src/layouts/sidebar/Sidebar.vue)
 
 - **插槽 Props：**
   - `editorService`: editorService 实例
@@ -259,7 +259,7 @@
 
 - **详情：** 编辑器中间区域
 
-- **默认：** [Workspace.vue](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/editor/src/layouts/workspace/Workspace.vue)
+- **默认：** [Workspace.vue](https://github.com/Tencent/tmagic-editor/blob/master/packages/editor/src/layouts/workspace/Workspace.vue)
 
 - **插槽 Props：**
   - `editorService`: editorService 实例
@@ -268,7 +268,7 @@
 
 - **详情：** 画布
 
-- **默认：** [Stage.vue](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/editor/src/layouts/workspace/Stage.vue)
+- **默认：** [Stage.vue](https://github.com/Tencent/tmagic-editor/blob/master/packages/editor/src/layouts/workspace/Stage.vue)
 
 ## stage-top
 
@@ -380,7 +380,7 @@
 
 - **详情：** 当前没有页面时，编辑器中间区域
 
-- **默认：** [AddPageBox.vue](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/editor/src/layouts/AddPageBox.vue)
+- **默认：** [AddPageBox.vue](https://github.com/Tencent/tmagic-editor/blob/master/packages/editor/src/layouts/AddPageBox.vue)
 
 - **插槽 Props：**
   - `editorService`: editorService 实例

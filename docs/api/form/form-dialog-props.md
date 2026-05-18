@@ -6,7 +6,19 @@
 
 - **默认值：** `[]`
 
-- **类型：** [FormConfig](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L864)
+- **类型：** `FormConfig`
+
+  ::: details 查看 FormConfig 及关联类型定义
+  <<< @/../packages/form-schema/src/base.ts#FormConfig{ts}
+
+  <<< @/../packages/form-schema/src/base.ts#FormItemConfig{ts}
+
+  <<< @/../packages/form-schema/src/base.ts#ChildConfig{ts}
+
+  <<< @/../packages/form-schema/src/base.ts#DynamicTypeConfig{ts}
+
+  <<< @/../packages/form-schema/src/base.ts#FormItem{ts}
+  :::
 
 - **示例：**
 

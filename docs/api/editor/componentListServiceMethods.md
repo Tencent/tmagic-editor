@@ -4,7 +4,13 @@
 
 - **参数：**
 
-  - {[ComponentGroup](https://github.com/Tencent/tmagic-editor/blob/5880dfbe15fcead63e9dc7c91900f8c4e7a574d8/packages/editor/src/type.ts#L355)[]} componentGroupList 组件列表配置
+  - {`ComponentGroup`[]} componentGroupList 组件列表配置
+
+  ::: details 查看 ComponentGroup 及关联类型定义
+  <<< @/../packages/editor/src/type.ts#ComponentGroup{ts}
+
+  <<< @/../packages/editor/src/type.ts#ComponentItem{ts}
+  :::
 
 - **返回：**
 
@@ -48,7 +54,7 @@ componentListService.setList([
 
 - **返回：**
 
-  - {[ComponentGroup](https://github.com/Tencent/tmagic-editor/blob/5880dfbe15fcead63e9dc7c91900f8c4e7a574d8/packages/editor/src/type.ts#L355)[]} 组件列表配置
+  - {`ComponentGroup`[]} 组件列表配置
 
 - **详情：**
 
@@ -102,3 +108,4 @@ import { componentListService } from '@tmagic/editor';
 
 componentListService.destroy();
 ```
+

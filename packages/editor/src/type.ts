@@ -143,6 +143,7 @@ export interface EditorInstallOptions {
   [key: string]: any;
 }
 
+// #region Services
 export interface Services {
   editorService: EditorService;
   historyService: HistoryService;
@@ -157,6 +158,7 @@ export interface Services {
   keybindingService: KeybindingService;
   stageOverlayService: StageOverlayService;
 }
+// #endregion Services
 
 export interface StageOptions {
   runtimeUrl?: string;
@@ -236,11 +238,13 @@ export interface ComponentGroupState {
   list: ComponentGroup[];
 }
 
+// #region ColumnLayout
 export enum ColumnLayout {
   LEFT = 'left',
   CENTER = 'center',
   RIGHT = 'right',
 }
+// #endregion ColumnLayout
 
 export interface SetColumnWidth {
   [ColumnLayout.LEFT]?: number;
@@ -309,11 +313,13 @@ export interface UiState {
   };
 }
 
+// #region EditorNodeInfo
 export interface EditorNodeInfo {
   node: MNode | null;
   parent: MContainer | null;
   page: MPage | MPageFragment | null;
 }
+// #endregion EditorNodeInfo
 
 export interface AddMNode {
   type: string;
@@ -322,6 +328,7 @@ export interface AddMNode {
   [key: string]: any;
 }
 
+// #region PastePosition
 export interface PastePosition {
   left?: number;
   top?: number;
@@ -334,7 +341,9 @@ export interface PastePosition {
    */
   offsetY?: number;
 }
+// #endregion PastePosition
 
+// #region MenuButton
 /**
  * 菜单按钮
  */
@@ -367,7 +376,9 @@ export interface MenuButton {
   /** 唯一标识，用于高亮 */
   id?: string | number;
 }
+// #endregion MenuButton
 
+// #region MenuComponent
 export interface MenuComponent {
   type: 'component';
   /** Vue3组件 */
@@ -382,6 +393,7 @@ export interface MenuComponent {
   display?: boolean | ((data: Services) => Promise<boolean> | boolean);
   [key: string]: any;
 }
+// #endregion MenuComponent
 
 /**
  * '/': 分隔符
@@ -396,6 +408,7 @@ export interface MenuComponent {
  * 'scale-to-original': 缩放到实际大小
  * 'scale-to-fit': 缩放以适应
  */
+// #region MenuItem
 export type MenuItem =
   | '/'
   | 'delete'
@@ -411,7 +424,9 @@ export type MenuItem =
   | MenuButton
   | MenuComponent
   | string;
+// #endregion MenuItem
 
+// #region MenuBarData
 /** 工具栏 */
 export interface MenuBarData {
   /** 顶部工具栏左边项 */
@@ -421,7 +436,9 @@ export interface MenuBarData {
   /** 顶部工具栏右边项 */
   [ColumnLayout.RIGHT]?: MenuItem[];
 }
+// #endregion MenuBarData
 
+// #region SideComponent
 export interface SideComponent extends MenuComponent {
   /** 显示文案 */
   text: string;
@@ -444,21 +461,27 @@ export interface SideComponent extends MenuComponent {
     props?: Record<string, any>;
   };
 }
+// #endregion SideComponent
 
+// #region SideItemKey
 export enum SideItemKey {
   COMPONENT_LIST = 'component-list',
   LAYER = 'layer',
   CODE_BLOCK = 'code-block',
   DATA_SOURCE = 'data-source',
 }
+// #endregion SideItemKey
 
+// #region SideItem
 /**
  * component-list: 组件列表
  * layer: 已选组件树
  * code-block: 代码块
  */
 export type SideItem = `${SideItemKey}` | SideComponent;
+// #endregion SideItem
 
+// #region SideBarData
 /** 工具栏 */
 export interface SideBarData {
   /** 容器类型 */
@@ -468,7 +491,9 @@ export interface SideBarData {
   /** panel列表 */
   items: SideItem[];
 }
+// #endregion SideBarData
 
+// #region ComponentItem
 export interface ComponentItem {
   /** 显示文案 */
   text: string;
@@ -483,19 +508,23 @@ export interface ComponentItem {
     [key: string]: any;
   };
 }
+// #endregion ComponentItem
 
+// #region ComponentGroup
 export interface ComponentGroup {
   /** 显示文案 */
   title: string;
   /** 组内列表 */
   items: ComponentItem[];
 }
+// #endregion ComponentGroup
 
 export enum LayerOffset {
   TOP = 'top',
   BOTTOM = 'bottom',
 }
 
+// #region Layout
 /** 容器布局 */
 export enum Layout {
   FLEX = 'flex',
@@ -503,6 +532,7 @@ export enum Layout {
   RELATIVE = 'relative',
   ABSOLUTE = 'absolute',
 }
+// #endregion Layout
 
 export enum Keys {
   ESCAPE = 'Space',
@@ -575,8 +605,11 @@ export interface CodeParamStatement {
   [key: string]: any;
 }
 
+// #region HistoryOpType
 export type HistoryOpType = 'add' | 'remove' | 'update';
+// #endregion HistoryOpType
 
+// #region StepValue
 export interface StepValue {
   /** 页面信息 */
   data: { name: string; id: Id };
@@ -597,6 +630,7 @@ export interface StepValue {
   /** opType 'update': 变更前后的节点快照 */
   updatedItems?: { oldNode: MNode; newNode: MNode }[];
 }
+// #endregion StepValue
 
 export interface HistoryState {
   pageId?: Id;
@@ -660,6 +694,7 @@ export interface KeyBindingCacheItem {
   bound: boolean;
 }
 
+// #region DatasourceTypeOption
 /** 可新增的数据源类型选项 */
 export interface DatasourceTypeOption {
   /** 数据源类型 */
@@ -667,6 +702,7 @@ export interface DatasourceTypeOption {
   /** 数据源名称 */
   text: string;
 }
+// #endregion DatasourceTypeOption
 
 /** 组件树节点状态 */
 export interface LayerNodeStatus {
@@ -688,12 +724,14 @@ export enum DragType {
   LAYER_TREE = 'layer-tree',
 }
 
+// #region TreeNodeData
 export interface TreeNodeData {
   id: Id;
   name?: string;
   items?: TreeNodeData[];
   [key: string]: any;
 }
+// #endregion TreeNodeData
 
 /** 判断组件树节点是否可展开（即是否要展示为拥有子节点的形态）的函数 */
 export type IsExpandableFunction = (_data: TreeNodeData, _nodeStatusMap: Map<Id, LayerNodeStatus>) => boolean;
@@ -775,9 +813,12 @@ export interface EventBus extends EventEmitter {
   emit<Name extends keyof EventBusEvent, Param extends EventBusEvent[Name]>(eventName: Name, ...args: Param): boolean;
 }
 
+// #region PropsFormConfigFunction
 export type PropsFormConfigFunction = (data: { editorService: EditorService }) => FormConfig;
+// #endregion PropsFormConfigFunction
 export type PropsFormValueFunction = (data: { editorService: EditorService }) => Partial<MNode>;
 
+// #region PageBarSortOptions
 export type PartSortableOptions = Omit<Options, 'onStart' | 'onUpdate'>;
 export interface PageBarSortOptions extends PartSortableOptions {
   /** 在onUpdate之后调用 */
@@ -785,6 +826,7 @@ export interface PageBarSortOptions extends PartSortableOptions {
   /** 在onStart之前调用 */
   beforeStart?: (event: SortableEvent, sortable: Sortable) => void | Promise<void>;
 }
+// #endregion PageBarSortOptions
 
 export type CustomContentMenuFunction = (
   menus: (MenuButton | MenuComponent)[],

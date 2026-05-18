@@ -9,7 +9,25 @@
 - **默认值：** `{}`
   
 
-- **类型：** [MApp](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/schema/src/index.ts?plain=1#L66-L73)[]
+- **类型：** `MApp[]`
+
+  ::: details 查看 MApp 及关联类型定义
+  <<< @/../packages/schema/src/index.ts#MApp{ts}
+
+  <<< @/../packages/schema/src/index.ts#MComponent{ts}
+
+  <<< @/../packages/schema/src/index.ts#NodeType{ts}
+
+  <<< @/../packages/schema/src/index.ts#MPage{ts}
+
+  <<< @/../packages/schema/src/index.ts#MPageFragment{ts}
+
+  <<< @/../packages/schema/src/index.ts#CodeBlockDSL{ts}
+
+  <<< @/../packages/schema/src/index.ts#DataSourceSchema{ts}
+
+  <<< @/../packages/schema/src/index.ts#DataSourceDeps{ts}
+  :::
 
 - **示例：**
   
@@ -49,7 +67,13 @@ const dsl = ref({
 
 - **默认值：** `[]`
 
-- **类型：** [ComponentGroup](https://github.com/Tencent/tmagic-editor/blob/5880dfbe15fcead63e9dc7c91900f8c4e7a574d8/packages/editor/src/type.ts#L355)
+- **类型：** `ComponentGroup[]`
+
+  ::: details 查看 ComponentGroup 及关联类型定义
+  <<< @/../packages/editor/src/type.ts#ComponentGroup{ts}
+
+  <<< @/../packages/editor/src/type.ts#ComponentItem{ts}
+  :::
 
 ::: tip
 icon使用的是[element-plus icon](https://element-plus.org/zh-CN/component/icon.html)
@@ -128,7 +152,11 @@ const componentGroupList = ref([
 
 - **默认值：**  `[]`
 
-- **类型：** [DatasourceTypeOption](https://github.com/Tencent/tmagic-editor/blob/5880dfbe15fcead63e9dc7c91900f8c4e7a574d8/packages/editor/src/type.ts#L589)
+- **类型：** `DatasourceTypeOption[]`
+
+  ::: details 查看 DatasourceTypeOption 类型定义
+  <<< @/../packages/editor/src/type.ts#DatasourceTypeOption{ts}
+  :::
 
 - **示例：**
 
@@ -169,7 +197,21 @@ const datasourceTypeList = ref([
 }
 ```
 
-- **类型：** [SideBarData](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/editor/src/type.ts#L258-L265)
+- **类型：** `SideBarData`
+
+  ::: details 查看 SideBarData 及关联类型定义
+  <<< @/../packages/editor/src/type.ts#SideBarData{ts}
+
+  <<< @/../packages/editor/src/type.ts#SideItem{ts}
+
+  <<< @/../packages/editor/src/type.ts#SideItemKey{ts}
+
+  <<< @/../packages/editor/src/type.ts#SideComponent{ts}
+
+  <<< @/../packages/editor/src/type.ts#MenuComponent{ts}
+
+  <<< @/../packages/editor/src/type.ts#Services{ts}
+  :::
 
 - **示例：**
   
@@ -248,7 +290,21 @@ icon使用的是[element-plus icon](https://element-plus.org/zh-CN/component/ico
 { left: [], center: [], right: [] }
 ```
 
-- **类型：** [MenuBarData](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/editor/src/type.ts#L235-L242)
+- **类型：** `MenuBarData`
+
+  ::: details 查看 MenuBarData 及关联类型定义
+  <<< @/../packages/editor/src/type.ts#MenuBarData{ts}
+
+  <<< @/../packages/editor/src/type.ts#ColumnLayout{ts}
+
+  <<< @/../packages/editor/src/type.ts#MenuItem{ts}
+
+  <<< @/../packages/editor/src/type.ts#MenuButton{ts}
+
+  <<< @/../packages/editor/src/type.ts#MenuComponent{ts}
+
+  <<< @/../packages/editor/src/type.ts#Services{ts}
+  :::
 
 - **示例：**
   
@@ -296,7 +352,15 @@ const menu = ref({
 
 - **默认值：** `[]`
 
-- **类型：** ([MenuButton](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/editor/src/type.ts#L168-L195) | [MenuComponent](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/editor/src/type.ts#L197-L210))[]
+- **类型：** `(MenuButton | MenuComponent)[]`
+
+  ::: details 查看 MenuButton / MenuComponent 及关联类型定义
+  <<< @/../packages/editor/src/type.ts#MenuButton{ts}
+
+  <<< @/../packages/editor/src/type.ts#MenuComponent{ts}
+
+  <<< @/../packages/editor/src/type.ts#Services{ts}
+  :::
 
 - **示例：**
 
@@ -330,7 +394,9 @@ const layerContentMenu = ref([
 
 - **默认值：** `[]`
 
-- **类型：** ([MenuButton](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/editor/src/type.ts#L168-L195) | [MenuComponent](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/editor/src/type.ts#L197-L210))[]
+- **类型：** `(MenuButton | MenuComponent)[]`
+
+  > 已在上面 [layerContentMenu](#layercontentmenu) 段落展开过相同类型，参考即可。
 
 - **示例：**
 
@@ -471,7 +537,19 @@ const renderFunction = async (stage) => {
   
 - **默认值：** `{}`
 - 
-- **类型：** Record<string, [FormConfig](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/form/src/schema.ts#L706)>
+- **类型：** `Record<string, FormConfig>`
+
+  ::: details 查看 FormConfig 及关联类型定义
+  <<< @/../packages/form-schema/src/base.ts#FormConfig{ts}
+
+  <<< @/../packages/form-schema/src/base.ts#FormItemConfig{ts}
+
+  <<< @/../packages/form-schema/src/base.ts#ChildConfig{ts}
+
+  <<< @/../packages/form-schema/src/base.ts#DynamicTypeConfig{ts}
+
+  <<< @/../packages/form-schema/src/base.ts#FormItem{ts}
+  :::
 
 - **示例：**
   
@@ -552,7 +630,11 @@ const propsValues = {
 
 - **默认值：** `{}`
 
-- **类型：** Record<string, { events: [EventOption](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/core/src/events.ts#L26-L29)[]; methods: [EventOption](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/core/src/events.ts#L26-L29)[] }>
+- **类型：** `Record<string, { events: EventOption[]; methods: EventOption[] }>`
+
+  ::: details 查看 EventOption 类型定义
+  <<< @/../packages/core/src/utils.ts#EventOption{ts}
+  :::
   
 - **示例：**
 
@@ -593,7 +675,23 @@ const eventMethodList = {
 
 - **默认值：** `{}`
 
-- **类型：** Record<string, Partial<[DataSourceSchema](https://github.com/Tencent/tmagic-editor/blob/5880dfbe15fcead63e9dc7c91900f8c4e7a574d8/packages/schema/src/index.ts#L221)>>
+- **类型：** `Record<string, Partial<DataSourceSchema>>`
+
+  ::: details 查看 DataSourceSchema 及关联类型定义
+  <<< @/../packages/schema/src/index.ts#DataSourceSchema{ts}
+
+  <<< @/../packages/schema/src/index.ts#DataSchema{ts}
+
+  <<< @/../packages/schema/src/index.ts#MockSchema{ts}
+
+  <<< @/../packages/schema/src/index.ts#CodeBlockContent{ts}
+
+  <<< @/../packages/schema/src/index.ts#CodeParam{ts}
+
+  <<< @/../packages/schema/src/index.ts#EventConfig{ts}
+
+  <<< @/../packages/schema/src/index.ts#JsEngine{ts}
+  :::
   
 - **示例：**
 
@@ -634,7 +732,9 @@ const datasourceValues = {
 
 - **默认值：** `{}`
 
-- **类型：** Record<string, [FormConfig](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/form/src/schema.ts#L706)>
+- **类型：** `Record<string, FormConfig>`
+
+  > 已在上面 [propsConfigs](#propsconfigs) 段落展开过 `FormConfig` 类型定义，参考即可。
   
 - **示例：**
 
@@ -675,7 +775,11 @@ const datasourceConfigs = {
 
 - **默认值：** `{}`
 
-- **类型：** ((config: [CustomizeMoveableOptionsCallbackConfig](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/stage/src/types.ts#L97-L109)) => MoveableOptions) | [MoveableOptions](https://daybrush.com/moveable/release/latest/doc/)
+- **类型：** `((config: CustomizeMoveableOptionsCallbackConfig) => MoveableOptions) | `[`MoveableOptions`](https://daybrush.com/moveable/release/latest/doc/)
+
+  ::: details 查看 CustomizeMoveableOptionsCallbackConfig 类型定义
+  <<< @/../packages/stage/src/types.ts#CustomizeMoveableOptionsCallbackConfig{ts}
+  :::
 
 - **示例：**
 
@@ -1412,7 +1516,11 @@ const extendFormState = async (state) => {
 
 - **默认值：** `undefined`
 
-- **类型：** [PageBarSortOptions](https://github.com/Tencent/tmagic-editor/blob/master/packages/editor/src/type.ts)
+- **类型：** `PageBarSortOptions`
+
+  ::: details 查看 PageBarSortOptions 类型定义
+  <<< @/../packages/editor/src/type.ts#PageBarSortOptions{ts}
+  :::
 
 - **示例：**
 

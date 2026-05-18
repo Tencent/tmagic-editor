@@ -188,15 +188,39 @@ app.use(MagicForm, {
 | name        | 绑定值                                            | string                                                                                                                                                   | —      | —      |
 | placeholder | 输入框占位文本                                    | string                                                                                                                                                   | —      | —      |
 | text        | 表单标签                                          | string                                                                                                                                                   | —      | —      |
-| disabled    | 是否禁用                                          | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L195) | —      | false  |
+| disabled    | 是否禁用                                          | boolean / `FilterFunction` | —      | false  |
 | multiple    | 是否多选                                          | boolean                                                                                                                                                  | —      | false  |
 | valueKey    | 作为 value 唯一标识的键名，绑定值为对象类型时必填 | string                                                                                                                                                   | —      | value  |
 | allowCreate | 是否允许用户创建新条目                            | boolean                                                                                                                                                  | —      | false  |
 | remote      | 是否为远程搜索                                    | boolean                                                                                                                                                  | —      | false  |
 | group       | 是否选择分组                                      | boolean                                                                                                                                                  | —      | false  |
-| onChange    | 值变化时触发的函数                                | [OnChangeHandler ](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L90)          | —      | -      |
+| onChange    | 值变化时触发的函数                                | `OnChangeHandler`          | —      | -      |
 | options     | 选项                                              | Array                                                                                                                                                    | —      | -      |
 | option      | 选项                                              | Object                                                                                                                                                   | —      | -      |
+
+::: details 查看 FilterFunction / OnChangeHandler 及关联类型定义
+<<< @/../packages/form-schema/src/base.ts#FilterFunction{ts}
+
+<<< @/../packages/form-schema/src/base.ts#OnChangeHandler{ts}
+
+<<< @/../packages/form-schema/src/base.ts#OnChangeHandlerData{ts}
+
+<<< @/../packages/form-schema/src/base.ts#ChangeRecord{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FormValue{ts}
+:::
+
+
+## 配置类型
+
+::: details 查看 SelectConfig 配置类型定义
+<<< @/../packages/form-schema/src/base.ts#SelectConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FormItem{ts}
+
+<<< @/../packages/form-schema/src/base.ts#Input{ts}
+
+:::
 
 ## options item
 

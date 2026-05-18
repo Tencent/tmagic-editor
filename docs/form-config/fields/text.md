@@ -119,14 +119,40 @@ Input输入框的type为'text', 是type的默认值，所以可以不配置
 | name        | 绑定值             | string                                                                                                                                                    | —      | —      |
 | text        | 表单标签           | string                                                                                                                                                    | —      | —      |
 | placeholder | 输入框占位文本     | string                                                                                                                                                    | —      | —      |
-| disabled    | 是否禁用           | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L195)  | —      | false  |
+| disabled    | 是否禁用           | boolean / `FilterFunction`  | —      | false  |
 | clearable   | 是否可清空         | boolean                                                                                                                                                   | —      | true   |
-| tooltip     | 输入时显示内容     | string / [ToolTipConfigType](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L90) | —      | —      |
+| tooltip     | 输入时显示内容     | string / `ToolTipConfigType` | —      | —      |
 | trim        | 是否去掉首尾空格   | boolean                                                                                                                                                   | —      | false  |
 | filter      | 过滤值             | string / Function                                                                                                                                         | number | -      |
 | prepend     | 前置内容           | string                                                                                                                                                    | —      | -      |
 | append      | 后置内容           | string / Object                                                                                                                                           | —      | -      |
-| onChange    | 值变化时触发的函数 | [OnChangeHandler](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L30)            | —      | -      |
+| onChange    | 值变化时触发的函数 | `OnChangeHandler`            | —      | -      |
+
+::: details 查看 FilterFunction / OnChangeHandler / ToolTipConfigType 及关联类型定义
+<<< @/../packages/form-schema/src/base.ts#FilterFunction{ts}
+
+<<< @/../packages/form-schema/src/base.ts#OnChangeHandler{ts}
+
+<<< @/../packages/form-schema/src/base.ts#OnChangeHandlerData{ts}
+
+<<< @/../packages/form-schema/src/base.ts#ChangeRecord{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FormValue{ts}
+
+<<< @/../packages/form-schema/src/base.ts#ToolTipConfigType{ts}
+:::
+
+
+## 配置类型
+
+::: details 查看 TextConfig 配置类型定义
+<<< @/../packages/form-schema/src/base.ts#TextConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FormItem{ts}
+
+<<< @/../packages/form-schema/src/base.ts#Input{ts}
+
+:::
 
 ## append Attributes
 

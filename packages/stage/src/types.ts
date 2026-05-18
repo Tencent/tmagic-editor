@@ -122,6 +122,7 @@ export interface MoveableOptionsManagerConfig {
   getRootContainer: GetRootContainer;
 }
 
+// #region CustomizeMoveableOptionsCallbackConfig
 export interface CustomizeMoveableOptionsCallbackConfig {
   targetEl: HTMLElement | null;
   targetElId?: string;
@@ -130,6 +131,7 @@ export interface CustomizeMoveableOptionsCallbackConfig {
   isMulti: boolean;
   document?: Document;
 }
+// #endregion CustomizeMoveableOptionsCallbackConfig
 
 export interface StageRenderConfig {
   runtimeUrl?: string;

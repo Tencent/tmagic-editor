@@ -50,3 +50,12 @@
 | name | 字段名 | string | — |
 | label | 标签名 | string | — |
 | defaultValue | 默认值 | any | — |
+
+## 配置类型
+
+::: details 查看 DynamicFieldConfig 配置类型定义
+<<< @/../packages/form-schema/src/base.ts#DynamicFieldConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FormItem{ts}
+
+:::

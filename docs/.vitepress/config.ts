@@ -102,10 +102,7 @@ export default defineConfig({
               text: '数据源',
               link: '/guide/advanced/data-source.md'
             },
-            {
-              text: '@tmagic/ui',
-              link: '/guide/advanced/tmagic-ui.md',
-            },
+
             {
               text: '@tmagic/form',
               link: '/guide/advanced/tmagic-form.md',
@@ -551,14 +548,8 @@ export default defineConfig({
   },
 
   vite: {
-    optimizeDeps: {
-      rolldownOptions: {
-        transform: {
-          define: {
-            global: 'globalThis',
-          },
-        },
-      },
+    define: {
+      global: 'globalThis',
     },
     resolve: {
       alias:[

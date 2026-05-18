@@ -423,16 +423,40 @@ options 支持传入函数，可根据表单其他字段动态生成选项列表
 | name | 绑定值 | string | — | — |
 | text | 表单标签 | string | — | — |
 | placeholder | 输入框占位文本 | string | — | — |
-| disabled | 是否禁用 | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/master/packages/form-schema/src/base.ts) | — | false |
+| disabled | 是否禁用 | boolean / `FilterFunction` | — | false |
 | multiple | 是否多选 | boolean | — | false |
 | emitPath | 在选中节点改变时，是否返回由该节点所在的各级菜单的值所组成的数组，若设置 false，则只返回该节点的值 | boolean | — | true |
-| checkStrictly | 是否严格的遵守父子节点不互相关联 | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/master/packages/form-schema/src/base.ts) | — | false |
-| valueSeparator | 合并成字符串时的分隔符 | string / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/master/packages/form-schema/src/base.ts) | — | — |
+| checkStrictly | 是否严格的遵守父子节点不互相关联 | boolean / `FilterFunction` | — | false |
+| valueSeparator | 合并成字符串时的分隔符 | string / `FilterFunction` | — | — |
 | popperClass | 弹出内容的自定义类名 | string | — | — |
 | remote | 是否为远程搜索 | boolean | — | false |
 | options | 选项数据源 | Array / Function | — | — |
 | option | 远程选项配置 | Object | — | — |
-| onChange | 值变化时触发的函数 | [OnChangeHandler](https://github.com/Tencent/tmagic-editor/blob/master/packages/form-schema/src/base.ts) | — | — |
+| onChange | 值变化时触发的函数 | `OnChangeHandler` | — | — |
+
+::: details 查看 FilterFunction / OnChangeHandler 及关联类型定义
+<<< @/../packages/form-schema/src/base.ts#FilterFunction{ts}
+
+<<< @/../packages/form-schema/src/base.ts#OnChangeHandler{ts}
+
+<<< @/../packages/form-schema/src/base.ts#OnChangeHandlerData{ts}
+
+<<< @/../packages/form-schema/src/base.ts#ChangeRecord{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FormValue{ts}
+:::
+
+
+## 配置类型
+
+::: details 查看 CascaderConfig 配置类型定义
+<<< @/../packages/form-schema/src/base.ts#CascaderConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FormItem{ts}
+
+<<< @/../packages/form-schema/src/base.ts#Input{ts}
+
+:::
 
 ## options item
 

@@ -4,7 +4,11 @@
 
 - **参数：**
 
-  - {Record<string, [EventOption](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/core/src/events.ts#L26-L29)[]>} events 事件配置对象
+  - {Record<string, `EventOption`[]>} events 事件配置对象
+
+  ::: details 查看 EventOption 类型定义
+  <<< @/../packages/core/src/utils.ts#EventOption{ts}
+  :::
 
 - **返回：**
 
@@ -35,7 +39,7 @@ eventsService.setEvents({
 - **参数：**
 
   - `{string}` type 组件类型
-  - {[EventOption](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/core/src/events.ts#L26-L29)[]} events 事件列表
+  - {`EventOption`[]} events 事件列表
 
 - **返回：**
 
@@ -64,7 +68,7 @@ eventsService.setEvent('button', [
 
 - **返回：**
 
-  - {[EventOption](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/core/src/events.ts#L26-L29)[]} 事件列表
+  - {`EventOption`[]} 事件列表
 
 - **详情：**
 
@@ -83,7 +87,7 @@ console.log(events); // [{ label: '点击', value: 'click' }, ...]
 
 - **参数：**
 
-  - {Record<string, [EventOption](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/core/src/events.ts#L26-L29)[]>} methods 方法配置对象
+  - {Record<string, `EventOption`[]>} methods 方法配置对象
 
 - **返回：**
 
@@ -115,7 +119,7 @@ eventsService.setMethods({
 - **参数：**
 
   - `{string}` type 组件类型
-  - {[EventOption](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/core/src/events.ts#L26-L29)[]} methods 方法列表
+  - {`EventOption`[]} methods 方法列表
 
 - **返回：**
 
@@ -146,7 +150,7 @@ eventsService.setMethod('video', [
 
 - **返回：**
 
-  - {[EventOption](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/core/src/events.ts#L26-L29)[]} 方法列表
+  - {`EventOption`[]} 方法列表
 
 - **详情：**
 
@@ -200,3 +204,4 @@ import { eventsService } from '@tmagic/editor';
 
 eventsService.destroy();
 ```
+

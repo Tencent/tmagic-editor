@@ -1,12 +1,26 @@
 # 3.[DSL](../conception.md#dsl) 解析渲染
 
-tmagic 提供了 vue/react 两个版本的解析渲染组件，可以直接使用
+tmagic 提供了 vue/react 两个版本的解析渲染组件，可以直接使用。基础渲染组件以 container 为核心，配合 page、button、img、text 等多个独立的 npm 包，分别发布在 `vue-components/` 与 `react-components/` 下：
 
-[@tmagic/ui](https://www.npmjs.com/package/@tmagic/ui)
+vue 版本：
 
-[@tmagic/ui-react](https://www.npmjs.com/package/@tmagic/ui-react)
+- [@tmagic/vue-container](https://www.npmjs.com/package/@tmagic/vue-container)
+- [@tmagic/vue-page](https://www.npmjs.com/package/@tmagic/vue-page)
+- [@tmagic/vue-button](https://www.npmjs.com/package/@tmagic/vue-button)
+- [@tmagic/vue-img](https://www.npmjs.com/package/@tmagic/vue-img)
+- [@tmagic/vue-text](https://www.npmjs.com/package/@tmagic/vue-text)
+- 其他：`@tmagic/vue-overlay`、`@tmagic/vue-qrcode`、`@tmagic/vue-page-fragment`、`@tmagic/vue-page-fragment-container`、`@tmagic/vue-iterator-container`
 
-接下来是以vue为基础，来讲述如何实现一个[@tmagic/ui](https://www.npmjs.com/package/@tmagic/ui)
+react 版本：
+
+- [@tmagic/react-container](https://www.npmjs.com/package/@tmagic/react-container)
+- [@tmagic/react-page](https://www.npmjs.com/package/@tmagic/react-page)
+- [@tmagic/react-button](https://www.npmjs.com/package/@tmagic/react-button)
+- [@tmagic/react-img](https://www.npmjs.com/package/@tmagic/react-img)
+- [@tmagic/react-text](https://www.npmjs.com/package/@tmagic/react-text)
+- 其他：`@tmagic/react-overlay`、`@tmagic/react-qrcode`、`@tmagic/react-page-fragment`、`@tmagic/react-page-fragment-container`、`@tmagic/react-iterator-container`
+
+接下来是以 vue 为基础，来讲述如何实现一个类似 [@tmagic/vue-container](https://www.npmjs.com/package/@tmagic/vue-container) 的渲染器
 
 ## 准备工作
 

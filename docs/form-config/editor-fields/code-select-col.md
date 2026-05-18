@@ -33,6 +33,28 @@
 | ----------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------ |
 | name        | 绑定值                                      | string                                                                                                                                                   | —      | —      |
 | text        | 表单标签                                    | string                                                                                                                                                   | —      | —      |
-| disabled    | 是否禁用                                    | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L195) | —      | false  |
-| notEditable | 是否不可编辑代码块（disable控制是否可选择） | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L195) | —      | false  |
-| onChange    | 值变化时触发的函数                          | [OnChangeHandler](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L30)           | —      | -      |
+| disabled    | 是否禁用                                    | boolean / `FilterFunction` | —      | false  |
+| notEditable | 是否不可编辑代码块（disable控制是否可选择） | boolean / `FilterFunction` | —      | false  |
+| onChange    | 值变化时触发的函数                          | `OnChangeHandler`           | —      | -      |
+
+::: details 查看 FilterFunction / OnChangeHandler 及关联类型定义
+<<< @/../packages/form-schema/src/base.ts#FilterFunction{ts}
+
+<<< @/../packages/form-schema/src/base.ts#OnChangeHandler{ts}
+
+<<< @/../packages/form-schema/src/base.ts#OnChangeHandlerData{ts}
+
+<<< @/../packages/form-schema/src/base.ts#ChangeRecord{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FormValue{ts}
+:::
+
+
+## 配置类型
+
+::: details 查看 CodeSelectColConfig 配置类型定义
+<<< @/../packages/form-schema/src/editor.ts#CodeSelectColConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FormItem{ts}
+
+:::

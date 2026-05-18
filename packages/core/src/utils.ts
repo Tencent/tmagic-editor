@@ -134,7 +134,9 @@ export const transformStyle = (style: Record<string, any> | string, jsEngine: Js
 export const COMMON_EVENT_PREFIX = 'magic:common:events:';
 export const COMMON_METHOD_PREFIX = 'magic:common:actions:';
 
+// #region EventOption
 export interface EventOption {
   label: string;
   value: string;
 }
+// #endregion EventOption

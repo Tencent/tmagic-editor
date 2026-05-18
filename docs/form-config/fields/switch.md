@@ -46,6 +46,20 @@
 | 参数           | 说明              | 类型                                                                                                                                              | 可选值 | 默认值 |
 | -------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------ |
 | name           | 绑定值            | string                                                                                                                                            | —      | —      |
-| disabled       | 是否禁用          | boolean / [Function](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L90) | —      | false  |
+| disabled       | 是否禁用          | boolean / `FilterFunction` | —      | false  |
 | active-value   | switch 打开时的值 | boolean / string / number                                                                                                                         | —      | true   |
 | inactive-value | switch 关闭时的值 | boolean / string / number                                                                                                                         | —      | false  |
+
+::: details 查看 FilterFunction 及关联类型定义
+<<< @/../packages/form-schema/src/base.ts#FilterFunction{ts}
+:::
+
+
+## 配置类型
+
+::: details 查看 SwitchConfig 配置类型定义
+<<< @/../packages/form-schema/src/base.ts#SwitchConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FormItem{ts}
+
+:::

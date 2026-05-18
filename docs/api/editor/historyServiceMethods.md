@@ -21,7 +21,13 @@
 ## changePage
 
 - **参数：**
-  - {[MPage](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/schema/src/index.ts#L157) | [MPageFragment](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/schema/src/index.ts#L162)} page
+  - `{MPage | MPageFragment} page`
+
+  ::: details 查看 MPage / MPageFragment 类型定义
+  <<< @/../packages/schema/src/index.ts#MPage{ts}
+
+  <<< @/../packages/schema/src/index.ts#MPageFragment{ts}
+  :::
 
 - **详情：**
 
@@ -30,10 +36,20 @@
 ## push
 
 - **参数：**
-  - {[StepValue](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/editor/src/type.ts#L400-L404)} state
+  - `{StepValue} state`
+
+  ::: details 查看 StepValue 及关联类型定义
+  <<< @/../packages/editor/src/type.ts#StepValue{ts}
+
+  <<< @/../packages/editor/src/type.ts#HistoryOpType{ts}
+
+  <<< @/../packages/schema/src/index.ts#Id{ts}
+
+  <<< @/../packages/schema/src/index.ts#MNode{ts}
+  :::
 
 - **返回：**
-  - {[StepValue](https://github.com/Tencent/tmagic-editor/blob/239b5d3efeae916a8cf3e3566d88063ecccc0553/packages/editor/src/type.ts#L400-L404) | null}
+  - `{StepValue | null}`
 
 - **详情：**
 
@@ -42,7 +58,7 @@
 ## undo
 
 - **返回：**
-  - {[StepValue](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/editor/src/type.ts#L554-L573) | null}
+  - `{StepValue | null}`
 
 - **详情：**
 
@@ -51,7 +67,7 @@
 ## redo
 
 - **返回：**
-  - {[StepValue](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/editor/src/type.ts#L554-L573) | null}
+  - `{StepValue | null}`
 
 - **详情：**
 
@@ -62,3 +78,4 @@
 - **详情：**
 
   销毁
+

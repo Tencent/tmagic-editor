@@ -69,9 +69,31 @@
 |------|------|------|--------|--------|
 | name | 绑定值 | string | — | — |
 | text | 表单标签 | string | — | — |
-| disabled | 是否禁用 | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/master/packages/form-schema/src/base.ts) | — | false |
+| disabled | 是否禁用 | boolean / `FilterFunction` | — | false |
 | defaultValue | 默认颜色值 | string | — | — |
-| onChange | 值变化时触发的函数 | [OnChangeHandler](https://github.com/Tencent/tmagic-editor/blob/master/packages/form-schema/src/base.ts) | — | — |
+| onChange | 值变化时触发的函数 | `OnChangeHandler` | — | — |
+
+::: details 查看 FilterFunction / OnChangeHandler 及关联类型定义
+<<< @/../packages/form-schema/src/base.ts#FilterFunction{ts}
+
+<<< @/../packages/form-schema/src/base.ts#OnChangeHandler{ts}
+
+<<< @/../packages/form-schema/src/base.ts#OnChangeHandlerData{ts}
+
+<<< @/../packages/form-schema/src/base.ts#ChangeRecord{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FormValue{ts}
+:::
+
+
+## 配置类型
+
+::: details 查看 ColorPickConfig 配置类型定义
+<<< @/../packages/form-schema/src/base.ts#ColorPickConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FormItem{ts}
+
+:::
 
 ## 颜色格式说明
 

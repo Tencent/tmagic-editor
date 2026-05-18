@@ -1,5 +1,36 @@
 # 布局
 
+## 配置类型
+
+::: details 查看 ContainerCommonConfig / RowConfig / TabConfig / TabPaneConfig / FieldsetConfig / PanelConfig / StepConfig / FlexLayoutConfig / GroupListConfig / TableConfig / TableColumnConfig / TableGroupListCommonConfig 配置类型定义
+<<< @/../packages/form-schema/src/base.ts#ContainerCommonConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#RowConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#TabConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#TabPaneConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FieldsetConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#PanelConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#StepConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FlexLayoutConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#GroupListConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#TableConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#TableColumnConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#TableGroupListCommonConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FormItem{ts}
+
+:::
+
 ## 基础用法
 
 <demo-block type="form" :config="[{

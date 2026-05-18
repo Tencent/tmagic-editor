@@ -101,8 +101,32 @@
 | name        | 绑定值的字段名         | string                                                                                                                                                   | —                       | —                   |
 | text        | 表单标签               | string                                                                                                                                                   | —                       | —                   |
 | placeholder | 输入框占位文本         | string                                                                                                                                                   | —                       | —                   |
-| disabled    | 是否禁用               | boolean / [FilterFunction](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L195) | —                       | false               |
+| disabled    | 是否禁用               | boolean / `FilterFunction` | —                       | false               |
 | format      | 显示在输入框中的格式   | string                                                                                                                                                   | 见[日期格式](#日期格式) | YYYY/MM/DD HH:mm:ss |
 | valueFormat | 绑定值的格式           | string                                                                                                                                                   | 见[日期格式](#日期格式) | YYYY/MM/DD HH:mm:ss |
 | defaultTime | 选择日期后的默认时间值 | Date                                                                                                                                                     | —                       | —                   |
-| onChange    | 值变化时触发的函数     | [OnChangeHandler](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L30)           | —                       | —                   |
+| onChange    | 值变化时触发的函数     | `OnChangeHandler`           | —                       | —                   |
+
+::: details 查看 FilterFunction / OnChangeHandler 及关联类型定义
+<<< @/../packages/form-schema/src/base.ts#FilterFunction{ts}
+
+<<< @/../packages/form-schema/src/base.ts#OnChangeHandler{ts}
+
+<<< @/../packages/form-schema/src/base.ts#OnChangeHandlerData{ts}
+
+<<< @/../packages/form-schema/src/base.ts#ChangeRecord{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FormValue{ts}
+:::
+
+
+## 配置类型
+
+::: details 查看 DateTimeConfig 配置类型定义
+<<< @/../packages/form-schema/src/base.ts#DateTimeConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FormItem{ts}
+
+<<< @/../packages/form-schema/src/base.ts#Input{ts}
+
+:::

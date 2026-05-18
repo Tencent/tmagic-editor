@@ -38,4 +38,20 @@
 | name        | 绑定值         | string                                                                                                                                            | —      | —      |
 | placeholder | 输入框占位文本 | string                                                                                                                                            | —      | —      |
 | text        | 表单标签       | string                                                                                                                                            | —      | —      |
-| disabled    | 是否禁用       | boolean / [Function](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L90) | —      | false  |
+| disabled    | 是否禁用       | boolean / `FilterFunction` | —      | false  |
+
+::: details 查看 FilterFunction 及关联类型定义
+<<< @/../packages/form-schema/src/base.ts#FilterFunction{ts}
+:::
+
+
+## 配置类型
+
+::: details 查看 TimeConfig 配置类型定义
+<<< @/../packages/form-schema/src/base.ts#TimeConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FormItem{ts}
+
+<<< @/../packages/form-schema/src/base.ts#Input{ts}
+
+:::

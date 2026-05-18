@@ -2,28 +2,6 @@
 
 用于显示，不可编辑
 
-## TS 定义
-
-```typescript
-interface Link extends FormItem {
-  type: "link";
-  href?: string | typeof LinkHrefFunction;
-  css?: {
-    [key: string]: string | number;
-  };
-  disabledCss?: {
-    [key: string]: string | number;
-  };
-  formTitle?: string;
-  formWidth?: number | string;
-  displayText?: string | typeof LinkDisplayTextFunction;
-  form: FormConfig | typeof LinkFormFunction;
-  fullscreen?: boolean;
-}
-```
-
-点击查看[FormItem](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L90)的定义
-
 ## 基础用法
 
 <demo-block type="form" :config="[{
@@ -63,3 +41,12 @@ interface Link extends FormItem {
 | ---- | -------- | ------ | ------ | ------ |
 | name | 绑定值   | string | —      | —      |
 | text | 表单标签 | string | —      | —      |
+
+## 配置类型
+
+::: details 查看 LinkConfig 配置类型定义
+<<< @/../packages/form-schema/src/base.ts#LinkConfig{ts}
+
+<<< @/../packages/form-schema/src/base.ts#FormItem{ts}
+
+:::

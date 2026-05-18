@@ -18,7 +18,7 @@ runtime 的概念，是理解tmagic-editor项目页运行的重要概念，runti
 各个 runtime 的作用除了作为不同场景下的渲染环境，同时也是不同环境的打包构建载体。tmagic-editor示例代码中的打包就是基于 runtime 进行的。
 
 ### 业务相关
-由于 runtime 是页面渲染的承载环境，其中会加载 @tmagic/ui 以及各个业务组件，业务发布项目页也是基于 runtime，所以在 runtime 中实现业务方的自定义逻辑是最合适的。runtime 可以提供一些全局 API，供业务组件调用。我们可以把下面的模拟器中的 runtime 视为一个业务方runtime。
+由于 runtime 是页面渲染的承载环境，其中会加载 `@tmagic/vue-container`（或 `@tmagic/react-container`）等基础渲染组件以及各个业务组件，业务发布项目页也是基于 runtime，所以在 runtime 中实现业务方的自定义逻辑是最合适的。runtime 可以提供一些全局 API，供业务组件调用。我们可以把下面的模拟器中的 runtime 视为一个业务方runtime。
 
 tmagic-editor提供了三个版本的 runtime 示例，可以参考：
 - [vue runtime](https://github.com/Tencent/tmagic-editor/blob/master/runtime/vue)

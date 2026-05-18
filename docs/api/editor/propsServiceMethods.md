@@ -47,11 +47,23 @@
 - **[扩展支持](../../guide/editor-expand#行为扩展)：** 是
 
 - **参数：**
-  - {[FormConfig](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L864)} config
+  - {`FormConfig`} config
   - `{string}` labelWidth 表单项 label 宽度，默认 `'80px'`
 
+  ::: details 查看 FormConfig 及关联类型定义
+  <<< @/../packages/form-schema/src/base.ts#FormConfig{ts}
+
+  <<< @/../packages/form-schema/src/base.ts#FormItemConfig{ts}
+
+  <<< @/../packages/form-schema/src/base.ts#ChildConfig{ts}
+
+  <<< @/../packages/form-schema/src/base.ts#DynamicTypeConfig{ts}
+
+  <<< @/../packages/form-schema/src/base.ts#FormItem{ts}
+  :::
+
 - **返回：**
-  - {Promise<[FormConfig](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L864)>}
+  - {Promise<`FormConfig`>}
 
 - **详情：**
 
@@ -60,7 +72,11 @@
 ## setPropsConfigs
 
 - **参数：**
-  - {Record<string, [FormConfig](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L864) | [PropsFormConfigFunction](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/editor/src/type.ts#L721)>} configs
+  - {Record<string, `FormConfig` | `PropsFormConfigFunction`>} configs
+
+  ::: details 查看 PropsFormConfigFunction 类型定义
+  <<< @/../packages/editor/src/type.ts#PropsFormConfigFunction{ts}
+  :::
 
 - **返回：**
   - `{void}`
@@ -75,7 +91,7 @@
 
 - **参数：**
   - `{string}` type 组件类型
-  - {[FormConfig](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L864)} config 属性表单配置DSL
+  - {`FormConfig`} config 属性表单配置DSL
 
 - **返回：**
   - `{Promise<void>}`
@@ -91,10 +107,26 @@
 - **参数：**
   - `{string}` type 组件类型
   - `{Object}` data 可选参数
-    - {[MNode](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/schema/src/index.ts#L210) | null} node 当前节点
+    - {`MNode` | null} node 当前节点
+
+  ::: details 查看 MNode 及关联类型定义
+  <<< @/../packages/schema/src/index.ts#MNode{ts}
+
+  <<< @/../packages/schema/src/index.ts#MComponent{ts}
+
+  <<< @/../packages/schema/src/index.ts#MContainer{ts}
+
+  <<< @/../packages/schema/src/index.ts#MIteratorContainer{ts}
+
+  <<< @/../packages/schema/src/index.ts#MPage{ts}
+
+  <<< @/../packages/schema/src/index.ts#MApp{ts}
+
+  <<< @/../packages/schema/src/index.ts#MPageFragment{ts}
+  :::
 
 - **返回：**
-  - {Promise<[FormConfig](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/form-schema/src/base.ts#L864)>}
+  - {Promise<`FormConfig`>}
 
 - **详情：**
 
@@ -103,7 +135,7 @@
 ## setPropsValues
 
 - **参数：**
-  - {Record<string, [MNode](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/schema/src/index.ts#L210)>} values
+  - {Record<string, `MNode`>} values
 
 - **返回：**
   - `{void}`
@@ -116,7 +148,7 @@
 
 - **参数：**
   - `{string}` type 组件类型
-  - {[MNode](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/schema/src/index.ts#L210)} value 组件初始值
+  - {`MNode`} value 组件初始值
 
 - **返回：**
   - `{Promise<void>}`
@@ -134,7 +166,7 @@
   - `{Object}` defaultValue 组件默认值，可选
 
 - **返回：**
-  - {Promise<[MNode](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/schema/src/index.ts#L210)>} 合并默认配置后的节点对象
+  - {Promise<`MNode`>} 合并默认配置后的节点对象
 
 - **详情：**
 
@@ -159,11 +191,11 @@
 - **[扩展支持](../../guide/editor-expand#行为扩展)：** 是
 
 - **参数：**
-  - {[MNode](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/schema/src/index.ts#L210)} config
+  - {`MNode`} config
   - `{boolean}` force 是否强制设置新ID，默认 `true`
 
 - **返回：**
-  - {[MNode](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/schema/src/index.ts#L210)} 处理后的节点
+  - {`MNode`} 处理后的节点
 
 - **详情：**
 
@@ -186,8 +218,8 @@
 ## replaceRelateId
 
 - **参数：**
-  - {[MNode](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/schema/src/index.ts#L210)[]} originConfigs 原始组件配置
-  - {[MNode](https://github.com/Tencent/tmagic-editor/blob/cce8b63fc3618b5b811aa33c703de21c22be8a6a/packages/schema/src/index.ts#L210)[]} targetConfigs 待替换的组件配置
+  - {`MNode`[]} originConfigs 原始组件配置
+  - {`MNode`[]} targetConfigs 待替换的组件配置
   - `{TargetOptions}` collectorOptions 依赖收集器配置
 
 - **返回：**
@@ -239,3 +271,4 @@
 - **详情：**
 
 删掉当前设置的所有扩展
+
