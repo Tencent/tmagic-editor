@@ -203,3 +203,132 @@ describe('Select - getInitOption empty value', () => {
     expect(wrapper.findComponent(MSelect).exists()).toBe(true);
   });
 });
+
+describe('Select - config.option model value watch', () => {
+  let request: ReturnType<typeof vi.fn>;
+
+  const mountFormWithRequest = (config: any[], initValues: any = {}) =>
+    mount(MForm, {
+      global: { plugins: [ElementPlus as any, [MagicForm as any, { request }]] },
+      props: { config, initValues },
+    });
+
+  const flushAsync = async () => {
+    await nextTick();
+    await new Promise((r) => setTimeout(r, 0));
+    await nextTick();
+  };
+
+  const buildConfig = (extra: any = {}) => [
+    {
+      name: 's',
+      type: 'select',
+      text: 's',
+      option: {
+        url: 'https://example.com/list',
+        initUrl: 'https://example.com/init',
+        initRoot: 'data.list',
+        ...extra,
+      },
+    },
+  ];
+
+  beforeEach(() => {
+    request = vi.fn((postOptions: Record<string, any>) => {
+      const id = postOptions.data?.id;
+      const ids = Array.isArray(id) ? id : [id];
+      return Promise.resolve({
+        data: {
+          list: ids.map((value: string) => ({ text: `Label-${value}`, value })),
+        },
+      });
+    });
+    setConfig({ request });
+  });
+
+  afterEach(() => {
+    setConfig({});
+    vi.restoreAllMocks();
+  });
+
+  test('model 值变化且 options 中无对应项时重新 getInitOption', async () => {
+    const wrapper = mountFormWithRequest(buildConfig(), { s: 'x' });
+    await flushAsync();
+
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(request.mock.calls[0][0].data).toMatchObject({ id: 'x' });
+
+    const select = wrapper.findComponent(MSelect);
+    expect((select.vm as any).options[0]).toMatchObject({ text: 'Label-x', value: 'x' });
+
+    (wrapper.vm as any).values.s = 'y';
+    await flushAsync();
+
+    expect(request).toHaveBeenCalledTimes(2);
+    expect(request.mock.calls[1][0].url).toBe('https://example.com/init');
+    expect(request.mock.calls[1][0].data).toMatchObject({ id: 'y' });
+    expect((select.vm as any).options[0]).toMatchObject({ text: 'Label-y', value: 'y' });
+  });
+
+  test('model 值变化但 options 已包含对应项时不重复请求', async () => {
+    const wrapper = mountFormWithRequest(buildConfig(), { s: 'x' });
+    await flushAsync();
+
+    (wrapper.vm as any).values.s = 'y';
+    await flushAsync();
+    expect(request).toHaveBeenCalledTimes(2);
+
+    request.mockClear();
+    (wrapper.vm as any).values.s = 'y';
+    await flushAsync();
+
+    expect(request).not.toHaveBeenCalled();
+  });
+
+  test('model 值变为 undefined 时不发起 init 请求', async () => {
+    const wrapper = mountFormWithRequest(buildConfig(), { s: 'x' });
+    await flushAsync();
+    const callCount = request.mock.calls.length;
+
+    (wrapper.vm as any).values.s = undefined;
+    await flushAsync();
+
+    expect(request.mock.calls.length).toBe(callCount);
+  });
+
+  test('multiple：model 值变化且缺少选项时重新 getInitOption', async () => {
+    const wrapper = mountFormWithRequest(
+      [
+        {
+          name: 's',
+          type: 'select',
+          text: 's',
+          multiple: true,
+          option: {
+            url: 'https://example.com/list',
+            initUrl: 'https://example.com/init',
+            initRoot: 'data.list',
+          },
+        },
+      ],
+      { s: ['x'] },
+    );
+    await flushAsync();
+
+    const select = wrapper.findComponent(MSelect);
+    expect((select.vm as any).options).toEqual(
+      expect.arrayContaining([expect.objectContaining({ text: 'Label-x', value: 'x' })]),
+    );
+
+    (wrapper.vm as any).values.s = ['x', 'y'];
+    await flushAsync();
+
+    expect(request.mock.calls.at(-1)?.[0].data).toMatchObject({ id: ['x', 'y'] });
+    expect((select.vm as any).options).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ text: 'Label-x', value: 'x' }),
+        expect.objectContaining({ text: 'Label-y', value: 'y' }),
+      ]),
+    );
+  });
+});

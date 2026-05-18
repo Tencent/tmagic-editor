@@ -78,7 +78,7 @@
 </template>
 
 <script lang="ts" setup>
-import { inject, nextTick, onBeforeMount, ref, watch, watchEffect } from 'vue';
+import { inject, nextTick, ref, watch, watchEffect } from 'vue';
 
 import { getDesignConfig, TMagicSelect } from '@tmagic/design';
 import { getValueByKeyPath } from '@tmagic/utils';
@@ -121,6 +121,26 @@ const equalValue = (value: any, v: any): boolean => {
   }
 
   return value === v;
+};
+
+const hasOption = (value: any): boolean => {
+  const { config } = props;
+
+  if (Array.isArray(value) && !value.length) return true;
+
+  if (config.group) {
+    const groups = options.value as SelectGroupOption[];
+    if (config.multiple && Array.isArray(value)) {
+      return value.every((v) => groups.some((group) => group.options.some((item) => equalValue(item.value, v))));
+    }
+    return groups.some((group) => group.options.some((item) => equalValue(item.value, value)));
+  }
+
+  const opts = options.value as SelectOption[];
+  if (config.multiple && Array.isArray(value)) {
+    return value.every((v) => opts.some((item) => equalValue(item.value, v)));
+  }
+  return opts.some((item) => equalValue(item.value, value));
 };
 
 const mapOptions = (data: any[]) => {
@@ -392,15 +412,22 @@ if (typeof props.config.options === 'function') {
     setOptions(props.config.options as SelectOption[] | SelectGroupOption[]);
   });
 } else if (props.config.option) {
-  onBeforeMount(() => {
+  const initOption = async () => {
     if (!props.model) return;
     const v = props.model[props.name];
-    if (Array.isArray(v) ? v.length : typeof v !== 'undefined') {
-      getInitOption().then((data) => {
-        setOptions(data);
-      });
-    }
-  });
+    if (Array.isArray(v) ? !v.length : typeof v === 'undefined') return;
+    if (typeof v === 'undefined' || hasOption(v)) return;
+    const data = await getInitOption();
+    setOptions(data);
+  };
+
+  watch(
+    () => props.model?.[props.name],
+    () => {
+      void initOption();
+    },
+    { immediate: true },
+  );
 }
 
 if (props.config.remote) {
