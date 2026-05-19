@@ -262,14 +262,15 @@ export const delQueStr = (url: string, ref: string[] | string) => {
 
 export const isObject = (obj: any) => Object.prototype.toString.call(obj) === '[object Object]';
 
-export const isPop = (node: MComponent | null): boolean => Boolean(node?.type?.toLowerCase().endsWith('pop'));
+export const isPop = (node: Pick<MComponent, 'type'> | null): boolean =>
+  Boolean(node?.type?.toLowerCase().endsWith('pop'));
 
-export const isPage = (node?: MComponent | null): boolean => {
+export const isPage = (node?: Pick<MComponent, 'type'> | null): boolean => {
   if (!node) return false;
   return Boolean(node.type?.toLowerCase() === NodeType.PAGE);
 };
 
-export const isPageFragment = (node?: MComponent | null): boolean => {
+export const isPageFragment = (node?: Pick<MComponent, 'type'> | null): boolean => {
   if (!node) return false;
   return Boolean(node.type?.toLowerCase() === NodeType.PAGE_FRAGMENT);
 };
