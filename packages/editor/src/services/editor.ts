@@ -65,6 +65,25 @@ import type { HistoryOpContext } from '@editor/utils/editor-history';
 import { applyHistoryAddOp, applyHistoryRemoveOp, applyHistoryUpdateOp } from '@editor/utils/editor-history';
 import { beforePaste, getAddParent } from '@editor/utils/operator';
 
+/**
+ * 经过 BaseService 的插件 / 中间件包装后，源方法的最后一个形参可能被注入为 dispatch 函数
+ * 当 options 形参位置被注入为函数（或为 null）时，将其归一为空对象，避免后续逻辑误读
+ */
+const safeOptions = <T extends object>(options: unknown): T => {
+  const empty = {};
+  if (!options || typeof options === 'function') return empty as T;
+  return options as T;
+};
+
+/**
+ * 经过 BaseService 的插件 / 中间件包装后，源方法的形参可能被注入为 dispatch 函数
+ * 当 parent 形参位置被注入为函数（或为空值）时，归一为 null，由调用方继续走默认 parent 逻辑
+ */
+const safeParent = (parent: unknown): MContainer | null => {
+  if (!parent || typeof parent === 'function') return null;
+  return parent as MContainer;
+};
+
 class Editor extends BaseService {
   public state: StoreState = reactive({
     root: null,
@@ -349,9 +368,18 @@ class Editor extends BaseService {
    * 向指点容器添加组件节点
    * @param addConfig 将要添加的组件节点配置
    * @param parent 要添加到的容器组件节点配置，如果不设置，默认为当前选中的组件的父节点
+   * @param options 可选配置
+   * @param options.doNotSelect 添加后是否不更新当前选中节点（默认 false，添加后会选中新增的节点）
    * @returns 添加后的节点
    */
-  public async add(addNode: AddMNode | MNode[], parent?: MContainer | null): Promise<MNode | MNode[]> {
+  public async add(
+    addNode: AddMNode | MNode[],
+    parent?: MContainer | null,
+    options?: { doNotSelect?: boolean },
+  ): Promise<MNode | MNode[]> {
+    const safeParentNode = safeParent(parent);
+    const { doNotSelect = false } = safeOptions<{ doNotSelect?: boolean }>(options);
+
     this.captureSelectionBeforeOp();
 
     const stage = this.get('stage');
@@ -374,25 +402,29 @@ class Editor extends BaseService {
         if ((isPage(node) || isPageFragment(node)) && root) {
           return this.doAdd(node, root);
         }
-        const parentNode = parent && typeof parent !== 'function' ? parent : getAddParent(node);
+        const parentNode = safeParentNode ?? getAddParent(node);
         if (!parentNode) throw new Error('未找到父元素');
         return this.doAdd(node, parentNode);
       }),
     );
 
     if (newNodes.length > 1) {
-      const newNodeIds = newNodes.map((node) => node.id);
-      // 触发选中样式
-      stage?.multiSelect(newNodeIds);
-      await this.multiSelect(newNodeIds);
+      if (!doNotSelect) {
+        const newNodeIds = newNodes.map((node) => node.id);
+        // 触发选中样式
+        stage?.multiSelect(newNodeIds);
+        await this.multiSelect(newNodeIds);
+      }
     } else {
-      await this.select(newNodes[0]);
+      if (!doNotSelect) {
+        await this.select(newNodes[0]);
+      }
 
       if (isPage(newNodes[0])) {
         this.state.pageLength += 1;
       } else if (isPageFragment(newNodes[0])) {
         this.state.pageFragmentLength += 1;
-      } else {
+      } else if (!doNotSelect) {
         // 新增页面，这个时候页面还有渲染出来，此时select会出错，在runtime-ready的时候回去select
         stage?.select(newNodes[0].id);
       }
@@ -421,7 +453,9 @@ class Editor extends BaseService {
     return Array.isArray(addNode) ? newNodes : newNodes[0];
   }
 
-  public async doRemove(node: MNode): Promise<void> {
+  public async doRemove(node: MNode, options?: { doNotSelect?: boolean }): Promise<void> {
+    const { doNotSelect = false } = safeOptions<{ doNotSelect?: boolean }>(options);
+
     const root = this.get('root');
     if (!root) throw new Error('root不能为空');
 
@@ -436,6 +470,24 @@ class Editor extends BaseService {
     parent.items?.splice(index, 1);
     const stage = this.get('stage');
     stage?.remove({ id: node.id, parentId: parent.id, root: cloneDeep(root) });
+
+    if (doNotSelect) {
+      // 当被删除节点正好在当前选中列表中时，必须从 state 中移除引用，避免 state 持有已删除节点（与 doNotSelect 无关）
+      const selectedNodes = this.get('nodes');
+      const removedSelectedIndex = selectedNodes.findIndex((n: MNode) => `${n.id}` === `${node.id}`);
+      if (removedSelectedIndex !== -1) {
+        const nextSelected = [...selectedNodes];
+        nextSelected.splice(removedSelectedIndex, 1);
+        this.set('nodes', nextSelected);
+      }
+      // 同理，如果被删除的是当前 page，也清空 state.page，避免持有已删除页面
+      if (isPage(node) || isPageFragment(node)) {
+        const currentPage = this.get('page');
+        if (currentPage && `${currentPage.id}` === `${node.id}`) {
+          this.set('page', null);
+        }
+      }
+    }
 
     const selectDefault = async (pages: MNode[]) => {
       if (pages[0]) {
@@ -453,14 +505,20 @@ class Editor extends BaseService {
     if (isPage(node)) {
       this.state.pageLength -= 1;
 
-      await selectDefault(rootItems);
+      if (!doNotSelect) {
+        await selectDefault(rootItems);
+      }
     } else if (isPageFragment(node)) {
       this.state.pageFragmentLength -= 1;
 
-      await selectDefault(rootItems);
+      if (!doNotSelect) {
+        await selectDefault(rootItems);
+      }
     } else {
-      await this.select(parent);
-      stage?.select(parent.id);
+      if (!doNotSelect) {
+        await this.select(parent);
+        stage?.select(parent.id);
+      }
 
       this.addModifiedNodeId(parent.id);
     }
@@ -473,9 +531,13 @@ class Editor extends BaseService {
 
   /**
    * 删除组件
-   * @param {Object} node
+   * @param {Object} node 要删除的节点或节点集合
+   * @param options 可选配置
+   * @param options.doNotSelect 删除后是否不更新当前选中节点（默认 false，删除后会选中父节点或首个页面）
    */
-  public async remove(nodeOrNodeList: MNode | MNode[]): Promise<void> {
+  public async remove(nodeOrNodeList: MNode | MNode[], options?: { doNotSelect?: boolean }): Promise<void> {
+    const { doNotSelect = false } = safeOptions<{ doNotSelect?: boolean }>(options);
+
     this.captureSelectionBeforeOp();
 
     const nodes = Array.isArray(nodeOrNodeList) ? nodeOrNodeList : [nodeOrNodeList];
@@ -499,7 +561,7 @@ class Editor extends BaseService {
       }
     }
 
-    await Promise.all(nodes.map((node) => this.doRemove(node)));
+    await Promise.all(nodes.map((node) => this.doRemove(node, { doNotSelect })));
 
     if (removedItems.length > 0 && pageForOp) {
       this.pushOpHistory('remove', { removedItems }, pageForOp);
@@ -510,10 +572,7 @@ class Editor extends BaseService {
 
   public async doUpdate(
     config: MNode,
-    {
-      changeRecords = [],
-      selectedAfterUpdate = true,
-    }: { changeRecords?: ChangeRecord[]; selectedAfterUpdate?: boolean } = {},
+    { changeRecords = [] }: { changeRecords?: ChangeRecord[] } = {},
   ): Promise<{ newNode: MNode; oldNode: MNode; changeRecords?: ChangeRecord[] }> {
     const root = this.get('root');
     if (!root) throw new Error('root为空');
@@ -557,12 +616,12 @@ class Editor extends BaseService {
 
     parentNodeItems[index] = newConfig;
 
-    // 将update后的配置更新到nodes中
-    if (selectedAfterUpdate) {
-      const nodes = this.get('nodes');
-      const targetIndex = nodes.findIndex((nodeItem: MNode) => `${nodeItem.id}` === `${newConfig.id}`);
-      nodes.splice(targetIndex, 1, newConfig);
-      this.set('nodes', [...nodes]);
+    // 当被更新节点正好在当前选中列表中时，必须同步引用，否则 state 会持有已被替换的旧节点
+    const selectedNodes = this.get('nodes');
+    const targetIndex = selectedNodes.findIndex((nodeItem: MNode) => `${nodeItem.id}` === `${newConfig.id}`);
+    if (targetIndex !== -1) {
+      selectedNodes.splice(targetIndex, 1, newConfig);
+      this.set('nodes', [...selectedNodes]);
     }
 
     if (isPage(newConfig) || isPageFragment(newConfig)) {
@@ -586,7 +645,7 @@ class Editor extends BaseService {
    */
   public async update(
     config: MNode | MNode[],
-    data: { changeRecords?: ChangeRecord[]; selectedAfterUpdate?: boolean } = {},
+    data: { changeRecords?: ChangeRecord[] } = {},
   ): Promise<MNode | MNode[]> {
     this.captureSelectionBeforeOp();
 
@@ -620,9 +679,13 @@ class Editor extends BaseService {
    * 将id为id1的组件移动到id为id2的组件位置上，例如：[1,2,3,4] -> sort(1,3) -> [2,1,3,4]
    * @param id1 组件ID
    * @param id2 组件ID
+   * @param options 可选配置
+   * @param options.doNotSelect 排序后是否不更新当前选中节点（默认 false）
    * @returns void
    */
-  public async sort(id1: Id, id2: Id): Promise<void> {
+  public async sort(id1: Id, id2: Id, options?: { doNotSelect?: boolean }): Promise<void> {
+    const { doNotSelect = false } = safeOptions<{ doNotSelect?: boolean }>(options);
+
     this.captureSelectionBeforeOp();
 
     const root = this.get('root');
@@ -642,7 +705,9 @@ class Editor extends BaseService {
     parent.items.splice(index2, 0, ...parent.items.splice(index1, 1));
 
     await this.update(parent);
-    await this.select(node);
+    if (!doNotSelect) {
+      await this.select(node);
+    }
 
     this.get('stage')?.update({
       config: cloneDeep(node),
@@ -682,9 +747,18 @@ class Editor extends BaseService {
   /**
    * 从localStorage中获取节点，然后添加到当前容器中
    * @param position 粘贴的坐标
+   * @param collectorOptions 可选的依赖收集器配置
+   * @param options 可选配置
+   * @param options.doNotSelect 粘贴后是否不更新当前选中节点（默认 false）
    * @returns 添加后的组件节点配置
    */
-  public async paste(position: PastePosition = {}, collectorOptions?: TargetOptions): Promise<MNode | MNode[] | void> {
+  public async paste(
+    position: PastePosition = {},
+    collectorOptions?: TargetOptions,
+    options?: { doNotSelect?: boolean },
+  ): Promise<MNode | MNode[] | void> {
+    const { doNotSelect = false } = safeOptions<{ doNotSelect?: boolean }>(options);
+
     const config: MNode[] = storageService.getItem(COPY_STORAGE_KEY);
     if (!Array.isArray(config)) return;
 
@@ -704,7 +778,7 @@ class Editor extends BaseService {
       propsService.replaceRelateId(config, pasteConfigs, collectorOptions);
     }
 
-    return this.add(pasteConfigs, parent);
+    return this.add(pasteConfigs, parent, { doNotSelect });
   }
 
   public async doPaste(config: MNode[], position: PastePosition = {}): Promise<MNode[]> {
@@ -732,9 +806,13 @@ class Editor extends BaseService {
   /**
    * 将指点节点设置居中
    * @param config 组件节点配置
+   * @param options 可选配置
+   * @param options.doNotSelect 居中后是否不更新当前选中节点（默认 false）
    * @returns 当前组件节点配置
    */
-  public async alignCenter(config: MNode | MNode[]): Promise<MNode | MNode[]> {
+  public async alignCenter(config: MNode | MNode[], options?: { doNotSelect?: boolean }): Promise<MNode | MNode[]> {
+    const { doNotSelect = false } = safeOptions<{ doNotSelect?: boolean }>(options);
+
     const nodes = Array.isArray(config) ? config : [config];
     const stage = this.get('stage');
 
@@ -742,10 +820,12 @@ class Editor extends BaseService {
 
     const newNode = await this.update(newNodes);
 
-    if (newNodes.length > 1) {
-      await stage?.multiSelect(newNodes.map((node) => node.id));
-    } else {
-      await stage?.select(newNodes[0].id);
+    if (!doNotSelect) {
+      if (newNodes.length > 1) {
+        await stage?.multiSelect(newNodes.map((node) => node.id));
+      } else {
+        await stage?.select(newNodes[0].id);
+      }
     }
 
     return newNode;
@@ -808,8 +888,16 @@ class Editor extends BaseService {
    * 移动到指定容器中
    * @param config 需要移动的节点
    * @param targetId 容器ID
+   * @param options 可选配置
+   * @param options.doNotSelect 移动后是否不更新当前选中节点（默认 false）
    */
-  public async moveToContainer(config: MNode, targetId: Id): Promise<MNode | undefined> {
+  public async moveToContainer(
+    config: MNode,
+    targetId: Id,
+    options?: { doNotSelect?: boolean },
+  ): Promise<MNode | undefined> {
+    const { doNotSelect = false } = safeOptions<{ doNotSelect?: boolean }>(options);
+
     this.captureSelectionBeforeOp();
 
     const root = this.get('root');
@@ -837,7 +925,9 @@ class Editor extends BaseService {
 
       target.items.push(newConfig);
 
-      await stage.select(targetId);
+      if (!doNotSelect) {
+        await stage.select(targetId);
+      }
 
       const targetParent = this.getParentById(target.id);
       await stage.update({
@@ -846,8 +936,10 @@ class Editor extends BaseService {
         root: cloneDeep(root),
       });
 
-      await this.select(newConfig);
-      stage.select(newConfig.id);
+      if (!doNotSelect) {
+        await this.select(newConfig);
+        stage.select(newConfig.id);
+      }
 
       this.addModifiedNodeId(target.id);
       this.addModifiedNodeId(parent.id);

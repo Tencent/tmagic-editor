@@ -286,6 +286,23 @@ describe('add', () => {
       ),
     ).rejects.toThrowError('app下不能添加组件');
   });
+
+  test('doNotSelect: true 不更新选中节点', async () => {
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.NODE_ID);
+    const beforeNodeId = editorService.get('node')?.id;
+    expect(beforeNodeId).toBe(NodeId.NODE_ID);
+
+    const newNode = await editorService.add({ type: 'text' }, null, { doNotSelect: true });
+
+    // 节点已被添加到 dsl
+    const addedId = Array.isArray(newNode) ? newNode[0].id : newNode.id;
+    const parentInfo = editorService.getParentById(addedId);
+    expect(parentInfo?.items).toHaveLength(3);
+
+    // 但当前选中节点保持原状（未自动选中新增节点）
+    expect(editorService.get('node')?.id).toBe(beforeNodeId);
+  });
 });
 
 describe('remove', () => {
@@ -315,6 +332,36 @@ describe('remove', () => {
 
   test('undefine', async () => {
     expect(() => editorService.remove({ id: NodeId.ERROR_NODE_ID, type: 'text' })).rejects.toThrow();
+  });
+
+  test('doNotSelect: true 不更新选中节点', async () => {
+    editorService.set('root', cloneDeep(root));
+    // 选中 NODE_ID，删除另外一个 NODE_ID2
+    await editorService.select(NodeId.NODE_ID);
+    const beforeNodeId = editorService.get('node')?.id;
+    expect(beforeNodeId).toBe(NodeId.NODE_ID);
+
+    await editorService.remove({ id: NodeId.NODE_ID2, type: 'text' }, { doNotSelect: true });
+
+    // 节点已被删除
+    expect(editorService.getNodeById(NodeId.NODE_ID2)).toBeNull();
+    // 当前选中节点保持原状（未自动选中父节点）
+    expect(editorService.get('node')?.id).toBe(beforeNodeId);
+  });
+
+  test('被删除节点正好是当前选中节点时，state 强制移除引用', async () => {
+    editorService.set('root', cloneDeep(root));
+    // 选中 NODE_ID 后再删除 NODE_ID 自身
+    await editorService.select(NodeId.NODE_ID);
+    expect(editorService.get('node')?.id).toBe(NodeId.NODE_ID);
+
+    // 即使 doNotSelect: true，被删除节点正好是当前选中节点时，state 也必须移除引用
+    await editorService.remove({ id: NodeId.NODE_ID, type: 'text' }, { doNotSelect: true });
+
+    // 节点已删除
+    expect(editorService.getNodeById(NodeId.NODE_ID)).toBeNull();
+    // state.nodes 中不再包含被删除的节点
+    expect(editorService.get('nodes').some((n) => n.id === NodeId.NODE_ID)).toBe(false);
   });
 });
 
@@ -365,6 +412,33 @@ describe('update', () => {
     const node2 = editorService.getNodeById(NodeId.NODE_ID);
     expect(node2?.style?.position).toBe('absolute');
   });
+
+  test('被更新节点正好是当前选中节点时，state.node 始终与 dsl 同步', async () => {
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.NODE_ID);
+
+    await editorService.update({ id: NodeId.NODE_ID, type: 'text', text: 'updated-text' });
+
+    // dsl 已更新
+    expect(editorService.getNodeById(NodeId.NODE_ID)?.text).toBe('updated-text');
+    // state.node 引用同步到新节点，不会持有过期数据
+    expect(editorService.get('node')?.text).toBe('updated-text');
+  });
+
+  test('更新非选中节点时，不影响当前选中列表', async () => {
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.NODE_ID);
+    const beforeSelected = editorService.get('node');
+
+    // 更新另一个非选中节点
+    await editorService.update({ id: NodeId.NODE_ID2, type: 'text', text: 'other-text' });
+
+    // dsl 已更新
+    expect(editorService.getNodeById(NodeId.NODE_ID2)?.text).toBe('other-text');
+    // 原选中节点引用不被错误替换（修复 splice(-1) 误改最后一个选中项的旧 bug）
+    expect(editorService.get('node')?.id).toBe(NodeId.NODE_ID);
+    expect(editorService.get('node')).toBe(beforeSelected);
+  });
 });
 
 describe('sort', () => {
@@ -378,6 +452,19 @@ describe('sort', () => {
     parent = editorService.get('parent');
     expect(parent?.items[0].id).toBe(NodeId.NODE_ID2);
   });
+
+  test('doNotSelect: true 完成排序且不触发额外 select', async () => {
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.NODE_ID2);
+    const parentBefore = editorService.get('parent');
+    expect(parentBefore?.items[0].id).toBe(NodeId.NODE_ID);
+
+    await editorService.sort(NodeId.NODE_ID2, NodeId.NODE_ID, { doNotSelect: true });
+
+    // dsl 顺序已更新
+    const parentAfter = editorService.getParentById(NodeId.NODE_ID2);
+    expect(parentAfter?.items[0].id).toBe(NodeId.NODE_ID2);
+  });
 });
 
 describe('copy', () => {
@@ -390,6 +477,26 @@ describe('copy', () => {
   });
 });
 
+describe('paste', () => {
+  test('doNotSelect: true 不更新选中节点', async () => {
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.NODE_ID);
+
+    const sourceNode = editorService.getNodeById(NodeId.NODE_ID2);
+    await editorService.copy(sourceNode!);
+
+    const beforeNodeId = editorService.get('node')?.id;
+    expect(beforeNodeId).toBe(NodeId.NODE_ID);
+
+    const pasted = await editorService.paste({}, undefined, { doNotSelect: true });
+
+    // 粘贴成功
+    expect(pasted).toBeTruthy();
+    // 当前选中节点保持原状
+    expect(editorService.get('node')?.id).toBe(beforeNodeId);
+  });
+});
+
 describe('moveLayer', () => {
   beforeAll(() => editorService.set('root', cloneDeep(root)));
 
@@ -399,6 +506,35 @@ describe('moveLayer', () => {
     const parent = editorService.get('parent');
     await editorService.moveLayer(1);
     expect(parent?.items[0].id).toBe(NodeId.NODE_ID2);
+  });
+});
+
+describe('插件参数兜底', () => {
+  test('add 的 parent 形参传入函数时不抛错，仍走默认父节点逻辑', async () => {
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.NODE_ID);
+
+    // 模拟 BaseService 中间件机制在 parent 位置注入 dispatch 函数
+    const dispatchFn = () => {};
+    const newNode = await editorService.add({ type: 'text' }, dispatchFn as any);
+
+    // 默认行为：被加到了当前选中节点的父节点 (PAGE)
+    const addedId = Array.isArray(newNode) ? newNode[0].id : newNode.id;
+    const parentInfo = editorService.getParentById(addedId);
+    expect(parentInfo?.id).toBe(NodeId.PAGE_ID);
+  });
+
+  test('add 的 options 形参传入函数时不抛错，doNotSelect 回落为默认值', async () => {
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.NODE_ID);
+
+    // 模拟 BaseService 中间件机制在 options 位置注入 dispatch 函数
+    const dispatchFn = () => {};
+    const newNode = await editorService.add({ type: 'text' }, null, dispatchFn as any);
+
+    // 默认行为：当前选中节点变成了新增节点
+    const addedId = Array.isArray(newNode) ? newNode[0].id : newNode.id;
+    expect(editorService.get('node')?.id).toBe(addedId);
   });
 });
 
