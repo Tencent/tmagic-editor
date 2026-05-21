@@ -1,3 +1,20 @@
+## [1.7.14-beta.3](https://github.com/Tencent/tmagic-editor/compare/v1.7.14-beta.2...v1.7.14-beta.3) (2026-05-21)
+
+
+### Bug Fixes
+
+* **form:** select 在 model 值变化时补拉 init 选项 ([aa2ee9f](https://github.com/Tencent/tmagic-editor/commit/aa2ee9fd4b08a4a2896eead33dfd1d4ba029c501))
+* **form:** 修复table-group-list中model属性可能为undefined导致的报错 ([12ce19f](https://github.com/Tencent/tmagic-editor/commit/12ce19fb02af7ac621d220b7e6d0a98859e631de))
+
+
+### Features
+
+* **editor:** 新增 DSL 修改方法的 doNotSelect 选项 ([05e512b](https://github.com/Tencent/tmagic-editor/commit/05e512b1fe978e26aa3064e7deae9a1aeadcae25))
+* **form:** 容器组件新增 extendState 属性 ([2d31b38](https://github.com/Tencent/tmagic-editor/commit/2d31b3812f2195f4afc5f16774e155f00cb0ec20))
+* **form:** 新增 submitForm 命令式提交函数 ([638c3e9](https://github.com/Tencent/tmagic-editor/commit/638c3e9f3cb550da2749fd4814c3bec9d518d081))
+
+
+
 ## [1.7.14-beta.2](https://github.com/Tencent/tmagic-editor/compare/v1.7.14-beta.1...v1.7.14-beta.2) (2026-05-18)
 
 
