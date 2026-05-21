@@ -250,6 +250,15 @@ export default defineConfig({
                 },
               ]
             },
+            {
+              text: '工具函数',
+              items: [
+                {
+                  text: 'submitForm',
+                  link: '/api/form/submit-form'
+                },
+              ]
+            },
           ],
         },
         {

@@ -19,6 +19,7 @@
 import type { FormConfig } from './schema';
 
 export * from './schema';
+export * from './submitForm';
 export * from './utils/form';
 export * from './utils/useAddField';
 

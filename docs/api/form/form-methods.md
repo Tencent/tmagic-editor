@@ -18,6 +18,8 @@
 
 - **详情：** 提交表单，先执行校验，校验通过后清空 `changeRecords` 并返回当前表单值
 
+- **相关：** 如果你想脱离组件树以函数方式完成一次表单提交，参见 [`submitForm` 函数](./submit-form.md)
+
 ## changeHandler
 
 - **签名：** `(prop: string, value: any, eventData?: ContainerChangeEventData) => void`
