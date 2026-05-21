@@ -28,6 +28,7 @@
         :label-position="labelPosition"
         :inline="inline"
         :prevent-submit-default="preventSubmitDefault"
+        :extend-state="extendState"
         @change="changeHandler"
       ></Form>
       <slot></slot>
@@ -59,7 +60,7 @@ import { ref, watchEffect } from 'vue';
 import { TMagicButton, TMagicCol, TMagicDrawer, TMagicRow } from '@tmagic/design';
 
 import Form from './Form.vue';
-import type { ContainerChangeEventData, FormConfig, FormValue } from './schema';
+import type { ContainerChangeEventData, FormConfig, FormState, FormValue } from './schema';
 
 defineOptions({
   name: 'MFormDialog',
@@ -83,6 +84,8 @@ withDefaults(
     preventSubmitDefault?: boolean;
     /** 关闭前的回调，会暂停 Drawer 的关闭; done 是个 function type 接受一个 boolean 参数, 执行 done 使用 true 参数或不提供参数将会终止关闭 */
     beforeClose?: (_done: (_cancel?: boolean) => void) => void;
+    /** 透传给内部 `MForm`，用于扩展 `formState`（如注入 `$message` / `$store` 等） */
+    extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
   }>(),
   {
     closeOnPressEscape: true,

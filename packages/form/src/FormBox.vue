@@ -13,6 +13,7 @@
           :label-position="labelPosition"
           :inline="inline"
           :prevent-submit-default="preventSubmitDefault"
+          :extend-state="extendState"
           @change="changeHandler"
         ></Form>
         <slot></slot>
@@ -40,7 +41,7 @@ import { computed, ref, watchEffect } from 'vue';
 import { TMagicButton, TMagicScrollbar } from '@tmagic/design';
 
 import Form from './Form.vue';
-import type { ContainerChangeEventData, FormConfig, FormValue } from './schema';
+import type { ContainerChangeEventData, FormConfig, FormState, FormValue } from './schema';
 
 defineOptions({
   name: 'MFormBox',
@@ -60,6 +61,7 @@ const props = withDefaults(
     inline?: boolean;
     labelPosition?: string;
     preventSubmitDefault?: boolean;
+    extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
   }>(),
   {
     config: () => [],

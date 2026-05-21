@@ -31,6 +31,7 @@
         :label-position="labelPosition"
         :inline="inline"
         :prevent-submit-default="preventSubmitDefault"
+        :extend-state="extendState"
         @change="changeHandler"
       ></Form>
       <slot></slot>
@@ -68,7 +69,7 @@ import { computed, ref } from 'vue';
 import { TMagicButton, TMagicCol, TMagicDialog, TMagicRow } from '@tmagic/design';
 
 import Form from './Form.vue';
-import { ContainerChangeEventData, FormConfig, FormValue, StepConfig } from './schema';
+import { ContainerChangeEventData, FormConfig, FormState, FormValue, StepConfig } from './schema';
 
 defineOptions({
   name: 'MFormDialog',
@@ -95,6 +96,8 @@ const props = withDefaults(
     destroyOnClose?: boolean;
     showClose?: boolean;
     showCancel?: boolean;
+    /** 透传给内部 `MForm`，用于扩展 `formState`（如注入 `$message` / `$store` 等） */
+    extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
   }>(),
   {
     config: () => [],
