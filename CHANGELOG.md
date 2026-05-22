@@ -1,3 +1,17 @@
+# [1.8.0-beta.0](https://github.com/Tencent/tmagic-editor/compare/v1.7.14-beta.3...v1.8.0-beta.0) (2026-05-22)
+
+
+### Bug Fixes
+
+* **editor:** 属性面板 padding 仅作用于最外层表单 ([eb1c5a3](https://github.com/Tencent/tmagic-editor/commit/eb1c5a3ec1c5987b50c700dfb9019aad695e042a))
+
+
+### Features
+
+* **editor:** 新增 DSL 修改方法的 doNotSwitchPage 选项 ([3d03851](https://github.com/Tencent/tmagic-editor/commit/3d038513e3f0d1c303332fd902c1ef83d7dfe860))
+
+
+
 ## [1.7.14-beta.3](https://github.com/Tencent/tmagic-editor/compare/v1.7.14-beta.2...v1.7.14-beta.3) (2026-05-21)
 
 
