@@ -33,6 +33,7 @@ import type {
   AddMNode,
   AsyncHookPlugin,
   AsyncMethodName,
+  DslOpOptions,
   EditorEvents,
   EditorNodeInfo,
   HistoryOpType,
@@ -189,6 +190,22 @@ class Editor extends BaseService {
   public getParentById(id: Id, raw = true): MContainer | null {
     const { parent } = this.getNodeInfo(id, raw);
     return parent;
+  }
+
+  /**
+   * 判断给定节点是否位于非当前页面（即选中该节点将会引起当前页面切换）
+   * @param node 节点
+   * @returns true 表示该节点位于非当前页面
+   */
+  public isOnDifferentPage(node: MNode): boolean {
+    const currentPageId = this.get('page')?.id;
+    if (currentPageId === undefined || currentPageId === null) return false;
+    if (isPage(node) || isPageFragment(node)) {
+      return `${node.id}` !== `${currentPageId}`;
+    }
+    const nodePage = this.getNodeInfo(node.id, false).page;
+    if (!nodePage) return false;
+    return `${nodePage.id}` !== `${currentPageId}`;
   }
 
   /**
@@ -370,15 +387,16 @@ class Editor extends BaseService {
    * @param parent 要添加到的容器组件节点配置，如果不设置，默认为当前选中的组件的父节点
    * @param options 可选配置
    * @param options.doNotSelect 添加后是否不更新当前选中节点（默认 false，添加后会选中新增的节点）
+   * @param options.doNotSwitchPage 添加后是否不切换当前页面（默认 false；新增页面 / 跨页新增时为 true 会跳过会引发页面切换的选中操作）
    * @returns 添加后的节点
    */
   public async add(
     addNode: AddMNode | MNode[],
     parent?: MContainer | null,
-    options?: { doNotSelect?: boolean },
+    options?: DslOpOptions,
   ): Promise<MNode | MNode[]> {
     const safeParentNode = safeParent(parent);
-    const { doNotSelect = false } = safeOptions<{ doNotSelect?: boolean }>(options);
+    const { doNotSelect = false, doNotSwitchPage = false } = safeOptions<DslOpOptions>(options);
 
     this.captureSelectionBeforeOp();
 
@@ -409,14 +427,19 @@ class Editor extends BaseService {
     );
 
     if (newNodes.length > 1) {
-      if (!doNotSelect) {
+      // 多选时只要任一新增节点位于非当前页面，触发的 multiSelect 就会引起页面切换
+      const wouldSwitchPage = newNodes.some((n) => this.isOnDifferentPage(n));
+      if (!doNotSelect && !(doNotSwitchPage && wouldSwitchPage)) {
         const newNodeIds = newNodes.map((node) => node.id);
         // 触发选中样式
         stage?.multiSelect(newNodeIds);
         await this.multiSelect(newNodeIds);
       }
     } else {
-      if (!doNotSelect) {
+      const wouldSwitchPage = this.isOnDifferentPage(newNodes[0]);
+      const skipSelect = doNotSelect || (doNotSwitchPage && wouldSwitchPage);
+
+      if (!skipSelect) {
         await this.select(newNodes[0]);
       }
 
@@ -424,7 +447,7 @@ class Editor extends BaseService {
         this.state.pageLength += 1;
       } else if (isPageFragment(newNodes[0])) {
         this.state.pageFragmentLength += 1;
-      } else if (!doNotSelect) {
+      } else if (!skipSelect) {
         // 新增页面，这个时候页面还有渲染出来，此时select会出错，在runtime-ready的时候回去select
         stage?.select(newNodes[0].id);
       }
@@ -453,8 +476,8 @@ class Editor extends BaseService {
     return Array.isArray(addNode) ? newNodes : newNodes[0];
   }
 
-  public async doRemove(node: MNode, options?: { doNotSelect?: boolean }): Promise<void> {
-    const { doNotSelect = false } = safeOptions<{ doNotSelect?: boolean }>(options);
+  public async doRemove(node: MNode, options?: DslOpOptions): Promise<void> {
+    const { doNotSelect = false, doNotSwitchPage = false } = safeOptions<DslOpOptions>(options);
 
     const root = this.get('root');
     if (!root) throw new Error('root不能为空');
@@ -471,21 +494,19 @@ class Editor extends BaseService {
     const stage = this.get('stage');
     stage?.remove({ id: node.id, parentId: parent.id, root: cloneDeep(root) });
 
-    if (doNotSelect) {
-      // 当被删除节点正好在当前选中列表中时，必须从 state 中移除引用，避免 state 持有已删除节点（与 doNotSelect 无关）
-      const selectedNodes = this.get('nodes');
-      const removedSelectedIndex = selectedNodes.findIndex((n: MNode) => `${n.id}` === `${node.id}`);
-      if (removedSelectedIndex !== -1) {
-        const nextSelected = [...selectedNodes];
-        nextSelected.splice(removedSelectedIndex, 1);
-        this.set('nodes', nextSelected);
-      }
-      // 同理，如果被删除的是当前 page，也清空 state.page，避免持有已删除页面
-      if (isPage(node) || isPageFragment(node)) {
-        const currentPage = this.get('page');
-        if (currentPage && `${currentPage.id}` === `${node.id}`) {
-          this.set('page', null);
-        }
+    // 始终清理已删除节点在 state 中的残留引用：
+    // - 即使后续会调用 selectDefault / select(parent) 覆盖，跳过这些调用（doNotSelect / doNotSwitchPage）时也不能让 state 持有已删除节点
+    const selectedNodes = this.get('nodes');
+    const removedSelectedIndex = selectedNodes.findIndex((n: MNode) => `${n.id}` === `${node.id}`);
+    if (removedSelectedIndex !== -1) {
+      const nextSelected = [...selectedNodes];
+      nextSelected.splice(removedSelectedIndex, 1);
+      this.set('nodes', nextSelected);
+    }
+    if (isPage(node) || isPageFragment(node)) {
+      const currentPage = this.get('page');
+      if (currentPage && `${currentPage.id}` === `${node.id}`) {
+        this.set('page', null);
       }
     }
 
@@ -505,13 +526,14 @@ class Editor extends BaseService {
     if (isPage(node)) {
       this.state.pageLength -= 1;
 
-      if (!doNotSelect) {
+      // 删除页面后默认会切到首个剩余页面（selectDefault），doNotSwitchPage 时跳过这次自动切换
+      if (!doNotSelect && !doNotSwitchPage) {
         await selectDefault(rootItems);
       }
     } else if (isPageFragment(node)) {
       this.state.pageFragmentLength -= 1;
 
-      if (!doNotSelect) {
+      if (!doNotSelect && !doNotSwitchPage) {
         await selectDefault(rootItems);
       }
     } else {
@@ -534,9 +556,10 @@ class Editor extends BaseService {
    * @param {Object} node 要删除的节点或节点集合
    * @param options 可选配置
    * @param options.doNotSelect 删除后是否不更新当前选中节点（默认 false，删除后会选中父节点或首个页面）
+   * @param options.doNotSwitchPage 删除后是否不切换当前页面（默认 false；删除页面 / 页面片段时为 true 会跳过自动切换到首个剩余页面）
    */
-  public async remove(nodeOrNodeList: MNode | MNode[], options?: { doNotSelect?: boolean }): Promise<void> {
-    const { doNotSelect = false } = safeOptions<{ doNotSelect?: boolean }>(options);
+  public async remove(nodeOrNodeList: MNode | MNode[], options?: DslOpOptions): Promise<void> {
+    const { doNotSelect = false, doNotSwitchPage = false } = safeOptions<DslOpOptions>(options);
 
     this.captureSelectionBeforeOp();
 
@@ -561,7 +584,7 @@ class Editor extends BaseService {
       }
     }
 
-    await Promise.all(nodes.map((node) => this.doRemove(node, { doNotSelect })));
+    await Promise.all(nodes.map((node) => this.doRemove(node, { doNotSelect, doNotSwitchPage })));
 
     if (removedItems.length > 0 && pageForOp) {
       this.pushOpHistory('remove', { removedItems }, pageForOp);
@@ -624,8 +647,12 @@ class Editor extends BaseService {
       this.set('nodes', [...selectedNodes]);
     }
 
+    // 只有被更新节点正好是当前选中页面时才同步 state.page，避免「更新非当前页」误将编辑器切到该页
     if (isPage(newConfig) || isPageFragment(newConfig)) {
-      this.set('page', newConfig as MPage | MPageFragment);
+      const currentPage = this.get('page');
+      if (currentPage && `${currentPage.id}` === `${newConfig.id}`) {
+        this.set('page', newConfig as MPage | MPageFragment);
+      }
     }
 
     this.addModifiedNodeId(newConfig.id);
@@ -681,10 +708,11 @@ class Editor extends BaseService {
    * @param id2 组件ID
    * @param options 可选配置
    * @param options.doNotSelect 排序后是否不更新当前选中节点（默认 false）
+   * @param options.doNotSwitchPage 排序后是否不切换当前页面（排序只发生在同一父节点内，方法内为空操作；保留以与其它 DSL 操作 API 一致）
    * @returns void
    */
-  public async sort(id1: Id, id2: Id, options?: { doNotSelect?: boolean }): Promise<void> {
-    const { doNotSelect = false } = safeOptions<{ doNotSelect?: boolean }>(options);
+  public async sort(id1: Id, id2: Id, options?: DslOpOptions): Promise<void> {
+    const { doNotSelect = false } = safeOptions<DslOpOptions>(options);
 
     this.captureSelectionBeforeOp();
 
@@ -750,14 +778,15 @@ class Editor extends BaseService {
    * @param collectorOptions 可选的依赖收集器配置
    * @param options 可选配置
    * @param options.doNotSelect 粘贴后是否不更新当前选中节点（默认 false）
+   * @param options.doNotSwitchPage 粘贴后是否不切换当前页面（默认 false；跨页粘贴时为 true 会跳过页面切换）
    * @returns 添加后的组件节点配置
    */
   public async paste(
     position: PastePosition = {},
     collectorOptions?: TargetOptions,
-    options?: { doNotSelect?: boolean },
+    options?: DslOpOptions,
   ): Promise<MNode | MNode[] | void> {
-    const { doNotSelect = false } = safeOptions<{ doNotSelect?: boolean }>(options);
+    const { doNotSelect = false, doNotSwitchPage = false } = safeOptions<DslOpOptions>(options);
 
     const config: MNode[] = storageService.getItem(COPY_STORAGE_KEY);
     if (!Array.isArray(config)) return;
@@ -778,7 +807,7 @@ class Editor extends BaseService {
       propsService.replaceRelateId(config, pasteConfigs, collectorOptions);
     }
 
-    return this.add(pasteConfigs, parent, { doNotSelect });
+    return this.add(pasteConfigs, parent, { doNotSelect, doNotSwitchPage });
   }
 
   public async doPaste(config: MNode[], position: PastePosition = {}): Promise<MNode[]> {
@@ -808,10 +837,11 @@ class Editor extends BaseService {
    * @param config 组件节点配置
    * @param options 可选配置
    * @param options.doNotSelect 居中后是否不更新当前选中节点（默认 false）
+   * @param options.doNotSwitchPage 居中后是否不切换当前页面（居中只更新节点 style，方法内为空操作；保留以与其它 DSL 操作 API 一致）
    * @returns 当前组件节点配置
    */
-  public async alignCenter(config: MNode | MNode[], options?: { doNotSelect?: boolean }): Promise<MNode | MNode[]> {
-    const { doNotSelect = false } = safeOptions<{ doNotSelect?: boolean }>(options);
+  public async alignCenter(config: MNode | MNode[], options?: DslOpOptions): Promise<MNode | MNode[]> {
+    const { doNotSelect = false } = safeOptions<DslOpOptions>(options);
 
     const nodes = Array.isArray(config) ? config : [config];
     const stage = this.get('stage');
@@ -890,13 +920,10 @@ class Editor extends BaseService {
    * @param targetId 容器ID
    * @param options 可选配置
    * @param options.doNotSelect 移动后是否不更新当前选中节点（默认 false）
+   * @param options.doNotSwitchPage 移动后是否不切换当前页面（默认 false；目标容器位于其它页面时为 true 会跳过自动选中以避免页面切换）
    */
-  public async moveToContainer(
-    config: MNode,
-    targetId: Id,
-    options?: { doNotSelect?: boolean },
-  ): Promise<MNode | undefined> {
-    const { doNotSelect = false } = safeOptions<{ doNotSelect?: boolean }>(options);
+  public async moveToContainer(config: MNode, targetId: Id, options?: DslOpOptions): Promise<MNode | undefined> {
+    const { doNotSelect = false, doNotSwitchPage = false } = safeOptions<DslOpOptions>(options);
 
     this.captureSelectionBeforeOp();
 
@@ -925,7 +952,11 @@ class Editor extends BaseService {
 
       target.items.push(newConfig);
 
-      if (!doNotSelect) {
+      // 目标容器是否在非当前页面：选中目标会触发当前页面切换
+      const targetWouldSwitchPage = this.isOnDifferentPage(target);
+      const skipSelect = doNotSelect || (doNotSwitchPage && targetWouldSwitchPage);
+
+      if (!skipSelect) {
         await stage.select(targetId);
       }
 
@@ -936,7 +967,7 @@ class Editor extends BaseService {
         root: cloneDeep(root),
       });
 
-      if (!doNotSelect) {
+      if (!skipSelect) {
         await this.select(newConfig);
         stage.select(newConfig.id);
       }

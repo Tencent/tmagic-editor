@@ -190,6 +190,43 @@ describe('getParentById', () => {
   });
 });
 
+describe('isOnDifferentPage', () => {
+  test('当前未选中任何页面时返回 false', () => {
+    editorService.set('root', cloneDeep(root));
+    editorService.resetState();
+    const pageNode = editorService.getNodeById(NodeId.PAGE_ID)!;
+    expect(editorService.isOnDifferentPage(pageNode)).toBe(false);
+  });
+
+  test('节点在当前页面内时返回 false', async () => {
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.PAGE_ID);
+    const innerNode = editorService.getNodeById(NodeId.NODE_ID)!;
+    expect(editorService.isOnDifferentPage(innerNode)).toBe(false);
+  });
+
+  test('页面节点本身就是当前页面时返回 false', async () => {
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.PAGE_ID);
+    const pageNode = editorService.getNodeById(NodeId.PAGE_ID)!;
+    expect(editorService.isOnDifferentPage(pageNode)).toBe(false);
+  });
+
+  test('节点位于非当前页面时返回 true', async () => {
+    editorService.set('root', cloneDeep(root));
+    const rootNode = editorService.get('root');
+    await editorService.select(NodeId.PAGE_ID);
+    // 加一个新页面
+    const newPage = await editorService.add({ type: NodeType.PAGE }, rootNode, { doNotSwitchPage: true });
+    const newPageId = Array.isArray(newPage) ? newPage[0].id : newPage.id;
+
+    // 当前还在第一个页面
+    expect(editorService.get('page')?.id).toBe(NodeId.PAGE_ID);
+    const newPageNode = editorService.getNodeById(newPageId)!;
+    expect(editorService.isOnDifferentPage(newPageNode)).toBe(true);
+  });
+});
+
 describe('select', () => {
   beforeAll(() => editorService.set('root', cloneDeep(root)));
 
@@ -303,6 +340,24 @@ describe('add', () => {
     // 但当前选中节点保持原状（未自动选中新增节点）
     expect(editorService.get('node')?.id).toBe(beforeNodeId);
   });
+
+  test('doNotSwitchPage: true 新增页面时保持当前页面不切换', async () => {
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.PAGE_ID);
+    const beforePageId = editorService.get('page')?.id;
+    expect(beforePageId).toBe(NodeId.PAGE_ID);
+
+    const rootNode = editorService.get('root');
+    const newPage = await editorService.add({ type: NodeType.PAGE }, rootNode, { doNotSwitchPage: true });
+
+    // 新页面已加入 dsl
+    const addedId = Array.isArray(newPage) ? newPage[0].id : newPage.id;
+    expect(editorService.getNodeById(addedId)).toBeTruthy();
+    expect(rootNode?.items.length).toBe(2);
+
+    // 当前 page 保持不变（没有自动切到新加的页面）
+    expect(editorService.get('page')?.id).toBe(beforePageId);
+  });
 });
 
 describe('remove', () => {
@@ -362,6 +417,51 @@ describe('remove', () => {
     expect(editorService.getNodeById(NodeId.NODE_ID)).toBeNull();
     // state.nodes 中不再包含被删除的节点
     expect(editorService.get('nodes').some((n) => n.id === NodeId.NODE_ID)).toBe(false);
+  });
+
+  test('doNotSwitchPage: true 删除当前页面后不自动切到其它页面', async () => {
+    editorService.set('root', cloneDeep(root));
+    const rootNode = editorService.get('root');
+    // 先加一个页面，确保 root 下有 2 个页面
+    await editorService.select(NodeId.PAGE_ID);
+    const newPage = await editorService.add({ type: NodeType.PAGE }, rootNode);
+    expect(rootNode?.items.length).toBe(2);
+
+    // 选中第一个页面，作为当前页面
+    await editorService.select(NodeId.PAGE_ID);
+    expect(editorService.get('page')?.id).toBe(NodeId.PAGE_ID);
+
+    // 删除当前页面，并要求不切换页面
+    await editorService.remove({ id: NodeId.PAGE_ID, type: NodeType.PAGE }, { doNotSwitchPage: true });
+
+    // 被删除页面在 dsl 中确实已不存在
+    expect(editorService.getNodeById(NodeId.PAGE_ID)).toBeNull();
+    // 当前 page 引用被清空，不会被自动切到剩余页面
+    expect(editorService.get('page')).toBeNull();
+    // 仍保留 newPage 在 dsl 中
+    const addedId = Array.isArray(newPage) ? newPage[0].id : newPage.id;
+    expect(editorService.getNodeById(addedId)).toBeTruthy();
+  });
+
+  test('默认删除当前页面后会自动切到剩余首个页面', async () => {
+    editorService.set('root', cloneDeep(root));
+    const rootNode = editorService.get('root');
+    // 先加一个页面
+    await editorService.select(NodeId.PAGE_ID);
+    const newPage = await editorService.add({ type: NodeType.PAGE }, rootNode);
+    const addedId = Array.isArray(newPage) ? newPage[0].id : newPage.id;
+    expect(rootNode?.items.length).toBe(2);
+
+    // 选中第一个页面作为当前页面
+    await editorService.select(NodeId.PAGE_ID);
+
+    // 删除当前页面，使用默认行为
+    await editorService.remove({ id: NodeId.PAGE_ID, type: NodeType.PAGE });
+
+    // 被删除页面在 dsl 中已不存在
+    expect(editorService.getNodeById(NodeId.PAGE_ID)).toBeNull();
+    // 自动切到剩余首个页面
+    expect(editorService.get('page')?.id).toBe(addedId);
   });
 });
 
@@ -439,6 +539,27 @@ describe('update', () => {
     expect(editorService.get('node')?.id).toBe(NodeId.NODE_ID);
     expect(editorService.get('node')).toBe(beforeSelected);
   });
+
+  test('更新非当前页面时，不会把编辑器切到该页', async () => {
+    editorService.set('root', cloneDeep(root));
+    const rootNode = editorService.get('root');
+    // 先加一个新页面
+    await editorService.select(NodeId.PAGE_ID);
+    const newPage = await editorService.add({ type: NodeType.PAGE }, rootNode);
+    const newPageId = Array.isArray(newPage) ? newPage[0].id : newPage.id;
+
+    // 选中第一个页面作为当前页
+    await editorService.select(NodeId.PAGE_ID);
+    expect(editorService.get('page')?.id).toBe(NodeId.PAGE_ID);
+
+    // 更新非当前页面（newPage）的配置
+    await editorService.update({ id: newPageId, type: NodeType.PAGE, name: 'page-renamed' });
+
+    // dsl 中该页已更新
+    expect(editorService.getNodeById(newPageId)?.name).toBe('page-renamed');
+    // 当前 page 没有被切走
+    expect(editorService.get('page')?.id).toBe(NodeId.PAGE_ID);
+  });
 });
 
 describe('sort', () => {
@@ -494,6 +615,24 @@ describe('paste', () => {
     expect(pasted).toBeTruthy();
     // 当前选中节点保持原状
     expect(editorService.get('node')?.id).toBe(beforeNodeId);
+  });
+
+  test('doNotSwitchPage: true 粘贴页面时不切换当前页面', async () => {
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.PAGE_ID);
+
+    // 复制当前页面
+    const pageNode = editorService.getNodeById(NodeId.PAGE_ID);
+    await editorService.copy(pageNode!);
+    const beforePageId = editorService.get('page')?.id;
+    expect(beforePageId).toBe(NodeId.PAGE_ID);
+
+    const pasted = await editorService.paste({}, undefined, { doNotSwitchPage: true });
+
+    // 粘贴成功
+    expect(pasted).toBeTruthy();
+    // 当前 page 保持不变
+    expect(editorService.get('page')?.id).toBe(beforePageId);
   });
 });
 
