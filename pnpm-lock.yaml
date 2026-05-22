@@ -557,23 +557,23 @@ importers:
         specifier: ^2.3.2
         version: 2.3.2(vue@3.5.34(typescript@6.0.3))
       '@tmagic/core':
-        specifier: 1.7.14-beta.3
-        version: 1.7.14-beta.3(typescript@6.0.3)
+        specifier: 1.8.0-beta.0
+        version: 1.8.0-beta.0(typescript@6.0.3)
       '@tmagic/design':
-        specifier: 1.7.14-beta.3
-        version: 1.7.14-beta.3(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
+        specifier: 1.8.0-beta.0
+        version: 1.8.0-beta.0(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
       '@tmagic/editor':
-        specifier: 1.7.14-beta.3
-        version: 1.7.14-beta.3(@tmagic/core@1.7.14-beta.3(typescript@6.0.3))(@tmagic/form-schema@1.7.14-beta.3(typescript@6.0.3))(@tmagic/schema@1.7.14-beta.3(typescript@6.0.3))(monaco-editor@0.55.1)(type-fest@5.2.0)(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
+        specifier: 1.8.0-beta.0
+        version: 1.8.0-beta.0(@tmagic/core@1.8.0-beta.0(typescript@6.0.3))(@tmagic/form-schema@1.8.0-beta.0(typescript@6.0.3))(@tmagic/schema@1.8.0-beta.0(typescript@6.0.3))(monaco-editor@0.55.1)(type-fest@5.2.0)(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
       '@tmagic/element-plus-adapter':
-        specifier: 1.7.14-beta.3
-        version: 1.7.14-beta.3(@tmagic/design@1.7.14-beta.3(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(element-plus@2.11.8(@vue/composition-api@1.7.2(vue@3.5.34(typescript@6.0.3)))(vue@3.5.34(typescript@6.0.3)))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
+        specifier: 1.8.0-beta.0
+        version: 1.8.0-beta.0(@tmagic/design@1.8.0-beta.0(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(element-plus@2.11.8(@vue/composition-api@1.7.2(vue@3.5.34(typescript@6.0.3)))(vue@3.5.34(typescript@6.0.3)))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
       '@tmagic/tdesign-vue-next-adapter':
-        specifier: 1.7.14-beta.3
-        version: 1.7.14-beta.3(@tmagic/design@1.7.14-beta.3(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(tdesign-vue-next@1.17.3(vue@3.5.34(typescript@6.0.3)))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
+        specifier: 1.8.0-beta.0
+        version: 1.8.0-beta.0(@tmagic/design@1.8.0-beta.0(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(tdesign-vue-next@1.17.3(vue@3.5.34(typescript@6.0.3)))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
       '@tmagic/tmagic-form-runtime':
         specifier: 1.1.3
-        version: 1.1.3(@tmagic/core@1.7.14-beta.3(typescript@6.0.3))(@tmagic/editor@1.7.14-beta.3(@tmagic/core@1.7.14-beta.3(typescript@6.0.3))(@tmagic/form-schema@1.7.14-beta.3(typescript@6.0.3))(@tmagic/schema@1.7.14-beta.3(typescript@6.0.3))(monaco-editor@0.55.1)(type-fest@5.2.0)(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(element-plus@2.11.8(@vue/composition-api@1.7.2(vue@3.5.34(typescript@6.0.3)))(vue@3.5.34(typescript@6.0.3)))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
+        version: 1.1.3(@tmagic/core@1.8.0-beta.0(typescript@6.0.3))(@tmagic/editor@1.8.0-beta.0(@tmagic/core@1.8.0-beta.0(typescript@6.0.3))(@tmagic/form-schema@1.8.0-beta.0(typescript@6.0.3))(@tmagic/schema@1.8.0-beta.0(typescript@6.0.3))(monaco-editor@0.55.1)(type-fest@5.2.0)(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(element-plus@2.11.8(@vue/composition-api@1.7.2(vue@3.5.34(typescript@6.0.3)))(vue@3.5.34(typescript@6.0.3)))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
       element-plus:
         specifier: ^2.11.8
         version: 2.11.8(@vue/composition-api@1.7.2(vue@3.5.34(typescript@6.0.3)))(vue@3.5.34(typescript@6.0.3))
@@ -913,14 +913,14 @@ importers:
   runtime/react:
     dependencies:
       '@tmagic/core':
-        specifier: 1.7.14-beta.3
-        version: 1.7.14-beta.3(typescript@6.0.3)
+        specifier: 1.8.0-beta.0
+        version: 1.8.0-beta.0(typescript@6.0.3)
       '@tmagic/react-runtime-help':
         specifier: 0.2.2
-        version: 0.2.2(@tmagic/core@1.7.14-beta.3(typescript@6.0.3))(@tmagic/stage@1.7.14-beta.3(@tmagic/core@1.7.14-beta.3(typescript@6.0.3))(typescript@6.0.3))(lodash-es@4.17.21)(react@18.3.1)(typescript@6.0.3)
+        version: 0.2.2(@tmagic/core@1.8.0-beta.0(typescript@6.0.3))(@tmagic/stage@1.8.0-beta.0(@tmagic/core@1.8.0-beta.0(typescript@6.0.3))(typescript@6.0.3))(lodash-es@4.17.21)(react@18.3.1)(typescript@6.0.3)
       '@tmagic/stage':
-        specifier: 1.7.14-beta.3
-        version: 1.7.14-beta.3(@tmagic/core@1.7.14-beta.3(typescript@6.0.3))(typescript@6.0.3)
+        specifier: 1.8.0-beta.0
+        version: 1.8.0-beta.0(@tmagic/core@1.8.0-beta.0(typescript@6.0.3))(typescript@6.0.3)
       axios:
         specifier: ^1.13.2
         version: 1.13.2
@@ -935,8 +935,8 @@ importers:
         version: 18.3.1(react@18.3.1)
     devDependencies:
       '@tmagic/cli':
-        specifier: 1.7.14-beta.3
-        version: 1.7.14-beta.3(typescript@6.0.3)
+        specifier: 1.8.0-beta.0
+        version: 1.8.0-beta.0(typescript@6.0.3)
       '@types/fs-extra':
         specifier: ^11.0.4
         version: 11.0.4
@@ -1011,14 +1011,14 @@ importers:
   runtime/vue:
     dependencies:
       '@tmagic/core':
-        specifier: 1.7.14-beta.3
-        version: 1.7.14-beta.3(typescript@6.0.3)
+        specifier: 1.8.0-beta.0
+        version: 1.8.0-beta.0(typescript@6.0.3)
       '@tmagic/stage':
-        specifier: 1.7.14-beta.3
-        version: 1.7.14-beta.3(@tmagic/core@1.7.14-beta.3(typescript@6.0.3))(typescript@6.0.3)
+        specifier: 1.8.0-beta.0
+        version: 1.8.0-beta.0(@tmagic/core@1.8.0-beta.0(typescript@6.0.3))(typescript@6.0.3)
       '@tmagic/vue-runtime-help':
         specifier: ^2.0.1
-        version: 2.0.2(@tmagic/core@1.7.14-beta.3(typescript@6.0.3))(@tmagic/stage@1.7.14-beta.3(@tmagic/core@1.7.14-beta.3(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
+        version: 2.0.2(@tmagic/core@1.8.0-beta.0(typescript@6.0.3))(@tmagic/stage@1.8.0-beta.0(@tmagic/core@1.8.0-beta.0(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
       axios:
         specifier: ^1.13.2
         version: 1.13.2
@@ -1027,8 +1027,8 @@ importers:
         version: 3.5.34(typescript@6.0.3)
     devDependencies:
       '@tmagic/cli':
-        specifier: 1.7.14-beta.3
-        version: 1.7.14-beta.3(typescript@6.0.3)
+        specifier: 1.8.0-beta.0
+        version: 1.8.0-beta.0(typescript@6.0.3)
       '@types/fs-extra':
         specifier: ^11.0.4
         version: 11.0.4
@@ -2912,8 +2912,8 @@ packages:
   '@sxzz/popperjs-es@2.11.7':
     resolution: {integrity: sha512-Ccy0NlLkzr0Ex2FKvh2X+OyERHXJ88XJ1MXtsI9y9fGexlaXaVTPzBCRBwIxFkORuOb+uBqeu+RqnpgYTEZRUQ==}
 
-  '@tmagic/cli@1.7.14-beta.3':
-    resolution: {integrity: sha512-h7o470F7zzGvYVC1XxfZ+7GCrH5GBSSN7d+ZMiXW/4AB0I72qOcTofL86GjJAyA52K5qMFpBwIrXvk3isvsDxw==}
+  '@tmagic/cli@1.8.0-beta.0':
+    resolution: {integrity: sha512-OVKNjnvx9JociGjyNHWajXSGWYeCoq+9wsmMgeKeBf4r3YgiQn3zh8qUVllUjjiyWJDDb84qqRXGgvbtNKJRmA==}
     engines: {node: '>=18'}
     hasBin: true
     peerDependencies:
@@ -2931,20 +2931,20 @@ packages:
       typescript:
         optional: true
 
-  '@tmagic/core@1.7.14-beta.3':
-    resolution: {integrity: sha512-FvSz1b/xI/OTfXGVv8AD+4yLBzanCjoC/FxQTspWwsqft2msnLB0I7Do6CfIDjr4IRtdcKtj7qws0KGoWIuLSg==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      typescript: ^6.0.3
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
   '@tmagic/core@1.7.2':
     resolution: {integrity: sha512-95ElN9VDBq7tdKSLLjp7g9h/4TGHj5g+SADA5Gth5XEF7TMQvWvANnHgk0gdpi7Ud3DH4sT0nj8frzzJOrh3pA==}
     engines: {node: '>=18'}
     peerDependencies:
       typescript: ^5.9.3
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  '@tmagic/core@1.8.0-beta.0':
+    resolution: {integrity: sha512-DmJ1MNH5doUctbIa1HKmUP7yVgqLcYjF44sn+TV3pJY9qn8ljVHSAGJ0VTzLkz0TvHGVg0c1YgF0Wa5hPP6uKg==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      typescript: ^6.0.3
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -2959,22 +2959,22 @@ packages:
       typescript:
         optional: true
 
-  '@tmagic/data-source@1.7.14-beta.3':
-    resolution: {integrity: sha512-D7aJCL0CidfX2yrpSlDyFwmFweipp+BxV7g9c+bymbwpbbdKzcxQmiL6sokuyqcJ4MJ/usTaYljyKlrvaUP/hw==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      '@tmagic/core': 1.7.14-beta.3
-      typescript: ^6.0.3
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
   '@tmagic/data-source@1.7.2':
     resolution: {integrity: sha512-QDYQO3G6luztP4uncq8NND6RKCYmyNFuaWlJIPtp+6Ff0AUeXZu1aqEmNhxbQkcuz0i6U+e8wSDCRlBWn0n8gg==}
     engines: {node: '>=18'}
     peerDependencies:
       '@tmagic/core': 1.7.2
       typescript: ^5.9.3
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  '@tmagic/data-source@1.8.0-beta.0':
+    resolution: {integrity: sha512-pp1o3ZtNlLegGXQ+e6wTtlGU4CSnnsz9Uvln5sd3IrkIIy0QenEYlz8A9ta2CXI5s0Kh4N1w5/GGFdzatbyzMw==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@tmagic/core': 1.8.0-beta.0
+      typescript: ^6.0.3
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -2990,17 +2990,6 @@ packages:
       typescript:
         optional: true
 
-  '@tmagic/dep@1.7.14-beta.3':
-    resolution: {integrity: sha512-ub/+TPVI9un5RWdlyaFISagbNwnAzUF4KtpgRKNHFFd3ui1t+3O/bMIYzAHwB0njKnrsWaGjcl1MehzV8epahg==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      '@tmagic/schema': 1.7.14-beta.3
-      '@tmagic/utils': 1.7.14-beta.3
-      typescript: ^6.0.3
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
   '@tmagic/dep@1.7.2':
     resolution: {integrity: sha512-4Sj4B6VXBkZjikm9XeEzzhOxvouofRP7kA5CFGei1jKo+Xs7uTpzhpU18pq1vdP8G1xxDohRnXpPgGKED0mAGg==}
     engines: {node: '>=18'}
@@ -3012,12 +3001,13 @@ packages:
       typescript:
         optional: true
 
-  '@tmagic/design@1.7.14-beta.3':
-    resolution: {integrity: sha512-yIOkw1a2n7DnzhMR+YDkudhAmqDFxFiMnYxIDA57diYHV/iMdFvLGvNWMyY648BD/cd+WJajvTJFL/pDnfif7A==}
+  '@tmagic/dep@1.8.0-beta.0':
+    resolution: {integrity: sha512-V2bM2FCXHyAWNO36rcxnb9+oscC/oqYzrtrGoslH9/jlqe1mgK9yPJSYf6S/XAhLxcj+X7FIQwDZCebRxScQVQ==}
     engines: {node: '>=18'}
     peerDependencies:
+      '@tmagic/schema': 1.8.0-beta.0
+      '@tmagic/utils': 1.8.0-beta.0
       typescript: ^6.0.3
-      vue: ^3.5.34
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -3032,18 +3022,13 @@ packages:
       typescript:
         optional: true
 
-  '@tmagic/editor@1.7.14-beta.3':
-    resolution: {integrity: sha512-302UDHXxj0u7RGRRLCCDbifTVSGucmVwXJF1McSjGpB4ET8nqUPT5MkCoPV6Nec+inWiWQnyThRSALwPuSZdoQ==}
+  '@tmagic/design@1.8.0-beta.0':
+    resolution: {integrity: sha512-X46glVOP/sKNl2bfnixcwR7FHxcPmEqog0qfmun6mrlBQO42dhXgpw8gLroVkWZY70NeQX5BaEwhjqNZpQavqw==}
     engines: {node: '>=18'}
     peerDependencies:
-      '@tmagic/core': 1.7.14-beta.3
-      monaco-editor: '^0.55.1 '
-      type-fest: ^5.2.0
       typescript: ^6.0.3
       vue: ^3.5.34
     peerDependenciesMeta:
-      type-fest:
-        optional: true
       typescript:
         optional: true
 
@@ -3059,23 +3044,29 @@ packages:
       typescript:
         optional: true
 
-  '@tmagic/element-plus-adapter@1.7.14-beta.3':
-    resolution: {integrity: sha512-0309rag86FsUjByPU5C3NdUbsA3QOIau7p4Uk12V4wX9JAIi9KCgjvs6rXFuDnbaglsQShT5GvSsGTU08D17sA==}
+  '@tmagic/editor@1.8.0-beta.0':
+    resolution: {integrity: sha512-5WsEYz8X68boTFahKAmbGP5FcK2KuCxV3lZpq+qDwBVSBJEEC0fOrWoRlgkYVFlQWo2IZdifM18Qe/ss3mDEMA==}
     engines: {node: '>=18'}
     peerDependencies:
-      '@tmagic/design': 1.7.14-beta.3
-      element-plus: '>=2.9.0'
+      '@tmagic/core': 1.8.0-beta.0
+      monaco-editor: '^0.55.1 '
+      type-fest: ^5.2.0
       typescript: ^6.0.3
       vue: ^3.5.34
     peerDependenciesMeta:
+      type-fest:
+        optional: true
       typescript:
         optional: true
 
-  '@tmagic/form-schema@1.7.14-beta.3':
-    resolution: {integrity: sha512-igXb81y9BTrDlcKrzB374FUNjgzj1WkBpDfTK6BBn24QHJVOZ+pXMTyX2GdoyRojlGmJMF4JEtdA1jhHuqEp0Q==}
+  '@tmagic/element-plus-adapter@1.8.0-beta.0':
+    resolution: {integrity: sha512-NhbrEBOd8XPoy3LQ2fYkORNiyVQ27a4VZPGFNj8TAMSNOhycZN6vPLxg5dbwkZYTOPPdb0Q0+AFi3NrbzNTm3A==}
     engines: {node: '>=18'}
     peerDependencies:
+      '@tmagic/design': 1.8.0-beta.0
+      element-plus: '>=2.9.0'
       typescript: ^6.0.3
+      vue: ^3.5.34
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -3089,15 +3080,11 @@ packages:
       typescript:
         optional: true
 
-  '@tmagic/form@1.7.14-beta.3':
-    resolution: {integrity: sha512-G+PjfuapbnsBUfIaf8bJlQ2XyvSXUnuL+rWTOY/l1ZBemqP1ZMNJMm3oa1POPl3AWilNYX+eh0XwuK8r6PsyYg==}
+  '@tmagic/form-schema@1.8.0-beta.0':
+    resolution: {integrity: sha512-G59l6NmWOTA8mkUvyoBPPc/udbKMOG18r04uSuOAMslxLkhwtY6wwZaxMx4z+2tw7bPEnd2oPm8Cl8aB/cJ5/g==}
     engines: {node: '>=18'}
     peerDependencies:
-      '@tmagic/design': 1.7.14-beta.3
-      '@tmagic/form-schema': 1.7.14-beta.3
-      '@tmagic/utils': 1.7.14-beta.3
       typescript: ^6.0.3
-      vue: ^3.5.34
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -3111,6 +3098,19 @@ packages:
       '@tmagic/utils': 1.7.2
       typescript: ^5.9.3
       vue: ^3.5.24
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  '@tmagic/form@1.8.0-beta.0':
+    resolution: {integrity: sha512-v0vbaOCuh2UzOamJZX8Dm/ZDYMewipApCFmv49+E9paqRB9UdCe9p3BOs6cvHCrP3ncPlZORrlQC0lGtHOZ6ng==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@tmagic/design': 1.8.0-beta.0
+      '@tmagic/form-schema': 1.8.0-beta.0
+      '@tmagic/utils': 1.8.0-beta.0
+      typescript: ^6.0.3
+      vue: ^3.5.34
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -3141,20 +3141,20 @@ packages:
       typescript:
         optional: true
 
-  '@tmagic/schema@1.7.14-beta.3':
-    resolution: {integrity: sha512-8rxCpx1b4W5YzukUHuCTepIhFmJhlaYs4Ad3n/aK/RRPLTf2l3kqbraDiEa6xDSYPDGgaO82zTF6Egaywnnbqw==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      typescript: ^6.0.3
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
   '@tmagic/schema@1.7.2':
     resolution: {integrity: sha512-Wifw58AK4uJ9Qg3qAnsTXttBt5xRKYCqD5/xaJKd8yy6UXIPO0KT9umEFzUsUhEc57BMDXSVpHy8GgEOwjNwrA==}
     engines: {node: '>=18'}
     peerDependencies:
       typescript: ^5.9.3
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  '@tmagic/schema@1.8.0-beta.0':
+    resolution: {integrity: sha512-9UeGQ9Baz0e0uDD9ljLHpFwRjRFStNVhLFzCa030eOlnThqC1TfT6gnVjSIqvVGtTLqn54KGKqnAXRsKXe4oBg==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      typescript: ^6.0.3
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -3169,16 +3169,6 @@ packages:
       typescript:
         optional: true
 
-  '@tmagic/stage@1.7.14-beta.3':
-    resolution: {integrity: sha512-AjXqOavnBx6IyjDZJQR9KaT3DnLyhkUgtMcRrxMUnStqGCADmXzlQA1IZxX1AhZLUZJX3UocR5aiCNc5HKSdVg==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      '@tmagic/core': 1.7.14-beta.3
-      typescript: ^6.0.3
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
   '@tmagic/stage@1.7.2':
     resolution: {integrity: sha512-QTmWQhWmtfra5ePVawfSsw7ESUvPBzM1EztdtSW26AYJdL2DNtOahqUKuWuw5TYW6c7SUsSDfgFT0Dq/h2aB7Q==}
     engines: {node: '>=18'}
@@ -3189,15 +3179,12 @@ packages:
       typescript:
         optional: true
 
-  '@tmagic/table@1.7.14-beta.3':
-    resolution: {integrity: sha512-nVGFiUA9OaxYxF4aN71CRnvw79odFTdeN0Xkg4Fiw9WSUW85LOFQCx62tf5A/xEDl6rNW49LPTR86/g7q3eE6w==}
+  '@tmagic/stage@1.8.0-beta.0':
+    resolution: {integrity: sha512-auBqUCuIXAmqVCEhiB4owR1VzdC4geGRCNfQi4qPE/m5JDWpbZKV/NGym5wpl6AQyfj6Da01mbX1I1Ip8mbjcA==}
     engines: {node: '>=18'}
     peerDependencies:
-      '@tmagic/design': 1.7.14-beta.3
-      '@tmagic/form': 1.7.14-beta.3
-      '@tmagic/utils': 1.7.14-beta.3
+      '@tmagic/core': 1.8.0-beta.0
       typescript: ^6.0.3
-      vue: ^3.5.34
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -3214,11 +3201,24 @@ packages:
       typescript:
         optional: true
 
-  '@tmagic/tdesign-vue-next-adapter@1.7.14-beta.3':
-    resolution: {integrity: sha512-x/L5SOOGHUM1rgYWnAdlsjnGx43AL6sxm7p2a01Mz+RiO8LK0AaxO7xmkh4cHfZqjJLPamj2qWiaRNTRu2wyVw==}
+  '@tmagic/table@1.8.0-beta.0':
+    resolution: {integrity: sha512-tPjIsySzufUreHTrcV3NJeBfSAdzxmv+fKuWie7B9FQxtg69r/slVD4KRdXDPvHTLWtlQu7nBTs+dV1cOCJxLA==}
     engines: {node: '>=18'}
     peerDependencies:
-      '@tmagic/design': 1.7.14-beta.3
+      '@tmagic/design': 1.8.0-beta.0
+      '@tmagic/form': 1.8.0-beta.0
+      '@tmagic/utils': 1.8.0-beta.0
+      typescript: ^6.0.3
+      vue: ^3.5.34
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  '@tmagic/tdesign-vue-next-adapter@1.8.0-beta.0':
+    resolution: {integrity: sha512-k4k4BtaOCOcsZA16M9R3H1Z6R3sQbnt7FXXku5DI3ppPagjV2ln30I69kxCWWqgo7GWqmdOjdMcEc6JXexXJaw==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@tmagic/design': 1.8.0-beta.0
       tdesign-vue-next: ^1.17.1
       typescript: ^6.0.3
       vue: ^3.5.34
@@ -3251,22 +3251,22 @@ packages:
       typescript:
         optional: true
 
-  '@tmagic/utils@1.7.14-beta.3':
-    resolution: {integrity: sha512-/5wXnY0VX0vy6+clPunV5gx+A45deqklRXsqWvUdCAX26MLr75qtwbT3vYFEgMdukeOAKoCZHaYx++XQmeFkIA==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      '@tmagic/schema': 1.7.14-beta.3
-      typescript: ^6.0.3
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
   '@tmagic/utils@1.7.2':
     resolution: {integrity: sha512-8/dienSNwDxvl5v04GFJa9K3lT4tu6iLKsgBrHy4nu+H+i/l7uBjeR7xSNNvoc7DPr8p1uQy3SY6mGvhSbY9rQ==}
     engines: {node: '>=18'}
     peerDependencies:
       '@tmagic/schema': 1.7.2
       typescript: ^5.9.3
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  '@tmagic/utils@1.8.0-beta.0':
+    resolution: {integrity: sha512-sqTs8N3MMchCPcUZ5a/IU7YwHwy6AcNbwKkpdxrDe+3i9T+Z0+L2PxanRQYbQWqJ13qIqD1vUD9wrut6CGG4dw==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@tmagic/schema': 1.8.0-beta.0
+      typescript: ^6.0.3
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -8699,7 +8699,7 @@ snapshots:
 
   '@sxzz/popperjs-es@2.11.7': {}
 
-  '@tmagic/cli@1.7.14-beta.3(typescript@6.0.3)':
+  '@tmagic/cli@1.8.0-beta.0(typescript@6.0.3)':
     dependencies:
       cac: 6.7.14
       chokidar: 3.6.0
@@ -8723,17 +8723,6 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
 
-  '@tmagic/core@1.7.14-beta.3(typescript@6.0.3)':
-    dependencies:
-      '@tmagic/data-source': 1.7.14-beta.3(@tmagic/core@1.7.14-beta.3(typescript@6.0.3))(typescript@6.0.3)
-      '@tmagic/dep': 1.7.14-beta.3(@tmagic/schema@1.7.14-beta.3(typescript@6.0.3))(@tmagic/utils@1.7.14-beta.3(@tmagic/schema@1.7.14-beta.3(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)
-      '@tmagic/schema': 1.7.14-beta.3(typescript@6.0.3)
-      '@tmagic/utils': 1.7.14-beta.3(@tmagic/schema@1.7.14-beta.3(typescript@6.0.3))(typescript@6.0.3)
-      events: 3.3.0
-      lodash-es: 4.17.21
-    optionalDependencies:
-      typescript: 6.0.3
-
   '@tmagic/core@1.7.2(typescript@6.0.3)':
     dependencies:
       '@tmagic/data-source': 1.7.2(@tmagic/core@1.7.2(typescript@6.0.3))(typescript@6.0.3)
@@ -8745,18 +8734,20 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
 
-  '@tmagic/data-source@1.7.0(@tmagic/core@1.7.0(typescript@6.0.3))(typescript@6.0.3)':
+  '@tmagic/core@1.8.0-beta.0(typescript@6.0.3)':
     dependencies:
-      '@tmagic/core': 1.7.0(typescript@6.0.3)
-      deep-state-observer: 5.5.14
+      '@tmagic/data-source': 1.8.0-beta.0(@tmagic/core@1.8.0-beta.0(typescript@6.0.3))(typescript@6.0.3)
+      '@tmagic/dep': 1.8.0-beta.0(@tmagic/schema@1.8.0-beta.0(typescript@6.0.3))(@tmagic/utils@1.8.0-beta.0(@tmagic/schema@1.8.0-beta.0(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)
+      '@tmagic/schema': 1.8.0-beta.0(typescript@6.0.3)
+      '@tmagic/utils': 1.8.0-beta.0(@tmagic/schema@1.8.0-beta.0(typescript@6.0.3))(typescript@6.0.3)
       events: 3.3.0
       lodash-es: 4.17.21
     optionalDependencies:
       typescript: 6.0.3
 
-  '@tmagic/data-source@1.7.14-beta.3(@tmagic/core@1.7.14-beta.3(typescript@6.0.3))(typescript@6.0.3)':
+  '@tmagic/data-source@1.7.0(@tmagic/core@1.7.0(typescript@6.0.3))(typescript@6.0.3)':
     dependencies:
-      '@tmagic/core': 1.7.14-beta.3(typescript@6.0.3)
+      '@tmagic/core': 1.7.0(typescript@6.0.3)
       deep-state-observer: 5.5.14
       events: 3.3.0
       lodash-es: 4.17.21
@@ -8772,17 +8763,19 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
 
+  '@tmagic/data-source@1.8.0-beta.0(@tmagic/core@1.8.0-beta.0(typescript@6.0.3))(typescript@6.0.3)':
+    dependencies:
+      '@tmagic/core': 1.8.0-beta.0(typescript@6.0.3)
+      deep-state-observer: 5.5.14
+      events: 3.3.0
+      lodash-es: 4.17.21
+    optionalDependencies:
+      typescript: 6.0.3
+
   '@tmagic/dep@1.7.0(@tmagic/schema@1.7.0(typescript@6.0.3))(@tmagic/utils@1.7.0(@tmagic/schema@1.7.0(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)':
     dependencies:
       '@tmagic/schema': 1.7.0(typescript@6.0.3)
       '@tmagic/utils': 1.7.0(@tmagic/schema@1.7.0(typescript@6.0.3))(typescript@6.0.3)
-    optionalDependencies:
-      typescript: 6.0.3
-
-  '@tmagic/dep@1.7.14-beta.3(@tmagic/schema@1.7.14-beta.3(typescript@6.0.3))(@tmagic/utils@1.7.14-beta.3(@tmagic/schema@1.7.14-beta.3(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)':
-    dependencies:
-      '@tmagic/schema': 1.7.14-beta.3(typescript@6.0.3)
-      '@tmagic/utils': 1.7.14-beta.3(@tmagic/schema@1.7.14-beta.3(typescript@6.0.3))(typescript@6.0.3)
     optionalDependencies:
       typescript: 6.0.3
 
@@ -8793,10 +8786,10 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
 
-  '@tmagic/design@1.7.14-beta.3(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))':
+  '@tmagic/dep@1.8.0-beta.0(@tmagic/schema@1.8.0-beta.0(typescript@6.0.3))(@tmagic/utils@1.8.0-beta.0(@tmagic/schema@1.8.0-beta.0(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)':
     dependencies:
-      '@popperjs/core': 2.11.8
-      vue: 3.5.34(typescript@6.0.3)
+      '@tmagic/schema': 1.8.0-beta.0(typescript@6.0.3)
+      '@tmagic/utils': 1.8.0-beta.0(@tmagic/schema@1.8.0-beta.0(typescript@6.0.3))(typescript@6.0.3)
     optionalDependencies:
       typescript: 6.0.3
 
@@ -8807,33 +8800,12 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
 
-  '@tmagic/editor@1.7.14-beta.3(@tmagic/core@1.7.14-beta.3(typescript@6.0.3))(@tmagic/form-schema@1.7.14-beta.3(typescript@6.0.3))(@tmagic/schema@1.7.14-beta.3(typescript@6.0.3))(monaco-editor@0.55.1)(type-fest@5.2.0)(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))':
+  '@tmagic/design@1.8.0-beta.0(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))':
     dependencies:
-      '@element-plus/icons-vue': 2.3.2(vue@3.5.34(typescript@6.0.3))
-      '@tmagic/core': 1.7.14-beta.3(typescript@6.0.3)
-      '@tmagic/design': 1.7.14-beta.3(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
-      '@tmagic/form': 1.7.14-beta.3(@tmagic/design@1.7.14-beta.3(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(@tmagic/form-schema@1.7.14-beta.3(typescript@6.0.3))(@tmagic/utils@1.7.14-beta.3(@tmagic/schema@1.7.14-beta.3(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
-      '@tmagic/stage': 1.7.14-beta.3(@tmagic/core@1.7.14-beta.3(typescript@6.0.3))(typescript@6.0.3)
-      '@tmagic/table': 1.7.14-beta.3(@tmagic/design@1.7.14-beta.3(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(@tmagic/form@1.7.14-beta.3(@tmagic/design@1.7.14-beta.3(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(@tmagic/form-schema@1.7.14-beta.3(typescript@6.0.3))(@tmagic/utils@1.7.14-beta.3(@tmagic/schema@1.7.14-beta.3(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(@tmagic/utils@1.7.14-beta.3(@tmagic/schema@1.7.14-beta.3(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
-      '@tmagic/utils': 1.7.14-beta.3(@tmagic/schema@1.7.14-beta.3(typescript@6.0.3))(typescript@6.0.3)
-      buffer: 6.0.3
-      deep-object-diff: 1.1.9
-      emmet-monaco-es: 5.7.0(monaco-editor@0.55.1)
-      events: 3.3.0
-      gesto: 1.19.4
-      keycon: 1.4.0
-      lodash-es: 4.17.21
-      monaco-editor: 0.55.1
-      moveable: 0.53.0
-      serialize-javascript: 7.0.0
-      sortablejs: 1.15.6
+      '@popperjs/core': 2.11.8
       vue: 3.5.34(typescript@6.0.3)
     optionalDependencies:
-      type-fest: 5.2.0
       typescript: 6.0.3
-    transitivePeerDependencies:
-      - '@tmagic/form-schema'
-      - '@tmagic/schema'
 
   '@tmagic/editor@1.7.2(@tmagic/core@1.7.2(typescript@6.0.3))(@tmagic/form-schema@1.7.2(typescript@6.0.3))(@tmagic/schema@1.7.2(typescript@6.0.3))(monaco-editor@0.55.1)(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))':
     dependencies:
@@ -8862,17 +8834,39 @@ snapshots:
       - '@tmagic/form-schema'
       - '@tmagic/schema'
 
-  '@tmagic/element-plus-adapter@1.7.14-beta.3(@tmagic/design@1.7.14-beta.3(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(element-plus@2.11.8(@vue/composition-api@1.7.2(vue@3.5.34(typescript@6.0.3)))(vue@3.5.34(typescript@6.0.3)))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))':
+  '@tmagic/editor@1.8.0-beta.0(@tmagic/core@1.8.0-beta.0(typescript@6.0.3))(@tmagic/form-schema@1.8.0-beta.0(typescript@6.0.3))(@tmagic/schema@1.8.0-beta.0(typescript@6.0.3))(monaco-editor@0.55.1)(type-fest@5.2.0)(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))':
     dependencies:
-      '@tmagic/design': 1.7.14-beta.3(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
-      element-plus: 2.11.8(@vue/composition-api@1.7.2(vue@3.5.34(typescript@6.0.3)))(vue@3.5.34(typescript@6.0.3))
+      '@element-plus/icons-vue': 2.3.2(vue@3.5.34(typescript@6.0.3))
+      '@tmagic/core': 1.8.0-beta.0(typescript@6.0.3)
+      '@tmagic/design': 1.8.0-beta.0(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
+      '@tmagic/form': 1.8.0-beta.0(@tmagic/design@1.8.0-beta.0(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(@tmagic/form-schema@1.8.0-beta.0(typescript@6.0.3))(@tmagic/utils@1.8.0-beta.0(@tmagic/schema@1.8.0-beta.0(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
+      '@tmagic/stage': 1.8.0-beta.0(@tmagic/core@1.8.0-beta.0(typescript@6.0.3))(typescript@6.0.3)
+      '@tmagic/table': 1.8.0-beta.0(@tmagic/design@1.8.0-beta.0(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(@tmagic/form@1.8.0-beta.0(@tmagic/design@1.8.0-beta.0(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(@tmagic/form-schema@1.8.0-beta.0(typescript@6.0.3))(@tmagic/utils@1.8.0-beta.0(@tmagic/schema@1.8.0-beta.0(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(@tmagic/utils@1.8.0-beta.0(@tmagic/schema@1.8.0-beta.0(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
+      '@tmagic/utils': 1.8.0-beta.0(@tmagic/schema@1.8.0-beta.0(typescript@6.0.3))(typescript@6.0.3)
+      buffer: 6.0.3
+      deep-object-diff: 1.1.9
+      emmet-monaco-es: 5.7.0(monaco-editor@0.55.1)
+      events: 3.3.0
+      gesto: 1.19.4
+      keycon: 1.4.0
+      lodash-es: 4.17.21
+      monaco-editor: 0.55.1
+      moveable: 0.53.0
+      serialize-javascript: 7.0.0
+      sortablejs: 1.15.6
       vue: 3.5.34(typescript@6.0.3)
     optionalDependencies:
+      type-fest: 5.2.0
       typescript: 6.0.3
+    transitivePeerDependencies:
+      - '@tmagic/form-schema'
+      - '@tmagic/schema'
 
-  '@tmagic/form-schema@1.7.14-beta.3(typescript@6.0.3)':
+  '@tmagic/element-plus-adapter@1.8.0-beta.0(@tmagic/design@1.8.0-beta.0(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(element-plus@2.11.8(@vue/composition-api@1.7.2(vue@3.5.34(typescript@6.0.3)))(vue@3.5.34(typescript@6.0.3)))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))':
     dependencies:
-      '@tmagic/schema': 1.7.14-beta.3(typescript@6.0.3)
+      '@tmagic/design': 1.8.0-beta.0(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
+      element-plus: 2.11.8(@vue/composition-api@1.7.2(vue@3.5.34(typescript@6.0.3)))(vue@3.5.34(typescript@6.0.3))
+      vue: 3.5.34(typescript@6.0.3)
     optionalDependencies:
       typescript: 6.0.3
 
@@ -8882,17 +8876,9 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
 
-  '@tmagic/form@1.7.14-beta.3(@tmagic/design@1.7.14-beta.3(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(@tmagic/form-schema@1.7.14-beta.3(typescript@6.0.3))(@tmagic/utils@1.7.14-beta.3(@tmagic/schema@1.7.14-beta.3(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))':
+  '@tmagic/form-schema@1.8.0-beta.0(typescript@6.0.3)':
     dependencies:
-      '@element-plus/icons-vue': 2.3.2(vue@3.5.34(typescript@6.0.3))
-      '@popperjs/core': 2.11.8
-      '@tmagic/design': 1.7.14-beta.3(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
-      '@tmagic/form-schema': 1.7.14-beta.3(typescript@6.0.3)
-      '@tmagic/utils': 1.7.14-beta.3(@tmagic/schema@1.7.14-beta.3(typescript@6.0.3))(typescript@6.0.3)
-      dayjs: 1.11.19
-      lodash-es: 4.17.21
-      sortablejs: 1.15.6
-      vue: 3.5.34(typescript@6.0.3)
+      '@tmagic/schema': 1.8.0-beta.0(typescript@6.0.3)
     optionalDependencies:
       typescript: 6.0.3
 
@@ -8910,20 +8896,30 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
 
-  '@tmagic/react-runtime-help@0.2.2(@tmagic/core@1.7.14-beta.3(typescript@6.0.3))(@tmagic/stage@1.7.14-beta.3(@tmagic/core@1.7.14-beta.3(typescript@6.0.3))(typescript@6.0.3))(lodash-es@4.17.21)(react@18.3.1)(typescript@6.0.3)':
+  '@tmagic/form@1.8.0-beta.0(@tmagic/design@1.8.0-beta.0(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(@tmagic/form-schema@1.8.0-beta.0(typescript@6.0.3))(@tmagic/utils@1.8.0-beta.0(@tmagic/schema@1.8.0-beta.0(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))':
+    dependencies:
+      '@element-plus/icons-vue': 2.3.2(vue@3.5.34(typescript@6.0.3))
+      '@popperjs/core': 2.11.8
+      '@tmagic/design': 1.8.0-beta.0(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
+      '@tmagic/form-schema': 1.8.0-beta.0(typescript@6.0.3)
+      '@tmagic/utils': 1.8.0-beta.0(@tmagic/schema@1.8.0-beta.0(typescript@6.0.3))(typescript@6.0.3)
+      dayjs: 1.11.19
+      lodash-es: 4.17.21
+      sortablejs: 1.15.6
+      vue: 3.5.34(typescript@6.0.3)
+    optionalDependencies:
+      typescript: 6.0.3
+
+  '@tmagic/react-runtime-help@0.2.2(@tmagic/core@1.8.0-beta.0(typescript@6.0.3))(@tmagic/stage@1.8.0-beta.0(@tmagic/core@1.8.0-beta.0(typescript@6.0.3))(typescript@6.0.3))(lodash-es@4.17.21)(react@18.3.1)(typescript@6.0.3)':
     dependencies:
       lodash-es: 4.17.21
       react: 18.3.1
     optionalDependencies:
-      '@tmagic/core': 1.7.14-beta.3(typescript@6.0.3)
-      '@tmagic/stage': 1.7.14-beta.3(@tmagic/core@1.7.14-beta.3(typescript@6.0.3))(typescript@6.0.3)
+      '@tmagic/core': 1.8.0-beta.0(typescript@6.0.3)
+      '@tmagic/stage': 1.8.0-beta.0(@tmagic/core@1.8.0-beta.0(typescript@6.0.3))(typescript@6.0.3)
       typescript: 6.0.3
 
   '@tmagic/schema@1.7.0(typescript@6.0.3)':
-    optionalDependencies:
-      typescript: 6.0.3
-
-  '@tmagic/schema@1.7.14-beta.3(typescript@6.0.3)':
     optionalDependencies:
       typescript: 6.0.3
 
@@ -8931,24 +8927,14 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
 
+  '@tmagic/schema@1.8.0-beta.0(typescript@6.0.3)':
+    optionalDependencies:
+      typescript: 6.0.3
+
   '@tmagic/stage@1.7.0(@tmagic/core@1.7.0(typescript@6.0.3))(typescript@6.0.3)':
     dependencies:
       '@scena/guides': 0.29.2
       '@tmagic/core': 1.7.0(typescript@6.0.3)
-      events: 3.3.0
-      keycon: 1.4.0
-      lodash-es: 4.17.21
-      moveable: 0.53.0
-      moveable-helper: 0.4.0(scenejs@1.10.3)
-      scenejs: 1.10.3
-    optionalDependencies:
-      typescript: 6.0.3
-
-  '@tmagic/stage@1.7.14-beta.3(@tmagic/core@1.7.14-beta.3(typescript@6.0.3))(typescript@6.0.3)':
-    dependencies:
-      '@scena/guides': 0.29.2
-      '@tmagic/core': 1.7.14-beta.3(typescript@6.0.3)
-      '@zumer/snapdom': 2.8.0
       events: 3.3.0
       keycon: 1.4.0
       lodash-es: 4.17.21
@@ -8971,13 +8957,17 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
 
-  '@tmagic/table@1.7.14-beta.3(@tmagic/design@1.7.14-beta.3(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(@tmagic/form@1.7.14-beta.3(@tmagic/design@1.7.14-beta.3(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(@tmagic/form-schema@1.7.14-beta.3(typescript@6.0.3))(@tmagic/utils@1.7.14-beta.3(@tmagic/schema@1.7.14-beta.3(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(@tmagic/utils@1.7.14-beta.3(@tmagic/schema@1.7.14-beta.3(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))':
+  '@tmagic/stage@1.8.0-beta.0(@tmagic/core@1.8.0-beta.0(typescript@6.0.3))(typescript@6.0.3)':
     dependencies:
-      '@tmagic/design': 1.7.14-beta.3(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
-      '@tmagic/form': 1.7.14-beta.3(@tmagic/design@1.7.14-beta.3(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(@tmagic/form-schema@1.7.14-beta.3(typescript@6.0.3))(@tmagic/utils@1.7.14-beta.3(@tmagic/schema@1.7.14-beta.3(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
-      '@tmagic/utils': 1.7.14-beta.3(@tmagic/schema@1.7.14-beta.3(typescript@6.0.3))(typescript@6.0.3)
+      '@scena/guides': 0.29.2
+      '@tmagic/core': 1.8.0-beta.0(typescript@6.0.3)
+      '@zumer/snapdom': 2.8.0
+      events: 3.3.0
+      keycon: 1.4.0
       lodash-es: 4.17.21
-      vue: 3.5.34(typescript@6.0.3)
+      moveable: 0.53.0
+      moveable-helper: 0.4.0(scenejs@1.10.3)
+      scenejs: 1.10.3
     optionalDependencies:
       typescript: 6.0.3
 
@@ -8990,33 +8980,36 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
 
-  '@tmagic/tdesign-vue-next-adapter@1.7.14-beta.3(@tmagic/design@1.7.14-beta.3(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(tdesign-vue-next@1.17.3(vue@3.5.34(typescript@6.0.3)))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))':
+  '@tmagic/table@1.8.0-beta.0(@tmagic/design@1.8.0-beta.0(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(@tmagic/form@1.8.0-beta.0(@tmagic/design@1.8.0-beta.0(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(@tmagic/form-schema@1.8.0-beta.0(typescript@6.0.3))(@tmagic/utils@1.8.0-beta.0(@tmagic/schema@1.8.0-beta.0(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(@tmagic/utils@1.8.0-beta.0(@tmagic/schema@1.8.0-beta.0(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))':
     dependencies:
-      '@tmagic/design': 1.7.14-beta.3(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
+      '@tmagic/design': 1.8.0-beta.0(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
+      '@tmagic/form': 1.8.0-beta.0(@tmagic/design@1.8.0-beta.0(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(@tmagic/form-schema@1.8.0-beta.0(typescript@6.0.3))(@tmagic/utils@1.8.0-beta.0(@tmagic/schema@1.8.0-beta.0(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
+      '@tmagic/utils': 1.8.0-beta.0(@tmagic/schema@1.8.0-beta.0(typescript@6.0.3))(typescript@6.0.3)
+      lodash-es: 4.17.21
+      vue: 3.5.34(typescript@6.0.3)
+    optionalDependencies:
+      typescript: 6.0.3
+
+  '@tmagic/tdesign-vue-next-adapter@1.8.0-beta.0(@tmagic/design@1.8.0-beta.0(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(tdesign-vue-next@1.17.3(vue@3.5.34(typescript@6.0.3)))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))':
+    dependencies:
+      '@tmagic/design': 1.8.0-beta.0(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
       tdesign-vue-next: 1.17.3(vue@3.5.34(typescript@6.0.3))
       vue: 3.5.34(typescript@6.0.3)
     optionalDependencies:
       typescript: 6.0.3
 
-  '@tmagic/tmagic-form-runtime@1.1.3(@tmagic/core@1.7.14-beta.3(typescript@6.0.3))(@tmagic/editor@1.7.14-beta.3(@tmagic/core@1.7.14-beta.3(typescript@6.0.3))(@tmagic/form-schema@1.7.14-beta.3(typescript@6.0.3))(@tmagic/schema@1.7.14-beta.3(typescript@6.0.3))(monaco-editor@0.55.1)(type-fest@5.2.0)(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(element-plus@2.11.8(@vue/composition-api@1.7.2(vue@3.5.34(typescript@6.0.3)))(vue@3.5.34(typescript@6.0.3)))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))':
+  '@tmagic/tmagic-form-runtime@1.1.3(@tmagic/core@1.8.0-beta.0(typescript@6.0.3))(@tmagic/editor@1.8.0-beta.0(@tmagic/core@1.8.0-beta.0(typescript@6.0.3))(@tmagic/form-schema@1.8.0-beta.0(typescript@6.0.3))(@tmagic/schema@1.8.0-beta.0(typescript@6.0.3))(monaco-editor@0.55.1)(type-fest@5.2.0)(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(element-plus@2.11.8(@vue/composition-api@1.7.2(vue@3.5.34(typescript@6.0.3)))(vue@3.5.34(typescript@6.0.3)))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))':
     dependencies:
-      '@tmagic/editor': 1.7.14-beta.3(@tmagic/core@1.7.14-beta.3(typescript@6.0.3))(@tmagic/form-schema@1.7.14-beta.3(typescript@6.0.3))(@tmagic/schema@1.7.14-beta.3(typescript@6.0.3))(monaco-editor@0.55.1)(type-fest@5.2.0)(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
+      '@tmagic/editor': 1.8.0-beta.0(@tmagic/core@1.8.0-beta.0(typescript@6.0.3))(@tmagic/form-schema@1.8.0-beta.0(typescript@6.0.3))(@tmagic/schema@1.8.0-beta.0(typescript@6.0.3))(monaco-editor@0.55.1)(type-fest@5.2.0)(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
       element-plus: 2.11.8(@vue/composition-api@1.7.2(vue@3.5.34(typescript@6.0.3)))(vue@3.5.34(typescript@6.0.3))
       vue: 3.5.34(typescript@6.0.3)
     optionalDependencies:
-      '@tmagic/core': 1.7.14-beta.3(typescript@6.0.3)
+      '@tmagic/core': 1.8.0-beta.0(typescript@6.0.3)
       typescript: 6.0.3
 
   '@tmagic/utils@1.7.0(@tmagic/schema@1.7.0(typescript@6.0.3))(typescript@6.0.3)':
     dependencies:
       '@tmagic/schema': 1.7.0(typescript@6.0.3)
-      lodash-es: 4.17.21
-    optionalDependencies:
-      typescript: 6.0.3
-
-  '@tmagic/utils@1.7.14-beta.3(@tmagic/schema@1.7.14-beta.3(typescript@6.0.3))(typescript@6.0.3)':
-    dependencies:
-      '@tmagic/schema': 1.7.14-beta.3(typescript@6.0.3)
       lodash-es: 4.17.21
     optionalDependencies:
       typescript: 6.0.3
@@ -9028,12 +9021,19 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
 
-  '@tmagic/vue-runtime-help@2.0.2(@tmagic/core@1.7.14-beta.3(typescript@6.0.3))(@tmagic/stage@1.7.14-beta.3(@tmagic/core@1.7.14-beta.3(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))':
+  '@tmagic/utils@1.8.0-beta.0(@tmagic/schema@1.8.0-beta.0(typescript@6.0.3))(typescript@6.0.3)':
+    dependencies:
+      '@tmagic/schema': 1.8.0-beta.0(typescript@6.0.3)
+      lodash-es: 4.17.21
+    optionalDependencies:
+      typescript: 6.0.3
+
+  '@tmagic/vue-runtime-help@2.0.2(@tmagic/core@1.8.0-beta.0(typescript@6.0.3))(@tmagic/stage@1.8.0-beta.0(@tmagic/core@1.8.0-beta.0(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))':
     dependencies:
       vue: 3.5.34(typescript@6.0.3)
     optionalDependencies:
-      '@tmagic/core': 1.7.14-beta.3(typescript@6.0.3)
-      '@tmagic/stage': 1.7.14-beta.3(@tmagic/core@1.7.14-beta.3(typescript@6.0.3))(typescript@6.0.3)
+      '@tmagic/core': 1.8.0-beta.0(typescript@6.0.3)
+      '@tmagic/stage': 1.8.0-beta.0(@tmagic/core@1.8.0-beta.0(typescript@6.0.3))(typescript@6.0.3)
       typescript: 6.0.3
 
   '@tybys/wasm-util@0.10.1':
