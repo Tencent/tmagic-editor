@@ -5,7 +5,7 @@
     <TMagicScrollbar>
       <MForm
         ref="configForm"
-        :class="propsPanelSize"
+        :class="[propsPanelSize, 'm-editor-props-form-panel-form']"
         :popper-class="`m-editor-props-panel-popper ${propsPanelSize}`"
         :label-width="labelWidth"
         :label-position="labelPosition"

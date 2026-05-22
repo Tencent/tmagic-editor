@@ -25,26 +25,6 @@
         right: calc(15px + var(--props-style-panel-width));
       }
     }
-
-    .tmagic-design-form {
-      padding-right: 10px;
-      padding-left: 10px;
-
-      > .m-container-tab {
-        > .tmagic-design-tabs {
-          > .el-tabs__content {
-            padding-top: 55px;
-          }
-          > .el-tabs__header.is-top {
-            position: absolute;
-            top: 0;
-            width: 100%;
-            background: #fff;
-            z-index: 3;
-          }
-        }
-      }
-    }
   }
 
   .m-editor-props-style-panel {
@@ -137,6 +117,26 @@
     .tmagic-design-table {
       th {
         font-size: 12px;
+      }
+    }
+  }
+}
+
+.m-editor-props-form-panel-form {
+  padding-right: 10px;
+  padding-left: 10px;
+
+  > .m-container-tab {
+    > .tmagic-design-tabs {
+      > .el-tabs__content {
+        padding-top: 55px;
+      }
+      > .el-tabs__header.is-top {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        background: #fff;
+        z-index: 3;
       }
     }
   }
