@@ -324,11 +324,14 @@ export const fixNodePosition = (config: MNode, parent: MContainer, stage: StageC
 };
 
 // 序列化配置
+// 仅去掉对象 key 的双引号；字符串值内的 "xxx": 不应被误处理
+// serialize-javascript 在 space: 2 时，每个 key 都会出现在换行 + 空白缩进之后，
+// 因此通过 (^|\n)\s* 锚定行首缩进，避免匹配到字符串值中的 \"xxx\":
 export const serializeConfig = (config: any) =>
   serialize(config, {
     space: 2,
     unsafe: true,
-  }).replace(/"(\w+)":\s/g, '$1: ');
+  }).replace(/(^|\n)(\s*)"(\w+)":\s/g, '$1$2$3: ');
 
 export const moveItemsInContainer = (sourceIndices: number[], parent: MContainer, targetIndex: number) => {
   sourceIndices.sort((a, b) => a - b);

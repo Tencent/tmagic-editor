@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
@@ -1045,6 +1046,53 @@ describe('补充：fixNodeLeft / fixNodePosition / serializeConfig', () => {
   test('serializeConfig - 输出去掉了 key 引号', () => {
     const out = editor.serializeConfig({ a: 1 });
     expect(out).toContain('a:');
+  });
+
+  test('serializeConfig - 输出去掉了 key 引号', () => {
+    const out = editor.serializeConfig({ a: { b: 1 }});
+    expect(out).toContain('a:');
+    expect(out).toContain('b: 1');
+  });
+
+  test('serializeConfig - value中包含"x"', () => {
+    const out = editor.serializeConfig({ a: '"a": 1' });
+    expect(out).toContain('\\"a\\":');
+  });
+
+  test('serializeConfig - value中包含"x"', () => {
+    const out = editor.serializeConfig({ a: { b: '"a": 1' } });
+    expect(out).toContain('\\"a\\":');
+    expect(out).toContain('b: ');
+  });
+
+  test('serializeConfig - function', () => {
+    const out = editor.serializeConfig({
+      a: () => {
+        const b = "b";
+        switch (b) {
+          // @ts-ignore
+          case "a":
+            return 1;
+        }
+      },
+    });
+    expect(out).toContain('"a":');
+  });
+
+   test('serializeConfig - function', () => {
+    const out = editor.serializeConfig({
+      a: {
+        b: () => {
+          const b = "b";
+          switch (b) {
+            // @ts-ignore
+            case "a": return 1;
+          }
+        }
+      },
+    });
+    expect(out).toContain('"a":');
+    expect(out).toContain('b: ');
   });
 });
 
