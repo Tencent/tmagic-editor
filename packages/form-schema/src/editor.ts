@@ -1,6 +1,6 @@
 import type { DataSourceFieldType, DataSourceSchema } from '@tmagic/schema';
 
-import type { FilterFunction, FormItem, FormItemConfig, FormState, Input } from './base';
+import type { ContainerCommonConfig, FilterFunction, FormItem, FormItemConfig, FormState, Input } from './base';
 
 // #region DataSourceFieldSelectConfig
 export interface DataSourceFieldSelectConfig<T = never> extends FormItem {
@@ -178,7 +178,7 @@ export interface UISelectConfig extends FormItem {
 // #endregion UISelectConfig
 
 // #region StyleSetterConfig
-export interface StyleSetterConfig extends FormItem {
+export interface StyleSetterConfig extends ContainerCommonConfig {
   type: 'style-setter';
 }
 // #endregion StyleSetterConfig
