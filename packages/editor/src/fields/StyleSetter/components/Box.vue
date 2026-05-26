@@ -64,6 +64,8 @@ withDefaults(
     disabled?: boolean;
     size?: 'large' | 'default' | 'small';
     model: FormValue;
+    lastValues?: FormValue;
+    isCompare?: boolean;
   }>(),
   {},
 );

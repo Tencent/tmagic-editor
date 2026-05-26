@@ -13,8 +13,8 @@ vi.mock('@tmagic/form', () => ({
   defineFormItem: (cfg: any) => cfg,
   MContainer: defineComponent({
     name: 'FakeMContainer',
-    props: ['config', 'model', 'size', 'disabled'],
-    emits: ['change'],
+    props: ['config', 'model', 'lastValues', 'isCompare', 'size', 'disabled'],
+    emits: ['change', 'addDiffCount'],
     setup(props, { emit }) {
       return () =>
         h(
@@ -22,6 +22,7 @@ vi.mock('@tmagic/form', () => ({
           {
             class: 'fake-mcontainer',
             onClick: () => emit('change', 'val', { propPath: 'p' }),
+            onDblclick: () => emit('addDiffCount'),
           },
           JSON.stringify(props.config?.items?.length || 0),
         );
@@ -61,5 +62,27 @@ describe('StyleSetter/Position.vue', () => {
     const config = wrapper.findComponent({ name: 'FakeMContainer' }).props('config') as any;
     const rowItems = config.items.filter((it: any) => it.type === 'row');
     expect(rowItems[0].display()).toBe(true);
+  });
+
+  test('lastValues/isCompare 透传到 MContainer', () => {
+    const wrapper = mount(Position, {
+      props: {
+        values: { position: 'absolute' },
+        lastValues: { position: 'static' },
+        isCompare: true,
+      } as any,
+    });
+    const container = wrapper.findComponent({ name: 'FakeMContainer' });
+    expect(container.props('lastValues')).toEqual({ position: 'static' });
+    expect(container.props('isCompare')).toBe(true);
+  });
+
+  test('MContainer 的 addDiffCount 事件向上冒泡', async () => {
+    const wrapper = mount(Position, {
+      props: { values: { position: 'absolute' } } as any,
+    });
+    await wrapper.find('.fake-mcontainer').trigger('dblclick');
+    expect(wrapper.emitted('addDiffCount')).toBeTruthy();
+    expect(wrapper.emitted('addDiffCount')?.length).toBe(1);
   });
 });

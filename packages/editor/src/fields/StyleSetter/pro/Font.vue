@@ -1,5 +1,14 @@
 <template>
-  <MContainer :config="config" :model="values" :size="size" :disabled="disabled" @change="change"></MContainer>
+  <MContainer
+    :config="config"
+    :model="values"
+    :last-values="lastValues"
+    :is-compare="isCompare"
+    :size="size"
+    :disabled="disabled"
+    @change="change"
+    @add-diff-count="onAddDiffCount"
+  ></MContainer>
 </template>
 
 <script lang="ts" setup>
@@ -12,12 +21,15 @@ import { AlignCenter, AlignLeft, AlignRight } from '../icons/text-align';
 
 defineProps<{
   values: Partial<StyleSchema>;
+  lastValues?: Partial<StyleSchema>;
+  isCompare?: boolean;
   disabled?: boolean;
   size?: 'large' | 'default' | 'small';
 }>();
 
 const emit = defineEmits<{
   change: [v: StyleSchema, eventData: ContainerChangeEventData];
+  addDiffCount: [];
 }>();
 
 const config = defineFormItem({
@@ -91,4 +103,6 @@ const config = defineFormItem({
 const change = (value: StyleSchema, eventData: ContainerChangeEventData) => {
   emit('change', value, eventData);
 };
+
+const onAddDiffCount = () => emit('addDiffCount');
 </script>

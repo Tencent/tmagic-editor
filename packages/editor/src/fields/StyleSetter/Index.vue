@@ -7,9 +7,12 @@
           v-if="item.component"
           :is="item.component"
           :values="model[name]"
+          :last-values="lastValues?.[name]"
+          :is-compare="isCompare"
           :size="size"
           :disabled="disabled"
           @change="change"
+          @add-diff-count="onAddDiffCount"
         ></component>
       </TMagicCollapseItem>
     </template>
@@ -36,6 +39,7 @@ const props = defineProps<FieldProps<StyleSchema>>();
 
 const emit = defineEmits<{
   change: [v: any, eventData: ContainerChangeEventData];
+  addDiffCount: [];
 }>();
 
 const list = [
@@ -82,4 +86,6 @@ const change = (v: any, eventData: ContainerChangeEventData) => {
   });
   emit('change', v, eventData);
 };
+
+const onAddDiffCount = () => emit('addDiffCount');
 </script>

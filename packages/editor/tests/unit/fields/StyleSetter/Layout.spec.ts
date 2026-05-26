@@ -13,8 +13,8 @@ vi.mock('@tmagic/form', () => ({
   defineFormItem: (cfg: any) => cfg,
   MContainer: defineComponent({
     name: 'FakeMContainer',
-    props: ['config', 'model', 'size', 'disabled'],
-    emits: ['change'],
+    props: ['config', 'model', 'lastValues', 'isCompare', 'size', 'disabled'],
+    emits: ['change', 'addDiffCount'],
     setup(_p, { emit }) {
       return () =>
         h(
@@ -22,6 +22,7 @@ vi.mock('@tmagic/form', () => ({
           {
             class: 'fake-mcontainer',
             onClick: () => emit('change', 'val', { propPath: 'p' }),
+            onDblclick: () => emit('addDiffCount'),
           },
           'mc',
         );
@@ -32,7 +33,7 @@ vi.mock('@tmagic/form', () => ({
 vi.mock('@editor/fields/StyleSetter/components/Box.vue', () => ({
   default: defineComponent({
     name: 'FakeBox',
-    props: ['model', 'size', 'disabled'],
+    props: ['model', 'lastValues', 'isCompare', 'size', 'disabled'],
     emits: ['change'],
     setup(_p, { emit }) {
       return () =>
@@ -109,5 +110,40 @@ describe('StyleSetter/Layout.vue', () => {
     const displayItem = config.items.find((it: any) => it.name === 'display');
     const values = displayItem.options.map((o: any) => o.value);
     expect(values).toEqual(['inline', 'flex', 'block', 'inline-block', 'none']);
+  });
+
+  test('lastValues/isCompare 透传到 MContainer 与 Box', () => {
+    const wrapper = mount(Layout, {
+      props: {
+        values: { position: 'static', display: 'flex' },
+        lastValues: { position: 'relative', display: 'block' },
+        isCompare: true,
+      } as any,
+    });
+    const container = wrapper.findComponent({ name: 'FakeMContainer' });
+    expect(container.props('lastValues')).toEqual({ position: 'relative', display: 'block' });
+    expect(container.props('isCompare')).toBe(true);
+    const box = wrapper.findComponent({ name: 'FakeBox' });
+    expect(box.props('lastValues')).toEqual({ position: 'relative', display: 'block' });
+    expect(box.props('isCompare')).toBe(true);
+  });
+
+  test('未传 lastValues 时为 undefined / isCompare 默认 false', () => {
+    const wrapper = mount(Layout, {
+      props: { values: { position: 'static', display: 'flex' } } as any,
+    });
+    const container = wrapper.findComponent({ name: 'FakeMContainer' });
+    expect(container.props('lastValues')).toBeUndefined();
+    // Boolean 类型 prop 未传时 Vue 默认为 false
+    expect(container.props('isCompare')).toBe(false);
+  });
+
+  test('MContainer 的 addDiffCount 事件向上冒泡', async () => {
+    const wrapper = mount(Layout, {
+      props: { values: { position: 'static', display: 'flex' } } as any,
+    });
+    await wrapper.find('.fake-mcontainer').trigger('dblclick');
+    expect(wrapper.emitted('addDiffCount')).toBeTruthy();
+    expect(wrapper.emitted('addDiffCount')?.length).toBe(1);
   });
 });

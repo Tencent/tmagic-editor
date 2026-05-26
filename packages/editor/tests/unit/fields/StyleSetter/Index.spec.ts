@@ -34,13 +34,14 @@ vi.mock('@editor/fields/StyleSetter/pro/index', () => {
   const make = (name: string) =>
     defineComponent({
       name,
-      props: ['values', 'size', 'disabled'],
-      emits: ['change'],
+      props: ['values', 'lastValues', 'isCompare', 'size', 'disabled'],
+      emits: ['change', 'addDiffCount'],
       setup(_p, { emit }) {
         return () =>
           h('div', {
             class: name,
             onClick: () => emit('change', { foo: 1 }, { changeRecords: [{ propPath: 'foo', value: 1 }] }),
+            onDblclick: () => emit('addDiffCount'),
           });
       },
     });
@@ -130,5 +131,48 @@ describe('StyleSetter Index', () => {
     expect(layout.props('values')).toEqual({ color: 'red' });
     expect(layout.props('size')).toBe('small');
     expect(layout.props('disabled')).toBe(true);
+  });
+
+  test('lastValues/isCompare 正确透传到子组件', () => {
+    const wrapper = mount(StyleSetter, {
+      props: {
+        model: { style: { color: 'red' } },
+        lastValues: { style: { color: 'blue' } },
+        isCompare: true,
+        name: 'style',
+        prop: 'style',
+      } as any,
+    });
+    const layout = wrapper.findComponent({ name: 'Layout' });
+    expect(layout.props('lastValues')).toEqual({ color: 'blue' });
+    expect(layout.props('isCompare')).toBe(true);
+  });
+
+  test('lastValues 为空时透传 undefined / isCompare 默认 false', () => {
+    const wrapper = mount(StyleSetter, {
+      props: { model: { style: {} }, name: 'style', prop: 'style' } as any,
+    });
+    const layout = wrapper.findComponent({ name: 'Layout' });
+    expect(layout.props('lastValues')).toBeUndefined();
+    // Boolean 类型 prop 未传时 Vue 默认为 false
+    expect(layout.props('isCompare')).toBe(false);
+  });
+
+  test('子组件 addDiffCount 事件向上冒泡', async () => {
+    const wrapper = mount(StyleSetter, {
+      props: {
+        model: { style: {} },
+        lastValues: { style: {} },
+        isCompare: true,
+        name: 'style',
+        prop: 'style',
+      } as any,
+    });
+    await wrapper.find('.Layout').trigger('dblclick');
+    expect(wrapper.emitted('addDiffCount')).toBeTruthy();
+    expect(wrapper.emitted('addDiffCount')?.length).toBe(1);
+
+    await wrapper.find('.Background').trigger('dblclick');
+    expect(wrapper.emitted('addDiffCount')?.length).toBe(2);
   });
 });

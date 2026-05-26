@@ -17,8 +17,8 @@ vi.mock('@tmagic/form', () => ({
   defineFormItem: (cfg: any) => cfg,
   MContainer: defineComponent({
     name: 'MContainer',
-    props: ['config', 'model', 'size', 'disabled'],
-    emits: ['change'],
+    props: ['config', 'model', 'lastValues', 'isCompare', 'size', 'disabled'],
+    emits: ['change', 'addDiffCount'],
     setup() {
       return () => h('div', { class: 'm-container' });
     },
@@ -28,7 +28,7 @@ vi.mock('@tmagic/form', () => ({
 vi.mock('@editor/fields/StyleSetter/components/Box.vue', () => ({
   default: defineComponent({
     name: 'StyleBox',
-    props: ['model', 'size', 'disabled'],
+    props: ['model', 'lastValues', 'isCompare', 'size', 'disabled'],
     emits: ['change'],
     setup() {
       return () => h('div', { class: 'fake-box' });
@@ -39,8 +39,8 @@ vi.mock('@editor/fields/StyleSetter/components/Box.vue', () => ({
 vi.mock('@editor/fields/StyleSetter/components/Border.vue', () => ({
   default: defineComponent({
     name: 'StyleBorder',
-    props: ['model', 'size', 'disabled'],
-    emits: ['change'],
+    props: ['model', 'lastValues', 'isCompare', 'size', 'disabled'],
+    emits: ['change', 'addDiffCount'],
     setup() {
       return () => h('div', { class: 'fake-border' });
     },
@@ -87,5 +87,67 @@ describe('StyleSetter pro 组件', () => {
   test('BorderPro 渲染 Border 子组件', () => {
     const wrapper = mount(BorderPro, { props: { values: {} } });
     expect(wrapper.find('.fake-border').exists()).toBe(true);
+  });
+
+  test.each([
+    ['Background', Background],
+    ['BorderPro', BorderPro],
+    ['Font', Font],
+    ['Layout', Layout],
+    ['Transform', Transform],
+  ])('%s 透传 lastValues/isCompare 给 MContainer', (_name, comp) => {
+    const wrapper = mount(comp as any, {
+      props: {
+        values: { color: 'red' },
+        lastValues: { color: 'blue' },
+        isCompare: true,
+      },
+    });
+    const container = wrapper.findComponent({ name: 'MContainer' });
+    expect(container.props('lastValues')).toEqual({ color: 'blue' });
+    expect(container.props('isCompare')).toBe(true);
+  });
+
+  test.each([
+    ['Background', Background],
+    ['BorderPro', BorderPro],
+    ['Font', Font],
+    ['Layout', Layout],
+    ['Transform', Transform],
+  ])('%s 冒泡 MContainer 的 addDiffCount 事件', (_name, comp) => {
+    const wrapper = mount(comp as any, { props: { values: {} } });
+    const container = wrapper.findComponent({ name: 'MContainer' });
+    container.vm.$emit('addDiffCount');
+    expect(wrapper.emitted('addDiffCount')).toBeTruthy();
+    expect(wrapper.emitted('addDiffCount')?.length).toBe(1);
+  });
+
+  test('Layout 透传 lastValues/isCompare 给 Box', () => {
+    const wrapper = mount(Layout, {
+      props: {
+        values: { position: 'static' } as any,
+        lastValues: { position: 'static' } as any,
+        isCompare: true,
+      },
+    });
+    const box = wrapper.findComponent({ name: 'StyleBox' });
+    expect(box.props('lastValues')).toEqual({ position: 'static' });
+    expect(box.props('isCompare')).toBe(true);
+  });
+
+  test('BorderPro 透传 lastValues/isCompare 给 Border 子组件，并冒泡其 addDiffCount', () => {
+    const wrapper = mount(BorderPro, {
+      props: {
+        values: { borderRadius: '4px' } as any,
+        lastValues: { borderRadius: '2px' } as any,
+        isCompare: true,
+      },
+    });
+    const border = wrapper.findComponent({ name: 'StyleBorder' });
+    expect(border.props('lastValues')).toEqual({ borderRadius: '2px' });
+    expect(border.props('isCompare')).toBe(true);
+
+    border.vm.$emit('addDiffCount');
+    expect(wrapper.emitted('addDiffCount')).toBeTruthy();
   });
 });

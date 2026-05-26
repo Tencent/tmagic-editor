@@ -13,8 +13,8 @@ vi.mock('@tmagic/form', () => ({
   defineFormItem: (cfg: any) => cfg,
   MContainer: defineComponent({
     name: 'MContainer',
-    props: ['config', 'model', 'size', 'disabled'],
-    emits: ['change'],
+    props: ['config', 'model', 'lastValues', 'isCompare', 'size', 'disabled'],
+    emits: ['change', 'addDiffCount'],
     setup(_props, { expose }) {
       expose({ trigger: () => null });
       return () => h('div', { class: 'm-container' });
@@ -60,5 +60,26 @@ describe('StyleSetter Border', () => {
     expect(wrapper.find('.border-icon-left').classes()).toContain('active');
     await wrapper.find('.border-icon-right').trigger('click');
     expect(wrapper.find('.border-icon-right').classes()).toContain('active');
+  });
+
+  test('lastValues/isCompare 透传到 MContainer', () => {
+    const wrapper = mount(Border, {
+      props: {
+        model: { borderWidth: '2px' },
+        lastValues: { borderWidth: '1px' },
+        isCompare: true,
+      } as any,
+    });
+    const container = wrapper.findComponent({ name: 'MContainer' });
+    expect(container.props('lastValues')).toEqual({ borderWidth: '1px' });
+    expect(container.props('isCompare')).toBe(true);
+  });
+
+  test('MContainer 的 addDiffCount 事件向上冒泡', () => {
+    const wrapper = mount(Border, { props: { model: {} } });
+    const container = wrapper.findComponent({ name: 'MContainer' });
+    container.vm.$emit('addDiffCount');
+    expect(wrapper.emitted('addDiffCount')).toBeTruthy();
+    expect(wrapper.emitted('addDiffCount')?.length).toBe(1);
   });
 });

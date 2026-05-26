@@ -30,7 +30,16 @@
       </div>
     </div>
     <div class="border-value-container">
-      <MContainer :config="config" :model="model" :size="size" :disabled="disabled" @change="change"></MContainer>
+      <MContainer
+        :config="config"
+        :model="model"
+        :last-values="lastValues"
+        :is-compare="isCompare"
+        :size="size"
+        :disabled="disabled"
+        @change="change"
+        @add-diff-count="onAddDiffCount"
+      ></MContainer>
     </div>
   </div>
 </template>
@@ -86,11 +95,14 @@ const selectDirection = (d?: string) => (direction.value = d || '');
 
 const emit = defineEmits<{
   change: [v: StyleSchema, eventData: ContainerChangeEventData];
+  addDiffCount: [];
 }>();
 
 withDefaults(
   defineProps<{
     model: FormValue;
+    lastValues?: FormValue;
+    isCompare?: boolean;
     disabled?: boolean;
     size?: 'large' | 'default' | 'small';
   }>(),
@@ -104,4 +116,6 @@ const change = (value: StyleSchema, eventData: ContainerChangeEventData) => {
     });
   });
 };
+
+const onAddDiffCount = () => emit('addDiffCount');
 </script>
