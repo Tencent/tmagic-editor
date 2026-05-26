@@ -92,14 +92,45 @@ const fields = new Map<string, any>();
 
 const requestFuc = getConfig('request') as Function;
 
+/**
+ * formState 实现说明：
+ *
+ * 1. 与 props 直接对应的字段（config / initValues / lastValues / isCompare / parentValues /
+ *    keyProp / popperClass）使用「访问器（getter）」定义，每次读取都会回到 `props.xxx`
+ *    取最新值，不存在「props 变了但 formState 还没同步过来」的中间态。
+ *
+ * 2. `values` / `lastValuesProcessed` 是 ref，Vue 的 `reactive` 会自动解包，因此每次
+ *    访问 `formState.values` / `formState.lastValuesProcessed` 也都是当前 ref 值。
+ *
+ * 3. `extendState` 注入的字段在下方的 `watchEffect` 中合并到 `formState`：
+ *    - data 描述符（普通字段）通过 `formState[key] = value` 写入，走 reactive proxy 的
+ *      set，触发依赖通知；`extendState` 同步段读到的响应式数据变化时会自动重跑，
+ *      把最新值刷进 formState。
+ *    - accessor 描述符（`{ get stage() { return ... } }`）按原样写入，调用方可以控制
+ *      读时求值，每次读取都会重新执行 getter。
+ */
 const formState: FormState = reactive<FormState>({
-  keyProp: props.keyProp,
-  popperClass: props.popperClass,
-  config: props.config,
-  initValues: props.initValues,
-  isCompare: props.isCompare,
-  lastValues: props.lastValues,
-  parentValues: props.parentValues,
+  get keyProp() {
+    return props.keyProp;
+  },
+  get popperClass() {
+    return props.popperClass;
+  },
+  get config() {
+    return props.config;
+  },
+  get initValues() {
+    return props.initValues;
+  },
+  get isCompare() {
+    return props.isCompare;
+  },
+  get lastValues() {
+    return props.lastValues;
+  },
+  get parentValues() {
+    return props.parentValues;
+  },
   values,
   lastValuesProcessed,
   $emit: emit as (_event: string, ..._args: any[]) => void,
@@ -119,20 +150,52 @@ const formState: FormState = reactive<FormState>({
   },
 });
 
-watchEffect(async () => {
-  formState.initValues = props.initValues;
-  formState.lastValues = props.lastValues;
-  formState.isCompare = props.isCompare;
-  formState.config = props.config;
-  formState.keyProp = props.keyProp;
-  formState.popperClass = props.popperClass;
-  formState.parentValues = props.parentValues;
+/**
+ * `extendState` 的同步段（直到第一个 `await` 之前）所访问的任何响应式数据，
+ * 都会被 `watchEffect` 自动跟踪。这样可以兼容历史用法 ——
+ *
+ *   extendState: (formState) => ({
+ *     username: store.username,   // 同步读 store，会被跟踪
+ *     env: store.env,
+ *   })
+ *
+ * 当 `store.username` 变化时，整个 effect 重跑，新值会被刷进 `formState`。
+ *
+ * prop 派生字段（initValues / config / ...）已经在上方用 getter 定义，
+ * 这里不再重复同步；因此 `props.initValues` 这类高频变化也不会再触发
+ * `extendState` 重跑（旧版的性能问题修复点）。
+ *
+ * 实现细节：
+ * - data 描述符：通过 `formState[key] = value` 走 reactive proxy 的 set，
+ *   触发依赖通知；与旧版「逐项赋值」语义完全等价。
+ * - accessor 描述符（`{ get stage() {...} }`）按原样写入 formState，调用方
+ *   可以自行控制读时求值；强制 `configurable: true` 以便下一次重跑可再 define。
+ */
+watchEffect(async (onCleanup) => {
+  const { extendState } = props;
+  if (typeof extendState !== 'function') return;
 
-  if (typeof props.extendState === 'function') {
-    const state = (await props.extendState(formState)) || {};
-    Object.entries(state).forEach(([key, value]) => {
-      formState[key] = value;
-    });
+  let stale = false;
+  onCleanup(() => {
+    stale = true;
+  });
+
+  let state: Record<string, any> = {};
+  try {
+    state = (await extendState(formState)) || {};
+  } catch (e) {
+    console.error('[MForm] extendState failed:', e);
+    return;
+  }
+  if (stale) return;
+
+  for (const [key, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(state))) {
+    if ('value' in descriptor) {
+      (formState as any)[key] = (state as any)[key];
+    } else {
+      descriptor.configurable = true;
+      Object.defineProperty(formState, key, descriptor);
+    }
   }
 });
 
