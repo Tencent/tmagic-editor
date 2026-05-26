@@ -242,4 +242,64 @@ describe('DataSourceFieldSelect Index', () => {
     });
     expect(wrapper.findAll('.fake-cascader').length).toBeGreaterThan(0);
   });
+
+  test('disabled 为 true 时切换按钮被禁用，点击不切换 showDataSourceFieldSelect', async () => {
+    const wrapper = mount(DSFSIndex, {
+      props: {
+        config: { fieldConfig: { type: 'text' } },
+        model: { v: [] },
+        name: 'v',
+        disabled: true,
+      } as any,
+    });
+
+    const toggleBtn = wrapper.find('.fake-btn');
+    expect((toggleBtn.element as HTMLButtonElement).hasAttribute('disabled')).toBe(true);
+
+    // 点击不应切换显示 FieldSelect
+    await toggleBtn.trigger('click');
+    expect(wrapper.findAll('.fake-cascader').length).toBe(0);
+  });
+
+  test('对比模式（mForm.isCompare=true）下切换按钮被禁用，点击不切换 showDataSourceFieldSelect', async () => {
+    const wrapper = mount(DSFSIndex, {
+      props: {
+        config: { fieldConfig: { type: 'text' } },
+        model: { v: [] },
+        name: 'v',
+      } as any,
+      global: {
+        provide: {
+          mForm: { isCompare: true },
+        },
+      },
+    });
+
+    const toggleBtn = wrapper.find('.fake-btn');
+    expect((toggleBtn.element as HTMLButtonElement).hasAttribute('disabled')).toBe(true);
+
+    await toggleBtn.trigger('click');
+    expect(wrapper.findAll('.fake-cascader').length).toBe(0);
+  });
+
+  test('非对比模式且未 disabled 时按钮可用，点击可切换', async () => {
+    const wrapper = mount(DSFSIndex, {
+      props: {
+        config: { fieldConfig: { type: 'text' } },
+        model: { v: [] },
+        name: 'v',
+      } as any,
+      global: {
+        provide: {
+          mForm: { isCompare: false },
+        },
+      },
+    });
+
+    const toggleBtn = wrapper.find('.fake-btn');
+    expect((toggleBtn.element as HTMLButtonElement).hasAttribute('disabled')).toBe(false);
+
+    await toggleBtn.trigger('click');
+    expect(wrapper.findAll('.fake-cascader').length).toBeGreaterThan(0);
+  });
 });

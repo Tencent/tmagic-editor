@@ -35,7 +35,8 @@
       <TMagicButton
         :type="showDataSourceFieldSelect ? 'primary' : 'default'"
         :size="size"
-        @click="showDataSourceFieldSelect = !showDataSourceFieldSelect"
+        :disabled="disabled || mForm?.isCompare"
+        @click="onToggleDataSourceFieldSelectHandler"
         ><MIcon :icon="Coin"></MIcon
       ></TMagicButton>
     </TMagicTooltip>
@@ -184,5 +185,11 @@ const onChangeHandler = (value: string[], eventData?: ContainerChangeEventData) 
     tMagicMessage.error(`请选择类型为${dataSourceFieldType.join('或')}的字段`);
     emit('change', [dsId], eventData);
   }
+};
+
+const onToggleDataSourceFieldSelectHandler = () => {
+  // 禁用或对比模式下禁止切换
+  if (props.disabled || mForm?.isCompare) return;
+  showDataSourceFieldSelect.value = !showDataSourceFieldSelect.value;
 };
 </script>
