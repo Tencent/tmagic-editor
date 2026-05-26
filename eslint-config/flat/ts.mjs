@@ -350,6 +350,43 @@ export default {
       },
     ],
     /**
+     * 禁止匿名 default class / default function 导出
+     * @reason 匿名 default 导出在 dts 聚合（rolldown / api-extractor / vue-tsc 等）时会被命名为
+     * `export_default`，导致跨包继承链在 .vue / .tsx 文件下解析失败，
+     * 父类成员（如 EventEmitter 的 on/off）无法被 ts-plugin 推断出来。
+     * 必须使用具名形式：先 `export class Foo {}` 再 `export default Foo;`，
+     * 或 `export default class Foo {}`，确保类型聚合后保留原标识符。
+     *
+     * 注：此处需要重申 base.mjs 中已有的 no-restricted-syntax 选择器
+     * （ForIn / Labeled / With），否则在 .ts/.tsx 下会被本规则整体覆盖。
+     */
+    'no-restricted-syntax': [
+      'error',
+      {
+        selector: 'ExportDefaultDeclaration > ClassDeclaration[id=null]',
+        message:
+          '禁止匿名 default class 导出。请改为具名形式（如 `export default class Foo extends Bar {}`），否则聚合 dts 会丢失类型信息，导致跨包继承的成员（on/off/emit 等）无法被推断。',
+      },
+      {
+        selector: 'ExportDefaultDeclaration > FunctionDeclaration[id=null]',
+        message:
+          '禁止匿名 default function 导出。请改为具名形式（如 `export default function foo() {}`），便于 dts 聚合保留原标识符与跨包类型推断。',
+      },
+      {
+        selector: 'ForInStatement',
+        message:
+          'for..in loops iterate over the entire prototype chain, which is virtually never what you want. Use Object.{keys,values,entries}, and iterate over the resulting array.',
+      },
+      {
+        selector: 'LabeledStatement',
+        message: 'Labels are a form of GOTO; using them makes code confusing and hard to maintain and understand.',
+      },
+      {
+        selector: 'WithStatement',
+        message: '`with` is disallowed in strict mode because it makes code impossible to predict and optimize.',
+      },
+    ],
+    /**
      * 在类型注释周围需要一致的间距
      */
     '@stylistic/ts/type-annotation-spacing': 'error',
