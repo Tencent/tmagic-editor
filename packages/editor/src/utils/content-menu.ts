@@ -1,7 +1,7 @@
 import { computed, markRaw, type ShallowRef } from 'vue';
 import { CopyDocument, Delete, DocumentCopy } from '@element-plus/icons-vue';
 
-import { Id, MContainer, NodeType } from '@tmagic/core';
+import { cloneDeep, Id, MContainer, NodeType } from '@tmagic/core';
 import { calcValueByFontsize, isPage, isPageFragment } from '@tmagic/utils';
 
 import ContentMenu from '@editor/components/ContentMenu.vue';
@@ -59,14 +59,19 @@ export const usePasteMenu = (menu?: ShallowRef<InstanceType<typeof ContentMenu> 
   },
 });
 
-const moveTo = (id: Id, { editorService }: Services) => {
+const moveTo = async (id: Id, { editorService }: Services) => {
   const nodes = editorService.get('nodes') || [];
   const parent = editorService.getNodeById(id) as MContainer;
 
   if (!parent) return;
+  const newNodes = cloneDeep(nodes);
 
-  editorService.add(nodes, parent);
-  editorService.remove(nodes);
+  await editorService.remove(nodes);
+
+  await editorService.add(newNodes, parent, {
+    doNotSelect: true,
+    doNotSwitchPage: true,
+  });
 };
 
 export const useMoveToMenu = ({ editorService }: Services): MenuButton => {
