@@ -154,13 +154,12 @@ describe('content-menu utils', () => {
         if (k === 'nodes') return [{ id: 'btn' }];
         return undefined;
       },
-      add: vi.fn(),
-      remove: vi.fn(),
+      moveToContainer: vi.fn(),
       getNodeById: () => null,
     };
     const m = useMoveToMenu({ editorService } as any);
     (m as any).items[0].handler({ editorService });
-    expect(editorService.add).not.toHaveBeenCalled();
+    expect(editorService.moveToContainer).not.toHaveBeenCalled();
   });
 
   test('useMoveToMenu - root 为空时 items 为空数组', () => {
@@ -191,15 +190,18 @@ describe('content-menu utils', () => {
         if (k === 'nodes') return [{ id: 'btn' }];
         return undefined;
       },
-      add: vi.fn(),
-      remove: vi.fn(),
+      moveToContainer: vi.fn(),
       getNodeById: (id: string) => ({ id, items: [] }),
     };
     const m = useMoveToMenu({ editorService } as any);
     expect((m as any).items).toHaveLength(1);
     expect((m as any).items[0].text).toContain('P2');
     (m as any).items[0].handler({ editorService });
-    expect(editorService.add).toHaveBeenCalled();
-    expect(editorService.remove).toHaveBeenCalled();
+    // 移动至 目标页：直接走 moveToContainer 单次调用，整批只产生一条历史
+    expect(editorService.moveToContainer).toHaveBeenCalledTimes(1);
+    const callArgs = (editorService.moveToContainer as any).mock.calls[0];
+    expect(Array.isArray(callArgs[0])).toBe(true);
+    expect(callArgs[0][0].id).toBe('btn');
+    expect(callArgs[1]).toBe('p2');
   });
 });

@@ -18,7 +18,7 @@
 
 import { reactive } from 'vue';
 
-import type { MPage, MPageFragment } from '@tmagic/core';
+import type { Id, MPage, MPageFragment } from '@tmagic/core';
 
 import type { HistoryState, StepValue } from '@editor/type';
 import { UndoRedo } from '@editor/utils/undo-redo';
@@ -71,11 +71,20 @@ class History extends BaseService {
     this.state.canUndo = false;
   }
 
-  public push(state: StepValue): StepValue | null {
-    const undoRedo = this.getUndoRedo();
+  /**
+   * 把一条步骤推入指定页面的栈；不指定 pageId 时落到当前活动页。
+   *
+   * 跨页操作（例如 `moveToContainer` 把节点搬到其它页）必须显式传入 `pageId`，
+   * 否则会把记录错误地落到操作发起页 / 当前激活页，破坏目标页 / 源页的撤销栈语义。
+   */
+  public push(state: StepValue, pageId?: Id): StepValue | null {
+    const undoRedo = this.getUndoRedo(pageId);
     if (!undoRedo) return null;
     undoRedo.pushElement(state);
-    this.emit('change', state);
+    // 仅当推入的是当前活动页时才需要刷新 canUndo/canRedo —— 其它页栈对当前 UI 状态没影响。
+    if (pageId === undefined || `${pageId}` === `${this.state.pageId}`) {
+      this.emit('change', state);
+    }
     return state;
   }
 
@@ -101,9 +110,19 @@ class History extends BaseService {
     this.removeAllPlugins();
   }
 
-  private getUndoRedo() {
-    if (!this.state.pageId) return null;
-    return this.state.pageSteps[this.state.pageId];
+  /**
+   * 取出指定页面的栈；不传 pageId 时按当前活动页取。
+   *
+   * 跨页 push 时如果目标页的栈尚不存在（用户从未进入过该页），会按需创建一条空栈，
+   * 这样切到目标页时 Ctrl+Z 也能撤回该步骤。
+   */
+  private getUndoRedo(pageId?: Id) {
+    const targetPageId = pageId ?? this.state.pageId;
+    if (!targetPageId) return null;
+    if (!this.state.pageSteps[targetPageId]) {
+      this.state.pageSteps[targetPageId] = new UndoRedo<StepValue>();
+    }
+    return this.state.pageSteps[targetPageId];
   }
 
   private setCanUndoRedo(): void {

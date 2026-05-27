@@ -56,4 +56,32 @@ describe('history service', () => {
     history.changePage(null as any);
     expect(history.state.pageId).toBeUndefined();
   });
+
+  test('push 指定 pageId 落到目标页栈，不影响当前页', () => {
+    // 当前激活在 p1
+    history.changePage({ id: 'p1' } as any);
+    const step = { data: { id: 'p2', name: '' }, modifiedNodeIds: new Map() } as any;
+
+    // 跨页 push：把记录推到 p2（目标页），p1 栈应保持为空
+    history.push(step, 'p2');
+    expect((history.state.pageSteps as any).p2).toBeDefined();
+    expect((history.state.pageSteps as any).p2.canUndo()).toBe(true);
+    // p1 栈虽然激活但没有 push 进来，仍不可撤销
+    expect((history.state.pageSteps as any).p1.canUndo()).toBe(false);
+
+    // 跨页 push 不应触发当前页（p1）的 canUndo 改变
+    expect(history.state.canUndo).toBe(false);
+
+    // 切到 p2 后能正常 undo 该跨页步骤
+    history.changePage({ id: 'p2' } as any);
+    expect(history.state.canUndo).toBe(true);
+    expect(history.undo()).toBeDefined();
+  });
+
+  test('push 不传 pageId 时落到当前活动页栈（向后兼容）', () => {
+    history.changePage({ id: 'p1' } as any);
+    history.push({ data: { id: 'p1', name: '' }, modifiedNodeIds: new Map() } as any);
+    expect((history.state.pageSteps as any).p1.canUndo()).toBe(true);
+    expect(history.state.canUndo).toBe(true);
+  });
 });

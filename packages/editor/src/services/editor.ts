@@ -66,6 +66,8 @@ import type { HistoryOpContext } from '@editor/utils/editor-history';
 import { applyHistoryAddOp, applyHistoryRemoveOp, applyHistoryUpdateOp } from '@editor/utils/editor-history';
 import { beforePaste, getAddParent } from '@editor/utils/operator';
 
+type MoveItem = { cfg: MNode; node: MNode; parent: MContainer; pageForOp: { name: string; id: Id } | null };
+
 class Editor extends BaseService {
   public state: StoreState = reactive({
     root: null,
@@ -892,37 +894,76 @@ class Editor extends BaseService {
   }
 
   /**
-   * 移动到指定容器中
-   * @param config 需要移动的节点
+   * 移动一个或多个节点到指定容器中。
+   *
+   * 多选场景（config 是数组）只会产生一条历史记录，
+   * `updatedItems` 涵盖所有源父容器 + 目标容器的前后快照。
+   * 这避免了"多选移动到某容器"在历史栈里被切成 N 条记录。
+   *
+   * @param config 需要移动的节点（或节点数组，各项需带 id；style 等字段会与原节点合并）
    * @param targetId 容器ID
    * @param options 可选配置
    * @param options.doNotSelect 移动后是否不更新当前选中节点（默认 false）
    * @param options.doNotSwitchPage 移动后是否不切换当前页面（默认 false；目标容器位于其它页面时为 true 会跳过自动选中以避免页面切换）
    */
   public async moveToContainer(
-    config: MNode,
+    config: MNode | MNode[],
     targetId: Id,
     { doNotSelect = false, doNotSwitchPage = false }: DslOpOptions = {},
-  ): Promise<MNode | undefined> {
+  ): Promise<MNode | MNode[]> {
+    const isBatch = Array.isArray(config);
+    const configs = (isBatch ? config : [config]).filter((item) => !(isPage(item) || isPageFragment(item)));
+
+    if (configs.length === 0) {
+      throw new Error('没有可移动的节点');
+    }
+
     this.captureSelectionBeforeOp();
 
-    const root = this.get('root');
-    const { node, parent, page: pageForOp } = this.getNodeInfo(config.id, false);
     const target = this.getNodeById(targetId, false) as MContainer;
 
-    const stage = this.get('stage');
-    if (root && node && parent && stage) {
-      const oldSourceParent = cloneDeep(toRaw(parent));
-      const oldTarget = cloneDeep(toRaw(target));
+    if (!target) {
+      throw new Error('目标容器不存在');
+    }
 
+    const root = this.get('root');
+    const stage = this.get('stage');
+
+    if (!root || !stage) {
+      throw new Error('root 或 stage为空');
+    }
+
+    // 收集 (节点, 源父) 信息，过滤掉异常节点（找不到父或源父等于目标本身）
+    const moves: MoveItem[] = [];
+    for (const cfg of configs) {
+      const { node, parent, page } = this.getNodeInfo(cfg.id, false);
+      if (!node || !parent) continue;
+      moves.push({ cfg, node, parent, pageForOp: page ? { name: page.name || '', id: page.id } : null });
+    }
+
+    if (moves.length === 0) {
+      throw new Error('没有可移动的节点');
+    }
+
+    // 记录所有涉及的源父容器（按 id 去重）+ 目标容器的前置快照；同一父容器只快照一次。
+    const beforeSnapshots = new Map<Id, MNode>();
+    beforeSnapshots.set(target.id, cloneDeep(toRaw(target)));
+    for (const m of moves) {
+      if (!beforeSnapshots.has(m.parent.id)) {
+        beforeSnapshots.set(m.parent.id, cloneDeep(toRaw(m.parent)));
+      }
+    }
+
+    const layout = await this.getLayout(target);
+    const newConfigs: MNode[] = [];
+
+    for (const { cfg, node, parent } of moves) {
       const index = getNodeIndex(node.id, parent);
       parent.items?.splice(index, 1);
 
       await stage.remove({ id: node.id, parentId: parent.id, root: cloneDeep(root) });
 
-      const layout = await this.getLayout(target);
-
-      const newConfig = mergeWith(cloneDeep(node), config, (_objValue, srcValue) => {
+      const newConfig = mergeWith(cloneDeep(node), cfg, (_objValue, srcValue) => {
         if (Array.isArray(srcValue)) {
           return srcValue;
         }
@@ -930,42 +971,70 @@ class Editor extends BaseService {
       newConfig.style = getInitPositionStyle(newConfig.style, layout);
 
       target.items.push(newConfig);
+      newConfigs.push(newConfig);
 
-      // 目标容器是否在非当前页面：选中目标会触发当前页面切换
-      const targetWouldSwitchPage = this.isOnDifferentPage(target);
-      const skipSelect = doNotSelect || (doNotSwitchPage && targetWouldSwitchPage);
-
-      if (!skipSelect) {
-        await stage.select(targetId);
-      }
-
-      const targetParent = this.getParentById(target.id);
-      await stage.update({
-        config: cloneDeep(target),
-        parentId: targetParent?.id,
-        root: cloneDeep(root),
-      });
-
-      if (!skipSelect) {
-        await this.select(newConfig);
-        stage.select(newConfig.id);
-      }
-
-      this.addModifiedNodeId(target.id);
       this.addModifiedNodeId(parent.id);
-      this.pushOpHistory(
-        'update',
-        {
-          updatedItems: [
-            { oldNode: oldSourceParent, newNode: cloneDeep(toRaw(parent)) },
-            { oldNode: oldTarget, newNode: cloneDeep(toRaw(target)) },
-          ],
-        },
-        { name: pageForOp?.name || '', id: pageForOp!.id },
-      );
-
-      return newConfig;
     }
+    this.addModifiedNodeId(target.id);
+
+    // 目标容器是否在非当前页面：选中目标会触发当前页面切换
+    const targetWouldSwitchPage = this.isOnDifferentPage(target);
+    const skipSelect = doNotSelect || (doNotSwitchPage && targetWouldSwitchPage);
+
+    if (!skipSelect) {
+      await stage.select(targetId);
+    }
+
+    const targetParent = this.getParentById(target.id);
+    await stage.update({
+      config: cloneDeep(target),
+      parentId: targetParent?.id,
+      root: cloneDeep(root),
+    });
+
+    if (!skipSelect) {
+      if (newConfigs.length > 1) {
+        const ids = newConfigs.map((n) => n.id);
+        await this.multiSelect(ids);
+        stage.multiSelect(ids);
+      } else {
+        await this.select(newConfigs[0]);
+        stage.select(newConfigs[0].id);
+      }
+    } else {
+      // 跳过选中目标节点（通常是因为目标位于其它页面），但 state.nodes 仍持有已经被
+      // 从源父容器中移除的旧节点引用 —— UI 上原页面会保留一个"指向不存在节点"的选中态。
+      // 这里需要把搬走的节点从 state.nodes 中剔除：
+      // - 如果剔除后还有剩余选中（部分被搬走、部分未动），保持新的多选状态；
+      // - 如果选中节点全部已被搬走，回退到第一个源父容器（与 `doRemove` 默认在原页面选中父节点的行为一致）。
+      const movedIds = new Set(moves.map((m) => `${m.node.id}`));
+      const selectedNodes = this.get('nodes');
+      const remained = selectedNodes.filter((n: MNode) => !movedIds.has(`${n.id}`));
+      if (remained.length === selectedNodes.length) {
+        // 当前选中根本不在被搬走的列表里，无需调整
+      } else if (remained.length > 0) {
+        this.multiSelect(remained.map((n: MNode) => n.id));
+      } else {
+        // 全部被搬走：选中源父容器，避免残留旧引用。多源父时取第一个，与单选场景默认表现一致。
+        const fallbackParent = moves[0].parent;
+        try {
+          await this.select(fallbackParent);
+        } catch {
+          this.set('nodes', []);
+        }
+      }
+    }
+
+    // 整批只入栈一条历史：updatedItems 包含所有源父容器 + 目标容器的前后快照（撤销/重做最小依赖）。
+    const updatedItems = Array.from(beforeSnapshots.entries()).map(([id, oldNode]) => ({
+      oldNode,
+      newNode: cloneDeep(toRaw(this.getNodeById(id, false))) as MNode,
+    }));
+
+    const historyPage = moves[0].pageForOp ?? { name: '', id: target.id };
+    this.pushOpHistory('update', { updatedItems }, historyPage);
+
+    return isBatch ? newConfigs : newConfigs[0];
   }
 
   public async dragTo(config: MNode | MNode[], targetParent: MContainer, targetIndex: number) {
@@ -1137,7 +1206,9 @@ class Editor extends BaseService {
       modifiedNodeIds: new Map(this.get('modifiedNodeIds')),
       ...extra,
     };
-    historyService.push(step);
+    // 显式按 step.data.id 入栈：跨页操作（如 moveToContainer 从源页搬到目标页）
+    // 必须落到正确的页面栈，否则会把记录错误地推到当前活动页 / 操作发起页。
+    historyService.push(step, pageData.id);
     this.selectionBeforeOp = null;
     this.isHistoryStateChange = false;
   }

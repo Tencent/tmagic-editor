@@ -63,13 +63,11 @@ const moveTo = async (id: Id, { editorService }: Services) => {
   const nodes = editorService.get('nodes') || [];
   const parent = editorService.getNodeById(id) as MContainer;
 
-  if (!parent) return;
-  const newNodes = cloneDeep(nodes);
+  if (!parent || nodes.length === 0) return;
 
-  await editorService.remove(nodes);
-
-  await editorService.add(newNodes, parent, {
-    doNotSelect: true,
+  // 直接调用 moveToContainer：内部对多选场景已做合并，整批只产生一条历史记录。
+  // 不要再走 remove + add 两步，否则会被切成两条历史（且语义也不正确）。
+  await editorService.moveToContainer(cloneDeep(nodes), parent.id, {
     doNotSwitchPage: true,
   });
 };

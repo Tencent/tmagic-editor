@@ -163,7 +163,28 @@ describe('useStage', () => {
       parentEl: { id: 'p_x' },
       data: [{ el: { id: 'c1' }, style: { left: 1 } }],
     });
-    expect(editorService.moveToContainer).toHaveBeenCalledWith({ id: 'c1', style: { left: 1 } }, 'p_x');
+    // 单选时整批仍只调用一次 moveToContainer，传入数组形式的 configs
+    expect(editorService.moveToContainer).toHaveBeenCalledWith([{ id: 'c1', style: { left: 1 } }], 'p_x');
+  });
+
+  test('update 事件 (parentEl 存在 - 多选 moveToContainer 合并为单次调用)', () => {
+    useStage({} as any);
+    stageInstance.handlers.update[0]({
+      parentEl: { id: 'p_x' },
+      data: [
+        { el: { id: 'c1' }, style: { left: 1 } },
+        { el: { id: 'c2' }, style: { left: 2 } },
+      ],
+    });
+    // 多选拖入容器：整批合并为一次 moveToContainer 调用，避免历史栈被切成两条
+    expect(editorService.moveToContainer).toHaveBeenCalledTimes(1);
+    expect(editorService.moveToContainer).toHaveBeenCalledWith(
+      [
+        { id: 'c1', style: { left: 1 } },
+        { id: 'c2', style: { left: 2 } },
+      ],
+      'p_x',
+    );
   });
 
   test('update 事件 (无 parentEl - update)', () => {
@@ -172,6 +193,24 @@ describe('useStage', () => {
       data: [{ el: { id: 'c1' }, style: { width: 10 } }],
     });
     expect(editorService.update).toHaveBeenCalled();
+  });
+
+  test('update 事件 (无 parentEl - 多选拖动 / 缩放合并为单次 update)', () => {
+    useStage({} as any);
+    (editorService.update as any).mockClear();
+    stageInstance.handlers.update[0]({
+      data: [
+        { el: { id: 'c1' }, style: { width: 10 } },
+        { el: { id: 'c2' }, style: { width: 20 } },
+      ],
+    });
+    // 多选场景整批走一次 editorService.update，避免历史栈被切成两条
+    expect(editorService.update).toHaveBeenCalledTimes(1);
+    const callArgs = (editorService.update as any).mock.calls[0];
+    expect(callArgs[0]).toEqual([
+      { id: 'c1', style: { width: 10 } },
+      { id: 'c2', style: { width: 20 } },
+    ]);
   });
 
   test('sort 事件', () => {

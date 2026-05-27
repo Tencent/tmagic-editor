@@ -97,23 +97,37 @@ export const useStage = (stageOptions: StageOptions) => {
 
   stage.on('update', (ev: UpdateEventData) => {
     if (ev.parentEl) {
-      for (const data of ev.data) {
-        const id = getIdFromEl()(data.el);
-        const pId = getIdFromEl()(ev.parentEl);
-        id && pId && editorService.moveToContainer({ id, style: data.style }, pId);
+      // 拖动多选元素到一个新容器：整批合成一次 moveToContainer，只产生一条历史记录
+      const pId = getIdFromEl()(ev.parentEl);
+      if (!pId) return;
+      const configs = ev.data
+        .map((data) => {
+          const id = getIdFromEl()(data.el);
+          if (!id) return null;
+          const cfg: MNode = { id, style: data.style };
+          return cfg;
+        })
+        .filter((cfg): cfg is MNode => Boolean(cfg));
+      if (configs.length > 0) {
+        editorService.moveToContainer(configs, pId);
       }
       return;
     }
 
-    // 为每个元素单独更新，确保 changeRecords 与对应的元素关联
+    // 多选拖动 / 多选缩放：所有元素整批走一次 update，避免历史栈被切成 N 条
+    const configs: MNode[] = [];
+    const changeRecordsAll: ReturnType<typeof buildChangeRecords> = [];
     ev.data.forEach((data) => {
       const id = getIdFromEl()(data.el);
       if (!id) return;
 
       const { style = {} } = data;
-
-      editorService.update({ id, style }, { changeRecords: buildChangeRecords(style, 'style') });
+      configs.push({ id, style });
+      changeRecordsAll.push(...buildChangeRecords(style, 'style'));
     });
+    if (configs.length === 0) return;
+
+    editorService.update(configs, { changeRecords: changeRecordsAll });
   });
 
   stage.on('sort', (ev: SortEventData) => {
