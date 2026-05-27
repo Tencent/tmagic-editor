@@ -1,3 +1,21 @@
+# [1.8.0-beta.1](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.0...v1.8.0-beta.1) (2026-05-27)
+
+
+### Bug Fixes
+
+* **core:** app.emit 在节点配置事件时不应短路 super.emit ([2846f9e](https://github.com/Tencent/tmagic-editor/commit/2846f9eb2a8655175a024b16eaba22b522e88603))
+* **editor:** serializeConfig 只去掉对象 key 的引号，避免破坏字符串 value 内的引号 ([540a271](https://github.com/Tencent/tmagic-editor/commit/540a2716d8e8e7b947ec5aa6352736dff6ee225c))
+* **editor:** 修复 root 整体替换时图层面板节点状态残留与组件树闪烁问题 ([b9a6dd5](https://github.com/Tencent/tmagic-editor/commit/b9a6dd5b84d6f043eda94dbc1a07b75aea87e6f2))
+
+
+### Features
+
+* **editor:** 数据源字段选择按钮在对比模式与禁用态下禁止切换 ([ff810d0](https://github.com/Tencent/tmagic-editor/commit/ff810d09e41163834f0ac9fd2057bd9fb9d53c55))
+* **editor:** 样式设置器 StyleSetter 支持表单对比模式 ([b1193b9](https://github.com/Tencent/tmagic-editor/commit/b1193b909e5e15f78783f72eb21959a52128e973))
+* **eslint-config:** 禁止匿名 default class/function 导出 ([a1fcb19](https://github.com/Tencent/tmagic-editor/commit/a1fcb191d243b3c7034f31f753757ca4bbd83f5f))
+
+
+
 # [1.8.0-beta.0](https://github.com/Tencent/tmagic-editor/compare/v1.7.14-beta.3...v1.8.0-beta.0) (2026-05-22)
 
 
