@@ -431,6 +431,58 @@ describe('App 配置/方法/组件注册', () => {
     expect(typeof result).toBe('boolean');
   });
 
+  // 回归用例：节点配置了 events 时，eventHelper 派发不能短路掉 super.emit，
+  // 即 app.on(name, cb) 注册的回调依然要被触发。
+  test('emit: 节点已绑定 events 时，app.on 注册的监听器仍然会被调用', () => {
+    const app = new App({
+      config: {
+        type: NodeType.ROOT,
+        id: 'app',
+        items: [
+          {
+            type: NodeType.PAGE,
+            id: 'p1',
+            items: [{ id: 'btn', type: 'button', events: [{ name: 'click', actions: [] }] }],
+          },
+        ],
+      } as any,
+    });
+    const node = app.getNode('btn')!;
+    const cb = vi.fn();
+    app.on('click', cb);
+
+    const result = app.emit('click', node, 'arg1');
+
+    expect(cb).toHaveBeenCalledTimes(1);
+    expect(cb).toHaveBeenCalledWith(node, 'arg1');
+    // EventEmitter.emit 在有 listener 时返回 true
+    expect(result).toBe(true);
+  });
+
+  test('emit: 未命中节点 eventKeys 时，app.on 注册的监听器正常被调用', () => {
+    const app = new App({
+      config: {
+        type: NodeType.ROOT,
+        id: 'app',
+        items: [
+          {
+            type: NodeType.PAGE,
+            id: 'p1',
+            items: [{ id: 'btn', type: 'button' }],
+          },
+        ],
+      } as any,
+    });
+    const node = app.getNode('btn')!;
+    const cb = vi.fn();
+    app.on('click', cb);
+
+    app.emit('click', node, 'arg1');
+
+    expect(cb).toHaveBeenCalledTimes(1);
+    expect(cb).toHaveBeenCalledWith(node, 'arg1');
+  });
+
   test('destroy 清理所有资源', () => {
     const app = new App({
       config: {

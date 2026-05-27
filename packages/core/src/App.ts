@@ -244,7 +244,7 @@ class App extends EventEmitter {
       node.data?.id &&
       node.eventKeys.has(`${String(name)}_${node.data.id}`)
     ) {
-      return this.eventHelper.emit(node.eventKeys.get(`${String(name)}_${node.data.id}`)!, node, ...otherArgs);
+      this.eventHelper.emit(node.eventKeys.get(`${String(name)}_${node.data.id}`)!, node, ...otherArgs);
     }
     return super.emit(name, ...args);
   }
