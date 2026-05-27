@@ -8,6 +8,7 @@ import type { ChangeRecord, FormConfig } from '@tmagic/form';
 import { guid, toLine } from '@tmagic/utils';
 
 import editorService from '@editor/services/editor';
+import historyService from '@editor/services/history';
 import storageService, { Protocol } from '@editor/services/storage';
 import type { DatasourceTypeOption, SyncHookPlugin } from '@editor/type';
 import { getFormConfig, getFormValue } from '@editor/utils/data-source';
@@ -110,6 +111,8 @@ class DataSource extends BaseService {
 
     this.get('dataSources').push(newConfig);
 
+    historyService.pushDataSource(newConfig.id, { oldSchema: null, newSchema: newConfig });
+
     this.emit('add', newConfig);
 
     return newConfig;
@@ -125,6 +128,11 @@ class DataSource extends BaseService {
 
     dataSources[index] = newConfig;
 
+    historyService.pushDataSource(newConfig.id, {
+      oldSchema: oldConfig ? cloneDeep(oldConfig) : null,
+      newSchema: newConfig,
+    });
+
     this.emit('update', newConfig, {
       oldConfig,
       changeRecords,
@@ -136,7 +144,12 @@ class DataSource extends BaseService {
   public remove(id: string) {
     const dataSources = this.get('dataSources');
     const index = dataSources.findIndex((ds) => ds.id === id);
+    const oldConfig = index !== -1 ? dataSources[index] : null;
     dataSources.splice(index, 1);
+
+    if (oldConfig) {
+      historyService.pushDataSource(id, { oldSchema: cloneDeep(oldConfig), newSchema: null });
+    }
 
     this.emit('remove', id);
   }

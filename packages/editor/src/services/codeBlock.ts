@@ -25,6 +25,7 @@ import { Target, Watcher } from '@tmagic/core';
 import type { TableColumnConfig } from '@tmagic/form';
 
 import editorService from '@editor/services/editor';
+import historyService from '@editor/services/history';
 import storageService, { Protocol } from '@editor/services/storage';
 import type { AsyncHookPlugin, CodeState } from '@editor/type';
 import { CODE_DRAFT_STORAGE_KEY } from '@editor/type';
@@ -123,12 +124,19 @@ class CodeBlock extends BaseService {
       }
     }
 
+    // 历史记录：在写入前快照旧内容，区分新增/更新
+    const oldContent: CodeBlockContent | null = codeDsl[id] ? cloneDeep(codeDsl[id]) : null;
+
     const existContent = codeDsl[id] || {};
 
     codeDsl[id] = {
       ...existContent,
       ...codeConfigProcessed,
     };
+
+    const newContent = cloneDeep(codeDsl[id]);
+
+    historyService.pushCodeBlock(id, { oldContent, newContent });
 
     this.emit('addOrUpdate', id, codeDsl[id]);
   }
@@ -225,7 +233,14 @@ class CodeBlock extends BaseService {
     if (!currentDsl) return;
 
     codeIds.forEach((id) => {
+      // 历史记录：删除前快照内容；不存在的 id 直接跳过历史推入
+      const oldContent: CodeBlockContent | null = currentDsl[id] ? cloneDeep(currentDsl[id]) : null;
+
       delete currentDsl[id];
+
+      if (oldContent) {
+        historyService.pushCodeBlock(id, { oldContent, newContent: null });
+      }
 
       this.emit('remove', id);
     });

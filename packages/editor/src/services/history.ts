@@ -17,10 +17,11 @@
  */
 
 import { reactive } from 'vue';
+import { cloneDeep } from 'lodash-es';
 
-import type { Id, MPage, MPageFragment } from '@tmagic/core';
+import type { CodeBlockContent, DataSourceSchema, Id, MPage, MPageFragment } from '@tmagic/core';
 
-import type { HistoryState, StepValue } from '@editor/type';
+import type { CodeBlockStepValue, DataSourceStepValue, HistoryState, StepValue } from '@editor/type';
 import { UndoRedo } from '@editor/utils/undo-redo';
 
 import BaseService from './BaseService';
@@ -31,6 +32,8 @@ class History extends BaseService {
     pageId: undefined,
     canRedo: false,
     canUndo: false,
+    codeBlockState: {},
+    dataSourceState: {},
   });
 
   constructor() {
@@ -41,6 +44,8 @@ class History extends BaseService {
 
   public reset() {
     this.state.pageSteps = {};
+    this.state.codeBlockState = {};
+    this.state.dataSourceState = {};
     this.resetPage();
   }
 
@@ -69,6 +74,8 @@ class History extends BaseService {
     this.state.pageSteps = {};
     this.state.canRedo = false;
     this.state.canUndo = false;
+    this.state.codeBlockState = {};
+    this.state.dataSourceState = {};
   }
 
   /**
@@ -86,6 +93,114 @@ class History extends BaseService {
       this.emit('change', state);
     }
     return state;
+  }
+
+  /**
+   * 推入一条代码块变更记录（与页面/节点完全无关），按 `codeBlockId` 维度独立一份 UndoRedo 栈。
+   *
+   * - 新增：oldContent = null，newContent = 新内容
+   * - 更新：oldContent / newContent 都为对应内容
+   * - 删除：newContent = null，oldContent = 删除前内容
+   * - 不直接驱动 codeBlockService，调用方负责实际写回。
+   */
+  public pushCodeBlock(
+    codeBlockId: Id,
+    payload: {
+      oldContent: CodeBlockContent | null;
+      newContent: CodeBlockContent | null;
+    },
+  ): CodeBlockStepValue | null {
+    if (!codeBlockId) return null;
+
+    const step: CodeBlockStepValue = {
+      id: codeBlockId,
+      oldContent: payload.oldContent ? cloneDeep(payload.oldContent) : null,
+      newContent: payload.newContent ? cloneDeep(payload.newContent) : null,
+    };
+
+    this.getCodeBlockUndoRedo(codeBlockId).pushElement(step);
+    this.emit('code-block-history-change', codeBlockId, step);
+    return step;
+  }
+
+  /**
+   * 推入一条数据源变更记录（与页面/节点完全无关），按 `dataSourceId` 维度独立一份 UndoRedo 栈。
+   * 行为同 pushCodeBlock（新增 oldSchema=null；删除 newSchema=null）。
+   */
+  public pushDataSource(
+    dataSourceId: Id,
+    payload: {
+      oldSchema: DataSourceSchema | null;
+      newSchema: DataSourceSchema | null;
+    },
+  ): DataSourceStepValue | null {
+    if (!dataSourceId) return null;
+
+    const step: DataSourceStepValue = {
+      id: dataSourceId,
+      oldSchema: payload.oldSchema ? cloneDeep(payload.oldSchema) : null,
+      newSchema: payload.newSchema ? cloneDeep(payload.newSchema) : null,
+    };
+
+    this.getDataSourceUndoRedo(dataSourceId).pushElement(step);
+    this.emit('data-source-history-change', dataSourceId, step);
+    return step;
+  }
+
+  /** 撤销指定代码块的最近一次变更。 */
+  public undoCodeBlock(codeBlockId: Id): CodeBlockStepValue | null {
+    const undoRedo = this.state.codeBlockState[codeBlockId];
+    if (!undoRedo) return null;
+    const step = undoRedo.undo();
+    if (step) this.emit('code-block-history-change', codeBlockId, step);
+    return step;
+  }
+
+  /** 重做指定代码块的下一次变更。 */
+  public redoCodeBlock(codeBlockId: Id): CodeBlockStepValue | null {
+    const undoRedo = this.state.codeBlockState[codeBlockId];
+    if (!undoRedo) return null;
+    const step = undoRedo.redo();
+    if (step) this.emit('code-block-history-change', codeBlockId, step);
+    return step;
+  }
+
+  /** 是否可对指定代码块撤销。 */
+  public canUndoCodeBlock(codeBlockId: Id): boolean {
+    return this.state.codeBlockState[codeBlockId]?.canUndo() ?? false;
+  }
+
+  /** 是否可对指定代码块重做。 */
+  public canRedoCodeBlock(codeBlockId: Id): boolean {
+    return this.state.codeBlockState[codeBlockId]?.canRedo() ?? false;
+  }
+
+  /** 撤销指定数据源的最近一次变更。 */
+  public undoDataSource(dataSourceId: Id): DataSourceStepValue | null {
+    const undoRedo = this.state.dataSourceState[dataSourceId];
+    if (!undoRedo) return null;
+    const step = undoRedo.undo();
+    if (step) this.emit('data-source-history-change', dataSourceId, step);
+    return step;
+  }
+
+  /** 重做指定数据源的下一次变更。 */
+  public redoDataSource(dataSourceId: Id): DataSourceStepValue | null {
+    const undoRedo = this.state.dataSourceState[dataSourceId];
+    if (!undoRedo) return null;
+    const step = undoRedo.redo();
+    if (step) this.emit('data-source-history-change', dataSourceId, step);
+    return step;
+  }
+
+  /** 是否可对指定数据源撤销。 */
+  public canUndoDataSource(dataSourceId: Id): boolean {
+    return this.state.dataSourceState[dataSourceId]?.canUndo() ?? false;
+  }
+
+  /** 是否可对指定数据源重做。 */
+  public canRedoDataSource(dataSourceId: Id): boolean {
+    return this.state.dataSourceState[dataSourceId]?.canRedo() ?? false;
   }
 
   public undo(): StepValue | null {
@@ -129,6 +244,26 @@ class History extends BaseService {
     const undoRedo = this.getUndoRedo();
     this.state.canRedo = undoRedo?.canRedo() || false;
     this.state.canUndo = undoRedo?.canUndo() || false;
+  }
+
+  /**
+   * 按 id 获取（或创建）指定代码块的 UndoRedo 栈。
+   */
+  private getCodeBlockUndoRedo(codeBlockId: Id): UndoRedo<CodeBlockStepValue> {
+    if (!this.state.codeBlockState[codeBlockId]) {
+      this.state.codeBlockState[codeBlockId] = new UndoRedo<CodeBlockStepValue>();
+    }
+    return this.state.codeBlockState[codeBlockId];
+  }
+
+  /**
+   * 按 id 获取（或创建）指定数据源的 UndoRedo 栈。
+   */
+  private getDataSourceUndoRedo(dataSourceId: Id): UndoRedo<DataSourceStepValue> {
+    if (!this.state.dataSourceState[dataSourceId]) {
+      this.state.dataSourceState[dataSourceId] = new UndoRedo<DataSourceStepValue>();
+    }
+    return this.state.dataSourceState[dataSourceId];
   }
 }
 

@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2025 Tencent.
  */
-import { afterEach, describe, expect, test } from 'vitest';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 
 import history from '@editor/services/history';
 
@@ -83,5 +83,146 @@ describe('history service', () => {
     history.push({ data: { id: 'p1', name: '' }, modifiedNodeIds: new Map() } as any);
     expect((history.state.pageSteps as any).p1.canUndo()).toBe(true);
     expect(history.state.canUndo).toBe(true);
+  });
+});
+
+describe('history service - codeBlock', () => {
+  test('pushCodeBlock 入栈并触发 code-block-history-change 事件', () => {
+    const fn = vi.fn();
+    history.on('code-block-history-change', fn);
+
+    const step = history.pushCodeBlock('code_1', {
+      oldContent: null,
+      newContent: { name: 'A', content: 'x' } as any,
+    });
+
+    expect(step).not.toBeNull();
+    expect(step?.id).toBe('code_1');
+    expect(step?.oldContent).toBeNull();
+    expect(step?.newContent).toEqual({ name: 'A', content: 'x' });
+    expect((history.state.codeBlockState as any).code_1).toBeDefined();
+    expect(history.canUndoCodeBlock('code_1')).toBe(true);
+    expect(fn).toHaveBeenCalledWith('code_1', expect.objectContaining({ id: 'code_1' }));
+
+    history.off('code-block-history-change', fn);
+  });
+
+  test('pushCodeBlock 不传 id 返回 null', () => {
+    expect(history.pushCodeBlock('', { oldContent: null, newContent: null })).toBeNull();
+  });
+
+  test('undoCodeBlock / redoCodeBlock 走对应 id 的 UndoRedo 栈', () => {
+    history.pushCodeBlock('code_1', { oldContent: null, newContent: { name: 'A' } as any });
+    history.pushCodeBlock('code_1', {
+      oldContent: { name: 'A' } as any,
+      newContent: { name: 'B' } as any,
+    });
+
+    expect(history.canUndoCodeBlock('code_1')).toBe(true);
+    const undone = history.undoCodeBlock('code_1');
+    expect(undone?.newContent).toEqual({ name: 'B' });
+    expect(history.canRedoCodeBlock('code_1')).toBe(true);
+
+    const redone = history.redoCodeBlock('code_1');
+    expect(redone?.newContent).toEqual({ name: 'B' });
+  });
+
+  test('undoCodeBlock 对不存在 id 返回 null', () => {
+    expect(history.undoCodeBlock('not-exist')).toBeNull();
+    expect(history.redoCodeBlock('not-exist')).toBeNull();
+    expect(history.canUndoCodeBlock('not-exist')).toBe(false);
+    expect(history.canRedoCodeBlock('not-exist')).toBe(false);
+  });
+
+  test('不同代码块 id 的栈相互隔离', () => {
+    history.pushCodeBlock('code_1', { oldContent: null, newContent: { name: 'A' } as any });
+    history.pushCodeBlock('code_2', { oldContent: null, newContent: { name: 'B' } as any });
+
+    expect(history.canUndoCodeBlock('code_1')).toBe(true);
+    expect(history.canUndoCodeBlock('code_2')).toBe(true);
+
+    history.undoCodeBlock('code_1');
+    expect(history.canUndoCodeBlock('code_1')).toBe(false);
+    // code_2 的栈不受影响
+    expect(history.canUndoCodeBlock('code_2')).toBe(true);
+  });
+
+  test('reset / resetState 清空 codeBlockState', () => {
+    history.pushCodeBlock('code_1', { oldContent: null, newContent: { name: 'A' } as any });
+    history.reset();
+    expect(Object.keys(history.state.codeBlockState)).toHaveLength(0);
+
+    history.pushCodeBlock('code_1', { oldContent: null, newContent: { name: 'A' } as any });
+    history.resetState();
+    expect(Object.keys(history.state.codeBlockState)).toHaveLength(0);
+  });
+});
+
+describe('history service - dataSource', () => {
+  test('pushDataSource 入栈并触发 data-source-history-change 事件', () => {
+    const fn = vi.fn();
+    history.on('data-source-history-change', fn);
+
+    const step = history.pushDataSource('ds_1', {
+      oldSchema: null,
+      newSchema: { id: 'ds_1', type: 'base', title: 'A' } as any,
+    });
+
+    expect(step).not.toBeNull();
+    expect(step?.id).toBe('ds_1');
+    expect(step?.oldSchema).toBeNull();
+    expect(step?.newSchema?.title).toBe('A');
+    expect((history.state.dataSourceState as any).ds_1).toBeDefined();
+    expect(history.canUndoDataSource('ds_1')).toBe(true);
+    expect(fn).toHaveBeenCalledWith('ds_1', expect.objectContaining({ id: 'ds_1' }));
+
+    history.off('data-source-history-change', fn);
+  });
+
+  test('pushDataSource 不传 id 返回 null', () => {
+    expect(history.pushDataSource('', { oldSchema: null, newSchema: null })).toBeNull();
+  });
+
+  test('undoDataSource / redoDataSource 走对应 id 的 UndoRedo 栈', () => {
+    history.pushDataSource('ds_1', {
+      oldSchema: null,
+      newSchema: { id: 'ds_1', type: 'base', title: 'A' } as any,
+    });
+    history.pushDataSource('ds_1', {
+      oldSchema: { id: 'ds_1', type: 'base', title: 'A' } as any,
+      newSchema: { id: 'ds_1', type: 'base', title: 'B' } as any,
+    });
+
+    const undone = history.undoDataSource('ds_1');
+    expect(undone?.newSchema?.title).toBe('B');
+
+    const redone = history.redoDataSource('ds_1');
+    expect(redone?.newSchema?.title).toBe('B');
+  });
+
+  test('undoDataSource 对不存在 id 返回 null', () => {
+    expect(history.undoDataSource('not-exist')).toBeNull();
+    expect(history.redoDataSource('not-exist')).toBeNull();
+    expect(history.canUndoDataSource('not-exist')).toBe(false);
+    expect(history.canRedoDataSource('not-exist')).toBe(false);
+  });
+
+  test('不同数据源 id 的栈相互隔离', () => {
+    history.pushDataSource('ds_1', { oldSchema: null, newSchema: { id: 'ds_1' } as any });
+    history.pushDataSource('ds_2', { oldSchema: null, newSchema: { id: 'ds_2' } as any });
+
+    history.undoDataSource('ds_1');
+    expect(history.canUndoDataSource('ds_1')).toBe(false);
+    expect(history.canUndoDataSource('ds_2')).toBe(true);
+  });
+
+  test('reset / resetState 清空 dataSourceState', () => {
+    history.pushDataSource('ds_1', { oldSchema: null, newSchema: { id: 'ds_1' } as any });
+    history.reset();
+    expect(Object.keys(history.state.dataSourceState)).toHaveLength(0);
+
+    history.pushDataSource('ds_1', { oldSchema: null, newSchema: { id: 'ds_1' } as any });
+    history.resetState();
+    expect(Object.keys(history.state.dataSourceState)).toHaveLength(0);
   });
 });

@@ -22,7 +22,17 @@ import type * as Monaco from 'monaco-editor';
 import type { default as Sortable, Options, SortableEvent } from 'sortablejs';
 import type { PascalCasedProperties, Writable } from 'type-fest';
 
-import type { CodeBlockContent, CodeBlockDSL, Id, MApp, MContainer, MNode, MPage, MPageFragment } from '@tmagic/core';
+import type {
+  CodeBlockContent,
+  CodeBlockDSL,
+  DataSourceSchema,
+  Id,
+  MApp,
+  MContainer,
+  MNode,
+  MPage,
+  MPageFragment,
+} from '@tmagic/core';
 import type { ChangeRecord, FormConfig, TableColumnConfig, TypeFunction } from '@tmagic/form';
 import type StageCore from '@tmagic/stage';
 import type {
@@ -632,11 +642,55 @@ export interface StepValue {
 }
 // #endregion StepValue
 
+// #region CodeBlockStepValue
+/**
+ * 代码块历史记录条目。按 codeBlock.id 分组保存到 historyState.codeBlockState。
+ * - 新增：oldContent = null，newContent = 新内容
+ * - 更新：oldContent / newContent 都为对应内容
+ * - 删除：newContent = null，oldContent = 删除前内容
+ */
+export interface CodeBlockStepValue {
+  /** 关联的代码块 id */
+  id: Id;
+  /** 变更前的代码块内容，新增时为 null */
+  oldContent: CodeBlockContent | null;
+  /** 变更后的代码块内容，删除时为 null */
+  newContent: CodeBlockContent | null;
+}
+// #endregion CodeBlockStepValue
+
+// #region DataSourceStepValue
+/**
+ * 数据源历史记录条目。按 dataSource.id 分组保存到 historyState.dataSourceState。
+ * - 新增：oldSchema = null，newSchema = 新 schema
+ * - 更新：oldSchema / newSchema 都为对应 schema
+ * - 删除：newSchema = null，oldSchema = 删除前 schema
+ */
+export interface DataSourceStepValue {
+  /** 关联的数据源 id */
+  id: Id;
+  /** 变更前的数据源 schema，新增时为 null */
+  oldSchema: DataSourceSchema | null;
+  /** 变更后的数据源 schema，删除时为 null */
+  newSchema: DataSourceSchema | null;
+}
+// #endregion DataSourceStepValue
+
 export interface HistoryState {
   pageId?: Id;
   pageSteps: Record<Id, UndoRedo<StepValue>>;
   canRedo: boolean;
   canUndo: boolean;
+  /**
+   * 代码块历史栈，按 codeBlock.id 分组（每个代码块独立一份 UndoRedo）。
+   * 与页面/节点无关，支持独立 undo/redo。
+   */
+  codeBlockState: Record<Id, UndoRedo<CodeBlockStepValue>>;
+  /**
+   * 数据源历史栈，按 dataSource.id 分组（每个数据源独立一份 UndoRedo）。
+   * 与页面/节点无关，支持独立 undo/redo。
+   */
+  dataSourceState: Record<Id, UndoRedo<DataSourceStepValue>>;
 }
 
 export enum KeyBindingCommand {

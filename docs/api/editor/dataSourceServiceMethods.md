@@ -306,6 +306,11 @@ dataSourceService.setFormMethod("http", [
 
   添加一个数据源，如果配置中没有id或id已存在，会自动生成新的id
 
+  ::: tip
+  添加成功会自动调用 `historyService.pushDataSource` 入栈一条 `oldSchema=null` 的新增记录，
+  参见 [historyService.pushDataSource](./historyServiceMethods.md#pushdatasource)。
+  :::
+
 - **示例：**
 
 ```js
@@ -341,6 +346,11 @@ console.log(newDs.id); // 自动生成的id
 
   更新数据源
 
+  ::: tip
+  更新成功会自动调用 `historyService.pushDataSource` 入栈一条 `oldSchema` / `newSchema`
+  均为对应 schema 的更新记录。
+  :::
+
 - **示例：**
 
 ```js
@@ -369,6 +379,11 @@ console.log(updatedDs);
 - **详情：**
 
   删除指定id的数据源
+
+  ::: tip
+  对实际存在的数据源会自动调用 `historyService.pushDataSource` 入栈一条 `newSchema=null`
+  的删除记录；不存在的 id 不会入历史。
+  :::
 
 - **示例：**
 

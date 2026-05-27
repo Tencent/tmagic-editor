@@ -6,6 +6,7 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import dataSource from '@editor/services/dataSource';
+import historyService from '@editor/services/history';
 import storageService, { Protocol } from '@editor/services/storage';
 import { setEditorConfig } from '@editor/utils/config';
 import { COPY_DS_STORAGE_KEY } from '@editor/utils/editor';
@@ -27,6 +28,7 @@ beforeEach(() => {
   dataSource.set('values', {});
   dataSource.set('events', {});
   dataSource.set('methods', {});
+  historyService.reset();
 });
 
 afterEach(() => {
@@ -125,5 +127,41 @@ describe('DataSource service', () => {
     dataSource.destroy();
     dataSource.emit('add', {});
     expect(fn).not.toHaveBeenCalled();
+  });
+});
+
+describe('DataSource service - 历史记录接入', () => {
+  test('add - 入历史（oldSchema=null）', () => {
+    const ds = dataSource.add({ title: 'a', type: 'base' } as any);
+    expect(historyService.canUndoDataSource(ds.id!)).toBe(true);
+    const step = historyService.undoDataSource(ds.id!);
+    expect(step?.oldSchema).toBeNull();
+    expect(step?.newSchema?.title).toBe('a');
+  });
+
+  test('update - 入历史，oldSchema 是旧值，newSchema 是新值', () => {
+    const created = dataSource.add({ title: 'a', type: 'base' } as any);
+    // 清掉 add 推入的那条
+    historyService.reset();
+
+    dataSource.update({ ...created, title: 'b' } as any);
+    const step = historyService.undoDataSource(created.id!);
+    expect(step?.oldSchema?.title).toBe('a');
+    expect(step?.newSchema?.title).toBe('b');
+  });
+
+  test('remove - 入历史（newSchema=null）', () => {
+    const created = dataSource.add({ title: 'a', type: 'base' } as any);
+    historyService.reset();
+
+    dataSource.remove(created.id!);
+    const step = historyService.undoDataSource(created.id!);
+    expect(step?.oldSchema?.title).toBe('a');
+    expect(step?.newSchema).toBeNull();
+  });
+
+  test('remove - 不存在的 id 不入历史', () => {
+    dataSource.remove('ghost');
+    expect(historyService.canUndoDataSource('ghost')).toBe(false);
   });
 });

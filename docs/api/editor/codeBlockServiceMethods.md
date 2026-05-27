@@ -70,6 +70,11 @@
 
   同步版本的 [setCodeDslById](#setcodedslbyid)，并会触发 `addOrUpdate` 事件
 
+  ::: tip
+  写入成功时（`force=false` 且同 id 已存在的跳过场景除外）会自动调用 `historyService.pushCodeBlock`
+  把本次变更入历史栈，参见 [historyService.pushCodeBlock](./historyServiceMethods.md#pushcodeblock)。
+  :::
+
 ## getCodeDslByIds
 
 - **参数：**
@@ -201,6 +206,11 @@
 - **详情：**
 
   在dsl数据源中删除指定id的代码块，每删除一个会触发一次 `remove` 事件
+
+  ::: tip
+  对每个实际存在并被删除的代码块，会自动调用 `historyService.pushCodeBlock` 入栈一条
+  `newContent=null` 的删除记录；不存在的 id 不会入历史。
+  :::
 
 ## setParamsColConfig
 

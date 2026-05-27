@@ -6,6 +6,7 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import codeBlockService from '@editor/services/codeBlock';
+import historyService from '@editor/services/history';
 import storageService, { Protocol } from '@editor/services/storage';
 import { CODE_DRAFT_STORAGE_KEY } from '@editor/type';
 import { setEditorConfig } from '@editor/utils/config';
@@ -26,6 +27,7 @@ beforeAll(() => {
 
 beforeEach(() => {
   codeBlockService.resetState();
+  historyService.reset();
   globalThis.localStorage.clear();
 });
 
@@ -164,5 +166,47 @@ describe('CodeBlockService - 基础', () => {
     codeBlockService.destroy();
     codeBlockService.emit('addOrUpdate', 'a');
     expect(fn).not.toHaveBeenCalled();
+  });
+});
+
+describe('CodeBlockService - 历史记录接入', () => {
+  test('setCodeDslByIdSync - 新增时入历史（oldContent=null）', async () => {
+    await codeBlockService.setCodeDsl({} as any);
+    codeBlockService.setCodeDslByIdSync('new_code', { name: 'A' } as any);
+
+    expect(historyService.canUndoCodeBlock('new_code')).toBe(true);
+    const step = historyService.undoCodeBlock('new_code');
+    expect(step?.oldContent).toBeNull();
+    expect(step?.newContent).toEqual(expect.objectContaining({ name: 'A' }));
+  });
+
+  test('setCodeDslByIdSync - 更新时入历史（oldContent / newContent 都非空）', async () => {
+    await codeBlockService.setCodeDsl({ a: { name: 'A' } } as any);
+    codeBlockService.setCodeDslByIdSync('a', { name: 'A2' } as any);
+
+    const step = historyService.undoCodeBlock('a');
+    expect(step?.oldContent).toEqual({ name: 'A' });
+    expect(step?.newContent).toEqual(expect.objectContaining({ name: 'A2' }));
+  });
+
+  test('setCodeDslByIdSync - force=false 已存在时不入历史', async () => {
+    await codeBlockService.setCodeDsl({ a: { name: 'A' } } as any);
+    codeBlockService.setCodeDslByIdSync('a', { name: 'A2' } as any, false);
+    expect(historyService.canUndoCodeBlock('a')).toBe(false);
+  });
+
+  test('deleteCodeDslByIds - 删除已存在的代码块入历史（newContent=null）', async () => {
+    await codeBlockService.setCodeDsl({ a: { name: 'A' }, b: { name: 'B' } } as any);
+    await codeBlockService.deleteCodeDslByIds(['a']);
+
+    const step = historyService.undoCodeBlock('a');
+    expect(step?.oldContent).toEqual({ name: 'A' });
+    expect(step?.newContent).toBeNull();
+  });
+
+  test('deleteCodeDslByIds - 删除不存在的 id 不入历史', async () => {
+    await codeBlockService.setCodeDsl({} as any);
+    await codeBlockService.deleteCodeDslByIds(['ghost']);
+    expect(historyService.canUndoCodeBlock('ghost')).toBe(false);
   });
 });
