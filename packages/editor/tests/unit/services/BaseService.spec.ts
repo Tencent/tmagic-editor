@@ -43,20 +43,6 @@ describe('BaseService 同步方法 + plugin', () => {
     expect(result).toBe(30);
   });
 
-  test('use 添加同步 middleware', () => {
-    const svc = new SyncService();
-    const order: string[] = [];
-    svc.use({
-      add(_value: number, next: Function) {
-        order.push('mw-before');
-        next();
-        order.push('mw-after');
-      },
-    });
-    svc.add(1);
-    expect(order).toEqual(['mw-before', 'mw-after']);
-  });
-
   test('removePlugin 解除指定钩子', () => {
     const svc = new SyncService();
     const before = vi.fn((v: number) => [v]);
@@ -66,7 +52,7 @@ describe('BaseService 同步方法 + plugin', () => {
     expect(before).not.toHaveBeenCalled();
   });
 
-  test('removeAllPlugins 清空所有 plugin/middleware', () => {
+  test('removeAllPlugins 清空所有 plugin', () => {
     const svc = new SyncService();
     const before = vi.fn((v: number) => [v]);
     svc.usePlugin({ beforeAdd: before });

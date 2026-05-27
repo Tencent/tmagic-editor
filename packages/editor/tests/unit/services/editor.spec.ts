@@ -648,35 +648,6 @@ describe('moveLayer', () => {
   });
 });
 
-describe('插件参数兜底', () => {
-  test('add 的 parent 形参传入函数时不抛错，仍走默认父节点逻辑', async () => {
-    editorService.set('root', cloneDeep(root));
-    await editorService.select(NodeId.NODE_ID);
-
-    // 模拟 BaseService 中间件机制在 parent 位置注入 dispatch 函数
-    const dispatchFn = () => {};
-    const newNode = await editorService.add({ type: 'text' }, dispatchFn as any);
-
-    // 默认行为：被加到了当前选中节点的父节点 (PAGE)
-    const addedId = Array.isArray(newNode) ? newNode[0].id : newNode.id;
-    const parentInfo = editorService.getParentById(addedId);
-    expect(parentInfo?.id).toBe(NodeId.PAGE_ID);
-  });
-
-  test('add 的 options 形参传入函数时不抛错，doNotSelect 回落为默认值', async () => {
-    editorService.set('root', cloneDeep(root));
-    await editorService.select(NodeId.NODE_ID);
-
-    // 模拟 BaseService 中间件机制在 options 位置注入 dispatch 函数
-    const dispatchFn = () => {};
-    const newNode = await editorService.add({ type: 'text' }, null, dispatchFn as any);
-
-    // 默认行为：当前选中节点变成了新增节点
-    const addedId = Array.isArray(newNode) ? newNode[0].id : newNode.id;
-    expect(editorService.get('node')?.id).toBe(addedId);
-  });
-});
-
 describe('undo redo', () => {
   beforeAll(() => editorService.set('root', cloneDeep(root)));
 

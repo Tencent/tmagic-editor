@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
 /*
  * Tencent is pleased to support the open source community by making TMagicEditor available.
  *
@@ -19,45 +18,32 @@
 
 import { EventEmitter } from 'events';
 
-import { compose } from '@editor/utils/compose';
-
 const methodName = (prefix: string, name: string) => `${prefix}${name[0].toUpperCase()}${name.substring(1)}`;
 
 const isError = (error: any): boolean => Object.prototype.toString.call(error) === '[object Error]';
 
-const doAction = (
-  args: any[],
-  scope: any,
-  sourceMethod: any,
-  beforeMethodName: string,
-  afterMethodName: string,
-  fn: (args: any[], next?: Function | undefined) => void,
-) => {
-  try {
-    let beforeArgs = args;
+const doAction = (args: any[], scope: any, sourceMethod: any, beforeMethodName: string, afterMethodName: string) => {
+  let beforeArgs = args;
 
-    for (const beforeMethod of scope.pluginOptionsList[beforeMethodName]) {
-      beforeArgs = beforeMethod(...beforeArgs) || [];
+  for (const beforeMethod of scope.pluginOptionsList[beforeMethodName]) {
+    beforeArgs = beforeMethod(...beforeArgs) || [];
 
-      if (isError(beforeArgs)) throw beforeArgs;
+    if (isError(beforeArgs)) throw beforeArgs;
 
-      if (!Array.isArray(beforeArgs)) {
-        beforeArgs = [beforeArgs];
-      }
+    if (!Array.isArray(beforeArgs)) {
+      beforeArgs = [beforeArgs];
     }
-
-    let returnValue: any = fn(beforeArgs, sourceMethod.bind(scope));
-
-    for (const afterMethod of scope.pluginOptionsList[afterMethodName]) {
-      returnValue = afterMethod(returnValue, ...beforeArgs);
-
-      if (isError(returnValue)) throw returnValue;
-    }
-
-    return returnValue;
-  } catch (error) {
-    throw error;
   }
+
+  let returnValue: any = sourceMethod.apply(scope, beforeArgs);
+
+  for (const afterMethod of scope.pluginOptionsList[afterMethodName]) {
+    returnValue = afterMethod(returnValue, ...beforeArgs);
+
+    if (isError(returnValue)) throw returnValue;
+  }
+
+  return returnValue;
 };
 
 const doAsyncAction = async (
@@ -66,40 +52,34 @@ const doAsyncAction = async (
   sourceMethod: any,
   beforeMethodName: string,
   afterMethodName: string,
-  fn: (args: any[], next?: Function | undefined) => Promise<void> | void,
 ) => {
-  try {
-    let beforeArgs = args;
+  let beforeArgs = args;
 
-    for (const beforeMethod of scope.pluginOptionsList[beforeMethodName]) {
-      beforeArgs = (await beforeMethod(...beforeArgs)) || [];
+  for (const beforeMethod of scope.pluginOptionsList[beforeMethodName]) {
+    beforeArgs = (await beforeMethod(...beforeArgs)) || [];
 
-      if (isError(beforeArgs)) throw beforeArgs;
+    if (isError(beforeArgs)) throw beforeArgs;
 
-      if (!Array.isArray(beforeArgs)) {
-        beforeArgs = [beforeArgs];
-      }
+    if (!Array.isArray(beforeArgs)) {
+      beforeArgs = [beforeArgs];
     }
-
-    let returnValue: any = await fn(beforeArgs, sourceMethod.bind(scope));
-
-    for (const afterMethod of scope.pluginOptionsList[afterMethodName]) {
-      returnValue = await afterMethod(returnValue, ...beforeArgs);
-
-      if (isError(returnValue)) throw returnValue;
-    }
-
-    return returnValue;
-  } catch (error) {
-    throw error;
   }
+
+  let returnValue: any = await sourceMethod.apply(scope, beforeArgs);
+
+  for (const afterMethod of scope.pluginOptionsList[afterMethodName]) {
+    returnValue = await afterMethod(returnValue, ...beforeArgs);
+
+    if (isError(returnValue)) throw returnValue;
+  }
+
+  return returnValue;
 };
 
 /**
- * 提供两种方式对Class进行扩展
- * 方法1：
+ * 对Class进行扩展
  * 给Class中的每个方法都添加before after两个钩子
- * 给Class添加一个usePlugin方法，use方法可以传入一个包含before或者after方法的对象
+ * 给Class添加一个usePlugin方法，usePlugin方法可以传入一个包含before或者after方法的对象
  *
  * 例如：
  *   Class EditorService extends BaseService {
@@ -124,27 +104,9 @@ const doAsyncAction = async (
  *
  * 调用时的参数会透传到before方法的参数中, 然后before的return 会作为原方法的参数和after的参数，after第一个参数则是原方法的return值;
  * 如需终止后续方法调用可以return new Error();
- *
- * 方法2：
- * 给Class中的每个方法都添加中间件
- * 给Class添加一个use方法，use方法可以传入一个包含源对象方法名作为key值的对象
- *
- * 例如：
- *   Class EditorService extends BaseService {
- *     constructor() {
- *       super([ { name: 'add', isAsync: true },]);
- *     }
- *     add(value) { return result; }
- *   };
- *
- *  const editorService = new EditorService();
- *  editorService.use({
- *    add(value, next) { console.log(value); next() },
- *  });
  */
-export default class extends EventEmitter {
+class BaseService extends EventEmitter {
   private pluginOptionsList: Record<string, Function[]> = {};
-  private middleware: Record<string, Function[]> = {};
   private taskList: (() => Promise<void>)[] = [];
   private doingTask = false;
 
@@ -161,14 +123,12 @@ export default class extends EventEmitter {
 
       this.pluginOptionsList[beforeMethodName] = [];
       this.pluginOptionsList[afterMethodName] = [];
-      this.middleware[propertyName] = [];
 
-      const fn = compose(this.middleware[propertyName], isAsync);
       Object.defineProperty(scope, propertyName, {
         value: isAsync
           ? async (...args: any[]) => {
               if (!serialMethods.includes(propertyName)) {
-                return doAsyncAction(args, scope, sourceMethod, beforeMethodName, afterMethodName, fn);
+                return doAsyncAction(args, scope, sourceMethod, beforeMethodName, afterMethodName);
               }
 
               // 由于async await，所以会出现函数执行到await时让出线程，导致执行顺序出错，例如调用了select(1) -> update -> select(2)，这个时候就有可能出现update了2；
@@ -176,7 +136,7 @@ export default class extends EventEmitter {
               const promise = new Promise<any>((resolve, reject) => {
                 this.taskList.push(async () => {
                   try {
-                    const value = await doAsyncAction(args, scope, sourceMethod, beforeMethodName, afterMethodName, fn);
+                    const value = await doAsyncAction(args, scope, sourceMethod, beforeMethodName, afterMethodName);
                     resolve(value);
                   } catch (e) {
                     reject(e);
@@ -190,18 +150,9 @@ export default class extends EventEmitter {
 
               return promise;
             }
-          : (...args: any[]) => doAction(args, scope, sourceMethod, beforeMethodName, afterMethodName, fn),
+          : (...args: any[]) => doAction(args, scope, sourceMethod, beforeMethodName, afterMethodName),
       });
     });
-  }
-
-  /**
-   * @deprecated 请使用usePlugin代替
-   */
-  public use(options: Record<string, Function>) {
-    for (const [methodName, method] of Object.entries(options)) {
-      if (typeof method === 'function') this.middleware[methodName].push(method);
-    }
   }
 
   public usePlugin(options: Record<string, Function>) {
@@ -224,10 +175,6 @@ export default class extends EventEmitter {
     for (const key of Object.keys(this.pluginOptionsList)) {
       this.pluginOptionsList[key] = [];
     }
-
-    for (const key of Object.keys(this.middleware)) {
-      this.middleware[key] = [];
-    }
   }
 
   private async doTask() {
@@ -240,3 +187,5 @@ export default class extends EventEmitter {
     this.doingTask = false;
   }
 }
+
+export default BaseService;

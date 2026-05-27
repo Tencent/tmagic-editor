@@ -66,25 +66,6 @@ import type { HistoryOpContext } from '@editor/utils/editor-history';
 import { applyHistoryAddOp, applyHistoryRemoveOp, applyHistoryUpdateOp } from '@editor/utils/editor-history';
 import { beforePaste, getAddParent } from '@editor/utils/operator';
 
-/**
- * 经过 BaseService 的插件 / 中间件包装后，源方法的最后一个形参可能被注入为 dispatch 函数
- * 当 options 形参位置被注入为函数（或为 null）时，将其归一为空对象，避免后续逻辑误读
- */
-const safeOptions = <T extends object>(options: unknown): T => {
-  const empty = {};
-  if (!options || typeof options === 'function') return empty as T;
-  return options as T;
-};
-
-/**
- * 经过 BaseService 的插件 / 中间件包装后，源方法的形参可能被注入为 dispatch 函数
- * 当 parent 形参位置被注入为函数（或为空值）时，归一为 null，由调用方继续走默认 parent 逻辑
- */
-const safeParent = (parent: unknown): MContainer | null => {
-  if (!parent || typeof parent === 'function') return null;
-  return parent as MContainer;
-};
-
 class Editor extends BaseService {
   public state: StoreState = reactive({
     root: null,
@@ -212,7 +193,7 @@ class Editor extends BaseService {
    * 只有容器拥有布局
    */
   public async getLayout(parent: MNode, node?: MNode | null): Promise<Layout> {
-    if (node && typeof node !== 'function' && isFixed(node.style || {})) return Layout.FIXED;
+    if (node && isFixed(node.style || {})) return Layout.FIXED;
 
     if (parent.layout) {
       return parent.layout;
@@ -393,11 +374,8 @@ class Editor extends BaseService {
   public async add(
     addNode: AddMNode | MNode[],
     parent?: MContainer | null,
-    options?: DslOpOptions,
+    { doNotSelect = false, doNotSwitchPage = false }: DslOpOptions = {},
   ): Promise<MNode | MNode[]> {
-    const safeParentNode = safeParent(parent);
-    const { doNotSelect = false, doNotSwitchPage = false } = safeOptions<DslOpOptions>(options);
-
     this.captureSelectionBeforeOp();
 
     const stage = this.get('stage');
@@ -420,7 +398,7 @@ class Editor extends BaseService {
         if ((isPage(node) || isPageFragment(node)) && root) {
           return this.doAdd(node, root);
         }
-        const parentNode = safeParentNode ?? getAddParent(node);
+        const parentNode = parent ?? getAddParent(node);
         if (!parentNode) throw new Error('未找到父元素');
         return this.doAdd(node, parentNode);
       }),
@@ -476,9 +454,10 @@ class Editor extends BaseService {
     return Array.isArray(addNode) ? newNodes : newNodes[0];
   }
 
-  public async doRemove(node: MNode, options?: DslOpOptions): Promise<void> {
-    const { doNotSelect = false, doNotSwitchPage = false } = safeOptions<DslOpOptions>(options);
-
+  public async doRemove(
+    node: MNode,
+    { doNotSelect = false, doNotSwitchPage = false }: DslOpOptions = {},
+  ): Promise<void> {
     const root = this.get('root');
     if (!root) throw new Error('root不能为空');
 
@@ -558,9 +537,10 @@ class Editor extends BaseService {
    * @param options.doNotSelect 删除后是否不更新当前选中节点（默认 false，删除后会选中父节点或首个页面）
    * @param options.doNotSwitchPage 删除后是否不切换当前页面（默认 false；删除页面 / 页面片段时为 true 会跳过自动切换到首个剩余页面）
    */
-  public async remove(nodeOrNodeList: MNode | MNode[], options?: DslOpOptions): Promise<void> {
-    const { doNotSelect = false, doNotSwitchPage = false } = safeOptions<DslOpOptions>(options);
-
+  public async remove(
+    nodeOrNodeList: MNode | MNode[],
+    { doNotSelect = false, doNotSwitchPage = false }: DslOpOptions = {},
+  ): Promise<void> {
     this.captureSelectionBeforeOp();
 
     const nodes = Array.isArray(nodeOrNodeList) ? nodeOrNodeList : [nodeOrNodeList];
@@ -711,9 +691,7 @@ class Editor extends BaseService {
    * @param options.doNotSwitchPage 排序后是否不切换当前页面（排序只发生在同一父节点内，方法内为空操作；保留以与其它 DSL 操作 API 一致）
    * @returns void
    */
-  public async sort(id1: Id, id2: Id, options?: DslOpOptions): Promise<void> {
-    const { doNotSelect = false } = safeOptions<DslOpOptions>(options);
-
+  public async sort(id1: Id, id2: Id, { doNotSelect = false }: DslOpOptions = {}): Promise<void> {
     this.captureSelectionBeforeOp();
 
     const root = this.get('root');
@@ -784,10 +762,8 @@ class Editor extends BaseService {
   public async paste(
     position: PastePosition = {},
     collectorOptions?: TargetOptions,
-    options?: DslOpOptions,
+    { doNotSelect = false, doNotSwitchPage = false }: DslOpOptions = {},
   ): Promise<MNode | MNode[] | void> {
-    const { doNotSelect = false, doNotSwitchPage = false } = safeOptions<DslOpOptions>(options);
-
     const config: MNode[] = storageService.getItem(COPY_STORAGE_KEY);
     if (!Array.isArray(config)) return;
 
@@ -840,9 +816,10 @@ class Editor extends BaseService {
    * @param options.doNotSwitchPage 居中后是否不切换当前页面（居中只更新节点 style，方法内为空操作；保留以与其它 DSL 操作 API 一致）
    * @returns 当前组件节点配置
    */
-  public async alignCenter(config: MNode | MNode[], options?: DslOpOptions): Promise<MNode | MNode[]> {
-    const { doNotSelect = false } = safeOptions<DslOpOptions>(options);
-
+  public async alignCenter(
+    config: MNode | MNode[],
+    { doNotSelect = false }: DslOpOptions = {},
+  ): Promise<MNode | MNode[]> {
     const nodes = Array.isArray(config) ? config : [config];
     const stage = this.get('stage');
 
@@ -922,9 +899,11 @@ class Editor extends BaseService {
    * @param options.doNotSelect 移动后是否不更新当前选中节点（默认 false）
    * @param options.doNotSwitchPage 移动后是否不切换当前页面（默认 false；目标容器位于其它页面时为 true 会跳过自动选中以避免页面切换）
    */
-  public async moveToContainer(config: MNode, targetId: Id, options?: DslOpOptions): Promise<MNode | undefined> {
-    const { doNotSelect = false, doNotSwitchPage = false } = safeOptions<DslOpOptions>(options);
-
+  public async moveToContainer(
+    config: MNode,
+    targetId: Id,
+    { doNotSelect = false, doNotSwitchPage = false }: DslOpOptions = {},
+  ): Promise<MNode | undefined> {
     this.captureSelectionBeforeOp();
 
     const root = this.get('root');

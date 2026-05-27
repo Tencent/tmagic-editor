@@ -97,9 +97,9 @@ class Props extends BaseService {
     return this.state.propsConfigMap;
   }
 
-  public async fillConfig(config: FormConfig, labelWidth?: string) {
+  public async fillConfig(config: FormConfig, labelWidth = '80px') {
     return fillConfig(config, {
-      labelWidth: typeof labelWidth !== 'function' ? labelWidth : '80px',
+      labelWidth,
       disabledDataSource: this.getDisabledDataSource(),
       disabledCodeBlock: this.getDisabledCodeBlock(),
     });
