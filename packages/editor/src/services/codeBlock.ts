@@ -325,6 +325,29 @@ class CodeBlock extends BaseService {
   }
 
   /**
+   * 跳转指定代码块的历史栈到目标游标。语义同 editor.gotoPageStep。
+   *
+   * @param id          代码块 id
+   * @param targetCursor 目标游标位置（已应用步骤数量）
+   * @returns 实际移动到的最终游标位置
+   */
+  public async goto(id: Id, targetCursor: number): Promise<number> {
+    let cursor = historyService.getCodeBlockCursor(id);
+    const target = Math.max(0, targetCursor);
+    while (cursor > target) {
+      const step = await this.undo(id);
+      if (!step) break;
+      cursor -= 1;
+    }
+    while (cursor < target) {
+      const step = await this.redo(id);
+      if (!step) break;
+      cursor += 1;
+    }
+    return cursor;
+  }
+
+  /**
    * 生成代码块唯一id
    * @returns {Id} 代码块唯一id
    */

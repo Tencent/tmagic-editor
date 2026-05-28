@@ -61,9 +61,33 @@ describe('CodeBlockTab.vue', () => {
       {
         id: 'code_1',
         groups: [
-          buildGroup('code_1', 'add', [{ id: 'code_1', oldContent: null, newContent: { id: 'code_1', name: 'fn' } }]),
-          buildGroup('code_1', 'remove', [
-            { id: 'code_1', oldContent: { id: 'code_1', name: 'fn' }, newContent: null },
+          buildGroup('code_1', 'update', [
+            {
+              id: 'code_1',
+              oldContent: { id: 'code_1', name: 'fn' },
+              newContent: { id: 'code_1', name: 'fn' },
+              changeRecords: [{ propPath: 'a' }],
+            },
+            {
+              id: 'code_1',
+              oldContent: { id: 'code_1', name: 'fn' },
+              newContent: { id: 'code_1', name: 'fn' },
+              changeRecords: [{ propPath: 'b' }],
+            },
+          ]),
+          buildGroup('code_1', 'update', [
+            {
+              id: 'code_1',
+              oldContent: { id: 'code_1', name: 'fn' },
+              newContent: { id: 'code_1', name: 'fn' },
+              changeRecords: [{ propPath: 'c' }],
+            },
+            {
+              id: 'code_1',
+              oldContent: { id: 'code_1', name: 'fn' },
+              newContent: { id: 'code_1', name: 'fn' },
+              changeRecords: [{ propPath: 'd' }],
+            },
           ]),
         ],
       },
@@ -74,6 +98,22 @@ describe('CodeBlockTab.vue', () => {
     expect(wrapper.emitted('toggle')![0]).toEqual(['cb-code_1-0']);
     await heads[1].trigger('click');
     expect(wrapper.emitted('toggle')![1]).toEqual(['cb-code_1-1']);
+  });
+
+  test('goto 透传：携带 codeBlock id 与最后一步 index', async () => {
+    const buckets = [
+      {
+        id: 'code_1',
+        groups: [
+          buildGroup('code_1', 'add', [{ id: 'code_1', oldContent: null, newContent: { id: 'code_1', name: 'fn' } }]),
+        ],
+      },
+    ];
+    const wrapper = mount(CodeBlockTab, { props: { buckets, expanded: {} } });
+    await wrapper.find('.m-editor-history-list-group-head').trigger('click');
+    const events = wrapper.emitted('goto');
+    expect(events).toBeTruthy();
+    expect(events![0]).toEqual(['code_1', 0]);
   });
 
   test('合并组在 expanded 时展开子步', () => {

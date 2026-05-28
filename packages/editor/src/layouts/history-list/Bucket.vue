@@ -27,21 +27,30 @@
         :is-current="group.isCurrent"
         :expanded="!!expanded[`${prefix}-${bucketId}-${gIdx}`]"
         @toggle="(key: string) => $emit('toggle', key)"
+        @goto="(index: number) => $emit('goto', bucketId, index)"
       />
+      <!--
+        初始状态项：永远位于该 bucket 列表底部（同样按倒序展示，最底部 = 最早状态）。
+        当 bucket 内所有 group 都未 applied 时即为当前位置。
+      -->
+      <InitialRow :is-current="isInitial" @goto-initial="$emit('goto-initial', bucketId)" />
     </ul>
   </div>
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue';
+
 import type { HistoryOpType } from '@editor/type';
 
 import GroupRow from './GroupRow.vue';
+import InitialRow from './InitialRow.vue';
 
 defineOptions({
   name: 'MEditorHistoryListBucket',
 });
 
-defineProps<{
+const props = defineProps<{
   /** Bucket 标题，例如 "数据源" / "代码块"，渲染在 bucket 头部。 */
   title: string;
   /** 当前 bucket 对应的目标 id（dataSource.id 或 codeBlock.id），同时用于组装子项的 key。 */
@@ -66,5 +75,15 @@ defineProps<{
 defineEmits<{
   /** 透传子组件 GroupRow 的 toggle，由上层 panel 更新 expanded。 */
   (_e: 'toggle', _key: string): void;
+  /**
+   * 透传子组件 GroupRow 的 goto，并附带当前 bucket 对应的 id（dataSourceId / codeBlockId），
+   * 上层据此调用对应 service.goto(id, targetCursor)。
+   */
+  (_e: 'goto', _bucketId: string | number, _index: number): void;
+  /** 用户点击初始项希望该 bucket 回到未修改状态；携带 bucketId 用于上层路由到正确的 service。 */
+  (_e: 'goto-initial', _bucketId: string | number): void;
 }>();
+
+/** 该 bucket 是否处于初始状态（栈 cursor=0），等价于全部 group 都未 applied。 */
+const isInitial = computed(() => props.groups.length > 0 && props.groups.every((g) => !g.applied));
 </script>

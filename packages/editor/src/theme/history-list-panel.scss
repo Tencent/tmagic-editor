@@ -72,7 +72,26 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      cursor: pointer;
+      cursor: default;
+
+      &.is-clickable {
+        cursor: pointer;
+      }
+    }
+
+    .m-editor-history-list-group-toggle {
+      flex: 0 0 auto;
+      width: 16px;
+      text-align: center;
+      color: #909399;
+      font-size: 12px;
+      user-select: none;
+      transition: transform 0.15s ease;
+      pointer-events: none;
+
+      &.is-expanded {
+        transform: rotate(180deg);
+      }
     }
 
     &.is-merged .m-editor-history-list-group-head {
@@ -93,6 +112,16 @@
       padding: 2px 8px;
       font-size: 11px;
       color: #606266;
+      cursor: default;
+      border-radius: 3px;
+
+      &.is-clickable {
+        cursor: pointer;
+
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.04);
+        }
+      }
 
       &.is-undone {
         color: #c0c4cc;
@@ -144,6 +173,26 @@
 
     &.op-update {
       background-color: #409eff;
+    }
+
+    &.op-initial {
+      background-color: #909399;
+    }
+  }
+
+  .m-editor-history-list-initial {
+    cursor: default;
+    color: #606266;
+    border-top: 1px dashed #dcdfe6;
+    margin-top: 4px;
+    padding-top: 8px;
+
+    &.is-clickable {
+      cursor: pointer;
+    }
+
+    .m-editor-history-list-item-desc {
+      font-style: italic;
     }
   }
 

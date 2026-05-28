@@ -12,6 +12,8 @@
       :describe-step="describeCodeBlockStep"
       :expanded="expanded"
       @toggle="(key: string) => $emit('toggle', key)"
+      @goto="(id: string | number, index: number) => $emit('goto', id, index)"
+      @goto-initial="(id: string | number) => $emit('goto-initial', id)"
     />
   </TMagicScrollbar>
 </template>
@@ -41,5 +43,9 @@ defineProps<{
 defineEmits<{
   /** 透传子组件 Bucket 的 toggle 事件给上层 panel，由其更新 expanded。 */
   (_e: 'toggle', _key: string): void;
+  /** 透传 Bucket 的 goto 事件，携带 codeBlock id 与目标 step 索引。 */
+  (_e: 'goto', _codeBlockId: string | number, _index: number): void;
+  /** 透传 Bucket 的 goto-initial 事件，携带 codeBlock id（回到该代码块未修改时的状态）。 */
+  (_e: 'goto-initial', _codeBlockId: string | number): void;
 }>();
 </script>

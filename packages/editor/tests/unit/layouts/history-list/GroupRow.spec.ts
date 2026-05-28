@@ -92,11 +92,79 @@ describe('GroupRow.vue', () => {
     expect(wrapper.find('.m-editor-history-list-substeps').exists()).toBe(false);
   });
 
-  test('点击头部触发 toggle 事件并携带 groupKey', async () => {
-    const wrapper = mount(GroupRow, { props: baseProps });
+  test('点击合并组头部触发 toggle 事件并携带 groupKey', async () => {
+    const wrapper = mount(GroupRow, { props: { ...baseProps, merged: true, stepCount: 2 } });
     await wrapper.find('.m-editor-history-list-group-head').trigger('click');
     const events = wrapper.emitted('toggle');
     expect(events).toBeTruthy();
     expect(events![0]).toEqual(['pg-0']);
+    // 合并组头部不应触发 goto，避免与展开/收起冲突
+    expect(wrapper.emitted('goto')).toBeFalsy();
+  });
+
+  test('点击单步组（非合并）头部触发 goto，携带该唯一 step 的 index', async () => {
+    const wrapper = mount(GroupRow, {
+      props: {
+        ...baseProps,
+        merged: false,
+        subSteps: [{ index: 7, applied: true, desc: 'a' }],
+      },
+    });
+    await wrapper.find('.m-editor-history-list-group-head').trigger('click');
+    expect(wrapper.emitted('goto')).toBeTruthy();
+    expect(wrapper.emitted('goto')![0]).toEqual([7]);
+    // 单步组没有展开概念，不应触发 toggle
+    expect(wrapper.emitted('toggle')).toBeFalsy();
+  });
+
+  test('当前单步组（isCurrent=true）点击头部不触发 goto', async () => {
+    const wrapper = mount(GroupRow, {
+      props: {
+        ...baseProps,
+        merged: false,
+        isCurrent: true,
+        subSteps: [{ index: 0, applied: true, desc: 'x' }],
+      },
+    });
+    await wrapper.find('.m-editor-history-list-group-head').trigger('click');
+    expect(wrapper.emitted('goto')).toBeFalsy();
+  });
+
+  test('当前合并组（isCurrent=true）点击头部仍能 toggle', async () => {
+    const wrapper = mount(GroupRow, {
+      props: {
+        ...baseProps,
+        merged: true,
+        stepCount: 2,
+        isCurrent: true,
+        subSteps: [
+          { index: 0, applied: true, desc: 'a' },
+          { index: 1, applied: true, desc: 'b', isCurrent: true },
+        ],
+      },
+    });
+    await wrapper.find('.m-editor-history-list-group-head').trigger('click');
+    expect(wrapper.emitted('toggle')).toBeTruthy();
+    expect(wrapper.emitted('goto')).toBeFalsy();
+  });
+
+  test('点击子步触发 goto 携带该子步 index；当前子步点击无效', async () => {
+    const wrapper = mount(GroupRow, {
+      props: {
+        ...baseProps,
+        merged: true,
+        stepCount: 2,
+        expanded: true,
+        subSteps: [
+          { index: 0, applied: true, desc: 'a', isCurrent: true },
+          { index: 1, applied: false, desc: 'b' },
+        ],
+      },
+    });
+    const subItems = wrapper.findAll('.m-editor-history-list-substeps li');
+    await subItems[0].trigger('click');
+    expect(wrapper.emitted('goto')).toBeFalsy();
+    await subItems[1].trigger('click');
+    expect(wrapper.emitted('goto')![0]).toEqual([1]);
   });
 });

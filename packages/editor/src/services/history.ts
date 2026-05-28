@@ -459,6 +459,26 @@ class History extends BaseService {
   }
 
   /**
+   * 读取指定页面历史栈的当前游标（已应用步骤数量）。不传则取当前活动页。
+   * 没有对应栈时返回 0。
+   */
+  public getPageCursor(pageId?: Id): number {
+    const targetPageId = pageId ?? this.state.pageId;
+    if (!targetPageId) return 0;
+    return this.state.pageSteps[targetPageId]?.getCursor() ?? 0;
+  }
+
+  /** 读取指定代码块历史栈的当前游标。 */
+  public getCodeBlockCursor(codeBlockId: Id): number {
+    return this.state.codeBlockState[codeBlockId]?.getCursor() ?? 0;
+  }
+
+  /** 读取指定数据源历史栈的当前游标。 */
+  public getDataSourceCursor(dataSourceId: Id): number {
+    return this.state.dataSourceState[dataSourceId]?.getCursor() ?? 0;
+  }
+
+  /**
    * 取出全部数据源的历史栈，按 dataSourceId 分组。同上。
    */
   public getDataSourceHistoryGroups(): DataSourceHistoryGroup[] {

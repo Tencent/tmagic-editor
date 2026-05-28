@@ -3,15 +3,27 @@
     class="m-editor-history-list-item m-editor-history-list-group"
     :class="{ 'is-undone': !applied, 'is-merged': merged, 'is-current': isCurrent }"
   >
-    <div class="m-editor-history-list-group-head" @click="$emit('toggle', groupKey)">
+    <div
+      class="m-editor-history-list-group-head"
+      :class="{ 'is-clickable': isHeadClickable }"
+      :title="headTitle"
+      @click="onHeadClick"
+    >
       <span class="m-editor-history-list-item-op" :class="`op-${opType}`">{{ opLabel(opType) }}</span>
       <span class="m-editor-history-list-item-desc">{{ desc }}</span>
       <span v-if="isCurrent" class="m-editor-history-list-item-current">当前</span>
       <span v-if="merged" class="m-editor-history-list-item-merge">合并 {{ stepCount }} 步</span>
+      <span v-if="merged" class="m-editor-history-list-group-toggle" :class="{ 'is-expanded': expanded }">▾</span>
     </div>
 
     <ul v-if="merged && expanded" class="m-editor-history-list-substeps">
-      <li v-for="s in subSteps" :key="s.index" :class="{ 'is-undone': !s.applied, 'is-current': s.isCurrent }">
+      <li
+        v-for="s in subSteps"
+        :key="s.index"
+        :class="{ 'is-undone': !s.applied, 'is-current': s.isCurrent, 'is-clickable': !s.isCurrent }"
+        :title="s.isCurrent ? '当前所在记录' : '点击跳转到该记录'"
+        @click="onSubStepClick(s)"
+      >
         <span class="m-editor-history-list-item-index">#{{ s.index + 1 }}</span>
         <span>{{ s.desc }}</span>
         <span v-if="s.isCurrent" class="m-editor-history-list-item-current">当前</span>
@@ -21,6 +33,8 @@
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue';
+
 import type { HistoryOpType } from '@editor/type';
 
 import { opLabel } from './composables';
@@ -29,7 +43,7 @@ defineOptions({
   name: 'MEditorHistoryListGroupRow',
 });
 
-defineProps<{
+const props = defineProps<{
   /** 唯一标识当前组的 key，作为 toggle 事件的 payload 回传给上层。形如 `pg-${idx}` / `ds-${id}-${idx}` / `cb-${id}-${idx}`。 */
   groupKey: string;
   /** 该组当前是否处于已应用状态（false 表示已被 undo 撤销，UI 会显示为灰态）。 */
@@ -50,8 +64,52 @@ defineProps<{
   isCurrent?: boolean;
 }>();
 
-defineEmits<{
-  /** 用户点击组头部时触发，携带 groupKey，由上层维护折叠状态。 */
+const emit = defineEmits<{
+  /**
+   * 用户点击合并组头部时触发，携带 groupKey；上层用其切换 expanded 状态。
+   * 对单步组（非合并）头部点击不会发该事件——因为单步组没有"展开"的概念。
+   */
   (_e: 'toggle', _key: string): void;
+  /**
+   * 用户希望跳转到该记录时触发，携带"目标 step 在所属栈中的索引"——上层据此计算目标 cursor (= index + 1)。
+   * 触发场景：
+   * - 单步组（merged=false）头部：取该唯一 step 的 index；
+   * - 子步条目：取该子步的 index。
+   * 合并组头部不再触发 goto，避免与展开/收起冲突；用户应展开后点具体子步精准跳转。
+   * 当前所在的步骤（isCurrent）始终不会触发 goto。
+   */
+  (_e: 'goto', _index: number): void;
 }>();
+
+/** 单步组：头部可点击 goto；合并组：头部可点击切换展开。当前组（isCurrent）的单步组头部不可点击。 */
+const isHeadClickable = computed(() => {
+  if (props.merged) return true;
+  return !props.isCurrent;
+});
+
+const headTitle = computed(() => {
+  if (props.merged) return props.expanded ? '点击收起子步' : '点击展开子步';
+  if (props.isCurrent) return '当前所在记录';
+  return '点击跳转到该记录';
+});
+
+/**
+ * 头部点击行为分流：
+ * - 合并组：仅切换展开 / 收起，不触发 goto；
+ * - 单步组：跳转到该唯一步骤；当前组忽略点击。
+ */
+const onHeadClick = () => {
+  if (props.merged) {
+    emit('toggle', props.groupKey);
+    return;
+  }
+  if (props.isCurrent) return;
+  if (!props.subSteps.length) return;
+  emit('goto', props.subSteps[0].index);
+};
+
+const onSubStepClick = (s: { index: number; isCurrent?: boolean }) => {
+  if (s.isCurrent) return;
+  emit('goto', s.index);
+};
 </script>

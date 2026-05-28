@@ -230,6 +230,27 @@ class DataSource extends BaseService {
     return historyService.canRedoDataSource(id);
   }
 
+  /**
+   * 跳转指定数据源的历史栈到目标游标。语义同 editor.gotoPageStep。
+   *
+   * @param id          数据源 id
+   * @param targetCursor 目标游标位置（已应用步骤数量）
+   * @returns 实际移动到的最终游标位置
+   */
+  public goto(id: Id, targetCursor: number): number {
+    let cursor = historyService.getDataSourceCursor(id);
+    const target = Math.max(0, targetCursor);
+    while (cursor > target) {
+      if (!this.undo(id)) break;
+      cursor -= 1;
+    }
+    while (cursor < target) {
+      if (!this.redo(id)) break;
+      cursor += 1;
+    }
+    return cursor;
+  }
+
   public createId(): string {
     return `ds_${guid()}`;
   }

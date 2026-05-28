@@ -69,7 +69,27 @@ describe('Bucket.vue', () => {
     expect(rows[1].find('.m-editor-history-list-item-desc').text()).toBe('group-remove-1');
   });
 
-  test('GroupRow toggle 事件被透传到 Bucket', async () => {
+  test('合并组头部点击 → toggle 事件被透传到 Bucket', async () => {
+    const wrapper = mount(Bucket, {
+      props: {
+        title: '代码块',
+        bucketId: 'code_1',
+        prefix: 'cb',
+        groups: [buildGroup('update', 2)],
+        describeGroup: () => 'g',
+        describeStep: () => 's',
+        expanded: {},
+      },
+    });
+    await wrapper.find('.m-editor-history-list-group-head').trigger('click');
+    const events = wrapper.emitted('toggle');
+    expect(events).toBeTruthy();
+    expect(events![0]).toEqual(['cb-code_1-0']);
+    // 合并组头部不应触发 goto
+    expect(wrapper.emitted('goto')).toBeFalsy();
+  });
+
+  test('单步组头部点击 → goto 事件被透传到 Bucket，并附带 bucketId', async () => {
     const wrapper = mount(Bucket, {
       props: {
         title: '代码块',
@@ -82,9 +102,29 @@ describe('Bucket.vue', () => {
       },
     });
     await wrapper.find('.m-editor-history-list-group-head').trigger('click');
-    const events = wrapper.emitted('toggle');
+    const events = wrapper.emitted('goto');
     expect(events).toBeTruthy();
-    expect(events![0]).toEqual(['cb-code_1-0']);
+    expect(events![0]).toEqual(['code_1', 0]);
+  });
+
+  test('合并组展开后点击子步 → goto 透传，附带子步 index', async () => {
+    const wrapper = mount(Bucket, {
+      props: {
+        title: '代码块',
+        bucketId: 'code_1',
+        prefix: 'cb',
+        groups: [buildGroup('update', 2)],
+        describeGroup: () => 'g',
+        describeStep: () => 's',
+        expanded: { 'cb-code_1-0': true },
+      },
+    });
+    const subItems = wrapper.findAll('.m-editor-history-list-substeps li');
+    expect(subItems).toHaveLength(2);
+    await subItems[1].trigger('click');
+    const events = wrapper.emitted('goto');
+    expect(events).toBeTruthy();
+    expect(events![0]).toEqual(['code_1', 1]);
   });
 
   test('groupKey 命名空间使用 prefix + bucketId + 索引', () => {
@@ -105,5 +145,43 @@ describe('Bucket.vue', () => {
     expect(rows[1].find('.m-editor-history-list-substeps').exists()).toBe(false);
     // 第一组未展开，也不应有 substeps
     expect(rows[0].find('.m-editor-history-list-substeps').exists()).toBe(false);
+  });
+
+  test('groups 非空时底部追加初始项；点击透传 goto-initial 携带 bucketId', async () => {
+    const wrapper = mount(Bucket, {
+      props: {
+        title: '数据源',
+        bucketId: 'ds_1',
+        prefix: 'ds',
+        groups: [buildGroup('add', 1)],
+        describeGroup: () => 'g',
+        describeStep: () => 's',
+        expanded: {},
+      },
+    });
+    const initial = wrapper.find('.m-editor-history-list-initial');
+    expect(initial.exists()).toBe(true);
+    // 已有 applied 组，初始项不应为当前
+    expect(initial.classes()).not.toContain('is-current');
+
+    await initial.trigger('click');
+    const events = wrapper.emitted('goto-initial');
+    expect(events).toBeTruthy();
+    expect(events![0]).toEqual(['ds_1']);
+  });
+
+  test('该 bucket 全部组都已撤销时初始项标记为当前', () => {
+    const wrapper = mount(Bucket, {
+      props: {
+        title: '代码块',
+        bucketId: 'cb_1',
+        prefix: 'cb',
+        groups: [buildGroup('add', 1, false), buildGroup('update', 2, false)],
+        describeGroup: () => 'g',
+        describeStep: () => 's',
+        expanded: {},
+      },
+    });
+    expect(wrapper.find('.m-editor-history-list-initial').classes()).toContain('is-current');
   });
 });

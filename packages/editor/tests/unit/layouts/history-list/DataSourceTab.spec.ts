@@ -72,12 +72,32 @@ describe('DataSourceTab.vue', () => {
       {
         id: 'ds_1',
         groups: [
-          buildGroup('ds_1', 'add', [{ id: 'ds_1', oldSchema: null, newSchema: { id: 'ds_1', title: 'A' } }]),
+          buildGroup('ds_1', 'update', [
+            {
+              id: 'ds_1',
+              oldSchema: { id: 'ds_1', title: 'A' },
+              newSchema: { id: 'ds_1', title: 'A' },
+              changeRecords: [{ propPath: 'a' }],
+            },
+            {
+              id: 'ds_1',
+              oldSchema: { id: 'ds_1', title: 'A' },
+              newSchema: { id: 'ds_1', title: 'A' },
+              changeRecords: [{ propPath: 'b' }],
+            },
+          ]),
           buildGroup('ds_1', 'update', [
             {
               id: 'ds_1',
               oldSchema: { id: 'ds_1', title: 'A' },
               newSchema: { id: 'ds_1', title: 'A2' },
+              changeRecords: [{ propPath: 'c' }],
+            },
+            {
+              id: 'ds_1',
+              oldSchema: { id: 'ds_1', title: 'A2' },
+              newSchema: { id: 'ds_1', title: 'A3' },
+              changeRecords: [{ propPath: 'd' }],
             },
           ]),
         ],
@@ -87,6 +107,20 @@ describe('DataSourceTab.vue', () => {
     const heads = wrapper.findAll('.m-editor-history-list-group-head');
     await heads[1].trigger('click');
     expect(wrapper.emitted('toggle')![0]).toEqual(['ds-ds_1-1']);
+  });
+
+  test('goto 透传：携带 dataSource id 与最后一步 index', async () => {
+    const buckets = [
+      {
+        id: 'ds_1',
+        groups: [buildGroup('ds_1', 'add', [{ id: 'ds_1', oldSchema: null, newSchema: { id: 'ds_1', title: 'A' } }])],
+      },
+    ];
+    const wrapper = mount(DataSourceTab, { props: { buckets, expanded: {} } });
+    await wrapper.find('.m-editor-history-list-group-head').trigger('click');
+    const events = wrapper.emitted('goto');
+    expect(events).toBeTruthy();
+    expect(events![0]).toEqual(['ds_1', 0]);
   });
 
   test('expanded 中对应 key 打开时展示子步', () => {

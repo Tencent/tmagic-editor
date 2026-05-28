@@ -1127,6 +1127,32 @@ class Editor extends BaseService {
     return value;
   }
 
+  /**
+   * 跳转当前页面历史栈到指定游标位置。
+   *
+   * `targetCursor` 与 `UndoRedo.getCursor()` 同义：表示"已应用步骤数量"，
+   * 取值范围 `[0, length]`。当目标 < 当前游标时循环 undo，否则循环 redo。
+   * 通常由历史面板传入「点击的 step.index + 1」作为目标。
+   *
+   * @returns 实际移动到的最终游标位置
+   */
+  public async gotoPageStep(targetCursor: number): Promise<number> {
+    let cursor = historyService.getPageCursor();
+    const { length } = historyService.getPageStepList();
+    const target = Math.max(0, Math.min(targetCursor, length));
+    while (cursor > target) {
+      const step = await this.undo();
+      if (!step) break;
+      cursor -= 1;
+    }
+    while (cursor < target) {
+      const step = await this.redo();
+      if (!step) break;
+      cursor += 1;
+    }
+    return cursor;
+  }
+
   public async move(left: number, top: number, { doNotPushHistory = false }: DslOpOptions = {}) {
     const node = toRaw(this.get('node'));
     if (!node || isPage(node)) return;

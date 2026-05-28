@@ -9,8 +9,12 @@ import { mount } from '@vue/test-utils';
 
 import historyService from '@editor/services/history';
 
+const editorService = { gotoPageStep: vi.fn(async () => 0) };
+const dataSourceService = { goto: vi.fn(() => 0) };
+const codeBlockService = { goto: vi.fn(async () => 0) };
+
 vi.mock('@editor/hooks/use-services', () => ({
-  useServices: () => ({ historyService }),
+  useServices: () => ({ historyService, editorService, dataSourceService, codeBlockService }),
 }));
 
 vi.mock('@tmagic/design', () => ({
@@ -110,7 +114,7 @@ describe('HistoryListPanel.vue', () => {
     expect(descs.some((t) => t === '创建 CB (id: code_1)')).toBe(true);
   });
 
-  test('点击合并组头部能切换 expanded 状态', async () => {
+  test('点击合并组头部能切换 expanded 状态（不触发 goto）', async () => {
     historyService.changePage({ id: 'p1' } as any);
     // 推两个修改同一节点的步骤，会合并为一个 group
     const mkUpdate = (path: string) => ({
@@ -138,8 +142,127 @@ describe('HistoryListPanel.vue', () => {
     await head.trigger('click');
     expect(wrapper.find('.m-editor-history-list-substeps').exists()).toBe(true);
     expect(wrapper.findAll('.m-editor-history-list-substeps li')).toHaveLength(2);
+    // 合并组头部点击不应触发 goto
+    expect(editorService.gotoPageStep).not.toHaveBeenCalled();
     // 再点击折叠
-    await head.trigger('click');
+    await wrapper.find('.m-editor-history-list-group-head').trigger('click');
     expect(wrapper.find('.m-editor-history-list-substeps').exists()).toBe(false);
+  });
+
+  test('点击页面 group 头部调用 editorService.gotoPageStep', async () => {
+    historyService.changePage({ id: 'p1' } as any);
+    historyService.push({
+      opType: 'add',
+      nodes: [{ id: 'n1', name: 'A' }],
+      modifiedNodeIds: new Map(),
+    } as any);
+    historyService.push({
+      opType: 'add',
+      nodes: [{ id: 'n2', name: 'B' }],
+      modifiedNodeIds: new Map(),
+    } as any);
+
+    const wrapper = await factory();
+    await nextTick();
+
+    // 第一组（页面 tab，倒序：最新一组在前，对应 step.index = 1）
+    const head = wrapper.find('.m-editor-history-list-group-head');
+    // 当前组（最新一组）属于 isCurrent=true，点击不会触发 goto；改点第二组
+    const heads = wrapper.findAll('.m-editor-history-list-group-head');
+    expect(heads.length).toBeGreaterThanOrEqual(2);
+    // 第二行（pg-1）对应原始 step.index = 0；cursor 应为 0+1 = 1
+    await heads[1].trigger('click');
+    expect(editorService.gotoPageStep).toHaveBeenCalledTimes(1);
+    expect(editorService.gotoPageStep).toHaveBeenCalledWith(1);
+
+    // 当前组点击不触发 goto
+    await head.trigger('click');
+    expect(editorService.gotoPageStep).toHaveBeenCalledTimes(1);
+  });
+
+  test('点击数据源组头部调用 dataSourceService.goto(id, cursor)', async () => {
+    historyService.pushDataSource('ds_1', {
+      oldSchema: null,
+      newSchema: { id: 'ds_1', title: 'DS' } as any,
+    });
+
+    const wrapper = await factory();
+    await nextTick();
+
+    // 当前 ds 组（isCurrent）点击不触发 goto；为了能触发，先撤销该步使其变为非当前
+    historyService.undoDataSource('ds_1');
+    await nextTick();
+
+    const heads = wrapper.findAll('.m-editor-history-list-group-head');
+    // 找到数据源 tab 那一组
+    const dsHead = heads.find((h) => h.text().includes('创建 DS'));
+    expect(dsHead).toBeTruthy();
+    await dsHead!.trigger('click');
+    expect(dataSourceService.goto).toHaveBeenCalledWith('ds_1', 1);
+  });
+
+  test('点击代码块组头部调用 codeBlockService.goto(id, cursor)', async () => {
+    historyService.pushCodeBlock('code_1', {
+      oldContent: null,
+      newContent: { id: 'code_1', name: 'CB' } as any,
+    });
+
+    const wrapper = await factory();
+    await nextTick();
+
+    historyService.undoCodeBlock('code_1');
+    await nextTick();
+
+    const heads = wrapper.findAll('.m-editor-history-list-group-head');
+    const cbHead = heads.find((h) => h.text().includes('创建 CB'));
+    expect(cbHead).toBeTruthy();
+    await cbHead!.trigger('click');
+    expect(codeBlockService.goto).toHaveBeenCalledWith('code_1', 1);
+  });
+
+  test('点击页面初始项调用 editorService.gotoPageStep(0)', async () => {
+    historyService.changePage({ id: 'p1' } as any);
+    historyService.push({
+      opType: 'add',
+      nodes: [{ id: 'n1', name: 'A' }],
+      modifiedNodeIds: new Map(),
+    } as any);
+
+    const wrapper = await factory();
+    await nextTick();
+
+    // 页面 tab 列表底部应有初始项
+    const initials = wrapper.findAll('.m-editor-history-list-initial');
+    expect(initials.length).toBeGreaterThanOrEqual(1);
+    // 第一项（页面 tab）应为页面 tab 的初始项；page tab 在三个 tab 中最先渲染
+    await initials[0].trigger('click');
+    expect(editorService.gotoPageStep).toHaveBeenCalledWith(0);
+  });
+
+  test('点击数据源/代码块初始项调用对应 service.goto(id, 0)', async () => {
+    historyService.pushDataSource('ds_x', {
+      oldSchema: null,
+      newSchema: { id: 'ds_x', title: 'DS' } as any,
+    });
+    historyService.pushCodeBlock('code_x', {
+      oldContent: null,
+      newContent: { id: 'code_x', name: 'CB' } as any,
+    });
+
+    const wrapper = await factory();
+    await nextTick();
+
+    // 三个 tab 都内容齐全：page tab 因没有 page push 是空态，没有初始项；
+    // ds tab 与 cb tab 各 1 个 bucket → 各 1 条初始项
+    const initials = wrapper.findAll('.m-editor-history-list-initial');
+    expect(initials).toHaveLength(2);
+
+    // 顺序：tab 渲染顺序是 page → data-source → code-block
+    // 因此 initials[0] 属于 ds_x，initials[1] 属于 code_x
+    await initials[0].trigger('click');
+    expect(dataSourceService.goto).toHaveBeenCalledWith('ds_x', 0);
+
+    await initials[1].trigger('click');
+    expect(codeBlockService.goto).toHaveBeenCalledWith('code_x', 0);
   });
 });
