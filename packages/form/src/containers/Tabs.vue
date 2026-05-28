@@ -19,7 +19,10 @@
       :is="tabPaneComponent?.component || 'el-tab-pane'"
       :key="tab[mForm?.keyProp || '__key'] ?? tabIndex"
       v-bind="
-        tabPaneComponent?.props({ name: filter(tab.status) || tabIndex.toString(), lazy: tab.lazy || false }) || {}
+        tabPaneComponent?.props({
+          name: filter(tab.status) || tabIndex.toString(),
+          lazy: isCompare ? false : tab.lazy || false,
+        }) || {}
       "
     >
       <template #label>
