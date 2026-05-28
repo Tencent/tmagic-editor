@@ -12,6 +12,7 @@
             @toggle="toggleGroup"
             @goto="onPageGoto"
             @goto-initial="onPageGotoInitial"
+            @diff-step="onPageDiff"
           />
         </component>
 
@@ -25,6 +26,7 @@
             @toggle="toggleGroup"
             @goto="onDataSourceGoto"
             @goto-initial="onDataSourceGotoInitial"
+            @diff-step="onDataSourceDiff"
           />
         </component>
 
@@ -38,6 +40,7 @@
             @toggle="toggleGroup"
             @goto="onCodeBlockGoto"
             @goto-initial="onCodeBlockGotoInitial"
+            @diff-step="onCodeBlockDiff"
           />
         </component>
       </TMagicTabs>
@@ -53,6 +56,8 @@
       </TMagicTooltip>
     </template>
   </TMagicPopover>
+
+  <HistoryDiffDialog ref="diffDialog" :extend-state="extendFormState" />
 </template>
 
 <script lang="ts" setup>
@@ -70,13 +75,17 @@
  *
  * 这里的 targetCursor = 用户点击的 step.index + 1，即"应用至此步完成的状态"。
  *
+ * 此外每条 step 上提供"查看差异"入口（仅在前后值都存在的 update 步骤显示），
+ * 点击后弹出 HistoryDiffDialog，使用 CompareForm 组件以表单形式展示新旧值差异。
+ *
  * 各 tab 的内容拆分为独立的 SFC（PageTab / DataSourceTab / CodeBlockTab），
  * 共享的描述生成与折叠状态在 composables.ts 中维护。
  */
-import { markRaw, ref } from 'vue';
+import { inject, markRaw, ref, useTemplateRef } from 'vue';
 import { Clock } from '@element-plus/icons-vue';
 
 import { getDesignConfig, TMagicButton, TMagicPopover, TMagicTabs, TMagicTooltip } from '@tmagic/design';
+import type { FormState } from '@tmagic/form';
 
 import MIcon from '@editor/components/Icon.vue';
 import { useServices } from '@editor/hooks/use-services';
@@ -84,6 +93,7 @@ import { useServices } from '@editor/hooks/use-services';
 import CodeBlockTab from './CodeBlockTab.vue';
 import { useHistoryList } from './composables';
 import DataSourceTab from './DataSourceTab.vue';
+import HistoryDiffDialog from './HistoryDiffDialog.vue';
 import PageTab from './PageTab.vue';
 
 defineOptions({
@@ -95,7 +105,17 @@ const activeTab = ref<'page' | 'data-source' | 'code-block'>('page');
 
 const tabPaneComponent = getDesignConfig('components')?.tabPane;
 
-const { editorService, dataSourceService, codeBlockService } = useServices();
+const { editorService, dataSourceService, codeBlockService, historyService } = useServices();
+
+/**
+ * 通过 inject 拿到 Editor 顶层注入的 `extendFormState`，转交给 HistoryDiffDialog
+ * 内部的 CompareForm，使差异对比表单的 filterFunction 能拿到完整的业务上下文。
+ * 未提供时为 undefined，CompareForm/MForm 会跳过 extendState 处理。
+ */
+const extendFormState = inject<((_state: FormState) => Record<string, any> | Promise<Record<string, any>>) | undefined>(
+  'extendFormState',
+  undefined,
+);
 
 const {
   expanded,
@@ -137,5 +157,75 @@ const onDataSourceGotoInitial = (id: string | number) => {
 
 const onCodeBlockGotoInitial = (id: string | number) => {
   codeBlockService.goto(id, 0);
+};
+
+const diffDialogRef = useTemplateRef<InstanceType<typeof HistoryDiffDialog>>('diffDialog');
+
+/**
+ * 页面 step 差异：仅 update 单节点修改可对比，传入旧/新节点。
+ * 节点类型 `type` 优先取 newNode.type，再回退 oldNode.type。
+ * `currentValue` 取自 editorService 中该节点当前实际值，用于支持「与当前对比」。
+ */
+const onPageDiff = (index: number) => {
+  const groups = historyService.getPageHistoryGroups();
+  for (const group of groups) {
+    const entry = group.steps.find((s) => s.index === index);
+    if (!entry) continue;
+    const item = entry.step.updatedItems?.[0];
+    if (!item?.oldNode || !item?.newNode) return;
+    const type = (item.newNode.type as string) || (item.oldNode.type as string) || '';
+    const nodeId = item.newNode.id ?? item.oldNode.id;
+    const currentNode = nodeId !== undefined ? editorService.getNodeById(nodeId) : null;
+    diffDialogRef.value?.open({
+      category: 'node',
+      type,
+      lastValue: item.oldNode as Record<string, any>,
+      value: item.newNode as Record<string, any>,
+      currentValue: (currentNode as Record<string, any>) || null,
+      targetLabel: (item.newNode.name as string) || (item.oldNode.name as string) || type,
+    });
+    return;
+  }
+};
+
+const onDataSourceDiff = (id: string | number, index: number) => {
+  const groups = historyService.getDataSourceHistoryGroups();
+  for (const group of groups) {
+    if (group.id !== id) continue;
+    const entry = group.steps.find((s) => s.index === index);
+    if (!entry) continue;
+    const { oldSchema, newSchema } = entry.step;
+    if (!oldSchema || !newSchema) return;
+    const currentSchema = dataSourceService.getDataSourceById(`${id}`);
+    diffDialogRef.value?.open({
+      category: 'data-source',
+      type: newSchema.type || oldSchema.type || 'base',
+      lastValue: oldSchema as Record<string, any>,
+      value: newSchema as Record<string, any>,
+      currentValue: (currentSchema as Record<string, any>) || null,
+      targetLabel: newSchema.title || oldSchema.title || `${id}`,
+    });
+    return;
+  }
+};
+
+const onCodeBlockDiff = (id: string | number, index: number) => {
+  const groups = historyService.getCodeBlockHistoryGroups();
+  for (const group of groups) {
+    if (group.id !== id) continue;
+    const entry = group.steps.find((s) => s.index === index);
+    if (!entry) continue;
+    const { oldContent, newContent } = entry.step;
+    if (!oldContent || !newContent) return;
+    const currentContent = codeBlockService.getCodeContentById(id);
+    diffDialogRef.value?.open({
+      category: 'code-block',
+      lastValue: oldContent as Record<string, any>,
+      value: newContent as Record<string, any>,
+      currentValue: (currentContent as Record<string, any>) || null,
+      targetLabel: newContent.name || oldContent.name || `${id}`,
+    });
+    return;
+  }
 };
 </script>

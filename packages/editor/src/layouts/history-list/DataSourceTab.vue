@@ -10,10 +10,12 @@
       :groups="bucket.groups"
       :describe-group="describeDataSourceGroup"
       :describe-step="describeDataSourceStep"
+      :is-step-diffable="isDataSourceStepDiffable"
       :expanded="expanded"
       @toggle="(key: string) => $emit('toggle', key)"
       @goto="(id: string | number, index: number) => $emit('goto', id, index)"
       @goto-initial="(id: string | number) => $emit('goto-initial', id)"
+      @diff-step="(id: string | number, index: number) => $emit('diff-step', id, index)"
     />
   </TMagicScrollbar>
 </template>
@@ -21,7 +23,7 @@
 <script lang="ts" setup>
 import { TMagicScrollbar } from '@tmagic/design';
 
-import type { DataSourceHistoryGroup } from '@editor/type';
+import type { DataSourceHistoryGroup, DataSourceStepValue } from '@editor/type';
 
 import Bucket from './Bucket.vue';
 import { describeDataSourceGroup, describeDataSourceStep } from './composables';
@@ -47,5 +49,10 @@ defineEmits<{
   (_e: 'goto', _dataSourceId: string | number, _index: number): void;
   /** 透传 Bucket 的 goto-initial 事件，携带 dataSource id（回到该数据源未修改时的状态）。 */
   (_e: 'goto-initial', _dataSourceId: string | number): void;
+  /** 透传 Bucket 的 diff-step 事件，携带 dataSource id 与 step 索引。 */
+  (_e: 'diff-step', _dataSourceId: string | number, _index: number): void;
 }>();
+
+/** 仅 update（前后 schema 都存在）时可查看差异。 */
+const isDataSourceStepDiffable = (step: DataSourceStepValue) => Boolean(step.oldSchema && step.newSchema);
 </script>

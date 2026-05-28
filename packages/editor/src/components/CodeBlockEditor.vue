@@ -63,14 +63,7 @@ import { computed, inject, nextTick, Ref, ref, useTemplateRef, watch } from 'vue
 
 import type { CodeBlockContent } from '@tmagic/core';
 import { TMagicButton, TMagicDialog, tMagicMessage, tMagicMessageBox, TMagicTag } from '@tmagic/design';
-import {
-  type ContainerChangeEventData,
-  defineFormConfig,
-  defineFormItem,
-  type FormConfig,
-  MFormBox,
-  type TableColumnConfig,
-} from '@tmagic/form';
+import { type ContainerChangeEventData, type FormConfig, MFormBox } from '@tmagic/form';
 
 import FloatingBox from '@editor/components/FloatingBox.vue';
 import { useEditorContentHeight } from '@editor/hooks/use-editor-content-height';
@@ -78,6 +71,7 @@ import { useNextFloatBoxPosition } from '@editor/hooks/use-next-float-box-positi
 import { useServices } from '@editor/hooks/use-services';
 import { useWindowRect } from '@editor/hooks/use-window-rect';
 import CodeEditor from '@editor/layouts/CodeEditor.vue';
+import { getCodeBlockFormConfig } from '@editor/utils/code-block';
 import { getEditorConfig } from '@editor/utils/config';
 
 defineOptions({
@@ -119,106 +113,23 @@ const diffChange = () => {
   difVisible.value = false;
 };
 
-const defaultParamColConfig = defineFormItem<TableColumnConfig>({
-  type: 'row',
-  label: '参数类型',
-  items: [
-    {
-      text: '参数类型',
-      labelWidth: '70px',
-      type: 'select',
-      name: 'type',
-      options: [
-        {
-          text: '数字',
-          label: '数字',
-          value: 'number',
-        },
-        {
-          text: '字符串',
-          label: '字符串',
-          value: 'text',
-        },
-        {
-          text: '组件',
-          label: '组件',
-          value: 'ui-select',
-        },
-      ],
-    },
-  ],
-});
+const codeOptions = inject<Record<string, any>>('codeOptions', {});
 
-const functionConfig = computed(
-  () =>
-    defineFormConfig([
-      {
-        text: '名称',
-        name: 'name',
-        rules: [{ required: true, message: '请输入名称', trigger: 'blur' }],
-      },
-      {
-        text: '描述',
-        name: 'desc',
-      },
-      {
-        text: '执行时机',
-        name: 'timing',
-        type: 'select',
-        options: () => {
-          const options = [
-            { text: '初始化前', value: 'beforeInit' },
-            { text: '初始化后', value: 'afterInit' },
-          ];
-          if (props.dataSourceType !== 'base') {
-            options.push({ text: '请求前', value: 'beforeRequest' });
-            options.push({ text: '请求后', value: 'afterRequest' });
-          }
-          return options;
-        },
-        display: () => props.isDataSource,
-      },
-      {
-        type: 'table',
-        border: true,
-        text: '参数',
-        enableFullscreen: false,
-        enableToggleMode: false,
-        name: 'params',
-        dropSort: false,
-        items: [
-          {
-            type: 'text',
-            label: '参数名',
-            name: 'name',
-          },
-          {
-            type: 'text',
-            label: '描述',
-            name: 'extra',
-          },
-          codeBlockService.getParamsColConfig() || defaultParamColConfig,
-        ],
-      },
-      {
-        name: 'content',
-        type: 'vs-code',
-        options: inject('codeOptions', {}),
-        autosize: { minRows: 10, maxRows: 30 },
-        onChange: (_formState, code: string) => {
-          try {
-            // 检测js代码是否存在语法错误
-            getEditorConfig('parseDSL')(code);
-
-            return code;
-          } catch (error: any) {
-            tMagicMessage.error(error.message);
-
-            throw error;
-          }
-        },
-      },
-    ]) as FormConfig,
+/**
+ * 代码块编辑表单配置。统一委托到 utils/code-block 的 `getCodeBlockFormConfig`，
+ * 与 CompareForm 等其它使用方共享同一份 schema，避免双份维护。
+ *
+ * 这里以 computed 包裹是为了让 `props.isDataSource` / `props.dataSourceType` 变化时
+ * "执行时机"字段的可见性与可选项实时刷新。
+ */
+const functionConfig = computed<FormConfig>(() =>
+  getCodeBlockFormConfig({
+    paramColConfig: codeBlockService.getParamsColConfig(),
+    isDataSource: () => Boolean(props.isDataSource),
+    dataSourceType: () => props.dataSourceType,
+    codeOptions,
+    editable: true,
+  }),
 );
 
 const parseContent = (content: any) => {

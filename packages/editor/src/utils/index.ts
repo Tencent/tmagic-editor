@@ -18,6 +18,7 @@
 
 export * from './config';
 export * from './props';
+export * from './code-block';
 export * from './logger';
 export * from './editor';
 export * from './operator';

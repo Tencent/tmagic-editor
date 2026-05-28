@@ -12,6 +12,13 @@
       <span class="m-editor-history-list-item-op" :class="`op-${opType}`">{{ opLabel(opType) }}</span>
       <span class="m-editor-history-list-item-desc">{{ desc }}</span>
       <span v-if="isCurrent" class="m-editor-history-list-item-current">当前</span>
+      <span
+        v-if="!merged && headDiffable"
+        class="m-editor-history-list-item-diff"
+        title="查看修改差异"
+        @click.stop="onDiffClick(subSteps[0].index)"
+        >查看差异</span
+      >
       <span v-if="merged" class="m-editor-history-list-item-merge">合并 {{ stepCount }} 步</span>
       <span v-if="merged" class="m-editor-history-list-group-toggle" :class="{ 'is-expanded': expanded }">▾</span>
     </div>
@@ -25,8 +32,15 @@
         @click="onSubStepClick(s)"
       >
         <span class="m-editor-history-list-item-index">#{{ s.index + 1 }}</span>
-        <span>{{ s.desc }}</span>
+        <span class="m-editor-history-list-substep-desc">{{ s.desc }}</span>
         <span v-if="s.isCurrent" class="m-editor-history-list-item-current">当前</span>
+        <span
+          v-if="s.diffable"
+          class="m-editor-history-list-item-diff"
+          title="查看修改差异"
+          @click.stop="onDiffClick(s.index)"
+          >查看差异</span
+        >
       </li>
     </ul>
   </li>
@@ -57,7 +71,7 @@ const props = defineProps<{
   /** 组内的 step 总数，仅在 merged 为 true 时显示为 "合并 N 步"。 */
   stepCount: number;
   /** 子步列表，用于在展开状态下逐条展示每个 step 的索引、应用状态与描述文案。 */
-  subSteps: { index: number; applied: boolean; desc: string; isCurrent?: boolean }[];
+  subSteps: { index: number; applied: boolean; desc: string; isCurrent?: boolean; diffable?: boolean }[];
   /** 当前组是否处于展开状态。仅在 merged 为 true 时生效，控制子步列表是否渲染。 */
   expanded: boolean;
   /** 是否为当前所在的分组（包含栈中最近一次已应用步骤的那一组），UI 高亮展示。 */
@@ -79,6 +93,12 @@ const emit = defineEmits<{
    * 当前所在的步骤（isCurrent）始终不会触发 goto。
    */
   (_e: 'goto', _index: number): void;
+  /**
+   * 用户希望查看该 step 的修改差异（旧值 vs 新值）。
+   * 只在 step 满足"前后值都存在"（如 update / 数据源、代码块的 update）时由父级标记 `diffable=true`。
+   * payload 为该 step 在所属栈中的索引，由上层根据 index 取 step 内容并展示对比。
+   */
+  (_e: 'diff-step', _index: number): void;
 }>();
 
 /** 单步组：头部可点击 goto；合并组：头部可点击切换展开。当前组（isCurrent）的单步组头部不可点击。 */
@@ -111,5 +131,12 @@ const onHeadClick = () => {
 const onSubStepClick = (s: { index: number; isCurrent?: boolean }) => {
   if (s.isCurrent) return;
   emit('goto', s.index);
+};
+
+/** 单步组头部是否展示"查看差异"入口：要求该唯一子步本身可对比。 */
+const headDiffable = computed(() => !props.merged && Boolean(props.subSteps[0]?.diffable));
+
+const onDiffClick = (index: number) => {
+  emit('diff-step', index);
 };
 </script>

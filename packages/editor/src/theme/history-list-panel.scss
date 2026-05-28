@@ -213,6 +213,29 @@
     background-color: rgba(230, 162, 60, 0.12);
   }
 
+  .m-editor-history-list-item-diff {
+    flex: 0 0 auto;
+    padding: 0 6px;
+    border-radius: 2px;
+    font-size: 10px;
+    line-height: 16px;
+    color: #409eff;
+    background-color: rgba(64, 158, 255, 0.1);
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+      background-color: rgba(64, 158, 255, 0.2);
+    }
+  }
+
+  .m-editor-history-list-substep-desc {
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .m-editor-history-list-bucket {
     margin-bottom: 8px;
 
@@ -248,5 +271,56 @@
     color: #909399;
     font-weight: 400;
     font-size: 11px;
+  }
+}
+
+.m-editor-history-diff-dialog {
+  .m-editor-history-diff-dialog-body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .m-editor-history-diff-dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding: 8px 12px;
+    background-color: #f5f7fa;
+    border-radius: 4px;
+    gap: 12px;
+  }
+
+  .m-editor-history-diff-dialog-mode {
+    flex: 0 0 auto;
+  }
+
+  .m-editor-history-diff-dialog-target {
+    flex: 1 1 auto;
+    font-size: 13px;
+    font-weight: 500;
+    color: #303133;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .m-editor-history-diff-dialog-legend {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+    padding: 0 4px;
+  }
+
+  .m-editor-history-diff-dialog-arrow {
+    color: #909399;
+    font-size: 12px;
+  }
+
+  .m-editor-history-diff-dialog-tip {
+    margin-left: 8px;
+    color: #e6a23c;
+    font-size: 12px;
   }
 }

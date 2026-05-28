@@ -22,12 +22,14 @@
             applied: s.applied,
             isCurrent: s.isCurrent,
             desc: describeStep(s.step),
+            diffable: isStepDiffable ? isStepDiffable(s.step) : false,
           }))
         "
         :is-current="group.isCurrent"
         :expanded="!!expanded[`${prefix}-${bucketId}-${gIdx}`]"
         @toggle="(key: string) => $emit('toggle', key)"
         @goto="(index: number) => $emit('goto', bucketId, index)"
+        @diff-step="(index: number) => $emit('diff-step', bucketId, index)"
       />
       <!--
         初始状态项：永远位于该 bucket 列表底部（同样按倒序展示，最底部 = 最早状态）。
@@ -68,6 +70,8 @@ const props = defineProps<{
   describeGroup: (_group: any) => string;
   /** 单步描述文案生成器，接收一个 step，返回展示文本。用于合并组展开后的子步列表。 */
   describeStep: (_step: any) => string;
+  /** 判断某个 step 是否可查看差异（前后值都存在）。由父组件按业务类型注入；不传则一律不展示差异入口。 */
+  isStepDiffable?: (_step: any) => boolean;
   /** 共享的折叠状态表（key -> 是否展开），由顶层 panel 统一维护以便跨 tab 复用。 */
   expanded: Record<string, boolean>;
 }>();
@@ -82,6 +86,8 @@ defineEmits<{
   (_e: 'goto', _bucketId: string | number, _index: number): void;
   /** 用户点击初始项希望该 bucket 回到未修改状态；携带 bucketId 用于上层路由到正确的 service。 */
   (_e: 'goto-initial', _bucketId: string | number): void;
+  /** 用户点击"查看差异"，携带 bucketId 与 step 索引。 */
+  (_e: 'diff-step', _bucketId: string | number, _index: number): void;
 }>();
 
 /** 该 bucket 是否处于初始状态（栈 cursor=0），等价于全部 group 都未 applied。 */

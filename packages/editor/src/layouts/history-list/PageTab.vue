@@ -17,12 +17,14 @@
             applied: s.applied,
             isCurrent: s.isCurrent,
             desc: describePageStep(s.step),
+            diffable: isPageStepDiffable(s.step),
           }))
         "
         :is-current="group.isCurrent"
         :expanded="!!expanded[`pg-${gIdx}`]"
         @toggle="(key: string) => $emit('toggle', key)"
         @goto="(index: number) => $emit('goto', index)"
+        @diff-step="(index: number) => $emit('diff-step', index)"
       />
       <!--
         初始状态项：永远位于列表底部（页面 tab 倒序展示，最底部=最早），
@@ -38,7 +40,7 @@ import { computed } from 'vue';
 
 import { TMagicScrollbar } from '@tmagic/design';
 
-import type { PageHistoryGroup } from '@editor/type';
+import type { PageHistoryGroup, StepValue } from '@editor/type';
 
 import { describePageGroup, describePageStep } from './composables';
 import GroupRow from './GroupRow.vue';
@@ -62,7 +64,22 @@ defineEmits<{
   (_e: 'goto', _index: number): void;
   /** 用户点击初始项希望回到未修改的状态（cursor=0）。 */
   (_e: 'goto-initial'): void;
+  /** 用户点击"查看差异"按钮，携带目标 step 在栈中的索引。 */
+  (_e: 'diff-step', _index: number): void;
 }>();
+
+/**
+ * 当前 step 是否可查看差异：
+ * - 仅 update 操作；
+ * - 单节点更新（updatedItems.length === 1），且 oldNode / newNode 都存在。
+ * 多节点更新难以选定单一对比目标，统一不展示差异入口。
+ */
+const isPageStepDiffable = (step: StepValue): boolean => {
+  if (step.opType !== 'update') return false;
+  const items = step.updatedItems ?? [];
+  if (items.length !== 1) return false;
+  return Boolean(items[0]?.oldNode && items[0]?.newNode);
+};
 
 /**
  * 是否处于"初始状态"——即对应页面历史栈 cursor===0：

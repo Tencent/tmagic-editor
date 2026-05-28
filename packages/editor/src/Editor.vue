@@ -229,6 +229,12 @@ provide('services', services);
 
 provide('codeOptions', props.codeOptions);
 provide('stageOptions', stageOptions);
+/**
+ * 把顶层 `extendFormState` 提供给非 PropsPanel 链路上的组件使用（例如历史差异对话框 HistoryDiffDialog
+ * 内部的 CompareForm）。这样所有依赖业务上下文的表单 filterFunction 都能拿到一致的扩展状态，
+ * 与 PropsPanel 通过 `:extend-state` 显式传入的方式保持等价。
+ */
+provide('extendFormState', props.extendFormState);
 
 provide<EventBus>('eventBus', new EventEmitter());
 
