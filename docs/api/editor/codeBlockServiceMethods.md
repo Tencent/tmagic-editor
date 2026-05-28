@@ -226,6 +226,72 @@
   `newContent=null` 的删除记录；不存在的 id 不会入历史。传入 `doNotPushHistory: true` 也可显式跳过写入历史栈。
   :::
 
+## undo
+
+- **参数：**
+  - `{Id}` id 代码块id
+
+- **返回：**
+  - `{Promise<CodeBlockStepValue | null>}` 撤销的 step；栈不存在或已无可撤销时返回 `null`
+
+- **详情：**
+
+  撤销指定代码块的最近一次变更。内部根据 [historyService](./historyServiceMethods.md) 取出 step 后，
+  复用 [setCodeDslByIdSync](#setcodedslbyidsync) / [deleteCodeDslByIds](#deletecodedslbyids) 写回，
+  并自动带上 `doNotPushHistory: true`，确保不会再次入栈。
+
+  写回会触发对应的 `addOrUpdate` / `remove` 事件，编辑器内部据此重新维护
+  `DepTargetType.CODE_BLOCK` 的 dep target，无需调用方额外处理。
+
+  对于带有 `changeRecords` 的更新 step，会按 `propPath` 局部 patch 当前代码块内容；缺省才退化为整内容替换，
+  避免冲掉同代码块上的其它无关变更。
+
+- **示例：**
+
+```js
+import { codeBlockService } from "@tmagic/editor";
+
+if (codeBlockService.canUndo("code_1234")) {
+  await codeBlockService.undo("code_1234");
+}
+```
+
+## redo
+
+- **参数：**
+  - `{Id}` id 代码块id
+
+- **返回：**
+  - `{Promise<CodeBlockStepValue | null>}` 重做的 step；栈不存在或已无可重做时返回 `null`
+
+- **详情：**
+
+  重做指定代码块的下一次变更。其它行为同 [undo](#undo)。
+
+## canUndo
+
+- **参数：**
+  - `{Id}` id 代码块id
+
+- **返回：**
+  - `{boolean}`
+
+- **详情：**
+
+  当前指定代码块是否可撤销，等价于 `historyService.canUndoCodeBlock(id)`。
+
+## canRedo
+
+- **参数：**
+  - `{Id}` id 代码块id
+
+- **返回：**
+  - `{boolean}`
+
+- **详情：**
+
+  当前指定代码块是否可重做，等价于 `historyService.canRedoCodeBlock(id)`。
+
 ## setParamsColConfig
 
 - **参数：**

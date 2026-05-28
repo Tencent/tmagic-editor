@@ -23,11 +23,12 @@ import type { Writable } from 'type-fest';
 import type { CodeBlockContent, CodeBlockDSL, Id, MNode, TargetOptions } from '@tmagic/core';
 import { Target, Watcher } from '@tmagic/core';
 import type { ChangeRecord, TableColumnConfig } from '@tmagic/form';
+import { getValueByKeyPath, setValueByKeyPath } from '@tmagic/utils';
 
 import editorService from '@editor/services/editor';
 import historyService from '@editor/services/history';
 import storageService, { Protocol } from '@editor/services/storage';
-import type { AsyncHookPlugin, CodeState } from '@editor/type';
+import type { AsyncHookPlugin, CodeBlockStepValue, CodeState } from '@editor/type';
 import { CODE_DRAFT_STORAGE_KEY } from '@editor/type';
 import { getEditorConfig } from '@editor/utils/config';
 import { COPY_CODE_STORAGE_KEY } from '@editor/utils/editor';
@@ -277,6 +278,46 @@ class CodeBlock extends BaseService {
   }
 
   /**
+   * 撤销指定代码块的最近一次变更。
+   *
+   * 内部走 setCodeDslByIdSync / deleteCodeDslByIds，因此会自动触发 codeBlockService 的
+   * `addOrUpdate` / `remove` 事件，由 initService 中的 handler 重新维护 dep target
+   * （DepTargetType.CODE_BLOCK 的 add / remove）。所有写回都带 `doNotPushHistory: true`，
+   * 确保不会在历史栈里产生新的记录。
+   *
+   * @param id 代码块 id
+   * @returns 撤销的 step；栈不存在或已无可撤销时返回 null
+   */
+  public async undo(id: Id): Promise<CodeBlockStepValue | null> {
+    const step = historyService.undoCodeBlock(id);
+    if (!step) return null;
+    await this.applyHistoryStep(step, true);
+    return step;
+  }
+
+  /**
+   * 重做指定代码块的下一次变更。
+   * @param id 代码块 id
+   * @returns 重做的 step；栈不存在或已无可重做时返回 null
+   */
+  public async redo(id: Id): Promise<CodeBlockStepValue | null> {
+    const step = historyService.redoCodeBlock(id);
+    if (!step) return null;
+    await this.applyHistoryStep(step, false);
+    return step;
+  }
+
+  /** 是否可对指定代码块撤销。 */
+  public canUndo(id: Id): boolean {
+    return historyService.canUndoCodeBlock(id);
+  }
+
+  /** 是否可对指定代码块重做。 */
+  public canRedo(id: Id): boolean {
+    return historyService.canRedoCodeBlock(id);
+  }
+
+  /**
    * 生成代码块唯一id
    * @returns {Id} 代码块唯一id
    */
@@ -356,6 +397,70 @@ class CodeBlock extends BaseService {
 
   public usePlugin(options: AsyncHookPlugin<AsyncMethodName, CodeBlock>): void {
     super.usePlugin(options);
+  }
+
+  /**
+   * 把一条历史 step 应用到当前代码块服务上。
+   *
+   * 复用现有的 setCodeDslByIdSync / deleteCodeDslByIds，目的是借助它们发出的事件
+   * 触发 initService 中的 dep target 维护（CODE_BLOCK 的 add / remove）。
+   * 所有写回都带 `doNotPushHistory: true`，确保不会在历史栈里产生新的记录。
+   *
+   * - oldContent=null, newContent≠null：原始为新增 → undo 删除；redo 再次 setCodeDslByIdSync
+   * - oldContent≠null, newContent=null：原始为删除 → undo 还原写入；redo 再次删除
+   * - 两侧都有：原始为更新 → 按 changeRecords 局部 patch；缺省退化为整内容替换
+   *
+   * @param step 历史 step
+   * @param reverse true=撤销，false=重做
+   */
+  private async applyHistoryStep(step: CodeBlockStepValue, reverse: boolean): Promise<void> {
+    const { id, oldContent, newContent, changeRecords } = step;
+
+    // 新增 / 删除：直接 set 或 delete，不走 patch 逻辑
+    if (oldContent === null && newContent) {
+      if (reverse) {
+        await this.deleteCodeDslByIds([id], { doNotPushHistory: true });
+      } else {
+        this.setCodeDslByIdSync(id, cloneDeep(newContent), true, { doNotPushHistory: true });
+      }
+      return;
+    }
+
+    if (oldContent && newContent === null) {
+      if (reverse) {
+        this.setCodeDslByIdSync(id, cloneDeep(oldContent), true, { doNotPushHistory: true });
+      } else {
+        await this.deleteCodeDslByIds([id], { doNotPushHistory: true });
+      }
+      return;
+    }
+
+    if (!oldContent || !newContent) return;
+
+    // 更新场景：优先按 changeRecords 局部 patch；缺省退化为整内容替换
+    const sourceForValues = reverse ? oldContent : newContent;
+
+    if (changeRecords?.length) {
+      const current = this.getCodeContentById(id);
+      if (!current) return;
+      const patched = cloneDeep(current) as CodeBlockContent;
+      let fallbackToFullReplace = false;
+      for (const record of changeRecords) {
+        if (!record.propPath) {
+          fallbackToFullReplace = true;
+          break;
+        }
+        const value = cloneDeep(getValueByKeyPath(record.propPath, sourceForValues));
+        setValueByKeyPath(record.propPath, value, patched);
+      }
+      this.setCodeDslByIdSync(id, fallbackToFullReplace ? cloneDeep(sourceForValues) : patched, true, {
+        changeRecords,
+        doNotPushHistory: true,
+      });
+      return;
+    }
+
+    this.setCodeDslByIdSync(id, cloneDeep(sourceForValues), true, { doNotPushHistory: true });
   }
 }
 

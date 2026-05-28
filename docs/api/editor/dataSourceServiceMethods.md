@@ -443,6 +443,72 @@ const ds = dataSourceService.getDataSourceById("ds_123");
 console.log(ds);
 ```
 
+## undo
+
+- **参数：**
+  - `{Id}` id 数据源id
+
+- **返回：**
+  - {`DataSourceStepValue` | null} 撤销的 step；栈不存在或已无可撤销时返回 `null`
+
+- **详情：**
+
+  撤销指定数据源的最近一次变更。内部根据 [historyService](./historyServiceMethods.md) 取出 step 后，
+  复用 [add](#add) / [update](#update) / [remove](#remove) 写回，并自动带上 `doNotPushHistory: true`，
+  确保不会再次入栈。
+
+  写回会触发对应的 `add` / `update` / `remove` 事件，编辑器内部据此重新维护数据源相关的依赖收集
+  （`DepTargetType.DATA_SOURCE` / `DATA_SOURCE_COND` / `DATA_SOURCE_METHOD`），无需调用方额外处理。
+
+  对于带有 `changeRecords` 的更新 step，会按 `propPath` 局部 patch 当前数据源；缺省才退化为整 schema 替换，
+  避免冲掉同节点上的其它无关变更。
+
+- **示例：**
+
+```js
+import { dataSourceService } from "@tmagic/editor";
+
+if (dataSourceService.canUndo("ds_123")) {
+  dataSourceService.undo("ds_123");
+}
+```
+
+## redo
+
+- **参数：**
+  - `{Id}` id 数据源id
+
+- **返回：**
+  - {`DataSourceStepValue` | null} 重做的 step；栈不存在或已无可重做时返回 `null`
+
+- **详情：**
+
+  重做指定数据源的下一次变更。其它行为同 [undo](#undo)。
+
+## canUndo
+
+- **参数：**
+  - `{Id}` id 数据源id
+
+- **返回：**
+  - `{boolean}`
+
+- **详情：**
+
+  当前指定数据源是否可撤销，等价于 `historyService.canUndoDataSource(id)`。
+
+## canRedo
+
+- **参数：**
+  - `{Id}` id 数据源id
+
+- **返回：**
+  - `{boolean}`
+
+- **详情：**
+
+  当前指定数据源是否可重做，等价于 `historyService.canRedoDataSource(id)`。
+
 ## copyWithRelated
 
 - **参数：**

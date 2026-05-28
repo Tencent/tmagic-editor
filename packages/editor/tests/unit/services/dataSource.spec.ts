@@ -186,3 +186,140 @@ describe('DataSource service - 历史记录接入', () => {
     expect(step?.changeRecords).toBeUndefined();
   });
 });
+
+describe('DataSource service - undo / redo', () => {
+  test('undo / redo - 新增场景：撤销=移除，重做=再添加', () => {
+    const created = dataSource.add({ title: 'a', type: 'base' } as any);
+
+    // undo 后数据源应被移除
+    const undoStep = dataSource.undo(created.id!);
+    expect(undoStep).not.toBeNull();
+    expect(dataSource.getDataSourceById(created.id!)).toBeUndefined();
+
+    // redo 后数据源应被重新添加
+    const redoStep = dataSource.redo(created.id!);
+    expect(redoStep).not.toBeNull();
+    expect(dataSource.getDataSourceById(created.id!)?.title).toBe('a');
+  });
+
+  test('undo / redo - 删除场景：撤销=还原，重做=再删除', () => {
+    const created = dataSource.add({ title: 'a', type: 'base' } as any);
+    historyService.reset();
+
+    dataSource.remove(created.id!);
+    expect(dataSource.getDataSourceById(created.id!)).toBeUndefined();
+
+    dataSource.undo(created.id!);
+    expect(dataSource.getDataSourceById(created.id!)?.title).toBe('a');
+
+    dataSource.redo(created.id!);
+    expect(dataSource.getDataSourceById(created.id!)).toBeUndefined();
+  });
+
+  test('undo / redo - 更新场景（无 changeRecords）：整 schema 替换', () => {
+    const created = dataSource.add({ title: 'a', type: 'base' } as any);
+    historyService.reset();
+
+    dataSource.update({ ...created, title: 'b' } as any);
+    expect(dataSource.getDataSourceById(created.id!)?.title).toBe('b');
+
+    dataSource.undo(created.id!);
+    expect(dataSource.getDataSourceById(created.id!)?.title).toBe('a');
+
+    dataSource.redo(created.id!);
+    expect(dataSource.getDataSourceById(created.id!)?.title).toBe('b');
+  });
+
+  test('undo / redo - 更新场景（带 changeRecords）：按 propPath 局部 patch，不冲掉同节点其它字段', () => {
+    const created = dataSource.add({ title: 'a', type: 'base', description: 'origin' } as any);
+    historyService.reset();
+
+    // 模拟 form 端只更新 title
+    dataSource.update({ ...created, title: 'b', description: 'origin' } as any, {
+      changeRecords: [{ propPath: 'title', value: 'b' }],
+    });
+
+    // 在两次 update 之间用户又改了同节点的另一个字段（不入历史，模拟外部同步）
+    dataSource.update({ ...dataSource.getDataSourceById(created.id!), description: 'changed-by-other' } as any, {
+      doNotPushHistory: true,
+    });
+
+    // undo 应只回滚 title，不影响 description
+    dataSource.undo(created.id!);
+    const after = dataSource.getDataSourceById(created.id!);
+    expect(after?.title).toBe('a');
+    expect(after?.description).toBe('changed-by-other');
+
+    // redo 应只重做 title
+    dataSource.redo(created.id!);
+    const redo = dataSource.getDataSourceById(created.id!);
+    expect(redo?.title).toBe('b');
+    expect(redo?.description).toBe('changed-by-other');
+  });
+
+  test('undo / redo - 通过 add / update / remove 触发事件，依赖收集链路保留', () => {
+    const addFn = vi.fn();
+    const updateFn = vi.fn();
+    const removeFn = vi.fn();
+    dataSource.on('add', addFn);
+    dataSource.on('update', updateFn);
+    dataSource.on('remove', removeFn);
+
+    const created = dataSource.add({ title: 'a', type: 'base' } as any);
+    addFn.mockClear();
+
+    // 撤销新增 → 触发 remove 事件，initService 中的 dataSourceRemoveHandler 会清依赖
+    dataSource.undo(created.id!);
+    expect(removeFn).toHaveBeenCalledWith(created.id);
+
+    // 重做新增 → 触发 add 事件，initService 会重新 collectIdle
+    dataSource.redo(created.id!);
+    expect(addFn).toHaveBeenCalled();
+
+    // 推入一次 update 历史，再 undo 触发 update 事件
+    historyService.reset();
+    dataSource.update({ ...created, title: 'b' } as any);
+    updateFn.mockClear();
+    dataSource.undo(created.id!);
+    expect(updateFn).toHaveBeenCalled();
+
+    dataSource.off('add', addFn);
+    dataSource.off('update', updateFn);
+    dataSource.off('remove', removeFn);
+  });
+
+  test('undo / redo - 写回时不会再次入历史栈', () => {
+    const created = dataSource.add({ title: 'a', type: 'base' } as any);
+    historyService.reset();
+
+    dataSource.update({ ...created, title: 'b' } as any);
+    // 此时栈里只有一条 update
+    expect(historyService.canUndoDataSource(created.id!)).toBe(true);
+
+    dataSource.undo(created.id!);
+    // undo 后栈应可 redo，并且 undo 不应再生新栈记录
+    expect(historyService.canRedoDataSource(created.id!)).toBe(true);
+
+    dataSource.redo(created.id!);
+    expect(historyService.canRedoDataSource(created.id!)).toBe(false);
+    expect(historyService.canUndoDataSource(created.id!)).toBe(true);
+  });
+
+  test('canUndo / canRedo 委托给 historyService', () => {
+    expect(dataSource.canUndo('ghost')).toBe(false);
+    expect(dataSource.canRedo('ghost')).toBe(false);
+
+    const created = dataSource.add({ title: 'a', type: 'base' } as any);
+    expect(dataSource.canUndo(created.id!)).toBe(true);
+    expect(dataSource.canRedo(created.id!)).toBe(false);
+
+    dataSource.undo(created.id!);
+    expect(dataSource.canUndo(created.id!)).toBe(false);
+    expect(dataSource.canRedo(created.id!)).toBe(true);
+  });
+
+  test('undo - 栈不存在或已无可撤销时返回 null', () => {
+    expect(dataSource.undo('ghost')).toBeNull();
+    expect(dataSource.redo('ghost')).toBeNull();
+  });
+});
