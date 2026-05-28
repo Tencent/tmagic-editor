@@ -73,10 +73,11 @@
 
     <!-- 对比 -->
     <template v-else-if="type && display && showDiff">
-      <!-- 上次内容 -->
+      <!-- 自接管对比的字段类型（如 vs-code）：只渲染一次组件，由字段内部用 diff 编辑器/视图自行展示前后差异 -->
       <TMagicFormItem
+        v-if="isSelfDiffField"
         v-bind="formItemProps"
-        :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text, 'show-diff': true }"
+        :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text, 'show-diff': true, 'self-diff': true }"
       >
         <template #label>
           <slot name="label" :config="config" :type="type" :text="text" :prop="itemProp" :disabled="disabled">
@@ -90,55 +91,105 @@
           </slot>
         </template>
         <TMagicTooltip v-if="tooltip.text" :placement="tooltip.placement">
-          <component v-bind="fieldsProps" :is="tagName" :model="lastValues" @change="onChangeHandler"></component>
+          <component
+            v-bind="fieldsProps"
+            :is="tagName"
+            :model="model"
+            :last-values="lastValues"
+            :is-compare="isCompare"
+            @change="onChangeHandler"
+          ></component>
           <template #content>
             <div v-html="tooltip.text"></div>
           </template>
         </TMagicTooltip>
 
-        <component v-else v-bind="fieldsProps" :is="tagName" :model="lastValues" @change="onChangeHandler"></component>
+        <component
+          v-else
+          v-bind="fieldsProps"
+          :is="tagName"
+          :model="model"
+          :last-values="lastValues"
+          :is-compare="isCompare"
+          @change="onChangeHandler"
+        ></component>
       </TMagicFormItem>
 
-      <TMagicTooltip v-if="config.tip && type === 'checkbox' && !(config as CheckboxConfig).useLabel" placement="top">
-        <TMagicIcon style="line-height: 40px; margin-left: 5px"><warning-filled /></TMagicIcon>
-        <template #content>
-          <div v-html="config.tip"></div>
-        </template>
-      </TMagicTooltip>
+      <!-- 普通字段：渲染前后两份独立的组件用于对比 -->
+      <template v-else>
+        <!-- 上次内容 -->
+        <TMagicFormItem
+          v-bind="formItemProps"
+          :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text, 'show-diff': true }"
+        >
+          <template #label>
+            <slot name="label" :config="config" :type="type" :text="text" :prop="itemProp" :disabled="disabled">
+              <FormLabel
+                :tip="config.tip"
+                :type="type"
+                :use-label="(config as CheckboxConfig).useLabel"
+                :label-title="config.labelTitle"
+                :text="text"
+              ></FormLabel>
+            </slot>
+          </template>
+          <TMagicTooltip v-if="tooltip.text" :placement="tooltip.placement">
+            <component v-bind="fieldsProps" :is="tagName" :model="lastValues" @change="onChangeHandler"></component>
+            <template #content>
+              <div v-html="tooltip.text"></div>
+            </template>
+          </TMagicTooltip>
 
-      <!-- 当前内容 -->
-      <TMagicFormItem
-        v-bind="formItemProps"
-        :style="config.tip ? 'flex: 1' : ''"
-        :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text, 'show-diff': true }"
-      >
-        <template #label>
-          <slot name="label" :config="config" :type="type" :text="text" :prop="itemProp" :disabled="disabled">
-            <FormLabel
-              :tip="config.tip"
-              :type="type"
-              :use-label="(config as CheckboxConfig).useLabel"
-              :label-title="config.labelTitle"
-              :text="text"
-            ></FormLabel>
-          </slot>
-        </template>
-        <TMagicTooltip v-if="tooltip.text" :placement="tooltip.placement">
-          <component v-bind="fieldsProps" :is="tagName" :model="model" @change="onChangeHandler"></component>
+          <component
+            v-else
+            v-bind="fieldsProps"
+            :is="tagName"
+            :model="lastValues"
+            @change="onChangeHandler"
+          ></component>
+        </TMagicFormItem>
+
+        <TMagicTooltip v-if="config.tip && type === 'checkbox' && !(config as CheckboxConfig).useLabel" placement="top">
+          <TMagicIcon style="line-height: 40px; margin-left: 5px"><warning-filled /></TMagicIcon>
           <template #content>
-            <div v-html="tooltip.text"></div>
+            <div v-html="config.tip"></div>
           </template>
         </TMagicTooltip>
 
-        <component v-else v-bind="fieldsProps" :is="tagName" :model="model" @change="onChangeHandler"></component>
-      </TMagicFormItem>
+        <!-- 当前内容 -->
+        <TMagicFormItem
+          v-bind="formItemProps"
+          :style="config.tip ? 'flex: 1' : ''"
+          :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text, 'show-diff': true }"
+        >
+          <template #label>
+            <slot name="label" :config="config" :type="type" :text="text" :prop="itemProp" :disabled="disabled">
+              <FormLabel
+                :tip="config.tip"
+                :type="type"
+                :use-label="(config as CheckboxConfig).useLabel"
+                :label-title="config.labelTitle"
+                :text="text"
+              ></FormLabel>
+            </slot>
+          </template>
+          <TMagicTooltip v-if="tooltip.text" :placement="tooltip.placement">
+            <component v-bind="fieldsProps" :is="tagName" :model="model" @change="onChangeHandler"></component>
+            <template #content>
+              <div v-html="tooltip.text"></div>
+            </template>
+          </TMagicTooltip>
 
-      <TMagicTooltip v-if="config.tip && type === 'checkbox' && !(config as CheckboxConfig).useLabel" placement="top">
-        <TMagicIcon style="line-height: 40px; margin-left: 5px"><warning-filled /></TMagicIcon>
-        <template #content>
-          <div v-html="config.tip"></div>
-        </template>
-      </TMagicTooltip>
+          <component v-else v-bind="fieldsProps" :is="tagName" :model="model" @change="onChangeHandler"></component>
+        </TMagicFormItem>
+
+        <TMagicTooltip v-if="config.tip && type === 'checkbox' && !(config as CheckboxConfig).useLabel" placement="top">
+          <TMagicIcon style="line-height: 40px; margin-left: 5px"><warning-filled /></TMagicIcon>
+          <template #content>
+            <div v-html="config.tip"></div>
+          </template>
+        </TMagicTooltip>
+      </template>
     </template>
 
     <template v-else-if="items && display">
@@ -280,6 +331,21 @@ const tagName = computed(() => {
 
   return getField(type.value || 'container') || `m-${items.value ? 'form' : 'fields'}-${type.value}`;
 });
+
+/**
+ * 自接管对比的字段类型白名单。
+ *
+ * 这类字段在 `isCompare === true` 且存在差异时，不再由 Container 渲染前后两份独立组件来对比，
+ * 而是只渲染一次组件，将 `model` / `lastValues` / `isCompare` 一并传给字段组件，
+ * 由字段组件内部自行展示前后差异（典型场景：vs-code 字段使用 monaco 自带的 diff 编辑器）。
+ *
+ * 这样做的好处：
+ * 1. 避免重型字段（如 monaco 编辑器）在对比模式下被实例化两次，节省资源；
+ * 2. 提供更专业的对比视觉效果（如 monaco diff 的行级高亮、左右滚动同步等）。
+ */
+const SELF_DIFF_FIELD_TYPES = new Set(['vs-code']);
+
+const isSelfDiffField = computed(() => SELF_DIFF_FIELD_TYPES.has(type.value));
 
 const disabled = computed(() => props.disabled || filterFunction(mForm, props.config.disabled, props));
 

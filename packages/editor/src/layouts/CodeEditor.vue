@@ -330,6 +330,21 @@ watch(
   },
 );
 
+// diff 模式下，对比的"当前值"（modifiedValues）也可能在外部变化（例如 lastValues 不变、当前 model 变了），
+// 此时同样需要重新设置编辑器值，否则右侧编辑器内容会停留在初始化时的快照。
+watch(
+  () => props.modifiedValues,
+  (v, preV) => {
+    if (props.type !== 'diff') return;
+    if (v !== preV) {
+      setEditorValue(props.initValues, props.modifiedValues);
+    }
+  },
+  {
+    deep: true,
+  },
+);
+
 watch(
   () => props.options,
   (v) => {
