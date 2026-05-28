@@ -25,13 +25,15 @@
     <template v-else-if="type && display && !showDiff">
       <TMagicFormItem v-bind="formItemProps" :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text }">
         <template #label>
-          <FormLabel
-            :tip="config.tip"
-            :type="type"
-            :use-label="(config as CheckboxConfig).useLabel"
-            :label-title="config.labelTitle"
-            :text="text"
-          ></FormLabel>
+          <slot name="label" :config="config" :type="type" :text="text" :prop="itemProp" :disabled="disabled">
+            <FormLabel
+              :tip="config.tip"
+              :type="type"
+              :use-label="(config as CheckboxConfig).useLabel"
+              :label-title="config.labelTitle"
+              :text="text"
+            ></FormLabel>
+          </slot>
         </template>
 
         <TMagicTooltip v-if="tooltip.text" :placement="tooltip.placement">
@@ -77,13 +79,15 @@
         :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text, 'show-diff': true }"
       >
         <template #label>
-          <FormLabel
-            :tip="config.tip"
-            :type="type"
-            :use-label="(config as CheckboxConfig).useLabel"
-            :label-title="config.labelTitle"
-            :text="text"
-          ></FormLabel>
+          <slot name="label" :config="config" :type="type" :text="text" :prop="itemProp" :disabled="disabled">
+            <FormLabel
+              :tip="config.tip"
+              :type="type"
+              :use-label="(config as CheckboxConfig).useLabel"
+              :label-title="config.labelTitle"
+              :text="text"
+            ></FormLabel>
+          </slot>
         </template>
         <TMagicTooltip v-if="tooltip.text" :placement="tooltip.placement">
           <component v-bind="fieldsProps" :is="tagName" :model="lastValues" @change="onChangeHandler"></component>
@@ -109,13 +113,15 @@
         :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text, 'show-diff': true }"
       >
         <template #label>
-          <FormLabel
-            :tip="config.tip"
-            :type="type"
-            :use-label="(config as CheckboxConfig).useLabel"
-            :label-title="config.labelTitle"
-            :text="text"
-          ></FormLabel>
+          <slot name="label" :config="config" :type="type" :text="text" :prop="itemProp" :disabled="disabled">
+            <FormLabel
+              :tip="config.tip"
+              :type="type"
+              :use-label="(config as CheckboxConfig).useLabel"
+              :label-title="config.labelTitle"
+              :text="text"
+            ></FormLabel>
+          </slot>
         </template>
         <TMagicTooltip v-if="tooltip.text" :placement="tooltip.placement">
           <component v-bind="fieldsProps" :is="tagName" :model="model" @change="onChangeHandler"></component>
@@ -152,7 +158,11 @@
           :prop="itemProp"
           @change="onChangeHandler"
           @addDiffCount="onAddDiffCount"
-        ></Container>
+        >
+          <template v-if="$slots.label" #label="labelProps">
+            <slot name="label" v-bind="labelProps"></slot>
+          </template>
+        </Container>
       </template>
     </template>
 
@@ -179,6 +189,7 @@ import type {
   ContainerChangeEventData,
   ContainerCommonConfig,
   FormItemConfig,
+  FormSlots,
   FormState,
   FormValue,
   ToolTipConfigType,
@@ -191,6 +202,8 @@ import FormLabel from './FormLabel.vue';
 defineOptions({
   name: 'MFormContainer',
 });
+
+defineSlots<FormSlots>();
 
 const props = withDefaults(
   defineProps<{

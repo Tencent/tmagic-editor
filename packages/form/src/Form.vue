@@ -22,7 +22,11 @@
         :step-active="stepActive"
         :size="size"
         @change="changeHandler"
-      ></Container>
+      >
+        <template v-if="$slots.label" #label="labelProps">
+          <slot name="label" v-bind="labelProps"></slot>
+        </template>
+      </Container>
     </template>
   </TMagicForm>
 </template>
@@ -37,11 +41,21 @@ import { setValueByKeyPath } from '@tmagic/utils';
 import Container from './containers/Container.vue';
 import { getConfig } from './utils/config';
 import { initValue } from './utils/form';
-import type { ChangeRecord, ContainerChangeEventData, FormConfig, FormState, FormValue, ValidateError } from './schema';
+import type {
+  ChangeRecord,
+  ContainerChangeEventData,
+  FormConfig,
+  FormSlots,
+  FormState,
+  FormValue,
+  ValidateError,
+} from './schema';
 
 defineOptions({
   name: 'MForm',
 });
+
+defineSlots<FormSlots>();
 
 const props = withDefaults(
   defineProps<{
