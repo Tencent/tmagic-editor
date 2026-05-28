@@ -932,8 +932,10 @@ export type AsyncMethodName = Writable<(typeof canUsePluginMethods)['async']>;
  * DSL 修改类操作的通用配置
  * - doNotSelect: 操作后是否不要自动触发选中（不调用 this.select / this.multiSelect / stage.select / stage.multiSelect）
  * - doNotSwitchPage: 操作若会引发当前页面切换（如新增 / 删除 / 跨页移动），是否跳过这次切换
+ * - doNotPushHistory: 操作完成后是否不要将本次操作压入历史栈（撤销/重做记录）
  */
 export type DslOpOptions = {
   doNotSelect?: boolean;
   doNotSwitchPage?: boolean;
+  doNotPushHistory?: boolean;
 };

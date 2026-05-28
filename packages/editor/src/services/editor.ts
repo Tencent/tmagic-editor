@@ -62,11 +62,9 @@ import {
   setLayout,
   toggleFixedPosition,
 } from '@editor/utils/editor';
-import type { HistoryOpContext } from '@editor/utils/editor-history';
-import { applyHistoryAddOp, applyHistoryRemoveOp, applyHistoryUpdateOp } from '@editor/utils/editor-history';
 import { beforePaste, getAddParent } from '@editor/utils/operator';
 
-type MoveItem = { cfg: MNode; node: MNode; parent: MContainer; pageForOp: { name: string; id: Id } | null };
+type MoveItem = { node: MNode; parent: MContainer; pageForOp: { name: string; id: Id } | null };
 
 class Editor extends BaseService {
   public state: StoreState = reactive({
@@ -84,7 +82,6 @@ class Editor extends BaseService {
     disabledMultiSelect: false,
     alwaysMultiSelect: false,
   });
-  private isHistoryStateChange = false;
   private selectionBeforeOp: Id[] | null = null;
 
   constructor() {
@@ -371,12 +368,13 @@ class Editor extends BaseService {
    * @param options 可选配置
    * @param options.doNotSelect 添加后是否不更新当前选中节点（默认 false，添加后会选中新增的节点）
    * @param options.doNotSwitchPage 添加后是否不切换当前页面（默认 false；新增页面 / 跨页新增时为 true 会跳过会引发页面切换的选中操作）
+   * @param options.doNotPushHistory 是否不写入历史记录（默认 false）
    * @returns 添加后的节点
    */
   public async add(
     addNode: AddMNode | MNode[],
     parent?: MContainer | null,
-    { doNotSelect = false, doNotSwitchPage = false }: DslOpOptions = {},
+    { doNotSelect = false, doNotSwitchPage = false, doNotPushHistory = false }: DslOpOptions = {},
   ): Promise<MNode | MNode[]> {
     this.captureSelectionBeforeOp();
 
@@ -435,20 +433,24 @@ class Editor extends BaseService {
 
     if (!(isPage(newNodes[0]) || isPageFragment(newNodes[0]))) {
       const pageForOp = this.getNodeInfo(newNodes[0].id, false).page;
-      this.pushOpHistory(
-        'add',
-        {
-          nodes: newNodes.map((n) => cloneDeep(toRaw(n))),
-          parentId: (this.getParentById(newNodes[0].id, false) ?? this.get('root'))!.id,
-          indexMap: Object.fromEntries(
-            newNodes.map((n) => {
-              const p = this.getParentById(n.id, false) as MContainer;
-              return [n.id, p ? getNodeIndex(n.id, p) : -1];
-            }),
-          ),
-        },
-        { name: pageForOp?.name || '', id: pageForOp!.id },
-      );
+      if (!doNotPushHistory) {
+        this.pushOpHistory(
+          'add',
+          {
+            nodes: newNodes.map((n) => cloneDeep(toRaw(n))),
+            parentId: (this.getParentById(newNodes[0].id, false) ?? this.get('root'))!.id,
+            indexMap: Object.fromEntries(
+              newNodes.map((n) => {
+                const p = this.getParentById(n.id, false) as MContainer;
+                return [n.id, p ? getNodeIndex(n.id, p) : -1];
+              }),
+            ),
+          },
+          { name: pageForOp?.name || '', id: pageForOp!.id },
+        );
+      } else {
+        this.selectionBeforeOp = null;
+      }
     }
 
     this.emit('add', newNodes);
@@ -538,10 +540,11 @@ class Editor extends BaseService {
    * @param options 可选配置
    * @param options.doNotSelect 删除后是否不更新当前选中节点（默认 false，删除后会选中父节点或首个页面）
    * @param options.doNotSwitchPage 删除后是否不切换当前页面（默认 false；删除页面 / 页面片段时为 true 会跳过自动切换到首个剩余页面）
+   * @param options.doNotPushHistory 是否不写入历史记录（默认 false）
    */
   public async remove(
     nodeOrNodeList: MNode | MNode[],
-    { doNotSelect = false, doNotSwitchPage = false }: DslOpOptions = {},
+    { doNotSelect = false, doNotSwitchPage = false, doNotPushHistory = false }: DslOpOptions = {},
   ): Promise<void> {
     this.captureSelectionBeforeOp();
 
@@ -569,7 +572,11 @@ class Editor extends BaseService {
     await Promise.all(nodes.map((node) => this.doRemove(node, { doNotSelect, doNotSwitchPage })));
 
     if (removedItems.length > 0 && pageForOp) {
-      this.pushOpHistory('remove', { removedItems }, pageForOp);
+      if (!doNotPushHistory) {
+        this.pushOpHistory('remove', { removedItems }, pageForOp);
+      } else {
+        this.selectionBeforeOp = null;
+      }
     }
 
     this.emit('remove', nodes);
@@ -650,13 +657,18 @@ class Editor extends BaseService {
    * 更新节点
    * update后会触发依赖收集，收集完后会掉stage.update方法
    * @param config 新的节点配置，配置中需要有id信息
+   * @param data 额外数据
+   * @param data.changeRecords form 端变更记录
+   * @param data.doNotPushHistory 是否不写入历史记录（默认 false）
    * @returns 更新后的节点配置
    */
   public async update(
     config: MNode | MNode[],
-    data: { changeRecords?: ChangeRecord[] } = {},
+    data: { changeRecords?: ChangeRecord[]; doNotPushHistory?: boolean } = {},
   ): Promise<MNode | MNode[]> {
     this.captureSelectionBeforeOp();
+
+    const { doNotPushHistory = false } = data;
 
     const nodes = Array.isArray(config) ? config : [config];
 
@@ -664,20 +676,23 @@ class Editor extends BaseService {
 
     if (updateData[0].oldNode?.type !== NodeType.ROOT) {
       const curNodes = this.get('nodes');
-      if (!this.isHistoryStateChange && curNodes.length) {
-        const pageForOp = this.getNodeInfo(nodes[0].id, false).page;
-        this.pushOpHistory(
-          'update',
-          {
-            updatedItems: updateData.map((d) => ({
-              oldNode: cloneDeep(d.oldNode),
-              newNode: cloneDeep(toRaw(d.newNode)),
-            })),
-          },
-          { name: pageForOp?.name || '', id: pageForOp!.id },
-        );
+      if (curNodes.length) {
+        if (!doNotPushHistory) {
+          const pageForOp = this.getNodeInfo(nodes[0].id, false).page;
+          this.pushOpHistory(
+            'update',
+            {
+              updatedItems: updateData.map((d) => ({
+                oldNode: cloneDeep(d.oldNode),
+                newNode: cloneDeep(toRaw(d.newNode)),
+              })),
+            },
+            { name: pageForOp?.name || '', id: pageForOp!.id },
+          );
+        } else {
+          this.selectionBeforeOp = null;
+        }
       }
-      this.isHistoryStateChange = false;
     }
 
     this.emit('update', updateData);
@@ -691,9 +706,14 @@ class Editor extends BaseService {
    * @param options 可选配置
    * @param options.doNotSelect 排序后是否不更新当前选中节点（默认 false）
    * @param options.doNotSwitchPage 排序后是否不切换当前页面（排序只发生在同一父节点内，方法内为空操作；保留以与其它 DSL 操作 API 一致）
+   * @param options.doNotPushHistory 是否不写入历史记录（默认 false）
    * @returns void
    */
-  public async sort(id1: Id, id2: Id, { doNotSelect = false }: DslOpOptions = {}): Promise<void> {
+  public async sort(
+    id1: Id,
+    id2: Id,
+    { doNotSelect = false, doNotPushHistory = false }: DslOpOptions = {},
+  ): Promise<void> {
     this.captureSelectionBeforeOp();
 
     const root = this.get('root');
@@ -712,7 +732,7 @@ class Editor extends BaseService {
 
     parent.items.splice(index2, 0, ...parent.items.splice(index1, 1));
 
-    await this.update(parent);
+    await this.update(parent, { doNotPushHistory });
     if (!doNotSelect) {
       await this.select(node);
     }
@@ -759,12 +779,13 @@ class Editor extends BaseService {
    * @param options 可选配置
    * @param options.doNotSelect 粘贴后是否不更新当前选中节点（默认 false）
    * @param options.doNotSwitchPage 粘贴后是否不切换当前页面（默认 false；跨页粘贴时为 true 会跳过页面切换）
+   * @param options.doNotPushHistory 是否不写入历史记录（默认 false）
    * @returns 添加后的组件节点配置
    */
   public async paste(
     position: PastePosition = {},
     collectorOptions?: TargetOptions,
-    { doNotSelect = false, doNotSwitchPage = false }: DslOpOptions = {},
+    { doNotSelect = false, doNotSwitchPage = false, doNotPushHistory = false }: DslOpOptions = {},
   ): Promise<MNode | MNode[] | void> {
     const config: MNode[] = storageService.getItem(COPY_STORAGE_KEY);
     if (!Array.isArray(config)) return;
@@ -785,7 +806,7 @@ class Editor extends BaseService {
       propsService.replaceRelateId(config, pasteConfigs, collectorOptions);
     }
 
-    return this.add(pasteConfigs, parent, { doNotSelect, doNotSwitchPage });
+    return this.add(pasteConfigs, parent, { doNotSelect, doNotSwitchPage, doNotPushHistory });
   }
 
   public async doPaste(config: MNode[], position: PastePosition = {}): Promise<MNode[]> {
@@ -816,18 +837,19 @@ class Editor extends BaseService {
    * @param options 可选配置
    * @param options.doNotSelect 居中后是否不更新当前选中节点（默认 false）
    * @param options.doNotSwitchPage 居中后是否不切换当前页面（居中只更新节点 style，方法内为空操作；保留以与其它 DSL 操作 API 一致）
+   * @param options.doNotPushHistory 是否不写入历史记录（默认 false）
    * @returns 当前组件节点配置
    */
   public async alignCenter(
     config: MNode | MNode[],
-    { doNotSelect = false }: DslOpOptions = {},
+    { doNotSelect = false, doNotPushHistory = false }: DslOpOptions = {},
   ): Promise<MNode | MNode[]> {
     const nodes = Array.isArray(config) ? config : [config];
     const stage = this.get('stage');
 
     const newNodes = await Promise.all(nodes.map((node) => this.doAlignCenter(node)));
 
-    const newNode = await this.update(newNodes);
+    const newNode = await this.update(newNodes, { doNotPushHistory });
 
     if (!doNotSelect) {
       if (newNodes.length > 1) {
@@ -843,8 +865,10 @@ class Editor extends BaseService {
   /**
    * 移动当前选中节点位置
    * @param offset 偏移量
+   * @param options 可选配置
+   * @param options.doNotPushHistory 是否不写入历史记录（默认 false）
    */
-  public async moveLayer(offset: number | LayerOffset): Promise<void> {
+  public async moveLayer(offset: number | LayerOffset, { doNotPushHistory = false }: DslOpOptions = {}): Promise<void> {
     this.captureSelectionBeforeOp();
 
     const root = this.get('root');
@@ -881,14 +905,18 @@ class Editor extends BaseService {
     });
 
     this.addModifiedNodeId(parent.id);
-    const pageForOp = this.getNodeInfo(node.id, false).page;
-    this.pushOpHistory(
-      'update',
-      {
-        updatedItems: [{ oldNode: oldParent, newNode: cloneDeep(toRaw(parent)) }],
-      },
-      { name: pageForOp?.name || '', id: pageForOp!.id },
-    );
+    if (!doNotPushHistory) {
+      const pageForOp = this.getNodeInfo(node.id, false).page;
+      this.pushOpHistory(
+        'update',
+        {
+          updatedItems: [{ oldNode: oldParent, newNode: cloneDeep(toRaw(parent)) }],
+        },
+        { name: pageForOp?.name || '', id: pageForOp!.id },
+      );
+    } else {
+      this.selectionBeforeOp = null;
+    }
 
     this.emit('move-layer', offset);
   }
@@ -905,11 +933,12 @@ class Editor extends BaseService {
    * @param options 可选配置
    * @param options.doNotSelect 移动后是否不更新当前选中节点（默认 false）
    * @param options.doNotSwitchPage 移动后是否不切换当前页面（默认 false；目标容器位于其它页面时为 true 会跳过自动选中以避免页面切换）
+   * @param options.doNotPushHistory 是否不写入历史记录（默认 false）
    */
   public async moveToContainer(
     config: MNode | MNode[],
     targetId: Id,
-    { doNotSelect = false, doNotSwitchPage = false }: DslOpOptions = {},
+    { doNotSelect = false, doNotSwitchPage = false, doNotPushHistory = false }: DslOpOptions = {},
   ): Promise<MNode | MNode[]> {
     const isBatch = Array.isArray(config);
     const configs = (isBatch ? config : [config]).filter((item) => !(isPage(item) || isPageFragment(item)));
@@ -935,10 +964,10 @@ class Editor extends BaseService {
 
     // 收集 (节点, 源父) 信息，过滤掉异常节点（找不到父或源父等于目标本身）
     const moves: MoveItem[] = [];
-    for (const cfg of configs) {
-      const { node, parent, page } = this.getNodeInfo(cfg.id, false);
+    for (const { id } of configs) {
+      const { node, parent, page } = this.getNodeInfo(id, false);
       if (!node || !parent) continue;
-      moves.push({ cfg, node, parent, pageForOp: page ? { name: page.name || '', id: page.id } : null });
+      moves.push({ node, parent, pageForOp: page ? { name: page.name || '', id: page.id } : null });
     }
 
     if (moves.length === 0) {
@@ -948,96 +977,44 @@ class Editor extends BaseService {
     // 记录所有涉及的源父容器（按 id 去重）+ 目标容器的前置快照；同一父容器只快照一次。
     const beforeSnapshots = new Map<Id, MNode>();
     beforeSnapshots.set(target.id, cloneDeep(toRaw(target)));
-    for (const m of moves) {
-      if (!beforeSnapshots.has(m.parent.id)) {
-        beforeSnapshots.set(m.parent.id, cloneDeep(toRaw(m.parent)));
+    for (const { parent } of moves) {
+      if (!beforeSnapshots.has(parent.id)) {
+        beforeSnapshots.set(parent.id, cloneDeep(toRaw(parent)));
       }
     }
 
-    const layout = await this.getLayout(target);
-    const newConfigs: MNode[] = [];
+    let newConfigs: MNode[] = [];
 
-    for (const { cfg, node, parent } of moves) {
-      const index = getNodeIndex(node.id, parent);
-      parent.items?.splice(index, 1);
+    const moveNodes = moves.map(({ node }) => node);
+    await this.remove(moveNodes, { doNotPushHistory: true, doNotSelect, doNotSwitchPage: true });
 
-      await stage.remove({ id: node.id, parentId: parent.id, root: cloneDeep(root) });
+    newConfigs = (await this.add(moveNodes, target, {
+      doNotPushHistory: true,
+      doNotSelect,
+      doNotSwitchPage,
+    })) as MNode[];
 
-      const newConfig = mergeWith(cloneDeep(node), cfg, (_objValue, srcValue) => {
-        if (Array.isArray(srcValue)) {
-          return srcValue;
-        }
-      });
-      newConfig.style = getInitPositionStyle(newConfig.style, layout);
-
-      target.items.push(newConfig);
-      newConfigs.push(newConfig);
-
-      this.addModifiedNodeId(parent.id);
-    }
-    this.addModifiedNodeId(target.id);
-
-    // 目标容器是否在非当前页面：选中目标会触发当前页面切换
-    const targetWouldSwitchPage = this.isOnDifferentPage(target);
-    const skipSelect = doNotSelect || (doNotSwitchPage && targetWouldSwitchPage);
-
-    if (!skipSelect) {
-      await stage.select(targetId);
-    }
-
-    const targetParent = this.getParentById(target.id);
-    await stage.update({
-      config: cloneDeep(target),
-      parentId: targetParent?.id,
-      root: cloneDeep(root),
-    });
-
-    if (!skipSelect) {
-      if (newConfigs.length > 1) {
-        const ids = newConfigs.map((n) => n.id);
-        await this.multiSelect(ids);
-        stage.multiSelect(ids);
-      } else {
-        await this.select(newConfigs[0]);
-        stage.select(newConfigs[0].id);
-      }
+    if (!doNotPushHistory) {
+      // 整批只入栈一条历史：updatedItems 包含所有源父容器 + 目标容器的前后快照（撤销/重做最小依赖）。
+      const updatedItems = Array.from(beforeSnapshots.entries()).map(([id, oldNode]) => ({
+        oldNode,
+        newNode: cloneDeep(toRaw(this.getNodeById(id, false))) as MNode,
+      }));
+      const historyPage = moves[0].pageForOp ?? { name: '', id: target.id };
+      this.pushOpHistory('update', { updatedItems }, historyPage);
     } else {
-      // 跳过选中目标节点（通常是因为目标位于其它页面），但 state.nodes 仍持有已经被
-      // 从源父容器中移除的旧节点引用 —— UI 上原页面会保留一个"指向不存在节点"的选中态。
-      // 这里需要把搬走的节点从 state.nodes 中剔除：
-      // - 如果剔除后还有剩余选中（部分被搬走、部分未动），保持新的多选状态；
-      // - 如果选中节点全部已被搬走，回退到第一个源父容器（与 `doRemove` 默认在原页面选中父节点的行为一致）。
-      const movedIds = new Set(moves.map((m) => `${m.node.id}`));
-      const selectedNodes = this.get('nodes');
-      const remained = selectedNodes.filter((n: MNode) => !movedIds.has(`${n.id}`));
-      if (remained.length === selectedNodes.length) {
-        // 当前选中根本不在被搬走的列表里，无需调整
-      } else if (remained.length > 0) {
-        this.multiSelect(remained.map((n: MNode) => n.id));
-      } else {
-        // 全部被搬走：选中源父容器，避免残留旧引用。多源父时取第一个，与单选场景默认表现一致。
-        const fallbackParent = moves[0].parent;
-        try {
-          await this.select(fallbackParent);
-        } catch {
-          this.set('nodes', []);
-        }
-      }
+      this.selectionBeforeOp = null;
     }
-
-    // 整批只入栈一条历史：updatedItems 包含所有源父容器 + 目标容器的前后快照（撤销/重做最小依赖）。
-    const updatedItems = Array.from(beforeSnapshots.entries()).map(([id, oldNode]) => ({
-      oldNode,
-      newNode: cloneDeep(toRaw(this.getNodeById(id, false))) as MNode,
-    }));
-
-    const historyPage = moves[0].pageForOp ?? { name: '', id: target.id };
-    this.pushOpHistory('update', { updatedItems }, historyPage);
 
     return isBatch ? newConfigs : newConfigs[0];
   }
 
-  public async dragTo(config: MNode | MNode[], targetParent: MContainer, targetIndex: number) {
+  public async dragTo(
+    config: MNode | MNode[],
+    targetParent: MContainer,
+    targetIndex: number,
+    { doNotPushHistory = false }: DslOpOptions = {},
+  ) {
     this.captureSelectionBeforeOp();
 
     if (!targetParent || !Array.isArray(targetParent.items)) return;
@@ -1097,8 +1074,12 @@ class Editor extends BaseService {
         updatedItems.push({ oldNode, newNode: cloneDeep(toRaw(newNode)) });
       }
     }
-    const pageForOp = this.getNodeInfo(configs[0].id, false).page;
-    this.pushOpHistory('update', { updatedItems }, { name: pageForOp?.name || '', id: pageForOp!.id });
+    if (!doNotPushHistory) {
+      const pageForOp = this.getNodeInfo(configs[0].id, false).page;
+      this.pushOpHistory('update', { updatedItems }, { name: pageForOp?.name || '', id: pageForOp!.id });
+    } else {
+      this.selectionBeforeOp = null;
+    }
 
     this.emit('drag-to', { targetIndex, configs, targetParent });
   }
@@ -1127,14 +1108,14 @@ class Editor extends BaseService {
     return value;
   }
 
-  public async move(left: number, top: number) {
+  public async move(left: number, top: number, { doNotPushHistory = false }: DslOpOptions = {}) {
     const node = toRaw(this.get('node'));
     if (!node || isPage(node)) return;
 
     const newStyle = calcMoveStyle(node.style || {}, left, top);
     if (!newStyle) return;
 
-    await this.update({ id: node.id, type: node.type, style: newStyle });
+    await this.update({ id: node.id, type: node.type, style: newStyle }, { doNotPushHistory });
   }
 
   public resetState() {
@@ -1182,22 +1163,15 @@ class Editor extends BaseService {
   }
 
   private addModifiedNodeId(id: Id) {
-    if (!this.isHistoryStateChange) {
-      this.get('modifiedNodeIds').set(id, id);
-    }
+    this.get('modifiedNodeIds').set(id, id);
   }
 
   private captureSelectionBeforeOp() {
-    if (this.isHistoryStateChange || this.selectionBeforeOp) return;
+    if (this.selectionBeforeOp) return;
     this.selectionBeforeOp = this.get('nodes').map((n) => n.id);
   }
 
   private pushOpHistory(opType: HistoryOpType, extra: Partial<StepValue>, pageData: { name: string; id: Id }) {
-    if (this.isHistoryStateChange) {
-      this.selectionBeforeOp = null;
-      return;
-    }
-
     const step: StepValue = {
       data: pageData,
       opType,
@@ -1210,41 +1184,100 @@ class Editor extends BaseService {
     // 必须落到正确的页面栈，否则会把记录错误地推到当前活动页 / 操作发起页。
     historyService.push(step, pageData.id);
     this.selectionBeforeOp = null;
-    this.isHistoryStateChange = false;
   }
 
   /**
    * 应用历史操作（撤销 / 重做）
+   *
+   * 所有 DSL 修改都走 `editor.add / remove / update`，并通过 `doNotPushHistory` 阻止再次入栈、
+   * `doNotSelect / doNotSwitchPage` 让选区由方法末尾的统一逻辑兜底。
+   *
+   * 注意：这些公开方法会发出 add / remove / update 事件，业务侧若需要区分"用户操作"与"撤销重做触发"，
+   * 请监听 `history-change` 事件配合判断。
+   *
    * @param step 操作记录
    * @param reverse true = 撤销，false = 重做
    */
   private async applyHistoryOp(step: StepValue, reverse: boolean) {
-    this.isHistoryStateChange = true;
-
     const root = this.get('root');
     const stage = this.get('stage');
     if (!root) return;
 
-    const ctx: HistoryOpContext = {
-      root,
-      stage,
-      getNodeById: (id, raw) => this.getNodeById(id, raw),
-      getNodeInfo: (id, raw) => this.getNodeInfo(id, raw),
-      setRoot: (r) => this.set('root', r),
-      setPage: (p) => this.set('page', p),
-      getPage: () => this.get('page'),
-    };
+    const commonOpts = { doNotSelect: true, doNotSwitchPage: true, doNotPushHistory: true } as const;
 
     switch (step.opType) {
-      case 'add':
-        await applyHistoryAddOp(step, reverse, ctx);
+      case 'add': {
+        const nodes = step.nodes ?? [];
+        if (reverse) {
+          // 撤销 add：把当时加入的节点删除
+          for (const n of nodes) {
+            const existing = this.getNodeById(n.id, false);
+            if (existing) {
+              await this.remove(existing, commonOpts);
+            }
+          }
+        } else {
+          // 重做 add：按记录的 indexMap 把节点重新插回父容器
+          const parent = this.getNodeById(step.parentId!, false) as MContainer | null;
+          if (parent) {
+            // 按目标 index 升序逐个插入，先小后大避免索引漂移
+            const sorted = [...nodes].sort((a, b) => (step.indexMap?.[a.id] ?? 0) - (step.indexMap?.[b.id] ?? 0));
+            for (const n of sorted) {
+              const idx = step.indexMap?.[n.id];
+              if (parent.items) {
+                if (typeof idx === 'number' && idx >= 0 && idx < parent.items.length) {
+                  parent.items.splice(idx, 0, cloneDeep(n));
+                } else {
+                  parent.items.push(cloneDeep(n));
+                }
+                await stage?.add({
+                  config: cloneDeep(n),
+                  parent: cloneDeep(parent),
+                  parentId: parent.id,
+                  root: cloneDeep(root),
+                });
+              }
+            }
+          }
+        }
         break;
-      case 'remove':
-        await applyHistoryRemoveOp(step, reverse, ctx);
+      }
+      case 'remove': {
+        const items = step.removedItems ?? [];
+        if (reverse) {
+          // 撤销 remove：按原 index 升序逐个插回（先小后大避免索引漂移）
+          const sorted = [...items].sort((a, b) => a.index - b.index);
+          for (const { node, parentId, index } of sorted) {
+            const parent = this.getNodeById(parentId, false) as MContainer | null;
+            if (parent?.items) {
+              parent.items.splice(index, 0, cloneDeep(node));
+              await stage?.add({
+                config: cloneDeep(node),
+                parent: cloneDeep(parent),
+                parentId,
+                root: cloneDeep(root),
+              });
+            }
+          }
+        } else {
+          // 重做 remove：再删一次
+          for (const { node } of items) {
+            const existing = this.getNodeById(node.id, false);
+            if (existing) {
+              await this.remove(existing, commonOpts);
+            }
+          }
+        }
         break;
-      case 'update':
-        await applyHistoryUpdateOp(step, reverse, ctx);
+      }
+      case 'update': {
+        const items = step.updatedItems ?? [];
+        const configs = items.map(({ oldNode, newNode }) => cloneDeep(reverse ? oldNode : newNode));
+        if (configs.length) {
+          await this.update(configs, { doNotPushHistory: true });
+        }
         break;
+      }
     }
 
     this.set('modifiedNodeIds', step.modifiedNodeIds);
@@ -1266,8 +1299,6 @@ class Editor extends BaseService {
       }, 0);
       this.emit('history-change', page as MPage | MPageFragment);
     }
-
-    this.isHistoryStateChange = false;
   }
 
   private selectedConfigExceptionHandler(config: MNode | Id): EditorNodeInfo {

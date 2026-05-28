@@ -298,6 +298,8 @@ dataSourceService.setFormMethod("http", [
 
 - **参数：**
   - {`DataSourceSchema`} config 数据源配置
+  - `{Object}` options 可选配置
+    - `{boolean}` doNotPushHistory 是否不写入历史记录（默认 false）
 
 - **返回：**
   - {`DataSourceSchema`} 添加后的数据源配置
@@ -309,6 +311,7 @@ dataSourceService.setFormMethod("http", [
   ::: tip
   添加成功会自动调用 `historyService.pushDataSource` 入栈一条 `oldSchema=null` 的新增记录，
   参见 [historyService.pushDataSource](./historyServiceMethods.md#pushdatasource)。
+  传入 `doNotPushHistory: true` 可跳过写入历史栈，常用于批量导入、外部同步等非用户操作场景。
   :::
 
 - **示例：**
@@ -334,6 +337,7 @@ console.log(newDs.id); // 自动生成的id
   - {`DataSourceSchema`} config 数据源配置
   - `{Object}` options 可选配置
     - {`ChangeRecord`[]} changeRecords 变更记录
+    - `{boolean}` doNotPushHistory 是否不写入历史记录（默认 false）
 
   ::: details 查看 ChangeRecord 类型定义
   <<< @/../packages/form-schema/src/base.ts#ChangeRecord{ts}
@@ -348,7 +352,7 @@ console.log(newDs.id); // 自动生成的id
 
   ::: tip
   更新成功会自动调用 `historyService.pushDataSource` 入栈一条 `oldSchema` / `newSchema`
-  均为对应 schema 的更新记录。
+  均为对应 schema 的更新记录。传入 `doNotPushHistory: true` 可跳过写入历史栈。
   :::
 
 - **示例：**
@@ -372,6 +376,8 @@ console.log(updatedDs);
 
 - **参数：**
   - `{string}` id 数据源id
+  - `{Object}` options 可选配置
+    - `{boolean}` doNotPushHistory 是否不写入历史记录（默认 false）
 
 - **返回：**
   - `{void}`
@@ -382,7 +388,7 @@ console.log(updatedDs);
 
   ::: tip
   对实际存在的数据源会自动调用 `historyService.pushDataSource` 入栈一条 `newSchema=null`
-  的删除记录；不存在的 id 不会入历史。
+  的删除记录；不存在的 id 不会入历史。传入 `doNotPushHistory: true` 也可显式跳过写入历史栈。
   :::
 
 - **示例：**

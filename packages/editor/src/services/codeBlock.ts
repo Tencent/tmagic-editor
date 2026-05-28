@@ -93,10 +93,16 @@ class CodeBlock extends BaseService {
    * 设置代码块ID和代码内容到源dsl
    * @param {Id} id 代码块id
    * @param {CodeBlockContent} codeConfig 代码块内容配置信息
+   * @param options 可选配置
+   * @param options.doNotPushHistory 是否不写入历史记录（默认 false）
    * @returns {void}
    */
-  public async setCodeDslById(id: Id, codeConfig: Partial<CodeBlockContent>): Promise<void> {
-    this.setCodeDslByIdSync(id, codeConfig, true);
+  public async setCodeDslById(
+    id: Id,
+    codeConfig: Partial<CodeBlockContent>,
+    { doNotPushHistory = false }: { doNotPushHistory?: boolean } = {},
+  ): Promise<void> {
+    this.setCodeDslByIdSync(id, codeConfig, true, { doNotPushHistory });
   }
 
   /**
@@ -105,9 +111,16 @@ class CodeBlock extends BaseService {
    * @param {Id} id 代码块id
    * @param {CodeBlockContent} codeConfig 代码块内容配置信息
    * @param {boolean} force 是否强制写入，默认true
+   * @param options 可选配置
+   * @param options.doNotPushHistory 是否不写入历史记录（默认 false）
    * @returns {void}
    */
-  public setCodeDslByIdSync(id: Id, codeConfig: Partial<CodeBlockContent>, force = true): void {
+  public setCodeDslByIdSync(
+    id: Id,
+    codeConfig: Partial<CodeBlockContent>,
+    force = true,
+    { doNotPushHistory = false }: { doNotPushHistory?: boolean } = {},
+  ): void {
     const codeDsl = this.getCodeDsl();
 
     if (!codeDsl) {
@@ -136,7 +149,9 @@ class CodeBlock extends BaseService {
 
     const newContent = cloneDeep(codeDsl[id]);
 
-    historyService.pushCodeBlock(id, { oldContent, newContent });
+    if (!doNotPushHistory) {
+      historyService.pushCodeBlock(id, { oldContent, newContent });
+    }
 
     this.emit('addOrUpdate', id, codeDsl[id]);
   }
@@ -226,8 +241,13 @@ class CodeBlock extends BaseService {
   /**
    * 在dsl数据源中删除指定id的代码块
    * @param {Id[]} codeIds 需要删除的代码块id数组
+   * @param options 可选配置
+   * @param options.doNotPushHistory 是否不写入历史记录（默认 false）
    */
-  public async deleteCodeDslByIds(codeIds: Id[]): Promise<void> {
+  public async deleteCodeDslByIds(
+    codeIds: Id[],
+    { doNotPushHistory = false }: { doNotPushHistory?: boolean } = {},
+  ): Promise<void> {
     const currentDsl = await this.getCodeDsl();
 
     if (!currentDsl) return;
@@ -238,7 +258,7 @@ class CodeBlock extends BaseService {
 
       delete currentDsl[id];
 
-      if (oldContent) {
+      if (oldContent && !doNotPushHistory) {
         historyService.pushCodeBlock(id, { oldContent, newContent: null });
       }
 

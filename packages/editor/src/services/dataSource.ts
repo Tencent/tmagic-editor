@@ -103,7 +103,13 @@ class DataSource extends BaseService {
     this.get('methods')[toLine(type)] = value;
   }
 
-  public add(config: DataSourceSchema) {
+  /**
+   * 新增数据源
+   * @param config 数据源配置
+   * @param options 可选配置
+   * @param options.doNotPushHistory 是否不写入历史记录（默认 false）
+   */
+  public add(config: DataSourceSchema, { doNotPushHistory = false }: { doNotPushHistory?: boolean } = {}) {
     const newConfig = {
       ...config,
       id: config.id && !this.getDataSourceById(config.id) ? config.id : this.createId(),
@@ -111,14 +117,29 @@ class DataSource extends BaseService {
 
     this.get('dataSources').push(newConfig);
 
-    historyService.pushDataSource(newConfig.id, { oldSchema: null, newSchema: newConfig });
+    if (!doNotPushHistory) {
+      historyService.pushDataSource(newConfig.id, { oldSchema: null, newSchema: newConfig });
+    }
 
     this.emit('add', newConfig);
 
     return newConfig;
   }
 
-  public update(config: DataSourceSchema, { changeRecords = [] }: { changeRecords?: ChangeRecord[] } = {}) {
+  /**
+   * 更新数据源
+   * @param config 数据源配置
+   * @param data 额外数据
+   * @param data.changeRecords form 端变更记录
+   * @param data.doNotPushHistory 是否不写入历史记录（默认 false）
+   */
+  public update(
+    config: DataSourceSchema,
+    {
+      changeRecords = [],
+      doNotPushHistory = false,
+    }: { changeRecords?: ChangeRecord[]; doNotPushHistory?: boolean } = {},
+  ) {
     const dataSources = this.get('dataSources');
 
     const index = dataSources.findIndex((ds) => ds.id === config.id);
@@ -128,10 +149,12 @@ class DataSource extends BaseService {
 
     dataSources[index] = newConfig;
 
-    historyService.pushDataSource(newConfig.id, {
-      oldSchema: oldConfig ? cloneDeep(oldConfig) : null,
-      newSchema: newConfig,
-    });
+    if (!doNotPushHistory) {
+      historyService.pushDataSource(newConfig.id, {
+        oldSchema: oldConfig ? cloneDeep(oldConfig) : null,
+        newSchema: newConfig,
+      });
+    }
 
     this.emit('update', newConfig, {
       oldConfig,
@@ -141,13 +164,19 @@ class DataSource extends BaseService {
     return newConfig;
   }
 
-  public remove(id: string) {
+  /**
+   * 删除数据源
+   * @param id 数据源 id
+   * @param options 可选配置
+   * @param options.doNotPushHistory 是否不写入历史记录（默认 false）
+   */
+  public remove(id: string, { doNotPushHistory = false }: { doNotPushHistory?: boolean } = {}) {
     const dataSources = this.get('dataSources');
     const index = dataSources.findIndex((ds) => ds.id === id);
     const oldConfig = index !== -1 ? dataSources[index] : null;
     dataSources.splice(index, 1);
 
-    if (oldConfig) {
+    if (oldConfig && !doNotPushHistory) {
       historyService.pushDataSource(id, { oldSchema: cloneDeep(oldConfig), newSchema: null });
     }
 

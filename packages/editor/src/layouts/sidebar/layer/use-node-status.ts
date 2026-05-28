@@ -9,12 +9,15 @@ import { updateStatus } from '@editor/utils/tree';
 const createPageNodeStatus = (page: MPage | MPageFragment, initialLayerNodeStatus?: Map<Id, LayerNodeStatus>) => {
   const map = new Map<Id, LayerNodeStatus>();
 
-  map.set(page.id, {
-    visible: true,
-    expand: true,
-    selected: true,
-    draggable: false,
-  });
+  map.set(
+    page.id,
+    initialLayerNodeStatus?.get(page.id) || {
+      visible: true,
+      expand: true,
+      selected: true,
+      draggable: false,
+    },
+  );
 
   page.items.forEach((node: MNode) =>
     traverseNode<MNode>(node, (node) => {

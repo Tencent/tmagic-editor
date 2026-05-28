@@ -48,6 +48,8 @@
 - **参数：**
   - `{string | number}` id 代码块id
   - {Partial<`CodeBlockContent`>} codeConfig 代码块内容配置信息
+  - `{Object}` options 可选配置
+    - `{boolean}` doNotPushHistory 是否不写入历史记录（默认 false）
 
 - **返回：**
   - `{Promise<void>}`
@@ -62,6 +64,8 @@
   - `{string | number}` id 代码块id
   - {Partial<`CodeBlockContent`>} codeConfig 代码块内容配置信息
   - `{boolean}` force 是否强制写入，默认 `true`；为 `false` 时若同 id 已存在则跳过
+  - `{Object}` options 可选配置
+    - `{boolean}` doNotPushHistory 是否不写入历史记录（默认 false）
 
 - **返回：**
   - `{void}`
@@ -73,6 +77,7 @@
   ::: tip
   写入成功时（`force=false` 且同 id 已存在的跳过场景除外）会自动调用 `historyService.pushCodeBlock`
   把本次变更入历史栈，参见 [historyService.pushCodeBlock](./historyServiceMethods.md#pushcodeblock)。
+  传入 `doNotPushHistory: true` 可跳过写入历史栈，常用于批量导入、外部同步等非用户操作场景。
   :::
 
 ## getCodeDslByIds
@@ -199,6 +204,8 @@
 
 - **参数：**
   - `{(string | number)[]}` codeIds 需要删除的代码块id数组
+  - `{Object}` options 可选配置
+    - `{boolean}` doNotPushHistory 是否不写入历史记录（默认 false）
 
 - **返回：**
   - `{Promise<void>}`
@@ -209,7 +216,7 @@
 
   ::: tip
   对每个实际存在并被删除的代码块，会自动调用 `historyService.pushCodeBlock` 入栈一条
-  `newContent=null` 的删除记录；不存在的 id 不会入历史。
+  `newContent=null` 的删除记录；不存在的 id 不会入历史。传入 `doNotPushHistory: true` 也可显式跳过写入历史栈。
   :::
 
 ## setParamsColConfig
