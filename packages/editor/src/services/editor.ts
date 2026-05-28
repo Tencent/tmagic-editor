@@ -374,7 +374,7 @@ class Editor extends BaseService {
   public async add(
     addNode: AddMNode | MNode[],
     parent?: MContainer | null,
-    { doNotSelect = false, doNotSwitchPage = false, doNotPushHistory = false }: DslOpOptions = {},
+    { doNotSelect = false, doNotSwitchPage = false, doNotPushHistory = false, historyDescription }: DslOpOptions = {},
   ): Promise<MNode | MNode[]> {
     this.captureSelectionBeforeOp();
 
@@ -447,6 +447,7 @@ class Editor extends BaseService {
             ),
           },
           { name: pageForOp?.name || '', id: pageForOp!.id },
+          historyDescription,
         );
       } else {
         this.selectionBeforeOp = null;
@@ -544,7 +545,7 @@ class Editor extends BaseService {
    */
   public async remove(
     nodeOrNodeList: MNode | MNode[],
-    { doNotSelect = false, doNotSwitchPage = false, doNotPushHistory = false }: DslOpOptions = {},
+    { doNotSelect = false, doNotSwitchPage = false, doNotPushHistory = false, historyDescription }: DslOpOptions = {},
   ): Promise<void> {
     this.captureSelectionBeforeOp();
 
@@ -573,7 +574,7 @@ class Editor extends BaseService {
 
     if (removedItems.length > 0 && pageForOp) {
       if (!doNotPushHistory) {
-        this.pushOpHistory('remove', { removedItems }, pageForOp);
+        this.pushOpHistory('remove', { removedItems }, pageForOp, historyDescription);
       } else {
         this.selectionBeforeOp = null;
       }
@@ -661,6 +662,7 @@ class Editor extends BaseService {
    * @param data.changeRecords 单节点 form 端变更记录（多节点场景下被忽略，使用 changeRecordList）
    * @param data.changeRecordList 多节点 form 端变更记录列表，按 config 数组同序对应每个节点；优先级高于 changeRecords
    * @param data.doNotPushHistory 是否不写入历史记录（默认 false）
+   * @param data.historyDescription 入栈时附带的人类可读描述，用于历史面板展示（不影响 undo/redo 行为）
    * @returns 更新后的节点配置
    */
   public async update(
@@ -669,11 +671,12 @@ class Editor extends BaseService {
       changeRecords?: ChangeRecord[];
       changeRecordList?: ChangeRecord[][];
       doNotPushHistory?: boolean;
+      historyDescription?: string;
     } = {},
   ): Promise<MNode | MNode[]> {
     this.captureSelectionBeforeOp();
 
-    const { doNotPushHistory = false, changeRecordList, changeRecords } = data;
+    const { doNotPushHistory = false, changeRecordList, changeRecords, historyDescription } = data;
 
     const nodes = Array.isArray(config) ? config : [config];
 
@@ -703,6 +706,7 @@ class Editor extends BaseService {
               })),
             },
             { name: pageForOp?.name || '', id: pageForOp!.id },
+            historyDescription,
           );
         } else {
           this.selectionBeforeOp = null;
@@ -1186,7 +1190,12 @@ class Editor extends BaseService {
     this.selectionBeforeOp = this.get('nodes').map((n) => n.id);
   }
 
-  private pushOpHistory(opType: HistoryOpType, extra: Partial<StepValue>, pageData: { name: string; id: Id }) {
+  private pushOpHistory(
+    opType: HistoryOpType,
+    extra: Partial<StepValue>,
+    pageData: { name: string; id: Id },
+    historyDescription?: string,
+  ) {
     const step: StepValue = {
       data: pageData,
       opType,
@@ -1195,6 +1204,7 @@ class Editor extends BaseService {
       modifiedNodeIds: new Map(this.get('modifiedNodeIds')),
       ...extra,
     };
+    if (historyDescription) step.historyDescription = historyDescription;
     // 显式按 step.data.id 入栈：跨页操作（如 moveToContainer 从源页搬到目标页）
     // 必须落到正确的页面栈，否则会把记录错误地推到当前活动页 / 操作发起页。
     historyService.push(step, pageData.id);

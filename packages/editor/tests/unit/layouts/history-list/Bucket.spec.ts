@@ -1,0 +1,109 @@
+/*
+ * Tencent is pleased to support the open source community by making TMagicEditor available.
+ *
+ * Copyright (C) 2025 Tencent.
+ */
+import { describe, expect, test } from 'vitest';
+import { mount } from '@vue/test-utils';
+
+import Bucket from '@editor/layouts/history-list/Bucket.vue';
+
+const buildGroup = (opType: 'add' | 'remove' | 'update', stepCount: number, applied = true) => ({
+  applied,
+  opType,
+  steps: Array.from({ length: stepCount }, (_, i) => ({
+    index: i,
+    applied,
+    step: { mark: `s-${i}` },
+  })),
+});
+
+describe('Bucket.vue', () => {
+  test('渲染 bucket 头部信息与组数', () => {
+    const wrapper = mount(Bucket, {
+      props: {
+        title: '数据源',
+        bucketId: 'ds_1',
+        prefix: 'ds',
+        groups: [buildGroup('update', 1), buildGroup('add', 1)],
+        describeGroup: () => 'desc',
+        describeStep: () => 'sub-desc',
+        expanded: {},
+      },
+    });
+    const head = wrapper.find('.m-editor-history-list-bucket-title');
+    expect(head.text()).toContain('数据源');
+    expect(head.find('code').text()).toBe('ds_1');
+    expect(head.find('.m-editor-history-list-bucket-count').text()).toBe('2 组');
+  });
+
+  test('为每个 group 渲染一个 GroupRow 并通过描述生成器生成文案', () => {
+    const groups = [buildGroup('update', 2), buildGroup('remove', 1)];
+    const describeGroup = (g: any) => `group-${g.opType}-${g.steps.length}`;
+    const describeStep = (s: any) => `step-${s.mark}`;
+
+    const wrapper = mount(Bucket, {
+      props: {
+        title: '代码块',
+        bucketId: 'code_1',
+        prefix: 'cb',
+        groups,
+        describeGroup,
+        describeStep,
+        expanded: { 'cb-code_1-0': true },
+      },
+    });
+    const rows = wrapper.findAll('.m-editor-history-list-group');
+    expect(rows).toHaveLength(2);
+    // 第一组（merged，2 步）的 desc 来自 describeGroup
+    expect(rows[0].find('.m-editor-history-list-item-desc').text()).toBe('group-update-2');
+    expect(rows[0].find('.m-editor-history-list-item-merge').exists()).toBe(true);
+    // 第一组展开后渲染的子步描述来自 describeStep
+    const subItems = rows[0].findAll('.m-editor-history-list-substeps li');
+    expect(subItems).toHaveLength(2);
+    expect(subItems[0].text()).toContain('step-s-0');
+    expect(subItems[1].text()).toContain('step-s-1');
+
+    // 第二组只有 1 步：未合并
+    expect(rows[1].find('.m-editor-history-list-item-merge').exists()).toBe(false);
+    expect(rows[1].find('.m-editor-history-list-item-desc').text()).toBe('group-remove-1');
+  });
+
+  test('GroupRow toggle 事件被透传到 Bucket', async () => {
+    const wrapper = mount(Bucket, {
+      props: {
+        title: '代码块',
+        bucketId: 'code_1',
+        prefix: 'cb',
+        groups: [buildGroup('update', 1)],
+        describeGroup: () => 'g',
+        describeStep: () => 's',
+        expanded: {},
+      },
+    });
+    await wrapper.find('.m-editor-history-list-group-head').trigger('click');
+    const events = wrapper.emitted('toggle');
+    expect(events).toBeTruthy();
+    expect(events![0]).toEqual(['cb-code_1-0']);
+  });
+
+  test('groupKey 命名空间使用 prefix + bucketId + 索引', () => {
+    const wrapper = mount(Bucket, {
+      props: {
+        title: '数据源',
+        bucketId: 42,
+        prefix: 'ds',
+        groups: [buildGroup('update', 2), buildGroup('add', 1)],
+        describeGroup: () => 'g',
+        describeStep: () => 's',
+        // 给第二组打开展开状态
+        expanded: { 'ds-42-1': true },
+      },
+    });
+    // 第二组只有 1 步，不应渲染 substeps（即使 expanded 为 true）
+    const rows = wrapper.findAll('.m-editor-history-list-group');
+    expect(rows[1].find('.m-editor-history-list-substeps').exists()).toBe(false);
+    // 第一组未展开，也不应有 substeps
+    expect(rows[0].find('.m-editor-history-list-substeps').exists()).toBe(false);
+  });
+});

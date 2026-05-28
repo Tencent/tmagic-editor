@@ -75,5 +75,28 @@ export class UndoRedo<T = any> {
     }
     return cloneDeep(this.elementList[this.listCursor - 1]);
   }
+
+  /**
+   * 返回栈内全部元素的浅克隆数组（按时间顺序，索引 0 为最早一步）。
+   * 仅用于历史面板等只读展示场景，不应直接修改返回值。
+   */
+  public getElementList(): T[] {
+    return this.elementList.slice();
+  }
+
+  /**
+   * 当前游标位置：表示已应用的步骤数量。
+   * - cursor === 0 表示全部已撤销
+   * - cursor === length 表示已重做到末尾
+   * 历史面板用于区分"已应用 / 已撤销"两段。
+   */
+  public getCursor(): number {
+    return this.listCursor;
+  }
+
+  /** 栈内总步数。 */
+  public getLength(): number {
+    return this.elementList.length;
+  }
 }
 // #endregion UndoRedo

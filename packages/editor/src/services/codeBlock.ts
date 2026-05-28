@@ -22,13 +22,19 @@ import type { Writable } from 'type-fest';
 
 import type { CodeBlockContent, CodeBlockDSL, Id, MNode, TargetOptions } from '@tmagic/core';
 import { Target, Watcher } from '@tmagic/core';
-import type { ChangeRecord, TableColumnConfig } from '@tmagic/form';
+import type { TableColumnConfig } from '@tmagic/form';
 import { getValueByKeyPath, setValueByKeyPath } from '@tmagic/utils';
 
 import editorService from '@editor/services/editor';
 import historyService from '@editor/services/history';
 import storageService, { Protocol } from '@editor/services/storage';
-import type { AsyncHookPlugin, CodeBlockStepValue, CodeState } from '@editor/type';
+import type {
+  AsyncHookPlugin,
+  CodeBlockStepValue,
+  CodeState,
+  HistoryOpOptions,
+  HistoryOpOptionsWithChangeRecords,
+} from '@editor/type';
 import { CODE_DRAFT_STORAGE_KEY } from '@editor/type';
 import { getEditorConfig } from '@editor/utils/config';
 import { COPY_CODE_STORAGE_KEY } from '@editor/utils/editor';
@@ -102,7 +108,7 @@ class CodeBlock extends BaseService {
   public async setCodeDslById(
     id: Id,
     codeConfig: Partial<CodeBlockContent>,
-    { changeRecords, doNotPushHistory = false }: { changeRecords?: ChangeRecord[]; doNotPushHistory?: boolean } = {},
+    { changeRecords, doNotPushHistory = false }: HistoryOpOptionsWithChangeRecords = {},
   ): Promise<void> {
     this.setCodeDslByIdSync(id, codeConfig, true, { changeRecords, doNotPushHistory });
   }
@@ -116,13 +122,14 @@ class CodeBlock extends BaseService {
    * @param options 可选配置
    * @param options.changeRecords form 端 propPath/value 列表，用于历史记录的精细化撤销/重做
    * @param options.doNotPushHistory 是否不写入历史记录（默认 false）
+   * @param options.historyDescription 入栈时附带的人类可读描述，用于历史面板展示
    * @returns {void}
    */
   public setCodeDslByIdSync(
     id: Id,
     codeConfig: Partial<CodeBlockContent>,
     force = true,
-    { changeRecords, doNotPushHistory = false }: { changeRecords?: ChangeRecord[]; doNotPushHistory?: boolean } = {},
+    { changeRecords, doNotPushHistory = false, historyDescription }: HistoryOpOptionsWithChangeRecords = {},
   ): void {
     const codeDsl = this.getCodeDsl();
 
@@ -153,7 +160,7 @@ class CodeBlock extends BaseService {
     const newContent = cloneDeep(codeDsl[id]);
 
     if (!doNotPushHistory) {
-      historyService.pushCodeBlock(id, { oldContent, newContent, changeRecords });
+      historyService.pushCodeBlock(id, { oldContent, newContent, changeRecords, historyDescription });
     }
 
     this.emit('addOrUpdate', id, codeDsl[id]);
@@ -249,7 +256,7 @@ class CodeBlock extends BaseService {
    */
   public async deleteCodeDslByIds(
     codeIds: Id[],
-    { doNotPushHistory = false }: { doNotPushHistory?: boolean } = {},
+    { doNotPushHistory = false, historyDescription }: HistoryOpOptions = {},
   ): Promise<void> {
     const currentDsl = await this.getCodeDsl();
 
@@ -262,7 +269,7 @@ class CodeBlock extends BaseService {
       delete currentDsl[id];
 
       if (oldContent && !doNotPushHistory) {
-        historyService.pushCodeBlock(id, { oldContent, newContent: null });
+        historyService.pushCodeBlock(id, { oldContent, newContent: null, historyDescription });
       }
 
       this.emit('remove', id);

@@ -417,6 +417,7 @@ export interface MenuComponent {
  * 'rule': 显示隐藏标尺
  * 'scale-to-original': 缩放到实际大小
  * 'scale-to-fit': 缩放以适应
+ * 'history-list': 历史记录面板（按 页面 / 数据源 / 代码块 三个 tab 展示，相邻同目标修改自动合并）
  */
 // #region MenuItem
 export type MenuItem =
@@ -431,6 +432,7 @@ export type MenuItem =
   | 'rule'
   | 'scale-to-original'
   | 'scale-to-fit'
+  | 'history-list'
   | MenuButton
   | MenuComponent
   | string;
@@ -644,6 +646,11 @@ export interface StepValue {
    * 缺省（未传 / 空数组）才退化为整节点替换。
    */
   updatedItems?: { oldNode: MNode; newNode: MNode; changeRecords?: ChangeRecord[] }[];
+  /**
+   * 调用方可选传入的人类可读描述（如「调整按钮颜色」），用于历史面板展示。
+   * 不影响 undo/redo 行为；缺省时面板会根据节点 / propPath 自动生成描述。
+   */
+  historyDescription?: string;
 }
 // #endregion StepValue
 
@@ -666,6 +673,8 @@ export interface CodeBlockStepValue {
    * 缺省才退化为整内容替换。新增/删除场景通常无 changeRecords。
    */
   changeRecords?: ChangeRecord[];
+  /** 调用方可选传入的人类可读描述，用于历史面板展示；不影响 undo/redo 行为。 */
+  historyDescription?: string;
 }
 // #endregion CodeBlockStepValue
 
@@ -688,6 +697,8 @@ export interface DataSourceStepValue {
    * 缺省才退化为整 schema 替换。新增/删除场景通常无 changeRecords。
    */
   changeRecords?: ChangeRecord[];
+  /** 调用方可选传入的人类可读描述，用于历史面板展示；不影响 undo/redo 行为。 */
+  historyDescription?: string;
 }
 // #endregion DataSourceStepValue
 
@@ -707,6 +718,81 @@ export interface HistoryState {
    */
   dataSourceState: Record<Id, UndoRedo<DataSourceStepValue>>;
 }
+
+// #region HistoryListEntry
+/**
+ * 历史面板用：当前页面的一条历史步骤（包含位置和是否已应用）。
+ */
+export interface PageHistoryStepEntry {
+  /** 步骤内容 */
+  step: StepValue;
+  /** 在所属栈中的索引（0 为最早） */
+  index: number;
+  /** 是否处于"已应用"段（即位于栈游标之前）。撤销后变为 false。 */
+  applied: boolean;
+  /** 是否为当前所在的步骤（栈中最近一次已应用的那一步，即 index === cursor - 1）。 */
+  isCurrent?: boolean;
+}
+
+/**
+ * 页面历史面板分组。
+ * - 连续修改同一目标节点（updatedItems[0].oldNode.id 一致）的 'update' 步骤合并成一组；
+ * - 多节点更新 / add / remove 始终独立成组（无法明确归属单一目标）。
+ * - targetId 为 undefined 表示"无明确目标"（如 add/remove/多节点 update），不参与合并。
+ */
+export interface PageHistoryGroup {
+  kind: 'page';
+  /** 所属页面 id */
+  pageId: Id;
+  /** 该分组的操作类型 */
+  opType: HistoryOpType;
+  /**
+   * 合并的目标节点 id；只有"单节点 update"才有值，并按此 id 与相邻同 id 的 update 合并。
+   * undefined 表示该分组不可被合并（add / remove / 多节点 update）。
+   */
+  targetId?: Id;
+  /** 目标节点的可读名（取最后一步的 newNode.name/type/id） */
+  targetName?: string;
+  /** 组内所有步骤，按时间正序 */
+  steps: PageHistoryStepEntry[];
+  /** 组内最后一步是否已应用 */
+  applied: boolean;
+  /** 是否为当前所在的分组（包含栈中最近一次已应用步骤的那一组）。 */
+  isCurrent?: boolean;
+}
+
+/**
+ * 代码块历史面板分组。
+ * - 同一 codeBlockId 的栈内，相邻的 'update' 操作会合并成一个 group；
+ * - 'add' / 'remove' 始终独立成组（语义上是一次性事件）。
+ */
+export interface CodeBlockHistoryGroup {
+  kind: 'code-block';
+  /** 关联的 codeBlock id */
+  id: Id;
+  /** 该分组的操作类型 */
+  opType: HistoryOpType;
+  /** 组内所有步骤，按时间正序 */
+  steps: { step: CodeBlockStepValue; index: number; applied: boolean; isCurrent?: boolean }[];
+  /** 组内最后一步是否已应用，用于整组的状态展示 */
+  applied: boolean;
+  /** 是否为当前所在的分组（包含该栈最近一次已应用步骤的那一组）。 */
+  isCurrent?: boolean;
+}
+
+/**
+ * 数据源历史面板分组，结构同 CodeBlockHistoryGroup。
+ */
+export interface DataSourceHistoryGroup {
+  kind: 'data-source';
+  id: Id;
+  opType: HistoryOpType;
+  steps: { step: DataSourceStepValue; index: number; applied: boolean; isCurrent?: boolean }[];
+  applied: boolean;
+  /** 是否为当前所在的分组（包含该栈最近一次已应用步骤的那一组）。 */
+  isCurrent?: boolean;
+}
+// #endregion HistoryListEntry
 
 export enum KeyBindingCommand {
   /** 复制 */
@@ -944,13 +1030,29 @@ export const canUsePluginMethods = {
 export type AsyncMethodName = Writable<(typeof canUsePluginMethods)['async']>;
 
 /**
+ * 历史记录写入相关的通用配置（codeBlock / dataSource / editor 共用）
+ * - doNotPushHistory: 操作完成后是否不要将本次操作压入历史栈（撤销/重做记录），默认 false
+ * - historyDescription: 入栈时附带的人类可读描述，用于历史面板展示；不影响 undo/redo 行为，缺省时面板会自动生成描述
+ */
+export interface HistoryOpOptions {
+  doNotPushHistory?: boolean;
+  historyDescription?: string;
+}
+
+/**
+ * 在 HistoryOpOptions 基础上携带 form 端 propPath/value 变更记录，
+ * 用于历史记录的精细化撤销/重做（按 propPath 局部 patch）。
+ */
+export interface HistoryOpOptionsWithChangeRecords extends HistoryOpOptions {
+  changeRecords?: ChangeRecord[];
+}
+
+/**
  * DSL 修改类操作的通用配置
  * - doNotSelect: 操作后是否不要自动触发选中（不调用 this.select / this.multiSelect / stage.select / stage.multiSelect）
  * - doNotSwitchPage: 操作若会引发当前页面切换（如新增 / 删除 / 跨页移动），是否跳过这次切换
- * - doNotPushHistory: 操作完成后是否不要将本次操作压入历史栈（撤销/重做记录）
  */
-export type DslOpOptions = {
+export interface DslOpOptions extends HistoryOpOptions {
   doNotSelect?: boolean;
   doNotSwitchPage?: boolean;
-  doNotPushHistory?: boolean;
-};
+}

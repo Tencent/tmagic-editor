@@ -27,7 +27,7 @@ export const useEditorMenu = (value: Ref<MApp>, save: () => void) => {
         component: AdapterSelect,
       },
     ],
-    center: ['delete', 'undo', 'redo', 'guides', 'rule', 'zoom'],
+    center: ['delete', 'undo', 'redo', 'history-list', 'guides', 'rule', 'zoom'],
     right: [
       {
         type: 'button',

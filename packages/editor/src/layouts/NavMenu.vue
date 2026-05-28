@@ -19,6 +19,7 @@ import { NodeType } from '@tmagic/core';
 import { useServices } from '@editor/hooks/use-services';
 import { ColumnLayout, MenuBarData, MenuButton, MenuComponent, MenuItem } from '@editor/type';
 
+import HistoryListPanel from './history-list/HistoryListPanel.vue';
 import NavMenuColumn from './NavMenuColumn.vue';
 
 defineOptions({
@@ -101,6 +102,14 @@ const getConfig = (item: MenuItem): (MenuButton | MenuComponent)[] => {
         tooltip: `前进(${ctrl}+Shift+z)`,
         disabled: () => !historyService.state.canRedo,
         handler: () => editorService.redo(),
+      });
+      break;
+    case 'history-list':
+      // 历史记录面板：以 component 形式挂入，自带 popover；点击 nav 上的图标弹出。
+      config.push({
+        type: 'component',
+        className: 'history-list',
+        component: markRaw(HistoryListPanel),
       });
       break;
     case 'zoom-in':

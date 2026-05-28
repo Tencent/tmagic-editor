@@ -4,13 +4,19 @@ import type { Writable } from 'type-fest';
 
 import type { DataSourceSchema, EventOption, Id, MNode, TargetOptions } from '@tmagic/core';
 import { Target, Watcher } from '@tmagic/core';
-import type { ChangeRecord, FormConfig } from '@tmagic/form';
+import type { FormConfig } from '@tmagic/form';
 import { getValueByKeyPath, guid, setValueByKeyPath, toLine } from '@tmagic/utils';
 
 import editorService from '@editor/services/editor';
 import historyService from '@editor/services/history';
 import storageService, { Protocol } from '@editor/services/storage';
-import type { DataSourceStepValue, DatasourceTypeOption, SyncHookPlugin } from '@editor/type';
+import type {
+  DataSourceStepValue,
+  DatasourceTypeOption,
+  HistoryOpOptions,
+  HistoryOpOptionsWithChangeRecords,
+  SyncHookPlugin,
+} from '@editor/type';
 import { getFormConfig, getFormValue } from '@editor/utils/data-source';
 import { COPY_DS_STORAGE_KEY } from '@editor/utils/editor';
 
@@ -108,8 +114,9 @@ class DataSource extends BaseService {
    * @param config 数据源配置
    * @param options 可选配置
    * @param options.doNotPushHistory 是否不写入历史记录（默认 false）
+   * @param options.historyDescription 入栈时附带的人类可读描述，用于历史面板展示
    */
-  public add(config: DataSourceSchema, { doNotPushHistory = false }: { doNotPushHistory?: boolean } = {}) {
+  public add(config: DataSourceSchema, { doNotPushHistory = false, historyDescription }: HistoryOpOptions = {}) {
     const newConfig = {
       ...config,
       id: config.id && !this.getDataSourceById(config.id) ? config.id : this.createId(),
@@ -118,7 +125,7 @@ class DataSource extends BaseService {
     this.get('dataSources').push(newConfig);
 
     if (!doNotPushHistory) {
-      historyService.pushDataSource(newConfig.id, { oldSchema: null, newSchema: newConfig });
+      historyService.pushDataSource(newConfig.id, { oldSchema: null, newSchema: newConfig, historyDescription });
     }
 
     this.emit('add', newConfig);
@@ -132,13 +139,11 @@ class DataSource extends BaseService {
    * @param data 额外数据
    * @param data.changeRecords form 端变更记录
    * @param data.doNotPushHistory 是否不写入历史记录（默认 false）
+   * @param data.historyDescription 入栈时附带的人类可读描述，用于历史面板展示
    */
   public update(
     config: DataSourceSchema,
-    {
-      changeRecords = [],
-      doNotPushHistory = false,
-    }: { changeRecords?: ChangeRecord[]; doNotPushHistory?: boolean } = {},
+    { changeRecords = [], doNotPushHistory = false, historyDescription }: HistoryOpOptionsWithChangeRecords = {},
   ) {
     const dataSources = this.get('dataSources');
 
@@ -154,6 +159,7 @@ class DataSource extends BaseService {
         oldSchema: oldConfig ? cloneDeep(oldConfig) : null,
         newSchema: newConfig,
         changeRecords,
+        historyDescription,
       });
     }
 
@@ -170,15 +176,16 @@ class DataSource extends BaseService {
    * @param id 数据源 id
    * @param options 可选配置
    * @param options.doNotPushHistory 是否不写入历史记录（默认 false）
+   * @param options.historyDescription 入栈时附带的人类可读描述，用于历史面板展示
    */
-  public remove(id: string, { doNotPushHistory = false }: { doNotPushHistory?: boolean } = {}) {
+  public remove(id: string, { doNotPushHistory = false, historyDescription }: HistoryOpOptions = {}) {
     const dataSources = this.get('dataSources');
     const index = dataSources.findIndex((ds) => ds.id === id);
     const oldConfig = index !== -1 ? dataSources[index] : null;
     dataSources.splice(index, 1);
 
     if (oldConfig && !doNotPushHistory) {
-      historyService.pushDataSource(id, { oldSchema: cloneDeep(oldConfig), newSchema: null });
+      historyService.pushDataSource(id, { oldSchema: cloneDeep(oldConfig), newSchema: null, historyDescription });
     }
 
     this.emit('remove', id);
