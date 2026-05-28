@@ -119,7 +119,16 @@ describe('useCodeBlockEdit', () => {
     const hook = mountHook({ setCodeDslById });
     hook.codeId.value = 'id1';
     await hook.submitCodeBlockHandler({ name: 'b' } as any);
-    expect(setCodeDslById).toHaveBeenCalledWith('id1', { name: 'b' });
+    expect(setCodeDslById).toHaveBeenCalledWith('id1', { name: 'b' }, { changeRecords: undefined });
     expect(hideMock).toHaveBeenCalled();
+  });
+
+  test('submitCodeBlockHandler - 透传 eventData.changeRecords 给 setCodeDslById', async () => {
+    const setCodeDslById = vi.fn();
+    const hook = mountHook({ setCodeDslById });
+    hook.codeId.value = 'id1';
+    const records = [{ propPath: 'name', value: 'b' }];
+    await hook.submitCodeBlockHandler({ name: 'b' } as any, { changeRecords: records } as any);
+    expect(setCodeDslById).toHaveBeenCalledWith('id1', { name: 'b' }, { changeRecords: records });
   });
 });

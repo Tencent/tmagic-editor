@@ -22,7 +22,7 @@ import type { Writable } from 'type-fest';
 
 import type { CodeBlockContent, CodeBlockDSL, Id, MNode, TargetOptions } from '@tmagic/core';
 import { Target, Watcher } from '@tmagic/core';
-import type { TableColumnConfig } from '@tmagic/form';
+import type { ChangeRecord, TableColumnConfig } from '@tmagic/form';
 
 import editorService from '@editor/services/editor';
 import historyService from '@editor/services/history';
@@ -94,15 +94,16 @@ class CodeBlock extends BaseService {
    * @param {Id} id 代码块id
    * @param {CodeBlockContent} codeConfig 代码块内容配置信息
    * @param options 可选配置
+   * @param options.changeRecords form 端 propPath/value 列表，用于历史记录的精细化撤销/重做
    * @param options.doNotPushHistory 是否不写入历史记录（默认 false）
    * @returns {void}
    */
   public async setCodeDslById(
     id: Id,
     codeConfig: Partial<CodeBlockContent>,
-    { doNotPushHistory = false }: { doNotPushHistory?: boolean } = {},
+    { changeRecords, doNotPushHistory = false }: { changeRecords?: ChangeRecord[]; doNotPushHistory?: boolean } = {},
   ): Promise<void> {
-    this.setCodeDslByIdSync(id, codeConfig, true, { doNotPushHistory });
+    this.setCodeDslByIdSync(id, codeConfig, true, { changeRecords, doNotPushHistory });
   }
 
   /**
@@ -112,6 +113,7 @@ class CodeBlock extends BaseService {
    * @param {CodeBlockContent} codeConfig 代码块内容配置信息
    * @param {boolean} force 是否强制写入，默认true
    * @param options 可选配置
+   * @param options.changeRecords form 端 propPath/value 列表，用于历史记录的精细化撤销/重做
    * @param options.doNotPushHistory 是否不写入历史记录（默认 false）
    * @returns {void}
    */
@@ -119,7 +121,7 @@ class CodeBlock extends BaseService {
     id: Id,
     codeConfig: Partial<CodeBlockContent>,
     force = true,
-    { doNotPushHistory = false }: { doNotPushHistory?: boolean } = {},
+    { changeRecords, doNotPushHistory = false }: { changeRecords?: ChangeRecord[]; doNotPushHistory?: boolean } = {},
   ): void {
     const codeDsl = this.getCodeDsl();
 
@@ -150,7 +152,7 @@ class CodeBlock extends BaseService {
     const newContent = cloneDeep(codeDsl[id]);
 
     if (!doNotPushHistory) {
-      historyService.pushCodeBlock(id, { oldContent, newContent });
+      historyService.pushCodeBlock(id, { oldContent, newContent, changeRecords });
     }
 
     this.emit('addOrUpdate', id, codeDsl[id]);

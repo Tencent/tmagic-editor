@@ -23,7 +23,7 @@ import type { Id, MApp, MContainer, MNode, MPage, MPageFragment, TargetOptions }
 import { NodeType } from '@tmagic/core';
 import type { ChangeRecord } from '@tmagic/form';
 import { isFixed } from '@tmagic/stage';
-import { getNodeInfo, getNodePath, isPage, isPageFragment } from '@tmagic/utils';
+import { getNodeInfo, getNodePath, getValueByKeyPath, isPage, isPageFragment, setValueByKeyPath } from '@tmagic/utils';
 
 import BaseService from '@editor/services//BaseService';
 import propsService from '@editor/services//props';
@@ -658,21 +658,33 @@ class Editor extends BaseService {
    * update后会触发依赖收集，收集完后会掉stage.update方法
    * @param config 新的节点配置，配置中需要有id信息
    * @param data 额外数据
-   * @param data.changeRecords form 端变更记录
+   * @param data.changeRecords 单节点 form 端变更记录（多节点场景下被忽略，使用 changeRecordList）
+   * @param data.changeRecordList 多节点 form 端变更记录列表，按 config 数组同序对应每个节点；优先级高于 changeRecords
    * @param data.doNotPushHistory 是否不写入历史记录（默认 false）
    * @returns 更新后的节点配置
    */
   public async update(
     config: MNode | MNode[],
-    data: { changeRecords?: ChangeRecord[]; doNotPushHistory?: boolean } = {},
+    data: {
+      changeRecords?: ChangeRecord[];
+      changeRecordList?: ChangeRecord[][];
+      doNotPushHistory?: boolean;
+    } = {},
   ): Promise<MNode | MNode[]> {
     this.captureSelectionBeforeOp();
 
-    const { doNotPushHistory = false } = data;
+    const { doNotPushHistory = false, changeRecordList, changeRecords } = data;
 
     const nodes = Array.isArray(config) ? config : [config];
 
-    const updateData = await Promise.all(nodes.map((node) => this.doUpdate(node, data)));
+    // 多节点必须使用 changeRecordList 为每个节点提供独立的记录；
+    // 否则同一份 changeRecords 会被复用到每个节点上，nodeUpdateHandler / 历史回放都会按错误的 propPath 处理。
+    const updateData = await Promise.all(
+      nodes.map((node, index) => {
+        const recordsForNode = changeRecordList ? (changeRecordList[index] ?? []) : (changeRecords ?? []);
+        return this.doUpdate(node, { changeRecords: recordsForNode });
+      }),
+    );
 
     if (updateData[0].oldNode?.type !== NodeType.ROOT) {
       const curNodes = this.get('nodes');
@@ -685,6 +697,9 @@ class Editor extends BaseService {
               updatedItems: updateData.map((d) => ({
                 oldNode: cloneDeep(d.oldNode),
                 newNode: cloneDeep(toRaw(d.newNode)),
+                // 每个节点单独保留自己的 changeRecords，便于撤销/重做时按 propPath 精细化更新；
+                // 没有 changeRecords 的（如内部 sort/moveLayer 等整节点替换操作）会退化为全节点替换。
+                changeRecords: d.changeRecords?.length ? cloneDeep(d.changeRecords) : undefined,
               })),
             },
             { name: pageForOp?.name || '', id: pageForOp!.id },
@@ -1272,7 +1287,26 @@ class Editor extends BaseService {
       }
       case 'update': {
         const items = step.updatedItems ?? [];
-        const configs = items.map(({ oldNode, newNode }) => cloneDeep(reverse ? oldNode : newNode));
+        // 优先按 changeRecords 局部 patch：仅触达 propPath 下的字段，避免整节点替换冲掉同节点上其它无关变更。
+        // 没有 changeRecords 的（如内部 sort/moveLayer/拖动等整节点快照场景）才退化为整节点替换。
+        const configs = items.map(({ oldNode, newNode, changeRecords }) => {
+          if (changeRecords?.length) {
+            const sourceForValues = reverse ? oldNode : newNode;
+            // 仅保留 id / type 作为最小骨架，再按 propPath 写入需要回滚/重做的字段；
+            // 后续 update -> mergeWith 会与现有节点深合并，patch 中未涉及的字段不会被改动。
+            const patch: MNode = { id: newNode.id, type: newNode.type };
+            for (const record of changeRecords) {
+              if (!record.propPath) {
+                // 没有 propPath 视为整节点替换
+                return cloneDeep(sourceForValues);
+              }
+              const value = cloneDeep(getValueByKeyPath(record.propPath, sourceForValues));
+              setValueByKeyPath(record.propPath, value, patch);
+            }
+            return patch;
+          }
+          return cloneDeep(reverse ? oldNode : newNode);
+        });
         if (configs.length) {
           await this.update(configs, { doNotPushHistory: true });
         }

@@ -667,4 +667,47 @@ describe('undo redo', () => {
     const redoNode = editorService.getNodeById(NodeId.NODE_ID);
     expect(redoNode?.id).toBeUndefined();
   });
+
+  test('update 携带 changeRecords 时，undo/redo 仅回滚/重做对应 propPath，不冲掉同节点其它字段', async () => {
+    editorService.set('root', cloneDeep(root));
+    historyService.reset();
+
+    await editorService.select(NodeId.PAGE_ID);
+    // 先携带 changeRecords 改 width
+    await editorService.update(
+      { id: NodeId.NODE_ID, type: 'text', style: { width: 500 } },
+      { changeRecords: [{ propPath: 'style.width', value: 500 }] },
+    );
+    expect(editorService.getNodeById(NodeId.NODE_ID)?.style?.width).toBe(500);
+
+    // 在 undo 之前再追加一个不入历史的字段（模拟"同节点上其它无关变更"），undo 不应把它冲掉
+    await editorService.update(
+      { id: NodeId.NODE_ID, type: 'text', style: { width: 500, height: 80 } },
+      { doNotPushHistory: true },
+    );
+    expect(editorService.getNodeById(NodeId.NODE_ID)?.style?.height).toBe(80);
+
+    await editorService.undo();
+    const afterUndo = editorService.getNodeById(NodeId.NODE_ID);
+    // width 回退；height 因为不在 changeRecords 内不会被局部 patch 覆盖
+    expect(afterUndo?.style?.width).toBe(270);
+    expect(afterUndo?.style?.height).toBe(80);
+
+    await editorService.redo();
+    const afterRedo = editorService.getNodeById(NodeId.NODE_ID);
+    expect(afterRedo?.style?.width).toBe(500);
+    expect(afterRedo?.style?.height).toBe(80);
+  });
+
+  test('update 不带 changeRecords 时退化为整节点替换', async () => {
+    editorService.set('root', cloneDeep(root));
+    historyService.reset();
+
+    await editorService.select(NodeId.PAGE_ID);
+    await editorService.update({ id: NodeId.NODE_ID, type: 'text', style: { width: 600 } });
+    expect(editorService.getNodeById(NodeId.NODE_ID)?.style?.width).toBe(600);
+
+    await editorService.undo();
+    expect(editorService.getNodeById(NodeId.NODE_ID)?.style?.width).toBe(270);
+  });
 });

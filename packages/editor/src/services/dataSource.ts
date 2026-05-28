@@ -153,6 +153,7 @@ class DataSource extends BaseService {
       historyService.pushDataSource(newConfig.id, {
         oldSchema: oldConfig ? cloneDeep(oldConfig) : null,
         newSchema: newConfig,
+        changeRecords,
       });
     }
 

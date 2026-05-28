@@ -164,4 +164,25 @@ describe('DataSource service - 历史记录接入', () => {
     dataSource.remove('ghost');
     expect(historyService.canUndoDataSource('ghost')).toBe(false);
   });
+
+  test('update - 携带 changeRecords 时写入历史 step', () => {
+    const created = dataSource.add({ title: 'a', type: 'base' } as any);
+    historyService.reset();
+
+    dataSource.update({ ...created, title: 'b' } as any, {
+      changeRecords: [{ propPath: 'title', value: 'b' }],
+    });
+
+    const step = historyService.undoDataSource(created.id!);
+    expect(step?.changeRecords).toEqual([{ propPath: 'title', value: 'b' }]);
+  });
+
+  test('update - 不传 changeRecords 时 step.changeRecords 为 undefined', () => {
+    const created = dataSource.add({ title: 'a', type: 'base' } as any);
+    historyService.reset();
+
+    dataSource.update({ ...created, title: 'b' } as any);
+    const step = historyService.undoDataSource(created.id!);
+    expect(step?.changeRecords).toBeUndefined();
+  });
 });

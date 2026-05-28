@@ -209,4 +209,24 @@ describe('CodeBlockService - 历史记录接入', () => {
     await codeBlockService.deleteCodeDslByIds(['ghost']);
     expect(historyService.canUndoCodeBlock('ghost')).toBe(false);
   });
+
+  test('setCodeDslByIdSync - 携带 changeRecords 时写入历史 step', async () => {
+    historyService.reset();
+    await codeBlockService.setCodeDsl({ a: { name: 'A' } } as any);
+    codeBlockService.setCodeDslByIdSync('a', { name: 'A2' } as any, true, {
+      changeRecords: [{ propPath: 'name', value: 'A2' }],
+    });
+
+    const step = historyService.undoCodeBlock('a');
+    expect(step?.changeRecords).toEqual([{ propPath: 'name', value: 'A2' }]);
+  });
+
+  test('setCodeDslByIdSync - 不传 changeRecords 时 step.changeRecords 为 undefined', async () => {
+    historyService.reset();
+    await codeBlockService.setCodeDsl({ a: { name: 'A' } } as any);
+    codeBlockService.setCodeDslByIdSync('a', { name: 'A2' } as any);
+
+    const step = historyService.undoCodeBlock('a');
+    expect(step?.changeRecords).toBeUndefined();
+  });
 });

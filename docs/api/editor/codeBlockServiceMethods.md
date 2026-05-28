@@ -49,7 +49,12 @@
   - `{string | number}` id 代码块id
   - {Partial<`CodeBlockContent`>} codeConfig 代码块内容配置信息
   - `{Object}` options 可选配置
+    - {`ChangeRecord`[]} changeRecords form 端变更记录，用于历史记录的精细化撤销/重做
     - `{boolean}` doNotPushHistory 是否不写入历史记录（默认 false）
+
+  ::: details 查看 ChangeRecord 类型定义
+  <<< @/../packages/form-schema/src/base.ts#ChangeRecord{ts}
+  :::
 
 - **返回：**
   - `{Promise<void>}`
@@ -65,6 +70,7 @@
   - {Partial<`CodeBlockContent`>} codeConfig 代码块内容配置信息
   - `{boolean}` force 是否强制写入，默认 `true`；为 `false` 时若同 id 已存在则跳过
   - `{Object}` options 可选配置
+    - {`ChangeRecord`[]} changeRecords form 端变更记录，用于历史记录的精细化撤销/重做
     - `{boolean}` doNotPushHistory 是否不写入历史记录（默认 false）
 
 - **返回：**
@@ -77,6 +83,7 @@
   ::: tip
   写入成功时（`force=false` 且同 id 已存在的跳过场景除外）会自动调用 `historyService.pushCodeBlock`
   把本次变更入历史栈，参见 [historyService.pushCodeBlock](./historyServiceMethods.md#pushcodeblock)。
+  传入的 `changeRecords` 会一同写进 step，撤销/重做时调用方可据此按 `propPath` 局部回放。
   传入 `doNotPushHistory: true` 可跳过写入历史栈，常用于批量导入、外部同步等非用户操作场景。
   :::
 

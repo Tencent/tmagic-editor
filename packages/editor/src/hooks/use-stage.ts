@@ -115,19 +115,21 @@ export const useStage = (stageOptions: StageOptions) => {
     }
 
     // 多选拖动 / 多选缩放：所有元素整批走一次 update，避免历史栈被切成 N 条
+    // changeRecordList 与 configs 同序，每个节点保留自己的 records；
+    // 不能把多个节点的 records 合并到同一个数组里，否则 doUpdate / nodeUpdateHandler 会把别的节点的 propPath 当成自己的。
     const configs: MNode[] = [];
-    const changeRecordsAll: ReturnType<typeof buildChangeRecords> = [];
+    const changeRecordList: ReturnType<typeof buildChangeRecords>[] = [];
     ev.data.forEach((data) => {
       const id = getIdFromEl()(data.el);
       if (!id) return;
 
       const { style = {} } = data;
       configs.push({ id, style });
-      changeRecordsAll.push(...buildChangeRecords(style, 'style'));
+      changeRecordList.push(buildChangeRecords(style, 'style'));
     });
     if (configs.length === 0) return;
 
-    editorService.update(configs, { changeRecords: changeRecordsAll });
+    editorService.update(configs, { changeRecordList });
   });
 
   stage.on('sort', (ev: SortEventData) => {

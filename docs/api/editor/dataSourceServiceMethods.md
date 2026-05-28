@@ -352,7 +352,8 @@ console.log(newDs.id); // 自动生成的id
 
   ::: tip
   更新成功会自动调用 `historyService.pushDataSource` 入栈一条 `oldSchema` / `newSchema`
-  均为对应 schema 的更新记录。传入 `doNotPushHistory: true` 可跳过写入历史栈。
+  均为对应 schema 的更新记录，传入的 `changeRecords` 也会一并写进 step；撤销/重做时调用方可据此按
+  `propPath` 局部回放，缺省才退化为整 schema 替换。传入 `doNotPushHistory: true` 可跳过写入历史栈。
   :::
 
 - **示例：**

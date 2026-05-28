@@ -84,7 +84,9 @@ vi.mock('@editor/services/ui', () => ({
 }));
 
 vi.mock('@editor/utils/editor', () => ({
-  buildChangeRecords: vi.fn(() => []),
+  buildChangeRecords: vi.fn((style: Record<string, any>, basePath: string) =>
+    Object.entries(style ?? {}).map(([k, v]) => ({ propPath: `${basePath}.${k}`, value: v })),
+  ),
   getGuideLineFromCache: vi.fn(() => []),
 }));
 
@@ -211,6 +213,11 @@ describe('useStage', () => {
       { id: 'c1', style: { width: 10 } },
       { id: 'c2', style: { width: 20 } },
     ]);
+    // changeRecordList 与 configs 同序，每个节点独立保有自己的 records，不能合并为一个数组
+    expect(callArgs[1].changeRecordList).toHaveLength(2);
+    expect(callArgs[1].changeRecordList[0]).toEqual([{ propPath: 'style.width', value: 10 }]);
+    expect(callArgs[1].changeRecordList[1]).toEqual([{ propPath: 'style.width', value: 20 }]);
+    expect(callArgs[1].changeRecords).toBeUndefined();
   });
 
   test('sort 事件', () => {

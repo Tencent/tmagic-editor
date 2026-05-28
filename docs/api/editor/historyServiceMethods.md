@@ -46,6 +46,8 @@
   <<< @/../packages/schema/src/index.ts#Id{ts}
 
   <<< @/../packages/schema/src/index.ts#MNode{ts}
+
+  <<< @/../packages/form-schema/src/base.ts#ChangeRecord{ts}
   :::
 
 - **返回：**
@@ -55,6 +57,12 @@
 
   添加一条历史记录
 
+  ::: tip
+  `opType: 'update'` 的每个 `updatedItems[i]` 上可携带 `changeRecords`，用于撤销 / 重做时仅按
+  `propPath` 局部更新对应字段，避免整节点替换冲掉同节点上的其它无关变更；不带
+  `changeRecords` 时退化为整节点替换（如 `sort` / `moveLayer` / 拖动等纯快照场景）。
+  :::
+
 ## undo
 
 - **返回：**
@@ -62,7 +70,8 @@
 
 - **详情：**
 
-  撤销当前操作
+  撤销当前操作。`opType: 'update'` 时，若 `updatedItems[i].changeRecords` 存在，会按
+  `propPath` 从 `oldNode` 取值做局部回滚；否则用 `oldNode` 整节点替换。
 
 ## redo
 
@@ -71,7 +80,8 @@
 
 - **详情：**
 
-  恢复到下一步
+  恢复到下一步。`opType: 'update'` 时，若 `updatedItems[i].changeRecords` 存在，会按
+  `propPath` 从 `newNode` 取值做局部重做；否则用 `newNode` 整节点替换。
 
 ## pushCodeBlock
 
@@ -80,11 +90,14 @@
   - `{Object} payload`
     - `{CodeBlockContent | null} oldContent` 变更前的代码块内容；新增时为 `null`
     - `{CodeBlockContent | null} newContent` 变更后的代码块内容；删除时为 `null`
+    - `{ChangeRecord[]} changeRecords` 可选；form 端 propPath/value 变更列表，撤销/重做时若有则按 propPath 局部更新；缺省（或空数组）才退化为整内容替换
 
   ::: details 查看 CodeBlockStepValue 及关联类型定义
   <<< @/../packages/editor/src/type.ts#CodeBlockStepValue{ts}
 
   <<< @/../packages/schema/src/index.ts#CodeBlockContent{ts}
+
+  <<< @/../packages/form-schema/src/base.ts#ChangeRecord{ts}
   :::
 
 - **返回：**
@@ -158,9 +171,12 @@
   - `{Object} payload`
     - `{DataSourceSchema | null} oldSchema` 变更前的数据源 schema；新增时为 `null`
     - `{DataSourceSchema | null} newSchema` 变更后的数据源 schema；删除时为 `null`
+    - `{ChangeRecord[]} changeRecords` 可选；form 端 propPath/value 变更列表，撤销/重做时若有则按 propPath 局部更新；缺省（或空数组）才退化为整 schema 替换
 
   ::: details 查看 DataSourceStepValue 及关联类型定义
   <<< @/../packages/editor/src/type.ts#DataSourceStepValue{ts}
+
+  <<< @/../packages/form-schema/src/base.ts#ChangeRecord{ts}
   :::
 
 - **返回：**

@@ -20,6 +20,7 @@ import { reactive } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
 import type { CodeBlockContent, DataSourceSchema, Id, MPage, MPageFragment } from '@tmagic/core';
+import type { ChangeRecord } from '@tmagic/form';
 
 import type { CodeBlockStepValue, DataSourceStepValue, HistoryState, StepValue } from '@editor/type';
 import { UndoRedo } from '@editor/utils/undo-redo';
@@ -101,6 +102,7 @@ class History extends BaseService {
    * - 新增：oldContent = null，newContent = 新内容
    * - 更新：oldContent / newContent 都为对应内容
    * - 删除：newContent = null，oldContent = 删除前内容
+   * - `changeRecords` 来自 form 端，撤销/重做时若有则按 propPath 局部覆盖；缺省才退化为整内容替换。
    * - 不直接驱动 codeBlockService，调用方负责实际写回。
    */
   public pushCodeBlock(
@@ -108,6 +110,7 @@ class History extends BaseService {
     payload: {
       oldContent: CodeBlockContent | null;
       newContent: CodeBlockContent | null;
+      changeRecords?: ChangeRecord[];
     },
   ): CodeBlockStepValue | null {
     if (!codeBlockId) return null;
@@ -116,6 +119,7 @@ class History extends BaseService {
       id: codeBlockId,
       oldContent: payload.oldContent ? cloneDeep(payload.oldContent) : null,
       newContent: payload.newContent ? cloneDeep(payload.newContent) : null,
+      changeRecords: payload.changeRecords?.length ? cloneDeep(payload.changeRecords) : undefined,
     };
 
     this.getCodeBlockUndoRedo(codeBlockId).pushElement(step);
@@ -132,6 +136,7 @@ class History extends BaseService {
     payload: {
       oldSchema: DataSourceSchema | null;
       newSchema: DataSourceSchema | null;
+      changeRecords?: ChangeRecord[];
     },
   ): DataSourceStepValue | null {
     if (!dataSourceId) return null;
@@ -140,6 +145,7 @@ class History extends BaseService {
       id: dataSourceId,
       oldSchema: payload.oldSchema ? cloneDeep(payload.oldSchema) : null,
       newSchema: payload.newSchema ? cloneDeep(payload.newSchema) : null,
+      changeRecords: payload.changeRecords?.length ? cloneDeep(payload.changeRecords) : undefined,
     };
 
     this.getDataSourceUndoRedo(dataSourceId).pushElement(step);

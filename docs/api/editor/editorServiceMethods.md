@@ -456,8 +456,13 @@ editorService.highlight("text_123");
 - **参数：**
   - {`MNode` | `MNode`[]} config 新的节点或节点集合
   - `{Object}` data 可选配置
-    - {`ChangeRecord`[]} changeRecords 变更记录
+    - {`ChangeRecord`[]} changeRecords 单节点 form 端变更记录（多节点场景下被忽略，使用 `changeRecordList`）
+    - {`ChangeRecord`[][]} changeRecordList 多节点 form 端变更记录列表，按 `config` 数组同序对应每个节点；优先级高于 `changeRecords`
     - `{boolean}` doNotPushHistory 是否不写入历史记录（默认 false）
+
+  ::: details 查看 ChangeRecord 类型定义
+  <<< @/../packages/form-schema/src/base.ts#ChangeRecord{ts}
+  :::
 
 - **返回：**
   - {Promise<`MNode` | `MNode`[]>} 新的节点或节点集合
@@ -472,6 +477,16 @@ editorService.highlight("text_123");
   update可以支持一次更新多个组件，update是通过调用[doUpdate](#doupdate)来最终实现更新的。
 
   编辑器内部更新组件都是调用update来实现的，update除了更新操作外，还会记录历史堆，还会更新[代码块](../../guide/advanced/code-block.md)关系链。
+  :::
+
+  :::tip
+  **多节点场景必须使用 `changeRecordList`**：每个节点应保留自己独立的 records，不能把多个节点的
+  records 合并到同一个 `changeRecords` 数组里，否则 `doUpdate` / 依赖收集 / 历史回放都会按错误的
+  `propPath` 处理。
+
+  写入历史时，每个节点的 records 会单独保存到 `updatedItems[i].changeRecords`；撤销/重做时若有
+  records，则仅按 `propPath` 局部更新对应字段，避免整节点替换冲掉同节点上的其它无关变更；缺省
+  才退化为整节点替换（如内部 `sort` / `moveLayer` / 拖动等纯快照场景）。
   :::
 
 ## sort

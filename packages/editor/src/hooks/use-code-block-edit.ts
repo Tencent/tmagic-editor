@@ -3,6 +3,7 @@ import { cloneDeep } from 'lodash-es';
 
 import type { CodeBlockContent } from '@tmagic/core';
 import { tMagicMessage } from '@tmagic/design';
+import type { ContainerChangeEventData } from '@tmagic/form';
 
 import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
 import type { Services } from '@editor/type';
@@ -61,10 +62,12 @@ export const useCodeBlockEdit = (codeBlockService: Services['codeBlockService'])
     codeBlockService.deleteCodeDslByIds([key]);
   };
 
-  const submitCodeBlockHandler = async (values: CodeBlockContent) => {
+  const submitCodeBlockHandler = async (values: CodeBlockContent, eventData?: ContainerChangeEventData) => {
     if (!codeId.value) return;
 
-    await codeBlockService.setCodeDslById(codeId.value, values);
+    await codeBlockService.setCodeDslById(codeId.value, values, {
+      changeRecords: eventData?.changeRecords,
+    });
 
     codeBlockEditorRef.value?.hide();
   };

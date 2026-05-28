@@ -637,8 +637,13 @@ export interface StepValue {
   indexMap?: Record<string, number>;
   /** opType 'remove': 被删除的节点及其位置信息 */
   removedItems?: { node: MNode; parentId: Id; index: number }[];
-  /** opType 'update': 变更前后的节点快照 */
-  updatedItems?: { oldNode: MNode; newNode: MNode }[];
+  /**
+   * opType 'update': 变更前后的节点快照
+   *
+   * `changeRecords` 来自 form 端的 propPath/value 列表，撤销/重做时只对这些 propPath 做局部更新；
+   * 缺省（未传 / 空数组）才退化为整节点替换。
+   */
+  updatedItems?: { oldNode: MNode; newNode: MNode; changeRecords?: ChangeRecord[] }[];
 }
 // #endregion StepValue
 
@@ -656,6 +661,11 @@ export interface CodeBlockStepValue {
   oldContent: CodeBlockContent | null;
   /** 变更后的代码块内容，删除时为 null */
   newContent: CodeBlockContent | null;
+  /**
+   * form 端 propPath/value 列表。撤销/重做时若有则按 propPath 局部更新；
+   * 缺省才退化为整内容替换。新增/删除场景通常无 changeRecords。
+   */
+  changeRecords?: ChangeRecord[];
 }
 // #endregion CodeBlockStepValue
 
@@ -673,6 +683,11 @@ export interface DataSourceStepValue {
   oldSchema: DataSourceSchema | null;
   /** 变更后的数据源 schema，删除时为 null */
   newSchema: DataSourceSchema | null;
+  /**
+   * form 端 propPath/value 列表。撤销/重做时若有则按 propPath 局部更新；
+   * 缺省才退化为整 schema 替换。新增/删除场景通常无 changeRecords。
+   */
+  changeRecords?: ChangeRecord[];
 }
 // #endregion DataSourceStepValue
 
