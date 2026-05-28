@@ -18,6 +18,7 @@
       :expand-more="expand"
       :label-width="itemLabelWidth"
       :style="config.fieldStyle"
+      :show-diff="showDiffProp"
       @change="onChangeHandler"
       @addDiffCount="onAddDiffCount"
     ></component>
@@ -207,6 +208,7 @@
           :expand-more="expand"
           :label-width="itemLabelWidth"
           :prop="itemProp"
+          :show-diff="showDiffProp"
           @change="onChangeHandler"
           @addDiffCount="onAddDiffCount"
         >
@@ -271,6 +273,19 @@ const props = withDefaults(
     size?: string;
     /** 是否开启对比模式 */
     isCompare?: boolean;
+    /**
+     * 自定义"是否展示对比内容"的判断函数（仅在 `isCompare === true` 时生效）。
+     *
+     * - 不传：使用默认逻辑 `!isEqual(curValue, lastValue)`；
+     * - 传函数：完全以函数返回值为准，返回 `true` 才展示前后两份对比内容。
+     *
+     * 典型场景：某些字段语义上相等但结构不同（例如 `''` 与 `{ hookType: 'code', hookData: [] }`），
+     * 业务侧可在此处自定义为相等以避免被误判为差异。
+     *
+     * 注意：本 prop 会在嵌套 Container 中自动透传给子级，调用方只需在最外层
+     * （MForm）传入一次即可。
+     */
+    showDiff?: (_data: { curValue: any; lastValue: any; config: FormItemConfig }) => boolean;
   }>(),
   {
     prop: '',
@@ -291,11 +306,30 @@ const mForm = inject<FormState | undefined>('mForm');
 const expand = ref(false);
 
 const name = computed(() => props.config.name || '');
+
+// 暴露 showDiff prop（自定义对比判断函数）给模板，便于在嵌套 Container 中
+// 透传到子级；用别名是为了避免与下方同名的「计算属性 showDiff（最终是否展示对比）」冲突。
+//
+// 优先级：本组件 props.showDiff > formState.showDiff（顶层 MForm 通过 provide 注入）。
+// 这样使用方既可在 `<MForm :show-diff="...">` 一处统一注入，
+// 也可在直接使用 `<Container>` 的高阶场景下用 prop 显式覆盖。
+const showDiffProp = computed<typeof props.showDiff>(() => props.showDiff || mForm?.showDiff);
+
 // 是否展示两个版本的对比内容
+//
+// 默认逻辑：在对比模式下用 lodash isEqual 比较当前值与历史值，不相等则展示对比。
+// 若调用方通过 `showDiff` prop / formState 注入了自定义判断函数，则完全以其返回值为准，
+// 便于业务侧自定义"语义上相等"的特殊场景（例如空字符串与空 hook 结构）。
 const showDiff = computed(() => {
   if (!props.isCompare) return false;
   const curValue = name.value ? props.model[name.value] : props.model;
   const lastValue = name.value ? props.lastValues[name.value] : props.lastValues;
+
+  const customShowDiff = showDiffProp.value;
+  if (typeof customShowDiff === 'function') {
+    return Boolean(customShowDiff({ curValue, lastValue, config: props.config }));
+  }
+
   return !isEqual(curValue, lastValue);
 });
 

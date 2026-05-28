@@ -21,6 +21,7 @@
         :label-width="item.labelWidth || labelWidth"
         :step-active="stepActive"
         :size="size"
+        :show-diff="showDiff"
         @change="changeHandler"
       >
         <template v-if="$slots.label" #label="labelProps">
@@ -79,6 +80,20 @@ const props = withDefaults(
     popperClass?: string;
     preventSubmitDefault?: boolean;
     extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
+    /**
+     * 自定义"是否展示对比内容"的判断函数（仅在 `isCompare === true` 时生效）。
+     *
+     * - 不传：使用默认逻辑 `!isEqual(curValue, lastValue)`；
+     * - 传函数：完全以函数返回值为准，返回 `true` 才展示前后两份对比内容。
+     *
+     * 透传给所有层级的 Container（通过 `formState` 注入），调用方只需在 MForm
+     * 这一层传一次即可对整棵表单生效。
+     *
+     * 典型场景：某些字段语义上相等但结构不同（例如 `code-select` 字段中 `''` 与
+     * `{ hookType: 'code', hookData: [] }` 应视为相等），调用方在此处显式声明，
+     * 避免被 lodash `isEqual` 误判为差异。
+     */
+    showDiff?: (_data: { curValue: any; lastValue: any; config: any }) => boolean;
   }>(),
   {
     config: () => [],
@@ -144,6 +159,9 @@ const formState: FormState = reactive<FormState>({
   },
   get parentValues() {
     return props.parentValues;
+  },
+  get showDiff() {
+    return props.showDiff;
   },
   values,
   lastValuesProcessed,

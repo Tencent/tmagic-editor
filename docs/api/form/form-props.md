@@ -85,6 +85,44 @@
 
 - **类型：** `boolean`
 
+## showDiff
+
+- **详情：**
+
+  自定义“是否展示对比内容”的判断函数（仅在 `isCompare === true` 时生效）。
+
+  - 不传：使用默认逻辑 `!isEqual(curValue, lastValue)`（基于 lodash `isEqual`）；
+  - 传函数：完全以函数返回值为准，返回 `true` 才展示前后两份对比内容。
+
+  该 prop 通过 `formState` 透传到所有层级的 Container 中，调用方只需在 MForm 这一层传一次即可对整棵表单生效。
+
+  典型场景：某些字段语义上相等但结构不同（例如 `code-select` 字段中 `''` 与 `{ hookType: 'code', hookData: [] }` 应视为相等），调用方在此处显式声明，避免被 `isEqual` 误判为差异。
+
+- **类型：** `(data: { curValue: any; lastValue: any; config: FormItemConfig }) => boolean`
+
+- **示例：**
+
+```html
+<template>
+  <m-form :config="config" :is-compare="true" :last-values="lastValues" :show-diff="showDiff"></m-form>
+</template>
+
+<script setup>
+  import { isEqual } from 'lodash-es';
+
+  const showDiff = ({ curValue, lastValue, config }) => {
+    if (config?.type === 'code-select') {
+      // 业务侧自定义：双方都是“空形态”视为相等，不展示对比
+      const isEmpty = (v) =>
+        v === '' || v === undefined || v === null ||
+        (typeof v === 'object' && v.hookType === 'code' && Array.isArray(v.hookData) && v.hookData.length === 0);
+      if (isEmpty(curValue) && isEmpty(lastValue)) return false;
+    }
+    return !isEqual(curValue, lastValue);
+  };
+</script>
+```
+
 ## parentValues
 
 - **详情：** 父级表单值
