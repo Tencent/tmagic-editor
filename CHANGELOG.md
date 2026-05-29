@@ -1,3 +1,37 @@
+# [1.8.0-beta.2](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.1...v1.8.0-beta.2) (2026-05-29)
+
+
+### Bug Fixes
+
+* **editor:** 修复移动到菜单导致节点引用异常的问题 ([d01a28c](https://github.com/Tencent/tmagic-editor/commit/d01a28ce76203765f333548b30b4ec2954e68d4c))
+* **editor:** 多选时对多个节点的操作合并入同一条历史记录 ([a341c7d](https://github.com/Tencent/tmagic-editor/commit/a341c7d73e78f0727c1adffce767b6806d356beb))
+* **editor:** 显式标注 CompareForm 的 defineExpose 类型以修复 DTS 构建报错 ([7a61a35](https://github.com/Tencent/tmagic-editor/commit/7a61a356649838531f4f51c45e2e76ab84474107))
+* 对比模式下关闭 tab-pane 的 lazy，确保差异数能正确统计 ([0f8abf7](https://github.com/Tencent/tmagic-editor/commit/0f8abf729854f5bfc3fbad98153a77e947ead246))
+
+
+### Features
+
+* **editor:** vs-code 字段对比模式改用 monaco diff 编辑器 ([c854dfa](https://github.com/Tencent/tmagic-editor/commit/c854dfa8bf80bd501534b98c72fa1b2802076cac))
+* **editor:** 代码块与数据源支持按 id 独立的历史记录 ([e2c065f](https://github.com/Tencent/tmagic-editor/commit/e2c065f90d12d1234edd3620430262857a014ee9))
+* **editor:** 写操作支持 doNotPushHistory 选项以跳过历史记录 ([4c855ba](https://github.com/Tencent/tmagic-editor/commit/4c855ba50b69a2e0ab73f944171c4d5561d5a06a))
+* **editor:** 历史记录接入 changeRecords，undo/redo 按 propPath 局部更新 ([09558fa](https://github.com/Tencent/tmagic-editor/commit/09558fa0273af0b7d25b4338a8ea56810b09bb1c))
+* **editor:** 历史记录面板支持单步回滚（类 git revert） ([b02aa75](https://github.com/Tencent/tmagic-editor/commit/b02aa75ddc2b37a024a8966ddad96cf8d85317bb))
+* **editor:** 历史记录面板支持差异对比 ([59f4e0e](https://github.com/Tencent/tmagic-editor/commit/59f4e0edac47e986a83a3f9b7862cf92650b7fee))
+* **editor:** 历史记录面板支持点击跳转与回到初始状态 ([62a2ee6](https://github.com/Tencent/tmagic-editor/commit/62a2ee66931caed51f86bf170c3bce96c7e40dea))
+* **editor:** 字段对比模式逐项展示差异并补充历史记录面板文档 ([cbc4b25](https://github.com/Tencent/tmagic-editor/commit/cbc4b25072542d98f19707a11b87be0295157216))
+* **editor:** 数据源与代码块 service 支持 undo/redo ([8dae677](https://github.com/Tencent/tmagic-editor/commit/8dae67769c32dbf65413d47ac56ca46e65eaeecf))
+* **editor:** 新增 hideSidebar 配置支持隐藏左侧面板 ([a3333e2](https://github.com/Tencent/tmagic-editor/commit/a3333e2b4e0f05b2f83c9dc539466ebd31c04250))
+* **editor:** 新增历史记录列表面板 ([0446202](https://github.com/Tencent/tmagic-editor/commit/0446202ba6aaf0c99265b367343c7a4d1a8201e9))
+* form 新增 showDiff prop 支持自定义对比判断 ([f0c6642](https://github.com/Tencent/tmagic-editor/commit/f0c66427b8e011252110a11c90a109f5f58d3101))
+* **form:** 支持自定义 label slot ([285434e](https://github.com/Tencent/tmagic-editor/commit/285434ef3effd94c51d3ed10198842f6e689046a))
+
+
+### Performance Improvements
+
+* **dep:** 依赖收集改为单次遍历批量处理多 target ([025cca3](https://github.com/Tencent/tmagic-editor/commit/025cca365c87d755abfc047786ac9a75758019f5))
+
+
+
 # [1.8.0-beta.1](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.0...v1.8.0-beta.1) (2026-05-27)
 
 
