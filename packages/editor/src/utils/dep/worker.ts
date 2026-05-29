@@ -42,9 +42,11 @@ onmessage = (e) => {
       }
     }
 
-    watcher.collectByCallback(mApp.items, undefined, ({ node, target }) => {
-      watcher.collectItem(node, target, { pageId: node.id }, true);
-    });
+    // worker 中 target 均为新建（deps 为空），无需删除阶段，直接批量收集
+    const targets = watcher.getCollectableTargets();
+    for (const page of mApp.items) {
+      watcher.collectItems(page, targets, { pageId: page.id }, true);
+    }
 
     const data: Record<string, Record<Id, DepData>> = {
       [DepTargetType.DATA_SOURCE]: {},

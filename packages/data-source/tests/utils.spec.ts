@@ -377,7 +377,7 @@ describe('registerDataSourceOnDemand', () => {
       ],
       dataSourceDeps: { a: { node1: { name: 'n', keys: ['x'] } } },
       dataSourceCondDeps: { c: { node2: { name: 'n', keys: ['y'] } } },
-      dataSourceMethodsDeps: {},
+      dataSourceMethodDeps: {},
     };
     const httpModule = { default: class HttpDS {} };
     const mockModule = { default: class MockDS {} };

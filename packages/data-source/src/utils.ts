@@ -241,7 +241,7 @@ export const registerDataSourceOnDemand = async (
   dsl: MApp,
   dataSourceModules: Record<string, () => Promise<AsyncDataSourceResolveResult>>,
 ) => {
-  const { dataSourceMethodsDeps = {}, dataSourceCondDeps = {}, dataSourceDeps = {}, dataSources = [] } = dsl;
+  const { dataSourceMethodDeps = {}, dataSourceCondDeps = {}, dataSourceDeps = {}, dataSources = [] } = dsl;
 
   const dsModuleMap: Record<string, () => Promise<AsyncDataSourceResolveResult>> = {};
 
@@ -253,7 +253,7 @@ export const registerDataSourceOnDemand = async (
     }
 
     if (!Object.keys(dep).length) {
-      dep = dataSourceMethodsDeps[ds.id] || {};
+      dep = dataSourceMethodDeps[ds.id] || {};
     }
 
     if (Object.keys(dep).length && dataSourceModules[ds.type]) {

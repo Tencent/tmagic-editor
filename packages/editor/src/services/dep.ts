@@ -109,9 +109,23 @@ class Dep extends BaseService {
 
   public collect(nodes: MNode[], depExtendedData: DepExtendedData = {}, deep = false, type?: DepTargetType) {
     this.set('collecting', true);
-    this.watcher.collectByCallback(nodes, type, ({ node, target }) => {
-      this.collectNode(node, target, depExtendedData, deep);
-    });
+
+    const targets = this.watcher.getCollectableTargets(type);
+
+    if (targets.length) {
+      for (const node of nodes) {
+        // 先删除原有依赖，再批量收集
+        if (isPage(node)) {
+          for (const target of targets) {
+            this.removePageDep(target, depExtendedData);
+          }
+        } else {
+          this.watcher.removeTargetsDep(targets, node);
+        }
+        this.watcher.collectItems(node, targets, depExtendedData, deep);
+      }
+    }
+
     this.set('collecting', false);
 
     this.emit('collected', nodes, deep);
@@ -176,7 +190,7 @@ class Dep extends BaseService {
             dsl.dataSourceDeps[target.id] = target.deps;
           } else if (target.type === DepTargetType.DATA_SOURCE_COND && dsl.dataSourceCondDeps) {
             dsl.dataSourceCondDeps[target.id] = target.deps;
-          } else if (target.type === DepTargetType.DATA_SOURCE_METHOD) {
+          } else if (target.type === DepTargetType.DATA_SOURCE_METHOD && dsl.dataSourceMethodDeps) {
             dsl.dataSourceMethodDeps[target.id] = target.deps;
           }
         }
@@ -194,11 +208,7 @@ class Dep extends BaseService {
   public collectNode(node: MNode, target: Target, depExtendedData: DepExtendedData = {}, deep = false) {
     // 先删除原有依赖，重新收集
     if (isPage(node)) {
-      for (const [depKey, dep] of Object.entries(target.deps)) {
-        if (dep.data?.pageId && dep.data.pageId === depExtendedData.pageId) {
-          delete target.deps[depKey];
-        }
-      }
+      this.removePageDep(target, depExtendedData);
     } else {
       this.watcher.removeTargetDep(target, node);
     }
@@ -261,6 +271,19 @@ class Dep extends BaseService {
 
   public emit<Name extends keyof DepEvents, Param extends DepEvents[Name]>(eventName: Name, ...args: Param) {
     return super.emit(eventName, ...args);
+  }
+
+  /**
+   * 删除指定 page 在该 target 下的旧依赖：
+   * 按 pageId 匹配，可清掉页面内已被删除节点的残留依赖
+   */
+  private removePageDep(target: Target, depExtendedData: DepExtendedData = {}) {
+    for (const depKey of Object.keys(target.deps)) {
+      const dep = target.deps[depKey];
+      if (dep.data?.pageId && dep.data.pageId === depExtendedData.pageId) {
+        delete target.deps[depKey];
+      }
+    }
   }
 
   private enqueueTask(node: MNode, target: Target, depExtendedData: DepExtendedData, deep: boolean) {

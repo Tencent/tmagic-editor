@@ -207,6 +207,7 @@ export interface MApp extends MComponent {
 
   dataSourceDeps?: DataSourceDeps;
   dataSourceCondDeps?: DataSourceDeps;
+  dataSourceMethodDeps?: DataSourceDeps;
 }
 // #endregion MApp
 

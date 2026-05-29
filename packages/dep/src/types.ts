@@ -15,7 +15,7 @@ export enum DepTargetType {
   DATA_SOURCE_COND = 'data-source-cond',
 }
 
-export type IsTarget = (key: string | number, value: any) => boolean;
+export type IsTarget = (key: string | number, value: any, data?: Record<string, any>) => boolean;
 
 export interface TargetOptions {
   isTarget: IsTarget;
