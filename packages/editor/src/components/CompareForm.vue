@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, ref, useTemplateRef, watch, watchEffect } from 'vue';
+import { computed, inject, type Ref, ref, type ShallowRef, useTemplateRef, watch, watchEffect } from 'vue';
 import { isEqual } from 'lodash-es';
 
 import { type CodeBlockContent, type DataSourceSchema, HookType, type MNode } from '@tmagic/core';
@@ -213,7 +213,11 @@ watchEffect(() => {
   }
 });
 
-defineExpose({
+defineExpose<{
+  form: ShallowRef<InstanceType<typeof MForm> | null>;
+  config: Ref<FormConfig>;
+  reload: () => Promise<void>;
+}>({
   form: formRef,
   config,
   reload: loadConfig,
