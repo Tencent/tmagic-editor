@@ -34,6 +34,8 @@ export interface EditorProps {
   datasourceList?: DatasourceTypeOption[];
   /** 左侧面板配置 */
   sidebar?: SideBarData;
+  /** 是否隐藏左侧面板 */
+  hideSidebar?: boolean;
   /** 顶部工具栏配置 */
   menu?: MenuBarData;
   /** 组件树右键菜单 */

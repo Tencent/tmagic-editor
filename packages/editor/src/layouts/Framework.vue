@@ -23,15 +23,15 @@
       left-class="m-editor-framework-left"
       center-class="m-editor-framework-center"
       right-class="m-editor-framework-right"
-      :left="columnWidth.left"
+      :left="hideSidebar ? undefined : columnWidth.left"
       :right="columnWidth.right"
-      :min-left="MIN_LEFT_COLUMN_WIDTH"
+      :min-left="hideSidebar ? 0 : MIN_LEFT_COLUMN_WIDTH"
       :min-right="MIN_RIGHT_COLUMN_WIDTH"
       :min-center="MIN_CENTER_COLUMN_WIDTH"
       :width="frameworkRect.width"
       @change="columnWidthChange"
     >
-      <template #left>
+      <template v-if="!hideSidebar" #left>
         <slot name="sidebar"></slot>
       </template>
 
@@ -94,10 +94,12 @@ defineOptions({
   name: 'MEditorFramework',
 });
 
-defineProps<{
+const props = defineProps<{
   disabledPageFragment: boolean;
   pageBarSortOptions?: PageBarSortOptions;
   pageFilterFunction?: (_page: MPage | MPageFragment, _keyword: string) => boolean;
+  /** 是否隐藏左侧面板 */
+  hideSidebar?: boolean;
 }>();
 
 const codeOptions = inject('codeOptions', {});
@@ -132,7 +134,10 @@ watch(
 );
 
 const columnWidthChange = (columnW: GetColumnWidth) => {
-  storageService.setItem(LEFT_COLUMN_WIDTH_STORAGE_KEY, columnW.left, { protocol: Protocol.NUMBER });
+  // 隐藏左侧面板时 left 恒为 0，不覆盖已持久化的左栏宽度，避免重新展示时丢失宽度
+  if (!props.hideSidebar) {
+    storageService.setItem(LEFT_COLUMN_WIDTH_STORAGE_KEY, columnW.left, { protocol: Protocol.NUMBER });
+  }
   storageService.setItem(RIGHT_COLUMN_WIDTH_STORAGE_KEY, columnW.right, { protocol: Protocol.NUMBER });
 
   uiService.set('columnWidth', columnW);

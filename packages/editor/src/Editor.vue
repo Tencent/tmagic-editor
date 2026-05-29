@@ -3,6 +3,7 @@
     :disabled-page-fragment="disabledPageFragment"
     :page-bar-sort-options="pageBarSortOptions"
     :page-filter-function="pageFilterFunction"
+    :hide-sidebar="hideSidebar"
   >
     <template #header>
       <slot name="header"></slot>
