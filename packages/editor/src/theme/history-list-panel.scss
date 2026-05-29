@@ -380,6 +380,14 @@
     gap: 12px;
   }
 
+  .m-editor-history-diff-dialog-controls {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    gap: 8px;
+  }
+
+  .m-editor-history-diff-dialog-view,
   .m-editor-history-diff-dialog-mode {
     flex: 0 0 auto;
   }

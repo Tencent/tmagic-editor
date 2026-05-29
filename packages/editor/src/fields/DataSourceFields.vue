@@ -1,8 +1,8 @@
 <template>
   <div class="m-editor-data-source-fields">
-    <MagicTable :data="model[name]" :columns="fieldColumns" :border="true"></MagicTable>
+    <MagicTable :data="model[name]" :columns="displayColumns" :border="true"></MagicTable>
 
-    <div class="m-editor-data-source-fields-footer">
+    <div v-if="!isCompare" class="m-editor-data-source-fields-footer">
       <TMagicButton size="small" :disabled="disabled" plain @click="newFromJsonHandler()">快速添加</TMagicButton>
       <TMagicButton size="small" type="primary" :disabled="disabled" plain @click="newHandler()">添加</TMagicButton>
     </div>
@@ -47,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { inject, Ref, ref } from 'vue';
+import { computed, inject, Ref, ref } from 'vue';
 
 import type { DataSchema } from '@tmagic/core';
 import { TMagicButton, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
@@ -84,6 +84,10 @@ const emit = defineEmits<{
 }>();
 
 const { uiService } = useServices();
+const mForm = inject<FormState | undefined>('mForm');
+
+/** 对比模式下隐藏新增/编辑/删除等操作按钮，仅保留只读展示。 */
+const isCompare = computed(() => Boolean(mForm?.isCompare));
 
 const fieldValues = ref<Record<string, any>>({});
 const fieldTitle = ref('');
@@ -175,6 +179,11 @@ const fieldColumns: ColumnConfig[] = [
     ],
   },
 ];
+
+/** 对比模式下移除「操作」列（编辑/删除按钮），仅保留只读列。 */
+const displayColumns = computed<ColumnConfig[]>(() =>
+  isCompare.value ? fieldColumns.filter((col) => !col.actions) : fieldColumns,
+);
 
 const dataSourceFieldsConfig: FormConfig = [
   { name: 'index', type: 'hidden', filter: 'number', defaultValue: -1 },

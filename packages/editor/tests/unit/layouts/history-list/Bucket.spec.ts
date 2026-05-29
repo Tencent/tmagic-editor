@@ -61,8 +61,9 @@ describe('Bucket.vue', () => {
     // 第一组展开后渲染的子步描述来自 describeStep
     const subItems = rows[0].findAll('.m-editor-history-list-substeps li');
     expect(subItems).toHaveLength(2);
-    expect(subItems[0].text()).toContain('step-s-0');
-    expect(subItems[1].text()).toContain('step-s-1');
+    // 子步倒序渲染（最新在上）：s-1 在前，s-0 在后
+    expect(subItems[0].text()).toContain('step-s-1');
+    expect(subItems[1].text()).toContain('step-s-0');
 
     // 第二组只有 1 步：未合并
     expect(rows[1].find('.m-editor-history-list-item-merge').exists()).toBe(false);
@@ -121,7 +122,8 @@ describe('Bucket.vue', () => {
     });
     const subItems = wrapper.findAll('.m-editor-history-list-substeps li');
     expect(subItems).toHaveLength(2);
-    await subItems[1].trigger('click');
+    // 子步倒序渲染：subItems[0] 对应 index=1
+    await subItems[0].trigger('click');
     const events = wrapper.emitted('goto');
     expect(events).toBeTruthy();
     expect(events![0]).toEqual(['code_1', 1]);

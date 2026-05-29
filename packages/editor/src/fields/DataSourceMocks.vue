@@ -1,8 +1,8 @@
 <template>
   <div class="m-editor-data-source-fields">
-    <MagicTable :data="model[name]" :columns="columns"></MagicTable>
+    <MagicTable :data="model[name]" :columns="displayColumns"></MagicTable>
 
-    <div class="m-editor-data-source-fields-footer">
+    <div v-if="!isCompare" class="m-editor-data-source-fields-footer">
       <TMagicButton size="small" type="primary" :disabled="disabled" plain @click="newHandler()">添加</TMagicButton>
     </div>
 
@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { inject, Ref, ref } from 'vue';
+import { computed, inject, Ref, ref } from 'vue';
 
 import type { MockSchema } from '@tmagic/core';
 import { TMagicButton, tMagicMessageBox, TMagicSwitch } from '@tmagic/design';
@@ -54,6 +54,11 @@ const props = withDefaults(defineProps<FieldProps<DataSourceMocksConfig>>(), {
 const emit = defineEmits(['change']);
 
 const { uiService } = useServices();
+const mForm = inject<FormState | undefined>('mForm');
+
+/** 对比模式下隐藏新增/编辑/删除等操作按钮，仅保留只读展示。 */
+const isCompare = computed(() => Boolean(mForm?.isCompare));
+
 const width = defineModel<number>('width', { default: 670 });
 
 const drawerTitle = ref('');
@@ -201,6 +206,11 @@ const columns: ColumnConfig[] = [
     ],
   },
 ];
+
+/** 对比模式下移除「操作」列（编辑/删除按钮），仅保留只读列。 */
+const displayColumns = computed<ColumnConfig[]>(() =>
+  isCompare.value ? columns.filter((col) => !col.actions) : columns,
+);
 
 const newHandler = () => {
   const isFirstRow = props.model[props.name].length === 0;

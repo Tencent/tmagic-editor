@@ -6,22 +6,32 @@
       :size="size"
       :disabled="disabled"
       :model="model"
+      :last-values="lastValues"
+      :is-compare="isCompareMode"
       :config="tableConfig"
       @change="onChangeHandler"
     ></MTable>
 
     <div v-else class="fullWidth">
-      <TMagicButton class="create-button" type="primary" :size="size" :disabled="disabled" @click="addEvent()"
+      <TMagicButton
+        v-if="!isCompareMode"
+        class="create-button"
+        type="primary"
+        :size="size"
+        :disabled="disabled"
+        @click="addEvent()"
         >添加事件</TMagicButton
       >
       <MPanel
-        v-for="(cardItem, index) in model[name]"
-        :key="index"
+        v-for="entry in displayList"
+        :key="entry.index"
         :disabled="disabled"
         :size="size"
-        :prop="`${prop}.${index}`"
+        :prop="`${prop}.${entry.index}`"
         :config="actionsConfig"
-        :model="cardItem"
+        :model="entry.cardItem"
+        :last-values="entry.lastCardItem"
+        :is-compare="isCompareMode"
         :label-width="config.labelWidth || '100px'"
         @change="onChangeHandler"
       >
@@ -29,19 +39,22 @@
           <MFormContainer
             class="fullWidth"
             :config="eventNameConfig"
-            :model="cardItem"
+            :model="entry.cardItem"
+            :last-values="entry.lastCardItem"
+            :is-compare="isCompareMode"
             :disabled="disabled"
             :size="size"
-            :prop="`${prop}.${index}`"
+            :prop="`${prop}.${entry.index}`"
             @change="eventNameChangeHandler"
           ></MFormContainer>
           <TMagicButton
+            v-if="!isCompareMode"
             style="color: #f56c6c"
             link
             :icon="Delete"
             :disabled="disabled"
             :size="size"
-            @click="removeEvent(Number(index))"
+            @click="removeEvent(Number(entry.index))"
           ></TMagicButton>
         </template>
       </MPanel>
@@ -372,6 +385,42 @@ const actionsConfig = computed(
 const isOldVersion = computed(() => {
   if (props.model[props.name].length === 0) return false;
   return !has(props.model[props.name][0], 'actions');
+});
+
+/**
+ * 对比模式判定：
+ *
+ * event-select 内部由「事件列表 + 嵌套子表单」组成，属于复合字段。父级 `MFormContainer` 已将其
+ * 归入「自接管对比字段」（见 Container.vue 的 `SELF_DIFF_FIELD_TYPES`），即对比时只渲染一次本组件，
+ * 并把当前值 `model` 与历史值 `lastValues` 一并传入，由本组件把 `is-compare`/`lastValues` 透传给
+ * 内部的 MPanel / MFormContainer，逐项（事件名、动作）展示前后差异。
+ *
+ * 仅当存在历史值时才启用对比，避免 lastValues 缺失时退化为「全部新增」的空对比。
+ */
+const isCompareMode = computed(() => Boolean(props.isCompare && props.lastValues));
+
+/**
+ * 待渲染的事件卡片列表。
+ *
+ * - 非对比模式：直接映射当前事件列表，`lastCardItem` 为空；
+ * - 对比模式：按索引对齐当前值与历史值，取两者长度的最大值，使得「新增」（仅当前有）与
+ *   「删除」（仅历史有）的事件都能被渲染出来；缺失的一侧用空对象兜底，从而让子级正确高亮差异。
+ */
+const displayList = computed<{ cardItem: any; lastCardItem: any; index: number }[]>(() => {
+  const current = props.model[props.name] || [];
+
+  if (!isCompareMode.value) {
+    return current.map((cardItem: any, index: number) => ({ cardItem, lastCardItem: undefined, index }));
+  }
+
+  const last = props.lastValues?.[props.name] || [];
+  const length = Math.max(current.length, last.length);
+
+  return Array.from({ length }, (_, index) => ({
+    cardItem: current[index] ?? {},
+    lastCardItem: last[index] ?? {},
+    index,
+  }));
 });
 
 // 添加事件

@@ -143,7 +143,8 @@ describe('CodeBlockTab.vue', () => {
     });
     const items = wrapper.findAll('.m-editor-history-list-substeps li');
     expect(items).toHaveLength(2);
-    expect(items[0].text()).toContain('修改 fn (id: code_1) · content');
-    expect(items[1].text()).toContain('修改 fn (id: code_1) · params');
+    // 子步倒序渲染（最新在上）：params 在前，content 在后
+    expect(items[0].text()).toContain('修改 fn (id: code_1) · params');
+    expect(items[1].text()).toContain('修改 fn (id: code_1) · content');
   });
 });

@@ -260,7 +260,7 @@ icon使用的是[element-plus icon](https://element-plus.org/zh-CN/component/ico
   
   顶部工具栏
 
-  系统提供了几个常用功能： `'/' | 'delete' | 'undo' | 'redo' | 'zoom-in' | 'zoom-out' | 'zoom' | 'guides' | 'rule' | 'scale-to-original' | 'scale-to-fit'`
+  系统提供了几个常用功能： `'/' | 'delete' | 'undo' | 'redo' | 'zoom-in' | 'zoom-out' | 'zoom' | 'guides' | 'rule' | 'scale-to-original' | 'scale-to-fit' | 'history-list'`
 
   '/': 分隔符
 
@@ -283,6 +283,8 @@ icon使用的是[element-plus icon](https://element-plus.org/zh-CN/component/ico
   'scale-to-original': 缩放到实际大小
 
   'scale-to-fit': 缩放以适应
+
+  'history-list': 历史记录面板（按 页面 / 数据源 / 代码块 三个 tab 展示操作历史，相邻同目标修改自动合并，支持点击跳转、回到初始状态、单步回滚及差异对比，详见[历史记录面板](/guide/advanced/history-list.md)）
 
 - **默认值：**
   

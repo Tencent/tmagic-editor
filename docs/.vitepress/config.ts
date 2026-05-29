@@ -102,6 +102,10 @@ export default defineConfig({
               text: '数据源',
               link: '/guide/advanced/data-source.md'
             },
+            {
+              text: '历史记录面板',
+              link: '/guide/advanced/history-list.md',
+            },
 
             {
               text: '@tmagic/form',

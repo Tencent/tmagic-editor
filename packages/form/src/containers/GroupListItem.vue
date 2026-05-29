@@ -7,6 +7,7 @@
         </TMagicButton>
 
         <TMagicButton
+          v-if="!isCompare"
           v-show="showDelete"
           type="danger"
           size="small"
@@ -17,7 +18,7 @@
         ></TMagicButton>
 
         <TMagicButton
-          v-if="copyable"
+          v-if="copyable && !isCompare"
           link
           size="small"
           type="primary"
@@ -27,7 +28,7 @@
           >复制</TMagicButton
         >
 
-        <template v-if="movable">
+        <template v-if="movable && !isCompare">
           <TMagicButton
             v-show="index !== 0"
             link
@@ -49,7 +50,7 @@
         </template>
 
         <TMagicPopover
-          v-if="config.moveSpecifyLocation"
+          v-if="config.moveSpecifyLocation && !isCompare"
           trigger="click"
           placement="top"
           width="200"

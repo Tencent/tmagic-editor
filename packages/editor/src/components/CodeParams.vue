@@ -3,6 +3,8 @@
     ref="form"
     :config="codeParamsConfig"
     :init-values="model"
+    :last-values="lastValues"
+    :is-compare="isCompare"
     :disabled="disabled"
     :size="size"
     :watch-props="false"
@@ -24,6 +26,10 @@ defineOptions({
 
 const props = defineProps<{
   model: any;
+  /** 对比模式下的历史值，透传给内部 MForm 用于逐项展示参数差异 */
+  lastValues?: any;
+  /** 是否开启对比模式 */
+  isCompare?: boolean;
   size?: 'small' | 'default' | 'large';
   disabled?: boolean;
   name: string;

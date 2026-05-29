@@ -18,7 +18,6 @@
       :expand-more="expand"
       :label-width="itemLabelWidth"
       :style="config.fieldStyle"
-      :show-diff="showDiffProp"
       @change="onChangeHandler"
       @addDiffCount="onAddDiffCount"
     ></component>
@@ -211,7 +210,6 @@
           :expand-more="expand"
           :label-width="itemLabelWidth"
           :prop="itemProp"
-          :show-diff="showDiffProp"
           @change="onChangeHandler"
           @addDiffCount="onAddDiffCount"
         >
@@ -244,12 +242,14 @@ import type {
   ComponentConfig,
   ContainerChangeEventData,
   ContainerCommonConfig,
+  FormDiffConfig,
   FormItemConfig,
   FormSlots,
   FormState,
   FormValue,
   ToolTipConfigType,
 } from '../schema';
+import { FORM_DIFF_CONFIG_KEY } from '../schema';
 import { getField } from '../utils/config';
 import { createObjectProp, display as displayFunction, filterFunction, getRules } from '../utils/form';
 
@@ -276,19 +276,6 @@ const props = withDefaults(
     size?: string;
     /** 是否开启对比模式 */
     isCompare?: boolean;
-    /**
-     * 自定义"是否展示对比内容"的判断函数（仅在 `isCompare === true` 时生效）。
-     *
-     * - 不传：使用默认逻辑 `!isEqual(curValue, lastValue)`；
-     * - 传函数：完全以函数返回值为准，返回 `true` 才展示前后两份对比内容。
-     *
-     * 典型场景：某些字段语义上相等但结构不同（例如 `''` 与 `{ hookType: 'code', hookData: [] }`），
-     * 业务侧可在此处自定义为相等以避免被误判为差异。
-     *
-     * 注意：本 prop 会在嵌套 Container 中自动透传给子级，调用方只需在最外层
-     * （MForm）传入一次即可。
-     */
-    showDiff?: (_data: { curValue: any; lastValue: any; config: FormItemConfig }) => boolean;
   }>(),
   {
     prop: '',
@@ -306,29 +293,24 @@ const emit = defineEmits<{
 
 const mForm = inject<FormState | undefined>('mForm');
 
+// 对比相关配置由 MForm 通过 provide 下发，这里直接 inject，无需逐层透传 prop。
+const diffConfig = inject<FormDiffConfig>(FORM_DIFF_CONFIG_KEY, {});
+
 const expand = ref(false);
 
 const name = computed(() => props.config.name || '');
 
-// 暴露 showDiff prop（自定义对比判断函数）给模板，便于在嵌套 Container 中
-// 透传到子级；用别名是为了避免与下方同名的「计算属性 showDiff（最终是否展示对比）」冲突。
-//
-// 优先级：本组件 props.showDiff > formState.showDiff（顶层 MForm 通过 provide 注入）。
-// 这样使用方既可在 `<MForm :show-diff="...">` 一处统一注入，
-// 也可在直接使用 `<Container>` 的高阶场景下用 prop 显式覆盖。
-const showDiffProp = computed<typeof props.showDiff>(() => props.showDiff || mForm?.showDiff);
-
 // 是否展示两个版本的对比内容
 //
 // 默认逻辑：在对比模式下用 lodash isEqual 比较当前值与历史值，不相等则展示对比。
-// 若调用方通过 `showDiff` prop / formState 注入了自定义判断函数，则完全以其返回值为准，
+// 若调用方通过 MForm 的 `showDiff` 注入了自定义判断函数，则完全以其返回值为准，
 // 便于业务侧自定义"语义上相等"的特殊场景（例如空字符串与空 hook 结构）。
 const showDiff = computed(() => {
   if (!props.isCompare) return false;
   const curValue = name.value ? props.model[name.value] : props.model;
   const lastValue = name.value ? props.lastValues[name.value] : props.lastValues;
 
-  const customShowDiff = showDiffProp.value;
+  const customShowDiff = diffConfig.showDiff;
   if (typeof customShowDiff === 'function') {
     return Boolean(customShowDiff({ curValue, lastValue, config: props.config }));
   }
@@ -379,10 +361,34 @@ const tagName = computed(() => {
  * 这样做的好处：
  * 1. 避免重型字段（如 monaco 编辑器）在对比模式下被实例化两次，节省资源；
  * 2. 提供更专业的对比视觉效果（如 monaco diff 的行级高亮、左右滚动同步等）。
+ *
+ * 注意：像 `event-select` / `code-select-col` 这类内部由列表 / 嵌套子表单组成的复合字段，若按默认逻辑
+ * 渲染前后两份独立组件，会出现两套下拉框 + 两份参数表单（或两套「添加事件」按钮、两份完整面板），
+ * 体验很差。这类字段在内部把 `is-compare`/`lastValues` 透传给子级容器，由子级逐项展示差异，
+ * 因此同样归类为自接管对比字段。
  */
-const SELF_DIFF_FIELD_TYPES = new Set(['vs-code']);
+const DEFAULT_SELF_DIFF_FIELD_TYPES = ['vs-code', 'event-select', 'code-select-col', 'code-select'];
 
-const isSelfDiffField = computed(() => SELF_DIFF_FIELD_TYPES.has(type.value));
+// 最终生效的自接管对比字段类型集合。
+//
+// - 未自定义：使用内置默认类型；
+// - 自定义传数组：在内置类型基础上「追加」；
+// - 自定义传函数：以函数返回值为「最终」完整列表（可完全替换内置项）。
+const effectiveSelfDiffFieldTypes = computed<Set<string>>(() => {
+  const custom = diffConfig.selfDiffFieldTypes;
+
+  if (typeof custom === 'function') {
+    return new Set(custom([...DEFAULT_SELF_DIFF_FIELD_TYPES]));
+  }
+
+  if (Array.isArray(custom)) {
+    return new Set([...DEFAULT_SELF_DIFF_FIELD_TYPES, ...custom]);
+  }
+
+  return new Set(DEFAULT_SELF_DIFF_FIELD_TYPES);
+});
+
+const isSelfDiffField = computed(() => effectiveSelfDiffFieldTypes.value.has(type.value));
 
 const disabled = computed(() => props.disabled || filterFunction(mForm, props.config.disabled, props));
 

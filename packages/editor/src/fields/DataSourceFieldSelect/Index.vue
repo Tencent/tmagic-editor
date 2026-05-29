@@ -28,14 +28,14 @@
     ></component>
 
     <TMagicTooltip
-      v-if="config.fieldConfig && !disabledDataSource"
+      v-if="config.fieldConfig && !disabledDataSource && !mForm?.isCompare"
       :disabled="showDataSourceFieldSelect"
       content="选择数据源"
     >
       <TMagicButton
         :type="showDataSourceFieldSelect ? 'primary' : 'default'"
         :size="size"
-        :disabled="disabled || mForm?.isCompare"
+        :disabled="disabled"
         @click="onToggleDataSourceFieldSelectHandler"
         ><MIcon :icon="Coin"></MIcon
       ></TMagicButton>

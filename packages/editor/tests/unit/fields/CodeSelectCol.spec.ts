@@ -42,6 +42,13 @@ vi.mock('@tmagic/form', async (importOriginal) => {
         return () => h('select', { class: 'fake-select' });
       },
     }),
+    MContainer: defineComponent({
+      name: 'MFormContainer',
+      props: ['model', 'lastValues', 'isCompare', 'size', 'prop', 'config'],
+      setup() {
+        return () => h('div', { class: 'fake-diff-select' });
+      },
+    }),
   };
 });
 
@@ -63,7 +70,7 @@ vi.mock('@editor/components/Icon.vue', () => ({
 vi.mock('@editor/components/CodeParams.vue', () => ({
   default: defineComponent({
     name: 'CodeParams',
-    props: ['name', 'model', 'size', 'disabled', 'paramsConfig'],
+    props: ['name', 'model', 'size', 'disabled', 'paramsConfig', 'lastValues', 'isCompare'],
     emits: ['change'],
     setup(_p, { emit }) {
       return () =>
@@ -148,9 +155,43 @@ describe('CodeSelectCol', () => {
   });
 
   test('codeDsl 为空时 selectConfig.options 返回空数组', () => {
-    codeBlockService.getCodeDsl.mockReturnValue(null);
+    codeBlockService.getCodeDsl.mockReturnValue(null as any);
     const wrapper = mount(CodeSelectCol, { props: baseProps({ model: { codeId: '', params: {} } }) as any });
     const select = wrapper.findComponent({ name: 'MSelect' });
     expect((select.props('config') as any).options()).toEqual([]);
+  });
+
+  describe('对比模式', () => {
+    test('isCompare 但无 lastValues 时仍渲染普通 MSelect', () => {
+      const wrapper = mount(CodeSelectCol, { props: baseProps({ isCompare: true }) as any });
+      expect(wrapper.findComponent({ name: 'MSelect' }).exists()).toBe(true);
+      expect(wrapper.find('.fake-diff-select').exists()).toBe(false);
+    });
+
+    test('对比模式下拉框改用 MFormContainer，并隐藏编辑按钮', () => {
+      const wrapper = mount(CodeSelectCol, {
+        props: baseProps({
+          isCompare: true,
+          lastValues: { codeId: 'c2', params: {} },
+        }) as any,
+      });
+      expect(wrapper.find('.fake-diff-select').exists()).toBe(true);
+      expect(wrapper.findComponent({ name: 'MSelect' }).exists()).toBe(false);
+      // 对比模式为只读，不展示查看/编辑按钮
+      expect(wrapper.find('button').exists()).toBe(false);
+    });
+
+    test('对比模式将 isCompare/lastValues 透传给参数表单 CodeParams', () => {
+      const wrapper = mount(CodeSelectCol, {
+        props: baseProps({
+          isCompare: true,
+          lastValues: { codeId: 'c1', params: { p1: 'old' } },
+        }) as any,
+      });
+      const params = wrapper.findComponent({ name: 'CodeParams' });
+      expect(params.exists()).toBe(true);
+      expect(params.props('isCompare')).toBe(true);
+      expect(params.props('lastValues')).toEqual({ codeId: 'c1', params: { p1: 'old' } });
+    });
   });
 });

@@ -28,7 +28,7 @@ vi.mock('@tmagic/form', async (importOriginal) => {
     ...actual,
     MContainer: defineComponent({
       name: 'MContainer',
-      props: ['config', 'size', 'prop', 'disabled', 'lastValues', 'model'],
+      props: ['config', 'size', 'prop', 'disabled', 'lastValues', 'isCompare', 'model'],
       emits: ['change'],
       setup() {
         return () => h('div', { class: 'fake-container' });
@@ -148,5 +148,22 @@ describe('CodeSelect', () => {
     expect(row.items[2].notEditable()).toBe(true);
     codeBlockService.getEditStatus.mockReturnValue(true);
     dataSourceService.get.mockReturnValue(true);
+  });
+
+  describe('对比模式', () => {
+    test('isCompare 但无 lastValues 时不进入对比', () => {
+      const wrapper = mount(CodeSelect, { props: baseProps({ isCompare: true }) as any });
+      const container = wrapper.findComponent({ name: 'MContainer' });
+      expect(container.props('isCompare')).toBe(false);
+    });
+
+    test('对比模式将 isCompare 与同层 lastValues[name] 透传给内部容器', () => {
+      const lastValues = { cs: { hookType: 'code', hookData: [{ codeType: 'code', codeId: 'c2' }] } };
+      const wrapper = mount(CodeSelect, { props: baseProps({ isCompare: true, lastValues }) as any });
+      const container = wrapper.findComponent({ name: 'MContainer' });
+      expect(container.props('isCompare')).toBe(true);
+      // 注意：model 传入的是 model[name]，因此 lastValues 也需取同层的 lastValues[name]
+      expect(container.props('lastValues')).toEqual(lastValues.cs);
+    });
   });
 });

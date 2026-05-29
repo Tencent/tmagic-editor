@@ -148,7 +148,7 @@ export interface EditorInstallOptions {
   customCreateMonacoDiffEditor: (
     monaco: typeof import('monaco-editor'),
     codeEditorEl: HTMLElement,
-    options: Monaco.editor.IStandaloneEditorConstructionOptions & { editorCustomType?: string },
+    options: Monaco.editor.IStandaloneDiffEditorConstructionOptions & { editorCustomType?: string },
   ) => Promise<Monaco.editor.IStandaloneDiffEditor> | Monaco.editor.IStandaloneDiffEditor;
   [key: string]: any;
 }

@@ -26,7 +26,7 @@
       @addDiffCount="onAddDiffCount()"
     ></MFieldsGroupListItem>
 
-    <div class="m-fields-group-list-footer">
+    <div class="m-fields-group-list-footer" v-if="!isCompare">
       <slot name="toggle-button"></slot>
       <div style="display: flex; justify-content: flex-end; flex: 1">
         <slot name="add-button"></slot>

@@ -71,12 +71,13 @@ describe('GroupRow.vue', () => {
     });
     const items = wrapper.findAll('.m-editor-history-list-substeps li');
     expect(items).toHaveLength(2);
-    expect(items[0].text()).toContain('#1');
-    expect(items[0].text()).toContain('修改 颜色');
-    expect(items[1].text()).toContain('#2');
-    expect(items[1].text()).toContain('修改 字号');
-    // 第二个子步未应用
-    expect(items[1].classes()).toContain('is-undone');
+    // 子步倒序渲染（最新在上）：index=1 在前，index=0 在后
+    expect(items[0].text()).toContain('#2');
+    expect(items[0].text()).toContain('修改 字号');
+    // 最新（index=1）子步未应用
+    expect(items[0].classes()).toContain('is-undone');
+    expect(items[1].text()).toContain('#1');
+    expect(items[1].text()).toContain('修改 颜色');
   });
 
   test('merged=true 但 expanded=false 时不渲染子步列表', () => {
@@ -161,10 +162,11 @@ describe('GroupRow.vue', () => {
         ],
       },
     });
+    // 子步倒序渲染：subItems[0] 为 index=1（非当前，可点击），subItems[1] 为 index=0（当前）
     const subItems = wrapper.findAll('.m-editor-history-list-substeps li');
-    await subItems[0].trigger('click');
-    expect(wrapper.emitted('goto')).toBeFalsy();
     await subItems[1].trigger('click');
+    expect(wrapper.emitted('goto')).toBeFalsy();
+    await subItems[0].trigger('click');
     expect(wrapper.emitted('goto')![0]).toEqual([1]);
   });
 });

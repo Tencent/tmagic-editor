@@ -44,7 +44,7 @@
               {{ isFullscreen ? '退出全屏' : '全屏编辑' }}
             </TMagicButton>
             <TMagicUpload
-              v-if="importable"
+              v-if="importable && !isCompare"
               style="display: inline-block"
               ref="excelBtn"
               action="/noop"
@@ -54,11 +54,17 @@
             >
               <TMagicButton size="small" type="success" :disabled="disabled" plain>导入EXCEL</TMagicButton>
             </TMagicUpload>
-            <TMagicButton v-if="importable" size="small" type="warning" :disabled="disabled" plain @click="clearHandler"
+            <TMagicButton
+              v-if="importable && !isCompare"
+              size="small"
+              type="warning"
+              :disabled="disabled"
+              plain
+              @click="clearHandler"
               >清空</TMagicButton
             >
           </div>
-          <slot name="add-button"></slot>
+          <slot name="add-button" v-if="!isCompare"></slot>
         </div>
 
         <div class="bottom" style="text-align: right" v-if="config.pagination">

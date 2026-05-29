@@ -5,16 +5,24 @@
       class="m-editor-history-diff-dialog"
       title="查看修改差异"
       width="900px"
+      top="5vh"
       destroy-on-close
       append-to-body
     >
       <div v-if="payload" class="m-editor-history-diff-dialog-body">
         <div class="m-editor-history-diff-dialog-header">
           <span class="m-editor-history-diff-dialog-target">{{ targetText }}</span>
-          <TMagicRadioGroup v-model="mode" size="small" class="m-editor-history-diff-dialog-mode">
-            <TMagicRadioButton value="before">与修改前对比</TMagicRadioButton>
-            <TMagicRadioButton value="current" :disabled="!hasCurrent">与当前对比</TMagicRadioButton>
-          </TMagicRadioGroup>
+          <div class="m-editor-history-diff-dialog-controls">
+            <TMagicRadioGroup v-model="viewMode" size="small" class="m-editor-history-diff-dialog-view">
+              <TMagicRadioButton value="form">表单对比</TMagicRadioButton>
+              <TMagicRadioButton value="code">源码对比</TMagicRadioButton>
+            </TMagicRadioGroup>
+
+            <TMagicRadioGroup v-model="mode" size="small" class="m-editor-history-diff-dialog-mode">
+              <TMagicRadioButton value="before">与修改前对比</TMagicRadioButton>
+              <TMagicRadioButton value="current" :disabled="!hasCurrent">与当前对比</TMagicRadioButton>
+            </TMagicRadioGroup>
+          </div>
         </div>
 
         <div class="m-editor-history-diff-dialog-legend">
@@ -27,13 +35,25 @@
         </div>
 
         <CompareForm
+          v-if="viewMode === 'form'"
           :category="payload.category"
           :type="payload.type"
           :data-source-type="payload.dataSourceType"
           :value="rightValue"
           :last-value="leftValue"
           :extend-state="extendState"
-          height="60vh"
+          height="70vh"
+        />
+
+        <CodeEditor
+          v-else
+          type="diff"
+          language="json"
+          :init-values="leftValue"
+          :modified-values="rightValue"
+          :options="codeDiffOptions"
+          disabled-full-screen
+          height="70vh"
         />
       </div>
 
@@ -52,6 +72,7 @@ import { TMagicButton, TMagicDialog, TMagicRadioButton, TMagicRadioGroup, TMagic
 import type { FormState } from '@tmagic/form';
 
 import CompareForm, { type CompareCategory } from '@editor/components/CompareForm.vue';
+import CodeEditor from '@editor/layouts/CodeEditor.vue';
 
 defineOptions({
   name: 'MEditorHistoryDiffDialog',
@@ -82,6 +103,8 @@ export interface DiffDialogPayload {
   currentValue?: Record<string, any> | null;
   /** 用于标题展示的目标名称 */
   targetLabel?: string;
+  /** 用于标题展示的目标 id */
+  id?: string | number;
 }
 
 /**
@@ -91,9 +114,37 @@ export interface DiffDialogPayload {
  */
 type DiffMode = 'before' | 'current';
 
+/**
+ * 展示形态：
+ * - form：以属性表单形式逐字段对比（默认，可读性更好）
+ * - code：以 JSON 源码形式做整体 diff（贴近"看原始数据差异"，可看到表单未覆盖的字段）
+ */
+type ViewMode = 'form' | 'code';
+
 const visible = ref(false);
 const payload = ref<DiffDialogPayload | null>(null);
 const mode = ref<DiffMode>('before');
+const viewMode = ref<ViewMode>('form');
+
+/**
+ * 源码对比始终只读，关闭小地图，强制左右并排（side-by-side）展示。
+ *
+ * monaco diff 编辑器在宽度低于 `renderSideBySideInlineBreakpoint`（默认 900px）时
+ * 会自动退化为 inline（上下/单栏）视图。本弹窗宽度约 900px，去掉内边距后编辑器实际
+ * 宽度小于该阈值，会被切到 inline。这里通过 `useInlineViewWhenSpaceIsLimited: false`
+ * 关闭该自动降级，确保始终保持左右两栏对比。
+ */
+const codeDiffOptions = {
+  readOnly: true,
+  tabSize: 2,
+  minimap: { enabled: false },
+  renderSideBySide: true,
+  useInlineViewWhenSpaceIsLimited: false,
+  scrollBeyondLastLine: false,
+  hideUnchangedRegions: {
+    enabled: true,
+  },
+};
 
 const hasCurrent = computed(() => payload.value?.currentValue !== undefined && payload.value?.currentValue !== null);
 
@@ -129,13 +180,17 @@ const targetText = computed(() => {
   };
   const prefix = categoryText[payload.value.category] || '';
   const label = payload.value.targetLabel || payload.value.type || '';
-  return [prefix, label].filter(Boolean).join('：');
+  const { id } = payload.value;
+  const labelWithId = id !== undefined && id !== '' ? `${label}（${id}）` : label;
+  return [prefix, labelWithId].filter(Boolean).join('：');
 });
 
 const open = (p: DiffDialogPayload) => {
   payload.value = p;
   // 每次打开按需重置默认模式：有当前值时优先「与当前对比」更贴近"看现在差什么"，否则回退到默认
   mode.value = 'before';
+  // 默认回到表单对比形态，避免残留上一次选择的源码模式
+  viewMode.value = 'form';
   visible.value = true;
 };
 

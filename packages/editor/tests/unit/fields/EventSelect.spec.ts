@@ -55,7 +55,7 @@ vi.mock('@tmagic/form', async (importOriginal) => {
     }),
     MPanel: defineComponent({
       name: 'MPanel',
-      props: ['model', 'config', 'prop', 'disabled', 'size', 'labelWidth'],
+      props: ['model', 'config', 'prop', 'disabled', 'size', 'labelWidth', 'lastValues', 'isCompare'],
       emits: ['change'],
       setup(_p, { slots }) {
         return () => h('div', { class: 'fake-panel' }, slots.header?.());
@@ -358,6 +358,50 @@ describe('EventSelect', () => {
     expect(opts).toEqual([{ text: 'open', value: 'open' }]);
     editorService.getNodeById.mockReturnValue(null);
     expect(methodCol.options(undefined, { model: { to: '1' } })).toEqual([]);
+  });
+
+  describe('对比模式', () => {
+    test('isCompare 但无 lastValues 时不进入对比，仍显示添加按钮', () => {
+      const wrapper = mount(EventSelect, {
+        props: baseProps({ isCompare: true, model: { events: [] } }) as any,
+      });
+      expect(wrapper.find('.create-button').exists()).toBe(true);
+    });
+
+    test('对比模式隐藏「添加事件」与删除按钮', () => {
+      const wrapper = mount(EventSelect, {
+        props: baseProps({
+          isCompare: true,
+          model: { events: [{ name: 'a', actions: [] }] },
+          lastValues: { events: [{ name: 'a', actions: [] }] },
+        }) as any,
+      });
+      expect(wrapper.find('.create-button').exists()).toBe(false);
+      // 对比模式 panel header 内不渲染删除按钮（仅 MFormContainer 占位）
+      expect(wrapper.findAll('button').length).toBe(0);
+    });
+
+    test('对比模式按索引对齐当前值与历史值，取最大长度渲染', () => {
+      const wrapper = mount(EventSelect, {
+        props: baseProps({
+          isCompare: true,
+          model: { events: [{ name: 'a', actions: [] }] },
+          lastValues: {
+            events: [
+              { name: 'a', actions: [] },
+              { name: 'b', actions: [] },
+            ],
+          },
+        }) as any,
+      });
+      // 当前 1 项 + 历史 2 项 → 取 max=2，渲染 2 个 panel（含被删除的事件）
+      expect(wrapper.findAll('.fake-panel').length).toBe(2);
+      const panels = wrapper.findAllComponents({ name: 'MPanel' });
+      expect(panels[0].props('isCompare')).toBe(true);
+      // 缺失一侧用空对象兜底
+      expect(panels[1].props('model')).toEqual({});
+      expect(panels[1].props('lastValues')).toEqual({ name: 'b', actions: [] });
+    });
   });
 
   test('removeEvent 通过 panel header 删除按钮调用', async () => {

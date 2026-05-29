@@ -261,7 +261,7 @@ describe('DataSourceFieldSelect Index', () => {
     expect(wrapper.findAll('.fake-cascader').length).toBe(0);
   });
 
-  test('对比模式（mForm.isCompare=true）下切换按钮被禁用，点击不切换 showDataSourceFieldSelect', async () => {
+  test('对比模式（mForm.isCompare=true）下不渲染「选择数据源」切换按钮', async () => {
     const wrapper = mount(DSFSIndex, {
       props: {
         config: { fieldConfig: { type: 'text' } },
@@ -275,10 +275,8 @@ describe('DataSourceFieldSelect Index', () => {
       },
     });
 
-    const toggleBtn = wrapper.find('.fake-btn');
-    expect((toggleBtn.element as HTMLButtonElement).hasAttribute('disabled')).toBe(true);
-
-    await toggleBtn.trigger('click');
+    // 对比模式仅做只读展示，切换按钮整体隐藏（不再以禁用态保留）
+    expect(wrapper.find('.fake-btn').exists()).toBe(false);
     expect(wrapper.findAll('.fake-cascader').length).toBe(0);
   });
 

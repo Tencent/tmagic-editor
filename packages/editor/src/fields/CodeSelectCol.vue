@@ -2,7 +2,20 @@
   <div class="m-fields-code-select-col">
     <div class="code-select-container">
       <!-- 代码块下拉框 -->
+      <!-- 对比模式下交由 MFormContainer 展示下拉框的前后差异（codeId 变化时高亮新旧代码块名），
+           普通模式仍直接渲染 MSelect 以保留选择 / 写值逻辑 -->
+      <MFormContainer
+        v-if="isCompareMode"
+        class="select"
+        :config="selectConfig"
+        :model="model"
+        :last-values="lastValues"
+        :is-compare="true"
+        :size="size"
+        :prop="prop"
+      ></MFormContainer>
       <MSelect
+        v-else
         class="select"
         :config="selectConfig"
         :name="name"
@@ -12,9 +25,9 @@
         @change="onCodeIdChangeHandler"
       ></MSelect>
 
-      <!-- 查看/编辑按钮 -->
+      <!-- 查看/编辑按钮：对比模式为只读，不展示 -->
       <TMagicButton
-        v-if="model[name] && hasCodeBlockSidePanel"
+        v-if="!isCompareMode && model[name] && hasCodeBlockSidePanel"
         class="m-fields-select-action-button"
         :size="size"
         @click="editCode(model[name])"
@@ -29,6 +42,8 @@
       name="params"
       :key="model[name]"
       :model="model"
+      :last-values="lastValues"
+      :is-compare="isCompareMode"
       :size="size"
       :disabled="disabled"
       :params-config="paramsConfig"
@@ -52,6 +67,7 @@ import {
   filterFunction,
   type FormItemConfig,
   type FormState,
+  MContainer as MFormContainer,
   MSelect,
   type SelectConfig,
 } from '@tmagic/form';
@@ -76,6 +92,18 @@ const emit = defineEmits<{
 const props = withDefaults(defineProps<FieldProps<CodeSelectColConfig>>(), {
   disabled: false,
 });
+
+/**
+ * 对比模式判定：
+ *
+ * code-select-col 由「代码块下拉框 + 参数子表单」组成，属于复合字段。父级 `MFormContainer` 已将其
+ * 归入「自接管对比字段」（见 Container.vue 的 `SELF_DIFF_FIELD_TYPES`），即对比时只渲染一次本组件，
+ * 并把当前值 `model` 与历史值 `lastValues` 一并传入，由本组件把 `is-compare`/`lastValues` 透传给
+ * 内部的下拉框（MFormContainer）与参数表单（CodeParams），逐项展示前后差异。
+ *
+ * 仅当存在历史值时才启用对比，避免 lastValues 缺失时退化为「全部新增」的空对比。
+ */
+const isCompareMode = computed(() => Boolean(props.isCompare && props.lastValues));
 
 const notEditable = computed(() => filterFunction(mForm, props.config.notEditable, props));
 

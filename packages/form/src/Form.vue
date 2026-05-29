@@ -21,7 +21,6 @@
         :label-width="item.labelWidth || labelWidth"
         :step-active="stepActive"
         :size="size"
-        :show-diff="showDiff"
         @change="changeHandler"
       >
         <template v-if="$slots.label" #label="labelProps">
@@ -51,6 +50,7 @@ import type {
   FormValue,
   ValidateError,
 } from './schema';
+import { FORM_DIFF_CONFIG_KEY } from './schema';
 
 defineOptions({
   name: 'MForm',
@@ -86,14 +86,27 @@ const props = withDefaults(
      * - 不传：使用默认逻辑 `!isEqual(curValue, lastValue)`；
      * - 传函数：完全以函数返回值为准，返回 `true` 才展示前后两份对比内容。
      *
-     * 透传给所有层级的 Container（通过 `formState` 注入），调用方只需在 MForm
-     * 这一层传一次即可对整棵表单生效。
+     * 通过 provide 下发给所有层级的 Container（含嵌套在容器组件内部的 Container），
+     * 调用方只需在 MForm 这一层传一次即可对整棵表单生效。
      *
      * 典型场景：某些字段语义上相等但结构不同（例如 `code-select` 字段中 `''` 与
      * `{ hookType: 'code', hookData: [] }` 应视为相等），调用方在此处显式声明，
      * 避免被 lodash `isEqual` 误判为差异。
      */
     showDiff?: (_data: { curValue: any; lastValue: any; config: any }) => boolean;
+    /**
+     * 自定义「自接管对比」的字段类型（仅在对比模式下生效）。
+     *
+     * 自接管对比的字段不会渲染前后两份独立组件，而是只渲染一次并由字段组件内部展示前后差异
+     * （如 vs-code 使用 monaco diff 编辑器；event-select / code-select-col 等复合字段逐项展示差异）。
+     *
+     * 支持两种形式：
+     * - 传数组：在内置类型基础上「追加」这些类型；
+     * - 传函数：入参为内置类型数组，返回值作为「最终」完整列表（可完全替换内置项）。
+     *
+     * 通过 provide 下发，对整棵表单的所有层级 Container 生效，只需在 MForm 这一层传一次。
+     */
+    selfDiffFieldTypes?: string[] | ((_defaultTypes: string[]) => string[]);
   }>(),
   {
     config: () => [],
@@ -159,9 +172,6 @@ const formState: FormState = reactive<FormState>({
   },
   get parentValues() {
     return props.parentValues;
-  },
-  get showDiff() {
-    return props.showDiff;
   },
   values,
   lastValuesProcessed,
@@ -232,6 +242,17 @@ watchEffect(async (onCleanup) => {
 });
 
 provide('mForm', formState);
+
+// 对比相关配置单独通过 provide 下发，所有层级的 Container 通过 inject 获取，无需逐层透传 prop。
+// 用 getter 对象保证读取时回到最新的 props 值，维持响应式。
+provide(FORM_DIFF_CONFIG_KEY, {
+  get showDiff() {
+    return props.showDiff;
+  },
+  get selfDiffFieldTypes() {
+    return props.selfDiffFieldTypes;
+  },
+});
 
 const changeRecords = shallowRef<ChangeRecord[]>([]);
 

@@ -12,14 +12,16 @@ import * as utilsMod from '@editor/utils';
 
 const submitMock = vi.fn();
 let lastConfig: any;
+let lastProps: any;
 
 vi.mock('@tmagic/form', () => ({
   MForm: defineComponent({
     name: 'MFormStub',
-    props: ['config', 'initValues', 'disabled', 'size', 'watchProps'],
+    props: ['config', 'initValues', 'disabled', 'size', 'watchProps', 'lastValues', 'isCompare'],
     emits: ['change'],
     setup(props, { expose, emit }) {
       lastConfig = props.config;
+      lastProps = props;
       expose({ submitForm: submitMock });
       return () =>
         h('div', {
@@ -38,6 +40,7 @@ describe('CodeParams.vue', () => {
   beforeEach(() => {
     submitMock.mockReset();
     lastConfig = null;
+    lastProps = null;
   });
 
   afterEach(() => {
@@ -94,6 +97,20 @@ describe('CodeParams.vue', () => {
     await new Promise((r) => setTimeout(r, 0));
     const events = wrapper.emitted('change') as any[];
     expect(events?.[0]?.[0]).toEqual({ p: { a: 1 } });
+  });
+
+  test('对比模式 isCompare/lastValues 透传给内部 MForm', () => {
+    mount(CodeParams as any, {
+      props: {
+        model: { p: { a: 'new' } },
+        name: 'p',
+        isCompare: true,
+        lastValues: { p: { a: 'old' } },
+        paramsConfig: [{ name: 'a', text: 'A', type: 'vs-code' }] as any,
+      },
+    });
+    expect(lastProps.isCompare).toBe(true);
+    expect(lastProps.lastValues).toEqual({ p: { a: 'old' } });
   });
 
   test('submitForm 抛错时调用 error 不抛出', async () => {

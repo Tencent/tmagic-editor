@@ -64,6 +64,18 @@ vi.mock('@editor/components/Icon.vue', () => ({
   }),
 }));
 
+// 差异对话框有独立的单测（HistoryDiffDialog.spec.ts），这里 stub 掉以隔离面板自身逻辑，
+// 同时避免其内部依赖（monaco CodeEditor / CompareForm / 设计层弹窗组件）在本用例下未被 mock 而报错。
+vi.mock('@editor/layouts/history-list/HistoryDiffDialog.vue', () => ({
+  default: defineComponent({
+    name: 'FakeHistoryDiffDialog',
+    setup(_p, { expose }) {
+      expose({ open: vi.fn(), close: vi.fn() });
+      return () => h('div', { class: 'fake-history-diff-dialog' });
+    },
+  }),
+}));
+
 afterEach(() => {
   historyService.reset();
   vi.clearAllMocks();

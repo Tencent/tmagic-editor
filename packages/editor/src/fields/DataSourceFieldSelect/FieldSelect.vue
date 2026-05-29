@@ -72,7 +72,10 @@
       @change="onChangeHandler"
     ></TMagicCascader>
 
-    <TMagicTooltip v-if="selectDataSourceId && hasDataSourceSidePanel" :content="notEditable ? '查看' : '编辑'">
+    <TMagicTooltip
+      v-if="selectDataSourceId && hasDataSourceSidePanel && !isCompare"
+      :content="notEditable ? '查看' : '编辑'"
+    >
       <TMagicButton class="m-fields-select-action-button" :size="size" @click="editHandler(selectDataSourceId)"
         ><MIcon :icon="!notEditable ? Edit : View"></MIcon
       ></TMagicButton>
@@ -132,6 +135,9 @@ const dataSources = computed(() => {
 
 const valueIsKey = computed(() => props.value === 'key');
 const notEditable = computed(() => filterFunction(mForm, props.notEditable, props));
+
+/** 对比模式下隐藏查看/编辑操作按钮，仅保留只读展示。 */
+const isCompare = computed(() => Boolean(mForm?.isCompare));
 
 const dataSourcesOptions = computed<SelectOption[]>(() =>
   dataSources.value.map((ds) => ({

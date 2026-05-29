@@ -19,6 +19,7 @@
         ></TMagicInput>
 
         <TMagicButton
+          v-if="!isCompare"
           class="m-fields-key-value-delete"
           type="danger"
           :size="size"
@@ -30,7 +31,14 @@
         ></TMagicButton>
       </div>
 
-      <TMagicButton type="primary" :size="size" :disabled="disabled" plain :icon="Plus" @click="addHandler"
+      <TMagicButton
+        v-if="!isCompare"
+        type="primary"
+        :size="size"
+        :disabled="disabled"
+        plain
+        :icon="Plus"
+        @click="addHandler"
         >添加</TMagicButton
       >
     </div>
@@ -52,7 +60,7 @@
     ></MagicCodeEditor>
 
     <TMagicButton
-      v-if="config.advanced"
+      v-if="config.advanced && !isCompare"
       size="default"
       :disabled="disabled"
       link
@@ -63,11 +71,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue';
+import { computed, inject, ref, watchEffect } from 'vue';
 import { Delete, Plus } from '@element-plus/icons-vue';
 
 import { TMagicButton, TMagicInput } from '@tmagic/design';
-import type { FieldProps, KeyValueConfig } from '@tmagic/form';
+import type { FieldProps, FormState, KeyValueConfig } from '@tmagic/form';
 
 import CodeIcon from '@editor/icons/CodeIcon.vue';
 import MagicCodeEditor from '@editor/layouts/CodeEditor.vue';
@@ -83,6 +91,11 @@ const props = withDefaults(defineProps<FieldProps<KeyValueConfig>>(), {
 const emit = defineEmits<{
   change: [value: Record<string, any>];
 }>();
+
+const mForm = inject<FormState | undefined>('mForm');
+
+/** 对比模式下隐藏增删/代码切换等操作按钮，仅保留只读展示。 */
+const isCompare = computed(() => Boolean(mForm?.isCompare));
 
 const records = ref<[string, string][]>([]);
 const showCode = ref(false);

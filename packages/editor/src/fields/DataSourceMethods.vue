@@ -1,8 +1,8 @@
 <template>
   <div class="m-editor-data-source-methods">
-    <MagicTable :data="model[name]" :columns="methodColumns" :border="true"></MagicTable>
+    <MagicTable :data="model[name]" :columns="displayColumns" :border="true"></MagicTable>
 
-    <div class="m-editor-data-source-methods-footer">
+    <div v-if="!isCompare" class="m-editor-data-source-methods-footer">
       <TMagicButton size="small" type="primary" :disabled="disabled" plain @click="createCodeHandler"
         >添加</TMagicButton
       >
@@ -21,12 +21,12 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref, useTemplateRef } from 'vue';
+import { computed, inject, nextTick, ref, useTemplateRef } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
 import type { CodeBlockContent } from '@tmagic/core';
 import { TMagicButton, tMagicMessageBox } from '@tmagic/design';
-import type { ContainerChangeEventData, DataSourceMethodsConfig, FieldProps } from '@tmagic/form';
+import type { ContainerChangeEventData, DataSourceMethodsConfig, FieldProps, FormState } from '@tmagic/form';
 import { type ColumnConfig, MagicTable } from '@tmagic/table';
 
 import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
@@ -41,6 +41,11 @@ const props = withDefaults(defineProps<FieldProps<DataSourceMethodsConfig>>(), {
 });
 
 const emit = defineEmits(['change']);
+
+const mForm = inject<FormState | undefined>('mForm');
+
+/** 对比模式下隐藏新增/编辑/删除等操作按钮，仅保留只读展示。 */
+const isCompare = computed(() => Boolean(mForm?.isCompare));
 
 const codeConfig = ref<Omit<CodeBlockContent, 'content'> & { content: string }>();
 const codeBlockEditorRef = useTemplateRef<InstanceType<typeof CodeBlockEditor>>('codeBlockEditor');
@@ -106,6 +111,11 @@ const methodColumns: ColumnConfig[] = [
     ],
   },
 ];
+
+/** 对比模式下移除「操作」列（编辑/删除按钮），仅保留只读列。 */
+const displayColumns = computed<ColumnConfig[]>(() =>
+  isCompare.value ? methodColumns.filter((col) => !col.actions) : methodColumns,
+);
 
 const createCodeHandler = () => {
   codeConfig.value = {

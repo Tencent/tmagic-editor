@@ -6,7 +6,7 @@
   </div>
   <div class="m-fields-ui-select" v-else style="display: flex">
     <template v-if="val">
-      <TMagicTooltip content="清除" placement="top">
+      <TMagicTooltip v-if="!isCompare" content="清除" placement="top">
         <TMagicButton
           style="padding: 0"
           type="danger"
@@ -32,7 +32,7 @@
       </TMagicTooltip>
     </template>
 
-    <TMagicTooltip v-else content="点击此处选择" placement="top">
+    <TMagicTooltip v-else-if="!isCompare" content="点击此处选择" placement="top">
       <TMagicButton link style="padding: 0; margin: 0" :disabled="disabled" :size="size" @click="startSelect"
         >点击此处选择</TMagicButton
       >
@@ -66,6 +66,9 @@ const mForm = inject<FormState>('mForm');
 
 const val = computed(() => props.model[props.name]);
 const uiSelectMode = ref(false);
+
+/** 对比模式下隐藏清除/选择等操作按钮，仅保留只读展示。 */
+const isCompare = computed(() => Boolean(mForm?.isCompare));
 
 const cancelHandler = () => {
   uiService.set('uiSelectMode', false);

@@ -9,10 +9,10 @@ import MagicForm, { MForm } from '@form/index';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
 
-const mountForm = (config: any[], initValues: any = {}) =>
+const mountForm = (config: any[], initValues: any = {}, extra: any = {}) =>
   mount(MForm, {
     global: { plugins: [ElementPlus as any, MagicForm as any] },
-    props: { config, initValues },
+    props: { config, initValues, ...extra },
   });
 
 describe('GroupList container', () => {
@@ -60,5 +60,42 @@ describe('GroupList container', () => {
     );
     await nextTick();
     expect(wrapper.html()).toContain('<em>tip</em>');
+  });
+
+  describe('对比模式', () => {
+    const compareConfig = [
+      {
+        type: 'group-list',
+        name: 'list',
+        copyable: true,
+        movable: true,
+        items: [{ name: 'text', type: 'text', text: 'text' }],
+      },
+    ];
+
+    test('非对比模式渲染底部操作栏与复制/移动按钮', async () => {
+      const wrapper = mountForm(compareConfig, { list: [{ text: 'a' }, { text: 'b' }] });
+      await nextTick();
+      expect(wrapper.find('.m-fields-group-list-footer').exists()).toBe(true);
+      expect(wrapper.text()).toContain('复制');
+      expect(wrapper.text()).toContain('上移');
+    });
+
+    test('对比模式隐藏底部操作栏与复制/移动按钮', async () => {
+      const wrapper = mountForm(
+        compareConfig,
+        { list: [{ text: 'a' }, { text: 'b' }] },
+        {
+          isCompare: true,
+          lastValues: { list: [{ text: 'a' }] },
+        },
+      );
+      await nextTick();
+      await nextTick();
+      expect(wrapper.find('.m-fields-group-list-footer').exists()).toBe(false);
+      expect(wrapper.text()).not.toContain('复制');
+      expect(wrapper.text()).not.toContain('上移');
+      expect(wrapper.text()).not.toContain('下移');
+    });
   });
 });

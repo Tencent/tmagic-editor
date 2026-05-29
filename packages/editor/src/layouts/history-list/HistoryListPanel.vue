@@ -220,6 +220,7 @@ const onPageDiff = (index: number) => {
       value: item.newNode as Record<string, any>,
       currentValue: (currentNode as Record<string, any>) || null,
       targetLabel: (item.newNode.name as string) || (item.oldNode.name as string) || type,
+      id: nodeId,
     });
     return;
   }
@@ -241,6 +242,7 @@ const onDataSourceDiff = (id: string | number, index: number) => {
       value: newSchema as Record<string, any>,
       currentValue: (currentSchema as Record<string, any>) || null,
       targetLabel: newSchema.title || oldSchema.title || `${id}`,
+      id,
     });
     return;
   }
@@ -261,6 +263,7 @@ const onCodeBlockDiff = (id: string | number, index: number) => {
       value: newContent as Record<string, any>,
       currentValue: (currentContent as Record<string, any>) || null,
       targetLabel: newContent.name || oldContent.name || `${id}`,
+      id,
     });
     return;
   }
