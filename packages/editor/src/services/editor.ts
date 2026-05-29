@@ -66,6 +66,38 @@ import { beforePaste, getAddParent } from '@editor/utils/operator';
 
 type MoveItem = { node: MNode; parent: MContainer; pageForOp: { name: string; id: Id } | null };
 
+/**
+ * 给「回滚」生成的新 step 用的简短描述生成器。
+ * 与 UI 层 `describePageStep` 同义，但避免 service 反向依赖 layouts/，故在此本地实现。
+ */
+const describeStepForRevert = (step: StepValue): string => {
+  switch (step.opType) {
+    case 'add': {
+      const count = step.nodes?.length ?? 0;
+      const node = step.nodes?.[0];
+      const label = node?.name || node?.type || (node?.id !== undefined ? `${node.id}` : '');
+      return `撤回新增 ${count} 个节点${count === 1 && label ? `（${label}）` : ''}`;
+    }
+    case 'remove': {
+      const count = step.removedItems?.length ?? 0;
+      const node = step.removedItems?.[0]?.node;
+      const label = node?.name || node?.type || (node?.id !== undefined ? `${node.id}` : '');
+      return `还原已删除的 ${count} 个节点${count === 1 && label ? `（${label}）` : ''}`;
+    }
+    case 'update':
+    default: {
+      const items = step.updatedItems ?? [];
+      if (items.length === 1) {
+        const { newNode, oldNode, changeRecords } = items[0];
+        const target = newNode?.name || newNode?.type || oldNode?.name || oldNode?.type || `${newNode?.id ?? ''}`;
+        const propPath = changeRecords?.[0]?.propPath;
+        return propPath ? `还原 ${target} · ${propPath}` : `还原 ${target}`;
+      }
+      return `还原 ${items.length} 个节点的修改`;
+    }
+  }
+};
+
 class Editor extends BaseService {
   public state: StoreState = reactive({
     root: null,
@@ -1125,6 +1157,106 @@ class Editor extends BaseService {
       await this.applyHistoryOp(value, false);
     }
     return value;
+  }
+
+  /**
+   * 「回滚」指定页面历史步骤（类 git revert 语义）：
+   * - 不动原始历史栈结构（不移动 cursor、不丢弃任何步骤）；
+   * - 取出 `index` 对应的 step，**反向应用**一次（add→remove / remove→add / update→旧值）；
+   * - 把这次反向应用作为一条**新步骤**追加到栈顶，可被普通 undo / redo。
+   *
+   * 与 `gotoPageStep`（类 git reset）的区别在于此操作**不丢弃**目标之后的历史。
+   * 与 `applyHistoryOp(reverse=true)` 的区别在于：本方法**不带** `doNotPushHistory`，
+   * 反向应用会以一条新 step 入栈；并且不实施 step 中保存的选区与 modifiedNodeIds 状态，
+   * 选区由用户当前位置决定，符合"新提交"语义。
+   *
+   * 仅对处于「已应用」状态的步骤生效——未应用的步骤本身就不存在于当前 DSL 中，反向无意义。
+   *
+   * @param index 目标 step 在所属页面栈中的索引（0 为最早），通常由历史面板传入
+   * @returns 反向后产生的新 step；目标不存在 / 未应用 / 反向失败时返回 null
+   */
+  public async revertPageStep(index: number): Promise<StepValue | null> {
+    const list = historyService.getPageStepList();
+    const entry = list[index];
+    if (!entry?.applied) return null;
+
+    const { step } = entry;
+    const root = this.get('root');
+    if (!root) return null;
+
+    // 反向应用产生的新 step 由内部 pushOpHistory 触发 history `change` 事件，监听一次以拿到引用。
+    let revertedStep: StepValue | null = null;
+    const captureRevert = (s: StepValue) => {
+      revertedStep = s;
+    };
+    historyService.once('change', captureRevert);
+
+    const historyDescription = `回滚 #${index + 1}: ${describeStepForRevert(step)}`;
+    // revert 走 public add/remove/update，让操作以一条普通新 step 入栈；不要切换选区与页面，避免打断用户。
+    const opts = { doNotSelect: true, doNotSwitchPage: true, historyDescription } as const;
+
+    try {
+      switch (step.opType) {
+        case 'add': {
+          // 原本是新增 → revert 即删除当时被加入的节点
+          const nodes = step.nodes ?? [];
+          for (const n of nodes) {
+            const existing = this.getNodeById(n.id, false);
+            if (existing) {
+              await this.remove(existing, opts);
+            }
+          }
+          break;
+        }
+        case 'remove': {
+          // 原本是删除 → revert 即把节点按原父容器加回来。
+          // 按原 index 升序逐个插回，先小后大避免索引漂移。
+          const items = step.removedItems ?? [];
+          const sorted = [...items].sort((a, b) => a.index - b.index);
+          for (const { node, parentId } of sorted) {
+            const parent = this.getNodeById(parentId, false) as MContainer | null;
+            if (parent) {
+              await this.add([cloneDeep(node)] as MNode[], parent, opts);
+            }
+          }
+          break;
+        }
+        case 'update': {
+          // 原本是更新 → revert 即把 oldNode 的值写回；
+          // 优先按 changeRecords 局部 patch（仅触达 propPath 下的字段，避免冲掉同节点上其它无关变更）。
+          const items = step.updatedItems ?? [];
+          const configs = items.map(({ oldNode, newNode, changeRecords }) => {
+            if (changeRecords?.length) {
+              const patch: MNode = { id: newNode.id, type: newNode.type };
+              for (const record of changeRecords) {
+                if (!record.propPath) {
+                  // 没有 propPath 视为整节点替换
+                  return cloneDeep(oldNode);
+                }
+                const value = cloneDeep(getValueByKeyPath(record.propPath, oldNode));
+                setValueByKeyPath(record.propPath, value, patch);
+              }
+              return patch;
+            }
+            return cloneDeep(oldNode);
+          });
+          if (configs.length) {
+            await this.update(configs, { historyDescription });
+          }
+          break;
+        }
+      }
+    } finally {
+      historyService.off('change', captureRevert);
+    }
+
+    // 通知一次 history-change，让上层（如属性面板）按当前最新 DSL 刷新
+    const page = toRaw(this.get('page'));
+    if (page) {
+      this.emit('history-change', page as MPage | MPageFragment);
+    }
+
+    return revertedStep;
   }
 
   /**

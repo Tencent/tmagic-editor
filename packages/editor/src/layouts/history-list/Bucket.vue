@@ -23,6 +23,7 @@
             isCurrent: s.isCurrent,
             desc: describeStep(s.step),
             diffable: isStepDiffable ? isStepDiffable(s.step) : false,
+            revertable: s.applied,
           }))
         "
         :is-current="group.isCurrent"
@@ -30,6 +31,7 @@
         @toggle="(key: string) => $emit('toggle', key)"
         @goto="(index: number) => $emit('goto', bucketId, index)"
         @diff-step="(index: number) => $emit('diff-step', bucketId, index)"
+        @revert-step="(index: number) => $emit('revert-step', bucketId, index)"
       />
       <!--
         初始状态项：永远位于该 bucket 列表底部（同样按倒序展示，最底部 = 最早状态）。
@@ -88,6 +90,8 @@ defineEmits<{
   (_e: 'goto-initial', _bucketId: string | number): void;
   /** 用户点击"查看差异"，携带 bucketId 与 step 索引。 */
   (_e: 'diff-step', _bucketId: string | number, _index: number): void;
+  /** 用户点击"回滚"按钮，携带 bucketId 与 step 索引，类 git revert。 */
+  (_e: 'revert-step', _bucketId: string | number, _index: number): void;
 }>();
 
 /** 该 bucket 是否处于初始状态（栈 cursor=0），等价于全部 group 都未 applied。 */

@@ -78,7 +78,10 @@
       <TMagicFormItem
         v-if="isSelfDiffField"
         v-bind="formItemProps"
-        :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text, 'show-diff': true, 'self-diff': true }"
+        :class="{
+          'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text,
+          'self-diff': true,
+        }"
       >
         <template #label>
           <slot name="label" :config="config" :type="type" :text="text" :prop="itemProp" :disabled="disabled">
@@ -121,7 +124,7 @@
         <!-- 上次内容 -->
         <TMagicFormItem
           v-bind="formItemProps"
-          :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text, 'show-diff': true }"
+          :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text, 'show-before-diff': true }"
         >
           <template #label>
             <slot name="label" :config="config" :type="type" :text="text" :prop="itemProp" :disabled="disabled">
@@ -161,7 +164,7 @@
         <TMagicFormItem
           v-bind="formItemProps"
           :style="config.tip ? 'flex: 1' : ''"
-          :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text, 'show-diff': true }"
+          :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text, 'show-after-diff': true }"
         >
           <template #label>
             <slot name="label" :config="config" :type="type" :text="text" :prop="itemProp" :disabled="disabled">

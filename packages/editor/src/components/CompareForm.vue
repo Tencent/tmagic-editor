@@ -139,6 +139,7 @@ const wrapperStyle = computed(() => {
  */
 const isEmptyCodeSelectValue = (v: any): boolean => {
   if (v === '' || v === undefined || v === null) return true;
+  if (Array.isArray(v) && v.length === 0) return true;
   return typeof v === 'object' && v.hookType === HookType.CODE && Array.isArray(v.hookData) && v.hookData.length === 0;
 };
 

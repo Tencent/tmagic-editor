@@ -70,8 +70,8 @@ afterEach(() => {
 });
 
 const factory = async () => {
-  const { default: HistoryListPanel } = await import('@editor/layouts/history-list/HistoryListPanel.vue');
-  return mount(HistoryListPanel, { attachTo: document.body });
+  const { default: historyListPanel } = await import('@editor/layouts/history-list/HistoryListPanel.vue');
+  return mount(historyListPanel, { attachTo: document.body });
 };
 
 describe('HistoryListPanel.vue', () => {

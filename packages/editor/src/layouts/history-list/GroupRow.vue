@@ -9,6 +9,7 @@
       :title="headTitle"
       @click="onHeadClick"
     >
+      <span class="m-editor-history-list-item-index" :title="headIndexTitle">{{ headIndexLabel }}</span>
       <span class="m-editor-history-list-item-op" :class="`op-${opType}`">{{ opLabel(opType) }}</span>
       <span class="m-editor-history-list-item-desc">{{ desc }}</span>
       <span v-if="isCurrent" class="m-editor-history-list-item-current">当前</span>
@@ -20,12 +21,19 @@
         >查看差异</span
       >
       <span v-if="merged" class="m-editor-history-list-item-merge">合并 {{ stepCount }} 步</span>
+      <span
+        v-if="!merged && headRevertable"
+        class="m-editor-history-list-item-revert"
+        title="将该步骤的修改作为一次新操作反向应用（不影响后续历史）"
+        @click.stop="onRevertClick(subSteps[0].index)"
+        >回滚</span
+      >
       <span v-if="merged" class="m-editor-history-list-group-toggle" :class="{ 'is-expanded': expanded }">▾</span>
     </div>
 
     <ul v-if="merged && expanded" class="m-editor-history-list-substeps">
       <li
-        v-for="s in subSteps"
+        v-for="s in subStepsDisplay"
         :key="s.index"
         :class="{ 'is-undone': !s.applied, 'is-current': s.isCurrent, 'is-clickable': !s.isCurrent }"
         :title="s.isCurrent ? '当前所在记录' : '点击跳转到该记录'"
@@ -40,6 +48,13 @@
           title="查看修改差异"
           @click.stop="onDiffClick(s.index)"
           >查看差异</span
+        >
+        <span
+          v-if="s.revertable"
+          class="m-editor-history-list-item-revert"
+          title="将该步骤的修改作为一次新操作反向应用（不影响后续历史）"
+          @click.stop="onRevertClick(s.index)"
+          >回滚</span
         >
       </li>
     </ul>
@@ -71,7 +86,15 @@ const props = defineProps<{
   /** 组内的 step 总数，仅在 merged 为 true 时显示为 "合并 N 步"。 */
   stepCount: number;
   /** 子步列表，用于在展开状态下逐条展示每个 step 的索引、应用状态与描述文案。 */
-  subSteps: { index: number; applied: boolean; desc: string; isCurrent?: boolean; diffable?: boolean }[];
+  subSteps: {
+    index: number;
+    applied: boolean;
+    desc: string;
+    isCurrent?: boolean;
+    diffable?: boolean;
+    /** 是否可对该子步执行「回滚」（已应用 + 业务侧确认支持反向）。父级根据 step 与 applied 决定。 */
+    revertable?: boolean;
+  }[];
   /** 当前组是否处于展开状态。仅在 merged 为 true 时生效，控制子步列表是否渲染。 */
   expanded: boolean;
   /** 是否为当前所在的分组（包含栈中最近一次已应用步骤的那一组），UI 高亮展示。 */
@@ -99,6 +122,11 @@ const emit = defineEmits<{
    * payload 为该 step 在所属栈中的索引，由上层根据 index 取 step 内容并展示对比。
    */
   (_e: 'diff-step', _index: number): void;
+  /**
+   * 用户希望「回滚」该 step——把它的修改作为一次新操作反向应用（类 git revert）。
+   * payload 为该 step 在所属栈中的索引。仅在单步组头部（headRevertable）或合并组的可回滚子步上触发。
+   */
+  (_e: 'revert-step', _index: number): void;
 }>();
 
 /** 单步组：头部可点击 goto；合并组：头部可点击切换展开。当前组（isCurrent）的单步组头部不可点击。 */
@@ -136,7 +164,44 @@ const onSubStepClick = (s: { index: number; isCurrent?: boolean }) => {
 /** 单步组头部是否展示"查看差异"入口：要求该唯一子步本身可对比。 */
 const headDiffable = computed(() => !props.merged && Boolean(props.subSteps[0]?.diffable));
 
+/** 单步组头部是否展示"回滚"入口：要求该唯一子步本身可回滚（已应用）。 */
+const headRevertable = computed(() => !props.merged && Boolean(props.subSteps[0]?.revertable));
+
+/**
+ * 合并组展开后的子步渲染顺序：与外层分组列表保持一致——倒序展示（最新的子步在最上方）。
+ * 外层 page tab / bucket 都已对 groups 做了 reverse，子步沿用同样的视觉规则更直观。
+ * 注意：仅用于渲染，原 `subSteps` 保持时间正序，`headIndexLabel` 等基于首尾索引的展示语义不变。
+ */
+const subStepsDisplay = computed(() => props.subSteps.slice().reverse());
+
+/**
+ * 头部索引展示：
+ * - 单步组（merged=false）：显示该唯一 step 的编号，如 `#5`；
+ * - 合并组：显示组内 step 的编号范围，如 `#3-#7`（首尾相同则退化为 `#5`）。
+ *
+ * 这里展示的是 step.index + 1（与子步列表 `#{{ s.index + 1 }}` 保持一致），从 1 起编号更符合直觉。
+ */
+const headIndexLabel = computed(() => {
+  const list = props.subSteps;
+  if (!list.length) return '';
+  const first = list[0].index + 1;
+  const last = list[list.length - 1].index + 1;
+  if (!props.merged || first === last) return `#${first}`;
+  return `#${first}-#${last}`;
+});
+
+const headIndexTitle = computed(() => {
+  if (!props.merged) return `历史步骤编号 #${props.subSteps[0]?.index + 1}`;
+  return `合并了第 ${props.subSteps[0]?.index + 1} 至第 ${
+    props.subSteps[props.subSteps.length - 1]?.index + 1
+  } 共 ${props.subSteps.length} 条历史步骤`;
+});
+
 const onDiffClick = (index: number) => {
   emit('diff-step', index);
+};
+
+const onRevertClick = (index: number) => {
+  emit('revert-step', index);
 };
 </script>

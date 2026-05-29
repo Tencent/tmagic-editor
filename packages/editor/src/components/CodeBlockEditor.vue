@@ -34,7 +34,7 @@
   <Teleport to="body">
     <TMagicDialog title="查看修改" v-model="difVisible" fullscreen destroy-on-close>
       <div style="display: flex; margin-bottom: 10px">
-        <div style="flex: 1"><TMagicTag size="small" type="info">修改前</TMagicTag></div>
+        <div style="flex: 1"><TMagicTag size="small" type="danger">修改前</TMagicTag></div>
         <div style="flex: 1"><TMagicTag size="small" type="success">修改后</TMagicTag></div>
       </div>
 

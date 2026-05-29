@@ -479,6 +479,28 @@ class History extends BaseService {
   }
 
   /**
+   * 取出指定代码块历史栈的平铺步骤列表（含 applied 标记）。供 revert 等按 index 索引步骤使用。
+   */
+  public getCodeBlockStepList(codeBlockId: Id): { step: CodeBlockStepValue; index: number; applied: boolean }[] {
+    const undoRedo = this.state.codeBlockState[codeBlockId];
+    if (!undoRedo) return [];
+    const list = undoRedo.getElementList();
+    const cursor = undoRedo.getCursor();
+    return list.map((step, index) => ({ step, index, applied: index < cursor }));
+  }
+
+  /**
+   * 取出指定数据源历史栈的平铺步骤列表（含 applied 标记）。供 revert 等按 index 索引步骤使用。
+   */
+  public getDataSourceStepList(dataSourceId: Id): { step: DataSourceStepValue; index: number; applied: boolean }[] {
+    const undoRedo = this.state.dataSourceState[dataSourceId];
+    if (!undoRedo) return [];
+    const list = undoRedo.getElementList();
+    const cursor = undoRedo.getCursor();
+    return list.map((step, index) => ({ step, index, applied: index < cursor }));
+  }
+
+  /**
    * 取出全部数据源的历史栈，按 dataSourceId 分组。同上。
    */
   public getDataSourceHistoryGroups(): DataSourceHistoryGroup[] {

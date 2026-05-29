@@ -1,6 +1,20 @@
 <template>
-  <TMagicPopover popper-class="m-editor-history-list-popover" placement="bottom" trigger="click" :width="660">
+  <TMagicPopover
+    popper-class="m-editor-history-list-popover"
+    placement="bottom"
+    trigger="click"
+    :visible="visible"
+    :width="660"
+  >
     <div class="m-editor-history-list">
+      <TMagicTooltip effect="dark" placement="top" content="关闭">
+        <TMagicButton class="m-editor-history-list-close" size="small" link @click="visible = false">
+          <template #icon>
+            <MIcon :icon="CloseIcon"></MIcon>
+          </template>
+        </TMagicButton>
+      </TMagicTooltip>
+
       <TMagicTabs v-model="activeTab" class="m-editor-history-list-tabs">
         <component
           :is="tabPaneComponent?.component || 'el-tab-pane'"
@@ -13,6 +27,7 @@
             @goto="onPageGoto"
             @goto-initial="onPageGotoInitial"
             @diff-step="onPageDiff"
+            @revert-step="onPageRevert"
           />
         </component>
 
@@ -27,6 +42,7 @@
             @goto="onDataSourceGoto"
             @goto-initial="onDataSourceGotoInitial"
             @diff-step="onDataSourceDiff"
+            @revert-step="onDataSourceRevert"
           />
         </component>
 
@@ -41,6 +57,7 @@
             @goto="onCodeBlockGoto"
             @goto-initial="onCodeBlockGotoInitial"
             @diff-step="onCodeBlockDiff"
+            @revert-step="onCodeBlockRevert"
           />
         </component>
       </TMagicTabs>
@@ -48,7 +65,7 @@
 
     <template #reference>
       <TMagicTooltip effect="dark" placement="bottom" content="历史记录">
-        <TMagicButton size="small" link>
+        <TMagicButton size="small" link @click="visible = !visible">
           <template #icon>
             <MIcon :icon="ClockIcon"></MIcon>
           </template>
@@ -82,7 +99,7 @@
  * 共享的描述生成与折叠状态在 composables.ts 中维护。
  */
 import { inject, markRaw, ref, useTemplateRef } from 'vue';
-import { Clock } from '@element-plus/icons-vue';
+import { Clock, Close } from '@element-plus/icons-vue';
 
 import { getDesignConfig, TMagicButton, TMagicPopover, TMagicTabs, TMagicTooltip } from '@tmagic/design';
 import type { FormState } from '@tmagic/form';
@@ -101,7 +118,11 @@ defineOptions({
 });
 
 const ClockIcon = markRaw(Clock);
+const CloseIcon = markRaw(Close);
 const activeTab = ref<'page' | 'data-source' | 'code-block'>('page');
+
+/** 面板显隐受控：reference 图标点击切换，右上角关闭按钮置为 false。 */
+const visible = ref(false);
 
 const tabPaneComponent = getDesignConfig('components')?.tabPane;
 
@@ -157,6 +178,22 @@ const onDataSourceGotoInitial = (id: string | number) => {
 
 const onCodeBlockGotoInitial = (id: string | number) => {
   codeBlockService.goto(id, 0);
+};
+
+/**
+ * 「回滚」入口：把目标历史步骤的修改作为一次新操作反向应用（类 git revert），
+ * 不破坏原有栈结构。各 service 内部完成反向 + 入栈，并自带描述用于面板展示。
+ */
+const onPageRevert = (index: number) => {
+  editorService.revertPageStep(index);
+};
+
+const onDataSourceRevert = (id: string | number, index: number) => {
+  dataSourceService.revert(id, index);
+};
+
+const onCodeBlockRevert = (id: string | number, index: number) => {
+  codeBlockService.revert(id, index);
 };
 
 const diffDialogRef = useTemplateRef<InstanceType<typeof HistoryDiffDialog>>('diffDialog');

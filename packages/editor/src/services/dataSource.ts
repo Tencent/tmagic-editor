@@ -54,6 +54,19 @@ const canUsePluginMethods = {
 
 type SyncMethodName = Writable<(typeof canUsePluginMethods)['sync']>;
 
+/**
+ * 「回滚」生成的新 step 简短描述。
+ * 仅在 service 层使用，避免依赖 UI 层 composables。
+ */
+const describeRevertDataSourceStep = (step: DataSourceStepValue): string => {
+  const { oldSchema, newSchema, changeRecords, id } = step;
+  if (oldSchema === null && newSchema) return `撤回新增 ${newSchema.title || newSchema.id || id}`;
+  if (oldSchema && newSchema === null) return `还原已删除的 ${oldSchema.title || oldSchema.id || id}`;
+  const title = newSchema?.title || oldSchema?.title || `${id}`;
+  const propPath = changeRecords?.[0]?.propPath;
+  return propPath ? `还原 ${title} · ${propPath}` : `还原 ${title}`;
+};
+
 class DataSource extends BaseService {
   private state = reactive<State>({
     datasourceTypeList: [],
@@ -251,6 +264,24 @@ class DataSource extends BaseService {
     return cursor;
   }
 
+  /**
+   * 「回滚」指定数据源历史步骤（类 git revert 语义）：
+   * - 不动原始栈结构（不移动 cursor、不丢弃任何步骤）；
+   * - 把目标 step 的修改**反向应用**一次，并作为**新步骤**追加到栈顶；
+   * - 仅对已应用的步骤生效——未应用步骤本身就不存在于当前 schema 中，反向无意义。
+   *
+   * @param id    数据源 id
+   * @param index 目标 step 在该栈中的索引（0 为最早），通常由历史面板传入
+   * @returns 反向后产生的新 step；目标不存在 / 未应用时返回 null
+   */
+  public revert(id: Id, index: number): DataSourceStepValue | null {
+    const list = historyService.getDataSourceStepList(id);
+    const entry = list[index];
+    if (!entry?.applied) return null;
+    const description = `回滚 #${index + 1}: ${describeRevertDataSourceStep(entry.step)}`;
+    return this.applyRevertStep(entry.step, description);
+  }
+
   public createId(): string {
     return `ds_${guid()}`;
   }
@@ -324,6 +355,52 @@ class DataSource extends BaseService {
         this.add(item);
       }
     });
+  }
+
+  /**
+   * 反向应用一个 step 并以新 step 入栈（不带 doNotPushHistory）。逻辑与 applyHistoryStep(reverse=true)
+   * 同构，差异仅在于走对应的公共 add / update / remove 而不是带 doNotPushHistory 的版本。
+   */
+  private applyRevertStep(step: DataSourceStepValue, historyDescription: string): DataSourceStepValue | null {
+    const { id, oldSchema, newSchema, changeRecords } = step;
+
+    // 原本是新增 → revert 即删除
+    if (oldSchema === null && newSchema) {
+      this.remove(`${id}`, { historyDescription });
+      return historyService.getDataSourceStepList(id).slice(-1)[0]?.step ?? null;
+    }
+
+    // 原本是删除 → revert 即重新加回
+    if (oldSchema && newSchema === null) {
+      this.add(cloneDeep(oldSchema), { historyDescription });
+      return historyService.getDataSourceStepList(id).slice(-1)[0]?.step ?? null;
+    }
+
+    if (!oldSchema || !newSchema) return null;
+
+    // 原本是更新 → 把 oldSchema 写回；优先按 changeRecords 局部 patch
+    if (changeRecords?.length) {
+      const current = this.getDataSourceById(`${id}`);
+      if (!current) return null;
+      const patched = cloneDeep(current) as DataSourceSchema;
+      let fallbackToFullReplace = false;
+      for (const record of changeRecords) {
+        if (!record.propPath) {
+          fallbackToFullReplace = true;
+          break;
+        }
+        const value = cloneDeep(getValueByKeyPath(record.propPath, oldSchema));
+        setValueByKeyPath(record.propPath, value, patched);
+      }
+      this.update(fallbackToFullReplace ? cloneDeep(oldSchema) : patched, {
+        changeRecords,
+        historyDescription,
+      });
+      return historyService.getDataSourceStepList(id).slice(-1)[0]?.step ?? null;
+    }
+
+    this.update(cloneDeep(oldSchema), { historyDescription });
+    return historyService.getDataSourceStepList(id).slice(-1)[0]?.step ?? null;
   }
 
   /**

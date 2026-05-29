@@ -18,6 +18,7 @@
             isCurrent: s.isCurrent,
             desc: describePageStep(s.step),
             diffable: isPageStepDiffable(s.step),
+            revertable: s.applied,
           }))
         "
         :is-current="group.isCurrent"
@@ -25,6 +26,7 @@
         @toggle="(key: string) => $emit('toggle', key)"
         @goto="(index: number) => $emit('goto', index)"
         @diff-step="(index: number) => $emit('diff-step', index)"
+        @revert-step="(index: number) => $emit('revert-step', index)"
       />
       <!--
         初始状态项：永远位于列表底部（页面 tab 倒序展示，最底部=最早），
@@ -66,6 +68,8 @@ defineEmits<{
   (_e: 'goto-initial'): void;
   /** 用户点击"查看差异"按钮，携带目标 step 在栈中的索引。 */
   (_e: 'diff-step', _index: number): void;
+  /** 用户点击"回滚"按钮，携带目标 step 在栈中的索引，类 git revert。 */
+  (_e: 'revert-step', _index: number): void;
 }>();
 
 /**

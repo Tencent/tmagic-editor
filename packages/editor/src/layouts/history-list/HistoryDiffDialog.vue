@@ -18,7 +18,7 @@
         </div>
 
         <div class="m-editor-history-diff-dialog-legend">
-          <TMagicTag size="small" type="info">{{ leftLabel }}</TMagicTag>
+          <TMagicTag size="small" type="danger">{{ leftLabel }}</TMagicTag>
           <span class="m-editor-history-diff-dialog-arrow">→</span>
           <TMagicTag size="small" type="success">{{ rightLabel }}</TMagicTag>
           <span v-if="mode === 'current' && isSameAsCurrent" class="m-editor-history-diff-dialog-tip">

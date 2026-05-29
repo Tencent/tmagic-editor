@@ -5,6 +5,7 @@
     :title="isCurrent ? '当前已回到未修改的初始状态' : '点击回到未修改的初始状态'"
     @click="onClick"
   >
+    <span class="m-editor-history-list-item-index" title="历史步骤编号 #0（未修改的初始状态）">#0</span>
     <span class="m-editor-history-list-item-op op-initial">初始</span>
     <span class="m-editor-history-list-item-desc">未修改的初始状态</span>
     <span v-if="isCurrent" class="m-editor-history-list-item-current">当前</span>

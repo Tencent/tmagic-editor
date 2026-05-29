@@ -469,13 +469,13 @@ describe('useHistoryList', () => {
   // useHistoryList 内部用了 useServices，需要 mount 在一个 host 组件里 provide services
   const mountWithHost = () => {
     let api!: ReturnType<typeof useHistoryList>;
-    const Host = defineComponent({
+    const host = defineComponent({
       setup() {
         api = useHistoryList();
         return () => h('div');
       },
     });
-    const wrapper = mount(Host, {
+    const wrapper = mount(host, {
       global: {
         provide: {
           services: { historyService },

@@ -15,7 +15,10 @@
   }
 
   .tmagic-design-form-item {
-    &.show-diff {
+    &.show-after-diff {
+      background: rgb(225, 243, 216);
+    }
+    &.show-before-diff {
       background: #f7dadd;
     }
   }

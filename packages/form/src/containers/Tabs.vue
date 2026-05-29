@@ -79,7 +79,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref, watchEffect } from 'vue';
+import { computed, inject, ref, watch, watchEffect } from 'vue';
 import { isEmpty } from 'lodash-es';
 
 import { getDesignConfig, TMagicBadge } from '@tmagic/design';
@@ -173,6 +173,11 @@ watchEffect(() => {
       prop: props.prop,
     });
   }
+});
+
+// model 或 lastValues 变化时，重置差异数
+watch([() => props.model, () => props.lastValues], () => {
+  diffCount.value = {};
 });
 
 const tabItems = (tab: TabPaneConfig) => (props.config.dynamic ? props.config.items : tab.items);

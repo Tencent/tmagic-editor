@@ -2,7 +2,27 @@
   padding: 0 !important;
 
   .m-editor-history-list {
+    position: relative;
     padding: 4px 8px 8px;
+  }
+
+  // 关闭按钮悬浮在 tab 标题同一行（绝对定位，不占布局空间）。
+  // top 对齐容器顶部内边距，height 跟 el-tabs/t-tabs 头部默认高度一致，
+  // 再用 flex 居中让图标与 tab 标题视觉对齐。
+  .m-editor-history-list-close {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    height: 40px;
+    margin: 0;
+    color: #909399;
+
+    &:hover {
+      color: #409eff;
+    }
   }
 
   .m-editor-history-list-tabs {
@@ -36,7 +56,8 @@
     color: #303133;
     cursor: default;
 
-    &:hover {
+    // 合并组（卡片）自己定义了 hover/active 视觉，跳过通用单步 hover 避免色彩叠加
+    &:not(.m-editor-history-list-group.is-merged):hover {
       background-color: rgba(0, 0, 0, 0.04);
     }
 
@@ -48,7 +69,10 @@
       }
     }
 
-    &.is-current {
+    // 当前所在的「单步」记录：左侧蓝条 + 浅蓝底；
+    // 合并组的当前态由 `.is-merged.is-current` 单独覆盖（border-left + 卡片背景），
+    // 故这里仅作用于「非合并组」的单步条目，避免与卡片样式互相干扰。
+    &.is-current:not(.m-editor-history-list-group.is-merged) {
       background-color: rgba(64, 158, 255, 0.1);
       box-shadow: inset 2px 0 0 #409eff;
 
@@ -94,22 +118,64 @@
       }
     }
 
-    &.is-merged .m-editor-history-list-group-head {
-      font-weight: 500;
+    // 合并组（≥2 个连续同节点的修改被聚合）需要与单步条目明显区分：
+    // - 左侧 3px 紫色色条暗示「这是一组」；
+    // - 浅紫背景 + 边框把整个组视觉化为一张「卡片」；
+    // - 头部加 padding，避免和单步条目混在一起难以辨认。
+    &.is-merged {
+      margin: 4px 0;
+      padding: 4px 8px 6px;
+      background-color: rgba(144, 105, 219, 0.06);
+      border: 1px solid rgba(144, 105, 219, 0.18);
+      border-left: 3px solid #9069db;
+      border-radius: 4px;
+
+      // 卡片本体已经有背景色，hover 状态以更深的同色提示交互
+      &:hover {
+        background-color: rgba(144, 105, 219, 0.1);
+      }
+
+      .m-editor-history-list-group-head {
+        font-weight: 600;
+        color: #5b3fa5;
+      }
+
+      // 已撤销态：整张卡片去色
+      &.is-undone {
+        background-color: rgba(192, 196, 204, 0.08);
+        border-color: rgba(192, 196, 204, 0.4);
+        border-left-color: #c0c4cc;
+
+        .m-editor-history-list-group-head {
+          color: #c0c4cc;
+        }
+      }
+
+      // 当前组：卡片左条变蓝，与单步「当前」高亮一致
+      &.is-current {
+        background-color: rgba(64, 158, 255, 0.08);
+        border-color: rgba(64, 158, 255, 0.3);
+        border-left-color: #409eff;
+        box-shadow: none; // 覆盖 .is-current 公共的 inset 阴影
+
+        .m-editor-history-list-group-head {
+          color: #409eff;
+        }
+      }
     }
   }
 
   .m-editor-history-list-substeps {
-    margin: 4px 0 0 18px;
+    margin: 6px 0 0 6px;
     padding: 0;
     list-style: none;
-    border-left: 1px dashed #dcdfe6;
+    border-left: 1px dashed rgba(144, 105, 219, 0.45);
 
     li {
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 2px 8px;
+      padding: 3px 8px;
       font-size: 11px;
       color: #606266;
       cursor: default;
@@ -119,7 +185,7 @@
         cursor: pointer;
 
         &:hover {
-          background-color: rgba(0, 0, 0, 0.04);
+          background-color: rgba(144, 105, 219, 0.1);
         }
       }
 
@@ -152,6 +218,8 @@
     color: #909399;
     font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
     font-size: 11px;
+    font-weight: 400; // 防止被合并组头部的粗体继承
+    white-space: nowrap;
   }
 
   .m-editor-history-list-item-op {
@@ -203,14 +271,17 @@
     white-space: nowrap;
   }
 
+  // 「合并 N 步」徽标：紫色实心胶囊，与合并组卡片色系一致，醒目区分单步条目。
   .m-editor-history-list-item-merge {
     flex: 0 0 auto;
-    padding: 0 6px;
-    border-radius: 2px;
+    padding: 0 8px;
+    border-radius: 8px;
     font-size: 10px;
     line-height: 16px;
-    color: #e6a23c;
-    background-color: rgba(230, 162, 60, 0.12);
+    color: #fff;
+    background-color: #9069db;
+    font-weight: 500;
+    letter-spacing: 0.2px;
   }
 
   .m-editor-history-list-item-diff {
@@ -226,6 +297,24 @@
 
     &:hover {
       background-color: rgba(64, 158, 255, 0.2);
+    }
+  }
+
+  // 「回滚」按钮：类 git revert，把目标 step 反向应用一次作为新提交。
+  // 使用与「查看差异」不同的色调（橙黄），用来区分"可逆操作"与"只读对比"。
+  .m-editor-history-list-item-revert {
+    flex: 0 0 auto;
+    padding: 0 6px;
+    border-radius: 2px;
+    font-size: 10px;
+    line-height: 16px;
+    color: #e6a23c;
+    background-color: rgba(230, 162, 60, 0.12);
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+      background-color: rgba(230, 162, 60, 0.25);
     }
   }
 
