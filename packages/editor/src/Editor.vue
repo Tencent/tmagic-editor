@@ -237,6 +237,13 @@ provide('stageOptions', stageOptions);
  */
 provide('extendFormState', props.extendFormState);
 
+/**
+ * 把历史记录面板的自定义扩展 tab 提供给深层的 HistoryListPanel（它挂在 NavMenu 中，
+ * 以 markRaw component 形式渲染，无法直接通过 props 透传）。业务方可借此在历史记录
+ * 面板内追加自定义模块的历史 tab。
+ */
+provide('historyListExtraTabs', props.historyListExtraTabs);
+
 provide<EventBus>('eventBus', new EventEmitter());
 
 const propsPanelMountedHandler = (e: InstanceType<typeof FormPanel>) => {

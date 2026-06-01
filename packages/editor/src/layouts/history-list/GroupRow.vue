@@ -35,8 +35,8 @@
       <li
         v-for="s in subStepsDisplay"
         :key="s.index"
-        :class="{ 'is-undone': !s.applied, 'is-current': s.isCurrent, 'is-clickable': !s.isCurrent }"
-        :title="s.isCurrent ? '当前所在记录' : '点击跳转到该记录'"
+        :class="{ 'is-undone': !s.applied, 'is-current': s.isCurrent, 'is-clickable': gotoEnabled && !s.isCurrent }"
+        :title="subStepTitle(s)"
         @click="onSubStepClick(s)"
       >
         <span class="m-editor-history-list-item-index">#{{ s.index + 1 }}</span>
@@ -72,34 +72,46 @@ defineOptions({
   name: 'MEditorHistoryListGroupRow',
 });
 
-const props = defineProps<{
-  /** 唯一标识当前组的 key，作为 toggle 事件的 payload 回传给上层。形如 `pg-${idx}` / `ds-${id}-${idx}` / `cb-${id}-${idx}`。 */
-  groupKey: string;
-  /** 该组当前是否处于已应用状态（false 表示已被 undo 撤销，UI 会显示为灰态）。 */
-  applied: boolean;
-  /** 是否为合并组（即组内 step 数大于 1，由多次连续操作合并而来）。决定是否展示合并标记与可展开的子步列表。 */
-  merged: boolean;
-  /** 操作类型：`add` / `remove` / `update`，用于决定操作徽标的颜色和文案。 */
-  opType: HistoryOpType;
-  /** 组的整体描述文案，由上层根据 step / group 计算后传入，例如 "修改 button · style.color"。 */
-  desc: string;
-  /** 组内的 step 总数，仅在 merged 为 true 时显示为 "合并 N 步"。 */
-  stepCount: number;
-  /** 子步列表，用于在展开状态下逐条展示每个 step 的索引、应用状态与描述文案。 */
-  subSteps: {
-    index: number;
+const props = withDefaults(
+  defineProps<{
+    /** 唯一标识当前组的 key，作为 toggle 事件的 payload 回传给上层。形如 `pg-${idx}` / `ds-${id}-${idx}` / `cb-${id}-${idx}`。 */
+    groupKey: string;
+    /** 该组当前是否处于已应用状态（false 表示已被 undo 撤销，UI 会显示为灰态）。 */
     applied: boolean;
+    /** 是否为合并组（即组内 step 数大于 1，由多次连续操作合并而来）。决定是否展示合并标记与可展开的子步列表。 */
+    merged: boolean;
+    /** 操作类型：`add` / `remove` / `update`，用于决定操作徽标的颜色和文案。 */
+    opType: HistoryOpType;
+    /** 组的整体描述文案，由上层根据 step / group 计算后传入，例如 "修改 button · style.color"。 */
     desc: string;
+    /** 组内的 step 总数，仅在 merged 为 true 时显示为 "合并 N 步"。 */
+    stepCount: number;
+    /** 子步列表，用于在展开状态下逐条展示每个 step 的索引、应用状态与描述文案。 */
+    subSteps: {
+      index: number;
+      applied: boolean;
+      desc: string;
+      isCurrent?: boolean;
+      diffable?: boolean;
+      /** 是否可对该子步执行「回滚」（已应用 + 业务侧确认支持反向）。父级根据 step 与 applied 决定。 */
+      revertable?: boolean;
+    }[];
+    /** 当前组是否处于展开状态。仅在 merged 为 true 时生效，控制子步列表是否渲染。 */
+    expanded: boolean;
+    /** 是否为当前所在的分组（包含栈中最近一次已应用步骤的那一组），UI 高亮展示。 */
     isCurrent?: boolean;
-    diffable?: boolean;
-    /** 是否可对该子步执行「回滚」（已应用 + 业务侧确认支持反向）。父级根据 step 与 applied 决定。 */
-    revertable?: boolean;
-  }[];
-  /** 当前组是否处于展开状态。仅在 merged 为 true 时生效，控制子步列表是否渲染。 */
-  expanded: boolean;
-  /** 是否为当前所在的分组（包含栈中最近一次已应用步骤的那一组），UI 高亮展示。 */
-  isCurrent?: boolean;
-}>();
+    /**
+     * 是否支持「跳转到该记录」(goto)。默认 true。
+     * 为 false 时：单步组头部与子步条目都不再可点击跳转、也不会触发 goto 事件，
+     * 仅保留合并组头部的展开 / 收起能力，以及查看差异、回滚等其它入口。
+     */
+    gotoEnabled?: boolean;
+  }>(),
+  {
+    isCurrent: false,
+    gotoEnabled: true,
+  },
+);
 
 const emit = defineEmits<{
   /**
@@ -129,15 +141,19 @@ const emit = defineEmits<{
   (_e: 'revert-step', _index: number): void;
 }>();
 
-/** 单步组：头部可点击 goto；合并组：头部可点击切换展开。当前组（isCurrent）的单步组头部不可点击。 */
+/**
+ * 单步组：头部可点击 goto（需 gotoEnabled）；合并组：头部可点击切换展开。
+ * 当前组（isCurrent）或禁用 goto 时，单步组头部不可点击。
+ */
 const isHeadClickable = computed(() => {
   if (props.merged) return true;
-  return !props.isCurrent;
+  return props.gotoEnabled && !props.isCurrent;
 });
 
 const headTitle = computed(() => {
   if (props.merged) return props.expanded ? '点击收起子步' : '点击展开子步';
   if (props.isCurrent) return '当前所在记录';
+  if (!props.gotoEnabled) return '';
   return '点击跳转到该记录';
 });
 
@@ -152,13 +168,21 @@ const onHeadClick = () => {
     return;
   }
   if (props.isCurrent) return;
+  if (!props.gotoEnabled) return;
   if (!props.subSteps.length) return;
   emit('goto', props.subSteps[0].index);
 };
 
 const onSubStepClick = (s: { index: number; isCurrent?: boolean }) => {
   if (s.isCurrent) return;
+  if (!props.gotoEnabled) return;
   emit('goto', s.index);
+};
+
+const subStepTitle = (s: { isCurrent?: boolean }) => {
+  if (s.isCurrent) return '当前所在记录';
+  if (!props.gotoEnabled) return '';
+  return '点击跳转到该记录';
 };
 
 /** 单步组头部是否展示"查看差异"入口：要求该唯一子步本身可对比。 */

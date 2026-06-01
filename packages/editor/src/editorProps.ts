@@ -15,6 +15,7 @@ import type {
   ComponentGroup,
   CustomContentMenuFunction,
   DatasourceTypeOption,
+  HistoryListExtraTab,
   IsExpandableFunction,
   MenuBarData,
   MenuButton,
@@ -125,6 +126,8 @@ export interface EditorProps {
   /** 组件树节点双击前的钩子函数，返回 false 则阻止默认的双击行为 */
   beforeLayerNodeDblclick?: (event: MouseEvent, data: TreeNodeData) => Promise<boolean | void> | boolean | void;
   extendFormState?: (state: FormState) => Record<string, any> | Promise<Record<string, any>>;
+  /** 历史记录面板的自定义扩展 tab，追加在内置的页面/数据源/代码块 tab 之后 */
+  historyListExtraTabs?: HistoryListExtraTab[];
   /** 页面顺序拖拽配置参数 */
   pageBarSortOptions?: PageBarSortOptions;
   /** 页面搜索函数 */
@@ -145,6 +148,7 @@ export const defaultEditorProps = {
   disabledCodeBlock: false,
   componentGroupList: () => [],
   datasourceList: () => [],
+  historyListExtraTabs: () => [],
   menu: () => ({ left: [], right: [] }),
   layerContentMenu: () => [],
   stageContentMenu: () => [],

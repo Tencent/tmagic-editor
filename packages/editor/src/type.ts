@@ -475,6 +475,29 @@ export interface SideComponent extends MenuComponent {
 }
 // #endregion SideComponent
 
+// #region HistoryListExtraTab
+/**
+ * 历史记录面板（HistoryListPanel）的自定义扩展 tab。
+ *
+ * 业务方可通过 Editor 的 `historyListExtraTabs` 注入额外的历史记录 tab，
+ * 例如某个自定义模块维护自己的操作历史时，可以在历史记录面板中增加一个
+ * 独立的 tab 来展示与回滚。内置的「页面 / 数据源 / 代码块」三个 tab 之后
+ * 会依次追加这些扩展 tab。
+ */
+export interface HistoryListExtraTab {
+  /** tab 唯一标识，作为 TMagicTabs 的 name */
+  name: string;
+  /** tab 显示文案，支持传入函数以展示动态内容（如记录数量） */
+  label: string | (() => string);
+  /** tab 内容区渲染的组件（Vue 组件或字符串标签） */
+  component: any;
+  /** 传入内容组件的 props */
+  props?: Record<string, any>;
+  /** 内容组件的事件监听 */
+  listeners?: Record<string, (..._args: any[]) => any>;
+}
+// #endregion HistoryListExtraTab
+
 // #region SideItemKey
 export enum SideItemKey {
   COMPONENT_LIST = 'component-list',

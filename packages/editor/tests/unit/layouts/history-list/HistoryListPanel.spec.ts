@@ -12,9 +12,13 @@ import historyService from '@editor/services/history';
 const editorService = { gotoPageStep: vi.fn(async () => 0) };
 const dataSourceService = { goto: vi.fn(() => 0) };
 const codeBlockService = { goto: vi.fn(async () => 0) };
+const propsService = {
+  getDisabledDataSource: vi.fn(() => false),
+  getDisabledCodeBlock: vi.fn(() => false),
+};
 
 vi.mock('@editor/hooks/use-services', () => ({
-  useServices: () => ({ historyService, editorService, dataSourceService, codeBlockService }),
+  useServices: () => ({ historyService, editorService, dataSourceService, codeBlockService, propsService }),
 }));
 
 vi.mock('@tmagic/design', () => ({
@@ -249,6 +253,38 @@ describe('HistoryListPanel.vue', () => {
     // 第一项（页面 tab）应为页面 tab 的初始项；page tab 在三个 tab 中最先渲染
     await initials[0].trigger('click');
     expect(editorService.gotoPageStep).toHaveBeenCalledWith(0);
+  });
+
+  test('注入 historyListExtraTabs 时追加渲染自定义 tab 内容组件', async () => {
+    const { default: historyListPanel } = await import('@editor/layouts/history-list/HistoryListPanel.vue');
+    const customTab = defineComponent({
+      name: 'CustomHistoryTab',
+      props: ['title'],
+      setup(p) {
+        return () => h('div', { class: 'custom-history-tab' }, p.title);
+      },
+    });
+
+    const wrapper = mount(historyListPanel, {
+      attachTo: document.body,
+      global: {
+        provide: {
+          historyListExtraTabs: [
+            {
+              name: 'custom-module',
+              label: () => '自定义模块 (1)',
+              component: customTab,
+              props: { title: 'hello-custom' },
+            },
+          ],
+        },
+      },
+    });
+    await nextTick();
+
+    const custom = wrapper.find('.custom-history-tab');
+    expect(custom.exists()).toBe(true);
+    expect(custom.text()).toBe('hello-custom');
   });
 
   test('点击数据源/代码块初始项调用对应 service.goto(id, 0)', async () => {

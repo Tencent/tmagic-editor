@@ -76,6 +76,47 @@ const menu = ref({
 表单对比依赖 `@tmagic/form` 的对比模式（`isCompare` / `lastValues`）。对于 `event-select`、`code-select`、`code-select-col` 等由列表或嵌套子表单组成的复合字段，表单会逐项展示新增 / 删除 / 修改的高亮差异，并在对比模式下隐藏「添加 / 删除 / 编辑」等写操作按钮，仅保留只读展示。
 :::
 
+## 扩展自定义 tab
+
+内置的三个 tab 之外，业务方可以通过 Editor 的 [`historyListExtraTabs`](/api/editor/props.html#historylistextratabs) 在面板中追加自定义的历史 tab，追加在「页面 / 数据源 / 代码块」之后。适用于某个自定义模块维护自己的操作历史，需要在历史记录面板中独立展示与回滚的场景。
+
+```html
+<template>
+  <m-editor :menu="menu" :history-list-extra-tabs="historyListExtraTabs"></m-editor>
+</template>
+
+<script setup>
+import { markRaw } from 'vue';
+
+import MyModuleHistoryTab from './MyModuleHistoryTab.vue';
+
+const historyListExtraTabs = [
+  {
+    name: 'my-module',
+    // label 支持字符串或函数，函数形式便于展示动态数量
+    label: () => `我的模块 (${getMyModuleHistory().length})`,
+    component: markRaw(MyModuleHistoryTab),
+    props: { foo: 'bar' },
+    listeners: {
+      goto: (cursor) => console.log(cursor),
+    },
+  },
+];
+</script>
+```
+
+每个扩展 tab 的字段说明：
+
+| 字段 | 必填 | 说明 |
+| --- | --- | --- |
+| `name` | 是 | tab 唯一标识，作为内部 `TMagicTabs` 的 `name` |
+| `label` | 是 | tab 显示文案，支持字符串或返回字符串的函数（便于展示动态数量） |
+| `component` | 是 | tab 内容区渲染的组件 |
+| `props` | 否 | 传入内容组件的 props |
+| `listeners` | 否 | 内容组件的事件监听 |
+
+> 内容组件内部可自行通过 `useServices()` 拿到 `historyService` 等服务，读取并回滚自定义模块自己维护的历史。
+
 ## 自定义对比判断
 
 差异对话框中的「表单对比」最终透传到 `MForm`，你可以通过 Editor 顶层注入的 `extendFormState` 让对比表单拿到完整业务上下文，从而让依赖上下文的 `display` / `disabled` 等 `filterFunction` 正常工作。

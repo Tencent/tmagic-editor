@@ -1508,6 +1508,55 @@ const extendFormState = async (state) => {
 ```
 :::
 
+## historyListExtraTabs
+
+- **详情：**
+
+  [历史记录面板](/guide/advanced/history-list.md) 的自定义扩展 tab。
+
+  业务方可借此在历史记录面板内置的「页面 / 数据源 / 代码块」三个 tab 之后追加自定义模块的历史 tab，例如某个自定义模块维护自己的操作历史时，可在面板中增加一个独立的 tab 来展示与回滚。
+
+- **默认值：** `[]`
+
+- **类型：** `HistoryListExtraTab[]`
+
+  ::: details 查看 HistoryListExtraTab 类型定义
+  <<< @/../packages/editor/src/type.ts#HistoryListExtraTab{ts}
+  :::
+
+- **示例：**
+
+```html
+<template>
+  <m-editor :menu="menu" :history-list-extra-tabs="historyListExtraTabs"></m-editor>
+</template>
+
+<script setup>
+import { markRaw } from 'vue';
+
+import MyModuleHistoryTab from './MyModuleHistoryTab.vue';
+
+const historyListExtraTabs = [
+  {
+    name: 'my-module',
+    // label 支持字符串或函数，函数形式便于展示动态数量
+    label: () => '我的模块',
+    component: markRaw(MyModuleHistoryTab),
+    // 传入内容组件的 props
+    props: { foo: 'bar' },
+    // 内容组件的事件监听
+    listeners: {
+      goto: (cursor) => console.log(cursor),
+    },
+  },
+];
+</script>
+```
+
+::: tip
+内容组件内部可自行通过 `useServices()` 获取 `historyService` 等服务来读取与回滚自定义模块的历史。
+:::
+
 ## pageBarSortOptions
 
 - **详情：**

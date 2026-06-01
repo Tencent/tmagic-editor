@@ -32,6 +32,7 @@
         </component>
 
         <component
+          v-if="!disabledDataSource"
           :is="tabPaneComponent?.component || 'el-tab-pane'"
           v-bind="tabPaneComponent?.props({ name: 'data-source', label: `数据源 (${dataSourceGroups.length})` }) || {}"
         >
@@ -47,6 +48,7 @@
         </component>
 
         <component
+          v-if="!disabledCodeBlock"
           :is="tabPaneComponent?.component || 'el-tab-pane'"
           v-bind="tabPaneComponent?.props({ name: 'code-block', label: `代码块 (${codeBlockGroups.length})` }) || {}"
         >
@@ -59,6 +61,15 @@
             @diff-step="onCodeBlockDiff"
             @revert-step="onCodeBlockRevert"
           />
+        </component>
+
+        <component
+          v-for="tab in extraTabs"
+          :key="tab.name"
+          :is="tabPaneComponent?.component || 'el-tab-pane'"
+          v-bind="tabPaneComponent?.props({ name: tab.name, label: resolveTabLabel(tab) }) || {}"
+        >
+          <component :is="tab.component" v-bind="tab.props || {}" v-on="tab.listeners || {}" />
         </component>
       </TMagicTabs>
     </div>
@@ -98,7 +109,7 @@
  * 各 tab 的内容拆分为独立的 SFC（PageTab / DataSourceTab / CodeBlockTab），
  * 共享的描述生成与折叠状态在 composables.ts 中维护。
  */
-import { inject, markRaw, ref, useTemplateRef } from 'vue';
+import { computed, inject, markRaw, ref, useTemplateRef, watch } from 'vue';
 import { Clock, Close } from '@element-plus/icons-vue';
 
 import { getDesignConfig, TMagicButton, TMagicPopover, TMagicTabs, TMagicTooltip } from '@tmagic/design';
@@ -106,6 +117,7 @@ import type { FormState } from '@tmagic/form';
 
 import MIcon from '@editor/components/Icon.vue';
 import { useServices } from '@editor/hooks/use-services';
+import type { HistoryListExtraTab } from '@editor/type';
 
 import CodeBlockTab from './CodeBlockTab.vue';
 import { useHistoryList } from './composables';
@@ -119,14 +131,36 @@ defineOptions({
 
 const ClockIcon = markRaw(Clock);
 const CloseIcon = markRaw(Close);
-const activeTab = ref<'page' | 'data-source' | 'code-block'>('page');
+const activeTab = ref<string>('page');
 
 /** 面板显隐受控：reference 图标点击切换，右上角关闭按钮置为 false。 */
 const visible = ref(false);
 
 const tabPaneComponent = getDesignConfig('components')?.tabPane;
 
-const { editorService, dataSourceService, codeBlockService, historyService } = useServices();
+/**
+ * 业务方自定义的扩展 tab，由 Editor 顶层通过 `historyListExtraTabs` 注入。
+ * 追加在内置「页面 / 数据源 / 代码块」三个 tab 之后，未提供时为空数组。
+ */
+const extraTabs = inject<HistoryListExtraTab[]>('historyListExtraTabs', []);
+
+/** label 支持字符串或函数，函数形式便于展示动态数量等内容。 */
+const resolveTabLabel = (tab: HistoryListExtraTab) => (typeof tab.label === 'function' ? tab.label() : tab.label);
+
+const { editorService, dataSourceService, codeBlockService, historyService, propsService } = useServices();
+
+/**
+ * 数据源 / 代码块功能可被业务方通过 `disabledDataSource` / `disabledCodeBlock` 禁用，
+ * 禁用后对应的历史记录 tab 不再展示。若当前激活的 tab 恰好被禁用，则回退到「页面」tab。
+ */
+const disabledDataSource = computed(() => propsService.getDisabledDataSource());
+const disabledCodeBlock = computed(() => propsService.getDisabledCodeBlock());
+
+watch([disabledDataSource, disabledCodeBlock], ([dsDisabled, cbDisabled]) => {
+  if ((activeTab.value === 'data-source' && dsDisabled) || (activeTab.value === 'code-block' && cbDisabled)) {
+    activeTab.value = 'page';
+  }
+});
 
 /**
  * 通过 inject 拿到 Editor 顶层注入的 `extendFormState`，转交给 HistoryDiffDialog
