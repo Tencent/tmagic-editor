@@ -59,7 +59,11 @@
       </div>
 
       <template #footer>
-        <TMagicButton size="small" @click="visible = false">关闭</TMagicButton>
+        <template v-if="onConfirm">
+          <TMagicButton size="small" @click="visible = false">取消</TMagicButton>
+          <TMagicButton size="small" type="primary" @click="onConfirmClick">确定回滚</TMagicButton>
+        </template>
+        <TMagicButton v-else size="small" @click="visible = false">关闭</TMagicButton>
       </template>
     </TMagicDialog>
   </Teleport>
@@ -74,13 +78,13 @@ import type { FormState } from '@tmagic/form';
 
 import CompareForm from '@editor/components/CompareForm.vue';
 import CodeEditor from '@editor/layouts/CodeEditor.vue';
-import type { CompareCategory, CompareFormLoadConfig } from '@editor/type';
+import type { CompareCategory, CompareFormLoadConfig, DiffDialogPayload } from '@editor/type';
 
 defineOptions({
   name: 'MEditorHistoryDiffDialog',
 });
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     /**
      * 来自 Editor 顶层的 `extendFormState`，用于扩展 MForm.formState。
@@ -94,31 +98,12 @@ withDefaults(
      */
     loadConfig?: CompareFormLoadConfig;
     width?: string;
+    onConfirm?: () => void;
   }>(),
   {
     width: '900px',
   },
 );
-
-/** 差异对话框的入参 */
-export interface DiffDialogPayload {
-  /** 表单类别 */
-  category: CompareCategory;
-  /** 节点类型 / 数据源类型 */
-  type?: string;
-  /** 代码块场景下的数据源类型 */
-  dataSourceType?: string;
-  /** 该 step 修改前的值（oldNode / oldSchema / oldContent） */
-  lastValue: Record<string, any>;
-  /** 该 step 修改后的值（newNode / newSchema / newContent） */
-  value: Record<string, any>;
-  /** 当前编辑器中实际的最新值；不传或为 null 时禁用「与当前对比」 */
-  currentValue?: Record<string, any> | null;
-  /** 用于标题展示的目标名称 */
-  targetLabel?: string;
-  /** 用于标题展示的目标 id */
-  id?: string | number;
-}
 
 /**
  * 差异对比模式：
@@ -183,6 +168,12 @@ const isSameAsCurrent = computed(() => {
   if (mode.value !== 'current' || !payload.value) return false;
   return isEqual(payload.value.value, payload.value.currentValue);
 });
+
+const onConfirmClick = () => {
+  const cb = props.onConfirm;
+  visible.value = false;
+  cb?.();
+};
 
 const targetText = computed(() => {
   if (!payload.value) return '';

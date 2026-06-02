@@ -3,9 +3,9 @@
   <TMagicScrollbar v-else max-height="360px">
     <ul class="m-editor-history-list-ul">
       <GroupRow
-        v-for="(group, gIdx) in list"
-        :key="`pg-${gIdx}`"
-        :group-key="`pg-${gIdx}`"
+        v-for="group in list"
+        :key="`pg-${group.steps[0]?.index}`"
+        :group-key="`pg-${group.steps[0]?.index}`"
         :applied="group.applied"
         :merged="group.steps.length > 1"
         :op-type="group.opType"
@@ -22,7 +22,7 @@
           }))
         "
         :is-current="group.isCurrent"
-        :expanded="!!expanded[`pg-${gIdx}`]"
+        :expanded="!!expanded[`pg-${group.steps[0]?.index}`]"
         @toggle="(key: string) => $emit('toggle', key)"
         @goto="(index: number) => $emit('goto', index)"
         @diff-step="(index: number) => $emit('diff-step', index)"
@@ -55,7 +55,11 @@ defineOptions({
 const props = defineProps<{
   /** 当前活动页面的历史分组列表，已按时间倒序排好（最新一组在最前）。空数组时显示空态。 */
   list: PageHistoryGroup[];
-  /** 共享的折叠状态表（key -> 是否展开），由顶层 panel 统一维护。本 tab 使用 `pg-${idx}` 作为 key。 */
+  /**
+   * 共享的折叠状态表（key -> 是否展开），由顶层 panel 统一维护。
+   * 本 tab 使用 `pg-${组内首步 index}` 作为 key——以稳定的 step 索引而非展示位置标识分组，
+   * 这样历史数据更新（新增 / 撤销重做导致列表顺序变化）后，已展开的分组状态仍能正确保持。
+   */
   expanded: Record<string, boolean>;
 }>();
 

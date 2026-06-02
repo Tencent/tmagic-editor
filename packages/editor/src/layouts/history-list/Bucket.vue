@@ -8,9 +8,9 @@
 
     <ul class="m-editor-history-list-ul">
       <GroupRow
-        v-for="(group, gIdx) in groups"
-        :key="`${prefix}-${bucketId}-${gIdx}`"
-        :group-key="`${prefix}-${bucketId}-${gIdx}`"
+        v-for="group in groups"
+        :key="`${prefix}-${bucketId}-${group.steps[0]?.index}`"
+        :group-key="`${prefix}-${bucketId}-${group.steps[0]?.index}`"
         :applied="group.applied"
         :merged="group.steps.length > 1"
         :op-type="group.opType"
@@ -27,7 +27,8 @@
           }))
         "
         :is-current="group.isCurrent"
-        :expanded="!!expanded[`${prefix}-${bucketId}-${gIdx}`]"
+        :expanded="!!expanded[`${prefix}-${bucketId}-${group.steps[0]?.index}`]"
+        :goto-enabled="gotoEnabled"
         @toggle="(key: string) => $emit('toggle', key)"
         @goto="(index: number) => $emit('goto', bucketId, index)"
         @diff-step="(index: number) => $emit('diff-step', bucketId, index)"
@@ -41,6 +42,7 @@
       <InitialRow
         v-if="showInitial !== false"
         :is-current="isInitial"
+        :goto-enabled="gotoEnabled"
         @goto-initial="$emit('goto-initial', bucketId)"
       />
     </ul>
@@ -87,9 +89,12 @@ const props = withDefaults(
     isStepDiffable?: (_step: any) => boolean;
     /** 共享的折叠状态表（key -> 是否展开），由顶层 panel 统一维护以便跨 tab 复用。 */
     expanded: Record<string, boolean>;
+    /** 是否支持「跳转到该记录」(goto)。默认 true。 */
+    gotoEnabled?: boolean;
   }>(),
   {
     showInitial: true,
+    gotoEnabled: true,
   },
 );
 

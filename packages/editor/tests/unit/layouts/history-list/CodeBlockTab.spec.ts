@@ -7,8 +7,9 @@ import { describe, expect, test, vi } from 'vitest';
 import { defineComponent, h } from 'vue';
 import { mount } from '@vue/test-utils';
 
-import CodeBlockTab from '@editor/layouts/history-list/CodeBlockTab.vue';
-import type { CodeBlockHistoryGroup } from '@editor/type';
+import BucketTab from '@editor/layouts/history-list/BucketTab.vue';
+import { describeCodeBlockGroup, describeCodeBlockStep } from '@editor/layouts/history-list/composables';
+import type { CodeBlockHistoryGroup, CodeBlockStepValue } from '@editor/type';
 
 vi.mock('@tmagic/design', () => ({
   TMagicScrollbar: defineComponent({
@@ -25,17 +26,31 @@ const buildGroup = (
   opType: 'add' | 'remove' | 'update',
   steps: any[],
   applied = true,
+  startIndex = 0,
 ): CodeBlockHistoryGroup => ({
   kind: 'code-block',
   id,
   opType,
   applied,
-  steps: steps.map((s, i) => ({ step: s, index: i, applied })),
+  steps: steps.map((s, i) => ({ step: s, index: startIndex + i, applied })),
 });
+
+/** 代码块 tab 复用通用 BucketTab，固定注入代码块的 title/prefix/describe/isStepDiffable。 */
+const mountCodeBlockTab = (props: { buckets: any[]; expanded: Record<string, boolean> }) =>
+  mount(BucketTab, {
+    props: {
+      title: '代码块',
+      prefix: 'cb',
+      describeGroup: describeCodeBlockGroup,
+      describeStep: describeCodeBlockStep,
+      isStepDiffable: (step: CodeBlockStepValue) => Boolean(step.oldContent && step.newContent),
+      ...props,
+    },
+  });
 
 describe('CodeBlockTab.vue', () => {
   test('buckets 为空时显示空态', () => {
-    const wrapper = mount(CodeBlockTab, { props: { buckets: [], expanded: {} } });
+    const wrapper = mountCodeBlockTab({ buckets: [], expanded: {} });
     expect(wrapper.find('.m-editor-history-list-empty').exists()).toBe(true);
   });
 
@@ -48,7 +63,7 @@ describe('CodeBlockTab.vue', () => {
         ],
       },
     ];
-    const wrapper = mount(CodeBlockTab, { props: { buckets, expanded: {} } });
+    const wrapper = mountCodeBlockTab({ buckets, expanded: {} });
     expect(wrapper.find('.m-editor-history-list-bucket-title').text()).toContain('代码块');
     expect(wrapper.find('.m-editor-history-list-bucket-title code').text()).toBe('code_1');
 
@@ -75,29 +90,35 @@ describe('CodeBlockTab.vue', () => {
               changeRecords: [{ propPath: 'b' }],
             },
           ]),
-          buildGroup('code_1', 'update', [
-            {
-              id: 'code_1',
-              oldContent: { id: 'code_1', name: 'fn' },
-              newContent: { id: 'code_1', name: 'fn' },
-              changeRecords: [{ propPath: 'c' }],
-            },
-            {
-              id: 'code_1',
-              oldContent: { id: 'code_1', name: 'fn' },
-              newContent: { id: 'code_1', name: 'fn' },
-              changeRecords: [{ propPath: 'd' }],
-            },
-          ]),
+          buildGroup(
+            'code_1',
+            'update',
+            [
+              {
+                id: 'code_1',
+                oldContent: { id: 'code_1', name: 'fn' },
+                newContent: { id: 'code_1', name: 'fn' },
+                changeRecords: [{ propPath: 'c' }],
+              },
+              {
+                id: 'code_1',
+                oldContent: { id: 'code_1', name: 'fn' },
+                newContent: { id: 'code_1', name: 'fn' },
+                changeRecords: [{ propPath: 'd' }],
+              },
+            ],
+            true,
+            2,
+          ),
         ],
       },
     ];
-    const wrapper = mount(CodeBlockTab, { props: { buckets, expanded: {} } });
+    const wrapper = mountCodeBlockTab({ buckets, expanded: {} });
     const heads = wrapper.findAll('.m-editor-history-list-group-head');
     await heads[0].trigger('click');
     expect(wrapper.emitted('toggle')![0]).toEqual(['cb-code_1-0']);
     await heads[1].trigger('click');
-    expect(wrapper.emitted('toggle')![1]).toEqual(['cb-code_1-1']);
+    expect(wrapper.emitted('toggle')![1]).toEqual(['cb-code_1-2']);
   });
 
   test('goto 透传：携带 codeBlock id 与最后一步 index', async () => {
@@ -109,8 +130,8 @@ describe('CodeBlockTab.vue', () => {
         ],
       },
     ];
-    const wrapper = mount(CodeBlockTab, { props: { buckets, expanded: {} } });
-    await wrapper.find('.m-editor-history-list-group-head').trigger('click');
+    const wrapper = mountCodeBlockTab({ buckets, expanded: {} });
+    await wrapper.find('.m-editor-history-list-item-goto').trigger('click');
     const events = wrapper.emitted('goto');
     expect(events).toBeTruthy();
     expect(events![0]).toEqual(['code_1', 0]);
@@ -138,9 +159,7 @@ describe('CodeBlockTab.vue', () => {
         ],
       },
     ];
-    const wrapper = mount(CodeBlockTab, {
-      props: { buckets, expanded: { 'cb-code_1-0': true } },
-    });
+    const wrapper = mountCodeBlockTab({ buckets, expanded: { 'cb-code_1-0': true } });
     const items = wrapper.findAll('.m-editor-history-list-substeps li');
     expect(items).toHaveLength(2);
     // 子步倒序渲染（最新在上）：params 在前，content 在后

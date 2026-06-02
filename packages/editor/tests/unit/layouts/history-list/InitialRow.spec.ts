@@ -17,15 +17,15 @@ describe('InitialRow.vue', () => {
     expect(wrapper.find('.m-editor-history-list-item-desc').text()).toBe('未修改的初始状态');
   });
 
-  test('isCurrent=true 时附 is-current 类名并显示「当前」徽标', () => {
+  test('isCurrent=true 时附 is-current 类名且不展示「回到」按钮', () => {
     const wrapper = mount(InitialRow, { props: { isCurrent: true } });
     expect(wrapper.find('.m-editor-history-list-initial').classes()).toContain('is-current');
-    expect(wrapper.find('.m-editor-history-list-item-current').exists()).toBe(true);
+    expect(wrapper.find('.m-editor-history-list-item-goto').exists()).toBe(false);
   });
 
-  test('非当前时点击触发 goto-initial 事件', async () => {
+  test('非当前时点击「回到」按钮触发 goto-initial 事件', async () => {
     const wrapper = mount(InitialRow, { props: { isCurrent: false } });
-    await wrapper.find('.m-editor-history-list-initial').trigger('click');
+    await wrapper.find('.m-editor-history-list-item-goto').trigger('click');
     expect(wrapper.emitted('goto-initial')).toBeTruthy();
     expect(wrapper.emitted('goto-initial')).toHaveLength(1);
   });

@@ -125,19 +125,19 @@
     &.is-merged {
       margin: 4px 0;
       padding: 4px 8px 6px;
-      background-color: rgba(144, 105, 219, 0.06);
-      border: 1px solid rgba(144, 105, 219, 0.18);
-      border-left: 3px solid #9069db;
+      background-color: rgba(47, 84, 235, 0.06);
+      border: 1px solid rgba(47, 84, 235, 0.18);
+      border-left: 3px solid #2f54eb;
       border-radius: 4px;
 
       // 卡片本体已经有背景色，hover 状态以更深的同色提示交互
       &:hover {
-        background-color: rgba(144, 105, 219, 0.1);
+        background-color: rgba(47, 84, 235, 0.1);
       }
 
       .m-editor-history-list-group-head {
         font-weight: 600;
-        color: #5b3fa5;
+        color: #1d39c4;
       }
 
       // 已撤销态：整张卡片去色
@@ -169,7 +169,7 @@
     margin: 6px 0 0 6px;
     padding: 0;
     list-style: none;
-    border-left: 1px dashed rgba(144, 105, 219, 0.45);
+    border-left: 1px dashed rgba(47, 84, 235, 0.45);
 
     li {
       display: flex;
@@ -185,7 +185,7 @@
         cursor: pointer;
 
         &:hover {
-          background-color: rgba(144, 105, 219, 0.1);
+          background-color: rgba(47, 84, 235, 0.1);
         }
       }
 
@@ -240,7 +240,7 @@
     }
 
     &.op-update {
-      background-color: #409eff;
+      background-color: #e6a23c;
     }
 
     &.op-initial {
@@ -279,7 +279,7 @@
     font-size: 10px;
     line-height: 16px;
     color: #fff;
-    background-color: #9069db;
+    background-color: #2f54eb;
     font-weight: 500;
     letter-spacing: 0.2px;
   }
@@ -300,21 +300,39 @@
     }
   }
 
+  // 「跳转」按钮：将历史游标移动到该 step，替代原先点击整行跳转的交互。
+  // 使用与组卡片一致的紫色色系，与「查看差异」「回滚」区分开。
+  .m-editor-history-list-item-goto {
+    flex: 0 0 auto;
+    padding: 0 6px;
+    border-radius: 2px;
+    font-size: 10px;
+    line-height: 16px;
+    color: #606266;
+    background-color: rgba(96, 98, 102, 0.1);
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+      background-color: rgba(96, 98, 102, 0.18);
+    }
+  }
+
   // 「回滚」按钮：类 git revert，把目标 step 反向应用一次作为新提交。
-  // 使用与「查看差异」不同的色调（橙黄），用来区分"可逆操作"与"只读对比"。
+  // 使用红色色调，强调其为"破坏性/可逆操作"，与「查看差异」「跳转」区分开。
   .m-editor-history-list-item-revert {
     flex: 0 0 auto;
     padding: 0 6px;
     border-radius: 2px;
     font-size: 10px;
     line-height: 16px;
-    color: #e6a23c;
-    background-color: rgba(230, 162, 60, 0.12);
+    color: #f56c6c;
+    background-color: rgba(245, 108, 108, 0.12);
     cursor: pointer;
     user-select: none;
 
     &:hover {
-      background-color: rgba(230, 162, 60, 0.25);
+      background-color: rgba(245, 108, 108, 0.25);
     }
   }
 

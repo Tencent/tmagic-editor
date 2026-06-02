@@ -22,7 +22,10 @@ import type {
 export const useHistoryList = () => {
   const { historyService } = useServices();
 
-  /** 折叠状态：key 形如 `pg-${groupIdx}` / `ds-${id}-${groupIdx}` / `cb-${id}-${groupIdx}`。 */
+  /**
+   * 折叠状态：key 形如 `pg-${组内首步 index}` / `ds-${id}-${组内首步 index}` / `cb-${id}-${组内首步 index}`。
+   * 用组内首步的稳定 index（而非展示位置）作为 key，确保历史数据更新后已展开的分组状态保持不变。
+   */
   const expanded = reactive<Record<string, boolean>>({});
   const toggleGroup = (key: string) => {
     expanded[key] = !expanded[key];

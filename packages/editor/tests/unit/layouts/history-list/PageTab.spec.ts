@@ -26,6 +26,7 @@ const buildPageGroup = (
   applied = true,
   targetName?: string,
   targetId?: string,
+  startIndex = 0,
 ): PageHistoryGroup => ({
   kind: 'page',
   pageId: 'p1',
@@ -33,7 +34,7 @@ const buildPageGroup = (
   applied,
   targetId,
   targetName,
-  steps: steps.map((s, i) => ({ step: s, index: i, applied })),
+  steps: steps.map((s, i) => ({ step: s, index: startIndex + i, applied })),
 });
 
 describe('PageTab.vue', () => {
@@ -148,6 +149,7 @@ describe('PageTab.vue', () => {
         true,
         '按钮2',
         'btn2',
+        2,
       ),
     ];
     const wrapper = mount(PageTab, { props: { list, expanded: {} } });
@@ -155,15 +157,15 @@ describe('PageTab.vue', () => {
     await heads[1].trigger('click');
     const events = wrapper.emitted('toggle');
     expect(events).toBeTruthy();
-    expect(events![0]).toEqual(['pg-1']);
+    expect(events![0]).toEqual(['pg-2']);
     // 合并组头部不应触发 goto
     expect(wrapper.emitted('goto')).toBeFalsy();
   });
 
-  test('点击单步组头部透传 goto 事件，携带该 step 的 index', async () => {
+  test('点击单步组「回到」按钮透传 goto 事件，携带该 step 的 index', async () => {
     const list = [buildPageGroup('add', [{ opType: 'add', nodes: [{ id: 'n1', name: 'A' }] }])];
     const wrapper = mount(PageTab, { props: { list, expanded: {} } });
-    await wrapper.find('.m-editor-history-list-group-head').trigger('click');
+    await wrapper.find('.m-editor-history-list-item-goto').trigger('click');
     expect(wrapper.emitted('goto')).toBeTruthy();
     expect(wrapper.emitted('goto')![0]).toEqual([0]);
     expect(wrapper.emitted('toggle')).toBeFalsy();
@@ -203,10 +205,10 @@ describe('PageTab.vue', () => {
     expect(initial.classes()).not.toContain('is-current');
   });
 
-  test('点击非当前的初始项透传 goto-initial 事件', async () => {
+  test('点击非当前初始项的「回到」按钮透传 goto-initial 事件', async () => {
     const list = [buildPageGroup('add', [{ opType: 'add', nodes: [{ id: 'n1', name: 'A' }] }], true)];
     const wrapper = mount(PageTab, { props: { list, expanded: {} } });
-    await wrapper.find('.m-editor-history-list-initial').trigger('click');
+    await wrapper.find('.m-editor-history-list-initial .m-editor-history-list-item-goto').trigger('click');
     expect(wrapper.emitted('goto-initial')).toBeTruthy();
     expect(wrapper.emitted('goto-initial')).toHaveLength(1);
   });

@@ -90,7 +90,7 @@ describe('Bucket.vue', () => {
     expect(wrapper.emitted('goto')).toBeFalsy();
   });
 
-  test('单步组头部点击 → goto 事件被透传到 Bucket，并附带 bucketId', async () => {
+  test('单步组「回到」按钮点击 → goto 事件被透传到 Bucket，并附带 bucketId', async () => {
     const wrapper = mount(Bucket, {
       props: {
         title: '代码块',
@@ -102,13 +102,13 @@ describe('Bucket.vue', () => {
         expanded: {},
       },
     });
-    await wrapper.find('.m-editor-history-list-group-head').trigger('click');
+    await wrapper.find('.m-editor-history-list-item-goto').trigger('click');
     const events = wrapper.emitted('goto');
     expect(events).toBeTruthy();
     expect(events![0]).toEqual(['code_1', 0]);
   });
 
-  test('合并组展开后点击子步 → goto 透传，附带子步 index', async () => {
+  test('合并组展开后点击子步「回到」按钮 → goto 透传，附带子步 index', async () => {
     const wrapper = mount(Bucket, {
       props: {
         title: '代码块',
@@ -123,7 +123,7 @@ describe('Bucket.vue', () => {
     const subItems = wrapper.findAll('.m-editor-history-list-substeps li');
     expect(subItems).toHaveLength(2);
     // 子步倒序渲染：subItems[0] 对应 index=1
-    await subItems[0].trigger('click');
+    await subItems[0].find('.m-editor-history-list-item-goto').trigger('click');
     const events = wrapper.emitted('goto');
     expect(events).toBeTruthy();
     expect(events![0]).toEqual(['code_1', 1]);
@@ -166,7 +166,7 @@ describe('Bucket.vue', () => {
     // 已有 applied 组，初始项不应为当前
     expect(initial.classes()).not.toContain('is-current');
 
-    await initial.trigger('click');
+    await initial.find('.m-editor-history-list-item-goto').trigger('click');
     const events = wrapper.emitted('goto-initial');
     expect(events).toBeTruthy();
     expect(events![0]).toEqual(['ds_1']);

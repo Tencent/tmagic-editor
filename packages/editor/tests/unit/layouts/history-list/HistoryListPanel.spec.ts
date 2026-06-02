@@ -187,11 +187,11 @@ describe('HistoryListPanel.vue', () => {
     const heads = wrapper.findAll('.m-editor-history-list-group-head');
     expect(heads.length).toBeGreaterThanOrEqual(2);
     // 第二行（pg-1）对应原始 step.index = 0；cursor 应为 0+1 = 1
-    await heads[1].trigger('click');
+    await heads[1].find('.m-editor-history-list-item-goto').trigger('click');
     expect(editorService.gotoPageStep).toHaveBeenCalledTimes(1);
     expect(editorService.gotoPageStep).toHaveBeenCalledWith(1);
 
-    // 当前组点击不触发 goto
+    // 当前组没有「回到」按钮，点击头部不触发 goto
     await head.trigger('click');
     expect(editorService.gotoPageStep).toHaveBeenCalledTimes(1);
   });
@@ -213,7 +213,7 @@ describe('HistoryListPanel.vue', () => {
     // 找到数据源 tab 那一组
     const dsHead = heads.find((h) => h.text().includes('创建 DS'));
     expect(dsHead).toBeTruthy();
-    await dsHead!.trigger('click');
+    await dsHead!.find('.m-editor-history-list-item-goto').trigger('click');
     expect(dataSourceService.goto).toHaveBeenCalledWith('ds_1', 1);
   });
 
@@ -232,7 +232,7 @@ describe('HistoryListPanel.vue', () => {
     const heads = wrapper.findAll('.m-editor-history-list-group-head');
     const cbHead = heads.find((h) => h.text().includes('创建 CB'));
     expect(cbHead).toBeTruthy();
-    await cbHead!.trigger('click');
+    await cbHead!.find('.m-editor-history-list-item-goto').trigger('click');
     expect(codeBlockService.goto).toHaveBeenCalledWith('code_1', 1);
   });
 
@@ -251,7 +251,7 @@ describe('HistoryListPanel.vue', () => {
     const initials = wrapper.findAll('.m-editor-history-list-initial');
     expect(initials.length).toBeGreaterThanOrEqual(1);
     // 第一项（页面 tab）应为页面 tab 的初始项；page tab 在三个 tab 中最先渲染
-    await initials[0].trigger('click');
+    await initials[0].find('.m-editor-history-list-item-goto').trigger('click');
     expect(editorService.gotoPageStep).toHaveBeenCalledWith(0);
   });
 
@@ -307,10 +307,10 @@ describe('HistoryListPanel.vue', () => {
 
     // 顺序：tab 渲染顺序是 page → data-source → code-block
     // 因此 initials[0] 属于 ds_x，initials[1] 属于 code_x
-    await initials[0].trigger('click');
+    await initials[0].find('.m-editor-history-list-item-goto').trigger('click');
     expect(dataSourceService.goto).toHaveBeenCalledWith('ds_x', 0);
 
-    await initials[1].trigger('click');
+    await initials[1].find('.m-editor-history-list-item-goto').trigger('click');
     expect(codeBlockService.goto).toHaveBeenCalledWith('code_x', 0);
   });
 });

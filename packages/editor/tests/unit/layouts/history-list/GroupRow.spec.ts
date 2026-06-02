@@ -103,7 +103,7 @@ describe('GroupRow.vue', () => {
     expect(wrapper.emitted('goto')).toBeFalsy();
   });
 
-  test('点击单步组（非合并）头部触发 goto，携带该唯一 step 的 index', async () => {
+  test('点击单步组（非合并）的「回到」按钮触发 goto，携带该唯一 step 的 index', async () => {
     const wrapper = mount(GroupRow, {
       props: {
         ...baseProps,
@@ -111,7 +111,11 @@ describe('GroupRow.vue', () => {
         subSteps: [{ index: 7, applied: true, desc: 'a' }],
       },
     });
+    // 点击头部本身不再触发 goto（整行不可点击）
     await wrapper.find('.m-editor-history-list-group-head').trigger('click');
+    expect(wrapper.emitted('goto')).toBeFalsy();
+    // 仅点击「回到」按钮才触发 goto
+    await wrapper.find('.m-editor-history-list-item-goto').trigger('click');
     expect(wrapper.emitted('goto')).toBeTruthy();
     expect(wrapper.emitted('goto')![0]).toEqual([7]);
     // 单步组没有展开概念，不应触发 toggle
@@ -149,7 +153,7 @@ describe('GroupRow.vue', () => {
     expect(wrapper.emitted('goto')).toBeFalsy();
   });
 
-  test('点击子步触发 goto 携带该子步 index；当前子步点击无效', async () => {
+  test('点击子步「回退」按钮触发 goto 携带该子步 index；当前子步无回退按钮', async () => {
     const wrapper = mount(GroupRow, {
       props: {
         ...baseProps,
@@ -162,11 +166,14 @@ describe('GroupRow.vue', () => {
         ],
       },
     });
-    // 子步倒序渲染：subItems[0] 为 index=1（非当前，可点击），subItems[1] 为 index=0（当前）
+    // 子步倒序渲染：subItems[0] 为 index=1（非当前，含跳转按钮），subItems[1] 为 index=0（当前，无跳转按钮）
     const subItems = wrapper.findAll('.m-editor-history-list-substeps li');
-    await subItems[1].trigger('click');
-    expect(wrapper.emitted('goto')).toBeFalsy();
+    expect(subItems[1].find('.m-editor-history-list-item-goto').exists()).toBe(false);
+    // 点击子步行本身不再触发 goto
     await subItems[0].trigger('click');
+    expect(wrapper.emitted('goto')).toBeFalsy();
+    // 仅点击「跳转」按钮才触发 goto
+    await subItems[0].find('.m-editor-history-list-item-goto').trigger('click');
     expect(wrapper.emitted('goto')![0]).toEqual([1]);
   });
 });

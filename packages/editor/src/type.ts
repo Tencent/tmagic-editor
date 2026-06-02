@@ -1113,3 +1113,23 @@ export interface DslOpOptions extends HistoryOpOptions {
   doNotSelect?: boolean;
   doNotSwitchPage?: boolean;
 }
+
+/** 差异对话框的入参 */
+export interface DiffDialogPayload {
+  /** 表单类别 */
+  category: CompareCategory;
+  /** 节点类型 / 数据源类型 */
+  type?: string;
+  /** 代码块场景下的数据源类型 */
+  dataSourceType?: string;
+  /** 该 step 修改前的值（oldNode / oldSchema / oldContent） */
+  lastValue: Record<string, any>;
+  /** 该 step 修改后的值（newNode / newSchema / newContent） */
+  value: Record<string, any>;
+  /** 当前编辑器中实际的最新值；不传或为 null 时禁用「与当前对比」 */
+  currentValue?: Record<string, any> | null;
+  /** 用于标题展示的目标名称 */
+  targetLabel?: string;
+  /** 用于标题展示的目标 id */
+  id?: string | number;
+}

@@ -12,21 +12,29 @@
       <span class="m-editor-history-list-item-index" :title="headIndexTitle">{{ headIndexLabel }}</span>
       <span class="m-editor-history-list-item-op" :class="`op-${opType}`">{{ opLabel(opType) }}</span>
       <span class="m-editor-history-list-item-desc">{{ desc }}</span>
-      <span v-if="isCurrent" class="m-editor-history-list-item-current">当前</span>
-      <span
-        v-if="!merged && headDiffable"
-        class="m-editor-history-list-item-diff"
-        title="查看修改差异"
-        @click.stop="onDiffClick(subSteps[0].index)"
-        >查看差异</span
-      >
+
       <span v-if="merged" class="m-editor-history-list-item-merge">合并 {{ stepCount }} 步</span>
+
       <span
         v-if="!merged && headRevertable"
         class="m-editor-history-list-item-revert"
         title="将该步骤的修改作为一次新操作反向应用（不影响后续历史）"
         @click.stop="onRevertClick(subSteps[0].index)"
         >回滚</span
+      >
+      <span
+        v-if="!merged && gotoEnabled && !isCurrent && subSteps.length"
+        class="m-editor-history-list-item-goto"
+        title="回到该记录"
+        @click.stop="onGotoClick(subSteps[0].index)"
+        >回到</span
+      >
+      <span
+        v-if="!merged && headDiffable"
+        class="m-editor-history-list-item-diff"
+        title="查看修改差异"
+        @click.stop="onDiffClick(subSteps[0].index)"
+        >查看差异</span
       >
       <span v-if="merged" class="m-editor-history-list-group-toggle" :class="{ 'is-expanded': expanded }">▾</span>
     </div>
@@ -35,26 +43,31 @@
       <li
         v-for="s in subStepsDisplay"
         :key="s.index"
-        :class="{ 'is-undone': !s.applied, 'is-current': s.isCurrent, 'is-clickable': gotoEnabled && !s.isCurrent }"
+        :class="{ 'is-undone': !s.applied, 'is-current': s.isCurrent }"
         :title="subStepTitle(s)"
-        @click="onSubStepClick(s)"
       >
         <span class="m-editor-history-list-item-index">#{{ s.index + 1 }}</span>
         <span class="m-editor-history-list-substep-desc">{{ s.desc }}</span>
-        <span v-if="s.isCurrent" class="m-editor-history-list-item-current">当前</span>
-        <span
-          v-if="s.diffable"
-          class="m-editor-history-list-item-diff"
-          title="查看修改差异"
-          @click.stop="onDiffClick(s.index)"
-          >查看差异</span
-        >
         <span
           v-if="s.revertable"
           class="m-editor-history-list-item-revert"
           title="将该步骤的修改作为一次新操作反向应用（不影响后续历史）"
           @click.stop="onRevertClick(s.index)"
           >回滚</span
+        >
+        <span
+          v-if="gotoEnabled && !s.isCurrent"
+          class="m-editor-history-list-item-goto"
+          title="回到该记录"
+          @click.stop="onGotoClick(s.index)"
+          >回到</span
+        >
+        <span
+          v-if="s.diffable"
+          class="m-editor-history-list-item-diff"
+          title="查看修改差异"
+          @click.stop="onDiffClick(s.index)"
+          >查看差异</span
         >
       </li>
     </ul>
@@ -74,7 +87,7 @@ defineOptions({
 
 const props = withDefaults(
   defineProps<{
-    /** 唯一标识当前组的 key，作为 toggle 事件的 payload 回传给上层。形如 `pg-${idx}` / `ds-${id}-${idx}` / `cb-${id}-${idx}`。 */
+    /** 唯一标识当前组的 key，作为 toggle 事件的 payload 回传给上层。形如 `pg-${首步 index}` / `ds-${id}-${首步 index}` / `cb-${id}-${首步 index}`，以稳定的 step 索引标识分组。 */
     groupKey: string;
     /** 该组当前是否处于已应用状态（false 表示已被 undo 撤销，UI 会显示为灰态）。 */
     applied: boolean;
@@ -142,47 +155,34 @@ const emit = defineEmits<{
 }>();
 
 /**
- * 单步组：头部可点击 goto（需 gotoEnabled）；合并组：头部可点击切换展开。
- * 当前组（isCurrent）或禁用 goto 时，单步组头部不可点击。
+ * 仅合并组头部可点击（切换展开 / 收起）；
+ * 单步组的跳转改由头部的「回退」按钮触发，整行不再可点击。
  */
-const isHeadClickable = computed(() => {
-  if (props.merged) return true;
-  return props.gotoEnabled && !props.isCurrent;
-});
+const isHeadClickable = computed(() => props.merged);
 
 const headTitle = computed(() => {
   if (props.merged) return props.expanded ? '点击收起子步' : '点击展开子步';
   if (props.isCurrent) return '当前所在记录';
-  if (!props.gotoEnabled) return '';
-  return '点击跳转到该记录';
+  return '';
 });
 
 /**
- * 头部点击行为分流：
- * - 合并组：仅切换展开 / 收起，不触发 goto；
- * - 单步组：跳转到该唯一步骤；当前组忽略点击。
+ * 头部点击行为：仅合并组切换展开 / 收起；单步组不再响应整行点击。
  */
 const onHeadClick = () => {
   if (props.merged) {
     emit('toggle', props.groupKey);
-    return;
   }
-  if (props.isCurrent) return;
-  if (!props.gotoEnabled) return;
-  if (!props.subSteps.length) return;
-  emit('goto', props.subSteps[0].index);
 };
 
-const onSubStepClick = (s: { index: number; isCurrent?: boolean }) => {
-  if (s.isCurrent) return;
+const onGotoClick = (index: number) => {
   if (!props.gotoEnabled) return;
-  emit('goto', s.index);
+  emit('goto', index);
 };
 
 const subStepTitle = (s: { isCurrent?: boolean }) => {
   if (s.isCurrent) return '当前所在记录';
-  if (!props.gotoEnabled) return '';
-  return '点击跳转到该记录';
+  return '';
 };
 
 /** 单步组头部是否展示"查看差异"入口：要求该唯一子步本身可对比。 */

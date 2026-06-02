@@ -36,9 +36,14 @@
           :is="tabPaneComponent?.component || 'el-tab-pane'"
           v-bind="tabPaneComponent?.props({ name: 'data-source', label: `数据源 (${dataSourceGroups.length})` }) || {}"
         >
-          <DataSourceTab
+          <BucketTab
+            title="数据源"
+            prefix="ds"
             :buckets="dataSourceGroupsByTarget"
             :expanded="expanded"
+            :describe-group="describeDataSourceGroup"
+            :describe-step="describeDataSourceStep"
+            :is-step-diffable="isDataSourceStepDiffable"
             @toggle="toggleGroup"
             @goto="onDataSourceGoto"
             @goto-initial="onDataSourceGotoInitial"
@@ -52,9 +57,14 @@
           :is="tabPaneComponent?.component || 'el-tab-pane'"
           v-bind="tabPaneComponent?.props({ name: 'code-block', label: `代码块 (${codeBlockGroups.length})` }) || {}"
         >
-          <CodeBlockTab
+          <BucketTab
+            title="代码块"
+            prefix="cb"
             :buckets="codeBlockGroupsByTarget"
             :expanded="expanded"
+            :describe-group="describeCodeBlockGroup"
+            :describe-step="describeCodeBlockStep"
+            :is-step-diffable="isCodeBlockStepDiffable"
             @toggle="toggleGroup"
             @goto="onCodeBlockGoto"
             @goto-initial="onCodeBlockGotoInitial"
@@ -85,7 +95,7 @@
     </template>
   </TMagicPopover>
 
-  <HistoryDiffDialog ref="diffDialog" :extend-state="extendFormState" />
+  <HistoryDiffDialog ref="diffDialog" :extend-state="extendFormState" :on-confirm="onConfirmRevert" />
 </template>
 
 <script lang="ts" setup>
@@ -106,10 +116,11 @@
  * 此外每条 step 上提供"查看差异"入口（仅在前后值都存在的 update 步骤显示），
  * 点击后弹出 HistoryDiffDialog，使用 CompareForm 组件以表单形式展示新旧值差异。
  *
- * 各 tab 的内容拆分为独立的 SFC（PageTab / DataSourceTab / CodeBlockTab），
+ * 各 tab 的内容拆分为独立的 SFC：页面用 PageTab，数据源 / 代码块复用通用的 BucketTab
+ * （通过 title / prefix / describe* / isStepDiffable 注入差异）。
  * 共享的描述生成与折叠状态在 composables.ts 中维护。
  */
-import { computed, inject, markRaw, ref, useTemplateRef, watch } from 'vue';
+import { computed, inject, markRaw, ref, shallowRef, useTemplateRef, watch } from 'vue';
 import { Clock, Close } from '@element-plus/icons-vue';
 
 import { getDesignConfig, TMagicButton, TMagicPopover, TMagicTabs, TMagicTooltip } from '@tmagic/design';
@@ -117,11 +128,16 @@ import type { FormState } from '@tmagic/form';
 
 import MIcon from '@editor/components/Icon.vue';
 import { useServices } from '@editor/hooks/use-services';
-import type { HistoryListExtraTab } from '@editor/type';
+import type { CodeBlockStepValue, DataSourceStepValue, DiffDialogPayload, HistoryListExtraTab } from '@editor/type';
 
-import CodeBlockTab from './CodeBlockTab.vue';
-import { useHistoryList } from './composables';
-import DataSourceTab from './DataSourceTab.vue';
+import BucketTab from './BucketTab.vue';
+import {
+  describeCodeBlockGroup,
+  describeCodeBlockStep,
+  describeDataSourceGroup,
+  describeDataSourceStep,
+  useHistoryList,
+} from './composables';
 import HistoryDiffDialog from './HistoryDiffDialog.vue';
 import PageTab from './PageTab.vue';
 
@@ -183,6 +199,12 @@ const {
   codeBlockGroupsByTarget,
 } = useHistoryList();
 
+/** 数据源 step 仅 update（前后 schema 都存在）时可查看差异。 */
+const isDataSourceStepDiffable = (step: DataSourceStepValue) => Boolean(step.oldSchema && step.newSchema);
+
+/** 代码块 step 仅 update（前后 content 都存在）时可查看差异。 */
+const isCodeBlockStepDiffable = (step: CodeBlockStepValue) => Boolean(step.oldContent && step.newContent);
+
 /** 把"目标 step 索引"翻译成"目标 cursor"（已应用步骤数量）。 */
 const indexToCursor = (index: number) => index + 1;
 
@@ -214,40 +236,25 @@ const onCodeBlockGotoInitial = (id: string | number) => {
   codeBlockService.goto(id, 0);
 };
 
-/**
- * 「回滚」入口：把目标历史步骤的修改作为一次新操作反向应用（类 git revert），
- * 不破坏原有栈结构。各 service 内部完成反向 + 入栈，并自带描述用于面板展示。
- */
-const onPageRevert = (index: number) => {
-  editorService.revertPageStep(index);
-};
-
-const onDataSourceRevert = (id: string | number, index: number) => {
-  dataSourceService.revert(id, index);
-};
-
-const onCodeBlockRevert = (id: string | number, index: number) => {
-  codeBlockService.revert(id, index);
-};
-
 const diffDialogRef = useTemplateRef<InstanceType<typeof HistoryDiffDialog>>('diffDialog');
 
 /**
- * 页面 step 差异：仅 update 单节点修改可对比，传入旧/新节点。
+ * 构造页面 step 的差异弹窗入参：仅 update 单节点修改可对比，传入旧/新节点。
  * 节点类型 `type` 优先取 newNode.type，再回退 oldNode.type。
  * `currentValue` 取自 editorService 中该节点当前实际值，用于支持「与当前对比」。
+ * 无可对比内容（如多节点 / add / remove）时返回 null。
  */
-const onPageDiff = (index: number) => {
+const buildPageDiffPayload = (index: number): DiffDialogPayload | null => {
   const groups = historyService.getPageHistoryGroups();
   for (const group of groups) {
     const entry = group.steps.find((s) => s.index === index);
     if (!entry) continue;
     const item = entry.step.updatedItems?.[0];
-    if (!item?.oldNode || !item?.newNode) return;
+    if (!item?.oldNode || !item?.newNode) return null;
     const type = (item.newNode.type as string) || (item.oldNode.type as string) || '';
     const nodeId = item.newNode.id ?? item.oldNode.id;
     const currentNode = nodeId !== undefined ? editorService.getNodeById(nodeId) : null;
-    diffDialogRef.value?.open({
+    return {
       category: 'node',
       type,
       lastValue: item.oldNode as Record<string, any>,
@@ -255,21 +262,35 @@ const onPageDiff = (index: number) => {
       currentValue: (currentNode as Record<string, any>) || null,
       targetLabel: (item.newNode.name as string) || (item.oldNode.name as string) || type,
       id: nodeId,
-    });
-    return;
+    };
   }
+  return null;
 };
 
-const onDataSourceDiff = (id: string | number, index: number) => {
-  const groups = historyService.getDataSourceHistoryGroups();
+/**
+ * 在指定分组列表中按 id / index 查找命中的 step，命中后交由 build 构造差异弹窗入参。
+ * 用于统一数据源、代码块两类历史的查找逻辑。
+ */
+const findGroupStep = <G extends { id: string | number; steps: { index: number; step: any }[] }>(
+  groups: G[],
+  id: string | number,
+  index: number,
+  build: (_step: G['steps'][number]['step']) => DiffDialogPayload | null,
+): DiffDialogPayload | null => {
   for (const group of groups) {
     if (group.id !== id) continue;
     const entry = group.steps.find((s) => s.index === index);
     if (!entry) continue;
-    const { oldSchema, newSchema } = entry.step;
-    if (!oldSchema || !newSchema) return;
+    return build(entry.step);
+  }
+  return null;
+};
+
+const buildDataSourceDiffPayload = (id: string | number, index: number): DiffDialogPayload | null =>
+  findGroupStep(historyService.getDataSourceHistoryGroups(), id, index, ({ oldSchema, newSchema }) => {
+    if (!oldSchema || !newSchema) return null;
     const currentSchema = dataSourceService.getDataSourceById(`${id}`);
-    diffDialogRef.value?.open({
+    return {
       category: 'data-source',
       type: newSchema.type || oldSchema.type || 'base',
       lastValue: oldSchema as Record<string, any>,
@@ -277,29 +298,74 @@ const onDataSourceDiff = (id: string | number, index: number) => {
       currentValue: (currentSchema as Record<string, any>) || null,
       targetLabel: newSchema.title || oldSchema.title || `${id}`,
       id,
-    });
-    return;
-  }
-};
+    };
+  });
 
-const onCodeBlockDiff = (id: string | number, index: number) => {
-  const groups = historyService.getCodeBlockHistoryGroups();
-  for (const group of groups) {
-    if (group.id !== id) continue;
-    const entry = group.steps.find((s) => s.index === index);
-    if (!entry) continue;
-    const { oldContent, newContent } = entry.step;
-    if (!oldContent || !newContent) return;
+const buildCodeBlockDiffPayload = (id: string | number, index: number): DiffDialogPayload | null =>
+  findGroupStep(historyService.getCodeBlockHistoryGroups(), id, index, ({ oldContent, newContent }) => {
+    if (!oldContent || !newContent) return null;
     const currentContent = codeBlockService.getCodeContentById(id);
-    diffDialogRef.value?.open({
+    return {
       category: 'code-block',
       lastValue: oldContent as Record<string, any>,
       value: newContent as Record<string, any>,
       currentValue: (currentContent as Record<string, any>) || null,
       targetLabel: newContent.name || oldContent.name || `${id}`,
       id,
-    });
-    return;
+    };
+  });
+
+const onPageDiff = (index: number) => {
+  const payload = buildPageDiffPayload(index);
+  if (payload) diffDialogRef.value?.open(payload);
+};
+
+const onDataSourceDiff = (id: string | number, index: number) => {
+  const payload = buildDataSourceDiffPayload(id, index);
+  if (payload) diffDialogRef.value?.open(payload);
+};
+
+const onCodeBlockDiff = (id: string | number, index: number) => {
+  const payload = buildCodeBlockDiffPayload(id, index);
+  if (payload) diffDialogRef.value?.open(payload);
+};
+
+const onConfirmRevert = shallowRef();
+
+/**
+ * 「回滚」入口：把目标历史步骤的修改作为一次新操作反向应用（类 git revert），
+ * 不破坏原有栈结构。各 service 内部完成反向 + 入栈，并自带描述用于面板展示。
+ *
+ * 交互：先弹出该步骤的差异弹窗供用户确认，点击「确定回滚」后再真正执行回滚；
+ * 对没有可对比内容的步骤（如 add / remove / 多节点更新）则直接回滚。
+ */
+const onPageRevert = (index: number) => {
+  const payload = buildPageDiffPayload(index);
+  onConfirmRevert.value = () => editorService.revertPageStep(index);
+  if (payload) {
+    diffDialogRef.value?.open({ ...payload });
+  } else {
+    onConfirmRevert.value();
+  }
+};
+
+const onDataSourceRevert = (id: string | number, index: number) => {
+  const payload = buildDataSourceDiffPayload(id, index);
+  onConfirmRevert.value = () => dataSourceService.revert(id, index);
+  if (payload) {
+    diffDialogRef.value?.open({ ...payload });
+  } else {
+    onConfirmRevert.value();
+  }
+};
+
+const onCodeBlockRevert = (id: string | number, index: number) => {
+  const payload = buildCodeBlockDiffPayload(id, index);
+  onConfirmRevert.value = () => codeBlockService.revert(id, index);
+  if (payload) {
+    diffDialogRef.value?.open({ ...payload });
+  } else {
+    onConfirmRevert.value();
   }
 };
 </script>

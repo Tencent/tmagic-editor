@@ -3,12 +3,17 @@
     class="m-editor-history-list-item m-editor-history-list-initial"
     :class="{ 'is-current': isCurrent, 'is-clickable': !isCurrent }"
     :title="isCurrent ? '当前已回到未修改的初始状态' : '点击回到未修改的初始状态'"
-    @click="onClick"
   >
     <span class="m-editor-history-list-item-index" title="历史步骤编号 #0（未修改的初始状态）">#0</span>
     <span class="m-editor-history-list-item-op op-initial">初始</span>
     <span class="m-editor-history-list-item-desc">未修改的初始状态</span>
-    <span v-if="isCurrent" class="m-editor-history-list-item-current">当前</span>
+    <span
+      v-if="gotoEnabled && !isCurrent"
+      class="m-editor-history-list-item-goto"
+      title="回到该记录"
+      @click.stop="onClick"
+      >回到</span
+    >
   </li>
 </template>
 
@@ -24,10 +29,16 @@ defineOptions({
   name: 'MEditorHistoryListInitialRow',
 });
 
-const props = defineProps<{
-  /** 当前对应栈是否已经处于初始状态 (cursor === 0)。true 时用蓝条高亮并禁用点击。 */
-  isCurrent: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    /** 当前对应栈是否已经处于初始状态 (cursor === 0)。true 时用蓝条高亮并禁用点击。 */
+    isCurrent: boolean;
+    gotoEnabled?: boolean;
+  }>(),
+  {
+    gotoEnabled: true,
+  },
+);
 
 const emit = defineEmits<{
   /** 点击非当前的初始项时触发，由上层调用对应 service 的 goto 把 cursor 移到 0。 */

@@ -7,8 +7,9 @@ import { describe, expect, test, vi } from 'vitest';
 import { defineComponent, h } from 'vue';
 import { mount } from '@vue/test-utils';
 
-import DataSourceTab from '@editor/layouts/history-list/DataSourceTab.vue';
-import type { DataSourceHistoryGroup } from '@editor/type';
+import BucketTab from '@editor/layouts/history-list/BucketTab.vue';
+import { describeDataSourceGroup, describeDataSourceStep } from '@editor/layouts/history-list/composables';
+import type { DataSourceHistoryGroup, DataSourceStepValue } from '@editor/type';
 
 vi.mock('@tmagic/design', () => ({
   TMagicScrollbar: defineComponent({
@@ -25,17 +26,31 @@ const buildGroup = (
   opType: 'add' | 'remove' | 'update',
   steps: any[],
   applied = true,
+  startIndex = 0,
 ): DataSourceHistoryGroup => ({
   kind: 'data-source',
   id,
   opType,
   applied,
-  steps: steps.map((s, i) => ({ step: s, index: i, applied })),
+  steps: steps.map((s, i) => ({ step: s, index: startIndex + i, applied })),
 });
+
+/** 数据源 tab 复用通用 BucketTab，固定注入数据源的 title/prefix/describe/isStepDiffable。 */
+const mountDataSourceTab = (props: { buckets: any[]; expanded: Record<string, boolean> }) =>
+  mount(BucketTab, {
+    props: {
+      title: '数据源',
+      prefix: 'ds',
+      describeGroup: describeDataSourceGroup,
+      describeStep: describeDataSourceStep,
+      isStepDiffable: (step: DataSourceStepValue) => Boolean(step.oldSchema && step.newSchema),
+      ...props,
+    },
+  });
 
 describe('DataSourceTab.vue', () => {
   test('buckets 为空时显示空态', () => {
-    const wrapper = mount(DataSourceTab, { props: { buckets: [], expanded: {} } });
+    const wrapper = mountDataSourceTab({ buckets: [], expanded: {} });
     expect(wrapper.find('.m-editor-history-list-empty').exists()).toBe(true);
   });
 
@@ -52,7 +67,7 @@ describe('DataSourceTab.vue', () => {
         ],
       },
     ];
-    const wrapper = mount(DataSourceTab, { props: { buckets, expanded: {} } });
+    const wrapper = mountDataSourceTab({ buckets, expanded: {} });
     const titles = wrapper.findAll('.m-editor-history-list-bucket-title');
     expect(titles).toHaveLength(2);
     expect(titles[0].text()).toContain('数据源');
@@ -86,27 +101,33 @@ describe('DataSourceTab.vue', () => {
               changeRecords: [{ propPath: 'b' }],
             },
           ]),
-          buildGroup('ds_1', 'update', [
-            {
-              id: 'ds_1',
-              oldSchema: { id: 'ds_1', title: 'A' },
-              newSchema: { id: 'ds_1', title: 'A2' },
-              changeRecords: [{ propPath: 'c' }],
-            },
-            {
-              id: 'ds_1',
-              oldSchema: { id: 'ds_1', title: 'A2' },
-              newSchema: { id: 'ds_1', title: 'A3' },
-              changeRecords: [{ propPath: 'd' }],
-            },
-          ]),
+          buildGroup(
+            'ds_1',
+            'update',
+            [
+              {
+                id: 'ds_1',
+                oldSchema: { id: 'ds_1', title: 'A' },
+                newSchema: { id: 'ds_1', title: 'A2' },
+                changeRecords: [{ propPath: 'c' }],
+              },
+              {
+                id: 'ds_1',
+                oldSchema: { id: 'ds_1', title: 'A2' },
+                newSchema: { id: 'ds_1', title: 'A3' },
+                changeRecords: [{ propPath: 'd' }],
+              },
+            ],
+            true,
+            2,
+          ),
         ],
       },
     ];
-    const wrapper = mount(DataSourceTab, { props: { buckets, expanded: {} } });
+    const wrapper = mountDataSourceTab({ buckets, expanded: {} });
     const heads = wrapper.findAll('.m-editor-history-list-group-head');
     await heads[1].trigger('click');
-    expect(wrapper.emitted('toggle')![0]).toEqual(['ds-ds_1-1']);
+    expect(wrapper.emitted('toggle')![0]).toEqual(['ds-ds_1-2']);
   });
 
   test('goto 透传：携带 dataSource id 与最后一步 index', async () => {
@@ -116,8 +137,8 @@ describe('DataSourceTab.vue', () => {
         groups: [buildGroup('ds_1', 'add', [{ id: 'ds_1', oldSchema: null, newSchema: { id: 'ds_1', title: 'A' } }])],
       },
     ];
-    const wrapper = mount(DataSourceTab, { props: { buckets, expanded: {} } });
-    await wrapper.find('.m-editor-history-list-group-head').trigger('click');
+    const wrapper = mountDataSourceTab({ buckets, expanded: {} });
+    await wrapper.find('.m-editor-history-list-item-goto').trigger('click');
     const events = wrapper.emitted('goto');
     expect(events).toBeTruthy();
     expect(events![0]).toEqual(['ds_1', 0]);
@@ -145,9 +166,7 @@ describe('DataSourceTab.vue', () => {
         ],
       },
     ];
-    const wrapper = mount(DataSourceTab, {
-      props: { buckets, expanded: { 'ds-ds_1-0': true } },
-    });
+    const wrapper = mountDataSourceTab({ buckets, expanded: { 'ds-ds_1-0': true } });
     expect(wrapper.findAll('.m-editor-history-list-substeps li')).toHaveLength(2);
   });
 });
