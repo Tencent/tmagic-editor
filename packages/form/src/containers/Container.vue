@@ -307,8 +307,10 @@ const name = computed(() => props.config.name || '');
 // 便于业务侧自定义"语义上相等"的特殊场景（例如空字符串与空 hook 结构）。
 const showDiff = computed(() => {
   if (!props.isCompare) return false;
-  const curValue = name.value ? props.model[name.value] : props.model;
-  const lastValue = name.value ? props.lastValues[name.value] : props.lastValues;
+  if (!name.value) return false;
+
+  const curValue = props.model[name.value];
+  const lastValue = props.lastValues[name.value];
 
   const customShowDiff = diffConfig.showDiff;
   if (typeof customShowDiff === 'function') {
