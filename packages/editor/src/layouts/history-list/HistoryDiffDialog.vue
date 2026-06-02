@@ -8,6 +8,7 @@
       destroy-on-close
       append-to-body
       :width="width"
+      @close="onClose"
     >
       <div v-if="payload" class="m-editor-history-diff-dialog-body">
         <div class="m-editor-history-diff-dialog-header">
@@ -104,6 +105,8 @@ const props = withDefaults(
     width: '900px',
   },
 );
+
+const emit = defineEmits(['close']);
 
 /**
  * 差异对比模式：
@@ -208,6 +211,10 @@ watch(visible, (v) => {
     payload.value = null;
   }
 });
+
+const onClose = () => {
+  emit('close');
+};
 
 defineExpose({
   open,
