@@ -24,19 +24,12 @@ import { type CodeBlockContent, type DataSourceSchema, HookType, type MNode } fr
 import { type FormConfig, type FormState, type FormValue, MForm } from '@tmagic/form';
 
 import { useServices } from '@editor/hooks/use-services';
+import type { CompareCategory, CompareFormLoadConfig } from '@editor/type';
 import { getCodeBlockFormConfig } from '@editor/utils/code-block';
 
 defineOptions({
   name: 'MEditorCompareForm',
 });
-
-/**
- * 对比类型：
- * - node: 节点组件，按 `type` 从 propsService 获取属性表单配置
- * - data-source: 数据源，按 `type`(base/http/...) 从 dataSourceService 获取数据源表单配置
- * - code-block: 数据源代码块，使用内置的代码块表单配置
- */
-export type CompareCategory = 'node' | 'data-source' | 'code-block';
 
 const props = withDefaults(
   defineProps<{
@@ -68,6 +61,12 @@ const props = withDefaults(
      * 因此在差异对比场景下也需要透传，避免出现 `formState.xxx is undefined` 的运行时错误。
      */
     extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
+    /**
+     * 自定义 FormConfig 加载逻辑。传入后将接管内置的按 `category`(node/data-source/code-block)
+     * 取配置逻辑，调用方可根据业务自行返回（或异步返回）表单配置。可通过
+     * `ctx.defaultLoadConfig()` 复用默认结果再做二次加工。返回的 config 直接用于对比展示。
+     */
+    loadConfig?: CompareFormLoadConfig;
   }>(),
   {
     category: 'node',
@@ -153,22 +152,23 @@ const showDiff = ({ curValue, lastValue, config }: { curValue: any; lastValue: a
   return !isEqual(curValue, lastValue);
 };
 
-const loadConfig = async () => {
+/**
+ * 内置的默认 FormConfig 加载逻辑：按 `category` 从对应 service / 工具取配置。
+ * 作为 ctx.defaultLoadConfig 透传给自定义 `loadConfig`，方便复用与二次加工。
+ */
+const defaultLoadConfig = async (): Promise<FormConfig> => {
   switch (props.category) {
     case 'node': {
       if (!props.type) {
-        config.value = [];
-        return;
+        return [];
       }
-      config.value = await propsService.getPropsConfig(props.type);
-      break;
+      return await propsService.getPropsConfig(props.type);
     }
     case 'data-source': {
-      config.value = dataSourceService.getFormConfig(props.type || 'base');
-      break;
+      return dataSourceService.getFormConfig(props.type || 'base');
     }
     case 'code-block': {
-      config.value = getCodeBlockFormConfig({
+      return getCodeBlockFormConfig({
         paramColConfig: codeBlockService.getParamsColConfig(),
         // 通过传入 dataSourceType 间接表达"是数据源代码块"——在对比场景下 props.dataSourceType
         // 由调用方按 step 上下文显式传入，未传则视为普通代码块，「执行时机」字段隐藏。
@@ -178,15 +178,28 @@ const loadConfig = async () => {
         // 对比模式只读，不需要校验/语法检查
         editable: false,
       });
-      break;
     }
     default:
-      config.value = [];
+      return [];
   }
 };
 
+const loadConfig = async () => {
+  if (props.loadConfig) {
+    config.value = await props.loadConfig({
+      category: props.category,
+      type: props.type,
+      dataSourceType: props.dataSourceType,
+      defaultLoadConfig,
+    });
+    return;
+  }
+
+  config.value = await defaultLoadConfig();
+};
+
 watch(
-  [() => props.category, () => props.type, () => props.dataSourceType],
+  [() => props.category, () => props.type, () => props.dataSourceType, () => props.loadConfig],
   () => {
     loadConfig();
   },

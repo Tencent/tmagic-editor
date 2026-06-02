@@ -4,10 +4,10 @@
       v-model="visible"
       class="m-editor-history-diff-dialog"
       title="查看修改差异"
-      width="900px"
       top="5vh"
       destroy-on-close
       append-to-body
+      :width="width"
     >
       <div v-if="payload" class="m-editor-history-diff-dialog-body">
         <div class="m-editor-history-diff-dialog-header">
@@ -42,6 +42,7 @@
           :value="rightValue"
           :last-value="leftValue"
           :extend-state="extendState"
+          :load-config="loadConfig"
           height="70vh"
         />
 
@@ -71,21 +72,33 @@ import { isEqual } from 'lodash-es';
 import { TMagicButton, TMagicDialog, TMagicRadioButton, TMagicRadioGroup, TMagicTag } from '@tmagic/design';
 import type { FormState } from '@tmagic/form';
 
-import CompareForm, { type CompareCategory } from '@editor/components/CompareForm.vue';
+import CompareForm from '@editor/components/CompareForm.vue';
 import CodeEditor from '@editor/layouts/CodeEditor.vue';
+import type { CompareCategory, CompareFormLoadConfig } from '@editor/type';
 
 defineOptions({
   name: 'MEditorHistoryDiffDialog',
 });
 
-defineProps<{
-  /**
-   * 来自 Editor 顶层的 `extendFormState`，用于扩展 MForm.formState。
-   * 透传给 CompareForm，从而让差异对比时表单 item 中依赖业务上下文的
-   * `display` / `disabled` 等 filterFunction 正常工作。
-   */
-  extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
-}>();
+withDefaults(
+  defineProps<{
+    /**
+     * 来自 Editor 顶层的 `extendFormState`，用于扩展 MForm.formState。
+     * 透传给 CompareForm，从而让差异对比时表单 item 中依赖业务上下文的
+     * `display` / `disabled` 等 filterFunction 正常工作。
+     */
+    extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
+    /**
+     * 自定义 FormConfig 加载逻辑，透传给 CompareForm。传入后将接管内置的按 `category`
+     * 取配置逻辑，可通过 `ctx.defaultLoadConfig()` 复用默认结果再做二次加工。
+     */
+    loadConfig?: CompareFormLoadConfig;
+    width?: string;
+  }>(),
+  {
+    width: '900px',
+  },
+);
 
 /** 差异对话框的入参 */
 export interface DiffDialogPayload {

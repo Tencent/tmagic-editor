@@ -498,6 +498,40 @@ export interface HistoryListExtraTab {
 }
 // #endregion HistoryListExtraTab
 
+// #region CompareForm
+/**
+ * 对比表单（CompareForm）的对比类型：
+ * - node: 节点组件，按 `type` 从 propsService 获取属性表单配置
+ * - data-source: 数据源，按 `type`(base/http/...) 从 dataSourceService 获取数据源表单配置
+ * - code-block: 数据源代码块，使用内置的代码块表单配置
+ */
+export type CompareCategory = 'node' | 'data-source' | 'code-block';
+
+/**
+ * 自定义 `loadConfig` 时回传的上下文，聚合了组件当前的对比入参，
+ * 方便调用方在外部按需拼装 FormConfig。
+ */
+export interface CompareFormLoadConfigContext {
+  /** 对比类型，见 CompareCategory */
+  category: string;
+  /** 节点 / 数据源类型 */
+  type?: string;
+  /** 数据源代码块场景下的数据源类型 */
+  dataSourceType?: string;
+  /**
+   * 内置的默认 FormConfig 加载逻辑（按 `category` 从 propsService / dataSourceService /
+   * 代码块工具取配置）。自定义 `loadConfig` 可调用它复用默认结果，再做二次加工。
+   */
+  defaultLoadConfig: () => Promise<FormConfig>;
+}
+
+/**
+ * 自定义 FormConfig 加载逻辑。传入后将接管内置的按 `category` 取配置逻辑，
+ * 可通过 `ctx.defaultLoadConfig()` 复用默认结果再做二次加工。
+ */
+export type CompareFormLoadConfig = (ctx: CompareFormLoadConfigContext) => FormConfig | Promise<FormConfig>;
+// #endregion CompareForm
+
 // #region SideItemKey
 export enum SideItemKey {
   COMPONENT_LIST = 'component-list',
