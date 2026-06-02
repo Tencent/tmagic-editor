@@ -4,11 +4,11 @@
 
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
-import serialize from 'serialize-javascript';
 
 import type { CodeLinkConfig, FieldProps, MLink } from '@tmagic/form';
 
 import { getEditorConfig } from '@editor/utils/config';
+import { serializeConfig } from '@editor/utils/editor';
 
 defineOptions({
   name: 'MFieldsCodeLink',
@@ -47,10 +47,7 @@ watch(
   () => props.model[props.name],
   (value) => {
     modelValue.form = {
-      [props.name]: serialize(value, {
-        space: 2,
-        unsafe: true,
-      }).replace(/"(\w+)":\s/g, '$1: '),
+      [props.name]: serializeConfig(value),
     };
   },
   {

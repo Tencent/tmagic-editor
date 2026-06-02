@@ -21,12 +21,12 @@ import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, useTe
 import { FullScreen } from '@element-plus/icons-vue';
 import { throttle } from 'lodash-es';
 import type * as Monaco from 'monaco-editor';
-import serialize from 'serialize-javascript';
 
 import { TMagicButton } from '@tmagic/design';
 
 import MIcon from '@editor/components/Icon.vue';
 import { getEditorConfig } from '@editor/utils/config';
+import { serializeConfig } from '@editor/utils/editor';
 import loadMonaco from '@editor/utils/monaco-editor';
 
 defineOptions({
@@ -163,10 +163,7 @@ const toString = (v: string | any, language: string): string => {
     if (language === 'json') {
       value = JSON.stringify(v, null, 2);
     } else {
-      value = serialize(v, {
-        space: 2,
-        unsafe: true,
-      }).replace(/"(\w+)":\s/g, '$1: ');
+      value = serializeConfig(v);
     }
   } else {
     value = v;

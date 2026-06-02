@@ -48,11 +48,17 @@
 
 <script lang="ts" setup>
 import { computed, onBeforeUnmount, ref, shallowRef, toRaw } from 'vue';
-import serialize from 'serialize-javascript';
 
 import type { MApp, MContainer, MNode } from '@tmagic/core';
 import type { DatasourceTypeOption } from '@tmagic/editor';
-import { editorService, propsService, TMagicDialog, TMagicEditor, tMagicMessage } from '@tmagic/editor';
+import {
+  editorService,
+  propsService,
+  serializeConfig,
+  TMagicDialog,
+  TMagicEditor,
+  tMagicMessage,
+} from '@tmagic/editor';
 
 import DeviceGroup from '../components/DeviceGroup.vue';
 import componentGroupList from '../configs/componentGroupList';
@@ -88,13 +94,7 @@ const previewUrl = computed(
 const { moveableOptions } = useEditorMoveableOptions(editor);
 
 const save = () => {
-  localStorage.setItem(
-    'magicDSL',
-    serialize(toRaw(value.value), {
-      space: 2,
-      unsafe: true,
-    }).replace(/"(\w+)":\s/g, '$1: '),
-  );
+  localStorage.setItem('magicDSL', serializeConfig(toRaw(value.value)));
   editor.value?.editorService.resetModifiedNodeId();
 };
 
