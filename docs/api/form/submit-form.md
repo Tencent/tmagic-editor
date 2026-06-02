@@ -18,7 +18,7 @@ function submitForm(options: SubmitFormOptions): Promise<any>;
 
 ## 参数
 
-`options` 与 `MForm` 组件的 props 基本对齐，额外提供了 `native`、`appContext`、`timeout` 三个参数。
+`options` 与 `MForm` 组件的 props 基本对齐，额外提供了 `native`、`returnChangeRecords`、`appContext`、`timeout` 等参数。
 
 | 名称                   | 类型                                                    | 默认值     | 说明                                                                                                  |
 | ---------------------- | ------------------------------------------------------- | ---------- | ----------------------------------------------------------------------------------------------------- |
@@ -39,16 +39,21 @@ function submitForm(options: SubmitFormOptions): Promise<any>;
 | `preventSubmitDefault` | `boolean`                                               | —          | 是否阻止表单原生 submit                                                                               |
 | `extendState`          | `(state: FormState) => Record<string, any> \| Promise<Record<string, any>>` | — | 扩展 `formState`                                                              |
 | `native`               | `boolean`                                               | `false`    | 透传给 `Form.submitForm`。`true` 时返回内部响应式 `values`，否则返回 `cloneDeep(toRaw(values))`        |
+| `returnChangeRecords`  | `boolean`                                               | `false`    | `true` 时 resolve 结果为 `{ values, changeRecords }`，携带表单变更记录；否则仅 resolve `values`        |
 | `appContext`           | `AppContext \| null`                                    | `null`     | 父级 Vue 应用上下文。需要继承全局组件、指令、provide 等时传入，常通过 `app._context` 或 `getCurrentInstance()?.appContext` 获取 |
 | `timeout`              | `number`                                                | `10000`    | 等待表单初始化的最长时间（毫秒）。超时将以错误 reject。设为 `<= 0` 时关闭超时兜底                       |
 
 ## 返回值
 
-- `校验通过` — `Promise<any>` resolve 当前表单值（`native` 决定是否克隆）
+- `校验通过` — `Promise<any>` resolve 当前表单值（`native` 决定是否克隆）；当 `returnChangeRecords` 为 `true` 时，resolve `{ values, changeRecords }`
 - `校验失败` — `Promise<any>` reject 一个 `Error`，`message` 中包含逐条字段错误信息（格式 `${text} -> ${message}`，多条用 `<br>` 分隔）
 - `初始化超时` — `Promise<any>` reject `Error('submitForm timeout after ${timeout}ms: form is not initialized.')`
 
 无论成功或失败，函数都会在最后自动 `unmount` 内部 app 并移除挂载用的 DOM 容器，无需调用方手动清理。
+
+::: tip 关于 changeRecords
+`changeRecords` 记录的是表单挂载后发生的字段变更（由各字段的 `change` 事件累积而来）。在 `submitForm` 这种命令式、无用户交互的场景下，通常为空数组；只有在 `extendState` 或字段联动等逻辑中触发了变更时才会有内容。`MForm` 内部的 `submitForm` 在校验通过后会清空变更记录，因此本函数会在调用前先对其做快照再返回。
+:::
 
 ## 基础用法
 
@@ -71,6 +76,23 @@ try {
 } catch (e) {
   console.error('校验失败', e);
 }
+```
+
+## 同时获取变更记录（changeRecords）
+
+设置 `returnChangeRecords: true` 后，resolve 的结果会从单纯的 `values` 变为 `{ values, changeRecords }`：
+
+```ts
+import { submitForm } from '@tmagic/form';
+
+const { values, changeRecords } = await submitForm({
+  config: [{ type: 'text', name: 'username', text: '用户名' }],
+  initValues: { username: 'foo' },
+  returnChangeRecords: true,
+});
+
+console.log(values); // { username: 'foo' }
+console.log(changeRecords); // ChangeRecord[]
 ```
 
 ## 在组件中继承父级应用上下文
@@ -189,4 +211,8 @@ console.log(values);
 
 ::: details 查看 `SubmitFormOptions` 类型定义
 <<< @/../packages/form/src/submitForm.ts#SubmitFormOptions{ts}
+:::
+
+::: details 查看 `SubmitFormResult` 类型定义
+<<< @/../packages/form/src/submitForm.ts#SubmitFormResult{ts}
 :::

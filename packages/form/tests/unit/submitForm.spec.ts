@@ -101,6 +101,31 @@ describe('submitForm', () => {
     });
   });
 
+  test('returnChangeRecords=true 时返回 { values, changeRecords }', async () => {
+    const result = await submitForm({
+      config: [{ type: 'text', name: 'text', text: 'text' }],
+      initValues: { text: 'hello' },
+      returnChangeRecords: true,
+      appContext,
+    });
+
+    expect(result).toHaveProperty('values');
+    expect(result).toHaveProperty('changeRecords');
+    expect(result.values).toEqual({ text: 'hello' });
+    expect(Array.isArray(result.changeRecords)).toBe(true);
+  });
+
+  test('未设置 returnChangeRecords 时仅返回 values（不包裹）', async () => {
+    const result = await submitForm({
+      config: [{ type: 'text', name: 'text', text: 'text' }],
+      initValues: { text: 'hello' },
+      appContext,
+    });
+
+    expect(result).toEqual({ text: 'hello' });
+    expect(result).not.toHaveProperty('changeRecords');
+  });
+
   test('多次连续调用不会相互干扰', async () => {
     const [v1, v2] = await Promise.all([
       submitForm({

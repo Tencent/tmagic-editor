@@ -19,7 +19,7 @@
 import { type AppContext, type Component, createApp, defineComponent, h, nextTick, ref, watch } from 'vue';
 
 import Form from './Form.vue';
-import type { FormConfig, FormState } from './schema';
+import type { ChangeRecord, FormConfig, FormState } from './schema';
 
 // #region SubmitFormOptions
 /**
@@ -49,6 +49,11 @@ export interface SubmitFormOptions {
   /** 透传给 Form.submitForm 的参数：是否直接返回原始响应式 values */
   native?: boolean;
   /**
+   * 是否在 resolve 结果中携带 changeRecords（变更记录）。
+   * 开启后 resolve 的结果为 `{ values, changeRecords }`，否则仅 resolve values。
+   */
+  returnChangeRecords?: boolean;
+  /**
    * 父级应用上下文，用于继承全局组件、指令、provide 等。
    * 通常通过 `app._context` 或 `getCurrentInstance()?.appContext` 获取。
    */
@@ -57,6 +62,18 @@ export interface SubmitFormOptions {
   timeout?: number;
 }
 // #endregion SubmitFormOptions
+
+// #region SubmitFormResult
+/**
+ * 开启 `returnChangeRecords` 时 submitForm 的返回结果
+ */
+export interface SubmitFormResult {
+  /** 校验通过后的表单值 */
+  values: any;
+  /** 表单变更记录 */
+  changeRecords: ChangeRecord[];
+}
+// #endregion SubmitFormResult
 
 /**
  * 以命令式方式调用 Form.vue 完成一次表单校验/提交。
@@ -78,10 +95,17 @@ export interface SubmitFormOptions {
  * } catch (e) {
  *   console.error(e);
  * }
+ *
+ * // 需要同时获取变更记录时：
+ * const { values, changeRecords } = await submitForm({
+ *   config: [...],
+ *   initValues: { name: 'foo' },
+ *   returnChangeRecords: true,
+ * });
  * ```
  */
 export const submitForm = (options: SubmitFormOptions): Promise<any> => {
-  const { native, appContext, timeout = 10000, ...formProps } = options;
+  const { native, appContext, timeout = 10000, returnChangeRecords, ...formProps } = options;
 
   return new Promise((resolve, reject) => {
     const container = document.createElement('div');
@@ -105,8 +129,10 @@ export const submitForm = (options: SubmitFormOptions): Promise<any> => {
             try {
               // 等待子组件（FormItem 等）完成首次渲染，确保 validate 能拿到所有字段
               await nextTick();
+              // submitForm 校验通过后会清空 changeRecords，需在调用前先做快照
+              const changeRecords: ChangeRecord[] = [...(formRef.value.changeRecords ?? [])];
               const result = await formRef.value.submitForm(native);
-              resolve(result);
+              resolve(returnChangeRecords ? { values: result, changeRecords } : result);
             } catch (err) {
               reject(err);
             } finally {
