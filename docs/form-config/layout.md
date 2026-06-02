@@ -135,6 +135,18 @@
   }]
 }]"></demo-block>
 
+`legend` 除了支持字符串，也支持函数，函数返回值作为标题展示，可根据表单数据动态生成：
+
+<demo-block type="form" :config="[{
+  type: 'fieldset',
+  labelWidth: '100px',
+  legend: (mForm, { formValue }) => `当前值：${formValue.text || '空'}`,
+  items: [{
+    name: 'text',
+    text: '配置1',
+  }]
+}]"></demo-block>
+
 ### panel
 
 <demo-block type="form" :config="[{

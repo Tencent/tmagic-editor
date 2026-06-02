@@ -7,11 +7,11 @@
         :true-value="checkboxTrueValue"
         :false-value="checkboxFalseValue"
         @update:modelValue="valueChangeHandler"
-        ><span v-html="config.legend"></span><span v-if="config.extra" v-html="config.extra" class="m-form-tip"></span
+        ><span v-html="legend"></span><span v-if="config.extra" v-html="config.extra" class="m-form-tip"></span
       ></TMagicCheckbox>
     </component>
     <legend v-else>
-      <span v-html="config.legend"></span>
+      <span v-html="legend"></span>
       <span v-if="config.extra" v-html="config.extra" class="m-form-tip"></span>
     </legend>
 
@@ -63,6 +63,7 @@ import { computed, inject } from 'vue';
 import { TMagicCheckbox } from '@tmagic/design';
 
 import { ContainerChangeEventData, FieldsetConfig, FormState } from '../schema';
+import { filterFunction } from '../utils/form';
 
 import Container from './Container.vue';
 
@@ -98,6 +99,8 @@ const emit = defineEmits<{
 const mForm = inject<FormState | undefined>('mForm');
 
 const name = computed(() => props.config.name || '');
+
+const legend = computed(() => filterFunction<string>(mForm, props.config.legend, props));
 
 const checkboxName = computed(() => {
   if (typeof props.config.checkbox === 'object' && typeof props.config.checkbox.name === 'string') {

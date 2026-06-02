@@ -58,6 +58,22 @@ describe('Panel container', () => {
     );
     await nextTick();
     expect(wrapper.exists()).toBe(true);
+    expect(wrapper.find('legend').text()).toContain('fs');
+  });
+
+  test('fieldset legend 支持函数', async () => {
+    const wrapper = mountForm(
+      [
+        {
+          type: 'fieldset',
+          legend: (mForm: any, { formValue }: any) => `legend-${formValue.text}`,
+          items: [{ name: 'text', type: 'text', text: 'text' }],
+        },
+      ],
+      { text: 'fn' },
+    );
+    await nextTick();
+    expect(wrapper.find('legend').text()).toContain('legend-fn');
   });
 
   test('flex-layout 容器渲染', async () => {

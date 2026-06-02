@@ -754,7 +754,7 @@ export interface FieldsetConfig<T = never> extends FormItem, ContainerCommonConf
         falseValue?: string | number;
       };
   expand?: boolean;
-  legend?: string;
+  legend?: string | FilterFunction<string>;
   schematic?: string;
 }
 // #endregion FieldsetConfig
