@@ -77,6 +77,21 @@ describe('PageTab.vue', () => {
     expect(rows[1].find('.m-editor-history-list-item-desc').text()).toBe('修改 按钮 (id: btn) · style.color');
   });
 
+  test('step 含 timestamp 时渲染时间元素', () => {
+    const list = [buildPageGroup('add', [{ opType: 'add', nodes: [{ id: 'n1', name: 'A' }], timestamp: Date.now() }])];
+    const wrapper = mount(PageTab, { props: { list, expanded: {} } });
+    const time = wrapper.find('.m-editor-history-list-item-time');
+    expect(time.exists()).toBe(true);
+    // 当天记录展示 HH:mm:ss
+    expect(time.text()).toMatch(/^\d{2}:\d{2}:\d{2}$/);
+  });
+
+  test('step 无 timestamp 时不渲染时间元素', () => {
+    const list = [buildPageGroup('add', [{ opType: 'add', nodes: [{ id: 'n1', name: 'A' }] }])];
+    const wrapper = mount(PageTab, { props: { list, expanded: {} } });
+    expect(wrapper.find('.m-editor-history-list-item-time').exists()).toBe(false);
+  });
+
   test('expanded 控制合并组的展开状态（key=pg-${idx}）', async () => {
     const mergedGroup = buildPageGroup(
       'update',

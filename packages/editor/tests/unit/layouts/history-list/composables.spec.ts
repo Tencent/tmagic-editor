@@ -14,6 +14,9 @@ import {
   describeDataSourceStep,
   describePageGroup,
   describePageStep,
+  formatHistoryFullTime,
+  formatHistoryTime,
+  groupTimestamp,
   opLabel,
   useHistoryList,
 } from '@editor/layouts/history-list/composables';
@@ -47,6 +50,50 @@ describe('opLabel', () => {
 
   test('未知操作类型回退到「修改」', () => {
     expect(opLabel('unknown' as any)).toBe('修改');
+  });
+});
+
+describe('formatHistoryFullTime', () => {
+  test('无时间戳返回空串', () => {
+    expect(formatHistoryFullTime()).toBe('');
+    expect(formatHistoryFullTime(0)).toBe('');
+  });
+
+  test('格式化为北京时间的完整 YYYY-MM-DD HH:mm:ss（不随本地时区漂移）', () => {
+    // 2026-01-02 03:04:05 UTC → 北京时间 (UTC+8) 2026-01-02 11:04:05
+    const ts = Date.UTC(2026, 0, 2, 3, 4, 5);
+    expect(formatHistoryFullTime(ts)).toBe('2026-01-02 11:04:05');
+  });
+});
+
+describe('formatHistoryTime', () => {
+  test('无时间戳返回空串', () => {
+    expect(formatHistoryTime()).toBe('');
+    expect(formatHistoryTime(0)).toBe('');
+  });
+
+  test('当天记录只显示 HH:mm:ss', () => {
+    expect(formatHistoryTime(Date.now())).toMatch(/^\d{2}:\d{2}:\d{2}$/);
+  });
+
+  test('跨天记录显示 MM-DD HH:mm:ss', () => {
+    // 取一个明显不是今天的旧时间戳
+    const ts = Date.UTC(2020, 5, 15, 1, 2, 3);
+    expect(formatHistoryTime(ts)).toMatch(/^\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/);
+  });
+});
+
+describe('groupTimestamp', () => {
+  test('取组内最后一步的时间戳', () => {
+    const group = {
+      steps: [{ step: { timestamp: 100 } }, { step: { timestamp: 200 } }, { step: { timestamp: 300 } }],
+    };
+    expect(groupTimestamp(group)).toBe(300);
+  });
+
+  test('末步无时间戳时返回 undefined', () => {
+    expect(groupTimestamp({ steps: [{ step: {} }] })).toBeUndefined();
+    expect(groupTimestamp({ steps: [] })).toBeUndefined();
   });
 });
 

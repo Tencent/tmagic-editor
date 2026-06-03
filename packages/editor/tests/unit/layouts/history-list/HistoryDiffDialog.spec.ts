@@ -13,7 +13,7 @@ vi.mock('@tmagic/design', () => ({
   // 受控对话框：modelValue 为真时才渲染 body / footer 插槽
   TMagicDialog: defineComponent({
     name: 'TMagicDialog',
-    props: ['modelValue'],
+    props: ['modelValue', 'title'],
     setup(props, { slots }) {
       return () =>
         props.modelValue ? h('div', { class: 'fake-dialog' }, [slots.default?.(), slots.footer?.()]) : null;
@@ -205,6 +205,34 @@ describe('HistoryDiffDialog.vue', () => {
     expect(wrapper.findComponent({ name: 'CompareForm' }).exists()).toBe(true);
     const form = wrapper.findComponent({ name: 'CompareForm' });
     expect(form.props('lastValue')).toEqual({ text: 'old' });
+  });
+
+  test('无 onConfirm 时标题为「查看修改差异」', async () => {
+    const wrapper = factory();
+    (wrapper.vm as any).open(basePayload());
+    await nextTick();
+
+    expect(wrapper.findComponent({ name: 'TMagicDialog' }).props('title')).toBe('查看修改差异');
+  });
+
+  test('有 onConfirm 时标题为「确认回滚」并展示回滚说明', async () => {
+    const wrapper = mount(HistoryDiffDialog, {
+      global: { stubs: { teleport: true } },
+      props: { onConfirm: vi.fn() },
+    });
+    (wrapper.vm as any).open(basePayload());
+    await nextTick();
+
+    expect(wrapper.findComponent({ name: 'TMagicDialog' }).props('title')).toBe('确认回滚');
+    expect(wrapper.find('.m-editor-history-diff-dialog-notice').text()).toBe('仅回滚有差异的字段');
+  });
+
+  test('无 onConfirm 时不展示回滚说明', async () => {
+    const wrapper = factory();
+    (wrapper.vm as any).open(basePayload());
+    await nextTick();
+
+    expect(wrapper.find('.m-editor-history-diff-dialog-notice').exists()).toBe(false);
   });
 
   test('close() 隐藏对话框并清空 payload', async () => {

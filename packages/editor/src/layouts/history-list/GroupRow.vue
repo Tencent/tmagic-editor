@@ -13,6 +13,8 @@
       <span class="m-editor-history-list-item-op" :class="`op-${opType}`">{{ opLabel(opType) }}</span>
       <span class="m-editor-history-list-item-desc">{{ desc }}</span>
 
+      <span v-if="time" class="m-editor-history-list-item-time" :title="timeTitle || time">{{ time }}</span>
+
       <span v-if="merged" class="m-editor-history-list-item-merge">合并 {{ stepCount }} 步</span>
 
       <span
@@ -48,6 +50,7 @@
       >
         <span class="m-editor-history-list-item-index">#{{ s.index + 1 }}</span>
         <span class="m-editor-history-list-substep-desc">{{ s.desc }}</span>
+        <span v-if="s.time" class="m-editor-history-list-item-time" :title="s.timeTitle || s.time">{{ s.time }}</span>
         <span
           v-if="s.revertable"
           class="m-editor-history-list-item-revert"
@@ -97,6 +100,10 @@ const props = withDefaults(
     opType: HistoryOpType;
     /** 组的整体描述文案，由上层根据 step / group 计算后传入，例如 "修改 button · style.color"。 */
     desc: string;
+    /** 组头部展示的时间文案（一般为组内最近一步的时间），为空时不渲染。 */
+    time?: string;
+    /** 组头部时间的 title 悬浮提示（完整时间），缺省时回退为 time。 */
+    timeTitle?: string;
     /** 组内的 step 总数，仅在 merged 为 true 时显示为 "合并 N 步"。 */
     stepCount: number;
     /** 子步列表，用于在展开状态下逐条展示每个 step 的索引、应用状态与描述文案。 */
@@ -108,6 +115,10 @@ const props = withDefaults(
       diffable?: boolean;
       /** 是否可对该子步执行「回滚」（已应用 + 业务侧确认支持反向）。父级根据 step 与 applied 决定。 */
       revertable?: boolean;
+      /** 该子步的时间文案，为空时不渲染。 */
+      time?: string;
+      /** 该子步时间的 title 悬浮提示（完整时间），缺省时回退为 time。 */
+      timeTitle?: string;
     }[];
     /** 当前组是否处于展开状态。仅在 merged 为 true 时生效，控制子步列表是否渲染。 */
     expanded: boolean;

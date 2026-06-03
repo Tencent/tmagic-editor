@@ -15,6 +15,8 @@
         :merged="group.steps.length > 1"
         :op-type="group.opType"
         :desc="describeGroup(group)"
+        :time="formatHistoryTime(groupTimestamp(group))"
+        :time-title="formatHistoryFullTime(groupTimestamp(group))"
         :step-count="group.steps.length"
         :sub-steps="
           group.steps.map((s: any) => ({
@@ -24,6 +26,8 @@
             desc: describeStep(s.step),
             diffable: isStepDiffable ? isStepDiffable(s.step) : false,
             revertable: s.applied,
+            time: formatHistoryTime(s.step.timestamp),
+            timeTitle: formatHistoryFullTime(s.step.timestamp),
           }))
         "
         :is-current="group.isCurrent"
@@ -54,6 +58,7 @@ import { computed } from 'vue';
 
 import type { HistoryOpType } from '@editor/type';
 
+import { formatHistoryFullTime, formatHistoryTime, groupTimestamp } from './composables';
 import GroupRow from './GroupRow.vue';
 import InitialRow from './InitialRow.vue';
 

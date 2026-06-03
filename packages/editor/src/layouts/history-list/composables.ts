@@ -1,5 +1,7 @@
 import { computed, reactive } from 'vue';
 
+import { datetimeFormatter } from '@tmagic/form';
+
 import { useServices } from '@editor/hooks/use-services';
 import type {
   CodeBlockHistoryGroup,
@@ -66,6 +68,32 @@ export const useHistoryList = () => {
     codeBlockGroupsByTarget,
   };
 };
+
+/**
+ * 历史面板的时间展示：
+ * - 当天的记录只显示 `HH:mm:ss`；
+ * - 跨天的记录显示 `MM-DD HH:mm:ss`。
+ * 无时间戳（旧数据 / 未写入）时返回空串，UI 据此不渲染时间。
+ */
+export const formatHistoryTime = (timestamp?: number): string => {
+  if (!timestamp) return '';
+  const isToday =
+    datetimeFormatter(new Date(timestamp), '', 'YYYY-MM-DD') ===
+    (datetimeFormatter(new Date(), '', 'YYYY-MM-DD') as string);
+  return `${
+    isToday
+      ? datetimeFormatter(new Date(timestamp), '', 'HH:mm:ss')
+      : datetimeFormatter(new Date(timestamp), '', 'MM-DD HH:mm:ss')
+  }`;
+};
+
+/** 完整时间（含年份与秒），用于 title 悬浮提示。无时间戳时返回空串。 */
+export const formatHistoryFullTime = (timestamp?: number): string =>
+  timestamp ? `${datetimeFormatter(new Date(timestamp), '', 'YYYY-MM-DD HH:mm:ss')}` : '';
+
+/** 取一组历史步骤里最后一步（最近一次）的时间戳，用于组头部展示。 */
+export const groupTimestamp = (group: { steps: { step: { timestamp?: number } }[] }): number | undefined =>
+  group.steps[group.steps.length - 1]?.step.timestamp;
 
 export const opLabel = (op: HistoryOpType) => {
   switch (op) {

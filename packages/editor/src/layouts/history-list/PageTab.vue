@@ -10,6 +10,8 @@
         :merged="group.steps.length > 1"
         :op-type="group.opType"
         :desc="describePageGroup(group)"
+        :time="formatHistoryTime(groupTimestamp(group))"
+        :time-title="formatHistoryFullTime(groupTimestamp(group))"
         :step-count="group.steps.length"
         :sub-steps="
           group.steps.map((s) => ({
@@ -19,6 +21,8 @@
             desc: describePageStep(s.step),
             diffable: isPageStepDiffable(s.step),
             revertable: s.applied,
+            time: formatHistoryTime(s.step.timestamp),
+            timeTitle: formatHistoryFullTime(s.step.timestamp),
           }))
         "
         :is-current="group.isCurrent"
@@ -44,7 +48,13 @@ import { TMagicScrollbar } from '@tmagic/design';
 
 import type { PageHistoryGroup, StepValue } from '@editor/type';
 
-import { describePageGroup, describePageStep } from './composables';
+import {
+  describePageGroup,
+  describePageStep,
+  formatHistoryFullTime,
+  formatHistoryTime,
+  groupTimestamp,
+} from './composables';
 import GroupRow from './GroupRow.vue';
 import InitialRow from './InitialRow.vue';
 

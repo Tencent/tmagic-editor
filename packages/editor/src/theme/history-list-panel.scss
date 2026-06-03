@@ -222,6 +222,16 @@
     white-space: nowrap;
   }
 
+  // 操作时间：弱化展示，紧贴在描述之后、各操作按钮之前。
+  .m-editor-history-list-item-time {
+    flex: 0 0 auto;
+    color: #a8abb2;
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+    font-size: 11px;
+    font-weight: 400; // 防止被合并组头部的粗体继承
+    white-space: nowrap;
+  }
+
   .m-editor-history-list-item-op {
     flex: 0 0 auto;
     padding: 0 6px;
@@ -385,6 +395,17 @@
   .m-editor-history-diff-dialog-body {
     display: flex;
     flex-direction: column;
+  }
+
+  .m-editor-history-diff-dialog-notice {
+    margin-bottom: 8px;
+    padding: 8px 12px;
+    background-color: #fdf6ec;
+    border: 1px solid #faecd8;
+    border-radius: 4px;
+    color: #e6a23c;
+    font-size: 13px;
+    line-height: 1.5;
   }
 
   .m-editor-history-diff-dialog-header {

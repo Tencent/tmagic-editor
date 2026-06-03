@@ -708,6 +708,10 @@ export interface StepValue {
    * 不影响 undo/redo 行为；缺省时面板会根据节点 / propPath 自动生成描述。
    */
   historyDescription?: string;
+  /**
+   * 入栈时间戳（毫秒）。在 historyService.push 时自动写入（若调用方未指定），仅用于历史面板展示。
+   */
+  timestamp?: number;
 }
 // #endregion StepValue
 
@@ -732,6 +736,8 @@ export interface CodeBlockStepValue {
   changeRecords?: ChangeRecord[];
   /** 调用方可选传入的人类可读描述，用于历史面板展示；不影响 undo/redo 行为。 */
   historyDescription?: string;
+  /** 入栈时间戳（毫秒），入栈时自动写入，仅用于历史面板展示。 */
+  timestamp?: number;
 }
 // #endregion CodeBlockStepValue
 
@@ -756,6 +762,8 @@ export interface DataSourceStepValue {
   changeRecords?: ChangeRecord[];
   /** 调用方可选传入的人类可读描述，用于历史面板展示；不影响 undo/redo 行为。 */
   historyDescription?: string;
+  /** 入栈时间戳（毫秒），入栈时自动写入，仅用于历史面板展示。 */
+  timestamp?: number;
 }
 // #endregion DataSourceStepValue
 

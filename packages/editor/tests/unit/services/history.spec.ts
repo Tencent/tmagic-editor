@@ -84,6 +84,25 @@ describe('history service', () => {
     expect((history.state.pageSteps as any).p1.canUndo()).toBe(true);
     expect(history.state.canUndo).toBe(true);
   });
+
+  test('push 未带 timestamp 时自动写入入栈时间', () => {
+    history.changePage({ id: 'p1' } as any);
+    const before = Date.now();
+    const step = history.push({ data: { id: 'p1', name: '' }, modifiedNodeIds: new Map() } as any);
+    const after = Date.now();
+    expect(step?.timestamp).toBeGreaterThanOrEqual(before);
+    expect(step?.timestamp).toBeLessThanOrEqual(after);
+  });
+
+  test('push 已带 timestamp 时保留调用方指定的值', () => {
+    history.changePage({ id: 'p1' } as any);
+    const step = history.push({
+      data: { id: 'p1', name: '' },
+      modifiedNodeIds: new Map(),
+      timestamp: 123456,
+    } as any);
+    expect(step?.timestamp).toBe(123456);
+  });
 });
 
 describe('history service - codeBlock', () => {
@@ -109,6 +128,14 @@ describe('history service - codeBlock', () => {
 
   test('pushCodeBlock 不传 id 返回 null', () => {
     expect(history.pushCodeBlock('', { oldContent: null, newContent: null })).toBeNull();
+  });
+
+  test('pushCodeBlock 自动写入入栈时间戳', () => {
+    const before = Date.now();
+    const step = history.pushCodeBlock('code_1', { oldContent: null, newContent: { name: 'A' } as any });
+    const after = Date.now();
+    expect(step?.timestamp).toBeGreaterThanOrEqual(before);
+    expect(step?.timestamp).toBeLessThanOrEqual(after);
   });
 
   test('undoCodeBlock / redoCodeBlock 走对应 id 的 UndoRedo 栈', () => {
@@ -181,6 +208,14 @@ describe('history service - dataSource', () => {
 
   test('pushDataSource 不传 id 返回 null', () => {
     expect(history.pushDataSource('', { oldSchema: null, newSchema: null })).toBeNull();
+  });
+
+  test('pushDataSource 自动写入入栈时间戳', () => {
+    const before = Date.now();
+    const step = history.pushDataSource('ds_1', { oldSchema: null, newSchema: { id: 'ds_1' } as any });
+    const after = Date.now();
+    expect(step?.timestamp).toBeGreaterThanOrEqual(before);
+    expect(step?.timestamp).toBeLessThanOrEqual(after);
   });
 
   test('undoDataSource / redoDataSource 走对应 id 的 UndoRedo 栈', () => {

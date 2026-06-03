@@ -95,7 +95,12 @@
     </template>
   </TMagicPopover>
 
-  <HistoryDiffDialog ref="diffDialog" :extend-state="extendFormState" :on-confirm="onConfirmRevert" />
+  <HistoryDiffDialog
+    ref="diffDialog"
+    :extend-state="extendFormState"
+    :on-confirm="onConfirmRevert"
+    @close="onDiffDialogClose"
+  />
 </template>
 
 <script lang="ts" setup>
@@ -367,5 +372,9 @@ const onCodeBlockRevert = (id: string | number, index: number) => {
   } else {
     onConfirmRevert.value();
   }
+};
+
+const onDiffDialogClose = () => {
+  onConfirmRevert.value = undefined;
 };
 </script>

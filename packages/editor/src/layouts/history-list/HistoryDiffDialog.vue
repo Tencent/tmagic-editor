@@ -3,7 +3,7 @@
     <TMagicDialog
       v-model="visible"
       class="m-editor-history-diff-dialog"
-      title="查看修改差异"
+      :title="dialogTitle"
       top="5vh"
       destroy-on-close
       append-to-body
@@ -11,6 +11,8 @@
       @close="onClose"
     >
       <div v-if="payload" class="m-editor-history-diff-dialog-body">
+        <div v-if="onConfirm" class="m-editor-history-diff-dialog-notice">仅回滚有差异的字段</div>
+
         <div class="m-editor-history-diff-dialog-header">
           <span class="m-editor-history-diff-dialog-target">{{ targetText }}</span>
           <div class="m-editor-history-diff-dialog-controls">
@@ -44,6 +46,7 @@
           :last-value="leftValue"
           :extend-state="extendState"
           :load-config="loadConfig"
+          :self-diff-field-types="selfDiffFieldTypes"
           height="70vh"
         />
 
@@ -100,6 +103,7 @@ const props = withDefaults(
     loadConfig?: CompareFormLoadConfig;
     width?: string;
     onConfirm?: () => void;
+    selfDiffFieldTypes?: string[];
   }>(),
   {
     width: '900px',
@@ -147,6 +151,8 @@ const codeDiffOptions = {
   },
 };
 
+const dialogTitle = computed(() => (props.onConfirm ? '确认回滚' : '查看修改差异'));
+
 const hasCurrent = computed(() => payload.value?.currentValue !== undefined && payload.value?.currentValue !== null);
 
 /** 左侧（旧/参照）值 */
@@ -174,8 +180,10 @@ const isSameAsCurrent = computed(() => {
 
 const onConfirmClick = () => {
   const cb = props.onConfirm;
-  visible.value = false;
+
   cb?.();
+
+  visible.value = false;
 };
 
 const targetText = computed(() => {

@@ -56,6 +56,45 @@ describe('GroupRow.vue', () => {
     expect(wrapper.find('.m-editor-history-list-item-merge').exists()).toBe(false);
   });
 
+  test('传入 time 时头部渲染时间，title 取 timeTitle', () => {
+    const wrapper = mount(GroupRow, {
+      props: { ...baseProps, time: '12:00:00', timeTitle: '2026-06-03 12:00:00' },
+    });
+    const time = wrapper.find('.m-editor-history-list-item-time');
+    expect(time.exists()).toBe(true);
+    expect(time.text()).toBe('12:00:00');
+    expect(time.attributes('title')).toBe('2026-06-03 12:00:00');
+  });
+
+  test('未传 time 时头部不渲染时间元素', () => {
+    const wrapper = mount(GroupRow, { props: baseProps });
+    expect(wrapper.find('.m-editor-history-list-item-time').exists()).toBe(false);
+  });
+
+  test('timeTitle 缺省时 title 回退为 time 本身', () => {
+    const wrapper = mount(GroupRow, { props: { ...baseProps, time: '08:30:00' } });
+    expect(wrapper.find('.m-editor-history-list-item-time').attributes('title')).toBe('08:30:00');
+  });
+
+  test('展开的子步各自渲染自己的时间', () => {
+    const wrapper = mount(GroupRow, {
+      props: {
+        ...baseProps,
+        merged: true,
+        stepCount: 2,
+        expanded: true,
+        subSteps: [
+          { index: 0, applied: true, desc: '修改 颜色', time: '10:00:00', timeTitle: '2026-06-03 10:00:00' },
+          { index: 1, applied: true, desc: '修改 字号', time: '10:01:00', timeTitle: '2026-06-03 10:01:00' },
+        ],
+      },
+    });
+    const items = wrapper.findAll('.m-editor-history-list-substeps li');
+    // 子步倒序渲染：index=1 在前
+    expect(items[0].find('.m-editor-history-list-item-time').text()).toBe('10:01:00');
+    expect(items[1].find('.m-editor-history-list-item-time').text()).toBe('10:00:00');
+  });
+
   test('merged=true 且 expanded=true 时渲染子步列表', () => {
     const wrapper = mount(GroupRow, {
       props: {

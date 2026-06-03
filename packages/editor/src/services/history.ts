@@ -254,6 +254,7 @@ class History extends BaseService {
   public push(state: StepValue, pageId?: Id): StepValue | null {
     const undoRedo = this.getUndoRedo(pageId);
     if (!undoRedo) return null;
+    if (state.timestamp === undefined) state.timestamp = Date.now();
     undoRedo.pushElement(state);
     // 仅当推入的是当前活动页时才需要刷新 canUndo/canRedo —— 其它页栈对当前 UI 状态没影响。
     if (pageId === undefined || `${pageId}` === `${this.state.pageId}`) {
@@ -289,6 +290,7 @@ class History extends BaseService {
       newContent: payload.newContent ? cloneDeep(payload.newContent) : null,
       changeRecords: payload.changeRecords?.length ? cloneDeep(payload.changeRecords) : undefined,
       historyDescription: payload.historyDescription,
+      timestamp: Date.now(),
     };
 
     this.getCodeBlockUndoRedo(codeBlockId).pushElement(step);
@@ -318,6 +320,7 @@ class History extends BaseService {
       newSchema: payload.newSchema ? cloneDeep(payload.newSchema) : null,
       changeRecords: payload.changeRecords?.length ? cloneDeep(payload.changeRecords) : undefined,
       historyDescription: payload.historyDescription,
+      timestamp: Date.now(),
     };
 
     this.getDataSourceUndoRedo(dataSourceId).pushElement(step);
