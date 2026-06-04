@@ -1,3 +1,23 @@
+# [1.8.0-beta.3](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.2...v1.8.0-beta.3) (2026-06-04)
+
+
+### Bug Fixes
+
+* **form:** 对比模式下无 name 字段时不展示差异 ([64d35d5](https://github.com/Tencent/tmagic-editor/commit/64d35d53631698e8d94362765a1621654bd3d1f6))
+
+
+### Features
+
+* **editor:** 历史记录列表展示时间并优化回滚差异弹窗 ([a9e9e65](https://github.com/Tencent/tmagic-editor/commit/a9e9e65f9c50e47b22de8eab7184cebd87632bc6))
+* **editor:** 历史记录差异对比弹窗关闭时派发 close 事件 ([42162f2](https://github.com/Tencent/tmagic-editor/commit/42162f2e4ac651ad78ff2f5291e00639a658a1ae))
+* **editor:** 历史记录面板支持自定义扩展 tab 并开放 Bucket/goto 配置 ([8612311](https://github.com/Tencent/tmagic-editor/commit/8612311db12a22adcc30188ae1ead03729fa6a7a))
+* **editor:** 对比表单支持自定义 loadConfig 加载逻辑 ([1cd69b3](https://github.com/Tencent/tmagic-editor/commit/1cd69b33fecd75fe8522d9a261e1c03e806ecf69))
+* **form:** fieldset legend 支持函数动态生成标题 ([35fc394](https://github.com/Tencent/tmagic-editor/commit/35fc39419902e14e2d5bdf98f99802f05a4b5934))
+* **form:** submitForm 支持返回 changeRecords ([12069e0](https://github.com/Tencent/tmagic-editor/commit/12069e0937589cf9b7684e4bd5ed927e15462513))
+* **stage:** 非点击画布选中组件时高亮闪烁选中区域 ([444d422](https://github.com/Tencent/tmagic-editor/commit/444d4223a943d763a33b752ffbbfa704591820ca))
+
+
+
 # [1.8.0-beta.2](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.1...v1.8.0-beta.2) (2026-05-29)
 
 
