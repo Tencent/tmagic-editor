@@ -1,5 +1,8 @@
 # codeBlockService方法
 
+写入历史栈的方法（[setCodeDslById](#setcodedslbyid)、[setCodeDslByIdSync](#setcodedslbyidsync)、[deleteCodeDslByIds](#deletecodedslbyids) 等）的 `options` 支持
+[historyDescription / historySource](./editorServiceMethods.md#历史记录相关-options)，会透传到 `historyService.pushCodeBlock` 的 `historyDescription` / `source` 字段。
+
 ## setCodeDsl
 
 - **参数：**
@@ -51,6 +54,8 @@
   - `{Object}` options 可选配置
     - {`ChangeRecord`[]} changeRecords form 端变更记录，用于历史记录的精细化撤销/重做
     - `{boolean}` doNotPushHistory 是否不写入历史记录（默认 false）
+    - `{string}` historyDescription 见 [editorService 历史记录相关 options](./editorServiceMethods.md#历史记录相关-options)
+    - `{HistoryOpSource}` historySource 见 [editorService 历史记录相关 options](./editorServiceMethods.md#历史记录相关-options)
 
   ::: details 查看 ChangeRecord 类型定义
   <<< @/../packages/form-schema/src/base.ts#ChangeRecord{ts}
@@ -72,6 +77,8 @@
   - `{Object}` options 可选配置
     - {`ChangeRecord`[]} changeRecords form 端变更记录，用于历史记录的精细化撤销/重做
     - `{boolean}` doNotPushHistory 是否不写入历史记录（默认 false）
+    - `{string}` historyDescription 见 [editorService 历史记录相关 options](./editorServiceMethods.md#历史记录相关-options)
+    - `{HistoryOpSource}` historySource 见 [editorService 历史记录相关 options](./editorServiceMethods.md#历史记录相关-options)
 
 - **返回：**
   - `{void}`
@@ -213,6 +220,8 @@
   - `{(string | number)[]}` codeIds 需要删除的代码块id数组
   - `{Object}` options 可选配置
     - `{boolean}` doNotPushHistory 是否不写入历史记录（默认 false）
+    - `{string}` historyDescription 见 [editorService 历史记录相关 options](./editorServiceMethods.md#历史记录相关-options)
+    - `{HistoryOpSource}` historySource 见 [editorService 历史记录相关 options](./editorServiceMethods.md#历史记录相关-options)
 
 - **返回：**
   - `{Promise<void>}`

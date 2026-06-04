@@ -510,7 +510,7 @@ export interface HistoryListExtraTab {
  * - data-source: 数据源，按 `type`(base/http/...) 从 dataSourceService 获取数据源表单配置
  * - code-block: 数据源代码块，使用内置的代码块表单配置
  */
-export type CompareCategory = 'node' | 'data-source' | 'code-block';
+export type CompareCategory = 'node' | 'data-source' | 'code-block' | string;
 
 /**
  * 自定义 `loadConfig` 时回传的上下文，聚合了组件当前的对比入参，
@@ -683,6 +683,44 @@ export interface CodeParamStatement {
 export type HistoryOpType = 'add' | 'remove' | 'update';
 // #endregion HistoryOpType
 
+// #region HistoryOpSource
+/**
+ * 历史记录的「操作途径」——标记本次变更由哪条交互入口触发，仅用于历史面板展示 / 业务埋点，
+ * 不影响 undo/redo 行为。缺省（未传）时 UI 视为「未知」。
+ *
+ * - `stage`：画布（拖拽 / 缩放 / 排序等舞台直接操作）
+ * - `tree`：树形面板（图层 / 数据源 / 代码块等树形结构里的拖拽 / 菜单操作）
+ * - `component-panel`：组件面板（左侧组件列表点击 / 拖拽新增组件）
+ * - `props`：配置面板表单（属性表单字段编辑）
+ * - `code`：源码编辑器（配置面板「源码」面板里直接编辑 JSON/代码后保存）
+ * - `stage-contextmenu`：画布右键菜单（舞台上节点的右键上下文菜单）
+ * - `tree-contextmenu`：树面板右键菜单（图层 / 数据源 / 代码块等树形列表上的右键上下文菜单）
+ * - `toolbar`：工具栏菜单（顶部导航工具栏按钮）
+ * - `shortcut`：键盘快捷键
+ * - `rollback`：历史回滚（历史面板里对某条历史「回滚」，反向应用为一条新记录，类 git revert）
+ * - `api`：代码 / 接口调用（程序化触发）
+ * - `ai`：AI 生成 / 智能助手触发的变更
+ * - `unknown`：未知来源
+ *
+ * 通过 `(string & {})` 允许业务侧扩展自定义途径字符串，同时保留内置值的自动补全。
+ */
+export type HistoryOpSource =
+  | 'stage'
+  | 'tree'
+  | 'component-panel'
+  | 'props'
+  | 'code'
+  | 'stage-contextmenu'
+  | 'tree-contextmenu'
+  | 'toolbar'
+  | 'shortcut'
+  | 'rollback'
+  | 'api'
+  | 'ai'
+  | 'unknown'
+  | (string & {});
+// #endregion HistoryOpSource
+
 // #region StepValue
 export interface StepValue {
   /** 页面信息 */
@@ -714,6 +752,12 @@ export interface StepValue {
    */
   historyDescription?: string;
   /**
+   * 操作途径：标记本次变更由哪条交互入口触发，取值见 {@link HistoryOpSource}
+   * （画布 / 树面板 / 组件面板 / 配置面板 / 源码编辑器 / 右键菜单 / 工具栏 / 快捷键 / 回滚 / 接口 等）。
+   * 仅用于历史面板展示与业务埋点，不影响 undo/redo 行为；缺省时面板视为「未知」。
+   */
+  source?: HistoryOpSource;
+  /**
    * 入栈时间戳（毫秒）。在 historyService.push 时自动写入（若调用方未指定），仅用于历史面板展示。
    */
   timestamp?: number;
@@ -741,6 +785,8 @@ export interface CodeBlockStepValue {
   changeRecords?: ChangeRecord[];
   /** 调用方可选传入的人类可读描述，用于历史面板展示；不影响 undo/redo 行为。 */
   historyDescription?: string;
+  /** 操作途径：标记本次变更由哪条交互入口触发，取值见 {@link HistoryOpSource}；仅用于历史面板展示与埋点，不影响 undo/redo 行为。 */
+  source?: HistoryOpSource;
   /** 入栈时间戳（毫秒），入栈时自动写入，仅用于历史面板展示。 */
   timestamp?: number;
 }
@@ -767,6 +813,8 @@ export interface DataSourceStepValue {
   changeRecords?: ChangeRecord[];
   /** 调用方可选传入的人类可读描述，用于历史面板展示；不影响 undo/redo 行为。 */
   historyDescription?: string;
+  /** 操作途径：标记本次变更由哪条交互入口触发，取值见 {@link HistoryOpSource}；仅用于历史面板展示与埋点，不影响 undo/redo 行为。 */
+  source?: HistoryOpSource;
   /** 入栈时间戳（毫秒），入栈时自动写入，仅用于历史面板展示。 */
   timestamp?: number;
 }
@@ -1099,16 +1147,21 @@ export const canUsePluginMethods = {
 
 export type AsyncMethodName = Writable<(typeof canUsePluginMethods)['async']>;
 
+// #region HistoryOpOptions
 /**
  * 历史记录写入相关的通用配置（codeBlock / dataSource / editor 共用）
  * - doNotPushHistory: 操作完成后是否不要将本次操作压入历史栈（撤销/重做记录），默认 false
  * - historyDescription: 入栈时附带的人类可读描述，用于历史面板展示；不影响 undo/redo 行为，缺省时面板会自动生成描述
+ * - historySource: 操作途径，取值见 {@link HistoryOpSource}（画布 / 树面板 / 组件面板 / 配置面板 / 源码编辑器 / 右键菜单 / 工具栏 / 快捷键 / 回滚 / 接口 等），用于历史面板展示与埋点；不影响 undo/redo 行为
  */
 export interface HistoryOpOptions {
   doNotPushHistory?: boolean;
   historyDescription?: string;
+  historySource?: HistoryOpSource;
 }
+// #endregion HistoryOpOptions
 
+// #region HistoryOpOptionsWithChangeRecords
 /**
  * 在 HistoryOpOptions 基础上携带 form 端 propPath/value 变更记录，
  * 用于历史记录的精细化撤销/重做（按 propPath 局部 patch）。
@@ -1116,7 +1169,9 @@ export interface HistoryOpOptions {
 export interface HistoryOpOptionsWithChangeRecords extends HistoryOpOptions {
   changeRecords?: ChangeRecord[];
 }
+// #endregion HistoryOpOptionsWithChangeRecords
 
+// #region DslOpOptions
 /**
  * DSL 修改类操作的通用配置
  * - doNotSelect: 操作后是否不要自动触发选中（不调用 this.select / this.multiSelect / stage.select / stage.multiSelect）
@@ -1126,6 +1181,7 @@ export interface DslOpOptions extends HistoryOpOptions {
   doNotSelect?: boolean;
   doNotSwitchPage?: boolean;
 }
+// #endregion DslOpOptions
 
 /** 差异对话框的入参 */
 export interface DiffDialogPayload {

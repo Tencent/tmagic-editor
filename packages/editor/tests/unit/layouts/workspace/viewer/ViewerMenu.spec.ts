@@ -126,9 +126,9 @@ describe('ViewerMenu.vue', () => {
     });
     const menuData = wrapper.findComponent({ name: 'FakeContentMenu' }).props('menuData') as any[];
     menuData.find((m: any) => m.text === '上移一层').handler();
-    expect(editorService.moveLayer).toHaveBeenCalledWith(1);
+    expect(editorService.moveLayer).toHaveBeenCalledWith(1, { historySource: 'stage-contextmenu' });
     menuData.find((m: any) => m.text === '下移一层').handler();
-    expect(editorService.moveLayer).toHaveBeenCalledWith(-1);
+    expect(editorService.moveLayer).toHaveBeenCalledWith(-1, { historySource: 'stage-contextmenu' });
     menuData.find((m: any) => m.text === '置顶').handler();
     menuData.find((m: any) => m.text === '置底').handler();
     expect(editorService.moveLayer).toHaveBeenCalledTimes(4);

@@ -5,11 +5,16 @@ import { cloneDeep, Id, MContainer, NodeType } from '@tmagic/core';
 import { calcValueByFontsize, isPage, isPageFragment } from '@tmagic/utils';
 
 import ContentMenu from '@editor/components/ContentMenu.vue';
-import type { MenuButton, Services } from '@editor/type';
+import type { HistoryOpSource, MenuButton, Services } from '@editor/type';
 
 import { COPY_STORAGE_KEY } from './editor';
 
-export const useDeleteMenu = (): MenuButton => ({
+/**
+ * 共享的右键菜单项构造器（画布 ViewerMenu 与图层树 LayerMenu 共用）。
+ * `historySource` 用于标记本次操作的途径，调用方按所在面板传入：
+ * 画布传 `'stage-contextmenu'`，树形面板传 `'tree-contextmenu'`。
+ */
+export const useDeleteMenu = (historySource?: HistoryOpSource): MenuButton => ({
   type: 'button',
   text: '删除',
   icon: Delete,
@@ -19,7 +24,7 @@ export const useDeleteMenu = (): MenuButton => ({
   },
   handler: ({ editorService }) => {
     const nodes = editorService.get('nodes');
-    nodes && editorService.remove(nodes);
+    nodes && editorService.remove(nodes, { historySource });
   },
 });
 
@@ -33,7 +38,10 @@ export const useCopyMenu = (): MenuButton => ({
   },
 });
 
-export const usePasteMenu = (menu?: ShallowRef<InstanceType<typeof ContentMenu> | null>): MenuButton => ({
+export const usePasteMenu = (
+  historySource?: HistoryOpSource,
+  menu?: ShallowRef<InstanceType<typeof ContentMenu> | null>,
+): MenuButton => ({
   type: 'button',
   text: '粘贴',
   icon: markRaw(DocumentCopy),
@@ -52,14 +60,14 @@ export const usePasteMenu = (menu?: ShallowRef<InstanceType<typeof ContentMenu> 
       const initialTop =
         calcValueByFontsize(stage?.renderer?.getDocument(), (rect.top || 0) - (parentRect?.top || 0)) /
         uiService.get('zoom');
-      editorService.paste({ left: initialLeft, top: initialTop });
+      editorService.paste({ left: initialLeft, top: initialTop }, undefined, { historySource });
     } else {
-      editorService.paste();
+      editorService.paste(undefined, undefined, { historySource });
     }
   },
 });
 
-const moveTo = async (id: Id, { editorService }: Services) => {
+const moveTo = async (id: Id, { editorService }: Services, historySource?: HistoryOpSource) => {
   const nodes = editorService.get('nodes') || [];
   const parent = editorService.getNodeById(id) as MContainer;
 
@@ -69,10 +77,11 @@ const moveTo = async (id: Id, { editorService }: Services) => {
   // 不要再走 remove + add 两步，否则会被切成两条历史（且语义也不正确）。
   await editorService.moveToContainer(cloneDeep(nodes), parent.id, {
     doNotSwitchPage: true,
+    historySource,
   });
 };
 
-export const useMoveToMenu = ({ editorService }: Services): MenuButton => {
+export const useMoveToMenu = ({ editorService }: Services, historySource?: HistoryOpSource): MenuButton => {
   const root = computed(() => editorService.get('root'));
 
   return {
@@ -89,7 +98,7 @@ export const useMoveToMenu = ({ editorService }: Services): MenuButton => {
         text: `${page.name}(${page.id})`,
         type: 'button',
         handler: (services: Services) => {
-          moveTo(page.id, services);
+          moveTo(page.id, services, historySource);
         },
       })),
   };

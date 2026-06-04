@@ -235,7 +235,7 @@ describe('useStage', () => {
   test('sort 事件', () => {
     useStage({} as any);
     stageInstance.handlers.sort[0]({ src: 'a', dist: 'b' });
-    expect(editorService.sort).toHaveBeenCalledWith('a', 'b');
+    expect(editorService.sort).toHaveBeenCalledWith('a', 'b', { historySource: 'stage' });
   });
 
   test('remove 事件', () => {

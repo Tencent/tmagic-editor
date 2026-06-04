@@ -300,6 +300,8 @@ dataSourceService.setFormMethod("http", [
   - {`DataSourceSchema`} config 数据源配置
   - `{Object}` options 可选配置
     - `{boolean}` doNotPushHistory 是否不写入历史记录（默认 false）
+    - `{string}` historyDescription 见 [editorService 历史记录相关 options](./editorServiceMethods.md#历史记录相关-options)
+    - `{HistoryOpSource}` historySource 见 [editorService 历史记录相关 options](./editorServiceMethods.md#历史记录相关-options)
 
 - **返回：**
   - {`DataSourceSchema`} 添加后的数据源配置
@@ -338,6 +340,8 @@ console.log(newDs.id); // 自动生成的id
   - `{Object}` options 可选配置
     - {`ChangeRecord`[]} changeRecords 变更记录
     - `{boolean}` doNotPushHistory 是否不写入历史记录（默认 false）
+    - `{string}` historyDescription 见 [editorService 历史记录相关 options](./editorServiceMethods.md#历史记录相关-options)
+    - `{HistoryOpSource}` historySource 见 [editorService 历史记录相关 options](./editorServiceMethods.md#历史记录相关-options)
 
   ::: details 查看 ChangeRecord 类型定义
   <<< @/../packages/form-schema/src/base.ts#ChangeRecord{ts}
@@ -379,6 +383,8 @@ console.log(updatedDs);
   - `{string}` id 数据源id
   - `{Object}` options 可选配置
     - `{boolean}` doNotPushHistory 是否不写入历史记录（默认 false）
+    - `{string}` historyDescription 见 [editorService 历史记录相关 options](./editorServiceMethods.md#历史记录相关-options)
+    - `{HistoryOpSource}` historySource 见 [editorService 历史记录相关 options](./editorServiceMethods.md#历史记录相关-options)
 
 - **返回：**
   - `{void}`

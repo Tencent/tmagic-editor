@@ -117,7 +117,9 @@ describe('LayerMenu', () => {
     const addItem = arg.find((m: any) => m.text === '新增');
     expect(addItem.items[0].text).toBe('标签页');
     addItem.items[0].handler();
-    expect(editorService.add).toHaveBeenCalledWith({ type: 'tab-pane' });
+    expect(editorService.add).toHaveBeenCalledWith({ type: 'tab-pane' }, undefined, {
+      historySource: 'tree-contextmenu',
+    });
   });
 
   test('node.items 时根据组件列表生成子菜单 (含分隔)', () => {
@@ -151,6 +153,8 @@ describe('LayerMenu', () => {
     const arg = customContentMenu.mock.calls[0][0];
     const addItem = arg.find((m: any) => m.text === '新增');
     addItem.items[0].handler();
-    expect(editorService.add).toHaveBeenCalledWith({ name: 'btn', type: 'button' });
+    expect(editorService.add).toHaveBeenCalledWith({ name: 'btn', type: 'button' }, undefined, {
+      historySource: 'tree-contextmenu',
+    });
   });
 });

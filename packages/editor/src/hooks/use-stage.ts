@@ -130,16 +130,16 @@ export const useStage = (stageOptions: StageOptions) => {
     });
     if (configs.length === 0) return;
 
-    editorService.update(configs, { changeRecordList });
+    editorService.update(configs, { changeRecordList, historySource: 'stage' });
   });
 
   stage.on('sort', (ev: SortEventData) => {
-    editorService.sort(ev.src, ev.dist);
+    editorService.sort(ev.src, ev.dist, { historySource: 'stage' });
   });
 
   stage.on('remove', (ev: RemoveEventData) => {
     const nodes = ev.data.map(({ el }) => editorService.getNodeById(getIdFromEl()(el) || ''));
-    editorService.remove(nodes.filter((node) => Boolean(node)) as MNode[]);
+    editorService.remove(nodes.filter((node) => Boolean(node)) as MNode[], { historySource: 'stage' });
   });
 
   stage.on('select-parent', () => {

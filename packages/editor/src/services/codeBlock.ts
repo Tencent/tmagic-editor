@@ -120,9 +120,19 @@ class CodeBlock extends BaseService {
   public async setCodeDslById(
     id: Id,
     codeConfig: Partial<CodeBlockContent>,
-    { changeRecords, doNotPushHistory = false }: HistoryOpOptionsWithChangeRecords = {},
+    {
+      changeRecords,
+      doNotPushHistory = false,
+      historyDescription,
+      historySource,
+    }: HistoryOpOptionsWithChangeRecords = {},
   ): Promise<void> {
-    this.setCodeDslByIdSync(id, codeConfig, true, { changeRecords, doNotPushHistory });
+    this.setCodeDslByIdSync(id, codeConfig, true, {
+      changeRecords,
+      doNotPushHistory,
+      historyDescription,
+      historySource,
+    });
   }
 
   /**
@@ -141,7 +151,12 @@ class CodeBlock extends BaseService {
     id: Id,
     codeConfig: Partial<CodeBlockContent>,
     force = true,
-    { changeRecords, doNotPushHistory = false, historyDescription }: HistoryOpOptionsWithChangeRecords = {},
+    {
+      changeRecords,
+      doNotPushHistory = false,
+      historyDescription,
+      historySource,
+    }: HistoryOpOptionsWithChangeRecords = {},
   ): void {
     const codeDsl = this.getCodeDsl();
 
@@ -172,7 +187,13 @@ class CodeBlock extends BaseService {
     const newContent = cloneDeep(codeDsl[id]);
 
     if (!doNotPushHistory) {
-      historyService.pushCodeBlock(id, { oldContent, newContent, changeRecords, historyDescription });
+      historyService.pushCodeBlock(id, {
+        oldContent,
+        newContent,
+        changeRecords,
+        historyDescription,
+        source: historySource,
+      });
     }
 
     this.emit('addOrUpdate', id, codeDsl[id]);
@@ -268,7 +289,7 @@ class CodeBlock extends BaseService {
    */
   public async deleteCodeDslByIds(
     codeIds: Id[],
-    { doNotPushHistory = false, historyDescription }: HistoryOpOptions = {},
+    { doNotPushHistory = false, historyDescription, historySource }: HistoryOpOptions = {},
   ): Promise<void> {
     const currentDsl = await this.getCodeDsl();
 
@@ -281,7 +302,7 @@ class CodeBlock extends BaseService {
       delete currentDsl[id];
 
       if (oldContent && !doNotPushHistory) {
-        historyService.pushCodeBlock(id, { oldContent, newContent: null, historyDescription });
+        historyService.pushCodeBlock(id, { oldContent, newContent: null, historyDescription, source: historySource });
       }
 
       this.emit('remove', id);
@@ -471,13 +492,13 @@ class CodeBlock extends BaseService {
 
     // 原本是新增 → revert 即删除
     if (oldContent === null && newContent) {
-      await this.deleteCodeDslByIds([id], { historyDescription });
+      await this.deleteCodeDslByIds([id], { historyDescription, historySource: 'rollback' });
       return historyService.getCodeBlockStepList(id).slice(-1)[0]?.step ?? null;
     }
 
     // 原本是删除 → revert 即写回
     if (oldContent && newContent === null) {
-      this.setCodeDslByIdSync(id, cloneDeep(oldContent), true, { historyDescription });
+      this.setCodeDslByIdSync(id, cloneDeep(oldContent), true, { historyDescription, historySource: 'rollback' });
       return historyService.getCodeBlockStepList(id).slice(-1)[0]?.step ?? null;
     }
 
@@ -500,11 +521,12 @@ class CodeBlock extends BaseService {
       this.setCodeDslByIdSync(id, fallbackToFullReplace ? cloneDeep(oldContent) : patched, true, {
         changeRecords,
         historyDescription,
+        historySource: 'rollback',
       });
       return historyService.getCodeBlockStepList(id).slice(-1)[0]?.step ?? null;
     }
 
-    this.setCodeDslByIdSync(id, cloneDeep(oldContent), true, { historyDescription });
+    this.setCodeDslByIdSync(id, cloneDeep(oldContent), true, { historyDescription, historySource: 'rollback' });
     return historyService.getCodeBlockStepList(id).slice(-1)[0]?.step ?? null;
   }
 

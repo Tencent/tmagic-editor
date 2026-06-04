@@ -104,7 +104,7 @@ describe('useCodeBlockEdit', () => {
     const deleteCodeDslByIds = vi.fn();
     const hook = mountHook({ deleteCodeDslByIds });
     await hook.deleteCode('k');
-    expect(deleteCodeDslByIds).toHaveBeenCalledWith(['k']);
+    expect(deleteCodeDslByIds).toHaveBeenCalledWith(['k'], { historySource: undefined });
   });
 
   test('submitCodeBlockHandler - 没有 codeId 时跳过', async () => {
@@ -119,7 +119,14 @@ describe('useCodeBlockEdit', () => {
     const hook = mountHook({ setCodeDslById });
     hook.codeId.value = 'id1';
     await hook.submitCodeBlockHandler({ name: 'b' } as any);
-    expect(setCodeDslById).toHaveBeenCalledWith('id1', { name: 'b' }, { changeRecords: undefined });
+    expect(setCodeDslById).toHaveBeenCalledWith(
+      'id1',
+      { name: 'b' },
+      {
+        changeRecords: undefined,
+        historySource: 'props',
+      },
+    );
     expect(hideMock).toHaveBeenCalled();
   });
 
@@ -129,6 +136,13 @@ describe('useCodeBlockEdit', () => {
     hook.codeId.value = 'id1';
     const records = [{ propPath: 'name', value: 'b' }];
     await hook.submitCodeBlockHandler({ name: 'b' } as any, { changeRecords: records } as any);
-    expect(setCodeDslById).toHaveBeenCalledWith('id1', { name: 'b' }, { changeRecords: records });
+    expect(setCodeDslById).toHaveBeenCalledWith(
+      'id1',
+      { name: 'b' },
+      {
+        changeRecords: records,
+        historySource: 'props',
+      },
+    );
   });
 });

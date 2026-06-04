@@ -129,7 +129,7 @@ const removeHandler = async (id: string) => {
     type: 'warning',
   });
 
-  dataSourceService.remove(id);
+  dataSourceService.remove(id, { historySource: 'tree-contextmenu' });
 };
 
 const dataSourceListRef = useTemplateRef<InstanceType<typeof DataSourceList>>('dataSourceList');

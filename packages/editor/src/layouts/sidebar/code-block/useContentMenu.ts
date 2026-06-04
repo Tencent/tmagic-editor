@@ -41,7 +41,7 @@ export const useContentMenu = (deleteCode: (id: string) => void) => {
 
         const newCodeId = await codeBlockService.getUniqueId();
 
-        codeBlockService.setCodeDslById(newCodeId, cloneDeep(codeBlock));
+        codeBlockService.setCodeDslById(newCodeId, cloneDeep(codeBlock), { historySource: 'tree-contextmenu' });
       },
     },
     {

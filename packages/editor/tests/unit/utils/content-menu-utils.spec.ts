@@ -114,9 +114,13 @@ describe('content-menu utils', () => {
       toJSON: () => ({}),
     });
     const menu = ref<any>({ $el: menuEl });
-    const m = usePasteMenu(menu);
+    const m = usePasteMenu('stage-contextmenu', menu);
     (m as any).handler({ editorService, uiService: { get: () => 2 } });
-    expect(paste).toHaveBeenCalledWith(expect.objectContaining({ left: expect.any(Number), top: expect.any(Number) }));
+    expect(paste).toHaveBeenCalledWith(
+      expect.objectContaining({ left: expect.any(Number), top: expect.any(Number) }),
+      undefined,
+      { historySource: 'stage-contextmenu' },
+    );
   });
 
   test('useMoveToMenu - display 行为校验', () => {

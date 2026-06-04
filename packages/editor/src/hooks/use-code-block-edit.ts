@@ -6,7 +6,7 @@ import { tMagicMessage } from '@tmagic/design';
 import type { ContainerChangeEventData } from '@tmagic/form';
 
 import CodeBlockEditor from '@editor/components/CodeBlockEditor.vue';
-import type { Services } from '@editor/type';
+import type { HistoryOpSource, Services } from '@editor/type';
 
 export const useCodeBlockEdit = (codeBlockService: Services['codeBlockService']) => {
   const codeConfig = ref<Omit<CodeBlockContent, 'content'> & { content: string }>();
@@ -58,8 +58,8 @@ export const useCodeBlockEdit = (codeBlockService: Services['codeBlockService'])
   };
 
   // 删除代码块
-  const deleteCode = async (key: string) => {
-    codeBlockService.deleteCodeDslByIds([key]);
+  const deleteCode = async (key: string, { historySource }: { historySource?: HistoryOpSource } = {}) => {
+    codeBlockService.deleteCodeDslByIds([key], { historySource });
   };
 
   const submitCodeBlockHandler = async (values: CodeBlockContent, eventData?: ContainerChangeEventData) => {
@@ -67,6 +67,7 @@ export const useCodeBlockEdit = (codeBlockService: Services['codeBlockService'])
 
     await codeBlockService.setCodeDslById(codeId.value, values, {
       changeRecords: eventData?.changeRecords,
+      historySource: 'props',
     });
 
     codeBlockEditorRef.value?.hide();

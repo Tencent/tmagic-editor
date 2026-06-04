@@ -39,7 +39,7 @@ describe('LayerNodeTool', () => {
       props: { data: { id: 'n1', type: 'text', visible: true } as any },
     });
     await wrapper.find('button').trigger('click');
-    expect(editorService.update).toHaveBeenCalledWith({ id: 'n1', visible: false });
+    expect(editorService.update).toHaveBeenCalledWith({ id: 'n1', visible: false }, { historySource: 'tree' });
   });
 
   test('点击按钮切换 visible 状态 (false -> true)', async () => {
@@ -48,6 +48,6 @@ describe('LayerNodeTool', () => {
       props: { data: { id: 'n2', type: 'text', visible: false } as any },
     });
     await wrapper.find('button').trigger('click');
-    expect(editorService.update).toHaveBeenCalledWith({ id: 'n2', visible: true });
+    expect(editorService.update).toHaveBeenCalledWith({ id: 'n2', visible: true }, { historySource: 'tree' });
   });
 });

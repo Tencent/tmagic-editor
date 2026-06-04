@@ -129,7 +129,10 @@ class DataSource extends BaseService {
    * @param options.doNotPushHistory 是否不写入历史记录（默认 false）
    * @param options.historyDescription 入栈时附带的人类可读描述，用于历史面板展示
    */
-  public add(config: DataSourceSchema, { doNotPushHistory = false, historyDescription }: HistoryOpOptions = {}) {
+  public add(
+    config: DataSourceSchema,
+    { doNotPushHistory = false, historyDescription, historySource }: HistoryOpOptions = {},
+  ) {
     const newConfig = {
       ...config,
       id: config.id && !this.getDataSourceById(config.id) ? config.id : this.createId(),
@@ -138,7 +141,12 @@ class DataSource extends BaseService {
     this.get('dataSources').push(newConfig);
 
     if (!doNotPushHistory) {
-      historyService.pushDataSource(newConfig.id, { oldSchema: null, newSchema: newConfig, historyDescription });
+      historyService.pushDataSource(newConfig.id, {
+        oldSchema: null,
+        newSchema: newConfig,
+        historyDescription,
+        source: historySource,
+      });
     }
 
     this.emit('add', newConfig);
@@ -156,7 +164,12 @@ class DataSource extends BaseService {
    */
   public update(
     config: DataSourceSchema,
-    { changeRecords = [], doNotPushHistory = false, historyDescription }: HistoryOpOptionsWithChangeRecords = {},
+    {
+      changeRecords = [],
+      doNotPushHistory = false,
+      historyDescription,
+      historySource,
+    }: HistoryOpOptionsWithChangeRecords = {},
   ) {
     const dataSources = this.get('dataSources');
 
@@ -173,6 +186,7 @@ class DataSource extends BaseService {
         newSchema: newConfig,
         changeRecords,
         historyDescription,
+        source: historySource,
       });
     }
 
@@ -191,14 +205,19 @@ class DataSource extends BaseService {
    * @param options.doNotPushHistory 是否不写入历史记录（默认 false）
    * @param options.historyDescription 入栈时附带的人类可读描述，用于历史面板展示
    */
-  public remove(id: string, { doNotPushHistory = false, historyDescription }: HistoryOpOptions = {}) {
+  public remove(id: string, { doNotPushHistory = false, historyDescription, historySource }: HistoryOpOptions = {}) {
     const dataSources = this.get('dataSources');
     const index = dataSources.findIndex((ds) => ds.id === id);
     const oldConfig = index !== -1 ? dataSources[index] : null;
     dataSources.splice(index, 1);
 
     if (oldConfig && !doNotPushHistory) {
-      historyService.pushDataSource(id, { oldSchema: cloneDeep(oldConfig), newSchema: null, historyDescription });
+      historyService.pushDataSource(id, {
+        oldSchema: cloneDeep(oldConfig),
+        newSchema: null,
+        historyDescription,
+        source: historySource,
+      });
     }
 
     this.emit('remove', id);
@@ -366,13 +385,13 @@ class DataSource extends BaseService {
 
     // 原本是新增 → revert 即删除
     if (oldSchema === null && newSchema) {
-      this.remove(`${id}`, { historyDescription });
+      this.remove(`${id}`, { historyDescription, historySource: 'rollback' });
       return historyService.getDataSourceStepList(id).slice(-1)[0]?.step ?? null;
     }
 
     // 原本是删除 → revert 即重新加回
     if (oldSchema && newSchema === null) {
-      this.add(cloneDeep(oldSchema), { historyDescription });
+      this.add(cloneDeep(oldSchema), { historyDescription, historySource: 'rollback' });
       return historyService.getDataSourceStepList(id).slice(-1)[0]?.step ?? null;
     }
 
@@ -395,11 +414,12 @@ class DataSource extends BaseService {
       this.update(fallbackToFullReplace ? cloneDeep(oldSchema) : patched, {
         changeRecords,
         historyDescription,
+        historySource: 'rollback',
       });
       return historyService.getDataSourceStepList(id).slice(-1)[0]?.step ?? null;
     }
 
-    this.update(cloneDeep(oldSchema), { historyDescription });
+    this.update(cloneDeep(oldSchema), { historyDescription, historySource: 'rollback' });
     return historyService.getDataSourceStepList(id).slice(-1)[0]?.step ?? null;
   }
 

@@ -41,11 +41,15 @@ const createMenuItems = (group: ComponentGroup): MenuButton[] =>
     type: 'button',
     icon: component.icon,
     handler: () => {
-      editorService.add({
-        name: component.text,
-        type: component.type,
-        ...(component.data || {}),
-      });
+      editorService.add(
+        {
+          name: component.text,
+          type: component.type,
+          ...(component.data || {}),
+        },
+        undefined,
+        { historySource: 'tree-contextmenu' },
+      );
     },
   }));
 
@@ -57,9 +61,13 @@ const getSubMenuData = computed<MenuButton[]>(() => {
         type: 'button',
         icon: Files,
         handler: () => {
-          editorService.add({
-            type: 'tab-pane',
-          });
+          editorService.add(
+            {
+              type: 'tab-pane',
+            },
+            undefined,
+            { historySource: 'tree-contextmenu' },
+          );
         },
       },
     ];
@@ -106,9 +114,9 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() =>
         items: getSubMenuData.value,
       },
       useCopyMenu(),
-      usePasteMenu(),
-      useDeleteMenu(),
-      useMoveToMenu(services),
+      usePasteMenu('tree-contextmenu'),
+      useDeleteMenu('tree-contextmenu'),
+      useMoveToMenu(services, 'tree-contextmenu'),
       ...props.layerContentMenu,
     ],
     'layer',

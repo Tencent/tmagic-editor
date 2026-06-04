@@ -94,11 +94,15 @@ let clientX: number;
 let clientY: number;
 
 const appendComponent = ({ text, type, data = {} }: ComponentItem): void => {
-  editorService.add({
-    name: text,
-    type,
-    ...data,
-  });
+  editorService.add(
+    {
+      name: text,
+      type,
+      ...data,
+    },
+    undefined,
+    { historySource: 'component-panel' },
+  );
 };
 
 const dragstartHandler = ({ text, type, data = {} }: ComponentItem, e: DragEvent) => {

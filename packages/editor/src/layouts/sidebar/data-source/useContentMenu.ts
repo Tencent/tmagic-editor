@@ -39,7 +39,7 @@ export const useContentMenu = () => {
           return;
         }
 
-        dataSourceService.add(cloneDeep(ds));
+        dataSourceService.add(cloneDeep(ds), { historySource: 'tree-contextmenu' });
       },
     },
     {

@@ -21,6 +21,8 @@
 
   <<< @/../packages/editor/src/type.ts#HistoryOpType{ts}
 
+  <<< @/../packages/editor/src/type.ts#HistoryOpSource{ts}
+
   <<< @/../packages/schema/src/index.ts#Id{ts}
 
   <<< @/../packages/schema/src/index.ts#MNode{ts}
@@ -38,6 +40,8 @@
 
   ::: details 查看 CodeBlockStepValue 及关联类型定义
   <<< @/../packages/editor/src/type.ts#CodeBlockStepValue{ts}
+
+  <<< @/../packages/editor/src/type.ts#HistoryOpSource{ts}
 
   <<< @/../packages/schema/src/index.ts#CodeBlockContent{ts}
 
@@ -58,6 +62,8 @@
 
   ::: details 查看 DataSourceStepValue 及关联类型定义
   <<< @/../packages/editor/src/type.ts#DataSourceStepValue{ts}
+
+  <<< @/../packages/editor/src/type.ts#HistoryOpSource{ts}
 
   <<< @/../packages/schema/src/index.ts#Id{ts}
   :::

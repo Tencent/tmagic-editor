@@ -36,6 +36,7 @@ import type {
   DslOpOptions,
   EditorEvents,
   EditorNodeInfo,
+  HistoryOpSource,
   HistoryOpType,
   PastePosition,
   StepValue,
@@ -406,7 +407,13 @@ class Editor extends BaseService {
   public async add(
     addNode: AddMNode | MNode[],
     parent?: MContainer | null,
-    { doNotSelect = false, doNotSwitchPage = false, doNotPushHistory = false, historyDescription }: DslOpOptions = {},
+    {
+      doNotSelect = false,
+      doNotSwitchPage = false,
+      doNotPushHistory = false,
+      historyDescription,
+      historySource,
+    }: DslOpOptions = {},
   ): Promise<MNode | MNode[]> {
     this.captureSelectionBeforeOp();
 
@@ -466,9 +473,8 @@ class Editor extends BaseService {
     if (!(isPage(newNodes[0]) || isPageFragment(newNodes[0]))) {
       const pageForOp = this.getNodeInfo(newNodes[0].id, false).page;
       if (!doNotPushHistory) {
-        this.pushOpHistory(
-          'add',
-          {
+        this.pushOpHistory('add', {
+          extra: {
             nodes: newNodes.map((n) => cloneDeep(toRaw(n))),
             parentId: (this.getParentById(newNodes[0].id, false) ?? this.get('root'))!.id,
             indexMap: Object.fromEntries(
@@ -478,9 +484,10 @@ class Editor extends BaseService {
               }),
             ),
           },
-          { name: pageForOp?.name || '', id: pageForOp!.id },
+          pageData: { name: pageForOp?.name || '', id: pageForOp!.id },
           historyDescription,
-        );
+          source: historySource,
+        });
       } else {
         this.selectionBeforeOp = null;
       }
@@ -577,7 +584,13 @@ class Editor extends BaseService {
    */
   public async remove(
     nodeOrNodeList: MNode | MNode[],
-    { doNotSelect = false, doNotSwitchPage = false, doNotPushHistory = false, historyDescription }: DslOpOptions = {},
+    {
+      doNotSelect = false,
+      doNotSwitchPage = false,
+      doNotPushHistory = false,
+      historyDescription,
+      historySource,
+    }: DslOpOptions = {},
   ): Promise<void> {
     this.captureSelectionBeforeOp();
 
@@ -606,7 +619,12 @@ class Editor extends BaseService {
 
     if (removedItems.length > 0 && pageForOp) {
       if (!doNotPushHistory) {
-        this.pushOpHistory('remove', { removedItems }, pageForOp, historyDescription);
+        this.pushOpHistory('remove', {
+          extra: { removedItems },
+          pageData: pageForOp,
+          historyDescription,
+          source: historySource,
+        });
       } else {
         this.selectionBeforeOp = null;
       }
@@ -704,11 +722,12 @@ class Editor extends BaseService {
       changeRecordList?: ChangeRecord[][];
       doNotPushHistory?: boolean;
       historyDescription?: string;
+      historySource?: HistoryOpSource;
     } = {},
   ): Promise<MNode | MNode[]> {
     this.captureSelectionBeforeOp();
 
-    const { doNotPushHistory = false, changeRecordList, changeRecords, historyDescription } = data;
+    const { doNotPushHistory = false, changeRecordList, changeRecords, historyDescription, historySource } = data;
 
     const nodes = Array.isArray(config) ? config : [config];
 
@@ -726,9 +745,8 @@ class Editor extends BaseService {
       if (curNodes.length) {
         if (!doNotPushHistory) {
           const pageForOp = this.getNodeInfo(nodes[0].id, false).page;
-          this.pushOpHistory(
-            'update',
-            {
+          this.pushOpHistory('update', {
+            extra: {
               updatedItems: updateData.map((d) => ({
                 oldNode: cloneDeep(d.oldNode),
                 newNode: cloneDeep(toRaw(d.newNode)),
@@ -737,9 +755,10 @@ class Editor extends BaseService {
                 changeRecords: d.changeRecords?.length ? cloneDeep(d.changeRecords) : undefined,
               })),
             },
-            { name: pageForOp?.name || '', id: pageForOp!.id },
+            pageData: { name: pageForOp?.name || '', id: pageForOp!.id },
             historyDescription,
-          );
+            source: historySource,
+          });
         } else {
           this.selectionBeforeOp = null;
         }
@@ -763,7 +782,7 @@ class Editor extends BaseService {
   public async sort(
     id1: Id,
     id2: Id,
-    { doNotSelect = false, doNotPushHistory = false }: DslOpOptions = {},
+    { doNotSelect = false, doNotPushHistory = false, historySource }: DslOpOptions = {},
   ): Promise<void> {
     this.captureSelectionBeforeOp();
 
@@ -783,7 +802,7 @@ class Editor extends BaseService {
 
     parent.items.splice(index2, 0, ...parent.items.splice(index1, 1));
 
-    await this.update(parent, { doNotPushHistory });
+    await this.update(parent, { doNotPushHistory, historySource });
     if (!doNotSelect) {
       await this.select(node);
     }
@@ -836,7 +855,13 @@ class Editor extends BaseService {
   public async paste(
     position: PastePosition = {},
     collectorOptions?: TargetOptions,
-    { doNotSelect = false, doNotSwitchPage = false, doNotPushHistory = false }: DslOpOptions = {},
+    {
+      doNotSelect = false,
+      doNotSwitchPage = false,
+      doNotPushHistory = false,
+      historyDescription,
+      historySource,
+    }: DslOpOptions = {},
   ): Promise<MNode | MNode[] | void> {
     const config: MNode[] = storageService.getItem(COPY_STORAGE_KEY);
     if (!Array.isArray(config)) return;
@@ -857,7 +882,13 @@ class Editor extends BaseService {
       propsService.replaceRelateId(config, pasteConfigs, collectorOptions);
     }
 
-    return this.add(pasteConfigs, parent, { doNotSelect, doNotSwitchPage, doNotPushHistory });
+    return this.add(pasteConfigs, parent, {
+      doNotSelect,
+      doNotSwitchPage,
+      doNotPushHistory,
+      historyDescription,
+      historySource,
+    });
   }
 
   public async doPaste(config: MNode[], position: PastePosition = {}): Promise<MNode[]> {
@@ -893,14 +924,14 @@ class Editor extends BaseService {
    */
   public async alignCenter(
     config: MNode | MNode[],
-    { doNotSelect = false, doNotPushHistory = false }: DslOpOptions = {},
+    { doNotSelect = false, doNotPushHistory = false, historyDescription, historySource }: DslOpOptions = {},
   ): Promise<MNode | MNode[]> {
     const nodes = Array.isArray(config) ? config : [config];
     const stage = this.get('stage');
 
     const newNodes = await Promise.all(nodes.map((node) => this.doAlignCenter(node)));
 
-    const newNode = await this.update(newNodes, { doNotPushHistory });
+    const newNode = await this.update(newNodes, { doNotPushHistory, historyDescription, historySource });
 
     if (!doNotSelect) {
       if (newNodes.length > 1) {
@@ -919,7 +950,10 @@ class Editor extends BaseService {
    * @param options 可选配置
    * @param options.doNotPushHistory 是否不写入历史记录（默认 false）
    */
-  public async moveLayer(offset: number | LayerOffset, { doNotPushHistory = false }: DslOpOptions = {}): Promise<void> {
+  public async moveLayer(
+    offset: number | LayerOffset,
+    { doNotPushHistory = false, historyDescription, historySource }: DslOpOptions = {},
+  ): Promise<void> {
     this.captureSelectionBeforeOp();
 
     const root = this.get('root');
@@ -960,10 +994,15 @@ class Editor extends BaseService {
       const pageForOp = this.getNodeInfo(node.id, false).page;
       this.pushOpHistory(
         'update',
+
         {
-          updatedItems: [{ oldNode: oldParent, newNode: cloneDeep(toRaw(parent)) }],
+          extra: {
+            updatedItems: [{ oldNode: oldParent, newNode: cloneDeep(toRaw(parent)) }],
+          },
+          pageData: { name: pageForOp?.name || '', id: pageForOp!.id },
+          historyDescription,
+          source: historySource,
         },
-        { name: pageForOp?.name || '', id: pageForOp!.id },
       );
     } else {
       this.selectionBeforeOp = null;
@@ -989,7 +1028,13 @@ class Editor extends BaseService {
   public async moveToContainer(
     config: MNode | MNode[],
     targetId: Id,
-    { doNotSelect = false, doNotSwitchPage = false, doNotPushHistory = false }: DslOpOptions = {},
+    {
+      doNotSelect = false,
+      doNotSwitchPage = false,
+      doNotPushHistory = false,
+      historyDescription,
+      historySource,
+    }: DslOpOptions = {},
   ): Promise<MNode | MNode[]> {
     const isBatch = Array.isArray(config);
     const configs = (isBatch ? config : [config]).filter((item) => !(isPage(item) || isPageFragment(item)));
@@ -1052,7 +1097,12 @@ class Editor extends BaseService {
         newNode: cloneDeep(toRaw(this.getNodeById(id, false))) as MNode,
       }));
       const historyPage = moves[0].pageForOp ?? { name: '', id: target.id };
-      this.pushOpHistory('update', { updatedItems }, historyPage);
+      this.pushOpHistory('update', {
+        extra: { updatedItems },
+        pageData: historyPage,
+        historyDescription,
+        source: historySource,
+      });
     } else {
       this.selectionBeforeOp = null;
     }
@@ -1064,7 +1114,7 @@ class Editor extends BaseService {
     config: MNode | MNode[],
     targetParent: MContainer,
     targetIndex: number,
-    { doNotPushHistory = false }: DslOpOptions = {},
+    { doNotPushHistory = false, historyDescription, historySource }: DslOpOptions = {},
   ) {
     this.captureSelectionBeforeOp();
 
@@ -1127,7 +1177,12 @@ class Editor extends BaseService {
     }
     if (!doNotPushHistory) {
       const pageForOp = this.getNodeInfo(configs[0].id, false).page;
-      this.pushOpHistory('update', { updatedItems }, { name: pageForOp?.name || '', id: pageForOp!.id });
+      this.pushOpHistory('update', {
+        extra: { updatedItems },
+        pageData: { name: pageForOp?.name || '', id: pageForOp!.id },
+        historyDescription,
+        source: historySource,
+      });
     } else {
       this.selectionBeforeOp = null;
     }
@@ -1193,7 +1248,7 @@ class Editor extends BaseService {
 
     const historyDescription = `回滚 #${index + 1}: ${describeStepForRevert(step)}`;
     // revert 走 public add/remove/update，让操作以一条普通新 step 入栈；不要切换选区与页面，避免打断用户。
-    const opts = { doNotSelect: true, doNotSwitchPage: true, historyDescription } as const;
+    const opts = { doNotSelect: true, doNotSwitchPage: true, historyDescription, historySource: 'rollback' } as const;
 
     try {
       switch (step.opType) {
@@ -1241,7 +1296,7 @@ class Editor extends BaseService {
             return cloneDeep(oldNode);
           });
           if (configs.length) {
-            await this.update(configs, { historyDescription });
+            await this.update(configs, { historyDescription, historySource: 'rollback' });
           }
           break;
         }
@@ -1285,14 +1340,21 @@ class Editor extends BaseService {
     return cursor;
   }
 
-  public async move(left: number, top: number, { doNotPushHistory = false }: DslOpOptions = {}) {
+  public async move(
+    left: number,
+    top: number,
+    { doNotPushHistory = false, historyDescription, historySource }: DslOpOptions = {},
+  ) {
     const node = toRaw(this.get('node'));
     if (!node || isPage(node)) return;
 
     const newStyle = calcMoveStyle(node.style || {}, left, top);
     if (!newStyle) return;
 
-    await this.update({ id: node.id, type: node.type, style: newStyle }, { doNotPushHistory });
+    await this.update(
+      { id: node.id, type: node.type, style: newStyle },
+      { doNotPushHistory, historyDescription, historySource },
+    );
   }
 
   public resetState() {
@@ -1350,9 +1412,17 @@ class Editor extends BaseService {
 
   private pushOpHistory(
     opType: HistoryOpType,
-    extra: Partial<StepValue>,
-    pageData: { name: string; id: Id },
-    historyDescription?: string,
+    {
+      extra,
+      pageData,
+      historyDescription,
+      source,
+    }: {
+      extra: Partial<StepValue>;
+      pageData: { name: string; id: Id };
+      historyDescription?: string;
+      source?: HistoryOpSource;
+    },
   ) {
     const step: StepValue = {
       data: pageData,
@@ -1363,6 +1433,7 @@ class Editor extends BaseService {
       ...extra,
     };
     if (historyDescription) step.historyDescription = historyDescription;
+    if (source) step.source = source;
     // 显式按 step.data.id 入栈：跨页操作（如 moveToContainer 从源页搬到目标页）
     // 必须落到正确的页面栈，否则会把记录错误地推到当前活动页 / 操作发起页。
     historyService.push(step, pageData.id);

@@ -151,7 +151,11 @@ const submit = async (v: MNode, eventData?: ContainerChangeEventData) => {
       });
     }
 
-    editorService.update(newValue, { changeRecords: eventData?.changeRecords });
+    // 区分操作途径：表单字段编辑（MForm @change）会带上 eventData（含 changeRecords）；
+    // 源码编辑器（CodeEditor @save → saveCode）保存时不带 eventData，据此标记为「源码编辑器」。
+    const historySource = eventData ? 'props' : 'code';
+
+    editorService.update(newValue, { changeRecords: eventData?.changeRecords, historySource });
   } catch (e: any) {
     emit('submit-error', e);
   }

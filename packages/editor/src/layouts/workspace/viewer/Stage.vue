@@ -380,7 +380,7 @@ const dropHandler = async (e: DragEvent) => {
 
     config.data.inputEvent = e;
 
-    editorService.add(config.data, parent);
+    editorService.add(config.data, parent, { historySource: 'component-panel' });
   }
 };
 </script>

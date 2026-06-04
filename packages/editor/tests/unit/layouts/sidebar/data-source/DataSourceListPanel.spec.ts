@@ -187,7 +187,7 @@ describe('DataSourceListPanel', () => {
     await wrapper.find('.remove-btn').trigger('click');
     expect(messageBoxConfirm).toHaveBeenCalled();
     await new Promise((r) => setTimeout(r, 0));
-    expect(dataSourceService.remove).toHaveBeenCalledWith('d1');
+    expect(dataSourceService.remove).toHaveBeenCalledWith('d1', { historySource: 'tree-contextmenu' });
     await wrapper.find('.ctx-btn').trigger('click');
     expect(nodeContentMenuHandler).toHaveBeenCalled();
   });

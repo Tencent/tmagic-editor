@@ -80,7 +80,7 @@ const getConfig = (item: MenuItem): (MenuButton | MenuComponent)[] => {
         disabled: () => editorService.get('node')?.type === NodeType.PAGE,
         handler: () => {
           const node = editorService.get('node');
-          node && editorService.remove(node);
+          node && editorService.remove(node, { historySource: 'toolbar' });
         },
       });
       break;

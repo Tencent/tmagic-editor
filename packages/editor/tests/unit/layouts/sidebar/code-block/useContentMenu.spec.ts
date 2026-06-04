@@ -70,7 +70,13 @@ describe('code-block useContentMenu', () => {
       setCodeDslById: vi.fn(),
     };
     await (result.menuData[1] as any).handler({ codeBlockService });
-    expect(codeBlockService.setCodeDslById).toHaveBeenCalledWith('newId', { name: 'a' });
+    expect(codeBlockService.setCodeDslById).toHaveBeenCalledWith(
+      'newId',
+      { name: 'a' },
+      {
+        historySource: 'tree-contextmenu',
+      },
+    );
   });
 
   test('复制按钮: 未选中时不触发', async () => {

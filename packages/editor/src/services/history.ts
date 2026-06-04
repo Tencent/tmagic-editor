@@ -27,6 +27,7 @@ import type {
   CodeBlockStepValue,
   DataSourceHistoryGroup,
   DataSourceStepValue,
+  HistoryOpSource,
   HistoryState,
   PageHistoryGroup,
   PageHistoryStepEntry,
@@ -280,6 +281,8 @@ class History extends BaseService {
       changeRecords?: ChangeRecord[];
       /** 可选的人类可读描述（如「修改按钮颜色」），仅用于历史面板展示。 */
       historyDescription?: string;
+      /** 可选的操作途径（配置面板 / 菜单 / 接口等），仅用于历史面板展示与埋点。 */
+      source?: HistoryOpSource;
     },
   ): CodeBlockStepValue | null {
     if (!codeBlockId) return null;
@@ -290,6 +293,7 @@ class History extends BaseService {
       newContent: payload.newContent ? cloneDeep(payload.newContent) : null,
       changeRecords: payload.changeRecords?.length ? cloneDeep(payload.changeRecords) : undefined,
       historyDescription: payload.historyDescription,
+      source: payload.source,
       timestamp: Date.now(),
     };
 
@@ -310,6 +314,8 @@ class History extends BaseService {
       changeRecords?: ChangeRecord[];
       /** 可选的人类可读描述，仅用于历史面板展示。 */
       historyDescription?: string;
+      /** 可选的操作途径（配置面板 / 菜单 / 接口等），仅用于历史面板展示与埋点。 */
+      source?: HistoryOpSource;
     },
   ): DataSourceStepValue | null {
     if (!dataSourceId) return null;
@@ -320,6 +326,7 @@ class History extends BaseService {
       newSchema: payload.newSchema ? cloneDeep(payload.newSchema) : null,
       changeRecords: payload.changeRecords?.length ? cloneDeep(payload.changeRecords) : undefined,
       historyDescription: payload.historyDescription,
+      source: payload.source,
       timestamp: Date.now(),
     };
 

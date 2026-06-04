@@ -27,9 +27,9 @@ export const useDataSourceEdit = (dataSourceService: Services['dataSourceService
 
   const submitDataSourceHandler = (value: DataSourceSchema, eventData: ContainerChangeEventData) => {
     if (value.id) {
-      dataSourceService.update(value, { changeRecords: eventData.changeRecords });
+      dataSourceService.update(value, { changeRecords: eventData.changeRecords, historySource: 'props' });
     } else {
-      dataSourceService.add(value);
+      dataSourceService.add(value, { historySource: 'props' });
     }
 
     editDialog.value?.hide();

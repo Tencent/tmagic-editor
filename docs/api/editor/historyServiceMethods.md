@@ -43,6 +43,8 @@
 
   <<< @/../packages/editor/src/type.ts#HistoryOpType{ts}
 
+  <<< @/../packages/editor/src/type.ts#HistoryOpSource{ts}
+
   <<< @/../packages/schema/src/index.ts#Id{ts}
 
   <<< @/../packages/schema/src/index.ts#MNode{ts}
@@ -61,6 +63,8 @@
   `opType: 'update'` 的每个 `updatedItems[i]` 上可携带 `changeRecords`，用于撤销 / 重做时仅按
   `propPath` 局部更新对应字段，避免整节点替换冲掉同节点上的其它无关变更；不带
   `changeRecords` 时退化为整节点替换（如 `sort` / `moveLayer` / 拖动等纯快照场景）。
+
+  `StepValue` 上的 `historyDescription` / `source` 仅用于历史面板展示与埋点，不影响 undo/redo 行为。
   :::
 
 ## undo
@@ -91,9 +95,13 @@
     - `{CodeBlockContent | null} oldContent` 变更前的代码块内容；新增时为 `null`
     - `{CodeBlockContent | null} newContent` 变更后的代码块内容；删除时为 `null`
     - `{ChangeRecord[]} changeRecords` 可选；form 端 propPath/value 变更列表，撤销/重做时若有则按 propPath 局部更新；缺省（或空数组）才退化为整内容替换
+    - `{string}` historyDescription 可选；人类可读描述，用于历史面板展示；不影响 undo/redo 行为
+    - `{HistoryOpSource}` source 可选；操作途径，用于历史面板展示与埋点；不影响 undo/redo 行为
 
   ::: details 查看 CodeBlockStepValue 及关联类型定义
   <<< @/../packages/editor/src/type.ts#CodeBlockStepValue{ts}
+
+  <<< @/../packages/editor/src/type.ts#HistoryOpSource{ts}
 
   <<< @/../packages/schema/src/index.ts#CodeBlockContent{ts}
 
@@ -172,9 +180,13 @@
     - `{DataSourceSchema | null} oldSchema` 变更前的数据源 schema；新增时为 `null`
     - `{DataSourceSchema | null} newSchema` 变更后的数据源 schema；删除时为 `null`
     - `{ChangeRecord[]} changeRecords` 可选；form 端 propPath/value 变更列表，撤销/重做时若有则按 propPath 局部更新；缺省（或空数组）才退化为整 schema 替换
+    - `{string}` historyDescription 可选；人类可读描述，用于历史面板展示；不影响 undo/redo 行为
+    - `{HistoryOpSource}` source 可选；操作途径，用于历史面板展示与埋点；不影响 undo/redo 行为
 
   ::: details 查看 DataSourceStepValue 及关联类型定义
   <<< @/../packages/editor/src/type.ts#DataSourceStepValue{ts}
+
+  <<< @/../packages/editor/src/type.ts#HistoryOpSource{ts}
 
   <<< @/../packages/form-schema/src/base.ts#ChangeRecord{ts}
   :::

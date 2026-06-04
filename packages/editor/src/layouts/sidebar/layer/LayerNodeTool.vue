@@ -25,9 +25,12 @@ const props = defineProps<{
 const { editorService } = useServices();
 
 const setNodeVisible = (visible: boolean) => {
-  editorService.update({
-    id: props.data.id,
-    visible,
-  });
+  editorService.update(
+    {
+      id: props.data.id,
+      visible,
+    },
+    { historySource: 'tree' },
+  );
 };
 </script>

@@ -67,7 +67,7 @@ describe('data-source useContentMenu', () => {
       add: vi.fn(),
     };
     (result.menuData[1] as any).handler({ dataSourceService });
-    expect(dataSourceService.add).toHaveBeenCalledWith({ name: 'a' });
+    expect(dataSourceService.add).toHaveBeenCalledWith({ name: 'a' }, { historySource: 'tree-contextmenu' });
   });
 
   test('复制按钮: 未选中时不触发', () => {

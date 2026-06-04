@@ -49,11 +49,11 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() =>
         display: () => canCenter.value,
         handler: () => {
           if (!nodes.value) return;
-          editorService.alignCenter(nodes.value);
+          editorService.alignCenter(nodes.value, { historySource: 'stage-contextmenu' });
         },
       },
       useCopyMenu(),
-      usePasteMenu(menuRef),
+      usePasteMenu('stage-contextmenu', menuRef),
       {
         type: 'divider',
         direction: 'horizontal',
@@ -68,7 +68,7 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() =>
         icon: markRaw(Top),
         display: () => !isPage(node.value) && !isPageFragment(node.value) && !props.isMultiSelect,
         handler: () => {
-          editorService.moveLayer(1);
+          editorService.moveLayer(1, { historySource: 'stage-contextmenu' });
         },
       },
       {
@@ -77,7 +77,7 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() =>
         icon: markRaw(Bottom),
         display: () => !isPage(node.value) && !isPageFragment(node.value) && !props.isMultiSelect,
         handler: () => {
-          editorService.moveLayer(-1);
+          editorService.moveLayer(-1, { historySource: 'stage-contextmenu' });
         },
       },
       {
@@ -86,7 +86,7 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() =>
         icon: markRaw(Top),
         display: () => !isPage(node.value) && !isPageFragment(node.value) && !props.isMultiSelect,
         handler: () => {
-          editorService.moveLayer(LayerOffset.TOP);
+          editorService.moveLayer(LayerOffset.TOP, { historySource: 'stage-contextmenu' });
         },
       },
       {
@@ -95,16 +95,16 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() =>
         icon: markRaw(Bottom),
         display: () => !isPage(node.value) && !isPageFragment(node.value) && !props.isMultiSelect,
         handler: () => {
-          editorService.moveLayer(LayerOffset.BOTTOM);
+          editorService.moveLayer(LayerOffset.BOTTOM, { historySource: 'stage-contextmenu' });
         },
       },
-      useMoveToMenu(services),
+      useMoveToMenu(services, 'stage-contextmenu'),
       {
         type: 'divider',
         direction: 'horizontal',
         display: () => !isPage(node.value) && !isPageFragment(node.value) && !props.isMultiSelect,
       },
-      useDeleteMenu(),
+      useDeleteMenu('stage-contextmenu'),
       {
         type: 'divider',
         direction: 'horizontal',

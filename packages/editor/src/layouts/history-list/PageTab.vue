@@ -10,6 +10,7 @@
         :merged="group.steps.length > 1"
         :op-type="group.opType"
         :desc="describePageGroup(group)"
+        :source="groupSource(group)"
         :time="formatHistoryTime(groupTimestamp(group))"
         :time-title="formatHistoryFullTime(groupTimestamp(group))"
         :step-count="group.steps.length"
@@ -21,6 +22,7 @@
             desc: describePageStep(s.step),
             diffable: isPageStepDiffable(s.step),
             revertable: s.applied,
+            source: s.step.source,
             time: formatHistoryTime(s.step.timestamp),
             timeTitle: formatHistoryFullTime(s.step.timestamp),
           }))
@@ -53,6 +55,7 @@ import {
   describePageStep,
   formatHistoryFullTime,
   formatHistoryTime,
+  groupSource,
   groupTimestamp,
 } from './composables';
 import GroupRow from './GroupRow.vue';

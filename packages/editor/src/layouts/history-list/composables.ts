@@ -8,6 +8,7 @@ import type {
   CodeBlockStepValue,
   DataSourceHistoryGroup,
   DataSourceStepValue,
+  HistoryOpSource,
   HistoryOpType,
   PageHistoryGroup,
   StepValue,
@@ -106,6 +107,32 @@ export const opLabel = (op: HistoryOpType) => {
       return '修改';
   }
 };
+
+/** 内置操作途径的中文文案；自定义来源直接回显原值，未知 / 缺省返回空串（UI 据此不渲染）。 */
+const HISTORY_SOURCE_LABELS: Record<string, string> = {
+  stage: '画布',
+  tree: '树面板',
+  'component-panel': '组件面板',
+  props: '配置面板',
+  code: '源码',
+  'stage-contextmenu': '画布菜单',
+  'tree-contextmenu': '树菜单',
+  toolbar: '工具栏',
+  shortcut: '快捷键',
+  rollback: '回滚',
+  api: '接口',
+  ai: 'AI',
+  unknown: '未知',
+};
+
+/** 操作途径文案：用于历史面板展示「画布 / 树面板 / 配置面板…」标签。 */
+export const sourceLabel = (source: HistoryOpSource = 'unknown'): string => {
+  return HISTORY_SOURCE_LABELS[source] ?? `${source}`;
+};
+
+/** 取一组历史步骤里最后一步（最近一次）的操作途径，用于组头部展示。 */
+export const groupSource = (group: { steps: { step: { source?: HistoryOpSource } }[] }): HistoryOpSource | undefined =>
+  group.steps[group.steps.length - 1]?.step.source;
 
 const nameOf = (node: { name?: string; id?: string | number; type?: string }) =>
   node?.name || node?.type || `${node?.id ?? ''}`;

@@ -20,7 +20,7 @@ class Keybinding extends BaseService {
       const nodes = editorService.get('nodes');
 
       if (!nodes || isPage(nodes[0]) || isPageFragment(nodes[0])) return;
-      editorService.remove(nodes);
+      editorService.remove(nodes, { historySource: 'shortcut' });
     },
     [KeyBindingCommand.COPY_NODE]: () => {
       const nodes = editorService.get('nodes');
@@ -31,11 +31,11 @@ class Keybinding extends BaseService {
 
       if (!nodes || isPage(nodes[0]) || isPageFragment(nodes[0])) return;
       editorService.copy(nodes);
-      editorService.remove(nodes);
+      editorService.remove(nodes, { historySource: 'shortcut' });
     },
     [KeyBindingCommand.PASTE_NODE]: () => {
       const nodes = editorService.get('nodes');
-      nodes && editorService.paste({ offsetX: 10, offsetY: 10 });
+      nodes && editorService.paste({ offsetX: 10, offsetY: 10 }, undefined, { historySource: 'shortcut' });
     },
     [KeyBindingCommand.UNDO]: () => {
       editorService.undo();

@@ -13,6 +13,13 @@
       <span class="m-editor-history-list-item-op" :class="`op-${opType}`">{{ opLabel(opType) }}</span>
       <span class="m-editor-history-list-item-desc">{{ desc }}</span>
 
+      <span
+        v-if="sourceLabel(source)"
+        class="m-editor-history-list-item-source"
+        :title="`操作途径：${sourceLabel(source)}`"
+        >{{ sourceLabel(source) }}</span
+      >
+
       <span v-if="time" class="m-editor-history-list-item-time" :title="timeTitle || time">{{ time }}</span>
 
       <span v-if="merged" class="m-editor-history-list-item-merge">合并 {{ stepCount }} 步</span>
@@ -50,6 +57,12 @@
       >
         <span class="m-editor-history-list-item-index">#{{ s.index + 1 }}</span>
         <span class="m-editor-history-list-substep-desc">{{ s.desc }}</span>
+        <span
+          v-if="sourceLabel(s.source)"
+          class="m-editor-history-list-item-source"
+          :title="`操作途径：${sourceLabel(s.source)}`"
+          >{{ sourceLabel(s.source) }}</span
+        >
         <span v-if="s.time" class="m-editor-history-list-item-time" :title="s.timeTitle || s.time">{{ s.time }}</span>
         <span
           v-if="s.revertable"
@@ -80,9 +93,9 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
 
-import type { HistoryOpType } from '@editor/type';
+import type { HistoryOpSource, HistoryOpType } from '@editor/type';
 
-import { opLabel } from './composables';
+import { opLabel, sourceLabel } from './composables';
 
 defineOptions({
   name: 'MEditorHistoryListGroupRow',
@@ -100,6 +113,8 @@ const props = withDefaults(
     opType: HistoryOpType;
     /** 组的整体描述文案，由上层根据 step / group 计算后传入，例如 "修改 button · style.color"。 */
     desc: string;
+    /** 组的操作途径（一般取组内最近一步），用于头部展示「画布 / 树面板 / 配置面板…」标签。 */
+    source?: HistoryOpSource;
     /** 组头部展示的时间文案（一般为组内最近一步的时间），为空时不渲染。 */
     time?: string;
     /** 组头部时间的 title 悬浮提示（完整时间），缺省时回退为 time。 */
@@ -115,6 +130,8 @@ const props = withDefaults(
       diffable?: boolean;
       /** 是否可对该子步执行「回滚」（已应用 + 业务侧确认支持反向）。父级根据 step 与 applied 决定。 */
       revertable?: boolean;
+      /** 该子步的操作途径，用于展示「画布 / 树面板 / 配置面板…」标签。 */
+      source?: HistoryOpSource;
       /** 该子步的时间文案，为空时不渲染。 */
       time?: string;
       /** 该子步时间的 title 悬浮提示（完整时间），缺省时回退为 time。 */

@@ -281,6 +281,20 @@
     white-space: nowrap;
   }
 
+  // 「操作途径」徽标：浅灰描边胶囊，弱化展示来源（画布 / 图层 / 配置面板…），不抢占描述焦点。
+  .m-editor-history-list-item-source {
+    flex: 0 0 auto;
+    padding: 0 6px;
+    border: 1px solid #dcdfe6;
+    border-radius: 8px;
+    font-size: 10px;
+    line-height: 14px;
+    color: #909399;
+    background-color: #f4f4f5;
+    white-space: nowrap;
+    font-weight: 400; // 防止被合并组头部的粗体继承
+  }
+
   // 「合并 N 步」徽标：紫色实心胶囊，与合并组卡片色系一致，醒目区分单步条目。
   .m-editor-history-list-item-merge {
     flex: 0 0 auto;

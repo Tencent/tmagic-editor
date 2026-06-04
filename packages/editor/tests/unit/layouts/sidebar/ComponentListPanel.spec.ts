@@ -97,7 +97,9 @@ describe('ComponentListPanel', () => {
   test('点击 component-item 调用 editorService.add', async () => {
     const wrapper = mount(ComponentListPanel);
     await wrapper.find('.component-item').trigger('click');
-    expect(editorService.add).toHaveBeenCalledWith({ name: '按钮', type: 'button' });
+    expect(editorService.add).toHaveBeenCalledWith({ name: '按钮', type: 'button' }, undefined, {
+      historySource: 'component-panel',
+    });
   });
 
   test('搜索过滤组件', async () => {
