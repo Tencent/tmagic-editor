@@ -14,13 +14,13 @@
       <span class="m-editor-history-list-item-desc">{{ desc }}</span>
 
       <span
-        v-if="sourceLabel(source)"
+        v-if="!merged && sourceLabel(source)"
         class="m-editor-history-list-item-source"
         :title="`操作途径：${sourceLabel(source)}`"
         >{{ sourceLabel(source) }}</span
       >
 
-      <span v-if="time" class="m-editor-history-list-item-time" :title="timeTitle || time">{{ time }}</span>
+      <span v-if="!merged && time" class="m-editor-history-list-item-time" :title="timeTitle || time">{{ time }}</span>
 
       <span v-if="merged" class="m-editor-history-list-item-merge">合并 {{ stepCount }} 步</span>
 
