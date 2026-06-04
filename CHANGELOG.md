@@ -1,3 +1,19 @@
+# [1.8.0-beta.4](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.3...v1.8.0-beta.4) (2026-06-04)
+
+
+### Bug Fixes
+
+* **editor:** 修复历史对比样式配置显示 ([cd19dec](https://github.com/Tencent/tmagic-editor/commit/cd19dec7907cac5cff775f1cbde24cb3f384e87b))
+* **editor:** 修复合并历史记录信息展示 ([3bd0eec](https://github.com/Tencent/tmagic-editor/commit/3bd0eecb42d06f06f50cc4736ecc31cc07cc1886))
+* **editor:** 禁止缺少变更记录的历史回滚 ([10b70c3](https://github.com/Tencent/tmagic-editor/commit/10b70c36bbace6af48bf6fa63f2df0704c6861af))
+
+
+### Features
+
+* **editor:** 历史记录支持操作来源 ([27b2c2c](https://github.com/Tencent/tmagic-editor/commit/27b2c2c68598264e97a1e1ecc34121829851c85e))
+
+
+
 # [1.8.0-beta.3](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.2...v1.8.0-beta.3) (2026-06-04)
 
 
