@@ -152,6 +152,24 @@ const showDiff = ({ curValue, lastValue, config }: { curValue: any; lastValue: a
   return !isEqual(curValue, lastValue);
 };
 
+const removeStyleDisplayConfig = (formConfig: FormConfig): FormConfig =>
+  formConfig.map((item) => {
+    if (!('type' in item)) return item;
+    if (item?.type !== 'tab' || !Array.isArray(item.items)) return item;
+
+    return {
+      ...item,
+      items: item.items.map((tabPane) => {
+        if (tabPane?.title !== '样式' || !Array.isArray(tabPane.items)) return tabPane;
+
+        return {
+          ...tabPane,
+          display: true,
+        };
+      }),
+    };
+  });
+
 /**
  * 内置的默认 FormConfig 加载逻辑：按 `category` 从对应 service / 工具取配置。
  * 作为 ctx.defaultLoadConfig 透传给自定义 `loadConfig`，方便复用与二次加工。
@@ -162,7 +180,7 @@ const defaultLoadConfig = async (): Promise<FormConfig> => {
       if (!props.type) {
         return [];
       }
-      return await propsService.getPropsConfig(props.type);
+      return removeStyleDisplayConfig(await propsService.getPropsConfig(props.type));
     }
     case 'data-source': {
       return dataSourceService.getFormConfig(props.type || 'base');
