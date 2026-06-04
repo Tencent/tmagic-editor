@@ -221,6 +221,7 @@ const stageOptions: StageOptions = {
   guidesOptions: props.guidesOptions,
   disabledMultiSelect: props.disabledMultiSelect,
   alwaysMultiSelect: props.alwaysMultiSelect,
+  disabledFlashTip: props.disabledFlashTip,
   beforeDblclick: props.beforeDblclick,
 };
 

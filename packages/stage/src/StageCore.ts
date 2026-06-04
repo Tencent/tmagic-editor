@@ -25,7 +25,8 @@ import type { Id } from '@tmagic/core';
 import { getIdFromEl } from '@tmagic/core';
 
 import ActionManager from './ActionManager';
-import { DEFAULT_ZOOM } from './const';
+import { DEFAULT_ZOOM, PAGE_CLASS } from './const';
+import StageFlashHighlight from './StageFlashHighlight';
 import StageMask from './StageMask';
 import StageRender from './StageRender';
 import type {
@@ -51,16 +52,20 @@ export default class StageCore extends EventEmitter {
   public renderer: StageRender | null = null;
   public mask: StageMask | null = null;
   public actionManager: ActionManager | null = null;
+  public flashHighlight: StageFlashHighlight | null = null;
 
   private pageResizeObserver: ResizeObserver | null = null;
   private autoScrollIntoView: boolean | undefined;
   private customizedRender?: CustomizeRender;
+  /** 非点击画布选中组件时，是否对选中区域做高亮闪烁提示，默认开启 */
+  private disabledFlashTip: boolean;
 
   constructor(config: StageCoreConfig) {
     super();
 
     this.autoScrollIntoView = config.autoScrollIntoView;
     this.customizedRender = config.render;
+    this.disabledFlashTip = config.disabledFlashTip ?? false;
 
     this.renderer = new StageRender({
       runtimeUrl: config.runtimeUrl,
@@ -78,6 +83,7 @@ export default class StageCore extends EventEmitter {
       disabledRule: config.disabledRule,
     });
     this.actionManager = new ActionManager(this.getActionManagerConfig(config));
+    this.flashHighlight = new StageFlashHighlight({ container: this.mask.content });
 
     this.initRenderEvent();
     this.initActionEvent();
@@ -88,7 +94,7 @@ export default class StageCore extends EventEmitter {
    * 单选选中元素
    * @param id 选中的id
    */
-  public async select(id: Id, event?: MouseEvent): Promise<void> {
+  public async select(id: Id, event?: MouseEvent, options: { flash?: boolean } = {}): Promise<void> {
     if (!this.renderer) {
       return;
     }
@@ -132,6 +138,13 @@ export default class StageCore extends EventEmitter {
 
     if (el && (this.autoScrollIntoView || el.dataset.autoScrollIntoView)) {
       this.mask?.observerIntersection(el);
+    }
+
+    // 非点击画布选中（如从图层树、面包屑等外部选中，此时没有鼠标事件）时，对选中区域做一次高亮闪烁，帮助用户定位组件
+    // 选中页面(mask.page 或带有 magic-ui-page class 的节点)时不做闪烁提示
+    const isPage = el === this.mask?.page || el?.className.includes(PAGE_CLASS);
+    if (el && !event && options.flash !== false && !this.disabledFlashTip && !isPage) {
+      this.flashHighlight?.flash(el);
     }
   }
 
@@ -300,11 +313,12 @@ export default class StageCore extends EventEmitter {
    * 销毁实例
    */
   public destroy(): void {
-    const { mask, renderer, actionManager, pageResizeObserver } = this;
+    const { mask, renderer, actionManager, flashHighlight, pageResizeObserver } = this;
 
     renderer?.destroy();
     mask?.destroy();
     actionManager?.destroy();
+    flashHighlight?.destroy();
     pageResizeObserver?.disconnect();
 
     this.removeAllListeners();
@@ -313,6 +327,7 @@ export default class StageCore extends EventEmitter {
     this.renderer = null;
     this.mask = null;
     this.actionManager = null;
+    this.flashHighlight = null;
     this.pageResizeObserver = null;
   }
 

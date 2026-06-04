@@ -1220,6 +1220,28 @@ const guidesOptions = {
 </template>
 ```
 
+## disabledFlashTip
+
+- **详情：**
+
+  禁用「非点击画布选中组件时的高亮闪烁提示」。
+
+  当组件不是通过点击画布选中（如从组件树、面包屑等外部方式选中）时，编辑器会在画布上对选中区域做一次高亮闪烁，帮助用户快速定位组件在画布中的位置。设置为 `true` 可关闭该提示。
+
+  注：选中页面（`magic-ui-page`）时不会触发闪烁。
+
+- **默认值：** `false`
+
+- **类型：** `boolean`
+
+- **示例：**
+
+```html
+<template>
+  <m-editor :disabled-flash-tip="true"></m-editor>
+</template>
+```
+
 ## disabledStageOverlay
 
 - **详情：**

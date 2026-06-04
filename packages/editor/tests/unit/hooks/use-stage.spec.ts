@@ -116,6 +116,18 @@ describe('useStage', () => {
     expect(stageInstance.mask.setGuides).toHaveBeenCalled();
   });
 
+  test('disabledFlashTip 透传给 StageCore', () => {
+    useStage({ disabledFlashTip: true } as any);
+    const opts = StageCoreCtor.mock.calls[0][0];
+    expect(opts.disabledFlashTip).toBe(true);
+  });
+
+  test('默认不开启 disabledFlashTip（透传 undefined）', () => {
+    useStage({} as any);
+    const opts = StageCoreCtor.mock.calls[0][0];
+    expect(opts.disabledFlashTip).toBeUndefined();
+  });
+
   test('canSelect: 无 stageOptions.canSelect 时返回 true', () => {
     useStage({} as any);
     const opts = StageCoreCtor.mock.calls[0][0];

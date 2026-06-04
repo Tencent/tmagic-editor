@@ -90,6 +90,11 @@ export interface StageCoreConfig {
    */
   alwaysMultiSelect?: boolean;
   disabledRule?: boolean;
+  /**
+   * 是否禁用「非点击画布选中组件时，对选中区域做高亮闪烁提示」，默认 false（即默认开启闪烁提示）。
+   * 用于从图层树、面包屑等外部选中组件时，帮助用户快速定位组件在画布中的位置。
+   */
+  disabledFlashTip?: boolean;
 }
 
 export interface ActionManagerConfig {

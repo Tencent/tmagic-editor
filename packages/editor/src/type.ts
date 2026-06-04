@@ -199,6 +199,11 @@ export interface StageOptions {
    */
   alwaysMultiSelect?: boolean;
   disabledRule?: boolean;
+  /**
+   * 禁用「非点击画布选中组件时（如从图层树、面包屑等外部选中），对选中区域做高亮闪烁提示」，
+   * 默认 false（即默认开启闪烁）
+   */
+  disabledFlashTip?: boolean;
   zoom?: number;
   /** 画布双击前的钩子函数，返回 false 则阻止默认的双击行为 */
   beforeDblclick?: (event: MouseEvent) => Promise<boolean | void> | boolean | void;

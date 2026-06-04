@@ -48,6 +48,7 @@ export const useStage = (stageOptions: StageOptions) => {
     disabledMultiSelect: stageOptions.disabledMultiSelect,
     alwaysMultiSelect: stageOptions.alwaysMultiSelect,
     disabledRule: stageOptions.disabledRule,
+    disabledFlashTip: stageOptions.disabledFlashTip,
   });
 
   watch(

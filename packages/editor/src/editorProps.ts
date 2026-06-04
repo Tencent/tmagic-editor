@@ -87,6 +87,8 @@ export interface EditorProps {
   alwaysMultiSelect?: boolean;
   /** 禁用页面片 */
   disabledPageFragment?: boolean;
+  /** 禁用「非点击画布选中组件时（如从图层树、面包屑等外部选中），对选中区域做高亮闪烁提示」，默认 false（即默认开启闪烁） */
+  disabledFlashTip?: boolean;
   /** 禁用双击在浮层中单独编辑选中组件 */
   disabledStageOverlay?: boolean;
   /** 禁用属性配置面板右下角显示源码的按钮 */
@@ -139,6 +141,7 @@ export const defaultEditorProps = {
   disabledMultiSelect: false,
   alwaysMultiSelect: false,
   disabledPageFragment: false,
+  disabledFlashTip: false,
   disabledStageOverlay: false,
   containerHighlightClassName: CONTAINER_HIGHLIGHT_CLASS_NAME,
   containerHighlightDuration: 800,
