@@ -21,7 +21,7 @@
             isCurrent: s.isCurrent,
             desc: describePageStep(s.step),
             diffable: isPageStepDiffable(s.step),
-            revertable: s.applied,
+            revertable: s.applied && isPageStepRevertable(s.step),
             source: s.step.source,
             time: formatHistoryTime(s.step.timestamp),
             timeTitle: formatHistoryFullTime(s.step.timestamp),
@@ -57,6 +57,7 @@ import {
   formatHistoryTime,
   groupSource,
   groupTimestamp,
+  isPageStepRevertable,
 } from './composables';
 import GroupRow from './GroupRow.vue';
 import InitialRow from './InitialRow.vue';

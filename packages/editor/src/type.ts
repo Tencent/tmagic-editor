@@ -1186,7 +1186,7 @@ export interface DslOpOptions extends HistoryOpOptions {
 /** 差异对话框的入参 */
 export interface DiffDialogPayload {
   /** 表单类别 */
-  category: CompareCategory;
+  category?: CompareCategory;
   /** 节点类型 / 数据源类型 */
   type?: string;
   /** 代码块场景下的数据源类型 */

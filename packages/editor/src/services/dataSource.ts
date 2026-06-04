@@ -297,6 +297,8 @@ class DataSource extends BaseService {
     const list = historyService.getDataSourceStepList(id);
     const entry = list[index];
     if (!entry?.applied) return null;
+    // 更新类步骤（前后 schema 都存在）必须带 changeRecords 才支持回滚，否则只能整 schema 替换，会冲掉后续无关变更。
+    if (entry.step.oldSchema && entry.step.newSchema && !entry.step.changeRecords?.length) return null;
     const description = `回滚 #${index + 1}: ${describeRevertDataSourceStep(entry.step)}`;
     return this.applyRevertStep(entry.step, description);
   }

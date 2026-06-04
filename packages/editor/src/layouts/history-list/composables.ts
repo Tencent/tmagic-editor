@@ -251,3 +251,36 @@ export const describeCodeBlockGroup = (group: CodeBlockHistoryGroup) => {
   const target = labelWithId(rawName, group.id);
   return pathList ? `修改 ${target} · ${pathList}${paths.size > 3 ? '…' : ''}` : `修改 ${target}`;
 };
+
+/**
+ * 页面 step 是否支持「回滚」（类 git revert）：
+ * - 新增 / 删除：不依赖 changeRecords，反向应用即删除 / 加回，始终可回滚；
+ * - 更新：必须每个被更新节点都带有 changeRecords，才支持按 propPath 局部反向 patch。
+ *   缺失 changeRecords 的更新只能整节点替换，会冲掉该节点后续的无关变更，因此不支持回滚。
+ */
+export const isPageStepRevertable = (step: StepValue): boolean => {
+  if (step.opType !== 'update') return true;
+  const items = step.updatedItems ?? [];
+  if (!items.length) return false;
+  return items.every((item) => Boolean(item.changeRecords?.length));
+};
+
+/**
+ * 数据源 step 是否支持「回滚」：
+ * - 新增（oldSchema=null）/ 删除（newSchema=null）：不依赖 changeRecords，始终可回滚；
+ * - 更新（前后 schema 都存在）：必须有 changeRecords 才支持局部反向 patch，否则不支持回滚。
+ */
+export const isDataSourceStepRevertable = (step: DataSourceStepValue): boolean => {
+  if (step.oldSchema === null || step.newSchema === null) return true;
+  return Boolean(step.changeRecords?.length);
+};
+
+/**
+ * 代码块 step 是否支持「回滚」：
+ * - 新增（oldContent=null）/ 删除（newContent=null）：不依赖 changeRecords，始终可回滚；
+ * - 更新（前后 content 都存在）：必须有 changeRecords 才支持局部反向 patch，否则不支持回滚。
+ */
+export const isCodeBlockStepRevertable = (step: CodeBlockStepValue): boolean => {
+  if (step.oldContent === null || step.newContent === null) return true;
+  return Boolean(step.changeRecords?.length);
+};

@@ -11,6 +11,7 @@
       :describe-group="describeGroup"
       :describe-step="describeStep"
       :is-step-diffable="isStepDiffable"
+      :is-step-revertable="isStepRevertable"
       :expanded="expanded"
       :goto-enabled="gotoEnabled"
       @toggle="(key: string) => $emit('toggle', key)"
@@ -48,6 +49,8 @@ withDefaults(
     describeStep: (_step: any) => string;
     /** 判断某个 step 是否可查看差异（前后值都存在）。由父组件按业务类型注入。 */
     isStepDiffable: (_step: any) => boolean;
+    /** 判断某个 step 是否支持回滚（如更新需带 changeRecords）。由父组件按业务类型注入；不传则已应用即可回滚。 */
+    isStepRevertable?: (_step: any) => boolean;
     /**
      * 共享的折叠状态表（key -> 是否展开），由顶层 panel 统一维护。
      * 本 tab 使用 `${prefix}-${id}-${组内首步 index}` 作为 key——以稳定的 step 索引而非展示位置标识分组，

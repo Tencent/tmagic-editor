@@ -44,6 +44,7 @@
             :describe-group="describeDataSourceGroup"
             :describe-step="describeDataSourceStep"
             :is-step-diffable="isDataSourceStepDiffable"
+            :is-step-revertable="isDataSourceStepRevertable"
             @toggle="toggleGroup"
             @goto="onDataSourceGoto"
             @goto-initial="onDataSourceGotoInitial"
@@ -65,6 +66,7 @@
             :describe-group="describeCodeBlockGroup"
             :describe-step="describeCodeBlockStep"
             :is-step-diffable="isCodeBlockStepDiffable"
+            :is-step-revertable="isCodeBlockStepRevertable"
             @toggle="toggleGroup"
             @goto="onCodeBlockGoto"
             @goto-initial="onCodeBlockGotoInitial"
@@ -141,6 +143,8 @@ import {
   describeCodeBlockStep,
   describeDataSourceGroup,
   describeDataSourceStep,
+  isCodeBlockStepRevertable,
+  isDataSourceStepRevertable,
   useHistoryList,
 } from './composables';
 import HistoryDiffDialog from './HistoryDiffDialog.vue';

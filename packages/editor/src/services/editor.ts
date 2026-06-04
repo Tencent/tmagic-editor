@@ -1239,6 +1239,12 @@ class Editor extends BaseService {
     const root = this.get('root');
     if (!root) return null;
 
+    // 更新类步骤必须带 changeRecords 才支持回滚：缺失时只能整节点替换，会冲掉后续无关变更，故不支持。
+    if (step.opType === 'update') {
+      const items = step.updatedItems ?? [];
+      if (!items.length || !items.every((item) => item.changeRecords?.length)) return null;
+    }
+
     // 反向应用产生的新 step 由内部 pushOpHistory 触发 history `change` 事件，监听一次以拿到引用。
     let revertedStep: StepValue | null = null;
     const captureRevert = (s: StepValue) => {

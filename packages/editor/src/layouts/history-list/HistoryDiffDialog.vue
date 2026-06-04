@@ -193,7 +193,8 @@ const targetText = computed(() => {
     'data-source': '数据源',
     'code-block': '代码块',
   };
-  const prefix = categoryText[payload.value.category] || '';
+  const { category } = payload.value;
+  const prefix = category ? categoryText[category] : '';
   const label = payload.value.targetLabel || payload.value.type || '';
   const { id } = payload.value;
   const labelWithId = id !== undefined && id !== '' ? `${label}（${id}）` : label;

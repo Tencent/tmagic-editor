@@ -394,6 +394,8 @@ class CodeBlock extends BaseService {
     const list = historyService.getCodeBlockStepList(id);
     const entry = list[index];
     if (!entry?.applied) return null;
+    // 更新类步骤（前后 content 都存在）必须带 changeRecords 才支持回滚，否则只能整内容替换，会冲掉后续无关变更。
+    if (entry.step.oldContent && entry.step.newContent && !entry.step.changeRecords?.length) return null;
     const description = `回滚 #${index + 1}: ${describeRevertCodeBlockStep(entry.step)}`;
     return await this.applyRevertStep(entry.step, description);
   }

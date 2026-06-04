@@ -17,6 +17,9 @@ import {
   formatHistoryFullTime,
   formatHistoryTime,
   groupTimestamp,
+  isCodeBlockStepRevertable,
+  isDataSourceStepRevertable,
+  isPageStepRevertable,
   opLabel,
   useHistoryList,
 } from '@editor/layouts/history-list/composables';
@@ -605,5 +608,84 @@ describe('useHistoryList', () => {
     const buckets = api.codeBlockGroupsByTarget.value;
     expect(buckets).toHaveLength(2);
     expect(buckets.map((b) => b.id).sort()).toEqual(['code_1', 'code_2']);
+  });
+});
+
+describe('isPageStepRevertable', () => {
+  test('add / remove 始终可回滚', () => {
+    expect(isPageStepRevertable({ opType: 'add', nodes: [{ id: 'n1' }] } as any)).toBe(true);
+    expect(isPageStepRevertable({ opType: 'remove', removedItems: [{ node: { id: 'n1' } }] } as any)).toBe(true);
+  });
+
+  test('update 每项都有 changeRecords 才可回滚', () => {
+    expect(
+      isPageStepRevertable({
+        opType: 'update',
+        updatedItems: [{ oldNode: { id: 'n1' }, newNode: { id: 'n1' }, changeRecords: [{ propPath: 'style.color' }] }],
+      } as any),
+    ).toBe(true);
+  });
+
+  test('update 缺少 changeRecords 不可回滚', () => {
+    expect(
+      isPageStepRevertable({
+        opType: 'update',
+        updatedItems: [{ oldNode: { id: 'n1' }, newNode: { id: 'n1' } }],
+      } as any),
+    ).toBe(false);
+  });
+
+  test('update 多项中任一缺少 changeRecords 不可回滚', () => {
+    expect(
+      isPageStepRevertable({
+        opType: 'update',
+        updatedItems: [
+          { oldNode: { id: 'n1' }, newNode: { id: 'n1' }, changeRecords: [{ propPath: 'a' }] },
+          { oldNode: { id: 'n2' }, newNode: { id: 'n2' } },
+        ],
+      } as any),
+    ).toBe(false);
+  });
+
+  test('update 无 updatedItems 不可回滚', () => {
+    expect(isPageStepRevertable({ opType: 'update' } as any)).toBe(false);
+  });
+});
+
+describe('isDataSourceStepRevertable', () => {
+  test('新增 / 删除 始终可回滚', () => {
+    expect(isDataSourceStepRevertable({ oldSchema: null, newSchema: { id: 'ds_1' } } as any)).toBe(true);
+    expect(isDataSourceStepRevertable({ oldSchema: { id: 'ds_1' }, newSchema: null } as any)).toBe(true);
+  });
+
+  test('更新有 changeRecords 才可回滚', () => {
+    expect(
+      isDataSourceStepRevertable({
+        oldSchema: { id: 'ds_1' },
+        newSchema: { id: 'ds_1' },
+        changeRecords: [{ propPath: 'title' }],
+      } as any),
+    ).toBe(true);
+    expect(isDataSourceStepRevertable({ oldSchema: { id: 'ds_1' }, newSchema: { id: 'ds_1' } } as any)).toBe(false);
+  });
+});
+
+describe('isCodeBlockStepRevertable', () => {
+  test('新增 / 删除 始终可回滚', () => {
+    expect(isCodeBlockStepRevertable({ oldContent: null, newContent: { id: 'code_1' } } as any)).toBe(true);
+    expect(isCodeBlockStepRevertable({ oldContent: { id: 'code_1' }, newContent: null } as any)).toBe(true);
+  });
+
+  test('更新有 changeRecords 才可回滚', () => {
+    expect(
+      isCodeBlockStepRevertable({
+        oldContent: { id: 'code_1' },
+        newContent: { id: 'code_1' },
+        changeRecords: [{ propPath: 'content' }],
+      } as any),
+    ).toBe(true);
+    expect(isCodeBlockStepRevertable({ oldContent: { id: 'code_1' }, newContent: { id: 'code_1' } } as any)).toBe(
+      false,
+    );
   });
 });

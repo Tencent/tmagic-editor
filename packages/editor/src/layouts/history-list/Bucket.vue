@@ -26,7 +26,7 @@
             isCurrent: s.isCurrent,
             desc: describeStep(s.step),
             diffable: isStepDiffable ? isStepDiffable(s.step) : false,
-            revertable: s.applied,
+            revertable: s.applied && (isStepRevertable ? isStepRevertable(s.step) : true),
             source: s.step.source,
             time: formatHistoryTime(s.step.timestamp),
             timeTitle: formatHistoryFullTime(s.step.timestamp),
@@ -94,6 +94,8 @@ const props = withDefaults(
     describeStep: (_step: any) => string;
     /** 判断某个 step 是否可查看差异（前后值都存在）。由父组件按业务类型注入；不传则一律不展示差异入口。 */
     isStepDiffable?: (_step: any) => boolean;
+    /** 判断某个 step 是否支持回滚（如更新需带 changeRecords）。由父组件按业务类型注入；不传则已应用即可回滚。 */
+    isStepRevertable?: (_step: any) => boolean;
     /** 共享的折叠状态表（key -> 是否展开），由顶层 panel 统一维护以便跨 tab 复用。 */
     expanded: Record<string, boolean>;
     /** 是否支持「跳转到该记录」(goto)。默认 true。 */

@@ -58,7 +58,7 @@
     position: absolute;
     right: 15px;
     bottom: 15px;
-    z-index: 30;
+    z-index: 32;
     opacity: 0.5;
 
     &:hover {
@@ -70,7 +70,7 @@
     position: absolute;
     right: 15px;
     bottom: 60px;
-    z-index: 30;
+    z-index: 31;
     opacity: 0.5;
 
     &:hover {
@@ -82,7 +82,7 @@
     position: absolute;
     left: 0;
     top: 0;
-    z-index: 10;
+    z-index: 31;
   }
 
   .m-editor-resizer {
