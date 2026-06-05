@@ -187,6 +187,79 @@ describe('DataSource service - 历史记录接入', () => {
   });
 });
 
+describe('DataSource service - *AndGetHistoryId', () => {
+  const lastStepUuid = (id: string) => {
+    const list = historyService.getDataSourceStepList(id);
+    return list[list.length - 1]?.step.uuid;
+  };
+
+  test('addAndGetHistoryId 返回本次写入历史记录的 uuid', () => {
+    const ds = dataSource.add({ id: 'temp', title: 'a', type: 'base' } as any);
+    historyService.reset();
+
+    const historyId = dataSource.addAndGetHistoryId({ id: 'ds_new', title: 'a', type: 'base' } as any);
+    expect(typeof historyId).toBe('string');
+    expect(historyId).toBe(lastStepUuid('ds_new'));
+    // 与默认 add 行为一致：仍会写入数据源
+    expect(dataSource.getDataSourceById('ds_new')).toBeDefined();
+    expect(ds).toBeDefined();
+  });
+
+  test('addAndGetHistoryId 传 doNotPushHistory 时返回 null', () => {
+    const historyId = dataSource.addAndGetHistoryId({ id: 'ds_x', title: 'a', type: 'base' } as any, {
+      doNotPushHistory: true,
+    });
+    expect(historyId).toBeNull();
+  });
+
+  test('updateAndGetHistoryId 返回本次写入历史记录的 uuid', () => {
+    const created = dataSource.add({ title: 'a', type: 'base' } as any);
+    historyService.reset();
+
+    const historyId = dataSource.updateAndGetHistoryId({ ...created, title: 'b' } as any);
+    expect(typeof historyId).toBe('string');
+    expect(historyId).toBe(lastStepUuid(created.id!));
+  });
+
+  test('removeAndGetHistoryId 返回本次写入历史记录的 uuid；不存在的 id 返回 null', () => {
+    const created = dataSource.add({ title: 'a', type: 'base' } as any);
+    historyService.reset();
+
+    const historyId = dataSource.removeAndGetHistoryId(created.id!);
+    expect(typeof historyId).toBe('string');
+    expect(historyId).toBe(lastStepUuid(created.id!));
+
+    expect(dataSource.removeAndGetHistoryId('ghost')).toBeNull();
+  });
+});
+
+describe('DataSource service - revertById', () => {
+  test('通过 uuid 回滚 add（移除数据源）', () => {
+    const created = dataSource.add({ title: 'a', type: 'base' } as any);
+    const uuid = historyService.getDataSourceStepList(created.id!).slice(-1)[0]?.step.uuid;
+    expect(typeof uuid).toBe('string');
+    expect(dataSource.getDataSourceById(created.id!)).toBeDefined();
+
+    const reverted = dataSource.revertById(uuid!);
+    expect(reverted).not.toBeNull();
+    expect(dataSource.getDataSourceById(created.id!)).toBeUndefined();
+  });
+
+  test('通过 uuid 回滚等价于按 (id, index) 回滚', () => {
+    const created = dataSource.add({ title: 'a', type: 'base' } as any);
+    const uuid = historyService.getDataSourceStepList(created.id!).slice(-1)[0]?.step.uuid;
+
+    const location = historyService.findDataSourceStepLocationByUuid(uuid!);
+    expect(location).toEqual({ id: created.id, index: 0 });
+  });
+
+  test('找不到 uuid 时返回 null', () => {
+    dataSource.add({ title: 'a', type: 'base' } as any);
+    expect(dataSource.revertById('not-exist')).toBeNull();
+    expect(dataSource.revertById('')).toBeNull();
+  });
+});
+
 describe('DataSource service - undo / redo', () => {
   test('undo / redo - 新增场景：撤销=移除，重做=再添加', () => {
     const created = dataSource.add({ title: 'a', type: 'base' } as any);

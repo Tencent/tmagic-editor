@@ -723,6 +723,11 @@ export type HistoryOpSource =
 
 // #region StepValue
 export interface StepValue {
+  /**
+   * 历史记录唯一标识（uuid）。在 historyService.push 时自动写入（若调用方未指定），
+   * 用于精确定位 / 引用某一条历史记录（如 revert、埋点、跨端同步等）。
+   */
+  uuid: string;
   /** 页面信息 */
   data: { name: string; id: Id };
   opType: HistoryOpType;
@@ -772,6 +777,11 @@ export interface StepValue {
  * - 删除：newContent = null，oldContent = 删除前内容
  */
 export interface CodeBlockStepValue {
+  /**
+   * 历史记录唯一标识（uuid），入栈时自动写入，用于精确定位 / 引用某一条历史记录。
+   * 注意与 `id`（关联的代码块 id）区分。
+   */
+  uuid: string;
   /** 关联的代码块 id */
   id: Id;
   /** 变更前的代码块内容，新增时为 null */
@@ -800,6 +810,11 @@ export interface CodeBlockStepValue {
  * - 删除：newSchema = null，oldSchema = 删除前 schema
  */
 export interface DataSourceStepValue {
+  /**
+   * 历史记录唯一标识（uuid），入栈时自动写入，用于精确定位 / 引用某一条历史记录。
+   * 注意与 `id`（关联的数据源 id）区分。
+   */
+  uuid: string;
   /** 关联的数据源 id */
   id: Id;
   /** 变更前的数据源 schema，新增时为 null */

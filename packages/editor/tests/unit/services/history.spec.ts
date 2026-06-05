@@ -103,6 +103,32 @@ describe('history service', () => {
     } as any);
     expect(step?.timestamp).toBe(123456);
   });
+
+  test('push 未带 uuid 时自动生成 uuid', () => {
+    history.changePage({ id: 'p1' } as any);
+    const step = history.push({ data: { id: 'p1', name: '' }, modifiedNodeIds: new Map() } as any);
+    expect(typeof step?.uuid).toBe('string');
+    expect(step?.uuid).toBeTruthy();
+  });
+
+  test('push 已带 uuid 时保留调用方指定的值', () => {
+    history.changePage({ id: 'p1' } as any);
+    const step = history.push({
+      uuid: 'my-uuid',
+      data: { id: 'p1', name: '' },
+      modifiedNodeIds: new Map(),
+    } as any);
+    expect(step?.uuid).toBe('my-uuid');
+  });
+
+  test('push 为每条记录生成不同的 uuid', () => {
+    history.changePage({ id: 'p1' } as any);
+    const s1 = history.push({ data: { id: 'p1', name: '' }, modifiedNodeIds: new Map() } as any);
+    const s2 = history.push({ data: { id: 'p1', name: '' }, modifiedNodeIds: new Map() } as any);
+    expect(s1?.uuid).toBeTruthy();
+    expect(s2?.uuid).toBeTruthy();
+    expect(s1?.uuid).not.toBe(s2?.uuid);
+  });
 });
 
 describe('history service - codeBlock', () => {
@@ -136,6 +162,12 @@ describe('history service - codeBlock', () => {
     const after = Date.now();
     expect(step?.timestamp).toBeGreaterThanOrEqual(before);
     expect(step?.timestamp).toBeLessThanOrEqual(after);
+  });
+
+  test('pushCodeBlock 自动生成 uuid', () => {
+    const step = history.pushCodeBlock('code_1', { oldContent: null, newContent: { name: 'A' } as any });
+    expect(typeof step?.uuid).toBe('string');
+    expect(step?.uuid).toBeTruthy();
   });
 
   test('undoCodeBlock / redoCodeBlock 走对应 id 的 UndoRedo 栈', () => {
@@ -216,6 +248,12 @@ describe('history service - dataSource', () => {
     const after = Date.now();
     expect(step?.timestamp).toBeGreaterThanOrEqual(before);
     expect(step?.timestamp).toBeLessThanOrEqual(after);
+  });
+
+  test('pushDataSource 自动生成 uuid', () => {
+    const step = history.pushDataSource('ds_1', { oldSchema: null, newSchema: { id: 'ds_1' } as any });
+    expect(typeof step?.uuid).toBe('string');
+    expect(step?.uuid).toBeTruthy();
   });
 
   test('undoDataSource / redoDataSource 走对应 id 的 UndoRedo 栈', () => {

@@ -21,6 +21,7 @@ import { cloneDeep } from 'lodash-es';
 
 import type { CodeBlockContent, DataSourceSchema, Id, MPage, MPageFragment } from '@tmagic/core';
 import type { ChangeRecord } from '@tmagic/form';
+import { guid } from '@tmagic/utils';
 
 import type {
   CodeBlockHistoryGroup,
@@ -255,6 +256,7 @@ class History extends BaseService {
   public push(state: StepValue, pageId?: Id): StepValue | null {
     const undoRedo = this.getUndoRedo(pageId);
     if (!undoRedo) return null;
+    if (state.uuid === undefined) state.uuid = guid();
     if (state.timestamp === undefined) state.timestamp = Date.now();
     undoRedo.pushElement(state);
     // 仅当推入的是当前活动页时才需要刷新 canUndo/canRedo —— 其它页栈对当前 UI 状态没影响。
@@ -288,6 +290,7 @@ class History extends BaseService {
     if (!codeBlockId) return null;
 
     const step: CodeBlockStepValue = {
+      uuid: guid(),
       id: codeBlockId,
       oldContent: payload.oldContent ? cloneDeep(payload.oldContent) : null,
       newContent: payload.newContent ? cloneDeep(payload.newContent) : null,
@@ -321,6 +324,7 @@ class History extends BaseService {
     if (!dataSourceId) return null;
 
     const step: DataSourceStepValue = {
+      uuid: guid(),
       id: dataSourceId,
       oldSchema: payload.oldSchema ? cloneDeep(payload.oldSchema) : null,
       newSchema: payload.newSchema ? cloneDeep(payload.newSchema) : null,
@@ -508,6 +512,41 @@ class History extends BaseService {
     const list = undoRedo.getElementList();
     const cursor = undoRedo.getCursor();
     return list.map((step, index) => ({ step, index, applied: index < cursor }));
+  }
+
+  /**
+   * 按历史记录 uuid 在指定页面（默认当前活动页）的栈中查找其索引。
+   * 找不到时返回 -1。供「按 uuid 回滚」等需要把 uuid 映射回 index 的场景使用。
+   */
+  public getPageStepIndexByUuid(uuid: string, pageId?: Id): number {
+    if (!uuid) return -1;
+    return this.getPageStepList(pageId).findIndex((entry) => entry.step.uuid === uuid);
+  }
+
+  /**
+   * 按历史记录 uuid 在全部代码块栈中查找其所属 codeBlockId 与索引。
+   * 找不到时返回 null。
+   */
+  public findCodeBlockStepLocationByUuid(uuid: string): { id: Id; index: number } | null {
+    if (!uuid) return null;
+    for (const id of Object.keys(this.state.codeBlockState)) {
+      const index = this.getCodeBlockStepList(id).findIndex((entry) => entry.step.uuid === uuid);
+      if (index >= 0) return { id, index };
+    }
+    return null;
+  }
+
+  /**
+   * 按历史记录 uuid 在全部数据源栈中查找其所属 dataSourceId 与索引。
+   * 找不到时返回 null。
+   */
+  public findDataSourceStepLocationByUuid(uuid: string): { id: Id; index: number } | null {
+    if (!uuid) return null;
+    for (const id of Object.keys(this.state.dataSourceState)) {
+      const index = this.getDataSourceStepList(id).findIndex((entry) => entry.step.uuid === uuid);
+      if (index >= 0) return { id, index };
+    }
+    return null;
   }
 
   /**

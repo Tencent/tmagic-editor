@@ -65,6 +65,12 @@
   `changeRecords` 时退化为整节点替换（如 `sort` / `moveLayer` / 拖动等纯快照场景）。
 
   `StepValue` 上的 `historyDescription` / `source` 仅用于历史面板展示与埋点，不影响 undo/redo 行为。
+
+  入栈时会为每条记录自动生成唯一标识 `uuid`（调用方未指定时），可用于精确引用 / 定位某一条历史记录。
+  若需要在执行 DSL 操作后拿到本次写入记录的 `uuid`，可使用 editorService / dataSourceService /
+  codeBlockService 提供的 `*AndGetHistoryId` 方法，参见
+  [editorService 历史记录 uuid 与 \*AndGetHistoryId](./editorServiceMethods.md#历史记录-uuid-与-andgethistoryid)。
+  `pushCodeBlock` / `pushDataSource` 同样会自动写入 `uuid`。
   :::
 
 ## undo

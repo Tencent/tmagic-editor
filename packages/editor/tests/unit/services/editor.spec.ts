@@ -711,3 +711,99 @@ describe('undo redo', () => {
     expect(editorService.getNodeById(NodeId.NODE_ID)?.style?.width).toBe(270);
   });
 });
+
+describe('*AndGetHistoryId', () => {
+  const lastStepUuid = () => {
+    const list = historyService.getPageStepList();
+    return list[list.length - 1]?.step.uuid;
+  };
+
+  test('addAndGetHistoryId 返回本次写入历史记录的 uuid，且与栈顶 step 一致', async () => {
+    editorService.set('root', cloneDeep(root));
+    historyService.reset();
+    await editorService.select(NodeId.PAGE_ID);
+
+    const historyId = await editorService.addAndGetHistoryId({ type: 'text' });
+    expect(typeof historyId).toBe('string');
+    expect(historyId).toBeTruthy();
+    expect(historyId).toBe(lastStepUuid());
+  });
+
+  test('addAndGetHistoryId 传 doNotPushHistory 时返回 null', async () => {
+    editorService.set('root', cloneDeep(root));
+    historyService.reset();
+    await editorService.select(NodeId.PAGE_ID);
+
+    const historyId = await editorService.addAndGetHistoryId({ type: 'text' }, null, { doNotPushHistory: true });
+    expect(historyId).toBeNull();
+  });
+
+  test('updateAndGetHistoryId 返回本次写入历史记录的 uuid', async () => {
+    editorService.set('root', cloneDeep(root));
+    historyService.reset();
+    await editorService.select(NodeId.PAGE_ID);
+
+    const historyId = await editorService.updateAndGetHistoryId({ id: NodeId.NODE_ID, type: 'text', text: 'x' });
+    expect(typeof historyId).toBe('string');
+    expect(historyId).toBe(lastStepUuid());
+  });
+
+  test('removeAndGetHistoryId 返回本次写入历史记录的 uuid', async () => {
+    editorService.set('root', cloneDeep(root));
+    historyService.reset();
+    await editorService.select(NodeId.PAGE_ID);
+
+    const historyId = await editorService.removeAndGetHistoryId({ id: NodeId.NODE_ID, type: 'text' });
+    expect(typeof historyId).toBe('string');
+    expect(historyId).toBe(lastStepUuid());
+  });
+
+  test('moveLayerAndGetHistoryId 返回本次写入历史记录的 uuid', async () => {
+    editorService.set('root', cloneDeep(root));
+    historyService.reset();
+    await editorService.select(NodeId.NODE_ID);
+
+    const historyId = await editorService.moveLayerAndGetHistoryId(1);
+    expect(typeof historyId).toBe('string');
+    expect(historyId).toBe(lastStepUuid());
+  });
+});
+
+describe('revertPageStepById', () => {
+  test('通过 uuid 回滚 add 步骤（删除被新增节点）', async () => {
+    editorService.set('root', cloneDeep(root));
+    historyService.reset();
+    await editorService.select(NodeId.PAGE_ID);
+
+    const uuid = await editorService.addAndGetHistoryId({ type: 'text' });
+    expect(typeof uuid).toBe('string');
+
+    const addedStep = historyService.getPageStepList().find((e) => e.step.uuid === uuid)!.step;
+    const addedId = addedStep.nodes![0].id;
+    expect(editorService.getNodeById(addedId)).toBeTruthy();
+
+    const reverted = await editorService.revertPageStepById(uuid!);
+    expect(reverted).not.toBeNull();
+    // 回滚（git revert 语义）会把被新增的节点删掉
+    expect(editorService.getNodeById(addedId)).toBeNull();
+  });
+
+  test('与按 index 回滚结果一致', async () => {
+    editorService.set('root', cloneDeep(root));
+    historyService.reset();
+    await editorService.select(NodeId.PAGE_ID);
+
+    const uuid = await editorService.addAndGetHistoryId({ type: 'text' });
+    const index = historyService.getPageStepIndexByUuid(uuid!);
+    expect(index).toBeGreaterThanOrEqual(0);
+  });
+
+  test('找不到 uuid 时返回 null', async () => {
+    editorService.set('root', cloneDeep(root));
+    historyService.reset();
+    await editorService.select(NodeId.PAGE_ID);
+
+    expect(await editorService.revertPageStepById('not-exist')).toBeNull();
+    expect(await editorService.revertPageStepById('')).toBeNull();
+  });
+});

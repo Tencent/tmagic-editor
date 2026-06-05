@@ -406,6 +406,78 @@ import { dataSourceService } from "@tmagic/editor";
 dataSourceService.remove("ds_123");
 ```
 
+## addAndGetHistoryId
+
+- **参数：** 同 [add](#add)
+
+- **返回：**
+  - {`string` | null} 本次写入历史记录的 uuid；未写入历史（`doNotPushHistory: true` 等）时返回 `null`
+
+- **详情：**
+
+  与 [add](#add) 行为完全一致，仅把返回值换成本次写入历史记录的 `uuid`，可用于精确引用 / 定位该条历史记录。
+  参见 [editorService 历史记录 uuid 与 \*AndGetHistoryId](./editorServiceMethods.md#历史记录-uuid-与-andgethistoryid)。
+
+- **示例：**
+
+```js
+import { dataSourceService } from "@tmagic/editor";
+
+const historyId = dataSourceService.addAndGetHistoryId({
+  type: "http",
+  title: "用户信息",
+  url: "/api/user",
+});
+console.log(historyId); // 本次新增对应的历史记录 uuid，或 null
+```
+
+## updateAndGetHistoryId
+
+- **参数：** 同 [update](#update)
+
+- **返回：**
+  - {`string` | null} 本次写入历史记录的 uuid；未写入历史时返回 `null`
+
+- **详情：**
+
+  与 [update](#update) 行为完全一致，仅把返回值换成本次写入历史记录的 `uuid`
+
+## removeAndGetHistoryId
+
+- **参数：** 同 [remove](#remove)
+
+- **返回：**
+  - {`string` | null} 本次写入历史记录的 uuid；删除的 id 不存在或未写入历史时返回 `null`
+
+- **详情：**
+
+  与 [remove](#remove) 行为完全一致，仅把返回值换成本次写入历史记录的 `uuid`
+
+## revertById
+
+- **参数：**
+  - `{string}` uuid 目标历史记录的 uuid（通常由 [addAndGetHistoryId](#addandgethistoryid) 等方法返回）
+
+- **返回：**
+  - {`DataSourceStepValue` | null} 反向应用后产生的新 step；找不到对应 uuid / 该步未应用时返回 `null`
+
+- **详情：**
+
+  通过历史记录 uuid「回滚」某条数据源历史步骤（类 git revert 语义），语义同按 `(id, index)` 回滚，
+  仅无需调用方再传 `dataSourceId` 与 `index`：内部会按 uuid 在全部数据源栈中定位对应步骤后再回滚。
+  参见 [editorService 历史记录 uuid 与 \*AndGetHistoryId](./editorServiceMethods.md#历史记录-uuid-与-andgethistoryid)。
+
+- **示例：**
+
+```js
+import { dataSourceService } from "@tmagic/editor";
+
+const historyId = dataSourceService.addAndGetHistoryId({ type: "http", title: "用户信息" });
+if (historyId) {
+  dataSourceService.revertById(historyId);
+}
+```
+
 ## createId
 
 - **[扩展支持](../../guide/editor-expand#行为扩展)：** 是

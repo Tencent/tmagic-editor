@@ -78,6 +78,13 @@ class DataSource extends BaseService {
     methods: {},
   });
 
+  /**
+   * 最近一次写入历史栈的数据源历史记录 uuid。
+   * 供 *AndGetHistoryId 系列方法在调用 add / update / remove 后取回本次产生的历史记录 id；
+   * 普通方法不读取它，调用前由 *AndGetHistoryId 重置为 null。
+   */
+  private lastPushedHistoryId: string | null = null;
+
   constructor() {
     super(canUsePluginMethods.sync.map((methodName) => ({ name: methodName, isAsync: false })));
   }
@@ -141,12 +148,13 @@ class DataSource extends BaseService {
     this.get('dataSources').push(newConfig);
 
     if (!doNotPushHistory) {
-      historyService.pushDataSource(newConfig.id, {
-        oldSchema: null,
-        newSchema: newConfig,
-        historyDescription,
-        source: historySource,
-      });
+      this.lastPushedHistoryId =
+        historyService.pushDataSource(newConfig.id, {
+          oldSchema: null,
+          newSchema: newConfig,
+          historyDescription,
+          source: historySource,
+        })?.uuid ?? null;
     }
 
     this.emit('add', newConfig);
@@ -181,13 +189,14 @@ class DataSource extends BaseService {
     dataSources[index] = newConfig;
 
     if (!doNotPushHistory) {
-      historyService.pushDataSource(newConfig.id, {
-        oldSchema: oldConfig ? cloneDeep(oldConfig) : null,
-        newSchema: newConfig,
-        changeRecords,
-        historyDescription,
-        source: historySource,
-      });
+      this.lastPushedHistoryId =
+        historyService.pushDataSource(newConfig.id, {
+          oldSchema: oldConfig ? cloneDeep(oldConfig) : null,
+          newSchema: newConfig,
+          changeRecords,
+          historyDescription,
+          source: historySource,
+        })?.uuid ?? null;
     }
 
     this.emit('update', newConfig, {
@@ -212,16 +221,51 @@ class DataSource extends BaseService {
     dataSources.splice(index, 1);
 
     if (oldConfig && !doNotPushHistory) {
-      historyService.pushDataSource(id, {
-        oldSchema: cloneDeep(oldConfig),
-        newSchema: null,
-        historyDescription,
-        source: historySource,
-      });
+      this.lastPushedHistoryId =
+        historyService.pushDataSource(id, {
+          oldSchema: cloneDeep(oldConfig),
+          newSchema: null,
+          historyDescription,
+          source: historySource,
+        })?.uuid ?? null;
     }
 
     this.emit('remove', id);
   }
+
+  // #region AndGetHistoryId
+  /**
+   * 下列 *AndGetHistoryId 方法与对应的 add / update / remove 行为完全一致，
+   * 唯一区别是返回值为本次写入历史栈的历史记录 uuid（{@link DataSourceStepValue.uuid}），
+   * 而非数据源配置。可用于精确引用 / 定位该条历史记录（埋点、revert、跨端同步等）。
+   *
+   * 当本次操作未写入历史（doNotPushHistory 为 true、或无对应记录）时返回 null。
+   */
+
+  /** 等价于 {@link add}，但返回本次写入历史记录的 uuid（未入栈时返回 null）。 */
+  public addAndGetHistoryId(config: DataSourceSchema, options: HistoryOpOptions = {}): string | null {
+    this.lastPushedHistoryId = null;
+    this.add(config, options);
+    return this.lastPushedHistoryId;
+  }
+
+  /** 等价于 {@link update}，但返回本次写入历史记录的 uuid（未入栈时返回 null）。 */
+  public updateAndGetHistoryId(
+    config: DataSourceSchema,
+    options: HistoryOpOptionsWithChangeRecords = {},
+  ): string | null {
+    this.lastPushedHistoryId = null;
+    this.update(config, options);
+    return this.lastPushedHistoryId;
+  }
+
+  /** 等价于 {@link remove}，但返回本次写入历史记录的 uuid（未入栈时返回 null）。 */
+  public removeAndGetHistoryId(id: string, options: HistoryOpOptions = {}): string | null {
+    this.lastPushedHistoryId = null;
+    this.remove(id, options);
+    return this.lastPushedHistoryId;
+  }
+  // #endregion AndGetHistoryId
 
   /**
    * 撤销指定数据源的最近一次变更。
@@ -301,6 +345,20 @@ class DataSource extends BaseService {
     if (entry.step.oldSchema && entry.step.newSchema && !entry.step.changeRecords?.length) return null;
     const description = `回滚 #${index + 1}: ${describeRevertDataSourceStep(entry.step)}`;
     return this.applyRevertStep(entry.step, description);
+  }
+
+  /**
+   * 通过历史记录 uuid 回滚某条数据源历史步骤，语义同 {@link revert}，
+   * 仅无需调用方再传 dataSourceId 与 index：内部会按 uuid（{@link DataSourceStepValue.uuid}）
+   * 在全部数据源栈中定位对应步骤后再回滚。
+   *
+   * @param uuid 目标历史记录的 uuid，通常由 {@link addAndGetHistoryId} 等方法返回
+   * @returns 反向后产生的新 step；找不到对应 uuid / 未应用时返回 null
+   */
+  public revertById(uuid: string): DataSourceStepValue | null {
+    const location = historyService.findDataSourceStepLocationByUuid(uuid);
+    if (!location) return null;
+    return this.revert(location.id, location.index);
   }
 
   public createId(): string {

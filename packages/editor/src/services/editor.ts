@@ -23,7 +23,15 @@ import type { Id, MApp, MContainer, MNode, MPage, MPageFragment, TargetOptions }
 import { NodeType } from '@tmagic/core';
 import type { ChangeRecord } from '@tmagic/form';
 import { isFixed } from '@tmagic/stage';
-import { getNodeInfo, getNodePath, getValueByKeyPath, isPage, isPageFragment, setValueByKeyPath } from '@tmagic/utils';
+import {
+  getNodeInfo,
+  getNodePath,
+  getValueByKeyPath,
+  guid,
+  isPage,
+  isPageFragment,
+  setValueByKeyPath,
+} from '@tmagic/utils';
 
 import BaseService from '@editor/services//BaseService';
 import propsService from '@editor/services//props';
@@ -116,6 +124,12 @@ class Editor extends BaseService {
     alwaysMultiSelect: false,
   });
   private selectionBeforeOp: Id[] | null = null;
+  /**
+   * 最近一次 pushOpHistory 写入的历史记录 uuid。
+   * 供 *AndGetHistoryId 系列方法在调用普通操作后取回本次产生的历史记录 id；
+   * 普通操作不会读取它，调用前由 *AndGetHistoryId 重置为 null。
+   */
+  private lastPushedHistoryId: string | null = null;
 
   constructor() {
     super(
@@ -1190,6 +1204,86 @@ class Editor extends BaseService {
     this.emit('drag-to', { targetIndex, configs, targetParent });
   }
 
+  // #region AndGetHistoryId
+  /**
+   * 下列 *AndGetHistoryId 方法与对应的普通操作（add / remove / update ...）行为完全一致，
+   * 唯一区别是返回值为本次写入历史栈的历史记录 uuid（{@link StepValue.uuid}），
+   * 而非节点 / 节点数组。可用于精确引用 / 定位该条历史记录（埋点、revert、跨端同步等）。
+   *
+   * 当本次操作未写入历史（doNotPushHistory 为 true、或操作无实际变更 / 提前返回）时返回 null。
+   */
+
+  /** 等价于 {@link add}，但返回本次写入历史记录的 uuid（未入栈时返回 null）。 */
+  public async addAndGetHistoryId(
+    addNode: AddMNode | MNode[],
+    parent?: MContainer | null,
+    options: DslOpOptions = {},
+  ): Promise<string | null> {
+    this.lastPushedHistoryId = null;
+    await this.add(addNode, parent, options);
+    return this.lastPushedHistoryId;
+  }
+
+  /** 等价于 {@link remove}，但返回本次写入历史记录的 uuid（未入栈时返回 null）。 */
+  public async removeAndGetHistoryId(
+    nodeOrNodeList: MNode | MNode[],
+    options: DslOpOptions = {},
+  ): Promise<string | null> {
+    this.lastPushedHistoryId = null;
+    await this.remove(nodeOrNodeList, options);
+    return this.lastPushedHistoryId;
+  }
+
+  /** 等价于 {@link update}，但返回本次写入历史记录的 uuid（未入栈时返回 null）。 */
+  public async updateAndGetHistoryId(
+    config: MNode | MNode[],
+    data: {
+      changeRecords?: ChangeRecord[];
+      changeRecordList?: ChangeRecord[][];
+      doNotPushHistory?: boolean;
+      historyDescription?: string;
+      historySource?: HistoryOpSource;
+    } = {},
+  ): Promise<string | null> {
+    this.lastPushedHistoryId = null;
+    await this.update(config, data);
+    return this.lastPushedHistoryId;
+  }
+
+  /** 等价于 {@link moveLayer}，但返回本次写入历史记录的 uuid（未入栈时返回 null）。 */
+  public async moveLayerAndGetHistoryId(
+    offset: number | LayerOffset,
+    options: DslOpOptions = {},
+  ): Promise<string | null> {
+    this.lastPushedHistoryId = null;
+    await this.moveLayer(offset, options);
+    return this.lastPushedHistoryId;
+  }
+
+  /** 等价于 {@link moveToContainer}，但返回本次写入历史记录的 uuid（未入栈时返回 null）。 */
+  public async moveToContainerAndGetHistoryId(
+    config: MNode | MNode[],
+    targetId: Id,
+    options: DslOpOptions = {},
+  ): Promise<string | null> {
+    this.lastPushedHistoryId = null;
+    await this.moveToContainer(config, targetId, options);
+    return this.lastPushedHistoryId;
+  }
+
+  /** 等价于 {@link dragTo}，但返回本次写入历史记录的 uuid（未入栈时返回 null）。 */
+  public async dragToAndGetHistoryId(
+    config: MNode | MNode[],
+    targetParent: MContainer,
+    targetIndex: number,
+    options: DslOpOptions = {},
+  ): Promise<string | null> {
+    this.lastPushedHistoryId = null;
+    await this.dragTo(config, targetParent, targetIndex, options);
+    return this.lastPushedHistoryId;
+  }
+  // #endregion AndGetHistoryId
+
   /**
    * 撤销当前操作
    * @returns 被撤销的操作
@@ -1321,6 +1415,20 @@ class Editor extends BaseService {
   }
 
   /**
+   * 通过历史记录 uuid 回滚当前页面的某条历史步骤，语义与 {@link revertPageStep} 完全一致，
+   * 仅入参从 index 改为 uuid（{@link StepValue.uuid}）。uuid 不随栈内步骤增删而变化，
+   * 更适合业务侧持有引用后再回滚（埋点、跨端同步等场景）。
+   *
+   * @param uuid 目标历史记录的 uuid，通常由 *AndGetHistoryId 方法返回
+   * @returns 反向后产生的新 step；找不到对应 uuid / 未应用 / 反向失败时返回 null
+   */
+  public async revertPageStepById(uuid: string): Promise<StepValue | null> {
+    const index = historyService.getPageStepIndexByUuid(uuid);
+    if (index < 0) return null;
+    return this.revertPageStep(index);
+  }
+
+  /**
    * 跳转当前页面历史栈到指定游标位置。
    *
    * `targetCursor` 与 `UndoRedo.getCursor()` 同义：表示"已应用步骤数量"，
@@ -1429,8 +1537,9 @@ class Editor extends BaseService {
       historyDescription?: string;
       source?: HistoryOpSource;
     },
-  ) {
+  ): string | null {
     const step: StepValue = {
+      uuid: guid(),
       data: pageData,
       opType,
       selectedBefore: this.selectionBeforeOp ?? [],
@@ -1442,8 +1551,12 @@ class Editor extends BaseService {
     if (source) step.source = source;
     // 显式按 step.data.id 入栈：跨页操作（如 moveToContainer 从源页搬到目标页）
     // 必须落到正确的页面栈，否则会把记录错误地推到当前活动页 / 操作发起页。
-    historyService.push(step, pageData.id);
+    const pushed = historyService.push(step, pageData.id);
+    // push 返回 null 表示当前没有可写入的页面栈（未真正入栈），此时不应返回 uuid。
+    const historyId = pushed ? step.uuid : null;
+    this.lastPushedHistoryId = historyId;
     this.selectionBeforeOp = null;
+    return historyId;
   }
 
   /**

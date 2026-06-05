@@ -231,6 +231,98 @@ describe('CodeBlockService - 历史记录接入', () => {
   });
 });
 
+describe('CodeBlockService - *AndGetHistoryId', () => {
+  const lastStepUuid = (id: string) => {
+    const list = historyService.getCodeBlockStepList(id);
+    return list[list.length - 1]?.step.uuid;
+  };
+
+  test('setCodeDslByIdSyncAndGetHistoryId 返回本次写入历史记录的 uuid', async () => {
+    await codeBlockService.setCodeDsl({} as any);
+
+    const historyId = codeBlockService.setCodeDslByIdSyncAndGetHistoryId('a', { name: 'A' } as any);
+    expect(typeof historyId).toBe('string');
+    expect(historyId).toBe(lastStepUuid('a'));
+    // 与默认行为一致：内容仍被写入
+    expect(codeBlockService.getCodeContentById('a')?.name).toBe('A');
+  });
+
+  test('setCodeDslByIdSyncAndGetHistoryId - force=false 已存在时返回 null', async () => {
+    await codeBlockService.setCodeDsl({ a: { name: 'A' } } as any);
+    const historyId = codeBlockService.setCodeDslByIdSyncAndGetHistoryId('a', { name: 'NEW' } as any, false);
+    expect(historyId).toBeNull();
+  });
+
+  test('setCodeDslByIdSyncAndGetHistoryId - doNotPushHistory 时返回 null', async () => {
+    await codeBlockService.setCodeDsl({} as any);
+    const historyId = codeBlockService.setCodeDslByIdSyncAndGetHistoryId('a', { name: 'A' } as any, true, {
+      doNotPushHistory: true,
+    });
+    expect(historyId).toBeNull();
+  });
+
+  test('setCodeDslByIdAndGetHistoryId（async）返回本次写入历史记录的 uuid', async () => {
+    await codeBlockService.setCodeDsl({} as any);
+
+    const historyId = await codeBlockService.setCodeDslByIdAndGetHistoryId('a', { name: 'A' } as any);
+    expect(typeof historyId).toBe('string');
+    expect(historyId).toBe(lastStepUuid('a'));
+  });
+
+  test('deleteCodeDslByIdsAndGetHistoryId 返回每条删除记录的 uuid 数组', async () => {
+    await codeBlockService.setCodeDsl({ a: { name: 'A' }, b: { name: 'B' } } as any);
+
+    const historyIds = await codeBlockService.deleteCodeDslByIdsAndGetHistoryId(['a', 'b']);
+    expect(Array.isArray(historyIds)).toBe(true);
+    expect(historyIds).toHaveLength(2);
+    expect(historyIds[0]).toBe(lastStepUuid('a'));
+    expect(historyIds[1]).toBe(lastStepUuid('b'));
+  });
+
+  test('deleteCodeDslByIdsAndGetHistoryId - 不存在的 id 不计入返回数组', async () => {
+    await codeBlockService.setCodeDsl({ a: { name: 'A' } } as any);
+
+    const historyIds = await codeBlockService.deleteCodeDslByIdsAndGetHistoryId(['a', 'ghost']);
+    expect(historyIds).toHaveLength(1);
+    expect(historyIds[0]).toBe(lastStepUuid('a'));
+  });
+
+  test('deleteCodeDslByIdsAndGetHistoryId - 全部不存在时返回空数组', async () => {
+    await codeBlockService.setCodeDsl({} as any);
+    const historyIds = await codeBlockService.deleteCodeDslByIdsAndGetHistoryId(['ghost']);
+    expect(historyIds).toEqual([]);
+  });
+});
+
+describe('CodeBlockService - revertById', () => {
+  test('通过 uuid 回滚新增（删除代码块内容）', async () => {
+    await codeBlockService.setCodeDsl({} as any);
+    const uuid = codeBlockService.setCodeDslByIdSyncAndGetHistoryId('a', { name: 'A' } as any);
+    expect(typeof uuid).toBe('string');
+    expect(codeBlockService.getCodeContentById('a')?.name).toBe('A');
+
+    const reverted = await codeBlockService.revertById(uuid!);
+    expect(reverted).not.toBeNull();
+    expect(codeBlockService.getCodeContentById('a')).toBeNull();
+  });
+
+  test('按 uuid 能定位到对应 (id, index)', async () => {
+    await codeBlockService.setCodeDsl({} as any);
+    const uuid = codeBlockService.setCodeDslByIdSyncAndGetHistoryId('a', { name: 'A' } as any);
+
+    const location = historyService.findCodeBlockStepLocationByUuid(uuid!);
+    expect(location).toEqual({ id: 'a', index: 0 });
+  });
+
+  test('找不到 uuid 时返回 null', async () => {
+    await codeBlockService.setCodeDsl({} as any);
+    codeBlockService.setCodeDslByIdSyncAndGetHistoryId('a', { name: 'A' } as any);
+
+    await expect(codeBlockService.revertById('not-exist')).resolves.toBeNull();
+    await expect(codeBlockService.revertById('')).resolves.toBeNull();
+  });
+});
+
 describe('CodeBlockService - undo / redo', () => {
   test('undo / redo - 新增场景：撤销=删除，重做=再写回', async () => {
     await codeBlockService.setCodeDsl({} as any);
