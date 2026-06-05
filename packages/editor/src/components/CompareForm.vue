@@ -180,7 +180,9 @@ const defaultLoadConfig = async (): Promise<FormConfig> => {
       if (!props.type) {
         return [];
       }
-      return removeStyleDisplayConfig(await propsService.getPropsConfig(props.type));
+      return removeStyleDisplayConfig(
+        await propsService.getPropsConfig(props.type, { node: props.value as unknown as MNode }),
+      );
     }
     case 'data-source': {
       return dataSourceService.getFormConfig(props.type || 'base');
