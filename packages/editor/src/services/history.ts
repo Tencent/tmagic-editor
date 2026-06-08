@@ -18,6 +18,7 @@
 
 import { reactive } from 'vue';
 import { cloneDeep } from 'lodash-es';
+import serialize from 'serialize-javascript';
 
 import type { CodeBlockContent, DataSourceSchema, Id, MPage, MPageFragment } from '@tmagic/core';
 import type { ChangeRecord } from '@tmagic/form';
@@ -29,14 +30,25 @@ import type {
   DataSourceHistoryGroup,
   DataSourceStepValue,
   HistoryOpSource,
+  HistoryPersistOptions,
   HistoryState,
   PageHistoryGroup,
   PageHistoryStepEntry,
+  PersistedHistoryState,
   StepValue,
 } from '@editor/type';
+import { getEditorConfig } from '@editor/utils/config';
+import { idbGet, idbSet } from '@editor/utils/indexed-db';
 import { UndoRedo } from '@editor/utils/undo-redo';
 
 import BaseService from './BaseService';
+import editorService from './editor';
+
+/** 历史记录持久化快照的默认存储位置与结构版本。 */
+const DEFAULT_DB_NAME = 'tmagic-editor';
+const DEFAULT_STORE_NAME = 'history';
+const DEFAULT_KEY: IDBValidKey = 'default';
+const PERSIST_VERSION = 1;
 
 class History extends BaseService {
   /**
@@ -194,6 +206,45 @@ class History extends BaseService {
       return step.removedItems?.length ? `${step.removedItems.length} 个节点` : undefined;
     }
     return undefined;
+  }
+
+  /**
+   * 把单个栈当前游标所在记录标记为已保存：先清除该栈内全部旧标记，保证同一栈最多一条 `saved`。
+   * 栈处于「全部已撤销」（cursor 为 0）时不会留下已保存记录，恢复时其游标回到 0。
+   */
+  private static markStackSaved<S extends { saved?: boolean }>(undoRedo?: UndoRedo<S>): void {
+    if (!undoRedo) return;
+    undoRedo.updateElements((element) => {
+      element.saved = false;
+    });
+    undoRedo.updateCurrentElement((element) => {
+      element.saved = true;
+    });
+  }
+
+  /** 把 `Record<Id, UndoRedo>` 整体序列化为 `Record<Id, SerializedUndoRedo>`。 */
+  private static serializeStacks<T>(stacks: Record<Id, UndoRedo<T>>) {
+    const result: Record<Id, ReturnType<UndoRedo<T>['serialize']>> = {};
+    Object.entries(stacks).forEach(([id, undoRedo]) => {
+      if (undoRedo) result[id] = undoRedo.serialize();
+    });
+    return result;
+  }
+
+  /**
+   * 把 `Record<Id, SerializedUndoRedo>` 整体还原为 `Record<Id, UndoRedo>`。
+   * 还原时把每个栈的游标定位到最近一条已保存（`saved === true`）记录之后。
+   */
+  private static deserializeStacks<T extends { saved?: boolean }>(
+    stacks: Record<Id, ReturnType<UndoRedo<T>['serialize']>> = {},
+  ): Record<Id, UndoRedo<T>> {
+    const result: Record<Id, UndoRedo<T>> = {};
+    Object.entries(stacks).forEach(([id, serialized]) => {
+      if (serialized) {
+        result[id] = UndoRedo.fromSerialized<T>(serialized, { isSavedStep: (element) => element.saved === true });
+      }
+    });
+    return result;
   }
 
   public state = reactive<HistoryState>({
@@ -418,6 +469,137 @@ class History extends BaseService {
   }
 
   /**
+   * 清空指定页面（缺省当前活动页）的历史记录栈。
+   * 仅删除撤销/重做记录，不会改动当前 DSL；清空后该页将无法再撤销/重做之前的操作。
+   */
+  public clearPage(pageId?: Id): void {
+    const targetPageId = pageId ?? this.state.pageId;
+    if (!targetPageId) return;
+    this.state.pageSteps[targetPageId] = new UndoRedo<StepValue>();
+    if (`${targetPageId}` === `${this.state.pageId}`) {
+      this.setCanUndoRedo();
+      this.emit('change', null);
+    }
+  }
+
+  /**
+   * 清空数据源历史记录栈：传入 `dataSourceId` 仅清空该数据源，缺省清空全部数据源。
+   * 仅删除撤销/重做记录，不会改动数据源本身。
+   */
+  public clearDataSource(dataSourceId?: Id): void {
+    if (dataSourceId !== undefined) {
+      delete this.state.dataSourceState[dataSourceId];
+    } else {
+      this.state.dataSourceState = {};
+    }
+  }
+
+  /**
+   * 清空代码块历史记录栈：传入 `codeBlockId` 仅清空该代码块，缺省清空全部代码块。
+   * 仅删除撤销/重做记录，不会改动代码块本身。
+   */
+  public clearCodeBlock(codeBlockId?: Id): void {
+    if (codeBlockId !== undefined) {
+      delete this.state.codeBlockState[codeBlockId];
+    } else {
+      this.state.codeBlockState = {};
+    }
+  }
+
+  /**
+   * 标记「整份 DSL 已保存」：把页面 / 代码块 / 数据源所有栈当前游标所在的记录都标为 `saved`。
+   * 适用于「整体落库」场景；若只保存了其中一类，请改用更细粒度的
+   * {@link markPageSaved} / {@link markCodeBlockSaved} / {@link markDataSourceSaved}。
+   */
+  public markSaved(): void {
+    Object.values(this.state.pageSteps).forEach(History.markStackSaved);
+    Object.values(this.state.codeBlockState).forEach(History.markStackSaved);
+    Object.values(this.state.dataSourceState).forEach(History.markStackSaved);
+    this.emit('mark-saved', { kind: 'all' });
+  }
+
+  /**
+   * 标记指定页面（缺省为当前活动页）的历史栈当前记录为已保存。
+   * 仅影响该页面自己的栈，不波及代码块 / 数据源 / 其它页面。
+   */
+  public markPageSaved(pageId?: Id): void {
+    const targetPageId = pageId ?? this.state.pageId;
+    if (!targetPageId) return;
+    History.markStackSaved(this.state.pageSteps[targetPageId]);
+    this.emit('mark-saved', { kind: 'page', id: targetPageId });
+  }
+
+  /** 标记指定代码块的历史栈当前记录为已保存，仅影响该代码块自己的栈。 */
+  public markCodeBlockSaved(codeBlockId: Id): void {
+    if (!codeBlockId) return;
+    History.markStackSaved(this.state.codeBlockState[codeBlockId]);
+    this.emit('mark-saved', { kind: 'code-block', id: codeBlockId });
+  }
+
+  /** 标记指定数据源的历史栈当前记录为已保存，仅影响该数据源自己的栈。 */
+  public markDataSourceSaved(dataSourceId: Id): void {
+    if (!dataSourceId) return;
+    History.markStackSaved(this.state.dataSourceState[dataSourceId]);
+    this.emit('mark-saved', { kind: 'data-source', id: dataSourceId });
+  }
+
+  /**
+   * 把当前内存中的全部历史栈（页面 / 代码块 / 数据源）序列化后写入本地 IndexedDB。
+   *
+   * - 每个 UndoRedo 栈连同其游标、容量一并保存，恢复后可继续 undo/redo；
+   * - `key` 用于区分不同活动页 / 项目（同一 store 下可保存多份快照），缺省为 `default`；
+   * - 返回写入成功的快照对象，便于调用方记录 savedAt 等信息；
+   * - 不支持 IndexedDB 的环境（如 SSR）会 reject。
+   */
+  public async saveToIndexedDB(options: HistoryPersistOptions = {}): Promise<PersistedHistoryState> {
+    const { dbName = DEFAULT_DB_NAME, storeName = DEFAULT_STORE_NAME, key = DEFAULT_KEY } = options;
+
+    const snapshot: PersistedHistoryState = {
+      version: PERSIST_VERSION,
+      pageId: this.state.pageId,
+      pageSteps: History.serializeStacks(this.state.pageSteps),
+      codeBlockState: History.serializeStacks(this.state.codeBlockState),
+      dataSourceState: History.serializeStacks(this.state.dataSourceState),
+      savedAt: Date.now(),
+    };
+
+    // 历史记录里可能包含函数（如代码块内容 / 节点事件 / 数据源方法），IndexedDB 的结构化克隆无法写入函数，
+    // 因此用 serialize-javascript 序列化成字符串后再写入（支持函数 / Map 等），读取时用 parseDSL 还原。
+    await idbSet(this.resolveDbName(dbName), storeName, key, serialize(snapshot));
+    this.emit('save-to-indexed-db', snapshot);
+    return snapshot;
+  }
+
+  /**
+   * 从本地 IndexedDB 读取此前保存的历史快照并重建全部撤销/重做栈。
+   *
+   * - 读取到的每个栈都会经 {@link UndoRedo.fromSerialized} 还原（含游标），随后可直接 undo/redo；
+   * - 会整体覆盖当前内存中的历史状态，并把活动页恢复为快照中的 pageId；
+   * - 找不到对应记录时返回 null，且不改动当前状态；
+   * - 不支持 IndexedDB 的环境（如 SSR）会 reject。
+   */
+  public async restoreFromIndexedDB(options: HistoryPersistOptions = {}): Promise<PersistedHistoryState | null> {
+    const { dbName = DEFAULT_DB_NAME, storeName = DEFAULT_STORE_NAME, key = DEFAULT_KEY } = options;
+
+    const raw = await idbGet<string | PersistedHistoryState>(this.resolveDbName(dbName), storeName, key);
+    if (!raw) return null;
+
+    // 新版以序列化字符串存储（含函数），用 parseDSL 还原；兼容历史上以对象形式存入的旧数据。
+    const snapshot = (typeof raw === 'string' ? getEditorConfig('parseDSL')(`(${raw})`) : raw) as PersistedHistoryState;
+    if (!snapshot) return null;
+
+    this.state.pageSteps = History.deserializeStacks(snapshot.pageSteps);
+    this.state.codeBlockState = History.deserializeStacks(snapshot.codeBlockState);
+    this.state.dataSourceState = History.deserializeStacks(snapshot.dataSourceState);
+    this.state.pageId = snapshot.pageId;
+
+    this.setCanUndoRedo();
+    this.emit('restore-from-indexed-db', snapshot);
+    this.emit('change', null);
+    return snapshot;
+  }
+
+  /**
    * 取出当前活动页的历史步骤平铺列表（包含已应用 + 已撤销）。
    * 列表按时间正序，最早一步在最前面。
    * 通常 UI 应使用 `getPageHistoryGroups` 取已合并分组的版本；本方法仅为兼容/调试保留。
@@ -577,6 +759,15 @@ class History extends BaseService {
       this.state.pageSteps[targetPageId] = new UndoRedo<StepValue>();
     }
     return this.state.pageSteps[targetPageId];
+  }
+
+  /**
+   * 把基础 dbName 与当前 DSL（root app）的 id 拼成最终库名，实现不同应用历史隔离。
+   * 取不到 app id（如尚未加载 DSL）时退回基础 dbName。
+   */
+  private resolveDbName(dbName: string): string {
+    const appId = editorService.get('root')?.id;
+    return appId ? `${dbName}-${appId}` : dbName;
   }
 
   private setCanUndoRedo(): void {

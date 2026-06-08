@@ -56,7 +56,7 @@ import type { PropsService } from './services/props';
 import type { StageOverlayService } from './services/stageOverlay';
 import type { StorageService } from './services/storage';
 import type { UiService } from './services/ui';
-import type { UndoRedo } from './utils/undo-redo';
+import type { SerializedUndoRedo, UndoRedo } from './utils/undo-redo';
 
 export type EditorSlots = FrameworkSlots &
   WorkspaceSlots &
@@ -721,13 +721,42 @@ export type HistoryOpSource =
   | (string & {});
 // #endregion HistoryOpSource
 
-// #region StepValue
-export interface StepValue {
+// #region BaseStepValue
+/**
+ * 历史记录条目公共字段，被 {@link StepValue} / {@link CodeBlockStepValue} / {@link DataSourceStepValue} 复用。
+ */
+export interface BaseStepValue {
   /**
-   * 历史记录唯一标识（uuid）。在 historyService.push 时自动写入（若调用方未指定），
+   * 历史记录唯一标识（uuid）。入栈时自动写入（若调用方未指定），
    * 用于精确定位 / 引用某一条历史记录（如 revert、埋点、跨端同步等）。
+   * 注意与各自的 `id`（关联的页面 / 代码块 / 数据源 id）区分。
    */
   uuid: string;
+  /**
+   * 调用方可选传入的人类可读描述（如「调整按钮颜色」），用于历史面板展示。
+   * 不影响 undo/redo 行为；缺省时面板会根据节点 / propPath 自动生成描述。
+   */
+  historyDescription?: string;
+  /**
+   * 操作途径：标记本次变更由哪条交互入口触发，取值见 {@link HistoryOpSource}
+   * （画布 / 树面板 / 组件面板 / 配置面板 / 源码编辑器 / 右键菜单 / 工具栏 / 快捷键 / 回滚 / 接口 等）。
+   * 仅用于历史面板展示与业务埋点，不影响 undo/redo 行为；缺省时面板视为「未知」。
+   */
+  source?: HistoryOpSource;
+  /**
+   * 入栈时间戳（毫秒）。入栈时自动写入（若调用方未指定），仅用于历史面板展示。
+   */
+  timestamp?: number;
+  /**
+   * 是否为「已保存」记录：DSL 落库（如保存到后端 / 本地）时由 historyService.markSaved 标记。
+   * 同一栈内任意时刻最多只有一条记录为 true；从 IndexedDB 恢复时游标会被定位到最近一条已保存记录之后。
+   */
+  saved?: boolean;
+}
+// #endregion BaseStepValue
+
+// #region StepValue
+export interface StepValue extends BaseStepValue {
   /** 页面信息 */
   data: { name: string; id: Id };
   opType: HistoryOpType;
@@ -751,21 +780,6 @@ export interface StepValue {
    * 缺省（未传 / 空数组）才退化为整节点替换。
    */
   updatedItems?: { oldNode: MNode; newNode: MNode; changeRecords?: ChangeRecord[] }[];
-  /**
-   * 调用方可选传入的人类可读描述（如「调整按钮颜色」），用于历史面板展示。
-   * 不影响 undo/redo 行为；缺省时面板会根据节点 / propPath 自动生成描述。
-   */
-  historyDescription?: string;
-  /**
-   * 操作途径：标记本次变更由哪条交互入口触发，取值见 {@link HistoryOpSource}
-   * （画布 / 树面板 / 组件面板 / 配置面板 / 源码编辑器 / 右键菜单 / 工具栏 / 快捷键 / 回滚 / 接口 等）。
-   * 仅用于历史面板展示与业务埋点，不影响 undo/redo 行为；缺省时面板视为「未知」。
-   */
-  source?: HistoryOpSource;
-  /**
-   * 入栈时间戳（毫秒）。在 historyService.push 时自动写入（若调用方未指定），仅用于历史面板展示。
-   */
-  timestamp?: number;
 }
 // #endregion StepValue
 
@@ -776,12 +790,7 @@ export interface StepValue {
  * - 更新：oldContent / newContent 都为对应内容
  * - 删除：newContent = null，oldContent = 删除前内容
  */
-export interface CodeBlockStepValue {
-  /**
-   * 历史记录唯一标识（uuid），入栈时自动写入，用于精确定位 / 引用某一条历史记录。
-   * 注意与 `id`（关联的代码块 id）区分。
-   */
-  uuid: string;
+export interface CodeBlockStepValue extends BaseStepValue {
   /** 关联的代码块 id */
   id: Id;
   /** 变更前的代码块内容，新增时为 null */
@@ -793,12 +802,6 @@ export interface CodeBlockStepValue {
    * 缺省才退化为整内容替换。新增/删除场景通常无 changeRecords。
    */
   changeRecords?: ChangeRecord[];
-  /** 调用方可选传入的人类可读描述，用于历史面板展示；不影响 undo/redo 行为。 */
-  historyDescription?: string;
-  /** 操作途径：标记本次变更由哪条交互入口触发，取值见 {@link HistoryOpSource}；仅用于历史面板展示与埋点，不影响 undo/redo 行为。 */
-  source?: HistoryOpSource;
-  /** 入栈时间戳（毫秒），入栈时自动写入，仅用于历史面板展示。 */
-  timestamp?: number;
 }
 // #endregion CodeBlockStepValue
 
@@ -809,12 +812,7 @@ export interface CodeBlockStepValue {
  * - 更新：oldSchema / newSchema 都为对应 schema
  * - 删除：newSchema = null，oldSchema = 删除前 schema
  */
-export interface DataSourceStepValue {
-  /**
-   * 历史记录唯一标识（uuid），入栈时自动写入，用于精确定位 / 引用某一条历史记录。
-   * 注意与 `id`（关联的数据源 id）区分。
-   */
-  uuid: string;
+export interface DataSourceStepValue extends BaseStepValue {
   /** 关联的数据源 id */
   id: Id;
   /** 变更前的数据源 schema，新增时为 null */
@@ -826,12 +824,6 @@ export interface DataSourceStepValue {
    * 缺省才退化为整 schema 替换。新增/删除场景通常无 changeRecords。
    */
   changeRecords?: ChangeRecord[];
-  /** 调用方可选传入的人类可读描述，用于历史面板展示；不影响 undo/redo 行为。 */
-  historyDescription?: string;
-  /** 操作途径：标记本次变更由哪条交互入口触发，取值见 {@link HistoryOpSource}；仅用于历史面板展示与埋点，不影响 undo/redo 行为。 */
-  source?: HistoryOpSource;
-  /** 入栈时间戳（毫秒），入栈时自动写入，仅用于历史面板展示。 */
-  timestamp?: number;
 }
 // #endregion DataSourceStepValue
 
@@ -851,6 +843,39 @@ export interface HistoryState {
    */
   dataSourceState: Record<Id, UndoRedo<DataSourceStepValue>>;
 }
+
+// #region PersistedHistoryState
+/**
+ * 历史记录的可持久化快照。由 historyService.saveToIndexedDB 写入 IndexedDB，
+ * 再由 historyService.restoreFromIndexedDB 读出并重建各 UndoRedo 栈。
+ */
+export interface PersistedHistoryState {
+  /** 快照结构版本号，便于后续兼容升级。 */
+  version: number;
+  /** 保存时的活动页 id。 */
+  pageId?: Id;
+  /** 各页面历史栈的序列化快照，按 pageId 分组。 */
+  pageSteps: Record<Id, SerializedUndoRedo<StepValue>>;
+  /** 各代码块历史栈的序列化快照，按 codeBlockId 分组。 */
+  codeBlockState: Record<Id, SerializedUndoRedo<CodeBlockStepValue>>;
+  /** 各数据源历史栈的序列化快照，按 dataSourceId 分组。 */
+  dataSourceState: Record<Id, SerializedUndoRedo<DataSourceStepValue>>;
+  /** 保存时间戳（毫秒）。 */
+  savedAt: number;
+}
+// #endregion PersistedHistoryState
+
+// #region HistoryPersistOptions
+/** historyService 持久化相关 API 的可选配置。 */
+export interface HistoryPersistOptions {
+  /** IndexedDB 数据库名，默认 `tmagic-editor`（最终库名会拼上当前 DSL app id）。 */
+  dbName?: string;
+  /** objectStore 名，默认 `history`。 */
+  storeName?: string;
+  /** 记录 key，用于区分不同活动页 / 项目，默认 `default`。 */
+  key?: IDBValidKey;
+}
+// #endregion HistoryPersistOptions
 
 // #region HistoryListEntry
 /**

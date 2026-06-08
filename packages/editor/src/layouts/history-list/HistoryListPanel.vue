@@ -28,6 +28,7 @@
             @goto-initial="onPageGotoInitial"
             @diff-step="onPageDiff"
             @revert-step="onPageRevert"
+            @clear="onPageClear"
           />
         </component>
 
@@ -50,6 +51,7 @@
             @goto-initial="onDataSourceGotoInitial"
             @diff-step="onDataSourceDiff"
             @revert-step="onDataSourceRevert"
+            @clear="onDataSourceClear"
           />
         </component>
 
@@ -72,6 +74,7 @@
             @goto-initial="onCodeBlockGotoInitial"
             @diff-step="onCodeBlockDiff"
             @revert-step="onCodeBlockRevert"
+            @clear="onCodeBlockClear"
           />
         </component>
 
@@ -130,7 +133,14 @@
 import { computed, inject, markRaw, ref, shallowRef, useTemplateRef, watch } from 'vue';
 import { Clock, Close } from '@element-plus/icons-vue';
 
-import { getDesignConfig, TMagicButton, TMagicPopover, TMagicTabs, TMagicTooltip } from '@tmagic/design';
+import {
+  getDesignConfig,
+  TMagicButton,
+  tMagicMessageBox,
+  TMagicPopover,
+  TMagicTabs,
+  TMagicTooltip,
+} from '@tmagic/design';
 import type { FormState } from '@tmagic/form';
 
 import MIcon from '@editor/components/Icon.vue';
@@ -380,5 +390,61 @@ const onCodeBlockRevert = (id: string | number, index: number) => {
 
 const onDiffDialogClose = () => {
   onConfirmRevert.value = undefined;
+};
+
+/**
+ * 「清空历史记录」入口：先弹出二次确认，确认后清空对应类别的历史栈。
+ * 仅删除撤销/重做记录，不会改动当前 DSL / 数据源 / 代码块本身。
+ * 用户取消（confirm reject）时静默忽略。
+ */
+const confirmClear = async (message: string): Promise<boolean> => {
+  try {
+    await tMagicMessageBox.confirm(message, '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    });
+    return true;
+    // eslint-disable-next-line no-unused-vars
+  } catch (e) {
+    return false;
+  }
+};
+
+/**
+ * 把内存中（已清空对应类别后的）历史状态重新写回 IndexedDB，
+ * 使本地持久化的那份与内存保持一致——即「连同本地保存的一并删除」。
+ * 不支持 IndexedDB 或写入失败时静默忽略（内存清空已生效）。
+ */
+const syncIndexedDB = async () => {
+  try {
+    await historyService.saveToIndexedDB();
+    // eslint-disable-next-line no-unused-vars
+  } catch (e) {
+    // ignore: 内存清空已生效，本地同步失败不阻塞交互
+  }
+};
+
+const onPageClear = async () => {
+  if (
+    await confirmClear('确定清空当前页面的历史记录吗？清空后将无法撤销/重做之前的操作，本地保存的记录也会一并删除。')
+  ) {
+    historyService.clearPage();
+    await syncIndexedDB();
+  }
+};
+
+const onDataSourceClear = async () => {
+  if (await confirmClear('确定清空数据源的历史记录吗？清空后将无法撤销/重做之前的操作，本地保存的记录也会一并删除。')) {
+    historyService.clearDataSource();
+    await syncIndexedDB();
+  }
+};
+
+const onCodeBlockClear = async () => {
+  if (await confirmClear('确定清空代码块的历史记录吗？清空后将无法撤销/重做之前的操作，本地保存的记录也会一并删除。')) {
+    historyService.clearCodeBlock();
+    await syncIndexedDB();
+  }
 };
 </script>

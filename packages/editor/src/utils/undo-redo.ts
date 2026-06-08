@@ -18,8 +18,59 @@
 
 import { cloneDeep } from 'lodash-es';
 
+// #region SerializedUndoRedo
+/**
+ * UndoRedo 栈的可序列化快照，用于持久化（如写入 IndexedDB）后再还原。
+ */
+export interface SerializedUndoRedo<T = any> {
+  /** 栈内全部元素（按时间正序，索引 0 为最早一步）。 */
+  elementList: T[];
+  /** 游标位置（已应用步骤数量）。 */
+  listCursor: number;
+  /** 栈容量上限。 */
+  listMaxSize: number;
+}
+// #endregion SerializedUndoRedo
+
 // #region UndoRedo
 export class UndoRedo<T = any> {
+  /**
+   * 由 {@link UndoRedo.serialize} 产出的快照重建一个 UndoRedo 实例。
+   * 游标会被夹紧到 [0, length] 区间，避免脏数据导致越界。
+   *
+   * @param options.isSavedStep 可选谓词：若提供，则把游标定位到「最近一条满足该谓词的记录」之后
+   *   （即恢复到最近一个已保存点）；找不到匹配记录时退回快照中的原游标。
+   */
+  public static fromSerialized<T = any>(
+    data: SerializedUndoRedo<T>,
+    options: { isSavedStep?: (element: T) => boolean } = {},
+  ): UndoRedo<T> {
+    const undoRedo = new UndoRedo<T>(data.listMaxSize);
+    const list = Array.isArray(data.elementList) ? data.elementList.map((item) => cloneDeep(item)) : [];
+    let cursor = Number.isFinite(data.listCursor) ? data.listCursor : list.length;
+
+    // 本地数据同样遵循容量上限：超出时裁掉最旧的记录（与 pushElement 的 shift 行为一致），并同步回退游标。
+    const overflow = list.length - undoRedo.listMaxSize;
+    if (overflow > 0) {
+      list.splice(0, overflow);
+      cursor -= overflow;
+    }
+
+    // 若指定了「已保存」谓词，则把游标移动到最近一条已保存记录之后；在裁剪后的 list 上查找以保证索引正确。
+    if (options.isSavedStep) {
+      for (let i = list.length - 1; i >= 0; i--) {
+        if (options.isSavedStep(list[i])) {
+          cursor = i + 1;
+          break;
+        }
+      }
+    }
+
+    undoRedo.elementList = list;
+    undoRedo.listCursor = Math.max(0, Math.min(cursor, list.length));
+    return undoRedo;
+  }
+
   private elementList: T[];
   private listCursor: number;
   private listMaxSize: number;
@@ -29,6 +80,18 @@ export class UndoRedo<T = any> {
     this.elementList = [];
     this.listCursor = 0;
     this.listMaxSize = listMaxSize > minListMaxSize ? listMaxSize : minListMaxSize;
+  }
+
+  /**
+   * 导出当前栈的可序列化快照（深克隆，避免外部改动污染内部状态）。
+   * 配合 {@link UndoRedo.fromSerialized} 可在持久化后完整还原撤销/重做栈。
+   */
+  public serialize(): SerializedUndoRedo<T> {
+    return {
+      elementList: this.elementList.map((item) => cloneDeep(item)),
+      listCursor: this.listCursor,
+      listMaxSize: this.listMaxSize,
+    };
   }
 
   public pushElement(element: T): void {
@@ -74,6 +137,20 @@ export class UndoRedo<T = any> {
       return null;
     }
     return cloneDeep(this.elementList[this.listCursor - 1]);
+  }
+
+  /**
+   * 对当前游标所在元素（cursor - 1）做就地更新；cursor 为 0（全部已撤销）时不做任何操作。
+   * 用于给「当前步骤」打标记（如标记为已保存）等元数据写入场景。
+   */
+  public updateCurrentElement(updater: (element: T) => void): void {
+    if (this.listCursor < 1) return;
+    updater(this.elementList[this.listCursor - 1]);
+  }
+
+  /** 对栈内全部元素做就地更新。用于批量清理元数据（如清空所有元素的已保存标记）。 */
+  public updateElements(updater: (element: T, index: number) => void): void {
+    this.elementList.forEach(updater);
   }
 
   /**

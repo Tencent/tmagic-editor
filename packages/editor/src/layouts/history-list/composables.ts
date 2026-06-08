@@ -4,6 +4,7 @@ import { datetimeFormatter } from '@tmagic/form';
 
 import { useServices } from '@editor/hooks/use-services';
 import type {
+  BaseStepValue,
   CodeBlockHistoryGroup,
   CodeBlockStepValue,
   DataSourceHistoryGroup,
@@ -13,6 +14,21 @@ import type {
   PageHistoryGroup,
   StepValue,
 } from '@editor/type';
+
+/**
+ * 通用 bucket 分组（数据源 / 代码块及业务自定义历史）在面板中的展示结构。
+ * 由 Bucket / BucketTab 复用，step 类型通过泛型 T 收窄（约束为 {@link BaseStepValue}）。
+ */
+export interface HistoryBucketGroup<T extends BaseStepValue = BaseStepValue> {
+  /** 组内最后一步是否已应用 */
+  applied: boolean;
+  /** 是否为当前所在的分组 */
+  isCurrent?: boolean;
+  /** 该分组的操作类型 */
+  opType: HistoryOpType;
+  /** 组内所有步骤 */
+  steps: { index: number; applied: boolean; isCurrent?: boolean; step: T }[];
+}
 
 /**
  * 历史记录面板共享逻辑：

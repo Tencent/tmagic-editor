@@ -1,32 +1,40 @@
 <template>
   <div v-if="!buckets.length" class="m-editor-history-list-empty">暂无操作记录</div>
-  <TMagicScrollbar v-else max-height="360px">
-    <Bucket
-      v-for="bucket in buckets"
-      :key="`${prefix}-${bucket.id}`"
-      :title="title"
-      :bucket-id="bucket.id"
-      :prefix="prefix"
-      :groups="bucket.groups"
-      :describe-group="describeGroup"
-      :describe-step="describeStep"
-      :is-step-diffable="isStepDiffable"
-      :is-step-revertable="isStepRevertable"
-      :expanded="expanded"
-      :goto-enabled="gotoEnabled"
-      @toggle="(key: string) => $emit('toggle', key)"
-      @goto="(id: string | number, index: number) => $emit('goto', id, index)"
-      @goto-initial="(id: string | number) => $emit('goto-initial', id)"
-      @diff-step="(id: string | number, index: number) => $emit('diff-step', id, index)"
-      @revert-step="(id: string | number, index: number) => $emit('revert-step', id, index)"
-    />
-  </TMagicScrollbar>
+  <template v-else>
+    <div class="m-editor-history-list-toolbar">
+      <span class="m-editor-history-list-clear" :title="`清空${title}的历史记录`" @click="$emit('clear')">清空</span>
+    </div>
+    <TMagicScrollbar max-height="360px">
+      <Bucket
+        v-for="bucket in buckets"
+        :key="`${prefix}-${bucket.id}`"
+        :title="title"
+        :bucket-id="bucket.id"
+        :prefix="prefix"
+        :groups="bucket.groups"
+        :describe-group="describeGroup"
+        :describe-step="describeStep"
+        :is-step-diffable="isStepDiffable"
+        :is-step-revertable="isStepRevertable"
+        :expanded="expanded"
+        :goto-enabled="gotoEnabled"
+        @toggle="(key: string) => $emit('toggle', key)"
+        @goto="(id: string | number, index: number) => $emit('goto', id, index)"
+        @goto-initial="(id: string | number) => $emit('goto-initial', id)"
+        @diff-step="(id: string | number, index: number) => $emit('diff-step', id, index)"
+        @revert-step="(id: string | number, index: number) => $emit('revert-step', id, index)"
+      />
+    </TMagicScrollbar>
+  </template>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup generic="T extends BaseStepValue = BaseStepValue">
 import { TMagicScrollbar } from '@tmagic/design';
 
+import type { BaseStepValue } from '@editor/type';
+
 import Bucket from './Bucket.vue';
+import type { HistoryBucketGroup } from './composables';
 
 defineOptions({
   name: 'MEditorHistoryListBucketTab',
@@ -42,15 +50,15 @@ withDefaults(
      * 已按目标 id 聚拢成的 bucket 列表，每个 bucket 内部的 groups 已按时间倒序排好。
      * 空数组时显示空态。
      */
-    buckets: { id: string | number; groups: any[] }[];
+    buckets: { id: string | number; groups: HistoryBucketGroup<T>[] }[];
     /** 组级描述文案生成器，由父组件按业务类型注入。 */
     describeGroup: (_group: any) => string;
     /** 单步描述文案生成器，由父组件按业务类型注入。 */
-    describeStep: (_step: any) => string;
+    describeStep: (_step: T) => string;
     /** 判断某个 step 是否可查看差异（前后值都存在）。由父组件按业务类型注入。 */
-    isStepDiffable: (_step: any) => boolean;
+    isStepDiffable: (_step: T) => boolean;
     /** 判断某个 step 是否支持回滚（如更新需带 changeRecords）。由父组件按业务类型注入；不传则已应用即可回滚。 */
-    isStepRevertable?: (_step: any) => boolean;
+    isStepRevertable?: (_step: T) => boolean;
     /**
      * 共享的折叠状态表（key -> 是否展开），由顶层 panel 统一维护。
      * 本 tab 使用 `${prefix}-${id}-${组内首步 index}` 作为 key——以稳定的 step 索引而非展示位置标识分组，
@@ -76,5 +84,7 @@ defineEmits<{
   (_e: 'diff-step', _targetId: string | number, _index: number): void;
   /** 透传 Bucket 的 revert-step 事件，携带目标 id 与 step 索引（类 git revert）。 */
   (_e: 'revert-step', _targetId: string | number, _index: number): void;
+  /** 用户点击"清空"按钮，请求清空该类（数据源 / 代码块）的全部历史记录（由上层弹窗二次确认后执行）。 */
+  (_e: 'clear'): void;
 }>();
 </script>

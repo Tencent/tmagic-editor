@@ -260,6 +260,122 @@
 
   指定数据源当前是否可重做。栈不存在时返回 `false`。
 
+## markSaved
+
+- **详情：**
+
+  标记「整份 DSL 已保存」：把页面 / 代码块 / 数据源所有栈当前游标所在的记录都标记为已保存（`saved = true`）。
+
+  同一栈内任意时刻最多保留一条已保存记录（标记前会清除该栈内全部旧标记）；某个栈处于「全部已撤销」（cursor 为 0）时不会留下已保存记录，从 IndexedDB 恢复时其游标会回到 0。
+
+  通常在 DSL 整体落库（保存到后端 / 本地）成功后调用，配合 [`restoreFromIndexedDB`](#restorefromindexeddb) 把游标恢复到此处。仅保存了其中一类时请改用更细粒度的 `markPageSaved` / `markCodeBlockSaved` / `markDataSourceSaved`。
+
+  调用后会触发 `mark-saved` 事件（`{ kind: 'all' }`）。
+
+## markPageSaved
+
+- **参数：**
+  - `{Id} pageId` 可选；缺省为当前活动页
+
+- **详情：**
+
+  标记指定页面（缺省当前活动页）历史栈的当前记录为已保存，仅影响该页面自己的栈。触发 `mark-saved` 事件（`{ kind: 'page', id }`）。
+
+## markCodeBlockSaved
+
+- **参数：**
+  - `{Id} codeBlockId`
+
+- **详情：**
+
+  标记指定代码块历史栈的当前记录为已保存，仅影响该代码块自己的栈。触发 `mark-saved` 事件（`{ kind: 'code-block', id }`）。
+
+## markDataSourceSaved
+
+- **参数：**
+  - `{Id} dataSourceId`
+
+- **详情：**
+
+  标记指定数据源历史栈的当前记录为已保存，仅影响该数据源自己的栈。触发 `mark-saved` 事件（`{ kind: 'data-source', id }`）。
+
+## clearPage
+
+- **参数：**
+  - `{Id} pageId` 可选；缺省为当前活动页
+
+- **详情：**
+
+  清空指定页面（缺省当前活动页）的历史记录栈。仅删除撤销/重做记录，不会改动当前 DSL；清空后该页将无法再撤销/重做之前的操作。清空当前活动页时会同步刷新 `canUndo` / `canRedo` 并触发 `change` 事件。
+
+## clearCodeBlock
+
+- **参数：**
+  - `{Id} codeBlockId` 可选；缺省清空全部代码块
+
+- **详情：**
+
+  清空代码块历史记录栈：传入 `codeBlockId` 仅清空该代码块，缺省清空全部代码块。仅删除撤销/重做记录，不会改动代码块本身。
+
+## clearDataSource
+
+- **参数：**
+  - `{Id} dataSourceId` 可选；缺省清空全部数据源
+
+- **详情：**
+
+  清空数据源历史记录栈：传入 `dataSourceId` 仅清空该数据源，缺省清空全部数据源。仅删除撤销/重做记录，不会改动数据源本身。
+
+## saveToIndexedDB
+
+- **参数：**
+  - `{HistoryPersistOptions} options` 可选
+
+  ::: details 查看 HistoryPersistOptions / PersistedHistoryState 类型定义
+  <<< @/../packages/editor/src/type.ts#HistoryPersistOptions{ts}
+
+  <<< @/../packages/editor/src/type.ts#PersistedHistoryState{ts}
+
+  <<< @/../packages/editor/src/utils/undo-redo.ts#SerializedUndoRedo{ts}
+  :::
+
+- **返回：**
+  - `{Promise<PersistedHistoryState>}` 写入成功的快照对象
+
+- **详情：**
+
+  把当前内存中的全部历史栈（页面 / 代码块 / 数据源）连同各自游标、容量序列化后写入本地 IndexedDB。
+
+  - 最终库名为 `${dbName}-${当前 DSL app id}`，按应用隔离；
+  - `key` 用于在同一 store 下区分不同记录，缺省为 `default`；
+  - 历史记录里可能包含函数（代码块内容 / 节点事件等），内部使用 `serialize-javascript` 序列化为字符串后写入，恢复时再用 `parseDSL` 还原，因此可安全持久化函数 / `Map` 等；
+  - 不支持 IndexedDB 的环境（如 SSR）会 reject。
+
+  写入成功后触发 `save-to-indexed-db` 事件。
+
+  ::: warning
+  `beforeunload` / `pagehide` 阶段浏览器不会等待异步 IndexedDB 事务提交，单纯依赖卸载时写入可能丢失最近一次编辑。建议在历史变更时（防抖）即调用本方法持久化，确保刷新后能完整恢复。
+  :::
+
+## restoreFromIndexedDB
+
+- **参数：**
+  - `{HistoryPersistOptions} options` 可选
+
+- **返回：**
+  - `{Promise<PersistedHistoryState | null>}` 找不到记录时返回 `null`
+
+- **详情：**
+
+  从本地 IndexedDB 读取此前保存的历史快照并重建全部撤销/重做栈。
+
+  - 每个栈都会按 `listMaxSize` 裁剪并还原游标；
+  - 若某个栈存在已保存记录（见 `markSaved`），其游标会被定位到「最近一条已保存记录」之后，使恢复后的状态与落库的 DSL 对齐；
+  - 会整体覆盖当前内存中的历史状态，并把活动页恢复为快照中的 `pageId`；
+  - 找不到对应记录时返回 `null` 且不改动当前状态；不支持 IndexedDB 的环境会 reject。
+
+  成功后触发 `restore-from-indexed-db` 与 `change` 事件。
+
 ## destroy
 
 - **详情：**

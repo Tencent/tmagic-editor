@@ -73,3 +73,36 @@
   - 删除触发的 step 中 `newSchema` 为 `null`
   - `undo` / `redo` 返回 `null`（边界状态）时不会触发该事件
   :::
+
+## mark-saved
+
+- **详情：** 调用 `markSaved` / `markPageSaved` / `markCodeBlockSaved` / `markDataSourceSaved` 标记「已保存」记录时触发
+
+- **事件回调函数：** `(payload: { kind: 'all' | 'page' | 'code-block' | 'data-source'; id?: Id }) => void`
+
+  ::: tip
+  - `markSaved` 触发时 `kind` 为 `all`，无 `id`
+  - 细粒度方法触发时 `kind` 对应类别，`id` 为目标页面 / 代码块 / 数据源 id
+  :::
+
+## save-to-indexed-db
+
+- **详情：** `saveToIndexedDB` 把历史记录写入本地 IndexedDB 成功时触发
+
+- **事件回调函数：** `(snapshot: PersistedHistoryState) => void`
+
+  ::: details 查看 PersistedHistoryState 类型定义
+  <<< @/../packages/editor/src/type.ts#PersistedHistoryState{ts}
+
+  <<< @/../packages/editor/src/utils/undo-redo.ts#SerializedUndoRedo{ts}
+  :::
+
+## restore-from-indexed-db
+
+- **详情：** `restoreFromIndexedDB` 从本地 IndexedDB 读取并重建历史记录成功时触发（找不到记录时不触发）
+
+- **事件回调函数：** `(snapshot: PersistedHistoryState) => void`
+
+  ::: details 查看 PersistedHistoryState 类型定义
+  <<< @/../packages/editor/src/type.ts#PersistedHistoryState{ts}
+  :::

@@ -13,6 +13,8 @@
       <span class="m-editor-history-list-item-op" :class="`op-${opType}`">{{ opLabel(opType) }}</span>
       <span class="m-editor-history-list-item-desc">{{ desc }}</span>
 
+      <span v-if="headSaved" class="m-editor-history-list-item-saved" title="该记录为最近一次保存的状态">已保存</span>
+
       <span
         v-if="!merged && sourceLabel(source)"
         class="m-editor-history-list-item-source"
@@ -57,6 +59,7 @@
       >
         <span class="m-editor-history-list-item-index">#{{ s.index + 1 }}</span>
         <span class="m-editor-history-list-substep-desc">{{ s.desc }}</span>
+        <span v-if="s.saved" class="m-editor-history-list-item-saved" title="该记录为最近一次保存的状态">已保存</span>
         <span
           v-if="sourceLabel(s.source)"
           class="m-editor-history-list-item-source"
@@ -127,6 +130,8 @@ const props = withDefaults(
       applied: boolean;
       desc: string;
       isCurrent?: boolean;
+      /** 该子步是否为最近一次保存的记录，用于展示「已保存」标记。 */
+      saved?: boolean;
       diffable?: boolean;
       /** 是否可对该子步执行「回滚」（已应用 + 业务侧确认支持反向）。父级根据 step 与 applied 决定。 */
       revertable?: boolean;
@@ -212,6 +217,15 @@ const subStepTitle = (s: { isCurrent?: boolean }) => {
   if (s.isCurrent) return '当前所在记录';
   return '';
 };
+
+/**
+ * 头部是否展示「已保存」标记：
+ * - 单步组：取该唯一子步的 saved；
+ * - 合并组：组内任一子步为已保存即在头部提示（具体落在哪一步可展开查看）。
+ */
+const headSaved = computed(() =>
+  props.merged ? props.subSteps.some((s) => s.saved) : Boolean(props.subSteps[0]?.saved),
+);
 
 /** 单步组头部是否展示"查看差异"入口：要求该唯一子步本身可对比。 */
 const headDiffable = computed(() => !props.merged && Boolean(props.subSteps[0]?.diffable));

@@ -45,6 +45,28 @@
     list-style: none;
   }
 
+  // 历史列表工具条：放置「清空」等列表级操作，右对齐。
+  .m-editor-history-list-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 4px 4px;
+  }
+
+  // 「清空」按钮：红色文字按钮，强调破坏性操作（点击后会二次确认）。
+  .m-editor-history-list-clear {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #f56c6c;
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+      background-color: rgba(245, 108, 108, 0.12);
+    }
+  }
+
   .m-editor-history-list-item {
     display: flex;
     align-items: center;
@@ -293,6 +315,20 @@
     background-color: #f4f4f5;
     white-space: nowrap;
     font-weight: 400; // 防止被合并组头部的粗体继承
+  }
+
+  // 「已保存」徽标：绿色实心胶囊，标记最近一次保存对应的历史记录（与 historyService.markSaved 对应）。
+  .m-editor-history-list-item-saved {
+    flex: 0 0 auto;
+    padding: 0 6px;
+    border-radius: 8px;
+    font-size: 10px;
+    line-height: 16px;
+    color: #fff;
+    background-color: #67c23a;
+    white-space: nowrap;
+    font-weight: 500;
+    letter-spacing: 0.2px;
   }
 
   // 「合并 N 步」徽标：紫色实心胶囊，与合并组卡片色系一致，醒目区分单步条目。

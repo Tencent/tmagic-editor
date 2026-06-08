@@ -27,5 +27,6 @@ export * from './dep/idle-task';
 export * from './scroll-viewer';
 export * from './tree';
 export * from './undo-redo';
+export * from './indexed-db';
 export * from './const';
 export { default as loadMonaco } from './monaco-editor';

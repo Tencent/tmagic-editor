@@ -161,3 +161,120 @@ describe('list max size', () => {
     expect(small.canUndo()).toBe(false);
   });
 });
+
+describe('updateCurrentElement / updateElements', () => {
+  test('updateCurrentElement 就地更新当前游标元素', () => {
+    const undoRedo = new UndoRedo();
+    undoRedo.pushElement({ a: 1 });
+    undoRedo.pushElement({ a: 2 });
+    undoRedo.updateCurrentElement((el: any) => {
+      el.saved = true;
+    });
+    expect(undoRedo.getCurrentElement()).toEqual({ a: 2, saved: true });
+    // 撤销后当前元素是更早的那条，不应被标记
+    expect(undoRedo.undo()).toEqual({ a: 2, saved: true });
+    expect(undoRedo.getCurrentElement()).toEqual({ a: 1 });
+  });
+
+  test('updateCurrentElement 在 cursor 为 0 时不做任何操作', () => {
+    const undoRedo = new UndoRedo();
+    undoRedo.pushElement({ a: 1 });
+    undoRedo.undo();
+    let called = false;
+    undoRedo.updateCurrentElement(() => {
+      called = true;
+    });
+    expect(called).toBe(false);
+  });
+
+  test('updateElements 遍历就地更新全部元素', () => {
+    const undoRedo = new UndoRedo();
+    undoRedo.pushElement({ a: 1, saved: true });
+    undoRedo.pushElement({ a: 2 });
+    undoRedo.updateElements((el: any) => {
+      el.saved = false;
+    });
+    const list = undoRedo.getElementList() as any[];
+    expect(list.every((el) => el.saved === false)).toBe(true);
+  });
+});
+
+describe('serialize / fromSerialized', () => {
+  test('serialize 导出快照并 fromSerialized 完整还原（含游标）', () => {
+    const undoRedo = new UndoRedo(50);
+    undoRedo.pushElement({ a: 1 });
+    undoRedo.pushElement({ a: 2 });
+    undoRedo.pushElement({ a: 3 });
+    undoRedo.undo(); // cursor = 2
+
+    const data = undoRedo.serialize();
+    expect(data.elementList).toHaveLength(3);
+    expect(data.listCursor).toBe(2);
+    expect(data.listMaxSize).toBe(50);
+
+    const restored = UndoRedo.fromSerialized(data);
+    expect(restored.getCursor()).toBe(2);
+    expect(restored.getLength()).toBe(3);
+    expect(restored.getCurrentElement()).toEqual({ a: 2 });
+    expect(restored.canRedo()).toBe(true);
+    expect(restored.redo()).toEqual({ a: 3 });
+  });
+
+  test('serialize 为深克隆，修改原栈不影响快照', () => {
+    const undoRedo = new UndoRedo();
+    const el: any = { a: 1 };
+    undoRedo.pushElement(el);
+    const data = undoRedo.serialize();
+    undoRedo.updateCurrentElement((cur: any) => {
+      cur.a = 999;
+    });
+    expect((data.elementList[0] as any).a).toBe(1);
+  });
+
+  test('fromSerialized 超出 listMaxSize 时裁掉最旧记录并回退游标', () => {
+    const restored = UndoRedo.fromSerialized({
+      elementList: [{ a: 1 }, { a: 2 }, { a: 3 }, { a: 4 }],
+      listCursor: 4,
+      listMaxSize: 2,
+    });
+    expect(restored.getLength()).toBe(2);
+    // 保留最近两条，cursor 同步回退到 2
+    expect(restored.getElementList()).toEqual([{ a: 3 }, { a: 4 }]);
+    expect(restored.getCursor()).toBe(2);
+  });
+
+  test('fromSerialized 游标越界时夹紧到 [0, length]', () => {
+    const restored = UndoRedo.fromSerialized({
+      elementList: [{ a: 1 }, { a: 2 }],
+      listCursor: 99,
+      listMaxSize: 100,
+    });
+    expect(restored.getCursor()).toBe(2);
+  });
+
+  test('fromSerialized isSavedStep 把游标定位到最近一条已保存记录之后', () => {
+    const restored = UndoRedo.fromSerialized<{ a: number; saved?: boolean }>(
+      {
+        elementList: [{ a: 1 }, { a: 2, saved: true }, { a: 3 }, { a: 4 }],
+        listCursor: 4,
+        listMaxSize: 100,
+      },
+      { isSavedStep: (el) => el.saved === true },
+    );
+    // 最近一条已保存记录在 index 1，游标应为 2
+    expect(restored.getCursor()).toBe(2);
+    expect(restored.getCurrentElement()).toEqual({ a: 2, saved: true });
+  });
+
+  test('fromSerialized isSavedStep 无匹配时退回原游标', () => {
+    const restored = UndoRedo.fromSerialized<{ a: number; saved?: boolean }>(
+      {
+        elementList: [{ a: 1 }, { a: 2 }],
+        listCursor: 1,
+        listMaxSize: 100,
+      },
+      { isSavedStep: (el) => el.saved === true },
+    );
+    expect(restored.getCursor()).toBe(1);
+  });
+});

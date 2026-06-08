@@ -20,10 +20,11 @@
         :time-title="formatHistoryFullTime(groupTimestamp(group))"
         :step-count="group.steps.length"
         :sub-steps="
-          group.steps.map((s: any) => ({
+          group.steps.map((s) => ({
             index: s.index,
             applied: s.applied,
             isCurrent: s.isCurrent,
+            saved: s.step.saved,
             desc: describeStep(s.step),
             diffable: isStepDiffable ? isStepDiffable(s.step) : false,
             revertable: s.applied && (isStepRevertable ? isStepRevertable(s.step) : true),
@@ -55,11 +56,12 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup generic="T extends BaseStepValue = BaseStepValue">
 import { computed } from 'vue';
 
-import type { HistoryOpType } from '@editor/type';
+import type { BaseStepValue } from '@editor/type';
 
+import type { HistoryBucketGroup } from './composables';
 import { formatHistoryFullTime, formatHistoryTime, groupSource, groupTimestamp } from './composables';
 import GroupRow from './GroupRow.vue';
 import InitialRow from './InitialRow.vue';
@@ -82,20 +84,15 @@ const props = withDefaults(
     /** 是否展示底部「回到初始状态」入口，默认 true。无 undo cursor 语义的自定义历史可传 false 关闭。 */
     showInitial?: boolean;
     /** 当前 bucket 下的所有历史分组，按时间倒序展示（最近的操作在前）。 */
-    groups: {
-      applied: boolean;
-      isCurrent?: boolean;
-      opType: HistoryOpType;
-      steps: { index: number; applied: boolean; isCurrent?: boolean; step: any }[];
-    }[];
+    groups: HistoryBucketGroup<T>[];
     /** 组级描述文案生成器，接收一个 group，返回展示文本。由父组件按业务类型注入。 */
     describeGroup: (_group: any) => string;
     /** 单步描述文案生成器，接收一个 step，返回展示文本。用于合并组展开后的子步列表。 */
-    describeStep: (_step: any) => string;
+    describeStep: (_step: T) => string;
     /** 判断某个 step 是否可查看差异（前后值都存在）。由父组件按业务类型注入；不传则一律不展示差异入口。 */
-    isStepDiffable?: (_step: any) => boolean;
+    isStepDiffable?: (_step: T) => boolean;
     /** 判断某个 step 是否支持回滚（如更新需带 changeRecords）。由父组件按业务类型注入；不传则已应用即可回滚。 */
-    isStepRevertable?: (_step: any) => boolean;
+    isStepRevertable?: (_step: T) => boolean;
     /** 共享的折叠状态表（key -> 是否展开），由顶层 panel 统一维护以便跨 tab 复用。 */
     expanded: Record<string, boolean>;
     /** 是否支持「跳转到该记录」(goto)。默认 true。 */

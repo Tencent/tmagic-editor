@@ -1,46 +1,52 @@
 <template>
   <div v-if="!list.length" class="m-editor-history-list-empty">暂无操作记录</div>
-  <TMagicScrollbar v-else max-height="360px">
-    <ul class="m-editor-history-list-ul">
-      <GroupRow
-        v-for="group in list"
-        :key="`pg-${group.steps[0]?.index}`"
-        :group-key="`pg-${group.steps[0]?.index}`"
-        :applied="group.applied"
-        :merged="group.steps.length > 1"
-        :op-type="group.opType"
-        :desc="describePageGroup(group)"
-        :source="groupSource(group)"
-        :time="formatHistoryTime(groupTimestamp(group))"
-        :time-title="formatHistoryFullTime(groupTimestamp(group))"
-        :step-count="group.steps.length"
-        :sub-steps="
-          group.steps.map((s) => ({
-            index: s.index,
-            applied: s.applied,
-            isCurrent: s.isCurrent,
-            desc: describePageStep(s.step),
-            diffable: isPageStepDiffable(s.step),
-            revertable: s.applied && isPageStepRevertable(s.step),
-            source: s.step.source,
-            time: formatHistoryTime(s.step.timestamp),
-            timeTitle: formatHistoryFullTime(s.step.timestamp),
-          }))
-        "
-        :is-current="group.isCurrent"
-        :expanded="!!expanded[`pg-${group.steps[0]?.index}`]"
-        @toggle="(key: string) => $emit('toggle', key)"
-        @goto="(index: number) => $emit('goto', index)"
-        @diff-step="(index: number) => $emit('diff-step', index)"
-        @revert-step="(index: number) => $emit('revert-step', index)"
-      />
-      <!--
+  <template v-else>
+    <div class="m-editor-history-list-toolbar">
+      <span class="m-editor-history-list-clear" title="清空当前页面的历史记录" @click="$emit('clear')">清空</span>
+    </div>
+    <TMagicScrollbar max-height="360px">
+      <ul class="m-editor-history-list-ul">
+        <GroupRow
+          v-for="group in list"
+          :key="`pg-${group.steps[0]?.index}`"
+          :group-key="`pg-${group.steps[0]?.index}`"
+          :applied="group.applied"
+          :merged="group.steps.length > 1"
+          :op-type="group.opType"
+          :desc="describePageGroup(group)"
+          :source="groupSource(group)"
+          :time="formatHistoryTime(groupTimestamp(group))"
+          :time-title="formatHistoryFullTime(groupTimestamp(group))"
+          :step-count="group.steps.length"
+          :sub-steps="
+            group.steps.map((s) => ({
+              index: s.index,
+              applied: s.applied,
+              isCurrent: s.isCurrent,
+              saved: s.step.saved,
+              desc: describePageStep(s.step),
+              diffable: isPageStepDiffable(s.step),
+              revertable: s.applied && isPageStepRevertable(s.step),
+              source: s.step.source,
+              time: formatHistoryTime(s.step.timestamp),
+              timeTitle: formatHistoryFullTime(s.step.timestamp),
+            }))
+          "
+          :is-current="group.isCurrent"
+          :expanded="!!expanded[`pg-${group.steps[0]?.index}`]"
+          @toggle="(key: string) => $emit('toggle', key)"
+          @goto="(index: number) => $emit('goto', index)"
+          @diff-step="(index: number) => $emit('diff-step', index)"
+          @revert-step="(index: number) => $emit('revert-step', index)"
+        />
+        <!--
         初始状态项：永远位于列表底部（页面 tab 倒序展示，最底部=最早），
         作为"未修改"零点。当所有 group 都未 applied 时它即为当前位置。
       -->
-      <InitialRow :is-current="isInitial" @goto-initial="$emit('goto-initial')" />
-    </ul>
-  </TMagicScrollbar>
+        <InitialRow :is-current="isInitial" @goto-initial="$emit('goto-initial')" />
+      </ul>
+    </TMagicScrollbar>
+  </template>
 </template>
 
 <script lang="ts" setup>
@@ -88,6 +94,8 @@ defineEmits<{
   (_e: 'diff-step', _index: number): void;
   /** 用户点击"回滚"按钮，携带目标 step 在栈中的索引，类 git revert。 */
   (_e: 'revert-step', _index: number): void;
+  /** 用户点击"清空"按钮，请求清空当前页面的历史记录（由上层弹窗二次确认后执行）。 */
+  (_e: 'clear'): void;
 }>();
 
 /**
