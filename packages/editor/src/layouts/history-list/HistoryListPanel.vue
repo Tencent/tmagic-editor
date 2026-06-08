@@ -38,14 +38,9 @@
           v-bind="tabPaneComponent?.props({ name: 'data-source', label: `数据源 (${dataSourceGroups.length})` }) || {}"
         >
           <BucketTab
-            title="数据源"
-            prefix="ds"
+            :config="dataSourceConfig"
             :buckets="dataSourceGroupsByTarget"
             :expanded="expanded"
-            :describe-group="describeDataSourceGroup"
-            :describe-step="describeDataSourceStep"
-            :is-step-diffable="isDataSourceStepDiffable"
-            :is-step-revertable="isDataSourceStepRevertable"
             @toggle="toggleGroup"
             @goto="onDataSourceGoto"
             @goto-initial="onDataSourceGotoInitial"
@@ -61,14 +56,9 @@
           v-bind="tabPaneComponent?.props({ name: 'code-block', label: `代码块 (${codeBlockGroups.length})` }) || {}"
         >
           <BucketTab
-            title="代码块"
-            prefix="cb"
+            :config="codeBlockConfig"
             :buckets="codeBlockGroupsByTarget"
             :expanded="expanded"
-            :describe-group="describeCodeBlockGroup"
-            :describe-step="describeCodeBlockStep"
-            :is-step-diffable="isCodeBlockStepDiffable"
-            :is-step-revertable="isCodeBlockStepRevertable"
             @toggle="toggleGroup"
             @goto="onCodeBlockGoto"
             @goto-initial="onCodeBlockGotoInitial"
@@ -148,6 +138,7 @@ import { useServices } from '@editor/hooks/use-services';
 import type { CodeBlockStepValue, DataSourceStepValue, DiffDialogPayload, HistoryListExtraTab } from '@editor/type';
 
 import BucketTab from './BucketTab.vue';
+import type { HistoryBucketConfig } from './composables';
 import {
   describeCodeBlockGroup,
   describeCodeBlockStep,
@@ -219,10 +210,34 @@ const {
 } = useHistoryList();
 
 /** 数据源 step 仅 update（前后 schema 都存在）时可查看差异。 */
-const isDataSourceStepDiffable = (step: DataSourceStepValue) => Boolean(step.oldSchema && step.newSchema);
+const isDataSourceStepDiffable = (step: DataSourceStepValue) =>
+  Boolean(step.diff?.[0]?.oldSchema && step.diff?.[0]?.newSchema);
 
 /** 代码块 step 仅 update（前后 content 都存在）时可查看差异。 */
-const isCodeBlockStepDiffable = (step: CodeBlockStepValue) => Boolean(step.oldContent && step.newContent);
+const isCodeBlockStepDiffable = (step: CodeBlockStepValue) =>
+  Boolean(step.diff?.[0]?.oldSchema && step.diff?.[0]?.newSchema);
+
+/**
+ * 数据源 / 代码块两类 bucket 历史的整体渲染配置：把 title / prefix 与各自的描述、
+ * 可差异、可回滚判定收敛为单一对象整体注入 BucketTab，组件内部按需读取。
+ */
+const dataSourceConfig: HistoryBucketConfig<DataSourceStepValue> = {
+  title: '数据源',
+  prefix: 'ds',
+  describeGroup: describeDataSourceGroup,
+  describeStep: describeDataSourceStep,
+  isStepDiffable: isDataSourceStepDiffable,
+  isStepRevertable: isDataSourceStepRevertable,
+};
+
+const codeBlockConfig: HistoryBucketConfig<CodeBlockStepValue> = {
+  title: '代码块',
+  prefix: 'cb',
+  describeGroup: describeCodeBlockGroup,
+  describeStep: describeCodeBlockStep,
+  isStepDiffable: isCodeBlockStepDiffable,
+  isStepRevertable: isCodeBlockStepRevertable,
+};
 
 /** 把"目标 step 索引"翻译成"目标 cursor"（已应用步骤数量）。 */
 const indexToCursor = (index: number) => index + 1;
@@ -259,7 +274,7 @@ const diffDialogRef = useTemplateRef<InstanceType<typeof HistoryDiffDialog>>('di
 
 /**
  * 构造页面 step 的差异弹窗入参：仅 update 单节点修改可对比，传入旧/新节点。
- * 节点类型 `type` 优先取 newNode.type，再回退 oldNode.type。
+ * 节点类型 `type` 优先取 newSchema.type，再回退 oldSchema.type。
  * `currentValue` 取自 editorService 中该节点当前实际值，用于支持「与当前对比」。
  * 无可对比内容（如多节点 / add / remove）时返回 null。
  */
@@ -268,18 +283,18 @@ const buildPageDiffPayload = (index: number): DiffDialogPayload | null => {
   for (const group of groups) {
     const entry = group.steps.find((s) => s.index === index);
     if (!entry) continue;
-    const item = entry.step.updatedItems?.[0];
-    if (!item?.oldNode || !item?.newNode) return null;
-    const type = (item.newNode.type as string) || (item.oldNode.type as string) || '';
-    const nodeId = item.newNode.id ?? item.oldNode.id;
+    const item = entry.step.diff?.[0];
+    if (!item?.oldSchema || !item?.newSchema) return null;
+    const type = (item.newSchema.type as string) || (item.oldSchema.type as string) || '';
+    const nodeId = item.newSchema.id ?? item.oldSchema.id;
     const currentNode = nodeId !== undefined ? editorService.getNodeById(nodeId) : null;
     return {
       category: 'node',
       type,
-      lastValue: item.oldNode as Record<string, any>,
-      value: item.newNode as Record<string, any>,
+      lastValue: item.oldSchema as Record<string, any>,
+      value: item.newSchema as Record<string, any>,
       currentValue: (currentNode as Record<string, any>) || null,
-      targetLabel: (item.newNode.name as string) || (item.oldNode.name as string) || type,
+      targetLabel: (item.newSchema.name as string) || (item.oldSchema.name as string) || type,
       id: nodeId,
     };
   }
@@ -306,7 +321,9 @@ const findGroupStep = <G extends { id: string | number; steps: { index: number; 
 };
 
 const buildDataSourceDiffPayload = (id: string | number, index: number): DiffDialogPayload | null =>
-  findGroupStep(historyService.getDataSourceHistoryGroups(), id, index, ({ oldSchema, newSchema }) => {
+  findGroupStep(historyService.getDataSourceHistoryGroups(), id, index, (step) => {
+    const oldSchema = step.diff?.[0]?.oldSchema;
+    const newSchema = step.diff?.[0]?.newSchema;
     if (!oldSchema || !newSchema) return null;
     const currentSchema = dataSourceService.getDataSourceById(`${id}`);
     return {
@@ -321,7 +338,9 @@ const buildDataSourceDiffPayload = (id: string | number, index: number): DiffDia
   });
 
 const buildCodeBlockDiffPayload = (id: string | number, index: number): DiffDialogPayload | null =>
-  findGroupStep(historyService.getCodeBlockHistoryGroups(), id, index, ({ oldContent, newContent }) => {
+  findGroupStep(historyService.getCodeBlockHistoryGroups(), id, index, (step) => {
+    const oldContent = step.diff?.[0]?.oldSchema;
+    const newContent = step.diff?.[0]?.newSchema;
     if (!oldContent || !newContent) return null;
     const currentContent = codeBlockService.getCodeContentById(id);
     return {
@@ -358,39 +377,50 @@ const onConfirmRevert = shallowRef();
  * 交互：先弹出该步骤的差异弹窗供用户确认，点击「确定回滚」后再真正执行回滚；
  * 对没有可对比内容的步骤（如 add / remove / 多节点更新）则直接回滚。
  */
-const onPageRevert = (index: number) => {
+const onPageRevert = async (index: number) => {
   const payload = buildPageDiffPayload(index);
-  onConfirmRevert.value = () => editorService.revertPageStep(index);
+  const revert = () => editorService.revertPageStep(index);
+  onConfirmRevert.value = revert;
   if (payload) {
     diffDialogRef.value?.open({ ...payload });
-  } else {
-    onConfirmRevert.value();
+  } else if (await confirmRevert()) {
+    revert();
   }
 };
 
-const onDataSourceRevert = (id: string | number, index: number) => {
+const onDataSourceRevert = async (id: string | number, index: number) => {
   const payload = buildDataSourceDiffPayload(id, index);
-  onConfirmRevert.value = () => dataSourceService.revert(id, index);
+  const revert = () => dataSourceService.revert(id, index);
+  onConfirmRevert.value = revert;
   if (payload) {
     diffDialogRef.value?.open({ ...payload });
-  } else {
-    onConfirmRevert.value();
+  } else if (await confirmRevert()) {
+    revert();
   }
 };
 
-const onCodeBlockRevert = (id: string | number, index: number) => {
+const onCodeBlockRevert = async (id: string | number, index: number) => {
   const payload = buildCodeBlockDiffPayload(id, index);
-  onConfirmRevert.value = () => codeBlockService.revert(id, index);
+  const revert = () => codeBlockService.revert(id, index);
+  onConfirmRevert.value = revert;
   if (payload) {
     diffDialogRef.value?.open({ ...payload });
-  } else {
-    onConfirmRevert.value();
+  } else if (await confirmRevert()) {
+    revert();
   }
 };
 
 const onDiffDialogClose = () => {
   onConfirmRevert.value = undefined;
 };
+
+/**
+ * 「回滚」二次确认：新增 / 删除 / 多节点更新等无法做差异对比的步骤，
+ * 不弹差异弹窗，改用一个普通确认框替代「确定回滚」按钮，避免点击后无任何提示直接执行。
+ * 用户取消时返回 false，调用方据此中止回滚。
+ */
+const confirmRevert = (): Promise<boolean> =>
+  confirmClear('确定回滚该步骤吗？回滚会将该操作作为一条新记录反向应用（新增将被删除、删除将被还原），不影响后续历史记录。');
 
 /**
  * 「清空历史记录」入口：先弹出二次确认，确认后清空对应类别的历史栈。

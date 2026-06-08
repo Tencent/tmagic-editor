@@ -19,6 +19,7 @@ import type {
 } from '@editor/type';
 import { getFormConfig, getFormValue } from '@editor/utils/data-source';
 import { COPY_DS_STORAGE_KEY } from '@editor/utils/editor';
+import { describeRevertStep } from '@editor/utils/history';
 
 import BaseService from './BaseService';
 
@@ -53,19 +54,6 @@ const canUsePluginMethods = {
 };
 
 type SyncMethodName = Writable<(typeof canUsePluginMethods)['sync']>;
-
-/**
- * 「回滚」生成的新 step 简短描述。
- * 仅在 service 层使用，避免依赖 UI 层 composables。
- */
-const describeRevertDataSourceStep = (step: DataSourceStepValue): string => {
-  const { oldSchema, newSchema, changeRecords, id } = step;
-  if (oldSchema === null && newSchema) return `撤回新增 ${newSchema.title || newSchema.id || id}`;
-  if (oldSchema && newSchema === null) return `还原已删除的 ${oldSchema.title || oldSchema.id || id}`;
-  const title = newSchema?.title || oldSchema?.title || `${id}`;
-  const propPath = changeRecords?.[0]?.propPath;
-  return propPath ? `还原 ${title} · ${propPath}` : `还原 ${title}`;
-};
 
 class DataSource extends BaseService {
   private state = reactive<State>({
@@ -342,8 +330,9 @@ class DataSource extends BaseService {
     const entry = list[index];
     if (!entry?.applied) return null;
     // 更新类步骤（前后 schema 都存在）必须带 changeRecords 才支持回滚，否则只能整 schema 替换，会冲掉后续无关变更。
-    if (entry.step.oldSchema && entry.step.newSchema && !entry.step.changeRecords?.length) return null;
-    const description = `回滚 #${index + 1}: ${describeRevertDataSourceStep(entry.step)}`;
+    const { oldSchema, newSchema, changeRecords } = entry.step.diff?.[0] ?? {};
+    if (oldSchema && newSchema && !changeRecords?.length) return null;
+    const description = `回滚 #${index + 1}: ${describeRevertStep<DataSourceSchema>(entry.step.id, entry.step.diff?.[0], (s) => s.title)}`;
     return this.applyRevertStep(entry.step, description);
   }
 
@@ -441,16 +430,17 @@ class DataSource extends BaseService {
    * 同构，差异仅在于走对应的公共 add / update / remove 而不是带 doNotPushHistory 的版本。
    */
   private applyRevertStep(step: DataSourceStepValue, historyDescription: string): DataSourceStepValue | null {
-    const { id, oldSchema, newSchema, changeRecords } = step;
+    const { id } = step;
+    const { oldSchema, newSchema, changeRecords } = step.diff?.[0] ?? {};
 
     // 原本是新增 → revert 即删除
-    if (oldSchema === null && newSchema) {
+    if (!oldSchema && newSchema) {
       this.remove(`${id}`, { historyDescription, historySource: 'rollback' });
       return historyService.getDataSourceStepList(id).slice(-1)[0]?.step ?? null;
     }
 
     // 原本是删除 → revert 即重新加回
-    if (oldSchema && newSchema === null) {
+    if (oldSchema && !newSchema) {
       this.add(cloneDeep(oldSchema), { historyDescription, historySource: 'rollback' });
       return historyService.getDataSourceStepList(id).slice(-1)[0]?.step ?? null;
     }
@@ -498,10 +488,11 @@ class DataSource extends BaseService {
    * @param reverse true=撤销，false=重做
    */
   private applyHistoryStep(step: DataSourceStepValue, reverse: boolean): void {
-    const { id, oldSchema, newSchema, changeRecords } = step;
+    const { id } = step;
+    const { oldSchema, newSchema, changeRecords } = step.diff?.[0] ?? {};
 
     // 新增 / 删除：直接 add 或 remove，不走 patch 逻辑
-    if (oldSchema === null && newSchema) {
+    if (!oldSchema && newSchema) {
       if (reverse) {
         this.remove(`${id}`, { doNotPushHistory: true });
       } else {
@@ -510,7 +501,7 @@ class DataSource extends BaseService {
       return;
     }
 
-    if (oldSchema && newSchema === null) {
+    if (oldSchema && !newSchema) {
       if (reverse) {
         this.add(cloneDeep(oldSchema), { doNotPushHistory: true });
       } else {

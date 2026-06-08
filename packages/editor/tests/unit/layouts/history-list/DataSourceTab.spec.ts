@@ -21,6 +21,19 @@ vi.mock('@tmagic/design', () => ({
   }),
 }));
 
+/** 把以 oldSchema/newSchema/changeRecords 描述的 fixture 归一成统一 diff 形态的 step。 */
+const toDiffStep = (s: any, opType: 'add' | 'remove' | 'update') => ({
+  id: s.id,
+  opType,
+  diff: [
+    {
+      ...(s.newSchema != null ? { newSchema: s.newSchema } : {}),
+      ...(s.oldSchema != null ? { oldSchema: s.oldSchema } : {}),
+      ...(s.changeRecords ? { changeRecords: s.changeRecords } : {}),
+    },
+  ],
+});
+
 const buildGroup = (
   id: string,
   opType: 'add' | 'remove' | 'update',
@@ -32,18 +45,20 @@ const buildGroup = (
   id,
   opType,
   applied,
-  steps: steps.map((s, i) => ({ step: s, index: startIndex + i, applied })),
+  steps: steps.map((s, i) => ({ step: toDiffStep(s, opType) as any, index: startIndex + i, applied })),
 });
 
-/** 数据源 tab 复用通用 BucketTab，固定注入数据源的 title/prefix/describe/isStepDiffable。 */
+/** 数据源 tab 复用通用 BucketTab，固定注入数据源的 config（title/prefix/describe/isStepDiffable）。 */
 const mountDataSourceTab = (props: { buckets: any[]; expanded: Record<string, boolean> }) =>
   mount(BucketTab, {
     props: {
-      title: '数据源',
-      prefix: 'ds',
-      describeGroup: describeDataSourceGroup,
-      describeStep: describeDataSourceStep,
-      isStepDiffable: (step: DataSourceStepValue) => Boolean(step.oldSchema && step.newSchema),
+      config: {
+        title: '数据源',
+        prefix: 'ds',
+        describeGroup: describeDataSourceGroup,
+        describeStep: describeDataSourceStep,
+        isStepDiffable: (step: DataSourceStepValue) => Boolean(step.diff?.[0]?.oldSchema && step.diff?.[0]?.newSchema),
+      },
       ...props,
     },
   });

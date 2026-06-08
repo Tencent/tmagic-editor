@@ -176,8 +176,8 @@ describe('CodeBlockService - 历史记录接入', () => {
 
     expect(historyService.canUndoCodeBlock('new_code')).toBe(true);
     const step = historyService.undoCodeBlock('new_code');
-    expect(step?.oldContent).toBeNull();
-    expect(step?.newContent).toEqual(expect.objectContaining({ name: 'A' }));
+    expect(step?.diff?.[0]?.oldSchema).toBeUndefined();
+    expect(step?.diff?.[0]?.newSchema).toEqual(expect.objectContaining({ name: 'A' }));
   });
 
   test('setCodeDslByIdSync - 更新时入历史（oldContent / newContent 都非空）', async () => {
@@ -185,8 +185,8 @@ describe('CodeBlockService - 历史记录接入', () => {
     codeBlockService.setCodeDslByIdSync('a', { name: 'A2' } as any);
 
     const step = historyService.undoCodeBlock('a');
-    expect(step?.oldContent).toEqual({ name: 'A' });
-    expect(step?.newContent).toEqual(expect.objectContaining({ name: 'A2' }));
+    expect(step?.diff?.[0]?.oldSchema).toEqual({ name: 'A' });
+    expect(step?.diff?.[0]?.newSchema).toEqual(expect.objectContaining({ name: 'A2' }));
   });
 
   test('setCodeDslByIdSync - force=false 已存在时不入历史', async () => {
@@ -200,8 +200,8 @@ describe('CodeBlockService - 历史记录接入', () => {
     await codeBlockService.deleteCodeDslByIds(['a']);
 
     const step = historyService.undoCodeBlock('a');
-    expect(step?.oldContent).toEqual({ name: 'A' });
-    expect(step?.newContent).toBeNull();
+    expect(step?.diff?.[0]?.oldSchema).toEqual({ name: 'A' });
+    expect(step?.diff?.[0]?.newSchema).toBeUndefined();
   });
 
   test('deleteCodeDslByIds - 删除不存在的 id 不入历史', async () => {
@@ -218,7 +218,7 @@ describe('CodeBlockService - 历史记录接入', () => {
     });
 
     const step = historyService.undoCodeBlock('a');
-    expect(step?.changeRecords).toEqual([{ propPath: 'name', value: 'A2' }]);
+    expect(step?.diff?.[0]?.changeRecords).toEqual([{ propPath: 'name', value: 'A2' }]);
   });
 
   test('setCodeDslByIdSync - 不传 changeRecords 时 step.changeRecords 为 undefined', async () => {
@@ -227,7 +227,7 @@ describe('CodeBlockService - 历史记录接入', () => {
     codeBlockService.setCodeDslByIdSync('a', { name: 'A2' } as any);
 
     const step = historyService.undoCodeBlock('a');
-    expect(step?.changeRecords).toBeUndefined();
+    expect(step?.diff?.[0]?.changeRecords).toBeUndefined();
   });
 });
 

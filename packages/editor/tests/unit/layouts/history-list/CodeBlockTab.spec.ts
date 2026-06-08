@@ -21,6 +21,19 @@ vi.mock('@tmagic/design', () => ({
   }),
 }));
 
+/** 把以 oldContent/newContent/changeRecords 描述的 fixture 归一成统一 diff 形态的 step。 */
+const toDiffStep = (s: any, opType: 'add' | 'remove' | 'update') => ({
+  id: s.id,
+  opType,
+  diff: [
+    {
+      ...(s.newContent != null ? { newSchema: s.newContent } : {}),
+      ...(s.oldContent != null ? { oldSchema: s.oldContent } : {}),
+      ...(s.changeRecords ? { changeRecords: s.changeRecords } : {}),
+    },
+  ],
+});
+
 const buildGroup = (
   id: string,
   opType: 'add' | 'remove' | 'update',
@@ -32,18 +45,20 @@ const buildGroup = (
   id,
   opType,
   applied,
-  steps: steps.map((s, i) => ({ step: s, index: startIndex + i, applied })),
+  steps: steps.map((s, i) => ({ step: toDiffStep(s, opType) as any, index: startIndex + i, applied })),
 });
 
-/** 代码块 tab 复用通用 BucketTab，固定注入代码块的 title/prefix/describe/isStepDiffable。 */
+/** 代码块 tab 复用通用 BucketTab，固定注入代码块的 config（title/prefix/describe/isStepDiffable）。 */
 const mountCodeBlockTab = (props: { buckets: any[]; expanded: Record<string, boolean> }) =>
   mount(BucketTab, {
     props: {
-      title: '代码块',
-      prefix: 'cb',
-      describeGroup: describeCodeBlockGroup,
-      describeStep: describeCodeBlockStep,
-      isStepDiffable: (step: CodeBlockStepValue) => Boolean(step.oldContent && step.newContent),
+      config: {
+        title: '代码块',
+        prefix: 'cb',
+        describeGroup: describeCodeBlockGroup,
+        describeStep: describeCodeBlockStep,
+        isStepDiffable: (step: CodeBlockStepValue) => Boolean(step.diff?.[0]?.oldSchema && step.diff?.[0]?.newSchema),
+      },
       ...props,
     },
   });

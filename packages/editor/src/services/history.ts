@@ -25,11 +25,13 @@ import type { ChangeRecord } from '@tmagic/form';
 import { guid } from '@tmagic/utils';
 
 import type {
+  BaseStepValue,
   CodeBlockHistoryGroup,
   CodeBlockStepValue,
   DataSourceHistoryGroup,
   DataSourceStepValue,
   HistoryOpSource,
+  HistoryOpType,
   HistoryPersistOptions,
   HistoryState,
   PageHistoryGroup,
@@ -52,20 +54,38 @@ const PERSIST_VERSION = 1;
 
 class History extends BaseService {
   /**
-   * 把单个代码块栈拆成若干 group：
+   * 把单个「按 id 分栈」的历史栈（代码块 / 数据源）拆成若干 group：
    * - 把"新增/删除"独立成组（语义上属于一次性事件，不应与 update 合并）；
    * - 连续 'update' 合并到同一组，组内 steps 顺序就是发生顺序。
+   *
+   * 代码块与数据源除 `kind` 外结构完全一致，统一由本方法处理；`kind` 决定返回的具体分组类型。
    */
-  private static mergeCodeBlockSteps(
-    codeBlockId: Id,
-    list: CodeBlockStepValue[],
+  private static mergeStackSteps<S extends BaseStepValue, K extends 'code-block' | 'data-source'>(
+    kind: K,
+    id: Id,
+    list: S[],
     cursor: number,
-  ): CodeBlockHistoryGroup[] {
-    const groups: CodeBlockHistoryGroup[] = [];
-    let current: CodeBlockHistoryGroup | null = null;
+  ): {
+    kind: K;
+    id: Id;
+    opType: HistoryOpType;
+    steps: { step: S; index: number; applied: boolean; isCurrent?: boolean }[];
+    applied: boolean;
+    isCurrent?: boolean;
+  }[] {
+    type Group = {
+      kind: K;
+      id: Id;
+      opType: HistoryOpType;
+      steps: { step: S; index: number; applied: boolean; isCurrent?: boolean }[];
+      applied: boolean;
+      isCurrent?: boolean;
+    };
+    const groups: Group[] = [];
+    let current: Group | null = null;
     const currentIndex = cursor - 1;
     list.forEach((step, index) => {
-      const opType = History.detectOpType(step.oldContent, step.newContent);
+      const { opType } = step;
       const applied = index < cursor;
       const isCurrent = index === currentIndex;
       if (opType === 'update' && current?.opType === 'update') {
@@ -74,39 +94,8 @@ class History extends BaseService {
         if (isCurrent) current.isCurrent = true;
       } else {
         current = {
-          kind: 'code-block',
-          id: codeBlockId,
-          opType,
-          steps: [{ step, index, applied, isCurrent }],
-          applied,
-          isCurrent,
-        };
-        groups.push(current);
-      }
-    });
-    return groups;
-  }
-
-  private static mergeDataSourceSteps(
-    dataSourceId: Id,
-    list: DataSourceStepValue[],
-    cursor: number,
-  ): DataSourceHistoryGroup[] {
-    const groups: DataSourceHistoryGroup[] = [];
-    let current: DataSourceHistoryGroup | null = null;
-    const currentIndex = cursor - 1;
-    list.forEach((step, index) => {
-      const opType = History.detectOpType(step.oldSchema, step.newSchema);
-      const applied = index < cursor;
-      const isCurrent = index === currentIndex;
-      if (opType === 'update' && current?.opType === 'update') {
-        current.steps.push({ step, index, applied, isCurrent });
-        current.applied = applied;
-        if (isCurrent) current.isCurrent = true;
-      } else {
-        current = {
-          kind: 'data-source',
-          id: dataSourceId,
+          kind,
+          id,
           opType,
           steps: [{ step, index, applied, isCurrent }],
           applied,
@@ -176,34 +165,34 @@ class History extends BaseService {
    */
   private static detectPageTargetId(step: StepValue): Id | undefined {
     if (step.opType !== 'update') return undefined;
-    const items = step.updatedItems;
+    const items = step.diff;
     if (items?.length !== 1) return undefined;
-    return items[0].newNode?.id ?? items[0].oldNode?.id;
+    return items[0].newSchema?.id ?? items[0].oldSchema?.id;
   }
 
   /** 解析 StepValue 中的目标节点可读名（用于 UI 展示）。 */
   private static detectPageTargetName(step: StepValue): string | undefined {
+    const items = step.diff;
     if (step.opType === 'update') {
-      const items = step.updatedItems;
       if (items?.length === 1) {
-        const node = items[0].newNode || items[0].oldNode;
+        const node = items[0].newSchema || items[0].oldSchema;
         return (node?.name as string) || (node?.type as string) || (node?.id !== undefined ? `${node.id}` : undefined);
       }
       return items?.length ? `${items.length} 个节点` : undefined;
     }
     if (step.opType === 'add') {
-      if (step.nodes?.length === 1) {
-        const n = step.nodes[0];
-        return (n.name as string) || (n.type as string) || `${n.id}`;
+      if (items?.length === 1) {
+        const n = items[0].newSchema;
+        return (n?.name as string) || (n?.type as string) || `${n?.id}`;
       }
-      return step.nodes?.length ? `${step.nodes.length} 个节点` : undefined;
+      return items?.length ? `${items.length} 个节点` : undefined;
     }
     if (step.opType === 'remove') {
-      if (step.removedItems?.length === 1) {
-        const n = step.removedItems[0].node;
-        return (n.name as string) || (n.type as string) || `${n.id}`;
+      if (items?.length === 1) {
+        const n = items[0].oldSchema;
+        return (n?.name as string) || (n?.type as string) || `${n?.id}`;
       }
-      return step.removedItems?.length ? `${step.removedItems.length} 个节点` : undefined;
+      return items?.length ? `${items.length} 个节点` : undefined;
     }
     return undefined;
   }
@@ -245,6 +234,16 @@ class History extends BaseService {
       }
     });
     return result;
+  }
+
+  /**
+   * 按 id 从「按 id 分栈」的记录表（代码块 / 数据源）中获取（或创建）对应的 UndoRedo 栈。
+   */
+  private static getOrCreateStack<T>(stacks: Record<Id, UndoRedo<T>>, id: Id): UndoRedo<T> {
+    if (!stacks[id]) {
+      stacks[id] = new UndoRedo<T>();
+    }
+    return stacks[id];
   }
 
   public state = reactive<HistoryState>({
@@ -338,20 +337,15 @@ class History extends BaseService {
       source?: HistoryOpSource;
     },
   ): CodeBlockStepValue | null {
-    if (!codeBlockId) return null;
-
-    const step: CodeBlockStepValue = {
-      uuid: guid(),
-      id: codeBlockId,
-      oldContent: payload.oldContent ? cloneDeep(payload.oldContent) : null,
-      newContent: payload.newContent ? cloneDeep(payload.newContent) : null,
-      changeRecords: payload.changeRecords?.length ? cloneDeep(payload.changeRecords) : undefined,
+    const step = this.createStackStep<CodeBlockContent, CodeBlockStepValue>(codeBlockId, {
+      oldValue: payload.oldContent,
+      newValue: payload.newContent,
+      changeRecords: payload.changeRecords,
       historyDescription: payload.historyDescription,
       source: payload.source,
-      timestamp: Date.now(),
-    };
-
-    this.getCodeBlockUndoRedo(codeBlockId).pushElement(step);
+    });
+    if (!step) return null;
+    History.getOrCreateStack(this.state.codeBlockState, codeBlockId).pushElement(step);
     this.emit('code-block-history-change', codeBlockId, step);
     return step;
   }
@@ -372,20 +366,15 @@ class History extends BaseService {
       source?: HistoryOpSource;
     },
   ): DataSourceStepValue | null {
-    if (!dataSourceId) return null;
-
-    const step: DataSourceStepValue = {
-      uuid: guid(),
-      id: dataSourceId,
-      oldSchema: payload.oldSchema ? cloneDeep(payload.oldSchema) : null,
-      newSchema: payload.newSchema ? cloneDeep(payload.newSchema) : null,
-      changeRecords: payload.changeRecords?.length ? cloneDeep(payload.changeRecords) : undefined,
+    const step = this.createStackStep<DataSourceSchema, DataSourceStepValue>(dataSourceId, {
+      oldValue: payload.oldSchema,
+      newValue: payload.newSchema,
+      changeRecords: payload.changeRecords,
       historyDescription: payload.historyDescription,
       source: payload.source,
-      timestamp: Date.now(),
-    };
-
-    this.getDataSourceUndoRedo(dataSourceId).pushElement(step);
+    });
+    if (!step) return null;
+    History.getOrCreateStack(this.state.dataSourceState, dataSourceId).pushElement(step);
     this.emit('data-source-history-change', dataSourceId, step);
     return step;
   }
@@ -649,7 +638,7 @@ class History extends BaseService {
       const list = undoRedo.getElementList();
       if (!list.length) return;
       const cursor = undoRedo.getCursor();
-      groups.push(...History.mergeCodeBlockSteps(id, list, cursor));
+      groups.push(...History.mergeStackSteps('code-block', id, list, cursor));
     });
     return groups;
   }
@@ -741,7 +730,7 @@ class History extends BaseService {
       const list = undoRedo.getElementList();
       if (!list.length) return;
       const cursor = undoRedo.getCursor();
-      groups.push(...History.mergeDataSourceSteps(id, list, cursor));
+      groups.push(...History.mergeStackSteps('data-source', id, list, cursor));
     });
     return groups;
   }
@@ -777,23 +766,47 @@ class History extends BaseService {
   }
 
   /**
-   * 按 id 获取（或创建）指定代码块的 UndoRedo 栈。
+   * 构造一条代码块 / 数据源「按 id 分栈」的历史记录：两者除 payload 字段命名外完全一致。
+   *
+   * - `add`：oldValue = null；`remove`：newValue = null；`update`：两者都有，可带 changeRecords 做局部更新。
+   * - 内容会做 cloneDeep 防止后续被外部引用篡改；opType 依据 old/new 是否为 null 推断。
+   * - 仅负责构造 step 并返回，入栈与事件 emit 由各公共方法（pushCodeBlock / pushDataSource）自行处理。
+   * - 不直接驱动业务 service，调用方负责实际写回。
    */
-  private getCodeBlockUndoRedo(codeBlockId: Id): UndoRedo<CodeBlockStepValue> {
-    if (!this.state.codeBlockState[codeBlockId]) {
-      this.state.codeBlockState[codeBlockId] = new UndoRedo<CodeBlockStepValue>();
-    }
-    return this.state.codeBlockState[codeBlockId];
-  }
+  private createStackStep<T, S extends BaseStepValue<T> & { id: Id }>(
+    id: Id,
+    payload: {
+      oldValue: T | null;
+      newValue: T | null;
+      changeRecords?: ChangeRecord[];
+      historyDescription?: string;
+      source?: HistoryOpSource;
+    },
+  ): S | null {
+    if (!id) return null;
 
-  /**
-   * 按 id 获取（或创建）指定数据源的 UndoRedo 栈。
-   */
-  private getDataSourceUndoRedo(dataSourceId: Id): UndoRedo<DataSourceStepValue> {
-    if (!this.state.dataSourceState[dataSourceId]) {
-      this.state.dataSourceState[dataSourceId] = new UndoRedo<DataSourceStepValue>();
-    }
-    return this.state.dataSourceState[dataSourceId];
+    const oldSchema = payload.oldValue ? cloneDeep(payload.oldValue) : null;
+    const newSchema = payload.newValue ? cloneDeep(payload.newValue) : null;
+    const changeRecords = payload.changeRecords?.length ? cloneDeep(payload.changeRecords) : undefined;
+    const opType = History.detectOpType(payload.oldValue, payload.newValue);
+
+    const step: BaseStepValue<T> & { id: Id } = {
+      uuid: guid(),
+      id,
+      opType,
+      diff: [
+        {
+          ...(newSchema !== null ? { newSchema } : {}),
+          ...(oldSchema !== null ? { oldSchema } : {}),
+          ...(opType === 'update' && changeRecords ? { changeRecords } : {}),
+        },
+      ],
+      historyDescription: payload.historyDescription,
+      source: payload.source,
+      timestamp: Date.now(),
+    };
+
+    return step as S;
   }
 }
 

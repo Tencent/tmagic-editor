@@ -105,7 +105,7 @@ describe('HistoryListPanel.vue', () => {
     historyService.changePage({ id: 'p1' } as any);
     historyService.push({
       opType: 'add',
-      nodes: [{ id: 'n1', name: 'A' }],
+      diff: [{ newSchema: { id: 'n1', name: 'A' } }],
       modifiedNodeIds: new Map(),
     } as any);
     historyService.pushDataSource('ds_1', {
@@ -136,10 +136,10 @@ describe('HistoryListPanel.vue', () => {
     const mkUpdate = (path: string) => ({
       opType: 'update',
       modifiedNodeIds: new Map(),
-      updatedItems: [
+      diff: [
         {
-          newNode: { id: 'btn', name: '按钮' },
-          oldNode: { id: 'btn', name: '按钮' },
+          newSchema: { id: 'btn', name: '按钮' },
+          oldSchema: { id: 'btn', name: '按钮' },
           changeRecords: [{ propPath: path }],
         },
       ],
@@ -169,12 +169,12 @@ describe('HistoryListPanel.vue', () => {
     historyService.changePage({ id: 'p1' } as any);
     historyService.push({
       opType: 'add',
-      nodes: [{ id: 'n1', name: 'A' }],
+      diff: [{ newSchema: { id: 'n1', name: 'A' } }],
       modifiedNodeIds: new Map(),
     } as any);
     historyService.push({
       opType: 'add',
-      nodes: [{ id: 'n2', name: 'B' }],
+      diff: [{ newSchema: { id: 'n2', name: 'B' } }],
       modifiedNodeIds: new Map(),
     } as any);
 
@@ -240,7 +240,7 @@ describe('HistoryListPanel.vue', () => {
     historyService.changePage({ id: 'p1' } as any);
     historyService.push({
       opType: 'add',
-      nodes: [{ id: 'n1', name: 'A' }],
+      diff: [{ newSchema: { id: 'n1', name: 'A' } }],
       modifiedNodeIds: new Map(),
     } as any);
 

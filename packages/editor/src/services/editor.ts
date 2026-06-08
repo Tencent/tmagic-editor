@@ -47,6 +47,7 @@ import type {
   HistoryOpSource,
   HistoryOpType,
   PastePosition,
+  StepDiffItem,
   StepValue,
   StoreState,
   StoreStateKey,
@@ -80,25 +81,26 @@ type MoveItem = { node: MNode; parent: MContainer; pageForOp: { name: string; id
  * 与 UI 层 `describePageStep` 同义，但避免 service 反向依赖 layouts/，故在此本地实现。
  */
 const describeStepForRevert = (step: StepValue): string => {
+  const items = step.diff ?? [];
   switch (step.opType) {
     case 'add': {
-      const count = step.nodes?.length ?? 0;
-      const node = step.nodes?.[0];
+      const count = items.length;
+      const node = items[0]?.newSchema;
       const label = node?.name || node?.type || (node?.id !== undefined ? `${node.id}` : '');
       return `撤回新增 ${count} 个节点${count === 1 && label ? `（${label}）` : ''}`;
     }
     case 'remove': {
-      const count = step.removedItems?.length ?? 0;
-      const node = step.removedItems?.[0]?.node;
+      const count = items.length;
+      const node = items[0]?.oldSchema;
       const label = node?.name || node?.type || (node?.id !== undefined ? `${node.id}` : '');
       return `还原已删除的 ${count} 个节点${count === 1 && label ? `（${label}）` : ''}`;
     }
     case 'update':
     default: {
-      const items = step.updatedItems ?? [];
       if (items.length === 1) {
-        const { newNode, oldNode, changeRecords } = items[0];
-        const target = newNode?.name || newNode?.type || oldNode?.name || oldNode?.type || `${newNode?.id ?? ''}`;
+        const { newSchema, oldSchema, changeRecords } = items[0];
+        const target =
+          newSchema?.name || newSchema?.type || oldSchema?.name || oldSchema?.type || `${newSchema?.id ?? ''}`;
         const propPath = changeRecords?.[0]?.propPath;
         return propPath ? `还原 ${target} · ${propPath}` : `还原 ${target}`;
       }
@@ -106,6 +108,20 @@ const describeStepForRevert = (step: StepValue): string => {
     }
   }
 };
+
+/**
+ * 把「变更前后节点快照」列表归一成 update 类型的 {@link StepDiffItem} 列表，供 {@link StepValue.diff} 使用。
+ * `changeRecords` 来自 form 端的 propPath/value 列表，撤销/重做时只对这些 propPath 做局部更新；
+ * 缺省（未传 / 空数组）才退化为整节点替换。
+ */
+const buildUpdateDiff = (
+  items: { oldNode: MNode; newNode: MNode; changeRecords?: ChangeRecord[] }[],
+): StepDiffItem<MNode>[] =>
+  items.map(({ oldNode, newNode, changeRecords }) => ({
+    oldSchema: oldNode,
+    newSchema: newNode,
+    ...(changeRecords?.length ? { changeRecords } : {}),
+  }));
 
 class Editor extends BaseService {
   public state: StoreState = reactive({
@@ -487,17 +503,17 @@ class Editor extends BaseService {
     if (!(isPage(newNodes[0]) || isPageFragment(newNodes[0]))) {
       const pageForOp = this.getNodeInfo(newNodes[0].id, false).page;
       if (!doNotPushHistory) {
+        const parentId = (this.getParentById(newNodes[0].id, false) ?? this.get('root'))!.id;
         this.pushOpHistory('add', {
-          extra: {
-            nodes: newNodes.map((n) => cloneDeep(toRaw(n))),
-            parentId: (this.getParentById(newNodes[0].id, false) ?? this.get('root'))!.id,
-            indexMap: Object.fromEntries(
-              newNodes.map((n) => {
-                const p = this.getParentById(n.id, false) as MContainer;
-                return [n.id, p ? getNodeIndex(n.id, p) : -1];
-              }),
-            ),
-          },
+          diff: newNodes.map((n) => {
+            const p = this.getParentById(n.id, false) as MContainer;
+            const idx = p ? getNodeIndex(n.id, p) : -1;
+            return {
+              newSchema: cloneDeep(toRaw(n)),
+              parentId,
+              index: typeof idx === 'number' ? idx : -1,
+            };
+          }),
           pageData: { name: pageForOp?.name || '', id: pageForOp!.id },
           historyDescription,
           source: historySource,
@@ -610,7 +626,7 @@ class Editor extends BaseService {
 
     const nodes = Array.isArray(nodeOrNodeList) ? nodeOrNodeList : [nodeOrNodeList];
 
-    const removedItems: { node: MNode; parentId: Id; index: number }[] = [];
+    const removedItems: StepDiffItem<MNode>[] = [];
     let pageForOp: { name: string; id: Id } | null = null;
     if (!(isPage(nodes[0]) || isPageFragment(nodes[0]))) {
       for (const n of nodes) {
@@ -621,7 +637,7 @@ class Editor extends BaseService {
           }
           const idx = getNodeIndex(curNode.id, parent);
           removedItems.push({
-            node: cloneDeep(toRaw(curNode)),
+            oldSchema: cloneDeep(toRaw(curNode)),
             parentId: parent.id,
             index: typeof idx === 'number' ? idx : -1,
           });
@@ -634,7 +650,7 @@ class Editor extends BaseService {
     if (removedItems.length > 0 && pageForOp) {
       if (!doNotPushHistory) {
         this.pushOpHistory('remove', {
-          extra: { removedItems },
+          diff: removedItems,
           pageData: pageForOp,
           historyDescription,
           source: historySource,
@@ -760,15 +776,15 @@ class Editor extends BaseService {
         if (!doNotPushHistory) {
           const pageForOp = this.getNodeInfo(nodes[0].id, false).page;
           this.pushOpHistory('update', {
-            extra: {
-              updatedItems: updateData.map((d) => ({
+            // 每个节点单独保留自己的 changeRecords，便于撤销/重做时按 propPath 精细化更新；
+            // 没有 changeRecords 的（如内部 sort/moveLayer 等整节点替换操作）会退化为全节点替换。
+            diff: buildUpdateDiff(
+              updateData.map((d) => ({
                 oldNode: cloneDeep(d.oldNode),
-                newNode: cloneDeep(toRaw(d.newNode)),
-                // 每个节点单独保留自己的 changeRecords，便于撤销/重做时按 propPath 精细化更新；
-                // 没有 changeRecords 的（如内部 sort/moveLayer 等整节点替换操作）会退化为全节点替换。
+                newNode: cloneDeep(d.newNode),
                 changeRecords: d.changeRecords?.length ? cloneDeep(d.changeRecords) : undefined,
               })),
-            },
+            ),
             pageData: { name: pageForOp?.name || '', id: pageForOp!.id },
             historyDescription,
             source: historySource,
@@ -1010,9 +1026,7 @@ class Editor extends BaseService {
         'update',
 
         {
-          extra: {
-            updatedItems: [{ oldNode: oldParent, newNode: cloneDeep(toRaw(parent)) }],
-          },
+          diff: buildUpdateDiff([{ oldNode: oldParent, newNode: cloneDeep(toRaw(parent)) }]),
           pageData: { name: pageForOp?.name || '', id: pageForOp!.id },
           historyDescription,
           source: historySource,
@@ -1112,7 +1126,7 @@ class Editor extends BaseService {
       }));
       const historyPage = moves[0].pageForOp ?? { name: '', id: target.id };
       this.pushOpHistory('update', {
-        extra: { updatedItems },
+        diff: buildUpdateDiff(updatedItems),
         pageData: historyPage,
         historyDescription,
         source: historySource,
@@ -1192,7 +1206,7 @@ class Editor extends BaseService {
     if (!doNotPushHistory) {
       const pageForOp = this.getNodeInfo(configs[0].id, false).page;
       this.pushOpHistory('update', {
-        extra: { updatedItems },
+        diff: buildUpdateDiff(updatedItems),
         pageData: { name: pageForOp?.name || '', id: pageForOp!.id },
         historyDescription,
         source: historySource,
@@ -1335,7 +1349,7 @@ class Editor extends BaseService {
 
     // 更新类步骤必须带 changeRecords 才支持回滚：缺失时只能整节点替换，会冲掉后续无关变更，故不支持。
     if (step.opType === 'update') {
-      const items = step.updatedItems ?? [];
+      const items = step.diff ?? [];
       if (!items.length || !items.every((item) => item.changeRecords?.length)) return null;
     }
 
@@ -1354,9 +1368,9 @@ class Editor extends BaseService {
       switch (step.opType) {
         case 'add': {
           // 原本是新增 → revert 即删除当时被加入的节点
-          const nodes = step.nodes ?? [];
-          for (const n of nodes) {
-            const existing = this.getNodeById(n.id, false);
+          for (const { newSchema } of step.diff ?? []) {
+            if (!newSchema) continue;
+            const existing = this.getNodeById(newSchema.id, false);
             if (existing) {
               await this.remove(existing, opts);
             }
@@ -1366,35 +1380,40 @@ class Editor extends BaseService {
         case 'remove': {
           // 原本是删除 → revert 即把节点按原父容器加回来。
           // 按原 index 升序逐个插回，先小后大避免索引漂移。
-          const items = step.removedItems ?? [];
-          const sorted = [...items].sort((a, b) => a.index - b.index);
-          for (const { node, parentId } of sorted) {
+          const items = step.diff ?? [];
+          const sorted = [...items].sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
+          for (const { oldSchema, parentId } of sorted) {
+            if (!oldSchema || parentId === undefined) continue;
             const parent = this.getNodeById(parentId, false) as MContainer | null;
             if (parent) {
-              await this.add([cloneDeep(node)] as MNode[], parent, opts);
+              await this.add([cloneDeep(oldSchema)] as MNode[], parent, opts);
             }
           }
           break;
         }
         case 'update': {
-          // 原本是更新 → revert 即把 oldNode 的值写回；
+          // 原本是更新 → revert 即把 oldSchema 的值写回；
           // 优先按 changeRecords 局部 patch（仅触达 propPath 下的字段，避免冲掉同节点上其它无关变更）。
-          const items = step.updatedItems ?? [];
-          const configs = items.map(({ oldNode, newNode, changeRecords }) => {
-            if (changeRecords?.length) {
-              const patch: MNode = { id: newNode.id, type: newNode.type };
-              for (const record of changeRecords) {
-                if (!record.propPath) {
-                  // 没有 propPath 视为整节点替换
-                  return cloneDeep(oldNode);
+          const items = step.diff ?? [];
+          const configs = items
+            .filter((item) => item.oldSchema && item.newSchema)
+            .map(({ oldSchema, newSchema, changeRecords }) => {
+              const oldNode = oldSchema!;
+              const newNode = newSchema!;
+              if (changeRecords?.length) {
+                const patch: MNode = { id: newNode.id, type: newNode.type };
+                for (const record of changeRecords) {
+                  if (!record.propPath) {
+                    // 没有 propPath 视为整节点替换
+                    return cloneDeep(oldNode);
+                  }
+                  const value = cloneDeep(getValueByKeyPath(record.propPath, oldNode));
+                  setValueByKeyPath(record.propPath, value, patch);
                 }
-                const value = cloneDeep(getValueByKeyPath(record.propPath, oldNode));
-                setValueByKeyPath(record.propPath, value, patch);
+                return patch;
               }
-              return patch;
-            }
-            return cloneDeep(oldNode);
-          });
+              return cloneDeep(oldNode);
+            });
           if (configs.length) {
             await this.update(configs, { historyDescription, historySource: 'rollback' });
           }
@@ -1527,12 +1546,12 @@ class Editor extends BaseService {
   private pushOpHistory(
     opType: HistoryOpType,
     {
-      extra,
+      diff,
       pageData,
       historyDescription,
       source,
     }: {
-      extra: Partial<StepValue>;
+      diff: StepDiffItem<MNode>[];
       pageData: { name: string; id: Id };
       historyDescription?: string;
       source?: HistoryOpSource;
@@ -1545,7 +1564,7 @@ class Editor extends BaseService {
       selectedBefore: this.selectionBeforeOp ?? [],
       selectedAfter: this.get('nodes').map((n) => n.id),
       modifiedNodeIds: new Map(this.get('modifiedNodeIds')),
-      ...extra,
+      diff,
     };
     if (historyDescription) step.historyDescription = historyDescription;
     if (source) step.source = source;
@@ -1580,52 +1599,52 @@ class Editor extends BaseService {
 
     switch (step.opType) {
       case 'add': {
-        const nodes = step.nodes ?? [];
+        const items = step.diff ?? [];
         if (reverse) {
           // 撤销 add：把当时加入的节点删除
-          for (const n of nodes) {
-            const existing = this.getNodeById(n.id, false);
+          for (const { newSchema } of items) {
+            if (!newSchema) continue;
+            const existing = this.getNodeById(newSchema.id, false);
             if (existing) {
               await this.remove(existing, commonOpts);
             }
           }
         } else {
-          // 重做 add：按记录的 indexMap 把节点重新插回父容器
-          const parent = this.getNodeById(step.parentId!, false) as MContainer | null;
-          if (parent) {
-            // 按目标 index 升序逐个插入，先小后大避免索引漂移
-            const sorted = [...nodes].sort((a, b) => (step.indexMap?.[a.id] ?? 0) - (step.indexMap?.[b.id] ?? 0));
-            for (const n of sorted) {
-              const idx = step.indexMap?.[n.id];
-              if (parent.items) {
-                if (typeof idx === 'number' && idx >= 0 && idx < parent.items.length) {
-                  parent.items.splice(idx, 0, cloneDeep(n));
-                } else {
-                  parent.items.push(cloneDeep(n));
-                }
-                await stage?.add({
-                  config: cloneDeep(n),
-                  parent: cloneDeep(parent),
-                  parentId: parent.id,
-                  root: cloneDeep(root),
-                });
+          // 重做 add：按记录的 parentId / index 把节点重新插回父容器。
+          // 按目标 index 升序逐个插入，先小后大避免索引漂移
+          const sorted = [...items].sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
+          for (const { newSchema, parentId, index } of sorted) {
+            if (!newSchema || parentId === undefined) continue;
+            const parent = this.getNodeById(parentId, false) as MContainer | null;
+            if (parent?.items) {
+              if (typeof index === 'number' && index >= 0 && index < parent.items.length) {
+                parent.items.splice(index, 0, cloneDeep(newSchema));
+              } else {
+                parent.items.push(cloneDeep(newSchema));
               }
+              await stage?.add({
+                config: cloneDeep(newSchema),
+                parent: cloneDeep(parent),
+                parentId: parent.id,
+                root: cloneDeep(root),
+              });
             }
           }
         }
         break;
       }
       case 'remove': {
-        const items = step.removedItems ?? [];
+        const items = step.diff ?? [];
         if (reverse) {
           // 撤销 remove：按原 index 升序逐个插回（先小后大避免索引漂移）
-          const sorted = [...items].sort((a, b) => a.index - b.index);
-          for (const { node, parentId, index } of sorted) {
+          const sorted = [...items].sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
+          for (const { oldSchema, parentId, index } of sorted) {
+            if (!oldSchema || parentId === undefined) continue;
             const parent = this.getNodeById(parentId, false) as MContainer | null;
             if (parent?.items) {
-              parent.items.splice(index, 0, cloneDeep(node));
+              parent.items.splice(index ?? parent.items.length, 0, cloneDeep(oldSchema));
               await stage?.add({
-                config: cloneDeep(node),
+                config: cloneDeep(oldSchema),
                 parent: cloneDeep(parent),
                 parentId,
                 root: cloneDeep(root),
@@ -1634,8 +1653,9 @@ class Editor extends BaseService {
           }
         } else {
           // 重做 remove：再删一次
-          for (const { node } of items) {
-            const existing = this.getNodeById(node.id, false);
+          for (const { oldSchema } of items) {
+            if (!oldSchema) continue;
+            const existing = this.getNodeById(oldSchema.id, false);
             if (existing) {
               await this.remove(existing, commonOpts);
             }
@@ -1644,27 +1664,31 @@ class Editor extends BaseService {
         break;
       }
       case 'update': {
-        const items = step.updatedItems ?? [];
+        const items = step.diff ?? [];
         // 优先按 changeRecords 局部 patch：仅触达 propPath 下的字段，避免整节点替换冲掉同节点上其它无关变更。
         // 没有 changeRecords 的（如内部 sort/moveLayer/拖动等整节点快照场景）才退化为整节点替换。
-        const configs = items.map(({ oldNode, newNode, changeRecords }) => {
-          if (changeRecords?.length) {
-            const sourceForValues = reverse ? oldNode : newNode;
-            // 仅保留 id / type 作为最小骨架，再按 propPath 写入需要回滚/重做的字段；
-            // 后续 update -> mergeWith 会与现有节点深合并，patch 中未涉及的字段不会被改动。
-            const patch: MNode = { id: newNode.id, type: newNode.type };
-            for (const record of changeRecords) {
-              if (!record.propPath) {
-                // 没有 propPath 视为整节点替换
-                return cloneDeep(sourceForValues);
+        const configs = items
+          .filter((item) => item.oldSchema && item.newSchema)
+          .map(({ oldSchema, newSchema, changeRecords }) => {
+            const oldNode = oldSchema!;
+            const newNode = newSchema!;
+            if (changeRecords?.length) {
+              const sourceForValues = reverse ? oldNode : newNode;
+              // 仅保留 id / type 作为最小骨架，再按 propPath 写入需要回滚/重做的字段；
+              // 后续 update -> mergeWith 会与现有节点深合并，patch 中未涉及的字段不会被改动。
+              const patch: MNode = { id: newNode.id, type: newNode.type };
+              for (const record of changeRecords) {
+                if (!record.propPath) {
+                  // 没有 propPath 视为整节点替换
+                  return cloneDeep(sourceForValues);
+                }
+                const value = cloneDeep(getValueByKeyPath(record.propPath, sourceForValues));
+                setValueByKeyPath(record.propPath, value, patch);
               }
-              const value = cloneDeep(getValueByKeyPath(record.propPath, sourceForValues));
-              setValueByKeyPath(record.propPath, value, patch);
+              return patch;
             }
-            return patch;
-          }
-          return cloneDeep(reverse ? oldNode : newNode);
-        });
+            return cloneDeep(reverse ? oldNode : newNode);
+          });
         if (configs.length) {
           await this.update(configs, { doNotPushHistory: true });
         }

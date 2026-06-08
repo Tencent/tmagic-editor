@@ -1,7 +1,7 @@
 <template>
   <div class="m-editor-history-list-bucket">
     <div class="m-editor-history-list-bucket-title">
-      <span>{{ title }}</span>
+      <span>{{ config.title }}</span>
       <code>{{ String(bucketId) }}</code>
       <span class="m-editor-history-list-bucket-count">{{ groups.length }} 组</span>
     </div>
@@ -9,33 +9,10 @@
     <ul class="m-editor-history-list-ul">
       <GroupRow
         v-for="group in groups"
-        :key="`${prefix}-${bucketId}-${group.steps[0]?.index}`"
-        :group-key="`${prefix}-${bucketId}-${group.steps[0]?.index}`"
-        :applied="group.applied"
-        :merged="group.steps.length > 1"
-        :op-type="group.opType"
-        :desc="describeGroup(group)"
-        :source="groupSource(group)"
-        :time="formatHistoryTime(groupTimestamp(group))"
-        :time-title="formatHistoryFullTime(groupTimestamp(group))"
-        :step-count="group.steps.length"
-        :sub-steps="
-          group.steps.map((s) => ({
-            index: s.index,
-            applied: s.applied,
-            isCurrent: s.isCurrent,
-            saved: s.step.saved,
-            desc: describeStep(s.step),
-            diffable: isStepDiffable ? isStepDiffable(s.step) : false,
-            revertable: s.applied && (isStepRevertable ? isStepRevertable(s.step) : true),
-            source: s.step.source,
-            time: formatHistoryTime(s.step.timestamp),
-            timeTitle: formatHistoryFullTime(s.step.timestamp),
-          }))
-        "
-        :is-current="group.isCurrent"
-        :expanded="!!expanded[`${prefix}-${bucketId}-${group.steps[0]?.index}`]"
-        :goto-enabled="gotoEnabled"
+        :key="rowKey(group)"
+        :group="toRow(group)"
+        :expanded="!!expanded[rowKey(group)]"
+        :goto-enabled="config.gotoEnabled"
         @toggle="(key: string) => $emit('toggle', key)"
         @goto="(index: number) => $emit('goto', bucketId, index)"
         @diff-step="(index: number) => $emit('diff-step', bucketId, index)"
@@ -44,12 +21,12 @@
       <!--
         初始状态项：永远位于该 bucket 列表底部（同样按倒序展示，最底部 = 最早状态）。
         当 bucket 内所有 group 都未 applied 时即为当前位置。
-        showInitial=false 时不展示（用于没有"撤销到初始状态"语义的自定义历史，如业务模块历史）。
+        config.showInitial=false 时不展示（用于没有"撤销到初始状态"语义的自定义历史，如业务模块历史）。
       -->
       <InitialRow
-        v-if="showInitial !== false"
+        v-if="config.showInitial !== false"
         :is-current="isInitial"
-        :goto-enabled="gotoEnabled"
+        :goto-enabled="config.gotoEnabled"
         @goto-initial="$emit('goto-initial', bucketId)"
       />
     </ul>
@@ -61,8 +38,8 @@ import { computed } from 'vue';
 
 import type { BaseStepValue } from '@editor/type';
 
-import type { HistoryBucketGroup } from './composables';
-import { formatHistoryFullTime, formatHistoryTime, groupSource, groupTimestamp } from './composables';
+import type { HistoryBucketConfig, HistoryBucketGroup, HistoryRowGroup } from './composables';
+import { toRowGroup } from './composables';
 import GroupRow from './GroupRow.vue';
 import InitialRow from './InitialRow.vue';
 
@@ -70,39 +47,19 @@ defineOptions({
   name: 'MEditorHistoryListBucket',
 });
 
-const props = withDefaults(
-  defineProps<{
-    /** Bucket 标题，例如 "数据源" / "代码块"，渲染在 bucket 头部。 */
-    title: string;
-    /** 当前 bucket 对应的目标 id（dataSource.id 或 codeBlock.id），同时用于组装子项的 key。 */
-    bucketId: string | number;
-    /**
-     * 子项 key 的命名空间前缀：内置 `ds` 表示数据源，`cb` 表示代码块；
-     * 业务方复用 Bucket 时可传入自定义前缀（如 `mod`）。与上层折叠状态 key 保持一致。
-     */
-    prefix: string;
-    /** 是否展示底部「回到初始状态」入口，默认 true。无 undo cursor 语义的自定义历史可传 false 关闭。 */
-    showInitial?: boolean;
-    /** 当前 bucket 下的所有历史分组，按时间倒序展示（最近的操作在前）。 */
-    groups: HistoryBucketGroup<T>[];
-    /** 组级描述文案生成器，接收一个 group，返回展示文本。由父组件按业务类型注入。 */
-    describeGroup: (_group: any) => string;
-    /** 单步描述文案生成器，接收一个 step，返回展示文本。用于合并组展开后的子步列表。 */
-    describeStep: (_step: T) => string;
-    /** 判断某个 step 是否可查看差异（前后值都存在）。由父组件按业务类型注入；不传则一律不展示差异入口。 */
-    isStepDiffable?: (_step: T) => boolean;
-    /** 判断某个 step 是否支持回滚（如更新需带 changeRecords）。由父组件按业务类型注入；不传则已应用即可回滚。 */
-    isStepRevertable?: (_step: T) => boolean;
-    /** 共享的折叠状态表（key -> 是否展开），由顶层 panel 统一维护以便跨 tab 复用。 */
-    expanded: Record<string, boolean>;
-    /** 是否支持「跳转到该记录」(goto)。默认 true。 */
-    gotoEnabled?: boolean;
-  }>(),
-  {
-    showInitial: true,
-    gotoEnabled: true,
-  },
-);
+const props = defineProps<{
+  /**
+   * 该类历史的整体渲染配置（title / prefix / describe* / isStep* / showInitial / gotoEnabled）。
+   * 由父组件按业务类型注入，组件内部按需读取，避免逐项透传多个 props。
+   */
+  config: HistoryBucketConfig<T>;
+  /** 当前 bucket 对应的目标 id（dataSource.id 或 codeBlock.id），同时用于组装子项的 key。 */
+  bucketId: string | number;
+  /** 当前 bucket 下的所有历史分组，按时间倒序展示（最近的操作在前）。 */
+  groups: HistoryBucketGroup<T>[];
+  /** 共享的折叠状态表（key -> 是否展开），由顶层 panel 统一维护以便跨 tab 复用。 */
+  expanded: Record<string, boolean>;
+}>();
 
 defineEmits<{
   /** 透传子组件 GroupRow 的 toggle，由上层 panel 更新 expanded。 */
@@ -119,6 +76,15 @@ defineEmits<{
   /** 用户点击"回滚"按钮，携带 bucketId 与 step 索引，类 git revert。 */
   (_e: 'revert-step', _bucketId: string | number, _index: number): void;
 }>();
+
+/**
+ * 子项 / 折叠状态 key：`${prefix}-${bucketId}-${组内首步 index}`。
+ * 以稳定的 step 索引（而非展示位置）标识分组，历史数据更新后已展开的分组状态仍能正确保持。
+ */
+const rowKey = (group: HistoryBucketGroup<T>) => `${props.config.prefix}-${props.bucketId}-${group.steps[0]?.index}`;
+
+/** 把原始分组派生为 GroupRow 直接消费的视图模型。 */
+const toRow = (group: HistoryBucketGroup<T>): HistoryRowGroup => toRowGroup(group, rowKey(group), props.config);
 
 /** 该 bucket 是否处于初始状态（栈 cursor=0），等价于全部 group 都未 applied。 */
 const isInitial = computed(() => props.groups.length > 0 && props.groups.every((g) => !g.applied));

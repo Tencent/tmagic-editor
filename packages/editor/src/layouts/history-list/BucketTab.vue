@@ -2,22 +2,18 @@
   <div v-if="!buckets.length" class="m-editor-history-list-empty">暂无操作记录</div>
   <template v-else>
     <div class="m-editor-history-list-toolbar">
-      <span class="m-editor-history-list-clear" :title="`清空${title}的历史记录`" @click="$emit('clear')">清空</span>
+      <span class="m-editor-history-list-clear" :title="`清空${config.title}的历史记录`" @click="$emit('clear')"
+        >清空</span
+      >
     </div>
     <TMagicScrollbar max-height="360px">
       <Bucket
         v-for="bucket in buckets"
-        :key="`${prefix}-${bucket.id}`"
-        :title="title"
+        :key="`${config.prefix}-${bucket.id}`"
+        :config="config"
         :bucket-id="bucket.id"
-        :prefix="prefix"
         :groups="bucket.groups"
-        :describe-group="describeGroup"
-        :describe-step="describeStep"
-        :is-step-diffable="isStepDiffable"
-        :is-step-revertable="isStepRevertable"
         :expanded="expanded"
-        :goto-enabled="gotoEnabled"
         @toggle="(key: string) => $emit('toggle', key)"
         @goto="(id: string | number, index: number) => $emit('goto', id, index)"
         @goto-initial="(id: string | number) => $emit('goto-initial', id)"
@@ -34,44 +30,30 @@ import { TMagicScrollbar } from '@tmagic/design';
 import type { BaseStepValue } from '@editor/type';
 
 import Bucket from './Bucket.vue';
-import type { HistoryBucketGroup } from './composables';
+import type { HistoryBucketConfig, HistoryBucketGroup } from './composables';
 
 defineOptions({
   name: 'MEditorHistoryListBucketTab',
 });
 
-withDefaults(
-  defineProps<{
-    /** bucket 头部展示的标题，例如 "数据源" / "代码块"。 */
-    title: string;
-    /** 子项 key 的命名空间前缀（`ds` 数据源 / `cb` 代码块），与上层折叠状态 key 保持一致。 */
-    prefix: string;
-    /**
-     * 已按目标 id 聚拢成的 bucket 列表，每个 bucket 内部的 groups 已按时间倒序排好。
-     * 空数组时显示空态。
-     */
-    buckets: { id: string | number; groups: HistoryBucketGroup<T>[] }[];
-    /** 组级描述文案生成器，由父组件按业务类型注入。 */
-    describeGroup: (_group: any) => string;
-    /** 单步描述文案生成器，由父组件按业务类型注入。 */
-    describeStep: (_step: T) => string;
-    /** 判断某个 step 是否可查看差异（前后值都存在）。由父组件按业务类型注入。 */
-    isStepDiffable: (_step: T) => boolean;
-    /** 判断某个 step 是否支持回滚（如更新需带 changeRecords）。由父组件按业务类型注入；不传则已应用即可回滚。 */
-    isStepRevertable?: (_step: T) => boolean;
-    /**
-     * 共享的折叠状态表（key -> 是否展开），由顶层 panel 统一维护。
-     * 本 tab 使用 `${prefix}-${id}-${组内首步 index}` 作为 key——以稳定的 step 索引而非展示位置标识分组，
-     * 这样历史数据更新后已展开的分组状态仍能正确保持。
-     */
-    expanded: Record<string, boolean>;
-    /** 是否支持「跳转到该记录」(goto)，透传给 Bucket。默认 true。 */
-    gotoEnabled?: boolean;
-  }>(),
-  {
-    gotoEnabled: true,
-  },
-);
+defineProps<{
+  /**
+   * 该类历史的整体渲染配置（title / prefix / describe* / isStep* / showInitial / gotoEnabled），
+   * 由父组件按业务类型注入并整体透传给 Bucket，避免逐项透传多个 props。
+   */
+  config: HistoryBucketConfig<T>;
+  /**
+   * 已按目标 id 聚拢成的 bucket 列表，每个 bucket 内部的 groups 已按时间倒序排好。
+   * 空数组时显示空态。
+   */
+  buckets: { id: string | number; groups: HistoryBucketGroup<T>[] }[];
+  /**
+   * 共享的折叠状态表（key -> 是否展开），由顶层 panel 统一维护。
+   * key 形如 `${prefix}-${id}-${组内首步 index}`——以稳定的 step 索引而非展示位置标识分组，
+   * 这样历史数据更新后已展开的分组状态仍能正确保持。
+   */
+  expanded: Record<string, boolean>;
+}>();
 
 defineEmits<{
   /** 透传子组件 Bucket 的 toggle 事件给上层 panel，由其更新 expanded。 */

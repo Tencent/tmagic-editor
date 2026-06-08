@@ -206,8 +206,8 @@ describe('history service - IndexedDB 持久化', () => {
     await history.restoreFromIndexedDB();
 
     const current = (history.state.codeBlockState as any).code_1.getCurrentElement();
-    expect(typeof current.newContent.code).toBe('function');
-    expect(current.newContent.code()).toBe(42);
+    expect(typeof current.diff[0].newSchema.code).toBe('function');
+    expect(current.diff[0].newSchema.code()).toBe(42);
   });
 
   test('restoreFromIndexedDB 找不到记录时返回 null 且不改动当前状态', async () => {

@@ -109,7 +109,7 @@ describe('describePageStep', () => {
   test('add 单个节点：含名称与 id', () => {
     const step = {
       opType: 'add',
-      nodes: [{ id: 'btn_1', type: 'button', name: '主按钮' }],
+      diff: [{ newSchema: { id: 'btn_1', type: 'button', name: '主按钮' } }],
     } as unknown as StepValue;
     expect(describePageStep(step)).toBe('新增 1 个节点（主按钮 (id: btn_1)）');
   });
@@ -117,7 +117,7 @@ describe('describePageStep', () => {
   test('add 节点无 name 但有 type：使用 type 作为名称', () => {
     const step = {
       opType: 'add',
-      nodes: [{ id: 'n1', type: 'text' }],
+      diff: [{ newSchema: { id: 'n1', type: 'text' } }],
     } as unknown as StepValue;
     expect(describePageStep(step)).toBe('新增 1 个节点（text (id: n1)）');
   });
@@ -125,7 +125,7 @@ describe('describePageStep', () => {
   test('add 节点 name 与 id 相同：仅显示 id', () => {
     const step = {
       opType: 'add',
-      nodes: [{ id: 'n1', name: 'n1' }],
+      diff: [{ newSchema: { id: 'n1', name: 'n1' } }],
     } as unknown as StepValue;
     expect(describePageStep(step)).toBe('新增 1 个节点（n1）');
   });
@@ -133,7 +133,7 @@ describe('describePageStep', () => {
   test('add 多个节点：仅给出数量', () => {
     const step = {
       opType: 'add',
-      nodes: [{ id: 'a' }, { id: 'b' }],
+      diff: [{ newSchema: { id: 'a' } }, { newSchema: { id: 'b' } }],
     } as unknown as StepValue;
     expect(describePageStep(step)).toBe('新增 2 个节点');
   });
@@ -146,7 +146,7 @@ describe('describePageStep', () => {
   test('remove 单个节点：含名称与 id', () => {
     const step = {
       opType: 'remove',
-      removedItems: [{ node: { id: 'btn_1', name: '主按钮' } }],
+      diff: [{ oldSchema: { id: 'btn_1', name: '主按钮' } }],
     } as unknown as StepValue;
     expect(describePageStep(step)).toBe('删除 1 个节点（主按钮 (id: btn_1)）');
   });
@@ -154,7 +154,7 @@ describe('describePageStep', () => {
   test('remove 多个节点', () => {
     const step = {
       opType: 'remove',
-      removedItems: [{ node: { id: 'a' } }, { node: { id: 'b' } }],
+      diff: [{ oldSchema: { id: 'a' } }, { oldSchema: { id: 'b' } }],
     } as unknown as StepValue;
     expect(describePageStep(step)).toBe('删除 2 个节点');
   });
@@ -162,10 +162,10 @@ describe('describePageStep', () => {
   test('update 单节点：附 propPath 与 id', () => {
     const step = {
       opType: 'update',
-      updatedItems: [
+      diff: [
         {
-          newNode: { id: 'btn_1', name: '按钮' },
-          oldNode: { id: 'btn_1', name: '按钮' },
+          newSchema: { id: 'btn_1', name: '按钮' },
+          oldSchema: { id: 'btn_1', name: '按钮' },
           changeRecords: [{ propPath: 'style.color' }],
         },
       ],
@@ -176,7 +176,7 @@ describe('describePageStep', () => {
   test('update 单节点无 propPath：仅展示节点', () => {
     const step = {
       opType: 'update',
-      updatedItems: [{ newNode: { id: 'btn_1', name: '按钮' }, oldNode: { id: 'btn_1' } }],
+      diff: [{ newSchema: { id: 'btn_1', name: '按钮' }, oldSchema: { id: 'btn_1' } }],
     } as unknown as StepValue;
     expect(describePageStep(step)).toBe('修改 按钮 (id: btn_1)');
   });
@@ -184,15 +184,15 @@ describe('describePageStep', () => {
   test('update 多节点：返回数量', () => {
     const step = {
       opType: 'update',
-      updatedItems: [
-        { newNode: { id: 'a' }, oldNode: { id: 'a' } },
-        { newNode: { id: 'b' }, oldNode: { id: 'b' } },
+      diff: [
+        { newSchema: { id: 'a' }, oldSchema: { id: 'a' } },
+        { newSchema: { id: 'b' }, oldSchema: { id: 'b' } },
       ],
     } as unknown as StepValue;
     expect(describePageStep(step)).toBe('修改 2 个节点');
   });
 
-  test('update updatedItems 缺省：兜底为「修改节点」', () => {
+  test('update diff 缺省：兜底为「修改节点」', () => {
     const step = { opType: 'update' } as unknown as StepValue;
     expect(describePageStep(step)).toBe('修改节点');
   });
@@ -219,7 +219,7 @@ describe('describePageGroup', () => {
   test('单步 group 复用 describePageStep', () => {
     const step = {
       opType: 'update',
-      updatedItems: [{ newNode: { id: 'a', name: 'A' }, oldNode: { id: 'a' } }],
+      diff: [{ newSchema: { id: 'a', name: 'A' }, oldSchema: { id: 'a' } }],
     } as unknown as StepValue;
     const group: PageHistoryGroup = {
       kind: 'page',
@@ -237,10 +237,10 @@ describe('describePageGroup', () => {
     const mkStep = (path: string) =>
       ({
         opType: 'update',
-        updatedItems: [
+        diff: [
           {
-            newNode: { id: 'btn_1', name: '按钮' },
-            oldNode: { id: 'btn_1', name: '按钮' },
+            newSchema: { id: 'btn_1', name: '按钮' },
+            oldSchema: { id: 'btn_1', name: '按钮' },
             changeRecords: [{ propPath: path }],
           },
         ],
@@ -262,10 +262,10 @@ describe('describePageGroup', () => {
     const mkStep = (path: string) =>
       ({
         opType: 'update',
-        updatedItems: [
+        diff: [
           {
-            newNode: { id: 'btn_1', name: '按钮' },
-            oldNode: { id: 'btn_1' },
+            newSchema: { id: 'btn_1', name: '按钮' },
+            oldSchema: { id: 'btn_1' },
             changeRecords: [{ propPath: path }],
           },
         ],
@@ -294,7 +294,7 @@ describe('describePageGroup', () => {
     const mkStep = () =>
       ({
         opType: 'update',
-        updatedItems: [{ newNode: { id: 'btn_1', name: '按钮' }, oldNode: { id: 'btn_1' } }],
+        diff: [{ newSchema: { id: 'btn_1', name: '按钮' }, oldSchema: { id: 'btn_1' } }],
       }) as unknown as StepValue;
 
     const group: PageHistoryGroup = {
@@ -317,8 +317,8 @@ describe('describePageGroup', () => {
       targetId: 'btn_1',
       applied: true,
       steps: [
-        buildPageEntry({ opType: 'update', updatedItems: [] } as any, 0),
-        buildPageEntry({ opType: 'update', updatedItems: [] } as any, 1),
+        buildPageEntry({ opType: 'update', diff: [] } as any, 0),
+        buildPageEntry({ opType: 'update', diff: [] } as any, 1),
       ],
     };
     // targetName 为 undefined，labelWithId 看 label === id 时只展示 id
@@ -328,61 +328,72 @@ describe('describePageGroup', () => {
 
 describe('describeDataSourceStep', () => {
   test('historyDescription 优先', () => {
-    const step: DataSourceStepValue = {
+    const step = {
       id: 'ds_1',
-      oldSchema: null,
-      newSchema: null,
+      opType: 'update',
+      diff: [{}],
       historyDescription: '自定义',
-    };
+    } as unknown as DataSourceStepValue;
     expect(describeDataSourceStep(step)).toBe('自定义');
   });
 
   test('新增（oldSchema=null）：展示 title 与 id', () => {
-    const step: DataSourceStepValue = {
+    const step = {
       id: 'ds_1',
-      oldSchema: null,
-      newSchema: { id: 'ds_1', title: '用户列表' } as any,
-    };
+      opType: 'add',
+      diff: [{ newSchema: { id: 'ds_1', title: '用户列表' } }],
+    } as unknown as DataSourceStepValue;
     expect(describeDataSourceStep(step)).toBe('创建 用户列表 (id: ds_1)');
   });
 
   test('删除（newSchema=null）：展示 title 与 id', () => {
-    const step: DataSourceStepValue = {
+    const step = {
       id: 'ds_1',
-      oldSchema: { id: 'ds_1', title: '用户列表' } as any,
-      newSchema: null,
-    };
+      opType: 'remove',
+      diff: [{ oldSchema: { id: 'ds_1', title: '用户列表' } }],
+    } as unknown as DataSourceStepValue;
     expect(describeDataSourceStep(step)).toBe('删除 用户列表 (id: ds_1)');
   });
 
   test('修改：展示 propPath', () => {
-    const step: DataSourceStepValue = {
+    const step = {
       id: 'ds_1',
-      oldSchema: { id: 'ds_1', title: '用户列表' } as any,
-      newSchema: { id: 'ds_1', title: '用户列表' } as any,
-      changeRecords: [{ propPath: 'fields.0.name' } as any],
-    };
+      opType: 'update',
+      diff: [
+        {
+          oldSchema: { id: 'ds_1', title: '用户列表' },
+          newSchema: { id: 'ds_1', title: '用户列表' },
+          changeRecords: [{ propPath: 'fields.0.name' }],
+        },
+      ],
+    } as unknown as DataSourceStepValue;
     expect(describeDataSourceStep(step)).toBe('修改 用户列表 (id: ds_1) · fields.0.name');
   });
 
   test('修改无 title 时仅展示 id', () => {
-    const step: DataSourceStepValue = {
+    const step = {
       id: 'ds_1',
-      oldSchema: { id: 'ds_1' } as any,
-      newSchema: { id: 'ds_1' } as any,
-    };
+      opType: 'update',
+      diff: [{ oldSchema: { id: 'ds_1' }, newSchema: { id: 'ds_1' } }],
+    } as unknown as DataSourceStepValue;
     expect(describeDataSourceStep(step)).toBe('修改 ds_1');
   });
 });
 
 describe('describeDataSourceGroup', () => {
   test('多步组：聚合 propPath 与目标 id', () => {
-    const mkStep = (path: string): DataSourceStepValue => ({
-      id: 'ds_1',
-      oldSchema: { id: 'ds_1', title: 'T' } as any,
-      newSchema: { id: 'ds_1', title: 'T' } as any,
-      changeRecords: [{ propPath: path } as any],
-    });
+    const mkStep = (path: string) =>
+      ({
+        id: 'ds_1',
+        opType: 'update',
+        diff: [
+          {
+            oldSchema: { id: 'ds_1', title: 'T' },
+            newSchema: { id: 'ds_1', title: 'T' },
+            changeRecords: [{ propPath: path }],
+          },
+        ],
+      }) as unknown as DataSourceStepValue;
     const group: DataSourceHistoryGroup = {
       kind: 'data-source',
       id: 'ds_1',
@@ -404,7 +415,11 @@ describe('describeDataSourceGroup', () => {
       applied: true,
       steps: [
         {
-          step: { id: 'ds_1', oldSchema: null, newSchema: { id: 'ds_1', title: 'T' } as any },
+          step: {
+            id: 'ds_1',
+            opType: 'add',
+            diff: [{ newSchema: { id: 'ds_1', title: 'T' } }],
+          } as unknown as DataSourceStepValue,
           index: 0,
           applied: true,
         },
@@ -423,10 +438,10 @@ describe('describeDataSourceGroup', () => {
         {
           step: {
             id: 'ds_1',
-            oldSchema: null,
-            newSchema: null,
+            opType: 'update',
+            diff: [{}],
             historyDescription: '我的描述',
-          },
+          } as unknown as DataSourceStepValue,
           index: 0,
           applied: true,
         },
@@ -438,52 +453,63 @@ describe('describeDataSourceGroup', () => {
 
 describe('describeCodeBlockStep', () => {
   test('新增', () => {
-    const step: CodeBlockStepValue = {
+    const step = {
       id: 'code_1',
-      oldContent: null,
-      newContent: { id: 'code_1', name: 'onClick' } as any,
-    };
+      opType: 'add',
+      diff: [{ newSchema: { id: 'code_1', name: 'onClick' } }],
+    } as unknown as CodeBlockStepValue;
     expect(describeCodeBlockStep(step)).toBe('创建 onClick (id: code_1)');
   });
 
   test('删除', () => {
-    const step: CodeBlockStepValue = {
+    const step = {
       id: 'code_1',
-      oldContent: { id: 'code_1', name: 'onClick' } as any,
-      newContent: null,
-    };
+      opType: 'remove',
+      diff: [{ oldSchema: { id: 'code_1', name: 'onClick' } }],
+    } as unknown as CodeBlockStepValue;
     expect(describeCodeBlockStep(step)).toBe('删除 onClick (id: code_1)');
   });
 
   test('修改 + propPath', () => {
-    const step: CodeBlockStepValue = {
+    const step = {
       id: 'code_1',
-      oldContent: { id: 'code_1', name: 'onClick' } as any,
-      newContent: { id: 'code_1', name: 'onClick' } as any,
-      changeRecords: [{ propPath: 'content' } as any],
-    };
+      opType: 'update',
+      diff: [
+        {
+          oldSchema: { id: 'code_1', name: 'onClick' },
+          newSchema: { id: 'code_1', name: 'onClick' },
+          changeRecords: [{ propPath: 'content' }],
+        },
+      ],
+    } as unknown as CodeBlockStepValue;
     expect(describeCodeBlockStep(step)).toBe('修改 onClick (id: code_1) · content');
   });
 
   test('historyDescription 优先', () => {
-    const step: CodeBlockStepValue = {
+    const step = {
       id: 'code_1',
-      oldContent: null,
-      newContent: null,
+      opType: 'update',
+      diff: [{}],
       historyDescription: '自定义说明',
-    };
+    } as unknown as CodeBlockStepValue;
     expect(describeCodeBlockStep(step)).toBe('自定义说明');
   });
 });
 
 describe('describeCodeBlockGroup', () => {
   test('多步组：聚合 propPath', () => {
-    const mkStep = (path: string): CodeBlockStepValue => ({
-      id: 'code_1',
-      oldContent: { id: 'code_1', name: 'fn' } as any,
-      newContent: { id: 'code_1', name: 'fn' } as any,
-      changeRecords: [{ propPath: path } as any],
-    });
+    const mkStep = (path: string) =>
+      ({
+        id: 'code_1',
+        opType: 'update',
+        diff: [
+          {
+            oldSchema: { id: 'code_1', name: 'fn' },
+            newSchema: { id: 'code_1', name: 'fn' },
+            changeRecords: [{ propPath: path }],
+          },
+        ],
+      }) as unknown as CodeBlockStepValue;
     const group: CodeBlockHistoryGroup = {
       kind: 'code-block',
       id: 'code_1',
@@ -505,7 +531,11 @@ describe('describeCodeBlockGroup', () => {
       applied: false,
       steps: [
         {
-          step: { id: 'code_1', oldContent: { id: 'code_1', name: 'fn' } as any, newContent: null },
+          step: {
+            id: 'code_1',
+            opType: 'remove',
+            diff: [{ oldSchema: { id: 'code_1', name: 'fn' } }],
+          } as unknown as CodeBlockStepValue,
           index: 0,
           applied: false,
         },
@@ -550,12 +580,12 @@ describe('useHistoryList', () => {
     historyService.changePage({ id: 'p1' } as any);
     historyService.push({
       opType: 'add',
-      nodes: [{ id: 'n1', name: 'A' }],
+      diff: [{ newSchema: { id: 'n1', name: 'A' } }],
       modifiedNodeIds: new Map(),
     } as any);
     historyService.push({
       opType: 'remove',
-      removedItems: [{ node: { id: 'n2', name: 'B' } }],
+      diff: [{ oldSchema: { id: 'n2', name: 'B' } }],
       modifiedNodeIds: new Map(),
     } as any);
 
@@ -613,15 +643,15 @@ describe('useHistoryList', () => {
 
 describe('isPageStepRevertable', () => {
   test('add / remove 始终可回滚', () => {
-    expect(isPageStepRevertable({ opType: 'add', nodes: [{ id: 'n1' }] } as any)).toBe(true);
-    expect(isPageStepRevertable({ opType: 'remove', removedItems: [{ node: { id: 'n1' } }] } as any)).toBe(true);
+    expect(isPageStepRevertable({ opType: 'add', diff: [{ newSchema: { id: 'n1' } }] } as any)).toBe(true);
+    expect(isPageStepRevertable({ opType: 'remove', diff: [{ oldSchema: { id: 'n1' } }] } as any)).toBe(true);
   });
 
   test('update 每项都有 changeRecords 才可回滚', () => {
     expect(
       isPageStepRevertable({
         opType: 'update',
-        updatedItems: [{ oldNode: { id: 'n1' }, newNode: { id: 'n1' }, changeRecords: [{ propPath: 'style.color' }] }],
+        diff: [{ oldSchema: { id: 'n1' }, newSchema: { id: 'n1' }, changeRecords: [{ propPath: 'style.color' }] }],
       } as any),
     ).toBe(true);
   });
@@ -630,7 +660,7 @@ describe('isPageStepRevertable', () => {
     expect(
       isPageStepRevertable({
         opType: 'update',
-        updatedItems: [{ oldNode: { id: 'n1' }, newNode: { id: 'n1' } }],
+        diff: [{ oldSchema: { id: 'n1' }, newSchema: { id: 'n1' } }],
       } as any),
     ).toBe(false);
   });
@@ -639,53 +669,51 @@ describe('isPageStepRevertable', () => {
     expect(
       isPageStepRevertable({
         opType: 'update',
-        updatedItems: [
-          { oldNode: { id: 'n1' }, newNode: { id: 'n1' }, changeRecords: [{ propPath: 'a' }] },
-          { oldNode: { id: 'n2' }, newNode: { id: 'n2' } },
+        diff: [
+          { oldSchema: { id: 'n1' }, newSchema: { id: 'n1' }, changeRecords: [{ propPath: 'a' }] },
+          { oldSchema: { id: 'n2' }, newSchema: { id: 'n2' } },
         ],
       } as any),
     ).toBe(false);
   });
 
-  test('update 无 updatedItems 不可回滚', () => {
+  test('update 无 diff 不可回滚', () => {
     expect(isPageStepRevertable({ opType: 'update' } as any)).toBe(false);
   });
 });
 
 describe('isDataSourceStepRevertable', () => {
   test('新增 / 删除 始终可回滚', () => {
-    expect(isDataSourceStepRevertable({ oldSchema: null, newSchema: { id: 'ds_1' } } as any)).toBe(true);
-    expect(isDataSourceStepRevertable({ oldSchema: { id: 'ds_1' }, newSchema: null } as any)).toBe(true);
+    expect(isDataSourceStepRevertable({ diff: [{ newSchema: { id: 'ds_1' } }] } as any)).toBe(true);
+    expect(isDataSourceStepRevertable({ diff: [{ oldSchema: { id: 'ds_1' } }] } as any)).toBe(true);
   });
 
   test('更新有 changeRecords 才可回滚', () => {
     expect(
       isDataSourceStepRevertable({
-        oldSchema: { id: 'ds_1' },
-        newSchema: { id: 'ds_1' },
-        changeRecords: [{ propPath: 'title' }],
+        diff: [{ oldSchema: { id: 'ds_1' }, newSchema: { id: 'ds_1' }, changeRecords: [{ propPath: 'title' }] }],
       } as any),
     ).toBe(true);
-    expect(isDataSourceStepRevertable({ oldSchema: { id: 'ds_1' }, newSchema: { id: 'ds_1' } } as any)).toBe(false);
+    expect(
+      isDataSourceStepRevertable({ diff: [{ oldSchema: { id: 'ds_1' }, newSchema: { id: 'ds_1' } }] } as any),
+    ).toBe(false);
   });
 });
 
 describe('isCodeBlockStepRevertable', () => {
   test('新增 / 删除 始终可回滚', () => {
-    expect(isCodeBlockStepRevertable({ oldContent: null, newContent: { id: 'code_1' } } as any)).toBe(true);
-    expect(isCodeBlockStepRevertable({ oldContent: { id: 'code_1' }, newContent: null } as any)).toBe(true);
+    expect(isCodeBlockStepRevertable({ diff: [{ newSchema: { id: 'code_1' } }] } as any)).toBe(true);
+    expect(isCodeBlockStepRevertable({ diff: [{ oldSchema: { id: 'code_1' } }] } as any)).toBe(true);
   });
 
   test('更新有 changeRecords 才可回滚', () => {
     expect(
       isCodeBlockStepRevertable({
-        oldContent: { id: 'code_1' },
-        newContent: { id: 'code_1' },
-        changeRecords: [{ propPath: 'content' }],
+        diff: [{ oldSchema: { id: 'code_1' }, newSchema: { id: 'code_1' }, changeRecords: [{ propPath: 'content' }] }],
       } as any),
     ).toBe(true);
-    expect(isCodeBlockStepRevertable({ oldContent: { id: 'code_1' }, newContent: { id: 'code_1' } } as any)).toBe(
-      false,
-    );
+    expect(
+      isCodeBlockStepRevertable({ diff: [{ oldSchema: { id: 'code_1' }, newSchema: { id: 'code_1' } }] } as any),
+    ).toBe(false);
   });
 });

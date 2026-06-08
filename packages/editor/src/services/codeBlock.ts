@@ -38,6 +38,7 @@ import type {
 import { CODE_DRAFT_STORAGE_KEY } from '@editor/type';
 import { getEditorConfig } from '@editor/utils/config';
 import { COPY_CODE_STORAGE_KEY } from '@editor/utils/editor';
+import { describeRevertStep } from '@editor/utils/history';
 
 import BaseService from './BaseService';
 
@@ -47,18 +48,6 @@ const canUsePluginMethods = {
 };
 
 type AsyncMethodName = Writable<(typeof canUsePluginMethods)['async']>;
-
-/**
- * 「回滚」生成的新 step 简短描述。仅 service 层使用。
- */
-const describeRevertCodeBlockStep = (step: CodeBlockStepValue): string => {
-  const { oldContent, newContent, changeRecords, id } = step;
-  if (oldContent === null && newContent) return `撤回新增 ${newContent.name || newContent.id || id}`;
-  if (oldContent && newContent === null) return `还原已删除的 ${oldContent.name || oldContent.id || id}`;
-  const name = newContent?.name || oldContent?.name || `${id}`;
-  const propPath = changeRecords?.[0]?.propPath;
-  return propPath ? `还原 ${name} · ${propPath}` : `还原 ${name}`;
-};
 
 class CodeBlock extends BaseService {
   private state = reactive<CodeState>({
@@ -458,8 +447,10 @@ class CodeBlock extends BaseService {
     const entry = list[index];
     if (!entry?.applied) return null;
     // 更新类步骤（前后 content 都存在）必须带 changeRecords 才支持回滚，否则只能整内容替换，会冲掉后续无关变更。
-    if (entry.step.oldContent && entry.step.newContent && !entry.step.changeRecords?.length) return null;
-    const description = `回滚 #${index + 1}: ${describeRevertCodeBlockStep(entry.step)}`;
+    const { oldSchema, newSchema, changeRecords } = entry.step.diff?.[0] ?? {};
+
+    if (oldSchema && newSchema && !changeRecords?.length) return null;
+    const description = `回滚 #${index + 1}: ${describeRevertStep<CodeBlockContent>(entry.step.id, entry.step.diff?.[0], (s) => s.name)}`;
     return await this.applyRevertStep(entry.step, description);
   }
 
@@ -567,21 +558,22 @@ class CodeBlock extends BaseService {
     step: CodeBlockStepValue,
     historyDescription: string,
   ): Promise<CodeBlockStepValue | null> {
-    const { id, oldContent, newContent, changeRecords } = step;
+    const { id } = step;
+    const { oldSchema, newSchema, changeRecords } = step.diff?.[0] ?? {};
 
     // 原本是新增 → revert 即删除
-    if (oldContent === null && newContent) {
+    if (!oldSchema && newSchema) {
       await this.deleteCodeDslByIds([id], { historyDescription, historySource: 'rollback' });
       return historyService.getCodeBlockStepList(id).slice(-1)[0]?.step ?? null;
     }
 
     // 原本是删除 → revert 即写回
-    if (oldContent && newContent === null) {
-      this.setCodeDslByIdSync(id, cloneDeep(oldContent), true, { historyDescription, historySource: 'rollback' });
+    if (oldSchema && !newSchema) {
+      this.setCodeDslByIdSync(id, cloneDeep(oldSchema), true, { historyDescription, historySource: 'rollback' });
       return historyService.getCodeBlockStepList(id).slice(-1)[0]?.step ?? null;
     }
 
-    if (!oldContent || !newContent) return null;
+    if (!oldSchema || !newSchema) return null;
 
     // 原本是更新 → 把 oldContent 写回；优先按 changeRecords 局部 patch
     if (changeRecords?.length) {
@@ -594,10 +586,10 @@ class CodeBlock extends BaseService {
           fallbackToFullReplace = true;
           break;
         }
-        const value = cloneDeep(getValueByKeyPath(record.propPath, oldContent));
+        const value = cloneDeep(getValueByKeyPath(record.propPath, oldSchema));
         setValueByKeyPath(record.propPath, value, patched);
       }
-      this.setCodeDslByIdSync(id, fallbackToFullReplace ? cloneDeep(oldContent) : patched, true, {
+      this.setCodeDslByIdSync(id, fallbackToFullReplace ? cloneDeep(oldSchema) : patched, true, {
         changeRecords,
         historyDescription,
         historySource: 'rollback',
@@ -605,7 +597,7 @@ class CodeBlock extends BaseService {
       return historyService.getCodeBlockStepList(id).slice(-1)[0]?.step ?? null;
     }
 
-    this.setCodeDslByIdSync(id, cloneDeep(oldContent), true, { historyDescription, historySource: 'rollback' });
+    this.setCodeDslByIdSync(id, cloneDeep(oldSchema), true, { historyDescription, historySource: 'rollback' });
     return historyService.getCodeBlockStepList(id).slice(-1)[0]?.step ?? null;
   }
 
@@ -624,31 +616,32 @@ class CodeBlock extends BaseService {
    * @param reverse true=撤销，false=重做
    */
   private async applyHistoryStep(step: CodeBlockStepValue, reverse: boolean): Promise<void> {
-    const { id, oldContent, newContent, changeRecords } = step;
+    const { id } = step;
+    const { oldSchema, newSchema, changeRecords } = step.diff?.[0] ?? {};
 
     // 新增 / 删除：直接 set 或 delete，不走 patch 逻辑
-    if (oldContent === null && newContent) {
+    if (!oldSchema && newSchema) {
       if (reverse) {
         await this.deleteCodeDslByIds([id], { doNotPushHistory: true });
       } else {
-        this.setCodeDslByIdSync(id, cloneDeep(newContent), true, { doNotPushHistory: true });
+        this.setCodeDslByIdSync(id, cloneDeep(newSchema), true, { doNotPushHistory: true });
       }
       return;
     }
 
-    if (oldContent && newContent === null) {
+    if (oldSchema && !newSchema) {
       if (reverse) {
-        this.setCodeDslByIdSync(id, cloneDeep(oldContent), true, { doNotPushHistory: true });
+        this.setCodeDslByIdSync(id, cloneDeep(oldSchema), true, { doNotPushHistory: true });
       } else {
         await this.deleteCodeDslByIds([id], { doNotPushHistory: true });
       }
       return;
     }
 
-    if (!oldContent || !newContent) return;
+    if (!oldSchema || !newSchema) return;
 
     // 更新场景：优先按 changeRecords 局部 patch；缺省退化为整内容替换
-    const sourceForValues = reverse ? oldContent : newContent;
+    const sourceForValues = reverse ? oldSchema : newSchema;
 
     if (changeRecords?.length) {
       const current = this.getCodeContentById(id);

@@ -779,7 +779,7 @@ describe('revertPageStepById', () => {
     expect(typeof uuid).toBe('string');
 
     const addedStep = historyService.getPageStepList().find((e) => e.step.uuid === uuid)!.step;
-    const addedId = addedStep.nodes![0].id;
+    const addedId = addedStep.diff[0].newSchema!.id;
     expect(editorService.getNodeById(addedId)).toBeTruthy();
 
     const reverted = await editorService.revertPageStepById(uuid!);

@@ -143,8 +143,8 @@ describe('history service - codeBlock', () => {
 
     expect(step).not.toBeNull();
     expect(step?.id).toBe('code_1');
-    expect(step?.oldContent).toBeNull();
-    expect(step?.newContent).toEqual({ name: 'A', content: 'x' });
+    expect(step?.diff?.[0]?.oldSchema).toBeUndefined();
+    expect(step?.diff?.[0]?.newSchema).toEqual({ name: 'A', content: 'x' });
     expect((history.state.codeBlockState as any).code_1).toBeDefined();
     expect(history.canUndoCodeBlock('code_1')).toBe(true);
     expect(fn).toHaveBeenCalledWith('code_1', expect.objectContaining({ id: 'code_1' }));
@@ -179,11 +179,11 @@ describe('history service - codeBlock', () => {
 
     expect(history.canUndoCodeBlock('code_1')).toBe(true);
     const undone = history.undoCodeBlock('code_1');
-    expect(undone?.newContent).toEqual({ name: 'B' });
+    expect(undone?.diff?.[0]?.newSchema).toEqual({ name: 'B' });
     expect(history.canRedoCodeBlock('code_1')).toBe(true);
 
     const redone = history.redoCodeBlock('code_1');
-    expect(redone?.newContent).toEqual({ name: 'B' });
+    expect(redone?.diff?.[0]?.newSchema).toEqual({ name: 'B' });
   });
 
   test('undoCodeBlock 对不存在 id 返回 null', () => {
@@ -229,8 +229,8 @@ describe('history service - dataSource', () => {
 
     expect(step).not.toBeNull();
     expect(step?.id).toBe('ds_1');
-    expect(step?.oldSchema).toBeNull();
-    expect(step?.newSchema?.title).toBe('A');
+    expect(step?.diff?.[0]?.oldSchema).toBeUndefined();
+    expect(step?.diff?.[0]?.newSchema?.title).toBe('A');
     expect((history.state.dataSourceState as any).ds_1).toBeDefined();
     expect(history.canUndoDataSource('ds_1')).toBe(true);
     expect(fn).toHaveBeenCalledWith('ds_1', expect.objectContaining({ id: 'ds_1' }));
@@ -267,10 +267,10 @@ describe('history service - dataSource', () => {
     });
 
     const undone = history.undoDataSource('ds_1');
-    expect(undone?.newSchema?.title).toBe('B');
+    expect(undone?.diff?.[0]?.newSchema?.title).toBe('B');
 
     const redone = history.redoDataSource('ds_1');
-    expect(redone?.newSchema?.title).toBe('B');
+    expect(redone?.diff?.[0]?.newSchema?.title).toBe('B');
   });
 
   test('undoDataSource 对不存在 id 返回 null', () => {

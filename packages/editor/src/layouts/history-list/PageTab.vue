@@ -8,32 +8,9 @@
       <ul class="m-editor-history-list-ul">
         <GroupRow
           v-for="group in list"
-          :key="`pg-${group.steps[0]?.index}`"
-          :group-key="`pg-${group.steps[0]?.index}`"
-          :applied="group.applied"
-          :merged="group.steps.length > 1"
-          :op-type="group.opType"
-          :desc="describePageGroup(group)"
-          :source="groupSource(group)"
-          :time="formatHistoryTime(groupTimestamp(group))"
-          :time-title="formatHistoryFullTime(groupTimestamp(group))"
-          :step-count="group.steps.length"
-          :sub-steps="
-            group.steps.map((s) => ({
-              index: s.index,
-              applied: s.applied,
-              isCurrent: s.isCurrent,
-              saved: s.step.saved,
-              desc: describePageStep(s.step),
-              diffable: isPageStepDiffable(s.step),
-              revertable: s.applied && isPageStepRevertable(s.step),
-              source: s.step.source,
-              time: formatHistoryTime(s.step.timestamp),
-              timeTitle: formatHistoryFullTime(s.step.timestamp),
-            }))
-          "
-          :is-current="group.isCurrent"
-          :expanded="!!expanded[`pg-${group.steps[0]?.index}`]"
+          :key="rowKey(group)"
+          :group="toRow(group)"
+          :expanded="!!expanded[rowKey(group)]"
           @toggle="(key: string) => $emit('toggle', key)"
           @goto="(index: number) => $emit('goto', index)"
           @diff-step="(index: number) => $emit('diff-step', index)"
@@ -56,15 +33,8 @@ import { TMagicScrollbar } from '@tmagic/design';
 
 import type { PageHistoryGroup, StepValue } from '@editor/type';
 
-import {
-  describePageGroup,
-  describePageStep,
-  formatHistoryFullTime,
-  formatHistoryTime,
-  groupSource,
-  groupTimestamp,
-  isPageStepRevertable,
-} from './composables';
+import type { HistoryRowDescriptor, HistoryRowGroup } from './composables';
+import { describePageGroup, describePageStep, isPageStepRevertable, toRowGroup } from './composables';
 import GroupRow from './GroupRow.vue';
 import InitialRow from './InitialRow.vue';
 
@@ -101,15 +71,27 @@ defineEmits<{
 /**
  * 当前 step 是否可查看差异：
  * - 仅 update 操作；
- * - 单节点更新（updatedItems.length === 1），且 oldNode / newNode 都存在。
+ * - 单节点更新（diff.length === 1），且 oldSchema / newSchema 都存在。
  * 多节点更新难以选定单一对比目标，统一不展示差异入口。
  */
 const isPageStepDiffable = (step: StepValue): boolean => {
   if (step.opType !== 'update') return false;
-  const items = step.updatedItems ?? [];
+  const items = step.diff ?? [];
   if (items.length !== 1) return false;
-  return Boolean(items[0]?.oldNode && items[0]?.newNode);
+  return Boolean(items[0]?.oldSchema && items[0]?.newSchema);
 };
+
+/** 页面历史的描述 / 可操作性判定集合，注入给统一的 `toRowGroup`。 */
+const descriptor: HistoryRowDescriptor<StepValue> = {
+  describeGroup: describePageGroup,
+  describeStep: describePageStep,
+  isStepDiffable: isPageStepDiffable,
+  isStepRevertable: isPageStepRevertable,
+};
+
+const rowKey = (group: PageHistoryGroup) => `pg-${group.steps[0]?.index}`;
+
+const toRow = (group: PageHistoryGroup): HistoryRowGroup => toRowGroup(group, rowKey(group), descriptor);
 
 /**
  * 是否处于"初始状态"——即对应页面历史栈 cursor===0：

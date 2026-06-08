@@ -721,17 +721,55 @@ export type HistoryOpSource =
   | (string & {});
 // #endregion HistoryOpSource
 
+// #region StepDiffItem
+/**
+ * 单条变更的 diff 描述，统一表达「页面节点 / 代码块 / 数据源」的变化内容，
+ * 被 {@link StepValue} / {@link CodeBlockStepValue} / {@link DataSourceStepValue} 的 `diff` 复用。
+ *
+ * 按 `opType` 区分携带的字段：
+ * - `add`：仅 `newSchema`（页面节点还带 `parentId` / `index`）；
+ * - `remove`：仅 `oldSchema`（页面节点还带 `parentId` / `index`）；
+ * - `update`：`oldSchema` + `newSchema`，并可带 `changeRecords` 做局部更新。
+ *
+ * 泛型 `T` 为变化内容的快照类型：页面节点为 `MNode`，代码块为 `CodeBlockContent`，数据源为 `DataSourceSchema`。
+ */
+export interface StepDiffItem<T = unknown> {
+  /** 变更后的内容快照。`opType` 为 `add` / `update` 时有，`remove` 时无。 */
+  newSchema?: T;
+  /** 变更前的内容快照。`opType` 为 `remove` / `update` 时有，`add` 时无。 */
+  oldSchema?: T;
+  /** 父节点 id。仅页面节点有（数据源 / 代码块没有父节点）。 */
+  parentId?: Id;
+  /** 在父节点 items 数组中的索引。仅页面节点有（数据源 / 代码块无需排序）。 */
+  index?: number;
+  /**
+   * form 端 propPath/value 变更列表，仅 `opType` 为 `update` 时有；
+   * 撤销/重做时若有则按 propPath 局部更新，缺省才退化为整内容替换。
+   */
+  changeRecords?: ChangeRecord[];
+}
+// #endregion StepDiffItem
+
 // #region BaseStepValue
 /**
  * 历史记录条目公共字段，被 {@link StepValue} / {@link CodeBlockStepValue} / {@link DataSourceStepValue} 复用。
+ *
+ * 泛型 `T` 为 `diff` 中变化内容的快照类型（页面节点 `MNode` / 代码块 `CodeBlockContent` / 数据源 `DataSourceSchema`）。
  */
-export interface BaseStepValue {
+export interface BaseStepValue<T = unknown> {
   /**
    * 历史记录唯一标识（uuid）。入栈时自动写入（若调用方未指定），
    * 用于精确定位 / 引用某一条历史记录（如 revert、埋点、跨端同步等）。
    * 注意与各自的 `id`（关联的页面 / 代码块 / 数据源 id）区分。
    */
   uuid: string;
+  /** 操作类型：新增 / 删除 / 更新（三类历史记录统一携带）。 */
+  opType: HistoryOpType;
+  /**
+   * 本次变更的内容（统一 diff 表达），每项见 {@link StepDiffItem}。
+   * 页面节点（add/remove 多节点、update 多节点）会有多项，代码块 / 数据源通常只有一项。
+   */
+  diff: StepDiffItem<T>[];
   /**
    * 调用方可选传入的人类可读描述（如「调整按钮颜色」），用于历史面板展示。
    * 不影响 undo/redo 行为；缺省时面板会根据节点 / propPath 自动生成描述。
@@ -756,74 +794,42 @@ export interface BaseStepValue {
 // #endregion BaseStepValue
 
 // #region StepValue
-export interface StepValue extends BaseStepValue {
+export interface StepValue extends BaseStepValue<MNode> {
   /** 页面信息 */
   data: { name: string; id: Id };
-  opType: HistoryOpType;
   /** 操作前选中的节点 ID，用于撤销后恢复选择状态 */
   selectedBefore: Id[];
   /** 操作后选中的节点 ID，用于重做后恢复选择状态 */
   selectedAfter: Id[];
   modifiedNodeIds: Map<Id, Id>;
-  /** opType 'add': 新增的节点 */
-  nodes?: MNode[];
-  /** opType 'add': 父节点 ID */
-  parentId?: Id;
-  /** opType 'add': 每个新增节点在父节点 items 中的索引 */
-  indexMap?: Record<string, number>;
-  /** opType 'remove': 被删除的节点及其位置信息 */
-  removedItems?: { node: MNode; parentId: Id; index: number }[];
-  /**
-   * opType 'update': 变更前后的节点快照
-   *
-   * `changeRecords` 来自 form 端的 propPath/value 列表，撤销/重做时只对这些 propPath 做局部更新；
-   * 缺省（未传 / 空数组）才退化为整节点替换。
-   */
-  updatedItems?: { oldNode: MNode; newNode: MNode; changeRecords?: ChangeRecord[] }[];
 }
 // #endregion StepValue
 
 // #region CodeBlockStepValue
 /**
  * 代码块历史记录条目。按 codeBlock.id 分组保存到 historyState.codeBlockState。
- * - 新增：oldContent = null，newContent = 新内容
- * - 更新：oldContent / newContent 都为对应内容
- * - 删除：newContent = null，oldContent = 删除前内容
+ * 变更内容统一由 `diff`（单项）表达，每项见 {@link StepDiffItem}：
+ * - 新增（opType 'add'）：仅 `newSchema`（新内容）；
+ * - 更新（opType 'update'）：`oldSchema` + `newSchema`，并可带 `changeRecords` 做局部更新；
+ * - 删除（opType 'remove'）：仅 `oldSchema`（删除前内容）。
  */
-export interface CodeBlockStepValue extends BaseStepValue {
+export interface CodeBlockStepValue extends BaseStepValue<CodeBlockContent> {
   /** 关联的代码块 id */
   id: Id;
-  /** 变更前的代码块内容，新增时为 null */
-  oldContent: CodeBlockContent | null;
-  /** 变更后的代码块内容，删除时为 null */
-  newContent: CodeBlockContent | null;
-  /**
-   * form 端 propPath/value 列表。撤销/重做时若有则按 propPath 局部更新；
-   * 缺省才退化为整内容替换。新增/删除场景通常无 changeRecords。
-   */
-  changeRecords?: ChangeRecord[];
 }
 // #endregion CodeBlockStepValue
 
 // #region DataSourceStepValue
 /**
  * 数据源历史记录条目。按 dataSource.id 分组保存到 historyState.dataSourceState。
- * - 新增：oldSchema = null，newSchema = 新 schema
- * - 更新：oldSchema / newSchema 都为对应 schema
- * - 删除：newSchema = null，oldSchema = 删除前 schema
+ * 变更内容统一由 `diff`（单项）表达，每项见 {@link StepDiffItem}：
+ * - 新增（opType 'add'）：仅 `newSchema`（新 schema）；
+ * - 更新（opType 'update'）：`oldSchema` + `newSchema`，并可带 `changeRecords` 做局部更新；
+ * - 删除（opType 'remove'）：仅 `oldSchema`（删除前 schema）。
  */
-export interface DataSourceStepValue extends BaseStepValue {
+export interface DataSourceStepValue extends BaseStepValue<DataSourceSchema> {
   /** 关联的数据源 id */
   id: Id;
-  /** 变更前的数据源 schema，新增时为 null */
-  oldSchema: DataSourceSchema | null;
-  /** 变更后的数据源 schema，删除时为 null */
-  newSchema: DataSourceSchema | null;
-  /**
-   * form 端 propPath/value 列表。撤销/重做时若有则按 propPath 局部更新；
-   * 缺省才退化为整 schema 替换。新增/删除场景通常无 changeRecords。
-   */
-  changeRecords?: ChangeRecord[];
 }
 // #endregion DataSourceStepValue
 

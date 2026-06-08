@@ -31,6 +31,86 @@ export interface HistoryBucketGroup<T extends BaseStepValue = BaseStepValue> {
 }
 
 /**
+ * 一组「描述 + 可操作性」的判定函数集合。页面 / 数据源 / 代码块及业务自定义历史
+ * 各自实现一份，作为整体注入，避免把 describe* / isStep* 拆成多个独立 props 反复透传。
+ */
+export interface HistoryRowDescriptor<T extends BaseStepValue = BaseStepValue> {
+  /** 组级描述文案生成器，接收一个 group，返回展示文本。 */
+  describeGroup: (_group: any) => string;
+  /** 单步描述文案生成器，接收一个 step，返回展示文本（合并组展开后的子步列表用）。 */
+  describeStep: (_step: T) => string;
+  /** 判断某个 step 是否可查看差异（前后值都存在）。不传则一律不展示差异入口。 */
+  isStepDiffable?: (_step: T) => boolean;
+  /** 判断某个 step 是否支持回滚（如更新需带 changeRecords）。不传则已应用即可回滚。 */
+  isStepRevertable?: (_step: T) => boolean;
+}
+
+/**
+ * 通用 bucket（数据源 / 代码块 / 业务自定义历史）的整体渲染配置。
+ * 把原先散落在 Bucket / BucketTab 上的 title / prefix / describe* / isStep* / showInitial / gotoEnabled
+ * 收敛成一个对象作为单一 prop 传递，调用方一次配齐、组件内部按需读取。
+ */
+export interface HistoryBucketConfig<T extends BaseStepValue = BaseStepValue> extends HistoryRowDescriptor<T> {
+  /** bucket 头部标题，例如 "数据源" / "代码块"。 */
+  title: string;
+  /** 子项 key 的命名空间前缀（`ds` 数据源 / `cb` 代码块 / 业务自定义如 `mod`）。 */
+  prefix: string;
+  /** 是否展示底部「回到初始状态」入口，默认 true。无 undo cursor 语义的自定义历史可传 false。 */
+  showInitial?: boolean;
+  /** 是否支持「跳转到该记录」(goto)，默认 true。 */
+  gotoEnabled?: boolean;
+}
+
+/** GroupRow 渲染所需的单个子步视图模型（已由 {@link toRowGroup} 预先派生，组件内部不再触碰原始 step）。 */
+export interface HistoryRowStep {
+  /** 该子步在所属栈中的稳定索引。 */
+  index: number;
+  /** 是否已应用（false 表示已被 undo，UI 灰态）。 */
+  applied: boolean;
+  /** 是否为当前所在步骤。 */
+  isCurrent?: boolean;
+  /** 是否为最近一次保存的记录。 */
+  saved?: boolean;
+  /** 子步描述文案。 */
+  desc: string;
+  /** 是否可查看差异。 */
+  diffable?: boolean;
+  /** 是否可回滚。 */
+  revertable?: boolean;
+  /** 操作途径。 */
+  source?: HistoryOpSource;
+  /** 时间文案。 */
+  time?: string;
+  /** 时间的完整 title 提示。 */
+  timeTitle?: string;
+}
+
+/**
+ * GroupRow 渲染所需的整组视图模型（由 {@link toRowGroup} 统一派生）。
+ * 把原先 GroupRow 上十多个扁平 props 收敛为单一对象，header 信息与子步列表一并携带。
+ */
+export interface HistoryRowGroup {
+  /** 分组的稳定 key，作为 toggle 事件 payload 与折叠状态的索引。 */
+  key: string;
+  /** 组内最后一步是否已应用。 */
+  applied: boolean;
+  /** 是否为当前所在分组。 */
+  isCurrent: boolean;
+  /** 操作类型，用于徽标颜色与文案。 */
+  opType: HistoryOpType;
+  /** 组整体描述文案。 */
+  desc: string;
+  /** 组的操作途径（取组内最近一步）。 */
+  source?: HistoryOpSource;
+  /** 组头部时间文案（取组内最近一步）。 */
+  time?: string;
+  /** 组头部时间的完整 title 提示。 */
+  timeTitle?: string;
+  /** 子步列表（时间正序）；其长度即合并步数，length > 1 即为合并组。 */
+  subSteps: HistoryRowStep[];
+}
+
+/**
  * 历史记录面板共享逻辑：
  * - 暴露三类历史的聚合数据（页面 / 数据源 / 代码块）；
  * - 提供折叠状态管理；
@@ -150,7 +230,51 @@ export const sourceLabel = (source: HistoryOpSource = 'unknown'): string => {
 export const groupSource = (group: { steps: { step: { source?: HistoryOpSource } }[] }): HistoryOpSource | undefined =>
   group.steps[group.steps.length - 1]?.step.source;
 
-const nameOf = (node: { name?: string; id?: string | number; type?: string }) =>
+/** {@link toRowGroup} 接受的最小分组结构，PageHistoryGroup 与 HistoryBucketGroup 均满足。 */
+interface RowGroupInput<T extends BaseStepValue = BaseStepValue> {
+  applied: boolean;
+  isCurrent?: boolean;
+  opType: HistoryOpType;
+  steps: { index: number; applied: boolean; isCurrent?: boolean; step: T }[];
+}
+
+/**
+ * 把一个历史分组（页面 / bucket）派生为 GroupRow 直接消费的视图模型 {@link HistoryRowGroup}。
+ * 统一了原先 PageTab / Bucket 各自内联的 sub-steps 映射逻辑：描述、可差异、可回滚、时间、途径
+ * 全部在此一次性算好，组件层只负责渲染。
+ */
+export const toRowGroup = <T extends BaseStepValue = BaseStepValue>(
+  group: RowGroupInput<T>,
+  key: string,
+  descriptor: HistoryRowDescriptor<T>,
+): HistoryRowGroup => {
+  const { describeGroup, describeStep, isStepDiffable, isStepRevertable } = descriptor;
+  const timestamp = groupTimestamp(group);
+  return {
+    key,
+    applied: group.applied,
+    isCurrent: Boolean(group.isCurrent),
+    opType: group.opType,
+    desc: describeGroup(group),
+    source: groupSource(group),
+    time: formatHistoryTime(timestamp),
+    timeTitle: formatHistoryFullTime(timestamp),
+    subSteps: group.steps.map((s) => ({
+      index: s.index,
+      applied: s.applied,
+      isCurrent: s.isCurrent,
+      saved: s.step.saved,
+      desc: describeStep(s.step),
+      diffable: isStepDiffable ? isStepDiffable(s.step) : false,
+      revertable: s.applied && (isStepRevertable ? isStepRevertable(s.step) : true),
+      source: s.step.source,
+      time: formatHistoryTime(s.step.timestamp),
+      timeTitle: formatHistoryFullTime(s.step.timestamp),
+    })),
+  };
+};
+
+const nameOf = (node?: { name?: string; id?: string | number; type?: string }) =>
   node?.name || node?.type || `${node?.id ?? ''}`;
 
 /**
@@ -175,25 +299,25 @@ const pickLastDescription = (descs: (string | undefined)[]): string | undefined 
 export const describePageStep = (step: StepValue) => {
   if (step.historyDescription) return step.historyDescription;
   const { opType } = step;
+  const items = step.diff ?? [];
   if (opType === 'add') {
-    const count = step.nodes?.length ?? 0;
-    const node = step.nodes?.[0];
+    const count = items.length;
+    const node = items[0]?.newSchema;
     return `新增 ${count} 个节点${count === 1 && node ? `（${labelWithId(nameOf(node), node.id)}）` : ''}`;
   }
   if (opType === 'remove') {
-    const count = step.removedItems?.length ?? 0;
-    const node = step.removedItems?.[0]?.node;
+    const count = items.length;
+    const node = items[0]?.oldSchema;
     return `删除 ${count} 个节点${count === 1 && node ? `（${labelWithId(nameOf(node), node.id)}）` : ''}`;
   }
-  const updated = step.updatedItems ?? [];
-  if (!updated.length) return '修改节点';
-  if (updated.length === 1) {
-    const { newNode, changeRecords } = updated[0];
+  if (!items.length) return '修改节点';
+  if (items.length === 1) {
+    const { newSchema, changeRecords } = items[0];
     const propPath = changeRecords?.[0]?.propPath;
-    const target = labelWithId(nameOf(newNode), newNode?.id);
+    const target = labelWithId(nameOf(newSchema), newSchema?.id);
     return `修改 ${target}${propPath ? ` · ${propPath}` : ''}`;
   }
-  return `修改 ${updated.length} 个节点`;
+  return `修改 ${items.length} 个节点`;
 };
 
 /**
@@ -208,7 +332,7 @@ export const describePageGroup = (group: PageHistoryGroup) => {
   if (group.steps.length === 1) return describePageStep(group.steps[0].step);
   const paths = new Set<string>();
   group.steps.forEach((s) => {
-    s.step.updatedItems?.[0]?.changeRecords?.forEach((r) => r.propPath && paths.add(r.propPath));
+    s.step.diff?.[0]?.changeRecords?.forEach((r) => r.propPath && paths.add(r.propPath));
   });
   const pathList = Array.from(paths).slice(0, 3).join(', ');
   const target = labelWithId(
@@ -220,12 +344,11 @@ export const describePageGroup = (group: PageHistoryGroup) => {
 
 export const describeDataSourceStep = (step: DataSourceStepValue) => {
   if (step.historyDescription) return step.historyDescription;
-  if (step.oldSchema === null && step.newSchema)
-    return `创建 ${labelWithId(step.newSchema.title, step.newSchema.id ?? step.id)}`;
-  if (step.newSchema === null && step.oldSchema)
-    return `删除 ${labelWithId(step.oldSchema.title, step.oldSchema.id ?? step.id)}`;
-  const propPath = step.changeRecords?.[0]?.propPath;
-  const title = labelWithId(step.newSchema?.title || step.oldSchema?.title, step.id);
+  const { oldSchema: oldSchema, newSchema: newSchema, changeRecords } = step.diff?.[0] ?? {};
+  if (!oldSchema && newSchema) return `创建 ${labelWithId(newSchema.title, newSchema.id ?? step.id)}`;
+  if (!newSchema && oldSchema) return `删除 ${labelWithId(oldSchema.title, oldSchema.id ?? step.id)}`;
+  const propPath = changeRecords?.[0]?.propPath;
+  const title = labelWithId(newSchema?.title || oldSchema?.title, step.id);
   return propPath ? `修改 ${title} · ${propPath}` : `修改 ${title}`;
 };
 
@@ -235,22 +358,23 @@ export const describeDataSourceGroup = (group: DataSourceHistoryGroup) => {
   if (group.steps.length === 1) return describeDataSourceStep(group.steps[0].step);
   const paths = new Set<string>();
   group.steps.forEach((s) => {
-    s.step.changeRecords?.forEach((r) => r.propPath && paths.add(r.propPath));
+    s.step.diff?.[0]?.changeRecords?.forEach((r) => r.propPath && paths.add(r.propPath));
   });
   const pathList = Array.from(paths).slice(0, 3).join(', ');
-  const rawTitle = group.steps[group.steps.length - 1].step.newSchema?.title || group.steps[0].step.oldSchema?.title;
+  const rawTitle =
+    group.steps[group.steps.length - 1].step.diff?.[0]?.newSchema?.title ||
+    group.steps[0].step.diff?.[0]?.oldSchema?.title;
   const target = labelWithId(rawTitle, group.id);
   return pathList ? `修改 ${target} · ${pathList}${paths.size > 3 ? '…' : ''}` : `修改 ${target}`;
 };
 
 export const describeCodeBlockStep = (step: CodeBlockStepValue) => {
   if (step.historyDescription) return step.historyDescription;
-  if (step.oldContent === null && step.newContent)
-    return `创建 ${labelWithId(step.newContent.name, step.newContent.id ?? step.id)}`;
-  if (step.newContent === null && step.oldContent)
-    return `删除 ${labelWithId(step.oldContent.name, step.oldContent.id ?? step.id)}`;
-  const propPath = step.changeRecords?.[0]?.propPath;
-  const title = labelWithId(step.newContent?.name || step.oldContent?.name, step.id);
+  const { oldSchema: oldContent, newSchema: newContent, changeRecords } = step.diff?.[0] ?? {};
+  if (!oldContent && newContent) return `创建 ${labelWithId(newContent.name, newContent.id ?? step.id)}`;
+  if (!newContent && oldContent) return `删除 ${labelWithId(oldContent.name, oldContent.id ?? step.id)}`;
+  const propPath = changeRecords?.[0]?.propPath;
+  const title = labelWithId(newContent?.name || oldContent?.name, step.id);
   return propPath ? `修改 ${title} · ${propPath}` : `修改 ${title}`;
 };
 
@@ -260,10 +384,12 @@ export const describeCodeBlockGroup = (group: CodeBlockHistoryGroup) => {
   if (group.steps.length === 1) return describeCodeBlockStep(group.steps[0].step);
   const paths = new Set<string>();
   group.steps.forEach((s) => {
-    s.step.changeRecords?.forEach((r) => r.propPath && paths.add(r.propPath));
+    s.step.diff?.[0]?.changeRecords?.forEach((r) => r.propPath && paths.add(r.propPath));
   });
   const pathList = Array.from(paths).slice(0, 3).join(', ');
-  const rawName = group.steps[group.steps.length - 1].step.newContent?.name || group.steps[0].step.oldContent?.name;
+  const rawName =
+    group.steps[group.steps.length - 1].step.diff?.[0]?.newSchema?.name ||
+    group.steps[0].step.diff?.[0]?.oldSchema?.name;
   const target = labelWithId(rawName, group.id);
   return pathList ? `修改 ${target} · ${pathList}${paths.size > 3 ? '…' : ''}` : `修改 ${target}`;
 };
@@ -276,27 +402,29 @@ export const describeCodeBlockGroup = (group: CodeBlockHistoryGroup) => {
  */
 export const isPageStepRevertable = (step: StepValue): boolean => {
   if (step.opType !== 'update') return true;
-  const items = step.updatedItems ?? [];
+  const items = step.diff ?? [];
   if (!items.length) return false;
   return items.every((item) => Boolean(item.changeRecords?.length));
 };
 
 /**
  * 数据源 step 是否支持「回滚」：
- * - 新增（oldSchema=null）/ 删除（newSchema=null）：不依赖 changeRecords，始终可回滚；
+ * - 新增（无 oldSchema）/ 删除（无 newSchema）：不依赖 changeRecords，始终可回滚；
  * - 更新（前后 schema 都存在）：必须有 changeRecords 才支持局部反向 patch，否则不支持回滚。
  */
 export const isDataSourceStepRevertable = (step: DataSourceStepValue): boolean => {
-  if (step.oldSchema === null || step.newSchema === null) return true;
-  return Boolean(step.changeRecords?.length);
+  const item = step.diff?.[0];
+  if (!item?.oldSchema || !item?.newSchema) return true;
+  return Boolean(item.changeRecords?.length);
 };
 
 /**
  * 代码块 step 是否支持「回滚」：
- * - 新增（oldContent=null）/ 删除（newContent=null）：不依赖 changeRecords，始终可回滚；
+ * - 新增（无 oldSchema）/ 删除（无 newSchema）：不依赖 changeRecords，始终可回滚；
  * - 更新（前后 content 都存在）：必须有 changeRecords 才支持局部反向 patch，否则不支持回滚。
  */
 export const isCodeBlockStepRevertable = (step: CodeBlockStepValue): boolean => {
-  if (step.oldContent === null || step.newContent === null) return true;
-  return Boolean(step.changeRecords?.length);
+  const item = step.diff?.[0];
+  if (!item?.oldSchema || !item?.newSchema) return true;
+  return Boolean(item.changeRecords?.length);
 };

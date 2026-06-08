@@ -135,8 +135,8 @@ describe('DataSource service - 历史记录接入', () => {
     const ds = dataSource.add({ title: 'a', type: 'base' } as any);
     expect(historyService.canUndoDataSource(ds.id!)).toBe(true);
     const step = historyService.undoDataSource(ds.id!);
-    expect(step?.oldSchema).toBeNull();
-    expect(step?.newSchema?.title).toBe('a');
+    expect(step?.diff?.[0]?.oldSchema).toBeUndefined();
+    expect(step?.diff?.[0]?.newSchema?.title).toBe('a');
   });
 
   test('update - 入历史，oldSchema 是旧值，newSchema 是新值', () => {
@@ -146,8 +146,8 @@ describe('DataSource service - 历史记录接入', () => {
 
     dataSource.update({ ...created, title: 'b' } as any);
     const step = historyService.undoDataSource(created.id!);
-    expect(step?.oldSchema?.title).toBe('a');
-    expect(step?.newSchema?.title).toBe('b');
+    expect(step?.diff?.[0]?.oldSchema?.title).toBe('a');
+    expect(step?.diff?.[0]?.newSchema?.title).toBe('b');
   });
 
   test('remove - 入历史（newSchema=null）', () => {
@@ -156,8 +156,8 @@ describe('DataSource service - 历史记录接入', () => {
 
     dataSource.remove(created.id!);
     const step = historyService.undoDataSource(created.id!);
-    expect(step?.oldSchema?.title).toBe('a');
-    expect(step?.newSchema).toBeNull();
+    expect(step?.diff?.[0]?.oldSchema?.title).toBe('a');
+    expect(step?.diff?.[0]?.newSchema).toBeUndefined();
   });
 
   test('remove - 不存在的 id 不入历史', () => {
@@ -174,7 +174,7 @@ describe('DataSource service - 历史记录接入', () => {
     });
 
     const step = historyService.undoDataSource(created.id!);
-    expect(step?.changeRecords).toEqual([{ propPath: 'title', value: 'b' }]);
+    expect(step?.diff?.[0]?.changeRecords).toEqual([{ propPath: 'title', value: 'b' }]);
   });
 
   test('update - 不传 changeRecords 时 step.changeRecords 为 undefined', () => {
@@ -183,7 +183,7 @@ describe('DataSource service - 历史记录接入', () => {
 
     dataSource.update({ ...created, title: 'b' } as any);
     const step = historyService.undoDataSource(created.id!);
-    expect(step?.changeRecords).toBeUndefined();
+    expect(step?.diff?.[0]?.changeRecords).toBeUndefined();
   });
 });
 

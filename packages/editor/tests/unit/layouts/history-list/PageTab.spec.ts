@@ -46,16 +46,16 @@ describe('PageTab.vue', () => {
 
   test('list 非空：每个 group 渲染一行', () => {
     const list = [
-      buildPageGroup('add', [{ opType: 'add', nodes: [{ id: 'n1', name: 'A' }] }]),
+      buildPageGroup('add', [{ opType: 'add', diff: [{ newSchema: { id: 'n1', name: 'A' } }] }]),
       buildPageGroup(
         'update',
         [
           {
             opType: 'update',
-            updatedItems: [
+            diff: [
               {
-                newNode: { id: 'btn', name: '按钮' },
-                oldNode: { id: 'btn' },
+                newSchema: { id: 'btn', name: '按钮' },
+                oldSchema: { id: 'btn' },
                 changeRecords: [{ propPath: 'style.color' }],
               },
             ],
@@ -78,7 +78,9 @@ describe('PageTab.vue', () => {
   });
 
   test('step 含 timestamp 时渲染时间元素', () => {
-    const list = [buildPageGroup('add', [{ opType: 'add', nodes: [{ id: 'n1', name: 'A' }], timestamp: Date.now() }])];
+    const list = [
+      buildPageGroup('add', [{ opType: 'add', diff: [{ newSchema: { id: 'n1', name: 'A' } }], timestamp: Date.now() }]),
+    ];
     const wrapper = mount(PageTab, { props: { list, expanded: {} } });
     const time = wrapper.find('.m-editor-history-list-item-time');
     expect(time.exists()).toBe(true);
@@ -87,7 +89,7 @@ describe('PageTab.vue', () => {
   });
 
   test('step 无 timestamp 时不渲染时间元素', () => {
-    const list = [buildPageGroup('add', [{ opType: 'add', nodes: [{ id: 'n1', name: 'A' }] }])];
+    const list = [buildPageGroup('add', [{ opType: 'add', diff: [{ newSchema: { id: 'n1', name: 'A' } }] }])];
     const wrapper = mount(PageTab, { props: { list, expanded: {} } });
     expect(wrapper.find('.m-editor-history-list-item-time').exists()).toBe(false);
   });
@@ -98,20 +100,20 @@ describe('PageTab.vue', () => {
       [
         {
           opType: 'update',
-          updatedItems: [
+          diff: [
             {
-              newNode: { id: 'btn', name: '按钮' },
-              oldNode: { id: 'btn' },
+              newSchema: { id: 'btn', name: '按钮' },
+              oldSchema: { id: 'btn' },
               changeRecords: [{ propPath: 'a' }],
             },
           ],
         },
         {
           opType: 'update',
-          updatedItems: [
+          diff: [
             {
-              newNode: { id: 'btn', name: '按钮' },
-              oldNode: { id: 'btn' },
+              newSchema: { id: 'btn', name: '按钮' },
+              oldSchema: { id: 'btn' },
               changeRecords: [{ propPath: 'b' }],
             },
           ],
@@ -138,11 +140,11 @@ describe('PageTab.vue', () => {
         [
           {
             opType: 'update',
-            updatedItems: [{ newNode: { id: 'btn' }, oldNode: { id: 'btn' }, changeRecords: [{ propPath: 'a' }] }],
+            diff: [{ newSchema: { id: 'btn' }, oldSchema: { id: 'btn' }, changeRecords: [{ propPath: 'a' }] }],
           },
           {
             opType: 'update',
-            updatedItems: [{ newNode: { id: 'btn' }, oldNode: { id: 'btn' }, changeRecords: [{ propPath: 'b' }] }],
+            diff: [{ newSchema: { id: 'btn' }, oldSchema: { id: 'btn' }, changeRecords: [{ propPath: 'b' }] }],
           },
         ],
         true,
@@ -154,11 +156,11 @@ describe('PageTab.vue', () => {
         [
           {
             opType: 'update',
-            updatedItems: [{ newNode: { id: 'btn2' }, oldNode: { id: 'btn2' }, changeRecords: [{ propPath: 'a' }] }],
+            diff: [{ newSchema: { id: 'btn2' }, oldSchema: { id: 'btn2' }, changeRecords: [{ propPath: 'a' }] }],
           },
           {
             opType: 'update',
-            updatedItems: [{ newNode: { id: 'btn2' }, oldNode: { id: 'btn2' }, changeRecords: [{ propPath: 'b' }] }],
+            diff: [{ newSchema: { id: 'btn2' }, oldSchema: { id: 'btn2' }, changeRecords: [{ propPath: 'b' }] }],
           },
         ],
         true,
@@ -178,7 +180,7 @@ describe('PageTab.vue', () => {
   });
 
   test('点击单步组「回到」按钮透传 goto 事件，携带该 step 的 index', async () => {
-    const list = [buildPageGroup('add', [{ opType: 'add', nodes: [{ id: 'n1', name: 'A' }] }])];
+    const list = [buildPageGroup('add', [{ opType: 'add', diff: [{ newSchema: { id: 'n1', name: 'A' } }] }])];
     const wrapper = mount(PageTab, { props: { list, expanded: {} } });
     await wrapper.find('.m-editor-history-list-item-goto').trigger('click');
     expect(wrapper.emitted('goto')).toBeTruthy();
@@ -187,7 +189,7 @@ describe('PageTab.vue', () => {
   });
 
   test('已撤销组（applied=false）附 is-undone 类名', () => {
-    const list = [buildPageGroup('add', [{ opType: 'add', nodes: [{ id: 'n1', name: 'A' }] }], false)];
+    const list = [buildPageGroup('add', [{ opType: 'add', diff: [{ newSchema: { id: 'n1', name: 'A' } }] }], false)];
     const wrapper = mount(PageTab, { props: { list, expanded: {} } });
     expect(wrapper.find('.m-editor-history-list-group').classes()).toContain('is-undone');
   });
@@ -198,13 +200,13 @@ describe('PageTab.vue', () => {
     expect(empty.find('.m-editor-history-list-initial').exists()).toBe(false);
 
     // 非空 list：底部应有一条初始项
-    const list = [buildPageGroup('add', [{ opType: 'add', nodes: [{ id: 'n1', name: 'A' }] }])];
+    const list = [buildPageGroup('add', [{ opType: 'add', diff: [{ newSchema: { id: 'n1', name: 'A' } }] }])];
     const wrapper = mount(PageTab, { props: { list, expanded: {} } });
     expect(wrapper.find('.m-editor-history-list-initial').exists()).toBe(true);
   });
 
   test('全部 group 都未 applied 时初始项标记为当前', () => {
-    const list = [buildPageGroup('add', [{ opType: 'add', nodes: [{ id: 'n1', name: 'A' }] }], false)];
+    const list = [buildPageGroup('add', [{ opType: 'add', diff: [{ newSchema: { id: 'n1', name: 'A' } }] }], false)];
     const wrapper = mount(PageTab, { props: { list, expanded: {} } });
     const initial = wrapper.find('.m-editor-history-list-initial');
     expect(initial.classes()).toContain('is-current');
@@ -212,8 +214,8 @@ describe('PageTab.vue', () => {
 
   test('存在已 applied 的 group 时初始项不为当前', () => {
     const list = [
-      buildPageGroup('add', [{ opType: 'add', nodes: [{ id: 'n1', name: 'A' }] }], true),
-      buildPageGroup('add', [{ opType: 'add', nodes: [{ id: 'n2', name: 'B' }] }], false),
+      buildPageGroup('add', [{ opType: 'add', diff: [{ newSchema: { id: 'n1', name: 'A' } }] }], true),
+      buildPageGroup('add', [{ opType: 'add', diff: [{ newSchema: { id: 'n2', name: 'B' } }] }], false),
     ];
     const wrapper = mount(PageTab, { props: { list, expanded: {} } });
     const initial = wrapper.find('.m-editor-history-list-initial');
@@ -221,7 +223,7 @@ describe('PageTab.vue', () => {
   });
 
   test('点击非当前初始项的「回到」按钮透传 goto-initial 事件', async () => {
-    const list = [buildPageGroup('add', [{ opType: 'add', nodes: [{ id: 'n1', name: 'A' }] }], true)];
+    const list = [buildPageGroup('add', [{ opType: 'add', diff: [{ newSchema: { id: 'n1', name: 'A' } }] }], true)];
     const wrapper = mount(PageTab, { props: { list, expanded: {} } });
     await wrapper.find('.m-editor-history-list-initial .m-editor-history-list-item-goto').trigger('click');
     expect(wrapper.emitted('goto-initial')).toBeTruthy();

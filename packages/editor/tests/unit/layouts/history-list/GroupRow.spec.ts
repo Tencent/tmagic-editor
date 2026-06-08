@@ -6,22 +6,30 @@
 import { describe, expect, test } from 'vitest';
 import { mount } from '@vue/test-utils';
 
+import type { HistoryRowGroup, HistoryRowStep } from '@editor/layouts/history-list/composables';
 import GroupRow from '@editor/layouts/history-list/GroupRow.vue';
 
-const baseProps = {
-  groupKey: 'pg-0',
+/** 构造 GroupRow 的视图模型（merged / stepCount 由 subSteps 长度派生）。 */
+const makeGroup = (overrides: Partial<HistoryRowGroup> = {}): HistoryRowGroup => ({
+  key: 'pg-0',
   applied: true,
-  merged: false,
-  opType: 'update' as const,
+  isCurrent: false,
+  opType: 'update',
   desc: '修改 按钮',
-  stepCount: 1,
-  subSteps: [] as { index: number; applied: boolean; desc: string }[],
-  expanded: false,
-};
+  subSteps: [],
+  ...overrides,
+});
+
+/** 构造单个子步，缺省值贴近真实派生结果。 */
+const makeStep = (overrides: Partial<HistoryRowStep> & Pick<HistoryRowStep, 'index'>): HistoryRowStep => ({
+  applied: true,
+  desc: '',
+  ...overrides,
+});
 
 describe('GroupRow.vue', () => {
   test('渲染描述与操作类型徽标（update→修改）', () => {
-    const wrapper = mount(GroupRow, { props: baseProps });
+    const wrapper = mount(GroupRow, { props: { group: makeGroup(), expanded: false } });
     expect(wrapper.find('.m-editor-history-list-item-desc').text()).toBe('修改 按钮');
     const op = wrapper.find('.m-editor-history-list-item-op');
     expect(op.text()).toBe('修改');
@@ -29,36 +37,41 @@ describe('GroupRow.vue', () => {
   });
 
   test('add / remove 操作徽标使用对应类名与文案', () => {
-    const w1 = mount(GroupRow, { props: { ...baseProps, opType: 'add' } });
+    const w1 = mount(GroupRow, { props: { group: makeGroup({ opType: 'add' }), expanded: false } });
     expect(w1.find('.m-editor-history-list-item-op').text()).toBe('新增');
     expect(w1.find('.m-editor-history-list-item-op').classes()).toContain('op-add');
 
-    const w2 = mount(GroupRow, { props: { ...baseProps, opType: 'remove' } });
+    const w2 = mount(GroupRow, { props: { group: makeGroup({ opType: 'remove' }), expanded: false } });
     expect(w2.find('.m-editor-history-list-item-op').text()).toBe('删除');
     expect(w2.find('.m-editor-history-list-item-op').classes()).toContain('op-remove');
   });
 
   test('applied=false 时附加 is-undone 类名', () => {
-    const wrapper = mount(GroupRow, { props: { ...baseProps, applied: false } });
+    const wrapper = mount(GroupRow, { props: { group: makeGroup({ applied: false }), expanded: false } });
     expect(wrapper.find('.m-editor-history-list-group').classes()).toContain('is-undone');
   });
 
-  test('merged=true 时显示「合并 N 步」并附 is-merged 类名', () => {
+  test('merged（子步数>1）时显示「合并 N 步」并附 is-merged 类名', () => {
     const wrapper = mount(GroupRow, {
-      props: { ...baseProps, merged: true, stepCount: 3 },
+      props: {
+        group: makeGroup({
+          subSteps: [makeStep({ index: 0 }), makeStep({ index: 1 }), makeStep({ index: 2 })],
+        }),
+        expanded: false,
+      },
     });
     expect(wrapper.find('.m-editor-history-list-group').classes()).toContain('is-merged');
     expect(wrapper.find('.m-editor-history-list-item-merge').text()).toBe('合并 3 步');
   });
 
   test('未合并时不渲染合并标记', () => {
-    const wrapper = mount(GroupRow, { props: baseProps });
+    const wrapper = mount(GroupRow, { props: { group: makeGroup(), expanded: false } });
     expect(wrapper.find('.m-editor-history-list-item-merge').exists()).toBe(false);
   });
 
   test('传入 time 时头部渲染时间，title 取 timeTitle', () => {
     const wrapper = mount(GroupRow, {
-      props: { ...baseProps, time: '12:00:00', timeTitle: '2026-06-03 12:00:00' },
+      props: { group: makeGroup({ time: '12:00:00', timeTitle: '2026-06-03 12:00:00' }), expanded: false },
     });
     const time = wrapper.find('.m-editor-history-list-item-time');
     expect(time.exists()).toBe(true);
@@ -67,26 +80,25 @@ describe('GroupRow.vue', () => {
   });
 
   test('未传 time 时头部不渲染时间元素', () => {
-    const wrapper = mount(GroupRow, { props: baseProps });
+    const wrapper = mount(GroupRow, { props: { group: makeGroup(), expanded: false } });
     expect(wrapper.find('.m-editor-history-list-item-time').exists()).toBe(false);
   });
 
   test('timeTitle 缺省时 title 回退为 time 本身', () => {
-    const wrapper = mount(GroupRow, { props: { ...baseProps, time: '08:30:00' } });
+    const wrapper = mount(GroupRow, { props: { group: makeGroup({ time: '08:30:00' }), expanded: false } });
     expect(wrapper.find('.m-editor-history-list-item-time').attributes('title')).toBe('08:30:00');
   });
 
   test('展开的子步各自渲染自己的时间', () => {
     const wrapper = mount(GroupRow, {
       props: {
-        ...baseProps,
-        merged: true,
-        stepCount: 2,
+        group: makeGroup({
+          subSteps: [
+            makeStep({ index: 0, desc: '修改 颜色', time: '10:00:00', timeTitle: '2026-06-03 10:00:00' }),
+            makeStep({ index: 1, desc: '修改 字号', time: '10:01:00', timeTitle: '2026-06-03 10:01:00' }),
+          ],
+        }),
         expanded: true,
-        subSteps: [
-          { index: 0, applied: true, desc: '修改 颜色', time: '10:00:00', timeTitle: '2026-06-03 10:00:00' },
-          { index: 1, applied: true, desc: '修改 字号', time: '10:01:00', timeTitle: '2026-06-03 10:01:00' },
-        ],
       },
     });
     const items = wrapper.findAll('.m-editor-history-list-substeps li');
@@ -95,17 +107,16 @@ describe('GroupRow.vue', () => {
     expect(items[1].find('.m-editor-history-list-item-time').text()).toBe('10:00:00');
   });
 
-  test('merged=true 且 expanded=true 时渲染子步列表', () => {
+  test('merged 且 expanded=true 时渲染子步列表', () => {
     const wrapper = mount(GroupRow, {
       props: {
-        ...baseProps,
-        merged: true,
-        stepCount: 2,
+        group: makeGroup({
+          subSteps: [
+            makeStep({ index: 0, applied: true, desc: '修改 颜色' }),
+            makeStep({ index: 1, applied: false, desc: '修改 字号' }),
+          ],
+        }),
         expanded: true,
-        subSteps: [
-          { index: 0, applied: true, desc: '修改 颜色' },
-          { index: 1, applied: false, desc: '修改 字号' },
-        ],
       },
     });
     const items = wrapper.findAll('.m-editor-history-list-substeps li');
@@ -119,21 +130,23 @@ describe('GroupRow.vue', () => {
     expect(items[1].text()).toContain('修改 颜色');
   });
 
-  test('merged=true 但 expanded=false 时不渲染子步列表', () => {
+  test('merged 但 expanded=false 时不渲染子步列表', () => {
     const wrapper = mount(GroupRow, {
       props: {
-        ...baseProps,
-        merged: true,
-        stepCount: 2,
+        group: makeGroup({ subSteps: [makeStep({ index: 0, desc: 'x' }), makeStep({ index: 1, desc: 'y' })] }),
         expanded: false,
-        subSteps: [{ index: 0, applied: true, desc: 'x' }],
       },
     });
     expect(wrapper.find('.m-editor-history-list-substeps').exists()).toBe(false);
   });
 
-  test('点击合并组头部触发 toggle 事件并携带 groupKey', async () => {
-    const wrapper = mount(GroupRow, { props: { ...baseProps, merged: true, stepCount: 2 } });
+  test('点击合并组头部触发 toggle 事件并携带 group.key', async () => {
+    const wrapper = mount(GroupRow, {
+      props: {
+        group: makeGroup({ subSteps: [makeStep({ index: 0 }), makeStep({ index: 1 })] }),
+        expanded: false,
+      },
+    });
     await wrapper.find('.m-editor-history-list-group-head').trigger('click');
     const events = wrapper.emitted('toggle');
     expect(events).toBeTruthy();
@@ -145,9 +158,8 @@ describe('GroupRow.vue', () => {
   test('点击单步组（非合并）的「回到」按钮触发 goto，携带该唯一 step 的 index', async () => {
     const wrapper = mount(GroupRow, {
       props: {
-        ...baseProps,
-        merged: false,
-        subSteps: [{ index: 7, applied: true, desc: 'a' }],
+        group: makeGroup({ subSteps: [makeStep({ index: 7, applied: true, desc: 'a' })] }),
+        expanded: false,
       },
     });
     // 点击头部本身不再触发 goto（整行不可点击）
@@ -164,10 +176,8 @@ describe('GroupRow.vue', () => {
   test('当前单步组（isCurrent=true）点击头部不触发 goto', async () => {
     const wrapper = mount(GroupRow, {
       props: {
-        ...baseProps,
-        merged: false,
-        isCurrent: true,
-        subSteps: [{ index: 0, applied: true, desc: 'x' }],
+        group: makeGroup({ isCurrent: true, subSteps: [makeStep({ index: 0, desc: 'x' })] }),
+        expanded: false,
       },
     });
     await wrapper.find('.m-editor-history-list-group-head').trigger('click');
@@ -177,14 +187,11 @@ describe('GroupRow.vue', () => {
   test('当前合并组（isCurrent=true）点击头部仍能 toggle', async () => {
     const wrapper = mount(GroupRow, {
       props: {
-        ...baseProps,
-        merged: true,
-        stepCount: 2,
-        isCurrent: true,
-        subSteps: [
-          { index: 0, applied: true, desc: 'a' },
-          { index: 1, applied: true, desc: 'b', isCurrent: true },
-        ],
+        group: makeGroup({
+          isCurrent: true,
+          subSteps: [makeStep({ index: 0, desc: 'a' }), makeStep({ index: 1, desc: 'b', isCurrent: true })],
+        }),
+        expanded: false,
       },
     });
     await wrapper.find('.m-editor-history-list-group-head').trigger('click');
@@ -192,17 +199,16 @@ describe('GroupRow.vue', () => {
     expect(wrapper.emitted('goto')).toBeFalsy();
   });
 
-  test('点击子步「回退」按钮触发 goto 携带该子步 index；当前子步无回退按钮', async () => {
+  test('点击子步「回到」按钮触发 goto 携带该子步 index；当前子步无回到按钮', async () => {
     const wrapper = mount(GroupRow, {
       props: {
-        ...baseProps,
-        merged: true,
-        stepCount: 2,
+        group: makeGroup({
+          subSteps: [
+            makeStep({ index: 0, applied: true, desc: 'a', isCurrent: true }),
+            makeStep({ index: 1, applied: false, desc: 'b' }),
+          ],
+        }),
         expanded: true,
-        subSteps: [
-          { index: 0, applied: true, desc: 'a', isCurrent: true },
-          { index: 1, applied: false, desc: 'b' },
-        ],
       },
     });
     // 子步倒序渲染：subItems[0] 为 index=1（非当前，含跳转按钮），subItems[1] 为 index=0（当前，无跳转按钮）

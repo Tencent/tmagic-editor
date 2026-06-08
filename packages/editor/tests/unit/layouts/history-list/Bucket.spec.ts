@@ -7,8 +7,9 @@ import { describe, expect, test } from 'vitest';
 import { mount } from '@vue/test-utils';
 
 import Bucket from '@editor/layouts/history-list/Bucket.vue';
+import type { HistoryBucketConfig } from '@editor/layouts/history-list/composables';
 
-const buildGroup = (opType: 'add' | 'remove' | 'update', stepCount: number, applied = true) => ({
+const buildGroup = (opType: 'add' | 'remove' | 'update', stepCount: number, applied = true): any => ({
   applied,
   opType,
   steps: Array.from({ length: stepCount }, (_, i) => ({
@@ -18,16 +19,22 @@ const buildGroup = (opType: 'add' | 'remove' | 'update', stepCount: number, appl
   })),
 });
 
+/** 把 title/prefix/describe* 收敛成单一 config，贴近真实调用方式。 */
+const buildConfig = (overrides: Partial<HistoryBucketConfig<any>> = {}): HistoryBucketConfig<any> => ({
+  title: '数据源',
+  prefix: 'ds',
+  describeGroup: () => 'desc',
+  describeStep: () => 'sub-desc',
+  ...overrides,
+});
+
 describe('Bucket.vue', () => {
   test('渲染 bucket 头部信息与组数', () => {
     const wrapper = mount(Bucket, {
       props: {
-        title: '数据源',
+        config: buildConfig(),
         bucketId: 'ds_1',
-        prefix: 'ds',
         groups: [buildGroup('update', 1), buildGroup('add', 1)],
-        describeGroup: () => 'desc',
-        describeStep: () => 'sub-desc',
         expanded: {},
       },
     });
@@ -44,12 +51,9 @@ describe('Bucket.vue', () => {
 
     const wrapper = mount(Bucket, {
       props: {
-        title: '代码块',
+        config: buildConfig({ title: '代码块', prefix: 'cb', describeGroup, describeStep }),
         bucketId: 'code_1',
-        prefix: 'cb',
         groups,
-        describeGroup,
-        describeStep,
         expanded: { 'cb-code_1-0': true },
       },
     });
@@ -73,12 +77,9 @@ describe('Bucket.vue', () => {
   test('合并组头部点击 → toggle 事件被透传到 Bucket', async () => {
     const wrapper = mount(Bucket, {
       props: {
-        title: '代码块',
+        config: buildConfig({ title: '代码块', prefix: 'cb', describeGroup: () => 'g', describeStep: () => 's' }),
         bucketId: 'code_1',
-        prefix: 'cb',
         groups: [buildGroup('update', 2)],
-        describeGroup: () => 'g',
-        describeStep: () => 's',
         expanded: {},
       },
     });
@@ -93,12 +94,9 @@ describe('Bucket.vue', () => {
   test('单步组「回到」按钮点击 → goto 事件被透传到 Bucket，并附带 bucketId', async () => {
     const wrapper = mount(Bucket, {
       props: {
-        title: '代码块',
+        config: buildConfig({ title: '代码块', prefix: 'cb', describeGroup: () => 'g', describeStep: () => 's' }),
         bucketId: 'code_1',
-        prefix: 'cb',
         groups: [buildGroup('update', 1)],
-        describeGroup: () => 'g',
-        describeStep: () => 's',
         expanded: {},
       },
     });
@@ -111,12 +109,9 @@ describe('Bucket.vue', () => {
   test('合并组展开后点击子步「回到」按钮 → goto 透传，附带子步 index', async () => {
     const wrapper = mount(Bucket, {
       props: {
-        title: '代码块',
+        config: buildConfig({ title: '代码块', prefix: 'cb', describeGroup: () => 'g', describeStep: () => 's' }),
         bucketId: 'code_1',
-        prefix: 'cb',
         groups: [buildGroup('update', 2)],
-        describeGroup: () => 'g',
-        describeStep: () => 's',
         expanded: { 'cb-code_1-0': true },
       },
     });
@@ -132,12 +127,9 @@ describe('Bucket.vue', () => {
   test('groupKey 命名空间使用 prefix + bucketId + 索引', () => {
     const wrapper = mount(Bucket, {
       props: {
-        title: '数据源',
+        config: buildConfig({ describeGroup: () => 'g', describeStep: () => 's' }),
         bucketId: 42,
-        prefix: 'ds',
         groups: [buildGroup('update', 2), buildGroup('add', 1)],
-        describeGroup: () => 'g',
-        describeStep: () => 's',
         // 给第二组打开展开状态
         expanded: { 'ds-42-1': true },
       },
@@ -152,12 +144,9 @@ describe('Bucket.vue', () => {
   test('groups 非空时底部追加初始项；点击透传 goto-initial 携带 bucketId', async () => {
     const wrapper = mount(Bucket, {
       props: {
-        title: '数据源',
+        config: buildConfig({ describeGroup: () => 'g', describeStep: () => 's' }),
         bucketId: 'ds_1',
-        prefix: 'ds',
         groups: [buildGroup('add', 1)],
-        describeGroup: () => 'g',
-        describeStep: () => 's',
         expanded: {},
       },
     });
@@ -175,12 +164,9 @@ describe('Bucket.vue', () => {
   test('该 bucket 全部组都已撤销时初始项标记为当前', () => {
     const wrapper = mount(Bucket, {
       props: {
-        title: '代码块',
+        config: buildConfig({ title: '代码块', prefix: 'cb', describeGroup: () => 'g', describeStep: () => 's' }),
         bucketId: 'cb_1',
-        prefix: 'cb',
         groups: [buildGroup('add', 1, false), buildGroup('update', 2, false)],
-        describeGroup: () => 'g',
-        describeStep: () => 's',
         expanded: {},
       },
     });
