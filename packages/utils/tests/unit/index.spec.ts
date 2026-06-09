@@ -201,6 +201,22 @@ describe('getNodePath', () => {
     expect(path).toHaveLength(0);
     expect(path2).toHaveLength(0);
   });
+
+  test('skip 跳过指定子树后查找不到其内部节点', () => {
+    // 跳过 id 为 2 的容器，其子树（22 / 222）不再被遍历
+    const skipped = util.getNodePath(222, root, root[1]);
+    expect(skipped).toHaveLength(0);
+    // 其它子树不受影响
+    const path = util.getNodePath(111, root, root[1]);
+    expect(path).toHaveLength(3);
+  });
+
+  test('skip 不影响对被跳过节点自身的匹配', () => {
+    // skip 仅阻止递归进入其 items，节点自身仍可被匹配到
+    const path = util.getNodePath(2, root, root[1]);
+    expect(path).toHaveLength(1);
+    expect(path[0].id).toBe(2);
+  });
 });
 
 describe('filterXSS', () => {

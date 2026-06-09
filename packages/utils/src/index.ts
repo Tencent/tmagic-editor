@@ -23,7 +23,6 @@ import type {
   DataSchema,
   DataSourceDeps,
   Id,
-  MApp,
   MComponent,
   MContainer,
   MNode,
@@ -80,10 +79,12 @@ export const emptyFn = (): any => undefined;
  * @param {Array} data 要查找的根容器节点
  * @return {Array} 组件在data中的子孙路径
  */
-export const getNodePath = (id: Id, data: MNode[] = []): MNode[] => {
+export const getNodePath = (id: Id, data: MNode[] = [], skip?: MNode | null): MNode[] => {
   const path: MNode[] = [];
+  // 目标 id 字符串只计算一次，避免在递归遍历中对每个节点重复拼接
+  const targetId = `${id}`;
 
-  const get = function (id: number | string, data: MNode[]): MNode | null {
+  const get = function (data: MNode[]): MNode | null {
     if (!Array.isArray(data)) {
       return null;
     }
@@ -92,12 +93,13 @@ export const getNodePath = (id: Id, data: MNode[] = []): MNode[] => {
       const item = data[i];
 
       path.push(item);
-      if (`${item.id}` === `${id}`) {
+      if (`${item.id}` === targetId) {
         return item;
       }
 
-      if (item.items) {
-        const node = get(id, item.items);
+      // skip 用于跳过已经搜索过的子树（如已优先搜索过的当前页面），避免重复遍历
+      if (item.items && item !== skip) {
+        const node = get(item.items);
         if (node) {
           return node;
         }
@@ -109,12 +111,12 @@ export const getNodePath = (id: Id, data: MNode[] = []): MNode[] => {
     return null;
   };
 
-  get(id, data);
+  get(data);
 
   return path;
 };
 
-export const getNodeInfo = (id: Id, root: Pick<MApp, 'id' | 'items'> | null) => {
+export const getNodeInfo = (id: Id, root: { id: Id; items?: MNode[] } | null, skip?: MNode | null) => {
   const info: EditorNodeInfo = {
     node: null,
     parent: null,
@@ -128,7 +130,7 @@ export const getNodeInfo = (id: Id, root: Pick<MApp, 'id' | 'items'> | null) => 
     return info;
   }
 
-  const path = getNodePath(id, root.items);
+  const path = getNodePath(id, root.items, skip);
 
   if (!path.length) return info;
 
@@ -137,12 +139,12 @@ export const getNodeInfo = (id: Id, root: Pick<MApp, 'id' | 'items'> | null) => 
   info.node = path[path.length - 1] as MComponent;
   info.parent = path[path.length - 2] as MContainer;
 
-  path.forEach((item) => {
+  for (const item of path) {
     if (isPage(item) || isPageFragment(item)) {
       info.page = item as MPage | MPageFragment;
-      return;
+      break;
     }
-  });
+  }
 
   return info;
 };

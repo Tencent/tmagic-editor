@@ -217,7 +217,30 @@ class Editor extends BaseService {
       root = toRaw(root);
     }
 
-    return getNodeInfo(id, root);
+    if (!root) {
+      return { node: null, parent: null, page: null };
+    }
+
+    if (id === root.id) {
+      return { node: root, parent: null, page: null };
+    }
+
+    // 大多数查找的目标都在当前页面内，优先在当前页面子树中查找以避免对整棵树做全量遍历。
+    // 注意：不能直接使用 state.page，它可能与当前 root 不同步（指向已脱离的旧页面对象），
+    // 因此仅借用其 id，再从当前 root 中取回真正的页面对象（页面均为 root 的直接子节点，数量很少）。
+    const pageIdStr = `${this.get('page')?.id || ''}`;
+    const currentPageNode = root.items?.find((item) => `${item.id}` === pageIdStr);
+    if (currentPageNode && `${id}` !== pageIdStr) {
+      // util 仅读取 root.id 与 root.items，按容器结构传入当前页面是安全的
+      const info = getNodeInfo(id, currentPageNode);
+      if (info.node) {
+        return info;
+      }
+    }
+
+    // 回退：在完整 root 上查找；当前页面已搜索过，用 skip 跳过其子树避免重复遍历，
+    // 同时保留真实的 parent / page 引用（id 命中当前页面节点本身时会在跳过子树前先匹配到）
+    return getNodeInfo(id, root, currentPageNode);
   }
 
   /**

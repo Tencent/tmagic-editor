@@ -248,6 +248,27 @@ describe('getNodeInfo', () => {
     const info = getNodeInfo('foo', null);
     expect(info.node).toBeNull();
   });
+
+  test('skip 跳过指定页面子树后查找不到其内部节点', () => {
+    const multiRoot = {
+      id: 'app',
+      items: [
+        { id: 'page_1', type: NodeType.PAGE, items: [{ id: 'btn_1', type: 'button' }] },
+        { id: 'page_2', type: NodeType.PAGE, items: [{ id: 'btn_2', type: 'button' }] },
+      ],
+    } as any;
+
+    // 跳过 page_1 后，page_1 内的节点查不到
+    const skipped = getNodeInfo('btn_1', multiRoot, multiRoot.items[0]);
+    expect(skipped.node).toBeNull();
+
+    // 其它页面节点不受影响，parent / page 仍为真实引用
+    const info = getNodeInfo('btn_2', multiRoot, multiRoot.items[0]);
+    expect(info.node?.id).toBe('btn_2');
+    expect(info.parent?.id).toBe('page_2');
+    expect(info.page?.id).toBe('page_2');
+    expect(info.parent).toBe(multiRoot.items[1]);
+  });
 });
 
 describe('setValueByKeyPath / getKeys', () => {

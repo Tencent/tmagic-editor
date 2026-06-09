@@ -190,6 +190,93 @@ describe('getParentById', () => {
   });
 });
 
+describe('getNodeInfo 当前页面优先 / 跨页面回退', () => {
+  // 两个页面，page2 内含一个容器及其子节点，用于覆盖「优先当前页面、回退跳过当前页面」逻辑
+  const PAGE2_ID = 20;
+  const NODE_IN_PAGE2 = 21;
+  const CONTAINER_IN_PAGE2 = 22;
+  const CHILD_IN_PAGE2 = 23;
+  const multiPageRoot: MApp = {
+    id: NodeId.ROOT_ID,
+    type: NodeType.ROOT,
+    items: [
+      cloneDeep(root.items[0]),
+      {
+        id: PAGE2_ID,
+        type: NodeType.PAGE,
+        layout: 'absolute',
+        style: { width: 375 },
+        items: [
+          { id: NODE_IN_PAGE2, type: 'text', style: {} },
+          {
+            id: CONTAINER_IN_PAGE2,
+            type: 'container',
+            style: {},
+            items: [{ id: CHILD_IN_PAGE2, type: 'text', style: {} }],
+          },
+        ],
+      },
+    ],
+  };
+
+  beforeAll(async () => {
+    editorService.set('root', cloneDeep(multiPageRoot));
+    // 当前停留在 page1
+    await editorService.select(NodeId.PAGE_ID);
+  });
+
+  test('id 为 root.id 时返回 root 自身，parent / page 为 null', () => {
+    const info = editorService.getNodeInfo(NodeId.ROOT_ID);
+    expect(info.node?.id).toBe(NodeId.ROOT_ID);
+    expect(info.parent).toBeNull();
+    expect(info.page).toBeNull();
+  });
+
+  test('当前页面节点本身：node 为页面、parent 为 root、page 为页面自身', () => {
+    const info = editorService.getNodeInfo(NodeId.PAGE_ID);
+    expect(info.node?.id).toBe(NodeId.PAGE_ID);
+    expect(info.parent?.id).toBe(NodeId.ROOT_ID);
+    expect(info.page?.id).toBe(NodeId.PAGE_ID);
+  });
+
+  test('命中当前页面内的节点（快速路径）', () => {
+    const info = editorService.getNodeInfo(NodeId.NODE_ID);
+    expect(info.node?.id).toBe(NodeId.NODE_ID);
+    expect(info.parent?.id).toBe(NodeId.PAGE_ID);
+    expect(info.page?.id).toBe(NodeId.PAGE_ID);
+  });
+
+  test('命中非当前页面内的深层节点（回退跳过当前页面），parent / page 正确', () => {
+    const info = editorService.getNodeInfo(CHILD_IN_PAGE2);
+    expect(info.node?.id).toBe(CHILD_IN_PAGE2);
+    expect(info.parent?.id).toBe(CONTAINER_IN_PAGE2);
+    expect(info.page?.id).toBe(PAGE2_ID);
+  });
+
+  test('非当前页面的页面节点：parent 为真实 root（同一引用，可安全 mutate）', () => {
+    const info = editorService.getNodeInfo(PAGE2_ID, false);
+    expect(info.node?.id).toBe(PAGE2_ID);
+    expect(info.page?.id).toBe(PAGE2_ID);
+    // parent 必须是真实 root 引用，而非临时副本，否则对页面增删/排序会改不到真实树
+    expect(info.parent).toBe(editorService.get('root'));
+  });
+
+  test('不存在的节点返回空 info', () => {
+    const info = editorService.getNodeInfo(NodeId.ERROR_NODE_ID);
+    expect(info.node).toBeNull();
+    expect(info.page).toBeNull();
+  });
+
+  test('未选中任何页面时仍能跨页面查找到节点', () => {
+    editorService.set('root', cloneDeep(multiPageRoot));
+    editorService.set('page', null);
+    const info = editorService.getNodeInfo(CHILD_IN_PAGE2);
+    expect(info.node?.id).toBe(CHILD_IN_PAGE2);
+    expect(info.parent?.id).toBe(CONTAINER_IN_PAGE2);
+    expect(info.page?.id).toBe(PAGE2_ID);
+  });
+});
+
 describe('isOnDifferentPage', () => {
   test('当前未选中任何页面时返回 false', () => {
     editorService.set('root', cloneDeep(root));
