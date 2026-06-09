@@ -82,25 +82,32 @@ type MoveItem = { node: MNode; parent: MContainer; pageForOp: { name: string; id
  */
 const describeStepForRevert = (step: StepValue): string => {
   const items = step.diff ?? [];
+  // 在可读名后拼接组件 id，便于在历史面板中精确定位被回滚的组件；id 缺失时退化为仅展示名称。
+  const withId = (node: MNode | undefined, label: string): string => {
+    const id = node?.id;
+    if (id === undefined || id === null || `${id}` === '') return label;
+    return label ? `${label}（id: ${id}）` : `id: ${id}`;
+  };
   switch (step.opType) {
     case 'add': {
       const count = items.length;
       const node = items[0]?.newSchema;
-      const label = node?.name || node?.type || (node?.id !== undefined ? `${node.id}` : '');
-      return `撤回新增 ${count} 个节点${count === 1 && label ? `（${label}）` : ''}`;
+      const label = node?.name || node?.type || '';
+      return `撤回新增 ${count} 个节点${count === 1 ? `（${withId(node, label)}）` : ''}`;
     }
     case 'remove': {
       const count = items.length;
       const node = items[0]?.oldSchema;
-      const label = node?.name || node?.type || (node?.id !== undefined ? `${node.id}` : '');
-      return `还原已删除的 ${count} 个节点${count === 1 && label ? `（${label}）` : ''}`;
+      const label = node?.name || node?.type || '';
+      return `还原已删除的 ${count} 个节点${count === 1 ? `（${withId(node, label)}）` : ''}`;
     }
     case 'update':
     default: {
       if (items.length === 1) {
         const { newSchema, oldSchema, changeRecords } = items[0];
-        const target =
-          newSchema?.name || newSchema?.type || oldSchema?.name || oldSchema?.type || `${newSchema?.id ?? ''}`;
+        const node = newSchema || oldSchema;
+        const label = newSchema?.name || newSchema?.type || oldSchema?.name || oldSchema?.type || '';
+        const target = withId(node, label);
         const propPath = changeRecords?.[0]?.propPath;
         return propPath ? `还原 ${target} · ${propPath}` : `还原 ${target}`;
       }

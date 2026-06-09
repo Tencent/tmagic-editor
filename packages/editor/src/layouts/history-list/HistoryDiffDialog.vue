@@ -1,76 +1,74 @@
 <template>
-  <Teleport to="body">
-    <TMagicDialog
-      v-model="visible"
-      class="m-editor-history-diff-dialog"
-      :title="dialogTitle"
-      top="5vh"
-      destroy-on-close
-      append-to-body
-      :width="width"
-      @close="onClose"
-    >
-      <div v-if="payload" class="m-editor-history-diff-dialog-body">
-        <div v-if="onConfirm" class="m-editor-history-diff-dialog-notice">仅回滚有差异的字段</div>
+  <TMagicDialog
+    v-model="visible"
+    class="m-editor-history-diff-dialog"
+    :title="dialogTitle"
+    top="5vh"
+    destroy-on-close
+    append-to-body
+    :width="width"
+    @close="onClose"
+  >
+    <div v-if="payload && visible" class="m-editor-history-diff-dialog-body">
+      <div v-if="onConfirm" class="m-editor-history-diff-dialog-notice">仅回滚有差异的字段</div>
 
-        <div class="m-editor-history-diff-dialog-header">
-          <span class="m-editor-history-diff-dialog-target">{{ targetText }}</span>
-          <div class="m-editor-history-diff-dialog-controls">
-            <TMagicRadioGroup v-model="viewMode" size="small" class="m-editor-history-diff-dialog-view">
-              <TMagicRadioButton value="form">表单对比</TMagicRadioButton>
-              <TMagicRadioButton value="code">源码对比</TMagicRadioButton>
-            </TMagicRadioGroup>
+      <div class="m-editor-history-diff-dialog-header">
+        <span class="m-editor-history-diff-dialog-target">{{ targetText }}</span>
+        <div class="m-editor-history-diff-dialog-controls">
+          <TMagicRadioGroup v-model="viewMode" size="small" class="m-editor-history-diff-dialog-view">
+            <TMagicRadioButton value="form">表单对比</TMagicRadioButton>
+            <TMagicRadioButton value="code">源码对比</TMagicRadioButton>
+          </TMagicRadioGroup>
 
-            <TMagicRadioGroup v-model="mode" size="small" class="m-editor-history-diff-dialog-mode">
-              <TMagicRadioButton value="before">与修改前对比</TMagicRadioButton>
-              <TMagicRadioButton value="current" :disabled="!hasCurrent">与当前对比</TMagicRadioButton>
-            </TMagicRadioGroup>
-          </div>
+          <TMagicRadioGroup v-model="mode" size="small" class="m-editor-history-diff-dialog-mode">
+            <TMagicRadioButton value="before">与修改前对比</TMagicRadioButton>
+            <TMagicRadioButton value="current" :disabled="!hasCurrent">与当前对比</TMagicRadioButton>
+          </TMagicRadioGroup>
         </div>
-
-        <div class="m-editor-history-diff-dialog-legend">
-          <TMagicTag size="small" type="danger">{{ leftLabel }}</TMagicTag>
-          <span class="m-editor-history-diff-dialog-arrow">→</span>
-          <TMagicTag size="small" type="success">{{ rightLabel }}</TMagicTag>
-          <span v-if="mode === 'current' && isSameAsCurrent" class="m-editor-history-diff-dialog-tip">
-            当前值与该步修改后一致，无差异
-          </span>
-        </div>
-
-        <CompareForm
-          v-if="viewMode === 'form'"
-          :category="payload.category"
-          :type="payload.type"
-          :data-source-type="payload.dataSourceType"
-          :value="rightValue"
-          :last-value="leftValue"
-          :extend-state="extendState"
-          :load-config="loadConfig"
-          :self-diff-field-types="selfDiffFieldTypes"
-          height="70vh"
-        />
-
-        <CodeEditor
-          v-else
-          type="diff"
-          language="json"
-          :init-values="leftValue"
-          :modified-values="rightValue"
-          :options="codeDiffOptions"
-          disabled-full-screen
-          height="70vh"
-        />
       </div>
 
-      <template #footer>
-        <template v-if="onConfirm">
-          <TMagicButton size="small" @click="visible = false">取消</TMagicButton>
-          <TMagicButton size="small" type="primary" @click="onConfirmClick">确定回滚</TMagicButton>
-        </template>
-        <TMagicButton v-else size="small" @click="visible = false">关闭</TMagicButton>
+      <div class="m-editor-history-diff-dialog-legend">
+        <TMagicTag size="small" type="danger">{{ leftLabel }}</TMagicTag>
+        <span class="m-editor-history-diff-dialog-arrow">→</span>
+        <TMagicTag size="small" type="success">{{ rightLabel }}</TMagicTag>
+        <span v-if="mode === 'current' && isSameAsCurrent" class="m-editor-history-diff-dialog-tip">
+          当前值与该步修改后一致，无差异
+        </span>
+      </div>
+
+      <CompareForm
+        v-if="viewMode === 'form'"
+        :category="payload.category"
+        :type="payload.type"
+        :data-source-type="payload.dataSourceType"
+        :value="rightValue"
+        :last-value="leftValue"
+        :extend-state="extendState"
+        :load-config="loadConfig"
+        :self-diff-field-types="selfDiffFieldTypes"
+        height="70vh"
+      />
+
+      <CodeEditor
+        v-else
+        type="diff"
+        language="json"
+        :init-values="leftValue"
+        :modified-values="rightValue"
+        :options="codeDiffOptions"
+        disabled-full-screen
+        height="70vh"
+      />
+    </div>
+
+    <template #footer>
+      <template v-if="isConfirm">
+        <TMagicButton size="small" @click="visible = false">取消</TMagicButton>
+        <TMagicButton size="small" type="primary" @click="onConfirmClick">确定回滚</TMagicButton>
       </template>
-    </TMagicDialog>
-  </Teleport>
+      <TMagicButton v-else size="small" @click="visible = false">关闭</TMagicButton>
+    </template>
+  </TMagicDialog>
 </template>
 
 <script lang="ts" setup>
@@ -102,6 +100,7 @@ const props = withDefaults(
      */
     loadConfig?: CompareFormLoadConfig;
     width?: string;
+    isConfirm?: boolean;
     onConfirm?: () => void;
     selfDiffFieldTypes?: string[];
   }>(),
@@ -178,10 +177,15 @@ const isSameAsCurrent = computed(() => {
   return isEqual(payload.value.value, payload.value.currentValue);
 });
 
-const onConfirmClick = () => {
-  const cb = props.onConfirm;
+/** confirm() 的 resolve，仅在「等待用户确认回滚」期间存在 */
+let confirmResolve: ((_value: boolean) => void) | null = null;
 
-  cb?.();
+const onConfirmClick = () => {
+  props.onConfirm?.();
+
+  // 用户确认回滚：resolve(true)，并清空以避免随后 visible=false 再 resolve(false)
+  confirmResolve?.(true);
+  confirmResolve = null;
 
   visible.value = false;
 };
@@ -210,6 +214,24 @@ const open = (p: DiffDialogPayload) => {
   visible.value = true;
 };
 
+/**
+ * 以 Promise 形式打开确认回滚弹窗：
+ * - 用户点击「确定回滚」时 resolve(true)；
+ * - 取消 / 关闭 / 按 Esc 等其他方式关闭弹窗时 resolve(false)。
+ *
+ * 同一时刻只允许一个待确认流程，重复调用会先 resolve(false) 掉上一个。
+ */
+const confirm = (p: DiffDialogPayload): Promise<boolean> => {
+  // 终止上一个未完成的确认流程，避免悬挂的 Promise
+  confirmResolve?.(false);
+  confirmResolve = null;
+
+  return new Promise<boolean>((resolve) => {
+    confirmResolve = resolve;
+    open(p);
+  });
+};
+
 const close = () => {
   visible.value = false;
 };
@@ -218,6 +240,9 @@ const close = () => {
 watch(visible, (v) => {
   if (!v) {
     payload.value = null;
+    // 非「确定回滚」方式关闭（取消 / Esc / 点遮罩等）时，resolve(false)
+    confirmResolve?.(false);
+    confirmResolve = null;
   }
 });
 
@@ -227,6 +252,7 @@ const onClose = () => {
 
 defineExpose({
   open,
+  confirm,
   close,
 });
 </script>
