@@ -122,18 +122,20 @@ describe('markStackSaved', () => {
 });
 
 describe('mergeStackSteps', () => {
-  test('连续 update 合并为一组', () => {
+  test('连续 update 各自独立成组', () => {
     const list = [
       { opType: 'update', uuid: '1' },
       { opType: 'update', uuid: '2' },
     ] as CodeBlockStepValue[];
     const groups = mergeStackSteps('code-block', 'code_1', list, 2);
-    expect(groups).toHaveLength(1);
-    expect(groups[0].steps).toHaveLength(2);
+    expect(groups).toHaveLength(2);
+    expect(groups[0].steps).toHaveLength(1);
+    expect(groups[1].steps).toHaveLength(1);
     expect(groups[0].opType).toBe('update');
+    expect(groups[1].opType).toBe('update');
   });
 
-  test('add / update 不合并', () => {
+  test('add / update 各自独立成组', () => {
     const list = [
       { opType: 'add', uuid: '1' },
       { opType: 'update', uuid: '2' },
@@ -148,10 +150,12 @@ describe('mergeStackSteps', () => {
       { opType: 'update', uuid: '2' },
     ] as CodeBlockStepValue[];
     const groups = mergeStackSteps('code-block', 'code_1', list, 1);
-    expect(groups[0].applied).toBe(false);
+    expect(groups[0].applied).toBe(true);
     expect(groups[0].steps[0].applied).toBe(true);
     expect(groups[0].steps[0].isCurrent).toBe(true);
-    expect(groups[0].steps[1].applied).toBe(false);
+    expect(groups[0].isCurrent).toBe(true);
+    expect(groups[1].applied).toBe(false);
+    expect(groups[1].steps[0].applied).toBe(false);
   });
 });
 

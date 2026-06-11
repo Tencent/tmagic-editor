@@ -100,8 +100,8 @@
 /**
  * 历史记录面板：在顶部 NavMenu 上点击图标打开 popover，分三个 tab：
  * - 页面：当前活动页面的历史栈，连续修改同一节点的多步会被合并成一组
- * - 数据源：以 dataSource.id 分组，每组内部相邻的连续 update 自动合并
- * - 代码块：同上，按 codeBlock.id 分组并合并相邻 update
+ * - 数据源：以 dataSource.id 分桶，每条操作记录独立展示
+ * - 代码块：同上，按 codeBlock.id 分桶，每条操作记录独立展示
  *
  * 数据通过 historyService 暴露的聚合 API 读取，UI 仅用于只读展示，
  * 同时支持点击任意一条记录跳转至该状态：

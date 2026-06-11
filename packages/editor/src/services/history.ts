@@ -526,11 +526,8 @@ class History extends BaseService {
   }
 
   /**
-   * 取出全部代码块的历史栈，按 codeBlockId 分组。
-   * 同一栈内相邻、同 opType 且作用于同一 id 的多步会被合并为一个 group：
-   * - 这正是"代码块/数据源各自按 id 分栈"的天然表现，再叠加"连续修改同目标的相邻步骤合并展示"。
-   * - 合并后 group 暴露子步骤数组，UI 可展开查看每一步的 changeRecords。
-   * - applied 字段：组内最后一步是否处于已应用段。
+   * 取出全部代码块的历史栈，按 codeBlockId 分桶展示。
+   * 同一栈内每条操作记录独立成组，不做相邻 update 合并。
    */
   public getCodeBlockHistoryGroups(): CodeBlockHistoryGroup[] {
     const groups: CodeBlockHistoryGroup[] = [];
@@ -622,7 +619,7 @@ class History extends BaseService {
   }
 
   /**
-   * 取出全部数据源的历史栈，按 dataSourceId 分组。同上。
+   * 取出全部数据源的历史栈，按 dataSourceId 分桶展示。同上，每条操作独立成组。
    */
   public getDataSourceHistoryGroups(): DataSourceHistoryGroup[] {
     const groups: DataSourceHistoryGroup[] = [];

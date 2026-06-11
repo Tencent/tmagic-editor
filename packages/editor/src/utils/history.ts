@@ -121,8 +121,7 @@ export const markStackSaved = <S extends { saved?: boolean }>(undoRedo?: UndoRed
 
 /**
  * 把单个「按 id 分栈」的历史栈（代码块 / 数据源）拆成若干 group：
- * - 把"新增/删除"独立成组（语义上属于一次性事件，不应与 update 合并）；
- * - 连续 'update' 合并到同一组，组内 steps 顺序就是发生顺序。
+ * 每条操作记录独立成组，不做相邻 update 合并（与页面历史的合并策略不同）。
  *
  * 代码块与数据源除 `kind` 外结构完全一致，统一由本方法处理；`kind` 决定返回的具体分组类型。
  */
@@ -139,38 +138,19 @@ export const mergeStackSteps = <S extends BaseStepValue, K extends 'code-block' 
   applied: boolean;
   isCurrent?: boolean;
 }[] => {
-  type Group = {
-    kind: K;
-    id: Id;
-    opType: HistoryOpType;
-    steps: { step: S; index: number; applied: boolean; isCurrent?: boolean }[];
-    applied: boolean;
-    isCurrent?: boolean;
-  };
-  const groups: Group[] = [];
-  let current: Group | null = null;
   const currentIndex = cursor - 1;
-  list.forEach((step, index) => {
-    const { opType } = step;
+  return list.map((step, index) => {
     const applied = index < cursor;
     const isCurrent = index === currentIndex;
-    if (opType === 'update' && current?.opType === 'update') {
-      current.steps.push({ step, index, applied, isCurrent });
-      current.applied = applied;
-      if (isCurrent) current.isCurrent = true;
-    } else {
-      current = {
-        kind,
-        id,
-        opType,
-        steps: [{ step, index, applied, isCurrent }],
-        applied,
-        isCurrent,
-      };
-      groups.push(current);
-    }
+    return {
+      kind,
+      id,
+      opType: step.opType,
+      steps: [{ step, index, applied, isCurrent }],
+      applied,
+      isCurrent,
+    };
   });
-  return groups;
 };
 
 /**
