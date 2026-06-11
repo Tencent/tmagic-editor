@@ -7,7 +7,7 @@ import { describe, expect, test } from 'vitest';
 import { mount } from '@vue/test-utils';
 
 import Bucket from '@editor/layouts/history-list/Bucket.vue';
-import type { HistoryBucketConfig } from '@editor/layouts/history-list/composables';
+import type { HistoryBucketConfig } from '@editor/type';
 
 const buildGroup = (opType: 'add' | 'remove' | 'update', stepCount: number, applied = true): any => ({
   applied,
@@ -137,8 +137,8 @@ describe('Bucket.vue', () => {
     // 第二组只有 1 步，不应渲染 substeps（即使 expanded 为 true）
     const rows = wrapper.findAll('.m-editor-history-list-group');
     expect(rows[1].find('.m-editor-history-list-substeps').exists()).toBe(false);
-    // 第一组未展开，也不应有 substeps
-    expect(rows[0].find('.m-editor-history-list-substeps').exists()).toBe(false);
+    // 第一组为合并组，默认展开
+    expect(rows[0].find('.m-editor-history-list-substeps').exists()).toBe(true);
   });
 
   test('groups 非空时底部追加初始项；点击透传 goto-initial 携带 bucketId', async () => {

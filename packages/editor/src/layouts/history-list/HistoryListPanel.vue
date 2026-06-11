@@ -23,6 +23,7 @@
           <PageTab
             :list="pageGroupsDisplay"
             :expanded="expanded"
+            :marker="pageMarker"
             @toggle="toggleGroup"
             @goto="onPageGoto"
             @goto-initial="onPageGotoInitial"
@@ -132,10 +133,15 @@ import type { FormState } from '@tmagic/form';
 
 import MIcon from '@editor/components/Icon.vue';
 import { useServices } from '@editor/hooks/use-services';
-import type { CodeBlockStepValue, DataSourceStepValue, DiffDialogPayload, HistoryListExtraTab } from '@editor/type';
+import type {
+  CodeBlockStepValue,
+  DataSourceStepValue,
+  DiffDialogPayload,
+  HistoryBucketConfig,
+  HistoryListExtraTab,
+} from '@editor/type';
 
 import BucketTab from './BucketTab.vue';
-import type { HistoryBucketConfig } from './composables';
 import {
   describeCodeBlockGroup,
   describeCodeBlockStep,
@@ -205,6 +211,12 @@ const {
   dataSourceGroupsByTarget,
   codeBlockGroupsByTarget,
 } = useHistoryList();
+
+/**
+ * 当前活动页的「加载/初始」标记记录（设置 root 时生成），透传给 PageTab 的底部初始行展示。
+ * 基于 historyService 的 reactive state 派生，活动页切换或标记写入后自动刷新。
+ */
+const pageMarker = computed(() => historyService.getPageMarker());
 
 /** 数据源 step 仅 update（前后 schema 都存在）时可查看差异。 */
 const isDataSourceStepDiffable = (step: DataSourceStepValue) =>

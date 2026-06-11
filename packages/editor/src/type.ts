@@ -680,7 +680,13 @@ export interface CodeParamStatement {
 }
 
 // #region HistoryOpType
-export type HistoryOpType = 'add' | 'remove' | 'update';
+/**
+ * 历史记录操作类型：
+ * - `add` / `remove` / `update`：普通可撤销/重做的节点变更；
+ * - `initial`：页面「未修改的初始状态」基线（设置 root 时生成），作为页面栈 index 0 的固定底线 step。
+ *   该 step 不可被撤销/回滚（cursor 不会低于它），仅用于历史面板底部的初始行展示。
+ */
+export type HistoryOpType = 'add' | 'remove' | 'update' | 'initial';
 // #endregion HistoryOpType
 
 // #region HistoryOpSource
@@ -705,11 +711,13 @@ export type HistoryOpType = 'add' | 'remove' | 'update';
  * 通过 `(string & {})` 允许业务侧扩展自定义途径字符串，同时保留内置值的自动补全。
  */
 export type HistoryOpSource =
+  | 'initial'
   | 'stage'
   | 'tree'
   | 'component-panel'
   | 'props'
   | 'code'
+  | 'root-code'
   | 'stage-contextmenu'
   | 'tree-contextmenu'
   | 'toolbar'
@@ -717,6 +725,8 @@ export type HistoryOpSource =
   | 'rollback'
   | 'api'
   | 'ai'
+  // 同步
+  | 'sync'
   | 'unknown'
   | (string & {});
 // #endregion HistoryOpSource
@@ -790,6 +800,12 @@ export interface BaseStepValue<T = unknown> {
    * 同一栈内任意时刻最多只有一条记录为 true；从 IndexedDB 恢复时游标会被定位到最近一条已保存记录之后。
    */
   saved?: boolean;
+  /**
+   * 是否为「整体设置 root」（set root）产生的记录（由 {@link Editor.pushRootDiffHistory} 写入）。
+   * 用于「连续 set root 合并」：当某页栈最新一条已是 root 记录时，下一条 set root 会替换它而非新增，
+   * 避免源码反复保存 / 外部重设 DSL 时堆积多条 root 记录。
+   */
+  rootStep?: boolean;
 }
 // #endregion BaseStepValue
 
@@ -880,6 +896,12 @@ export interface HistoryPersistOptions {
   storeName?: string;
   /** 记录 key，用于区分不同活动页 / 项目，默认 `default`。 */
   key?: IDBValidKey;
+  /**
+   * 显式指定用于库名隔离的 DSL app id。
+   * 缺省时回退到当前 editorService 的 `root.id`；在「先恢复历史再 set root」场景下 root 尚未设置，
+   * 需由调用方（如从待加载 DSL 取 id）显式传入，否则会读 / 写到未按 app 隔离的默认库。
+   */
+  appId?: Id;
 }
 // #endregion HistoryPersistOptions
 
@@ -1247,4 +1269,35 @@ export interface DiffDialogPayload {
   targetLabel?: string;
   /** 用于标题展示的目标 id */
   id?: string | number;
+}
+
+/**
+ * 一组「描述 + 可操作性」的判定函数集合。页面 / 数据源 / 代码块及业务自定义历史
+ * 各自实现一份，作为整体注入，避免把 describe* / isStep* 拆成多个独立 props 反复透传。
+ */
+export interface HistoryRowDescriptor<T extends BaseStepValue = BaseStepValue> {
+  /** 组级描述文案生成器，接收一个 group，返回展示文本。 */
+  describeGroup: (_group: any) => string;
+  /** 单步描述文案生成器，接收一个 step，返回展示文本（合并组展开后的子步列表用）。 */
+  describeStep: (_step: T) => string;
+  /** 判断某个 step 是否可查看差异（前后值都存在）。不传则一律不展示差异入口。 */
+  isStepDiffable?: (_step: T) => boolean;
+  /** 判断某个 step 是否支持回滚（如更新需带 changeRecords）。不传则已应用即可回滚。 */
+  isStepRevertable?: (_step: T) => boolean;
+}
+
+/**
+ * 通用 bucket（数据源 / 代码块 / 业务自定义历史）的整体渲染配置。
+ * 把原先散落在 Bucket / BucketTab 上的 title / prefix / describe* / isStep* / showInitial / gotoEnabled
+ * 收敛成一个对象作为单一 prop 传递，调用方一次配齐、组件内部按需读取。
+ */
+export interface HistoryBucketConfig<T extends BaseStepValue = BaseStepValue> extends HistoryRowDescriptor<T> {
+  /** bucket 头部标题，例如 "数据源" / "代码块"。 */
+  title: string;
+  /** 子项 key 的命名空间前缀（`ds` 数据源 / `cb` 代码块 / 业务自定义如 `mod`）。 */
+  prefix: string;
+  /** 是否展示底部「回到初始状态」入口，默认 true。无 undo cursor 语义的自定义历史可传 false。 */
+  showInitial?: boolean;
+  /** 是否支持「跳转到该记录」(goto)，默认 true。 */
+  gotoEnabled?: boolean;
 }

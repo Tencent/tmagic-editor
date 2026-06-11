@@ -11,6 +11,7 @@ import type {
   DataSourceStepValue,
   HistoryOpSource,
   HistoryOpType,
+  HistoryRowDescriptor,
   PageHistoryGroup,
   StepValue,
 } from '@editor/type';
@@ -28,37 +29,6 @@ export interface HistoryBucketGroup<T extends BaseStepValue = BaseStepValue> {
   opType: HistoryOpType;
   /** 组内所有步骤 */
   steps: { index: number; applied: boolean; isCurrent?: boolean; step: T }[];
-}
-
-/**
- * 一组「描述 + 可操作性」的判定函数集合。页面 / 数据源 / 代码块及业务自定义历史
- * 各自实现一份，作为整体注入，避免把 describe* / isStep* 拆成多个独立 props 反复透传。
- */
-export interface HistoryRowDescriptor<T extends BaseStepValue = BaseStepValue> {
-  /** 组级描述文案生成器，接收一个 group，返回展示文本。 */
-  describeGroup: (_group: any) => string;
-  /** 单步描述文案生成器，接收一个 step，返回展示文本（合并组展开后的子步列表用）。 */
-  describeStep: (_step: T) => string;
-  /** 判断某个 step 是否可查看差异（前后值都存在）。不传则一律不展示差异入口。 */
-  isStepDiffable?: (_step: T) => boolean;
-  /** 判断某个 step 是否支持回滚（如更新需带 changeRecords）。不传则已应用即可回滚。 */
-  isStepRevertable?: (_step: T) => boolean;
-}
-
-/**
- * 通用 bucket（数据源 / 代码块 / 业务自定义历史）的整体渲染配置。
- * 把原先散落在 Bucket / BucketTab 上的 title / prefix / describe* / isStep* / showInitial / gotoEnabled
- * 收敛成一个对象作为单一 prop 传递，调用方一次配齐、组件内部按需读取。
- */
-export interface HistoryBucketConfig<T extends BaseStepValue = BaseStepValue> extends HistoryRowDescriptor<T> {
-  /** bucket 头部标题，例如 "数据源" / "代码块"。 */
-  title: string;
-  /** 子项 key 的命名空间前缀（`ds` 数据源 / `cb` 代码块 / 业务自定义如 `mod`）。 */
-  prefix: string;
-  /** 是否展示底部「回到初始状态」入口，默认 true。无 undo cursor 语义的自定义历史可传 false。 */
-  showInitial?: boolean;
-  /** 是否支持「跳转到该记录」(goto)，默认 true。 */
-  gotoEnabled?: boolean;
 }
 
 /** GroupRow 渲染所需的单个子步视图模型（已由 {@link toRowGroup} 预先派生，组件内部不再触碰原始 step）。 */
@@ -110,6 +80,9 @@ export interface HistoryRowGroup {
   subSteps: HistoryRowStep[];
 }
 
+/** 合并组默认展开；仅当 expanded[key] === false 时为收起。 */
+export const isHistoryGroupExpanded = (expanded: Record<string, boolean>, key: string) => expanded[key] !== false;
+
 /**
  * 历史记录面板共享逻辑：
  * - 暴露三类历史的聚合数据（页面 / 数据源 / 代码块）；
@@ -124,10 +97,11 @@ export const useHistoryList = () => {
   /**
    * 折叠状态：key 形如 `pg-${组内首步 index}` / `ds-${id}-${组内首步 index}` / `cb-${id}-${组内首步 index}`。
    * 用组内首步的稳定 index（而非展示位置）作为 key，确保历史数据更新后已展开的分组状态保持不变。
+   * 合并组默认展开；仅当值为 `false` 时表示收起。
    */
   const expanded = reactive<Record<string, boolean>>({});
   const toggleGroup = (key: string) => {
-    expanded[key] = !expanded[key];
+    expanded[key] = expanded[key] === false;
   };
 
   const pageGroups = computed(() => historyService.getPageHistoryGroups());
@@ -211,6 +185,7 @@ const HISTORY_SOURCE_LABELS: Record<string, string> = {
   'component-panel': '组件面板',
   props: '配置面板',
   code: '源码',
+  'root-code': 'DSL源码',
   'stage-contextmenu': '画布菜单',
   'tree-contextmenu': '树菜单',
   toolbar: '工具栏',
@@ -218,6 +193,8 @@ const HISTORY_SOURCE_LABELS: Record<string, string> = {
   rollback: '回滚',
   api: '接口',
   ai: 'AI',
+  initial: '初始值',
+  sync: '同步',
   unknown: '未知',
 };
 

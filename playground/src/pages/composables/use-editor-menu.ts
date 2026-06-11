@@ -9,7 +9,7 @@ import AdapterSelect from '../../components/AdapterSelect.vue';
 import DeviceGroup from '../../components/DeviceGroup.vue';
 import { uaMap } from '../../const';
 
-export const useEditorMenu = (value: Ref<MApp>, save: () => void) => {
+export const useEditorMenu = (value: Ref<MApp | undefined>, save: () => void) => {
   const router = useRouter();
 
   const deviceGroup = shallowRef<InstanceType<typeof DeviceGroup>>();

@@ -145,7 +145,7 @@ describe('Framework', () => {
     });
     const wrapper = mount(Framework, { props: { disabledPageFragment: false } as any });
     await wrapper.find('.fake-code-editor').trigger('click');
-    expect(editorService.set).toHaveBeenCalledWith('root', { id: 'x' });
+    expect(editorService.set).toHaveBeenCalledWith('root', { id: 'x' }, { historySource: 'root-code' });
   });
 
   test('SplitView change 写入 uiService 和 storage', async () => {

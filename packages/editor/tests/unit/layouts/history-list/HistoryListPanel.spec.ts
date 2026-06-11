@@ -152,17 +152,17 @@ describe('HistoryListPanel.vue', () => {
 
     const head = wrapper.find('.m-editor-history-list-group-head');
     expect(head.exists()).toBe(true);
-    // 默认未展开
-    expect(wrapper.find('.m-editor-history-list-substeps').exists()).toBe(false);
-    // 点击展开
-    await head.trigger('click');
+    // 默认展开
     expect(wrapper.find('.m-editor-history-list-substeps').exists()).toBe(true);
     expect(wrapper.findAll('.m-editor-history-list-substeps li')).toHaveLength(2);
     // 合并组头部点击不应触发 goto
     expect(editorService.gotoPageStep).not.toHaveBeenCalled();
-    // 再点击折叠
-    await wrapper.find('.m-editor-history-list-group-head').trigger('click');
+    // 点击收起
+    await head.trigger('click');
     expect(wrapper.find('.m-editor-history-list-substeps').exists()).toBe(false);
+    // 再点击展开
+    await wrapper.find('.m-editor-history-list-group-head').trigger('click');
+    expect(wrapper.find('.m-editor-history-list-substeps').exists()).toBe(true);
   });
 
   test('点击页面 group 头部调用 editorService.gotoPageStep', async () => {

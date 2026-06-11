@@ -17,7 +17,7 @@
  */
 
 import { reactive, toRaw } from 'vue';
-import { cloneDeep, isObject, mergeWith, uniq } from 'lodash-es';
+import { cloneDeep, isEmpty, isEqual, isObject, mergeWith, uniq } from 'lodash-es';
 
 import type { Id, MApp, MContainer, MNode, MPage, MPageFragment, TargetOptions } from '@tmagic/core';
 import { NodeType } from '@tmagic/core';
@@ -60,6 +60,7 @@ import {
   classifyDragSources,
   collectRelatedNodes,
   COPY_STORAGE_KEY,
+  describeStepForRevert,
   editorNodeMergeCustomizer,
   fixNodePosition,
   getInitPositionStyle,
@@ -75,46 +76,6 @@ import {
 import { beforePaste, getAddParent } from '@editor/utils/operator';
 
 type MoveItem = { node: MNode; parent: MContainer; pageForOp: { name: string; id: Id } | null };
-
-/**
- * 给「回滚」生成的新 step 用的简短描述生成器。
- * 与 UI 层 `describePageStep` 同义，但避免 service 反向依赖 layouts/，故在此本地实现。
- */
-const describeStepForRevert = (step: StepValue): string => {
-  const items = step.diff ?? [];
-  // 在可读名后拼接组件 id，便于在历史面板中精确定位被回滚的组件；id 缺失时退化为仅展示名称。
-  const withId = (node: MNode | undefined, label: string): string => {
-    const id = node?.id;
-    if (id === undefined || id === null || `${id}` === '') return label;
-    return label ? `${label}（id: ${id}）` : `id: ${id}`;
-  };
-  switch (step.opType) {
-    case 'add': {
-      const count = items.length;
-      const node = items[0]?.newSchema;
-      const label = node?.name || node?.type || '';
-      return `撤回新增 ${count} 个节点${count === 1 ? `（${withId(node, label)}）` : ''}`;
-    }
-    case 'remove': {
-      const count = items.length;
-      const node = items[0]?.oldSchema;
-      const label = node?.name || node?.type || '';
-      return `还原已删除的 ${count} 个节点${count === 1 ? `（${withId(node, label)}）` : ''}`;
-    }
-    case 'update':
-    default: {
-      if (items.length === 1) {
-        const { newSchema, oldSchema, changeRecords } = items[0];
-        const node = newSchema || oldSchema;
-        const label = newSchema?.name || newSchema?.type || oldSchema?.name || oldSchema?.type || '';
-        const target = withId(node, label);
-        const propPath = changeRecords?.[0]?.propPath;
-        return propPath ? `还原 ${target} · ${propPath}` : `还原 ${target}`;
-      }
-      return `还原 ${items.length} 个节点的修改`;
-    }
-  }
-};
 
 /**
  * 把「变更前后节点快照」列表归一成 update 类型的 {@link StepDiffItem} 列表，供 {@link StepValue.diff} 使用。
@@ -166,8 +127,13 @@ class Editor extends BaseService {
    * 设置当前指点节点配置
    * @param name 'root' | 'page' | 'parent' | 'node' | 'highlightNode' | 'nodes' | 'stage' | 'modifiedNodeIds' | 'pageLength' | 'pageFragmentLength
    * @param value MNode
+   * @param options.historySource 设置 root 时，本次变更写入历史记录的「操作来源」（仅 name === 'root' 时生效）
    */
-  public set<K extends StoreStateKey, T extends StoreState[K]>(name: K, value: T) {
+  public set<K extends StoreStateKey, T extends StoreState[K]>(
+    name: K,
+    value: T,
+    options: { historySource?: HistoryOpSource } = {},
+  ) {
     const preValue = this.state[name];
     this.state[name] = value;
 
@@ -186,6 +152,25 @@ class Editor extends BaseService {
         this.state.pageLength = getPageList(app).length || 0;
         this.state.pageFragmentLength = getPageFragmentList(app).length || 0;
         this.state.stageLoading = this.state.pageLength !== 0;
+
+        if (preValue && !isEmpty(preValue)) {
+          // 编辑期间再次整体设置 root（源码保存 / 外部重设 DSL / root 节点更新）：与上一次 root
+          // 做页面级 diff，按 update / add / remove 入栈，作为正常历史记录体现整体替换。
+          this.pushRootDiffHistory(preValue as MApp, app, options.historySource);
+        } else {
+          // 首次设置 root：仅当该页面 / 页面片尚无基线标记时，才写入「未修改的初始状态」基线。
+          // 配合「先恢复历史再 set root」：若基线已随历史恢复建立（恢复后已有基线），则此处不再
+          // 重复创建，set root 不额外产生记录，由恢复出的历史栈作为当前状态来源。
+          // 标记不进入撤销/重做栈，仅作为该页历史列表底部的初始基线展示。
+          app.items?.forEach((pageNode) => {
+            if (pageNode?.id !== undefined && !historyService.getPageMarker(pageNode.id)) {
+              historyService.setPageMarker(pageNode.id, {
+                name: pageNode.name,
+                source: options.historySource,
+              });
+            }
+          });
+        }
       } else {
         this.state.pageLength = 0;
         this.state.pageFragmentLength = 0;
@@ -695,7 +680,7 @@ class Editor extends BaseService {
 
   public async doUpdate(
     config: MNode,
-    { changeRecords = [] }: { changeRecords?: ChangeRecord[] } = {},
+    { changeRecords = [], historySource }: { changeRecords?: ChangeRecord[]; historySource?: HistoryOpSource } = {},
   ): Promise<{ newNode: MNode; oldNode: MNode; changeRecords?: ChangeRecord[] }> {
     const root = this.get('root');
     if (!root) throw new Error('root为空');
@@ -715,7 +700,7 @@ class Editor extends BaseService {
     if (!newConfig.type) throw new Error('配置缺少type值');
 
     if (newConfig.type === NodeType.ROOT) {
-      this.set('root', newConfig as MApp);
+      this.set('root', newConfig as MApp, { historySource });
       return {
         oldNode: node,
         newNode: newConfig,
@@ -796,7 +781,7 @@ class Editor extends BaseService {
     const updateData = await Promise.all(
       nodes.map((node, index) => {
         const recordsForNode = changeRecordList ? (changeRecordList[index] ?? []) : (changeRecords ?? []);
-        return this.doUpdate(node, { changeRecords: recordsForNode });
+        return this.doUpdate(node, { changeRecords: recordsForNode, historySource });
       }),
     );
 
@@ -1374,6 +1359,8 @@ class Editor extends BaseService {
     if (!entry?.applied) return null;
 
     const { step } = entry;
+    // 初始基线（index 0 的 initial step）是栈底线，不可回滚。
+    if (step.opType === 'initial') return null;
     const root = this.get('root');
     if (!root) return null;
 
@@ -1573,6 +1560,86 @@ class Editor extends BaseService {
     this.selectionBeforeOp = this.get('nodes').map((n) => n.id);
   }
 
+  /**
+   * 比较「上一次 root」与「新 root」的页面 / 页面片，按页面粒度把整体替换拆成历史记录：
+   * - 新旧都存在且内容变化的页面 → 一条 `update`（整页快照替换，无 changeRecords）；
+   * - 仅新 root 存在的页面 → 一条 `add`；
+   * - 仅旧 root 存在的页面 → 一条 `remove`。
+   *
+   * 每条记录落到对应页面自己的历史栈（与普通节点操作一致），并标记来源 `source`。
+   * 内容未变化的页面不产生记录，避免重复设置相同 DSL 时产生噪声。
+   */
+  private pushRootDiffHistory(preRoot: MApp, nextRoot: MApp, source?: HistoryOpSource): void {
+    const prevPages = preRoot?.items || [];
+    const nextPages = nextRoot?.items || [];
+    const prevMap = new Map(prevPages.map((p) => [`${p.id}`, p]));
+    const nextMap = new Map(nextPages.map((p) => [`${p.id}`, p]));
+    const indexInItems = (root: MApp, id: Id) => (root.items ?? []).findIndex((item) => `${item.id}` === `${id}`);
+
+    nextPages.forEach((nextPage) => {
+      const prevPage = prevMap.get(`${nextPage.id}`);
+      if (!prevPage) {
+        this.pushPageDiffStep(
+          'add',
+          nextPage,
+          { newSchema: cloneDeep(toRaw(nextPage)), parentId: nextRoot.id, index: indexInItems(nextRoot, nextPage.id) },
+          source,
+        );
+      } else if (!isEqual(toRaw(prevPage), toRaw(nextPage))) {
+        this.pushPageDiffStep(
+          'update',
+          nextPage,
+          { oldSchema: cloneDeep(toRaw(prevPage)), newSchema: cloneDeep(toRaw(nextPage)) },
+          source,
+        );
+      }
+    });
+
+    prevPages.forEach((prevPage) => {
+      if (!nextMap.has(`${prevPage.id}`)) {
+        this.pushPageDiffStep(
+          'remove',
+          prevPage,
+          { oldSchema: cloneDeep(toRaw(prevPage)), parentId: preRoot.id, index: indexInItems(preRoot, prevPage.id) },
+          source,
+        );
+      }
+    });
+  }
+
+  /**
+   * 构造一条页面级「set root」历史记录（不携带选区 / modifiedNodeIds 上下文）并落到该页面自己的栈。
+   *
+   * 连续 set root 替换：若该页栈最新一条已是**同来源**的 set root 记录（{@link StepValue.rootStep} 且 `source` 相同），
+   * 则用本次记录**替换**它而非新增，避免源码反复保存 / 外部重设 DSL 时堆积多条 root 记录；
+   * 来源不同则照常新增（initial 基线不是 rootStep，不在此列）。
+   */
+  private pushPageDiffStep(
+    opType: HistoryOpType,
+    page: MPage | MPageFragment,
+    diffItem: StepDiffItem<MNode>,
+    source?: HistoryOpSource,
+  ): void {
+    const step: StepValue = {
+      uuid: guid(),
+      data: { name: page.name || '', id: page.id },
+      opType,
+      selectedBefore: [],
+      selectedAfter: [],
+      modifiedNodeIds: new Map(),
+      diff: [diffItem],
+      rootStep: true,
+    };
+    if (source) step.source = source;
+
+    const top = historyService.getCurrentPageStep(page.id);
+    if (top?.rootStep && top.source === source) {
+      historyService.replaceCurrentPageStep(step, page.id);
+    } else {
+      historyService.push(step, page.id);
+    }
+  }
+
   private pushOpHistory(
     opType: HistoryOpType,
     {
@@ -1621,6 +1688,8 @@ class Editor extends BaseService {
    * @param reverse true = 撤销，false = 重做
    */
   private async applyHistoryOp(step: StepValue, reverse: boolean) {
+    // 初始基线 step 仅作展示，不承载任何变更，撤销/重做时无需应用（正常流程下也不会被触达）。
+    if (step.opType === 'initial') return;
     const root = this.get('root');
     const stage = this.get('stage');
     if (!root) return;

@@ -17,7 +17,6 @@
  */
 
 import { reactive } from 'vue';
-import { cloneDeep } from 'lodash-es';
 import serialize from 'serialize-javascript';
 
 import type { CodeBlockContent, DataSourceSchema, Id, MPage, MPageFragment } from '@tmagic/core';
@@ -25,13 +24,11 @@ import type { ChangeRecord } from '@tmagic/form';
 import { guid } from '@tmagic/utils';
 
 import type {
-  BaseStepValue,
   CodeBlockHistoryGroup,
   CodeBlockStepValue,
   DataSourceHistoryGroup,
   DataSourceStepValue,
   HistoryOpSource,
-  HistoryOpType,
   HistoryPersistOptions,
   HistoryState,
   PageHistoryGroup,
@@ -40,6 +37,16 @@ import type {
   StepValue,
 } from '@editor/type';
 import { getEditorConfig } from '@editor/utils/config';
+import {
+  createStackStep,
+  deserializeStacks,
+  getOrCreateStack,
+  markStackSaved,
+  mergePageSteps,
+  mergeStackSteps,
+  serializeStacks,
+  undoFloor,
+} from '@editor/utils/history';
 import { idbGet, idbSet } from '@editor/utils/indexed-db';
 import { UndoRedo } from '@editor/utils/undo-redo';
 
@@ -53,199 +60,6 @@ const DEFAULT_KEY: IDBValidKey = 'default';
 const PERSIST_VERSION = 1;
 
 class History extends BaseService {
-  /**
-   * 把单个「按 id 分栈」的历史栈（代码块 / 数据源）拆成若干 group：
-   * - 把"新增/删除"独立成组（语义上属于一次性事件，不应与 update 合并）；
-   * - 连续 'update' 合并到同一组，组内 steps 顺序就是发生顺序。
-   *
-   * 代码块与数据源除 `kind` 外结构完全一致，统一由本方法处理；`kind` 决定返回的具体分组类型。
-   */
-  private static mergeStackSteps<S extends BaseStepValue, K extends 'code-block' | 'data-source'>(
-    kind: K,
-    id: Id,
-    list: S[],
-    cursor: number,
-  ): {
-    kind: K;
-    id: Id;
-    opType: HistoryOpType;
-    steps: { step: S; index: number; applied: boolean; isCurrent?: boolean }[];
-    applied: boolean;
-    isCurrent?: boolean;
-  }[] {
-    type Group = {
-      kind: K;
-      id: Id;
-      opType: HistoryOpType;
-      steps: { step: S; index: number; applied: boolean; isCurrent?: boolean }[];
-      applied: boolean;
-      isCurrent?: boolean;
-    };
-    const groups: Group[] = [];
-    let current: Group | null = null;
-    const currentIndex = cursor - 1;
-    list.forEach((step, index) => {
-      const { opType } = step;
-      const applied = index < cursor;
-      const isCurrent = index === currentIndex;
-      if (opType === 'update' && current?.opType === 'update') {
-        current.steps.push({ step, index, applied, isCurrent });
-        current.applied = applied;
-        if (isCurrent) current.isCurrent = true;
-      } else {
-        current = {
-          kind,
-          id,
-          opType,
-          steps: [{ step, index, applied, isCurrent }],
-          applied,
-          isCurrent,
-        };
-        groups.push(current);
-      }
-    });
-    return groups;
-  }
-
-  /**
-   * 根据 old/new 是否为 null 推断 opType（与 push 时的约定一致）。
-   */
-  private static detectOpType(oldVal: unknown, newVal: unknown): 'add' | 'remove' | 'update' {
-    if (oldVal === null && newVal !== null) return 'add';
-    if (oldVal !== null && newVal === null) return 'remove';
-    return 'update';
-  }
-
-  /**
-   * 把页面栈拆成若干 group：
-   * - 单节点的 'update' 按 targetId 与相邻同 targetId 的 update 合并到一个 group；
-   * - 'add' / 'remove' 始终独立成组（语义上是结构变更，不应被收纳进单节点修改组）；
-   * - 多节点 'update'（如批量改属性）也独立成组（无明确单一目标，避免误合并）。
-   */
-  private static mergePageSteps(pageId: Id, list: StepValue[], cursor: number): PageHistoryGroup[] {
-    const groups: PageHistoryGroup[] = [];
-    let current: PageHistoryGroup | null = null;
-    const currentIndex = cursor - 1;
-    list.forEach((step, index) => {
-      const applied = index < cursor;
-      const isCurrent = index === currentIndex;
-      const targetId = History.detectPageTargetId(step);
-      const targetName = History.detectPageTargetName(step);
-      const entry: PageHistoryStepEntry = { step, index, applied, isCurrent };
-
-      // 仅"单节点 update"参与合并；其它情形（add/remove/多节点 update）始终独立成组。
-      const mergeable = step.opType === 'update' && targetId !== undefined;
-      if (mergeable && current?.opType === 'update' && current.targetId === targetId) {
-        current.steps.push(entry);
-        current.applied = applied;
-        if (isCurrent) current.isCurrent = true;
-        // 保持目标名为最近一次的（节点重命名时也能反映）
-        if (targetName) current.targetName = targetName;
-      } else {
-        current = {
-          kind: 'page',
-          pageId,
-          opType: step.opType,
-          targetId: mergeable ? targetId : undefined,
-          targetName,
-          steps: [entry],
-          applied,
-          isCurrent,
-        };
-        groups.push(current);
-      }
-    });
-    return groups;
-  }
-
-  /**
-   * 解析 StepValue 中的"目标节点 id"用于合并：
-   * - 单节点 update：取唯一一项 updatedItems 的节点 id；
-   * - 其它情形（多节点 update / add / remove）：返回 undefined，表示不参与合并。
-   */
-  private static detectPageTargetId(step: StepValue): Id | undefined {
-    if (step.opType !== 'update') return undefined;
-    const items = step.diff;
-    if (items?.length !== 1) return undefined;
-    return items[0].newSchema?.id ?? items[0].oldSchema?.id;
-  }
-
-  /** 解析 StepValue 中的目标节点可读名（用于 UI 展示）。 */
-  private static detectPageTargetName(step: StepValue): string | undefined {
-    const items = step.diff;
-    if (step.opType === 'update') {
-      if (items?.length === 1) {
-        const node = items[0].newSchema || items[0].oldSchema;
-        return (node?.name as string) || (node?.type as string) || (node?.id !== undefined ? `${node.id}` : undefined);
-      }
-      return items?.length ? `${items.length} 个节点` : undefined;
-    }
-    if (step.opType === 'add') {
-      if (items?.length === 1) {
-        const n = items[0].newSchema;
-        return (n?.name as string) || (n?.type as string) || `${n?.id}`;
-      }
-      return items?.length ? `${items.length} 个节点` : undefined;
-    }
-    if (step.opType === 'remove') {
-      if (items?.length === 1) {
-        const n = items[0].oldSchema;
-        return (n?.name as string) || (n?.type as string) || `${n?.id}`;
-      }
-      return items?.length ? `${items.length} 个节点` : undefined;
-    }
-    return undefined;
-  }
-
-  /**
-   * 把单个栈当前游标所在记录标记为已保存：先清除该栈内全部旧标记，保证同一栈最多一条 `saved`。
-   * 栈处于「全部已撤销」（cursor 为 0）时不会留下已保存记录，恢复时其游标回到 0。
-   */
-  private static markStackSaved<S extends { saved?: boolean }>(undoRedo?: UndoRedo<S>): void {
-    if (!undoRedo) return;
-    undoRedo.updateElements((element) => {
-      element.saved = false;
-    });
-    undoRedo.updateCurrentElement((element) => {
-      element.saved = true;
-    });
-  }
-
-  /** 把 `Record<Id, UndoRedo>` 整体序列化为 `Record<Id, SerializedUndoRedo>`。 */
-  private static serializeStacks<T>(stacks: Record<Id, UndoRedo<T>>) {
-    const result: Record<Id, ReturnType<UndoRedo<T>['serialize']>> = {};
-    Object.entries(stacks).forEach(([id, undoRedo]) => {
-      if (undoRedo) result[id] = undoRedo.serialize();
-    });
-    return result;
-  }
-
-  /**
-   * 把 `Record<Id, SerializedUndoRedo>` 整体还原为 `Record<Id, UndoRedo>`。
-   * 还原时把每个栈的游标定位到最近一条已保存（`saved === true`）记录之后。
-   */
-  private static deserializeStacks<T extends { saved?: boolean }>(
-    stacks: Record<Id, ReturnType<UndoRedo<T>['serialize']>> = {},
-  ): Record<Id, UndoRedo<T>> {
-    const result: Record<Id, UndoRedo<T>> = {};
-    Object.entries(stacks).forEach(([id, serialized]) => {
-      if (serialized) {
-        result[id] = UndoRedo.fromSerialized<T>(serialized, { isSavedStep: (element) => element.saved === true });
-      }
-    });
-    return result;
-  }
-
-  /**
-   * 按 id 从「按 id 分栈」的记录表（代码块 / 数据源）中获取（或创建）对应的 UndoRedo 栈。
-   */
-  private static getOrCreateStack<T>(stacks: Record<Id, UndoRedo<T>>, id: Id): UndoRedo<T> {
-    if (!stacks[id]) {
-      stacks[id] = new UndoRedo<T>();
-    }
-    return stacks[id];
-  }
-
   public state = reactive<HistoryState>({
     pageSteps: {},
     pageId: undefined,
@@ -298,6 +112,59 @@ class History extends BaseService {
   }
 
   /**
+   * 为指定页面 / 页面片种入一条「初始基线」记录（如加载 DSL 时的「初始 / 加载」基线）。
+   *
+   * 该记录是一条 `opType: 'initial'` 的 {@link StepValue}，作为页面历史栈 **index 0 的固定底线**：
+   * - 它是一条真实入栈的 step（随栈一起持久化），但被钉为撤销/回滚的下限——cursor 永不低于它，
+   *   因此不会被 undo / goto / revert 触达（详见 {@link undo} / {@link setCanUndoRedo}）；
+   * - 历史面板把它过滤出分组列表（见 {@link getPageHistoryGroups}），改由底部「初始」行展示。
+   *
+   * 仅当目标页面栈为空时种入（保证 initial 一定位于 index 0）；已存在 initial 底线时默认不重复种入，
+   * 传 `force=true` 且栈为空时按新基线种入。
+   */
+  public setPageMarker(
+    pageId: Id,
+    options: { name?: string; description?: string; source?: HistoryOpSource } = {},
+  ): StepValue | null {
+    if (pageId === undefined || pageId === null || `${pageId}` === '') return null;
+
+    const existing = this.getPageMarker(pageId);
+    if (existing) return existing;
+
+    const stack = getOrCreateStack(this.state.pageSteps, pageId);
+    // initial 必须是 index 0；栈非空（已有真实记录、却无 initial，如旧数据）时不强行前插，优雅降级为无基线。
+    if (stack.getLength() > 0) return null;
+
+    const marker: StepValue = {
+      uuid: guid(),
+      opType: 'initial',
+      diff: [],
+      data: { name: options.name || '', id: pageId },
+      selectedBefore: [],
+      selectedAfter: [],
+      modifiedNodeIds: new Map(),
+      historyDescription: options.description || '未修改的初始状态',
+      timestamp: Date.now(),
+      ...(options.source ? { source: options.source } : {}),
+    };
+    stack.pushElement(marker);
+    if (`${pageId}` === `${this.state.pageId}`) this.setCanUndoRedo();
+    this.emit('page-marker-change', marker);
+    return marker;
+  }
+
+  /**
+   * 读取指定页面（缺省当前活动页）的初始基线 step（页面栈 index 0 且 `opType: 'initial'`）；
+   * 不存在时返回 undefined。
+   */
+  public getPageMarker(pageId?: Id): StepValue | undefined {
+    const targetPageId = pageId ?? this.state.pageId;
+    if (!targetPageId) return undefined;
+    const first = this.state.pageSteps[targetPageId]?.getElementList()[0];
+    return first?.opType === 'initial' ? first : undefined;
+  }
+
+  /**
    * 把一条步骤推入指定页面的栈；不指定 pageId 时落到当前活动页。
    *
    * 跨页操作（例如 `moveToContainer` 把节点搬到其它页）必须显式传入 `pageId`，
@@ -313,6 +180,27 @@ class History extends BaseService {
     if (pageId === undefined || `${pageId}` === `${this.state.pageId}`) {
       this.emit('change', state);
     }
+    return state;
+  }
+
+  /** 读取指定页面（缺省当前活动页）历史栈当前游标所在的 step（cursor - 1）；无则返回 null。 */
+  public getCurrentPageStep(pageId?: Id): StepValue | null {
+    const targetPageId = pageId ?? this.state.pageId;
+    if (!targetPageId) return null;
+    return this.state.pageSteps[targetPageId]?.getCurrentElement() ?? null;
+  }
+
+  /**
+   * 用 `state` 替换指定页面栈当前游标所在的 step（并丢弃其后的重做尾部），游标不变。
+   * 用于「连续 set root 记录合并」等就地替换最新一条的场景；替换成功后按需刷新 / 通知。
+   */
+  public replaceCurrentPageStep(state: StepValue, pageId?: Id): StepValue | null {
+    const undoRedo = this.getUndoRedo(pageId);
+    if (!undoRedo) return null;
+    if (state.uuid === undefined) state.uuid = guid();
+    if (state.timestamp === undefined) state.timestamp = Date.now();
+    if (!undoRedo.replaceCurrentElement(state)) return null;
+    this.emit('change', state);
     return state;
   }
 
@@ -337,7 +225,7 @@ class History extends BaseService {
       source?: HistoryOpSource;
     },
   ): CodeBlockStepValue | null {
-    const step = this.createStackStep<CodeBlockContent, CodeBlockStepValue>(codeBlockId, {
+    const step = createStackStep<CodeBlockContent, CodeBlockStepValue>(codeBlockId, {
       oldValue: payload.oldContent,
       newValue: payload.newContent,
       changeRecords: payload.changeRecords,
@@ -345,7 +233,7 @@ class History extends BaseService {
       source: payload.source,
     });
     if (!step) return null;
-    History.getOrCreateStack(this.state.codeBlockState, codeBlockId).pushElement(step);
+    getOrCreateStack(this.state.codeBlockState, codeBlockId).pushElement(step);
     this.emit('code-block-history-change', codeBlockId, step);
     return step;
   }
@@ -366,7 +254,7 @@ class History extends BaseService {
       source?: HistoryOpSource;
     },
   ): DataSourceStepValue | null {
-    const step = this.createStackStep<DataSourceSchema, DataSourceStepValue>(dataSourceId, {
+    const step = createStackStep<DataSourceSchema, DataSourceStepValue>(dataSourceId, {
       oldValue: payload.oldSchema,
       newValue: payload.newSchema,
       changeRecords: payload.changeRecords,
@@ -374,7 +262,7 @@ class History extends BaseService {
       source: payload.source,
     });
     if (!step) return null;
-    History.getOrCreateStack(this.state.dataSourceState, dataSourceId).pushElement(step);
+    getOrCreateStack(this.state.dataSourceState, dataSourceId).pushElement(step);
     this.emit('data-source-history-change', dataSourceId, step);
     return step;
   }
@@ -438,6 +326,8 @@ class History extends BaseService {
   public undo(): StepValue | null {
     const undoRedo = this.getUndoRedo();
     if (!undoRedo) return null;
+    // 不允许撤销越过初始基线（index 0 的 initial step）。
+    if (undoRedo.getCursor() <= undoFloor(undoRedo)) return null;
     const state = undoRedo.undo();
     this.emit('change', state);
     return state;
@@ -464,7 +354,16 @@ class History extends BaseService {
   public clearPage(pageId?: Id): void {
     const targetPageId = pageId ?? this.state.pageId;
     if (!targetPageId) return;
+    // 保留该页原 initial 基线的文案 / 来源（仅清空其后的真实操作记录），无基线时清空成空栈。
+    const marker = this.getPageMarker(targetPageId);
     this.state.pageSteps[targetPageId] = new UndoRedo<StepValue>();
+    if (marker) {
+      this.setPageMarker(targetPageId, {
+        name: marker.data?.name,
+        description: marker.historyDescription,
+        source: marker.source,
+      });
+    }
     if (`${targetPageId}` === `${this.state.pageId}`) {
       this.setCanUndoRedo();
       this.emit('change', null);
@@ -501,9 +400,9 @@ class History extends BaseService {
    * {@link markPageSaved} / {@link markCodeBlockSaved} / {@link markDataSourceSaved}。
    */
   public markSaved(): void {
-    Object.values(this.state.pageSteps).forEach(History.markStackSaved);
-    Object.values(this.state.codeBlockState).forEach(History.markStackSaved);
-    Object.values(this.state.dataSourceState).forEach(History.markStackSaved);
+    Object.values(this.state.pageSteps).forEach(markStackSaved);
+    Object.values(this.state.codeBlockState).forEach(markStackSaved);
+    Object.values(this.state.dataSourceState).forEach(markStackSaved);
     this.emit('mark-saved', { kind: 'all' });
   }
 
@@ -514,21 +413,21 @@ class History extends BaseService {
   public markPageSaved(pageId?: Id): void {
     const targetPageId = pageId ?? this.state.pageId;
     if (!targetPageId) return;
-    History.markStackSaved(this.state.pageSteps[targetPageId]);
+    markStackSaved(this.state.pageSteps[targetPageId]);
     this.emit('mark-saved', { kind: 'page', id: targetPageId });
   }
 
   /** 标记指定代码块的历史栈当前记录为已保存，仅影响该代码块自己的栈。 */
   public markCodeBlockSaved(codeBlockId: Id): void {
     if (!codeBlockId) return;
-    History.markStackSaved(this.state.codeBlockState[codeBlockId]);
+    markStackSaved(this.state.codeBlockState[codeBlockId]);
     this.emit('mark-saved', { kind: 'code-block', id: codeBlockId });
   }
 
   /** 标记指定数据源的历史栈当前记录为已保存，仅影响该数据源自己的栈。 */
   public markDataSourceSaved(dataSourceId: Id): void {
     if (!dataSourceId) return;
-    History.markStackSaved(this.state.dataSourceState[dataSourceId]);
+    markStackSaved(this.state.dataSourceState[dataSourceId]);
     this.emit('mark-saved', { kind: 'data-source', id: dataSourceId });
   }
 
@@ -541,20 +440,20 @@ class History extends BaseService {
    * - 不支持 IndexedDB 的环境（如 SSR）会 reject。
    */
   public async saveToIndexedDB(options: HistoryPersistOptions = {}): Promise<PersistedHistoryState> {
-    const { dbName = DEFAULT_DB_NAME, storeName = DEFAULT_STORE_NAME, key = DEFAULT_KEY } = options;
+    const { dbName = DEFAULT_DB_NAME, storeName = DEFAULT_STORE_NAME, key = DEFAULT_KEY, appId } = options;
 
     const snapshot: PersistedHistoryState = {
       version: PERSIST_VERSION,
       pageId: this.state.pageId,
-      pageSteps: History.serializeStacks(this.state.pageSteps),
-      codeBlockState: History.serializeStacks(this.state.codeBlockState),
-      dataSourceState: History.serializeStacks(this.state.dataSourceState),
+      pageSteps: serializeStacks(this.state.pageSteps),
+      codeBlockState: serializeStacks(this.state.codeBlockState),
+      dataSourceState: serializeStacks(this.state.dataSourceState),
       savedAt: Date.now(),
     };
 
     // 历史记录里可能包含函数（如代码块内容 / 节点事件 / 数据源方法），IndexedDB 的结构化克隆无法写入函数，
     // 因此用 serialize-javascript 序列化成字符串后再写入（支持函数 / Map 等），读取时用 parseDSL 还原。
-    await idbSet(this.resolveDbName(dbName), storeName, key, serialize(snapshot));
+    await idbSet(this.resolveDbName(dbName, appId), storeName, key, serialize(snapshot));
     this.emit('save-to-indexed-db', snapshot);
     return snapshot;
   }
@@ -568,18 +467,19 @@ class History extends BaseService {
    * - 不支持 IndexedDB 的环境（如 SSR）会 reject。
    */
   public async restoreFromIndexedDB(options: HistoryPersistOptions = {}): Promise<PersistedHistoryState | null> {
-    const { dbName = DEFAULT_DB_NAME, storeName = DEFAULT_STORE_NAME, key = DEFAULT_KEY } = options;
+    const { dbName = DEFAULT_DB_NAME, storeName = DEFAULT_STORE_NAME, key = DEFAULT_KEY, appId } = options;
 
-    const raw = await idbGet<string | PersistedHistoryState>(this.resolveDbName(dbName), storeName, key);
+    const raw = await idbGet<string | PersistedHistoryState>(this.resolveDbName(dbName, appId), storeName, key);
     if (!raw) return null;
 
     // 新版以序列化字符串存储（含函数），用 parseDSL 还原；兼容历史上以对象形式存入的旧数据。
     const snapshot = (typeof raw === 'string' ? getEditorConfig('parseDSL')(`(${raw})`) : raw) as PersistedHistoryState;
     if (!snapshot) return null;
 
-    this.state.pageSteps = History.deserializeStacks(snapshot.pageSteps);
-    this.state.codeBlockState = History.deserializeStacks(snapshot.codeBlockState);
-    this.state.dataSourceState = History.deserializeStacks(snapshot.dataSourceState);
+    this.state.pageSteps = deserializeStacks(snapshot.pageSteps);
+    this.state.codeBlockState = deserializeStacks(snapshot.codeBlockState);
+    this.state.dataSourceState = deserializeStacks(snapshot.dataSourceState);
+    // initial 基线作为页面栈 index 0 的 step 随 pageSteps 一并还原，无需单独恢复。
     this.state.pageId = snapshot.pageId;
 
     this.setCanUndoRedo();
@@ -621,7 +521,9 @@ class History extends BaseService {
     const list = undoRedo.getElementList();
     if (!list.length) return [];
     const cursor = undoRedo.getCursor();
-    return History.mergePageSteps(targetPageId, list, cursor);
+    // initial 基线（index 0）不作为普通操作组展示，过滤掉；其余真实 step 的 index 保持不变，
+    // 以便面板 goto(index+1) / revert(index) 仍直接对应栈内位置。底部「初始」行由 getPageMarker 驱动。
+    return mergePageSteps(targetPageId, list, cursor).filter((group) => group.opType !== 'initial');
   }
 
   /**
@@ -638,7 +540,7 @@ class History extends BaseService {
       const list = undoRedo.getElementList();
       if (!list.length) return;
       const cursor = undoRedo.getCursor();
-      groups.push(...History.mergeStackSteps('code-block', id, list, cursor));
+      groups.push(...mergeStackSteps('code-block', id, list, cursor));
     });
     return groups;
   }
@@ -730,7 +632,7 @@ class History extends BaseService {
       const list = undoRedo.getElementList();
       if (!list.length) return;
       const cursor = undoRedo.getCursor();
-      groups.push(...History.mergeStackSteps('data-source', id, list, cursor));
+      groups.push(...mergeStackSteps('data-source', id, list, cursor));
     });
     return groups;
   }
@@ -754,59 +656,17 @@ class History extends BaseService {
    * 把基础 dbName 与当前 DSL（root app）的 id 拼成最终库名，实现不同应用历史隔离。
    * 取不到 app id（如尚未加载 DSL）时退回基础 dbName。
    */
-  private resolveDbName(dbName: string): string {
-    const appId = editorService.get('root')?.id;
-    return appId ? `${dbName}-${appId}` : dbName;
+  private resolveDbName(dbName: string, appId?: Id): string {
+    // 优先用显式传入的 appId（「先恢复再 set root」时 root 尚未就绪）；否则回退到当前 root.id。
+    const resolvedAppId = appId ?? editorService.get('root')?.id;
+    return resolvedAppId ? `${dbName}-${resolvedAppId}` : dbName;
   }
 
   private setCanUndoRedo(): void {
     const undoRedo = this.getUndoRedo();
     this.state.canRedo = undoRedo?.canRedo() || false;
-    this.state.canUndo = undoRedo?.canUndo() || false;
-  }
-
-  /**
-   * 构造一条代码块 / 数据源「按 id 分栈」的历史记录：两者除 payload 字段命名外完全一致。
-   *
-   * - `add`：oldValue = null；`remove`：newValue = null；`update`：两者都有，可带 changeRecords 做局部更新。
-   * - 内容会做 cloneDeep 防止后续被外部引用篡改；opType 依据 old/new 是否为 null 推断。
-   * - 仅负责构造 step 并返回，入栈与事件 emit 由各公共方法（pushCodeBlock / pushDataSource）自行处理。
-   * - 不直接驱动业务 service，调用方负责实际写回。
-   */
-  private createStackStep<T, S extends BaseStepValue<T> & { id: Id }>(
-    id: Id,
-    payload: {
-      oldValue: T | null;
-      newValue: T | null;
-      changeRecords?: ChangeRecord[];
-      historyDescription?: string;
-      source?: HistoryOpSource;
-    },
-  ): S | null {
-    if (!id) return null;
-
-    const oldSchema = payload.oldValue ? cloneDeep(payload.oldValue) : null;
-    const newSchema = payload.newValue ? cloneDeep(payload.newValue) : null;
-    const changeRecords = payload.changeRecords?.length ? cloneDeep(payload.changeRecords) : undefined;
-    const opType = History.detectOpType(payload.oldValue, payload.newValue);
-
-    const step: BaseStepValue<T> & { id: Id } = {
-      uuid: guid(),
-      id,
-      opType,
-      diff: [
-        {
-          ...(newSchema !== null ? { newSchema } : {}),
-          ...(oldSchema !== null ? { oldSchema } : {}),
-          ...(opType === 'update' && changeRecords ? { changeRecords } : {}),
-        },
-      ],
-      historyDescription: payload.historyDescription,
-      source: payload.source,
-      timestamp: Date.now(),
-    };
-
-    return step as S;
+    // 初始基线之上才可撤销：cursor 必须高于底线（有 initial 时为 1）。
+    this.state.canUndo = undoRedo ? undoRedo.getCursor() > undoFloor(undoRedo) : false;
   }
 }
 

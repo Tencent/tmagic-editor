@@ -1,7 +1,7 @@
 <template>
-  <div v-if="!list.length" class="m-editor-history-list-empty">暂无操作记录</div>
+  <div v-if="!list.length && !marker" class="m-editor-history-list-empty">暂无操作记录</div>
   <template v-else>
-    <div class="m-editor-history-list-toolbar">
+    <div v-if="list.length" class="m-editor-history-list-toolbar">
       <span class="m-editor-history-list-clear" title="清空当前页面的历史记录" @click="$emit('clear')">清空</span>
     </div>
     <TMagicScrollbar max-height="360px">
@@ -10,7 +10,7 @@
           v-for="group in list"
           :key="rowKey(group)"
           :group="toRow(group)"
-          :expanded="!!expanded[rowKey(group)]"
+          :expanded="isHistoryGroupExpanded(expanded, rowKey(group))"
           @toggle="(key: string) => $emit('toggle', key)"
           @goto="(index: number) => $emit('goto', index)"
           @diff-step="(index: number) => $emit('diff-step', index)"
@@ -19,8 +19,9 @@
         <!--
         初始状态项：永远位于列表底部（页面 tab 倒序展示，最底部=最早），
         作为"未修改"零点。当所有 group 都未 applied 时它即为当前位置。
+        设置 root 时生成的「未修改的初始状态」标记（marker）会作为该行的文案与时间来源。
       -->
-        <InitialRow :is-current="isInitial" @goto-initial="$emit('goto-initial')" />
+        <InitialRow :is-current="isInitial" :marker="marker" @goto-initial="$emit('goto-initial')" />
       </ul>
     </TMagicScrollbar>
   </template>
@@ -31,10 +32,16 @@ import { computed } from 'vue';
 
 import { TMagicScrollbar } from '@tmagic/design';
 
-import type { PageHistoryGroup, StepValue } from '@editor/type';
+import type { HistoryRowDescriptor, PageHistoryGroup, StepValue } from '@editor/type';
 
-import type { HistoryRowDescriptor, HistoryRowGroup } from './composables';
-import { describePageGroup, describePageStep, isPageStepRevertable, toRowGroup } from './composables';
+import type { HistoryRowGroup } from './composables';
+import {
+  describePageGroup,
+  describePageStep,
+  isHistoryGroupExpanded,
+  isPageStepRevertable,
+  toRowGroup,
+} from './composables';
 import GroupRow from './GroupRow.vue';
 import InitialRow from './InitialRow.vue';
 
@@ -46,11 +53,16 @@ const props = defineProps<{
   /** 当前活动页面的历史分组列表，已按时间倒序排好（最新一组在最前）。空数组时显示空态。 */
   list: PageHistoryGroup[];
   /**
-   * 共享的折叠状态表（key -> 是否展开），由顶层 panel 统一维护。
+   * 共享的折叠状态表（key -> 是否展开，缺省或 true 为展开、false 为收起），由顶层 panel 统一维护。
    * 本 tab 使用 `pg-${组内首步 index}` 作为 key——以稳定的 step 索引而非展示位置标识分组，
    * 这样历史数据更新（新增 / 撤销重做导致列表顺序变化）后，已展开的分组状态仍能正确保持。
    */
   expanded: Record<string, boolean>;
+  /**
+   * 当前活动页的「加载/初始」基线记录（设置 root 时生成的 `opType: 'initial'` StepValue）。
+   * 提供时即使没有任何操作记录也会展示底部初始行，并用其文案 / 时间渲染。
+   */
+  marker?: StepValue;
 }>();
 
 defineEmits<{
@@ -95,8 +107,8 @@ const toRow = (group: PageHistoryGroup): HistoryRowGroup => toRowGroup(group, ro
 
 /**
  * 是否处于"初始状态"——即对应页面历史栈 cursor===0：
- * 当 list 中所有 group 的 applied 都为 false 时即为该状态。
- * 没有任何 group 的情况由外层"暂无操作记录"分支兜底，本计算可以不考虑。
+ * 当 list 中所有 group 的 applied 都为 false 时即为该状态（空列表 `every` 返回 true，
+ * 即仅有 marker、无任何操作记录时也视为处于初始状态）。
  */
-const isInitial = computed(() => props.list.length > 0 && props.list.every((g) => !g.applied));
+const isInitial = computed(() => props.list.every((g) => !g.applied));
 </script>

@@ -565,9 +565,11 @@ describe('useHistoryList', () => {
     return { api, wrapper };
   };
 
-  test('toggleGroup 切换 expanded[key]', () => {
+  test('toggleGroup 切换 expanded[key]（默认展开）', () => {
     const { api } = mountWithHost();
-    expect(api.expanded.foo).toBeFalsy();
+    expect(api.expanded.foo).toBeUndefined();
+    api.toggleGroup('foo');
+    expect(api.expanded.foo).toBe(false);
     api.toggleGroup('foo');
     expect(api.expanded.foo).toBe(true);
     api.toggleGroup('foo');

@@ -81,7 +81,7 @@ const { propsValues, propsConfigs, eventMethodList, datasourceConfigs, datasourc
 const { contentMenuData } = useEditorContentMenuData();
 
 const editor = shallowRef<InstanceType<typeof TMagicEditor>>();
-const value = ref<MApp>(dsl);
+const value = ref<MApp>();
 const defaultSelected = ref(dsl.items[0].id);
 
 const stageRect = ref({
@@ -148,20 +148,19 @@ const persistHistory = () => {
 // 编辑（尤其是本次会话新增的代码块 / 数据源历史）丢失，这里改为变更即落库以保证恢复完整。
 const schedulePersist = debounce(persistHistory, 500);
 
-// 进入页面时从 IndexedDB 恢复历史记录，并对齐到当前激活页，保证 undo/redo 作用于正在编辑的页面。
+// 进入页面时从 IndexedDB 恢复历史记录。此时 root 尚未设置，需显式传入待加载 DSL 的 id 以选中
+// 按 app 隔离的库；页面对齐由编辑器挂载后 select(defaultSelected) 触发的 changePage 负责。
 const restoreHistory = async () => {
   try {
-    const snapshot = await historyService.restoreFromIndexedDB();
-    if (!snapshot) return;
-    const page = editorService.get('page');
-    if (page) historyService.changePage(page);
+    await historyService.restoreFromIndexedDB({ appId: value.value?.id });
   } catch (error) {
     console.error('恢复历史记录失败', error);
   }
 };
 
-onMounted(() => {
-  restoreHistory();
+onMounted(async () => {
+  await restoreHistory();
+  value.value = dsl;
   historyService.on('change', schedulePersist);
   historyService.on('code-block-history-change', schedulePersist);
   historyService.on('data-source-history-change', schedulePersist);

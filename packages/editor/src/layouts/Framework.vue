@@ -168,7 +168,7 @@ onBeforeUnmount(() => {
 const saveCode = (value: string) => {
   try {
     const parseDSL = getEditorConfig('parseDSL');
-    editorService.set('root', parseDSL(value));
+    editorService.set('root', parseDSL(value), { historySource: 'root-code' });
   } catch (e: any) {
     console.error(e);
   }

@@ -55,7 +55,7 @@ export const initServiceState = (
   watch(
     () => props.modelValue,
     (modelValue) => {
-      editorService.set('root', modelValue || null);
+      editorService.set('root', modelValue || null, { historySource: 'initial' });
     },
     {
       immediate: true,

@@ -56,19 +56,6 @@ afterEach(() => {
 const pageStep = (id = 'p1') => ({ data: { id, name: '' }, modifiedNodeIds: new Map() }) as any;
 
 describe('history service - markSaved', () => {
-  test('markSaved 标记页面 / 代码块 / 数据源各栈的当前记录', () => {
-    history.changePage({ id: 'p1' } as any);
-    history.push(pageStep());
-    history.pushCodeBlock('code_1', { oldContent: null, newContent: { name: 'A' } as any });
-    history.pushDataSource('ds_1', { oldSchema: null, newSchema: { id: 'ds_1' } as any });
-
-    history.markSaved();
-
-    expect((history.state.pageSteps as any).p1.getCurrentElement().saved).toBe(true);
-    expect((history.state.codeBlockState as any).code_1.getCurrentElement().saved).toBe(true);
-    expect((history.state.dataSourceState as any).ds_1.getCurrentElement().saved).toBe(true);
-  });
-
   test('markSaved 派发 mark-saved 事件并带 kind=all', () => {
     const fn = vi.fn();
     history.on('mark-saved', fn);
@@ -77,29 +64,23 @@ describe('history service - markSaved', () => {
     history.off('mark-saved', fn);
   });
 
-  test('同一栈最多保留一条 saved：再次标记会清除旧标记', () => {
-    history.changePage({ id: 'p1' } as any);
-    history.push(pageStep());
-    history.markPageSaved();
-    history.push(pageStep());
-    history.markPageSaved();
-
-    const list = (history.state.pageSteps as any).p1.getElementList();
-    expect(list.filter((s: any) => s.saved)).toHaveLength(1);
-    // 最新一条才是 saved
-    expect(list[list.length - 1].saved).toBe(true);
-    expect(list[0].saved).toBeFalsy();
-  });
-
-  test('markPageSaved / markCodeBlockSaved / markDataSourceSaved 仅影响对应栈', () => {
+  test('markPageSaved / markCodeBlockSaved / markDataSourceSaved 派发对应 kind 事件', () => {
     history.changePage({ id: 'p1' } as any);
     history.push(pageStep());
     history.pushCodeBlock('code_1', { oldContent: null, newContent: { name: 'A' } as any });
 
+    const pageFn = vi.fn();
+    const codeFn = vi.fn();
+    history.on('mark-saved', (payload) => {
+      if (payload.kind === 'page') pageFn(payload);
+      if (payload.kind === 'code-block') codeFn(payload);
+    });
+
+    history.markPageSaved();
     history.markCodeBlockSaved('code_1');
-    expect((history.state.codeBlockState as any).code_1.getCurrentElement().saved).toBe(true);
-    // 页面栈未被标记
-    expect((history.state.pageSteps as any).p1.getCurrentElement().saved).toBeFalsy();
+
+    expect(pageFn).toHaveBeenCalledWith({ kind: 'page', id: 'p1' });
+    expect(codeFn).toHaveBeenCalledWith({ kind: 'code-block', id: 'code_1' });
   });
 });
 

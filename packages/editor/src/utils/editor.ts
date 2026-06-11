@@ -35,7 +35,7 @@ import {
   isValueIncludeDataSource,
 } from '@tmagic/utils';
 
-import type { EditorNodeInfo } from '@editor/type';
+import type { EditorNodeInfo, StepValue } from '@editor/type';
 import { LayerOffset, Layout } from '@editor/type';
 
 export const COPY_STORAGE_KEY = '$MagicEditorCopyData';
@@ -683,4 +683,44 @@ export const classifyDragSources = (
   }
 
   return { sameParentIndices, crossParentConfigs, aborted: false };
+};
+
+/**
+ * 给「回滚」生成的新 step 用的简短描述生成器。
+ * 与 UI 层 `describePageStep` 同义，但避免 service 反向依赖 layouts/，故放在此工具函数中。
+ */
+export const describeStepForRevert = (step: StepValue): string => {
+  const items = step.diff ?? [];
+  // 在可读名后拼接组件 id，便于在历史面板中精确定位被回滚的组件；id 缺失时退化为仅展示名称。
+  const withId = (node: MNode | undefined, label: string): string => {
+    const id = node?.id;
+    if (id === undefined || id === null || `${id}` === '') return label;
+    return label ? `${label}（id: ${id}）` : `id: ${id}`;
+  };
+  switch (step.opType) {
+    case 'add': {
+      const count = items.length;
+      const node = items[0]?.newSchema;
+      const label = node?.name || node?.type || '';
+      return `撤回新增 ${count} 个节点${count === 1 ? `（${withId(node, label)}）` : ''}`;
+    }
+    case 'remove': {
+      const count = items.length;
+      const node = items[0]?.oldSchema;
+      const label = node?.name || node?.type || '';
+      return `还原已删除的 ${count} 个节点${count === 1 ? `（${withId(node, label)}）` : ''}`;
+    }
+    case 'update':
+    default: {
+      if (items.length === 1) {
+        const { newSchema, oldSchema, changeRecords } = items[0];
+        const node = newSchema || oldSchema;
+        const label = newSchema?.name || newSchema?.type || oldSchema?.name || oldSchema?.type || '';
+        const target = withId(node, label);
+        const propPath = changeRecords?.[0]?.propPath;
+        return propPath ? `还原 ${target} · ${propPath}` : `还原 ${target}`;
+      }
+      return `还原 ${items.length} 个节点的修改`;
+    }
+  }
 };

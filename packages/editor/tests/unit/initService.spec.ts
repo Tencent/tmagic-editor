@@ -179,7 +179,7 @@ describe('initServiceState', () => {
   test('modelValue 变化设置 editor root', () => {
     const props = { modelValue: { id: 'a' } } as any;
     mount(Wrap(props, services));
-    expect(services.editorService.set).toHaveBeenCalledWith('root', { id: 'a' });
+    expect(services.editorService.set).toHaveBeenCalledWith('root', { id: 'a' }, { historySource: 'initial' });
   });
 
   test('disabledMultiSelect/alwaysMultiSelect 设置', () => {

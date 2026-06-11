@@ -27,10 +27,10 @@
 <script lang="ts" setup generic="T extends BaseStepValue = BaseStepValue">
 import { TMagicScrollbar } from '@tmagic/design';
 
-import type { BaseStepValue } from '@editor/type';
+import type { BaseStepValue, HistoryBucketConfig } from '@editor/type';
 
 import Bucket from './Bucket.vue';
-import type { HistoryBucketConfig, HistoryBucketGroup } from './composables';
+import type { HistoryBucketGroup } from './composables';
 
 defineOptions({
   name: 'MEditorHistoryListBucketTab',

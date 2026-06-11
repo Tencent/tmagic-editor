@@ -140,6 +140,17 @@ export class UndoRedo<T = any> {
   }
 
   /**
+   * 用 `element` 替换当前游标所在元素（cursor - 1），并丢弃其后的重做尾部（与 {@link pushElement} 的丢尾一致），
+   * 游标位置保持不变（元素数量不增）。cursor 为 0（无已应用元素）时不做任何操作并返回 false。
+   * 用于「连续同类记录合并」等就地替换最新一条的场景。
+   */
+  public replaceCurrentElement(element: T): boolean {
+    if (this.listCursor < 1) return false;
+    this.elementList.splice(this.listCursor - 1, this.elementList.length - (this.listCursor - 1), cloneDeep(element));
+    return true;
+  }
+
+  /**
    * 对当前游标所在元素（cursor - 1）做就地更新；cursor 为 0（全部已撤销）时不做任何操作。
    * 用于给「当前步骤」打标记（如标记为已保存）等元数据写入场景。
    */

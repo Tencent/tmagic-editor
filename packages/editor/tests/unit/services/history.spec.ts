@@ -129,6 +129,40 @@ describe('history service', () => {
     expect(s2?.uuid).toBeTruthy();
     expect(s1?.uuid).not.toBe(s2?.uuid);
   });
+
+  test('setPageMarker 在空栈时种入 initial 基线', () => {
+    history.changePage({ id: 'p1' } as any);
+    const marker = history.setPageMarker('p1', { name: '首页', description: '初始' });
+    expect(marker?.opType).toBe('initial');
+    expect(history.getPageMarker('p1')?.uuid).toBe(marker?.uuid);
+    expect((history.state.pageSteps as any).p1.getLength()).toBe(1);
+  });
+
+  test('有 initial 基线时不可撤销越过基线', () => {
+    history.changePage({ id: 'p1' } as any);
+    history.setPageMarker('p1');
+    history.push({ data: { id: 'p1', name: '' }, modifiedNodeIds: new Map() } as any);
+
+    expect(history.state.canUndo).toBe(true);
+    history.undo();
+    expect(history.state.canUndo).toBe(false);
+    expect(history.undo()).toBeNull();
+    expect(history.getPageCursor('p1')).toBe(1);
+  });
+
+  test('getPageHistoryGroups 过滤 initial 基线', () => {
+    history.changePage({ id: 'p1' } as any);
+    history.setPageMarker('p1');
+    history.push({
+      opType: 'add',
+      diff: [{ newSchema: { id: 'n1', name: 'A' } }],
+      modifiedNodeIds: new Map(),
+    } as any);
+
+    const groups = history.getPageHistoryGroups('p1');
+    expect(groups).toHaveLength(1);
+    expect(groups[0].opType).toBe('add');
+  });
 });
 
 describe('history service - codeBlock', () => {

@@ -11,7 +11,7 @@
         v-for="group in groups"
         :key="rowKey(group)"
         :group="toRow(group)"
-        :expanded="!!expanded[rowKey(group)]"
+        :expanded="isHistoryGroupExpanded(expanded, rowKey(group))"
         :goto-enabled="config.gotoEnabled"
         @toggle="(key: string) => $emit('toggle', key)"
         @goto="(index: number) => $emit('goto', bucketId, index)"
@@ -36,10 +36,10 @@
 <script lang="ts" setup generic="T extends BaseStepValue = BaseStepValue">
 import { computed } from 'vue';
 
-import type { BaseStepValue } from '@editor/type';
+import type { BaseStepValue, HistoryBucketConfig } from '@editor/type';
 
-import type { HistoryBucketConfig, HistoryBucketGroup, HistoryRowGroup } from './composables';
-import { toRowGroup } from './composables';
+import type { HistoryBucketGroup, HistoryRowGroup } from './composables';
+import { isHistoryGroupExpanded, toRowGroup } from './composables';
 import GroupRow from './GroupRow.vue';
 import InitialRow from './InitialRow.vue';
 
@@ -57,7 +57,7 @@ const props = defineProps<{
   bucketId: string | number;
   /** 当前 bucket 下的所有历史分组，按时间倒序展示（最近的操作在前）。 */
   groups: HistoryBucketGroup<T>[];
-  /** 共享的折叠状态表（key -> 是否展开），由顶层 panel 统一维护以便跨 tab 复用。 */
+  /** 共享的折叠状态表（key -> 是否展开，缺省或 true 为展开、false 为收起），由顶层 panel 统一维护以便跨 tab 复用。 */
   expanded: Record<string, boolean>;
 }>();
 

@@ -124,11 +124,11 @@ describe('PageTab.vue', () => {
       'btn',
     );
 
-    const wrapper = mount(PageTab, { props: { list: [mergedGroup], expanded: { 'pg-0': true } } });
+    const wrapper = mount(PageTab, { props: { list: [mergedGroup], expanded: {} } });
     expect(wrapper.find('.m-editor-history-list-substeps').exists()).toBe(true);
     expect(wrapper.findAll('.m-editor-history-list-substeps li')).toHaveLength(2);
 
-    await wrapper.setProps({ list: [mergedGroup], expanded: {} });
+    await wrapper.setProps({ list: [mergedGroup], expanded: { 'pg-0': false } });
     expect(wrapper.find('.m-editor-history-list-substeps').exists()).toBe(false);
   });
 
