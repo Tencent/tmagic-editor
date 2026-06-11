@@ -1,3 +1,30 @@
+# [1.8.0-beta.5](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.4...v1.8.0-beta.5) (2026-06-11)
+
+
+### Bug Fixes
+
+* **editor:** 优化历史回滚确认流程 ([48519b0](https://github.com/Tencent/tmagic-editor/commit/48519b0155a7cda8226217fa3bfd97a92410a7a6))
+* **editor:** 修复历史对比属性配置上下文缺失 ([be3a900](https://github.com/Tencent/tmagic-editor/commit/be3a900e6a132751f3b1d59c06b850c00604ee15))
+* **stage:** 复用 TargetShadow 修正闪烁高亮定位 ([171d31e](https://github.com/Tencent/tmagic-editor/commit/171d31e20797ab0e68ac8b2a4c39740e1f636634))
+
+
+### Features
+
+* **design:** popover 支持点击外部关闭 ([846f05e](https://github.com/Tencent/tmagic-editor/commit/846f05e04d6d85d37611148185eae93661e9d0da))
+* **editor:** 将侧边栏激活面板状态同步至 uiService ([6ba59c0](https://github.com/Tencent/tmagic-editor/commit/6ba59c0d141947727c83bc708c9fb7fc6b71a47f))
+* **editor:** 支持历史记录持久化 ([614f12a](https://github.com/Tencent/tmagic-editor/commit/614f12adf3174a4dadac028bda27057d18831a81))
+* **editor:** 支持按历史记录 uuid 回滚 ([bddc6f3](https://github.com/Tencent/tmagic-editor/commit/bddc6f343cc97d3034c869c3fc46780759134f7c))
+* **editor:** 支持页面初始基线与 root 变更历史记录 ([4f284e8](https://github.com/Tencent/tmagic-editor/commit/4f284e8d9cf6af9af234d345c14a2bf9176e5284))
+* **editor:** 页面删除前增加确认弹窗并支持危险样式按钮 ([113af7d](https://github.com/Tencent/tmagic-editor/commit/113af7dd5104f5f49515abd66f12f5e62098f7e2))
+* **editor:** 页面历史记录点击选中对应画布节点 ([fd652b0](https://github.com/Tencent/tmagic-editor/commit/fd652b0d13a2bf87db55d03013dc2c9ff01ff45d))
+
+
+### Performance Improvements
+
+* **editor:** 优化节点信息查找性能 ([c4ec2c5](https://github.com/Tencent/tmagic-editor/commit/c4ec2c5c722963c95141ac2d2ddf94d952d2e47d))
+
+
+
 # [1.8.0-beta.4](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.3...v1.8.0-beta.4) (2026-06-04)
 
 
