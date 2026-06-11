@@ -9,7 +9,15 @@ import { mount } from '@vue/test-utils';
 
 import historyService from '@editor/services/history';
 
-const editorService = { gotoPageStep: vi.fn(async () => 0) };
+const stageSelect = vi.fn();
+const overlayStageSelect = vi.fn();
+const editorService = {
+  gotoPageStep: vi.fn(async () => 0),
+  getNodeById: vi.fn((id: string | number) => ({ id })),
+  select: vi.fn(async () => {}),
+  get: vi.fn(() => ({ select: stageSelect })),
+};
+const stageOverlayService = { get: vi.fn(() => ({ select: overlayStageSelect })) };
 const dataSourceService = { goto: vi.fn(() => 0) };
 const codeBlockService = { goto: vi.fn(async () => 0) };
 const propsService = {
@@ -18,11 +26,20 @@ const propsService = {
 };
 
 vi.mock('@editor/hooks/use-services', () => ({
-  useServices: () => ({ historyService, editorService, dataSourceService, codeBlockService, propsService }),
+  useServices: () => ({
+    historyService,
+    editorService,
+    dataSourceService,
+    codeBlockService,
+    propsService,
+    stageOverlayService,
+  }),
 }));
 
 vi.mock('@tmagic/design', () => ({
   getDesignConfig: vi.fn(() => undefined),
+  tMagicMessage: { warning: vi.fn(), error: vi.fn(), success: vi.fn() },
+  tMagicMessageBox: { confirm: vi.fn(async () => undefined) },
   TMagicButton: defineComponent({
     name: 'FakeButton',
     setup(_p, { slots }) {
@@ -194,6 +211,50 @@ describe('HistoryListPanel.vue', () => {
     // 当前组没有「回到」按钮，点击头部不触发 goto
     await head.trigger('click');
     expect(editorService.gotoPageStep).toHaveBeenCalledTimes(1);
+  });
+
+  test('点击页面 group 头部选中对应节点（editorService.select + 画布 select 联动）', async () => {
+    historyService.changePage({ id: 'p1' } as any);
+    historyService.push({
+      opType: 'add',
+      diff: [{ newSchema: { id: 'n1', name: 'A' } }],
+      modifiedNodeIds: new Map(),
+    } as any);
+
+    const wrapper = await factory();
+    await nextTick();
+
+    const head = wrapper.find('.m-editor-history-list-group-head');
+    await head.trigger('click');
+    await nextTick();
+
+    expect(editorService.getNodeById).toHaveBeenCalledWith('n1', false);
+    expect(editorService.select).toHaveBeenCalledWith({ id: 'n1' });
+    expect(stageSelect).toHaveBeenCalledWith('n1');
+    expect(overlayStageSelect).toHaveBeenCalledWith('n1');
+    // 选中不应触发跳转
+    expect(editorService.gotoPageStep).not.toHaveBeenCalled();
+  });
+
+  test('点击页面记录时节点已不存在则提示且不选中', async () => {
+    historyService.changePage({ id: 'p1' } as any);
+    historyService.push({
+      opType: 'remove',
+      diff: [{ oldSchema: { id: 'gone', name: 'G' } }],
+      modifiedNodeIds: new Map(),
+    } as any);
+    editorService.getNodeById.mockReturnValueOnce(null);
+
+    const { tMagicMessage } = await import('@tmagic/design');
+    const wrapper = await factory();
+    await nextTick();
+
+    await wrapper.find('.m-editor-history-list-group-head').trigger('click');
+    await nextTick();
+
+    expect(tMagicMessage.warning).toHaveBeenCalled();
+    expect(editorService.select).not.toHaveBeenCalled();
+    expect(stageSelect).not.toHaveBeenCalled();
   });
 
   test('点击数据源组头部调用 dataSourceService.goto(id, cursor)', async () => {

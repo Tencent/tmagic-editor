@@ -29,6 +29,7 @@
             @goto-initial="onPageGotoInitial"
             @diff-step="onPageDiff"
             @revert-step="onPageRevert"
+            @select="onPageSelect"
             @clear="onPageClear"
           />
         </component>
@@ -176,7 +177,8 @@ const extraTabs = inject<HistoryListExtraTab[]>('historyListExtraTabs', []);
 /** label 支持字符串或函数，函数形式便于展示动态数量等内容。 */
 const resolveTabLabel = (tab: HistoryListExtraTab) => (typeof tab.label === 'function' ? tab.label() : tab.label);
 
-const { editorService, dataSourceService, codeBlockService, historyService, propsService } = useServices();
+const { editorService, dataSourceService, codeBlockService, historyService, propsService, stageOverlayService } =
+  useServices();
 
 /**
  * 数据源 / 代码块功能可被业务方通过 `disabledDataSource` / `disabledCodeBlock` 禁用，
@@ -253,6 +255,29 @@ const indexToCursor = (index: number) => index + 1;
 
 const onPageGoto = (index: number) => {
   editorService.gotoPageStep(indexToCursor(index));
+};
+
+/**
+ * 点击页面历史记录行：选中该记录对应的画布节点。
+ * - 从目标 step 的 diff 中取节点 id（优先 newSchema，回退 oldSchema），按出现顺序找到第一个当前仍存在的节点；
+ * - 与图层树点击选中一致：editorService.select + 画布 / overlay 画布 select 三者联动；
+ * - 该 step 涉及的节点都已不存在（如删除记录、被撤销的新增）时给出提示，不做选中。
+ */
+const onPageSelect = async (index: number) => {
+  const step = historyService.getPageStepList()[index]?.step;
+  if (!step) return;
+  const targetId = (step.diff ?? [])
+    .map((item) => item.newSchema?.id ?? item.oldSchema?.id)
+    .find((id) => id !== undefined && id !== null && editorService.getNodeById(id, false));
+  if (targetId === undefined || targetId === null) {
+    tMagicMessage.warning('该记录对应的节点已不存在，无法选中');
+    return;
+  }
+  const node = editorService.getNodeById(targetId, false);
+  if (!node) return;
+  await editorService.select(node);
+  editorService.get('stage')?.select(targetId);
+  stageOverlayService.get('stage')?.select(targetId);
 };
 
 const onDataSourceGoto = (id: string | number, index: number) => {

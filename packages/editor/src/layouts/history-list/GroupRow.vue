@@ -64,8 +64,9 @@
       <li
         v-for="s in subStepsDisplay"
         :key="s.index"
-        :class="{ 'is-undone': !s.applied, 'is-current': s.isCurrent }"
+        :class="{ 'is-undone': !s.applied, 'is-current': s.isCurrent, 'is-clickable': selectEnabled }"
         :title="subStepTitle(s)"
+        @click="onSubStepClick(s.index)"
       >
         <span class="m-editor-history-list-item-index">#{{ s.index + 1 }}</span>
         <span class="m-editor-history-list-substep-desc">{{ s.desc }}</span>
@@ -133,9 +134,16 @@ const props = withDefaults(
      * 仅保留合并组头部的展开 / 收起能力，以及查看差异、回滚等其它入口。
      */
     gotoEnabled?: boolean;
+    /**
+     * 是否支持「点击记录选中对应节点」。默认 false（仅页面 tab 启用，数据源 / 代码块无节点概念）。
+     * 为 true 时：点击单步组头部、子步条目或合并组头部都会发出 `select` 事件（携带对应 step 索引），
+     * 由上层解析出节点 id 并在画布选中；合并组头部同时保留展开 / 收起能力。
+     */
+    selectEnabled?: boolean;
   }>(),
   {
     gotoEnabled: true,
+    selectEnabled: false,
   },
 );
 
@@ -165,6 +173,11 @@ const emit = defineEmits<{
    * payload 为该 step 在所属栈中的索引。仅在单步组头部（headRevertable）或合并组的可回滚子步上触发。
    */
   (_e: 'revert-step', _index: number): void;
+  /**
+   * 用户希望「选中该记录对应的节点」。payload 为该 step 在所属栈中的索引，
+   * 由上层据 index 取出 step、解析出节点 id 并在画布选中。仅在 `selectEnabled` 为 true 时触发。
+   */
+  (_e: 'select', _index: number): void;
 }>();
 
 /** 子步数大于 1 即为合并组：决定是否展示合并标记与可展开的子步列表。 */
@@ -174,21 +187,32 @@ const merged = computed(() => props.group.subSteps.length > 1);
 const stepCount = computed(() => props.group.subSteps.length);
 
 /**
- * 仅合并组头部可点击（切换展开 / 收起）；
- * 单步组的跳转改由头部的「回到」按钮触发，整行不再可点击。
+ * 头部可点击的场景：
+ * - 合并组：点击切换展开 / 收起；
+ * - 开启 `selectEnabled`（页面 tab）：点击选中对应节点。
+ * 单步组的跳转仍由头部的「回到」按钮触发。
  */
-const isHeadClickable = computed(() => merged.value);
+const isHeadClickable = computed(() => merged.value || props.selectEnabled);
 
 const headTitle = computed(() => {
-  if (merged.value) return props.expanded ? '点击收起子步' : '点击展开子步';
+  if (merged.value) {
+    const expandHint = props.expanded ? '点击收起子步' : '点击展开子步';
+    return props.selectEnabled ? `${expandHint}（并选中该节点）` : expandHint;
+  }
+  if (props.selectEnabled) return '点击选中该节点';
   if (props.group.isCurrent) return '当前所在记录';
   return '';
 });
 
 /**
- * 头部点击行为：仅合并组切换展开 / 收起；单步组不再响应整行点击。
+ * 头部点击行为：
+ * - 开启 selectEnabled 时，发出 select（携带组内首步 index，上层据此选中节点）；
+ * - 合并组同时切换展开 / 收起。
  */
 const onHeadClick = () => {
+  if (props.selectEnabled && props.group.subSteps.length) {
+    emit('select', props.group.subSteps[0].index);
+  }
   if (merged.value) {
     emit('toggle', props.group.key);
   }
@@ -199,7 +223,14 @@ const onGotoClick = (index: number) => {
   emit('goto', index);
 };
 
+/** 点击子步行：开启 selectEnabled 时选中该子步对应的节点。 */
+const onSubStepClick = (index: number) => {
+  if (!props.selectEnabled) return;
+  emit('select', index);
+};
+
 const subStepTitle = (s: { isCurrent?: boolean }) => {
+  if (props.selectEnabled) return '点击选中该节点';
   if (s.isCurrent) return '当前所在记录';
   return '';
 };

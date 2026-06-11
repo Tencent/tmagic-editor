@@ -366,7 +366,7 @@ class History extends BaseService {
     }
     if (`${targetPageId}` === `${this.state.pageId}`) {
       this.setCanUndoRedo();
-      this.emit('change', null);
+      this.emit('clear-page', null);
     }
   }
 
@@ -484,7 +484,6 @@ class History extends BaseService {
 
     this.setCanUndoRedo();
     this.emit('restore-from-indexed-db', snapshot);
-    this.emit('change', null);
     return snapshot;
   }
 

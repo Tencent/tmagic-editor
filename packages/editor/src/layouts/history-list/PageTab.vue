@@ -11,10 +11,12 @@
           :key="rowKey(group)"
           :group="toRow(group)"
           :expanded="isHistoryGroupExpanded(expanded, rowKey(group))"
+          :select-enabled="true"
           @toggle="(key: string) => $emit('toggle', key)"
           @goto="(index: number) => $emit('goto', index)"
           @diff-step="(index: number) => $emit('diff-step', index)"
           @revert-step="(index: number) => $emit('revert-step', index)"
+          @select="(index: number) => $emit('select', index)"
         />
         <!--
         初始状态项：永远位于列表底部（页面 tab 倒序展示，最底部=最早），
@@ -76,6 +78,8 @@ defineEmits<{
   (_e: 'diff-step', _index: number): void;
   /** 用户点击"回滚"按钮，携带目标 step 在栈中的索引，类 git revert。 */
   (_e: 'revert-step', _index: number): void;
+  /** 用户点击记录行希望选中对应节点，携带目标 step 在栈中的索引。 */
+  (_e: 'select', _index: number): void;
   /** 用户点击"清空"按钮，请求清空当前页面的历史记录（由上层弹窗二次确认后执行）。 */
   (_e: 'clear'): void;
 }>();

@@ -173,6 +173,58 @@ describe('GroupRow.vue', () => {
     expect(wrapper.emitted('toggle')).toBeFalsy();
   });
 
+  test('selectEnabled 时点击单步组头部触发 select，携带该 step 的 index', async () => {
+    const wrapper = mount(GroupRow, {
+      props: {
+        group: makeGroup({ subSteps: [makeStep({ index: 5, applied: true, desc: 'a' })] }),
+        expanded: false,
+        selectEnabled: true,
+      },
+    });
+    await wrapper.find('.m-editor-history-list-group-head').trigger('click');
+    expect(wrapper.emitted('select')).toBeTruthy();
+    expect(wrapper.emitted('select')![0]).toEqual([5]);
+  });
+
+  test('selectEnabled 时点击合并组头部同时触发 select 与 toggle', async () => {
+    const wrapper = mount(GroupRow, {
+      props: {
+        group: makeGroup({ subSteps: [makeStep({ index: 3, desc: 'a' }), makeStep({ index: 4, desc: 'b' })] }),
+        expanded: false,
+        selectEnabled: true,
+      },
+    });
+    await wrapper.find('.m-editor-history-list-group-head').trigger('click');
+    // 合并组头部点击：选中组内首步对应节点，同时切换展开
+    expect(wrapper.emitted('select')![0]).toEqual([3]);
+    expect(wrapper.emitted('toggle')![0]).toEqual(['pg-0']);
+  });
+
+  test('selectEnabled 时点击子步行触发 select，携带该子步 index', async () => {
+    const wrapper = mount(GroupRow, {
+      props: {
+        group: makeGroup({ subSteps: [makeStep({ index: 0, desc: 'a' }), makeStep({ index: 1, desc: 'b' })] }),
+        expanded: true,
+        selectEnabled: true,
+      },
+    });
+    const subItems = wrapper.findAll('.m-editor-history-list-substeps li');
+    // 子步倒序渲染：subItems[0] 为 index=1
+    await subItems[0].trigger('click');
+    expect(wrapper.emitted('select')![0]).toEqual([1]);
+  });
+
+  test('未开启 selectEnabled（默认）时点击单步组头部不触发 select', async () => {
+    const wrapper = mount(GroupRow, {
+      props: {
+        group: makeGroup({ subSteps: [makeStep({ index: 5, applied: true, desc: 'a' })] }),
+        expanded: false,
+      },
+    });
+    await wrapper.find('.m-editor-history-list-group-head').trigger('click');
+    expect(wrapper.emitted('select')).toBeFalsy();
+  });
+
   test('当前单步组（isCurrent=true）点击头部不触发 goto', async () => {
     const wrapper = mount(GroupRow, {
       props: {
