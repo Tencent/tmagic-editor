@@ -258,6 +258,13 @@ export interface PopoverProps {
   popperClass?: string;
   tabindex?: number;
   destroyOnClose?: boolean;
+  /** 点击 popover 及其衍生浮层以外的区域时收起，默认开启。 */
+  closeOnClickOutside?: boolean;
+  /**
+   * 追加的「点击不关闭」选择器，会与内置的弹窗 / 确认框 / 下拉等浮层选择器合并。
+   * 用于 popover 内部触发、挂载到 body 之外的浮层不应顺带关闭 popover 的场景。
+   */
+  clickOutsideIgnore?: string;
 }
 
 export interface RadioProps {

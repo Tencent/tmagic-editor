@@ -3,7 +3,7 @@
     popper-class="m-editor-history-list-popover"
     placement="bottom"
     trigger="click"
-    :visible="visible"
+    v-model:visible="visible"
     :width="660"
   >
     <div class="m-editor-history-list">
@@ -163,7 +163,10 @@ const ClockIcon = markRaw(Clock);
 const CloseIcon = markRaw(Close);
 const activeTab = ref<string>('page');
 
-/** 面板显隐受控：reference 图标点击切换，右上角关闭按钮置为 false。 */
+/**
+ * 面板显隐受控：reference 图标点击切换，右上角关闭按钮置为 false。
+ * 点击面板以外区域的自动收起由 TMagicPopover 通过 v-model:visible 回写完成。
+ */
 const visible = ref(false);
 
 const tabPaneComponent = getDesignConfig('components')?.tabPane;
