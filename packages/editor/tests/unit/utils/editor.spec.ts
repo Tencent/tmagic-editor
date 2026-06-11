@@ -20,6 +20,7 @@ import { describe, expect, test, vi } from 'vitest';
 
 import type { MApp, MContainer, MNode } from '@tmagic/core';
 import { NodeType } from '@tmagic/core';
+import { getNodePath } from '@tmagic/utils';
 
 import type { EditorNodeInfo } from '@editor/type';
 import { LayerOffset, Layout } from '@editor/type';
@@ -342,20 +343,31 @@ const mockRoot: MApp = {
   ],
 };
 
+/** 构建从 root 到目标节点的路径（含 root 与目标节点），与 getNodeInfo 返回的 path 一致 */
+const buildNodePath = (root: MApp, nodeId: string | number): MNode[] => {
+  const path = getNodePath(nodeId, root.items) as MNode[];
+  if (path.length) {
+    path.unshift(root as unknown as MNode);
+  }
+  return path;
+};
+
+const mockNodePath = buildNodePath(mockRoot, 'node_1');
+
 const mockGetNodeInfo = (id: string | number): EditorNodeInfo => {
   const page = mockRoot.items[0];
   if (`${id}` === `${mockRoot.id}`) {
-    return { node: mockRoot as unknown as MNode, parent: null, page: null };
+    return { node: mockRoot as unknown as MNode, parent: null, page: null, path: [] };
   }
   if (`${id}` === `${page.id}`) {
-    return { node: page, parent: mockRoot as unknown as MContainer, page: page as any };
+    return { node: page, parent: mockRoot as unknown as MContainer, page: page as any, path: [] };
   }
   const items = (page as MContainer).items || [];
   const node = items.find((n: MNode) => `${n.id}` === `${id}`);
   if (node) {
-    return { node, parent: page as MContainer, page: page as any };
+    return { node, parent: page as MContainer, page: page as any, path: buildNodePath(mockRoot, id) };
   }
-  return { node: null, parent: null, page: null };
+  return { node: null, parent: null, page: null, path: [] };
 };
 
 describe('resolveSelectedNode', () => {
@@ -402,7 +414,7 @@ describe('toggleFixedPosition', () => {
     const src: MNode = { id: 'node_1', type: 'text', style: { position: 'absolute', top: 10, left: 20 } };
     const dist: MNode = { id: 'node_1', type: 'text', style: { position: 'fixed', top: 10, left: 20 } };
 
-    const result = await editor.toggleFixedPosition(dist, src, mockRoot, getLayoutFn);
+    const result = await editor.toggleFixedPosition(dist, src, mockNodePath, getLayoutFn);
     expect(result.style?.position).toBe('fixed');
     expect(result).not.toBe(dist);
   });
@@ -411,7 +423,7 @@ describe('toggleFixedPosition', () => {
     const src: MNode = { id: 'node_1', type: 'text', style: { position: 'fixed', top: 10, left: 20 } };
     const dist: MNode = { id: 'node_1', type: 'text', style: { position: 'absolute', top: 10, left: 20 } };
 
-    const result = await editor.toggleFixedPosition(dist, src, mockRoot, getLayoutFn);
+    const result = await editor.toggleFixedPosition(dist, src, [...mockNodePath], getLayoutFn);
     expect(result.style?.position).toBe('absolute');
   });
 
@@ -419,7 +431,7 @@ describe('toggleFixedPosition', () => {
     const src: MNode = { id: 'node_1', type: 'text', style: { position: 'absolute', top: 10, left: 20 } };
     const dist: MNode = { id: 'node_1', type: 'text', style: { position: 'absolute', top: 30, left: 40 } };
 
-    const result = await editor.toggleFixedPosition(dist, src, mockRoot, getLayoutFn);
+    const result = await editor.toggleFixedPosition(dist, src, mockNodePath, getLayoutFn);
     expect(result.style?.top).toBe(30);
     expect(result.style?.left).toBe(40);
   });
@@ -433,7 +445,7 @@ describe('toggleFixedPosition', () => {
     };
     const dist: MNode = { id: 'node_1', type: 'pop', style: { position: 'fixed', top: 10, left: 20 }, name: 'pop' };
 
-    const result = await editor.toggleFixedPosition(dist, src, mockRoot, getLayoutFn);
+    const result = await editor.toggleFixedPosition(dist, src, mockNodePath, getLayoutFn);
     expect(result.style?.position).toBe('fixed');
   });
 
@@ -441,7 +453,7 @@ describe('toggleFixedPosition', () => {
     const src: MNode = { id: 'node_1', type: 'text', style: { position: 'absolute' } };
     const dist: MNode = { id: 'node_1', type: 'text', style: { width: 100 } };
 
-    const result = await editor.toggleFixedPosition(dist, src, mockRoot, getLayoutFn);
+    const result = await editor.toggleFixedPosition(dist, src, mockNodePath, getLayoutFn);
     expect(result.style?.position).toBeUndefined();
   });
 
@@ -449,7 +461,7 @@ describe('toggleFixedPosition', () => {
     const src: MNode = { id: 'node_1', type: 'text', style: { position: 'absolute', top: 10 } };
     const dist: MNode = { id: 'node_1', type: 'text', style: { position: 'absolute', top: 20 } };
 
-    const result = await editor.toggleFixedPosition(dist, src, mockRoot, getLayoutFn);
+    const result = await editor.toggleFixedPosition(dist, src, mockNodePath, getLayoutFn);
     expect(result).not.toBe(dist);
     expect(dist.style?.top).toBe(20);
   });
@@ -680,18 +692,19 @@ describe('classifyDragSources', () => {
           node: container1.items.find((n) => `${n.id}` === `${id}`) ?? null,
           parent: container1,
           page,
+          path: [],
         };
       }
       if (`${id}` === 'c3') {
-        return { node: child3, parent: container2, page };
+        return { node: child3, parent: container2, page, path: [] };
       }
       if (`${id}` === 'cont1') {
-        return { node: container1, parent: page, page };
+        return { node: container1, parent: page, page, path: [] };
       }
       if (`${id}` === 'cont2') {
-        return { node: container2, parent: page, page };
+        return { node: container2, parent: page, page, path: [] };
       }
-      return { node: null, parent: null, page: null };
+      return { node: null, parent: null, page: null, path: [] };
     };
 
     return { root, getNodeInfo };
@@ -750,9 +763,10 @@ describe('classifyDragSources', () => {
           node: { id: 'c1', type: 'text' },
           parent: targetParent,
           page: { id: 'page_1', type: NodeType.PAGE, items: [] } as any,
+          path: [],
         };
       }
-      return { node: null, parent: null, page: null };
+      return { node: null, parent: null, page: null, path: [] };
     });
     expect(result.sameParentIndices).toEqual([0]);
     expect(result.crossParentConfigs).toHaveLength(0);
@@ -860,20 +874,20 @@ describe('change2Fixed / Fixed2Other', () => {
 
   test('change2Fixed 累加路径上的 left/top', () => {
     const node = root.items[0]!.items![0] as MNode;
-    const style = editor.change2Fixed(node, root);
+    const style = editor.change2Fixed(node, buildNodePath(root, node.id));
     expect(style.left).toBeGreaterThan(0);
     expect(style.top).toBeGreaterThan(0);
   });
 
   test('Fixed2Other 转回 absolute', async () => {
     const node = root.items[0]!.items![0] as MNode;
-    const style = await editor.Fixed2Other(node, root, async () => Layout.ABSOLUTE);
+    const style = await editor.Fixed2Other(node, buildNodePath(root, node.id), async () => Layout.ABSOLUTE);
     expect(style.position).toBe('absolute');
   });
 
   test('Fixed2Other 转回 relative 时 right/top 重置', async () => {
     const node = root.items[0]!.items![0] as MNode;
-    const style = await editor.Fixed2Other(node, root, async () => Layout.RELATIVE);
+    const style = await editor.Fixed2Other(node, buildNodePath(root, node.id), async () => Layout.RELATIVE);
     expect(style.position).toBe('relative');
   });
 });
@@ -939,6 +953,54 @@ describe('补充：getInitPositionStyle / setLayout / setChildrenLayout', () => 
   test('Layout.ABSOLUTE - 没有 left/right 时默认 left=0', () => {
     const style = editor.getInitPositionStyle({}, Layout.ABSOLUTE);
     expect(style.left).toBe(0);
+  });
+
+  test('Layout.ABSOLUTE - left/right 同时存在，left 有效 right 无效时删掉 right', () => {
+    const style = editor.getInitPositionStyle({ left: 20, right: '' }, Layout.ABSOLUTE);
+    expect(style.left).toBe(20);
+    expect('right' in style).toBe(false);
+  });
+
+  test('Layout.ABSOLUTE - left/right 同时存在，right 有效 left 无效时删掉 left', () => {
+    const style = editor.getInitPositionStyle({ left: 0, right: 30 }, Layout.ABSOLUTE);
+    expect(style.right).toBe(30);
+    expect('left' in style).toBe(false);
+  });
+
+  test('Layout.ABSOLUTE - left/right 都无效时优先保留值为 0 的（right=0）', () => {
+    const style = editor.getInitPositionStyle({ left: '', right: 0 }, Layout.ABSOLUTE);
+    expect(style.right).toBe(0);
+    expect('left' in style).toBe(false);
+  });
+
+  test('Layout.ABSOLUTE - left/right 都无效且都非 0 时默认保留 left', () => {
+    const style = editor.getInitPositionStyle({ left: undefined, right: null }, Layout.ABSOLUTE);
+    expect('left' in style).toBe(true);
+    expect('right' in style).toBe(false);
+  });
+
+  test('Layout.ABSOLUTE - left/right 都有效时都保留', () => {
+    const style = editor.getInitPositionStyle({ left: 10, right: 20 }, Layout.ABSOLUTE);
+    expect(style.left).toBe(10);
+    expect(style.right).toBe(20);
+  });
+
+  test('Layout.ABSOLUTE - top/bottom 同时存在，bottom 有效 top 无效时删掉 top', () => {
+    const style = editor.getInitPositionStyle({ top: 0, bottom: 50 }, Layout.ABSOLUTE);
+    expect(style.bottom).toBe(50);
+    expect('top' in style).toBe(false);
+  });
+
+  test('Layout.ABSOLUTE - top/bottom 都无效时优先保留值为 0 的（top=0）', () => {
+    const style = editor.getInitPositionStyle({ top: 0, bottom: undefined }, Layout.ABSOLUTE);
+    expect(style.top).toBe(0);
+    expect('bottom' in style).toBe(false);
+  });
+
+  test('Layout.ABSOLUTE - 仅存在 left 时不处理冲突', () => {
+    const style = editor.getInitPositionStyle({ left: '' }, Layout.ABSOLUTE);
+    expect(style.left).toBe('');
+    expect('right' in style).toBe(false);
   });
 
   test('Layout.RELATIVE - 走 getRelativeStyle', () => {
@@ -1210,7 +1272,7 @@ describe('补充：change2Fixed 边界', () => {
       ],
     };
     const node = root.items[0]!.items![0] as MNode;
-    const style = editor.change2Fixed(node, root);
+    const style = editor.change2Fixed(node, buildNodePath(root, node.id));
     expect(style.left).toBe(5);
   });
 
@@ -1228,8 +1290,85 @@ describe('补充：change2Fixed 边界', () => {
       ],
     };
     const node = root.items[0]!.items![0] as MNode;
-    const style = editor.change2Fixed(node, root);
+    const style = editor.change2Fixed(node, buildNodePath(root, node.id));
     expect(style.left).toBeUndefined();
+  });
+
+  test('节点以 right 锚定时累加路径上的 right', () => {
+    const root: MApp = {
+      id: 'app',
+      type: NodeType.ROOT,
+      items: [
+        {
+          id: 'p1',
+          type: NodeType.PAGE,
+          style: { right: 10 },
+          items: [{ id: 'b', type: 'text', style: { position: 'absolute', right: 5 } }],
+        } as any,
+      ],
+    };
+    const node = root.items[0]!.items![0] as MNode;
+    const style = editor.change2Fixed(node, buildNodePath(root, node.id));
+    expect(style.right).toBe(15);
+    expect(style.left).toBeUndefined();
+  });
+
+  test('节点以 bottom 锚定时累加路径上的 bottom', () => {
+    const root: MApp = {
+      id: 'app',
+      type: NodeType.ROOT,
+      items: [
+        {
+          id: 'p1',
+          type: NodeType.PAGE,
+          style: { bottom: 20 },
+          items: [{ id: 'b', type: 'text', style: { position: 'absolute', bottom: 5 } }],
+        } as any,
+      ],
+    };
+    const node = root.items[0]!.items![0] as MNode;
+    const style = editor.change2Fixed(node, buildNodePath(root, node.id));
+    expect(style.bottom).toBe(25);
+    expect(style.top).toBeUndefined();
+  });
+
+  test('right: 0 不被误判为未设置 right，仍走 right 分支', () => {
+    const root: MApp = {
+      id: 'app',
+      type: NodeType.ROOT,
+      items: [
+        {
+          id: 'p1',
+          type: NodeType.PAGE,
+          style: { left: 10, top: 20 },
+          items: [{ id: 'b', type: 'text', style: { position: 'absolute', right: 0 } }],
+        } as any,
+      ],
+    };
+    const node = root.items[0]!.items![0] as MNode;
+    const style = editor.change2Fixed(node, buildNodePath(root, node.id));
+    // 父节点为 left 锚定，无法换算 right，放弃补偿，保持 right: 0 且不写入 left
+    expect(style.left).toBeUndefined();
+    expect(style.right).toBe(0);
+  });
+
+  test('Fixed2Other 以 right 锚定时抵消路径上的 right', async () => {
+    const root: MApp = {
+      id: 'app',
+      type: NodeType.ROOT,
+      items: [
+        {
+          id: 'p1',
+          type: NodeType.PAGE,
+          style: { right: 10 },
+          items: [{ id: 'b', type: 'text', style: { position: 'absolute', right: 15 } }],
+        } as any,
+      ],
+    };
+    const node = root.items[0]!.items![0] as MNode;
+    const style = await editor.Fixed2Other(node, buildNodePath(root, node.id), async () => Layout.ABSOLUTE);
+    expect(style.position).toBe('absolute');
+    expect(style.right).toBe(5);
   });
 });
 
@@ -1255,7 +1394,7 @@ describe('toggleFixedPosition', () => {
     const result = await editor.toggleFixedPosition(
       { id: 'a', type: 'text', style: { position: 'absolute', top: 0, left: 0 } } as any,
       { id: 'a', type: 'text', style: { position: 'fixed' } } as any,
-      root,
+      [...buildNodePath(root, 'a')],
       async () => Layout.ABSOLUTE,
     );
     expect(result.style?.position).toBeDefined();
@@ -1277,7 +1416,7 @@ describe('toggleFixedPosition', () => {
     const result = await editor.toggleFixedPosition(
       { id: 'a', type: 'text', style: { position: 'fixed', left: 0, top: 0 } } as any,
       { id: 'a', type: 'text', style: { position: 'absolute' } } as any,
-      root,
+      buildNodePath(root, 'a'),
       async () => Layout.ABSOLUTE,
     );
     expect(result.style?.position).toBe('fixed');

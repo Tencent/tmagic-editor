@@ -203,11 +203,11 @@ class Editor extends BaseService {
     }
 
     if (!root) {
-      return { node: null, parent: null, page: null };
+      return { node: null, parent: null, page: null, path: [] };
     }
 
     if (id === root.id) {
-      return { node: root, parent: null, page: null };
+      return { node: root, parent: null, page: null, path: [] };
     }
 
     // 大多数查找的目标都在当前页面内，优先在当前页面子树中查找以避免对整棵树做全量遍历。
@@ -693,7 +693,7 @@ class Editor extends BaseService {
 
     const node = toRaw(info.node);
 
-    let newConfig = await toggleFixedPosition(toRaw(config), node, root, this.getLayout);
+    let newConfig = await toggleFixedPosition(toRaw(config), node, info.path, this.getLayout);
 
     newConfig = mergeWith(cloneDeep(node), newConfig, editorNodeMergeCustomizer);
 

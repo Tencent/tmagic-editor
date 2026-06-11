@@ -121,6 +121,7 @@ export const getNodeInfo = (id: Id, root: { id: Id; items?: MNode[] } | null, sk
     node: null,
     parent: null,
     page: null,
+    path: [],
   };
 
   if (!root) return info;
@@ -131,6 +132,7 @@ export const getNodeInfo = (id: Id, root: { id: Id; items?: MNode[] } | null, sk
   }
 
   const path = getNodePath(id, root.items, skip);
+  info.path = path;
 
   if (!path.length) return info;
 

@@ -19,8 +19,9 @@
 import { beforeAll, describe, expect, test } from 'vitest';
 import { cloneDeep } from 'lodash-es';
 
-import type { MApp } from '@tmagic/core';
+import type { MApp, MNode } from '@tmagic/core';
 import { NodeType } from '@tmagic/core';
+import { getNodePath } from '@tmagic/utils';
 
 import editorService from '@editor/services/editor';
 import historyService from '@editor/services/history';
@@ -553,7 +554,30 @@ describe('remove', () => {
 });
 
 describe('update', () => {
-  beforeAll(() => editorService.set('root', cloneDeep(root)));
+  beforeAll(() => {
+    editorService.set('root', cloneDeep(root));
+
+    // dist 版 getNodeInfo 尚未返回 path，测试中手动补齐以匹配 toggleFixedPosition 入参
+    const originalGetNodeInfo = editorService.getNodeInfo.bind(editorService);
+    editorService.getNodeInfo = (id, raw = true) => {
+      const info = originalGetNodeInfo(id, raw);
+      if (!Array.isArray(info.path) && info.node) {
+        const appRoot = editorService.get('root');
+        if (appRoot && `${id}` !== `${appRoot.id}`) {
+          const path = getNodePath(id, appRoot.items) as MNode[];
+          if (path.length) {
+            path.unshift(appRoot as unknown as MNode);
+            info.path = path;
+          } else {
+            info.path = [];
+          }
+        } else {
+          info.path = [];
+        }
+      }
+      return info;
+    };
+  });
 
   test('正常', async () => {
     await editorService.select(NodeId.PAGE_ID);

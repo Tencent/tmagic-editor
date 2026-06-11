@@ -132,12 +132,43 @@ const getMiddleTop = (node: MNode, parentNode: MNode, stage: StageCore | null) =
   return (Math.min(parentHeight, wrapperHeightDeal) - height) / 2;
 };
 
+// 同时存在一对相反的定位属性（如 left/right）时只保留一个，避免元素被拉伸
+const removeConflictPosition = (style: Record<string, any>, primary: string, secondary: string) => {
+  // '' / 0 / undefined / null 视为无效值
+  const isInvalid = (value: any) => value === '' || value === 0 || value === undefined || value === null;
+
+  if (!(primary in style) || !(secondary in style)) {
+    return;
+  }
+
+  const primaryValue = style[primary];
+  const secondaryValue = style[secondary];
+  const primaryInvalid = isInvalid(primaryValue);
+  const secondaryInvalid = isInvalid(secondaryValue);
+
+  if (primaryInvalid && !secondaryInvalid) {
+    delete style[primary];
+  } else if (secondaryInvalid && !primaryInvalid) {
+    delete style[secondary];
+  } else if (primaryInvalid && secondaryInvalid) {
+    // 都是无效值时优先保留 0，否则保留 primary（left/top）
+    if (secondaryValue === 0 && primaryValue !== 0) {
+      delete style[primary];
+    } else {
+      delete style[secondary];
+    }
+  }
+};
+
 export const getInitPositionStyle = (style: Record<string, any> = {}, layout: Layout) => {
   if (layout === Layout.ABSOLUTE) {
     const newStyle: Record<string, any> = {
       ...style,
       position: 'absolute',
     };
+
+    removeConflictPosition(newStyle, 'left', 'right');
+    removeConflictPosition(newStyle, 'top', 'bottom');
 
     if (typeof newStyle.left === 'undefined' && typeof newStyle.right === 'undefined') {
       newStyle.left = 0;
@@ -178,43 +209,68 @@ export const setLayout = (node: MNode, layout: Layout) => {
   return node;
 };
 
-export const change2Fixed = (node: MNode, root: MApp) => {
+type PositionKey = 'left' | 'top' | 'right' | 'bottom';
+
+// 判断 style 是否显式设置了某个定位属性，使用 typeof 判断以避免将 0（如 right: 0）误判为未设置
+const hasPositionValue = (style: Record<string, any> | undefined, key: PositionKey): boolean =>
+  typeof style?.[key] !== 'undefined' && style?.[key] !== '';
+
+/**
+ * 沿节点路径累加（或抵消）某一方向上的定位偏移量
+ * 当路径上的祖先使用了反方向定位（例如计算 left 时祖先用了 right）或非数值定位时，
+ * 无法简单地通过求和换算坐标，此时返回 0 表示放弃补偿、保持原值
+ * @param path 从根到目标节点的路径（含节点自身）
+ * @param dir 需要累加的定位方向
+ * @param opposite 反方向定位属性
+ * @param sign change2Fixed 取 1（累加祖先偏移），Fixed2Other 取 -1（抵消祖先偏移）
+ * @param init 偏移量初始值
+ */
+const accumulatePositionOffset = (
+  path: MNode[],
+  dir: PositionKey,
+  opposite: PositionKey,
+  sign: 1 | -1,
+  init = 0,
+): number => {
+  let offset = init;
+  for (const value of path) {
+    if (hasPositionValue(value.style, opposite) || !isNumber(value.style?.[dir] || 0)) {
+      return 0;
+    }
+    offset = offset + sign * Number(value.style?.[dir] || 0);
+  }
+  return offset;
+};
+
+export const change2Fixed = (node: MNode, path: MNode[]) => {
   const style = {
     ...(node.style || {}),
   };
 
-  const path = getNodePath(node.id, root.items);
-  const offset = {
-    left: 0,
-    top: 0,
-  };
-
-  if (!node.style?.right && isNumber(node.style?.left || 0)) {
-    for (const value of path) {
-      if (value.style?.right || !isNumber(value.style?.left || 0)) {
-        offset.left = 0;
-        break;
-      }
-      offset.left = offset.left + Number(value.style?.left || 0);
+  // 水平方向：以 left 锚定则累加祖先 left，以 right 锚定则累加祖先 right
+  if (!hasPositionValue(node.style, 'right') && isNumber(node.style?.left || 0)) {
+    const left = accumulatePositionOffset(path, 'left', 'right', 1);
+    if (left) {
+      style.left = left;
+    }
+  } else if (hasPositionValue(node.style, 'right') && isNumber(node.style?.right || 0)) {
+    const right = accumulatePositionOffset(path, 'right', 'left', 1);
+    if (right) {
+      style.right = right;
     }
   }
 
-  if (!node.style?.bottom && isNumber(node.style?.top || 0)) {
-    for (const value of path) {
-      if (value.style?.bottom || !isNumber(value.style?.top || 0)) {
-        offset.top = 0;
-        break;
-      }
-      offset.top = offset.top + Number(value.style?.top || 0);
+  // 垂直方向：以 top 锚定则累加祖先 top，以 bottom 锚定则累加祖先 bottom
+  if (!hasPositionValue(node.style, 'bottom') && isNumber(node.style?.top || 0)) {
+    const top = accumulatePositionOffset(path, 'top', 'bottom', 1);
+    if (top) {
+      style.top = top;
     }
-  }
-
-  if (offset.left) {
-    style.left = offset.left;
-  }
-
-  if (offset.top) {
-    style.top = offset.top;
+  } else if (hasPositionValue(node.style, 'bottom') && isNumber(node.style?.bottom || 0)) {
+    const bottom = accumulatePositionOffset(path, 'bottom', 'top', 1);
+    if (bottom) {
+      style.bottom = bottom;
+    }
   }
 
   return style;
@@ -222,34 +278,29 @@ export const change2Fixed = (node: MNode, root: MApp) => {
 
 export const Fixed2Other = async (
   node: MNode,
-  root: MApp,
+  path: MNode[],
   getLayout: (parent: MNode, node?: MNode) => Promise<Layout>,
 ) => {
-  const path = getNodePath(node.id, root.items);
   const cur = path.pop();
   const offset = {
-    left: cur?.style?.left || 0,
-    top: cur?.style?.top || 0,
+    left: 0,
+    top: 0,
+    right: 0,
+    bottom: 0,
   };
 
-  if (!node.style?.right && isNumber(node.style?.left || 0)) {
-    for (const value of path) {
-      if (value.style?.right || !isNumber(value.style?.left || 0)) {
-        offset.left = 0;
-        break;
-      }
-      offset.left = offset.left - Number(value.style?.left || 0);
-    }
+  // 水平方向：抵消祖先在对应锚定方向上的偏移量，初始值为节点自身的偏移
+  if (!hasPositionValue(node.style, 'right') && isNumber(node.style?.left || 0)) {
+    offset.left = accumulatePositionOffset(path, 'left', 'right', -1, Number(cur?.style?.left || 0));
+  } else if (hasPositionValue(node.style, 'right') && isNumber(node.style?.right || 0)) {
+    offset.right = accumulatePositionOffset(path, 'right', 'left', -1, Number(cur?.style?.right || 0));
   }
 
-  if (!node.style?.bottom && isNumber(node.style?.top || 0)) {
-    for (const value of path) {
-      if (value.style?.bottom || !isNumber(value.style?.top || 0)) {
-        offset.top = 0;
-        break;
-      }
-      offset.top = offset.top - Number(value.style?.top || 0);
-    }
+  // 垂直方向：同上
+  if (!hasPositionValue(node.style, 'bottom') && isNumber(node.style?.top || 0)) {
+    offset.top = accumulatePositionOffset(path, 'top', 'bottom', -1, Number(cur?.style?.top || 0));
+  } else if (hasPositionValue(node.style, 'bottom') && isNumber(node.style?.bottom || 0)) {
+    offset.bottom = accumulatePositionOffset(path, 'bottom', 'top', -1, Number(cur?.style?.bottom || 0));
   }
 
   const style = node.style || {};
@@ -267,6 +318,14 @@ export const Fixed2Other = async (
 
     if (offset.top) {
       style.top = offset.top;
+    }
+
+    if (offset.right) {
+      style.right = offset.right;
+    }
+
+    if (offset.bottom) {
+      style.bottom = offset.bottom;
     }
 
     return {
@@ -460,11 +519,11 @@ export const resolveSelectedNode = (
     throw new Error('没有ID，无法选中');
   }
 
-  const { node, parent, page } = getNodeInfoFn(id);
+  const { node, parent, page, path } = getNodeInfoFn(id);
   if (!node) throw new Error('获取不到组件信息');
   if (node.id === rootId) throw new Error('不能选根节点');
 
-  return { node, parent, page };
+  return { node, parent, page, path };
 };
 
 /**
@@ -479,16 +538,16 @@ export const resolveSelectedNode = (
 export const toggleFixedPosition = async (
   dist: MNode,
   src: MNode,
-  root: MApp,
+  path: MNode[],
   getLayoutFn: (parent: MNode, node?: MNode | null) => Promise<Layout>,
 ): Promise<MNode> => {
   const newConfig = cloneDeep(dist);
 
   if (!isPop(src) && newConfig.style?.position) {
     if (isFixed(newConfig.style) && !isFixed(src.style || {})) {
-      newConfig.style = change2Fixed(newConfig, root);
+      newConfig.style = change2Fixed(newConfig, path);
     } else if (!isFixed(newConfig.style) && isFixed(src.style || {})) {
-      newConfig.style = await Fixed2Other(newConfig, root, getLayoutFn);
+      newConfig.style = await Fixed2Other(newConfig, path, getLayoutFn);
     }
   }
 

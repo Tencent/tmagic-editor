@@ -335,6 +335,7 @@ export interface EditorNodeInfo {
   node: MNode | null;
   parent: MContainer | null;
   page: MPage | MPageFragment | null;
+  path: MNode[];
 }
 // #endregion EditorNodeInfo
 
