@@ -83,7 +83,10 @@ export default class StageCore extends EventEmitter {
       disabledRule: config.disabledRule,
     });
     this.actionManager = new ActionManager(this.getActionManagerConfig(config));
-    this.flashHighlight = new StageFlashHighlight({ container: this.mask.content });
+    this.flashHighlight = new StageFlashHighlight({
+      container: this.mask.content,
+      updateDragEl: config.updateDragEl,
+    });
 
     this.initRenderEvent();
     this.initActionEvent();

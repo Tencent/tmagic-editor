@@ -269,6 +269,11 @@ export interface TargetShadowConfig {
   idPrefix?: string;
 }
 
+export interface StageFlashHighlightConfig {
+  container: HTMLElement;
+  updateDragEl?: UpdateDragEl;
+}
+
 export interface RuleOptions {
   guidesOptions?: Partial<GuidesOptions>;
   disabledRule?: boolean;

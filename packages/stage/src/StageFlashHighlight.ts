@@ -18,8 +18,9 @@
 
 import { getDocument, injectStyle } from '@tmagic/core';
 
-import { ZIndex } from './const';
-import { getOffset } from './util';
+import { FLASH_EL_ID_PREFIX, ZIndex } from './const';
+import TargetShadow from './TargetShadow';
+import type { StageFlashHighlightConfig } from './types';
 
 /** 闪烁提示节点的 class name */
 export const FLASH_TIP_CLASS_NAME = 'tmagic-stage-flash-tip';
@@ -34,14 +35,18 @@ const FLASH_DURATION = 1500;
  * 帮助用户快速定位组件在画布中的位置。
  */
 export default class StageFlashHighlight {
-  /** 闪烁节点挂载的容器（蒙层的content） */
-  private container: HTMLElement;
-  private el?: HTMLElement;
+  /** 复用 TargetShadow 负责节点的定位校准（updateDragEl、fixed、滚动偏移等） */
+  private targetShadow: TargetShadow;
   private timer?: NodeJS.Timeout;
   private styleEl?: HTMLStyleElement;
 
-  constructor(config: { container: HTMLElement }) {
-    this.container = config.container;
+  constructor(config: StageFlashHighlightConfig) {
+    this.targetShadow = new TargetShadow({
+      container: config.container,
+      updateDragEl: config.updateDragEl,
+      zIndex: ZIndex.SELECTED_EL,
+      idPrefix: FLASH_EL_ID_PREFIX,
+    });
   }
 
   /**
@@ -52,27 +57,15 @@ export default class StageFlashHighlight {
     if (!el) return;
 
     this.injectStyle();
+    // 先销毁旧节点再 update，确保每次都拿到全新节点，让闪烁动画重新播放
     this.clear();
 
-    const offset = getOffset(el);
-    const { transform } = getComputedStyle(el);
-
-    const flashEl = globalThis.document.createElement('div');
-    flashEl.className = FLASH_TIP_CLASS_NAME;
-    flashEl.style.cssText = `
-      position: absolute;
-      box-sizing: border-box;
-      pointer-events: none;
-      transform: ${transform};
-      left: ${offset.left}px;
-      top: ${offset.top}px;
-      width: ${el.clientWidth}px;
-      height: ${el.clientHeight}px;
-      z-index: ${ZIndex.SELECTED_EL};
-    `;
-
-    this.container.appendChild(flashEl);
-    this.el = flashEl;
+    const flashEl = this.targetShadow.update(el);
+    flashEl.classList.add(FLASH_TIP_CLASS_NAME);
+    flashEl.style.boxSizing = 'border-box';
+    flashEl.style.pointerEvents = 'none';
+    // getTargetElStyle 会写入 target 的内联 border，需清掉以让动画 class 的边框生效
+    flashEl.style.border = '';
 
     this.timer = globalThis.setTimeout(() => {
       this.clear();
@@ -87,8 +80,7 @@ export default class StageFlashHighlight {
       globalThis.clearTimeout(this.timer);
       this.timer = undefined;
     }
-    this.el?.remove();
-    this.el = undefined;
+    this.targetShadow.destroyEl();
   }
 
   /**
@@ -96,6 +88,7 @@ export default class StageFlashHighlight {
    */
   public destroy(): void {
     this.clear();
+    this.targetShadow.destroy();
     this.styleEl?.remove();
     this.styleEl = undefined;
   }
