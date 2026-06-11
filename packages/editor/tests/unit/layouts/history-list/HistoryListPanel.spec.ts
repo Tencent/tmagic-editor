@@ -9,17 +9,31 @@ import { mount } from '@vue/test-utils';
 
 import historyService from '@editor/services/history';
 
+const { diffDialogOpen, confirmDialogConfirm } = vi.hoisted(() => ({
+  diffDialogOpen: vi.fn(),
+  confirmDialogConfirm: vi.fn(async () => true),
+}));
+
 const stageSelect = vi.fn();
 const overlayStageSelect = vi.fn();
 const editorService = {
   gotoPageStep: vi.fn(async () => 0),
+  revertPageStep: vi.fn(async () => null),
   getNodeById: vi.fn((id: string | number) => ({ id })),
   select: vi.fn(async () => {}),
   get: vi.fn(() => ({ select: stageSelect })),
 };
 const stageOverlayService = { get: vi.fn(() => ({ select: overlayStageSelect })) };
-const dataSourceService = { goto: vi.fn(() => 0) };
-const codeBlockService = { goto: vi.fn(async () => 0) };
+const dataSourceService = {
+  goto: vi.fn(() => 0),
+  revert: vi.fn(async () => null),
+  getDataSourceById: vi.fn((id: string) => ({ id, title: 'DS' })),
+};
+const codeBlockService = {
+  goto: vi.fn(async () => 0),
+  revert: vi.fn(async () => null),
+  getCodeContentById: vi.fn((id: string | number) => ({ id, name: 'CB' })),
+};
 const propsService = {
   getDisabledDataSource: vi.fn(() => false),
   getDisabledCodeBlock: vi.fn(() => false),
@@ -91,7 +105,7 @@ vi.mock('@editor/layouts/history-list/HistoryDiffDialog.vue', () => ({
   default: defineComponent({
     name: 'FakeHistoryDiffDialog',
     setup(_p, { expose }) {
-      expose({ open: vi.fn(), close: vi.fn() });
+      expose({ open: diffDialogOpen, close: vi.fn(), confirm: confirmDialogConfirm });
       return () => h('div', { class: 'fake-history-diff-dialog' });
     },
   }),
@@ -100,6 +114,8 @@ vi.mock('@editor/layouts/history-list/HistoryDiffDialog.vue', () => ({
 afterEach(() => {
   historyService.reset();
   vi.clearAllMocks();
+  propsService.getDisabledDataSource.mockReturnValue(false);
+  propsService.getDisabledCodeBlock.mockReturnValue(false);
 });
 
 const factory = async () => {
@@ -348,6 +364,112 @@ describe('HistoryListPanel.vue', () => {
     expect(custom.text()).toBe('hello-custom');
   });
 
+  test('disabledDataSource / disabledCodeBlock 为 true 时不渲染对应 tab', async () => {
+    propsService.getDisabledDataSource.mockReturnValue(true);
+    propsService.getDisabledCodeBlock.mockReturnValue(true);
+
+    const wrapper = await factory();
+    await nextTick();
+
+    const empties = wrapper.findAll('.m-editor-history-list-empty');
+    expect(empties).toHaveLength(1);
+  });
+
+  test('点击页面 update 记录的「查看差异」打开 diff 弹窗', async () => {
+    historyService.changePage({ id: 'p1' } as any);
+    historyService.push({
+      opType: 'update',
+      modifiedNodeIds: new Map(),
+      diff: [
+        {
+          newSchema: { id: 'btn', name: '新按钮', type: 'button' },
+          oldSchema: { id: 'btn', name: '旧按钮', type: 'button' },
+          changeRecords: [{ propPath: 'name' }],
+        },
+      ],
+    } as any);
+
+    const wrapper = await factory();
+    await nextTick();
+
+    await wrapper.find('.m-editor-history-list-item-diff').trigger('click');
+    expect(diffDialogOpen).toHaveBeenCalledWith(
+      expect.objectContaining({
+        category: 'node',
+        targetLabel: '新按钮',
+        value: expect.objectContaining({ name: '新按钮' }),
+      }),
+    );
+  });
+
+  test('点击页面 update 记录的「回滚」在确认后调用 revertPageStep', async () => {
+    historyService.changePage({ id: 'p1' } as any);
+    historyService.push({
+      opType: 'update',
+      modifiedNodeIds: new Map(),
+      diff: [
+        {
+          newSchema: { id: 'btn', name: '新按钮', type: 'button' },
+          oldSchema: { id: 'btn', name: '旧按钮', type: 'button' },
+          changeRecords: [{ propPath: 'name' }],
+        },
+      ],
+    } as any);
+
+    const wrapper = await factory();
+    await nextTick();
+
+    await wrapper.find('.m-editor-history-list-item-revert').trigger('click');
+    await nextTick();
+    expect(confirmDialogConfirm).toHaveBeenCalled();
+    expect(editorService.revertPageStep).toHaveBeenCalledWith(0);
+  });
+
+  test('回滚目标节点已删除时提示错误且不执行 revert', async () => {
+    historyService.changePage({ id: 'p1' } as any);
+    historyService.push({
+      opType: 'update',
+      modifiedNodeIds: new Map(),
+      diff: [
+        {
+          newSchema: { id: 'gone', name: '按钮', type: 'button' },
+          oldSchema: { id: 'gone', name: '按钮', type: 'button' },
+          changeRecords: [{ propPath: 'name' }],
+        },
+      ],
+    } as any);
+    editorService.getNodeById.mockReturnValueOnce(null);
+
+    const { tMagicMessage } = await import('@tmagic/design');
+    const wrapper = await factory();
+    await nextTick();
+
+    await wrapper.find('.m-editor-history-list-item-revert').trigger('click');
+    await nextTick();
+    expect(tMagicMessage.error).toHaveBeenCalledWith('回滚失败：该记录对应的数据已被删除');
+    expect(editorService.revertPageStep).not.toHaveBeenCalled();
+  });
+
+  test('确认清空页面历史后调用 historyService.clearPage', async () => {
+    historyService.changePage({ id: 'p1' } as any);
+    historyService.push({
+      opType: 'add',
+      diff: [{ newSchema: { id: 'n1', name: 'A' } }],
+      modifiedNodeIds: new Map(),
+    } as any);
+    const saveSpy = vi.spyOn(historyService, 'saveToIndexedDB').mockResolvedValue(undefined);
+
+    const wrapper = await factory();
+    await nextTick();
+
+    await wrapper.find('.m-editor-history-list-clear').trigger('click');
+    await nextTick();
+
+    expect(historyService.getPageHistoryGroups()).toHaveLength(0);
+    expect(saveSpy).toHaveBeenCalled();
+    saveSpy.mockRestore();
+  });
+
   test('点击数据源/代码块初始项调用对应 service.goto(id, 0)', async () => {
     historyService.pushDataSource('ds_x', {
       oldSchema: null,
@@ -373,5 +495,58 @@ describe('HistoryListPanel.vue', () => {
 
     await initials[1].find('.m-editor-history-list-item-goto').trigger('click');
     expect(codeBlockService.goto).toHaveBeenCalledWith('code_x', 0);
+  });
+
+  test('点击数据源 update 记录的「查看差异」与「回滚」', async () => {
+    historyService.pushDataSource('ds_1', {
+      oldSchema: null,
+      newSchema: { id: 'ds_1', title: 'DS' } as any,
+    });
+    historyService.pushDataSource('ds_1', {
+      oldSchema: { id: 'ds_1', title: '旧 DS' } as any,
+      newSchema: { id: 'ds_1', title: '新 DS' } as any,
+      changeRecords: [{ propPath: 'title' }],
+    });
+
+    const wrapper = await factory();
+    await nextTick();
+
+    const diffBtn = wrapper.find('.m-editor-history-list-item-diff');
+    await diffBtn.trigger('click');
+    expect(diffDialogOpen).toHaveBeenCalledWith(
+      expect.objectContaining({ category: 'data-source', targetLabel: '新 DS' }),
+    );
+
+    await wrapper.find('.m-editor-history-list-item-revert').trigger('click');
+    await nextTick();
+    expect(confirmDialogConfirm).toHaveBeenCalled();
+    expect(dataSourceService.revert).toHaveBeenCalledWith('ds_1', 1);
+  });
+
+  test('确认清空数据源/代码块历史后调用 clearDataSource / clearCodeBlock', async () => {
+    historyService.pushDataSource('ds_1', {
+      oldSchema: null,
+      newSchema: { id: 'ds_1', title: 'DS' } as any,
+    });
+    historyService.pushCodeBlock('code_1', {
+      oldContent: null,
+      newContent: { id: 'code_1', name: 'CB' } as any,
+    });
+    const saveSpy = vi.spyOn(historyService, 'saveToIndexedDB').mockResolvedValue(undefined);
+
+    const wrapper = await factory();
+    await nextTick();
+
+    const clears = wrapper.findAll('.m-editor-history-list-clear');
+    expect(clears.length).toBeGreaterThanOrEqual(2);
+    await clears[0].trigger('click');
+    await nextTick();
+    await clears[1].trigger('click');
+    await nextTick();
+
+    expect(historyService.getDataSourceHistoryGroups()).toHaveLength(0);
+    expect(historyService.getCodeBlockHistoryGroups()).toHaveLength(0);
+    expect(saveSpy).toHaveBeenCalled();
+    saveSpy.mockRestore();
   });
 });

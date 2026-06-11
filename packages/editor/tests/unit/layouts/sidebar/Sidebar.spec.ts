@@ -9,7 +9,13 @@ import { mount } from '@vue/test-utils';
 
 import Sidebar from '@editor/layouts/sidebar/Sidebar.vue';
 
-const depService = { get: vi.fn(() => false) };
+const depService = {
+  get: vi.fn((name: string) => {
+    if (name === 'collecting') return false;
+    if (name === 'taskLength') return 0;
+    return false;
+  }),
+};
 const uiState: Record<string, any> = reactive({});
 const uiService = {
   get: vi.fn((name: string) => (name === 'sideBarActiveTabName' ? uiState.sideBarActiveTabName : { left: 200 })),
@@ -176,5 +182,45 @@ describe('Sidebar', () => {
     const items = wrapper.findAll('.m-editor-sidebar-header-item');
     await items[0].trigger('dragstart');
     expect(dragstartHandler).toHaveBeenCalled();
+  });
+
+  test('dragendHandler 触发', async () => {
+    const wrapper = mount(Sidebar, { props: baseProps() as any });
+    const items = wrapper.findAll('.m-editor-sidebar-header-item');
+    await items[0].trigger('dragend');
+    expect(dragendHandler).toHaveBeenCalled();
+  });
+
+  test('自定义 sidebar item 可渲染 slots 组件', async () => {
+    const customPanel = stub('CustomPanel');
+    const wrapper = mount(Sidebar, {
+      props: baseProps({
+        data: {
+          type: 'tabs',
+          status: '自定义',
+          items: [
+            {
+              $key: 'custom',
+              text: '自定义',
+              component: customPanel,
+              slots: { componentList: stub('SlotComponentList') },
+            },
+          ],
+        },
+      }) as any,
+    });
+    await wrapper.find('.m-editor-sidebar-header-item').trigger('click');
+    expect(wrapper.find('.CustomPanel').exists()).toBe(true);
+  });
+
+  test('dep collecting 时展示 tips 区域', () => {
+    depService.get.mockImplementation((name: string) => {
+      if (name === 'collecting') return true;
+      if (name === 'taskLength') return 3;
+      return false;
+    });
+    const wrapper = mount(Sidebar, { props: baseProps() as any });
+    expect(wrapper.find('.m-editor-sidebar-tips').exists()).toBe(true);
+    expect(wrapper.find('.m-editor-sidebar-tips').text()).toContain('剩余任务：3');
   });
 });

@@ -27,8 +27,8 @@ const toDiffStep = (s: any, opType: 'add' | 'remove' | 'update') => ({
   opType,
   diff: [
     {
-      ...(s.newSchema != null ? { newSchema: s.newSchema } : {}),
-      ...(s.oldSchema != null ? { oldSchema: s.oldSchema } : {}),
+      ...(s.newSchema !== null && s.newSchema !== undefined ? { newSchema: s.newSchema } : {}),
+      ...(s.oldSchema !== null && s.oldSchema !== undefined ? { oldSchema: s.oldSchema } : {}),
       ...(s.changeRecords ? { changeRecords: s.changeRecords } : {}),
     },
   ],

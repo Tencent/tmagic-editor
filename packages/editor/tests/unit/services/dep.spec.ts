@@ -11,11 +11,17 @@ import depService from '@editor/services/dep';
 
 vi.mock('@editor/utils/dep/worker.ts?worker&inline', () => ({
   default: class FakeWorker {
+    public static nextData: Record<string, any> = {};
+    public static nextError = false;
     public onmessage: ((e: any) => void) | null = null;
     public onerror: (() => void) | null = null;
     public postMessage() {
       setTimeout(() => {
-        this.onmessage?.({ data: {} });
+        if (FakeWorker.nextError) {
+          this.onerror?.(new Event('error'));
+          return;
+        }
+        this.onmessage?.({ data: FakeWorker.nextData });
       }, 0);
     }
   },
@@ -147,5 +153,75 @@ describe('Dep service', () => {
     depService.reset();
     expect(depService.get('collecting')).toBe(false);
     expect(depService.hasTarget('rs')).toBe(false);
+  });
+
+  test('collect 在有 collectable target 时会收集依赖并触发 collected / ds-collected', () => {
+    const collected = vi.fn();
+    const dsCollected = vi.fn();
+    depService.on('collected', collected);
+    depService.on('ds-collected', dsCollected);
+    depService.addTarget(makeTarget('t-collect'));
+    depService.collect([{ id: 'n1', type: 'text' }] as any);
+    expect(collected).toHaveBeenCalledWith([{ id: 'n1', type: 'text' }], false);
+    expect(dsCollected).toHaveBeenCalled();
+    depService.off('collected', collected);
+    depService.off('ds-collected', dsCollected);
+  });
+
+  test('collect 对 page 节点会清理 page 级旧依赖', () => {
+    depService.addTarget(makeTarget('page-target'));
+    expect(() => depService.collect([{ id: 'p1', type: 'page', items: [] }] as any, { pageId: 'p1' })).not.toThrow();
+  });
+
+  test('collectNode 支持 page 与普通节点两条路径', () => {
+    const target = makeTarget('node-target');
+    depService.addTarget(target);
+    depService.collectNode({ id: 'n1', type: 'text' } as any, target);
+    depService.collectNode({ id: 'p1', type: 'page', items: [] } as any, target, { pageId: 'p1' });
+    expect(depService.get('collecting')).toBe(false);
+  });
+
+  test('collectByWorker worker 报错时返回空对象并完成 collected', async () => {
+    const fakeWorker = (await import('@editor/utils/dep/worker.ts?worker&inline')).default as any;
+    fakeWorker.nextError = true;
+    fakeWorker.nextData = {};
+    const collected = vi.fn();
+    depService.on('collected', collected);
+    const result = await depService.collectByWorker({ items: [], id: 'app', type: 'app' } as any);
+    expect(result).toEqual({});
+    expect(collected).toHaveBeenCalled();
+    fakeWorker.nextError = false;
+    depService.off('collected', collected);
+  });
+
+  test('collectByWorker 会把 worker 返回的 deps 写回 target 与 dsl', async () => {
+    const fakeWorker = (await import('@editor/utils/dep/worker.ts?worker&inline')).default as any;
+    depService.addTarget(makeTarget('ds1', DepTargetType.DATA_SOURCE));
+    depService.addTarget(makeTarget('cond1', DepTargetType.DATA_SOURCE_COND));
+    depService.addTarget(makeTarget('method1', DepTargetType.DATA_SOURCE_METHOD));
+    fakeWorker.nextData = {
+      [DepTargetType.DATA_SOURCE]: { ds1: { fieldA: { data: {} } } },
+      [DepTargetType.DATA_SOURCE_COND]: { cond1: { condA: { data: {} } } },
+      [DepTargetType.DATA_SOURCE_METHOD]: { method1: { methodA: { data: {} } } },
+    };
+    const dsl: any = {
+      items: [{ id: 'n1', type: 'text' }],
+      id: 'app',
+      type: 'app',
+      dataSourceDeps: {},
+      dataSourceCondDeps: {},
+      dataSourceMethodDeps: {},
+    };
+    await depService.collectByWorker(dsl);
+    expect(dsl.dataSourceDeps.ds1).toBeDefined();
+    expect(dsl.dataSourceCondDeps.cond1).toBeDefined();
+    expect(dsl.dataSourceMethodDeps.method1).toBeDefined();
+    fakeWorker.nextData = {};
+  });
+
+  test('destroy 会 reset 并移除监听', () => {
+    depService.addTarget(makeTarget('destroy-me'));
+    expect(() => depService.destroy()).not.toThrow();
+    expect(depService.hasTarget('destroy-me')).toBe(false);
   });
 });

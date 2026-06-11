@@ -83,5 +83,24 @@ describe('plugin install', () => {
     editorPlugin.install(app);
     expect(app.config.globalProperties.$TMAGIC_EDITOR).toBeDefined();
     expect(typeof app.config.globalProperties.$TMAGIC_EDITOR.parseDSL).toBe('function');
+    expect(typeof app.config.globalProperties.$TMAGIC_EDITOR.customCreateMonacoEditor).toBe('function');
+    expect(typeof app.config.globalProperties.$TMAGIC_EDITOR.customCreateMonacoDiffEditor).toBe('function');
+  });
+
+  test('customCreateMonacoEditor / customCreateMonacoDiffEditor 会调用 monaco API', () => {
+    const { app } = buildApp();
+    editorPlugin.install(app);
+    const { customCreateMonacoEditor, customCreateMonacoDiffEditor } = app.config.globalProperties.$TMAGIC_EDITOR;
+    const monaco = {
+      editor: {
+        create: vi.fn(() => 'editor'),
+        createDiffEditor: vi.fn(() => 'diff-editor'),
+      },
+    };
+    const el = document.createElement('div');
+    expect(customCreateMonacoEditor(monaco, el, { theme: 'vs' })).toBe('editor');
+    expect(customCreateMonacoDiffEditor(monaco, el, { readOnly: true })).toBe('diff-editor');
+    expect(monaco.editor.create).toHaveBeenCalledWith(el, { theme: 'vs' });
+    expect(monaco.editor.createDiffEditor).toHaveBeenCalledWith(el, { readOnly: true });
   });
 });

@@ -519,6 +519,9 @@ importers:
       '@types/lodash-es':
         specifier: ^4.17.4
         version: 4.17.12
+      '@vue/test-utils':
+        specifier: ^2.4.6
+        version: 2.4.6
 
   packages/tdesign-vue-next-adapter:
     dependencies:
