@@ -237,11 +237,24 @@
 
   .m-editor-history-list-item-index {
     flex: 0 0 auto;
+    // 固定最小宽度并右对齐：序号位数不一（#6 / #16）时右边界仍统一，
+    // 使紧随其后的「类型」徽标在各行间对齐成整齐的一列。
+    min-width: 30px;
+    text-align: right;
     color: #909399;
     font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
     font-size: 11px;
     font-weight: 400; // 防止被合并组头部的粗体继承
     white-space: nowrap;
+  }
+
+  // 合并组头部展示的是步骤区间（如 #10-#20），宽度本就不定、也无需与单步行对齐，
+  // 恢复自然宽度与左对齐，避免被强制成固定列后显得突兀。
+  .m-editor-history-list-group.is-merged
+    > .m-editor-history-list-group-head
+    > .m-editor-history-list-item-index {
+    min-width: 0;
+    text-align: left;
   }
 
   // 操作时间：弱化展示，紧贴在描述之后、各操作按钮之前。
@@ -344,6 +357,24 @@
     letter-spacing: 0.2px;
   }
 
+  // 操作区：把「回滚 / 回到 / 查看差异」收敛为一个统一容器，默认隐藏，
+  // 仅在指针悬停于所在行时显示。静止状态下每行最右侧固定为「时间」，
+  // 各行因此能对齐成整齐的右侧列，避免按钮数量不一导致的参差错乱。
+  .m-editor-history-list-item-actions {
+    display: none;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .m-editor-history-list-group-head:hover > .m-editor-history-list-item-actions,
+  .m-editor-history-list-substeps
+    > li:hover
+    > .m-editor-history-list-item-actions,
+  .m-editor-history-list-initial:hover > .m-editor-history-list-item-actions {
+    display: flex;
+  }
+
   .m-editor-history-list-item-diff {
     flex: 0 0 auto;
     padding: 0 6px;
@@ -360,21 +391,21 @@
     }
   }
 
-  // 「跳转」按钮：将历史游标移动到该 step，替代原先点击整行跳转的交互。
-  // 使用与组卡片一致的紫色色系，与「查看差异」「回滚」区分开。
+  // 「回到」按钮：将历史游标移动到该 step。使用绿色色系，
+  // 与红色「回滚」、蓝色「查看差异」区分，也避免与紧邻的灰色「来源」徽标混淆。
   .m-editor-history-list-item-goto {
     flex: 0 0 auto;
     padding: 0 6px;
     border-radius: 2px;
     font-size: 10px;
     line-height: 16px;
-    color: #606266;
-    background-color: rgba(96, 98, 102, 0.1);
+    color: #529b2e;
+    background-color: rgba(103, 194, 58, 0.12);
     cursor: pointer;
     user-select: none;
 
     &:hover {
-      background-color: rgba(96, 98, 102, 0.18);
+      background-color: rgba(103, 194, 58, 0.24);
     }
   }
 

@@ -7,14 +7,10 @@
     <span class="m-editor-history-list-item-index" title="历史步骤编号 #0（未修改的初始状态）">#0</span>
     <span class="m-editor-history-list-item-op op-initial">初始</span>
     <span class="m-editor-history-list-item-desc">{{ desc }}</span>
+    <span v-if="gotoEnabled && !isCurrent" class="m-editor-history-list-item-actions">
+      <span class="m-editor-history-list-item-goto" title="回到该记录" @click.stop="onClick">回到</span>
+    </span>
     <span v-if="time" class="m-editor-history-list-item-time" :title="timeTitle">{{ time }}</span>
-    <span
-      v-if="gotoEnabled && !isCurrent"
-      class="m-editor-history-list-item-goto"
-      title="回到该记录"
-      @click.stop="onClick"
-      >回到</span
-    >
   </li>
 </template>
 

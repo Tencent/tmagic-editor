@@ -16,6 +16,33 @@
       <span v-if="headSaved" class="m-editor-history-list-item-saved" title="该记录为最近一次保存的状态">已保存</span>
 
       <span
+        v-if="!merged && (headRevertable || headDiffable || canHeadGoto)"
+        class="m-editor-history-list-item-actions"
+      >
+        <span
+          v-if="headRevertable"
+          class="m-editor-history-list-item-revert"
+          title="将该步骤的修改作为一次新操作反向应用（不影响后续历史）"
+          @click.stop="onRevertClick(group.subSteps[0].index)"
+          >回滚</span
+        >
+        <span
+          v-if="canHeadGoto"
+          class="m-editor-history-list-item-goto"
+          title="回到该记录"
+          @click.stop="onGotoClick(group.subSteps[0].index)"
+          >回到</span
+        >
+        <span
+          v-if="headDiffable"
+          class="m-editor-history-list-item-diff"
+          title="查看修改差异"
+          @click.stop="onDiffClick(group.subSteps[0].index)"
+          >查看差异</span
+        >
+      </span>
+
+      <span
         v-if="!merged && sourceLabel(group.source)"
         class="m-editor-history-list-item-source"
         :title="`操作途径：${sourceLabel(group.source)}`"
@@ -30,28 +57,6 @@
       >
 
       <span v-if="merged" class="m-editor-history-list-item-merge">合并 {{ stepCount }} 步</span>
-
-      <span
-        v-if="!merged && headRevertable"
-        class="m-editor-history-list-item-revert"
-        title="将该步骤的修改作为一次新操作反向应用（不影响后续历史）"
-        @click.stop="onRevertClick(group.subSteps[0].index)"
-        >回滚</span
-      >
-      <span
-        v-if="!merged && gotoEnabled && !group.isCurrent && group.subSteps.length"
-        class="m-editor-history-list-item-goto"
-        title="回到该记录"
-        @click.stop="onGotoClick(group.subSteps[0].index)"
-        >回到</span
-      >
-      <span
-        v-if="!merged && headDiffable"
-        class="m-editor-history-list-item-diff"
-        title="查看修改差异"
-        @click.stop="onDiffClick(group.subSteps[0].index)"
-        >查看差异</span
-      >
       <span v-if="merged" class="m-editor-history-list-group-toggle" :class="{ 'is-expanded': expanded }">▾</span>
     </div>
 
@@ -66,33 +71,38 @@
         <span class="m-editor-history-list-substep-desc">{{ s.desc }}</span>
         <span v-if="s.saved" class="m-editor-history-list-item-saved" title="该记录为最近一次保存的状态">已保存</span>
         <span
+          v-if="s.revertable || s.diffable || (gotoEnabled && !s.isCurrent)"
+          class="m-editor-history-list-item-actions"
+        >
+          <span
+            v-if="s.revertable"
+            class="m-editor-history-list-item-revert"
+            title="将该步骤的修改作为一次新操作反向应用（不影响后续历史）"
+            @click.stop="onRevertClick(s.index)"
+            >回滚</span
+          >
+          <span
+            v-if="gotoEnabled && !s.isCurrent"
+            class="m-editor-history-list-item-goto"
+            title="回到该记录"
+            @click.stop="onGotoClick(s.index)"
+            >回到</span
+          >
+          <span
+            v-if="s.diffable"
+            class="m-editor-history-list-item-diff"
+            title="查看修改差异"
+            @click.stop="onDiffClick(s.index)"
+            >查看差异</span
+          >
+        </span>
+        <span
           v-if="sourceLabel(s.source)"
           class="m-editor-history-list-item-source"
           :title="`操作途径：${sourceLabel(s.source)}`"
           >{{ sourceLabel(s.source) }}</span
         >
         <span v-if="s.time" class="m-editor-history-list-item-time" :title="s.timeTitle || s.time">{{ s.time }}</span>
-        <span
-          v-if="s.revertable"
-          class="m-editor-history-list-item-revert"
-          title="将该步骤的修改作为一次新操作反向应用（不影响后续历史）"
-          @click.stop="onRevertClick(s.index)"
-          >回滚</span
-        >
-        <span
-          v-if="gotoEnabled && !s.isCurrent"
-          class="m-editor-history-list-item-goto"
-          title="回到该记录"
-          @click.stop="onGotoClick(s.index)"
-          >回到</span
-        >
-        <span
-          v-if="s.diffable"
-          class="m-editor-history-list-item-diff"
-          title="查看修改差异"
-          @click.stop="onDiffClick(s.index)"
-          >查看差异</span
-        >
       </li>
     </ul>
   </li>
@@ -208,6 +218,11 @@ const headDiffable = computed(() => !merged.value && Boolean(props.group.subStep
 
 /** 单步组头部是否展示"回滚"入口：要求该唯一子步本身可回滚（已应用）。 */
 const headRevertable = computed(() => !merged.value && Boolean(props.group.subSteps[0]?.revertable));
+
+/** 单步组头部是否展示"回到"入口：可跳转、非当前、且存在唯一子步。 */
+const canHeadGoto = computed(
+  () => !merged.value && props.gotoEnabled && !props.group.isCurrent && props.group.subSteps.length > 0,
+);
 
 /**
  * 合并组展开后的子步渲染顺序：与外层分组列表保持一致——倒序展示（最新的子步在最上方）。
