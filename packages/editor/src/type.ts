@@ -392,6 +392,9 @@ export interface MenuButton {
   items?: MenuButton[];
   /** 唯一标识，用于高亮 */
   id?: string | number;
+  buttonProps?: {
+    type?: string;
+  };
 }
 // #endregion MenuButton
 

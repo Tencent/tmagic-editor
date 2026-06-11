@@ -9,6 +9,8 @@ import { mount } from '@vue/test-utils';
 
 import PageBar from '@editor/layouts/page-bar/PageBar.vue';
 
+const { messageBoxConfirm } = vi.hoisted(() => ({ messageBoxConfirm: vi.fn(async () => undefined) }));
+
 const editorState = {
   page: ref<any>({ id: 'p1' }),
   root: ref<any>({
@@ -120,6 +122,7 @@ vi.mock('@tmagic/design', () => ({
       return () => h('div', { class: 'fake-popover' }, [slots.reference?.(), slots.default?.()]);
     },
   }),
+  tMagicMessageBox: { confirm: messageBoxConfirm },
 }));
 
 beforeEach(() => {
@@ -171,6 +174,7 @@ describe('PageBar.vue', () => {
     const wrapper = factory();
     const removeBtn = wrapper.findAll('.remove')[0];
     await removeBtn.trigger('click');
+    expect(messageBoxConfirm).toHaveBeenCalledWith('确定删除该页面吗？');
     expect(editorService.remove).toHaveBeenCalled();
   });
 

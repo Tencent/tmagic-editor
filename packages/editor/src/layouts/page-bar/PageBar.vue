@@ -51,6 +51,7 @@
                   type: 'button',
                   text: '删除',
                   icon: Delete,
+                  buttonProps: { type: 'danger' },
                   handler: () => remove(item),
                 }"
               ></ToolButton>
@@ -72,7 +73,7 @@ import { computed, ref, useTemplateRef, watch } from 'vue';
 import { CaretBottom, Delete, DocumentCopy } from '@element-plus/icons-vue';
 
 import { type Id, type MPage, type MPageFragment, NodeType } from '@tmagic/core';
-import { TMagicIcon, TMagicPopover } from '@tmagic/design';
+import { TMagicIcon, tMagicMessageBox, TMagicPopover } from '@tmagic/design';
 
 import ToolButton from '@editor/components/ToolButton.vue';
 import { useServices } from '@editor/hooks/use-services';
@@ -140,7 +141,8 @@ const copy = (node: MPage | MPageFragment) => {
   });
 };
 
-const remove = (node: MPage | MPageFragment) => {
+const remove = async (node: MPage | MPageFragment) => {
+  await tMagicMessageBox.confirm('确定删除该页面吗？');
   editorService.remove(node);
 };
 
