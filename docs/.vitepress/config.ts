@@ -201,7 +201,16 @@ export default defineConfig({
             },
             {
               text: 'uiService',
-              link: '/api/editor/uiServiceMethods.md',
+              items: [
+                {
+                  text: '方法',
+                  link: '/api/editor/uiServiceMethods.md',
+                },
+                {
+                  text: '事件',
+                  link: '/api/editor/uiServiceEvents.md',
+                },
+              ],
             },
             {
               text: 'codeBlockService',

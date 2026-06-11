@@ -13,7 +13,7 @@
 
 - **详情：**
 
-  设置UI服务的状态
+  设置UI服务的状态。新值与旧值不同时会触发 [`state-change`](./uiServiceEvents.md#state-change) 事件
   
   可用的状态键：
   - `uiSelectMode`: UI选择模式
@@ -31,6 +31,7 @@
   - `showPageListButton`: 是否显示页面列表按钮
   - `hideSlideBar`: 是否隐藏侧边栏
   - `sideBarItems`: 侧边栏项目
+  - `sideBarActiveTabName`: 当前激活的侧边栏面板
   - `navMenuRect`: 导航菜单尺寸
   - `frameworkRect`: 框架尺寸
 

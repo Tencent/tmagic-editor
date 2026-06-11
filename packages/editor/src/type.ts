@@ -312,6 +312,8 @@ export interface UiState {
   hideSlideBar: boolean;
   /** 侧边栏面板配置 */
   sideBarItems: SideComponent[];
+  /** 当前激活的侧边栏面板 */
+  sideBarActiveTabName: string;
 
   // navMenu 的宽高
   navMenuRect: {

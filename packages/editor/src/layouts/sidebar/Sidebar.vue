@@ -239,7 +239,12 @@ const unWatchEditorContentHeight = watch(
   },
 );
 
-const activeTabName = ref(props.data?.status);
+const activeTabName = computed<string>({
+  get: () => uiService.get('sideBarActiveTabName'),
+  set: (value) => uiService.set('sideBarActiveTabName', value),
+});
+
+uiService.set('sideBarActiveTabName', props.data?.status || '');
 
 const getItemConfig = (data: SideItem): SideComponent => {
   const map: Record<string, SideComponent> = {

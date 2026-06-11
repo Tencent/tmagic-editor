@@ -4,15 +4,18 @@
  * Copyright (C) 2025 Tencent.
  */
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { defineComponent, h, nextTick } from 'vue';
+import { defineComponent, h, nextTick, reactive } from 'vue';
 import { mount } from '@vue/test-utils';
 
 import Sidebar from '@editor/layouts/sidebar/Sidebar.vue';
 
 const depService = { get: vi.fn(() => false) };
+const uiState: Record<string, any> = reactive({});
 const uiService = {
-  get: vi.fn(() => ({ left: 200 })),
-  set: vi.fn(),
+  get: vi.fn((name: string) => (name === 'sideBarActiveTabName' ? uiState.sideBarActiveTabName : { left: 200 })),
+  set: vi.fn((name: string, value: any) => {
+    uiState[name] = value;
+  }),
 };
 const propsService = {
   getDisabledDataSource: vi.fn(() => false),
@@ -91,7 +94,10 @@ beforeEach(() => {
   vi.clearAllMocks();
   propsService.getDisabledDataSource.mockReturnValue(false);
   propsService.getDisabledCodeBlock.mockReturnValue(false);
-  uiService.get.mockReturnValue({ left: 200 });
+  Object.keys(uiState).forEach((key) => delete uiState[key]);
+  uiService.get.mockImplementation((name: string) =>
+    name === 'sideBarActiveTabName' ? uiState.sideBarActiveTabName : { left: 200 },
+  );
 });
 
 const baseProps = (extra: any = {}) => ({

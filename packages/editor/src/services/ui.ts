@@ -62,6 +62,7 @@ const state = shallowReactive<UiState>({
   showPageListButton: true,
   hideSlideBar: false,
   sideBarItems: [],
+  sideBarActiveTabName: '',
   navMenuRect: {
     left: 0,
     top: 0,
@@ -104,7 +105,13 @@ class Ui extends BaseService {
       mask?.showRule(value as unknown as boolean);
     }
 
+    const preValue = state[name];
+
     state[name] = value;
+
+    if (preValue !== value) {
+      this.emit('state-change', name, value, preValue);
+    }
   }
 
   public get<K extends keyof UiState>(name: K) {
