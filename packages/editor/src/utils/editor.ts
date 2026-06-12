@@ -375,11 +375,18 @@ export const fixNodePosition = (config: MNode, parent: MContainer, stage: StageC
     return config.style;
   }
 
-  return {
-    ...(config.style || {}),
-    top: getMiddleTop(config, parent, stage),
-    left: fixNodeLeft(config, parent, stage?.renderer?.contentWindow?.document),
-  };
+  const style = { ...(config.style || {}) };
+  const baseStyle = config.style || {};
+
+  if ('left' in baseStyle && !('right' in baseStyle)) {
+    style.left = fixNodeLeft(config, parent, stage?.renderer?.contentWindow?.document);
+  }
+
+  if ('top' in baseStyle && !('bottom' in baseStyle)) {
+    style.top = getMiddleTop(config, parent, stage);
+  }
+
+  return style;
 };
 
 // 序列化配置

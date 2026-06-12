@@ -1105,6 +1105,40 @@ describe('补充：fixNodeLeft / fixNodePosition / serializeConfig', () => {
     expect(result).toBeDefined();
   });
 
+  test('fixNodePosition - 仅设置 right 时不修正 left', () => {
+    const style = { position: 'absolute', right: 10 } as any;
+    const result = editor.fixNodePosition({ id: 'a', style } as any, { id: 'p', items: [] } as any, null);
+    expect(result).toEqual(style);
+    expect(result?.left).toBeUndefined();
+  });
+
+  test('fixNodePosition - 仅设置 bottom 时不修正 top', () => {
+    const style = { position: 'absolute', bottom: 20 } as any;
+    const result = editor.fixNodePosition({ id: 'a', style } as any, { id: 'p', items: [] } as any, null);
+    expect(result).toEqual(style);
+    expect(result?.top).toBeUndefined();
+  });
+
+  test('fixNodePosition - 设置 left 且无 right 时修正 left', () => {
+    const doc = document.implementation.createHTMLDocument();
+    const parent = doc.createElement('div');
+    parent.dataset.tmagicId = 'p3';
+    Object.defineProperty(parent, 'offsetWidth', { value: 100 });
+    const child = doc.createElement('div');
+    child.dataset.tmagicId = 'a3';
+    Object.defineProperty(child, 'offsetWidth', { value: 80 });
+    parent.appendChild(child);
+    doc.body.appendChild(parent);
+
+    const stage = { renderer: { contentWindow: { document: doc } } } as any;
+    const result = editor.fixNodePosition(
+      { id: 'a3', style: { position: 'absolute', left: 50 } } as any,
+      { id: 'p3', items: [] } as any,
+      stage,
+    );
+    expect(result?.left).toBe(20);
+  });
+
   test('serializeConfig - 输出去掉了 key 引号', () => {
     const out = editor.serializeConfig({ a: 1 });
     expect(out).toContain('a:');
