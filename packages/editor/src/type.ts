@@ -737,6 +737,14 @@ export type HistoryOpSource =
   | (string & {});
 // #endregion HistoryOpSource
 
+// #region DslOpWithHistoryIdsResult
+/** *AndGetHistoryId 系列方法返回值：原操作结果 + 本次写入历史记录的 uuid 列表（未入栈时为 `[]`）。 */
+export type DslOpWithHistoryIdsResult<T> = {
+  result: T;
+  historyIds: string[];
+};
+// #endregion DslOpWithHistoryIdsResult
+
 // #region StepDiffItem
 /**
  * 单条变更的 diff 描述，统一表达「页面节点 / 代码块 / 数据源」的变化内容，

@@ -276,3 +276,6 @@ export const getOrCreateStack = <T>(stacks: Record<Id, UndoRedo<T>>, id: Id): Un
 export const undoFloor = (undoRedo: UndoRedo<StepValue>): number => {
   return undoRedo.getElementList()[0]?.opType === 'initial' ? 1 : 0;
 };
+
+/** 将单次 push 产生的 history uuid（或 null）转为 *AndGetHistoryId 返回用的 uuid 列表。 */
+export const getLastPushedHistoryIds = (historyId: string | null): string[] => (historyId ? [historyId] : []);

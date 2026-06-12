@@ -42,6 +42,7 @@ import type {
   AsyncHookPlugin,
   AsyncMethodName,
   DslOpOptions,
+  DslOpWithHistoryIdsResult,
   EditorEvents,
   EditorNodeInfo,
   HistoryOpSource,
@@ -73,6 +74,7 @@ import {
   setLayout,
   toggleFixedPosition,
 } from '@editor/utils/editor';
+import { getLastPushedHistoryIds } from '@editor/utils/history';
 import { beforePaste, getAddParent } from '@editor/utils/operator';
 
 type MoveItem = { node: MNode; parent: MContainer; pageForOp: { name: string; id: Id } | null };
@@ -1236,34 +1238,34 @@ class Editor extends BaseService {
   // #region AndGetHistoryId
   /**
    * 下列 *AndGetHistoryId 方法与对应的普通操作（add / remove / update ...）行为完全一致，
-   * 唯一区别是返回值为本次写入历史栈的历史记录 uuid（{@link StepValue.uuid}），
-   * 而非节点 / 节点数组。可用于精确引用 / 定位该条历史记录（埋点、revert、跨端同步等）。
+   * 返回值在 {@link DslOpWithHistoryIdsResult} 中同时包含原操作结果与本次写入历史栈的 uuid 列表（{@link StepValue.uuid}），
+   * 可用于精确引用 / 定位该条历史记录（埋点、revert、跨端同步等）。
    *
-   * 当本次操作未写入历史（doNotPushHistory 为 true、或操作无实际变更 / 提前返回）时返回 null。
+   * 当本次操作未写入历史（doNotPushHistory 为 true、或操作无实际变更 / 提前返回）时 historyIds 为 `[]`。
    */
 
-  /** 等价于 {@link add}，但返回本次写入历史记录的 uuid（未入栈时返回 null）。 */
+  /** 等价于 {@link add}，并额外返回本次写入历史记录的 uuid 列表（未入栈时 historyIds 为 `[]`）。 */
   public async addAndGetHistoryId(
     addNode: AddMNode | MNode[],
     parent?: MContainer | null,
     options: DslOpOptions = {},
-  ): Promise<string | null> {
+  ): Promise<DslOpWithHistoryIdsResult<MNode | MNode[]>> {
     this.lastPushedHistoryId = null;
-    await this.add(addNode, parent, options);
-    return this.lastPushedHistoryId;
+    const result = await this.add(addNode, parent, options);
+    return { result, historyIds: getLastPushedHistoryIds(this.lastPushedHistoryId) };
   }
 
-  /** 等价于 {@link remove}，但返回本次写入历史记录的 uuid（未入栈时返回 null）。 */
+  /** 等价于 {@link remove}，并额外返回本次写入历史记录的 uuid 列表（未入栈时 historyIds 为 `[]`）。 */
   public async removeAndGetHistoryId(
     nodeOrNodeList: MNode | MNode[],
     options: DslOpOptions = {},
-  ): Promise<string | null> {
+  ): Promise<DslOpWithHistoryIdsResult<void>> {
     this.lastPushedHistoryId = null;
     await this.remove(nodeOrNodeList, options);
-    return this.lastPushedHistoryId;
+    return { result: undefined, historyIds: getLastPushedHistoryIds(this.lastPushedHistoryId) };
   }
 
-  /** 等价于 {@link update}，但返回本次写入历史记录的 uuid（未入栈时返回 null）。 */
+  /** 等价于 {@link update}，并额外返回本次写入历史记录的 uuid 列表（未入栈时 historyIds 为 `[]`）。 */
   public async updateAndGetHistoryId(
     config: MNode | MNode[],
     data: {
@@ -1273,43 +1275,43 @@ class Editor extends BaseService {
       historyDescription?: string;
       historySource?: HistoryOpSource;
     } = {},
-  ): Promise<string | null> {
+  ): Promise<DslOpWithHistoryIdsResult<MNode | MNode[]>> {
     this.lastPushedHistoryId = null;
-    await this.update(config, data);
-    return this.lastPushedHistoryId;
+    const result = await this.update(config, data);
+    return { result, historyIds: getLastPushedHistoryIds(this.lastPushedHistoryId) };
   }
 
-  /** 等价于 {@link moveLayer}，但返回本次写入历史记录的 uuid（未入栈时返回 null）。 */
+  /** 等价于 {@link moveLayer}，并额外返回本次写入历史记录的 uuid 列表（未入栈时 historyIds 为 `[]`）。 */
   public async moveLayerAndGetHistoryId(
     offset: number | LayerOffset,
     options: DslOpOptions = {},
-  ): Promise<string | null> {
+  ): Promise<DslOpWithHistoryIdsResult<void>> {
     this.lastPushedHistoryId = null;
     await this.moveLayer(offset, options);
-    return this.lastPushedHistoryId;
+    return { result: undefined, historyIds: getLastPushedHistoryIds(this.lastPushedHistoryId) };
   }
 
-  /** 等价于 {@link moveToContainer}，但返回本次写入历史记录的 uuid（未入栈时返回 null）。 */
+  /** 等价于 {@link moveToContainer}，并额外返回本次写入历史记录的 uuid 列表（未入栈时 historyIds 为 `[]`）。 */
   public async moveToContainerAndGetHistoryId(
     config: MNode | MNode[],
     targetId: Id,
     options: DslOpOptions = {},
-  ): Promise<string | null> {
+  ): Promise<DslOpWithHistoryIdsResult<MNode | MNode[]>> {
     this.lastPushedHistoryId = null;
-    await this.moveToContainer(config, targetId, options);
-    return this.lastPushedHistoryId;
+    const result = await this.moveToContainer(config, targetId, options);
+    return { result, historyIds: getLastPushedHistoryIds(this.lastPushedHistoryId) };
   }
 
-  /** 等价于 {@link dragTo}，但返回本次写入历史记录的 uuid（未入栈时返回 null）。 */
+  /** 等价于 {@link dragTo}，并额外返回本次写入历史记录的 uuid 列表（未入栈时 historyIds 为 `[]`）。 */
   public async dragToAndGetHistoryId(
     config: MNode | MNode[],
     targetParent: MContainer,
     targetIndex: number,
     options: DslOpOptions = {},
-  ): Promise<string | null> {
+  ): Promise<DslOpWithHistoryIdsResult<void>> {
     this.lastPushedHistoryId = null;
     await this.dragTo(config, targetParent, targetIndex, options);
-    return this.lastPushedHistoryId;
+    return { result: undefined, historyIds: getLastPushedHistoryIds(this.lastPushedHistoryId) };
   }
   // #endregion AndGetHistoryId
 
@@ -1451,17 +1453,19 @@ class Editor extends BaseService {
   }
 
   /**
-   * 通过历史记录 uuid 回滚当前页面的某条历史步骤，语义与 {@link revertPageStep} 完全一致，
-   * 仅入参从 index 改为 uuid（{@link StepValue.uuid}）。uuid 不随栈内步骤增删而变化，
-   * 更适合业务侧持有引用后再回滚（埋点、跨端同步等场景）。
+   * 通过历史记录 uuid 回滚当前页面的历史步骤，语义与 {@link revertPageStep} 完全一致，
+   * 仅入参从 index 改为 uuid 列表（{@link StepValue.uuid}）。按数组顺序依次回滚，
+   * 返回与入参同序的结果列表（某项失败时为 `null`）。
    *
-   * @param uuid 目标历史记录的 uuid，通常由 *AndGetHistoryId 方法返回
-   * @returns 反向后产生的新 step；找不到对应 uuid / 未应用 / 反向失败时返回 null
+   * @param uuids 目标历史记录的 uuid 列表，通常由 *AndGetHistoryId 方法返回的 `historyIds`
    */
-  public async revertPageStepById(uuid: string): Promise<StepValue | null> {
-    const index = historyService.getPageStepIndexByUuid(uuid);
-    if (index < 0) return null;
-    return this.revertPageStep(index);
+  public async revertPageStepById(uuids: string[]): Promise<(StepValue | null)[]> {
+    const results: (StepValue | null)[] = [];
+    for (const uuid of uuids) {
+      const index = historyService.getPageStepIndexByUuid(uuid);
+      results.push(index < 0 ? null : await this.revertPageStep(index));
+    }
+    return results;
   }
 
   /**

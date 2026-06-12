@@ -32,13 +32,14 @@ import type {
   AsyncHookPlugin,
   CodeBlockStepValue,
   CodeState,
+  DslOpWithHistoryIdsResult,
   HistoryOpOptions,
   HistoryOpOptionsWithChangeRecords,
 } from '@editor/type';
 import { CODE_DRAFT_STORAGE_KEY } from '@editor/type';
 import { getEditorConfig } from '@editor/utils/config';
 import { COPY_CODE_STORAGE_KEY } from '@editor/utils/editor';
-import { describeRevertStep } from '@editor/utils/history';
+import { describeRevertStep, getLastPushedHistoryIds } from '@editor/utils/history';
 
 import BaseService from './BaseService';
 
@@ -321,43 +322,46 @@ class CodeBlock extends BaseService {
   // #region AndGetHistoryId
   /**
    * 下列 *AndGetHistoryId 方法与对应的写入方法行为完全一致，
-   * 唯一区别是返回值为本次写入历史栈的历史记录 uuid（{@link CodeBlockStepValue.uuid}），
+   * 返回值在 {@link DslOpWithHistoryIdsResult} 中同时包含原操作结果与本次写入的历史 uuid 列表，
    * 可用于精确引用 / 定位该条历史记录（埋点、revert、跨端同步等）。
    *
-   * 当本次操作未写入历史（doNotPushHistory 为 true、或无对应记录）时：单条写入返回 null，批量删除返回空数组。
+   * 当本次操作未写入历史（doNotPushHistory 为 true、或无对应记录）时 historyIds 为 `[]`。
    */
 
-  /** 等价于 {@link setCodeDslById}，但返回本次写入历史记录的 uuid（未入栈时返回 null）。 */
+  /** 等价于 {@link setCodeDslById}，并额外返回本次写入历史记录的 uuid 列表（未入栈时 historyIds 为 `[]`）。 */
   public async setCodeDslByIdAndGetHistoryId(
     id: Id,
     codeConfig: Partial<CodeBlockContent>,
     options: HistoryOpOptionsWithChangeRecords = {},
-  ): Promise<string | null> {
+  ): Promise<DslOpWithHistoryIdsResult<void>> {
     this.lastPushedHistoryId = null;
     await this.setCodeDslById(id, codeConfig, options);
-    return this.lastPushedHistoryId;
+    return { result: undefined, historyIds: getLastPushedHistoryIds(this.lastPushedHistoryId) };
   }
 
-  /** 等价于 {@link setCodeDslByIdSync}，但返回本次写入历史记录的 uuid（未入栈时返回 null）。 */
+  /** 等价于 {@link setCodeDslByIdSync}，并额外返回本次写入历史记录的 uuid 列表（未入栈时 historyIds 为 `[]`）。 */
   public setCodeDslByIdSyncAndGetHistoryId(
     id: Id,
     codeConfig: Partial<CodeBlockContent>,
     force = true,
     options: HistoryOpOptionsWithChangeRecords = {},
-  ): string | null {
+  ): DslOpWithHistoryIdsResult<void> {
     this.lastPushedHistoryId = null;
     this.setCodeDslByIdSync(id, codeConfig, force, options);
-    return this.lastPushedHistoryId;
+    return { result: undefined, historyIds: getLastPushedHistoryIds(this.lastPushedHistoryId) };
   }
 
   /**
-   * 等价于 {@link deleteCodeDslByIds}，但返回本次写入的全部历史记录 uuid（按删除顺序）。
-   * 一次删除多个代码块会产生多条历史记录，因此返回数组；未写入任何历史时返回空数组。
+   * 等价于 {@link deleteCodeDslByIds}，并额外返回本次写入的全部历史记录 uuid（按删除顺序）。
+   * 一次删除多个代码块会产生多条历史记录；未写入任何历史时 historyIds 为 `[]`。
    */
-  public async deleteCodeDslByIdsAndGetHistoryId(codeIds: Id[], options: HistoryOpOptions = {}): Promise<string[]> {
+  public async deleteCodeDslByIdsAndGetHistoryId(
+    codeIds: Id[],
+    options: HistoryOpOptions = {},
+  ): Promise<DslOpWithHistoryIdsResult<void>> {
     this.lastDeletedHistoryIds = [];
     await this.deleteCodeDslByIds(codeIds, options);
-    return [...this.lastDeletedHistoryIds];
+    return { result: undefined, historyIds: [...this.lastDeletedHistoryIds] };
   }
   // #endregion AndGetHistoryId
 
@@ -455,17 +459,19 @@ class CodeBlock extends BaseService {
   }
 
   /**
-   * 通过历史记录 uuid 回滚某条代码块历史步骤，语义同 {@link revert}，
-   * 仅无需调用方再传 codeBlockId 与 index：内部会按 uuid（{@link CodeBlockStepValue.uuid}）
-   * 在全部代码块栈中定位对应步骤后再回滚。
+   * 通过历史记录 uuid 回滚代码块历史步骤，语义同 {@link revert}，
+   * 仅无需调用方再传 codeBlockId 与 index：内部会按 uuid 在全部代码块栈中定位对应步骤后再回滚。
+   * 按数组顺序依次回滚，返回与入参同序的结果列表（某项失败时为 `null`）。
    *
-   * @param uuid 目标历史记录的 uuid，通常由 {@link setCodeDslByIdAndGetHistoryId} 等方法返回
-   * @returns 反向后产生的新 step；找不到对应 uuid / 未应用时返回 null
+   * @param uuids 目标历史记录的 uuid 列表，通常由 {@link setCodeDslByIdAndGetHistoryId} 等方法返回的 `historyIds`
    */
-  public async revertById(uuid: string): Promise<CodeBlockStepValue | null> {
-    const location = historyService.findCodeBlockStepLocationByUuid(uuid);
-    if (!location) return null;
-    return await this.revert(location.id, location.index);
+  public async revertById(uuids: string[]): Promise<(CodeBlockStepValue | null)[]> {
+    const results: (CodeBlockStepValue | null)[] = [];
+    for (const uuid of uuids) {
+      const location = historyService.findCodeBlockStepLocationByUuid(uuid);
+      results.push(location ? await this.revert(location.id, location.index) : null);
+    }
+    return results;
   }
 
   /**

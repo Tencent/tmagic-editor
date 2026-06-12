@@ -240,39 +240,39 @@ describe('CodeBlockService - *AndGetHistoryId', () => {
   test('setCodeDslByIdSyncAndGetHistoryId 返回本次写入历史记录的 uuid', async () => {
     await codeBlockService.setCodeDsl({} as any);
 
-    const historyId = codeBlockService.setCodeDslByIdSyncAndGetHistoryId('a', { name: 'A' } as any);
-    expect(typeof historyId).toBe('string');
-    expect(historyId).toBe(lastStepUuid('a'));
+    const { historyIds } = codeBlockService.setCodeDslByIdSyncAndGetHistoryId('a', { name: 'A' } as any);
+    expect(historyIds).toHaveLength(1);
+    expect(historyIds[0]).toBe(lastStepUuid('a'));
     // 与默认行为一致：内容仍被写入
     expect(codeBlockService.getCodeContentById('a')?.name).toBe('A');
   });
 
-  test('setCodeDslByIdSyncAndGetHistoryId - force=false 已存在时返回 null', async () => {
+  test('setCodeDslByIdSyncAndGetHistoryId - force=false 已存在时返回空数组', async () => {
     await codeBlockService.setCodeDsl({ a: { name: 'A' } } as any);
-    const historyId = codeBlockService.setCodeDslByIdSyncAndGetHistoryId('a', { name: 'NEW' } as any, false);
-    expect(historyId).toBeNull();
+    const { historyIds } = codeBlockService.setCodeDslByIdSyncAndGetHistoryId('a', { name: 'NEW' } as any, false);
+    expect(historyIds).toEqual([]);
   });
 
-  test('setCodeDslByIdSyncAndGetHistoryId - doNotPushHistory 时返回 null', async () => {
+  test('setCodeDslByIdSyncAndGetHistoryId - doNotPushHistory 时返回空数组', async () => {
     await codeBlockService.setCodeDsl({} as any);
-    const historyId = codeBlockService.setCodeDslByIdSyncAndGetHistoryId('a', { name: 'A' } as any, true, {
+    const { historyIds } = codeBlockService.setCodeDslByIdSyncAndGetHistoryId('a', { name: 'A' } as any, true, {
       doNotPushHistory: true,
     });
-    expect(historyId).toBeNull();
+    expect(historyIds).toEqual([]);
   });
 
   test('setCodeDslByIdAndGetHistoryId（async）返回本次写入历史记录的 uuid', async () => {
     await codeBlockService.setCodeDsl({} as any);
 
-    const historyId = await codeBlockService.setCodeDslByIdAndGetHistoryId('a', { name: 'A' } as any);
-    expect(typeof historyId).toBe('string');
-    expect(historyId).toBe(lastStepUuid('a'));
+    const { historyIds } = await codeBlockService.setCodeDslByIdAndGetHistoryId('a', { name: 'A' } as any);
+    expect(historyIds).toHaveLength(1);
+    expect(historyIds[0]).toBe(lastStepUuid('a'));
   });
 
   test('deleteCodeDslByIdsAndGetHistoryId 返回每条删除记录的 uuid 数组', async () => {
     await codeBlockService.setCodeDsl({ a: { name: 'A' }, b: { name: 'B' } } as any);
 
-    const historyIds = await codeBlockService.deleteCodeDslByIdsAndGetHistoryId(['a', 'b']);
+    const { historyIds } = await codeBlockService.deleteCodeDslByIdsAndGetHistoryId(['a', 'b']);
     expect(Array.isArray(historyIds)).toBe(true);
     expect(historyIds).toHaveLength(2);
     expect(historyIds[0]).toBe(lastStepUuid('a'));
@@ -282,14 +282,14 @@ describe('CodeBlockService - *AndGetHistoryId', () => {
   test('deleteCodeDslByIdsAndGetHistoryId - 不存在的 id 不计入返回数组', async () => {
     await codeBlockService.setCodeDsl({ a: { name: 'A' } } as any);
 
-    const historyIds = await codeBlockService.deleteCodeDslByIdsAndGetHistoryId(['a', 'ghost']);
+    const { historyIds } = await codeBlockService.deleteCodeDslByIdsAndGetHistoryId(['a', 'ghost']);
     expect(historyIds).toHaveLength(1);
     expect(historyIds[0]).toBe(lastStepUuid('a'));
   });
 
   test('deleteCodeDslByIdsAndGetHistoryId - 全部不存在时返回空数组', async () => {
     await codeBlockService.setCodeDsl({} as any);
-    const historyIds = await codeBlockService.deleteCodeDslByIdsAndGetHistoryId(['ghost']);
+    const { historyIds } = await codeBlockService.deleteCodeDslByIdsAndGetHistoryId(['ghost']);
     expect(historyIds).toEqual([]);
   });
 });
@@ -297,20 +297,21 @@ describe('CodeBlockService - *AndGetHistoryId', () => {
 describe('CodeBlockService - revertById', () => {
   test('通过 uuid 回滚新增（删除代码块内容）', async () => {
     await codeBlockService.setCodeDsl({} as any);
-    const uuid = codeBlockService.setCodeDslByIdSyncAndGetHistoryId('a', { name: 'A' } as any);
+    const { historyIds } = codeBlockService.setCodeDslByIdSyncAndGetHistoryId('a', { name: 'A' } as any);
+    const uuid = historyIds[0];
     expect(typeof uuid).toBe('string');
     expect(codeBlockService.getCodeContentById('a')?.name).toBe('A');
 
-    const reverted = await codeBlockService.revertById(uuid!);
-    expect(reverted).not.toBeNull();
+    const reverted = await codeBlockService.revertById([uuid!]);
+    expect(reverted[0]).not.toBeNull();
     expect(codeBlockService.getCodeContentById('a')).toBeNull();
   });
 
   test('按 uuid 能定位到对应 (id, index)', async () => {
     await codeBlockService.setCodeDsl({} as any);
-    const uuid = codeBlockService.setCodeDslByIdSyncAndGetHistoryId('a', { name: 'A' } as any);
+    const { historyIds } = codeBlockService.setCodeDslByIdSyncAndGetHistoryId('a', { name: 'A' } as any);
 
-    const location = historyService.findCodeBlockStepLocationByUuid(uuid!);
+    const location = historyService.findCodeBlockStepLocationByUuid(historyIds[0]!);
     expect(location).toEqual({ id: 'a', index: 0 });
   });
 
@@ -318,8 +319,21 @@ describe('CodeBlockService - revertById', () => {
     await codeBlockService.setCodeDsl({} as any);
     codeBlockService.setCodeDslByIdSyncAndGetHistoryId('a', { name: 'A' } as any);
 
-    await expect(codeBlockService.revertById('not-exist')).resolves.toBeNull();
-    await expect(codeBlockService.revertById('')).resolves.toBeNull();
+    await expect(codeBlockService.revertById(['not-exist'])).resolves.toEqual([null]);
+    await expect(codeBlockService.revertById([''])).resolves.toEqual([null]);
+  });
+
+  test('支持传入 uuid 数组并按顺序回滚', async () => {
+    await codeBlockService.setCodeDsl({} as any);
+    const { historyIds: ids1 } = codeBlockService.setCodeDslByIdSyncAndGetHistoryId('a', { name: 'A' } as any);
+    const { historyIds: ids2 } = codeBlockService.setCodeDslByIdSyncAndGetHistoryId('b', { name: 'B' } as any);
+
+    const reverted = await codeBlockService.revertById([ids1[0]!, ids2[0]!]);
+    expect(reverted).toHaveLength(2);
+    expect(reverted[0]).not.toBeNull();
+    expect(reverted[1]).not.toBeNull();
+    expect(codeBlockService.getCodeContentById('a')).toBeNull();
+    expect(codeBlockService.getCodeContentById('b')).toBeNull();
   });
 });
 

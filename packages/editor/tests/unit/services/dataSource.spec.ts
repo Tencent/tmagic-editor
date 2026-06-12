@@ -197,39 +197,41 @@ describe('DataSource service - *AndGetHistoryId', () => {
     const ds = dataSource.add({ id: 'temp', title: 'a', type: 'base' } as any);
     historyService.reset();
 
-    const historyId = dataSource.addAndGetHistoryId({ id: 'ds_new', title: 'a', type: 'base' } as any);
-    expect(typeof historyId).toBe('string');
-    expect(historyId).toBe(lastStepUuid('ds_new'));
+    const { result, historyIds } = dataSource.addAndGetHistoryId({ id: 'ds_new', title: 'a', type: 'base' } as any);
+    expect(historyIds).toHaveLength(1);
+    expect(historyIds[0]).toBe(lastStepUuid('ds_new'));
+    expect(result.id).toBe('ds_new');
     // 与默认 add 行为一致：仍会写入数据源
     expect(dataSource.getDataSourceById('ds_new')).toBeDefined();
     expect(ds).toBeDefined();
   });
 
-  test('addAndGetHistoryId 传 doNotPushHistory 时返回 null', () => {
-    const historyId = dataSource.addAndGetHistoryId({ id: 'ds_x', title: 'a', type: 'base' } as any, {
+  test('addAndGetHistoryId 传 doNotPushHistory 时返回空数组', () => {
+    const { historyIds } = dataSource.addAndGetHistoryId({ id: 'ds_x', title: 'a', type: 'base' } as any, {
       doNotPushHistory: true,
     });
-    expect(historyId).toBeNull();
+    expect(historyIds).toEqual([]);
   });
 
   test('updateAndGetHistoryId 返回本次写入历史记录的 uuid', () => {
     const created = dataSource.add({ title: 'a', type: 'base' } as any);
     historyService.reset();
 
-    const historyId = dataSource.updateAndGetHistoryId({ ...created, title: 'b' } as any);
-    expect(typeof historyId).toBe('string');
-    expect(historyId).toBe(lastStepUuid(created.id!));
+    const { result, historyIds } = dataSource.updateAndGetHistoryId({ ...created, title: 'b' } as any);
+    expect(historyIds).toHaveLength(1);
+    expect(historyIds[0]).toBe(lastStepUuid(created.id!));
+    expect(result.title).toBe('b');
   });
 
-  test('removeAndGetHistoryId 返回本次写入历史记录的 uuid；不存在的 id 返回 null', () => {
+  test('removeAndGetHistoryId 返回本次写入历史记录的 uuid；不存在的 id 返回空数组', () => {
     const created = dataSource.add({ title: 'a', type: 'base' } as any);
     historyService.reset();
 
-    const historyId = dataSource.removeAndGetHistoryId(created.id!);
-    expect(typeof historyId).toBe('string');
-    expect(historyId).toBe(lastStepUuid(created.id!));
+    const { historyIds } = dataSource.removeAndGetHistoryId(created.id!);
+    expect(historyIds).toHaveLength(1);
+    expect(historyIds[0]).toBe(lastStepUuid(created.id!));
 
-    expect(dataSource.removeAndGetHistoryId('ghost')).toBeNull();
+    expect(dataSource.removeAndGetHistoryId('ghost').historyIds).toEqual([]);
   });
 });
 
@@ -240,8 +242,8 @@ describe('DataSource service - revertById', () => {
     expect(typeof uuid).toBe('string');
     expect(dataSource.getDataSourceById(created.id!)).toBeDefined();
 
-    const reverted = dataSource.revertById(uuid!);
-    expect(reverted).not.toBeNull();
+    const reverted = dataSource.revertById([uuid!]);
+    expect(reverted[0]).not.toBeNull();
     expect(dataSource.getDataSourceById(created.id!)).toBeUndefined();
   });
 
@@ -255,8 +257,22 @@ describe('DataSource service - revertById', () => {
 
   test('找不到 uuid 时返回 null', () => {
     dataSource.add({ title: 'a', type: 'base' } as any);
-    expect(dataSource.revertById('not-exist')).toBeNull();
-    expect(dataSource.revertById('')).toBeNull();
+    expect(dataSource.revertById(['not-exist'])).toEqual([null]);
+    expect(dataSource.revertById([''])).toEqual([null]);
+  });
+
+  test('支持传入 uuid 数组并按顺序回滚', () => {
+    const ds1 = dataSource.add({ title: 'a', type: 'base' } as any);
+    const ds2 = dataSource.add({ title: 'b', type: 'base' } as any);
+    const uuid1 = historyService.getDataSourceStepList(ds1.id!).slice(-1)[0]?.step.uuid;
+    const uuid2 = historyService.getDataSourceStepList(ds2.id!).slice(-1)[0]?.step.uuid;
+
+    const reverted = dataSource.revertById([uuid1!, uuid2!]);
+    expect(reverted).toHaveLength(2);
+    expect(reverted[0]).not.toBeNull();
+    expect(reverted[1]).not.toBeNull();
+    expect(dataSource.getDataSourceById(ds1.id!)).toBeUndefined();
+    expect(dataSource.getDataSourceById(ds2.id!)).toBeUndefined();
   });
 });
 

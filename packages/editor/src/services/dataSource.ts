@@ -13,13 +13,14 @@ import storageService, { Protocol } from '@editor/services/storage';
 import type {
   DataSourceStepValue,
   DatasourceTypeOption,
+  DslOpWithHistoryIdsResult,
   HistoryOpOptions,
   HistoryOpOptionsWithChangeRecords,
   SyncHookPlugin,
 } from '@editor/type';
 import { getFormConfig, getFormValue } from '@editor/utils/data-source';
 import { COPY_DS_STORAGE_KEY } from '@editor/utils/editor';
-import { describeRevertStep } from '@editor/utils/history';
+import { describeRevertStep, getLastPushedHistoryIds } from '@editor/utils/history';
 
 import BaseService from './BaseService';
 
@@ -224,34 +225,37 @@ class DataSource extends BaseService {
   // #region AndGetHistoryId
   /**
    * 下列 *AndGetHistoryId 方法与对应的 add / update / remove 行为完全一致，
-   * 唯一区别是返回值为本次写入历史栈的历史记录 uuid（{@link DataSourceStepValue.uuid}），
-   * 而非数据源配置。可用于精确引用 / 定位该条历史记录（埋点、revert、跨端同步等）。
+   * 返回值在 {@link DslOpWithHistoryIdsResult} 中同时包含原操作结果与本次写入历史栈的 uuid 列表（{@link DataSourceStepValue.uuid}），
+   * 可用于精确引用 / 定位该条历史记录（埋点、revert、跨端同步等）。
    *
-   * 当本次操作未写入历史（doNotPushHistory 为 true、或无对应记录）时返回 null。
+   * 当本次操作未写入历史（doNotPushHistory 为 true、或无对应记录）时 historyIds 为 `[]`。
    */
 
-  /** 等价于 {@link add}，但返回本次写入历史记录的 uuid（未入栈时返回 null）。 */
-  public addAndGetHistoryId(config: DataSourceSchema, options: HistoryOpOptions = {}): string | null {
+  /** 等价于 {@link add}，并额外返回本次写入历史记录的 uuid 列表（未入栈时 historyIds 为 `[]`）。 */
+  public addAndGetHistoryId(
+    config: DataSourceSchema,
+    options: HistoryOpOptions = {},
+  ): DslOpWithHistoryIdsResult<DataSourceSchema> {
     this.lastPushedHistoryId = null;
-    this.add(config, options);
-    return this.lastPushedHistoryId;
+    const result = this.add(config, options);
+    return { result, historyIds: getLastPushedHistoryIds(this.lastPushedHistoryId) };
   }
 
-  /** 等价于 {@link update}，但返回本次写入历史记录的 uuid（未入栈时返回 null）。 */
+  /** 等价于 {@link update}，并额外返回本次写入历史记录的 uuid 列表（未入栈时 historyIds 为 `[]`）。 */
   public updateAndGetHistoryId(
     config: DataSourceSchema,
     options: HistoryOpOptionsWithChangeRecords = {},
-  ): string | null {
+  ): DslOpWithHistoryIdsResult<DataSourceSchema> {
     this.lastPushedHistoryId = null;
-    this.update(config, options);
-    return this.lastPushedHistoryId;
+    const result = this.update(config, options);
+    return { result, historyIds: getLastPushedHistoryIds(this.lastPushedHistoryId) };
   }
 
-  /** 等价于 {@link remove}，但返回本次写入历史记录的 uuid（未入栈时返回 null）。 */
-  public removeAndGetHistoryId(id: string, options: HistoryOpOptions = {}): string | null {
+  /** 等价于 {@link remove}，并额外返回本次写入历史记录的 uuid 列表（未入栈时 historyIds 为 `[]`）。 */
+  public removeAndGetHistoryId(id: string, options: HistoryOpOptions = {}): DslOpWithHistoryIdsResult<void> {
     this.lastPushedHistoryId = null;
     this.remove(id, options);
-    return this.lastPushedHistoryId;
+    return { result: undefined, historyIds: getLastPushedHistoryIds(this.lastPushedHistoryId) };
   }
   // #endregion AndGetHistoryId
 
@@ -337,17 +341,18 @@ class DataSource extends BaseService {
   }
 
   /**
-   * 通过历史记录 uuid 回滚某条数据源历史步骤，语义同 {@link revert}，
-   * 仅无需调用方再传 dataSourceId 与 index：内部会按 uuid（{@link DataSourceStepValue.uuid}）
-   * 在全部数据源栈中定位对应步骤后再回滚。
+   * 通过历史记录 uuid 回滚数据源历史步骤，语义同 {@link revert}，
+   * 仅无需调用方再传 dataSourceId 与 index：内部会按 uuid 在全部数据源栈中定位对应步骤后再回滚。
+   * 按数组顺序依次回滚，返回与入参同序的结果列表（某项失败时为 `null`）。
    *
-   * @param uuid 目标历史记录的 uuid，通常由 {@link addAndGetHistoryId} 等方法返回
-   * @returns 反向后产生的新 step；找不到对应 uuid / 未应用时返回 null
+   * @param uuids 目标历史记录的 uuid 列表，通常由 {@link addAndGetHistoryId} 等方法返回的 `historyIds`
    */
-  public revertById(uuid: string): DataSourceStepValue | null {
-    const location = historyService.findDataSourceStepLocationByUuid(uuid);
-    if (!location) return null;
-    return this.revert(location.id, location.index);
+  public revertById(uuids: string[]): (DataSourceStepValue | null)[] {
+    return uuids.map((uuid) => {
+      const location = historyService.findDataSourceStepLocationByUuid(uuid);
+      if (!location) return null;
+      return this.revert(location.id, location.index);
+    });
   }
 
   public createId(): string {

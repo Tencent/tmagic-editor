@@ -834,19 +834,20 @@ describe('*AndGetHistoryId', () => {
     historyService.reset();
     await editorService.select(NodeId.PAGE_ID);
 
-    const historyId = await editorService.addAndGetHistoryId({ type: 'text' });
-    expect(typeof historyId).toBe('string');
-    expect(historyId).toBeTruthy();
-    expect(historyId).toBe(lastStepUuid());
+    const { result, historyIds } = await editorService.addAndGetHistoryId({ type: 'text' });
+    expect(result).toBeTruthy();
+    expect(historyIds).toHaveLength(1);
+    expect(historyIds[0]).toBeTruthy();
+    expect(historyIds[0]).toBe(lastStepUuid());
   });
 
-  test('addAndGetHistoryId 传 doNotPushHistory 时返回 null', async () => {
+  test('addAndGetHistoryId 传 doNotPushHistory 时返回空数组', async () => {
     editorService.set('root', cloneDeep(root));
     historyService.reset();
     await editorService.select(NodeId.PAGE_ID);
 
-    const historyId = await editorService.addAndGetHistoryId({ type: 'text' }, null, { doNotPushHistory: true });
-    expect(historyId).toBeNull();
+    const { historyIds } = await editorService.addAndGetHistoryId({ type: 'text' }, null, { doNotPushHistory: true });
+    expect(historyIds).toEqual([]);
   });
 
   test('updateAndGetHistoryId 返回本次写入历史记录的 uuid', async () => {
@@ -854,9 +855,14 @@ describe('*AndGetHistoryId', () => {
     historyService.reset();
     await editorService.select(NodeId.PAGE_ID);
 
-    const historyId = await editorService.updateAndGetHistoryId({ id: NodeId.NODE_ID, type: 'text', text: 'x' });
-    expect(typeof historyId).toBe('string');
-    expect(historyId).toBe(lastStepUuid());
+    const { result, historyIds } = await editorService.updateAndGetHistoryId({
+      id: NodeId.NODE_ID,
+      type: 'text',
+      text: 'x',
+    });
+    expect(result).toBeTruthy();
+    expect(historyIds).toHaveLength(1);
+    expect(historyIds[0]).toBe(lastStepUuid());
   });
 
   test('removeAndGetHistoryId 返回本次写入历史记录的 uuid', async () => {
@@ -864,9 +870,9 @@ describe('*AndGetHistoryId', () => {
     historyService.reset();
     await editorService.select(NodeId.PAGE_ID);
 
-    const historyId = await editorService.removeAndGetHistoryId({ id: NodeId.NODE_ID, type: 'text' });
-    expect(typeof historyId).toBe('string');
-    expect(historyId).toBe(lastStepUuid());
+    const { historyIds } = await editorService.removeAndGetHistoryId({ id: NodeId.NODE_ID, type: 'text' });
+    expect(historyIds).toHaveLength(1);
+    expect(historyIds[0]).toBe(lastStepUuid());
   });
 
   test('moveLayerAndGetHistoryId 返回本次写入历史记录的 uuid', async () => {
@@ -874,9 +880,9 @@ describe('*AndGetHistoryId', () => {
     historyService.reset();
     await editorService.select(NodeId.NODE_ID);
 
-    const historyId = await editorService.moveLayerAndGetHistoryId(1);
-    expect(typeof historyId).toBe('string');
-    expect(historyId).toBe(lastStepUuid());
+    const { historyIds } = await editorService.moveLayerAndGetHistoryId(1);
+    expect(historyIds).toHaveLength(1);
+    expect(historyIds[0]).toBe(lastStepUuid());
   });
 });
 
@@ -886,15 +892,16 @@ describe('revertPageStepById', () => {
     historyService.reset();
     await editorService.select(NodeId.PAGE_ID);
 
-    const uuid = await editorService.addAndGetHistoryId({ type: 'text' });
+    const { historyIds } = await editorService.addAndGetHistoryId({ type: 'text' });
+    const uuid = historyIds[0];
     expect(typeof uuid).toBe('string');
 
     const addedStep = historyService.getPageStepList().find((e) => e.step.uuid === uuid)!.step;
     const addedId = addedStep.diff[0].newSchema!.id;
     expect(editorService.getNodeById(addedId)).toBeTruthy();
 
-    const reverted = await editorService.revertPageStepById(uuid!);
-    expect(reverted).not.toBeNull();
+    const reverted = await editorService.revertPageStepById([uuid!]);
+    expect(reverted[0]).not.toBeNull();
     // 回滚（git revert 语义）会把被新增的节点删掉
     expect(editorService.getNodeById(addedId)).toBeNull();
   });
@@ -904,7 +911,8 @@ describe('revertPageStepById', () => {
     historyService.reset();
     await editorService.select(NodeId.PAGE_ID);
 
-    const uuid = await editorService.addAndGetHistoryId({ type: 'text' });
+    const { historyIds } = await editorService.addAndGetHistoryId({ type: 'text' });
+    const uuid = historyIds[0];
     const index = historyService.getPageStepIndexByUuid(uuid!);
     expect(index).toBeGreaterThanOrEqual(0);
   });
@@ -914,7 +922,27 @@ describe('revertPageStepById', () => {
     historyService.reset();
     await editorService.select(NodeId.PAGE_ID);
 
-    expect(await editorService.revertPageStepById('not-exist')).toBeNull();
-    expect(await editorService.revertPageStepById('')).toBeNull();
+    expect(await editorService.revertPageStepById(['not-exist'])).toEqual([null]);
+    expect(await editorService.revertPageStepById([''])).toEqual([null]);
+  });
+
+  test('支持传入 uuid 数组并按顺序回滚', async () => {
+    editorService.set('root', cloneDeep(root));
+    historyService.reset();
+    await editorService.select(NodeId.PAGE_ID);
+
+    const { historyIds: ids1 } = await editorService.addAndGetHistoryId({ type: 'text' });
+    const { historyIds: ids2 } = await editorService.addAndGetHistoryId({ type: 'text' });
+    const uuids = [ids1[0]!, ids2[0]!];
+
+    const addedId1 = historyService.getPageStepList().find((e) => e.step.uuid === uuids[0])!.step.diff[0].newSchema!.id;
+    const addedId2 = historyService.getPageStepList().find((e) => e.step.uuid === uuids[1])!.step.diff[0].newSchema!.id;
+
+    const reverted = await editorService.revertPageStepById(uuids);
+    expect(reverted).toHaveLength(2);
+    expect(reverted[0]).not.toBeNull();
+    expect(reverted[1]).not.toBeNull();
+    expect(editorService.getNodeById(addedId1)).toBeNull();
+    expect(editorService.getNodeById(addedId2)).toBeNull();
   });
 });

@@ -411,11 +411,13 @@ dataSourceService.remove("ds_123");
 - **参数：** 同 [add](#add)
 
 - **返回：**
-  - {`string` | null} 本次写入历史记录的 uuid；未写入历史（`doNotPushHistory: true` 等）时返回 `null`
+  - {[`DslOpWithHistoryIdsResult<DataSourceSchema>`](./editorServiceMethods.md#历史记录-uuid-与-andgethistoryid)}
+    - `result`：同 [add](#add) 的返回值（新增的数据源配置）
+    - `historyIds`：本次写入历史记录的 uuid 列表；未写入历史（`doNotPushHistory: true` 等）时为 `[]`
 
 - **详情：**
 
-  与 [add](#add) 行为完全一致，仅把返回值换成本次写入历史记录的 `uuid`，可用于精确引用 / 定位该条历史记录。
+  与 [add](#add) 行为完全一致，并在返回值中额外提供 `historyIds`，可用于精确引用 / 定位该条历史记录。
   参见 [editorService 历史记录 uuid 与 \*AndGetHistoryId](./editorServiceMethods.md#历史记录-uuid-与-andgethistoryid)。
 
 - **示例：**
@@ -423,12 +425,13 @@ dataSourceService.remove("ds_123");
 ```js
 import { dataSourceService } from "@tmagic/editor";
 
-const historyId = dataSourceService.addAndGetHistoryId({
+const { result, historyIds } = dataSourceService.addAndGetHistoryId({
   type: "http",
   title: "用户信息",
   url: "/api/user",
 });
-console.log(historyId); // 本次新增对应的历史记录 uuid，或 null
+console.log(result); // 新增的数据源配置
+console.log(historyIds); // 本次新增对应的历史记录 uuid 列表，或 []
 ```
 
 ## updateAndGetHistoryId
@@ -436,35 +439,38 @@ console.log(historyId); // 本次新增对应的历史记录 uuid，或 null
 - **参数：** 同 [update](#update)
 
 - **返回：**
-  - {`string` | null} 本次写入历史记录的 uuid；未写入历史时返回 `null`
+  - {[`DslOpWithHistoryIdsResult<DataSourceSchema>`](./editorServiceMethods.md#历史记录-uuid-与-andgethistoryid)}
+    - `result`：同 [update](#update) 的返回值（更新后的数据源配置）
+    - `historyIds`：本次写入历史记录的 uuid 列表；未写入历史时为 `[]`
 
 - **详情：**
 
-  与 [update](#update) 行为完全一致，仅把返回值换成本次写入历史记录的 `uuid`
+  与 [update](#update) 行为完全一致，并在返回值中额外提供 `historyIds`
 
 ## removeAndGetHistoryId
 
 - **参数：** 同 [remove](#remove)
 
 - **返回：**
-  - {`string` | null} 本次写入历史记录的 uuid；删除的 id 不存在或未写入历史时返回 `null`
+  - {[`DslOpWithHistoryIdsResult<void>`](./editorServiceMethods.md#历史记录-uuid-与-andgethistoryid)}
+    - `historyIds`：本次写入历史记录的 uuid 列表；删除的 id 不存在或未写入历史时为 `[]`
 
 - **详情：**
 
-  与 [remove](#remove) 行为完全一致，仅把返回值换成本次写入历史记录的 `uuid`
+  与 [remove](#remove) 行为完全一致，并在返回值中额外提供 `historyIds`
 
 ## revertById
 
 - **参数：**
-  - `{string}` uuid 目标历史记录的 uuid（通常由 [addAndGetHistoryId](#addandgethistoryid) 等方法返回）
+  - `{string[]}` uuids 目标历史记录的 uuid 列表（通常由 [addAndGetHistoryId](#addandgethistoryid) 等方法返回的 `historyIds`）
 
 - **返回：**
-  - {`DataSourceStepValue` | null} 反向应用后产生的新 step；找不到对应 uuid / 该步未应用时返回 `null`
+  - {(`DataSourceStepValue` | null)[]} 与入参同序的回滚结果列表，某项失败时为 `null`
 
 - **详情：**
 
-  通过历史记录 uuid「回滚」某条数据源历史步骤（类 git revert 语义），语义同按 `(id, index)` 回滚，
-  仅无需调用方再传 `dataSourceId` 与 `index`：内部会按 uuid 在全部数据源栈中定位对应步骤后再回滚。
+  通过历史记录 uuid「回滚」数据源历史步骤（类 git revert 语义），语义同按 `(id, index)` 回滚，
+  仅无需调用方再传 `dataSourceId` 与 `index`。**按数组顺序依次回滚**。
   参见 [editorService 历史记录 uuid 与 \*AndGetHistoryId](./editorServiceMethods.md#历史记录-uuid-与-andgethistoryid)。
 
 - **示例：**
@@ -472,9 +478,9 @@ console.log(historyId); // 本次新增对应的历史记录 uuid，或 null
 ```js
 import { dataSourceService } from "@tmagic/editor";
 
-const historyId = dataSourceService.addAndGetHistoryId({ type: "http", title: "用户信息" });
-if (historyId) {
-  dataSourceService.revertById(historyId);
+const { historyIds } = dataSourceService.addAndGetHistoryId({ type: "http", title: "用户信息" });
+if (historyIds.length) {
+  dataSourceService.revertById(historyIds);
 }
 ```
 

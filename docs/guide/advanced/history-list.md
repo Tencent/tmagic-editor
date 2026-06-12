@@ -61,11 +61,11 @@ const menu = ref({
 - 数据源：`dataSourceService.revert(id, index)`
 - 代码块：`codeBlockService.revert(id, index)`
 
-如果业务侧在执行操作时已通过 `*AndGetHistoryId` 拿到了该条记录的 [uuid](/api/editor/editorServiceMethods.md#历史记录-uuid-与-andgethistoryid)，也可以直接按 uuid 回滚（无需再关心 index / id，且 uuid 不会随栈内步骤增删而变化）：
+如果业务侧在执行操作时已通过 `*AndGetHistoryId` 拿到了该条记录的 uuid（见 [uuid 与 *AndGetHistoryId](/api/editor/editorServiceMethods.md#历史记录-uuid-与-andgethistoryid) 返回的 `historyIds`），也可以直接按 uuid 回滚（无需再关心 index / id，且 uuid 不会随栈内步骤增删而变化）：
 
-- 页面：`editorService.revertPageStepById(uuid)`
-- 数据源：`dataSourceService.revertById(uuid)`
-- 代码块：`codeBlockService.revertById(uuid)`
+- 页面：`editorService.revertPageStepById(uuids)`
+- 数据源：`dataSourceService.revertById(uuids)`
+- 代码块：`codeBlockService.revertById(uuids)`
 
 ### 4. 差异对比
 

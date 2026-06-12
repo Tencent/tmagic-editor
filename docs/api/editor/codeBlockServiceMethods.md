@@ -240,11 +240,12 @@
 - **参数：** 同 [setCodeDslById](#setcodedslbyid)
 
 - **返回：**
-  - {`Promise<string | null>`} 本次写入历史记录的 uuid；未写入历史（`doNotPushHistory: true` 等）时返回 `null`
+  - {`Promise<`[`DslOpWithHistoryIdsResult<void>`](./editorServiceMethods.md#历史记录-uuid-与-andgethistoryid)`>`}
+    - `historyIds`：本次写入历史记录的 uuid 列表；未写入历史（`doNotPushHistory: true` 等）时为 `[]`
 
 - **详情：**
 
-  与 [setCodeDslById](#setcodedslbyid) 行为完全一致，仅把返回值换成本次写入历史记录的 `uuid`，可用于精确引用 / 定位该条历史记录。
+  与 [setCodeDslById](#setcodedslbyid) 行为完全一致，并在返回值中额外提供 `historyIds`，可用于精确引用 / 定位该条历史记录。
   参见 [editorService 历史记录 uuid 与 \*AndGetHistoryId](./editorServiceMethods.md#历史记录-uuid-与-andgethistoryid)。
 
 - **示例：**
@@ -252,11 +253,11 @@
 ```js
 import { codeBlockService } from "@tmagic/editor";
 
-const historyId = await codeBlockService.setCodeDslByIdAndGetHistoryId("code_1234", {
+const { historyIds } = await codeBlockService.setCodeDslByIdAndGetHistoryId("code_1234", {
   name: "代码块1",
   content: "() => {}",
 });
-console.log(historyId); // 本次变更对应的历史记录 uuid，或 null
+console.log(historyIds); // 本次变更对应的历史记录 uuid 列表，或 []
 ```
 
 ## setCodeDslByIdSyncAndGetHistoryId
@@ -264,44 +265,46 @@ console.log(historyId); // 本次变更对应的历史记录 uuid，或 null
 - **参数：** 同 [setCodeDslByIdSync](#setcodedslbyidsync)
 
 - **返回：**
-  - {`string | null`} 本次写入历史记录的 uuid；未写入历史（`doNotPushHistory: true`、或 `force=false` 跳过等）时返回 `null`
+  - {[`DslOpWithHistoryIdsResult<void>`](./editorServiceMethods.md#历史记录-uuid-与-andgethistoryid)}
+    - `historyIds`：本次写入历史记录的 uuid 列表；未写入历史（`doNotPushHistory: true`、或 `force=false` 跳过等）时为 `[]`
 
 - **详情：**
 
-  与 [setCodeDslByIdSync](#setcodedslbyidsync) 行为完全一致（同步），仅把返回值换成本次写入历史记录的 `uuid`
+  与 [setCodeDslByIdSync](#setcodedslbyidsync) 行为完全一致（同步），并在返回值中额外提供 `historyIds`
 
 ## deleteCodeDslByIdsAndGetHistoryId
 
 - **参数：** 同 [deleteCodeDslByIds](#deletecodedslbyids)
 
 - **返回：**
-  - {`Promise<string[]>`} 本次写入的全部历史记录 uuid（按删除顺序）；未写入任何历史时返回空数组 `[]`
+  - {`Promise<`[`DslOpWithHistoryIdsResult<void>`](./editorServiceMethods.md#历史记录-uuid-与-andgethistoryid)`>`}
+    - `historyIds`：本次写入的全部历史记录 uuid（按删除顺序）；未写入任何历史时为 `[]`
 
 - **详情：**
 
-  与 [deleteCodeDslByIds](#deletecodedslbyids) 行为完全一致。由于一次可删除多个代码块、会产生多条历史记录，因此返回的是 uuid 数组（每条删除记录一个 uuid）；不存在的 id 不会入历史，也不会出现在返回数组中。
+  与 [deleteCodeDslByIds](#deletecodedslbyids) 行为完全一致。由于一次可删除多个代码块、会产生多条历史记录，因此使用 `historyIds` 数组（每条删除记录一个 uuid）；不存在的 id 不会入历史，也不会出现在 `historyIds` 中。
 
 - **示例：**
 
 ```js
 import { codeBlockService } from "@tmagic/editor";
 
-const historyIds = await codeBlockService.deleteCodeDslByIdsAndGetHistoryId(["code_1", "code_2"]);
+const { historyIds } = await codeBlockService.deleteCodeDslByIdsAndGetHistoryId(["code_1", "code_2"]);
 console.log(historyIds); // ['xxxx', 'yyyy']，或 []
 ```
 
 ## revertById
 
 - **参数：**
-  - `{string}` uuid 目标历史记录的 uuid（通常由 [setCodeDslByIdAndGetHistoryId](#setcodedslbyidandgethistoryid) 等方法返回）
+  - `{string[]}` uuids 目标历史记录的 uuid 列表（通常由 [setCodeDslByIdAndGetHistoryId](#setcodedslbyidandgethistoryid) 等方法返回的 `historyIds`）
 
 - **返回：**
-  - {`Promise<CodeBlockStepValue | null>`} 反向应用后产生的新 step；找不到对应 uuid / 该步未应用时返回 `null`
+  - {`Promise<(`CodeBlockStepValue` | null)[]>`} 与入参同序的回滚结果列表，某项失败时为 `null`
 
 - **详情：**
 
-  通过历史记录 uuid「回滚」某条代码块历史步骤（类 git revert 语义），语义同按 `(id, index)` 回滚，
-  仅无需调用方再传 `codeBlockId` 与 `index`：内部会按 uuid 在全部代码块栈中定位对应步骤后再回滚。
+  通过历史记录 uuid「回滚」代码块历史步骤（类 git revert 语义），语义同按 `(id, index)` 回滚，
+  仅无需调用方再传 `codeBlockId` 与 `index`。**按数组顺序依次回滚**。
   参见 [editorService 历史记录 uuid 与 \*AndGetHistoryId](./editorServiceMethods.md#历史记录-uuid-与-andgethistoryid)。
 
 - **示例：**
@@ -309,9 +312,9 @@ console.log(historyIds); // ['xxxx', 'yyyy']，或 []
 ```js
 import { codeBlockService } from "@tmagic/editor";
 
-const historyId = await codeBlockService.setCodeDslByIdAndGetHistoryId("code_1234", { name: "代码块1" });
-if (historyId) {
-  await codeBlockService.revertById(historyId);
+const { historyIds } = await codeBlockService.setCodeDslByIdAndGetHistoryId("code_1234", { name: "代码块1" });
+if (historyIds.length) {
+  await codeBlockService.revertById(historyIds);
 }
 ```
 
