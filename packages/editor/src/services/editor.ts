@@ -179,7 +179,7 @@ class Editor extends BaseService {
         this.state.stageLoading = false;
       }
 
-      this.emit('root-change', value as StoreState['root'], preValue as StoreState['root']);
+      this.emit('root-change', value as StoreState['root'], preValue as StoreState['root'], options);
     }
   }
 

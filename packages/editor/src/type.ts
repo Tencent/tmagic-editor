@@ -1189,7 +1189,11 @@ export type CustomContentMenuFunction = (
 ) => (MenuButton | MenuComponent)[];
 
 export interface EditorEvents {
-  'root-change': [value: StoreState['root'], preValue?: StoreState['root']];
+  'root-change': [
+    value: StoreState['root'],
+    preValue?: StoreState['root'],
+    options?: { historySource?: HistoryOpSource },
+  ];
   select: [node: MNode | null];
   add: [nodes: MNode[]];
   remove: [nodes: MNode[]];

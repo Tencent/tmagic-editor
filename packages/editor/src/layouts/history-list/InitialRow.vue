@@ -7,6 +7,7 @@
     <span class="m-editor-history-list-item-index" title="历史步骤编号 #0（未修改的初始状态）">#0</span>
     <span class="m-editor-history-list-item-op op-initial">初始</span>
     <span class="m-editor-history-list-item-desc">{{ desc }}</span>
+    <span v-if="saved" class="m-editor-history-list-item-saved" title="该记录为最近一次保存的状态">已保存</span>
     <span v-if="gotoEnabled && !isCurrent" class="m-editor-history-list-item-actions">
       <span class="m-editor-history-list-item-goto" title="回到该记录" @click.stop="onClick">回到</span>
     </span>
@@ -49,6 +50,8 @@ const props = withDefaults(
 );
 
 const desc = computed(() => props.marker?.historyDescription || '未修改的初始状态');
+/** 基线（初始状态）是否为最近一次保存点：仅页面栈的 `initial` 基线 step 会被 markSaved 标记。 */
+const saved = computed(() => Boolean(props.marker?.saved));
 const time = computed(() => formatHistoryTime(props.marker?.timestamp));
 const timeTitle = computed(() => formatHistoryFullTime(props.marker?.timestamp));
 const rowTitle = computed(() => {

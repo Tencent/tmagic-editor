@@ -17,6 +17,7 @@
  */
 
 import { cloneDeep } from 'lodash-es';
+import serialize from 'serialize-javascript';
 
 import type { Id } from '@tmagic/core';
 import type { ChangeRecord } from '@tmagic/form';
@@ -234,11 +235,25 @@ export const detectPageTargetName = (step: StepValue): string | undefined => {
   return undefined;
 };
 
-/** 把 `Record<Id, UndoRedo>` 整体序列化为 `Record<Id, SerializedUndoRedo>`。 */
-export const serializeStacks = <T>(stacks: Record<Id, UndoRedo<T>>) => {
+/**
+ * 把 `Record<Id, UndoRedo>` 整体序列化为 `Record<Id, SerializedUndoRedo>`。
+ *
+ * 序列化（深克隆）的同一趟里，只把每条 step 中可能含函数的 `diff` 用 serialize-javascript 序列化成字符串，
+ * 其余字段（uuid / opType / timestamp / `modifiedNodeIds` Map 等）原样保留，交给 IndexedDB 结构化克隆。
+ * 这样既能写入函数，又避免序列化整份快照的开销；读取时再由 {@link parseStacksStepDiff} 还原 diff。
+ * 不含 `diff` 的元素（如通用栈）原样透传。
+ */
+export const serializeStacks = <T extends { diff?: unknown }>(stacks: Record<Id, UndoRedo<T>>) => {
   const result: Record<Id, ReturnType<UndoRedo<T>['serialize']>> = {};
   Object.entries(stacks).forEach(([id, undoRedo]) => {
-    if (undoRedo) result[id] = undoRedo.serialize();
+    if (!undoRedo) return;
+    const serialized = undoRedo.serialize();
+    result[id] = {
+      ...serialized,
+      elementList: serialized.elementList.map((step) =>
+        step.diff === undefined ? step : Object.assign({}, step, { diff: serialize(step.diff) }),
+      ),
+    };
   });
   return result;
 };
@@ -246,15 +261,27 @@ export const serializeStacks = <T>(stacks: Record<Id, UndoRedo<T>>) => {
 /**
  * 把 `Record<Id, SerializedUndoRedo>` 整体还原为 `Record<Id, UndoRedo>`。
  * 还原时把每个栈的游标定位到最近一条已保存（`saved === true`）记录之后。
+ *
+ * 与 {@link serializeStacks} 相反：当传入 `parse`（parseDSL）时，把每条 step 中以字符串形式存储的 `diff`
+ * 解析回真实对象（含函数）；不含 `diff` 的元素（如通用栈）原样透传。
  */
 export const deserializeStacks = <T extends { saved?: boolean }>(
   stacks: Record<Id, ReturnType<UndoRedo<T>['serialize']>> = {},
+  parse?: (serialized: string) => unknown,
 ): Record<Id, UndoRedo<T>> => {
   const result: Record<Id, UndoRedo<T>> = {};
   Object.entries(stacks).forEach(([id, serialized]) => {
-    if (serialized) {
-      result[id] = UndoRedo.fromSerialized<T>(serialized, { isSavedStep: (element) => element.saved === true });
-    }
+    if (!serialized) return;
+    const elementList = parse
+      ? serialized.elementList.map((step) => {
+          const { diff } = step as { diff?: unknown };
+          return typeof diff === 'string' ? Object.assign({}, step, { diff: parse(`(${diff})`) }) : step;
+        })
+      : serialized.elementList;
+    result[id] = UndoRedo.fromSerialized<T>(
+      { ...serialized, elementList },
+      { isSavedStep: (element) => element.saved === true },
+    );
   });
   return result;
 };

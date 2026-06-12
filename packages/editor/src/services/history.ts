@@ -17,7 +17,6 @@
  */
 
 import { reactive } from 'vue';
-import serialize from 'serialize-javascript';
 
 import type { CodeBlockContent, DataSourceSchema, Id, MPage, MPageFragment } from '@tmagic/core';
 import type { ChangeRecord } from '@tmagic/form';
@@ -57,7 +56,8 @@ import editorService from './editor';
 const DEFAULT_DB_NAME = 'tmagic-editor';
 const DEFAULT_STORE_NAME = 'history';
 const DEFAULT_KEY: IDBValidKey = 'default';
-const PERSIST_VERSION = 1;
+// v2：仅把每条 step 的 diff 序列化成字符串，其余字段交给 IndexedDB 结构化克隆原生存储（见 saveToIndexedDB）。
+const PERSIST_VERSION = 2;
 
 class History extends BaseService {
   public state = reactive<HistoryState>({
@@ -442,6 +442,8 @@ class History extends BaseService {
   public async saveToIndexedDB(options: HistoryPersistOptions = {}): Promise<PersistedHistoryState> {
     const { dbName = DEFAULT_DB_NAME, storeName = DEFAULT_STORE_NAME, key = DEFAULT_KEY, appId } = options;
 
+    // serializeStacks 会在序列化各栈时只把每条 step 的 diff（可能含函数）序列化成字符串，其余字段原样保留，
+    // 因此整份快照可直接按对象写入 IndexedDB（结构化克隆），避免序列化整份快照的开销；读取时再用 parseDSL 还原 diff。
     const snapshot: PersistedHistoryState = {
       version: PERSIST_VERSION,
       pageId: this.state.pageId,
@@ -451,9 +453,7 @@ class History extends BaseService {
       savedAt: Date.now(),
     };
 
-    // 历史记录里可能包含函数（如代码块内容 / 节点事件 / 数据源方法），IndexedDB 的结构化克隆无法写入函数，
-    // 因此用 serialize-javascript 序列化成字符串后再写入（支持函数 / Map 等），读取时用 parseDSL 还原。
-    await idbSet(this.resolveDbName(dbName, appId), storeName, key, serialize(snapshot));
+    await idbSet(this.resolveDbName(dbName, appId), storeName, key, snapshot);
     this.emit('save-to-indexed-db', snapshot);
     return snapshot;
   }
@@ -469,16 +469,14 @@ class History extends BaseService {
   public async restoreFromIndexedDB(options: HistoryPersistOptions = {}): Promise<PersistedHistoryState | null> {
     const { dbName = DEFAULT_DB_NAME, storeName = DEFAULT_STORE_NAME, key = DEFAULT_KEY, appId } = options;
 
-    const raw = await idbGet<string | PersistedHistoryState>(this.resolveDbName(dbName, appId), storeName, key);
-    if (!raw) return null;
-
-    // 新版以序列化字符串存储（含函数），用 parseDSL 还原；兼容历史上以对象形式存入的旧数据。
-    const snapshot = (typeof raw === 'string' ? getEditorConfig('parseDSL')(`(${raw})`) : raw) as PersistedHistoryState;
+    const snapshot = await idbGet<PersistedHistoryState>(this.resolveDbName(dbName, appId), storeName, key);
     if (!snapshot) return null;
 
-    this.state.pageSteps = deserializeStacks(snapshot.pageSteps);
-    this.state.codeBlockState = deserializeStacks(snapshot.codeBlockState);
-    this.state.dataSourceState = deserializeStacks(snapshot.dataSourceState);
+    // 各 step 的 diff 以序列化字符串存储（含函数），由 deserializeStacks 逐条用 parseDSL 还原。
+    const parseDSL = getEditorConfig('parseDSL');
+    this.state.pageSteps = deserializeStacks(snapshot.pageSteps, parseDSL);
+    this.state.codeBlockState = deserializeStacks(snapshot.codeBlockState, parseDSL);
+    this.state.dataSourceState = deserializeStacks(snapshot.dataSourceState, parseDSL);
     // initial 基线作为页面栈 index 0 的 step 随 pageSteps 一并还原，无需单独恢复。
     this.state.pageId = snapshot.pageId;
 

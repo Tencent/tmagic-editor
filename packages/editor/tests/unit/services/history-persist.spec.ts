@@ -123,17 +123,23 @@ describe('history service - clear', () => {
 });
 
 describe('history service - IndexedDB 持久化', () => {
-  test('saveToIndexedDB 以序列化字符串写入并返回快照对象', async () => {
+  test('saveToIndexedDB 以对象写入（仅 step.diff 序列化成字符串）并返回快照对象', async () => {
     history.changePage({ id: 'p1' } as any);
-    history.push(pageStep());
+    history.push({ ...pageStep(), diff: [{ newSchema: { id: 'n1', name: '节点' } }] } as any);
 
     const snapshot = await history.saveToIndexedDB();
-    expect(snapshot.version).toBe(1);
+    expect(snapshot.version).toBe(2);
     expect(snapshot.pageId).toBe('p1');
-    // 实际写入 IndexedDB 的是字符串（serialize-javascript 结果）
+    // 实际写入 IndexedDB 的是对象（交给结构化克隆），仅每条 step 的 diff 被序列化成字符串
     expect(indexedDb.idbSet).toHaveBeenCalled();
     const written = (indexedDb.idbSet as any).mock.calls[0][3];
-    expect(typeof written).toBe('string');
+    expect(typeof written).toBe('object');
+    expect(typeof written.pageSteps.p1.elementList[0].diff).toBe('string');
+    // diff 之外的字段（如 modifiedNodeIds Map）原样交给结构化克隆，不被字符串化
+    expect(written.pageSteps.p1.elementList[0].modifiedNodeIds instanceof Map).toBe(true);
+    // 返回的快照即写入 IndexedDB 的持久化形态：diff 已是序列化字符串
+    expect(written).toBe(snapshot);
+    expect(typeof snapshot.pageSteps.p1.elementList[0].diff).toBe('string');
   });
 
   test('restoreFromIndexedDB 还原页面 / 代码块 / 数据源全部栈与游标', async () => {
