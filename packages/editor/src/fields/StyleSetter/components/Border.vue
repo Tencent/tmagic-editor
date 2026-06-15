@@ -4,27 +4,31 @@
       <div class="border-icon-container-row">
         <div
           class="border-icon border-icon-top"
-          :class="{ active: direction === 'Top' }"
+          :class="{ active: direction === 'Top', configured: isConfigured('Top') }"
           @click="selectDirection('Top')"
         ></div>
       </div>
       <div class="border-icon-container-row">
         <div
           class="border-icon border-icon-left"
-          :class="{ active: direction === 'Left' }"
+          :class="{ active: direction === 'Left', configured: isConfigured('Left') }"
           @click="selectDirection('Left')"
         ></div>
-        <div class="border-icon" :class="{ active: direction === '' }" @click="selectDirection()"></div>
+        <div
+          class="border-icon"
+          :class="{ active: direction === '', configured: isConfigured('') }"
+          @click="selectDirection()"
+        ></div>
         <div
           class="border-icon border-icon-right"
-          :class="{ active: direction === 'Right' }"
+          :class="{ active: direction === 'Right', configured: isConfigured('Right') }"
           @click="selectDirection('Right')"
         ></div>
       </div>
       <div class="border-icon-container-row">
         <div
           class="border-icon border-icon-bottom"
-          :class="{ active: direction === 'Bottom' }"
+          :class="{ active: direction === 'Bottom', configured: isConfigured('Bottom') }"
           @click="selectDirection('Bottom')"
         ></div>
       </div>
@@ -98,7 +102,7 @@ const emit = defineEmits<{
   addDiffCount: [];
 }>();
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     model: FormValue;
     lastValues?: FormValue;
@@ -108,6 +112,11 @@ withDefaults(
   }>(),
   {},
 );
+
+const hasValue = (value: unknown) => value !== undefined && value !== null && value !== '';
+
+const isConfigured = (d: string) =>
+  ['Width', 'Color', 'Style'].some((key) => hasValue(props.model?.[`border${d}${key}`]));
 
 const change = (value: StyleSchema, eventData: ContainerChangeEventData) => {
   eventData.changeRecords?.forEach((record) => {

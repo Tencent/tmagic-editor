@@ -24,9 +24,12 @@
       & + .border-icon {
         margin-left: 8px;
       }
+      &.configured {
+        border-color: var(--el-color-success, var(--td-success-color, #2ba471));
+      }
       &.active {
         border-width: 1px;
-        border-color: var(--el-color-primary);
+        border-color: var(--el-color-primary, var(--td-brand-color, #0052d9));
       }
       &.border-icon-top {
         border-top-width: 2px;
