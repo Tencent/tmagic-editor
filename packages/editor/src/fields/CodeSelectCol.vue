@@ -107,9 +107,11 @@ const isCompareMode = computed(() => Boolean(props.isCompare && props.lastValues
 
 const notEditable = computed(() => filterFunction(mForm, props.config.notEditable, props));
 
-const hasCodeBlockSidePanel = computed(() =>
+const codeBlockSidePanel = computed(() =>
   (uiService.get('sideBarItems') || []).find((item) => item.$key === SideItemKey.CODE_BLOCK),
 );
+
+const hasCodeBlockSidePanel = computed(() => codeBlockSidePanel.value);
 
 /**
  * 根据代码块id获取代码块参数配置
@@ -191,6 +193,10 @@ const onParamsChangeHandler = (value: any, eventData: ContainerChangeEventData) 
 };
 
 const editCode = (id: string) => {
+  const sideBarItem = codeBlockSidePanel.value;
+  if (sideBarItem) {
+    uiService.set('sideBarActiveTabName', sideBarItem.text || sideBarItem.$key || SideItemKey.CODE_BLOCK);
+  }
   eventBus?.emit('edit-code', id);
 };
 </script>

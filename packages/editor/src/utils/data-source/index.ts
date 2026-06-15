@@ -10,6 +10,7 @@ const dataSourceFormConfig: TabConfig = {
   items: [
     {
       title: '数据定义',
+      status: 'fields',
       items: [
         {
           name: 'fields',
@@ -20,6 +21,7 @@ const dataSourceFormConfig: TabConfig = {
     },
     {
       title: '方法定义',
+      status: 'methods',
       items: [
         {
           name: 'methods',

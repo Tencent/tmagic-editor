@@ -13,7 +13,7 @@
       ></MCascader>
 
       <TMagicTooltip
-        v-if="model[name] && isCustomMethod && hasDataSourceSidePanel && !isCompare"
+        v-if="model[name] && isCustomMethod && dataSourceSidePanel && !isCompare"
         :content="notEditable ? '查看' : '编辑'"
       >
         <TMagicButton class="m-fields-select-action-button" :size="size" @click="editCodeHandler">
@@ -75,7 +75,7 @@ const props = withDefaults(defineProps<FieldProps<DataSourceMethodSelectConfig>>
   disabled: false,
 });
 
-const hasDataSourceSidePanel = computed(() =>
+const dataSourceSidePanel = computed(() =>
   (uiService.get('sideBarItems') || []).find((item) => item.$key === SideItemKey.DATA_SOURCE),
 );
 
@@ -208,12 +208,17 @@ const onParamsChangeHandler = (value: any, eventData: ContainerChangeEventData) 
 };
 
 const editCodeHandler = () => {
-  const [id] = props.model[props.name];
+  const [id, methodName] = props.model[props.name];
 
   const dataSource = dataSourceService.getDataSourceById(id);
 
   if (!dataSource) return;
 
-  eventBus?.emit('edit-data-source', id);
+  const sideBarItem = dataSourceSidePanel.value;
+  if (sideBarItem) {
+    uiService.set('sideBarActiveTabName', sideBarItem.text || sideBarItem.$key || SideItemKey.DATA_SOURCE);
+  }
+
+  eventBus?.emit('edit-data-source-method', id, methodName);
 };
 </script>

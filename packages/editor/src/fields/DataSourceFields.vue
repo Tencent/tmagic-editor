@@ -47,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, Ref, ref } from 'vue';
+import { computed, type ComputedRef, inject, onMounted, provide, Ref, ref } from 'vue';
 
 import type { DataSchema } from '@tmagic/core';
 import { TMagicButton, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
@@ -97,6 +97,16 @@ const width = defineModel<number>('width', { default: 670 });
 const newHandler = () => {
   fieldValues.value = {};
   fieldTitle.value = '新增属性';
+  calcBoxPosition();
+  addDialogVisible.value = true;
+};
+
+const editField = (row: Record<string, any>, index: number) => {
+  fieldValues.value = {
+    ...row,
+    index,
+  };
+  fieldTitle.value = `编辑${row.title}`;
   calcBoxPosition();
   addDialogVisible.value = true;
 };
@@ -158,13 +168,7 @@ const fieldColumns: ColumnConfig[] = [
       {
         text: '编辑',
         handler: (row: Record<string, any>, index: number) => {
-          fieldValues.value = {
-            ...row,
-            index,
-          };
-          fieldTitle.value = `编辑${row.title}`;
-          calcBoxPosition();
-          addDialogVisible.value = true;
+          editField(row, index);
         },
       },
       {
@@ -354,4 +358,29 @@ const { height: editorHeight } = useEditorContentHeight();
 
 const parentFloating = inject<Ref<HTMLDivElement | null>>('parentFloating', ref(null));
 const { boxPosition, calcBoxPosition } = useNextFloatBoxPosition(uiService, parentFloating);
+
+/**
+ * 由 DataSourceConfigPanel 注入：打开数据源详情后需要直接打开的字段路径（字段名数组）。
+ * 当前层消费 path[0]，并把剩余路径下发给嵌套字段，实现逐层打开。
+ */
+const editingFieldPath = inject<ComputedRef<string[]>>(
+  'editingDataSourceFieldPath',
+  computed(() => []),
+);
+
+provide(
+  'editingDataSourceFieldPath',
+  computed(() => editingFieldPath.value.slice(1)),
+);
+
+onMounted(() => {
+  const path = editingFieldPath.value;
+  if (!path.length) return;
+
+  const fields: Record<string, any>[] = props.model[props.name] || [];
+  const index = fields.findIndex((field) => field.name === path[0]);
+  if (index === -1) return;
+
+  editField(fields[index], index);
+});
 </script>

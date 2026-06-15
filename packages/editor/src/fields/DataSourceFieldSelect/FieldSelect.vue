@@ -211,11 +211,25 @@ const onChangeHandler = (v: string[] = []) => {
   emit('change', v);
 };
 
-const hasDataSourceSidePanel = computed(() =>
+const dataSourceSidePanel = computed(() =>
   uiService.get('sideBarItems').find((item) => item.$key === SideItemKey.DATA_SOURCE),
 );
 
+const hasDataSourceSidePanel = computed(() => dataSourceSidePanel.value);
+
 const editHandler = (id: string) => {
-  eventBus?.emit('edit-data-source', removeDataSourceFieldPrefix(id));
+  const sideBarItem = dataSourceSidePanel.value;
+  if (sideBarItem) {
+    uiService.set('sideBarActiveTabName', sideBarItem.text || sideBarItem.$key || SideItemKey.DATA_SOURCE);
+  }
+
+  const dataSourceId = removeDataSourceFieldPrefix(id);
+  const fieldPath = selectFieldsId.value;
+
+  if (fieldPath.length) {
+    eventBus?.emit('edit-data-source-field', dataSourceId, [...fieldPath]);
+  } else {
+    eventBus?.emit('edit-data-source', dataSourceId);
+  }
 };
 </script>

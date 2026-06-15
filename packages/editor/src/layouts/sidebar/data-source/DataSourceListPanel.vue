@@ -29,6 +29,8 @@
     :disabled="!editable"
     :values="dataSourceValues"
     :title="dialogTitle"
+    :edit-method-name="editMethodName"
+    :edit-field-path="editFieldPath"
     @submit="submitDataSourceHandler"
     @close="editDialogCloseHandler"
   ></DataSourceConfigPanel>
@@ -45,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, useTemplateRef, watch } from 'vue';
+import { computed, inject, ref, useTemplateRef, watch } from 'vue';
 import { mergeWith } from 'lodash-es';
 
 import { tMagicMessageBox, TMagicScrollbar } from '@tmagic/design';
@@ -79,7 +81,16 @@ const { dataSourceService } = useServices();
 const { editDialog, dataSourceValues, dialogTitle, editable, editHandler, submitDataSourceHandler } =
   useDataSourceEdit(dataSourceService);
 
+/** 打开数据源详情时需要直接定位并打开的方法名，为空则正常展示「数据定义」tab */
+const editMethodName = ref('');
+
+/** 打开数据源详情时需要直接定位并打开的字段路径，为空则不自动打开字段配置 */
+const editFieldPath = ref<string[]>([]);
+
 const editDialogCloseHandler = () => {
+  editMethodName.value = '';
+  editFieldPath.value = [];
+
   if (dataSourceListRef.value) {
     for (const [, status] of dataSourceListRef.value.nodeStatusMap.entries()) {
       status.selected = false;
@@ -139,6 +150,20 @@ const filterTextChangeHandler = (val: string) => {
 };
 
 eventBus?.on('edit-data-source', (id: string) => {
+  editMethodName.value = '';
+  editFieldPath.value = [];
+  editHandler(id);
+});
+
+eventBus?.on('edit-data-source-method', (id: string, methodName: string) => {
+  editMethodName.value = methodName;
+  editFieldPath.value = [];
+  editHandler(id);
+});
+
+eventBus?.on('edit-data-source-field', (id: string, fieldPath: string[]) => {
+  editMethodName.value = '';
+  editFieldPath.value = fieldPath;
   editHandler(id);
 });
 

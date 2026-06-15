@@ -1156,6 +1156,8 @@ export type SyncHookPlugin<
 
 export interface EventBusEvent {
   'edit-data-source': [id: string];
+  'edit-data-source-method': [id: string, methodName: string];
+  'edit-data-source-field': [id: string, fieldPath: string[]];
   'remove-data-source': [id: string];
   'edit-code': [id: string];
 }

@@ -22,7 +22,7 @@ const dataSourceService = {
   getFormMethod: vi.fn(() => []),
 };
 
-const uiService = { get: vi.fn(() => [{ $key: 'data-source' }]) };
+const uiService = { get: vi.fn(() => [{ $key: 'data-source' }]), set: vi.fn() };
 
 vi.mock('@editor/hooks/use-services', () => ({
   useServices: () => ({ dataSourceService, uiService }),
@@ -158,7 +158,7 @@ describe('DataSourceMethodSelect', () => {
     expect(evts).toBeTruthy();
   });
 
-  test('编辑按钮 emit edit-data-source', async () => {
+  test('编辑按钮 emit edit-data-source-method 并切换到数据源 tab', async () => {
     dataSourceService.getDataSourceById.mockReturnValue({ id: 'ds1', methods: [{ name: 'doFetch' }] });
     const eventBus = { emit: vi.fn() };
     const wrapper = mount(DataSourceMethodSelect, {
@@ -166,7 +166,8 @@ describe('DataSourceMethodSelect', () => {
       global: { provide: { eventBus } },
     });
     await wrapper.find('button').trigger('click');
-    expect(eventBus.emit).toHaveBeenCalledWith('edit-data-source', 'ds1');
+    expect(uiService.set).toHaveBeenCalledWith('sideBarActiveTabName', 'data-source');
+    expect(eventBus.emit).toHaveBeenCalledWith('edit-data-source-method', 'ds1', 'doFetch');
   });
 
   test('编辑按钮: 找不到 dataSource 时不触发', async () => {

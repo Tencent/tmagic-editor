@@ -14,7 +14,7 @@ const { messageError } = vi.hoisted(() => ({ messageError: vi.fn() }));
 
 const dataSourceService = { get: vi.fn() };
 const propsService = { getDisabledDataSource: vi.fn() };
-const uiService = { get: vi.fn() };
+const uiService = { get: vi.fn(), set: vi.fn() };
 
 vi.mock('@editor/hooks/use-services', () => ({
   useServices: () => ({ dataSourceService, propsService, uiService }),
@@ -158,13 +158,25 @@ describe('FieldSelect', () => {
     expect(wrapper.emitted('change')?.[0]?.[0]).toEqual(['ds1', 'a']);
   });
 
-  test('editHandler emit edit-data-source 到 eventBus', () => {
+  test('editHandler 无字段时 emit edit-data-source 并切换数据源 tab', async () => {
     const eventBusEmit = vi.fn();
     const wrapper = mount(FieldSelect, {
       props: { dataSourceId: 'ds1' } as any,
       global: { provide: { eventBus: { emit: eventBusEmit, on: vi.fn() } } },
     });
-    expect(wrapper).toBeTruthy();
+    await wrapper.find('.m-fields-select-action-button').trigger('click');
+    expect(uiService.set).toHaveBeenCalledWith('sideBarActiveTabName', 'data-source');
+    expect(eventBusEmit).toHaveBeenCalledWith('edit-data-source', 'ds1');
+  });
+
+  test('editHandler 有字段时 emit edit-data-source-field 带字段路径', async () => {
+    const eventBusEmit = vi.fn();
+    const wrapper = mount(FieldSelect, {
+      props: { dataSourceId: 'ds1', modelValue: ['a'] } as any,
+      global: { provide: { eventBus: { emit: eventBusEmit, on: vi.fn() } } },
+    });
+    await wrapper.find('.m-fields-select-action-button').trigger('click');
+    expect(eventBusEmit).toHaveBeenCalledWith('edit-data-source-field', 'ds1', ['a']);
   });
 });
 

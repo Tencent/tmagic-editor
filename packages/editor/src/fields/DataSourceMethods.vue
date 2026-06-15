@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, nextTick, ref, useTemplateRef } from 'vue';
+import { computed, type ComputedRef, inject, nextTick, onMounted, ref, useTemplateRef } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
 import type { CodeBlockContent } from '@tmagic/core';
@@ -52,6 +52,29 @@ const codeBlockEditorRef = useTemplateRef<InstanceType<typeof CodeBlockEditor>>(
 
 let editIndex = -1;
 
+const editMethod = (method: CodeBlockContent, index: number) => {
+  let codeContent: string = '({ params, dataSource, app }) => {\n  // place your code here\n}';
+
+  if (method.content) {
+    if (typeof method.content !== 'string') {
+      codeContent = method.content.toString();
+    } else {
+      codeContent = method.content;
+    }
+  }
+
+  codeConfig.value = {
+    ...cloneDeep(method),
+    content: codeContent,
+  };
+
+  editIndex = index;
+
+  nextTick(() => {
+    codeBlockEditorRef.value?.show();
+  });
+};
+
 const methodColumns: ColumnConfig[] = [
   {
     label: '名称',
@@ -77,26 +100,7 @@ const methodColumns: ColumnConfig[] = [
       {
         text: '编辑',
         handler: (method: CodeBlockContent, index: number) => {
-          let codeContent: string = '({ params, dataSource, app }) => {\n  // place your code here\n}';
-
-          if (method.content) {
-            if (typeof method.content !== 'string') {
-              codeContent = method.content.toString();
-            } else {
-              codeContent = method.content;
-            }
-          }
-
-          codeConfig.value = {
-            ...cloneDeep(method),
-            content: codeContent,
-          };
-
-          editIndex = index;
-
-          nextTick(() => {
-            codeBlockEditorRef.value?.show();
-          });
+          editMethod(method, index);
         },
       },
       {
@@ -158,4 +162,21 @@ const submitCodeHandler = (value: CodeBlockContent, data: ContainerChangeEventDa
 
   codeBlockEditorRef.value?.hide();
 };
+
+/** 由 DataSourceConfigPanel 注入：打开数据源详情后需要直接打开的方法名 */
+const editingMethodName = inject<ComputedRef<string | undefined>>(
+  'editingDataSourceMethodName',
+  computed(() => ''),
+);
+
+onMounted(() => {
+  const methodName = editingMethodName.value;
+  if (!methodName) return;
+
+  const methods: CodeBlockContent[] = props.model[props.name] || [];
+  const index = methods.findIndex((method) => method.name === methodName);
+  if (index === -1) return;
+
+  editMethod(methods[index], index);
+});
 </script>
