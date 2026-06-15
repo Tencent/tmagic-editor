@@ -51,10 +51,11 @@ import { computed, onBeforeUnmount, onMounted, ref, shallowRef, toRaw } from 'vu
 import { debounce } from 'lodash-es';
 
 import type { MApp, MContainer, MNode } from '@tmagic/core';
-import type { DatasourceTypeOption } from '@tmagic/editor';
+import type { DatasourceTypeOption, HistoryOpSource, StoreState } from '@tmagic/editor';
 import {
   editorService,
   historyService,
+  markStackSaved,
   propsService,
   serializeConfig,
   TMagicDialog,
@@ -148,15 +149,28 @@ const persistHistory = () => {
 // 编辑（尤其是本次会话新增的代码块 / 数据源历史）丢失，这里改为变更即落库以保证恢复完整。
 const schedulePersist = debounce(persistHistory, 500);
 
-// 进入页面时从 IndexedDB 恢复历史记录。此时 root 尚未设置，需显式传入待加载 DSL 的 id 以选中
-// 按 app 隔离的库；页面对齐由编辑器挂载后 select(defaultSelected) 触发的 changePage 负责。
+// 进入页面时从 IndexedDB 恢复历史记录。此时 root 尚未设置（value 在 restore 之后才赋值），
+// 需显式传入待加载 DSL 的 id 以选中按 app 隔离的库；页面对齐由编辑器挂载后
+// select(defaultSelected) 触发的 changePage 负责。
 const restoreHistory = async () => {
   try {
-    await historyService.restoreFromIndexedDB({ appId: value.value?.id });
+    await historyService.restoreFromIndexedDB({ appId: dsl.id });
   } catch (error) {
     console.error('恢复历史记录失败', error);
   }
 };
+
+const rootChangeHandler = (
+  _v: StoreState['root'],
+  _pV?: StoreState['root'],
+  { historySource }: { historySource?: HistoryOpSource } = {},
+) => {
+  if (historySource === 'initial') {
+    Object.values(historyService.state.pageSteps).forEach(markStackSaved);
+  }
+};
+
+editorService.on('root-change', rootChangeHandler);
 
 onMounted(async () => {
   await restoreHistory();
@@ -177,6 +191,7 @@ onBeforeUnmount(() => {
   window.removeEventListener('beforeunload', persistHistory);
   window.removeEventListener('pagehide', persistHistory);
   editorService.removeAllPlugins();
+  editorService.off('root-change', rootChangeHandler);
 });
 
 const propsSubmitErrorHandler = async (e: any) => {
