@@ -17,6 +17,7 @@ const codeBlockService = {
 };
 const uiService = {
   get: vi.fn(() => [{ $key: 'code-block' }]),
+  set: vi.fn(),
 };
 
 vi.mock('@editor/hooks/use-services', () => ({
@@ -138,13 +139,14 @@ describe('CodeSelectCol', () => {
     expect(((evts?.[0]?.[1] as any).changeRecords[0] as any).propPath).toContain('p1');
   });
 
-  test('编辑按钮 emit edit-code', async () => {
+  test('编辑按钮 emit edit-code 并切换到代码块 tab', async () => {
     const eventBus = { emit: vi.fn() };
     const wrapper = mount(CodeSelectCol, {
       props: baseProps() as any,
       global: { provide: { eventBus } },
     });
     await wrapper.find('button').trigger('click');
+    expect(uiService.set).toHaveBeenCalledWith('sideBarActiveTabName', 'code-block');
     expect(eventBus.emit).toHaveBeenCalledWith('edit-code', 'c1');
   });
 
