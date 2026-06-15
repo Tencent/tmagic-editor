@@ -1,3 +1,22 @@
+# [1.8.0-beta.6](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.5...v1.8.0-beta.6) (2026-06-15)
+
+
+### Bug Fixes
+
+* **editor:** 仅在使用 left/top 定位时修正节点位置 ([27fac02](https://github.com/Tencent/tmagic-editor/commit/27fac02e994b69417622d009cb69037d99eef10a))
+* **editor:** 完善 fixed 与 absolute 定位切换逻辑 ([1298104](https://github.com/Tencent/tmagic-editor/commit/1298104732de1074ecc1398777459dd2fcbb74f7))
+* **playground:** 修复历史恢复后加载 DSL 时缺少页面基线记录 ([4a82891](https://github.com/Tencent/tmagic-editor/commit/4a8289137b539a6597d1b978418bb9901392e5c3))
+
+
+### Features
+
+* **editor:** 增强 *AndGetHistoryId 与 revertById 的 historyIds 能力 ([6960bd5](https://github.com/Tencent/tmagic-editor/commit/6960bd50e16fe612e486eb78af7630642f5e6c8f))
+* **editor:** 数据源与代码块历史记录不再合并相邻操作 ([89cef4e](https://github.com/Tencent/tmagic-editor/commit/89cef4e9a9b1ffb11ab72c33e8b283bf59377f47))
+* **editor:** 查看/编辑时自动切换 sidebar 并定位到对应配置 ([ffcc734](https://github.com/Tencent/tmagic-editor/commit/ffcc7341021da525263819cb6559cf20c2afea6a))
+* **editor:** 边框方向有配置时显示高亮状态 ([b35132e](https://github.com/Tencent/tmagic-editor/commit/b35132e93eba6136990ba82912e53887c17c0cc1))
+
+
+
 # [1.8.0-beta.5](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.4...v1.8.0-beta.5) (2026-06-11)
 
 
