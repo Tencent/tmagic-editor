@@ -257,7 +257,7 @@ const getItemConfig = (data: SideItem): SideComponent => {
       slots: {},
     },
     layer: {
-      $key: 'layer',
+      $key: SideItemKey.LAYER,
       type: 'component',
       icon: List,
       text: '已选组件',
@@ -277,7 +277,7 @@ const getItemConfig = (data: SideItem): SideComponent => {
       slots: {},
     },
     [SideItemKey.CODE_BLOCK]: {
-      $key: 'code-block',
+      $key: SideItemKey.CODE_BLOCK,
       type: 'component',
       icon: EditPen,
       text: '代码编辑',
