@@ -83,16 +83,17 @@ watchEffect(() => {
   const config = dataSourceService.getFormConfig(initValues.value.type);
 
   // 传入方法名/字段路径时，将外层 tab 容器默认激活到对应 tab（status: methods / fields）
-  let activeTab = '';
+  // 未传入时默认激活「数据定义」tab（fields）
+  let activeTab = 'fields';
   if (props.editMethodName) {
     activeTab = 'methods';
   } else if (props.editFieldPath?.length) {
     activeTab = 'fields';
   }
 
-  dataSourceConfig.value = activeTab
-    ? config.map((item) => ((item as { type?: string }).type === 'tab' ? { ...item, active: activeTab } : item))
-    : config;
+  dataSourceConfig.value = config.map((item) =>
+    (item as { type?: string }).type === 'tab' ? { ...item, active: activeTab } : item,
+  );
 });
 
 const submitHandler = (values: any, data: ContainerChangeEventData) => {
