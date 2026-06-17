@@ -1,3 +1,15 @@
+# [1.8.0-beta.7](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.6...v1.8.0-beta.7) (2026-06-17)
+
+
+### Bug Fixes
+
+* **editor:** sidebar 侧栏项 key 与 SideItemKey 常量对齐 ([8933c46](https://github.com/Tencent/tmagic-editor/commit/8933c46b73525aa2aeca81aeea88610539a218d9))
+* **editor:** 修复历史记录面板分组与展示逻辑 ([bbf79fd](https://github.com/Tencent/tmagic-editor/commit/bbf79fd6df505351bc28d63bea1a5c0cd16a5984))
+* **editor:** 恢复新增组件在当前视窗中垂直居中 ([24b9b34](https://github.com/Tencent/tmagic-editor/commit/24b9b34f6569ed671edaf4e9f14622597688d72c))
+* **editor:** 数据源配置面板默认激活「数据定义」tab ([95769d6](https://github.com/Tencent/tmagic-editor/commit/95769d6ae05d6171366ad5995f6e8ce79491d5cd))
+
+
+
 # [1.8.0-beta.6](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.5...v1.8.0-beta.6) (2026-06-15)
 
 
