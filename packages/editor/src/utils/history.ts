@@ -26,9 +26,9 @@ import { guid } from '@tmagic/utils';
 import type {
   BaseStepValue,
   HistoryOpSource,
-  HistoryOpType,
   PageHistoryGroup,
   PageHistoryStepEntry,
+  StackHistoryGroup,
   StepDiffItem,
   StepValue,
 } from '@editor/type';
@@ -131,14 +131,7 @@ export const mergeStackSteps = <S extends BaseStepValue, K extends 'code-block' 
   id: Id,
   list: S[],
   cursor: number,
-): {
-  kind: K;
-  id: Id;
-  opType: HistoryOpType;
-  steps: { step: S; index: number; applied: boolean; isCurrent?: boolean }[];
-  applied: boolean;
-  isCurrent?: boolean;
-}[] => {
+): StackHistoryGroup<S, K>[] => {
   const currentIndex = cursor - 1;
   return list.map((step, index) => {
     const applied = index < cursor;

@@ -135,6 +135,7 @@ import type { FormState } from '@tmagic/form';
 import MIcon from '@editor/components/Icon.vue';
 import { useServices } from '@editor/hooks/use-services';
 import type {
+  BaseStepValue,
   CodeBlockStepValue,
   DataSourceStepValue,
   DiffDialogPayload,
@@ -143,15 +144,7 @@ import type {
 } from '@editor/type';
 
 import BucketTab from './BucketTab.vue';
-import {
-  describeCodeBlockGroup,
-  describeCodeBlockStep,
-  describeDataSourceGroup,
-  describeDataSourceStep,
-  isCodeBlockStepRevertable,
-  isDataSourceStepRevertable,
-  useHistoryList,
-} from './composables';
+import { describeStep, isSingleDiffStepRevertable, useHistoryList } from './composables';
 import HistoryDiffDialog from './HistoryDiffDialog.vue';
 import PageTab from './PageTab.vue';
 
@@ -223,34 +216,28 @@ const {
  */
 const pageMarker = computed(() => historyService.getPageMarker());
 
-/** 数据源 step 仅 update（前后 schema 都存在）时可查看差异。 */
-const isDataSourceStepDiffable = (step: DataSourceStepValue) =>
-  Boolean(step.diff?.[0]?.oldSchema && step.diff?.[0]?.newSchema);
-
 /** 代码块 step 仅 update（前后 content 都存在）时可查看差异。 */
-const isCodeBlockStepDiffable = (step: CodeBlockStepValue) =>
-  Boolean(step.diff?.[0]?.oldSchema && step.diff?.[0]?.newSchema);
+const isStepDiffable = (step: BaseStepValue) => Boolean(step.diff?.[0]?.oldSchema && step.diff?.[0]?.newSchema);
 
 /**
  * 数据源 / 代码块两类 bucket 历史的整体渲染配置：把 title / prefix 与各自的描述、
  * 可差异、可回滚判定收敛为单一对象整体注入 BucketTab，组件内部按需读取。
  */
+// 数据源/代码块不做相邻合并，每组恒为单步，省略 describeGroup，由 toRowGroup 回退到 describeStep。
 const dataSourceConfig: HistoryBucketConfig<DataSourceStepValue> = {
   title: '数据源',
   prefix: 'ds',
-  describeGroup: describeDataSourceGroup,
-  describeStep: describeDataSourceStep,
-  isStepDiffable: isDataSourceStepDiffable,
-  isStepRevertable: isDataSourceStepRevertable,
+  describeStep: (step: DataSourceStepValue): string => describeStep(step, (schema) => schema?.title, '数据源'),
+  isStepDiffable,
+  isStepRevertable: isSingleDiffStepRevertable,
 };
 
 const codeBlockConfig: HistoryBucketConfig<CodeBlockStepValue> = {
   title: '代码块',
   prefix: 'cb',
-  describeGroup: describeCodeBlockGroup,
-  describeStep: describeCodeBlockStep,
-  isStepDiffable: isCodeBlockStepDiffable,
-  isStepRevertable: isCodeBlockStepRevertable,
+  describeStep: (step: CodeBlockStepValue): string => describeStep(step, (content) => content?.name, '代码块'),
+  isStepDiffable,
+  isStepRevertable: isSingleDiffStepRevertable,
 };
 
 /** 把"目标 step 索引"翻译成"目标 cursor"（已应用步骤数量）。 */

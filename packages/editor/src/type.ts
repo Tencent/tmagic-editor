@@ -962,32 +962,26 @@ export interface PageHistoryGroup {
 }
 
 /**
- * 代码块历史面板分组。
- * - 同一 codeBlockId 的栈内，相邻的 'update' 操作会合并成一个 group；
- * - 'add' / 'remove' 始终独立成组（语义上是一次性事件）。
+ * 数据源 / 代码块历史面板分组（按 id 分栈展示）。
+ * 二者结构完全一致，仅 `kind` 与 step 类型不同，统一由该泛型描述：
+ * - 数据源：`StackHistoryGroup<DataSourceStepValue, 'data-source'>`；
+ * - 代码块：`StackHistoryGroup<CodeBlockStepValue, 'code-block'>`。
+ *
+ * 每条操作记录独立成组，不做相邻合并（与页面历史 {@link PageHistoryGroup} 不同），故 `steps` 恒为单元素。
  */
-export interface CodeBlockHistoryGroup {
-  kind: 'code-block';
-  /** 关联的 codeBlock id */
+export interface StackHistoryGroup<
+  T extends BaseStepValue = BaseStepValue,
+  K extends 'code-block' | 'data-source' = 'code-block' | 'data-source',
+> {
+  /** 区分代码块 / 数据源。 */
+  kind: K;
+  /** 关联的代码块 / 数据源 id。 */
   id: Id;
-  /** 该分组的操作类型 */
+  /** 该分组的操作类型。 */
   opType: HistoryOpType;
-  /** 组内所有步骤，按时间正序 */
-  steps: { step: CodeBlockStepValue; index: number; applied: boolean; isCurrent?: boolean }[];
-  /** 组内最后一步是否已应用，用于整组的状态展示 */
-  applied: boolean;
-  /** 是否为当前所在的分组（包含该栈最近一次已应用步骤的那一组）。 */
-  isCurrent?: boolean;
-}
-
-/**
- * 数据源历史面板分组，结构同 CodeBlockHistoryGroup。
- */
-export interface DataSourceHistoryGroup {
-  kind: 'data-source';
-  id: Id;
-  opType: HistoryOpType;
-  steps: { step: DataSourceStepValue; index: number; applied: boolean; isCurrent?: boolean }[];
+  /** 组内所有步骤，按时间正序（不做相邻合并，恒为单元素）。 */
+  steps: { step: T; index: number; applied: boolean; isCurrent?: boolean }[];
+  /** 组内最后一步是否已应用，用于整组的状态展示。 */
   applied: boolean;
   /** 是否为当前所在的分组（包含该栈最近一次已应用步骤的那一组）。 */
   isCurrent?: boolean;
@@ -1296,8 +1290,11 @@ export interface DiffDialogPayload {
  * 各自实现一份，作为整体注入，避免把 describe* / isStep* 拆成多个独立 props 反复透传。
  */
 export interface HistoryRowDescriptor<T extends BaseStepValue = BaseStepValue> {
-  /** 组级描述文案生成器，接收一个 group，返回展示文本。 */
-  describeGroup: (_group: any) => string;
+  /**
+   * 组级描述文案生成器，接收一个 group，返回展示文本。
+   * 不传时回退到对组内最后一步调用 {@link describeStep}（适用于不做相邻合并、每组恒为单步的历史，如数据源/代码块）。
+   */
+  describeGroup?: (_group: any) => string;
   /** 单步描述文案生成器，接收一个 step，返回展示文本（合并组展开后的子步列表用）。 */
   describeStep: (_step: T) => string;
   /** 判断某个 step 是否可查看差异（前后值都存在）。不传则一律不展示差异入口。 */

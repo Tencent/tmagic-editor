@@ -71,10 +71,10 @@ describe('PageTab.vue', () => {
     expect(rows).toHaveLength(2);
     // 第一组 add
     expect(rows[0].find('.m-editor-history-list-item-op').text()).toBe('新增');
-    expect(rows[0].find('.m-editor-history-list-item-desc').text()).toContain('新增 1 个节点');
+    expect(rows[0].find('.m-editor-history-list-item-desc').text()).toBe('A (id: n1)');
     // 第二组 update
     expect(rows[1].find('.m-editor-history-list-item-op').text()).toBe('修改');
-    expect(rows[1].find('.m-editor-history-list-item-desc').text()).toBe('修改 按钮 (id: btn) · style.color');
+    expect(rows[1].find('.m-editor-history-list-item-desc').text()).toBe('按钮 (id: btn) · style.color');
   });
 
   test('step 含 timestamp 时渲染时间元素', () => {

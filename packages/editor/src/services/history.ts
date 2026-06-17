@@ -23,9 +23,7 @@ import type { ChangeRecord } from '@tmagic/form';
 import { guid } from '@tmagic/utils';
 
 import type {
-  CodeBlockHistoryGroup,
   CodeBlockStepValue,
-  DataSourceHistoryGroup,
   DataSourceStepValue,
   HistoryOpSource,
   HistoryPersistOptions,
@@ -33,6 +31,7 @@ import type {
   PageHistoryGroup,
   PageHistoryStepEntry,
   PersistedHistoryState,
+  StackHistoryGroup,
   StepValue,
 } from '@editor/type';
 import { getEditorConfig } from '@editor/utils/config';
@@ -527,8 +526,8 @@ class History extends BaseService {
    * 取出全部代码块的历史栈，按 codeBlockId 分桶展示。
    * 同一栈内每条操作记录独立成组，不做相邻 update 合并。
    */
-  public getCodeBlockHistoryGroups(): CodeBlockHistoryGroup[] {
-    const groups: CodeBlockHistoryGroup[] = [];
+  public getCodeBlockHistoryGroups(): StackHistoryGroup<CodeBlockStepValue, 'code-block'>[] {
+    const groups: StackHistoryGroup<CodeBlockStepValue, 'code-block'>[] = [];
     Object.entries(this.state.codeBlockState).forEach(([id, undoRedo]) => {
       if (!undoRedo) return;
       const list = undoRedo.getElementList();
@@ -619,8 +618,8 @@ class History extends BaseService {
   /**
    * 取出全部数据源的历史栈，按 dataSourceId 分桶展示。同上，每条操作独立成组。
    */
-  public getDataSourceHistoryGroups(): DataSourceHistoryGroup[] {
-    const groups: DataSourceHistoryGroup[] = [];
+  public getDataSourceHistoryGroups(): StackHistoryGroup<DataSourceStepValue, 'data-source'>[] {
+    const groups: StackHistoryGroup<DataSourceStepValue, 'data-source'>[] = [];
     Object.entries(this.state.dataSourceState).forEach(([id, undoRedo]) => {
       if (!undoRedo) return;
       const list = undoRedo.getElementList();

@@ -158,9 +158,9 @@ describe('HistoryListPanel.vue', () => {
     expect(rows.length).toBe(3);
 
     const descs = rows.map((r) => r.find('.m-editor-history-list-item-desc').text());
-    expect(descs.some((t) => t.includes('新增 1 个节点'))).toBe(true);
-    expect(descs.some((t) => t === '创建 DS (id: ds_1)')).toBe(true);
-    expect(descs.some((t) => t === '创建 CB (id: code_1)')).toBe(true);
+    expect(descs.some((t) => t === 'A (id: n1)')).toBe(true);
+    expect(descs.some((t) => t === 'DS (id: ds_1)')).toBe(true);
+    expect(descs.some((t) => t === 'CB (id: code_1)')).toBe(true);
   });
 
   test('点击合并组头部能切换 expanded 状态（不触发 goto）', async () => {
@@ -288,7 +288,7 @@ describe('HistoryListPanel.vue', () => {
 
     const heads = wrapper.findAll('.m-editor-history-list-group-head');
     // 找到数据源 tab 那一组
-    const dsHead = heads.find((h) => h.text().includes('创建 DS'));
+    const dsHead = heads.find((h) => h.text().includes('DS (id: ds_1)'));
     expect(dsHead).toBeTruthy();
     await dsHead!.find('.m-editor-history-list-item-goto').trigger('click');
     expect(dataSourceService.goto).toHaveBeenCalledWith('ds_1', 1);
@@ -307,7 +307,7 @@ describe('HistoryListPanel.vue', () => {
     await nextTick();
 
     const heads = wrapper.findAll('.m-editor-history-list-group-head');
-    const cbHead = heads.find((h) => h.text().includes('创建 CB'));
+    const cbHead = heads.find((h) => h.text().includes('CB (id: code_1)'));
     expect(cbHead).toBeTruthy();
     await cbHead!.find('.m-editor-history-list-item-goto').trigger('click');
     expect(codeBlockService.goto).toHaveBeenCalledWith('code_1', 1);

@@ -8,8 +8,8 @@ import { defineComponent, h } from 'vue';
 import { mount } from '@vue/test-utils';
 
 import BucketTab from '@editor/layouts/history-list/BucketTab.vue';
-import { describeCodeBlockGroup, describeCodeBlockStep } from '@editor/layouts/history-list/composables';
-import type { CodeBlockHistoryGroup, CodeBlockStepValue } from '@editor/type';
+import { describeStep } from '@editor/layouts/history-list/composables';
+import type { CodeBlockStepValue, HistoryBucketConfig, StackHistoryGroup } from '@editor/type';
 
 vi.mock('@tmagic/design', () => ({
   TMagicScrollbar: defineComponent({
@@ -40,7 +40,7 @@ const buildGroup = (
   steps: any[],
   applied = true,
   startIndex = 0,
-): CodeBlockHistoryGroup => ({
+): StackHistoryGroup<CodeBlockStepValue, 'code-block'> => ({
   kind: 'code-block',
   id,
   opType,
@@ -49,16 +49,17 @@ const buildGroup = (
 });
 
 /** 代码块 tab 复用通用 BucketTab，固定注入代码块的 config（title/prefix/describe/isStepDiffable）。 */
+const codeBlockConfig: HistoryBucketConfig<any> = {
+  title: '代码块',
+  prefix: 'cb',
+  describeStep: (step: CodeBlockStepValue): string => describeStep(step, (content) => content?.name, '代码块'),
+  isStepDiffable: (step: CodeBlockStepValue) => Boolean(step.diff?.[0]?.oldSchema && step.diff?.[0]?.newSchema),
+};
+
 const mountCodeBlockTab = (props: { buckets: any[]; expanded: Record<string, boolean> }) =>
   mount(BucketTab, {
     props: {
-      config: {
-        title: '代码块',
-        prefix: 'cb',
-        describeGroup: describeCodeBlockGroup,
-        describeStep: describeCodeBlockStep,
-        isStepDiffable: (step: CodeBlockStepValue) => Boolean(step.diff?.[0]?.oldSchema && step.diff?.[0]?.newSchema),
-      },
+      config: codeBlockConfig,
       ...props,
     },
   });
@@ -83,7 +84,7 @@ describe('CodeBlockTab.vue', () => {
     expect(wrapper.find('.m-editor-history-list-bucket-title code').text()).toBe('code_1');
 
     const desc = wrapper.find('.m-editor-history-list-item-desc').text();
-    expect(desc).toBe('创建 fn (id: code_1)');
+    expect(desc).toBe('fn (id: code_1)');
   });
 
   test('toggle 透传：key 形如 cb-${id}-${idx}', async () => {
@@ -178,7 +179,7 @@ describe('CodeBlockTab.vue', () => {
     const items = wrapper.findAll('.m-editor-history-list-substeps li');
     expect(items).toHaveLength(2);
     // 子步倒序渲染（最新在上）：params 在前，content 在后
-    expect(items[0].text()).toContain('修改 fn (id: code_1) · params');
-    expect(items[1].text()).toContain('修改 fn (id: code_1) · content');
+    expect(items[0].text()).toContain('fn (id: code_1) · params');
+    expect(items[1].text()).toContain('fn (id: code_1) · content');
   });
 });

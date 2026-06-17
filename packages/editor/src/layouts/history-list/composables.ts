@@ -5,10 +5,6 @@ import { datetimeFormatter } from '@tmagic/form';
 import { useServices } from '@editor/hooks/use-services';
 import type {
   BaseStepValue,
-  CodeBlockHistoryGroup,
-  CodeBlockStepValue,
-  DataSourceHistoryGroup,
-  DataSourceStepValue,
   HistoryOpSource,
   HistoryOpType,
   HistoryRowDescriptor,
@@ -227,12 +223,14 @@ export const toRowGroup = <T extends BaseStepValue = BaseStepValue>(
 ): HistoryRowGroup => {
   const { describeGroup, describeStep, isStepDiffable, isStepRevertable } = descriptor;
   const timestamp = groupTimestamp(group);
+  // 无 describeGroup 时回退到组内最后一步的 describeStep：数据源/代码块不做相邻合并，每组恒为单步，二者等价。
+  const lastStep = group.steps[group.steps.length - 1]?.step;
   return {
     key,
     applied: group.applied,
     isCurrent: Boolean(group.isCurrent),
     opType: group.opType,
-    desc: describeGroup(group),
+    desc: describeGroup ? describeGroup(group) : describeStep(lastStep),
     source: groupSource(group),
     time: formatHistoryTime(timestamp),
     timeTitle: formatHistoryFullTime(timestamp),
@@ -273,29 +271,42 @@ const pickLastDescription = (descs: (string | undefined)[]): string | undefined 
   return undefined;
 };
 
-export const describePageStep = (step: StepValue) => {
+/**
+ * 页面 / 数据源 / 代码块三类历史共用的单步描述核心。
+ * 各类型只在「取展示名」与「实体单位名」上有差异，通过参数注入，文案模板完全一致：
+ * - 新增 / 删除：单实体展示「label」，多实体（仅页面可能出现）退化为「N 个X」；
+ * - 修改：展示「label · propPath」，无 diff 时兜底「X」，多实体退化为「N 个X」。
+ * 操作类型（新增 / 删除 / 修改）已由列表行的 op 徽标单独展示，故描述文案不再重复动词。
+ * 展示 id 统一取 schema.id；调用方显式传入的 historyDescription 永远优先。
+ */
+export const describeStep = <T>(
+  step: BaseStepValue<T>,
+  getLabel: (_schema?: T) => string | number | undefined,
+  unit: string,
+): string => {
   if (step.historyDescription) return step.historyDescription;
-  const { opType } = step;
   const items = step.diff ?? [];
-  if (opType === 'add') {
-    const count = items.length;
+  const label = (schema?: T) => labelWithId(getLabel(schema), (schema as { id?: string | number } | undefined)?.id);
+
+  if (step.opType === 'add') {
     const node = items[0]?.newSchema;
-    return `新增 ${count} 个节点${count === 1 && node ? `（${labelWithId(nameOf(node), node.id)}）` : ''}`;
+    return items.length === 1 && node ? label(node) : `${items.length} 个${unit}`;
   }
-  if (opType === 'remove') {
-    const count = items.length;
+  if (step.opType === 'remove') {
     const node = items[0]?.oldSchema;
-    return `删除 ${count} 个节点${count === 1 && node ? `（${labelWithId(nameOf(node), node.id)}）` : ''}`;
+    return items.length === 1 && node ? label(node) : `${items.length} 个${unit}`;
   }
-  if (!items.length) return '修改节点';
+  if (!items.length) return unit;
   if (items.length === 1) {
-    const { newSchema, changeRecords } = items[0];
-    const propPath = changeRecords?.[0]?.propPath;
-    const target = labelWithId(nameOf(newSchema), newSchema?.id);
-    return `修改 ${target}${propPath ? ` · ${propPath}` : ''}`;
+    const { newSchema, oldSchema, changeRecords } = items[0];
+    const propPath = changeRecords?.map((changeRecord) => changeRecord.propPath).join(',');
+    const target = label(newSchema ?? oldSchema);
+    return propPath ? `${target} · ${propPath}` : target;
   }
-  return `修改 ${items.length} 个节点`;
+  return `${items.length} 个${unit}`;
 };
+
+export const describePageStep = (step: StepValue): string => describeStep(step, (node) => nameOf(node), '节点');
 
 /**
  * 合并组的展示文案：
@@ -307,68 +318,8 @@ export const describePageGroup = (group: PageHistoryGroup) => {
   const lastDesc = pickLastDescription(group.steps.map((s) => s.step.historyDescription));
   if (lastDesc) return lastDesc;
   if (group.steps.length === 1) return describePageStep(group.steps[0].step);
-  const paths = new Set<string>();
-  group.steps.forEach((s) => {
-    s.step.diff?.[0]?.changeRecords?.forEach((r) => r.propPath && paths.add(r.propPath));
-  });
-  const pathList = Array.from(paths).slice(0, 3).join(', ');
-  const target = labelWithId(
-    group.targetName ?? (group.targetId !== undefined ? `${group.targetId}` : '节点'),
-    group.targetId,
-  );
-  return pathList ? `修改 ${target} · ${pathList}${paths.size > 3 ? '…' : ''}` : `修改 ${target}`;
-};
 
-export const describeDataSourceStep = (step: DataSourceStepValue) => {
-  if (step.historyDescription) return step.historyDescription;
-  const { oldSchema: oldSchema, newSchema: newSchema, changeRecords } = step.diff?.[0] ?? {};
-  if (!oldSchema && newSchema) return `创建 ${labelWithId(newSchema.title, newSchema.id ?? step.id)}`;
-  if (!newSchema && oldSchema) return `删除 ${labelWithId(oldSchema.title, oldSchema.id ?? step.id)}`;
-  const propPath = changeRecords?.[0]?.propPath;
-  const title = labelWithId(newSchema?.title || oldSchema?.title, step.id);
-  return propPath ? `修改 ${title} · ${propPath}` : `修改 ${title}`;
-};
-
-export const describeDataSourceGroup = (group: DataSourceHistoryGroup) => {
-  const lastDesc = pickLastDescription(group.steps.map((s) => s.step.historyDescription));
-  if (lastDesc) return lastDesc;
-  if (group.steps.length === 1) return describeDataSourceStep(group.steps[0].step);
-  const paths = new Set<string>();
-  group.steps.forEach((s) => {
-    s.step.diff?.[0]?.changeRecords?.forEach((r) => r.propPath && paths.add(r.propPath));
-  });
-  const pathList = Array.from(paths).slice(0, 3).join(', ');
-  const rawTitle =
-    group.steps[group.steps.length - 1].step.diff?.[0]?.newSchema?.title ||
-    group.steps[0].step.diff?.[0]?.oldSchema?.title;
-  const target = labelWithId(rawTitle, group.id);
-  return pathList ? `修改 ${target} · ${pathList}${paths.size > 3 ? '…' : ''}` : `修改 ${target}`;
-};
-
-export const describeCodeBlockStep = (step: CodeBlockStepValue) => {
-  if (step.historyDescription) return step.historyDescription;
-  const { oldSchema: oldContent, newSchema: newContent, changeRecords } = step.diff?.[0] ?? {};
-  if (!oldContent && newContent) return `创建 ${labelWithId(newContent.name, newContent.id ?? step.id)}`;
-  if (!newContent && oldContent) return `删除 ${labelWithId(oldContent.name, oldContent.id ?? step.id)}`;
-  const propPath = changeRecords?.[0]?.propPath;
-  const title = labelWithId(newContent?.name || oldContent?.name, step.id);
-  return propPath ? `修改 ${title} · ${propPath}` : `修改 ${title}`;
-};
-
-export const describeCodeBlockGroup = (group: CodeBlockHistoryGroup) => {
-  const lastDesc = pickLastDescription(group.steps.map((s) => s.step.historyDescription));
-  if (lastDesc) return lastDesc;
-  if (group.steps.length === 1) return describeCodeBlockStep(group.steps[0].step);
-  const paths = new Set<string>();
-  group.steps.forEach((s) => {
-    s.step.diff?.[0]?.changeRecords?.forEach((r) => r.propPath && paths.add(r.propPath));
-  });
-  const pathList = Array.from(paths).slice(0, 3).join(', ');
-  const rawName =
-    group.steps[group.steps.length - 1].step.diff?.[0]?.newSchema?.name ||
-    group.steps[0].step.diff?.[0]?.oldSchema?.name;
-  const target = labelWithId(rawName, group.id);
-  return pathList ? `修改 ${target} · ${pathList}${paths.size > 3 ? '…' : ''}` : `修改 ${target}`;
+  return labelWithId(group.targetName ?? (group.targetId !== undefined ? `${group.targetId}` : '节点'), group.targetId);
 };
 
 /**
@@ -385,22 +336,11 @@ export const isPageStepRevertable = (step: StepValue): boolean => {
 };
 
 /**
- * 数据源 step 是否支持「回滚」：
+ * 单 diff 项历史（数据源 / 代码块）是否支持「回滚」：
  * - 新增（无 oldSchema）/ 删除（无 newSchema）：不依赖 changeRecords，始终可回滚；
- * - 更新（前后 schema 都存在）：必须有 changeRecords 才支持局部反向 patch，否则不支持回滚。
+ * - 更新（前后内容都存在）：必须有 changeRecords 才支持局部反向 patch，否则不支持回滚。
  */
-export const isDataSourceStepRevertable = (step: DataSourceStepValue): boolean => {
-  const item = step.diff?.[0];
-  if (!item?.oldSchema || !item?.newSchema) return true;
-  return Boolean(item.changeRecords?.length);
-};
-
-/**
- * 代码块 step 是否支持「回滚」：
- * - 新增（无 oldSchema）/ 删除（无 newSchema）：不依赖 changeRecords，始终可回滚；
- * - 更新（前后 content 都存在）：必须有 changeRecords 才支持局部反向 patch，否则不支持回滚。
- */
-export const isCodeBlockStepRevertable = (step: CodeBlockStepValue): boolean => {
+export const isSingleDiffStepRevertable = (step: BaseStepValue): boolean => {
   const item = step.diff?.[0];
   if (!item?.oldSchema || !item?.newSchema) return true;
   return Boolean(item.changeRecords?.length);

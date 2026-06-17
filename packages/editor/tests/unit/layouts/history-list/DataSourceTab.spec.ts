@@ -8,8 +8,8 @@ import { defineComponent, h } from 'vue';
 import { mount } from '@vue/test-utils';
 
 import BucketTab from '@editor/layouts/history-list/BucketTab.vue';
-import { describeDataSourceGroup, describeDataSourceStep } from '@editor/layouts/history-list/composables';
-import type { DataSourceHistoryGroup, DataSourceStepValue } from '@editor/type';
+import { describeStep } from '@editor/layouts/history-list/composables';
+import type { DataSourceStepValue, HistoryBucketConfig, StackHistoryGroup } from '@editor/type';
 
 vi.mock('@tmagic/design', () => ({
   TMagicScrollbar: defineComponent({
@@ -40,7 +40,7 @@ const buildGroup = (
   steps: any[],
   applied = true,
   startIndex = 0,
-): DataSourceHistoryGroup => ({
+): StackHistoryGroup<DataSourceStepValue, 'data-source'> => ({
   kind: 'data-source',
   id,
   opType,
@@ -49,16 +49,17 @@ const buildGroup = (
 });
 
 /** 数据源 tab 复用通用 BucketTab，固定注入数据源的 config（title/prefix/describe/isStepDiffable）。 */
+const dataSourceConfig: HistoryBucketConfig<any> = {
+  title: '数据源',
+  prefix: 'ds',
+  describeStep: (step: DataSourceStepValue): string => describeStep(step, (schema) => schema?.title, '数据源'),
+  isStepDiffable: (step: DataSourceStepValue) => Boolean(step.diff?.[0]?.oldSchema && step.diff?.[0]?.newSchema),
+};
+
 const mountDataSourceTab = (props: { buckets: any[]; expanded: Record<string, boolean> }) =>
   mount(BucketTab, {
     props: {
-      config: {
-        title: '数据源',
-        prefix: 'ds',
-        describeGroup: describeDataSourceGroup,
-        describeStep: describeDataSourceStep,
-        isStepDiffable: (step: DataSourceStepValue) => Boolean(step.diff?.[0]?.oldSchema && step.diff?.[0]?.newSchema),
-      },
+      config: dataSourceConfig,
       ...props,
     },
   });
@@ -92,9 +93,9 @@ describe('DataSourceTab.vue', () => {
     const rows = wrapper.findAll('.m-editor-history-list-group');
     expect(rows).toHaveLength(2);
     expect(rows[0].find('.m-editor-history-list-item-op').text()).toBe('新增');
-    expect(rows[0].find('.m-editor-history-list-item-desc').text()).toBe('创建 A (id: ds_1)');
+    expect(rows[0].find('.m-editor-history-list-item-desc').text()).toBe('A (id: ds_1)');
     expect(rows[1].find('.m-editor-history-list-item-op').text()).toBe('删除');
-    expect(rows[1].find('.m-editor-history-list-item-desc').text()).toBe('删除 B (id: ds_2)');
+    expect(rows[1].find('.m-editor-history-list-item-desc').text()).toBe('B (id: ds_2)');
   });
 
   test('toggle 透传：key 形如 ds-${id}-${idx}', async () => {
