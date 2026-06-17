@@ -378,11 +378,11 @@ export const fixNodePosition = (config: MNode, parent: MContainer, stage: StageC
   const style = { ...(config.style || {}) };
   const baseStyle = config.style || {};
 
-  if ('left' in baseStyle && !('right' in baseStyle)) {
+  if (!('right' in baseStyle)) {
     style.left = fixNodeLeft(config, parent, stage?.renderer?.contentWindow?.document);
   }
 
-  if ('top' in baseStyle && !('bottom' in baseStyle)) {
+  if (!('top' in baseStyle) && !('bottom' in baseStyle)) {
     style.top = getMiddleTop(config, parent, stage);
   }
 
