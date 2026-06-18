@@ -105,19 +105,6 @@ const save = () => {
 
 const { menu, deviceGroup, iframe, previewVisible } = useEditorMenu(value, save);
 
-try {
-  // eslint-disable-next-line no-eval
-  const magicDSL = eval(`(${localStorage.getItem('magicDSL')})`);
-  if (!magicDSL) {
-    save();
-  } else {
-    value.value = magicDSL;
-  }
-} catch (e) {
-  console.error(e);
-  save();
-}
-
 editorService.usePlugin({
   beforeDoAdd: (config: MNode, parent: MContainer) => {
     if (config.type === 'overlay') {
@@ -174,7 +161,20 @@ editorService.on('root-change', rootChangeHandler);
 
 onMounted(async () => {
   await restoreHistory();
-  value.value = dsl;
+  try {
+    // eslint-disable-next-line no-eval
+    const magicDSL = eval(`(${localStorage.getItem('magicDSL')})`);
+    if (!magicDSL) {
+      value.value = dsl;
+      save();
+    } else {
+      value.value = magicDSL;
+    }
+  } catch (e) {
+    console.error(e);
+    save();
+  }
+
   historyService.on('change', schedulePersist);
   historyService.on('code-block-history-change', schedulePersist);
   historyService.on('data-source-history-change', schedulePersist);
