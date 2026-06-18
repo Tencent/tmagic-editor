@@ -17,14 +17,14 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, type Ref, ref, type ShallowRef, useTemplateRef, watch, watchEffect } from 'vue';
+import { computed, inject, provide, type Ref, ref, type ShallowRef, useTemplateRef, watch, watchEffect } from 'vue';
 import { isEqual } from 'lodash-es';
 
 import { type CodeBlockContent, type DataSourceSchema, HookType, type MNode } from '@tmagic/core';
 import { type FormConfig, type FormState, type FormValue, MForm } from '@tmagic/form';
 
 import { useServices } from '@editor/hooks/use-services';
-import type { CompareCategory, CompareFormLoadConfig } from '@editor/type';
+import type { CompareCategory, CompareFormLoadConfig, Services } from '@editor/type';
 import { getCodeBlockFormConfig } from '@editor/utils/code-block';
 
 defineOptions({
@@ -67,15 +67,19 @@ const props = withDefaults(
      * `ctx.defaultLoadConfig()` 复用默认结果再做二次加工。返回的 config 直接用于对比展示。
      */
     loadConfig?: CompareFormLoadConfig;
+    /** 编辑器服务集合，由调用方传入（不再通过 inject('services') 获取）。 */
+    services: Services;
   }>(),
   {
     category: 'node',
     labelWidth: '120px',
+    services: () => useServices(),
   },
 );
 
-const { propsService, dataSourceService, codeBlockService, editorService } = useServices();
-const services = useServices();
+const { propsService, dataSourceService, codeBlockService, editorService } = props.services;
+
+provide('services', props.services);
 
 const config = ref<FormConfig>([]);
 
@@ -242,7 +246,7 @@ const stage = computed(() => editorService.get('stage'));
 watchEffect(() => {
   if (formRef.value) {
     formRef.value.formState.stage = stage.value;
-    formRef.value.formState.services = services;
+    formRef.value.formState.services = props.services;
   }
 });
 

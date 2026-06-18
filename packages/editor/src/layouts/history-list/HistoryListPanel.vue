@@ -91,9 +91,6 @@
       </TMagicTooltip>
     </template>
   </TMagicPopover>
-
-  <HistoryDiffDialog ref="diffDialog" :extend-state="extendFormState" />
-  <HistoryDiffDialog ref="confirmDialog" :is-confirm="true" :extend-state="extendFormState" />
 </template>
 
 <script lang="ts" setup>
@@ -118,18 +115,10 @@
  * （通过 title / prefix / describe* / isStepDiffable 注入差异）。
  * 共享的描述生成与折叠状态在 composables.ts 中维护。
  */
-import { computed, inject, markRaw, ref, useTemplateRef, watch } from 'vue';
+import { computed, inject, markRaw, ref, watch } from 'vue';
 import { Clock, Close } from '@element-plus/icons-vue';
 
-import {
-  getDesignConfig,
-  TMagicButton,
-  tMagicMessage,
-  tMagicMessageBox,
-  TMagicPopover,
-  TMagicTabs,
-  TMagicTooltip,
-} from '@tmagic/design';
+import { getDesignConfig, TMagicButton, tMagicMessage, TMagicPopover, TMagicTabs, TMagicTooltip } from '@tmagic/design';
 import type { FormState } from '@tmagic/form';
 
 import MIcon from '@editor/components/Icon.vue';
@@ -138,15 +127,15 @@ import type {
   BaseStepValue,
   CodeBlockStepValue,
   DataSourceStepValue,
-  DiffDialogPayload,
   HistoryBucketConfig,
   HistoryListExtraTab,
 } from '@editor/type';
 
 import BucketTab from './BucketTab.vue';
-import { describeStep, isSingleDiffStepRevertable, useHistoryList } from './composables';
-import HistoryDiffDialog from './HistoryDiffDialog.vue';
+import { confirmHistoryAction, describeStep, isSingleDiffStepRevertable } from './composables';
 import PageTab from './PageTab.vue';
+import { useHistoryList } from './useHistoryList';
+import { useHistoryRevert } from './useHistoryRevert';
 
 defineOptions({
   name: 'MEditorHistoryListPanel',
@@ -173,8 +162,9 @@ const extraTabs = inject<HistoryListExtraTab[]>('historyListExtraTabs', []);
 /** label 支持字符串或函数，函数形式便于展示动态数量等内容。 */
 const resolveTabLabel = (tab: HistoryListExtraTab) => (typeof tab.label === 'function' ? tab.label() : tab.label);
 
+const services = useServices();
 const { editorService, dataSourceService, codeBlockService, historyService, propsService, stageOverlayService } =
-  useServices();
+  services;
 
 /**
  * 数据源 / 代码块功能可被业务方通过 `disabledDataSource` / `disabledCodeBlock` 禁用，
@@ -294,222 +284,13 @@ const onCodeBlockGotoInitial = (id: string | number) => {
   codeBlockService.goto(id, 0);
 };
 
-const diffDialogRef = useTemplateRef<InstanceType<typeof HistoryDiffDialog>>('diffDialog');
-const confirmDialogRef = useTemplateRef<InstanceType<typeof HistoryDiffDialog>>('confirmDialog');
-
 /**
- * 三类历史（页面 / 数据源 / 代码块）差异弹窗入参的构造差异，收敛为一份配置：
- * 仅「分组来源、当前值读取、类型 / 展示名提取」不同，定位 step、校验前后值、组装 payload 的流程共用。
+ * 「单步回滚」与「查看差异」的完整逻辑收敛到 useHistoryRevert，面板与业务方共用：
+ * 二者均由 useHistoryRevert 内部按需动态挂载 HistoryDiffDialog，
+ * 业务方亦可直接 import useHistoryRevert(services) 调用，无需自行挂载任何弹窗。
  */
-interface DiffPayloadSource {
-  /** 表单类别：节点 / 数据源 / 代码块。 */
-  category: DiffDialogPayload['category'];
-  /** 该类别按时间正序的历史分组列表（含已撤销）。 */
-  groups: () => { id?: string | number; steps: { index: number; step: { diff?: any[] } }[] }[];
-  /** 读取目标当前实际值，用于「与当前对比」；不存在时返回空即禁用对比。 */
-  getCurrent: (_id: string | number) => Record<string, any> | null | undefined;
-  /** 由新/旧快照提取展示名（含各自的兜底，如节点回退 type、数据源 / 代码块回退 id）。 */
-  resolveLabel: (_newSchema: Record<string, any>, _oldSchema: Record<string, any>, _id: string | number) => string;
-  /** 由新/旧快照提取类型；代码块无 type 字段则不传。 */
-  resolveType?: (_newSchema: Record<string, any>, _oldSchema: Record<string, any>) => string;
-}
-
-/**
- * 构造差异弹窗入参：仅 update（前后值都存在）可对比。
- * - 页面（无 id）：在全部分组中按 index 定位 step，目标 id 取自快照；
- * - 数据源 / 代码块（带 id）：先匹配分组 id 再按 index 定位。
- * 无可对比内容（多节点 / add / remove）或定位不到时返回 null。
- */
-const buildDiffPayload = (source: DiffPayloadSource, index: number, id?: string | number): DiffDialogPayload | null => {
-  for (const group of source.groups()) {
-    if (id !== undefined && group.id !== id) continue;
-    const step = group.steps.find((s) => s.index === index)?.step;
-    if (!step) continue;
-    const oldSchema = step.diff?.[0]?.oldSchema as Record<string, any> | undefined;
-    const newSchema = step.diff?.[0]?.newSchema as Record<string, any> | undefined;
-    if (!oldSchema || !newSchema) return null;
-    const targetId = id ?? newSchema.id ?? oldSchema.id;
-    const type = source.resolveType?.(newSchema, oldSchema);
-    return {
-      category: source.category,
-      ...(type !== undefined ? { type } : {}),
-      lastValue: oldSchema,
-      value: newSchema,
-      currentValue: (targetId !== undefined ? source.getCurrent(targetId) : null) || null,
-      targetLabel: source.resolveLabel(newSchema, oldSchema, targetId),
-      id: targetId,
-    };
-  }
-  return null;
-};
-
-const buildPageDiffPayload = (index: number): DiffDialogPayload | null =>
-  buildDiffPayload(
-    {
-      category: 'node',
-      groups: () => historyService.getPageHistoryGroups(),
-      getCurrent: (id) => editorService.getNodeById(id) as Record<string, any> | null,
-      resolveType: (n, o) => n.type || o.type || '',
-      resolveLabel: (n, o) => n.name || o.name || n.type || o.type || '',
-    },
-    index,
-  );
-
-const buildDataSourceDiffPayload = (id: string | number, index: number): DiffDialogPayload | null =>
-  buildDiffPayload(
-    {
-      category: 'data-source',
-      groups: () => historyService.getDataSourceHistoryGroups(),
-      getCurrent: (id) => dataSourceService.getDataSourceById(`${id}`) as Record<string, any> | null,
-      resolveType: (n, o) => n.type || o.type || 'base',
-      resolveLabel: (n, o, id) => n.title || o.title || `${id}`,
-    },
-    index,
-    id,
-  );
-
-const buildCodeBlockDiffPayload = (id: string | number, index: number): DiffDialogPayload | null =>
-  buildDiffPayload(
-    {
-      category: 'code-block',
-      groups: () => historyService.getCodeBlockHistoryGroups(),
-      getCurrent: (id) => codeBlockService.getCodeContentById(id) as Record<string, any> | null,
-      resolveLabel: (n, o, id) => n.name || o.name || `${id}`,
-    },
-    index,
-    id,
-  );
-
-const onPageDiff = (index: number) => {
-  const payload = buildPageDiffPayload(index);
-  if (payload) diffDialogRef.value?.open(payload);
-};
-
-const onDataSourceDiff = (id: string | number, index: number) => {
-  const payload = buildDataSourceDiffPayload(id, index);
-  if (payload) diffDialogRef.value?.open(payload);
-};
-
-const onCodeBlockDiff = (id: string | number, index: number) => {
-  const payload = buildCodeBlockDiffPayload(id, index);
-  if (payload) diffDialogRef.value?.open(payload);
-};
-
-/**
- * 「回滚」统一入口：把目标历史步骤的修改作为一次新操作反向应用（类 git revert），
- * 不破坏原有栈结构。各 service 内部完成反向 + 入栈，并自带描述用于面板展示。
- *
- * 交互：
- * - 可差异对比的步骤（单节点 / 单实体 update）：弹出差异弹窗供用户确认，点「确定回滚」再执行；
- * - 无法对比的步骤（add / remove / 多节点更新，payload 为 null）：弹出普通二次确认框，确认后执行。
- *
- * 页面 / 数据源 / 代码块三类回滚仅「差异入参构造」与「实际 revert 调用」不同，
- * 由调用方分别传入 payload 与 revert，公共的弹窗 / 确认流程在此收敛。
- */
-const runRevert = (payload: DiffDialogPayload | null): Promise<boolean> => {
-  if (payload && confirmDialogRef.value) {
-    return confirmDialogRef.value.confirm(payload);
-  }
-  return confirmRevert();
-};
-
-/**
- * 回滚前置校验：若该历史步骤回滚所依赖的目标数据已被删除，则无法回滚。
- * - update（把旧值写回）：被修改的目标必须仍存在；
- * - 页面 remove（还原被删节点）：被删节点的原父容器必须仍存在，否则无处插回；
- * add（回滚即删除）即使目标已不在，也已达成「删除」目的，不视为失败。
- *
- * 命中时弹出「回滚失败」提示并返回 true，调用方据此中止本次回滚。
- */
-const isPageRevertTargetMissing = (index: number): boolean => {
-  const step = historyService.getPageStepList()[index]?.step;
-  if (!step) return false;
-  if (step.opType === 'update') {
-    return (step.diff ?? []).some((item) => {
-      const id = item.newSchema?.id ?? item.oldSchema?.id;
-      return id !== undefined && !editorService.getNodeById(id, false);
-    });
-  }
-  if (step.opType === 'remove') {
-    return (step.diff ?? []).some(
-      (item) => item.parentId !== undefined && !editorService.getNodeById(item.parentId, false),
-    );
-  }
-  return false;
-};
-
-/** 数据源 update 步骤回滚时，对应数据源必须仍存在（已删除则无处写回旧值）。 */
-const isDataSourceRevertTargetMissing = (id: string | number, index: number): boolean => {
-  const step = historyService.getDataSourceStepList(id)[index]?.step;
-  return Boolean(step && step.opType === 'update' && !dataSourceService.getDataSourceById(`${id}`));
-};
-
-/** 代码块 update 步骤回滚时，对应代码块必须仍存在（已删除则无处写回旧值）。 */
-const isCodeBlockRevertTargetMissing = (id: string | number, index: number): boolean => {
-  const step = historyService.getCodeBlockStepList(id)[index]?.step;
-  return Boolean(step && step.opType === 'update' && !codeBlockService.getCodeContentById(id));
-};
-
-/** 目标数据已被删除、无法回滚时的统一提示。 */
-const showRevertTargetMissing = () => {
-  tMagicMessage.error('回滚失败：该记录对应的数据已被删除');
-};
-
-const onPageRevert = (index: number) => {
-  if (isPageRevertTargetMissing(index)) {
-    showRevertTargetMissing();
-    return Promise.resolve(null);
-  }
-  return runRevert(buildPageDiffPayload(index)).then((result) => (result ? editorService.revertPageStep(index) : null));
-};
-
-const onDataSourceRevert = (id: string | number, index: number) => {
-  if (isDataSourceRevertTargetMissing(id, index)) {
-    showRevertTargetMissing();
-    return Promise.resolve(null);
-  }
-  return runRevert(buildDataSourceDiffPayload(id, index)).then((result) =>
-    result ? dataSourceService.revert(id, index) : null,
-  );
-};
-
-const onCodeBlockRevert = (id: string | number, index: number) => {
-  if (isCodeBlockRevertTargetMissing(id, index)) {
-    showRevertTargetMissing();
-    return Promise.resolve(null);
-  }
-  return runRevert(buildCodeBlockDiffPayload(id, index)).then((result) =>
-    result ? codeBlockService.revert(id, index) : null,
-  );
-};
-
-/**
- * 「回滚」二次确认：新增 / 删除 / 多节点更新等无法做差异对比的步骤，
- * 不弹差异弹窗，改用一个普通确认框替代「确定回滚」按钮，避免点击后无任何提示直接执行。
- * 用户取消时返回 false，调用方据此中止回滚。
- */
-const confirmRevert = (): Promise<boolean> =>
-  confirmDialog(
-    '确定回滚该步骤吗？回滚会将该操作作为一条新记录反向应用（新增将被删除、删除将被还原），不影响后续历史记录。',
-  );
-
-/**
- * 通用二次确认弹窗：清空历史 / 无法差异对比的回滚等会改变状态的操作，先弹出确认框，
- * 用户点击「确定」返回 true，取消（confirm reject）时返回 false 并静默忽略。
- */
-const confirmDialog = async (message: string): Promise<boolean> => {
-  try {
-    await tMagicMessageBox.confirm(message, '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning',
-    });
-    return true;
-    // eslint-disable-next-line no-unused-vars
-  } catch (e) {
-    return false;
-  }
-};
+const { onPageRevert, onDataSourceRevert, onCodeBlockRevert, onPageDiff, onDataSourceDiff, onCodeBlockDiff } =
+  useHistoryRevert(services, { extendState: extendFormState });
 
 /**
  * 把内存中（已清空对应类别后的）历史状态重新写回 IndexedDB，
@@ -527,7 +308,9 @@ const syncIndexedDB = async () => {
 
 const onPageClear = async () => {
   if (
-    await confirmDialog('确定清空当前页面的历史记录吗？清空后将无法撤销/重做之前的操作，本地保存的记录也会一并删除。')
+    await confirmHistoryAction(
+      '确定清空当前页面的历史记录吗？清空后将无法撤销/重做之前的操作，本地保存的记录也会一并删除。',
+    )
   ) {
     historyService.clearPage();
     await syncIndexedDB();
@@ -536,7 +319,9 @@ const onPageClear = async () => {
 
 const onDataSourceClear = async () => {
   if (
-    await confirmDialog('确定清空数据源的历史记录吗？清空后将无法撤销/重做之前的操作，本地保存的记录也会一并删除。')
+    await confirmHistoryAction(
+      '确定清空数据源的历史记录吗？清空后将无法撤销/重做之前的操作，本地保存的记录也会一并删除。',
+    )
   ) {
     historyService.clearDataSource();
     await syncIndexedDB();
@@ -545,7 +330,9 @@ const onDataSourceClear = async () => {
 
 const onCodeBlockClear = async () => {
   if (
-    await confirmDialog('确定清空代码块的历史记录吗？清空后将无法撤销/重做之前的操作，本地保存的记录也会一并删除。')
+    await confirmHistoryAction(
+      '确定清空代码块的历史记录吗？清空后将无法撤销/重做之前的操作，本地保存的记录也会一并删除。',
+    )
   ) {
     historyService.clearCodeBlock();
     await syncIndexedDB();

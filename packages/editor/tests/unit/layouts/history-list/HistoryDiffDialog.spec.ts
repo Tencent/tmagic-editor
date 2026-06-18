@@ -82,10 +82,12 @@ vi.mock('@editor/layouts/CodeEditor.vue', () => ({
   }),
 }));
 
+const services = {} as any;
+
 const factory = () =>
   mount(HistoryDiffDialog, {
     // 让 Teleport 内容内联渲染，便于通过 wrapper 查询
-    global: { stubs: { teleport: true } },
+    global: { stubs: { teleport: true }, provide: { services } },
   });
 
 const basePayload = (extra: any = {}) => ({
@@ -217,7 +219,7 @@ describe('HistoryDiffDialog.vue', () => {
 
   test('有 onConfirm 时标题为「确认回滚」并展示回滚说明', async () => {
     const wrapper = mount(HistoryDiffDialog, {
-      global: { stubs: { teleport: true } },
+      global: { stubs: { teleport: true }, provide: { services } },
       props: { onConfirm: vi.fn() },
     });
     (wrapper.vm as any).open(basePayload());

@@ -67,6 +67,44 @@ const menu = ref({
 - 数据源：`dataSourceService.revertById(uuids)`
 - 代码块：`codeBlockService.revertById(uuids)`
 
+#### 复用面板的「交互式回滚 / 查看差异」流程
+
+上面的 `revert*` 方法是**静默**的：它们直接执行反向应用，不做任何校验与二次确认。如果业务方想在自己的入口（自定义按钮、右键菜单等）里复用历史面板那一套**完整交互流程**——即「目标数据已删除的前置校验 + 失败提示」「可差异步骤弹差异确认弹窗 / 其余步骤弹普通二次确认框」「用户确认后才回滚」，以及「查看差异」弹窗——可以直接 import `useHistoryRevert`：
+
+```ts
+import { useHistoryRevert } from '@tmagic/editor';
+
+// editorRef 为 <m-editor> 组件实例，其 expose 出的即各 service 集合（Services）
+const {
+  onPageRevert,
+  onDataSourceRevert,
+  onCodeBlockRevert,
+  onPageDiff,
+  onDataSourceDiff,
+  onCodeBlockDiff,
+} = useHistoryRevert(editorRef.value);
+
+// 回滚：可差异步骤弹出差异确认弹窗、其余步骤弹普通二次确认框；用户点「确定」后回滚第 index 步，
+// 命中前置校验或用户取消时不执行，返回 null
+await onPageRevert(index);
+await onDataSourceRevert(id, index);
+await onCodeBlockRevert(id, index);
+
+// 查看差异：可差异步骤弹出只读差异弹窗展示前后值差异，无可对比内容时不弹窗
+onPageDiff(index);
+onDataSourceDiff(id, index);
+onCodeBlockDiff(id, index);
+```
+
+回滚确认弹窗与查看差异弹窗均由 `useHistoryRevert` 内部**按需动态挂载** `HistoryDiffDialog` 实现，业务方无需自行挂载任何弹窗组件。第二个参数 `options` 可选：
+
+| 字段 | 必填 | 说明 |
+| --- | --- | --- |
+| `appContext` | 否 | 父级应用上下文，用于让动态挂载的差异确认弹窗继承全局组件 / 指令 / provide / 插件（Element Plus、`@tmagic/form` 字段组件等）。在组件 `setup` 中调用时会自动取当前组件的 `appContext`，无需手动传；仅当在组件 setup 之外调用时才需显式传入（如 `editorApp._context`）。 |
+| `extendState` | 否 | 透传给差异确认弹窗的 `extendState`（同 Editor 的 [`extendFormState`](#自定义对比判断)），使对比表单中依赖业务上下文的 `display` / `disabled` 等 `filterFunction` 正常工作。 |
+
+> 若只需要无确认、无校验的静默回滚，直接用上面的 `editorService.revertPageStep` 等即可，无需 `useHistoryRevert`。
+
 ### 4. 差异对比
 
 在前后值都存在的 `update` 步骤上提供「查看差异」入口，点击后弹出差异对话框。对话框支持两个维度的切换：

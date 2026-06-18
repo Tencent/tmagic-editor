@@ -9,10 +9,15 @@ import { mount } from '@vue/test-utils';
 
 import historyService from '@editor/services/history';
 
-const { diffDialogOpen, confirmDialogConfirm } = vi.hoisted(() => ({
-  diffDialogOpen: vi.fn(),
-  confirmDialogConfirm: vi.fn(async () => true),
-}));
+const { onPageDiff, onDataSourceDiff, onCodeBlockDiff, onPageRevert, onDataSourceRevert, onCodeBlockRevert } =
+  vi.hoisted(() => ({
+    onPageDiff: vi.fn(),
+    onDataSourceDiff: vi.fn(),
+    onCodeBlockDiff: vi.fn(),
+    onPageRevert: vi.fn(),
+    onDataSourceRevert: vi.fn(),
+    onCodeBlockRevert: vi.fn(),
+  }));
 
 const stageSelect = vi.fn();
 const overlayStageSelect = vi.fn();
@@ -48,6 +53,17 @@ vi.mock('@editor/hooks/use-services', () => ({
     propsService,
     stageOverlayService,
   }),
+}));
+
+vi.mock('@editor/layouts/history-list/useHistoryRevert', () => ({
+  useHistoryRevert: vi.fn(() => ({
+    onPageRevert,
+    onDataSourceRevert,
+    onCodeBlockRevert,
+    onPageDiff,
+    onDataSourceDiff,
+    onCodeBlockDiff,
+  })),
 }));
 
 vi.mock('@tmagic/design', () => ({
@@ -95,18 +111,6 @@ vi.mock('@editor/components/Icon.vue', () => ({
     props: ['icon'],
     setup() {
       return () => h('i', { class: 'fake-icon' });
-    },
-  }),
-}));
-
-// 差异对话框有独立的单测（HistoryDiffDialog.spec.ts），这里 stub 掉以隔离面板自身逻辑，
-// 同时避免其内部依赖（monaco CodeEditor / CompareForm / 设计层弹窗组件）在本用例下未被 mock 而报错。
-vi.mock('@editor/layouts/history-list/HistoryDiffDialog.vue', () => ({
-  default: defineComponent({
-    name: 'FakeHistoryDiffDialog',
-    setup(_p, { expose }) {
-      expose({ open: diffDialogOpen, close: vi.fn(), confirm: confirmDialogConfirm });
-      return () => h('div', { class: 'fake-history-diff-dialog' });
     },
   }),
 }));
@@ -393,16 +397,10 @@ describe('HistoryListPanel.vue', () => {
     await nextTick();
 
     await wrapper.find('.m-editor-history-list-item-diff').trigger('click');
-    expect(diffDialogOpen).toHaveBeenCalledWith(
-      expect.objectContaining({
-        category: 'node',
-        targetLabel: '新按钮',
-        value: expect.objectContaining({ name: '新按钮' }),
-      }),
-    );
+    expect(onPageDiff).toHaveBeenCalledWith(0);
   });
 
-  test('点击页面 update 记录的「回滚」在确认后调用 revertPageStep', async () => {
+  test('点击页面 update 记录的「回滚」透传到 onPageRevert', async () => {
     historyService.changePage({ id: 'p1' } as any);
     historyService.push({
       opType: 'update',
@@ -420,12 +418,11 @@ describe('HistoryListPanel.vue', () => {
     await nextTick();
 
     await wrapper.find('.m-editor-history-list-item-revert').trigger('click');
-    await nextTick();
-    expect(confirmDialogConfirm).toHaveBeenCalled();
-    expect(editorService.revertPageStep).toHaveBeenCalledWith(0);
+    expect(onPageRevert).toHaveBeenCalledWith(0);
+    expect(editorService.revertPageStep).not.toHaveBeenCalled();
   });
 
-  test('回滚目标节点已删除时提示错误且不执行 revert', async () => {
+  test('回滚目标校验由 useHistoryRevert 处理，面板仅透传 index', async () => {
     historyService.changePage({ id: 'p1' } as any);
     historyService.push({
       opType: 'update',
@@ -438,15 +435,11 @@ describe('HistoryListPanel.vue', () => {
         },
       ],
     } as any);
-    editorService.getNodeById.mockReturnValueOnce(null);
-
-    const { tMagicMessage } = await import('@tmagic/design');
     const wrapper = await factory();
     await nextTick();
 
     await wrapper.find('.m-editor-history-list-item-revert').trigger('click');
-    await nextTick();
-    expect(tMagicMessage.error).toHaveBeenCalledWith('回滚失败：该记录对应的数据已被删除');
+    expect(onPageRevert).toHaveBeenCalledWith(0);
     expect(editorService.revertPageStep).not.toHaveBeenCalled();
   });
 
@@ -505,7 +498,7 @@ describe('HistoryListPanel.vue', () => {
     historyService.pushDataSource('ds_1', {
       oldSchema: { id: 'ds_1', title: '旧 DS' } as any,
       newSchema: { id: 'ds_1', title: '新 DS' } as any,
-      changeRecords: [{ propPath: 'title' }],
+      changeRecords: [{ propPath: 'title', value: '新 DS' }],
     });
 
     const wrapper = await factory();
@@ -513,14 +506,11 @@ describe('HistoryListPanel.vue', () => {
 
     const diffBtn = wrapper.find('.m-editor-history-list-item-diff');
     await diffBtn.trigger('click');
-    expect(diffDialogOpen).toHaveBeenCalledWith(
-      expect.objectContaining({ category: 'data-source', targetLabel: '新 DS' }),
-    );
+    expect(onDataSourceDiff).toHaveBeenCalledWith('ds_1', 1);
 
     await wrapper.find('.m-editor-history-list-item-revert').trigger('click');
-    await nextTick();
-    expect(confirmDialogConfirm).toHaveBeenCalled();
-    expect(dataSourceService.revert).toHaveBeenCalledWith('ds_1', 1);
+    expect(onDataSourceRevert).toHaveBeenCalledWith('ds_1', 1);
+    expect(dataSourceService.revert).not.toHaveBeenCalled();
   });
 
   test('确认清空数据源/代码块历史后调用 clearDataSource / clearCodeBlock', async () => {

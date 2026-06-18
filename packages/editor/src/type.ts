@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import type { Component } from 'vue';
+import type { AppContext, Component } from 'vue';
 import type EventEmitter from 'events';
 import type * as Monaco from 'monaco-editor';
 import type { default as Sortable, Options, SortableEvent } from 'sortablejs';
@@ -33,7 +33,7 @@ import type {
   MPage,
   MPageFragment,
 } from '@tmagic/core';
-import type { ChangeRecord, FormConfig, TableColumnConfig, TypeFunction } from '@tmagic/form';
+import type { ChangeRecord, FormConfig, FormState, TableColumnConfig, TypeFunction } from '@tmagic/form';
 import type StageCore from '@tmagic/stage';
 import type {
   CanDropIn,
@@ -1317,4 +1317,50 @@ export interface HistoryBucketConfig<T extends BaseStepValue = BaseStepValue> ex
   showInitial?: boolean;
   /** 是否支持「跳转到该记录」(goto)，默认 true。 */
   gotoEnabled?: boolean;
+}
+
+export interface UseHistoryRevertOptions {
+  /**
+   * 父级应用上下文，用于让动态挂载的「差异确认弹窗」继承全局组件 / 指令 / provide / 插件
+   * （Element Plus、@tmagic/form 字段组件等）。未显式传入时，会自动取调用方所在组件的 appContext
+   * （`getCurrentInstance()?.appContext`）。业务方若在组件 setup 之外调用，需手动传入（如 `editorApp._context`）。
+   */
+  appContext?: AppContext | null;
+  /**
+   * 透传给差异确认弹窗的 `extendState`（即 Editor 的 `extendFormState`），
+   * 使对比表单中依赖业务上下文的 `display` / `disabled` 等 filterFunction 正常工作。
+   */
+  extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
+}
+
+/**
+ * 业务自有历史（如管理台「模块」）做差异对比时所需的额外渲染入参。
+ * 内置的页面 / 数据源 / 代码块按 `category` 自动取表单配置，无需传这些；
+ * 业务自有类别可通过 `loadConfig` 注入自定义表单配置加载逻辑。
+ */
+export interface CustomDiffFormOptions {
+  /**
+   * 自定义差异表单配置加载逻辑（如「模块」按 c_type 重建表单配置），
+   * 透传给弹窗内部的 CompareForm；缺省时按 `category` 走内置加载。
+   */
+  loadConfig?: CompareFormLoadConfig;
+  /** 需要走 self diff 的字段类型（如模块的 mod-cond）。 */
+  selfDiffFieldTypes?: string[];
+}
+
+/**
+ * 业务自有历史复用「单步回滚」交互（{@link useHistoryRevert} 的 `confirmAndRevert`）的入参。
+ * 与内置页面 / 数据源 / 代码块回滚共用「目标校验 → 差异/二次确认弹窗 → 反向回滚」流程，
+ * 业务方只需提供：差异弹窗入参（可选）、表单配置加载（可选）、实际回滚执行函数。
+ */
+export interface ConfirmAndRevertOptions<T = unknown> extends CustomDiffFormOptions {
+  /**
+   * 差异确认弹窗入参；可对比的步骤（单实体 update）传入后弹差异确认弹窗，
+   * 传 null / 省略则退化为普通二次确认框（add / remove / 不可对比）。
+   */
+  diffPayload?: DiffDialogPayload | null;
+  /** 回滚前置校验：返回 true 表示目标数据已删除等不可回滚，给出统一提示并中止。 */
+  isTargetMissing?: () => boolean;
+  /** 用户确认后执行的实际回滚逻辑。 */
+  revert: () => T | Promise<T>;
 }

@@ -30,17 +30,15 @@ const editorService = {
   get: vi.fn(() => ({ select: vi.fn() })),
 };
 
+const services = {
+  propsService,
+  dataSourceService,
+  codeBlockService,
+  editorService,
+} as any;
+
 let capturedShowDiff: ((args: any) => boolean) | undefined;
 let capturedFormProps: Record<string, any> = {};
-
-vi.mock('@editor/hooks/use-services', () => ({
-  useServices: () => ({
-    propsService,
-    dataSourceService,
-    codeBlockService,
-    editorService,
-  }),
-}));
 
 vi.mock('@editor/utils/code-block', () => ({
   getCodeBlockFormConfig: vi.fn(() => [{ type: 'text', name: 'content' }]),
@@ -73,6 +71,7 @@ describe('CompareForm.vue', () => {
         type: 'text',
         value: { id: 'n1', name: 'new' },
         lastValue: { id: 'n1', name: 'old' },
+        services,
       },
       global: {
         provide: {
@@ -94,6 +93,7 @@ describe('CompareForm.vue', () => {
       props: {
         category: 'node',
         value: { id: 'n1' },
+        services,
       },
     });
     await nextTick();
@@ -107,6 +107,7 @@ describe('CompareForm.vue', () => {
         type: 'http',
         value: { id: 'ds_1', title: 'A' },
         lastValue: { id: 'ds_1', title: 'B' },
+        services,
       },
     });
     await nextTick();
@@ -120,6 +121,7 @@ describe('CompareForm.vue', () => {
         category: 'code-block',
         value: { id: 'cb_1', content: { toString: () => 'fn-body' } },
         lastValue: { id: 'cb_1', content: '' },
+        services,
       },
     });
     await nextTick();
@@ -135,6 +137,7 @@ describe('CompareForm.vue', () => {
         type: 'text',
         value: { id: 'n1' },
         height: '400px',
+        services,
       },
     });
     const style = wrapper.find('.m-editor-compare-form-wrapper').attributes('style') || '';
@@ -153,6 +156,7 @@ describe('CompareForm.vue', () => {
         type: 'text',
         value: { id: 'n1' },
         loadConfig,
+        services,
       },
     });
     await nextTick();
@@ -168,6 +172,7 @@ describe('CompareForm.vue', () => {
         category: 'node',
         type: 'text',
         value: { id: 'n1' },
+        services,
       },
     });
     await nextTick();
@@ -202,6 +207,7 @@ describe('CompareForm.vue', () => {
         category: 'data-source',
         type: 'base',
         value: { id: 'ds_1' },
+        services,
       },
     });
     await nextTick();
@@ -219,6 +225,7 @@ describe('CompareForm.vue', () => {
         category: 'node',
         type: 'text',
         value: { id: 'n1' },
+        services,
       },
     });
     await nextTick();

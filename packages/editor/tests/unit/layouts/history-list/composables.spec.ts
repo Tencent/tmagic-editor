@@ -16,8 +16,8 @@ import {
   isPageStepRevertable,
   isSingleDiffStepRevertable,
   opLabel,
-  useHistoryList,
 } from '@editor/layouts/history-list/composables';
+import { useHistoryList } from '@editor/layouts/history-list/useHistoryList';
 import historyService from '@editor/services/history';
 import type { PageHistoryGroup, PageHistoryStepEntry, StepValue } from '@editor/type';
 

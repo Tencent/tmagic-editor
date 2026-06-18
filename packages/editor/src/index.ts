@@ -74,6 +74,8 @@ export { default as CompareForm } from './components/CompareForm.vue';
 export { default as HistoryListBucket } from './layouts/history-list/Bucket.vue';
 export { default as HistoryListBucketTab } from './layouts/history-list/BucketTab.vue';
 export { default as HistoryDiffDialog } from './layouts/history-list/HistoryDiffDialog.vue';
+export { confirmHistoryAction } from './layouts/history-list/composables';
+export { useHistoryRevert } from './layouts/history-list/useHistoryRevert';
 export { default as FloatingBox } from './components/FloatingBox.vue';
 export { default as Tree } from './components/Tree.vue';
 export { default as TreeNode } from './components/TreeNode.vue';
