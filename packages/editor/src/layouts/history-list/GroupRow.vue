@@ -50,6 +50,13 @@
       >
 
       <span
+        v-if="!merged && group.operator"
+        class="m-editor-history-list-item-operator"
+        :title="`操作人：${group.operator}`"
+        >{{ group.operator }}</span
+      >
+
+      <span
         v-if="!merged && group.time"
         class="m-editor-history-list-item-time"
         :title="group.timeTitle || group.time"
@@ -103,6 +110,9 @@
           :title="`操作途径：${sourceLabel(s.source)}`"
           >{{ sourceLabel(s.source) }}</span
         >
+        <span v-if="s.operator" class="m-editor-history-list-item-operator" :title="`操作人：${s.operator}`">{{
+          s.operator
+        }}</span>
         <span v-if="s.time" class="m-editor-history-list-item-time" :title="s.timeTitle || s.time">{{ s.time }}</span>
       </li>
     </ul>

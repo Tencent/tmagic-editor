@@ -17,6 +17,7 @@
  */
 
 import { reactive } from 'vue';
+import type { Writable } from 'type-fest';
 
 import type { CodeBlockContent, DataSourceSchema, Id, MPage, MPageFragment } from '@tmagic/core';
 import type { ChangeRecord } from '@tmagic/form';
@@ -33,6 +34,7 @@ import type {
   PersistedHistoryState,
   StackHistoryGroup,
   StepValue,
+  SyncHookPlugin,
 } from '@editor/type';
 import { getEditorConfig } from '@editor/utils/config';
 import {
@@ -50,6 +52,22 @@ import { UndoRedo } from '@editor/utils/undo-redo';
 
 import BaseService from './BaseService';
 import editorService from './editor';
+
+const canUsePluginMethods = {
+  sync: [
+    'push',
+    'pushCodeBlock',
+    'pushDataSource',
+    'undoCodeBlock',
+    'redoCodeBlock',
+    'undoDataSource',
+    'redoDataSource',
+    'undo',
+    'redo',
+  ] as const,
+};
+
+type SyncMethodName = Writable<(typeof canUsePluginMethods)['sync']>;
 
 /** 历史记录持久化快照的默认存储位置与结构版本。 */
 const DEFAULT_DB_NAME = 'tmagic-editor';
@@ -69,7 +87,7 @@ class History extends BaseService {
   });
 
   constructor() {
-    super([]);
+    super([...canUsePluginMethods.sync.map((methodName) => ({ name: methodName, isAsync: false }))]);
 
     this.on('change', this.setCanUndoRedo);
   }
@@ -628,6 +646,10 @@ class History extends BaseService {
       groups.push(...mergeStackSteps('data-source', id, list, cursor));
     });
     return groups;
+  }
+
+  public usePlugin(options: SyncHookPlugin<SyncMethodName, History>): void {
+    super.usePlugin(options);
   }
 
   /**

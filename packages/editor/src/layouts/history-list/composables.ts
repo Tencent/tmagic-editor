@@ -25,51 +25,49 @@ export interface HistoryBucketGroup<T extends BaseStepValue = BaseStepValue> {
   steps: { index: number; applied: boolean; isCurrent?: boolean; step: T }[];
 }
 
-/** GroupRow 渲染所需的单个子步视图模型（已由 {@link toRowGroup} 预先派生，组件内部不再触碰原始 step）。 */
-export interface HistoryRowStep {
-  /** 该子步在所属栈中的稳定索引。 */
-  index: number;
+/**
+ * GroupRow 的组头部与子步共用的展示字段（均由 {@link toRowGroup} 预先派生）。
+ * 抽出公共部分避免 {@link HistoryRowStep} / {@link HistoryRowGroup} 重复声明，
+ * 也便于消费方用本类型收窄「组头 / 子步」通用渲染逻辑的入参。
+ */
+export interface HistoryRowDisplay {
   /** 是否已应用（false 表示已被 undo，UI 灰态）。 */
   applied: boolean;
-  /** 是否为当前所在步骤。 */
-  isCurrent?: boolean;
-  /** 是否为最近一次保存的记录。 */
-  saved?: boolean;
-  /** 子步描述文案。 */
+  /** 是否为当前所在步骤 / 分组。 */
+  isCurrent: boolean;
+  /** 描述文案。 */
   desc: string;
-  /** 是否可查看差异。 */
-  diffable?: boolean;
-  /** 是否可回滚。 */
-  revertable?: boolean;
   /** 操作途径。 */
   source?: HistoryOpSource;
+  /** 操作人。 */
+  operator?: string;
   /** 时间文案。 */
   time?: string;
   /** 时间的完整 title 提示。 */
   timeTitle?: string;
 }
 
+/** GroupRow 渲染所需的单个子步视图模型（已由 {@link toRowGroup} 预先派生，组件内部不再触碰原始 step）。 */
+export interface HistoryRowStep extends HistoryRowDisplay {
+  /** 该子步在所属栈中的稳定索引。 */
+  index: number;
+  /** 是否为最近一次保存的记录。 */
+  saved?: boolean;
+  /** 是否可查看差异。 */
+  diffable?: boolean;
+  /** 是否可回滚。 */
+  revertable?: boolean;
+}
+
 /**
  * GroupRow 渲染所需的整组视图模型（由 {@link toRowGroup} 统一派生）。
  * 把原先 GroupRow 上十多个扁平 props 收敛为单一对象，header 信息与子步列表一并携带。
  */
-export interface HistoryRowGroup {
+export interface HistoryRowGroup extends HistoryRowDisplay {
   /** 分组的稳定 key，作为 toggle 事件 payload 与折叠状态的索引。 */
   key: string;
-  /** 组内最后一步是否已应用。 */
-  applied: boolean;
-  /** 是否为当前所在分组。 */
-  isCurrent: boolean;
   /** 操作类型，用于徽标颜色与文案。 */
   opType: HistoryOpType;
-  /** 组整体描述文案。 */
-  desc: string;
-  /** 组的操作途径（取组内最近一步）。 */
-  source?: HistoryOpSource;
-  /** 组头部时间文案（取组内最近一步）。 */
-  time?: string;
-  /** 组头部时间的完整 title 提示。 */
-  timeTitle?: string;
   /** 子步列表（时间正序）；其长度即合并步数，length > 1 即为合并组。 */
   subSteps: HistoryRowStep[];
 }
@@ -144,6 +142,10 @@ export const sourceLabel = (source: HistoryOpSource = 'unknown'): string => {
 export const groupSource = (group: { steps: { step: { source?: HistoryOpSource } }[] }): HistoryOpSource | undefined =>
   group.steps[group.steps.length - 1]?.step.source;
 
+/** 取一组历史步骤里最后一步（最近一次）的操作人，用于组头部展示。 */
+export const groupOperator = (group: { steps: { step: { operator?: string } }[] }): string | undefined =>
+  group.steps[group.steps.length - 1]?.step.operator;
+
 /** {@link toRowGroup} 接受的最小分组结构，PageHistoryGroup 与 HistoryBucketGroup 均满足。 */
 interface RowGroupInput<T extends BaseStepValue = BaseStepValue> {
   applied: boolean;
@@ -173,17 +175,19 @@ export const toRowGroup = <T extends BaseStepValue = BaseStepValue>(
     opType: group.opType,
     desc: describeGroup ? describeGroup(group) : describeStep(lastStep),
     source: groupSource(group),
+    operator: groupOperator(group),
     time: formatHistoryTime(timestamp),
     timeTitle: formatHistoryFullTime(timestamp),
     subSteps: group.steps.map((s) => ({
       index: s.index,
       applied: s.applied,
-      isCurrent: s.isCurrent,
+      isCurrent: Boolean(s.isCurrent),
       saved: s.step.saved,
       desc: describeStep(s.step),
       diffable: isStepDiffable ? isStepDiffable(s.step) : false,
       revertable: s.applied && (isStepRevertable ? isStepRevertable(s.step) : true),
       source: s.step.source,
+      operator: s.step.operator,
       time: formatHistoryTime(s.step.timestamp),
       timeTitle: formatHistoryFullTime(s.step.timestamp),
     })),

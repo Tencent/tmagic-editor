@@ -23,6 +23,7 @@ const makeGroup = (overrides: Partial<HistoryRowGroup> = {}): HistoryRowGroup =>
 /** 构造单个子步，缺省值贴近真实派生结果。 */
 const makeStep = (overrides: Partial<HistoryRowStep> & Pick<HistoryRowStep, 'index'>): HistoryRowStep => ({
   applied: true,
+  isCurrent: false,
   desc: '',
   ...overrides,
 });

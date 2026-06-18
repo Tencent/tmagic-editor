@@ -330,6 +330,20 @@
     font-weight: 400; // 防止被合并组头部的粗体继承
   }
 
+  // 「操作人」徽标：浅蓝描边胶囊，弱化展示操作人，仅在 step.operator 有值时渲染。
+  .m-editor-history-list-item-operator {
+    flex: 0 0 auto;
+    padding: 0 6px;
+    border: 1px solid #c6e2ff;
+    border-radius: 8px;
+    font-size: 10px;
+    line-height: 14px;
+    color: #409eff;
+    background-color: #ecf5ff;
+    white-space: nowrap;
+    font-weight: 400; // 防止被合并组头部的粗体继承
+  }
+
   // 「已保存」徽标：绿色实心胶囊，标记最近一次保存对应的历史记录（与 historyService.markSaved 对应）。
   .m-editor-history-list-item-saved {
     flex: 0 0 auto;

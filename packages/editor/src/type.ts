@@ -820,6 +820,10 @@ export interface BaseStepValue<T = unknown> {
    * 避免源码反复保存 / 外部重设 DSL 时堆积多条 root 记录。
    */
   rootStep?: boolean;
+  /** 操作人 */
+  operator?: string;
+  /** 扩展信息 */
+  extra?: Record<string, any>;
 }
 // #endregion BaseStepValue
 
