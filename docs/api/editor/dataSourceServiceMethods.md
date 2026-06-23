@@ -311,8 +311,8 @@ dataSourceService.setFormMethod("http", [
   添加一个数据源，如果配置中没有id或id已存在，会自动生成新的id
 
   ::: tip
-  添加成功会自动调用 `historyService.pushDataSource` 入栈一条 `oldSchema=null` 的新增记录，
-  参见 [historyService.pushDataSource](./historyServiceMethods.md#pushdatasource)。
+  添加成功会自动调用 `historyService.push('dataSource', step, id)` 入栈一条 `oldSchema=null` 的新增记录，
+  参见 [historyService.push](./historyServiceMethods.md#push)。
   传入 `doNotPushHistory: true` 可跳过写入历史栈，常用于批量导入、外部同步等非用户操作场景。
   :::
 
@@ -355,7 +355,7 @@ console.log(newDs.id); // 自动生成的id
   更新数据源
 
   ::: tip
-  更新成功会自动调用 `historyService.pushDataSource` 入栈一条 `oldSchema` / `newSchema`
+  更新成功会自动调用 `historyService.push('dataSource', step, id)` 入栈一条 `oldSchema` / `newSchema`
   均为对应 schema 的更新记录，传入的 `changeRecords` 也会一并写进 step；撤销/重做时调用方可据此按
   `propPath` 局部回放，缺省才退化为整 schema 替换。传入 `doNotPushHistory: true` 可跳过写入历史栈。
   :::
@@ -394,7 +394,7 @@ console.log(updatedDs);
   删除指定id的数据源
 
   ::: tip
-  对实际存在的数据源会自动调用 `historyService.pushDataSource` 入栈一条 `newSchema=null`
+  对实际存在的数据源会自动调用 `historyService.push('dataSource', step, id)` 入栈一条 `newSchema=null`
   的删除记录；不存在的 id 不会入历史。传入 `doNotPushHistory: true` 也可显式跳过写入历史栈。
   :::
 
@@ -579,7 +579,7 @@ if (dataSourceService.canUndo("ds_123")) {
 
 - **详情：**
 
-  当前指定数据源是否可撤销，等价于 `historyService.canUndoDataSource(id)`。
+  当前指定数据源是否可撤销，等价于 `historyService.canUndo('dataSource', id)`。
 
 ## canRedo
 
@@ -591,7 +591,7 @@ if (dataSourceService.canUndo("ds_123")) {
 
 - **详情：**
 
-  当前指定数据源是否可重做，等价于 `historyService.canRedoDataSource(id)`。
+  当前指定数据源是否可重做，等价于 `historyService.canRedo('dataSource', id)`。
 
 ## copyWithRelated
 

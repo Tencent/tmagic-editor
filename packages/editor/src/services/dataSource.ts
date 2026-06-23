@@ -20,7 +20,7 @@ import type {
 } from '@editor/type';
 import { getFormConfig, getFormValue } from '@editor/utils/data-source';
 import { COPY_DS_STORAGE_KEY } from '@editor/utils/editor';
-import { describeRevertStep, getLastPushedHistoryIds } from '@editor/utils/history';
+import { createStackStep, describeRevertStep, getLastPushedHistoryIds } from '@editor/utils/history';
 
 import BaseService from './BaseService';
 
@@ -137,13 +137,13 @@ class DataSource extends BaseService {
     this.get('dataSources').push(newConfig);
 
     if (!doNotPushHistory) {
-      this.lastPushedHistoryId =
-        historyService.pushDataSource(newConfig.id, {
-          oldSchema: null,
-          newSchema: newConfig,
-          historyDescription,
-          source: historySource,
-        })?.uuid ?? null;
+      const step = createStackStep<DataSourceSchema, DataSourceStepValue>(newConfig.id, {
+        oldValue: null,
+        newValue: newConfig,
+        historyDescription,
+        source: historySource,
+      });
+      this.lastPushedHistoryId = (step ? historyService.push('dataSource', step, newConfig.id) : null)?.uuid ?? null;
     }
 
     this.emit('add', newConfig);
@@ -178,14 +178,14 @@ class DataSource extends BaseService {
     dataSources[index] = newConfig;
 
     if (!doNotPushHistory) {
-      this.lastPushedHistoryId =
-        historyService.pushDataSource(newConfig.id, {
-          oldSchema: oldConfig ? cloneDeep(oldConfig) : null,
-          newSchema: newConfig,
-          changeRecords,
-          historyDescription,
-          source: historySource,
-        })?.uuid ?? null;
+      const step = createStackStep<DataSourceSchema, DataSourceStepValue>(newConfig.id, {
+        oldValue: oldConfig ? cloneDeep(oldConfig) : null,
+        newValue: newConfig,
+        changeRecords,
+        historyDescription,
+        source: historySource,
+      });
+      this.lastPushedHistoryId = (step ? historyService.push('dataSource', step, newConfig.id) : null)?.uuid ?? null;
     }
 
     this.emit('update', newConfig, {
@@ -210,13 +210,13 @@ class DataSource extends BaseService {
     dataSources.splice(index, 1);
 
     if (oldConfig && !doNotPushHistory) {
-      this.lastPushedHistoryId =
-        historyService.pushDataSource(id, {
-          oldSchema: cloneDeep(oldConfig),
-          newSchema: null,
-          historyDescription,
-          source: historySource,
-        })?.uuid ?? null;
+      const step = createStackStep<DataSourceSchema, DataSourceStepValue>(id, {
+        oldValue: cloneDeep(oldConfig),
+        newValue: null,
+        historyDescription,
+        source: historySource,
+      });
+      this.lastPushedHistoryId = (step ? historyService.push('dataSource', step, id) : null)?.uuid ?? null;
     }
 
     this.emit('remove', id);
@@ -270,7 +270,7 @@ class DataSource extends BaseService {
    * @returns 撤销的 step；栈不存在或已无可撤销时返回 null
    */
   public undo(id: Id) {
-    const step = historyService.undoDataSource(id);
+    const step = historyService.undo('dataSource', id);
     if (!step) return null;
     this.applyHistoryStep(step, true);
     return step;
@@ -282,7 +282,7 @@ class DataSource extends BaseService {
    * @returns 重做的 step；栈不存在或已无可重做时返回 null
    */
   public redo(id: Id) {
-    const step = historyService.redoDataSource(id);
+    const step = historyService.redo('dataSource', id);
     if (!step) return null;
     this.applyHistoryStep(step, false);
     return step;
@@ -290,12 +290,12 @@ class DataSource extends BaseService {
 
   /** 是否可对指定数据源撤销。 */
   public canUndo(id: Id): boolean {
-    return historyService.canUndoDataSource(id);
+    return historyService.canUndo('dataSource', id);
   }
 
   /** 是否可对指定数据源重做。 */
   public canRedo(id: Id): boolean {
-    return historyService.canRedoDataSource(id);
+    return historyService.canRedo('dataSource', id);
   }
 
   /**
@@ -306,7 +306,7 @@ class DataSource extends BaseService {
    * @returns 实际移动到的最终游标位置
    */
   public goto(id: Id, targetCursor: number): number {
-    let cursor = historyService.getDataSourceCursor(id);
+    let cursor = historyService.getCursor('dataSource', id);
     const target = Math.max(0, targetCursor);
     while (cursor > target) {
       if (!this.undo(id)) break;
@@ -330,13 +330,13 @@ class DataSource extends BaseService {
    * @returns 反向后产生的新 step；目标不存在 / 未应用时返回 null
    */
   public revert(id: Id, index: number): DataSourceStepValue | null {
-    const list = historyService.getDataSourceStepList(id);
+    const list = historyService.getStepList('dataSource', id);
     const entry = list[index];
     if (!entry?.applied) return null;
     // 更新类步骤（前后 schema 都存在）必须带 changeRecords 才支持回滚，否则只能整 schema 替换，会冲掉后续无关变更。
     const { oldSchema, newSchema, changeRecords } = entry.step.diff?.[0] ?? {};
     if (oldSchema && newSchema && !changeRecords?.length) return null;
-    const description = `回滚 #${index + 1}: ${describeRevertStep<DataSourceSchema>(entry.step.id, entry.step.diff?.[0], (s) => s.title)}`;
+    const description = `回滚 #${index + 1}: ${describeRevertStep<DataSourceSchema>(entry.step.data.id, entry.step.diff?.[0], (s) => s.title)}`;
     return this.applyRevertStep(entry.step, description);
   }
 
@@ -349,7 +349,7 @@ class DataSource extends BaseService {
    */
   public revertById(uuids: string[]): (DataSourceStepValue | null)[] {
     return uuids.map((uuid) => {
-      const location = historyService.findDataSourceStepLocationByUuid(uuid);
+      const location = historyService.findStepLocationByUuid('dataSource', uuid);
       if (!location) return null;
       return this.revert(location.id, location.index);
     });
@@ -435,19 +435,19 @@ class DataSource extends BaseService {
    * 同构，差异仅在于走对应的公共 add / update / remove 而不是带 doNotPushHistory 的版本。
    */
   private applyRevertStep(step: DataSourceStepValue, historyDescription: string): DataSourceStepValue | null {
-    const { id } = step;
+    const { id } = step.data;
     const { oldSchema, newSchema, changeRecords } = step.diff?.[0] ?? {};
 
     // 原本是新增 → revert 即删除
     if (!oldSchema && newSchema) {
       this.remove(`${id}`, { historyDescription, historySource: 'rollback' });
-      return historyService.getDataSourceStepList(id).slice(-1)[0]?.step ?? null;
+      return historyService.getStepList('dataSource', id).slice(-1)[0]?.step ?? null;
     }
 
     // 原本是删除 → revert 即重新加回
     if (oldSchema && !newSchema) {
       this.add(cloneDeep(oldSchema), { historyDescription, historySource: 'rollback' });
-      return historyService.getDataSourceStepList(id).slice(-1)[0]?.step ?? null;
+      return historyService.getStepList('dataSource', id).slice(-1)[0]?.step ?? null;
     }
 
     if (!oldSchema || !newSchema) return null;
@@ -471,11 +471,11 @@ class DataSource extends BaseService {
         historyDescription,
         historySource: 'rollback',
       });
-      return historyService.getDataSourceStepList(id).slice(-1)[0]?.step ?? null;
+      return historyService.getStepList('dataSource', id).slice(-1)[0]?.step ?? null;
     }
 
     this.update(cloneDeep(oldSchema), { historyDescription, historySource: 'rollback' });
-    return historyService.getDataSourceStepList(id).slice(-1)[0]?.step ?? null;
+    return historyService.getStepList('dataSource', id).slice(-1)[0]?.step ?? null;
   }
 
   /**
@@ -493,7 +493,7 @@ class DataSource extends BaseService {
    * @param reverse true=撤销，false=重做
    */
   private applyHistoryStep(step: DataSourceStepValue, reverse: boolean): void {
-    const { id } = step;
+    const { id } = step.data;
     const { oldSchema, newSchema, changeRecords } = step.diff?.[0] ?? {};
 
     // 新增 / 删除：直接 add 或 remove，不走 patch 逻辑

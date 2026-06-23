@@ -90,7 +90,7 @@ const getConfig = (item: MenuItem): (MenuButton | MenuComponent)[] => {
         className: 'undo',
         icon: markRaw(Back),
         tooltip: `后退(${ctrl}+z)`,
-        disabled: () => !historyService.state.canUndo,
+        disabled: () => !historyService.canUndo('page', editorService.get('page')?.id),
         handler: () => editorService.undo(),
       });
       break;
@@ -100,7 +100,7 @@ const getConfig = (item: MenuItem): (MenuButton | MenuComponent)[] => {
         className: 'redo',
         icon: markRaw(Right),
         tooltip: `前进(${ctrl}+Shift+z)`,
-        disabled: () => !historyService.state.canRedo,
+        disabled: () => !historyService.canRedo('page', editorService.get('page')?.id),
         handler: () => editorService.redo(),
       });
       break;

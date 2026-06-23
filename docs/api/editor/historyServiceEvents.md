@@ -1,23 +1,17 @@
 # historyService事件
 
-## page-change
-
-- **详情：** 页面切换
-
-- **事件回调函数：** `(undoRedo: UndoRedo) => void`
-
-  ::: details 查看 UndoRedo 类定义
-  <<< @/../packages/editor/src/utils/undo-redo.ts#UndoRedo{ts}
-  :::
-
 ## change
 
-- **详情：** 历史记录发生变化
+- **详情：** 页面历史记录发生变化（`page` 类型 `push` / `undo` / `redo` 成功时触发；与 `code-block-history-change` / `data-source-history-change` 同构）
 
-- **事件回调函数：** `(state: StepValue | null) => void`
+- **事件回调函数：** `(pageId: Id, step: StepValue) => void`
 
   ::: details 查看 StepValue 及关联类型定义
   <<< @/../packages/editor/src/type.ts#StepValue{ts}
+
+  <<< @/../packages/editor/src/type.ts#BaseStepValue{ts}
+
+  <<< @/../packages/editor/src/type.ts#StepExtra{ts}
 
   <<< @/../packages/editor/src/type.ts#HistoryOpType{ts}
 
@@ -29,17 +23,35 @@
   :::
 
   :::tip
-  当游标处于历史栈边界（已经无法继续撤销或重做）时，`UndoRedo.undo()` / `redo()` 返回 `null`，对应 `change` 回调收到的 `state` 为 `null`
+  回调签名已与其它历史类型统一为 `(id, step)`。当游标处于历史栈边界（已无法继续撤销 / 重做）时 `undo` / `redo` 返回 `null`，此时不会触发该事件。
+  :::
+
+## marker-change
+
+- **详情：** 通过 [`setMarker`](./historyServiceMethods.md#setmarker) 为某个历史栈种入 `initial` 基线时触发（适用于所有类型）
+
+- **事件回调函数：** `(id: Id, marker: StepValue, stepType: HistoryStepType) => void`
+
+## clear
+
+- **详情：** 调用 [`clear`](./historyServiceMethods.md#clear) 清空历史栈时触发（适用于所有类型）
+
+- **事件回调函数：** `(id: Id | undefined, stepType: HistoryStepType) => void`
+
+  :::tip
+  `id` 缺省（清空 `stepType` 下全部栈）时回调的 `id` 为 `undefined`。
   :::
 
 ## code-block-history-change
 
-- **详情：** 代码块历史记录发生变化（`pushCodeBlock` / `undoCodeBlock` / `redoCodeBlock` 成功时触发）
+- **详情：** 代码块历史记录发生变化（`push('codeBlock', step, codeBlockId)` / `undo('codeBlock', id)` / `redo('codeBlock', id)` 成功时触发）
 
 - **事件回调函数：** `(codeBlockId: Id, step: CodeBlockStepValue) => void`
 
   ::: details 查看 CodeBlockStepValue 及关联类型定义
   <<< @/../packages/editor/src/type.ts#CodeBlockStepValue{ts}
+
+  <<< @/../packages/editor/src/type.ts#BaseStepValue{ts}
 
   <<< @/../packages/editor/src/type.ts#HistoryOpSource{ts}
 
@@ -49,19 +61,21 @@
   :::
 
   :::tip
-  - 新增触发的 step 中 `oldContent` 为 `null`
-  - 删除触发的 step 中 `newContent` 为 `null`
+  - 新增触发的 step 其 diff 项 `oldSchema` 为 `null`
+  - 删除触发的 step 其 diff 项 `newSchema` 为 `null`
   - `undo` / `redo` 返回 `null`（边界状态）时不会触发该事件
   :::
 
 ## data-source-history-change
 
-- **详情：** 数据源历史记录发生变化（`pushDataSource` / `undoDataSource` / `redoDataSource` 成功时触发）
+- **详情：** 数据源历史记录发生变化（`push('dataSource', step, dataSourceId)` / `undo('dataSource', id)` / `redo('dataSource', id)` 成功时触发）
 
 - **事件回调函数：** `(dataSourceId: Id, step: DataSourceStepValue) => void`
 
   ::: details 查看 DataSourceStepValue 及关联类型定义
   <<< @/../packages/editor/src/type.ts#DataSourceStepValue{ts}
+
+  <<< @/../packages/editor/src/type.ts#BaseStepValue{ts}
 
   <<< @/../packages/editor/src/type.ts#HistoryOpSource{ts}
 
@@ -69,20 +83,20 @@
   :::
 
   :::tip
-  - 新增触发的 step 中 `oldSchema` 为 `null`
-  - 删除触发的 step 中 `newSchema` 为 `null`
+  - 新增触发的 step 其 diff 项 `oldSchema` 为 `null`
+  - 删除触发的 step 其 diff 项 `newSchema` 为 `null`
   - `undo` / `redo` 返回 `null`（边界状态）时不会触发该事件
   :::
 
 ## mark-saved
 
-- **详情：** 调用 `markSaved` / `markPageSaved` / `markCodeBlockSaved` / `markDataSourceSaved` 标记「已保存」记录时触发
+- **详情：** 调用 [`markSaved`](./historyServiceMethods.md#marksaved) 标记「已保存」记录时触发
 
-- **事件回调函数：** `(payload: { kind: 'all' | 'page' | 'code-block' | 'data-source'; id?: Id }) => void`
+- **事件回调函数：** `(payload: { kind: 'all' | HistoryStepType; id?: Id }) => void`
 
   ::: tip
-  - `markSaved` 触发时 `kind` 为 `all`，无 `id`
-  - 细粒度方法触发时 `kind` 对应类别，`id` 为目标页面 / 代码块 / 数据源 id
+  - `markSaved(stepType)`（缺省 id）触发时 `kind` 为 `all`，无 `id`（此时 `stepType` 不生效）
+  - `markSaved(stepType, id)` 触发时 `kind` 为对应的 `stepType`（`page` / `codeBlock` / `dataSource` / 扩展），`id` 为目标栈 id
   :::
 
 ## save-to-indexed-db

@@ -19,13 +19,32 @@ import {
 } from '@editor/layouts/history-list/composables';
 import { useHistoryList } from '@editor/layouts/history-list/useHistoryList';
 import historyService from '@editor/services/history';
-import type { PageHistoryGroup, PageHistoryStepEntry, StepValue } from '@editor/type';
+import type { HistoryGroup, HistoryStepEntry, StepValue } from '@editor/type';
+import { createStackStep } from '@editor/utils/history';
+
+// pushCodeBlock / pushDataSource 已合入统一的 push(stepType, step, id)；用等价小工具沿用既有用例。
+const pushCodeBlock = (id: any, payload: any) => {
+  const step = createStackStep(id, {
+    oldValue: payload.oldContent,
+    newValue: payload.newContent,
+    changeRecords: payload.changeRecords,
+  });
+  return step ? historyService.push('codeBlock', step as any, id) : null;
+};
+const pushDataSource = (id: any, payload: any) => {
+  const step = createStackStep(id, {
+    oldValue: payload.oldSchema,
+    newValue: payload.newSchema,
+    changeRecords: payload.changeRecords,
+  });
+  return step ? historyService.push('dataSource', step as any, id) : null;
+};
 
 afterEach(() => {
   historyService.reset();
 });
 
-const buildPageEntry = (step: StepValue, index = 0, applied = true): PageHistoryStepEntry => ({
+const buildPageEntry = (step: StepValue, index = 0, applied = true): HistoryStepEntry<StepValue> => ({
   step,
   index,
   applied,
@@ -187,9 +206,9 @@ describe('describePageStep', () => {
 
 describe('describePageGroup', () => {
   test('historyDescription 取最后一条非空的描述', () => {
-    const group: PageHistoryGroup = {
+    const group: HistoryGroup<StepValue> = {
       kind: 'page',
-      pageId: 'p1',
+      id: 'p1',
       opType: 'update',
       targetId: 'btn_1',
       targetName: '按钮',
@@ -208,9 +227,9 @@ describe('describePageGroup', () => {
       opType: 'update',
       diff: [{ newSchema: { id: 'a', name: 'A' }, oldSchema: { id: 'a' } }],
     } as unknown as StepValue;
-    const group: PageHistoryGroup = {
+    const group: HistoryGroup<StepValue> = {
       kind: 'page',
-      pageId: 'p1',
+      id: 'p1',
       opType: 'update',
       targetId: 'a',
       targetName: 'A',
@@ -233,9 +252,9 @@ describe('describePageGroup', () => {
         ],
       }) as unknown as StepValue;
 
-    const group: PageHistoryGroup = {
+    const group: HistoryGroup<StepValue> = {
       kind: 'page',
-      pageId: 'p1',
+      id: 'p1',
       opType: 'update',
       targetId: 'btn_1',
       targetName: '按钮',
@@ -258,9 +277,9 @@ describe('describePageGroup', () => {
         ],
       }) as unknown as StepValue;
 
-    const group: PageHistoryGroup = {
+    const group: HistoryGroup<StepValue> = {
       kind: 'page',
-      pageId: 'p1',
+      id: 'p1',
       opType: 'update',
       targetId: 'btn_1',
       targetName: '按钮',
@@ -282,9 +301,9 @@ describe('describePageGroup', () => {
         diff: [{ newSchema: { id: 'btn_1', name: '按钮' }, oldSchema: { id: 'btn_1' } }],
       }) as unknown as StepValue;
 
-    const group: PageHistoryGroup = {
+    const group: HistoryGroup<StepValue> = {
       kind: 'page',
-      pageId: 'p1',
+      id: 'p1',
       opType: 'update',
       targetId: 'btn_1',
       targetName: '按钮',
@@ -295,9 +314,9 @@ describe('describePageGroup', () => {
   });
 
   test('多步组 targetName 缺省时使用 targetId 兜底', () => {
-    const group: PageHistoryGroup = {
+    const group: HistoryGroup<StepValue> = {
       kind: 'page',
-      pageId: 'p1',
+      id: 'p1',
       opType: 'update',
       targetId: 'btn_1',
       applied: true,
@@ -324,7 +343,11 @@ describe('useHistoryList', () => {
     const wrapper = mount(host, {
       global: {
         provide: {
-          services: { historyService },
+          // useHistoryList 现在按当前页 id 取页面历史，提供 editorService.get('page') 返回固定 id 'p1'。
+          services: {
+            historyService,
+            editorService: { get: (k?: string) => (k === 'page' ? { id: 'p1' } : undefined) },
+          },
         },
       },
     });
@@ -345,17 +368,24 @@ describe('useHistoryList', () => {
   test('pageGroupsDisplay：按时间倒序', () => {
     const { api } = mountWithHost();
 
-    historyService.changePage({ id: 'p1' } as any);
-    historyService.push({
-      opType: 'add',
-      diff: [{ newSchema: { id: 'n1', name: 'A' } }],
-      modifiedNodeIds: new Map(),
-    } as any);
-    historyService.push({
-      opType: 'remove',
-      diff: [{ oldSchema: { id: 'n2', name: 'B' } }],
-      modifiedNodeIds: new Map(),
-    } as any);
+    historyService.push(
+      'page',
+      {
+        opType: 'add',
+        diff: [{ newSchema: { id: 'n1', name: 'A' } }],
+        modifiedNodeIds: new Map(),
+      } as any,
+      'p1',
+    );
+    historyService.push(
+      'page',
+      {
+        opType: 'remove',
+        diff: [{ oldSchema: { id: 'n2', name: 'B' } }],
+        modifiedNodeIds: new Map(),
+      } as any,
+      'p1',
+    );
 
     expect(api.pageGroups.value).toHaveLength(2);
     // 正序：最早的 add 在前；倒序展示：最新的 remove 在前
@@ -366,15 +396,15 @@ describe('useHistoryList', () => {
   test('dataSourceGroupsByTarget：按 id 聚拢，每 bucket 内倒序', () => {
     const { api } = mountWithHost();
 
-    historyService.pushDataSource('ds_1', {
+    pushDataSource('ds_1', {
       oldSchema: null,
       newSchema: { id: 'ds_1', title: 'A' } as any,
     });
-    historyService.pushDataSource('ds_1', {
+    pushDataSource('ds_1', {
       oldSchema: { id: 'ds_1', title: 'A' } as any,
       newSchema: { id: 'ds_1', title: 'A2' } as any,
     });
-    historyService.pushDataSource('ds_2', {
+    pushDataSource('ds_2', {
       oldSchema: null,
       newSchema: { id: 'ds_2', title: 'B' } as any,
     });
@@ -394,11 +424,11 @@ describe('useHistoryList', () => {
   test('codeBlockGroupsByTarget：按 id 聚拢', () => {
     const { api } = mountWithHost();
 
-    historyService.pushCodeBlock('code_1', {
+    pushCodeBlock('code_1', {
       oldContent: null,
       newContent: { id: 'code_1', name: 'fn' } as any,
     });
-    historyService.pushCodeBlock('code_2', {
+    pushCodeBlock('code_2', {
       oldContent: null,
       newContent: { id: 'code_2', name: 'fn2' } as any,
     });

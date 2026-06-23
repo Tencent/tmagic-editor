@@ -165,8 +165,8 @@ class Editor extends BaseService {
           // 重复创建，set root 不额外产生记录，由恢复出的历史栈作为当前状态来源。
           // 标记不进入撤销/重做栈，仅作为该页历史列表底部的初始基线展示。
           app.items?.forEach((pageNode) => {
-            if (pageNode?.id !== undefined && !historyService.getPageMarker(pageNode.id)) {
-              historyService.setPageMarker(pageNode.id, {
+            if (pageNode?.id !== undefined && !historyService.getMarker('page', pageNode.id)) {
+              historyService.setMarker('page', pageNode.id, {
                 name: pageNode.name,
                 source: options.historySource,
               });
@@ -296,12 +296,6 @@ class Editor extends BaseService {
     this.set('nodes', node ? [node] : []);
     this.set('page', page);
     this.set('parent', parent);
-
-    if (page) {
-      historyService.changePage(toRaw(page));
-    } else {
-      historyService.resetState();
-    }
 
     if (node?.id) {
       this.get('stage')
@@ -586,8 +580,6 @@ class Editor extends BaseService {
         stage?.select(pages[0].id);
       } else {
         this.selectRoot();
-
-        historyService.resetPage();
       }
     };
 
@@ -1320,7 +1312,9 @@ class Editor extends BaseService {
    * @returns 被撤销的操作
    */
   public async undo(): Promise<StepValue | null> {
-    const value = historyService.undo();
+    const pageId = this.get('page')?.id;
+    if (pageId === undefined) return null;
+    const value = historyService.undo('page', pageId);
     if (value) {
       await this.applyHistoryOp(value, true);
     }
@@ -1332,7 +1326,9 @@ class Editor extends BaseService {
    * @returns 被恢复的操作
    */
   public async redo(): Promise<StepValue | null> {
-    const value = historyService.redo();
+    const pageId = this.get('page')?.id;
+    if (pageId === undefined) return null;
+    const value = historyService.redo('page', pageId);
     if (value) {
       await this.applyHistoryOp(value, false);
     }
@@ -1356,7 +1352,7 @@ class Editor extends BaseService {
    * @returns 反向后产生的新 step；目标不存在 / 未应用 / 反向失败时返回 null
    */
   public async revertPageStep(index: number): Promise<StepValue | null> {
-    const list = historyService.getPageStepList();
+    const list = historyService.getStepList('page', this.get('page')?.id);
     const entry = list[index];
     if (!entry?.applied) return null;
 
@@ -1374,7 +1370,8 @@ class Editor extends BaseService {
 
     // 反向应用产生的新 step 由内部 pushOpHistory 触发 history `change` 事件，监听一次以拿到引用。
     let revertedStep: StepValue | null = null;
-    const captureRevert = (s: StepValue) => {
+    // page 的 `change` 事件回调签名为 `(pageId, step)`，这里只关心被回滚产生的新 step。
+    const captureRevert = (_pageId: Id, s: StepValue) => {
       revertedStep = s;
     };
     historyService.once('change', captureRevert);
@@ -1461,9 +1458,10 @@ class Editor extends BaseService {
    */
   public async revertPageStepById(uuids: string[]): Promise<(StepValue | null)[]> {
     const results: (StepValue | null)[] = [];
+    const pageId = this.get('page')?.id;
     for (const uuid of uuids) {
-      const index = historyService.getPageStepIndexByUuid(uuid);
-      results.push(index < 0 ? null : await this.revertPageStep(index));
+      const location = historyService.findStepLocationByUuid('page', uuid, pageId);
+      results.push(!location ? null : await this.revertPageStep(location.index));
     }
     return results;
   }
@@ -1478,8 +1476,9 @@ class Editor extends BaseService {
    * @returns 实际移动到的最终游标位置
    */
   public async gotoPageStep(targetCursor: number): Promise<number> {
-    let cursor = historyService.getPageCursor();
-    const { length } = historyService.getPageStepList();
+    const pageId = this.get('page')?.id;
+    let cursor = historyService.getCursor('page', pageId);
+    const { length } = historyService.getStepList('page', pageId);
     const target = Math.max(0, Math.min(targetCursor, length));
     while (cursor > target) {
       const step = await this.undo();
@@ -1628,9 +1627,11 @@ class Editor extends BaseService {
       uuid: guid(),
       data: { name: page.name || '', id: page.id },
       opType,
-      selectedBefore: [],
-      selectedAfter: [],
-      modifiedNodeIds: new Map(),
+      extra: {
+        selectedBefore: [],
+        selectedAfter: [],
+        modifiedNodeIds: new Map(),
+      },
       diff: [diffItem],
       rootStep: true,
     };
@@ -1638,9 +1639,9 @@ class Editor extends BaseService {
 
     const top = historyService.getCurrentPageStep(page.id);
     if (top?.rootStep && top.source === source) {
-      historyService.replaceCurrentPageStep(step, page.id);
+      historyService.replaceCurrentStep('page', step, page.id);
     } else {
-      historyService.push(step, page.id);
+      historyService.push('page', step, page.id);
     }
   }
 
@@ -1662,16 +1663,18 @@ class Editor extends BaseService {
       uuid: guid(),
       data: pageData,
       opType,
-      selectedBefore: this.selectionBeforeOp ?? [],
-      selectedAfter: this.get('nodes').map((n) => n.id),
-      modifiedNodeIds: new Map(this.get('modifiedNodeIds')),
+      extra: {
+        selectedBefore: this.selectionBeforeOp ?? [],
+        selectedAfter: this.get('nodes').map((n) => n.id),
+        modifiedNodeIds: new Map(this.get('modifiedNodeIds')),
+      },
       diff,
     };
     if (historyDescription) step.historyDescription = historyDescription;
     if (source) step.source = source;
     // 显式按 step.data.id 入栈：跨页操作（如 moveToContainer 从源页搬到目标页）
     // 必须落到正确的页面栈，否则会把记录错误地推到当前活动页 / 操作发起页。
-    const pushed = historyService.push(step, pageData.id);
+    const pushed = historyService.push('page', step, pageData.id);
     // push 返回 null 表示当前没有可写入的页面栈（未真正入栈），此时不应返回 uuid。
     const historyId = pushed ? step.uuid : null;
     this.lastPushedHistoryId = historyId;
@@ -1799,11 +1802,11 @@ class Editor extends BaseService {
       }
     }
 
-    this.set('modifiedNodeIds', step.modifiedNodeIds);
+    this.set('modifiedNodeIds', step.extra?.modifiedNodeIds ?? new Map());
 
     const page = toRaw(this.get('page'));
     if (page) {
-      const selectIds = reverse ? step.selectedBefore : step.selectedAfter;
+      const selectIds = (reverse ? step.extra?.selectedBefore : step.extra?.selectedAfter) ?? [];
       setTimeout(() => {
         if (!selectIds.length) return;
 

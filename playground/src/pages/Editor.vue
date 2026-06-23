@@ -100,7 +100,7 @@ const save = () => {
   localStorage.setItem('magicDSL', serializeConfig(toRaw(value.value)));
   editor.value?.editorService.resetModifiedNodeId();
   // 标记当前历史记录为已保存，从 IndexedDB 恢复时会把游标定位到此处。
-  historyService.markSaved();
+  historyService.markSaved('page');
 };
 
 const { menu, deviceGroup, iframe, previewVisible } = useEditorMenu(value, save);
@@ -138,7 +138,7 @@ const schedulePersist = debounce(persistHistory, 500);
 
 // 进入页面时从 IndexedDB 恢复历史记录。此时 root 尚未设置（value 在 restore 之后才赋值），
 // 需显式传入待加载 DSL 的 id 以选中按 app 隔离的库；页面对齐由编辑器挂载后
-// select(defaultSelected) 触发的 changePage 负责。
+// select(defaultSelected) 设置当前活动页负责（历史栈在首次 push 时按需创建）。
 const restoreHistory = async () => {
   try {
     await historyService.restoreFromIndexedDB({ appId: dsl.id });
@@ -153,7 +153,7 @@ const rootChangeHandler = (
   { historySource }: { historySource?: HistoryOpSource } = {},
 ) => {
   if (historySource === 'initial') {
-    Object.values(historyService.state.pageSteps).forEach(markStackSaved);
+    Object.values(historyService.state.steps).forEach((steps) => Object.values(steps).forEach(markStackSaved));
   }
 };
 
@@ -176,8 +176,6 @@ onMounted(async () => {
   }
 
   historyService.on('change', schedulePersist);
-  historyService.on('code-block-history-change', schedulePersist);
-  historyService.on('data-source-history-change', schedulePersist);
   window.addEventListener('beforeunload', persistHistory);
   window.addEventListener('pagehide', persistHistory);
 });
@@ -186,8 +184,6 @@ onBeforeUnmount(() => {
   schedulePersist.cancel();
   persistHistory();
   historyService.off('change', schedulePersist);
-  historyService.off('code-block-history-change', schedulePersist);
-  historyService.off('data-source-history-change', schedulePersist);
   window.removeEventListener('beforeunload', persistHistory);
   window.removeEventListener('pagehide', persistHistory);
   editorService.removeAllPlugins();

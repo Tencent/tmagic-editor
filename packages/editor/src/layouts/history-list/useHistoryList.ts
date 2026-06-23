@@ -11,7 +11,7 @@ import { useServices } from '@editor/hooks/use-services';
  * 所有数据基于 historyService 的 reactive state 派生，自动跟随历史变化刷新。
  */
 export const useHistoryList = () => {
-  const { historyService } = useServices();
+  const { editorService, historyService } = useServices();
 
   /**
    * 折叠状态：key 形如 `pg-${组内首步 index}` / `ds-${id}-${组内首步 index}` / `cb-${id}-${组内首步 index}`。
@@ -23,9 +23,9 @@ export const useHistoryList = () => {
     expanded[key] = expanded[key] === false;
   };
 
-  const pageGroups = computed(() => historyService.getPageHistoryGroups());
-  const dataSourceGroups = computed(() => historyService.getDataSourceHistoryGroups());
-  const codeBlockGroups = computed(() => historyService.getCodeBlockHistoryGroups());
+  const pageGroups = computed(() => historyService.getHistoryGroups('page', editorService.get('page')?.id));
+  const dataSourceGroups = computed(() => historyService.getHistoryGroups('dataSource'));
+  const codeBlockGroups = computed(() => historyService.getHistoryGroups('codeBlock'));
 
   /** 页面 tab 倒序展示（最新一组在最上面）。 */
   const pageGroupsDisplay = computed(() => pageGroups.value.slice().reverse());

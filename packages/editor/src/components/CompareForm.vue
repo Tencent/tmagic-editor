@@ -189,7 +189,11 @@ const defaultLoadConfig = async (): Promise<FormConfig> => {
       );
     }
     case 'data-source': {
-      return dataSourceService.getFormConfig(props.type || 'base');
+      const config = dataSourceService.getFormConfig(props.type || 'base');
+      // 数据源表单外层 tab 的「数据定义」项 status 为 'fields'，tab-pane name 随之为 'fields'。
+      // 未显式设置 active 时，Tabs 默认取 '0'，与 'fields' 不匹配会导致打开弹窗时无默认激活项，
+      // 这里与 DataSourceConfigPanel 保持一致，默认激活「数据定义」tab。
+      return config.map((item) => ('type' in item && item.type === 'tab' ? { ...item, active: 'fields' } : item));
     }
     case 'code-block': {
       return getCodeBlockFormConfig({

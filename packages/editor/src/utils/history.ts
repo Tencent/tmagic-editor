@@ -23,15 +23,7 @@ import type { Id } from '@tmagic/core';
 import type { ChangeRecord } from '@tmagic/form';
 import { guid } from '@tmagic/utils';
 
-import type {
-  BaseStepValue,
-  HistoryOpSource,
-  PageHistoryGroup,
-  PageHistoryStepEntry,
-  StackHistoryGroup,
-  StepDiffItem,
-  StepValue,
-} from '@editor/type';
+import type { BaseStepValue, HistoryGroup, StepDiffItem } from '@editor/type';
 
 import { UndoRedo } from './undo-redo';
 
@@ -71,17 +63,20 @@ export const detectStackOpType = (oldVal: unknown, newVal: unknown): 'add' | 're
  *
  * - `add`：oldValue = null；`remove`：newValue = null；`update`：两者都有，可带 changeRecords 做局部更新。
  * - 内容会做 cloneDeep 防止后续被外部引用篡改；opType 依据 old/new 是否为 null 推断。
- * - 仅负责构造 step 并返回，入栈与事件 emit 由各公共方法（pushCodeBlock / pushDataSource）自行处理。
+ * - 仅负责构造 step 并返回，入栈与事件 emit 由统一的 history.push(stepType, step, id) 处理。
  * - 不直接驱动业务 service，调用方负责实际写回。
  */
-export const createStackStep = <T, S extends BaseStepValue<T> & { id: Id }>(
+export const createStackStep = <T, S extends BaseStepValue<T>>(
   id: Id,
-  payload: {
+  // payload 以 {@link BaseStepValue} 为基础：透传字段（historyDescription / source / operator / rootStep / extra）
+  // 随 BaseStepValue 演进自动同步，原样写入 step；自动生成字段（uuid / data / opType / diff / timestamp / saved）
+  // 从 payload 中排除，由本方法内部构造。oldValue / newValue / changeRecords / name 为构造 diff 与 data 用的输入。
+  payload: Omit<BaseStepValue<T>, 'uuid' | 'data' | 'opType' | 'diff' | 'timestamp' | 'saved'> & {
     oldValue: T | null;
     newValue: T | null;
     changeRecords?: ChangeRecord[];
-    historyDescription?: string;
-    source?: HistoryOpSource;
+    /** 展示名（缺省时从快照 name / title 推断）。 */
+    name?: string;
   },
 ): S | null => {
   if (!id) return null;
@@ -90,10 +85,13 @@ export const createStackStep = <T, S extends BaseStepValue<T> & { id: Id }>(
   const newSchema = payload.newValue ? cloneDeep(payload.newValue) : null;
   const changeRecords = payload.changeRecords?.length ? cloneDeep(payload.changeRecords) : undefined;
   const opType = detectStackOpType(payload.oldValue, payload.newValue);
+  // 展示名：代码块取 name，数据源取 title，取不到则留空（不影响 undo/redo，仅用于展示）。
+  const schema = (payload.newValue ?? payload.oldValue) as { name?: string; title?: string } | null;
+  const name = payload.name ?? schema?.name ?? schema?.title ?? '';
 
-  const step: BaseStepValue<T> & { id: Id } = {
+  const step: BaseStepValue<T> = {
     uuid: guid(),
-    id,
+    data: { name, id },
     opType,
     diff: [
       {
@@ -104,7 +102,10 @@ export const createStackStep = <T, S extends BaseStepValue<T> & { id: Id }>(
     ],
     historyDescription: payload.historyDescription,
     source: payload.source,
+    operator: payload.operator,
+    rootStep: payload.rootStep,
     timestamp: Date.now(),
+    extra: payload.extra,
   };
 
   return step as S;
@@ -121,61 +122,41 @@ export const markStackSaved = <S extends { saved?: boolean }>(undoRedo?: UndoRed
 };
 
 /**
- * 把单个「按 id 分栈」的历史栈（代码块 / 数据源）拆成若干 group：
- * 每条操作记录独立成组，不做相邻 update 合并（与页面历史的合并策略不同）。
+ * 把单个历史栈（页面 / 代码块 / 数据源 / 扩展类型）的步骤列表按"目标"做相邻合并：
+ * - 单实体的 'update' 按 targetId 与相邻同 targetId 的 update 合并到一个 group，组内可展开查看每步；
+ * - 'add' / 'remove' 始终独立成组（语义上是结构变更，不应被收纳进单实体修改组）；
+ * - 多实体 'update'（如页面批量改属性）也独立成组（无明确单一目标，避免误合并）。
  *
- * 代码块与数据源除 `kind` 外结构完全一致，统一由本方法处理；`kind` 决定返回的具体分组类型。
+ * 各类型行为完全一致，仅 `kind` 与 step 快照类型不同，统一由本方法处理。
  */
-export const mergeStackSteps = <S extends BaseStepValue, K extends 'code-block' | 'data-source'>(
-  kind: K,
+export const mergeSteps = <T extends BaseStepValue>(
+  kind: string,
   id: Id,
-  list: S[],
+  list: T[],
   cursor: number,
-): StackHistoryGroup<S, K>[] => {
-  const currentIndex = cursor - 1;
-  return list.map((step, index) => {
-    const applied = index < cursor;
-    const isCurrent = index === currentIndex;
-    return {
-      kind,
-      id,
-      opType: step.opType,
-      steps: [{ step, index, applied, isCurrent }],
-      applied,
-      isCurrent,
-    };
-  });
-};
-
-/**
- * 把页面栈拆成若干 group：
- * - 单节点的 'update' 按 targetId 与相邻同 targetId 的 update 合并到一个 group；
- * - 'add' / 'remove' 始终独立成组（语义上是结构变更，不应被收纳进单节点修改组）；
- * - 多节点 'update'（如批量改属性）也独立成组（无明确单一目标，避免误合并）。
- */
-export const mergePageSteps = (pageId: Id, list: StepValue[], cursor: number): PageHistoryGroup[] => {
-  const groups: PageHistoryGroup[] = [];
-  let current: PageHistoryGroup | null = null;
+): HistoryGroup<T>[] => {
+  const groups: HistoryGroup<T>[] = [];
+  let current: HistoryGroup<T> | null = null;
   const currentIndex = cursor - 1;
   list.forEach((step, index) => {
     const applied = index < cursor;
     const isCurrent = index === currentIndex;
-    const targetId = detectPageTargetId(step);
-    const targetName = detectPageTargetName(step);
-    const entry: PageHistoryStepEntry = { step, index, applied, isCurrent };
+    const targetId = detectTargetId(step);
+    const targetName = detectTargetName(step);
+    const entry = { step, index, applied, isCurrent };
 
-    // 仅"单节点 update"参与合并；其它情形（add/remove/多节点 update）始终独立成组。
+    // 仅"单实体 update"参与合并；其它情形（add/remove/多实体 update）始终独立成组。
     const mergeable = step.opType === 'update' && targetId !== undefined;
     if (mergeable && current?.opType === 'update' && current.targetId === targetId) {
       current.steps.push(entry);
       current.applied = applied;
       if (isCurrent) current.isCurrent = true;
-      // 保持目标名为最近一次的（节点重命名时也能反映）
+      // 保持目标名为最近一次的（重命名时也能反映）
       if (targetName) current.targetName = targetName;
     } else {
       current = {
-        kind: 'page',
-        pageId,
+        kind,
+        id,
         opType: step.opType,
         targetId: mergeable ? targetId : undefined,
         targetName,
@@ -190,37 +171,40 @@ export const mergePageSteps = (pageId: Id, list: StepValue[], cursor: number): P
 };
 
 /**
- * 解析 StepValue 中的"目标节点 id"用于合并：
- * - 单节点 update：取唯一一项 updatedItems 的节点 id；
- * - 其它情形（多节点 update / add / remove）：返回 undefined，表示不参与合并。
+ * 解析 step 中的"目标 id"用于合并：
+ * - 单实体 update：取唯一一项 diff 的快照 id；快照无 id 时（如 CodeBlockContent）回退到 `step.data.id`
+ *   （即资源 id），使代码块 / 数据源同样能按资源合并相邻 update；
+ * - 其它情形（多实体 update / add / remove）：返回 undefined，表示不参与合并。
  */
-export const detectPageTargetId = (step: StepValue): Id | undefined => {
+export const detectTargetId = (step: BaseStepValue): Id | undefined => {
   if (step.opType !== 'update') return undefined;
   const items = step.diff;
   if (items?.length !== 1) return undefined;
-  return items[0].newSchema?.id ?? items[0].oldSchema?.id;
+  const newSchema = items[0].newSchema as { id?: Id } | undefined;
+  const oldSchema = items[0].oldSchema as { id?: Id } | undefined;
+  return newSchema?.id ?? oldSchema?.id ?? step.data?.id;
 };
 
-/** 解析 StepValue 中的目标节点可读名（用于 UI 展示）。 */
-export const detectPageTargetName = (step: StepValue): string | undefined => {
+/** 解析 step 中的目标可读名（用于 UI 展示）。 */
+export const detectTargetName = (step: BaseStepValue): string | undefined => {
   const items = step.diff;
   if (step.opType === 'update') {
     if (items?.length === 1) {
-      const node = items[0].newSchema || items[0].oldSchema;
+      const node = (items[0].newSchema || items[0].oldSchema) as { name?: string; type?: string; id?: Id } | undefined;
       return (node?.name as string) || (node?.type as string) || (node?.id !== undefined ? `${node.id}` : undefined);
     }
     return items?.length ? `${items.length} 个节点` : undefined;
   }
   if (step.opType === 'add') {
     if (items?.length === 1) {
-      const n = items[0].newSchema;
+      const n = items[0].newSchema as { name?: string; type?: string; id?: Id } | undefined;
       return (n?.name as string) || (n?.type as string) || `${n?.id}`;
     }
     return items?.length ? `${items.length} 个节点` : undefined;
   }
   if (step.opType === 'remove') {
     if (items?.length === 1) {
-      const n = items[0].oldSchema;
+      const n = items[0].oldSchema as { name?: string; type?: string; id?: Id } | undefined;
       return (n?.name as string) || (n?.type as string) || `${n?.id}`;
     }
     return items?.length ? `${items.length} 个节点` : undefined;
@@ -290,10 +274,11 @@ export const getOrCreateStack = <T>(stacks: Record<Id, UndoRedo<T>>, id: Id): Un
 };
 
 /**
- * 撤销下限：当页面栈 index 0 是 `opType: 'initial'` 的基线 step 时为 1（基线不可被撤销），否则为 0。
- * 用于把 cursor 钉在基线之上，保证 undo / canUndo / goto 都不会越过初始基线。
+ * 撤销下限：当栈 index 0 是 `opType: 'initial'` 的基线 step 时为 1（基线不可被撤销），否则为 0。
+ * 适用于所有历史类型（page / codeBlock / dataSource / 扩展），把 cursor 钉在基线之上，
+ * 保证 undo / canUndo / goto 都不会越过初始基线。
  */
-export const undoFloor = (undoRedo: UndoRedo<StepValue>): number => {
+export const undoFloor = (undoRedo: UndoRedo<any>): number => {
   return undoRedo.getElementList()[0]?.opType === 'initial' ? 1 : 0;
 };
 

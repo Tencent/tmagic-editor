@@ -780,13 +780,18 @@ export interface StepDiffItem<T = unknown> {
  *
  * 泛型 `T` 为 `diff` 中变化内容的快照类型（页面节点 `MNode` / 代码块 `CodeBlockContent` / 数据源 `DataSourceSchema`）。
  */
-export interface BaseStepValue<T = unknown> {
+export interface BaseStepValue<T = unknown, U extends Record<string, any> = {}> {
   /**
    * 历史记录唯一标识（uuid）。入栈时自动写入（若调用方未指定），
    * 用于精确定位 / 引用某一条历史记录（如 revert、埋点、跨端同步等）。
-   * 注意与各自的 `id`（关联的页面 / 代码块 / 数据源 id）区分。
+   * 注意与 `data.id`（关联的页面 / 代码块 / 数据源 id）区分。
    */
   uuid: string;
+  /**
+   * 关联目标信息：`id` 为关联的页面 / 代码块 / 数据源等资源 id（也是历史栈的分组 key），
+   * `name` 为展示名。所有历史类型统一携带。
+   */
+  data: { name: string; id: Id };
   /** 操作类型：新增 / 删除 / 更新（三类历史记录统一携带）。 */
   opType: HistoryOpType;
   /**
@@ -823,65 +828,93 @@ export interface BaseStepValue<T = unknown> {
   /** 操作人 */
   operator?: string;
   /** 扩展信息 */
-  extra?: Record<string, any>;
+  extra?: U;
 }
 // #endregion BaseStepValue
 
-// #region StepValue
-export interface StepValue extends BaseStepValue<MNode> {
-  /** 页面信息 */
-  data: { name: string; id: Id };
-  /** 操作前选中的节点 ID，用于撤销后恢复选择状态 */
-  selectedBefore: Id[];
-  /** 操作后选中的节点 ID，用于重做后恢复选择状态 */
-  selectedAfter: Id[];
-  modifiedNodeIds: Map<Id, Id>;
+// #region StepExtra
+/**
+ * 历史记录的扩展上下文（{@link BaseStepValue.extra}）。
+ * 内置字段供 `page` 类型在撤销 / 重做时恢复选区与受影响节点；扩展类型可自由附加其它键。
+ */
+export interface StepExtra {
+  /** 操作前选中的节点 ID，用于撤销后恢复选择状态（page 类型） */
+  selectedBefore?: Id[];
+  /** 操作后选中的节点 ID，用于重做后恢复选择状态（page 类型） */
+  selectedAfter?: Id[];
+  /** 本次操作涉及的节点 id 集合（page 类型） */
+  modifiedNodeIds?: Map<Id, Id>;
+  [key: string]: any;
 }
+// #endregion StepExtra
+
+// #region StepValue
+/**
+ * 页面节点历史记录条目（`diff` 内容为 {@link MNode}）。结构已与代码块 / 数据源统一收敛到
+ * {@link BaseStepValue}：关联 id 见 `data.id`，选区等上下文见 `extra`。
+ */
+export type StepValue = BaseStepValue<MNode, StepExtra>;
 // #endregion StepValue
 
 // #region CodeBlockStepValue
 /**
- * 代码块历史记录条目。按 codeBlock.id 分组保存到 historyState.codeBlockState。
- * 变更内容统一由 `diff`（单项）表达，每项见 {@link StepDiffItem}：
- * - 新增（opType 'add'）：仅 `newSchema`（新内容）；
- * - 更新（opType 'update'）：`oldSchema` + `newSchema`，并可带 `changeRecords` 做局部更新；
- * - 删除（opType 'remove'）：仅 `oldSchema`（删除前内容）。
+ * 代码块历史记录条目（`diff` 内容为 {@link CodeBlockContent}），按 `data.id`（codeBlock.id）
+ * 分组保存到 historyState.steps.codeBlock。结构与 {@link StepValue} / {@link DataSourceStepValue}
+ * 一致，仅 `diff` 快照类型不同。
  */
-export interface CodeBlockStepValue extends BaseStepValue<CodeBlockContent> {
-  /** 关联的代码块 id */
-  id: Id;
-}
+export type CodeBlockStepValue = BaseStepValue<CodeBlockContent>;
 // #endregion CodeBlockStepValue
 
 // #region DataSourceStepValue
 /**
- * 数据源历史记录条目。按 dataSource.id 分组保存到 historyState.dataSourceState。
- * 变更内容统一由 `diff`（单项）表达，每项见 {@link StepDiffItem}：
- * - 新增（opType 'add'）：仅 `newSchema`（新 schema）；
- * - 更新（opType 'update'）：`oldSchema` + `newSchema`，并可带 `changeRecords` 做局部更新；
- * - 删除（opType 'remove'）：仅 `oldSchema`（删除前 schema）。
+ * 数据源历史记录条目（`diff` 内容为 {@link DataSourceSchema}），按 `data.id`（dataSource.id）
+ * 分组保存到 historyState.steps.dataSource。结构与 {@link StepValue} / {@link CodeBlockStepValue}
+ * 一致，仅 `diff` 快照类型不同。
  */
-export interface DataSourceStepValue extends BaseStepValue<DataSourceSchema> {
-  /** 关联的数据源 id */
-  id: Id;
-}
+export type DataSourceStepValue = BaseStepValue<DataSourceSchema>;
 // #endregion DataSourceStepValue
 
+// #region HistorySteps
+/**
+ * 历史记录类型标识：内置 `page` / `codeBlock` / `dataSource`，并允许业务扩展自定义类型。
+ * `(string & {})` 保留对内置字面量的智能提示，同时不限制扩展取值。
+ */
+export type HistoryStepType = 'page' | 'codeBlock' | 'dataSource' | (string & {});
+
+/**
+ * 全部历史栈的统一容器，按「类型 -> id -> UndoRedo 栈」两级分组。
+ *
+ * - `page`：页面历史栈，按 page.id 分组（每页一份 UndoRedo）；
+ * - `codeBlock`：代码块历史栈，按 codeBlock.id 分组；
+ * - `dataSource`：数据源历史栈，按 dataSource.id 分组；
+ * - 其余键：业务通过 {@link HistoryService.registerStepType} 注册的自定义历史类型。
+ *
+ * 所有类型（含扩展类型）一视同仁：均按 id 独立分栈、独立 undo/redo，且都可通过
+ * {@link HistoryService.setMarker} 在 index 0 种入 `initial` 基线（撤销 / 回滚不会越过该基线）。
+ */
+export interface HistorySteps {
+  page: Record<Id, UndoRedo<StepValue>>;
+  codeBlock: Record<Id, UndoRedo<CodeBlockStepValue>>;
+  dataSource: Record<Id, UndoRedo<DataSourceStepValue>>;
+  /** 扩展历史类型：按 id 分组的 UndoRedo 栈。 */
+  [stepType: string]: Record<Id, UndoRedo<any>>;
+}
+// #endregion HistorySteps
+
 export interface HistoryState {
-  pageId?: Id;
-  pageSteps: Record<Id, UndoRedo<StepValue>>;
-  canRedo: boolean;
-  canUndo: boolean;
   /**
-   * 代码块历史栈，按 codeBlock.id 分组（每个代码块独立一份 UndoRedo）。
-   * 与页面/节点无关，支持独立 undo/redo。
+   * 全部历史栈的统一容器（页面 / 代码块 / 数据源 / 扩展类型），见 {@link HistorySteps}。
+   * 各类型互不影响，支持按 id 独立 undo/redo；是否可撤销 / 重做改用 {@link HistoryService.canUndo} /
+   * {@link HistoryService.canRedo}（按 stepType + id 查询）替代旧的全局 canUndo / canRedo 字段。
    */
-  codeBlockState: Record<Id, UndoRedo<CodeBlockStepValue>>;
+  steps: HistorySteps;
   /**
-   * 数据源历史栈，按 dataSource.id 分组（每个数据源独立一份 UndoRedo）。
-   * 与页面/节点无关，支持独立 undo/redo。
+   * 各历史类型的展示名称，用于历史面板（{@link HistorySteps} 的 tab / 分组标题等）。
+   * 内置 `page` / `codeBlock` / `dataSource` 有默认中文名（页面 / 代码块 / 数据源），
+   * 扩展类型可通过 {@link HistoryService.registerStepType} 的 `name` 选项或
+   * {@link HistoryService.setStepName} 登记；读取请用 {@link HistoryService.getStepName}。
    */
-  dataSourceState: Record<Id, UndoRedo<DataSourceStepValue>>;
+  stepNames: Record<string, string>;
 }
 
 // #region PersistedHistoryState
@@ -892,14 +925,16 @@ export interface HistoryState {
 export interface PersistedHistoryState {
   /** 快照结构版本号，便于后续兼容升级。 */
   version: number;
-  /** 保存时的活动页 id。 */
-  pageId?: Id;
-  /** 各页面历史栈的序列化快照，按 pageId 分组。 */
-  pageSteps: Record<Id, SerializedUndoRedo<StepValue>>;
-  /** 各代码块历史栈的序列化快照，按 codeBlockId 分组。 */
-  codeBlockState: Record<Id, SerializedUndoRedo<CodeBlockStepValue>>;
-  /** 各数据源历史栈的序列化快照，按 dataSourceId 分组。 */
-  dataSourceState: Record<Id, SerializedUndoRedo<DataSourceStepValue>>;
+  /**
+   * 全部历史栈的序列化快照，按「类型 -> id」两级分组，与 {@link HistorySteps} 对应。
+   * 内置 `page` / `codeBlock` / `dataSource`，并包含业务注册的扩展类型。
+   */
+  steps: {
+    page: Record<Id, SerializedUndoRedo<StepValue>>;
+    codeBlock: Record<Id, SerializedUndoRedo<CodeBlockStepValue>>;
+    dataSource: Record<Id, SerializedUndoRedo<DataSourceStepValue>>;
+    [stepType: string]: Record<Id, SerializedUndoRedo<any>>;
+  };
   /** 保存时间戳（毫秒）。 */
   savedAt: number;
 }
@@ -927,9 +962,9 @@ export interface HistoryPersistOptions {
 /**
  * 历史面板用：当前页面的一条历史步骤（包含位置和是否已应用）。
  */
-export interface PageHistoryStepEntry {
+export interface HistoryStepEntry<T> {
   /** 步骤内容 */
-  step: StepValue;
+  step: T;
   /** 在所属栈中的索引（0 为最早） */
   index: number;
   /** 是否处于"已应用"段（即位于栈游标之前）。撤销后变为 false。 */
@@ -939,55 +974,37 @@ export interface PageHistoryStepEntry {
 }
 
 /**
- * 页面历史面板分组。
- * - 连续修改同一目标节点（updatedItems[0].oldNode.id 一致）的 'update' 步骤合并成一组；
- * - 多节点更新 / add / remove 始终独立成组（无法明确归属单一目标）。
- * - targetId 为 undefined 表示"无明确目标"（如 add/remove/多节点 update），不参与合并。
- */
-export interface PageHistoryGroup {
-  kind: 'page';
-  /** 所属页面 id */
-  pageId: Id;
-  /** 该分组的操作类型 */
-  opType: HistoryOpType;
-  /**
-   * 合并的目标节点 id；只有"单节点 update"才有值，并按此 id 与相邻同 id 的 update 合并。
-   * undefined 表示该分组不可被合并（add / remove / 多节点 update）。
-   */
-  targetId?: Id;
-  /** 目标节点的可读名（取最后一步的 newNode.name/type/id） */
-  targetName?: string;
-  /** 组内所有步骤，按时间正序 */
-  steps: PageHistoryStepEntry[];
-  /** 组内最后一步是否已应用 */
-  applied: boolean;
-  /** 是否为当前所在的分组（包含栈中最近一次已应用步骤的那一组）。 */
-  isCurrent?: boolean;
-}
-
-/**
- * 数据源 / 代码块历史面板分组（按 id 分栈展示）。
- * 二者结构完全一致，仅 `kind` 与 step 类型不同，统一由该泛型描述：
- * - 数据源：`StackHistoryGroup<DataSourceStepValue, 'data-source'>`；
- * - 代码块：`StackHistoryGroup<CodeBlockStepValue, 'code-block'>`。
+ * 历史面板分组（页面 / 数据源 / 代码块 / 扩展类型统一结构）。
  *
- * 每条操作记录独立成组，不做相邻合并（与页面历史 {@link PageHistoryGroup} 不同），故 `steps` 恒为单元素。
+ * 把指定历史栈的步骤列表按"目标"做相邻合并：
+ * - 连续修改同一目标（单实体 update，targetId 一致）的多步合并成一组，组内可展开查看每步；
+ * - add / remove / 多实体 update 始终独立成组（无法明确归属单一目标）；
+ * - targetId 为 undefined 表示"无明确目标"，不参与合并。
+ *
+ * 各类型仅 `kind` 与 step 快照类型不同，统一由泛型描述：
+ * - 页面：`HistoryGroup<StepValue>`，`kind: 'page'`，`id` 为 pageId，`targetId` 为被改节点 id；
+ * - 数据源：`HistoryGroup<DataSourceStepValue>`，`kind: 'data-source'`，`id` 为 dataSource.id；
+ * - 代码块：`HistoryGroup<CodeBlockStepValue>`，`kind: 'code-block'`，`id` 为 codeBlock.id。
  */
-export interface StackHistoryGroup<
-  T extends BaseStepValue = BaseStepValue,
-  K extends 'code-block' | 'data-source' = 'code-block' | 'data-source',
-> {
-  /** 区分代码块 / 数据源。 */
-  kind: K;
-  /** 关联的代码块 / 数据源 id。 */
+export interface HistoryGroup<T extends BaseStepValue = BaseStepValue> {
+  /** 历史类型标识：page / code-block / data-source（扩展类型同理）。 */
+  kind: string;
+  /** 所属栈 id（page 为 pageId，代码块 / 数据源为对应资源 id）。 */
   id: Id;
   /** 该分组的操作类型。 */
   opType: HistoryOpType;
-  /** 组内所有步骤，按时间正序（不做相邻合并，恒为单元素）。 */
+  /**
+   * 合并的目标 id：仅"单实体 update"有值，并按此与相邻同 id 的 update 合并。
+   * undefined 表示该分组不可被合并（add / remove / 多实体 update）。
+   */
+  targetId?: Id;
+  /** 目标可读名（取最后一步快照的 name/type/id）。 */
+  targetName?: string;
+  /** 组内所有步骤，按时间正序。 */
   steps: { step: T; index: number; applied: boolean; isCurrent?: boolean }[];
-  /** 组内最后一步是否已应用，用于整组的状态展示。 */
+  /** 组内最后一步是否已应用。 */
   applied: boolean;
-  /** 是否为当前所在的分组（包含该栈最近一次已应用步骤的那一组）。 */
+  /** 是否为当前所在的分组（包含栈中最近一次已应用步骤的那一组）。 */
   isCurrent?: boolean;
 }
 // #endregion HistoryListEntry
@@ -1201,6 +1218,21 @@ export interface EditorEvents {
   'move-layer': [offset: number | LayerOffset];
   'drag-to': [data: { targetIndex: number; configs: MNode | MNode[]; targetParent: MContainer }];
   'history-change': [data: MPage | MPageFragment];
+}
+
+export interface HistoryEvents {
+  change: [
+    state: BaseStepValue | StepValue | CodeBlockStepValue | DataSourceStepValue,
+    stepType: HistoryStepType,
+    id: Id,
+  ];
+  'code-block-history-change': [id: Id, state: CodeBlockStepValue];
+  'data-source-history-change': [id: Id, state: DataSourceStepValue];
+  'restore-from-indexed-db': [snapshot: PersistedHistoryState | null];
+  'save-to-indexed-db': [snapshot: PersistedHistoryState];
+  'mark-saved': [{ kind: HistoryStepType; id?: Id }];
+  clear: [{ id: Id; stepType: HistoryStepType }];
+  'marker-change': [{ id: Id; marker: StepValue; stepType: HistoryStepType }];
 }
 
 export const canUsePluginMethods = {

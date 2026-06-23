@@ -3,10 +3,10 @@ import { datetimeFormatter } from '@tmagic/form';
 
 import type {
   BaseStepValue,
+  HistoryGroup,
   HistoryOpSource,
   HistoryOpType,
   HistoryRowDescriptor,
-  PageHistoryGroup,
   StepValue,
 } from '@editor/type';
 
@@ -146,7 +146,7 @@ export const groupSource = (group: { steps: { step: { source?: HistoryOpSource }
 export const groupOperator = (group: { steps: { step: { operator?: string } }[] }): string | undefined =>
   group.steps[group.steps.length - 1]?.step.operator;
 
-/** {@link toRowGroup} 接受的最小分组结构，PageHistoryGroup 与 HistoryBucketGroup 均满足。 */
+/** {@link toRowGroup} 接受的最小分组结构 */
 interface RowGroupInput<T extends BaseStepValue = BaseStepValue> {
   applied: boolean;
   isCurrent?: boolean;
@@ -259,7 +259,7 @@ export const describePageStep = (step: StepValue): string => describeStep(step, 
  * - 单步组：复用 describePageStep；
  * - 多步组（连续修改同一节点）：展示节点名 + 涉及的前几个 propPath。
  */
-export const describePageGroup = (group: PageHistoryGroup) => {
+export const describePageGroup = (group: HistoryGroup<StepValue>) => {
   const lastDesc = pickLastDescription(group.steps.map((s) => s.step.historyDescription));
   if (lastDesc) return lastDesc;
   if (group.steps.length === 1) return describePageStep(group.steps[0].step);

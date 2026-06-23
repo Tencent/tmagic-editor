@@ -227,7 +227,7 @@ export const useHistoryRevert = (
     buildDiffPayload(
       {
         category: 'node',
-        groups: () => historyService.getPageHistoryGroups(),
+        groups: () => historyService.getHistoryGroups('page', editorService.get('page')?.id),
         getCurrent: (id) => editorService.getNodeById(id) as Record<string, any> | null,
         resolveType: (n, o) => n.type || o.type || '',
         resolveLabel: (n, o) => n.name || o.name || n.type || o.type || '',
@@ -239,7 +239,7 @@ export const useHistoryRevert = (
     buildDiffPayload(
       {
         category: 'data-source',
-        groups: () => historyService.getDataSourceHistoryGroups(),
+        groups: () => historyService.getHistoryGroups('dataSource'),
         getCurrent: (id) => dataSourceService.getDataSourceById(`${id}`) as Record<string, any> | null,
         resolveType: (n, o) => n.type || o.type || 'base',
         resolveLabel: (n, o, id) => n.title || o.title || `${id}`,
@@ -252,7 +252,7 @@ export const useHistoryRevert = (
     buildDiffPayload(
       {
         category: 'code-block',
-        groups: () => historyService.getCodeBlockHistoryGroups(),
+        groups: () => historyService.getHistoryGroups('codeBlock'),
         getCurrent: (id) => codeBlockService.getCodeContentById(id) as Record<string, any> | null,
         resolveLabel: (n, o, id) => n.name || o.name || `${id}`,
       },
@@ -267,7 +267,7 @@ export const useHistoryRevert = (
    * add（回滚即删除）即使目标已不在，也已达成「删除」目的，不视为失败。
    */
   const isPageRevertTargetMissing = (index: number): boolean => {
-    const step = historyService.getPageStepList()[index]?.step;
+    const step = historyService.getStepList('page', editorService.get('page')?.id)[index]?.step;
     if (!step) return false;
     if (step.opType === 'update') {
       return (step.diff ?? []).some((item) => {
@@ -285,13 +285,13 @@ export const useHistoryRevert = (
 
   /** 数据源 update 步骤回滚时，对应数据源必须仍存在（已删除则无处写回旧值）。 */
   const isDataSourceRevertTargetMissing = (id: string | number, index: number): boolean => {
-    const step = historyService.getDataSourceStepList(id)[index]?.step;
+    const step = historyService.getStepList('dataSource', id)[index]?.step;
     return Boolean(step?.opType === 'update' && !dataSourceService.getDataSourceById(`${id}`));
   };
 
   /** 代码块 update 步骤回滚时，对应代码块必须仍存在（已删除则无处写回旧值）。 */
   const isCodeBlockRevertTargetMissing = (id: string | number, index: number): boolean => {
-    const step = historyService.getCodeBlockStepList(id)[index]?.step;
+    const step = historyService.getStepList('codeBlock', id)[index]?.step;
     return Boolean(step?.opType === 'update' && !codeBlockService.getCodeContentById(id));
   };
 

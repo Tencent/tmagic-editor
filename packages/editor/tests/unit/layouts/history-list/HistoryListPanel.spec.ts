@@ -8,6 +8,27 @@ import { defineComponent, h, nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
 
 import historyService from '@editor/services/history';
+import { createStackStep } from '@editor/utils/history';
+
+// pushCodeBlock / pushDataSource 已合入统一的 push(stepType, step, id)；用等价小工具沿用既有用例。
+const pushCodeBlock = (id: any, payload: any) => {
+  const step = createStackStep(id, {
+    oldValue: payload.oldContent,
+    newValue: payload.newContent,
+    changeRecords: payload.changeRecords,
+  });
+  return step ? historyService.push('codeBlock', step as any, id) : null;
+};
+const pushDataSource = (id: any, payload: any) => {
+  const step = createStackStep(id, {
+    oldValue: payload.oldSchema,
+    newValue: payload.newSchema,
+    changeRecords: payload.changeRecords,
+  });
+  return step ? historyService.push('dataSource', step as any, id) : null;
+};
+// 页面 push 现在必须显式传 pageId；默认推到 'p1'（与 editorService.get('page') 的 mock 对齐）。
+const pushPage = (step: any, id: any = 'p1') => historyService.push('page', step, id);
 
 const { onPageDiff, onDataSourceDiff, onCodeBlockDiff, onPageRevert, onDataSourceRevert, onCodeBlockRevert } =
   vi.hoisted(() => ({
@@ -26,7 +47,8 @@ const editorService = {
   revertPageStep: vi.fn(async () => null),
   getNodeById: vi.fn((id: string | number) => ({ id })),
   select: vi.fn(async () => {}),
-  get: vi.fn(() => ({ select: stageSelect })),
+  // 历史面板已改为显式按当前页 id 取页面历史，'page' 返回固定 id 'p1'。
+  get: vi.fn((key?: string) => (key === 'page' ? { id: 'p1' } : { select: stageSelect })),
 };
 const stageOverlayService = { get: vi.fn(() => ({ select: overlayStageSelect })) };
 const dataSourceService = {
@@ -139,17 +161,16 @@ describe('HistoryListPanel.vue', () => {
   });
 
   test('页面/数据源/代码块 数据齐全时各 tab 渲染对应内容', async () => {
-    historyService.changePage({ id: 'p1' } as any);
-    historyService.push({
+    pushPage({
       opType: 'add',
       diff: [{ newSchema: { id: 'n1', name: 'A' } }],
       modifiedNodeIds: new Map(),
     } as any);
-    historyService.pushDataSource('ds_1', {
+    pushDataSource('ds_1', {
       oldSchema: null,
       newSchema: { id: 'ds_1', title: 'DS' } as any,
     });
-    historyService.pushCodeBlock('code_1', {
+    pushCodeBlock('code_1', {
       oldContent: null,
       newContent: { id: 'code_1', name: 'CB' } as any,
     });
@@ -168,7 +189,6 @@ describe('HistoryListPanel.vue', () => {
   });
 
   test('点击合并组头部能切换 expanded 状态（不触发 goto）', async () => {
-    historyService.changePage({ id: 'p1' } as any);
     // 推两个修改同一节点的步骤，会合并为一个 group
     const mkUpdate = (path: string) => ({
       opType: 'update',
@@ -181,8 +201,8 @@ describe('HistoryListPanel.vue', () => {
         },
       ],
     });
-    historyService.push(mkUpdate('a') as any);
-    historyService.push(mkUpdate('b') as any);
+    pushPage(mkUpdate('a') as any);
+    pushPage(mkUpdate('b') as any);
 
     const wrapper = await factory();
     await nextTick();
@@ -203,13 +223,12 @@ describe('HistoryListPanel.vue', () => {
   });
 
   test('点击页面 group 头部调用 editorService.gotoPageStep', async () => {
-    historyService.changePage({ id: 'p1' } as any);
-    historyService.push({
+    pushPage({
       opType: 'add',
       diff: [{ newSchema: { id: 'n1', name: 'A' } }],
       modifiedNodeIds: new Map(),
     } as any);
-    historyService.push({
+    pushPage({
       opType: 'add',
       diff: [{ newSchema: { id: 'n2', name: 'B' } }],
       modifiedNodeIds: new Map(),
@@ -234,8 +253,7 @@ describe('HistoryListPanel.vue', () => {
   });
 
   test('点击页面 group 头部选中对应节点（editorService.select + 画布 select 联动）', async () => {
-    historyService.changePage({ id: 'p1' } as any);
-    historyService.push({
+    pushPage({
       opType: 'add',
       diff: [{ newSchema: { id: 'n1', name: 'A' } }],
       modifiedNodeIds: new Map(),
@@ -257,8 +275,7 @@ describe('HistoryListPanel.vue', () => {
   });
 
   test('点击页面记录时节点已不存在则提示且不选中', async () => {
-    historyService.changePage({ id: 'p1' } as any);
-    historyService.push({
+    pushPage({
       opType: 'remove',
       diff: [{ oldSchema: { id: 'gone', name: 'G' } }],
       modifiedNodeIds: new Map(),
@@ -278,7 +295,7 @@ describe('HistoryListPanel.vue', () => {
   });
 
   test('点击数据源组头部调用 dataSourceService.goto(id, cursor)', async () => {
-    historyService.pushDataSource('ds_1', {
+    pushDataSource('ds_1', {
       oldSchema: null,
       newSchema: { id: 'ds_1', title: 'DS' } as any,
     });
@@ -287,7 +304,7 @@ describe('HistoryListPanel.vue', () => {
     await nextTick();
 
     // 当前 ds 组（isCurrent）点击不触发 goto；为了能触发，先撤销该步使其变为非当前
-    historyService.undoDataSource('ds_1');
+    historyService.undo('dataSource', 'ds_1');
     await nextTick();
 
     const heads = wrapper.findAll('.m-editor-history-list-group-head');
@@ -299,7 +316,7 @@ describe('HistoryListPanel.vue', () => {
   });
 
   test('点击代码块组头部调用 codeBlockService.goto(id, cursor)', async () => {
-    historyService.pushCodeBlock('code_1', {
+    pushCodeBlock('code_1', {
       oldContent: null,
       newContent: { id: 'code_1', name: 'CB' } as any,
     });
@@ -307,7 +324,7 @@ describe('HistoryListPanel.vue', () => {
     const wrapper = await factory();
     await nextTick();
 
-    historyService.undoCodeBlock('code_1');
+    historyService.undo('codeBlock', 'code_1');
     await nextTick();
 
     const heads = wrapper.findAll('.m-editor-history-list-group-head');
@@ -318,8 +335,7 @@ describe('HistoryListPanel.vue', () => {
   });
 
   test('点击页面初始项调用 editorService.gotoPageStep(0)', async () => {
-    historyService.changePage({ id: 'p1' } as any);
-    historyService.push({
+    pushPage({
       opType: 'add',
       diff: [{ newSchema: { id: 'n1', name: 'A' } }],
       modifiedNodeIds: new Map(),
@@ -380,8 +396,7 @@ describe('HistoryListPanel.vue', () => {
   });
 
   test('点击页面 update 记录的「查看差异」打开 diff 弹窗', async () => {
-    historyService.changePage({ id: 'p1' } as any);
-    historyService.push({
+    pushPage({
       opType: 'update',
       modifiedNodeIds: new Map(),
       diff: [
@@ -401,8 +416,7 @@ describe('HistoryListPanel.vue', () => {
   });
 
   test('点击页面 update 记录的「回滚」透传到 onPageRevert', async () => {
-    historyService.changePage({ id: 'p1' } as any);
-    historyService.push({
+    pushPage({
       opType: 'update',
       modifiedNodeIds: new Map(),
       diff: [
@@ -423,8 +437,7 @@ describe('HistoryListPanel.vue', () => {
   });
 
   test('回滚目标校验由 useHistoryRevert 处理，面板仅透传 index', async () => {
-    historyService.changePage({ id: 'p1' } as any);
-    historyService.push({
+    pushPage({
       opType: 'update',
       modifiedNodeIds: new Map(),
       diff: [
@@ -443,9 +456,8 @@ describe('HistoryListPanel.vue', () => {
     expect(editorService.revertPageStep).not.toHaveBeenCalled();
   });
 
-  test('确认清空页面历史后调用 historyService.clearPage', async () => {
-    historyService.changePage({ id: 'p1' } as any);
-    historyService.push({
+  test('确认清空页面历史后调用 historyService.clear', async () => {
+    pushPage({
       opType: 'add',
       diff: [{ newSchema: { id: 'n1', name: 'A' } }],
       modifiedNodeIds: new Map(),
@@ -458,17 +470,17 @@ describe('HistoryListPanel.vue', () => {
     await wrapper.find('.m-editor-history-list-clear').trigger('click');
     await nextTick();
 
-    expect(historyService.getPageHistoryGroups()).toHaveLength(0);
+    expect(historyService.getHistoryGroups('page', 'p1')).toHaveLength(0);
     expect(saveSpy).toHaveBeenCalled();
     saveSpy.mockRestore();
   });
 
   test('点击数据源/代码块初始项调用对应 service.goto(id, 0)', async () => {
-    historyService.pushDataSource('ds_x', {
+    pushDataSource('ds_x', {
       oldSchema: null,
       newSchema: { id: 'ds_x', title: 'DS' } as any,
     });
-    historyService.pushCodeBlock('code_x', {
+    pushCodeBlock('code_x', {
       oldContent: null,
       newContent: { id: 'code_x', name: 'CB' } as any,
     });
@@ -491,11 +503,11 @@ describe('HistoryListPanel.vue', () => {
   });
 
   test('点击数据源 update 记录的「查看差异」与「回滚」', async () => {
-    historyService.pushDataSource('ds_1', {
+    pushDataSource('ds_1', {
       oldSchema: null,
       newSchema: { id: 'ds_1', title: 'DS' } as any,
     });
-    historyService.pushDataSource('ds_1', {
+    pushDataSource('ds_1', {
       oldSchema: { id: 'ds_1', title: '旧 DS' } as any,
       newSchema: { id: 'ds_1', title: '新 DS' } as any,
       changeRecords: [{ propPath: 'title', value: '新 DS' }],
@@ -513,12 +525,12 @@ describe('HistoryListPanel.vue', () => {
     expect(dataSourceService.revert).not.toHaveBeenCalled();
   });
 
-  test('确认清空数据源/代码块历史后调用 clearDataSource / clearCodeBlock', async () => {
-    historyService.pushDataSource('ds_1', {
+  test('确认清空数据源/代码块历史后调用 clear(undefined, stepType)', async () => {
+    pushDataSource('ds_1', {
       oldSchema: null,
       newSchema: { id: 'ds_1', title: 'DS' } as any,
     });
-    historyService.pushCodeBlock('code_1', {
+    pushCodeBlock('code_1', {
       oldContent: null,
       newContent: { id: 'code_1', name: 'CB' } as any,
     });
@@ -534,8 +546,8 @@ describe('HistoryListPanel.vue', () => {
     await clears[1].trigger('click');
     await nextTick();
 
-    expect(historyService.getDataSourceHistoryGroups()).toHaveLength(0);
-    expect(historyService.getCodeBlockHistoryGroups()).toHaveLength(0);
+    expect(historyService.getHistoryGroups('dataSource')).toHaveLength(0);
+    expect(historyService.getHistoryGroups('codeBlock')).toHaveLength(0);
     expect(saveSpy).toHaveBeenCalled();
     saveSpy.mockRestore();
   });

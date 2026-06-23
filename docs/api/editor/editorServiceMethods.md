@@ -862,6 +862,10 @@ await editorService.revertPageStepById(historyIds);
   ::: details 查看 StepValue 及关联类型定义
   <<< @/../packages/editor/src/type.ts#StepValue{ts}
 
+  <<< @/../packages/editor/src/type.ts#BaseStepValue{ts}
+
+  <<< @/../packages/editor/src/type.ts#StepExtra{ts}
+
   <<< @/../packages/editor/src/type.ts#HistoryOpType{ts}
 
   <<< @/../packages/editor/src/type.ts#HistoryOpSource{ts}
@@ -882,6 +886,10 @@ await editorService.revertPageStepById(historyIds);
 
   ::: details 查看 StepValue 及关联类型定义
   <<< @/../packages/editor/src/type.ts#StepValue{ts}
+
+  <<< @/../packages/editor/src/type.ts#BaseStepValue{ts}
+
+  <<< @/../packages/editor/src/type.ts#StepExtra{ts}
 
   <<< @/../packages/editor/src/type.ts#HistoryOpType{ts}
 

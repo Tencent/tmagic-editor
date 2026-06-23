@@ -1,7 +1,7 @@
 # codeBlockService方法
 
 写入历史栈的方法（[setCodeDslById](#setcodedslbyid)、[setCodeDslByIdSync](#setcodedslbyidsync)、[deleteCodeDslByIds](#deletecodedslbyids) 等）的 `options` 支持
-[historyDescription / historySource](./editorServiceMethods.md#历史记录相关-options)，会透传到 `historyService.pushCodeBlock` 的 `historyDescription` / `source` 字段。
+[historyDescription / historySource](./editorServiceMethods.md#历史记录相关-options)，会透传到 `historyService.push('codeBlock', step, id)` 入栈记录的 `historyDescription` / `source` 字段。
 
 ## setCodeDsl
 
@@ -88,8 +88,8 @@
   同步版本的 [setCodeDslById](#setcodedslbyid)，并会触发 `addOrUpdate` 事件
 
   ::: tip
-  写入成功时（`force=false` 且同 id 已存在的跳过场景除外）会自动调用 `historyService.pushCodeBlock`
-  把本次变更入历史栈，参见 [historyService.pushCodeBlock](./historyServiceMethods.md#pushcodeblock)。
+  写入成功时（`force=false` 且同 id 已存在的跳过场景除外）会自动调用 `historyService.push('codeBlock', step, id)`
+  把本次变更入历史栈，参见 [historyService.push](./historyServiceMethods.md#push)。
   传入的 `changeRecords` 会一同写进 step，撤销/重做时调用方可据此按 `propPath` 局部回放。
   传入 `doNotPushHistory: true` 可跳过写入历史栈，常用于批量导入、外部同步等非用户操作场景。
   :::
@@ -231,8 +231,8 @@
   在dsl数据源中删除指定id的代码块，每删除一个会触发一次 `remove` 事件
 
   ::: tip
-  对每个实际存在并被删除的代码块，会自动调用 `historyService.pushCodeBlock` 入栈一条
-  `newContent=null` 的删除记录；不存在的 id 不会入历史。传入 `doNotPushHistory: true` 也可显式跳过写入历史栈。
+  对每个实际存在并被删除的代码块，会自动调用 `historyService.push('codeBlock', step, id)` 入栈一条
+  `newSchema=null` 的删除记录；不存在的 id 不会入历史。传入 `doNotPushHistory: true` 也可显式跳过写入历史栈。
   :::
 
 ## setCodeDslByIdAndGetHistoryId
@@ -370,7 +370,7 @@ if (codeBlockService.canUndo("code_1234")) {
 
 - **详情：**
 
-  当前指定代码块是否可撤销，等价于 `historyService.canUndoCodeBlock(id)`。
+  当前指定代码块是否可撤销，等价于 `historyService.canUndo('codeBlock', id)`。
 
 ## canRedo
 
@@ -382,7 +382,7 @@ if (codeBlockService.canUndo("code_1234")) {
 
 - **详情：**
 
-  当前指定代码块是否可重做，等价于 `historyService.canRedoCodeBlock(id)`。
+  当前指定代码块是否可重做，等价于 `historyService.canRedo('codeBlock', id)`。
 
 ## setParamsColConfig
 

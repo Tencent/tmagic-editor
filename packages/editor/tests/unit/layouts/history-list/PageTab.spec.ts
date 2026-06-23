@@ -8,7 +8,7 @@ import { defineComponent, h } from 'vue';
 import { mount } from '@vue/test-utils';
 
 import PageTab from '@editor/layouts/history-list/PageTab.vue';
-import type { PageHistoryGroup } from '@editor/type';
+import type { HistoryGroup, StepValue } from '@editor/type';
 
 vi.mock('@tmagic/design', () => ({
   TMagicScrollbar: defineComponent({
@@ -27,9 +27,9 @@ const buildPageGroup = (
   targetName?: string,
   targetId?: string,
   startIndex = 0,
-): PageHistoryGroup => ({
+): HistoryGroup<StepValue> => ({
   kind: 'page',
-  pageId: 'p1',
+  id: 'p1',
   opType,
   applied,
   targetId,

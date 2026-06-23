@@ -825,7 +825,7 @@ describe('undo redo', () => {
 
 describe('*AndGetHistoryId', () => {
   const lastStepUuid = () => {
-    const list = historyService.getPageStepList();
+    const list = historyService.getStepList('page', editorService.get('page')?.id);
     return list[list.length - 1]?.step.uuid;
   };
 
@@ -896,7 +896,9 @@ describe('revertPageStepById', () => {
     const uuid = historyIds[0];
     expect(typeof uuid).toBe('string');
 
-    const addedStep = historyService.getPageStepList().find((e) => e.step.uuid === uuid)!.step;
+    const addedStep = historyService
+      .getStepList('page', editorService.get('page')?.id)
+      .find((e) => e.step.uuid === uuid)!.step;
     const addedId = addedStep.diff[0].newSchema!.id;
     expect(editorService.getNodeById(addedId)).toBeTruthy();
 
@@ -913,8 +915,8 @@ describe('revertPageStepById', () => {
 
     const { historyIds } = await editorService.addAndGetHistoryId({ type: 'text' });
     const uuid = historyIds[0];
-    const index = historyService.getPageStepIndexByUuid(uuid!);
-    expect(index).toBeGreaterThanOrEqual(0);
+    const location = historyService.findStepLocationByUuid('page', uuid!, editorService.get('page')?.id);
+    expect(location?.index).toBeGreaterThanOrEqual(0);
   });
 
   test('找不到 uuid 时返回 null', async () => {
@@ -935,8 +937,11 @@ describe('revertPageStepById', () => {
     const { historyIds: ids2 } = await editorService.addAndGetHistoryId({ type: 'text' });
     const uuids = [ids1[0]!, ids2[0]!];
 
-    const addedId1 = historyService.getPageStepList().find((e) => e.step.uuid === uuids[0])!.step.diff[0].newSchema!.id;
-    const addedId2 = historyService.getPageStepList().find((e) => e.step.uuid === uuids[1])!.step.diff[0].newSchema!.id;
+    const pageId = editorService.get('page')?.id;
+    const addedId1 = historyService.getStepList('page', pageId).find((e) => e.step.uuid === uuids[0])!.step.diff[0]
+      .newSchema!.id;
+    const addedId2 = historyService.getStepList('page', pageId).find((e) => e.step.uuid === uuids[1])!.step.diff[0]
+      .newSchema!.id;
 
     const reverted = await editorService.revertPageStepById(uuids);
     expect(reverted).toHaveLength(2);

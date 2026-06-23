@@ -27,6 +27,7 @@ vi.mock('@editor/layouts/history-list/composables', async () => {
 const createServices = () =>
   ({
     editorService: {
+      get: vi.fn(() => ({ id: 'p1' })),
       getNodeById: vi.fn(),
       revertPageStep: vi.fn(async () => null),
     },
@@ -39,12 +40,8 @@ const createServices = () =>
       revert: vi.fn(async () => null),
     },
     historyService: {
-      getPageStepList: vi.fn(() => []),
-      getDataSourceStepList: vi.fn(() => []),
-      getCodeBlockStepList: vi.fn(() => []),
-      getPageHistoryGroups: vi.fn(() => []),
-      getDataSourceHistoryGroups: vi.fn(() => []),
-      getCodeBlockHistoryGroups: vi.fn(() => []),
+      getStepList: vi.fn(() => []),
+      getHistoryGroups: vi.fn(() => []),
     },
   }) as any;
 
@@ -55,7 +52,7 @@ afterEach(() => {
 describe('useHistoryRevert', () => {
   test('页面 update 记录的目标节点已删除时，提示错误且不执行回滚', async () => {
     const services = createServices();
-    services.historyService.getPageStepList.mockReturnValue([
+    services.historyService.getStepList.mockReturnValue([
       {
         step: {
           opType: 'update',
@@ -74,7 +71,7 @@ describe('useHistoryRevert', () => {
 
   test('页面 add 记录回滚时走普通二次确认，并执行 revertPageStep', async () => {
     const services = createServices();
-    services.historyService.getPageStepList.mockReturnValue([
+    services.historyService.getStepList.mockReturnValue([
       {
         step: {
           opType: 'add',
@@ -92,7 +89,7 @@ describe('useHistoryRevert', () => {
 
   test('数据源 update 记录对应目标已删除时，提示错误且不执行回滚', async () => {
     const services = createServices();
-    services.historyService.getDataSourceStepList.mockReturnValue([
+    services.historyService.getStepList.mockReturnValue([
       {
         step: {
           opType: 'update',

@@ -10,13 +10,12 @@ import {
   createStackStep,
   describeRevertStep,
   deserializeStacks,
-  detectPageTargetId,
-  detectPageTargetName,
   detectStackOpType,
+  detectTargetId,
+  detectTargetName,
   getOrCreateStack,
   markStackSaved,
-  mergePageSteps,
-  mergeStackSteps,
+  mergeSteps,
   serializeStacks,
   undoFloor,
 } from '@editor/utils/history';
@@ -121,13 +120,13 @@ describe('markStackSaved', () => {
   });
 });
 
-describe('mergeStackSteps', () => {
-  test('连续 update 各自独立成组', () => {
+describe('mergeSteps（代码块 / 数据源等按 id 分栈类型）', () => {
+  test('无 diff 的连续 update 不合并（无明确目标）', () => {
     const list = [
       { opType: 'update', uuid: '1' },
       { opType: 'update', uuid: '2' },
     ] as CodeBlockStepValue[];
-    const groups = mergeStackSteps('code-block', 'code_1', list, 2);
+    const groups = mergeSteps('code-block', 'code_1', list, 2);
     expect(groups).toHaveLength(2);
     expect(groups[0].steps).toHaveLength(1);
     expect(groups[1].steps).toHaveLength(1);
@@ -135,12 +134,32 @@ describe('mergeStackSteps', () => {
     expect(groups[1].opType).toBe('update');
   });
 
+  test('同目标连续 update 合并成一组（CodeBlockContent 无 id，回退 step.data.id）', () => {
+    const mkUpdate = (path: string) =>
+      ({
+        opType: 'update',
+        data: { name: 'A', id: 'code_1' },
+        diff: [
+          {
+            newSchema: { name: 'A', content: 'x' },
+            oldSchema: { name: 'A', content: 'x' },
+            changeRecords: [{ propPath: path }],
+          },
+        ],
+      }) as unknown as CodeBlockStepValue;
+    const groups = mergeSteps('code-block', 'code_1', [mkUpdate('content'), mkUpdate('params')], 2);
+    expect(groups).toHaveLength(1);
+    expect(groups[0].steps).toHaveLength(2);
+    expect(groups[0].id).toBe('code_1');
+    expect(groups[0].kind).toBe('code-block');
+  });
+
   test('add / update 各自独立成组', () => {
     const list = [
       { opType: 'add', uuid: '1' },
       { opType: 'update', uuid: '2' },
     ] as CodeBlockStepValue[];
-    const groups = mergeStackSteps('code-block', 'code_1', list, 2);
+    const groups = mergeSteps('code-block', 'code_1', list, 2);
     expect(groups).toHaveLength(2);
   });
 
@@ -149,7 +168,7 @@ describe('mergeStackSteps', () => {
       { opType: 'update', uuid: '1' },
       { opType: 'update', uuid: '2' },
     ] as CodeBlockStepValue[];
-    const groups = mergeStackSteps('code-block', 'code_1', list, 1);
+    const groups = mergeSteps('code-block', 'code_1', list, 1);
     expect(groups[0].applied).toBe(true);
     expect(groups[0].steps[0].applied).toBe(true);
     expect(groups[0].steps[0].isCurrent).toBe(true);
@@ -159,14 +178,14 @@ describe('mergeStackSteps', () => {
   });
 });
 
-describe('detectPageTargetId / detectPageTargetName', () => {
+describe('detectTargetId / detectTargetName', () => {
   test('单节点 update 返回 targetId 与名称', () => {
     const step = {
       opType: 'update',
       diff: [{ newSchema: { id: 'btn_1', name: '按钮' }, oldSchema: { id: 'btn_1' } }],
     } as unknown as StepValue;
-    expect(detectPageTargetId(step)).toBe('btn_1');
-    expect(detectPageTargetName(step)).toBe('按钮');
+    expect(detectTargetId(step)).toBe('btn_1');
+    expect(detectTargetName(step)).toBe('按钮');
   });
 
   test('多节点 update 不参与合并', () => {
@@ -177,8 +196,8 @@ describe('detectPageTargetId / detectPageTargetName', () => {
         { newSchema: { id: 'b' }, oldSchema: { id: 'b' } },
       ],
     } as unknown as StepValue;
-    expect(detectPageTargetId(step)).toBeUndefined();
-    expect(detectPageTargetName(step)).toBe('2 个节点');
+    expect(detectTargetId(step)).toBeUndefined();
+    expect(detectTargetName(step)).toBe('2 个节点');
   });
 
   test('add 单节点返回名称', () => {
@@ -186,12 +205,12 @@ describe('detectPageTargetId / detectPageTargetName', () => {
       opType: 'add',
       diff: [{ newSchema: { id: 'n1', type: 'text' } }],
     } as unknown as StepValue;
-    expect(detectPageTargetId(step)).toBeUndefined();
-    expect(detectPageTargetName(step)).toBe('text');
+    expect(detectTargetId(step)).toBeUndefined();
+    expect(detectTargetName(step)).toBe('text');
   });
 });
 
-describe('mergePageSteps', () => {
+describe('mergeSteps（页面）', () => {
   test('相邻同 targetId 的 update 合并', () => {
     const mkUpdate = (path: string) =>
       ({
@@ -206,7 +225,7 @@ describe('mergePageSteps', () => {
       }) as unknown as StepValue;
 
     const list = [mkUpdate('style.color'), mkUpdate('style.fontSize')];
-    const groups = mergePageSteps('p1', list, 2);
+    const groups = mergeSteps('page', 'p1', list, 2);
     expect(groups).toHaveLength(1);
     expect(groups[0].targetId).toBe('btn_1');
     expect(groups[0].steps).toHaveLength(2);
@@ -223,7 +242,7 @@ describe('mergePageSteps', () => {
         diff: [{ newSchema: { id: 'n1', name: 'A' }, oldSchema: { id: 'n1', name: 'A' } }],
       },
     ] as unknown as StepValue[];
-    const groups = mergePageSteps('p1', list, 2);
+    const groups = mergeSteps('page', 'p1', list, 2);
     expect(groups).toHaveLength(2);
     expect(groups[0].opType).toBe('add');
     expect(groups[1].opType).toBe('update');
@@ -240,7 +259,7 @@ describe('mergePageSteps', () => {
         diff: [{ newSchema: { id: 'n1', name: '新名' }, oldSchema: { id: 'n1', name: '旧名' } }],
       },
     ] as unknown as StepValue[];
-    const groups = mergePageSteps('p1', list, 2);
+    const groups = mergeSteps('page', 'p1', list, 2);
     expect(groups[0].targetName).toBe('新名');
   });
 });

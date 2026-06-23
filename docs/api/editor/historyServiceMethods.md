@@ -4,42 +4,70 @@
 
 - **详情：**
 
-  重置全部历史记录（包括页面节点栈、代码块栈、数据源栈），并重置当前页面 id / canRedo / canUndo
-
-## resetPage
-
-- **详情：**
-
-  重置当前页面的历史记录状态（清空当前页面id，重置 canRedo/canUndo）
+  重置全部历史记录：清空 `state.steps` 下的页面 / 代码块 / 数据源 / 扩展类型全部栈（保留已注册的扩展类型键）。
 
 ## resetState
 
 - **详情：**
 
-  重置历史记录全部内部状态（清空 pageId、pageSteps、canRedo、canUndo、codeBlockState、dataSourceState）
+  同 [`reset`](#reset)，清空 `state.steps` 下全部栈。
 
-## changePage
+  ::: tip
+  历史服务不再维护「当前活动页」状态（已移除 `state.pageId` / `state.canUndo` / `state.canRedo`）。
+  活动页由 `editorService` 维护，撤销 / 重做 / 读取页面历史时请显式传入 pageId。
+  是否可撤销 / 重做请改用 [`canUndo`](#canundo) / [`canRedo`](#canredo)。
+  :::
+
+## registerStepType
 
 - **参数：**
-  - `{MPage | MPageFragment} page`
-
-  ::: details 查看 MPage / MPageFragment 类型定义
-  <<< @/../packages/schema/src/index.ts#MPage{ts}
-
-  <<< @/../packages/schema/src/index.ts#MPageFragment{ts}
-  :::
+  - `{string} stepType` 自定义历史类型标识（勿与内置 `page` / `codeBlock` / `dataSource` 重名）
+  - `{Object} options` 可选
+    - `{string} event` push / undo / redo 后派发的事件名；缺省为 `${stepType}-history-change`
+    - `{string} name` 历史面板中的展示名称（tab / 分组标题等）；缺省回退到 stepType 本身
 
 - **详情：**
 
-  按页面切换历史堆栈
+  注册一个扩展历史类型，使其可与内置 `page` / `codeBlock` / `dataSource` 一样走统一的
+  [`push`](#push) / [`undo`](#undo) / [`redo`](#redo)（按 id 分栈、独立 undo/redo）。
+  注册后该类型的栈存放在 `historyService.state.steps[stepType]`，展示名称存放在 `historyService.state.stepNames[stepType]`。
+
+## getStepName
+
+- **参数：**
+  - `{HistoryStepType} stepType` 历史类型
+
+- **返回：**
+  - `{string}` 该类型的展示名称（用于历史面板 tab / 分组标题等）；未登记时回退到 stepType 本身
+
+- **详情：**
+
+  读取指定历史类型的展示名称。内置 `page` / `codeBlock` / `dataSource` 默认分别为「页面 / 代码块 / 数据源」。
+
+## setStepName
+
+- **参数：**
+  - `{HistoryStepType} stepType` 历史类型
+  - `{string} name` 展示名称
+
+- **详情：**
+
+  设置指定历史类型的展示名称（写入 `historyService.state.stepNames`，历史面板会响应式刷新）。
+  内置 `page` / `codeBlock` / `dataSource` 也可在此覆盖默认中文名。
 
 ## push
 
 - **参数：**
-  - `{StepValue} state`
+  - `{HistoryStepType} stepType` 历史类型，内置 `'page'` / `'codeBlock'` / `'dataSource'`，并支持通过 [`registerStepType`](#registersteptype) 扩展
+  - `{StepValue | BaseStepValue} step` 已构造好的历史记录（缺省自动补全 `uuid` / `timestamp`）
+  - `{Id} id` 必填；目标栈 id（`page` 为 pageId，其余类型为对应资源 id）
 
   ::: details 查看 StepValue 及关联类型定义
   <<< @/../packages/editor/src/type.ts#StepValue{ts}
+
+  <<< @/../packages/editor/src/type.ts#BaseStepValue{ts}
+
+  <<< @/../packages/editor/src/type.ts#StepExtra{ts}
 
   <<< @/../packages/editor/src/type.ts#HistoryOpType{ts}
 
@@ -53,278 +81,137 @@
   :::
 
 - **返回：**
-  - `{StepValue | null}`
+  - `{StepValue | BaseStepValue | null}` 入栈失败（未传 / 无效 id）时返回 `null`
 
 - **详情：**
 
-  添加一条历史记录
+  添加一条历史记录。统一入口，所有类型（`page` / `codeBlock` / `dataSource` / 扩展）行为完全一致：按 `stepType` 选择目标栈类型、按 `id`（必填）选择具体栈，按需建栈后入栈，并派发对应的历史变更事件（`page` 为 `change`，其余如 `code-block-history-change` / `data-source-history-change`），回调签名统一为 `(id, step)`。
+
+  跨页 / 跨资源操作（如把节点搬到其它页）必须显式传入目标 id。`codeBlock` / `dataSource` 的 step 通常由 `createStackStep` 等工具按 `oldValue` / `newValue` 构造后传入。
 
   ::: tip
-  `opType: 'update'` 的每个 `updatedItems[i]` 上可携带 `changeRecords`，用于撤销 / 重做时仅按
+  `opType: 'update'` 的每个 diff 项上可携带 `changeRecords`，用于撤销 / 重做时仅按
   `propPath` 局部更新对应字段，避免整节点替换冲掉同节点上的其它无关变更；不带
   `changeRecords` 时退化为整节点替换（如 `sort` / `moveLayer` / 拖动等纯快照场景）。
 
-  `StepValue` 上的 `historyDescription` / `source` 仅用于历史面板展示与埋点，不影响 undo/redo 行为。
+  `step` 上的 `historyDescription` / `source` 仅用于历史面板展示与埋点，不影响 undo/redo 行为。
 
   入栈时会为每条记录自动生成唯一标识 `uuid`（调用方未指定时），可用于精确引用 / 定位某一条历史记录。
   若需要在执行 DSL 操作后拿到本次写入记录的 `uuid`，可使用 editorService / dataSourceService /
   codeBlockService 提供的 `*AndGetHistoryId` 方法，参见
   [editorService 历史记录 uuid 与 \*AndGetHistoryId](./editorServiceMethods.md#历史记录-uuid-与-andgethistoryid)。
-  `pushCodeBlock` / `pushDataSource` 同样会自动写入 `uuid`。
   :::
 
 ## undo
 
+- **参数：**
+  - `{HistoryStepType} stepType` 历史类型
+  - `{Id} id` 必填；目标栈 id（`page` 为 pageId，其余类型为对应资源 id）
+
 - **返回：**
-  - `{StepValue | null}`
+  - `{StepValue | BaseStepValue | null}`
 
 - **详情：**
 
-  撤销当前操作。`opType: 'update'` 时，若 `updatedItems[i].changeRecords` 存在，会按
-  `propPath` 从 `oldNode` 取值做局部回滚；否则用 `oldNode` 整节点替换。
+  撤销指定历史栈的最近一次变更。所有类型行为一致：按 `stepType` + `id` 定位栈，不会越过 index 0 的 initial 基线（所有类型同等适用，见 [`setMarker`](#setmarker)），仅在确有可撤销 step 时派发对应的历史变更事件（`page` 为 `change`，回调签名 `(id, step)`）。
+
+  `page` 类型 `opType: 'update'` 时，若 diff 项的 `changeRecords` 存在，会按 `propPath` 从 `oldSchema` 取值做局部回滚；否则用 `oldSchema` 整节点替换。`codeBlock` / `dataSource` 拿到 step 后由调用方写回对应 service（本方法不会自动回放）。
 
 ## redo
 
+- **参数：**
+  - `{HistoryStepType} stepType` 历史类型
+  - `{Id} id` 必填；目标栈 id（`page` 为 pageId，其余类型为对应资源 id）
+
 - **返回：**
-  - `{StepValue | null}`
+  - `{StepValue | BaseStepValue | null}`
 
 - **详情：**
 
-  恢复到下一步。`opType: 'update'` 时，若 `updatedItems[i].changeRecords` 存在，会按
-  `propPath` 从 `newNode` 取值做局部重做；否则用 `newNode` 整节点替换。
+  恢复指定历史栈到下一步，语义与 [`undo`](#undo) 对称。`page` 类型 `opType: 'update'` 时，若 diff 项的 `changeRecords` 存在，会按 `propPath` 从 `newSchema` 取值做局部重做；否则用 `newSchema` 整节点替换。
 
-## pushCodeBlock
-
-- **参数：**
-  - `{Id} codeBlockId` 代码块 id
-  - `{Object} payload`
-    - `{CodeBlockContent | null} oldContent` 变更前的代码块内容；新增时为 `null`
-    - `{CodeBlockContent | null} newContent` 变更后的代码块内容；删除时为 `null`
-    - `{ChangeRecord[]} changeRecords` 可选；form 端 propPath/value 变更列表，撤销/重做时若有则按 propPath 局部更新；缺省（或空数组）才退化为整内容替换
-    - `{string}` historyDescription 可选；人类可读描述，用于历史面板展示；不影响 undo/redo 行为
-    - `{HistoryOpSource}` source 可选；操作途径，用于历史面板展示与埋点；不影响 undo/redo 行为
-
-  ::: details 查看 CodeBlockStepValue 及关联类型定义
-  <<< @/../packages/editor/src/type.ts#CodeBlockStepValue{ts}
-
-  <<< @/../packages/editor/src/type.ts#HistoryOpSource{ts}
-
-  <<< @/../packages/schema/src/index.ts#CodeBlockContent{ts}
-
-  <<< @/../packages/form-schema/src/base.ts#ChangeRecord{ts}
-  :::
-
-- **返回：**
-  - `{CodeBlockStepValue | null}` 入栈失败（未传 id）时返回 `null`
-
-- **详情：**
-
-  推入一条代码块变更记录。与页面 / 节点完全无关，按 `codeBlockId` 维度独立一份 `UndoRedo` 栈，
-  栈实例存放在 `historyService.state.codeBlockState[codeBlockId]`。
-
-  入栈成功后会触发 `code-block-history-change` 事件。
-
-  ::: tip
-  `codeBlockService.setCodeDslByIdSync` 与 `codeBlockService.deleteCodeDslByIds` 内部已经
-  自动调用本方法，业务代码通常无需手动调用。
-  :::
-
-## undoCodeBlock
+## canUndo
 
 - **参数：**
-  - `{Id} codeBlockId`
-
-- **返回：**
-  - `{CodeBlockStepValue | null}` 栈不存在或已无可撤销记录时返回 `null`
-
-- **详情：**
-
-  撤销指定代码块的最近一次变更。成功时会触发 `code-block-history-change` 事件。
-  拿到 step 后由调用方根据 `step.oldContent` 写回 `codeBlockService`（本方法不会自动回放）。
-
-## redoCodeBlock
-
-- **参数：**
-  - `{Id} codeBlockId`
-
-- **返回：**
-  - `{CodeBlockStepValue | null}` 栈不存在或已无可重做记录时返回 `null`
-
-- **详情：**
-
-  重做指定代码块的下一次变更。成功时会触发 `code-block-history-change` 事件。
-
-## canUndoCodeBlock
-
-- **参数：**
-  - `{Id} codeBlockId`
+  - `{HistoryStepType} stepType` 历史类型
+  - `{Id} id` 可选；目标栈 id；缺省 / 无效时返回 `false`
 
 - **返回：**
   - `{boolean}`
 
 - **详情：**
 
-  指定代码块当前是否可撤销。栈不存在时返回 `false`。
+  指定历史栈当前是否可撤销（游标高于 index 0 的 initial 基线底线）。适用于所有类型（`page` / `codeBlock` / `dataSource` / 扩展）。
 
-## canRedoCodeBlock
+## canRedo
 
 - **参数：**
-  - `{Id} codeBlockId`
+  - `{HistoryStepType} stepType` 历史类型
+  - `{Id} id` 可选；目标栈 id；缺省 / 无效时返回 `false`
 
 - **返回：**
   - `{boolean}`
 
 - **详情：**
 
-  指定代码块当前是否可重做。栈不存在时返回 `false`。
+  指定历史栈当前是否可重做。适用于所有类型（`page` / `codeBlock` / `dataSource` / 扩展）。
 
-## pushDataSource
+## setMarker
 
 - **参数：**
-  - `{Id} dataSourceId` 数据源 id
-  - `{Object} payload`
-    - `{DataSourceSchema | null} oldSchema` 变更前的数据源 schema；新增时为 `null`
-    - `{DataSourceSchema | null} newSchema` 变更后的数据源 schema；删除时为 `null`
-    - `{ChangeRecord[]} changeRecords` 可选；form 端 propPath/value 变更列表，撤销/重做时若有则按 propPath 局部更新；缺省（或空数组）才退化为整 schema 替换
-    - `{string}` historyDescription 可选；人类可读描述，用于历史面板展示；不影响 undo/redo 行为
-    - `{HistoryOpSource}` source 可选；操作途径，用于历史面板展示与埋点；不影响 undo/redo 行为
-
-  ::: details 查看 DataSourceStepValue 及关联类型定义
-  <<< @/../packages/editor/src/type.ts#DataSourceStepValue{ts}
-
-  <<< @/../packages/editor/src/type.ts#HistoryOpSource{ts}
-
-  <<< @/../packages/form-schema/src/base.ts#ChangeRecord{ts}
-  :::
+  - `{HistoryStepType} stepType` 历史类型
+  - `{Id} id` 目标栈 id（`page` 为 pageId，其余类型为对应资源 id）
+  - `{Object} options` 可选：`name` / `description` / `source`，用于基线的展示信息
 
 - **返回：**
-  - `{DataSourceStepValue | null}` 入栈失败（未传 id）时返回 `null`
+  - `{StepValue | null}` 已存在基线时返回原基线；栈非空（无基线）或 id 无效时返回 `null`
 
 - **详情：**
 
-  推入一条数据源变更记录。与页面 / 节点完全无关，按 `dataSourceId` 维度独立一份 `UndoRedo` 栈，
-  栈实例存放在 `historyService.state.dataSourceState[dataSourceId]`。
+  为指定历史栈种入一条 `opType: 'initial'` 的「初始基线」记录，作为该栈 index 0 的固定底线：它是真实入栈并随栈持久化的 step，但被钉为撤销 / 回滚的下限，`undo` / `goto` / `revert` 都不会越过它。所有类型（含扩展类型）均可设置基线，仅当目标栈为空时种入。
 
-  入栈成功后会触发 `data-source-history-change` 事件。
-
-  ::: tip
-  `dataSourceService.add` / `update` / `remove` 内部已经自动调用本方法，业务代码通常无需手动调用。
-  :::
-
-## undoDataSource
+## getMarker
 
 - **参数：**
-  - `{Id} dataSourceId`
+  - `{HistoryStepType} stepType` 历史类型
+  - `{Id} id` 可选；目标栈 id；缺省 / 无效时返回 `undefined`
 
 - **返回：**
-  - `{DataSourceStepValue | null}`
+  - `{StepValue | undefined}`
 
 - **详情：**
 
-  撤销指定数据源的最近一次变更。成功时会触发 `data-source-history-change` 事件。
-  拿到 step 后由调用方根据 `step.oldSchema` 写回 `dataSourceService`（本方法不会自动回放）。
-
-## redoDataSource
-
-- **参数：**
-  - `{Id} dataSourceId`
-
-- **返回：**
-  - `{DataSourceStepValue | null}`
-
-- **详情：**
-
-  重做指定数据源的下一次变更。成功时会触发 `data-source-history-change` 事件。
-
-## canUndoDataSource
-
-- **参数：**
-  - `{Id} dataSourceId`
-
-- **返回：**
-  - `{boolean}`
-
-- **详情：**
-
-  指定数据源当前是否可撤销。栈不存在时返回 `false`。
-
-## canRedoDataSource
-
-- **参数：**
-  - `{Id} dataSourceId`
-
-- **返回：**
-  - `{boolean}`
-
-- **详情：**
-
-  指定数据源当前是否可重做。栈不存在时返回 `false`。
+  读取指定历史栈的初始基线 step（栈 index 0 且 `opType: 'initial'`），不存在时返回 `undefined`。
 
 ## markSaved
 
+- **参数：**
+  - `{HistoryStepType} stepType` 历史类型，内置另有 `'codeBlock'` / `'dataSource'`，并支持扩展（仅在传入 `id` 时生效）
+  - `{Id} id` 可选；目标栈 id。缺省表示标记全部类型、全部栈
+
 - **详情：**
 
-  标记「整份 DSL 已保存」：把页面 / 代码块 / 数据源所有栈当前游标所在的记录都标记为已保存（`saved = true`）。
+  标记历史记录为「已保存」（把对应栈当前游标所在的记录标记为 `saved = true`）。统一入口：
 
-  同一栈内任意时刻最多保留一条已保存记录（标记前会清除该栈内全部旧标记）；某个栈处于「全部已撤销」（cursor 为 0）时不会留下已保存记录，从 IndexedDB 恢复时其游标会回到 0。
+  - **缺省 `id`**：标记「整份 DSL 已保存」——把所有类型、所有栈当前游标所在的记录都标记为已保存（此时 `stepType` 不生效），触发 `mark-saved` 事件且 `{ kind: 'all' }`。通常在 DSL 整体落库成功后调用。
+  - **传入 `id`**：仅标记 `stepType` 下该 id 对应的栈，触发 `mark-saved` 事件且 `{ kind: stepType, id }`（如 `{ kind: 'page', id }` / `{ kind: 'codeBlock', id }` / `{ kind: 'dataSource', id }`）。
 
-  通常在 DSL 整体落库（保存到后端 / 本地）成功后调用，配合 [`restoreFromIndexedDB`](#restorefromindexeddb) 把游标恢复到此处。仅保存了其中一类时请改用更细粒度的 `markPageSaved` / `markCodeBlockSaved` / `markDataSourceSaved`。
+  同一栈内任意时刻最多保留一条已保存记录（标记前会清除该栈内全部旧标记）；某个栈处于「全部已撤销」（cursor 为 0）时不会留下已保存记录，从 IndexedDB 恢复时其游标会回到 0。配合 [`restoreFromIndexedDB`](#restorefromindexeddb) 把游标恢复到此处。
 
-  调用后会触发 `mark-saved` 事件（`{ kind: 'all' }`）。
-
-## markPageSaved
+## clear
 
 - **参数：**
-  - `{Id} pageId` 可选；缺省为当前活动页
+  - `{HistoryStepType} stepType` 历史类型，内置另有 `'codeBlock'` / `'dataSource'`，并支持扩展
+  - `{Id} id` 可选；目标栈 id。缺省表示清空 `stepType` 下的全部栈
 
 - **详情：**
 
-  标记指定页面（缺省当前活动页）历史栈的当前记录为已保存，仅影响该页面自己的栈。触发 `mark-saved` 事件（`{ kind: 'page', id }`）。
+  清空历史记录栈。统一入口，所有类型（page / codeBlock / dataSource / 扩展）行为一致：
 
-## markCodeBlockSaved
+  - **传入 `id`**：仅清空 `stepType` 下该 id 对应的栈；
+  - **缺省 `id`**：清空 `stepType` 下的全部栈。
 
-- **参数：**
-  - `{Id} codeBlockId`
-
-- **详情：**
-
-  标记指定代码块历史栈的当前记录为已保存，仅影响该代码块自己的栈。触发 `mark-saved` 事件（`{ kind: 'code-block', id }`）。
-
-## markDataSourceSaved
-
-- **参数：**
-  - `{Id} dataSourceId`
-
-- **详情：**
-
-  标记指定数据源历史栈的当前记录为已保存，仅影响该数据源自己的栈。触发 `mark-saved` 事件（`{ kind: 'data-source', id }`）。
-
-## clearPage
-
-- **参数：**
-  - `{Id} pageId` 可选；缺省为当前活动页
-
-- **详情：**
-
-  清空指定页面（缺省当前活动页）的历史记录栈。仅删除撤销/重做记录，不会改动当前 DSL；清空后该页将无法再撤销/重做之前的操作。清空当前活动页时会同步刷新 `canUndo` / `canRedo` 并触发 `change` 事件。
-
-## clearCodeBlock
-
-- **参数：**
-  - `{Id} codeBlockId` 可选；缺省清空全部代码块
-
-- **详情：**
-
-  清空代码块历史记录栈：传入 `codeBlockId` 仅清空该代码块，缺省清空全部代码块。仅删除撤销/重做记录，不会改动代码块本身。
-
-## clearDataSource
-
-- **参数：**
-  - `{Id} dataSourceId` 可选；缺省清空全部数据源
-
-- **详情：**
-
-  清空数据源历史记录栈：传入 `dataSourceId` 仅清空该数据源，缺省清空全部数据源。仅删除撤销/重做记录，不会改动数据源本身。
+  仅删除撤销/重做记录，不会改动 DSL / 代码块 / 数据源本身。清空时会**保留各栈原有的 initial 基线**（文案 / 来源，见 [`setMarker`](#setmarker)），无基线时清空成空栈。清空后触发 `clear` 事件（签名 `(id, stepType)`）。
 
 ## saveToIndexedDB
 
@@ -344,7 +231,7 @@
 
 - **详情：**
 
-  把当前内存中的全部历史栈（页面 / 代码块 / 数据源）连同各自游标、容量序列化后写入本地 IndexedDB。
+  把当前内存中的全部历史栈（页面 / 代码块 / 数据源 / 扩展类型）连同各自游标、容量序列化后写入本地 IndexedDB。
 
   - 最终库名为 `${dbName}-${当前 DSL app id}`，按应用隔离；
   - `key` 用于在同一 store 下区分不同记录，缺省为 `default`；
@@ -371,14 +258,32 @@
 
   - 每个栈都会按 `listMaxSize` 裁剪并还原游标；
   - 若某个栈存在已保存记录（见 `markSaved`），其游标会被定位到「最近一条已保存记录」之后，使恢复后的状态与落库的 DSL 对齐；
-  - 会整体覆盖当前内存中的历史状态，并把活动页恢复为快照中的 `pageId`；
+  - 会整体覆盖当前内存中的历史状态（活动页由 `editorService` 维护，不在此恢复）；
   - 找不到对应记录时返回 `null` 且不改动当前状态；不支持 IndexedDB 的环境会 reject。
 
-  成功后触发 `restore-from-indexed-db` 与 `change` 事件。
+  成功后触发 `restore-from-indexed-db` 事件。
+
+## findStepLocationByUuid
+
+- **参数：**
+  - `{HistoryStepType} stepType` 历史类型
+  - `{string} uuid` 目标历史记录的 uuid
+  - `{Id} id` 可选；目标栈 id
+
+- **返回：**
+  - `{ { id: Id; index: number } | null }` 找到时返回所属栈 id 与步骤索引；找不到时返回 `null`
+
+- **详情：**
+
+  按历史记录 uuid 在指定历史类型的栈中查找其所属 id 与索引，统一入口。
+
+  - **传入 `id`**：仅在该 id 对应的单个栈中查找（如页面历史按活动页查看，传入 pageId）；
+  - **缺省 `id`**：遍历该类型下全部栈查找（代码块 / 数据源等按全部资源分桶的场景）。
+
+  供「按 uuid 回滚」等需要把 uuid 映射回 `(id, index)` 的场景使用，如 [editorService.revertPageStepById](./editorServiceMethods.md#revertpagestepbyid) / [codeBlockService.revertById](./codeBlockServiceMethods.md#revertbyid) / [dataSourceService.revertById](./dataSourceServiceMethods.md#revertbyid) 内部均通过本方法定位步骤。
 
 ## destroy
 
 - **详情：**
 
   销毁
-

@@ -34,7 +34,7 @@ import { computed } from 'vue';
 
 import { TMagicScrollbar } from '@tmagic/design';
 
-import type { HistoryRowDescriptor, PageHistoryGroup, StepValue } from '@editor/type';
+import type { HistoryGroup, HistoryRowDescriptor, StepValue } from '@editor/type';
 
 import type { HistoryRowGroup } from './composables';
 import {
@@ -53,7 +53,7 @@ defineOptions({
 
 const props = defineProps<{
   /** 当前活动页面的历史分组列表，已按时间倒序排好（最新一组在最前）。空数组时显示空态。 */
-  list: PageHistoryGroup[];
+  list: HistoryGroup<StepValue>[];
   /**
    * 共享的折叠状态表（key -> 是否展开，缺省或 true 为展开、false 为收起），由顶层 panel 统一维护。
    * 本 tab 使用 `pg-${组内首步 index}` 作为 key——以稳定的 step 索引而非展示位置标识分组，
@@ -105,9 +105,9 @@ const descriptor: HistoryRowDescriptor<StepValue> = {
   isStepRevertable: isPageStepRevertable,
 };
 
-const rowKey = (group: PageHistoryGroup) => `pg-${group.steps[0]?.index}`;
+const rowKey = (group: HistoryGroup<StepValue>) => `pg-${group.steps[0]?.index}`;
 
-const toRow = (group: PageHistoryGroup): HistoryRowGroup => toRowGroup(group, rowKey(group), descriptor);
+const toRow = (group: HistoryGroup<StepValue>): HistoryRowGroup => toRowGroup(group, rowKey(group), descriptor);
 
 /**
  * 是否处于"初始状态"——即对应页面历史栈 cursor===0：

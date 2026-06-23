@@ -174,8 +174,8 @@ describe('CodeBlockService - 历史记录接入', () => {
     await codeBlockService.setCodeDsl({} as any);
     codeBlockService.setCodeDslByIdSync('new_code', { name: 'A' } as any);
 
-    expect(historyService.canUndoCodeBlock('new_code')).toBe(true);
-    const step = historyService.undoCodeBlock('new_code');
+    expect(historyService.canUndo('codeBlock', 'new_code')).toBe(true);
+    const step = historyService.undo('codeBlock', 'new_code');
     expect(step?.diff?.[0]?.oldSchema).toBeUndefined();
     expect(step?.diff?.[0]?.newSchema).toEqual(expect.objectContaining({ name: 'A' }));
   });
@@ -184,7 +184,7 @@ describe('CodeBlockService - 历史记录接入', () => {
     await codeBlockService.setCodeDsl({ a: { name: 'A' } } as any);
     codeBlockService.setCodeDslByIdSync('a', { name: 'A2' } as any);
 
-    const step = historyService.undoCodeBlock('a');
+    const step = historyService.undo('codeBlock', 'a');
     expect(step?.diff?.[0]?.oldSchema).toEqual({ name: 'A' });
     expect(step?.diff?.[0]?.newSchema).toEqual(expect.objectContaining({ name: 'A2' }));
   });
@@ -192,14 +192,14 @@ describe('CodeBlockService - 历史记录接入', () => {
   test('setCodeDslByIdSync - force=false 已存在时不入历史', async () => {
     await codeBlockService.setCodeDsl({ a: { name: 'A' } } as any);
     codeBlockService.setCodeDslByIdSync('a', { name: 'A2' } as any, false);
-    expect(historyService.canUndoCodeBlock('a')).toBe(false);
+    expect(historyService.canUndo('codeBlock', 'a')).toBe(false);
   });
 
   test('deleteCodeDslByIds - 删除已存在的代码块入历史（newContent=null）', async () => {
     await codeBlockService.setCodeDsl({ a: { name: 'A' }, b: { name: 'B' } } as any);
     await codeBlockService.deleteCodeDslByIds(['a']);
 
-    const step = historyService.undoCodeBlock('a');
+    const step = historyService.undo('codeBlock', 'a');
     expect(step?.diff?.[0]?.oldSchema).toEqual({ name: 'A' });
     expect(step?.diff?.[0]?.newSchema).toBeUndefined();
   });
@@ -207,7 +207,7 @@ describe('CodeBlockService - 历史记录接入', () => {
   test('deleteCodeDslByIds - 删除不存在的 id 不入历史', async () => {
     await codeBlockService.setCodeDsl({} as any);
     await codeBlockService.deleteCodeDslByIds(['ghost']);
-    expect(historyService.canUndoCodeBlock('ghost')).toBe(false);
+    expect(historyService.canUndo('codeBlock', 'ghost')).toBe(false);
   });
 
   test('setCodeDslByIdSync - 携带 changeRecords 时写入历史 step', async () => {
@@ -217,7 +217,7 @@ describe('CodeBlockService - 历史记录接入', () => {
       changeRecords: [{ propPath: 'name', value: 'A2' }],
     });
 
-    const step = historyService.undoCodeBlock('a');
+    const step = historyService.undo('codeBlock', 'a');
     expect(step?.diff?.[0]?.changeRecords).toEqual([{ propPath: 'name', value: 'A2' }]);
   });
 
@@ -226,14 +226,14 @@ describe('CodeBlockService - 历史记录接入', () => {
     await codeBlockService.setCodeDsl({ a: { name: 'A' } } as any);
     codeBlockService.setCodeDslByIdSync('a', { name: 'A2' } as any);
 
-    const step = historyService.undoCodeBlock('a');
+    const step = historyService.undo('codeBlock', 'a');
     expect(step?.diff?.[0]?.changeRecords).toBeUndefined();
   });
 });
 
 describe('CodeBlockService - *AndGetHistoryId', () => {
   const lastStepUuid = (id: string) => {
-    const list = historyService.getCodeBlockStepList(id);
+    const list = historyService.getStepList('codeBlock', id);
     return list[list.length - 1]?.step.uuid;
   };
 
@@ -311,7 +311,7 @@ describe('CodeBlockService - revertById', () => {
     await codeBlockService.setCodeDsl({} as any);
     const { historyIds } = codeBlockService.setCodeDslByIdSyncAndGetHistoryId('a', { name: 'A' } as any);
 
-    const location = historyService.findCodeBlockStepLocationByUuid(historyIds[0]!);
+    const location = historyService.findStepLocationByUuid('codeBlock', historyIds[0]!);
     expect(location).toEqual({ id: 'a', index: 0 });
   });
 
@@ -433,14 +433,14 @@ describe('CodeBlockService - undo / redo', () => {
     historyService.reset();
 
     codeBlockService.setCodeDslByIdSync('a', { name: 'A2' } as any);
-    expect(historyService.canUndoCodeBlock('a')).toBe(true);
+    expect(historyService.canUndo('codeBlock', 'a')).toBe(true);
 
     await codeBlockService.undo('a');
-    expect(historyService.canRedoCodeBlock('a')).toBe(true);
+    expect(historyService.canRedo('codeBlock', 'a')).toBe(true);
 
     await codeBlockService.redo('a');
-    expect(historyService.canRedoCodeBlock('a')).toBe(false);
-    expect(historyService.canUndoCodeBlock('a')).toBe(true);
+    expect(historyService.canRedo('codeBlock', 'a')).toBe(false);
+    expect(historyService.canUndo('codeBlock', 'a')).toBe(true);
   });
 
   test('canUndo / canRedo 委托给 historyService', async () => {

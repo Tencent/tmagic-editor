@@ -133,8 +133,8 @@ describe('DataSource service', () => {
 describe('DataSource service - 历史记录接入', () => {
   test('add - 入历史（oldSchema=null）', () => {
     const ds = dataSource.add({ title: 'a', type: 'base' } as any);
-    expect(historyService.canUndoDataSource(ds.id!)).toBe(true);
-    const step = historyService.undoDataSource(ds.id!);
+    expect(historyService.canUndo('dataSource', ds.id!)).toBe(true);
+    const step = historyService.undo('dataSource', ds.id!);
     expect(step?.diff?.[0]?.oldSchema).toBeUndefined();
     expect(step?.diff?.[0]?.newSchema?.title).toBe('a');
   });
@@ -145,7 +145,7 @@ describe('DataSource service - 历史记录接入', () => {
     historyService.reset();
 
     dataSource.update({ ...created, title: 'b' } as any);
-    const step = historyService.undoDataSource(created.id!);
+    const step = historyService.undo('dataSource', created.id!);
     expect(step?.diff?.[0]?.oldSchema?.title).toBe('a');
     expect(step?.diff?.[0]?.newSchema?.title).toBe('b');
   });
@@ -155,14 +155,14 @@ describe('DataSource service - 历史记录接入', () => {
     historyService.reset();
 
     dataSource.remove(created.id!);
-    const step = historyService.undoDataSource(created.id!);
+    const step = historyService.undo('dataSource', created.id!);
     expect(step?.diff?.[0]?.oldSchema?.title).toBe('a');
     expect(step?.diff?.[0]?.newSchema).toBeUndefined();
   });
 
   test('remove - 不存在的 id 不入历史', () => {
     dataSource.remove('ghost');
-    expect(historyService.canUndoDataSource('ghost')).toBe(false);
+    expect(historyService.canUndo('dataSource', 'ghost')).toBe(false);
   });
 
   test('update - 携带 changeRecords 时写入历史 step', () => {
@@ -173,7 +173,7 @@ describe('DataSource service - 历史记录接入', () => {
       changeRecords: [{ propPath: 'title', value: 'b' }],
     });
 
-    const step = historyService.undoDataSource(created.id!);
+    const step = historyService.undo('dataSource', created.id!);
     expect(step?.diff?.[0]?.changeRecords).toEqual([{ propPath: 'title', value: 'b' }]);
   });
 
@@ -182,14 +182,14 @@ describe('DataSource service - 历史记录接入', () => {
     historyService.reset();
 
     dataSource.update({ ...created, title: 'b' } as any);
-    const step = historyService.undoDataSource(created.id!);
+    const step = historyService.undo('dataSource', created.id!);
     expect(step?.diff?.[0]?.changeRecords).toBeUndefined();
   });
 });
 
 describe('DataSource service - *AndGetHistoryId', () => {
   const lastStepUuid = (id: string) => {
-    const list = historyService.getDataSourceStepList(id);
+    const list = historyService.getStepList('dataSource', id);
     return list[list.length - 1]?.step.uuid;
   };
 
@@ -238,7 +238,7 @@ describe('DataSource service - *AndGetHistoryId', () => {
 describe('DataSource service - revertById', () => {
   test('通过 uuid 回滚 add（移除数据源）', () => {
     const created = dataSource.add({ title: 'a', type: 'base' } as any);
-    const uuid = historyService.getDataSourceStepList(created.id!).slice(-1)[0]?.step.uuid;
+    const uuid = historyService.getStepList('dataSource', created.id!).slice(-1)[0]?.step.uuid;
     expect(typeof uuid).toBe('string');
     expect(dataSource.getDataSourceById(created.id!)).toBeDefined();
 
@@ -249,9 +249,9 @@ describe('DataSource service - revertById', () => {
 
   test('通过 uuid 回滚等价于按 (id, index) 回滚', () => {
     const created = dataSource.add({ title: 'a', type: 'base' } as any);
-    const uuid = historyService.getDataSourceStepList(created.id!).slice(-1)[0]?.step.uuid;
+    const uuid = historyService.getStepList('dataSource', created.id!).slice(-1)[0]?.step.uuid;
 
-    const location = historyService.findDataSourceStepLocationByUuid(uuid!);
+    const location = historyService.findStepLocationByUuid('dataSource', uuid!);
     expect(location).toEqual({ id: created.id, index: 0 });
   });
 
@@ -264,8 +264,8 @@ describe('DataSource service - revertById', () => {
   test('支持传入 uuid 数组并按顺序回滚', () => {
     const ds1 = dataSource.add({ title: 'a', type: 'base' } as any);
     const ds2 = dataSource.add({ title: 'b', type: 'base' } as any);
-    const uuid1 = historyService.getDataSourceStepList(ds1.id!).slice(-1)[0]?.step.uuid;
-    const uuid2 = historyService.getDataSourceStepList(ds2.id!).slice(-1)[0]?.step.uuid;
+    const uuid1 = historyService.getStepList('dataSource', ds1.id!).slice(-1)[0]?.step.uuid;
+    const uuid2 = historyService.getStepList('dataSource', ds2.id!).slice(-1)[0]?.step.uuid;
 
     const reverted = dataSource.revertById([uuid1!, uuid2!]);
     expect(reverted).toHaveLength(2);
@@ -383,15 +383,15 @@ describe('DataSource service - undo / redo', () => {
 
     dataSource.update({ ...created, title: 'b' } as any);
     // 此时栈里只有一条 update
-    expect(historyService.canUndoDataSource(created.id!)).toBe(true);
+    expect(historyService.canUndo('dataSource', created.id!)).toBe(true);
 
     dataSource.undo(created.id!);
     // undo 后栈应可 redo，并且 undo 不应再生新栈记录
-    expect(historyService.canRedoDataSource(created.id!)).toBe(true);
+    expect(historyService.canRedo('dataSource', created.id!)).toBe(true);
 
     dataSource.redo(created.id!);
-    expect(historyService.canRedoDataSource(created.id!)).toBe(false);
-    expect(historyService.canUndoDataSource(created.id!)).toBe(true);
+    expect(historyService.canRedo('dataSource', created.id!)).toBe(false);
+    expect(historyService.canUndo('dataSource', created.id!)).toBe(true);
   });
 
   test('canUndo / canRedo 委托给 historyService', () => {

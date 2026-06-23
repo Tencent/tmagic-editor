@@ -15,7 +15,7 @@ const editorService = {
   undo: vi.fn(),
   redo: vi.fn(),
 };
-const historyService = { state: { canUndo: true, canRedo: true } };
+const historyService = { state: { steps: {} }, canUndo: vi.fn(() => true), canRedo: vi.fn(() => true) };
 const uiService = {
   get: vi.fn(),
   set: vi.fn(),

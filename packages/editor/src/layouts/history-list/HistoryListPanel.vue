@@ -18,7 +18,7 @@
       <TMagicTabs v-model="activeTab" class="m-editor-history-list-tabs">
         <component
           :is="tabPaneComponent?.component || 'el-tab-pane'"
-          v-bind="tabPaneComponent?.props({ name: 'page', label: `页面 (${pageGroups.length})` }) || {}"
+          v-bind="tabPaneComponent?.props({ name: 'page', label: `${pageName} (${pageGroups.length})` }) || {}"
         >
           <PageTab
             :list="pageGroupsDisplay"
@@ -37,7 +37,10 @@
         <component
           v-if="!disabledDataSource"
           :is="tabPaneComponent?.component || 'el-tab-pane'"
-          v-bind="tabPaneComponent?.props({ name: 'data-source', label: `数据源 (${dataSourceGroups.length})` }) || {}"
+          v-bind="
+            tabPaneComponent?.props({ name: 'data-source', label: `${dataSourceName} (${dataSourceGroups.length})` }) ||
+            {}
+          "
         >
           <BucketTab
             :config="dataSourceConfig"
@@ -55,7 +58,9 @@
         <component
           v-if="!disabledCodeBlock"
           :is="tabPaneComponent?.component || 'el-tab-pane'"
-          v-bind="tabPaneComponent?.props({ name: 'code-block', label: `代码块 (${codeBlockGroups.length})` }) || {}"
+          v-bind="
+            tabPaneComponent?.props({ name: 'code-block', label: `${codeBlockName} (${codeBlockGroups.length})` }) || {}
+          "
         >
           <BucketTab
             :config="codeBlockConfig"
@@ -204,7 +209,15 @@ const {
  * 当前活动页的「加载/初始」标记记录（设置 root 时生成），透传给 PageTab 的底部初始行展示。
  * 基于 historyService 的 reactive state 派生，活动页切换或标记写入后自动刷新。
  */
-const pageMarker = computed(() => historyService.getPageMarker());
+const pageMarker = computed(() => historyService.getMarker('page', editorService.get('page')?.id));
+
+/**
+ * 各历史类型的展示名称（页面 / 数据源 / 代码块），由 historyService.state.stepNames 配置，
+ * 业务方可通过 historyService.setStepName / registerStepType 覆盖。基于 reactive state 派生，配置变更后自动刷新。
+ */
+const pageName = computed(() => historyService.getStepName('page'));
+const dataSourceName = computed(() => historyService.getStepName('dataSource'));
+const codeBlockName = computed(() => historyService.getStepName('codeBlock'));
 
 /** 代码块 step 仅 update（前后 content 都存在）时可查看差异。 */
 const isStepDiffable = (step: BaseStepValue) => Boolean(step.diff?.[0]?.oldSchema && step.diff?.[0]?.newSchema);
@@ -212,23 +225,26 @@ const isStepDiffable = (step: BaseStepValue) => Boolean(step.diff?.[0]?.oldSchem
 /**
  * 数据源 / 代码块两类 bucket 历史的整体渲染配置：把 title / prefix 与各自的描述、
  * 可差异、可回滚判定收敛为单一对象整体注入 BucketTab，组件内部按需读取。
+ * title / 描述回退名取自可配置的展示名称，故用 computed 使其随 stepNames 变更刷新。
  */
 // 数据源/代码块不做相邻合并，每组恒为单步，省略 describeGroup，由 toRowGroup 回退到 describeStep。
-const dataSourceConfig: HistoryBucketConfig<DataSourceStepValue> = {
-  title: '数据源',
+const dataSourceConfig = computed<HistoryBucketConfig<DataSourceStepValue>>(() => ({
+  title: dataSourceName.value,
   prefix: 'ds',
-  describeStep: (step: DataSourceStepValue): string => describeStep(step, (schema) => schema?.title, '数据源'),
+  describeStep: (step: DataSourceStepValue): string =>
+    describeStep(step, (schema) => schema?.title, dataSourceName.value),
   isStepDiffable,
   isStepRevertable: isSingleDiffStepRevertable,
-};
+}));
 
-const codeBlockConfig: HistoryBucketConfig<CodeBlockStepValue> = {
-  title: '代码块',
+const codeBlockConfig = computed<HistoryBucketConfig<CodeBlockStepValue>>(() => ({
+  title: codeBlockName.value,
   prefix: 'cb',
-  describeStep: (step: CodeBlockStepValue): string => describeStep(step, (content) => content?.name, '代码块'),
+  describeStep: (step: CodeBlockStepValue): string =>
+    describeStep(step, (content) => content?.name, codeBlockName.value),
   isStepDiffable,
   isStepRevertable: isSingleDiffStepRevertable,
-};
+}));
 
 /** 把"目标 step 索引"翻译成"目标 cursor"（已应用步骤数量）。 */
 const indexToCursor = (index: number) => index + 1;
@@ -244,7 +260,7 @@ const onPageGoto = (index: number) => {
  * - 该 step 涉及的节点都已不存在（如删除记录、被撤销的新增）时给出提示，不做选中。
  */
 const onPageSelect = async (index: number) => {
-  const step = historyService.getPageStepList()[index]?.step;
+  const step = historyService.getStepList('page', editorService.get('page')?.id)[index]?.step;
   if (!step) return;
   const targetId = (step.diff ?? [])
     .map((item) => item.newSchema?.id ?? item.oldSchema?.id)
@@ -312,7 +328,7 @@ const onPageClear = async () => {
       '确定清空当前页面的历史记录吗？清空后将无法撤销/重做之前的操作，本地保存的记录也会一并删除。',
     )
   ) {
-    historyService.clearPage();
+    historyService.clear('page', editorService.get('page')?.id);
     await syncIndexedDB();
   }
 };
@@ -323,7 +339,7 @@ const onDataSourceClear = async () => {
       '确定清空数据源的历史记录吗？清空后将无法撤销/重做之前的操作，本地保存的记录也会一并删除。',
     )
   ) {
-    historyService.clearDataSource();
+    historyService.clear('dataSource');
     await syncIndexedDB();
   }
 };
@@ -334,7 +350,7 @@ const onCodeBlockClear = async () => {
       '确定清空代码块的历史记录吗？清空后将无法撤销/重做之前的操作，本地保存的记录也会一并删除。',
     )
   ) {
-    historyService.clearCodeBlock();
+    historyService.clear('codeBlock');
     await syncIndexedDB();
   }
 };
