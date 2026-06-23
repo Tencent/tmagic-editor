@@ -1,3 +1,17 @@
+# [1.8.0-beta.8](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.7...v1.8.0-beta.8) (2026-06-23)
+
+
+### Bug Fixes
+
+* **playground:** 调整初始化时序避免历史恢复被覆盖 ([bfdaf2b](https://github.com/Tencent/tmagic-editor/commit/bfdaf2b244dfe7387cac5b399a84ccd614201e73))
+
+
+### Features
+
+* **editor:** 历史记录支持展示操作人 ([1ade61d](https://github.com/Tencent/tmagic-editor/commit/1ade61d62e61c86fcff2033a3dd57c533ce4241c))
+
+
+
 # [1.8.0-beta.7](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.6...v1.8.0-beta.7) (2026-06-17)
 
 
