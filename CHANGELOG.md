@@ -1,3 +1,13 @@
+# [1.8.0-beta.9](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.8...v1.8.0-beta.9) (2026-06-25)
+
+
+### Features
+
+* **editor:** 优化历史记录对比与回滚流程 ([ce65b18](https://github.com/Tencent/tmagic-editor/commit/ce65b18dbb2976db484ab35a98479858b4c426e4))
+* 导出 componentListService 和 keybindingService ([40acb5b](https://github.com/Tencent/tmagic-editor/commit/40acb5b34cb3b492bc5234c75bde4fbf8e787be2))
+
+
+
 # [1.8.0-beta.8](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.7...v1.8.0-beta.8) (2026-06-23)
 
 
