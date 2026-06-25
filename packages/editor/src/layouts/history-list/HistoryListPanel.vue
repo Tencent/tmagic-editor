@@ -18,7 +18,9 @@
       <TMagicTabs v-model="activeTab" class="m-editor-history-list-tabs">
         <component
           :is="tabPaneComponent?.component || 'el-tab-pane'"
-          v-bind="tabPaneComponent?.props({ name: 'page', label: `${pageName} (${pageGroups.length})` }) || {}"
+          v-bind="
+            tabPaneComponent?.props({ name: 'page', label: `${pageName} (${pageGroups.length})`, lazy: true }) || {}
+          "
         >
           <PageTab
             :list="pageGroupsDisplay"
@@ -38,8 +40,11 @@
           v-if="!disabledDataSource"
           :is="tabPaneComponent?.component || 'el-tab-pane'"
           v-bind="
-            tabPaneComponent?.props({ name: 'data-source', label: `${dataSourceName} (${dataSourceGroups.length})` }) ||
-            {}
+            tabPaneComponent?.props({
+              name: 'data-source',
+              label: `${dataSourceName} (${dataSourceGroups.length})`,
+              lazy: true,
+            }) || {}
           "
         >
           <BucketTab
@@ -59,7 +64,11 @@
           v-if="!disabledCodeBlock"
           :is="tabPaneComponent?.component || 'el-tab-pane'"
           v-bind="
-            tabPaneComponent?.props({ name: 'code-block', label: `${codeBlockName} (${codeBlockGroups.length})` }) || {}
+            tabPaneComponent?.props({
+              name: 'code-block',
+              label: `${codeBlockName} (${codeBlockGroups.length})`,
+              lazy: true,
+            }) || {}
           "
         >
           <BucketTab
@@ -79,7 +88,7 @@
           v-for="tab in extraTabs"
           :key="tab.name"
           :is="tabPaneComponent?.component || 'el-tab-pane'"
-          v-bind="tabPaneComponent?.props({ name: tab.name, label: resolveTabLabel(tab) }) || {}"
+          v-bind="tabPaneComponent?.props({ name: tab.name, label: resolveTabLabel(tab), lazy: true }) || {}"
         >
           <component :is="tab.component" v-bind="tab.props || {}" v-on="tab.listeners || {}" />
         </component>
@@ -193,6 +202,7 @@ const extendFormState = inject<((_state: FormState) => Record<string, any> | Pro
   'extendFormState',
   undefined,
 );
+const getPropsPanelFormState = inject<(() => FormState | undefined) | undefined>('getPropsPanelFormState', undefined);
 
 const {
   expanded,
@@ -306,7 +316,7 @@ const onCodeBlockGotoInitial = (id: string | number) => {
  * 业务方亦可直接 import useHistoryRevert(services) 调用，无需自行挂载任何弹窗。
  */
 const { onPageRevert, onDataSourceRevert, onCodeBlockRevert, onPageDiff, onDataSourceDiff, onCodeBlockDiff } =
-  useHistoryRevert(services, { extendState: extendFormState });
+  useHistoryRevert(services, { extendState: extendFormState, getPropsPanelFormState });
 
 /**
  * 把内存中（已清空对应类别后的）历史状态重新写回 IndexedDB，

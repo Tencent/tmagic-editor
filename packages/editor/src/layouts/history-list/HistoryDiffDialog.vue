@@ -43,6 +43,7 @@
         :data-source-type="payload.dataSourceType"
         :value="rightValue"
         :last-value="leftValue"
+        :base-form-state="compareFormState"
         :extend-state="extendState"
         :load-config="loadConfig"
         :self-diff-field-types="selfDiffFieldTypes"
@@ -107,6 +108,7 @@ const props = withDefaults(
     isConfirm?: boolean;
     onConfirm?: () => void;
     selfDiffFieldTypes?: string[];
+    compareFormState?: FormState;
   }>(),
   {
     services: () => useServices(),

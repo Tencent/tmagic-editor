@@ -69,6 +69,8 @@ vi.mock('@tmagic/design', async () => {
             class: 'select-field-btn',
             onClick: () => emit('select', { value: 'a', type: 'field' }),
           }),
+          // 模拟部分实现会以 undefined 触发默认插槽参数
+          slots.default?.(),
           slots.suffix?.(),
         ]);
       };
@@ -162,6 +164,10 @@ describe('DataSourceInput', () => {
   test('禁用时直接渲染 autocomplete', () => {
     const wrapper = mountIt('text-value', true);
     expect(wrapper.find('.fake-autocomplete').exists()).toBe(true);
+  });
+
+  test('autocomplete 默认插槽参数为 undefined 时不应报错', () => {
+    expect(() => mountIt('text-value', true)).not.toThrow();
   });
 
   test('未 focus 时显示文本视图', () => {

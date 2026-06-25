@@ -10,8 +10,9 @@
       :is-compare="true"
       :disabled="true"
       :label-width="labelWidth"
-      :extend-state="extendState"
+      :extend-state="mergedExtendState"
       :show-diff="showDiff"
+      :self-diff-field-types="selfDiffFieldTypes"
     ></MForm>
   </div>
 </template>
@@ -62,6 +63,13 @@ const props = withDefaults(
      */
     extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
     /**
+     * 外部透传的基础 formState（通常来自 PropsPanel 主属性表单）。
+     * CompareForm 会提取其中的扩展字段覆盖到自己的 formState，保证 filterFunction 上下文一致。
+     */
+    baseFormState?: FormState;
+    /** 需要走 self diff 的字段类型（例如 mod-cond）。 */
+    selfDiffFieldTypes?: string[];
+    /**
      * 自定义 FormConfig 加载逻辑。传入后将接管内置的按 `category`(node/data-source/code-block)
      * 取配置逻辑，调用方可根据业务自行返回（或异步返回）表单配置。可通过
      * `ctx.defaultLoadConfig()` 复用默认结果再做二次加工。返回的 config 直接用于对比展示。
@@ -74,6 +82,7 @@ const props = withDefaults(
     category: 'node',
     labelWidth: '120px',
     services: () => useServices(),
+    extendState: (state: FormState) => state,
   },
 );
 
@@ -173,6 +182,10 @@ const removeStyleDisplayConfig = (formConfig: FormConfig): FormConfig =>
       }),
     };
   });
+
+const mergedExtendState = (state: FormState) => {
+  return props.extendState(props.baseFormState || state);
+};
 
 /**
  * 内置的默认 FormConfig 加载逻辑：按 `category` 从对应 service / 工具取配置。

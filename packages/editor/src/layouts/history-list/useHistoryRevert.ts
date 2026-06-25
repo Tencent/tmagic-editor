@@ -59,6 +59,7 @@ const buildDiffPayload = (source: DiffPayloadSource, index: number, id?: string 
 };
 
 interface MountedDiffDialog {
+  app: ReturnType<typeof createApp>;
   instance: {
     open: (_payload: DiffDialogPayload) => void;
     confirm: (_payload: DiffDialogPayload) => Promise<boolean>;
@@ -75,7 +76,7 @@ interface MountedDiffDialog {
 const mountHistoryDiffDialog = async (
   options: Pick<UseHistoryRevertOptions, 'appContext' | 'extendState'> &
     CustomDiffFormOptions & {
-      services: Pick<Services, 'editorService' | 'dataSourceService' | 'codeBlockService' | 'historyService'>;
+      services: Services;
       isConfirm?: boolean;
       onClose?: () => void;
     },
@@ -92,6 +93,7 @@ const mountHistoryDiffDialog = async (
     extendState: options.extendState,
     loadConfig: options.loadConfig,
     selfDiffFieldTypes: options.selfDiffFieldTypes,
+    compareFormState: options.compareFormState,
     onClose: options.onClose,
   });
   if (options.appContext) {
@@ -111,7 +113,7 @@ const mountHistoryDiffDialog = async (
     }, 300);
   };
 
-  return { instance, destroy };
+  return { app, instance, destroy };
 };
 
 /**
@@ -123,7 +125,7 @@ const confirmRevertWithDiffDialog = async (
   payload: DiffDialogPayload,
   options: Pick<UseHistoryRevertOptions, 'appContext' | 'extendState'> &
     CustomDiffFormOptions & {
-      services: Pick<Services, 'editorService' | 'dataSourceService' | 'codeBlockService' | 'historyService'>;
+      services: Services;
     },
 ): Promise<boolean> => {
   const { instance, destroy } = await mountHistoryDiffDialog({
@@ -145,7 +147,7 @@ const viewHistoryDiffDialog = async (
   payload: DiffDialogPayload,
   options: Pick<UseHistoryRevertOptions, 'appContext' | 'extendState'> &
     CustomDiffFormOptions & {
-      services: Pick<Services, 'editorService' | 'dataSourceService' | 'codeBlockService' | 'historyService'>;
+      services: Services;
     },
 ): Promise<void> => {
   // onClose 在用户关闭弹窗时才触发，此时 handle.destroy 早已赋值。
@@ -187,14 +189,11 @@ const viewHistoryDiffDialog = async (
  * onPageDiff(index); // 弹出只读差异弹窗查看前后值差异
  * ```
  */
-export const useHistoryRevert = (
-  services: Pick<Services, 'editorService' | 'dataSourceService' | 'codeBlockService' | 'historyService'>,
-  options: UseHistoryRevertOptions = {},
-) => {
+export const useHistoryRevert = (services: Services, options: UseHistoryRevertOptions = {}) => {
   const { editorService, dataSourceService, codeBlockService, historyService } = services;
   // 自动捕获调用方所在组件的 appContext（在 setup 中调用时），业务方亦可显式覆盖。
   const appContext = options.appContext ?? getCurrentInstance()?.appContext ?? null;
-  const { extendState } = options;
+  const { extendState, getPropsPanelFormState } = options;
 
   /** 目标数据已被删除、无法回滚时的统一提示。 */
   const showRevertTargetMissing = () => {
@@ -300,7 +299,7 @@ export const useHistoryRevert = (
       showRevertTargetMissing();
       return Promise.resolve(null);
     }
-    return runRevert(buildPageDiffPayload(index)).then((result) =>
+    return runRevert(buildPageDiffPayload(index), { compareFormState: getPropsPanelFormState?.() }).then((result) =>
       result ? editorService.revertPageStep(index) : null,
     );
   };
@@ -331,7 +330,14 @@ export const useHistoryRevert = (
    */
   const onPageDiff = (index: number): Promise<void> | void => {
     const payload = buildPageDiffPayload(index);
-    if (payload) return viewHistoryDiffDialog(payload, { appContext, extendState, services });
+    if (payload) {
+      return viewHistoryDiffDialog(payload, {
+        appContext,
+        extendState,
+        services,
+        compareFormState: getPropsPanelFormState?.(),
+      });
+    }
   };
 
   const onDataSourceDiff = (id: string | number, index: number): Promise<void> | void => {

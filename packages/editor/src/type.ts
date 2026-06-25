@@ -1367,6 +1367,12 @@ export interface UseHistoryRevertOptions {
    * 使对比表单中依赖业务上下文的 `display` / `disabled` 等 filterFunction 正常工作。
    */
   extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
+  /**
+   * 返回 PropsPanel 主属性表单（FormPanel -> MForm）的 formState。
+   * 仅页面历史「查看差异 / 回滚确认」场景会使用该 formState 覆盖 CompareForm 中同名扩展字段，
+   * 以保证两处 filterFunction 读取到一致的运行态上下文。
+   */
+  getPropsPanelFormState?: () => FormState | undefined;
 }
 
 /**
@@ -1382,6 +1388,11 @@ export interface CustomDiffFormOptions {
   loadConfig?: CompareFormLoadConfig;
   /** 需要走 self diff 的字段类型（如模块的 mod-cond）。 */
   selfDiffFieldTypes?: string[];
+  /**
+   * 可选：外部提供的 formState（通常来自 PropsPanel 主表单），
+   * 对比弹窗会用它覆盖 CompareForm 中同名扩展字段，避免上下文不一致。
+   */
+  compareFormState?: FormState;
 }
 
 /**

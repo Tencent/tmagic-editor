@@ -30,10 +30,10 @@
     <template #suffix>
       <Icon :icon="Coin" />
     </template>
-    <template #default="{ item }">
+    <template #default="slotProps">
       <div style="display: flex; flex-direction: column; line-height: 1.2em">
-        <div>{{ item.text }}</div>
-        <span style="font-size: 10px; color: rgba(0, 0, 0, 0.6)">{{ item.value }}</span>
+        <div>{{ slotProps?.item?.text || '' }}</div>
+        <span style="font-size: 10px; color: rgba(0, 0, 0, 0.6)">{{ slotProps?.item?.value || '' }}</span>
       </div>
     </template>
   </component>

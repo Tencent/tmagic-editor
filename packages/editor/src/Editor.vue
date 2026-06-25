@@ -135,7 +135,7 @@
 <script lang="ts" setup>
 import { EventEmitter } from 'events';
 
-import { provide } from 'vue';
+import { provide, ref } from 'vue';
 
 import type { MApp } from '@tmagic/core';
 
@@ -227,6 +227,8 @@ const stageOptions: StageOptions = {
 
 stageOverlayService.set('stageOptions', stageOptions);
 
+const propsPanelRef = ref<InstanceType<typeof FormPanel> | null>(null);
+
 provide('services', services);
 
 provide('codeOptions', props.codeOptions);
@@ -237,6 +239,11 @@ provide('stageOptions', stageOptions);
  * 与 PropsPanel 通过 `:extend-state` 显式传入的方式保持等价。
  */
 provide('extendFormState', props.extendFormState);
+/**
+ * 提供 PropsPanel 主属性表单的 formState getter，供历史差异弹窗复用，
+ * 让 CompareForm 与 PropsPanel 的 filterFunction 上下文保持一致。
+ */
+provide('getPropsPanelFormState', () => propsPanelRef.value?.configForm?.formState);
 
 /**
  * 把历史记录面板的自定义扩展 tab 提供给深层的 HistoryListPanel（它挂在 NavMenu 中，
@@ -248,9 +255,11 @@ provide('historyListExtraTabs', props.historyListExtraTabs);
 provide<EventBus>('eventBus', new EventEmitter());
 
 const propsPanelMountedHandler = (e: InstanceType<typeof FormPanel>) => {
+  propsPanelRef.value = e;
   emit('props-panel-mounted', e);
 };
 const propsPanelUnmountedHandler = () => {
+  propsPanelRef.value = null;
   emit('props-panel-unmounted');
 };
 
