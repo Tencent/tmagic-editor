@@ -138,8 +138,14 @@ export const useEditorDsl = (app = inject<TMagicApp>('app'), runtimeApi: Runtime
       }
     },
 
-    remove: ({ id, parentId }: RemoveData) => {
-      if (!root.value) throw new Error('error');
+    remove: ({ id, parentId, root: appConfig }: RemoveData) => {
+      if (!root.value) {
+        if (appConfig) {
+          updateRoot(appConfig);
+          return;
+        }
+        throw new Error('error');
+      }
 
       const node = getNodePath(id, [root.value]).pop();
       if (!node) throw new Error('未找到目标元素');
