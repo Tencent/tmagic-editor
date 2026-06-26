@@ -82,7 +82,7 @@ const {
   onPageDiff,
   onDataSourceDiff,
   onCodeBlockDiff,
-} = useHistoryRevert(editorRef.value);
+} = useHistoryRevert({}, editorRef.value);
 
 // 回滚：可差异步骤弹出差异确认弹窗、其余步骤弹普通二次确认框；用户点「确定」后回滚第 index 步，
 // 命中前置校验或用户取消时不执行，返回 null

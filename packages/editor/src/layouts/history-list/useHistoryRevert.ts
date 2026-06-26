@@ -76,7 +76,7 @@ interface MountedDiffDialog {
 const mountHistoryDiffDialog = async (
   options: Pick<UseHistoryRevertOptions, 'appContext' | 'extendState'> &
     CustomDiffFormOptions & {
-      services: Services;
+      services?: Services;
       isConfirm?: boolean;
       onClose?: () => void;
     },
@@ -125,7 +125,7 @@ const confirmRevertWithDiffDialog = async (
   payload: DiffDialogPayload,
   options: Pick<UseHistoryRevertOptions, 'appContext' | 'extendState'> &
     CustomDiffFormOptions & {
-      services: Services;
+      services?: Services;
     },
 ): Promise<boolean> => {
   const { instance, destroy } = await mountHistoryDiffDialog({
@@ -147,7 +147,7 @@ const viewHistoryDiffDialog = async (
   payload: DiffDialogPayload,
   options: Pick<UseHistoryRevertOptions, 'appContext' | 'extendState'> &
     CustomDiffFormOptions & {
-      services: Services;
+      services?: Services;
     },
 ): Promise<void> => {
   // onClose 在用户关闭弹窗时才触发，此时 handle.destroy 早已赋值。
@@ -184,13 +184,12 @@ const viewHistoryDiffDialog = async (
  * ```ts
  * import { useHistoryRevert } from '@tmagic/editor';
  *
- * const { onPageRevert, onPageDiff } = useHistoryRevert(editorRef.value); // editorRef.value 即 Editor 暴露的 services
+ * const { onPageRevert, onPageDiff } = useHistoryRevert({}, editorRef.value); // editorRef.value 即 Editor 暴露的 services
  * await onPageRevert(index); // 弹出差异 / 二次确认弹窗后回滚
  * onPageDiff(index); // 弹出只读差异弹窗查看前后值差异
  * ```
  */
-export const useHistoryRevert = (services: Services, options: UseHistoryRevertOptions = {}) => {
-  const { editorService, dataSourceService, codeBlockService, historyService } = services;
+export const useHistoryRevert = (options: UseHistoryRevertOptions = {}, services?: Services) => {
   // 自动捕获调用方所在组件的 appContext（在 setup 中调用时），业务方亦可显式覆盖。
   const appContext = options.appContext ?? getCurrentInstance()?.appContext ?? null;
   const { extendState, getPropsPanelFormState } = options;
@@ -226,8 +225,8 @@ export const useHistoryRevert = (services: Services, options: UseHistoryRevertOp
     buildDiffPayload(
       {
         category: 'node',
-        groups: () => historyService.getHistoryGroups('page', editorService.get('page')?.id),
-        getCurrent: (id) => editorService.getNodeById(id) as Record<string, any> | null,
+        groups: () => services?.historyService.getHistoryGroups('page', services?.editorService.get('page')?.id) ?? [],
+        getCurrent: (id) => services?.editorService.getNodeById(id) as Record<string, any> | null,
         resolveType: (n, o) => n.type || o.type || '',
         resolveLabel: (n, o) => n.name || o.name || n.type || o.type || '',
       },
@@ -238,8 +237,8 @@ export const useHistoryRevert = (services: Services, options: UseHistoryRevertOp
     buildDiffPayload(
       {
         category: 'data-source',
-        groups: () => historyService.getHistoryGroups('dataSource'),
-        getCurrent: (id) => dataSourceService.getDataSourceById(`${id}`) as Record<string, any> | null,
+        groups: () => services?.historyService.getHistoryGroups('dataSource') ?? [],
+        getCurrent: (id) => services?.dataSourceService.getDataSourceById(`${id}`) as Record<string, any> | null,
         resolveType: (n, o) => n.type || o.type || 'base',
         resolveLabel: (n, o, id) => n.title || o.title || `${id}`,
       },
@@ -251,8 +250,8 @@ export const useHistoryRevert = (services: Services, options: UseHistoryRevertOp
     buildDiffPayload(
       {
         category: 'code-block',
-        groups: () => historyService.getHistoryGroups('codeBlock'),
-        getCurrent: (id) => codeBlockService.getCodeContentById(id) as Record<string, any> | null,
+        groups: () => services?.historyService.getHistoryGroups('codeBlock') ?? [],
+        getCurrent: (id) => services?.codeBlockService.getCodeContentById(id) as Record<string, any> | null,
         resolveLabel: (n, o, id) => n.name || o.name || `${id}`,
       },
       index,
@@ -266,17 +265,17 @@ export const useHistoryRevert = (services: Services, options: UseHistoryRevertOp
    * add（回滚即删除）即使目标已不在，也已达成「删除」目的，不视为失败。
    */
   const isPageRevertTargetMissing = (index: number): boolean => {
-    const step = historyService.getStepList('page', editorService.get('page')?.id)[index]?.step;
+    const step = services?.historyService.getStepList('page', services?.editorService.get('page')?.id)[index]?.step;
     if (!step) return false;
     if (step.opType === 'update') {
       return (step.diff ?? []).some((item) => {
         const id = item.newSchema?.id ?? item.oldSchema?.id;
-        return id !== undefined && !editorService.getNodeById(id, false);
+        return id !== undefined && !services?.editorService.getNodeById(id, false);
       });
     }
     if (step.opType === 'remove') {
       return (step.diff ?? []).some(
-        (item) => item.parentId !== undefined && !editorService.getNodeById(item.parentId, false),
+        (item) => item.parentId !== undefined && !services?.editorService.getNodeById(item.parentId, false),
       );
     }
     return false;
@@ -284,14 +283,14 @@ export const useHistoryRevert = (services: Services, options: UseHistoryRevertOp
 
   /** 数据源 update 步骤回滚时，对应数据源必须仍存在（已删除则无处写回旧值）。 */
   const isDataSourceRevertTargetMissing = (id: string | number, index: number): boolean => {
-    const step = historyService.getStepList('dataSource', id)[index]?.step;
-    return Boolean(step?.opType === 'update' && !dataSourceService.getDataSourceById(`${id}`));
+    const step = services?.historyService.getStepList('dataSource', id)[index]?.step;
+    return Boolean(step?.opType === 'update' && !services?.dataSourceService.getDataSourceById(`${id}`));
   };
 
   /** 代码块 update 步骤回滚时，对应代码块必须仍存在（已删除则无处写回旧值）。 */
   const isCodeBlockRevertTargetMissing = (id: string | number, index: number): boolean => {
-    const step = historyService.getStepList('codeBlock', id)[index]?.step;
-    return Boolean(step?.opType === 'update' && !codeBlockService.getCodeContentById(id));
+    const step = services?.historyService.getStepList('codeBlock', id)[index]?.step;
+    return Boolean(step?.opType === 'update' && !services?.codeBlockService.getCodeContentById(id));
   };
 
   const onPageRevert = (index: number) => {
@@ -300,7 +299,7 @@ export const useHistoryRevert = (services: Services, options: UseHistoryRevertOp
       return Promise.resolve(null);
     }
     return runRevert(buildPageDiffPayload(index), { compareFormState: getPropsPanelFormState?.() }).then((result) =>
-      result ? editorService.revertPageStep(index) : null,
+      result ? services?.editorService.revertPageStep(index) : null,
     );
   };
 
@@ -310,7 +309,7 @@ export const useHistoryRevert = (services: Services, options: UseHistoryRevertOp
       return Promise.resolve(null);
     }
     return runRevert(buildDataSourceDiffPayload(id, index)).then((result) =>
-      result ? dataSourceService.revert(id, index) : null,
+      result ? services?.dataSourceService.revert(id, index) : null,
     );
   };
 
@@ -320,7 +319,7 @@ export const useHistoryRevert = (services: Services, options: UseHistoryRevertOp
       return Promise.resolve(null);
     }
     return runRevert(buildCodeBlockDiffPayload(id, index)).then((result) =>
-      result ? codeBlockService.revert(id, index) : null,
+      result ? services?.codeBlockService.revert(id, index) : null,
     );
   };
 

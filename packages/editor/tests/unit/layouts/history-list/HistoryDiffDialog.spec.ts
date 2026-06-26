@@ -87,7 +87,7 @@ const services = {} as any;
 const factory = () =>
   mount(HistoryDiffDialog, {
     // 让 Teleport 内容内联渲染，便于通过 wrapper 查询
-    global: { stubs: { teleport: true }, provide: { services } },
+    global: { stubs: { teleport: true } },
   });
 
 const basePayload = (extra: any = {}) => ({

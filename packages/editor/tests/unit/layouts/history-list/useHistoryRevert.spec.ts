@@ -62,7 +62,7 @@ describe('useHistoryRevert', () => {
     ]);
     services.editorService.getNodeById.mockReturnValue(null);
 
-    const { onPageRevert } = useHistoryRevert(services);
+    const { onPageRevert } = useHistoryRevert({}, services);
     await onPageRevert(0);
 
     expect(tMagicMessage.error).toHaveBeenCalledWith('回滚失败：该记录对应的数据已被删除');
@@ -80,7 +80,7 @@ describe('useHistoryRevert', () => {
       },
     ]);
 
-    const { onPageRevert } = useHistoryRevert(services);
+    const { onPageRevert } = useHistoryRevert({}, services);
     await onPageRevert(0);
 
     expect(confirmHistoryAction).toHaveBeenCalled();
@@ -99,7 +99,7 @@ describe('useHistoryRevert', () => {
     ]);
     services.dataSourceService.getDataSourceById.mockReturnValue(null);
 
-    const { onDataSourceRevert } = useHistoryRevert(services);
+    const { onDataSourceRevert } = useHistoryRevert({}, services);
     await onDataSourceRevert('ds_1', 0);
 
     expect(tMagicMessage.error).toHaveBeenCalledWith('回滚失败：该记录对应的数据已被删除');

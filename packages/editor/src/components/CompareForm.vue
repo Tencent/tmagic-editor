@@ -24,7 +24,6 @@ import { isEqual } from 'lodash-es';
 import { type CodeBlockContent, type DataSourceSchema, HookType, type MNode } from '@tmagic/core';
 import { type FormConfig, type FormState, type FormValue, MForm } from '@tmagic/form';
 
-import { useServices } from '@editor/hooks/use-services';
 import type { CompareCategory, CompareFormLoadConfig, Services } from '@editor/type';
 import { getCodeBlockFormConfig } from '@editor/utils/code-block';
 
@@ -76,17 +75,14 @@ const props = withDefaults(
      */
     loadConfig?: CompareFormLoadConfig;
     /** 编辑器服务集合，由调用方传入（不再通过 inject('services') 获取）。 */
-    services: Services;
+    services?: Services;
   }>(),
   {
     category: 'node',
     labelWidth: '120px',
-    services: () => useServices(),
     extendState: (state: FormState) => state,
   },
 );
-
-const { propsService, dataSourceService, codeBlockService, editorService } = props.services;
 
 provide('services', props.services);
 
@@ -192,17 +188,21 @@ const mergedExtendState = (state: FormState) => {
  * 作为 ctx.defaultLoadConfig 透传给自定义 `loadConfig`，方便复用与二次加工。
  */
 const defaultLoadConfig = async (): Promise<FormConfig> => {
+  if (!props.services) {
+    return [];
+  }
+
   switch (props.category) {
     case 'node': {
       if (!props.type) {
         return [];
       }
       return removeStyleDisplayConfig(
-        await propsService.getPropsConfig(props.type, { node: props.value as unknown as MNode }),
+        await props.services.propsService.getPropsConfig(props.type, { node: props.value as unknown as MNode }),
       );
     }
     case 'data-source': {
-      const config = dataSourceService.getFormConfig(props.type || 'base');
+      const config = props.services.dataSourceService.getFormConfig(props.type || 'base');
       // 数据源表单外层 tab 的「数据定义」项 status 为 'fields'，tab-pane name 随之为 'fields'。
       // 未显式设置 active 时，Tabs 默认取 '0'，与 'fields' 不匹配会导致打开弹窗时无默认激活项，
       // 这里与 DataSourceConfigPanel 保持一致，默认激活「数据定义」tab。
@@ -210,7 +210,7 @@ const defaultLoadConfig = async (): Promise<FormConfig> => {
     }
     case 'code-block': {
       return getCodeBlockFormConfig({
-        paramColConfig: codeBlockService.getParamsColConfig(),
+        paramColConfig: props.services.codeBlockService.getParamsColConfig(),
         // 通过传入 dataSourceType 间接表达"是数据源代码块"——在对比场景下 props.dataSourceType
         // 由调用方按 step 上下文显式传入，未传则视为普通代码块，「执行时机」字段隐藏。
         isDataSource: () => Boolean(props.dataSourceType),
@@ -258,11 +258,9 @@ const formRef = useTemplateRef<InstanceType<typeof MForm>>('form');
  * - services：整个 useServices() 返回的服务集合；
  * - stage：当前 editorService.get('stage') 的最新值。
  */
-const stage = computed(() => editorService.get('stage'));
-
 watchEffect(() => {
-  if (formRef.value) {
-    formRef.value.formState.stage = stage.value;
+  if (formRef.value && props.services) {
+    formRef.value.formState.stage = props.services.editorService.get('stage');
     formRef.value.formState.services = props.services;
   }
 });

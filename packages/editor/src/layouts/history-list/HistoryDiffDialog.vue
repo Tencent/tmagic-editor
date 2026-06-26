@@ -81,7 +81,6 @@ import { TMagicButton, TMagicDialog, TMagicRadioButton, TMagicRadioGroup, TMagic
 import type { FormState } from '@tmagic/form';
 
 import CompareForm from '@editor/components/CompareForm.vue';
-import { useServices } from '@editor/hooks/use-services';
 import CodeEditor from '@editor/layouts/CodeEditor.vue';
 import type { CompareCategory, CompareFormLoadConfig, DiffDialogPayload, Services } from '@editor/type';
 
@@ -92,7 +91,7 @@ defineOptions({
 const props = withDefaults(
   defineProps<{
     /** 编辑器服务集合，由调用方传入（不再通过 inject('services') 获取）。 */
-    services: Services;
+    services?: Services;
     /**
      * 来自 Editor 顶层的 `extendFormState`，用于扩展 MForm.formState。
      * 透传给 CompareForm，从而让差异对比时表单 item 中依赖业务上下文的
@@ -111,7 +110,6 @@ const props = withDefaults(
     compareFormState?: FormState;
   }>(),
   {
-    services: () => useServices(),
     width: '900px',
   },
 );

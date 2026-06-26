@@ -313,10 +313,10 @@ const onCodeBlockGotoInitial = (id: string | number) => {
 /**
  * 「单步回滚」与「查看差异」的完整逻辑收敛到 useHistoryRevert，面板与业务方共用：
  * 二者均由 useHistoryRevert 内部按需动态挂载 HistoryDiffDialog，
- * 业务方亦可直接 import useHistoryRevert(services) 调用，无需自行挂载任何弹窗。
+ * 业务方亦可直接 import useHistoryRevert(options, services) 调用，无需自行挂载任何弹窗。
  */
 const { onPageRevert, onDataSourceRevert, onCodeBlockRevert, onPageDiff, onDataSourceDiff, onCodeBlockDiff } =
-  useHistoryRevert(services, { extendState: extendFormState, getPropsPanelFormState });
+  useHistoryRevert({ extendState: extendFormState, getPropsPanelFormState }, services);
 
 /**
  * 把内存中（已清空对应类别后的）历史状态重新写回 IndexedDB，
