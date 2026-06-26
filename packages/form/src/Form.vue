@@ -79,6 +79,13 @@ const props = withDefaults(
     keyProp?: string;
     popperClass?: string;
     preventSubmitDefault?: boolean;
+    /**
+     * 表单校验失败时，错误提示前缀是否使用字段的 text 文案（通过 `getTextByName` 从 config 中查找）。
+     *
+     * - `true`（默认）：错误提示形如 `字段文案 -> 错误信息`，找不到 text 时回退为字段 name；
+     * - `false`：跳过查找，直接使用字段 name 作为错误提示前缀（形如 `字段name -> 错误信息`）。
+     */
+    useFieldTextInError?: boolean;
     extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
     /**
      * 自定义"是否展示对比内容"的判断函数（仅在 `isCompare === true` 时生效）。
@@ -121,6 +128,7 @@ const props = withDefaults(
     inline: false,
     labelPosition: 'right',
     keyProp: '__key',
+    useFieldTextInError: true,
   },
 );
 
@@ -384,7 +392,7 @@ defineExpose({
       Object.entries(invalidFields).forEach(([prop, ValidateError]) => {
         (ValidateError as ValidateError[]).forEach(({ field, message }) => {
           const name = field || prop;
-          const text = getTextByName(name, props.config) || name;
+          const text = (props.useFieldTextInError ? getTextByName(name, props.config) : undefined) || name;
 
           error.push(`${text} -> ${message}`);
         });

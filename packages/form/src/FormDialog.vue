@@ -31,6 +31,7 @@
         :label-position="labelPosition"
         :inline="inline"
         :prevent-submit-default="preventSubmitDefault"
+        :use-field-text-in-error="useFieldTextInError"
         :extend-state="extendState"
         @change="changeHandler"
       ></Form>
@@ -96,6 +97,8 @@ const props = withDefaults(
     destroyOnClose?: boolean;
     showClose?: boolean;
     showCancel?: boolean;
+    /** 透传给内部 `MForm`，控制表单校验失败时错误提示前缀是否使用字段的 text 文案 */
+    useFieldTextInError?: boolean;
     /** 透传给内部 `MForm`，用于扩展 `formState`（如注入 `$message` / `$store` 等） */
     extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
   }>(),
@@ -108,6 +111,7 @@ const props = withDefaults(
     destroyOnClose: false,
     showClose: true,
     showCancel: true,
+    useFieldTextInError: true,
   },
 );
 

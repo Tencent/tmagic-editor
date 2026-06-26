@@ -28,6 +28,7 @@
         :label-position="labelPosition"
         :inline="inline"
         :prevent-submit-default="preventSubmitDefault"
+        :use-field-text-in-error="useFieldTextInError"
         :extend-state="extendState"
         @change="changeHandler"
       ></Form>
@@ -82,6 +83,8 @@ withDefaults(
     inline?: boolean;
     labelPosition?: string;
     preventSubmitDefault?: boolean;
+    /** 透传给内部 `MForm`，控制表单校验失败时错误提示前缀是否使用字段的 text 文案 */
+    useFieldTextInError?: boolean;
     /** 关闭前的回调，会暂停 Drawer 的关闭; done 是个 function type 接受一个 boolean 参数, 执行 done 使用 true 参数或不提供参数将会终止关闭 */
     beforeClose?: (_done: (_cancel?: boolean) => void) => void;
     /** 透传给内部 `MForm`，用于扩展 `formState`（如注入 `$message` / `$store` 等） */
@@ -92,6 +95,7 @@ withDefaults(
     config: () => [],
     values: () => ({}),
     confirmText: '确定',
+    useFieldTextInError: true,
   },
 );
 

@@ -150,6 +150,14 @@
 
 - **类型：** `boolean`
 
+## useFieldTextInError
+
+- **详情：** 透传给内部 `Form`，控制表单校验失败时错误提示前缀是否使用字段的 `text` 文案。`false` 时直接使用字段 `name`
+
+- **默认值：** `true`
+
+- **类型：** `boolean`
+
 ## closeOnClickModal
 
 - **详情：** 是否可以通过点击 modal 关闭 Dialog

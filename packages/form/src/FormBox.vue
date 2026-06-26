@@ -13,6 +13,7 @@
           :label-position="labelPosition"
           :inline="inline"
           :prevent-submit-default="preventSubmitDefault"
+          :use-field-text-in-error="useFieldTextInError"
           :extend-state="extendState"
           @change="changeHandler"
         ></Form>
@@ -61,12 +62,15 @@ const props = withDefaults(
     inline?: boolean;
     labelPosition?: string;
     preventSubmitDefault?: boolean;
+    /** 透传给内部 `MForm`，控制表单校验失败时错误提示前缀是否使用字段的 text 文案 */
+    useFieldTextInError?: boolean;
     extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
   }>(),
   {
     config: () => [],
     values: () => ({}),
     confirmText: '确定',
+    useFieldTextInError: true,
   },
 );
 

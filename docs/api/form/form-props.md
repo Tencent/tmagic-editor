@@ -206,6 +206,19 @@
 
 - **类型：** `boolean`
 
+## useFieldTextInError
+
+- **详情：**
+
+  表单校验失败时，错误提示前缀是否使用字段的 `text` 文案（通过 `getTextByName` 从 `config` 中查找）。
+
+  - `true`（默认）：错误提示形如 `字段文案 -> 错误信息`，找不到 `text` 时回退为字段 `name`；
+  - `false`：跳过查找，直接使用字段 `name` 作为错误提示前缀（形如 `字段name -> 错误信息`）。
+
+- **默认值：** `true`
+
+- **类型：** `boolean`
+
 ## extendState
 
 - **详情：** 扩展 formState 的钩子函数，返回的对象会被合并到 formState 上

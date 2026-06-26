@@ -45,6 +45,11 @@ export interface SubmitFormOptions {
   keyProp?: string;
   popperClass?: string;
   preventSubmitDefault?: boolean;
+  /**
+   * 表单校验失败时，错误提示前缀是否使用字段的 text 文案（通过 `getTextByName` 从 config 中查找）。
+   * 默认 `true`，置为 `false` 时直接使用字段 name。
+   */
+  useFieldTextInError?: boolean;
   extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
   /** 透传给 Form.submitForm 的参数：是否直接返回原始响应式 values */
   native?: boolean;

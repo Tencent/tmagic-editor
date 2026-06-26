@@ -37,6 +37,7 @@ function submitForm(options: SubmitFormOptions): Promise<any>;
 | `keyProp`              | `string`                                                | `'__key'`  | 配置项的唯一 key                                                                                      |
 | `popperClass`          | `string`                                                | —          | 弹层 className                                                                                        |
 | `preventSubmitDefault` | `boolean`                                               | —          | 是否阻止表单原生 submit                                                                               |
+| `useFieldTextInError`  | `boolean`                                               | `true`     | 校验失败时错误提示前缀是否使用字段的 `text` 文案；`false` 时直接使用字段 `name`                        |
 | `extendState`          | `(state: FormState) => Record<string, any> \| Promise<Record<string, any>>` | — | 扩展 `formState`                                                              |
 | `native`               | `boolean`                                               | `false`    | 透传给 `Form.submitForm`。`true` 时返回内部响应式 `values`，否则返回 `cloneDeep(toRaw(values))`        |
 | `returnChangeRecords`  | `boolean`                                               | `false`    | `true` 时 resolve 结果为 `{ values, changeRecords }`，携带表单变更记录；否则仅 resolve `values`        |

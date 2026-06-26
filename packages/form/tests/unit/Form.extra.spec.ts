@@ -340,6 +340,69 @@ describe('Form.vue —— submitForm 实例方法', () => {
   });
 });
 
+describe('Form.vue —— useFieldTextInError', () => {
+  const mountAndMockValidate = async (
+    props: Record<string, any>,
+    invalidFields: Record<string, { field: string; message: string }[]>,
+  ) => {
+    const wrapper = mountForm(props);
+    await nextTick();
+
+    const tmForm = wrapper.findComponent({ name: 'TMForm' });
+    const { exposed } = (tmForm.vm as any).$;
+    exposed.validate = vi.fn().mockRejectedValue(invalidFields);
+
+    let caught: Error | null = null;
+    try {
+      await wrapper.vm.submitForm();
+    } catch (e: any) {
+      caught = e;
+    }
+
+    return { wrapper, caught };
+  };
+
+  test('默认（useFieldTextInError 未传）时错误信息使用 config 中的 text', async () => {
+    const { caught } = await mountAndMockValidate(
+      {
+        config: [{ text: '名称', type: 'text', name: 'name' }],
+        initValues: { name: '' },
+      },
+      { name: [{ field: 'name', message: '必填' }] },
+    );
+
+    expect(caught!.message).toContain('名称');
+    expect(caught!.message).not.toContain('name -> ');
+  });
+
+  test('useFieldTextInError=true 时错误信息使用 config 中的 text', async () => {
+    const { caught } = await mountAndMockValidate(
+      {
+        config: [{ text: '名称', type: 'text', name: 'name' }],
+        initValues: { name: '' },
+        useFieldTextInError: true,
+      },
+      { name: [{ field: 'name', message: '必填' }] },
+    );
+
+    expect(caught!.message).toContain('名称 -> 必填');
+  });
+
+  test('useFieldTextInError=false 时跳过查找，直接使用字段 name', async () => {
+    const { caught } = await mountAndMockValidate(
+      {
+        config: [{ text: '名称', type: 'text', name: 'name' }],
+        initValues: { name: '' },
+        useFieldTextInError: false,
+      },
+      { name: [{ field: 'name', message: '必填' }] },
+    );
+
+    expect(caught!.message).toContain('name -> 必填');
+    expect(caught!.message).not.toContain('名称');
+  });
+});
+
 describe('Form.vue —— getTextByName', () => {
   let wrapper: ReturnType<typeof mountForm>;
 

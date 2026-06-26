@@ -40,6 +40,8 @@
 
 - **详情：** 通过 `name` 从表单 `config` 中查找对应表单项的 `text`
 
+- **相关：** 表单校验失败时是否使用该方法生成错误提示前缀，由 [`useFieldTextInError`](./form-props.md#usefieldtextinerror) prop 控制（默认 `true`）
+
 ## values
 
 - **类型：** `Ref<FormValue>`
