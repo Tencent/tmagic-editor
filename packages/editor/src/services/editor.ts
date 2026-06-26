@@ -535,6 +535,10 @@ class Editor extends BaseService {
     }
 
     this.emit('add', newNodes);
+    this.emit('change', {
+      type: 'add',
+      data: newNodes.map((node) => ({ node, page: this.getPageOfNode(node.id) })),
+    });
 
     return Array.isArray(addNode) ? newNodes : newNodes[0];
   }
@@ -635,6 +639,9 @@ class Editor extends BaseService {
 
     const nodes = Array.isArray(nodeOrNodeList) ? nodeOrNodeList : [nodeOrNodeList];
 
+    // 删除后节点已从树中移除，无法再反查所属 page，这里在删除前先逐个捕获用于 `change` 事件
+    const changeItems = nodes.map((node) => ({ node, page: this.getPageOfNode(node.id) }));
+
     const removedItems: StepDiffItem<MNode>[] = [];
     let pageForOp: { name: string; id: Id } | null = null;
     if (!(isPage(nodes[0]) || isPageFragment(nodes[0]))) {
@@ -670,6 +677,7 @@ class Editor extends BaseService {
     }
 
     this.emit('remove', nodes);
+    this.emit('change', { type: 'remove', data: changeItems });
   }
 
   public async doUpdate(
@@ -805,6 +813,10 @@ class Editor extends BaseService {
     }
 
     this.emit('update', updateData);
+    this.emit('change', {
+      type: 'update',
+      data: updateData.map((node) => ({ node, page: this.getPageOfNode(node.newNode.id) })),
+    });
     return Array.isArray(config) ? updateData.map((item) => item.newNode) : updateData[0].newNode;
   }
 
@@ -1046,6 +1058,11 @@ class Editor extends BaseService {
     }
 
     this.emit('move-layer', offset);
+    this.emit('change', {
+      type: 'move-layer',
+      data: [{ node, page: this.getPageOfNode(node.id) }],
+      offset,
+    });
   }
 
   /**
@@ -1225,6 +1242,12 @@ class Editor extends BaseService {
     }
 
     this.emit('drag-to', { targetIndex, configs, targetParent });
+    this.emit('change', {
+      type: 'drag-to',
+      data: configs.map((node) => ({ node, page: this.getPageOfNode(node.id) })),
+      targetIndex,
+      targetParent,
+    });
   }
 
   // #region AndGetHistoryId
@@ -1556,6 +1579,20 @@ class Editor extends BaseService {
 
   private addModifiedNodeId(id: Id) {
     this.get('modifiedNodeIds').set(id, id);
+  }
+
+  /**
+   * 获取指定节点所属的页面 / 页面片：
+   * - 普通节点返回其所在的 page；
+   * - 节点本身就是 page / pageFragment 时返回它自己；
+   * - 找不到时返回 null。
+   * 供 `change` 事件携带「变更节点对应的 page」（而非编辑器当前选中页）。
+   */
+  private getPageOfNode(id: Id): MPage | MPageFragment | null {
+    const { node, page } = this.getNodeInfo(id, false);
+    if (page) return page;
+    if (node && (isPage(node) || isPageFragment(node))) return node as MPage | MPageFragment;
+    return null;
   }
 
   private captureSelectionBeforeOp() {

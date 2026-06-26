@@ -1218,7 +1218,40 @@ export interface EditorEvents {
   'move-layer': [offset: number | LayerOffset];
   'drag-to': [data: { targetIndex: number; configs: MNode | MNode[]; targetParent: MContainer }];
   'history-change': [data: MPage | MPageFragment];
+  /**
+   * DSL 发生变更后统一触发，免去分别监听 add / remove / update / move-layer / drag-to。
+   * 回调参数为 {@link EditorChangeEvent}，按 `type` 区分操作类型并携带各自的操作内容（payload）
+   * 以及变更所在的当前 page（可能为 null）。撤销 / 重做内部同样会经由
+   * add / remove / update 触发本事件；如需区分「用户操作」与「撤销重做」请配合 `history-change`。
+   */
+  change: [event: EditorChangeEvent];
 }
+
+// #region EditorChangeEvent
+/** `change` 事件中单个变更项：变更的 node 及其所属的 page（可能为 null）。 */
+export interface EditorChangeItem {
+  node: MNode;
+  page: StoreState['page'];
+}
+
+/** `update` 类型变更项：node 为前后快照及 form 端变更记录，page 为其所属页面。 */
+export interface EditorUpdateChangeItem {
+  node: { newNode: MNode; oldNode: MNode; changeRecords?: ChangeRecord[] };
+  page: StoreState['page'];
+}
+
+/**
+ * {@link EditorEvents.change} 的回调参数：以 `type` 区分操作类型，并携带对应的操作内容。
+ * `data` 为本次变更的节点列表，每项包含 node 及其所属的 page（可能为 null）；
+ * `move-layer` 额外带层级偏移 `offset`，`drag-to` 额外带目标位置 `targetIndex` / `targetParent`。
+ */
+export type EditorChangeEvent =
+  | { type: 'add'; data: EditorChangeItem[] }
+  | { type: 'remove'; data: EditorChangeItem[] }
+  | { type: 'update'; data: EditorUpdateChangeItem[] }
+  | { type: 'move-layer'; data: EditorChangeItem[]; offset: number | LayerOffset }
+  | { type: 'drag-to'; data: EditorChangeItem[]; targetIndex: number; targetParent: MContainer };
+// #endregion EditorChangeEvent
 
 export interface HistoryEvents {
   change: [

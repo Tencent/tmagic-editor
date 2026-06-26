@@ -16,16 +16,17 @@
  * limitations under the License.
  */
 
-import { beforeAll, describe, expect, test } from 'vitest';
+import { beforeAll, describe, expect, test, vi } from 'vitest';
 import { cloneDeep } from 'lodash-es';
 
-import type { MApp, MNode } from '@tmagic/core';
+import type { MApp, MContainer, MNode } from '@tmagic/core';
 import { NodeType } from '@tmagic/core';
 import { getNodePath } from '@tmagic/utils';
 
 import editorService from '@editor/services/editor';
 import historyService from '@editor/services/history';
 import storageService from '@editor/services/storage';
+import type { EditorChangeEvent } from '@editor/type';
 import { COPY_STORAGE_KEY, setEditorConfig } from '@editor/utils';
 
 setEditorConfig({
@@ -756,6 +757,105 @@ describe('moveLayer', () => {
     const parent = editorService.get('parent');
     await editorService.moveLayer(1);
     expect(parent?.items[0].id).toBe(NodeId.NODE_ID2);
+  });
+});
+
+describe('change 事件', () => {
+  // 取出最后一次 change 事件的回调参数
+  const lastChangeEvent = (fn: ReturnType<typeof vi.fn>): EditorChangeEvent =>
+    fn.mock.calls[fn.mock.calls.length - 1][0];
+
+  test('add 触发 change：type 为 add，data 携带新增 node 及其所属 page', async () => {
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.PAGE_ID);
+
+    const fn = vi.fn();
+    editorService.on('change', fn);
+    const newNode = await editorService.add({ type: 'text' });
+    editorService.off('change', fn);
+
+    expect(fn).toHaveBeenCalledTimes(1);
+    const event = lastChangeEvent(fn);
+    expect(event.type).toBe('add');
+    expect(event.data).toHaveLength(1);
+    const addedId = Array.isArray(newNode) ? newNode[0].id : newNode.id;
+    expect(event.data[0].node.id).toBe(addedId);
+    // 新增节点归属于当前页面
+    expect(event.data[0].page?.id).toBe(NodeId.PAGE_ID);
+  });
+
+  test('remove 触发 change：type 为 remove，data 携带被删 node 及删除前所属 page', async () => {
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.PAGE_ID);
+
+    const fn = vi.fn();
+    editorService.on('change', fn);
+    await editorService.remove({ id: NodeId.NODE_ID, type: 'text' });
+    editorService.off('change', fn);
+
+    const event = lastChangeEvent(fn);
+    expect(event.type).toBe('remove');
+    expect(event.data).toHaveLength(1);
+    expect(event.data[0].node.id).toBe(NodeId.NODE_ID);
+    // 删除前捕获，page 仍能正确反查到
+    expect(event.data[0].page?.id).toBe(NodeId.PAGE_ID);
+  });
+
+  test('update 触发 change：type 为 update，data.node 携带 newNode / oldNode', async () => {
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.PAGE_ID);
+
+    const fn = vi.fn();
+    editorService.on('change', fn);
+    await editorService.update({ id: NodeId.NODE_ID, type: 'text', text: 'changed' });
+    editorService.off('change', fn);
+
+    const event = lastChangeEvent(fn);
+    expect(event.type).toBe('update');
+    if (event.type === 'update') {
+      expect(event.data[0].node.newNode.id).toBe(NodeId.NODE_ID);
+      expect(event.data[0].node.newNode.text).toBe('changed');
+      expect(event.data[0].node.oldNode.id).toBe(NodeId.NODE_ID);
+      expect(event.data[0].page?.id).toBe(NodeId.PAGE_ID);
+    }
+  });
+
+  test('moveLayer 触发 change：type 为 move-layer，并携带 offset', async () => {
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.NODE_ID);
+
+    const fn = vi.fn();
+    editorService.on('change', fn);
+    await editorService.moveLayer(1);
+    editorService.off('change', fn);
+
+    const event = lastChangeEvent(fn);
+    expect(event.type).toBe('move-layer');
+    if (event.type === 'move-layer') {
+      expect(event.offset).toBe(1);
+      expect(event.data[0].node.id).toBe(NodeId.NODE_ID);
+      expect(event.data[0].page?.id).toBe(NodeId.PAGE_ID);
+    }
+  });
+
+  test('dragTo 触发 change：type 为 drag-to，并携带 targetIndex / targetParent', async () => {
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.PAGE_ID);
+    const page = editorService.get('page') as unknown as MContainer;
+
+    const fn = vi.fn();
+    editorService.on('change', fn);
+    await editorService.dragTo({ id: NodeId.NODE_ID2, type: 'text' }, page, 0);
+    editorService.off('change', fn);
+
+    const event = lastChangeEvent(fn);
+    expect(event.type).toBe('drag-to');
+    if (event.type === 'drag-to') {
+      expect(event.targetIndex).toBe(0);
+      expect(event.targetParent.id).toBe(NodeId.PAGE_ID);
+      expect(event.data[0].node.id).toBe(NodeId.NODE_ID2);
+      expect(event.data[0].page?.id).toBe(NodeId.PAGE_ID);
+    }
   });
 });
 

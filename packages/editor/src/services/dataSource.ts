@@ -147,6 +147,7 @@ class DataSource extends BaseService {
     }
 
     this.emit('add', newConfig);
+    this.emit('change', this.get('dataSources'));
 
     return newConfig;
   }
@@ -192,6 +193,7 @@ class DataSource extends BaseService {
       oldConfig,
       changeRecords,
     });
+    this.emit('change', this.get('dataSources'));
 
     return newConfig;
   }
@@ -220,6 +222,7 @@ class DataSource extends BaseService {
     }
 
     this.emit('remove', id);
+    this.emit('change', this.get('dataSources'));
   }
 
   // #region AndGetHistoryId

@@ -85,6 +85,7 @@ class CodeBlock extends BaseService {
   public async setCodeDsl(codeDsl: CodeBlockDSL): Promise<void> {
     this.state.codeDsl = codeDsl;
     this.emit('code-dsl-change', this.state.codeDsl);
+    this.emit('change', this.state.codeDsl);
   }
 
   /**
@@ -199,6 +200,7 @@ class CodeBlock extends BaseService {
     }
 
     this.emit('addOrUpdate', id, codeDsl[id]);
+    this.emit('change', this.getCodeDsl());
   }
 
   /**
@@ -318,6 +320,8 @@ class CodeBlock extends BaseService {
 
       this.emit('remove', id);
     });
+
+    this.emit('change', this.getCodeDsl());
   }
 
   // #region AndGetHistoryId
