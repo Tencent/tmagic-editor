@@ -1,3 +1,19 @@
+# [1.8.0-beta.10](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.9...v1.8.0-beta.10) (2026-06-26)
+
+
+### Bug Fixes
+
+* **vue-runtime-help:** handle remove when root is not initialized ([af19736](https://github.com/Tencent/tmagic-editor/commit/af197363cfaa5c555758c19354a0b3a5031b973e))
+
+
+### Features
+
+* **editor:** add unified change events ([7bbb1f2](https://github.com/Tencent/tmagic-editor/commit/7bbb1f24c0f7180f301f573de1b916bfd0a35152))
+* **editor:** refine history diff defaults ([f7afed6](https://github.com/Tencent/tmagic-editor/commit/f7afed66aaa8f57cdde02f0e25cca1dab825e7c0))
+* **form:** support useFieldTextInError option ([fd359e4](https://github.com/Tencent/tmagic-editor/commit/fd359e493fdf205126957799a4a228f31267f3c2))
+
+
+
 # [1.8.0-beta.9](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.8...v1.8.0-beta.9) (2026-06-25)
 
 
