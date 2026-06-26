@@ -166,6 +166,43 @@ describe('HistoryDiffDialog.vue', () => {
     expect(currentRadio!.attributes('data-disabled')).toBe('true');
   });
 
+  test('无「修改后的值」时「与修改前对比」按钮置灰', async () => {
+    const wrapper = factory();
+    (wrapper.vm as any).open(basePayload({ value: null }));
+    await nextTick();
+
+    const beforeRadio = wrapper.findAll('.fake-radio-btn').find((b) => b.attributes('data-value') === 'before');
+    expect(beforeRadio!.attributes('data-disabled')).toBe('true');
+  });
+
+  test('无「修改后的值」但有当前值时默认进入「与当前对比」', async () => {
+    const wrapper = factory();
+    (wrapper.vm as any).open(basePayload({ value: null }));
+    await nextTick();
+
+    const form = wrapper.findComponent({ name: 'CompareForm' });
+    // current 模式：左=该步修改后 value（此处为空），右=当前 currentValue
+    expect(form.props('value')).toEqual({ text: 'current' });
+  });
+
+  test('无「修改后的值」且无当前值时仍默认「与修改前对比」', async () => {
+    const wrapper = factory();
+    (wrapper.vm as any).open(basePayload({ value: null, currentValue: null }));
+    await nextTick();
+
+    const form = wrapper.findComponent({ name: 'CompareForm' });
+    expect(form.props('lastValue')).toEqual({ text: 'old' });
+  });
+
+  test('有「修改后的值」时「与修改前对比」按钮可用', async () => {
+    const wrapper = factory();
+    (wrapper.vm as any).open(basePayload());
+    await nextTick();
+
+    const beforeRadio = wrapper.findAll('.fake-radio-btn').find((b) => b.attributes('data-value') === 'before');
+    expect(beforeRadio!.attributes('data-disabled')).toBe('false');
+  });
+
   test('targetText 按 category 生成前缀', async () => {
     const wrapper = factory();
     (wrapper.vm as any).open(basePayload({ category: 'data-source', targetLabel: '接口A' }));

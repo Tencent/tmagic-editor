@@ -16,7 +16,7 @@ const buildConfig = (): HistoryBucketConfig<any> => ({
   describeStep: () => 'sub-desc',
 });
 
-const buildGroup = () => ({
+const buildGroup = (): any => ({
   applied: true,
   opType: 'update' as const,
   steps: [{ index: 0, applied: true, step: { mark: 's-0' } }],
@@ -56,6 +56,18 @@ describe('BucketTab.vue', () => {
     });
     await wrapper.find('.m-editor-history-list-clear').trigger('click');
     expect(wrapper.emitted('clear')).toBeTruthy();
+  });
+
+  test('config.showClear 为 false 时不渲染清空按钮', () => {
+    const wrapper = mount(BucketTab, {
+      props: {
+        config: { ...buildConfig(), showClear: false },
+        buckets: [{ id: 'ds_1', groups: [buildGroup()] }],
+        expanded: {},
+      },
+    });
+    expect(wrapper.find('.m-editor-history-list-toolbar').exists()).toBe(false);
+    expect(wrapper.find('.m-editor-history-list-clear').exists()).toBe(false);
   });
 
   test('透传 Bucket 子组件事件', async () => {

@@ -1353,6 +1353,8 @@ export interface HistoryBucketConfig<T extends BaseStepValue = BaseStepValue> ex
   showInitial?: boolean;
   /** 是否支持「跳转到该记录」(goto)，默认 true。 */
   gotoEnabled?: boolean;
+  /** 是否展示顶部「清空」按钮，默认 true。无需提供清空能力的自定义历史可传 false。 */
+  showClear?: boolean;
 }
 
 export interface UseHistoryRevertOptions {

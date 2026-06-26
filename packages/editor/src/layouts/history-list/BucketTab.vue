@@ -1,7 +1,7 @@
 <template>
   <div v-if="!buckets.length" class="m-editor-history-list-empty">暂无操作记录</div>
   <template v-else>
-    <div class="m-editor-history-list-toolbar">
+    <div v-if="config.showClear !== false" class="m-editor-history-list-toolbar">
       <span class="m-editor-history-list-clear" :title="`清空${config.title}的历史记录`" @click="$emit('clear')"
         >清空</span
       >
@@ -38,7 +38,7 @@ defineOptions({
 
 defineProps<{
   /**
-   * 该类历史的整体渲染配置（title / prefix / describe* / isStep* / showInitial / gotoEnabled），
+   * 该类历史的整体渲染配置（title / prefix / describe* / isStep* / showInitial / gotoEnabled / showClear），
    * 由父组件按业务类型注入并整体透传给 Bucket，避免逐项透传多个 props。
    */
   config: HistoryBucketConfig<T>;
