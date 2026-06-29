@@ -1,3 +1,13 @@
+# [1.8.0-beta.11](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.10...v1.8.0-beta.11) (2026-06-29)
+
+
+### Features
+
+* **editor:** support custom width and initial diff mode for history diff dialog ([83f4e52](https://github.com/Tencent/tmagic-editor/commit/83f4e528450be3971eea25b59dab126e04ac4df4))
+* **form:** add debug mode to submitForm ([4330738](https://github.com/Tencent/tmagic-editor/commit/4330738b9f3d91c728826f5a74129cf1febbcf48))
+
+
+
 # [1.8.0-beta.10](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.9...v1.8.0-beta.10) (2026-06-26)
 
 
