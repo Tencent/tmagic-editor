@@ -1,0 +1,2 @@
+import{n as e}from"./use-app-jtve4EAG.js";import{D as t,R as n,_ as r,g as i,r as a,v as o,w as s}from"./index-CHM8vzlz.js";var c=o({name:`tmagic-button`,__name:`index`,props:{config:{},iteratorIndex:{},iteratorContainerId:{},containerIndex:{},pageFragmentContainerId:{},model:{},disabled:{type:Boolean}},setup(o){let{app:c,node:l}=e(o),u=()=>{c&&l&&c.emit(`${a}click`,l)};return(e,a)=>(s(),i(`button`,{onClick:u},[t(e.$slots,`default`,{},()=>[r(n(o.config?.text||``),1)])]))}});export{c as default};
+//# sourceMappingURL=src-BLIfsXv9.js.map

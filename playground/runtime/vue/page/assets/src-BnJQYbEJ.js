@@ -1,0 +1,2 @@
+import{r as e,t}from"./use-app-jtve4EAG.js";import{g as n,v as r,w as i}from"./index-CHM8vzlz.js";var a=[`src`],o=r({name:`tmagic-img`,__name:`index`,props:{config:{},iteratorIndex:{},iteratorContainerId:{},containerIndex:{},pageFragmentContainerId:{},model:{},disabled:{type:Boolean}},setup(r){let o=r,s=()=>{o.config.url&&(window.location.href=o.config.url)};return t(e(o)),(e,t)=>(i(),n(`img`,{src:r.config.src,onClick:s},null,8,a))}});export{o as default};
+//# sourceMappingURL=src-BnJQYbEJ.js.map
