@@ -1352,6 +1352,14 @@ export interface DiffDialogPayload {
   targetLabel?: string;
   /** 用于标题展示的目标 id */
   id?: string | number;
+  /**
+   * 指定打开时的初始对比模式：
+   * - before：该步骤修改前 vs 修改后
+   * - current：该步骤修改后 vs 当前最新值
+   * 不传时按是否存在「修改后的值」/「当前值」自动推断。
+   * 若指定的模式当前不可用（对应数据缺失），将回退到自动推断结果。
+   */
+  mode?: 'before' | 'current';
 }
 
 /**
@@ -1408,6 +1416,12 @@ export interface UseHistoryRevertOptions {
    * 以保证两处 filterFunction 读取到一致的运行态上下文。
    */
   getPropsPanelFormState?: () => FormState | undefined;
+  /**
+   * 内置页面 / 数据源 / 代码块的差异 / 回滚确认弹窗默认宽度（透传给 TMagicDialog 的 `width`），
+   * 如 `'1200px'` / `'80%'`。缺省时使用弹窗内置默认宽度（900px）。
+   * 业务自有历史（`viewDiff` / `confirmAndRevert`）可在调用时通过各自入参的 `width` 单独覆盖。
+   */
+  dialogWidth?: string;
 }
 
 /**
@@ -1428,6 +1442,11 @@ export interface CustomDiffFormOptions {
    * 对比弹窗会用它覆盖 CompareForm 中同名扩展字段，避免上下文不一致。
    */
   compareFormState?: FormState;
+  /**
+   * 差异 / 确认回滚弹窗宽度（透传给 HistoryDiffDialog 的 TMagicDialog `width`），
+   * 如 `'1200px'` / `'80%'`。缺省时使用弹窗内置默认宽度（900px）。
+   */
+  width?: string;
 }
 
 /**

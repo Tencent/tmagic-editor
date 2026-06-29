@@ -162,11 +162,19 @@ const hasCurrent = computed(() => payload.value?.currentValue !== undefined && p
 /** 是否存在该步「修改后的值」：不存在（如仅删除）时「与修改前对比」无意义，置灰禁用。 */
 const hasValue = computed(() => payload.value?.value !== undefined && payload.value?.value !== null);
 
+/** 指定模式当前是否可用：before 依赖「修改后的值」，current 依赖「当前值」。 */
+const isModeAvailable = (m: DiffMode): boolean => (m === 'current' ? hasCurrent.value : hasValue.value);
+
 /**
  * 计算 open 时的初始对比模式：
- * 没有「修改后的值」但有当前值时（「与修改前对比」不可用），默认进入「与当前对比」；否则默认「与修改前对比」。
+ * - 调用方通过 payload.mode 指定且该模式可用时，优先使用指定模式；
+ * - 否则没有「修改后的值」但有当前值时（「与修改前对比」不可用），默认进入「与当前对比」；
+ * - 其余情况默认「与修改前对比」。
  */
-const resolveInitialMode = (): DiffMode => (!hasValue.value && hasCurrent.value ? 'current' : 'before');
+const resolveInitialMode = (specified?: DiffMode): DiffMode => {
+  if (specified && isModeAvailable(specified)) return specified;
+  return !hasValue.value && hasCurrent.value ? 'current' : 'before';
+};
 
 /** 左侧（旧/参照）值 */
 const leftValue = computed<Record<string, any>>(() => {
@@ -222,8 +230,8 @@ const targetText = computed(() => {
 const open = (p: DiffDialogPayload) => {
   payload.value = p;
   // 每次打开按 payload 重置对比模式（hasValue / hasCurrent 依赖 payload，需先赋值）：
-  // 无「修改后的值」但有当前值时默认「与当前对比」，否则默认「与修改前对比」
-  mode.value = resolveInitialMode();
+  // 优先使用 payload.mode 指定的模式；不可用或未指定时按数据自动推断。
+  mode.value = resolveInitialMode(p.mode);
   // 默认回到表单对比形态，避免残留上一次选择的源码模式
   viewMode.value = 'form';
   visible.value = true;

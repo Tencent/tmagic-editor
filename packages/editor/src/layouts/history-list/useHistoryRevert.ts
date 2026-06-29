@@ -94,6 +94,7 @@ const mountHistoryDiffDialog = async (
     loadConfig: options.loadConfig,
     selfDiffFieldTypes: options.selfDiffFieldTypes,
     compareFormState: options.compareFormState,
+    width: options.width,
     onClose: options.onClose,
   });
   if (options.appContext) {
@@ -192,7 +193,7 @@ const viewHistoryDiffDialog = async (
 export const useHistoryRevert = (options: UseHistoryRevertOptions = {}, services?: Services) => {
   // 自动捕获调用方所在组件的 appContext（在 setup 中调用时），业务方亦可显式覆盖。
   const appContext = options.appContext ?? getCurrentInstance()?.appContext ?? null;
-  const { extendState, getPropsPanelFormState } = options;
+  const { extendState, getPropsPanelFormState, dialogWidth } = options;
 
   /** 目标数据已被删除、无法回滚时的统一提示。 */
   const showRevertTargetMissing = () => {
@@ -216,7 +217,13 @@ export const useHistoryRevert = (options: UseHistoryRevertOptions = {}, services
    */
   const runRevert = (payload: DiffDialogPayload | null, extra?: CustomDiffFormOptions): Promise<boolean> => {
     if (payload) {
-      return confirmRevertWithDiffDialog(payload, { appContext, extendState, services, ...extra });
+      return confirmRevertWithDiffDialog(payload, {
+        appContext,
+        extendState,
+        services,
+        ...extra,
+        width: extra?.width ?? dialogWidth,
+      });
     }
     return confirmRevert();
   };
@@ -334,6 +341,7 @@ export const useHistoryRevert = (options: UseHistoryRevertOptions = {}, services
         appContext,
         extendState,
         services,
+        width: dialogWidth,
         compareFormState: getPropsPanelFormState?.(),
       });
     }
@@ -341,12 +349,12 @@ export const useHistoryRevert = (options: UseHistoryRevertOptions = {}, services
 
   const onDataSourceDiff = (id: string | number, index: number): Promise<void> | void => {
     const payload = buildDataSourceDiffPayload(id, index);
-    if (payload) return viewHistoryDiffDialog(payload, { appContext, extendState, services });
+    if (payload) return viewHistoryDiffDialog(payload, { appContext, extendState, services, width: dialogWidth });
   };
 
   const onCodeBlockDiff = (id: string | number, index: number): Promise<void> | void => {
     const payload = buildCodeBlockDiffPayload(id, index);
-    if (payload) return viewHistoryDiffDialog(payload, { appContext, extendState, services });
+    if (payload) return viewHistoryDiffDialog(payload, { appContext, extendState, services, width: dialogWidth });
   };
 
   /**
@@ -373,6 +381,7 @@ export const useHistoryRevert = (options: UseHistoryRevertOptions = {}, services
     const confirmed = await runRevert(revertOptions.diffPayload ?? null, {
       loadConfig: revertOptions.loadConfig,
       selfDiffFieldTypes: revertOptions.selfDiffFieldTypes,
+      width: revertOptions.width,
     });
     if (!confirmed) return null;
     return await revertOptions.revert();
@@ -383,7 +392,14 @@ export const useHistoryRevert = (options: UseHistoryRevertOptions = {}, services
    * 可透传 `loadConfig` / `selfDiffFieldTypes`。payload 为 null（不可对比）时静默返回。
    */
   const viewDiff = (payload: DiffDialogPayload | null, extra?: CustomDiffFormOptions): Promise<void> | void => {
-    if (payload) return viewHistoryDiffDialog(payload, { appContext, extendState, services, ...extra });
+    if (payload)
+      return viewHistoryDiffDialog(payload, {
+        appContext,
+        extendState,
+        services,
+        ...extra,
+        width: extra?.width ?? dialogWidth,
+      });
   };
 
   return {
