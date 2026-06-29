@@ -65,6 +65,15 @@ export interface SubmitFormOptions {
   appContext?: AppContext | null;
   /** 等待表单初始化的最长时间（毫秒），超时将以错误 reject。默认 10000ms */
   timeout?: number;
+  /**
+   * 调试模式。默认 `false`。
+   *
+   * - `false`：表单以隐藏方式挂载，初始化完成后自动提交（原有行为）。
+   * - `true`：将表单以弹层形式可见地渲染在页面上，需手动点击「确定」才会触发校验/提交，
+   *   点击「取消」则以 reject 中断；校验失败时保留弹层并展示错误信息，便于修正后重试。
+   *   调试模式下 `timeout` 不生效（等待人工操作）。
+   */
+  debug?: boolean;
 }
 // #endregion SubmitFormOptions
 
@@ -107,14 +116,24 @@ export interface SubmitFormResult {
  *   initValues: { name: 'foo' },
  *   returnChangeRecords: true,
  * });
+ *
+ * // 调试模式：可见地渲染表单，点击「确定」才提交：
+ * const values = await submitForm({
+ *   config: [...],
+ *   initValues: { name: 'foo' },
+ *   debug: true,
+ * });
  * ```
  */
 export const submitForm = (options: SubmitFormOptions): Promise<any> => {
-  const { native, appContext, timeout = 10000, returnChangeRecords, ...formProps } = options;
+  const { native, appContext, timeout = 10000, returnChangeRecords, debug = false, ...formProps } = options;
 
   return new Promise((resolve, reject) => {
     const container = document.createElement('div');
-    container.style.display = 'none';
+    // 调试模式下需要把表单展示出来，普通模式则隐藏挂载
+    if (!debug) {
+      container.style.display = 'none';
+    }
     document.body.appendChild(container);
 
     let cleaned = false;
@@ -124,25 +143,154 @@ export const submitForm = (options: SubmitFormOptions): Promise<any> => {
       name: 'MFormSubmitWrapper',
       setup() {
         const formRef = ref<any>(null);
+        // 调试模式下用于展示校验失败信息
+        const errorMsg = ref('');
 
+        const doSubmit = async () => {
+          try {
+            // 等待子组件（FormItem 等）完成首次渲染，确保 validate 能拿到所有字段
+            await nextTick();
+            // submitForm 校验通过后会清空 changeRecords，需在调用前先做快照
+            const changeRecords: ChangeRecord[] = [...(formRef.value?.changeRecords ?? [])];
+            const result = await formRef.value.submitForm(native);
+            resolve(returnChangeRecords ? { values: result, changeRecords } : result);
+            cleanup();
+          } catch (err) {
+            // 调试模式下校验失败时保留弹层并展示错误，便于修正后重新提交
+            if (debug) {
+              errorMsg.value = err instanceof Error ? err.message : String(err);
+              return;
+            }
+            reject(err);
+            cleanup();
+          }
+        };
+
+        // 调试模式：可见地渲染表单，点击「确定」才提交，点击「取消」则中断
+        if (debug) {
+          const handleCancel = () => {
+            reject(new Error('submitForm canceled in debug mode.'));
+            cleanup();
+          };
+
+          const btnBase = {
+            padding: '8px 20px',
+            fontSize: '14px',
+            lineHeight: '1',
+            border: '1px solid #dcdfe6',
+            borderRadius: '4px',
+            cursor: 'pointer',
+          };
+
+          return () =>
+            h(
+              'div',
+              {
+                style: {
+                  position: 'fixed',
+                  inset: '0',
+                  zIndex: '10000',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'rgba(0, 0, 0, 0.5)',
+                },
+              },
+              [
+                h(
+                  'div',
+                  {
+                    style: {
+                      display: 'flex',
+                      flexDirection: 'column',
+                      width: '600px',
+                      maxWidth: '90vw',
+                      maxHeight: '85vh',
+                      background: '#fff',
+                      borderRadius: '8px',
+                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)',
+                      overflow: 'hidden',
+                    },
+                  },
+                  [
+                    h(
+                      'div',
+                      {
+                        style: {
+                          padding: '16px 20px',
+                          fontSize: '16px',
+                          fontWeight: '600',
+                          borderBottom: '1px solid #ebeef5',
+                        },
+                      },
+                      'submitForm 调试',
+                    ),
+                    h(
+                      'div',
+                      {
+                        style: {
+                          flex: '1',
+                          padding: '20px',
+                          overflow: 'auto',
+                        },
+                      },
+                      [
+                        h(Form as Component, { ...formProps, ref: formRef }),
+                        errorMsg.value
+                          ? h('div', {
+                              style: {
+                                marginTop: '12px',
+                                color: '#f56c6c',
+                                fontSize: '13px',
+                                lineHeight: '1.5',
+                              },
+                              innerHTML: errorMsg.value,
+                            })
+                          : null,
+                      ],
+                    ),
+                    h(
+                      'div',
+                      {
+                        style: {
+                          display: 'flex',
+                          justifyContent: 'flex-end',
+                          gap: '12px',
+                          padding: '12px 20px',
+                          borderTop: '1px solid #ebeef5',
+                        },
+                      },
+                      [
+                        h('button', { type: 'button', onClick: handleCancel, style: { ...btnBase } }, '取消'),
+                        h(
+                          'button',
+                          {
+                            type: 'button',
+                            onClick: doSubmit,
+                            style: {
+                              ...btnBase,
+                              color: '#fff',
+                              background: '#409eff',
+                              borderColor: '#409eff',
+                            },
+                          },
+                          '确定',
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            );
+        }
+
+        // 普通模式：表单初始化完成后自动提交
         const stop = watch(
           () => formRef.value?.initialized,
-          async (initialized) => {
+          (initialized) => {
             if (!initialized) return;
             stop();
-
-            try {
-              // 等待子组件（FormItem 等）完成首次渲染，确保 validate 能拿到所有字段
-              await nextTick();
-              // submitForm 校验通过后会清空 changeRecords，需在调用前先做快照
-              const changeRecords: ChangeRecord[] = [...(formRef.value.changeRecords ?? [])];
-              const result = await formRef.value.submitForm(native);
-              resolve(returnChangeRecords ? { values: result, changeRecords } : result);
-            } catch (err) {
-              reject(err);
-            } finally {
-              cleanup();
-            }
+            doSubmit();
           },
           { flush: 'post', immediate: true },
         );
@@ -173,7 +321,8 @@ export const submitForm = (options: SubmitFormOptions): Promise<any> => {
       container.parentNode?.removeChild(container);
     };
 
-    if (timeout > 0) {
+    // 调试模式等待人工操作，不应用超时
+    if (timeout > 0 && !debug) {
       timer = setTimeout(() => {
         if (!cleaned) {
           reject(new Error(`submitForm timeout after ${timeout}ms: form is not initialized.`));
