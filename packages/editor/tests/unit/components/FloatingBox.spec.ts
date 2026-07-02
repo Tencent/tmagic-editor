@@ -9,9 +9,12 @@ import { mount } from '@vue/test-utils';
 
 import FloatingBox from '@editor/components/FloatingBox.vue';
 
-const moveableHandlers = new Map<string, (...args: any[]) => void>();
+const moveableHandlers = new Map<string, ((...args: any[]) => void)[]>();
 const destroyMock = vi.fn();
 let lastInstance: any;
+
+const emitMoveable = (event: string, ...args: any[]) =>
+  (moveableHandlers.get(event) || []).forEach((fn) => fn(...args));
 
 vi.mock('moveable', () => {
   class FakeMoveable {
@@ -26,7 +29,9 @@ vi.mock('moveable', () => {
       moveableHandlers.clear();
     }
     public on(event: string, fn: (...args: any[]) => void) {
-      moveableHandlers.set(event, fn);
+      const list = moveableHandlers.get(event) || [];
+      list.push(fn);
+      moveableHandlers.set(event, list);
       return this;
     }
     public destroy() {
@@ -144,7 +149,7 @@ describe('FloatingBox.vue', () => {
     });
     await new Promise((r) => setTimeout(r, 0));
     const target = document.createElement('div');
-    moveableHandlers.get('resize')?.({
+    emitMoveable('resize', {
       width: 200,
       height: 300,
       target,
@@ -163,7 +168,7 @@ describe('FloatingBox.vue', () => {
     });
     await new Promise((r) => setTimeout(r, 0));
     const target = document.createElement('div');
-    moveableHandlers.get('drag')?.({ target, transform: 'translate(10px,20px)' });
+    emitMoveable('drag', { target, transform: 'translate(10px,20px)' });
     expect(target.style.transform.replace(/\s+/g, '')).toBe('translate(10px,20px)');
   });
 
@@ -236,5 +241,27 @@ describe('FloatingBox.vue', () => {
     await new Promise((r) => setTimeout(r, 0));
     wrapper.unmount();
     expect(destroyMock).toHaveBeenCalled();
+  });
+
+  test('dragStart 时不显示拖拽遮罩，仅在真正 drag 时显示，dragEnd 时移除', async () => {
+    const wrapper = mount(FloatingBox as any, {
+      props: { visible: true },
+      attachTo: document.body,
+    });
+    await new Promise((r) => setTimeout(r, 0));
+    await wrapper.vm.$nextTick();
+
+    // mousedown（dragStart）不应立即盖遮罩，否则会盖住关闭按钮导致点击失效
+    emitMoveable('dragStart');
+    expect(document.querySelector('.m-editor-float-box-drag-mask')).toBeNull();
+
+    // 真正发生位移时才显示遮罩
+    emitMoveable('drag', { target: document.body, transform: 'translate(0,0)' });
+    expect(document.querySelector('.m-editor-float-box-drag-mask')).not.toBeNull();
+
+    // 拖拽结束移除遮罩
+    emitMoveable('dragEnd');
+    expect(document.querySelector('.m-editor-float-box-drag-mask')).toBeNull();
+    wrapper.unmount();
   });
 });

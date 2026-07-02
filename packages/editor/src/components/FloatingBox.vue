@@ -98,15 +98,20 @@ let moveable: VanillaMoveable | null = null;
 
 // 拖拽/缩放时用于覆盖 iframe 的遮罩，防止鼠标进入 iframe 区域后事件被 iframe 吞掉导致拖拽丢失
 let dragMask: HTMLDivElement | null = null;
+let dragMaskVisible = false;
 
 const showDragMask = () => {
+  if (dragMaskVisible) {
+    return;
+  }
   if (!dragMask) {
     dragMask = globalThis.document.createElement('div');
     dragMask.className = 'm-editor-float-box-drag-mask';
   }
   globalThis.document.body.appendChild(dragMask);
+  dragMaskVisible = true;
 
-  // 拖拽标题时，root 上的 @mousedown="nextZIndex" 会在 dragStart 之后把浮窗 z-index 抬高，
+  // 拖拽标题时，root 上的 @mousedown="nextZIndex" 会把浮窗 z-index 抬高，
   // 若此时才读取会拿到旧值导致遮罩被浮窗（及其内部 iframe）盖住，故用 nextTick 在 z-index 稳定后再设置到浮窗之上
   const setMaskZIndex = () => {
     if (dragMask) {
@@ -119,6 +124,7 @@ const showDragMask = () => {
 
 const hideDragMask = () => {
   dragMask?.parentNode?.removeChild(dragMask);
+  dragMaskVisible = false;
 };
 
 const initMoveable = () => {
@@ -138,8 +144,11 @@ const initMoveable = () => {
     bounds: { left: 0, top: 0, right: 0, bottom: 0, position: 'css' },
   });
 
-  moveable.on('dragStart', showDragMask);
-  moveable.on('resizeStart', showDragMask);
+  // 仅在真正发生拖拽/缩放位移时插入遮罩：moveable 的 dragStart/resizeStart 在 mousedown 时即触发，
+  // 若此时就盖遮罩，会盖住浮窗本身导致 mouseup 落在遮罩上、关闭按钮的 click 无法触发（点击关闭不了）。
+  // 改为在 drag/resize（实际位移）时才显示，纯点击不再触发遮罩。
+  moveable.on('drag', showDragMask);
+  moveable.on('resize', showDragMask);
   moveable.on('dragEnd', hideDragMask);
   moveable.on('resizeEnd', hideDragMask);
 
