@@ -1,6 +1,12 @@
 <template>
   <Teleport to="body" v-if="visible">
-    <div ref="target" class="m-editor-float-box" :style="{ ...style, zIndex: curZIndex }" @mousedown="nextZIndex">
+    <div
+      ref="target"
+      class="m-editor-float-box"
+      v-bind="$attrs"
+      :style="{ ...style, zIndex: curZIndex }"
+      @mousedown="nextZIndex"
+    >
       <div ref="title" class="m-editor-float-box-title">
         <slot name="title">
           <span>{{ title }}</span>
@@ -9,7 +15,7 @@
           <TMagicButton link size="small" @click="closeHandler"><MIcon :icon="Close"></MIcon></TMagicButton>
         </div>
       </div>
-      <div class="m-editor-float-box-body" :style="{ height: `${bodyHeight}px` }">
+      <div class="m-editor-float-box-body" :style="{ height: `${bodyHeight}px`, ...bodyStyle }">
         <slot name="body"></slot>
       </div>
     </div>
@@ -17,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, provide, ref, useTemplateRef, watch } from 'vue';
+import { computed, type CSSProperties, nextTick, onBeforeUnmount, provide, ref, useTemplateRef, watch } from 'vue';
 import { Close } from '@element-plus/icons-vue';
 import VanillaMoveable from 'moveable';
 
@@ -39,6 +45,7 @@ const props = withDefaults(
   defineProps<{
     position?: Position;
     title?: string;
+    bodyStyle?: CSSProperties;
     beforeClose?: (_done: (_cancel?: boolean) => void) => void;
   }>(),
   {
@@ -84,6 +91,31 @@ const style = computed(() => {
 
 let moveable: VanillaMoveable | null = null;
 
+// 拖拽/缩放时用于覆盖 iframe 的遮罩，防止鼠标进入 iframe 区域后事件被 iframe 吞掉导致拖拽丢失
+let dragMask: HTMLDivElement | null = null;
+
+const showDragMask = () => {
+  if (!dragMask) {
+    dragMask = globalThis.document.createElement('div');
+    dragMask.className = 'm-editor-float-box-drag-mask';
+  }
+  globalThis.document.body.appendChild(dragMask);
+
+  // 拖拽标题时，root 上的 @mousedown="nextZIndex" 会在 dragStart 之后把浮窗 z-index 抬高，
+  // 若此时才读取会拿到旧值导致遮罩被浮窗（及其内部 iframe）盖住，故用 nextTick 在 z-index 稳定后再设置到浮窗之上
+  const setMaskZIndex = () => {
+    if (dragMask) {
+      dragMask.style.zIndex = `${curZIndex.value + 1}`;
+    }
+  };
+  setMaskZIndex();
+  nextTick(setMaskZIndex);
+};
+
+const hideDragMask = () => {
+  dragMask?.parentNode?.removeChild(dragMask);
+};
+
 const initMoveable = () => {
   moveable = new VanillaMoveable(globalThis.document.body, {
     className: 'm-editor-floating-box-moveable',
@@ -101,6 +133,11 @@ const initMoveable = () => {
     bounds: { left: 0, top: 0, right: 0, bottom: 0, position: 'css' },
   });
 
+  moveable.on('dragStart', showDragMask);
+  moveable.on('resizeStart', showDragMask);
+  moveable.on('dragEnd', hideDragMask);
+  moveable.on('resizeEnd', hideDragMask);
+
   moveable.on('drag', (e) => {
     e.target.style.transform = e.transform;
   });
@@ -115,6 +152,7 @@ const initMoveable = () => {
 };
 
 const destroyMoveable = () => {
+  hideDragMask();
   moveable?.destroy();
   moveable = null;
 };

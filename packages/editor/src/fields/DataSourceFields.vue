@@ -8,6 +8,7 @@
     </div>
 
     <FloatingBox
+      :body-style="{ padding: '0 16px' }"
       v-model:visible="addDialogVisible"
       v-model:width="width"
       v-model:height="editorHeight"
@@ -28,6 +29,7 @@
     </FloatingBox>
 
     <FloatingBox
+      :body-style="{ padding: '0 16px' }"
       v-model:visible="addFromJsonDialogVisible"
       v-model:width="width"
       v-model:height="editorHeight"

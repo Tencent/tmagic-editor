@@ -1,5 +1,6 @@
 <template>
   <FloatingBox
+    :body-style="{ padding: '0 16px' }"
     v-model:visible="boxVisible"
     v-model:width="width"
     v-model:height="editorHeight"

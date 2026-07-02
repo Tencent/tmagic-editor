@@ -4,6 +4,7 @@
     v-model:visible="boxVisible"
     v-model:width="width"
     v-model:height="codeBlockEditorHeight"
+    :body-style="{ padding: '0 16px' }"
     :title="content.name ? `${disabled ? '查看' : '编辑'}${content.name}` : '新增代码'"
     :position="boxPosition"
     :before-close="beforeClose"
