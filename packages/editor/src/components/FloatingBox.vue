@@ -30,7 +30,6 @@ import VanillaMoveable from 'moveable';
 import { TMagicButton, useZIndex } from '@tmagic/design';
 
 import MIcon from '@editor/components/Icon.vue';
-import { useServices } from '@editor/hooks/use-services';
 
 interface Position {
   left: number;
@@ -46,11 +45,17 @@ const props = withDefaults(
     position?: Position;
     title?: string;
     bodyStyle?: CSSProperties;
+    /** 浮窗初始样式，会与内部计算样式合并，外部传入优先 */
+    initialStyle?: CSSProperties;
+    /** 用于约束浮窗 left 的容器宽度，传入时按宽度收敛 left，避免超出右边界；默认取视窗宽度 */
+    frameworkWidth?: number;
     beforeClose?: (_done: (_cancel?: boolean) => void) => void;
   }>(),
   {
     title: '',
     position: () => ({ left: 0, top: 0 }),
+    initialStyle: () => ({}),
+    frameworkWidth: 0,
   },
 );
 
@@ -73,12 +78,11 @@ const bodyHeight = computed(() => {
   return 'auto';
 });
 
-const { uiService } = useServices();
-const frameworkWidth = computed(() => uiService.get('frameworkRect').width || 0);
 const style = computed(() => {
   let { left } = props.position;
-  if (width.value) {
-    left = left + width.value > frameworkWidth.value ? frameworkWidth.value - width.value : left;
+  const frameworkWidth = props.frameworkWidth || globalThis.window?.innerWidth || 0;
+  if (width.value && frameworkWidth) {
+    left = left + width.value > frameworkWidth ? frameworkWidth - width.value : left;
   }
 
   return {
@@ -86,6 +90,7 @@ const style = computed(() => {
     top: `${props.position.top}px`,
     width: width.value ? `${width.value}px` : 'auto',
     height: height.value ? `${height.value}px` : 'auto',
+    ...props.initialStyle,
   };
 });
 

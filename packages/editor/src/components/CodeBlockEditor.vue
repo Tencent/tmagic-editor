@@ -6,6 +6,7 @@
     v-model:height="codeBlockEditorHeight"
     :body-style="{ padding: '0 16px' }"
     :title="content.name ? `${disabled ? '查看' : '编辑'}${content.name}` : '新增代码'"
+    :framework-width="frameworkWidth"
     :position="boxPosition"
     :before-close="beforeClose"
   >
@@ -207,6 +208,7 @@ const closedHandler = () => {
 
 const parentFloating = inject<Ref<HTMLDivElement | null>>('parentFloating', ref(null));
 const { boxPosition, calcBoxPosition } = useNextFloatBoxPosition(uiService, parentFloating);
+const frameworkWidth = computed(() => uiService.get('frameworkRect')?.width || 0);
 
 watch(boxVisible, (visible) => {
   nextTick(() => {

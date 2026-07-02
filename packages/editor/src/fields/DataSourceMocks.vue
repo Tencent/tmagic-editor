@@ -12,6 +12,7 @@
       v-model:width="width"
       v-model:height="editorHeight"
       :title="drawerTitle"
+      :framework-width="frameworkWidth"
       :position="boxPosition"
     >
       <template #body>
@@ -255,4 +256,5 @@ const addDialogVisible = defineModel<boolean>('visible', { default: false });
 const { height: editorHeight } = useEditorContentHeight();
 const parentFloating = inject<Ref<HTMLDivElement | null>>('parentFloating', ref(null));
 const { boxPosition, calcBoxPosition } = useNextFloatBoxPosition(uiService, parentFloating);
+const frameworkWidth = computed(() => uiService.get('frameworkRect')?.width || 0);
 </script>

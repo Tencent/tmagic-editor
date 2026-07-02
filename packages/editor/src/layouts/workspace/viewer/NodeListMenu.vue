@@ -8,6 +8,7 @@
     ref="box"
     v-model:visible="visible"
     title="当前位置下的组件"
+    :framework-width="frameworkWidth"
     :position="menuPosition"
   >
     <template #body>
@@ -36,7 +37,9 @@ import { useNodeStatus } from '@editor/layouts/sidebar/layer/use-node-status';
 import type { TreeNodeData } from '@editor/type';
 
 const services = useServices();
-const { editorService } = services;
+const { editorService, uiService } = services;
+
+const frameworkWidth = computed(() => uiService.get('frameworkRect')?.width || 0);
 
 const visible = ref(false);
 const buttonVisible = ref(false);

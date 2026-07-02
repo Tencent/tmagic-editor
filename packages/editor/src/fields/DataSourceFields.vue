@@ -13,6 +13,7 @@
       v-model:width="width"
       v-model:height="editorHeight"
       :title="fieldTitle"
+      :framework-width="frameworkWidth"
       :position="boxPosition"
     >
       <template #body>
@@ -34,6 +35,7 @@
       v-model:width="width"
       v-model:height="editorHeight"
       title="快速添加数据定义"
+      :framework-width="frameworkWidth"
       :position="boxPosition"
     >
       <template #body>
@@ -360,6 +362,7 @@ const { height: editorHeight } = useEditorContentHeight();
 
 const parentFloating = inject<Ref<HTMLDivElement | null>>('parentFloating', ref(null));
 const { boxPosition, calcBoxPosition } = useNextFloatBoxPosition(uiService, parentFloating);
+const frameworkWidth = computed(() => uiService.get('frameworkRect')?.width || 0);
 
 /**
  * 由 DataSourceConfigPanel 注入：打开数据源详情后需要直接打开的字段路径（字段名数组）。

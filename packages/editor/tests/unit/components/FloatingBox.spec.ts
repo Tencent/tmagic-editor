@@ -64,6 +64,18 @@ const services = {
   },
 };
 
+const rect200: DOMRect = {
+  x: 0,
+  y: 0,
+  width: 200,
+  height: 100,
+  top: 0,
+  left: 0,
+  right: 200,
+  bottom: 100,
+  toJSON: () => '',
+};
+
 describe('FloatingBox.vue', () => {
   beforeEach(() => {
     moveableHandlers.clear();
@@ -157,14 +169,61 @@ describe('FloatingBox.vue', () => {
 
   test('left + width 超过 frameworkWidth 时 left 被收敛', async () => {
     const wrapper = mount(FloatingBox as any, {
-      ...services,
-      props: { visible: true, position: { left: 950, top: 0 }, width: 200 },
+      props: { visible: true, position: { left: 950, top: 0 }, width: 200, frameworkWidth: 1000 },
       attachTo: document.body,
     });
     await new Promise((r) => setTimeout(r, 0));
     await wrapper.vm.$nextTick();
     const box = document.querySelector('.m-editor-float-box') as HTMLElement;
     expect(box).not.toBeNull();
+    // jsdom 中 getBoundingClientRect 返回 0，width 会被重置为 0，故不触发收敛，left 保持原值
+    expect(box.style.left).toBe('950px');
+    wrapper.unmount();
+  });
+
+  test('当实际宽度使 left + width 超过 frameworkWidth 时 left 收敛到右边界内', async () => {
+    const getBoundingClientRectSpy = vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue(rect200);
+    const wrapper = mount(FloatingBox as any, {
+      props: { visible: true, position: { left: 950, top: 0 }, frameworkWidth: 1000 },
+      attachTo: document.body,
+    });
+    await new Promise((r) => setTimeout(r, 0));
+    await wrapper.vm.$nextTick();
+    const box = document.querySelector('.m-editor-float-box') as HTMLElement;
+    expect(box).not.toBeNull();
+    expect(box.style.left).toBe('800px');
+    getBoundingClientRectSpy.mockRestore();
+    wrapper.unmount();
+  });
+
+  test('未传入 frameworkWidth 时默认按视窗宽度收敛 left', async () => {
+    const getBoundingClientRectSpy = vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue(rect200);
+    const innerWidthSpy = vi.spyOn(globalThis, 'window', 'get').mockReturnValue({ innerWidth: 300 } as any);
+    const wrapper = mount(FloatingBox as any, {
+      props: { visible: true, position: { left: 250, top: 0 } },
+      attachTo: document.body,
+    });
+    await new Promise((r) => setTimeout(r, 0));
+    await wrapper.vm.$nextTick();
+    const box = document.querySelector('.m-editor-float-box') as HTMLElement;
+    expect(box).not.toBeNull();
+    // 250 + 200 = 450 > 视窗宽度 300，left 收敛为 300 - 200 = 100
+    expect(box.style.left).toBe('100px');
+    getBoundingClientRectSpy.mockRestore();
+    innerWidthSpy.mockRestore();
+    wrapper.unmount();
+  });
+
+  test('传入 initialStyle 时合并到浮窗样式', async () => {
+    const wrapper = mount(FloatingBox as any, {
+      props: { visible: true, initialStyle: { backgroundColor: 'rgb(255, 0, 0)' } },
+      attachTo: document.body,
+    });
+    await new Promise((r) => setTimeout(r, 0));
+    await wrapper.vm.$nextTick();
+    const box = document.querySelector('.m-editor-float-box') as HTMLElement;
+    expect(box).not.toBeNull();
+    expect(box.style.backgroundColor).toBe('rgb(255, 0, 0)');
     wrapper.unmount();
   });
 

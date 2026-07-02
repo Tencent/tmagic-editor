@@ -38,10 +38,14 @@ const editorService = {
   select: vi.fn(),
 };
 
+const uiService = {
+  get: vi.fn((k: string) => (k === 'frameworkRect' ? { width: 1000 } : undefined)),
+};
+
 const nodeStatusMap = ref(new Map<string, any>([['p1', { selected: false }]]));
 
 vi.mock('@editor/hooks/use-services', () => ({
-  useServices: () => ({ editorService }),
+  useServices: () => ({ editorService, uiService }),
 }));
 
 vi.mock('@editor/layouts/sidebar/layer/use-node-status', () => ({

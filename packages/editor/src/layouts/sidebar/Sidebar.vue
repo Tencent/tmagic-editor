@@ -132,6 +132,7 @@
         v-model:height="columnLeftHeight"
         :width="columnLeftWidth"
         :title="config.text"
+        :framework-width="frameworkWidth"
         :position="{
           left: floatBoxStates[config.$key].left,
           top: floatBoxStates[config.$key].top,
@@ -221,6 +222,7 @@ const taskLength = computed(() => depService.get('taskLength'));
 const tipsBarVisible = ref(true);
 
 const columnLeftWidth = computed(() => uiService.get('columnWidth')[ColumnLayout.LEFT]);
+const frameworkWidth = computed(() => uiService.get('frameworkRect')?.width || 0);
 const { height: editorContentHeight } = useEditorContentHeight();
 const columnLeftHeight = ref(0);
 

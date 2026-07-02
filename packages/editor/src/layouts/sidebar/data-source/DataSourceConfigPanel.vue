@@ -5,6 +5,7 @@
     v-model:width="width"
     v-model:height="editorHeight"
     :title="title"
+    :framework-width="frameworkWidth"
     :position="boxPosition"
   >
     <template #body>
@@ -66,6 +67,7 @@ const { height: editorHeight } = useEditorContentHeight();
 
 const parentFloating = inject<Ref<HTMLDivElement | null>>('parentFloating', ref(null));
 const { boxPosition, calcBoxPosition } = useNextFloatBoxPosition(uiService, parentFloating);
+const frameworkWidth = computed(() => uiService.get('frameworkRect')?.width || 0);
 
 /** 供「方法定义」tab 内的字段消费，用于打开数据源详情后自动打开指定方法 */
 provide(
