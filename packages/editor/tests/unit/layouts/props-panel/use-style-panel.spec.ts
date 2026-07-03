@@ -7,12 +7,14 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { nextTick, reactive, ref } from 'vue';
 
 import { useStylePanel } from '@editor/layouts/props-panel/use-style-panel';
+import { MIN_CENTER_COLUMN_WIDTH } from '@editor/utils/const';
 
 const mkServices = (storageInit?: any) => {
   const uiState: Record<string, any> = reactive({
     frameworkRect: { width: 1280 },
     showStylePanel: true,
     columnWidth: { right: 400, center: 800, left: 200 },
+    minCenterColumnWidth: MIN_CENTER_COLUMN_WIDTH,
   });
   const uiService = {
     get: vi.fn((k: string) => uiState[k]),

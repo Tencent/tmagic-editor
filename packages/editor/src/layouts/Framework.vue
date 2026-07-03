@@ -25,9 +25,9 @@
       right-class="m-editor-framework-right"
       :left="hideSidebar ? undefined : columnWidth.left"
       :right="columnWidth.right"
-      :min-left="hideSidebar ? 0 : MIN_LEFT_COLUMN_WIDTH"
-      :min-right="MIN_RIGHT_COLUMN_WIDTH"
-      :min-center="MIN_CENTER_COLUMN_WIDTH"
+      :min-left="hideSidebar ? 0 : minLeftColumnWidth"
+      :min-right="minRightColumnWidth"
+      :min-center="minCenterColumnWidth"
       :width="frameworkRect.width"
       @change="columnWidthChange"
     >
@@ -78,9 +78,6 @@ import { getEditorConfig } from '@editor/utils/config';
 import {
   DEFAULT_LEFT_COLUMN_WIDTH,
   LEFT_COLUMN_WIDTH_STORAGE_KEY,
-  MIN_CENTER_COLUMN_WIDTH,
-  MIN_LEFT_COLUMN_WIDTH,
-  MIN_RIGHT_COLUMN_WIDTH,
   RIGHT_COLUMN_WIDTH_STORAGE_KEY,
 } from '@editor/utils/const';
 
@@ -115,6 +112,10 @@ const pageLength = computed(() => editorService.get('pageLength') || 0);
 const showSrc = computed(() => uiService.get('showSrc'));
 
 const columnWidth = computed(() => uiService.get('columnWidth'));
+
+const minLeftColumnWidth = computed(() => uiService.get('minLeftColumnWidth'));
+const minCenterColumnWidth = computed(() => uiService.get('minCenterColumnWidth'));
+const minRightColumnWidth = computed(() => uiService.get('minRightColumnWidth'));
 
 watch(pageLength, () => {
   splitViewRef.value?.updateWidth();

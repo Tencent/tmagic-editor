@@ -2,7 +2,7 @@ import { computed, type Ref, watch } from 'vue';
 
 import { Protocol } from '@editor/services/storage';
 import { Services } from '@editor/type';
-import { MIN_CENTER_COLUMN_WIDTH, RIGHT_COLUMN_WIDTH_STORAGE_KEY } from '@editor/utils/const';
+import { RIGHT_COLUMN_WIDTH_STORAGE_KEY } from '@editor/utils/const';
 
 export const useStylePanel = (
   { uiService, storageService }: Pick<Services, 'uiService' | 'storageService'>,
@@ -47,8 +47,9 @@ export const useStylePanel = (
     }
 
     if (columnWidth.center < 0) {
-      columnWidth.right = columnWidth.right + columnWidth.center - MIN_CENTER_COLUMN_WIDTH;
-      columnWidth.center = MIN_CENTER_COLUMN_WIDTH;
+      const minCenterColumnWidth = uiService.get('minCenterColumnWidth');
+      columnWidth.right = columnWidth.right + columnWidth.center - minCenterColumnWidth;
+      columnWidth.center = minCenterColumnWidth;
 
       propsPanelWidth.value = columnWidth.right / 2;
     }

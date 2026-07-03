@@ -296,6 +296,12 @@ export interface UiState {
   stageRect: StageRect;
   /** 编辑器列布局每一列的宽度，分为左中右三列 */
   columnWidth: GetColumnWidth;
+  /** 编辑器列布局左侧列最小宽度 */
+  minLeftColumnWidth: number;
+  /** 编辑器列布局中间列最小宽度 */
+  minCenterColumnWidth: number;
+  /** 编辑器列布局右侧列最小宽度 */
+  minRightColumnWidth: number;
   /** 是否显示画布参考线，true: 显示，false: 不显示，默认为true */
   showGuides: boolean;
   /** 画布上是否存在参考线 */

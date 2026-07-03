@@ -27,6 +27,9 @@ import {
   DEFAULT_LEFT_COLUMN_WIDTH,
   DEFAULT_RIGHT_COLUMN_WIDTH,
   LEFT_COLUMN_WIDTH_STORAGE_KEY,
+  MIN_CENTER_COLUMN_WIDTH,
+  MIN_LEFT_COLUMN_WIDTH,
+  MIN_RIGHT_COLUMN_WIDTH,
   RIGHT_COLUMN_WIDTH_STORAGE_KEY,
 } from '@editor/utils/const';
 
@@ -54,6 +57,9 @@ const state = shallowReactive<UiState>({
       storageService.getItem(RIGHT_COLUMN_WIDTH_STORAGE_KEY, { protocol: Protocol.NUMBER }) ||
       DEFAULT_RIGHT_COLUMN_WIDTH,
   },
+  minLeftColumnWidth: MIN_LEFT_COLUMN_WIDTH,
+  minCenterColumnWidth: MIN_CENTER_COLUMN_WIDTH,
+  minRightColumnWidth: MIN_RIGHT_COLUMN_WIDTH,
   showGuides: true,
   hasGuides: false,
   showRule: true,
