@@ -76,9 +76,11 @@ class IteratorContainer extends Node {
       }
     }
 
-    config.items?.forEach((element: MNode) => {
-      this.initNode(element, node, map);
-    });
+    if (Array.isArray(config.items)) {
+      config.items?.forEach((element: MNode) => {
+        this.initNode(element, node, map);
+      });
+    }
   }
 
   public setNodes(nodes: MNode[], index: number) {

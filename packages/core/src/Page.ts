@@ -79,9 +79,11 @@ class Page extends Node {
       }
     }
 
-    config.items?.forEach((element: MComponent | MContainer) => {
-      this.initNode(element, node);
-    });
+    if (Array.isArray(config.items)) {
+      config.items?.forEach((element: MComponent | MContainer) => {
+        this.initNode(element, node);
+      });
+    }
   }
 
   public getNode<T extends TMagicNode = TMagicNode>(
