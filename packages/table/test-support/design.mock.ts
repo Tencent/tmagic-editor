@@ -86,6 +86,14 @@ export const createDesignMock = () => ({
       return () => h('div', { class: 'tmagic-popover-stub' }, [slots.reference?.(), slots.default?.()]);
     },
   }),
+  TMagicPopconfirm: defineComponent({
+    name: 'TMagicPopconfirm',
+    props: ['title', 'placement', 'width'],
+    emits: ['confirm', 'cancel'],
+    setup(props, { slots }) {
+      return () => h('div', { class: 'tmagic-popconfirm-stub' }, [props.title, slots.reference?.()]);
+    },
+  }),
   tMagicMessage,
 });
 

@@ -11,6 +11,7 @@ import ActionsColumn from '../src/ActionsColumn.vue';
 import ComponentColumn from '../src/ComponentColumn.vue';
 import ExpandColumn from '../src/ExpandColumn.vue';
 import PopoverColumn from '../src/PopoverColumn.vue';
+import { ColumnActionConfig } from '../src/schema';
 import TextColumn from '../src/TextColumn.vue';
 import { tMagicMessage } from '../test-support/design.mock';
 
@@ -126,7 +127,7 @@ describe('ActionsColumn.vue', () => {
           after: vi.fn(),
           before: vi.fn(),
         },
-      ],
+      ] as ColumnActionConfig[],
     },
     row: { id: 1, visible: true, locked: false },
     index: 0,
@@ -179,6 +180,34 @@ describe('ActionsColumn.vue', () => {
     expect(deleteAction.before).toHaveBeenCalled();
     expect(deleteAction.handler).toHaveBeenCalledWith(props.row, 0);
     expect(deleteAction.after).toHaveBeenCalled();
+  });
+
+  test('popconfirm action 用 Popconfirm 包裹并在确认时触发 handler', async () => {
+    const props = baseProps();
+    props.config.actions[1].popconfirm = true;
+    props.config.actions[1].confirmText = (row: any) => `确定删除${row.id}?`;
+    const wrapper = mount(ActionsColumn, { props });
+    const deleteAction = props.config.actions[1];
+
+    expect(wrapper.find('.tmagic-popconfirm-stub').exists()).toBe(true);
+    expect(wrapper.text()).toContain('确定删除1?');
+
+    // 普通点击按钮不应立即触发 handler，需等待 Popconfirm 确认
+    const btn = wrapper.findAll('.action-btn').find((b) => b.text().includes('删除'));
+    await btn?.trigger('click');
+    expect(deleteAction.handler).not.toHaveBeenCalled();
+
+    await wrapper.findComponent({ name: 'TMagicPopconfirm' }).vm.$emit('confirm');
+    expect(deleteAction.handler).toHaveBeenCalledWith(props.row, 0);
+  });
+
+  test('popconfirm 透传 popconfirmWidth 到 TMagicPopconfirm', () => {
+    const props = baseProps();
+    props.config.actions[1].popconfirm = true;
+    props.config.actions[1].popconfirmWidth = 240;
+    const wrapper = mount(ActionsColumn, { props });
+    const popconfirm = wrapper.findComponent({ name: 'TMagicPopconfirm' });
+    expect(popconfirm.props('width')).toBe(240);
   });
 });
 

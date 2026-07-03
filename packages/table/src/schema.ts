@@ -28,6 +28,12 @@ export interface ColumnActionConfig {
   tooltip?: string;
   tooltipPlacement?: string;
   icon?: any;
+  /** 为 true 时用 Popconfirm 包裹按钮，点击后需二次确认才会触发 handler */
+  popconfirm?: boolean;
+  /** Popconfirm 的确认提示文案，支持函数动态生成 */
+  confirmText?: string | ((row: any) => string);
+  /** Popconfirm 浮层宽度，数字按 px 处理 */
+  popconfirmWidth?: string | number;
   handler?: (row: any, index: number) => Promise<any> | any;
   before?: (row: any, index: number) => Promise<void> | void;
   after?: (row: any, index: number) => Promise<void> | void;

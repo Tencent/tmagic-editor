@@ -1,23 +1,46 @@
 <template>
-  <TMagicTooltip
-    v-for="(action, actionIndex) in config.actions"
-    :placement="action.tooltipPlacement || 'top'"
-    :key="actionIndex"
-    :disabled="!Boolean(action.tooltip)"
-    :content="action.tooltip"
-  >
-    <TMagicButton
-      v-show="display(action.display, row) && !editState[index]"
-      class="action-btn"
-      link
-      size="small"
-      :type="action.buttonType || 'primary'"
-      :icon="action.icon"
-      :disabled="disabled(action.disabled, row)"
-      @click="actionHandler(action, row, index)"
-      ><span v-html="formatter(action.text, row)"></span
-    ></TMagicButton>
-  </TMagicTooltip>
+  <template v-for="(action, actionIndex) in config.actions" :key="actionIndex">
+    <TMagicPopconfirm
+      v-if="action.popconfirm"
+      placement="top"
+      :width="action.popconfirmWidth"
+      :title="formatter(action.confirmText, row) || '确定执行此操作？'"
+      @confirm="actionHandler(action, row, index)"
+    >
+      <template #reference>
+        <TMagicButton
+          v-show="display(action.display, row) && !editState[index]"
+          class="action-btn"
+          link
+          size="small"
+          :type="action.buttonType || 'primary'"
+          :icon="action.icon"
+          :disabled="disabled(action.disabled, row)"
+        >
+          <span v-html="formatter(action.text, row)"></span>
+        </TMagicButton>
+      </template>
+    </TMagicPopconfirm>
+
+    <TMagicTooltip
+      v-else
+      :placement="action.tooltipPlacement || 'top'"
+      :disabled="!Boolean(action.tooltip)"
+      :content="action.tooltip"
+    >
+      <TMagicButton
+        v-show="display(action.display, row) && !editState[index]"
+        class="action-btn"
+        link
+        size="small"
+        :type="action.buttonType || 'primary'"
+        :icon="action.icon"
+        :disabled="disabled(action.disabled, row)"
+        @click="actionHandler(action, row, index)"
+        ><span v-html="formatter(action.text, row)"></span
+      ></TMagicButton>
+    </TMagicTooltip>
+  </template>
 
   <TMagicButton
     class="action-btn"
@@ -42,7 +65,7 @@
 <script lang="ts" setup>
 import { cloneDeep } from 'lodash-es';
 
-import { TMagicButton, tMagicMessage, TMagicTooltip } from '@tmagic/design';
+import { TMagicButton, tMagicMessage, TMagicPopconfirm, TMagicTooltip } from '@tmagic/design';
 
 import { ColumnActionConfig, ColumnConfig } from './schema';
 

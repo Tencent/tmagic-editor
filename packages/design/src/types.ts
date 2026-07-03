@@ -234,6 +234,9 @@ export interface PaginationProps {
 
 export interface PopconfirmProps {
   title?: string;
+  width?: string | number;
+  /** 浮层是否插入到 body，默认 true。设为 false 时浮层内联渲染，便于嵌套在 hover 浮层中避免父级因 mouseleave 收起。 */
+  teleported?: boolean;
   placement?:
     | 'top'
     | 'left'
