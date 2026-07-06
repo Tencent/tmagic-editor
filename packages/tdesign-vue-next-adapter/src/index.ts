@@ -494,9 +494,12 @@ const adapter: any = {
 
     tag: {
       component: TTag,
-      props: (props: TagProps) => ({
-        theme: props.type ? props.type : 'default',
-      }),
+      props: (props: TagProps) => {
+        const VALID_TAG_THEMES = ['default', 'primary', 'warning', 'danger', 'success'];
+        return {
+          theme: props.type && VALID_TAG_THEMES.includes(props.type) ? props.type : 'default',
+        };
+      },
     },
 
     timePicker: {

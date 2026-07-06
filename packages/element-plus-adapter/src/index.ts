@@ -296,7 +296,13 @@ const adapter: DesignPluginOptions = {
 
     tag: {
       component: ElTag as any,
-      props: (props: TagProps) => props,
+      props: (props: TagProps) => {
+        const VALID_TAG_TYPES = ['primary', 'success', 'info', 'warning', 'danger'];
+        if (props.type && !VALID_TAG_TYPES.includes(props.type)) {
+          return { ...props, type: 'primary' };
+        }
+        return props;
+      },
     },
 
     timePicker: {
