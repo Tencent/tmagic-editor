@@ -100,6 +100,21 @@ let moveable: VanillaMoveable | null = null;
 let dragMask: HTMLDivElement | null = null;
 let dragMaskVisible = false;
 
+// 兜底：正常情况下遮罩由 moveable 的 dragEnd/resizeEnd 移除；但某些极端场景
+// （拖拽中鼠标移出窗口后松开、alt-tab 切走窗口失焦、标签页被隐藏等）结束事件不会触发，
+// 会导致全屏透明遮罩残留、整个编辑器无法点击。这里挂全局 pointerup/blur/visibilitychange 强制收尾。
+const bindDragMaskSafety = () => {
+  globalThis.window?.addEventListener('pointerup', hideDragMask, true);
+  globalThis.window?.addEventListener('blur', hideDragMask);
+  globalThis.document?.addEventListener('visibilitychange', hideDragMask);
+};
+
+const unbindDragMaskSafety = () => {
+  globalThis.window?.removeEventListener('pointerup', hideDragMask, true);
+  globalThis.window?.removeEventListener('blur', hideDragMask);
+  globalThis.document?.removeEventListener('visibilitychange', hideDragMask);
+};
+
 const showDragMask = () => {
   if (dragMaskVisible) {
     return;
@@ -110,6 +125,7 @@ const showDragMask = () => {
   }
   globalThis.document.body.appendChild(dragMask);
   dragMaskVisible = true;
+  bindDragMaskSafety();
 
   // 拖拽标题时，root 上的 @mousedown="nextZIndex" 会把浮窗 z-index 抬高，
   // 若此时才读取会拿到旧值导致遮罩被浮窗（及其内部 iframe）盖住，故用 nextTick 在 z-index 稳定后再设置到浮窗之上
@@ -123,6 +139,7 @@ const showDragMask = () => {
 };
 
 const hideDragMask = () => {
+  unbindDragMaskSafety();
   dragMask?.parentNode?.removeChild(dragMask);
   dragMaskVisible = false;
 };
