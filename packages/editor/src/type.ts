@@ -33,6 +33,7 @@ import type {
   MPage,
   MPageFragment,
 } from '@tmagic/core';
+import type { FieldSize } from '@tmagic/design';
 import type { ChangeRecord, FormConfig, FormState, TableColumnConfig, TypeFunction } from '@tmagic/form';
 import type StageCore from '@tmagic/stage';
 import type {
@@ -1453,6 +1454,11 @@ export interface CustomDiffFormOptions {
    * 如 `'1200px'` / `'80%'`。缺省时使用弹窗内置默认宽度（900px）。
    */
   width?: string;
+  /**
+   * 差异 / 确认回滚弹窗内 form 表单的尺寸（透传给 CompareForm 的 `size`），
+   * 可选 `'large' | 'default' | 'small'`，缺省时使用表单内置默认尺寸。
+   */
+  size?: FieldSize;
 }
 
 /**

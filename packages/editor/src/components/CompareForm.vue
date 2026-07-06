@@ -13,6 +13,7 @@
       :extend-state="mergedExtendState"
       :show-diff="showDiff"
       :self-diff-field-types="selfDiffFieldTypes"
+      :size="size"
     ></MForm>
   </div>
 </template>
@@ -22,6 +23,7 @@ import { computed, inject, provide, type Ref, ref, type ShallowRef, useTemplateR
 import { isEqual } from 'lodash-es';
 
 import { type CodeBlockContent, type DataSourceSchema, HookType, type MNode } from '@tmagic/core';
+import { type FieldSize } from '@tmagic/design';
 import { type FormConfig, type FormState, type FormValue, MForm } from '@tmagic/form';
 
 import type { CompareCategory, CompareFormLoadConfig, Services } from '@editor/type';
@@ -68,6 +70,11 @@ const props = withDefaults(
     baseFormState?: FormState;
     /** 需要走 self diff 的字段类型（例如 mod-cond）。 */
     selfDiffFieldTypes?: string[];
+    /**
+     * 表单内组件的尺寸（透传给 MForm 的 `size`），可选 'large' | 'default' | 'small'。
+     * 缺省时使用 MForm 内置默认尺寸。
+     */
+    size?: FieldSize;
     /**
      * 自定义 FormConfig 加载逻辑。传入后将接管内置的按 `category`(node/data-source/code-block)
      * 取配置逻辑，调用方可根据业务自行返回（或异步返回）表单配置。可通过

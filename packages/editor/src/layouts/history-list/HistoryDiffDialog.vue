@@ -48,6 +48,7 @@
         :load-config="loadConfig"
         :self-diff-field-types="selfDiffFieldTypes"
         :services="props.services"
+        :size="props.size"
         height="70vh"
       />
 
@@ -77,7 +78,14 @@
 import { computed, ref, watch } from 'vue';
 import { isEqual } from 'lodash-es';
 
-import { TMagicButton, TMagicDialog, TMagicRadioButton, TMagicRadioGroup, TMagicTag } from '@tmagic/design';
+import {
+  type FieldSize,
+  TMagicButton,
+  TMagicDialog,
+  TMagicRadioButton,
+  TMagicRadioGroup,
+  TMagicTag,
+} from '@tmagic/design';
 import type { FormState } from '@tmagic/form';
 
 import CompareForm from '@editor/components/CompareForm.vue';
@@ -104,6 +112,8 @@ const props = withDefaults(
      */
     loadConfig?: CompareFormLoadConfig;
     width?: string;
+    /** 差异对比表单内组件的尺寸（透传给 CompareForm 的 `size`），可选 'large' | 'default' | 'small'。 */
+    size?: FieldSize;
     isConfirm?: boolean;
     onConfirm?: () => void;
     selfDiffFieldTypes?: string[];

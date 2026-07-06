@@ -95,6 +95,7 @@ const mountHistoryDiffDialog = async (
     selfDiffFieldTypes: options.selfDiffFieldTypes,
     compareFormState: options.compareFormState,
     width: options.width,
+    size: options.size ?? options.services?.uiService?.get('propsPanelSize'),
     onClose: options.onClose,
   });
   if (options.appContext) {
@@ -223,6 +224,7 @@ export const useHistoryRevert = (options: UseHistoryRevertOptions = {}, services
         services,
         ...extra,
         width: extra?.width ?? dialogWidth,
+        size: extra?.size,
       });
     }
     return confirmRevert();
@@ -382,6 +384,7 @@ export const useHistoryRevert = (options: UseHistoryRevertOptions = {}, services
       loadConfig: revertOptions.loadConfig,
       selfDiffFieldTypes: revertOptions.selfDiffFieldTypes,
       width: revertOptions.width,
+      size: revertOptions.size,
     });
     if (!confirmed) return null;
     return await revertOptions.revert();
@@ -399,6 +402,7 @@ export const useHistoryRevert = (options: UseHistoryRevertOptions = {}, services
         services,
         ...extra,
         width: extra?.width ?? dialogWidth,
+        size: extra?.size,
       });
   };
 
