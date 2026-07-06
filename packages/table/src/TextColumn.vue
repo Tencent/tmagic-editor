@@ -47,8 +47,8 @@
 import { TMagicButton, TMagicTag, TMagicTooltip } from '@tmagic/design';
 import { type ContainerChangeEventData, MForm } from '@tmagic/form';
 import type { FormItemConfig, FormValue } from '@tmagic/form-schema';
-import { setValueByKeyPath } from '@tmagic/utils';
 
+import { applyInlineEditChange } from './formHelpers';
 import { ColumnConfig } from './schema';
 import { formatter } from './utils';
 
@@ -70,12 +70,6 @@ const props = withDefaults(
 );
 
 const formChangeHandler = (v: FormValue, eventData: ContainerChangeEventData) => {
-  if (eventData.changeRecords?.length) {
-    for (const record of eventData.changeRecords) {
-      if (record.propPath) {
-        setValueByKeyPath(record.propPath, record.value, props.editState[props.index]);
-      }
-    }
-  }
+  applyInlineEditChange(props.editState[props.index], eventData);
 };
 </script>

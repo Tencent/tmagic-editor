@@ -1,19 +1,20 @@
 <template>
   <component
     :is="config.component"
-    v-bind="componentProps(row, index)"
-    v-on="componentListeners(row, index)"
+    v-bind="resolveComponentProps(config, row, index)"
+    v-on="resolveComponentListeners(config, row, index)"
   ></component>
 </template>
 
 <script lang="ts" setup>
+import { resolveComponentListeners, resolveComponentProps } from './componentHelpers';
 import { ColumnConfig } from './schema';
 
 defineOptions({
   name: 'MTableColumn',
 });
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     config: ColumnConfig;
     row: any;
@@ -23,18 +24,4 @@ const props = withDefaults(
     config: () => ({}),
   },
 );
-
-const componentProps = (row: any, index: number) => {
-  if (typeof props.config.props === 'function') {
-    return props.config.props(row, index) || {};
-  }
-  return props.config.props || {};
-};
-
-const componentListeners = (row: any, index: number) => {
-  if (typeof props.config.listeners === 'function') {
-    return props.config.listeners(row, index) || {};
-  }
-  return props.config.listeners || {};
-};
 </script>

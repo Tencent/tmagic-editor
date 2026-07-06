@@ -7,9 +7,13 @@ import { describe, expect, test, vi } from 'vitest';
 import { defineComponent, h } from 'vue';
 import { mount } from '@vue/test-utils';
 
+import ActionButton from '../src/ActionButton.vue';
+import { disabled, display, formatActionText } from '../src/actionHelpers';
 import ActionsColumn from '../src/ActionsColumn.vue';
 import ComponentColumn from '../src/ComponentColumn.vue';
+import { resolveComponentListeners, resolveComponentProps } from '../src/componentHelpers';
 import ExpandColumn from '../src/ExpandColumn.vue';
+import { applyInlineEditChange } from '../src/formHelpers';
 import PopoverColumn from '../src/PopoverColumn.vue';
 import { ColumnActionConfig } from '../src/schema';
 import TextColumn from '../src/TextColumn.vue';
@@ -96,7 +100,7 @@ describe('TextColumn.vue', () => {
       },
     });
     expect(wrapper.find('.mform-stub').exists()).toBe(true);
-    wrapper.vm.formChangeHandler({}, { changeRecords: [{ propPath: 'name', value: 'new' }] });
+    applyInlineEditChange(editState[0], { changeRecords: [{ propPath: 'name', value: 'new' }] });
     expect(editState[0].name).toBe('new');
   });
 
@@ -105,6 +109,31 @@ describe('TextColumn.vue', () => {
       props: { config: { prop: 'name' }, row: { name: 'Tom' }, index: 0 },
     });
     expect(wrapper.text()).toContain('Tom');
+  });
+});
+
+describe('actionHelpers', () => {
+  test('display / disabled / formatActionText 辅助函数', () => {
+    expect(display(() => false, {})).toBe(false);
+    expect(display(true, {})).toBe(true);
+    expect(display(undefined, {})).toBe(true);
+    expect(disabled(() => true, {})).toBe(true);
+    expect(disabled(false, {})).toBe(false);
+    expect(formatActionText((row: any) => row.id, { id: 2 })).toBe(2);
+    expect(formatActionText('静态', {})).toBe('静态');
+  });
+});
+
+describe('ActionButton.vue', () => {
+  test('渲染操作按钮', () => {
+    const wrapper = mount(ActionButton, {
+      props: {
+        action: { text: '操作' },
+        row: { id: 1 },
+        index: 0,
+      },
+    });
+    expect(wrapper.text()).toContain('操作');
   });
 });
 
@@ -132,17 +161,6 @@ describe('ActionsColumn.vue', () => {
     row: { id: 1, visible: true, locked: false },
     index: 0,
     editState: [] as any[],
-  });
-
-  test('display / disabled / formatter 辅助函数', () => {
-    const wrapper = mount(ActionsColumn, { props: baseProps() });
-    expect(wrapper.vm.display(() => false, {})).toBe(false);
-    expect(wrapper.vm.display(true, {})).toBe(true);
-    expect(wrapper.vm.display(undefined, {})).toBe(true);
-    expect(wrapper.vm.disabled(() => true, {})).toBe(true);
-    expect(wrapper.vm.disabled(false, {})).toBe(false);
-    expect(wrapper.vm.formatter((row: any) => row.id, { id: 2 })).toBe(2);
-    expect(wrapper.vm.formatter('静态', {})).toBe('静态');
   });
 
   test('编辑 / 保存 / 取消流程', async () => {
@@ -233,18 +251,12 @@ describe('ComponentColumn.vue', () => {
       },
     });
     expect(wrapper.find('.inner').text()).toBe('Cell');
-    wrapper.vm.componentListeners({ name: 'Cell' }, 3).click();
+    resolveComponentListeners(wrapper.props('config'), { name: 'Cell' }, 3).click();
     expect(onClick).toHaveBeenCalledWith(3);
 
-    const wrapper2 = mount(ComponentColumn, {
-      props: {
-        config: { component: innerComp, props: { label: '静态' }, listeners: {} },
-        row: {},
-        index: 0,
-      },
-    });
-    expect(wrapper2.vm.componentProps({}, 0)).toEqual({ label: '静态' });
-    expect(wrapper2.vm.componentListeners({}, 0)).toEqual({});
+    const staticConfig = { component: innerComp, props: { label: '静态' }, listeners: {} };
+    expect(resolveComponentProps(staticConfig, {}, 0)).toEqual({ label: '静态' });
+    expect(resolveComponentListeners(staticConfig, {}, 0)).toEqual({});
   });
 });
 

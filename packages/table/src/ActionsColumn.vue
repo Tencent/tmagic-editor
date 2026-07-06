@@ -8,19 +8,69 @@
       @confirm="actionHandler(action, row, index)"
     >
       <template #reference>
-        <TMagicButton
-          v-show="display(action.display, row) && !editState[index]"
-          class="action-btn"
-          link
-          size="small"
-          :type="action.buttonType || 'primary'"
-          :icon="action.icon"
-          :disabled="disabled(action.disabled, row)"
-        >
-          <span v-html="formatter(action.text, row)"></span>
-        </TMagicButton>
+        <ActionButton
+          :action="action"
+          :row="row"
+          :index="index"
+          :visible="display(action.display, row) && !editState[index]"
+        />
       </template>
     </TMagicPopconfirm>
+
+    <TMagicPopover
+      v-else-if="action.type === 'sub-actions'"
+      trigger="click"
+      :placement="action.subActionConfig?.placement || 'bottom'"
+      :width="action.subActionConfig?.popoverWidth"
+      :popper-class="action.subActionConfig?.popoverClass"
+      :destroy-on-close="action.subActionConfig?.popoverDestroyOnClose"
+    >
+      <template #reference>
+        <ActionButton
+          :action="action"
+          :row="row"
+          :index="index"
+          :visible="display(action.display, row) && !editState[index]"
+        />
+      </template>
+      <div class="sub-actions">
+        <template v-for="(subAction, subIndex) in action.subActionConfig?.items" :key="subIndex">
+          <TMagicPopconfirm
+            v-if="subAction.popconfirm"
+            placement="top"
+            :width="subAction.popconfirmWidth"
+            :title="formatter(subAction.confirmText, row) || '确定执行此操作？'"
+            @confirm="actionHandler(subAction, row, index)"
+          >
+            <template #reference>
+              <ActionButton
+                :action="subAction"
+                :row="row"
+                :index="index"
+                btn-class="sub-action-btn"
+                :visible="display(subAction.display, row)"
+              />
+            </template>
+          </TMagicPopconfirm>
+
+          <TMagicTooltip
+            v-else
+            :placement="subAction.tooltipPlacement || 'top'"
+            :disabled="!Boolean(subAction.tooltip)"
+            :content="subAction.tooltip"
+          >
+            <ActionButton
+              :action="subAction"
+              :row="row"
+              :index="index"
+              btn-class="sub-action-btn"
+              :visible="display(subAction.display, row)"
+              @click="actionHandler"
+            />
+          </TMagicTooltip>
+        </template>
+      </div>
+    </TMagicPopover>
 
     <TMagicTooltip
       v-else
@@ -28,17 +78,13 @@
       :disabled="!Boolean(action.tooltip)"
       :content="action.tooltip"
     >
-      <TMagicButton
-        v-show="display(action.display, row) && !editState[index]"
-        class="action-btn"
-        link
-        size="small"
-        :type="action.buttonType || 'primary'"
-        :icon="action.icon"
-        :disabled="disabled(action.disabled, row)"
-        @click="actionHandler(action, row, index)"
-        ><span v-html="formatter(action.text, row)"></span
-      ></TMagicButton>
+      <ActionButton
+        :action="action"
+        :row="row"
+        :index="index"
+        :visible="display(action.display, row) && !editState[index]"
+        @click="actionHandler"
+      />
     </TMagicTooltip>
   </template>
 
@@ -65,8 +111,10 @@
 <script lang="ts" setup>
 import { cloneDeep } from 'lodash-es';
 
-import { TMagicButton, tMagicMessage, TMagicPopconfirm, TMagicTooltip } from '@tmagic/design';
+import { TMagicButton, tMagicMessage, TMagicPopconfirm, TMagicPopover, TMagicTooltip } from '@tmagic/design';
 
+import ActionButton from './ActionButton.vue';
+import { display, formatActionText as formatter } from './actionHelpers';
 import { ColumnActionConfig, ColumnConfig } from './schema';
 
 defineOptions({
@@ -94,33 +142,6 @@ const emit = defineEmits<{
   'after-action': [{ index: number }];
   'after-action-cancel': [{ index: number }];
 }>();
-
-const display = (fuc: boolean | Function | undefined, row: any) => {
-  if (typeof fuc === 'function') {
-    return fuc(row);
-  }
-  if (typeof fuc === 'boolean') {
-    return fuc;
-  }
-  return true;
-};
-
-const disabled = (fuc: boolean | Function | undefined, row: any) => {
-  if (typeof fuc === 'function') {
-    return fuc(row);
-  }
-  if (typeof fuc === 'boolean') {
-    return fuc;
-  }
-  return false;
-};
-
-const formatter = (fuc: string | Function | undefined, row: any) => {
-  if (typeof fuc === 'function') {
-    return fuc(row);
-  }
-  return fuc;
-};
 
 const actionHandler = async (action: ColumnActionConfig, row: any, index: number) => {
   await action.before?.(row, index);
@@ -163,4 +184,23 @@ const cancel = async (index: number, config: ColumnConfig) => {
   }
   emit('after-action-cancel', { index });
 };
+
+defineExpose({
+  actionHandler,
+  save,
+  cancel,
+});
 </script>
+
+<style scoped>
+.sub-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sub-actions .sub-action-btn {
+  justify-content: flex-start;
+  width: 100%;
+}
+</style>

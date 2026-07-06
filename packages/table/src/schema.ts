@@ -18,8 +18,44 @@
 
 import { FormConfig, FormValue } from '@tmagic/form';
 
+export type ColumnActionPlacement =
+  | 'auto'
+  | 'auto-start'
+  | 'auto-end'
+  | 'top'
+  | 'bottom'
+  | 'left'
+  | 'right'
+  | 'top-start'
+  | 'top-end'
+  | 'bottom-start'
+  | 'bottom-end'
+  | 'left-start'
+  | 'left-end'
+  | 'right-start'
+  | 'right-end';
+
+/** 当 type 为 sub-actions 时，更多菜单（Popover）的配置 */
+export interface ColumnSubActionConfig {
+  /** Popover 的弹出位置，默认 bottom */
+  placement?: ColumnActionPlacement;
+  /** Popover 浮层宽度，数字按 px 处理 */
+  popoverWidth?: string | number;
+  /** 附加到 Popover 浮层上的自定义 class */
+  popoverClass?: string;
+  /** Popover 关闭后是否销毁内容，默认 false */
+  popoverDestroyOnClose?: boolean;
+  /** 更多菜单中的子动作配置 */
+  items?: ColumnActionConfig[];
+}
+
 export interface ColumnActionConfig {
-  type?: 'delete' | 'copy' | 'edit' | string;
+  /**
+   * 动作类型：
+   * - `delete` / `copy` / `edit`：内置语义，`edit` 会进入行内编辑态。
+   * - `sub-actions`：点击后以 Popover 形式展开更多菜单，菜单配置通过 `subActionConfig` 提供。
+   */
+  type?: 'delete' | 'copy' | 'edit' | 'sub-actions' | string;
   buttonType?: string;
   display?: boolean | ((row: any) => boolean);
   disabled?: boolean | ((row: any) => boolean);
@@ -34,10 +70,15 @@ export interface ColumnActionConfig {
   confirmText?: string | ((row: any) => string);
   /** Popconfirm 浮层宽度，数字按 px 处理 */
   popconfirmWidth?: string | number;
+  /** 当 type 为 sub-actions 时，更多菜单（Popover）的配置 */
+  subActionConfig?: ColumnSubActionConfig;
   handler?: (row: any, index: number) => Promise<any> | any;
   before?: (row: any, index: number) => Promise<void> | void;
   after?: (row: any, index: number) => Promise<void> | void;
-  action?: (data: { data: any; index: number }) => Promise<void> | void;
+  action?: (data: {
+    data: any;
+    index: number;
+  }) => Promise<{ ret: number; msg?: string } | void> | { ret: number; msg?: string } | void;
   cancel?: (data: { index: number }) => Promise<void> | void;
 }
 
