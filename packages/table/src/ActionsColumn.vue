@@ -1,24 +1,17 @@
 <template>
   <template v-for="(action, actionIndex) in config.actions" :key="actionIndex">
-    <TMagicPopconfirm
+    <ActionPopconfirm
       v-if="action.popconfirm"
-      placement="top"
-      :width="action.popconfirmWidth"
-      :title="formatter(action.confirmText, row) || '确定执行此操作？'"
-      @confirm="actionHandler(action, row, index)"
-    >
-      <template #reference>
-        <ActionButton
-          :action="action"
-          :row="row"
-          :index="index"
-          :visible="display(action.display, row) && !editState[index]"
-        />
-      </template>
-    </TMagicPopconfirm>
+      :action="action"
+      :row="row"
+      :index="index"
+      :visible="display(action.display, row) && !editState[index]"
+      @confirm="actionHandler"
+    />
 
     <TMagicPopover
       v-else-if="action.type === 'sub-actions'"
+      v-model:visible="popoverVisible"
       trigger="click"
       :placement="action.subActionConfig?.placement || 'bottom'"
       :width="action.subActionConfig?.popoverWidth"
@@ -26,66 +19,49 @@
       :destroy-on-close="action.subActionConfig?.popoverDestroyOnClose"
     >
       <template #reference>
-        <ActionButton
-          :action="action"
-          :row="row"
-          :index="index"
-          :visible="display(action.display, row) && !editState[index]"
-        />
+        <TMagicButton
+          v-show="action.subActionConfig?.items?.length && display(action.display, row) && !editState[index]"
+          class="action-btn"
+          link
+          size="small"
+          :type="action.buttonType || 'primary'"
+          :icon="popoverVisible ? ArrowDown : ArrowRight"
+          @click.stop="togglePopover"
+        ></TMagicButton>
       </template>
       <div class="sub-actions">
         <template v-for="(subAction, subIndex) in action.subActionConfig?.items" :key="subIndex">
-          <TMagicPopconfirm
+          <ActionPopconfirm
             v-if="subAction.popconfirm"
-            placement="top"
-            :width="subAction.popconfirmWidth"
-            :title="formatter(subAction.confirmText, row) || '确定执行此操作？'"
-            @confirm="actionHandler(subAction, row, index)"
-          >
-            <template #reference>
-              <ActionButton
-                :action="subAction"
-                :row="row"
-                :index="index"
-                btn-class="sub-action-btn"
-                :visible="display(subAction.display, row)"
-              />
-            </template>
-          </TMagicPopconfirm>
+            :action="subAction"
+            :row="row"
+            :index="index"
+            btn-class="sub-action-btn"
+            :visible="display(subAction.display, row)"
+            @confirm="actionHandler"
+          />
 
-          <TMagicTooltip
+          <ActionButton
             v-else
-            :placement="subAction.tooltipPlacement || 'top'"
-            :disabled="!Boolean(subAction.tooltip)"
-            :content="subAction.tooltip"
-          >
-            <ActionButton
-              :action="subAction"
-              :row="row"
-              :index="index"
-              btn-class="sub-action-btn"
-              :visible="display(subAction.display, row)"
-              @click="actionHandler"
-            />
-          </TMagicTooltip>
+            :action="subAction"
+            :row="row"
+            :index="index"
+            btn-class="sub-action-btn"
+            :visible="display(subAction.display, row)"
+            @click="actionHandler"
+          />
         </template>
       </div>
     </TMagicPopover>
 
-    <TMagicTooltip
+    <ActionButton
       v-else
-      :placement="action.tooltipPlacement || 'top'"
-      :disabled="!Boolean(action.tooltip)"
-      :content="action.tooltip"
-    >
-      <ActionButton
-        :action="action"
-        :row="row"
-        :index="index"
-        :visible="display(action.display, row) && !editState[index]"
-        @click="actionHandler"
-      />
-    </TMagicTooltip>
+      :action="action"
+      :row="row"
+      :index="index"
+      :visible="display(action.display, row) && !editState[index]"
+      @click="actionHandler"
+    />
   </template>
 
   <TMagicButton
@@ -109,12 +85,15 @@
 </template>
 
 <script lang="ts" setup>
+import { ref } from 'vue';
+import { ArrowDown, ArrowRight } from '@element-plus/icons-vue';
 import { cloneDeep } from 'lodash-es';
 
-import { TMagicButton, tMagicMessage, TMagicPopconfirm, TMagicPopover, TMagicTooltip } from '@tmagic/design';
+import { TMagicButton, tMagicMessage, TMagicPopover } from '@tmagic/design';
 
 import ActionButton from './ActionButton.vue';
-import { display, formatActionText as formatter } from './actionHelpers';
+import { display } from './actionHelpers';
+import ActionPopconfirm from './ActionPopconfirm.vue';
 import { ColumnActionConfig, ColumnConfig } from './schema';
 
 defineOptions({
@@ -137,6 +116,11 @@ const props = withDefaults(
     editState: () => [],
   },
 );
+
+const popoverVisible = ref(false);
+const togglePopover = () => {
+  popoverVisible.value = !popoverVisible.value;
+};
 
 const emit = defineEmits<{
   'after-action': [{ index: number }];
@@ -192,15 +176,23 @@ defineExpose({
 });
 </script>
 
-<style scoped>
+<style lang="scss">
 .sub-actions {
   display: flex;
   flex-direction: column;
   gap: 4px;
-}
+  align-items: flex-start;
 
-.sub-actions .sub-action-btn {
-  justify-content: flex-start;
-  width: 100%;
+  .sub-action-btn {
+    width: 100%;
+  }
+
+  .tmagic-design-button + .tmagic-design-button {
+    margin-left: 0;
+  }
+
+  .tmagic-design-button {
+    justify-content: flex-start;
+  }
 }
 </style>

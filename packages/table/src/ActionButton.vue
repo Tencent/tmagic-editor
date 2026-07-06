@@ -1,20 +1,26 @@
 <template>
-  <TMagicButton
-    v-show="visible"
-    :class="btnClass"
-    link
-    size="small"
-    :type="action.buttonType || 'primary'"
-    :icon="action.icon"
-    :disabled="disabled(action.disabled, row)"
-    @click="onClick"
+  <TMagicTooltip
+    :placement="action.tooltipPlacement || 'top'"
+    :disabled="!Boolean(action.tooltip)"
+    :content="action.tooltip"
   >
-    <span v-html="formatter(action.text, row)"></span>
-  </TMagicButton>
+    <TMagicButton
+      v-show="visible"
+      :class="btnClass"
+      link
+      size="small"
+      :type="action.buttonType || 'primary'"
+      :icon="action.icon"
+      :disabled="disabled(action.disabled, row)"
+      @click="onClick"
+    >
+      <span v-html="formatter(action.text, row)"></span>
+    </TMagicButton>
+  </TMagicTooltip>
 </template>
 
 <script lang="ts" setup>
-import { TMagicButton } from '@tmagic/design';
+import { TMagicButton, TMagicTooltip } from '@tmagic/design';
 
 import { disabled, formatActionText as formatter } from './actionHelpers';
 import { ColumnActionConfig } from './schema';

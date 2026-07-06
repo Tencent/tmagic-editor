@@ -37,6 +37,7 @@
     "url": "https://github.com/Tencent/tmagic-editor.git"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^2.3.2",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
