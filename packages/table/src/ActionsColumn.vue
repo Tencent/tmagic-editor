@@ -16,7 +16,7 @@
       :placement="action.subActionConfig?.placement || 'bottom'"
       :width="action.subActionConfig?.popoverWidth"
       :popper-class="action.subActionConfig?.popoverClass"
-      :destroy-on-close="action.subActionConfig?.popoverDestroyOnClose"
+      :destroy-on-close="action.subActionConfig?.popoverDestroyOnClose ?? true"
     >
       <template #reference>
         <TMagicButton
@@ -29,7 +29,7 @@
           @click.stop="togglePopover"
         ></TMagicButton>
       </template>
-      <div class="sub-actions">
+      <div class="tmagic-table-sub-actions">
         <template v-for="(subAction, subIndex) in action.subActionConfig?.items" :key="subIndex">
           <ActionPopconfirm
             v-if="subAction.popconfirm"
@@ -175,24 +175,3 @@ defineExpose({
   cancel,
 });
 </script>
-
-<style lang="scss">
-.sub-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  align-items: flex-start;
-
-  .sub-action-btn {
-    width: 100%;
-  }
-
-  .tmagic-design-button + .tmagic-design-button {
-    margin-left: 0;
-  }
-
-  .tmagic-design-button {
-    justify-content: flex-start;
-  }
-}
-</style>

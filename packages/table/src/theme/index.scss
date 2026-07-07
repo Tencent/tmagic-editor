@@ -13,3 +13,22 @@
     color: #999;
   }
 }
+
+.tmagic-table-sub-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+
+  .sub-action-btn {
+    width: 100%;
+  }
+
+  .tmagic-design-button + .tmagic-design-button {
+    margin-left: 0;
+  }
+
+  .tmagic-design-button {
+    justify-content: flex-start;
+  }
+}
