@@ -36,6 +36,9 @@ const itemComponent = computed(() => (props.config.childType === 'button' ? TMag
 const emit = defineEmits(['change']);
 
 const clickHandler = (item: string | number | boolean) => {
+  if (props.disabled) {
+    return;
+  }
   // 再次点击取消选中
   emit('change', props.model[props.name] === item ? '' : item);
 };
