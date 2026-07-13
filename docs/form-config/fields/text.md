@@ -82,6 +82,21 @@ Input输入框的type为'text', 是type的默认值，所以可以不配置
 </template>
 </demo-block>
 
+## 表单校验
+
+可通过 `rules` 配置校验规则。其中 `typeMatch: true` 会按字段 type（以及 `filter` / `valueFormat` 等）校验值是否合法，详见[表单校验](/form-config/rules.md)。
+
+```ts
+{
+  name: 'text',
+  text: '输入框',
+  rules: [
+    { required: true, message: '请输入' },
+    { typeMatch: true, message: '值类型不合法' },
+  ],
+}
+```
+
 ## 去掉首尾空格
 
 <demo-block type="form" :config="[{
@@ -124,6 +139,7 @@ Input输入框的type为'text', 是type的默认值，所以可以不配置
 | tooltip     | 输入时显示内容     | string / `ToolTipConfigType` | —      | —      |
 | trim        | 是否去掉首尾空格   | boolean                                                                                                                                                   | —      | false  |
 | filter      | 过滤值             | string / Function                                                                                                                                         | number | -      |
+| rules       | 表单验证规则       | `Rule[]`                                                                                                                                                  | —      | —      |
 | prepend     | 前置内容           | string                                                                                                                                                    | —      | -      |
 | append      | 后置内容           | string / Object                                                                                                                                           | —      | -      |
 | onChange    | 值变化时触发的函数 | `OnChangeHandler`            | —      | -      |
@@ -140,6 +156,8 @@ Input输入框的type为'text', 是type的默认值，所以可以不配置
 <<< @/../packages/form-schema/src/base.ts#FormValue{ts}
 
 <<< @/../packages/form-schema/src/base.ts#ToolTipConfigType{ts}
+
+<<< @/../packages/form-schema/src/base.ts#Rule{ts}
 :::
 
 

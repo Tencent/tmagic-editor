@@ -39,6 +39,8 @@ import type {
   TypeFunction,
 } from '../schema';
 
+import { createTypeMatchValidator } from './typeMatch';
+
 interface DefaultItem {
   defaultValue: any;
   type: string;
@@ -261,6 +263,11 @@ export const getRules = function (mForm: FormState | undefined, rules: Rule[] | 
   }
 
   return rules.map((item) => {
+    if (item.typeMatch) {
+      (item as any).validator = createTypeMatchValidator(mForm, props, item);
+      return item;
+    }
+
     if (typeof item.validator === 'function') {
       const fnc = item.validator;
 

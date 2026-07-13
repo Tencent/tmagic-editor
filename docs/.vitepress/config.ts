@@ -489,6 +489,15 @@ export default defineConfig({
           ]
         },
         {
+          text: '表单校验',
+          items: [
+            {
+              text: '表单校验',
+              link: '/form-config/rules.md',
+            }
+          ]
+        },
+        {
           text: '表单对比',
           items: [
             {

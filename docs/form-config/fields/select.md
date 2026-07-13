@@ -24,6 +24,26 @@ type为'select'
 </template>
 </demo-block>
 
+## 选项值校验
+
+可在 `rules` 中开启 `typeMatch`，校验当前值是否落在 `options` 中（`multiple` 时校验数组元素）。详见[表单校验](/form-config/rules.md)。
+
+```ts
+{
+  type: 'select',
+  name: 'status',
+  text: '状态',
+  options: [
+    { text: '启用', value: 1 },
+    { text: '禁用', value: 0 },
+  ],
+  rules: [
+    { required: true, message: '请选择状态' },
+    { typeMatch: true, message: '状态值不合法' },
+  ],
+}
+```
+
 ## 有禁用选项
 
 <demo-block type="form" :config="[{

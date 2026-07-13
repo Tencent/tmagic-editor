@@ -63,6 +63,17 @@ export {
   registerField as registerFormField,
 } from './utils/config';
 
+export {
+  clearTypeMatchRules,
+  deleteTypeMatchRule,
+  getTypeMatchRule,
+  registerTypeMatchRule,
+  registerTypeMatchRules,
+  validateTypeMatch,
+} from './utils/typeMatch';
+
+export type { TypeMatchValidateContext, TypeMatchValidator } from './utils/typeMatch';
+
 export type { FormInstallOptions } from './plugin';
 
 export const createForm = <T extends [] = []>(config: FormConfig | T) => config;

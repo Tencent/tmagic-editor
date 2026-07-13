@@ -163,10 +163,13 @@ export interface ContainerCommonConfig<T = never> extends FormItem {
 }
 // #endregion ContainerCommonConfig
 
+// #region Rule
 export interface Rule {
   message?: string;
   /** 系统提供的验证器类型。有：string,number,boolean,method,regexp,integer,float,array,object,enum,date,url,hex,email,any */
   type?: string;
+  /** 是否按字段 config.type 校验值类型/选项匹配 */
+  typeMatch?: boolean;
   /** 是否必填 */
   required?: boolean;
   trigger?: string;
@@ -195,6 +198,7 @@ export interface Rule {
     mForm: FormState | undefined,
   ) => void;
 }
+// #endregion Rule
 
 // #region Input
 export interface Input {

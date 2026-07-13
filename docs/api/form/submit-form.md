@@ -68,7 +68,10 @@ try {
         type: 'text',
         name: 'username',
         text: '用户名',
-        rules: [{ required: true, message: '请输入用户名' }],
+        rules: [
+          { required: true, message: '请输入用户名' },
+          { typeMatch: true, message: '用户名类型不合法' },
+        ],
       },
     ],
     initValues: { username: '' },

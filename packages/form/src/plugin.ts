@@ -47,14 +47,19 @@ import Textarea from './fields/Textarea.vue';
 import Time from './fields/Time.vue';
 import Timerange from './fields/Timerange.vue';
 import { setConfig } from './utils/config';
+import { registerTypeMatchRules, type TypeMatchValidator } from './utils/typeMatch';
 import Form from './Form.vue';
 import FormDialog from './FormDialog.vue';
 
 import './theme/index.scss';
 
+// #region FormInstallOptions
 export interface FormInstallOptions {
+  /** 自定义字段 type 的 typeMatch 校验规则，可覆盖内置规则或扩展业务字段 */
+  typeMatchRules?: Record<string, TypeMatchValidator>;
   [key: string]: any;
 }
+// #endregion FormInstallOptions
 
 const defaultInstallOpt: FormInstallOptions = {};
 
@@ -64,6 +69,10 @@ export default {
 
     app.config.globalProperties.$MAGIC_FORM = option;
     setConfig(option);
+
+    if (option.typeMatchRules) {
+      registerTypeMatchRules(option.typeMatchRules);
+    }
 
     app.component('m-form', Form);
     app.component('m-form-dialog', FormDialog);

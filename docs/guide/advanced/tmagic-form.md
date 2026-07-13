@@ -2,7 +2,7 @@
 
 tmagic-editor的表单配置，核心就是使用了 @tmagic/form 来作为渲染器。@tmagic/form 是一个 npm 包，可以安装它，在你想使用的地方单独使用。
 
-@tmagic/form 接受一个表单配置，详细配置可参考[表单 api](../../api/form/form-props.md)。
+@tmagic/form 接受一个表单配置，详细配置可参考[表单 api](../../api/form/form-props.md)。字段校验（含 `typeMatch` 类型匹配）见[表单校验](../../form-config/rules.md)。
 
 ## 安装
 
@@ -43,6 +43,20 @@ app.use(ElementPlus, {
 app.use(TMagicDesign, MagicElementPlusAdapter);
 app.use(MagicForm);
 app.mount("#app");
+```
+
+也可在安装时传入自定义 `typeMatch` 规则，详见[表单校验 - 扩展自定义 type 规则](../../form-config/rules.md#扩展自定义-type-规则)：
+
+```javascript
+app.use(MagicForm, {
+  typeMatchRules: {
+    'my-field': (value, { message }) => {
+      if (typeof value !== 'string') {
+        return message || 'my-field 应为字符串';
+      }
+    },
+  },
+});
 ```
 
 
