@@ -10,9 +10,14 @@ import editorPlugin from '@editor/plugin';
 vi.mock('@tmagic/design', () => ({
   default: { install: vi.fn() },
 }));
-vi.mock('@tmagic/form', () => ({
-  default: { install: vi.fn() },
-}));
+vi.mock('@tmagic/form', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@tmagic/form')>();
+  return {
+    ...actual,
+    default: { install: vi.fn() },
+    registerTypeMatchRules: vi.fn(),
+  };
+});
 vi.mock('@tmagic/table', () => ({
   default: { install: vi.fn() },
 }));
@@ -70,10 +75,13 @@ describe('plugin install', () => {
     };
   };
 
-  test('install 调用 design/form/table 插件并注册全局组件', () => {
+  test('install 调用 design/form/table 插件并注册全局组件', async () => {
+    const { registerTypeMatchRules } = await import('@tmagic/form');
+    const { editorTypeMatchRules } = await import('@editor/utils/typeMatchRules');
     const { app, components } = buildApp();
     editorPlugin.install(app, { someOption: true } as any);
     expect(app.use).toHaveBeenCalledTimes(3);
+    expect(registerTypeMatchRules).toHaveBeenCalledWith(editorTypeMatchRules);
     expect(Object.keys(components).length).toBeGreaterThan(10);
     expect(components.MEditor).toBeDefined();
   });

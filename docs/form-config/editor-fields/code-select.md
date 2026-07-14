@@ -24,6 +24,10 @@ CodeSelect 组件支持：
 - 选择数据源方法
 - 配置代码块参数
 
+## 值校验
+
+安装 `@tmagic/editor` 后该字段会自动注册内置 `typeMatch` 校验规则：做 `{ hookType: 'code', hookData }` 的浅层结构校验，`codeId` / 数据源方法存在性由内部单元格各自校验。服务数据未就绪时仅做基础形态校验。详见[表单校验 - Editor 字段内置规则](/form-config/rules.md#editor-字段内置规则)。
+
 ## Attributes
 
 | 参数      | 说明               | 类型                                                                                                                                                     | 可选值 | 默认值 |

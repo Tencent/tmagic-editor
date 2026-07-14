@@ -239,29 +239,29 @@ const validateSelectValue = (
   if (config.allowCreate || config.remote) {
     if (config.multiple) {
       if (!Array.isArray(value)) {
-        return defaultMessage(message, '值类型应为数组');
+        return defaultMessage(message, `${value} 类型应为数组`);
       }
       return undefined;
     }
 
     if (typeof value === 'object') {
-      return defaultMessage(message, '值类型不合法');
+      return defaultMessage(message, `${value} 类型不合法`);
     }
     return undefined;
   }
 
   if (config.multiple) {
     if (!Array.isArray(value)) {
-      return defaultMessage(message, '值类型应为数组');
+      return defaultMessage(message, `${value} 类型应为数组`);
     }
     if (value.some((item) => !includesOptionValue(optionValues, item))) {
-      return defaultMessage(message, '值不在可选项中');
+      return defaultMessage(message, `${value} 不在可选项中`);
     }
     return undefined;
   }
 
   if (!includesOptionValue(optionValues, value)) {
-    return defaultMessage(message, '值不在可选项中');
+    return defaultMessage(message, `${value} 不在可选项中`);
   }
   return undefined;
 };
@@ -279,14 +279,14 @@ const validateCascaderValue = (
 
   if (valueSeparator) {
     if (typeof value !== 'string' && !Array.isArray(value)) {
-      return defaultMessage(message, '值类型应为字符串或数组');
+      return defaultMessage(message, `${value} 类型应为字符串或数组`);
     }
   } else if (multiple) {
     if (!Array.isArray(value)) {
-      return defaultMessage(message, '值类型应为数组');
+      return defaultMessage(message, `${value} 类型应为数组`);
     }
   } else if (emitPath && !Array.isArray(value)) {
-    return defaultMessage(message, '值类型应为数组');
+    return defaultMessage(message, `${value} 类型应为数组`);
   }
 
   if (config.remote) {
@@ -302,7 +302,7 @@ const validateCascaderValue = (
 
   if (multiple) {
     if (!Array.isArray(normalizedValue)) {
-      return defaultMessage(message, '值类型应为数组');
+      return defaultMessage(message, `${value} 类型应为数组`);
     }
 
     const invalid = normalizedValue.some((item) => {
@@ -313,20 +313,20 @@ const validateCascaderValue = (
     });
 
     if (invalid) {
-      return defaultMessage(message, '值不在可选项中');
+      return defaultMessage(message, `${value} 不在可选项中`);
     }
     return undefined;
   }
 
   if (emitPath) {
     if (!Array.isArray(normalizedValue) || !isValidCascaderPath(options, normalizedValue)) {
-      return defaultMessage(message, '值不在可选项中');
+      return defaultMessage(message, `${value} 不在可选项中`);
     }
     return undefined;
   }
 
   if (!includesOptionValue(collectCascaderLeafValues(options), normalizedValue)) {
-    return defaultMessage(message, '值不在可选项中');
+    return defaultMessage(message, `${value} 不在可选项中`);
   }
   return undefined;
 };
@@ -347,7 +347,7 @@ const validateBuiltinTypeMatch = (
   if (STRING_TYPES.has(fieldType)) {
     if (config.filter === 'number') {
       if (typeof value !== 'number' || Number.isNaN(value)) {
-        return defaultMessage(message, '值类型应为数字');
+        return defaultMessage(message, `${value} 类型应为数字`);
       }
       return undefined;
     }
@@ -358,7 +358,7 @@ const validateBuiltinTypeMatch = (
     }
 
     if (typeof value !== 'string') {
-      return defaultMessage(message, '值类型应为字符串');
+      return defaultMessage(message, `${value} 类型应为字符串`);
     }
     return undefined;
   }
@@ -373,7 +373,7 @@ const validateBuiltinTypeMatch = (
 
   if (fieldType === 'number') {
     if (typeof value !== 'number' || Number.isNaN(value)) {
-      return defaultMessage(message, '值类型应为数字');
+      return defaultMessage(message, `${value} 类型应为数字`);
     }
     return undefined;
   }
@@ -384,7 +384,7 @@ const validateBuiltinTypeMatch = (
       value.length !== 2 ||
       value.some((item) => typeof item !== 'number' || Number.isNaN(item))
     ) {
-      return defaultMessage(message, '值类型应为长度为 2 的数字数组');
+      return defaultMessage(message, `${value} 类型应为长度为 2 的数字数组`);
     }
     return undefined;
   }
@@ -392,7 +392,7 @@ const validateBuiltinTypeMatch = (
   if (fieldType === 'switch' || fieldType === 'checkbox') {
     const { activeValue, inactiveValue } = resolveToggleValues(config);
     if (!Object.is(value, activeValue) && !Object.is(value, inactiveValue)) {
-      return defaultMessage(message, '值不在合法开关值中');
+      return defaultMessage(message, `${value} 不在合法开关值中`);
     }
     return undefined;
   }
@@ -405,18 +405,18 @@ const validateBuiltinTypeMatch = (
   if (fieldType === 'radio-group') {
     const optionValues = flattenSelectOptions(resolveOptions(mForm, props));
     if (!includesOptionValue(optionValues, value)) {
-      return defaultMessage(message, '值不在可选项中');
+      return defaultMessage(message, `${value} 不在可选项中`);
     }
     return undefined;
   }
 
   if (fieldType === 'checkbox-group') {
     if (!Array.isArray(value)) {
-      return defaultMessage(message, '值类型应为数组');
+      return defaultMessage(message, `${value} 类型应为数组`);
     }
     const optionValues = flattenSelectOptions(resolveOptions(mForm, props));
     if (value.some((item) => !includesOptionValue(optionValues, item))) {
-      return defaultMessage(message, '值不在可选项中');
+      return defaultMessage(message, `${value} 不在可选项中`);
     }
     return undefined;
   }
@@ -438,8 +438,8 @@ const validateBuiltinTypeMatch = (
       return defaultMessage(
         message,
         isTimestampValueFormat(valueFormat)
-          ? '值类型应为长度为 2 的时间戳数字数组'
-          : `值格式应为长度为 2 的 ${valueFormat} 数组`,
+          ? `${value} 类型应为长度为 2 的时间戳数字数组`
+          : `${value} 格式应为长度为 2 的 ${valueFormat} 数组`,
       );
     }
     return undefined;
@@ -447,7 +447,7 @@ const validateBuiltinTypeMatch = (
 
   if (fieldType === 'table' || fieldType === 'group-list' || fieldType === 'grouplist') {
     if (!Array.isArray(value)) {
-      return defaultMessage(message, '值类型应为数组');
+      return defaultMessage(message, `${value} 类型应为数组`);
     }
     return undefined;
   }

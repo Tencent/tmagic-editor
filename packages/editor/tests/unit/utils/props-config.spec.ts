@@ -10,10 +10,12 @@ import { NODE_CONDS_RESULT_KEY } from '@tmagic/core';
 import {
   advancedTabConfig,
   arrayOptions,
+  booleanOptions,
   displayTabConfig,
   eqOptions,
   eventTabConfig,
   fillConfig,
+  getCondOpOptionsByFieldType,
   numberOptions,
   styleTabConfig,
 } from '@editor/utils/props';
@@ -26,10 +28,31 @@ vi.mock('@tmagic/design', () => ({
 }));
 
 describe('props 选项常量', () => {
-  test('eqOptions / arrayOptions / numberOptions 内容稳定', () => {
+  test('eqOptions / arrayOptions / numberOptions / booleanOptions 内容稳定', () => {
     expect(eqOptions.map((o) => o.value)).toEqual(['=', '!=']);
     expect(arrayOptions.map((o) => o.value)).toEqual(['include', 'not_include']);
     expect(numberOptions.map((o) => o.value)).toEqual(['>', '>=', '<', '<=', 'between', 'not_between']);
+    expect(booleanOptions.map((o) => o.value)).toEqual(['is', 'not']);
+  });
+
+  test('getCondOpOptionsByFieldType 按类型返回选项', () => {
+    expect(getCondOpOptionsByFieldType('array')).toEqual(arrayOptions);
+    expect(getCondOpOptionsByFieldType('boolean')).toEqual(booleanOptions);
+    expect(getCondOpOptionsByFieldType('null')).toEqual(booleanOptions);
+    expect(getCondOpOptionsByFieldType('number').map((o) => o.value)).toEqual([
+      ...eqOptions.map((o) => o.value),
+      ...numberOptions.map((o) => o.value),
+    ]);
+    expect(getCondOpOptionsByFieldType('string').map((o) => o.value)).toEqual([
+      ...arrayOptions.map((o) => o.value),
+      ...eqOptions.map((o) => o.value),
+    ]);
+    expect(getCondOpOptionsByFieldType('any').map((o) => o.value)).toEqual([
+      ...arrayOptions.map((o) => o.value),
+      ...eqOptions.map((o) => o.value),
+      ...numberOptions.map((o) => o.value),
+    ]);
+    expect(getCondOpOptionsByFieldType('').map((o) => o.value)).not.toContain('is');
   });
 
   test('styleTabConfig / eventTabConfig / displayTabConfig 基础结构', () => {

@@ -11,6 +11,7 @@ import {
   getFieldType,
   getFormConfig,
   getFormValue,
+  resolveFieldByPath,
 } from '@editor/utils/data-source';
 
 describe('data-source utils', () => {
@@ -82,6 +83,48 @@ describe('data-source utils', () => {
     ];
     const opts = getCascaderOptionsFromFields(fields, ['number']);
     expect(opts.map((o) => o.value)).toEqual(['a']);
+  });
+
+  test('resolveFieldByPath 沿 path 下钻', () => {
+    const fields: any = [
+      {
+        name: 'obj',
+        type: 'object',
+        fields: [{ name: 'name', type: 'string' }],
+      },
+      {
+        name: 'arr',
+        type: 'array',
+        fields: [{ name: 'item', type: 'number' }],
+      },
+    ];
+
+    expect(resolveFieldByPath(fields, ['obj', 'name'])).toMatchObject({
+      ok: true,
+      field: { name: 'name', type: 'string' },
+      fields: [],
+    });
+    expect(resolveFieldByPath(fields, ['obj']).field?.name).toBe('obj');
+    expect(resolveFieldByPath(fields, ['unknown'])).toEqual({ ok: false, fields });
+    expect(resolveFieldByPath(undefined, ['x'])).toEqual({ ok: false, fields: [] });
+    expect(resolveFieldByPath(fields, []).ok).toBe(true);
+  });
+
+  test('resolveFieldByPath 可跳过数字下标', () => {
+    const fields: any = [
+      {
+        name: 'arr',
+        type: 'array',
+        fields: [{ name: 'item', type: 'number', fields: [{ name: 'n', type: 'string' }] }],
+      },
+    ];
+
+    const result = resolveFieldByPath(fields, ['arr', '0', 'item'], { skipNumberIndices: true });
+    expect(result.ok).toBe(true);
+    expect(result.field?.name).toBe('item');
+    expect(result.fields).toEqual([{ name: 'n', type: 'string' }]);
+
+    expect(resolveFieldByPath(fields, ['arr', '0', 'missing'], { skipNumberIndices: true }).ok).toBe(false);
   });
 
   test('getFieldType 沿 path 取最终类型', () => {

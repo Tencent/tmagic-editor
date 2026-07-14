@@ -67,11 +67,9 @@ import { computed } from 'vue';
 import { Delete } from '@element-plus/icons-vue';
 import { has } from 'lodash-es';
 
-import type { EventOption, MComponent, MContainer } from '@tmagic/core';
 import { ActionType } from '@tmagic/core';
 import { TMagicButton } from '@tmagic/design';
 import type {
-  CascaderOption,
   CodeSelectColConfig,
   ContainerChangeEventData,
   DataSourceMethodSelectConfig,
@@ -84,10 +82,15 @@ import type {
   UISelectConfig,
 } from '@tmagic/form';
 import { defineFormItem, MContainer as MFormContainer, MPanel, MTable } from '@tmagic/form';
-import { DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX, traverseNode } from '@tmagic/utils';
 
 import { useServices } from '@editor/hooks/use-services';
-import { getCascaderOptionsFromFields } from '@editor/utils';
+import {
+  getCompActionAllowedValues,
+  getCompActionOptions,
+  getEventNameAllowedValues,
+  getEventNameOptions,
+  normalizeCompActionValue,
+} from '@editor/utils';
 
 defineOptions({
   name: 'MFieldsEventSelect',
@@ -118,66 +121,54 @@ const eventNameConfig = computed(() => {
     labelWidth: '40px',
     checkStrictly: () => props.config.src !== 'component',
     valueSeparator: '.',
-    options: (mForm: FormState, { formValue }: any) => {
-      let events: EventOption[] | CascaderOption[] = [];
-
-      if (props.config.src === 'component') {
-        events = eventsService.getEvent(formValue.type);
-
-        if (formValue.type === 'page-fragment-container' && formValue.pageFragmentId) {
-          const pageFragment = editorService.get('root')?.items?.find((page) => page.id === formValue.pageFragmentId);
-          if (pageFragment) {
-            events = [
-              {
-                label: pageFragment.name || '页面片容器',
-                value: pageFragment.id,
-                children: events,
-              },
-            ];
-            pageFragment.items.forEach((node) => {
-              traverseNode<MComponent | MContainer>(node, (node) => {
-                const nodeEvents = (node.type && eventsService.getEvent(node.type)) || [];
-
-                events.push({
-                  label: `${node.name}_${node.id}`,
-                  value: `${node.id}`,
-                  children: nodeEvents,
-                });
-              });
-            });
-
-            return events;
+    options: (_mForm: FormState, { formValue }: any) => getEventNameOptions(props.config.src, formValue),
+    rules: [
+      {
+        validator: ({ value, callback }: any, { formValue }: any) => {
+          const allowedNames = getEventNameAllowedValues(props.config as any, formValue);
+          if (allowedNames && allowedNames.size > 0 && value && !allowedNames.has(value)) {
+            return callback(`事件名(${value})不存在`);
           }
-        }
-
-        return events.map((option) => ({
-          text: option.label,
-          value: option.value,
-        }));
-      }
-
-      if (props.config.src === 'datasource') {
-        // 从数据源类型中获取到相关事件
-        events = dataSourceService.getFormEvent(formValue.type);
-        // 从数据源类型和实例中分别获取数据以追加数据变化的事件
-        const dataSource = dataSourceService.getDataSourceById(formValue.id);
-        const fields = dataSource?.fields || [];
-        if (fields.length > 0) {
-          return [
-            ...events,
-            {
-              label: '数据变化',
-              value: DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX,
-              children: getCascaderOptionsFromFields(fields),
-            },
-          ];
-        }
-
-        return events;
-      }
-    },
+          callback();
+        },
+      },
+    ],
   };
   return { ...defaultEventNameConfig, ...props.config.eventNameConfig };
+});
+
+const actionTypeOptions = computed(() => {
+  const o: {
+    text: string;
+    label: string;
+    value: string;
+    disabled?: boolean;
+  }[] = [
+    {
+      text: '组件',
+      label: '组件',
+      value: ActionType.COMP,
+    },
+  ];
+
+  if (!propsService.getDisabledCodeBlock()) {
+    o.push({
+      text: '代码',
+      label: '代码',
+      disabled: !Object.keys(codeBlockService.getCodeDsl() || {}).length,
+      value: ActionType.CODE,
+    });
+  }
+
+  if (!propsService.getDisabledDataSource()) {
+    o.push({
+      text: '数据源',
+      label: '数据源',
+      value: ActionType.DATA_SOURCE,
+    });
+  }
+
+  return o;
 });
 
 // 联动类型
@@ -187,39 +178,17 @@ const actionTypeConfig = computed(() => {
     text: '联动类型',
     type: 'select',
     defaultValue: ActionType.COMP,
-    options: () => {
-      const o: {
-        text: string;
-        label: string;
-        value: string;
-        disabled?: boolean;
-      }[] = [
-        {
-          text: '组件',
-          label: '组件',
-          value: ActionType.COMP,
-        },
-      ];
-
-      if (!propsService.getDisabledCodeBlock()) {
-        o.push({
-          text: '代码',
-          label: '代码',
-          disabled: !Object.keys(codeBlockService.getCodeDsl() || {}).length,
-          value: ActionType.CODE,
-        });
-      }
-
-      if (!propsService.getDisabledDataSource()) {
-        o.push({
-          text: '数据源',
-          label: '数据源',
-          value: ActionType.DATA_SOURCE,
-        });
-      }
-
-      return o;
-    },
+    options: actionTypeOptions.value,
+    rules: [
+      {
+        required: true,
+        message: '联动类型不能为空',
+      },
+      {
+        typeMatch: true,
+        trigger: 'blur',
+      },
+    ],
   };
   return { ...defaultActionTypeConfig, ...props.config.actionTypeConfig };
 });
@@ -234,6 +203,12 @@ const targetCompConfig = computed(() => {
     onChange: (_MForm, _v, { setModel }) => {
       setModel('method', '');
     },
+    rules: [
+      {
+        typeMatch: true,
+        trigger: 'blur',
+      },
+    ],
   };
   return { ...defaultTargetCompConfig, ...props.config.targetCompConfig };
 });
@@ -254,41 +229,20 @@ const compActionConfig = computed(() => {
     },
     checkStrictly: () => props.config.src !== 'component',
     display: (mForm: FormState | undefined, { model }: any) => model.actionType === ActionType.COMP,
-    options: (mForm: FormState, { model }: any) => {
-      const node = editorService.getNodeById(model.to);
-      if (!node?.type) return [];
-
-      let methods: EventOption[] | CascaderOption[] = [];
-
-      methods = eventsService.getMethod(node.type, model.to);
-
-      if (node.type === 'page-fragment-container' && node.pageFragmentId) {
-        const pageFragment = editorService.get('root')?.items?.find((page) => page.id === node.pageFragmentId);
-        if (pageFragment) {
-          methods = [];
-          pageFragment.items.forEach((node: MComponent | MContainer) => {
-            traverseNode<MComponent | MContainer>(node, (node) => {
-              const nodeMethods = (node.type && eventsService.getMethod(node.type, node.id)) || [];
-
-              if (nodeMethods.length) {
-                methods.push({
-                  label: `${node.name}_${node.id}`,
-                  value: `${node.id}`,
-                  children: nodeMethods,
-                });
-              }
-            });
-          });
-
-          return methods;
-        }
-      }
-
-      return methods.map((method) => ({
-        text: method.label,
-        value: method.value,
-      }));
-    },
+    options: (_mForm: FormState, { model }: any) => getCompActionOptions(model.to),
+    rules: [
+      {
+        trigger: 'blur',
+        validator: ({ value, callback }: any, { model }: any) => {
+          const allowedMethods = getCompActionAllowedValues(props.config as any, model);
+          const normalized = normalizeCompActionValue(value);
+          if (allowedMethods && allowedMethods.size > 0 && normalized && !allowedMethods.has(normalized)) {
+            return callback(`动作名(${normalized})不存在`);
+          }
+          callback();
+        },
+      },
+    ],
   };
   return { ...defaultCompActionConfig, ...props.config.compActionConfig };
 });

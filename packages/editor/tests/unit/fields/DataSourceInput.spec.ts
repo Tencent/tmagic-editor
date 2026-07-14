@@ -29,12 +29,16 @@ vi.mock('@editor/hooks/use-services', () => ({
   useServices: () => ({ dataSourceService, propsService }),
 }));
 
-vi.mock('@editor/utils/data-source', () => ({
-  getDisplayField: vi.fn((_dss: any, value: string) => {
-    if (!value) return [];
-    return [{ value, type: 'text' }];
-  }),
-}));
+vi.mock('@editor/utils/data-source', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@editor/utils/data-source')>();
+  return {
+    ...actual,
+    getDisplayField: vi.fn((_dss: any, value: string) => {
+      if (!value) return [];
+      return [{ value, type: 'text' }];
+    }),
+  };
+});
 
 vi.mock('@editor/components/Icon.vue', () => ({
   default: defineComponent({ name: 'IconStub', setup: () => () => h('i') }),

@@ -27,6 +27,10 @@
 }
 ```
 
+## 值校验
+
+安装 `@tmagic/editor` 后该字段会自动注册内置 `typeMatch` 校验规则：须为 `[dsId, methodName]`，方法须在该数据源可选方法集中。服务数据未就绪时仅做基础形态校验。详见[表单校验 - Editor 字段内置规则](/form-config/rules.md#editor-字段内置规则)。
+
 ## Attributes
 
 | 参数        | 说明                                        | 类型                                                                                                                                                     | 可选值 | 默认值 |

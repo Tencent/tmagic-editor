@@ -93,7 +93,8 @@ const codeConfig = computed<GroupListConfig>(() => ({
             { value: HookCodeType.CODE, text: '代码块' },
             { value: HookCodeType.DATA_SOURCE_METHOD, text: '数据源方法' },
           ],
-          defaultValue: 'code',
+          rules: [{ typeMatch: true, trigger: 'blur' }],
+          defaultValue: HookCodeType.CODE,
           onChange: (_mForm, v: HookCodeType, { setModel }) => {
             if (v === HookCodeType.DATA_SOURCE_METHOD) {
               setModel('codeId', []);
@@ -111,6 +112,7 @@ const codeConfig = computed<GroupListConfig>(() => ({
           labelWidth: 0,
           display: (_mForm, { model }) => model.codeType !== HookCodeType.DATA_SOURCE_METHOD,
           notEditable: () => !codeBlockService.getEditStatus(),
+          rules: [{ typeMatch: true, trigger: 'blur' }],
         },
         {
           type: 'data-source-method-select',
@@ -119,6 +121,7 @@ const codeConfig = computed<GroupListConfig>(() => ({
           labelWidth: 0,
           display: (_mForm, { model }) => model.codeType === HookCodeType.DATA_SOURCE_METHOD,
           notEditable: () => !dataSourceService.get('editable'),
+          rules: [{ typeMatch: true }],
         },
       ],
     },

@@ -28,6 +28,8 @@ import {
   validateTypeMatch,
 } from '@form/utils/typeMatch';
 
+import { setDesignConfig } from '@tmagic/design';
+
 const mForm: FormState = {
   config: [],
   initValues: {},
@@ -74,15 +76,15 @@ describe('validateTypeMatch', () => {
 
   test('text 期望 string', () => {
     expect(validateTypeMatch('ok', mForm, propsOf({ type: 'text' }))).toBeUndefined();
-    expect(validateTypeMatch(1, mForm, propsOf({ type: 'text' }))).toBe('值类型应为字符串');
+    expect(validateTypeMatch(1, mForm, propsOf({ type: 'text' }))).toBe('1 类型应为字符串');
     expect(validateTypeMatch(1, mForm, propsOf({ type: 'text' }), '自定义错误')).toBe('自定义错误');
   });
 
   test('text filter=number 时期望 number', () => {
     expect(validateTypeMatch(1, mForm, propsOf({ type: 'text', filter: 'number' }))).toBeUndefined();
     expect(validateTypeMatch(0, mForm, propsOf({ type: 'text', filter: 'number' }))).toBeUndefined();
-    expect(validateTypeMatch('1', mForm, propsOf({ type: 'text', filter: 'number' }))).toBe('值类型应为数字');
-    expect(validateTypeMatch(NaN, mForm, propsOf({ type: 'textarea', filter: 'number' }))).toBe('值类型应为数字');
+    expect(validateTypeMatch('1', mForm, propsOf({ type: 'text', filter: 'number' }))).toBe('1 类型应为数字');
+    expect(validateTypeMatch(NaN, mForm, propsOf({ type: 'textarea', filter: 'number' }))).toBe('NaN 类型应为数字');
   });
 
   test('text 自定义 filter 函数时跳过内置类型校验', () => {
@@ -91,8 +93,8 @@ describe('validateTypeMatch', () => {
 
   test('number 期望 number', () => {
     expect(validateTypeMatch(1, mForm, propsOf({ type: 'number' }))).toBeUndefined();
-    expect(validateTypeMatch('1', mForm, propsOf({ type: 'number' }))).toBe('值类型应为数字');
-    expect(validateTypeMatch(NaN, mForm, propsOf({ type: 'number' }))).toBe('值类型应为数字');
+    expect(validateTypeMatch('1', mForm, propsOf({ type: 'number' }))).toBe('1 类型应为数字');
+    expect(validateTypeMatch(NaN, mForm, propsOf({ type: 'number' }))).toBe('NaN 类型应为数字');
   });
 
   test('date / time / datetime 按 valueFormat（Day.js format）校验', () => {
@@ -124,20 +126,20 @@ describe('validateTypeMatch', () => {
   test('switch / checkbox 默认 true/false', () => {
     expect(validateTypeMatch(true, mForm, propsOf({ type: 'switch' }))).toBeUndefined();
     expect(validateTypeMatch(false, mForm, propsOf({ type: 'checkbox' }))).toBeUndefined();
-    expect(validateTypeMatch(1, mForm, propsOf({ type: 'switch' }))).toBe('值不在合法开关值中');
+    expect(validateTypeMatch(1, mForm, propsOf({ type: 'switch' }))).toBe('1 不在合法开关值中');
   });
 
   test('switch / checkbox filter=number 时为 1/0', () => {
     expect(validateTypeMatch(1, mForm, propsOf({ type: 'switch', filter: 'number' }))).toBeUndefined();
     expect(validateTypeMatch(0, mForm, propsOf({ type: 'checkbox', filter: 'number' }))).toBeUndefined();
-    expect(validateTypeMatch(true, mForm, propsOf({ type: 'switch', filter: 'number' }))).toBe('值不在合法开关值中');
+    expect(validateTypeMatch(true, mForm, propsOf({ type: 'switch', filter: 'number' }))).toBe('true 不在合法开关值中');
   });
 
   test('switch / checkbox 自定义 activeValue/inactiveValue', () => {
     const config = { type: 'switch', activeValue: 'on', inactiveValue: 'off' };
     expect(validateTypeMatch('on', mForm, propsOf(config))).toBeUndefined();
     expect(validateTypeMatch('off', mForm, propsOf(config))).toBeUndefined();
-    expect(validateTypeMatch('maybe', mForm, propsOf(config))).toBe('值不在合法开关值中');
+    expect(validateTypeMatch('maybe', mForm, propsOf(config))).toBe('maybe 不在合法开关值中');
   });
 
   test('select 单选值必须在 options 中', () => {
@@ -149,7 +151,7 @@ describe('validateTypeMatch', () => {
       ],
     };
     expect(validateTypeMatch(1, mForm, propsOf(config))).toBeUndefined();
-    expect(validateTypeMatch(3, mForm, propsOf(config))).toBe('值不在可选项中');
+    expect(validateTypeMatch(3, mForm, propsOf(config))).toBe('3 不在可选项中');
   });
 
   test('select multiple 校验数组元素', () => {
@@ -162,8 +164,8 @@ describe('validateTypeMatch', () => {
       ],
     };
     expect(validateTypeMatch(['a'], mForm, propsOf(config))).toBeUndefined();
-    expect(validateTypeMatch(['a', 'c'], mForm, propsOf(config))).toBe('值不在可选项中');
-    expect(validateTypeMatch('a', mForm, propsOf(config))).toBe('值类型应为数组');
+    expect(validateTypeMatch(['a', 'c'], mForm, propsOf(config))).toBe('a,c 不在可选项中');
+    expect(validateTypeMatch('a', mForm, propsOf(config))).toBe('a 类型应为数组');
   });
 
   test('select options 为函数 / group', () => {
@@ -172,7 +174,7 @@ describe('validateTypeMatch', () => {
       options: () => [{ text: 'A', value: 1 }],
     };
     expect(validateTypeMatch(1, mForm, propsOf(fnConfig))).toBeUndefined();
-    expect(validateTypeMatch(2, mForm, propsOf(fnConfig))).toBe('值不在可选项中');
+    expect(validateTypeMatch(2, mForm, propsOf(fnConfig))).toBe('2 不在可选项中');
 
     const groupConfig = {
       type: 'select',
@@ -186,15 +188,17 @@ describe('validateTypeMatch', () => {
       ],
     };
     expect(validateTypeMatch('a', mForm, propsOf(groupConfig))).toBeUndefined();
-    expect(validateTypeMatch('b', mForm, propsOf(groupConfig))).toBe('值不在可选项中');
+    expect(validateTypeMatch('b', mForm, propsOf(groupConfig))).toBe('b 不在可选项中');
   });
 
   test('select allowCreate / remote 不做枚举', () => {
     expect(validateTypeMatch('custom', mForm, propsOf({ type: 'select', allowCreate: true }))).toBeUndefined();
-    expect(validateTypeMatch({ a: 1 }, mForm, propsOf({ type: 'select', allowCreate: true }))).toBe('值类型不合法');
+    expect(validateTypeMatch({ a: 1 }, mForm, propsOf({ type: 'select', allowCreate: true }))).toBe(
+      '[object Object] 类型不合法',
+    );
     expect(validateTypeMatch(['x'], mForm, propsOf({ type: 'select', multiple: true, remote: true }))).toBeUndefined();
     expect(validateTypeMatch('x', mForm, propsOf({ type: 'select', multiple: true, remote: true }))).toBe(
-      '值类型应为数组',
+      'x 类型应为数组',
     );
   });
 
@@ -207,7 +211,7 @@ describe('validateTypeMatch', () => {
       ],
     };
     expect(validateTypeMatch(1, mForm, propsOf(radio))).toBeUndefined();
-    expect(validateTypeMatch(3, mForm, propsOf(radio))).toBe('值不在可选项中');
+    expect(validateTypeMatch(3, mForm, propsOf(radio))).toBe('3 不在可选项中');
 
     const checkboxGroup = {
       type: 'checkbox-group',
@@ -217,7 +221,7 @@ describe('validateTypeMatch', () => {
       ],
     };
     expect(validateTypeMatch(['a', 'b'], mForm, propsOf(checkboxGroup))).toBeUndefined();
-    expect(validateTypeMatch(['c'], mForm, propsOf(checkboxGroup))).toBe('值不在可选项中');
+    expect(validateTypeMatch(['c'], mForm, propsOf(checkboxGroup))).toBe('c 不在可选项中');
   });
 
   test('cascader 静态路径与 valueSeparator', () => {
@@ -236,33 +240,33 @@ describe('validateTypeMatch', () => {
 
     expect(validateTypeMatch(['zhejiang', 'hangzhou'], mForm, propsOf({ type: 'cascader', options }))).toBeUndefined();
     expect(validateTypeMatch(['zhejiang', 'ningbo'], mForm, propsOf({ type: 'cascader', options }))).toBe(
-      '值不在可选项中',
+      'zhejiang,ningbo 不在可选项中',
     );
     expect(
       validateTypeMatch('zhejiang/hangzhou', mForm, propsOf({ type: 'cascader', options, valueSeparator: '/' })),
     ).toBeUndefined();
-    expect(validateTypeMatch('bad', mForm, propsOf({ type: 'cascader', remote: true }))).toBe('值类型应为数组');
+    expect(validateTypeMatch('bad', mForm, propsOf({ type: 'cascader', remote: true }))).toBe('bad 类型应为数组');
     expect(validateTypeMatch(['a'], mForm, propsOf({ type: 'cascader', remote: true }))).toBeUndefined();
   });
 
   test('number-range / daterange / table', () => {
     expect(validateTypeMatch([1, 2], mForm, propsOf({ type: 'number-range' }))).toBeUndefined();
-    expect(validateTypeMatch([1], mForm, propsOf({ type: 'number-range' }))).toBe('值类型应为长度为 2 的数字数组');
+    expect(validateTypeMatch([1], mForm, propsOf({ type: 'number-range' }))).toBe('1 类型应为长度为 2 的数字数组');
 
     expect(
       validateTypeMatch(['2020/01/01 00:00:00', '2020/01/02 00:00:00'], mForm, propsOf({ type: 'daterange' })),
     ).toBeUndefined();
     expect(validateTypeMatch(['2020-01-01', '2020-01-02'], mForm, propsOf({ type: 'daterange' }))).toBe(
-      '值格式应为长度为 2 的 YYYY/MM/DD HH:mm:ss 数组',
+      '2020-01-01,2020-01-02 格式应为长度为 2 的 YYYY/MM/DD HH:mm:ss 数组',
     );
     expect(validateTypeMatch(['a'], mForm, propsOf({ type: 'daterange' }))).toBe(
-      '值格式应为长度为 2 的 YYYY/MM/DD HH:mm:ss 数组',
+      'a 格式应为长度为 2 的 YYYY/MM/DD HH:mm:ss 数组',
     );
     expect(validateTypeMatch([1, 2], mForm, propsOf({ type: 'daterange', valueFormat: 'timestamp' }))).toBeUndefined();
     expect(validateTypeMatch('x', mForm, propsOf({ type: 'daterange', names: ['a', 'b'] }))).toBeUndefined();
 
     expect(validateTypeMatch([{ id: 1 }], mForm, propsOf({ type: 'table' }))).toBeUndefined();
-    expect(validateTypeMatch({}, mForm, propsOf({ type: 'groupList' }))).toBe('值类型应为数组');
+    expect(validateTypeMatch({}, mForm, propsOf({ type: 'groupList' }))).toBe('[object Object] 类型应为数组');
   });
 
   test('容器类字段 no-op', () => {
@@ -272,25 +276,25 @@ describe('validateTypeMatch', () => {
 
   test('无 type 默认按 text 校验', () => {
     expect(validateTypeMatch('ok', mForm, propsOf({}))).toBeUndefined();
-    expect(validateTypeMatch(1, mForm, propsOf({}))).toBe('值类型应为字符串');
+    expect(validateTypeMatch(1, mForm, propsOf({}))).toBe('1 类型应为字符串');
   });
 
   test('textarea / color-picker / html 期望 string', () => {
     expect(validateTypeMatch('ok', mForm, propsOf({ type: 'textarea' }))).toBeUndefined();
     expect(validateTypeMatch('ok', mForm, propsOf({ type: 'color-picker' }))).toBeUndefined();
-    expect(validateTypeMatch(1, mForm, propsOf({ type: 'html' }))).toBe('值类型应为字符串');
+    expect(validateTypeMatch(1, mForm, propsOf({ type: 'html' }))).toBe('1 类型应为字符串');
   });
 
   test('checkbox-group 非数组', () => {
     expect(
       validateTypeMatch('a', mForm, propsOf({ type: 'checkbox-group', options: [{ text: 'A', value: 'a' }] })),
-    ).toBe('值类型应为数组');
+    ).toBe('a 类型应为数组');
   });
 
   test('timerange 按 valueFormat 校验', () => {
     expect(validateTypeMatch(['12:00:00', '13:00:00'], mForm, propsOf({ type: 'timerange' }))).toBeUndefined();
     expect(validateTypeMatch(['bad'], mForm, propsOf({ type: 'timerange' }))).toBe(
-      '值格式应为长度为 2 的 HH:mm:ss 数组',
+      'bad 格式应为长度为 2 的 HH:mm:ss 数组',
     );
   });
 
@@ -306,7 +310,7 @@ describe('validateTypeMatch', () => {
       validateTypeMatch('hangzhou', mForm, propsOf({ type: 'cascader', options, emitPath: false })),
     ).toBeUndefined();
     expect(validateTypeMatch('ningbo', mForm, propsOf({ type: 'cascader', options, emitPath: false }))).toBe(
-      '值不在可选项中',
+      'ningbo 不在可选项中',
     );
   });
 
@@ -323,7 +327,7 @@ describe('validateTypeMatch', () => {
     ).toBeUndefined();
     expect(
       validateTypeMatch(['ningbo'], mForm, propsOf({ type: 'cascader', options, multiple: true, emitPath: false })),
-    ).toBe('值不在可选项中');
+    ).toBe('ningbo 不在可选项中');
   });
 
   test('cascader valueSeparator 时数组值', () => {
@@ -340,7 +344,9 @@ describe('validateTypeMatch', () => {
   });
 
   test('select allowCreate 对象值非法', () => {
-    expect(validateTypeMatch({ a: 1 }, mForm, propsOf({ type: 'select', allowCreate: true }))).toBe('值类型不合法');
+    expect(validateTypeMatch({ a: 1 }, mForm, propsOf({ type: 'select', allowCreate: true }))).toBe(
+      '[object Object] 类型不合法',
+    );
   });
 
   test('动态 type 函数解析', () => {
@@ -391,6 +397,50 @@ describe('getRules typeMatch', () => {
     newRules[0].validator({}, 1, okCallback);
     expect(custom).toHaveBeenCalled();
     expect(okCallback).toHaveBeenCalledWith();
+  });
+});
+
+describe('getRules tdesign validator', () => {
+  beforeEach(() => {
+    setDesignConfig({ adapterType: 'tdesign-vue-next' });
+  });
+
+  afterEach(() => {
+    setDesignConfig({});
+  });
+
+  test('typeMatch 校验失败时返回 CustomValidateObj', async () => {
+    const rules: any = [{ typeMatch: true, message: '类型错误' }];
+    const newRules: any = getRules(mForm, rules, propsOf({ type: 'text' }));
+    // TDesign 调用签名：validator(val)
+    await expect(newRules[0].validator(123)).resolves.toEqual({
+      result: false,
+      message: '类型错误',
+    });
+  });
+
+  test('typeMatch 校验通过时返回 true', async () => {
+    const rules: any = [{ typeMatch: true }];
+    const newRules: any = getRules(mForm, rules, propsOf({ type: 'text' }));
+    await expect(newRules[0].validator('ok')).resolves.toBe(true);
+  });
+
+  test('自定义 validator 通过 callback 报告错误', async () => {
+    const rules: any = {
+      validator: ({ value, callback }: any) => {
+        if (value < 0) {
+          callback(new Error('不能为负'));
+          return;
+        }
+        callback();
+      },
+    };
+    const newRules: any = getRules(mForm, rules, { config: {} });
+    await expect(newRules[0].validator(-1)).resolves.toEqual({
+      result: false,
+      message: '不能为负',
+    });
+    await expect(newRules[0].validator(1)).resolves.toBe(true);
   });
 });
 

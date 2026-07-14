@@ -125,6 +125,29 @@ app.use(MagicForm, {
 });
 ```
 
+### Editor 字段内置规则
+
+安装 `@tmagic/editor` 时会自动 `registerTypeMatchRules` 注册编辑器自定义字段规则。服务数据（数据源 / 代码块 / 节点树）未就绪时，只做基础形态校验，不做枚举或存在性失败。
+
+| 字段 type | 期望值 |
+| --- | --- |
+| `key-value` / `style-setter` | 普通对象；`key-value` + `advanced` 且值为 `function` 时放行 |
+| `cond-op-select` | 已知算子；能解析字段类型时按类型收窄 |
+| `code-select-col` | `string`；有代码块 DSL 时须为已有 codeId |
+| `page-fragment-select` / `ui-select` | `string \| number`；有节点树时须为已有页面片 / 组件 id |
+| `data-source-input` | `string`；`${...}` 绑定须指向已有数据源/字段 |
+| `data-source-method-select` | `[dsId, methodName]`，方法须在该数据源可选方法集中 |
+| `data-source-field-select` | 数据源路径 `string[]`；有 `fieldConfig` 且非路径值时跳过 |
+| `data-source-select` | `value: 'id'` 为已有 ds id；否则为含 `isBindDataSource` + `dataSourceId` 的对象 |
+| `code-select` | `{ hookType: 'code', hookData }` 的浅层结构校验（`codeId` 存在性 / 数据源方法存在性由内部 `code-select-col`、`data-source-method-select` 单元格各自校验，只标红出错单元格） |
+| `data-source-fields` / `data-source-mocks` / `data-source-methods` | 数组 + 浅层结构（`name`/`type`、`title`/`enable`/`data`、`content`/`params` 等） |
+| `event-select` | 数组；兼容新旧格式的浅层结构校验（`name` / 联动组件 `method` 是否 ∈ 可选项由字段内 `eventNameConfig.rules`、`compActionConfig.rules` 单独校验，只标红对应 select） |
+| `display-conds` | 数组 + `cond[].field`/`op` 浅层结构校验（`op` 是否为已知算子、字段路径是否存在由内部 `cond-op-select`、`field` 单元格各自校验，只标红出错单元格） |
+
+> 容器类字段（`event-select` / `code-select` / `display-conds`）遵循同一约定：容器级 typeMatch 只做结构校验，「枚举 / 存在性」下沉到内部单元格各自的 typeMatch/rules，避免单个子项非法导致整块表单标红。
+
+业务仍可用 `registerTypeMatchRule` 覆盖上述任一 type。
+
 ## 示例
 
 ### select 选项匹配

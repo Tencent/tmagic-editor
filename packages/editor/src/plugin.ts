@@ -21,7 +21,7 @@ import type { App } from 'vue';
 import type { DesignPluginOptions } from '@tmagic/design';
 import designPlugin from '@tmagic/design';
 import type { FormInstallOptions } from '@tmagic/form';
-import formPlugin from '@tmagic/form';
+import formPlugin, { registerTypeMatchRules } from '@tmagic/form';
 import tablePlugin from '@tmagic/table';
 
 import Code from './fields/Code.vue';
@@ -44,6 +44,7 @@ import StyleSetter from './fields/StyleSetter/Index.vue';
 import uiSelect from './fields/UISelect.vue';
 import CodeEditor from './layouts/CodeEditor.vue';
 import { setEditorConfig } from './utils/config';
+import { editorTypeMatchRules } from './utils/typeMatchRules';
 import Editor from './Editor.vue';
 import type { EditorInstallOptions } from './type';
 
@@ -64,6 +65,7 @@ export default {
     app.use(designPlugin, opt || {});
     app.use(formPlugin, opt || {});
     app.use(tablePlugin);
+    registerTypeMatchRules(editorTypeMatchRules);
 
     app.config.globalProperties.$TMAGIC_EDITOR = option;
     setEditorConfig(option);

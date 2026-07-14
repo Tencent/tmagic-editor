@@ -45,6 +45,32 @@ export const numberOptions = [
   { text: '不在范围内', value: 'not_between' },
 ];
 
+export const booleanOptions = [
+  { text: '是', value: 'is' },
+  { text: '不是', value: 'not' },
+];
+
+/** 按字段类型返回条件运算符选项（UI 与 typeMatch 校验共用） */
+export const getCondOpOptionsByFieldType = (type: string) => {
+  if (type === 'array') {
+    return arrayOptions;
+  }
+
+  if (type === 'boolean' || type === 'null') {
+    return booleanOptions;
+  }
+
+  if (type === 'number') {
+    return [...eqOptions, ...numberOptions];
+  }
+
+  if (type === 'string') {
+    return [...arrayOptions, ...eqOptions];
+  }
+
+  return [...arrayOptions, ...eqOptions, ...numberOptions];
+};
+
 export const styleTabConfig: TabPaneConfig = {
   title: '样式',
   lazy: true,
@@ -127,6 +153,7 @@ export const eventTabConfig: TabPaneConfig = {
       src: 'component',
       labelWidth: '100px',
       type: 'event-select',
+      rules: [{ typeMatch: true }],
     },
   ],
 };
@@ -155,6 +182,7 @@ export const advancedTabConfig: TabPaneConfig = {
       labelPosition: 'top',
       type: 'code-select',
       extra: '组件初始化时执行',
+      rules: [{ typeMatch: true }],
     },
     {
       name: 'mounted',
@@ -162,6 +190,7 @@ export const advancedTabConfig: TabPaneConfig = {
       labelPosition: 'top',
       type: 'code-select',
       extra: '组件挂载到dom时执行',
+      rules: [{ typeMatch: true }],
     },
     {
       name: 'display',
@@ -169,6 +198,7 @@ export const advancedTabConfig: TabPaneConfig = {
       extra: '控制组件是否渲染，关系的代码块返回值为false时不渲染',
       labelPosition: 'top',
       type: 'code-select',
+      rules: [{ typeMatch: true }],
     },
   ],
 };
@@ -194,6 +224,7 @@ export const displayTabConfig: TabPaneConfig<DisplayCondsConfig> = {
       name: NODE_CONDS_KEY,
       titlePrefix: '条件组',
       defaultValue: [],
+      rules: [{ typeMatch: true }],
     },
   ],
 };

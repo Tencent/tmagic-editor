@@ -137,6 +137,19 @@ describe('CodeSelect', () => {
     expect(dsCol.display(undefined, { model: { codeType: 'code' } })).toBe(false);
   });
 
+  test('codeId 单元格开启 typeMatch（存在性校验下沉到单元格）', () => {
+    const wrapper = mount(CodeSelect, { props: baseProps() as any });
+    const container = wrapper.findComponent({ name: 'MContainer' });
+    const config = container.props('config') as any;
+    const row = config.items[0];
+    const codeIdCol = row.items[1];
+    const dsCol = row.items[2];
+    expect(codeIdCol.type).toBe('code-select-col');
+    expect(codeIdCol.rules).toEqual([{ typeMatch: true, trigger: 'blur' }]);
+    expect(dsCol.type).toBe('data-source-method-select');
+    expect(dsCol.rules).toEqual([{ typeMatch: true }]);
+  });
+
   test('notEditable 调用各服务', () => {
     codeBlockService.getEditStatus.mockReturnValue(false);
     dataSourceService.get.mockReturnValue(false);

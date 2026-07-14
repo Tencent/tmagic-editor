@@ -9,34 +9,42 @@ import { mount } from '@vue/test-utils';
 
 import EventSelect from '@editor/fields/EventSelect.vue';
 
-const editorService = {
-  get: vi.fn(),
-  getNodeById: vi.fn(),
-};
-const dataSourceService = {
-  get: vi.fn(),
-  getDataSourceById: vi.fn(),
-  getFormEvent: vi.fn(() => []),
-};
-const eventsService = {
-  getEvent: vi.fn(() => [{ label: 'click', value: 'click' }]),
-  getMethod: vi.fn(() => [{ label: 'open', value: 'open' }]),
-};
-const codeBlockService = {
-  getCodeDsl: vi.fn(() => ({ c1: {} })),
-  getEditStatus: vi.fn(() => true),
-};
-const propsService = {
-  getDisabledCodeBlock: vi.fn(() => false),
-  getDisabledDataSource: vi.fn(() => false),
-};
+const { editorService, dataSourceService, eventsService, codeBlockService, propsService } = vi.hoisted(() => ({
+  editorService: {
+    get: vi.fn(),
+    getNodeById: vi.fn(),
+  },
+  dataSourceService: {
+    get: vi.fn(),
+    getDataSourceById: vi.fn(),
+    getFormEvent: vi.fn(() => []),
+  },
+  eventsService: {
+    getEvent: vi.fn(() => [{ label: 'click', value: 'click' }]),
+    getMethod: vi.fn(() => [{ label: 'open', value: 'open' }]),
+  },
+  codeBlockService: {
+    getCodeDsl: vi.fn(() => ({ c1: {} })),
+    getEditStatus: vi.fn(() => true),
+  },
+  propsService: {
+    getDisabledCodeBlock: vi.fn(() => false),
+    getDisabledDataSource: vi.fn(() => false),
+  },
+}));
 
 vi.mock('@editor/hooks/use-services', () => ({
   useServices: () => ({ editorService, dataSourceService, eventsService, codeBlockService, propsService }),
 }));
 
-vi.mock('@editor/utils', async () => {
-  const actual = await vi.importActual<any>('@editor/utils');
+vi.mock('@editor/services/editor', () => ({ default: editorService }));
+vi.mock('@editor/services/dataSource', () => ({ default: dataSourceService }));
+vi.mock('@editor/services/events', () => ({ default: eventsService }));
+vi.mock('@editor/services/codeBlock', () => ({ default: codeBlockService }));
+vi.mock('@editor/services/props', () => ({ default: propsService }));
+
+vi.mock('@editor/utils/data-source', async () => {
+  const actual = await vi.importActual<any>('@editor/utils/data-source');
   return { ...actual, getCascaderOptionsFromFields: vi.fn(() => []) };
 });
 
@@ -192,6 +200,44 @@ describe('EventSelect', () => {
     expect(opts[0]).toMatchObject({ text: 'click', value: 'click' });
   });
 
+  test('eventNameConfig.rules 仅校验事件名是否在可选项中', () => {
+    const wrapper = mount(EventSelect, {
+      props: baseProps({
+        model: { events: [{ name: 'a', actions: [] }] },
+      }) as any,
+    });
+    const cfg = wrapper.findComponent({ name: 'MFormContainer' }).props('config') as any;
+    const [rule] = cfg.rules;
+
+    const okCb = vi.fn();
+    rule.validator({ value: 'click', callback: okCb }, { formValue: { type: 'btn' } });
+    expect(okCb).toHaveBeenCalledWith();
+
+    const errCb = vi.fn();
+    rule.validator({ value: 'unknown', callback: errCb }, { formValue: { type: 'btn' } });
+    expect(errCb).toHaveBeenCalledWith('事件名(unknown)不存在');
+
+    // 空值不做枚举校验
+    const emptyCb = vi.fn();
+    rule.validator({ value: '', callback: emptyCb }, { formValue: { type: 'btn' } });
+    expect(emptyCb).toHaveBeenCalledWith();
+  });
+
+  test('eventNameConfig.rules 自定义 options 时跳过枚举', () => {
+    const wrapper = mount(EventSelect, {
+      props: baseProps({
+        config: { type: 'event-select', src: 'component', eventNameConfig: { options: () => [{ value: 'x' }] } },
+        model: { events: [{ name: 'a', actions: [] }] },
+      }) as any,
+    });
+    const cfg = wrapper.findComponent({ name: 'MFormContainer' }).props('config') as any;
+    const [rule] = cfg.rules;
+
+    const cb = vi.fn();
+    rule.validator({ value: 'whatever', callback: cb }, { formValue: { type: 'btn' } });
+    expect(cb).toHaveBeenCalledWith();
+  });
+
   test('eventNameConfig type 当 page-fragment 且有 pageFragmentId 返回 cascader', () => {
     editorService.get.mockReturnValue({ items: [{ id: 'pf1', items: [] }] });
     const wrapper = mount(EventSelect, {
@@ -244,7 +290,7 @@ describe('EventSelect', () => {
     const panelCfg = wrapper.findComponent({ name: 'MPanel' }).props('config') as any;
     const groupItems = panelCfg.items[0].items;
     const actionType = groupItems[0];
-    const opts = actionType.options();
+    const opts = typeof actionType.options === 'function' ? actionType.options() : actionType.options;
     expect(opts.map((o: any) => o.value).sort()).toEqual(['code', 'comp', 'data-source'].sort());
   });
 
@@ -258,7 +304,7 @@ describe('EventSelect', () => {
     });
     const panelCfg = wrapper.findComponent({ name: 'MPanel' }).props('config') as any;
     const actionType = panelCfg.items[0].items[0];
-    const opts = actionType.options();
+    const opts = typeof actionType.options === 'function' ? actionType.options() : actionType.options;
     expect(opts.map((o: any) => o.value)).toEqual(['comp']);
     propsService.getDisabledCodeBlock.mockReturnValue(false);
     propsService.getDisabledDataSource.mockReturnValue(false);
@@ -316,6 +362,74 @@ describe('EventSelect', () => {
     const panelCfg = wrapper.findComponent({ name: 'MPanel' }).props('config') as any;
     const compAction = panelCfg.items[0].items[2];
     expect(compAction.options(undefined, { model: { to: 'unknown' } })).toEqual([]);
+  });
+
+  test('compActionConfig.rules 仅校验动作名是否在可选项中', () => {
+    editorService.getNodeById.mockReturnValue({ type: 'btn', id: '1' });
+    eventsService.getMethod.mockReturnValue([{ label: 'open', value: 'open' }]);
+    const wrapper = mount(EventSelect, {
+      props: baseProps({
+        model: { events: [{ name: 'a', actions: [] }] },
+      }) as any,
+    });
+    const panelCfg = wrapper.findComponent({ name: 'MPanel' }).props('config') as any;
+    const compAction = panelCfg.items[0].items[2];
+    const [rule] = compAction.rules;
+
+    const okCb = vi.fn();
+    rule.validator({ value: 'open', callback: okCb }, { model: { to: '1' } });
+    expect(okCb).toHaveBeenCalledWith();
+
+    const errCb = vi.fn();
+    rule.validator({ value: 'unknown', callback: errCb }, { model: { to: '1' } });
+    expect(errCb).toHaveBeenCalledWith('动作名(unknown)不存在');
+
+    const emptyCb = vi.fn();
+    rule.validator({ value: '', callback: emptyCb }, { model: { to: '1' } });
+    expect(emptyCb).toHaveBeenCalledWith();
+  });
+
+  test('compActionConfig.rules 自定义 options 时跳过枚举', () => {
+    editorService.getNodeById.mockReturnValue({ type: 'btn', id: '1' });
+    const wrapper = mount(EventSelect, {
+      props: baseProps({
+        config: {
+          type: 'event-select',
+          src: 'component',
+          compActionConfig: { options: () => [{ text: 'x', value: 'x' }] },
+        },
+        model: { events: [{ name: 'a', actions: [] }] },
+      }) as any,
+    });
+    const panelCfg = wrapper.findComponent({ name: 'MPanel' }).props('config') as any;
+    const compAction = panelCfg.items[0].items[2];
+    const [rule] = compAction.rules;
+
+    const cb = vi.fn();
+    rule.validator({ value: 'whatever', callback: cb }, { model: { to: '1' } });
+    expect(cb).toHaveBeenCalledWith();
+  });
+
+  test('compActionConfig.rules 页面片 cascader 支持数组 method', () => {
+    editorService.getNodeById.mockReturnValue({ type: 'page-fragment-container', id: '1', pageFragmentId: 'pf1' });
+    editorService.get.mockReturnValue({ items: [{ id: 'pf1', items: [{ id: 'c1', type: 'btn', name: 'b' }] }] });
+    eventsService.getMethod.mockReturnValue([{ label: 'open', value: 'open' }]);
+    const wrapper = mount(EventSelect, {
+      props: baseProps({
+        model: { events: [{ name: 'a', actions: [] }] },
+      }) as any,
+    });
+    const panelCfg = wrapper.findComponent({ name: 'MPanel' }).props('config') as any;
+    const compAction = panelCfg.items[0].items[2];
+    const [rule] = compAction.rules;
+
+    const okCb = vi.fn();
+    rule.validator({ value: ['c1', 'open'], callback: okCb }, { model: { to: '1' } });
+    expect(okCb).toHaveBeenCalledWith();
+
+    const errCb = vi.fn();
+    rule.validator({ value: ['c1', 'missing'], callback: errCb }, { model: { to: '1' } });
+    expect(errCb).toHaveBeenCalledWith('动作名(c1.missing)不存在');
   });
 
   test('codeActionConfig display/notEditable', () => {

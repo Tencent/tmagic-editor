@@ -100,6 +100,35 @@ describe('DisplayConds', () => {
     expect(item.type).toBe('data-source-field-select');
   });
 
+  test('field / op 单元格开启 typeMatch（枚举校验下沉到单元格）', () => {
+    mount(DisplayConds, {
+      props: { config: { titlePrefix: 't', parentFields: ['ds1'] }, model: {}, name: 'conds' } as any,
+    });
+    const cascaderField = capturedConfig.items[0].items[0];
+    const opItem = capturedConfig.items[0].items[1];
+    expect(cascaderField.rules).toEqual([
+      { required: true, trigger: 'blur', message: '请选择字段' },
+      { typeMatch: true, trigger: 'blur' },
+    ]);
+    expect(opItem.type).toBe('cond-op-select');
+    expect(opItem.rules).toEqual([
+      { required: true, trigger: 'blur', message: '请选择条件' },
+      { typeMatch: true, trigger: 'blur' },
+    ]);
+
+    // parentFields 为空时 field 走 data-source-field-select，同样开启 typeMatch
+    capturedConfig = null;
+    mount(DisplayConds, {
+      props: { config: { titlePrefix: 't', parentFields: [] }, model: {}, name: 'conds' } as any,
+    });
+    const dsField = capturedConfig.items[0].items[0];
+    expect(dsField.type).toBe('data-source-field-select');
+    expect(dsField.rules).toEqual([
+      { required: true, trigger: 'blur', message: '请选择字段' },
+      { typeMatch: true, trigger: 'blur' },
+    ]);
+  });
+
   test('value 字段类型 - number', () => {
     mount(DisplayConds, {
       props: { config: { titlePrefix: 't', parentFields: ['ds1'] }, model: {}, name: 'conds' } as any,

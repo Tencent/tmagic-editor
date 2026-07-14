@@ -23,9 +23,6 @@ vi.mock('@editor/utils', async () => {
   return {
     ...actual,
     getFieldType: vi.fn(),
-    arrayOptions: [{ text: 'in', value: 'in' }],
-    eqOptions: [{ text: 'eq', value: 'eq' }],
-    numberOptions: [{ text: 'gt', value: 'gt' }],
   };
 });
 
@@ -61,7 +58,9 @@ describe('CondOpSelect', () => {
   test('array 类型展示 arrayOptions', () => {
     (getFieldType as any).mockReturnValue('array');
     const wrapper = mount(CondOpSelect, { props: baseProps() as any });
-    expect(wrapper.findAll('option, .tmagic-design-option, [label]').length).toBeGreaterThan(0);
+    const html = wrapper.html();
+    expect(html).toContain('label="包含"');
+    expect(html).toContain('label="不包含"');
   });
 
   test('boolean/null 类型展示 是/不是', () => {
@@ -74,31 +73,31 @@ describe('CondOpSelect', () => {
     (getFieldType as any).mockReturnValue('number');
     const wrapper = mount(CondOpSelect, { props: baseProps() as any });
     const html = wrapper.html();
-    expect(html).toContain('label="eq"');
-    expect(html).toContain('label="gt"');
+    expect(html).toContain('label="等于"');
+    expect(html).toContain('label="大于"');
   });
 
   test('string 类型 options 包含 array+eq', () => {
     (getFieldType as any).mockReturnValue('string');
     const wrapper = mount(CondOpSelect, { props: baseProps() as any });
     const html = wrapper.html();
-    expect(html).toContain('label="in"');
-    expect(html).toContain('label="eq"');
+    expect(html).toContain('label="包含"');
+    expect(html).toContain('label="等于"');
   });
 
   test('其他类型展示 array+eq+number', () => {
     (getFieldType as any).mockReturnValue('any');
     const wrapper = mount(CondOpSelect, { props: baseProps() as any });
     const html = wrapper.html();
-    expect(html).toContain('label="in"');
-    expect(html).toContain('label="eq"');
-    expect(html).toContain('label="gt"');
+    expect(html).toContain('label="包含"');
+    expect(html).toContain('label="等于"');
+    expect(html).toContain('label="大于"');
   });
 
   test('change 事件 emit', async () => {
     (getFieldType as any).mockReturnValue('string');
     const wrapper = mount(CondOpSelect, { props: baseProps() as any });
-    await wrapper.findComponent({ name: 'TMagicSelect' }).vm.$emit('change', 'eq');
-    expect(wrapper.emitted('change')?.[0]?.[0]).toBe('eq');
+    await wrapper.findComponent({ name: 'TMagicSelect' }).vm.$emit('change', '=');
+    expect(wrapper.emitted('change')?.[0]?.[0]).toBe('=');
   });
 });

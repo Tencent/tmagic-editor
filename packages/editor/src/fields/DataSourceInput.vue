@@ -79,11 +79,11 @@ import { Coin } from '@element-plus/icons-vue';
 import type { DataSchema, DataSourceSchema } from '@tmagic/core';
 import { getDesignConfig, TMagicAutocomplete, TMagicInput, TMagicTag } from '@tmagic/design';
 import type { DataSourceInputConfig, FieldProps } from '@tmagic/form';
-import { getKeysArray, isNumber } from '@tmagic/utils';
+import { getKeysArray } from '@tmagic/utils';
 
 import Icon from '@editor/components/Icon.vue';
 import { useServices } from '@editor/hooks/use-services';
-import { getDisplayField } from '@editor/utils/data-source';
+import { getDisplayField, resolveFieldByPath } from '@editor/utils/data-source';
 
 defineOptions({
   name: 'MFieldsDataSourceInput',
@@ -251,34 +251,16 @@ const fieldQuerySearch = (
     return;
   }
 
-  let fields = ds.fields || [];
-
-  // 后面这些是字段
-  let key = keys.shift();
-  while (key) {
-    if (isNumber(key)) {
-      key = keys.shift();
-      continue;
-    }
-
-    for (const field of fields) {
-      if (field.name === key) {
-        fields = field.fields || [];
-        key = keys.shift();
-        break;
-      }
-    }
-  }
+  const { fields } = resolveFieldByPath(ds.fields, keys, { skipNumberIndices: true });
 
   if (curCharIsDot(dotIndex)) {
     // 当前输入的是.
-    result = fields || [];
+    result = fields;
   } else if (dotIndex > -1) {
     const queryName = queryString.substring(dotIndex + 1).toLowerCase();
-    result =
-      fields.filter(
-        (field) => field.name?.toLowerCase().includes(queryName) || field.title?.toLowerCase().includes(queryName),
-      ) || [];
+    result = fields.filter(
+      (field) => field.name?.toLowerCase().includes(queryName) || field.title?.toLowerCase().includes(queryName),
+    );
   }
 
   cb(

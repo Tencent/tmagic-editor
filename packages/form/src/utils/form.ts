@@ -21,6 +21,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { cloneDeep } from 'lodash-es';
 
+import { getDesignConfig } from '@tmagic/design';
 import { getValueByKeyPath } from '@tmagic/utils';
 
 import type {
@@ -40,6 +41,56 @@ import type {
 } from '../schema';
 
 import { createTypeMatchValidator } from './typeMatch';
+
+type AsyncValidatorFn = (rule: any, value: any, callback: Function, source?: any, options?: any) => any;
+
+const isTDesignAdapter = () => getDesignConfig('adapterType') === 'tdesign-vue-next';
+
+/**
+ * 将 async-validator（Element Plus）风格的 validator 适配到当前 UI 库。
+ * TDesign 调用签名为 `(val) => boolean | CustomValidateObj | Promise`，无 callback。
+ */
+export const adaptFormValidator = (validator: AsyncValidatorFn): AsyncValidatorFn => {
+  return (arg1: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any) => {
+    if (!isTDesignAdapter()) {
+      return validator(arg1, arg2, arg3, arg4, arg5);
+    }
+
+    // TDesign: validator(val)
+    const value = arg1;
+    return new Promise((resolve) => {
+      let settled = false;
+      const callback = (error?: Error | string) => {
+        if (settled) return;
+        settled = true;
+        if (error) {
+          resolve({
+            result: false,
+            message: typeof error === 'string' ? error : error.message,
+          });
+        } else {
+          resolve(true);
+        }
+      };
+
+      try {
+        const result = validator(undefined, value, callback);
+        if (result !== null && typeof (result as PromiseLike<unknown>).then === 'function') {
+          Promise.resolve(result).then(
+            () => {
+              if (!settled) callback();
+            },
+            (err) => {
+              callback(err instanceof Error ? err : new Error(String(err)));
+            },
+          );
+        }
+      } catch (e) {
+        callback(e instanceof Error ? e : new Error(String(e)));
+      }
+    });
+  };
+};
 
 interface DefaultItem {
   defaultValue: any;
@@ -264,32 +315,34 @@ export const getRules = function (mForm: FormState | undefined, rules: Rule[] | 
 
   return rules.map((item) => {
     if (item.typeMatch) {
-      (item as any).validator = createTypeMatchValidator(mForm, props, item);
+      (item as any).validator = adaptFormValidator(createTypeMatchValidator(mForm, props, item));
       return item;
     }
 
     if (typeof item.validator === 'function') {
       const fnc = item.validator;
 
-      (item as any).validator = (rule: any, value: any, callback: Function, source: any, options: any) =>
-        fnc(
-          {
-            rule,
-            value: props.config.names ? props.model : value,
-            callback,
-            source,
-            options,
-          },
-          {
-            values: mForm?.initValues || {},
-            model: props.model,
-            parent: mForm?.parentValues || {},
-            formValue: mForm?.values || props.model,
-            prop: props.prop,
-            config: props.config,
-          },
-          mForm,
-        );
+      (item as any).validator = adaptFormValidator(
+        (rule: any, value: any, callback: Function, source: any, options: any) =>
+          fnc(
+            {
+              rule,
+              value: props.config.names ? props.model : value,
+              callback,
+              source,
+              options,
+            },
+            {
+              values: mForm?.initValues || {},
+              model: props.model,
+              parent: mForm?.parentValues || {},
+              formValue: mForm?.values || props.model,
+              prop: props.prop,
+              config: props.config,
+            },
+            mForm,
+          ),
+      );
     }
     return item;
   });

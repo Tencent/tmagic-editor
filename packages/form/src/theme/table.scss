@@ -26,6 +26,16 @@
   }
 }
 
+.el-form-item {
+  .m-fields-table {
+    .el-form-item {
+      &.is-error {
+        margin-bottom: 18px;
+      }
+    }
+  }
+}
+
 .m-fields-table {
   width: 100%;
 
@@ -62,7 +72,7 @@
     }
   }
 
-  .el-form-item {
+  .el-form-item:not(.is-error) {
     margin-bottom: 0;
   }
 

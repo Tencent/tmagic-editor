@@ -29,6 +29,10 @@
 }
 ```
 
+## 值校验
+
+安装 `@tmagic/editor` 后该字段会自动注册内置 `typeMatch` 校验规则：须为普通对象，`advanced` 且值为 `function` 时放行。详见[表单校验 - Editor 字段内置规则](/form-config/rules.md#editor-字段内置规则)。
+
 ## Attributes
 
 | 参数     | 说明                         | 类型                                                                                                                                                     | 可选值 | 默认值 |

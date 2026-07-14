@@ -35,3 +35,11 @@
     margin-right: 5px;
   }
 }
+
+.el-form-item {
+  .el-form-item {
+    &.is-error {
+      margin-bottom: 18px;
+    }
+  }
+}

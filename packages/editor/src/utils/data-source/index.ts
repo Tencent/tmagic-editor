@@ -235,19 +235,37 @@ export const getCascaderOptionsFromFields = (
   return result;
 };
 
-export const getFieldType = (ds: DataSourceSchema | undefined, fieldNames: string[]) => {
-  let fields = ds?.fields;
-  let type = '';
+/**
+ * 按字段名路径下钻 DataSchema。
+ * @param skipNumberIndices 为 true 时跳过数字段（模板路径中的数组下标，如 arr[0].x）
+ */
+export const resolveFieldByPath = (
+  fields: DataSchema[] | undefined,
+  fieldNames: string[],
+  options: { skipNumberIndices?: boolean } = {},
+): { ok: boolean; field?: DataSchema; fields: DataSchema[] } => {
+  let currentFields = fields || [];
+  let field: DataSchema | undefined;
 
-  for (const fieldName of fieldNames) {
-    if (!fields?.length) return '';
-
-    const field = fields.find((f) => f.name === fieldName);
-    if (!field) return '';
-
-    type = field.type || '';
-    fields = field.fields;
+  for (const name of fieldNames) {
+    if (options.skipNumberIndices && isNumber(name)) {
+      continue;
+    }
+    if (!currentFields.length) {
+      return { ok: false, fields: currentFields };
+    }
+    field = currentFields.find((item) => item.name === name);
+    if (!field) {
+      return { ok: false, fields: currentFields };
+    }
+    currentFields = field.fields || [];
   }
 
-  return type;
+  return { field, ok: true, fields: currentFields };
+};
+
+export const getFieldType = (ds: DataSourceSchema | undefined, fieldNames: string[]) => {
+  const { ok, field } = resolveFieldByPath(ds?.fields, fieldNames);
+  if (!ok) return '';
+  return field?.type || '';
 };

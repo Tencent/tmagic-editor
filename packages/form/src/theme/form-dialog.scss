@@ -7,7 +7,7 @@
     padding: 0 20px;
   }
 
-  .el-table .m-form-item .el-form-item {
+  .el-table .m-form-item .el-form-item:not(.is-error) {
     margin-bottom: 0;
   }
 }
