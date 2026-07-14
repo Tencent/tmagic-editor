@@ -48,6 +48,7 @@ vi.mock('@editor/layouts/sidebar/code-block/useContentMenu', () => ({
       return menuDataState.items;
     },
     contentMenuHideHandler,
+    getTarget: () => null,
   }),
 }));
 

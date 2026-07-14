@@ -133,4 +133,16 @@ describe('code-block useContentMenu', () => {
     (result.menuData[2] as any).handler({});
     expect(deleteCode).not.toHaveBeenCalled();
   });
+
+  test('getTarget 返回当前右键目标', () => {
+    const deleteCode = vi.fn();
+    const { result } = mountHook(deleteCode);
+    expect(result.getTarget()).toBeNull();
+
+    result.nodeContentMenuHandler({ preventDefault: vi.fn() } as any, { type: 'code', id: 'c1', name: 'code1' } as any);
+    expect(result.getTarget()).toEqual({ id: 'c1', data: { type: 'code', id: 'c1', name: 'code1' } });
+
+    result.contentMenuHideHandler();
+    expect(result.getTarget()).toBeNull();
+  });
 });

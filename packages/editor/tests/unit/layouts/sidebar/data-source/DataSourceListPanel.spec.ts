@@ -38,12 +38,14 @@ vi.mock('@editor/hooks/use-data-source-edit', () => ({
 
 const nodeContentMenuHandler = vi.fn();
 const contentMenuHideHandler = vi.fn();
-const menuData = ref<any[]>([{ type: 'button', text: 'Edit' }]);
+const menuData = [{ type: 'button', text: 'Edit' }];
+const getTarget = vi.fn(() => null);
 vi.mock('@editor/layouts/sidebar/data-source/useContentMenu', () => ({
   useContentMenu: () => ({
     nodeContentMenuHandler,
     menuData,
     contentMenuHideHandler,
+    getTarget,
   }),
 }));
 

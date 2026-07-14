@@ -1365,13 +1365,34 @@ const guidesOptions = {
 
 - **详情：**
   
-  用于自定义组件树与画布的右键菜单
+  用于自定义组件树（图层）、画布、数据源、代码块的右键菜单
 
-  该函数会在显示右键菜单前被调用，接收默认菜单项作为参数，返回最终显示的菜单项
+  该函数会在显示右键菜单前被调用，接收默认菜单项与菜单类型作为参数，返回最终显示的菜单项
+
+  第二个参数 `type` 用于区分菜单来源：`'layer'`（图层）、`'viewer'`（画布）、`'data-source'`（数据源）、`'code-block'`（代码块）
+
+  第三个参数 `getTarget` 仅在**数据源**与**代码块**面板下传入，用于读取当前右键目标（节点 `id` 与原始数据）；图层 / 画布不会传入该参数
 
 - **默认值：** `(menus) => menus`
 
-- **类型：** `(menus: (MenuButton | MenuComponent)[], data: { node?: MNode; page?: MPage; parent?: MContainer; stage?: StageCore }) => (MenuButton | MenuComponent)[]`
+- **类型：**
+
+```ts
+interface ContentMenuTarget {
+  /** 目标 ID */
+  id: string;
+  /** 原始节点数据（树节点等） */
+  data?: TreeNodeData;
+}
+
+type ContentMenuType = 'layer' | 'data-source' | 'viewer' | 'code-block';
+
+type CustomContentMenuFunction = (
+  menus: (MenuButton | MenuComponent)[],
+  type: ContentMenuType,
+  getTarget?: () => ContentMenuTarget | null,
+) => (MenuButton | MenuComponent)[];
+```
 
 - **示例：**
 
@@ -1381,20 +1402,24 @@ const guidesOptions = {
 </template>
 
 <script setup>
-const customContentMenu = (menus, { node }) => {
-  // 为特定类型的组件添加自定义菜单
-  if (node?.type === 'container') {
+const customContentMenu = (menus, type, getTarget) => {
+  // 为数据源右键菜单追加自定义菜单
+  if (type === 'data-source') {
     menus.push({
       type: 'button',
-      text: '清空容器',
+      text: '查看详情',
       handler: () => {
-        // 清空容器的逻辑
+        // getTarget 仅在数据源 / 代码块面板下传入
+        const target = getTarget?.();
+        if (target) {
+          console.log(target.id, target.data);
+        }
       },
     });
   }
-  
+
   // 可以过滤掉某些菜单项
-  return menus.filter(menu => menu.text !== '删除');
+  return menus.filter((menu) => menu.text !== '删除');
 };
 </script>
 ```

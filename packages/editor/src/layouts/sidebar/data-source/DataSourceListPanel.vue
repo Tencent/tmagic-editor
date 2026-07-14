@@ -171,8 +171,8 @@ eventBus?.on('remove-data-source', (id: string) => {
   removeHandler(id);
 });
 
-const { nodeContentMenuHandler, menuData: contentMenuData, contentMenuHideHandler } = useContentMenu();
+const { nodeContentMenuHandler, menuData: contentMenuData, contentMenuHideHandler, getTarget } = useContentMenu();
 const menuData = computed<(MenuButton | MenuComponent)[]>(() =>
-  props.customContentMenu(contentMenuData, 'data-source'),
+  props.customContentMenu(contentMenuData, 'data-source', getTarget),
 );
 </script>

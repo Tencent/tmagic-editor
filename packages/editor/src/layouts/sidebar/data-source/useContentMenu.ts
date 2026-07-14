@@ -3,13 +3,21 @@ import { CopyDocument, Delete, Edit } from '@element-plus/icons-vue';
 import { cloneDeep } from 'lodash-es';
 
 import ContentMenu from '@editor/components/ContentMenu.vue';
-import type { EventBus, MenuButton, MenuComponent, TreeNodeData } from '@editor/type';
+import type { ContentMenuTarget, EventBus, MenuButton, MenuComponent, TreeNodeData } from '@editor/type';
 
 export const useContentMenu = () => {
   const eventBus = inject<EventBus>('eventBus');
   const menuRef = useTemplateRef<InstanceType<typeof ContentMenu>>('menu');
 
   let selectId = '';
+  let selectData: TreeNodeData | null = null;
+
+  const getTarget = (): ContentMenuTarget | null => {
+    if (!selectId) {
+      return null;
+    }
+    return { id: selectId, data: selectData ?? undefined };
+  };
 
   const menuData: (MenuButton | MenuComponent)[] = [
     {
@@ -63,19 +71,23 @@ export const useContentMenu = () => {
       menuRef.value?.show(event);
       if (data.id) {
         selectId = `${data.id}`;
+        selectData = data;
       } else {
         selectId = '';
+        selectData = null;
       }
     }
   };
 
   const contentMenuHideHandler = () => {
     selectId = '';
+    selectData = null;
   };
 
   return {
     menuData,
     nodeContentMenuHandler,
     contentMenuHideHandler,
+    getTarget,
   };
 };

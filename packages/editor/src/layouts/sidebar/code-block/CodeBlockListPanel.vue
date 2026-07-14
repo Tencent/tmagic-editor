@@ -121,8 +121,11 @@ const {
   nodeContentMenuHandler,
   menuData: contentMenuData,
   contentMenuHideHandler,
+  getTarget,
 } = useContentMenu((id: string) => {
   codeBlockListRef.value?.deleteCode(id, { historySource: 'tree-contextmenu' });
 });
-const menuData = computed<(MenuButton | MenuComponent)[]>(() => props.customContentMenu(contentMenuData, 'code-block'));
+const menuData = computed<(MenuButton | MenuComponent)[]>(() =>
+  props.customContentMenu(contentMenuData, 'code-block', getTarget),
+);
 </script>

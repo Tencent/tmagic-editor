@@ -126,4 +126,15 @@ describe('data-source useContentMenu', () => {
     (result.menuData[2] as any).handler({});
     expect(eventBus.emit).not.toHaveBeenCalled();
   });
+
+  test('getTarget 返回当前右键目标', () => {
+    const { result } = mountHook();
+    expect(result.getTarget()).toBeNull();
+
+    result.nodeContentMenuHandler({ preventDefault: vi.fn() } as any, { type: 'ds', id: 'd1', name: 'ds1' } as any);
+    expect(result.getTarget()).toEqual({ id: 'd1', data: { type: 'ds', id: 'd1', name: 'ds1' } });
+
+    result.contentMenuHideHandler();
+    expect(result.getTarget()).toBeNull();
+  });
 });

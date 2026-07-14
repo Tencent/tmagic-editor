@@ -1207,9 +1207,24 @@ export interface PageBarSortOptions extends PartSortableOptions {
 }
 // #endregion PageBarSortOptions
 
+/**
+ * 右键菜单当前目标（侧栏树节点等）。
+ * 数据源 / 代码块面板通过 `customContentMenu` 的 `getTarget` 暴露，业务在 handler 内自行读取。
+ */
+export interface ContentMenuTarget {
+  /** 目标 ID */
+  id: string;
+  /** 原始节点数据（树节点等） */
+  data?: TreeNodeData;
+}
+
+export type ContentMenuType = 'layer' | 'data-source' | 'viewer' | 'code-block';
+
 export type CustomContentMenuFunction = (
   menus: (MenuButton | MenuComponent)[],
-  type: 'layer' | 'data-source' | 'viewer' | 'code-block',
+  type: ContentMenuType,
+  /** 读取当前右键目标；数据源 / 代码块面板会传入，图层 / 画布一般不需要 */
+  getTarget?: () => ContentMenuTarget | null,
 ) => (MenuButton | MenuComponent)[];
 
 export interface EditorEvents {
