@@ -21,7 +21,7 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { HookCodeType, HookType, NodeType } from '@tmagic/core';
 import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX, DATA_SOURCE_SET_DATA_METHOD_NAME } from '@tmagic/utils';
 
-import { ALL_COND_OPS, editorTypeMatchRules } from '@editor/utils/typeMatchRules';
+import { ALL_COND_OPS, editorTypeMatchRules } from '@editor/utils/type-match-rules';
 
 const codeDslState = vi.hoisted(() => ({ value: null as Record<string, any> | null }));
 const dataSourcesState = vi.hoisted(() => ({ value: [] as any[] }));

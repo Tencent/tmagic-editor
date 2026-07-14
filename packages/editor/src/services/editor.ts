@@ -815,7 +815,7 @@ class Editor extends BaseService {
     );
 
     // 校验错误信息在 pushOpHistory 之前落库，保证历史快照包含本次变更对应的错误状态。
-    this.applyInvalidInfo(invalidInfo);
+    this.applyInvalidInfo(config, invalidInfo);
 
     if (updateData[0].oldNode?.type !== NodeType.ROOT) {
       const curNodes = this.get('nodes');
@@ -1666,10 +1666,21 @@ class Editor extends BaseService {
 
   /**
    * 应用一次属性面板提交携带的校验错误信息（在写入历史记录之前调用，使历史快照与本次变更对齐）。
-   * error 非空则记录错误，为空则清除对应来源的错误。
+   * - invalidInfo 为空（调用方未携带）：认为本次更新对应的节点已无校验错误，清除其全部来源的错误；
+   * - error 非空则记录错误，为空则清除对应来源的错误。
    */
-  private applyInvalidInfo(invalidInfo?: { id: Id; source: NodeInvalidSource; error?: string }) {
-    if (!invalidInfo) return;
+  private applyInvalidInfo(
+    config: MNode | MNode[],
+    invalidInfo?: { id: Id; source: NodeInvalidSource; error?: string },
+  ) {
+    if (!invalidInfo) {
+      // 调用方未携带 invalidInfo：本次更新对应节点不应再保留校验错误，清除其全部来源。
+      const ids = (Array.isArray(config) ? config : [config])
+        .map((node) => node.id)
+        .filter((id): id is Id => id !== undefined);
+      ids.forEach((id) => this.deleteInvalidNode(id));
+      return;
+    }
     const { id, source, error } = invalidInfo;
     if (error) {
       this.setInvalidNode(id, source, error);

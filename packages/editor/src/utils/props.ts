@@ -18,6 +18,7 @@
  */
 
 import {
+  HookType,
   NODE_CONDS_KEY,
   NODE_CONDS_RESULT_KEY,
   NODE_DISABLE_CODE_BLOCK_KEY,
@@ -182,7 +183,17 @@ export const advancedTabConfig: TabPaneConfig = {
       labelPosition: 'top',
       type: 'code-select',
       extra: '组件初始化时执行',
-      rules: [{ typeMatch: true }],
+      rules: [
+        { typeMatch: true, trigger: 'change' },
+        {
+          validator: ({ value, callback }: any) => {
+            if (value && value.hookType !== HookType.CODE) {
+              return callback('hookType 必须是 code');
+            }
+            callback();
+          },
+        },
+      ],
     },
     {
       name: 'mounted',
@@ -190,7 +201,17 @@ export const advancedTabConfig: TabPaneConfig = {
       labelPosition: 'top',
       type: 'code-select',
       extra: '组件挂载到dom时执行',
-      rules: [{ typeMatch: true }],
+      rules: [
+        { typeMatch: true, trigger: 'change' },
+        {
+          validator: ({ value, callback }: any) => {
+            if (value && value.hookType !== HookType.CODE) {
+              return callback('hookType 必须是 code');
+            }
+            callback();
+          },
+        },
+      ],
     },
     {
       name: 'display',
@@ -198,7 +219,17 @@ export const advancedTabConfig: TabPaneConfig = {
       extra: '控制组件是否渲染，关系的代码块返回值为false时不渲染',
       labelPosition: 'top',
       type: 'code-select',
-      rules: [{ typeMatch: true }],
+      rules: [
+        { typeMatch: true, trigger: 'change' },
+        {
+          validator: ({ value, callback }: any) => {
+            if (value && value.hookType !== HookType.CODE) {
+              return callback('hookType 必须是 code');
+            }
+            callback();
+          },
+        },
+      ],
     },
   ],
 };

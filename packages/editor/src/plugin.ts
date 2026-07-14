@@ -44,7 +44,7 @@ import StyleSetter from './fields/StyleSetter/Index.vue';
 import uiSelect from './fields/UISelect.vue';
 import CodeEditor from './layouts/CodeEditor.vue';
 import { setEditorConfig } from './utils/config';
-import { editorTypeMatchRules } from './utils/typeMatchRules';
+import { editorTypeMatchRules } from './utils/type-match-rules';
 import Editor from './Editor.vue';
 import type { EditorInstallOptions } from './type';
 

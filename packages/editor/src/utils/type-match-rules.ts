@@ -17,7 +17,7 @@
  */
 
 import type { DataSourceFieldType, DataSourceSchema, Id } from '@tmagic/core';
-import { HookCodeType, HookType, NodeType } from '@tmagic/core';
+import { NodeType } from '@tmagic/core';
 import type { TypeMatchValidateContext, TypeMatchValidator } from '@tmagic/form';
 import {
   DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX,
@@ -376,7 +376,7 @@ const validateDataSourceSelect: TypeMatchValidator = (value, { message, props })
 };
 
 const validateCodeSelect: TypeMatchValidator = (value, { message }) => {
-  if (!isPlainObject(value) || value.hookType !== HookType.CODE || !Array.isArray(value.hookData)) {
+  if (!isPlainObject(value) || !Array.isArray(value.hookData)) {
     return defaultMessage(message, `${value}类型不合法`);
   }
 
@@ -387,27 +387,7 @@ const validateCodeSelect: TypeMatchValidator = (value, { message }) => {
       return defaultMessage(message, '钩子项结构不合法');
     }
 
-    if (item.codeType !== HookCodeType.CODE && item.codeType !== HookCodeType.DATA_SOURCE_METHOD) {
-      return defaultMessage(message, '钩子项结构不合法');
-    }
-
     if (typeof item.params !== 'undefined' && !isPlainObject(item.params)) {
-      return defaultMessage(message, '钩子项结构不合法');
-    }
-
-    if (item.codeType === HookCodeType.CODE) {
-      if (typeof item.codeId !== 'string') {
-        return defaultMessage(message, '钩子项结构不合法');
-      }
-      continue;
-    }
-
-    // DATA_SOURCE_METHOD：仅校验元组形态，存在性交给单元格
-    if (
-      !Array.isArray(item.codeId) ||
-      item.codeId.length !== 2 ||
-      item.codeId.some((part: any) => typeof part !== 'string')
-    ) {
       return defaultMessage(message, '钩子项结构不合法');
     }
   }

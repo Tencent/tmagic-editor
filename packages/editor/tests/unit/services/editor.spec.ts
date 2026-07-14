@@ -1235,12 +1235,12 @@ describe('invalidNodeIds 校验错误状态', () => {
     expect(editorService.getInvalidNodeInfo(NodeId.NODE_ID)).toBeUndefined();
   });
 
-  test('update 未携带 invalidInfo 时不改动已有错误状态', async () => {
+  test('update 未携带 invalidInfo 时清除对应节点的全部来源错误', async () => {
     await editorService.select(NodeId.PAGE_ID);
     editorService.setInvalidNode(NodeId.NODE_ID, 'props', 'props 错误');
 
     await editorService.update({ id: NodeId.NODE_ID, type: 'text', text: 'z' });
 
-    expect(editorService.getInvalidNodeInfo(NodeId.NODE_ID)).toEqual({ props: 'props 错误' });
+    expect(editorService.getInvalidNodeInfo(NodeId.NODE_ID)).toBeUndefined();
   });
 });

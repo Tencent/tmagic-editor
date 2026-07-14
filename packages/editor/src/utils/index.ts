@@ -30,6 +30,6 @@ export * from './undo-redo';
 export * from './indexed-db';
 export * from './history';
 export * from './const';
-export * from './typeMatchRules';
+export * from './type-match-rules';
 export * from './event';
 export { default as loadMonaco } from './monaco-editor';

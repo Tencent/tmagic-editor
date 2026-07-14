@@ -77,7 +77,7 @@ describe('plugin install', () => {
 
   test('install 调用 design/form/table 插件并注册全局组件', async () => {
     const { registerTypeMatchRules } = await import('@tmagic/form');
-    const { editorTypeMatchRules } = await import('@editor/utils/typeMatchRules');
+    const { editorTypeMatchRules } = await import('@editor/utils/type-match-rules');
     const { app, components } = buildApp();
     editorPlugin.install(app, { someOption: true } as any);
     expect(app.use).toHaveBeenCalledTimes(3);

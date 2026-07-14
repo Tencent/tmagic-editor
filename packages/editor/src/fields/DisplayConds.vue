@@ -98,9 +98,10 @@ const config = computed<GroupListConfig>(() => ({
               label: '字段',
               checkStrictly: false,
               onChange: fieldOnChange,
+              defaultValue: () => [],
               rules: [
                 { required: true, trigger: 'blur', message: '请选择字段' },
-                { typeMatch: true, trigger: 'blur' },
+                { typeMatch: true, trigger: 'change' },
               ],
             }
           : {
@@ -111,9 +112,10 @@ const config = computed<GroupListConfig>(() => ({
               checkStrictly: false,
               dataSourceFieldType: ['string', 'number', 'boolean', 'any'],
               onChange: fieldOnChange,
+              defaultValue: () => [],
               rules: [
                 { required: true, trigger: 'blur', message: '请选择字段' },
-                { typeMatch: true, trigger: 'blur' },
+                { typeMatch: true, trigger: 'change' },
               ],
             },
         {
@@ -124,7 +126,7 @@ const config = computed<GroupListConfig>(() => ({
           name: 'op',
           rules: [
             { required: true, trigger: 'blur', message: '请选择条件' },
-            { typeMatch: true, trigger: 'blur' },
+            { typeMatch: true, trigger: 'change' },
           ],
         },
         {

@@ -167,7 +167,7 @@ const submit = async (
       changeRecords: eventData?.changeRecords,
       historySource,
       // 启用校验联动时，仅校验失败（error 存在）才把错误信息随更新传入 editorService 记录；
-      // CodeEditor 源码保存与表单校验成功均不携带 invalidInfo，保持已有错误状态不变。
+      // 其余情况（含表单校验成功、CodeEditor 源码保存）不携带 invalidInfo，由 editorService 在执行 update 时统一清除该节点错误。
       ...(enablePropsFormValidate && error ? { invalidInfo: { id: newValue.id, source, error: error?.message } } : {}),
     });
   } catch (e: any) {
