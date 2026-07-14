@@ -111,6 +111,10 @@ export default defineConfig({
               text: '@tmagic/form',
               link: '/guide/advanced/tmagic-form.md',
             },
+            {
+              text: '属性配置表单校验联动',
+              link: '/guide/advanced/prop-form-validate.md',
+            },
           ],
         },
         {

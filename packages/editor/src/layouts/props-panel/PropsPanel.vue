@@ -9,7 +9,7 @@
       :values="values"
       :disabledShowSrc="disabledShowSrc"
       :extendState="extendState"
-      @submit="submit"
+      @submit="(v, eventData, error) => submit(v, eventData, error, 'props')"
       @submit-error="errorHandler"
       @form-error="errorHandler"
       @mounted="mountedHandler"
@@ -27,7 +27,7 @@
       :values="values"
       :disabledShowSrc="disabledShowSrc"
       :extendState="extendState"
-      @submit="submit"
+      @submit="(v, eventData, error) => submit(v, eventData, error, 'style')"
       @submit-error="errorHandler"
       @form-error="errorHandler"
     >
@@ -55,7 +55,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef, watch, watchEffect } from 'vue';
+import { computed, inject, onBeforeUnmount, onMounted, ref, useTemplateRef, watch, watchEffect } from 'vue';
 import { Close, Sugar } from '@element-plus/icons-vue';
 import type { OnDrag } from 'gesto';
 
@@ -66,9 +66,10 @@ import { setValueByKeyPath } from '@tmagic/utils';
 
 import MIcon from '@editor/components/Icon.vue';
 import Resizer from '@editor/components/Resizer.vue';
+import { ENABLE_PROPS_FORM_VALIDATE } from '@editor/editorProps';
 import { useServices } from '@editor/hooks/use-services';
 import { Protocol } from '@editor/services/storage';
-import type { PropsPanelSlots } from '@editor/type';
+import type { NodeInvalidSource, PropsPanelSlots } from '@editor/type';
 import { styleTabConfig } from '@editor/utils';
 import { PROPS_PANEL_WIDTH_STORAGE_KEY } from '@editor/utils/const';
 
@@ -94,6 +95,8 @@ const emit = defineEmits<{
 }>();
 
 const { editorService, uiService, propsService, storageService } = useServices();
+
+const enablePropsFormValidate = inject(ENABLE_PROPS_FORM_VALIDATE, false);
 
 const values = ref<FormValue>({});
 // ts类型应该是FormConfig， 但是打包时会出错，所以暂时用any
@@ -126,7 +129,12 @@ onBeforeUnmount(() => {
   propsService.off('props-configs-change', init);
 });
 
-const submit = async (v: MNode, eventData?: ContainerChangeEventData) => {
+const submit = async (
+  v: MNode,
+  eventData?: ContainerChangeEventData,
+  error?: any,
+  source: NodeInvalidSource = 'props',
+) => {
   try {
     if (!v.id) {
       v.id = values.value.id;
@@ -155,7 +163,13 @@ const submit = async (v: MNode, eventData?: ContainerChangeEventData) => {
     // 源码编辑器（CodeEditor @save → saveCode）保存时不带 eventData，据此标记为「源码编辑器」。
     const historySource = eventData ? 'props' : 'code';
 
-    editorService.update(newValue, { changeRecords: eventData?.changeRecords, historySource });
+    editorService.update(newValue, {
+      changeRecords: eventData?.changeRecords,
+      historySource,
+      // 启用校验联动时，仅校验失败（error 存在）才把错误信息随更新传入 editorService 记录；
+      // CodeEditor 源码保存与表单校验成功均不携带 invalidInfo，保持已有错误状态不变。
+      ...(enablePropsFormValidate && error ? { invalidInfo: { id: newValue.id, source, error: error?.message } } : {}),
+    });
   } catch (e: any) {
     emit('submit-error', e);
   }

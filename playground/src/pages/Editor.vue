@@ -19,6 +19,7 @@
       :stage-rect="stageRect"
       :layerContentMenu="contentMenuData"
       :stageContentMenu="contentMenuData"
+      :enable-props-form-validate="true"
       @props-submit-error="propsSubmitErrorHandler"
     >
       <template #workspace-content>

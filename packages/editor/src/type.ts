@@ -210,6 +210,22 @@ export interface StageOptions {
   beforeDblclick?: (event: MouseEvent) => Promise<boolean | void> | boolean | void;
 }
 
+/**
+ * 节点校验错误信息，按来源（属性表单 / 样式表单）分别保存错误文案。
+ * 属性表单与样式表单是两个独立的 FormPanel，均指向同一节点，故以来源为键，
+ * 避免某个面板校验通过时误清另一个面板记录的错误。
+ * 节点视为存在错误当且仅当任一来源存在非空文本。
+ */
+export interface NodeInvalidInfo {
+  /** 属性表单校验错误文案（可能为包含 <br> 的 HTML） */
+  props?: string;
+  /** 样式表单校验错误文案（可能为包含 <br> 的 HTML） */
+  style?: string;
+}
+
+/** 节点校验错误来源 */
+export type NodeInvalidSource = keyof NodeInvalidInfo;
+
 export interface StoreState {
   root: MApp | null;
   page: MPage | MPageFragment | null;
@@ -220,6 +236,8 @@ export interface StoreState {
   stage: StageCore | null;
   stageLoading: boolean;
   modifiedNodeIds: Map<Id, Id>;
+  /** 校验失败的节点错误信息，按节点 id 存储，供组件树标记与保存拦截读取 */
+  invalidNodeIds: Map<Id, NodeInvalidInfo>;
   pageLength: number;
   pageFragmentLength: number;
   disabledMultiSelect: boolean;
@@ -851,6 +869,10 @@ export interface StepExtra {
   selectedAfter?: Id[];
   /** 本次操作涉及的节点 id 集合（page 类型） */
   modifiedNodeIds?: Map<Id, Id>;
+  /** 操作前的节点校验错误快照，撤销后还原（使撤销一个「校验失败」的改动后错误消失） */
+  invalidNodeIdsBefore?: Map<Id, NodeInvalidInfo>;
+  /** 操作后的节点校验错误快照，重做后还原（使重做后错误恢复） */
+  invalidNodeIdsAfter?: Map<Id, NodeInvalidInfo>;
   [key: string]: any;
 }
 // #endregion StepExtra
@@ -1247,6 +1269,8 @@ export interface EditorEvents {
    * add / remove / update 触发本事件；如需区分「用户操作」与「撤销重做」请配合 `history-change`。
    */
   change: [event: EditorChangeEvent];
+  /** 节点校验错误状态发生变化时触发，携带当前完整的错误 Map（供非响应式消费方订阅） */
+  'invalid-node-change': [invalidNodeIds: Map<Id, NodeInvalidInfo>];
 }
 
 // #region EditorChangeEvent

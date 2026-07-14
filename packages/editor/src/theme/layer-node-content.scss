@@ -1,0 +1,14 @@
+.m-editor-layer-node-content {
+  display: inline-flex;
+  align-items: center;
+
+  &.is-invalid .m-editor-layer-node-label {
+    color: var(--el-color-danger, #f56c6c);
+  }
+
+  .m-editor-layer-node-error-icon {
+    margin-left: 4px;
+    color: var(--el-color-danger, #f56c6c);
+    cursor: help;
+  }
+}

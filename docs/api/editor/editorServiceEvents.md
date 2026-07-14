@@ -103,3 +103,19 @@
   ::: details 查看 EditorChangeEvent 类型定义
   <<< @/../packages/editor/src/type.ts#EditorChangeEvent{ts}
   :::
+
+## invalid-node-change
+
+- **详情：** 节点校验错误状态发生变化时触发（记录 / 清除错误、删除节点、整体替换 root、撤销重做还原错误标记等场景均会触发），在 [editorService.setInvalidNode()](./editorServiceMethods.md#setinvalidnode)、[editorService.deleteInvalidNode()](./editorServiceMethods.md#deleteinvalidnode)、[editorService.resetInvalidNodeId()](./editorServiceMethods.md#resetinvalidnodeid) 及 DSL 操作 / 撤销重做内部调用后触发。
+
+  携带当前完整的错误 Map，供非响应式消费方（如自定义工具栏）订阅，实现组件树标红、保存拦截等。需响应式读取（如组件树节点内容）请直接读取 `editorService.get('invalidNodeIds')`。
+
+- **事件回调函数：** `(invalidNodeIds: Map<Id, NodeInvalidInfo>) => void`
+
+  ::: details 查看 NodeInvalidInfo 及关联类型定义
+  <<< @/../packages/editor/src/type.ts#NodeInvalidInfo{ts}
+
+  <<< @/../packages/editor/src/type.ts#NodeInvalidSource{ts}
+
+  <<< @/../packages/schema/src/index.ts#Id{ts}
+  :::

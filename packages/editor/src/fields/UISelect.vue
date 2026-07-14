@@ -127,15 +127,3 @@ const unhighlight = () => {
   stageOverlayService.get('stage')?.clearHighlight();
 };
 </script>
-
-<style lang="scss">
-.m-fields-ui-select {
-  cursor: pointer;
-  i {
-    margin-right: 3px;
-  }
-  span {
-    color: #2882e0;
-  }
-}
-</style>

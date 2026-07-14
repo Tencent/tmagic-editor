@@ -80,8 +80,19 @@ vi.mock('@editor/components/Tree.vue', () => ({
             class: 'dblclick-btn',
             onClick: () => emit('node-dblclick', new MouseEvent('dblclick'), { id: 'a' }),
           }),
+          slots['tree-node-label']?.({ data: { id: 'a', name: 'A', type: 'node' } }),
           slots['tree-node-tool']?.({ data: { id: 'a', type: 'node' } }),
         ]);
+    },
+  }),
+}));
+
+vi.mock('@editor/layouts/sidebar/layer/LayerNodeContent.vue', () => ({
+  default: defineComponent({
+    name: 'LayerNodeContent',
+    props: ['data'],
+    setup() {
+      return () => h('div', { class: 'fake-node-content' });
     },
   }),
 }));
@@ -132,6 +143,13 @@ describe('LayerPanel', () => {
     });
     expect(wrapper.findComponent({ name: 'TreeStub' }).exists()).toBe(true);
     expect(wrapper.findComponent({ name: 'LayerMenu' }).exists()).toBe(true);
+  });
+
+  test('tree-node-label 默认渲染 LayerNodeContent', () => {
+    const wrapper = mount(LayerPanel, {
+      props: { layerContentMenu: [], customContentMenu: (m: any) => m } as any,
+    });
+    expect(wrapper.find('.fake-node-content').exists()).toBe(true);
   });
 
   test('page 为空时不渲染 Tree', () => {

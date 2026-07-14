@@ -7,6 +7,7 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { defineComponent, h, nextTick, ref } from 'vue';
 import { mount } from '@vue/test-utils';
 
+import { ENABLE_PROPS_FORM_VALIDATE } from '@editor/editorProps';
 import PropsPanel from '@editor/layouts/props-panel/PropsPanel.vue';
 
 const editorService = {
@@ -86,6 +87,16 @@ vi.mock('@editor/layouts/props-panel/FormPanel.vue', () => ({
                 { changeRecords: [{ propPath: 'style.bg', value: '' }] },
               ),
           }),
+          h('button', {
+            class: 'submit-with-err-btn',
+            onClick: () =>
+              emit('submit', { id: 'n1', style: { color: 'red' } }, { changeRecords: [] }, new Error('校验失败详情')),
+          }),
+          // 模拟 CodeEditor 源码保存：仅传 values，无 eventData、无 error（对应 saveCode 路径）
+          h('button', {
+            class: 'code-save-btn',
+            onClick: () => emit('submit', { id: 'n1', style: { color: 'red' } }),
+          }),
           h('button', { class: 'submit-err-btn', onClick: () => emit('submit-error', new Error('e')) }),
           h('button', { class: 'form-err-btn', onClick: () => emit('form-error', new Error('e')) }),
           h('button', { class: 'mounted-btn', onClick: () => emit('mounted', { proxy: true }) }),
@@ -164,6 +175,68 @@ describe('PropsPanel', () => {
     const calledNode = (editorService.update.mock.calls[0] as any)[0];
     expect(calledNode.style.color).toBe('red');
     expect(calledNode.style.empty).toBeUndefined();
+  });
+
+  test('未启用 enablePropsFormValidate 时 update 不携带 invalidInfo', async () => {
+    const wrapper = mount(PropsPanel, { props: {} as any });
+    await new Promise((r) => setTimeout(r, 0));
+    await wrapper.find('.submit-with-err-btn').trigger('click');
+    const options = (editorService.update.mock.calls[0] as any)[1];
+    expect(options.invalidInfo).toBeUndefined();
+  });
+
+  test('启用 enablePropsFormValidate 时属性表单校验失败携带 invalidInfo(source=props)', async () => {
+    const wrapper = mount(PropsPanel, {
+      props: {} as any,
+      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: true } },
+    });
+    await new Promise((r) => setTimeout(r, 0));
+    await wrapper.find('.submit-with-err-btn').trigger('click');
+
+    const options = (editorService.update.mock.calls[0] as any)[1];
+    expect(options.invalidInfo).toEqual({ id: 'n1', source: 'props', error: '校验失败详情' });
+  });
+
+  test('启用 enablePropsFormValidate 且校验成功时不携带 invalidInfo（保持错误状态不变）', async () => {
+    const wrapper = mount(PropsPanel, {
+      props: {} as any,
+      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: true } },
+    });
+    await new Promise((r) => setTimeout(r, 0));
+    await wrapper.find('.submit-btn').trigger('click');
+
+    const options = (editorService.update.mock.calls[0] as any)[1];
+    expect(options.invalidInfo).toBeUndefined();
+  });
+
+  test('启用 enablePropsFormValidate 时样式表单提交携带 invalidInfo(source=style)', async () => {
+    showStylePanel.value = true;
+    const wrapper = mount(PropsPanel, {
+      props: {} as any,
+      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: true } },
+    });
+    await new Promise((r) => setTimeout(r, 0));
+    // 第二个 FormPanel 为样式面板
+    const styleSubmitBtns = wrapper.findAll('.submit-with-err-btn');
+    expect(styleSubmitBtns.length).toBe(2);
+    await styleSubmitBtns[1].trigger('click');
+
+    const options = (editorService.update.mock.calls[0] as any)[1];
+    expect(options.invalidInfo.source).toBe('style');
+  });
+
+  test('CodeEditor 源码保存不携带 invalidInfo（未经表单校验，不应改动错误状态）', async () => {
+    const wrapper = mount(PropsPanel, {
+      props: {} as any,
+      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: true } },
+    });
+    await new Promise((r) => setTimeout(r, 0));
+    await wrapper.find('.code-save-btn').trigger('click');
+
+    const options = (editorService.update.mock.calls[0] as any)[1];
+    expect(options.invalidInfo).toBeUndefined();
+    // historySource 应为 code
+    expect(options.historySource).toBe('code');
   });
 
   test('mounted 事件 emit', async () => {

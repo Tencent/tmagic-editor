@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { beforeAll, describe, expect, test, vi } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 import { cloneDeep } from 'lodash-es';
 
 import type { MApp, MContainer, MNode } from '@tmagic/core';
@@ -1049,5 +1049,198 @@ describe('revertPageStepById', () => {
     expect(reverted[1]).not.toBeNull();
     expect(editorService.getNodeById(addedId1)).toBeNull();
     expect(editorService.getNodeById(addedId2)).toBeNull();
+  });
+});
+
+describe('invalidNodeIds 校验错误状态', () => {
+  beforeEach(() => {
+    editorService.set('root', cloneDeep(root));
+    editorService.resetInvalidNodeId();
+    historyService.reset();
+  });
+
+  test('初始状态为空 Map', () => {
+    expect(editorService.getInvalidNodeIds()).toBeInstanceOf(Map);
+    expect(editorService.getInvalidNodeIds().size).toBe(0);
+  });
+
+  test('setInvalidNode 记录错误并触发 invalid-node-change 事件', () => {
+    const handler = vi.fn();
+    editorService.on('invalid-node-change', handler);
+
+    editorService.setInvalidNode(NodeId.NODE_ID, 'props', 'name 必填');
+
+    expect(handler).toHaveBeenCalledTimes(1);
+    expect(editorService.getInvalidNodeInfo(NodeId.NODE_ID)).toEqual({ props: 'name 必填' });
+
+    editorService.off('invalid-node-change', handler);
+  });
+
+  test('同一节点不同来源(props/style)合并，互不覆盖', () => {
+    editorService.setInvalidNode(NodeId.NODE_ID, 'props', 'props 错误');
+    editorService.setInvalidNode(NodeId.NODE_ID, 'style', 'style 错误');
+
+    expect(editorService.getInvalidNodeInfo(NodeId.NODE_ID)).toEqual({
+      props: 'props 错误',
+      style: 'style 错误',
+    });
+    expect(editorService.getInvalidNodeIds().size).toBe(1);
+  });
+
+  test('deleteInvalidNode 指定来源仅删除该来源，另一来源保留', () => {
+    editorService.setInvalidNode(NodeId.NODE_ID, 'props', 'props 错误');
+    editorService.setInvalidNode(NodeId.NODE_ID, 'style', 'style 错误');
+
+    editorService.deleteInvalidNode(NodeId.NODE_ID, 'props');
+
+    expect(editorService.getInvalidNodeInfo(NodeId.NODE_ID)).toEqual({ style: 'style 错误' });
+  });
+
+  test('deleteInvalidNode 删除最后一个来源时整条记录移除', () => {
+    editorService.setInvalidNode(NodeId.NODE_ID, 'props', 'props 错误');
+    editorService.deleteInvalidNode(NodeId.NODE_ID, 'props');
+
+    expect(editorService.getInvalidNodeInfo(NodeId.NODE_ID)).toBeUndefined();
+    expect(editorService.getInvalidNodeIds().size).toBe(0);
+  });
+
+  test('deleteInvalidNode 不传 source 删除整节点全部来源', () => {
+    editorService.setInvalidNode(NodeId.NODE_ID, 'props', 'props 错误');
+    editorService.setInvalidNode(NodeId.NODE_ID, 'style', 'style 错误');
+
+    editorService.deleteInvalidNode(NodeId.NODE_ID);
+
+    expect(editorService.getInvalidNodeInfo(NodeId.NODE_ID)).toBeUndefined();
+  });
+
+  test('deleteInvalidNode 不存在的节点为空操作，不触发事件', () => {
+    const handler = vi.fn();
+    editorService.on('invalid-node-change', handler);
+
+    editorService.deleteInvalidNode(NodeId.ERROR_NODE_ID);
+
+    expect(handler).not.toHaveBeenCalled();
+    editorService.off('invalid-node-change', handler);
+  });
+
+  test('resetInvalidNodeId 清空全部并触发事件；已空时不触发', () => {
+    editorService.setInvalidNode(NodeId.NODE_ID, 'props', 'props 错误');
+
+    const handler = vi.fn();
+    editorService.on('invalid-node-change', handler);
+
+    editorService.resetInvalidNodeId();
+    expect(editorService.getInvalidNodeIds().size).toBe(0);
+    expect(handler).toHaveBeenCalledTimes(1);
+
+    // 已经为空时再次调用不应触发事件
+    editorService.resetInvalidNodeId();
+    expect(handler).toHaveBeenCalledTimes(1);
+
+    editorService.off('invalid-node-change', handler);
+  });
+
+  test('resetState 清空 invalidNodeIds', () => {
+    editorService.setInvalidNode(NodeId.NODE_ID, 'props', 'props 错误');
+    editorService.resetState();
+    expect(editorService.getInvalidNodeIds().size).toBe(0);
+  });
+
+  test('update 携带 invalidInfo(error) 时在入栈前落库；error 为空时清除', async () => {
+    await editorService.select(NodeId.PAGE_ID);
+
+    await editorService.update(
+      { id: NodeId.NODE_ID, type: 'text', text: 'a' },
+      { invalidInfo: { id: NodeId.NODE_ID, source: 'props', error: '校验失败' } },
+    );
+    expect(editorService.getInvalidNodeInfo(NodeId.NODE_ID)).toEqual({ props: '校验失败' });
+
+    await editorService.update(
+      { id: NodeId.NODE_ID, type: 'text', text: 'b' },
+      { invalidInfo: { id: NodeId.NODE_ID, source: 'props', error: undefined } },
+    );
+    expect(editorService.getInvalidNodeInfo(NodeId.NODE_ID)).toBeUndefined();
+  });
+
+  test('remove 删除节点及其子树的错误记录', async () => {
+    await editorService.select(NodeId.NODE_ID);
+    editorService.setInvalidNode(NodeId.NODE_ID, 'props', 'props 错误');
+
+    const node = editorService.get('node');
+    if (!node) throw new Error('未选中节点');
+    await editorService.remove(node);
+
+    expect(editorService.getInvalidNodeInfo(NodeId.NODE_ID)).toBeUndefined();
+  });
+
+  test('整体替换 root 后清理不存在于新 DSL 的错误记录', () => {
+    editorService.setInvalidNode(NodeId.NODE_ID, 'props', 'props 错误');
+    // 新 DSL 不包含 NODE_ID
+    const newRoot: MApp = {
+      id: NodeId.ROOT_ID,
+      type: NodeType.ROOT,
+      items: [
+        {
+          id: NodeId.PAGE_ID,
+          type: NodeType.PAGE,
+          layout: 'absolute',
+          style: { width: 375 },
+          items: [],
+        },
+      ],
+    };
+    editorService.set('root', cloneDeep(newRoot));
+    expect(editorService.getInvalidNodeInfo(NodeId.NODE_ID)).toBeUndefined();
+  });
+
+  test('历史同步：update 携带错误后 undo 清错、redo 恢复错', async () => {
+    await editorService.select(NodeId.PAGE_ID);
+
+    await editorService.update(
+      { id: NodeId.NODE_ID, type: 'text', text: 'x' },
+      { invalidInfo: { id: NodeId.NODE_ID, source: 'props', error: '校验失败' } },
+    );
+    expect(editorService.getInvalidNodeInfo(NodeId.NODE_ID)).toEqual({ props: '校验失败' });
+
+    // 撤销：还原到「操作前」——错误应消失
+    await editorService.undo();
+    expect(editorService.getInvalidNodeInfo(NodeId.NODE_ID)).toBeUndefined();
+
+    // 重做：还原到「操作后」——错误应恢复
+    await editorService.redo();
+    expect(editorService.getInvalidNodeInfo(NodeId.NODE_ID)).toEqual({ props: '校验失败' });
+  });
+
+  test('历史同步：修复(清除错误)后 undo 恢复错、redo 再次清错', async () => {
+    await editorService.select(NodeId.PAGE_ID);
+
+    // step1：产生错误
+    await editorService.update(
+      { id: NodeId.NODE_ID, type: 'text', text: 'x' },
+      { invalidInfo: { id: NodeId.NODE_ID, source: 'props', error: '校验失败' } },
+    );
+    // step2：修复（清除错误）
+    await editorService.update(
+      { id: NodeId.NODE_ID, type: 'text', text: 'y' },
+      { invalidInfo: { id: NodeId.NODE_ID, source: 'props', error: undefined } },
+    );
+    expect(editorService.getInvalidNodeInfo(NodeId.NODE_ID)).toBeUndefined();
+
+    // 撤销 step2：还原到「修复前」——错误恢复
+    await editorService.undo();
+    expect(editorService.getInvalidNodeInfo(NodeId.NODE_ID)).toEqual({ props: '校验失败' });
+
+    // 重做 step2：错误再次被清除
+    await editorService.redo();
+    expect(editorService.getInvalidNodeInfo(NodeId.NODE_ID)).toBeUndefined();
+  });
+
+  test('update 未携带 invalidInfo 时不改动已有错误状态', async () => {
+    await editorService.select(NodeId.PAGE_ID);
+    editorService.setInvalidNode(NodeId.NODE_ID, 'props', 'props 错误');
+
+    await editorService.update({ id: NodeId.NODE_ID, type: 'text', text: 'z' });
+
+    expect(editorService.getInvalidNodeInfo(NodeId.NODE_ID)).toEqual({ props: 'props 错误' });
   });
 });

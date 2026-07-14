@@ -158,7 +158,7 @@ import stageOverlayService from './services/stageOverlay';
 import storageService from './services/storage';
 import uiService from './services/ui';
 import keybindingConfig from './utils/keybinding-config';
-import { defaultEditorProps, EditorProps } from './editorProps';
+import { defaultEditorProps, EditorProps, ENABLE_PROPS_FORM_VALIDATE } from './editorProps';
 import { initServiceEvents, initServiceState } from './initService';
 import type { TreeNodeData } from './type';
 import type { EditorSlots, EventBus, Services, StageOptions } from './type';
@@ -233,6 +233,8 @@ provide('services', services);
 
 provide('codeOptions', props.codeOptions);
 provide('stageOptions', stageOptions);
+/** 是否启用「属性配置表单校验」联动能力，供 PropsPanel / FormPanel 判断校验失败时是否仍更新节点并记录错误 */
+provide(ENABLE_PROPS_FORM_VALIDATE, props.enablePropsFormValidate ?? false);
 /**
  * 把顶层 `extendFormState` 提供给非 PropsPanel 链路上的组件使用（例如历史差异对话框 HistoryDiffDialog
  * 内部的 CompareForm）。这样所有依赖业务上下文的表单 filterFunction 都能拿到一致的扩展状态，

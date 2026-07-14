@@ -16,6 +16,36 @@ export const useEditorMenu = (value: Ref<MApp | undefined>, save: () => void) =>
   const iframe = shallowRef<HTMLIFrameElement>();
   const previewVisible = ref(false);
 
+  /**
+   * 校验是否存在配置错误的组件：存在则弹出错误提示（列出问题组件）并返回 false 阻止保存。
+   * 依赖编辑器 enablePropsFormValidate 能力集中记录的 invalidNodeIds。
+   */
+  const checkInvalidNodes = (services?: any): boolean => {
+    const invalidNodeIds: Map<any, any> | undefined = services?.editorService.getInvalidNodeIds?.();
+    if (!invalidNodeIds || invalidNodeIds.size === 0) {
+      return true;
+    }
+
+    // 按页面分组，提示信息需指明问题组件所属页面
+    const pageMap = new Map<string, string[]>();
+    [...invalidNodeIds.keys()].forEach((id) => {
+      const info = services?.editorService.getNodeInfo?.(id);
+      const page = info?.page;
+      const pageKey = page?.name ? `${page.name}(${page.id})` : '未知页面';
+      const node = info?.node;
+      const nodeName = node?.name ? `${node.name}(${id})` : `${id}`;
+      if (!pageMap.has(pageKey)) pageMap.set(pageKey, []);
+      pageMap.get(pageKey)!.push(nodeName);
+    });
+
+    const details = [...pageMap.entries()]
+      .map(([pageName, nodeNames]) => `【${pageName}】${nodeNames.join('、')}`)
+      .join('；');
+
+    tMagicMessage.error(`以下组件存在配置校验错误，请修复后再保存：${details}`);
+    return false;
+  };
+
   const menu: MenuBarData = {
     left: [
       {
@@ -57,8 +87,11 @@ export const useEditorMenu = (value: Ref<MApp | undefined>, save: () => void) =>
                 cancelButtonText: '预览',
                 type: 'warning',
               });
-              save();
-              tMagicMessage.success('保存成功');
+              // 存在校验错误时中断保存（预览仍使用当前内存中的 DSL）
+              if (checkInvalidNodes(services)) {
+                save();
+                tMagicMessage.success('保存成功');
+              }
             } catch (e) {
               console.error(e);
             }
@@ -78,7 +111,8 @@ export const useEditorMenu = (value: Ref<MApp | undefined>, save: () => void) =>
         type: 'button',
         text: '保存',
         icon: Coin,
-        handler: () => {
+        handler: (services) => {
+          if (!checkInvalidNodes(services)) return;
           save();
           tMagicMessage.success('保存成功');
         },

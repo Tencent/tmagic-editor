@@ -7,6 +7,7 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { defineComponent, h, nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
 
+import { ENABLE_PROPS_FORM_VALIDATE } from '@editor/editorProps';
 import FormPanel from '@editor/layouts/props-panel/FormPanel.vue';
 
 const editorService = { get: vi.fn() };
@@ -61,6 +62,9 @@ vi.mock('@tmagic/design', () => ({
   }),
 }));
 
+// 可控的 submitForm 实现：默认校验成功，测试可将其改为 reject 以模拟校验失败
+let submitFormImpl: () => Promise<any> = async () => ({ a: 1 });
+
 vi.mock('@tmagic/form', async () => {
   const actual = await vi.importActual<any>('@tmagic/form');
   return {
@@ -73,7 +77,7 @@ vi.mock('@tmagic/form', async () => {
         const formState = { stage: null as any, services: null as any };
         expose({
           formState,
-          submitForm: vi.fn(async () => ({ a: 1 })),
+          submitForm: vi.fn(() => submitFormImpl()),
         });
         return () =>
           h('div', { class: 'fake-mform' }, [
@@ -90,6 +94,7 @@ vi.mock('@tmagic/form', async () => {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  submitFormImpl = async () => ({ a: 1 });
   uiService.get.mockImplementation((k: string) => (k === 'propsPanelSize' ? 'small' : null));
   editorService.get.mockImplementation((k: string) => (k === 'stage' ? { id: 'stage' } : null));
 });
@@ -117,6 +122,52 @@ describe('FormPanel', () => {
     const wrapper = mount(FormPanel, { props: { config: [], values: {} } as any });
     await wrapper.find('.err-btn').trigger('click');
     expect(wrapper.emitted('form-error')).toBeTruthy();
+  });
+
+  test('校验失败且未启用 enablePropsFormValidate 时 emit submit-error，不更新节点', async () => {
+    submitFormImpl = async () => {
+      throw new Error('校验失败');
+    };
+    const wrapper = mount(FormPanel, { props: { config: [], values: {} } as any });
+    await wrapper.find('.change-btn').trigger('click');
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(wrapper.emitted('submit-error')).toBeTruthy();
+    expect(wrapper.emitted('submit')).toBeFalsy();
+  });
+
+  test('校验失败且启用 enablePropsFormValidate 时仍 emit submit(携带当前值+error)', async () => {
+    const err = new Error('校验失败');
+    submitFormImpl = async () => {
+      throw err;
+    };
+    const wrapper = mount(FormPanel, {
+      props: { config: [], values: {} } as any,
+      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: true } },
+    });
+    await wrapper.find('.change-btn').trigger('click');
+    await new Promise((r) => setTimeout(r, 0));
+
+    const submitEvents = wrapper.emitted('submit');
+    expect(submitEvents).toBeTruthy();
+    // 第三个参数为错误对象
+    expect(submitEvents?.[0]?.[2]).toBe(err);
+    // 第一个参数为 change 携带的当前表单值
+    expect(submitEvents?.[0]?.[0]).toEqual({ a: 1 });
+    expect(wrapper.emitted('submit-error')).toBeFalsy();
+  });
+
+  test('校验成功时 emit submit 且不携带 error', async () => {
+    const wrapper = mount(FormPanel, {
+      props: { config: [], values: {} } as any,
+      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: true } },
+    });
+    await wrapper.find('.change-btn').trigger('click');
+    await new Promise((r) => setTimeout(r, 0));
+
+    const submitEvents = wrapper.emitted('submit');
+    expect(submitEvents).toBeTruthy();
+    expect(submitEvents?.[0]?.[2]).toBeUndefined();
   });
 
   test('disabledShowSrc 控制源码按钮', () => {

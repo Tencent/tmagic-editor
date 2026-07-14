@@ -51,6 +51,7 @@ import type { ContainerChangeEventData, FormConfig, FormState, FormValue } from 
 import { MForm } from '@tmagic/form';
 
 import MIcon from '@editor/components/Icon.vue';
+import { ENABLE_PROPS_FORM_VALIDATE } from '@editor/editorProps';
 import { useEditorContentHeight } from '@editor/hooks/use-editor-content-height';
 import { useServices } from '@editor/hooks/use-services';
 
@@ -75,12 +76,14 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  submit: [values: any, eventData?: ContainerChangeEventData];
+  submit: [values: any, eventData?: ContainerChangeEventData, error?: any];
   'submit-error': [e: any];
   'form-error': [e: any];
   mounted: [internalInstance: any];
   unmounted: [];
 }>();
+
+const enablePropsFormValidate = inject(ENABLE_PROPS_FORM_VALIDATE, false);
 
 const services = useServices();
 const { editorService, uiService } = services;
@@ -113,9 +116,16 @@ onUnmounted(() => {
 const submit = async (v: FormValue, eventData: ContainerChangeEventData) => {
   try {
     const values = await configFormRef.value?.submitForm();
+    // 校验成功：正常更新节点（第三个参数 error 为空，表示清除该来源的错误记录）
     emit('submit', values, eventData);
   } catch (e: any) {
-    emit('submit-error', e);
+    if (enablePropsFormValidate) {
+      // 启用校验联动：校验失败时仍以当前表单值更新节点，并把错误信息一并抛给上层记录
+      emit('submit', v, eventData, e);
+    } else {
+      // 未启用：保持原行为，校验失败丢弃本次改动
+      emit('submit-error', e);
+    }
   }
 };
 

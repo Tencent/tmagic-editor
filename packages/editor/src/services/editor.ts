@@ -31,6 +31,7 @@ import {
   isPage,
   isPageFragment,
   setValueByKeyPath,
+  traverseNode,
 } from '@tmagic/utils';
 
 import BaseService from '@editor/services//BaseService';
@@ -47,6 +48,8 @@ import type {
   EditorNodeInfo,
   HistoryOpSource,
   HistoryOpType,
+  NodeInvalidInfo,
+  NodeInvalidSource,
   PastePosition,
   StepDiffItem,
   StepValue,
@@ -104,12 +107,18 @@ class Editor extends BaseService {
     stageLoading: true,
     highlightNode: null,
     modifiedNodeIds: new Map(),
+    invalidNodeIds: new Map(),
     pageLength: 0,
     pageFragmentLength: 0,
     disabledMultiSelect: false,
     alwaysMultiSelect: false,
   });
   private selectionBeforeOp: Id[] | null = null;
+  /**
+   * 操作前的节点校验错误快照，与 selectionBeforeOp 同时在 captureSelectionBeforeOp 中捕获，
+   * 供 pushOpHistory 写入 step.extra.invalidNodeIdsBefore，用于撤销时还原到「操作前」的错误状态。
+   */
+  private invalidNodeIdsBeforeOp: Map<Id, NodeInvalidInfo> | null = null;
   /**
    * 最近一次 pushOpHistory 写入的历史记录 uuid。
    * 供 *AndGetHistoryId 系列方法在调用普通操作后取回本次产生的历史记录 id；
@@ -127,7 +136,7 @@ class Editor extends BaseService {
 
   /**
    * 设置当前指点节点配置
-   * @param name 'root' | 'page' | 'parent' | 'node' | 'highlightNode' | 'nodes' | 'stage' | 'modifiedNodeIds' | 'pageLength' | 'pageFragmentLength
+   * @param name 'root' | 'page' | 'parent' | 'node' | 'highlightNode' | 'nodes' | 'stage' | 'modifiedNodeIds' | 'invalidNodeIds' | 'pageLength' | 'pageFragmentLength
    * @param value MNode
    * @param options.historySource 设置 root 时，本次变更写入历史记录的「操作来源」（仅 name === 'root' 时生效）
    */
@@ -180,12 +189,15 @@ class Editor extends BaseService {
       }
 
       this.emit('root-change', value as StoreState['root'], preValue as StoreState['root'], options);
+
+      // 整体替换 DSL 后，清理不再存在于新 DSL 中的失效节点错误记录，避免残留误报。
+      this.pruneInvalidNodeIds();
     }
   }
 
   /**
    * 获取当前指点节点配置
-   * @param name  'root' | 'page' | 'parent' | 'node' | 'highlightNode' | 'nodes' | 'stage' | 'modifiedNodeIds' | 'pageLength' | 'pageFragmentLength'
+   * @param name  'root' | 'page' | 'parent' | 'node' | 'highlightNode' | 'nodes' | 'stage' | 'modifiedNodeIds' | 'invalidNodeIds' | 'pageLength' | 'pageFragmentLength'
    * @returns MNode
    */
   public get<K extends StoreStateKey>(name: K): StoreState[K] {
@@ -663,6 +675,9 @@ class Editor extends BaseService {
 
     await Promise.all(nodes.map((node) => this.doRemove(node, { doNotSelect, doNotSwitchPage })));
 
+    // 删除节点时同步清理其（含子树）的校验错误记录；置于 pushOpHistory 之前，使历史快照与本次删除对齐。
+    this.removeInvalidNodesBySubtree(nodes);
+
     if (removedItems.length > 0 && pageForOp) {
       if (!doNotPushHistory) {
         this.pushOpHistory('remove', {
@@ -770,11 +785,23 @@ class Editor extends BaseService {
       doNotPushHistory?: boolean;
       historyDescription?: string;
       historySource?: HistoryOpSource;
+      /**
+       * 属性面板提交时携带的校验错误信息，在写入历史记录之前落库，
+       * 使历史快照与本次变更对齐，从而 undo/redo 能正确还原错误标记。
+       */
+      invalidInfo?: { id: Id; source: NodeInvalidSource; error?: string };
     } = {},
   ): Promise<MNode | MNode[]> {
     this.captureSelectionBeforeOp();
 
-    const { doNotPushHistory = false, changeRecordList, changeRecords, historyDescription, historySource } = data;
+    const {
+      doNotPushHistory = false,
+      changeRecordList,
+      changeRecords,
+      historyDescription,
+      historySource,
+      invalidInfo,
+    } = data;
 
     const nodes = Array.isArray(config) ? config : [config];
 
@@ -786,6 +813,9 @@ class Editor extends BaseService {
         return this.doUpdate(node, { changeRecords: recordsForNode, historySource });
       }),
     );
+
+    // 校验错误信息在 pushOpHistory 之前落库，保证历史快照包含本次变更对应的错误状态。
+    this.applyInvalidInfo(invalidInfo);
 
     if (updateData[0].oldNode?.type !== NodeType.ROOT) {
       const curNodes = this.get('nodes');
@@ -1542,6 +1572,7 @@ class Editor extends BaseService {
     this.set('stage', null);
     this.set('highlightNode', null);
     this.set('modifiedNodeIds', new Map());
+    this.set('invalidNodeIds', new Map());
     this.set('pageLength', 0);
   }
 
@@ -1553,6 +1584,62 @@ class Editor extends BaseService {
 
   public resetModifiedNodeId() {
     this.get('modifiedNodeIds').clear();
+  }
+
+  /**
+   * 记录（或覆盖）某个节点在指定来源（属性表单 / 样式表单）上的校验错误信息。
+   * @param id 节点 id
+   * @param source 错误来源：'props'（属性表单）| 'style'（样式表单）
+   * @param message 错误文案（可能是包含 <br> 的 HTML）
+   */
+  public setInvalidNode(id: Id, source: NodeInvalidSource, message: string) {
+    const map = this.get('invalidNodeIds');
+    const info: NodeInvalidInfo = { ...(map.get(id) || {}) };
+    info[source] = message;
+    map.set(id, info);
+    this.emit('invalid-node-change', map);
+  }
+
+  /**
+   * 删除节点的校验错误记录。
+   * @param id 节点 id
+   * @param source 指定来源则仅删除该来源；不传则删除该节点全部来源的错误
+   */
+  public deleteInvalidNode(id: Id, source?: NodeInvalidSource) {
+    const map = this.get('invalidNodeIds');
+    if (!map.has(id)) return;
+
+    if (!source) {
+      map.delete(id);
+    } else {
+      const info: NodeInvalidInfo = { ...(map.get(id) || {}) };
+      delete info[source];
+      if (info.props || info.style) {
+        map.set(id, info);
+      } else {
+        map.delete(id);
+      }
+    }
+
+    this.emit('invalid-node-change', map);
+  }
+
+  /** 获取当前存在校验错误的节点错误 Map（key 为节点 id） */
+  public getInvalidNodeIds(): Map<Id, NodeInvalidInfo> {
+    return this.get('invalidNodeIds');
+  }
+
+  /** 获取指定节点的校验错误信息 */
+  public getInvalidNodeInfo(id: Id): NodeInvalidInfo | undefined {
+    return this.get('invalidNodeIds').get(id);
+  }
+
+  /** 清空全部校验错误记录 */
+  public resetInvalidNodeId() {
+    const map = this.get('invalidNodeIds');
+    if (map.size === 0) return;
+    map.clear();
+    this.emit('invalid-node-change', map);
   }
 
   public usePlugin(options: AsyncHookPlugin<AsyncMethodName, Editor>): void {
@@ -1577,6 +1664,57 @@ class Editor extends BaseService {
     return super.emit(eventName, ...args);
   }
 
+  /**
+   * 应用一次属性面板提交携带的校验错误信息（在写入历史记录之前调用，使历史快照与本次变更对齐）。
+   * error 非空则记录错误，为空则清除对应来源的错误。
+   */
+  private applyInvalidInfo(invalidInfo?: { id: Id; source: NodeInvalidSource; error?: string }) {
+    if (!invalidInfo) return;
+    const { id, source, error } = invalidInfo;
+    if (error) {
+      this.setInvalidNode(id, source, error);
+    } else {
+      this.deleteInvalidNode(id, source);
+    }
+  }
+
+  /** 删除被移除节点（含其子树）的校验错误记录，避免残留误报 */
+  private removeInvalidNodesBySubtree(nodes: MNode[]) {
+    const map = this.get('invalidNodeIds');
+    if (map.size === 0) return;
+
+    let changed = false;
+    nodes.forEach((node) => {
+      traverseNode(node, (n) => {
+        if (n.id !== undefined && map.delete(n.id)) {
+          changed = true;
+        }
+      });
+    });
+
+    if (changed) {
+      this.emit('invalid-node-change', map);
+    }
+  }
+
+  /** 清理不在当前 DSL 中的失效节点错误记录（用于整体替换 root 后） */
+  private pruneInvalidNodeIds() {
+    const map = this.get('invalidNodeIds');
+    if (map.size === 0) return;
+
+    let changed = false;
+    for (const id of [...map.keys()]) {
+      if (!this.getNodeById(id, false)) {
+        map.delete(id);
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      this.emit('invalid-node-change', map);
+    }
+  }
+
   private addModifiedNodeId(id: Id) {
     this.get('modifiedNodeIds').set(id, id);
   }
@@ -1598,6 +1736,9 @@ class Editor extends BaseService {
   private captureSelectionBeforeOp() {
     if (this.selectionBeforeOp) return;
     this.selectionBeforeOp = this.get('nodes').map((n) => n.id);
+    // 与选区快照同步捕获「操作前」的校验错误状态；因 applyInvalidInfo 会在 pushOpHistory 前修改 invalidNodeIds，
+    // 必须在此（操作最开始）留存操作前快照，供 undo 还原。
+    this.invalidNodeIdsBeforeOp = new Map(this.get('invalidNodeIds'));
   }
 
   /**
@@ -1704,6 +1845,9 @@ class Editor extends BaseService {
         selectedBefore: this.selectionBeforeOp ?? [],
         selectedAfter: this.get('nodes').map((n) => n.id),
         modifiedNodeIds: new Map(this.get('modifiedNodeIds')),
+        // 方向性双快照：undo 还原「操作前」错误状态，redo 还原「操作后」错误状态。
+        invalidNodeIdsBefore: new Map(this.invalidNodeIdsBeforeOp ?? this.get('invalidNodeIds')),
+        invalidNodeIdsAfter: new Map(this.get('invalidNodeIds')),
       },
       diff,
     };
@@ -1716,6 +1860,7 @@ class Editor extends BaseService {
     const historyId = pushed ? step.uuid : null;
     this.lastPushedHistoryId = historyId;
     this.selectionBeforeOp = null;
+    this.invalidNodeIdsBeforeOp = null;
     return historyId;
   }
 
@@ -1840,6 +1985,15 @@ class Editor extends BaseService {
     }
 
     this.set('modifiedNodeIds', step.extra?.modifiedNodeIds ?? new Map());
+
+    // 还原校验错误标记：因 undo/redo 复用同一 step，需按方向取「操作前 / 操作后」快照——
+    // undo(reverse=true) 还原到操作前的错误状态（撤销一个「校验失败」的改动后错误消失），
+    // redo(reverse=false) 还原到操作后的错误状态（重做后错误恢复）。
+    // 浅拷贝一份以隔离历史快照，避免后续 set/deleteInvalidNode 反向污染 step.extra。
+    const invalidToRestore =
+      (reverse ? step.extra?.invalidNodeIdsBefore : step.extra?.invalidNodeIdsAfter) ?? new Map();
+    this.set('invalidNodeIds', new Map(invalidToRestore));
+    this.emit('invalid-node-change', this.get('invalidNodeIds'));
 
     const page = toRaw(this.get('page'));
     if (page) {

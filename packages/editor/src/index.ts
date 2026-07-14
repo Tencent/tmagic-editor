@@ -48,6 +48,7 @@ export { default as componentListService } from './services/componentList';
 export { default as keybindingService } from './services/keybinding';
 export { default as ComponentListPanel } from './layouts/sidebar/ComponentListPanel.vue';
 export { default as LayerPanel } from './layouts/sidebar/layer/LayerPanel.vue';
+export { default as LayerNodeContent } from './layouts/sidebar/layer/LayerNodeContent.vue';
 export { default as CodeSelect } from './fields/CodeSelect.vue';
 export { default as CodeSelectCol } from './fields/CodeSelectCol.vue';
 export { default as DataSourceFields } from './fields/DataSourceFields.vue';

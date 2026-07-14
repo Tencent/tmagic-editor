@@ -31,6 +31,7 @@ import {
   getKeysArray,
   getNodeInfo,
   IS_DSL_NODE_KEY,
+  isArrayIndex,
   isDslNode,
   isNumber,
   isObject,
@@ -276,6 +277,47 @@ describe('setValueByKeyPath / getKeys', () => {
     const obj: any = {};
     setValueByKeyPath('a.b.c', 1, obj);
     expect(obj.a.b.c).toBe(1);
+  });
+
+  test('setValueByKeyPath 当 value 为 undefined 时不写入 undefined 到数组', () => {
+    const obj: any = {};
+    setValueByKeyPath('displayConds.0.cond.0', undefined, obj);
+    expect(obj).toEqual({ displayConds: [{ cond: [] }] });
+  });
+
+  test('setValueByKeyPath 当 value 为 undefined 时保留已有父级数据', () => {
+    const obj: any = { displayConds: [{ cond: ['x'] }] };
+    setValueByKeyPath('displayConds.0.cond.1', undefined, obj);
+    expect(obj).toEqual({ displayConds: [{ cond: ['x'] }] });
+  });
+
+  test('setValueByKeyPath 对象属性 value 为 undefined 时保持原行为', () => {
+    const obj: any = {};
+    setValueByKeyPath('a.b.c', undefined, obj);
+    expect(obj.a.b.c).toBeUndefined();
+  });
+
+  test('setValueByKeyPath 末级为数字 key 且父级已存在但非数组时不覆盖父级', () => {
+    const obj: any = { displayConds: [{ cond: 'not-array' }] };
+    setValueByKeyPath('displayConds.0.cond.0', undefined, obj);
+    // 父级非数组时跳过补建，保留原值
+    expect(obj).toEqual({ displayConds: [{ cond: 'not-array' }] });
+  });
+
+  test('setValueByKeyPath 数字型末级 key 统一按数组下标处理（数字型对象 key 歧义）', () => {
+    const obj: any = { map: { 0: 'a' } };
+    setValueByKeyPath('map.0', undefined, obj);
+    // map 已存在，直接返回，不会把 map['0'] 置为 undefined
+    expect(obj).toEqual({ map: { 0: 'a' } });
+  });
+
+  test('isArrayIndex 仅对纯数字返回 true', () => {
+    expect(isArrayIndex(0)).toBe(true);
+    expect(isArrayIndex('0')).toBe(true);
+    expect(isArrayIndex('12')).toBe(true);
+    expect(isArrayIndex('a')).toBe(false);
+    expect(isArrayIndex('1a')).toBe(false);
+    expect(isArrayIndex('')).toBe(false);
   });
 
   test('getKeys 返回对象 keys', () => {

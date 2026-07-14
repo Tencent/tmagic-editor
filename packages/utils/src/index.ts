@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-import { cloneDeep, set as objectSet } from 'lodash-es';
+import { cloneDeep, get as objectGet, set as objectSet } from 'lodash-es';
 
 import type {
   DataSchema,
@@ -308,6 +308,13 @@ export const getKeysArray = (keys: string | number) =>
   // 将 array[0] 转成 array.0
   `${keys}`.replace(/\[(\d+)\]/g, '.$1').split('.');
 
+/**
+ * 判断某一层 key 是否为数组下标（纯数字）
+ * @param key 单层 key
+ * @returns 是否为数组下标
+ */
+export const isArrayIndex = (key: string | number): boolean => /^\d+$/.test(`${key}`);
+
 export const getValueByKeyPath = (
   keys: number | string | string[] = '',
   data: Record<string | number, any> = {},
@@ -327,8 +334,23 @@ export const getValueByKeyPath = (
   }, data);
 };
 
-export const setValueByKeyPath = (keys: string | number, value: any, data: Record<string | number, any> = {}): any =>
-  objectSet(data, keys, value);
+export const setValueByKeyPath = (keys: string | number, value: any, data: Record<string | number, any> = {}): any => {
+  if (typeof value === 'undefined') {
+    // 仅数组下标场景需要特殊处理：lodash 的 set 会把 undefined 写入数组得到 [undefined]，
+    // 此处改为只创建父级空数组，避免出现 [undefined]。对象属性场景 undefined 会被 JSON 自然丢弃，保持原行为。
+    // 注意：这里将「数字型末级 key」统一按数组下标处理，无法区分数字型对象 key，属于预期内的取舍。
+    const keyArray = getKeysArray(keys);
+    const lastKey = keyArray[keyArray.length - 1];
+    if (keyArray.length > 1 && isArrayIndex(lastKey)) {
+      const parentPath = keyArray.slice(0, -1).join('.');
+      if (typeof objectGet(data, parentPath) === 'undefined') {
+        objectSet(data, parentPath, []);
+      }
+      return data;
+    }
+  }
+  return objectSet(data, keys, value);
+};
 
 export const getNodes = (ids: Id[], data: MNode[] = []): MNode[] => {
   const nodes: MNode[] = [];

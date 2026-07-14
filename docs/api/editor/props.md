@@ -1265,7 +1265,7 @@ const guidesOptions = {
 ## disabledShowSrc
 
 - **详情：**
-  
+
   禁用属性配置面板右下角"显示源码"的按钮
 
   该按钮可以查看和编辑组件的 JSON 配置
@@ -1281,6 +1281,45 @@ const guidesOptions = {
   <m-editor :disabled-show-src="true"></m-editor>
 </template>
 ```
+
+## enablePropsFormValidate
+
+- **详情：**
+
+  是否启用「属性配置表单校验」联动能力。
+
+  开启后（默认 `false` 关闭），当属性面板（属性表单 / 样式表单）校验失败时，编辑器会**仍按当前表单值更新节点**，并把错误信息集中记录到 `editorService`（`invalidNodeIds` 状态），用于：
+
+  - 组件树（图层）中对出错节点标红并显示错误图标，鼠标悬停可查看错误文案；
+  - 保存前拦截：业务可通过 `editorService.getInvalidNodeIds()` 读取错误节点，存在校验错误时阻止保存（参考 [playground 菜单保存拦截](../../guide/advanced/prop-form-validate.md#保存拦截)）。
+
+  关闭时保持原行为：属性 / 样式表单校验失败则丢弃本次改动，不写入节点。
+
+  :::tip
+  校验错误以「来源」为维度分别记录 —— 属性表单来源记为 `props`，样式表单来源记为 `style`；两者指向同一节点，互不覆盖。节点只要任一来源存在错误即视为出错。
+
+  错误信息会随 DSL 操作写入历史记录快照，因此「撤销 / 重做」能正确还原校验错误状态（撤销一个「校验失败」的改动后错误消失，重做后错误恢复）。
+  :::
+
+- **默认值：** `false`
+
+- **类型：** `boolean`
+
+- **示例：**
+
+```html
+<template>
+  <!-- 开启属性配置表单校验联动能力 -->
+  <m-editor :enable-props-form-validate="true"></m-editor>
+</template>
+```
+
+- **相关 API：**
+
+  - `editorService` 错误状态与方法：`get('invalidNodeIds')` / [setInvalidNode](#setinvalidnode) / [deleteInvalidNode](#deleteinvalidnode) / [getInvalidNodeIds](#getinvalidnodeids) / [getInvalidNodeInfo](#getinvalidnodeinfo) / [resetInvalidNodeId](#resetinvalidnodeid)
+  - 错误状态变化事件：[invalid-node-change](#invalid-node-change)
+  - 进阶用法见[属性配置表单校验联动](../../guide/advanced/prop-form-validate.md)
+
 
 ## disabledDataSource
 

@@ -33,7 +33,9 @@
       </template>
 
       <template #tree-node-label="{ data: nodeData }">
-        <slot name="layer-node-label" :data="nodeData"></slot>
+        <slot name="layer-node-label" :data="nodeData">
+          <LayerNodeContent :data="nodeData"></LayerNodeContent>
+        </slot>
       </template>
     </Tree>
 
@@ -69,6 +71,7 @@ import type {
 } from '@editor/type';
 
 import LayerMenu from './LayerMenu.vue';
+import LayerNodeContent from './LayerNodeContent.vue';
 import LayerNodeTool from './LayerNodeTool.vue';
 import { useClick } from './use-click';
 import { useDrag } from './use-drag';

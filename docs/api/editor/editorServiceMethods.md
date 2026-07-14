@@ -48,7 +48,7 @@ DSL 操作方法（`add` / `remove` / `update` 等）默认返回操作结果（
 ## get
 
 - **参数：**
-  - `{'root' | 'page' | 'parent' | 'node' | 'highlightNode' | 'nodes' | 'modifiedNodeIds' | 'pageLength' | 'pageFragmentLength' | 'stage' | 'stageLoading' | 'disabledMultiSelect' | 'alwaysMultiSelect'} name`
+  - `{'root' | 'page' | 'parent' | 'node' | 'highlightNode' | 'nodes' | 'modifiedNodeIds' | 'invalidNodeIds' | 'pageLength' | 'pageFragmentLength' | 'stage' | 'stageLoading' | 'disabledMultiSelect' | 'alwaysMultiSelect'} name`
 
 - **返回：**
   - `{any} value`
@@ -70,6 +70,8 @@ DSL 操作方法（`add` / `remove` / `update` 等）默认返回操作结果（
   'nodes': 当前选中的所有节点
 
   'modifiedNodeIds': 当前页面所有改动过的节点id
+
+  'invalidNodeIds': 校验失败的节点错误信息（`Map<Id, NodeInvalidInfo>`），供组件树标红提示与保存拦截读取
 
   'pageLength': 所以页面个数
 
@@ -93,7 +95,7 @@ const node = editorService.get("node");
 
 ## set
 
-- `{'root' | 'page' | 'parent' | 'node' | 'highlightNode' | 'nodes' | 'modifiedNodeIds' | 'pageLength' | 'pageFragmentLength' | 'stage' | 'stageLoading' | 'disabledMultiSelect' | 'alwaysMultiSelect'} name`
+- `{'root' | 'page' | 'parent' | 'node' | 'highlightNode' | 'nodes' | 'modifiedNodeIds' | 'invalidNodeIds' | 'pageLength' | 'pageFragmentLength' | 'stage' | 'stageLoading' | 'disabledMultiSelect' | 'alwaysMultiSelect'} name`
 - `{any} value`
 
 - **详情：**
@@ -510,6 +512,10 @@ editorService.highlight("text_123");
     - `{boolean}` doNotPushHistory 是否不写入历史记录（默认 false）
     - `{string}` historyDescription 见[历史记录相关 options](#历史记录相关-options)
     - `{HistoryOpSource}` historySource 见[历史记录相关 options](#历史记录相关-options)
+    - `{Object}` invalidInfo 启用 [enablePropsFormValidate](./props.md#enablepropsformvalidate) 时，属性面板提交携带的校验错误信息，在写入历史记录之前落库，使历史快照与本次变更对齐
+      - `{Id}` id 节点 id
+      - `{'props' | 'style'}` source 错误来源：属性表单 / 样式表单
+      - `{string}` error 错误文案（可为含 `<br>` 的 HTML）；为空时表示清除该来源的错误记录
 
   ::: details 查看 ChangeRecord 类型定义
   <<< @/../packages/form-schema/src/base.ts#ChangeRecord{ts}
@@ -926,6 +932,89 @@ await editorService.revertPageStepById(historyIds);
 - **详情：**
 
 重置当前记录的修改过的节点id记录，通常用于保存之后
+
+## setInvalidNode
+
+- **参数：**
+  - `{Id}` id 节点 id
+  - `{'props' | 'style'}` source 错误来源：属性表单（`props`）/ 样式表单（`style`）
+  - `{string}` message 错误文案（可能为包含 `<br>` 的 HTML）
+
+- **详情：**
+
+  记录（或覆盖）某个节点在指定来源上的校验错误信息，写入 `invalidNodeIds` 状态并发出 [invalid-node-change](#invalid-node-change) 事件。
+
+  属性表单与样式表单是两个独立的 `FormPanel` 且均指向同一节点，故以来源为键分别保存，避免某个面板校验通过时误清另一个面板记录的错误。节点视为存在错误当且仅当任一来源存在非空文本。
+
+- **示例：**
+
+```js
+import { editorService } from "@tmagic/editor";
+
+// 标记 text_123 的属性表单校验错误
+editorService.setInvalidNode("text_123", "props", "标题不能为空");
+```
+
+## deleteInvalidNode
+
+- **参数：**
+  - `{Id}` id 节点 id
+  - `{'props' | 'style'}` source 可选；指定来源则仅删除该来源错误，不传则删除该节点全部来源的错误
+
+- **详情：**
+
+  删除节点的校验错误记录。仅当该来源被清空且另一来源也无错误时，节点整体错误记录才会被移除；随后发出 [invalid-node-change](#invalid-node-change) 事件。
+
+## getInvalidNodeIds
+
+- **返回：**
+  - {`Map<Id, NodeInvalidInfo>`} 当前存在校验错误的节点错误 Map（key 为节点 id）
+
+- **详情：**
+
+  获取当前存在校验错误的节点错误 Map，供组件树标红提示与保存拦截读取。
+
+  ::: details 查看 NodeInvalidInfo 及关联类型定义
+  <<< @/../packages/editor/src/type.ts#NodeInvalidInfo{ts}
+
+  <<< @/../packages/editor/src/type.ts#NodeInvalidSource{ts}
+
+  <<< @/../packages/schema/src/index.ts#Id{ts}
+  :::
+
+- **示例：**
+
+```js
+import { editorService } from "@tmagic/editor";
+
+// 保存前检查是否存在校验错误的组件
+const invalidNodeIds = editorService.getInvalidNodeIds();
+if (invalidNodeIds.size > 0) {
+  const names = [...invalidNodeIds.keys()].map((id) => {
+    const node = editorService.getNodeById(id);
+    return node?.name ? `${node.name}(${id})` : `${id}`;
+  });
+  console.warn(`以下组件存在配置校验错误，请修复后再保存：${names.join("、")}`);
+}
+```
+
+## getInvalidNodeInfo
+
+- **参数：**
+  - `{Id}` id 节点 id
+
+- **返回：**
+  - {`NodeInvalidInfo` | undefined} 指定节点的校验错误信息（含 `props` / `style` 来源的错误文案）
+
+- **详情：**
+
+  获取指定节点的校验错误信息。
+
+## resetInvalidNodeId
+
+- **详情：**
+
+  清空全部校验错误记录（即 `invalidNodeIds` 状态），随后发出 [invalid-node-change](#invalid-node-change) 事件。
 
 ## resetState
 

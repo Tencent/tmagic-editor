@@ -1,3 +1,5 @@
+import type { InjectionKey } from 'vue';
+
 import type { DataSourceSchema, EventOption, Id, MApp, MNode, MPage, MPageFragment } from '@tmagic/core';
 import type { FormConfig, FormState } from '@tmagic/form';
 import StageCore, {
@@ -25,6 +27,12 @@ import type {
   StageRect,
   TreeNodeData,
 } from './type';
+
+/**
+ * 「属性配置表单校验」联动能力的 provide/inject 注入键。
+ * 使用 Symbol 避免与其它字符串键冲突，供 PropsPanel / FormPanel 注入判断校验失败时是否仍更新节点并记录错误。
+ */
+export const ENABLE_PROPS_FORM_VALIDATE: InjectionKey<boolean> = Symbol('enablePropsFormValidate');
 
 export interface EditorProps {
   /** 页面初始值 */
@@ -91,6 +99,11 @@ export interface EditorProps {
   disabledFlashTip?: boolean;
   /** 禁用双击在浮层中单独编辑选中组件 */
   disabledStageOverlay?: boolean;
+  /**
+   * 是否启用「属性配置表单校验」联动能力：开启后属性/样式表单校验失败时仍更新节点，
+   * 并把错误信息集中记录到 editorService，用于组件树标红提示与保存拦截；默认 false（关闭）。
+   */
+  enablePropsFormValidate?: boolean;
   /** 禁用属性配置面板右下角显示源码的按钮 */
   disabledShowSrc?: boolean;
   /** 禁用数据源 */
