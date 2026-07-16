@@ -35,6 +35,16 @@ defineExpose({
     return form.value?.validate();
   },
 
+  clearValidate(props?: string | string[]) {
+    if (typeof form.value?.clearValidate === 'function') {
+      return form.value?.clearValidate(props);
+    }
+    // tdesign 使用 clearValidate，element-plus 也是 clearValidate；此处兜底其它可能的命名
+    if (typeof form.value?.clearValidateState === 'function') {
+      return form.value?.clearValidateState();
+    }
+  },
+
   resetFields() {
     if (typeof form.value?.resetFields === 'function') {
       return form.value?.resetFields();

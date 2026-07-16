@@ -3,9 +3,10 @@
  *
  * Copyright (C) 2025 Tencent.
  */
-import { describe, expect, test, vi } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { NODE_CONDS_RESULT_KEY } from '@tmagic/core';
+import { validateForm } from '@tmagic/form';
 
 import {
   advancedTabConfig,
@@ -18,6 +19,7 @@ import {
   getCondOpOptionsByFieldType,
   numberOptions,
   styleTabConfig,
+  validatePropsForm,
 } from '@editor/utils/props';
 
 vi.mock('@tmagic/design', () => ({
@@ -25,6 +27,10 @@ vi.mock('@tmagic/design', () => ({
     success: vi.fn(),
     error: vi.fn(),
   },
+}));
+
+vi.mock('@tmagic/form', () => ({
+  validateForm: vi.fn(),
 }));
 
 describe('props 选项常量', () => {
@@ -162,5 +168,58 @@ describe('fillConfig', () => {
     codeSelects.forEach((cs: any) => {
       expect(cs.labelPosition).toBe('top');
     });
+  });
+});
+
+describe('validatePropsForm', () => {
+  beforeEach(() => {
+    vi.mocked(validateForm).mockReset();
+  });
+
+  test('合入 appContext.provides、注入 stage/services 并合并外部 extendState，debug 默认 true', async () => {
+    vi.mocked(validateForm).mockResolvedValue('err-text');
+
+    const services = { uiService: {} } as any;
+    const stage = { id: 'stage' };
+    const appContext = { app: {}, provides: { foo: 1 } } as any;
+
+    const result = await validatePropsForm({
+      config: [],
+      values: { a: 1 },
+      appContext,
+      services,
+      stage,
+      extendState: async () => ({ extra: true }),
+    });
+
+    // 直接返回 validateForm 的结果
+    expect(result).toBe('err-text');
+
+    const arg = vi.mocked(validateForm).mock.calls[0][0];
+    expect(arg.config).toEqual([]);
+    expect(arg.debug).toBe(true);
+    expect(arg.initValues).toEqual({ a: 1 });
+    // appContext 保留原字段，但 provides 被替换为 { services }
+    expect(arg.appContext).toEqual({ app: {}, provides: { services } });
+
+    // extendState 合并外部返回并注入 stage/services
+    const state = await arg.extendState!({} as any);
+    expect(state).toEqual({ extra: true, stage, services });
+  });
+
+  test('appContext 缺省为 null，extendState 缺省时仍注入 stage/services，可覆盖 debug', async () => {
+    vi.mocked(validateForm).mockResolvedValue('');
+
+    const services = {} as any;
+    const stage = {};
+
+    await validatePropsForm({ config: [], values: {}, services, stage, debug: false });
+
+    const arg = vi.mocked(validateForm).mock.calls[0][0];
+    expect(arg.appContext).toBeNull();
+    expect(arg.debug).toBe(false);
+
+    const state = await arg.extendState!({} as any);
+    expect(state).toEqual({ stage, services });
   });
 });

@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { provide, reactive, ref, shallowRef, toRaw, useTemplateRef, watch, watchEffect } from 'vue';
+import { nextTick, provide, reactive, ref, shallowRef, toRaw, useTemplateRef, watch, watchEffect } from 'vue';
 import { cloneDeep, isEqual } from 'lodash-es';
 
 import { TMagicForm, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
@@ -280,6 +280,10 @@ watch(
       values.value = value;
       // 非对比模式，初始化完成
       initialized.value = !props.isCompare;
+
+      nextTick(() => {
+        tMagicFormRef.value?.validate();
+      });
     });
 
     if (props.isCompare) {
@@ -360,6 +364,27 @@ const getTextByName = (name: string, config: FormConfig = props.config): string 
   return findInConfig(config, nameParts);
 };
 
+/**
+ * 将校验返回的 invalidFields 汇总为可读的错误文案（多条以 `<br>` 拼接）。
+ *
+ * 抽离为独立方法，供 `submitForm`（提交校验）与 `validate`（返回错误文案的校验）复用，
+ * 保证两种校验入口产出的错误文案格式完全一致。
+ */
+const formatValidateError = (invalidFields: Record<string, any>): string => {
+  const error: string[] = [];
+
+  Object.entries(invalidFields).forEach(([prop, validateError]) => {
+    (validateError as ValidateError[]).forEach(({ field, message }) => {
+      const name = field || prop;
+      const text = (props.useFieldTextInError ? getTextByName(name, props.config) : undefined) || name;
+
+      error.push(`${text} -> ${message}`);
+    });
+  });
+
+  return error.join('<br>');
+};
+
 defineExpose({
   values,
   lastValuesProcessed,
@@ -387,18 +412,36 @@ defineExpose({
     } catch (invalidFields: any) {
       emit('error', invalidFields);
 
-      const error: string[] = [];
+      throw new Error(formatValidateError(invalidFields));
+    }
+  },
 
-      Object.entries(invalidFields).forEach(([prop, ValidateError]) => {
-        (ValidateError as ValidateError[]).forEach(({ field, message }) => {
-          const name = field || prop;
-          const text = (props.useFieldTextInError ? getTextByName(name, props.config) : undefined) || name;
-
-          error.push(`${text} -> ${message}`);
-        });
-      });
-
-      throw new Error(error.join('<br>'));
+  /**
+   * 校验：对表单当前值执行校验，返回汇总后的错误文案。
+   *
+   * 与 `submitForm` 的区别：
+   * - 校验失败时不抛异常、不触发 `error` 事件，而是以返回值形式给出错误文案；
+   * - 不重置 `changeRecords`，不改变提交语义，仅用于「探测」当前配置是否合法。
+   *
+   * 注意：本方法只改变「校验结果的返回方式」，并不负责「不污染页面表单状态」——
+   * 若需对一份独立的「配置 + 值」做完全不影响页面上已渲染表单的校验，请使用 `validateForm`
+   * （内部会新建一个隐藏的 MForm 实例，通过 `initValues` 传入待校验值，用完即卸载）。
+   *
+   * 典型用途：作为 `validateForm` 内部复用的校验实现；也可在已渲染的表单实例上主动调用，
+   * 根据返回的错误文案自行决定后续处理（如记录节点错误状态）。
+   *
+   * @returns 校验通过返回空字符串 `''`，否则返回以 `<br>` 拼接的错误文案。
+   */
+  validate: async (): Promise<string> => {
+    try {
+      const result = await tMagicFormRef.value?.validate();
+      // tdesign 通过返回值返回校验结果，element-plus 通过 throw error
+      if (result !== true) {
+        throw result;
+      }
+      return '';
+    } catch (invalidFields: any) {
+      return formatValidateError(invalidFields);
     }
   },
 

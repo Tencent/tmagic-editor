@@ -17,14 +17,14 @@
  */
 import { afterEach, beforeAll, describe, expect, test, vi } from 'vitest';
 import { type AppContext, createApp, defineComponent, h, nextTick } from 'vue';
-import MagicForm, { submitForm } from '@form/index';
+import MagicForm, { validateForm } from '@form/index';
 import ElementPlus from 'element-plus';
 
 let appContext: AppContext;
 
 beforeAll(() => {
   // 构造一个父级 app，把 element-plus 与 m-form 插件装上，
-  // 之后通过 appContext 传给 submitForm 复用全局注册
+  // 之后通过 appContext 传给 validateForm 复用全局注册
   const parentApp = createApp(defineComponent({ render: () => h('div') }));
   parentApp.use(ElementPlus);
   parentApp.use(MagicForm);
@@ -35,41 +35,36 @@ afterEach(() => {
   document.body.innerHTML = '';
 });
 
-describe('submitForm', () => {
-  test('校验通过时 resolve 表单值，并自动清理 DOM', async () => {
-    const values = await submitForm({
-      config: [
-        {
-          type: 'text',
-          name: 'text',
-          text: 'text',
-        },
-      ],
+// 说明：validateForm 内部会新建一个独立的 MForm 实例并复用其校验方法 `validate`（返回错误文案、不抛异常），
+// 校验失败时的错误文案格式由 Form.vue 实例的 `validate` 负责，已在 Form.extra.spec.ts
+// 中覆盖；此处聚焦 validateForm 独有的「命令式挂载 / 卸载 / 上下文注入 / 超时」等行为。
+describe('validateForm', () => {
+  test('校验通过时 resolve 空字符串，并自动清理 DOM', async () => {
+    const error = await validateForm({
+      config: [{ type: 'text', name: 'text', text: 'text' }],
       initValues: { text: 'hello' },
       appContext,
     });
 
-    expect(values).toEqual({ text: 'hello' });
+    expect(error).toBe('');
     expect(document.body.querySelector('.m-form')).toBeNull();
   });
 
-  test('native=true 时返回原始（未 clone）的 values', async () => {
-    const initValues = { text: 'origin' };
-
-    const values = await submitForm({
-      config: [{ type: 'text', name: 'text', text: 'text' }],
-      initValues,
-      native: true,
+  test('resolve 结果始终为字符串（校验入口不抛异常）', async () => {
+    const error = await validateForm({
+      config: [{ type: 'text', name: 'name', text: '名称' }],
+      initValues: { name: '' },
       appContext,
     });
 
-    expect(values).toEqual({ text: 'origin' });
+    expect(typeof error).toBe('string');
+    expect(document.body.querySelector('.m-form')).toBeNull();
   });
 
   test('支持 extendState 扩展状态', async () => {
     const extendState = vi.fn(async () => ({ extra: 'value' }));
 
-    await submitForm({
+    await validateForm({
       config: [{ type: 'text', name: 'text', text: 'text' }],
       initValues: { text: 'foo' },
       extendState,
@@ -79,8 +74,40 @@ describe('submitForm', () => {
     expect(extendState).toHaveBeenCalled();
   });
 
+  test('tab 的 display 函数读取 extendState 注入的值时不会因竞态崩溃', async () => {
+    // 模拟编辑器 styleTabConfig.display 的模式：display 函数从 mForm 解构 services
+    // services 通过 extendState 注入。若 extendState 异步且在首次渲染前未完成，
+    // display 函数会读到 undefined 导致 TypeError。
+    const error = await validateForm({
+      config: [
+        {
+          type: 'tab',
+          items: [
+            { title: '属性', items: [{ type: 'text', name: 'name', text: '名称' }] },
+            {
+              title: '样式',
+              display: (mForm: any) => {
+                const { services } = mForm || {};
+                return !(services?.uiService?.get('showStylePanel') ?? true);
+              },
+              items: [{ type: 'text', name: 'style', text: '样式' }],
+            },
+          ],
+        },
+      ],
+      initValues: { name: 'test' },
+      extendState: () => ({
+        services: { uiService: { get: () => false } },
+      }),
+      appContext,
+    });
+
+    expect(typeof error).toBe('string');
+    expect(document.body.querySelector('.m-form')).toBeNull();
+  });
+
   test('在嵌套 items 配置下也能正确 resolve', async () => {
-    const values = await submitForm({
+    const error = await validateForm({
       config: [
         { type: 'text', name: 'name', text: 'name' },
         {
@@ -95,68 +122,86 @@ describe('submitForm', () => {
       appContext,
     });
 
-    expect(values).toEqual({
-      name: 'a',
-      object: { nested: 'b' },
-    });
+    expect(error).toBe('');
   });
 
-  test('returnChangeRecords=true 时返回 { values, changeRecords }', async () => {
-    const result = await submitForm({
-      config: [{ type: 'text', name: 'text', text: 'text' }],
-      initValues: { text: 'hello' },
-      returnChangeRecords: true,
+  test('去除 type 为 tab 的容器中各标签页的 lazy，使懒加载标签页字段也参与校验', async () => {
+    const config: any = [
+      {
+        type: 'tab',
+        items: [
+          { title: '属性', items: [{ type: 'text', name: 'name', text: '名称' }] },
+          { title: '样式', lazy: true, items: [{ type: 'text', name: 'style', text: '样式' }] },
+        ],
+      },
+    ];
+
+    const error = await validateForm({
+      config,
+      initValues: { name: 'a', style: 'b' },
       appContext,
     });
 
-    expect(result).toHaveProperty('values');
-    expect(result).toHaveProperty('changeRecords');
-    expect(result.values).toEqual({ text: 'hello' });
-    expect(Array.isArray(result.changeRecords)).toBe(true);
+    expect(error).toBe('');
+    // 校验只使用 config 副本，不污染调用方传入的原始配置
+    expect(config[0].items[1].lazy).toBe(true);
+    expect(document.body.querySelector('.m-form')).toBeNull();
   });
 
-  test('未设置 returnChangeRecords 时仅返回 values（不包裹）', async () => {
-    const result = await submitForm({
-      config: [{ type: 'text', name: 'text', text: 'text' }],
-      initValues: { text: 'hello' },
+  test('嵌套在标签页内的 tab 容器的 lazy 同样被去除', async () => {
+    const config: any = [
+      {
+        type: 'tab',
+        items: [
+          {
+            title: '外层',
+            items: [
+              {
+                type: 'tab',
+                items: [
+                  { title: '内层1', items: [{ type: 'text', name: 'inner1', text: '内层1' }] },
+                  {
+                    title: '内层2',
+                    lazy: true,
+                    items: [{ type: 'text', name: 'inner2', text: '内层2' }],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ];
+
+    const error = await validateForm({
+      config,
+      initValues: { inner1: 'a', inner2: 'b' },
       appContext,
     });
 
-    expect(result).toEqual({ text: 'hello' });
-    expect(result).not.toHaveProperty('changeRecords');
+    expect(typeof error).toBe('string');
+    // 原始配置不被污染
+    expect(config[0].items[0].items[0].items[1].lazy).toBe(true);
+    expect(document.body.querySelector('.m-form')).toBeNull();
   });
 
-  test('多次连续调用不会相互干扰', async () => {
-    const [v1, v2] = await Promise.all([
-      submitForm({
+  test('多次并发调用互不干扰，且结束后不在 body 残留节点', async () => {
+    const baseChildCount = document.body.children.length;
+
+    const results = await Promise.all([
+      validateForm({
         config: [{ type: 'text', name: 'text', text: 'text' }],
         initValues: { text: 'first' },
         appContext,
       }),
-      submitForm({
+      validateForm({
         config: [{ type: 'text', name: 'text', text: 'text' }],
         initValues: { text: 'second' },
         appContext,
       }),
     ]);
 
-    expect(v1).toEqual({ text: 'first' });
-    expect(v2).toEqual({ text: 'second' });
-    expect(document.body.querySelector('.m-form')).toBeNull();
-  });
-
-  test('多次串行调用后 document.body 不留下任何节点', async () => {
-    const baseChildCount = document.body.children.length;
-
-    for (let i = 0; i < 5; i++) {
-      await submitForm({
-        config: [{ type: 'text', name: 'text', text: 'text' }],
-        initValues: { text: `value-${i}` },
-        appContext,
-      });
-    }
-
-    // 反复调用后，body 下不应残留任何挂载容器
+    expect(results).toEqual(['', '']);
     expect(document.body.children.length).toBe(baseChildCount);
     expect(document.body.querySelector('.m-form')).toBeNull();
   });
@@ -164,13 +209,12 @@ describe('submitForm', () => {
   test('调用过程中临时容器会被附加到 body 上，结束后被移除', async () => {
     const baseChildCount = document.body.children.length;
 
-    const pending = submitForm({
+    const pending = validateForm({
       config: [{ type: 'text', name: 'text', text: 'text' }],
       initValues: { text: 'in-flight' },
       appContext,
     });
 
-    // 此时容器应已加入 body
     expect(document.body.children.length).toBe(baseChildCount + 1);
 
     await pending;
@@ -181,12 +225,11 @@ describe('submitForm', () => {
   test('未注入 DOM 环境时（document 不可用）以错误 reject', async () => {
     const originalDocument = globalThis.document;
 
-    // 模拟纯 Node 环境
     delete (globalThis as any).document;
 
     let caught: any = null;
     try {
-      await submitForm({
+      await validateForm({
         config: [{ type: 'text', name: 'text', text: 'text' }],
         initValues: { text: 'no-dom' },
         appContext,
@@ -203,7 +246,7 @@ describe('submitForm', () => {
   test('timeout > 0 时会注册定时器，timeout <= 0 时不注册', async () => {
     const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
 
-    await submitForm({
+    await validateForm({
       config: [{ type: 'text', name: 'text', text: 'text' }],
       initValues: { text: 'with-timeout' },
       timeout: 5000,
@@ -215,7 +258,7 @@ describe('submitForm', () => {
 
     setTimeoutSpy.mockClear();
 
-    await submitForm({
+    await validateForm({
       config: [{ type: 'text', name: 'text', text: 'text' }],
       initValues: { text: 'no-timeout' },
       timeout: 0,
@@ -229,7 +272,7 @@ describe('submitForm', () => {
   });
 });
 
-describe('submitForm —— debug 模式', () => {
+describe('validateForm —— debug 模式', () => {
   const findButton = (text: string) =>
     Array.from(document.body.querySelectorAll('button')).find(
       (b) => (b.textContent || '').trim() === text,
@@ -248,14 +291,15 @@ describe('submitForm —— debug 模式', () => {
     Object.defineProperty(comp.exposed, method, { value: fn, configurable: true, writable: true });
   };
 
-  test('debug 模式可见渲染弹层，点击「确定」校验通过后 resolve 表单值并清理 DOM', async () => {
-    const pending = submitForm({
+  test('debug 模式可见渲染弹层，点击「确定」校验通过后 resolve 空字符串并清理 DOM', async () => {
+    const pending = validateForm({
       config: [{ type: 'text', name: 'text', text: 'text' }],
       initValues: { text: 'hello' },
       debug: true,
       appContext,
     });
 
+    // 等待弹层与表单渲染
     await nextTick();
     await nextTick();
 
@@ -264,13 +308,13 @@ describe('submitForm —— debug 模式', () => {
 
     findButton('确定').click();
 
-    const values = await pending;
-    expect(values).toEqual({ text: 'hello' });
+    const error = await pending;
+    expect(error).toBe('');
     expect(document.body.querySelector('.m-form')).toBeNull();
   });
 
   test('点击「取消」以错误 reject 并清理 DOM', async () => {
-    const pending = submitForm({
+    const pending = validateForm({
       config: [{ type: 'text', name: 'text', text: 'text' }],
       initValues: { text: 'hello' },
       debug: true,
@@ -294,7 +338,7 @@ describe('submitForm —— debug 模式', () => {
   });
 
   test('校验失败时点击「确定」在弹层展示错误并保留弹层，随后取消结束', async () => {
-    const pending = submitForm({
+    const pending = validateForm({
       config: [{ type: 'text', name: 'name', text: '名称' }],
       initValues: { name: '' },
       debug: true,
@@ -303,14 +347,14 @@ describe('submitForm —— debug 模式', () => {
     await nextTick();
     await nextTick();
 
-    // mock MForm 实例的 submitForm 抛出汇总错误（真实 element-plus 校验在 jsdom 下不可靠）
+    // mock MForm 实例的 validate 返回非空错误文案（真实 element-plus 校验在 jsdom 下不可靠）
     const comp = findMFormInstance();
     expect(comp).toBeTruthy();
-    mockExposed(comp, 'submitForm', vi.fn().mockRejectedValue(new Error('名称 -> 必填')));
+    mockExposed(comp, 'validate', vi.fn().mockResolvedValue('名称 -> 必填'));
 
     findButton('确定').click();
 
-    // 等待异步校验完成并展示错误（mock submitForm 为 rejected，需等 microtask + DOM 更新）
+    // 等待异步校验完成并展示错误（mock validate 为 resolved，需等 microtask + DOM 更新）
     await vi.waitFor(
       () => {
         const el = Array.from(document.body.querySelectorAll('div')).find((d) =>
@@ -341,7 +385,7 @@ describe('submitForm —— debug 模式', () => {
   test('debug 模式不注册超时定时器（等待人工操作）', async () => {
     const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
 
-    const pending = submitForm({
+    const pending = validateForm({
       config: [{ type: 'text', name: 'text', text: 'text' }],
       initValues: { text: 'hello' },
       debug: true,

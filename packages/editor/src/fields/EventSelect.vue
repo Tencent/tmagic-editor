@@ -131,6 +131,7 @@ const eventNameConfig = computed(() => {
           }
           callback();
         },
+        trigger: 'blur',
       },
     ],
   };

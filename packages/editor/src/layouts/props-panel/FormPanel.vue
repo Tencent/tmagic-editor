@@ -54,6 +54,7 @@ import MIcon from '@editor/components/Icon.vue';
 import { ENABLE_PROPS_FORM_VALIDATE } from '@editor/editorProps';
 import { useEditorContentHeight } from '@editor/hooks/use-editor-content-height';
 import { useServices } from '@editor/hooks/use-services';
+import { validatePropsForm } from '@editor/utils/props';
 
 import CodeEditor from '../CodeEditor.vue';
 
@@ -133,8 +134,33 @@ const errorHandler = (e: any) => {
   emit('form-error', e);
 };
 
-const saveCode = (values: any) => {
-  emit('submit', props.codeValueKey ? { [props.codeValueKey]: values } : values);
+const saveCode = async (values: any) => {
+  const newValues = props.codeValueKey ? { [props.codeValueKey]: values } : values;
+
+  if (!enablePropsFormValidate) {
+    // 未启用校验联动：保持原行为，直接提交源码保存的值
+    emit('submit', newValues);
+    return;
+  }
+
+  // 启用校验联动：源码编辑器保存的值未经过表单交互，这里另建一个独立的 MForm 实例对最新配置
+  // 做一次静默校验（不复用、也不污染页面上正在展示的表单），并将校验结果（错误信息）随提交
+  // 一并抛给上层记录，使源码保存的错误状态与表单编辑保持一致。
+  try {
+    const error = await validatePropsForm({
+      config: props.config,
+      values: newValues,
+      appContext: internalInstance?.appContext ?? null,
+      services,
+      stage: stage.value,
+      extendState: props.extendState,
+    });
+    emit('submit', newValues, undefined, error ? new Error(error) : undefined);
+  } catch (e: any) {
+    console.log('validateForm error', e);
+    // 静默校验本身出现异常（如初始化超时）时，退回到不携带错误信息的提交，避免阻塞源码保存
+    emit('submit', newValues);
+  }
 };
 
 defineExpose({ configForm: configFormRef, submit });

@@ -17,6 +17,8 @@
  * limitations under the License.
  */
 
+import type { AppContext } from 'vue';
+
 import {
   HookType,
   NODE_CONDS_KEY,
@@ -25,7 +27,18 @@ import {
   NODE_DISABLE_DATA_SOURCE_KEY,
 } from '@tmagic/core';
 import { tMagicMessage } from '@tmagic/design';
-import type { ChildConfig, DisplayCondsConfig, FormConfig, TabConfig, TabPaneConfig } from '@tmagic/form';
+import type {
+  ChildConfig,
+  DisplayCondsConfig,
+  FormConfig,
+  FormState,
+  FormValue,
+  TabConfig,
+  TabPaneConfig,
+} from '@tmagic/form';
+import { validateForm } from '@tmagic/form';
+
+import type { Services } from '@editor/type';
 
 export const arrayOptions = [
   { text: '包含', value: 'include' },
@@ -75,7 +88,7 @@ export const getCondOpOptionsByFieldType = (type: string) => {
 export const styleTabConfig: TabPaneConfig = {
   title: '样式',
   lazy: true,
-  display: ({ services }: any) => !(services.uiService.get('showStylePanel') ?? true),
+  display: ({ services }: any) => !(services?.uiService?.get('showStylePanel') ?? true),
   items: [
     {
       name: 'style',
@@ -348,3 +361,83 @@ export const fillConfig = (
 
   return [tabConfig];
 };
+
+// #region ValidatePropsFormOptions
+/**
+ * validatePropsForm 参数
+ */
+export interface ValidatePropsFormOptions {
+  /** 组件属性表单配置 */
+  config: FormConfig;
+  /** 待校验的表单值 */
+  values: FormValue;
+  /**
+   * 当前组件实例的 appContext（通常为 `getCurrentInstance()?.appContext`）。
+   * 会与 services 一并合入临时 MForm 的 appContext，使编辑器字段组件（DataSourceInput 等）能正常 inject。
+   */
+  appContext?: AppContext | null;
+  /** 编辑器服务集合，注入到临时表单的 formState */
+  services?: Services;
+  /** stage 实例，注入到临时表单的 formState */
+  stage?: any;
+  /** 外部扩展的 formState */
+  extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
+  /**
+   * 调试模式，默认 `true`：以弹层形式可见地渲染表单，点击「确定」才触发校验。
+   * 置为 `false` 时静默挂载后自动校验。
+   */
+  debug?: boolean;
+}
+// #endregion ValidatePropsFormOptions
+
+/**
+ * 对一份「组件属性表单配置 + 值」做一次独立的校验，**不复用也不污染页面上正在展示的表单**。
+ *
+ * 内部基于 `@tmagic/form` 的 `validateForm` 另建一个独立的 MForm 实例完成校验，并统一处理
+ * 编辑器场景所需的上下文注入：将当前组件实例的 provides 合入 appContext，并向 formState 注入
+ * stage / services 及外部扩展状态，保证校验规则依赖的上下文可用。
+ *
+ * 常用于源码编辑器保存后，对最新配置做一次校验，并将校验结果（错误信息）随提交一并抛给上层记录，
+ * 使源码保存的错误状态与表单编辑保持一致。
+ *
+ * @returns 校验通过返回空字符串 `''`，否则返回以 `<br>` 拼接的错误文案。
+ *   仅在初始化超时或挂载失败等异常情况下才会 reject。
+ *
+ * @example
+ * ```ts
+ * const error = await validatePropsForm({
+ *   config,
+ *   values,
+ *   appContext: getCurrentInstance()?.appContext,
+ *   services,
+ *   stage: editorService.get('stage'),
+ *   extendState,
+ * });
+ * if (error) {
+ *   // 配置不合法，error 为错误文案
+ * }
+ * ```
+ */
+export const validatePropsForm = ({
+  config,
+  values,
+  appContext = null,
+  services,
+  stage,
+  extendState,
+  debug,
+}: ValidatePropsFormOptions): Promise<string> =>
+  validateForm({
+    config,
+    debug,
+    initValues: values,
+    // 将当前组件实例的 provides（含 Editor 顶层的 services / codeOptions 等组件级 provide）
+    // 合入 appContext，使临时 MForm 中的编辑器字段组件（DataSourceInput 等）能正常 inject
+    appContext: appContext ? { ...appContext, provides: { services } } : null,
+    // 与页面表单保持一致：注入 stage/services 及外部扩展状态，保证校验规则依赖的上下文可用
+    extendState: async (state) => ({
+      ...((await extendState?.(state)) || {}),
+      stage,
+      services,
+    }),
+  });

@@ -64,11 +64,15 @@ vi.mock('@tmagic/design', () => ({
 
 // 可控的 submitForm 实现：默认校验成功，测试可将其改为 reject 以模拟校验失败
 let submitFormImpl: () => Promise<any> = async () => ({ a: 1 });
+// 可控的静默校验 validateForm 实现：默认返回空字符串（校验通过）
+let validateFormImpl: (_options?: any) => Promise<string> = async () => '';
 
 vi.mock('@tmagic/form', async () => {
   const actual = await vi.importActual<any>('@tmagic/form');
   return {
     ...actual,
+    // 源码保存后的静默校验走独立的 validateForm（内部新建 MForm 实例），此处 mock 便于断言
+    validateForm: vi.fn((options?: any) => validateFormImpl(options)),
     MForm: defineComponent({
       name: 'MForm',
       props: ['config', 'initValues', 'extendState'],
@@ -95,6 +99,7 @@ vi.mock('@tmagic/form', async () => {
 beforeEach(() => {
   vi.clearAllMocks();
   submitFormImpl = async () => ({ a: 1 });
+  validateFormImpl = async () => '';
   uiService.get.mockImplementation((k: string) => (k === 'propsPanelSize' ? 'small' : null));
   editorService.get.mockImplementation((k: string) => (k === 'stage' ? { id: 'stage' } : null));
 });
@@ -197,5 +202,103 @@ describe('FormPanel', () => {
     await wrapper.find('.fake-btn').trigger('click');
     await wrapper.find('.fake-code-editor').trigger('click');
     expect(wrapper.emitted('submit')?.[0]?.[0]).toEqual({ foo: 'bar' });
+  });
+
+  test('未启用 enablePropsFormValidate 时源码保存不触发静默校验', async () => {
+    const validateSpy = vi.fn(async () => '');
+    validateFormImpl = validateSpy;
+    const wrapper = mount(FormPanel, { props: { config: [], values: {} } as any });
+    await wrapper.find('.fake-btn').trigger('click');
+    await wrapper.find('.fake-code-editor').trigger('click');
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(validateSpy).not.toHaveBeenCalled();
+    // 仅携带值，不携带 error
+    expect(wrapper.emitted('submit')?.[0]).toEqual([{ foo: 'bar' }]);
+  });
+
+  test('启用 enablePropsFormValidate 时源码保存通过新建的 MForm 做静默校验（携带 config/initValues）', async () => {
+    const validateSpy = vi.fn(async () => '');
+    validateFormImpl = validateSpy;
+    const wrapper = mount(FormPanel, {
+      props: { config: [], values: {}, codeValueKey: 'style' } as any,
+      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: true } },
+    });
+    await wrapper.find('.fake-btn').trigger('click');
+    await wrapper.find('.fake-code-editor').trigger('click');
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(validateSpy).toHaveBeenCalledTimes(1);
+    // 以源码保存后的最新值作为待校验的 initValues
+    expect(validateSpy.mock.calls[0][0]).toMatchObject({ initValues: { style: { foo: 'bar' } } });
+  });
+
+  test('源码保存时传给 validateForm 的 extendState 注入 services 和 stage', async () => {
+    const validateSpy = vi.fn(async () => '');
+    validateFormImpl = validateSpy;
+    const wrapper = mount(FormPanel, {
+      props: { config: [], values: {} } as any,
+      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: true } },
+    });
+    await wrapper.find('.fake-btn').trigger('click');
+    await wrapper.find('.fake-code-editor').trigger('click');
+    await new Promise((r) => setTimeout(r, 0));
+
+    const { extendState } = validateSpy.mock.calls[0][0];
+    expect(typeof extendState).toBe('function');
+    const result = await extendState({});
+    expect(result).toHaveProperty('services');
+    expect(result).toHaveProperty('stage');
+  });
+
+  test('启用 enablePropsFormValidate 且源码保存静默校验通过时 submit 不携带 error', async () => {
+    validateFormImpl = async () => '';
+    const wrapper = mount(FormPanel, {
+      props: { config: [], values: {} } as any,
+      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: true } },
+    });
+    await wrapper.find('.fake-btn').trigger('click');
+    await wrapper.find('.fake-code-editor').trigger('click');
+    await new Promise((r) => setTimeout(r, 0));
+
+    const submitEvents = wrapper.emitted('submit');
+    expect(submitEvents?.[0]?.[0]).toEqual({ foo: 'bar' });
+    // eventData 为 undefined（源码保存），error 为 undefined（校验通过）
+    expect(submitEvents?.[0]?.[1]).toBeUndefined();
+    expect(submitEvents?.[0]?.[2]).toBeUndefined();
+  });
+
+  test('启用 enablePropsFormValidate 且源码保存静默校验失败时 submit 携带 error', async () => {
+    validateFormImpl = async () => '字段A -> 必填';
+    const wrapper = mount(FormPanel, {
+      props: { config: [], values: {} } as any,
+      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: true } },
+    });
+    await wrapper.find('.fake-btn').trigger('click');
+    await wrapper.find('.fake-code-editor').trigger('click');
+    await new Promise((r) => setTimeout(r, 0));
+
+    const submitEvents = wrapper.emitted('submit');
+    expect(submitEvents?.[0]?.[0]).toEqual({ foo: 'bar' });
+    expect(submitEvents?.[0]?.[1]).toBeUndefined();
+    expect(submitEvents?.[0]?.[2]).toBeInstanceOf(Error);
+    expect((submitEvents?.[0]?.[2] as Error).message).toBe('字段A -> 必填');
+  });
+
+  test('启用 enablePropsFormValidate 时静默校验抛异常则退回普通提交', async () => {
+    validateFormImpl = async () => {
+      throw new Error('validate 异常');
+    };
+    const wrapper = mount(FormPanel, {
+      props: { config: [], values: {} } as any,
+      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: true } },
+    });
+    await wrapper.find('.fake-btn').trigger('click');
+    await wrapper.find('.fake-code-editor').trigger('click');
+    await new Promise((r) => setTimeout(r, 0));
+
+    const submitEvents = wrapper.emitted('submit');
+    // 退回到仅携带值的提交
+    expect(submitEvents?.[0]).toEqual([{ foo: 'bar' }]);
   });
 });

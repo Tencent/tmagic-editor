@@ -340,6 +340,56 @@ describe('Form.vue —— submitForm 实例方法', () => {
   });
 });
 
+describe('Form.vue —— validate 校验实例方法（返回错误文案，不抛异常）', () => {
+  test('校验通过返回空字符串，且不触发 error 事件', async () => {
+    const wrapper = mountForm({
+      config: [{ text: 'text', type: 'text', name: 'text' }],
+      initValues: { text: 'hi' },
+    });
+    await nextTick();
+
+    const result = await wrapper.vm.validate();
+    expect(result).toBe('');
+    expect(wrapper.emitted('error')).toBeFalsy();
+  });
+
+  test('校验失败返回汇总后的错误文案（含字段 text），且不触发 error 事件、不抛异常', async () => {
+    const wrapper = mountForm({
+      config: [{ text: '名称', type: 'text', name: 'name' }],
+      initValues: { name: '' },
+    });
+    await nextTick();
+
+    const tmForm = wrapper.findComponent({ name: 'TMForm' });
+    const { exposed } = (tmForm.vm as any).$;
+    exposed.validate = vi.fn().mockRejectedValue({
+      name: [{ field: 'name', message: '必填' }],
+    });
+
+    const result = await wrapper.vm.validate();
+    expect(result).toBe('名称 -> 必填');
+    // 校验失败仅通过返回值给出错误文案，不触发 error 事件
+    expect(wrapper.emitted('error')).toBeFalsy();
+  });
+
+  test('校验返回非 true（tdesign 风格）时也返回错误文案', async () => {
+    const wrapper = mountForm({
+      config: [{ text: '账号', type: 'text', name: 'account' }],
+      initValues: { account: '' },
+    });
+    await nextTick();
+
+    const tmForm = wrapper.findComponent({ name: 'TMForm' });
+    const { exposed } = (tmForm.vm as any).$;
+    exposed.validate = vi.fn().mockResolvedValue({
+      account: [{ field: 'account', message: '不能为空' }],
+    });
+
+    const result = await wrapper.vm.validate();
+    expect(result).toContain('账号 -> 不能为空');
+  });
+});
+
 describe('Form.vue —— useFieldTextInError', () => {
   const mountAndMockValidate = async (
     props: Record<string, any>,
