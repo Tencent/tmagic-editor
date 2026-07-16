@@ -8,6 +8,7 @@ import { defineComponent, h, nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
 
 import CodeEditor from '@editor/layouts/CodeEditor.vue';
+import { getEditorConfig } from '@editor/utils/config';
 
 const {
   vsEditorInstance,
@@ -343,6 +344,41 @@ describe('CodeEditor', () => {
     const callArg = vsEditorInstance.setValue.mock.calls[0][0];
     expect(callArg).toMatch(/^\(/);
     wrapper.unmount();
+  });
+
+  test('异步初始化期间组件卸载则不创建编辑器', async () => {
+    const wrapper = mount(CodeEditor, { props: { initValues: 'abc' } as any, attachTo: document.body });
+    // loadMonaco 为异步，此时尚未 resolve，立即卸载
+    wrapper.unmount();
+    await flush();
+    // 组件已卸载，不应创建编辑器（不注册内容变化监听、不派发 initd）
+    expect(vsEditorInstance.onDidChangeModelContent).not.toHaveBeenCalled();
+    expect(wrapper.emitted('initd')).toBeFalsy();
+  });
+
+  test('编辑器创建期间组件卸载则销毁编辑器', async () => {
+    let resolveCreate!: (v: any) => void;
+    const createPromise = new Promise((resolve) => {
+      resolveCreate = resolve;
+    });
+    // 让 customCreateMonacoEditor 变为异步，模拟创建过程中组件被卸载
+    (getEditorConfig as any).mockImplementationOnce(() => async () => {
+      await createPromise;
+      return vsEditorInstance;
+    });
+
+    const wrapper = mount(CodeEditor, { props: { initValues: 'abc' } as any, attachTo: document.body });
+    // 等待进入创建阶段（loadMonaco 已 resolve），但 create 尚未完成
+    await nextTick();
+    await new Promise((r) => setTimeout(r, 10));
+
+    wrapper.unmount();
+    // 创建在卸载之后才完成
+    resolveCreate(vsEditorInstance);
+    await flush();
+
+    expect(vsEditorInstance.dispose).toHaveBeenCalled();
+    expect(wrapper.emitted('initd')).toBeFalsy();
   });
 
   test('toString 处理 json 对象', async () => {

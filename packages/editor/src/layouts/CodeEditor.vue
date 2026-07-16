@@ -194,6 +194,9 @@ const values = ref('');
 const loading = ref(false);
 const codeEditorEl = useTemplateRef<HTMLDivElement>('codeEditor');
 
+// 组件是否已卸载，避免异步初始化过程中组件被销毁后继续创建编辑器
+let destroyed = false;
+
 const resizeObserver = new globalThis.ResizeObserver(
   throttle((): void => {
     vsEditor?.layout();
@@ -254,17 +257,29 @@ const handleKeyDown = (e: KeyboardEvent) => {
   }
 };
 
-const init = async () => {
-  if (!codeEditorEl.value) return;
+// 判断容器是否仍然有效：组件未卸载、ref 存在且已挂载到文档树中
+// Monaco 在创建编辑器时会向上遍历 parentNode 判断是否处于 shadow DOM，
+// 若容器为 null 或已从文档树脱离，将抛出 "Cannot read properties of null (reading 'parentNode')"
+const isEditorElValid = () => !destroyed && !!codeEditorEl.value && codeEditorEl.value.isConnected;
 
-  if (codeEditorEl.value.clientHeight === 0) {
+const init = async () => {
+  if (!isEditorElValid()) return;
+
+  if (codeEditorEl.value!.clientHeight === 0) {
     await nextTick();
+    // await 期间组件可能已被卸载或容器被移除
+    if (!isEditorElValid()) return;
   }
 
   // 重置缓存的额外高度，因为编辑器重新初始化
   cachedExtraHeight = null;
 
   monaco = await loadMonaco();
+
+  // 加载 monaco 是异步过程，期间组件可能已被卸载或容器被移除
+  if (!isEditorElValid()) return;
+
+  const editorEl = codeEditorEl.value!;
 
   const options = {
     value: values.value,
@@ -275,7 +290,7 @@ const init = async () => {
   };
 
   if (props.type === 'diff') {
-    vsDiffEditor = await getEditorConfig('customCreateMonacoDiffEditor')(monaco!, codeEditorEl.value, options);
+    vsDiffEditor = await getEditorConfig('customCreateMonacoDiffEditor')(monaco!, editorEl, options);
 
     // 监听diff编辑器内容变化
     vsDiffEditor.getModifiedEditor().onDidChangeModelContent(() => {
@@ -285,7 +300,7 @@ const init = async () => {
       }
     });
   } else {
-    vsEditor = await getEditorConfig('customCreateMonacoEditor')(monaco!, codeEditorEl.value, options);
+    vsEditor = await getEditorConfig('customCreateMonacoEditor')(monaco!, editorEl, options);
 
     // 监听编辑器内容变化
     vsEditor.onDidChangeModelContent(() => {
@@ -296,10 +311,19 @@ const init = async () => {
     });
   }
 
+  // 编辑器创建可能是异步的，创建完成后若组件已卸载则立即销毁，避免内存泄漏
+  if (destroyed) {
+    vsEditor?.dispose();
+    vsDiffEditor?.dispose();
+    vsEditor = null;
+    vsDiffEditor = null;
+    return;
+  }
+
   setEditorValue(props.initValues, props.modifiedValues);
 
   emit('initd', vsEditor);
-  codeEditorEl.value.addEventListener('keydown', handleKeyDown);
+  editorEl.addEventListener('keydown', handleKeyDown);
 
   if (props.type !== 'diff' && props.autoSave) {
     vsEditor?.onDidBlurEditorWidget(() => {
@@ -311,7 +335,7 @@ const init = async () => {
     });
   }
 
-  resizeObserver.observe(codeEditorEl.value);
+  resizeObserver.observe(editorEl);
 };
 
 watch(
@@ -362,6 +386,8 @@ onMounted(async () => {
 });
 
 onBeforeUnmount(() => {
+  destroyed = true;
+
   resizeObserver.disconnect();
 
   vsEditor?.dispose();
