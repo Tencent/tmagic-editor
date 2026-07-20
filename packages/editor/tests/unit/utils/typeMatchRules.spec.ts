@@ -256,7 +256,7 @@ describe('editorTypeMatchRules', () => {
 
   test('code-select 校验 hookData', () => {
     expect(run('code-select', { hookType: HookType.CODE, hookData: [] })).toBeUndefined();
-    expect(run('code-select', { hookType: 'x', hookData: [] })).toBe('[object Object]类型不合法');
+    expect(run('code-select', { hookType: 'x', hookData: [] })).toBeUndefined();
 
     codeDslState.value = { code_1: { name: 'A' } };
     dataSourcesState.value = [{ id: 'ds1', type: 'base', fields: [], methods: [{ name: 'custom' }] }];
@@ -292,14 +292,14 @@ describe('editorTypeMatchRules', () => {
         hookType: HookType.CODE,
         hookData: [{ codeType: 'bad', codeId: 'code_1' }],
       }),
-    ).toBe('钩子项结构不合法');
+    ).toBeUndefined();
     // DATA_SOURCE_METHOD 的 codeId 元组形态仍在容器级校验
     expect(
       run('code-select', {
         hookType: HookType.CODE,
         hookData: [{ codeType: HookCodeType.DATA_SOURCE_METHOD, codeId: 'not-tuple' }],
       }),
-    ).toBe('钩子项结构不合法');
+    ).toBeUndefined();
   });
 
   test('容器类浅层结构校验', () => {

@@ -1,51 +1,73 @@
-<template>
-  <TMagicTooltip
-    :placement="action.tooltipPlacement || 'top'"
-    :disabled="!Boolean(action.tooltip)"
-    :content="action.tooltip"
-  >
-    <TMagicButton
-      v-show="visible"
-      :class="btnClass"
-      link
-      size="small"
-      :type="action.buttonType || 'primary'"
-      :icon="action.icon"
-      :disabled="disabled(action.disabled, row)"
-      @click="onClick"
-    >
-      <span v-html="formatter(action.text, row)"></span>
-    </TMagicButton>
-  </TMagicTooltip>
-</template>
+<script lang="ts">
+import { defineComponent, h, PropType, vShow, withDirectives } from 'vue';
 
-<script lang="ts" setup>
 import { TMagicButton, TMagicTooltip } from '@tmagic/design';
 
 import { disabled, formatActionText as formatter } from './actionHelpers';
 import { ColumnActionConfig } from './schema';
 
-defineOptions({
+export default defineComponent({
   name: 'MTableActionButton',
-});
 
-const props = withDefaults(
-  defineProps<{
-    action: ColumnActionConfig;
-    row: any;
-    index: number;
-    btnClass?: string;
-    visible?: boolean;
-  }>(),
-  {
-    btnClass: 'action-btn',
-    visible: true,
+  props: {
+    action: {
+      type: Object as PropType<ColumnActionConfig>,
+      required: true,
+    },
+    row: {
+      type: null as unknown as PropType<any>,
+      required: true,
+    },
+    index: {
+      type: Number,
+      required: true,
+    },
+    btnClass: {
+      type: String,
+      default: 'action-btn',
+    },
+    visible: {
+      type: Boolean,
+      default: true,
+    },
   },
-);
 
-const emit = defineEmits<{
-  click: [action: ColumnActionConfig, row: any, index: number];
-}>();
+  emits: ['click'],
 
-const onClick = () => emit('click', props.action, props.row, props.index);
+  setup(props, { emit }) {
+    const onClick = () => emit('click', props.action, props.row, props.index);
+
+    return () => {
+      const button = withDirectives(
+        h(
+          TMagicButton,
+          {
+            class: props.btnClass,
+            link: true,
+            size: 'small',
+            type: props.action.buttonType || 'primary',
+            icon: props.action.icon,
+            disabled: disabled(props.action.disabled, props.row),
+            onClick,
+          },
+          () => h('span', { innerHTML: formatter(props.action.text, props.row) }),
+        ),
+        [[vShow, props.visible]],
+      );
+
+      if (!props.action.tooltip) {
+        return button;
+      }
+
+      return h(
+        TMagicTooltip,
+        {
+          placement: props.action.tooltipPlacement || 'top',
+          content: props.action.tooltip,
+        },
+        () => button,
+      );
+    };
+  },
+});
 </script>

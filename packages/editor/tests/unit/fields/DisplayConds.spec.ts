@@ -108,12 +108,12 @@ describe('DisplayConds', () => {
     const opItem = capturedConfig.items[0].items[1];
     expect(cascaderField.rules).toEqual([
       { required: true, trigger: 'blur', message: '请选择字段' },
-      { typeMatch: true, trigger: 'blur' },
+      { typeMatch: true, trigger: 'change' },
     ]);
     expect(opItem.type).toBe('cond-op-select');
     expect(opItem.rules).toEqual([
       { required: true, trigger: 'blur', message: '请选择条件' },
-      { typeMatch: true, trigger: 'blur' },
+      { typeMatch: true, trigger: 'change' },
     ]);
 
     // parentFields 为空时 field 走 data-source-field-select，同样开启 typeMatch
@@ -125,7 +125,7 @@ describe('DisplayConds', () => {
     expect(dsField.type).toBe('data-source-field-select');
     expect(dsField.rules).toEqual([
       { required: true, trigger: 'blur', message: '请选择字段' },
-      { typeMatch: true, trigger: 'blur' },
+      { typeMatch: true, trigger: 'change' },
     ]);
   });
 

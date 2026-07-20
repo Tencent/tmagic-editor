@@ -176,7 +176,7 @@ describe('validatePropsForm', () => {
     vi.mocked(validateForm).mockReset();
   });
 
-  test('合入 appContext.provides、注入 stage/services 并合并外部 extendState，debug 默认 true', async () => {
+  test('合入 appContext.provides、注入 stage/services 并合并外部 extendState，debug 默认 undefined', async () => {
     vi.mocked(validateForm).mockResolvedValue('err-text');
 
     const services = { uiService: {} } as any;
@@ -197,7 +197,7 @@ describe('validatePropsForm', () => {
 
     const arg = vi.mocked(validateForm).mock.calls[0][0];
     expect(arg.config).toEqual([]);
-    expect(arg.debug).toBe(true);
+    expect(arg.debug).toBeUndefined();
     expect(arg.initValues).toEqual({ a: 1 });
     // appContext 保留原字段，但 provides 被替换为 { services }
     expect(arg.appContext).toEqual({ app: {}, provides: { services } });

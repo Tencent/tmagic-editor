@@ -145,9 +145,9 @@ describe('CodeSelect', () => {
     const codeIdCol = row.items[1];
     const dsCol = row.items[2];
     expect(codeIdCol.type).toBe('code-select-col');
-    expect(codeIdCol.rules).toEqual([{ typeMatch: true, trigger: 'blur' }]);
+    expect(codeIdCol.rules).toEqual([{ typeMatch: true, trigger: 'change' }]);
     expect(dsCol.type).toBe('data-source-method-select');
-    expect(dsCol.rules).toEqual([{ typeMatch: true }]);
+    expect(dsCol.rules).toEqual([{ typeMatch: true, trigger: 'change' }]);
   });
 
   test('notEditable 调用各服务', () => {
