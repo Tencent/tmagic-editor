@@ -7,7 +7,7 @@
           v-if="item.component"
           :is="item.component"
           :values="model[name]"
-          :prop="prop ? `${prop}.${name}` : name"
+          :prop="prop || name"
           :last-values="lastValues?.[name]"
           :is-compare="isCompare"
           :size="size"
