@@ -38,8 +38,7 @@ export interface HttpDataSourceSchema extends DataSourceSchema {
   };
   autoFetch?: boolean;
   beforeRequest:
-    | string
-    | ((options: HttpOptions, content: { app: TMagicApp; dataSource: HttpDataSource }) => HttpOptions);
+    string | ((options: HttpOptions, content: { app: TMagicApp; dataSource: HttpDataSource }) => HttpOptions);
   afterResponse:
     | string
     | ((response: any, content: { app: TMagicApp; dataSource: HttpDataSource; options: Partial<HttpOptions> }) => any);

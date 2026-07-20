@@ -77,7 +77,7 @@ export interface FrameworkSlots {
   empty(props: {}): any;
   workspace(props: {}): any;
   'props-panel'(props: {}): any;
-  'footer'(props: {}): any;
+  footer(props: {}): any;
   'page-bar'(props: {}): any;
   'page-bar-add-button'(props: {}): any;
   'page-bar-title'(props: { page: MPage | MPageFragment }): any;

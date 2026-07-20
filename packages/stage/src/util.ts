@@ -126,7 +126,7 @@ export const getScrollParent = (element: HTMLElement, includeHidden = false): HT
 
   if (isFixed(style)) return null;
 
-  for (let parent = element; parent.parentElement; ) {
+  for (let parent = element; parent.parentElement;) {
     parent = parent.parentElement;
 
     if (parent.tagName === 'HTML') return parent;
