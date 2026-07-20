@@ -29,6 +29,7 @@
         :inline="inline"
         :prevent-submit-default="preventSubmitDefault"
         :use-field-text-in-error="useFieldTextInError"
+        :type-match-valid="typeMatchValid"
         :extend-state="extendState"
         @change="changeHandler"
       ></Form>
@@ -74,6 +75,8 @@ withDefaults(
     parentValues?: Object;
     width?: string | number;
     labelWidth?: string;
+    /** 是否开启类型匹配校验 */
+    typeMatchValid?: boolean;
     disabled?: boolean;
     closeOnPressEscape?: boolean;
     title?: string;

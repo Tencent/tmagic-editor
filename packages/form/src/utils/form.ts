@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { readonly } from 'vue';
+import { ComputedRef, readonly } from 'vue';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { cloneDeep } from 'lodash-es';
@@ -306,11 +306,22 @@ export const display = function (mForm: FormState | undefined, config: any, prop
   return true;
 };
 
-export const getRules = function (mForm: FormState | undefined, rules: Rule[] | Rule = [], props: any) {
-  rules = cloneDeep(rules);
+export const getRules = function (
+  mForm: FormState | undefined,
+  r: Rule[] | Rule = [],
+  props: any,
+  typeMatchValid?: ComputedRef<boolean>,
+) {
+  let rules = cloneDeep(r);
 
   if (typeof rules === 'object' && !Array.isArray(rules)) {
     rules = [rules];
+  }
+
+  if (typeMatchValid?.value && !rules.some((r) => typeof r.typeMatch !== 'undefined')) {
+    rules.push({
+      typeMatch: true,
+    });
   }
 
   return rules.map((item) => {

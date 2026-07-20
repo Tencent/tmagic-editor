@@ -34,7 +34,7 @@ vi.mock('@editor/fields/StyleSetter/pro/index', () => {
   const make = (name: string) =>
     defineComponent({
       name,
-      props: ['values', 'lastValues', 'isCompare', 'size', 'disabled'],
+      props: ['values', 'lastValues', 'isCompare', 'size', 'disabled', 'prop'],
       emits: ['change', 'addDiffCount'],
       setup(_p, { emit }) {
         return () =>
@@ -63,26 +63,6 @@ describe('StyleSetter Index', () => {
     expect(wrapper.findAll('.collapse-item').length).toBe(6);
   });
 
-  test('change 时为 propPath 添加 prop 前缀', async () => {
-    const wrapper = mount(StyleSetter, {
-      props: { model: { style: {} }, name: 'style', prop: 'style' } as any,
-    });
-    await wrapper.find('.Layout').trigger('click');
-    const events = wrapper.emitted('change');
-    expect(events).toBeTruthy();
-    expect((events?.[0]?.[1] as any).changeRecords[0].propPath).toBe('style.foo');
-  });
-
-  test('prop 与 name 不一致时，propPath 使用完整的 prop 路径而非 name', async () => {
-    const wrapper = mount(StyleSetter, {
-      props: { model: { style: {} }, name: 'style', prop: 'data.items.0.style' } as any,
-    });
-    await wrapper.find('.Position').trigger('click');
-    const events = wrapper.emitted('change');
-    expect(events).toBeTruthy();
-    expect((events?.[0]?.[1] as any).changeRecords[0].propPath).toBe('data.items.0.style.foo');
-  });
-
   test('change 透传原始 value 并保留 changeRecords 其他字段', async () => {
     const wrapper = mount(StyleSetter, {
       props: { model: { style: {} }, name: 'style', prop: 'style' } as any,
@@ -93,7 +73,7 @@ describe('StyleSetter Index', () => {
     const [value, eventData] = events![0] as any[];
     expect(value).toEqual({ foo: 1 });
     expect(eventData.changeRecords).toHaveLength(1);
-    expect(eventData.changeRecords[0]).toEqual({ propPath: 'style.foo', value: 1 });
+    expect(eventData.changeRecords[0]).toEqual({ propPath: 'foo', value: 1 });
   });
 
   test('eventData 无 changeRecords 时也能正常 emit', async () => {

@@ -14,7 +14,7 @@
 import { computed } from 'vue';
 import { WarningFilled } from '@element-plus/icons-vue';
 
-import { TMagicTooltip } from '@tmagic/design';
+import { stripValidateSuggestion, TMagicTooltip } from '@tmagic/design';
 
 import MIcon from '@editor/components/Icon.vue';
 import { useServices } from '@editor/hooks/use-services';
@@ -37,6 +37,21 @@ const invalidInfo = computed(() => editorService.get('invalidNodeIds').get(props
 
 const hasError = computed(() => Boolean(invalidInfo.value?.props || invalidInfo.value?.style));
 
-/** 合并属性表单与样式表单的错误文案（本身可能已是含 <br> 的 HTML） */
-const errorMessage = computed(() => [invalidInfo.value?.props, invalidInfo.value?.style].filter(Boolean).join('<br>'));
+/**
+ * 去掉单条校验文案中的「修改建议」部分。
+ *
+ * 错误文案可能是多条错误以 `<br>` 拼接的 HTML，每条本身形如 `主文案\n\n建议`。
+ * 组件树 tooltip 仅展示错误描述，不展示修改建议（建议仅在错误汇总面板展示），
+ * 故先按 `<br>` 拆分，每段用 `stripValidateSuggestion` 截断建议后再拼回。
+ */
+const stripSuggestion = (text?: string): string =>
+  String(text ?? '')
+    .split(/<br\s*\/?>/i)
+    .map((segment) => stripValidateSuggestion(segment))
+    .join('<br>');
+
+/** 合并属性表单与样式表单的错误文案（去掉建议，本身可能仍是含 <br> 的 HTML） */
+const errorMessage = computed(() =>
+  [stripSuggestion(invalidInfo.value?.props), stripSuggestion(invalidInfo.value?.style)].filter(Boolean).join('<br>'),
+);
 </script>

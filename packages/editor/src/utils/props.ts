@@ -387,6 +387,7 @@ export interface ValidatePropsFormOptions {
    * 置为 `false` 时静默挂载后自动校验。
    */
   debug?: boolean;
+  typeMatchValid?: boolean;
 }
 // #endregion ValidatePropsFormOptions
 
@@ -426,10 +427,12 @@ export const validatePropsForm = ({
   stage,
   extendState,
   debug,
+  typeMatchValid,
 }: ValidatePropsFormOptions): Promise<string> =>
   validateForm({
     config,
     debug,
+    typeMatchValid,
     initValues: values,
     // 将当前组件实例的 provides（含 Editor 顶层的 services / codeOptions 等组件级 provide）
     // 合入 appContext，使临时 MForm 中的编辑器字段组件（DataSourceInput 等）能正常 inject

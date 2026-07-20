@@ -11,6 +11,7 @@ import Layout from '@editor/fields/StyleSetter/pro/Layout.vue';
 
 vi.mock('@tmagic/form', () => ({
   defineFormItem: (cfg: any) => cfg,
+  defineFormConfig: (cfg: any) => cfg,
   MContainer: defineComponent({
     name: 'FakeMContainer',
     props: ['config', 'model', 'lastValues', 'isCompare', 'size', 'disabled'],
@@ -84,8 +85,8 @@ describe('StyleSetter/Layout.vue', () => {
     const wrapper = mount(Layout, {
       props: { values: { position: 'static', display: 'flex' } } as any,
     });
-    const config = wrapper.findComponent({ name: 'FakeMContainer' }).props('config') as any;
-    const flexItem = config.items.find((it: any) => it.name === 'flexDirection');
+    const configs = wrapper.findAllComponents({ name: 'FakeMContainer' }).map((c) => c.props('config') as any);
+    const flexItem = configs.find((it: any) => it.name === 'flexDirection');
     expect(flexItem.display(null, { model: { display: 'flex' } })).toBe(true);
     expect(flexItem.display(null, { model: { display: 'block' } })).toBe(false);
   });
@@ -94,9 +95,9 @@ describe('StyleSetter/Layout.vue', () => {
     const wrapper = mount(Layout, {
       props: { values: { position: 'static', display: 'flex' } } as any,
     });
-    const config = wrapper.findComponent({ name: 'FakeMContainer' }).props('config') as any;
+    const configs = wrapper.findAllComponents({ name: 'FakeMContainer' }).map((c) => c.props('config') as any);
     ['justifyContent', 'alignItems', 'flexWrap'].forEach((name) => {
-      const item = config.items.find((it: any) => it.name === name);
+      const item = configs.find((it: any) => it.name === name);
       expect(item.display(null, { model: { display: 'flex' } })).toBe(true);
       expect(item.display(null, { model: { display: 'block' } })).toBe(false);
     });
@@ -106,8 +107,8 @@ describe('StyleSetter/Layout.vue', () => {
     const wrapper = mount(Layout, {
       props: { values: { position: 'static', display: 'flex' } } as any,
     });
-    const config = wrapper.findComponent({ name: 'FakeMContainer' }).props('config') as any;
-    const displayItem = config.items.find((it: any) => it.name === 'display');
+    const configs = wrapper.findAllComponents({ name: 'FakeMContainer' }).map((c) => c.props('config') as any);
+    const displayItem = configs.find((it: any) => it.name === 'display');
     const values = displayItem.options.map((o: any) => o.value);
     expect(values).toEqual(['inline', 'flex', 'block', 'inline-block', 'none']);
   });

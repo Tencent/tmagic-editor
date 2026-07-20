@@ -1,5 +1,6 @@
 <template>
   <MContainer
+    :prop="prop"
     :config="config"
     :model="values"
     :last-values="lastValues"
@@ -32,6 +33,7 @@ defineProps<{
   isCompare?: boolean;
   disabled?: boolean;
   size?: 'large' | 'default' | 'small';
+  prop?: string;
 }>();
 
 const emit = defineEmits<{
@@ -40,17 +42,13 @@ const emit = defineEmits<{
 }>();
 
 const config = defineFormItem({
-  items: [
-    {
-      labelWidth: '68px',
-      name: 'borderRadius',
-      text: '圆角',
-      type: 'data-source-field-select',
-      fieldConfig: {
-        type: 'text',
-      },
-    },
-  ],
+  labelWidth: '68px',
+  name: 'borderRadius',
+  text: '圆角',
+  type: 'data-source-field-select',
+  fieldConfig: {
+    type: 'text',
+  },
 });
 
 const change = (value: StyleSchema, eventData: ContainerChangeEventData) => {

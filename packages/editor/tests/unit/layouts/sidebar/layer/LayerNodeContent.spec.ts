@@ -38,6 +38,7 @@ vi.mock('@tmagic/design', () => ({
       return () => h('div', { class: 'fake-tooltip' }, [slots.content?.(), slots.default?.()]);
     },
   }),
+  stripValidateSuggestion: (text?: string) => String(text ?? '').split('\n\n')[0],
 }));
 
 describe('LayerNodeContent', () => {
@@ -76,6 +77,40 @@ describe('LayerNodeContent', () => {
     const tooltip = wrapper.find('.fake-tooltip');
     expect(tooltip.html()).toContain('name 必填');
     expect(tooltip.html()).toContain('width 非法');
+  });
+
+  test('tooltip 不展示 \\n\\n 之后的修改建议', () => {
+    invalidNodeIds.clear();
+    invalidNodeIds.set('n1', {
+      props: 'name 类型应为字符串\n\n请参考以下示例值："文本内容"',
+      style: 'width 不在可选项中\n\n请使用以下某一个值：100',
+    });
+    const wrapper = mount(LayerNodeContent, {
+      props: { data: { id: 'n1', name: '文本', type: 'text' } as any },
+    });
+    const html = wrapper.find('.fake-tooltip').html();
+    // 错误描述保留
+    expect(html).toContain('name 类型应为字符串');
+    expect(html).toContain('width 不在可选项中');
+    // 修改建议被截断
+    expect(html).not.toContain('请参考以下示例值');
+    expect(html).not.toContain('请使用以下某一个值');
+  });
+
+  test('多条错误以 <br> 拼接时逐条截断建议', () => {
+    invalidNodeIds.clear();
+    invalidNodeIds.set('n1', {
+      props: 'name 必填\n\n建议A<br>id 类型应为数字\n\n建议B',
+    });
+    const wrapper = mount(LayerNodeContent, {
+      props: { data: { id: 'n1', name: '文本', type: 'text' } as any },
+    });
+    const html = wrapper.find('.fake-tooltip').html();
+    expect(html).toContain('name 必填');
+    expect(html).toContain('id 类型应为数字');
+    expect(html).toContain('<br>');
+    expect(html).not.toContain('建议A');
+    expect(html).not.toContain('建议B');
   });
 
   test('错误状态变化时响应式更新', async () => {

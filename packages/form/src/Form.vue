@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, provide, reactive, ref, shallowRef, toRaw, useTemplateRef, watch, watchEffect } from 'vue';
+import { computed, nextTick, provide, reactive, ref, shallowRef, toRaw, useTemplateRef, watch, watchEffect } from 'vue';
 import { cloneDeep, isEqual } from 'lodash-es';
 
 import { TMagicForm, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
@@ -50,7 +50,7 @@ import type {
   FormValue,
   ValidateError,
 } from './schema';
-import { FORM_DIFF_CONFIG_KEY } from './schema';
+import { FORM_DIFF_CONFIG_KEY, FORM_TYPE_MATCH_VALID_KEY } from './schema';
 
 defineOptions({
   name: 'MForm',
@@ -70,6 +70,8 @@ const props = withDefaults(
     isCompare?: boolean;
     parentValues?: Record<string, any>;
     labelWidth?: string;
+    /** 是否开启类型匹配校验 */
+    typeMatchValid?: boolean;
     disabled?: boolean;
     height?: string;
     stepActive?: string | number;
@@ -133,6 +135,11 @@ const props = withDefaults(
 );
 
 const emit = defineEmits(['change', 'error', 'field-input', 'field-change', 'update:stepActive']);
+
+provide(
+  FORM_TYPE_MATCH_VALID_KEY,
+  computed(() => props.typeMatchValid),
+);
 
 const tMagicFormRef = useTemplateRef('tMagicForm');
 const initialized = ref(false);

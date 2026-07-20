@@ -1,5 +1,6 @@
 <template>
   <MContainer
+    :prop="prop"
     :config="config"
     :model="values"
     :last-values="lastValues"
@@ -21,6 +22,7 @@ defineProps<{
   isCompare?: boolean;
   disabled?: boolean;
   size?: 'large' | 'default' | 'small';
+  prop?: string;
 }>();
 
 const emit = defineEmits<{
@@ -29,33 +31,29 @@ const emit = defineEmits<{
 }>();
 
 const config = defineFormItem({
+  name: 'transform',
   items: [
     {
-      name: 'transform',
-      items: [
-        {
-          name: 'rotate',
-          text: '旋转角度',
-          labelWidth: '68px',
-          type: 'data-source-field-select',
-          checkStrictly: false,
-          dataSourceFieldType: ['string', 'number'],
-          fieldConfig: {
-            type: 'text',
-          },
-        },
-        {
-          name: 'scale',
-          text: '缩放',
-          labelWidth: '68px',
-          type: 'data-source-field-select',
-          checkStrictly: false,
-          dataSourceFieldType: ['string', 'number'],
-          fieldConfig: {
-            type: 'text',
-          },
-        },
-      ],
+      name: 'rotate',
+      text: '旋转角度',
+      labelWidth: '68px',
+      type: 'data-source-field-select',
+      checkStrictly: false,
+      dataSourceFieldType: ['string', 'number'],
+      fieldConfig: {
+        type: 'text',
+      },
+    },
+    {
+      name: 'scale',
+      text: '缩放',
+      labelWidth: '68px',
+      type: 'data-source-field-select',
+      checkStrictly: false,
+      dataSourceFieldType: ['string', 'number'],
+      fieldConfig: {
+        type: 'text',
+      },
     },
   ],
 });

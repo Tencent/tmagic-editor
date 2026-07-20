@@ -20,6 +20,7 @@ import { readonly } from 'vue';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 
+import { appendValidateSuggestion } from '@tmagic/design';
 import { getValueByKeyPath } from '@tmagic/utils';
 
 import type { CascaderOption, FormState, Rule } from '../schema';
@@ -123,7 +124,106 @@ const DATE_LIKE_DEFAULT_VALUE_FORMAT: Record<string, string> = {
 
 const TIMESTAMP_VALUE_FORMATS = new Set(['x', 'timestamp']);
 
-const defaultMessage = (message: string | undefined, fallback: string) => message || fallback;
+/**
+ * 将值格式化为可读的参考示例字符串。
+ */
+const stringifyExampleValue = (value: any): string => {
+  if (typeof value === 'string') return `"${value}"`;
+  if (value === null || value === undefined) return String(value);
+  if (typeof value === 'object') {
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return String(value);
+    }
+  }
+  return String(value);
+};
+
+// 参考建议中最多展示的可选值个数，超出以「等」省略。
+const MAX_SUGGESTION_OPTIONS = 5;
+
+/**
+ * 生成「请使用以下某一个值：xxx；xxx」形式的参考建议；无可选值时返回空字符串（不追加建议）。
+ * 可选值超过 MAX_SUGGESTION_OPTIONS 个时仅展示前若干个并以「等」省略。
+ */
+const optionSuggestion = (optionValues: any[]): string => {
+  const values = optionValues.filter((item) => typeof item !== 'undefined');
+  if (!values.length) return '';
+  const shown = values.slice(0, MAX_SUGGESTION_OPTIONS).map(stringifyExampleValue);
+  const suffix = values.length > MAX_SUGGESTION_OPTIONS ? ' 等' : '';
+  return `请使用以下某一个值：${shown.join('；')}${suffix}`;
+};
+
+/**
+ * 基于真实 options 生成类型不匹配场景的「参考示例值」。
+ *
+ * - expectArray 为 true 时，取前若干个真实可选值组成数组示例；
+ * - 否则取第一个真实可选值作为标量示例。
+ * 无可用 options 时回退到通用示例。
+ */
+const optionExampleSuggestion = (optionValues: any[], fallbackExample: string, expectArray: boolean): string => {
+  const values = optionValues.filter((item) => typeof item !== 'undefined');
+  if (!values.length) return `请参考以下示例值：${fallbackExample}`;
+  const example = expectArray ? stringifyExampleValue(values.slice(0, 2)) : stringifyExampleValue(values[0]);
+  return `请参考以下示例值：${example}`;
+};
+
+/**
+ * 生成开关类字段的参考建议，列出合法的开关值。
+ */
+const toggleSuggestion = (activeValue: any, inactiveValue: any): string =>
+  `请使用以下某一个值：${stringifyExampleValue(activeValue)}；${stringifyExampleValue(inactiveValue)}`;
+
+/**
+ * 解析字段配置中的真实默认值（defaultValue），用于生成「真实」的参考示例值。
+ * defaultValue 可能是函数，交由 resolveConfig 处理；未配置时返回 undefined。
+ */
+const resolveFieldDefaultValue = (mForm: FormState | undefined, props: any): any => {
+  const { defaultValue } = props.config || {};
+  if (typeof defaultValue === 'undefined' || defaultValue === 'undefined') return undefined;
+  return resolveConfig(mForm, defaultValue, props);
+};
+
+const isNumberValue = (value: any) => typeof value === 'number' && !Number.isNaN(value);
+const isStringValue = (value: any) => typeof value === 'string';
+const isObjectValue = (value: any) => typeof value === 'object' && value !== null && !Array.isArray(value);
+const isObjectArrayValue = (value: any) => Array.isArray(value) && value.every((item) => isObjectValue(item));
+const isNumberRangeValue = (value: any) =>
+  Array.isArray(value) && value.length === 2 && value.every((item) => isNumberValue(item));
+
+/**
+ * 生成类型不匹配场景的「参考示例值」。
+ *
+ * 优先使用字段配置的真实默认值（defaultValue，需符合期望类型）；无可用默认值时回退到通用示例。
+ */
+const typeExampleSuggestion = (
+  mForm: FormState | undefined,
+  props: any,
+  fallbackExample: string,
+  isValid: (value: any) => boolean,
+): string => {
+  const defaultValue = resolveFieldDefaultValue(mForm, props);
+  const example =
+    typeof defaultValue !== 'undefined' && isValid(defaultValue)
+      ? stringifyExampleValue(defaultValue)
+      : fallbackExample;
+  return `请参考以下示例值：${example}`;
+};
+
+/**
+ * 返回最终错误文案。
+ *
+ * - 传入了自定义 `message` 时，直接使用自定义文案（不追加建议）；
+ * - 否则使用默认文案 `fallback`，并在其后拼接「参考建议」。
+ *   参考建议给出一个可参考的示例值（如可选项列表、示例数据），仅用于错误汇总展示；
+ *   form-item 行内错误不展示建议（由 @tmagic/design FormItem 在渲染时截断建议）。
+ *   主文案与建议的拼接/截断统一复用 @tmagic/design 的 `appendValidateSuggestion`。
+ */
+const defaultMessage = (message: string | undefined, fallback: string, suggestion?: string) => {
+  if (message) return message;
+  return appendValidateSuggestion(fallback, suggestion);
+};
 
 const isEmptyValue = (value: any) => value === undefined || value === null || value === '';
 
@@ -145,8 +245,31 @@ const isValidDateValueByFormat = (value: any, valueFormat: string): boolean => {
   return dayjs(value, valueFormat, true).isValid();
 };
 
+/**
+ * 生成单个日期类字段的参考示例值：时间戳格式给出当前时间戳，其余按 valueFormat 格式化当前时间。
+ */
+const dateSuggestion = (valueFormat: string): string =>
+  isTimestampValueFormat(valueFormat)
+    ? `请参考以下示例值：${Date.now()}`
+    : `请参考以下示例值："${dayjs().format(valueFormat)}"`;
+
+/**
+ * 生成日期范围类字段的参考示例值（长度为 2 的数组）。
+ */
+const dateRangeSuggestion = (valueFormat: string): string => {
+  if (isTimestampValueFormat(valueFormat)) {
+    return `请参考以下示例值：[${Date.now()}, ${Date.now()}]`;
+  }
+  const example = dayjs().format(valueFormat);
+  return `请参考以下示例值：["${example}", "${example}"]`;
+};
+
 const dateValueFormatErrorMessage = (message: string | undefined, valueFormat: string) =>
-  defaultMessage(message, isTimestampValueFormat(valueFormat) ? '值类型应为时间戳数字' : `值格式应为 ${valueFormat}`);
+  defaultMessage(
+    message,
+    isTimestampValueFormat(valueFormat) ? '值类型应为时间戳数字' : `值格式应为 ${valueFormat}`,
+    dateSuggestion(valueFormat),
+  );
 
 const resolveFieldType = (mForm: FormState | undefined, props: any): string => {
   let type = 'type' in (props.config || {}) ? props.config.type : '';
@@ -230,6 +353,51 @@ const isValidCascaderPath = (options: CascaderOption[], path: any[]): boolean =>
   return false;
 };
 
+/**
+ * 取 cascader options 的第一条完整路径（从顶层到叶子的 value 数组）。
+ */
+const firstCascaderPath = (options: CascaderOption[]): any[] => {
+  const path: any[] = [];
+  let current: CascaderOption[] | undefined = options;
+  while (current?.length) {
+    const node: CascaderOption = current[0];
+    if (typeof node.value === 'undefined') break;
+    path.push(node.value);
+    current = node.children;
+  }
+  return path;
+};
+
+/**
+ * 基于真实 cascader options 生成类型不匹配场景的「参考示例值」。
+ *
+ * 依据 valueSeparator / multiple / emitPath 组织真实选中值的形态；无可用 options 时回退到通用示例。
+ */
+const cascaderExampleSuggestion = (
+  options: CascaderOption[],
+  config: any,
+  valueSeparator: string | undefined,
+  fallbackExample: string,
+): string => {
+  const path = firstCascaderPath(options);
+  if (!path.length) return `请参考以下示例值：${fallbackExample}`;
+
+  const emitPath = config.emitPath !== false;
+  const multiple = Boolean(config.multiple);
+  // 单个选中值：emitPath 时为完整路径数组，否则为叶子值
+  const single = emitPath ? path : path[path.length - 1];
+
+  let example: any;
+  if (valueSeparator) {
+    example = path.join(valueSeparator);
+  } else if (multiple) {
+    example = [single];
+  } else {
+    example = single;
+  }
+  return `请参考以下示例值：${stringifyExampleValue(example)}`;
+};
+
 const validateSelectValue = (
   value: any,
   config: any,
@@ -239,29 +407,44 @@ const validateSelectValue = (
   if (config.allowCreate || config.remote) {
     if (config.multiple) {
       if (!Array.isArray(value)) {
-        return defaultMessage(message, `${value} 类型应为数组`);
+        return defaultMessage(
+          message,
+          `${value} 类型应为数组`,
+          optionExampleSuggestion(optionValues, '["选项1", "选项2"]', true),
+        );
       }
       return undefined;
     }
 
     if (typeof value === 'object') {
-      return defaultMessage(message, `${value} 类型不合法`);
+      return defaultMessage(
+        message,
+        `${value} 类型不合法`,
+        optionExampleSuggestion(optionValues, '"文本内容" 或 123', false),
+      );
     }
     return undefined;
   }
+
+  // 仅当 options 为静态数组时才校验值是否在可选项中，动态 options（函数形式）跳过
+  const isStaticOptions = Array.isArray(config.options);
 
   if (config.multiple) {
     if (!Array.isArray(value)) {
-      return defaultMessage(message, `${value} 类型应为数组`);
+      return defaultMessage(
+        message,
+        `${value} 类型应为数组`,
+        optionExampleSuggestion(optionValues, '["选项1", "选项2"]', true),
+      );
     }
-    if (value.some((item) => !includesOptionValue(optionValues, item))) {
-      return defaultMessage(message, `${value} 不在可选项中`);
+    if (isStaticOptions && value.some((item) => !includesOptionValue(optionValues, item))) {
+      return defaultMessage(message, `${value} 不在可选项中`, optionSuggestion(optionValues));
     }
     return undefined;
   }
 
-  if (!includesOptionValue(optionValues, value)) {
-    return defaultMessage(message, `${value} 不在可选项中`);
+  if (isStaticOptions && !includesOptionValue(optionValues, value)) {
+    return defaultMessage(message, `${value} 不在可选项中`, optionSuggestion(optionValues));
   }
   return undefined;
 };
@@ -276,24 +459,30 @@ const validateCascaderValue = (
   const valueSeparator = resolveConfig<string | undefined>(mForm, config.valueSeparator, props);
   const emitPath = config.emitPath !== false;
   const multiple = Boolean(config.multiple);
+  const options = resolveOptions(mForm, props) as CascaderOption[];
+  const cascaderExample = (fallbackExample: string) =>
+    cascaderExampleSuggestion(options, config, valueSeparator, fallbackExample);
 
   if (valueSeparator) {
     if (typeof value !== 'string' && !Array.isArray(value)) {
-      return defaultMessage(message, `${value} 类型应为字符串或数组`);
+      return defaultMessage(
+        message,
+        `${value} 类型应为字符串或数组`,
+        cascaderExample('"选项1,选项2" 或 ["选项1", "选项2"]'),
+      );
     }
   } else if (multiple) {
     if (!Array.isArray(value)) {
-      return defaultMessage(message, `${value} 类型应为数组`);
+      return defaultMessage(message, `${value} 类型应为数组`, cascaderExample('["选项1", "选项2"]'));
     }
   } else if (emitPath && !Array.isArray(value)) {
-    return defaultMessage(message, `${value} 类型应为数组`);
+    return defaultMessage(message, `${value} 类型应为数组`, cascaderExample('["选项1", "选项2"]'));
   }
 
   if (config.remote) {
     return undefined;
   }
 
-  const options = resolveOptions(mForm, props) as CascaderOption[];
   if (!options.length) {
     return undefined;
   }
@@ -302,7 +491,7 @@ const validateCascaderValue = (
 
   if (multiple) {
     if (!Array.isArray(normalizedValue)) {
-      return defaultMessage(message, `${value} 类型应为数组`);
+      return defaultMessage(message, `${value} 类型应为数组`, cascaderExample('["选项1", "选项2"]'));
     }
 
     const invalid = normalizedValue.some((item) => {
@@ -313,20 +502,20 @@ const validateCascaderValue = (
     });
 
     if (invalid) {
-      return defaultMessage(message, `${value} 不在可选项中`);
+      return defaultMessage(message, `${value} 不在可选项中`, optionSuggestion(collectCascaderLeafValues(options)));
     }
     return undefined;
   }
 
   if (emitPath) {
     if (!Array.isArray(normalizedValue) || !isValidCascaderPath(options, normalizedValue)) {
-      return defaultMessage(message, `${value} 不在可选项中`);
+      return defaultMessage(message, `${value} 不在可选项中`, optionSuggestion(collectCascaderLeafValues(options)));
     }
     return undefined;
   }
 
   if (!includesOptionValue(collectCascaderLeafValues(options), normalizedValue)) {
-    return defaultMessage(message, `${value} 不在可选项中`);
+    return defaultMessage(message, `${value} 不在可选项中`, optionSuggestion(collectCascaderLeafValues(options)));
   }
   return undefined;
 };
@@ -347,7 +536,11 @@ const validateBuiltinTypeMatch = (
   if (STRING_TYPES.has(fieldType)) {
     if (config.filter === 'number') {
       if (typeof value !== 'number' || Number.isNaN(value)) {
-        return defaultMessage(message, `${value} 类型应为数字`);
+        return defaultMessage(
+          message,
+          `${value} 类型应为数字`,
+          typeExampleSuggestion(mForm, props, '123', isNumberValue),
+        );
       }
       return undefined;
     }
@@ -358,7 +551,11 @@ const validateBuiltinTypeMatch = (
     }
 
     if (typeof value !== 'string') {
-      return defaultMessage(message, `${value} 类型应为字符串`);
+      return defaultMessage(
+        message,
+        `${value} 类型应为字符串`,
+        typeExampleSuggestion(mForm, props, '"文本内容"', isStringValue),
+      );
     }
     return undefined;
   }
@@ -373,7 +570,11 @@ const validateBuiltinTypeMatch = (
 
   if (fieldType === 'number') {
     if (typeof value !== 'number' || Number.isNaN(value)) {
-      return defaultMessage(message, `${value} 类型应为数字`);
+      return defaultMessage(
+        message,
+        `${value} 类型应为数字`,
+        typeExampleSuggestion(mForm, props, '123', isNumberValue),
+      );
     }
     return undefined;
   }
@@ -384,7 +585,11 @@ const validateBuiltinTypeMatch = (
       value.length !== 2 ||
       value.some((item) => typeof item !== 'number' || Number.isNaN(item))
     ) {
-      return defaultMessage(message, `${value} 类型应为长度为 2 的数字数组`);
+      return defaultMessage(
+        message,
+        `${value} 类型应为长度为 2 的数字数组`,
+        typeExampleSuggestion(mForm, props, '[0, 100]', isNumberRangeValue),
+      );
     }
     return undefined;
   }
@@ -392,7 +597,7 @@ const validateBuiltinTypeMatch = (
   if (fieldType === 'switch' || fieldType === 'checkbox') {
     const { activeValue, inactiveValue } = resolveToggleValues(config);
     if (!Object.is(value, activeValue) && !Object.is(value, inactiveValue)) {
-      return defaultMessage(message, `${value} 不在合法开关值中`);
+      return defaultMessage(message, `${value} 不在合法开关值中`, toggleSuggestion(activeValue, inactiveValue));
     }
     return undefined;
   }
@@ -405,18 +610,22 @@ const validateBuiltinTypeMatch = (
   if (fieldType === 'radio-group') {
     const optionValues = flattenSelectOptions(resolveOptions(mForm, props));
     if (!includesOptionValue(optionValues, value)) {
-      return defaultMessage(message, `${value} 不在可选项中`);
+      return defaultMessage(message, `${value} 不在可选项中`, optionSuggestion(optionValues));
     }
     return undefined;
   }
 
   if (fieldType === 'checkbox-group') {
-    if (!Array.isArray(value)) {
-      return defaultMessage(message, `${value} 类型应为数组`);
-    }
     const optionValues = flattenSelectOptions(resolveOptions(mForm, props));
+    if (!Array.isArray(value)) {
+      return defaultMessage(
+        message,
+        `${value} 类型应为数组`,
+        optionExampleSuggestion(optionValues, '["选项1", "选项2"]', true),
+      );
+    }
     if (value.some((item) => !includesOptionValue(optionValues, item))) {
-      return defaultMessage(message, `${value} 不在可选项中`);
+      return defaultMessage(message, `${value} 不在可选项中`, optionSuggestion(optionValues));
     }
     return undefined;
   }
@@ -440,14 +649,19 @@ const validateBuiltinTypeMatch = (
         isTimestampValueFormat(valueFormat)
           ? `${value} 类型应为长度为 2 的时间戳数字数组`
           : `${value} 格式应为长度为 2 的 ${valueFormat} 数组`,
+        dateRangeSuggestion(valueFormat),
       );
     }
     return undefined;
   }
 
   if (fieldType === 'table' || fieldType === 'group-list' || fieldType === 'grouplist') {
-    if (!Array.isArray(value)) {
-      return defaultMessage(message, `${value} 类型应为数组`);
+    if (!Array.isArray(value) || value.some((item) => !isObjectValue(item))) {
+      return defaultMessage(
+        message,
+        `${value} 类型应为对象数组`,
+        typeExampleSuggestion(mForm, props, '[{}]', isObjectArrayValue),
+      );
     }
     return undefined;
   }

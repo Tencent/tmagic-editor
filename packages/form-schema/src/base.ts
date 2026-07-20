@@ -896,6 +896,10 @@ export interface StepConfig<T = never> extends FormItem {
 }
 // #endregion StepConfig
 
+export interface ImgUploadConfig extends FormItem {
+  type: 'img-upload';
+}
+
 // #region ComponentConfig
 export interface ComponentConfig extends FormItem {
   type: 'component';

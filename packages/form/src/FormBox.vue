@@ -15,6 +15,7 @@
           :prevent-submit-default="preventSubmitDefault"
           :use-field-text-in-error="useFieldTextInError"
           :extend-state="extendState"
+          :type-match-valid="typeMatchValid"
           @change="changeHandler"
         ></Form>
         <slot></slot>
@@ -56,6 +57,8 @@ const props = withDefaults(
     width?: number;
     height?: number;
     labelWidth?: string;
+    /** 是否开启类型匹配校验 */
+    typeMatchValid?: boolean;
     disabled?: boolean;
     size?: 'small' | 'default' | 'large';
     confirmText?: string;

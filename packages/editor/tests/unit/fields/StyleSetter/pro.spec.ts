@@ -15,6 +15,7 @@ import Transform from '@editor/fields/StyleSetter/pro/Transform.vue';
 
 vi.mock('@tmagic/form', () => ({
   defineFormItem: (cfg: any) => cfg,
+  defineFormConfig: (cfg: any) => cfg,
   MContainer: defineComponent({
     name: 'MContainer',
     props: ['config', 'model', 'lastValues', 'isCompare', 'size', 'disabled'],

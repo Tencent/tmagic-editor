@@ -74,6 +74,7 @@ export interface SubmitFormOptions {
    *   调试模式下 `timeout` 不生效（等待人工操作）。
    */
   debug?: boolean;
+  typeMatchValid?: boolean;
 }
 // #endregion SubmitFormOptions
 
@@ -538,6 +539,7 @@ export interface ValidateFormOptions {
    *   校验通过则 resolve 空字符串。调试模式下 `timeout` 不生效（等待人工操作）。
    */
   debug?: boolean;
+  typeMatchValid?: boolean;
 }
 // #endregion ValidateFormOptions
 

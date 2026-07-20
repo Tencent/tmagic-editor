@@ -60,6 +60,7 @@ vi.mock('@tmagic/design', () => ({
       return () => h('button', { class: 'fake-btn' }, slots.default?.());
     },
   }),
+  tMagicMessage: () => {},
 }));
 
 // 可控的 submitForm 实现：默认校验成功，测试可将其改为 reject 以模拟校验失败

@@ -249,7 +249,7 @@ import type {
   FormValue,
   ToolTipConfigType,
 } from '../schema';
-import { FORM_DIFF_CONFIG_KEY } from '../schema';
+import { FORM_DIFF_CONFIG_KEY, FORM_TYPE_MATCH_VALID_KEY } from '../schema';
 import { getField } from '../utils/config';
 import { createObjectProp, display as displayFunction, filterFunction, getRules } from '../utils/form';
 
@@ -295,6 +295,8 @@ const mForm = inject<FormState | undefined>('mForm');
 
 // 对比相关配置由 MForm 通过 provide 下发，这里直接 inject，无需逐层透传 prop。
 const diffConfig = inject<FormDiffConfig>(FORM_DIFF_CONFIG_KEY, {});
+
+const typeMatchValid = inject(FORM_TYPE_MATCH_VALID_KEY);
 
 const expand = ref(false);
 
@@ -411,7 +413,7 @@ const tooltip = computed(() => {
   };
 });
 
-const rule = computed(() => getRules(mForm, props.config.rules, props));
+const rule = computed(() => getRules(mForm, props.config.rules, props, typeMatchValid));
 
 const display = computed((): boolean => {
   const value = displayFunction(mForm, props.config.display, props);

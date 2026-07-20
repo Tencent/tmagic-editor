@@ -1,4 +1,4 @@
-import type { InjectionKey } from 'vue';
+import type { ComputedRef, InjectionKey } from 'vue';
 
 import type { FormItemConfig } from '@tmagic/form-schema';
 
@@ -27,6 +27,7 @@ export interface FormDiffConfig {
 }
 
 export const FORM_DIFF_CONFIG_KEY: InjectionKey<FormDiffConfig> = Symbol('mFormDiffConfig');
+export const FORM_TYPE_MATCH_VALID_KEY: InjectionKey<ComputedRef<boolean>> = Symbol('mFormTypeMatchValid');
 
 export interface ValidateError {
   message: string;

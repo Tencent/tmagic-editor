@@ -76,15 +76,21 @@ describe('validateTypeMatch', () => {
 
   test('text 期望 string', () => {
     expect(validateTypeMatch('ok', mForm, propsOf({ type: 'text' }))).toBeUndefined();
-    expect(validateTypeMatch(1, mForm, propsOf({ type: 'text' }))).toBe('1 类型应为字符串');
+    expect(validateTypeMatch(1, mForm, propsOf({ type: 'text' }))).toBe(
+      '1 类型应为字符串\n\n请参考以下示例值："文本内容"',
+    );
     expect(validateTypeMatch(1, mForm, propsOf({ type: 'text' }), '自定义错误')).toBe('自定义错误');
   });
 
   test('text filter=number 时期望 number', () => {
     expect(validateTypeMatch(1, mForm, propsOf({ type: 'text', filter: 'number' }))).toBeUndefined();
     expect(validateTypeMatch(0, mForm, propsOf({ type: 'text', filter: 'number' }))).toBeUndefined();
-    expect(validateTypeMatch('1', mForm, propsOf({ type: 'text', filter: 'number' }))).toBe('1 类型应为数字');
-    expect(validateTypeMatch(NaN, mForm, propsOf({ type: 'textarea', filter: 'number' }))).toBe('NaN 类型应为数字');
+    expect(validateTypeMatch('1', mForm, propsOf({ type: 'text', filter: 'number' }))).toBe(
+      '1 类型应为数字\n\n请参考以下示例值：123',
+    );
+    expect(validateTypeMatch(NaN, mForm, propsOf({ type: 'textarea', filter: 'number' }))).toBe(
+      'NaN 类型应为数字\n\n请参考以下示例值：123',
+    );
   });
 
   test('text 自定义 filter 函数时跳过内置类型校验', () => {
@@ -93,16 +99,24 @@ describe('validateTypeMatch', () => {
 
   test('number 期望 number', () => {
     expect(validateTypeMatch(1, mForm, propsOf({ type: 'number' }))).toBeUndefined();
-    expect(validateTypeMatch('1', mForm, propsOf({ type: 'number' }))).toBe('1 类型应为数字');
-    expect(validateTypeMatch(NaN, mForm, propsOf({ type: 'number' }))).toBe('NaN 类型应为数字');
+    expect(validateTypeMatch('1', mForm, propsOf({ type: 'number' }))).toBe('1 类型应为数字\n\n请参考以下示例值：123');
+    expect(validateTypeMatch(NaN, mForm, propsOf({ type: 'number' }))).toBe(
+      'NaN 类型应为数字\n\n请参考以下示例值：123',
+    );
   });
 
   test('date / time / datetime 按 valueFormat（Day.js format）校验', () => {
     // 默认 date: YYYY/MM/DD
     expect(validateTypeMatch('2020/01/01', mForm, propsOf({ type: 'date' }))).toBeUndefined();
-    expect(validateTypeMatch('2020-01-01', mForm, propsOf({ type: 'date' }))).toBe('值格式应为 YYYY/MM/DD');
-    expect(validateTypeMatch(new Date(), mForm, propsOf({ type: 'datetime' }))).toBe('值格式应为 YYYY/MM/DD HH:mm:ss');
-    expect(validateTypeMatch(1710000000000, mForm, propsOf({ type: 'time' }))).toBe('值格式应为 HH:mm:ss');
+    expect(validateTypeMatch('2020-01-01', mForm, propsOf({ type: 'date' }))).toMatch(
+      /^值格式应为 YYYY\/MM\/DD\n\n请参考以下示例值："\d{4}\/\d{2}\/\d{2}"$/,
+    );
+    expect(validateTypeMatch(new Date(), mForm, propsOf({ type: 'datetime' }))).toMatch(
+      /^值格式应为 YYYY\/MM\/DD HH:mm:ss\n\n请参考以下示例值："\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2}"$/,
+    );
+    expect(validateTypeMatch(1710000000000, mForm, propsOf({ type: 'time' }))).toMatch(
+      /^值格式应为 HH:mm:ss\n\n请参考以下示例值："\d{2}:\d{2}:\d{2}"$/,
+    );
     expect(validateTypeMatch('12:30:00', mForm, propsOf({ type: 'time' }))).toBeUndefined();
 
     // 自定义格式
@@ -118,28 +132,34 @@ describe('validateTypeMatch', () => {
       validateTypeMatch(1710000000000, mForm, propsOf({ type: 'date', valueFormat: 'timestamp' })),
     ).toBeUndefined();
     expect(validateTypeMatch(1710000000000, mForm, propsOf({ type: 'datetime', valueFormat: 'x' }))).toBeUndefined();
-    expect(validateTypeMatch('2020-01-01', mForm, propsOf({ type: 'date', valueFormat: 'x' }))).toBe(
-      '值类型应为时间戳数字',
+    expect(validateTypeMatch('2020-01-01', mForm, propsOf({ type: 'date', valueFormat: 'x' }))).toMatch(
+      /^值类型应为时间戳数字\n\n请参考以下示例值：\d+$/,
     );
   });
 
   test('switch / checkbox 默认 true/false', () => {
     expect(validateTypeMatch(true, mForm, propsOf({ type: 'switch' }))).toBeUndefined();
     expect(validateTypeMatch(false, mForm, propsOf({ type: 'checkbox' }))).toBeUndefined();
-    expect(validateTypeMatch(1, mForm, propsOf({ type: 'switch' }))).toBe('1 不在合法开关值中');
+    expect(validateTypeMatch(1, mForm, propsOf({ type: 'switch' }))).toBe(
+      '1 不在合法开关值中\n\n请使用以下某一个值：true；false',
+    );
   });
 
   test('switch / checkbox filter=number 时为 1/0', () => {
     expect(validateTypeMatch(1, mForm, propsOf({ type: 'switch', filter: 'number' }))).toBeUndefined();
     expect(validateTypeMatch(0, mForm, propsOf({ type: 'checkbox', filter: 'number' }))).toBeUndefined();
-    expect(validateTypeMatch(true, mForm, propsOf({ type: 'switch', filter: 'number' }))).toBe('true 不在合法开关值中');
+    expect(validateTypeMatch(true, mForm, propsOf({ type: 'switch', filter: 'number' }))).toBe(
+      'true 不在合法开关值中\n\n请使用以下某一个值：1；0',
+    );
   });
 
   test('switch / checkbox 自定义 activeValue/inactiveValue', () => {
     const config = { type: 'switch', activeValue: 'on', inactiveValue: 'off' };
     expect(validateTypeMatch('on', mForm, propsOf(config))).toBeUndefined();
     expect(validateTypeMatch('off', mForm, propsOf(config))).toBeUndefined();
-    expect(validateTypeMatch('maybe', mForm, propsOf(config))).toBe('maybe 不在合法开关值中');
+    expect(validateTypeMatch('maybe', mForm, propsOf(config))).toBe(
+      'maybe 不在合法开关值中\n\n请使用以下某一个值："on"；"off"',
+    );
   });
 
   test('select 单选值必须在 options 中', () => {
@@ -151,7 +171,17 @@ describe('validateTypeMatch', () => {
       ],
     };
     expect(validateTypeMatch(1, mForm, propsOf(config))).toBeUndefined();
-    expect(validateTypeMatch(3, mForm, propsOf(config))).toBe('3 不在可选项中');
+    expect(validateTypeMatch(3, mForm, propsOf(config))).toBe('3 不在可选项中\n\n请使用以下某一个值：1；2');
+  });
+
+  test('可选项超过 5 个时建议仅展示前 5 个并以「等」省略', () => {
+    const config = {
+      type: 'select',
+      options: [1, 2, 3, 4, 5, 6, 7].map((v) => ({ text: `${v}`, value: v })),
+    };
+    expect(validateTypeMatch(99, mForm, propsOf(config))).toBe(
+      '99 不在可选项中\n\n请使用以下某一个值：1；2；3；4；5 等',
+    );
   });
 
   test('select multiple 校验数组元素', () => {
@@ -164,8 +194,20 @@ describe('validateTypeMatch', () => {
       ],
     };
     expect(validateTypeMatch(['a'], mForm, propsOf(config))).toBeUndefined();
-    expect(validateTypeMatch(['a', 'c'], mForm, propsOf(config))).toBe('a,c 不在可选项中');
-    expect(validateTypeMatch('a', mForm, propsOf(config))).toBe('a 类型应为数组');
+    expect(validateTypeMatch(['a', 'c'], mForm, propsOf(config))).toBe(
+      'a,c 不在可选项中\n\n请使用以下某一个值："a"；"b"',
+    );
+    // multiple 类型不匹配时，示例值基于真实 options（前 2 个值组成的数组）
+    expect(validateTypeMatch('a', mForm, propsOf(config))).toBe('a 类型应为数组\n\n请参考以下示例值：["a","b"]');
+  });
+
+  test('select multiple 仅 1 个 option 时类型不匹配示例为单元素数组', () => {
+    const config = {
+      type: 'select',
+      multiple: true,
+      options: [{ text: 'A', value: 'a' }],
+    };
+    expect(validateTypeMatch('a', mForm, propsOf(config))).toBe('a 类型应为数组\n\n请参考以下示例值：["a"]');
   });
 
   test('select options 为函数 / group', () => {
@@ -174,7 +216,8 @@ describe('validateTypeMatch', () => {
       options: () => [{ text: 'A', value: 1 }],
     };
     expect(validateTypeMatch(1, mForm, propsOf(fnConfig))).toBeUndefined();
-    expect(validateTypeMatch(2, mForm, propsOf(fnConfig))).toBe('2 不在可选项中');
+    // options 为函数（动态）时，跳过「不在可选项中」枚举校验
+    expect(validateTypeMatch(2, mForm, propsOf(fnConfig))).toBeUndefined();
 
     const groupConfig = {
       type: 'select',
@@ -188,17 +231,38 @@ describe('validateTypeMatch', () => {
       ],
     };
     expect(validateTypeMatch('a', mForm, propsOf(groupConfig))).toBeUndefined();
-    expect(validateTypeMatch('b', mForm, propsOf(groupConfig))).toBe('b 不在可选项中');
+    expect(validateTypeMatch('b', mForm, propsOf(groupConfig))).toBe('b 不在可选项中\n\n请使用以下某一个值："a"');
   });
 
   test('select allowCreate / remote 不做枚举', () => {
     expect(validateTypeMatch('custom', mForm, propsOf({ type: 'select', allowCreate: true }))).toBeUndefined();
+    // allowCreate 无 options 时类型不合法示例回退到通用示例
     expect(validateTypeMatch({ a: 1 }, mForm, propsOf({ type: 'select', allowCreate: true }))).toBe(
-      '[object Object] 类型不合法',
+      '[object Object] 类型不合法\n\n请参考以下示例值："文本内容" 或 123',
     );
     expect(validateTypeMatch(['x'], mForm, propsOf({ type: 'select', multiple: true, remote: true }))).toBeUndefined();
+    // remote multiple 无 options 时类型不匹配示例回退到通用数组示例
     expect(validateTypeMatch('x', mForm, propsOf({ type: 'select', multiple: true, remote: true }))).toBe(
-      'x 类型应为数组',
+      'x 类型应为数组\n\n请参考以下示例值：["选项1", "选项2"]',
+    );
+  });
+
+  test('select allowCreate 有 options 时类型不匹配示例用真实 options', () => {
+    // allowCreate + options：非 multiple 传 object，示例取第一个真实 option 值
+    const config = {
+      type: 'select',
+      allowCreate: true,
+      options: [
+        { text: 'A', value: 'a' },
+        { text: 'B', value: 'b' },
+      ],
+    };
+    expect(validateTypeMatch({ a: 1 }, mForm, propsOf(config))).toBe(
+      '[object Object] 类型不合法\n\n请参考以下示例值："a"',
+    );
+    // allowCreate + multiple + options：传非数组，示例取前 2 个真实 option 值组成数组
+    expect(validateTypeMatch('a', mForm, propsOf({ ...config, multiple: true }))).toBe(
+      'a 类型应为数组\n\n请参考以下示例值：["a","b"]',
     );
   });
 
@@ -211,7 +275,7 @@ describe('validateTypeMatch', () => {
       ],
     };
     expect(validateTypeMatch(1, mForm, propsOf(radio))).toBeUndefined();
-    expect(validateTypeMatch(3, mForm, propsOf(radio))).toBe('3 不在可选项中');
+    expect(validateTypeMatch(3, mForm, propsOf(radio))).toBe('3 不在可选项中\n\n请使用以下某一个值：1；2');
 
     const checkboxGroup = {
       type: 'checkbox-group',
@@ -221,7 +285,9 @@ describe('validateTypeMatch', () => {
       ],
     };
     expect(validateTypeMatch(['a', 'b'], mForm, propsOf(checkboxGroup))).toBeUndefined();
-    expect(validateTypeMatch(['c'], mForm, propsOf(checkboxGroup))).toBe('c 不在可选项中');
+    expect(validateTypeMatch(['c'], mForm, propsOf(checkboxGroup))).toBe(
+      'c 不在可选项中\n\n请使用以下某一个值："a"；"b"',
+    );
   });
 
   test('cascader 静态路径与 valueSeparator', () => {
@@ -240,33 +306,52 @@ describe('validateTypeMatch', () => {
 
     expect(validateTypeMatch(['zhejiang', 'hangzhou'], mForm, propsOf({ type: 'cascader', options }))).toBeUndefined();
     expect(validateTypeMatch(['zhejiang', 'ningbo'], mForm, propsOf({ type: 'cascader', options }))).toBe(
-      'zhejiang,ningbo 不在可选项中',
+      'zhejiang,ningbo 不在可选项中\n\n请使用以下某一个值："hangzhou"',
     );
     expect(
       validateTypeMatch('zhejiang/hangzhou', mForm, propsOf({ type: 'cascader', options, valueSeparator: '/' })),
     ).toBeUndefined();
-    expect(validateTypeMatch('bad', mForm, propsOf({ type: 'cascader', remote: true }))).toBe('bad 类型应为数组');
+    // remote 无 options 时类型不匹配示例回退到通用数组示例
+    expect(validateTypeMatch('bad', mForm, propsOf({ type: 'cascader', remote: true }))).toBe(
+      'bad 类型应为数组\n\n请参考以下示例值：["选项1", "选项2"]',
+    );
     expect(validateTypeMatch(['a'], mForm, propsOf({ type: 'cascader', remote: true }))).toBeUndefined();
   });
 
   test('number-range / daterange / table', () => {
     expect(validateTypeMatch([1, 2], mForm, propsOf({ type: 'number-range' }))).toBeUndefined();
-    expect(validateTypeMatch([1], mForm, propsOf({ type: 'number-range' }))).toBe('1 类型应为长度为 2 的数字数组');
+    expect(validateTypeMatch([1], mForm, propsOf({ type: 'number-range' }))).toBe(
+      '1 类型应为长度为 2 的数字数组\n\n请参考以下示例值：[0, 100]',
+    );
 
     expect(
       validateTypeMatch(['2020/01/01 00:00:00', '2020/01/02 00:00:00'], mForm, propsOf({ type: 'daterange' })),
     ).toBeUndefined();
-    expect(validateTypeMatch(['2020-01-01', '2020-01-02'], mForm, propsOf({ type: 'daterange' }))).toBe(
-      '2020-01-01,2020-01-02 格式应为长度为 2 的 YYYY/MM/DD HH:mm:ss 数组',
+    expect(validateTypeMatch(['2020-01-01', '2020-01-02'], mForm, propsOf({ type: 'daterange' }))).toMatch(
+      /^2020-01-01,2020-01-02 格式应为长度为 2 的 YYYY\/MM\/DD HH:mm:ss 数组\n\n请参考以下示例值：\["\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2}", "\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2}"\]$/,
     );
-    expect(validateTypeMatch(['a'], mForm, propsOf({ type: 'daterange' }))).toBe(
-      'a 格式应为长度为 2 的 YYYY/MM/DD HH:mm:ss 数组',
+    expect(validateTypeMatch(['a'], mForm, propsOf({ type: 'daterange' }))).toMatch(
+      /^a 格式应为长度为 2 的 YYYY\/MM\/DD HH:mm:ss 数组\n\n请参考以下示例值：\["\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2}", "\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2}"\]$/,
     );
     expect(validateTypeMatch([1, 2], mForm, propsOf({ type: 'daterange', valueFormat: 'timestamp' }))).toBeUndefined();
     expect(validateTypeMatch('x', mForm, propsOf({ type: 'daterange', names: ['a', 'b'] }))).toBeUndefined();
 
     expect(validateTypeMatch([{ id: 1 }], mForm, propsOf({ type: 'table' }))).toBeUndefined();
-    expect(validateTypeMatch({}, mForm, propsOf({ type: 'groupList' }))).toBe('[object Object] 类型应为数组');
+    // table 无 options，类型不匹配示例回退到通用对象数组示例
+    expect(validateTypeMatch({}, mForm, propsOf({ type: 'groupList' }))).toBe(
+      '[object Object] 类型应为对象数组\n\n请参考以下示例值：[{}]',
+    );
+    // table / group-list 元素必须为对象，字符串数组不合法
+    expect(validateTypeMatch(['a', 'b'], mForm, propsOf({ type: 'table' }))).toBe(
+      'a,b 类型应为对象数组\n\n请参考以下示例值：[{}]',
+    );
+    expect(validateTypeMatch([1], mForm, propsOf({ type: 'group-list' }))).toBe(
+      '1 类型应为对象数组\n\n请参考以下示例值：[{}]',
+    );
+    // 数组中混入非对象元素也不合法
+    expect(validateTypeMatch([{ id: 1 }, 'x'], mForm, propsOf({ type: 'grouplist' }))).toBe(
+      '[object Object],x 类型应为对象数组\n\n请参考以下示例值：[{}]',
+    );
   });
 
   test('容器类字段 no-op', () => {
@@ -276,25 +361,28 @@ describe('validateTypeMatch', () => {
 
   test('无 type 默认按 text 校验', () => {
     expect(validateTypeMatch('ok', mForm, propsOf({}))).toBeUndefined();
-    expect(validateTypeMatch(1, mForm, propsOf({}))).toBe('1 类型应为字符串');
+    expect(validateTypeMatch(1, mForm, propsOf({}))).toBe('1 类型应为字符串\n\n请参考以下示例值："文本内容"');
   });
 
   test('textarea / color-picker / html 期望 string', () => {
     expect(validateTypeMatch('ok', mForm, propsOf({ type: 'textarea' }))).toBeUndefined();
     expect(validateTypeMatch('ok', mForm, propsOf({ type: 'color-picker' }))).toBeUndefined();
-    expect(validateTypeMatch(1, mForm, propsOf({ type: 'html' }))).toBe('1 类型应为字符串');
+    expect(validateTypeMatch(1, mForm, propsOf({ type: 'html' }))).toBe(
+      '1 类型应为字符串\n\n请参考以下示例值："文本内容"',
+    );
   });
 
   test('checkbox-group 非数组', () => {
+    // 类型不匹配时示例基于真实 options（仅 1 个 option → 单元素数组）
     expect(
       validateTypeMatch('a', mForm, propsOf({ type: 'checkbox-group', options: [{ text: 'A', value: 'a' }] })),
-    ).toBe('a 类型应为数组');
+    ).toBe('a 类型应为数组\n\n请参考以下示例值：["a"]');
   });
 
   test('timerange 按 valueFormat 校验', () => {
     expect(validateTypeMatch(['12:00:00', '13:00:00'], mForm, propsOf({ type: 'timerange' }))).toBeUndefined();
-    expect(validateTypeMatch(['bad'], mForm, propsOf({ type: 'timerange' }))).toBe(
-      'bad 格式应为长度为 2 的 HH:mm:ss 数组',
+    expect(validateTypeMatch(['bad'], mForm, propsOf({ type: 'timerange' }))).toMatch(
+      /^bad 格式应为长度为 2 的 HH:mm:ss 数组\n\n请参考以下示例值：\["\d{2}:\d{2}:\d{2}", "\d{2}:\d{2}:\d{2}"\]$/,
     );
   });
 
@@ -310,7 +398,7 @@ describe('validateTypeMatch', () => {
       validateTypeMatch('hangzhou', mForm, propsOf({ type: 'cascader', options, emitPath: false })),
     ).toBeUndefined();
     expect(validateTypeMatch('ningbo', mForm, propsOf({ type: 'cascader', options, emitPath: false }))).toBe(
-      'ningbo 不在可选项中',
+      'ningbo 不在可选项中\n\n请使用以下某一个值："hangzhou"',
     );
   });
 
@@ -327,7 +415,7 @@ describe('validateTypeMatch', () => {
     ).toBeUndefined();
     expect(
       validateTypeMatch(['ningbo'], mForm, propsOf({ type: 'cascader', options, multiple: true, emitPath: false })),
-    ).toBe('ningbo 不在可选项中');
+    ).toBe('ningbo 不在可选项中\n\n请使用以下某一个值："hangzhou"');
   });
 
   test('cascader valueSeparator 时数组值', () => {
@@ -343,9 +431,35 @@ describe('validateTypeMatch', () => {
     ).toBeUndefined();
   });
 
+  test('cascader 类型不匹配时示例基于真实路径', () => {
+    const options = [
+      {
+        value: 'zhejiang',
+        label: 'Zhejiang',
+        children: [{ value: 'hangzhou', label: 'Hangzhou' }],
+      },
+    ];
+    // emitPath（默认）单选：示例为完整路径数组
+    expect(validateTypeMatch('bad', mForm, propsOf({ type: 'cascader', options }))).toBe(
+      'bad 类型应为数组\n\n请参考以下示例值：["zhejiang","hangzhou"]',
+    );
+    // multiple + emitPath：示例为路径数组的数组
+    expect(validateTypeMatch('bad', mForm, propsOf({ type: 'cascader', options, multiple: true }))).toBe(
+      'bad 类型应为数组\n\n请参考以下示例值：[["zhejiang","hangzhou"]]',
+    );
+    // valueSeparator：示例为路径拼接字符串
+    expect(validateTypeMatch(123, mForm, propsOf({ type: 'cascader', options, valueSeparator: '/' }))).toBe(
+      '123 类型应为字符串或数组\n\n请参考以下示例值："zhejiang/hangzhou"',
+    );
+    // emitPath=false + multiple：示例为叶子值组成的数组
+    expect(
+      validateTypeMatch('bad', mForm, propsOf({ type: 'cascader', options, multiple: true, emitPath: false })),
+    ).toBe('bad 类型应为数组\n\n请参考以下示例值：["hangzhou"]');
+  });
+
   test('select allowCreate 对象值非法', () => {
     expect(validateTypeMatch({ a: 1 }, mForm, propsOf({ type: 'select', allowCreate: true }))).toBe(
-      '[object Object] 类型不合法',
+      '[object Object] 类型不合法\n\n请参考以下示例值："文本内容" 或 123',
     );
   });
 

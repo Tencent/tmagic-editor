@@ -1,6 +1,9 @@
 <template>
   <MContainer
-    :config="config"
+    v-for="(item, index) in formConfig"
+    :prop="prop"
+    :key="index"
+    :config="item"
     :model="values"
     :last-values="lastValues"
     :is-compare="isCompare"
@@ -12,7 +15,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type ContainerChangeEventData, defineFormItem, MContainer } from '@tmagic/form';
+import { type ContainerChangeEventData, defineFormConfig, MContainer } from '@tmagic/form';
 import type { StyleSchema } from '@tmagic/schema';
 
 const props = defineProps<{
@@ -21,6 +24,7 @@ const props = defineProps<{
   isCompare?: boolean;
   disabled?: boolean;
   size?: 'large' | 'default' | 'small';
+  prop?: string;
 }>();
 
 const emit = defineEmits<{
@@ -36,78 +40,76 @@ const positionText: Record<string, string> = {
   sticky: '粘性定位',
 };
 
-const config = defineFormItem({
-  items: [
-    {
-      name: 'position',
-      text: '定位',
-      labelWidth: '68px',
-      type: 'data-source-field-select',
-      fieldConfig: {
-        type: 'select',
-        options: Object.keys(positionText).map((item) => ({
-          value: item,
-          text: `${item}(${positionText[item]})`,
-        })),
+const formConfig = defineFormConfig([
+  {
+    name: 'position',
+    text: '定位',
+    labelWidth: '68px',
+    type: 'data-source-field-select',
+    fieldConfig: {
+      type: 'select',
+      options: Object.keys(positionText).map((item) => ({
+        value: item,
+        text: `${item}(${positionText[item]})`,
+      })),
+    },
+  },
+  {
+    type: 'row',
+    labelWidth: '68px',
+    display: () => props.values.position !== 'static',
+    items: [
+      {
+        name: 'left',
+        type: 'data-source-field-select',
+        text: 'left',
+        fieldConfig: {
+          type: 'text',
+        },
       },
-    },
-    {
-      type: 'row',
-      labelWidth: '68px',
-      display: () => props.values.position !== 'static',
-      items: [
-        {
-          name: 'left',
-          type: 'data-source-field-select',
-          text: 'left',
-          fieldConfig: {
-            type: 'text',
-          },
+      {
+        name: 'top',
+        type: 'data-source-field-select',
+        text: 'top',
+        fieldConfig: {
+          type: 'text',
         },
-        {
-          name: 'top',
-          type: 'data-source-field-select',
-          text: 'top',
-          fieldConfig: {
-            type: 'text',
-          },
-        },
-      ],
-    },
-    {
-      type: 'row',
-      labelWidth: '68px',
-      display: () => props.values.position !== 'static',
-      items: [
-        {
-          name: 'right',
-          type: 'data-source-field-select',
-          text: 'right',
-          fieldConfig: {
-            type: 'text',
-          },
-        },
-        {
-          name: 'bottom',
-          type: 'data-source-field-select',
-          text: 'bottom',
-          fieldConfig: {
-            type: 'text',
-          },
-        },
-      ],
-    },
-    {
-      labelWidth: '68px',
-      name: 'zIndex',
-      text: 'zIndex',
-      type: 'data-source-field-select',
-      fieldConfig: {
-        type: 'text',
       },
+    ],
+  },
+  {
+    type: 'row',
+    labelWidth: '68px',
+    display: () => props.values.position !== 'static',
+    items: [
+      {
+        name: 'right',
+        type: 'data-source-field-select',
+        text: 'right',
+        fieldConfig: {
+          type: 'text',
+        },
+      },
+      {
+        name: 'bottom',
+        type: 'data-source-field-select',
+        text: 'bottom',
+        fieldConfig: {
+          type: 'text',
+        },
+      },
+    ],
+  },
+  {
+    labelWidth: '68px',
+    name: 'zIndex',
+    text: 'zIndex',
+    type: 'data-source-field-select',
+    fieldConfig: {
+      type: 'text',
     },
-  ],
-});
+  },
+]);
 
 const change = (value: string | StyleSchema, eventData: ContainerChangeEventData) => {
   emit('change', value, eventData);

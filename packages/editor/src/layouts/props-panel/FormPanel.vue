@@ -12,6 +12,7 @@
         :size="propsPanelSize"
         :init-values="values"
         :config="config"
+        :type-match-valid="true"
         :extend-state="extendState"
         @change="submit"
         @error="errorHandler"
@@ -46,9 +47,10 @@
 import { computed, getCurrentInstance, inject, onMounted, onUnmounted, ref, useTemplateRef, watchEffect } from 'vue';
 import { Document as DocumentIcon } from '@element-plus/icons-vue';
 
-import { TMagicButton, TMagicScrollbar } from '@tmagic/design';
+import { TMagicButton, tMagicMessage, TMagicScrollbar } from '@tmagic/design';
 import type { ContainerChangeEventData, FormConfig, FormState, FormValue } from '@tmagic/form';
 import { MForm } from '@tmagic/form';
+import { filterXSS } from '@tmagic/utils';
 
 import MIcon from '@editor/components/Icon.vue';
 import { ENABLE_PROPS_FORM_VALIDATE } from '@editor/editorProps';
@@ -134,6 +136,19 @@ const errorHandler = (e: any) => {
   emit('form-error', e);
 };
 
+/**
+ * 将校验错误文案安全地转为用于弹窗展示的 HTML。
+ *
+ * 文案形如 `字段 -> 主文案\n\n建议`，多条以结构性 `<br>` 拼接。为在保留换行排版的同时
+ * 避免 `${value}`/字段名中可能夹带的 HTML 造成 XSS：先按结构性 `<br>` 拆分，对每段做 HTML
+ * 转义后再把段内换行 `\n` 替换为 `<br>`，最后用 `<br>` 拼回。
+ */
+const formatValidateErrorHtml = (error: string): string =>
+  error
+    .split(/<br\s*\/?>/i)
+    .map((segment) => filterXSS(segment).replaceAll('\n', '<br>'))
+    .join('<br>');
+
 const saveCode = async (values: any) => {
   const newValues = props.codeValueKey ? { [props.codeValueKey]: values } : values;
 
@@ -153,8 +168,18 @@ const saveCode = async (values: any) => {
       appContext: internalInstance?.appContext ?? null,
       services,
       stage: stage.value,
+      typeMatchValid: true,
       extendState: props.extendState,
     });
+
+    if (error) {
+      tMagicMessage({
+        type: 'error',
+        message: formatValidateErrorHtml(error),
+        dangerouslyUseHTMLString: true,
+      });
+    }
+
     emit('submit', newValues, undefined, error ? new Error(error) : undefined);
   } catch (e: any) {
     console.log('validateForm error', e);

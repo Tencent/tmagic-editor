@@ -8,6 +8,7 @@ import './theme/index.scss';
 
 export * from './types';
 export * from './config';
+export * from './formValidateMessage';
 
 export { default as TMagicAutocomplete } from './Autocomplete.vue';
 export { default as TMagicBadge } from './Badge.vue';

@@ -11,6 +11,7 @@ import Position from '@editor/fields/StyleSetter/pro/Position.vue';
 
 vi.mock('@tmagic/form', () => ({
   defineFormItem: (cfg: any) => cfg,
+  defineFormConfig: (cfg: any) => cfg,
   MContainer: defineComponent({
     name: 'FakeMContainer',
     props: ['config', 'model', 'lastValues', 'isCompare', 'size', 'disabled'],
@@ -48,8 +49,8 @@ describe('StyleSetter/Position.vue', () => {
         values: { position: 'static' },
       } as any,
     });
-    const config = wrapper.findComponent({ name: 'FakeMContainer' }).props('config') as any;
-    const rowItems = config.items.filter((it: any) => it.type === 'row');
+    const configs = wrapper.findAllComponents({ name: 'FakeMContainer' }).map((c) => c.props('config') as any);
+    const rowItems = configs.filter((it: any) => it.type === 'row');
     expect(rowItems[0].display()).toBe(false);
   });
 
@@ -59,8 +60,8 @@ describe('StyleSetter/Position.vue', () => {
         values: { position: 'absolute' },
       } as any,
     });
-    const config = wrapper.findComponent({ name: 'FakeMContainer' }).props('config') as any;
-    const rowItems = config.items.filter((it: any) => it.type === 'row');
+    const configs = wrapper.findAllComponents({ name: 'FakeMContainer' }).map((c) => c.props('config') as any);
+    const rowItems = configs.filter((it: any) => it.type === 'row');
     expect(rowItems[0].display()).toBe(true);
   });
 

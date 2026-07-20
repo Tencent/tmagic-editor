@@ -7,6 +7,7 @@
           v-if="item.component"
           :is="item.component"
           :values="model[name]"
+          :prop="prop ? `${prop}.${name}` : name"
           :last-values="lastValues?.[name]"
           :is-compare="isCompare"
           :size="size"
@@ -35,7 +36,7 @@ defineOptions({
   name: 'MFieldsStyleSetter',
 });
 
-const props = defineProps<FieldProps<StyleSchema>>();
+defineProps<FieldProps<StyleSchema>>();
 
 const emit = defineEmits<{
   change: [v: any, eventData: ContainerChangeEventData];
@@ -77,13 +78,6 @@ const collapseValue = shallowRef(
 );
 
 const change = (v: any, eventData: ContainerChangeEventData) => {
-  eventData.changeRecords?.forEach((record) => {
-    if (props.prop) {
-      record.propPath = `${props.prop}.${record.propPath}`;
-    } else if (props.name) {
-      record.propPath = `${props.name}.${record.propPath}`;
-    }
-  });
   emit('change', v, eventData);
 };
 
