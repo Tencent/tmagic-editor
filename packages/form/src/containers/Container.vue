@@ -5,7 +5,9 @@
     :class="`m-form-container m-container-${type || ''} ${config.className || ''}${config.tip ? ' has-tip' : ''}`"
     :style="config.style"
   >
-    <MHidden v-if="type === 'hidden'" :name="`${name}`" :prop="itemProp" :model="model"></MHidden>
+    <TMagicFormItem v-if="type === 'hidden'" v-bind="formItemProps" style="display: none">
+      <MHidden :name="`${name}`" :prop="itemProp" :model="model"></MHidden>
+    </TMagicFormItem>
 
     <component
       v-else-if="items && !text && type && display"

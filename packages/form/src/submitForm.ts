@@ -590,7 +590,7 @@ const removeTabItemsLazy = (node: any): void => {
  * 无法校验到这些标签页内的字段。校验场景需要一次性渲染全部字段，故在此统一去除 lazy。
  * 处理基于深拷贝，不会污染调用方传入的原始 config。
  */
-const stripTabItemsLazy = (config: FormConfig): FormConfig => {
+export const stripTabItemsLazy = (config: FormConfig): FormConfig => {
   const cloned = cloneConfigValue(config);
   removeTabItemsLazy(cloned);
   return cloned;
