@@ -17,6 +17,7 @@
  */
 
 export * from './use-code-block-edit';
+export * from './use-compare-form';
 export * from './use-stage';
 export * from './use-float-box';
 export * from './use-window-rect';

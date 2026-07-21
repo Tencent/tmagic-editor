@@ -566,6 +566,58 @@ export interface CompareFormLoadConfigContext {
  * 可通过 `ctx.defaultLoadConfig()` 复用默认结果再做二次加工。
  */
 export type CompareFormLoadConfig = (ctx: CompareFormLoadConfigContext) => FormConfig | Promise<FormConfig>;
+
+/**
+ * CompareForm / ViewForm 共用的基础 props。
+ * 两者都基于同一套「按 category 加载 FormConfig + 注入 services/stage」的逻辑（见 useCompareForm），
+ * 差异仅在于是否做新旧值对比。这里抽出公共字段避免重复定义。
+ */
+export interface CompareFormBaseProps {
+  /** 当前值（对比场景下为修改后的值） */
+  value: Partial<MNode> | Partial<DataSourceSchema> | Partial<CodeBlockContent> | Record<string, any>;
+  /**
+   * 类型说明：
+   * - `category` 为 `node` 时，`type` 为节点组件的类型，例如 'text'、'button'、'page'、'container' 等
+   * - `category` 为 `data-source` 时，`type` 为数据源类型，例如 'base'、'http'
+   * - `category` 为 `code-block` 时，`type` 可不传
+   */
+  type?: string;
+  /** 表单配置类别，决定从哪里取 FormConfig */
+  category?: CompareCategory;
+  /** 数据源代码块场景下的数据源类型（base/http），用于代码块表单中"执行时机"展示 */
+  dataSourceType?: string;
+  labelWidth?: string;
+  /**
+   * 外层容器高度。设置后表单内容超出时会在组件内部出现滚动条，
+   * 避免 dialog / 面板使用方需要自行处理滚动。可传任意 CSS 长度，例如 `60vh` / `400px` / `100%`。
+   */
+  height?: string;
+  /**
+   * 用户自定义注入到 MForm.formState 的扩展字段，与 Editor 顶层的 `extendFormState`、
+   * PropsPanel 的 `extend-state` 语义一致。表单 item 的 `display` / `disabled` 等
+   * filterFunction 经常依赖这里注入的字段（如 stage、自定义业务上下文等），
+   * 因此在对比 / 展示场景下也需要透传，避免出现 `formState.xxx is undefined` 的运行时错误。
+   */
+  extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
+  /**
+   * 外部透传的基础 formState（通常来自 PropsPanel 主属性表单）。
+   * 组件会提取其中的扩展字段覆盖到自己的 formState，保证 filterFunction 上下文一致。
+   */
+  baseFormState?: FormState;
+  /**
+   * 表单内组件的尺寸（透传给 MForm 的 `size`），可选 'large' | 'default' | 'small'。
+   * 缺省时使用 MForm 内置默认尺寸。
+   */
+  size?: FieldSize;
+  /**
+   * 自定义 FormConfig 加载逻辑。传入后将接管内置的按 `category`(node/data-source/code-block)
+   * 取配置逻辑，调用方可根据业务自行返回（或异步返回）表单配置。可通过
+   * `ctx.defaultLoadConfig()` 复用默认结果再做二次加工。
+   */
+  loadConfig?: CompareFormLoadConfig;
+  /** 编辑器服务集合，由调用方传入（不再通过 inject('services') 获取）。 */
+  services?: Services;
+}
 // #endregion CompareForm
 
 // #region SideItemKey

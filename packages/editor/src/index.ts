@@ -74,6 +74,7 @@ export { default as SplitView } from './components/SplitView.vue';
 export { default as Resizer } from './components/Resizer.vue';
 export { default as CodeBlockEditor } from './components/CodeBlockEditor.vue';
 export { default as CompareForm } from './components/CompareForm.vue';
+export { default as ViewForm } from './components/ViewForm.vue';
 export { default as HistoryListBucket } from './layouts/history-list/Bucket.vue';
 export { default as HistoryListBucketTab } from './layouts/history-list/BucketTab.vue';
 export { default as HistoryDiffDialog } from './layouts/history-list/HistoryDiffDialog.vue';

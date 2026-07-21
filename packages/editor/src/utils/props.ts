@@ -362,6 +362,35 @@ export const fillConfig = (
   return [tabConfig];
 };
 
+/**
+ * 将属性表单配置中「样式」tab-pane 的 `display` 强制置为 `true`。
+ *
+ * `propsService.getPropsConfig` 返回的样式 tab 默认带有
+ * `display: ({ services }) => !(services?.uiService?.get('showStylePanel') ?? true)`，
+ * 在对比 / 只读展示场景（CompareForm / ViewForm）下并不需要跟随 uiService 状态隐藏，
+ * 这里统一放开，保证样式 tab 始终可见。
+ *
+ * @param formConfig 组件属性表单配置
+ * @returns 处理后的表单配置（不修改入参，返回浅拷贝）
+ */
+export const removeStyleDisplayConfig = (formConfig: FormConfig): FormConfig =>
+  formConfig.map((item) => {
+    if (!('type' in item)) return item;
+    if (item?.type !== 'tab' || !Array.isArray(item.items)) return item;
+
+    return {
+      ...item,
+      items: item.items.map((tabPane) => {
+        if (tabPane?.title !== '样式' || !Array.isArray(tabPane.items)) return tabPane;
+
+        return {
+          ...tabPane,
+          display: true,
+        };
+      }),
+    };
+  });
+
 // #region ValidatePropsFormOptions
 /**
  * validatePropsForm 参数
