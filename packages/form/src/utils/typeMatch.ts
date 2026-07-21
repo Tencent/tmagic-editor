@@ -21,7 +21,7 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 
 import { appendValidateSuggestion } from '@tmagic/design';
-import { getValueByKeyPath } from '@tmagic/utils';
+import { getValueByKeyPath, toLine } from '@tmagic/utils';
 
 import type { CascaderOption, FormState, Rule } from '../schema';
 
@@ -44,11 +44,12 @@ export type TypeMatchValidator = (value: any, context: TypeMatchValidateContext)
 
 const typeMatchRuleRegistry = new Map<string, TypeMatchValidator>();
 
-const normalizeType = (type: string) => type.replace(/([A-Z])/g, '-$1').toLowerCase();
+const isPromise = (value: any): value is Promise<unknown> =>
+  typeof value === 'object' && value !== null && typeof value.then === 'function';
 
 /** 注册或覆盖某个字段 type 的 typeMatch 校验规则 */
 export const registerTypeMatchRule = (type: string, validator: TypeMatchValidator): void => {
-  typeMatchRuleRegistry.set(normalizeType(type), validator);
+  typeMatchRuleRegistry.set(toLine(type), validator);
 };
 
 /** 批量注册 typeMatch 校验规则 */
@@ -60,10 +61,10 @@ export const registerTypeMatchRules = (rules: Record<string, TypeMatchValidator>
 
 /** 获取某个字段 type 的自定义 typeMatch 校验规则 */
 export const getTypeMatchRule = (type: string): TypeMatchValidator | undefined =>
-  typeMatchRuleRegistry.get(normalizeType(type));
+  typeMatchRuleRegistry.get(toLine(type));
 
 /** 删除某个字段 type 的自定义 typeMatch 校验规则 */
-export const deleteTypeMatchRule = (type: string): boolean => typeMatchRuleRegistry.delete(normalizeType(type));
+export const deleteTypeMatchRule = (type: string): boolean => typeMatchRuleRegistry.delete(toLine(type));
 
 /** 清空所有自定义 typeMatch 校验规则 */
 export const clearTypeMatchRules = (): void => {
@@ -182,7 +183,12 @@ const toggleSuggestion = (activeValue: any, inactiveValue: any): string =>
 const resolveFieldDefaultValue = (mForm: FormState | undefined, props: any): any => {
   const { defaultValue } = props.config || {};
   if (typeof defaultValue === 'undefined' || defaultValue === 'undefined') return undefined;
-  return resolveConfig(mForm, defaultValue, props);
+  const resolvedDefaultValue = resolveConfig(mForm, defaultValue, props);
+  // resolveConfig 返回 Promise（如 defaultValue 为异步函数）时无法同步获取默认值，回退到通用示例
+  if (isPromise(resolvedDefaultValue)) {
+    return undefined;
+  }
+  return resolvedDefaultValue;
 };
 
 const isNumberValue = (value: any) => typeof value === 'number' && !Number.isNaN(value);
@@ -271,13 +277,6 @@ const dateValueFormatErrorMessage = (message: string | undefined, valueFormat: s
     dateSuggestion(valueFormat),
   );
 
-const resolveFieldType = (mForm: FormState | undefined, props: any): string => {
-  let type = 'type' in (props.config || {}) ? props.config.type : '';
-  type = type ? resolveConfig<string>(mForm, type, props) || '' : '';
-  if (type === 'form' || type === 'container') return '';
-  return normalizeType(type || '') || (props.config?.items ? '' : 'text');
-};
-
 const resolveToggleValues = (config: any) => {
   const filterIsNumber = config.filter === 'number';
   const { activeValue: configActiveValue, inactiveValue: configInactiveValue } = config;
@@ -317,13 +316,9 @@ const flattenSelectOptions = (options: any[]): any[] => {
   return values;
 };
 
-const resolveOptions = (mForm: FormState | undefined, props: any): any[] => {
+const resolveOptions = (props: any): any[] => {
   const { options } = props.config || {};
-  if (Array.isArray(options)) return options;
-  if (typeof options === 'function') {
-    return resolveConfig(mForm, options, props) || [];
-  }
-  return [];
+  return Array.isArray(options) ? options : [];
 };
 
 const includesOptionValue = (optionValues: any[], value: any) => optionValues.some((item) => Object.is(item, value));
@@ -404,6 +399,10 @@ const validateSelectValue = (
   optionValues: any[],
   message: string | undefined,
 ): string | undefined => {
+  if (optionValues.length === 0) {
+    return undefined;
+  }
+
   if (config.allowCreate || config.remote) {
     if (config.multiple) {
       if (!Array.isArray(value)) {
@@ -456,10 +455,19 @@ const validateCascaderValue = (
   mForm: FormState | undefined,
   message: string | undefined,
 ): string | undefined => {
+  const options = resolveOptions(props) as CascaderOption[];
+
+  if (!options.length) {
+    return;
+  }
+
   const valueSeparator = resolveConfig<string | undefined>(mForm, config.valueSeparator, props);
+  // resolveConfig 返回 Promise（如 valueSeparator 为异步函数）时无法同步确定分隔符，跳过校验
+  if (isPromise(valueSeparator)) {
+    return undefined;
+  }
   const emitPath = config.emitPath !== false;
   const multiple = Boolean(config.multiple);
-  const options = resolveOptions(mForm, props) as CascaderOption[];
   const cascaderExample = (fallbackExample: string) =>
     cascaderExampleSuggestion(options, config, valueSeparator, fallbackExample);
 
@@ -603,12 +611,17 @@ const validateBuiltinTypeMatch = (
   }
 
   if (fieldType === 'select') {
-    const optionValues = flattenSelectOptions(resolveOptions(mForm, props));
+    const optionValues = flattenSelectOptions(resolveOptions(props));
     return validateSelectValue(value, config, optionValues, message);
   }
 
   if (fieldType === 'radio-group') {
-    const optionValues = flattenSelectOptions(resolveOptions(mForm, props));
+    const optionValues = flattenSelectOptions(resolveOptions(props));
+
+    if (optionValues.length === 0) {
+      return undefined;
+    }
+
     if (!includesOptionValue(optionValues, value)) {
       return defaultMessage(message, `${value} 不在可选项中`, optionSuggestion(optionValues));
     }
@@ -616,7 +629,12 @@ const validateBuiltinTypeMatch = (
   }
 
   if (fieldType === 'checkbox-group') {
-    const optionValues = flattenSelectOptions(resolveOptions(mForm, props));
+    const optionValues = flattenSelectOptions(resolveOptions(props));
+
+    if (optionValues.length === 0) {
+      return undefined;
+    }
+
     if (!Array.isArray(value)) {
       return defaultMessage(
         message,
@@ -679,7 +697,14 @@ export const validateTypeMatch = (
     return undefined;
   }
 
-  const fieldType = resolveFieldType(mForm, props);
+  const rawFieldType = 'type' in (props.config || {}) ? props.config.type : '';
+  if (typeof rawFieldType !== 'string' || !rawFieldType) {
+    return;
+  }
+
+  // 统一将驼峰形式（如 radioGroup）归一化为连字符形式（radio-group），与内置规则的 key 保持一致
+  const fieldType = toLine(rawFieldType);
+
   const customValidator = getTypeMatchRule(fieldType);
 
   // 自定义规则优先：可覆盖内置规则，也可为业务自定义字段 type 扩展校验
@@ -695,11 +720,15 @@ export const createTypeMatchValidator = (mForm: FormState | undefined, props: an
 
   return (asyncValidatorRule: any, value: any, callback: Function, source: any, options: any) => {
     const actualValue = props.config?.names ? props.model : value;
-    const error = validateTypeMatch(actualValue, mForm, props, rule.message);
+    try {
+      const error = validateTypeMatch(actualValue, mForm, props, rule.message);
 
-    if (error) {
-      callback(new Error(error));
-      return;
+      if (error) {
+        callback(new Error(error));
+        return;
+      }
+    } catch (error) {
+      console.error(error);
     }
 
     if (originalValidator) {

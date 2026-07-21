@@ -236,15 +236,11 @@ describe('validateTypeMatch', () => {
 
   test('select allowCreate / remote 不做枚举', () => {
     expect(validateTypeMatch('custom', mForm, propsOf({ type: 'select', allowCreate: true }))).toBeUndefined();
-    // allowCreate 无 options 时类型不合法示例回退到通用示例
-    expect(validateTypeMatch({ a: 1 }, mForm, propsOf({ type: 'select', allowCreate: true }))).toBe(
-      '[object Object] 类型不合法\n\n请参考以下示例值："文本内容" 或 123',
-    );
+    // allowCreate 无 options 时跳过类型校验
+    expect(validateTypeMatch({ a: 1 }, mForm, propsOf({ type: 'select', allowCreate: true }))).toBeUndefined();
     expect(validateTypeMatch(['x'], mForm, propsOf({ type: 'select', multiple: true, remote: true }))).toBeUndefined();
-    // remote multiple 无 options 时类型不匹配示例回退到通用数组示例
-    expect(validateTypeMatch('x', mForm, propsOf({ type: 'select', multiple: true, remote: true }))).toBe(
-      'x 类型应为数组\n\n请参考以下示例值：["选项1", "选项2"]',
-    );
+    // remote multiple 无 options 时跳过类型校验
+    expect(validateTypeMatch('x', mForm, propsOf({ type: 'select', multiple: true, remote: true }))).toBeUndefined();
   });
 
   test('select allowCreate 有 options 时类型不匹配示例用真实 options', () => {
@@ -268,7 +264,7 @@ describe('validateTypeMatch', () => {
 
   test('radio-group / checkbox-group', () => {
     const radio = {
-      type: 'radioGroup',
+      type: 'radio-group',
       options: [
         { text: 'A', value: 1 },
         { text: 'B', value: 2 },
@@ -287,6 +283,19 @@ describe('validateTypeMatch', () => {
     expect(validateTypeMatch(['a', 'b'], mForm, propsOf(checkboxGroup))).toBeUndefined();
     expect(validateTypeMatch(['c'], mForm, propsOf(checkboxGroup))).toBe(
       'c 不在可选项中\n\n请使用以下某一个值："a"；"b"',
+    );
+
+    // type 为驼峰形式 radioGroup，应通过 toLine 归一化后按 radio-group 规则校验
+    const radioGroupCamelCase = {
+      type: 'radioGroup',
+      options: [
+        { text: 'A', value: 1 },
+        { text: 'B', value: 2 },
+      ],
+    };
+    expect(validateTypeMatch(1, mForm, propsOf(radioGroupCamelCase))).toBeUndefined();
+    expect(validateTypeMatch(3, mForm, propsOf(radioGroupCamelCase))).toBe(
+      '3 不在可选项中\n\n请使用以下某一个值：1；2',
     );
   });
 
@@ -311,10 +320,8 @@ describe('validateTypeMatch', () => {
     expect(
       validateTypeMatch('zhejiang/hangzhou', mForm, propsOf({ type: 'cascader', options, valueSeparator: '/' })),
     ).toBeUndefined();
-    // remote 无 options 时类型不匹配示例回退到通用数组示例
-    expect(validateTypeMatch('bad', mForm, propsOf({ type: 'cascader', remote: true }))).toBe(
-      'bad 类型应为数组\n\n请参考以下示例值：["选项1", "选项2"]',
-    );
+    // remote 无 options 时跳过类型校验
+    expect(validateTypeMatch('bad', mForm, propsOf({ type: 'cascader', remote: true }))).toBeUndefined();
     expect(validateTypeMatch(['a'], mForm, propsOf({ type: 'cascader', remote: true }))).toBeUndefined();
   });
 
@@ -338,7 +345,7 @@ describe('validateTypeMatch', () => {
 
     expect(validateTypeMatch([{ id: 1 }], mForm, propsOf({ type: 'table' }))).toBeUndefined();
     // table 无 options，类型不匹配示例回退到通用对象数组示例
-    expect(validateTypeMatch({}, mForm, propsOf({ type: 'groupList' }))).toBe(
+    expect(validateTypeMatch({}, mForm, propsOf({ type: 'group-list' }))).toBe(
       '[object Object] 类型应为对象数组\n\n请参考以下示例值：[{}]',
     );
     // table / group-list 元素必须为对象，字符串数组不合法
@@ -359,9 +366,9 @@ describe('validateTypeMatch', () => {
     expect(validateTypeMatch(1, mForm, propsOf({ type: 'panel', items: [] }))).toBeUndefined();
   });
 
-  test('无 type 默认按 text 校验', () => {
+  test('无 type 时跳过校验', () => {
     expect(validateTypeMatch('ok', mForm, propsOf({}))).toBeUndefined();
-    expect(validateTypeMatch(1, mForm, propsOf({}))).toBe('1 类型应为字符串\n\n请参考以下示例值："文本内容"');
+    expect(validateTypeMatch(1, mForm, propsOf({}))).toBeUndefined();
   });
 
   test('textarea / color-picker / html 期望 string', () => {
@@ -457,15 +464,49 @@ describe('validateTypeMatch', () => {
     ).toBe('bad 类型应为数组\n\n请参考以下示例值：["hangzhou"]');
   });
 
-  test('select allowCreate 对象值非法', () => {
-    expect(validateTypeMatch({ a: 1 }, mForm, propsOf({ type: 'select', allowCreate: true }))).toBe(
-      '[object Object] 类型不合法\n\n请参考以下示例值："文本内容" 或 123',
-    );
+  test('select allowCreate 无 options 时跳过类型校验', () => {
+    expect(validateTypeMatch({ a: 1 }, mForm, propsOf({ type: 'select', allowCreate: true }))).toBeUndefined();
   });
 
   test('动态 type 函数解析', () => {
     expect(validateTypeMatch('ok', mForm, propsOf({ type: () => 'text', name: 'field' }))).toBeUndefined();
     expect(validateTypeMatch(1, mForm, propsOf({ type: () => 'number', name: 'field' }))).toBeUndefined();
+  });
+
+  test('type 为异步函数（返回 Promise）时跳过校验', () => {
+    expect(
+      validateTypeMatch('ok', mForm, propsOf({ type: () => Promise.resolve('text'), name: 'field' })),
+    ).toBeUndefined();
+    expect(validateTypeMatch(123, mForm, propsOf({ type: async () => 'number', name: 'field' }))).toBeUndefined();
+    // 即便值类型明显不匹配，异步 type 也跳过校验
+    expect(validateTypeMatch({ a: 1 }, mForm, propsOf({ type: async () => 'text', name: 'field' }))).toBeUndefined();
+  });
+
+  test('cascader valueSeparator 为异步函数（返回 Promise）时跳过校验', () => {
+    const options = [
+      {
+        value: 'zhejiang',
+        label: 'Zhejiang',
+        children: [{ value: 'hangzhou', label: 'Hangzhou' }],
+      },
+    ];
+    // valueSeparator 异步时无法同步确定分隔符，跳过校验（即便值类型不匹配也不报错）
+    expect(
+      validateTypeMatch(123, mForm, propsOf({ type: 'cascader', options, valueSeparator: () => Promise.resolve('/') })),
+    ).toBeUndefined();
+    expect(
+      validateTypeMatch('bad', mForm, propsOf({ type: 'cascader', options, valueSeparator: async () => '/' })),
+    ).toBeUndefined();
+  });
+
+  test('defaultValue 为异步函数（返回 Promise）时示例回退到通用值', () => {
+    // defaultValue 异步时无法同步获取，错误信息中的示例值回退到通用示例，不报错也不 crash
+    expect(validateTypeMatch('1', mForm, propsOf({ type: 'number', defaultValue: () => Promise.resolve(123) }))).toBe(
+      '1 类型应为数字\n\n请参考以下示例值：123',
+    );
+    expect(validateTypeMatch(1, mForm, propsOf({ type: 'text', defaultValue: async () => '示例' }))).toBe(
+      '1 类型应为字符串\n\n请参考以下示例值："文本内容"',
+    );
   });
 });
 
