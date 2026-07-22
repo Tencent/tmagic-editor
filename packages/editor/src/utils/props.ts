@@ -195,7 +195,6 @@ export const advancedTabConfig: TabPaneConfig = {
     {
       name: 'created',
       text: 'Created',
-      flat: true,
       labelPosition: 'top',
       type: 'code-select',
       titleExtra: '组件初始化时执行',
@@ -215,8 +214,6 @@ export const advancedTabConfig: TabPaneConfig = {
       name: 'mounted',
       text: 'Mounted',
       labelPosition: 'top',
-      flat: true,
-
       type: 'code-select',
       titleExtra: '组件挂载到dom时执行',
       rules: [
@@ -234,7 +231,6 @@ export const advancedTabConfig: TabPaneConfig = {
     {
       name: 'display',
       text: 'Display',
-      flat: true,
       titleExtra: '控制组件是否渲染，关系的代码块返回值为false时不渲染',
       labelPosition: 'top',
       type: 'code-select',
@@ -278,7 +274,6 @@ export const displayTabConfig: TabPaneConfig<DisplayCondsConfig> = {
       type: 'display-conds',
       name: NODE_CONDS_KEY,
       titlePrefix: '条件组',
-      flat: true,
       fixed: 'right',
       operateColWidth: 112,
       defaultValue: [],

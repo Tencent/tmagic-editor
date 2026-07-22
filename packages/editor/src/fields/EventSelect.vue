@@ -340,7 +340,6 @@ const actionsConfig = computed(
     defineFormItem({
       type: 'panel',
       labelPosition: 'left',
-      flat: true,
       items: [
         {
           type: 'group-list',
@@ -349,7 +348,6 @@ const actionsConfig = computed(
           enableToggleMode: false,
           titlePrefix: '动作',
           labelPosition: 'left',
-          flat: true,
           items: [
             actionTypeConfig.value,
             targetCompConfig.value,

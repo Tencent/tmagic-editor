@@ -74,7 +74,6 @@ const codeConfig = computed<GroupListConfig>(() => ({
   name: 'hookData',
   enableToggleMode: false,
   expandAll: true,
-  flat: true,
   addable: () => false,
   title: (mForm, { model, index }: any) => {
     if (model.codeType === HookCodeType.DATA_SOURCE_METHOD) {
