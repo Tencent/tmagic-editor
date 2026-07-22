@@ -27,9 +27,7 @@ import editorPlugin from '@tmagic/editor';
 
 import App from './App.vue';
 import router from './route';
-
-// import '@tmagic/editor/dist/style.css';
-import '@tmagic/editor/dist/themes/magic-admin.css';
+import { DEFAULT_THEME, loadTheme } from './theme-loader';
 
 // @ts-ignore
 globalThis.MonacoEnvironment = {
@@ -51,6 +49,7 @@ globalThis.MonacoEnvironment = {
 };
 
 const adapter = sessionStorage.getItem('tmagic-playground-ui-adapter') || 'element-plus';
+const theme = sessionStorage.getItem('tmagic-playground-theme') || DEFAULT_THEME;
 
 let adapterModule;
 
@@ -62,9 +61,9 @@ if (adapter === 'tdesign-vue-next') {
   adapterModule = import('@tmagic/element-plus-adapter');
 }
 
-adapterModule.then((module: any) => {
+Promise.all([adapterModule, loadTheme(theme)]).then(([module]) => {
   const app = createApp(App);
   app.use(router);
-  app.use(editorPlugin, { ...module.default, flat: true });
+  app.use(editorPlugin, { ...module.default, flat: theme !== DEFAULT_THEME });
   app.mount('#app');
 });

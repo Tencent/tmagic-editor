@@ -12,7 +12,6 @@ export default {
 html,
 body,
 #app {
-  --el-color-primary: #0054e1;
   padding: 0;
   margin: 0;
   width: 100%;

@@ -11,7 +11,7 @@
       :datasource-event-method-list="datasourceEventMethodList"
       :datasource-configs="datasourceConfigs"
       :datasource-values="datasourceValues"
-      theme="magic-admin"
+      :theme="theme"
       :component-group-list="componentGroupList"
       :datasource-list="datasourceList"
       :default-selected="defaultSelected"
@@ -69,6 +69,7 @@ import {
 import DeviceGroup from '../components/DeviceGroup.vue';
 import componentGroupList from '../configs/componentGroupList';
 import dsl from '../configs/dsl';
+import { DEFAULT_THEME } from '../theme-loader';
 
 import { useEditorContentMenuData } from './composables/use-editor-content-menu-data';
 import { useEditorMenu } from './composables/use-editor-menu';
@@ -88,7 +89,18 @@ const { contentMenuData } = useEditorContentMenuData();
 
 const editor = shallowRef<InstanceType<typeof TMagicEditor>>();
 const value = ref<MApp>();
+const theme = ref(sessionStorage.getItem('tmagic-playground-theme') || DEFAULT_THEME);
 const defaultSelected = ref(dsl.items[0].id);
+
+const updateThemeVariables = (themeName: string) => {
+  if (themeName === 'magic-admin') {
+    document.documentElement.style.setProperty('--el-color-primary', '#0054e1');
+  } else {
+    document.documentElement.style.removeProperty('--el-color-primary');
+  }
+};
+
+updateThemeVariables(theme.value);
 
 const stageRect = ref({
   width: 375,
@@ -108,7 +120,12 @@ const save = () => {
   historyService.markSaved('page');
 };
 
-const { menu, deviceGroup, iframe, previewVisible } = useEditorMenu(value, save);
+const themeChangeHandler = (value: string) => {
+  theme.value = value;
+  updateThemeVariables(value);
+};
+
+const { menu, deviceGroup, iframe, previewVisible } = useEditorMenu(value, save, themeChangeHandler);
 
 editorService.usePlugin({
   beforeDoAdd: (config: MNode, parent: MContainer) => {
@@ -193,6 +210,7 @@ onBeforeUnmount(() => {
   window.removeEventListener('pagehide', persistHistory);
   editorService.removeAllPlugins();
   editorService.off('root-change', rootChangeHandler);
+  document.documentElement.style.removeProperty('--el-color-primary');
 });
 
 const propsSubmitErrorHandler = async (e: any) => {

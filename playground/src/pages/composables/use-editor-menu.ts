@@ -7,9 +7,14 @@ import { type MenuBarData, tMagicMessage, tMagicMessageBox } from '@tmagic/edito
 
 import AdapterSelect from '../../components/AdapterSelect.vue';
 import DeviceGroup from '../../components/DeviceGroup.vue';
+import ThemeSelect from '../../components/ThemeSelect.vue';
 import { uaMap } from '../../const';
 
-export const useEditorMenu = (value: Ref<MApp | undefined>, save: () => void) => {
+export const useEditorMenu = (
+  value: Ref<MApp | undefined>,
+  save: () => void,
+  onThemeChange: (theme: string) => void,
+) => {
   const router = useRouter();
 
   const deviceGroup = shallowRef<InstanceType<typeof DeviceGroup>>();
@@ -55,6 +60,13 @@ export const useEditorMenu = (value: Ref<MApp | undefined>, save: () => void) =>
       {
         type: 'component',
         component: AdapterSelect,
+      },
+      {
+        type: 'component',
+        component: ThemeSelect,
+        listeners: {
+          change: onThemeChange,
+        },
       },
     ],
     center: ['delete', 'undo', 'redo', 'history-list', 'guides', 'rule', 'zoom'],
