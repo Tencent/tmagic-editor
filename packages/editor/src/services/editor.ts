@@ -550,6 +550,8 @@ class Editor extends BaseService {
     this.emit('change', {
       type: 'add',
       data: newNodes.map((node) => ({ node, page: this.getPageOfNode(node.id) })),
+      historySource,
+      doNotPushHistory,
     });
 
     return Array.isArray(addNode) ? newNodes : newNodes[0];
@@ -692,7 +694,7 @@ class Editor extends BaseService {
     }
 
     this.emit('remove', nodes);
-    this.emit('change', { type: 'remove', data: changeItems });
+    this.emit('change', { type: 'remove', data: changeItems, historySource, doNotPushHistory });
   }
 
   public async doUpdate(
@@ -846,6 +848,8 @@ class Editor extends BaseService {
     this.emit('change', {
       type: 'update',
       data: updateData.map((node) => ({ node, page: this.getPageOfNode(node.newNode.id) })),
+      historySource,
+      doNotPushHistory,
     });
     return Array.isArray(config) ? updateData.map((item) => item.newNode) : updateData[0].newNode;
   }
@@ -1092,6 +1096,8 @@ class Editor extends BaseService {
       type: 'move-layer',
       data: [{ node, page: this.getPageOfNode(node.id) }],
       offset,
+      historySource,
+      doNotPushHistory,
     });
   }
 
@@ -1277,6 +1283,8 @@ class Editor extends BaseService {
       data: configs.map((node) => ({ node, page: this.getPageOfNode(node.id) })),
       targetIndex,
       targetParent,
+      historySource,
+      doNotPushHistory,
     });
   }
 
@@ -1878,10 +1886,12 @@ class Editor extends BaseService {
   /**
    * 应用历史操作（撤销 / 重做）
    *
-   * 所有 DSL 修改都走 `editor.add / remove / update`，并通过 `doNotPushHistory` 阻止再次入栈、
-   * `doNotSelect / doNotSwitchPage` 让选区由方法末尾的统一逻辑兜底。
+   * 删除 / 更新类修改走 `editor.remove / update`，并通过 `doNotPushHistory` 阻止再次入栈、
+   * `doNotSelect / doNotSwitchPage` 让选区由方法末尾的统一逻辑兜底；
+   * 「重新插回节点」（撤销 remove / 重做 add）需按 step 记录的 parentId / index 精确还原，
+   * 不走 this.add，由手工 splice + stage.add 完成后补发等价的 add / change 事件（见 emitHistoryInsertEvents）。
    *
-   * 注意：这些公开方法会发出 add / remove / update 事件，业务侧若需要区分"用户操作"与"撤销重做触发"，
+   * 注意：这些路径都会发出 add / remove / update / change 事件，业务侧若需要区分"用户操作"与"撤销重做触发"，
    * 请监听 `history-change` 事件配合判断。
    *
    * @param step 操作记录
@@ -1894,7 +1904,14 @@ class Editor extends BaseService {
     const stage = this.get('stage');
     if (!root) return;
 
-    const commonOpts = { doNotSelect: true, doNotSwitchPage: true, doNotPushHistory: true } as const;
+    // 撤销/重做内部复用 add/remove/update，透传被应用 step 上记录的 source，
+    // 使其触发的 change 事件同样携带「历史来源」
+    const commonOpts = {
+      doNotSelect: true,
+      doNotSwitchPage: true,
+      doNotPushHistory: true,
+      historySource: step.source,
+    } as const;
 
     switch (step.opType) {
       case 'add': {
@@ -1910,17 +1927,22 @@ class Editor extends BaseService {
           }
         } else {
           // 重做 add：按记录的 parentId / index 把节点重新插回父容器。
-          // 按目标 index 升序逐个插入，先小后大避免索引漂移
+          // 按目标 index 升序逐个插入，先小后大避免索引漂移。
+          // 不走 this.add：doAdd 依赖当前选中节点（无选区时直接抛错），且只能插到选中节点之后 / 末尾，
+          // 无法按 step 记录的 parentId / index 精确还原，还会重算 style 破坏已记录的终态位置。
           const sorted = [...items].sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
+          const addedNodes: MNode[] = [];
           for (const { newSchema, parentId, index } of sorted) {
             if (!newSchema || parentId === undefined) continue;
             const parent = this.getNodeById(parentId, false) as MContainer | null;
             if (parent?.items) {
+              const addedNode = cloneDeep(newSchema);
               if (typeof index === 'number' && index >= 0 && index < parent.items.length) {
-                parent.items.splice(index, 0, cloneDeep(newSchema));
+                parent.items.splice(index, 0, addedNode);
               } else {
-                parent.items.push(cloneDeep(newSchema));
+                parent.items.push(addedNode);
               }
+              addedNodes.push(addedNode);
               await stage?.add({
                 config: cloneDeep(newSchema),
                 parent: cloneDeep(parent),
@@ -1929,19 +1951,23 @@ class Editor extends BaseService {
               });
             }
           }
+          this.emitHistoryInsertEvents(addedNodes, step.source);
         }
         break;
       }
       case 'remove': {
         const items = step.diff ?? [];
         if (reverse) {
-          // 撤销 remove：按原 index 升序逐个插回（先小后大避免索引漂移）
+          // 撤销 remove：按原 index 升序逐个插回（先小后大避免索引漂移）；不走 this.add 的原因同上
           const sorted = [...items].sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
+          const addedNodes: MNode[] = [];
           for (const { oldSchema, parentId, index } of sorted) {
             if (!oldSchema || parentId === undefined) continue;
             const parent = this.getNodeById(parentId, false) as MContainer | null;
             if (parent?.items) {
-              parent.items.splice(index ?? parent.items.length, 0, cloneDeep(oldSchema));
+              const addedNode = cloneDeep(oldSchema);
+              parent.items.splice(index ?? parent.items.length, 0, addedNode);
+              addedNodes.push(addedNode);
               await stage?.add({
                 config: cloneDeep(oldSchema),
                 parent: cloneDeep(parent),
@@ -1950,6 +1976,7 @@ class Editor extends BaseService {
               });
             }
           }
+          this.emitHistoryInsertEvents(addedNodes, step.source);
         } else {
           // 重做 remove：再删一次
           for (const { oldSchema } of items) {
@@ -1989,7 +2016,7 @@ class Editor extends BaseService {
             return cloneDeep(reverse ? oldNode : newNode);
           });
         if (configs.length) {
-          await this.update(configs, { doNotPushHistory: true });
+          await this.update(configs, { doNotPushHistory: true, historySource: step.source });
         }
         break;
       }
@@ -2027,6 +2054,22 @@ class Editor extends BaseService {
 
   private selectedConfigExceptionHandler(config: MNode | Id): EditorNodeInfo {
     return resolveSelectedNode(config, (id) => this.getNodeInfo(id), this.state.root?.id);
+  }
+
+  /**
+   * 撤销 remove / 重做 add 通过手工 splice 按 step 记录的 parentId / index 精确还原节点（不走 this.add，原因见调用处注释），
+   * 这里补齐与 this.add 等价的 add / change 事件，保证撤销/重做路径的事件行为与正向操作一致。
+   */
+  private emitHistoryInsertEvents(nodes: MNode[], source?: HistoryOpSource) {
+    if (!nodes.length) return;
+    this.emit('add', nodes);
+    this.emit('change', {
+      type: 'add',
+      data: nodes.map((node) => ({ node, page: this.getPageOfNode(node.id) })),
+      historySource: source,
+      // 撤销/重做本身不再写入历史记录
+      doNotPushHistory: true,
+    });
   }
 }
 

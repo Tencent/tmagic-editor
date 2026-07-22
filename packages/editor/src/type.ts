@@ -1338,17 +1338,37 @@ export interface EditorUpdateChangeItem {
   page: StoreState['page'];
 }
 
+/** {@link EditorEvents.change} 各操作类型共有的历史相关字段。 */
+export interface EditorChangeEventHistoryMeta {
+  /**
+   * 本次变更的「历史来源」（调用 DSL 操作时传入的 {@link HistoryOpOptions.historySource}，
+   * 撤销 / 重做时则为被应用 step 上记录的 `source`），未携带时为 undefined。
+   */
+  historySource?: HistoryOpSource;
+  /**
+   * 本次操作是否未写入历史记录（即调用时传入的 {@link HistoryOpOptions.doNotPushHistory}，缺省为 false）；
+   * 撤销 / 重做路径补发的事件恒为 true（撤销/重做本身不再入栈）。
+   */
+  doNotPushHistory?: boolean;
+}
+
 /**
  * {@link EditorEvents.change} 的回调参数：以 `type` 区分操作类型，并携带对应的操作内容。
  * `data` 为本次变更的节点列表，每项包含 node 及其所属的 page（可能为 null）；
- * `move-layer` 额外带层级偏移 `offset`，`drag-to` 额外带目标位置 `targetIndex` / `targetParent`。
+ * `move-layer` 额外带层级偏移 `offset`，`drag-to` 额外带目标位置 `targetIndex` / `targetParent`；
+ * 历史相关字段（historySource / doNotPushHistory）见 {@link EditorChangeEventHistoryMeta}。
  */
 export type EditorChangeEvent =
-  | { type: 'add'; data: EditorChangeItem[] }
-  | { type: 'remove'; data: EditorChangeItem[] }
-  | { type: 'update'; data: EditorUpdateChangeItem[] }
-  | { type: 'move-layer'; data: EditorChangeItem[]; offset: number | LayerOffset }
-  | { type: 'drag-to'; data: EditorChangeItem[]; targetIndex: number; targetParent: MContainer };
+  | ({ type: 'add'; data: EditorChangeItem[] } & EditorChangeEventHistoryMeta)
+  | ({ type: 'remove'; data: EditorChangeItem[] } & EditorChangeEventHistoryMeta)
+  | ({ type: 'update'; data: EditorUpdateChangeItem[] } & EditorChangeEventHistoryMeta)
+  | ({ type: 'move-layer'; data: EditorChangeItem[]; offset: number | LayerOffset } & EditorChangeEventHistoryMeta)
+  | ({
+      type: 'drag-to';
+      data: EditorChangeItem[];
+      targetIndex: number;
+      targetParent: MContainer;
+    } & EditorChangeEventHistoryMeta);
 // #endregion EditorChangeEvent
 
 export interface HistoryEvents {

@@ -857,6 +857,127 @@ describe('change 事件', () => {
       expect(event.data[0].page?.id).toBe(NodeId.PAGE_ID);
     }
   });
+
+  test('change 事件携带历史来源 historySource，未传时为 undefined', async () => {
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.PAGE_ID);
+    const page = editorService.get('page') as unknown as MContainer;
+
+    const fn = vi.fn();
+    editorService.on('change', fn);
+
+    // update
+    await editorService.update({ id: NodeId.NODE_ID, type: 'text', text: 'source' }, { historySource: 'props' });
+    expect(lastChangeEvent(fn).historySource).toBe('props');
+
+    // moveLayer
+    await editorService.select(NodeId.NODE_ID);
+    await editorService.moveLayer(1, { historySource: 'stage' });
+    expect(lastChangeEvent(fn).historySource).toBe('stage');
+
+    // dragTo
+    await editorService.select(NodeId.PAGE_ID);
+    await editorService.dragTo({ id: NodeId.NODE_ID2, type: 'text' }, page, 0, { historySource: 'stage' });
+    expect(lastChangeEvent(fn).historySource).toBe('stage');
+
+    // add
+    const newNode = (await editorService.add({ type: 'text' }, undefined, {
+      historySource: 'component-panel',
+    })) as MNode;
+    expect(lastChangeEvent(fn).historySource).toBe('component-panel');
+
+    // remove
+    await editorService.remove(newNode, { historySource: 'shortcut' });
+    expect(lastChangeEvent(fn).historySource).toBe('shortcut');
+
+    // 未传 historySource 时为 undefined
+    await editorService.update({ id: NodeId.NODE_ID, type: 'text', text: 'no-source' });
+    expect(lastChangeEvent(fn).historySource).toBeUndefined();
+
+    // doNotPushHistory 透传：true 表示本次变更未写入历史记录，缺省为 false
+    await editorService.update({ id: NodeId.NODE_ID, type: 'text', text: 'no-history' }, { doNotPushHistory: true });
+    expect(lastChangeEvent(fn).doNotPushHistory).toBe(true);
+    await editorService.update({ id: NodeId.NODE_ID, type: 'text', text: 'with-history' });
+    expect(lastChangeEvent(fn).doNotPushHistory).toBe(false);
+
+    editorService.off('change', fn);
+  });
+
+  test('撤销/重做触发的 change 事件携带被应用 step 的 source', async () => {
+    historyService.reset();
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.PAGE_ID);
+
+    await editorService.update({ id: NodeId.NODE_ID, type: 'text', text: 'undo-source' }, { historySource: 'props' });
+
+    const fn = vi.fn();
+    editorService.on('change', fn);
+
+    await editorService.undo();
+    expect(lastChangeEvent(fn).historySource).toBe('props');
+
+    await editorService.redo();
+    expect(lastChangeEvent(fn).historySource).toBe('props');
+
+    editorService.off('change', fn);
+  });
+
+  test('撤销 remove：重新插回节点时触发 change（type 为 add，携带 step source）', async () => {
+    historyService.reset();
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.PAGE_ID);
+
+    await editorService.remove({ id: NodeId.NODE_ID, type: 'text' }, { historySource: 'shortcut' });
+    expect(editorService.getNodeById(NodeId.NODE_ID)).toBeNull();
+
+    const fn = vi.fn();
+    editorService.on('change', fn);
+    await editorService.undo();
+    editorService.off('change', fn);
+
+    // 节点已按 step 记录的位置插回
+    expect(editorService.getNodeById(NodeId.NODE_ID)?.id).toBe(NodeId.NODE_ID);
+    const events = fn.mock.calls.map((call) => call[0]) as EditorChangeEvent[];
+    const addEvent = events.find((e) => e.type === 'add');
+    expect(addEvent).toBeTruthy();
+    expect(addEvent?.historySource).toBe('shortcut');
+    // 撤销/重做补发的事件不写入历史记录
+    expect(addEvent?.doNotPushHistory).toBe(true);
+    if (addEvent?.type === 'add') {
+      expect(addEvent.data[0].node.id).toBe(NodeId.NODE_ID);
+      expect(addEvent.data[0].page?.id).toBe(NodeId.PAGE_ID);
+    }
+  });
+
+  test('重做 add：重新插入节点时触发 change（type 为 add，携带 step source）', async () => {
+    historyService.reset();
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.PAGE_ID);
+
+    const newNode = (await editorService.add({ type: 'text' }, undefined, {
+      historySource: 'component-panel',
+    })) as MNode;
+    // 撤销 add，使节点从 DSL 中移除
+    await editorService.undo();
+    expect(editorService.getNodeById(newNode.id)).toBeNull();
+
+    const fn = vi.fn();
+    editorService.on('change', fn);
+    await editorService.redo();
+    editorService.off('change', fn);
+
+    // 节点已重新插入
+    expect(editorService.getNodeById(newNode.id)?.id).toBe(newNode.id);
+    const events = fn.mock.calls.map((call) => call[0]) as EditorChangeEvent[];
+    const addEvent = events.find((e) => e.type === 'add');
+    expect(addEvent).toBeTruthy();
+    expect(addEvent?.historySource).toBe('component-panel');
+    // 撤销/重做补发的事件不写入历史记录
+    expect(addEvent?.doNotPushHistory).toBe(true);
+    if (addEvent?.type === 'add') {
+      expect(addEvent.data[0].node.id).toBe(newNode.id);
+    }
+  });
 });
 
 describe('undo redo', () => {
