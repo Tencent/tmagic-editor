@@ -1,3 +1,34 @@
+# [1.8.0-beta.13](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.11...v1.8.0-beta.13) (2026-07-22)
+
+
+### Bug Fixes
+
+* **adapters:** tag 非法 type 回退为默认主题 ([90492ad](https://github.com/Tencent/tmagic-editor/commit/90492ad3eac82f052e99e7a286772a3feac288f7))
+* **core:** 在 initNode 前校验 config.items 为数组 ([aa71fe9](https://github.com/Tencent/tmagic-editor/commit/aa71fe9ddd011e98b40af04e898bdf79263e0e89))
+* **editor:** 为 FloatingBox 拖拽遮罩添加失焦等兜底清理，避免残留导致编辑器无法点击 ([4a893d3](https://github.com/Tencent/tmagic-editor/commit/4a893d35df354cfedce8e57b0deaaa0c535f8fba))
+* **editor:** 修复 FloatingBox 拖动时鼠标进入 iframe 区域事件丢失 ([284be0d](https://github.com/Tencent/tmagic-editor/commit/284be0d276d90fe58cdcd94372dbacb476fd919c))
+* **editor:** 修复 Monaco 编辑器卸载时容器失效与 Canceled 未处理异常 ([4a15da2](https://github.com/Tencent/tmagic-editor/commit/4a15da21083a30d2590a03fe68c488c71ec44eb2))
+* **editor:** 修正 StyleSetter 字段 prop 取值逻辑 ([e5e0da3](https://github.com/Tencent/tmagic-editor/commit/e5e0da37852c78728e6506980dc2de6928dd571c))
+* **editor:** 延迟 FloatingBox 拖拽遮罩到实际位移时显示，修复关闭按钮点击失效 ([9aa251c](https://github.com/Tencent/tmagic-editor/commit/9aa251ce57e36120a1f6c3b4835ba3bcd604448d))
+* **form,editor:** 完善表单校验与样式属性匹配 ([ef66e8a](https://github.com/Tencent/tmagic-editor/commit/ef66e8a59863f9ffeb7292adcb314e5620c238ef))
+* **form:** radio group disabled不生效 ([42d45be](https://github.com/Tencent/tmagic-editor/commit/42d45bed187393ae02a1fef1df5d46b114f198a8))
+* **form:** typeMatch 使用 toLine 统一类型转换并处理异步 type/defaultValue ([6cdf54a](https://github.com/Tencent/tmagic-editor/commit/6cdf54a4a663dd6531c70a069220b6d9a63ca7c0))
+* **form:** 修复隐藏字段校验处理 ([78b34a4](https://github.com/Tencent/tmagic-editor/commit/78b34a452b1ac263b652ace81ef351f56fae7ff9))
+
+
+### Features
+
+* **editor:** 扩展 customContentMenu 支持 getTarget 获取右键目标 ([bbe73aa](https://github.com/Tencent/tmagic-editor/commit/bbe73aae6437cabc8cfada24367c3d969687faa9))
+* **editor:** 抽离表单视图与对比逻辑 ([6f3f321](https://github.com/Tencent/tmagic-editor/commit/6f3f321736a40b242e7b556b0bea456484f161ea))
+* **editor:** 支持自定义历史对比/回滚弹窗内表单组件的尺寸 ([605f07c](https://github.com/Tencent/tmagic-editor/commit/605f07c8fe24fd67de22f5cb9adfdb151d3b8772))
+* **editor:** 支持通过 uiService 配置列布局最小宽度 ([3c21f45](https://github.com/Tencent/tmagic-editor/commit/3c21f45e88dfe7c61552c704bd9cbd09215017fe))
+* **editor:** 新增属性配置表单校验联动能力 ([0e46692](https://github.com/Tencent/tmagic-editor/commit/0e4669261fe50acaa8f72203dbc342e6eff324e6))
+* **editor:** 注册编辑器字段内置 typeMatch 校验规则并补充文档 ([1c67b5e](https://github.com/Tencent/tmagic-editor/commit/1c67b5e77b726ded63b12d761faff37e97563ff2))
+* **form,editor:** 新增 validateForm 校验能力并接入源码保存校验联动 ([d07e48b](https://github.com/Tencent/tmagic-editor/commit/d07e48bb101a3833b57b97001af3f053e2392c7a))
+* **form:** 支持 rules.typeMatch 按字段 type 校验值类型与选项匹配 ([734e6a8](https://github.com/Tencent/tmagic-editor/commit/734e6a8ee6f9a948273c25461556eb4f54adc1ee))
+* **table:** 为操作列新增 Popconfirm 二次确认能力 ([9e8272b](https://github.com/Tencent/tmagic-editor/commit/9e8272b521784265f18007e11f94d2ae5ee3faba))
+* **table:** 抽取 ActionPopconfirm 并优化 sub-actions 展开交互 ([b183e71](https://github.com/Tencent/tmagic-editor/commit/b183e71f642fba84c82b0e8e63bcb03e0d27e610))
+* **table:** 操作列支持 sub-actions 更多菜单并抽取 ActionButton 组件 ([78a1259](https://github.com/Tencent/tmagic-editor/commit/78a1259665c9d7057f3cf0066beef2604949345b))
 # [1.8.0-beta.12](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.11...v1.8.0-beta.12) (2026-07-20)
 
 
