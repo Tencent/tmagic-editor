@@ -32,6 +32,9 @@ export { DepTargetType } from '@tmagic/core';
 export * from './type';
 export * from './hooks';
 export * from './utils';
+// `isGlobalFlat` 同时在 `@tmagic/design` 和 `./utils/config` 中存在，
+// 通过显式重导一次消除 `export *` 带来的歧义，并固定使用 editor 自己那份。
+export { isGlobalFlat } from './utils/config';
 export { default as TMagicEditor } from './Editor.vue';
 export { default as TMagicCodeEditor } from './layouts/CodeEditor.vue';
 export { default as editorService } from './services/editor';

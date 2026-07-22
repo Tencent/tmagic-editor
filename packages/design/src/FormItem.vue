@@ -1,12 +1,24 @@
 <template>
-  <component class="tmagic-design-form-item" :is="uiComponent" v-bind="uiProps">
+  <component
+    class="tmagic-design-form-item"
+    :class="{ 'has-extra-tips': adapterType === 'element-plus' && extraTips }"
+    :is="uiComponent"
+    v-bind="uiProps"
+  >
     <template #label>
-      <slot name="label"></slot>
+      <slot name="label"> </slot>
     </template>
 
     <template #default>
       <slot></slot>
-      <div v-if="adapterType === 'element-plus' && extra" v-html="extra" class="m-form-tip"></div>
+      <alert
+        v-if="adapterType === 'element-plus' && extraTips"
+        :title="extraTips"
+        type="warning"
+        show-icon
+        :closable="false"
+      ></alert>
+      <div v-else-if="adapterType === 'element-plus' && extra" v-html="extra" class="m-form-tip"></div>
     </template>
 
     <template v-if="adapterType === 'element-plus'" #error="{ error }">
@@ -16,26 +28,32 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, inject } from 'vue';
 
+import Alert from './Alert.vue';
 import { getDesignConfig } from './config';
 import { stripValidateSuggestion } from './formValidateMessage';
+import { isGlobalFlat } from './index';
 import type { FormItemProps } from './types';
 
 defineOptions({
   name: 'TMFormItem',
 });
 
-const props = defineProps<FormItemProps>();
+const props = defineProps<FormItemProps & { theme?: string }>();
 
 const ui = getDesignConfig('components')?.formItem;
-
 const uiComponent = ui?.component || 'el-form-item';
 
 const adapterType = getDesignConfig('adapterType');
 
+const formInline = inject<boolean>('formInline');
+
 const uiProps = computed<FormItemProps>(() => {
-  const { extra, ...rest } = ui?.props(props) || props;
+  const { extra, extraTips, ...rest } = ui?.props(props) || props;
+  if (isGlobalFlat.value && rest.labelPosition === undefined) {
+    return { ...rest, labelPosition: formInline ? 'right' : 'left' };
+  }
   return rest;
 });
 

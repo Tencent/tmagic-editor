@@ -2,8 +2,8 @@
   <transition name="fade">
     <div
       v-show="visible"
-      class="magic-editor-content-menu"
       ref="menu"
+      :class="['magic-editor-content-menu', themeClass]"
       :style="menuStyle"
       @mouseenter="mouseenterHandler()"
       @contextmenu.prevent
@@ -39,7 +39,7 @@
 <script lang="ts" setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, type Ref, ref, useTemplateRef } from 'vue';
 
-import { useZIndex } from '@tmagic/design';
+import { useThemeClass, useZIndex } from '@tmagic/design';
 
 import { MenuButton, MenuComponent } from '@editor/type';
 
@@ -73,6 +73,14 @@ const menuEl = useTemplateRef<HTMLDivElement>('menu');
 const buttonRefs = useTemplateRef<InstanceType<typeof ToolButton>[]>('buttons');
 const subMenuRef = useTemplateRef<any>('subMenu');
 const visible = ref(false);
+
+/**
+ * 主题修饰类（来自最近的 `<MEditor>` / `<MForm>` 祖先 provide）。
+ * - 顶层 `ContentMenu` 渲染在编辑器子树中，加上去是冗余但无害；
+ * - 子菜单（递归 `<content-menu :is-sub-menu="true">` 被 `<teleport to="body">` 送到 body）
+ *   不在编辑器子树中，必须显式挂上主题类，主题级 CSS 变量才能命中。
+ */
+const themeClass = useThemeClass();
 const subMenuData: Ref<(MenuButton | MenuComponent)[]> = ref<(MenuButton | MenuComponent)[]>([]);
 const zIndex = useZIndex();
 const curZIndex = ref<number>(0);

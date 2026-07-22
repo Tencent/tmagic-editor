@@ -16,7 +16,7 @@ export default defineConfig([
     '*/**/public/**/*',
     '*/**/types/**/*',
     '*/**/*.config.ts',
-    './tepm/**/*',
+    './temp/**/*',
     'vite-env.d.ts',
   ]),
   ...eslintConfig(path.join(path.dirname(fileURLToPath(import.meta.url)), 'tsconfig.json')),

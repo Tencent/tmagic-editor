@@ -129,7 +129,8 @@
   > .m-container-tab {
     > .tmagic-design-tabs {
       > .el-tabs__content {
-        padding-top: 55px;
+        margin-top: var(--el-tabs-header-height);
+        padding-top: 15px;
       }
       > .el-tabs__header.is-top {
         position: absolute;

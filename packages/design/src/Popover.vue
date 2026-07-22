@@ -4,10 +4,9 @@
     <div
       v-if="popoverVisible || !destroyOnClose"
       v-show="popoverVisible"
-      class="tmagic-design-popper"
       ref="popperElementRef"
       :tabindex="tabindex"
-      :class="popperClass"
+      :class="['tmagic-design-popper', popperClass, themeClass]"
       :style="style"
       @mouseenter.once="popperMouseenterHandler"
     >
@@ -22,7 +21,7 @@ import { computed, getCurrentInstance, nextTick, onBeforeUnmount, onMounted, ref
 import type { Instance } from '@popperjs/core';
 import { createPopper } from '@popperjs/core';
 
-import { useZIndex } from './index';
+import { useThemeClass, useZIndex } from './index';
 import type { PopoverProps } from './types';
 
 defineSlots<{
@@ -46,6 +45,12 @@ const props = withDefaults(defineProps<PopoverProps>(), {
   closeOnClickOutside: true,
 });
 
+/**
+ * 主题修饰类（来自最近的 `<MEditor>` / `<MForm>` 祖先 provide）。
+ * 挂在 `Teleport` 出去的 popper 根节点上，让主题级 CSS 变量（`--el-color-primary` 等）
+ * 在 portal 节点上也能命中。详见 `@tmagic/design/theme.ts`。
+ */
+const themeClass = useThemeClass();
 const emit = defineEmits<{
   /** 受控模式（传入了 visible）下点击外部收起时触发，便于配合 v-model:visible。 */
   'update:visible': [_visible: boolean];

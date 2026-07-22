@@ -1,3 +1,54 @@
+.m-container-fieldset {
+  &.no-border-fieldset {
+    &.fieldset-in-row {
+      > fieldset.m-fieldset {
+        legend {
+          left: 0;
+        }
+      }
+    }
+    > fieldset.m-fieldset {
+      border: 0;
+      legend {
+        position: relative;
+        left: -5px;
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 24px;
+        padding: 0;
+      }
+    }
+  }
+  &.fieldset-in-card-fit {
+    border-bottom: 1px solid #e6e6e6;
+    > fieldset.m-fieldset {
+      padding: 16px 0 16px 0 !important;
+      border: 0;
+      margin-top: 0;
+      margin-bottom: 0;
+      legend {
+        position: relative;
+        top: 10px;
+        background-color: transparent;
+      }
+    }
+    &.fieldset-in-card-fit-last {
+      padding-bottom: 0 !important;
+      border-bottom: 0;
+    }
+    &.fieldset-in-card-fit-first {
+      padding-top: 0 !important;
+    }
+    &:last-child {
+      padding-bottom: 0 !important;
+      border-bottom: 0;
+    }
+    &:first {
+      padding-top: 0 !important;
+    }
+  }
+}
+
 fieldset.m-fieldset {
   position: relative;
   border: 1px solid rgb(229, 229, 229);

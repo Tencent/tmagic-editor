@@ -1,0 +1,214 @@
+// magic-admin 主题：所有规则均以 `.m-editor.m-editor--magic-admin` 为前缀，
+// 仅在 `<MEditor theme="magic-admin" />` 时生效，避免污染默认样式。
+
+@use "@tmagic/design/src/theme/themes/magic-admin/index.scss" as tMagicDesign;
+@use "@tmagic/table/src/theme/index.scss" as tMagicTable;
+@use "@tmagic/form/src/theme/themes/magic-admin/index.scss" as tMagicForm;
+@use "../../theme.scss";
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+
+// 仅作用于编辑器内部 DOM 的具体样式仍保留「双类」，避免误中 portal 上只挂 `m-theme--*`
+// 的节点。
+.m-editor.m-editor--magic-admin {
+  // 主题级 CSS 变量入口：想覆盖 nav 高度等 token 时，改这里一行即可；
+  // 走 CSS 级联，运行时切主题（换 `.m-editor--magic-admin` class）即可即时生效，
+  // 不受 SCSS `@use` 加载顺序限制。fallback 值定义在 common/var.scss，未启用主题
+  // 时自动回落 35px。
+  --editor-nav-height: 40px;
+
+  .m-editor-sidebar {
+    .m-editor-sidebar-header {
+      // padding: 8px 0;
+      width: 61px;
+      padding-top: 4px;
+      // sidebar 父容器是 `display: flex` (row)，同级 `.m-editor-sidebar-content` 的 width
+      // 是 `calc(100% - 40px)`（sidebar.scss:52，40 是老 header 宽度）。当 header 改成 61px
+      // 后，两者之和会溢出 21px 左右，默认 `flex-shrink: 1` 会按权重压缩 header，最终渲染
+      // 出 56.3px 而非 61px。这里强制 `flex-shrink: 0` 让 header 守住宽度，多余的部分由
+      // content 侧承担（content 的 `100% - 40` 会自然让出）。
+      flex-shrink: 0;
+      border-right: 1px solid rgba(0, 84, 225, 0.1);
+      display: flex;
+      background-color: #fff;
+      box-sizing: border-box;
+      flex-direction: column;
+      align-items: center;
+      .m-editor-sidebar-header-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border-radius: 4px;
+        padding: 4px 2px;
+        width: 52px;
+        margin-bottom: 4px;
+        box-sizing: border-box;
+        background-color: transparent;
+        color: #84909d;
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.05);
+        }
+        > i {
+          color: #84909d;
+          font-size: 20px;
+        }
+        &.is-active {
+          background-color: var(--el-button-hover-bg-color, rgb(230, 238, 253));
+          color: var(--el-color-primary);
+          &:hover {
+            background-color: var(
+              --el-button-hover-bg-color,
+              rgb(230, 238, 253)
+            );
+          }
+          > i {
+            color: var(--el-color-primary);
+          }
+          .magic-editor-tab-panel-title {
+            color: var(--el-color-primary);
+          }
+        }
+        .magic-editor-tab-panel-title {
+          font-size: 12px;
+          line-height: 14px;
+          font-weight: 400;
+          margin: 0 4px;
+          width: 52px;
+          text-align: center;
+        }
+      }
+    }
+    .m-editor-sidebar-content {
+      width: calc(100% - 61px);
+    }
+  }
+  .m-editor-props-panel .el-input__wrapper {
+    border-radius: 4px;
+  }
+
+  .border-box-container .border-icon-container .border-icon {
+    border-color: #ccc;
+    --unuse-border-style: solid;
+    &.configured {
+      border-color: var(--el-color-success, var(--td-success-color, #2ba471));
+    }
+
+    &.active {
+      border-color: var(--el-color-primary);
+      background-color: rgba(0, 84, 225, 0.1);
+      &.center {
+        border-width: 2px;
+      }
+      // 命中 `.border-icon-<side>` 时只保留该侧 2px，其余三边清零。
+      // 用 `@each` 循环避免四面手抄；后续要加禁用、hover 等状态也可以照搬这套结构。
+      @each $side in (top, right, bottom, left) {
+        &.border-icon-#{$side} {
+          border-width: 0;
+          border-#{$side}-width: 2px;
+        }
+      }
+    }
+
+    &.center {
+      border-width: 2px;
+    }
+    border-radius: 2px;
+  }
+
+  .m-container-code-select {
+    > .el-form-item:first-child {
+      > .el-form-item__label:first-child > :not(.m-form-tip) {
+        color: #111;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 24px;
+      }
+    }
+  }
+}
+
+.m-editor.m-theme--magic-admin {
+  .m-editor-props-form-panel-form {
+    > .m-container-tab {
+      > .tmagic-design-tabs {
+        > .el-tabs__content {
+          background-color: #fafafa;
+          border-radius: 8px;
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+      }
+    }
+  }
+}
+
+.m-editor.m-theme--magic-admin {
+  .m-fields-style-setter {
+    border: 0;
+    .tmagic-design-collapse-item {
+      .el-collapse-item__wrap {
+        padding: 16px;
+      }
+    }
+  }
+}
+
+.m-editor.m-theme--magic-admin {
+  .magic-right-panel-tabs-top {
+    > .el-tabs {
+      > .el-tabs__header {
+        .el-tabs__nav-wrap.is-top {
+          .el-tabs__nav.is-top {
+            .el-tabs__active-bar {
+              display: none;
+            }
+            .el-tabs__item {
+              &:not(:last-child)::after {
+                content: "";
+                position: absolute;
+                right: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                height: 12px;
+                border-right: 1px solid #e6e6e6;
+              }
+            }
+          }
+          &::after {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+}
+
+.m-editor.m-theme--magic-admin {
+  .m-editor-nav-menu {
+    .menu-right,
+    .menu-left {
+      > .menu-item {
+        > button {
+          color: #111;
+        }
+      }
+    }
+    .menu-item {
+      margin-right: 8px;
+      .el-button--small {
+        font-size: 14px;
+      }
+      > button {
+        > i {
+          font-size: 16px;
+        }
+      }
+    }
+  }
+}

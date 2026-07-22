@@ -7,6 +7,7 @@ import { build as buildVite } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import minimist from 'minimist';
 import rimraf from 'rimraf';
+import * as sass from 'sass-embedded';
 
 const args = minimist(process.argv.slice(2));
 
@@ -24,6 +25,7 @@ if (args.package) {
 
     build({ packageName: args.package, format: 'es', pkg, packagesDir });
     build({ packageName: args.package, format: 'umd', pkg, packagesDir });
+    buildThemes({ packageName: args.package, packagesDir });
   }
 } else {
   const packages = getPackageNames(packagesDir);
@@ -35,6 +37,7 @@ if (args.package) {
 
     build({ packageName, format: 'es', pkg, packagesDir });
     build({ packageName, format: 'umd', pkg, packagesDir });
+    buildThemes({ packageName, packagesDir });
   }
 
   for (const packageName of runtimeHelpers) {
@@ -131,6 +134,47 @@ async function build({ packageName, format, pkg, packagesDir }) {
       ],
     },
   });
+}
+
+/**
+ * 扫描 `<package>/src/theme/themes/<theme>/index.scss`，
+ * 为每个主题单独编译输出 `<package>/dist/themes/<theme>.css`。
+ *
+ * 主题样式独立于主样式包（dist/style.css），消费者通过
+ * `import '@tmagic/<pkg>/dist/themes/<theme>.css'` 按需引入，
+ * 并在 `<MEditor :theme="..." />` / `<MForm :theme="..." />`
+ * 上挂载对应的 `m-editor--<theme>` / `m-form--<theme>` 修饰类后生效。
+ */
+function buildThemes({ packageName, packagesDir }) {
+  const themesDir = path.resolve(packagesDir, `./${packageName}/src/theme/themes`);
+  if (!fs.existsSync(themesDir)) return;
+
+  const themes = fs.readdirSync(themesDir).filter((name) => {
+    const themePath = path.resolve(themesDir, name);
+    return fs.statSync(themePath).isDirectory() && fs.existsSync(path.resolve(themePath, 'index.scss'));
+  });
+  if (themes.length === 0) return;
+
+  const outputDir = path.resolve(packagesDir, `./${packageName}/dist/themes`);
+  fs.mkdirSync(outputDir, { recursive: true });
+
+  // 把 `<pkg>/node_modules` 也加到 loadPaths，使主题 SCSS 内
+  // `@use "@tmagic/<pkg>/src/.../index.scss"` 能通过 pnpm 在 node_modules
+  // 下的 symlink 解析到对应的源码包。
+  const nodeModulesDir = path.resolve(packagesDir, `./${packageName}/node_modules`);
+  const loadPaths = [path.resolve(packagesDir, `./${packageName}/src`)];
+  if (fs.existsSync(nodeModulesDir)) loadPaths.push(nodeModulesDir);
+
+  for (const theme of themes) {
+    const input = path.resolve(themesDir, theme, 'index.scss');
+    const result = sass.compile(input, {
+      style: 'expanded',
+      sourceMap: false,
+      loadPaths: [path.resolve(themesDir, theme), ...loadPaths],
+    });
+    fs.writeFileSync(path.resolve(outputDir, `${theme}.css`), result.css);
+    console.log(`[themes] ${packageName}: ${theme}.css`);
+  }
 }
 
 function getPackageNames(packagesDir) {

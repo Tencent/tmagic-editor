@@ -40,6 +40,32 @@ export default defineConfig({
         find: /^@tmagic\/editor\/dist\/style.css/,
         replacement: path.join(__dirname, '../packages/editor/src/theme/index.scss'),
       },
+      // 开发态：把 `@tmagic/editor/dist/themes/<name>.css` 直接指到对应 SCSS 源码，
+      // 这样调主题样式不用先跑 build。$1 来自 `find` 正则的捕获组。
+      {
+        find: /^@tmagic\/editor\/dist\/themes\/(.+)\.css$/,
+        replacement: path.join(__dirname, '../packages/editor/src/theme/themes/$1/index.scss'),
+      },
+      {
+        find: /^@tmagic\/form\/dist\/themes\/(.+)\.css$/,
+        replacement: path.join(__dirname, '../packages/form/src/theme/themes/$1/index.scss'),
+      },
+      // 主题 SCSS 在内部互相 @use 时（例如 editor 的主题里 @use 了 design / form 的主题），
+      // 写的是 `@tmagic/<pkg>/src/theme/themes/<name>/index.scss`。这些 SCSS 子路径必须
+      // 在下方通用的 `^@tmagic/<pkg>` 规则（指向 `src/index.ts`）之前命中，否则会被
+      // 错误改写成 `.../src/index.ts/src/theme/themes/...` 触发 ENOTDIR。
+      {
+        find: /^@tmagic\/editor\/src\/theme\/themes\/(.+)\/index\.scss$/,
+        replacement: path.join(__dirname, '../packages/editor/src/theme/themes/$1/index.scss'),
+      },
+      {
+        find: /^@tmagic\/form\/src\/theme\/themes\/(.+)\/index\.scss$/,
+        replacement: path.join(__dirname, '../packages/form/src/theme/themes/$1/index.scss'),
+      },
+      {
+        find: /^@tmagic\/design\/src\/theme\/themes\/(.+)\/index\.scss$/,
+        replacement: path.join(__dirname, '../packages/design/src/theme/themes/$1/index.scss'),
+      },
       {
         find: /^@tmagic\/form\/src\/theme\/index.scss/,
         replacement: path.join(__dirname, '../packages/form/src/theme/index.scss'),

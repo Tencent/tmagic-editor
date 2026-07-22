@@ -1,7 +1,12 @@
 <template>
-  <div class="m-fields-data-source-field-select">
+  <div
+    class="m-fields-data-source-field-select"
+    :class="{
+      [`data-source-field-${type}`]: !isSelectValid,
+    }"
+  >
     <FieldSelect
-      v-if="!disabledDataSource && (showDataSourceFieldSelect || !config.fieldConfig)"
+      v-if="isSelectValid"
       :model-value="model[name]"
       :disabled="disabled"
       :size="size"
@@ -37,15 +42,14 @@
         :size="size"
         :disabled="disabled"
         @click="onToggleDataSourceFieldSelectHandler"
-        ><MIcon :icon="Coin"></MIcon
-      ></TMagicButton>
+        ><MIcon :icon="dataSourceIcon"></MIcon>
+      </TMagicButton>
     </TMagicTooltip>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, inject, ref, resolveComponent, watch } from 'vue';
-import { Coin } from '@element-plus/icons-vue';
 
 import { DataSchema } from '@tmagic/core';
 import { TMagicButton, tMagicMessage, TMagicTooltip } from '@tmagic/design';
@@ -61,6 +65,8 @@ import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX, removeDataSourceFieldPrefix } f
 import MIcon from '@editor/components/Icon.vue';
 import { useServices } from '@editor/hooks/use-services';
 
+import dataSourceIcon from '../../icons/DatasourceIcon.vue';
+
 import FieldSelect from './FieldSelect.vue';
 
 defineOptions({
@@ -75,6 +81,9 @@ const props = withDefaults(defineProps<FieldProps<DataSourceFieldSelectConfig>>(
 
 const showDataSourceFieldSelect = ref(false);
 
+const isSelectValid = computed(
+  () => !disabledDataSource.value && (showDataSourceFieldSelect.value || !props.config.fieldConfig),
+);
 watch(
   () => props.model[props.name],
   (value) => {

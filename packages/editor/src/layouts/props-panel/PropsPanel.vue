@@ -111,14 +111,31 @@ const styleFormConfig = [
   },
 ];
 
+// 用单调递增序号标记每次 init 调用，只让"最新一次"的 await 结果落到 ref 上。
+// 避免节点快速切换时多个 init 并发 + 解析顺序错乱导致 stale config 覆盖最新选中节点，
+// 以及组件已卸载 / FormPanel 正在 remount 的中间态下写 ref 触发 Vue setRef 把 __vnode
+// 设到 null 上的报错（TypeError: Cannot set properties of null (setting '__vnode')）。
+let initSeq = 0;
+let mounted = true;
+
 const init = async () => {
+  initSeq += 1;
+  const seq = initSeq;
+
   if (!node.value) {
+    if (seq !== initSeq || !mounted) return;
     curFormConfig.value = [];
     return;
   }
 
   const type = node.value.type || (node.value.items ? 'container' : 'text');
-  curFormConfig.value = await propsService.getPropsConfig(type, { node: node.value });
+  const config = await propsService.getPropsConfig(type, { node: node.value });
+
+  // 期间被新一次 init 取代 / 组件已卸载，丢弃本次结果
+  if (seq !== initSeq || !mounted) return;
+  if (!node.value) return;
+
+  curFormConfig.value = config;
   values.value = node.value;
 };
 
@@ -126,6 +143,7 @@ watchEffect(init);
 propsService.on('props-configs-change', init);
 
 onBeforeUnmount(() => {
+  mounted = false;
   propsService.off('props-configs-change', init);
 });
 

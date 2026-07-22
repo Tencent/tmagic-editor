@@ -6,6 +6,7 @@ import { type TableColumnOptions, TMagicIcon, TMagicTooltip } from '@tmagic/desi
 import type { FormItemConfig, FormState, TableColumnConfig } from '@tmagic/form-schema';
 
 import type { ContainerChangeEventData } from '../../schema';
+import { isGlobalFlat } from '../../utils/config';
 import { display as displayFunc, getDataByPage, sortArray } from '../../utils/form';
 import Container from '../Container.vue';
 
@@ -111,23 +112,26 @@ export const useTableColumns = (
         },
       });
     }
-
-    let actionFixed: 'left' | 'right' | undefined = props.config.fixed === false ? undefined : 'left';
-
+    const defaultFixed: 'left' | 'right' = isGlobalFlat.value ? 'right' : 'left';
+    let actionFixed: 'left' | 'right' | undefined = props.config.fixed === false ? undefined : defaultFixed;
     if (typeof props.config.fixed === 'string' && ['left', 'right'].includes(props.config.fixed)) {
       actionFixed = props.config.fixed;
     }
+
+    const actionFlat = props.config.flat === undefined && isGlobalFlat.value ? true : props.config.flat;
 
     const actionColumn = {
       props: {
         label: '操作',
         fixed: actionFixed,
+
         width: props.config.operateColWidth ?? (props.config.dropSortHandle && props.config.dropSort ? 132 : 112),
         align: 'center',
       },
       cell: ({ row, $index }: any) =>
         h(ActionsColumn, {
           row,
+          flat: actionFlat,
           index: $index,
           model: props.model,
           config: props.config,

@@ -28,7 +28,8 @@ import editorPlugin from '@tmagic/editor';
 import App from './App.vue';
 import router from './route';
 
-import '@tmagic/editor/dist/style.css';
+// import '@tmagic/editor/dist/style.css';
+import '@tmagic/editor/dist/themes/magic-admin.css';
 
 // @ts-ignore
 globalThis.MonacoEnvironment = {
@@ -64,6 +65,6 @@ if (adapter === 'tdesign-vue-next') {
 adapterModule.then((module: any) => {
   const app = createApp(App);
   app.use(router);
-  app.use(editorPlugin, module.default);
+  app.use(editorPlugin, { ...module.default, flat: true });
   app.mount('#app');
 });

@@ -35,6 +35,9 @@
               :label-title="config.labelTitle"
               :text="text"
             ></FormLabel>
+            <span class="m-form-tip m-form-title-extra" v-if="config.titleExtra && config.labelPosition === 'top'">
+              {{ config.titleExtra }}</span
+            >
           </slot>
         </template>
 
@@ -222,17 +225,23 @@
       </template>
     </template>
 
-    <div style="text-align: center" v-if="config.expand && type !== 'fieldset'">
-      <TMagicButton type="primary" size="small" :disabled="false" link @click="expandHandler">{{
-        expand ? '收起配置' : '展开更多配置'
-      }}</TMagicButton>
+    <div class="m-form-container-expand" v-if="config.expand && type !== 'fieldset'">
+      <TMagicButton
+        type="primary"
+        size="small"
+        :disabled="false"
+        link
+        @click="expandHandler"
+        :icon="expand ? ArrowUp : ArrowDown"
+        >{{ expand ? '收起配置' : '展开更多配置' }}</TMagicButton
+      >
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, inject, readonly, ref, toRaw, watch, watchEffect } from 'vue';
-import { WarningFilled } from '@element-plus/icons-vue';
+import { ArrowDown, ArrowUp, WarningFilled } from '@element-plus/icons-vue';
 import { isEqual } from 'lodash-es';
 
 import { TMagicButton, TMagicFormItem, TMagicIcon, TMagicTooltip } from '@tmagic/design';
@@ -440,8 +449,10 @@ const formItemProps = computed(() => ({
   prop: itemProp.value,
   labelWidth: itemLabelWidth.value,
   labelPosition: props.config.labelPosition,
+
   rules: rule.value,
   extra: filterFunction(mForm, props.config.extra, props),
+  extraTips: props.config.extraTips,
 }));
 
 const itemLabelWidth = computed(() => props.config.labelWidth ?? props.labelWidth);

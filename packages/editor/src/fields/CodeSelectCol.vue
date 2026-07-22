@@ -147,6 +147,7 @@ const selectConfig: SelectConfig = {
   type: 'select',
   name: props.name,
   disabled: props.disabled,
+  text: props.config.text,
   options: () => {
     if (codeDsl.value) {
       return map(codeDsl.value, (value, key) => ({

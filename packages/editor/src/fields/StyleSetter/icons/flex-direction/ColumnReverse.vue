@@ -1,7 +1,8 @@
 <template>
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
     <path
-      d="M896 704H128v320h768V704z m0-320H128v256h768v-256z m-128-192l-256-192-256 192 192 0.032V320h128V192h192z"
-    ></path>
+      d="M12 5C12.5523 5 13 5.44772 13 6V12C13 12.5523 12.5523 13 12 13H4C3.44772 13 3 12.5523 3 12V6C3 5.44772 3.44772 5 4 5H12ZM4.5 6C4.22386 6 4 6.22386 4 6.5V11.5C4 11.7761 4.22386 12 4.5 12H11.5C11.7761 12 12 11.7761 12 11.5V6.5C12 6.22386 11.7761 6 11.5 6H4.5Z"
+    />
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M5 4L8 1L11 4L5 4Z" fill-opacity="0.3" />
   </svg>
 </template>

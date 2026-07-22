@@ -9,15 +9,18 @@
     >
     </TMagicButton>
   </TMagicTooltip>
+
   <TMagicButton
     v-show="showDelete(index + 1 + currentPage * pageSize - 1)"
     size="small"
     type="danger"
     link
     title="删除"
-    :icon="config.deleteActionButtonIcon || Delete"
+    :icon="flat ? undefined : config.deleteActionButtonIcon || Delete"
     @click="removeHandler(index + 1 + currentPage * pageSize - 1)"
-  ></TMagicButton>
+  >
+    <template v-if="flat">删除</template>
+  </TMagicButton>
 
   <TMagicButton
     v-if="copyable(index + 1 + currentPage * pageSize - 1)"
@@ -25,10 +28,12 @@
     size="small"
     type="primary"
     title="复制"
-    :icon="config.copyActionButtonIcon || DocumentCopy"
+    :icon="flat ? undefined : config.copyActionButtonIcon || DocumentCopy"
     :disabled="disabled"
     @click="copyHandler(index + 1 + currentPage * pageSize - 1)"
-  ></TMagicButton>
+  >
+    <template v-if="flat">复制</template>
+  </TMagicButton>
 </template>
 
 <script setup lang="ts">
@@ -53,6 +58,7 @@ const props = defineProps<{
   row: any;
   prop?: string;
   sortKey?: string;
+  flat?: boolean;
 }>();
 
 const mForm = inject<FormState | undefined>('mForm');

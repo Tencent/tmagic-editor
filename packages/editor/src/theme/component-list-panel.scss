@@ -77,9 +77,9 @@
           margin-bottom: 5px;
 
           &:hover {
-            background: #2882e0;
+            background: var(--el-color-primary, #2882e0);
             color: #fff;
-            border-color: #4e8be1;
+            border-color: var(--el-color-primary, #4e8be1);
           }
         }
 

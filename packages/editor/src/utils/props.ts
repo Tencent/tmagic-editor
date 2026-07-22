@@ -180,6 +180,7 @@ export const advancedTabConfig: TabPaneConfig = {
       name: NODE_DISABLE_CODE_BLOCK_KEY,
       text: '禁用代码块',
       type: 'switch',
+      labelPosition: 'left',
       defaultValue: false,
       extra: '开启后，配置的代码块将不会被执行',
     },
@@ -187,15 +188,17 @@ export const advancedTabConfig: TabPaneConfig = {
       name: NODE_DISABLE_DATA_SOURCE_KEY,
       text: '禁用数据源',
       type: 'switch',
+      labelPosition: 'left',
       defaultValue: false,
       extra: '开启后，组件内配置的数据源相关配置将不会被编译，显隐条件将失效',
     },
     {
       name: 'created',
-      text: 'created',
+      text: 'Created',
+      flat: true,
       labelPosition: 'top',
       type: 'code-select',
-      extra: '组件初始化时执行',
+      titleExtra: '组件初始化时执行',
       rules: [
         { typeMatch: true, trigger: 'change' },
         {
@@ -210,10 +213,12 @@ export const advancedTabConfig: TabPaneConfig = {
     },
     {
       name: 'mounted',
-      text: 'mounted',
+      text: 'Mounted',
       labelPosition: 'top',
+      flat: true,
+
       type: 'code-select',
-      extra: '组件挂载到dom时执行',
+      titleExtra: '组件挂载到dom时执行',
       rules: [
         { typeMatch: true, trigger: 'change' },
         {
@@ -228,8 +233,9 @@ export const advancedTabConfig: TabPaneConfig = {
     },
     {
       name: 'display',
-      text: 'display',
-      extra: '控制组件是否渲染，关系的代码块返回值为false时不渲染',
+      text: 'Display',
+      flat: true,
+      titleExtra: '控制组件是否渲染，关系的代码块返回值为false时不渲染',
       labelPosition: 'top',
       type: 'code-select',
       rules: [
@@ -264,9 +270,17 @@ export const displayTabConfig: TabPaneConfig<DisplayCondsConfig> = {
         `条件成立时${model[NODE_CONDS_RESULT_KEY] ? '隐藏' : '显示'}，不成立时${model[NODE_CONDS_RESULT_KEY] ? '显示' : '隐藏'}；<br />同一条件组内的所有条件配置同时成立时表示该条件组成立，任意一个条件组成立时表示条件成立(条件组内为且的关系，条件组间为或的关系)；<br />条件为空时表示成立；`,
     },
     {
+      text: '条件组配置',
+      static: true,
+      className: 'display-conds-title',
+    },
+    {
       type: 'display-conds',
       name: NODE_CONDS_KEY,
       titlePrefix: '条件组',
+      flat: true,
+      fixed: 'right',
+      operateColWidth: 112,
       defaultValue: [],
       rules: [{ typeMatch: true }],
     },
@@ -303,10 +317,13 @@ export const fillConfig = (
       name: 'id',
       text: 'ID',
       type: 'text',
-      disabled: true,
+      // 走纯文本渲染，避免出现 disabled 的灰底输入框；append 仍正常显示。
+      static: true,
+
       append: {
-        type: 'button',
-        text: '复制',
+        type: 'icon',
+        text: 'https://vip.image.video.qpic.cn/vupload/20260615/36cf7e1781493669935.svg',
+        extra: '复制',
         handler: (vm, { model }) => {
           navigator.clipboard
             .writeText(`${model.id}`)
@@ -339,6 +356,7 @@ export const fillConfig = (
   const tabConfig: TabConfig = {
     type: 'tab',
     labelWidth,
+    className: 'magic-right-panel-tabs-top',
     items: [
       {
         title: '属性',

@@ -95,9 +95,9 @@ const formConfig = defineFormConfig([
     childType: 'button',
     labelWidth: '68px',
     options: [
-      { value: 'left', icon: markRaw(AlignLeft), tooltip: '左对齐 row' },
-      { value: 'center', icon: markRaw(AlignCenter), tooltip: '居中对齐 center' },
-      { value: 'right', icon: markRaw(AlignRight), tooltip: '右对齐 right' },
+      { value: 'left', icon: markRaw(AlignLeft), tooltip: '左对齐 row', text: '左对齐' },
+      { value: 'center', icon: markRaw(AlignCenter), tooltip: '居中对齐 center', text: '居中对齐' },
+      { value: 'right', icon: markRaw(AlignRight), tooltip: '右对齐 right', text: '右对齐' },
     ],
   },
 ]);

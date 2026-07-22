@@ -5,10 +5,11 @@ export const LEFT_COLUMN_WIDTH_STORAGE_KEY = '$MagicEditorLeftColumnWidthData';
 export const RIGHT_COLUMN_WIDTH_STORAGE_KEY = '$MagicEditorRightColumnWidthData';
 export const PROPS_PANEL_WIDTH_STORAGE_KEY = '$MagicEditorPropsPanelWidthData';
 
-export const DEFAULT_LEFT_COLUMN_WIDTH = 310;
+export const DEFAULT_LEFT_COLUMN_WIDTH = 345;
 export const DEFAULT_RIGHT_COLUMN_WIDTH = 480;
 
-export const MIN_LEFT_COLUMN_WIDTH = 200;
+// 2026-06-11 设计稿修改，固定左侧栏存在时最小宽度为 345
+export const MIN_LEFT_COLUMN_WIDTH = 345;
 export const MIN_CENTER_COLUMN_WIDTH = 400;
 export const MIN_RIGHT_COLUMN_WIDTH = 300;
 

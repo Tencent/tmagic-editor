@@ -1,4 +1,5 @@
 import {
+  ElAlert,
   ElAutocomplete,
   ElBadge,
   ElButton,
@@ -48,6 +49,7 @@ import {
 } from 'element-plus';
 
 import type {
+  AlertProps,
   AutocompleteProps,
   BadgeProps,
   ButtonProps,
@@ -102,6 +104,11 @@ const adapter: DesignPluginOptions = {
     autocomplete: {
       component: ElAutocomplete as any,
       props: (props: AutocompleteProps) => props,
+    },
+
+    alert: {
+      component: ElAlert as any,
+      props: (props: AlertProps) => props,
     },
 
     badge: {
@@ -261,7 +268,7 @@ const adapter: DesignPluginOptions = {
 
     select: {
       component: ElSelect as any,
-      props: (props: SelectProps) => props,
+      props: (props: SelectProps) => ({ remoteShowSuffix: true, ...props }),
     },
 
     step: {

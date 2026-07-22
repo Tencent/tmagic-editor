@@ -16,14 +16,22 @@
  * limitations under the License.
  */
 
+import { ref } from 'vue';
+
 import { EditorInstallOptions } from '@editor/type';
 
 let $TMAGIC_EDITOR: EditorInstallOptions = {} as any;
 
+// 用 ref 持有 flat 全局开关：const 引用本身不可变，符合 `import/no-mutable-exports`；
+// 通过 `.value` 改值仍保持模块级响应式语义，与 editor/plugin.ts、design/index.ts 里
+// 的同名变量写法对齐。
+const isGlobalFlat = ref(false);
+
 const setEditorConfig = (option: EditorInstallOptions): void => {
   $TMAGIC_EDITOR = option;
+  isGlobalFlat.value = option.flat ?? false;
 };
 
 const getEditorConfig = <K extends keyof EditorInstallOptions>(key: K): EditorInstallOptions[K] => $TMAGIC_EDITOR[key];
 
-export { getEditorConfig, setEditorConfig };
+export { getEditorConfig, isGlobalFlat, setEditorConfig };

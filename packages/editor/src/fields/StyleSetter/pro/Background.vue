@@ -29,6 +29,7 @@ defineProps<{
   isCompare?: boolean;
   disabled?: boolean;
   size?: 'large' | 'default' | 'small';
+  theme?: string;
   prop?: string;
 }>();
 
@@ -112,10 +113,14 @@ const formConfig = defineFormConfig([
     childType: 'button',
     labelWidth: '68px',
     options: [
-      { value: 'repeat', icon: markRaw(BackgroundRepeat), tooltip: '垂直和水平方向重复 repeat' },
+      { value: 'no-repeat', icon: markRaw(BackgroundNoRepeat), tooltip: '不重复 no-repeat' },
       { value: 'repeat-x', icon: markRaw(BackgroundRepeatX), tooltip: '水平方向重复 repeat-x' },
       { value: 'repeat-y', icon: markRaw(BackgroundRepeatY), tooltip: '垂直方向重复 repeat-y' },
-      { value: 'no-repeat', icon: markRaw(BackgroundNoRepeat), tooltip: '不重复 no-repeat' },
+      {
+        value: 'repeat',
+        icon: markRaw(BackgroundRepeat),
+        tooltip: '垂直和水平方向重复 repeat',
+      },
     ],
   },
   {

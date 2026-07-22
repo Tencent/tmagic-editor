@@ -24,6 +24,17 @@ export interface BadgeProps {
   hidden?: boolean;
 }
 
+export interface AlertProps {
+  title?: string;
+  /** ElAlert 实际支持的 type；与 ButtonProps.type 不同，没有 `primary` / `danger` */
+  type?: 'success' | 'warning' | 'info' | 'error' | 'primary';
+  description?: string;
+  closable?: boolean;
+  center?: boolean;
+  closeText?: string;
+  showIcon?: boolean;
+  effect?: 'light' | 'dark';
+}
 export interface ButtonProps {
   type?: string;
   size?: FieldSize;
@@ -39,6 +50,11 @@ export interface CardProps {
   bodyStyle?: Record<string, any>;
   shadow?: string;
   header?: string;
+  /**
+   * 铺平模式：去除卡片自身的视觉（背景 / 阴影 / 边框 / 圆角 / header 分隔线 / header 与 body 内边距）。
+   * 用于已有外层容器或者使用方希望「无卡片感」的场景，TMagicCard 的折叠等 prop 仍可正常使用。
+   */
+  flat?: boolean;
 }
 
 export interface CascaderProps {
@@ -97,6 +113,7 @@ export interface ColorPickerProps {
   disabled?: boolean;
   showAlpha?: boolean;
   size?: FieldSize;
+  flat?: boolean;
 }
 
 export interface DatePickerProps {
@@ -185,7 +202,9 @@ export interface FormItemProps {
   labelWidth?: string | number;
   rules?: any;
   extra?: string;
+  extraTips?: string;
   labelPosition?: 'top' | 'left' | 'right';
+  text?: string;
 }
 
 export interface InputProps {
@@ -464,6 +483,11 @@ export interface Components {
     props: (props: BadgeProps) => BadgeProps;
   };
 
+  alert: {
+    component: DefineComponent<AlertProps, {}, any> | string;
+    props: (props: AlertProps) => AlertProps;
+  };
+
   autocomplete: {
     component: DefineComponent<AutocompleteProps, {}, any> | string;
     props: (props: AutocompleteProps) => AutocompleteProps;
@@ -726,6 +750,7 @@ export interface Components {
 }
 
 export interface DesignPluginOptions {
+  flat?: boolean;
   adapterType?: string;
   message?: TMagicMessage;
   messageBox?: TMagicMessageBox;

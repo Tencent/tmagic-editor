@@ -2,7 +2,7 @@
   <Teleport to="body" v-if="visible">
     <div
       ref="target"
-      class="m-editor-float-box"
+      :class="['m-editor-float-box', themeClass]"
       v-bind="$attrs"
       :style="{ ...style, zIndex: curZIndex }"
       @mousedown="nextZIndex"
@@ -27,7 +27,7 @@ import { computed, type CSSProperties, nextTick, onBeforeUnmount, provide, ref, 
 import { Close } from '@element-plus/icons-vue';
 import VanillaMoveable from 'moveable';
 
-import { TMagicButton, useZIndex } from '@tmagic/design';
+import { TMagicButton, useThemeClass, useZIndex } from '@tmagic/design';
 
 import MIcon from '@editor/components/Icon.vue';
 
@@ -61,6 +61,12 @@ const props = withDefaults(
 
 const targetEl = useTemplateRef<HTMLDivElement>('target');
 const titleEl = useTemplateRef<HTMLDivElement>('title');
+
+/**
+ * 主题修饰类（来自最近的 `<MEditor>` / `<MForm>` 祖先 provide）。
+ * 挂在 `Teleport` 出去的浮动面板根节点上，让主题级 CSS 变量在 portal 节点上也能命中。
+ */
+const themeClass = useThemeClass();
 
 const zIndex = useZIndex();
 const curZIndex = ref<number>(0);

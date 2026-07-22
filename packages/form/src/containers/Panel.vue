@@ -3,10 +3,17 @@
     v-if="items && items.length"
     class="box-card m-form-panel"
     :body-style="{ display: expand ? 'block' : 'none' }"
+    :flat="config.flat"
   >
     <template #header>
       <div style="width: 100%; display: flex; align-items: center">
-        <TMagicButton style="padding: 0" link :icon="expand ? CaretBottom : CaretRight" @click="expand = !expand">
+        <TMagicButton
+          style="padding: 0; margin-right: 10px"
+          link
+          :icon="expand ? ArrowDown : ArrowRight"
+          @click="expand = !expand"
+          v-if="!hideExpand"
+        >
         </TMagicButton>
         <slot name="header">
           <span style="cursor: pointer" @click="expand = !expand">{{ filter(config.title) }}</span>
@@ -62,7 +69,7 @@
 
 <script setup lang="ts">
 import { computed, inject, ref } from 'vue';
-import { CaretBottom, CaretRight } from '@element-plus/icons-vue';
+import { ArrowDown, ArrowRight } from '@element-plus/icons-vue';
 
 import { TMagicButton, TMagicCard } from '@tmagic/design';
 
@@ -85,6 +92,7 @@ const props = defineProps<{
   prop?: string;
   size?: string;
   disabled?: boolean;
+  hideExpand?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -107,7 +115,6 @@ const onAddDiffCount = () => emit('addDiffCount');
 
 defineExpose({
   getExpand: () => expand.value,
-
   setExpand: (v: boolean) => {
     expand.value = v;
   },

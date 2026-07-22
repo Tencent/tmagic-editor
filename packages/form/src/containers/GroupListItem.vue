@@ -1,26 +1,29 @@
 <template>
-  <TMagicCard class="m-fields-group-list-item" :body-style="{ display: expand ? 'block' : 'none' }">
+  <TMagicCard class="m-fields-group-list-item" :flat="config.flat" :body-style="{ display: expand ? 'block' : 'none' }">
     <template #header>
-      <div>
-        <TMagicButton link :disabled="disabled" @click="expandHandler">
-          <TMagicIcon><CaretBottom v-if="expand" /><CaretRight v-else /></TMagicIcon><span v-html="title"></span>
+      <div class="m-fields-group-list-item-header">
+        <TMagicButton link :disabled="disabled" @click="expandHandler" class="expand-button">
+          <TMagicIcon><ArrowDown v-if="expand" /><ArrowRight v-else /></TMagicIcon>
         </TMagicButton>
 
-        <TMagicButton
-          v-if="!isCompare"
-          v-show="showDelete"
-          type="danger"
-          size="small"
-          link
-          :icon="Delete"
-          :disabled="disabled"
-          @click="removeHandler"
-        ></TMagicButton>
+        <span v-html="title"></span>
+        <TMagicTooltip :content="`删除 ${title}`">
+          <TMagicButton
+            v-if="!isCompare"
+            v-show="showDelete"
+            size="default"
+            link
+            class="delete-button"
+            :icon="Delete"
+            :disabled="disabled"
+            @click="removeHandler"
+          ></TMagicButton>
+        </TMagicTooltip>
 
         <TMagicButton
           v-if="copyable && !isCompare"
           link
-          size="small"
+          size="default"
           type="primary"
           :icon="DocumentCopy"
           :disabled="disabled"
@@ -32,18 +35,18 @@
           <TMagicButton
             v-show="index !== 0"
             link
-            size="small"
+            size="default"
             :disabled="disabled"
-            :icon="CaretTop"
+            :icon="Top"
             @click="changeOrder(-1)"
             >上移</TMagicButton
           >
           <TMagicButton
             v-show="index !== length - 1"
             link
-            size="small"
+            size="default"
             :disabled="disabled"
-            :icon="CaretBottom"
+            :icon="Bottom"
             @click="changeOrder(1)"
             >下移</TMagicButton
           >
@@ -107,9 +110,9 @@
 
 <script setup lang="ts">
 import { computed, inject, ref } from 'vue';
-import { CaretBottom, CaretRight, CaretTop, Delete, DocumentCopy, Position } from '@element-plus/icons-vue';
+import { ArrowDown, ArrowRight, Bottom, Delete, DocumentCopy, Position, Top } from '@element-plus/icons-vue';
 
-import { TMagicButton, TMagicCard, TMagicIcon, TMagicInputNumber, TMagicPopover } from '@tmagic/design';
+import { TMagicButton, TMagicCard, TMagicIcon, TMagicInputNumber, TMagicPopover, TMagicTooltip } from '@tmagic/design';
 
 import type { ContainerChangeEventData, FormState, GroupListConfig } from '../schema';
 import { filterFunction } from '../utils/form';
@@ -152,7 +155,10 @@ const rowConfig = computed(() => ({
 
 const title = computed(() => {
   if (props.config.titleKey && props.model[props.config.titleKey]) {
-    return props.model[props.config.titleKey];
+    const { titlePrefix } = props.config;
+    return titlePrefix
+      ? `${titlePrefix} ${String(props.index + 1)}: ${props.model[props.config.titleKey]}`
+      : `${props.model[props.config.titleKey]}`;
   }
 
   if (props.config.title) {

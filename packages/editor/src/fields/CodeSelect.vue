@@ -1,9 +1,10 @@
 <template>
   <div class="m-fields-code-select" :class="config.className">
-    <TMagicCard>
+    <TMagicCard :flat="config.flat">
       <MContainer
         :config="codeConfig"
         :size="size"
+        class="code-select-content"
         :prop="prop"
         :disabled="disabled"
         :is-compare="isCompareMode"
@@ -12,16 +13,20 @@
         @change="changeHandler"
       >
       </MContainer>
+      <TMagicButton class="create-button fullWidth" :icon="Plus" :size="size" :disabled="disabled" @click="newHandler()"
+        >添加{{ config.text }}</TMagicButton
+      >
     </TMagicCard>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { computed, watch } from 'vue';
+import { Plus } from '@element-plus/icons-vue';
 import { isEmpty } from 'lodash-es';
 
 import { HookCodeType, HookType } from '@tmagic/core';
-import { TMagicCard } from '@tmagic/design';
+import { TMagicButton, TMagicCard } from '@tmagic/design';
 import type { CodeSelectConfig, ContainerChangeEventData, FieldProps, GroupListConfig } from '@tmagic/form';
 import { MContainer } from '@tmagic/form';
 
@@ -53,12 +58,24 @@ const props = withDefaults(defineProps<FieldProps<CodeSelectConfig>>(), {});
  * 仅当存在历史值时才启用对比，避免 lastValues 缺失时退化为「全部新增」的空对比。
  */
 const isCompareMode = computed(() => Boolean(props.isCompare && props.lastValues));
-
+const newHandler = () => {
+  const defaultCode = {
+    codeType: HookCodeType.CODE,
+    codeId: '',
+  };
+  const name = props.config.name || '';
+  const hookData = props.model[name]?.hookData || [];
+  emit('change', defaultCode, {
+    modifyKey: `hookData.${hookData.length}`,
+  });
+};
 const codeConfig = computed<GroupListConfig>(() => ({
   type: 'group-list',
   name: 'hookData',
   enableToggleMode: false,
   expandAll: true,
+  flat: true,
+  addable: () => false,
   title: (mForm, { model, index }: any) => {
     if (model.codeType === HookCodeType.DATA_SOURCE_METHOD) {
       if (Array.isArray(model.codeId)) {
@@ -81,49 +98,44 @@ const codeConfig = computed<GroupListConfig>(() => ({
 
     return model.codeId || index;
   },
+  titlePrefix: props.config.name === undefined ? undefined : String(props.config.name),
   items: [
     {
-      type: 'row',
-      items: [
-        {
-          type: 'select',
-          name: 'codeType',
-          span: 6,
-          options: [
-            { value: HookCodeType.CODE, text: '代码块' },
-            { value: HookCodeType.DATA_SOURCE_METHOD, text: '数据源方法' },
-          ],
-          rules: [{ typeMatch: true, trigger: 'change' }],
-          defaultValue: HookCodeType.CODE,
-          onChange: (_mForm, v: HookCodeType, { setModel }) => {
-            if (v === HookCodeType.DATA_SOURCE_METHOD) {
-              setModel('codeId', []);
-            } else {
-              setModel('codeId', '');
-            }
-
-            return v;
-          },
-        },
-        {
-          type: 'code-select-col',
-          name: 'codeId',
-          span: 18,
-          labelWidth: 0,
-          display: (_mForm, { model }) => model.codeType !== HookCodeType.DATA_SOURCE_METHOD,
-          notEditable: () => !codeBlockService.getEditStatus(),
-          rules: [{ typeMatch: true, trigger: 'change' }],
-        },
-        {
-          type: 'data-source-method-select',
-          name: 'codeId',
-          span: 18,
-          labelWidth: 0,
-          display: (_mForm, { model }) => model.codeType === HookCodeType.DATA_SOURCE_METHOD,
-          notEditable: () => !dataSourceService.get('editable'),
-          rules: [{ typeMatch: true, trigger: 'change' }],
-        },
+      text: '代码类型',
+      type: 'select',
+      name: 'codeType',
+      labelPosition: 'right',
+      rules: [{ typeMatch: true, trigger: 'change' }],
+      options: [
+        { value: HookCodeType.CODE, text: '代码块' },
+        { value: HookCodeType.DATA_SOURCE_METHOD, text: '数据源方法' },
       ],
+      defaultValue: HookCodeType.CODE,
+      onChange: (_mForm, v: HookCodeType, { setModel }) => {
+        if (v === HookCodeType.DATA_SOURCE_METHOD) {
+          setModel('codeId', []);
+        } else {
+          setModel('codeId', '');
+        }
+        return v;
+      },
+    },
+    {
+      type: 'code-select-col',
+      name: 'codeId',
+      text: '代码块',
+      rules: [{ typeMatch: true, trigger: 'change' }],
+
+      display: (_mForm, { model }) => model.codeType !== HookCodeType.DATA_SOURCE_METHOD,
+      notEditable: () => !codeBlockService.getEditStatus(),
+    },
+    {
+      type: 'data-source-method-select',
+      name: 'codeId',
+      text: '数据源字段',
+      rules: [{ typeMatch: true, trigger: 'change' }],
+      display: (_mForm, { model }) => model.codeType === HookCodeType.DATA_SOURCE_METHOD,
+      notEditable: () => !dataSourceService.get('editable'),
     },
   ],
 }));

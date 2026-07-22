@@ -526,9 +526,11 @@ describe('EventSelect', () => {
       ],
     };
     const wrapper = mount(EventSelect, { props: baseProps({ model: m }) as any });
-    const buttons = wrapper.findAll('button');
-    const deleteBtn = buttons[buttons.length - 1];
-    await deleteBtn.trigger('click');
+    // 用 class 选择器直击 panel header 里的删除按钮：模板里同时存在顶部 / 底部「添加事件」按钮，
+    // 早期靠 `buttons[length - 1]` 取最后一个会误选到底部添加按钮，导致 events 没被删减。
+    const deleteBtns = wrapper.findAll('.event-item-delete-button');
+    expect(deleteBtns.length).toBe(m.events.length);
+    await deleteBtns[deleteBtns.length - 1].trigger('click');
     expect(m.events.length).toBe(1);
   });
 });

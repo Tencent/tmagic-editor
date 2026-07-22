@@ -3,7 +3,7 @@
     v-if="model"
     v-model="value"
     clearable
-    controls-position="right"
+    :controls-position="isGlobalFlat ? '' : 'right'"
     :size="size"
     :max="config.max"
     :min="config.min"
@@ -21,6 +21,7 @@ import { inject, ref, watch } from 'vue';
 import { TMagicInputNumber } from '@tmagic/design';
 
 import type { FieldProps, FormState, NumberConfig } from '../schema';
+import { isGlobalFlat } from '../utils/config';
 import { useAddField } from '../utils/useAddField';
 
 defineOptions({

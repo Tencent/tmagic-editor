@@ -155,7 +155,7 @@
 
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue';
-import { Close, Coin, EditPen, Goods, List } from '@element-plus/icons-vue';
+import { Box, Close, Coin, EditPen, Finished } from '@element-plus/icons-vue';
 
 import FloatingBox from '@editor/components/FloatingBox.vue';
 import MIcon from '@editor/components/Icon.vue';
@@ -253,7 +253,7 @@ const getItemConfig = (data: SideItem): SideComponent => {
     [SideItemKey.COMPONENT_LIST]: {
       $key: SideItemKey.COMPONENT_LIST,
       type: 'component',
-      icon: Goods,
+      icon: Box,
       text: '组件',
       component: ComponentListPanel,
       slots: {},
@@ -261,7 +261,7 @@ const getItemConfig = (data: SideItem): SideComponent => {
     layer: {
       $key: SideItemKey.LAYER,
       type: 'component',
-      icon: List,
+      icon: Finished,
       text: '已选组件',
       props: {
         layerContentMenu: props.layerContentMenu,

@@ -1,3 +1,20 @@
 div.m-fields-link {
   width: fit-content;
 }
+a.magic-admin-link {
+  width: calc(100%);
+  box-sizing: border-box;
+  border-radius: 4px;
+  border: 1px solid #e6e6e6;
+  background-color: #fafafa;
+  padding: 0 8px;
+  height: 28px;
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  text-decoration: none;
+
+  i {
+    margin-right: 4px;
+  }
+}

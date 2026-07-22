@@ -1,0 +1,38 @@
+@use "../../index.scss";
+
+.m-form.m-form--magic-admin {
+  .el-collapse-item__header {
+    background-color: transparent;
+    padding: 0;
+    border: 0;
+    padding-left: 0;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+}
+
+.tmagic-design-form-item {
+  &.has-extra-tips {
+    > .el-form-item__content {
+      gap: 10px;
+      > .tmagic-design-alert {
+        border-radius: 2px;
+        width: fit-content;
+        padding: 0 8px;
+        color: var(--el-color-primary, #0056ea);
+        background-color: var(--el-color-primary-light-9, rgb(236, 245, 255));
+        .el-icon.el-alert__icon {
+          fill: var(--el-color-primary, #0056ea);
+          color: var(--el-color-primary, #0056ea);
+        }
+        .el-alert__title {
+          font-size: 14px;
+          line-height: 22px;
+        }
+      }
+    }
+  }
+}

@@ -1,6 +1,31 @@
 <template>
-  <div class="m-fields-text">
+  <div :class="['m-fields-text', { 'm-fields-text--static': config.static }]">
+    <div v-if="config.disabled"></div>
+    <!-- 新增静态展示文本样式 -->
+    <template v-if="config.static">
+      <span v-if="config.prepend" class="m-fields-text__prepend">{{ config.prepend }}</span>
+      <span class="m-fields-text__value">{{ value }}</span>
+      <template v-if="appendConfig">
+        <TMagicButton
+          v-if="appendConfig.type === 'button'"
+          style="color: #0056ea"
+          :size="size"
+          @click.prevent="buttonClickHandler"
+        >
+          {{ appendConfig.text }}
+        </TMagicButton>
+        <img
+          v-else-if="appendConfig.type === 'icon'"
+          class="m-fields-text__icon"
+          :src="appendConfig.text"
+          @click="buttonClickHandler"
+        />
+        <span v-else>{{ appendConfig.text }}</span>
+      </template>
+    </template>
+
     <TMagicInput
+      v-else
       v-model="value"
       ref="input"
       :clearable="config.clearable ?? true"
@@ -17,17 +42,18 @@
       <template #append v-if="appendConfig">
         <TMagicButton
           v-if="appendConfig.type === 'button'"
-          style="color: #409eff"
+          style="color: #0056ea"
           :size="size"
           @click.prevent="buttonClickHandler"
         >
           {{ appendConfig.text }}
         </TMagicButton>
+        <img v-else-if="appendConfig.type === 'icon'" :src="appendConfig.text" @click="buttonClickHandler" />
         <span v-else>{{ appendConfig.text }}</span>
       </template>
     </TMagicInput>
 
-    <Teleport to="body">
+    <Teleport to="body" v-if="!config.static">
       <div v-if="popoverVisible" class="tmagic-form-text-popper m-form-item__content" ref="popoverEl">
         <div class="m-form-validate__warning">输入内容前后有空格，是否移除空格？</div>
         <div style="display: flex; justify-content: flex-end">
@@ -80,28 +106,26 @@ watch(
 );
 
 const appendConfig = computed(() => {
-  if (typeof props.config.append === 'string') {
+  const { append } = props.config;
+
+  // 字符串形态：纯文本 append。
+  if (typeof append === 'string') {
     return {
       type: 'text',
-      text: props.config.append,
+      text: append,
       handler: undefined,
     };
   }
-  if (typeof props.config.append === 'object') {
-    if (typeof props.config.append?.handler === 'function') {
-      return {
-        type: 'button',
-        text: props.config.append.text,
-        handler: props.config.append.handler,
-      };
-    }
-    if (props.config.append) {
-      if (props.config.append.value === 0) {
-        return false;
-      }
 
-      return props.config.append;
-    }
+  // 对象形态：按 schema 定义，`type` 可为 `'button' | 'icon'`，`handler` 可选。
+  //
+  // 旧逻辑里只要带 handler 就强制覆盖为 `type: 'button'`，导致 schema 中显式传入的
+  // `type: 'icon'` 在到达模板前被抹掉（参见 `@editor/utils/props.ts` 中 ID 字段
+  // 的复制按钮配置）。这里直接返回原对象，模板按 `type` 分支渲染 button / icon / text。
+  if (typeof append === 'object' && append) {
+    // `value === 0` 沿用旧约定：作为「隐藏 append」的开关。
+    if (append.value === 0) return false;
+    return append;
   }
 
   return false;

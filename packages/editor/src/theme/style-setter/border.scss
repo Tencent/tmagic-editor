@@ -1,5 +1,6 @@
 .border-box-container {
   display: flex;
+  --unuse-border-style: dashed;
   .border-icon-container {
     display: flex;
     flex-direction: column;
@@ -28,24 +29,32 @@
         border-color: var(--el-color-success, var(--td-success-color, #2ba471));
       }
       &.active {
+        border-color: var(--el-color-primary);
         border-width: 1px;
-        border-color: var(--el-color-primary, var(--td-brand-color, #0052d9));
+        // border-color: var(--el-color-primary, var(--td-brand-color, #0052d9));
+      }
+      &.center {
+        border-width: 1px;
       }
       &.border-icon-top {
         border-top-width: 2px;
-        border-style: solid dashed dashed dashed;
+        border-style: solid var(--unuse-border-style) var(--unuse-border-style)
+          var(--unuse-border-style);
       }
       &.border-icon-right {
         border-right-width: 2px;
-        border-style: dashed solid dashed dashed;
+        border-style: var(--unuse-border-style) solid var(--unuse-border-style)
+          var(--unuse-border-style);
       }
       &.border-icon-bottom {
         border-bottom-width: 2px;
-        border-style: dashed dashed solid dashed;
+        border-style: var(--unuse-border-style) var(--unuse-border-style) solid
+          var(--unuse-border-style);
       }
       &.border-icon-left {
         border-left-width: 2px;
-        border-style: dashed dashed dashed solid;
+        border-style: var(--unuse-border-style) var(--unuse-border-style)
+          var(--unuse-border-style) solid;
       }
     }
   }

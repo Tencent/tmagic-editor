@@ -37,11 +37,17 @@
         :size="addButtonSize"
         :plain="displayMode === 'table'"
         :icon="Plus"
+        text
         :disabled="disabled"
         v-bind="currentConfig.addButtonConfig?.props || { type: 'primary' }"
         @click="newHandler"
       >
-        {{ currentConfig.addButtonConfig?.text || (displayMode === 'table' ? '新增一行' : '新增') }}
+        {{
+          currentConfig.addButtonConfig?.text ||
+          (displayMode === 'table'
+            ? `新增一行${groupListConfig.titlePrefix || ''}`
+            : `新增${groupListConfig.titlePrefix || ''}`)
+        }}
       </TMagicButton>
     </template>
   </component>

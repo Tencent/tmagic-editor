@@ -1,0 +1,23 @@
+// 单个 radio option 的内容容器：横向排列 icon + 文本，垂直居中对齐。
+// 这样多行文本（`text: '内联布局\n inline'`）能跟左侧 icon 在视觉中线对齐，
+// 不会出现 icon 顶到第一行的错位。
+.m-fields-radio-group__option {
+  display: flex;
+  align-items: center;
+}
+
+.m-fields-radio-group__text {
+  // `inline-block` 关键：inline span 的 line-height 会被父级 inline formatting
+  // context（如 `.el-radio-button__inner` 的 strut）覆盖，外观高度量出来会比
+  // `line-height` 大；显式声明 `inline-block` 让 span 有独立的格式化上下文，
+  // 自身 line-height 才真正生效。
+  display: inline-block;
+  vertical-align: middle;
+  // `pre-line` 让 `\n` 渲染为换行，同时保留自动折行。
+  white-space: pre-line;
+  line-height: 20px;
+}
+
+.m-fields-radio-group__icon_with_text {
+  margin-right: 8px;
+}

@@ -5,8 +5,8 @@
       margin-right: auto;
       min-width: 50px;
       outline: none;
-      border-color: #409eff;
-      color: #409eff;
+      border-color: var(--el-color-primary, #409eff);
+      color: var(--el-color-primary, #409eff);
       width: 10px;
       &::before {
         content: "添加";

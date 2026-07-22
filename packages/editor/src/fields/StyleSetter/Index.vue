@@ -2,7 +2,7 @@
   <TMagicCollapse class="m-fields-style-setter" v-model="collapseValue">
     <template v-for="(item, index) in list" :key="index">
       <TMagicCollapseItem :name="`${index}`">
-        <template #title><MIcon :icon="Grid"></MIcon>{{ item.title }}</template>
+        <template #title>{{ item.title }}</template>
         <component
           v-if="item.component"
           :is="item.component"
@@ -22,13 +22,10 @@
 
 <script setup lang="ts">
 import { shallowRef } from 'vue';
-import { Grid } from '@element-plus/icons-vue';
 
 import { TMagicCollapse, TMagicCollapseItem } from '@tmagic/design';
 import type { ContainerChangeEventData, FieldProps } from '@tmagic/form';
 import type { StyleSchema } from '@tmagic/schema';
-
-import MIcon from '@editor/components/Icon.vue';
 
 import { Background, Border, Font, Layout, Position, Transform } from './pro/';
 

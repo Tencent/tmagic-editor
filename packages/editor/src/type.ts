@@ -140,6 +140,7 @@ export type BeforeAdd = (config: MNode, parent: MContainer) => Promise<MNode> | 
 export type GetConfig = (config: FormConfig) => Promise<FormConfig> | FormConfig;
 
 export interface EditorInstallOptions {
+  flat?: boolean;
   parseDSL: <T = any>(dsl: string) => T;
   customCreateMonacoEditor: (
     monaco: typeof import('monaco-editor'),

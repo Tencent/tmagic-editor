@@ -90,6 +90,22 @@ describe('Form.vue —— formState getter 行为', () => {
     expect(fs2.parentValues).toEqual({ x: 2 });
   });
 
+  test('formState.popperClass 在传入 theme 时自动追加 m-theme 修饰类', async () => {
+    const wrapper = mountForm({ popperClass: 'pop-x', theme: 'magic-admin' });
+    await nextTick();
+
+    const fs: any = wrapper.vm.formState;
+    expect(fs.popperClass).toBe('pop-x m-theme--magic-admin');
+
+    // 仅 theme 没有用户 popperClass 时不带前导空格
+    await wrapper.setProps({ popperClass: undefined });
+    expect(wrapper.vm.formState.popperClass).toBe('m-theme--magic-admin');
+
+    // 取消 theme 后回退为原始 popperClass
+    await wrapper.setProps({ theme: undefined, popperClass: 'pop-x' });
+    expect(wrapper.vm.formState.popperClass).toBe('pop-x');
+  });
+
   test('values / lastValuesProcessed 在 formState 上自动解包为 ref 当前值', async () => {
     const wrapper = mountForm({
       isCompare: true,

@@ -1,8 +1,7 @@
 <template>
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-    <path
-      d="M170.666667 227.555556v227.555555h682.666666V227.555556H170.666667z m625.777777 56.888888v113.777778H227.555556V284.444444h568.888888zM170.666667 568.888889v227.555555h682.666666v-227.555555H170.666667z m625.777777 56.888889v113.777778H227.555556v-113.777778h568.888888zM56.888889 56.888889h910.222222v56.888889H56.888889zM56.888889 910.222222h910.222222v56.888889H56.888889z"
-      fill="#333333"
-    ></path>
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+    <rect x="13" y="3" width="2" height="10" rx="1" transform="rotate(90 13 3)" />
+    <rect x="13" y="7" width="2" height="10" rx="1" transform="rotate(90 13 7)" />
+    <rect x="13" y="11" width="2" height="10" rx="1" transform="rotate(90 13 11)" fill-opacity="0.3" />
   </svg>
 </template>

@@ -1,8 +1,8 @@
 <template>
   <TMagicDrawer
-    class="m-form-drawer"
+    :class="['m-form-drawer', effectiveTheme ? `m-theme--${effectiveTheme}` : '']"
     ref="drawer"
-    v-model="visible"
+    v-model="dialogVisible"
     :title="title"
     :close-on-press-escape="closeOnPressEscape"
     :append-to-body="true"
@@ -16,7 +16,7 @@
     @close="closeHandler"
     @closed="closedHandler"
   >
-    <div v-if="visible" ref="drawerBody" class="m-drawer-body">
+    <div v-if="dialogVisible" ref="drawerBody" class="m-drawer-body">
       <Form
         ref="form"
         :size="size"
@@ -31,6 +31,7 @@
         :use-field-text-in-error="useFieldTextInError"
         :type-match-valid="typeMatchValid"
         :extend-state="extendState"
+        :theme="effectiveTheme"
         @change="changeHandler"
       ></Form>
       <slot></slot>
@@ -57,18 +58,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue';
+import { computed, inject, provide, ref, watchEffect } from 'vue';
 
-import { TMagicButton, TMagicCol, TMagicDrawer, TMagicRow } from '@tmagic/design';
+import { M_THEME_KEY, TMagicButton, TMagicCol, TMagicDrawer, TMagicRow } from '@tmagic/design';
 
 import Form from './Form.vue';
 import type { ContainerChangeEventData, FormConfig, FormState, FormValue } from './schema';
 
 defineOptions({
-  name: 'MFormDialog',
+  name: 'MFormDrawer',
 });
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     config?: FormConfig;
     values?: Object;
@@ -92,6 +93,12 @@ withDefaults(
     beforeClose?: (_done: (_cancel?: boolean) => void) => void;
     /** 透传给内部 `MForm`，用于扩展 `formState`（如注入 `$message` / `$store` 等） */
     extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
+    /**
+     * 主题名。优先级：传入 `theme` prop > 祖先 `provide(M_THEME_KEY)` > 空串。
+     * 计算结果会再次 `provide` 出去，使得 Drawer 被 Teleport 到 body 后，内部子树
+     * （包括 `MForm` 以及更深的 popover / dropdown）仍能拿到主题。
+     */
+    theme?: string;
   }>(),
   {
     closeOnPressEscape: true,
@@ -102,12 +109,16 @@ withDefaults(
   },
 );
 
+const ancestorTheme = inject(M_THEME_KEY, null);
+const effectiveTheme = computed(() => props.theme || ancestorTheme?.value || '');
+provide(M_THEME_KEY, effectiveTheme);
+
 const emit = defineEmits(['close', 'closed', 'submit', 'error', 'change', 'open', 'opened']);
 
 const drawer = ref<InstanceType<typeof TMagicDrawer>>();
 const form = ref<InstanceType<typeof Form>>();
 const drawerBody = ref<HTMLDivElement>();
-const visible = ref(false);
+const dialogVisible = ref(false);
 const saveFetch = ref(false);
 const bodyHeight = ref(0);
 
@@ -148,25 +159,42 @@ const closedHandler = () => {
 };
 
 const show = () => {
-  visible.value = true;
+  dialogVisible.value = true;
 };
 
 const hide = () => {
-  visible.value = false;
+  dialogVisible.value = false;
 };
-
+const close = () => {
+  dialogVisible.value = false;
+};
+const cancel = () => {
+  hide();
+};
 /** 用于关闭 Drawer, 该方法会调用传入的 before-close 方法 */
 const handleClose = () => {
   drawer.value?.handleClose();
+};
+
+const save = async () => {
+  try {
+    const changeRecords = [...(form.value?.changeRecords || [])];
+    const values = await form.value?.submitForm();
+    emit('submit', values, { changeRecords });
+  } catch (e) {
+    emit('error', e);
+  }
 };
 
 defineExpose({
   form,
   saveFetch,
   bodyHeight,
-
+  close,
   show,
   hide,
+  save,
+  cancel,
   handleClose,
 });
 </script>

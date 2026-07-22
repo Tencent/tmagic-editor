@@ -4,6 +4,7 @@
     :page-bar-sort-options="pageBarSortOptions"
     :page-filter-function="pageFilterFunction"
     :hide-sidebar="hideSidebar"
+    :theme="theme"
   >
     <template #header>
       <slot name="header"></slot>
@@ -135,9 +136,10 @@
 <script lang="ts" setup>
 import { EventEmitter } from 'events';
 
-import { provide, ref } from 'vue';
+import { computed, provide, ref } from 'vue';
 
 import type { MApp } from '@tmagic/core';
+import { M_THEME_KEY } from '@tmagic/design';
 
 import Framework from './layouts/Framework.vue';
 import TMagicNavMenu from './layouts/NavMenu.vue';
@@ -241,6 +243,15 @@ provide(ENABLE_PROPS_FORM_VALIDATE, props.enablePropsFormValidate ?? false);
  * 与 PropsPanel 通过 `:extend-state` 显式传入的方式保持等价。
  */
 provide('extendFormState', props.extendFormState);
+
+// 用 computed 包一层再 provide，否则传下去的是 provide 那一刻的值快照，
+// props.isLargeStageContainer 后续变化不会同步到子孙（如 @tmagic/design/ColorPicker）。
+// 子孙侧 `inject<ComputedRef<boolean>>('isLargeStageContainer', computed(() => false))`
+// 用 `.value` 或模板自动解包读取即可拿到最新值。
+provide(
+  'isLargeStageContainer',
+  computed(() => props.isLargeStageContainer),
+);
 /**
  * 提供 PropsPanel 主属性表单的 formState getter，供历史差异弹窗复用，
  * 让 CompareForm 与 PropsPanel 的 filterFunction 上下文保持一致。
@@ -255,6 +266,16 @@ provide('getPropsPanelFormState', () => propsPanelRef.value?.configForm?.formSta
 provide('historyListExtraTabs', props.historyListExtraTabs);
 
 provide<EventBus>('eventBus', new EventEmitter());
+
+/**
+ * 把当前主题以响应式 ref 形式 provide 给后代，供包含 `Teleport` 的组件
+ * （如 `TMagicPopover` / `FloatingBox` / `ContentMenu`）在传送目标上挂 `m-theme--<theme>`
+ * 类，让主题级 CSS 变量在 portal 节点上也能命中。详见 `@tmagic/design/theme.ts`。
+ */
+provide(
+  M_THEME_KEY,
+  computed(() => props.theme ?? ''),
+);
 
 const propsPanelMountedHandler = (e: InstanceType<typeof FormPanel>) => {
   propsPanelRef.value = e;

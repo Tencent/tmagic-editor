@@ -1,7 +1,7 @@
 <template>
   <TMagicDialog
     v-model="dialogVisible"
-    class="m-form-dialog"
+    :class="['m-form-dialog', effectiveTheme ? `m-theme--${effectiveTheme}` : '']"
     top="20px"
     append-to-body
     :title="title"
@@ -34,6 +34,7 @@
         :use-field-text-in-error="useFieldTextInError"
         :type-match-valid="typeMatchValid"
         :extend-state="extendState"
+        :theme="effectiveTheme"
         @change="changeHandler"
       ></Form>
       <slot></slot>
@@ -66,9 +67,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, inject, provide, ref } from 'vue';
 
-import { TMagicButton, TMagicCol, TMagicDialog, TMagicRow } from '@tmagic/design';
+import { M_THEME_KEY, TMagicButton, TMagicCol, TMagicDialog, TMagicRow } from '@tmagic/design';
 
 import Form from './Form.vue';
 import { ContainerChangeEventData, FormConfig, FormState, FormValue, StepConfig } from './schema';
@@ -104,6 +105,12 @@ const props = withDefaults(
     useFieldTextInError?: boolean;
     /** 透传给内部 `MForm`，用于扩展 `formState`（如注入 `$message` / `$store` 等） */
     extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
+    /**
+     * 主题名。优先级：传入 `theme` prop > 祖先 `provide(M_THEME_KEY)` > 空串。
+     * 计算结果会再次 `provide` 出去，使得 Dialog 被 Teleport 到 body 后，内部子树
+     * （包括 `MForm` 以及更深的 popover / dropdown）仍能拿到主题。
+     */
+    theme?: string;
   }>(),
   {
     config: () => [],
@@ -117,6 +124,10 @@ const props = withDefaults(
     useFieldTextInError: true,
   },
 );
+
+const ancestorTheme = inject(M_THEME_KEY, null);
+const effectiveTheme = computed(() => props.theme || ancestorTheme?.value || '');
+provide(M_THEME_KEY, effectiveTheme);
 
 const emit = defineEmits(['close', 'submit', 'error', 'change']);
 

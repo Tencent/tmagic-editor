@@ -1,6 +1,10 @@
 <template>
   <TMagicForm
-    class="m-form"
+    :class="[
+      'm-form',
+      effectiveTheme ? `m-form--${effectiveTheme}` : '',
+      effectiveTheme ? `m-theme--${effectiveTheme}` : '',
+    ]"
     ref="tMagicForm"
     :model="values"
     :label-width="labelWidth"
@@ -32,10 +36,22 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, provide, reactive, ref, shallowRef, toRaw, useTemplateRef, watch, watchEffect } from 'vue';
+import {
+  computed,
+  inject,
+  nextTick,
+  provide,
+  reactive,
+  ref,
+  shallowRef,
+  toRaw,
+  useTemplateRef,
+  watch,
+  watchEffect,
+} from 'vue';
 import { cloneDeep, isEqual } from 'lodash-es';
 
-import { TMagicForm, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
+import { M_THEME_KEY, TMagicForm, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
 import { setValueByKeyPath } from '@tmagic/utils';
 
 import Container from './containers/Container.vue';
@@ -116,6 +132,15 @@ const props = withDefaults(
      * 通过 provide 下发，对整棵表单的所有层级 Container 生效，只需在 MForm 这一层传一次。
      */
     selfDiffFieldTypes?: string[] | ((_defaultTypes: string[]) => string[]);
+    /**
+     * 主题名称：对应 `packages/form/src/theme/themes/<theme>/index.scss` 的目录名。
+     *
+     * 设置后会在表单根元素上追加 `m-form--<theme>` 修饰类，配合按需引入
+     * `@tmagic/form/dist/themes/<theme>.css` 即可启用主题样式。
+     *
+     * 例如：`<MForm theme="magic-admin" />` + `import '@tmagic/form/dist/themes/magic-admin.css'`。
+     */
+    theme?: string;
   }>(),
   {
     config: () => [],
@@ -150,6 +175,27 @@ const fields = new Map<string, any>();
 const requestFuc = getConfig('request') as Function;
 
 /**
+ * 当前表单生效的主题名称：
+ * - 优先用本组件自己的 `props.theme`；
+ * - 没设置时回退到最近祖先 `<MEditor>` / `<MForm>` provide 的主题，便于内嵌于编辑器
+ *   时自动跟随外层主题，无需在每个 `MForm` 上重复传 `theme`。
+ *
+ * 同时把合并后的值再 provide 出去（见下方 `provide(M_THEME_KEY, ...)`），让 form 子树
+ * 里再嵌套的 portal 组件（`TMagicPopover` 等）依然能拿到非空主题。
+ */
+const ancestorTheme = inject(M_THEME_KEY, null);
+const effectiveTheme = computed(() => props.theme || ancestorTheme?.value || '');
+
+/**
+ * 拼到 `formState.popperClass` 上的主题修饰类（仅 `m-theme--<theme>`，
+ * 不带 `m-form` / `m-editor` 前缀，因为 Element Plus 弹层节点本身既不是 form 也不是 editor）。
+ *
+ * 这条类会随所有读 `mForm.popperClass` 的字段（Select / DateTime / Cascader 等）下发到
+ * Element Plus 的 `popper-class`，让 portal 节点也命中 `m-theme--<theme>` 上的 CSS 变量。
+ */
+const themeClass = computed(() => (effectiveTheme.value ? `m-theme--${effectiveTheme.value}` : ''));
+
+/**
  * formState 实现说明：
  *
  * 1. 与 props 直接对应的字段（config / initValues / lastValues / isCompare / parentValues /
@@ -165,13 +211,21 @@ const requestFuc = getConfig('request') as Function;
  *      把最新值刷进 formState。
  *    - accessor 描述符（`{ get stage() { return ... } }`）按原样写入，调用方可以控制
  *      读时求值，每次读取都会重新执行 getter。
+ *
+ * 4. `popperClass` 会自动拼接 `themeClass`：调用方传入的 `popperClass` + 当前主题
+ *    修饰类（含祖先 `<MEditor>` provide 的主题）。这样所有透传到 Element Plus 弹层
+ *    `popper-class` 的字段（Select / DateTime / Cascader 等）能自带主题作用域。
  */
 const formState: FormState = reactive<FormState>({
   get keyProp() {
     return props.keyProp;
   },
   get popperClass() {
-    return props.popperClass;
+    const userClass = props.popperClass ?? '';
+    const tc = themeClass.value;
+    if (!userClass) return tc;
+    if (!tc) return userClass;
+    return `${userClass} ${tc}`;
   },
   get config() {
     return props.config;
@@ -250,6 +304,13 @@ watchEffect(async (onCleanup) => {
 
 provide('mForm', formState);
 
+/**
+ * 把生效主题（自身或祖先）再 provide 出去，供 form 子树内含 `Teleport` 的组件
+ * （如 `TMagicPopover`）在传送目标上挂 `m-theme--<theme>` 类。
+ * 详见 `@tmagic/design/theme.ts`。
+ */
+provide(M_THEME_KEY, effectiveTheme);
+provide('formInline', props.inline);
 // 对比相关配置单独通过 provide 下发，所有层级的 Container 通过 inject 获取，无需逐层透传 prop。
 // 用 getter 对象保证读取时回到最新的 props 值，维持响应式。
 provide(FORM_DIFF_CONFIG_KEY, {

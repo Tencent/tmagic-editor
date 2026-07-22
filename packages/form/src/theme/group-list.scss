@@ -1,4 +1,8 @@
 .m-fields-group-list {
+  .m-fields-group-list-item.tmagic-design-card--flat:last-child {
+    border: 0;
+  }
+
   .el-button--text {
     padding: 0;
     margin-bottom: 7px;
@@ -19,14 +23,11 @@
     &:last-of-type {
       border-bottom: 0;
     }
-  }
 
-  .tmagic-design-card {
-    .el-card__header {
-      padding: 5px 20px;
-    }
-    .t-card__header {
-      padding: 5px 0;
+    .m-fields-group-list-item-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
   }
 
@@ -34,5 +35,6 @@
     display: flex;
     justify-content: space-between;
     margin-top: 10px;
+    margin-bottom: 16px;
   }
 }

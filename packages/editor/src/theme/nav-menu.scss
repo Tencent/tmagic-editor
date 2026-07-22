@@ -13,7 +13,11 @@
   font-weight: 400;
   box-sizing: border-box;
   margin: 0px;
-  flex: 0 0 $nav-height;
+  // 用 CSS 变量做主题化开关：默认没设 `--editor-nav-height` 时回落到
+  // SCSS 变量 `$nav-height`（common/var.scss，35px）；主题（如 magic-admin）
+  // 只需在祖先节点声明 `--editor-nav-height: 40px` 即可运行时覆盖，避免
+  // 走 `@use with` 那条对加载顺序极敏感的 SCSS 模块配置路径。
+  flex: 0 0 var(--editor-nav-height, #{$nav-height});
   border-bottom: 1px solid #d8dee8;
 
   > div {

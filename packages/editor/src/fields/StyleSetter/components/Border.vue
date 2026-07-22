@@ -15,7 +15,7 @@
           @click="selectDirection('Left')"
         ></div>
         <div
-          class="border-icon"
+          class="border-icon center"
           :class="{ active: direction === '', configured: isConfigured('') }"
           @click="selectDirection()"
         ></div>

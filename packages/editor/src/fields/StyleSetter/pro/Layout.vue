@@ -26,11 +26,19 @@
 <script lang="ts" setup>
 import { markRaw } from 'vue';
 
+import { useTheme } from '@tmagic/design';
 import type { ContainerChangeEventData } from '@tmagic/form';
 import { defineFormConfig, MContainer } from '@tmagic/form';
 import type { StyleSchema } from '@tmagic/schema';
 
 import Box from '../components/Box.vue';
+import {
+  AlignItemsCenter,
+  AlignItemsFlexEnd,
+  AlignItemsFlexStart,
+  AlignItemsSpaceAround,
+  AlignItemsSpaceBetween,
+} from '../icons/align-items';
 import { DisplayBlock, DisplayFlex, DisplayInline, DisplayInlineBlock, DisplayNone } from '../icons/display';
 import {
   FlexDirectionColumn,
@@ -46,12 +54,13 @@ import {
   JustifyContentSpaceBetween,
 } from '../icons/justify-content';
 
-defineProps<{
+const props = defineProps<{
   values: Partial<StyleSchema>;
   lastValues?: Partial<StyleSchema>;
   isCompare?: boolean;
   disabled?: boolean;
   size?: 'large' | 'default' | 'small';
+  theme?: string;
   prop?: string;
 }>();
 
@@ -60,19 +69,42 @@ const emit = defineEmits<{
   addDiffCount: [];
 }>();
 
+const displayTheme = useTheme(props);
+
 const formConfig = defineFormConfig([
   {
     name: 'display',
     text: '模式',
     type: 'radioGroup',
     childType: 'button',
-    labelWidth: '68px',
+    labelWidth: '90px',
+    iconSize: '24px',
     options: [
-      { value: 'inline', icon: markRaw(DisplayInline), tooltip: '内联布局 inline' },
-      { value: 'flex', icon: markRaw(DisplayFlex), tooltip: '弹性布局 flex' },
-      { value: 'block', icon: markRaw(DisplayBlock), tooltip: '块级布局 block' },
-      { value: 'inline-block', icon: markRaw(DisplayInlineBlock), tooltip: '内联块布局 inline-block' },
-      { value: 'none', icon: markRaw(DisplayNone), tooltip: '隐藏 none' },
+      {
+        value: 'inline',
+        icon: markRaw(DisplayInline),
+        tooltip: '内联布局 inline',
+      },
+      {
+        value: 'flex',
+        icon: markRaw(DisplayFlex),
+        tooltip: '弹性布局 flex',
+      },
+      {
+        value: 'block',
+        icon: markRaw(DisplayBlock),
+        tooltip: '块级布局 block',
+      },
+      {
+        value: 'inline-block',
+        icon: markRaw(DisplayInlineBlock),
+        tooltip: '内联块布局 inline-block',
+      },
+      {
+        value: 'none',
+        icon: markRaw(DisplayNone),
+        tooltip: '隐藏 none',
+      },
     ],
   },
   {
@@ -80,11 +112,20 @@ const formConfig = defineFormConfig([
     text: '主轴方向',
     type: 'radioGroup',
     childType: 'button',
-    labelWidth: '68px',
+    labelWidth: '90px',
+    iconSize: '24px',
     options: [
       { value: 'row', icon: markRaw(FlexDirectionRow), tooltip: '水平方向 起点在左侧 row' },
-      { value: 'row-reverse', icon: markRaw(FlexDirectionRowReverse), tooltip: '水平方向 起点在右侧 row-reverse' },
-      { value: 'column', icon: markRaw(FlexDirectionColumn), tooltip: '垂直方向 起点在上沿 column' },
+      {
+        value: 'row-reverse',
+        icon: markRaw(FlexDirectionRowReverse),
+        tooltip: '水平方向 起点在右侧 row-reverse',
+      },
+      {
+        value: 'column',
+        icon: markRaw(FlexDirectionColumn),
+        tooltip: '垂直方向 起点在上沿 column',
+      },
       {
         value: 'column-reverse',
         icon: markRaw(FlexDirectionColumnReverse),
@@ -98,13 +139,22 @@ const formConfig = defineFormConfig([
     text: '主轴对齐',
     type: 'radioGroup',
     childType: 'button',
-    labelWidth: '68px',
+    labelWidth: '90px',
+    iconSize: '24px',
     options: [
       { value: 'flex-start', icon: markRaw(JustifyContentFlexStart), tooltip: '左对齐 flex-start' },
       { value: 'flex-end', icon: markRaw(JustifyContentFlexEnd), tooltip: '右对齐 flex-end' },
       { value: 'center', icon: markRaw(JustifyContentCenter), tooltip: '居中 center' },
-      { value: 'space-between', icon: markRaw(JustifyContentSpaceBetween), tooltip: '两端对齐 space-between' },
-      { value: 'space-around', icon: markRaw(JustifyContentSpaceAround), tooltip: '横向平分 space-around' },
+      {
+        value: 'space-between',
+        icon: markRaw(JustifyContentSpaceBetween),
+        tooltip: '两端对齐 space-between',
+      },
+      {
+        value: 'space-around',
+        icon: markRaw(JustifyContentSpaceAround),
+        tooltip: '横向平分 space-around',
+      },
     ],
     display: (_mForm, { model }: { model: Record<any, any> }) => model.display === 'flex',
   },
@@ -113,13 +163,22 @@ const formConfig = defineFormConfig([
     text: '辅轴对齐',
     type: 'radioGroup',
     childType: 'button',
-    labelWidth: '68px',
+    labelWidth: '90px',
+    iconSize: '24px',
     options: [
-      { value: 'flex-start', icon: markRaw(JustifyContentFlexStart), tooltip: '左对齐 flex-start' },
-      { value: 'flex-end', icon: markRaw(JustifyContentFlexEnd), tooltip: '右对齐 flex-end' },
-      { value: 'center', icon: markRaw(JustifyContentCenter), tooltip: '居中 center' },
-      { value: 'space-between', icon: markRaw(JustifyContentSpaceBetween), tooltip: '两端对齐 space-between' },
-      { value: 'space-around', icon: markRaw(JustifyContentSpaceAround), tooltip: '横向平分 space-around' },
+      { value: 'flex-start', icon: markRaw(AlignItemsFlexStart), tooltip: '左对齐 flex-start' },
+      { value: 'flex-end', icon: markRaw(AlignItemsFlexEnd), tooltip: '右对齐 flex-end' },
+      { value: 'center', icon: markRaw(AlignItemsCenter), tooltip: '居中 center' },
+      {
+        value: 'space-between',
+        icon: markRaw(AlignItemsSpaceBetween),
+        tooltip: '两端对齐 space-between',
+      },
+      {
+        value: 'space-around',
+        icon: markRaw(AlignItemsSpaceAround),
+        tooltip: '横向平分 space-around',
+      },
     ],
     display: (_mForm, { model }: { model: Record<any, any> }) => model.display === 'flex',
   },
@@ -127,8 +186,9 @@ const formConfig = defineFormConfig([
     name: 'flexWrap',
     text: '换行',
     type: 'radioGroup',
-    childType: 'button',
-    labelWidth: '68px',
+    childType: displayTheme.value !== 'magic-admin' ? 'button' : 'default',
+    labelWidth: '90px',
+    iconSize: '24px',
     options: [
       { value: 'nowrap', text: '不换行', tooltip: '不换行 nowrap' },
       { value: 'wrap', text: '正换行', tooltip: '第一行在上方 wrap' },
@@ -141,17 +201,22 @@ const formConfig = defineFormConfig([
     items: [
       {
         name: 'width',
-        text: '宽度',
-        labelWidth: '68px',
+        text: '宽度（px）',
+        labelWidth: '90px',
         type: 'data-source-field-select',
         fieldConfig: {
           type: 'text',
         },
       },
+    ],
+  },
+  {
+    type: 'row',
+    items: [
       {
         name: 'height',
-        text: '高度',
-        labelWidth: '68px',
+        text: '高度（px）',
+        labelWidth: '90px',
         type: 'data-source-field-select',
         fieldConfig: {
           type: 'text',
@@ -166,7 +231,7 @@ const formConfig = defineFormConfig([
         type: 'data-source-field-select',
         text: 'overflow',
         name: 'overflow',
-        labelWidth: '68px',
+        labelWidth: '90px',
         checkStrictly: false,
         dataSourceFieldType: ['string'],
         fieldConfig: {
@@ -184,11 +249,16 @@ const formConfig = defineFormConfig([
           ],
         },
       },
+    ],
+  },
+  {
+    type: 'row',
+    items: [
       {
         type: 'data-source-field-select',
-        text: '透明度',
+        text: '透明度（%）',
         name: 'opacity',
-        labelWidth: '68px',
+        labelWidth: '90px',
         dataSourceFieldType: ['string', 'number'],
         fieldConfig: {
           type: 'text',

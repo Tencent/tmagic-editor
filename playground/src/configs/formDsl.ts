@@ -8,6 +8,16 @@ export default createForm([
     extra: (vm: any, { model }: any) => `${model.text}extra`,
     rules: [{ required: true, message: '请输入活动名称', trigger: 'blur' }],
   },
+  // `img-upload` 是 playground 自定义业务字段，未在 `FormItemConfig` 联合里注册；
+  // `checkStrictly` 又是 `DataSourceFieldSelectConfig` 的专属字段，会把 TS 收窄到该
+  // 分支再报「type 不匹配」。这里用 `as any` 放过，正式工程里应通过 `createForm<T>`
+  // 的泛型把自定义类型并入。
+  {
+    type: 'img-upload',
+    checkStrictly: false,
+    name: 'backgroundImage',
+    text: '背景图',
+  } as any,
   {
     type: 'checkbox',
     text: 'checkbox',

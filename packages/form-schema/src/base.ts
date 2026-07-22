@@ -50,6 +50,9 @@ export interface FieldProps<T = any> {
   size?: 'large' | 'default' | 'small';
   lastValues?: Record<string, any>;
   isCompare?: boolean;
+  text?: string;
+  labelWidth?: string | number;
+  labelPosition?: 'top' | 'left' | 'right';
 }
 
 /**
@@ -110,6 +113,8 @@ export interface FormItem {
   name?: string | number;
   /** 额外的提示信息，和 help 类似，当提示文案同时出现时，可以使用这个。 */
   extra?: string | FilterFunction<string>;
+  /** 额外的提示信息，和 extra 类似，着重强调时用这个显示，优先级高于extra*/
+  extraTips?: string;
   /** 配置提示信息 */
   tooltip?: ToolTipConfigType | FilterFunction<ToolTipConfigType>;
   /** 是否置灰 */
@@ -130,6 +135,8 @@ export interface FormItem {
   trim?: boolean;
   /** 默认值 */
   defaultValue?: any | DefaultValueFunction;
+  /** 标题下方的额外提示信息 */
+  titleExtra?: string;
   /** 表单验证规则 */
   rules?: Rule[];
   extensible?: boolean;
@@ -139,6 +146,9 @@ export interface FormItem {
   style?: Record<string, any>;
   fieldStyle?: Record<string, any>;
   labelPosition?: 'top' | 'left' | 'right';
+  flat?: boolean;
+  fixed?: boolean | 'left' | 'right';
+  operateColWidth?: number | string;
 }
 // #endregion FormItem
 
@@ -386,6 +396,12 @@ export interface TextConfig extends FormItem, Input {
   tooltip?: string;
   /** 是否可清空 */
   clearable?: boolean;
+  /**
+   * 是否以纯文本（非输入框）形态渲染。
+   * 开启后字段值以 `<span>` 展示，不参与编辑，但保留 `prepend` / `append` 槽位，
+   * 适合用于「只读但需要保留操作按钮（如复制 icon）」的场景。
+   */
+  static?: boolean;
   prepend?: string;
   /** 后置元素，一般为标签或按钮 */
   append?:
@@ -393,7 +409,8 @@ export interface TextConfig extends FormItem, Input {
     | {
         text: string;
         value?: 0 | 1;
-        type: 'button';
+        type: 'button' | 'icon';
+        extra?: string;
         handler?: (
           mForm: FormState | undefined,
           data: {
@@ -529,6 +546,7 @@ export interface SwitchConfig extends FormItem {
 export interface RadioGroupConfig extends FormItem {
   type: 'radio-group' | 'radioGroup';
   childType?: 'default' | 'button';
+  iconSize?: string;
   options: {
     value: string | number | boolean;
     text?: string;
@@ -718,6 +736,7 @@ export interface TabPaneConfig<T = never> {
   title: string;
   lazy?: boolean;
   labelWidth?: string;
+  titleExtra?: string;
   items: FormConfig<T>;
   display?: boolean | 'expand' | FilterFunction<boolean | 'expand'>;
   onTabClick?: (mForm: FormState | undefined, tab: any, data: any) => void;
@@ -772,6 +791,11 @@ export interface PanelConfig<T = never> extends FormItem, ContainerCommonConfig<
   expand?: boolean;
   title?: string;
   schematic?: string;
+  /**
+   * 是否「铺平」：去掉 panel 自身的卡片视觉（背景 / 阴影 / 边框 / 圆角 / 内边距等），
+   * 让 panel 在视觉上与外层容器融为一体。仍保留 header、折叠等交互。
+   */
+  flat?: boolean;
 }
 // #endregion PanelConfig
 
@@ -825,6 +849,8 @@ export interface TableConfig<T = never> extends TableGroupListCommonConfig {
   /** 操作栏宽度 */
   operateColWidth?: number | string;
   pagination?: boolean;
+  /** 表格标题前缀 ，新增xxx,暂无xxx数据，表明表格内容是什么 */
+  titlePrefix?: string;
   /** 是否显示删除按钮 */
   delete?: (model: any, index: number, values: any) => boolean | boolean;
   copyable?: (model: any, data: any) => boolean | boolean;
@@ -865,6 +891,13 @@ export interface GroupListConfig<T = never> extends TableGroupListCommonConfig {
   title?: string | FilterFunction<string>;
   itemExtra?: string | FilterFunction<string>;
   expandAll?: boolean;
+  /**
+   * 铺平模式：去除每个 item 外层卡片视觉（背景、阴影、顶/左/右边框、header 分隔线、内边距），
+   * 但保留标题 + 删除/复制/上/下移/移动至等头部按钮。适合外层已有自己的视觉容器、
+   * 不希望再嵌套一层 card 的场景（例如 `EventSelect` 里的 actions 列表）。
+   * item 之间仍保留底部分隔线，最后一项除外。
+   */
+  flat?: boolean;
   /**
    * 默认展开的数量，用于控制分组列表默认展示的项数
    * 当设置为数字时，表示默认展开指定数量的项

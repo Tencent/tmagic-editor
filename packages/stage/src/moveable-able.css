@@ -1,7 +1,7 @@
 .moveable-button {
   width: 20px;
   height: 20px;
-  background: #4af;
+  background: var(--el-color-primary,#4af);
   border-radius: 4px;
   appearance: none;
   border: 0;

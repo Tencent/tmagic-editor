@@ -8,6 +8,7 @@ import './theme/index.scss';
 
 export * from './types';
 export * from './config';
+export * from './theme';
 export * from './formValidateMessage';
 
 export { default as TMagicAutocomplete } from './Autocomplete.vue';
@@ -94,6 +95,10 @@ export let useZIndex = (zIndexOverrides?: Ref<number>) => {
   };
 };
 
+// 与 form/utils/config、editor/utils/config 里的同名变量保持一致：用 ref 持有 flat 全局开关，
+// const 引用本身不可变，规避 `no-mutable-exports` / `naming-convention` 对 `let` 模块变量的限制。
+export const isGlobalFlat = ref(false);
+
 export default {
   install(app: App, options: DesignPluginOptions) {
     tMagicMessage =
@@ -128,6 +133,8 @@ export default {
     if (options.useZIndex) {
       useZIndex = options.useZIndex;
     }
+
+    isGlobalFlat.value = options.flat ?? false;
 
     if (options.adapterType && globalThis.document?.documentElement) {
       globalThis.document.documentElement.classList.add(`tmagic-adapter-${options.adapterType}`);

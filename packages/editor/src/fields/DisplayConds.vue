@@ -68,12 +68,15 @@ const config = computed<GroupListConfig>(() => ({
   titlePrefix: props.config.titlePrefix,
   expandAll: true,
   enableToggleMode: false,
+  flat: props.config.flat,
   items: [
     {
       type: 'table',
       name: 'cond',
-      operateColWidth: 80,
+      operateColWidth: props.config.operateColWidth,
       enableToggleMode: false,
+      fixed: props.config.fixed,
+      flat: props.config.flat,
       items: [
         parentFields.value.length
           ? {

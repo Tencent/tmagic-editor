@@ -6,7 +6,10 @@
   width: 100%;
 
   &-content {
-    height: calc(100% - #{$nav-height});
+    // 与 nav-menu.scss 的 `--editor-nav-height` 联动：默认 fallback 到 SCSS
+    // `$nav-height`（35px），主题覆盖时两处会同时切成同一个高度，保证 nav 和
+    // 主内容区总高度 = 100%。
+    height: calc(100% - var(--editor-nav-height, #{$nav-height}));
   }
 
   &-framework-center {

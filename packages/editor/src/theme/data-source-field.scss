@@ -5,6 +5,10 @@
   width: 100%;
   display: flex;
   align-items: center;
+  &.data-source-field-img-upload,
+  &.data-source-field-big-img-upload {
+    align-items: flex-start;
+  }
 
   .m-fields-select-action-button {
     margin-left: 5px;

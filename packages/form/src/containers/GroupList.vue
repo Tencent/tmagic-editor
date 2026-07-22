@@ -2,7 +2,7 @@
   <div class="m-fields-group-list">
     <div v-if="config.extra" v-html="config.extra" style="color: rgba(0, 0, 0, 0.45)"></div>
     <div v-if="!model[name] || !model[name].length" class="el-table__empty-block">
-      <span class="el-table__empty-text t-table__empty">暂无数据</span>
+      <span class="el-table__empty-text t-table__empty">暂无{{ config.titlePrefix || '' }}数据</span>
     </div>
 
     <MFieldsGroupListItem

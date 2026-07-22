@@ -70,6 +70,7 @@ export interface CodeSelectConfig extends FormItem {
 // #region CodeSelectColConfig
 export interface CodeSelectColConfig extends FormItem {
   type: 'code-select-col';
+
   /** 是否可以编辑代码块，disable表示的是是否可以选择代码块 */
   notEditable?: boolean | FilterFunction;
 }

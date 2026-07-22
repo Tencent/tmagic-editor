@@ -11,6 +11,7 @@
       :datasource-event-method-list="datasourceEventMethodList"
       :datasource-configs="datasourceConfigs"
       :datasource-values="datasourceValues"
+      theme="magic-admin"
       :component-group-list="componentGroupList"
       :datasource-list="datasourceList"
       :default-selected="defaultSelected"
@@ -62,6 +63,7 @@ import {
   TMagicDialog,
   TMagicEditor,
   tMagicMessage,
+  uiService,
 } from '@tmagic/editor';
 
 import DeviceGroup from '../components/DeviceGroup.vue';
@@ -74,6 +76,8 @@ import { useEditorMoveableOptions } from './composables/use-editor-moveable-opti
 import { useEditorRes } from './composables/use-editor-res';
 
 const { VITE_RUNTIME_PATH } = import.meta.env;
+
+uiService.set('propsPanelSize', 'default');
 
 const datasourceList: DatasourceTypeOption[] = [];
 const runtimeUrl = `${VITE_RUNTIME_PATH}/playground/index.html`;

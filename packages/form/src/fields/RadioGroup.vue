@@ -1,5 +1,11 @@
 <template>
-  <TMagicRadioGroup v-if="model" :model-value="model[name]" :size="size" :disabled="disabled">
+  <TMagicRadioGroup
+    v-if="model"
+    :model-value="model[name]"
+    :size="size"
+    :disabled="disabled"
+    class="icon-{{ iconSize }}"
+  >
     <component
       v-for="option in config.options"
       :is="itemComponent"
@@ -8,9 +14,14 @@
       @click="clickHandler(option.value)"
     >
       <TMagicTooltip :disabled="!Boolean(option.tooltip)" placement="top-start" :content="option.tooltip">
-        <div>
-          <TMagicIcon v-if="option.icon" :size="iconSize"><component :is="option.icon"></component></TMagicIcon>
-          <span v-if="option.text">{{ option.text }}</span>
+        <div class="m-fields-radio-group__option">
+          <TMagicIcon
+            v-if="option.icon"
+            :size="iconSize"
+            :class="{ 'm-fields-radio-group__icon_with_text': !!option.text }"
+            ><component :is="option.icon"></component
+          ></TMagicIcon>
+          <span v-if="option.text" class="m-fields-radio-group__text">{{ option.text }}</span>
         </div>
       </TMagicTooltip>
     </component>
@@ -45,13 +56,17 @@ const clickHandler = (item: string | number | boolean) => {
 
 useAddField(props.prop);
 
+// 这里换了设计稿里的图标，所以需要调整一下图标大小
 const iconSize = computed(() => {
+  if (props.config.iconSize) {
+    return props.config.iconSize;
+  }
   if (props.size === 'small') {
-    return '12';
+    return '14';
   }
   if (props.size === 'large') {
     return '16';
   }
-  return '14';
+  return '16';
 });
 </script>

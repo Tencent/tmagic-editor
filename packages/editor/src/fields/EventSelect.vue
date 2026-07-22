@@ -12,16 +12,21 @@
       @change="onChangeHandler"
     ></MTable>
 
-    <div v-else class="fullWidth">
-      <TMagicButton
-        v-if="!isCompareMode"
-        class="create-button"
-        type="primary"
-        :size="size"
-        :disabled="disabled"
-        @click="addEvent()"
-        >添加事件</TMagicButton
-      >
+    <div v-else class="fullWidth event-select-container">
+      <div class="event-select-header">
+        <div class="event-select-title">事件配置</div>
+        <TMagicButton
+          v-if="!isCompareMode && displayList.length > 0"
+          class="create-button"
+          text
+          type="primary"
+          :icon="Plus"
+          :size="size"
+          :disabled="disabled"
+          @click="addEvent()"
+          >添加事件</TMagicButton
+        >
+      </div>
       <MPanel
         v-for="entry in displayList"
         :key="entry.index"
@@ -32,32 +37,45 @@
         :model="entry.cardItem"
         :last-values="entry.lastCardItem"
         :is-compare="isCompareMode"
+        :hide-expand="true"
         :label-width="config.labelWidth || '100px'"
         @change="onChangeHandler"
       >
         <template #header>
-          <MFormContainer
-            class="fullWidth"
-            :config="eventNameConfig"
-            :model="entry.cardItem"
-            :last-values="entry.lastCardItem"
-            :is-compare="isCompareMode"
-            :disabled="disabled"
-            :size="size"
-            :prop="`${prop}.${entry.index}`"
-            @change="eventNameChangeHandler"
-          ></MFormContainer>
-          <TMagicButton
-            v-if="!isCompareMode"
-            style="color: #f56c6c"
-            link
-            :icon="Delete"
-            :disabled="disabled"
-            :size="size"
-            @click="removeEvent(Number(entry.index))"
-          ></TMagicButton>
+          <div class="event-item-header">
+            <div class="event-item-title">事件{{ Number(entry.index) + 1 }}</div>
+            <MFormContainer
+              class="fullWidth"
+              :config="eventNameConfig"
+              :model="entry.cardItem"
+              :last-values="entry.lastCardItem"
+              :is-compare="isCompareMode"
+              :disabled="disabled"
+              :size="size"
+              :prop="`${prop}.${entry.index}`"
+              @change="eventNameChangeHandler"
+            ></MFormContainer>
+            <TMagicButton
+              class="event-item-delete-button"
+              v-if="!isCompareMode"
+              link
+              :icon="Delete"
+              :disabled="disabled"
+              :size="size"
+              @click="removeEvent(Number(entry.index))"
+            ></TMagicButton>
+          </div>
         </template>
       </MPanel>
+
+      <TMagicButton
+        v-if="!isCompareMode"
+        class="create-button fullWidth"
+        :icon="Plus"
+        :disabled="disabled"
+        @click="addEvent()"
+        >添加事件</TMagicButton
+      >
     </div>
   </div>
 </template>
@@ -65,6 +83,7 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
 import { Delete } from '@element-plus/icons-vue';
+import { Plus } from '@element-plus/icons-vue';
 import { has } from 'lodash-es';
 
 import { ActionType } from '@tmagic/core';
@@ -108,7 +127,7 @@ const { editorService, dataSourceService, eventsService, codeBlockService, props
 const eventNameConfig = computed(() => {
   const defaultEventNameConfig = {
     name: 'name',
-    text: '事件',
+    text: '事件类型',
     type: (mForm: FormState | undefined, { formValue }: any) => {
       if (
         props.config.src !== 'component' ||
@@ -118,7 +137,7 @@ const eventNameConfig = computed(() => {
       }
       return 'select';
     },
-    labelWidth: '40px',
+    labelWidth: '70px',
     checkStrictly: () => props.config.src !== 'component',
     valueSeparator: '.',
     options: (_mForm: FormState, { formValue }: any) => getEventNameOptions(props.config.src, formValue),
@@ -178,6 +197,7 @@ const actionTypeConfig = computed(() => {
     name: 'actionType',
     text: '联动类型',
     type: 'select',
+    labelPosition: 'left',
     defaultValue: ActionType.COMP,
     options: actionTypeOptions.value,
     rules: [
@@ -200,6 +220,7 @@ const targetCompConfig = computed(() => {
     name: 'to',
     text: '联动组件',
     type: 'ui-select',
+    labelPosition: 'left',
     display: (_mForm, { model }) => model.actionType === ActionType.COMP,
     onChange: (_MForm, _v, { setModel }) => {
       setModel('method', '');
@@ -219,6 +240,7 @@ const compActionConfig = computed(() => {
   const defaultCompActionConfig: DynamicTypeConfig = {
     name: 'method',
     text: '动作',
+    labelPosition: 'left',
     type: (mForm: FormState | undefined, { model }: any) => {
       const to = editorService.getNodeById(model.to);
 
@@ -317,6 +339,8 @@ const actionsConfig = computed(
   () =>
     defineFormItem({
       type: 'panel',
+      labelPosition: 'left',
+      flat: true,
       items: [
         {
           type: 'group-list',
@@ -324,6 +348,8 @@ const actionsConfig = computed(
           expandAll: true,
           enableToggleMode: false,
           titlePrefix: '动作',
+          labelPosition: 'left',
+          flat: true,
           items: [
             actionTypeConfig.value,
             targetCompConfig.value,

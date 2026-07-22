@@ -44,6 +44,12 @@ vi.mock('@tmagic/design', () => ({
       return () => h('div', { class: 'fake-card' }, slots.default?.());
     },
   }),
+  TMagicButton: defineComponent({
+    name: 'TMagicButton',
+    setup(_p, { slots }) {
+      return () => h('button', { class: 'fake-button' }, slots.default?.());
+    },
+  }),
 }));
 
 const baseProps = (extra: any = {}) => ({
@@ -108,13 +114,11 @@ describe('CodeSelect', () => {
     expect((props.model.cs as any).hookData).toEqual([]);
   });
 
-  test('codeType row items 配置正确', () => {
+  test('codeType items 配置正确', () => {
     const wrapper = mount(CodeSelect, { props: baseProps() as any });
     const container = wrapper.findComponent({ name: 'MContainer' });
     const config = container.props('config') as any;
-    const row = config.items[0];
-    expect(row.type).toBe('row');
-    const codeTypeSelect = row.items[0];
+    const codeTypeSelect = config.items[0];
     expect(codeTypeSelect.name).toBe('codeType');
     const setModel = vi.fn();
     codeTypeSelect.onChange(undefined, 'data-source-method', { setModel });
@@ -128,9 +132,8 @@ describe('CodeSelect', () => {
     const wrapper = mount(CodeSelect, { props: baseProps() as any });
     const container = wrapper.findComponent({ name: 'MContainer' });
     const config = container.props('config') as any;
-    const row = config.items[0];
-    const codeIdCol = row.items[1];
-    const dsCol = row.items[2];
+    const codeIdCol = config.items[1];
+    const dsCol = config.items[2];
     expect(codeIdCol.display(undefined, { model: { codeType: 'code' } })).toBe(true);
     expect(codeIdCol.display(undefined, { model: { codeType: 'data-source-method' } })).toBe(false);
     expect(dsCol.display(undefined, { model: { codeType: 'data-source-method' } })).toBe(true);
@@ -141,9 +144,8 @@ describe('CodeSelect', () => {
     const wrapper = mount(CodeSelect, { props: baseProps() as any });
     const container = wrapper.findComponent({ name: 'MContainer' });
     const config = container.props('config') as any;
-    const row = config.items[0];
-    const codeIdCol = row.items[1];
-    const dsCol = row.items[2];
+    const codeIdCol = config.items[1];
+    const dsCol = config.items[2];
     expect(codeIdCol.type).toBe('code-select-col');
     expect(codeIdCol.rules).toEqual([{ typeMatch: true, trigger: 'change' }]);
     expect(dsCol.type).toBe('data-source-method-select');
@@ -156,9 +158,8 @@ describe('CodeSelect', () => {
     const wrapper = mount(CodeSelect, { props: baseProps() as any });
     const container = wrapper.findComponent({ name: 'MContainer' });
     const config = container.props('config') as any;
-    const row = config.items[0];
-    expect(row.items[1].notEditable()).toBe(true);
-    expect(row.items[2].notEditable()).toBe(true);
+    expect(config.items[1].notEditable()).toBe(true);
+    expect(config.items[2].notEditable()).toBe(true);
     codeBlockService.getEditStatus.mockReturnValue(true);
     dataSourceService.get.mockReturnValue(true);
   });

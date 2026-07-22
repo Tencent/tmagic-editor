@@ -1,3 +1,40 @@
 .m-fields-code-select {
   width: 100%;
+  > .el-card.tmagic-design-card--flat {
+    background-color: transparent;
+    margin-bottom: 10px;
+    > .el-card__body {
+      padding-left: 0;
+      .code-select-content {
+        > .m-fields-group-list {
+          > .tmagic-design-card--flat.el-card {
+            padding-left: 16px;
+            padding-right: 16px;
+            margin-bottom: 10px;
+            border: 0 !important;
+          }
+        }
+      }
+    }
+  }
+  .el-card__body {
+    .tmagic-design-form-item {
+      margin-bottom: 18px;
+    }
+  }
+  .code-select-content {
+    > .m-fields-group-list {
+      > .tmagic-design-card--flat {
+        > .el-card__header {
+          padding: 16px 0;
+        }
+      }
+    }
+  }
+  .create-button {
+    &.fullWidth {
+      width: 100%;
+      margin: 0 0 16px 0;
+    }
+  }
 }

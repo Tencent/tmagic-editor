@@ -49,13 +49,14 @@ const state = shallowReactive<UiState>({
     width: 375,
     height: 817,
   },
+  // 先给 columnWidth 留占位，真正的 clamp 逻辑在 state 创建完成后
+  // 用 state.minLeftColumnWidth / state.minRightColumnWidth 作为下限重新赋值 —
+  // 这样以后从外部（比如 uiService.set('minLeftColumnWidth', ...)）动态改最小宽度，
+  // 只改一处 state 字段即可，不用同步 MIN_* 常量。
   columnWidth: {
-    left:
-      storageService.getItem(LEFT_COLUMN_WIDTH_STORAGE_KEY, { protocol: Protocol.NUMBER }) || DEFAULT_LEFT_COLUMN_WIDTH,
+    left: 0,
     center: 0,
-    right:
-      storageService.getItem(RIGHT_COLUMN_WIDTH_STORAGE_KEY, { protocol: Protocol.NUMBER }) ||
-      DEFAULT_RIGHT_COLUMN_WIDTH,
+    right: 0,
   },
   minLeftColumnWidth: MIN_LEFT_COLUMN_WIDTH,
   minCenterColumnWidth: MIN_CENTER_COLUMN_WIDTH,
@@ -82,6 +83,20 @@ const state = shallowReactive<UiState>({
     top: 0,
   },
 });
+
+// 左右两栏宽度延后初始化：
+// - 优先取 storage 里用户上次拖到的值；storage 空时回落到 DEFAULT_*；
+// - 再用 state.min*ColumnWidth 兜底，防止历史 storage 里存的是老版本或用户拖过头
+//   留下的"比当前 min 还小"的数值。放到 state 之后写是因为初始化时无法在同一个
+//   对象字面量里读到自己的其它字段。
+state.columnWidth.left = Math.max(
+  storageService.getItem(LEFT_COLUMN_WIDTH_STORAGE_KEY, { protocol: Protocol.NUMBER }) || DEFAULT_LEFT_COLUMN_WIDTH,
+  state.minLeftColumnWidth,
+);
+state.columnWidth.right = Math.max(
+  storageService.getItem(RIGHT_COLUMN_WIDTH_STORAGE_KEY, { protocol: Protocol.NUMBER }) || DEFAULT_RIGHT_COLUMN_WIDTH,
+  state.minRightColumnWidth,
+);
 
 const canUsePluginMethods = {
   async: ['zoom', 'calcZoom'] as const,

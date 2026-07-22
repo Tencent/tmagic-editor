@@ -2,6 +2,30 @@
   display: flex;
   align-items: center;
   width: 100%;
+
+  // 纯文本（非输入框）形态：保留 prepend / append 槽位的横向布局。
+  // 配合 `TextConfig.static = true` 使用，常见于 ID 之类「只读 + 操作 icon」场景。
+  &--static {
+    gap: 6px;
+    min-height: 32px;
+
+    .m-fields-text__prepend {
+      color: var(--el-text-color-secondary, #909399);
+    }
+
+    .m-fields-text__value {
+      color: var(--el-text-color-regular, #606266);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .m-fields-text__icon {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+  }
 }
 
 .m-form-validate__warning {
@@ -26,6 +50,20 @@
 
   &:focus {
     outline: none;
+  }
+}
+
+.m-container-text {
+  &.m-fields-title-container {
+    .tmagic-design-form-item {
+      .el-form-item__label {
+        color: #0f1113;
+        font-weight: 500;
+        font-size: 16px;
+      }
+      line-height: 24px;
+      margin-bottom: 16px;
+    }
   }
 }
 

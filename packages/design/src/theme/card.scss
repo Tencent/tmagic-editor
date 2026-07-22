@@ -1,0 +1,67 @@
+// `TMagicCard` 的「铺平」模式：去掉卡片自身的视觉表达（背景 / 阴影 / 边框 / 圆角 /
+// header 分隔线 / header & body 内边距），让卡片在视觉上与外层容器融为一体。
+//
+// 不动 body-style、不动折叠相关 prop —— 这些上层用法仍可正常工作。
+// `is-always-shadow` 是 el-card 在 `shadow="always"` 时附加的类，需要单独再压一次。
+.tmagic-design-card.tmagic-design-card--flat {
+  background: #fff;
+  box-shadow: none !important;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  border-radius: 0;
+  border-bottom: 0;
+
+  &.m-fields-group-list-item {
+    margin-bottom: 0;
+  }
+  &.is-always-shadow {
+    box-shadow: none;
+  }
+
+  .el-card__header {
+    border-bottom: none;
+    padding: 16px;
+    &:hover {
+      background: transparent;
+      box-shadow: none;
+      cursor: default;
+    }
+  }
+
+  .el-card__body {
+    padding: 0 16px 0 16px;
+    // 这里每个form-item应该要有一个16px间距，但是除了tbody中的form-item
+    .tmagic-design-form-item:not(tbody .tmagic-design-form-item) {
+      margin-bottom: 16px;
+    }
+    > .m-container-row {
+      overflow-x: hidden;
+    }
+  }
+  .tmagic-design-card--flat {
+    // .el-card__body {
+    //   padding: 0;
+    // }
+    // .el-card__header {
+    //   padding: 0 16px;
+    // }
+  }
+}
+
+.m-split-title-card-container {
+  > .tmagic-design-card.tmagic-design-card--flat {
+    background-color: transparent;
+    > .el-card__header {
+      margin-bottom: 10px;
+      padding: 0;
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 24px;
+    }
+    > .el-card__body {
+      background-color: #fff;
+      padding-top: 16px;
+    }
+  }
+}

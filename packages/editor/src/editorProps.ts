@@ -35,6 +35,10 @@ import type {
 export const ENABLE_PROPS_FORM_VALIDATE: InjectionKey<boolean> = Symbol('enablePropsFormValidate');
 
 export interface EditorProps {
+  /** 是否是大屏模拟器容器，大屏容器时，左侧属性面板会扩展为两列（正常3列），颜色表单不扩展两列等 */
+  isLargeStageContainer?: boolean;
+
+  theme?: string;
   /** 页面初始值 */
   modelValue?: MApp;
   /** 左侧面板中的组件类型列表 */

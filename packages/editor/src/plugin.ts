@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import type { App } from 'vue';
+import { type App } from 'vue';
 
 import type { DesignPluginOptions } from '@tmagic/design';
 import designPlugin from '@tmagic/design';
@@ -56,6 +56,8 @@ const defaultInstallOpt: EditorInstallOptions = {
   customCreateMonacoEditor: (monaco, codeEditorEl, options) => monaco.editor.create(codeEditorEl, options),
   customCreateMonacoDiffEditor: (monaco, codeEditorEl, options) =>
     monaco.editor.createDiffEditor(codeEditorEl, options),
+
+  flat: false,
 };
 
 export default {
@@ -69,7 +71,6 @@ export default {
 
     app.config.globalProperties.$TMAGIC_EDITOR = option;
     setEditorConfig(option);
-
     app.component(`${Editor.name || 'MEditor'}`, Editor);
     app.component('magic-code-editor', CodeEditor);
     app.component('m-fields-ui-select', uiSelect);

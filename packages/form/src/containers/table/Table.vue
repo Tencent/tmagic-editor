@@ -27,6 +27,7 @@
             :key="updateKey"
             @select="selectHandle"
             @sort-change="sortChangeHandler"
+            :empty-text="`暂无${config.titlePrefix || ''}数据`"
           ></TMagicTable>
         </TMagicTooltip>
 

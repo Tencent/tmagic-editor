@@ -1,0 +1,95 @@
+// magic-admin 主题：所有规则均以 `.m-form.m-form--magic-admin` 为前缀，
+// 仅在 `<MForm theme="magic-admin" />` 时生效，避免污染默认样式。
+@use "../../index.scss";
+
+.m-form.m-form--magic-admin {
+  // 精确匹配"只挂 `m-form-container` + `m-container-fieldset` 这两个 class"的元素：
+  // `.a.b` 只能保证"包含"这两个 class，多余的 class 也会命中；
+  // 用 `[class="..."]` 做全量字符串等值匹配即可排除第三个 class 的情况。
+  // 由于 Vue/框架不保证 class 拼接顺序，两种顺序都列出以覆盖到位。
+  [class="m-form-container m-container-fieldset"],
+  [class="m-container-fieldset m-form-container"] {
+    margin-top: 15px;
+  }
+
+  .m-container-tab:not(.magic-right-panel-tabs-top):not(
+      .magic-form-dynamic-tab
+    ) {
+    > .tmagic-design-tabs:not(.el-tabs--border-card) {
+      > .el-tabs__content {
+        background-color: #fff;
+        padding: 16px 16px 0 16px;
+        border-radius: 4px;
+      }
+    }
+  }
+
+  .m-container-tab.magic-form-dynamic-tab {
+  }
+
+  .m-form-tip {
+    color: rgba(0, 0, 0, 0.55);
+  }
+
+  .tmagic-design-form-item {
+    &.show-after-diff {
+      background: #d4edbc;
+    }
+
+    &.show-before-diff {
+      background: #fad2cf;
+    }
+  }
+  .m-fields-radio-group__text {
+    // `pre-line` 让 `\n` 渲染为换行，同时保留自动折行；线高与默认按钮组高度对齐。
+    white-space: pre-line;
+    line-height: 20px;
+  }
+  .el-form-item__content {
+    .tmagic-design-radio-group {
+      .tmagic-design-radio-button {
+        height: 32px;
+        .el-radio-button__inner {
+          height: 32px;
+          display: flex;
+          padding-top: 0;
+          padding-bottom: 0;
+          align-items: center;
+        }
+      }
+    }
+  }
+  .m-fields-data-source-field-select .tmagic-design-button {
+    margin-left: 8px;
+    span {
+      font-size: 16px;
+    }
+  }
+
+  .m-fields-group-list-item.tmagic-design-card--flat {
+    .el-card__body {
+      .m-fields-table-wrap {
+        .m-fields-table {
+          .el-table__header-wrapper {
+            thead {
+              height: 48px;
+            }
+          }
+        }
+      }
+    }
+    .m-fields-group-list-item-header {
+      position: relative;
+      .delete-button {
+        position: absolute;
+        right: 0;
+        color: #0f1113;
+      }
+    }
+  }
+  .m-form-container {
+    .m-form-container-expand {
+      text-align: left;
+    }
+  }
+}

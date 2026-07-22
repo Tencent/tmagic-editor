@@ -1,5 +1,9 @@
 <template>
-  <div class="m-editor" ref="content" style="min-width: 900px">
+  <div
+    ref="content"
+    :class="['m-editor', theme ? `m-editor--${theme}` : '', theme ? `m-theme--${theme}` : '']"
+    style="min-width: 900px"
+  >
     <slot name="header"></slot>
 
     <slot name="nav"></slot>
@@ -97,6 +101,8 @@ const props = defineProps<{
   pageFilterFunction?: (_page: MPage | MPageFragment, _keyword: string) => boolean;
   /** 是否隐藏左侧面板 */
   hideSidebar?: boolean;
+  /** 主题名称，会在根节点追加 `m-editor--<theme>` 修饰类 */
+  theme?: string;
 }>();
 
 const codeOptions = inject('codeOptions', {});

@@ -4,7 +4,7 @@
       background: #f2f6fc;
     }
     a {
-      color: #409eff;
+      color: var(--el-color-primary, #409eff);
     }
   }
 
