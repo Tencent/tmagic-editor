@@ -18,6 +18,7 @@
 
 import { type AppContext, type Component, createApp, defineComponent, h, nextTick, type Ref, ref, watch } from 'vue';
 
+import { applyExtendState } from './utils/form';
 import Form from './Form.vue';
 import type { ChangeRecord, FormConfig, FormState } from './schema';
 
@@ -192,17 +193,10 @@ const mountFormInstance = <T>(options: MountFormInstanceOptions<T>): Promise<T> 
                     console.error('[MForm] extendState failed:', e);
                     return;
                   }
-                  const apply = (state: Record<string, any> | null | undefined) => {
-                    if (!state) return;
-                    for (const [key, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(state))) {
-                      if ('value' in descriptor) {
-                        (form.formState as any)[key] = (state as any)[key];
-                      } else {
-                        descriptor.configurable = true;
-                        Object.defineProperty(form.formState, key, descriptor);
-                      }
-                    }
-                  };
+                  // 合并逻辑收口在 applyExtendState：props 派生的只读 getter 字段
+                  // （keyProp 等）以普通字段形式返回时会被跳过并告警，避免 proxy set 抛错
+                  const apply = (state: Record<string, any> | null | undefined) =>
+                    applyExtendState(form.formState, state);
                   if (result && typeof result.then === 'function') {
                     result.then(apply, (e: any) => console.error('[MForm] extendState failed:', e));
                   } else {

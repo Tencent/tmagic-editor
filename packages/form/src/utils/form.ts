@@ -441,6 +441,43 @@ export const sortChange = (data: any[], { prop, order }: SortProp) => {
   }
 };
 
+/**
+ * 将 extendState 返回的扩展字段合并进 formState。
+ *
+ * - data 描述符（普通字段）通过 `formState[key] = value` 写入，走 reactive proxy 的 set，
+ *   触发依赖通知；
+ * - accessor 描述符（`{ get stage() { return ... } }`）按原样 defineProperty，调用方
+ *   可控制读时求值；强制 `configurable: true` 以便下一次合并可再 define。
+ *
+ * 注意：formState 上由 props 派生的字段（keyProp / popperClass / config / initValues /
+ * isCompare / lastValues / parentValues）是只读 getter（无 setter），extendState 若以
+ * 普通字段形式返回同名 key，直接赋值会让 proxy 的 set trap 失败并抛出
+ * `TypeError: 'set' on proxy: trap returned falsish`，这里统一跳过并告警；
+ * 如确需覆盖，可在 extendState 中以 get 访问器形式返回。
+ */
+export const applyExtendState = (formState: FormState, state: Record<string, any> | null | undefined): void => {
+  if (!state) return;
+
+  for (const [key, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(state))) {
+    if (!('value' in descriptor)) {
+      descriptor.configurable = true;
+      Object.defineProperty(formState, key, descriptor);
+      continue;
+    }
+
+    const targetDescriptor = Object.getOwnPropertyDescriptor(formState, key);
+    if (targetDescriptor && !('value' in targetDescriptor) && typeof targetDescriptor.set !== 'function') {
+      console.warn(
+        `[MForm] extendState: "${key}" is a read-only field derived from props and cannot be assigned a plain value. ` +
+          'Return it as a getter accessor if you really need to override it.',
+      );
+      continue;
+    }
+
+    (formState as any)[key] = (state as any)[key];
+  }
+};
+
 export const createObjectProp = (prop: string, key: string, name?: string | number) => {
   if (prop === '') {
     return key;

@@ -173,6 +173,48 @@ describe('Form.vue —— extendState', () => {
     expect(v2).toMatch(/^stage-/);
   });
 
+  test('extendState 以普通字段返回 props 派生的只读字段时跳过并告警，不抛错', async () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const wrapper = mountForm({
+      keyProp: 'id',
+      extendState: () => ({ keyProp: 'custom', config: [], extra: 'ok' }),
+    });
+
+    await nextTick();
+    await nextTick();
+    await nextTick();
+
+    // 只读派生字段保持 props 值，未被覆盖
+    expect((wrapper.vm.formState as any).keyProp).toBe('id');
+    expect(Array.isArray((wrapper.vm.formState as any).config)).toBe(true);
+    // 其他字段正常合并
+    expect((wrapper.vm.formState as any).extra).toBe('ok');
+    expect(warnSpy).toHaveBeenCalled();
+    expect(wrapper.find('.m-form').exists()).toBe(true);
+
+    warnSpy.mockRestore();
+  });
+
+  test('extendState 以 get 访问器返回只读字段同名 key 时允许显式覆盖', async () => {
+    const wrapper = mountForm({
+      keyProp: 'id',
+      extendState: () =>
+        Object.defineProperties(
+          {},
+          {
+            keyProp: { enumerable: true, get: () => 'custom-key' },
+          },
+        ),
+    });
+
+    await nextTick();
+    await nextTick();
+    await nextTick();
+
+    expect((wrapper.vm.formState as any).keyProp).toBe('custom-key');
+  });
+
   test('extendState 同步段读到的响应式数据变化时会重跑', async () => {
     const username = ref('alice');
     const calls: string[] = [];

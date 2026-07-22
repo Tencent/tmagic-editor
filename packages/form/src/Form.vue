@@ -40,7 +40,7 @@ import { setValueByKeyPath } from '@tmagic/utils';
 
 import Container from './containers/Container.vue';
 import { getConfig } from './utils/config';
-import { initValue } from './utils/form';
+import { applyExtendState, initValue } from './utils/form';
 import type {
   ChangeRecord,
   ContainerChangeEventData,
@@ -222,11 +222,10 @@ const formState: FormState = reactive<FormState>({
  * 这里不再重复同步；因此 `props.initValues` 这类高频变化也不会再触发
  * `extendState` 重跑（旧版的性能问题修复点）。
  *
- * 实现细节：
- * - data 描述符：通过 `formState[key] = value` 走 reactive proxy 的 set，
- *   触发依赖通知；与旧版「逐项赋值」语义完全等价。
- * - accessor 描述符（`{ get stage() {...} }`）按原样写入 formState，调用方
- *   可以自行控制读时求值；强制 `configurable: true` 以便下一次重跑可再 define。
+ * 实现细节：合并逻辑统一收口在 `applyExtendState`（utils/form）——
+ * data 描述符走 reactive proxy 的 set 触发依赖通知（与旧版「逐项赋值」语义等价），
+ * accessor 描述符按原样 defineProperty 支持读时求值；
+ * props 派生的只读 getter 字段（keyProp 等）以普通字段形式返回时会被跳过并告警。
  */
 watchEffect(async (onCleanup) => {
   const { extendState } = props;
@@ -246,14 +245,7 @@ watchEffect(async (onCleanup) => {
   }
   if (stale) return;
 
-  for (const [key, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(state))) {
-    if ('value' in descriptor) {
-      (formState as any)[key] = (state as any)[key];
-    } else {
-      descriptor.configurable = true;
-      Object.defineProperty(formState, key, descriptor);
-    }
-  }
+  applyExtendState(formState, state);
 });
 
 provide('mForm', formState);

@@ -79,6 +79,22 @@ describe('submitForm', () => {
     expect(extendState).toHaveBeenCalled();
   });
 
+  test('extendState 返回 keyProp 等只读派生字段时不抛错且正常 resolve', async () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const values = await submitForm({
+      config: [{ type: 'text', name: 'text', text: 'text' }],
+      initValues: { text: 'foo' },
+      extendState: () => ({ keyProp: 'custom', extra: 'value' }),
+      appContext,
+    });
+
+    expect(values).toEqual({ text: 'foo' });
+    expect(warnSpy).toHaveBeenCalled();
+
+    warnSpy.mockRestore();
+  });
+
   test('在嵌套 items 配置下也能正确 resolve', async () => {
     const values = await submitForm({
       config: [
