@@ -1,3 +1,22 @@
+# [1.8.0-beta.15](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.14...v1.8.0-beta.15) (2026-07-23)
+
+
+### Bug Fixes
+
+* **core:** 为背景图片 URL 添加引号 ([97e0cac](https://github.com/Tencent/tmagic-editor/commit/97e0cac44a2d6ceafaf95fbc4ae716bfe5d47f70))
+* **editor:** 使用属性面板中的源码删除样式无效 ([cde0805](https://github.com/Tencent/tmagic-editor/commit/cde08052924ddef1c51faeb68ce15d3195827adb))
+* **editor:** 右键菜单动态变化后修复菜单位置防止截断 ([6919a0a](https://github.com/Tencent/tmagic-editor/commit/6919a0a0b19efff92821fc8d52b61b2f7382a817))
+* 跳过无字段名称配置的类型校验 ([11bf037](https://github.com/Tencent/tmagic-editor/commit/11bf037054774937132743a40006364e49ee8fd5))
+
+
+### Features
+
+* **design:** 优化 FormItem 和 colorPicker 样式 ([2e031cc](https://github.com/Tencent/tmagic-editor/commit/2e031cc1346fb6ea739f0d45a89213b6577dc7ee))
+* **editor:** 数据源字段选择器校验提示细化并支持 fieldConfig 类型校验 ([fe9e754](https://github.com/Tencent/tmagic-editor/commit/fe9e754b50f14e6034170b2284553ec1c4536150))
+* **form,design:** 一行多个表单默认右靠齐label  ([48abab7](https://github.com/Tencent/tmagic-editor/commit/48abab7051b93b7ed336172c21ab3b908733f2e7))
+* **form,editor:** submitForm/validateForm 静默挂载时注入静默标记，vs-code 字段跳过 monaco 渲染 ([3b9d5da](https://github.com/Tencent/tmagic-editor/commit/3b9d5da0bc9f323e944c0e2adb4fc88642ce1915))
+* **form:** text 类型校验允许数字值，兼容数据源字段配置 ([1f389ff](https://github.com/Tencent/tmagic-editor/commit/1f389ff9fd77fb93ad749f3fdbbc8aa0fe8725ac))
+* 新增 page-structure-change 事件，支持页面增删统一通知 ([745f449](https://github.com/Tencent/tmagic-editor/commit/745f44939605528e8e2ccd0639478db98293a441))
 # [1.8.0-beta.14](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.13...v1.8.0-beta.14) (2026-07-23)
 
 
