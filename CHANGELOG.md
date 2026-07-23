@@ -1,3 +1,18 @@
+# [1.8.0-beta.14](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.13...v1.8.0-beta.14) (2026-07-23)
+
+
+### Bug Fixes
+
+* **editor:** 保留历史操作来源并补发插入事件 ([89689bb](https://github.com/Tencent/tmagic-editor/commit/89689bb9fd2d2d3edcc027b87932cbdd3a5755ad))
+* **form:** 统一 extendState 合并逻辑 ([0feada8](https://github.com/Tencent/tmagic-editor/commit/0feada8d1fa4057444da746040b3824df09eef07))
+* **stage:** 修复选中组件时 stage 外层滚动 ([09eecd5](https://github.com/Tencent/tmagic-editor/commit/09eecd5bedd49e5a002fa5ef122eaa1579dc895b))
+* 调整编辑器配置项展示 ([8699dc1](https://github.com/Tencent/tmagic-editor/commit/8699dc12af9d52b1c460f61f3d3f48e4cf3fc5f6))
+
+
+### Features
+
+* **design,editor:** 新增magic-admin主题样式,优化组件表单配置布局样式 ([b13cd34](https://github.com/Tencent/tmagic-editor/commit/b13cd3425b16eaeac33f897bf51e80f7984db782))
+* playground 支持主题切换 ([ee5247c](https://github.com/Tencent/tmagic-editor/commit/ee5247ca9436c385a5b634d161726006912fe77c))
 # [1.8.0-beta.13](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.11...v1.8.0-beta.13) (2026-07-22)
 
 
