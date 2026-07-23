@@ -4,9 +4,26 @@
  * Copyright (C) 2025 Tencent.
  */
 import { afterEach, describe, expect, test, vi } from 'vitest';
+import { nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
 
 import ContentMenu from '@editor/components/ContentMenu.vue';
+
+const roCallbacks: Array<() => void> = [];
+class FakeResizeObserver {
+  public static disconnectSpy = vi.fn();
+  public cb: () => void;
+  constructor(cb: () => void) {
+    this.cb = cb;
+    roCallbacks.push(cb);
+  }
+  public observe() {}
+  public unobserve() {}
+  public disconnect() {
+    FakeResizeObserver.disconnectSpy();
+  }
+}
+(globalThis as any).ResizeObserver = FakeResizeObserver;
 
 const provideServices = () => ({
   global: {
@@ -22,6 +39,8 @@ const provideServices = () => ({
 describe('ContentMenu.vue', () => {
   afterEach(() => {
     vi.useRealTimers();
+    roCallbacks.length = 0;
+    FakeResizeObserver.disconnectSpy.mockClear();
   });
 
   test('show 后触发 show 事件', async () => {
@@ -65,6 +84,62 @@ describe('ContentMenu.vue', () => {
     (wrapper.vm as any).setPosition({ clientX: 10, clientY: 90 });
     expect((wrapper.vm as any).menuPosition.left).toBe(10);
     expect((wrapper.vm as any).menuPosition.top).toBeLessThanOrEqual(100);
+  });
+
+  test('菜单大小动态变化后修正位置避免超出可视范围', async () => {
+    // jsdom 中 clientWidth/clientHeight 默认为 0，先 mock 一个足够大的视口，避免 show 时位置被修正
+    Object.defineProperty(document.body, 'clientHeight', { value: 1000, configurable: true });
+    Object.defineProperty(document.body, 'clientWidth', { value: 1000, configurable: true });
+
+    const wrapper = mount(ContentMenu as any, {
+      ...provideServices(),
+      props: { menuData: [{ id: '1', type: 'button', text: 'a' }] as any },
+      attachTo: document.body,
+    });
+    (wrapper.vm as any).show({ clientX: 90, clientY: 90 });
+    await new Promise((r) => setTimeout(r, 0));
+    expect((wrapper.vm as any).menuPosition.top).toBe(90);
+    expect((wrapper.vm as any).menuPosition.left).toBe(90);
+
+    // 视口缩小为 100x100
+    Object.defineProperty(document.body, 'clientHeight', { value: 100, configurable: true });
+    Object.defineProperty(document.body, 'clientWidth', { value: 100, configurable: true });
+
+    const menuEl = wrapper.find('.magic-editor-content-menu').element as HTMLElement;
+    // 模拟菜单内容增多后尺寸变为 50x50
+    Object.defineProperty(menuEl, 'clientHeight', { value: 50, configurable: true });
+    Object.defineProperty(menuEl, 'clientWidth', { value: 50, configurable: true });
+
+    roCallbacks.forEach((cb) => cb());
+    await nextTick();
+
+    expect((wrapper.vm as any).menuPosition.top).toBe(50);
+    expect((wrapper.vm as any).menuPosition.left).toBe(50);
+    wrapper.unmount();
+  });
+
+  test('菜单未显示时尺寸变化不修正位置', async () => {
+    const wrapper = mount(ContentMenu as any, {
+      ...provideServices(),
+      props: { menuData: [{ id: '1', type: 'button', text: 'a' }] as any },
+    });
+    Object.defineProperty(document.body, 'clientHeight', { value: 100, configurable: true });
+
+    roCallbacks.forEach((cb) => cb());
+    await nextTick();
+
+    expect((wrapper.vm as any).menuPosition.top).toBe(0);
+    expect((wrapper.vm as any).menuPosition.left).toBe(0);
+    wrapper.unmount();
+  });
+
+  test('卸载时断开 ResizeObserver', () => {
+    const wrapper = mount(ContentMenu as any, {
+      ...provideServices(),
+      props: { menuData: [] as any },
+    });
+    wrapper.unmount();
+    expect(FakeResizeObserver.disconnectSpy).toHaveBeenCalled();
   });
 
   test('contains 判断 DOM 是否在菜单内部', async () => {

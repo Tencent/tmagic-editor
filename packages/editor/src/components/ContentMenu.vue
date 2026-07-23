@@ -128,19 +128,41 @@ const outsideClickHideHandler = (e: MouseEvent) => {
   hide();
 };
 
-const setPosition = (e: { clientY: number; clientX: number }) => {
-  const menuHeight = menuEl.value?.clientHeight || 0;
+// 根据菜单实际尺寸修正位置，避免超出可视范围
+const fixPosition = () => {
+  const menu = menuEl.value;
+  if (!menu || !visible.value) return;
 
-  let top = e.clientY;
-  if (menuHeight + e.clientY > document.body.clientHeight) {
-    top = document.body.clientHeight - menuHeight;
+  const menuHeight = menu.clientHeight;
+  const menuWidth = menu.clientWidth;
+
+  let { top, left } = menuPosition.value;
+
+  if (top + menuHeight > document.body.clientHeight) {
+    top = Math.max(0, document.body.clientHeight - menuHeight);
   }
 
+  if (left + menuWidth > document.body.clientWidth) {
+    left = Math.max(0, document.body.clientWidth - menuWidth);
+  }
+
+  if (top !== menuPosition.value.top || left !== menuPosition.value.left) {
+    menuPosition.value = { top, left };
+  }
+};
+
+const setPosition = (e: { clientY: number; clientX: number }) => {
   menuPosition.value = {
-    top,
+    top: e.clientY,
     left: e.clientX,
   };
+  fixPosition();
 };
+
+// 菜单大小动态变化（如菜单项更新）后重新修正位置
+const resizeObserver = new ResizeObserver(() => {
+  fixPosition();
+});
 
 const show = (e?: { clientY: number; clientX: number }) => {
   visible.value = true;
@@ -186,12 +208,18 @@ const mouseenterHandler = () => {
 };
 
 onMounted(() => {
+  if (menuEl.value) {
+    resizeObserver.observe(menuEl.value);
+  }
+
   if (props.isSubMenu) return;
 
   globalThis.addEventListener('mousedown', outsideClickHideHandler, true);
 });
 
 onBeforeUnmount(() => {
+  resizeObserver.disconnect();
+
   if (props.isSubMenu) return;
 
   globalThis.removeEventListener('mousedown', outsideClickHideHandler, true);
