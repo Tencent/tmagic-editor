@@ -1,3 +1,9 @@
+# [1.8.0-beta.16](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.15...v1.8.0-beta.16) (2026-07-23)
+
+
+### Features
+
+* 参考建议可选值最多展示个数由 5 调整为 20 ([0e1986c](https://github.com/Tencent/tmagic-editor/commit/0e1986c81998e50461c294c1a27a8139e8ae9a13))
 # [1.8.0-beta.15](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.14...v1.8.0-beta.15) (2026-07-23)
 
 
