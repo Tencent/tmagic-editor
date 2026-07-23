@@ -29,6 +29,17 @@ export interface FormDiffConfig {
 export const FORM_DIFF_CONFIG_KEY: InjectionKey<FormDiffConfig> = Symbol('mFormDiffConfig');
 export const FORM_TYPE_MATCH_VALID_KEY: InjectionKey<ComputedRef<boolean>> = Symbol('mFormTypeMatchValid');
 
+/**
+ * 静默模式标记，由 `submitForm` / `validateForm` 以隐藏方式挂载临时表单时 provide（debug 弹层模式不提供）。
+ *
+ * 重型字段组件（如 vs-code）可 inject 该标记并跳过自身渲染：字段校验由 FormItem 基于 model 值完成，
+ * 与叶子 UI 组件实例无关，跳过可省去无谓的实例化开销（如 monaco worker / model 的创建）。
+ *
+ * 注意：仅「挂载无值副作用」（不在 onMounted/watch immediate 中 emit change、不依赖 DOM 计算值）的
+ * 字段组件可以安全跳过，接入前需逐一审计。
+ */
+export const FORM_SILENT_MODE_KEY: InjectionKey<boolean> = Symbol('mFormSilentMode');
+
 export interface ValidateError {
   message: string;
   field: string;

@@ -16,11 +16,21 @@
  * limitations under the License.
  */
 import { afterEach, beforeAll, describe, expect, test, vi } from 'vitest';
-import { type AppContext, createApp, defineComponent, h, nextTick } from 'vue';
-import MagicForm, { submitForm } from '@form/index';
+import { type AppContext, createApp, defineComponent, h, inject, nextTick } from 'vue';
+import MagicForm, { FORM_SILENT_MODE_KEY, submitForm, validateForm } from '@form/index';
 import ElementPlus from 'element-plus';
 
 let appContext: AppContext;
+
+// 探针字段：挂载时注入静默标记并记录，用于验证 submitForm/validateForm 的 provide 行为
+const silentProbeValues: (boolean | undefined)[] = [];
+const SilentProbe = defineComponent({
+  name: 'MFieldsSilentProbe',
+  setup() {
+    silentProbeValues.push(inject(FORM_SILENT_MODE_KEY, undefined));
+    return () => h('div');
+  },
+});
 
 beforeAll(() => {
   // 构造一个父级 app，把 element-plus 与 m-form 插件装上，
@@ -28,6 +38,7 @@ beforeAll(() => {
   const parentApp = createApp(defineComponent({ render: () => h('div') }));
   parentApp.use(ElementPlus);
   parentApp.use(MagicForm);
+  parentApp.component('m-fields-silent-probe', SilentProbe);
   appContext = parentApp._context;
 });
 
@@ -216,6 +227,44 @@ describe('submitForm', () => {
     expect(caught).toBeInstanceOf(Error);
   });
 
+  test('静默（隐藏挂载）模式下向字段 provide FORM_SILENT_MODE_KEY=true', async () => {
+    silentProbeValues.length = 0;
+
+    const values = await submitForm({
+      config: [{ type: 'silent-probe', name: 'text', text: 'text' }],
+      initValues: { text: 'hello' },
+      appContext,
+    });
+
+    expect(values).toEqual({ text: 'hello' });
+    expect(silentProbeValues).toEqual([true]);
+  });
+
+  test('静默标记不会泄漏到父级应用的 provides', async () => {
+    silentProbeValues.length = 0;
+
+    await submitForm({
+      config: [{ type: 'silent-probe', name: 'text', text: 'text' }],
+      initValues: { text: 'hello' },
+      appContext,
+    });
+
+    expect((appContext as any).provides[FORM_SILENT_MODE_KEY as symbol]).toBeUndefined();
+  });
+
+  test('validateForm 静默模式下同样 provide FORM_SILENT_MODE_KEY=true', async () => {
+    silentProbeValues.length = 0;
+
+    const error = await validateForm({
+      config: [{ type: 'silent-probe', name: 'text', text: 'text' }],
+      initValues: { text: 'hello' },
+      appContext,
+    });
+
+    expect(error).toBe('');
+    expect(silentProbeValues).toEqual([true]);
+  });
+
   test('timeout > 0 时会注册定时器，timeout <= 0 时不注册', async () => {
     const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
 
@@ -352,6 +401,24 @@ describe('submitForm —— debug 模式', () => {
     expect(caught).toBeInstanceOf(Error);
     expect(caught.message).toContain('canceled');
     expect(document.body.querySelector('.m-form')).toBeNull();
+  });
+
+  test('debug 模式不提供静默标记（表单可见，字段应正常渲染）', async () => {
+    silentProbeValues.length = 0;
+
+    const pending = submitForm({
+      config: [{ type: 'silent-probe', name: 'text', text: 'text' }],
+      initValues: { text: 'hello' },
+      debug: true,
+      appContext,
+    });
+    await nextTick();
+    await nextTick();
+
+    expect(silentProbeValues).toEqual([undefined]);
+
+    findButton('确定').click();
+    await pending;
   });
 
   test('debug 模式不注册超时定时器（等待人工操作）', async () => {

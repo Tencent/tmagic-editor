@@ -16,11 +16,22 @@
  * limitations under the License.
  */
 
-import { type AppContext, type Component, createApp, defineComponent, h, nextTick, type Ref, ref, watch } from 'vue';
+import {
+  type AppContext,
+  type Component,
+  createApp,
+  defineComponent,
+  h,
+  nextTick,
+  provide,
+  type Ref,
+  ref,
+  watch,
+} from 'vue';
 
 import { applyExtendState } from './utils/form';
 import Form from './Form.vue';
-import type { ChangeRecord, FormConfig, FormState } from './schema';
+import { type ChangeRecord, FORM_SILENT_MODE_KEY, type FormConfig, type FormState } from './schema';
 
 // #region SubmitFormOptions
 /**
@@ -210,7 +221,21 @@ const mountFormInstance = <T>(options: MountFormInstanceOptions<T>): Promise<T> 
           })
         : userWrapper;
 
-    const app = createApp(wrapperComponent);
+    // 静默（隐藏挂载）模式下注入静默标记：vs-code 等重型字段组件可据此跳过自身渲染，
+    // 校验/取值依赖 FormItem 与 model 值，与叶子 UI 组件无关（见 FORM_SILENT_MODE_KEY 注释）。
+    // 用组件级 provide 而非 app.provide：appContext 合并后 app._context.provides 与父级应用
+    // 共享引用，app.provide 会把标记泄漏到父级应用。
+    const rootComponent = hidden
+      ? defineComponent({
+          name: 'MFormSilentProvider',
+          setup() {
+            provide(FORM_SILENT_MODE_KEY, true);
+            return () => h(wrapperComponent);
+          },
+        })
+      : wrapperComponent;
+
+    const app = createApp(rootComponent);
     instance.app = app;
 
     // 继承父级应用上下文（components / directives / provides / config 等）

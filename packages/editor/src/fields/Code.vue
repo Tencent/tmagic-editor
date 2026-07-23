@@ -1,5 +1,6 @@
 <template>
   <MagicCodeEditor
+    v-if="!silentMode"
     :height="config.height"
     :type="diffMode ? 'diff' : undefined"
     :init-values="diffMode ? (lastValues || {})[name] : model[name]"
@@ -17,15 +18,22 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, inject } from 'vue';
 
-import type { CodeConfig, FieldProps } from '@tmagic/form';
+import { type CodeConfig, type FieldProps, FORM_SILENT_MODE_KEY } from '@tmagic/form';
 
 import MagicCodeEditor from '@editor/layouts/CodeEditor.vue';
 
 defineOptions({
   name: 'MFieldsVsCode',
 });
+
+/**
+ * 静默模式（submitForm/validateForm 隐藏挂载）下跳过 monaco 渲染：
+ * 校验由 FormItem 针对 model 中的值完成，与编辑器实例无关；本组件挂载无值副作用
+ * （save 仅由用户操作/编辑器内容变更触发），跳过可省去 monaco worker/model 的无谓实例化。
+ */
+const silentMode = inject(FORM_SILENT_MODE_KEY, false);
 
 const emit = defineEmits<{
   change: [value: string | any];
