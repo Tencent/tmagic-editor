@@ -95,7 +95,7 @@ vi.mock('@editor/layouts/props-panel/FormPanel.vue', () => ({
           // 模拟 CodeEditor 源码保存：仅传 values，无 eventData、无 error（对应 saveCode 路径）
           h('button', {
             class: 'code-save-btn',
-            onClick: () => emit('submit', { id: 'n1', style: { color: 'red' } }),
+            onClick: () => emit('submit', { id: 'n1', style: { color: 'red', width: '' } }),
           }),
           h('button', { class: 'submit-err-btn', onClick: () => emit('submit-error', new Error('e')) }),
           h('button', { class: 'form-err-btn', onClick: () => emit('form-error', new Error('e')) }),
@@ -237,6 +237,16 @@ describe('PropsPanel', () => {
     expect(options.invalidInfo).toBeUndefined();
     // historySource 应为 code
     expect(options.historySource).toBe('code');
+  });
+
+  test('CodeEditor 源码保存时 style 中的空字符串值被保留（表示清除该样式）', async () => {
+    const wrapper = mount(PropsPanel, { props: {} as any });
+    await new Promise((r) => setTimeout(r, 0));
+    await wrapper.find('.code-save-btn').trigger('click');
+
+    const calledNode = (editorService.update.mock.calls[0] as any)[0];
+    expect(calledNode.style.color).toBe('red');
+    expect(calledNode.style.width).toBe('');
   });
 
   test('mounted 事件 emit', async () => {

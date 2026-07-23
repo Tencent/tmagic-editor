@@ -164,17 +164,25 @@ const submit = async (
     };
 
     if (v.style) {
-      Object.entries(v.style).forEach(([key, value]) => {
-        if (value !== '' && newValue.style) {
-          newValue.style[key] = value;
-        }
-      });
+      // 空字符串样式值表示「清除该样式」，需保留才能在 doUpdate 的 mergeWith 中覆盖旧值。
+      if (eventData) {
+        // 表单编辑：先过滤掉空字符串（避免表单默认空值污染 DSL），
+        // 再按 changeRecords 恢复被主动清空的字段。
+        Object.entries(v.style).forEach(([key, value]) => {
+          if (value !== '' && newValue.style) {
+            newValue.style[key] = value;
+          }
+        });
 
-      eventData?.changeRecords?.forEach((record) => {
-        if (record.propPath?.startsWith('style') && record.value === '') {
-          setValueByKeyPath(record.propPath, record.value, newValue);
-        }
-      });
+        eventData.changeRecords?.forEach((record) => {
+          if (record.propPath?.startsWith('style') && record.value === '') {
+            setValueByKeyPath(record.propPath, record.value, newValue);
+          }
+        });
+      } else {
+        // 源码编辑器保存（无 eventData）：style 原样保留，其中的空字符串视为用户主动清除该样式。
+        newValue.style = { ...v.style };
+      }
     }
 
     // 区分操作途径：表单字段编辑（MForm @change）会带上 eventData（含 changeRecords）；
