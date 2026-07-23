@@ -105,8 +105,8 @@ describe('data-source utils', () => {
       fields: [],
     });
     expect(resolveFieldByPath(fields, ['obj']).field?.name).toBe('obj');
-    expect(resolveFieldByPath(fields, ['unknown'])).toEqual({ ok: false, fields });
-    expect(resolveFieldByPath(undefined, ['x'])).toEqual({ ok: false, fields: [] });
+    expect(resolveFieldByPath(fields, ['unknown'])).toEqual({ ok: false, fields, failedName: 'unknown' });
+    expect(resolveFieldByPath(undefined, ['x'])).toEqual({ ok: false, fields: [], failedName: 'x' });
     expect(resolveFieldByPath(fields, []).ok).toBe(true);
   });
 
@@ -124,7 +124,9 @@ describe('data-source utils', () => {
     expect(result.field?.name).toBe('item');
     expect(result.fields).toEqual([{ name: 'n', type: 'string' }]);
 
-    expect(resolveFieldByPath(fields, ['arr', '0', 'missing'], { skipNumberIndices: true }).ok).toBe(false);
+    const failed = resolveFieldByPath(fields, ['arr', '0', 'missing'], { skipNumberIndices: true });
+    expect(failed.ok).toBe(false);
+    expect(failed.failedName).toBe('missing');
   });
 
   test('getFieldType 沿 path 取最终类型', () => {

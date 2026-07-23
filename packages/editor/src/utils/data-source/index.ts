@@ -243,7 +243,7 @@ export const resolveFieldByPath = (
   fields: DataSchema[] | undefined,
   fieldNames: string[],
   options: { skipNumberIndices?: boolean } = {},
-): { ok: boolean; field?: DataSchema; fields: DataSchema[] } => {
+): { ok: boolean; field?: DataSchema; fields: DataSchema[]; failedName?: string } => {
   let currentFields = fields || [];
   let field: DataSchema | undefined;
 
@@ -252,11 +252,11 @@ export const resolveFieldByPath = (
       continue;
     }
     if (!currentFields.length) {
-      return { ok: false, fields: currentFields };
+      return { ok: false, fields: currentFields, failedName: name };
     }
     field = currentFields.find((item) => item.name === name);
     if (!field) {
-      return { ok: false, fields: currentFields };
+      return { ok: false, fields: currentFields, failedName: name };
     }
     currentFields = field.fields || [];
   }

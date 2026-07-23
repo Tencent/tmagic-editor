@@ -207,9 +207,18 @@ describe('editorTypeMatchRules', () => {
     expect(firstLine(run('data-source-method-select', ['missing', 'custom']))).toBe('数据源(missing)不存在');
   });
 
-  test('data-source-field-select 校验路径与 fieldConfig 跳过', () => {
+  test('data-source-field-select 校验路径与 fieldConfig 类型校验', () => {
     expect(firstLine(run('data-source-field-select', 'x'))).toBe('x类型应为字符串数组');
-    expect(run('data-source-field-select', 'text-value', { fieldConfig: { type: 'text' } })).toBeUndefined();
+
+    // 有 fieldConfig 且值不是数据源字段路径时，按 fieldConfig 的类型校验（text 允许数字）
+    expect(run('data-source-field-select', 'text-value', { name: 'f', fieldConfig: { type: 'text' } })).toBeUndefined();
+    expect(run('data-source-field-select', 123, { name: 'f', fieldConfig: { type: 'text' } })).toBeUndefined();
+    expect(firstLine(run('data-source-field-select', { a: 1 }, { name: 'f', fieldConfig: { type: 'text' } }))).toBe(
+      '[object Object] 类型应为字符串',
+    );
+    expect(run('data-source-field-select', 123, { name: 'f', fieldConfig: { type: 'number' } })).toBeUndefined();
+    // fieldConfig 未声明 type 时不做类型校验
+    expect(run('data-source-field-select', 123, { name: 'f', fieldConfig: {} })).toBeUndefined();
 
     dataSourcesState.value = [
       {
@@ -225,7 +234,26 @@ describe('editorTypeMatchRules', () => {
 
     expect(run('data-source-field-select', ['ds1', 'title'], { value: 'key' })).toBeUndefined();
     expect(run('data-source-field-select', [`${DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX}ds1`, 'title'])).toBeUndefined();
-    expect(firstLine(run('data-source-field-select', ['ds1', 'missing'], { value: 'key' }))).toBe('值不在可选项中');
+    // 数据源不存在时直出具体的数据源 id
+    expect(firstLine(run('data-source-field-select', ['missing', 'title'], { value: 'key' }))).toBe(
+      '数据源(missing)不存在',
+    );
+    expect(firstLine(run('data-source-field-select', ['title'], { dataSourceId: 'missing' }))).toBe(
+      '数据源(missing)不存在',
+    );
+    // 字段路径解析失败时直出具体失败的字段名
+    expect(firstLine(run('data-source-field-select', ['ds1', 'missing'], { value: 'key' }))).toBe(
+      '数据源字段(missing)不存在',
+    );
+    // 字段路径解析失败时，建议列出失败层级的可用字段名而非数据源 id
+    expect(run('data-source-field-select', ['ds1', 'missing'], { value: 'key' })).toBe(
+      '数据源字段(missing)不存在\n\n请使用以下某一个值："title"；"obj"',
+    );
+    expect(run('data-source-field-select', ['ds1', 'obj', 'missing'], { value: 'key' })).toBe(
+      '数据源字段(missing)不存在\n\n请使用以下某一个值："a"',
+    );
+    // 父字段无子字段时无建议
+    expect(run('data-source-field-select', ['ds1', 'title', 'x'], { value: 'key' })).toBe('数据源字段(x)不存在');
     expect(
       firstLine(
         run('data-source-field-select', ['title'], {

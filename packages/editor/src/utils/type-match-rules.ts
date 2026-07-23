@@ -20,6 +20,7 @@ import type { DataSourceFieldType, DataSourceSchema, Id } from '@tmagic/core';
 import { NodeType } from '@tmagic/core';
 import { appendValidateSuggestion } from '@tmagic/design';
 import type { TypeMatchValidateContext, TypeMatchValidator } from '@tmagic/form';
+import { validateTypeMatch } from '@tmagic/form';
 import {
   DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX,
   DATA_SOURCE_SET_DATA_METHOD_NAME,
@@ -261,16 +262,20 @@ const validateDataSourceFieldPath = (
 
   const ds = findDataSource(`${dsId}`);
   if (!ds) {
-    return defaultMessage(options.message, '值不在可选项中', dataSourceIdSuggestion());
+    return defaultMessage(options.message, `数据源(${dsId})不存在`, dataSourceIdSuggestion());
   }
 
   if (!fieldNames.length) {
     return undefined;
   }
 
-  const { field, ok } = resolveFieldByPath(ds.fields, fieldNames);
+  const { field, ok, fields, failedName } = resolveFieldByPath(ds.fields, fieldNames);
   if (!ok) {
-    return defaultMessage(options.message, '值不在可选项中', dataSourceIdSuggestion());
+    return defaultMessage(
+      options.message,
+      `数据源字段(${failedName})不存在`,
+      listSuggestion(fields.map((item) => item.name)),
+    );
   }
 
   const allowedTypes = options.dataSourceFieldType || ['any'];
@@ -471,11 +476,12 @@ const isDataSourceFieldPathValue = (value: any, config: any): value is string[] 
   return `${value[0]}`.startsWith(DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX);
 };
 
-const validateDataSourceFieldSelect: TypeMatchValidator = (value, { message, props }) => {
+const validateDataSourceFieldSelect: TypeMatchValidator = (value, { mForm, message, props }) => {
   const config = props.config || {};
 
   if (config.fieldConfig && !isDataSourceFieldPathValue(value, config)) {
-    return undefined;
+    // 值不是数据源字段路径时，按 fieldConfig 的类型校验（与表单项自身 typeMatch 行为一致）
+    return validateTypeMatch(value, mForm, { ...props, config: { name: config.name, ...config.fieldConfig } }, message);
   }
 
   if (!Array.isArray(value) || value.some((item) => typeof item !== 'string')) {
