@@ -50,7 +50,7 @@ describe('style2Obj', () => {
 
 describe('fillBackgroundImage', () => {
   test('裸路径会包裹 url()', () => {
-    expect(fillBackgroundImage('a.png')).toBe('url(a.png)');
+    expect(fillBackgroundImage('a.png')).toBe('url("a.png")');
   });
 
   test('已经是 url() 不重复包裹', () => {
@@ -127,7 +127,7 @@ describe('transformStyle', () => {
 
   test('backgroundImage: browser 下补全 url()', () => {
     expect(transformStyle({ backgroundImage: 'a.png' }, 'browser')).toEqual({
-      backgroundImage: 'url(a.png)',
+      backgroundImage: 'url("a.png")',
     });
   });
 

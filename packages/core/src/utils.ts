@@ -51,7 +51,7 @@ export const style2Obj = (style: string) => {
 
 export const fillBackgroundImage = (value: string) => {
   if (value && !/^url/.test(value) && !/^linear-gradient/.test(value)) {
-    return `url(${value})`;
+    return `url("${value}")`;
   }
   return value;
 };
