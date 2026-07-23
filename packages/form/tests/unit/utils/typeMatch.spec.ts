@@ -196,13 +196,14 @@ describe('validateTypeMatch', () => {
     expect(validateTypeMatch(3, mForm, propsOf(config))).toBe('3 不在可选项中\n\n请使用以下某一个值：1；2');
   });
 
-  test('可选项超过 5 个时建议仅展示前 5 个并以「等」省略', () => {
+  test('可选项超过 20 个时建议仅展示前 20 个并以「等」省略', () => {
+    const values = Array.from({ length: 21 }, (_, i) => i + 1);
     const config = {
       type: 'select',
-      options: [1, 2, 3, 4, 5, 6, 7].map((v) => ({ text: `${v}`, value: v })),
+      options: values.map((v) => ({ text: `${v}`, value: v })),
     };
     expect(validateTypeMatch(99, mForm, propsOf(config))).toBe(
-      '99 不在可选项中\n\n请使用以下某一个值：1；2；3；4；5 等',
+      `99 不在可选项中\n\n请使用以下某一个值：${values.slice(0, 20).join('；')} 等`,
     );
   });
 

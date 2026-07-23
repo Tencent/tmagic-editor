@@ -58,7 +58,7 @@ const stringifyExampleValue = (value: any): string => {
 };
 
 // 参考建议中最多展示的可选值个数，超出以「等」省略。
-const MAX_SUGGESTION_OPTIONS = 5;
+const MAX_SUGGESTION_OPTIONS = 20;
 
 /**
  * 生成「请使用以下某一个值：xxx；xxx」形式的参考建议；无可选值时返回空字符串（不追加建议）。
