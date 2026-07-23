@@ -321,3 +321,92 @@ describe('down / up 排序', () => {
     expect(result.src).toBe('c');
   });
 });
+
+describe('scrollElementIntoView', () => {
+  const makeDomRect = (partial: Partial<DOMRect>): DOMRect => ({
+    x: partial.x ?? partial.left ?? 0,
+    y: partial.y ?? partial.top ?? 0,
+    width: partial.width ?? 0,
+    height: partial.height ?? 0,
+    top: partial.top ?? 0,
+    left: partial.left ?? 0,
+    right: partial.right ?? 0,
+    bottom: partial.bottom ?? 0,
+    toJSON: () => ({}),
+  });
+
+  const createScrollContainer = () => {
+    const container = globalThis.document.createElement('div');
+    container.style.overflow = 'auto';
+    globalThis.document.body.appendChild(container);
+    Object.defineProperty(container, 'clientHeight', { value: 300, configurable: true });
+    Object.defineProperty(container, 'scrollTop', { value: 0, writable: true, configurable: true });
+    container.getBoundingClientRect = () =>
+      makeDomRect({ left: 0, top: 0, right: 400, bottom: 300, width: 400, height: 300 });
+    return container;
+  };
+
+  const createTarget = (rect: Partial<DOMRect>) => {
+    const el = globalThis.document.createElement('div');
+    el.getBoundingClientRect = () => makeDomRect(rect);
+    return el;
+  };
+
+  test('元素在可视区域下方时，向下滚动最小距离', () => {
+    const container = createScrollContainer();
+    const el = createTarget({ top: 500, bottom: 600, height: 100 });
+
+    util.scrollElementIntoView(el, container);
+
+    // 600 - 300 = 300
+    expect(container.scrollTop).toBe(300);
+  });
+
+  test('元素在可视区域上方时，向上滚动', () => {
+    const container = createScrollContainer();
+    container.scrollTop = 200;
+    const el = createTarget({ top: -100, bottom: 0, height: 100 });
+
+    util.scrollElementIntoView(el, container);
+
+    expect(container.scrollTop).toBe(100);
+  });
+
+  test('元素已在可视区域内时不滚动', () => {
+    const container = createScrollContainer();
+    const el = createTarget({ top: 50, bottom: 150, height: 100 });
+
+    util.scrollElementIntoView(el, container);
+
+    expect(container.scrollTop).toBe(0);
+  });
+
+  test('元素高于可视区域时优先让顶部可见', () => {
+    const container = createScrollContainer();
+    const el = createTarget({ top: 500, bottom: 1200, height: 700 });
+
+    util.scrollElementIntoView(el, container);
+
+    // 对齐顶部滚动 500，而不是 1200 - 300 = 900
+    expect(container.scrollTop).toBe(500);
+  });
+
+  test('容器为文档滚动元素时，以窗口视口为可视区域', () => {
+    const docEl = globalThis.document.documentElement;
+    const originalDescriptor = Object.getOwnPropertyDescriptor(docEl, 'scrollTop');
+    Object.defineProperty(docEl, 'scrollTop', { value: 0, writable: true, configurable: true });
+
+    try {
+      const el = createTarget({ top: 1000, bottom: 1100, height: 100 });
+
+      util.scrollElementIntoView(el, docEl);
+
+      // jsdom 默认 innerHeight 为 768：1100 - 768 = 332
+      expect(docEl.scrollTop).toBe(globalThis.innerHeight > 0 ? 1100 - globalThis.innerHeight : 0);
+    } finally {
+      if (originalDescriptor) {
+        Object.defineProperty(docEl, 'scrollTop', originalDescriptor);
+      }
+    }
+  });
+});

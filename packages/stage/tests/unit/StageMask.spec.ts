@@ -114,7 +114,33 @@ describe('StageMask', () => {
     expect(fn).toHaveBeenCalled();
   });
 
-  test('observe 后 observerIntersection 触发 scrollIntoView', () => {
+  // 构造一个带滚动容器的页面结构：body > scrollParent(overflow: auto) > page
+  const setupScrollablePage = (m: StageMask) => {
+    const scrollParent = globalThis.document.createElement('div');
+    scrollParent.style.overflow = 'auto';
+    scrollParent.style.position = 'relative';
+    globalThis.document.body.appendChild(scrollParent);
+    Object.defineProperty(scrollParent, 'clientHeight', { value: 300, configurable: true });
+    Object.defineProperty(scrollParent, 'scrollTop', { value: 0, writable: true, configurable: true });
+    scrollParent.scrollTo = vi.fn();
+    scrollParent.getBoundingClientRect = () =>
+      makeDomRect({ left: 0, top: 0, right: 400, bottom: 300, width: 400, height: 300 });
+
+    const page = globalThis.document.createElement('div');
+    Object.defineProperty(page, 'clientWidth', { value: 400, configurable: true });
+    Object.defineProperty(page, 'clientHeight', { value: 1000, configurable: true });
+    Object.defineProperty(page, 'scrollWidth', { value: 400, configurable: true });
+    scrollParent.appendChild(page);
+
+    m.observe(page);
+    m.pageResize([makeResizeEntry(page)]);
+    m.wrapperWidth = 400;
+    m.wrapperHeight = 300;
+
+    return { scrollParent, page };
+  };
+
+  test('observe 后 observerIntersection 触发 scrollIntoView，只滚动页面滚动容器', () => {
     const originalIo = globalThis.IntersectionObserver;
     const MockIntersectionObserver = vi.fn(function (
       this: {
@@ -143,25 +169,109 @@ describe('StageMask', () => {
 
     try {
       mask = new StageMask({ disabledRule: true });
-      const page = globalThis.document.createElement('div');
-      Object.defineProperty(page, 'clientWidth', { value: 400, configurable: true });
-      Object.defineProperty(page, 'clientHeight', { value: 300, configurable: true });
-      Object.defineProperty(page, 'scrollWidth', { value: 400, configurable: true });
-      mask.observe(page);
-      mask.pageResize([makeResizeEntry(page)]);
-      mask.wrapperWidth = 400;
-      mask.wrapperHeight = 300;
+      const { scrollParent, page } = setupScrollablePage(mask);
 
       const el = globalThis.document.createElement('div');
       page.appendChild(el);
       el.scrollIntoView = vi.fn();
-      el.getBoundingClientRect = () => makeDomRect({ left: 0, top: 0, width: 10, height: 10 });
+      // 元素在可视区域（300）下方
+      el.getBoundingClientRect = () =>
+        makeDomRect({ left: 0, top: 500, right: 10, bottom: 600, width: 10, height: 100 });
 
       mask.observerIntersection(el);
-      expect(el.scrollIntoView).toHaveBeenCalled();
+
+      // 不调用原生 scrollIntoView，避免编辑器外层滚动容器被连带滚动
+      expect(el.scrollIntoView).not.toHaveBeenCalled();
+      // 只滚动页面所在的滚动容器：600 - 300 = 300
+      expect(scrollParent.scrollTop).toBe(300);
+      expect(mask.scrollTop).toBe(300);
     } finally {
       globalThis.IntersectionObserver = originalIo;
     }
+  });
+
+  test('scrollIntoView：元素已在可视区域内时不滚动', () => {
+    mask = new StageMask({ disabledRule: true });
+    const { scrollParent, page } = setupScrollablePage(mask);
+
+    const el = globalThis.document.createElement('div');
+    page.appendChild(el);
+    el.getBoundingClientRect = () => makeDomRect({ left: 0, top: 50, right: 10, bottom: 150, width: 10, height: 100 });
+
+    mask.scrollIntoView(el);
+
+    expect(scrollParent.scrollTop).toBe(0);
+    expect(mask.scrollTop).toBe(0);
+  });
+
+  test('scrollIntoView：元素在可视区域上方时向上滚动', () => {
+    mask = new StageMask({ disabledRule: true });
+    const { scrollParent, page } = setupScrollablePage(mask);
+    scrollParent.scrollTop = 200;
+
+    const el = globalThis.document.createElement('div');
+    page.appendChild(el);
+    el.getBoundingClientRect = () => makeDomRect({ left: 0, top: -100, right: 10, bottom: 0, width: 10, height: 100 });
+
+    mask.scrollIntoView(el);
+
+    // 200 - 100 = 100
+    expect(scrollParent.scrollTop).toBe(100);
+    expect(mask.scrollTop).toBe(100);
+  });
+
+  test('scrollIntoView：元素高于可视区域时优先让顶部可见', () => {
+    mask = new StageMask({ disabledRule: true });
+    const { scrollParent, page } = setupScrollablePage(mask);
+
+    const el = globalThis.document.createElement('div');
+    page.appendChild(el);
+    // 元素高度 700，超过可视区域高度 300
+    el.getBoundingClientRect = () =>
+      makeDomRect({ left: 0, top: 500, right: 10, bottom: 1200, width: 10, height: 700 });
+
+    mask.scrollIntoView(el);
+
+    // 对齐顶部：滚动 500，而不是 1200 - 300 = 900
+    expect(scrollParent.scrollTop).toBe(500);
+    expect(mask.scrollTop).toBe(500);
+  });
+
+  test('scrollIntoView：元素在内部滚动容器中时，滚动页面滚动容器使内部容器可见', () => {
+    mask = new StageMask({ disabledRule: true });
+    const { scrollParent, page } = setupScrollablePage(mask);
+
+    const innerScroll = globalThis.document.createElement('div');
+    innerScroll.style.overflow = 'auto';
+    innerScroll.style.position = 'relative';
+    page.appendChild(innerScroll);
+    innerScroll.getBoundingClientRect = () =>
+      makeDomRect({ left: 0, top: 500, right: 100, bottom: 700, width: 100, height: 200 });
+
+    const el = globalThis.document.createElement('div');
+    innerScroll.appendChild(el);
+    el.getBoundingClientRect = () => makeDomRect({ left: 0, top: 500, right: 10, bottom: 600, width: 10, height: 100 });
+
+    mask.scrollIntoView(el);
+
+    // 递归滚动页面滚动容器，使内部滚动容器完整可见：700 - 300 = 400
+    expect(scrollParent.scrollTop).toBe(400);
+    expect(mask.scrollTop).toBe(400);
+  });
+
+  test('scrollIntoView：pageScrollParent 不存在时不滚动', () => {
+    mask = new StageMask({ disabledRule: true });
+    const page = globalThis.document.createElement('div');
+    Object.defineProperty(page, 'scrollWidth', { value: 400, configurable: true });
+    mask.observe(page);
+
+    const el = globalThis.document.createElement('div');
+    page.appendChild(el);
+    el.scrollIntoView = vi.fn();
+    el.getBoundingClientRect = () => makeDomRect({ left: 0, top: 500, right: 10, bottom: 600, width: 10, height: 100 });
+
+    expect(() => mask.scrollIntoView(el)).not.toThrow();
+    expect(el.scrollIntoView).not.toHaveBeenCalled();
   });
 
   test('destroy 清理 observer 与 page', () => {

@@ -141,6 +141,48 @@ export const getScrollParent = (element: HTMLElement, includeHidden = false): HT
   return null;
 };
 
+/**
+ * 将元素滚动到指定滚动容器的可视区域内（仅垂直方向，滚动最小距离）
+ * @description 与原生 scrollIntoView 不同，只滚动指定的容器自身，不会连带滚动外层祖先滚动容器，
+ * 避免编辑器画布外层容器（如 stage 外层使用 transform 模拟滚动的容器）被浏览器自动滚动导致整个画布位移
+ * @param el 目标元素
+ * @param container 滚动容器
+ */
+export const scrollElementIntoView = (el: Element, container: HTMLElement): void => {
+  const { ownerDocument } = container;
+  const win = ownerDocument?.defaultView;
+  if (!ownerDocument || !win) return;
+
+  const elRect = el.getBoundingClientRect();
+
+  let viewTop = 0;
+  let viewHeight = 0;
+
+  if (container === ownerDocument.documentElement || container === ownerDocument.body) {
+    // 文档滚动元素的可视区域为窗口视口
+    viewTop = 0;
+    viewHeight = win.innerHeight;
+  } else {
+    const containerRect = container.getBoundingClientRect();
+    viewTop = containerRect.top + container.clientTop;
+    viewHeight = container.clientHeight;
+  }
+
+  const viewBottom = viewTop + viewHeight;
+
+  let delta = 0;
+  if (elRect.top < viewTop) {
+    delta = elRect.top - viewTop;
+  } else if (elRect.bottom > viewBottom) {
+    // 元素高度超过可视区域高度时，优先保证元素顶部可见
+    delta = Math.min(elRect.bottom - viewBottom, elRect.top - viewTop);
+  }
+
+  if (delta !== 0) {
+    container.scrollTop += delta;
+  }
+};
+
 export const removeSelectedClassName = (doc: Document) => {
   const oldEl = doc.querySelector(`.${SELECTED_CLASS}`);
 

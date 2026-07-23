@@ -21,7 +21,7 @@ import { createDiv, getDocument, injectStyle } from '@tmagic/core';
 import { Mode, ZIndex } from './const';
 import Rule from './Rule';
 import type { MaskEvents, RuleOptions } from './types';
-import { getScrollParent, isFixedParent } from './util';
+import { getScrollParent, isFixedParent, scrollElementIntoView } from './util';
 
 const wrapperClassName = 'editor-mask-wrapper';
 
@@ -165,9 +165,11 @@ export default class StageMask extends Rule {
       return;
     }
 
-    el.scrollIntoView();
-
     if (!this.pageScrollParent) return;
+
+    // 不使用原生 scrollIntoView，避免编辑器画布外层滚动容器被浏览器连带滚动导致整个 stage 位移，
+    // 只滚动页面所在的滚动容器
+    scrollElementIntoView(el, this.pageScrollParent);
 
     this.scrollLeft = this.pageScrollParent.scrollLeft;
     this.scrollTop = this.pageScrollParent.scrollTop;
