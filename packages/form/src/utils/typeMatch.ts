@@ -697,9 +697,13 @@ export const validateTypeMatch = (
     return undefined;
   }
 
+  if (!props.config?.name) {
+    return undefined;
+  }
+
   const rawFieldType = 'type' in (props.config || {}) ? props.config.type : '';
   if (typeof rawFieldType !== 'string' || !rawFieldType) {
-    return;
+    return undefined;
   }
 
   // 统一将驼峰形式（如 radioGroup）归一化为连字符形式（radio-group），与内置规则的 key 保持一致

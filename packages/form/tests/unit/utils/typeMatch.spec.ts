@@ -21,6 +21,7 @@ import type { FormState } from '@form/index';
 import { getRules } from '@form/utils/form';
 import {
   clearTypeMatchRules,
+  createTypeMatchValidator,
   deleteTypeMatchRule,
   getTypeMatchRule,
   registerTypeMatchRule,
@@ -51,9 +52,12 @@ const mForm: FormState = {
 };
 
 const propsOf = (config: Record<string, any>, model: Record<string, any> = {}) => ({
-  config,
+  config: {
+    name: 'field',
+    ...config,
+  },
   model,
-  prop: config.name || 'field',
+  prop: config.name || config.prop || 'field',
 });
 
 describe('validateTypeMatch', () => {
@@ -62,6 +66,19 @@ describe('validateTypeMatch', () => {
     expect(validateTypeMatch(null, mForm, propsOf({ type: 'text' }))).toBeUndefined();
     expect(validateTypeMatch('', mForm, propsOf({ type: 'text' }))).toBeUndefined();
     expect(validateTypeMatch([], mForm, propsOf({ type: 'select', multiple: true }))).toBeUndefined();
+  });
+
+  test('config 未配置 name 时跳过校验', () => {
+    const noNameProps = { config: { type: 'text' }, model: {} };
+    expect(validateTypeMatch(123, mForm, noNameProps)).toBeUndefined();
+    expect(validateTypeMatch({ a: 1 }, mForm, { config: { type: 'number' }, model: {} })).toBeUndefined();
+    expect(
+      validateTypeMatch('bad', mForm, {
+        config: { type: 'select', options: [{ text: 'A', value: 'a' }] },
+        model: {},
+      }),
+    ).toBeUndefined();
+    expect(validateTypeMatch(123, mForm, { config: undefined, model: {} })).toBeUndefined();
   });
 
   test('0 / false 不视为空值', () => {
@@ -386,6 +403,11 @@ describe('validateTypeMatch', () => {
     ).toBe('a 类型应为数组\n\n请参考以下示例值：["a"]');
   });
 
+  test('radio-group / checkbox-group 无 options 时跳过校验', () => {
+    expect(validateTypeMatch('a', mForm, propsOf({ type: 'radio-group' }))).toBeUndefined();
+    expect(validateTypeMatch('a', mForm, propsOf({ type: 'checkbox-group' }))).toBeUndefined();
+  });
+
   test('timerange 按 valueFormat 校验', () => {
     expect(validateTypeMatch(['12:00:00', '13:00:00'], mForm, propsOf({ type: 'timerange' }))).toBeUndefined();
     expect(validateTypeMatch(['bad'], mForm, propsOf({ type: 'timerange' }))).toMatch(
@@ -692,5 +714,32 @@ describe('plugin typeMatchRules', () => {
 
     expect(validateTypeMatch('ok', mForm, propsOf({ type: 'install-type' }))).toBeUndefined();
     expect(validateTypeMatch('bad', mForm, propsOf({ type: 'install-type' }))).toBe('install error');
+  });
+});
+
+describe('createTypeMatchValidator', () => {
+  beforeEach(() => {
+    clearTypeMatchRules();
+  });
+
+  afterEach(() => {
+    clearTypeMatchRules();
+  });
+
+  test('validateTypeMatch 抛异常时仍执行原始 validator', () => {
+    registerTypeMatchRule('throw', () => {
+      throw new Error('boom');
+    });
+
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const originalValidator = vi.fn();
+    const validator = createTypeMatchValidator(mForm, propsOf({ type: 'throw' }), {
+      validator: originalValidator,
+    } as any);
+
+    validator({}, 'value', () => {}, {}, {});
+    expect(originalValidator).toHaveBeenCalled();
+    expect(errorSpy).toHaveBeenCalled();
+    errorSpy.mockRestore();
   });
 });
