@@ -19,7 +19,7 @@
 import { reactive } from 'vue';
 import type { Writable } from 'type-fest';
 
-import type { Id } from '@tmagic/core';
+import type { Id, MPage, MPageFragment } from '@tmagic/core';
 import { guid } from '@tmagic/utils';
 
 import type {
@@ -351,6 +351,27 @@ class History extends BaseService {
     if (!this.isValidStackId(id)) return;
     markStackSaved(this.state.steps[stepType]?.[id]);
     this.emit('mark-saved', { kind: stepType, id });
+  }
+
+  /**
+   * 派发「页面 / 页面片结构变更」事件（`page-structure-change`）。
+   *
+   * 常规 `editorService.add` / `remove` 页面节点不会写入 `page` 历史栈（见 editor.add / remove 中
+   * 对 isPage / isPageFragment 的分支），因此不会产生任何 historyService 事件。该方法用于在这些
+   * 场景（以及 setRoot 整体替换 DSL 增删页面）下，向外统一通知页面结构的增删变化，供业务方感知。
+   *
+   * 一次操作涉及多个页面时，调用方应把本次增删的页面**合并为一个 change 一次性传入**，
+   * 使一次操作只派发一个事件；`add` / `remove` 分别为本次新增与删除的页面列表（其一可为空数组）。
+   *
+   * @param change 本次结构变更：{ add: 新增的页面列表, remove: 删除的页面列表 }
+   */
+  public notifyPageStructureChange(change: {
+    add: (MPage | MPageFragment)[];
+    remove: (MPage | MPageFragment)[];
+  }): void {
+    // 增删均为空时不派发，避免无意义通知
+    if (!change.add.length && !change.remove.length) return;
+    this.emit('page-structure-change', change);
   }
 
   /**

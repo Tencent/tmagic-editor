@@ -1385,6 +1385,12 @@ export interface HistoryEvents {
   'mark-saved': [{ kind: HistoryStepType; id?: Id }];
   clear: [{ id: Id; stepType: HistoryStepType }];
   'marker-change': [{ id: Id; marker: StepValue; stepType: HistoryStepType }];
+  /**
+   * 页面 / 页面片结构变更（新增 / 删除）时派发，见 {@link HistoryService.notifyPageStructureChange}。
+   * 一次操作（add / remove / setRoot 整体替换）涉及多个页面时合并为**一个**事件；
+   * `add` / `remove` 分别为本次新增与删除的页面列表（其一可为空数组）。
+   */
+  'page-structure-change': [change: { add: (MPage | MPageFragment)[]; remove: (MPage | MPageFragment)[] }];
 }
 
 export const canUsePluginMethods = {

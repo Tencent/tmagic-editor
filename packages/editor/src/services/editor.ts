@@ -554,6 +554,12 @@ class Editor extends BaseService {
       doNotPushHistory,
     });
 
+    // 页面 / 页面片新增不入历史栈（见上方 isPage / isPageFragment 分支），这里合并补发一次结构变更通知
+    const addedPages = newNodes.filter((node) => isPage(node) || isPageFragment(node)) as (MPage | MPageFragment)[];
+    if (addedPages.length) {
+      historyService.notifyPageStructureChange({ add: addedPages, remove: [] });
+    }
+
     return Array.isArray(addNode) ? newNodes : newNodes[0];
   }
 
@@ -695,6 +701,12 @@ class Editor extends BaseService {
 
     this.emit('remove', nodes);
     this.emit('change', { type: 'remove', data: changeItems, historySource, doNotPushHistory });
+
+    // 页面 / 页面片删除不入历史栈（见上方 isPage / isPageFragment 分支），这里合并补发一次结构变更通知
+    const removedPages = nodes.filter((node) => isPage(node) || isPageFragment(node)) as (MPage | MPageFragment)[];
+    if (removedPages.length) {
+      historyService.notifyPageStructureChange({ add: [], remove: removedPages });
+    }
   }
 
   public async doUpdate(
@@ -1776,6 +1788,10 @@ class Editor extends BaseService {
     const nextMap = new Map(nextPages.map((p) => [`${p.id}`, p]));
     const indexInItems = (root: MApp, id: Id) => (root.items ?? []).findIndex((item) => `${item.id}` === `${id}`);
 
+    // 收集本次整体替换中增删的页面，循环结束后合并为一次结构变更通知（避免逐页派发多个事件）
+    const addedPages: (MPage | MPageFragment)[] = [];
+    const removedPages: (MPage | MPageFragment)[] = [];
+
     nextPages.forEach((nextPage) => {
       const prevPage = prevMap.get(`${nextPage.id}`);
       if (!prevPage) {
@@ -1785,6 +1801,7 @@ class Editor extends BaseService {
           { newSchema: cloneDeep(toRaw(nextPage)), parentId: nextRoot.id, index: indexInItems(nextRoot, nextPage.id) },
           source,
         );
+        addedPages.push(nextPage);
       } else if (!isEqual(toRaw(prevPage), toRaw(nextPage))) {
         this.pushPageDiffStep(
           'update',
@@ -1803,8 +1820,13 @@ class Editor extends BaseService {
           { oldSchema: cloneDeep(toRaw(prevPage)), parentId: preRoot.id, index: indexInItems(preRoot, prevPage.id) },
           source,
         );
+        removedPages.push(prevPage);
       }
     });
+
+    if (addedPages.length || removedPages.length) {
+      historyService.notifyPageStructureChange({ add: addedPages, remove: removedPages });
+    }
   }
 
   /**
