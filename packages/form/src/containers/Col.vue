@@ -12,6 +12,7 @@
       :disabled="disabled"
       @change="changeHandler"
       @add-diff-count="onAddDiffCount"
+      :is-in-row="true"
     ></Container>
   </TMagicCol>
 </template>

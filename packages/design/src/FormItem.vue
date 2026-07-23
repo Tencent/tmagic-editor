@@ -48,11 +48,11 @@ const uiComponent = ui?.component || 'el-form-item';
 const adapterType = getDesignConfig('adapterType');
 
 const formInline = inject<boolean>('formInline');
-
+const formInRow = inject<boolean>('isInRow');
 const uiProps = computed<FormItemProps>(() => {
   const { extra, extraTips, ...rest } = ui?.props(props) || props;
   if (isGlobalFlat.value && rest.labelPosition === undefined) {
-    return { ...rest, labelPosition: formInline ? 'right' : 'left' };
+    return { ...rest, labelPosition: formInline || formInRow ? 'right' : 'left' };
   }
   return rest;
 });

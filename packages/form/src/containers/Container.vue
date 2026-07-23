@@ -240,7 +240,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, readonly, ref, toRaw, watch, watchEffect } from 'vue';
+import { computed, inject, provide, readonly, ref, toRaw, watch, watchEffect } from 'vue';
 import { ArrowDown, ArrowUp, WarningFilled } from '@element-plus/icons-vue';
 import { isEqual } from 'lodash-es';
 
@@ -287,6 +287,8 @@ const props = withDefaults(
     size?: string;
     /** 是否开启对比模式 */
     isCompare?: boolean;
+    /** 是否在行容器中 */
+    isInRow?: boolean;
   }>(),
   {
     prop: '',
@@ -475,6 +477,8 @@ watch(
     immediate: true,
   },
 );
+
+provide('isInRow', props.isInRow ?? false);
 
 const expandHandler = () => (expand.value = !expand.value);
 
