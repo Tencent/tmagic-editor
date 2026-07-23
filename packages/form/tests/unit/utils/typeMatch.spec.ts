@@ -91,12 +91,17 @@ describe('validateTypeMatch', () => {
     expect(validateTypeMatch({ a: 1 }, mForm, propsOf({ type: 'hidden' }))).toBeUndefined();
   });
 
-  test('text 期望 string', () => {
+  test('text 期望 string，允许 number', () => {
     expect(validateTypeMatch('ok', mForm, propsOf({ type: 'text' }))).toBeUndefined();
-    expect(validateTypeMatch(1, mForm, propsOf({ type: 'text' }))).toBe(
-      '1 类型应为字符串\n\n请参考以下示例值："文本内容"',
+    expect(validateTypeMatch(1, mForm, propsOf({ type: 'text' }))).toBeUndefined();
+    expect(validateTypeMatch(0, mForm, propsOf({ type: 'text' }))).toBeUndefined();
+    expect(validateTypeMatch(NaN, mForm, propsOf({ type: 'text' }))).toBe(
+      'NaN 类型应为字符串\n\n请参考以下示例值："文本内容"',
     );
-    expect(validateTypeMatch(1, mForm, propsOf({ type: 'text' }), '自定义错误')).toBe('自定义错误');
+    expect(validateTypeMatch({ a: 1 }, mForm, propsOf({ type: 'text' }))).toBe(
+      '[object Object] 类型应为字符串\n\n请参考以下示例值："文本内容"',
+    );
+    expect(validateTypeMatch(true, mForm, propsOf({ type: 'text' }), '自定义错误')).toBe('自定义错误');
   });
 
   test('text filter=number 时期望 number', () => {
@@ -526,8 +531,8 @@ describe('validateTypeMatch', () => {
     expect(validateTypeMatch('1', mForm, propsOf({ type: 'number', defaultValue: () => Promise.resolve(123) }))).toBe(
       '1 类型应为数字\n\n请参考以下示例值：123',
     );
-    expect(validateTypeMatch(1, mForm, propsOf({ type: 'text', defaultValue: async () => '示例' }))).toBe(
-      '1 类型应为字符串\n\n请参考以下示例值："文本内容"',
+    expect(validateTypeMatch({ a: 1 }, mForm, propsOf({ type: 'text', defaultValue: async () => '示例' }))).toBe(
+      '[object Object] 类型应为字符串\n\n请参考以下示例值："文本内容"',
     );
   });
 });
@@ -545,7 +550,7 @@ describe('getRules typeMatch', () => {
     const rules: any = [{ typeMatch: true, message: '类型错误' }];
     const newRules: any = getRules(mForm, rules, propsOf({ type: 'text' }));
     const callback = vi.fn();
-    newRules[0].validator({}, 123, callback);
+    newRules[0].validator({}, { a: 1 }, callback);
     expect(callback).toHaveBeenCalledWith(expect.any(Error));
     expect(callback.mock.calls[0][0].message).toBe('类型错误');
   });
@@ -590,7 +595,7 @@ describe('getRules tdesign validator', () => {
     const rules: any = [{ typeMatch: true, message: '类型错误' }];
     const newRules: any = getRules(mForm, rules, propsOf({ type: 'text' }));
     // TDesign 调用签名：validator(val)
-    await expect(newRules[0].validator(123)).resolves.toEqual({
+    await expect(newRules[0].validator({ a: 1 })).resolves.toEqual({
       result: false,
       message: '类型错误',
     });

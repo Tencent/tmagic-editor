@@ -558,6 +558,11 @@ const validateBuiltinTypeMatch = (
       return undefined;
     }
 
+    // text 常与数字（如 id、数量）绑定，值允许为数字；错误建议仍按字符串给出
+    if (fieldType === 'text' && isNumberValue(value)) {
+      return undefined;
+    }
+
     if (typeof value !== 'string') {
       return defaultMessage(
         message,
