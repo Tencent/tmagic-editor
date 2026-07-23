@@ -449,16 +449,27 @@ export const sortChange = (data: any[], { prop, order }: SortProp) => {
  * - accessor 描述符（`{ get stage() { return ... } }`）按原样 defineProperty，调用方
  *   可控制读时求值；强制 `configurable: true` 以便下一次合并可再 define。
  *
- * 注意：formState 上由 props 派生的字段（keyProp / popperClass / config / initValues /
- * isCompare / lastValues / parentValues）是只读 getter（无 setter），extendState 若以
- * 普通字段形式返回同名 key，直接赋值会让 proxy 的 set trap 失败并抛出
- * `TypeError: 'set' on proxy: trap returned falsish`，这里统一跳过并告警；
- * 如确需覆盖，可在 extendState 中以 get 访问器形式返回。
+ * 注意：extendState 只能向 formState「新增」字段，不允许覆盖其已有 key。
+ * 调用方可通过 `reservedKeys` 传入合并前已存在的内置 key 快照（keyProp / popperClass /
+ * config / initValues / isCompare / lastValues / parentValues / values / $emit / fields /
+ * post 等），命中这些 key 时统一跳过并告警。
+ *
+ * 兜底：未传 `reservedKeys` 时，仍会拦截 props 派生的只读 getter 字段（无 setter），
+ * 否则以普通字段形式赋值会让 proxy 的 set trap 抛出
+ * `TypeError: 'set' on proxy: trap returned falsish`。
  */
-export const applyExtendState = (formState: FormState, state: Record<string, any> | null | undefined): void => {
+export const applyExtendState = (
+  formState: FormState,
+  state: Record<string, any> | null | undefined,
+  reservedKeys?: Set<string | symbol>,
+): void => {
   if (!state) return;
 
   for (const [key, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(state))) {
+    if (reservedKeys?.has(key)) {
+      continue;
+    }
+
     if (!('value' in descriptor)) {
       descriptor.configurable = true;
       Object.defineProperty(formState, key, descriptor);

@@ -204,10 +204,14 @@ const mountFormInstance = <T>(options: MountFormInstanceOptions<T>): Promise<T> 
                     console.error('[MForm] extendState failed:', e);
                     return;
                   }
+                  // formState 的内置 key 快照：在 extendState 合并前捕获，
+                  // 供 applyExtendState 禁止 extendState 覆盖这些已有字段（只能新增），
+                  // 与 Form.vue 中 reservedStateKeys 的语义保持一致。
+                  const reservedStateKeys = new Set<string | symbol>(Reflect.ownKeys(form.formState));
                   // 合并逻辑收口在 applyExtendState：props 派生的只读 getter 字段
                   // （keyProp 等）以普通字段形式返回时会被跳过并告警，避免 proxy set 抛错
                   const apply = (state: Record<string, any> | null | undefined) =>
-                    applyExtendState(form.formState, state);
+                    applyExtendState(form.formState, state, reservedStateKeys);
                   if (result && typeof result.then === 'function') {
                     result.then(apply, (e: any) => console.error('[MForm] extendState failed:', e));
                   } else {

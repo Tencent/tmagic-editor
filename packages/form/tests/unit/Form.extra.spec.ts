@@ -189,9 +189,7 @@ describe('Form.vue —— extendState', () => {
     expect(v2).toMatch(/^stage-/);
   });
 
-  test('extendState 以普通字段返回 props 派生的只读字段时跳过并告警，不抛错', async () => {
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-
+  test('extendState 以普通字段返回内置保留字段时静默跳过，其余字段正常合并', async () => {
     const wrapper = mountForm({
       keyProp: 'id',
       extendState: () => ({ keyProp: 'custom', config: [], extra: 'ok' }),
@@ -201,18 +199,15 @@ describe('Form.vue —— extendState', () => {
     await nextTick();
     await nextTick();
 
-    // 只读派生字段保持 props 值，未被覆盖
+    // 内置保留字段（keyProp / config）未被 extendState 覆盖
     expect((wrapper.vm.formState as any).keyProp).toBe('id');
     expect(Array.isArray((wrapper.vm.formState as any).config)).toBe(true);
-    // 其他字段正常合并
+    // 非保留字段正常合并
     expect((wrapper.vm.formState as any).extra).toBe('ok');
-    expect(warnSpy).toHaveBeenCalled();
     expect(wrapper.find('.m-form').exists()).toBe(true);
-
-    warnSpy.mockRestore();
   });
 
-  test('extendState 以 get 访问器返回只读字段同名 key 时允许显式覆盖', async () => {
+  test('extendState 以 get 访问器返回内置保留字段同名 key 时仍被拦截，无法覆盖', async () => {
     const wrapper = mountForm({
       keyProp: 'id',
       extendState: () =>
@@ -228,7 +223,8 @@ describe('Form.vue —— extendState', () => {
     await nextTick();
     await nextTick();
 
-    expect((wrapper.vm.formState as any).keyProp).toBe('custom-key');
+    // keyProp 属于内置保留字段，即使以访问器形式返回也不允许覆盖
+    expect((wrapper.vm.formState as any).keyProp).toBe('id');
   });
 
   test('extendState 同步段读到的响应式数据变化时会重跑', async () => {

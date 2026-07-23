@@ -262,6 +262,18 @@ const formState: FormState = reactive<FormState>({
 });
 
 /**
+ * formState 的内置 key 快照（keyProp / values / $emit / fields / post 等）。
+ *
+ * 在 `extendState` 首次合并前捕获，`applyExtendState` 会据此禁止 `extendState`
+ * 覆盖这些已有字段（只能新增字段），避免表单核心状态被外部意外改写。
+ *
+ * 之所以在此处（effect 之外）捕获而不是在 `applyExtendState` 内动态取：
+ * `watchEffect` 会在依赖变化时重跑，若动态取，`extendState` 自己新增的字段在第二次
+ * 合并时也会被当成「已有 key」而拒绝刷新；这里只锁定内置字段即可规避该问题。
+ */
+const reservedStateKeys = new Set<string | symbol>(Reflect.ownKeys(formState));
+
+/**
  * `extendState` 的同步段（直到第一个 `await` 之前）所访问的任何响应式数据，
  * 都会被 `watchEffect` 自动跟踪。这样可以兼容历史用法 ——
  *
@@ -299,7 +311,7 @@ watchEffect(async (onCleanup) => {
   }
   if (stale) return;
 
-  applyExtendState(formState, state);
+  applyExtendState(formState, state, reservedStateKeys);
 });
 
 provide('mForm', formState);

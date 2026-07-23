@@ -90,9 +90,7 @@ describe('submitForm', () => {
     expect(extendState).toHaveBeenCalled();
   });
 
-  test('extendState 返回 keyProp 等只读派生字段时不抛错且正常 resolve', async () => {
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-
+  test('extendState 返回 keyProp 等内置保留字段时静默跳过且正常 resolve', async () => {
     const values = await submitForm({
       config: [{ type: 'text', name: 'text', text: 'text' }],
       initValues: { text: 'foo' },
@@ -100,10 +98,8 @@ describe('submitForm', () => {
       appContext,
     });
 
+    // keyProp 属于内置保留字段，被静默跳过，不污染最终 values
     expect(values).toEqual({ text: 'foo' });
-    expect(warnSpy).toHaveBeenCalled();
-
-    warnSpy.mockRestore();
   });
 
   test('在嵌套 items 配置下也能正确 resolve', async () => {

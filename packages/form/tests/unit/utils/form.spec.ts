@@ -16,9 +16,10 @@
  * limitations under the License.
  */
 
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 import type { FormState } from '@form/index';
 import {
+  applyExtendState,
   createObjectProp,
   createValues,
   datetimeFormatter,
@@ -1012,5 +1013,132 @@ describe('createObjectProp', () => {
 
   test('带name参数且路径多段且最后一段匹配', () => {
     expect(createObjectProp('a.b.c', 'newKey', 'c')).toBe('a.b.newKey');
+  });
+});
+
+describe('applyExtendState', () => {
+  test('state 为 null 或 undefined 时不修改 formState', () => {
+    const formState = { a: 1 } as any;
+
+    applyExtendState(formState, null);
+    applyExtendState(formState, undefined);
+
+    expect(formState).toEqual({ a: 1 });
+  });
+
+  test('普通字段（data descriptor）以新增字段形式合并进 formState', () => {
+    const formState = {} as any;
+
+    applyExtendState(formState, { foo: 'bar', num: 1 });
+
+    expect(formState.foo).toBe('bar');
+    expect(formState.num).toBe(1);
+  });
+
+  test('accessor descriptor 按原样 define 且读时求值', () => {
+    const formState = {} as any;
+    let count = 0;
+    const state = {};
+    Object.defineProperty(state, 'stage', {
+      get() {
+        count += 1;
+        return 'stageValue';
+      },
+      enumerable: true,
+      configurable: true,
+    });
+
+    applyExtendState(formState, state);
+
+    // 读时才求值
+    expect(count).toBe(0);
+    expect(formState.stage).toBe('stageValue');
+    expect(count).toBe(1);
+  });
+
+  test('accessor descriptor 强制 configurable=true，可再次 define 不报错', () => {
+    const formState = {} as any;
+    const state = {};
+    // 原始描述符 configurable 为 false
+    Object.defineProperty(state, 'stage', {
+      get: () => 'v',
+      enumerable: true,
+      configurable: false,
+    });
+
+    applyExtendState(formState, state);
+
+    const descriptor = Object.getOwnPropertyDescriptor(formState, 'stage');
+    expect(descriptor?.configurable).toBe(true);
+    // 再次合并（重新 define）不应抛出
+    expect(() => applyExtendState(formState, state)).not.toThrow();
+  });
+
+  test('reservedKeys 命中的 key 被跳过，不覆盖已有内置字段', () => {
+    const formState = { values: { origin: true } } as any;
+    const reservedKeys = new Set<string | symbol>(['values']);
+
+    applyExtendState(formState, { values: { changed: true }, extra: 1 }, reservedKeys);
+
+    // reserved key 未被覆盖
+    expect(formState.values).toEqual({ origin: true });
+    // 非 reserved 的新字段正常新增
+    expect(formState.extra).toBe(1);
+  });
+
+  test('reservedKeys 对 accessor 形式的同名 key 同样跳过', () => {
+    const formState = { keyProp: 'origin' } as any;
+    const reservedKeys = new Set<string | symbol>(['keyProp']);
+    const state = {};
+    Object.defineProperty(state, 'keyProp', {
+      get: () => 'override',
+      enumerable: true,
+      configurable: true,
+    });
+
+    applyExtendState(formState, state, reservedKeys);
+
+    expect(formState.keyProp).toBe('origin');
+  });
+
+  test('未传 reservedKeys 时，只读 getter 字段被跳过并告警', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const formState = {} as any;
+    Object.defineProperty(formState, 'keyProp', {
+      get: () => 'readonly',
+      enumerable: true,
+      configurable: true,
+    });
+
+    applyExtendState(formState, { keyProp: 'newValue' });
+
+    expect(formState.keyProp).toBe('readonly');
+    expect(warnSpy).toHaveBeenCalled();
+    warnSpy.mockRestore();
+  });
+
+  test('未传 reservedKeys 时，存在 setter 的字段可被赋值', () => {
+    let inner = 'old';
+    const formState = {} as any;
+    Object.defineProperty(formState, 'writable', {
+      get: () => inner,
+      set: (v: string) => {
+        inner = v;
+      },
+      enumerable: true,
+      configurable: true,
+    });
+
+    applyExtendState(formState, { writable: 'new' });
+
+    expect(formState.writable).toBe('new');
+  });
+
+  test('未传 reservedKeys 时，普通可写字段正常覆盖赋值', () => {
+    const formState = { editable: 'old' } as any;
+
+    applyExtendState(formState, { editable: 'new' });
+
+    expect(formState.editable).toBe('new');
   });
 });

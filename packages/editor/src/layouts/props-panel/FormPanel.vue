@@ -49,14 +49,13 @@ import { Document as DocumentIcon } from '@element-plus/icons-vue';
 
 import { TMagicButton, tMagicMessage, TMagicScrollbar } from '@tmagic/design';
 import type { ContainerChangeEventData, FormConfig, FormState, FormValue } from '@tmagic/form';
-import { MForm } from '@tmagic/form';
+import { MForm, validateForm } from '@tmagic/form';
 import { filterXSS } from '@tmagic/utils';
 
 import MIcon from '@editor/components/Icon.vue';
 import { ENABLE_PROPS_FORM_VALIDATE } from '@editor/editorProps';
 import { useEditorContentHeight } from '@editor/hooks/use-editor-content-height';
 import { useServices } from '@editor/hooks/use-services';
-import { validatePropsForm } from '@editor/utils/props';
 
 import CodeEditor from '../CodeEditor.vue';
 
@@ -162,14 +161,19 @@ const saveCode = async (values: any) => {
   // 做一次静默校验（不复用、也不污染页面上正在展示的表单），并将校验结果（错误信息）随提交
   // 一并抛给上层记录，使源码保存的错误状态与表单编辑保持一致。
   try {
-    const error = await validatePropsForm({
+    const error = await validateForm({
       config: props.config,
-      values: newValues,
-      appContext: internalInstance?.appContext ?? null,
-      services,
-      stage: stage.value,
       typeMatchValid: true,
-      extendState: props.extendState,
+      initValues: newValues,
+      // 将当前组件实例的 provides（含 Editor 顶层的 services / codeOptions 等组件级 provide）
+      // 合入 appContext，使临时 MForm 中的编辑器字段组件（DataSourceInput 等）能正常 inject
+      appContext: internalInstance?.appContext ? { ...internalInstance?.appContext, provides: { services } } : null,
+      extendState: (state) => {
+        if (configFormRef.value?.formState) {
+          return { ...(configFormRef.value?.formState || {}) };
+        }
+        return props.extendState?.(state) || {};
+      },
     });
 
     if (error) {
