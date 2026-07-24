@@ -333,11 +333,11 @@ export const initServiceEvents = (
     Promise.all(
       nodes.map((node) => {
         if (node.type === NodeType.ROOT) {
-          return Promise.resolve();
+          return Promise.resolve(true);
         }
         return depService.collectIdle([node], { pageId: getPageIdByNode(node) }, deep, type);
       }),
-    );
+    ).then((results) => results.every(Boolean));
 
   watch(
     () => editorService.get('stage'),
@@ -351,7 +351,7 @@ export const initServiceEvents = (
 
         if (!node) return;
 
-        await collectIdle([node], true, DepTargetType.DATA_SOURCE);
+        if (!(await collectIdle([node], true, DepTargetType.DATA_SOURCE))) return;
         updateStageNode(node);
       });
     },
@@ -494,8 +494,10 @@ export const initServiceEvents = (
 
   // 新增节点，收集依赖
   const nodeAddHandler = (nodes: MComponent[]) => {
-    collectIdle(nodes, true).then(() => {
-      updateStageNodes(nodes);
+    collectIdle(nodes, true).then((completed) => {
+      if (completed) {
+        updateStageNodes(nodes);
+      }
     });
   };
 
@@ -549,8 +551,8 @@ export const initServiceEvents = (
     if (needRecollectNodes.length) {
       // 有数据源依赖，需要等依赖重新收集完才更新stage
       const handler = async () => {
-        await collectIdle(needRecollectNodes, true, DepTargetType.DATA_SOURCE);
-        await collectIdle(needRecollectNodes, true, DepTargetType.DATA_SOURCE_COND);
+        if (!(await collectIdle(needRecollectNodes, true, DepTargetType.DATA_SOURCE))) return;
+        if (!(await collectIdle(needRecollectNodes, true, DepTargetType.DATA_SOURCE_COND))) return;
         updateStageNodes(needRecollectNodes);
       };
       handler();
@@ -572,8 +574,10 @@ export const initServiceEvents = (
 
   // 历史记录变化时，需要重新收集依赖
   const historyChangeHandler = (page: MPage | MPageFragment) => {
-    collectIdle([page], true).then(() => {
-      updateStageNode(page);
+    collectIdle([page], true).then((completed) => {
+      if (completed) {
+        updateStageNode(page);
+      }
     });
   };
 
@@ -654,7 +658,7 @@ export const initServiceEvents = (
       if (Array.isArray(root?.items)) {
         depService.clearIdleTasks();
 
-        let collectIdlePromises: Promise<void[]>[] = [];
+        let collectIdlePromises: Promise<boolean>[] = [];
         if (isModifyField) {
           depService.removeTarget(config.id, DepTargetType.DATA_SOURCE);
           depService.removeTarget(config.id, DepTargetType.DATA_SOURCE_COND);
@@ -679,10 +683,15 @@ export const initServiceEvents = (
 
           collectIdlePromises = [collectIdle(root.items, true, DepTargetType.DATA_SOURCE_METHOD)];
         }
-        Promise.all(collectIdlePromises)
-          .then(() => updateDataSourceSchema())
-          .then(() => updateDsData())
-          .then(() => updateStageNodes(root.items));
+        const handler = async () => {
+          const results = await Promise.all(collectIdlePromises);
+          if (!results.every(Boolean)) return;
+
+          updateDataSourceSchema();
+          await updateDsData();
+          updateStageNodes(root.items);
+        };
+        handler();
       }
     } else if (root?.dataSources) {
       updateDsData();
@@ -706,11 +715,12 @@ export const initServiceEvents = (
       const nodeIds = Object.keys(root.dataSourceDeps?.[id] || {});
       const nodes = getNodes(nodeIds, root.items);
 
-      await Promise.all([
+      const results = await Promise.all([
         collectIdle(nodes, false, DepTargetType.DATA_SOURCE),
         collectIdle(nodes, false, DepTargetType.DATA_SOURCE_COND),
         collectIdle(nodes, false, DepTargetType.DATA_SOURCE_METHOD),
       ]);
+      if (!results.every(Boolean)) return;
 
       updateDataSourceSchema();
 

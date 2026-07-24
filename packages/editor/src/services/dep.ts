@@ -42,6 +42,21 @@ interface State {
 
 type StateKey = keyof State;
 
+/**
+ * 一次 collectIdle 调用对应一个批次。批次自行统计入队/完成的任务数，在自身任务全部完成或被中断时
+ * 结算对应的 Promise，避免多次快速触发时共用 idleTask 的 finish 事件造成的串扰、提前 resolve，
+ * 以及 clearTasks 后 Promise 永不 resolve（collecting 卡死、监听器泄漏）。
+ */
+interface CollectBatch {
+  nodes: MNode[];
+  deep: boolean;
+  pending: number;
+  dsPending: number;
+  collectedEmitted: boolean;
+  dsSettled: boolean;
+  resolve: (completed: boolean) => void;
+}
+
 class Dep extends BaseService {
   private state = shallowReactive<State>({
     collecting: false,
@@ -53,6 +68,12 @@ class Dep extends BaseService {
   private watcher = new Watcher({ initialTargets: reactive({}) });
 
   private waitingWorker?: Promise<void>;
+
+  private resolveWaitingWorker?: () => void;
+
+  private workerGeneration = 0;
+
+  private activeBatches = new Set<CollectBatch>();
 
   constructor() {
     super();
@@ -137,38 +158,44 @@ class Dep extends BaseService {
       await this.waitingWorker;
     }
 
-    this.set('collecting', true);
-    let startTask = false;
-    this.watcher.collectByCallback(nodes, type, ({ node, target }) => {
-      startTask = true;
+    const batch: CollectBatch = {
+      nodes,
+      deep,
+      pending: 0,
+      dsPending: 0,
+      collectedEmitted: false,
+      dsSettled: false,
+      resolve: () => {},
+    };
 
-      this.enqueueTask(node, target, depExtendedData, deep);
+    this.watcher.collectByCallback(nodes, type, ({ node, target }) => {
+      this.enqueueTask(node, target, depExtendedData, deep, batch);
     });
 
-    return new Promise<void>((resolve) => {
-      if (!startTask) {
-        this.emit('collected', nodes, deep);
-        this.set('collecting', false);
-        resolve();
-        return;
-      }
-      this.idleTask.once('finish', () => {
-        this.emit('collected', nodes, deep);
-        this.set('collecting', false);
-      });
-      this.idleTask.once('hight-level-finish', () => {
-        this.emit('ds-collected', nodes, deep);
-        resolve();
-      });
+    // 没有命中任何 target，无需收集，直接完成
+    if (batch.pending === 0) {
+      this.emit('collected', nodes, deep);
+      this.updateCollectingState();
+      return true;
+    }
+
+    this.activeBatches.add(batch);
+    this.set('collecting', true);
+
+    return new Promise<boolean>((resolve) => {
+      batch.resolve = resolve;
     });
   }
 
   public collectByWorker(dsl: MApp) {
     this.set('collecting', true);
+    this.workerGeneration += 1;
+    const generation = this.workerGeneration;
 
     const { promise, resolve: waitingResolve } = Promise.withResolvers<void>();
 
     this.waitingWorker = promise;
+    this.resolveWaitingWorker = waitingResolve;
 
     return new Promise<Record<string, Record<string, DepData>>>((resolve) => {
       const worker = new Work();
@@ -182,6 +209,11 @@ class Dep extends BaseService {
         resolve({});
       };
     }).then((depsData) => {
+      if (generation !== this.workerGeneration) {
+        waitingResolve();
+        return depsData;
+      }
+
       traverseTarget(this.watcher.getTargetsList(), (target) => {
         if (depsData[target.type]?.[target.id]) {
           target.deps = reactive(depsData[target.type][target.id]);
@@ -200,6 +232,10 @@ class Dep extends BaseService {
       this.emit('collected', dsl.items, true);
       this.emit('ds-collected', dsl.items, true);
       waitingResolve();
+      if (this.waitingWorker === promise) {
+        this.waitingWorker = undefined;
+        this.resolveWaitingWorker = undefined;
+      }
 
       return depsData;
     });
@@ -233,6 +269,7 @@ class Dep extends BaseService {
   }
 
   public clearIdleTasks() {
+    this.abortActiveBatches();
     this.idleTask.clearTasks();
   }
 
@@ -251,6 +288,11 @@ class Dep extends BaseService {
   }
 
   public reset() {
+    this.abortActiveBatches();
+    this.workerGeneration += 1;
+    this.resolveWaitingWorker?.();
+    this.resolveWaitingWorker = undefined;
+    this.waitingWorker = undefined;
     this.idleTask.clearTasks();
 
     for (const type of Object.keys(this.watcher.getTargetsList())) {
@@ -286,24 +328,98 @@ class Dep extends BaseService {
     }
   }
 
-  private enqueueTask(node: MNode, target: Target, depExtendedData: DepExtendedData, deep: boolean) {
+  private enqueueTask(
+    node: MNode,
+    target: Target,
+    depExtendedData: DepExtendedData,
+    deep: boolean,
+    batch: CollectBatch,
+  ) {
+    const isDataSource = target.type === DepTargetType.DATA_SOURCE;
+
+    batch.pending += 1;
+    if (isDataSource) {
+      batch.dsPending += 1;
+    }
+
     this.idleTask.enqueueTask(
       ({ node, deep, target }) => {
-        this.collectNode(node, target, depExtendedData, deep);
+        try {
+          this.collectNode(node, target, depExtendedData, deep);
+        } finally {
+          this.onBatchTaskDone(batch, isDataSource);
+        }
       },
       {
         node,
         deep: false,
         target,
       },
-      target.type === DepTargetType.DATA_SOURCE,
+      isDataSource,
     );
 
     if (deep && Array.isArray(node.items) && node.items.length) {
       node.items.forEach((item) => {
-        this.enqueueTask(item, target, depExtendedData, deep);
+        this.enqueueTask(item, target, depExtendedData, deep, batch);
       });
     }
+  }
+
+  private onBatchTaskDone(batch: CollectBatch, isDataSource: boolean) {
+    if (isDataSource) {
+      batch.dsPending -= 1;
+      // 数据源依赖收集完先 resolve，让 stage 尽快更新，其余依赖继续在后台收集
+      if (batch.dsPending === 0) {
+        this.settleBatchDs(batch);
+      }
+    }
+
+    batch.pending -= 1;
+    if (batch.pending === 0) {
+      this.finishBatch(batch);
+    }
+  }
+
+  private settleBatchDs(batch: CollectBatch) {
+    if (batch.dsSettled) return;
+    batch.dsSettled = true;
+    this.emit('ds-collected', batch.nodes, batch.deep);
+    batch.resolve(true);
+  }
+
+  private finishBatch(batch: CollectBatch) {
+    if (!batch.collectedEmitted) {
+      batch.collectedEmitted = true;
+      this.emit('collected', batch.nodes, batch.deep);
+    }
+    // 没有数据源任务的批次在此结算 Promise
+    this.settleBatchDs(batch);
+    this.activeBatches.delete(batch);
+    this.updateCollectingState();
+  }
+
+  /**
+   * idleTask 被清空时，在途批次的任务不会再执行，必须主动结算，
+   * 否则对应的 collectIdle Promise 永远不会 resolve（collecting 卡在 true、once 监听器泄漏）。
+   * 收集被中断（通常紧跟一次全量重新收集），因此不再 emit collected/ds-collected，仅结算 Promise。
+   */
+  private abortActiveBatches() {
+    if (!this.activeBatches.size) {
+      return;
+    }
+
+    const batches = [...this.activeBatches];
+    this.activeBatches.clear();
+
+    for (const batch of batches) {
+      batch.resolve(false);
+    }
+
+    this.updateCollectingState();
+  }
+
+  private updateCollectingState() {
+    this.set('collecting', this.activeBatches.size > 0);
   }
 }
 

@@ -25,6 +25,12 @@ globalThis.requestIdleCallback =
     }, 1);
   };
 
+globalThis.cancelIdleCallback =
+  globalThis.cancelIdleCallback ||
+  function (handle) {
+    clearTimeout(handle as unknown as ReturnType<typeof setTimeout>);
+  };
+
 export class IdleTask<T = any> extends EventEmitter {
   private taskList: TaskList<T> = [];
 

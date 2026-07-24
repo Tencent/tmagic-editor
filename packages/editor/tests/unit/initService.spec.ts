@@ -91,7 +91,7 @@ const mkServices = () => {
     clear: vi.fn(),
     clearTargets: vi.fn(),
     clearIdleTasks: vi.fn(),
-    collectIdle: vi.fn(async () => undefined),
+    collectIdle: vi.fn(async () => true),
     collectByWorker: vi.fn(async () => undefined),
     reset: vi.fn(),
   };

@@ -13,16 +13,17 @@ vi.mock('@editor/utils/dep/worker.ts?worker&inline', () => ({
   default: class FakeWorker {
     public static nextData: Record<string, any> = {};
     public static nextError = false;
+    public static nextDelay = 0;
     public onmessage: ((e: any) => void) | null = null;
     public onerror: (() => void) | null = null;
     public postMessage() {
       setTimeout(() => {
         if (FakeWorker.nextError) {
-          this.onerror?.(new Event('error'));
+          this.onerror?.();
           return;
         }
         this.onmessage?.({ data: FakeWorker.nextData });
-      }, 0);
+      }, FakeWorker.nextDelay);
     }
   },
 }));
@@ -121,7 +122,7 @@ describe('Dep service', () => {
   test('collectIdle - 没有命中时立即 resolve 并 emit collected', async () => {
     const fn = vi.fn();
     depService.on('collected', fn);
-    await depService.collectIdle([{ id: 'n1', type: 'text' }] as any);
+    await expect(depService.collectIdle([{ id: 'n1', type: 'text' }] as any)).resolves.toBe(true);
     expect(fn).toHaveBeenCalled();
     depService.off('collected', fn);
   });
@@ -217,6 +218,83 @@ describe('Dep service', () => {
     expect(dsl.dataSourceCondDeps.cond1).toBeDefined();
     expect(dsl.dataSourceMethodDeps.method1).toBeDefined();
     fakeWorker.nextData = {};
+  });
+
+  test('collectIdle 命中 target 时最终 resolve 并按批次 emit collected/ds-collected', async () => {
+    depService.addTarget(makeTarget('ds1', DepTargetType.DATA_SOURCE));
+    const collected = vi.fn();
+    const dsCollected = vi.fn();
+    depService.on('collected', collected);
+    depService.on('ds-collected', dsCollected);
+
+    const nodes = [{ id: 'n1', type: 'text' }] as any;
+    await expect(depService.collectIdle(nodes, {}, false, DepTargetType.DATA_SOURCE)).resolves.toBe(true);
+
+    expect(dsCollected).toHaveBeenCalledWith(nodes, false);
+    expect(collected).toHaveBeenCalledWith(nodes, false);
+    expect(depService.get('collecting')).toBe(false);
+
+    depService.off('collected', collected);
+    depService.off('ds-collected', dsCollected);
+  });
+
+  test('clearIdleTasks 会结算在途 collectIdle，避免 Promise 永久挂起且 collecting 复位', async () => {
+    depService.addTarget(makeTarget('ds1', DepTargetType.DATA_SOURCE));
+
+    const promise = depService.collectIdle([{ id: 'n1', type: 'text' }] as any, {}, false, DepTargetType.DATA_SOURCE);
+    expect(depService.get('collecting')).toBe(true);
+
+    // 快速触发：任务尚未执行就清空队列，批次应被主动结算而不是永久挂起
+    depService.clearIdleTasks();
+
+    await expect(promise).resolves.toBe(false);
+    expect(depService.get('collecting')).toBe(false);
+  });
+
+  test('reset 会结算在途 collectIdle', async () => {
+    depService.addTarget(makeTarget('ds1', DepTargetType.DATA_SOURCE));
+
+    const promise = depService.collectIdle([{ id: 'n1', type: 'text' }] as any, {}, false, DepTargetType.DATA_SOURCE);
+    depService.reset();
+
+    await expect(promise).resolves.toBe(false);
+    expect(depService.get('collecting')).toBe(false);
+  });
+
+  test('reset 会忽略在途 worker 的过期结果，避免覆盖新依赖', async () => {
+    const fakeWorker = (await import('@editor/utils/dep/worker.ts?worker&inline')).default as any;
+    fakeWorker.nextDelay = 20;
+    fakeWorker.nextData = {
+      [DepTargetType.DATA_SOURCE]: { ds1: { n1: { data: {} } } },
+    };
+
+    const workerPromise = depService.collectByWorker({ items: [], id: 'app', type: 'app' } as any);
+    depService.reset();
+
+    const target = makeTarget('ds1', DepTargetType.DATA_SOURCE);
+    depService.addTarget(target);
+    const idlePromise = depService.collectIdle(
+      [{ id: 'n1', type: 'text' }] as any,
+      {},
+      false,
+      DepTargetType.DATA_SOURCE,
+    );
+
+    await Promise.all([workerPromise, idlePromise]);
+    expect(target.deps.n1).toBeUndefined();
+
+    fakeWorker.nextDelay = 0;
+    fakeWorker.nextData = {};
+  });
+
+  test('多个批次并发时各自独立 resolve，全部完成后 collecting 复位', async () => {
+    depService.addTarget(makeTarget('ds1', DepTargetType.DATA_SOURCE));
+
+    const p1 = depService.collectIdle([{ id: 'n1', type: 'text' }] as any, {}, false, DepTargetType.DATA_SOURCE);
+    const p2 = depService.collectIdle([{ id: 'n2', type: 'text' }] as any, {}, false, DepTargetType.DATA_SOURCE);
+
+    await Promise.all([p1, p2]);
+    expect(depService.get('collecting')).toBe(false);
   });
 
   test('destroy 会 reset 并移除监听', () => {
