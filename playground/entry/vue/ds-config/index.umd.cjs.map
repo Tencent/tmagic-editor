@@ -1,0 +1,1 @@
+{"version":3,"file":"index.umd.cjs","names":[],"sources":["../../../.tmagic/ds-config-entry.ts"],"sourcesContent":["const dsConfigs: Record<string, any> = {};\nexport default dsConfigs;"],"mappings":""}

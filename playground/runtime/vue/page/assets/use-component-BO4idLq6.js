@@ -1,0 +1,2 @@
+import{b as e,ot as t}from"./src-DKsT9m2m.js";function n(n=``){let r,i,a;return typeof n==`string`?r=n:{componentType:r,app:i}=n,(!r||r===``)&&(r=`container`),i||(i=t(`app`)),a=i?.resolveComponent(r),!a&&!r.startsWith(`magic-ui-`)&&(r=`magic-ui-${e(r)}`,a=i?.resolveComponent(r)),a??r}export{n as t};
+//# sourceMappingURL=use-component-BO4idLq6.js.map

@@ -1,0 +1,2 @@
+import{et as e,it as t,ot as n,ut as r}from"./src-DKsT9m2m.js";import{t as i}from"./utils-BROmy4yG.js";import{r as a,t as o}from"./use-app-J-A1gM1_.js";var s=[`innerHTML`],c=t({name:`tmagic-text`,__name:`index`,props:{config:{},iteratorIndex:{},iteratorContainerId:{},containerIndex:{},pageFragmentContainerId:{},model:{},disabled:{type:Boolean}},setup(t){let c=t,l=n(`app`),u=a(c);o(u);let d=()=>{l&&u&&l.emit(`${i}click`,u)};return(n,i)=>(r(),e(`p`,{onClick:d,innerHTML:t.config.text},null,8,s))}});export{c as default};
+//# sourceMappingURL=src-sklRQHeX.js.map

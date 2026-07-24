@@ -1,0 +1,2 @@
+import{et as e,it as t,nt as n,pt as r,ut as i,zt as a}from"./src-DKsT9m2m.js";import{t as o}from"./utils-BROmy4yG.js";import{n as s}from"./use-app-J-A1gM1_.js";var c=t({name:`tmagic-button`,__name:`index`,props:{config:{},iteratorIndex:{},iteratorContainerId:{},containerIndex:{},pageFragmentContainerId:{},model:{},disabled:{type:Boolean}},setup(t){let{app:c,node:l}=s(t),u=()=>{c&&l&&c.emit(`${o}click`,l)};return(o,s)=>(i(),e(`button`,{onClick:u},[r(o.$slots,`default`,{},()=>[n(a(t.config?.text||``),1)])]))}});export{c as default};
+//# sourceMappingURL=src-1uoMLx9O.js.map

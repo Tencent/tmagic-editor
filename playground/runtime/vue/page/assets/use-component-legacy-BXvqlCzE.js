@@ -1,0 +1,2 @@
+System.register(["./src-legacy-CCACeKdE.js"],function(t,e){var n,o;return t("t",function(t=""){let e,r,i;return"string"==typeof t?e=t:({componentType:e,app:r}=t),e&&""!==e||(e="container"),r||(r=o("app")),i=r?.resolveComponent(e),i||e.startsWith("magic-ui-")||(e=`magic-ui-${n(e)}`,i=r?.resolveComponent(e)),i??e}),{setters:[function(t){n=t.b,o=t.ot}],execute:function(){}}});
+//# sourceMappingURL=use-component-legacy-BXvqlCzE.js.map
