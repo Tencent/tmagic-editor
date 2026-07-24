@@ -87,6 +87,11 @@ export interface SubmitFormOptions {
    */
   debug?: boolean;
   typeMatchValid?: boolean;
+  /**
+   * 外部中断信号。abort 时会立即以 `signal.reason` reject 并卸载临时表单实例、移除容器。
+   * 主要用于 `debug` 模式（无超时兜底）下取消一个被放弃的表单弹层，避免其无限驻留在页面上。
+   */
+  signal?: AbortSignal;
 }
 // #endregion SubmitFormOptions
 
@@ -127,7 +132,7 @@ interface MountFormInstanceOptions<T> {
   formProps: Record<string, any>;
   /** 父级应用上下文，用于继承全局组件、指令、provide 等 */
   appContext?: AppContext | null;
-  /** 等待表单初始化的最长时间（毫秒），<=0 表示不注册超时 */
+  /** 等待表单初始化的最长时间（毫秒），<=0 时回退到默认超时以保证兜底清理生效 */
   timeout: number;
   /** 超时 reject 的错误文案 */
   timeoutMessage: string;
@@ -135,9 +140,14 @@ interface MountFormInstanceOptions<T> {
   hidden?: boolean;
   /** 是否跳过超时注册。调试模式等待人工操作，应传 `true` */
   skipTimeout?: boolean;
+  /** 外部中断信号：abort 时会 reject 并卸载实例、移除容器，用于取消无超时（如 debug）的挂载 */
+  signal?: AbortSignal;
   /** 构造 wrapper 组件 */
   createWrapper: FormWrapperFactory<T>;
 }
+
+/** 未指定或传入非正数 timeout 时的兜底超时（毫秒），保证非 debug 挂载始终能被清理 */
+const DEFAULT_MOUNT_TIMEOUT = 10000;
 
 /**
  * submitForm / validateForm 的公共脚手架：
@@ -149,19 +159,35 @@ interface MountFormInstanceOptions<T> {
  * 容器创建、卸载、超时、上下文注入等模板代码在此统一收口。
  */
 const mountFormInstance = <T>(options: MountFormInstanceOptions<T>): Promise<T> => {
-  const { formProps, appContext, timeout, timeoutMessage, hidden = true, skipTimeout = false, createWrapper } = options;
+  const {
+    formProps,
+    appContext,
+    timeout,
+    timeoutMessage,
+    hidden = true,
+    skipTimeout = false,
+    signal,
+    createWrapper,
+  } = options;
 
   return new Promise<T>((resolve, reject) => {
+    // 已中断则直接 reject，不创建任何容器/实例
+    if (signal?.aborted) {
+      reject(signal.reason ?? new Error('mountFormInstance aborted'));
+      return;
+    }
+
+    let cleaned = false;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    let onAbort: (() => void) | null = null;
+    // 用 holder 持有 app，使 cleanup 可在 app 创建之前定义（const app + 无 TDZ / 无 use-before-define）
+    const instance: { app: ReturnType<typeof createApp> | null } = { app: null };
+
     const container = document.createElement('div');
     if (hidden) {
       container.style.display = 'none';
     }
     document.body.appendChild(container);
-
-    let cleaned = false;
-    let timer: ReturnType<typeof setTimeout> | null = null;
-    // 用 holder 持有 app，使 cleanup 可在 app 创建之前定义（const app + 无 TDZ / 无 use-before-define）
-    const instance: { app: ReturnType<typeof createApp> | null } = { app: null };
 
     const cleanup = () => {
       if (cleaned) return;
@@ -169,6 +195,10 @@ const mountFormInstance = <T>(options: MountFormInstanceOptions<T>): Promise<T> 
       if (timer) {
         clearTimeout(timer);
         timer = null;
+      }
+      if (signal && onAbort) {
+        signal.removeEventListener('abort', onAbort);
+        onAbort = null;
       }
       try {
         instance.app?.unmount();
@@ -178,85 +208,101 @@ const mountFormInstance = <T>(options: MountFormInstanceOptions<T>): Promise<T> 
       container.parentNode?.removeChild(container);
     };
 
-    const formRef = ref<any>(null);
+    // 支持外部通过 AbortSignal 主动中断：debug 模式无超时兜底，若调用方放弃了该 Promise，
+    // 可通过 abort 卸载实例、移除遮罩/容器，避免无限驻留在 DOM 中。
+    if (signal) {
+      onAbort = () => {
+        if (cleaned) return;
+        reject(signal.reason ?? new Error('mountFormInstance aborted'));
+        cleanup();
+      };
+      signal.addEventListener('abort', onAbort);
+    }
 
-    // 将 extendState 从 formProps 中剥离：不由 Form.vue 的 async watchEffect 异步应用，
-    // 而是在 wrapper 中通过 sync watch 在 formRef 就绪后直接写入 formState，
-    // 避免 display 等 filterFunction 在首次渲染时读到 undefined。
-    // 与 CompareForm / FormPanel 中「formRef.value.formState.services = ...」的做法一致。
-    const { extendState, ...restFormProps } = formProps;
+    // 从容器创建到 mount 的全流程统一 try/catch：任一步骤（createWrapper/createApp/上下文合并/mount）
+    // 抛错都会走到 cleanup，避免已插入 body 的 container 及未挂载的 app 残留导致泄漏。
+    try {
+      const formRef = ref<any>(null);
 
-    const userWrapper = createWrapper({ formRef, formProps: restFormProps, cleanup, resolve, reject });
+      // 将 extendState 从 formProps 中剥离：不由 Form.vue 的 async watchEffect 异步应用，
+      // 而是在 wrapper 中通过 sync watch 在 formRef 就绪后直接写入 formState，
+      // 避免 display 等 filterFunction 在首次渲染时读到 undefined。
+      // 与 CompareForm / FormPanel 中「formRef.value.formState.services = ...」的做法一致。
+      const { extendState, ...restFormProps } = formProps;
 
-    const wrapperComponent =
-      typeof extendState === 'function'
+      const userWrapper = createWrapper({ formRef, formProps: restFormProps, cleanup, resolve, reject });
+
+      const wrapperComponent =
+        typeof extendState === 'function'
+          ? defineComponent({
+              name: 'MFormExtendStateInjector',
+              setup() {
+                watch(
+                  () => formRef.value,
+                  (form) => {
+                    if (!form) return;
+                    let result: any;
+                    try {
+                      result = extendState(form.formState);
+                    } catch (e) {
+                      console.error('[MForm] extendState failed:', e);
+                      return;
+                    }
+                    // formState 的内置 key 快照：在 extendState 合并前捕获，
+                    // 供 applyExtendState 禁止 extendState 覆盖这些已有字段（只能新增），
+                    // 与 Form.vue 中 reservedStateKeys 的语义保持一致。
+                    const reservedStateKeys = new Set<string | symbol>(Reflect.ownKeys(form.formState));
+                    // 合并逻辑收口在 applyExtendState：props 派生的只读 getter 字段
+                    // （keyProp 等）以普通字段形式返回时会被跳过并告警，避免 proxy set 抛错
+                    const apply = (state: Record<string, any> | null | undefined) =>
+                      applyExtendState(form.formState, state, reservedStateKeys);
+                    if (result && typeof result.then === 'function') {
+                      result.then(apply, (e: any) => console.error('[MForm] extendState failed:', e));
+                    } else {
+                      apply(result);
+                    }
+                  },
+                  { flush: 'sync', immediate: true },
+                );
+                return () => h(userWrapper);
+              },
+            })
+          : userWrapper;
+
+      // 静默（隐藏挂载）模式下注入静默标记：vs-code 等重型字段组件可据此跳过自身渲染，
+      // 校验/取值依赖 FormItem 与 model 值，与叶子 UI 组件无关（见 FORM_SILENT_MODE_KEY 注释）。
+      // 用组件级 provide 而非 app.provide：appContext 合并后 app._context.provides 与父级应用
+      // 共享引用，app.provide 会把标记泄漏到父级应用。
+      const rootComponent = hidden
         ? defineComponent({
-            name: 'MFormExtendStateInjector',
+            name: 'MFormSilentProvider',
             setup() {
-              watch(
-                () => formRef.value,
-                (form) => {
-                  if (!form) return;
-                  let result: any;
-                  try {
-                    result = extendState(form.formState);
-                  } catch (e) {
-                    console.error('[MForm] extendState failed:', e);
-                    return;
-                  }
-                  // formState 的内置 key 快照：在 extendState 合并前捕获，
-                  // 供 applyExtendState 禁止 extendState 覆盖这些已有字段（只能新增），
-                  // 与 Form.vue 中 reservedStateKeys 的语义保持一致。
-                  const reservedStateKeys = new Set<string | symbol>(Reflect.ownKeys(form.formState));
-                  // 合并逻辑收口在 applyExtendState：props 派生的只读 getter 字段
-                  // （keyProp 等）以普通字段形式返回时会被跳过并告警，避免 proxy set 抛错
-                  const apply = (state: Record<string, any> | null | undefined) =>
-                    applyExtendState(form.formState, state, reservedStateKeys);
-                  if (result && typeof result.then === 'function') {
-                    result.then(apply, (e: any) => console.error('[MForm] extendState failed:', e));
-                  } else {
-                    apply(result);
-                  }
-                },
-                { flush: 'sync', immediate: true },
-              );
-              return () => h(userWrapper);
+              provide(FORM_SILENT_MODE_KEY, true);
+              return () => h(wrapperComponent);
             },
           })
-        : userWrapper;
+        : wrapperComponent;
 
-    // 静默（隐藏挂载）模式下注入静默标记：vs-code 等重型字段组件可据此跳过自身渲染，
-    // 校验/取值依赖 FormItem 与 model 值，与叶子 UI 组件无关（见 FORM_SILENT_MODE_KEY 注释）。
-    // 用组件级 provide 而非 app.provide：appContext 合并后 app._context.provides 与父级应用
-    // 共享引用，app.provide 会把标记泄漏到父级应用。
-    const rootComponent = hidden
-      ? defineComponent({
-          name: 'MFormSilentProvider',
-          setup() {
-            provide(FORM_SILENT_MODE_KEY, true);
-            return () => h(wrapperComponent);
-          },
-        })
-      : wrapperComponent;
+      const app = createApp(rootComponent);
+      instance.app = app;
 
-    const app = createApp(rootComponent);
-    instance.app = app;
+      // 继承父级应用上下文（components / directives / provides / config 等）
+      if (appContext) {
+        Object.assign(app._context, appContext);
+      }
 
-    // 继承父级应用上下文（components / directives / provides / config 等）
-    if (appContext) {
-      Object.assign(app._context, appContext);
-    }
+      // 非 debug（未跳过超时）场景始终注册超时兜底：timeout 为非正数时回退到默认值，
+      // 避免表单永不初始化时实例/容器/watcher 无限驻留而泄漏。
+      if (!skipTimeout) {
+        const effectiveTimeout = timeout > 0 ? timeout : DEFAULT_MOUNT_TIMEOUT;
+        timer = setTimeout(() => {
+          if (!cleaned) {
+            reject(new Error(timeoutMessage));
+            cleanup();
+          }
+        }, effectiveTimeout);
+      }
 
-    if (timeout > 0 && !skipTimeout) {
-      timer = setTimeout(() => {
-        if (!cleaned) {
-          reject(new Error(timeoutMessage));
-          cleanup();
-        }
-      }, timeout);
-    }
-
-    try {
       app.mount(container);
     } catch (err) {
       reject(err);
@@ -454,12 +500,13 @@ const createDebugWrapper = (options: DebugWrapperOptions): Component => {
  * ```
  */
 export const submitForm = (options: SubmitFormOptions): Promise<any> => {
-  const { native, appContext, timeout = 10000, returnChangeRecords, debug = false, ...formProps } = options;
+  const { native, appContext, timeout = 10000, returnChangeRecords, debug = false, signal, ...formProps } = options;
 
   return mountFormInstance<any>({
     formProps,
     appContext,
     timeout,
+    signal,
     // 调试模式需把表单展示出来；普通模式隐藏挂载
     hidden: !debug,
     // 调试模式等待人工操作，不应用超时
@@ -563,6 +610,11 @@ export interface ValidateFormOptions {
    */
   debug?: boolean;
   typeMatchValid?: boolean;
+  /**
+   * 外部中断信号。abort 时会立即以 `signal.reason` reject 并卸载临时表单实例、移除容器。
+   * 主要用于 `debug` 模式（无超时兜底）下取消一个被放弃的表单弹层，避免其无限驻留在页面上。
+   */
+  signal?: AbortSignal;
 }
 // #endregion ValidateFormOptions
 
@@ -658,7 +710,7 @@ export const stripTabItemsLazy = (config: FormConfig): FormConfig => {
  * ```
  */
 export const validateForm = (options: ValidateFormOptions): Promise<string> => {
-  const { appContext, timeout = 10000, debug = false, config, ...rest } = options;
+  const { appContext, timeout = 10000, debug = false, config, signal, ...rest } = options;
 
   // 去掉 tab 容器各标签页的 lazy，确保懒加载标签页内的字段也参与校验
   const formProps = { ...rest, config: stripTabItemsLazy(config) };
@@ -667,6 +719,7 @@ export const validateForm = (options: ValidateFormOptions): Promise<string> => {
     formProps,
     appContext,
     timeout,
+    signal,
     // 调试模式需把表单展示出来；普通模式隐藏挂载
     hidden: !debug,
     // 调试模式等待人工操作，不应用超时
