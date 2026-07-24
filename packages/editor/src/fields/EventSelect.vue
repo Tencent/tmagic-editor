@@ -210,6 +210,12 @@ const actionTypeConfig = computed(() => {
         trigger: 'blur',
       },
     ],
+    onChange: (_mForm: FormState, _v: string, { setModel }: any) => {
+      setModel('to', '');
+      setModel('method', '');
+      setModel('codeId', '');
+      setModel('dataSourceMethod', []);
+    },
   };
   return { ...defaultActionTypeConfig, ...props.config.actionTypeConfig };
 });
@@ -222,7 +228,7 @@ const targetCompConfig = computed(() => {
     type: 'ui-select',
     labelPosition: 'left',
     display: (_mForm, { model }) => model.actionType === ActionType.COMP,
-    onChange: (_MForm, _v, { setModel }) => {
+    onChange: (_mForm, _v, { setModel }) => {
       setModel('method', '');
     },
     rules: [
