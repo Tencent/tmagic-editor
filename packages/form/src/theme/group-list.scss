@@ -38,3 +38,14 @@
     margin-bottom: 16px;
   }
 }
+
+/** 最外层的groupList需要每个item需要增加空白区域界限时，增加outer-gorup_list可以实现 */
+.m-container-group-list {
+  &.outer-gorup_list {
+    > .m-fields-group-list {
+      > .m-fields-group-list-item {
+        margin-bottom: 10px;
+      }
+    }
+  }
+}

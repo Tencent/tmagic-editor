@@ -92,4 +92,15 @@
       text-align: left;
     }
   }
+
+  .m-fields-group-list {
+    .el-table__empty-block {
+      .el-table__empty-text {
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.03);
+        margin-top: 8px;
+        border-radius: 4px;
+      }
+    }
+  }
 }

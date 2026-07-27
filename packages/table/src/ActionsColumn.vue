@@ -17,6 +17,7 @@
       :width="action.subActionConfig?.popoverWidth"
       :popper-class="action.subActionConfig?.popoverClass"
       :destroy-on-close="action.subActionConfig?.popoverDestroyOnClose ?? true"
+      @clickoutside="popoverVisible = false"
     >
       <template #reference>
         <TMagicButton
@@ -84,8 +85,15 @@
   >
 </template>
 
-<script lang="ts" setup>
+<script lang="ts">
 import { ref } from 'vue';
+
+// 所有行共享：同一时间仅允许一个 sub-actions 气泡展开，激活新的会自动关闭上一个
+const activePopoverId = ref<symbol | null>(null);
+</script>
+
+<script lang="ts" setup>
+import { watch } from 'vue';
 import { ArrowDown, ArrowRight } from '@element-plus/icons-vue';
 import { cloneDeep } from 'lodash-es';
 
@@ -117,7 +125,23 @@ const props = withDefaults(
   },
 );
 
+const popoverId = Symbol('sub-actions-popover');
 const popoverVisible = ref(false);
+
+watch(popoverVisible, (visible) => {
+  if (visible) {
+    activePopoverId.value = popoverId;
+  } else if (activePopoverId.value === popoverId) {
+    activePopoverId.value = null;
+  }
+});
+
+watch(activePopoverId, (id) => {
+  if (id !== popoverId && popoverVisible.value) {
+    popoverVisible.value = false;
+  }
+});
+
 const togglePopover = () => {
   popoverVisible.value = !popoverVisible.value;
 };
