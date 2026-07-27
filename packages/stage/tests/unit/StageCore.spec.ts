@@ -181,6 +181,16 @@ describe('StageCore', () => {
     stage.destroy();
   });
 
+  test('delayedMarkContainer 将新增标识透传给 actionManager', async () => {
+    const { host, stage } = createStage();
+    await stage.mount(host);
+    const spy = vi.spyOn(stage.actionManager!, 'delayedMarkContainer');
+    const event = mouseAtOrigin();
+    stage.delayedMarkContainer(event, [], true);
+    expect(spy).toHaveBeenCalledWith(event, [], true);
+    stage.destroy();
+  });
+
   test('autoScrollIntoView 选中时调用 mask.observerIntersection', async () => {
     const host = globalThis.document.createElement('div');
     globalThis.document.body.appendChild(host);

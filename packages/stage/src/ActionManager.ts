@@ -84,6 +84,8 @@ export default class ActionManager extends EventEmitter {
   private containerHighlightDuration: number;
   /** 将组件加入容器的操作方式 */
   private containerHighlightType?: ContainerHighlightType;
+  /** 是否仅在新增组件时才启用将组件加入容器 */
+  private containerHighlightAddOnly = false;
   private isAltKeydown = false;
   private getTargetElement: GetTargetElement;
   private getElementsFromPoint: GetElementsFromPoint;
@@ -124,6 +126,7 @@ export default class ActionManager extends EventEmitter {
     this.containerHighlightClassName = config.containerHighlightClassName || CONTAINER_HIGHLIGHT_CLASS_NAME;
     this.containerHighlightDuration = config.containerHighlightDuration || defaultContainerHighlightDuration;
     this.containerHighlightType = config.containerHighlightType;
+    this.containerHighlightAddOnly = config.containerHighlightAddOnly ?? false;
     this.disabledMultiSelect = config.disabledMultiSelect ?? false;
     this.alwaysMultiSelect = config.alwaysMultiSelect ?? false;
     this.getTargetElement = config.getTargetElement;
@@ -428,10 +431,15 @@ export default class ActionManager extends EventEmitter {
    * 标记的作用：1、高亮容器，给用户一个加入容器的交互感知；2、释放鼠标后，通过标记的标志找到要加入的容器
    * @param event 鼠标事件
    * @param excludeElList 计算鼠标所在容器时要排除的元素列表
+   * @param isAdd 当前操作是否为新增组件（从组件列表拖入），开启 containerHighlightAddOnly 时只有新增才会标记
    * @returns timeoutId，调用方在鼠标移走时要取消该timeout，阻止标记
    */
-  public delayedMarkContainer(event: MouseEvent, excludeElList: Element[] = []): NodeJS.Timeout | undefined {
-    if (this.canAddToContainer()) {
+  public delayedMarkContainer(
+    event: MouseEvent,
+    excludeElList: Element[] = [],
+    isAdd = false,
+  ): NodeJS.Timeout | undefined {
+    if (this.canAddToContainer(isAdd)) {
       return globalThis.setTimeout(() => {
         this.addContainerHighlightClassName(event, excludeElList);
       }, this.containerHighlightDuration);
@@ -609,9 +617,13 @@ export default class ActionManager extends EventEmitter {
   }
 
   /**
-   * 当前状态下能否将组件加入容器，默认是鼠标悬停一段时间加入，alt模式则是按住alt+鼠标悬停一段时间加入
+   * 当前状态下能否将组件加入容器，默认是鼠标悬停一段时间加入，alt模式则是按住alt+鼠标悬停一段时间加入；
+   * 开启containerHighlightAddOnly时，画布中拖动已有组件不能加入容器
+   * @param isAdd 当前操作是否为新增组件
    */
-  private canAddToContainer(): boolean {
+  private canAddToContainer(isAdd = false): boolean {
+    if (this.containerHighlightAddOnly && !isAdd) return false;
+
     return (
       this.containerHighlightType === ContainerHighlightType.DEFAULT ||
       (this.containerHighlightType === ContainerHighlightType.ALT && this.isAltKeydown)
@@ -624,10 +636,10 @@ export default class ActionManager extends EventEmitter {
    */
   private markContainerEnd(): HTMLElement | null {
     const doc = this.getRenderDocument();
-    if (doc && this.canAddToContainer()) {
-      return removeClassNameByClassName(doc, this.containerHighlightClassName);
-    }
-    return null;
+    if (!doc) return null;
+
+    const markedContainer = removeClassNameByClassName(doc, this.containerHighlightClassName);
+    return this.canAddToContainer() ? markedContainer : null;
   }
 
   private initMouseEvent(): void {

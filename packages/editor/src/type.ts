@@ -178,6 +178,11 @@ export interface StageOptions {
   containerHighlightClassName?: string;
   containerHighlightDuration?: number;
   containerHighlightType?: ContainerHighlightType;
+  /**
+   * 是否仅在新增组件（从组件列表拖入新组件）时才启用识别容器，
+   * 开启后在画布中拖动已有组件不会识别容器，默认 false
+   */
+  containerHighlightAddOnly?: boolean;
   disabledDragStart?: boolean;
   render?: (stage: StageCore) => HTMLDivElement | void | Promise<HTMLDivElement | void>;
   moveableOptions?: CustomizeMoveableOptions;

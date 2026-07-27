@@ -135,6 +135,6 @@ describe('ComponentListPanel', () => {
     const item = wrapper.find('.component-item');
     await item.trigger('drag', { clientX: 0, clientY: 0 });
     await item.trigger('drag', { clientX: 0, clientY: 0 });
-    expect(stage.delayedMarkContainer).toHaveBeenCalled();
+    expect(stage.delayedMarkContainer).toHaveBeenCalledWith(expect.anything(), [], true);
   });
 });

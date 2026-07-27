@@ -218,6 +218,7 @@ const stageOptions: StageOptions = {
   containerHighlightClassName: props.containerHighlightClassName,
   containerHighlightDuration: props.containerHighlightDuration,
   containerHighlightType: props.containerHighlightType,
+  containerHighlightAddOnly: props.containerHighlightAddOnly,
   disabledDragStart: props.disabledDragStart,
   renderType: props.renderType,
   guidesOptions: props.guidesOptions,

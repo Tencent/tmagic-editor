@@ -263,10 +263,15 @@ export default class StageCore extends EventEmitter {
    * 标记的作用：1、高亮容器，给用户一个加入容器的交互感知；2、释放鼠标后，通过标记的标志找到要加入的容器
    * @param event 鼠标事件
    * @param excludeElList 计算鼠标所在容器时要排除的元素列表
+   * @param isAdd 当前操作是否为新增组件（从组件列表拖入），开启 containerHighlightAddOnly 时只有新增才会标记
    * @returns timeoutId，调用方在鼠标移走时要取消该timeout，阻止标记
    */
-  public delayedMarkContainer(event: MouseEvent, excludeElList: Element[] = []): NodeJS.Timeout | undefined {
-    return this.actionManager?.delayedMarkContainer(event, excludeElList);
+  public delayedMarkContainer(
+    event: MouseEvent,
+    excludeElList: Element[] = [],
+    isAdd = false,
+  ): NodeJS.Timeout | undefined {
+    return this.actionManager?.delayedMarkContainer(event, excludeElList, isAdd);
   }
 
   public getMoveableOption<K extends keyof MoveableOptions>(key: K): MoveableOptions[K] | undefined {
@@ -368,6 +373,7 @@ export default class StageCore extends EventEmitter {
       containerHighlightClassName: config.containerHighlightClassName,
       containerHighlightDuration: config.containerHighlightDuration,
       containerHighlightType: config.containerHighlightType,
+      containerHighlightAddOnly: config.containerHighlightAddOnly,
       moveableOptions: config.moveableOptions,
       container: this.mask!.content,
       disabledDragStart: config.disabledDragStart,

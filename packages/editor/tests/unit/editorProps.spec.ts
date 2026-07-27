@@ -21,6 +21,7 @@ describe('defaultEditorProps', () => {
   test('containerHighlight 默认值', () => {
     expect(defaultEditorProps.containerHighlightDuration).toBe(800);
     expect(typeof defaultEditorProps.containerHighlightClassName).toBe('string');
+    expect(defaultEditorProps.containerHighlightAddOnly).toBe(false);
   });
 
   test('数组/对象工厂函数返回空值', () => {

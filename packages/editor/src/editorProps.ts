@@ -82,6 +82,11 @@ export interface EditorProps {
   containerHighlightDuration?: number;
   /** 拖入画布中容器时，识别容器的操作类型 */
   containerHighlightType?: ContainerHighlightType;
+  /**
+   * 是否仅在新增组件（从组件列表拖入新组件）时才启用识别容器，
+   * 开启后在画布中拖动已有组件不会识别容器，默认 false
+   */
+  containerHighlightAddOnly?: boolean;
   /** 画布大小 */
   stageRect?: StageRect;
   /** monaco editor 的配置 */
@@ -163,6 +168,7 @@ export const defaultEditorProps = {
   containerHighlightClassName: CONTAINER_HIGHLIGHT_CLASS_NAME,
   containerHighlightDuration: 800,
   containerHighlightType: ContainerHighlightType.DEFAULT,
+  containerHighlightAddOnly: false,
   disabledShowSrc: false,
   disabledDataSource: false,
   disabledCodeBlock: false,

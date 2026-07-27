@@ -53,7 +53,11 @@ export type GetTargetElement = (id: Id) => HTMLElement | null;
 /** render提供的接口，通过坐标获得坐标下所有HTML元素数组 */
 export type GetElementsFromPoint = (point: Point) => HTMLElement[];
 export type GetRenderDocument = () => Document | undefined;
-export type DelayedMarkContainer = (event: MouseEvent, exclude: Element[]) => NodeJS.Timeout | undefined;
+export type DelayedMarkContainer = (
+  event: MouseEvent,
+  exclude?: Element[],
+  isAdd?: boolean,
+) => NodeJS.Timeout | undefined;
 export type MarkContainerEnd = () => HTMLElement | null;
 export type GetRootContainer = () => HTMLDivElement | undefined;
 
@@ -74,6 +78,11 @@ export interface StageCoreConfig {
   containerHighlightClassName?: string;
   containerHighlightDuration?: number;
   containerHighlightType?: ContainerHighlightType;
+  /**
+   * 是否仅在新增组件（从组件列表拖入新组件）时才启用将组件拖入容器，
+   * 开启后在画布中拖动已有组件不会识别容器，默认 false
+   */
+  containerHighlightAddOnly?: boolean;
   moveableOptions?: CustomizeMoveableOptions;
   /** runtime 的HTML地址，可以是一个HTTP地址，如果和编辑器不同域，需要设置跨域，也可以是一个相对或绝对路径 */
   runtimeUrl?: string;
@@ -102,6 +111,8 @@ export interface ActionManagerConfig {
   containerHighlightClassName?: string;
   containerHighlightDuration?: number;
   containerHighlightType?: ContainerHighlightType;
+  /** 见 StageCoreConfig.containerHighlightAddOnly */
+  containerHighlightAddOnly?: boolean;
   moveableOptions?: CustomizeMoveableOptions;
   disabledDragStart?: boolean;
   disabledMultiSelect?: boolean;

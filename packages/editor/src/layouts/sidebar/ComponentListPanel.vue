@@ -145,6 +145,6 @@ const dragHandler = (e: DragEvent) => {
 
   if (timeout || !stage.value) return;
 
-  timeout = stage.value.delayedMarkContainer(e);
+  timeout = stage.value.delayedMarkContainer(e, [], true);
 };
 </script>

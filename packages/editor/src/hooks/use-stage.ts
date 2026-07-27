@@ -28,6 +28,7 @@ export const useStage = (stageOptions: StageOptions) => {
     containerHighlightClassName: stageOptions.containerHighlightClassName,
     containerHighlightDuration: stageOptions.containerHighlightDuration,
     containerHighlightType: stageOptions.containerHighlightType,
+    containerHighlightAddOnly: stageOptions.containerHighlightAddOnly,
     disabledDragStart: stageOptions.disabledDragStart,
     renderType: stageOptions.renderType,
     canSelect: (el, event, stop) => {

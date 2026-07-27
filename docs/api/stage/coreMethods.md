@@ -69,10 +69,11 @@
 
 ## delayedMarkContainer
 
-- **类型**：`(event: MouseEvent, excludeElList?: Element[]) => NodeJS.Timeout | undefined`
+- **类型**：`(event: MouseEvent, excludeElList?: Element[], isAdd?: boolean) => NodeJS.Timeout | undefined`
 - **参数**：
   - `event`：鼠标事件
   - `excludeElList`：计算鼠标所在容器时要排除的元素列表
+  - `isAdd`：当前操作是否为新增组件（从组件列表拖入新组件），`containerHighlightType` 为 `addOnly` 时只有新增才会标记容器
 - **详情**：
 
 鼠标拖拽着元素，在容器上方悬停，延迟一段时间后，对容器进行标记，如果悬停时间够长将标记成功，悬停时间短，调用方通过返回的timeoutId取消标记

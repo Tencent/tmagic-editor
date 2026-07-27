@@ -275,6 +275,84 @@ describe('ActionManager - 交互与事件', () => {
     expect(containerEl.classList.contains('tmagic-stage-container-highlight')).toBe(true);
   });
 
+  test('delayedMarkContainer 未配置 containerHighlightType 时不标记容器', () => {
+    am = new ActionManager(createConfig({ isContainer: async () => true }));
+    expect(am.delayedMarkContainer(mouseAtOrigin())).toBeUndefined();
+  });
+
+  test('delayedMarkContainer alt 模式下需按住 alt 才标记容器', () => {
+    am = new ActionManager(
+      createConfig({
+        containerHighlightType: ContainerHighlightType.ALT,
+        isContainer: async () => true,
+      }),
+    );
+    expect(am.delayedMarkContainer(mouseAtOrigin())).toBeUndefined();
+    (am as any).isAltKeydown = true;
+    expect(am.delayedMarkContainer(mouseAtOrigin())).toBeDefined();
+  });
+
+  test('containerHighlightAddOnly 开启时拖动已有组件不标记容器', () => {
+    const containerEl = globalThis.document.createElement('div');
+    containerEl.dataset.tmagicId = 'container_1';
+    am = new ActionManager(
+      createConfig({
+        containerHighlightType: ContainerHighlightType.DEFAULT,
+        containerHighlightAddOnly: true,
+        getElementsFromPoint: () => [containerEl],
+        isContainer: async () => true,
+      }),
+    );
+    expect(am.delayedMarkContainer(mouseAtOrigin(), [globalThis.document.createElement('div')])).toBeUndefined();
+    vi.advanceTimersByTime(900);
+    expect(containerEl.classList.contains('tmagic-stage-container-highlight')).toBe(false);
+  });
+
+  test('containerHighlightAddOnly 开启时新增组件仍按 containerHighlightType 标记容器', async () => {
+    const containerEl = globalThis.document.createElement('div');
+    containerEl.dataset.tmagicId = 'container_1';
+    am = new ActionManager(
+      createConfig({
+        containerHighlightType: ContainerHighlightType.DEFAULT,
+        containerHighlightAddOnly: true,
+        getElementsFromPoint: () => [containerEl],
+        isContainer: async () => true,
+      }),
+    );
+    expect(am.delayedMarkContainer(mouseAtOrigin(), [], true)).toBeDefined();
+    vi.advanceTimersByTime(900);
+    await Promise.resolve();
+    expect(containerEl.classList.contains('tmagic-stage-container-highlight')).toBe(true);
+  });
+
+  test('containerHighlightAddOnly 开启且 containerHighlightType 为 alt 时新增组件也需按住 alt', () => {
+    am = new ActionManager(
+      createConfig({
+        containerHighlightType: ContainerHighlightType.ALT,
+        containerHighlightAddOnly: true,
+        isContainer: async () => true,
+      }),
+    );
+    expect(am.delayedMarkContainer(mouseAtOrigin(), [], true)).toBeUndefined();
+    (am as any).isAltKeydown = true;
+    expect(am.delayedMarkContainer(mouseAtOrigin(), [], true)).toBeDefined();
+  });
+
+  test('containerHighlightAddOnly 开启时结束标记仍清理高亮但不返回容器', () => {
+    const containerEl = globalThis.document.createElement('div');
+    containerEl.classList.add('tmagic-stage-container-highlight');
+    globalThis.document.body.appendChild(containerEl);
+    am = new ActionManager(
+      createConfig({
+        containerHighlightType: ContainerHighlightType.DEFAULT,
+        containerHighlightAddOnly: true,
+      }),
+    );
+
+    expect((am as any).markContainerEnd()).toBeNull();
+    expect(containerEl.classList.contains('tmagic-stage-container-highlight')).toBe(false);
+  });
+
   test('updateMoveableOptions / getDragStatus 可调用', () => {
     am = new ActionManager(createConfig());
     expect(() => am.updateMoveableOptions()).not.toThrow();

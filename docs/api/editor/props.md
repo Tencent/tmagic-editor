@@ -1019,6 +1019,18 @@ alt: 按住alt键启动识别
 
 
 - **类型：** `'default' | 'alt' | ''`
+
+## containerHighlightAddOnly
+
+- **详情：**
+
+是否只有新增组件（从组件列表拖入新组件）时才启用识别容器
+
+开启后，在画布中拖动已有组件时不再识别容器，即已有组件不能通过拖动加入其他容器；新增组件仍然按 [containerHighlightType](#containerHighlightType) 配置的方式识别
+
+- **默认值：** `false`
+
+- **类型：** `boolean`
   
 ## stageRect
 
