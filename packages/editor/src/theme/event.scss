@@ -1,8 +1,11 @@
 .m-fields-event-select {
   width: 100%;
   .fullWidth {
-    width: 100%;
+    width: calc(100% - 32px);
     box-sizing: border-box;
+    &.create-button {
+      width: 100%;
+    }
   }
   .event-select-container {
     padding: 0 16px;
@@ -11,7 +14,7 @@
         border-bottom: 1px solid #ebeef5;
       }
       > .el-card__body {
-        padding-bottom: 16px;
+        padding-bottom: 8px;
         .m-fields-group-list-footer {
           div {
             justify-content: flex-start !important;
@@ -19,7 +22,7 @@
         }
         .el-card.tmagic-design-card--flat {
           > .el-card__header {
-            padding: 16px 0;
+            padding: 8px 0;
           }
         }
       }
@@ -76,17 +79,18 @@
 .event-item-header {
   position: relative;
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   .event-item-title {
     color: #0f1113;
     font-size: 16px;
     font-weight: 500;
     line-height: 24px;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
   }
   .event-item-delete-button {
-    position: absolute;
-    right: 0;
-    top: 0;
+    color: #0f1113;
   }
 
   .el-form-item {

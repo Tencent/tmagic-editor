@@ -11,7 +11,11 @@
   border-right: 0;
   border-radius: 0;
   border-bottom: 0;
-
+  &.m-flat-hide-body {
+    .el-card__header {
+      border-bottom: 0 !important;
+    }
+  }
   &.m-fields-group-list-item {
     margin-bottom: 0;
   }
@@ -21,7 +25,7 @@
 
   .el-card__header {
     border-bottom: none;
-    padding: 16px;
+    padding: 8px 16px;
     &:hover {
       background: transparent;
       box-shadow: none;
@@ -29,11 +33,15 @@
     }
   }
 
+  .m-fields-group-list-footer {
+    margin-bottom: 4px;
+    margin-top: 4px;
+  }
   .el-card__body {
     padding: 0 16px 0 16px;
     // 这里每个form-item应该要有一个16px间距，但是除了tbody中的form-item
     .tmagic-design-form-item:not(tbody .tmagic-design-form-item) {
-      margin-bottom: 16px;
+      margin-bottom: 8px;
     }
     > .m-container-row {
       overflow-x: hidden;
@@ -61,7 +69,7 @@
     }
     > .el-card__body {
       background-color: #fff;
-      padding-top: 16px;
+      padding-top: 8px;
     }
   }
 }

@@ -37,13 +37,12 @@
         :model="entry.cardItem"
         :last-values="entry.lastCardItem"
         :is-compare="isCompareMode"
-        :hide-expand="true"
+        :hide-expand="false"
         :label-width="config.labelWidth || '100px'"
         @change="onChangeHandler"
       >
         <template #header>
           <div class="event-item-header">
-            <div class="event-item-title">事件{{ Number(entry.index) + 1 }}</div>
             <MFormContainer
               class="fullWidth"
               :config="eventNameConfig"
