@@ -134,7 +134,8 @@ const actionHandler = async (action: ColumnActionConfig, row: any, index: number
   } else {
     await action.handler?.(row, index);
   }
-  action.after?.(row, index);
+  await action.after?.(row, index);
+  popoverVisible.value = false;
 };
 
 const save = async (index: number, config: ColumnConfig) => {
