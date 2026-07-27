@@ -1,3 +1,18 @@
+# [1.8.0-beta.17](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.16...v1.8.0-beta.17) (2026-07-27)
+
+
+### Bug Fixes
+
+* **editor:** 修复 collectIdle 批次结算与中断时 Promise 挂起问题 ([b5abf31](https://github.com/Tencent/tmagic-editor/commit/b5abf310663f0bc34bd2c51c2e1a28de0bdf6ab9))
+* **editor:** 切换动作类型时清空关联配置字段 ([b564c9e](https://github.com/Tencent/tmagic-editor/commit/b564c9e4aacd215dd46c4b839cf0033ceedc8047))
+* **form,table:** groupList分界线、空状态、actions只存在一个  ([dec4ebf](https://github.com/Tencent/tmagic-editor/commit/dec4ebfa20483f699a676e41e0541d23ebe24d81))
+* **form:** 完善 mountFormInstance 清理逻辑，避免临时表单实例泄漏 ([bf8df74](https://github.com/Tencent/tmagic-editor/commit/bf8df74864b78891a8820462062624702a1d33d3))
+* **table:** 列操作点击后关闭popover ([596d86f](https://github.com/Tencent/tmagic-editor/commit/596d86f2ab08d3d4e6548b5e4bd5759d18e4493d))
+
+
+### Features
+
+* **editor,stage:** 新增 containerHighlightAddOnly 配置 ([e6cf694](https://github.com/Tencent/tmagic-editor/commit/e6cf694a032652e4f2c05efbab4a07a252e2ffa1))
 # [1.8.0-beta.16](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.15...v1.8.0-beta.16) (2026-07-23)
 
 
