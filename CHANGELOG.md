@@ -1,3 +1,14 @@
+# [1.8.0-beta.18](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.17...v1.8.0-beta.18) (2026-07-28)
+
+
+### Bug Fixes
+
+* **editor:** 修复 IdleTask 任务异常或 clearTasks 时队列卡住的问题 ([3fe9cf9](https://github.com/Tencent/tmagic-editor/commit/3fe9cf9b664dc5b39c17b40efe1d3935c89f7553))
+
+
+### Features
+
+* **form:** 支持 typeMatch 异步校验与 validator 返回值约定 ([a123747](https://github.com/Tencent/tmagic-editor/commit/a123747e9d250166c2bb0f1d3ce3a39dd5baea9f))
 # [1.8.0-beta.17](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.16...v1.8.0-beta.17) (2026-07-27)
 
 
