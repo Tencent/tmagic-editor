@@ -69,6 +69,8 @@
 }
 ```
 
+`validator` 除了调用 `callback` 外，也兼容 async-validator 的返回值约定：返回 `false` 或 `Error` / 错误数组表示失败，返回 `true` 表示通过，返回 `Promise` 则以 resolve / reject 为结果，内部抛出的异常会转成校验失败。同步与异步 `typeMatch` 下这些约定行为一致，且只会上报一次结果（既调 `callback` 又返回 `Promise` 时以先到的为准）。
+
 ## 扩展自定义 type 规则
 
 业务可覆盖内置规则，或为自定义字段 type 注册校验。自定义规则优先于内置规则。
@@ -107,7 +109,26 @@ deleteTypeMatchRule('foo');
 clearTypeMatchRules();
 ```
 
-自定义校验器签名：`(value, context) => string | undefined`。返回错误文案表示失败，返回 `undefined` 表示通过。`context` 包含 `fieldType`、`mForm`、`props`、`message`。
+自定义校验器签名：`(value, context) => string | undefined | Promise<string | undefined>`。返回错误文案表示失败，返回 `undefined` 表示通过。`context` 包含 `fieldType`、`mForm`、`props`、`message`。
+
+### 异步校验
+
+自定义校验器可以返回 `Promise`，用于需要异步确认取值是否合法的场景（如请求接口校验 id 是否存在）。内置规则均为同步。
+
+```ts
+registerTypeMatchRule('mod-select', async (value, { message }) => {
+  const exists = await checkModExists(value);
+  if (!exists) {
+    return message || `模块(${value})不存在`;
+  }
+});
+```
+
+异步校验器通过后才会执行同一条 rule 上的自定义 `validator`。需要注意几点：
+
+- **校验器自身失败不算校验失败。** Promise 被 reject（如接口异常）时只打印错误、该字段按通过处理，避免网络故障阻塞操作。需要把失败暴露给用户时请在校验器内部 catch 并返回错误文案。
+- **建议自行缓存请求结果。** 每次校验都会执行校验器，无缓存会导致逐次输入都发请求；也可以给 rule 配 `trigger: 'blur'` 降低触发频率。
+- **只有最新一轮校验的结论会被采用。** 新一轮校验开始后，上一轮针对旧值、尚未返回的校验不再使用自己的结论，而是等最新一轮出结论后一起结算，因此旧结论不会晚到覆盖新结论，`form.validate()` 也不会对一个尚未校验完的值返回成功。
 
 ### 安装时注册
 

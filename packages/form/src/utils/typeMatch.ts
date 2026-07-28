@@ -38,8 +38,15 @@ export interface TypeMatchValidateContext {
 // #endregion TypeMatchValidateContext
 
 // #region TypeMatchValidator
-/** 自定义 type 校验器：返回错误文案；通过则返回 undefined */
-export type TypeMatchValidator = (value: any, context: TypeMatchValidateContext) => string | undefined;
+/**
+ * 自定义 type 校验器：返回错误文案；通过则返回 undefined。
+ *
+ * 支持返回 Promise，用于需要异步确认取值是否合法的场景（如请求接口校验 id 是否存在）。
+ */
+export type TypeMatchValidator = (
+  value: any,
+  context: TypeMatchValidateContext,
+) => string | undefined | Promise<string | undefined>;
 // #endregion TypeMatchValidator
 
 const typeMatchRuleRegistry = new Map<string, TypeMatchValidator>();
@@ -692,12 +699,17 @@ const validateBuiltinTypeMatch = (
   return undefined;
 };
 
+/**
+ * 校验取值与字段 type 是否匹配；通过返回 undefined，否则返回错误文案。
+ *
+ * 命中的自定义规则是异步校验器时返回 Promise，内置规则始终同步返回。
+ */
 export const validateTypeMatch = (
   value: any,
   mForm: FormState | undefined,
   props: any,
   message?: string,
-): string | undefined => {
+): string | undefined | Promise<string | undefined> => {
   if (isEmptyValue(value) || isEmptyArray(value)) {
     return undefined;
   }
@@ -724,43 +736,135 @@ export const validateTypeMatch = (
   return validateBuiltinTypeMatch(value, fieldType, mForm, props, message);
 };
 
+const toError = (error: any): Error => (error instanceof Error ? error : new Error(`${error}`));
+
 export const createTypeMatchValidator = (mForm: FormState | undefined, props: any, rule: Rule) => {
   const originalValidator = typeof rule.validator === 'function' ? rule.validator : undefined;
 
+  /**
+   * 每次校验取一个自增序号，只有最新一轮的结论会被采用。
+   *
+   * 旧值的在途校验不能用自己的结论结算：它可能晚于新校验结束，用过期结论覆盖新结论
+   * （表单取最后结束的那次结果）；也不能在新校验开始时无条件按通过结算，否则
+   * `form.validate()` 会对一个还没校验过的值返回成功。因此所有尚未结算的调用都登记在
+   * pendingSettlers 中，等最新一轮出结论后用同一个结论一起结算。
+   *
+   * 不比较取值本身：配了 names 或取值为对象/数组时拿到的是同一个引用，就地修改后比较不出变化。
+   */
+  let generation = 0;
+  let pendingSettlers: ((args: any[]) => void)[] = [];
+
   return (asyncValidatorRule: any, value: any, callback: Function, source: any, options: any) => {
     const actualValue = props.config?.names ? props.model : value;
-    try {
-      const error = validateTypeMatch(actualValue, mForm, props, rule.message);
 
-      if (error) {
-        callback(new Error(error));
+    generation += 1;
+    const currentGeneration = generation;
+    /** 已有更新的一轮校验开始，本轮结论作废 */
+    const isStale = () => currentGeneration !== generation;
+
+    pendingSettlers.push((args: any[]) => callback(...args));
+
+    /**
+     * 结算本轮与被本轮取代的所有在途校验。
+     *
+     * async-validator 的 callback 不幂等：重复调用会让它的内部计数提前满足、错误信息重复；
+     * 原始 validator 写成 async 时很容易既调 callback 又返回 Promise，故所有回调都收敛到这里，
+     * 由「取出即出队」保证每个调用的 callback 只会被调用一次。
+     */
+    const conclude = (...args: any[]) => {
+      if (isStale()) {
         return;
       }
-    } catch (error) {
-      console.error(error);
+
+      const settlers = pendingSettlers;
+      pendingSettlers = [];
+      for (const settle of settlers) {
+        settle(args);
+      }
+    };
+
+    /**
+     * 执行原始 validator 并把结果统一转成 callback。
+     *
+     * async-validator 只解析同步返回给它的返回值（true / false / Error / 错误数组 / Promise，
+     * 抛错转成错误信息），异步路径已脱离它的调用栈，这些约定会失效导致校验永不结束，故复刻一份。
+     */
+    const settleWithOriginalValidator = () => {
+      // 本轮结论已作废，不必再跑一遍原始 validator 触发副作用
+      if (isStale()) {
+        return;
+      }
+
+      if (!originalValidator) {
+        conclude();
+        return;
+      }
+
+      let result: any;
+      try {
+        result = originalValidator(
+          { rule: asyncValidatorRule, value: actualValue, callback: conclude, source, options },
+          {
+            values: mForm?.initValues || {},
+            model: props.model,
+            parent: mForm?.parentValues || {},
+            formValue: mForm?.values || props.model,
+            prop: props.prop,
+            config: props.config,
+          },
+          mForm,
+        );
+      } catch (err) {
+        conclude(toError(err));
+        return;
+      }
+
+      if (isPromise(result)) {
+        result.then(
+          () => conclude(),
+          (err: any) => conclude(toError(err)),
+        );
+      } else if (result === true) {
+        conclude();
+      } else if (result === false) {
+        const field = asyncValidatorRule?.fullField || asyncValidatorRule?.field || props.prop;
+        conclude(new Error(rule.message || `${field} fails`));
+      } else if (result instanceof Error || Array.isArray(result)) {
+        conclude(result);
+      }
+      // 其余返回值（undefined / void）按约定由 validator 自行调用 callback
+    };
+
+    // 校验器自身失败（如接口异常）不应阻塞用户，记录后按通过处理
+    const skipFailedTypeMatch = (err: any) => {
+      console.error(err);
+      settleWithOriginalValidator();
+    };
+
+    let error: string | undefined | Promise<string | undefined>;
+    try {
+      error = validateTypeMatch(actualValue, mForm, props, rule.message);
+    } catch (err) {
+      skipFailedTypeMatch(err);
+      return;
     }
 
-    if (originalValidator) {
-      return originalValidator(
-        {
-          rule: asyncValidatorRule,
-          value: actualValue,
-          callback,
-          source,
-          options,
-        },
-        {
-          values: mForm?.initValues || {},
-          model: props.model,
-          parent: mForm?.parentValues || {},
-          formValue: mForm?.values || props.model,
-          prop: props.prop,
-          config: props.config,
-        },
-        mForm,
-      );
+    if (isPromise(error)) {
+      error.then((asyncMessage) => {
+        if (asyncMessage) {
+          conclude(new Error(asyncMessage));
+          return;
+        }
+        settleWithOriginalValidator();
+      }, skipFailedTypeMatch);
+      return;
     }
 
-    callback();
+    if (error) {
+      conclude(new Error(error));
+      return;
+    }
+
+    settleWithOriginalValidator();
   };
 };

@@ -625,6 +625,88 @@ describe('getRules tdesign validator', () => {
     });
     await expect(newRules[0].validator(1)).resolves.toBe(true);
   });
+
+  test('异步 typeMatch 校验器的结果能正确适配', async () => {
+    registerTypeMatchRule('async-type', async (value) => (value === 'ok' ? undefined : '异步校验失败'));
+
+    const rules: any = [{ typeMatch: true }];
+    const newRules: any = getRules(mForm, rules, propsOf({ type: 'async-type' }));
+
+    await expect(newRules[0].validator('ok')).resolves.toBe(true);
+    await expect(newRules[0].validator('bad')).resolves.toEqual({
+      result: false,
+      message: '异步校验失败',
+    });
+
+    deleteTypeMatchRule('async-type');
+  });
+
+  test('自定义 validator 返回 Promise 时按 Promise 结果适配', async () => {
+    const rules: any = [
+      { validator: () => Promise.resolve() },
+      { validator: () => Promise.reject(new Error('异步失败')) },
+      { validator: () => Promise.reject('非 Error') },
+    ];
+    const newRules: any = getRules(mForm, rules, { config: {} });
+
+    await expect(newRules[0].validator('ok')).resolves.toBe(true);
+    await expect(newRules[1].validator('ok')).resolves.toEqual({
+      result: false,
+      message: '异步失败',
+    });
+    await expect(newRules[2].validator('ok')).resolves.toEqual({
+      result: false,
+      message: '非 Error',
+    });
+  });
+
+  test('自定义 validator 同步抛错时转成 CustomValidateObj', async () => {
+    const rules: any = [
+      {
+        validator: () => {
+          throw new Error('validator 内部抛错');
+        },
+      },
+      {
+        validator: () => {
+          throw 'string error';
+        },
+      },
+    ];
+    const newRules: any = getRules(mForm, rules, { config: {} });
+
+    await expect(newRules[0].validator('ok')).resolves.toEqual({
+      result: false,
+      message: 'validator 内部抛错',
+    });
+    await expect(newRules[1].validator('ok')).resolves.toEqual({
+      result: false,
+      message: 'string error',
+    });
+  });
+
+  test('callback 收到错误数组时取首条展示', async () => {
+    const rules: any = [
+      {
+        validator: ({ callback }: any) => {
+          callback([new Error('错误一'), new Error('错误二')]);
+        },
+      },
+      {
+        validator: ({ callback }: any) => {
+          callback([]);
+        },
+      },
+    ];
+    const newRules: any = getRules(mForm, rules, { config: {} });
+
+    await expect(newRules[0].validator('ok')).resolves.toEqual({
+      result: false,
+      message: '错误一',
+    });
+    // 空数组视为无错误
+    await expect(newRules[1].validator('ok')).resolves.toBe(true);
+  });
 });
 
 describe('typeMatch 扩展注册', () => {
@@ -747,5 +829,403 @@ describe('createTypeMatchValidator', () => {
     expect(originalValidator).toHaveBeenCalled();
     expect(errorSpy).toHaveBeenCalled();
     errorSpy.mockRestore();
+  });
+
+  test('异步校验器返回错误文案时回调 Error', async () => {
+    registerTypeMatchRule('async-type', async (value) => (value === 'ok' ? undefined : '异步校验失败'));
+
+    const callback = vi.fn();
+    const validator = createTypeMatchValidator(mForm, propsOf({ type: 'async-type' }), { typeMatch: true } as any);
+
+    // 异步校验器不能把 Promise 交还给 async-validator，否则会重复回调
+    expect(validator({}, 'bad', callback, {}, {})).toBeUndefined();
+    expect(callback).not.toHaveBeenCalled();
+
+    await vi.waitFor(() => expect(callback).toHaveBeenCalledTimes(1));
+    expect(callback.mock.calls[0][0]).toBeInstanceOf(Error);
+    expect(callback.mock.calls[0][0].message).toBe('异步校验失败');
+  });
+
+  test('异步校验器通过时无参回调', async () => {
+    registerTypeMatchRule('async-type', async (value) => (value === 'ok' ? undefined : '异步校验失败'));
+
+    const callback = vi.fn();
+    const validator = createTypeMatchValidator(mForm, propsOf({ type: 'async-type' }), { typeMatch: true } as any);
+
+    validator({}, 'ok', callback, {}, {});
+
+    await vi.waitFor(() => expect(callback).toHaveBeenCalledTimes(1));
+    expect(callback).toHaveBeenCalledWith();
+  });
+
+  test('异步校验器通过后继续执行原始 validator', async () => {
+    registerTypeMatchRule('async-type', async () => undefined);
+
+    const callback = vi.fn();
+    const originalValidator = vi.fn();
+    const validator = createTypeMatchValidator(mForm, propsOf({ type: 'async-type' }), {
+      typeMatch: true,
+      validator: originalValidator,
+    } as any);
+
+    validator({}, 'ok', callback, {}, {});
+
+    await vi.waitFor(() => expect(originalValidator).toHaveBeenCalled());
+    // 原始 validator 拿到 callback 后自行回调，这里不重复调用
+    expect(callback).not.toHaveBeenCalled();
+    expect(originalValidator.mock.calls[0][0].value).toBe('ok');
+  });
+
+  test('异步校验器不通过时不执行原始 validator', async () => {
+    registerTypeMatchRule('async-type', async () => '异步校验失败');
+
+    const callback = vi.fn();
+    const originalValidator = vi.fn();
+    const validator = createTypeMatchValidator(mForm, propsOf({ type: 'async-type' }), {
+      typeMatch: true,
+      validator: originalValidator,
+    } as any);
+
+    validator({}, 'bad', callback, {}, {});
+
+    await vi.waitFor(() => expect(callback).toHaveBeenCalledTimes(1));
+    expect(originalValidator).not.toHaveBeenCalled();
+  });
+
+  test('异步校验器 reject 时忽略异常并继续执行原始 validator', async () => {
+    registerTypeMatchRule('async-type', () => Promise.reject(new Error('boom')));
+
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const callback = vi.fn();
+    const originalValidator = vi.fn();
+    const validator = createTypeMatchValidator(mForm, propsOf({ type: 'async-type' }), {
+      typeMatch: true,
+      validator: originalValidator,
+    } as any);
+
+    validator({}, 'value', callback, {}, {});
+
+    await vi.waitFor(() => expect(originalValidator).toHaveBeenCalled());
+    expect(errorSpy).toHaveBeenCalled();
+    errorSpy.mockRestore();
+  });
+
+  test('异步路径下原始 validator 返回的 Promise 会被转成 callback', async () => {
+    registerTypeMatchRule('async-type', async () => undefined);
+
+    const callback = vi.fn();
+    const validator = createTypeMatchValidator(mForm, propsOf({ type: 'async-type' }), {
+      typeMatch: true,
+      validator: () => Promise.reject(new Error('原始校验失败')),
+    } as any);
+
+    validator({}, 'ok', callback, {}, {});
+
+    await vi.waitFor(() => expect(callback).toHaveBeenCalledTimes(1));
+    expect(callback.mock.calls[0][0].message).toBe('原始校验失败');
+  });
+
+  test('原始 validator 既调 callback 又返回 Promise 时只回调一次', async () => {
+    registerTypeMatchRule('async-type', async () => undefined);
+
+    const callback = vi.fn();
+    const validator = createTypeMatchValidator(mForm, propsOf({ type: 'async-type' }), {
+      typeMatch: true,
+      // async 写法很常见：内部调了 callback，函数本身又返回 Promise
+      validator: async ({ callback: cb }: any) => {
+        cb(new Error('原始校验失败'));
+      },
+    } as any);
+
+    validator({}, 'ok', callback, {}, {});
+
+    await vi.waitFor(() => expect(callback).toHaveBeenCalledTimes(1));
+    expect(callback.mock.calls[0][0].message).toBe('原始校验失败');
+
+    // 等 Promise 链彻底跑完，确认没有第二次回调
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(callback).toHaveBeenCalledTimes(1);
+  });
+
+  test('异步校验器不影响同步内置规则', () => {
+    registerTypeMatchRule('async-type', async () => '异步校验失败');
+
+    const callback = vi.fn();
+    const validator = createTypeMatchValidator(mForm, propsOf({ type: 'number' }), { typeMatch: true } as any);
+
+    validator({}, 'not-a-number', callback, {}, {});
+
+    // 内置规则仍同步回调
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback.mock.calls[0][0].message).toContain('类型应为数字');
+  });
+});
+
+/**
+ * async-validator 只解析同步返回给它的 validator 返回值，异步 typeMatch 通过后已脱离其调用栈，
+ * 因此这些约定必须由 createTypeMatchValidator 自行复刻，否则 callback 永不触发、校验一直挂起。
+ */
+describe('createTypeMatchValidator 原始 validator 返回值约定', () => {
+  beforeEach(() => {
+    clearTypeMatchRules();
+    registerTypeMatchRule('async-type', async () => undefined);
+  });
+
+  afterEach(() => {
+    clearTypeMatchRules();
+  });
+
+  const validatorOf = (originalValidator: any, type = 'async-type') =>
+    createTypeMatchValidator(mForm, propsOf({ type }), {
+      typeMatch: true,
+      validator: originalValidator,
+    } as any);
+
+  /** async-type 走异步 typeMatch 路径，text 走同步内置规则路径，两者行为应完全一致 */
+  const paths = ['async-type', 'text'];
+
+  test.each(paths)('%s：返回 false 时回调错误', async (type) => {
+    const callback = vi.fn();
+    validatorOf(() => false, type)({ fullField: 'title' }, 'ok', callback, {}, {});
+
+    await vi.waitFor(() => expect(callback).toHaveBeenCalledTimes(1));
+    expect(callback.mock.calls[0][0].message).toBe('title fails');
+  });
+
+  test('返回 false 时优先使用 rule.message', async () => {
+    const callback = vi.fn();
+    createTypeMatchValidator(mForm, propsOf({ type: 'async-type' }), {
+      typeMatch: true,
+      message: '自定义错误',
+      validator: () => false,
+    } as any)({}, 'ok', callback, {}, {});
+
+    await vi.waitFor(() => expect(callback).toHaveBeenCalledTimes(1));
+    expect(callback.mock.calls[0][0].message).toBe('自定义错误');
+  });
+
+  test.each(paths)('%s：返回 true 时无参回调', async (type) => {
+    const callback = vi.fn();
+    validatorOf(() => true, type)({}, 'ok', callback, {}, {});
+
+    await vi.waitFor(() => expect(callback).toHaveBeenCalledTimes(1));
+    expect(callback).toHaveBeenCalledWith();
+  });
+
+  test.each(paths)('%s：返回 Error 实例时透传', async (type) => {
+    const error = new Error('返回 Error');
+    const callback = vi.fn();
+    validatorOf(() => error, type)({}, 'ok', callback, {}, {});
+
+    await vi.waitFor(() => expect(callback).toHaveBeenCalledTimes(1));
+    expect(callback).toHaveBeenCalledWith(error);
+  });
+
+  test.each(paths)('%s：返回错误数组时透传', async (type) => {
+    const errors = [new Error('错误一'), new Error('错误二')];
+    const callback = vi.fn();
+    validatorOf(() => errors, type)({}, 'ok', callback, {}, {});
+
+    await vi.waitFor(() => expect(callback).toHaveBeenCalledTimes(1));
+    expect(callback).toHaveBeenCalledWith(errors);
+  });
+
+  test.each(paths)('%s：同步抛错时转成回调而非未捕获异常', async (type) => {
+    const unhandled: any[] = [];
+    const onUnhandled = (reason: any) => unhandled.push(reason);
+    process.on('unhandledRejection', onUnhandled);
+
+    const callback = vi.fn();
+    validatorOf(() => {
+      throw new Error('validator 内部抛错');
+    }, type)({}, 'ok', callback, {}, {});
+
+    await vi.waitFor(() => expect(callback).toHaveBeenCalledTimes(1));
+    expect(callback.mock.calls[0][0].message).toBe('validator 内部抛错');
+
+    // 等待微任务队列排空，确认异常没有变成游离的 rejected promise
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    process.off('unhandledRejection', onUnhandled);
+    expect(unhandled).toEqual([]);
+  });
+
+  test.each([
+    [
+      '抛出',
+      () => {
+        throw 'string error';
+      },
+    ],
+    ['reject', () => Promise.reject('string error')],
+  ])('%s非 Error 时包装成 Error', async (_case, originalValidator) => {
+    const callback = vi.fn();
+    validatorOf(originalValidator)({}, 'ok', callback, {}, {});
+
+    await vi.waitFor(() => expect(callback).toHaveBeenCalledTimes(1));
+    expect(callback.mock.calls[0][0]).toBeInstanceOf(Error);
+    expect(callback.mock.calls[0][0].message).toBe('string error');
+  });
+
+  test('同步 typeMatch 路径不把 Promise 交还 async-validator，避免重复回调', async () => {
+    const callback = vi.fn();
+    // async 写法很常见：内部调了 callback，函数本身又返回 Promise
+    const returned = validatorOf(async ({ callback: cb }: any) => {
+      cb(new Error('原始校验失败'));
+    }, 'text')({}, 'ok', callback, {}, {});
+
+    // 返回 undefined，async-validator 不会再解析 Promise 二次回调
+    expect(returned).toBeUndefined();
+    expect(callback).toHaveBeenCalledTimes(1);
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback.mock.calls[0][0].message).toBe('原始校验失败');
+  });
+});
+
+describe('createTypeMatchValidator 异步校验竞态', () => {
+  beforeEach(() => {
+    clearTypeMatchRules();
+  });
+
+  afterEach(() => {
+    clearTypeMatchRules();
+  });
+
+  /** 注册一个由测试手动控制结束时机的异步规则，返回按调用顺序收集的 resolve 队列 */
+  const registerManualRule = () => {
+    const resolvers: ((message: string | undefined) => void)[] = [];
+    registerTypeMatchRule('async-type', () => new Promise<string | undefined>((resolve) => resolvers.push(resolve)));
+    return resolvers;
+  };
+
+  test('旧校验不会用过期结论结算，而是跟随最新一轮的结论', async () => {
+    const resolvers = registerManualRule();
+    const validator = createTypeMatchValidator(mForm, propsOf({ type: 'async-type' }), { typeMatch: true } as any);
+
+    const staleCallback = vi.fn();
+    const freshCallback = vi.fn();
+    validator({}, 'old', staleCallback, {}, {});
+    expect(staleCallback).not.toHaveBeenCalled();
+
+    // 值变化触发新一轮校验：旧校验的结论作废，但不能提前按通过结算
+    validator({}, 'new', freshCallback, {}, {});
+    expect(staleCallback).not.toHaveBeenCalled();
+
+    // 旧校验先返回，它的结论被丢弃
+    resolvers[0]('旧值校验失败');
+    await Promise.resolve();
+    expect(staleCallback).not.toHaveBeenCalled();
+
+    // 最新一轮出结论后，两次调用都以新结论结算
+    resolvers[1]('新值校验失败');
+
+    await vi.waitFor(() => expect(staleCallback).toHaveBeenCalledTimes(1));
+    expect(freshCallback).toHaveBeenCalledTimes(1);
+    expect(staleCallback.mock.calls[0][0].message).toBe('新值校验失败');
+    expect(freshCallback.mock.calls[0][0].message).toBe('新值校验失败');
+  });
+
+  test('旧校验被同步路径的校验取代时，跟随同步结论结算', async () => {
+    const resolvers = registerManualRule();
+    const validator = createTypeMatchValidator(mForm, propsOf({ type: 'async-type' }), { typeMatch: true } as any);
+
+    const staleCallback = vi.fn();
+    const freshCallback = vi.fn();
+    validator({}, 'bad', staleCallback, {}, {});
+
+    // 值被清空：空值走同步路径直接通过，在途的旧校验必须跟着通过
+    validator({}, '', freshCallback, {}, {});
+    expect(freshCallback).toHaveBeenCalledWith();
+    expect(staleCallback).toHaveBeenCalledWith();
+
+    // 旧校验的失败结论晚到，不能落到已经通过的新值上
+    resolvers[0]('异步校验失败');
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(staleCallback).toHaveBeenCalledTimes(1);
+  });
+
+  test('取值为同一引用（names / 对象值）时也能识别出旧校验', async () => {
+    const resolvers = registerManualRule();
+    const model: Record<string, any> = { start: 'old' };
+    const props = { ...propsOf({ type: 'async-type', names: ['start'] }), model };
+    const validator = createTypeMatchValidator(mForm, props, { typeMatch: true } as any);
+
+    const staleCallback = vi.fn();
+    const freshCallback = vi.fn();
+    validator({}, 'x', staleCallback, {}, {});
+
+    // names 场景下校验的是 model 本身，就地修改后引用不变
+    model.start = 'new';
+    validator({}, 'y', freshCallback, {}, {});
+
+    // 新校验先通过，旧校验的失败结论后到，不能覆盖
+    resolvers[1](undefined);
+    resolvers[0]('旧值校验失败');
+
+    await vi.waitFor(() => expect(freshCallback).toHaveBeenCalledTimes(1));
+    expect(freshCallback).toHaveBeenCalledWith();
+    expect(staleCallback).toHaveBeenCalledTimes(1);
+    expect(staleCallback).toHaveBeenCalledWith();
+  });
+
+  test('同值的多次在途校验都会被最新一轮结算', async () => {
+    const resolvers = registerManualRule();
+    const validator = createTypeMatchValidator(mForm, propsOf({ type: 'async-type' }), { typeMatch: true } as any);
+
+    const first = vi.fn();
+    const second = vi.fn();
+    const third = vi.fn();
+    // 同一个值可能被 blur、change 触发两次校验，之后值才变化
+    validator({}, 'old', first, {}, {});
+    validator({}, 'old', second, {}, {});
+    validator({}, 'new', third, {}, {});
+
+    resolvers[0]('旧值校验失败');
+    resolvers[1]('旧值校验失败');
+    resolvers[2]('新值校验失败');
+
+    await vi.waitFor(() => expect(third).toHaveBeenCalledTimes(1));
+    expect(first.mock.calls[0][0].message).toBe('新值校验失败');
+    expect(second.mock.calls[0][0].message).toBe('新值校验失败');
+    expect(third.mock.calls[0][0].message).toBe('新值校验失败');
+  });
+
+  test('并发的多次校验都会拿到结论，不会有调用被漏掉', async () => {
+    registerTypeMatchRule('async-type', async () => '异步校验失败');
+
+    const validator = createTypeMatchValidator(mForm, propsOf({ type: 'async-type' }), { typeMatch: true } as any);
+
+    const first = vi.fn();
+    const second = vi.fn();
+    validator({}, 'same', first, {}, {});
+    validator({}, 'same', second, {}, {});
+
+    await vi.waitFor(() => {
+      expect(first).toHaveBeenCalledTimes(1);
+      expect(second).toHaveBeenCalledTimes(1);
+    });
+    expect(first.mock.calls[0][0].message).toBe('异步校验失败');
+    expect(second.mock.calls[0][0].message).toBe('异步校验失败');
+  });
+
+  test('结论已作废的旧校验返回后不再执行原始 validator', async () => {
+    const resolvers = registerManualRule();
+    const originalValidator = vi.fn(({ callback }: any) => callback());
+    const validator = createTypeMatchValidator(mForm, propsOf({ type: 'async-type' }), {
+      typeMatch: true,
+      validator: originalValidator,
+    } as any);
+
+    validator({}, 'old', vi.fn(), {}, {});
+    validator({}, 'new', vi.fn(), {}, {});
+
+    // 旧校验的结论已作废，它的 typeMatch 通过后不应再触发一次原始 validator（可能带副作用）
+    resolvers[0](undefined);
+    resolvers[1](undefined);
+
+    await vi.waitFor(() => expect(originalValidator).toHaveBeenCalled());
+    expect(originalValidator).toHaveBeenCalledTimes(1);
   });
 });

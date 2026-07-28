@@ -60,13 +60,15 @@ export const adaptFormValidator = (validator: AsyncValidatorFn): AsyncValidatorF
     const value = arg1;
     return new Promise((resolve) => {
       let settled = false;
-      const callback = (error?: Error | string) => {
+      const callback = (error?: Error | string | (Error | string)[]) => {
         if (settled) return;
         settled = true;
-        if (error) {
+        // async-validator 约定 callback 也可接收错误数组，TDesign 只能展示一条，取首条
+        const first = Array.isArray(error) ? error[0] : error;
+        if (first) {
           resolve({
             result: false,
-            message: typeof error === 'string' ? error : error.message,
+            message: typeof first === 'string' ? first : first.message,
           });
         } else {
           resolve(true);
@@ -74,8 +76,9 @@ export const adaptFormValidator = (validator: AsyncValidatorFn): AsyncValidatorF
       };
 
       try {
+        // 异步 validator 会先返回 undefined，稍后再调 callback，这里不能当成 thenable 取值
         const result = validator(undefined, value, callback);
-        if (result !== null && typeof (result as PromiseLike<unknown>).then === 'function') {
+        if (result && typeof (result as PromiseLike<unknown>).then === 'function') {
           Promise.resolve(result).then(
             () => {
               if (!settled) callback();
