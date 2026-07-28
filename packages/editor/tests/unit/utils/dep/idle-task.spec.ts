@@ -6,6 +6,7 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { IdleTask } from '@editor/utils/dep/idle-task';
+import * as logger from '@editor/utils/logger';
 
 const fakeIdleDeadline = (timeRemaining: number, callsBeforeZero = 1): IdleDeadline => {
   let remainingCalls = callsBeforeZero;
@@ -125,6 +126,77 @@ describe('IdleTask', () => {
     for (let i = 0; i < 200; i++) task.enqueueTask(handler, i);
     scheduled[0].cb(fakeIdleDeadline(3, 1));
     expect(scheduled.length).toBeGreaterThan(1);
+  });
+
+  test('单个任务抛错不会中断整个队列', () => {
+    const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => undefined);
+    const task = new IdleTask<number>();
+    const done: number[] = [];
+    const finishHandler = vi.fn();
+    task.on('finish', finishHandler);
+
+    for (let i = 0; i < 10; i++) {
+      task.enqueueTask((n) => {
+        if (n === 3) throw new Error('boom');
+        done.push(n);
+      }, i);
+    }
+
+    expect(() => scheduled[0].cb(fakeIdleDeadline(50))).not.toThrow();
+    expect(done).toEqual([0, 1, 2, 4, 5, 6, 7, 8, 9]);
+    expect(finishHandler).toHaveBeenCalled();
+    expect(errorSpy).toHaveBeenCalled();
+    errorSpy.mockRestore();
+  });
+
+  test('任务抛错且仍有剩余任务时继续调度下一轮并同步任务数', () => {
+    const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => undefined);
+    const task = new IdleTask<number>();
+    const updateHandler = vi.fn();
+    task.on('update-task-length', updateHandler);
+
+    for (let i = 0; i < 200; i++) {
+      task.enqueueTask((n) => {
+        if (n === 0) throw new Error('boom');
+      }, i);
+    }
+
+    // 单批最多执行 10 个，执行完仍有剩余任务
+    scheduled[0].cb(fakeIdleDeadline(3, 1));
+
+    expect(scheduled.length).toBeGreaterThan(1);
+    expect(updateHandler).toHaveBeenCalledWith({ length: 190, hightLevelLength: 0 });
+    errorSpy.mockRestore();
+  });
+
+  test('任务执行过程中 clearTasks 会立即停止消费已清空的队列', () => {
+    const task = new IdleTask<number>();
+    const handler = vi.fn((n: number) => {
+      if (n === 0) {
+        task.clearTasks();
+      }
+    });
+    for (let i = 0; i < 200; i++) task.enqueueTask(handler, i);
+
+    scheduled[0].cb(fakeIdleDeadline(50));
+
+    expect(handler).toHaveBeenCalledTimes(1);
+  });
+
+  test('任务执行过程中清空并重新入队，新任务仍会被执行', () => {
+    const task = new IdleTask<number>();
+    const afterHandler = vi.fn();
+    task.enqueueTask((n) => {
+      if (n === 0) {
+        task.clearTasks();
+        task.enqueueTask(afterHandler, 999);
+      }
+    }, 0);
+    for (let i = 1; i < 200; i++) task.enqueueTask(() => undefined, i);
+
+    scheduled[0].cb(fakeIdleDeadline(50));
+
+    expect(afterHandler).toHaveBeenCalled();
   });
 
   test('clearTasks - 取消挂起任务并重置队列', () => {

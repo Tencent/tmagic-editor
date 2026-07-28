@@ -297,6 +297,29 @@ describe('Dep service', () => {
     expect(depService.get('collecting')).toBe(false);
   });
 
+  test('target 收集抛错时批次仍会结算，collecting 与 taskLength 复位', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    depService.addTarget(
+      new Target({
+        id: 'throw-target',
+        type: DepTargetType.DATA_SOURCE,
+        isTarget: () => {
+          throw new Error('boom');
+        },
+      }),
+    );
+
+    const nodes = Array.from({ length: 50 }, (_, i) => ({ id: `n${i}`, type: 'text', text: 'x' })) as any;
+    await expect(depService.collectIdle(nodes, {}, false, DepTargetType.DATA_SOURCE)).resolves.toBe(true);
+
+    expect(depService.get('collecting')).toBe(false);
+    // taskLength 的更新做了 1s 节流，等节流窗口结束后才会同步到 0
+    await new Promise((resolve) => setTimeout(resolve, 1100));
+    expect(depService.get('taskLength')).toBe(0);
+
+    errorSpy.mockRestore();
+  });
+
   test('destroy 会 reset 并移除监听', () => {
     depService.addTarget(makeTarget('destroy-me'));
     expect(() => depService.destroy()).not.toThrow();
