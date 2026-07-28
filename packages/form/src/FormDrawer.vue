@@ -30,6 +30,7 @@
         :prevent-submit-default="preventSubmitDefault"
         :use-field-text-in-error="useFieldTextInError"
         :type-match-valid="typeMatchValid"
+        :validate-on-init="validateOnInit"
         :extend-state="extendState"
         :theme="effectiveTheme"
         @change="changeHandler"
@@ -78,6 +79,8 @@ const props = withDefaults(
     labelWidth?: string;
     /** 是否开启类型匹配校验 */
     typeMatchValid?: boolean;
+    /** 透传给内部 `MForm`，初始化完成后是否立即校验（默认 `false`） */
+    validateOnInit?: boolean;
     disabled?: boolean;
     closeOnPressEscape?: boolean;
     title?: string;
@@ -106,6 +109,7 @@ const props = withDefaults(
     values: () => ({}),
     confirmText: '确定',
     useFieldTextInError: true,
+    validateOnInit: false,
   },
 );
 

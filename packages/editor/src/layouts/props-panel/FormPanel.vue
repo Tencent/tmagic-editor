@@ -14,6 +14,7 @@
         :config="config"
         :type-match-valid="true"
         :extend-state="extendState"
+        :validate-on-init="true"
         @change="submit"
         @error="errorHandler"
       ></MForm>

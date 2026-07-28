@@ -88,6 +88,13 @@ const props = withDefaults(
     labelWidth?: string;
     /** 是否开启类型匹配校验 */
     typeMatchValid?: boolean;
+    /**
+     * 初始化（`config` / `initValues` 就绪）后是否立即执行一次表单校验。
+     *
+     * - `false`（默认）：不自动校验，避免打开表单时就展示错误态；
+     * - `true`：初始化完成后在 `nextTick` 中调用 `validate()`。
+     */
+    validateOnInit?: boolean;
     disabled?: boolean;
     height?: string;
     stepActive?: string | number;
@@ -156,6 +163,7 @@ const props = withDefaults(
     labelPosition: 'right',
     keyProp: '__key',
     useFieldTextInError: true,
+    validateOnInit: false,
   },
 );
 
@@ -353,9 +361,11 @@ watch(
       // 非对比模式，初始化完成
       initialized.value = !props.isCompare;
 
-      nextTick(() => {
-        tMagicFormRef.value?.validate();
-      });
+      if (props.validateOnInit) {
+        nextTick(() => {
+          tMagicFormRef.value?.validate();
+        });
+      }
     });
 
     if (props.isCompare) {

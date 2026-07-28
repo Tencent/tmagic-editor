@@ -16,6 +16,7 @@
           :use-field-text-in-error="useFieldTextInError"
           :extend-state="extendState"
           :type-match-valid="typeMatchValid"
+          :validate-on-init="validateOnInit"
           @change="changeHandler"
         ></Form>
         <slot></slot>
@@ -59,6 +60,8 @@ const props = withDefaults(
     labelWidth?: string;
     /** 是否开启类型匹配校验 */
     typeMatchValid?: boolean;
+    /** 透传给内部 `MForm`，初始化完成后是否立即校验（默认 `false`） */
+    validateOnInit?: boolean;
     disabled?: boolean;
     size?: 'small' | 'default' | 'large';
     confirmText?: string;
@@ -74,6 +77,7 @@ const props = withDefaults(
     values: () => ({}),
     confirmText: '确定',
     useFieldTextInError: true,
+    validateOnInit: false,
   },
 );
 
