@@ -1,3 +1,9 @@
+# [1.8.0-beta.19](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.18...v1.8.0-beta.19) (2026-07-28)
+
+
+### Features
+
+* **form:** 新增 validateOnInit，默认关闭初始化时自动校验 ([b7c04ed](https://github.com/Tencent/tmagic-editor/commit/b7c04edcd518554d5117c2212bbfe8ef632a4b37))
 # [1.8.0-beta.18](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.17...v1.8.0-beta.18) (2026-07-28)
 
 
