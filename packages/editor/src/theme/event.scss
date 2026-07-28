@@ -1,10 +1,13 @@
 .m-fields-event-select {
   width: 100%;
   .fullWidth {
-    width: calc(100% - 32px);
+    width: 100%;
     box-sizing: border-box;
     &.create-button {
       width: 100%;
+    }
+    &.m-container-ui-event {
+      width: calc(100% - 32px);
     }
   }
   .event-select-container {
@@ -14,7 +17,7 @@
         border-bottom: 1px solid #ebeef5;
       }
       > .el-card__body {
-        padding-bottom: 8px;
+        padding-bottom: 16px;
         .m-fields-group-list-footer {
           div {
             justify-content: flex-start !important;
@@ -22,7 +25,7 @@
         }
         .el-card.tmagic-design-card--flat {
           > .el-card__header {
-            padding: 8px 0;
+            padding: 16px 0;
           }
         }
       }

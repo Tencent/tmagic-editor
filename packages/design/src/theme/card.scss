@@ -25,7 +25,7 @@
 
   .el-card__header {
     border-bottom: none;
-    padding: 8px 16px;
+    padding: 16px;
     &:hover {
       background: transparent;
       box-shadow: none;
@@ -41,7 +41,7 @@
     padding: 0 16px 0 16px;
     // 这里每个form-item应该要有一个16px间距，但是除了tbody中的form-item
     .tmagic-design-form-item:not(tbody .tmagic-design-form-item) {
-      margin-bottom: 8px;
+      margin-bottom: 16px;
     }
     > .m-container-row {
       overflow-x: hidden;
