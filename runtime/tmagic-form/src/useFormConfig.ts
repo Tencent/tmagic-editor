@@ -1,7 +1,7 @@
 import { computed, nextTick, onBeforeUnmount, reactive, ref } from 'vue';
 
 import type { Id, MApp, MNode } from '@tmagic/core';
-import TMagicApp from '@tmagic/core';
+import TMagicApp, { NodeType } from '@tmagic/core';
 import type { FormConfig, MForm, RemoveData, UpdateData } from '@tmagic/editor';
 import { getElById, getNodePath, initValue, replaceChildNode } from '@tmagic/editor';
 
@@ -136,8 +136,11 @@ export const useFormConfig = (props: AppProps) => {
         const parent = getNodePath(parentId, [root.value]).pop();
         if (!parent) throw new Error('未找到父元素');
 
-        if (node.type === 'page') {
-          app?.deletePage();
+        // 页面与页面片都由 app.page 承载，只有删的正是当前渲染的那个才销毁实例，避免误清其它页的画布
+        if (node.type === NodeType.PAGE || node.type === NodeType.PAGE_FRAGMENT) {
+          if (`${app?.page?.data.id}` === `${node.id}`) {
+            app?.deletePage();
+          }
         } else {
           app?.page?.deleteNode(node.id);
         }

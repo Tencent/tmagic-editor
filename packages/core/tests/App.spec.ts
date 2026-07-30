@@ -341,6 +341,20 @@ describe('App 配置/方法/组件注册', () => {
     expect(app.page).toBeUndefined();
   });
 
+  test('deletePage 销毁当前 page', () => {
+    const app = new App({
+      config: {
+        type: NodeType.ROOT,
+        id: 'app',
+        items: [{ type: NodeType.PAGE, id: 'p1', items: [] }],
+      },
+    });
+    expect(app.page?.data.id).toBe('p1');
+
+    app.deletePage();
+    expect(app.page).toBeUndefined();
+  });
+
   test('runCode 执行代码块', async () => {
     const fn = vi.fn();
     const app = new App({

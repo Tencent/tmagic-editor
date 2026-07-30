@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { reactive, toRaw } from 'vue';
+import { nextTick, reactive, toRaw } from 'vue';
 import { cloneDeep, isEmpty, isEqual, isObject, mergeWith, uniq } from 'lodash-es';
 
 import type { Id, MApp, MContainer, MNode, MPage, MPageFragment, TargetOptions } from '@tmagic/core';
@@ -30,6 +30,7 @@ import {
   guid,
   isPage,
   isPageFragment,
+  isPageOrFragment,
   setValueByKeyPath,
   traverseNode,
 } from '@tmagic/utils';
@@ -272,7 +273,7 @@ class Editor extends BaseService {
   public isOnDifferentPage(node: MNode): boolean {
     const currentPageId = this.get('page')?.id;
     if (currentPageId === undefined || currentPageId === null) return false;
-    if (isPage(node) || isPageFragment(node)) {
+    if (isPageOrFragment(node)) {
       return `${node.id}` !== `${currentPageId}`;
     }
     const nodePage = this.getNodeInfo(node.id, false).page;
@@ -413,11 +414,11 @@ class Editor extends BaseService {
 
     if (!curNode) throw new Error('当前选中节点为空');
 
-    if ((parent.type === NodeType.ROOT || curNode?.type === NodeType.ROOT) && !(isPage(node) || isPageFragment(node))) {
+    if ((parent.type === NodeType.ROOT || curNode?.type === NodeType.ROOT) && !isPageOrFragment(node)) {
       throw new Error('app下不能添加组件');
     }
 
-    if (parent.id !== curNode.id && !(isPage(node) || isPageFragment(node))) {
+    if (parent.id !== curNode.id && !isPageOrFragment(node)) {
       const index = parent.items.indexOf(curNode);
       parent.items?.splice(index + 1, 0, node);
     } else {
@@ -487,7 +488,7 @@ class Editor extends BaseService {
     const newNodes = await Promise.all(
       addNodes.map((node) => {
         const root = this.get('root');
-        if ((isPage(node) || isPageFragment(node)) && root) {
+        if (isPageOrFragment(node) && root) {
           return this.doAdd(node, root);
         }
         const parentNode = parent ?? getAddParent(node);
@@ -523,7 +524,7 @@ class Editor extends BaseService {
       }
     }
 
-    if (!(isPage(newNodes[0]) || isPageFragment(newNodes[0]))) {
+    if (!isPageOrFragment(newNodes[0])) {
       const pageForOp = this.getNodeInfo(newNodes[0].id, false).page;
       if (!doNotPushHistory) {
         const parentId = (this.getParentById(newNodes[0].id, false) ?? this.get('root'))!.id;
@@ -554,8 +555,8 @@ class Editor extends BaseService {
       doNotPushHistory,
     });
 
-    // 页面 / 页面片新增不入历史栈（见上方 isPage / isPageFragment 分支），这里合并补发一次结构变更通知
-    const addedPages = newNodes.filter((node) => isPage(node) || isPageFragment(node)) as (MPage | MPageFragment)[];
+    // 页面 / 页面片新增不入历史栈（见上方 isPageOrFragment 分支），这里合并补发一次结构变更通知
+    const addedPages = newNodes.filter((node) => isPageOrFragment(node)) as (MPage | MPageFragment)[];
     if (addedPages.length) {
       historyService.notifyPageStructureChange({ add: addedPages, remove: [] });
     }
@@ -578,12 +579,14 @@ class Editor extends BaseService {
 
     if (typeof index !== 'number' || index === -1) throw new Error('找不要删除的节点');
 
-    parent.items?.splice(index, 1);
     const stage = this.get('stage');
-    stage?.remove({ id: node.id, parentId: parent.id, root: cloneDeep(root) });
+    const currentPage = this.get('page');
+    const isDeletingCurrentPage = isPageOrFragment(node) && !!currentPage && `${currentPage.id}` === `${node.id}`;
+
+    parent.items?.splice(index, 1);
 
     // 始终清理已删除节点在 state 中的残留引用：
-    // - 即使后续会调用 selectDefault / select(parent) 覆盖，跳过这些调用（doNotSelect / doNotSwitchPage）时也不能让 state 持有已删除节点
+    // - 即使后续会调用 select 覆盖，跳过这些调用（doNotSelect / doNotSwitchPage）时也不能让 state 持有已删除节点
     const selectedNodes = this.get('nodes');
     const removedSelectedIndex = selectedNodes.findIndex((n: MNode) => `${n.id}` === `${node.id}`);
     if (removedSelectedIndex !== -1) {
@@ -591,38 +594,44 @@ class Editor extends BaseService {
       nextSelected.splice(removedSelectedIndex, 1);
       this.set('nodes', nextSelected);
     }
-    if (isPage(node) || isPageFragment(node)) {
-      const currentPage = this.get('page');
-      if (currentPage && `${currentPage.id}` === `${node.id}`) {
-        this.set('page', null);
-      }
-    }
 
-    const selectDefault = async (pages: MNode[]) => {
-      if (pages[0]) {
-        await this.select(pages[0]);
-        stage?.select(pages[0].id);
-      } else {
-        this.selectRoot();
-      }
-    };
-
+    const removeData = { id: node.id, parentId: parent.id, root: cloneDeep(root) };
     const rootItems = root.items || [];
+    // 删非当前页时画布不应该变动，所以只有删的是当前页才重新选中
+    const shouldReselect = isDeletingCurrentPage && !doNotSelect && !doNotSwitchPage;
+    // 还有剩余页面才能切过去，否则退回选中 root
+    const shouldSwitchPage = shouldReselect && rootItems.length > 0;
 
-    if (isPage(node)) {
-      this.state.pageLength -= 1;
-
-      // 删除页面后默认会切到首个剩余页面（selectDefault），doNotSwitchPage 时跳过这次自动切换
-      if (!doNotSelect && !doNotSwitchPage) {
-        await selectDefault(rootItems);
+    if (isPageOrFragment(node)) {
+      if (isPage(node)) {
+        this.state.pageLength -= 1;
+      } else {
+        this.state.pageFragmentLength -= 1;
       }
-    } else if (isPageFragment(node)) {
-      this.state.pageFragmentLength -= 1;
 
-      if (!doNotSelect && !doNotSwitchPage) {
-        await selectDefault(rootItems);
+      if (shouldSwitchPage) {
+        // runtime 收到页面删除时会销毁当前渲染的 page 实例，必须先把画布切到剩余页面再通知删除，
+        // 否则画布会被清空，且要等下一次 updatePageId 才能恢复。
+        // nextTick 用于等 Stage 的 page watch 把新页面 id 同步给 runtime。
+        await this.select(rootItems[0]);
+        stage?.select(rootItems[0].id);
+        await nextTick();
+        stage?.remove(removeData);
+      } else {
+        // page 置空会让 Workspace 卸载 Stage 并销毁 renderer，删除通知必须在卸载前发出，
+        // 且不能 await：runtime 未 ready 时 getRuntime 的监听会随 destroy 一起被移除，永远不会 resolve
+        stage?.remove(removeData);
+
+        if (shouldReselect) {
+          // 页面已全部删完
+          this.selectRoot();
+        } else if (isDeletingCurrentPage) {
+          this.set('page', null);
+        }
       }
     } else {
+      stage?.remove(removeData);
+
       if (!doNotSelect) {
         await this.select(parent);
         stage?.select(parent.id);
@@ -664,7 +673,7 @@ class Editor extends BaseService {
 
     const removedItems: StepDiffItem<MNode>[] = [];
     let pageForOp: { name: string; id: Id } | null = null;
-    if (!(isPage(nodes[0]) || isPageFragment(nodes[0]))) {
+    if (!isPageOrFragment(nodes[0])) {
       for (const n of nodes) {
         const { parent, node: curNode, page } = this.getNodeInfo(n.id, false);
         if (parent && curNode) {
@@ -702,8 +711,8 @@ class Editor extends BaseService {
     this.emit('remove', nodes);
     this.emit('change', { type: 'remove', data: changeItems, historySource, doNotPushHistory });
 
-    // 页面 / 页面片删除不入历史栈（见上方 isPage / isPageFragment 分支），这里合并补发一次结构变更通知
-    const removedPages = nodes.filter((node) => isPage(node) || isPageFragment(node)) as (MPage | MPageFragment)[];
+    // 页面 / 页面片删除不入历史栈（见上方 isPageOrFragment 分支），这里合并补发一次结构变更通知
+    const removedPages = nodes.filter((node) => isPageOrFragment(node)) as (MPage | MPageFragment)[];
     if (removedPages.length) {
       historyService.notifyPageStructureChange({ add: [], remove: removedPages });
     }
@@ -764,7 +773,7 @@ class Editor extends BaseService {
     }
 
     // 只有被更新节点正好是当前选中页面时才同步 state.page，避免「更新非当前页」误将编辑器切到该页
-    if (isPage(newConfig) || isPageFragment(newConfig)) {
+    if (isPageOrFragment(newConfig)) {
       const currentPage = this.get('page');
       if (currentPage && `${currentPage.id}` === `${newConfig.id}`) {
         this.set('page', newConfig as MPage | MPageFragment);
@@ -1139,7 +1148,7 @@ class Editor extends BaseService {
     }: DslOpOptions = {},
   ): Promise<MNode | MNode[]> {
     const isBatch = Array.isArray(config);
-    const configs = (isBatch ? config : [config]).filter((item) => !(isPage(item) || isPageFragment(item)));
+    const configs = (isBatch ? config : [config]).filter((item) => !isPageOrFragment(item));
 
     if (configs.length === 0) {
       throw new Error('没有可移动的节点');
@@ -1760,7 +1769,7 @@ class Editor extends BaseService {
   private getPageOfNode(id: Id): MPage | MPageFragment | null {
     const { node, page } = this.getNodeInfo(id, false);
     if (page) return page;
-    if (node && (isPage(node) || isPageFragment(node))) return node as MPage | MPageFragment;
+    if (node && isPageOrFragment(node)) return node as MPage | MPageFragment;
     return null;
   }
 

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 import { cloneDeep } from 'lodash-es';
 
 import type { MApp, MContainer, MNode } from '@tmagic/core';
@@ -551,6 +551,153 @@ describe('remove', () => {
     expect(editorService.getNodeById(NodeId.PAGE_ID)).toBeNull();
     // 自动切到剩余首个页面
     expect(editorService.get('page')?.id).toBe(addedId);
+  });
+
+  test('默认删除当前页面并自动切页时，不会先把 page 置为 null', async () => {
+    editorService.set('root', cloneDeep(root));
+    const rootNode = editorService.get('root');
+    await editorService.select(NodeId.PAGE_ID);
+    const newPage = await editorService.add({ type: NodeType.PAGE }, rootNode);
+    const addedId = Array.isArray(newPage) ? newPage[0].id : newPage.id;
+
+    await editorService.select(NodeId.PAGE_ID);
+
+    const pageValues: Array<MNode | null> = [];
+    const originalSet = editorService.set.bind(editorService);
+    const setSpy = vi.spyOn(editorService, 'set').mockImplementation((name, value, options) => {
+      if (name === 'page') {
+        pageValues.push(value as MNode | null);
+      }
+      return originalSet(name, value, options);
+    });
+
+    try {
+      await editorService.remove({ id: NodeId.PAGE_ID, type: NodeType.PAGE });
+    } finally {
+      setSpy.mockRestore();
+    }
+
+    expect(pageValues.some((page) => page === null)).toBe(false);
+    expect(editorService.get('page')?.id).toBe(addedId);
+  });
+
+  test('删除非当前页面时保持当前页选中，不强制切到首个页面', async () => {
+    editorService.set('root', cloneDeep(root));
+    const rootNode = editorService.get('root');
+    await editorService.select(NodeId.PAGE_ID);
+    const newPage = await editorService.add({ type: NodeType.PAGE }, rootNode);
+    const addedId = Array.isArray(newPage) ? newPage[0].id : newPage.id;
+
+    await editorService.select(NodeId.PAGE_ID);
+    expect(editorService.get('page')?.id).toBe(NodeId.PAGE_ID);
+
+    await editorService.remove({ id: addedId, type: NodeType.PAGE });
+
+    expect(editorService.getNodeById(addedId)).toBeNull();
+    expect(editorService.get('page')?.id).toBe(NodeId.PAGE_ID);
+  });
+
+  test('删除最后一个页面后退回选中 root', async () => {
+    editorService.set('root', cloneDeep(root));
+    const rootNode = editorService.get('root');
+    await editorService.select(NodeId.PAGE_ID);
+    expect(rootNode?.items.length).toBe(1);
+
+    await editorService.remove({ id: NodeId.PAGE_ID, type: NodeType.PAGE });
+
+    expect(rootNode?.items.length).toBe(0);
+    expect(editorService.get('page')).toBeNull();
+    // root 下已无页面，编辑器应回到「选中 root」状态，而不是什么都没选中
+    expect(editorService.get('nodes')).toEqual([rootNode]);
+    expect(editorService.get('parent')).toBeNull();
+  });
+
+  describe('与画布的调用顺序', () => {
+    const createStageStub = () => {
+      const calls: string[] = [];
+      return {
+        calls,
+        stage: {
+          remove: vi.fn(() => {
+            calls.push('remove');
+            return Promise.resolve();
+          }),
+          select: vi.fn(() => {
+            calls.push('select');
+            return Promise.resolve();
+          }),
+        },
+      };
+    };
+
+    afterEach(() => {
+      editorService.set('stage', null);
+    });
+
+    test('删除当前页面时先把画布切到剩余页面，再通知画布删除', async () => {
+      editorService.set('root', cloneDeep(root));
+      const rootNode = editorService.get('root');
+      await editorService.select(NodeId.PAGE_ID);
+      const newPage = await editorService.add({ type: NodeType.PAGE }, rootNode);
+      const addedId = Array.isArray(newPage) ? newPage[0].id : newPage.id;
+      await editorService.select(NodeId.PAGE_ID);
+
+      const { calls, stage } = createStageStub();
+      editorService.set('stage', stage as any);
+
+      await editorService.remove({ id: NodeId.PAGE_ID, type: NodeType.PAGE });
+
+      // runtime 删除 page 时会销毁当前渲染的实例，必须切页在前，否则画布会被清空
+      expect(calls).toEqual(['select', 'remove']);
+      expect(stage.select).toHaveBeenCalledWith(addedId);
+      expect(editorService.get('page')?.id).toBe(addedId);
+    });
+
+    test('删除当前页面片时同样先切页再通知画布删除', async () => {
+      editorService.set('root', cloneDeep(root));
+      const rootNode = editorService.get('root');
+      await editorService.select(NodeId.PAGE_ID);
+      const fragment = await editorService.add({ type: NodeType.PAGE_FRAGMENT }, rootNode);
+      const fragmentId = Array.isArray(fragment) ? fragment[0].id : fragment.id;
+      // 新增页面片后当前页已切到页面片
+      expect(editorService.get('page')?.id).toBe(fragmentId);
+
+      const { calls, stage } = createStageStub();
+      editorService.set('stage', stage as any);
+
+      await editorService.remove({ id: fragmentId, type: NodeType.PAGE_FRAGMENT });
+
+      expect(calls).toEqual(['select', 'remove']);
+      expect(editorService.get('page')?.id).toBe(NodeId.PAGE_ID);
+    });
+
+    test('删除普通节点时先通知画布删除，再选中父节点', async () => {
+      editorService.set('root', cloneDeep(root));
+      await editorService.select(NodeId.NODE_ID);
+
+      const { calls, stage } = createStageStub();
+      editorService.set('stage', stage as any);
+
+      await editorService.remove({ id: NodeId.NODE_ID, type: 'text' });
+
+      expect(calls).toEqual(['remove', 'select']);
+      expect(stage.select).toHaveBeenCalledWith(NodeId.PAGE_ID);
+    });
+
+    test('删除最后一个页面时在 Stage 卸载前发出删除通知', async () => {
+      editorService.set('root', cloneDeep(root));
+      await editorService.select(NodeId.PAGE_ID);
+
+      const { calls, stage } = createStageStub();
+      editorService.set('stage', stage as any);
+
+      await editorService.remove({ id: NodeId.PAGE_ID, type: NodeType.PAGE });
+
+      // page 置空会让 Workspace 卸载 Stage，删除通知必须在这之前发出
+      expect(calls).toEqual(['remove']);
+      // selectRoot 会顺带清掉 stage 引用
+      expect(editorService.get('stage')).toBeNull();
+    });
   });
 });
 

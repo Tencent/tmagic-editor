@@ -2,7 +2,7 @@ import { computed, inject, nextTick, reactive, ref, watch } from 'vue';
 
 import type TMagicApp from '@tmagic/core';
 import type { Id, MApp, MNode, MPage, MPageFragment } from '@tmagic/core';
-import { asyncLoadCss, getElById, getNodePath, replaceChildNode } from '@tmagic/core';
+import { asyncLoadCss, getElById, getNodePath, NodeType, replaceChildNode } from '@tmagic/core';
 import type { Magic, RemoveData, Runtime, UpdateData } from '@tmagic/stage';
 
 declare global {
@@ -10,6 +10,8 @@ declare global {
     magic?: Magic;
   }
 }
+
+const isPageNode = (node: MNode) => node.type === NodeType.PAGE || node.type === NodeType.PAGE_FRAGMENT;
 
 let styleEl: HTMLStyleElement | null = null;
 
@@ -153,8 +155,12 @@ export const useEditorDsl = (app = inject<TMagicApp>('app'), runtimeApi: Runtime
       const parent = getNodePath(parentId, [root.value]).pop();
       if (!parent) throw new Error('未找到父元素');
 
-      if (node.type === 'page') {
-        app?.deletePage();
+      // 页面与页面片都由 app.page 承载，只有删的正是当前渲染的那个才销毁实例：
+      // 无条件销毁会清空画布，且编辑器删页时已先切到其它页，会把刚切过去的页面误清掉
+      if (isPageNode(node)) {
+        if (`${app?.page?.data.id}` === `${node.id}`) {
+          app?.deletePage();
+        }
       } else {
         app?.page?.deleteNode(node.id);
       }
