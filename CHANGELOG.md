@@ -1,3 +1,14 @@
+# [1.8.0-beta.20](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.19...v1.8.0-beta.20) (2026-07-30)
+
+
+### Bug Fixes
+
+* **editor:** 修复删除页面/页面片时画布被误清空的问题 ([aa42144](https://github.com/Tencent/tmagic-editor/commit/aa4214473858200c62b6efab79c0671e06cc3917))
+
+
+### Features
+
+* **editor,dep:** collectIdle 使用常驻 Web Worker 做依赖收集 ([4bbda35](https://github.com/Tencent/tmagic-editor/commit/4bbda354a987b0a409a01184e8511822a0384a13))
 # [1.8.0-beta.19](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.18...v1.8.0-beta.19) (2026-07-28)
 
 
