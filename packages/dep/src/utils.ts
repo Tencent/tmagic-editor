@@ -1,5 +1,4 @@
 import {
-  type CodeBlockContent,
   type DataSchema,
   type DataSourceSchema,
   type DepData,
@@ -16,16 +15,17 @@ import {
 } from '@tmagic/utils';
 
 import Target from './Target';
-import { DepTargetType, type TargetList } from './types';
+import { type CodeBlockName, DepTargetType, type TargetDescriptor, type TargetList } from './types';
 
 const INTEGER_REGEXP = /^\d+$/;
 
-export const createCodeBlockTarget = (id: Id, codeBlock: CodeBlockContent, initialDeps: DepData = {}) =>
+export const createCodeBlockTarget = (id: Id, codeBlock: CodeBlockName, initialDeps: DepData = {}) =>
   new Target({
     type: DepTargetType.CODE_BLOCK,
     id,
     initialDeps,
     name: codeBlock.name,
+    descriptor: { type: DepTargetType.CODE_BLOCK, id, codeBlock: { name: codeBlock.name } },
     isTarget: (_key: string | number, value: any) => {
       if (id === value) {
         return true;
@@ -238,6 +238,8 @@ export const createDataSourceTarget = (ds: Pick<DataSourceSchema, 'id' | 'fields
     type: DepTargetType.DATA_SOURCE,
     id: ds.id,
     initialDeps,
+    // isTarget 需要完整 fields 结构（含 type / 嵌套 fields），但不必带上 methods 等无关字段
+    descriptor: { type: DepTargetType.DATA_SOURCE, ds: { id: ds.id, fields: ds.fields || [] } },
     isTarget: (key: string | number, value: any) => isDataSourceTarget(ds, key, value),
   });
 
@@ -246,6 +248,8 @@ export const createDataSourceCondTarget = (ds: Pick<DataSourceSchema, 'id' | 'fi
     type: DepTargetType.DATA_SOURCE_COND,
     id: ds.id,
     initialDeps,
+    // 与 DATA_SOURCE 相同，只序列化 isTarget 所需的 id + fields
+    descriptor: { type: DepTargetType.DATA_SOURCE_COND, ds: { id: ds.id, fields: ds.fields || [] } },
     isTarget: (key: string | number, value: any) => isDataSourceCondTarget(ds, key, value),
   });
 
@@ -257,6 +261,15 @@ export const createDataSourceMethodTarget = (
     type: DepTargetType.DATA_SOURCE_METHOD,
     id: ds.id,
     initialDeps,
+    // isTarget 只用方法名/字段名，不序列化 content 等函数，降低 idle 收集通信成本
+    descriptor: {
+      type: DepTargetType.DATA_SOURCE_METHOD,
+      ds: {
+        id: ds.id,
+        methods: (ds.methods || []).map((method) => ({ name: method.name })),
+        fields: (ds.fields || []).map((field) => ({ name: field.name })),
+      },
+    },
     isTarget: (_key: string | number, value: any) => {
       // 使用data-source-method-select 可以配置出来
       if (!Array.isArray(value)) {
@@ -281,6 +294,31 @@ export const createDataSourceMethodTarget = (
       return true;
     },
   });
+
+/**
+ * 用可序列化描述重建 target，使依赖收集可以在 worker 等无法传递函数的环境中进行
+ * @param descriptor 由工厂函数写入 target 的描述
+ * @param initialDeps 初始依赖
+ * @returns Target
+ */
+export const createTargetByDescriptor = (descriptor: TargetDescriptor, initialDeps: DepData = {}): Target => {
+  switch (descriptor.type) {
+    case DepTargetType.CODE_BLOCK:
+      return createCodeBlockTarget(descriptor.id, descriptor.codeBlock, initialDeps);
+    case DepTargetType.DATA_SOURCE:
+      return createDataSourceTarget(descriptor.ds, initialDeps);
+    case DepTargetType.DATA_SOURCE_COND:
+      return createDataSourceCondTarget(descriptor.ds, initialDeps);
+    case DepTargetType.DATA_SOURCE_METHOD:
+      // descriptor 只保留名称，对 isTarget 已足够；重建时按同样结构传入
+      return createDataSourceMethodTarget(
+        descriptor.ds as Pick<DataSourceSchema, 'id' | 'methods' | 'fields'>,
+        initialDeps,
+      );
+    default:
+      throw new Error(`unknown target descriptor: ${JSON.stringify(descriptor)}`);
+  }
+};
 
 export const traverseTarget = (
   targetsList: TargetList,

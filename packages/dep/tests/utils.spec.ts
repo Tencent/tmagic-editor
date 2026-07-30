@@ -266,6 +266,65 @@ describe('utils', () => {
     expect(t3.isTarget('k', ['ds_1', 'unknown'])).toBe(true);
   });
 
+  test('内置 target 带可序列化描述，可在 worker 中重建', () => {
+    const ds = { id: 'ds_1', fields: [{ name: 'name' }] as DataSchema[] };
+
+    expect(utils.createCodeBlockTarget('code_1', { name: 'fn', content: () => false, params: [] }).descriptor).toEqual({
+      type: DepTargetType.CODE_BLOCK,
+      id: 'code_1',
+      codeBlock: { name: 'fn' },
+    });
+    const dsWithMethods = {
+      ...ds,
+      methods: [{ name: 'load', content: () => undefined, params: [] } as any],
+    };
+    // DATA_SOURCE / COND 只带 id + fields，不透传完整数据源对象
+    expect(utils.createDataSourceTarget(dsWithMethods).descriptor).toEqual({
+      type: DepTargetType.DATA_SOURCE,
+      ds: { id: 'ds_1', fields: ds.fields },
+    });
+    expect(utils.createDataSourceCondTarget(dsWithMethods).descriptor).toEqual({
+      type: DepTargetType.DATA_SOURCE_COND,
+      ds: { id: 'ds_1', fields: ds.fields },
+    });
+    // METHOD 描述只保留名称，不带 content 等函数
+    expect(utils.createDataSourceMethodTarget(dsWithMethods).descriptor).toEqual({
+      type: DepTargetType.DATA_SOURCE_METHOD,
+      ds: { id: 'ds_1', methods: [{ name: 'load' }], fields: [{ name: 'name' }] },
+    });
+    // 自定义 target 无法序列化 isTarget，因此没有描述
+    expect(new Target({ id: 'custom', isTarget: () => true }).descriptor).toBeUndefined();
+  });
+
+  test('createTargetByDescriptor 用描述重建出等价的 target', () => {
+    const ds = { id: 'ds_1', fields: [{ name: 'name' }] as DataSchema[] };
+
+    const codeBlockTarget = utils.createTargetByDescriptor({
+      type: DepTargetType.CODE_BLOCK,
+      id: 'code_1',
+      codeBlock: { name: 'fn' },
+    });
+    expect(codeBlockTarget.type).toBe(DepTargetType.CODE_BLOCK);
+    expect(codeBlockTarget.name).toBe('fn');
+    expect(codeBlockTarget.isTarget('created', 'code_1')).toBe(true);
+
+    const dsTarget = utils.createTargetByDescriptor({ type: DepTargetType.DATA_SOURCE, ds });
+    expect(dsTarget.type).toBe(DepTargetType.DATA_SOURCE);
+    expect(dsTarget.isTarget('text', '${ds_1.name}')).toBe(true);
+
+    const condTarget = utils.createTargetByDescriptor({ type: DepTargetType.DATA_SOURCE_COND, ds });
+    expect(condTarget.isTarget(`${NODE_CONDS_KEY}_x`, ['ds_1', 'name'])).toBe(true);
+
+    const methodTarget = utils.createTargetByDescriptor(
+      { type: DepTargetType.DATA_SOURCE_METHOD, ds: { ...ds, methods: [] } },
+      { n1: { name: 'n1', keys: ['k'] } },
+    );
+    expect(methodTarget.isTarget('k', ['ds_1', 'load'])).toBe(true);
+    expect(methodTarget.deps.n1.keys).toEqual(['k']);
+
+    expect(() => utils.createTargetByDescriptor({ type: 'unknown' } as any)).toThrow();
+  });
+
   test('traverseTarget 遍历所有 / 指定 type', () => {
     const t1 = new Target({ id: '1', isTarget: () => true, type: 'a' });
     const t2 = new Target({ id: '2', isTarget: () => true, type: 'b' });

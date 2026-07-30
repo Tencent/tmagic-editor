@@ -1,6 +1,6 @@
 import type { DepData } from '@tmagic/schema';
 
-import { DepTargetType, type IsTarget, type TargetOptions } from './types';
+import { DepTargetType, type IsTarget, type TargetDescriptor, type TargetOptions } from './types';
 
 export interface DepUpdateOptions {
   id: string | number;
@@ -40,12 +40,17 @@ export default class Target {
    * 是否默认收集，默认为true，当值为false时需要传入type参数给collect方法才会被收集
    */
   public isCollectByDefault?: boolean;
+  /**
+   * 可序列化描述，有该描述的 target 可以在 worker 中重建，从而把依赖收集放到子线程执行
+   */
+  public descriptor?: TargetDescriptor;
 
   constructor(options: TargetOptions) {
     this.isTarget = options.isTarget;
     this.id = options.id;
     this.name = options.name;
     this.isCollectByDefault = options.isCollectByDefault ?? true;
+    this.descriptor = options.descriptor;
     if (options.type) {
       this.type = options.type;
     }
