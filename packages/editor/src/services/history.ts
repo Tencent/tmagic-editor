@@ -357,7 +357,7 @@ class History extends BaseService {
    * 派发「页面 / 页面片结构变更」事件（`page-structure-change`）。
    *
    * 常规 `editorService.add` / `remove` 页面节点不会写入 `page` 历史栈（见 editor.add / remove 中
-   * 对 isPage / isPageFragment 的分支），因此不会产生任何 historyService 事件。该方法用于在这些
+   * 对 isPageOrFragment 的分支），因此不会产生任何 historyService 事件。该方法用于在这些
    * 场景（以及 setRoot 整体替换 DSL 增删页面）下，向外统一通知页面结构的增删变化，供业务方感知。
    *
    * 一次操作涉及多个页面时，调用方应把本次增删的页面**合并为一个 change 一次性传入**，

@@ -36,6 +36,7 @@ import {
   isNumber,
   isObject,
   isPageFragment,
+  isPageOrFragment,
   isPercentage,
   isPop,
   isValueIncludeDataSource,
@@ -110,6 +111,14 @@ describe('node 类型判断', () => {
     expect(isPageFragment({ id: 1, type: NodeType.PAGE })).toBe(false);
     expect(isPageFragment(undefined)).toBe(false);
     expect(isPageFragment(null)).toBe(false);
+  });
+
+  test('isPageOrFragment 识别 page 与 page-fragment', () => {
+    expect(isPageOrFragment({ id: 1, type: NodeType.PAGE })).toBe(true);
+    expect(isPageOrFragment({ id: 1, type: NodeType.PAGE_FRAGMENT })).toBe(true);
+    expect(isPageOrFragment({ id: 1, type: 'text' })).toBe(false);
+    expect(isPageOrFragment(undefined)).toBe(false);
+    expect(isPageOrFragment(null)).toBe(false);
   });
 
   test('isDslNode 默认为 true，手动 false 关闭', () => {

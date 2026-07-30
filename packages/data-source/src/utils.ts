@@ -7,8 +7,7 @@ import {
   DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX,
   dataSourceTemplateRegExp,
   getValueByKeyPath,
-  isPage,
-  isPageFragment,
+  isPageOrFragment,
   NODE_CONDS_KEY,
   replaceChildNode,
 } from '@tmagic/core';
@@ -68,7 +67,7 @@ export const compliedConditions = (node: { [NODE_CONDS_KEY]?: DisplayCond[] }, d
 };
 
 export const updateNode = (node: MNode, dsl: MApp) => {
-  if (isPage(node) || isPageFragment(node)) {
+  if (isPageOrFragment(node)) {
     const index = dsl.items?.findIndex((child: MNode) => child.id === node.id);
     dsl.items.splice(index, 1, node as MPage | MPageFragment);
   } else {

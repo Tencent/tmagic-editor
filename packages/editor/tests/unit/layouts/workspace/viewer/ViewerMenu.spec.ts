@@ -24,11 +24,6 @@ vi.mock('@editor/hooks/use-services', () => ({
   useServices: () => ({ editorService }),
 }));
 
-vi.mock('@tmagic/utils', () => ({
-  isPage: (n: any) => n?.type === 'page',
-  isPageFragment: (n: any) => n?.type === 'page-fragment',
-}));
-
 vi.mock('@editor/utils/content-menu', () => ({
   useCopyMenu: () => ({ type: 'button', text: '复制', handler: vi.fn() }),
   usePasteMenu: () => ({ type: 'button', text: '粘贴', handler: vi.fn() }),

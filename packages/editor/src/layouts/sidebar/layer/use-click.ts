@@ -2,7 +2,7 @@ import { computed, type ComputedRef, nextTick, type Ref, type ShallowRef } from 
 import { throttle } from 'lodash-es';
 
 import { Id, MNode } from '@tmagic/core';
-import { getElById, isPage, isPageFragment } from '@tmagic/utils';
+import { getElById, isPageOrFragment } from '@tmagic/utils';
 
 import type { LayerNodeStatus, Services, TreeNodeData } from '@editor/type';
 import { UI_SELECT_MODE_EVENT_NAME } from '@editor/utils/const';
@@ -36,7 +36,7 @@ export const useClick = (
   };
 
   const multiSelect = async (data: MNode) => {
-    if (isPage(data) || isPageFragment(data)) {
+    if (isPageOrFragment(data)) {
       return;
     }
 
@@ -50,7 +50,7 @@ export const useClick = (
         return;
       }
 
-      if (isPage(node) || isPageFragment(node)) {
+      if (isPageOrFragment(node)) {
         return;
       }
 

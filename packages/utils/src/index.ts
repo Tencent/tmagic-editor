@@ -142,7 +142,7 @@ export const getNodeInfo = (id: Id, root: { id: Id; items?: MNode[] } | null, sk
   info.parent = path[path.length - 2] as MContainer;
 
   for (const item of path) {
-    if (isPage(item) || isPageFragment(item)) {
+    if (isPageOrFragment(item)) {
       info.page = item as MPage | MPageFragment;
       break;
     }
@@ -278,6 +278,10 @@ export const isPageFragment = (node?: Pick<MComponent, 'type'> | null): boolean 
   if (!node) return false;
   return Boolean(node.type?.toLowerCase() === NodeType.PAGE_FRAGMENT);
 };
+
+/** 是否为页面或页面片 */
+export const isPageOrFragment = (node?: Pick<MComponent, 'type'> | null): boolean =>
+  isPage(node) || isPageFragment(node);
 
 export const isNumber = (value: any) =>
   (typeof value === 'number' && !isNaN(value)) || /^(-?\d+)(\.\d+)?$/.test(`${value}`);

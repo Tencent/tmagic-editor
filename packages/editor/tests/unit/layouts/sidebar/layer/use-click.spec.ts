@@ -17,8 +17,6 @@ vi.mock('@tmagic/utils', async () => {
   const actual = await vi.importActual<any>('@tmagic/utils');
   return {
     ...actual,
-    isPage: (n: any) => n.type === 'page',
-    isPageFragment: (n: any) => n.type === 'page-fragment',
     getElById: () => (_doc: any, id: any) => (id === 'no-el' ? null : { id }),
   };
 });

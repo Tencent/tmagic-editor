@@ -3,7 +3,7 @@ import { isEmpty } from 'lodash-es';
 
 import type { Id, MContainer, MNode } from '@tmagic/core';
 import { NodeType } from '@tmagic/core';
-import { calcValueByFontsize, getElById, isPage, isPageFragment } from '@tmagic/utils';
+import { calcValueByFontsize, getElById, isPage, isPageOrFragment } from '@tmagic/utils';
 
 import editorService from '@editor/services/editor';
 import propsService from '@editor/services/props';
@@ -58,7 +58,7 @@ export const beforePaste = (position: PastePosition, config: MNode[], doc?: Docu
       };
     }
     const root = editorService.get('root');
-    if ((isPage(pasteConfig) || isPageFragment(pasteConfig)) && root) {
+    if (isPageOrFragment(pasteConfig) && root) {
       pasteConfig.name = generatePageNameByApp(root, isPage(pasteConfig) ? NodeType.PAGE : NodeType.PAGE_FRAGMENT);
     }
     return pasteConfig as MNode;

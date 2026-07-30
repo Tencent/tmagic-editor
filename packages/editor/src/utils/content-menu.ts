@@ -2,7 +2,7 @@ import { computed, markRaw, type ShallowRef } from 'vue';
 import { CopyDocument, Delete, DocumentCopy } from '@element-plus/icons-vue';
 
 import { cloneDeep, Id, MContainer, NodeType } from '@tmagic/core';
-import { calcValueByFontsize, isPage, isPageFragment } from '@tmagic/utils';
+import { calcValueByFontsize, isPage, isPageOrFragment } from '@tmagic/utils';
 
 import ContentMenu from '@editor/components/ContentMenu.vue';
 import type { HistoryOpSource, MenuButton, Services } from '@editor/type';
@@ -20,7 +20,7 @@ export const useDeleteMenu = (historySource?: HistoryOpSource): MenuButton => ({
   icon: Delete,
   display: ({ editorService }) => {
     const node = editorService.get('node');
-    return node?.type !== NodeType.ROOT && !isPage(node) && !isPageFragment(node);
+    return node?.type !== NodeType.ROOT && !isPageOrFragment(node);
   },
   handler: ({ editorService }) => {
     const nodes = editorService.get('nodes');

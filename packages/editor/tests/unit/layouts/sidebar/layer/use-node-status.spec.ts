@@ -12,13 +12,7 @@ vi.mock('@tmagic/utils', async () => {
   const actual = await vi.importActual<any>('@tmagic/utils');
   return {
     ...actual,
-    isPage: (n: any) => n.type === 'page',
-    isPageFragment: (n: any) => n.type === 'page-fragment',
     getNodePath: vi.fn(() => []),
-    traverseNode: (node: any, fn: any) => {
-      fn(node);
-      node.items?.forEach((c: any) => fn(c));
-    },
   };
 });
 

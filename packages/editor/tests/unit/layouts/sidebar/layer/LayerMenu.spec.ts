@@ -28,15 +28,6 @@ vi.mock('@editor/utils/content-menu', () => ({
   useMoveToMenu: () => ({ type: 'button', text: 'moveto' }),
 }));
 
-vi.mock('@tmagic/utils', async () => {
-  const actual = await vi.importActual<any>('@tmagic/utils');
-  return {
-    ...actual,
-    isPage: (n: any) => n?.type === 'page',
-    isPageFragment: (n: any) => n?.type === 'page-fragment',
-  };
-});
-
 const showMock = vi.fn();
 vi.mock('@editor/components/ContentMenu.vue', () => ({
   default: defineComponent({

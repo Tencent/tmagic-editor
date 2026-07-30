@@ -1,7 +1,7 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
 
 import type { Id, MApp, MNode, MPage, MPageFragment } from '@tmagic/core';
-import { getNodePath, isPage, isPageFragment, traverseNode } from '@tmagic/utils';
+import { getNodePath, isPageOrFragment, traverseNode } from '@tmagic/utils';
 
 import type { LayerNodeStatus, Services } from '@editor/type';
 import { updateStatus } from '@editor/utils/tree';
@@ -136,7 +136,7 @@ export const useNodeStatus = ({ editorService }: Services) => {
 
   const addHandler = (newNodes: MNode[]) => {
     newNodes.forEach((node) => {
-      if (isPage(node) || isPageFragment(node)) return;
+      if (isPageOrFragment(node)) return;
 
       traverseNode(node, (node: MNode) => {
         nodeStatusMap.value?.set(node.id, {

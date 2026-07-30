@@ -7,7 +7,7 @@ import { computed, markRaw, ref, useTemplateRef, watch } from 'vue';
 import { Bottom, Top } from '@element-plus/icons-vue';
 
 import { NodeType } from '@tmagic/core';
-import { isPage, isPageFragment } from '@tmagic/utils';
+import { isPageOrFragment } from '@tmagic/utils';
 
 import ContentMenu from '@editor/components/ContentMenu.vue';
 import { useServices } from '@editor/hooks/use-services';
@@ -59,14 +59,14 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() =>
         direction: 'horizontal',
         display: () => {
           if (!node.value) return false;
-          return !isPage(node.value) && !isPageFragment(node.value);
+          return !isPageOrFragment(node.value);
         },
       },
       {
         type: 'button',
         text: '上移一层',
         icon: markRaw(Top),
-        display: () => !isPage(node.value) && !isPageFragment(node.value) && !props.isMultiSelect,
+        display: () => !isPageOrFragment(node.value) && !props.isMultiSelect,
         handler: () => {
           editorService.moveLayer(1, { historySource: 'stage-contextmenu' });
         },
@@ -75,7 +75,7 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() =>
         type: 'button',
         text: '下移一层',
         icon: markRaw(Bottom),
-        display: () => !isPage(node.value) && !isPageFragment(node.value) && !props.isMultiSelect,
+        display: () => !isPageOrFragment(node.value) && !props.isMultiSelect,
         handler: () => {
           editorService.moveLayer(-1, { historySource: 'stage-contextmenu' });
         },
@@ -84,7 +84,7 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() =>
         type: 'button',
         text: '置顶',
         icon: markRaw(Top),
-        display: () => !isPage(node.value) && !isPageFragment(node.value) && !props.isMultiSelect,
+        display: () => !isPageOrFragment(node.value) && !props.isMultiSelect,
         handler: () => {
           editorService.moveLayer(LayerOffset.TOP, { historySource: 'stage-contextmenu' });
         },
@@ -93,7 +93,7 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() =>
         type: 'button',
         text: '置底',
         icon: markRaw(Bottom),
-        display: () => !isPage(node.value) && !isPageFragment(node.value) && !props.isMultiSelect,
+        display: () => !isPageOrFragment(node.value) && !props.isMultiSelect,
         handler: () => {
           editorService.moveLayer(LayerOffset.BOTTOM, { historySource: 'stage-contextmenu' });
         },
@@ -102,7 +102,7 @@ const menuData = computed<(MenuButton | MenuComponent)[]>(() =>
       {
         type: 'divider',
         direction: 'horizontal',
-        display: () => !isPage(node.value) && !isPageFragment(node.value) && !props.isMultiSelect,
+        display: () => !isPageOrFragment(node.value) && !props.isMultiSelect,
       },
       useDeleteMenu('stage-contextmenu'),
       {
