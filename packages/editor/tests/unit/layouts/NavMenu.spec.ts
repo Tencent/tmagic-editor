@@ -48,11 +48,6 @@ vi.mock('@editor/components/ToolButton.vue', () => ({
   }),
 }));
 
-vi.mock('@editor/type', async () => {
-  const actual = await vi.importActual<any>('@editor/type');
-  return { ...actual, ColumnLayout: { LEFT: 'left', CENTER: 'center', RIGHT: 'right' } };
-});
-
 class FakeResizeObserver {
   cb: any;
   constructor(cb: any) {

@@ -96,10 +96,6 @@ vi.mock('@tmagic/utils', async () => {
   return {
     ...actual,
     DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX: 'ds_change_',
-    traverseNode: (node: any, fn: any) => {
-      fn(node);
-      node.items?.forEach((c: any) => fn(c));
-    },
   };
 });
 

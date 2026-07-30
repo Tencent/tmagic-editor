@@ -144,7 +144,6 @@ vi.mock('@tmagic/utils', async () => {
     ...actual,
     getDepNodeIds: vi.fn(() => []),
     getNodes: vi.fn(() => []),
-    isValueIncludeDataSource: vi.fn((v: any) => /\$\{/.test(String(v))),
   };
 });
 

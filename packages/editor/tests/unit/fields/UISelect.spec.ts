@@ -27,11 +27,6 @@ vi.mock('@editor/hooks/use-services', () => ({
   useServices: () => ({ editorService, uiService, stageOverlayService }),
 }));
 
-vi.mock('@tmagic/utils', async () => {
-  const actual = await vi.importActual<any>('@tmagic/utils');
-  return { ...actual, getIdFromEl: () => (el: any) => el?.dataset?.tmagicId };
-});
-
 vi.mock('@tmagic/design', () => ({
   TMagicButton: defineComponent({
     name: 'TMagicButton',

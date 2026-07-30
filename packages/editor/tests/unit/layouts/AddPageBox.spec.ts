@@ -8,14 +8,6 @@ import { mount } from '@vue/test-utils';
 
 import AddPageBox from '@editor/layouts/AddPageBox.vue';
 
-vi.mock('@tmagic/core', async () => {
-  const actual = await vi.importActual<any>('@tmagic/core');
-  return {
-    ...actual,
-    NodeType: { PAGE: 'page', PAGE_FRAGMENT: 'page-fragment' },
-  };
-});
-
 const editorService = {
   get: vi.fn((key: string) => (key === 'root' ? { items: [] } : undefined)),
   add: vi.fn(),

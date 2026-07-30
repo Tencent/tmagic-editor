@@ -33,11 +33,6 @@ vi.mock('@editor/utils', async () => {
   return { ...actual, getFieldType: vi.fn(() => 'string') };
 });
 
-vi.mock('@editor/type', async () => {
-  const actual = await vi.importActual<any>('@editor/type');
-  return { ...actual, SideItemKey: { DATA_SOURCE: 'data-source' } };
-});
-
 vi.mock('@tmagic/utils', async () => {
   const actual = await vi.importActual<any>('@tmagic/utils');
   return { ...actual, DATA_SOURCE_SET_DATA_METHOD_NAME: '__set_data__' };

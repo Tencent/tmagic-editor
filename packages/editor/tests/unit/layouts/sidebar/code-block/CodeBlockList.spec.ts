@@ -35,11 +35,6 @@ vi.mock('@editor/hooks/use-filter', () => ({
   useFilter: () => ({ filterTextChangeHandler: vi.fn() }),
 }));
 
-vi.mock('@tmagic/core', async () => {
-  const actual = await vi.importActual<any>('@tmagic/core');
-  return { ...actual, DepTargetType: { CODE_BLOCK: 'code-block' } };
-});
-
 const { messageBoxConfirm, messageError } = vi.hoisted(() => ({
   messageBoxConfirm: vi.fn(async () => 'confirm'),
   messageError: vi.fn(),

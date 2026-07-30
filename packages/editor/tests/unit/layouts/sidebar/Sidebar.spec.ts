@@ -82,20 +82,6 @@ vi.mock('@editor/components/FloatingBox.vue', () => ({
   }),
 }));
 
-vi.mock('@editor/type', async () => {
-  const actual = await vi.importActual<any>('@editor/type');
-  return {
-    ...actual,
-    SideItemKey: {
-      COMPONENT_LIST: 'component-list',
-      LAYER: 'layer',
-      CODE_BLOCK: 'code-block',
-      DATA_SOURCE: 'data-source',
-    },
-    ColumnLayout: { LEFT: 'left', CENTER: 'center', RIGHT: 'right' },
-  };
-});
-
 beforeEach(() => {
   vi.clearAllMocks();
   propsService.getDisabledDataSource.mockReturnValue(false);

@@ -15,17 +15,6 @@ vi.mock('@editor/utils', async () => {
   };
 });
 
-vi.mock('@tmagic/utils', async () => {
-  const actual = await vi.importActual<any>('@tmagic/utils');
-  return {
-    ...actual,
-    addClassName: (el: any, _doc: any, className: string) => el?.classList?.add(className),
-    removeClassName: (el: any, ...classNames: string[]) => {
-      classNames.forEach((c) => el?.classList?.remove(c));
-    },
-  };
-});
-
 const makeEditorService = () => ({
   getNodeInfo: vi.fn(),
   get: vi.fn(() => []),

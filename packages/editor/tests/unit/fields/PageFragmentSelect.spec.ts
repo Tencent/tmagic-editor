@@ -44,11 +44,6 @@ vi.mock('@editor/components/Icon.vue', () => ({
   }),
 }));
 
-vi.mock('@tmagic/core', async () => {
-  const actual = await vi.importActual<any>('@tmagic/core');
-  return { ...actual, NodeType: { PAGE: 'page', PAGE_FRAGMENT: 'page-fragment' } };
-});
-
 describe('PageFragmentSelect', () => {
   test('model[name] 不为空时显示编辑图标', () => {
     editorService.get.mockReturnValue({ items: [{ id: 'p1', type: 'page-fragment', name: 'A' }] });

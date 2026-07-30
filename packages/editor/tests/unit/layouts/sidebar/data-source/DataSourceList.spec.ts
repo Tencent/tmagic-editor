@@ -32,18 +32,6 @@ vi.mock('@editor/hooks/use-filter', () => ({
   useFilter: () => ({ filterTextChangeHandler: vi.fn() }),
 }));
 
-vi.mock('@tmagic/core', async () => {
-  const actual = await vi.importActual<any>('@tmagic/core');
-  return {
-    ...actual,
-    DepTargetType: {
-      DATA_SOURCE: 'data-source',
-      DATA_SOURCE_METHOD: 'data-source-method',
-      DATA_SOURCE_COND: 'data-source-cond',
-    },
-  };
-});
-
 vi.mock('@editor/components/Tree.vue', () => ({
   default: defineComponent({
     name: 'TreeStub',

@@ -115,15 +115,6 @@ vi.mock('@tmagic/design', async () => {
   };
 });
 
-vi.mock('@tmagic/utils', async () => {
-  const actual = await vi.importActual<any>('@tmagic/utils');
-  return {
-    ...actual,
-    getKeysArray: vi.fn((s: string) => s.split('.').filter(Boolean)),
-    isNumber: (v: any) => /^\d+$/.test(String(v)),
-  };
-});
-
 beforeEach(() => {
   vi.clearAllMocks();
   inputRef.input = null;

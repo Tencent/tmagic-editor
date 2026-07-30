@@ -24,11 +24,6 @@ vi.mock('@editor/hooks/use-services', () => ({
   useServices: () => ({ codeBlockService, uiService }),
 }));
 
-vi.mock('@editor/type', async () => {
-  const actual = await vi.importActual<any>('@editor/type');
-  return { ...actual, SideItemKey: { CODE_BLOCK: 'code-block' } };
-});
-
 vi.mock('@tmagic/form', async (importOriginal) => {
   const actual = await importOriginal<any>();
   return {
