@@ -1,0 +1,45 @@
+{
+  "name": "@leafer-components",
+  "version": "0.0.1",
+  "description": "TMagic editor 端 leafer-ui shape 渲染器集合。仅用于 editor 画布渲染,不用作 runtime 替代品。",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "files": [
+    "src"
+  ],
+  "exports": {
+    ".": "./src/index.ts",
+    "./utils": "./src/utils.ts",
+    "./button": "./src/button.ts",
+    "./text": "./src/text.ts",
+    "./img": "./src/img.ts",
+    "./container": "./src/container.ts",
+    "./overlay": "./src/overlay.ts",
+    "./page": "./src/page.ts",
+    "./qrcode": "./src/qrcode.ts",
+    "./page-fragment": "./src/page-fragment.ts",
+    "./page-fragment-container": "./src/page-fragment-container.ts",
+    "./iterator-container": "./src/iterator-container.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tencent/tmagic-editor.git"
+  },
+  "peerDependencies": {
+    "leafer-ui": "^2.0.0",
+    "@tmagic/schema": "workspace:^"
+  },
+  "devDependencies": {
+    "leafer-ui": "^2.0.0",
+    "@tmagic/schema": "workspace:^",
+    "vitest": "^4.1.10"
+  }
+}

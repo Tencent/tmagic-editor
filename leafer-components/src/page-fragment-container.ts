@@ -16,20 +16,13 @@
  * limitations under the License.
  */
 
-import StageCore from './StageCore';
+import type { ShapeFn } from './utils'
+import { buildPlaceholderRect } from './placeholder'
 
-export * from 'moveable';
-export type { GuidesOptions } from '@scena/guides';
+/**
+ * page-fragment-container placeholder:容器指向 page-fragment。
+ * editor 端占位,业务方可后续实现解析逻辑。
+ */
+const shape: ShapeFn = (config) => buildPlaceholderRect(config)
 
-export { default as StageRender } from './StageRender';
-export { default as StageMask } from './StageMask';
-export { default as StageDragResize } from './StageDragResize';
-export { default as LeaferShapeRegistry } from './LeaferShapeRegistry';
-export type { ShapeFn, ShapeContext, ShapeWithChildren } from './LeaferShapeRegistry';
-export * from './types';
-export * from './const';
-export * from './util';
-export * from './MoveableActionsAble';
-export { default as MoveableActionsAble } from './MoveableActionsAble';
-
-export default StageCore;
+export default shape

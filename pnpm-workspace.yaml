@@ -4,6 +4,7 @@ packages:
   - "runtime/*"
   - "vue-components/*"
   - "react-components/*"
+  - "leafer-components"
   - "eslint-config"
 
 catalog:

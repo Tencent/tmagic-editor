@@ -16,20 +16,25 @@
  * limitations under the License.
  */
 
-import StageCore from './StageCore';
+import { Rect } from 'leafer-ui'
 
-export * from 'moveable';
-export type { GuidesOptions } from '@scena/guides';
+import type { MComponent } from '@tmagic/core'
 
-export { default as StageRender } from './StageRender';
-export { default as StageMask } from './StageMask';
-export { default as StageDragResize } from './StageDragResize';
-export { default as LeaferShapeRegistry } from './LeaferShapeRegistry';
-export type { ShapeFn, ShapeContext, ShapeWithChildren } from './LeaferShapeRegistry';
-export * from './types';
-export * from './const';
-export * from './util';
-export * from './MoveableActionsAble';
-export { default as MoveableActionsAble } from './MoveableActionsAble';
+import { parsePx } from './utils'
 
-export default StageCore;
+/**
+ * 通用占位矩形:浅灰背景 + 边框,供未实现 shape 的 type 使用。
+ * qrcode / page-fragment / page-fragment-container / iterator-container 都用这个。
+ */
+export const buildPlaceholderRect = (config: MComponent): Rect => {
+  const w = parsePx(config.style?.width) ?? 100
+  const h = parsePx(config.style?.height) ?? 100
+  return new Rect({
+    width: w,
+    height: h,
+    fill: '#f5f5f5',
+    stroke: { type: 'solid', color: '#ddd' } as any,
+    strokeWidth: 1,
+    cornerRadius: 4,
+  })
+}

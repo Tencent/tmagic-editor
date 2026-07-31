@@ -16,20 +16,26 @@
  * limitations under the License.
  */
 
-import StageCore from './StageCore';
+import { Frame } from 'leafer-ui'
 
-export * from 'moveable';
-export type { GuidesOptions } from '@scena/guides';
+import type { MPage } from '@tmagic/schema'
 
-export { default as StageRender } from './StageRender';
-export { default as StageMask } from './StageMask';
-export { default as StageDragResize } from './StageDragResize';
-export { default as LeaferShapeRegistry } from './LeaferShapeRegistry';
-export type { ShapeFn, ShapeContext, ShapeWithChildren } from './LeaferShapeRegistry';
-export * from './types';
-export * from './const';
-export * from './util';
-export * from './MoveableActionsAble';
-export { default as MoveableActionsAble } from './MoveableActionsAble';
+import { parsePx, type ShapeFn, type ShapeWithChildren } from './utils'
 
-export default StageCore;
+/**
+ * page = 根 Frame,持有 items。
+ * 与 vue-components/page 行为对齐(page 渲染为容器组件,内含 items)。
+ */
+const shape: ShapeFn = (config, _ctx): ShapeWithChildren => {
+  const c = config as MPage
+  const node = new Frame({
+    x: parsePx(c.style?.left) ?? 0,
+    y: parsePx(c.style?.top) ?? 0,
+    width: parsePx(c.style?.width),
+    height: parsePx(c.style?.height),
+    fill: c.style?.backgroundColor as string | undefined,
+  })
+  return { node, children: c.items ?? [] }
+}
+
+export default shape

@@ -40,7 +40,8 @@
   },
   "devDependencies": {
     "@types/events": "^3.0.3",
-    "@types/lodash-es": "^4.17.4"
+    "@types/lodash-es": "^4.17.4",
+    "leafer-ui": "^2.0.0"
   },
   "peerDependencies": {
     "@tmagic/core": "workspace:*",
