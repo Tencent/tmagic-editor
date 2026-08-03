@@ -311,10 +311,12 @@ const tableConfig = computed(
           label: '事件名',
           type: eventNameConfig.value.type,
           options: (mForm: FormState, { formValue }: any) =>
-            eventsService.getEvent(formValue.type).map((option: any) => ({
-              text: option.label,
-              value: option.value,
-            })),
+            eventsService
+              .getEvent(formValue.type, { node: editorService.getNodeById(formValue.id) })
+              .map((option: any) => ({
+                text: option.label,
+                value: option.value,
+              })),
         },
         {
           name: 'to',
@@ -329,7 +331,7 @@ const tableConfig = computed(
             const node = editorService.getNodeById(model.to);
             if (!node?.type) return [];
 
-            return eventsService.getMethod(node.type, model.to).map((option: any) => ({
+            return eventsService.getMethod(node.type, { targetId: model.to, node }).map((option: any) => ({
               text: option.label,
               value: option.value,
             }));

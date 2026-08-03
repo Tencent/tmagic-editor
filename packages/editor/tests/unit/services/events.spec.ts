@@ -30,7 +30,7 @@ describe('events', () => {
   test('setMethod', () => {
     const method = [{ label: '点击', value: 'magic:common:events:click' }];
     events.setMethod('button', method);
-    expect(events.getMethod('button', '')).toHaveLength(1);
+    expect(events.getMethod('button', { targetId: 'btn_1' })).toHaveLength(1);
   });
 
   test('setEvents 批量设置', () => {
@@ -46,12 +46,20 @@ describe('events', () => {
     events.setMethods({
       Image: [{ label: 'show', value: 'show' }],
     } as any);
-    expect(events.getMethod('image', '')).toHaveLength(1);
+    expect(events.getMethod('image', {})).toHaveLength(1);
+  });
+
+  test('getEvent / getMethod 支持节点上下文参数', () => {
+    const node = { id: 'n1', type: 'button' } as any;
+    events.setEvent('button', [{ label: '点击', value: 'click' }]);
+    events.setMethod('button', [{ label: '打开', value: 'open' }]);
+    expect(events.getEvent('button', { node })).toEqual([{ label: '点击', value: 'click' }]);
+    expect(events.getMethod('button', { targetId: 'n1', node })).toEqual([{ label: '打开', value: 'open' }]);
   });
 
   test('未注册类型返回空数组', () => {
     expect(events.getEvent('not-exist')).toEqual([]);
-    expect(events.getMethod('not-exist', '')).toEqual([]);
+    expect(events.getMethod('not-exist')).toEqual([]);
   });
 
   test('resetState 清空所有事件 / 方法', () => {

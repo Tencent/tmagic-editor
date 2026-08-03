@@ -65,6 +65,7 @@ eventsService.setEvent('button', [
 - **参数：**
 
   - `{string}` type 组件类型
+  - `{ node?: MNode | null }` data 可选上下文，便于插件按节点定制事件列表（默认 `{}`）
 
 - **返回：**
 
@@ -72,15 +73,25 @@ eventsService.setEvent('button', [
 
 - **详情：**
 
-  获取指定组件类型的事件列表
+  获取指定组件类型的事件列表。默认实现仅按 `type` 返回注册事件；可通过 `usePlugin` 的 `beforeGetEvent` / `afterGetEvent` 读取 `data.node` 做节点级过滤或扩展。
 
 - **示例：**
 
 ```js
 import { eventsService } from '@tmagic/editor';
 
-const events = eventsService.getEvent('button');
+const events = eventsService.getEvent('button', { node });
 console.log(events); // [{ label: '点击', value: 'click' }, ...]
+
+// 插件按节点定制
+eventsService.usePlugin({
+  afterGetEvent(events, type, data) {
+    if (data?.node?.id === 'btn_1') {
+      return events.filter((item) => item.value !== 'longpress');
+    }
+    return events;
+  },
+});
 ```
 
 ## setMethods
@@ -146,7 +157,9 @@ eventsService.setMethod('video', [
 - **参数：**
 
   - `{string}` type 组件类型
-  - `{string | number}` _targetId 目标节点id（保留参数，便于扩展时按节点定制）
+  - `{ node?: MNode | null; targetId?: Id }` data 可选上下文（默认 `{}`）
+    - `targetId`：目标节点 id
+    - `node`：目标节点配置，便于插件按节点定制方法列表
 
 - **返回：**
 
@@ -154,15 +167,36 @@ eventsService.setMethod('video', [
 
 - **详情：**
 
-  获取指定组件类型的方法列表
+  获取指定组件类型的方法列表。默认实现仅按 `type` 返回注册方法；可通过 `usePlugin` 的 `beforeGetMethod` / `afterGetMethod` 读取 `data` 做节点级过滤或扩展。
+
+  ::: warning 破坏性变更
+  第二参数已从 `targetId: Id` 调整为对象 `{ node?, targetId? }`。请同步更新调用方与插件钩子入参，例如：
+
+  ```js
+  // 旧
+  eventsService.getMethod('video', 'video_123');
+  // 新
+  eventsService.getMethod('video', { targetId: 'video_123', node });
+  ```
+  :::
 
 - **示例：**
 
 ```js
 import { eventsService } from '@tmagic/editor';
 
-const methods = eventsService.getMethod('video', 'video_123');
+const methods = eventsService.getMethod('video', { targetId: 'video_123', node });
 console.log(methods); // [{ label: '播放', value: 'play' }, ...]
+
+// 插件按节点定制
+eventsService.usePlugin({
+  afterGetMethod(methods, type, data) {
+    if (data?.targetId === 'video_123') {
+      return methods.filter((item) => item.value !== 'stop');
+    }
+    return methods;
+  },
+});
 ```
 
 ## resetState

@@ -52,8 +52,10 @@ describe('event utils', () => {
   });
 
   test('getCompActionOptions 普通组件返回 select options', () => {
-    editorService.getNodeById.mockReturnValue({ type: 'btn', id: '1' });
+    const node = { type: 'btn', id: '1' };
+    editorService.getNodeById.mockReturnValue(node);
     expect(getCompActionOptions('1')).toEqual([{ text: 'open', value: 'open' }]);
+    expect(eventsService.getMethod).toHaveBeenCalledWith('btn', { targetId: '1', node });
   });
 
   test('getCompActionOptions 无节点返回空', () => {
@@ -63,8 +65,10 @@ describe('event utils', () => {
   });
 
   test('getCompActionOptions 页面片容器返回 cascader options', () => {
-    editorService.getNodeById.mockReturnValue({ type: 'page-fragment-container', id: '1', pageFragmentId: 'pf1' });
-    editorService.get.mockReturnValue({ items: [{ id: 'pf1', items: [{ id: 'c1', type: 'btn', name: 'b' }] }] });
+    const container = { type: 'page-fragment-container', id: '1', pageFragmentId: 'pf1' };
+    const child = { id: 'c1', type: 'btn', name: 'b' };
+    editorService.getNodeById.mockImplementation((id: string) => (id === '1' ? container : null));
+    editorService.get.mockReturnValue({ items: [{ id: 'pf1', items: [child] }] });
     expect(getCompActionOptions('1')).toEqual([
       {
         label: 'b_c1',
@@ -72,6 +76,7 @@ describe('event utils', () => {
         children: [{ label: 'open', value: 'open' }],
       },
     ]);
+    expect(eventsService.getMethod).toHaveBeenCalledWith('btn', { targetId: 'c1', node: child });
   });
 
   test('getCompActionAllowedValues 枚举合法动作', () => {
@@ -97,6 +102,29 @@ describe('event utils', () => {
       getEventNameAllowedValues({ src: 'component', eventNameConfig: { options: [] } }, { type: 'btn' }),
     ).toBeNull();
     expect(collectEventNameOptionValues([{ value: 'a', children: [{ value: 'b' }] }], false)).toEqual(new Set(['a.b']));
+  });
+
+  test('getEventNameOptions 页面片子节点查找失败时回退 current', () => {
+    const formValue = { type: 'page-fragment-container', id: '1', pageFragmentId: 'pf1' };
+    const child = { id: 'c1', type: 'btn', name: 'b' };
+    editorService.getNodeById.mockReturnValue(null);
+    editorService.get.mockReturnValue({
+      items: [{ id: 'pf1', name: '页面片', items: [child] }],
+    });
+
+    expect(getEventNameOptions('component', formValue)).toEqual([
+      {
+        label: '页面片',
+        value: 'pf1',
+        children: [{ label: 'click', value: 'click' }],
+      },
+      {
+        label: 'b_c1',
+        value: 'c1',
+        children: [{ label: 'click', value: 'click' }],
+      },
+    ]);
+    expect(eventsService.getEvent).toHaveBeenCalledWith('btn', { node: child });
   });
 
   test('getEventNameOptions datasource 追加数据变化', () => {

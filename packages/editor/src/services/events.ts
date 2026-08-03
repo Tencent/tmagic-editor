@@ -20,7 +20,7 @@ import { reactive } from 'vue';
 import { cloneDeep } from 'lodash-es';
 import type { Writable } from 'type-fest';
 
-import { type EventOption, type Id } from '@tmagic/core';
+import type { EventOption, Id, MNode } from '@tmagic/core';
 import { toLine } from '@tmagic/utils';
 
 import type { AsyncHookPlugin, SyncHookPlugin } from '@editor/type';
@@ -56,7 +56,7 @@ class Events extends BaseService {
     eventMap[toLine(type)] = [...events];
   }
 
-  public getEvent(type: string): EventOption[] {
+  public getEvent(type: string, _data: { node?: MNode | null } = {}): EventOption[] {
     return cloneDeep(eventMap[toLine(type)]) || [];
   }
 
@@ -70,7 +70,7 @@ class Events extends BaseService {
     methodMap[toLine(type)] = [...method];
   }
 
-  public getMethod(type: string, _targetId: Id) {
+  public getMethod(type: string, _data: { node?: MNode | null; targetId?: Id } = {}) {
     return cloneDeep(methodMap[toLine(type)]) || [];
   }
 

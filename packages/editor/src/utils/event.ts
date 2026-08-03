@@ -56,7 +56,8 @@ export const getEventNameOptions = (
   }
 
   if (src === 'component') {
-    let events: EventOption[] | CascaderOption[] = eventsService.getEvent(formValue.type) || [];
+    const sourceNode = editorService.getNodeById(formValue.id);
+    let events: EventOption[] | CascaderOption[] = eventsService.getEvent(formValue.type, { node: sourceNode }) || [];
 
     if (formValue.type === 'page-fragment-container' && formValue.pageFragmentId) {
       const pageFragment = editorService.get('root')?.items?.find((page) => page.id === formValue.pageFragmentId);
@@ -72,9 +73,14 @@ export const getEventNameOptions = (
         },
       ];
 
-      (pageFragment.items || []).forEach((node) => {
-        traverseNode<MComponent | MContainer>(node, (current) => {
-          const nodeEvents = (current.type && eventsService.getEvent(current.type)) || [];
+      (pageFragment.items || []).forEach((item) => {
+        traverseNode<MComponent | MContainer>(item, (current) => {
+          if (!current.type) {
+            return;
+          }
+
+          const node = editorService.getNodeById(current.id) || current;
+          const nodeEvents = eventsService.getEvent(current.type, { node }) || [];
           (events as CascaderOption[]).push({
             label: `${current.name}_${current.id}`,
             value: `${current.id}`,
@@ -176,7 +182,7 @@ export const getCompActionOptions = (toId?: Id): EventNameOption[] => {
     return [];
   }
 
-  let methods: EventOption[] | CascaderOption[] = eventsService.getMethod(node.type, toId) || [];
+  let methods: EventOption[] | CascaderOption[] = eventsService.getMethod(node.type, { targetId: toId, node }) || [];
 
   if (node.type === 'page-fragment-container' && node.pageFragmentId) {
     const pageFragment = editorService.get('root')?.items?.find((page) => page.id === node.pageFragmentId);
@@ -187,15 +193,22 @@ export const getCompActionOptions = (toId?: Id): EventNameOption[] => {
     methods = [];
     (pageFragment.items || []).forEach((item: MComponent | MContainer) => {
       traverseNode<MComponent | MContainer>(item, (current) => {
-        const nodeMethods = (current.type && eventsService.getMethod(current.type, current.id)) || [];
+        const node = editorService.getNodeById(current.id) || current;
 
-        if (nodeMethods.length) {
-          (methods as CascaderOption[]).push({
-            label: `${current.name}_${current.id}`,
-            value: `${current.id}`,
-            children: nodeMethods,
-          });
+        if (!current.type) {
+          return;
         }
+
+        const nodeMethods = eventsService.getMethod(current.type, { targetId: current.id, node }) || [];
+        if (!nodeMethods.length) {
+          return;
+        }
+
+        (methods as CascaderOption[]).push({
+          label: `${current.name}_${current.id}`,
+          value: `${current.id}`,
+          children: nodeMethods,
+        });
       });
     });
 
