@@ -117,19 +117,27 @@ export default class StageMask extends Rule {
     this.page = page;
     this.initObserverIntersection();
     this.initObserverWrapper();
+    // 页面切换后立即同步一次；ResizeObserver 首次回调可能仍上报旧页/0 尺寸
+    this.syncPageSize();
   }
 
   /**
-   * 处理页面大小变更，同步页面和mask大小
+   * 处理页面大小变更，同步页面和 mask 大小
+   * @description 仅处理当前 page 且仍挂载在文档中的 entry；非当前页、已卸载或宽高为 0 的回调会被忽略
    * @param entries ResizeObserverEntry，获取页面最新大小
    */
   public pageResize(entries: ResizeObserverEntry[]): void {
-    const [entry] = entries;
-    const { clientHeight, clientWidth } = entry.target;
-    this.setHeight(clientHeight);
-    this.setWidth(clientWidth);
+    if (!this.page || !entries.length) return;
 
-    this.scroll();
+    // 取当前 page 对应 entry，避免 batch 中首项是旧页时整批被丢弃
+    const entry = entries.find((item) => item.target === this.page);
+    if (!entry) return;
+
+    const { target } = entry;
+    // 旧页卸载后仍可能回调，已断开连接的节点不再同步尺寸
+    if (!target.isConnected) return;
+
+    this.applyPageSize(target.clientWidth, target.clientHeight);
   }
 
   /**
@@ -186,6 +194,7 @@ export default class StageMask extends Rule {
     this.content?.remove();
     this.page = null;
     this.pageScrollParent = null;
+    this.intersectionObserver?.disconnect();
     this.wrapperResizeObserver?.disconnect();
   }
 
@@ -285,6 +294,26 @@ export default class StageMask extends Rule {
       },
     });
     this.content.dispatchEvent(event);
+  }
+
+  /**
+   * 从当前页面同步蒙层宽高，并修正滚动偏移
+   */
+  private syncPageSize(): void {
+    if (!this.page?.isConnected) return;
+
+    this.applyPageSize(this.page.clientWidth, this.page.clientHeight);
+  }
+
+  /**
+   * 应用页面尺寸到蒙层；宽高为 0 时忽略，避免切换/布局过程中把 editor-mask 置空
+   */
+  private applyPageSize(clientWidth: number, clientHeight: number): void {
+    if (clientWidth <= 0 || clientHeight <= 0) return;
+
+    this.setHeight(clientHeight);
+    this.setWidth(clientWidth);
+    this.scroll();
   }
 
   /**

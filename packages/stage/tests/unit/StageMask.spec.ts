@@ -79,9 +79,122 @@ describe('StageMask', () => {
     const page = globalThis.document.createElement('div');
     Object.defineProperty(page, 'clientWidth', { value: 400, configurable: true });
     Object.defineProperty(page, 'clientHeight', { value: 300, configurable: true });
+    globalThis.document.body.appendChild(page);
     mask.observe(page);
 
     mask.pageResize([makeResizeEntry(page)]);
+    expect(mask.width).toBe(400);
+    expect(mask.height).toBe(300);
+    expect(mask.content.style.width).toBe('400px');
+    expect(mask.content.style.height).toBe('300px');
+  });
+
+  test('observe 立即同步尺寸，并从长页切到短页时修正滚动偏移', () => {
+    mask = new StageMask({ disabledRule: true });
+    const tallPage = globalThis.document.createElement('div');
+    Object.defineProperty(tallPage, 'clientWidth', { value: 400, configurable: true });
+    Object.defineProperty(tallPage, 'clientHeight', { value: 1000, configurable: true });
+    globalThis.document.body.appendChild(tallPage);
+    mask.observe(tallPage);
+    mask.wrapperWidth = 400;
+    mask.wrapperHeight = 300;
+    (mask as any).setMaxScrollLeft();
+    (mask as any).setMaxScrollTop();
+    mask.scrollTop = 500;
+    (mask as any).scroll();
+    expect(mask.scrollTop).toBe(500);
+
+    const shortPage = globalThis.document.createElement('div');
+    Object.defineProperty(shortPage, 'clientWidth', { value: 400, configurable: true });
+    Object.defineProperty(shortPage, 'clientHeight', { value: 400, configurable: true });
+    globalThis.document.body.appendChild(shortPage);
+    mask.observe(shortPage);
+
+    expect(mask.width).toBe(400);
+    expect(mask.height).toBe(400);
+    expect(mask.maxScrollTop).toBe(100);
+    expect(mask.scrollTop).toBe(100);
+    expect(mask.content.style.transform).toBe('translate3d(0px, -100px, 0)');
+  });
+
+  test('pageResize 忽略非当前页、已卸载页与 0 尺寸，避免切换页面后 editor-mask 变为 0', () => {
+    mask = new StageMask({ disabledRule: true });
+    const oldPage = globalThis.document.createElement('div');
+    Object.defineProperty(oldPage, 'clientWidth', { value: 400, configurable: true });
+    Object.defineProperty(oldPage, 'clientHeight', { value: 300, configurable: true });
+    globalThis.document.body.appendChild(oldPage);
+    mask.observe(oldPage);
+    expect(mask.width).toBe(400);
+    expect(mask.height).toBe(300);
+
+    const newPage = globalThis.document.createElement('div');
+    Object.defineProperty(newPage, 'clientWidth', { value: 500, configurable: true });
+    Object.defineProperty(newPage, 'clientHeight', { value: 600, configurable: true });
+    globalThis.document.body.appendChild(newPage);
+    mask.observe(newPage);
+    expect(mask.width).toBe(500);
+    expect(mask.height).toBe(600);
+    expect(mask.content.style.width).toBe('500px');
+    expect(mask.content.style.height).toBe('600px');
+
+    // 仍连接但不是当前 page：忽略
+    Object.defineProperty(oldPage, 'clientWidth', { value: 100, configurable: true });
+    Object.defineProperty(oldPage, 'clientHeight', { value: 100, configurable: true });
+    mask.pageResize([makeResizeEntry(oldPage)]);
+    expect(mask.width).toBe(500);
+    expect(mask.height).toBe(600);
+
+    // batch 首项是旧页、后续是当前页：仍应应用当前页尺寸
+    Object.defineProperty(newPage, 'clientWidth', { value: 520, configurable: true });
+    Object.defineProperty(newPage, 'clientHeight', { value: 620, configurable: true });
+    mask.pageResize([makeResizeEntry(oldPage), makeResizeEntry(newPage)]);
+    expect(mask.width).toBe(520);
+    expect(mask.height).toBe(620);
+
+    // 旧页面卸载后 ResizeObserver 可能仍回调，不应覆盖当前蒙层尺寸
+    Object.defineProperty(oldPage, 'clientWidth', { value: 0, configurable: true });
+    Object.defineProperty(oldPage, 'clientHeight', { value: 0, configurable: true });
+    oldPage.remove();
+    mask.pageResize([makeResizeEntry(oldPage)]);
+    expect(mask.width).toBe(520);
+    expect(mask.height).toBe(620);
+
+    // 当前 page 已断开连接：忽略
+    newPage.remove();
+    Object.defineProperty(newPage, 'clientWidth', { value: 100, configurable: true });
+    Object.defineProperty(newPage, 'clientHeight', { value: 100, configurable: true });
+    mask.pageResize([makeResizeEntry(newPage)]);
+    expect(mask.width).toBe(520);
+    expect(mask.height).toBe(620);
+    expect(mask.content.style.width).toBe('520px');
+    expect(mask.content.style.height).toBe('620px');
+
+    // 重新挂载后短暂为 0 时也应忽略
+    globalThis.document.body.appendChild(newPage);
+    Object.defineProperty(newPage, 'clientWidth', { value: 0, configurable: true });
+    Object.defineProperty(newPage, 'clientHeight', { value: 0, configurable: true });
+    mask.pageResize([makeResizeEntry(newPage)]);
+    expect(mask.width).toBe(520);
+    expect(mask.height).toBe(620);
+    expect(mask.content.style.width).toBe('520px');
+    expect(mask.content.style.height).toBe('620px');
+  });
+
+  test('observe 时 page 宽高为 0 不更新蒙层尺寸', () => {
+    mask = new StageMask({ disabledRule: true });
+    const firstPage = globalThis.document.createElement('div');
+    Object.defineProperty(firstPage, 'clientWidth', { value: 400, configurable: true });
+    Object.defineProperty(firstPage, 'clientHeight', { value: 300, configurable: true });
+    globalThis.document.body.appendChild(firstPage);
+    mask.observe(firstPage);
+
+    const emptyPage = globalThis.document.createElement('div');
+    Object.defineProperty(emptyPage, 'clientWidth', { value: 0, configurable: true });
+    Object.defineProperty(emptyPage, 'clientHeight', { value: 0, configurable: true });
+    globalThis.document.body.appendChild(emptyPage);
+    mask.observe(emptyPage);
+
+    expect(mask.page).toBe(emptyPage);
     expect(mask.width).toBe(400);
     expect(mask.height).toBe(300);
   });
@@ -91,6 +204,7 @@ describe('StageMask', () => {
     const page = globalThis.document.createElement('div');
     Object.defineProperty(page, 'clientWidth', { value: 1000, configurable: true });
     Object.defineProperty(page, 'clientHeight', { value: 1000, configurable: true });
+    globalThis.document.body.appendChild(page);
     mask.observe(page);
     mask.pageResize([makeResizeEntry(page)]);
     mask.wrapperWidth = 400;
