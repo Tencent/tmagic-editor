@@ -21,7 +21,7 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { HookCodeType, HookType, NodeType } from '@tmagic/core';
 import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX, DATA_SOURCE_SET_DATA_METHOD_NAME } from '@tmagic/utils';
 
-import { ALL_COND_OPS, editorTypeMatchRules } from '@editor/utils/type-match-rules';
+import { ALL_COND_OPS, editorTypeMatchRules, validateDataSourceFieldSelectValue } from '@editor/utils/type-match-rules';
 
 const codeDslState = vi.hoisted(() => ({ value: null as Record<string, any> | null }));
 const dataSourcesState = vi.hoisted(() => ({ value: [] as any[] }));
@@ -268,6 +268,59 @@ describe('editorTypeMatchRules', () => {
         dataSourceFieldType: ['number'],
       }),
     ).toBeUndefined();
+  });
+
+  test('validateDataSourceFieldSelectValue 支持自定义 plain 值校验并保留数据源路径校验', () => {
+    const config = {
+      name: 'fontWeight',
+      type: 'data-source-field-select',
+      dataSourceFieldType: ['string', 'number'],
+      fieldConfig: { type: 'select', allowCreate: true, options: [{ text: '700', value: '700' }] },
+    };
+    const context = ctx(config);
+    const allowStringOrNumber = {
+      validatePlainValue: (value: any) => {
+        if (typeof value === 'string' || (typeof value === 'number' && !Number.isNaN(value))) {
+          return undefined;
+        }
+        return 'fontWeight 类型应为字符串或数字';
+      },
+    };
+
+    expect(validateDataSourceFieldSelectValue(700, context, allowStringOrNumber)).toBeUndefined();
+    expect(validateDataSourceFieldSelectValue('bold', context, allowStringOrNumber)).toBeUndefined();
+    expect(firstLine(validateDataSourceFieldSelectValue({ a: 1 }, context, allowStringOrNumber))).toBe(
+      'fontWeight 类型应为字符串或数字',
+    );
+
+    dataSourcesState.value = [
+      {
+        id: 'ds1',
+        type: 'base',
+        fields: [
+          { name: 'title', type: 'string' },
+          { name: 'weight', type: 'number' },
+        ],
+        methods: [],
+      },
+    ];
+
+    expect(
+      validateDataSourceFieldSelectValue(
+        [`${DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX}ds1`, 'weight'],
+        context,
+        allowStringOrNumber,
+      ),
+    ).toBeUndefined();
+    expect(
+      firstLine(
+        validateDataSourceFieldSelectValue(
+          [`${DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX}ds1`, 'missing'],
+          context,
+          allowStringOrNumber,
+        ),
+      ),
+    ).toBe('数据源字段(missing)不存在');
   });
 
   test('data-source-select id / 对象形态', () => {

@@ -17,8 +17,11 @@
 <script lang="ts" setup>
 import { markRaw } from 'vue';
 
+import { appendValidateSuggestion } from '@tmagic/design';
 import { type ContainerChangeEventData, defineFormConfig, MContainer } from '@tmagic/form';
 import type { StyleSchema } from '@tmagic/schema';
+
+import { validateDataSourceFieldSelectValue } from '@editor/utils/type-match-rules';
 
 import { AlignCenter, AlignLeft, AlignRight } from '../icons/text-align';
 
@@ -48,6 +51,12 @@ const formConfig = defineFormConfig([
         fieldConfig: {
           type: 'text',
         },
+        rules: [
+          {
+            typeMatch: true,
+            message: appendValidateSuggestion('字号应为字符串或数字', '请参考以下示例值：24 或 "24"'),
+          },
+        ],
       },
       {
         labelWidth: '68px',
@@ -65,8 +74,10 @@ const formConfig = defineFormConfig([
     text: '字重',
     labelWidth: '68px',
     type: 'data-source-field-select',
+    dataSourceFieldType: ['string', 'number'],
     fieldConfig: {
       type: 'select',
+      allowCreate: true,
       options: ['normal', 'bold']
         .concat(
           Array(7)
@@ -78,6 +89,46 @@ const formConfig = defineFormConfig([
           text: item,
         })),
     },
+    rules: [
+      {
+        typeMatch: false,
+      },
+      {
+        validator: ({ value, callback }, { config, model, prop }, mForm) => {
+          if (value === '' || value === null || value === undefined) {
+            return callback();
+          }
+
+          const result = validateDataSourceFieldSelectValue(
+            value,
+            {
+              fieldType: 'data-source-field-select',
+              mForm,
+              props: { config, model, prop },
+            },
+            {
+              // 字重允许 string（含可创建项）与 number（如 700）
+              validatePlainValue: (plainValue) => {
+                if (typeof plainValue === 'string' || (typeof plainValue === 'number' && !Number.isNaN(plainValue))) {
+                  return undefined;
+                }
+                return '字重应为字符串或数字';
+              },
+            },
+          );
+
+          if (result && typeof (result as Promise<string | undefined>).then === 'function') {
+            (result as Promise<string | undefined>).then(
+              (error) => callback(error),
+              (error) => callback(error),
+            );
+            return;
+          }
+
+          return callback(result);
+        },
+      },
+    ],
   },
   {
     labelWidth: '68px',
@@ -87,6 +138,12 @@ const formConfig = defineFormConfig([
     fieldConfig: {
       type: 'colorPicker',
     },
+    rules: [
+      {
+        typeMatch: true,
+        message: appendValidateSuggestion('颜色应为字符串', '请参考以下示例值："#000000"'),
+      },
+    ],
   },
   {
     name: 'textAlign',

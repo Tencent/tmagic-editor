@@ -15,6 +15,7 @@
 </template>
 
 <script lang="ts" setup>
+import { appendValidateSuggestion } from '@tmagic/design';
 import { type ContainerChangeEventData, defineFormConfig, MContainer } from '@tmagic/form';
 import type { StyleSchema } from '@tmagic/schema';
 
@@ -66,6 +67,12 @@ const formConfig = defineFormConfig([
         fieldConfig: {
           type: 'text',
         },
+        rules: [
+          {
+            typeMatch: true,
+            message: appendValidateSuggestion('left 应为字符串', '请参考以下示例值："10"'),
+          },
+        ],
       },
       {
         name: 'top',
@@ -74,6 +81,12 @@ const formConfig = defineFormConfig([
         fieldConfig: {
           type: 'text',
         },
+        rules: [
+          {
+            typeMatch: true,
+            message: appendValidateSuggestion('top 应为字符串', '请参考以下示例值："10"'),
+          },
+        ],
       },
     ],
   },
@@ -89,6 +102,12 @@ const formConfig = defineFormConfig([
         fieldConfig: {
           type: 'text',
         },
+        rules: [
+          {
+            typeMatch: true,
+            message: appendValidateSuggestion('right 应为字符串', '请参考以下示例值："10"'),
+          },
+        ],
       },
       {
         name: 'bottom',
@@ -97,6 +116,12 @@ const formConfig = defineFormConfig([
         fieldConfig: {
           type: 'text',
         },
+        rules: [
+          {
+            typeMatch: true,
+            message: appendValidateSuggestion('bottom 应为字符串', '请参考以下示例值："10"'),
+          },
+        ],
       },
     ],
   },
@@ -108,6 +133,12 @@ const formConfig = defineFormConfig([
     fieldConfig: {
       type: 'text',
     },
+    rules: [
+      {
+        typeMatch: true,
+        message: appendValidateSuggestion('zIndex 应为数字', '请参考以下示例值：10'),
+      },
+    ],
   },
 ]);
 

@@ -327,39 +327,48 @@ export const getRules = function (
     });
   }
 
-  return rules.map((item) => {
-    if (item.typeMatch) {
-      (item as any).validator = adaptFormValidator(createTypeMatchValidator(mForm, props, item));
+  return rules
+    .map((item) => {
+      if (item.typeMatch) {
+        (item as any).validator = adaptFormValidator(createTypeMatchValidator(mForm, props, item));
+        return item;
+      }
+
+      if (typeof item.validator === 'function') {
+        const fnc = item.validator;
+
+        (item as any).validator = adaptFormValidator(
+          (rule: any, value: any, callback: Function, source: any, options: any) =>
+            fnc(
+              {
+                rule,
+                value: props.config.names ? props.model : value,
+                callback,
+                source,
+                options,
+              },
+              {
+                values: mForm?.initValues || {},
+                model: props.model,
+                parent: mForm?.parentValues || {},
+                formValue: mForm?.values || props.model,
+                prop: props.prop,
+                config: props.config,
+              },
+              mForm,
+            ),
+        );
+      }
       return item;
-    }
-
-    if (typeof item.validator === 'function') {
-      const fnc = item.validator;
-
-      (item as any).validator = adaptFormValidator(
-        (rule: any, value: any, callback: Function, source: any, options: any) =>
-          fnc(
-            {
-              rule,
-              value: props.config.names ? props.model : value,
-              callback,
-              source,
-              options,
-            },
-            {
-              values: mForm?.initValues || {},
-              model: props.model,
-              parent: mForm?.parentValues || {},
-              formValue: mForm?.values || props.model,
-              prop: props.prop,
-              config: props.config,
-            },
-            mForm,
-          ),
-      );
-    }
-    return item;
-  });
+    })
+    .filter((item) => {
+      // typeMatch: false 仅用于关闭自动注入，本身没有校验能力。
+      // 若原样交给 async-validator，会因默认 type=string 误杀 number 等合法值。
+      if (item.typeMatch === false && typeof item.validator !== 'function') {
+        return false;
+      }
+      return true;
+    });
 };
 
 export const initValue = async (

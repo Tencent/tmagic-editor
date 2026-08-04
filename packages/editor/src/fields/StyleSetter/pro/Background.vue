@@ -17,6 +17,7 @@
 <script lang="ts" setup>
 import { markRaw } from 'vue';
 
+import { appendValidateSuggestion } from '@tmagic/design';
 import { type ContainerChangeEventData, defineFormConfig, MContainer } from '@tmagic/form';
 import type { StyleSchema } from '@tmagic/schema';
 
@@ -47,6 +48,12 @@ const formConfig = defineFormConfig([
     fieldConfig: {
       type: 'colorPicker',
     },
+    rules: [
+      {
+        typeMatch: true,
+        message: appendValidateSuggestion('背景色应为字符串', '请参考以下示例值："#000000"'),
+      },
+    ],
   },
   {
     name: 'backgroundImage',

@@ -581,6 +581,33 @@ describe('getRules typeMatch', () => {
     expect(custom).toHaveBeenCalled();
     expect(okCallback).toHaveBeenCalledWith();
   });
+
+  test('typeMatch: false 标记规则会被过滤，避免默认按 string 校验', () => {
+    const custom = vi.fn(({ callback }: any) => callback());
+    const rules: any = [{ typeMatch: false }, { validator: custom }];
+    const typeMatchValid = { value: true } as any;
+    const newRules: any = getRules(mForm, rules, propsOf({ type: 'select' }), typeMatchValid);
+
+    // 仅保留自定义 validator；不会自动注入 typeMatch: true；也不会留下空的 typeMatch:false 规则
+    expect(newRules).toHaveLength(1);
+    expect(newRules[0].typeMatch).toBeUndefined();
+    expect(typeof newRules[0].validator).toBe('function');
+
+    const callback = vi.fn();
+    newRules[0].validator({}, 700, callback);
+    expect(custom).toHaveBeenCalled();
+    expect(callback).toHaveBeenCalledWith();
+  });
+
+  test('typeMatch: false 与 validator 写在同一条 rule 时保留', () => {
+    const custom = vi.fn(({ callback }: any) => callback());
+    const rules: any = [{ typeMatch: false, validator: custom }];
+    const newRules: any = getRules(mForm, rules, propsOf({ type: 'select' }));
+
+    expect(newRules).toHaveLength(1);
+    expect(newRules[0].typeMatch).toBe(false);
+    expect(typeof newRules[0].validator).toBe('function');
+  });
 });
 
 describe('getRules tdesign validator', () => {

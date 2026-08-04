@@ -476,12 +476,42 @@ const isDataSourceFieldPathValue = (value: any, config: any): value is string[] 
   return `${value[0]}`.startsWith(DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX);
 };
 
-const validateDataSourceFieldSelect: TypeMatchValidator = (value, { mForm, message, props }) => {
+export type ValidateDataSourceFieldSelectOptions = {
+  /**
+   * 覆盖「非数据源字段路径」时的校验。
+   * 不传则按 fieldConfig 走内置 typeMatch（与表单项自身 typeMatch 行为一致）。
+   */
+  validatePlainValue?: (
+    value: any,
+    context: TypeMatchValidateContext,
+  ) => string | undefined | Promise<string | undefined>;
+};
+
+/**
+ * data-source-field-select 的 typeMatch 校验逻辑，可供自定义 rules.validator 复用。
+ */
+export const validateDataSourceFieldSelectValue = (
+  value: any,
+  context: TypeMatchValidateContext,
+  options?: ValidateDataSourceFieldSelectOptions,
+): string | undefined | Promise<string | undefined> => {
+  const { mForm, message, props } = context;
   const config = props.config || {};
 
-  if (config.fieldConfig && !isDataSourceFieldPathValue(value, config)) {
-    // 值不是数据源字段路径时，按 fieldConfig 的类型校验（与表单项自身 typeMatch 行为一致）
-    return validateTypeMatch(value, mForm, { ...props, config: { name: config.name, ...config.fieldConfig } }, message);
+  if (!isDataSourceFieldPathValue(value, config)) {
+    if (options?.validatePlainValue) {
+      return options.validatePlainValue(value, context);
+    }
+
+    if (config.fieldConfig) {
+      // 值不是数据源字段路径时，按 fieldConfig 的类型校验（与表单项自身 typeMatch 行为一致）
+      return validateTypeMatch(
+        value,
+        mForm,
+        { ...props, config: { name: config.name, ...config.fieldConfig } },
+        message,
+      );
+    }
   }
 
   if (!Array.isArray(value) || value.some((item) => typeof item !== 'string')) {
@@ -495,6 +525,9 @@ const validateDataSourceFieldSelect: TypeMatchValidator = (value, { mForm, messa
     message,
   });
 };
+
+const validateDataSourceFieldSelect: TypeMatchValidator = (value, context) =>
+  validateDataSourceFieldSelectValue(value, context);
 
 const validateDataSourceSelect: TypeMatchValidator = (value, { message, props }) => {
   const config = props.config || {};
