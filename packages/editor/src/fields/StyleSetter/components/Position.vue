@@ -3,7 +3,7 @@
     <div v-for="(item, index) in list" :key="index" :class="item.class">
       <span class="next-input">
         <input
-          :model-value="model[item.name]"
+          :value="model[item.name]"
           placeholder="0"
           :title="model[item.name]"
           :disabled="disabled"

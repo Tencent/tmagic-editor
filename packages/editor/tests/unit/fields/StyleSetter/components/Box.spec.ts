@@ -15,6 +15,36 @@ describe('StyleSetter Box', () => {
     expect(wrapper.findAll('input').length).toBe(8);
   });
 
+  test('根据 model 显示 margin/padding 值', () => {
+    const wrapper = mount(Box, {
+      props: {
+        model: {
+          marginTop: '10',
+          marginRight: '20',
+          marginBottom: '30',
+          marginLeft: '40',
+          paddingTop: '1',
+          paddingRight: '2',
+          paddingBottom: '3',
+          paddingLeft: '4',
+        },
+      },
+    });
+    const values = wrapper.findAll('input').map((i) => (i.element as HTMLInputElement).value);
+    expect(values).toEqual(['10', '20', '30', '40', '1', '2', '3', '4']);
+  });
+
+  test('model 变更时输入框值同步更新', async () => {
+    const wrapper = mount(Box, {
+      props: { model: { marginTop: '10', marginRight: '20' } },
+    });
+    expect((wrapper.findAll('input')[0].element as HTMLInputElement).value).toBe('10');
+
+    await wrapper.setProps({ model: { marginTop: '50', marginRight: '60' } });
+    expect((wrapper.findAll('input')[0].element as HTMLInputElement).value).toBe('50');
+    expect((wrapper.findAll('input')[1].element as HTMLInputElement).value).toBe('60');
+  });
+
   test('change 事件携带值与对应字段名', async () => {
     const wrapper = mount(Box, { props: { model: { marginTop: '10' } } });
     const input = wrapper.findAll('input')[0];
@@ -38,6 +68,13 @@ describe('StyleSetter Position', () => {
   test('渲染 4 个输入框', () => {
     const wrapper = mount(Position, { props: { model: {} } });
     expect(wrapper.findAll('input').length).toBe(4);
+  });
+
+  test('model 变更时输入框值同步更新', async () => {
+    const wrapper = mount(Position, { props: { model: { top: '0', right: '10' } } });
+    await wrapper.setProps({ model: { top: '20', right: '30' } });
+    expect((wrapper.findAll('input')[0].element as HTMLInputElement).value).toBe('20');
+    expect((wrapper.findAll('input')[1].element as HTMLInputElement).value).toBe('30');
   });
 
   test('change 事件触发并携带 modifyKey', async () => {
