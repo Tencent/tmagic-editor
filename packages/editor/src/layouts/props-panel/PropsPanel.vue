@@ -158,14 +158,34 @@ const submit = async (
       v.id = values.value.id;
     }
 
-    const newValue: MNode = {
-      ...v,
-      style: {},
-    };
+    // 区分操作途径：表单字段编辑（MForm @change）会带上 eventData（含 changeRecords）；
+    // 源码编辑器（CodeEditor @save → saveCode）保存时不带 eventData，据此标记为「源码编辑器」。
+    const historySource = eventData ? 'props' : 'code';
+    // 源码编辑统一走整节点 replace，避免 merge 保留已删除字段。
+    const replace = historySource === 'code';
 
-    if (v.style) {
-      // 空字符串样式值表示「清除该样式」，需保留才能在 doUpdate 的 mergeWith 中覆盖旧值。
-      if (eventData) {
+    let newValue: MNode;
+
+    if (replace) {
+      if (source === 'style') {
+        // 样式面板源码仅提交 { style }：先把新 style 替换到原节点上，再整节点覆盖。
+        newValue = {
+          ...values.value,
+          id: v.id || values.value.id,
+          style: { ...(v.style || {}) },
+        };
+      } else {
+        // 属性面板源码提交完整节点 DSL
+        newValue = { ...v };
+      }
+    } else {
+      newValue = {
+        ...v,
+        style: {},
+      };
+
+      if (v.style) {
+        // 空字符串样式值表示「清除该样式」，需保留才能在 doUpdate 的 mergeWith 中覆盖旧值。
         // 表单编辑：先过滤掉空字符串（避免表单默认空值污染 DSL），
         // 再按 changeRecords 恢复被主动清空的字段。
         Object.entries(v.style).forEach(([key, value]) => {
@@ -174,24 +194,18 @@ const submit = async (
           }
         });
 
-        eventData.changeRecords?.forEach((record) => {
+        eventData?.changeRecords?.forEach((record) => {
           if (record.propPath?.startsWith('style') && record.value === '') {
             setValueByKeyPath(record.propPath, record.value, newValue);
           }
         });
-      } else {
-        // 源码编辑器保存（无 eventData）：style 原样保留，其中的空字符串视为用户主动清除该样式。
-        newValue.style = { ...v.style };
       }
     }
-
-    // 区分操作途径：表单字段编辑（MForm @change）会带上 eventData（含 changeRecords）；
-    // 源码编辑器（CodeEditor @save → saveCode）保存时不带 eventData，据此标记为「源码编辑器」。
-    const historySource = eventData ? 'props' : 'code';
 
     editorService.update(newValue, {
       changeRecords: eventData?.changeRecords,
       historySource,
+      replace,
       // 启用校验联动时，仅校验失败（error 存在）才把错误信息随更新传入 editorService 记录；
       // 其余情况（含表单校验成功、CodeEditor 源码保存）不携带 invalidInfo，由 editorService 在执行 update 时统一清除该节点错误。
       ...(enablePropsFormValidate && error ? { invalidInfo: { id: newValue.id, source, error: error?.message } } : {}),

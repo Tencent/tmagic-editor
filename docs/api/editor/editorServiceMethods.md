@@ -480,6 +480,8 @@ editorService.highlight("text_123");
   - {`MNode`} config 新的节点
   - `{Object}` data 可选配置
     - {`ChangeRecord`[]} changeRecords 变更记录
+    - `{boolean}` replace 是否整节点替换（默认 false）。为 `true` 时跳过 `mergeWith` / `toggleFixedPosition` / `setChildrenLayout`，直接用传入配置覆盖现有节点
+    - `{HistoryOpSource}` historySource 见[历史记录相关 options](#历史记录相关-options)
 
 - **返回：**
   - `{Promise<{ newNode: MNode; oldNode: MNode; changeRecords?: ChangeRecord[] }>}` 更新前后的节点信息
@@ -498,6 +500,8 @@ editorService.highlight("text_123");
   当被更新节点正好在当前选中列表中时，state 会自动同步到新的节点引用，无需调用方处理
 
   当被更新节点正好是当前页面时，state.page 也会同步到新的节点引用；更新非当前页面（不同 ID）时不会把编辑器切到该页
+
+  默认会将传入配置与现有节点深合并（保留未传入的字段）。若需要完整 DSL 覆盖（如源码编辑写回），传入 `replace: true`。
   :::
 
 ## update
@@ -512,6 +516,7 @@ editorService.highlight("text_123");
     - `{boolean}` doNotPushHistory 是否不写入历史记录（默认 false）
     - `{string}` historyDescription 见[历史记录相关 options](#历史记录相关-options)
     - `{HistoryOpSource}` historySource 见[历史记录相关 options](#历史记录相关-options)
+    - `{boolean}` replace 是否整节点替换（默认 false）。为 `true` 时跳过 `mergeWith` / `toggleFixedPosition` / `setChildrenLayout`，直接用传入配置覆盖现有节点；适用于源码编辑、完整 DSL 回写等场景
     - `{Object}` invalidInfo 启用 [enablePropsFormValidate](./props.md#enablepropsformvalidate) 时，属性面板提交携带的校验错误信息，在写入历史记录之前落库，使历史快照与本次变更对齐
       - `{Id}` id 节点 id
       - `{'props' | 'style'}` source 错误来源：属性表单 / 样式表单
@@ -544,6 +549,12 @@ editorService.highlight("text_123");
   写入历史时，每个节点的 records 会单独保存到 `updatedItems[i].changeRecords`；撤销/重做时若有
   records，则仅按 `propPath` 局部更新对应字段，避免整节点替换冲掉同节点上的其它无关变更；缺省
   才退化为整节点替换（如内部 `sort` / `moveLayer` / 拖动等纯快照场景）。
+  :::
+
+  :::tip
+  **`replace: true` 整节点替换：** 默认 `update` 会将传入配置与现有节点深合并，未传入的字段会保留。
+  传入 `replace: true` 后跳过合并与布局相关变换，直接用传入配置覆盖，传入对象中不存在的字段会被删除。
+  属性面板局部改动请保持默认；源码编辑 / 完整 DSL 回写等场景使用 `replace: true`。
   :::
 
 ## sort

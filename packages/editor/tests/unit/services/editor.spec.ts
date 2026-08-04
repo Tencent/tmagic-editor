@@ -734,6 +734,21 @@ describe('update', () => {
     expect(node?.text).toBe('text');
   });
 
+  test('replace=true 时整节点替换，不 merge 保留旧字段', async () => {
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.PAGE_ID);
+
+    // 默认 merge：未传入的 style.width 会保留
+    await editorService.update({ id: NodeId.NODE_ID, type: 'text', text: 'merged' });
+    expect(editorService.getNodeById(NodeId.NODE_ID)?.style?.width).toBe(270);
+
+    // replace：直接用传入配置覆盖，旧字段（style）被去掉
+    await editorService.update({ id: NodeId.NODE_ID, type: 'text', text: 'replaced' }, { replace: true });
+    const node = editorService.getNodeById(NodeId.NODE_ID);
+    expect(node?.text).toBe('replaced');
+    expect(node?.style).toBeUndefined();
+  });
+
   test('没有id', async () => {
     try {
       await editorService.update({ type: 'text', text: 'text', id: '' });

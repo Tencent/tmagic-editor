@@ -720,7 +720,11 @@ class Editor extends BaseService {
 
   public async doUpdate(
     config: MNode,
-    { changeRecords = [], historySource }: { changeRecords?: ChangeRecord[]; historySource?: HistoryOpSource } = {},
+    {
+      changeRecords = [],
+      historySource,
+      replace = false,
+    }: { changeRecords?: ChangeRecord[]; historySource?: HistoryOpSource; replace?: boolean } = {},
   ): Promise<{ newNode: MNode; oldNode: MNode; changeRecords?: ChangeRecord[] }> {
     const root = this.get('root');
     if (!root) throw new Error('root为空');
@@ -733,9 +737,14 @@ class Editor extends BaseService {
 
     const node = toRaw(info.node);
 
-    let newConfig = await toggleFixedPosition(toRaw(config), node, info.path, this.getLayout);
+    // replace=true 时跳过 toggleFixedPosition / mergeWith / setChildrenLayout，直接用传入配置整节点替换
+    let newConfig = replace
+      ? cloneDeep(toRaw(config))
+      : await toggleFixedPosition(toRaw(config), node, info.path, this.getLayout);
 
-    newConfig = mergeWith(cloneDeep(node), newConfig, editorNodeMergeCustomizer);
+    if (!replace) {
+      newConfig = mergeWith(cloneDeep(node), newConfig, editorNodeMergeCustomizer);
+    }
 
     if (!newConfig.type) throw new Error('配置缺少type值');
 
@@ -756,10 +765,12 @@ class Editor extends BaseService {
 
     if (!parentNodeItems || typeof index === 'undefined' || index === -1) throw new Error('更新的节点未找到');
 
-    const newLayout = await this.getLayout(newConfig);
-    const layout = await this.getLayout(node);
-    if (Array.isArray(newConfig.items) && newLayout !== layout) {
-      newConfig = setChildrenLayout(newConfig as MContainer, newLayout);
+    if (!replace) {
+      const newLayout = await this.getLayout(newConfig);
+      const layout = await this.getLayout(node);
+      if (Array.isArray(newConfig.items) && newLayout !== layout) {
+        newConfig = setChildrenLayout(newConfig as MContainer, newLayout);
+      }
     }
 
     parentNodeItems[index] = newConfig;
@@ -798,6 +809,7 @@ class Editor extends BaseService {
    * @param data.changeRecordList 多节点 form 端变更记录列表，按 config 数组同序对应每个节点；优先级高于 changeRecords
    * @param data.doNotPushHistory 是否不写入历史记录（默认 false）
    * @param data.historyDescription 入栈时附带的人类可读描述，用于历史面板展示（不影响 undo/redo 行为）
+   * @param data.replace 是否整节点替换：为 true 时跳过 mergeWith / toggleFixedPosition / setChildrenLayout，直接用传入配置覆盖（默认 false）
    * @returns 更新后的节点配置
    */
   public async update(
@@ -808,6 +820,11 @@ class Editor extends BaseService {
       doNotPushHistory?: boolean;
       historyDescription?: string;
       historySource?: HistoryOpSource;
+      /**
+       * 为 true 时不做深合并等变换，直接用传入配置整节点替换现有节点。
+       * 适用于源码编辑、历史整节点快照回放等「完整 DSL」场景；默认 false（局部属性更新走 merge）。
+       */
+      replace?: boolean;
       /**
        * 属性面板提交时携带的校验错误信息，在写入历史记录之前落库，
        * 使历史快照与本次变更对齐，从而 undo/redo 能正确还原错误标记。
@@ -823,6 +840,7 @@ class Editor extends BaseService {
       changeRecords,
       historyDescription,
       historySource,
+      replace = false,
       invalidInfo,
     } = data;
 
@@ -833,7 +851,7 @@ class Editor extends BaseService {
     const updateData = await Promise.all(
       nodes.map((node, index) => {
         const recordsForNode = changeRecordList ? (changeRecordList[index] ?? []) : (changeRecords ?? []);
-        return this.doUpdate(node, { changeRecords: recordsForNode, historySource });
+        return this.doUpdate(node, { changeRecords: recordsForNode, historySource, replace });
       }),
     );
 
@@ -1348,6 +1366,7 @@ class Editor extends BaseService {
       doNotPushHistory?: boolean;
       historyDescription?: string;
       historySource?: HistoryOpSource;
+      replace?: boolean;
     } = {},
   ): Promise<DslOpWithHistoryIdsResult<MNode | MNode[]>> {
     this.lastPushedHistoryId = null;

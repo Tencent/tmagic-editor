@@ -92,10 +92,15 @@ vi.mock('@editor/layouts/props-panel/FormPanel.vue', () => ({
             onClick: () =>
               emit('submit', { id: 'n1', style: { color: 'red' } }, { changeRecords: [] }, new Error('校验失败详情')),
           }),
-          // 模拟 CodeEditor 源码保存：仅传 values，无 eventData、无 error（对应 saveCode 路径）
+          // 模拟属性面板 CodeEditor 源码保存：完整节点，无 eventData（对应 saveCode 路径）
           h('button', {
             class: 'code-save-btn',
-            onClick: () => emit('submit', { id: 'n1', style: { color: 'red', width: '' } }),
+            onClick: () => emit('submit', { id: 'n1', type: 'text', style: { color: 'red', width: '' } }),
+          }),
+          // 模拟样式面板 CodeEditor 源码保存：仅 { style }（FormPanel codeValueKey=style）
+          h('button', {
+            class: 'style-code-save-btn',
+            onClick: () => emit('submit', { style: { color: 'blue', width: '' } }),
           }),
           h('button', { class: 'submit-err-btn', onClick: () => emit('submit-error', new Error('e')) }),
           h('button', { class: 'form-err-btn', onClick: () => emit('form-error', new Error('e')) }),
@@ -140,7 +145,7 @@ beforeEach(() => {
     return null;
   });
   editorService.get.mockImplementation((k: string) => {
-    if (k === 'node') return { id: 'n1', type: 'text' };
+    if (k === 'node') return { id: 'n1', type: 'text', text: 'hello', style: { width: 100, color: 'old' } };
     if (k === 'nodes') return [{ id: 'n1' }];
     return null;
   });
@@ -237,6 +242,8 @@ describe('PropsPanel', () => {
     expect(options.invalidInfo).toBeUndefined();
     // historySource 应为 code
     expect(options.historySource).toBe('code');
+    // 属性面板源码保存应整节点替换，避免 merge 保留已删除字段
+    expect(options.replace).toBe(true);
   });
 
   test('CodeEditor 源码保存时 style 中的空字符串值被保留（表示清除该样式）', async () => {
@@ -247,6 +254,36 @@ describe('PropsPanel', () => {
     const calledNode = (editorService.update.mock.calls[0] as any)[0];
     expect(calledNode.style.color).toBe('red');
     expect(calledNode.style.width).toBe('');
+  });
+
+  test('样式面板源码保存：将新 style 替换到原节点后整节点 replace', async () => {
+    showStylePanel.value = true;
+    const wrapper = mount(PropsPanel, { props: {} as any });
+    await new Promise((r) => setTimeout(r, 0));
+
+    // 第二个 FormPanel 为样式面板
+    const styleCodeBtns = wrapper.findAll('.style-code-save-btn');
+    expect(styleCodeBtns.length).toBe(2);
+    await styleCodeBtns[1].trigger('click');
+
+    const [calledNode, options] = editorService.update.mock.calls[0] as any;
+    expect(options.replace).toBe(true);
+    expect(options.historySource).toBe('code');
+    // 原节点其它字段保留
+    expect(calledNode.id).toBe('n1');
+    expect(calledNode.type).toBe('text');
+    expect(calledNode.text).toBe('hello');
+    // style 被源码内容整段替换（旧 width:100 / color:old 不再 merge 保留）
+    expect(calledNode.style).toEqual({ color: 'blue', width: '' });
+  });
+
+  test('表单字段编辑不使用 replace', async () => {
+    const wrapper = mount(PropsPanel, { props: {} as any });
+    await new Promise((r) => setTimeout(r, 0));
+    await wrapper.find('.submit-btn').trigger('click');
+
+    const options = (editorService.update.mock.calls[0] as any)[1];
+    expect(options.replace).toBe(false);
   });
 
   test('mounted 事件 emit', async () => {
