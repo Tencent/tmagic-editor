@@ -1,3 +1,14 @@
+# [1.8.0-beta.21](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.20...v1.8.0-beta.21) (2026-08-04)
+
+
+### Bug Fixes
+
+* **editor:** 修复 IdleTask 在 requestIdleCallback timeout 时队列空转的问题 ([b544f05](https://github.com/Tencent/tmagic-editor/commit/b544f059173ff7807a421a98d4247d334bce5fbc))
+
+
+### Features
+
+* **editor:** getEvent/getMethod 支持节点上下文参数 ([d2a02e1](https://github.com/Tencent/tmagic-editor/commit/d2a02e16d26a4424681ac02592da1de850ebb78d))
 # [1.8.0-beta.20](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.19...v1.8.0-beta.20) (2026-07-30)
 
 
