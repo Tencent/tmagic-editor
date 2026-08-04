@@ -1,3 +1,17 @@
+# [1.8.0-beta.22](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.21...v1.8.0-beta.22) (2026-08-04)
+
+
+### Bug Fixes
+
+* **editor:** 优化组件列表与图层面板搜索过滤 ([7777c20](https://github.com/Tencent/tmagic-editor/commit/7777c205b95429c80f7762510d46c6d98b5f73c5))
+* **editor:** 修复 StyleSetter Box/Position 输入框无法正确显示 model 值 ([af157fc](https://github.com/Tencent/tmagic-editor/commit/af157fcda96da817d1507cb93a564709b6d010b9))
+* **stage:** 修复切换页面后 StageMask 尺寸与滚动偏移异常 ([a9cda71](https://github.com/Tencent/tmagic-editor/commit/a9cda719bc85161039405dd3219139347638268e))
+
+
+### Features
+
+* **editor:** 完善样式设置器字段 typeMatch 校验 ([d5a2e25](https://github.com/Tencent/tmagic-editor/commit/d5a2e25e18a7eba980839224bf65ed8481901637))
+* **editor:** 支持 update replace 整节点替换，源码编辑走 replace 模式 ([6f0a41f](https://github.com/Tencent/tmagic-editor/commit/6f0a41f2db8add132943cf7b3e4d796f99106e6f))
 # [1.8.0-beta.21](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.20...v1.8.0-beta.21) (2026-08-04)
 
 
