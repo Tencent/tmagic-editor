@@ -13,6 +13,18 @@ type TaskList<T> = {
   data: T;
 }[];
 
+/**
+ * 回调因 timeout 触发（主线程一直没有空闲）时，单次回调执行任务的时间预算，单位 ms
+ * 参考一帧内可让出的余量：既保证队列有进展，又不长时间阻塞主线程
+ */
+const TIMEOUT_RUN_BUDGET = 5;
+
+/**
+ * 回调因 timeout 触发时，每两次读取时钟之间执行的任务数
+ * 与空闲时间 <=5ms 时的批量保持一致，避免每个任务都读一次时钟
+ */
+const TIMEOUT_BATCH_SIZE = 10;
+
 globalThis.requestIdleCallback =
   globalThis.requestIdleCallback ||
   function (cb) {
@@ -94,6 +106,19 @@ export class IdleTask<T = any> extends EventEmitter {
     this.taskHandle = null;
 
     try {
+      // 主线程一直没有空闲时，回调只会因 timeout 触发，此时 deadline.timeRemaining() 恒为 0（规范行为）。
+      // 若仍以它作为循环条件，一个任务都执行不了，而 finishRun 又会接着重新调度，
+      // 队列就会无限空转下去：依赖收集永远不结束，collecting 卡在 true，画布也不再更新。
+      // 这种情况下改用自有时间预算推进，既保证有进展，又不会像放开循环那样长时间阻塞主线程。
+      if (deadline.didTimeout) {
+        const start = Date.now();
+        do {
+          this.runTaskBatch(TIMEOUT_BATCH_SIZE);
+        } while (this.getTaskLength() && Date.now() - start < TIMEOUT_RUN_BUDGET);
+
+        return;
+      }
+
       // 动画会占用空闲时间,当任务一直无法执行时，看看是否有动画正在播放
       // 根据空闲时间的多少来决定执行的任务数，保证页面不卡死的情况下尽量多执行任务，不然当任务数巨大时，执行时间会很久
       // 执行不完不会影响配置，但是会影响画布渲染
@@ -110,22 +135,29 @@ export class IdleTask<T = any> extends EventEmitter {
           times = 600;
         }
 
-        for (let i = 0; i < times; i++) {
-          // 每次都从实例上取队列，任务执行过程中调用 clearTasks 能立即生效，不会继续消费已被清空的旧队列
-          const task = this.hightLevelTaskList.length > 0 ? this.hightLevelTaskList.shift() : this.taskList.shift();
-          if (task) {
-            this.runTask(task);
-          }
-
-          if (!this.getTaskLength()) {
-            break;
-          }
-        }
+        this.runTaskBatch(times);
       }
     } finally {
       // 必须放在 finally 中：一旦这里被跳过，taskHandle 会一直是真值，
       // enqueueTask 也就不会再重新调度，剩余任务与任务数将永久停在当前状态
       this.finishRun();
+    }
+  }
+
+  /**
+   * 执行一批任务，队列被清空时提前结束
+   */
+  private runTaskBatch(times: number) {
+    for (let i = 0; i < times; i++) {
+      // 每次都从实例上取队列，任务执行过程中调用 clearTasks 能立即生效，不会继续消费已被清空的旧队列
+      const task = this.hightLevelTaskList.length > 0 ? this.hightLevelTaskList.shift() : this.taskList.shift();
+      if (task) {
+        this.runTask(task);
+      }
+
+      if (!this.getTaskLength()) {
+        break;
+      }
     }
   }
 
