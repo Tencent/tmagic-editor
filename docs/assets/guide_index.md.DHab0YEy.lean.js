@@ -1,0 +1,1 @@
+import{At as e,E as t,Ot as n,Xt as r}from"./chunks/framework.ECw2lWOt.js";var i=JSON.parse(`{"title":"快速开始","description":"","frontmatter":{},"headers":[],"relativePath":"guide/index.md","filePath":"guide/index.md"}`),a={name:`guide/index.md`};function o(t,i,a,o,s,c){return r(),n(`div`,null,[...i[0]||=[e("",58)]])}var s=t(a,[[`render`,o]]);export{i as __pageData,s as default};
