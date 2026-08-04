@@ -71,7 +71,11 @@ const stage = computed(() => editorService.get('stage'));
 const list = computed<ComponentGroup[]>(() =>
   componentListService.getList().map((group: ComponentGroup) => ({
     ...group,
-    items: group.items.filter((item: ComponentItem) => item.text.includes(searchText.value)),
+    items: group.items.filter((item: ComponentItem) =>
+      `${item.text || ''}${item.desc || ''}${item.type}`
+        .toLocaleLowerCase()
+        .includes(searchText.value.toLocaleLowerCase()),
+    ),
   })),
 );
 

@@ -120,7 +120,7 @@ const filterNodeMethod = (v: string, data: MNode): boolean => {
     name = 'container';
   }
 
-  return `${data.id}${name}${data.type}`.includes(v);
+  return `${data.id}${name}${data.type || ''}`.toLocaleLowerCase().includes(v.toLocaleLowerCase());
 };
 
 const { filterTextChangeHandler } = useFilter(nodeData, nodeStatusMap, filterNodeMethod);
