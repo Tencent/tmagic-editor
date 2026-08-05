@@ -30,17 +30,17 @@
   },
   "dependencies": {
     "@scena/guides": "^0.29.2",
+    "@zumer/snapdom": "^2.23.2",
     "events": "^3.3.0",
-    "@zumer/snapdom": "^2.8.0",
     "keycon": "^1.4.0",
-    "lodash-es": "^4.17.21",
+    "lodash-es": "^4.18.1",
     "moveable": "^0.53.0",
     "moveable-helper": "^0.4.0",
     "scenejs": "^1.10.3"
   },
   "devDependencies": {
     "@types/events": "^3.0.3",
-    "@types/lodash-es": "^4.17.4"
+    "@types/lodash-es": "^4.17.12"
   },
   "peerDependencies": {
     "@tmagic/core": "workspace:*",

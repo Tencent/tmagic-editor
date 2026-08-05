@@ -32,9 +32,9 @@
     "data-source"
   ],
   "dependencies": {
-    "deep-state-observer": "^5.5.13",
+    "deep-state-observer": "^5.5.17",
     "events": "^3.3.0",
-    "lodash-es": "^4.17.21"
+    "lodash-es": "^4.18.1"
   },
   "peerDependencies": {
     "@tmagic/core": "workspace:*",
@@ -47,6 +47,6 @@
   },
   "devDependencies": {
     "@types/events": "^3.0.3",
-    "@types/lodash-es": "^4.17.4"
+    "@types/lodash-es": "^4.17.12"
   }
 }

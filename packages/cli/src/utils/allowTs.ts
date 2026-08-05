@@ -1,23 +1,27 @@
-import { transformSync } from 'esbuild';
 import fs from 'fs-extra';
+import ts from 'typescript';
+
+import { require } from '../require';
 
 /**
  * Transform a ts file to cjs code
  */
 export const transformTsFileToCodeSync = (filename: string): string =>
-  transformSync(fs.readFileSync(filename).toString(), {
-    format: 'cjs',
-    loader: 'ts',
-    sourcefile: filename,
-    sourcemap: 'inline',
-    target: 'node18',
-  }).code;
+  ts.transpileModule(fs.readFileSync(filename).toString(), {
+    compilerOptions: {
+      inlineSourceMap: true,
+      inlineSources: true,
+      module: ts.ModuleKind.CommonJS,
+      target: ts.ScriptTarget.ES2022,
+    },
+    fileName: filename,
+  }).outputText;
 
 /**
  * Globally allow ts files to be loaded via `require()`
  */
 export const allowTs = (): void => {
-  require.extensions['.ts'] = (m: any, filename) => {
+  require.extensions['.ts'] = (m: any, filename: string) => {
     m._compile(transformTsFileToCodeSync(filename), filename);
   };
 };

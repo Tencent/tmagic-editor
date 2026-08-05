@@ -38,18 +38,18 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
-    "lodash-es": "^4.17.21"
+    "lodash-es": "^4.18.1"
   },
   "devDependencies": {
-    "@types/lodash-es": "^4.17.4",
-    "@vue/test-utils": "^2.4.6"
+    "@types/lodash-es": "^4.17.12",
+    "@vue/test-utils": "^2.4.11"
   },
   "peerDependencies": {
     "@tmagic/design": "workspace:*",
     "@tmagic/form": "workspace:*",
     "@tmagic/utils": "workspace:*",
-    "vue": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vue": "catalog:"
   },
   "peerDependenciesMeta": {
     "typescript": {

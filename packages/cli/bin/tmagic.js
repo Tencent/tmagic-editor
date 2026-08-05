@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { cli } = require('../lib');
+import { cli } from '../lib/index.js';
 
 cli({
   source: process.cwd(),

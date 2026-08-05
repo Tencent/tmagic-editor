@@ -1,3 +1,4 @@
+import { require } from '../require';
 import { UserConfig, UserConfigLoader } from '../types';
 
 export const isPlainObject = <T extends Record<any, any> = Record<any, any>>(val: unknown): val is T =>
@@ -10,7 +11,6 @@ export const hasExportDefault = <T = any>(mod: unknown): mod is { default: T } =
   isPlainObject(mod) && !!mod.__esModule && Object.prototype.hasOwnProperty.call(mod, 'default');
 
 export const loadUserConfigCjs: UserConfigLoader = async (userConfigPath) => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const required = require(userConfigPath);
   return hasExportDefault(required) ? required.default : required;
 };

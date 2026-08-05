@@ -18,7 +18,7 @@ https://tencent.github.io/tmagic-editor/playground/index.html
 
 node.js ^20.19.0 || >=22.12.0
 
-pnpm >= 10
+pnpm 11.20.0
 
 先安装 pnpm
 

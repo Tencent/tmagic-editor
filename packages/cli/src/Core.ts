@@ -4,10 +4,10 @@ import fs from 'fs-extra';
 
 import { prepareEntryFile } from './utils/prepareEntryFile';
 import { resolveAppPackages } from './utils/resolveAppPackages';
+import { require } from './require';
 import { ModuleMainFilePath, UserConfig } from './types';
 
 export default class Core {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
   public version = require('../package.json').version;
 
   public options: UserConfig;

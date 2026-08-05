@@ -1,6 +1,7 @@
 import * as recast from 'recast';
 
 import type App from '../Core';
+import { require } from '../require';
 import { EntryType } from '../types';
 
 export const prepareEntryFile = async (app: App) => {
@@ -138,7 +139,6 @@ export const generateContent = (
 };
 
 export const prettyCode = (code: string) =>
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
   recast.prettyPrint(recast.parse(code.replace(/\\/g, '/'), { parser: require('recast/parsers/typescript') }), {
     tabWidth: 2,
     trailingComma: true,

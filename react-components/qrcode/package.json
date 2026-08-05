@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@tmagic/form-schema": "workspace:^",
-     "qrcode": "^1.5.0"
+    "qrcode": "^1.5.4"
   },
   "peerDependencies": {
     "@tmagic/core": "workspace:^",
@@ -30,8 +30,8 @@
     }
   },
   "devDependencies": {
-    "@types/qrcode": "^1.4.2",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0"
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4"
   }
 }

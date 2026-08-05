@@ -2,12 +2,10 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-    "moduleResolution": "node16",
-    "module": "node16",
+    "moduleResolution": "bundler",
+    "module": "ESNext",
     "rootDir": "./src",
     "outDir": "./lib",
-    "declaration": true,
-    
     "types": ["node"],
   },
   "include": ["./src"],

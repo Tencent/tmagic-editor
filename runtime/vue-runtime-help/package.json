@@ -44,6 +44,6 @@
     }
   },
   "devDependencies": {
-    "@vue/test-utils": "^2.4.6"
+    "@vue/test-utils": "^2.4.11"
   }
 }

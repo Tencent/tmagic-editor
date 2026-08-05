@@ -39,11 +39,11 @@
     "@tmagic/schema": "workspace:*",
     "@tmagic/utils": "workspace:*",
     "events": "^3.3.0",
-    "lodash-es": "^4.17.21"
+    "lodash-es": "^4.18.1"
   },
   "devDependencies": {
     "@types/events": "^3.0.3",
-    "@types/lodash-es": "^4.17.4"
+    "@types/lodash-es": "^4.17.12"
   },
   "peerDependencies": {
     "typescript": "catalog:"

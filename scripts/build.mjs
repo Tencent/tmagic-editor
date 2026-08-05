@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { build as buildVite } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import minimist from 'minimist';
-import rimraf from 'rimraf';
+import { rimrafSync } from 'rimraf';
 import * as sass from 'sass-embedded';
 
 const args = minimist(process.argv.slice(2));
@@ -20,7 +20,7 @@ const runtimeDir = path.resolve(dirname, '../runtime');
 if (args.package) {
   const pkgRoot = path.resolve(packagesDir, args.package);
   if (fs.statSync(pkgRoot).isDirectory()) {
-    rimraf.sync(path.resolve(packagesDir, `./${args.package}/dist`));
+    rimrafSync(path.resolve(packagesDir, `./${args.package}/dist`));
     const pkg = createRequire(import.meta.url)(`../packages/${args.package}/package.json`);
 
     build({ packageName: args.package, format: 'es', pkg, packagesDir });
@@ -32,7 +32,7 @@ if (args.package) {
   const runtimeHelpers = getPackageNames(runtimeDir);
 
   for (const packageName of packages) {
-    rimraf.sync(path.resolve(packagesDir, `./${packageName}/dist`));
+    rimrafSync(path.resolve(packagesDir, `./${packageName}/dist`));
     const pkg = createRequire(import.meta.url)(`../packages/${packageName}/package.json`);
 
     build({ packageName, format: 'es', pkg, packagesDir });
@@ -41,7 +41,7 @@ if (args.package) {
   }
 
   for (const packageName of runtimeHelpers) {
-    rimraf.sync(path.resolve(runtimeDir, `./${packageName}/dist`));
+    rimrafSync(path.resolve(runtimeDir, `./${packageName}/dist`));
     const pkg = createRequire(import.meta.url)(`../runtime/${packageName}/package.json`);
 
     build({ packageName, format: 'es', pkg, packagesDir: runtimeDir });

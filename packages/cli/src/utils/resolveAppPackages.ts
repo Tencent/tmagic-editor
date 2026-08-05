@@ -2,10 +2,11 @@ import { execSync } from 'node:child_process';
 import path from 'node:path';
 import { exit } from 'node:process';
 
-import fs, { existsSync } from 'fs-extra';
+import fs from 'fs-extra';
 import * as recast from 'recast';
 
 import type App from '../Core';
+import { require } from '../require';
 import { EntryType, ModuleMainFilePath, NpmConfig, PackageType } from '../types';
 
 import { backupLock, backupPackageJson, restoreLock, restorePackageJson } from './backupPackageFile';
@@ -127,7 +128,7 @@ const typeAssertion = function ({
 
       if (isFile(defaultFile)) {
         const defaultCode = fs.readFileSync(defaultFile, { encoding: 'utf-8', flag: 'r' });
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
+
         const ast = recast.parse(defaultCode, { parser: require('recast/parsers/typescript') });
         if (
           isDatasource(
@@ -294,7 +295,7 @@ const getComponentPackageImports = function ({
     if (propertyMatch) {
       let file = getIndexPath(path.resolve(path.dirname(indexPath), propertyMatch.source.value));
 
-      if (!existsSync(file)) {
+      if (!fs.existsSync(file)) {
         file = propertyMatch.source.value;
       }
 
@@ -518,7 +519,7 @@ const setPackages = (packages: ModuleMainFilePath, app: App, packagePath: string
     .replace('\n', '');
 
   const indexCode = fs.readFileSync(indexPath, { encoding: 'utf-8', flag: 'r' });
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
+
   const ast: Ast = recast.parse(indexCode, { parser: require('recast/parsers/typescript') });
   const result = typeAssertion({ ast, indexPath, componentFileAffix, datasoucreSuperClass });
 
