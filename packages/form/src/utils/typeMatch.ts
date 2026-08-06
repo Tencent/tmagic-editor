@@ -135,7 +135,7 @@ const TIMESTAMP_VALUE_FORMATS = new Set(['x', 'timestamp']);
 /**
  * 将值格式化为可读的参考示例字符串。
  */
-const stringifyExampleValue = (value: any): string => {
+export const stringifyExampleValue = (value: any): string => {
   if (typeof value === 'string') return `"${value}"`;
   if (value === null || value === undefined) return String(value);
   if (typeof value === 'object') {
@@ -148,19 +148,23 @@ const stringifyExampleValue = (value: any): string => {
   return String(value);
 };
 
-// 参考建议中最多展示的可选值个数，超出以「等」省略。
-const MAX_SUGGESTION_OPTIONS = 20;
+/** 参考建议中可选值全量展示上限；超出时仅举例 EXAMPLE_SUGGESTION_COUNT 个并标明总数。 */
+export const MAX_SUGGESTION_OPTIONS = 20;
+const EXAMPLE_SUGGESTION_COUNT = 5;
 
 /**
- * 生成「请使用以下某一个值：xxx；xxx」形式的参考建议；无可选值时返回空字符串（不追加建议）。
- * 可选值超过 MAX_SUGGESTION_OPTIONS 个时仅展示前若干个并以「等」省略。
+ * 生成可选项参考建议；无可选值时返回空字符串（不追加建议）。
+ * 未超过 MAX_SUGGESTION_OPTIONS 时全部列举；超过时仅举例前 EXAMPLE_SUGGESTION_COUNT 个并标明总数，避免 AI 误以为仅有举例值合法。
  */
-const optionSuggestion = (optionValues: any[]): string => {
+export const optionSuggestion = (optionValues: any[]): string => {
   const values = optionValues.filter((item) => typeof item !== 'undefined');
   if (!values.length) return '';
-  const shown = values.slice(0, MAX_SUGGESTION_OPTIONS).map(stringifyExampleValue);
-  const suffix = values.length > MAX_SUGGESTION_OPTIONS ? ' 等' : '';
-  return `请使用以下某一个值：${shown.join('；')}${suffix}`;
+  const truncated = values.length > MAX_SUGGESTION_OPTIONS;
+  const shown = values.slice(0, truncated ? EXAMPLE_SUGGESTION_COUNT : values.length).map(stringifyExampleValue);
+  if (truncated) {
+    return `请从可选项中选用合法值（共 ${values.length} 个，例如：${shown.join('；')}）`;
+  }
+  return `请使用以下某一个值：${shown.join('；')}`;
 };
 
 /**

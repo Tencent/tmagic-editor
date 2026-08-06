@@ -20,7 +20,7 @@ import type { DataSourceFieldType, DataSourceSchema, Id } from '@tmagic/core';
 import { NodeType } from '@tmagic/core';
 import { appendValidateSuggestion } from '@tmagic/design';
 import type { TypeMatchValidateContext, TypeMatchValidator } from '@tmagic/form';
-import { validateTypeMatch } from '@tmagic/form';
+import { MAX_SUGGESTION_OPTIONS, optionSuggestion, stringifyExampleValue, validateTypeMatch } from '@tmagic/form';
 import {
   DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX,
   DATA_SOURCE_SET_DATA_METHOD_NAME,
@@ -41,35 +41,9 @@ import {
   numberOptions,
 } from '@editor/utils/props';
 
-/**
- * 将值格式化为可读的参考示例字符串。
- */
-const stringifyExampleValue = (value: any): string => {
-  if (typeof value === 'string') return `"${value}"`;
-  if (value === null || value === undefined) return String(value);
-  if (typeof value === 'object') {
-    try {
-      return JSON.stringify(value);
-    } catch {
-      return String(value);
-    }
-  }
-  return String(value);
-};
-
-// 参考建议中最多展示的可选值个数，超出以「等」省略。
-const MAX_SUGGESTION_OPTIONS = 20;
-
-/**
- * 生成「请使用以下某一个值：xxx；xxx」形式的参考建议；无可选值时返回空字符串（不追加建议）。
- */
-const listSuggestion = (values: any[]): string => {
-  const list = values.filter((item) => typeof item !== 'undefined' && item !== null && item !== '');
-  if (!list.length) return '';
-  const shown = list.slice(0, MAX_SUGGESTION_OPTIONS).map(stringifyExampleValue);
-  const suffix = list.length > MAX_SUGGESTION_OPTIONS ? ' 等' : '';
-  return `请使用以下某一个值：${shown.join('；')}${suffix}`;
-};
+/** 复用 form 的可选项建议文案；额外过滤 null / 空串，避免业务侧无效枚举污染提示。 */
+const listSuggestion = (values: any[]): string =>
+  optionSuggestion(values.filter((item) => item !== null && item !== ''));
 
 /**
  * 列出当前可用数据源 id 的参考建议。

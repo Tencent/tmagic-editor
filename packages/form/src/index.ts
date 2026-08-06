@@ -67,8 +67,11 @@ export {
   clearTypeMatchRules,
   deleteTypeMatchRule,
   getTypeMatchRule,
+  MAX_SUGGESTION_OPTIONS,
+  optionSuggestion,
   registerTypeMatchRule,
   registerTypeMatchRules,
+  stringifyExampleValue,
   validateTypeMatch,
 } from './utils/typeMatch';
 
