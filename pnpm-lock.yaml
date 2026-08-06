@@ -564,23 +564,23 @@ importers:
         specifier: ^2.3.2
         version: 2.3.2(vue@3.5.40(typescript@6.0.3))
       '@tmagic/core':
-        specifier: 1.8.0-beta.22
-        version: 1.8.0-beta.22(typescript@6.0.3)
+        specifier: 1.8.0-beta.23
+        version: 1.8.0-beta.23(typescript@6.0.3)
       '@tmagic/design':
-        specifier: 1.8.0-beta.22
-        version: 1.8.0-beta.22(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
+        specifier: 1.8.0-beta.23
+        version: 1.8.0-beta.23(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
       '@tmagic/editor':
-        specifier: 1.8.0-beta.22
-        version: 1.8.0-beta.22(@tmagic/core@1.8.0-beta.22(typescript@6.0.3))(@tmagic/form-schema@1.8.0-beta.22(typescript@6.0.3))(@tmagic/schema@1.8.0-beta.22(typescript@6.0.3))(monaco-editor@0.56.0)(type-fest@5.2.0)(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
+        specifier: 1.8.0-beta.23
+        version: 1.8.0-beta.23(@tmagic/core@1.8.0-beta.23(typescript@6.0.3))(@tmagic/form-schema@1.8.0-beta.23(typescript@6.0.3))(@tmagic/schema@1.8.0-beta.23(typescript@6.0.3))(monaco-editor@0.56.0)(type-fest@5.2.0)(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
       '@tmagic/element-plus-adapter':
-        specifier: 1.8.0-beta.22
-        version: 1.8.0-beta.22(@tmagic/design@1.8.0-beta.22(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(element-plus@2.14.3(vue@3.5.40(typescript@6.0.3)))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
+        specifier: 1.8.0-beta.23
+        version: 1.8.0-beta.23(@tmagic/design@1.8.0-beta.23(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(element-plus@2.14.3(vue@3.5.40(typescript@6.0.3)))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
       '@tmagic/tdesign-vue-next-adapter':
-        specifier: 1.8.0-beta.22
-        version: 1.8.0-beta.22(@tmagic/design@1.8.0-beta.22(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(tdesign-vue-next@1.20.5(vue@3.5.40(typescript@6.0.3)))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
+        specifier: 1.8.0-beta.23
+        version: 1.8.0-beta.23(@tmagic/design@1.8.0-beta.23(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(tdesign-vue-next@1.20.5(vue@3.5.40(typescript@6.0.3)))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
       '@tmagic/tmagic-form-runtime':
         specifier: 1.1.6
-        version: 1.1.6(@tmagic/core@1.8.0-beta.22(typescript@6.0.3))(@tmagic/editor@1.8.0-beta.22(@tmagic/core@1.8.0-beta.22(typescript@6.0.3))(@tmagic/form-schema@1.8.0-beta.22(typescript@6.0.3))(@tmagic/schema@1.8.0-beta.22(typescript@6.0.3))(monaco-editor@0.56.0)(type-fest@5.2.0)(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(element-plus@2.14.3(vue@3.5.40(typescript@6.0.3)))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
+        version: 1.1.6(@tmagic/core@1.8.0-beta.23(typescript@6.0.3))(@tmagic/editor@1.8.0-beta.23(@tmagic/core@1.8.0-beta.23(typescript@6.0.3))(@tmagic/form-schema@1.8.0-beta.23(typescript@6.0.3))(@tmagic/schema@1.8.0-beta.23(typescript@6.0.3))(monaco-editor@0.56.0)(type-fest@5.2.0)(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(element-plus@2.14.3(vue@3.5.40(typescript@6.0.3)))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
       element-plus:
         specifier: ^2.14.3
         version: 2.14.3(vue@3.5.40(typescript@6.0.3))
@@ -920,14 +920,14 @@ importers:
   runtime/react:
     dependencies:
       '@tmagic/core':
-        specifier: 1.8.0-beta.22
-        version: 1.8.0-beta.22(typescript@6.0.3)
+        specifier: 1.8.0-beta.23
+        version: 1.8.0-beta.23(typescript@6.0.3)
       '@tmagic/react-runtime-help':
         specifier: 0.2.2
-        version: 0.2.2(@tmagic/core@1.8.0-beta.22(typescript@6.0.3))(@tmagic/stage@1.8.0-beta.22(@tmagic/core@1.8.0-beta.22(typescript@6.0.3))(typescript@6.0.3))(lodash-es@4.18.1)(react@19.2.8)(typescript@6.0.3)
+        version: 0.2.2(@tmagic/core@1.8.0-beta.23(typescript@6.0.3))(@tmagic/stage@1.8.0-beta.23(@tmagic/core@1.8.0-beta.23(typescript@6.0.3))(typescript@6.0.3))(lodash-es@4.18.1)(react@19.2.8)(typescript@6.0.3)
       '@tmagic/stage':
-        specifier: 1.8.0-beta.22
-        version: 1.8.0-beta.22(@tmagic/core@1.8.0-beta.22(typescript@6.0.3))(typescript@6.0.3)
+        specifier: 1.8.0-beta.23
+        version: 1.8.0-beta.23(@tmagic/core@1.8.0-beta.23(typescript@6.0.3))(typescript@6.0.3)
       axios:
         specifier: ^1.19.0
         version: 1.19.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
@@ -942,8 +942,8 @@ importers:
         version: 19.2.8(react@19.2.8)
     devDependencies:
       '@tmagic/cli':
-        specifier: 1.8.0-beta.22
-        version: 1.8.0-beta.22(typescript@6.0.3)
+        specifier: 1.8.0-beta.23
+        version: 1.8.0-beta.23
       '@types/fs-extra':
         specifier: ^11.0.4
         version: 11.0.4
@@ -1018,14 +1018,14 @@ importers:
   runtime/vue:
     dependencies:
       '@tmagic/core':
-        specifier: 1.8.0-beta.22
-        version: 1.8.0-beta.22(typescript@6.0.3)
+        specifier: 1.8.0-beta.23
+        version: 1.8.0-beta.23(typescript@6.0.3)
       '@tmagic/stage':
-        specifier: 1.8.0-beta.22
-        version: 1.8.0-beta.22(@tmagic/core@1.8.0-beta.22(typescript@6.0.3))(typescript@6.0.3)
+        specifier: 1.8.0-beta.23
+        version: 1.8.0-beta.23(@tmagic/core@1.8.0-beta.23(typescript@6.0.3))(typescript@6.0.3)
       '@tmagic/vue-runtime-help':
         specifier: ^2.0.4
-        version: 2.0.4(@tmagic/core@1.8.0-beta.22(typescript@6.0.3))(@tmagic/stage@1.8.0-beta.22(@tmagic/core@1.8.0-beta.22(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
+        version: 2.0.4(@tmagic/core@1.8.0-beta.23(typescript@6.0.3))(@tmagic/stage@1.8.0-beta.23(@tmagic/core@1.8.0-beta.23(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
       axios:
         specifier: ^1.19.0
         version: 1.19.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
@@ -1034,8 +1034,8 @@ importers:
         version: 3.5.40(typescript@6.0.3)
     devDependencies:
       '@tmagic/cli':
-        specifier: 1.8.0-beta.22
-        version: 1.8.0-beta.22(typescript@6.0.3)
+        specifier: 1.8.0-beta.23
+        version: 1.8.0-beta.23
       '@types/fs-extra':
         specifier: ^11.0.4
         version: 11.0.4
@@ -2034,34 +2034,16 @@ packages:
   '@emmetio/scanner@1.0.4':
     resolution: {integrity: sha512-IqRuJtQff7YHHBk4G8YZ45uB9BaAGcwQeVzgj/zj8/UdOhtQpEIupUhSk8dys6spFIWVZVeK20CzGEnqR5SbqA==}
 
-  '@esbuild/aix-ppc64@0.21.5':
-    resolution: {integrity: sha512-1SDgH6ZSPTlggy1yI6+Dbkiz8xzpHJEVAlF/AM1tHPLsf5STom9rwtjE4hKAF20FfXXNTFqEYXyJNWh1GiZedQ==}
-    engines: {node: '>=12'}
-    cpu: [ppc64]
-    os: [aix]
-
   '@esbuild/aix-ppc64@0.28.1':
     resolution: {integrity: sha512-Svl7tq8k/08+p6CXPpRjQ1fKX+1odH/BQbb48fV6fj3CWHhsoIOoY87w1oHXm0qEpkIK3ZfVgp0hed3XBXzXMQ==}
     engines: {node: '>=18'}
     cpu: [ppc64]
     os: [aix]
 
-  '@esbuild/android-arm64@0.21.5':
-    resolution: {integrity: sha512-c0uX9VAUBQ7dTDCjq+wdyGLowMdtR/GoC2U5IYk/7D1H1JYC0qseD7+11iMP2mRLN9RcCMRcjC4YMclCzGwS/A==}
-    engines: {node: '>=12'}
-    cpu: [arm64]
-    os: [android]
-
   '@esbuild/android-arm64@0.28.1':
     resolution: {integrity: sha512-34EGEbCIAgosYz6goLcopX6Mo7NyGv9tfwEM2/7Ce2VcVRk568iSvniGWcUXIy7wEDR1wzolcxcriFVrWYcwBg==}
     engines: {node: '>=18'}
     cpu: [arm64]
-    os: [android]
-
-  '@esbuild/android-arm@0.21.5':
-    resolution: {integrity: sha512-vCPvzSjpPHEi1siZdlvAlsPxXl7WbOVUBBAowWug4rJHb68Ox8KualB+1ocNvT5fjv6wpkX6o/iEpbDrf68zcg==}
-    engines: {node: '>=12'}
-    cpu: [arm]
     os: [android]
 
   '@esbuild/android-arm@0.28.1':
@@ -2070,34 +2052,16 @@ packages:
     cpu: [arm]
     os: [android]
 
-  '@esbuild/android-x64@0.21.5':
-    resolution: {integrity: sha512-D7aPRUUNHRBwHxzxRvp856rjUHRFW1SdQATKXH2hqA0kAZb1hKmi02OpYRacl0TxIGz/ZmXWlbZgjwWYaCakTA==}
-    engines: {node: '>=12'}
-    cpu: [x64]
-    os: [android]
-
   '@esbuild/android-x64@0.28.1':
     resolution: {integrity: sha512-dbwY7ltSMDWsRatcRpCnES4F+im88OCUgGZjy52shC7GqHRE/cYlxNbB4Z4UpJswpcc4Qxd2oE/ufM0p61IKng==}
     engines: {node: '>=18'}
     cpu: [x64]
     os: [android]
 
-  '@esbuild/darwin-arm64@0.21.5':
-    resolution: {integrity: sha512-DwqXqZyuk5AiWWf3UfLiRDJ5EDd49zg6O9wclZ7kUMv2WRFr4HKjXp/5t8JZ11QbQfUS6/cRCKGwYhtNAY88kQ==}
-    engines: {node: '>=12'}
-    cpu: [arm64]
-    os: [darwin]
-
   '@esbuild/darwin-arm64@0.28.1':
     resolution: {integrity: sha512-TZbWkQY7kvTAXbXUT7uVACR5cMHsDiSz9z7ZKAX/RTq/WJEk3QyRr0wZpNhBDX+/0CtdqUIJlOiodQcta6tY3Q==}
     engines: {node: '>=18'}
     cpu: [arm64]
-    os: [darwin]
-
-  '@esbuild/darwin-x64@0.21.5':
-    resolution: {integrity: sha512-se/JjF8NlmKVG4kNIuyWMV/22ZaerB+qaSi5MdrXtd6R08kvs2qCN4C09miupktDitvh8jRFflwGFBQcxZRjbw==}
-    engines: {node: '>=12'}
-    cpu: [x64]
     os: [darwin]
 
   '@esbuild/darwin-x64@0.28.1':
@@ -2106,22 +2070,10 @@ packages:
     cpu: [x64]
     os: [darwin]
 
-  '@esbuild/freebsd-arm64@0.21.5':
-    resolution: {integrity: sha512-5JcRxxRDUJLX8JXp/wcBCy3pENnCgBR9bN6JsY4OmhfUtIHe3ZW0mawA7+RDAcMLrMIZaf03NlQiX9DGyB8h4g==}
-    engines: {node: '>=12'}
-    cpu: [arm64]
-    os: [freebsd]
-
   '@esbuild/freebsd-arm64@0.28.1':
     resolution: {integrity: sha512-wG2EA8ENdEI0qhkSZMjfqrdY+ziCYCPMmtZjjIwOmXFjmyzEHn+UUxk5of+SYsjtfs3VpnlC7QLzSI5hY/rOAw==}
     engines: {node: '>=18'}
     cpu: [arm64]
-    os: [freebsd]
-
-  '@esbuild/freebsd-x64@0.21.5':
-    resolution: {integrity: sha512-J95kNBj1zkbMXtHVH29bBriQygMXqoVQOQYA+ISs0/2l3T9/kj42ow2mpqerRBxDJnmkUDCaQT/dfNXWX/ZZCQ==}
-    engines: {node: '>=12'}
-    cpu: [x64]
     os: [freebsd]
 
   '@esbuild/freebsd-x64@0.28.1':
@@ -2130,22 +2082,10 @@ packages:
     cpu: [x64]
     os: [freebsd]
 
-  '@esbuild/linux-arm64@0.21.5':
-    resolution: {integrity: sha512-ibKvmyYzKsBeX8d8I7MH/TMfWDXBF3db4qM6sy+7re0YXya+K1cem3on9XgdT2EQGMu4hQyZhan7TeQ8XkGp4Q==}
-    engines: {node: '>=12'}
-    cpu: [arm64]
-    os: [linux]
-
   '@esbuild/linux-arm64@0.28.1':
     resolution: {integrity: sha512-yHs+0uc8+nvEAfAfxrWQKK5peSNzBc4PegcMO0EJ2hT71uA7vB8Ihg2e77R2P7SG5uYjPbHlLLmve4LLLRCf0g==}
     engines: {node: '>=18'}
     cpu: [arm64]
-    os: [linux]
-
-  '@esbuild/linux-arm@0.21.5':
-    resolution: {integrity: sha512-bPb5AHZtbeNGjCKVZ9UGqGwo8EUu4cLq68E95A53KlxAPRmUyYv2D6F0uUI65XisGOL1hBP5mTronbgo+0bFcA==}
-    engines: {node: '>=12'}
-    cpu: [arm]
     os: [linux]
 
   '@esbuild/linux-arm@0.28.1':
@@ -2154,22 +2094,10 @@ packages:
     cpu: [arm]
     os: [linux]
 
-  '@esbuild/linux-ia32@0.21.5':
-    resolution: {integrity: sha512-YvjXDqLRqPDl2dvRODYmmhz4rPeVKYvppfGYKSNGdyZkA01046pLWyRKKI3ax8fbJoK5QbxblURkwK/MWY18Tg==}
-    engines: {node: '>=12'}
-    cpu: [ia32]
-    os: [linux]
-
   '@esbuild/linux-ia32@0.28.1':
     resolution: {integrity: sha512-d1z4ZuP0ajrfz/FhGT4vv278rX8KnPPJx8i5+AtK7TYbx9Le9F1hyzurZpkEyjkGa9dUGhQow4C1NmeGvqxN2w==}
     engines: {node: '>=18'}
     cpu: [ia32]
-    os: [linux]
-
-  '@esbuild/linux-loong64@0.21.5':
-    resolution: {integrity: sha512-uHf1BmMG8qEvzdrzAqg2SIG/02+4/DHB6a9Kbya0XDvwDEKCoC8ZRWI5JJvNdUjtciBGFQ5PuBlpEOXQj+JQSg==}
-    engines: {node: '>=12'}
-    cpu: [loong64]
     os: [linux]
 
   '@esbuild/linux-loong64@0.28.1':
@@ -2178,22 +2106,10 @@ packages:
     cpu: [loong64]
     os: [linux]
 
-  '@esbuild/linux-mips64el@0.21.5':
-    resolution: {integrity: sha512-IajOmO+KJK23bj52dFSNCMsz1QP1DqM6cwLUv3W1QwyxkyIWecfafnI555fvSGqEKwjMXVLokcV5ygHW5b3Jbg==}
-    engines: {node: '>=12'}
-    cpu: [mips64el]
-    os: [linux]
-
   '@esbuild/linux-mips64el@0.28.1':
     resolution: {integrity: sha512-mRObBZeHh2OxcBFPWE/FjylkRgZdYuiTR3vaTozquCGOH14iP9oN4x4Ge81CoIDYQrXmIxpFumJBu5MtZpnQJQ==}
     engines: {node: '>=18'}
     cpu: [mips64el]
-    os: [linux]
-
-  '@esbuild/linux-ppc64@0.21.5':
-    resolution: {integrity: sha512-1hHV/Z4OEfMwpLO8rp7CvlhBDnjsC3CttJXIhBi+5Aj5r+MBvy4egg7wCbe//hSsT+RvDAG7s81tAvpL2XAE4w==}
-    engines: {node: '>=12'}
-    cpu: [ppc64]
     os: [linux]
 
   '@esbuild/linux-ppc64@0.28.1':
@@ -2202,34 +2118,16 @@ packages:
     cpu: [ppc64]
     os: [linux]
 
-  '@esbuild/linux-riscv64@0.21.5':
-    resolution: {integrity: sha512-2HdXDMd9GMgTGrPWnJzP2ALSokE/0O5HhTUvWIbD3YdjME8JwvSCnNGBnTThKGEB91OZhzrJ4qIIxk/SBmyDDA==}
-    engines: {node: '>=12'}
-    cpu: [riscv64]
-    os: [linux]
-
   '@esbuild/linux-riscv64@0.28.1':
     resolution: {integrity: sha512-kw0owk1o0GFETUJyW0jc0G4Yzs0BHZn0JDZ8JRT088vjJYX777BAs1fDGxAC+q831qOs2DTC96mNsG2opdfyyQ==}
     engines: {node: '>=18'}
     cpu: [riscv64]
     os: [linux]
 
-  '@esbuild/linux-s390x@0.21.5':
-    resolution: {integrity: sha512-zus5sxzqBJD3eXxwvjN1yQkRepANgxE9lgOW2qLnmr8ikMTphkjgXu1HR01K4FJg8h1kEEDAqDcZQtbrRnB41A==}
-    engines: {node: '>=12'}
-    cpu: [s390x]
-    os: [linux]
-
   '@esbuild/linux-s390x@0.28.1':
     resolution: {integrity: sha512-/lAIjX8aYFRByhh6L5rYtPEDRqa9de/4V/juOXcta5frjvzXO4/sqEtyytse0g3zZFuWu5cDN0MkLz2qRDD2Ag==}
     engines: {node: '>=18'}
     cpu: [s390x]
-    os: [linux]
-
-  '@esbuild/linux-x64@0.21.5':
-    resolution: {integrity: sha512-1rYdTpyv03iycF1+BhzrzQJCdOuAOtaqHTWJZCWvijKD2N5Xu0TtVC8/+1faWqcP9iBCWOmjmhoH94dH82BxPQ==}
-    engines: {node: '>=12'}
-    cpu: [x64]
     os: [linux]
 
   '@esbuild/linux-x64@0.28.1':
@@ -2244,12 +2142,6 @@ packages:
     cpu: [arm64]
     os: [netbsd]
 
-  '@esbuild/netbsd-x64@0.21.5':
-    resolution: {integrity: sha512-Woi2MXzXjMULccIwMnLciyZH4nCIMpWQAs049KEeMvOcNADVxo0UBIQPfSmxB3CWKedngg7sWZdLvLczpe0tLg==}
-    engines: {node: '>=12'}
-    cpu: [x64]
-    os: [netbsd]
-
   '@esbuild/netbsd-x64@0.28.1':
     resolution: {integrity: sha512-aeL6lAnN89Hz43Mlh1G8ARasbuoYvSITDEx0tHh5b7jJnHcssqgjy9Yx430GDpmCa6OyrKoS0aNRjKundRizGg==}
     engines: {node: '>=18'}
@@ -2260,12 +2152,6 @@ packages:
     resolution: {integrity: sha512-MEFJe5C3R8pwXdZ5Y21oo6m7ePiS0d9pWucn99O/wvyJZChoIQKrQDxKrGeW8F5+T0okTHesAmDeiHDTIq0V/Q==}
     engines: {node: '>=18'}
     cpu: [arm64]
-    os: [openbsd]
-
-  '@esbuild/openbsd-x64@0.21.5':
-    resolution: {integrity: sha512-HLNNw99xsvx12lFBUwoT8EVCsSvRNDVxNpjZ7bPn947b8gJPzeHWyNVhFsaerc0n3TsbOINvRP2byTZ5LKezow==}
-    engines: {node: '>=12'}
-    cpu: [x64]
     os: [openbsd]
 
   '@esbuild/openbsd-x64@0.28.1':
@@ -2280,23 +2166,11 @@ packages:
     cpu: [arm64]
     os: [openharmony]
 
-  '@esbuild/sunos-x64@0.21.5':
-    resolution: {integrity: sha512-6+gjmFpfy0BHU5Tpptkuh8+uw3mnrvgs+dSPQXQOv3ekbordwnzTVEb4qnIvQcYXq6gzkyTnoZ9dZG+D4garKg==}
-    engines: {node: '>=12'}
-    cpu: [x64]
-    os: [sunos]
-
   '@esbuild/sunos-x64@0.28.1':
     resolution: {integrity: sha512-BEjgtECkL3vY+SaSQ6nzVfiALUeFxpawyp8Jmf5PtYhf1Ug40N1h/hxlhts+f1FvSvarEigdxS3BlSMI2PJLcQ==}
     engines: {node: '>=18'}
     cpu: [x64]
     os: [sunos]
-
-  '@esbuild/win32-arm64@0.21.5':
-    resolution: {integrity: sha512-Z0gOTd75VvXqyq7nsl93zwahcTROgqvuAcYDUr+vOv8uHhNSKROyU961kgtCD1e95IqPKSQKH7tBTslnS3tA8A==}
-    engines: {node: '>=12'}
-    cpu: [arm64]
-    os: [win32]
 
   '@esbuild/win32-arm64@0.28.1':
     resolution: {integrity: sha512-lCv9eK/H6ZJWbE7bh2nw54CZ9M2nupBxJcTsdk/QQnWkdSjKGuxmmH8/GWrlT1eMmZfn4dGcCjRte397WqfQXA==}
@@ -2304,22 +2178,10 @@ packages:
     cpu: [arm64]
     os: [win32]
 
-  '@esbuild/win32-ia32@0.21.5':
-    resolution: {integrity: sha512-SWXFF1CL2RVNMaVs+BBClwtfZSvDgtL//G/smwAc5oVK/UPu2Gu9tIaRgFmYFFKrmg3SyAjSrElf0TiJ1v8fYA==}
-    engines: {node: '>=12'}
-    cpu: [ia32]
-    os: [win32]
-
   '@esbuild/win32-ia32@0.28.1':
     resolution: {integrity: sha512-zvb/mB2bSCoJOpoCBgYKKpX6YM6mJBlBUVUtVj41DlZJVEB6/0CKlRYxP5wWl1C1ILiCoAU5wZZ4q1P3qeS6Eg==}
     engines: {node: '>=18'}
     cpu: [ia32]
-    os: [win32]
-
-  '@esbuild/win32-x64@0.21.5':
-    resolution: {integrity: sha512-tQd/1efJuzPC6rCFwEvLtci/xNFcTZknmXs98FYDfGE4wP9ClFV98nyKrzJKVPMhdDnjzLhdUyMX4PsQAPjwIw==}
-    engines: {node: '>=12'}
-    cpu: [x64]
     os: [win32]
 
   '@esbuild/win32-x64@0.28.1':
@@ -2790,15 +2652,10 @@ packages:
   '@sxzz/popperjs-es@2.11.8':
     resolution: {integrity: sha512-wOwESXvvED3S8xBmcPWHs2dUuzrE4XiZeFu7e1hROIJkm02a49N120pmOXxY33sBb6hArItm5W5tcg1cBtV+HQ==}
 
-  '@tmagic/cli@1.8.0-beta.22':
-    resolution: {integrity: sha512-TdVsvLYsfoCYL2UBBY6Z8j9Iwh1EVYp4CiQ2tEanyWUTXroCCU4FX6roNDU5vd6DasfqZ1dtr2oCBhCpuj1JHg==}
+  '@tmagic/cli@1.8.0-beta.23':
+    resolution: {integrity: sha512-vn87mAZH8PwQn3nkpPnzHkthCnNLmI5QFXExi2e3Q7SBgQNm1Tt8BYmSBopv+Bygepm+zRrXEuZCrigqZh+X9w==}
     engines: {node: '>=18'}
     hasBin: true
-    peerDependencies:
-      typescript: ^6.0.3
-    peerDependenciesMeta:
-      typescript:
-        optional: true
 
   '@tmagic/core@1.7.0':
     resolution: {integrity: sha512-n3IRm71D0/BZodzywBPRN6h0TWlpdZol1kbW7b3H+V8oRj4ZXdcWKOpo7+vGsRuR0DdzJtfgo7o4hGj7EVLyTA==}
@@ -2818,8 +2675,8 @@ packages:
       typescript:
         optional: true
 
-  '@tmagic/core@1.8.0-beta.22':
-    resolution: {integrity: sha512-5ajInrG9DN9o1CAlPlU02qEDTb4PKpd4HAlirqmu8GgSEbMUlMLwap/dzXglYza4nvH3rBsMQX+9itN/v8fx5A==}
+  '@tmagic/core@1.8.0-beta.23':
+    resolution: {integrity: sha512-LqodBsOQlkqjpS7tATnjfMzMhIoQ/UJ2URlye9nF5cEtGa6wQkc17pW6eAPHsifxmTveoofpRsW4W7CGBtKLMA==}
     engines: {node: '>=18'}
     peerDependencies:
       typescript: ^6.0.3
@@ -2847,11 +2704,11 @@ packages:
       typescript:
         optional: true
 
-  '@tmagic/data-source@1.8.0-beta.22':
-    resolution: {integrity: sha512-vlbZJZPrc2J7JYWGGqljr1cDOu2g2fJR3Uqe6DB70RFgnawn+w/7kKQSqFNtSM//p3zmXbwkYLl3QGHEt4n9uA==}
+  '@tmagic/data-source@1.8.0-beta.23':
+    resolution: {integrity: sha512-07AhMWeFLwxnBAqCAUn+2JP+ZGVJ1MhQJR+VwsRej0oLNL7SuXTbLmrVCU2i+stC1t+rV9Z3lmOsTJ9cBki1OQ==}
     engines: {node: '>=18'}
     peerDependencies:
-      '@tmagic/core': 1.8.0-beta.22
+      '@tmagic/core': 1.8.0-beta.23
       typescript: ^6.0.3
     peerDependenciesMeta:
       typescript:
@@ -2879,12 +2736,12 @@ packages:
       typescript:
         optional: true
 
-  '@tmagic/dep@1.8.0-beta.22':
-    resolution: {integrity: sha512-wh8y1FuDtgFnp8EazZta2TiAaBFxUGXsk6D9ZRWKxNeMH6IOOi0nTgPfHXOPK3hxn81p3fXJcsMYHpAHvG1iQw==}
+  '@tmagic/dep@1.8.0-beta.23':
+    resolution: {integrity: sha512-vpaoOixaVqmWQClQpD9GF1Q6b3ayOByf0+qDfgNFGA9wVtCnigNRPR00sredW+FArFykS+q5xUfou10OyqxzTg==}
     engines: {node: '>=18'}
     peerDependencies:
-      '@tmagic/schema': 1.8.0-beta.22
-      '@tmagic/utils': 1.8.0-beta.22
+      '@tmagic/schema': 1.8.0-beta.23
+      '@tmagic/utils': 1.8.0-beta.23
       typescript: ^6.0.3
     peerDependenciesMeta:
       typescript:
@@ -2900,8 +2757,8 @@ packages:
       typescript:
         optional: true
 
-  '@tmagic/design@1.8.0-beta.22':
-    resolution: {integrity: sha512-jvmkT+p+ihhv8xUSA78u/BnauakDtNJQf+6B7pcUDpqIH86IhmqK4wa9sWCRx4csJV1sCJhmcB5aEIoG5ZmzxQ==}
+  '@tmagic/design@1.8.0-beta.23':
+    resolution: {integrity: sha512-1fR2q5EK9nbuYyvk9i9iXAEXo9CspneQXErLbcdfnbgJPR70iOpMPkysEyUoOzqonv4q4N6SozN4Vj3UVizU4w==}
     engines: {node: '>=18'}
     peerDependencies:
       typescript: ^6.0.3
@@ -2922,11 +2779,11 @@ packages:
       typescript:
         optional: true
 
-  '@tmagic/editor@1.8.0-beta.22':
-    resolution: {integrity: sha512-s79YdxF78lYkzcHep0k82X5ElKS0uGhVeNch3czSyaWhZh5pBYyMx0zStE+WHpYWUEM/gTuzpJQxmefODJTy4w==}
+  '@tmagic/editor@1.8.0-beta.23':
+    resolution: {integrity: sha512-QKqX4EP7rEA3UlUUII2011Cckf/rO8amy3S8wtVV2t4YX7jaloZoDEFsucy7nGT3eQdqBFFriZApjtYYLKAU5g==}
     engines: {node: '>=18'}
     peerDependencies:
-      '@tmagic/core': 1.8.0-beta.22
+      '@tmagic/core': 1.8.0-beta.23
       monaco-editor: '^0.55.1 '
       type-fest: ^5.2.0
       typescript: ^6.0.3
@@ -2937,11 +2794,11 @@ packages:
       typescript:
         optional: true
 
-  '@tmagic/element-plus-adapter@1.8.0-beta.22':
-    resolution: {integrity: sha512-44460ovHA9MMK0NmErYxJSHINWFyYg8ePh9d4LnfHhuxIi6d2XH8vBwz8pIBnRMXkodLY4FZcKQBrLUPjRIs3g==}
+  '@tmagic/element-plus-adapter@1.8.0-beta.23':
+    resolution: {integrity: sha512-LMhYM+4F5M/dEOjMn2uB1Rqp3vYuK9++cLLm1bcbt5iLxavlsTMlPZsT9nkNEFRt0zj8ShuhSTTepXeD8hBYpw==}
     engines: {node: '>=18'}
     peerDependencies:
-      '@tmagic/design': 1.8.0-beta.22
+      '@tmagic/design': 1.8.0-beta.23
       element-plus: ^2.14.3
       typescript: ^6.0.3
       vue: ^3.5.40
@@ -2958,8 +2815,8 @@ packages:
       typescript:
         optional: true
 
-  '@tmagic/form-schema@1.8.0-beta.22':
-    resolution: {integrity: sha512-+v9ASyQcyDsbOnErVIvwm1naXGlqfM1HUerANsYTJ3VX3eC3Ro7oP0rztJs0vB+pXYGs1o+iqAaEGGl/4pp5Gg==}
+  '@tmagic/form-schema@1.8.0-beta.23':
+    resolution: {integrity: sha512-6Bh44+k5dUlF3PQuPzNJr9xZNg6s7mAGmtNnDfXG/k+c/bWoMShhaACK+CULhgyQ9AGDJqRNQ/EOU8m9SMSiog==}
     engines: {node: '>=18'}
     peerDependencies:
       typescript: ^6.0.3
@@ -2980,13 +2837,13 @@ packages:
       typescript:
         optional: true
 
-  '@tmagic/form@1.8.0-beta.22':
-    resolution: {integrity: sha512-DqDD5rQyaIxGkFLbbIXpoPh41op8RVQaKg6zFIFzf+MnYVU3ncXd7gpbu9sNpyq3obxGTTyPyGRbeGeJ2uJA4A==}
+  '@tmagic/form@1.8.0-beta.23':
+    resolution: {integrity: sha512-wSvF7YkkO03VvXUqm2XeQfjbl15HVetWRiJv/ZxKZsrKzkZr/QTcQUkrwJLIFTZvg86Q/Ub2/KYZLYid2SS6OA==}
     engines: {node: '>=18'}
     peerDependencies:
-      '@tmagic/design': 1.8.0-beta.22
-      '@tmagic/form-schema': 1.8.0-beta.22
-      '@tmagic/utils': 1.8.0-beta.22
+      '@tmagic/design': 1.8.0-beta.23
+      '@tmagic/form-schema': 1.8.0-beta.23
+      '@tmagic/utils': 1.8.0-beta.23
       typescript: ^6.0.3
       vue: ^3.5.40
     peerDependenciesMeta:
@@ -3028,8 +2885,8 @@ packages:
       typescript:
         optional: true
 
-  '@tmagic/schema@1.8.0-beta.22':
-    resolution: {integrity: sha512-0lI3VnmTIzVzpnWTTVBgadvlsJmpBysoq7cjNoFI1hRvbO6KzXO6FSzsmv+fUwkNCFskhsPpjBELeCgdJTlvtg==}
+  '@tmagic/schema@1.8.0-beta.23':
+    resolution: {integrity: sha512-NVHvy450BQxzymDO55HNx50HccFb54JG2o586hOHpVJdNRB4Nwxk/9CWRzlgr903/D2eYO1gUobYpV4cW5vQ2w==}
     engines: {node: '>=18'}
     peerDependencies:
       typescript: ^6.0.3
@@ -3057,11 +2914,11 @@ packages:
       typescript:
         optional: true
 
-  '@tmagic/stage@1.8.0-beta.22':
-    resolution: {integrity: sha512-hzcbSZIUOicdrZiZfvxyn+1TRDMRnk/T9Zuu56iV3QHohfdOWKVGvYUK9yRoUOdhgBZS5kD/Wrw+u3s3BSSHvw==}
+  '@tmagic/stage@1.8.0-beta.23':
+    resolution: {integrity: sha512-L3sm61AZdnF6q48W4bxugetRef3JNLxWsNi1Q7QKtV5cTzSLcWw6MZ6eia3FPWI9zyaQSCrUjrQPuEZ5ZBoh/g==}
     engines: {node: '>=18'}
     peerDependencies:
-      '@tmagic/core': 1.8.0-beta.22
+      '@tmagic/core': 1.8.0-beta.23
       typescript: ^6.0.3
     peerDependenciesMeta:
       typescript:
@@ -3079,24 +2936,24 @@ packages:
       typescript:
         optional: true
 
-  '@tmagic/table@1.8.0-beta.22':
-    resolution: {integrity: sha512-mhUslhsQ0QHL/GEyAvPFVMnxX/vbpIkHwH+P9rwqcfRc43PImMOMUAdBj3aKwvFweQGUrk15YrEiggbpEm2D7g==}
+  '@tmagic/table@1.8.0-beta.23':
+    resolution: {integrity: sha512-SGS3iy/xzvYqbRJUlss8N6RPHguDRq5QW7gmPH+82IzeyN+hnPLSL+vnNwFWAp9BSYf/CykF0IEfk6ePirZwkw==}
     engines: {node: '>=18'}
     peerDependencies:
-      '@tmagic/design': 1.8.0-beta.22
-      '@tmagic/form': 1.8.0-beta.22
-      '@tmagic/utils': 1.8.0-beta.22
+      '@tmagic/design': 1.8.0-beta.23
+      '@tmagic/form': 1.8.0-beta.23
+      '@tmagic/utils': 1.8.0-beta.23
       typescript: ^6.0.3
       vue: ^3.5.40
     peerDependenciesMeta:
       typescript:
         optional: true
 
-  '@tmagic/tdesign-vue-next-adapter@1.8.0-beta.22':
-    resolution: {integrity: sha512-FPqrhdPwfLaWIjnTIOJcjclqyagm1G5O7M6HGIN+vxzUP3WUyClT/pWcN7ARbEuUBlxrF15SUSRKyvERdvu5GA==}
+  '@tmagic/tdesign-vue-next-adapter@1.8.0-beta.23':
+    resolution: {integrity: sha512-6L/62rdnacN4fSXMEWHfragk576yFHSRVBem7lrkjwxlgBSIIADK+BMCSbrMzQ4rd3sEw4PJa1909Lyx+iKfEw==}
     engines: {node: '>=18'}
     peerDependencies:
-      '@tmagic/design': 1.8.0-beta.22
+      '@tmagic/design': 1.8.0-beta.23
       tdesign-vue-next: ^1.17.1
       typescript: ^6.0.3
       vue: ^3.5.40
@@ -3139,11 +2996,11 @@ packages:
       typescript:
         optional: true
 
-  '@tmagic/utils@1.8.0-beta.22':
-    resolution: {integrity: sha512-nxC1aR1hqYql0Fjia6EGJfRQx8pNPOGubOHt4Ta6ZssV5yMJiUeTy+7WMDEwF1UNnMuvqG46Z+rk13/Rh78m4Q==}
+  '@tmagic/utils@1.8.0-beta.23':
+    resolution: {integrity: sha512-ANQdRNi0dpSyeAgn82YqS5OS696E7BB9YABOszGNEkWPOJ7BkjuJ62/tzD7AX07X8IwEnI0TTUFpEDXomp/7Ug==}
     engines: {node: '>=18'}
     peerDependencies:
-      '@tmagic/schema': 1.8.0-beta.22
+      '@tmagic/schema': 1.8.0-beta.23
       typescript: ^6.0.3
     peerDependenciesMeta:
       typescript:
@@ -3750,10 +3607,6 @@ packages:
     resolution: {integrity: sha512-4Dj6M28JB+oAH8kFkTLUo+a2jwOFkuqb3yucU0CANcRRUbxS0cP0nZYCGjcc3BNXwRIsUVmDGgzawme7zvJHvg==}
     engines: {node: '>=12'}
 
-  anymatch@3.1.3:
-    resolution: {integrity: sha512-KMReFUr0B4t+D+OBkjR3KYqvocp2XaSzO55UcB6mgQMd3KbcE+mWTyvVV7D/zsdEbNnV6acZUutkiHQXvTr1Rw==}
-    engines: {node: '>= 8'}
-
   argparse@2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
 
@@ -3861,10 +3714,6 @@ packages:
   bidi-js@1.0.3:
     resolution: {integrity: sha512-RKshQI1R3YQ+n9YJz2QQ147P66ELpa1FQEg20Dk8oW9t2KgLbpDLLp9aGZ7y8WHSshDknG0bknqGw5/tyCs5tw==}
 
-  binary-extensions@2.3.0:
-    resolution: {integrity: sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==}
-    engines: {node: '>=8'}
-
   birpc@2.9.0:
     resolution: {integrity: sha512-KrayHS5pBi69Xi9JmvoqrIgYGDkD6mcSe/i6YKi3w5kekCLzrX4+nawcXqrj2tIp50Kw/mT/s3p+GVK0A0sKxw==}
 
@@ -3927,10 +3776,6 @@ packages:
       monocart-coverage-reports:
         optional: true
 
-  cac@6.7.14:
-    resolution: {integrity: sha512-b6Ilus+c3RrdDk+JhLKUAQfzzgLEPy6wcXqS7f/xe1EETvsDP6GORG7SFuOs6cID5YkqchW/LXZbX5bc8j7ZcQ==}
-    engines: {node: '>=8'}
-
   cac@7.0.0:
     resolution: {integrity: sha512-tixWYgm5ZoOD+3g6UTea91eow5z6AAHaho3g0V9CNSNb45gM8SmflpAc+GRd1InC4AqN/07Unrgp56Y94N9hJQ==}
     engines: {node: '>=20.19.0'}
@@ -3985,10 +3830,6 @@ packages:
 
   chardet@2.2.0:
     resolution: {integrity: sha512-rddelWYNPRrXq6PtNEN2S3f6t9ILzvqaN5pVgi4kqt9jHQaXIial9PznB5iSPVlQSLNaaH22ItWz3EJtQ10+OA==}
-
-  chokidar@3.6.0:
-    resolution: {integrity: sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==}
-    engines: {node: '>= 8.10.0'}
 
   chokidar@5.0.0:
     resolution: {integrity: sha512-TQMmc3w+5AxjpL8iIiwebF73dRDF4fBIieAqGn9RGCWaEVwQ6Fb2cGe31Yns0RRIzii5goJ1Y7xbMwo1TxMplw==}
@@ -4456,11 +4297,6 @@ packages:
 
   es-toolkit@1.50.0:
     resolution: {integrity: sha512-OyZKhUVvEep9ITEiwHn8GKnMRQIVqoSIX7WnRbkWgJkllCujilqP2rD0u979tkl8wqyc8ICwlc1UBVv/Sl1G6w==}
-
-  esbuild@0.21.5:
-    resolution: {integrity: sha512-mg3OPMV4hXywwpoDxu3Qda5xCKQi+vCTZq8S9J/EpkhB2HzKXq4SNFZE3+NK93JYxc8VMSep+lOUSC/RVKaBqw==}
-    engines: {node: '>=12'}
-    hasBin: true
 
   esbuild@0.28.1:
     resolution: {integrity: sha512-HrJrvZv5ayxBzPfwphOoNzkzOIIlifzk0KJrGK2c8R4+LKpMtpYLQeUdjnwjWv/LZlkH2laZk+4w78pi99D4Vw==}
@@ -5033,10 +4869,6 @@ packages:
     resolution: {integrity: sha512-n4ZT37wG78iz03xPRKJrHTdZbe3IicyucEtdRsV5yglwc3GyUfbAfpSeD0FJ41NbUNSt5wbhqfp1fS+BgnvDFQ==}
     engines: {node: '>= 0.4'}
 
-  is-binary-path@2.1.0:
-    resolution: {integrity: sha512-ZMERYes6pDydyuGidse7OsHxtbI7WVeUEozgR/g7rd0xUimYNlvZRE/K2MgZTjWy725IfelLeVcEM97mmtRGXw==}
-    engines: {node: '>=8'}
-
   is-boolean-object@1.2.2:
     resolution: {integrity: sha512-wa56o2/ElJMYqjCjGkXri7it5FbebW5usLw/nPmCMs5DeZ7eziSYZhSmPRn0txqeW4LnAmQQU7FgqLpsEFKM4A==}
     engines: {node: '>= 0.4'}
@@ -5585,10 +5417,6 @@ packages:
     resolution: {integrity: sha512-V6gygoYb/5EmNI+MEGrWkC+e6+Rr7mTmfHrxDbLzxQogBkgzo76rkok0Am6thgSF7Mv2nLOajAJj5vDJZEFn7g==}
     engines: {node: ^16.14.0 || >=18.0.0}
 
-  normalize-path@3.0.0:
-    resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
-    engines: {node: '>=0.10.0'}
-
   normalize-wheel-es@1.2.0:
     resolution: {integrity: sha512-Wj7+EJQ8mSuXr2iWfnujrimU35R2W4FAErEyTmJoJ7ucwTn2hOUSsRehMb5RSYkxXGTM7Y9QpvPmp++w5ftoJw==}
 
@@ -5879,10 +5707,6 @@ packages:
   readable-stream@3.6.2:
     resolution: {integrity: sha512-9u/sniCrY3D5WdsERHzHE4G2YCXqoG5FTHUiCC4SIbr6XcLZBY05ya9EKjYek9O5xOAwjGq+1JdGBAS7Q9ScoA==}
     engines: {node: '>= 6'}
-
-  readdirp@3.6.0:
-    resolution: {integrity: sha512-hOS089on8RduqdbhvQ5Z37A0ESjsqz6qnRcffsMU3495FuTdqSm+7bhJ29JvIOsBDEEnan5DPu9t3To9VRlMzA==}
-    engines: {node: '>=8.10.0'}
 
   readdirp@5.0.0:
     resolution: {integrity: sha512-9u/XQ1pvrQtYyMpZe7DXKv2p5CNvyVwzUB6uhLAnQwHMSgKMBR62lc7AHljaeteeHXn11XTAaLLUVZYVZyuRBQ==}
@@ -7942,103 +7766,52 @@ snapshots:
 
   '@emmetio/scanner@1.0.4': {}
 
-  '@esbuild/aix-ppc64@0.21.5':
-    optional: true
-
   '@esbuild/aix-ppc64@0.28.1':
-    optional: true
-
-  '@esbuild/android-arm64@0.21.5':
     optional: true
 
   '@esbuild/android-arm64@0.28.1':
     optional: true
 
-  '@esbuild/android-arm@0.21.5':
-    optional: true
-
   '@esbuild/android-arm@0.28.1':
-    optional: true
-
-  '@esbuild/android-x64@0.21.5':
     optional: true
 
   '@esbuild/android-x64@0.28.1':
     optional: true
 
-  '@esbuild/darwin-arm64@0.21.5':
-    optional: true
-
   '@esbuild/darwin-arm64@0.28.1':
-    optional: true
-
-  '@esbuild/darwin-x64@0.21.5':
     optional: true
 
   '@esbuild/darwin-x64@0.28.1':
     optional: true
 
-  '@esbuild/freebsd-arm64@0.21.5':
-    optional: true
-
   '@esbuild/freebsd-arm64@0.28.1':
-    optional: true
-
-  '@esbuild/freebsd-x64@0.21.5':
     optional: true
 
   '@esbuild/freebsd-x64@0.28.1':
     optional: true
 
-  '@esbuild/linux-arm64@0.21.5':
-    optional: true
-
   '@esbuild/linux-arm64@0.28.1':
-    optional: true
-
-  '@esbuild/linux-arm@0.21.5':
     optional: true
 
   '@esbuild/linux-arm@0.28.1':
     optional: true
 
-  '@esbuild/linux-ia32@0.21.5':
-    optional: true
-
   '@esbuild/linux-ia32@0.28.1':
-    optional: true
-
-  '@esbuild/linux-loong64@0.21.5':
     optional: true
 
   '@esbuild/linux-loong64@0.28.1':
     optional: true
 
-  '@esbuild/linux-mips64el@0.21.5':
-    optional: true
-
   '@esbuild/linux-mips64el@0.28.1':
-    optional: true
-
-  '@esbuild/linux-ppc64@0.21.5':
     optional: true
 
   '@esbuild/linux-ppc64@0.28.1':
     optional: true
 
-  '@esbuild/linux-riscv64@0.21.5':
-    optional: true
-
   '@esbuild/linux-riscv64@0.28.1':
     optional: true
 
-  '@esbuild/linux-s390x@0.21.5':
-    optional: true
-
   '@esbuild/linux-s390x@0.28.1':
-    optional: true
-
-  '@esbuild/linux-x64@0.21.5':
     optional: true
 
   '@esbuild/linux-x64@0.28.1':
@@ -8047,16 +7820,10 @@ snapshots:
   '@esbuild/netbsd-arm64@0.28.1':
     optional: true
 
-  '@esbuild/netbsd-x64@0.21.5':
-    optional: true
-
   '@esbuild/netbsd-x64@0.28.1':
     optional: true
 
   '@esbuild/openbsd-arm64@0.28.1':
-    optional: true
-
-  '@esbuild/openbsd-x64@0.21.5':
     optional: true
 
   '@esbuild/openbsd-x64@0.28.1':
@@ -8065,25 +7832,13 @@ snapshots:
   '@esbuild/openharmony-arm64@0.28.1':
     optional: true
 
-  '@esbuild/sunos-x64@0.21.5':
-    optional: true
-
   '@esbuild/sunos-x64@0.28.1':
-    optional: true
-
-  '@esbuild/win32-arm64@0.21.5':
     optional: true
 
   '@esbuild/win32-arm64@0.28.1':
     optional: true
 
-  '@esbuild/win32-ia32@0.21.5':
-    optional: true
-
   '@esbuild/win32-ia32@0.28.1':
-    optional: true
-
-  '@esbuild/win32-x64@0.21.5':
     optional: true
 
   '@esbuild/win32-x64@0.28.1':
@@ -8486,17 +8241,14 @@ snapshots:
 
   '@sxzz/popperjs-es@2.11.8': {}
 
-  '@tmagic/cli@1.8.0-beta.22(typescript@6.0.3)':
+  '@tmagic/cli@1.8.0-beta.23':
     dependencies:
-      cac: 6.7.14
-      chokidar: 3.6.0
-      esbuild: 0.21.5
+      cac: 7.0.0
+      chokidar: 5.0.0
       fs-extra: 11.4.0
       merge-options: 3.0.4
       picocolors: 1.1.1
       recast: 0.23.19
-      tslib: 2.8.1
-    optionalDependencies:
       typescript: 6.0.3
 
   '@tmagic/core@1.7.0(typescript@6.0.3)':
@@ -8521,12 +8273,12 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
 
-  '@tmagic/core@1.8.0-beta.22(typescript@6.0.3)':
+  '@tmagic/core@1.8.0-beta.23(typescript@6.0.3)':
     dependencies:
-      '@tmagic/data-source': 1.8.0-beta.22(@tmagic/core@1.8.0-beta.22(typescript@6.0.3))(typescript@6.0.3)
-      '@tmagic/dep': 1.8.0-beta.22(@tmagic/schema@1.8.0-beta.22(typescript@6.0.3))(@tmagic/utils@1.8.0-beta.22(@tmagic/schema@1.8.0-beta.22(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)
-      '@tmagic/schema': 1.8.0-beta.22(typescript@6.0.3)
-      '@tmagic/utils': 1.8.0-beta.22(@tmagic/schema@1.8.0-beta.22(typescript@6.0.3))(typescript@6.0.3)
+      '@tmagic/data-source': 1.8.0-beta.23(@tmagic/core@1.8.0-beta.23(typescript@6.0.3))(typescript@6.0.3)
+      '@tmagic/dep': 1.8.0-beta.23(@tmagic/schema@1.8.0-beta.23(typescript@6.0.3))(@tmagic/utils@1.8.0-beta.23(@tmagic/schema@1.8.0-beta.23(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)
+      '@tmagic/schema': 1.8.0-beta.23(typescript@6.0.3)
+      '@tmagic/utils': 1.8.0-beta.23(@tmagic/schema@1.8.0-beta.23(typescript@6.0.3))(typescript@6.0.3)
       events: 3.3.0
       lodash-es: 4.18.1
     optionalDependencies:
@@ -8550,9 +8302,9 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
 
-  '@tmagic/data-source@1.8.0-beta.22(@tmagic/core@1.8.0-beta.22(typescript@6.0.3))(typescript@6.0.3)':
+  '@tmagic/data-source@1.8.0-beta.23(@tmagic/core@1.8.0-beta.23(typescript@6.0.3))(typescript@6.0.3)':
     dependencies:
-      '@tmagic/core': 1.8.0-beta.22(typescript@6.0.3)
+      '@tmagic/core': 1.8.0-beta.23(typescript@6.0.3)
       deep-state-observer: 5.5.17
       events: 3.3.0
       lodash-es: 4.18.1
@@ -8573,10 +8325,10 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
 
-  '@tmagic/dep@1.8.0-beta.22(@tmagic/schema@1.8.0-beta.22(typescript@6.0.3))(@tmagic/utils@1.8.0-beta.22(@tmagic/schema@1.8.0-beta.22(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)':
+  '@tmagic/dep@1.8.0-beta.23(@tmagic/schema@1.8.0-beta.23(typescript@6.0.3))(@tmagic/utils@1.8.0-beta.23(@tmagic/schema@1.8.0-beta.23(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)':
     dependencies:
-      '@tmagic/schema': 1.8.0-beta.22(typescript@6.0.3)
-      '@tmagic/utils': 1.8.0-beta.22(@tmagic/schema@1.8.0-beta.22(typescript@6.0.3))(typescript@6.0.3)
+      '@tmagic/schema': 1.8.0-beta.23(typescript@6.0.3)
+      '@tmagic/utils': 1.8.0-beta.23(@tmagic/schema@1.8.0-beta.23(typescript@6.0.3))(typescript@6.0.3)
     optionalDependencies:
       typescript: 6.0.3
 
@@ -8587,7 +8339,7 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
 
-  '@tmagic/design@1.8.0-beta.22(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))':
+  '@tmagic/design@1.8.0-beta.23(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))':
     dependencies:
       '@popperjs/core': 2.11.8
       vue: 3.5.40(typescript@6.0.3)
@@ -8621,15 +8373,15 @@ snapshots:
       - '@tmagic/form-schema'
       - '@tmagic/schema'
 
-  '@tmagic/editor@1.8.0-beta.22(@tmagic/core@1.8.0-beta.22(typescript@6.0.3))(@tmagic/form-schema@1.8.0-beta.22(typescript@6.0.3))(@tmagic/schema@1.8.0-beta.22(typescript@6.0.3))(monaco-editor@0.56.0)(type-fest@5.2.0)(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))':
+  '@tmagic/editor@1.8.0-beta.23(@tmagic/core@1.8.0-beta.23(typescript@6.0.3))(@tmagic/form-schema@1.8.0-beta.23(typescript@6.0.3))(@tmagic/schema@1.8.0-beta.23(typescript@6.0.3))(monaco-editor@0.56.0)(type-fest@5.2.0)(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))':
     dependencies:
       '@element-plus/icons-vue': 2.3.2(vue@3.5.40(typescript@6.0.3))
-      '@tmagic/core': 1.8.0-beta.22(typescript@6.0.3)
-      '@tmagic/design': 1.8.0-beta.22(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
-      '@tmagic/form': 1.8.0-beta.22(@tmagic/design@1.8.0-beta.22(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(@tmagic/form-schema@1.8.0-beta.22(typescript@6.0.3))(@tmagic/utils@1.8.0-beta.22(@tmagic/schema@1.8.0-beta.22(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
-      '@tmagic/stage': 1.8.0-beta.22(@tmagic/core@1.8.0-beta.22(typescript@6.0.3))(typescript@6.0.3)
-      '@tmagic/table': 1.8.0-beta.22(@tmagic/design@1.8.0-beta.22(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(@tmagic/form@1.8.0-beta.22(@tmagic/design@1.8.0-beta.22(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(@tmagic/form-schema@1.8.0-beta.22(typescript@6.0.3))(@tmagic/utils@1.8.0-beta.22(@tmagic/schema@1.8.0-beta.22(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(@tmagic/utils@1.8.0-beta.22(@tmagic/schema@1.8.0-beta.22(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
-      '@tmagic/utils': 1.8.0-beta.22(@tmagic/schema@1.8.0-beta.22(typescript@6.0.3))(typescript@6.0.3)
+      '@tmagic/core': 1.8.0-beta.23(typescript@6.0.3)
+      '@tmagic/design': 1.8.0-beta.23(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
+      '@tmagic/form': 1.8.0-beta.23(@tmagic/design@1.8.0-beta.23(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(@tmagic/form-schema@1.8.0-beta.23(typescript@6.0.3))(@tmagic/utils@1.8.0-beta.23(@tmagic/schema@1.8.0-beta.23(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
+      '@tmagic/stage': 1.8.0-beta.23(@tmagic/core@1.8.0-beta.23(typescript@6.0.3))(typescript@6.0.3)
+      '@tmagic/table': 1.8.0-beta.23(@tmagic/design@1.8.0-beta.23(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(@tmagic/form@1.8.0-beta.23(@tmagic/design@1.8.0-beta.23(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(@tmagic/form-schema@1.8.0-beta.23(typescript@6.0.3))(@tmagic/utils@1.8.0-beta.23(@tmagic/schema@1.8.0-beta.23(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(@tmagic/utils@1.8.0-beta.23(@tmagic/schema@1.8.0-beta.23(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
+      '@tmagic/utils': 1.8.0-beta.23(@tmagic/schema@1.8.0-beta.23(typescript@6.0.3))(typescript@6.0.3)
       buffer: 6.0.3
       deep-object-diff: 1.1.9
       emmet-monaco-es: 5.7.0(monaco-editor@0.56.0)
@@ -8649,9 +8401,9 @@ snapshots:
       - '@tmagic/form-schema'
       - '@tmagic/schema'
 
-  '@tmagic/element-plus-adapter@1.8.0-beta.22(@tmagic/design@1.8.0-beta.22(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(element-plus@2.14.3(vue@3.5.40(typescript@6.0.3)))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))':
+  '@tmagic/element-plus-adapter@1.8.0-beta.23(@tmagic/design@1.8.0-beta.23(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(element-plus@2.14.3(vue@3.5.40(typescript@6.0.3)))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))':
     dependencies:
-      '@tmagic/design': 1.8.0-beta.22(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
+      '@tmagic/design': 1.8.0-beta.23(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
       element-plus: 2.14.3(vue@3.5.40(typescript@6.0.3))
       vue: 3.5.40(typescript@6.0.3)
     optionalDependencies:
@@ -8663,9 +8415,9 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
 
-  '@tmagic/form-schema@1.8.0-beta.22(typescript@6.0.3)':
+  '@tmagic/form-schema@1.8.0-beta.23(typescript@6.0.3)':
     dependencies:
-      '@tmagic/schema': 1.8.0-beta.22(typescript@6.0.3)
+      '@tmagic/schema': 1.8.0-beta.23(typescript@6.0.3)
     optionalDependencies:
       typescript: 6.0.3
 
@@ -8683,13 +8435,13 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
 
-  '@tmagic/form@1.8.0-beta.22(@tmagic/design@1.8.0-beta.22(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(@tmagic/form-schema@1.8.0-beta.22(typescript@6.0.3))(@tmagic/utils@1.8.0-beta.22(@tmagic/schema@1.8.0-beta.22(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))':
+  '@tmagic/form@1.8.0-beta.23(@tmagic/design@1.8.0-beta.23(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(@tmagic/form-schema@1.8.0-beta.23(typescript@6.0.3))(@tmagic/utils@1.8.0-beta.23(@tmagic/schema@1.8.0-beta.23(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))':
     dependencies:
       '@element-plus/icons-vue': 2.3.2(vue@3.5.40(typescript@6.0.3))
       '@popperjs/core': 2.11.8
-      '@tmagic/design': 1.8.0-beta.22(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
-      '@tmagic/form-schema': 1.8.0-beta.22(typescript@6.0.3)
-      '@tmagic/utils': 1.8.0-beta.22(@tmagic/schema@1.8.0-beta.22(typescript@6.0.3))(typescript@6.0.3)
+      '@tmagic/design': 1.8.0-beta.23(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
+      '@tmagic/form-schema': 1.8.0-beta.23(typescript@6.0.3)
+      '@tmagic/utils': 1.8.0-beta.23(@tmagic/schema@1.8.0-beta.23(typescript@6.0.3))(typescript@6.0.3)
       dayjs: 1.11.21
       lodash-es: 4.18.1
       sortablejs: 1.15.7
@@ -8697,13 +8449,13 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
 
-  '@tmagic/react-runtime-help@0.2.2(@tmagic/core@1.8.0-beta.22(typescript@6.0.3))(@tmagic/stage@1.8.0-beta.22(@tmagic/core@1.8.0-beta.22(typescript@6.0.3))(typescript@6.0.3))(lodash-es@4.18.1)(react@19.2.8)(typescript@6.0.3)':
+  '@tmagic/react-runtime-help@0.2.2(@tmagic/core@1.8.0-beta.23(typescript@6.0.3))(@tmagic/stage@1.8.0-beta.23(@tmagic/core@1.8.0-beta.23(typescript@6.0.3))(typescript@6.0.3))(lodash-es@4.18.1)(react@19.2.8)(typescript@6.0.3)':
     dependencies:
       lodash-es: 4.18.1
       react: 19.2.8
     optionalDependencies:
-      '@tmagic/core': 1.8.0-beta.22(typescript@6.0.3)
-      '@tmagic/stage': 1.8.0-beta.22(@tmagic/core@1.8.0-beta.22(typescript@6.0.3))(typescript@6.0.3)
+      '@tmagic/core': 1.8.0-beta.23(typescript@6.0.3)
+      '@tmagic/stage': 1.8.0-beta.23(@tmagic/core@1.8.0-beta.23(typescript@6.0.3))(typescript@6.0.3)
       typescript: 6.0.3
 
   '@tmagic/schema@1.7.0(typescript@6.0.3)':
@@ -8714,7 +8466,7 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
 
-  '@tmagic/schema@1.8.0-beta.22(typescript@6.0.3)':
+  '@tmagic/schema@1.8.0-beta.23(typescript@6.0.3)':
     optionalDependencies:
       typescript: 6.0.3
 
@@ -8744,10 +8496,10 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
 
-  '@tmagic/stage@1.8.0-beta.22(@tmagic/core@1.8.0-beta.22(typescript@6.0.3))(typescript@6.0.3)':
+  '@tmagic/stage@1.8.0-beta.23(@tmagic/core@1.8.0-beta.23(typescript@6.0.3))(typescript@6.0.3)':
     dependencies:
       '@scena/guides': 0.29.2
-      '@tmagic/core': 1.8.0-beta.22(typescript@6.0.3)
+      '@tmagic/core': 1.8.0-beta.23(typescript@6.0.3)
       '@zumer/snapdom': 2.23.2
       events: 3.3.0
       keycon: 1.4.0
@@ -8767,32 +8519,32 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
 
-  '@tmagic/table@1.8.0-beta.22(@tmagic/design@1.8.0-beta.22(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(@tmagic/form@1.8.0-beta.22(@tmagic/design@1.8.0-beta.22(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(@tmagic/form-schema@1.8.0-beta.22(typescript@6.0.3))(@tmagic/utils@1.8.0-beta.22(@tmagic/schema@1.8.0-beta.22(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(@tmagic/utils@1.8.0-beta.22(@tmagic/schema@1.8.0-beta.22(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))':
+  '@tmagic/table@1.8.0-beta.23(@tmagic/design@1.8.0-beta.23(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(@tmagic/form@1.8.0-beta.23(@tmagic/design@1.8.0-beta.23(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(@tmagic/form-schema@1.8.0-beta.23(typescript@6.0.3))(@tmagic/utils@1.8.0-beta.23(@tmagic/schema@1.8.0-beta.23(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(@tmagic/utils@1.8.0-beta.23(@tmagic/schema@1.8.0-beta.23(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))':
     dependencies:
       '@element-plus/icons-vue': 2.3.2(vue@3.5.40(typescript@6.0.3))
-      '@tmagic/design': 1.8.0-beta.22(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
-      '@tmagic/form': 1.8.0-beta.22(@tmagic/design@1.8.0-beta.22(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(@tmagic/form-schema@1.8.0-beta.22(typescript@6.0.3))(@tmagic/utils@1.8.0-beta.22(@tmagic/schema@1.8.0-beta.22(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
-      '@tmagic/utils': 1.8.0-beta.22(@tmagic/schema@1.8.0-beta.22(typescript@6.0.3))(typescript@6.0.3)
+      '@tmagic/design': 1.8.0-beta.23(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
+      '@tmagic/form': 1.8.0-beta.23(@tmagic/design@1.8.0-beta.23(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(@tmagic/form-schema@1.8.0-beta.23(typescript@6.0.3))(@tmagic/utils@1.8.0-beta.23(@tmagic/schema@1.8.0-beta.23(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
+      '@tmagic/utils': 1.8.0-beta.23(@tmagic/schema@1.8.0-beta.23(typescript@6.0.3))(typescript@6.0.3)
       lodash-es: 4.18.1
       vue: 3.5.40(typescript@6.0.3)
     optionalDependencies:
       typescript: 6.0.3
 
-  '@tmagic/tdesign-vue-next-adapter@1.8.0-beta.22(@tmagic/design@1.8.0-beta.22(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(tdesign-vue-next@1.20.5(vue@3.5.40(typescript@6.0.3)))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))':
+  '@tmagic/tdesign-vue-next-adapter@1.8.0-beta.23(@tmagic/design@1.8.0-beta.23(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(tdesign-vue-next@1.20.5(vue@3.5.40(typescript@6.0.3)))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))':
     dependencies:
-      '@tmagic/design': 1.8.0-beta.22(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
+      '@tmagic/design': 1.8.0-beta.23(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
       tdesign-vue-next: 1.20.5(vue@3.5.40(typescript@6.0.3))
       vue: 3.5.40(typescript@6.0.3)
     optionalDependencies:
       typescript: 6.0.3
 
-  '@tmagic/tmagic-form-runtime@1.1.6(@tmagic/core@1.8.0-beta.22(typescript@6.0.3))(@tmagic/editor@1.8.0-beta.22(@tmagic/core@1.8.0-beta.22(typescript@6.0.3))(@tmagic/form-schema@1.8.0-beta.22(typescript@6.0.3))(@tmagic/schema@1.8.0-beta.22(typescript@6.0.3))(monaco-editor@0.56.0)(type-fest@5.2.0)(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(element-plus@2.14.3(vue@3.5.40(typescript@6.0.3)))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))':
+  '@tmagic/tmagic-form-runtime@1.1.6(@tmagic/core@1.8.0-beta.23(typescript@6.0.3))(@tmagic/editor@1.8.0-beta.23(@tmagic/core@1.8.0-beta.23(typescript@6.0.3))(@tmagic/form-schema@1.8.0-beta.23(typescript@6.0.3))(@tmagic/schema@1.8.0-beta.23(typescript@6.0.3))(monaco-editor@0.56.0)(type-fest@5.2.0)(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3)))(element-plus@2.14.3(vue@3.5.40(typescript@6.0.3)))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))':
     dependencies:
-      '@tmagic/editor': 1.8.0-beta.22(@tmagic/core@1.8.0-beta.22(typescript@6.0.3))(@tmagic/form-schema@1.8.0-beta.22(typescript@6.0.3))(@tmagic/schema@1.8.0-beta.22(typescript@6.0.3))(monaco-editor@0.56.0)(type-fest@5.2.0)(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
+      '@tmagic/editor': 1.8.0-beta.23(@tmagic/core@1.8.0-beta.23(typescript@6.0.3))(@tmagic/form-schema@1.8.0-beta.23(typescript@6.0.3))(@tmagic/schema@1.8.0-beta.23(typescript@6.0.3))(monaco-editor@0.56.0)(type-fest@5.2.0)(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
       element-plus: 2.14.3(vue@3.5.40(typescript@6.0.3))
       vue: 3.5.40(typescript@6.0.3)
     optionalDependencies:
-      '@tmagic/core': 1.8.0-beta.22(typescript@6.0.3)
+      '@tmagic/core': 1.8.0-beta.23(typescript@6.0.3)
       typescript: 6.0.3
 
   '@tmagic/utils@1.7.0(@tmagic/schema@1.7.0(typescript@6.0.3))(typescript@6.0.3)':
@@ -8809,19 +8561,19 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
 
-  '@tmagic/utils@1.8.0-beta.22(@tmagic/schema@1.8.0-beta.22(typescript@6.0.3))(typescript@6.0.3)':
+  '@tmagic/utils@1.8.0-beta.23(@tmagic/schema@1.8.0-beta.23(typescript@6.0.3))(typescript@6.0.3)':
     dependencies:
-      '@tmagic/schema': 1.8.0-beta.22(typescript@6.0.3)
+      '@tmagic/schema': 1.8.0-beta.23(typescript@6.0.3)
       lodash-es: 4.18.1
     optionalDependencies:
       typescript: 6.0.3
 
-  '@tmagic/vue-runtime-help@2.0.4(@tmagic/core@1.8.0-beta.22(typescript@6.0.3))(@tmagic/stage@1.8.0-beta.22(@tmagic/core@1.8.0-beta.22(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))':
+  '@tmagic/vue-runtime-help@2.0.4(@tmagic/core@1.8.0-beta.23(typescript@6.0.3))(@tmagic/stage@1.8.0-beta.23(@tmagic/core@1.8.0-beta.23(typescript@6.0.3))(typescript@6.0.3))(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))':
     dependencies:
       vue: 3.5.40(typescript@6.0.3)
     optionalDependencies:
-      '@tmagic/core': 1.8.0-beta.22(typescript@6.0.3)
-      '@tmagic/stage': 1.8.0-beta.22(@tmagic/core@1.8.0-beta.22(typescript@6.0.3))(typescript@6.0.3)
+      '@tmagic/core': 1.8.0-beta.23(typescript@6.0.3)
+      '@tmagic/stage': 1.8.0-beta.23(@tmagic/core@1.8.0-beta.23(typescript@6.0.3))(typescript@6.0.3)
       typescript: 6.0.3
 
   '@types/chai@5.2.3':
@@ -9429,11 +9181,6 @@ snapshots:
 
   ansi-styles@6.2.3: {}
 
-  anymatch@3.1.3:
-    dependencies:
-      normalize-path: 3.0.0
-      picomatch: 2.3.2
-
   argparse@2.0.1: {}
 
   argue-cli@3.1.0: {}
@@ -9571,8 +9318,6 @@ snapshots:
     dependencies:
       require-from-string: 2.0.2
 
-  binary-extensions@2.3.0: {}
-
   birpc@2.9.0: {}
 
   bl@4.1.0:
@@ -9647,8 +9392,6 @@ snapshots:
       yargs: 18.1.0
       yargs-parser: 21.1.1
 
-  cac@6.7.14: {}
-
   cac@7.0.0: {}
 
   cachedir@2.4.0: {}
@@ -9696,18 +9439,6 @@ snapshots:
   character-entities-legacy@3.0.0: {}
 
   chardet@2.2.0: {}
-
-  chokidar@3.6.0:
-    dependencies:
-      anymatch: 3.1.3
-      braces: 3.0.3
-      glob-parent: 5.1.2
-      is-binary-path: 2.1.0
-      is-glob: 4.0.3
-      normalize-path: 3.0.0
-      readdirp: 3.6.0
-    optionalDependencies:
-      fsevents: 2.3.3
 
   chokidar@5.0.0:
     dependencies:
@@ -10294,32 +10025,6 @@ snapshots:
       is-symbol: 1.1.1
 
   es-toolkit@1.50.0: {}
-
-  esbuild@0.21.5:
-    optionalDependencies:
-      '@esbuild/aix-ppc64': 0.21.5
-      '@esbuild/android-arm': 0.21.5
-      '@esbuild/android-arm64': 0.21.5
-      '@esbuild/android-x64': 0.21.5
-      '@esbuild/darwin-arm64': 0.21.5
-      '@esbuild/darwin-x64': 0.21.5
-      '@esbuild/freebsd-arm64': 0.21.5
-      '@esbuild/freebsd-x64': 0.21.5
-      '@esbuild/linux-arm': 0.21.5
-      '@esbuild/linux-arm64': 0.21.5
-      '@esbuild/linux-ia32': 0.21.5
-      '@esbuild/linux-loong64': 0.21.5
-      '@esbuild/linux-mips64el': 0.21.5
-      '@esbuild/linux-ppc64': 0.21.5
-      '@esbuild/linux-riscv64': 0.21.5
-      '@esbuild/linux-s390x': 0.21.5
-      '@esbuild/linux-x64': 0.21.5
-      '@esbuild/netbsd-x64': 0.21.5
-      '@esbuild/openbsd-x64': 0.21.5
-      '@esbuild/sunos-x64': 0.21.5
-      '@esbuild/win32-arm64': 0.21.5
-      '@esbuild/win32-ia32': 0.21.5
-      '@esbuild/win32-x64': 0.21.5
 
   esbuild@0.28.1:
     optionalDependencies:
@@ -11029,10 +10734,6 @@ snapshots:
     dependencies:
       has-bigints: 1.1.0
 
-  is-binary-path@2.1.0:
-    dependencies:
-      binary-extensions: 2.3.0
-
   is-boolean-object@1.2.2:
     dependencies:
       call-bound: 1.0.4
@@ -11546,8 +11247,6 @@ snapshots:
       semver: 7.8.5
       validate-npm-package-license: 3.0.4
 
-  normalize-path@3.0.0: {}
-
   normalize-wheel-es@1.2.0: {}
 
   nostics@1.2.0: {}
@@ -11863,10 +11562,6 @@ snapshots:
       inherits: 2.0.4
       string_decoder: 1.3.0
       util-deprecate: 1.0.2
-
-  readdirp@3.6.0:
-    dependencies:
-      picomatch: 2.3.2
 
   readdirp@5.0.0: {}
 
