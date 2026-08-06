@@ -368,6 +368,17 @@ export default class StageCore extends EventEmitter {
     }
   }
 
+  /**
+   * page-el-update 后，若当前选中节点仍在新页面文档中且需要自动滚动，则重新触发 scrollIntoView
+   */
+  private scrollSelectedIntoViewAfterPageUpdate(): void {
+    const selected = this.actionManager?.getSelectedEl();
+    if (!selected?.isConnected) return;
+    if (!(this.autoScrollIntoView || selected.dataset.autoScrollIntoView)) return;
+
+    this.mask?.observerIntersection(selected);
+  }
+
   private getActionManagerConfig(config: StageCoreConfig): ActionManagerConfig {
     const actionManagerConfig: ActionManagerConfig = {
       containerHighlightClassName: config.containerHighlightClassName,
@@ -399,6 +410,10 @@ export default class StageCore extends EventEmitter {
     this.renderer?.on('page-el-update', (el: HTMLElement) => {
       this.mask?.observe(el);
       this.observePageResize(el);
+
+      // observe 切页时会重置滚动；若 select + scrollIntoView 已先完成，这里对仍挂载的选中节点
+      // 重新触发一次，避免滚动被打回顶部
+      this.scrollSelectedIntoViewAfterPageUpdate();
 
       this.emit('page-el-update', el);
     });

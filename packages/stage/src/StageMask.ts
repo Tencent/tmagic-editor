@@ -108,15 +108,29 @@ export default class StageMask extends Rule {
 
   /**
    * 初始化视窗和蒙层监听，监听元素是否在视窗区域、监听mask蒙层所在的wrapper大小变化
-   * @description 初始化视窗和蒙层监听
+   * @description 初始化视窗和蒙层监听；切换到新页面 DOM 时重置滚动
    * @param page 页面Dom节点
    */
   public observe(page: HTMLElement): void {
     if (!page) return;
 
+    const pageChanged = this.page !== page;
+
     this.page = page;
     this.initObserverIntersection();
     this.initObserverWrapper();
+
+    if (pageChanged) {
+      // runtime 按 pageId 重挂载后，滚动容器（多为 documentElement）可能仍残留上一页偏移；
+      // 新页默认从顶部展示：重置页面与 mask 滚动，并立刻 scroll() 刷新 transform/标尺。
+      // syncPageSize 在宽高为 0 时会提前返回，不能依赖它刷新视觉状态。
+      // 若 select 已先 scrollIntoView，由 StageCore 在 page-el-update 后重新触发一次补回。
+      this.pageScrollParent?.scrollTo({ top: 0, left: 0 });
+      this.scrollTop = 0;
+      this.scrollLeft = 0;
+      this.scroll();
+    }
+
     // 页面切换后立即同步一次；ResizeObserver 首次回调可能仍上报旧页/0 尺寸
     this.syncPageSize();
   }

@@ -89,13 +89,67 @@ describe('StageMask', () => {
     expect(mask.content.style.height).toBe('300px');
   });
 
-  test('observe 立即同步尺寸，并从长页切到短页时修正滚动偏移', () => {
+  test('observe 切到新页面时重置页面与 mask 滚动', () => {
     mask = new StageMask({ disabledRule: true });
+    const tallScrollParent = globalThis.document.createElement('div');
+    tallScrollParent.style.overflow = 'auto';
+    Object.defineProperty(tallScrollParent, 'scrollTop', { value: 0, writable: true, configurable: true });
+    Object.defineProperty(tallScrollParent, 'scrollLeft', { value: 0, writable: true, configurable: true });
+    tallScrollParent.scrollTo = vi.fn(({ top = 0, left = 0 }: ScrollToOptions = {}) => {
+      tallScrollParent.scrollTop = Number(top);
+      tallScrollParent.scrollLeft = Number(left);
+    });
+    globalThis.document.body.appendChild(tallScrollParent);
+
     const tallPage = globalThis.document.createElement('div');
     Object.defineProperty(tallPage, 'clientWidth', { value: 400, configurable: true });
     Object.defineProperty(tallPage, 'clientHeight', { value: 1000, configurable: true });
-    globalThis.document.body.appendChild(tallPage);
+    tallScrollParent.appendChild(tallPage);
     mask.observe(tallPage);
+    mask.wrapperWidth = 400;
+    mask.wrapperHeight = 300;
+    (mask as any).setMaxScrollLeft();
+    (mask as any).setMaxScrollTop();
+    mask.scrollTop = 500;
+    mask.scrollLeft = 80;
+    (mask as any).scroll();
+    expect(mask.scrollTop).toBe(500);
+    expect(tallScrollParent.scrollTop).toBe(500);
+
+    const shortScrollParent = globalThis.document.createElement('div');
+    shortScrollParent.style.overflow = 'auto';
+    // 模拟新页挂载前滚动容器仍残留偏移（如 iframe documentElement）
+    Object.defineProperty(shortScrollParent, 'scrollTop', { value: 500, writable: true, configurable: true });
+    Object.defineProperty(shortScrollParent, 'scrollLeft', { value: 80, writable: true, configurable: true });
+    shortScrollParent.scrollTo = vi.fn(({ top = 0, left = 0 }: ScrollToOptions = {}) => {
+      shortScrollParent.scrollTop = Number(top);
+      shortScrollParent.scrollLeft = Number(left);
+    });
+    globalThis.document.body.appendChild(shortScrollParent);
+
+    const shortPage = globalThis.document.createElement('div');
+    Object.defineProperty(shortPage, 'clientWidth', { value: 400, configurable: true });
+    Object.defineProperty(shortPage, 'clientHeight', { value: 400, configurable: true });
+    shortScrollParent.appendChild(shortPage);
+    mask.observe(shortPage);
+
+    expect(mask.width).toBe(400);
+    expect(mask.height).toBe(400);
+    expect(mask.maxScrollTop).toBe(100);
+    expect(shortScrollParent.scrollTop).toBe(0);
+    expect(shortScrollParent.scrollLeft).toBe(0);
+    expect(mask.scrollTop).toBe(0);
+    expect(mask.scrollLeft).toBe(0);
+    expect(mask.content.style.transform).toBe('translate3d(0px, 0px, 0)');
+  });
+
+  test('observe 同一页面 DOM 时不重新同步滚动；同页尺寸变化仅修正偏移', () => {
+    mask = new StageMask({ disabledRule: true });
+    const page = globalThis.document.createElement('div');
+    Object.defineProperty(page, 'clientWidth', { value: 400, configurable: true });
+    Object.defineProperty(page, 'clientHeight', { value: 1000, configurable: true });
+    globalThis.document.body.appendChild(page);
+    mask.observe(page);
     mask.wrapperWidth = 400;
     mask.wrapperHeight = 300;
     (mask as any).setMaxScrollLeft();
@@ -104,17 +158,95 @@ describe('StageMask', () => {
     (mask as any).scroll();
     expect(mask.scrollTop).toBe(500);
 
-    const shortPage = globalThis.document.createElement('div');
-    Object.defineProperty(shortPage, 'clientWidth', { value: 400, configurable: true });
-    Object.defineProperty(shortPage, 'clientHeight', { value: 400, configurable: true });
-    globalThis.document.body.appendChild(shortPage);
-    mask.observe(shortPage);
+    mask.observe(page);
+    expect(mask.scrollTop).toBe(500);
 
-    expect(mask.width).toBe(400);
+    Object.defineProperty(page, 'clientHeight', { value: 400, configurable: true });
+    mask.pageResize([makeResizeEntry(page)]);
     expect(mask.height).toBe(400);
     expect(mask.maxScrollTop).toBe(100);
     expect(mask.scrollTop).toBe(100);
-    expect(mask.content.style.transform).toBe('translate3d(0px, -100px, 0)');
+  });
+
+  test('observe 切到 0 尺寸页面时仍重置 transform，不依赖 syncPageSize', () => {
+    mask = new StageMask({ disabledRule: true });
+    const tallScrollParent = globalThis.document.createElement('div');
+    tallScrollParent.style.overflow = 'auto';
+    Object.defineProperty(tallScrollParent, 'scrollTop', { value: 0, writable: true, configurable: true });
+    tallScrollParent.scrollTo = vi.fn(({ top = 0 }: ScrollToOptions = {}) => {
+      tallScrollParent.scrollTop = Number(top);
+    });
+    globalThis.document.body.appendChild(tallScrollParent);
+
+    const tallPage = globalThis.document.createElement('div');
+    Object.defineProperty(tallPage, 'clientWidth', { value: 400, configurable: true });
+    Object.defineProperty(tallPage, 'clientHeight', { value: 1000, configurable: true });
+    tallScrollParent.appendChild(tallPage);
+    mask.observe(tallPage);
+    mask.wrapperWidth = 400;
+    mask.wrapperHeight = 300;
+    (mask as any).setMaxScrollTop();
+    mask.scrollTop = 500;
+    (mask as any).scroll();
+    expect(mask.content.style.transform).toBe('translate3d(0px, -500px, 0)');
+
+    const emptyScrollParent = globalThis.document.createElement('div');
+    emptyScrollParent.style.overflow = 'auto';
+    Object.defineProperty(emptyScrollParent, 'scrollTop', { value: 500, writable: true, configurable: true });
+    emptyScrollParent.scrollTo = vi.fn(({ top = 0 }: ScrollToOptions = {}) => {
+      emptyScrollParent.scrollTop = Number(top);
+    });
+    globalThis.document.body.appendChild(emptyScrollParent);
+
+    const emptyPage = globalThis.document.createElement('div');
+    Object.defineProperty(emptyPage, 'clientWidth', { value: 0, configurable: true });
+    Object.defineProperty(emptyPage, 'clientHeight', { value: 0, configurable: true });
+    emptyScrollParent.appendChild(emptyPage);
+
+    const customScrollHandler = vi.fn();
+    mask.content.addEventListener('customScroll', customScrollHandler);
+    mask.observe(emptyPage);
+
+    // 尺寸保持旧值（syncPageSize 忽略 0），但滚动视觉状态必须立刻归零
+    expect(mask.width).toBe(400);
+    expect(mask.height).toBe(1000);
+    expect(mask.scrollTop).toBe(0);
+    expect(emptyScrollParent.scrollTop).toBe(0);
+    expect(mask.content.style.transform).toBe('translate3d(0px, 0px, 0)');
+    expect(customScrollHandler).toHaveBeenCalled();
+    expect(customScrollHandler.mock.calls.at(-1)?.[0].detail).toEqual({
+      scrollLeft: 0,
+      scrollTop: 0,
+    });
+  });
+
+  test('observe 无 pageScrollParent 时仍重置 mask 滚动并刷新 transform', () => {
+    mask = new StageMask({ disabledRule: true });
+    // position: fixed 时 getScrollParent 返回 null
+    const page = globalThis.document.createElement('div');
+    page.style.position = 'fixed';
+    Object.defineProperty(page, 'clientWidth', { value: 400, configurable: true });
+    Object.defineProperty(page, 'clientHeight', { value: 1000, configurable: true });
+    globalThis.document.body.appendChild(page);
+    mask.observe(page);
+    expect((mask as any).pageScrollParent).toBeNull();
+    mask.wrapperWidth = 400;
+    mask.wrapperHeight = 300;
+    (mask as any).setMaxScrollTop();
+    mask.scrollTop = 500;
+    (mask as any).scroll();
+    expect(mask.content.style.transform).toBe('translate3d(0px, -500px, 0)');
+
+    const nextPage = globalThis.document.createElement('div');
+    nextPage.style.position = 'fixed';
+    Object.defineProperty(nextPage, 'clientWidth', { value: 400, configurable: true });
+    Object.defineProperty(nextPage, 'clientHeight', { value: 400, configurable: true });
+    globalThis.document.body.appendChild(nextPage);
+    mask.observe(nextPage);
+
+    expect((mask as any).pageScrollParent).toBeNull();
+    expect(mask.scrollTop).toBe(0);
+    expect(mask.content.style.transform).toBe('translate3d(0px, 0px, 0)');
   });
 
   test('pageResize 忽略非当前页、已卸载页与 0 尺寸，避免切换页面后 editor-mask 变为 0', () => {

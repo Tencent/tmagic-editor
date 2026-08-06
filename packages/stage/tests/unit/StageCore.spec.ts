@@ -231,6 +231,79 @@ describe('StageCore', () => {
     stage.destroy();
   });
 
+  test('page-el-update 重置滚动后，对仍挂载的选中节点重新触发 scrollIntoView', async () => {
+    const host = globalThis.document.createElement('div');
+    globalThis.document.body.appendChild(host);
+    const page = globalThis.document.createElement('div');
+    page.className = 'magic-ui-page';
+    setIdToEl()(page, 'page_1');
+    const node = globalThis.document.createElement('div');
+    setIdToEl()(node, 'scroll-node');
+    node.style.cssText = 'position:absolute;width:10px;height:10px;';
+    page.appendChild(node);
+
+    const stage = new StageCore({
+      renderType: RenderType.NATIVE,
+      disabledRule: true,
+      autoScrollIntoView: true,
+      render: async () => page,
+    });
+    await stage.mount(host);
+    mountRuntime(stage);
+    await stage.select('scroll-node');
+
+    const spy = vi.spyOn(stage.mask!, 'observerIntersection');
+    spy.mockClear();
+
+    // 模拟切页：选中节点挂到仍在文档中的新 page 上，observe 会重置滚动
+    const newPage = globalThis.document.createElement('div');
+    newPage.className = 'magic-ui-page';
+    setIdToEl()(newPage, 'page_2');
+    page.replaceWith(newPage);
+    newPage.appendChild(node);
+    expect(node.isConnected).toBe(true);
+    stage.renderer!.getMagicApi().onPageElUpdate(newPage);
+
+    expect(spy).toHaveBeenCalledWith(node);
+    stage.destroy();
+  });
+
+  test('page-el-update 时旧选中节点已卸载则不重新 scrollIntoView', async () => {
+    const host = globalThis.document.createElement('div');
+    globalThis.document.body.appendChild(host);
+    const page = globalThis.document.createElement('div');
+    page.className = 'magic-ui-page';
+    setIdToEl()(page, 'page_1');
+    const node = globalThis.document.createElement('div');
+    setIdToEl()(node, 'scroll-node');
+    node.style.cssText = 'position:absolute;width:10px;height:10px;';
+    page.appendChild(node);
+
+    const stage = new StageCore({
+      renderType: RenderType.NATIVE,
+      disabledRule: true,
+      autoScrollIntoView: true,
+      render: async () => page,
+    });
+    await stage.mount(host);
+    mountRuntime(stage);
+    await stage.select('scroll-node');
+
+    const spy = vi.spyOn(stage.mask!, 'observerIntersection');
+    spy.mockClear();
+
+    // 新页不包含旧选中节点（已随旧页卸载）
+    const newPage = globalThis.document.createElement('div');
+    newPage.className = 'magic-ui-page';
+    setIdToEl()(newPage, 'page_2');
+    globalThis.document.body.appendChild(newPage);
+    node.remove();
+    stage.renderer!.getMagicApi().onPageElUpdate(newPage);
+
+    expect(spy).not.toHaveBeenCalled();
+    stage.destroy();
+  });
+
   test('getElementImage / reloadIframe / getAddContainerHighlightClassNameTimeout 代理', async () => {
     const { host, page, stage } = createStage();
     await stage.mount(host);
