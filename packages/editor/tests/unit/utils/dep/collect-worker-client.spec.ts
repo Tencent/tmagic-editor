@@ -23,6 +23,8 @@ vi.mock('@editor/utils/dep/worker.ts?worker&inline', () => ({
     public static throwOnCreate = false;
     /** postMessage 抛错，如结构化克隆失败 */
     public static throwOnPost = false;
+    /** 模拟大页面收集耗时 */
+    public static delay = 0;
 
     public onmessage: ((e: any) => void) | null = null;
     public onerror: (() => void) | null = null;
@@ -52,7 +54,7 @@ vi.mock('@editor/utils/dep/worker.ts?worker&inline', () => ({
         this.onmessage?.({
           data: { id: request.id, failed: FakeCollectWorker.failed, ...FakeCollectWorker.response },
         });
-      });
+      }, FakeCollectWorker.delay);
     }
 
     public terminate() {
@@ -81,6 +83,7 @@ beforeEach(async () => {
   fakeCollectWorker.fatal = false;
   fakeCollectWorker.throwOnCreate = false;
   fakeCollectWorker.throwOnPost = false;
+  fakeCollectWorker.delay = 0;
 
   (globalThis as any).Worker = class {};
 });
@@ -241,17 +244,97 @@ describe('dep/collect-worker-client', () => {
     expect(fakeCollectWorker.instances[0].terminated).toBe(true);
   });
 
-  test('abort 与 terminate 一样丢弃在途请求，后续收集会重建 worker', async () => {
+  test('abort 丢弃在途请求，但保留常驻 worker（不重建、不重复加载）', async () => {
     const fakeCollectWorker = await getFakeWorker();
     const client = new CollectWorkerClient();
 
     const promise = client.collect(payload);
     client.abort();
 
+    // 在途请求按 null 结算，调用方回退主线程收集
     await expect(promise).resolves.toBeNull();
-    expect(fakeCollectWorker.instances[0].terminated).toBe(true);
+    expect(fakeCollectWorker.instances[0].terminated).toBe(false);
 
+    // worker 复用，不会因为 abort 重建
     await expect(client.collect(payload)).resolves.not.toBeNull();
-    expect(fakeCollectWorker.instances).toHaveLength(2);
+    expect(fakeCollectWorker.instances).toHaveLength(1);
+  });
+
+  test('被 abort 丢弃的请求结果不会回传，且不阻塞后续请求', async () => {
+    const fakeCollectWorker = await getFakeWorker();
+    const client = new CollectWorkerClient();
+    const settled: unknown[] = [];
+
+    const aborted = client.collect(payload).then((result) => settled.push(result));
+    client.abort();
+    // abort 后紧接着的新请求（如 root 更新触发的全量收集）排在被丢弃请求之后，仍能拿到结果
+    const next = client.collectDsl(dsl);
+
+    await Promise.all([aborted, next]);
+
+    expect(settled).toEqual([null]);
+    await expect(next).resolves.not.toBeNull();
+    expect(fakeCollectWorker.instances).toHaveLength(1);
+  });
+
+  test('无在途请求时 abort 保留常驻 worker，不会反复加载 worker 产物', async () => {
+    const fakeCollectWorker = await getFakeWorker();
+    const client = new CollectWorkerClient();
+
+    await client.collectDsl(dsl);
+    expect(fakeCollectWorker.instances).toHaveLength(1);
+
+    // 模拟 root 更新：clearIdleTasks 先 abort，紧接着发起全量收集
+    client.abort();
+    await client.collectDsl(dsl);
+
+    expect(fakeCollectWorker.instances).toHaveLength(1);
+    expect(fakeCollectWorker.instances[0].terminated).toBe(false);
+  });
+
+  test('大页面长耗时 + 连续 abort/收集：不重建 worker，最终请求仍能完成', async () => {
+    const fakeCollectWorker = await getFakeWorker();
+    // 模拟大页面收集耗时；连续 abort 落在「上一次还没跑完」的窗口内
+    fakeCollectWorker.delay = 80;
+    const client = new CollectWorkerClient();
+    const results: Array<unknown> = [];
+
+    // 首轮投递后，在 worker 忙时连续模拟 root 更新：abort + 新全量收集
+    const first = client.collectDsl(dsl).then((result) => results.push(result));
+    const overlapping: Promise<unknown>[] = [];
+    for (let i = 0; i < 12; i++) {
+      client.abort();
+      overlapping.push(client.collectDsl(dsl).then((result) => results.push(result)));
+    }
+
+    const all = await Promise.all([first, ...overlapping]);
+
+    // 不应陷入「加载中被销毁 → 重建」：始终只有 1 个 worker 实例
+    expect(fakeCollectWorker.instances).toHaveLength(1);
+    expect(fakeCollectWorker.instances[0].terminated).toBe(false);
+    // 被 abort 的立即 null；最后一次保留的请求能拿到结果
+    expect(results.filter((item) => item === null).length).toBeGreaterThan(0);
+    expect(all[all.length - 1]).not.toBeNull();
+    // discarded 长任务仍占 worker：真正投递给 worker 的次数远少于发起次数
+    expect(fakeCollectWorker.requests.length).toBeLessThan(all.length);
+    expect(fakeCollectWorker.requests.length).toBeGreaterThanOrEqual(1);
+  });
+
+  test('abort 后新请求要等 discarded 长任务结束才能投递', async () => {
+    const fakeCollectWorker = await getFakeWorker();
+    fakeCollectWorker.delay = 60;
+    const client = new CollectWorkerClient();
+
+    const first = client.collectDsl(dsl);
+    client.abort();
+    const next = client.collectDsl(dsl);
+
+    // abort 后立刻结算旧请求，但新请求尚未投递（仍被 discarded inflight 堵住）
+    await expect(first).resolves.toBeNull();
+    expect(fakeCollectWorker.requests).toHaveLength(1);
+
+    await expect(next).resolves.not.toBeNull();
+    expect(fakeCollectWorker.requests).toHaveLength(2);
+    expect(fakeCollectWorker.instances).toHaveLength(1);
   });
 });

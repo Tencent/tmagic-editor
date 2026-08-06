@@ -545,21 +545,101 @@ describe('Dep service', () => {
     expect(depService.get('collecting')).toBe(false);
   });
 
-  test('clearIdleTasks 会 abort 常驻 worker，避免在途任务继续占用', async () => {
+  test('clearIdleTasks 会丢弃在途 worker 结果，但不会销毁重建常驻 worker', async () => {
     const fakeCollectWorker = await enableCollectWorker();
     fakeCollectWorker.delay = 50;
     depService.addTarget(createDataSourceTarget({ id: 'ds_1', fields: [] }, reactive({})));
 
     const promise = depService.collectIdle([{ id: 'n1', type: 'text' }] as any, {}, true, DepTargetType.DATA_SOURCE);
-    expect(fakeCollectWorker.instances).toHaveLength(1);
+    const instanceLength = fakeCollectWorker.instances.length;
 
     depService.clearIdleTasks();
     await expect(promise).resolves.toBe(false);
 
-    // abort 后再次收集会新建 worker，而不是排队在已 abort 的旧任务后面
+    // 中断只丢结果：worker 复用，避免「加载中被销毁 → 重建 → 又被销毁」的反复加载
     fakeCollectWorker.delay = 0;
     await depService.collectIdle([{ id: 'n2', type: 'text' }] as any, {}, true, DepTargetType.DATA_SOURCE);
-    expect(fakeCollectWorker.instances.length).toBeGreaterThan(1);
+    expect(fakeCollectWorker.instances.length).toBe(instanceLength);
+  });
+
+  test('root 反复更新时复用常驻 worker，不会重复创建', async () => {
+    const fakeCollectWorker = await enableCollectWorker();
+    const dsl = { id: 'app', type: 'app', items: [] } as any;
+
+    depService.clearIdleTasks();
+    await depService.collectByWorker(dsl);
+    const instanceLength = fakeCollectWorker.instances.length;
+
+    // root 更新流程：clearIdleTasks + 全量收集，多次更新应始终复用同一个 worker
+    for (let i = 0; i < 3; i++) {
+      depService.clearIdleTasks();
+      await depService.collectByWorker(dsl);
+    }
+
+    expect(fakeCollectWorker.requests).toHaveLength(4);
+    expect(fakeCollectWorker.instances.length).toBe(instanceLength);
+  });
+
+  test('大页面 + 连续 root/数据源变更：不反复创建 worker，最终收集可完成', async () => {
+    const fakeCollectWorker = await enableCollectWorker();
+    // 模拟大页面：worker 单次收集较慢，后续变更会打在「上一次还没结束」的窗口
+    fakeCollectWorker.nextDelay = 80;
+    fakeCollectWorker.delay = 80;
+    fakeCollectWorker.nextData = {
+      [DepTargetType.DATA_SOURCE]: { ds_1: { n1: { name: 'n1', keys: ['text'] } } },
+    };
+    fakeCollectWorker.response = {
+      deps: { [DepTargetType.DATA_SOURCE]: { ds_1: { n1: { name: 'n1', keys: ['text'] } } } },
+      nodeIds: ['n1'],
+    };
+
+    const dsl = {
+      id: 'app',
+      type: 'app',
+      items: Array.from({ length: 200 }, (_, index) => ({ id: `n${index}`, type: 'text', text: '${ds_1.name}' })),
+      dataSources: [{ id: 'ds_1', fields: [{ name: 'name', type: 'string' }] }],
+      dataSourceDeps: {},
+    } as any;
+
+    depService.addTarget(
+      createDataSourceTarget({ id: 'ds_1', fields: [{ name: 'name', type: 'string' }] }, reactive({})),
+    );
+
+    // 先暖机一次：depService 单例可能复用上个用例的 worker，以当前 instances 为基线
+    await depService.collectByWorker(dsl);
+    const instanceLength = fakeCollectWorker.instances.length;
+    const requestLength = fakeCollectWorker.requests.length;
+
+    const settled: boolean[] = [];
+    // 首轮 root 全量收集尚未完成时，交错触发 root 更新与数据源重收
+    const firstRoot = depService.collectByWorker(dsl).then(() => settled.push(true));
+    const overlapping: Promise<unknown>[] = [];
+
+    for (let i = 0; i < 8; i++) {
+      depService.clearIdleTasks();
+      overlapping.push(depService.collectByWorker(dsl).then(() => settled.push(true)));
+
+      depService.clearIdleTasks();
+      overlapping.push(
+        depService
+          .collectIdle(
+            [{ id: `n${i}`, type: 'text', text: '${ds_1.name}' }] as any,
+            {},
+            true,
+            DepTargetType.DATA_SOURCE,
+          )
+          .then((completed) => settled.push(completed)),
+      );
+    }
+
+    await Promise.all([firstRoot, ...overlapping]);
+
+    // 连续变更不应再 new Worker（instances 不增长）；请求有实际投递
+    expect(fakeCollectWorker.instances.length).toBe(instanceLength);
+    expect(fakeCollectWorker.requests.length).toBeGreaterThan(requestLength);
+    // 最终至少有一轮完整收集完成；中间被 clearIdleTasks 打断的 idle 可能是 false
+    expect(settled.some(Boolean)).toBe(true);
+    expect(depService.get('collecting')).toBe(false);
   });
 
   test('collectIdle 节点为空时不会启动 worker', async () => {
