@@ -1,3 +1,11 @@
+# [1.8.0-beta.23](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.22...v1.8.0-beta.23) (2026-08-06)
+
+
+### Bug Fixes
+
+* **editor:** abort 时保留常驻依赖收集 worker，避免反复重建 ([efb637e](https://github.com/Tencent/tmagic-editor/commit/efb637e72e19c4c1ce5eb07a4c6dd9e6828778d1))
+* **form:** 优化可选项校验建议文案并导出供 editor 复用 ([0d1a17d](https://github.com/Tencent/tmagic-editor/commit/0d1a17dce3b8b912238f822ad7d67c1992af53f4))
+* **stage:** 修复切换页面后 mask 滚动重置与 scrollIntoView 失效 ([cf007f9](https://github.com/Tencent/tmagic-editor/commit/cf007f9082043589ce94fb3dd1c11dbf96ca0e1d))
 # [1.8.0-beta.22](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.21...v1.8.0-beta.22) (2026-08-04)
 
 
