@@ -430,6 +430,87 @@ describe('add', () => {
     expect(editorService.get('node')?.id).toBe(beforeNodeId);
   });
 
+  test('doNotSelect: true 连续多次 add 保持插入顺序', async () => {
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.NODE_ID);
+
+    const first = await editorService.add({ type: 'text' }, null, { doNotSelect: true });
+    const second = await editorService.add({ type: 'text' }, null, { doNotSelect: true });
+    const firstId = Array.isArray(first) ? first[0].id : first.id;
+    const secondId = Array.isArray(second) ? second[0].id : second.id;
+
+    const parent = editorService.getParentById(firstId);
+    const ids = parent?.items.map((item) => item.id);
+    // 应紧接在原选中节点之后，且先后顺序不被后一次 splice 颠倒
+    expect(ids).toEqual([NodeId.NODE_ID, firstId, secondId, NodeId.NODE_ID2]);
+    expect(editorService.get('node')?.id).toBe(NodeId.NODE_ID);
+  });
+
+  test('批量 add 多个节点时按传入顺序插入', async () => {
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.NODE_ID);
+
+    const added = await editorService.add(
+      [
+        { id: 'batch-a', type: 'text', style: {} },
+        { id: 'batch-b', type: 'text', style: {} },
+        { id: 'batch-c', type: 'text', style: {} },
+      ],
+      null,
+      { doNotSelect: true },
+    );
+
+    expect(Array.isArray(added)).toBe(true);
+    const parent = editorService.getParentById('batch-a');
+    expect(parent?.items.map((item) => item.id)).toEqual([
+      NodeId.NODE_ID,
+      'batch-a',
+      'batch-b',
+      'batch-c',
+      NodeId.NODE_ID2,
+    ]);
+  });
+
+  test('插件注册异步 beforeDoAdd 时批量 add 仍按顺序插入', async () => {
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.NODE_ID);
+
+    // beforeDoAdd 是公开插件钩子，异步实现会让 doAdd 在插入节点前先让出线程；
+    // 这里刻意让耗时递减，插入顺序不能依赖钩子的返回快慢
+    const delays = [30, 20, 10];
+    let callIndex = 0;
+    const beforeDoAdd = async (...args: any[]) => {
+      const delay = delays[callIndex] ?? 0;
+      callIndex += 1;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      return args;
+    };
+    editorService.usePlugin({ beforeDoAdd });
+
+    try {
+      await editorService.add(
+        [
+          { id: 'hook-a', type: 'text', style: {} },
+          { id: 'hook-b', type: 'text', style: {} },
+          { id: 'hook-c', type: 'text', style: {} },
+        ] as MNode[],
+        null,
+        { doNotSelect: true },
+      );
+
+      const parent = editorService.getParentById('hook-a');
+      expect(parent?.items.map((item) => item.id)).toEqual([
+        NodeId.NODE_ID,
+        'hook-a',
+        'hook-b',
+        'hook-c',
+        NodeId.NODE_ID2,
+      ]);
+    } finally {
+      editorService.removePlugin({ beforeDoAdd });
+    }
+  });
+
   test('doNotSwitchPage: true 新增页面时保持当前页面不切换', async () => {
     editorService.set('root', cloneDeep(root));
     await editorService.select(NodeId.PAGE_ID);

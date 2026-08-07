@@ -235,6 +235,8 @@ export interface UpdateData {
   parent?: MContainer;
   parentId?: Id;
   root: MApp;
+  /** 插入到父节点 items 中的目标下标；runtime 优先按此同步，避免依赖选中态推算顺序 */
+  index?: number;
 }
 
 export interface RemoveData {

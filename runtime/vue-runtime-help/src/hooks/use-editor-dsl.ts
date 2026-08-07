@@ -88,7 +88,7 @@ export const useEditorDsl = (app = inject<TMagicApp>('app'), runtimeApi: Runtime
       return nextTick().then(() => getElById()(document, `${id}`));
     },
 
-    add: ({ config, parentId, root: appConfig }: UpdateData) => {
+    add: ({ config, parentId, root: appConfig, index }: UpdateData) => {
       if (!root.value) {
         if (appConfig) {
           updateRoot(appConfig);
@@ -107,9 +107,13 @@ export const useEditorDsl = (app = inject<TMagicApp>('app'), runtimeApi: Runtime
         parentNode && app?.page?.initNode(config, parentNode);
       }
 
-      if (parent.id !== selectedId.value) {
-        const index = parent.items?.findIndex((child: MNode) => child.id === selectedId.value);
-        parent.items?.splice(index + 1, 0, config);
+      // 编辑器传了 index 就按它对齐，避免连续 add / 撤销重做时与选中态推算的结果不一致；
+      // 老版本编辑器不带 index，保持原有的「接在选中节点之后」逻辑
+      if (typeof index === 'number' && index >= 0 && index <= (parent.items?.length ?? 0)) {
+        parent.items?.splice(index, 0, config);
+      } else if (parent.id !== selectedId.value) {
+        const selectedIndex = parent.items?.findIndex((child: MNode) => child.id === selectedId.value);
+        parent.items?.splice(selectedIndex + 1, 0, config);
       } else {
         // 新增节点添加到配置中
         parent.items?.push(config);

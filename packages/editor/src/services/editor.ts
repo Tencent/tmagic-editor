@@ -83,6 +83,10 @@ import { beforePaste, getAddParent } from '@editor/utils/operator';
 
 type MoveItem = { node: MNode; parent: MContainer; pageForOp: { name: string; id: Id } | null };
 
+/** 历史插回时把记录的下标收敛到 [0, length]，越界（含未记录）一律追加到末尾 */
+const clampIndex = (index: number | undefined, length: number): number =>
+  typeof index === 'number' && index >= 0 && index <= length ? index : length;
+
 /**
  * 把「变更前后节点快照」列表归一成 update 类型的 {@link StepDiffItem} 列表，供 {@link StepValue.diff} 使用。
  * `changeRecords` 来自 form 端的 propPath/value 列表，撤销/重做时只对这些 propPath 做局部更新；
@@ -126,6 +130,11 @@ class Editor extends BaseService {
    * 普通操作不会读取它，调用前由 *AndGetHistoryId 重置为 null。
    */
   private lastPushedHistoryId: string | null = null;
+  /**
+   * 上一次 doAdd 的插入记忆：nodeId 为插入的节点，selectedId 为当时的选中节点。
+   * 仅在选中节点未变化时复用（连续 add / doNotSelect / 批量粘贴），选中变化后自动失效，无需手动清理。
+   */
+  private lastAdded: { selectedId: Id; nodeId: Id } | null = null;
 
   constructor() {
     super(
@@ -418,13 +427,16 @@ class Editor extends BaseService {
       throw new Error('app下不能添加组件');
     }
 
-    if (parent.id !== curNode.id && !isPageOrFragment(node)) {
-      const index = parent.items.indexOf(curNode);
-      parent.items?.splice(index + 1, 0, node);
-    } else {
-      // 新增节点添加到配置中
-      parent.items?.push(node);
-    }
+    // 连续 add 时接在上一个新增节点之后，否则接在当前选中节点之后；
+    // 锚点节点可能已不在 items 中（被删 / DSL 整体替换），回退到当前选中节点，都不在则追加到末尾
+    const anchorId = this.lastAdded?.selectedId === curNode.id ? this.lastAdded.nodeId : curNode.id;
+    const anchorIndex = isPageOrFragment(node)
+      ? -1
+      : Math.max(getNodeIndex(anchorId, parent), getNodeIndex(curNode.id, parent));
+    const insertIndex = anchorIndex < 0 ? parent.items.length : anchorIndex + 1;
+
+    parent.items.splice(insertIndex, 0, node);
+    this.lastAdded = { selectedId: curNode.id, nodeId: node.id };
 
     const layout = await this.getLayout(toRaw(parent), node as MNode);
     node.style = getInitPositionStyle(node.style, layout);
@@ -434,6 +446,7 @@ class Editor extends BaseService {
       parent: cloneDeep(parent),
       parentId: parent.id,
       root: cloneDeep(root),
+      index: insertIndex,
     });
 
     const newStyle = fixNodePosition(node, parent, stage);
@@ -485,17 +498,15 @@ class Editor extends BaseService {
       addNodes.push(...addNode);
     }
 
-    const newNodes = await Promise.all(
-      addNodes.map((node) => {
-        const root = this.get('root');
-        if (isPageOrFragment(node) && root) {
-          return this.doAdd(node, root);
-        }
-        const parentNode = parent ?? getAddParent(node);
-        if (!parentNode) throw new Error('未找到父元素');
-        return this.doAdd(node, parentNode);
-      }),
-    );
+    // 必须串行：每个节点的插入位置依赖上一个已插入的节点，并行时插入顺序会受
+    // doAdd 前置耗时（如异步 beforeDoAdd 插件钩子）影响而错乱
+    const newNodes: MNode[] = [];
+    for (const node of addNodes) {
+      const root = this.get('root');
+      const parentNode = isPageOrFragment(node) && root ? root : (parent ?? getAddParent(node));
+      if (!parentNode) throw new Error('未找到父元素');
+      newNodes.push(await this.doAdd(node, parentNode));
+    }
 
     if (newNodes.length > 1) {
       // 多选时只要任一新增节点位于非当前页面，触发的 multiSelect 就会引起页面切换
@@ -1987,17 +1998,15 @@ class Editor extends BaseService {
             const parent = this.getNodeById(parentId, false) as MContainer | null;
             if (parent?.items) {
               const addedNode = cloneDeep(newSchema);
-              if (typeof index === 'number' && index >= 0 && index < parent.items.length) {
-                parent.items.splice(index, 0, addedNode);
-              } else {
-                parent.items.push(addedNode);
-              }
+              const insertIndex = clampIndex(index, parent.items.length);
+              parent.items.splice(insertIndex, 0, addedNode);
               addedNodes.push(addedNode);
               await stage?.add({
                 config: cloneDeep(newSchema),
                 parent: cloneDeep(parent),
                 parentId: parent.id,
                 root: cloneDeep(root),
+                index: insertIndex,
               });
             }
           }
@@ -2016,13 +2025,15 @@ class Editor extends BaseService {
             const parent = this.getNodeById(parentId, false) as MContainer | null;
             if (parent?.items) {
               const addedNode = cloneDeep(oldSchema);
-              parent.items.splice(index ?? parent.items.length, 0, addedNode);
+              const insertIndex = clampIndex(index, parent.items.length);
+              parent.items.splice(insertIndex, 0, addedNode);
               addedNodes.push(addedNode);
               await stage?.add({
                 config: cloneDeep(oldSchema),
                 parent: cloneDeep(parent),
                 parentId,
                 root: cloneDeep(root),
+                index: insertIndex,
               });
             }
           }
