@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import type { EventOption, Id, MComponent, MContainer } from '@tmagic/core';
+import type { EventOption, Id, MComponent, MContainer, MNode } from '@tmagic/core';
 import type { CascaderOption } from '@tmagic/form';
 import { DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX, traverseNode } from '@tmagic/utils';
 
@@ -56,7 +56,7 @@ export const getEventNameOptions = (
   }
 
   if (src === 'component') {
-    const sourceNode = editorService.getNodeById(formValue.id);
+    const sourceNode = editorService.getNodeById(formValue.id) || (formValue as MNode);
     let events: EventOption[] | CascaderOption[] = eventsService.getEvent(formValue.type, { node: sourceNode }) || [];
 
     if (formValue.type === 'page-fragment-container' && formValue.pageFragmentId) {

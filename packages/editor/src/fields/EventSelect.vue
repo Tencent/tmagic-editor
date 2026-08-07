@@ -85,7 +85,7 @@ import { Delete } from '@element-plus/icons-vue';
 import { Plus } from '@element-plus/icons-vue';
 import { has } from 'lodash-es';
 
-import { ActionType } from '@tmagic/core';
+import { ActionType, MNode } from '@tmagic/core';
 import { TMagicButton } from '@tmagic/design';
 import type {
   CodeSelectColConfig,
@@ -327,8 +327,8 @@ const tableConfig = computed(
           name: 'method',
           label: '动作',
           type: compActionConfig.value.type,
-          options: (mForm: FormState, { model }: any) => {
-            const node = editorService.getNodeById(model.to);
+          options: (mForm: FormState, { model, formValue }: any) => {
+            const node = editorService.getNodeById(model.to) || (formValue as MNode);
             if (!node?.type) return [];
 
             return eventsService.getMethod(node.type, { targetId: model.to, node }).map((option: any) => ({
