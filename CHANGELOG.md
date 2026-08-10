@@ -1,3 +1,16 @@
+# [1.8.0-beta.24](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.23...v1.8.0-beta.24) (2026-08-10)
+
+
+### Bug Fixes
+
+* **editor:** 修复连续 add 与批量插入时节点顺序错乱 ([a7198e2](https://github.com/Tencent/tmagic-editor/commit/a7198e273123484822987c4d1838b2cc4689fb86))
+* **editor:** 移除 removeStyleDisplayConfig 并取消属性 tab 懒加载 ([8550e6f](https://github.com/Tencent/tmagic-editor/commit/8550e6f854e1d0d0267b7064836f845aa2b004f9))
+* **editor:** 节点未注册时回退使用 formValue 加载事件与动作选项 ([53c4763](https://github.com/Tencent/tmagic-editor/commit/53c4763a596abfb355061db651dc56843e75cacc))
+
+
+### Features
+
+* **form,editor:** 静默校验模式下跳过叶子字段渲染以提升性能 ([44cd3d4](https://github.com/Tencent/tmagic-editor/commit/44cd3d480f5f3b76bb6ba6d2bc4b2632f6a5e957))
 # [1.8.0-beta.23](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.22...v1.8.0-beta.23) (2026-08-06)
 
 
