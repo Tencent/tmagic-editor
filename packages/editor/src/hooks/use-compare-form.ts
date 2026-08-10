@@ -23,7 +23,6 @@ import { type FormConfig, type FormState, type FormValue, MForm } from '@tmagic/
 
 import type { CompareFormBaseProps } from '@editor/type';
 import { getCodeBlockFormConfig } from '@editor/utils/code-block';
-import { removeStyleDisplayConfig } from '@editor/utils/props';
 
 export interface UseCompareFormReturn {
   config: Ref<FormConfig>;
@@ -107,9 +106,7 @@ export const useCompareForm = (props: CompareFormBaseProps): UseCompareFormRetur
         if (!props.type) {
           return [];
         }
-        return removeStyleDisplayConfig(
-          await props.services.propsService.getPropsConfig(props.type, { node: props.value as unknown as MNode }),
-        );
+        return props.services.propsService.getPropsConfig(props.type, { node: props.value as unknown as MNode });
       }
       case 'data-source': {
         const config = props.services.dataSourceService.getFormConfig(props.type || 'base');

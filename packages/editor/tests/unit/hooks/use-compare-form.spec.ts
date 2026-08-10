@@ -81,14 +81,18 @@ describe('useCompareForm', () => {
     expect(captured.config.value).toEqual([]);
   });
 
-  test('node 类别加载 props 配置并把「样式」tab display 置为 true', async () => {
+  test('node 类别加载 props 配置并原样返回 getPropsConfig 结果', async () => {
     const { captured } = mountHook({ category: 'node', type: 'text', value: { id: 'n1' }, services });
     await nextTick();
     await nextTick();
     expect(propsService.getPropsConfig).toHaveBeenCalledWith('text', { node: { id: 'n1' } });
-    const tab = captured.config.value.find((i: any) => i.type === 'tab');
-    const stylePane = tab.items.find((p: any) => p.title === '样式');
-    expect(stylePane.display).toBe(true);
+    expect(captured.config.value).toEqual([
+      {
+        type: 'tab',
+        items: [{ title: '样式', items: [{ type: 'text', name: 'color', display: false }] }],
+      },
+      { type: 'text', name: 'name' },
+    ]);
   });
 
   test('node 类别缺少 type 时返回空配置', async () => {

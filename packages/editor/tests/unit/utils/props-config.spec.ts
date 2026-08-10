@@ -17,7 +17,6 @@ import {
   fillConfig,
   getCondOpOptionsByFieldType,
   numberOptions,
-  removeStyleDisplayConfig,
   styleTabConfig,
 } from '@editor/utils/props';
 
@@ -64,6 +63,12 @@ describe('props 选项常量', () => {
     expect(styleTabConfig.title).toBe('样式');
     expect(eventTabConfig.title).toBe('事件');
     expect(displayTabConfig.title).toBe('显示条件');
+  });
+
+  test('styleTabConfig / eventTabConfig / advancedTabConfig 不使用 lazy 懒加载', () => {
+    expect(styleTabConfig.lazy).toBeUndefined();
+    expect(eventTabConfig.lazy).toBeUndefined();
+    expect(advancedTabConfig.lazy).toBeUndefined();
   });
 
   test('advancedTabConfig 中包含 created/mounted/display', () => {
@@ -167,53 +172,5 @@ describe('fillConfig', () => {
     codeSelects.forEach((cs: any) => {
       expect(cs.labelPosition).toBe('top');
     });
-  });
-});
-
-describe('removeStyleDisplayConfig', () => {
-  test('将 tab 内「样式」pane 的 display 置为 true', () => {
-    const config = [
-      {
-        type: 'tab',
-        items: [
-          { title: '属性', items: [{ name: 'a' }] },
-          { title: '样式', display: false, items: [{ name: 'color' }] },
-        ],
-      },
-    ] as any;
-
-    const result = removeStyleDisplayConfig(config) as any;
-    const stylePane = result[0].items.find((i: any) => i.title === '样式');
-    expect(stylePane.display).toBe(true);
-    // 非样式 pane 保持不变
-    expect(result[0].items.find((i: any) => i.title === '属性').display).toBeUndefined();
-  });
-
-  test('不修改入参，返回浅拷贝', () => {
-    const stylePane = { title: '样式', display: false, items: [{ name: 'color' }] };
-    const config = [{ type: 'tab', items: [stylePane] }] as any;
-
-    const result = removeStyleDisplayConfig(config) as any;
-    expect(result).not.toBe(config);
-    expect(result[0]).not.toBe(config[0]);
-    expect(stylePane.display).toBe(false);
-  });
-
-  test('非 tab 项 / 无 items 的项原样返回', () => {
-    const plain = { name: 'x', type: 'text' };
-    const tabWithoutItems = { type: 'tab' };
-    const noType = { foo: 'bar' };
-    const config = [plain, tabWithoutItems, noType] as any;
-
-    const result = removeStyleDisplayConfig(config) as any;
-    expect(result[0]).toBe(plain);
-    expect(result[1]).toBe(tabWithoutItems);
-    expect(result[2]).toBe(noType);
-  });
-
-  test('样式 pane 无 items 数组时不处理', () => {
-    const config = [{ type: 'tab', items: [{ title: '样式' }] }] as any;
-    const result = removeStyleDisplayConfig(config) as any;
-    expect(result[0].items[0].display).toBeUndefined();
   });
 });
