@@ -5,7 +5,7 @@
  */
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { defineComponent, h, nextTick } from 'vue';
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 
 import ViewForm from '@editor/components/ViewForm.vue';
 
@@ -52,6 +52,12 @@ beforeEach(() => {
   capturedFormProps = {};
 });
 
+const waitForFormReady = async (wrapper: VueWrapper) => {
+  await vi.waitFor(() => {
+    expect(wrapper.find('.fake-mform').exists()).toBe(true);
+  });
+};
+
 describe('ViewForm.vue', () => {
   test('node 类别按 type 加载配置并渲染 MForm', async () => {
     const wrapper = mount(ViewForm, {
@@ -62,15 +68,14 @@ describe('ViewForm.vue', () => {
         services,
       },
     });
-    await nextTick();
-    await nextTick();
+    await waitForFormReady(wrapper);
     expect(propsService.getPropsConfig).toHaveBeenCalledWith('text', { node: { id: 'n1', name: 'a' } });
     expect(wrapper.find('.fake-mform').exists()).toBe(true);
     expect(capturedFormProps.initValues).toEqual({ id: 'n1', name: 'a' });
   });
 
   test('默认 disabled 为 true', async () => {
-    mount(ViewForm, {
+    const wrapper = mount(ViewForm, {
       props: {
         category: 'node',
         type: 'text',
@@ -78,13 +83,12 @@ describe('ViewForm.vue', () => {
         services,
       },
     });
-    await nextTick();
-    await nextTick();
+    await waitForFormReady(wrapper);
     expect(capturedFormProps.disabled).toBe(true);
   });
 
   test('可通过 disabled=false 覆盖为可编辑', async () => {
-    mount(ViewForm, {
+    const wrapper = mount(ViewForm, {
       props: {
         category: 'node',
         type: 'text',
@@ -93,13 +97,12 @@ describe('ViewForm.vue', () => {
         services,
       },
     });
-    await nextTick();
-    await nextTick();
+    await waitForFormReady(wrapper);
     expect(capturedFormProps.disabled).toBe(false);
   });
 
   test('size 透传给 MForm', async () => {
-    mount(ViewForm, {
+    const wrapper = mount(ViewForm, {
       props: {
         category: 'node',
         type: 'text',
@@ -108,8 +111,7 @@ describe('ViewForm.vue', () => {
         services,
       },
     });
-    await nextTick();
-    await nextTick();
+    await waitForFormReady(wrapper);
     expect(capturedFormProps.size).toBe('small');
   });
 

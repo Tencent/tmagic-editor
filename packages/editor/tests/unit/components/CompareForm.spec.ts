@@ -5,7 +5,7 @@
  */
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { defineComponent, h, nextTick, ref } from 'vue';
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 
 import { HookType } from '@tmagic/core';
 
@@ -63,6 +63,12 @@ beforeEach(() => {
   capturedFormProps = {};
 });
 
+const waitForFormReady = async (wrapper: VueWrapper) => {
+  await vi.waitFor(() => {
+    expect(wrapper.find('.fake-mform').exists()).toBe(true);
+  });
+};
+
 describe('CompareForm.vue', () => {
   test('node 类别按 type 加载 props 配置并展示 MForm', async () => {
     const wrapper = mount(CompareForm, {
@@ -79,8 +85,7 @@ describe('CompareForm.vue', () => {
         },
       },
     });
-    await nextTick();
-    await nextTick();
+    await waitForFormReady(wrapper);
 
     expect(propsService.getPropsConfig).toHaveBeenCalledWith('text', { node: { id: 'n1', name: 'new' } });
     expect(wrapper.find('.fake-mform').exists()).toBe(true);
@@ -167,7 +172,7 @@ describe('CompareForm.vue', () => {
   });
 
   test('showDiff 对 code-select 的空形态视为相等', async () => {
-    mount(CompareForm, {
+    const wrapper = mount(CompareForm, {
       props: {
         category: 'node',
         type: 'text',
@@ -175,8 +180,7 @@ describe('CompareForm.vue', () => {
         services,
       },
     });
-    await nextTick();
-    await nextTick();
+    await waitForFormReady(wrapper);
     expect(capturedShowDiff).toBeTypeOf('function');
     expect(
       capturedShowDiff!({
