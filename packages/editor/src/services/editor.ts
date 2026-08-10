@@ -56,6 +56,7 @@ import type {
   StepValue,
   StoreState,
   StoreStateKey,
+  UpdateOptions,
 } from '@editor/type';
 import { canUsePluginMethods, LayerOffset, Layout } from '@editor/type';
 import {
@@ -413,7 +414,7 @@ class Editor extends BaseService {
     this.set('highlightNode', null);
   }
 
-  public async doAdd(node: MNode, parent: MContainer): Promise<MNode> {
+  public async doAdd(node: MNode, parent: MContainer, _options: DslOpOptions = {}): Promise<MNode> {
     const root = this.get('root');
 
     if (!root) throw new Error('root为空');
@@ -465,24 +466,23 @@ class Editor extends BaseService {
    * 向指点容器添加组件节点
    * @param addConfig 将要添加的组件节点配置
    * @param parent 要添加到的容器组件节点配置，如果不设置，默认为当前选中的组件的父节点
-   * @param options 可选配置
-   * @param options.doNotSelect 添加后是否不更新当前选中节点（默认 false，添加后会选中新增的节点）
-   * @param options.doNotSwitchPage 添加后是否不切换当前页面（默认 false；新增页面 / 跨页新增时为 true 会跳过会引发页面切换的选中操作）
-   * @param options.doNotPushHistory 是否不写入历史记录（默认 false）
+   * @param options 可选配置，见 {@link DslOpOptions}
    * @returns 添加后的节点
    */
   public async add(
     addNode: AddMNode | MNode[],
     parent?: MContainer | null,
-    {
+    options: DslOpOptions = {},
+  ): Promise<MNode | MNode[]> {
+    this.captureSelectionBeforeOp();
+
+    const {
       doNotSelect = false,
       doNotSwitchPage = false,
       doNotPushHistory = false,
       historyDescription,
       historySource,
-    }: DslOpOptions = {},
-  ): Promise<MNode | MNode[]> {
-    this.captureSelectionBeforeOp();
+    } = options;
 
     const stage = this.get('stage');
 
@@ -505,7 +505,7 @@ class Editor extends BaseService {
       const root = this.get('root');
       const parentNode = isPageOrFragment(node) && root ? root : (parent ?? getAddParent(node));
       if (!parentNode) throw new Error('未找到父元素');
-      newNodes.push(await this.doAdd(node, parentNode));
+      newNodes.push(await this.doAdd(node, parentNode, options));
     }
 
     if (newNodes.length > 1) {
@@ -665,16 +665,8 @@ class Editor extends BaseService {
    * @param options.doNotSwitchPage 删除后是否不切换当前页面（默认 false；删除页面 / 页面片段时为 true 会跳过自动切换到首个剩余页面）
    * @param options.doNotPushHistory 是否不写入历史记录（默认 false）
    */
-  public async remove(
-    nodeOrNodeList: MNode | MNode[],
-    {
-      doNotSelect = false,
-      doNotSwitchPage = false,
-      doNotPushHistory = false,
-      historyDescription,
-      historySource,
-    }: DslOpOptions = {},
-  ): Promise<void> {
+  public async remove(nodeOrNodeList: MNode | MNode[], options: DslOpOptions = {}): Promise<void> {
+    const { doNotPushHistory = false, historyDescription, historySource } = options;
     this.captureSelectionBeforeOp();
 
     const nodes = Array.isArray(nodeOrNodeList) ? nodeOrNodeList : [nodeOrNodeList];
@@ -701,7 +693,7 @@ class Editor extends BaseService {
       }
     }
 
-    await Promise.all(nodes.map((node) => this.doRemove(node, { doNotSelect, doNotSwitchPage })));
+    await Promise.all(nodes.map((node) => this.doRemove(node, options)));
 
     // 删除节点时同步清理其（含子树）的校验错误记录；置于 pushOpHistory 之前，使历史快照与本次删除对齐。
     this.removeInvalidNodesBySubtree(nodes);
@@ -731,12 +723,9 @@ class Editor extends BaseService {
 
   public async doUpdate(
     config: MNode,
-    {
-      changeRecords = [],
-      historySource,
-      replace = false,
-    }: { changeRecords?: ChangeRecord[]; historySource?: HistoryOpSource; replace?: boolean } = {},
+    data: UpdateOptions = {},
   ): Promise<{ newNode: MNode; oldNode: MNode; changeRecords?: ChangeRecord[] }> {
+    const { changeRecords = [], historySource, replace = false } = data;
     const root = this.get('root');
     if (!root) throw new Error('root为空');
 
@@ -815,34 +804,10 @@ class Editor extends BaseService {
    * 更新节点
    * update后会触发依赖收集，收集完后会掉stage.update方法
    * @param config 新的节点配置，配置中需要有id信息
-   * @param data 额外数据
-   * @param data.changeRecords 单节点 form 端变更记录（多节点场景下被忽略，使用 changeRecordList）
-   * @param data.changeRecordList 多节点 form 端变更记录列表，按 config 数组同序对应每个节点；优先级高于 changeRecords
-   * @param data.doNotPushHistory 是否不写入历史记录（默认 false）
-   * @param data.historyDescription 入栈时附带的人类可读描述，用于历史面板展示（不影响 undo/redo 行为）
-   * @param data.replace 是否整节点替换：为 true 时跳过 mergeWith / toggleFixedPosition / setChildrenLayout，直接用传入配置覆盖（默认 false）
+   * @param data 额外数据，见 {@link UpdateOptions}
    * @returns 更新后的节点配置
    */
-  public async update(
-    config: MNode | MNode[],
-    data: {
-      changeRecords?: ChangeRecord[];
-      changeRecordList?: ChangeRecord[][];
-      doNotPushHistory?: boolean;
-      historyDescription?: string;
-      historySource?: HistoryOpSource;
-      /**
-       * 为 true 时不做深合并等变换，直接用传入配置整节点替换现有节点。
-       * 适用于源码编辑、历史整节点快照回放等「完整 DSL」场景；默认 false（局部属性更新走 merge）。
-       */
-      replace?: boolean;
-      /**
-       * 属性面板提交时携带的校验错误信息，在写入历史记录之前落库，
-       * 使历史快照与本次变更对齐，从而 undo/redo 能正确还原错误标记。
-       */
-      invalidInfo?: { id: Id; source: NodeInvalidSource; error?: string };
-    } = {},
-  ): Promise<MNode | MNode[]> {
+  public async update(config: MNode | MNode[], data: UpdateOptions = {}): Promise<MNode | MNode[]> {
     this.captureSelectionBeforeOp();
 
     const {
@@ -851,7 +816,6 @@ class Editor extends BaseService {
       changeRecords,
       historyDescription,
       historySource,
-      replace = false,
       invalidInfo,
     } = data;
 
@@ -862,7 +826,7 @@ class Editor extends BaseService {
     const updateData = await Promise.all(
       nodes.map((node, index) => {
         const recordsForNode = changeRecordList ? (changeRecordList[index] ?? []) : (changeRecords ?? []);
-        return this.doUpdate(node, { changeRecords: recordsForNode, historySource, replace });
+        return this.doUpdate(node, { ...data, changeRecords: recordsForNode });
       }),
     );
 
@@ -1371,14 +1335,7 @@ class Editor extends BaseService {
   /** 等价于 {@link update}，并额外返回本次写入历史记录的 uuid 列表（未入栈时 historyIds 为 `[]`）。 */
   public async updateAndGetHistoryId(
     config: MNode | MNode[],
-    data: {
-      changeRecords?: ChangeRecord[];
-      changeRecordList?: ChangeRecord[][];
-      doNotPushHistory?: boolean;
-      historyDescription?: string;
-      historySource?: HistoryOpSource;
-      replace?: boolean;
-    } = {},
+    data: UpdateOptions = {},
   ): Promise<DslOpWithHistoryIdsResult<MNode | MNode[]>> {
     this.lastPushedHistoryId = null;
     const result = await this.update(config, data);

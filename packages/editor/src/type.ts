@@ -1464,6 +1464,29 @@ export interface DslOpOptions extends HistoryOpOptions {
 }
 // #endregion DslOpOptions
 
+// #region UpdateOptions
+/**
+ * {@link EditorService.update} / {@link EditorService.doUpdate} 的额外数据
+ * - changeRecords: 单节点 form 端变更记录（多节点场景下被忽略，使用 changeRecordList）
+ * - changeRecordList: 多节点 form 端变更记录列表，按 config 数组同序对应每个节点；优先级高于 changeRecords
+ * - replace: 为 true 时跳过 mergeWith / toggleFixedPosition / setChildrenLayout，直接用传入配置整节点替换
+ * - invalidInfo: 属性面板提交时携带的校验错误信息，在写入历史记录之前落库
+ */
+export interface UpdateOptions extends HistoryOpOptionsWithChangeRecords {
+  changeRecordList?: ChangeRecord[][];
+  /**
+   * 为 true 时不做深合并等变换，直接用传入配置整节点替换现有节点。
+   * 适用于源码编辑、历史整节点快照回放等「完整 DSL」场景；默认 false（局部属性更新走 merge）。
+   */
+  replace?: boolean;
+  /**
+   * 属性面板提交时携带的校验错误信息，在写入历史记录之前落库，
+   * 使历史快照与本次变更对齐，从而 undo/redo 能正确还原错误标记。
+   */
+  invalidInfo?: { id: Id; source: NodeInvalidSource; error?: string };
+}
+// #endregion UpdateOptions
+
 /** 差异对话框的入参 */
 export interface DiffDialogPayload {
   /** 表单类别 */
