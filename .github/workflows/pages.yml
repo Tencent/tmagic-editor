@@ -18,13 +18,13 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 11.20.0
+          version: 11.21.0
 
       - name: Set node version to 22
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - run: pnpm bootstrap
 

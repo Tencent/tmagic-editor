@@ -9,16 +9,17 @@ packages:
 minimumReleaseAge: 0
 
 allowBuilds:
-  '@parcel/watcher': true
+  "@parcel/watcher": true
   core-js: true
   esbuild: true
 
 catalog:
-  "@vue/compiler-sfc": ^3.5.40
+  "@vue/compiler-sfc": ^3.5.41
   typescript: "^6.0.3"
-  vite: ^8.2.0
-  vue: ^3.5.40
+  vite: ^8.2.1
+  vue: ^3.5.41
+  element-plus: ^2.14.4
 
 overrides:
-  element-plus: ^2.14.3
-  vue: ^3.5.40
+  element-plus: ^2.14.4
+  vue: ^3.5.41
