@@ -7,6 +7,8 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { defineComponent, h } from 'vue';
 import { mount } from '@vue/test-utils';
 
+import { FORM_SILENT_MODE_KEY } from '@tmagic/form';
+
 import CodeSelectCol from '@editor/fields/CodeSelectCol.vue';
 
 const codeBlockService = {
@@ -110,6 +112,16 @@ describe('CodeSelectCol', () => {
 
   test('paramsConfig 不为空时渲染 CodeParams', () => {
     const wrapper = mount(CodeSelectCol, { props: baseProps() as any });
+    expect(wrapper.find('.fake-params').exists()).toBe(true);
+  });
+
+  test('静默模式跳过选择器和编辑按钮但保留 CodeParams', () => {
+    const wrapper = mount(CodeSelectCol, {
+      props: baseProps() as any,
+      global: { provide: { [FORM_SILENT_MODE_KEY as symbol]: true } },
+    });
+    expect(wrapper.findComponent({ name: 'MSelect' }).exists()).toBe(false);
+    expect(wrapper.find('button').exists()).toBe(false);
     expect(wrapper.find('.fake-params').exists()).toBe(true);
   });
 

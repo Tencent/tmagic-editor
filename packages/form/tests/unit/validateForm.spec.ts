@@ -17,7 +17,7 @@
  */
 import { afterEach, beforeAll, describe, expect, test, vi } from 'vitest';
 import { type AppContext, createApp, defineComponent, h, nextTick } from 'vue';
-import MagicForm, { validateForm } from '@form/index';
+import MagicForm, { clearSilentLeafFieldTypes, registerSilentLeafFieldTypes, validateForm } from '@form/index';
 import ElementPlus from 'element-plus';
 
 let appContext: AppContext;
@@ -33,6 +33,7 @@ beforeAll(() => {
 
 afterEach(() => {
   document.body.innerHTML = '';
+  clearSilentLeafFieldTypes();
 });
 
 // 说明：validateForm 内部会新建一个独立的 MForm 实例并复用其校验方法 `validate`（返回错误文案、不抛异常），
@@ -401,5 +402,191 @@ describe('validateForm —— debug 模式', () => {
     findButton('确定').click();
     await pending;
     setTimeoutSpy.mockRestore();
+  });
+});
+
+describe('validateForm —— 静默模式', () => {
+  /**
+   * 两个探针都由渲染过程驱动，与 DOM 时序无关：
+   * - `extra` 在 Container 的 formItemProps 中求值，被调用即说明 FormItem 渲染了（rules 也随之生效）；
+   * - `options` 在 select 组件 setup 的 watchEffect 中求值，被调用即说明字段组件被实例化了。
+   */
+  const createProbes = () => ({
+    extra: vi.fn(() => ''),
+    options: vi.fn(() => [{ text: 'a', value: 'a' }]),
+    tooltip: vi.fn(() => ({ text: 'tip' })),
+  });
+
+  const selectConfig = ({ extra, options, tooltip }: ReturnType<typeof createProbes>): any => [
+    {
+      type: 'select',
+      name: 'kind',
+      text: '类型',
+      extra,
+      options,
+      tooltip,
+      rules: [{ required: true, message: '类型不能为空' }],
+    },
+  ];
+
+  test('开启后只挂载 FormItem，不实例化内置叶子字段', async () => {
+    const probes = createProbes();
+
+    const error = await validateForm({
+      config: selectConfig(probes),
+      initValues: { kind: 'a' },
+      appContext,
+    });
+
+    expect(error).toBe('');
+    expect(probes.extra).toHaveBeenCalled();
+    expect(probes.options).not.toHaveBeenCalled();
+    expect(probes.tooltip).not.toHaveBeenCalled();
+    expect(document.body.querySelector('.m-form')).toBeNull();
+  });
+
+  test('带挂载初始化逻辑的字段不跳过渲染，保持校验值一致', async () => {
+    const error = await validateForm({
+      config: [
+        {
+          type: 'display',
+          name: 'status',
+          text: '状态',
+          initValue: 'ready',
+          rules: [{ required: true, message: '状态不能为空' }],
+        },
+        {
+          type: 'date',
+          name: 'date',
+          text: '日期',
+          rules: [{ typeMatch: true }],
+        },
+      ] as any,
+      initValues: { date: new Date('2021-07-17T15:37:00') },
+      typeMatchValid: true,
+      appContext,
+    });
+
+    expect(error).toBe('');
+  });
+
+  test('非内置叶子字段仍照常渲染，避免漏掉其内部嵌套字段的校验', async () => {
+    const customSetup = vi.fn();
+    const customField = defineComponent({
+      name: 'CustomField',
+      inheritAttrs: false,
+      props: {
+        model: { type: Object, default: () => ({}) },
+        name: { type: String, default: '' },
+      },
+      setup() {
+        customSetup();
+        return () => h('div', 'custom');
+      },
+    });
+
+    await validateForm({
+      config: [{ type: 'component', name: 'custom', text: '自定义', component: customField }] as any,
+      initValues: { custom: 'x' },
+      appContext,
+    });
+
+    expect(customSetup).toHaveBeenCalled();
+  });
+
+  test('debug 模式下不生效：弹层需要完整渲染供人工操作', async () => {
+    const probes = createProbes();
+
+    const pending = validateForm({
+      config: selectConfig(probes),
+      initValues: { kind: 'a' },
+      appContext,
+      debug: true,
+    });
+    await nextTick();
+    await nextTick();
+
+    expect(probes.options).toHaveBeenCalled();
+
+    const confirm = Array.from(document.body.querySelectorAll('button')).find(
+      (b) => (b.textContent || '').trim() === '确定',
+    ) as HTMLButtonElement;
+    confirm.click();
+    await pending;
+  });
+});
+
+describe('validateForm —— 可配置静默叶子字段集合', () => {
+  const createCustomField = (setupSpy: () => void) =>
+    defineComponent({
+      name: 'MFieldsCustomSafe',
+      inheritAttrs: false,
+      props: {
+        model: { type: Object, default: () => ({}) },
+        name: { type: String, default: '' },
+      },
+      setup() {
+        setupSpy();
+        return () => h('div', 'custom-safe');
+      },
+    });
+
+  test('registerSilentLeafFieldTypes 后，自定义 type 在静默模式跳过渲染', async () => {
+    const setupSpy = vi.fn();
+    const parentApp = createApp(defineComponent({ render: () => h('div') }));
+    parentApp.use(ElementPlus);
+    parentApp.use(MagicForm);
+    parentApp.component('m-fields-custom-safe', createCustomField(setupSpy));
+    registerSilentLeafFieldTypes(['custom-safe']);
+
+    await validateForm({
+      config: [{ type: 'custom-safe', name: 'safe', text: '安全自定义' }] as any,
+      initValues: { safe: 'x' },
+      appContext: parentApp._context,
+    });
+
+    expect(setupSpy).not.toHaveBeenCalled();
+  });
+
+  test('未注册时自定义 type 仍渲染', async () => {
+    const setupSpy = vi.fn();
+    const parentApp = createApp(defineComponent({ render: () => h('div') }));
+    parentApp.use(ElementPlus);
+    parentApp.use(MagicForm);
+    parentApp.component('m-fields-custom-safe', createCustomField(setupSpy));
+
+    await validateForm({
+      config: [{ type: 'custom-safe', name: 'safe', text: '安全自定义' }] as any,
+      initValues: { safe: 'x' },
+      appContext: parentApp._context,
+    });
+
+    expect(setupSpy).toHaveBeenCalled();
+  });
+
+  test('debug 模式下即使注册了自定义集合也完整渲染', async () => {
+    const setupSpy = vi.fn();
+    const parentApp = createApp(defineComponent({ render: () => h('div') }));
+    parentApp.use(ElementPlus);
+    parentApp.use(MagicForm);
+    parentApp.component('m-fields-custom-safe', createCustomField(setupSpy));
+    registerSilentLeafFieldTypes(['custom-safe']);
+
+    const pending = validateForm({
+      config: [{ type: 'custom-safe', name: 'safe', text: '安全自定义' }] as any,
+      initValues: { safe: 'x' },
+      appContext: parentApp._context,
+      debug: true,
+    });
+    await nextTick();
+    await nextTick();
+
+    expect(setupSpy).toHaveBeenCalled();
+
+    const confirm = Array.from(document.body.querySelectorAll('button')).find(
+      (b) => (b.textContent || '').trim() === '确定',
+    ) as HTMLButtonElement;
+    confirm.click();
+    await pending;
   });
 });

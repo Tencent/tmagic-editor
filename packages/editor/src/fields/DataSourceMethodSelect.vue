@@ -2,6 +2,7 @@
   <div class="m-fields-data-source-method-select">
     <div class="data-source-method-select-container">
       <MCascader
+        v-if="!silentMode"
         class="select"
         :config="cascaderConfig"
         :model="model"
@@ -13,7 +14,7 @@
       ></MCascader>
 
       <TMagicTooltip
-        v-if="model[name] && isCustomMethod && dataSourceSidePanel && !isCompare"
+        v-if="!silentMode && model[name] && isCustomMethod && dataSourceSidePanel && !isCompare"
         :content="notEditable ? '查看' : '编辑'"
       >
         <TMagicButton class="m-fields-select-action-button" :size="size" @click="editCodeHandler">
@@ -48,6 +49,7 @@ import {
   type DataSourceMethodSelectConfig,
   type FieldProps,
   filterFunction,
+  FORM_SILENT_MODE_KEY,
   type FormItemConfig,
   type FormState,
   MCascader,
@@ -67,6 +69,7 @@ defineOptions({
 
 const { dataSourceService, uiService } = useServices();
 const mForm = inject<FormState | undefined>('mForm');
+const silentMode = inject(FORM_SILENT_MODE_KEY, false);
 const eventBus = inject<EventBus>('eventBus');
 
 const emit = defineEmits(['change']);

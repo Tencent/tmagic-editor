@@ -7,6 +7,8 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { defineComponent, h, ref } from 'vue';
 import { mount } from '@vue/test-utils';
 
+import { FORM_SILENT_MODE_KEY } from '@tmagic/form';
+
 import DataSourceMocks from '@editor/fields/DataSourceMocks.vue';
 
 const { messageBoxConfirm } = vi.hoisted(() => ({ messageBoxConfirm: vi.fn(async () => true) }));
@@ -112,6 +114,14 @@ describe('DataSourceMocks', () => {
     });
     expect(wrapper.find('.fake-table').exists()).toBe(true);
     expect(wrapper.find('.fake-add-btn').exists()).toBe(true);
+  });
+
+  test('静默模式不渲染编辑浮窗', () => {
+    const wrapper = mount(DataSourceMocks, {
+      props: { config: {}, model: { mocks: [] }, name: 'mocks' } as any,
+      global: { provide: { [FORM_SILENT_MODE_KEY as symbol]: true } },
+    });
+    expect(wrapper.find('.fake-floating').exists()).toBe(false);
   });
 
   test('点击添加按钮显示 dialog', async () => {

@@ -7,6 +7,7 @@
     </div>
 
     <FloatingBox
+      v-if="!silentMode"
       :body-style="{ padding: '0 16px' }"
       v-model:visible="addDialogVisible"
       v-model:width="width"
@@ -34,7 +35,14 @@ import { computed, inject, Ref, ref } from 'vue';
 
 import type { MockSchema } from '@tmagic/core';
 import { TMagicButton, tMagicMessageBox, TMagicSwitch } from '@tmagic/design';
-import { type DataSourceMocksConfig, type FieldProps, type FormConfig, type FormState, MFormBox } from '@tmagic/form';
+import {
+  type DataSourceMocksConfig,
+  type FieldProps,
+  FORM_SILENT_MODE_KEY,
+  type FormConfig,
+  type FormState,
+  MFormBox,
+} from '@tmagic/form';
 import { type ColumnConfig, MagicTable } from '@tmagic/table';
 import { getDefaultValueFromFields } from '@tmagic/utils';
 
@@ -57,6 +65,7 @@ const emit = defineEmits(['change']);
 
 const { uiService } = useServices();
 const mForm = inject<FormState | undefined>('mForm');
+const silentMode = inject(FORM_SILENT_MODE_KEY, false);
 
 /** 对比模式下隐藏新增/编辑/删除等操作按钮，仅保留只读展示。 */
 const isCompare = computed(() => Boolean(mForm?.isCompare));

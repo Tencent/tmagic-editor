@@ -15,7 +15,7 @@
         :prop="prop"
       ></MFormContainer>
       <MSelect
-        v-else
+        v-else-if="!silentMode"
         class="select"
         :config="selectConfig"
         :name="name"
@@ -27,7 +27,7 @@
 
       <!-- 查看/编辑按钮：对比模式为只读，不展示 -->
       <TMagicButton
-        v-if="!isCompareMode && model[name] && hasCodeBlockSidePanel"
+        v-if="!isCompareMode && !silentMode && model[name] && hasCodeBlockSidePanel"
         class="m-fields-select-action-button"
         :size="size"
         @click="editCode(model[name])"
@@ -65,6 +65,7 @@ import {
   createValues,
   type FieldProps,
   filterFunction,
+  FORM_SILENT_MODE_KEY,
   type FormItemConfig,
   type FormState,
   MContainer as MFormContainer,
@@ -83,6 +84,7 @@ defineOptions({
 });
 
 const mForm = inject<FormState | undefined>('mForm');
+const silentMode = inject(FORM_SILENT_MODE_KEY, false);
 const { codeBlockService, uiService } = useServices();
 const eventBus = inject<EventBus>('eventBus');
 const emit = defineEmits<{

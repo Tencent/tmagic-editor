@@ -7,6 +7,8 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { defineComponent, h, ref } from 'vue';
 import { mount } from '@vue/test-utils';
 
+import { FORM_SILENT_MODE_KEY } from '@tmagic/form';
+
 import DataSourceFields from '@editor/fields/DataSourceFields.vue';
 
 const { messageBoxConfirm, messageError } = vi.hoisted(() => ({
@@ -130,6 +132,14 @@ describe('DataSourceFields', () => {
     });
     expect(wrapper.find('.fake-table').exists()).toBe(true);
     expect(wrapper.findAll('.fake-btn').length).toBeGreaterThanOrEqual(2);
+  });
+
+  test('静默模式不渲染编辑浮窗', () => {
+    const wrapper = mount(DataSourceFields, {
+      props: { config: {}, model: { fields: [] }, name: 'fields', prop: 'fields' } as any,
+      global: { provide: { [FORM_SILENT_MODE_KEY as symbol]: true } },
+    });
+    expect(wrapper.findAll('.fake-floating')).toHaveLength(0);
   });
 
   test('点击新增字段添加', async () => {

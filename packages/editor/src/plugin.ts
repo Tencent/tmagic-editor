@@ -21,7 +21,7 @@ import { type App } from 'vue';
 import type { DesignPluginOptions } from '@tmagic/design';
 import designPlugin from '@tmagic/design';
 import type { FormInstallOptions } from '@tmagic/form';
-import formPlugin, { registerTypeMatchRules } from '@tmagic/form';
+import formPlugin, { registerSilentLeafFieldTypes, registerTypeMatchRules } from '@tmagic/form';
 import tablePlugin from '@tmagic/table';
 
 import Code from './fields/Code.vue';
@@ -68,6 +68,14 @@ export default {
     app.use(formPlugin, opt || {});
     app.use(tablePlugin);
     registerTypeMatchRules(editorTypeMatchRules);
+    registerSilentLeafFieldTypes([
+      'vs-code',
+      'ui-select',
+      'cond-op-select',
+      'page-fragment-select',
+      'data-source-select',
+      'data-source-input',
+    ]);
 
     app.config.globalProperties.$TMAGIC_EDITOR = option;
     setEditorConfig(option);

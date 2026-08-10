@@ -7,6 +7,8 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { defineComponent, h, nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
 
+import { FORM_SILENT_MODE_KEY } from '@tmagic/form';
+
 import DataSourceMethods from '@editor/fields/DataSourceMethods.vue';
 
 const { messageBoxConfirm, codeBlockEditorShow, codeBlockEditorHide } = vi.hoisted(() => ({
@@ -107,6 +109,26 @@ describe('DataSourceMethods.vue', () => {
     expect(wrapper.find('.fake-code-block-editor').exists()).toBe(true);
     await nextTick();
     expect(codeBlockEditorShow).toHaveBeenCalled();
+  });
+
+  test('静默模式不根据注入的方法名打开编辑器', async () => {
+    const wrapper = mount(DataSourceMethods, {
+      props: {
+        name: 'methods',
+        prop: 'methods',
+        config: {} as any,
+        model: { methods: [{ name: 'm1', content: 'function () {}' }] } as any,
+      } as any,
+      global: {
+        provide: {
+          [FORM_SILENT_MODE_KEY as symbol]: true,
+          editingDataSourceMethodName: { value: 'm1' },
+        },
+      },
+    });
+    await nextTick();
+    expect(wrapper.find('.fake-code-block-editor').exists()).toBe(false);
+    expect(codeBlockEditorShow).not.toHaveBeenCalled();
   });
 
   test('编辑 action - method.content 是 string', async () => {

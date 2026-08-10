@@ -64,6 +64,12 @@ export {
 } from './utils/config';
 
 export {
+  clearSilentLeafFieldTypes,
+  getSilentLeafFieldTypes,
+  registerSilentLeafFieldTypes,
+} from './utils/silentLeafFieldTypes';
+
+export {
   clearTypeMatchRules,
   deleteTypeMatchRule,
   getTypeMatchRule,
