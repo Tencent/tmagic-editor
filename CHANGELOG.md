@@ -1,3 +1,9 @@
+# [1.8.0-beta.25](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.24...v1.8.0-beta.25) (2026-08-13)
+
+
+### Bug Fixes
+
+* **editor:** 统一数据源字段路径解析并优化 typeMatch 校验 ([05fbdb1](https://github.com/Tencent/tmagic-editor/commit/05fbdb17b53e688f562202a32cdb748afae65347))
 # [1.8.0-beta.24](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.23...v1.8.0-beta.24) (2026-08-10)
 
 
