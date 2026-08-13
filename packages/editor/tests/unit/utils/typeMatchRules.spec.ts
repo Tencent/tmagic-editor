@@ -21,7 +21,7 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { HookCodeType, HookType, NodeType } from '@tmagic/core';
 import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX, DATA_SOURCE_SET_DATA_METHOD_NAME } from '@tmagic/utils';
 
-import { ALL_COND_OPS, editorTypeMatchRules, validateDataSourceFieldSelectValue } from '@editor/utils/type-match-rules';
+import { ALL_COND_OPS, editorTypeMatchRules, validateDataSourceFieldSelect } from '@editor/utils/type-match-rules';
 
 const codeDslState = vi.hoisted(() => ({ value: null as Record<string, any> | null }));
 const dataSourcesState = vi.hoisted(() => ({ value: [] as any[] }));
@@ -126,6 +126,9 @@ describe('editorTypeMatchRules', () => {
       },
     ];
     expect(run('cond-op-select', '>', {}, { field: ['ds1', 'age'] })).toBeUndefined();
+    expect(
+      run('cond-op-select', '>', {}, { field: [`${DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX}ds1`, 'age'] }),
+    ).toBeUndefined();
     expect(firstLine(run('cond-op-select', 'include', {}, { field: ['ds1', 'age'] }))).toBe('include 不在可选项中');
     expect(run('cond-op-select', 'is', {}, { field: ['ds1', 'flag'] })).toBeUndefined();
     // 未知类型与 UI 默认选项对齐：不含 boolean ops
@@ -234,6 +237,11 @@ describe('editorTypeMatchRules', () => {
 
     expect(run('data-source-field-select', ['ds1', 'title'], { value: 'key' })).toBeUndefined();
     expect(run('data-source-field-select', [`${DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX}ds1`, 'title'])).toBeUndefined();
+    // 未指定 dataSourceId 且路径为空：缺少数据源 id
+    expect(firstLine(run('data-source-field-select', [], { value: 'key' }))).toBe('数据源不存在');
+    // 已有 dataSourceId 时，空字段路径视为只选了数据源，不报错
+    expect(run('data-source-field-select', [], { dataSourceId: 'ds1' })).toBeUndefined();
+    expect(run('data-source-field-select', ['ds1'], { value: 'key' })).toBeUndefined();
     // 数据源不存在时直出具体的数据源 id
     expect(firstLine(run('data-source-field-select', ['missing', 'title'], { value: 'key' }))).toBe(
       '数据源(missing)不存在',
@@ -254,23 +262,55 @@ describe('editorTypeMatchRules', () => {
     );
     // 父字段无子字段时无建议
     expect(run('data-source-field-select', ['ds1', 'title', 'x'], { value: 'key' })).toBe('数据源字段(x)不存在');
+    // 类型不匹配时，文案直出当前字段与其类型，不追加建议
     expect(
-      firstLine(
-        run('data-source-field-select', ['title'], {
-          dataSourceId: 'ds1',
-          dataSourceFieldType: ['number'],
-        }),
-      ),
-    ).toBe('值不在可选项中');
+      run('data-source-field-select', ['title'], {
+        dataSourceId: 'ds1',
+        dataSourceFieldType: ['number'],
+      }),
+    ).toBe('请选择类型为number的字段，字段(title)的类型为string');
     expect(
       run('data-source-field-select', ['obj', 'a'], {
         dataSourceId: 'ds1',
         dataSourceFieldType: ['number'],
       }),
     ).toBeUndefined();
+    expect(
+      run('data-source-field-select', ['obj', 'a'], {
+        dataSourceId: 'ds1',
+        dataSourceFieldType: ['string'],
+      }),
+    ).toBe('请选择类型为string的字段，字段(a)的类型为number');
+
+    // 有 fieldConfig、未声明 value/dataSourceId 时，仍按取值中的 ds-field:: 前缀解析数据源路径
+    dataSourcesState.value = [
+      {
+        id: 'ds_4554243a',
+        type: 'base',
+        fields: [{ name: 'marqueeModId', type: 'string' }],
+        methods: [],
+      },
+    ];
+    expect(
+      run('data-source-field-select', [`${DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX}ds_4554243a`, 'marqueeModId'], {
+        name: 'modId',
+        checkStrictly: false,
+        dataSourceFieldType: ['string'],
+        fieldConfig: { type: 'mod-select', modType: 100119 },
+      }),
+    ).toBeUndefined();
+    expect(
+      firstLine(
+        run('data-source-field-select', [`${DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX}ds_4554243a`, 'missing'], {
+          name: 'modId',
+          dataSourceFieldType: ['string'],
+          fieldConfig: { type: 'mod-select', modType: 100119 },
+        }),
+      ),
+    ).toBe('数据源字段(missing)不存在');
   });
 
-  test('validateDataSourceFieldSelectValue 支持自定义 plain 值校验并保留数据源路径校验', () => {
+  test('validateDataSourceFieldSelect 支持自定义 plain 值校验并保留数据源路径校验', () => {
     const config = {
       name: 'fontWeight',
       type: 'data-source-field-select',
@@ -287,9 +327,9 @@ describe('editorTypeMatchRules', () => {
       },
     };
 
-    expect(validateDataSourceFieldSelectValue(700, context, allowStringOrNumber)).toBeUndefined();
-    expect(validateDataSourceFieldSelectValue('bold', context, allowStringOrNumber)).toBeUndefined();
-    expect(firstLine(validateDataSourceFieldSelectValue({ a: 1 }, context, allowStringOrNumber))).toBe(
+    expect(validateDataSourceFieldSelect(700, context, allowStringOrNumber)).toBeUndefined();
+    expect(validateDataSourceFieldSelect('bold', context, allowStringOrNumber)).toBeUndefined();
+    expect(firstLine(validateDataSourceFieldSelect({ a: 1 }, context, allowStringOrNumber))).toBe(
       'fontWeight 类型应为字符串或数字',
     );
 
@@ -306,7 +346,7 @@ describe('editorTypeMatchRules', () => {
     ];
 
     expect(
-      validateDataSourceFieldSelectValue(
+      validateDataSourceFieldSelect(
         [`${DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX}ds1`, 'weight'],
         context,
         allowStringOrNumber,
@@ -314,7 +354,7 @@ describe('editorTypeMatchRules', () => {
     ).toBeUndefined();
     expect(
       firstLine(
-        validateDataSourceFieldSelectValue(
+        validateDataSourceFieldSelect(
           [`${DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX}ds1`, 'missing'],
           context,
           allowStringOrNumber,

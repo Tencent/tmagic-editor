@@ -143,7 +143,10 @@ const checkStrictly = computed(() => {
   if (typeof props.config.checkStrictly !== 'function') {
     value = props.config.checkStrictly;
   } else {
-    const dsId = removeDataSourceFieldPrefix(props.model[0]);
+    const fieldValue = props.model[props.name];
+    // 指定了 dataSourceId 时取值里只有字段名，数据源 id 只能取自 config
+    const rawDsId = props.config.dataSourceId ?? (Array.isArray(fieldValue) ? fieldValue[0] : fieldValue);
+    const dsId = removeDataSourceFieldPrefix(`${rawDsId}`);
     const dataSource = dataSources.value.find((ds) => ds.id === dsId);
 
     value = props.config.checkStrictly(mForm, {

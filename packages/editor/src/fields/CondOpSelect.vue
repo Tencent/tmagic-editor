@@ -31,6 +31,7 @@ import { computed } from 'vue';
 
 import { getDesignConfig, TMagicSelect } from '@tmagic/design';
 import type { CondOpSelectConfig, FieldProps } from '@tmagic/form';
+import { removeDataSourceFieldPrefix } from '@tmagic/utils';
 
 import { useServices } from '@editor/hooks/use-services';
 import { getCondOpOptionsByFieldType, getFieldType } from '@editor/utils';
@@ -50,8 +51,8 @@ const props = defineProps<FieldProps<CondOpSelectConfig>>();
 const optionComponent = getDesignConfig('components')?.option;
 
 const options = computed(() => {
-  const [id, ...fieldNames] = [...(props.config.parentFields || []), ...props.model.field];
-  const ds = dataSourceService.getDataSourceById(id);
+  const [id, ...fieldNames] = [...(props.config.parentFields || []), ...(props.model.field || [])];
+  const ds = id ? dataSourceService.getDataSourceById(removeDataSourceFieldPrefix(id)) : undefined;
   const type = getFieldType(ds, fieldNames);
   return getCondOpOptionsByFieldType(type);
 });

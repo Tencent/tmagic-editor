@@ -100,4 +100,14 @@ describe('CondOpSelect', () => {
     await wrapper.findComponent({ name: 'TMagicSelect' }).vm.$emit('change', '=');
     expect(wrapper.emitted('change')?.[0]?.[0]).toBe('=');
   });
+
+  test('字段路径带 ds-field:: 前缀时仍按数据源 id 查询', () => {
+    (getFieldType as any).mockReturnValue('number');
+    mount(CondOpSelect, {
+      props: baseProps({
+        model: { field: ['ds-field::ds1', 'a'], op: '' },
+      }) as any,
+    });
+    expect(dataSourceService.getDataSourceById).toHaveBeenCalledWith('ds1');
+  });
 });

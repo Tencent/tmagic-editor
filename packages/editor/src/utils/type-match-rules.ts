@@ -209,7 +209,6 @@ const validateDataSourceFieldPath = (
   path: string[],
   options: {
     dataSourceId?: string;
-    valueMode?: 'key' | 'value';
     dataSourceFieldType?: DataSourceFieldType[];
     message?: string;
   } = {},
@@ -219,19 +218,11 @@ const validateDataSourceFieldPath = (
     return undefined;
   }
 
-  let dsId = options.dataSourceId;
-  let fieldNames = path;
-
+  const dsId = options.dataSourceId;
   if (!dsId) {
-    if (!path.length) {
-      return defaultMessage(options.message, '值不在可选项中', dataSourceIdSuggestion());
-    }
-    const rawDsId = path[0];
-    dsId =
-      options.valueMode === 'key' || !`${rawDsId}`.startsWith(DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX)
-        ? `${rawDsId}`
-        : removeDataSourceFieldPrefix(`${rawDsId}`);
-    fieldNames = path.slice(1);
+    // 仅当取值为空数组或首项为空串时命中。表单校验管道里 validateTypeMatch 对空数组会短路，
+    // 因此这里只可能来自直接调用 validateDataSourceFieldSelect 的自定义 validator
+    return defaultMessage(options.message, '数据源不存在', dataSourceIdSuggestion());
   }
 
   const ds = findDataSource(`${dsId}`);
@@ -239,11 +230,11 @@ const validateDataSourceFieldPath = (
     return defaultMessage(options.message, `数据源(${dsId})不存在`, dataSourceIdSuggestion());
   }
 
-  if (!fieldNames.length) {
+  if (!path.length) {
     return undefined;
   }
 
-  const { field, ok, fields, failedName } = resolveFieldByPath(ds.fields, fieldNames);
+  const { field, ok, fields, failedName } = resolveFieldByPath(ds.fields, path);
   if (!ok) {
     return defaultMessage(
       options.message,
@@ -258,11 +249,15 @@ const validateDataSourceFieldPath = (
   }
 
   const leafType = field?.type || 'any';
-  if (leafType === 'any' || allowedTypes.includes(leafType)) {
-    return undefined;
-  }
+  if (leafType !== 'any' && !allowedTypes.includes(leafType)) {
+    const fieldName = field?.name || path[path.length - 1];
 
-  return defaultMessage(options.message, '值不在可选项中', dataSourceIdSuggestion());
+    // 文案已点明当前字段类型与要求类型，无需再列同级可选字段
+    return defaultMessage(
+      options.message,
+      `请选择类型为${allowedTypes.join('或')}的字段，字段(${fieldName})的类型为${leafType}`,
+    );
+  }
 };
 
 const validateDataSourceMethodTuple = (value: any, message?: string): string | undefined => {
@@ -367,7 +362,7 @@ const validateCondOpSelect: TypeMatchValidator = (value, { message, props }) => 
   const parentFields = props.config?.parentFields || [];
   const fieldPath = Array.isArray(props.model?.field) ? props.model.field : [];
   const [id, ...fieldNames] = [...parentFields, ...fieldPath];
-  const ds = id ? findDataSource(`${id}`) : undefined;
+  const ds = id ? findDataSource(removeDataSourceFieldPrefix(`${id}`)) : undefined;
   const fieldType = getFieldType(ds, fieldNames);
   const allowed = getCondOpsByFieldType(fieldType);
 
@@ -464,7 +459,7 @@ export type ValidateDataSourceFieldSelectOptions = {
 /**
  * data-source-field-select 的 typeMatch 校验逻辑，可供自定义 rules.validator 复用。
  */
-export const validateDataSourceFieldSelectValue = (
+export const validateDataSourceFieldSelect = (
   value: any,
   context: TypeMatchValidateContext,
   options?: ValidateDataSourceFieldSelectOptions,
@@ -492,16 +487,21 @@ export const validateDataSourceFieldSelectValue = (
     return defaultMessage(message, `${value}类型应为字符串数组`, dataSourceFieldPathSuggestion());
   }
 
-  return validateDataSourceFieldPath(value, {
-    dataSourceId: config.dataSourceId,
-    valueMode: config.value,
+  // 未指定 dataSourceId 时，路径首项为数据源 id，其余为字段名。
+  // value 模式的首项带 ds-field:: 前缀、key 模式不带，removeDataSourceFieldPrefix 对后者是幂等的，无需分支。
+  let dataSourceId = config.dataSourceId ? `${config.dataSourceId}` : undefined;
+  let fieldNames = value;
+  if (!dataSourceId) {
+    dataSourceId = value.length ? removeDataSourceFieldPrefix(value[0]) : undefined;
+    fieldNames = value.slice(1);
+  }
+
+  return validateDataSourceFieldPath(fieldNames, {
+    dataSourceId,
     dataSourceFieldType: config.dataSourceFieldType,
     message,
   });
 };
-
-const validateDataSourceFieldSelect: TypeMatchValidator = (value, context) =>
-  validateDataSourceFieldSelectValue(value, context);
 
 const validateDataSourceSelect: TypeMatchValidator = (value, { message, props }) => {
   const config = props.config || {};
@@ -678,7 +678,8 @@ export const editorTypeMatchRules: Record<string, TypeMatchValidator> = {
   'ui-select': validateUiSelect,
   'data-source-input': validateDataSourceInput,
   'data-source-method-select': validateDataSourceMethodSelect,
-  'data-source-field-select': validateDataSourceFieldSelect,
+  /** 注册进 typeMatch 规则表的入口，收窄为 TypeMatchValidator，避免调用方误传第三个参数 */
+  'data-source-field-select': (value, context) => validateDataSourceFieldSelect(value, context),
   'data-source-select': validateDataSourceSelect,
   'code-select': validateCodeSelect,
   'data-source-fields': validateDataSourceFields,

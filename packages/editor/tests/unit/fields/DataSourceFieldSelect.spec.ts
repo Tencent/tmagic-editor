@@ -324,4 +324,17 @@ describe('DataSourceFieldSelect Index', () => {
     await toggleBtn.trigger('click');
     expect(wrapper.findAll('.fake-cascader').length).toBeGreaterThan(0);
   });
+
+  test('checkStrictly 为函数时从当前字段值解析数据源', () => {
+    const checkStrictly = vi.fn(() => true);
+    mount(DSFSIndex, {
+      props: {
+        config: { checkStrictly },
+        model: { v: ['ds-ds1', 'a'] },
+        name: 'v',
+      } as any,
+    });
+    expect(checkStrictly).toHaveBeenCalled();
+    expect(checkStrictly.mock.calls[0][1].dataSource?.id).toBe('ds1');
+  });
 });

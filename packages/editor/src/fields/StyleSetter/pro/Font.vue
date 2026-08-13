@@ -21,7 +21,7 @@ import { appendValidateSuggestion } from '@tmagic/design';
 import { type ContainerChangeEventData, defineFormConfig, MContainer } from '@tmagic/form';
 import type { StyleSchema } from '@tmagic/schema';
 
-import { validateDataSourceFieldSelectValue } from '@editor/utils/type-match-rules';
+import { validateDataSourceFieldSelect } from '@editor/utils/type-match-rules';
 
 import { AlignCenter, AlignLeft, AlignRight } from '../icons/text-align';
 
@@ -99,7 +99,7 @@ const formConfig = defineFormConfig([
             return callback();
           }
 
-          const result = validateDataSourceFieldSelectValue(
+          const result = validateDataSourceFieldSelect(
             value,
             {
               fieldType: 'data-source-field-select',

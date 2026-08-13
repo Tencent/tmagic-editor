@@ -25,6 +25,7 @@ import {
   type GroupListConfig,
   MGroupList,
 } from '@tmagic/form';
+import { removeDataSourceFieldPrefix } from '@tmagic/utils';
 
 import { useServices } from '@editor/hooks/use-services';
 import { getCascaderOptionsFromFields, getFieldType } from '@editor/utils';
@@ -46,9 +47,14 @@ const mForm = inject<FormState | undefined>('mForm');
 
 const parentFields = computed(() => filterFunction<string[]>(mForm, props.config.parentFields, props) || []);
 
+const resolveFieldPath = (path: string[]) => {
+  const [id, ...fieldNames] = path;
+  const ds = id ? dataSourceService.getDataSourceById(removeDataSourceFieldPrefix(`${id}`)) : undefined;
+  return { ds, fieldNames };
+};
+
 const fieldOnChange = (_formState: FormState | undefined, v: string[], { model }: { model: Record<string, any> }) => {
-  const [id, ...fieldNames] = [...parentFields.value, ...v];
-  const ds = dataSourceService.getDataSourceById(id);
+  const { ds, fieldNames } = resolveFieldPath([...parentFields.value, ...v]);
   const type = getFieldType(ds, fieldNames);
   if (type === 'number') {
     model.value = Number(model.value);
@@ -82,14 +88,13 @@ const config = computed<GroupListConfig>(() => ({
           ? {
               type: 'cascader',
               options: () => {
-                const [dsId, ...keys] = parentFields.value;
-                const ds = dataSourceService.getDataSourceById(dsId);
+                const { ds, fieldNames } = resolveFieldPath(parentFields.value);
                 if (!ds) {
                   return [];
                 }
 
                 let fields = ds.fields || [];
-                keys.forEach((key) => {
+                fieldNames.forEach((key) => {
                   const field = fields.find((f) => f.name === key);
                   fields = field?.fields || [];
                 });
@@ -139,8 +144,7 @@ const config = computed<GroupListConfig>(() => ({
             {
               name: 'value',
               type: (_mForm, { model }) => {
-                const [id, ...fieldNames] = [...parentFields.value, ...model.field];
-                const ds = dataSourceService.getDataSourceById(id);
+                const { ds, fieldNames } = resolveFieldPath([...parentFields.value, ...(model.field || [])]);
                 const type = getFieldType(ds, fieldNames);
 
                 if (type === 'number') {
