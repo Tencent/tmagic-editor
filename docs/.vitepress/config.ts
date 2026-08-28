@@ -589,9 +589,11 @@ export default defineConfig({
     resolve: {
       alias:[
         { find: /^@tmagic\/form-schema/, replacement: path.join(__dirname, '../../packages/form-schema/src/index.ts') },
+        { find: /^@tmagic\/form\/headless$/, replacement: path.join(__dirname, '../../packages/form/src/headless.ts') },
         { find: /^@tmagic\/form/, replacement: path.join(__dirname, '../../packages/form/src/index.ts') },
         { find: /^@tmagic\/utils/, replacement: path.join(__dirname, '../../packages/utils/src/index.ts') },
         { find: /^@tmagic\/schema/, replacement: path.join(__dirname, '../../packages/schema/src/index.ts') },
+        { find: /^@tmagic\/design\/headless$/, replacement: path.join(__dirname, '../../packages/design/src/headless.ts') },
         { find: /^@tmagic\/design/, replacement: path.join(__dirname, '../../packages/design/src/index.ts') },
         { find: /^@tmagic\/element-plus-adapter/, replacement: path.join(__dirname, '../../packages/element-plus-adapter/src/index.ts') },
       ]

@@ -78,35 +78,34 @@
 ### 运行时注册
 
 ```ts
-import {
-  registerTypeMatchRule,
-  registerTypeMatchRules,
-  deleteTypeMatchRule,
-  clearTypeMatchRules,
-} from '@tmagic/form';
+import { registerField, registerFields, unregisterField, clearFields } from '@tmagic/form';
 
 // 覆盖内置 text
-registerTypeMatchRule('text', (value, { message }) => {
-  if (typeof value !== 'string') {
-    return message || '值类型应为字符串';
-  }
+registerField('text', {
+  typeMatch: (value, { message }) => {
+    if (typeof value !== 'string') {
+      return message || '值类型应为字符串';
+    }
+  },
 });
 
 // 扩展业务字段
-registerTypeMatchRule('vs-code', (value, { message }) => {
-  if (typeof value !== 'string') {
-    return message || '代码字段应为字符串';
-  }
+registerField('vs-code', {
+  typeMatch: (value, { message }) => {
+    if (typeof value !== 'string') {
+      return message || '代码字段应为字符串';
+    }
+  },
 });
 
 // 批量注册
-registerTypeMatchRules({
-  foo: (value) => (Array.isArray(value) ? undefined : '应为数组'),
+registerFields({
+  foo: { typeMatch: (value) => (Array.isArray(value) ? undefined : '应为数组') },
 });
 
-// 删除 / 清空
-deleteTypeMatchRule('foo');
-clearTypeMatchRules();
+// 删除 / 清空该 type 的全部登记（含 typeMatch）
+unregisterField('foo');
+clearFields();
 ```
 
 自定义校验器签名：`(value, context) => string | undefined | Promise<string | undefined>`。返回错误文案表示失败，返回 `undefined` 表示通过。`context` 包含 `fieldType`、`mForm`、`props`、`message`。
@@ -116,11 +115,15 @@ clearTypeMatchRules();
 自定义校验器可以返回 `Promise`，用于需要异步确认取值是否合法的场景（如请求接口校验 id 是否存在）。内置规则均为同步。
 
 ```ts
-registerTypeMatchRule('mod-select', async (value, { message }) => {
-  const exists = await checkModExists(value);
-  if (!exists) {
-    return message || `模块(${value})不存在`;
-  }
+import { registerField } from '@tmagic/form';
+
+registerField('mod-select', {
+  typeMatch: async (value, { message }) => {
+    const exists = await checkModExists(value);
+    if (!exists) {
+      return message || `模块(${value})不存在`;
+    }
+  },
 });
 ```
 
@@ -134,13 +137,17 @@ registerTypeMatchRule('mod-select', async (value, { message }) => {
 
 ```ts
 import MagicForm from '@tmagic/form';
+import MyField from './MyField.vue';
 
 app.use(MagicForm, {
-  typeMatchRules: {
-    'my-field': (value, { message }) => {
-      if (typeof value !== 'string') {
-        return message || 'my-field 应为字符串';
-      }
+  fields: {
+    'my-field': {
+      component: MyField,
+      typeMatch: (value, { message }) => {
+        if (typeof value !== 'string') {
+          return message || 'my-field 应为字符串';
+        }
+      },
     },
   },
 });
@@ -148,7 +155,7 @@ app.use(MagicForm, {
 
 ### Editor 字段内置规则
 
-安装 `@tmagic/editor` 时会自动 `registerTypeMatchRules` 注册编辑器自定义字段规则。服务数据（数据源 / 代码块 / 节点树）未就绪时，只做基础形态校验，不做枚举或存在性失败。
+安装 `@tmagic/editor` 时会把 `editorFields`（无 Vue 组件）叠上字段组件后作为 `fields` 传给 `@tmagic/form`。Node 里从 `@tmagic/form/headless` 与 `@tmagic/editor/headless` 引入即可。若安装时也传了 `fields`，会与编辑器字段按 type 浅合并：调用方传入的 key 覆盖对应项，未传的 key（如 `nested` / `typeMatch`）保留。服务数据（数据源 / 代码块 / 节点树）未就绪时，只做基础形态校验，不做枚举或存在性失败。
 
 | 字段 type | 期望值 |
 | --- | --- |
@@ -167,7 +174,7 @@ app.use(MagicForm, {
 
 > 容器类字段（`event-select` / `code-select` / `display-conds`）遵循同一约定：容器级 typeMatch 只做结构校验，「枚举 / 存在性」下沉到内部单元格各自的 typeMatch/rules，避免单个子项非法导致整块表单标红。
 
-业务仍可用 `registerTypeMatchRule` 覆盖上述任一 type。
+业务仍可用 `registerField(type, { typeMatch })` 覆盖上述任一 type 的类型校验；多次 `registerField` 按字段浅合并，不会丢掉已登记的 `nested` / `walk` / `effect`。
 
 ## 示例
 
@@ -220,6 +227,10 @@ app.use(MagicForm, {
 <<< @/../packages/form/src/utils/typeMatch.ts#TypeMatchValidator{ts}
 
 <<< @/../packages/form/src/utils/typeMatch.ts#TypeMatchValidateContext{ts}
+:::
+
+::: details 查看 FieldOptions 类型定义
+<<< @/../packages/form/src/utils/registerField.ts#FieldOptions{ts}
 :::
 
 ::: details 查看 FormInstallOptions 类型定义

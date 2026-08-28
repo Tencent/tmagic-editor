@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-import type { Component } from 'vue';
 import { ref } from 'vue';
 
 let $MAGIC_FORM = {} as any;
@@ -32,17 +31,4 @@ const setConfig = (option: any): void => {
 
 const getConfig = <T = unknown>(key: string): T => $MAGIC_FORM[key];
 
-const fieldRegistry = new Map<string, Component>();
-
-const registerField = (tagName: string, component: Component): void => {
-  if (fieldRegistry.has(tagName)) {
-    return;
-  }
-  fieldRegistry.set(tagName, component);
-};
-
-const getField = (tagName: string): Component | undefined => fieldRegistry.get(tagName);
-
-const deleteField = (tagName: string): boolean => fieldRegistry.delete(tagName);
-
-export { deleteField, getConfig, getField, isGlobalFlat, registerField, setConfig };
+export { getConfig, isGlobalFlat, setConfig };

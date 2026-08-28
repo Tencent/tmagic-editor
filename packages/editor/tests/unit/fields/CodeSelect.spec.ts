@@ -9,18 +9,21 @@ import { mount } from '@vue/test-utils';
 
 import CodeSelect from '@editor/fields/CodeSelect.vue';
 
-const dataSourceService = {
-  get: vi.fn(() => true),
-  getDataSourceById: vi.fn(() => ({ title: 'DS1' })),
-};
-const codeBlockService = {
-  getCodeContentById: vi.fn(() => ({ name: 'code-name' })),
-  getEditStatus: vi.fn(() => true),
-};
-
-vi.mock('@editor/hooks/use-services', () => ({
-  useServices: () => ({ dataSourceService, codeBlockService }),
+// 表单配置由 fields/configs/codeSelect.ts 产出（组件与无渲染校验的嵌套配置共用），
+// 那里直接用服务单例，因此这里 mock 服务模块本身
+const { dataSourceService, codeBlockService } = vi.hoisted(() => ({
+  dataSourceService: {
+    get: vi.fn(() => true),
+    getDataSourceById: vi.fn(() => ({ title: 'DS1' })),
+  },
+  codeBlockService: {
+    getCodeContentById: vi.fn(() => ({ name: 'code-name' })),
+    getEditStatus: vi.fn(() => true),
+  },
 }));
+
+vi.mock('@editor/services/dataSource', () => ({ default: dataSourceService }));
+vi.mock('@editor/services/codeBlock', () => ({ default: codeBlockService }));
 
 vi.mock('@tmagic/form', async (importOriginal) => {
   const actual = await importOriginal<any>();

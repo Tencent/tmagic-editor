@@ -16,6 +16,11 @@
       "import": "./dist/es/index.js",
       "require": "./dist/tmagic-design.umd.cjs"
     },
+    "./headless": {
+      "types": "./types/headless.d.ts",
+      "import": "./dist/es/headless.js",
+      "require": "./dist/tmagic-design-headless.umd.cjs"
+    },
     "./*": "./*"
   },
   "files": [

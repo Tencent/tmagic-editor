@@ -415,6 +415,9 @@ importers:
       '@tmagic/utils':
         specifier: workspace:*
         version: link:../utils
+      async-validator:
+        specifier: ^4.2.5
+        version: 4.2.5
       dayjs:
         specifier: ^1.11.21
         version: 1.11.21

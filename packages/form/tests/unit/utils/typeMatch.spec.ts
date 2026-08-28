@@ -19,6 +19,7 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import type { FormState } from '@form/index';
 import { getRules } from '@form/utils/form';
+import { clearFields } from '@form/utils/registerField';
 import {
   clearTypeMatchRules,
   createTypeMatchValidator,
@@ -30,6 +31,7 @@ import {
 } from '@form/utils/typeMatch';
 
 import { setDesignConfig } from '@tmagic/design';
+import { getDesignConfig } from '@tmagic/design/headless';
 
 const mForm: FormState = {
   config: [],
@@ -621,6 +623,18 @@ describe('getRules typeMatch', () => {
   });
 });
 
+describe('design 配置入口', () => {
+  // 无渲染链路读的是 @tmagic/design/headless（窄入口，不带组件），而 app.use(designPlugin)
+  // 写的是 @tmagic/design。两个入口必须落在同一份 design 配置上，否则适配器判定会静默失效。
+  test('@tmagic/design 与 @tmagic/design/headless 共用同一份配置', () => {
+    setDesignConfig({ adapterType: 'tdesign-vue-next' });
+    expect(getDesignConfig('adapterType')).toBe('tdesign-vue-next');
+
+    setDesignConfig({});
+    expect(getDesignConfig('adapterType')).toBeUndefined();
+  });
+});
+
 describe('getRules tdesign validator', () => {
   beforeEach(() => {
     setDesignConfig({ adapterType: 'tdesign-vue-next' });
@@ -816,25 +830,40 @@ describe('typeMatch 扩展注册', () => {
     });
     expect(validateTypeMatch(1, mForm, propsOf({ type: 'batch' }))).toBe('batch error');
   });
+
+  test('clearTypeMatchRules / deleteTypeMatchRule 不清内置规则', () => {
+    registerTypeMatchRule('built-in-keep', () => 'built-in', true);
+    registerTypeMatchRule('built-in-keep', () => 'extra');
+    expect(validateTypeMatch(1, mForm, propsOf({ type: 'built-in-keep' }))).toBe('extra');
+
+    expect(deleteTypeMatchRule('built-in-keep')).toBe(true);
+    expect(validateTypeMatch(1, mForm, propsOf({ type: 'built-in-keep' }))).toBe('built-in');
+
+    registerTypeMatchRule('built-in-keep', () => 'extra-again');
+    clearTypeMatchRules();
+    expect(validateTypeMatch(1, mForm, propsOf({ type: 'built-in-keep' }))).toBe('built-in');
+  });
 });
 
-describe('plugin typeMatchRules', () => {
+describe('plugin fields', () => {
   beforeEach(() => {
-    clearTypeMatchRules();
+    clearFields();
   });
 
   afterEach(() => {
-    clearTypeMatchRules();
+    clearFields();
   });
 
-  test('install 时注册 typeMatchRules', async () => {
+  test('install 时注册 fields', async () => {
     const { createApp } = await import('vue');
     const plugin = (await import('@form/plugin')).default;
 
     const app = createApp({});
     plugin.install(app, {
-      typeMatchRules: {
-        'install-type': (value) => (value === 'ok' ? undefined : 'install error'),
+      fields: {
+        'install-type': {
+          typeMatch: (value) => (value === 'ok' ? undefined : 'install error'),
+        },
       },
     });
 

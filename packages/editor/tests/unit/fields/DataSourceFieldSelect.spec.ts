@@ -7,8 +7,6 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { defineComponent, h } from 'vue';
 import { mount } from '@vue/test-utils';
 
-import { FORM_SILENT_MODE_KEY } from '@tmagic/form';
-
 import FieldSelect from '@editor/fields/DataSourceFieldSelect/FieldSelect.vue';
 import DSFSIndex from '@editor/fields/DataSourceFieldSelect/Index.vue';
 
@@ -196,16 +194,6 @@ describe('DataSourceFieldSelect Index', () => {
       props: { config: {}, model: { v: [] }, name: 'v' } as any,
     });
     expect(wrapper.findAll('.fake-cascader').length).toBeGreaterThanOrEqual(1);
-  });
-
-  test('静默模式跳过内部 FieldSelect', () => {
-    const wrapper = mount(DSFSIndex, {
-      props: { config: {}, model: { v: [] }, name: 'v' } as any,
-      global: { provide: { [FORM_SILENT_MODE_KEY as symbol]: true } },
-    });
-    expect(wrapper.findAll('.fake-cascader').length).toBe(0);
-    expect(wrapper.find('.fake-btn').exists()).toBe(false);
-    expect(wrapper.find('fake-form-field').exists()).toBe(false);
   });
 
   test('toggle showDataSourceFieldSelect', async () => {

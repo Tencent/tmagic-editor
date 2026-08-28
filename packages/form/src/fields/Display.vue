@@ -6,6 +6,7 @@
 import { computed, inject } from 'vue';
 
 import type { DisplayConfig, FieldProps, FormState } from '../schema';
+import { applyDisplayInitValue } from '../utils/fieldValueEffects';
 import { filterFunction } from '../utils/form';
 import { useAddField } from '../utils/useAddField';
 
@@ -17,9 +18,7 @@ const props = defineProps<FieldProps<DisplayConfig>>();
 
 const mForm = inject<FormState | undefined>('mForm');
 
-if (props.config.initValue && props.model) {
-  props.model[props.name] = props.config.initValue;
-}
+applyDisplayInitValue(props.config, props.model, props.name);
 
 const text = computed(() => {
   if (props.config.displayText) {

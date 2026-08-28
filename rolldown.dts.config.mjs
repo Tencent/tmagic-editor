@@ -51,9 +51,9 @@ function aliasPlugin() {
   };
 }
 
-function rolldownConfig(pkg, base) {
+function rolldownConfig(pkg, base, entry = 'index') {
   return {
-    input: `./temp/${base}/${pkg}/src/index.d.ts`,
+    input: `./temp/${base}/${pkg}/src/${entry}.d.ts`,
     external: (id) =>
       !id.startsWith('.') &&
       !id.startsWith('/') &&
@@ -62,15 +62,23 @@ function rolldownConfig(pkg, base) {
       !id.startsWith('@data-source/'),
     plugins: [aliasPlugin(), ...dts({ dtsInput: true, tsconfig: false })],
     output: {
-      file: `${base}/${pkg}/types/index.d.ts`,
+      file: `${base}/${pkg}/types/${entry}.d.ts`,
       format: 'es',
     },
   };
 }
 
+function packageDtsConfigs(pkg, base) {
+  const configs = [rolldownConfig(pkg, base, 'index')];
+  if (existsSync(`./temp/${base}/${pkg}/src/headless.d.ts`)) {
+    configs.push(rolldownConfig(pkg, base, 'headless'));
+  }
+  return configs;
+}
+
 export default [
-  ...targetPackages.map((pkg) => rolldownConfig(pkg, 'packages')),
-  ...runtimes.map((pkg) => rolldownConfig(pkg, 'runtime')),
+  ...targetPackages.flatMap((pkg) => packageDtsConfigs(pkg, 'packages')),
+  ...runtimes.flatMap((pkg) => packageDtsConfigs(pkg, 'runtime')),
 ];
 
 function removeScss(path) {

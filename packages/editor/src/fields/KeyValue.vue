@@ -44,7 +44,7 @@
     </div>
 
     <MagicCodeEditor
-      v-if="config.advanced && showCode && !silentMode"
+      v-if="config.advanced && showCode"
       editor-custom-type="m-fields-key-value"
       language="javascript"
       :init-values="model[name]"
@@ -60,7 +60,7 @@
     ></MagicCodeEditor>
 
     <TMagicButton
-      v-if="config.advanced && !isCompare && !silentMode"
+      v-if="config.advanced && !isCompare"
       size="default"
       :disabled="disabled"
       link
@@ -75,7 +75,7 @@ import { computed, inject, ref, watchEffect } from 'vue';
 import { Delete, Plus } from '@element-plus/icons-vue';
 
 import { TMagicButton, TMagicInput } from '@tmagic/design';
-import { type FieldProps, FORM_SILENT_MODE_KEY, type FormState, type KeyValueConfig } from '@tmagic/form';
+import { type FieldProps, type FormState, type KeyValueConfig } from '@tmagic/form';
 
 import CodeIcon from '@editor/icons/CodeIcon.vue';
 import MagicCodeEditor from '@editor/layouts/CodeEditor.vue';
@@ -93,7 +93,6 @@ const emit = defineEmits<{
 }>();
 
 const mForm = inject<FormState | undefined>('mForm');
-const silentMode = inject(FORM_SILENT_MODE_KEY, false);
 
 /** 对比模式下隐藏增删/代码切换等操作按钮，仅保留只读展示。 */
 const isCompare = computed(() => Boolean(mForm?.isCompare));

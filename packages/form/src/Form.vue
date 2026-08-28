@@ -55,17 +55,9 @@ import { M_THEME_KEY, TMagicForm, tMagicMessage, tMagicMessageBox } from '@tmagi
 import { setValueByKeyPath } from '@tmagic/utils';
 
 import Container from './containers/Container.vue';
-import { getConfig } from './utils/config';
-import { applyExtendState, initValue } from './utils/form';
-import type {
-  ChangeRecord,
-  ContainerChangeEventData,
-  FormConfig,
-  FormSlots,
-  FormState,
-  FormValue,
-  ValidateError,
-} from './schema';
+import { applyExtendState, createFormStateBase, initValue } from './utils/form';
+import { formatValidateError as formatError, getTextByName as findTextByName } from './utils/validateError';
+import type { ChangeRecord, ContainerChangeEventData, FormConfig, FormSlots, FormState, FormValue } from './schema';
 import { FORM_DIFF_CONFIG_KEY, FORM_TYPE_MATCH_VALID_KEY } from './schema';
 
 defineOptions({
@@ -178,9 +170,6 @@ const tMagicFormRef = useTemplateRef('tMagicForm');
 const initialized = ref(false);
 const values = ref<FormValue>({});
 const lastValuesProcessed = ref<FormValue>({});
-const fields = new Map<string, any>();
-
-const requestFuc = getConfig('request') as Function;
 
 /**
  * 当前表单生效的主题名称：
@@ -253,20 +242,7 @@ const formState: FormState = reactive<FormState>({
   values,
   lastValuesProcessed,
   $emit: emit as (_event: string, ..._args: any[]) => void,
-  fields,
-  setField: (prop: string, field: any) => fields.set(prop, field),
-  getField: (prop: string) => fields.get(prop),
-  deleteField: (prop: string) => fields.delete(prop),
-  $messageBox: tMagicMessageBox,
-  $message: tMagicMessage,
-  post: (options: any) => {
-    if (requestFuc) {
-      return requestFuc({
-        method: 'POST',
-        ...options,
-      });
-    }
-  },
+  ...createFormStateBase({ $message: tMagicMessage, $messageBox: tMagicMessageBox }),
 });
 
 /**
@@ -406,66 +382,17 @@ const submitHandler = (e: SubmitEvent) => {
   }
 };
 
-/**
- * 通过 name 从 config 中查找对应的 text
- * @param name - 字段名，支持点分隔的路径格式，如 'a.b.c'
- * @param config - 表单配置数组
- * @returns 找到的 text 值，如果未找到则返回 undefined
- */
-const getTextByName = (name: string, config: FormConfig = props.config): string | undefined => {
-  if (!name || !Array.isArray(config)) return undefined;
-
-  const nameParts = name.split('.');
-
-  const findInConfig = (configs: FormConfig, parts: string[]): string | undefined => {
-    if (parts.length === 0) return undefined;
-
-    const [currentPart, ...remainingParts] = parts;
-
-    for (const item of configs) {
-      if (item.name === currentPart) {
-        if (remainingParts.length === 0) {
-          return typeof item.text === 'string' ? item.text : undefined;
-        }
-
-        if ('items' in item && Array.isArray(item.items)) {
-          const result = findInConfig(item.items, remainingParts);
-          if (result !== undefined) return result;
-        }
-      }
-
-      if ('items' in item && Array.isArray(item.items)) {
-        const result = findInConfig(item.items, parts);
-        if (result !== undefined) return result;
-      }
-    }
-
-    return undefined;
-  };
-
-  return findInConfig(config, nameParts);
-};
+const getTextByName = (name: string, config: FormConfig = props.config): string | undefined =>
+  findTextByName(name, config);
 
 /**
  * 将校验返回的 invalidFields 汇总为可读的错误文案（多条以 `<br>` 拼接）。
  *
- * 抽离为独立方法，供 `submitForm`（提交校验）与 `validate`（返回错误文案的校验）复用，
- * 保证两种校验入口产出的错误文案格式完全一致。
+ * 实现收口在 `utils/validateError`，供渲染式校验（本组件的 `submitForm` / `validate`）与
+ * 无渲染校验（`validateValues`）共用，保证两条链路产出的错误文案格式完全一致。
  */
-const formatValidateError = (invalidFields: Record<string, any>): string => {
-  const error: string[] = [];
-
-  Object.entries(invalidFields).forEach(([prop, validateError]) => {
-    (validateError as ValidateError[]).forEach(({ field, message }) => {
-      const name = field || prop;
-      const text = (props.useFieldTextInError ? getTextByName(name, props.config) : undefined) || name;
-
-      error.push(`${text} -> ${message}`);
-    });
-  });
-
-  return error.join('<br>');
-};
+const formatValidateError = (invalidFields: Record<string, any>): string =>
+  formatError(invalidFields, { config: props.config, useFieldTextInError: props.useFieldTextInError });
 
 defineExpose({
   values,

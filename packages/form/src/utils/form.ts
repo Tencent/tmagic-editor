@@ -18,10 +18,11 @@
 
 import { ComputedRef, readonly } from 'vue';
 import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
+// dayjs 没有 exports 映射，原生 Node ESM 不会补扩展名，深路径必须写全 .js
+import utc from 'dayjs/plugin/utc.js';
 import { cloneDeep } from 'lodash-es';
 
-import { getDesignConfig } from '@tmagic/design';
+import { getDesignConfig } from '@tmagic/design/headless';
 import { getValueByKeyPath } from '@tmagic/utils';
 
 import type {
@@ -40,6 +41,7 @@ import type {
   TypeFunction,
 } from '../schema';
 
+import { getConfig } from './config';
 import { createTypeMatchValidator } from './typeMatch';
 
 type AsyncValidatorFn = (rule: any, value: any, callback: Function, source?: any, options?: any) => any;
@@ -272,6 +274,92 @@ const getDefaultValue = function (
   return '';
 };
 
+/**
+ * formState 中与表单 props 无关的公共部分：字段注册表、消息组件、post 请求。
+ *
+ * 由渲染式表单（`Form.vue`）与无渲染校验（`createHeadlessFormState`）共用，
+ * 保证两者提供给字段配置（`onChange` / `validator` / 异步 options 等）的能力一致。
+ */
+const fallbackMessage = {
+  error: (msg: string) => console.error(msg),
+  success: (msg: string) => console.log(msg),
+  warning: (msg: string) => console.warn(msg),
+  info: (msg: string) => console.info(msg),
+  closeAll: () => undefined,
+};
+
+const fallbackMessageBox = {
+  alert: (msg: string) => console.log(msg),
+  confirm: (msg: string) => console.log(msg),
+  close: (msg: string) => console.log(msg),
+};
+
+export const createFormStateBase = (ui?: { $message?: any; $messageBox?: any }) => {
+  const fields = new Map<string, any>();
+  const requestFuc = getConfig('request') as Function;
+
+  return {
+    fields,
+    setField: (prop: string, field: any) => fields.set(prop, field),
+    getField: (prop: string) => fields.get(prop),
+    deleteField: (prop: string) => fields.delete(prop),
+    $messageBox: ui?.$messageBox ?? fallbackMessageBox,
+    $message: ui?.$message ?? fallbackMessage,
+    post: (options: any) => {
+      if (requestFuc) {
+        return requestFuc({
+          method: 'POST',
+          ...options,
+        });
+      }
+    },
+  };
+};
+
+/**
+ * 配置项的 `name` 是否可用于从 model 中下钻取值。
+ *
+ * 供 `Container.vue` 与无渲染校验（`collectValidatableFields`）共用，两者对「该不该下钻」
+ * 的判断必须一致。
+ */
+export const isValidName = (name: unknown): boolean => {
+  const valueType = typeof name;
+  if (valueType !== 'string' && valueType !== 'symbol' && valueType !== 'number') return false;
+  if (name === '') return false;
+  if (valueType === 'number') return (name as number) >= 0;
+  return true;
+};
+
+/**
+ * 在 `prop` 后追加一段路径。
+ *
+ * 用于容器把 `prop` 透传给子级时再拼上索引 / key（如 group-list 的行、table 的行）。
+ */
+export const appendProp = (prop: string | undefined = '', key: string | number): string =>
+  `${prop}${prop ? '.' : ''}${key}`;
+
+/**
+ * 由父级 `prop` 与配置项 `name` 拼出该配置项的完整 `prop`（即 FormItem 的 prop）。
+ *
+ * 调用方传入的 name 已按 `config.name || ''` 归一化，空 name 表示该配置项不占据值路径上的一层，
+ * 此时沿用父级 `prop`。
+ */
+export const getItemProp = (prop: string | undefined = '', name: string | number | undefined = ''): string =>
+  name === '' ? (prop ?? '') : appendProp(prop, name);
+
+/**
+ * 归一化配置项的 `type`：求值动态 type、剥离容器语义的 type、驼峰转中划线、补默认值。
+ *
+ * 供 `Container.vue` 与无渲染校验共用，保证两者分派到的 type 完全一致。
+ */
+export const resolveItemType = (mForm: FormState | undefined, config: any, props: any): string => {
+  let type = 'type' in (config || {}) ? config.type : '';
+  type = type && filterFunction<string>(mForm, type, props);
+  // form / container 都表示「仅嵌套，不渲染字段」
+  if (type === 'form' || type === 'container') return '';
+  return type?.replace(/([A-Z])/g, '-$1').toLowerCase() || (config?.items ? '' : 'text');
+};
+
 export const filterFunction = <T = any>(
   mForm: FormState | undefined,
   config: T | FilterFunction<T> | undefined,
@@ -309,11 +397,12 @@ export const display = function (mForm: FormState | undefined, config: any, prop
   return true;
 };
 
-export const getRules = function (
+const buildRules = function (
   mForm: FormState | undefined,
   r: Rule[] | Rule = [],
   props: any,
-  typeMatchValid?: ComputedRef<boolean>,
+  typeMatchValid: ComputedRef<boolean> | undefined,
+  adapt: (_validator: AsyncValidatorFn) => AsyncValidatorFn = (validator) => validator,
 ) {
   let rules = cloneDeep(r);
 
@@ -330,33 +419,32 @@ export const getRules = function (
   return rules
     .map((item) => {
       if (item.typeMatch) {
-        (item as any).validator = adaptFormValidator(createTypeMatchValidator(mForm, props, item));
+        (item as any).validator = adapt(createTypeMatchValidator(mForm, props, item));
         return item;
       }
 
       if (typeof item.validator === 'function') {
         const fnc = item.validator;
 
-        (item as any).validator = adaptFormValidator(
-          (rule: any, value: any, callback: Function, source: any, options: any) =>
-            fnc(
-              {
-                rule,
-                value: props.config.names ? props.model : value,
-                callback,
-                source,
-                options,
-              },
-              {
-                values: mForm?.initValues || {},
-                model: props.model,
-                parent: mForm?.parentValues || {},
-                formValue: mForm?.values || props.model,
-                prop: props.prop,
-                config: props.config,
-              },
-              mForm,
-            ),
+        (item as any).validator = adapt((rule: any, value: any, callback: Function, source: any, options: any) =>
+          fnc(
+            {
+              rule,
+              value: props.config.names ? props.model : value,
+              callback,
+              source,
+              options,
+            },
+            {
+              values: mForm?.initValues || {},
+              model: props.model,
+              parent: mForm?.parentValues || {},
+              formValue: mForm?.values || props.model,
+              prop: props.prop,
+              config: props.config,
+            },
+            mForm,
+          ),
         );
       }
       return item;
@@ -369,6 +457,30 @@ export const getRules = function (
       }
       return true;
     });
+};
+
+export const getRules = function (
+  mForm: FormState | undefined,
+  r: Rule[] | Rule = [],
+  props: any,
+  typeMatchValid?: ComputedRef<boolean>,
+) {
+  return buildRules(mForm, r, props, typeMatchValid, adaptFormValidator);
+};
+
+/**
+ * 与 `getRules` 相同，但 validator 保持 async-validator（Element Plus）原生签名，不做 UI 库适配。
+ *
+ * 供无渲染校验（`validateValues`）使用：它直接把规则交给 async-validator 执行，
+ * 不经过 TDesign 的 `validator(val)` 调用约定，因此不能套 `adaptFormValidator`。
+ */
+export const getNativeRules = function (
+  mForm: FormState | undefined,
+  r: Rule[] | Rule = [],
+  props: any,
+  typeMatchValid?: ComputedRef<boolean>,
+) {
+  return buildRules(mForm, r, props, typeMatchValid);
 };
 
 export const initValue = async (

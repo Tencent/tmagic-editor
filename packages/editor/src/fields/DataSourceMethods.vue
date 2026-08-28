@@ -9,7 +9,7 @@
     </div>
 
     <CodeBlockEditor
-      v-if="codeConfig && !silentMode"
+      v-if="codeConfig"
       ref="codeBlockEditor"
       :disabled="disabled"
       :content="codeConfig"
@@ -30,7 +30,6 @@ import {
   type ContainerChangeEventData,
   type DataSourceMethodsConfig,
   type FieldProps,
-  FORM_SILENT_MODE_KEY,
   type FormState,
 } from '@tmagic/form';
 import { type ColumnConfig, MagicTable } from '@tmagic/table';
@@ -49,8 +48,6 @@ const props = withDefaults(defineProps<FieldProps<DataSourceMethodsConfig>>(), {
 const emit = defineEmits(['change']);
 
 const mForm = inject<FormState | undefined>('mForm');
-const silentMode = inject(FORM_SILENT_MODE_KEY, false);
-
 /** 对比模式下隐藏新增/编辑/删除等操作按钮，仅保留只读展示。 */
 const isCompare = computed(() => Boolean(mForm?.isCompare));
 
@@ -177,8 +174,6 @@ const editingMethodName = inject<ComputedRef<string | undefined>>(
 );
 
 onMounted(() => {
-  if (silentMode) return;
-
   const methodName = editingMethodName.value;
   if (!methodName) return;
 

@@ -22,13 +22,10 @@ import {
   type FieldProps,
   filterFunction,
   type FormState,
-  type GroupListConfig,
   MGroupList,
 } from '@tmagic/form';
-import { removeDataSourceFieldPrefix } from '@tmagic/utils';
 
-import { useServices } from '@editor/hooks/use-services';
-import { getCascaderOptionsFromFields, getFieldType } from '@editor/utils';
+import { createDisplayCondsConfig } from '@editor/fields/configs/displayConds';
 
 defineOptions({
   name: 'm-fields-display-conds',
@@ -42,148 +39,11 @@ const props = withDefaults(defineProps<FieldProps<DisplayCondsConfig>>(), {
   disabled: false,
 });
 
-const { dataSourceService } = useServices();
 const mForm = inject<FormState | undefined>('mForm');
 
 const parentFields = computed(() => filterFunction<string[]>(mForm, props.config.parentFields, props) || []);
 
-const resolveFieldPath = (path: string[]) => {
-  const [id, ...fieldNames] = path;
-  const ds = id ? dataSourceService.getDataSourceById(removeDataSourceFieldPrefix(`${id}`)) : undefined;
-  return { ds, fieldNames };
-};
-
-const fieldOnChange = (_formState: FormState | undefined, v: string[], { model }: { model: Record<string, any> }) => {
-  const { ds, fieldNames } = resolveFieldPath([...parentFields.value, ...v]);
-  const type = getFieldType(ds, fieldNames);
-  if (type === 'number') {
-    model.value = Number(model.value);
-  } else if (type === 'boolean') {
-    model.value = Boolean(model.value);
-  } else if (type === 'null') {
-    model.value = null;
-  } else {
-    model.value = `${model.value}`;
-  }
-  return v;
-};
-
-const config = computed<GroupListConfig>(() => ({
-  type: 'groupList',
-  name: props.name,
-  titlePrefix: props.config.titlePrefix,
-  expandAll: true,
-  enableToggleMode: false,
-  flat: props.config.flat,
-  items: [
-    {
-      type: 'table',
-      name: 'cond',
-      operateColWidth: props.config.operateColWidth,
-      enableToggleMode: false,
-      fixed: props.config.fixed,
-      flat: props.config.flat,
-      items: [
-        parentFields.value.length
-          ? {
-              type: 'cascader',
-              options: () => {
-                const { ds, fieldNames } = resolveFieldPath(parentFields.value);
-                if (!ds) {
-                  return [];
-                }
-
-                let fields = ds.fields || [];
-                fieldNames.forEach((key) => {
-                  const field = fields.find((f) => f.name === key);
-                  fields = field?.fields || [];
-                });
-
-                return getCascaderOptionsFromFields(fields, ['string', 'number', 'boolean', 'any']);
-              },
-              name: 'field',
-              value: 'key',
-              label: '字段',
-              checkStrictly: false,
-              onChange: fieldOnChange,
-              defaultValue: () => [],
-              rules: [
-                { required: true, trigger: 'blur', message: '请选择字段' },
-                { typeMatch: true, trigger: 'change' },
-              ],
-            }
-          : {
-              type: 'data-source-field-select',
-              name: 'field',
-              value: 'key',
-              label: '字段',
-              checkStrictly: false,
-              dataSourceFieldType: ['string', 'number', 'boolean', 'any'],
-              onChange: fieldOnChange,
-              defaultValue: () => [],
-              rules: [
-                { required: true, trigger: 'blur', message: '请选择字段' },
-                { typeMatch: true, trigger: 'change' },
-              ],
-            },
-        {
-          type: 'cond-op-select',
-          parentFields: parentFields.value,
-          label: '条件',
-          width: 140,
-          name: 'op',
-          rules: [
-            { required: true, trigger: 'blur', message: '请选择条件' },
-            { typeMatch: true, trigger: 'change' },
-          ],
-        },
-        {
-          label: '值',
-          width: 160,
-          items: [
-            {
-              name: 'value',
-              type: (_mForm, { model }) => {
-                const { ds, fieldNames } = resolveFieldPath([...parentFields.value, ...(model.field || [])]);
-                const type = getFieldType(ds, fieldNames);
-
-                if (type === 'number') {
-                  return 'number';
-                }
-
-                if (type === 'boolean') {
-                  return 'select';
-                }
-
-                if (type === 'null') {
-                  return 'display';
-                }
-
-                return 'text';
-              },
-              options: [
-                { text: 'true', value: true },
-                { text: 'false', value: false },
-              ],
-              display: (_mForm, { model }) => !['between', 'not_between'].includes(model.op),
-              displayText: (_mForm: FormState | undefined, { model }: any) => {
-                if (model.value === null) {
-                  return 'null';
-                }
-                return model.value;
-              },
-            },
-            {
-              name: 'range',
-              type: 'number-range',
-              display: (vm, { model }) => ['between', 'not_between'].includes(model.op),
-            },
-          ],
-        },
-      ],
-    },
-  ],
-}));
+const config = computed(() => createDisplayCondsConfig(props.config, props.name, parentFields.value));
 
 const changeHandler = (v: DisplayCond[], eventData?: ContainerChangeEventData) => {
   if (!Array.isArray(props.model[props.name])) {

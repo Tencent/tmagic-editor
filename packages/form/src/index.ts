@@ -57,17 +57,31 @@ export { default as MSelect } from './fields/Select.vue';
 export { default as MCascader } from './fields/Cascader.vue';
 export { default as MDynamicField } from './fields/DynamicField.vue';
 
-export {
-  deleteField as deleteFormField,
-  getField as getFormField,
-  registerField as registerFormField,
-} from './utils/config';
+export { builtInFields } from './utils/builtInFields';
 
 export {
-  clearSilentLeafFieldTypes,
-  getSilentLeafFieldTypes,
-  registerSilentLeafFieldTypes,
-} from './utils/silentLeafFieldTypes';
+  clearFields,
+  getField as getFormField,
+  mergeFieldOptions,
+  registerBuiltInFields,
+  registerField,
+  registerFields,
+  unregisterField,
+} from './utils/registerField';
+export type { FieldOptions, HeadlessFieldOptions } from './utils/registerField';
+
+export type { FieldNestedConfig, FieldNestedConfigContext, FieldNestedConfigResult } from './utils/fieldNestedConfig';
+
+export { isLeafFieldType } from './utils/fieldValueEffects';
+export type { FieldMountValueEffect, FieldMountValueEffectContext } from './utils/fieldValueEffects';
+
+export { collectValidatableFields, FieldNestedConfigError, isFieldNestedConfigError } from './utils/collectFields';
+export type { CollectedField } from './utils/collectFields';
+
+export { createHeadlessFormState, validateValues } from './utils/validateValues';
+export type { HeadlessFormStateOptions, ValidateValuesOptions, ValidateValuesResult } from './utils/validateValues';
+
+export { formatValidateError, getTextByName } from './utils/validateError';
 
 export {
   clearTypeMatchRules,
@@ -75,8 +89,6 @@ export {
   getTypeMatchRule,
   MAX_SUGGESTION_OPTIONS,
   optionSuggestion,
-  registerTypeMatchRule,
-  registerTypeMatchRules,
   stringifyExampleValue,
   validateTypeMatch,
 } from './utils/typeMatch';

@@ -8,7 +8,6 @@
     </div>
 
     <FloatingBox
-      v-if="!silentMode"
       :body-style="{ padding: '0 16px' }"
       v-model:visible="addDialogVisible"
       v-model:width="width"
@@ -31,7 +30,6 @@
     </FloatingBox>
 
     <FloatingBox
-      v-if="!silentMode"
       :body-style="{ padding: '0 16px' }"
       v-model:visible="addFromJsonDialogVisible"
       v-model:width="width"
@@ -62,7 +60,6 @@ import {
   type ContainerChangeEventData,
   type DataSourceFieldsConfig,
   type FieldProps,
-  FORM_SILENT_MODE_KEY,
   type FormConfig,
   type FormState,
   MFormBox,
@@ -92,8 +89,6 @@ const emit = defineEmits<{
 
 const { uiService } = useServices();
 const mForm = inject<FormState | undefined>('mForm');
-const silentMode = inject(FORM_SILENT_MODE_KEY, false);
-
 /** 对比模式下隐藏新增/编辑/删除等操作按钮，仅保留只读展示。 */
 const isCompare = computed(() => Boolean(mForm?.isCompare));
 
@@ -383,8 +378,6 @@ provide(
 );
 
 onMounted(() => {
-  if (silentMode) return;
-
   const path = editingFieldPath.value;
   if (!path.length) return;
 

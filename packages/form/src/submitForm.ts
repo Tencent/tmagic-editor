@@ -16,102 +16,26 @@
  * limitations under the License.
  */
 
-import {
-  type AppContext,
-  type Component,
-  createApp,
-  defineComponent,
-  h,
-  nextTick,
-  provide,
-  type Ref,
-  ref,
-  watch,
-} from 'vue';
+import { type AppContext, type Component, createApp, defineComponent, h, nextTick, type Ref, ref, watch } from 'vue';
 
 import { applyExtendState } from './utils/form';
+import {
+  submitForm as submitFormHeadless,
+  type SubmitFormOptions,
+  type SubmitFormResult,
+  validateForm as validateFormHeadless,
+  type ValidateFormOptions,
+} from './utils/submitHeadless';
 import Form from './Form.vue';
-import { type ChangeRecord, FORM_SILENT_MODE_KEY, type FormConfig, type FormState } from './schema';
+import { type ChangeRecord, type FormConfig } from './schema';
 
-// #region SubmitFormOptions
-/**
- * submitForm 函数参数（与 Form.vue 组件 props 对齐）
- */
-export interface SubmitFormOptions {
-  /** 表单配置 */
-  config: FormConfig;
-  /** 表单初始值 */
-  initValues?: Record<string, any>;
-  /** 需对比的值（开启对比模式时传入） */
-  lastValues?: Record<string, any>;
-  /** 是否开启对比模式 */
-  isCompare?: boolean;
-  parentValues?: Record<string, any>;
-  labelWidth?: string;
-  disabled?: boolean;
-  height?: string;
-  stepActive?: string | number;
-  size?: 'small' | 'default' | 'large';
-  inline?: boolean;
-  labelPosition?: string;
-  keyProp?: string;
-  popperClass?: string;
-  preventSubmitDefault?: boolean;
-  /**
-   * 表单校验失败时，错误提示前缀是否使用字段的 text 文案（通过 `getTextByName` 从 config 中查找）。
-   * 默认 `true`，置为 `false` 时直接使用字段 name。
-   */
-  useFieldTextInError?: boolean;
-  extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
-  /** 透传给 Form.submitForm 的参数：是否直接返回原始响应式 values */
-  native?: boolean;
-  /**
-   * 是否在 resolve 结果中携带 changeRecords（变更记录）。
-   * 开启后 resolve 的结果为 `{ values, changeRecords }`，否则仅 resolve values。
-   */
-  returnChangeRecords?: boolean;
-  /**
-   * 父级应用上下文，用于继承全局组件、指令、provide 等。
-   * 通常通过 `app._context` 或 `getCurrentInstance()?.appContext` 获取。
-   */
-  appContext?: AppContext | null;
-  /** 等待表单初始化的最长时间（毫秒），超时将以错误 reject。默认 10000ms */
-  timeout?: number;
-  /**
-   * 调试模式。默认 `false`。
-   *
-   * - `false`：表单以隐藏方式挂载，初始化完成后自动提交（原有行为）。
-   * - `true`：将表单以弹层形式可见地渲染在页面上，需手动点击「确定」才会触发校验/提交，
-   *   点击「取消」则以 reject 中断；校验失败时保留弹层并展示错误信息，便于修正后重试。
-   *   调试模式下 `timeout` 不生效（等待人工操作）。
-   */
-  debug?: boolean;
-  typeMatchValid?: boolean;
-  /**
-   * 外部中断信号。abort 时会立即以 `signal.reason` reject 并卸载临时表单实例、移除容器。
-   * 主要用于 `debug` 模式（无超时兜底）下取消一个被放弃的表单弹层，避免其无限驻留在页面上。
-   */
-  signal?: AbortSignal;
-}
-// #endregion SubmitFormOptions
-
-// #region SubmitFormResult
-/**
- * 开启 `returnChangeNodes` 时 submitForm 的返回结果
- */
-export interface SubmitFormResult {
-  /** 校验通过后的表单值 */
-  values: any;
-  /** 表单变更记录 */
-  changeRecords: ChangeRecord[];
-}
-// #endregion SubmitFormResult
+export type { SubmitFormOptions, SubmitFormResult, ValidateFormOptions };
 
 // #region mountFormInstance
 /**
  * 构造 wrapper 组件的工厂：在合适时机调用 MForm 实例方法并 resolve/reject、清理实例。
  *
- * 由调用方决定「等待 `initialized` 后自动执行」还是「等待人工触发」（debug 模式），
+ * 由调用方决定「等待 `initialized` 后自动执行」还是「等待人工触发」（`dialog: true`），
  * 以及「调用 `submitForm` 还是 `validate`」「结果如何包装」，从而复用公共脚手架。
  */
 type FormWrapperFactory<T> = (ctx: {
@@ -132,43 +56,22 @@ interface MountFormInstanceOptions<T> {
   formProps: Record<string, any>;
   /** 父级应用上下文，用于继承全局组件、指令、provide 等 */
   appContext?: AppContext | null;
-  /** 等待表单初始化的最长时间（毫秒），<=0 时回退到默认超时以保证兜底清理生效 */
-  timeout: number;
-  /** 超时 reject 的错误文案 */
-  timeoutMessage: string;
-  /** 是否以 `display:none` 隐藏容器。调试模式需可见，应传 `false` */
-  hidden?: boolean;
-  /** 是否跳过超时注册。调试模式等待人工操作，应传 `true` */
-  skipTimeout?: boolean;
-  /** 外部中断信号：abort 时会 reject 并卸载实例、移除容器，用于取消无超时（如 debug）的挂载 */
+  /** 外部中断信号：abort 时会 reject 并卸载实例、移除容器，用于取消等待人工操作的挂载 */
   signal?: AbortSignal;
   /** 构造 wrapper 组件 */
   createWrapper: FormWrapperFactory<T>;
 }
 
-/** 未指定或传入非正数 timeout 时的兜底超时（毫秒），保证非 debug 挂载始终能被清理 */
-const DEFAULT_MOUNT_TIMEOUT = 10000;
-
 /**
- * submitForm / validateForm 的公共脚手架：
+ * `dialog: true` 时 submitForm / validateForm 的公共脚手架：
  *
- * 创建临时容器 → 挂载一个 wrapper 组件（内含 MForm）→ 提供统一的 cleanup / timeout / appContext 继承 →
+ * 创建临时容器 → 挂载一个 wrapper 组件（内含 MForm）→ 提供统一的 cleanup / appContext 继承 →
  * 由 `createWrapper` 决定「何时调用 MForm 的哪个方法、如何 resolve/reject」。
  *
- * 调用方只需关注差异逻辑（调用 `submitForm` 还是 `validate`、结果如何包装、是否需要调试弹层），
- * 容器创建、卸载、超时、上下文注入等模板代码在此统一收口。
+ * 挂载出来的表单等待人工点击，因此没有超时兜底，靠「确定」/「取消」/`signal` 结束。
  */
 const mountFormInstance = <T>(options: MountFormInstanceOptions<T>): Promise<T> => {
-  const {
-    formProps,
-    appContext,
-    timeout,
-    timeoutMessage,
-    hidden = true,
-    skipTimeout = false,
-    signal,
-    createWrapper,
-  } = options;
+  const { formProps, appContext, signal, createWrapper } = options;
 
   return new Promise<T>((resolve, reject) => {
     // 已中断则直接 reject，不创建任何容器/实例
@@ -178,24 +81,16 @@ const mountFormInstance = <T>(options: MountFormInstanceOptions<T>): Promise<T> 
     }
 
     let cleaned = false;
-    let timer: ReturnType<typeof setTimeout> | null = null;
     let onAbort: (() => void) | null = null;
     // 用 holder 持有 app，使 cleanup 可在 app 创建之前定义（const app + 无 TDZ / 无 use-before-define）
     const instance: { app: ReturnType<typeof createApp> | null } = { app: null };
 
     const container = document.createElement('div');
-    if (hidden) {
-      container.style.display = 'none';
-    }
     document.body.appendChild(container);
 
     const cleanup = () => {
       if (cleaned) return;
       cleaned = true;
-      if (timer) {
-        clearTimeout(timer);
-        timer = null;
-      }
       if (signal && onAbort) {
         signal.removeEventListener('abort', onAbort);
         onAbort = null;
@@ -208,7 +103,7 @@ const mountFormInstance = <T>(options: MountFormInstanceOptions<T>): Promise<T> 
       container.parentNode?.removeChild(container);
     };
 
-    // 支持外部通过 AbortSignal 主动中断：debug 模式无超时兜底，若调用方放弃了该 Promise，
+    // 支持外部通过 AbortSignal 主动中断：弹层无超时兜底，若调用方放弃了该 Promise，
     // 可通过 abort 卸载实例、移除遮罩/容器，避免无限驻留在 DOM 中。
     if (signal) {
       onAbort = () => {
@@ -269,38 +164,12 @@ const mountFormInstance = <T>(options: MountFormInstanceOptions<T>): Promise<T> 
             })
           : userWrapper;
 
-      // 静默（隐藏挂载）模式下注入静默标记：vs-code 等重型字段组件可据此跳过自身渲染，
-      // 校验/取值依赖 FormItem 与 model 值，与叶子 UI 组件无关（见 FORM_SILENT_MODE_KEY 注释）。
-      // 用组件级 provide 而非 app.provide：appContext 合并后 app._context.provides 与父级应用
-      // 共享引用，app.provide 会把标记泄漏到父级应用。
-      const rootComponent = hidden
-        ? defineComponent({
-            name: 'MFormSilentProvider',
-            setup() {
-              provide(FORM_SILENT_MODE_KEY, true);
-              return () => h(wrapperComponent);
-            },
-          })
-        : wrapperComponent;
-
-      const app = createApp(rootComponent);
+      const app = createApp(wrapperComponent);
       instance.app = app;
 
       // 继承父级应用上下文（components / directives / provides / config 等）
       if (appContext) {
         Object.assign(app._context, appContext);
-      }
-
-      // 非 debug（未跳过超时）场景始终注册超时兜底：timeout 为非正数时回退到默认值，
-      // 避免表单永不初始化时实例/容器/watcher 无限驻留而泄漏。
-      if (!skipTimeout) {
-        const effectiveTimeout = timeout > 0 ? timeout : DEFAULT_MOUNT_TIMEOUT;
-        timer = setTimeout(() => {
-          if (!cleaned) {
-            reject(new Error(timeoutMessage));
-            cleanup();
-          }
-        }, effectiveTimeout);
       }
 
       app.mount(container);
@@ -312,8 +181,8 @@ const mountFormInstance = <T>(options: MountFormInstanceOptions<T>): Promise<T> 
 };
 // #endregion mountFormInstance
 
-// #region createDebugWrapper
-interface DebugWrapperOptions {
+// #region createDialogWrapper
+interface DialogWrapperOptions {
   /** 指向挂载的 MForm 实例 */
   formRef: Ref<any>;
   /** 透传给 Form 组件的 props */
@@ -332,12 +201,12 @@ interface DebugWrapperOptions {
 }
 
 /**
- * 构造调试模式下的可见弹层 wrapper：以 fixed 遮罩居中渲染 MForm，提供「确定 / 取消」按钮与错误展示区。
+ * 构造可见弹层 wrapper：以 fixed 遮罩居中渲染 MForm，提供「确定 / 取消」按钮与错误展示区。
  *
- * submitForm 与 validateForm 的调试弹层 UI 完全一致，仅「确定」时调用的实例方法、错误处理与取消文案不同，
+ * submitForm 与 validateForm 的弹层 UI 完全一致，仅「确定」时调用的实例方法、错误处理与取消文案不同，
  * 这些差异通过 `onConfirm` / `onCancel` 注入，弹层结构在此统一收口。
  */
-const createDebugWrapper = (options: DebugWrapperOptions): Component => {
+const createDialogWrapper = (options: DialogWrapperOptions): Component => {
   const { formRef, formProps, title, name, onConfirm, onCancel } = options;
 
   const btnBase = {
@@ -461,63 +330,22 @@ const createDebugWrapper = (options: DebugWrapperOptions): Component => {
     },
   });
 };
-// #endregion createDebugWrapper
+// #endregion createDialogWrapper
 
 /**
- * 以命令式方式调用 Form.vue 完成一次表单校验/提交。
+ * 可见弹层提交：把表单渲染在弹层里，点击「确定」才调用挂载实例的 `submitForm`。
  *
- * 类似 ElMessage 的用法：传入 props（包含 `config`/`initValues` 等），函数内部会临时挂载
- * 一个不可见的 Form 组件实例，等待初始化完成后调用其 `submitForm` 方法，
- * 校验通过则 resolve 表单值，校验失败则 reject 错误信息，最后自动卸载实例。
- *
- * @example
- * ```ts
- * import { submitForm } from '@tmagic/form';
- *
- * try {
- *   const values = await submitForm({
- *     config: [...],
- *     initValues: { name: 'foo' },
- *   });
- *   console.log(values);
- * } catch (e) {
- *   console.error(e);
- * }
- *
- * // 需要同时获取变更记录时：
- * const { values, changeRecords } = await submitForm({
- *   config: [...],
- *   initValues: { name: 'foo' },
- *   returnChangeRecords: true,
- * });
- *
- * // 调试模式：可见地渲染表单，点击「确定」才提交：
- * const values = await submitForm({
- *   config: [...],
- *   initValues: { name: 'foo' },
- *   debug: true,
- * });
- * ```
+ * 用于需要用户填写/确认的场景；默认路径仍是无渲染校验（见 `submitForm` 的说明）。
  */
-export const submitForm = (options: SubmitFormOptions): Promise<any> => {
-  const { native, appContext, timeout = 10000, returnChangeRecords, debug = false, signal, ...formProps } = options;
+const submitFormByDialogRender = (options: SubmitFormOptions): Promise<any> => {
+  const { native, appContext, returnChangeRecords, signal, dialog, title, ...formProps } = options;
 
   return mountFormInstance<any>({
     formProps,
     appContext,
-    timeout,
     signal,
-    // 调试模式需把表单展示出来；普通模式隐藏挂载
-    hidden: !debug,
-    // 调试模式等待人工操作，不应用超时
-    skipTimeout: debug,
-    timeoutMessage: `submitForm timeout after ${timeout}ms: form is not initialized.`,
     createWrapper: ({ formRef, formProps, cleanup, resolve, reject }) => {
-      /**
-       * 执行一次提交：nextTick 等待子组件渲染 → 快照 changeRecords → 调用实例 submitForm → resolve。
-       * 校验失败时交给 `onValidateError` 决定「保留弹层展示错误（debug）」还是「reject 并清理（普通）」，
-       * 从而让 debug 与普通模式共享同一份提交逻辑。
-       */
+      // 执行一次提交：nextTick 等待子组件渲染 → 快照 changeRecords → 调用实例 submitForm → resolve
       const doSubmit = async (onValidateError: (err: any) => void) => {
         try {
           // 等待子组件（FormItem 等）完成首次渲染，确保 validate 能拿到所有字段
@@ -532,91 +360,24 @@ export const submitForm = (options: SubmitFormOptions): Promise<any> => {
         }
       };
 
-      // 调试模式：可见地渲染表单，点击「确定」才提交，点击「取消」则中断
-      if (debug) {
-        return createDebugWrapper({
-          formRef,
-          formProps,
-          name: 'MFormSubmitWrapper',
-          title: 'submitForm 调试',
-          onConfirm: (setError) =>
-            doSubmit((err) => {
-              // 校验失败时保留弹层并展示错误，便于修正后重新提交
-              setError(err instanceof Error ? err.message : String(err));
-            }),
-          onCancel: () => {
-            reject(new Error('submitForm canceled in debug mode.'));
-            cleanup();
-          },
-        });
-      }
-
-      // 普通模式：表单初始化完成后自动提交
-      return defineComponent({
+      return createDialogWrapper({
+        formRef,
+        formProps,
         name: 'MFormSubmitWrapper',
-        setup() {
-          const stop = watch(
-            () => formRef.value?.initialized,
-            (initialized) => {
-              if (!initialized) return;
-              stop();
-              doSubmit((err) => {
-                reject(err);
-                cleanup();
-              });
-            },
-            { flush: 'post', immediate: true },
-          );
-
-          return () => h(Form as Component, { ...formProps, ref: formRef });
+        title: title ?? 'submitForm',
+        onConfirm: (setError) =>
+          doSubmit((err) => {
+            // 校验失败时保留弹层并展示错误，便于修正后重新提交
+            setError(err instanceof Error ? err.message : String(err));
+          }),
+        onCancel: () => {
+          reject(new Error('submitForm canceled.'));
+          cleanup();
         },
       });
     },
   });
 };
-
-// #region ValidateFormOptions
-/**
- * validateForm 函数参数（与 Form.vue 组件 props 对齐，取校验所需子集）
- */
-export interface ValidateFormOptions {
-  /** 表单配置 */
-  config: FormConfig;
-  /** 待校验的表单值 */
-  initValues?: Record<string, any>;
-  parentValues?: Record<string, any>;
-  labelWidth?: string;
-  keyProp?: string;
-  /**
-   * 校验失败时，错误提示前缀是否使用字段的 text 文案（通过 `getTextByName` 从 config 中查找）。
-   * 默认 `true`，置为 `false` 时直接使用字段 name。
-   */
-  useFieldTextInError?: boolean;
-  extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
-  /**
-   * 父级应用上下文，用于继承全局组件、指令、provide 等。
-   * 通常通过 `app._context` 或 `getCurrentInstance()?.appContext` 获取。
-   */
-  appContext?: AppContext | null;
-  /** 等待表单初始化的最长时间（毫秒），超时将以错误 reject。默认 10000ms */
-  timeout?: number;
-  /**
-   * 调试模式。默认 `false`。
-   *
-   * - `false`：以隐藏方式挂载，初始化完成后自动校验并 resolve 错误文案（原有静默行为）。
-   * - `true`：将表单以弹层形式可见地渲染在页面上，需手动点击「确定」才会触发校验，
-   *   点击「取消」则以 reject 中断；校验失败时在弹层内展示错误信息并保留弹层，便于修正后重试，
-   *   校验通过则 resolve 空字符串。调试模式下 `timeout` 不生效（等待人工操作）。
-   */
-  debug?: boolean;
-  typeMatchValid?: boolean;
-  /**
-   * 外部中断信号。abort 时会立即以 `signal.reason` reject 并卸载临时表单实例、移除容器。
-   * 主要用于 `debug` 模式（无超时兜底）下取消一个被放弃的表单弹层，避免其无限驻留在页面上。
-   */
-  signal?: AbortSignal;
-}
-// #endregion ValidateFormOptions
 
 // #region stripTabLazy
 /**
@@ -673,44 +434,12 @@ export const stripTabItemsLazy = (config: FormConfig): FormConfig => {
 // #endregion stripTabLazy
 
 /**
- * 以命令式方式对一份「表单配置 + 值」做一次静默校验，**不依赖也不影响任何已渲染的表单**。
+ * 可见弹层校验：把表单渲染在弹层里，点击「确定」才调用挂载实例的 `validate`。
  *
- * 与 `submitForm` 类似，内部会临时挂载一个不可见的 MForm 实例，等待其初始化完成后调用
- * 实例的 `validate` 方法，返回汇总后的错误文案，随后自动卸载实例。
- *
- * 与 `submitForm` 的区别：
- * - 「静默」：校验失败不抛异常、不触发 `error` 事件、不返回表单值；
- * - 仅用于「探测」配置是否合法，适合源码保存后校验、批量校验组件配置等场景。
- *
- * 由于每次都新建一个独立的 MForm 实例，调用方无需持有任何表单 ref，也不会污染
- * 页面上正在展示的表单状态。
- *
- * @returns 校验通过返回空字符串 `''`，否则返回以 `<br>` 拼接的错误文案。
- *   仅在初始化超时或挂载失败等异常情况下才会 reject。
- *
- * @example
- * ```ts
- * import { validateForm } from '@tmagic/form';
- *
- * const error = await validateForm({
- *   config: [...],
- *   initValues: { name: 'foo' },
- *   appContext: getCurrentInstance()?.appContext,
- * });
- * if (error) {
- *   // 配置不合法，error 为错误文案
- * }
- *
- * // 调试模式：可见地渲染表单，点击「确定」才校验，校验失败保留弹层可修正重试：
- * const error = await validateForm({
- *   config: [...],
- *   initValues: { name: 'foo' },
- *   debug: true,
- * });
- * ```
+ * 用于需要用户填写/确认的场景；默认路径仍是无渲染校验（见 `validateForm` 的说明）。
  */
-export const validateForm = (options: ValidateFormOptions): Promise<string> => {
-  const { appContext, timeout = 10000, debug = false, config, signal, ...rest } = options;
+const validateFormByDialogRender = (options: ValidateFormOptions): Promise<string> => {
+  const { appContext, config, signal, dialog, title, ...rest } = options;
 
   // 去掉 tab 容器各标签页的 lazy，确保懒加载标签页内的字段也参与校验
   const formProps = { ...rest, config: stripTabItemsLazy(config) };
@@ -718,19 +447,9 @@ export const validateForm = (options: ValidateFormOptions): Promise<string> => {
   return mountFormInstance<string>({
     formProps,
     appContext,
-    timeout,
     signal,
-    // 调试模式需把表单展示出来；普通模式隐藏挂载
-    hidden: !debug,
-    // 调试模式等待人工操作，不应用超时
-    skipTimeout: debug,
-    timeoutMessage: `validateForm timeout after ${timeout}ms: form is not initialized.`,
     createWrapper: ({ formRef, formProps, cleanup, resolve, reject }) => {
-      /**
-       * 执行一次校验：nextTick 等待子组件渲染 → 调用实例 validate → 通过则 resolve ''。
-       * 校验失败（返回非空错误文案）时交给 `onInvalid` 决定「静默 resolve 错误文案（普通）」
-       * 还是「在弹层展示错误并保留供重试（debug）」，从而让两种模式共享同一份校验逻辑。
-       */
+      // 执行一次校验：nextTick 等待子组件渲染 → 调用实例 validate → 通过则 resolve ''，失败则在弹层展示错误
       const doValidate = async (onInvalid: (error: string) => void) => {
         try {
           // 等待子组件（FormItem 等）完成首次渲染，确保 validate 能拿到所有字段
@@ -749,46 +468,43 @@ export const validateForm = (options: ValidateFormOptions): Promise<string> => {
         }
       };
 
-      // 调试模式：可见地渲染表单，点击「确定」才校验，点击「取消」则中断
-      if (debug) {
-        return createDebugWrapper({
-          formRef,
-          formProps,
-          name: 'MFormValidateWrapper',
-          title: 'validateForm 调试',
-          onConfirm: (setError) =>
-            doValidate((error) => {
-              // 校验失败时保留弹层并展示错误，便于修正后重新校验
-              setError(error);
-            }),
-          onCancel: () => {
-            reject(new Error('validateForm canceled in debug mode.'));
-            cleanup();
-          },
-        });
-      }
-
-      // 普通模式：表单初始化完成后自动校验（静默 resolve 错误文案）
-      return defineComponent({
+      return createDialogWrapper({
+        formRef,
+        formProps,
         name: 'MFormValidateWrapper',
-        setup() {
-          const stop = watch(
-            () => formRef.value?.initialized,
-            (initialized) => {
-              if (!initialized) return;
-              stop();
-              doValidate((error) => {
-                // 静默：校验失败也以错误文案 resolve（不抛异常）
-                resolve(error);
-                cleanup();
-              });
-            },
-            { flush: 'post', immediate: true },
-          );
-
-          return () => h(Form as Component, { ...formProps, ref: formRef });
+        title: title ?? 'validateForm',
+        onConfirm: (setError) =>
+          doValidate((error) => {
+            // 校验失败时保留弹层并展示错误，便于修正后重新校验
+            setError(error);
+          }),
+        onCancel: () => {
+          reject(new Error('validateForm canceled.'));
+          cleanup();
         },
       });
     },
   });
 };
+
+// #region headless
+/**
+ * 以命令式方式对一份「表单配置 + 值」做一次校验并取回表单值。
+ *
+ * 默认走无渲染实现（见 `@tmagic/form/headless`）。`dialog: true` 会把表单以弹层渲染出来。
+ */
+export const submitForm = async (options: SubmitFormOptions): Promise<any> => {
+  if (options.dialog) return submitFormByDialogRender(options);
+  return submitFormHeadless(options);
+};
+
+/**
+ * 以命令式方式对一份「表单配置 + 值」做一次静默校验。
+ *
+ * 默认走无渲染实现。`dialog: true` 的处理详见 `submitForm`。
+ */
+export const validateForm = async (options: ValidateFormOptions): Promise<string> => {
+  if (options.dialog) return validateFormByDialogRender(options);
+  return validateFormHeadless(options);
+};
+// #endregion headless

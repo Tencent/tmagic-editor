@@ -9,13 +9,13 @@ import { mount } from '@vue/test-utils';
 
 import DisplayConds from '@editor/fields/DisplayConds.vue';
 
-const dataSourceService = {
-  getDataSourceById: vi.fn(),
-};
-
-vi.mock('@editor/hooks/use-services', () => ({
-  useServices: () => ({ dataSourceService }),
+// 表单配置由 fields/configs/displayConds.ts 产出（组件与无渲染校验的嵌套配置共用），
+// 那里直接用服务单例，因此这里 mock 服务模块本身
+const { dataSourceService } = vi.hoisted(() => ({
+  dataSourceService: { getDataSourceById: vi.fn() },
 }));
+
+vi.mock('@editor/services/dataSource', () => ({ default: dataSourceService }));
 
 const { fieldTypeMock } = vi.hoisted(() => ({
   fieldTypeMock: vi.fn((_ds: any, names: string[]) => {

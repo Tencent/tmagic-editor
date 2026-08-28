@@ -18,9 +18,10 @@
 
 import { readonly } from 'vue';
 import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
+// dayjs 没有 exports 映射，原生 Node ESM 不会补扩展名，深路径必须写全 .js
+import customParseFormat from 'dayjs/plugin/customParseFormat.js';
 
-import { appendValidateSuggestion } from '@tmagic/design';
+import { appendValidateSuggestion } from '@tmagic/design/headless';
 import { getValueByKeyPath, toLine } from '@tmagic/utils';
 
 import type { CascaderOption, FormState, Rule } from '../schema';
@@ -49,33 +50,36 @@ export type TypeMatchValidator = (
 ) => string | undefined | Promise<string | undefined>;
 // #endregion TypeMatchValidator
 
-const typeMatchRuleRegistry = new Map<string, TypeMatchValidator>();
+const extraTypeMatchRules = new Map<string, TypeMatchValidator>();
+const builtInTypeMatchRules = new Map<string, TypeMatchValidator>();
 
 const isPromise = (value: any): value is Promise<unknown> =>
   typeof value === 'object' && value !== null && typeof value.then === 'function';
 
-/** 注册或覆盖某个字段 type 的 typeMatch 校验规则 */
-export const registerTypeMatchRule = (type: string, validator: TypeMatchValidator): void => {
-  typeMatchRuleRegistry.set(toLine(type), validator);
+/** 注册或覆盖某个字段 type 的 typeMatch 校验规则。`builtIn` 登记不受 `clearTypeMatchRules` / `deleteTypeMatchRule` 影响。 */
+export const registerTypeMatchRule = (type: string, validator: TypeMatchValidator, builtIn = false): void => {
+  (builtIn ? builtInTypeMatchRules : extraTypeMatchRules).set(toLine(type), validator);
 };
 
 /** 批量注册 typeMatch 校验规则 */
-export const registerTypeMatchRules = (rules: Record<string, TypeMatchValidator>): void => {
+export const registerTypeMatchRules = (rules: Record<string, TypeMatchValidator>, builtIn = false): void => {
   Object.entries(rules).forEach(([type, validator]) => {
-    registerTypeMatchRule(type, validator);
+    registerTypeMatchRule(type, validator, builtIn);
   });
 };
 
-/** 获取某个字段 type 的自定义 typeMatch 校验规则 */
-export const getTypeMatchRule = (type: string): TypeMatchValidator | undefined =>
-  typeMatchRuleRegistry.get(toLine(type));
+/** 获取某个字段 type 的 typeMatch 校验规则（业务侧优先于内置） */
+export const getTypeMatchRule = (type: string): TypeMatchValidator | undefined => {
+  const key = toLine(type);
+  return extraTypeMatchRules.get(key) ?? builtInTypeMatchRules.get(key);
+};
 
-/** 删除某个字段 type 的自定义 typeMatch 校验规则 */
-export const deleteTypeMatchRule = (type: string): boolean => typeMatchRuleRegistry.delete(toLine(type));
+/** 删除业务侧 typeMatch 校验规则（不影响内置） */
+export const deleteTypeMatchRule = (type: string): boolean => extraTypeMatchRules.delete(toLine(type));
 
-/** 清空所有自定义 typeMatch 校验规则 */
+/** 清空业务侧 typeMatch 校验规则（不影响内置） */
 export const clearTypeMatchRules = (): void => {
-  typeMatchRuleRegistry.clear();
+  extraTypeMatchRules.clear();
 };
 
 /** 本地解析配置函数，避免与 form.ts 循环依赖 */

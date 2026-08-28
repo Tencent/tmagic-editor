@@ -29,6 +29,7 @@ import { TMagicForm, TMagicFormItem, TMagicInput } from '@tmagic/design';
 
 import type { DynamicFieldConfig, FieldProps } from '../schema';
 import { getConfig } from '../utils/config';
+import { eachDynamicField } from '../utils/fieldValueEffects';
 import { useAddField } from '../utils/useAddField';
 
 defineOptions({
@@ -54,15 +55,13 @@ const changeFieldMap = async () => {
   const fields = await props.config.returnFields(props.config, props.model, request);
   fieldMap.value = {};
   fieldLabelMap.value = {};
-  fields.forEach((v) => {
-    if (typeof v !== 'object' || v.name === undefined) return;
-    let oldVal = props.model?.[v.name] || '';
-    if (!oldVal && v.defaultValue !== undefined) {
-      oldVal = v.defaultValue;
-      emit('change', oldVal, { modifyKey: v.name });
+  eachDynamicField(fields, props.model, (field, value, isDefaultApplied) => {
+    // 取了 defaultValue 的字段需要写回表单值
+    if (isDefaultApplied) {
+      emit('change', value, { modifyKey: field.name });
     }
-    fieldMap.value[v.name] = oldVal;
-    fieldLabelMap.value[v.name] = v.label || '';
+    fieldMap.value[field.name] = value;
+    fieldLabelMap.value[field.name] = field.label || '';
   });
 };
 

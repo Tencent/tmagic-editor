@@ -1,13 +1,13 @@
 import { computed, h, inject, type Ref } from 'vue';
 import { WarningFilled } from '@element-plus/icons-vue';
-import { cloneDeep } from 'lodash-es';
 
 import { type TableColumnOptions, TMagicIcon, TMagicTooltip } from '@tmagic/design';
-import type { FormItemConfig, FormState, TableColumnConfig } from '@tmagic/form-schema';
+import type { FormItemConfig, FormState } from '@tmagic/form-schema';
 
 import type { ContainerChangeEventData } from '../../schema';
 import { isGlobalFlat } from '../../utils/config';
-import { display as displayFunc, getDataByPage, sortArray } from '../../utils/form';
+import { appendProp, display as displayFunc, getDataByPage, sortArray } from '../../utils/form';
+import { isTableColumnRendered, makeTableColumnConfig } from '../../utils/tableGroupList';
 import Container from '../Container.vue';
 
 import ActionsColumn from './ActionsColumn.vue';
@@ -65,18 +65,7 @@ export const useTableColumns = (
     return props.config.selection;
   });
 
-  const getProp = (index: number) => {
-    return `${props.prop}${props.prop ? '.' : ''}${index + 1 + currentPage.value * pageSize.value - 1}`;
-  };
-
-  const makeConfig = (config: TableColumnConfig, row: any): TableColumnConfig => {
-    const newConfig = cloneDeep(config);
-    if (typeof config.itemsFunction === 'function') {
-      newConfig.items = config.itemsFunction(row);
-    }
-    delete newConfig.display;
-    return newConfig;
-  };
+  const getProp = (index: number) => appendProp(props.prop, index + currentPage.value * pageSize.value);
 
   const changeHandler = (v: any, eventData: ContainerChangeEventData) => {
     emit('change', props.model, eventData);
@@ -185,7 +174,7 @@ export const useTableColumns = (
     }
 
     for (const column of props.config.items) {
-      if (column.type !== 'hidden' && display(column.display)) {
+      if (isTableColumnRendered(column, display)) {
         const titleTipValue = titleTip(column.titleTip);
 
         columns.push({
@@ -203,7 +192,7 @@ export const useTableColumns = (
               disabled: props.disabled,
               prop: getProp($index),
               rules: column.rules,
-              config: makeConfig(column, row) as FormItemConfig,
+              config: makeTableColumnConfig(column, row) as FormItemConfig,
               model: row,
               lastValues: lastData.value[$index],
               isCompare: props.isCompare,

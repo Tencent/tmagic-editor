@@ -15,8 +15,6 @@ vi.mock('@tmagic/form', async (importOriginal) => {
   return {
     ...actual,
     default: { install: vi.fn() },
-    registerSilentLeafFieldTypes: vi.fn(),
-    registerTypeMatchRules: vi.fn(),
   };
 });
 vi.mock('@tmagic/table', () => ({
@@ -77,22 +75,73 @@ describe('plugin install', () => {
   };
 
   test('install 调用 design/form/table 插件并注册全局组件', async () => {
-    const { registerSilentLeafFieldTypes, registerTypeMatchRules } = await import('@tmagic/form');
-    const { editorTypeMatchRules } = await import('@editor/utils/type-match-rules');
+    const formPlugin = (await import('@tmagic/form')).default;
     const { app, components } = buildApp();
     editorPlugin.install(app, { someOption: true } as any);
     expect(app.use).toHaveBeenCalledTimes(3);
-    expect(registerTypeMatchRules).toHaveBeenCalledWith(editorTypeMatchRules);
-    expect(registerSilentLeafFieldTypes).toHaveBeenCalledWith([
-      'vs-code',
-      'ui-select',
-      'cond-op-select',
-      'page-fragment-select',
-      'data-source-select',
-      'data-source-input',
-    ]);
-    expect(Object.keys(components).length).toBeGreaterThan(10);
+    const formInstall = (app.use as any).mock.calls.find((call: any[]) => call[0] === formPlugin);
+    expect(formInstall).toBeDefined();
+    const fields = formInstall[1].fields as Record<
+      string,
+      { component?: unknown; container?: unknown; nested?: unknown; typeMatch?: unknown }
+    >;
+    expect(formInstall[1].someOption).toBe(true);
+    expect(Object.keys(fields)).toEqual(
+      expect.arrayContaining([
+        'vs-code',
+        'ui-select',
+        'cond-op-select',
+        'page-fragment-select',
+        'data-source-select',
+        'data-source-input',
+        'code-link',
+        'key-value',
+        'code-select-col',
+        'data-source-fields',
+        'data-source-mocks',
+        'data-source-methods',
+        'data-source-method-select',
+        'data-source-field-select',
+        'code-select',
+        'display-conds',
+        'event-select',
+        'style-setter',
+      ]),
+    );
+    expect(fields['vs-code'].component).toBeDefined();
+    for (const type of Object.keys(fields)) {
+      if (type === 'style-setter') {
+        expect(fields[type].container, `${type} 缺少 container`).toBeDefined();
+        expect(fields[type].component).toBeUndefined();
+        continue;
+      }
+      expect(fields[type].component, `${type} 缺少 component`).toBeDefined();
+    }
+    expect(fields['code-select'].nested).toEqual(expect.any(Function));
+    expect(fields['code-select'].typeMatch).toEqual(expect.any(Function));
+    expect(fields['style-setter'].nested).toEqual(expect.any(Function));
+    expect(fields['ui-select'].typeMatch).toEqual(expect.any(Function));
+    expect(fields['vs-code'].nested).toBeUndefined();
     expect(components.MEditor).toBeDefined();
+    expect(components['magic-code-editor']).toBeDefined();
+    expect(Object.keys(components)).toEqual(['MEditor', 'magic-code-editor']);
+  });
+
+  test('install 时调用方 fields 与 editorFields 按 type 浅合并', async () => {
+    const formPlugin = (await import('@tmagic/form')).default;
+    const { app } = buildApp();
+    editorPlugin.install(app, {
+      fields: {
+        'code-select': { component: { name: 'CustomCodeSelect' } },
+        'my-field': { component: { name: 'MyField' } },
+      },
+    } as any);
+    const formOpt = (app.use as any).mock.calls.find((call: any[]) => call[0] === formPlugin)[1];
+    expect(formOpt.fields['code-select'].component).toEqual({ name: 'CustomCodeSelect' });
+    expect(formOpt.fields['code-select'].nested).toEqual(expect.any(Function));
+    expect(formOpt.fields['code-select'].typeMatch).toEqual(expect.any(Function));
+    expect(formOpt.fields['my-field'].component).toEqual({ name: 'MyField' });
+    expect(formOpt.fields['ui-select'].component).toBeDefined();
   });
 
   test('install 不传 opt 时使用默认配置', () => {

@@ -1,7 +1,7 @@
 <template>
   <MContainer
     :prop="prop"
-    :config="config"
+    :config="borderRadiusConfig"
     :model="values"
     :last-values="lastValues"
     :is-compare="isCompare"
@@ -22,10 +22,11 @@
 </template>
 
 <script lang="ts" setup>
-import { type ContainerChangeEventData, defineFormItem, MContainer } from '@tmagic/form';
+import { type ContainerChangeEventData, MContainer } from '@tmagic/form';
 import type { StyleSchema } from '@tmagic/schema';
 
 import Border from '../components/Border.vue';
+import { borderRadiusConfig } from '../configs';
 
 defineProps<{
   values: Partial<StyleSchema>;
@@ -40,16 +41,6 @@ const emit = defineEmits<{
   change: [v: StyleSchema, eventData: ContainerChangeEventData];
   addDiffCount: [];
 }>();
-
-const config = defineFormItem({
-  labelWidth: '68px',
-  name: 'borderRadius',
-  text: '圆角',
-  type: 'data-source-field-select',
-  fieldConfig: {
-    type: 'text',
-  },
-});
 
 const change = (value: StyleSchema, eventData: ContainerChangeEventData) => {
   emit('change', value, eventData);

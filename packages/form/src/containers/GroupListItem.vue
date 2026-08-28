@@ -99,7 +99,7 @@
       :lastValues="lastValues"
       :is-compare="isCompare"
       :labelWidth="labelWidth"
-      :prop="`${prop}${prop ? '.' : ''}${String(index)}`"
+      :prop="rowProp"
       :size="size"
       :disabled="disabled"
       @change="changeHandler"
@@ -115,7 +115,8 @@ import { ArrowDown, ArrowRight, Bottom, Delete, DocumentCopy, Position, Top } fr
 import { TMagicButton, TMagicCard, TMagicIcon, TMagicInputNumber, TMagicPopover, TMagicTooltip } from '@tmagic/design';
 
 import type { ContainerChangeEventData, FormState, GroupListConfig } from '../schema';
-import { filterFunction } from '../utils/form';
+import { appendProp, filterFunction } from '../utils/form';
+import { getGroupListRowConfig } from '../utils/tableGroupList';
 
 import Container from './Container.vue';
 
@@ -143,15 +144,9 @@ const mForm = inject<FormState | undefined>('mForm');
 const defaultExpandQuantity = props.config.defaultExpandQuantity ?? 7;
 const expand = ref(props.config.expandAll || defaultExpandQuantity > props.index);
 
-const rowConfig = computed(() => ({
-  type: 'row',
-  span: props.config.span || 24,
-  items: props.config.items,
-  labelWidth: props.config.labelWidth,
-  [mForm?.keyProp || '__key']: `${(props.config as Record<string, any>)[mForm?.keyProp || '__key']}${String(
-    props.index,
-  )}`,
-}));
+const rowConfig = computed(() => getGroupListRowConfig(props.config, props.index, mForm?.keyProp));
+
+const rowProp = computed(() => appendProp(props.prop, props.index));
 
 const title = computed(() => {
   if (props.config.titleKey && props.model[props.config.titleKey]) {

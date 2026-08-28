@@ -91,4 +91,6 @@ export { default as DisplayConds } from './fields/DisplayConds.vue';
 export { default as CondOpSelect } from './fields/CondOpSelect.vue';
 export { default as StyleSetter } from './fields/StyleSetter/Index.vue';
 
+export { editorFields } from './fields/headless-validation';
+
 export { default } from './plugin';

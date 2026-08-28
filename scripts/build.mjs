@@ -17,37 +17,46 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 const packagesDir = path.resolve(dirname, '../packages');
 const runtimeDir = path.resolve(dirname, '../runtime');
 
-if (args.package) {
-  const pkgRoot = path.resolve(packagesDir, args.package);
-  if (fs.statSync(pkgRoot).isDirectory()) {
-    rimrafSync(path.resolve(packagesDir, `./${args.package}/dist`));
-    const pkg = createRequire(import.meta.url)(`../packages/${args.package}/package.json`);
+/**
+ * 一个包的全部产物。
+ *
+ * 同一个包内必须串行：umd 与 headless-umd 都写 `dist/`，并发写会互相覆盖
+ * （`emptyOutDir: false` 只是不清目录，不解决同时写同名 chunk 的问题）。
+ * 包之间仍然并发。
+ */
+async function buildPackage({ packageName, packagesDir, requirePath }) {
+  rimrafSync(path.resolve(packagesDir, `./${packageName}/dist`));
+  const pkg = createRequire(import.meta.url)(`${requirePath}/${packageName}/package.json`);
 
-    build({ packageName: args.package, format: 'es', pkg, packagesDir });
-    build({ packageName: args.package, format: 'umd', pkg, packagesDir });
-    buildThemes({ packageName: args.package, packagesDir });
-  }
-} else {
-  const packages = getPackageNames(packagesDir);
-  const runtimeHelpers = getPackageNames(runtimeDir);
-
-  for (const packageName of packages) {
-    rimrafSync(path.resolve(packagesDir, `./${packageName}/dist`));
-    const pkg = createRequire(import.meta.url)(`../packages/${packageName}/package.json`);
-
-    build({ packageName, format: 'es', pkg, packagesDir });
-    build({ packageName, format: 'umd', pkg, packagesDir });
-    buildThemes({ packageName, packagesDir });
-  }
-
-  for (const packageName of runtimeHelpers) {
-    rimrafSync(path.resolve(runtimeDir, `./${packageName}/dist`));
-    const pkg = createRequire(import.meta.url)(`../runtime/${packageName}/package.json`);
-
-    build({ packageName, format: 'es', pkg, packagesDir: runtimeDir });
-    build({ packageName, format: 'umd', pkg, packagesDir: runtimeDir });
-  }
+  await build({ packageName, format: 'es', pkg, packagesDir });
+  await build({ packageName, format: 'umd', pkg, packagesDir });
+  await buildHeadlessUmd({ packageName, pkg, packagesDir });
+  buildThemes({ packageName, packagesDir });
 }
+
+async function main() {
+  if (args.package) {
+    const pkgRoot = path.resolve(packagesDir, args.package);
+    if (!fs.statSync(pkgRoot).isDirectory()) return;
+
+    await buildPackage({ packageName: args.package, packagesDir, requirePath: '../packages' });
+    return;
+  }
+
+  await Promise.all([
+    ...getPackageNames(packagesDir).map((packageName) =>
+      buildPackage({ packageName, packagesDir, requirePath: '../packages' }),
+    ),
+    ...getPackageNames(runtimeDir).map((packageName) =>
+      buildPackage({ packageName, packagesDir: runtimeDir, requirePath: '../runtime' }),
+    ),
+  ]);
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});
 
 // rolldown 在 UMD 输出顶部会注入
 //   Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
@@ -73,9 +82,28 @@ function fixUmdSymbolShadow() {
   };
 }
 
-async function build({ packageName, format, pkg, packagesDir }) {
+function buildHeadlessUmd({ packageName, pkg, packagesDir }) {
+  const pkgRoot = path.resolve(packagesDir, `./${packageName}`);
+  if (!fs.existsSync(path.join(pkgRoot, 'src/headless.ts'))) return;
+
+  return build({
+    packageName,
+    format: 'umd',
+    pkg,
+    packagesDir,
+    entry: 'src/headless.ts',
+    name: `TMagic${toPascalCase(packageName)}Headless`,
+    fileName: `tmagic-${packageName}-headless`,
+    cssFileName: 'style-headless',
+  });
+}
+
+async function build({ packageName, format, pkg, packagesDir, entry, name, fileName, cssFileName = 'style' }) {
+  const pkgRoot = path.resolve(packagesDir, `./${packageName}`);
+  const hasHeadless = !entry && format === 'es' && fs.existsSync(path.join(pkgRoot, 'src/headless.ts'));
+
   await buildVite({
-    root: path.resolve(packagesDir, `./${packageName}`),
+    root: pkgRoot,
     clearScreen: false,
     configFile: false,
     plugins: [vue()],
@@ -89,11 +117,11 @@ async function build({ packageName, format, pkg, packagesDir }) {
       target: 'esnext',
 
       lib: {
-        entry: 'src/index.ts',
-        name: `TMagic${toPascalCase(packageName)}`,
-        fileName: `tmagic-${packageName}`,
+        entry: entry ?? (hasHeadless ? { index: 'src/index.ts', headless: 'src/headless.ts' } : 'src/index.ts'),
+        name: name ?? `TMagic${toPascalCase(packageName)}`,
+        fileName: fileName ?? `tmagic-${packageName}`,
         formats: [format],
-        cssFileName: 'style',
+        cssFileName,
       },
 
       rolldownOptions: {

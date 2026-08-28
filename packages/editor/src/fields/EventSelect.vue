@@ -83,32 +83,17 @@
 import { computed } from 'vue';
 import { Delete } from '@element-plus/icons-vue';
 import { Plus } from '@element-plus/icons-vue';
-import { has } from 'lodash-es';
 
-import { ActionType, MNode } from '@tmagic/core';
 import { TMagicButton } from '@tmagic/design';
-import type {
-  CodeSelectColConfig,
-  ContainerChangeEventData,
-  DataSourceMethodSelectConfig,
-  DynamicTypeConfig,
-  EventSelectConfig,
-  FieldProps,
-  FormState,
-  PanelConfig,
-  TableConfig,
-  UISelectConfig,
-} from '@tmagic/form';
-import { defineFormItem, MContainer as MFormContainer, MPanel, MTable } from '@tmagic/form';
+import type { ContainerChangeEventData, EventSelectConfig, FieldProps } from '@tmagic/form';
+import { MContainer as MFormContainer, MPanel, MTable } from '@tmagic/form';
 
-import { useServices } from '@editor/hooks/use-services';
 import {
-  getCompActionAllowedValues,
-  getCompActionOptions,
-  getEventNameAllowedValues,
-  getEventNameOptions,
-  normalizeCompActionValue,
-} from '@editor/utils';
+  createActionsConfig,
+  createEventNameConfig,
+  createLegacyTableConfig,
+  isLegacyEventValue,
+} from '@editor/fields/configs/eventSelect';
 
 defineOptions({
   name: 'MFieldsEventSelect',
@@ -120,258 +105,17 @@ const emit = defineEmits<{
   change: [v: any, eventData?: ContainerChangeEventData];
 }>();
 
-const { editorService, dataSourceService, eventsService, codeBlockService, propsService } = useServices();
-
 // 事件名称下拉框表单配置
-const eventNameConfig = computed(() => {
-  const defaultEventNameConfig = {
-    name: 'name',
-    text: '事件类型',
-    type: (mForm: FormState | undefined, { formValue }: any) => {
-      if (
-        props.config.src !== 'component' ||
-        (formValue.type === 'page-fragment-container' && formValue.pageFragmentId)
-      ) {
-        return 'cascader';
-      }
-      return 'select';
-    },
-    labelWidth: '70px',
-    checkStrictly: () => props.config.src !== 'component',
-    valueSeparator: '.',
-    options: (_mForm: FormState, { formValue }: any) => getEventNameOptions(props.config.src, formValue),
-    rules: [
-      {
-        validator: ({ value, callback }: any, { formValue }: any) => {
-          const allowedNames = getEventNameAllowedValues(props.config as any, formValue);
-          if (allowedNames && allowedNames.size > 0 && value && !allowedNames.has(value)) {
-            return callback(`事件名(${value})不存在`);
-          }
-          callback();
-        },
-        trigger: 'blur',
-      },
-    ],
-  };
-  return { ...defaultEventNameConfig, ...props.config.eventNameConfig };
-});
-
-const actionTypeOptions = computed(() => {
-  const o: {
-    text: string;
-    label: string;
-    value: string;
-    disabled?: boolean;
-  }[] = [
-    {
-      text: '组件',
-      label: '组件',
-      value: ActionType.COMP,
-    },
-  ];
-
-  if (!propsService.getDisabledCodeBlock()) {
-    o.push({
-      text: '代码',
-      label: '代码',
-      disabled: !Object.keys(codeBlockService.getCodeDsl() || {}).length,
-      value: ActionType.CODE,
-    });
-  }
-
-  if (!propsService.getDisabledDataSource()) {
-    o.push({
-      text: '数据源',
-      label: '数据源',
-      value: ActionType.DATA_SOURCE,
-    });
-  }
-
-  return o;
-});
-
-// 联动类型
-const actionTypeConfig = computed(() => {
-  const defaultActionTypeConfig = {
-    name: 'actionType',
-    text: '联动类型',
-    type: 'select',
-    labelPosition: 'left',
-    defaultValue: ActionType.COMP,
-    options: actionTypeOptions.value,
-    rules: [
-      {
-        required: true,
-        message: '联动类型不能为空',
-      },
-      {
-        typeMatch: true,
-        trigger: 'blur',
-      },
-    ],
-    onChange: (_mForm: FormState, _v: string, { setModel }: any) => {
-      setModel('to', '');
-      setModel('method', '');
-      setModel('codeId', '');
-      setModel('dataSourceMethod', []);
-    },
-  };
-  return { ...defaultActionTypeConfig, ...props.config.actionTypeConfig };
-});
-
-// 联动组件配置
-const targetCompConfig = computed(() => {
-  const defaultTargetCompConfig: UISelectConfig = {
-    name: 'to',
-    text: '联动组件',
-    type: 'ui-select',
-    labelPosition: 'left',
-    display: (_mForm, { model }) => model.actionType === ActionType.COMP,
-    onChange: (_mForm, _v, { setModel }) => {
-      setModel('method', '');
-    },
-    rules: [
-      {
-        typeMatch: true,
-        trigger: 'blur',
-      },
-    ],
-  };
-  return { ...defaultTargetCompConfig, ...props.config.targetCompConfig };
-});
-
-// 联动组件动作配置
-const compActionConfig = computed(() => {
-  const defaultCompActionConfig: DynamicTypeConfig = {
-    name: 'method',
-    text: '动作',
-    labelPosition: 'left',
-    type: (mForm: FormState | undefined, { model }: any) => {
-      const to = editorService.getNodeById(model.to);
-
-      if (to && to.type === 'page-fragment-container' && to.pageFragmentId) {
-        return 'cascader';
-      }
-
-      return 'select';
-    },
-    checkStrictly: () => props.config.src !== 'component',
-    display: (mForm: FormState | undefined, { model }: any) => model.actionType === ActionType.COMP,
-    options: (_mForm: FormState, { model }: any) => getCompActionOptions(model.to),
-    rules: [
-      {
-        trigger: 'blur',
-        validator: ({ value, callback }: any, { model }: any) => {
-          const allowedMethods = getCompActionAllowedValues(props.config as any, model);
-          const normalized = normalizeCompActionValue(value);
-          if (allowedMethods && allowedMethods.size > 0 && normalized && !allowedMethods.has(normalized)) {
-            return callback(`动作名(${normalized})不存在`);
-          }
-          callback();
-        },
-      },
-    ],
-  };
-  return { ...defaultCompActionConfig, ...props.config.compActionConfig };
-});
-
-// 代码联动配置
-const codeActionConfig = computed(() => {
-  const defaultCodeActionConfig: CodeSelectColConfig = {
-    type: 'code-select-col',
-    text: '代码块',
-    name: 'codeId',
-    notEditable: () => !codeBlockService.getEditStatus(),
-    display: (mForm, { model }) => model.actionType === ActionType.CODE,
-  };
-  return { ...defaultCodeActionConfig, ...props.config.codeActionConfig };
-});
-
-// 数据源联动配置
-const dataSourceActionConfig = computed(() => {
-  const defaultDataSourceActionConfig: DataSourceMethodSelectConfig = {
-    type: 'data-source-method-select',
-    text: '数据源方法',
-    name: 'dataSourceMethod',
-    notEditable: () => !dataSourceService.get('editable'),
-    display: (mForm, { model }) => model.actionType === ActionType.DATA_SOURCE,
-  };
-  return { ...defaultDataSourceActionConfig, ...props.config.dataSourceActionConfig };
-});
+const eventNameConfig = computed(() => createEventNameConfig(props.config));
 
 // 兼容旧的数据格式
-const tableConfig = computed(
-  () =>
-    defineFormItem({
-      type: 'table',
-      name: 'events',
-      items: [
-        {
-          name: 'name',
-          label: '事件名',
-          type: eventNameConfig.value.type,
-          options: (mForm: FormState, { formValue }: any) =>
-            eventsService
-              .getEvent(formValue.type, { node: editorService.getNodeById(formValue.id) })
-              .map((option: any) => ({
-                text: option.label,
-                value: option.value,
-              })),
-        },
-        {
-          name: 'to',
-          label: '联动组件',
-          type: 'ui-select',
-        },
-        {
-          name: 'method',
-          label: '动作',
-          type: compActionConfig.value.type,
-          options: (mForm: FormState, { model, formValue }: any) => {
-            const node = editorService.getNodeById(model.to) || (formValue as MNode);
-            if (!node?.type) return [];
-
-            return eventsService.getMethod(node.type, { targetId: model.to, node }).map((option: any) => ({
-              text: option.label,
-              value: option.value,
-            }));
-          },
-        },
-      ],
-    }) as TableConfig,
-);
+const tableConfig = computed(() => createLegacyTableConfig(props.config));
 
 // 组件动作组表单配置
-const actionsConfig = computed(
-  () =>
-    defineFormItem({
-      type: 'panel',
-      labelPosition: 'left',
-      items: [
-        {
-          type: 'group-list',
-          name: 'actions',
-          expandAll: true,
-          enableToggleMode: false,
-          titlePrefix: '动作',
-          labelPosition: 'left',
-          items: [
-            actionTypeConfig.value,
-            targetCompConfig.value,
-            compActionConfig.value,
-            codeActionConfig.value,
-            dataSourceActionConfig.value,
-          ],
-        },
-      ],
-    }) as PanelConfig,
-);
+const actionsConfig = computed(() => createActionsConfig(props.config));
 
 // 是否为旧的数据格式
-const isOldVersion = computed(() => {
-  if (props.model[props.name].length === 0) return false;
-  return !has(props.model[props.name][0], 'actions');
-});
+const isOldVersion = computed(() => isLegacyEventValue(props.model[props.name]));
 
 /**
  * 对比模式判定：

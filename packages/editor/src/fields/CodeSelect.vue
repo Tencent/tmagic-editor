@@ -23,14 +23,13 @@
 <script lang="ts" setup>
 import { computed, watch } from 'vue';
 import { Plus } from '@element-plus/icons-vue';
-import { isEmpty } from 'lodash-es';
 
-import { HookCodeType, HookType } from '@tmagic/core';
+import { HookCodeType } from '@tmagic/core';
 import { TMagicButton, TMagicCard } from '@tmagic/design';
-import type { CodeSelectConfig, ContainerChangeEventData, FieldProps, GroupListConfig } from '@tmagic/form';
+import type { CodeSelectConfig, ContainerChangeEventData, FieldProps } from '@tmagic/form';
 import { MContainer } from '@tmagic/form';
 
-import { useServices } from '@editor/hooks/use-services';
+import { createCodeSelectConfig, normalizeCodeSelectValue } from '@editor/fields/configs/codeSelect';
 
 defineOptions({
   name: 'MFieldsCodeSelect',
@@ -39,8 +38,6 @@ defineOptions({
 const emit = defineEmits<{
   change: [v: any, eventData: ContainerChangeEventData];
 }>();
-
-const { dataSourceService, codeBlockService } = useServices();
 
 const props = withDefaults(defineProps<FieldProps<CodeSelectConfig>>(), {});
 
@@ -69,87 +66,13 @@ const newHandler = () => {
     modifyKey: `hookData.${hookData.length}`,
   });
 };
-const codeConfig = computed<GroupListConfig>(() => ({
-  type: 'group-list',
-  name: 'hookData',
-  enableToggleMode: false,
-  expandAll: true,
-  addable: () => false,
-  title: (mForm, { model, index }: any) => {
-    if (model.codeType === HookCodeType.DATA_SOURCE_METHOD) {
-      if (Array.isArray(model.codeId)) {
-        if (model.codeId.length < 2) {
-          return index;
-        }
-
-        const ds = dataSourceService.getDataSourceById(model.codeId[0]);
-        return `${ds?.title} / ${model.codeId[1]}`;
-      }
-
-      return Array.isArray(model.codeId) ? model.codeId.join('/') : index;
-    }
-
-    const codeContent = codeBlockService.getCodeContentById(model.codeId);
-
-    if (codeContent) {
-      return codeContent.name;
-    }
-
-    return model.codeId || index;
-  },
-  titlePrefix: props.config.name === undefined ? undefined : String(props.config.name),
-  items: [
-    {
-      text: '代码类型',
-      type: 'select',
-      name: 'codeType',
-      labelPosition: 'right',
-      rules: [{ typeMatch: true, trigger: 'change' }],
-      options: [
-        { value: HookCodeType.CODE, text: '代码块' },
-        { value: HookCodeType.DATA_SOURCE_METHOD, text: '数据源方法' },
-      ],
-      defaultValue: HookCodeType.CODE,
-      onChange: (_mForm, v: HookCodeType, { setModel }) => {
-        if (v === HookCodeType.DATA_SOURCE_METHOD) {
-          setModel('codeId', []);
-        } else {
-          setModel('codeId', '');
-        }
-        return v;
-      },
-    },
-    {
-      type: 'code-select-col',
-      name: 'codeId',
-      text: '代码块',
-      rules: [{ typeMatch: true, trigger: 'change' }],
-
-      display: (_mForm, { model }) => model.codeType !== HookCodeType.DATA_SOURCE_METHOD,
-      notEditable: () => !codeBlockService.getEditStatus(),
-    },
-    {
-      type: 'data-source-method-select',
-      name: 'codeId',
-      text: '数据源字段',
-      rules: [{ typeMatch: true, trigger: 'change' }],
-      display: (_mForm, { model }) => model.codeType === HookCodeType.DATA_SOURCE_METHOD,
-      notEditable: () => !dataSourceService.get('editable'),
-    },
-  ],
-}));
+const codeConfig = computed(() => createCodeSelectConfig(props.config));
 
 watch(
   () => props.model[props.name],
-  (value) => {
+  () => {
     // 兼容旧的数据结构
-    if (isEmpty(value)) {
-      // 空值或者空数组
-      props.model[props.name] = {
-        hookType: HookType.CODE,
-        hookData: [],
-      };
-    }
+    normalizeCodeSelectValue(props.model, props.name);
   },
   {
     immediate: true,

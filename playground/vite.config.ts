@@ -80,9 +80,13 @@ export default defineConfig({
       },
       { find: /^@tmagic\/core/, replacement: path.join(__dirname, '../packages/core/src/index.ts') },
       { find: /^@editor/, replacement: path.join(__dirname, '../packages/editor/src/') },
+      // `/headless` 必须在下方通用的 `^@tmagic/<pkg>` 规则之前命中，否则会被改写成
+      // `.../src/index.ts/headless` 导致 Vite 解析失败。
+      { find: /^@tmagic\/editor\/headless$/, replacement: path.join(__dirname, '../packages/editor/src/headless.ts') },
       { find: /^@tmagic\/editor/, replacement: path.join(__dirname, '../packages/editor/src/index.ts') },
       { find: /^@tmagic\/form-schema/, replacement: path.join(__dirname, '../packages/form-schema/src/index.ts') },
       { find: /^@tmagic\/schema/, replacement: path.join(__dirname, '../packages/schema/src/index.ts') },
+      { find: /^@tmagic\/form\/headless$/, replacement: path.join(__dirname, '../packages/form/src/headless.ts') },
       { find: /^@tmagic\/form/, replacement: path.join(__dirname, '../packages/form/src/index.ts') },
       {
         find: /^@tmagic\/tmagic-form-runtime/,
@@ -91,6 +95,10 @@ export default defineConfig({
       { find: /^@tmagic\/table/, replacement: path.join(__dirname, '../packages/table/src/index.ts') },
       { find: /^@tmagic\/stage/, replacement: path.join(__dirname, '../packages/stage/src/index.ts') },
       { find: /^@tmagic\/utils/, replacement: path.join(__dirname, '../packages/utils/src/index.ts') },
+      {
+        find: /^@tmagic\/design\/headless$/,
+        replacement: path.join(__dirname, '../packages/design/src/headless.ts'),
+      },
       { find: /^@tmagic\/design/, replacement: path.join(__dirname, '../packages/design/src/index.ts') },
       {
         find: /^@tmagic\/data-source/,

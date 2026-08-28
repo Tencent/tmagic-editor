@@ -20,8 +20,8 @@ import { type App } from 'vue';
 
 import type { DesignPluginOptions } from '@tmagic/design';
 import designPlugin from '@tmagic/design';
-import type { FormInstallOptions } from '@tmagic/form';
-import formPlugin, { registerSilentLeafFieldTypes, registerTypeMatchRules } from '@tmagic/form';
+import type { FieldOptions, FormInstallOptions } from '@tmagic/form';
+import formPlugin, { mergeFieldOptions } from '@tmagic/form';
 import tablePlugin from '@tmagic/table';
 
 import Code from './fields/Code.vue';
@@ -38,13 +38,13 @@ import DataSourceMocks from './fields/DataSourceMocks.vue';
 import DataSourceSelect from './fields/DataSourceSelect.vue';
 import DisplayConds from './fields/DisplayConds.vue';
 import EventSelect from './fields/EventSelect.vue';
+import { editorFields } from './fields/headless-validation';
 import KeyValue from './fields/KeyValue.vue';
 import PageFragmentSelect from './fields/PageFragmentSelect.vue';
 import StyleSetter from './fields/StyleSetter/Index.vue';
 import uiSelect from './fields/UISelect.vue';
 import CodeEditor from './layouts/CodeEditor.vue';
 import { setEditorConfig } from './utils/config';
-import { editorTypeMatchRules } from './utils/type-match-rules';
 import Editor from './Editor.vue';
 import type { EditorInstallOptions } from './type';
 
@@ -60,44 +60,43 @@ const defaultInstallOpt: EditorInstallOptions = {
   flat: false,
 };
 
+const editorFieldVue: Record<string, Pick<FieldOptions, 'component' | 'container'>> = {
+  'vs-code': { component: Code },
+  'ui-select': { component: uiSelect },
+  'cond-op-select': { component: CondOpSelect },
+  'page-fragment-select': { component: PageFragmentSelect },
+  'data-source-select': { component: DataSourceSelect },
+  'data-source-input': { component: DataSourceInput },
+  'code-link': { component: CodeLink },
+  'key-value': { component: KeyValue },
+  'code-select-col': { component: CodeSelectCol },
+  'data-source-fields': { component: DataSourceFields },
+  'data-source-mocks': { component: DataSourceMocks },
+  'data-source-methods': { component: DataSourceMethods },
+  'data-source-method-select': { component: DataSourceMethodSelect },
+  'data-source-field-select': { component: DataSourceFieldSelect },
+  'code-select': { component: CodeSelect },
+  'display-conds': { component: DisplayConds },
+  'event-select': { component: EventSelect },
+  'style-setter': { container: StyleSetter },
+};
+
 export default {
   install: (app: App, opt?: Partial<EditorInstallOptions | DesignPluginOptions | FormInstallOptions>): void => {
-    const option = Object.assign(defaultInstallOpt, opt || {});
+    const incoming = opt || {};
+    const option = { ...defaultInstallOpt, ...incoming };
+    const formOpt = incoming as FormInstallOptions;
 
-    app.use(designPlugin, opt || {});
-    app.use(formPlugin, opt || {});
+    app.use(designPlugin, incoming);
+    app.use(formPlugin, {
+      ...formOpt,
+      fields: mergeFieldOptions(editorFields, editorFieldVue, formOpt.fields),
+    });
     app.use(tablePlugin);
-    registerTypeMatchRules(editorTypeMatchRules);
-    registerSilentLeafFieldTypes([
-      'vs-code',
-      'ui-select',
-      'cond-op-select',
-      'page-fragment-select',
-      'data-source-select',
-      'data-source-input',
-    ]);
 
     app.config.globalProperties.$TMAGIC_EDITOR = option;
     setEditorConfig(option);
     app.component(`${Editor.name || 'MEditor'}`, Editor);
     app.component('magic-code-editor', CodeEditor);
-    app.component('m-fields-ui-select', uiSelect);
-    app.component('m-fields-code-link', CodeLink);
-    app.component('m-fields-vs-code', Code);
-    app.component('m-fields-code-select', CodeSelect);
-    app.component('m-fields-code-select-col', CodeSelectCol);
-    app.component('m-fields-event-select', EventSelect);
-    app.component('m-fields-data-source-fields', DataSourceFields);
-    app.component('m-fields-data-source-mocks', DataSourceMocks);
-    app.component('m-fields-key-value', KeyValue);
-    app.component('m-fields-data-source-input', DataSourceInput);
-    app.component('m-fields-data-source-select', DataSourceSelect);
-    app.component('m-fields-data-source-methods', DataSourceMethods);
-    app.component('m-fields-data-source-method-select', DataSourceMethodSelect);
-    app.component('m-fields-data-source-field-select', DataSourceFieldSelect);
-    app.component('m-fields-page-fragment-select', PageFragmentSelect);
-    app.component('m-fields-display-conds', DisplayConds);
-    app.component('m-fields-cond-op-select', CondOpSelect);
-    app.component('m-form-style-setter', StyleSetter);
   },
 };

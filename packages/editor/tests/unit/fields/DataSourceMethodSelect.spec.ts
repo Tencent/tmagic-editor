@@ -7,8 +7,6 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { defineComponent, h } from 'vue';
 import { mount } from '@vue/test-utils';
 
-import { FORM_SILENT_MODE_KEY } from '@tmagic/form';
-
 import DataSourceMethodSelect from '@editor/fields/DataSourceMethodSelect.vue';
 
 const dataSourceService = {
@@ -136,16 +134,6 @@ describe('DataSourceMethodSelect', () => {
   test('paramsConfig 不为空时渲染 CodeParams', () => {
     dataSourceService.getDataSourceById.mockReturnValue({ id: 'ds1', methods: [{ name: 'doFetch' }] });
     const wrapper = mount(DataSourceMethodSelect, { props: baseProps() as any });
-    expect(wrapper.find('.fake-params').exists()).toBe(true);
-  });
-
-  test('静默模式跳过级联选择器和编辑按钮但保留 CodeParams', () => {
-    const wrapper = mount(DataSourceMethodSelect, {
-      props: baseProps() as any,
-      global: { provide: { [FORM_SILENT_MODE_KEY as symbol]: true } },
-    });
-    expect(wrapper.findComponent({ name: 'MCascader' }).exists()).toBe(false);
-    expect(wrapper.find('button').exists()).toBe(false);
     expect(wrapper.find('.fake-params').exists()).toBe(true);
   });
 

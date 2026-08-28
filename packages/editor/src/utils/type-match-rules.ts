@@ -18,9 +18,14 @@
 
 import type { DataSourceFieldType, DataSourceSchema, Id } from '@tmagic/core';
 import { NodeType } from '@tmagic/core';
-import { appendValidateSuggestion } from '@tmagic/design';
-import type { TypeMatchValidateContext, TypeMatchValidator } from '@tmagic/form';
-import { MAX_SUGGESTION_OPTIONS, optionSuggestion, stringifyExampleValue, validateTypeMatch } from '@tmagic/form';
+import { appendValidateSuggestion } from '@tmagic/design/headless';
+import type { TypeMatchValidateContext, TypeMatchValidator } from '@tmagic/form/headless';
+import {
+  MAX_SUGGESTION_OPTIONS,
+  optionSuggestion,
+  stringifyExampleValue,
+  validateTypeMatch,
+} from '@tmagic/form/headless';
 import {
   DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX,
   DATA_SOURCE_SET_DATA_METHOD_NAME,

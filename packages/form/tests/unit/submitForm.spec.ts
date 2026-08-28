@@ -16,65 +16,106 @@
  * limitations under the License.
  */
 import { afterEach, beforeAll, describe, expect, test, vi } from 'vitest';
-import { type AppContext, createApp, defineComponent, h, inject, nextTick } from 'vue';
-import MagicForm, { FORM_SILENT_MODE_KEY, submitForm, validateForm } from '@form/index';
-import ElementPlus from 'element-plus';
+import { type AppContext, defineComponent, h, nextTick } from 'vue';
+import { clearFields, registerFields, submitForm } from '@form/index';
+
+import {
+  captureError,
+  createFormAppContext,
+  findButton,
+  findMFormInstance,
+  mockExposed,
+  required,
+  withoutDocument,
+} from './helpers/formValidation';
 
 let appContext: AppContext;
 
-// 探针字段：挂载时注入静默标记并记录，用于验证 submitForm/validateForm 的 provide 行为
-const silentProbeValues: (boolean | undefined)[] = [];
-const SilentProbe = defineComponent({
-  name: 'MFieldsSilentProbe',
+// 探针字段：被真实实例化时记一次，用于区分「纯逻辑校验」与「dialog 弹层真实渲染」
+const probeMountCount = { value: 0 };
+const MountProbe = defineComponent({
+  name: 'MFieldsMountProbe',
   setup() {
-    silentProbeValues.push(inject(FORM_SILENT_MODE_KEY, undefined));
+    probeMountCount.value += 1;
     return () => h('div');
   },
 });
 
 beforeAll(() => {
-  // 构造一个父级 app，把 element-plus 与 m-form 插件装上，
-  // 之后通过 appContext 传给 submitForm 复用全局注册
-  const parentApp = createApp(defineComponent({ render: () => h('div') }));
-  parentApp.use(ElementPlus);
-  parentApp.use(MagicForm);
-  parentApp.component('m-fields-silent-probe', SilentProbe);
-  appContext = parentApp._context;
+  appContext = createFormAppContext((app) => app.component('m-fields-mount-probe', MountProbe));
 });
 
 afterEach(() => {
   document.body.innerHTML = '';
+  probeMountCount.value = 0;
+  clearFields();
 });
 
+/** 探针配置：mount-probe 不是内置 type，无渲染路径不会实例化该组件 */
+const probeConfig = [{ type: 'mount-probe', name: 'text', text: 'text' }];
+
+// submitForm 走无渲染实现：不挂载组件、不需要 DOM。
+// 校验引擎本身的行为在 utils/validateValues.spec.ts 中覆盖；
+// 此处聚焦 submitForm 这一层：返回值形态、无 DOM 可用、未登记 type 不挂载、dialog 弹层。
 describe('submitForm', () => {
-  test('校验通过时 resolve 表单值，并自动清理 DOM', async () => {
-    const values = await submitForm({
-      config: [
-        {
-          type: 'text',
-          name: 'text',
-          text: 'text',
-        },
-      ],
-      initValues: { text: 'hello' },
-      appContext,
-    });
-
-    expect(values).toEqual({ text: 'hello' });
-    expect(document.body.querySelector('.m-form')).toBeNull();
-  });
-
-  test('native=true 时返回原始（未 clone）的 values', async () => {
-    const initValues = { text: 'origin' };
+  test('校验通过时 resolve 表单值，且不产生任何 DOM', async () => {
+    const baseChildCount = document.body.children.length;
 
     const values = await submitForm({
       config: [{ type: 'text', name: 'text', text: 'text' }],
-      initValues,
+      initValues: { text: 'hello' },
+    });
+
+    expect(values).toEqual({ text: 'hello' });
+    expect(document.body.children.length).toBe(baseChildCount);
+    expect(document.body.querySelector('.m-form')).toBeNull();
+  });
+
+  test('校验失败时以错误文案 reject', async () => {
+    const caught = await captureError(() =>
+      submitForm({
+        config: [{ type: 'text', name: 'name', text: '名称', rules: required() }],
+        initValues: { name: '' },
+      }),
+    );
+
+    expect(caught).toBeInstanceOf(Error);
+    expect(caught.message).toBe('名称 -> 必填');
+  });
+
+  test('config 中的 defaultValue 会被填入结果', async () => {
+    const values = await submitForm({
+      config: [
+        { type: 'text', name: 'text', text: 'text' },
+        { type: 'text', name: 'withDefault', text: 'withDefault', defaultValue: 'fallback' },
+      ] as any,
+      initValues: { text: 'hello' },
+    });
+
+    expect(values).toEqual({ text: 'hello', withDefault: 'fallback' });
+  });
+
+  test('native=true 时返回未经 clone 的 values', async () => {
+    const values = await submitForm({
+      config: [{ type: 'text', name: 'text', text: 'text' }],
+      initValues: { text: 'origin' },
       native: true,
-      appContext,
     });
 
     expect(values).toEqual({ text: 'origin' });
+  });
+
+  test('默认（native 未开启）返回的是深拷贝，不与调用方入参共享引用', async () => {
+    const initValues = { object: { nested: 'b' } };
+
+    const values = await submitForm({
+      config: [{ name: 'object', items: [{ type: 'text', name: 'nested', text: 'nested' }] }],
+      initValues,
+    });
+
+    expect(values).toEqual({ object: { nested: 'b' } });
+    values.object.nested = 'mutated';
+    expect(initValues.object.nested).toBe('b');
   });
 
   test('支持 extendState 扩展状态', async () => {
@@ -84,7 +125,6 @@ describe('submitForm', () => {
       config: [{ type: 'text', name: 'text', text: 'text' }],
       initValues: { text: 'foo' },
       extendState,
-      appContext,
     });
 
     expect(extendState).toHaveBeenCalled();
@@ -95,7 +135,6 @@ describe('submitForm', () => {
       config: [{ type: 'text', name: 'text', text: 'text' }],
       initValues: { text: 'foo' },
       extendState: () => ({ keyProp: 'custom', extra: 'value' }),
-      appContext,
     });
 
     // keyProp 属于内置保留字段，被静默跳过，不污染最终 values
@@ -106,66 +145,46 @@ describe('submitForm', () => {
     const values = await submitForm({
       config: [
         { type: 'text', name: 'name', text: 'name' },
-        {
-          name: 'object',
-          items: [{ type: 'text', name: 'nested', text: 'nested' }],
-        },
+        { name: 'object', items: [{ type: 'text', name: 'nested', text: 'nested' }] },
       ],
-      initValues: {
-        name: 'a',
-        object: { nested: 'b' },
-      },
-      appContext,
+      initValues: { name: 'a', object: { nested: 'b' } },
     });
 
-    expect(values).toEqual({
-      name: 'a',
-      object: { nested: 'b' },
-    });
+    expect(values).toEqual({ name: 'a', object: { nested: 'b' } });
   });
 
-  test('returnChangeRecords=true 时返回 { values, changeRecords }', async () => {
+  test('returnChangeRecords=true 时返回 { values, changeRecords }，无渲染下变更记录为空', async () => {
     const result = await submitForm({
       config: [{ type: 'text', name: 'text', text: 'text' }],
       initValues: { text: 'hello' },
       returnChangeRecords: true,
-      appContext,
     });
 
-    expect(result).toHaveProperty('values');
-    expect(result).toHaveProperty('changeRecords');
     expect(result.values).toEqual({ text: 'hello' });
-    expect(Array.isArray(result.changeRecords)).toBe(true);
+    // 无渲染校验没有用户交互，因此不存在变更记录
+    expect(result.changeRecords).toEqual([]);
   });
 
   test('未设置 returnChangeRecords 时仅返回 values（不包裹）', async () => {
     const result = await submitForm({
       config: [{ type: 'text', name: 'text', text: 'text' }],
       initValues: { text: 'hello' },
-      appContext,
     });
 
     expect(result).toEqual({ text: 'hello' });
     expect(result).not.toHaveProperty('changeRecords');
   });
 
-  test('多次连续调用不会相互干扰', async () => {
+  test('多次并发调用互不干扰', async () => {
+    const config = [{ type: 'text', name: 'text', text: 'text' }];
+
     const [v1, v2] = await Promise.all([
-      submitForm({
-        config: [{ type: 'text', name: 'text', text: 'text' }],
-        initValues: { text: 'first' },
-        appContext,
-      }),
-      submitForm({
-        config: [{ type: 'text', name: 'text', text: 'text' }],
-        initValues: { text: 'second' },
-        appContext,
-      }),
+      submitForm({ config, initValues: { text: 'first' } }),
+      submitForm({ config, initValues: { text: 'second' } }),
     ]);
 
     expect(v1).toEqual({ text: 'first' });
     expect(v2).toEqual({ text: 'second' });
-    expect(document.body.querySelector('.m-form')).toBeNull();
   });
 
   test('多次串行调用后 document.body 不留下任何节点', async () => {
@@ -175,152 +194,109 @@ describe('submitForm', () => {
       await submitForm({
         config: [{ type: 'text', name: 'text', text: 'text' }],
         initValues: { text: `value-${i}` },
-        appContext,
       });
     }
 
-    // 反复调用后，body 下不应残留任何挂载容器
-    expect(document.body.children.length).toBe(baseChildCount);
-    expect(document.body.querySelector('.m-form')).toBeNull();
-  });
-
-  test('调用过程中临时容器会被附加到 body 上，结束后被移除', async () => {
-    const baseChildCount = document.body.children.length;
-
-    const pending = submitForm({
-      config: [{ type: 'text', name: 'text', text: 'text' }],
-      initValues: { text: 'in-flight' },
-      appContext,
-    });
-
-    // 此时容器应已加入 body
-    expect(document.body.children.length).toBe(baseChildCount + 1);
-
-    await pending;
-
     expect(document.body.children.length).toBe(baseChildCount);
   });
 
-  test('未注入 DOM 环境时（document 不可用）以错误 reject', async () => {
-    const originalDocument = globalThis.document;
+  test('signal 已中断时立即以 reason 抛错', async () => {
+    const controller = new AbortController();
+    const reason = new Error('canceled by caller');
+    controller.abort(reason);
 
-    // 模拟纯 Node 环境
-    delete (globalThis as any).document;
-
-    let caught: any = null;
-    try {
-      await submitForm({
+    await expect(
+      submitForm({
         config: [{ type: 'text', name: 'text', text: 'text' }],
-        initValues: { text: 'no-dom' },
-        appContext,
-      });
-    } catch (e) {
-      caught = e;
-    } finally {
-      (globalThis as any).document = originalDocument;
-    }
-
-    expect(caught).toBeInstanceOf(Error);
-  });
-
-  test('静默（隐藏挂载）模式下向字段 provide FORM_SILENT_MODE_KEY=true', async () => {
-    silentProbeValues.length = 0;
-
-    const values = await submitForm({
-      config: [{ type: 'silent-probe', name: 'text', text: 'text' }],
-      initValues: { text: 'hello' },
-      appContext,
-    });
-
-    expect(values).toEqual({ text: 'hello' });
-    expect(silentProbeValues).toEqual([true]);
-  });
-
-  test('静默标记不会泄漏到父级应用的 provides', async () => {
-    silentProbeValues.length = 0;
-
-    await submitForm({
-      config: [{ type: 'silent-probe', name: 'text', text: 'text' }],
-      initValues: { text: 'hello' },
-      appContext,
-    });
-
-    expect((appContext as any).provides[FORM_SILENT_MODE_KEY as symbol]).toBeUndefined();
-  });
-
-  test('validateForm 静默模式下同样 provide FORM_SILENT_MODE_KEY=true', async () => {
-    silentProbeValues.length = 0;
-
-    const error = await validateForm({
-      config: [{ type: 'silent-probe', name: 'text', text: 'text' }],
-      initValues: { text: 'hello' },
-      appContext,
-    });
-
-    expect(error).toBe('');
-    expect(silentProbeValues).toEqual([true]);
-  });
-
-  test('timeout > 0 时会注册定时器，timeout <= 0 时不注册', async () => {
-    const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
-
-    await submitForm({
-      config: [{ type: 'text', name: 'text', text: 'text' }],
-      initValues: { text: 'with-timeout' },
-      timeout: 5000,
-      appContext,
-    });
-
-    const calledWithTimeout = setTimeoutSpy.mock.calls.some(([, delay]) => delay === 5000);
-    expect(calledWithTimeout).toBe(true);
-
-    setTimeoutSpy.mockClear();
-
-    await submitForm({
-      config: [{ type: 'text', name: 'text', text: 'text' }],
-      initValues: { text: 'no-timeout' },
-      timeout: 0,
-      appContext,
-    });
-
-    const calledWithZero = setTimeoutSpy.mock.calls.some(([, delay]) => delay === 0);
-    expect(calledWithZero).toBe(false);
-
-    setTimeoutSpy.mockRestore();
+        initValues: { text: 'a' },
+        signal: controller.signal,
+      }),
+    ).rejects.toBe(reason);
   });
 });
 
-describe('submitForm —— debug 模式', () => {
-  const findButton = (text: string) =>
-    Array.from(document.body.querySelectorAll('button')).find(
-      (b) => (b.textContent || '').trim() === text,
-    ) as HTMLButtonElement;
+describe('submitForm —— 无 DOM 环境', () => {
+  test('全为内置类型时，无 document 也能取回表单值', async () => {
+    const values = await withoutDocument(() =>
+      submitForm({
+        config: [{ type: 'text', name: 'text', text: 'text' }],
+        initValues: { text: 'no-dom' },
+      }),
+    );
 
-  // 通过 Vue 渲染留下的内部指针定位 MForm 组件实例，用于 mock 其 expose 方法。
-  // 真实 element-plus 校验在 jsdom 下不可靠（form-item 未注册到 form），故校验失败分支以 mock 方式验证。
-  const findMFormInstance = (): any => {
-    const formEl = document.body.querySelector('.m-form') as any;
-    let comp: any = formEl?.__vueParentComponent;
-    while (comp && comp.type?.name !== 'MForm' && comp.type?.__name !== 'MForm') comp = comp.parent;
-    return comp;
-  };
+    expect(values).toEqual({ text: 'no-dom' });
+  });
 
-  const mockExposed = (comp: any, method: string, fn: any) => {
-    Object.defineProperty(comp.exposed, method, { value: fn, configurable: true, writable: true });
-  };
+  test('无 document 时校验规则依然生效', async () => {
+    const caught = await withoutDocument(() =>
+      captureError(() =>
+        submitForm({
+          config: [{ type: 'text', name: 'name', text: '名称', rules: required() }],
+          initValues: { name: '' },
+        }),
+      ),
+    );
 
-  test('debug 模式可见渲染弹层，点击「确定」校验通过后 resolve 表单值并清理 DOM', async () => {
+    expect(caught).toBeInstanceOf(Error);
+    expect(caught.message).toBe('名称 -> 必填');
+  });
+
+  test('无 document 时未登记 type 也能提交', async () => {
+    const values = await withoutDocument(() =>
+      submitForm({ config: probeConfig, initValues: { text: 'hello' }, appContext }),
+    );
+
+    expect(values).toEqual({ text: 'hello' });
+  });
+});
+
+describe('submitForm —— 未登记字段 type', () => {
+  test('即使有 DOM 也不挂载字段组件，无 rules 时直接 resolve', async () => {
+    const baseChildCount = document.body.children.length;
+
+    const values = await submitForm({ config: probeConfig, initValues: { text: 'hello' }, appContext });
+
+    expect(values).toEqual({ text: 'hello' });
+    expect(probeMountCount.value).toBe(0);
+    expect(document.body.children.length).toBe(baseChildCount);
+  });
+
+  test('登记为叶子字段后提交仍不渲染任何组件', async () => {
+    registerFields({ 'mount-probe': {} });
+
+    const values = await submitForm({ config: probeConfig, initValues: { text: 'hello' }, appContext });
+
+    expect(values).toEqual({ text: 'hello' });
+    expect(probeMountCount.value).toBe(0);
+  });
+
+  test('登记为叶子字段后，无 DOM 也能提交', async () => {
+    registerFields({ 'totally-unknown': {} });
+
+    const values = await withoutDocument(() =>
+      submitForm({
+        config: [{ type: 'totally-unknown', name: 'x', text: 'X' }] as any,
+        initValues: { x: 'v' },
+      }),
+    );
+
+    expect(values).toEqual({ x: 'v' });
+  });
+});
+
+describe('submitForm —— dialog 弹层', () => {
+  test('可见渲染弹层，点击「确定」校验通过后 resolve 表单值并清理 DOM', async () => {
     const pending = submitForm({
       config: [{ type: 'text', name: 'text', text: 'text' }],
       initValues: { text: 'hello' },
-      debug: true,
+      dialog: true,
       appContext,
     });
 
     await nextTick();
     await nextTick();
 
-    // debug 模式容器未隐藏，表单可见渲染
+    // 弹层容器未隐藏，表单可见渲染
     expect(document.body.querySelector('.m-form')).not.toBeNull();
 
     findButton('确定').click();
@@ -330,11 +306,29 @@ describe('submitForm —— debug 模式', () => {
     expect(document.body.querySelector('.m-form')).toBeNull();
   });
 
+  test('弹层标题可配置', async () => {
+    const pending = submitForm({
+      config: [{ type: 'text', name: 'text', text: 'text' }],
+      initValues: { text: 'hello' },
+      dialog: true,
+      title: '编辑配置',
+      appContext,
+    });
+    await nextTick();
+    await nextTick();
+
+    expect(document.body.textContent).toContain('编辑配置');
+    expect(document.body.textContent).not.toContain('submitForm');
+
+    findButton('取消').click();
+    await captureError(() => pending);
+  });
+
   test('点击「取消」以错误 reject 并清理 DOM', async () => {
     const pending = submitForm({
       config: [{ type: 'text', name: 'text', text: 'text' }],
       initValues: { text: 'hello' },
-      debug: true,
+      dialog: true,
       appContext,
     });
     await nextTick();
@@ -342,12 +336,7 @@ describe('submitForm —— debug 模式', () => {
 
     findButton('取消').click();
 
-    let caught: any = null;
-    try {
-      await pending;
-    } catch (e) {
-      caught = e;
-    }
+    const caught = await captureError(() => pending);
 
     expect(caught).toBeInstanceOf(Error);
     expect(caught.message).toContain('canceled');
@@ -358,20 +347,18 @@ describe('submitForm —— debug 模式', () => {
     const pending = submitForm({
       config: [{ type: 'text', name: 'name', text: '名称' }],
       initValues: { name: '' },
-      debug: true,
+      dialog: true,
       appContext,
     });
     await nextTick();
     await nextTick();
 
-    // mock MForm 实例的 submitForm 抛出汇总错误（真实 element-plus 校验在 jsdom 下不可靠）
     const comp = findMFormInstance();
     expect(comp).toBeTruthy();
     mockExposed(comp, 'submitForm', vi.fn().mockRejectedValue(new Error('名称 -> 必填')));
 
     findButton('确定').click();
 
-    // 等待异步校验完成并展示错误（mock submitForm 为 rejected，需等 microtask + DOM 更新）
     await vi.waitFor(
       () => {
         const el = Array.from(document.body.querySelectorAll('div')).find((d) =>
@@ -388,53 +375,20 @@ describe('submitForm —— debug 模式', () => {
     // promise 仍 pending：点击取消以 reject 结束，避免悬挂
     findButton('取消').click();
 
-    let caught: any = null;
-    try {
-      await pending;
-    } catch (e) {
-      caught = e;
-    }
+    const caught = await captureError(() => pending);
     expect(caught).toBeInstanceOf(Error);
     expect(caught.message).toContain('canceled');
     expect(document.body.querySelector('.m-form')).toBeNull();
   });
 
-  test('debug 模式不提供静默标记（表单可见，字段应正常渲染）', async () => {
-    silentProbeValues.length = 0;
-
-    const pending = submitForm({
-      config: [{ type: 'silent-probe', name: 'text', text: 'text' }],
-      initValues: { text: 'hello' },
-      debug: true,
-      appContext,
-    });
+  test('字段被真实实例化（dialog 是唯一会渲染的路径）', async () => {
+    const pending = submitForm({ config: probeConfig, initValues: { text: 'hello' }, dialog: true, appContext });
     await nextTick();
     await nextTick();
 
-    expect(silentProbeValues).toEqual([undefined]);
+    expect(probeMountCount.value).toBe(1);
 
     findButton('确定').click();
     await pending;
-  });
-
-  test('debug 模式不注册超时定时器（等待人工操作）', async () => {
-    const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
-
-    const pending = submitForm({
-      config: [{ type: 'text', name: 'text', text: 'text' }],
-      initValues: { text: 'hello' },
-      debug: true,
-      timeout: 5000,
-      appContext,
-    });
-    await nextTick();
-    await nextTick();
-
-    const calledWithTimeout = setTimeoutSpy.mock.calls.some(([, delay]) => delay === 5000);
-    expect(calledWithTimeout).toBe(false);
-
-    findButton('确定').click();
-    await pending;
-    setTimeoutSpy.mockRestore();
   });
 });

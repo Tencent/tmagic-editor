@@ -7,8 +7,6 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { defineComponent, h } from 'vue';
 import { mount } from '@vue/test-utils';
 
-import { FORM_SILENT_MODE_KEY } from '@tmagic/form';
-
 import Code from '@editor/fields/Code.vue';
 
 // 用一个简单的桩组件代替 MagicCodeEditor，把所有 props 原样渲染到 data-* 属性上，
@@ -168,28 +166,6 @@ describe('Code', () => {
       const el = getEl(wrapper);
       expect(el.getAttribute('data-type')).toBe('');
       expect(readJson(el, 'data-init')).toBe('cur');
-    });
-  });
-
-  describe('静默模式', () => {
-    test('注入 FORM_SILENT_MODE_KEY=true 时不渲染 CodeEditor', () => {
-      const wrapper = mountCode(
-        {},
-        {
-          provide: { [FORM_SILENT_MODE_KEY as symbol]: true },
-        },
-      );
-      expect(wrapper.find('.fake-code-editor').exists()).toBe(false);
-    });
-
-    test('注入 FORM_SILENT_MODE_KEY=false 时正常渲染 CodeEditor', () => {
-      const wrapper = mountCode(
-        {},
-        {
-          provide: { [FORM_SILENT_MODE_KEY as symbol]: false },
-        },
-      );
-      expect(wrapper.find('.fake-code-editor').exists()).toBe(true);
     });
   });
 

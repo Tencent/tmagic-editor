@@ -7,8 +7,6 @@ import { describe, expect, test, vi } from 'vitest';
 import { defineComponent, h, nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
 
-import { FORM_SILENT_MODE_KEY } from '@tmagic/form';
-
 import KeyValue from '@editor/fields/KeyValue.vue';
 
 vi.mock('@tmagic/design', () => ({
@@ -124,17 +122,6 @@ describe('KeyValue', () => {
       }) as any,
     });
     expect(wrapper.find('.code-editor').exists()).toBe(true);
-  });
-
-  test('静默模式跳过高级代码编辑器', () => {
-    const wrapper = mount(KeyValue, {
-      props: baseProps({
-        config: { advanced: true, type: 'key-value' },
-        model: { kv: () => null },
-      }) as any,
-      global: { provide: { [FORM_SILENT_MODE_KEY as symbol]: true } },
-    });
-    expect(wrapper.find('.code-editor').exists()).toBe(false);
   });
 
   test('CodeEditor save emit change', async () => {

@@ -8,6 +8,10 @@ const r = (p: string) => resolve(__dirname, p);
 const alias = {
   '@editor': r('./packages/editor/src'),
   '@form': r('./packages/form/src'),
+  '@form/headless': r('./packages/form/src/headless.ts'),
+  '@tmagic/form/headless': r('./packages/form/src/headless.ts'),
+  '@tmagic/form': r('./packages/form/src'),
+  '@tmagic/editor/headless': r('./packages/editor/src/headless.ts'),
   '@data-source': r('./packages/data-source/src'),
 };
 
@@ -35,7 +39,12 @@ export default defineConfig({
         test: {
           name: 'dom',
           include: ['./packages/*/tests/**', './runtime/*/tests/**'],
-          exclude: ['./packages/cli/tests/**', './packages/editor/tests/unit/hooks/use-stage.spec.ts'],
+          exclude: [
+            './packages/cli/tests/**',
+            './packages/editor/tests/unit/hooks/use-stage.spec.ts',
+            // 多份用例共用的脚手架模块，本身不含用例
+            './packages/*/tests/**/helpers/**',
+          ],
           environment: 'happy-dom',
           pool: 'vmThreads',
           vmMemoryLimit: '2GB',
@@ -61,7 +70,7 @@ export default defineConfig({
         resolve: { alias },
         test: {
           name: 'node',
-          include: ['./packages/cli/tests/**'],
+          include: ['./packages/cli/tests/**', './packages/form/tests/node/**'],
           environment: 'node',
           pool: 'forks',
           isolate: false,

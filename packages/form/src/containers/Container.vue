@@ -27,15 +27,7 @@
     <template v-else-if="type && display && !showDiff">
       <TMagicFormItem v-bind="formItemProps" :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text }">
         <template #label>
-          <slot
-            v-if="shouldRenderLeafField"
-            name="label"
-            :config="config"
-            :type="type"
-            :text="text"
-            :prop="itemProp"
-            :disabled="disabled"
-          >
+          <slot name="label" :config="config" :type="type" :text="text" :prop="itemProp" :disabled="disabled">
             <FormLabel
               :tip="config.tip"
               :type="type"
@@ -49,25 +41,8 @@
           </slot>
         </template>
 
-        <!-- 静默校验时只保留 FormItem：校验依赖其 prop / rules 与 model 值，与字段组件实例无关 -->
-        <template v-if="shouldRenderLeafField">
-          <TMagicTooltip v-if="tooltip.text" :placement="tooltip.placement">
-            <component
-              v-bind="fieldsProps"
-              :is="tagName"
-              :model="model"
-              :last-values="lastValues"
-              :is-compare="isCompare"
-              @change="onChangeHandler"
-              @addDiffCount="onAddDiffCount"
-            ></component>
-            <template #content>
-              <div v-html="tooltip.text"></div>
-            </template>
-          </TMagicTooltip>
-
+        <TMagicTooltip v-if="tooltip.text" :placement="tooltip.placement">
           <component
-            v-else
             v-bind="fieldsProps"
             :is="tagName"
             :model="model"
@@ -76,13 +51,24 @@
             @change="onChangeHandler"
             @addDiffCount="onAddDiffCount"
           ></component>
-        </template>
+          <template #content>
+            <div v-html="tooltip.text"></div>
+          </template>
+        </TMagicTooltip>
+
+        <component
+          v-else
+          v-bind="fieldsProps"
+          :is="tagName"
+          :model="model"
+          :last-values="lastValues"
+          :is-compare="isCompare"
+          @change="onChangeHandler"
+          @addDiffCount="onAddDiffCount"
+        ></component>
       </TMagicFormItem>
 
-      <TMagicTooltip
-        v-if="shouldRenderLeafField && config.tip && type === 'checkbox' && !(config as CheckboxConfig).useLabel"
-        placement="top"
-      >
+      <TMagicTooltip v-if="config.tip && type === 'checkbox' && !(config as CheckboxConfig).useLabel" placement="top">
         <TMagicIcon style="line-height: 40px; margin-left: 5px"><warning-filled /></TMagicIcon>
         <template #content>
           <div v-html="config.tip"></div>
@@ -102,15 +88,7 @@
         }"
       >
         <template #label>
-          <slot
-            v-if="shouldRenderLeafField"
-            name="label"
-            :config="config"
-            :type="type"
-            :text="text"
-            :prop="itemProp"
-            :disabled="disabled"
-          >
+          <slot name="label" :config="config" :type="type" :text="text" :prop="itemProp" :disabled="disabled">
             <FormLabel
               :tip="config.tip"
               :type="type"
@@ -120,23 +98,9 @@
             ></FormLabel>
           </slot>
         </template>
-        <template v-if="shouldRenderLeafField">
-          <TMagicTooltip v-if="tooltip.text" :placement="tooltip.placement">
-            <component
-              v-bind="fieldsProps"
-              :is="tagName"
-              :model="model"
-              :last-values="lastValues"
-              :is-compare="isCompare"
-              @change="onChangeHandler"
-            ></component>
-            <template #content>
-              <div v-html="tooltip.text"></div>
-            </template>
-          </TMagicTooltip>
 
+        <TMagicTooltip v-if="tooltip.text" :placement="tooltip.placement">
           <component
-            v-else
             v-bind="fieldsProps"
             :is="tagName"
             :model="model"
@@ -144,7 +108,20 @@
             :is-compare="isCompare"
             @change="onChangeHandler"
           ></component>
-        </template>
+          <template #content>
+            <div v-html="tooltip.text"></div>
+          </template>
+        </TMagicTooltip>
+
+        <component
+          v-else
+          v-bind="fieldsProps"
+          :is="tagName"
+          :model="model"
+          :last-values="lastValues"
+          :is-compare="isCompare"
+          @change="onChangeHandler"
+        ></component>
       </TMagicFormItem>
 
       <!-- 普通字段：渲染前后两份独立的组件用于对比 -->
@@ -155,15 +132,7 @@
           :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text, 'show-before-diff': true }"
         >
           <template #label>
-            <slot
-              v-if="shouldRenderLeafField"
-              name="label"
-              :config="config"
-              :type="type"
-              :text="text"
-              :prop="itemProp"
-              :disabled="disabled"
-            >
+            <slot name="label" :config="config" :type="type" :text="text" :prop="itemProp" :disabled="disabled">
               <FormLabel
                 :tip="config.tip"
                 :type="type"
@@ -173,28 +142,24 @@
               ></FormLabel>
             </slot>
           </template>
-          <template v-if="shouldRenderLeafField">
-            <TMagicTooltip v-if="tooltip.text" :placement="tooltip.placement">
-              <component v-bind="fieldsProps" :is="tagName" :model="lastValues" @change="onChangeHandler"></component>
-              <template #content>
-                <div v-html="tooltip.text"></div>
-              </template>
-            </TMagicTooltip>
 
-            <component
-              v-else
-              v-bind="fieldsProps"
-              :is="tagName"
-              :model="lastValues"
-              @change="onChangeHandler"
-            ></component>
-          </template>
+          <TMagicTooltip v-if="tooltip.text" :placement="tooltip.placement">
+            <component v-bind="fieldsProps" :is="tagName" :model="lastValues" @change="onChangeHandler"></component>
+            <template #content>
+              <div v-html="tooltip.text"></div>
+            </template>
+          </TMagicTooltip>
+
+          <component
+            v-else
+            v-bind="fieldsProps"
+            :is="tagName"
+            :model="lastValues"
+            @change="onChangeHandler"
+          ></component>
         </TMagicFormItem>
 
-        <TMagicTooltip
-          v-if="shouldRenderLeafField && config.tip && type === 'checkbox' && !(config as CheckboxConfig).useLabel"
-          placement="top"
-        >
+        <TMagicTooltip v-if="config.tip && type === 'checkbox' && !(config as CheckboxConfig).useLabel" placement="top">
           <TMagicIcon style="line-height: 40px; margin-left: 5px"><warning-filled /></TMagicIcon>
           <template #content>
             <div v-html="config.tip"></div>
@@ -208,15 +173,7 @@
           :class="{ 'tmagic-form-hidden': `${itemLabelWidth}` === '0' || !text, 'show-after-diff': true }"
         >
           <template #label>
-            <slot
-              v-if="shouldRenderLeafField"
-              name="label"
-              :config="config"
-              :type="type"
-              :text="text"
-              :prop="itemProp"
-              :disabled="disabled"
-            >
+            <slot name="label" :config="config" :type="type" :text="text" :prop="itemProp" :disabled="disabled">
               <FormLabel
                 :tip="config.tip"
                 :type="type"
@@ -226,22 +183,18 @@
               ></FormLabel>
             </slot>
           </template>
-          <template v-if="shouldRenderLeafField">
-            <TMagicTooltip v-if="tooltip.text" :placement="tooltip.placement">
-              <component v-bind="fieldsProps" :is="tagName" :model="model" @change="onChangeHandler"></component>
-              <template #content>
-                <div v-html="tooltip.text"></div>
-              </template>
-            </TMagicTooltip>
 
-            <component v-else v-bind="fieldsProps" :is="tagName" :model="model" @change="onChangeHandler"></component>
-          </template>
+          <TMagicTooltip v-if="tooltip.text" :placement="tooltip.placement">
+            <component v-bind="fieldsProps" :is="tagName" :model="model" @change="onChangeHandler"></component>
+            <template #content>
+              <div v-html="tooltip.text"></div>
+            </template>
+          </TMagicTooltip>
+
+          <component v-else v-bind="fieldsProps" :is="tagName" :model="model" @change="onChangeHandler"></component>
         </TMagicFormItem>
 
-        <TMagicTooltip
-          v-if="shouldRenderLeafField && config.tip && type === 'checkbox' && !(config as CheckboxConfig).useLabel"
-          placement="top"
-        >
+        <TMagicTooltip v-if="config.tip && type === 'checkbox' && !(config as CheckboxConfig).useLabel" placement="top">
           <TMagicIcon style="line-height: 40px; margin-left: 5px"><warning-filled /></TMagicIcon>
           <template #content>
             <div v-html="config.tip"></div>
@@ -310,10 +263,17 @@ import type {
   FormValue,
   ToolTipConfigType,
 } from '../schema';
-import { FORM_DIFF_CONFIG_KEY, FORM_SILENT_MODE_KEY, FORM_TYPE_MATCH_VALID_KEY } from '../schema';
-import { getField } from '../utils/config';
-import { createObjectProp, display as displayFunction, filterFunction, getRules } from '../utils/form';
-import { getSilentLeafFieldTypes } from '../utils/silentLeafFieldTypes';
+import { FORM_DIFF_CONFIG_KEY, FORM_TYPE_MATCH_VALID_KEY } from '../schema';
+import {
+  createObjectProp,
+  display as displayFunction,
+  filterFunction,
+  getItemProp,
+  getRules,
+  isValidName as isValidNameOf,
+  resolveItemType,
+} from '../utils/form';
+import { getField } from '../utils/registerField';
 
 import FormLabel from './FormLabel.vue';
 
@@ -388,30 +348,14 @@ const showDiff = computed(() => {
 
 const items = computed(() => (props.config as ContainerCommonConfig).items);
 
-const itemProp = computed(() => {
-  let n: string | number = '';
-  if (name.value) {
-    n = name.value;
-  } else {
-    return props.prop;
-  }
+const itemProp = computed(() => getItemProp(props.prop, name.value));
 
-  if (typeof props.prop !== 'undefined' && props.prop !== '') {
-    return `${props.prop}.${n}`;
-  }
-
-  return `${n}`;
-});
-
-const type = computed((): string => {
-  let type = 'type' in props.config ? props.config.type : '';
-  type = type && filterFunction<string>(mForm, type, props);
-  if (type === 'form') return '';
-  if (type === 'container') return '';
-  return type?.replace(/([A-Z])/g, '-$1').toLowerCase() || (items.value ? '' : 'text');
-});
+const type = computed((): string => resolveItemType(mForm, props.config, props));
 
 const tagName = computed(() => {
+  // `type: 'component'` 把任意 Vue 组件当字段渲染。无渲染校验把它当叶子、不遍历内部结构，
+  // 因此该组件不得再向父表单注册 FormItem（不要在内部挂会 addField 的 MContainer）。
+  // 需要嵌套表单项时，应对该具体组件 registerField(type, { nested })。
   if (type.value === 'component' && (props.config as ComponentConfig).component) {
     return (props.config as ComponentConfig).component;
   }
@@ -457,11 +401,6 @@ const effectiveSelfDiffFieldTypes = computed<Set<string>>(() => {
 });
 
 const isSelfDiffField = computed(() => effectiveSelfDiffFieldTypes.value.has(type.value));
-
-// 静默模式下仅白名单叶子字段跳过渲染；扩展字段通过 registerSilentLeafFieldTypes 注册
-const silentMode = inject(FORM_SILENT_MODE_KEY, false);
-
-const shouldRenderLeafField = computed(() => !silentMode || !getSilentLeafFieldTypes().has(type.value));
 
 const disabled = computed(() => props.disabled || filterFunction(mForm, props.config.disabled, props));
 
@@ -571,22 +510,7 @@ const onAddDiffCount = () => emit('addDiffCount');
 const hasModifyKey = (eventDataItem: ContainerChangeEventData) =>
   typeof eventDataItem?.modifyKey !== 'undefined' && eventDataItem.modifyKey !== '';
 
-const isValidName = () => {
-  const valueType = typeof name.value;
-  if (valueType !== 'string' && valueType !== 'symbol' && valueType !== 'number') {
-    return false;
-  }
-
-  if (name.value === '') {
-    return false;
-  }
-
-  if (typeof name.value === 'number') {
-    return name.value >= 0;
-  }
-
-  return true;
-};
+const isValidName = () => isValidNameOf(name.value);
 
 const createModelProxy = (
   target: any,

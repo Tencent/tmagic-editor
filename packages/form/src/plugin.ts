@@ -46,8 +46,9 @@ import Text from './fields/Text.vue';
 import Textarea from './fields/Textarea.vue';
 import Time from './fields/Time.vue';
 import Timerange from './fields/Timerange.vue';
+import { builtInFields } from './utils/builtInFields';
 import { setConfig } from './utils/config';
-import { registerTypeMatchRules, type TypeMatchValidator } from './utils/typeMatch';
+import { type FieldOptions, registerBuiltInFields, registerFields } from './utils/registerField';
 import Form from './Form.vue';
 import FormDialog from './FormDialog.vue';
 import FormDrawer from './FormDrawer.vue';
@@ -55,59 +56,79 @@ import FormDrawer from './FormDrawer.vue';
 import './theme/index.scss';
 
 // #region FormInstallOptions
+/**
+ * `@tmagic/form` 插件安装选项。
+ */
 export interface FormInstallOptions {
+  /** 是否启用全局 flat 模式。 */
   flat?: boolean;
-  /** 自定义字段 type 的 typeMatch 校验规则，可覆盖内置规则或扩展业务字段 */
-  typeMatchRules?: Record<string, TypeMatchValidator>;
+  /**
+   * 自定义字段 type 的登记（叶子 / nested / walk / typeMatch / component / container）。
+   * 与 `registerFields` 相同。
+   */
+  fields?: Record<string, FieldOptions>;
   [key: string]: any;
 }
 // #endregion FormInstallOptions
 
+const builtInFieldVue: Record<string, Pick<FieldOptions, 'component' | 'container'>> = {
+  text: { component: Text },
+  'img-upload': { component: Text },
+  number: { component: Number },
+  'number-range': { component: NumberRange },
+  textarea: { component: Textarea },
+  hidden: { component: Hidden },
+  date: { component: Date },
+  datetime: { component: DateTime },
+  daterange: { component: Daterange },
+  timerange: { component: Timerange },
+  time: { component: Time },
+  checkbox: { component: Checkbox },
+  switch: { component: Switch },
+  'color-picker': { component: ColorPicker },
+  'checkbox-group': { component: CheckboxGroup },
+  'radio-group': { component: RadioGroup },
+  display: { component: Display },
+  link: { component: Link },
+  select: { component: Select },
+  cascader: { component: Cascader },
+  'dynamic-field': { component: DynamicField },
+  container: { container: Container },
+  tab: { container: Tabs },
+  row: { container: Row },
+  'flex-layout': { container: FlexLayout },
+  fieldset: { container: Fieldset },
+  panel: { container: Panel },
+  step: { container: MStep },
+  table: { container: TableGroupList },
+  'group-list': { container: TableGroupList },
+  'table-group-list': { container: TableGroupList },
+};
+
 const defaultInstallOpt: FormInstallOptions = {};
 
 export default {
+  /**
+   * 安装 `@tmagic/form`：登记内置字段、挂载 `m-form` / `m-form-dialog` / `m-form-drawer`。
+   *
+   * @param app - Vue 应用
+   * @param [opt] - 安装选项
+   */
   install(app: App, opt: FormInstallOptions = {}) {
-    const option = Object.assign(defaultInstallOpt, opt);
+    const option = { ...defaultInstallOpt, ...opt };
 
     app.config.globalProperties.$MAGIC_FORM = option;
     setConfig(option);
 
-    if (option.typeMatchRules) {
-      registerTypeMatchRules(option.typeMatchRules);
+    registerBuiltInFields(builtInFields);
+    registerBuiltInFields(builtInFieldVue, app);
+
+    if (option.fields) {
+      registerFields(option.fields, app);
     }
 
     app.component('m-form', Form);
     app.component('m-form-dialog', FormDialog);
     app.component('m-form-drawer', FormDrawer);
-    app.component('m-form-container', Container);
-    app.component('m-form-fieldset', Fieldset);
-    app.component('m-form-group-list', TableGroupList);
-    app.component('m-form-panel', Panel);
-    app.component('m-form-row', Row);
-    app.component('m-form-step', MStep);
-    app.component('m-form-table', TableGroupList);
-    app.component('m-form-tab', Tabs);
-    app.component('m-form-flex-layout', FlexLayout);
-    app.component('m-fields-text', Text);
-    app.component('m-fields-img-upload', Text);
-    app.component('m-fields-number', Number);
-    app.component('m-fields-number-range', NumberRange);
-    app.component('m-fields-textarea', Textarea);
-    app.component('m-fields-hidden', Hidden);
-    app.component('m-fields-date', Date);
-    app.component('m-fields-datetime', DateTime);
-    app.component('m-fields-daterange', Daterange);
-    app.component('m-fields-timerange', Timerange);
-    app.component('m-fields-time', Time);
-    app.component('m-fields-checkbox', Checkbox);
-    app.component('m-fields-switch', Switch);
-    app.component('m-fields-color-picker', ColorPicker);
-    app.component('m-fields-checkbox-group', CheckboxGroup);
-    app.component('m-fields-radio-group', RadioGroup);
-    app.component('m-fields-display', Display);
-    app.component('m-fields-link', Link);
-    app.component('m-fields-select', Select);
-    app.component('m-fields-cascader', Cascader);
-    app.component('m-fields-dynamic-field', DynamicField);
   },
 };

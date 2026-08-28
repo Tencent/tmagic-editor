@@ -12,6 +12,7 @@ import { computed, inject } from 'vue';
 import { TMagicCheckbox, TMagicCheckboxGroup } from '@tmagic/design';
 
 import type { CheckboxGroupConfig, CheckboxGroupOption, FieldProps, FormState } from '../schema';
+import { initCheckboxGroupValue } from '../utils/fieldValueEffects';
 import { filterFunction } from '../utils/form';
 import { useAddField } from '../utils/useAddField';
 
@@ -25,10 +26,7 @@ const emit = defineEmits(['change']);
 
 useAddField(props.prop);
 
-// 初始化选项
-if (props.model && !props.model[props.name]) {
-  props.model[props.name] = [];
-}
+initCheckboxGroupValue(props.model, props.name);
 
 const changeHandler = (v: Array<string | number | boolean>) => {
   emit('change', v);

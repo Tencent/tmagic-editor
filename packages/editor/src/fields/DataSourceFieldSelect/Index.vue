@@ -6,7 +6,7 @@
     }"
   >
     <FieldSelect
-      v-if="isSelectValid && !silentMode"
+      v-if="isSelectValid"
       :model-value="model[name]"
       :disabled="disabled"
       :size="size"
@@ -18,7 +18,7 @@
     ></FieldSelect>
 
     <component
-      v-else-if="!silentMode"
+      v-else
       :is="tagName"
       :config="config.fieldConfig"
       :model="model"
@@ -33,7 +33,7 @@
     ></component>
 
     <TMagicTooltip
-      v-if="!silentMode && config.fieldConfig && !disabledDataSource && !mForm?.isCompare"
+      v-if="config.fieldConfig && !disabledDataSource && !mForm?.isCompare"
       :disabled="showDataSourceFieldSelect"
       content="选择数据源"
     >
@@ -57,7 +57,6 @@ import {
   type ContainerChangeEventData,
   type DataSourceFieldSelectConfig,
   type FieldProps,
-  FORM_SILENT_MODE_KEY,
   type FormState,
   getFormField,
 } from '@tmagic/form';
@@ -105,7 +104,6 @@ watch(
 
 const { dataSourceService, propsService } = useServices();
 const mForm = inject<FormState | undefined>('mForm');
-const silentMode = inject(FORM_SILENT_MODE_KEY, false);
 
 const dataSources = computed(() => dataSourceService.get('dataSources') || []);
 const disabledDataSource = computed(() => propsService.getDisabledDataSource());

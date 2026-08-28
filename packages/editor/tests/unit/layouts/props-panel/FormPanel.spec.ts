@@ -60,7 +60,7 @@ vi.mock('@tmagic/design', () => ({
       return () => h('button', { class: 'fake-btn' }, slots.default?.());
     },
   }),
-  tMagicMessage: () => {},
+  tMagicMessage: vi.fn(),
 }));
 
 // 可控的 submitForm 实现：默认校验成功，测试可将其改为 reject 以模拟校验失败
@@ -72,7 +72,7 @@ vi.mock('@tmagic/form', async () => {
   const actual = await vi.importActual<any>('@tmagic/form');
   return {
     ...actual,
-    // 源码保存后的静默校验走独立的 validateForm（内部新建 MForm 实例），此处 mock 便于断言
+    // 源码保存后的静默校验走独立的 validateForm（无渲染校验，不挂载组件），此处 mock 便于断言
     validateForm: vi.fn((options?: any) => validateFormImpl(options)),
     MForm: defineComponent({
       name: 'MForm',
@@ -218,7 +218,7 @@ describe('FormPanel', () => {
     expect(wrapper.emitted('submit')?.[0]).toEqual([{ foo: 'bar' }]);
   });
 
-  test('启用 enablePropsFormValidate 时源码保存通过新建的 MForm 做静默校验（携带 config/initValues）', async () => {
+  test('启用 enablePropsFormValidate 时源码保存走 validateForm 静默校验（携带 config/initValues）', async () => {
     const validateSpy = vi.fn(async () => '');
     validateFormImpl = validateSpy;
     const wrapper = mount(FormPanel, {
@@ -286,7 +286,9 @@ describe('FormPanel', () => {
     expect((submitEvents?.[0]?.[2] as Error).message).toBe('字段A -> 必填');
   });
 
-  test('启用 enablePropsFormValidate 时静默校验抛异常则退回普通提交', async () => {
+  test('启用 enablePropsFormValidate 时静默校验抛异常仍提交，并携带 error', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const { tMagicMessage } = await import('@tmagic/design');
     validateFormImpl = async () => {
       throw new Error('validate 异常');
     };
@@ -299,7 +301,12 @@ describe('FormPanel', () => {
     await new Promise((r) => setTimeout(r, 0));
 
     const submitEvents = wrapper.emitted('submit');
-    // 退回到仅携带值的提交
-    expect(submitEvents?.[0]).toEqual([{ foo: 'bar' }]);
+    expect(submitEvents?.[0]?.[0]).toEqual({ foo: 'bar' });
+    expect(submitEvents?.[0]?.[1]).toBeUndefined();
+    expect(submitEvents?.[0]?.[2]).toBeInstanceOf(Error);
+    expect((submitEvents?.[0]?.[2] as Error).message).toBe('validate 异常');
+    expect(consoleError).toHaveBeenCalledWith('validateForm error', expect.any(Error));
+    expect(tMagicMessage).not.toHaveBeenCalled();
+    consoleError.mockRestore();
   });
 });
