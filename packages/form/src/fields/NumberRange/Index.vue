@@ -23,9 +23,8 @@ import { ref, watch } from 'vue';
 
 import { TMagicInput } from '@tmagic/design';
 
-import type { FieldProps, NumberRangeConfig } from '../schema';
-import { normalizeNumberRangeValue } from '../utils/fieldValueEffects';
-import { useAddField } from '../utils/useAddField';
+import type { FieldProps, NumberRangeConfig } from '@form/schema';
+import { useAddField } from '@form/utils/useAddField';
 
 defineOptions({
   name: 'MFormNumberRange',
@@ -53,8 +52,6 @@ watch(
 );
 
 useAddField(props.prop);
-
-normalizeNumberRangeValue(props.model, props.name);
 
 const minChangeHandler = (v: string) => {
   emit('change', [Number(v), props.model[props.name][1]]);

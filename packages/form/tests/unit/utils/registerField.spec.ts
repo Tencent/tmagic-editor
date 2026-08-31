@@ -18,6 +18,7 @@
 
 import { afterEach, describe, expect, test } from 'vitest';
 import { createApp, defineComponent } from 'vue';
+
 import {
   builtInFields,
   clearFields,
@@ -168,21 +169,21 @@ describe('builtInFields', () => {
   });
 
   test('mergeFieldOptions 后一份只覆盖自己带的 key', () => {
-    const nested = () => undefined;
+    const innerConfig = () => undefined;
     const typeMatch = () => undefined;
     const merged = mergeFieldOptions(
-      { 'code-select': { nested, typeMatch } },
+      { 'code-select': { innerConfig, typeMatch } },
       { 'code-select': { component: FakeA } },
       { 'code-select': { component: FakeB }, 'my-field': { component: FakeA } },
     );
     expect(merged['code-select'].component).toBe(FakeB);
-    expect(merged['code-select'].nested).toBe(nested);
+    expect(merged['code-select'].innerConfig).toBe(innerConfig);
     expect(merged['code-select'].typeMatch).toBe(typeMatch);
     expect(merged['my-field'].component).toBe(FakeA);
   });
 
-  test('多次 registerField 按字段合并，typeMatch 不会丢掉 nested', () => {
-    registerField('my-composite', { nested: innerTextNested });
+  test('多次 registerField 按字段合并，typeMatch 不会丢掉 innerConfig', () => {
+    registerField('my-composite', { innerConfig: innerTextNested });
     registerField('my-composite', { typeMatch: () => undefined });
 
     expect(getTypeMatchRule('my-composite')).toBeTypeOf('function');
@@ -201,8 +202,8 @@ describe('builtInFields', () => {
     expect(getTypeMatchRule('built-in-match')).toBeTypeOf('function');
   });
 
-  test('registerBuiltInFields 的 nested 不会被 clearFields / unregisterField 清掉', () => {
-    registerBuiltInFields({ 'built-in-nested': { nested: innerTextNested } });
+  test('registerBuiltInFields 的 innerConfig 不会被 clearFields / unregisterField 清掉', () => {
+    registerBuiltInFields({ 'built-in-nested': { innerConfig: innerTextNested } });
 
     const collect = () =>
       collectValidatableFields(undefined, [{ type: 'built-in-nested', name: 'outer' }] as any, {
@@ -218,9 +219,9 @@ describe('builtInFields', () => {
     expect(collect()).toEqual(['outer.inner']);
   });
 
-  test('业务侧 nested 覆盖内置，unregisterField 后回落到内置', () => {
-    registerBuiltInFields({ 'both-nested': { nested: innerTextNested } });
-    registerField('both-nested', { nested: renameInnerNested });
+  test('业务侧 innerConfig 覆盖内置，unregisterField 后回落到内置', () => {
+    registerBuiltInFields({ 'both-nested': { innerConfig: innerTextNested } });
+    registerField('both-nested', { innerConfig: renameInnerNested });
 
     const collect = () =>
       collectValidatableFields(undefined, [{ type: 'both-nested', name: 'outer' }] as any, {
@@ -233,11 +234,11 @@ describe('builtInFields', () => {
     expect(collect()).toEqual(['outer.inner']);
   });
 
-  test('内置登记 nested 不会清掉业务侧已登记的叶子', () => {
+  test('内置登记 innerConfig 不会清掉业务侧已登记的叶子', () => {
     registerField('leaf-then-built-in', {});
     expect(isLeafFieldType('leaf-then-built-in')).toBe(true);
 
-    registerBuiltInFields({ 'leaf-then-built-in': { nested: innerTextNested } });
+    registerBuiltInFields({ 'leaf-then-built-in': { innerConfig: innerTextNested } });
     expect(isLeafFieldType('leaf-then-built-in')).toBe(true);
   });
 });

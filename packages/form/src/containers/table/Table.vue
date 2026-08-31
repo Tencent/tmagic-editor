@@ -92,8 +92,8 @@ import { FullScreen } from '@element-plus/icons-vue';
 
 import { TMagicButton, TMagicPagination, TMagicTable, TMagicTooltip, TMagicUpload } from '@tmagic/design';
 
-import type { SortProp } from '../../schema';
-import { sortChange } from '../../utils/form';
+import type { SortProp } from '@form/schema';
+import { sortChange } from '@form/utils/form';
 
 import type { TableProps } from './type';
 import { useFullscreen } from './useFullscreen';

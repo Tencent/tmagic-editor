@@ -5,9 +5,10 @@
  */
 import { describe, expect, test } from 'vitest';
 import { nextTick } from 'vue';
-import MagicForm, { MFormBox, MFormDialog, MFormDrawer } from '@form/index';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
+
+import MagicForm, { MFormBox, MFormDialog, MFormDrawer } from '@form/index';
 
 describe('FormDialog/FormDrawer/FormBox', () => {
   test('FormDialog 基础渲染', async () => {

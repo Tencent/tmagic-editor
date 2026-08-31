@@ -45,7 +45,7 @@ app.use(MagicForm);
 app.mount("#app");
 ```
 
-也可在安装时传入自定义字段登记（叶子 / nested / typeMatch / component），详见[表单校验 - 扩展自定义 type 规则](../../form-config/rules.md#扩展自定义-type-规则)：
+也可在安装时传入自定义字段登记（叶子 / innerConfig / typeMatch / component），详见[表单校验 - 扩展自定义 type 规则](../../form-config/rules.md#扩展自定义-type-规则)：
 
 ```javascript
 import MyField from './MyField.vue';

@@ -155,7 +155,7 @@ app.use(MagicForm, {
 
 ### Editor 字段内置规则
 
-安装 `@tmagic/editor` 时会把 `editorFields`（无 Vue 组件）叠上字段组件后作为 `fields` 传给 `@tmagic/form`。Node 里从 `@tmagic/form/headless` 与 `@tmagic/editor/headless` 引入即可。若安装时也传了 `fields`，会与编辑器字段按 type 浅合并：调用方传入的 key 覆盖对应项，未传的 key（如 `nested` / `typeMatch`）保留。服务数据（数据源 / 代码块 / 节点树）未就绪时，只做基础形态校验，不做枚举或存在性失败。
+安装 `@tmagic/editor` 时会把 `editorFields`（无 Vue 组件）叠上字段组件后作为 `fields` 传给 `@tmagic/form`。Node 里从 `@tmagic/form/headless` 与 `@tmagic/editor/headless` 引入即可。若安装时也传了 `fields`，会与编辑器字段按 type 浅合并：调用方传入的 key 覆盖对应项，未传的 key（如 `innerConfig` / `typeMatch`）保留。服务数据（数据源 / 代码块 / 节点树）未就绪时，只做基础形态校验，不做枚举或存在性失败。
 
 | 字段 type | 期望值 |
 | --- | --- |
@@ -174,7 +174,7 @@ app.use(MagicForm, {
 
 > 容器类字段（`event-select` / `code-select` / `display-conds`）遵循同一约定：容器级 typeMatch 只做结构校验，「枚举 / 存在性」下沉到内部单元格各自的 typeMatch/rules，避免单个子项非法导致整块表单标红。
 
-业务仍可用 `registerField(type, { typeMatch })` 覆盖上述任一 type 的类型校验；多次 `registerField` 按字段浅合并，不会丢掉已登记的 `nested` / `walk` / `effect`。
+业务仍可用 `registerField(type, { typeMatch })` 覆盖上述任一 type 的类型校验；多次 `registerField` 按字段浅合并，不会丢掉已登记的 `innerConfig` / `walk` / `effect`。
 
 ## 示例
 

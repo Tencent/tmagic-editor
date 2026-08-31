@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { ComputedRef, readonly } from 'vue';
+import { type MaybeRef, readonly, unref } from 'vue';
 import dayjs from 'dayjs';
 // dayjs 没有 exports 映射，原生 Node ESM 不会补扩展名，深路径必须写全 .js
 import utc from 'dayjs/plugin/utc.js';
@@ -401,7 +401,7 @@ const buildRules = function (
   mForm: FormState | undefined,
   r: Rule[] | Rule = [],
   props: any,
-  typeMatchValid: ComputedRef<boolean> | undefined,
+  typeMatchValid?: MaybeRef<boolean>,
   adapt: (_validator: AsyncValidatorFn) => AsyncValidatorFn = (validator) => validator,
 ) {
   let rules = cloneDeep(r);
@@ -410,7 +410,7 @@ const buildRules = function (
     rules = [rules];
   }
 
-  if (typeMatchValid?.value && !rules.some((r) => typeof r.typeMatch !== 'undefined')) {
+  if (unref(typeMatchValid) && !rules.some((r) => typeof r.typeMatch !== 'undefined')) {
     rules.push({
       typeMatch: true,
     });
@@ -463,7 +463,7 @@ export const getRules = function (
   mForm: FormState | undefined,
   r: Rule[] | Rule = [],
   props: any,
-  typeMatchValid?: ComputedRef<boolean>,
+  typeMatchValid?: MaybeRef<boolean>,
 ) {
   return buildRules(mForm, r, props, typeMatchValid, adaptFormValidator);
 };
@@ -478,7 +478,7 @@ export const getNativeRules = function (
   mForm: FormState | undefined,
   r: Rule[] | Rule = [],
   props: any,
-  typeMatchValid?: ComputedRef<boolean>,
+  typeMatchValid?: MaybeRef<boolean>,
 ) {
   return buildRules(mForm, r, props, typeMatchValid);
 };

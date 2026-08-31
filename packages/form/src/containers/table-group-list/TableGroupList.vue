@@ -58,8 +58,9 @@ import { Grid, Plus } from '@element-plus/icons-vue';
 import { TMagicButton } from '@tmagic/design';
 import type { GroupListConfig, TableConfig } from '@tmagic/form-schema';
 
-import type { ContainerChangeEventData } from '../../schema';
-import { isGroupListType, toGroupListConfig, toTableConfig } from '../../utils/tableGroupList';
+import type { ContainerChangeEventData } from '@form/schema';
+import { isGroupListType, toGroupListConfig, toTableConfig } from '@form/utils/tableGroupList';
+
 import MFormGroupList from '../GroupList.vue';
 import MFormTable from '../table/Table.vue';
 

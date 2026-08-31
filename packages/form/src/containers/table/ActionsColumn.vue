@@ -43,7 +43,7 @@ import { cloneDeep } from 'lodash-es';
 
 import { TMagicButton, TMagicTooltip } from '@tmagic/design';
 
-import type { FormState, TableConfig } from '../../schema';
+import type { FormState, TableConfig } from '@form/schema';
 
 const emit = defineEmits(['change']);
 

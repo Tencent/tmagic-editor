@@ -60,9 +60,8 @@ const lastValuesProcessed = computed<FormValue>(() => {
 /**
  * `code-select` 字段在历史数据中存在两种"语义为空"的形态：
  * - 字符串 `''`（旧数据 / 用户从未配置过钩子）；
- * - `{ hookType: HookType.CODE, hookData: [] }`（CodeSelect.vue 在挂载时
- *   写入的默认结构，参见 packages/editor/src/fields/CodeSelect.vue 中
- *   `props.model[props.name] = { hookType: HookType.CODE, hookData: [] }`）。
+ * - `{ hookType: HookType.CODE, hookData: [] }`（`normalizeCodeSelectValue`
+ *   写入的默认结构）。
  *
  * 直接 `isEqual` 会把两者判为不等，从而在历史对比里对每个未配置过钩子的组件
  * 都展示一份"差异"，体验很糟糕。这里把它们视为相等，跳过对比。

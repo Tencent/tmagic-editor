@@ -24,8 +24,9 @@
  * 统一收口在此。
  */
 import { type AppContext, createApp, defineComponent, h } from 'vue';
-import MagicForm from '@form/index';
 import ElementPlus from 'element-plus';
+
+import MagicForm from '@form/index';
 
 /** 必填规则 */
 export const required = (message = '必填') => [{ required: true, message }] as any;

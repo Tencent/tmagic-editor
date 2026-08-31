@@ -159,6 +159,7 @@ async function build({ packageName, format, pkg, packagesDir, entry, name, fileN
       alias: [
         { find: /^@data-source/, replacement: path.join(packagesDir, '/data-source/src') },
         { find: /^@editor/, replacement: path.join(packagesDir, './editor/src') },
+        { find: /^@form/, replacement: path.join(packagesDir, './form/src') },
       ],
     },
   });

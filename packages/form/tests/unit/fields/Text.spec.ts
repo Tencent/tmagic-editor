@@ -17,9 +17,10 @@
  */
 import { describe, expect, test } from 'vitest';
 import { nextTick } from 'vue';
-import MagicForm, { MForm, MText } from '@form/index';
 import { mount } from '@vue/test-utils';
 import ElementPlus, { ElButton } from 'element-plus';
+
+import MagicForm, { MForm, MText } from '@form/index';
 
 /**
  * 获取mock的Text实例

@@ -83,7 +83,7 @@ describe('plugin install', () => {
     expect(formInstall).toBeDefined();
     const fields = formInstall[1].fields as Record<
       string,
-      { component?: unknown; container?: unknown; nested?: unknown; typeMatch?: unknown }
+      { component?: unknown; container?: unknown; innerConfig?: unknown; typeMatch?: unknown }
     >;
     expect(formInstall[1].someOption).toBe(true);
     expect(Object.keys(fields)).toEqual(
@@ -117,11 +117,14 @@ describe('plugin install', () => {
       }
       expect(fields[type].component, `${type} 缺少 component`).toBeDefined();
     }
-    expect(fields['code-select'].nested).toEqual(expect.any(Function));
+    expect(fields['code-select'].effect).toEqual(expect.any(Function));
+    expect(fields['code-select'].innerConfig).toEqual(expect.any(Function));
     expect(fields['code-select'].typeMatch).toEqual(expect.any(Function));
-    expect(fields['style-setter'].nested).toEqual(expect.any(Function));
+    expect(fields['event-select'].effect).toEqual(expect.any(Function));
+    expect(fields['event-select'].innerConfig).toEqual(expect.any(Function));
+    expect(fields['style-setter'].innerConfig).toEqual(expect.any(Function));
     expect(fields['ui-select'].typeMatch).toEqual(expect.any(Function));
-    expect(fields['vs-code'].nested).toBeUndefined();
+    expect(fields['vs-code'].innerConfig).toBeUndefined();
     expect(components.MEditor).toBeDefined();
     expect(components['magic-code-editor']).toBeDefined();
     expect(Object.keys(components)).toEqual(['MEditor', 'magic-code-editor']);
@@ -138,7 +141,8 @@ describe('plugin install', () => {
     } as any);
     const formOpt = (app.use as any).mock.calls.find((call: any[]) => call[0] === formPlugin)[1];
     expect(formOpt.fields['code-select'].component).toEqual({ name: 'CustomCodeSelect' });
-    expect(formOpt.fields['code-select'].nested).toEqual(expect.any(Function));
+    expect(formOpt.fields['code-select'].effect).toEqual(expect.any(Function));
+    expect(formOpt.fields['code-select'].innerConfig).toEqual(expect.any(Function));
     expect(formOpt.fields['code-select'].typeMatch).toEqual(expect.any(Function));
     expect(formOpt.fields['event-select'].effect).toEqual(expect.any(Function));
     expect(formOpt.fields['my-field'].component).toEqual({ name: 'MyField' });

@@ -28,17 +28,17 @@ import TableGroupList from './containers/table-group-list/TableGroupList.vue';
 import Tabs from './containers/Tabs.vue';
 import Cascader from './fields/Cascader.vue';
 import Checkbox from './fields/Checkbox.vue';
-import CheckboxGroup from './fields/CheckboxGroup.vue';
+import CheckboxGroup from './fields/CheckboxGroup/Index.vue';
 import ColorPicker from './fields/ColorPicker.vue';
-import Date from './fields/Date.vue';
+import Date from './fields/Date/Index.vue';
 import Daterange from './fields/Daterange.vue';
-import DateTime from './fields/DateTime.vue';
-import Display from './fields/Display.vue';
-import DynamicField from './fields/DynamicField.vue';
+import DateTime from './fields/DateTime/Index.vue';
+import Display from './fields/Display/Index.vue';
+import DynamicField from './fields/DynamicField/Index.vue';
 import Hidden from './fields/Hidden.vue';
 import Link from './fields/Link.vue';
 import Number from './fields/Number.vue';
-import NumberRange from './fields/NumberRange.vue';
+import NumberRange from './fields/NumberRange/Index.vue';
 import RadioGroup from './fields/RadioGroup.vue';
 import Select from './fields/Select.vue';
 import Switch from './fields/Switch.vue';
@@ -63,7 +63,7 @@ export interface FormInstallOptions {
   /** 是否启用全局 flat 模式。 */
   flat?: boolean;
   /**
-   * 自定义字段 type 的登记（叶子 / nested / walk / typeMatch / component / container）。
+   * 自定义字段 type 的登记（叶子 / innerConfig / walk / typeMatch / component / container）。
    * 与 `registerFields` 相同。
    */
   fields?: Record<string, FieldOptions>;

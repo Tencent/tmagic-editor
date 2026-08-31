@@ -15,9 +15,13 @@
 
 无渲染实现按 `Container.vue` 及各容器组件的模板规则遍历配置树，产出的字段 `prop` 与规则与「挂载 `MForm` 后调用 `validate()`」等价。需要 UI 时传入 `dialog: true`，会把表单以弹层渲染出来供填写/确认。
 
-字段只要带了 `rules`（会包 FormItem），就会校验自身，不必先登记为叶子。配置里有 `items` 会下钻子项。内部再渲染 `MContainer` 的复合字段需要 `registerField(type, { nested })`，把内部会挂到父表单上的配置交出来。nested 回调自身抛错时，会以 `FieldNestedConfigError`（`code: 'FIELD_NESTED_CONFIG'`）reject。
+字段只要带了 `rules`（会包 FormItem），就会校验自身，不必先登记为叶子。配置里有 `items` 会下钻子项。内部再渲染 `MContainer` 的复合字段需要 `registerField(type, { innerConfig })`，把内部会挂到父表单上的配置交出来。innerConfig 回调自身抛错时，会以 `FieldInnerConfigError`（`code: 'FIELD_INNER_CONFIG'`）reject。
+
+innerConfig 回调在校验和表单值初始化两条链路上都会被调用（后者用于走到复合字段内部、找出需要执行 `effect` 的子字段），所以它应当只做配置派生、可重复调用、不要做重活。在表单值初始化链路上，回调抛错只会记录到 console 并跳过该子树，不会让表单渲染不出来。
 
 自定义字段的渲染组件和无渲染校验都通过 `registerField` / `registerFields` 一次登记。`component` 会写入字段注册表（`getFormField`）；传入 `app` 时同时 `app.component('m-fields-*')`。容器组件用 `container`，对应 `m-form-*`。
+
+字段对表单值的初始化写入统一登记为 `effect`，渲染与无渲染共用同一份登记表，执行点也只有一个：表单值初始化完成后（`MForm` 内部、`validateValues`、以及 tab / table 新增行时）各执行一次 `applyMountValueEffects`，字段组件自身不要在 `setup` 里改写 `model`。因此 effect 有两个约束：一是必须幂等，同一份值可能被执行多次（如 `initValues` 变化后重新初始化）；二是不看 `display`（`display: false` 或函数返回假的字段也会被规整，避免字段由隐藏转为显示时漏掉）。`type: 'hidden'` 不同：遍历在该节点停止、不往下分派，内部字段不会执行 effect。需要按路径跨层级写值时用上下文里的 `values`（本次处理的值根对象，`prop` 即以它为根），不要用 `mForm.values`——对比模式处理的是 `lastValues` 那一份，新增行处理的则是还没挂到表单上的一行值。单个 effect 抛错只会记录到 console，不影响其余字段与表单渲染。复合字段可以同时登记 `effect` 与 `innerConfig`：前者改本字段的值，后者只派生内部配置、不要在回调里改 `model`。
 
 | 字段形态                                                              | 登记方式                                    |
 | --------------------------------------------------------------------- | ------------------------------------------- |
@@ -25,8 +29,8 @@
 | 内部只渲染叶子 UI，或把子表单渲染在独立的 `MForm` / `MFormBox` 实例里 | `registerField('my-field')`（配置里有 `items` 但不属于父表单时，避免被当下钻） |
 | 同时需要渲染组件                                                      | `registerField('my-field', { component })`   |
 | 容器组件（`m-form-*`）                                                | `registerField('my-box', { container, walk })` |
-| 叶子字段，但挂载时会改写 model（类似 `display` 的 `initValue`）       | `registerField('my-field', { effect })`      |
-| 内部再渲染 `MContainer` / `MPanel` / `MGroupList`，向父表单注册字段    | `registerField('my-field', { nested })`      |
+| 叶子字段，但需要改写表单值（类似 `display` 的 `initValue`）           | `registerField('my-field', { effect })`      |
+| 内部再渲染 `MContainer` / `MPanel` / `MGroupList`，向父表单注册字段    | `registerField('my-field', { innerConfig })`（需要改本字段的值时再加 `effect`） |
 | 自定义 `typeMatch` 类型校验                                           | `registerField('my-field', { typeMatch })`   |
 
 ```ts
@@ -38,8 +42,7 @@ registerFields({ 'my-color-picker': { component: MyColorPicker } });
 // 需要挂到当前 app 时传入第二个参数
 registerFields({ 'my-color-picker': { component: MyColorPicker } }, app);
 
-// 叶子字段，但挂载（setup）时会改写 model：传入 effect 让无渲染校验复刻这份写入，
-// 否则无渲染校验拿到的值会与渲染式校验不一致
+// 叶子字段，但需要改写表单值：写成 effect，不要在组件 setup 里改 model
 registerField('my-status', {
   effect: ({ config, model }) => {
     if ((config as any).initValue && model) {
@@ -50,55 +53,55 @@ registerField('my-status', {
 
 // 复合字段：把组件内部渲染的 MContainer 配置交出来
 registerField('my-composite', {
-  nested: ({ config, model, prop }) => ({
-    // 对应组件内部 <MContainer :config="innerConfig" :model="model[name]" :prop="prop">
-    config: innerConfig,
+  innerConfig: ({ config, model, prop }) => ({
+    // 对应组件内部 <MContainer :config="childConfig" :model="model[name]" :prop="prop">
+    config: childConfig,
     model: model[config.name],
     prop,
   }),
 });
 
-// typeMatch：覆盖或扩展该 type 的类型匹配校验，可与 nested / effect 同时登记
+// typeMatch：覆盖或扩展该 type 的类型匹配校验，可与 innerConfig / effect 同时登记
 registerField('my-status', {
   typeMatch: (value, { message }) => (typeof value === 'string' ? undefined : message || '应为字符串'),
 });
 ```
 
-返回的 `config` 的 `name` 会被追加到返回的 `prop` 上。因此当嵌套配置复用了字段自身的 `name`（例如内部渲染 `<MGroupList :config="{ name, items }" :model="model" :prop="prop">`）时，要返回 `parentProp` 而非 `prop`，否则 `name` 会被拼两次：
+返回的 `config` 的 `name` 会被追加到返回的 `prop` 上。因此当内部配置复用了字段自身的 `name`（例如内部渲染 `<MGroupList :config="{ name, items }" :model="model" :prop="prop">`）时，要返回 `parentProp` 而非 `prop`，否则 `name` 会被拼两次：
 
 ```ts
 registerField('my-list', {
-  nested: ({ config, parentProp }) => ({
+  innerConfig: ({ config, parentProp }) => ({
     config: { type: 'group-list', name: config.name, items: innerItems },
     prop: parentProp,
   }),
 });
 ```
 
-编辑器侧四个复合字段（`code-select` / `display-conds` / `event-select` / `style-setter`）的登记可参考 `packages/editor/src/fields/headless-validation.ts`：nested 与组件共用同一份配置工厂（`packages/editor/src/fields/configs/`），避免两条链路各写一份而逐渐跑偏。
+编辑器侧四个复合字段（`code-select` / `display-conds` / `event-select` / `style-setter`）的登记可参考 `packages/editor/src/fields/headless-validation.ts`：innerConfig 与组件共用同一份配置工厂（`packages/editor/src/fields/configs/`），避免两条链路各写一份而逐渐跑偏。
 
-`type: 'component'` 会把 `config.component` 当任意 Vue 组件渲染。无渲染校验把它视为叶子，**不会**遍历内部结构。因此该组件不得再向父表单注册 FormItem；需要嵌套表单项时，应对该具体组件 `registerField(type, { nested })`。
+`type: 'component'` 会把 `config.component` 当任意 Vue 组件渲染。无渲染校验把它视为叶子，**不会**遍历内部结构。因此该组件不得再向父表单注册 FormItem；需要嵌套表单项时，应对该具体组件 `registerField(type, { innerConfig })`。
 
 ### 重复登记与撤销
 
 同一个 type 多次登记按字段浅合并，后一次只覆盖自己传入的 key：
 
 ```ts
-registerField('my-composite', { nested });
-registerField('my-composite', { component: MyComposite }); // nested 仍在
+registerField('my-composite', { innerConfig });
+registerField('my-composite', { component: MyComposite }); // innerConfig 仍在
 ```
 
 登记分「内置」与「业务」两层。`app.use(MagicForm)` / `registerBuiltInFields` 写内置层，`registerField` / `registerFields` 写业务层；读取时业务层优先，`unregisterField` / `clearFields` 只清业务层，内置字段不受影响（单测里 `clearFields` 之后仍能校验 `text`、`tab` 等内置 type）。
 
-因为是合并语义，把一个已登记 `nested` 的 type 改成普通叶子，不能靠再传一次空对象，要先撤销：
+因为是合并语义，把一个已登记 `innerConfig` 的 type 改成普通叶子，不能靠再传一次空对象，要先撤销：
 
 ```ts
-registerField('my-composite', {}); // ✗ 合并后 nested 还在，仍会下钻
+registerField('my-composite', {}); // ✗ 合并后 innerConfig 还在，仍会下钻
 unregisterField('my-composite'); // ✓ 先清掉业务层登记
 registerField('my-composite', { component: MyComposite });
 ```
 
-一次登记里同时传多个形态时的优先级：`walk` > `nested` > `effect`（叶子），命中低优先级的那份会被忽略并在控制台给出告警。
+一次登记里同时传多个形态时的优先级：`walk` > `innerConfig` > `effect`（叶子），命中低优先级的那份会被忽略并在控制台给出告警。
 
 ## 签名
 
@@ -274,7 +277,7 @@ if (error) {
 }
 ```
 
-校验通过返回空字符串 `''`，否则返回以 `<br>` 拼接的错误文案。无法完成校验时才会 reject（例如嵌套配置回调失败抛出 `FieldNestedConfigError`）。
+校验通过返回空字符串 `''`，否则返回以 `<br>` 拼接的错误文案。无法完成校验时才会 reject（例如 innerConfig 回调失败抛出 `FieldInnerConfigError`）。
 
 ## 运行环境
 

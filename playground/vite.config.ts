@@ -80,6 +80,7 @@ export default defineConfig({
       },
       { find: /^@tmagic\/core/, replacement: path.join(__dirname, '../packages/core/src/index.ts') },
       { find: /^@editor/, replacement: path.join(__dirname, '../packages/editor/src/') },
+      { find: /^@form/, replacement: path.join(__dirname, '../packages/form/src/') },
       // `/headless` 必须在下方通用的 `^@tmagic/<pkg>` 规则之前命中，否则会被改写成
       // `.../src/index.ts/headless` 导致 Vite 解析失败。
       { find: /^@tmagic\/editor\/headless$/, replacement: path.join(__dirname, '../packages/editor/src/headless.ts') },

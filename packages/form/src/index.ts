@@ -38,24 +38,24 @@ export { default as MGroupList } from './containers/table-group-list/TableGroupL
 export { default as MTableGroupList } from './containers/table-group-list/TableGroupList.vue';
 export { default as MText } from './fields/Text.vue';
 export { default as MNumber } from './fields/Number.vue';
-export { default as MNumberRange } from './fields/NumberRange.vue';
+export { default as MNumberRange } from './fields/NumberRange/Index.vue';
 export { default as MTextarea } from './fields/Textarea.vue';
 export { default as MHidden } from './fields/Hidden.vue';
-export { default as MDate } from './fields/Date.vue';
-export { default as MDateTime } from './fields/DateTime.vue';
+export { default as MDate } from './fields/Date/Index.vue';
+export { default as MDateTime } from './fields/DateTime/Index.vue';
 export { default as MTime } from './fields/Time.vue';
 export { default as MCheckbox } from './fields/Checkbox.vue';
 export { default as MSwitch } from './fields/Switch.vue';
 export { default as MDaterange } from './fields/Daterange.vue';
 export { default as MTimerange } from './fields/Timerange.vue';
 export { default as MColorPicker } from './fields/ColorPicker.vue';
-export { default as MCheckboxGroup } from './fields/CheckboxGroup.vue';
+export { default as MCheckboxGroup } from './fields/CheckboxGroup/Index.vue';
 export { default as MRadioGroup } from './fields/RadioGroup.vue';
-export { default as MDisplay } from './fields/Display.vue';
+export { default as MDisplay } from './fields/Display/Index.vue';
 export { default as MLink } from './fields/Link.vue';
 export { default as MSelect } from './fields/Select.vue';
 export { default as MCascader } from './fields/Cascader.vue';
-export { default as MDynamicField } from './fields/DynamicField.vue';
+export { default as MDynamicField } from './fields/DynamicField/Index.vue';
 
 export { builtInFields } from './utils/builtInFields';
 
@@ -70,12 +70,17 @@ export {
 } from './utils/registerField';
 export type { FieldOptions, HeadlessFieldOptions } from './utils/registerField';
 
-export type { FieldNestedConfig, FieldNestedConfigContext, FieldNestedConfigResult } from './utils/fieldNestedConfig';
+export type { FieldInnerConfig, FieldInnerConfigContext, FieldInnerConfigResult } from './utils/fieldInnerConfig';
 
 export { isLeafFieldType } from './utils/fieldValueEffects';
 export type { FieldMountValueEffect, FieldMountValueEffectContext } from './utils/fieldValueEffects';
 
-export { collectValidatableFields, FieldNestedConfigError, isFieldNestedConfigError } from './utils/collectFields';
+export {
+  applyMountValueEffects,
+  collectValidatableFields,
+  FieldInnerConfigError,
+  isFieldInnerConfigError,
+} from './utils/collectFields';
 export type { CollectedField } from './utils/collectFields';
 
 export { createHeadlessFormState, validateValues } from './utils/validateValues';

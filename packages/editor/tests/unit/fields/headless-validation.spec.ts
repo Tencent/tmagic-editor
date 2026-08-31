@@ -4,9 +4,14 @@
  * Copyright (C) 2025 Tencent.
  */
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
-import { computed } from 'vue';
+
+import { NODE_CONDS_KEY } from '@tmagic/core';
+
+import { editorFields } from '@editor/fields/headless-validation';
+import { fillConfig } from '@editor/utils/props';
 // 走 @form 源码别名而非 @tmagic/form：编辑器包在单测里解析到的是 form 的构建产物
 import {
+  applyMountValueEffects,
   builtInFields,
   clearFields,
   collectValidatableFields,
@@ -14,11 +19,6 @@ import {
   registerBuiltInFields,
   registerFields,
 } from '@form/index';
-
-import { NODE_CONDS_KEY } from '@tmagic/core';
-
-import { editorFields } from '@editor/fields/headless-validation';
-import { fillConfig } from '@editor/utils/props';
 
 /**
  * 无渲染校验只遍历 config 树，看不到复合字段在组件内部渲染出来的嵌套字段。
@@ -29,12 +29,7 @@ const collect = (config: any[], values: any, typeMatchValid = true) => {
   const formState = createHeadlessFormState({ config, initValues: values });
   formState.values = values;
 
-  const fields = collectValidatableFields(
-    formState,
-    config,
-    values,
-    computed(() => typeMatchValid),
-  );
+  const fields = collectValidatableFields(formState, config, values, typeMatchValid);
 
   return { props: fields.map((field) => field.prop) };
 };
@@ -82,11 +77,22 @@ describe('code-select', () => {
     ]);
   });
 
-  test('空值按组件的旧数据兼容改写为 { hookType, hookData }', () => {
+  test('collect 只读，空值不会在收集字段时被改写', () => {
     const config = [{ type: 'code-select', name: 'created' }];
     const values: any = { created: [] };
 
     collect(config, values);
+
+    expect(values.created).toEqual([]);
+  });
+
+  test('applyMountValueEffects 把空值改写成 { hookType, hookData }', () => {
+    const config = [{ type: 'code-select', name: 'created' }] as any;
+    const values: any = { created: [] };
+    const formState = createHeadlessFormState({ config, initValues: values });
+    formState.values = values;
+
+    applyMountValueEffects(formState, config, values);
 
     expect(values.created).toEqual({ hookType: 'code', hookData: [] });
   });
@@ -199,6 +205,17 @@ describe('event-select', () => {
     ]);
   });
 
+  test('applyMountValueEffects 把非数组收成空数组', () => {
+    const config = [{ type: 'event-select', name: 'events' }] as any;
+    const values: any = {};
+    const formState = createHeadlessFormState({ config, initValues: values });
+    formState.values = values;
+
+    applyMountValueEffects(formState, config, values);
+
+    expect(values.events).toEqual([]);
+  });
+
   test('旧数据格式（列表项没有 actions）不含校验规则，不产出字段', () => {
     const config = [{ type: 'event-select', name: 'events' }];
     const values = { events: [{ name: 'click', to: 'node_1', method: 'show' }] };
@@ -295,14 +312,7 @@ describe('fillConfig 通用属性表单', () => {
     // 关掉独立样式面板，让 fillConfig 注入的 style tab 走 display，从而覆盖 style-setter
     (formState as any).services = { uiService: { get: (key: string) => key !== 'showStylePanel' } };
 
-    expect(() =>
-      collectValidatableFields(
-        formState,
-        config,
-        values,
-        computed(() => true),
-      ),
-    ).not.toThrow();
+    expect(() => collectValidatableFields(formState, config, values, true)).not.toThrow();
   });
 
   test('显示条件 tab 按 groupList 展开条件组与组内条件', () => {

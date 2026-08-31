@@ -17,9 +17,10 @@
  */
 import { describe, expect, test } from 'vitest';
 import { nextTick } from 'vue';
-import MagicForm, { createForm, MForm } from '@form/index';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
+
+import MagicForm, { createForm, MForm } from '@form/index';
 
 describe('表单', () => {
   test('初始化', async () => {

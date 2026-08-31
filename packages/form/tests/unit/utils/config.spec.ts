@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+
 import { getConfig, setConfig } from '@form/utils/config';
 
 describe('config.ts', () => {

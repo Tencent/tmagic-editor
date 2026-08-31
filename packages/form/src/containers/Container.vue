@@ -358,7 +358,7 @@ const type = computed((): string => resolveItemType(mForm, props.config, props))
 const tagName = computed(() => {
   // `type: 'component'` 把任意 Vue 组件当字段渲染。无渲染校验把它当叶子、不遍历内部结构，
   // 因此该组件不得再向父表单注册 FormItem（不要在内部挂会 addField 的 MContainer）。
-  // 需要嵌套表单项时，应对该具体组件 registerField(type, { nested })。
+  // 需要嵌套表单项时，应对该具体组件 registerField(type, { innerConfig })。
   if (type.value === 'component' && (props.config as ComponentConfig).component) {
     return (props.config as ComponentConfig).component;
   }

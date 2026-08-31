@@ -4,6 +4,7 @@
  * Copyright (C) 2025 Tencent.
  */
 import { describe, expect, test } from 'vitest';
+
 import { getGroupListRowConfig } from '@form/utils/tableGroupList';
 
 describe('getGroupListRowConfig', () => {

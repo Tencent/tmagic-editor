@@ -4,10 +4,11 @@ import { WarningFilled } from '@element-plus/icons-vue';
 import { type TableColumnOptions, TMagicIcon, TMagicTooltip } from '@tmagic/design';
 import type { FormItemConfig, FormState } from '@tmagic/form-schema';
 
-import type { ContainerChangeEventData } from '../../schema';
-import { isGlobalFlat } from '../../utils/config';
-import { appendProp, display as displayFunc, getDataByPage, sortArray } from '../../utils/form';
-import { isTableColumnRendered, makeTableColumnConfig } from '../../utils/tableGroupList';
+import type { ContainerChangeEventData } from '@form/schema';
+import { isGlobalFlat } from '@form/utils/config';
+import { appendProp, display as displayFunc, getDataByPage, sortArray } from '@form/utils/form';
+import { isTableColumnRendered, makeTableColumnConfig } from '@form/utils/tableGroupList';
+
 import Container from '../Container.vue';
 
 import ActionsColumn from './ActionsColumn.vue';

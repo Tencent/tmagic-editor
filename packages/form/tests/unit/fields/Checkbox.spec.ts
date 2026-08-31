@@ -18,9 +18,10 @@
 
 import { describe, expect, test } from 'vitest';
 import { nextTick } from 'vue';
-import MagicForm, { MCheckbox, MForm } from '@form/index';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
+
+import MagicForm, { MCheckbox, MForm } from '@form/index';
 
 const getWrapper = (
   config: any = [

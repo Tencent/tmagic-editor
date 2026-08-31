@@ -44,12 +44,17 @@ export {
 } from './utils/registerField';
 export type { FieldOptions, HeadlessFieldOptions } from './utils/registerField';
 
-export type { FieldNestedConfig, FieldNestedConfigContext, FieldNestedConfigResult } from './utils/fieldNestedConfig';
+export type { FieldInnerConfig, FieldInnerConfigContext, FieldInnerConfigResult } from './utils/fieldInnerConfig';
 
 export { isLeafFieldType } from './utils/fieldValueEffects';
 export type { FieldMountValueEffect, FieldMountValueEffectContext } from './utils/fieldValueEffects';
 
-export { collectValidatableFields, FieldNestedConfigError, isFieldNestedConfigError } from './utils/collectFields';
+export {
+  applyMountValueEffects,
+  collectValidatableFields,
+  FieldInnerConfigError,
+  isFieldInnerConfigError,
+} from './utils/collectFields';
 export type { CollectedField } from './utils/collectFields';
 
 export { createHeadlessFormState, validateValues } from './utils/validateValues';

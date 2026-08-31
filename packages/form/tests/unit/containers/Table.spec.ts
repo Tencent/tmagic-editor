@@ -5,10 +5,11 @@
  */
 import { describe, expect, test } from 'vitest';
 import { nextTick } from 'vue';
-import Table from '@form/containers/table/Table.vue';
-import MagicForm from '@form/index';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
+
+import Table from '@form/containers/table/Table.vue';
+import MagicForm from '@form/index';
 
 // el-table 在 happy-dom 下的 MutationObserver 会报错，这里直接 stub 掉表格本体；
 // 导入 / 清空 / 新增按钮的显隐只取决于 importable & isCompare，与表格渲染无关。

@@ -588,6 +588,7 @@ export default defineConfig({
     },
     resolve: {
       alias:[
+        { find: /^@form/, replacement: path.join(__dirname, '../../packages/form/src/') },
         { find: /^@tmagic\/form-schema/, replacement: path.join(__dirname, '../../packages/form-schema/src/index.ts') },
         { find: /^@tmagic\/form\/headless$/, replacement: path.join(__dirname, '../../packages/form/src/headless.ts') },
         { find: /^@tmagic\/form/, replacement: path.join(__dirname, '../../packages/form/src/index.ts') },

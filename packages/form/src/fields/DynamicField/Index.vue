@@ -27,10 +27,11 @@ import { onBeforeUnmount, reactive, watch } from 'vue';
 
 import { TMagicForm, TMagicFormItem, TMagicInput } from '@tmagic/design';
 
-import type { DynamicFieldConfig, FieldProps } from '../schema';
-import { getConfig } from '../utils/config';
-import { eachDynamicField } from '../utils/fieldValueEffects';
-import { useAddField } from '../utils/useAddField';
+import type { DynamicFieldConfig, FieldProps } from '@form/schema';
+import { getConfig } from '@form/utils/config';
+import { useAddField } from '@form/utils/useAddField';
+
+import { eachDynamicField } from './effect';
 
 defineOptions({
   name: 'MFormDynamicField',

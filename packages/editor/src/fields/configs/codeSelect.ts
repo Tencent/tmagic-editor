@@ -109,10 +109,10 @@ export const createCodeSelectConfig = (config: CodeSelectConfig): GroupListConfi
 };
 
 /**
- * `fields/CodeSelect.vue` 挂载时的值兼容：旧数据结构里钩子值可能是空值或空数组，
- * 组件用 `watch(immediate)` 把它改写成 `{ hookType, hookData }`。
+ * `code-select` 的旧数据兼容：钩子值可能是空值或空数组，改写成 `{ hookType, hookData }`。
  *
- * 这个写入发生在校验之前，无渲染校验必须同样执行，否则内部字段的取值层级不一致。
+ * 表单值初始化时由 `code-select` 的 `effect` 执行（`applyMountValueEffects`）；
+ * 组件里的 `watch`（无 immediate）只兜运行期被置空。必须幂等。
  */
 export const normalizeCodeSelectValue = (model: FormValue | undefined, name: string): void => {
   if (!model) return;

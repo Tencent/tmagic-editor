@@ -17,6 +17,10 @@
  */
 
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+
+import { setDesignConfig } from '@tmagic/design';
+import { getDesignConfig } from '@tmagic/design/headless';
+
 import type { FormState } from '@form/index';
 import { getRules } from '@form/utils/form';
 import { clearFields } from '@form/utils/registerField';
@@ -29,9 +33,6 @@ import {
   registerTypeMatchRules,
   validateTypeMatch,
 } from '@form/utils/typeMatch';
-
-import { setDesignConfig } from '@tmagic/design';
-import { getDesignConfig } from '@tmagic/design/headless';
 
 const mForm: FormState = {
   config: [],

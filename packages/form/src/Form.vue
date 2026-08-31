@@ -56,6 +56,7 @@ import { M_THEME_KEY, TMagicForm, tMagicMessage, tMagicMessageBox } from '@tmagi
 import { setValueByKeyPath } from '@tmagic/utils';
 
 import Container from './containers/Container.vue';
+import { applyMountValueEffects } from './utils/collectFields';
 import { applyExtendState, createFormStateBase, initValue } from './utils/form';
 import { formatValidateError as formatError, getTextByName as findTextByName } from './utils/validateError';
 import type { ChangeRecord, ContainerChangeEventData, FormConfig, FormSlots, FormState, FormValue } from './schema';
@@ -346,6 +347,9 @@ watch(
       config: props.config,
     }).then((value) => {
       values.value = value;
+      // 字段的值初始化写入统一在这里执行，字段组件自身不再改写 model。
+      // 必须放在赋值之后：effect 与动态 type / display 回调读到的 formValue 才是这一轮的值。
+      applyMountValueEffects(formState, props.config, values.value);
       // 非对比模式，初始化完成
       initialized.value = !props.isCompare;
 
@@ -363,6 +367,8 @@ watch(
         config: props.config,
       }).then((value) => {
         lastValuesProcessed.value = value;
+        // 对比模式下待对比的那份值同样要规整，否则会与当前值比出「格式差异」这种假差异
+        applyMountValueEffects(formState, props.config, lastValuesProcessed.value);
         initialized.value = true;
       });
     }

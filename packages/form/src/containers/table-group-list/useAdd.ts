@@ -3,7 +3,9 @@ import { computed, inject } from 'vue';
 import { tMagicMessage } from '@tmagic/design';
 import type { FormConfig, FormState, TableConfig, TableGroupListCommonConfig } from '@tmagic/form-schema';
 
-import { initValue } from '../../utils/form';
+import { applyMountValueEffects } from '@form/utils/collectFields';
+import { initValue } from '@form/utils/form';
+
 import type { TableProps } from '../table/type';
 
 export const useAdd = (
@@ -109,6 +111,9 @@ export const useAdd = (
         initValues: inputs,
       });
     }
+
+    // enum / Excel 导入的数组行与默认新增共用同一份规整，字段组件不再在 setup 里改 model
+    applyMountValueEffects(mForm, columns as FormConfig, inputs);
 
     if (props.sortKey && length) {
       inputs[props.sortKey] = list[length - 1][props.sortKey] - 1;

@@ -17,9 +17,10 @@
  */
 import { describe, expect, test } from 'vitest';
 import { nextTick } from 'vue';
-import MagicForm, { FormState, MForm, MFormDialog, MLink } from '@form/index';
 import { mount } from '@vue/test-utils';
 import ElementPlus, { ElButton } from 'element-plus';
+
+import MagicForm, { FormState, MForm, MFormDialog, MLink } from '@form/index';
 
 const getWrapper = (
   config: any = [

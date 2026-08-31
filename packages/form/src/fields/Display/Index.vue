@@ -5,10 +5,9 @@
 <script setup lang="ts">
 import { computed, inject } from 'vue';
 
-import type { DisplayConfig, FieldProps, FormState } from '../schema';
-import { applyDisplayInitValue } from '../utils/fieldValueEffects';
-import { filterFunction } from '../utils/form';
-import { useAddField } from '../utils/useAddField';
+import type { DisplayConfig, FieldProps, FormState } from '@form/schema';
+import { filterFunction } from '@form/utils/form';
+import { useAddField } from '@form/utils/useAddField';
 
 defineOptions({
   name: 'MFormDisplay',
@@ -17,8 +16,6 @@ defineOptions({
 const props = defineProps<FieldProps<DisplayConfig>>();
 
 const mForm = inject<FormState | undefined>('mForm');
-
-applyDisplayInitValue(props.config, props.model, props.name);
 
 const text = computed(() => {
   if (props.config.displayText) {

@@ -52,14 +52,11 @@ const isCompareMode = computed(() => Boolean(props.isCompare && props.lastValues
 
 const codeConfig = computed(() => createCodeSelectConfig(props.config));
 
+// 挂载时的归一化由 applyMountValueEffects → code-select 的 effect 完成，这里只兜运行期被置空
 watch(
   () => props.model[props.name],
   () => {
-    // 兼容旧的数据结构
     normalizeCodeSelectValue(props.model, props.name);
-  },
-  {
-    immediate: true,
   },
 );
 

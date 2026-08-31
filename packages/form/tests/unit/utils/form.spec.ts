@@ -17,6 +17,7 @@
  */
 
 import { describe, expect, test, vi } from 'vitest';
+
 import type { FormState } from '@form/index';
 import {
   applyExtendState,

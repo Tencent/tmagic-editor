@@ -17,9 +17,10 @@
  */
 import { describe, expect, test } from 'vitest';
 import { nextTick } from 'vue';
-import MagicForm, { FormConfig, MForm, MTabs } from '@form/index';
 import { mount } from '@vue/test-utils';
-import ElementPlus from 'element-plus';
+import ElementPlus, { ElTabs } from 'element-plus';
+
+import MagicForm, { FormConfig, MForm, MTabs } from '@form/index';
 
 const getWrapper = (
   config: FormConfig = [
@@ -82,5 +83,69 @@ describe('Tabs', () => {
 
     const item = wrapper.findAllComponents({ name: 'TMFormItem' }).find((w) => w.props('prop') === 'text');
     expect(item?.props('labelPosition')).toBe('left');
+  });
+
+  test('dynamic 新增标签页的值被规整', async () => {
+    const wrapper = getWrapper(
+      [
+        {
+          type: 'tab',
+          name: 'tabs',
+          dynamic: true,
+          editable: true,
+          items: [
+            {
+              type: 'date',
+              name: 'start',
+              text: '开始',
+              valueFormat: 'YYYY-MM-DD',
+              defaultValue: '2021/07/17 15:37:00',
+            },
+          ],
+        },
+      ] as any,
+      { tabs: [] },
+    );
+
+    await nextTick();
+
+    wrapper.findComponent(ElTabs).vm.$emit('tabAdd');
+    await nextTick();
+    await nextTick();
+
+    expect((wrapper.vm as any).values.tabs[0].start).toBe('2021-07-17');
+  });
+
+  test('自定义 onTabAdd 之后新增页的值也被规整', async () => {
+    const wrapper = getWrapper(
+      [
+        {
+          type: 'tab',
+          name: 'tabs',
+          dynamic: true,
+          editable: true,
+          onTabAdd: (_mForm: any, { model }: any) => {
+            model.tabs.push({ start: '2021/07/17 15:37:00' });
+          },
+          items: [
+            {
+              type: 'date',
+              name: 'start',
+              text: '开始',
+              valueFormat: 'YYYY-MM-DD',
+            },
+          ],
+        },
+      ] as any,
+      { tabs: [] },
+    );
+
+    await nextTick();
+
+    wrapper.findComponent(ElTabs).vm.$emit('tabAdd');
+    await nextTick();
+    await nextTick();
+
+    expect((wrapper.vm as any).values.tabs[0].start).toBe('2021-07-17');
   });
 });

@@ -86,6 +86,7 @@ import { isEmpty } from 'lodash-es';
 import { getDesignConfig, TMagicBadge } from '@tmagic/design';
 
 import type { ContainerChangeEventData, FormState, TabConfig, TabPaneConfig } from '../schema';
+import { applyMountValueEffects } from '../utils/collectFields';
 import { display as displayFunc, filterFunction, initValue } from '../utils/form';
 
 import Container from './Container.vue';
@@ -205,12 +206,22 @@ const onTabAdd = async () => {
       prop: props.prop,
       config: props.config,
     });
+    // 自定义回调可能直接 push 原始对象；对现有标签页再规整一遍（effect 必须幂等）
+    const tabsModel = props.model[props.name];
+    if (Array.isArray(tabsModel) && Array.isArray(props.config.items)) {
+      for (const tab of tabsModel) {
+        applyMountValueEffects(mForm, props.config.items, tab);
+      }
+    }
     emit('change', props.model[props.name]);
   } else {
     const newObj = await initValue(mForm, {
       config: props.config.items,
       initValues: {},
     });
+
+    // 新增标签页的值在挂到表单上之前先规整一遍，与整表初始化走同一份登记表
+    applyMountValueEffects(mForm, props.config.items, newObj);
 
     newObj.title = `标签${tabs.value.length + 1}`;
 

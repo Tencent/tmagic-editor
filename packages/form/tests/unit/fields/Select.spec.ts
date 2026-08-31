@@ -5,10 +5,11 @@
  */
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { nextTick } from 'vue';
-import MagicForm, { MForm, MSelect } from '@form/index';
-import { setConfig } from '@form/utils/config';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
+
+import MagicForm, { MForm, MSelect } from '@form/index';
+import { setConfig } from '@form/utils/config';
 
 const mountForm = (config: any[], initValues: any = {}) =>
   mount(MForm, {

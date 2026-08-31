@@ -17,9 +17,10 @@
  */
 import { describe, expect, test } from 'vitest';
 import { nextTick } from 'vue';
-import MagicForm, { MForm, MTime } from '@form/index';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
+
+import MagicForm, { MForm, MTime } from '@form/index';
 
 const getWrapper = (
   config: any = [

@@ -5,9 +5,10 @@
  */
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { nextTick } from 'vue';
-import MagicForm, { MForm } from '@form/index';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
+
+import MagicForm, { MForm } from '@form/index';
 
 const mountForm = (config: any[], initValues: any = {}, extra: any = {}) =>
   mount(MForm, {

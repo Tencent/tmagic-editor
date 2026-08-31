@@ -17,36 +17,27 @@
  */
 
 /**
- * @fileoverview 叶子字段登记表：哪些 type 是叶子，以及挂载阶段对 model 的写入。
+ * @fileoverview 叶子字段登记表：哪些 type 是叶子，以及该字段对表单值的初始化写入。
  *
- * 无渲染校验据此判定该 type 没有属于父表单的嵌套字段，并复刻组件 setup 阶段的写入。
+ * 无渲染校验据此判定该 type 没有属于父表单的嵌套字段。
  * 业务自定义字段通过 `registerField` / `registerFields` 登记。
  * 内置叶子字段由 `MagicForm.install` 的 `registerBuiltInFields` 写入。
- * 未登记且没有嵌套配置的 type：有 `items` 会下钻子项，自身有 `rules` 会校验自身。
+ * 未登记且没有 innerConfig 的 type：有 `items` 会下钻子项，自身有 `rules` 会校验自身。
+ *
+ * 这里只是登记表。各字段的 effect 写在对应组件同目录的 `fields/<Field>/effect.ts`，
+ * 执行收口在 `collectFields` 的 `applyMountValueEffects`：渲染（`Form.vue`）
+ * 与无渲染（`validateValues`）都在表单值初始化完成后调用它一次，
+ * 字段组件自身不再在 setup 里改写 model。
  *
  * @module fieldValueEffects
  */
 
-import { setValueByKeyPath, toLine } from '@tmagic/utils';
+import { toLine } from '@tmagic/utils';
 
-import type {
-  DateConfig,
-  DateTimeConfig,
-  DisplayConfig,
-  DynamicFieldConfig,
-  FormItemConfig,
-  FormState,
-  FormValue,
-} from '../schema';
-
-import { getConfig } from './config';
-import { datetimeFormatter } from './form';
-
-/** `dynamic-field` 的 `returnFields` 返回的单个字段描述 */
-type DynamicFieldItem = ReturnType<DynamicFieldConfig['returnFields']>[number];
+import type { FormItemConfig, FormState, FormValue } from '../schema';
 
 // #region FieldMountValueEffect
-/** mount effect 的入参：字段自身的配置、所在层级的 model、完整字段路径与表单状态 */
+/** effect 的入参：字段自身的配置、所在层级的 model、完整字段路径、表单值根对象与表单状态 */
 export interface FieldMountValueEffectContext {
   /** 字段自身的配置 */
   config: FormItemConfig;
@@ -54,163 +45,25 @@ export interface FieldMountValueEffectContext {
   model: FormValue;
   /** 字段的完整 prop 路径（含父级前缀），对应 Container 的 `itemProp` */
   prop: string;
+  /**
+   * 本次处理的表单值根对象，`prop` 即以它为根。
+   *
+   * 需要按路径跨层级写值时用它，不要用 `mForm.values`：对比模式下处理的是 lastValues 那一份，
+   * tab / table 新增行处理的则是还没挂到表单上的一行值，两者都与 `mForm.values` 不是同一个对象。
+   */
+  values: FormValue;
   /** 表单状态 */
   mForm: FormState | undefined;
 }
 
 /**
- * 字段挂载时改写 model 的副作用。
+ * 字段对表单值的初始化写入（如 `display` 的 `initValue`、`date` 的格式归一化）。
  *
- * 无渲染校验遇到登记了 effect 的 type 时会调用它，以复刻组件 setup 阶段的写入。
+ * 由 `applyMountValueEffects` 在表单值初始化完成后统一执行一次，渲染与无渲染共用。
+ * 因为可能对同一份值重复执行（如 `initValues` 变化后重新初始化），实现必须幂等。
  */
 export type FieldMountValueEffect = (_ctx: FieldMountValueEffectContext) => void;
 // #endregion FieldMountValueEffect
-
-/**
- * `fields/Display.vue`：把 `initValue` 写入 model。
- *
- * @param config - 含 `initValue` 的字段配置
- * @param model - 所在层级的 model 切片
- * @param name - 字段 name
- */
-export const applyDisplayInitValue = (
-  config: Pick<DisplayConfig, 'initValue'>,
-  model: FormValue | undefined,
-  name: string,
-): void => {
-  if (config.initValue && model) {
-    model[name] = config.initValue;
-  }
-};
-
-/**
- * `fields/NumberRange.vue`：值不是数组时修正为空数组。
- *
- * @param model - 所在层级的 model 切片
- * @param name - 字段 name
- */
-export const normalizeNumberRangeValue = (model: FormValue | undefined, name: string): void => {
-  if (model && !Array.isArray(model[name])) {
-    model[name] = [];
-  }
-};
-
-/**
- * `fields/CheckboxGroup.vue`：空值初始化为空数组。
- *
- * @param model - 所在层级的 model 切片
- * @param name - 字段 name
- */
-export const initCheckboxGroupValue = (model: FormValue | undefined, name: string): void => {
-  if (model && !model[name]) {
-    model[name] = [];
-  }
-};
-
-/**
- * `fields/Date.vue`：按 `valueFormat` 归一化日期值。
- *
- * @param config - 含 `valueFormat` 的字段配置
- * @param model - 所在层级的 model 切片
- * @param name - 字段 name
- */
-export const normalizeDateValue = (
-  config: Pick<DateConfig, 'valueFormat'>,
-  model: FormValue | undefined,
-  name: string,
-): void => {
-  if (!model) return;
-
-  model[name] = datetimeFormatter(model[name], '', config.valueFormat || 'YYYY/MM/DD');
-};
-
-/**
- * `fields/DateTime.vue`：按 `valueFormat` 归一化日期时间值，空值与非法值统一为空字符串。
- *
- * @param config - 含 `valueFormat` 的字段配置
- * @param model - 所在层级的 model 切片
- * @param name - 字段 name
- */
-export const normalizeDateTimeValue = (
-  config: Pick<DateTimeConfig, 'valueFormat'>,
-  model: FormValue | undefined,
-  name: string,
-): void => {
-  if (!model) return;
-
-  const value = model[name]?.toString();
-
-  if (!value || value === 'Invalid Date') {
-    model[name] = '';
-    return;
-  }
-
-  model[name] = datetimeFormatter(model[name], '', config.valueFormat || 'YYYY/MM/DD HH:mm:ss');
-};
-
-/**
- * `fields/DynamicField.vue`：遍历动态字段列表，按「原值为空且声明了 defaultValue 则取默认值」
- * 求出每个字段当前的值。
- *
- * `isDefaultApplied` 为真表示该值来自 `defaultValue`，需要写回表单值
- * （组件通过 emit change 写回，无渲染校验直接写 model）。
- *
- * @param fields - `returnFields` 返回的字段描述列表
- * @param model - 所在层级的 model 切片
- * @param onField - 每个字段的回调
- */
-export const eachDynamicField = (
-  fields: DynamicFieldItem[],
-  model: FormValue | undefined,
-  onField: (_field: DynamicFieldItem, _value: any, _isDefaultApplied: boolean) => void,
-): void => {
-  for (const field of fields) {
-    if (typeof field !== 'object' || field?.name === undefined) continue;
-
-    let value = model?.[field.name] || '';
-    let isDefaultApplied = false;
-
-    if (!value && field.defaultValue !== undefined) {
-      value = field.defaultValue;
-      isDefaultApplied = true;
-    }
-
-    onField(field, value, isDefaultApplied);
-  }
-};
-
-export const displayEffect: FieldMountValueEffect = ({ config, model }) =>
-  applyDisplayInitValue(config as DisplayConfig, model, (config as any).name);
-
-export const numberRangeEffect: FieldMountValueEffect = ({ config, model }) =>
-  normalizeNumberRangeValue(model, (config as any).name);
-
-export const checkboxGroupEffect: FieldMountValueEffect = ({ config, model }) =>
-  initCheckboxGroupValue(model, (config as any).name);
-
-export const dateEffect: FieldMountValueEffect = ({ config, model }) =>
-  normalizeDateValue(config as DateConfig, model, (config as any).name);
-
-export const dateTimeEffect: FieldMountValueEffect = ({ config, model }) =>
-  normalizeDateTimeValue(config as DateTimeConfig, model, (config as any).name);
-
-export const dynamicFieldEffect: FieldMountValueEffect = ({ config, model, prop, mForm }) => {
-  // 该组件读取的是同级 model，但写入走 Container 的 modifyKey 分支，落在 `${prop}.${key}`，
-  // 这里保持与渲染一致（含这层不对称），避免两条链路产出不同的值。
-  const { returnFields, dynamicKey } = config as DynamicFieldConfig;
-  if (typeof returnFields !== 'function' || !model) return;
-  if (model[dynamicKey] === '') return;
-
-  const result = returnFields(config as DynamicFieldConfig, model, getConfig<Function>('request'));
-  // 同步返回才能在校验前生效；异步 returnFields 与渲染式校验一样存在时序不确定性，此处不等待
-  if (!result || typeof (result as any).then === 'function' || !Array.isArray(result)) return;
-
-  eachDynamicField(result, model, (field, value, isDefaultApplied) => {
-    if (isDefaultApplied) {
-      setValueByKeyPath(`${prop}.${field.name}`, value, mForm?.values || model);
-    }
-  });
-};
 
 /** 内置叶子字段（由 `MagicForm.install` 写入；clearFields 不会清掉） */
 const builtInLeafFieldTypes = new Set<string>();

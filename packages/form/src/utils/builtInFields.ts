@@ -16,15 +16,14 @@
  * limitations under the License.
  */
 
+import { effect as checkboxGroupEffect } from '../fields/CheckboxGroup/effect';
+import { effect as dateEffect } from '../fields/Date/effect';
+import { effect as dateTimeEffect } from '../fields/DateTime/effect';
+import { effect as displayEffect } from '../fields/Display/effect';
+import { effect as dynamicFieldEffect } from '../fields/DynamicField/effect';
+import { effect as numberRangeEffect } from '../fields/NumberRange/effect';
+
 import { expandFieldset, expandPanel, expandRow, expandStep, expandTab, expandTableGroupList } from './collectFields';
-import {
-  checkboxGroupEffect,
-  dateEffect,
-  dateTimeEffect,
-  displayEffect,
-  dynamicFieldEffect,
-  numberRangeEffect,
-} from './fieldValueEffects';
 import { type HeadlessFieldOptions } from './registerField';
 
 /**

@@ -19,7 +19,8 @@
 import {
   type DisplayCondsConfig,
   type EventSelectConfig,
-  type FieldNestedConfig,
+  type FieldInnerConfig,
+  type FieldMountValueEffect,
   filterFunction,
   type FormItemConfig,
   type HeadlessFieldOptions,
@@ -35,19 +36,30 @@ import { createStyleSetterConfig } from './StyleSetter/configs';
 
 const getName = (config: FormItemConfig): string => `${(config as any).name ?? ''}`;
 
+/** `code-select` 旧数据兼容：空值改写成 `{ hookType, hookData }`。 */
+const codeSelectEffect: FieldMountValueEffect = ({ config, model }) => {
+  normalizeCodeSelectValue(model, getName(config));
+};
+
+/** `event-select`：表单 init 对未声明 defaultValue 的自定义 type 会写成空串，统一收成数组。 */
+const eventSelectEffect: FieldMountValueEffect = ({ config, model }) => {
+  const name = getName(config);
+  if (model && !Array.isArray(model[name])) {
+    model[name] = [];
+  }
+};
+
 /**
- * `code-select` 的嵌套配置。
+ * `code-select` 的内部配置。
  *
  * 对应 `fields/CodeSelect.vue` 内部
  * `<MContainer :config="codeConfig" :model="model[name]" :prop="prop">`。
  *
- * @param ctx - 嵌套配置回调入参
+ * @param ctx - innerConfig 回调入参
  * @returns 内部容器的 config / model / prop
  */
-const codeSelectNestedConfig: FieldNestedConfig = ({ config, model, prop }) => {
+const codeSelectInnerConfig: FieldInnerConfig = ({ config, model, prop }) => {
   const name = getName(config);
-  // 组件在 watch(immediate) 里做的旧数据兼容，发生在校验之前
-  normalizeCodeSelectValue(model, name);
 
   return {
     config: createCodeSelectConfig(config as any),
@@ -57,14 +69,14 @@ const codeSelectNestedConfig: FieldNestedConfig = ({ config, model, prop }) => {
 };
 
 /**
- * `display-conds` 的嵌套配置。
+ * `display-conds` 的内部配置。
  *
  * 对应 `fields/DisplayConds.vue` 内部把同一份 groupList 配置交给 `MGroupList`。
  *
- * @param ctx - 嵌套配置回调入参
+ * @param ctx - innerConfig 回调入参
  * @returns 内部 group-list 配置；prop 基准为 parentProp，避免 name 被拼两次
  */
-const displayCondsNestedConfig: FieldNestedConfig = ({ config, model, prop, parentProp, mForm }) => {
+const displayCondsInnerConfig: FieldInnerConfig = ({ config, model, prop, parentProp, mForm }) => {
   const name = getName(config);
   const parentFields =
     filterFunction<string[]>(mForm, (config as DisplayCondsConfig).parentFields, {
@@ -81,19 +93,16 @@ const displayCondsNestedConfig: FieldNestedConfig = ({ config, model, prop, pare
 };
 
 /**
- * `event-select` 的嵌套配置。
+ * `event-select` 的内部配置。
  *
  * 对应 `fields/EventSelect.vue`：列表走 group-list，事件名渲染在 title slot，
  * 无渲染校验仍把事件名当作列表项字段，路径为 `<prop>.<index>.name`。
  *
- * @param ctx - 嵌套配置回调入参
+ * @param ctx - innerConfig 回调入参
  * @returns 合成的 group-list 配置；旧数据格式返回 null，不参与校验
  */
-const eventSelectNestedConfig: FieldNestedConfig = ({ config, model, parentProp }) => {
+const eventSelectInnerConfig: FieldInnerConfig = ({ config, model, parentProp }) => {
   const name = getName(config);
-  if (model && !Array.isArray(model[name])) {
-    model[name] = [];
-  }
   const events = model?.[name];
 
   // 旧数据格式走的是另一套表格配置，其中不含任何 rules，不参与校验
@@ -106,15 +115,15 @@ const eventSelectNestedConfig: FieldNestedConfig = ({ config, model, parentProp 
 };
 
 /**
- * `style-setter` 的嵌套配置。
+ * `style-setter` 的内部配置。
  *
  * 对应 `fields/StyleSetter/Index.vue`：6 个面板共用 `:values="model[name]"`、`:prop="prop || name"`。
  * `theme` 按 `useTheme` 缺省空串传入，只改 flexWrap 的 UI childType，不影响校验字段。
  *
- * @param ctx - 嵌套配置回调入参
+ * @param ctx - innerConfig 回调入参
  * @returns style 面板配置及 styleModel
  */
-const styleSetterNestedConfig: FieldNestedConfig = ({ config, model, prop }) => {
+const styleSetterInnerConfig: FieldInnerConfig = ({ config, model, prop }) => {
   const name = getName(config);
   const styleModel = (model?.[name] ?? {}) as Partial<StyleSchema>;
 
@@ -132,10 +141,10 @@ const styleSetterNestedConfig: FieldNestedConfig = ({ config, model, prop }) => 
  * 安装编辑器时由 plugin 把 `component` 叠上去再传给 `@tmagic/form`。
  *
  * - 叶子：内部只渲染叶子 UI，或把子表单渲染在独立的 MForm / MFormBox 实例里
- * - nested：内部再渲染 MContainer / MPanel / MGroupList，把运行期配置交出来
+ * - innerConfig：内部再渲染 MContainer / MPanel / MGroupList，把运行期配置交出来
  * - typeMatch：该 type 自身的类型匹配校验
  *
- * nested 返回的 config / model / prop 与组件模板里传给内部容器的那一组保持一一对应，
+ * innerConfig 返回的 config / model / prop 与组件模板里传给内部容器的那一组保持一一对应，
  * 且配置本身与组件共用同一份工厂（`fields/configs/`）。
  */
 export const editorFields: Record<string, HeadlessFieldOptions> = {
@@ -153,8 +162,16 @@ export const editorFields: Record<string, HeadlessFieldOptions> = {
   'data-source-methods': { typeMatch: editorTypeMatchRules['data-source-methods'] },
   'data-source-method-select': { typeMatch: editorTypeMatchRules['data-source-method-select'] },
   'data-source-field-select': { typeMatch: editorTypeMatchRules['data-source-field-select'] },
-  'code-select': { nested: codeSelectNestedConfig, typeMatch: editorTypeMatchRules['code-select'] },
-  'display-conds': { nested: displayCondsNestedConfig, typeMatch: editorTypeMatchRules['display-conds'] },
-  'event-select': { nested: eventSelectNestedConfig, typeMatch: editorTypeMatchRules['event-select'] },
-  'style-setter': { nested: styleSetterNestedConfig, typeMatch: editorTypeMatchRules['style-setter'] },
+  'code-select': {
+    effect: codeSelectEffect,
+    innerConfig: codeSelectInnerConfig,
+    typeMatch: editorTypeMatchRules['code-select'],
+  },
+  'display-conds': { innerConfig: displayCondsInnerConfig, typeMatch: editorTypeMatchRules['display-conds'] },
+  'event-select': {
+    effect: eventSelectEffect,
+    innerConfig: eventSelectInnerConfig,
+    typeMatch: editorTypeMatchRules['event-select'],
+  },
+  'style-setter': { innerConfig: styleSetterInnerConfig, typeMatch: editorTypeMatchRules['style-setter'] },
 };

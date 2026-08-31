@@ -16,9 +16,8 @@
 <script lang="ts" setup>
 import { TMagicDatePicker } from '@tmagic/design';
 
-import type { DateTimeConfig, FieldProps } from '../schema';
-import { normalizeDateTimeValue } from '../utils/fieldValueEffects';
-import { useAddField } from '../utils/useAddField';
+import type { DateTimeConfig, FieldProps } from '@form/schema';
+import { useAddField } from '@form/utils/useAddField';
 
 defineOptions({
   name: 'MFormDateTime',
@@ -31,8 +30,6 @@ const emit = defineEmits<{
 }>();
 
 useAddField(props.prop);
-
-normalizeDateTimeValue(props.config, props.model, props.name);
 
 const changeHandler = (v: string) => {
   emit('change', v);

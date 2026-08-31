@@ -5,9 +5,10 @@
  */
 import { describe, expect, test } from 'vitest';
 import { nextTick } from 'vue';
-import MagicForm, { MForm, MNumberRange } from '@form/index';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
+
+import MagicForm, { MForm, MNumberRange } from '@form/index';
 
 const getWrapper = (initValues: any = { range: [10, 20] }) =>
   mount(MForm, {

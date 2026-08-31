@@ -17,9 +17,10 @@
  */
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { nextTick, ref } from 'vue';
-import MagicForm, { MForm } from '@form/index';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
+
+import MagicForm, { MForm } from '@form/index';
 
 const mountForm = (props: Record<string, any> = {}, options: Record<string, any> = {}) =>
   mount(MForm, {
@@ -698,6 +699,113 @@ describe('Form.vue —— config 变化', () => {
     await nextTick();
 
     expect(wrapper.vm.changeRecords).toEqual([]);
+  });
+});
+
+/**
+ * 字段的值初始化写入（`date` 归一化、`display` 的 `initValue` 等）统一由 `applyMountValueEffects`
+ * 在表单值初始化完成后执行一次，字段组件自身不再在 setup 里改写 model。
+ */
+describe('Form.vue —— 字段值初始化统一执行', () => {
+  test('字段未渲染出来时值同样被规整', async () => {
+    const wrapper = mountForm({
+      config: [
+        {
+          type: 'fieldset',
+          name: 'wrap',
+          expand: true,
+          checkbox: { name: 'value', trueValue: 1, falseValue: 0 },
+          items: [{ type: 'date', name: 'start', text: '开始', valueFormat: 'YYYY-MM-DD' }],
+        },
+      ],
+      initValues: { wrap: { value: 0, start: '2021/07/17 15:37:00' } },
+    });
+    await nextTick();
+    await nextTick();
+
+    // 勾选框未勾选，内部字段没有渲染
+    expect(wrapper.findComponent({ name: 'MFormDate' }).exists()).toBe(false);
+    expect(wrapper.vm.values.wrap.start).toBe('2021-07-17');
+  });
+
+  test('initValues 变化后重新初始化，值仍被规整', async () => {
+    const config = [{ type: 'date', name: 'start', text: '开始', valueFormat: 'YYYY-MM-DD' }];
+    const wrapper = mountForm({ config, initValues: { start: '2021/07/17 15:37:00' } });
+    await nextTick();
+    await nextTick();
+
+    expect(wrapper.vm.values.start).toBe('2021-07-17');
+
+    await wrapper.setProps({ initValues: { start: '2022/08/18 15:37:00' } });
+    await nextTick();
+    await nextTick();
+
+    expect(wrapper.vm.values.start).toBe('2022-08-18');
+  });
+
+  test('对比模式下待对比的那份值同样被规整', async () => {
+    const wrapper = mountForm({
+      isCompare: true,
+      config: [{ type: 'date', name: 'start', text: '开始', valueFormat: 'YYYY-MM-DD' }],
+      initValues: { start: '2021/07/17 15:37:00' },
+      lastValues: { start: '2021/07/17 09:00:00' },
+    });
+    await nextTick();
+    await nextTick();
+    await nextTick();
+
+    expect(wrapper.vm.values.start).toBe('2021-07-17');
+    // 两份值都归一化后才不会比出「只是格式不同」的假差异
+    expect(wrapper.vm.lastValuesProcessed.start).toBe('2021-07-17');
+  });
+
+  test('group-list 新增行的值被规整', async () => {
+    const wrapper = mountForm({
+      config: [
+        {
+          type: 'group-list',
+          name: 'list',
+          items: [
+            {
+              type: 'date',
+              name: 'start',
+              text: '开始',
+              valueFormat: 'YYYY-MM-DD',
+              defaultValue: '2021/07/17 15:37:00',
+            },
+          ],
+        },
+      ],
+      initValues: { list: [] },
+    });
+    await nextTick();
+
+    const addButton = wrapper.findAll('button').find((btn) => btn.text().includes('新增'));
+    await addButton?.trigger('click');
+    await nextTick();
+
+    expect(wrapper.vm.values.list[0].start).toBe('2021-07-17');
+  });
+
+  test('group-list 走 enum 新增时值也被规整', async () => {
+    const wrapper = mountForm({
+      config: [
+        {
+          type: 'group-list',
+          name: 'list',
+          enum: [{ id: 1, start: '2021/07/17 15:37:00' }],
+          items: [{ type: 'date', name: 'start', text: '开始', valueFormat: 'YYYY-MM-DD' }],
+        },
+      ],
+      initValues: { list: [] },
+    });
+    await nextTick();
+
+    const addButton = wrapper.findAll('button').find((btn) => btn.text().includes('新增'));
+    await addButton?.trigger('click');
+    await nextTick();
+
+    expect(wrapper.vm.values.list[0].start).toBe('2021-07-17');
   });
 });
 

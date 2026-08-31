@@ -108,10 +108,13 @@ describe('CodeSelect', () => {
     expect(title).toBe('unknown');
   });
 
-  test('空 model 时初始化为 { hookType, hookData }', () => {
-    const props = baseProps({ model: { cs: undefined } });
-    mount(CodeSelect, { props: props as any });
-    expect((props.model.cs as any).hookData).toEqual([]);
+  test('运行期被置空时补成 { hookType, hookData }', async () => {
+    const wrapper = mount(CodeSelect, { props: baseProps() as any });
+    const model: Record<string, any> = { cs: '' };
+
+    await wrapper.setProps({ model });
+
+    expect(model.cs).toEqual({ hookType: 'code', hookData: [] });
   });
 
   test('codeType items 配置正确', () => {

@@ -27,11 +27,11 @@ import {
   registerContainerWalker,
 } from './collectFields';
 import {
-  clearFieldNestedConfigs,
-  deleteFieldNestedConfig,
-  type FieldNestedConfig,
-  registerFieldNestedConfig,
-} from './fieldNestedConfig';
+  clearFieldInnerConfigs,
+  deleteFieldInnerConfig,
+  type FieldInnerConfig,
+  registerFieldInnerConfig,
+} from './fieldInnerConfig';
 import {
   clearLeafFieldTypes,
   deleteLeafFieldType,
@@ -57,19 +57,19 @@ export interface FieldOptions {
    * 传入 `app` 时同时 `app.component('m-form-*')`。
    */
   container?: Component;
-  /** 叶子字段挂载时改写 model 的副作用。 */
+  /** 字段挂载时改写 model 的副作用。可与 `innerConfig` 同时登记。 */
   effect?: FieldMountValueEffect;
   /**
    * 按容器模板遍历（tab / table 等）。
-   * 与 `nested` / `effect` 同时传入时 `walk` 优先。
+   * 与 `innerConfig` / `effect` 同时传入时 `walk` 优先。
    */
   walk?: ContainerWalker;
   /**
    * 把内部会挂到父表单的配置交出来。
-   * 与 `effect` 同时传入时 `effect` 被忽略。
+   * 可与 `effect` 同时传入：`effect` 负责本字段的值初始化，`innerConfig` 只做配置派生。
    */
-  nested?: FieldNestedConfig;
-  /** 该 type 的 typeMatch 校验；可与叶子、walk 或 nested 同时登记。 */
+  innerConfig?: FieldInnerConfig;
+  /** 该 type 的 typeMatch 校验；可与叶子、walk 或 innerConfig 同时登记。 */
   typeMatch?: TypeMatchValidator;
 }
 
@@ -139,7 +139,7 @@ export const mergeFieldOptions = (
   return result;
 };
 
-const FIELD_OPTION_KEYS = ['component', 'container', 'effect', 'walk', 'nested', 'typeMatch'] as const;
+const FIELD_OPTION_KEYS = ['component', 'container', 'effect', 'walk', 'innerConfig', 'typeMatch'] as const;
 
 const pickDefinedFieldOptions = (options?: FieldOptions): FieldOptions => {
   if (!options) return {};
@@ -183,15 +183,10 @@ const registerFieldImpl = (type: string, options: FieldOptions | undefined, app:
   const merged: FieldOptions = { ...store.get(key), ...incoming };
   store.set(key, merged);
 
-  if (incoming.walk && (incoming.nested || typeof incoming.effect === 'function')) {
+  if (incoming.walk && (incoming.innerConfig || typeof incoming.effect === 'function')) {
     console.warn(
-      `[MForm] registerField("${key}"): walk is set together with nested/effect; ` +
-        'headless validation will use walk and nested/effect will be ignored.',
-    );
-  } else if (incoming.nested && typeof incoming.effect === 'function') {
-    console.warn(
-      `[MForm] registerField("${key}"): nested and effect are both set; ` +
-        'headless validation will use nested and the mount value effect will be ignored.',
+      `[MForm] registerField("${key}"): walk is set together with innerConfig/effect; ` +
+        'headless validation will use walk and innerConfig/effect will be ignored.',
     );
   }
 
@@ -218,7 +213,7 @@ const registerFieldImpl = (type: string, options: FieldOptions | undefined, app:
     registerContainerWalker(type, merged.walk, builtIn);
     if (!builtIn) {
       deleteLeafFieldType(type);
-      deleteFieldNestedConfig(type);
+      deleteFieldInnerConfig(type);
     }
     return;
   }
@@ -227,9 +222,13 @@ const registerFieldImpl = (type: string, options: FieldOptions | undefined, app:
     deleteContainerWalker(type);
   }
 
-  if (merged.nested) {
-    if (!builtIn) deleteLeafFieldType(type);
-    registerFieldNestedConfig(type, merged.nested, builtIn);
+  if (merged.innerConfig) {
+    registerFieldInnerConfig(type, merged.innerConfig, builtIn);
+    if (typeof merged.effect === 'function') {
+      registerLeafFieldType(type, merged.effect, builtIn);
+    } else if (!builtIn) {
+      deleteLeafFieldType(type);
+    }
     return;
   }
 
@@ -240,7 +239,7 @@ const registerFieldImpl = (type: string, options: FieldOptions | undefined, app:
   }
 
   if (!builtIn) {
-    deleteFieldNestedConfig(type);
+    deleteFieldInnerConfig(type);
   }
   registerLeafFieldType(type, merged.effect, builtIn);
 };
@@ -292,7 +291,7 @@ export const registerBuiltInFields = (fields: Record<string, FieldOptions>, app?
 export const unregisterField = (type: string): void => {
   extraFieldOptions.delete(toLine(type));
   deleteLeafFieldType(type);
-  deleteFieldNestedConfig(type);
+  deleteFieldInnerConfig(type);
   deleteTypeMatchRule(type);
   deleteContainerWalker(type);
   removeFormComponent(type);
@@ -302,7 +301,7 @@ export const unregisterField = (type: string): void => {
 export const clearFields = (): void => {
   extraFieldOptions.clear();
   clearLeafFieldTypes();
-  clearFieldNestedConfigs();
+  clearFieldInnerConfigs();
   clearTypeMatchRules();
   clearContainerWalkers();
   clearFormComponents();

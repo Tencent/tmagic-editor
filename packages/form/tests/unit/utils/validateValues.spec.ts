@@ -17,13 +17,14 @@
  */
 import { afterEach, beforeAll, describe, expect, test, vi } from 'vitest';
 import { createApp, defineComponent } from 'vue';
+
 import MagicForm, {
   builtInFields,
   clearFields,
   collectValidatableFields,
   createHeadlessFormState,
   getTypeMatchRule,
-  isFieldNestedConfigError,
+  isFieldInnerConfigError,
   isLeafFieldType,
   registerBuiltInFields,
   registerField,
@@ -679,9 +680,9 @@ describe('validateValues —— 未登记 type 与扩展登记', () => {
     expect(props).toEqual(['wrap.inner']);
   });
 
-  test('registerField nested 可遍历复合字段的内部配置', async () => {
+  test('registerField innerConfig 可遍历复合字段的内部配置', async () => {
     registerField('my-composite', {
-      nested: ({ config, model }) => ({
+      innerConfig: ({ config, model }) => ({
         config: { type: 'text', name: 'inner', text: '内部', rules: required('内部必填') },
         model: model[(config as any).name],
       }),
@@ -692,30 +693,30 @@ describe('validateValues —— 未登记 type 与扩展登记', () => {
       initValues: { wrap: { inner: '' } },
     });
 
-    // 嵌套配置不在调用方传入的 config 树上，getTextByName 找不到 text，回退为 prop 路径
+    // 内部配置不在调用方传入的 config 树上，getTextByName 找不到 text，回退为 prop 路径
     expect(error).toBe('wrap.inner -> 内部必填');
   });
 
-  test('nested 返回 null 表示该字段没有内部字段', () => {
-    registerField('my-composite', { nested: () => null });
+  test('innerConfig 返回 null 表示该字段没有内部字段', () => {
+    registerField('my-composite', { innerConfig: () => null });
     expect(() => collectProps([{ type: 'my-composite', name: 'a', text: 'A' }], { a: '' })).not.toThrow();
   });
 
-  test('nested 抛错时把失败原因带出去', () => {
+  test('innerConfig 抛错时把失败原因带出去', () => {
     registerField('my-composite', {
-      nested: () => {
+      innerConfig: () => {
         throw new Error('boom');
       },
     });
 
     expect(() => collectProps([{ type: 'my-composite', name: 'a', text: 'A' }], { a: '' })).toThrow(
-      /\[MForm\] nested config for "my-composite" at "a" failed: boom/,
+      /\[MForm\] innerConfig for "my-composite" at "a" failed: boom/,
     );
   });
 
-  test('nested 抛错时抛出 FieldNestedConfigError，可按 code 判别', () => {
+  test('innerConfig 抛错时抛出 FieldInnerConfigError，可按 code 判别', () => {
     registerField('my-composite', {
-      nested: () => {
+      innerConfig: () => {
         throw new Error('boom');
       },
     });
@@ -724,31 +725,30 @@ describe('validateValues —— 未登记 type 与扩展登记', () => {
       collectProps([{ type: 'my-composite', name: 'a', text: 'A' }], { a: '' });
       expect.unreachable('should throw');
     } catch (e) {
-      expect(isFieldNestedConfigError(e)).toBe(true);
-      expect((e as { code?: string }).code).toBe('FIELD_NESTED_CONFIG');
+      expect(isFieldInnerConfigError(e)).toBe(true);
+      expect((e as { code?: string }).code).toBe('FIELD_INNER_CONFIG');
       expect((e as { type?: string; prop?: string }).type).toBe('my-composite');
       expect((e as { type?: string; prop?: string }).prop).toBe('a');
     }
   });
 
-  test('nested 的 type 名支持驼峰与中划线互通', () => {
-    registerField('myComposite', { nested: () => null });
+  test('innerConfig 的 type 名支持驼峰与中划线互通', () => {
+    registerField('myComposite', { innerConfig: () => null });
     expect(() => collectProps([{ type: 'my-composite', name: 'a', text: 'A' }], { a: '' })).not.toThrow();
   });
 
-  test('同时传 nested 与 effect 时告警 effect 会被忽略', () => {
+  test('同时传 innerConfig 与 effect 时不告警，两者并存', () => {
     const spy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
-    registerField('my-both', { nested: () => null, effect: () => undefined });
+    registerField('my-both', { innerConfig: () => null, effect: () => undefined });
 
-    expect(spy).toHaveBeenCalledWith(expect.stringContaining('[MForm] registerField("my-both")'));
-    expect(spy.mock.calls[0][0]).toContain('mount value effect will be ignored');
+    expect(spy).not.toHaveBeenCalled();
     spy.mockRestore();
   });
 
   test('后一次 registerField 覆盖前一次，不告警', () => {
     const spy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     registerField('my-both', { effect: () => undefined });
-    registerField('my-both', { nested: () => null });
+    registerField('my-both', { innerConfig: () => null });
     expect(spy).not.toHaveBeenCalled();
     spy.mockRestore();
   });

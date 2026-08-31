@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-import { computed, reactive } from 'vue';
+import { reactive } from 'vue';
 import Schema from 'async-validator';
 
 import type { FormConfig, FormState, FormValue } from '../schema';
 
-import { type CollectedField, collectValidatableFields } from './collectFields';
+import { applyMountValueEffects, type CollectedField, collectValidatableFields } from './collectFields';
 import { applyExtendState, createFormStateBase, initValue } from './form';
 import { formatValidateError } from './validateError';
 
@@ -119,7 +119,7 @@ export interface ValidateValuesOptions extends HeadlessFormStateOptions {
 // #region ValidateValuesResult
 /** `validateValues` 结果 */
 export interface ValidateValuesResult {
-  /** 经 `initValue` 初始化并复刻挂载副作用后的表单值 */
+  /** 经 `initValue` 初始化并执行字段值初始化写入后的表单值 */
   values: FormValue;
   /** 汇总后的错误文案（多条以 `<br>` 拼接），校验通过为空字符串 */
   error: string;
@@ -135,8 +135,9 @@ export interface ValidateValuesResult {
  *
  * 1. 构造 headless `formState` 并合并 `extendState`；
  * 2. `initValue` 初始化表单值（默认值、嵌套结构、`onInitValue` 等）；
- * 3. 遍历 config 树收集所有带规则的字段（等价于渲染出的 FormItem 集合）；
- * 4. 逐字段交给 async-validator 执行，汇总错误文案。
+ * 3. `applyMountValueEffects` 执行字段登记的值初始化写入（与渲染式共用同一份登记表）；
+ * 4. 遍历 config 树收集所有带规则的字段（等价于渲染出的 FormItem 集合）；
+ * 5. 逐字段交给 async-validator 执行，汇总错误文案。
  *
  * @example
  * ```ts
@@ -165,13 +166,10 @@ export const validateValues = async (options: ValidateValuesOptions): Promise<Va
 
   const values = await initValue(formState, { initValues, config });
   formState.values = values;
+  // 与 Form.vue 一致：值挂到 formState 之后再执行字段的值初始化写入
+  applyMountValueEffects(formState, config, values);
 
-  const fields = collectValidatableFields(
-    formState,
-    config,
-    values,
-    computed(() => Boolean(typeMatchValid)),
-  );
+  const fields = collectValidatableFields(formState, config, values, Boolean(typeMatchValid));
 
   const invalidFields: Record<string, any> = {};
   for (const field of fields) {
