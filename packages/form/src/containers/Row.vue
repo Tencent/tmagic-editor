@@ -6,6 +6,7 @@
       :span="col.span || config.span || 24 / config.items.length"
       :config="col"
       :labelWidth="config.labelWidth || labelWidth"
+      :labelPosition="config.labelPosition || labelPosition"
       :expandMore="expandMore"
       :model="name ? model[name] : model"
       :lastValues="name ? lastValues[name] : lastValues"
@@ -39,6 +40,7 @@ const props = defineProps<{
   config: RowConfig;
   name: string;
   labelWidth?: string;
+  labelPosition?: 'top' | 'left' | 'right';
   prop?: string;
   size?: string;
   expandMore?: boolean;

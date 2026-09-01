@@ -74,7 +74,7 @@ const props = defineProps<{
   disabledShowSrc?: boolean;
   labelWidth?: string;
   codeValueKey?: string;
-  labelPosition?: string;
+  labelPosition?: 'top' | 'left' | 'right';
   extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
 }>();
 

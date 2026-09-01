@@ -43,4 +43,28 @@ describe('Step container', () => {
     expect(wrapper.text()).toContain('Step 1');
     expect(wrapper.text()).toContain('Step 2');
   });
+
+  test('step 的 labelPosition 透传到子表单项', async () => {
+    const wrapper = mountForm(
+      [
+        {
+          type: 'step',
+          labelPosition: 'left',
+          items: [
+            {
+              title: 'Step 1',
+              name: 's1',
+              items: [{ name: 'text', type: 'text', text: 'text' }],
+            },
+          ],
+        },
+      ],
+      { s1: { text: 'a' } },
+      { stepActive: 1 },
+    );
+    await nextTick();
+
+    const item = wrapper.findAllComponents({ name: 'TMFormItem' }).find((w) => w.props('prop') === 's1.text');
+    expect(item?.props('labelPosition')).toBe('left');
+  });
 });

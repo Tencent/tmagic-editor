@@ -12,6 +12,7 @@
     :last-values="lastValues"
     :prop="prop"
     :label-width="labelWidth"
+    :label-position="labelPosition"
     :show-index="showIndex"
     :sort-key="sortKey"
     :sort="sort"
@@ -80,6 +81,7 @@ const props = defineProps<{
   name: string;
   prop?: string;
   labelWidth?: string;
+  labelPosition?: 'top' | 'left' | 'right';
   disabled?: boolean;
   size?: string;
   enableToggleMode?: true;

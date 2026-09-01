@@ -7,6 +7,7 @@
       :config="config"
       :prop="prop"
       :label-width="config.labelWidth || labelWidth"
+      :label-position="config.labelPosition || labelPosition"
       :expand-more="expandMore"
       :size="size"
       :disabled="disabled"
@@ -37,6 +38,7 @@ const props = defineProps<{
   isCompare?: boolean;
   config: FormItemConfig;
   labelWidth?: string | number;
+  labelPosition?: 'top' | 'left' | 'right';
   expandMore?: boolean;
   span?: number;
   size?: string;

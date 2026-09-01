@@ -16,6 +16,7 @@
       :prop="prop"
       :index="Number(index)"
       :label-width="labelWidth"
+      :label-position="labelPosition"
       :size="size"
       :disabled="disabled"
       :group-model="model[name]"
@@ -53,6 +54,7 @@ const props = defineProps<{
   config: GroupListConfig;
   name: string;
   labelWidth?: string;
+  labelPosition?: 'top' | 'left' | 'right';
   prop?: string;
   size?: string;
   disabled?: boolean;

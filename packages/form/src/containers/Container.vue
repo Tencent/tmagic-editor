@@ -19,6 +19,7 @@
       :step-active="stepActive"
       :expand-more="expand"
       :label-width="itemLabelWidth"
+      :label-position="itemLabelPosition"
       :style="config.fieldStyle"
       @change="onChangeHandler"
       @addDiffCount="onAddDiffCount"
@@ -35,7 +36,7 @@
               :label-title="config.labelTitle"
               :text="text"
             ></FormLabel>
-            <span class="m-form-tip m-form-title-extra" v-if="config.titleExtra && config.labelPosition === 'top'">
+            <span class="m-form-tip m-form-title-extra" v-if="config.titleExtra && itemLabelPosition === 'top'">
               {{ config.titleExtra }}</span
             >
           </slot>
@@ -217,6 +218,7 @@
           :step-active="stepActive"
           :expand-more="expand"
           :label-width="itemLabelWidth"
+          :label-position="itemLabelPosition"
           :prop="itemProp"
           @change="onChangeHandler"
           @addDiffCount="onAddDiffCount"
@@ -293,6 +295,7 @@ const props = withDefaults(
     prop?: string;
     disabled?: boolean;
     labelWidth?: string | number;
+    labelPosition?: 'top' | 'left' | 'right';
     expandMore?: boolean;
     stepActive?: string | number;
     size?: string;
@@ -445,7 +448,7 @@ const fieldsProps = computed(() => ({
 const formItemProps = computed(() => ({
   prop: itemProp.value,
   labelWidth: itemLabelWidth.value,
-  labelPosition: props.config.labelPosition,
+  labelPosition: itemLabelPosition.value,
 
   rules: rule.value,
   extra: filterFunction(mForm, props.config.extra, props),
@@ -453,6 +456,8 @@ const formItemProps = computed(() => ({
 }));
 
 const itemLabelWidth = computed(() => props.config.labelWidth ?? props.labelWidth);
+
+const itemLabelPosition = computed(() => props.config.labelPosition ?? props.labelPosition);
 
 watchEffect(() => {
   expand.value = props.expandMore;

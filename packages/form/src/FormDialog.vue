@@ -94,7 +94,7 @@ const props = withDefaults(
     disabled?: boolean;
     title?: string;
     inline?: boolean;
-    labelPosition?: string;
+    labelPosition?: 'top' | 'left' | 'right';
     zIndex?: number;
     size?: 'small' | 'default' | 'large';
     confirmText?: string;

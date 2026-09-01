@@ -89,4 +89,92 @@ describe('Panel container', () => {
     await nextTick();
     expect(wrapper.exists()).toBe(true);
   });
+
+  describe('labelPosition 透传', () => {
+    const getFormItemLabelPosition = (wrapper: ReturnType<typeof mountForm>, prop: string) => {
+      const item = wrapper.findAllComponents({ name: 'TMFormItem' }).find((w) => w.props('prop') === prop);
+      return item?.props('labelPosition');
+    };
+
+    test('panel 的 labelPosition 透传到子表单项', async () => {
+      const wrapper = mountForm(
+        [
+          {
+            type: 'panel',
+            title: 'group',
+            labelPosition: 'left',
+            items: [{ name: 'text', type: 'text', text: 'text' }],
+          },
+        ],
+        { text: 'hello' },
+      );
+      await nextTick();
+
+      expect(getFormItemLabelPosition(wrapper, 'text')).toBe('left');
+    });
+
+    test('fieldset 的 labelPosition 透传到子表单项', async () => {
+      const wrapper = mountForm(
+        [
+          {
+            type: 'fieldset',
+            legend: 'fs',
+            labelPosition: 'left',
+            items: [{ name: 'text', type: 'text', text: 'text' }],
+          },
+        ],
+        { text: 'fs' },
+      );
+      await nextTick();
+
+      expect(getFormItemLabelPosition(wrapper, 'text')).toBe('left');
+    });
+
+    test('flex-layout 的 labelPosition 透传到子表单项', async () => {
+      const wrapper = mountForm(
+        [
+          {
+            type: 'flex-layout',
+            labelPosition: 'left',
+            items: [{ name: 'text', type: 'text', text: 'text' }],
+          },
+        ],
+        { text: 'fl' },
+      );
+      await nextTick();
+
+      expect(getFormItemLabelPosition(wrapper, 'text')).toBe('left');
+    });
+
+    test('row 的 labelPosition 透传到子表单项', async () => {
+      const wrapper = mountForm(
+        [
+          {
+            type: 'row',
+            labelPosition: 'left',
+            items: [{ name: 'text', type: 'text', text: 'text' }],
+          },
+        ],
+        { text: 'r' },
+      );
+      await nextTick();
+
+      expect(getFormItemLabelPosition(wrapper, 'text')).toBe('left');
+    });
+
+    test('无 type 的 items 容器把 labelPosition 透传到子项', async () => {
+      const wrapper = mountForm(
+        [
+          {
+            labelPosition: 'left',
+            items: [{ name: 'text', type: 'text', text: 'text' }],
+          },
+        ],
+        { text: 'x' },
+      );
+      await nextTick();
+
+      expect(getFormItemLabelPosition(wrapper, 'text')).toBe('left');
+    });
+  });
 });

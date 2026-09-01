@@ -94,6 +94,7 @@ export const getGroupListRowConfig = (config: GroupListConfig, index: number, ke
     span: config.span || 24,
     items: config.items,
     labelWidth: config.labelWidth,
+    labelPosition: config.labelPosition,
     [key]: `${(config as Record<string, any>)[key]}${String(index)}`,
   };
 };

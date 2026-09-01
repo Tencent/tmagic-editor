@@ -24,6 +24,7 @@
           :size="size"
           :disabled="disabled"
           :label-width="config.labelWidth || labelWidth"
+          :label-position="config.labelPosition || labelPosition"
           @change="changeHandler"
           @addDiffCount="onAddDiffCount()"
         ></Container>
@@ -54,6 +55,7 @@ const props = withDefaults(
     config: StepConfig;
     stepActive?: number;
     labelWidth?: string;
+    labelPosition?: 'top' | 'left' | 'right';
     size?: string;
     disabled?: boolean;
   }>(),

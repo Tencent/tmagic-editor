@@ -66,7 +66,7 @@ const props = withDefaults(
     size?: 'small' | 'default' | 'large';
     confirmText?: string;
     inline?: boolean;
-    labelPosition?: string;
+    labelPosition?: 'top' | 'left' | 'right';
     preventSubmitDefault?: boolean;
     /** 透传给内部 `MForm`，控制表单校验失败时错误提示前缀是否使用字段的 text 文案 */
     useFieldTextInError?: boolean;

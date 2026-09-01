@@ -99,6 +99,7 @@
       :lastValues="lastValues"
       :is-compare="isCompare"
       :labelWidth="labelWidth"
+      :labelPosition="labelPosition"
       :prop="rowProp"
       :size="size"
       :disabled="disabled"
@@ -131,6 +132,7 @@ const props = defineProps<{
   groupModel: any[];
   config: GroupListConfig;
   labelWidth?: string;
+  labelPosition?: 'top' | 'left' | 'right';
   prop?: string;
   size?: string;
   index: number;

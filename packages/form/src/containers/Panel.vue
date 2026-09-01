@@ -39,6 +39,7 @@
             :size="size"
             :disabled="disabled"
             :label-width="config.labelWidth || labelWidth"
+            :label-position="config.labelPosition || labelPosition"
             @change="changeHandler"
             @addDiffCount="onAddDiffCount()"
           ></Container>
@@ -59,6 +60,7 @@
           :size="size"
           :disabled="disabled"
           :label-width="config.labelWidth || labelWidth"
+          :label-position="config.labelPosition || labelPosition"
           @change="changeHandler"
           @addDiffCount="onAddDiffCount()"
         ></Container>
@@ -89,6 +91,7 @@ const props = defineProps<{
   config: PanelConfig;
   name?: string;
   labelWidth?: string;
+  labelPosition?: 'top' | 'left' | 'right';
   prop?: string;
   size?: string;
   disabled?: boolean;

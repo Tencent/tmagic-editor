@@ -23,6 +23,7 @@
         :last-values="lastValuesProcessed"
         :is-compare="isCompare"
         :label-width="item.labelWidth || labelWidth"
+        :label-position="item.labelPosition || labelPosition"
         :step-active="stepActive"
         :size="size"
         @change="changeHandler"
@@ -92,7 +93,7 @@ const props = withDefaults(
     stepActive?: string | number;
     size?: 'small' | 'default' | 'large';
     inline?: boolean;
-    labelPosition?: string;
+    labelPosition?: 'top' | 'left' | 'right';
     keyProp?: string;
     popperClass?: string;
     preventSubmitDefault?: boolean;

@@ -11,6 +11,7 @@
       :size="size"
       :disabled="disabled"
       :label-width="config.labelWidth || labelWidth"
+      :label-position="config.labelPosition || labelPosition"
       @change="changeHandler"
       @addDiffCount="onAddDiffCount()"
     />
@@ -37,6 +38,7 @@ const props = defineProps<{
   config: FlexLayoutConfig;
   name?: string;
   labelWidth?: string;
+  labelPosition?: 'top' | 'left' | 'right';
   prop?: string;
   size?: string;
   disabled?: boolean;

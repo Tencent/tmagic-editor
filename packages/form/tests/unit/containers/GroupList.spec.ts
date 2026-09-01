@@ -98,4 +98,50 @@ describe('GroupList container', () => {
       expect(wrapper.text()).not.toContain('下移');
     });
   });
+
+  describe('labelPosition 透传', () => {
+    const getFormItemLabelPosition = (wrapper: ReturnType<typeof mountForm>, prop: string) => {
+      const item = wrapper.findAllComponents({ name: 'TMFormItem' }).find((w) => w.props('prop') === prop);
+      return item?.props('labelPosition');
+    };
+
+    test('group-list 的 labelPosition 透传到子表单项', async () => {
+      const wrapper = mountForm(
+        [
+          {
+            type: 'group-list',
+            name: 'list',
+            labelPosition: 'left',
+            labelWidth: '80px',
+            items: [{ name: 'text', type: 'text', text: 'text' }],
+          },
+        ],
+        { list: [{ text: 'a' }] },
+      );
+      await nextTick();
+
+      expect(getFormItemLabelPosition(wrapper, 'list.0.text')).toBe('left');
+    });
+
+    test('子项自身的 labelPosition 优先于 group-list', async () => {
+      const wrapper = mountForm(
+        [
+          {
+            type: 'group-list',
+            name: 'list',
+            labelPosition: 'left',
+            items: [
+              { name: 'text', type: 'text', text: 'text' },
+              { name: 'title', type: 'text', text: 'title', labelPosition: 'top' },
+            ],
+          },
+        ],
+        { list: [{ text: 'a', title: 'b' }] },
+      );
+      await nextTick();
+
+      expect(getFormItemLabelPosition(wrapper, 'list.0.text')).toBe('left');
+      expect(getFormItemLabelPosition(wrapper, 'list.0.title')).toBe('top');
+    });
+  });
 });

@@ -51,6 +51,26 @@ describe('Form.vue —— 默认 props', () => {
     const formEl = wrapper.find('.m-form').element as HTMLElement;
     expect(formEl.getAttribute('style') || '').toContain('height: 300px');
   });
+
+  test('labelPosition 与 labelWidth 一样，未配置时回落到表单级，配置了则用自身', async () => {
+    const wrapper = mountForm({
+      labelPosition: 'left',
+      labelWidth: '120px',
+      config: [
+        { name: 'a', type: 'text', text: 'a' },
+        { name: 'b', type: 'text', text: 'b', labelPosition: 'top' },
+      ],
+      initValues: { a: '1', b: '2' },
+    });
+    await nextTick();
+
+    const containers = wrapper.findAllComponents({ name: 'MFormContainer' });
+    const byName = Object.fromEntries(containers.map((c) => [c.props('config')?.name, c]));
+
+    expect(byName.a.props('labelWidth')).toBe('120px');
+    expect(byName.a.props('labelPosition')).toBe('left');
+    expect(byName.b.props('labelPosition')).toBe('top');
+  });
 });
 
 describe('Form.vue —— formState getter 行为', () => {

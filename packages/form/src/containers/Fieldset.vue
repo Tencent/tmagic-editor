@@ -28,6 +28,7 @@
           :prop="prop"
           :disabled="disabled"
           :labelWidth="lWidth"
+          :labelPosition="lPosition"
           :size="size"
           @change="changeHandler"
           @add-diff-count="onAddDiffCount()"
@@ -48,6 +49,7 @@
         :config="item"
         :prop="prop"
         :labelWidth="lWidth"
+        :labelPosition="lPosition"
         :size="size"
         :disabled="disabled"
         @change="changeHandler"
@@ -74,6 +76,7 @@ defineOptions({
 const props = withDefaults(
   defineProps<{
     labelWidth?: string;
+    labelPosition?: 'top' | 'left' | 'right';
     prop: string;
     size?: string;
     model: Record<string, any>;
@@ -139,6 +142,8 @@ const lWidth = computed(() => {
   }
   return props.config.labelWidth || props.labelWidth || (props.config.text ? undefined : '0');
 });
+
+const lPosition = computed(() => props.config.labelPosition || props.labelPosition);
 
 const valueChangeHandler = (value: number | boolean) => {
   emit('change', value, { modifyKey: checkboxName.value });

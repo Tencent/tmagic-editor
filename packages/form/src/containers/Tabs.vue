@@ -70,6 +70,7 @@
         "
         :size="size"
         :label-width="tab.labelWidth || labelWidth"
+        :label-position="tab.labelPosition || labelPosition"
         :expand-more="expandMore"
         @change="changeHandler"
         @addDiffCount="onAddDiffCount(Number(tabIndex))"
@@ -106,6 +107,7 @@ const props = withDefaults(
     name: string;
     size?: string;
     labelWidth?: string;
+    labelPosition?: 'top' | 'left' | 'right';
     prop?: string;
     expandMore?: boolean;
     disabled?: boolean;

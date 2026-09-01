@@ -63,4 +63,24 @@ describe('Tabs', () => {
     const value = await (wrapper.vm as any).submitForm();
     expect(value.text).toBe('text');
   });
+
+  test('tab 的 labelPosition 透传到子表单项', async () => {
+    const wrapper = getWrapper([
+      {
+        type: 'tab',
+        items: [
+          {
+            title: 'tab1',
+            labelPosition: 'left',
+            items: [{ name: 'text', text: 'text' }],
+          },
+        ],
+      },
+    ]);
+
+    await nextTick();
+
+    const item = wrapper.findAllComponents({ name: 'TMFormItem' }).find((w) => w.props('prop') === 'text');
+    expect(item?.props('labelPosition')).toBe('left');
+  });
 });

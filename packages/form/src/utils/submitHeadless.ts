@@ -43,7 +43,7 @@ export interface SubmitFormOptions {
   stepActive?: string | number;
   size?: 'small' | 'default' | 'large';
   inline?: boolean;
-  labelPosition?: string;
+  labelPosition?: 'top' | 'left' | 'right';
   keyProp?: string;
   popperClass?: string;
   preventSubmitDefault?: boolean;
