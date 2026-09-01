@@ -29,11 +29,25 @@ import { getDepNodeIds, getNodes, isPage, isValueIncludeDataSource } from '@tmag
 
 import PropsPanel from './layouts/PropsPanel.vue';
 import { isIncludeDataSource } from './utils/editor';
+import { error as logError } from './utils/logger';
 import { EditorProps } from './editorProps';
 import { Services } from './type';
 
 export declare type LooseRequired<T> = {
   [P in string & keyof T]: T[P];
+};
+
+/**
+ * select 为异步串行执行，节点不可选中（如已从 DSL 中移除）时会抛错。
+ * 在 watch 回调中调用不能把拒绝抛回调用方，否则会变成 Vue 的「Unhandled error during execution of watcher callback」，
+ * 这里统一兜底成日志。
+ */
+const selectNode = async (editorService: Services['editorService'], id: Id) => {
+  try {
+    await editorService.select(id);
+  } catch (e) {
+    logError(e);
+  }
 };
 
 export const initServiceState = (
@@ -193,9 +207,17 @@ export const initServiceState = (
     },
   );
 
+  // defaultSelected 可能早于 modelValue 到位（immediate 首次执行时 root 还是空的，或节点尚未出现在 DSL 中），
+  // 此时 select 会因为「获取不到组件信息」而抛错，交由 root-change 中的选中逻辑在 root 就绪后补上即可。
   watch(
     () => props.defaultSelected,
-    (defaultSelected) => defaultSelected && editorService.select(defaultSelected),
+    (defaultSelected) => {
+      if (!defaultSelected || !editorService.getNodeById(defaultSelected)) {
+        return;
+      }
+
+      selectNode(editorService, defaultSelected);
+    },
     {
       immediate: true,
     },

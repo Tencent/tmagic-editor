@@ -4,12 +4,13 @@
  * Copyright (C) 2025 Tencent.
  */
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { defineComponent, h } from 'vue';
+import { defineComponent, h, nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
 
 import { DepTargetType } from '@tmagic/core';
 
 import { initServiceEvents, initServiceState } from '@editor/initService';
+import * as logger from '@editor/utils/logger';
 
 const mkServices = () => {
   const handlers: Record<string, Record<string, any[]>> = {};
@@ -151,6 +152,10 @@ vi.mock('@editor/utils/editor', () => ({
   isIncludeDataSource: vi.fn(() => false),
 }));
 
+vi.mock('@editor/utils/logger', () => ({
+  error: vi.fn(),
+}));
+
 const Wrap = (props: any, services: any) =>
   defineComponent({
     setup() {
@@ -233,9 +238,28 @@ describe('initServiceState', () => {
   });
 
   test('defaultSelected 调用 select', () => {
+    services.editorService.getNodeById.mockReturnValue({ id: 'n1' });
     const props = { defaultSelected: 'n1' } as any;
     mount(Wrap(props, services));
     expect(services.editorService.select).toHaveBeenCalledWith('n1');
+  });
+
+  test('defaultSelected 对应节点不存在时不调用 select', () => {
+    services.editorService.getNodeById.mockReturnValue(null);
+    const props = { defaultSelected: 'n1' } as any;
+    mount(Wrap(props, services));
+    expect(services.editorService.select).not.toHaveBeenCalled();
+  });
+
+  test('defaultSelected select 失败时兜底成日志，不产生未处理的拒绝', async () => {
+    const err = new Error('获取不到组件信息');
+    vi.mocked(logger.error).mockClear();
+    services.editorService.getNodeById.mockReturnValue({ id: 'n1' });
+    services.editorService.select.mockRejectedValue(err);
+    const props = { defaultSelected: 'n1' } as any;
+    mount(Wrap(props, services));
+    await nextTick();
+    expect(logger.error).toHaveBeenCalledWith(err);
   });
 
   test('stageRect 设置 ui state', () => {
