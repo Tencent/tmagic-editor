@@ -34,7 +34,7 @@
         :use-field-text-in-error="useFieldTextInError"
         :type-match-valid="typeMatchValid"
         :validate-on-init="validateOnInit"
-        :extend-state="extendState"
+        :context="context"
         :theme="effectiveTheme"
         @change="changeHandler"
       ></Form>
@@ -73,7 +73,7 @@ import { computed, inject, provide, ref } from 'vue';
 import { M_THEME_KEY, TMagicButton, TMagicCol, TMagicDialog, TMagicRow } from '@tmagic/design';
 
 import Form from './Form.vue';
-import { ContainerChangeEventData, FormConfig, FormState, FormValue, StepConfig } from './schema';
+import { ContainerChangeEventData, FormConfig, FormContext, FormValue, StepConfig } from './schema';
 
 defineOptions({
   name: 'MFormDialog',
@@ -106,8 +106,8 @@ const props = withDefaults(
     showCancel?: boolean;
     /** 透传给内部 `MForm`，控制表单校验失败时错误提示前缀是否使用字段的 text 文案 */
     useFieldTextInError?: boolean;
-    /** 透传给内部 `MForm`，用于扩展 `formState`（如注入 `$message` / `$store` 等） */
-    extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
+    /** 透传给内部 `MForm` 的宿主业务上下文 */
+    context?: FormContext;
     /**
      * 主题名。优先级：传入 `theme` prop > 祖先 `provide(M_THEME_KEY)` > 空串。
      * 计算结果会再次 `provide` 出去，使得 Dialog 被 Teleport 到 body 后，内部子树

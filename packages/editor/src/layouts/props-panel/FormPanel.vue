@@ -13,7 +13,7 @@
         :init-values="values"
         :config="config"
         :type-match-valid="true"
-        :extend-state="extendState"
+        :context="formContext"
         :validate-on-init="true"
         @change="submit"
         @error="errorHandler"
@@ -45,17 +45,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed, getCurrentInstance, inject, onMounted, onUnmounted, ref, useTemplateRef, watchEffect } from 'vue';
+import { computed, getCurrentInstance, inject, onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 import { Document as DocumentIcon } from '@element-plus/icons-vue';
 
 import { TMagicButton, tMagicMessage, TMagicScrollbar } from '@tmagic/design';
-import type { ContainerChangeEventData, FormConfig, FormState, FormValue } from '@tmagic/form';
+import type { ContainerChangeEventData, FormConfig, FormValue } from '@tmagic/form';
 import { MForm, validateForm } from '@tmagic/form';
 import { filterXSS } from '@tmagic/utils';
 
 import MIcon from '@editor/components/Icon.vue';
 import { ENABLE_PROPS_FORM_VALIDATE } from '@editor/editorProps';
 import { useEditorContentHeight } from '@editor/hooks/use-editor-content-height';
+import { useEditorFormContext } from '@editor/hooks/use-form-context';
 import { useServices } from '@editor/hooks/use-services';
 
 import CodeEditor from '../CodeEditor.vue';
@@ -75,7 +76,6 @@ const props = defineProps<{
   labelWidth?: string;
   codeValueKey?: string;
   labelPosition?: 'top' | 'left' | 'right';
-  extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
 }>();
 
 const emit = defineEmits<{
@@ -89,23 +89,17 @@ const emit = defineEmits<{
 const enablePropsFormValidate = inject(ENABLE_PROPS_FORM_VALIDATE, false);
 
 const services = useServices();
-const { editorService, uiService } = services;
+const { uiService } = services;
 
 const codeOptions = inject('codeOptions', {});
 
 const showSrc = ref(false);
 const propsPanelSize = computed(() => uiService.get('propsPanelSize') || 'small');
 const { height: editorContentHeight } = useEditorContentHeight();
-const stage = computed(() => editorService.get('stage'));
+
+const formContext = useEditorFormContext(() => services);
 
 const configFormRef = useTemplateRef<InstanceType<typeof MForm>>('configForm');
-
-watchEffect(() => {
-  if (configFormRef.value) {
-    configFormRef.value.formState.stage = stage.value;
-    configFormRef.value.formState.services = services;
-  }
-});
 
 const internalInstance = getCurrentInstance();
 onMounted(() => {
@@ -162,18 +156,13 @@ const saveCode = async (values: any) => {
   // （不挂载任何组件，也不影响页面上正在展示的表单），并将校验结果（错误信息）随提交
   // 一并抛给上层记录，使源码保存的错误状态与表单编辑保持一致。
   //
-  // 配置里的 display / rules 回调会从 formState 上读 services，因此必须通过 extendState 带过去。
+  // 配置里的 display / rules 回调会从 formState 上读 services，因此必须带上 context。
   try {
     const error = await validateForm({
       config: props.config,
       typeMatchValid: true,
       initValues: newValues,
-      extendState: (state) => {
-        if (configFormRef.value?.formState) {
-          return { ...(configFormRef.value?.formState || {}) };
-        }
-        return props.extendState?.(state) || {};
-      },
+      context: formContext.value,
     });
 
     if (error) {

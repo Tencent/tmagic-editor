@@ -119,26 +119,30 @@ describe('submitForm', () => {
     expect(initValues.object.nested).toBe('b');
   });
 
-  test('支持 extendState 扩展状态', async () => {
-    const extendState = vi.fn(async () => ({ extra: 'value' }));
-
-    await submitForm({
-      config: [{ type: 'text', name: 'text', text: 'text' }],
-      initValues: { text: 'foo' },
-      extendState,
+  test('context 可被 defaultValue 经 mForm 读到', async () => {
+    const values = await submitForm({
+      config: [
+        {
+          type: 'text',
+          name: 'u',
+          text: 'u',
+          defaultValue: (mForm: any) => mForm?.username ?? 'MISSING',
+        },
+      ],
+      initValues: {},
+      context: { username: 'from-context' },
     });
 
-    expect(extendState).toHaveBeenCalled();
+    expect(values).toEqual({ u: 'from-context' });
   });
 
-  test('extendState 返回 keyProp 等内置保留字段时静默跳过且正常 resolve', async () => {
+  test('context 携带 keyProp 等内置保留字段时不污染最终 values', async () => {
     const values = await submitForm({
       config: [{ type: 'text', name: 'text', text: 'text' }],
       initValues: { text: 'foo' },
-      extendState: () => ({ keyProp: 'custom', extra: 'value' }),
+      context: { keyProp: 'custom', extra: 'value' } as any,
     });
 
-    // keyProp 属于内置保留字段，被静默跳过，不污染最终 values
     expect(values).toEqual({ text: 'foo' });
   });
 

@@ -219,8 +219,25 @@
 
 - **类型：** `boolean`
 
-## extendState
+## context
 
-- **详情：** 扩展 formState 的钩子函数，返回的对象会被合并到 formState 上
+- **详情：** 宿主业务上下文。可用本 prop 直接传，也可由祖先 `provide(FORM_CONTEXT_KEY)` 下发；同名字段本 prop 优先。
 
-- **类型：** `(state: FormState) => Record<string, any> | Promise<Record<string, any>>`
+  嵌套表单（Link 的子表单、`MFormBox`、`MFormDialog`）会自动继承最近祖先的 context，不需要层层透传。
+
+  配置回调统一通过第一个参数 `mForm` 读取：formState 是一个读穿 Proxy，`mForm` 上找不到的字段会自动落到 context。回调签名因此保持不变，后端 eval 下发的存量配置无需改动。
+
+- **类型：** `FormContext`
+
+- **示例：**
+
+```ts
+// 模板：<m-form :context="formContext" />
+const formContext = computed(() => ({ username: store.username }));
+
+// 配置回调：mForm.username 读穿到 context
+{
+  display: (mForm) => mForm.username === 'admin',
+}
+```
+

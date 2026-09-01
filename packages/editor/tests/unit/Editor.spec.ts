@@ -4,10 +4,14 @@
  * Copyright (C) 2025 Tencent.
  */
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { defineComponent, h, nextTick } from 'vue';
+import { type ComputedRef, defineComponent, h, inject, nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
 
+import { FORM_CONTEXT_KEY, type FormContext } from '@tmagic/form';
+
 import Editor from '@editor/Editor.vue';
+
+let injectedFormContext: ComputedRef<FormContext> | undefined;
 
 const { initServiceEventsMock, initServiceStateMock } = vi.hoisted(() => ({
   initServiceEventsMock: vi.fn(),
@@ -23,7 +27,21 @@ vi.mock('@editor/services/codeBlock', () => ({ default: {} }));
 vi.mock('@editor/services/componentList', () => ({ default: {} }));
 vi.mock('@editor/services/dataSource', () => ({ default: {} }));
 vi.mock('@editor/services/dep', () => ({ default: {} }));
-vi.mock('@editor/services/editor', () => ({ default: {} }));
+const { stageStub } = vi.hoisted(() => ({ stageStub: { name: 'stage-instance' } }));
+// 用响应式 ref 承载 stage，模拟真实 editorService 的 reactive state，
+// 这样 formContext 的 computed 才会在 stage 变化时失效重算
+vi.mock('@editor/services/editor', async () => {
+  const { shallowRef } = await import('vue');
+  const stage = shallowRef<any>(stageStub);
+  return {
+    default: {
+      get: vi.fn((key: string) => (key === 'stage' ? stage.value : undefined)),
+      __setStage: (value: any) => {
+        stage.value = value;
+      },
+    },
+  };
+});
 vi.mock('@editor/services/events', () => ({ default: {} }));
 vi.mock('@editor/services/history', () => ({ default: {} }));
 vi.mock('@editor/services/keybinding', () => ({
@@ -88,6 +106,7 @@ vi.mock('@editor/layouts/props-panel/PropsPanel.vue', () => ({
     name: 'PropsPanel',
     emits: ['mounted', 'unmounted', 'submit-error', 'form-error'],
     setup(_p, { emit }) {
+      injectedFormContext = inject(FORM_CONTEXT_KEY, undefined);
       return () =>
         h('div', { class: 'fake-props-panel' }, [
           h('button', { class: 'mounted-btn', onClick: () => emit('mounted', { proxy: true }) }),
@@ -105,6 +124,7 @@ vi.mock('@editor/layouts/props-panel/FormPanel.vue', () => ({
 
 beforeEach(() => {
   vi.clearAllMocks();
+  injectedFormContext = undefined;
 });
 
 describe('Editor', () => {
@@ -151,6 +171,30 @@ describe('Editor', () => {
     const wrapper = mount(Editor, { props: {} as any });
     await wrapper.find('.fake-sidebar').trigger('click');
     expect(wrapper.emitted('layer-node-dblclick')).toBeTruthy();
+  });
+
+  test('provide FORM_CONTEXT_KEY，子孙可拿到 services 与当前 stage', async () => {
+    mount(Editor, { props: {} as any });
+    await nextTick();
+
+    expect(injectedFormContext).toBeDefined();
+    const context = injectedFormContext!.value as any;
+    expect(context.services.editorService).toBeDefined();
+    expect(context.services.propsService).toBeDefined();
+    expect(context.stage).toBe(stageStub);
+  });
+
+  test('stage 走 computed 读时求值，切换画布后能读到新实例', async () => {
+    const editorServiceMod = (await import('@editor/services/editor')) as any;
+    mount(Editor, { props: {} as any });
+    await nextTick();
+
+    expect((injectedFormContext!.value as any).stage).toBe(stageStub);
+
+    const nextStage = { name: 'next-stage' };
+    editorServiceMod.default.__setStage(nextStage);
+    expect((injectedFormContext!.value as any).stage).toBe(nextStage);
+    editorServiceMod.default.__setStage(stageStub);
   });
 
   test('expose services', () => {

@@ -1,6 +1,6 @@
 import type { ComputedRef, InjectionKey } from 'vue';
 
-import type { FormItemConfig } from '@tmagic/form-schema';
+import type { FormContext, FormItemConfig } from '@tmagic/form-schema';
 
 export * from '@tmagic/form-schema';
 
@@ -28,6 +28,16 @@ export interface FormDiffConfig {
 
 export const FORM_DIFF_CONFIG_KEY: InjectionKey<FormDiffConfig> = Symbol('mFormDiffConfig');
 export const FORM_TYPE_MATCH_VALID_KEY: InjectionKey<ComputedRef<boolean>> = Symbol('mFormTypeMatchValid');
+
+/**
+ * 宿主业务上下文，由 `MForm`（或更外层的 Editor）通过 `provide` 下发。
+ *
+ * 嵌套表单（Link 子表单、FormBox、临时校验表单等）会自动继承最近祖先的 context，
+ * 无需层层透传。
+ *
+ * 配置回调统一通过 `mForm.xxx` 读取，由 formState 的读穿 Proxy 落到这里。
+ */
+export const FORM_CONTEXT_KEY: InjectionKey<ComputedRef<FormContext>> = Symbol('mFormContext');
 
 export interface ValidateError {
   message: string;

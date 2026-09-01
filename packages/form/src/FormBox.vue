@@ -14,7 +14,7 @@
           :inline="inline"
           :prevent-submit-default="preventSubmitDefault"
           :use-field-text-in-error="useFieldTextInError"
-          :extend-state="extendState"
+          :context="context"
           :type-match-valid="typeMatchValid"
           :validate-on-init="validateOnInit"
           @change="changeHandler"
@@ -44,7 +44,7 @@ import { computed, ref, watchEffect } from 'vue';
 import { TMagicButton, TMagicScrollbar } from '@tmagic/design';
 
 import Form from './Form.vue';
-import type { ContainerChangeEventData, FormConfig, FormState, FormValue } from './schema';
+import type { ContainerChangeEventData, FormConfig, FormContext, FormValue } from './schema';
 
 defineOptions({
   name: 'MFormBox',
@@ -70,7 +70,8 @@ const props = withDefaults(
     preventSubmitDefault?: boolean;
     /** 透传给内部 `MForm`，控制表单校验失败时错误提示前缀是否使用字段的 text 文案 */
     useFieldTextInError?: boolean;
-    extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
+    /** 透传给内部 `MForm` 的宿主业务上下文 */
+    context?: FormContext;
   }>(),
   {
     config: () => [],

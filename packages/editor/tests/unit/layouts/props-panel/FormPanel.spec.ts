@@ -76,7 +76,7 @@ vi.mock('@tmagic/form', async () => {
     validateForm: vi.fn((options?: any) => validateFormImpl(options)),
     MForm: defineComponent({
       name: 'MForm',
-      props: ['config', 'initValues', 'extendState'],
+      props: ['config', 'initValues', 'context'],
       emits: ['change', 'error'],
       setup(_p, { expose, emit }) {
         const formState = { stage: null as any, services: null as any };
@@ -234,7 +234,7 @@ describe('FormPanel', () => {
     expect(validateSpy.mock.calls[0][0]).toMatchObject({ initValues: { style: { foo: 'bar' } } });
   });
 
-  test('源码保存时传给 validateForm 的 extendState 注入 services 和 stage', async () => {
+  test('源码保存时传给 validateForm 的 context 含 services 和 stage', async () => {
     const validateSpy = vi.fn(async () => '');
     validateFormImpl = validateSpy;
     const wrapper = mount(FormPanel, {
@@ -245,11 +245,9 @@ describe('FormPanel', () => {
     await wrapper.find('.fake-code-editor').trigger('click');
     await new Promise((r) => setTimeout(r, 0));
 
-    const { extendState } = validateSpy.mock.calls[0][0];
-    expect(typeof extendState).toBe('function');
-    const result = await extendState({});
-    expect(result).toHaveProperty('services');
-    expect(result).toHaveProperty('stage');
+    const { context } = validateSpy.mock.calls[0][0];
+    expect(context).toHaveProperty('services');
+    expect(context).toHaveProperty('stage');
   });
 
   test('启用 enablePropsFormValidate 且源码保存静默校验通过时 submit 不携带 error', async () => {

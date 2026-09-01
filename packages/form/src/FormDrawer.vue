@@ -31,7 +31,7 @@
         :use-field-text-in-error="useFieldTextInError"
         :type-match-valid="typeMatchValid"
         :validate-on-init="validateOnInit"
-        :extend-state="extendState"
+        :context="context"
         :theme="effectiveTheme"
         @change="changeHandler"
       ></Form>
@@ -64,7 +64,7 @@ import { computed, inject, provide, ref, watchEffect } from 'vue';
 import { M_THEME_KEY, TMagicButton, TMagicCol, TMagicDrawer, TMagicRow } from '@tmagic/design';
 
 import Form from './Form.vue';
-import type { ContainerChangeEventData, FormConfig, FormState, FormValue } from './schema';
+import type { ContainerChangeEventData, FormConfig, FormContext, FormValue } from './schema';
 
 defineOptions({
   name: 'MFormDrawer',
@@ -94,8 +94,8 @@ const props = withDefaults(
     useFieldTextInError?: boolean;
     /** 关闭前的回调，会暂停 Drawer 的关闭; done 是个 function type 接受一个 boolean 参数, 执行 done 使用 true 参数或不提供参数将会终止关闭 */
     beforeClose?: (_done: (_cancel?: boolean) => void) => void;
-    /** 透传给内部 `MForm`，用于扩展 `formState`（如注入 `$message` / `$store` 等） */
-    extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
+    /** 透传给内部 `MForm` 的宿主业务上下文 */
+    context?: FormContext;
     /**
      * 主题名。优先级：传入 `theme` prop > 祖先 `provide(M_THEME_KEY)` > 空串。
      * 计算结果会再次 `provide` 出去，使得 Drawer 被 Teleport 到 body 后，内部子树

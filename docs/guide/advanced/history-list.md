@@ -101,7 +101,6 @@ onCodeBlockDiff(id, index);
 | 字段 | 必填 | 说明 |
 | --- | --- | --- |
 | `appContext` | 否 | 父级应用上下文，用于让动态挂载的差异确认弹窗继承全局组件 / 指令 / provide / 插件（Element Plus、`@tmagic/form` 字段组件等）。在组件 `setup` 中调用时会自动取当前组件的 `appContext`，无需手动传；仅当在组件 setup 之外调用时才需显式传入（如 `editorApp._context`）。 |
-| `extendState` | 否 | 透传给差异确认弹窗的 `extendState`（同 Editor 的 [`extendFormState`](#自定义对比判断)），使对比表单中依赖业务上下文的 `display` / `disabled` 等 `filterFunction` 正常工作。 |
 | `dialogWidth` | 否 | 内置页面 / 数据源 / 代码块的差异 / 回滚确认弹窗默认宽度（透传给 `TMagicDialog` 的 `width`），如 `'1200px'` / `'80%'`。缺省时使用弹窗内置默认宽度（`900px`）。业务自有历史可在 `viewDiff` / `confirmAndRevert` 调用时通过各自入参的 `width` 单独覆盖。 |
 
 > 若只需要无确认、无校验的静默回滚，直接用上面的 `editorService.revertPageStep` 等即可，无需 `useHistoryRevert`。
@@ -164,7 +163,7 @@ const historyListExtraTabs = [
 
 ## 自定义对比判断
 
-差异对话框中的「表单对比」最终透传到 `MForm`，你可以通过 Editor 顶层注入的 `extendFormState` 让对比表单拿到完整业务上下文，从而让依赖上下文的 `display` / `disabled` 等 `filterFunction` 正常工作。
+差异对话框中的「表单对比」最终透传到 `MForm`。Editor 会把 `services` / `stage` provide 为 `FORM_CONTEXT_KEY`，对比表单自动继承；业务字段在 `<m-editor>` 外层再 provide 一层即可，详见 [表单业务上下文](/api/editor/props.html#表单业务上下文)。配置回调通过 `mForm.xxx` 读穿取用。
 
 若某些字段语义上相等但结构不同（例如 `code-select` 字段中 `''` 与 `{ hookType: 'code', hookData: [] }` 应视为相等），可借助 `@tmagic/form` 的 [`showDiff`](/api/form/form-props.html#showdiff) 自定义判断函数避免被误判为差异。
 

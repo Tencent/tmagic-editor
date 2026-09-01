@@ -16,11 +16,12 @@
  * limitations under the License.
  */
 
-import { computed, type ComputedRef, inject, provide, type Ref, ref, useTemplateRef, watch, watchEffect } from 'vue';
+import { computed, type ComputedRef, inject, provide, type Ref, ref, useTemplateRef, watch } from 'vue';
 
 import type { CodeBlockContent, MNode } from '@tmagic/core';
-import { type FormConfig, type FormState, type FormValue, MForm } from '@tmagic/form';
+import { type FormConfig, type FormContext, type FormValue, MForm } from '@tmagic/form';
 
+import { useEditorFormContext } from '@editor/hooks/use-form-context';
 import type { CompareFormBaseProps } from '@editor/type';
 import { getCodeBlockFormConfig } from '@editor/utils/code-block';
 
@@ -28,7 +29,7 @@ export interface UseCompareFormReturn {
   config: Ref<FormConfig>;
   currentValues: ComputedRef<FormValue>;
   wrapperStyle: ComputedRef<Record<string, string> | undefined>;
-  mergedExtendState: (state: FormState) => Record<string, any> | Promise<Record<string, any>>;
+  formContext: ComputedRef<FormContext>;
   loadConfig: () => Promise<void>;
   formRef: Readonly<Ref<InstanceType<typeof MForm> | null>>;
   normalizeCodeBlockValue: (v: Partial<CodeBlockContent> | Record<string, any> | undefined) => Record<string, any>;
@@ -39,7 +40,7 @@ export interface UseCompareFormReturn {
  * - 按 `category`(node / data-source / code-block) 加载 FormConfig（支持自定义 `loadConfig`）；
  * - 代码块 `content` 归一化为字符串；
  * - 外层容器固定高度 + 内部滚动的 `wrapperStyle`；
- * - 将 services / stage 注入 MForm.formState，保证 filterFunction 上下文一致。
+ * - 将 services / stage 作为 form context 传给 MForm，保证 filterFunction 上下文一致。
  *
  * 两个组件的差异仅在于是否做新旧值对比，这部分逻辑保留在各自组件中。
  */
@@ -87,10 +88,7 @@ export const useCompareForm = (props: CompareFormBaseProps): UseCompareFormRetur
     return style;
   });
 
-  const mergedExtendState = (state: FormState) => {
-    const extendState = props.extendState ?? ((s: FormState) => s);
-    return extendState(props.baseFormState || state);
-  };
+  const formContext = useEditorFormContext(() => props.services);
 
   /**
    * 内置的默认 FormConfig 加载逻辑：按 `category` 从对应 service / 工具取配置。
@@ -156,27 +154,11 @@ export const useCompareForm = (props: CompareFormBaseProps): UseCompareFormRetur
 
   const formRef = useTemplateRef<InstanceType<typeof MForm>>('form');
 
-  /**
-   * 把 services / stage 注入 MForm 的 formState，避免 propsService 注入的表单配置中
-   * 形如 `display: ({ services }) => services.uiService.get(...)` 的 filterFunction
-   * 在执行时拿不到 `formState.services` 而报错。
-   *
-   * 与 props-panel/FormPanel.vue 中的注入方式保持一致：
-   * - services：整个 useServices() 返回的服务集合；
-   * - stage：当前 editorService.get('stage') 的最新值。
-   */
-  watchEffect(() => {
-    if (formRef.value && props.services) {
-      formRef.value.formState.stage = props.services.editorService.get('stage');
-      formRef.value.formState.services = props.services;
-    }
-  });
-
   return {
     config,
     currentValues,
     wrapperStyle,
-    mergedExtendState,
+    formContext,
     loadConfig,
     formRef,
     normalizeCodeBlockValue,

@@ -71,7 +71,7 @@ const mountedHandlers: any[] = [];
 vi.mock('@editor/layouts/props-panel/FormPanel.vue', () => ({
   default: defineComponent({
     name: 'FormPanel',
-    props: ['config', 'values', 'disabledShowSrc', 'extendState'],
+    props: ['config', 'values', 'disabledShowSrc'],
     emits: ['submit', 'submit-error', 'form-error', 'mounted', 'unmounted'],
     setup(_p, { emit, expose }) {
       mountedHandlers.push(emit);

@@ -44,6 +44,8 @@ import type {
 import { getConfig } from './config';
 import { createTypeMatchValidator } from './typeMatch';
 
+export { createFormStateProxy, mergeFormContexts } from './formStateProxy';
+
 type AsyncValidatorFn = (rule: any, value: any, callback: Function, source?: any, options?: any) => any;
 
 const isTDesignAdapter = () => getDesignConfig('adapterType') === 'tdesign-vue-next';
@@ -562,54 +564,6 @@ export const sortChange = (data: any[], { prop, order }: SortProp) => {
     data.sort((a: any, b: any) => a[prop] - b[prop]);
   } else if (order === 'descending') {
     data.sort((a: any, b: any) => b[prop] - a[prop]);
-  }
-};
-
-/**
- * 将 extendState 返回的扩展字段合并进 formState。
- *
- * - data 描述符（普通字段）通过 `formState[key] = value` 写入，走 reactive proxy 的 set，
- *   触发依赖通知；
- * - accessor 描述符（`{ get stage() { return ... } }`）按原样 defineProperty，调用方
- *   可控制读时求值；强制 `configurable: true` 以便下一次合并可再 define。
- *
- * 注意：extendState 只能向 formState「新增」字段，不允许覆盖其已有 key。
- * 调用方可通过 `reservedKeys` 传入合并前已存在的内置 key 快照（keyProp / popperClass /
- * config / initValues / isCompare / lastValues / parentValues / values / $emit / fields /
- * post 等），命中这些 key 时统一跳过并告警。
- *
- * 兜底：未传 `reservedKeys` 时，仍会拦截 props 派生的只读 getter 字段（无 setter），
- * 否则以普通字段形式赋值会让 proxy 的 set trap 抛出
- * `TypeError: 'set' on proxy: trap returned falsish`。
- */
-export const applyExtendState = (
-  formState: FormState,
-  state: Record<string, any> | null | undefined,
-  reservedKeys?: Set<string | symbol>,
-): void => {
-  if (!state) return;
-
-  for (const [key, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(state))) {
-    if (reservedKeys?.has(key)) {
-      continue;
-    }
-
-    if (!('value' in descriptor)) {
-      descriptor.configurable = true;
-      Object.defineProperty(formState, key, descriptor);
-      continue;
-    }
-
-    const targetDescriptor = Object.getOwnPropertyDescriptor(formState, key);
-    if (targetDescriptor && !('value' in targetDescriptor) && typeof targetDescriptor.set !== 'function') {
-      console.warn(
-        `[MForm] extendState: "${key}" is a read-only field derived from props and cannot be assigned a plain value. ` +
-          'Return it as a getter accessor if you really need to override it.',
-      );
-      continue;
-    }
-
-    (formState as any)[key] = (state as any)[key];
   }
 };
 

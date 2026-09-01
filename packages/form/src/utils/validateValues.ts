@@ -19,10 +19,10 @@
 import { reactive } from 'vue';
 import Schema from 'async-validator';
 
-import type { FormConfig, FormState, FormValue } from '../schema';
+import type { FormConfig, FormContext, FormState, FormValue } from '../schema';
 
 import { applyMountValueEffects, type CollectedField, collectValidatableFields } from './collectFields';
-import { applyExtendState, createFormStateBase, initValue } from './form';
+import { createFormStateBase, createFormStateProxy, initValue } from './form';
 import { formatValidateError } from './validateError';
 
 // #region HeadlessFormStateOptions
@@ -33,6 +33,8 @@ export interface HeadlessFormStateOptions {
   parentValues?: FormValue;
   keyProp?: string;
   popperClass?: string;
+  /** 宿主业务上下文，与 MForm 的同名 prop 语义一致 */
+  context?: FormContext;
 }
 // #endregion HeadlessFormStateOptions
 
@@ -46,6 +48,7 @@ export interface HeadlessFormStateOptions {
  * （该注册表在整个仓库中只写不读，不参与校验）。
  */
 export const createHeadlessFormState = (options: HeadlessFormStateOptions): FormState => {
+  const context = options.context ?? {};
   const state: FormState = {
     keyProp: options.keyProp ?? '__key',
     popperClass: options.popperClass ?? '',
@@ -60,7 +63,7 @@ export const createHeadlessFormState = (options: HeadlessFormStateOptions): Form
     ...createFormStateBase(),
   };
 
-  return reactive(state);
+  return createFormStateProxy(reactive(state), () => context);
 };
 
 /**
@@ -111,8 +114,6 @@ export interface ValidateValuesOptions extends HeadlessFormStateOptions {
    * 校验失败时错误提示前缀是否使用字段的 text 文案。默认 `true`。
    */
   useFieldTextInError?: boolean;
-  /** 扩展 formState，与 MForm 的同名 prop 语义一致（只能新增字段，不能覆盖内置字段） */
-  extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
 }
 // #endregion ValidateValuesOptions
 
@@ -133,7 +134,7 @@ export interface ValidateValuesResult {
  *
  * 流程与渲染式校验一一对应，但不需要 DOM，也不会实例化任何字段组件：
  *
- * 1. 构造 headless `formState` 并合并 `extendState`；
+ * 1. 构造 headless `formState` 并挂上 `context` 读穿；
  * 2. `initValue` 初始化表单值（默认值、嵌套结构、`onInitValue` 等）；
  * 3. `applyMountValueEffects` 执行字段登记的值初始化写入（与渲染式共用同一份登记表）；
  * 4. 遍历 config 树收集所有带规则的字段（等价于渲染出的 FormItem 集合）；
@@ -149,20 +150,9 @@ export interface ValidateValuesResult {
  * ```
  */
 export const validateValues = async (options: ValidateValuesOptions): Promise<ValidateValuesResult> => {
-  const { config, initValues = {}, typeMatchValid, useFieldTextInError = true, extendState } = options;
+  const { config, initValues = {}, typeMatchValid, useFieldTextInError = true } = options;
 
   const formState = createHeadlessFormState(options);
-
-  // formState 的内置 key 快照：extendState 只能新增字段，不能覆盖这些字段，与 Form.vue 语义一致
-  const reservedStateKeys = new Set<string | symbol>(Reflect.ownKeys(formState));
-
-  if (typeof extendState === 'function') {
-    try {
-      applyExtendState(formState, await extendState(formState), reservedStateKeys);
-    } catch (e) {
-      console.error('[MForm] extendState failed:', e);
-    }
-  }
 
   const values = await initValue(formState, { initValues, config });
   formState.values = values;

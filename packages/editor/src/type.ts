@@ -34,7 +34,7 @@ import type {
   MPageFragment,
 } from '@tmagic/core';
 import type { FieldSize } from '@tmagic/design';
-import type { ChangeRecord, FormConfig, FormState, TableColumnConfig, TypeFunction } from '@tmagic/form';
+import type { ChangeRecord, FormConfig, TableColumnConfig, TypeFunction } from '@tmagic/form';
 import type StageCore from '@tmagic/stage';
 import type {
   CanDropIn,
@@ -171,6 +171,15 @@ export interface Services {
   stageOverlayService: StageOverlayService;
 }
 // #endregion Services
+
+declare module '@tmagic/form-schema' {
+  interface FormContext {
+    /** 编辑器服务集合（由 Editor / FormPanel provide） */
+    services?: Services;
+    /** 当前画布 Stage 实例（由 Editor / FormPanel provide） */
+    stage?: any;
+  }
+}
 
 export interface StageOptions {
   runtimeUrl?: string;
@@ -598,18 +607,6 @@ export interface CompareFormBaseProps {
    * 避免 dialog / 面板使用方需要自行处理滚动。可传任意 CSS 长度，例如 `60vh` / `400px` / `100%`。
    */
   height?: string;
-  /**
-   * 用户自定义注入到 MForm.formState 的扩展字段，与 Editor 顶层的 `extendFormState`、
-   * PropsPanel 的 `extend-state` 语义一致。表单 item 的 `display` / `disabled` 等
-   * filterFunction 经常依赖这里注入的字段（如 stage、自定义业务上下文等），
-   * 因此在对比 / 展示场景下也需要透传，避免出现 `formState.xxx is undefined` 的运行时错误。
-   */
-  extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
-  /**
-   * 外部透传的基础 formState（通常来自 PropsPanel 主属性表单）。
-   * 组件会提取其中的扩展字段覆盖到自己的 formState，保证 filterFunction 上下文一致。
-   */
-  baseFormState?: FormState;
   /**
    * 表单内组件的尺寸（透传给 MForm 的 `size`），可选 'large' | 'default' | 'small'。
    * 缺省时使用 MForm 内置默认尺寸。
@@ -1559,17 +1556,6 @@ export interface UseHistoryRevertOptions {
    */
   appContext?: AppContext | null;
   /**
-   * 透传给差异确认弹窗的 `extendState`（即 Editor 的 `extendFormState`），
-   * 使对比表单中依赖业务上下文的 `display` / `disabled` 等 filterFunction 正常工作。
-   */
-  extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
-  /**
-   * 返回 PropsPanel 主属性表单（FormPanel -> MForm）的 formState。
-   * 仅页面历史「查看差异 / 回滚确认」场景会使用该 formState 覆盖 CompareForm 中同名扩展字段，
-   * 以保证两处 filterFunction 读取到一致的运行态上下文。
-   */
-  getPropsPanelFormState?: () => FormState | undefined;
-  /**
    * 内置页面 / 数据源 / 代码块的差异 / 回滚确认弹窗默认宽度（透传给 TMagicDialog 的 `width`），
    * 如 `'1200px'` / `'80%'`。缺省时使用弹窗内置默认宽度（900px）。
    * 业务自有历史（`viewDiff` / `confirmAndRevert`）可在调用时通过各自入参的 `width` 单独覆盖。
@@ -1590,11 +1576,6 @@ export interface CustomDiffFormOptions {
   loadConfig?: CompareFormLoadConfig;
   /** 需要走 self diff 的字段类型（如模块的 mod-cond）。 */
   selfDiffFieldTypes?: string[];
-  /**
-   * 可选：外部提供的 formState（通常来自 PropsPanel 主表单），
-   * 对比弹窗会用它覆盖 CompareForm 中同名扩展字段，避免上下文不一致。
-   */
-  compareFormState?: FormState;
   /**
    * 差异 / 确认回滚弹窗宽度（透传给 HistoryDiffDialog 的 TMagicDialog `width`），
    * 如 `'1200px'` / `'80%'`。缺省时使用弹窗内置默认宽度（900px）。

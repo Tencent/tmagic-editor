@@ -169,9 +169,9 @@ describe('validateValues —— 基础校验', () => {
     expect(error).toContain('数字');
   });
 
-  test('extendState 注入的字段可被 display 函数读到', async () => {
-    const { props } = await (async () => {
-      const config: any = [
+  test('context 注入的字段可被 mForm 读穿', async () => {
+    const { error } = await validateValues({
+      config: [
         {
           type: 'text',
           name: 'a',
@@ -179,42 +179,60 @@ describe('validateValues —— 基础校验', () => {
           rules: required(),
           display: (mForm: any) => mForm?.custom === 'on',
         },
-      ];
-      const { error } = await validateValues({
-        config,
-        initValues: { a: '' },
-        extendState: () => ({ custom: 'on' }),
-      });
-      return { props: error };
-    })();
-
-    expect(props).toBe('A -> 必填');
-  });
-
-  test('extendState 抛错时不影响校验流程', async () => {
-    const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-
-    const { error } = await validateValues({
-      config: [{ type: 'text', name: 'a', text: 'A', rules: required() }] as any,
+      ] as any,
       initValues: { a: '' },
-      extendState: () => {
-        throw new Error('boom');
-      },
+      context: { custom: 'on' },
     });
 
     expect(error).toBe('A -> 必填');
-    expect(spy).toHaveBeenCalled();
-    spy.mockRestore();
   });
 
-  test('extendState 不能覆盖 formState 内置字段', async () => {
+  test('context 不能覆盖 formState 内置字段', async () => {
     const { values } = await validateValues({
       config: [{ type: 'text', name: 'a', text: 'A' }] as any,
       initValues: { a: 'origin' },
-      extendState: () => ({ keyProp: 'hacked', initValues: { a: 'hacked' } }),
+      context: { keyProp: 'hacked', initValues: { a: 'hacked' } } as any,
     });
 
     expect(values).toEqual({ a: 'origin' });
+  });
+
+  test('context 注入的字段可被 display 通过 mForm 读到', async () => {
+    const { error } = await validateValues({
+      config: [
+        {
+          type: 'text',
+          name: 'a',
+          text: 'A',
+          rules: required(),
+          display: (mForm: any) => mForm?.custom === 'on',
+        },
+      ] as any,
+      initValues: { a: '' },
+      context: { custom: 'on' },
+    });
+
+    expect(error).toBe('A -> 必填');
+  });
+
+  test('同一次校验中各回调从 mForm 读到同一份 context', async () => {
+    const seen: any[] = [];
+    const display = (mForm: any) => {
+      seen.push({ username: mForm?.username, env: mForm?.env });
+      return true;
+    };
+
+    await validateValues({
+      config: [
+        { type: 'text', name: 'a', text: 'A', display },
+        { type: 'text', name: 'b', text: 'B', display },
+      ] as any,
+      initValues: { a: '1', b: '2' },
+      context: { username: 'alice', env: 'prod' },
+    });
+
+    expect(seen.length).toBeGreaterThan(1);
+    expect(seen.every((c) => c.username === 'alice' && c.env === 'prod')).toBe(true);
   });
 });
 

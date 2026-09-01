@@ -74,7 +74,7 @@ interface MountedDiffDialog {
  * 弹窗组件动态 import，避免拖累其它消费者。供「确认回滚」与「查看差异」两种交互共用。
  */
 const mountHistoryDiffDialog = async (
-  options: Pick<UseHistoryRevertOptions, 'appContext' | 'extendState'> &
+  options: Pick<UseHistoryRevertOptions, 'appContext'> &
     CustomDiffFormOptions & {
       services?: Services;
       isConfirm?: boolean;
@@ -90,10 +90,8 @@ const mountHistoryDiffDialog = async (
   const app = createApp(historyDiffDialog, {
     services: options.services,
     isConfirm: options.isConfirm,
-    extendState: options.extendState,
     loadConfig: options.loadConfig,
     selfDiffFieldTypes: options.selfDiffFieldTypes,
-    compareFormState: options.compareFormState,
     width: options.width,
     size: options.size ?? options.services?.uiService?.get('propsPanelSize'),
     onClose: options.onClose,
@@ -125,7 +123,7 @@ const mountHistoryDiffDialog = async (
  */
 const confirmRevertWithDiffDialog = async (
   payload: DiffDialogPayload,
-  options: Pick<UseHistoryRevertOptions, 'appContext' | 'extendState'> &
+  options: Pick<UseHistoryRevertOptions, 'appContext'> &
     CustomDiffFormOptions & {
       services?: Services;
     },
@@ -147,7 +145,7 @@ const confirmRevertWithDiffDialog = async (
  */
 const viewHistoryDiffDialog = async (
   payload: DiffDialogPayload,
-  options: Pick<UseHistoryRevertOptions, 'appContext' | 'extendState'> &
+  options: Pick<UseHistoryRevertOptions, 'appContext'> &
     CustomDiffFormOptions & {
       services?: Services;
     },
@@ -194,7 +192,7 @@ const viewHistoryDiffDialog = async (
 export const useHistoryRevert = (options: UseHistoryRevertOptions = {}, services?: Services) => {
   // 自动捕获调用方所在组件的 appContext（在 setup 中调用时），业务方亦可显式覆盖。
   const appContext = options.appContext ?? getCurrentInstance()?.appContext ?? null;
-  const { extendState, getPropsPanelFormState, dialogWidth } = options;
+  const { dialogWidth } = options;
 
   /** 目标数据已被删除、无法回滚时的统一提示。 */
   const showRevertTargetMissing = () => {
@@ -220,7 +218,6 @@ export const useHistoryRevert = (options: UseHistoryRevertOptions = {}, services
     if (payload) {
       return confirmRevertWithDiffDialog(payload, {
         appContext,
-        extendState,
         services,
         ...extra,
         width: extra?.width ?? dialogWidth,
@@ -307,7 +304,7 @@ export const useHistoryRevert = (options: UseHistoryRevertOptions = {}, services
       showRevertTargetMissing();
       return Promise.resolve(null);
     }
-    return runRevert(buildPageDiffPayload(index), { compareFormState: getPropsPanelFormState?.() }).then((result) =>
+    return runRevert(buildPageDiffPayload(index), {}).then((result) =>
       result ? services?.editorService.revertPageStep(index) : null,
     );
   };
@@ -341,22 +338,20 @@ export const useHistoryRevert = (options: UseHistoryRevertOptions = {}, services
     if (payload) {
       return viewHistoryDiffDialog(payload, {
         appContext,
-        extendState,
         services,
         width: dialogWidth,
-        compareFormState: getPropsPanelFormState?.(),
       });
     }
   };
 
   const onDataSourceDiff = (id: string | number, index: number): Promise<void> | void => {
     const payload = buildDataSourceDiffPayload(id, index);
-    if (payload) return viewHistoryDiffDialog(payload, { appContext, extendState, services, width: dialogWidth });
+    if (payload) return viewHistoryDiffDialog(payload, { appContext, services, width: dialogWidth });
   };
 
   const onCodeBlockDiff = (id: string | number, index: number): Promise<void> | void => {
     const payload = buildCodeBlockDiffPayload(id, index);
-    if (payload) return viewHistoryDiffDialog(payload, { appContext, extendState, services, width: dialogWidth });
+    if (payload) return viewHistoryDiffDialog(payload, { appContext, services, width: dialogWidth });
   };
 
   /**
@@ -398,7 +393,6 @@ export const useHistoryRevert = (options: UseHistoryRevertOptions = {}, services
     if (payload)
       return viewHistoryDiffDialog(payload, {
         appContext,
-        extendState,
         services,
         ...extra,
         width: extra?.width ?? dialogWidth,

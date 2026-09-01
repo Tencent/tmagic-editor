@@ -19,7 +19,7 @@
 import type { AppContext } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
-import type { ChangeRecord, FormConfig, FormState } from '../schema';
+import type { ChangeRecord, FormConfig, FormContext } from '../schema';
 
 import { validateValues, type ValidateValuesResult } from './validateValues';
 
@@ -52,7 +52,8 @@ export interface SubmitFormOptions {
    * 默认 `true`，置为 `false` 时直接使用字段 name。
    */
   useFieldTextInError?: boolean;
-  extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
+  /** 宿主业务上下文，与 MForm 的同名 prop 语义一致 */
+  context?: FormContext;
   /** 透传给 Form.submitForm 的参数：是否直接返回原始响应式 values */
   native?: boolean;
   /**
@@ -112,7 +113,8 @@ export interface ValidateFormOptions {
    * 默认 `true`，置为 `false` 时直接使用字段 name。
    */
   useFieldTextInError?: boolean;
-  extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
+  /** 宿主业务上下文，与 MForm 的同名 prop 语义一致 */
+  context?: FormContext;
   /**
    * 父级应用上下文。仅 `dialog: true` 时生效。`@tmagic/form/headless` 不支持弹层。
    */
@@ -156,8 +158,7 @@ export const validateWithoutRender = async (
   fnName: 'submitForm' | 'validateForm',
   options: SubmitFormOptions | ValidateFormOptions,
 ): Promise<ValidateValuesResult> => {
-  const { signal, config, initValues, parentValues, keyProp, typeMatchValid, useFieldTextInError, extendState } =
-    options;
+  const { signal, config, initValues, parentValues, keyProp, typeMatchValid, useFieldTextInError, context } = options;
 
   throwIfAborted(signal, fnName);
 
@@ -169,7 +170,7 @@ export const validateWithoutRender = async (
     popperClass: (options as SubmitFormOptions).popperClass,
     typeMatchValid,
     useFieldTextInError,
-    extendState,
+    context,
   });
 
   throwIfAborted(signal, fnName);

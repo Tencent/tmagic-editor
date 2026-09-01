@@ -79,20 +79,7 @@ describe('validateForm', () => {
     expect(error).toBe('');
   });
 
-  test('支持 extendState 扩展状态', async () => {
-    const extendState = vi.fn(async () => ({ extra: 'value' }));
-
-    await validateForm({
-      config: [{ type: 'text', name: 'text', text: 'text' }],
-      initValues: { text: 'foo' },
-      extendState,
-    });
-
-    expect(extendState).toHaveBeenCalled();
-  });
-
-  test('tab 的 display 函数读取 extendState 注入的值时不会因竞态崩溃', async () => {
-    // 无渲染实现下 extendState 一定先于遍历完成，不存在渲染式实现里的时序竞态
+  test('tab 的 display 函数可读取 context 注入的 services', async () => {
     const error = await validateForm({
       config: [
         {
@@ -111,7 +98,7 @@ describe('validateForm', () => {
         },
       ],
       initValues: { name: 'test' },
-      extendState: () => ({ services: { uiService: { get: () => false } } }),
+      context: { services: { uiService: { get: () => false } } } as any,
     });
 
     expect(error).toBe('');

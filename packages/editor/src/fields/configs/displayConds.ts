@@ -124,7 +124,7 @@ export const createDisplayCondsConfig = (
         copyable: true,
         movable: false,
         flat: true,
-        labelWidth: 80,
+        labelWidth: '80px',
         ...stickyAddButton('新增条件'),
         items: [
           fieldItem,

@@ -17,8 +17,9 @@
  */
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { defineComponent, nextTick, ref } from 'vue';
-import { useScrollLastItemIntoView } from '@form/containers/table-group-list/useScrollLastItemIntoView';
 import { mount } from '@vue/test-utils';
+
+import { useScrollLastItemIntoView } from '@form/containers/table-group-list/useScrollLastItemIntoView';
 
 const settle = async () => {
   for (let i = 0; i < 6; i++) {

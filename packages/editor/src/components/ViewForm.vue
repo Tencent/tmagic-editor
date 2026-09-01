@@ -8,7 +8,7 @@
       :init-values="currentValues"
       :disabled="disabled"
       :label-width="labelWidth"
-      :extend-state="mergedExtendState"
+      :context="formContext"
       :size="size"
     ></MForm>
   </div>
@@ -37,11 +37,10 @@ const props = withDefaults(
     category: 'node',
     labelWidth: '120px',
     disabled: true,
-    // extendState 的默认值由 useCompareForm 内部兜底（props.extendState ?? ...），此处无需重复提供
   },
 );
 
-const { config, currentValues, wrapperStyle, mergedExtendState, loadConfig, formRef } = useCompareForm(props);
+const { config, currentValues, wrapperStyle, formContext, loadConfig, formRef } = useCompareForm(props);
 
 defineExpose<{
   form: ShallowRef<InstanceType<typeof MForm> | null>;

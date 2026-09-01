@@ -133,7 +133,6 @@ import { computed, inject, markRaw, ref, watch } from 'vue';
 import { Clock, Close } from '@element-plus/icons-vue';
 
 import { getDesignConfig, TMagicButton, tMagicMessage, TMagicPopover, TMagicTabs, TMagicTooltip } from '@tmagic/design';
-import type { FormState } from '@tmagic/form';
 
 import MIcon from '@editor/components/Icon.vue';
 import { useServices } from '@editor/hooks/use-services';
@@ -192,17 +191,6 @@ watch([disabledDataSource, disabledCodeBlock], ([dsDisabled, cbDisabled]) => {
     activeTab.value = 'page';
   }
 });
-
-/**
- * 通过 inject 拿到 Editor 顶层注入的 `extendFormState`，转交给 HistoryDiffDialog
- * 内部的 CompareForm，使差异对比表单的 filterFunction 能拿到完整的业务上下文。
- * 未提供时为 undefined，CompareForm/MForm 会跳过 extendState 处理。
- */
-const extendFormState = inject<((_state: FormState) => Record<string, any> | Promise<Record<string, any>>) | undefined>(
-  'extendFormState',
-  undefined,
-);
-const getPropsPanelFormState = inject<(() => FormState | undefined) | undefined>('getPropsPanelFormState', undefined);
 
 const {
   expanded,
@@ -316,7 +304,7 @@ const onCodeBlockGotoInitial = (id: string | number) => {
  * 业务方亦可直接 import useHistoryRevert(options, services) 调用，无需自行挂载任何弹窗。
  */
 const { onPageRevert, onDataSourceRevert, onCodeBlockRevert, onPageDiff, onDataSourceDiff, onCodeBlockDiff } =
-  useHistoryRevert({ extendState: extendFormState, getPropsPanelFormState }, services);
+  useHistoryRevert({}, services);
 
 /**
  * 把内存中（已清空对应类别后的）历史状态重新写回 IndexedDB，

@@ -101,7 +101,6 @@
     <template #props-panel>
       <slot name="props-panel">
         <PropsPanel
-          :extend-state="extendFormState"
           :disabled-show-src="disabledShowSrc"
           @mounted="propsPanelMountedHandler"
           @unmounted="propsPanelUnmountedHandler"
@@ -136,11 +135,13 @@
 <script lang="ts" setup>
 import { EventEmitter } from 'events';
 
-import { computed, provide, ref } from 'vue';
+import { computed, provide } from 'vue';
 
 import type { MApp } from '@tmagic/core';
 import { M_THEME_KEY } from '@tmagic/design';
+import { FORM_CONTEXT_KEY } from '@tmagic/form';
 
+import { useEditorFormContext } from './hooks/use-form-context';
 import Framework from './layouts/Framework.vue';
 import TMagicNavMenu from './layouts/NavMenu.vue';
 import FormPanel from './layouts/props-panel/FormPanel.vue';
@@ -230,8 +231,6 @@ const stageOptions: StageOptions = {
 
 stageOverlayService.set('stageOptions', stageOptions);
 
-const propsPanelRef = ref<InstanceType<typeof FormPanel> | null>(null);
-
 provide('services', services);
 
 provide('codeOptions', props.codeOptions);
@@ -239,11 +238,16 @@ provide('stageOptions', stageOptions);
 /** 是否启用「属性配置表单校验」联动能力，供 PropsPanel / FormPanel 判断校验失败时是否仍更新节点并记录错误 */
 provide(ENABLE_PROPS_FORM_VALIDATE, props.enablePropsFormValidate ?? false);
 /**
- * 把顶层 `extendFormState` 提供给非 PropsPanel 链路上的组件使用（例如历史差异对话框 HistoryDiffDialog
- * 内部的 CompareForm）。这样所有依赖业务上下文的表单 filterFunction 都能拿到一致的扩展状态，
- * 与 PropsPanel 通过 `:extend-state` 显式传入的方式保持等价。
+ * 编辑器注入给整棵表单树的业务上下文（`services` / `stage`），属性面板、对比表单、
+ * 侧边栏里的嵌套 MForm 都通过 inject 自动继承。
+ *
+ * 业务方要追加自己的字段，在 `<MEditor>` 外层再 `provide(FORM_CONTEXT_KEY, computed(...))`
+ * 即可，配置回调统一通过 `mForm.xxx` 读取。
  */
-provide('extendFormState', props.extendFormState);
+provide(
+  FORM_CONTEXT_KEY,
+  useEditorFormContext(() => services),
+);
 
 // 用 computed 包一层再 provide，否则传下去的是 provide 那一刻的值快照，
 // props.isLargeStageContainer 后续变化不会同步到子孙（如 @tmagic/design/ColorPicker）。
@@ -253,12 +257,6 @@ provide(
   'isLargeStageContainer',
   computed(() => props.isLargeStageContainer),
 );
-/**
- * 提供 PropsPanel 主属性表单的 formState getter，供历史差异弹窗复用，
- * 让 CompareForm 与 PropsPanel 的 filterFunction 上下文保持一致。
- */
-provide('getPropsPanelFormState', () => propsPanelRef.value?.configForm?.formState);
-
 /**
  * 把历史记录面板的自定义扩展 tab 提供给深层的 HistoryListPanel（它挂在 NavMenu 中，
  * 以 markRaw component 形式渲染，无法直接通过 props 透传）。业务方可借此在历史记录
@@ -279,11 +277,9 @@ provide(
 );
 
 const propsPanelMountedHandler = (e: InstanceType<typeof FormPanel>) => {
-  propsPanelRef.value = e;
   emit('props-panel-mounted', e);
 };
 const propsPanelUnmountedHandler = () => {
-  propsPanelRef.value = null;
   emit('props-panel-unmounted');
 };
 

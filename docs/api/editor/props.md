@@ -1558,52 +1558,71 @@ const onLayerNodeDblclick = (event, data) => {
 - 返回 `false` 时，会同时阻断默认的"展开/收起"行为以及向上抛出的 [`layer-node-dblclick`](./events.md#layer-node-dblclick) 事件；返回其他值则继续触发默认行为并抛出事件。
 :::
 
-## extendFormState
+## 表单业务上下文
 
 - **详情：**
-  
-  扩展表单状态
 
-  用于在属性表单中注入自定义的状态数据，这些数据可以在表单配置的各个字段为函数时的第一个参数中获取
+  编辑器会把 `services` 与当前 `stage` 通过 `FORM_CONTEXT_KEY` provide 下去，编辑器内所有 `MForm`（属性面板、历史差异对比表单、侧边栏、以及 Link / FormBox 里的嵌套子表单）都自动继承。
 
-- **默认值：** `undefined`
-
-- **类型：** `(state: FormState) => Record<string, any> | Promise<Record<string, any>>`
-
-- **示例：**
+  业务方要往里追加自己的字段，在 `<m-editor>` 外层再 provide 一层即可，同名字段覆盖内置的：
 
 ```html
 <template>
-  <m-editor :extend-form-state="extendFormState"></m-editor>
+  <m-editor></m-editor>
 </template>
 
 <script setup>
-const extendFormState = async (state) => {
-  // 返回自定义的状态数据
-  return {
-    // 可以是同步数据
-    currentUser: {
-      name: 'Admin',
-      role: 'admin',
-    },
-    // 也可以是异步获取的数据
-    projectConfig: await fetchProjectConfig(),
-  };
-};
+import { computed, provide } from 'vue';
+import { FORM_CONTEXT_KEY } from '@tmagic/form';
+
+provide(
+  FORM_CONTEXT_KEY,
+  computed(() => ({
+    currentUser: store.currentUser,
+    env: store.env,
+  })),
+);
 </script>
 ```
 
-:::tip
-扩展的状态可以在表单配置中通过 `state` 访问，例如：
+  补类型用模块增强：
+
+```ts
+declare module '@tmagic/form-schema' {
+  interface FormContext {
+    currentUser?: { name: string; role: string };
+  }
+}
+```
+
+  表单配置里统一从第一个参数 `mForm` 读：formState 是读穿 Proxy，`mForm` 上没有的字段自动落到 context，所以回调签名不变，后端下发的存量配置无需改动。
 
 ```js
 {
   name: 'title',
   text: '标题',
-  // 根据扩展的状态动态设置
-  disabled: (state) => state.currentUser.role !== 'admin',
+  disabled: (mForm) => mForm.currentUser?.role !== 'admin',
+  display: (mForm) => mForm.env === 'prod',
 }
 ```
+
+::: warning 从 extendFormState 迁移
+`extendFormState` prop 已移除，同时移除的还有 `PropsPanel` / `FormPanel` / `HistoryDiffDialog` / `CompareForm` / `ViewForm` 的 `extendState`、`CompareForm` 的 `baseFormState`、`useHistoryRevert` 的 `extendState` 与 `getPropsPanelFormState`。
+
+改法是把「返回数据的函数」换成「数据本身」：
+
+```ts
+// before
+const extendFormState = (state) => ({ env: store.env });
+// <m-editor :extend-form-state="extendFormState" />
+
+// after
+provide(FORM_CONTEXT_KEY, computed(() => ({ env: store.env })));
+```
+
+原先返回 Promise 的写法，改由宿主自己决定挂载时机（`v-if="ready"`），或先 provide 一个空 context、数据到位后更新——后者不保证 `defaultValue` / `onInitValue` 首轮能读到。
+
+配置里的 `mForm.xxx` 读法不受影响，读穿 Proxy 保留。
 :::
 
 ## historyListExtraTabs

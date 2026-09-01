@@ -16,9 +16,8 @@
  * limitations under the License.
  */
 
-import { type AppContext, type Component, createApp, defineComponent, h, nextTick, type Ref, ref, watch } from 'vue';
+import { type AppContext, type Component, createApp, defineComponent, h, nextTick, type Ref, ref } from 'vue';
 
-import { applyExtendState } from './utils/form';
 import {
   submitForm as submitFormHeadless,
   type SubmitFormOptions,
@@ -119,50 +118,7 @@ const mountFormInstance = <T>(options: MountFormInstanceOptions<T>): Promise<T> 
     try {
       const formRef = ref<any>(null);
 
-      // 将 extendState 从 formProps 中剥离：不由 Form.vue 的 async watchEffect 异步应用，
-      // 而是在 wrapper 中通过 sync watch 在 formRef 就绪后直接写入 formState，
-      // 避免 display 等 filterFunction 在首次渲染时读到 undefined。
-      // 与 CompareForm / FormPanel 中「formRef.value.formState.services = ...」的做法一致。
-      const { extendState, ...restFormProps } = formProps;
-
-      const userWrapper = createWrapper({ formRef, formProps: restFormProps, cleanup, resolve, reject });
-
-      const wrapperComponent =
-        typeof extendState === 'function'
-          ? defineComponent({
-              name: 'MFormExtendStateInjector',
-              setup() {
-                watch(
-                  () => formRef.value,
-                  (form) => {
-                    if (!form) return;
-                    let result: any;
-                    try {
-                      result = extendState(form.formState);
-                    } catch (e) {
-                      console.error('[MForm] extendState failed:', e);
-                      return;
-                    }
-                    // formState 的内置 key 快照：在 extendState 合并前捕获，
-                    // 供 applyExtendState 禁止 extendState 覆盖这些已有字段（只能新增），
-                    // 与 Form.vue 中 reservedStateKeys 的语义保持一致。
-                    const reservedStateKeys = new Set<string | symbol>(Reflect.ownKeys(form.formState));
-                    // 合并逻辑收口在 applyExtendState：props 派生的只读 getter 字段
-                    // （keyProp 等）以普通字段形式返回时会被跳过并告警，避免 proxy set 抛错
-                    const apply = (state: Record<string, any> | null | undefined) =>
-                      applyExtendState(form.formState, state, reservedStateKeys);
-                    if (result && typeof result.then === 'function') {
-                      result.then(apply, (e: any) => console.error('[MForm] extendState failed:', e));
-                    } else {
-                      apply(result);
-                    }
-                  },
-                  { flush: 'sync', immediate: true },
-                );
-                return () => h(userWrapper);
-              },
-            })
-          : userWrapper;
+      const wrapperComponent = createWrapper({ formRef, formProps, cleanup, resolve, reject });
 
       const app = createApp(wrapperComponent);
       instance.app = app;

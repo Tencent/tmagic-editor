@@ -131,7 +131,7 @@ function submitForm(options: SubmitFormOptions): Promise<any>;
 | `popperClass`          | `string`                                                | —          | 弹层 className                                                                                        |
 | `preventSubmitDefault` | `boolean`                                               | —          | 是否阻止表单原生 submit                                                                               |
 | `useFieldTextInError`  | `boolean`                                               | `true`     | 校验失败时错误提示前缀是否使用字段的 `text` 文案；`false` 时直接使用字段 `name`                        |
-| `extendState`          | `(state: FormState) => Record<string, any> \| Promise<Record<string, any>>` | — | 扩展 `formState`                                                              |
+| `context`              | `FormContext`                                           | —          | 宿主业务上下文，与 MForm 的 `context` 语义一致；配置回调通过 `mForm.xxx` 读穿取用                    |
 | `native`               | `boolean`                                               | `false`    | 透传给 `Form.submitForm`。`true` 时返回内部响应式 `values`，否则返回 `cloneDeep(toRaw(values))`        |
 | `returnChangeRecords`  | `boolean`                                               | `false`    | `true` 时 resolve 结果为 `{ values, changeRecords }`，携带表单变更记录；否则仅 resolve `values`        |
 | `appContext`           | `AppContext \| null`                                    | `null`     | 父级 Vue 应用上下文。仅 `dialog: true` 时生效，用于继承全局组件、指令、provide 等，常通过 `app._context` 或 `getCurrentInstance()?.appContext` 获取 |

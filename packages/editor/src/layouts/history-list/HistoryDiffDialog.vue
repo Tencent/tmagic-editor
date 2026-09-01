@@ -43,8 +43,6 @@
         :data-source-type="payload.dataSourceType"
         :value="rightValue"
         :last-value="leftValue"
-        :base-form-state="compareFormState"
-        :extend-state="extendState"
         :load-config="loadConfig"
         :self-diff-field-types="selfDiffFieldTypes"
         :services="props.services"
@@ -86,7 +84,6 @@ import {
   TMagicRadioGroup,
   TMagicTag,
 } from '@tmagic/design';
-import type { FormState } from '@tmagic/form';
 
 import CompareForm from '@editor/components/CompareForm.vue';
 import CodeEditor from '@editor/layouts/CodeEditor.vue';
@@ -101,12 +98,6 @@ const props = withDefaults(
     /** 编辑器服务集合，由调用方传入（不再通过 inject('services') 获取）。 */
     services?: Services;
     /**
-     * 来自 Editor 顶层的 `extendFormState`，用于扩展 MForm.formState。
-     * 透传给 CompareForm，从而让差异对比时表单 item 中依赖业务上下文的
-     * `display` / `disabled` 等 filterFunction 正常工作。
-     */
-    extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
-    /**
      * 自定义 FormConfig 加载逻辑，透传给 CompareForm。传入后将接管内置的按 `category`
      * 取配置逻辑，可通过 `ctx.defaultLoadConfig()` 复用默认结果再做二次加工。
      */
@@ -117,7 +108,6 @@ const props = withDefaults(
     isConfirm?: boolean;
     onConfirm?: () => void;
     selfDiffFieldTypes?: string[];
-    compareFormState?: FormState;
   }>(),
   {
     width: '900px',

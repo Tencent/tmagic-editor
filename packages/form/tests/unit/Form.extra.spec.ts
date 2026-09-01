@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import { nextTick, ref } from 'vue';
+import { computed, defineComponent, h, nextTick, provide, ref } from 'vue';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
 
-import MagicForm, { MForm } from '@form/index';
+import MagicForm, { FORM_CONTEXT_KEY, MForm } from '@form/index';
 
 const mountForm = (props: Record<string, any> = {}, options: Record<string, any> = {}) =>
   mount(MForm, {
@@ -143,141 +143,168 @@ describe('Form.vue —— formState getter 行为', () => {
   });
 });
 
-describe('Form.vue —— extendState', () => {
-  test('extendState 抛错时被 catch，不影响表单渲染', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
-    const extendState = vi.fn(async () => {
-      throw new Error('boom');
-    });
-
+describe('Form.vue —— context', () => {
+  test('context 字段可通过 formState 读穿，核心字段不被覆盖', async () => {
     const wrapper = mountForm({
-      extendState,
-      config: [{ text: 'text', name: 'text', type: 'text' }],
+      keyProp: 'id',
+      context: { username: 'alice', keyProp: 'hacked' },
     });
 
     await nextTick();
-    await nextTick();
 
-    expect(extendState).toHaveBeenCalled();
-    expect(errorSpy).toHaveBeenCalled();
-    expect(wrapper.find('.m-form').exists()).toBe(true);
-
-    errorSpy.mockRestore();
+    expect((wrapper.vm.formState as any).username).toBe('alice');
+    expect((wrapper.vm.formState as any).keyProp).toBe('id');
   });
 
-  test('extendState 返回的普通字段被合并到 formState', async () => {
-    const wrapper = mountForm({
-      extendState: async () => ({ extra: 'hello', count: 42 }),
-    });
-
-    await nextTick();
-    await nextTick();
-    await nextTick();
-
-    expect((wrapper.vm.formState as any).extra).toBe('hello');
-    expect((wrapper.vm.formState as any).count).toBe(42);
-  });
-
-  test('extendState 返回的 accessor 描述符按原样定义并支持读时求值', async () => {
+  test('context 里的 accessor 保持读时求值', async () => {
     let counter = 0;
-
     const wrapper = mountForm({
-      extendState: () =>
-        Object.defineProperties(
-          {},
-          {
-            stage: {
-              enumerable: true,
-              get() {
-                counter += 1;
-                return `stage-${counter}`;
-              },
+      context: Object.defineProperties(
+        {},
+        {
+          stage: {
+            enumerable: true,
+            get() {
+              counter += 1;
+              return `stage-${counter}`;
             },
           },
-        ),
+        },
+      ),
     });
 
     await nextTick();
-    await nextTick();
-    await nextTick();
 
-    const v1 = (wrapper.vm.formState as any).stage;
-    const v2 = (wrapper.vm.formState as any).stage;
-
-    expect(v1).not.toEqual(v2);
-    expect(v1).toMatch(/^stage-/);
-    expect(v2).toMatch(/^stage-/);
+    // 每次读都重新求值，而不是挂载时快照一次
+    const first = (wrapper.vm.formState as any).stage;
+    const second = (wrapper.vm.formState as any).stage;
+    expect(first).toMatch(/^stage-\d+$/);
+    expect(second).not.toBe(first);
   });
 
-  test('extendState 以普通字段返回内置保留字段时静默跳过，其余字段正常合并', async () => {
-    const wrapper = mountForm({
-      keyProp: 'id',
-      extendState: () => ({ keyProp: 'custom', config: [], extra: 'ok' }),
-    });
+  test('Object.entries(formState) 能枚举到 context 字段', async () => {
+    const wrapper = mountForm({ context: { username: 'alice', env: 'prod' } });
 
     await nextTick();
-    await nextTick();
-    await nextTick();
 
-    // 内置保留字段（keyProp / config）未被 extendState 覆盖
-    expect((wrapper.vm.formState as any).keyProp).toBe('id');
-    expect(Array.isArray((wrapper.vm.formState as any).config)).toBe(true);
-    // 非保留字段正常合并
-    expect((wrapper.vm.formState as any).extra).toBe('ok');
-    expect(wrapper.find('.m-form').exists()).toBe(true);
+    const keys = Object.keys(wrapper.vm.formState as any);
+    expect(keys).toContain('username');
+    expect(keys).toContain('env');
+    expect(keys).toContain('values');
   });
 
-  test('extendState 以 get 访问器返回内置保留字段同名 key 时仍被拦截，无法覆盖', async () => {
-    const wrapper = mountForm({
-      keyProp: 'id',
-      extendState: () =>
-        Object.defineProperties(
-          {},
-          {
-            keyProp: { enumerable: true, get: () => 'custom-key' },
-          },
-        ),
-    });
+  test('context 变化后 formState 读到新值，且不残留旧 key', async () => {
+    const context = ref<Record<string, any>>({ username: 'alice', stale: 1 });
+    const wrapper = mountForm({ context: context.value });
 
-    await nextTick();
-    await nextTick();
-    await nextTick();
-
-    // keyProp 属于内置保留字段，即使以访问器形式返回也不允许覆盖
-    expect((wrapper.vm.formState as any).keyProp).toBe('id');
-  });
-
-  test('extendState 同步段读到的响应式数据变化时会重跑', async () => {
-    const username = ref('alice');
-    const calls: string[] = [];
-
-    const wrapper = mountForm({
-      // 同步读取 ref，会被 watchEffect 跟踪
-      extendState: (_state: any) => {
-        calls.push(username.value);
-        return { username: username.value };
-      },
-    });
-
-    await nextTick();
     await nextTick();
     expect((wrapper.vm.formState as any).username).toBe('alice');
 
-    username.value = 'bob';
-    await nextTick();
-    await nextTick();
+    await wrapper.setProps({ context: { username: 'bob' } });
     await nextTick();
 
     expect((wrapper.vm.formState as any).username).toBe('bob');
-    // 至少跑了两次（初始 + 响应变化）
-    expect(calls.length).toBeGreaterThanOrEqual(2);
+    expect((wrapper.vm.formState as any).stale).toBeUndefined();
   });
 
-  test('未传 extendState 时 watchEffect 早退，不抛错', async () => {
+  test('defaultValue 首轮就能读到 context 注入的字段', async () => {
+    const seen: any[] = [];
+    const wrapper = mountForm({
+      context: { username: 'alice' },
+      config: [
+        {
+          text: 'u',
+          name: 'u',
+          type: 'text',
+          defaultValue: (mForm: any) => {
+            seen.push(mForm?.username);
+            return mForm?.username;
+          },
+        },
+      ],
+    });
+
+    await nextTick();
+    await nextTick();
+    await nextTick();
+
+    expect(seen[0]).toBe('alice');
+    expect(wrapper.vm.values.u).toBe('alice');
+  });
+
+  test('formState 直写扩展字段优先于 context', async () => {
+    const wrapper = mountForm({
+      context: { stage: 'from-context' },
+    });
+
+    await nextTick();
+    (wrapper.vm.formState as any).stage = 'assigned';
+    await nextTick();
+
+    expect((wrapper.vm.formState as any).stage).toBe('assigned');
+  });
+
+  test('嵌套 MForm 通过 FORM_CONTEXT_KEY 继承祖先 context', async () => {
+    const parentComponent = defineComponent({
+      setup() {
+        provide(
+          FORM_CONTEXT_KEY,
+          computed(() => ({ username: 'ancestor', env: 'prod' })),
+        );
+        return () => h(MForm, { initValues: {}, config: [] });
+      },
+    });
+
+    const wrapper = mount(parentComponent, {
+      global: {
+        plugins: [ElementPlus as any, MagicForm as any],
+      },
+    });
+    await nextTick();
+    await nextTick();
+
+    const formState = wrapper.findComponent(MForm).vm.formState as any;
+    expect(formState.username).toBe('ancestor');
+    expect(formState.env).toBe('prod');
+    expect(Object.keys(formState)).toEqual(expect.arrayContaining(['username', 'env', 'values']));
+    expect(Object.getOwnPropertyDescriptor(formState, 'username')?.enumerable).toBe(true);
+  });
+
+  test('子表单 props.context 覆盖祖先同名字段，未覆盖的仍可读', async () => {
+    const parentComponent = defineComponent({
+      setup() {
+        provide(
+          FORM_CONTEXT_KEY,
+          computed(() => ({ username: 'ancestor', env: 'prod' })),
+        );
+        return () =>
+          h(MForm, {
+            initValues: {},
+            config: [],
+            context: { username: 'child' },
+          });
+      },
+    });
+
+    const wrapper = mount(parentComponent, {
+      global: {
+        plugins: [ElementPlus as any, MagicForm as any],
+      },
+    });
+    await nextTick();
+    await nextTick();
+
+    const formState = wrapper.findComponent(MForm).vm.formState as any;
+    expect(formState.username).toBe('child');
+    expect(formState.env).toBe('prod');
+  });
+
+  test('未传 context 也未有祖先注入时，读扩展字段为 undefined 且不抛错', async () => {
     const wrapper = mountForm({});
     await nextTick();
+
     expect(wrapper.find('.m-form').exists()).toBe(true);
+    expect((wrapper.vm.formState as any).whatever).toBeUndefined();
   });
 });
 

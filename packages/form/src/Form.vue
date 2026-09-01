@@ -37,19 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  computed,
-  inject,
-  nextTick,
-  provide,
-  reactive,
-  ref,
-  shallowRef,
-  toRaw,
-  useTemplateRef,
-  watch,
-  watchEffect,
-} from 'vue';
+import { computed, inject, nextTick, provide, reactive, ref, shallowRef, toRaw, useTemplateRef, watch } from 'vue';
 import { cloneDeep, isEqualWith } from 'lodash-es';
 
 import { M_THEME_KEY, TMagicForm, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
@@ -57,10 +45,18 @@ import { setValueByKeyPath } from '@tmagic/utils';
 
 import Container from './containers/Container.vue';
 import { applyMountValueEffects } from './utils/collectFields';
-import { applyExtendState, createFormStateBase, initValue } from './utils/form';
+import { createFormStateBase, createFormStateProxy, initValue, mergeFormContexts } from './utils/form';
 import { formatValidateError as formatError, getTextByName as findTextByName } from './utils/validateError';
-import type { ChangeRecord, ContainerChangeEventData, FormConfig, FormSlots, FormState, FormValue } from './schema';
-import { FORM_DIFF_CONFIG_KEY, FORM_TYPE_MATCH_VALID_KEY } from './schema';
+import type {
+  ChangeRecord,
+  ContainerChangeEventData,
+  FormConfig,
+  FormContext,
+  FormSlots,
+  FormState,
+  FormValue,
+} from './schema';
+import { FORM_CONTEXT_KEY, FORM_DIFF_CONFIG_KEY, FORM_TYPE_MATCH_VALID_KEY } from './schema';
 
 defineOptions({
   name: 'MForm',
@@ -105,7 +101,12 @@ const props = withDefaults(
      * - `false`：跳过查找，直接使用字段 name 作为错误提示前缀（形如 `字段name -> 错误信息`）。
      */
     useFieldTextInError?: boolean;
-    extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
+    /**
+     * 宿主业务上下文。也可由祖先 `provide(FORM_CONTEXT_KEY)` 下发，本 prop 覆盖祖先的同名字段。
+     *
+     * 配置回调通过 `mForm.xxx` 读取，由 formState 的读穿 Proxy 落到这里。
+     */
+    context?: FormContext;
     /**
      * 自定义"是否展示对比内容"的判断函数（仅在 `isCompare === true` 时生效）。
      *
@@ -204,18 +205,14 @@ const themeClass = computed(() => (effectiveTheme.value ? `m-theme--${effectiveT
  * 2. `values` / `lastValuesProcessed` 是 ref，Vue 的 `reactive` 会自动解包，因此每次
  *    访问 `formState.values` / `formState.lastValuesProcessed` 也都是当前 ref 值。
  *
- * 3. `extendState` 注入的字段在下方的 `watchEffect` 中合并到 `formState`：
- *    - data 描述符（普通字段）通过 `formState[key] = value` 写入，走 reactive proxy 的
- *      set，触发依赖通知；`extendState` 同步段读到的响应式数据变化时会自动重跑，
- *      把最新值刷进 formState。
- *    - accessor 描述符（`{ get stage() { return ... } }`）按原样写入，调用方可以控制
- *      读时求值，每次读取都会重新执行 getter。
+ * 3. 宿主业务上下文不再 merge 进 coreState，而是单独放在 `contextRef` 上，由读穿
+ *    Proxy 在 miss 时落到 context。核心字段结构性优先，`mForm.xxx` 永久兼容旧读法。
  *
  * 4. `popperClass` 会自动拼接 `themeClass`：调用方传入的 `popperClass` + 当前主题
  *    修饰类（含祖先 `<MEditor>` provide 的主题）。这样所有透传到 Element Plus 弹层
  *    `popper-class` 的字段（Select / DateTime / Cascader 等）能自带主题作用域。
  */
-const formState: FormState = reactive<FormState>({
+const coreState: FormState = reactive<FormState>({
   get keyProp() {
     return props.keyProp;
   },
@@ -247,60 +244,18 @@ const formState: FormState = reactive<FormState>({
   ...createFormStateBase({ $message: tMagicMessage, $messageBox: tMagicMessageBox }),
 });
 
-/**
- * formState 的内置 key 快照（keyProp / values / $emit / fields / post 等）。
- *
- * 在 `extendState` 首次合并前捕获，`applyExtendState` 会据此禁止 `extendState`
- * 覆盖这些已有字段（只能新增字段），避免表单核心状态被外部意外改写。
- *
- * 之所以在此处（effect 之外）捕获而不是在 `applyExtendState` 内动态取：
- * `watchEffect` 会在依赖变化时重跑，若动态取，`extendState` 自己新增的字段在第二次
- * 合并时也会被当成「已有 key」而拒绝刷新；这里只锁定内置字段即可规避该问题。
- */
-const reservedStateKeys = new Set<string | symbol>(Reflect.ownKeys(formState));
+const ancestorContext = inject(FORM_CONTEXT_KEY, undefined);
 
 /**
- * `extendState` 的同步段（直到第一个 `await` 之前）所访问的任何响应式数据，
- * 都会被 `watchEffect` 自动跟踪。这样可以兼容历史用法 ——
- *
- *   extendState: (formState) => ({
- *     username: store.username,   // 同步读 store，会被跟踪
- *     env: store.env,
- *   })
- *
- * 当 `store.username` 变化时，整个 effect 重跑，新值会被刷进 `formState`。
- *
- * prop 派生字段（initValues / config / ...）已经在上方用 getter 定义，
- * 这里不再重复同步；因此 `props.initValues` 这类高频变化也不会再触发
- * `extendState` 重跑（旧版的性能问题修复点）。
- *
- * 实现细节：合并逻辑统一收口在 `applyExtendState`（utils/form）——
- * data 描述符走 reactive proxy 的 set 触发依赖通知（与旧版「逐项赋值」语义等价），
- * accessor 描述符按原样 defineProperty 支持读时求值；
- * props 派生的只读 getter 字段（keyProp 等）以普通字段形式返回时会被跳过并告警。
+ * 宿主业务上下文：`props.context` 覆盖祖先注入的同名字段。
+ * 嵌套表单（Link / FormBox / FormDialog）通过下面的 provide 自动继承。
  */
-watchEffect(async (onCleanup) => {
-  const { extendState } = props;
-  if (typeof extendState !== 'function') return;
+const contextRef = computed<FormContext>(() => mergeFormContexts(ancestorContext?.value, props.context));
 
-  let stale = false;
-  onCleanup(() => {
-    stale = true;
-  });
-
-  let state: Record<string, any> = {};
-  try {
-    state = (await extendState(formState)) || {};
-  } catch (e) {
-    console.error('[MForm] extendState failed:', e);
-    return;
-  }
-  if (stale) return;
-
-  applyExtendState(formState, state, reservedStateKeys);
-});
+const formState: FormState = createFormStateProxy(coreState, () => contextRef.value);
 
 provide('mForm', formState);
+provide(FORM_CONTEXT_KEY, contextRef);
 
 /**
  * 把生效主题（自身或祖先）再 provide 出去，供 form 子树内含 `Teleport` 的组件
@@ -335,7 +290,7 @@ const isSameConfigShape = (config: unknown, preConfig: unknown) =>
 
 watch(
   [() => props.config, () => props.initValues],
-  ([config], [preConfig]) => {
+  async ([config], [preConfig]) => {
     changeRecords.value = [];
 
     if (!isSameConfigShape(toRaw(config), toRaw(preConfig))) {

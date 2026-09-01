@@ -173,4 +173,47 @@ describe('Link', () => {
     expect(dialog.exists()).toBe(true);
     dialog.vm.$emit('submit');
   });
+
+  // Link 的 FormDialog 不透传 context，靠 FORM_CONTEXT_KEY 的 provide/inject 继承
+  test('子表单自动继承宿主 context，无需层层透传', async () => {
+    const seen: any[] = [];
+    const wrapper = mount(MForm, {
+      global: {
+        plugins: [ElementPlus as any, MagicForm as any],
+      },
+      props: {
+        initValues: { link: {} },
+        context: { env: 'prod' },
+        config: [
+          {
+            type: 'link',
+            text: 'link',
+            name: 'link',
+            href: '',
+            disabled: false,
+            form: [
+              {
+                type: 'text',
+                name: 'inner',
+                text: 'inner',
+                display: (mForm: any) => {
+                  seen.push((mForm as any)?.env);
+                  return true;
+                },
+              },
+            ],
+          },
+        ],
+      },
+    });
+
+    await nextTick();
+    await wrapper.findComponent(ElButton).trigger('click');
+    await nextTick();
+    await nextTick();
+
+    expect(seen.length).toBeGreaterThan(0);
+    // 子表单的 mForm.xxx 读穿到祖先注入的同一份 context
+    expect(seen[0]).toBe('prod');
+  });
 });

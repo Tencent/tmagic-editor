@@ -47,7 +47,7 @@ vi.mock('@editor/utils/code-block', () => ({
 vi.mock('@tmagic/form', () => ({
   MForm: defineComponent({
     name: 'MForm',
-    props: ['config', 'initValues', 'lastValues', 'isCompare', 'disabled', 'labelWidth', 'extendState', 'showDiff'],
+    props: ['config', 'initValues', 'lastValues', 'isCompare', 'disabled', 'labelWidth', 'context', 'showDiff'],
     setup(props, { expose }) {
       capturedShowDiff = props.showDiff as (args: any) => boolean;
       capturedFormProps = props as Record<string, any>;
@@ -91,6 +91,8 @@ describe('CompareForm.vue', () => {
     expect(wrapper.find('.fake-mform').exists()).toBe(true);
     expect(capturedFormProps.initValues).toEqual({ id: 'n1', name: 'new' });
     expect(capturedFormProps.lastValues).toEqual({ id: 'n1', name: 'old' });
+    expect(capturedFormProps.context?.services).toEqual(services);
+    expect(capturedFormProps.context).toHaveProperty('stage');
   });
 
   test('node 类别缺少 type 时不渲染 MForm', async () => {

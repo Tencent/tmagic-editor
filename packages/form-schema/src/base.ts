@@ -33,6 +33,27 @@ export interface OnChangeHandlerData {
 export type FormValue = Record<string | number, any>;
 // #endregion FormValue
 
+// #region FormContext
+/**
+ * 宿主注入到表单的业务上下文。
+ *
+ * 空接口，供业务侧通过 `declare module '@tmagic/form-schema'` 模块增强补字段，例如：
+ *
+ * ```ts
+ * declare module '@tmagic/form-schema' {
+ *   interface FormContext {
+ *     services?: Services;
+ *     stage?: any;
+ *   }
+ * }
+ * ```
+ *
+ * 不加索引签名，否则模块增强会失去类型约束。
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface FormContext {}
+// #endregion FormContext
+
 // #region OnChangeHandler
 export type OnChangeHandler = (mForm: FormState | undefined, value: any, data: OnChangeHandlerData) => any;
 // #endregion OnChangeHandler

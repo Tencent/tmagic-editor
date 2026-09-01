@@ -10,7 +10,7 @@
       :is-compare="true"
       :disabled="true"
       :label-width="labelWidth"
-      :extend-state="mergedExtendState"
+      :context="formContext"
       :show-diff="showDiff"
       :self-diff-field-types="selfDiffFieldTypes"
       :size="size"
@@ -47,7 +47,7 @@ const props = withDefaults(
   },
 );
 
-const { config, currentValues, wrapperStyle, mergedExtendState, loadConfig, formRef, normalizeCodeBlockValue } =
+const { config, currentValues, wrapperStyle, formContext, loadConfig, formRef, normalizeCodeBlockValue } =
   useCompareForm(props);
 
 const lastValuesProcessed = computed<FormValue>(() => {

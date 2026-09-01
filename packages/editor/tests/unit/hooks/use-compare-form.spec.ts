@@ -168,28 +168,6 @@ describe('useCompareForm', () => {
     expect(c2.wrapperStyle.value).toBeUndefined();
   });
 
-  test('mergedExtendState 优先使用 baseFormState 并调用 extendState', () => {
-    const extendState = vi.fn((s: any) => ({ ...s, x: 1 }));
-    const base = { a: 1 } as any;
-    const { captured } = mountHook({
-      category: 'node',
-      type: 'text',
-      value: {},
-      services,
-      extendState,
-      baseFormState: base,
-    });
-    const result = captured.mergedExtendState({ b: 2 });
-    expect(extendState).toHaveBeenCalledWith(base);
-    expect(result).toEqual({ a: 1, x: 1 });
-  });
-
-  test('mergedExtendState 无 extendState 时原样返回 state', () => {
-    const { captured } = mountHook({ category: 'node', type: 'text', value: {}, services });
-    const state = { a: 1 } as any;
-    expect(captured.mergedExtendState(state)).toBe(state);
-  });
-
   test('自定义 loadConfig 可接管配置加载并复用 defaultLoadConfig', async () => {
     const loadConfig = vi.fn(async ({ defaultLoadConfig }: any) => {
       await defaultLoadConfig();
@@ -213,14 +191,14 @@ describe('useCompareForm', () => {
     expect(dataSourceService.getFormConfig).toHaveBeenCalled();
   });
 
-  test('formRef.formState 注入 stage / services', async () => {
+  test('formContext 含 stage / services', async () => {
     const stage = { select: vi.fn() };
     editorService.get.mockReturnValue(stage);
     const { captured } = mountHook({ category: 'node', type: 'text', value: {}, services });
     await nextTick();
     await nextTick();
+    expect(captured.formContext.value.services).toBe(services);
+    expect(captured.formContext.value.stage).toBe(stage);
     expect(editorService.get).toHaveBeenCalledWith('stage');
-    expect(captured.formRef.value.formState.services).toBe(services);
-    expect(captured.formRef.value.formState.stage).toBe(stage);
   });
 });

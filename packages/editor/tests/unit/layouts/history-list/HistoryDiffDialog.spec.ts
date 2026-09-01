@@ -65,7 +65,7 @@ vi.mock('@tmagic/design', () => ({
 vi.mock('@editor/components/CompareForm.vue', () => ({
   default: defineComponent({
     name: 'CompareForm',
-    props: ['category', 'type', 'dataSourceType', 'value', 'lastValue', 'extendState', 'height'],
+    props: ['category', 'type', 'dataSourceType', 'value', 'lastValue', 'height'],
     setup() {
       return () => h('div', { class: 'fake-compare-form' });
     },

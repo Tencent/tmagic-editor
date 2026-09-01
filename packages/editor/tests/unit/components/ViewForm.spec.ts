@@ -38,7 +38,7 @@ vi.mock('@editor/utils/code-block', () => ({
 vi.mock('@tmagic/form', () => ({
   MForm: defineComponent({
     name: 'MForm',
-    props: ['config', 'initValues', 'disabled', 'labelWidth', 'extendState', 'size'],
+    props: ['config', 'initValues', 'disabled', 'labelWidth', 'context', 'size'],
     setup(props, { expose }) {
       capturedFormProps = props as Record<string, any>;
       expose({ formState: {} });
@@ -72,6 +72,8 @@ describe('ViewForm.vue', () => {
     expect(propsService.getPropsConfig).toHaveBeenCalledWith('text', { node: { id: 'n1', name: 'a' } });
     expect(wrapper.find('.fake-mform').exists()).toBe(true);
     expect(capturedFormProps.initValues).toEqual({ id: 'n1', name: 'a' });
+    expect(capturedFormProps.context?.services).toEqual(services);
+    expect(capturedFormProps.context).toHaveProperty('stage');
   });
 
   test('默认 disabled 为 true', async () => {

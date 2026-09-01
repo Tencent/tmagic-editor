@@ -8,7 +8,6 @@
       :config="curFormConfig"
       :values="values"
       :disabledShowSrc="disabledShowSrc"
-      :extendState="extendState"
       @submit="(v, eventData, error) => submit(v, eventData, error, 'props')"
       @submit-error="errorHandler"
       @form-error="errorHandler"
@@ -26,7 +25,6 @@
       :config="styleFormConfig"
       :values="values"
       :disabledShowSrc="disabledShowSrc"
-      :extendState="extendState"
       @submit="(v, eventData, error) => submit(v, eventData, error, 'style')"
       @submit-error="errorHandler"
       @form-error="errorHandler"
@@ -61,7 +59,7 @@ import type { OnDrag } from 'gesto';
 
 import { type MNode } from '@tmagic/core';
 import { TMagicButton } from '@tmagic/design';
-import type { ContainerChangeEventData, FormState, FormValue } from '@tmagic/form';
+import type { ContainerChangeEventData, FormValue } from '@tmagic/form';
 import { setValueByKeyPath } from '@tmagic/utils';
 
 import MIcon from '@editor/components/Icon.vue';
@@ -84,7 +82,6 @@ defineOptions({
 
 defineProps<{
   disabledShowSrc?: boolean;
-  extendState?: (_state: FormState) => Record<string, any> | Promise<Record<string, any>>;
 }>();
 
 const emit = defineEmits<{
