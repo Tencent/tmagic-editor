@@ -31,6 +31,10 @@ export default defineConfig({
         './packages/element-plus-adapter/**',
         './packages/tdesign-vue-next-adapter/**',
       ],
+      reporter: ['text-summary', 'json-summary', 'html'],
+      thresholds: {
+        lines: 85,
+      },
     },
     projects: [
       {
@@ -75,6 +79,16 @@ export default defineConfig({
           pool: 'forks',
           isolate: false,
           sequence: { groupOrder: 2 },
+        },
+      },
+      {
+        test: {
+          name: 'scripts',
+          include: ['./scripts/**/*.spec.ts'],
+          environment: 'node',
+          pool: 'forks',
+          isolate: false,
+          sequence: { groupOrder: 3 },
         },
       },
     ],
