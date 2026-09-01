@@ -322,9 +322,9 @@ CJS 产物是两个各自独立的 bundle，注册表不共享。所以同一进
 ## 类型定义
 
 ::: details 查看 `SubmitFormOptions` 类型定义
-<<< @/../packages/form/src/submitForm.ts#SubmitFormOptions{ts}
+<<< @/../packages/form/src/utils/submitHeadless.ts#SubmitFormOptions{ts}
 :::
 
 ::: details 查看 `SubmitFormResult` 类型定义
-<<< @/../packages/form/src/submitForm.ts#SubmitFormResult{ts}
+<<< @/../packages/form/src/utils/submitHeadless.ts#SubmitFormResult{ts}
 :::

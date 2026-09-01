@@ -225,6 +225,7 @@ export interface StageOptions {
   beforeDblclick?: (event: MouseEvent) => Promise<boolean | void> | boolean | void;
 }
 
+// #region NodeInvalidInfo
 /**
  * 节点校验错误信息，按来源（属性表单 / 样式表单）分别保存错误文案。
  * 属性表单与样式表单是两个独立的 FormPanel，均指向同一节点，故以来源为键，
@@ -237,9 +238,12 @@ export interface NodeInvalidInfo {
   /** 样式表单校验错误文案（可能为包含 <br> 的 HTML） */
   style?: string;
 }
+// #endregion NodeInvalidInfo
 
+// #region NodeInvalidSource
 /** 节点校验错误来源 */
 export type NodeInvalidSource = keyof NodeInvalidInfo;
+// #endregion NodeInvalidSource
 
 export interface StoreState {
   root: MApp | null;
@@ -312,6 +316,7 @@ export interface StageRect {
   height: number | string;
 }
 
+// #region UiState
 export interface UiState {
   /** 当前点击画布是否触发选中，true: 不触发，false: 触发，默认为false */
   uiSelectMode: boolean;
@@ -369,6 +374,7 @@ export interface UiState {
     height: number;
   };
 }
+// #endregion UiState
 
 // #region EditorNodeInfo
 export interface EditorNodeInfo {
