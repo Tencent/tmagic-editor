@@ -6,89 +6,95 @@
           <TMagicIcon><ArrowDown v-if="expand" /><ArrowRight v-else /></TMagicIcon>
         </TMagicButton>
 
-        <span v-html="title"></span>
-        <TMagicTooltip :content="`删除 ${title}`">
+        <div class="m-fields-group-list-item-title">
+          <slot name="title" :model="model" :index="index" :last-values="lastValues" :prop="rowProp" :title="title">
+            <span v-html="title"></span>
+          </slot>
+        </div>
+        <div class="m-fields-group-list-item-actions">
           <TMagicButton
-            v-if="!isCompare"
-            v-show="showDelete"
-            size="default"
-            link
-            class="delete-button"
-            :icon="Delete"
-            :disabled="disabled"
-            @click="removeHandler"
-          ></TMagicButton>
-        </TMagicTooltip>
-
-        <TMagicButton
-          v-if="copyable && !isCompare"
-          link
-          size="default"
-          type="primary"
-          :icon="DocumentCopy"
-          :disabled="disabled"
-          @click="copyHandler"
-          >复制</TMagicButton
-        >
-
-        <template v-if="movable && !isCompare">
-          <TMagicButton
-            v-show="index !== 0"
+            v-if="copyable && !isCompare"
             link
             size="default"
+            type="primary"
+            :icon="DocumentCopy"
             :disabled="disabled"
-            :icon="Top"
-            @click="changeOrder(-1)"
-            >上移</TMagicButton
+            @click="copyHandler"
+            >复制</TMagicButton
           >
-          <TMagicButton
-            v-show="index !== length - 1"
-            link
-            size="default"
-            :disabled="disabled"
-            :icon="Bottom"
-            @click="changeOrder(1)"
-            >下移</TMagicButton
-          >
-        </template>
 
-        <TMagicPopover
-          v-if="config.moveSpecifyLocation && !isCompare"
-          trigger="click"
-          placement="top"
-          width="200"
-          :visible="moveSpecifyLocationVisible"
-        >
-          <template #reference>
+          <template v-if="movable && !isCompare">
             <TMagicButton
+              v-show="index !== 0"
               link
-              size="small"
-              type="primary"
-              :icon="Position"
+              size="default"
               :disabled="disabled"
-              @click="moveSpecifyLocationVisible = true"
-              >移动至</TMagicButton
+              :icon="Top"
+              @click="changeOrder(-1)"
+              >上移</TMagicButton
+            >
+            <TMagicButton
+              v-show="index !== length - 1"
+              link
+              size="default"
+              :disabled="disabled"
+              :icon="Bottom"
+              @click="changeOrder(1)"
+              >下移</TMagicButton
             >
           </template>
-          <div>
-            <div>
-              第<TMagicInputNumber
-                style="margin: 0 5px"
-                v-model="moveSpecifyLocationIndex"
-                size="small"
-                :min="1"
-                :disabled="disabled"
-              ></TMagicInputNumber
-              >行
-            </div>
-            <div style="text-align: right; margin-top: 20px">
-              <TMagicButton size="small" text @click="moveSpecifyLocationVisible = false">取消</TMagicButton>
-              <TMagicButton size="small" type="primary" @click="moveSpecifyLocationHandler">确认</TMagicButton>
-            </div>
-          </div>
-        </TMagicPopover>
 
-        <span v-if="itemExtra" v-html="itemExtra" class="m-form-tip"></span>
+          <TMagicPopover
+            v-if="config.moveSpecifyLocation && !isCompare"
+            trigger="click"
+            placement="top"
+            width="200"
+            :visible="moveSpecifyLocationVisible"
+          >
+            <template #reference>
+              <TMagicButton
+                link
+                size="small"
+                type="primary"
+                :icon="Position"
+                :disabled="disabled"
+                @click="moveSpecifyLocationVisible = true"
+                >移动至</TMagicButton
+              >
+            </template>
+            <div>
+              <div>
+                第<TMagicInputNumber
+                  style="margin: 0 5px"
+                  v-model="moveSpecifyLocationIndex"
+                  size="small"
+                  :min="1"
+                  :disabled="disabled"
+                ></TMagicInputNumber
+                >行
+              </div>
+              <div style="text-align: right; margin-top: 20px">
+                <TMagicButton size="small" text @click="moveSpecifyLocationVisible = false">取消</TMagicButton>
+                <TMagicButton size="small" type="primary" @click="moveSpecifyLocationHandler">确认</TMagicButton>
+              </div>
+            </div>
+          </TMagicPopover>
+
+          <TMagicTooltip :content="`删除 ${title}`">
+            <TMagicButton
+              v-if="!isCompare"
+              v-show="showDelete"
+              size="default"
+              link
+              class="delete-button"
+              :icon="Delete"
+              :disabled="disabled"
+              @click="removeHandler"
+            ></TMagicButton>
+          </TMagicTooltip>
+
+          <span v-if="itemExtra" v-html="itemExtra" class="m-form-tip"></span>
+        </div>
       </div>
     </template>
 

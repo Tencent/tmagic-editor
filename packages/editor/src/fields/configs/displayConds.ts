@@ -20,18 +20,21 @@ import type { DisplayCondsConfig, FormState, GroupListConfig } from '@tmagic/for
 import { removeDataSourceFieldPrefix } from '@tmagic/utils';
 
 import dataSourceService from '@editor/services/dataSource';
-import { getCascaderOptionsFromFields, getFieldType } from '@editor/utils';
+import { getCascaderOptionsFromFields, getFieldType } from '@editor/utils/data-source';
+
+import { stickyAddButton } from './stickyAddButton';
 
 /**
  * `fields/DisplayConds.vue` 内部渲染的条件列表配置。
  *
- * 由组件与无渲染校验的嵌套配置共用：组件用它渲染，嵌套配置用它让父表单校验到这些字段。
+ * 外层是条件组，内层 `cond` 是组内条件（groupList，每个字段单独一行）。
+ * 由组件与无渲染校验的嵌套配置共用。
  *
- * `parentFields` 由调用方求值（组件里来自 `filterFunction(mForm, config.parentFields, props)`）：
- * 有父级字段路径时用 cascader 在该路径下选字段，没有时用 data-source-field-select 从头选。
+ * `parentFields` 由调用方求值：有父级字段路径时用 cascader 在该路径下选字段，
+ * 没有时用 data-source-field-select 从头选。
  */
 export const createDisplayCondsConfig = (
-  config: DisplayCondsConfig,
+  config: Pick<DisplayCondsConfig, 'titlePrefix' | 'flat' | 'defaultValue' | 'rules'>,
   name: string,
   parentFields: string[],
 ): GroupListConfig => {
@@ -57,69 +60,78 @@ export const createDisplayCondsConfig = (
     return v;
   };
 
+  const fieldItem = parentFields.length
+    ? {
+        type: 'cascader',
+        options: () => {
+          const { ds, fieldNames } = resolveFieldPath(parentFields);
+          if (!ds) {
+            return [];
+          }
+
+          let fields = ds.fields || [];
+          fieldNames.forEach((key) => {
+            const field = fields.find((f) => f.name === key);
+            fields = field?.fields || [];
+          });
+
+          return getCascaderOptionsFromFields(fields, ['string', 'number', 'boolean', 'any']);
+        },
+        name: 'field',
+        value: 'key',
+        text: '字段',
+        checkStrictly: false,
+        onChange: fieldOnChange,
+        defaultValue: () => [],
+        rules: [
+          { required: true, trigger: 'blur', message: '请选择字段' },
+          { typeMatch: true, trigger: 'change' },
+        ],
+      }
+    : {
+        type: 'data-source-field-select',
+        name: 'field',
+        value: 'key',
+        text: '字段',
+        checkStrictly: false,
+        dataSourceFieldType: ['string', 'number', 'boolean', 'any'],
+        onChange: fieldOnChange,
+        defaultValue: () => [],
+        rules: [
+          { required: true, trigger: 'blur', message: '请选择字段' },
+          { typeMatch: true, trigger: 'change' },
+        ],
+      };
+
   return {
     type: 'groupList',
     name,
     titlePrefix: config.titlePrefix,
     expandAll: true,
     enableToggleMode: false,
+    defaultAdd: { cond: [] },
+    ...stickyAddButton(`新增${config.titlePrefix || '条件组'}`),
     flat: config.flat,
+    defaultValue: config.defaultValue ?? [],
+    rules: config.rules ?? [{ typeMatch: true }],
     items: [
       {
-        type: 'table',
+        type: 'groupList',
         name: 'cond',
-        operateColWidth: config.operateColWidth,
+        titlePrefix: '条件',
+        expandAll: true,
         enableToggleMode: false,
-        fixed: config.fixed,
-        flat: config.flat,
+        copyable: true,
+        movable: false,
+        flat: true,
+        labelWidth: 80,
+        ...stickyAddButton('新增条件'),
         items: [
-          parentFields.length
-            ? {
-                type: 'cascader',
-                options: () => {
-                  const { ds, fieldNames } = resolveFieldPath(parentFields);
-                  if (!ds) {
-                    return [];
-                  }
-
-                  let fields = ds.fields || [];
-                  fieldNames.forEach((key) => {
-                    const field = fields.find((f) => f.name === key);
-                    fields = field?.fields || [];
-                  });
-
-                  return getCascaderOptionsFromFields(fields, ['string', 'number', 'boolean', 'any']);
-                },
-                name: 'field',
-                value: 'key',
-                label: '字段',
-                checkStrictly: false,
-                onChange: fieldOnChange,
-                defaultValue: () => [],
-                rules: [
-                  { required: true, trigger: 'blur', message: '请选择字段' },
-                  { typeMatch: true, trigger: 'change' },
-                ],
-              }
-            : {
-                type: 'data-source-field-select',
-                name: 'field',
-                value: 'key',
-                label: '字段',
-                checkStrictly: false,
-                dataSourceFieldType: ['string', 'number', 'boolean', 'any'],
-                onChange: fieldOnChange,
-                defaultValue: () => [],
-                rules: [
-                  { required: true, trigger: 'blur', message: '请选择字段' },
-                  { typeMatch: true, trigger: 'change' },
-                ],
-              },
+          fieldItem,
           {
             type: 'cond-op-select',
             parentFields,
-            label: '条件',
-            width: 140,
+            text: '条件',
             name: 'op',
             rules: [
               { required: true, trigger: 'blur', message: '请选择条件' },
@@ -127,49 +139,43 @@ export const createDisplayCondsConfig = (
             ],
           },
           {
-            label: '值',
-            width: 160,
-            items: [
-              {
-                name: 'value',
-                type: (_mForm: FormState | undefined, { model }: any) => {
-                  const { ds, fieldNames } = resolveFieldPath([...parentFields, ...(model.field || [])]);
-                  const type = getFieldType(ds, fieldNames);
+            name: 'value',
+            text: '值',
+            type: (_mForm: FormState | undefined, { model }: any) => {
+              const { ds, fieldNames } = resolveFieldPath([...parentFields, ...(model.field || [])]);
+              const type = getFieldType(ds, fieldNames);
 
-                  if (type === 'number') {
-                    return 'number';
-                  }
+              if (type === 'number') {
+                return 'number';
+              }
 
-                  if (type === 'boolean') {
-                    return 'select';
-                  }
+              if (type === 'boolean') {
+                return 'select';
+              }
 
-                  if (type === 'null') {
-                    return 'display';
-                  }
+              if (type === 'null') {
+                return 'display';
+              }
 
-                  return 'text';
-                },
-                options: [
-                  { text: 'true', value: true },
-                  { text: 'false', value: false },
-                ],
-                display: (_mForm: FormState | undefined, { model }: any) =>
-                  !['between', 'not_between'].includes(model.op),
-                displayText: (_mForm: FormState | undefined, { model }: any) => {
-                  if (model.value === null) {
-                    return 'null';
-                  }
-                  return model.value;
-                },
-              },
-              {
-                name: 'range',
-                type: 'number-range',
-                display: (_mForm: FormState | undefined, { model }: any) =>
-                  ['between', 'not_between'].includes(model.op),
-              },
+              return 'text';
+            },
+            options: [
+              { text: 'true', value: true },
+              { text: 'false', value: false },
             ],
+            display: (_mForm: FormState | undefined, { model }: any) => !['between', 'not_between'].includes(model.op),
+            displayText: (_mForm: FormState | undefined, { model }: any) => {
+              if (model.value === null) {
+                return 'null';
+              }
+              return model.value;
+            },
+          },
+          {
+            name: 'range',
+            text: '值',
+            type: 'number-range',
+            display: (_mForm: FormState | undefined, { model }: any) => ['between', 'not_between'].includes(model.op),
           },
         ],
       },

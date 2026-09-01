@@ -140,6 +140,7 @@ describe('plugin install', () => {
     expect(formOpt.fields['code-select'].component).toEqual({ name: 'CustomCodeSelect' });
     expect(formOpt.fields['code-select'].nested).toEqual(expect.any(Function));
     expect(formOpt.fields['code-select'].typeMatch).toEqual(expect.any(Function));
+    expect(formOpt.fields['event-select'].effect).toEqual(expect.any(Function));
     expect(formOpt.fields['my-field'].component).toEqual({ name: 'MyField' });
     expect(formOpt.fields['ui-select'].component).toBeDefined();
   });

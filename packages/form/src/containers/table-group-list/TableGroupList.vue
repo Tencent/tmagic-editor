@@ -21,13 +21,8 @@
     @addDiffCount="onAddDiffCount"
     @add="onAdd"
   >
-    <template #toggle-button>
-      <TMagicButton
-        v-if="config.enableToggleMode || enableToggleMode"
-        :icon="Grid"
-        size="small"
-        @click="toggleDisplayMode"
-      >
+    <template #toggle-button v-if="config.enableToggleMode || enableToggleMode">
+      <TMagicButton :icon="Grid" size="small" @click="toggleDisplayMode">
         {{ displayMode === 'table' ? '展开配置' : '切换为表格' }}
       </TMagicButton>
     </template>
@@ -36,12 +31,10 @@
       <TMagicButton
         :class="displayMode === 'table' ? 'm-form-table-add-button' : ''"
         :size="addButtonSize"
-        :plain="displayMode === 'table'"
         :icon="Plus"
-        text
         :disabled="disabled"
-        v-bind="currentConfig.addButtonConfig?.props || { type: 'primary' }"
-        @click="newHandler"
+        v-bind="addButtonProps"
+        @click="handleAdd"
       >
         {{
           currentConfig.addButtonConfig?.text ||
@@ -50,6 +43,10 @@
             : `新增${groupListConfig.titlePrefix || ''}`)
         }}
       </TMagicButton>
+    </template>
+
+    <template #title="slotProps" v-if="$slots.title">
+      <slot name="title" v-bind="slotProps"></slot>
     </template>
   </component>
 </template>
@@ -67,6 +64,7 @@ import MFormGroupList from '../GroupList.vue';
 import MFormTable from '../table/Table.vue';
 
 import { useAdd } from './useAdd';
+import { useScrollLastItemIntoView } from './useScrollLastItemIntoView';
 
 defineOptions({
   name: 'MFormTableGroupList',
@@ -107,24 +105,44 @@ const currentConfig = computed<any>(() => (displayMode.value === 'table' ? table
 
 // 保持原 Table/GroupList 模式下新增按钮的不同尺寸策略
 const addButtonSize = computed(() => {
+  if (currentConfig.value.addButtonConfig?.sticky) return 'default';
   if (displayMode.value === 'table') return 'small';
   return props.config.enableToggleMode !== false ? 'small' : 'default';
+});
+
+const addButtonProps = computed(() => {
+  const custom = currentConfig.value.addButtonConfig?.props;
+  if (custom) return { type: 'primary', ...custom };
+  if (displayMode.value === 'table') return { type: 'primary', plain: true };
+  return { type: 'primary', text: true };
 });
 
 const toggleDisplayMode = () => {
   displayMode.value = displayMode.value === 'table' ? 'groupList' : 'table';
 };
 
+const tableGroupListRef = useTemplateRef<InstanceType<typeof MFormTable>>('tableGroupList');
+
+const { scrollLastItemIntoView } = useScrollLastItemIntoView(
+  tableGroupListRef,
+  () => Boolean(currentConfig.value.scrollLastItemIntoView) && displayMode.value === 'groupList',
+);
+
+const handleAdd = async () => {
+  const expectedCount = await newHandler();
+  if (expectedCount !== null) await scrollLastItemIntoView(expectedCount);
+};
+
 const onChange = (v: any, eventData?: ContainerChangeEventData) => emit('change', v, eventData);
 const onSelect = (...args: any[]) => emit('select', ...args);
 const onAddDiffCount = () => emit('addDiffCount');
-const onAdd = (rows: any[]) => {
-  rows.forEach((row: any) => {
-    newHandler(row);
-  });
+const onAdd = async (rows: any[]) => {
+  let expectedCount: number | null = null;
+  for (const row of rows) {
+    expectedCount = (await newHandler(row)) ?? expectedCount;
+  }
+  if (expectedCount !== null) await scrollLastItemIntoView(expectedCount);
 };
-
-const tableGroupListRef = useTemplateRef<InstanceType<typeof MFormTable>>('tableGroupList');
 
 defineExpose({
   toggleRowSelection: (row: any, selected: boolean) => tableGroupListRef.value?.toggleRowSelection?.(row, selected),

@@ -24,6 +24,8 @@ import type { CodeSelectConfig, FormValue, GroupListConfig } from '@tmagic/form/
 import codeBlockService from '@editor/services/codeBlock';
 import dataSourceService from '@editor/services/dataSource';
 
+import { stickyAddButton } from './stickyAddButton';
+
 /**
  * `fields/CodeSelect.vue` 内部渲染的钩子列表配置。
  *
@@ -35,7 +37,11 @@ export const createCodeSelectConfig = (config: CodeSelectConfig): GroupListConfi
     name: 'hookData',
     enableToggleMode: false,
     expandAll: true,
-    addable: () => false,
+    defaultAdd: () => ({
+      codeType: HookCodeType.CODE,
+      codeId: '',
+    }),
+    ...stickyAddButton(`添加${config.text || ''}`),
     title: (_mForm: any, { model, index }: any) => {
       if (model.codeType === HookCodeType.DATA_SOURCE_METHOD) {
         if (Array.isArray(model.codeId)) {
@@ -64,7 +70,6 @@ export const createCodeSelectConfig = (config: CodeSelectConfig): GroupListConfi
         text: '代码类型',
         type: 'select',
         name: 'codeType',
-        labelPosition: 'right',
         rules: [{ typeMatch: true, trigger: 'change' }],
         options: [
           { value: HookCodeType.CODE, text: '代码块' },

@@ -1,4 +1,20 @@
 .m-fields-group-list {
+  // footer 高度由这三项派生，改 padding / 按钮尺寸时嵌套吸底按钮的偏移会跟着走；
+  // TableGroupList 计算 scroll-margin 时量的是同一个 footer 的实际高度，两边不会漂移
+  --m-group-list-footer-padding-top: 12px;
+  --m-group-list-footer-padding-bottom: 16px;
+  --m-group-list-footer-button-height: 32px;
+  --m-group-list-footer-height: calc(
+    var(--m-group-list-footer-padding-top) +
+      var(--m-group-list-footer-button-height) +
+      var(--m-group-list-footer-padding-bottom)
+  );
+  --m-group-list-footer-bg: var(--el-bg-color, #fff);
+  --m-group-list-header-height: 65px;
+  --m-group-list-header-bg: #fff;
+  width: 100%;
+  min-width: 0;
+
   .m-fields-group-list-item.tmagic-design-card--flat:last-child {
     border: 0;
   }
@@ -16,6 +32,7 @@
   }
 
   .m-fields-group-list-item {
+    overflow: visible;
     border-bottom: 1px solid #ebeef5;
     margin-bottom: 7px;
 
@@ -23,17 +40,106 @@
       border-bottom: 0;
     }
 
+    .el-card__body,
+    .t-card__body {
+      overflow: visible;
+
+      > .m-container-row {
+        overflow: visible;
+      }
+
+      .tmagic-design-form-item {
+        margin-bottom: 16px;
+      }
+    }
+
     .m-fields-group-list-item-header {
       display: flex;
       align-items: center;
       gap: 8px;
     }
+
+    .m-fields-group-list-item-title {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .m-fields-group-list-item-actions {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      gap: 8px;
+    }
+
+    // 卡片标题吸顶；补不透明背景，避免滚动时正文透出。
+    // z-index 必须低于吸底 footer，否则标题会盖住「新增」按钮。
+    > .el-card__header,
+    > .t-card__header {
+      position: sticky;
+      top: var(--m-group-list-header-sticky-top, 0px);
+      z-index: 7;
+      background-color: var(--m-group-list-header-bg, #fff);
+    }
   }
 
-  .m-fields-group-list-footer {
+  // 嵌套标题叠在外层标题之下，层级更低以免盖住外层底部分隔线
+  .m-fields-group-list-item .m-fields-group-list-item {
+    > .el-card__header,
+    > .t-card__header {
+      top: calc(
+        var(--m-group-list-header-sticky-top, 0px) +
+          var(--m-group-list-header-height)
+      );
+      z-index: 6;
+    }
+  }
+
+  .el-table__empty-block {
+    width: 100%;
+    min-height: 0;
+  }
+
+  .el-table__empty-text {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  > .m-fields-group-list-footer {
+    display: flex;
     justify-content: space-between;
     margin-top: 10px;
     margin-bottom: 16px;
+  }
+
+  // 吸底全宽主按钮（event-select / code-select / display-conds 外层列表）
+  // z-index 高于 item header，避免吸顶标题挡住新增按钮
+  > .m-fields-group-list-footer.is-sticky-full {
+    position: sticky;
+    bottom: 0;
+    z-index: 7;
+    margin-bottom: 0;
+    padding: var(--m-group-list-footer-padding-top) 0
+      var(--m-group-list-footer-padding-bottom);
+    background-color: var(--m-group-list-footer-bg);
+
+    > div {
+      justify-content: stretch;
+    }
+
+    .el-button,
+    .tmagic-design-button {
+      width: 100%;
+      height: var(--m-group-list-footer-button-height);
+    }
+  }
+
+  // 嵌套吸底按钮叠在外层 footer 之上（如「新增条件」叠在「新增条件组」上面）
+  .m-fields-group-list-item
+    .m-fields-group-list
+    > .m-fields-group-list-footer.is-sticky-full {
+    bottom: var(--m-group-list-footer-height);
+    z-index: 7;
   }
 }
 

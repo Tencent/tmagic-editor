@@ -700,3 +700,50 @@ describe('Form.vue —— config 变化', () => {
     expect(wrapper.vm.changeRecords).toEqual([]);
   });
 });
+
+describe('Form.vue —— 配置变化是否触发重挂', () => {
+  const makeConfig = () => [
+    {
+      type: 'text',
+      name: 'title',
+      text: '标题',
+      // 宿主每次重新生成配置时都是新闭包
+      display: () => true,
+      onChange: (_mForm: any, v: any) => v,
+    },
+  ];
+
+  test('结构不变、只有闭包换了新实例时不卸载重挂', async () => {
+    const wrapper = mountForm({ config: makeConfig(), initValues: { title: 'a' } });
+    await nextTick();
+    await nextTick();
+
+    const before = wrapper.find('input').element;
+    expect(before).toBeTruthy();
+
+    await wrapper.setProps({ config: makeConfig(), initValues: { title: 'b' } });
+    await nextTick();
+    await nextTick();
+
+    // 同一个 DOM 节点还在，说明表单没有被销毁重建，滚动位置/焦点才不会丢
+    expect(wrapper.find('input').element).toBe(before);
+    expect(wrapper.vm.initialized).toBe(true);
+  });
+
+  test('结构真的变了（换字段）时仍然重挂', async () => {
+    const wrapper = mountForm({ config: makeConfig(), initValues: { title: 'a' } });
+    await nextTick();
+    await nextTick();
+
+    const before = wrapper.find('input').element;
+
+    await wrapper.setProps({
+      config: [{ type: 'text', name: 'subtitle', text: '副标题' }],
+      initValues: { subtitle: 'b' },
+    });
+    await nextTick();
+    await nextTick();
+
+    expect(wrapper.find('input').element).not.toBe(before);
+  });
+});

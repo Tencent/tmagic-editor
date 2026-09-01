@@ -15,6 +15,7 @@ let lastConfig: any;
 let lastProps: any;
 
 vi.mock('@tmagic/form', () => ({
+  defineFormItem: (cfg: any) => cfg,
   MForm: defineComponent({
     name: 'MFormStub',
     props: ['config', 'initValues', 'disabled', 'size', 'watchProps', 'lastValues', 'isCompare'],

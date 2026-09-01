@@ -50,7 +50,7 @@ import {
   watch,
   watchEffect,
 } from 'vue';
-import { cloneDeep, isEqual } from 'lodash-es';
+import { cloneDeep, isEqualWith } from 'lodash-es';
 
 import { M_THEME_KEY, TMagicForm, tMagicMessage, tMagicMessageBox } from '@tmagic/design';
 import { setValueByKeyPath } from '@tmagic/utils';
@@ -321,12 +321,23 @@ provide(FORM_DIFF_CONFIG_KEY, {
 
 const changeRecords = shallowRef<ChangeRecord[]>([]);
 
+/**
+ * 两份配置的结构是否一致；函数一律视为相等。
+ *
+ * 宿主（如编辑器属性面板）往往在每次节点更新后整份重新生成配置，其中的
+ * `display` / `options` / `onChange` 都是新闭包，深比较必然判不等。若据此把 `initialized`
+ * 置 false，整棵表单会卸载重挂，滚动位置、展开态、输入焦点全部丢失。
+ * 配置是响应式 prop，闭包换了照样生效，只有结构变化（增删字段、换组件类型）才需要重挂。
+ */
+const isSameConfigShape = (config: unknown, preConfig: unknown) =>
+  isEqualWith(config, preConfig, (a, b) => (typeof a === 'function' && typeof b === 'function' ? true : undefined));
+
 watch(
   [() => props.config, () => props.initValues],
   ([config], [preConfig]) => {
     changeRecords.value = [];
 
-    if (!isEqual(toRaw(config), toRaw(preConfig))) {
+    if (!isSameConfigShape(toRaw(config), toRaw(preConfig))) {
       initialized.value = false;
     }
 

@@ -125,14 +125,28 @@
 .m-editor-props-form-panel-form {
   padding-right: 10px;
   padding-left: 10px;
+  // 吸顶标题避开绝对定位的 tabs header
+  --m-group-list-header-sticky-top: var(
+    --el-tabs-header-height,
+    var(--td-comp-size-xxl, 48px)
+  );
 
   > .m-container-tab {
     > .tmagic-design-tabs {
-      > .el-tabs__content {
-        margin-top: var(--el-tabs-header-height);
+      > .el-tabs__content,
+      > .t-tabs__content {
+        margin-top: var(--el-tabs-header-height, var(--td-comp-size-xxl, 48px));
         padding-top: 15px;
+        // 允许吸底按钮相对属性面板滚动容器定位（tabs 默认 overflow:hidden 会截断 sticky）
+        overflow: visible;
+
+        > .el-tab-pane,
+        > .t-tab-panel {
+          overflow: visible;
+        }
       }
-      > .el-tabs__header.is-top {
+      > .el-tabs__header.is-top,
+      > .t-tabs__header {
         position: absolute;
         top: 0;
         width: 100%;

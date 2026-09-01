@@ -304,4 +304,25 @@ describe('fillConfig 通用属性表单', () => {
       ),
     ).not.toThrow();
   });
+
+  test('显示条件 tab 按 groupList 展开条件组与组内条件', () => {
+    const config = fillConfig([]);
+    const values = {
+      type: 'text',
+      id: '1',
+      name: '',
+      [NODE_CONDS_KEY]: [{ cond: [{ field: [], op: '', value: '' }] }],
+    };
+
+    const { props } = collect(config, values);
+
+    expect(props).toEqual(
+      expect.arrayContaining([
+        `${NODE_CONDS_KEY}.0.cond.0.field`,
+        `${NODE_CONDS_KEY}.0.cond.0.op`,
+        `${NODE_CONDS_KEY}.0.cond.0.value`,
+      ]),
+    );
+    expect(props).not.toContain(`${NODE_CONDS_KEY}.${NODE_CONDS_KEY}`);
+  });
 });

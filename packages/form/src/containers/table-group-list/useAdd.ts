@@ -22,54 +22,63 @@ export const useAdd = (
 
     if (!modelName) return false;
 
+    if (typeof props.config.addable === 'function') {
+      return Boolean(
+        props.config.addable(mForm, {
+          model: props.model[modelName],
+          formValue: mForm?.values,
+          prop: props.prop,
+          config: props.config,
+        }),
+      );
+    }
+
     if (!props.model[modelName]?.length) {
       return true;
     }
 
-    if (typeof props.config.addable === 'function') {
-      return props.config.addable(mForm, {
-        model: props.model[modelName],
-        formValue: mForm?.values,
-        prop: props.prop,
-        config: props.config,
-      });
-    }
-
-    return typeof props.config.addable === 'undefined' ? true : props.config.addable;
+    return typeof props.config.addable === 'undefined' ? true : Boolean(props.config.addable);
   });
 
-  const newHandler = async (row?: any) => {
-    const modelName = props.name || props.config.name || '';
+  /**
+   * 新增一项，返回新增后列表应有的长度；没有新增（超上限 / 被 beforeAddRow 拦下 / enum 用尽）返回 null。
+   *
+   * 只抛 change，不直接改 `props.model`：写回由 `MForm` 按 changeRecords 的 propPath 完成。
+   * 返回长度是给调用方用的——新项要等写回后才出现在 DOM 里，靠它才能判断等到了没有。
+   */
+  const newHandler = async (row?: any): Promise<number | null> => {
+    const modelName = `${props.name || props.config.name || ''}`;
+    const list: any[] = Array.isArray(props.model[modelName]) ? props.model[modelName] : [];
 
-    if (props.config.max && props.model[modelName].length >= props.config.max) {
+    if (props.config.max && list.length >= props.config.max) {
       tMagicMessage.error(`最多新增配置不能超过${props.config.max}条`);
-      return;
+      return null;
     }
 
     if (typeof props.config.beforeAddRow === 'function') {
       const beforeCheckRes = await props.config.beforeAddRow(mForm, {
-        model: props.model[modelName],
+        model: list,
         formValue: mForm?.values,
         prop: props.prop,
       });
-      if (!beforeCheckRes) return;
+      if (!beforeCheckRes) return null;
     }
 
     const columns = props.config.items;
     const enumValues = props.config.enum || [];
     let enumV = [];
-    const { length } = props.model[modelName];
+    const { length } = list;
     const key = props.config.key || 'id';
     let inputs: any = {};
 
     if (enumValues.length) {
       if (length >= enumValues.length) {
-        return;
+        return null;
       }
       enumV = enumValues.filter((item) => {
         let i = 0;
         for (; i < length; i++) {
-          if (item[key] === props.model[modelName][i][key]) {
+          if (item[key] === list[i][key]) {
             break;
           }
         }
@@ -87,7 +96,7 @@ export const useAdd = (
     } else {
       if (typeof props.config.defaultAdd === 'function') {
         inputs = await props.config.defaultAdd(mForm, {
-          model: props.model[modelName],
+          model: list,
           prop: props.prop,
           formValue: mForm?.values,
         });
@@ -102,17 +111,18 @@ export const useAdd = (
     }
 
     if (props.sortKey && length) {
-      inputs[props.sortKey] = props.model[modelName][length - 1][props.sortKey] - 1;
+      inputs[props.sortKey] = list[length - 1][props.sortKey] - 1;
     }
 
-    emit('change', [...props.model[modelName], inputs], {
+    emit('change', [...list, inputs], {
       changeRecords: [
         {
-          propPath: `${props.prop}.${props.model[modelName].length}`,
+          propPath: `${props.prop}.${length}`,
           value: inputs,
         },
       ],
     });
+    return length + 1;
   };
 
   return {

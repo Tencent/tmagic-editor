@@ -34,7 +34,10 @@ vi.mock('@tmagic/form', async (importOriginal) => {
       props: ['config', 'size', 'prop', 'disabled', 'lastValues', 'isCompare', 'model'],
       emits: ['change'],
       setup() {
-        return () => h('div', { class: 'fake-container' });
+        return () =>
+          h('div', { class: 'fake-container' }, [
+            h('div', { class: 'm-fields-group-list' }, [h('div', { class: 'group-item' })]),
+          ]);
       },
     }),
   };
@@ -45,12 +48,6 @@ vi.mock('@tmagic/design', () => ({
     name: 'TMagicCard',
     setup(_p, { slots }) {
       return () => h('div', { class: 'fake-card' }, slots.default?.());
-    },
-  }),
-  TMagicButton: defineComponent({
-    name: 'TMagicButton',
-    setup(_p, { slots }) {
-      return () => h('button', { class: 'fake-button' }, slots.default?.());
     },
   }),
 }));
@@ -121,6 +118,9 @@ describe('CodeSelect', () => {
     const wrapper = mount(CodeSelect, { props: baseProps() as any });
     const container = wrapper.findComponent({ name: 'MContainer' });
     const config = container.props('config') as any;
+    expect(config.scrollLastItemIntoView).toBe(true);
+    expect(config.addButtonConfig.sticky).toBe(true);
+    expect(config.addButtonConfig.text).toBe('添加');
     const codeTypeSelect = config.items[0];
     expect(codeTypeSelect.name).toBe('codeType');
     const setModel = vi.fn();

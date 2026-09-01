@@ -25,7 +25,7 @@ import type {
   DynamicTypeConfig,
   EventSelectConfig,
   FormState,
-  PanelConfig,
+  GroupListConfig,
   TableConfig,
   UISelectConfig,
 } from '@tmagic/form/headless';
@@ -43,6 +43,8 @@ import {
   getEventNameOptions,
   normalizeCompActionValue,
 } from '@editor/utils';
+
+import { stickyAddButton } from './stickyAddButton';
 
 /**
  * `fields/EventSelect.vue` 内部渲染的各段配置。
@@ -122,7 +124,6 @@ const createActionTypeConfig = (config: EventSelectConfig) => {
     name: 'actionType',
     text: '联动类型',
     type: 'select',
-    labelPosition: 'left',
     defaultValue: ActionType.COMP,
     options: createActionTypeOptions(),
     rules: [
@@ -151,7 +152,6 @@ const createTargetCompConfig = (config: EventSelectConfig) => {
     name: 'to',
     text: '联动组件',
     type: 'ui-select',
-    labelPosition: 'left',
     display: (_mForm, { model }) => model.actionType === ActionType.COMP,
     onChange: (_mForm, _v, { setModel }) => {
       setModel('method', '');
@@ -171,7 +171,6 @@ const createCompActionConfig = (config: EventSelectConfig) => {
   const defaultCompActionConfig: DynamicTypeConfig = {
     name: 'method',
     text: '动作',
-    labelPosition: 'left',
     type: (_mForm: FormState | undefined, { model }: any) => {
       const to = editorService.getNodeById(model.to);
 
@@ -225,29 +224,43 @@ const createDataSourceActionConfig = (config: EventSelectConfig) => {
   return { ...defaultDataSourceActionConfig, ...config.dataSourceActionConfig };
 };
 
-/** 单张事件卡片里的动作组配置 */
-export const createActionsConfig = (config: EventSelectConfig): PanelConfig =>
+/** 单张事件里的动作组 */
+export const createActionsConfig = (config: EventSelectConfig): GroupListConfig =>
   defineFormItem({
-    type: 'panel',
-    labelPosition: 'left',
+    type: 'group-list',
+    name: 'actions',
+    expandAll: true,
+    enableToggleMode: false,
+    titlePrefix: '动作',
+    labelPosition: 'top',
+    flat: true,
+    ...stickyAddButton('新增动作'),
     items: [
-      {
-        type: 'group-list',
-        name: 'actions',
-        expandAll: true,
-        enableToggleMode: false,
-        titlePrefix: '动作',
-        labelPosition: 'left',
-        items: [
-          createActionTypeConfig(config),
-          createTargetCompConfig(config),
-          createCompActionConfig(config),
-          createCodeActionConfig(config),
-          createDataSourceActionConfig(config),
-        ],
-      },
+      createActionTypeConfig(config),
+      createTargetCompConfig(config),
+      createCompActionConfig(config),
+      createCodeActionConfig(config),
+      createDataSourceActionConfig(config),
     ],
-  }) as PanelConfig;
+  }) as GroupListConfig;
+
+/** 事件列表（外层 group-list）。事件名走 title slot，body 只放动作组。 */
+export const createEventSelectConfig = (
+  config: EventSelectConfig,
+  name: string,
+  options?: { includeEventName?: boolean },
+): GroupListConfig =>
+  defineFormItem({
+    type: 'group-list',
+    name,
+    titlePrefix: '事件',
+    expandAll: true,
+    enableToggleMode: false,
+    movable: false,
+    defaultAdd: { name: '', actions: [] },
+    ...stickyAddButton('添加事件'),
+    items: [...(options?.includeEventName ? [createEventNameConfig(config)] : []), createActionsConfig(config)],
+  }) as GroupListConfig;
 
 /** 兼容旧数据格式（事件列表里没有 actions）时渲染的表格配置，本身不带校验规则 */
 export const createLegacyTableConfig = (config: EventSelectConfig): TableConfig =>

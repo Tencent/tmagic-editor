@@ -1,49 +1,45 @@
 .m-fields-event-select {
   width: 100%;
+
   .fullWidth {
     width: 100%;
     box-sizing: border-box;
-    &.create-button {
-      width: 100%;
-    }
     &.m-container-ui-event {
       width: calc(100% - 32px);
     }
   }
+
   .event-select-container {
     padding: 0 16px;
-    > .el-card.tmagic-design-card--flat {
-      > .el-card__header {
+
+    > .m-fields-group-list
+      > .m-fields-group-list-item.tmagic-design-card--flat {
+      > .el-card__header,
+      > .t-card__header {
         border-bottom: 1px solid #ebeef5;
       }
-      > .el-card__body {
+
+      > .el-card__body,
+      > .t-card__body {
         padding-bottom: 16px;
-        .m-fields-group-list-footer {
-          div {
-            justify-content: flex-start !important;
-          }
-        }
-        .el-card.tmagic-design-card--flat {
-          > .el-card__header {
+
+        .el-card.tmagic-design-card--flat,
+        .t-card.tmagic-design-card--flat {
+          > .el-card__header,
+          > .t-card__header {
             padding: 16px 0;
           }
         }
       }
     }
   }
+
   .event-select-code {
     margin-left: 20px;
     width: auto;
   }
-
-  .m-form-panel {
-    margin: 10px 0px;
-  }
-
-  .el-card.is-always-shadow {
-    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.12);
-  }
 }
+
 .m-fields-code-select-col,
 .m-fields-data-source-method-select {
   width: 100%;
@@ -63,10 +59,6 @@
   }
 }
 
-.event-select-container {
-  padding: 0 16px;
-}
-
 .event-select-header {
   display: flex;
   align-items: center;
@@ -79,28 +71,13 @@
     line-height: 24px;
   }
 }
-.event-item-header {
-  position: relative;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  .event-item-title {
-    color: #0f1113;
-    font-size: 16px;
-    font-weight: 500;
-    line-height: 24px;
-    margin-bottom: 8px;
-  }
-  .event-item-delete-button {
-    color: #0f1113;
-  }
 
-  .el-form-item {
-    .el-form-item {
-      &.is-error {
-        margin-bottom: 18px;
-      }
-    }
+.event-item-header {
+  width: 100%;
+  .tmagic-design-form-item {
+    margin-bottom: 0;
+  }
+  .el-form-item .el-form-item.is-error {
+    margin-bottom: 18px;
   }
 }

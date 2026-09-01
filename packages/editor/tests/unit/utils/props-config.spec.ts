@@ -5,7 +5,7 @@
  */
 import { describe, expect, test, vi } from 'vitest';
 
-import { NODE_CONDS_RESULT_KEY } from '@tmagic/core';
+import { NODE_CONDS_KEY, NODE_CONDS_RESULT_KEY } from '@tmagic/core';
 
 import {
   advancedTabConfig,
@@ -27,9 +27,13 @@ vi.mock('@tmagic/design', () => ({
   },
 }));
 
-vi.mock('@tmagic/form', () => ({
-  validateForm: vi.fn(),
-}));
+vi.mock('@tmagic/form', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@tmagic/form')>();
+  return {
+    ...actual,
+    validateForm: vi.fn(),
+  };
+});
 
 describe('props 选项常量', () => {
   test('eqOptions / arrayOptions / numberOptions / booleanOptions 内容稳定', () => {
@@ -63,6 +67,7 @@ describe('props 选项常量', () => {
     expect(styleTabConfig.title).toBe('样式');
     expect(eventTabConfig.title).toBe('事件');
     expect(displayTabConfig.title).toBe('显示条件');
+    expect((eventTabConfig.items as any[])[0].defaultValue).toEqual([]);
   });
 
   test('styleTabConfig / eventTabConfig / advancedTabConfig 不使用 lazy 懒加载', () => {
@@ -126,6 +131,12 @@ describe('fillConfig', () => {
   test('displayTabConfig.display 当节点为 page 时返回 false', () => {
     expect(displayTabConfig.display!({} as any, { model: { type: 'page' } } as any)).toBe(false);
     expect(displayTabConfig.display!({} as any, { model: { type: 'text' } } as any)).toBe(true);
+  });
+
+  test('displayTabConfig 条件组使用 display-conds', () => {
+    const conds = (displayTabConfig.items as any[]).find((i) => i.name === NODE_CONDS_KEY);
+    expect(conds.type).toBe('display-conds');
+    expect(conds.titlePrefix).toBe('条件组');
   });
 
   test('displayTabConfig select 项 extra 文案随 NODE_CONDS_RESULT_KEY 变化', () => {

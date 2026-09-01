@@ -1,31 +1,25 @@
 <template>
   <div class="m-fields-code-select" :class="config.className">
-    <TMagicCard :flat="config.flat">
-      <MContainer
-        :config="codeConfig"
-        :size="size"
-        class="code-select-content"
-        :prop="prop"
-        :disabled="disabled"
-        :is-compare="isCompareMode"
-        :last-values="lastValues?.[name]"
-        :model="model[name]"
-        @change="changeHandler"
-      >
-      </MContainer>
-      <TMagicButton class="create-button fullWidth" :icon="Plus" :size="size" :disabled="disabled" @click="newHandler()"
-        >添加{{ config.text }}</TMagicButton
-      >
-    </TMagicCard>
+    <MContainer
+      :config="codeConfig"
+      :size="size"
+      class="code-select-content"
+      :prop="prop"
+      :disabled="disabled"
+      :is-compare="isCompareMode"
+      :last-values="lastValues?.[name]"
+      :model="model[name]"
+      :label-position="config.labelPosition"
+      :label-width="config.labelWidth"
+      @change="changeHandler"
+    >
+    </MContainer>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { computed, watch } from 'vue';
-import { Plus } from '@element-plus/icons-vue';
 
-import { HookCodeType } from '@tmagic/core';
-import { TMagicButton, TMagicCard } from '@tmagic/design';
 import type { CodeSelectConfig, ContainerChangeEventData, FieldProps } from '@tmagic/form';
 import { MContainer } from '@tmagic/form';
 
@@ -55,17 +49,7 @@ const props = withDefaults(defineProps<FieldProps<CodeSelectConfig>>(), {});
  * 仅当存在历史值时才启用对比，避免 lastValues 缺失时退化为「全部新增」的空对比。
  */
 const isCompareMode = computed(() => Boolean(props.isCompare && props.lastValues));
-const newHandler = () => {
-  const defaultCode = {
-    codeType: HookCodeType.CODE,
-    codeId: '',
-  };
-  const name = props.config.name || '';
-  const hookData = props.model[name]?.hookData || [];
-  emit('change', defaultCode, {
-    modifyKey: `hookData.${hookData.length}`,
-  });
-};
+
 const codeConfig = computed(() => createCodeSelectConfig(props.config));
 
 watch(

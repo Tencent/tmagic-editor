@@ -1,15 +1,17 @@
 <template>
-  <MGroupList
-    style="width: 100%"
-    :config="config"
-    :name="name"
-    :disabled="disabled"
-    :model="model"
-    :last-values="lastValues"
-    :prop="prop"
-    :size="size"
-    @change="changeHandler"
-  ></MGroupList>
+  <div class="m-fields-display-conds">
+    <MGroupList
+      :config="config"
+      :name="name"
+      :disabled="disabled"
+      :model="model"
+      :last-values="lastValues"
+      :is-compare="isCompareMode"
+      :prop="prop"
+      :size="size"
+      @change="changeHandler"
+    ></MGroupList>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -32,7 +34,7 @@ defineOptions({
 });
 
 const emit = defineEmits<{
-  change: [value: DisplayCond[], eventData?: ContainerChangeEventData];
+  change: [value: DisplayCond | DisplayCond[], eventData?: ContainerChangeEventData];
 }>();
 
 const props = withDefaults(defineProps<FieldProps<DisplayCondsConfig>>(), {
@@ -45,11 +47,9 @@ const parentFields = computed(() => filterFunction<string[]>(mForm, props.config
 
 const config = computed(() => createDisplayCondsConfig(props.config, props.name, parentFields.value));
 
-const changeHandler = (v: DisplayCond[], eventData?: ContainerChangeEventData) => {
-  if (!Array.isArray(props.model[props.name])) {
-    props.model[props.name] = [];
-  }
+const isCompareMode = computed(() => Boolean(props.isCompare && props.lastValues));
 
+const changeHandler = (v: DisplayCond[], eventData?: ContainerChangeEventData) => {
   emit('change', v, eventData);
 };
 </script>

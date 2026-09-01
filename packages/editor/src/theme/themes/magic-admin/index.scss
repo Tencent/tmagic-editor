@@ -137,7 +137,8 @@
   .m-editor-props-form-panel-form {
     > .m-container-tab {
       > .tmagic-design-tabs {
-        > .el-tabs__content {
+        > .el-tabs__content,
+        > .t-tabs__content {
           background-color: #fafafa;
           border-radius: 8px;
           padding-left: 16px;
@@ -145,6 +146,16 @@
         }
       }
     }
+  }
+
+  .m-fields-group-list-footer.is-sticky-full {
+    --m-group-list-footer-bg: #fafafa;
+    background-color: #fafafa;
+  }
+
+  .m-fields-group-list-item .m-fields-group-list-footer.is-sticky-full {
+    --m-group-list-footer-bg: #fff;
+    background-color: #fff;
   }
 }
 

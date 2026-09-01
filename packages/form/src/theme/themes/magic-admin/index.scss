@@ -16,17 +16,14 @@
       .magic-form-dynamic-tab
     ) {
     > .tmagic-design-tabs:not(.el-tabs--border-card) {
-      > .el-tabs__content {
+      > .el-tabs__content,
+      > .t-tabs__content {
         background-color: #fff;
         padding: 16px 16px 0 16px;
         border-radius: 4px;
       }
     }
   }
-
-  .m-container-tab.magic-form-dynamic-tab {
-  }
-
   .m-form-tip {
     color: rgba(0, 0, 0, 0.55);
   }
@@ -79,10 +76,7 @@
       }
     }
     .m-fields-group-list-item-header {
-      position: relative;
       .delete-button {
-        position: absolute;
-        right: 0;
         color: #0f1113;
       }
     }

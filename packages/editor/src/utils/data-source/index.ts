@@ -37,6 +37,7 @@ const dataSourceFormConfig: TabConfig = {
           name: 'events',
           src: 'datasource',
           type: 'event-select',
+          defaultValue: [],
         },
       ],
     },

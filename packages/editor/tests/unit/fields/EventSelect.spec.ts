@@ -48,6 +48,9 @@ vi.mock('@editor/utils/data-source', async () => {
   return { ...actual, getCascaderOptionsFromFields: vi.fn(() => []) };
 });
 
+let capturedConfig: any = null;
+let capturedEventNameConfig: any = null;
+
 vi.mock('@tmagic/form', async (importOriginal) => {
   const actual = await importOriginal<any>();
   return {
@@ -61,35 +64,44 @@ vi.mock('@tmagic/form', async (importOriginal) => {
         return () => h('div', { class: 'fake-table' });
       },
     }),
-    MPanel: defineComponent({
-      name: 'MPanel',
-      props: ['model', 'config', 'prop', 'disabled', 'size', 'labelWidth', 'lastValues', 'isCompare'],
-      emits: ['change'],
-      setup(_p, { slots }) {
-        return () => h('div', { class: 'fake-panel' }, slots.header?.());
-      },
-    }),
     MContainer: defineComponent({
       name: 'MFormContainer',
-      props: ['model', 'config', 'prop', 'disabled', 'size'],
+      props: ['config', 'model', 'lastValues', 'isCompare', 'disabled', 'size', 'prop'],
       emits: ['change'],
-      setup() {
-        return () => h('div', { class: 'fake-container' });
+      setup(props) {
+        capturedEventNameConfig = props.config;
+        return () => h('div', { class: 'fake-form-container' });
+      },
+    }),
+    MGroupList: defineComponent({
+      name: 'MGroupList',
+      props: ['config', 'name', 'disabled', 'model', 'lastValues', 'isCompare', 'prop', 'size'],
+      emits: ['change'],
+      setup(props, { emit, slots }) {
+        capturedConfig = props.config;
+        return () => {
+          const events = props.model?.[props.name] || [];
+          const first = events[0];
+          return h(
+            'div',
+            { class: 'fake-group-list', onClick: () => emit('change', events) },
+            first && slots.title
+              ? [
+                  slots.title({
+                    model: first,
+                    lastValues: props.lastValues?.[props.name]?.[0],
+                    prop: `${props.prop}.0`,
+                    index: 0,
+                    title: '事件 1',
+                  }),
+                ]
+              : [],
+          );
+        };
       },
     }),
   };
 });
-
-vi.mock('@tmagic/design', () => ({
-  TMagicButton: defineComponent({
-    name: 'TMagicButton',
-    props: ['type', 'size', 'disabled', 'icon', 'link'],
-    emits: ['click'],
-    setup(_p, { emit, slots }) {
-      return () => h('button', { onClick: () => emit('click') }, slots.default?.());
-    },
-  }),
-}));
 
 vi.mock('@tmagic/utils', async () => {
   const actual = await vi.importActual<any>('@tmagic/utils');
@@ -109,40 +121,45 @@ const baseProps = (extra: any = {}) => ({
   ...extra,
 });
 
+const eventNameCfg = () => capturedEventNameConfig;
+const actionsCfg = () => capturedConfig.items[0];
+const mountEvent = (extra: any = {}) => mount(EventSelect, { props: baseProps(extra) as any });
+
 describe('EventSelect', () => {
-  test('events 为空 isOldVersion=false 显示新版按钮', () => {
+  test('events 为空 isOldVersion=false 渲染 group-list', () => {
     const wrapper = mount(EventSelect, { props: baseProps() as any });
-    expect(wrapper.find('.create-button').exists()).toBe(true);
+    expect(wrapper.find('.event-select-container').exists()).toBe(true);
+    expect(wrapper.findComponent({ name: 'MGroupList' }).exists()).toBe(true);
     expect(wrapper.find('.fake-table').exists()).toBe(false);
+    expect(capturedConfig.type).toBe('group-list');
+    expect(capturedConfig.scrollLastItemIntoView).toBe(true);
+    expect(capturedConfig.addButtonConfig.sticky).toBe(true);
+    expect(capturedConfig.addButtonConfig.text).toBe('添加事件');
+    expect(capturedConfig.defaultAdd).toEqual({ name: '', actions: [] });
+    expect(capturedConfig.movable).toBe(false);
+    expect(capturedConfig.items[0].scrollLastItemIntoView).toBe(true);
+    expect(capturedConfig.items[0].addButtonConfig.sticky).toBe(true);
+    expect(capturedConfig.items[0].addButtonConfig.text).toBe('新增动作');
   });
 
-  test('addEvent emit 事件并携带 modifyKey', async () => {
+  test('group-list change 向外 emit', async () => {
     const wrapper = mount(EventSelect, { props: baseProps() as any });
-    await wrapper.find('.create-button').trigger('click');
-    const evts = wrapper.emitted('change');
-    expect((evts?.[0]?.[0] as any).name).toBe('');
+    await wrapper.findComponent({ name: 'MGroupList' }).vm.$emit('change', [], { modifyKey: 'foo' });
+    expect(wrapper.emitted('change')?.[0]?.[0]).toEqual([]);
   });
 
-  test('removeEvent 删除指定 index', async () => {
-    const wrapper = mount(EventSelect, {
-      props: baseProps({
-        model: { events: [{ name: 'a', actions: [] }] },
-      }) as any,
-    });
-    const buttons = wrapper.findAll('button');
-    const lastBtn = buttons[buttons.length - 1];
-    await lastBtn.trigger('click');
-    const evts = wrapper.emitted('change');
-    expect(evts).toBeTruthy();
+  test('title 里改事件名仍抛出事件列表，而不是单条', async () => {
+    const events = [{ name: 'click', actions: [] }];
+    const wrapper = mountEvent({ model: { events } });
+    await wrapper.findComponent({ name: 'MFormContainer' }).vm.$emit('change', { name: 'click' }, {});
+    expect(wrapper.emitted('change')?.[0]?.[0]).toEqual(events);
   });
 
-  test('events 含 actions 字段时不算 oldVersion，渲染 panel', () => {
-    const wrapper = mount(EventSelect, {
-      props: baseProps({
-        model: { events: [{ name: 'a', actions: [] }] },
-      }) as any,
+  test('events 含 actions 字段时不算 oldVersion，渲染 group-list', () => {
+    const wrapper = mountEvent({
+      model: { events: [{ name: 'a', actions: [] }] },
     });
-    expect(wrapper.findAll('.fake-panel').length).toBe(1);
+    expect(wrapper.findComponent({ name: 'MGroupList' }).exists()).toBe(true);
   });
 
   test('events 不含 actions 字段时为 oldVersion，渲染 table', () => {
@@ -164,32 +181,11 @@ describe('EventSelect', () => {
     expect(wrapper.emitted('change')).toBeTruthy();
   });
 
-  test('Panel header MFormContainer change emit', async () => {
-    const wrapper = mount(EventSelect, {
-      props: baseProps({
-        model: { events: [{ name: 'a', actions: [] }] },
-      }) as any,
-    });
-    await wrapper.findComponent({ name: 'MFormContainer' }).vm.$emit('change', null, { modifyKey: 'name' });
-    expect(wrapper.emitted('change')).toBeTruthy();
-  });
-
-  test('addEvent 在 model[name] 为空时初始化', async () => {
-    const m: any = { events: [] };
-    const wrapper = mount(EventSelect, { props: baseProps({ model: m }) as any });
-    await wrapper.find('.create-button').trigger('click');
-    const evts = wrapper.emitted('change');
-    expect(evts).toBeTruthy();
-    expect((evts?.[0]?.[0] as any).actions).toEqual([]);
-  });
-
   test('eventNameConfig type/options src=component 返回 select', () => {
-    const wrapper = mount(EventSelect, {
-      props: baseProps({
-        model: { events: [{ name: 'a', actions: [] }] },
-      }) as any,
+    mountEvent({
+      model: { events: [{ name: 'a', actions: [] }] },
     });
-    const cfg = wrapper.findComponent({ name: 'MFormContainer' }).props('config') as any;
+    const cfg = eventNameCfg();
     expect(cfg.type(undefined, { formValue: { type: 'btn' } })).toBe('select');
     const opts = cfg.options(undefined, { formValue: { type: 'btn' } });
     expect(Array.isArray(opts)).toBe(true);
@@ -197,12 +193,10 @@ describe('EventSelect', () => {
   });
 
   test('eventNameConfig.rules 仅校验事件名是否在可选项中', () => {
-    const wrapper = mount(EventSelect, {
-      props: baseProps({
-        model: { events: [{ name: 'a', actions: [] }] },
-      }) as any,
+    mountEvent({
+      model: { events: [{ name: 'a', actions: [] }] },
     });
-    const cfg = wrapper.findComponent({ name: 'MFormContainer' }).props('config') as any;
+    const cfg = eventNameCfg();
     const [rule] = cfg.rules;
 
     const okCb = vi.fn();
@@ -220,13 +214,11 @@ describe('EventSelect', () => {
   });
 
   test('eventNameConfig.rules 自定义 options 时跳过枚举', () => {
-    const wrapper = mount(EventSelect, {
-      props: baseProps({
-        config: { type: 'event-select', src: 'component', eventNameConfig: { options: () => [{ value: 'x' }] } },
-        model: { events: [{ name: 'a', actions: [] }] },
-      }) as any,
+    mountEvent({
+      config: { type: 'event-select', src: 'component', eventNameConfig: { options: () => [{ value: 'x' }] } },
+      model: { events: [{ name: 'a', actions: [] }] },
     });
-    const cfg = wrapper.findComponent({ name: 'MFormContainer' }).props('config') as any;
+    const cfg = eventNameCfg();
     const [rule] = cfg.rules;
 
     const cb = vi.fn();
@@ -236,12 +228,10 @@ describe('EventSelect', () => {
 
   test('eventNameConfig type 当 page-fragment 且有 pageFragmentId 返回 cascader', () => {
     editorService.get.mockReturnValue({ items: [{ id: 'pf1', items: [] }] });
-    const wrapper = mount(EventSelect, {
-      props: baseProps({
-        model: { events: [{ name: 'a', actions: [] }] },
-      }) as any,
+    mountEvent({
+      model: { events: [{ name: 'a', actions: [] }] },
     });
-    const cfg = wrapper.findComponent({ name: 'MFormContainer' }).props('config') as any;
+    const cfg = eventNameCfg();
     expect(cfg.type(undefined, { formValue: { type: 'page-fragment-container', pageFragmentId: 'pf1' } })).toBe(
       'cascader',
     );
@@ -251,26 +241,22 @@ describe('EventSelect', () => {
 
   test('eventNameConfig src=datasource 返回事件 + 数据变化字段', () => {
     dataSourceService.getDataSourceById.mockReturnValue({ fields: [{ name: 'f1' }] });
-    const wrapper = mount(EventSelect, {
-      props: baseProps({
-        config: { type: 'event-select', src: 'datasource' },
-        model: { events: [{ name: 'a', actions: [] }] },
-      }) as any,
+    mountEvent({
+      config: { type: 'event-select', src: 'datasource' },
+      model: { events: [{ name: 'a', actions: [] }] },
     });
-    const cfg = wrapper.findComponent({ name: 'MFormContainer' }).props('config') as any;
+    const cfg = eventNameCfg();
     const opts = cfg.options(undefined, { formValue: { type: 'ds', id: 'd1' } });
     expect(opts).toEqual([{ label: '数据变化', value: 'ds_change_', children: [] }]);
   });
 
   test('eventNameConfig src=datasource 无 fields 时返回原始事件', () => {
     dataSourceService.getDataSourceById.mockReturnValue({ fields: [] });
-    const wrapper = mount(EventSelect, {
-      props: baseProps({
-        config: { type: 'event-select', src: 'datasource' },
-        model: { events: [{ name: 'a', actions: [] }] },
-      }) as any,
+    mountEvent({
+      config: { type: 'event-select', src: 'datasource' },
+      model: { events: [{ name: 'a', actions: [] }] },
     });
-    const cfg = wrapper.findComponent({ name: 'MFormContainer' }).props('config') as any;
+    const cfg = eventNameCfg();
     const opts = cfg.options(undefined, { formValue: { type: 'ds', id: 'd1' } });
     expect(opts).toEqual([]);
   });
@@ -278,14 +264,10 @@ describe('EventSelect', () => {
   test('actionTypeConfig 含 组件/代码/数据源', () => {
     propsService.getDisabledCodeBlock.mockReturnValue(false);
     propsService.getDisabledDataSource.mockReturnValue(false);
-    const wrapper = mount(EventSelect, {
-      props: baseProps({
-        model: { events: [{ name: 'a', actions: [] }] },
-      }) as any,
+    mountEvent({
+      model: { events: [{ name: 'a', actions: [] }] },
     });
-    const panelCfg = wrapper.findComponent({ name: 'MPanel' }).props('config') as any;
-    const groupItems = panelCfg.items[0].items;
-    const actionType = groupItems[0];
+    const actionType = actionsCfg().items[0];
     const opts = typeof actionType.options === 'function' ? actionType.options() : actionType.options;
     expect(opts.map((o: any) => o.value).sort()).toEqual(['code', 'comp', 'data-source'].sort());
   });
@@ -293,13 +275,10 @@ describe('EventSelect', () => {
   test('actionTypeConfig disabledCodeBlock/disabledDataSource 时不包含选项', () => {
     propsService.getDisabledCodeBlock.mockReturnValue(true);
     propsService.getDisabledDataSource.mockReturnValue(true);
-    const wrapper = mount(EventSelect, {
-      props: baseProps({
-        model: { events: [{ name: 'a', actions: [] }] },
-      }) as any,
+    mountEvent({
+      model: { events: [{ name: 'a', actions: [] }] },
     });
-    const panelCfg = wrapper.findComponent({ name: 'MPanel' }).props('config') as any;
-    const actionType = panelCfg.items[0].items[0];
+    const actionType = actionsCfg().items[0];
     const opts = typeof actionType.options === 'function' ? actionType.options() : actionType.options;
     expect(opts.map((o: any) => o.value)).toEqual(['comp']);
     propsService.getDisabledCodeBlock.mockReturnValue(false);
@@ -307,13 +286,10 @@ describe('EventSelect', () => {
   });
 
   test('targetCompConfig display/onChange', () => {
-    const wrapper = mount(EventSelect, {
-      props: baseProps({
-        model: { events: [{ name: 'a', actions: [] }] },
-      }) as any,
+    mountEvent({
+      model: { events: [{ name: 'a', actions: [] }] },
     });
-    const panelCfg = wrapper.findComponent({ name: 'MPanel' }).props('config') as any;
-    const target = panelCfg.items[0].items[1];
+    const target = actionsCfg().items[1];
     expect(target.display(undefined, { model: { actionType: 'comp' } })).toBe(true);
     const setModel = vi.fn();
     target.onChange(undefined, undefined, { setModel });
@@ -322,13 +298,10 @@ describe('EventSelect', () => {
 
   test('compActionConfig 解析 type/options', () => {
     editorService.getNodeById.mockReturnValue({ type: 'btn', id: '1' });
-    const wrapper = mount(EventSelect, {
-      props: baseProps({
-        model: { events: [{ name: 'a', actions: [] }] },
-      }) as any,
+    mountEvent({
+      model: { events: [{ name: 'a', actions: [] }] },
     });
-    const panelCfg = wrapper.findComponent({ name: 'MPanel' }).props('config') as any;
-    const compAction = panelCfg.items[0].items[2];
+    const compAction = actionsCfg().items[2];
     expect(compAction.type(undefined, { model: { to: '1' } })).toBe('select');
     expect(Array.isArray(compAction.options(undefined, { model: { to: '1' } }))).toBe(true);
   });
@@ -336,13 +309,10 @@ describe('EventSelect', () => {
   test('compActionConfig type cascader 当 page-fragment-container', () => {
     editorService.getNodeById.mockReturnValue({ type: 'page-fragment-container', id: '1', pageFragmentId: 'pf1' });
     editorService.get.mockReturnValue({ items: [{ id: 'pf1', items: [{ id: 'c1', type: 'btn', name: 'b' }] }] });
-    const wrapper = mount(EventSelect, {
-      props: baseProps({
-        model: { events: [{ name: 'a', actions: [] }] },
-      }) as any,
+    mountEvent({
+      model: { events: [{ name: 'a', actions: [] }] },
     });
-    const panelCfg = wrapper.findComponent({ name: 'MPanel' }).props('config') as any;
-    const compAction = panelCfg.items[0].items[2];
+    const compAction = actionsCfg().items[2];
     expect(compAction.type(undefined, { model: { to: '1' } })).toBe('cascader');
     const opts = compAction.options(undefined, { model: { to: '1' } });
     expect(Array.isArray(opts)).toBe(true);
@@ -350,26 +320,20 @@ describe('EventSelect', () => {
 
   test('compActionConfig options 当 node 无 type 返回空数组', () => {
     editorService.getNodeById.mockReturnValue(null);
-    const wrapper = mount(EventSelect, {
-      props: baseProps({
-        model: { events: [{ name: 'a', actions: [] }] },
-      }) as any,
+    mountEvent({
+      model: { events: [{ name: 'a', actions: [] }] },
     });
-    const panelCfg = wrapper.findComponent({ name: 'MPanel' }).props('config') as any;
-    const compAction = panelCfg.items[0].items[2];
+    const compAction = actionsCfg().items[2];
     expect(compAction.options(undefined, { model: { to: 'unknown' } })).toEqual([]);
   });
 
   test('compActionConfig.rules 仅校验动作名是否在可选项中', () => {
     editorService.getNodeById.mockReturnValue({ type: 'btn', id: '1' });
     eventsService.getMethod.mockReturnValue([{ label: 'open', value: 'open' }]);
-    const wrapper = mount(EventSelect, {
-      props: baseProps({
-        model: { events: [{ name: 'a', actions: [] }] },
-      }) as any,
+    mountEvent({
+      model: { events: [{ name: 'a', actions: [] }] },
     });
-    const panelCfg = wrapper.findComponent({ name: 'MPanel' }).props('config') as any;
-    const compAction = panelCfg.items[0].items[2];
+    const compAction = actionsCfg().items[2];
     const [rule] = compAction.rules;
 
     const okCb = vi.fn();
@@ -387,18 +351,15 @@ describe('EventSelect', () => {
 
   test('compActionConfig.rules 自定义 options 时跳过枚举', () => {
     editorService.getNodeById.mockReturnValue({ type: 'btn', id: '1' });
-    const wrapper = mount(EventSelect, {
-      props: baseProps({
-        config: {
-          type: 'event-select',
-          src: 'component',
-          compActionConfig: { options: () => [{ text: 'x', value: 'x' }] },
-        },
-        model: { events: [{ name: 'a', actions: [] }] },
-      }) as any,
+    mountEvent({
+      config: {
+        type: 'event-select',
+        src: 'component',
+        compActionConfig: { options: () => [{ text: 'x', value: 'x' }] },
+      },
+      model: { events: [{ name: 'a', actions: [] }] },
     });
-    const panelCfg = wrapper.findComponent({ name: 'MPanel' }).props('config') as any;
-    const compAction = panelCfg.items[0].items[2];
+    const compAction = actionsCfg().items[2];
     const [rule] = compAction.rules;
 
     const cb = vi.fn();
@@ -410,13 +371,10 @@ describe('EventSelect', () => {
     editorService.getNodeById.mockReturnValue({ type: 'page-fragment-container', id: '1', pageFragmentId: 'pf1' });
     editorService.get.mockReturnValue({ items: [{ id: 'pf1', items: [{ id: 'c1', type: 'btn', name: 'b' }] }] });
     eventsService.getMethod.mockReturnValue([{ label: 'open', value: 'open' }]);
-    const wrapper = mount(EventSelect, {
-      props: baseProps({
-        model: { events: [{ name: 'a', actions: [] }] },
-      }) as any,
+    mountEvent({
+      model: { events: [{ name: 'a', actions: [] }] },
     });
-    const panelCfg = wrapper.findComponent({ name: 'MPanel' }).props('config') as any;
-    const compAction = panelCfg.items[0].items[2];
+    const compAction = actionsCfg().items[2];
     const [rule] = compAction.rules;
 
     const okCb = vi.fn();
@@ -430,13 +388,10 @@ describe('EventSelect', () => {
 
   test('codeActionConfig display/notEditable', () => {
     codeBlockService.getEditStatus.mockReturnValue(false);
-    const wrapper = mount(EventSelect, {
-      props: baseProps({
-        model: { events: [{ name: 'a', actions: [] }] },
-      }) as any,
+    mountEvent({
+      model: { events: [{ name: 'a', actions: [] }] },
     });
-    const panelCfg = wrapper.findComponent({ name: 'MPanel' }).props('config') as any;
-    const codeAction = panelCfg.items[0].items[3];
+    const codeAction = actionsCfg().items[3];
     expect(codeAction.display(undefined, { model: { actionType: 'code' } })).toBe(true);
     expect(codeAction.notEditable()).toBe(true);
     codeBlockService.getEditStatus.mockReturnValue(true);
@@ -444,13 +399,10 @@ describe('EventSelect', () => {
 
   test('dataSourceActionConfig display/notEditable', () => {
     dataSourceService.get.mockReturnValue(false);
-    const wrapper = mount(EventSelect, {
-      props: baseProps({
-        model: { events: [{ name: 'a', actions: [] }] },
-      }) as any,
+    mountEvent({
+      model: { events: [{ name: 'a', actions: [] }] },
     });
-    const panelCfg = wrapper.findComponent({ name: 'MPanel' }).props('config') as any;
-    const dsAction = panelCfg.items[0].items[4];
+    const dsAction = actionsCfg().items[4];
     expect(dsAction.display(undefined, { model: { actionType: 'data-source' } })).toBe(true);
     expect(dsAction.notEditable()).toBe(true);
   });
@@ -471,62 +423,25 @@ describe('EventSelect', () => {
   });
 
   describe('对比模式', () => {
-    test('isCompare 但无 lastValues 时不进入对比，仍显示添加按钮', () => {
+    test('isCompare 但无 lastValues 时不进入对比', () => {
       const wrapper = mount(EventSelect, {
         props: baseProps({ isCompare: true, model: { events: [] } }) as any,
       });
-      expect(wrapper.find('.create-button').exists()).toBe(true);
+      expect(wrapper.findComponent({ name: 'MGroupList' }).props('isCompare')).toBe(false);
     });
 
-    test('对比模式隐藏「添加事件」与删除按钮', () => {
+    test('对比模式向内部透传 isCompare 与 lastValues', () => {
+      const lastValues = { events: [{ name: 'a', actions: [] }] };
       const wrapper = mount(EventSelect, {
         props: baseProps({
           isCompare: true,
           model: { events: [{ name: 'a', actions: [] }] },
-          lastValues: { events: [{ name: 'a', actions: [] }] },
+          lastValues,
         }) as any,
       });
-      expect(wrapper.find('.create-button').exists()).toBe(false);
-      // 对比模式 panel header 内不渲染删除按钮（仅 MFormContainer 占位）
-      expect(wrapper.findAll('button').length).toBe(0);
+      const list = wrapper.findComponent({ name: 'MGroupList' });
+      expect(list.props('isCompare')).toBe(true);
+      expect(list.props('lastValues')).toEqual(lastValues);
     });
-
-    test('对比模式按索引对齐当前值与历史值，取最大长度渲染', () => {
-      const wrapper = mount(EventSelect, {
-        props: baseProps({
-          isCompare: true,
-          model: { events: [{ name: 'a', actions: [] }] },
-          lastValues: {
-            events: [
-              { name: 'a', actions: [] },
-              { name: 'b', actions: [] },
-            ],
-          },
-        }) as any,
-      });
-      // 当前 1 项 + 历史 2 项 → 取 max=2，渲染 2 个 panel（含被删除的事件）
-      expect(wrapper.findAll('.fake-panel').length).toBe(2);
-      const panels = wrapper.findAllComponents({ name: 'MPanel' });
-      expect(panels[0].props('isCompare')).toBe(true);
-      // 缺失一侧用空对象兜底
-      expect(panels[1].props('model')).toEqual({});
-      expect(panels[1].props('lastValues')).toEqual({ name: 'b', actions: [] });
-    });
-  });
-
-  test('removeEvent 通过 panel header 删除按钮调用', async () => {
-    const m: any = {
-      events: [
-        { name: 'a', actions: [] },
-        { name: 'b', actions: [] },
-      ],
-    };
-    const wrapper = mount(EventSelect, { props: baseProps({ model: m }) as any });
-    // 用 class 选择器直击 panel header 里的删除按钮：模板里同时存在顶部 / 底部「添加事件」按钮，
-    // 早期靠 `buttons[length - 1]` 取最后一个会误选到底部添加按钮，导致 events 没被删减。
-    const deleteBtns = wrapper.findAll('.event-item-delete-button');
-    expect(deleteBtns.length).toBe(m.events.length);
-    await deleteBtns[deleteBtns.length - 1].trigger('click');
-    expect(m.events.length).toBe(1);
   });
 });

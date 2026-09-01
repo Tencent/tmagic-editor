@@ -120,6 +120,10 @@ export default defineConfig({
   },
 
   optimizeDeps: {
+    // 适配器是运行时按 sessionStorage 动态 import 的，默认只预构建当前页面扫到的包。
+    // 切到 tdesign 时 Vite 会临时重优化，浏览器仍请求旧 hash → 504 Outdated Optimize Dep，
+    // 进而拖垮 `@tmagic/tdesign-vue-next-adapter` 的动态加载。两边都 include，启动时一次打好。
+    include: ['element-plus', 'tdesign-vue-next'],
     rolldownOptions: {
       transform: {
         define: {

@@ -30,7 +30,7 @@ import { editorTypeMatchRules, validateDataSourceFieldSelect } from '@editor/uti
 
 import { createCodeSelectConfig, normalizeCodeSelectValue } from './configs/codeSelect';
 import { createDisplayCondsConfig } from './configs/displayConds';
-import { createActionsConfig, createEventNameConfig, isLegacyEventValue } from './configs/eventSelect';
+import { createEventSelectConfig, isLegacyEventValue } from './configs/eventSelect';
 import { createStyleSetterConfig } from './StyleSetter/configs';
 
 const getName = (config: FormItemConfig): string => `${(config as any).name ?? ''}`;
@@ -59,8 +59,7 @@ const codeSelectNestedConfig: FieldNestedConfig = ({ config, model, prop }) => {
 /**
  * `display-conds` 的嵌套配置。
  *
- * 对应 `fields/DisplayConds.vue` 内部
- * `<MGroupList :config="config" :name="name" :model="model" :prop="prop">`。
+ * 对应 `fields/DisplayConds.vue` 内部把同一份 groupList 配置交给 `MGroupList`。
  *
  * @param ctx - 嵌套配置回调入参
  * @returns 内部 group-list 配置；prop 基准为 parentProp，避免 name 被拼两次
@@ -84,26 +83,24 @@ const displayCondsNestedConfig: FieldNestedConfig = ({ config, model, prop, pare
 /**
  * `event-select` 的嵌套配置。
  *
- * 对应 `fields/EventSelect.vue` 按事件列表 `v-for` 出的卡片：每张卡片渲染
- * `<MFormContainer>` 与 `<MPanel>`，`:prop` 为 `${prop}.${index}`。
- * 用合成的 group-list 表达这层 `v-for`。
+ * 对应 `fields/EventSelect.vue`：列表走 group-list，事件名渲染在 title slot，
+ * 无渲染校验仍把事件名当作列表项字段，路径为 `<prop>.<index>.name`。
  *
  * @param ctx - 嵌套配置回调入参
  * @returns 合成的 group-list 配置；旧数据格式返回 null，不参与校验
  */
 const eventSelectNestedConfig: FieldNestedConfig = ({ config, model, parentProp }) => {
   const name = getName(config);
+  if (model && !Array.isArray(model[name])) {
+    model[name] = [];
+  }
   const events = model?.[name];
 
   // 旧数据格式走的是另一套表格配置，其中不含任何 rules，不参与校验
   if (!Array.isArray(events) || isLegacyEventValue(events)) return null;
 
   return {
-    config: {
-      type: 'group-list',
-      name,
-      items: [createEventNameConfig(config as EventSelectConfig), createActionsConfig(config as EventSelectConfig)],
-    } as any as FormItemConfig,
+    config: createEventSelectConfig(config as EventSelectConfig, name, { includeEventName: true }),
     prop: parentProp,
   };
 };

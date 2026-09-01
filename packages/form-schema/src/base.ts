@@ -799,6 +799,16 @@ export interface PanelConfig<T = never> extends FormItem, ContainerCommonConfig<
 }
 // #endregion PanelConfig
 
+// #region AddButtonConfig
+/** table / group-list 新增按钮的文案与形态 */
+export interface AddButtonConfig {
+  props?: Record<string, any>;
+  text?: string;
+  /** 吸底全宽主按钮 */
+  sticky?: boolean;
+}
+// #endregion AddButtonConfig
+
 // #region TableGroupListCommonConfig
 export interface TableGroupListCommonConfig extends FormItem {
   type: 'table' | 'groupList' | 'group-list';
@@ -812,6 +822,9 @@ export interface TableGroupListCommonConfig extends FormItem {
   defaultAdd?: ((mForm: FormState | undefined, data: any) => any) | Record<string, any>;
   /** table 新增行时前置回调 */
   beforeAddRow?: (mForm: FormState | undefined, data: any) => boolean | Promise<boolean>;
+  /** 新增后滚动到最后一项（group-list 形态，默认关闭） */
+  scrollLastItemIntoView?: boolean;
+  addButtonConfig?: AddButtonConfig;
 }
 // #endregion TableGroupListCommonConfig
 
@@ -826,10 +839,8 @@ export interface TableColumnConfig<T = never> extends FormItem {
   itemsFunction?: (row: any) => FormConfig<T>;
   titleTip?: FilterFunction<string>;
   type?: string;
-  addButtonConfig?: {
-    props?: Record<string, any>;
-    text?: string;
-  };
+  /** 列内嵌套列表的新增按钮不支持吸底 */
+  addButtonConfig?: Omit<AddButtonConfig, 'sticky'>;
 }
 // #endregion TableColumnConfig
 
@@ -904,14 +915,10 @@ export interface GroupListConfig<T = never> extends TableGroupListCommonConfig {
    * 当未设置时，默认展开第一项
    */
   defaultExpandQuantity?: number;
-  delete?: (model: any, index: number | string | symbol, values: any) => boolean | boolean;
-  copyable?: FilterFunction<boolean>;
-  movable?: (
-    mForm: FormState | undefined,
-    index: number | string | symbol,
-    model: any,
-    groupModel: any,
-  ) => boolean | boolean;
+  delete?: boolean | ((model: any, index: number | string | symbol, values: any) => boolean);
+  copyable?: boolean | FilterFunction<boolean>;
+  movable?:
+    boolean | ((mForm: FormState | undefined, index: number | string | symbol, model: any, groupModel: any) => boolean);
   moveSpecifyLocation?: boolean;
 }
 // #endregion GroupListConfig
