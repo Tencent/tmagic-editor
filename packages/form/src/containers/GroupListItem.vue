@@ -80,9 +80,9 @@
             </div>
           </TMagicPopover>
 
-          <TMagicTooltip :content="`删除 ${title}`">
+          <!-- v-if 必须挂在 Tooltip 上：子节点为 false 时 ElOnlyChild 会报 no valid child node found -->
+          <TMagicTooltip v-if="!isCompare" :content="`删除 ${title}`">
             <TMagicButton
-              v-if="!isCompare"
               v-show="showDelete"
               size="default"
               link

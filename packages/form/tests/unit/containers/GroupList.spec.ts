@@ -180,7 +180,8 @@ describe('GroupList container', () => {
       expect(item.props('model')).toEqual({});
     });
 
-    test('对比模式隐藏底部操作栏与复制/移动按钮', async () => {
+    test('对比模式隐藏底部操作栏与复制/移动/删除按钮，且不触发 ElOnlyChild 警告', async () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const wrapper = mountForm(
         compareConfig,
         { list: [{ text: 'a' }, { text: 'b' }] },
@@ -192,9 +193,14 @@ describe('GroupList container', () => {
       await nextTick();
       await nextTick();
       expect(wrapper.find('.m-fields-group-list-footer').exists()).toBe(false);
+      expect(wrapper.find('.delete-button').exists()).toBe(false);
       expect(wrapper.text()).not.toContain('复制');
       expect(wrapper.text()).not.toContain('上移');
       expect(wrapper.text()).not.toContain('下移');
+      expect(
+        warn.mock.calls.some((args) => args.some((arg) => String(arg?.message ?? arg).includes('ElOnlyChild'))),
+      ).toBe(false);
+      warn.mockRestore();
     });
   });
 

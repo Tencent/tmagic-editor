@@ -8,13 +8,14 @@
     >
       <div class="m-fields-table" :class="{ 'm-fields-table-item-extra': config.itemExtra }">
         <span v-if="config.extra" style="color: rgba(0, 0, 0, 0.45)" v-html="config.extra"></span>
+        <!-- v-if 必须挂在 Tooltip 上：表格未就绪时 ElOnlyChild 会报 no valid child node found -->
         <TMagicTooltip
+          v-if="model[modelName]"
           content="拖拽可排序"
           placement="left-start"
           :disabled="config.dropSort !== true || config.dropSortHandle"
         >
           <TMagicTable
-            v-if="model[modelName]"
             ref="tMagicTable"
             style="width: 100%"
             show-header

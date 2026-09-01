@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2025 Tencent.
  */
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 import { nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
@@ -40,5 +40,15 @@ describe('Table container —— 对比模式', () => {
     const wrapper = mountTable({ isCompare: true, lastValues: { list: [{ text: 'a' }] } });
     await nextTick();
     expect(wrapper.text()).not.toContain('清空');
+  });
+
+  test('model 为空时不渲染表格，且不触发 ElOnlyChild 警告', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    mountTable({ model: { list: undefined } });
+    await nextTick();
+    expect(
+      warn.mock.calls.some((args) => args.some((arg) => String(arg?.message ?? arg).includes('ElOnlyChild'))),
+    ).toBe(false);
+    warn.mockRestore();
   });
 });
