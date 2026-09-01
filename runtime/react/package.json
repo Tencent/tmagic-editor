@@ -1,6 +1,6 @@
 {
   "name": "runtime-react",
-  "version": "1.8.0-beta.25",
+  "version": "1.8.0-beta.26",
   "type": "module",
   "private": true,
   "engines": {
@@ -16,16 +16,16 @@
     "build:playground": "node scripts/build.mjs --type=playground"
   },
   "dependencies": {
-    "@tmagic/core": "1.8.0-beta.25",
+    "@tmagic/core": "1.8.0-beta.26",
     "@tmagic/react-runtime-help": "0.2.2",
-    "@tmagic/stage": "1.8.0-beta.25",
+    "@tmagic/stage": "1.8.0-beta.26",
     "axios": "^1.19.0",
     "qrcode": "^1.5.4",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
   "devDependencies": {
-    "@tmagic/cli": "1.8.0-beta.25",
+    "@tmagic/cli": "1.8.0-beta.26",
     "@types/fs-extra": "^11.0.4",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",

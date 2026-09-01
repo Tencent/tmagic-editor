@@ -1,6 +1,6 @@
 {
   "name": "tmagic-playground",
-  "version": "1.8.0-beta.25",
+  "version": "1.8.0-beta.26",
   "type": "module",
   "private": true,
   "scripts": {
@@ -12,11 +12,11 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
-    "@tmagic/core": "1.8.0-beta.25",
-    "@tmagic/design": "1.8.0-beta.25",
-    "@tmagic/editor": "1.8.0-beta.25",
-    "@tmagic/element-plus-adapter": "1.8.0-beta.25",
-    "@tmagic/tdesign-vue-next-adapter": "1.8.0-beta.25",
+    "@tmagic/core": "1.8.0-beta.26",
+    "@tmagic/design": "1.8.0-beta.26",
+    "@tmagic/editor": "1.8.0-beta.26",
+    "@tmagic/element-plus-adapter": "1.8.0-beta.26",
+    "@tmagic/tdesign-vue-next-adapter": "1.8.0-beta.26",
     "@tmagic/tmagic-form-runtime": "1.1.6",
     "element-plus": "catalog:",
     "lodash-es": "^4.18.1",

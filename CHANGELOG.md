@@ -1,3 +1,20 @@
+# [1.8.0-beta.26](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.25...v1.8.0-beta.26) (2026-09-01)
+
+
+### Bug Fixes
+
+* **editor:** inject eventBus 时提供 null 默认值 ([58f2a94](https://github.com/Tencent/tmagic-editor/commit/58f2a943b866a836817b12b93194eb0e13f82d16))
+* **editor:** 避免 defaultSelected 早于 root 就绪时 select 抛出未处理错误 ([08b610a](https://github.com/Tencent/tmagic-editor/commit/08b610a4f2de9c6c433ec792fc46039e6f57e7b0))
+* **form:** 避免 Tooltip 无合法触发器时报 ElOnlyChild ([90e4bec](https://github.com/Tencent/tmagic-editor/commit/90e4bec70b25194446b6b7c8453ac7c9dc32bff3))
+
+
+### Features
+
+* **editor:** 统一列表字段添加按钮样式并支持新增后自动滚动 ([02eeb2e](https://github.com/Tencent/tmagic-editor/commit/02eeb2e87f78f59d18baaf471704d3f574c5556c))
+* **form:** 容器透传 labelPosition ([c34ed6a](https://github.com/Tencent/tmagic-editor/commit/c34ed6aafc0542ea12ba7d32e0130eb227da1f81))
+* **form:** 新增无渲染校验入口，支持 Node/CI 环境执行表单校验 ([93dc0d2](https://github.com/Tencent/tmagic-editor/commit/93dc0d2187046d5d5da9409cc67e21afd01a0abe))
+* **form:** 用 FormContext 与 provide/inject 替代 extendState 钩子 ([a7999f5](https://github.com/Tencent/tmagic-editor/commit/a7999f50d542e3c369db4a1f6f42339ec0056e04))
+* **form:** 统一字段值 effect 机制并将 nested 重命名为 innerConfig ([f2ee7ae](https://github.com/Tencent/tmagic-editor/commit/f2ee7ae7b522d0fe78f354de531d6cbd6116ab4b))
 # [1.8.0-beta.25](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.24...v1.8.0-beta.25) (2026-08-13)
 
 
