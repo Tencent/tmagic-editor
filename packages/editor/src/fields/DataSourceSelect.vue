@@ -50,7 +50,7 @@ const props = withDefaults(defineProps<FieldProps<DataSourceSelect>>(), {
 
 const mForm = inject<FormState | undefined>('mForm');
 const { dataSourceService, uiService } = useServices();
-const eventBus = inject<EventBus>('eventBus');
+const eventBus = inject<EventBus | null>('eventBus', null);
 
 const dataSources = computed(() => dataSourceService.get('dataSources'));
 

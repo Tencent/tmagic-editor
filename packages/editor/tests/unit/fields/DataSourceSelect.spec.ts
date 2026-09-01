@@ -119,6 +119,15 @@ describe('DataSourceSelect', () => {
     });
   });
 
+  test('未 provide eventBus 时不告警，点击编辑也不抛错', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    dataSourceService.getDataSourceById.mockReturnValue({ id: '1' });
+    const wrapper = mount(DataSourceSelect, { props: baseProps({ model: { ds: '1' } }) as any });
+    expect(warn.mock.calls.some((c) => String(c[0]).includes('eventBus'))).toBe(false);
+    await expect(wrapper.find('button').trigger('click')).resolves.toBeUndefined();
+    warn.mockRestore();
+  });
+
   test('editHandler emit edit-data-source', async () => {
     const eventBus = { emit: vi.fn() };
     dataSourceService.getDataSourceById.mockReturnValue({ id: '1' });

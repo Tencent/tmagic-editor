@@ -6,7 +6,7 @@ import ContentMenu from '@editor/components/ContentMenu.vue';
 import type { ContentMenuTarget, EventBus, MenuButton, MenuComponent, TreeNodeData } from '@editor/type';
 
 export const useContentMenu = () => {
-  const eventBus = inject<EventBus>('eventBus');
+  const eventBus = inject<EventBus | null>('eventBus', null);
   const menuRef = useTemplateRef<InstanceType<typeof ContentMenu>>('menu');
 
   let selectId = '';

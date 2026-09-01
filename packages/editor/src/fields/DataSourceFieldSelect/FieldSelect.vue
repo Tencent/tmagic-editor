@@ -124,7 +124,7 @@ const optionComponent = getDesignConfig('components')?.option;
 
 const { dataSourceService, uiService } = useServices();
 const mForm = inject<FormState | undefined>('mForm');
-const eventBus = inject<EventBus>('eventBus');
+const eventBus = inject<EventBus | null>('eventBus', null);
 
 const allDataSources = computed(() => dataSourceService.get('dataSources') || []);
 

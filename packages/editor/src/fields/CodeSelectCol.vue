@@ -84,7 +84,7 @@ defineOptions({
 
 const mForm = inject<FormState | undefined>('mForm');
 const { codeBlockService, uiService } = useServices();
-const eventBus = inject<EventBus>('eventBus');
+const eventBus = inject<EventBus | null>('eventBus', null);
 const emit = defineEmits<{
   change: [v: any, eventData: ContainerChangeEventData];
 }>();

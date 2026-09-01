@@ -82,7 +82,7 @@ const props = defineProps<{
   customContentMenu: CustomContentMenuFunction;
 }>();
 
-const eventBus = inject<EventBus>('eventBus');
+const eventBus = inject<EventBus | null>('eventBus', null);
 
 const { codeBlockService } = useServices();
 

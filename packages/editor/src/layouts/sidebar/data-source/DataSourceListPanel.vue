@@ -75,7 +75,7 @@ const props = defineProps<{
   customContentMenu: CustomContentMenuFunction;
 }>();
 
-const eventBus = inject<EventBus>('eventBus');
+const eventBus = inject<EventBus | null>('eventBus', null);
 const { dataSourceService } = useServices();
 
 const { editDialog, dataSourceValues, dialogTitle, editable, editHandler, submitDataSourceHandler } =
