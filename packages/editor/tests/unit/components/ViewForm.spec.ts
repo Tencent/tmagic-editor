@@ -35,7 +35,8 @@ vi.mock('@editor/utils/code-block', () => ({
   getCodeBlockFormConfig: vi.fn(() => [{ type: 'text', name: 'content' }]),
 }));
 
-vi.mock('@tmagic/form', () => ({
+vi.mock('@tmagic/form', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@tmagic/form')>()),
   MForm: defineComponent({
     name: 'MForm',
     props: ['config', 'initValues', 'disabled', 'labelWidth', 'context', 'size'],

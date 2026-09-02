@@ -4,7 +4,7 @@
  * Copyright (C) 2025 Tencent.
  */
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { type ComputedRef, defineComponent, h, inject, nextTick } from 'vue';
+import { computed, type ComputedRef, defineComponent, h, inject, nextTick, provide, ref } from 'vue';
 import { mount } from '@vue/test-utils';
 
 import { FORM_CONTEXT_KEY, type FormContext } from '@tmagic/form';
@@ -182,6 +182,55 @@ describe('Editor', () => {
     expect(context.services.editorService).toBeDefined();
     expect(context.services.propsService).toBeDefined();
     expect(context.stage).toBe(stageStub);
+  });
+
+  test('合并宿主在外层 provide 的 FORM_CONTEXT_KEY，不遮蔽其业务字段', async () => {
+    const hostComponent = defineComponent({
+      setup: () => {
+        provide(
+          FORM_CONTEXT_KEY,
+          computed(() => ({ username: 'tester', editor: { editorCore: {} } }) as unknown as FormContext),
+        );
+        return () => h(Editor, {} as any);
+      },
+    });
+
+    mount(hostComponent);
+    await nextTick();
+
+    const context = injectedFormContext!.value as any;
+    expect(context.username).toBe('tester');
+    expect(context.editor.editorCore).toBeDefined();
+    // 编辑器自己的字段优先级更高，仍然兜底
+    expect(context.services.editorService).toBeDefined();
+    expect(context.stage).toBe(stageStub);
+  });
+
+  test('宿主上下文的 accessor 保持读时求值', async () => {
+    const counter = ref(0);
+    const hostComponent = defineComponent({
+      setup: () => {
+        provide(
+          FORM_CONTEXT_KEY,
+          computed(
+            () =>
+              ({
+                get buildVersion() {
+                  return counter.value;
+                },
+              }) as unknown as FormContext,
+          ),
+        );
+        return () => h(Editor, {} as any);
+      },
+    });
+
+    mount(hostComponent);
+    await nextTick();
+
+    expect((injectedFormContext!.value as any).buildVersion).toBe(0);
+    counter.value = 7;
+    expect((injectedFormContext!.value as any).buildVersion).toBe(7);
   });
 
   test('stage 走 computed 读时求值，切换画布后能读到新实例', async () => {

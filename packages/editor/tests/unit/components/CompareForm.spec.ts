@@ -4,10 +4,11 @@
  * Copyright (C) 2025 Tencent.
  */
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { defineComponent, h, nextTick, ref } from 'vue';
+import { computed, defineComponent, h, nextTick, ref } from 'vue';
 import { mount, type VueWrapper } from '@vue/test-utils';
 
 import { HookType } from '@tmagic/core';
+import { FORM_CONTEXT_KEY } from '@tmagic/form';
 
 import CompareForm from '@editor/components/CompareForm.vue';
 
@@ -44,7 +45,8 @@ vi.mock('@editor/utils/code-block', () => ({
   getCodeBlockFormConfig: vi.fn(() => [{ type: 'text', name: 'content' }]),
 }));
 
-vi.mock('@tmagic/form', () => ({
+vi.mock('@tmagic/form', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@tmagic/form')>()),
   MForm: defineComponent({
     name: 'MForm',
     props: ['config', 'initValues', 'lastValues', 'isCompare', 'disabled', 'labelWidth', 'context', 'showDiff'],
@@ -93,6 +95,28 @@ describe('CompareForm.vue', () => {
     expect(capturedFormProps.lastValues).toEqual({ id: 'n1', name: 'old' });
     expect(capturedFormProps.context?.services).toEqual(services);
     expect(capturedFormProps.context).toHaveProperty('stage');
+  });
+
+  test('宿主 provide 的上下文不被遮蔽，且 services 由编辑器兜底', async () => {
+    const wrapper = mount(CompareForm, {
+      props: {
+        category: 'node',
+        type: 'text',
+        value: { id: 'n1' },
+        lastValue: { id: 'n1' },
+        services,
+      },
+      global: {
+        provide: {
+          codeOptions: {},
+          [FORM_CONTEXT_KEY as symbol]: computed(() => ({ username: 'alice', services: 'host-services' })),
+        },
+      },
+    });
+    await waitForFormReady(wrapper);
+
+    expect(capturedFormProps.context.username).toBe('alice');
+    expect(capturedFormProps.context.services).toEqual(services);
   });
 
   test('node 类别缺少 type 时不渲染 MForm', async () => {

@@ -106,6 +106,77 @@ describe('createFormStateProxy', () => {
     expect(Object.getOwnPropertyDescriptor(formState, 'username')?.enumerable).toBe(true);
   });
 
+  test('mForm 自引用回 formState，读能穿到 core 与 context', () => {
+    const formState = createFormStateProxy(makeCore({ keyProp: 'id' }), () => ({ username: 'alice' }));
+    const vm = formState as any;
+
+    expect(vm.mForm).toBe(formState);
+    expect(vm.mForm.keyProp).toBe('id');
+    expect(vm.mForm.username).toBe('alice');
+    expect('mForm' in formState).toBe(true);
+  });
+
+  test('往 mForm 上挂的方法落到 core 并持久可读，跨回调可取回', () => {
+    const core = makeCore();
+    const formState = createFormStateProxy(core, () => ({ username: 'alice' }));
+    const vm = formState as any;
+
+    // 存量配置的跨字段通信写法：一个 validator 里挂，另一处取出来调用
+    const check = () => 'checked';
+    vm.mForm.checkPropertyLimit = check;
+
+    expect((core as any).checkPropertyLimit).toBe(check);
+    expect(vm.mForm.checkPropertyLimit()).toBe('checked');
+    expect(vm.checkPropertyLimit).toBe(check);
+  });
+
+  test('mForm 不进入枚举，避免循环引用', () => {
+    const formState = createFormStateProxy(makeCore(), () => ({ username: 'alice' }));
+
+    expect(Object.keys(formState)).not.toContain('mForm');
+    expect(() => JSON.stringify({ ...formState })).not.toThrow();
+  });
+
+  test('core 或 context 显式提供 mForm 时不被自引用覆盖', () => {
+    const host = { name: 'host-mForm' };
+    const fromContext = createFormStateProxy(makeCore(), () => ({ mForm: host }) as any);
+    expect((fromContext as any).mForm).toBe(host);
+
+    const own = { name: 'core-mForm' };
+    const fromCore = createFormStateProxy(makeCore({ mForm: own }), () => ({ mForm: host }) as any);
+    expect((fromCore as any).mForm).toEqual(own);
+  });
+
+  /**
+   * 嵌套表单（ComponentForm）把父 formState 整体当 context 传给子表单，
+   * 此时 mForm 应命中 context 指向父表单——与 extendState 时代把父状态并入子状态一致，
+   * 跨字段通信仍落在同一份对象上。不要「修正」成指向子表单。
+   */
+  test('父 formState 作为 context 时，mForm 指向父表单而非自引用', () => {
+    const parent = createFormStateProxy(makeCore({ owner: 'parent' }), () => ({}) as any);
+    const child = createFormStateProxy(makeCore({ owner: 'child' }), () => parent as any);
+
+    expect((child as any).mForm).toBe(parent);
+    // 子表单自己的 core 字段仍优先，不被父级覆盖
+    expect((child as any).owner).toBe('child');
+
+    // 跨字段通信：一个回调往 mForm 上挂，另一个回调取回，落在同一份对象上
+    (child as any).mForm.checkLimit = () => 'ok';
+    expect((parent as any).checkLimit()).toBe('ok');
+  });
+
+  test('把 formState 自己当 context 传回来不爆栈', () => {
+    // 闭包只在 trap 触发时求值，构造期不会读到未初始化的 formState
+    const formState: any = createFormStateProxy(makeCore({ a: 1 }), () => formState);
+
+    expect(formState.a).toBe(1);
+    expect(formState.missing).toBeUndefined();
+    expect('missing' in formState).toBe(false);
+    // 自引用不提供额外字段，mForm 仍由兜底合成
+    expect(formState.mForm).toBe(formState);
+    expect(Object.keys(formState)).toContain('a');
+  });
+
   test('getContext 可以是 Ref', () => {
     const ctx = ref({ username: 'alice' });
     const formState = createFormStateProxy(makeCore(), ctx);

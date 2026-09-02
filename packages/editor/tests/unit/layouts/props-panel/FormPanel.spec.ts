@@ -4,8 +4,10 @@
  * Copyright (C) 2025 Tencent.
  */
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { defineComponent, h, nextTick } from 'vue';
+import { computed, defineComponent, h, nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
+
+import { FORM_CONTEXT_KEY } from '@tmagic/form';
 
 import { ENABLE_PROPS_FORM_VALIDATE } from '@editor/editorProps';
 import FormPanel from '@editor/layouts/props-panel/FormPanel.vue';
@@ -109,6 +111,26 @@ describe('FormPanel', () => {
   test('渲染 MForm', () => {
     const wrapper = mount(FormPanel, { props: { config: [], values: {} } as any });
     expect(wrapper.findComponent({ name: 'MForm' }).exists()).toBe(true);
+  });
+
+  /**
+   * 属性面板是宿主字段读不到时最先暴露问题的地方：编辑器自己 provide 一层 context 时
+   * 不能把宿主在 <MEditor> 外层 provide 的那层遮蔽掉。
+   */
+  test('宿主 provide 的上下文不被遮蔽，且 services / stage 由编辑器兜底', () => {
+    const wrapper = mount(FormPanel, {
+      props: { config: [], values: {} } as any,
+      global: {
+        provide: {
+          [FORM_CONTEXT_KEY as symbol]: computed(() => ({ username: 'alice', services: 'host-services' })),
+        },
+      },
+    });
+
+    const context = wrapper.findComponent({ name: 'MForm' }).props('context') as any;
+    expect(context.username).toBe('alice');
+    expect(context.services).not.toBe('host-services');
+    expect(context.stage).toEqual({ id: 'stage' });
   });
 
   test('mounted 事件 emit', async () => {

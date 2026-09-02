@@ -46,7 +46,8 @@ vi.mock('@editor/utils/code-block', () => ({
   }),
 }));
 
-vi.mock('@tmagic/form', () => ({
+vi.mock('@tmagic/form', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@tmagic/form')>()),
   MForm: defineComponent({
     name: 'MForm',
     setup(_, { expose }) {

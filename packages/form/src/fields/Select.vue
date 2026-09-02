@@ -57,7 +57,7 @@
       <component
         v-for="option in options as SelectOption[]"
         class="tmagic-design-option"
-        :key="config.valueKey ? option.value[config.valueKey] : option.value"
+        :key="config.valueKey ? option.value?.[config.valueKey] : option.value"
         :is="optionComponent?.component || 'el-option'"
         v-bind="
           optionComponent?.props({
