@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 
 import type TMagicApp from '@tmagic/core';
 import { AppContent, useDsl } from '@tmagic/react-runtime-help';
@@ -25,6 +25,10 @@ function App() {
   const app = useContext<TMagicApp | undefined>(AppContent);
 
   const { pageConfig } = useDsl(app);
+
+  useEffect(() => {
+    app?.dataSourceManager?.emit('mounted');
+  }, [app]);
 
   const MagicUiPage = app?.resolveComponent('page');
 

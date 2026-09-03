@@ -43,6 +43,7 @@ new DataSource(options: DataSourceOptions)
 | `methods` | `CodeBlockContent[]` | 自定义方法配置 |
 | `data` | `any` | 当前数据 |
 | `isInit` | `boolean` | 是否已初始化 |
+| `isMounted` | `boolean` | 页面渲染后的 `mounted` 是否已执行 |
 
 ## 实例方法
 
@@ -171,6 +172,28 @@ ds.onDataChange('user.name', (payload) => {
 - **详情：**
 
   初始化数据源。
+
+### mounted
+
+- **返回：**
+  - `{Promise<void>}`
+
+- **详情：**
+
+  页面渲染完成后执行，执行后 `isMounted` 为 `true`。由 `DataSourceManager` 监听到 `mounted` 事件后统一调用，自定义数据源可以重写该方法实现「页面渲染后」的逻辑。
+
+- **示例：**
+
+```typescript
+class CustomDataSource extends DataSource {
+  public async mounted() {
+    // 页面渲染后再拉取数据，避免阻塞首屏
+    this.setData(await fetchSomething());
+
+    await super.mounted();
+  }
+}
+```
 
 ### destroy
 

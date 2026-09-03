@@ -222,7 +222,13 @@ describe('CodeBlockEditor', () => {
     });
     const timingItem = capturedConfig.find((c: any) => c.name === 'timing');
     const opts = timingItem.options();
-    expect(opts.length).toBe(4);
+    expect(opts.map((opt: any) => opt.value)).toEqual([
+      'beforeInit',
+      'afterInit',
+      'mounted',
+      'beforeRequest',
+      'afterRequest',
+    ]);
   });
 
   test('timing options - base 类型', () => {
@@ -231,7 +237,7 @@ describe('CodeBlockEditor', () => {
     });
     const timingItem = capturedConfig.find((c: any) => c.name === 'timing');
     const opts = timingItem.options();
-    expect(opts.length).toBe(2);
+    expect(opts.map((opt: any) => opt.value)).toEqual(['beforeInit', 'afterInit', 'mounted']);
   });
 
   test('changeHandler 触发 changedValue', async () => {

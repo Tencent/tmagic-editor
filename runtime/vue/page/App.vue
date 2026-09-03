@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive } from 'vue';
+import { onMounted, reactive } from 'vue';
 
 import type { Id, MPage } from '@tmagic/core';
 import { cloneDeep, DevtoolApi, getNodeInfo, replaceChildNode, setValueByKeyPath } from '@tmagic/core';
@@ -11,6 +11,10 @@ import { useComponent, useDsl } from '@tmagic/vue-runtime-help';
 
 const { pageConfig, app } = useDsl();
 const pageComponent = useComponent('page');
+
+onMounted(() => {
+  app.dataSourceManager?.emit('mounted');
+});
 
 if (import.meta.env.DEV) {
   app.devtools = new (class extends DevtoolApi {

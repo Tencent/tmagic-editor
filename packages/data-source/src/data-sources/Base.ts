@@ -31,6 +31,7 @@ import type { ChangeEvent, DataSourceOptions } from '@data-source/types';
  */
 export default class DataSource<T extends DataSourceSchema = DataSourceSchema> extends EventEmitter {
   public isInit = false;
+  public isMounted = false;
 
   /** @tmagic/core 实例 */
   public app: TMagicApp;
@@ -150,6 +151,13 @@ export default class DataSource<T extends DataSourceSchema = DataSourceSchema> e
 
   public async init() {
     this.isInit = true;
+  }
+
+  /**
+   * 页面渲染后执行，由 DataSourceManager 监听到 mounted 事件后统一调用
+   */
+  public async mounted() {
+    this.isMounted = true;
   }
 
   public destroy() {

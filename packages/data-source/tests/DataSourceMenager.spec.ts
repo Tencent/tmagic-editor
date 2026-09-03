@@ -302,6 +302,227 @@ describe('DataSourceManager - init 生命周期', () => {
   });
 });
 
+describe('DataSourceManager - mounted 生命周期', () => {
+  afterEach(() => {
+    DataSourceManager.clearDataSourceClass();
+  });
+
+  // 等待 mounted 事件触发的异步流程执行完
+  const flush = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
+
+  const createApp = (id: string, dataSources: any[] = [], jsEngine?: any) =>
+    new TMagicApp({
+      ...(jsEngine ? { jsEngine } : {}),
+      config: {
+        type: NodeType.ROOT,
+        id,
+        items: [],
+        dataSources,
+      },
+    } as any);
+
+  test('mounted 事件会统一执行所有数据源的 mounted', async () => {
+    const app = createApp('app_mounted', [
+      { type: 'base', id: 'ds_m1', fields: [], methods: [], events: [] },
+      { type: 'base', id: 'ds_m2', fields: [], methods: [], events: [] },
+    ]);
+    const dsm = new DataSourceManager({ app });
+
+    expect(dsm.isMounted).toBe(false);
+    expect(dsm.get('ds_m1')?.isMounted).toBe(false);
+
+    dsm.emit('mounted');
+    await flush();
+
+    expect(dsm.isMounted).toBe(true);
+    expect(dsm.get('ds_m1')?.isMounted).toBe(true);
+    expect(dsm.get('ds_m2')?.isMounted).toBe(true);
+  });
+
+  test('methods 中 timing=mounted 的 content 会在 ds.mounted 之后调用', async () => {
+    const app = createApp('app_mounted_method');
+    const dsm = new DataSourceManager({ app });
+    const order: string[] = [];
+    const mountedContent = vi.fn(() => {
+      order.push('method');
+    });
+    const ds = new DataSource({
+      app,
+      schema: {
+        type: 'base',
+        id: 'ds_mounted_method',
+        fields: [],
+        events: [],
+        methods: [{ name: 'onMounted', content: mountedContent, timing: 'mounted', params: [] }],
+      } as any,
+    });
+    const origMounted = ds.mounted.bind(ds);
+    ds.mounted = async () => {
+      order.push('mounted');
+      await origMounted();
+    };
+
+    await dsm.mounted(ds);
+
+    expect(mountedContent).toHaveBeenCalledTimes(1);
+    const arg = mountedContent.mock.calls[0][0] as any;
+    expect(arg.dataSource).toBe(ds);
+    expect(arg.app).toBe(app);
+    expect(order).toEqual(['mounted', 'method']);
+  });
+
+  test('ds.isMounted 为 true 时直接跳过', async () => {
+    const app = createApp('app_mounted_skip');
+    const dsm = new DataSourceManager({ app });
+    const content = vi.fn();
+    const ds = new DataSource({
+      app,
+      schema: {
+        type: 'base',
+        id: 'ds_mounted_skip',
+        fields: [],
+        events: [],
+        methods: [{ name: 'onMounted', content, timing: 'mounted', params: [] }],
+      } as any,
+    });
+
+    await dsm.mounted(ds);
+    await dsm.mounted(ds);
+
+    expect(content).toHaveBeenCalledTimes(1);
+  });
+
+  test('jsEngine 命中 disabledInitInJsEngine 时跳过 mounted', async () => {
+    const app = createApp('app_mounted_disabled', [], 'nodejs');
+    const dsm = new DataSourceManager({ app });
+    const ds = new DataSource({
+      app,
+      schema: {
+        type: 'base',
+        id: 'ds_mounted_disabled',
+        fields: [],
+        methods: [],
+        events: [],
+        disabledInitInJsEngine: ['nodejs'],
+      } as any,
+    });
+
+    await dsm.mounted(ds);
+
+    expect(ds.isMounted).toBe(false);
+  });
+
+  test('method.content 非函数时提前返回', async () => {
+    const app = createApp('app_mounted_bad');
+    const dsm = new DataSourceManager({ app });
+    const content = vi.fn();
+    const ds = new DataSource({
+      app,
+      schema: {
+        type: 'base',
+        id: 'ds_mounted_bad',
+        fields: [],
+        events: [],
+        methods: [
+          { name: 'bad', content: 'not-a-function', timing: 'mounted', params: [] } as any,
+          { name: 'onMounted', content, timing: 'mounted', params: [] } as any,
+        ],
+      } as any,
+    });
+
+    await dsm.mounted(ds);
+
+    expect(ds.isMounted).toBe(true);
+    expect(content).not.toHaveBeenCalled();
+  });
+
+  test('mounted 抛错时不会产生未处理的异常', async () => {
+    const mountedSpy = vi.spyOn(DataSource.prototype, 'mounted').mockRejectedValue(new Error('mounted-boom'));
+
+    try {
+      const app = createApp('app_mounted_err', [{ type: 'base', id: 'ds_me', fields: [], methods: [], events: [] }]);
+      const dsm = new DataSourceManager({ app });
+
+      dsm.emit('mounted');
+      await flush();
+
+      expect(dsm.isMounted).toBe(true);
+    } finally {
+      mountedSpy.mockRestore();
+    }
+  });
+
+  test('Promise.allSettled 不可用时走 Promise.all 兼容分支', async () => {
+    const original = Promise.allSettled;
+    (Promise as any).allSettled = undefined;
+    const mountedSpy = vi.spyOn(DataSource.prototype, 'mounted').mockRejectedValueOnce(new Error('compat-boom'));
+
+    try {
+      const app = createApp('app_mounted_compat', [
+        { type: 'base', id: 'ds_mc1', fields: [], methods: [], events: [] },
+        { type: 'base', id: 'ds_mc2', fields: [], methods: [], events: [] },
+      ]);
+      const dsm = new DataSourceManager({ app });
+
+      dsm.emit('mounted');
+      await flush();
+
+      expect(mountedSpy).toHaveBeenCalledTimes(2);
+      expect(dsm.get('ds_mc2')?.isMounted).toBe(true);
+    } finally {
+      (Promise as any).allSettled = original;
+      mountedSpy.mockRestore();
+    }
+  });
+
+  test('页面渲染后注册的数据源类型会在 init 之后补充执行 mounted', async () => {
+    const app = createApp('app_mounted_register', [
+      { type: 'mounted-late', id: 'ds_late', fields: [], methods: [], events: [] },
+    ]);
+    const dsm = new DataSourceManager({ app });
+
+    expect(dsm.get('ds_late')).toBeUndefined();
+
+    dsm.emit('mounted');
+    await flush();
+
+    class LateDataSource extends DataSource {}
+    DataSourceManager.register('mounted-late', LateDataSource as any);
+    await flush();
+
+    expect(dsm.get('ds_late')?.isInit).toBe(true);
+    expect(dsm.get('ds_late')?.isMounted).toBe(true);
+  });
+
+  test('页面渲染后 updateSchema 重建的数据源会执行 mounted', async () => {
+    const app = createApp('app_mounted_update', [
+      { type: 'base', id: 'ds_up', fields: [{ name: 'a' }], methods: [], events: [] },
+    ]);
+    const dsm = new DataSourceManager({ app });
+
+    dsm.emit('mounted');
+    await flush();
+
+    dsm.updateSchema([{ type: 'base', id: 'ds_up', fields: [{ name: 'b' }], methods: [], events: [] }]);
+    await flush();
+
+    expect(dsm.get('ds_up')?.isMounted).toBe(true);
+  });
+
+  test('页面未渲染时 updateSchema 不会执行 mounted', async () => {
+    const app = createApp('app_update_not_mounted', [
+      { type: 'base', id: 'ds_nm', fields: [{ name: 'a' }], methods: [], events: [] },
+    ]);
+    const dsm = new DataSourceManager({ app });
+
+    dsm.updateSchema([{ type: 'base', id: 'ds_nm', fields: [{ name: 'b' }], methods: [], events: [] }]);
+    await flush();
+
+    expect(dsm.get('ds_nm')?.isInit).toBe(true);
+    expect(dsm.get('ds_nm')?.isMounted).toBe(false);
+  });
+});
+
 describe('DataSourceManager - addDataSource 边界', () => {
   afterEach(() => {
     DataSourceManager.clearDataSourceClass();

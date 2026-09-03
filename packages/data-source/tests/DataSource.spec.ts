@@ -38,6 +38,25 @@ describe('DataSource', () => {
 
     expect(ds.isInit).toBeTruthy();
   });
+
+  test('mounted', async () => {
+    const ds = new DataSource({
+      schema: {
+        type: 'base',
+        id: '1',
+        fields: [{ name: 'name' }],
+        methods: [],
+        events: [],
+      },
+      app: new App({}),
+    });
+
+    expect(ds.isMounted).toBe(false);
+
+    await ds.mounted();
+
+    expect(ds.isMounted).toBe(true);
+  });
 });
 
 describe('DataSource setData', () => {

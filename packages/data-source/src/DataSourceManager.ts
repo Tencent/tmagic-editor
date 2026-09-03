@@ -57,7 +57,7 @@ class DataSourceManager extends EventEmitter {
       for (let config = list.shift(); config; config = list.shift()) {
         const ds = app.addDataSource(config);
         if (ds) {
-          app.init(ds);
+          app.initAndMount(ds);
         }
       }
     });
@@ -84,6 +84,8 @@ class DataSourceManager extends EventEmitter {
   public data: DataSourceManagerData = {};
   public initialData: DataSourceManagerData = {};
   public useMock?: boolean = false;
+  /** 页面是否已经渲染完成 */
+  public isMounted = false;
 
   constructor({ app, useMock, initialData }: DataSourceManagerOptions) {
     super();
@@ -109,6 +111,12 @@ class DataSourceManager extends EventEmitter {
         this.callDsInit();
       });
     }
+
+    // 由runtime在顶层组件渲染完成后触发
+    this.on('mounted', () => {
+      this.isMounted = true;
+      this.callDsMounted();
+    });
   }
 
   public async init(ds: DataSource) {
@@ -132,6 +140,29 @@ class DataSourceManager extends EventEmitter {
     for (const method of ds.methods) {
       if (typeof method.content !== 'function') return;
       if (method.timing === 'afterInit') {
+        await method.content({ params: {}, dataSource: ds, app: this.app });
+      }
+    }
+  }
+
+  /**
+   * 页面渲染完成后执行单个数据源的mounted
+   * @param {DataSource} ds 数据源实例
+   */
+  public async mounted(ds: DataSource) {
+    if (ds.isMounted) {
+      return;
+    }
+
+    if (this.app.jsEngine && ds.schema.disabledInitInJsEngine?.includes(this.app.jsEngine)) {
+      return;
+    }
+
+    await ds.mounted?.();
+
+    for (const method of ds.methods) {
+      if (typeof method.content !== 'function') return;
+      if (method.timing === 'mounted') {
         await method.content({ params: {}, dataSource: ds, app: this.app });
       }
     }
@@ -219,7 +250,7 @@ class DataSourceManager extends EventEmitter {
       this.addDataSource(cloneDeep(schema));
       const newDs = this.get(schema.id);
       if (newDs) {
-        this.init(newDs);
+        this.initAndMount(newDs);
       }
     }
   }
@@ -388,6 +419,28 @@ class DataSourceManager extends EventEmitter {
         .catch(() => {
           this.emit('init', this.data);
         });
+    }
+  }
+
+  private callDsMounted() {
+    const promises = Array.from(this.dataSourceMap).map(([, ds]) => this.mounted(ds));
+
+    if (typeof Promise.allSettled === 'function') {
+      return Promise.allSettled(promises);
+    }
+
+    return Promise.all(promises.map((promise) => promise.catch(() => undefined)));
+  }
+
+  /**
+   * 初始化数据源，如果页面已经渲染完成（如异步注册的数据源类型），则在初始化后补充执行mounted
+   * @param {DataSource} ds 数据源实例
+   */
+  private async initAndMount(ds: DataSource) {
+    await this.init(ds);
+
+    if (this.isMounted) {
+      await this.mounted(ds);
     }
   }
 }

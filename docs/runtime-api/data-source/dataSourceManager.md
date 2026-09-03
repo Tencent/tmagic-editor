@@ -25,6 +25,7 @@ new DataSourceManager(options: DataSourceManagerOptions)
 | `data` | `DataSourceManagerData` | 所有数据源的数据 |
 | `initialData` | `DataSourceManagerData` | 初始化数据 |
 | `useMock` | `boolean` | 是否使用 Mock 数据 |
+| `isMounted` | `boolean` | 页面是否已渲染完成（收到过 `mounted` 事件） |
 
 ## 静态方法
 
@@ -109,6 +110,27 @@ if (ds) {
 }
 ```
 
+### mounted
+
+- **参数：**
+  - `{DataSource} ds` 单个数据源实例（必填）
+
+- **返回：**
+  - `{Promise<void>}`
+
+- **详情：**
+
+  页面渲染完成后执行单个数据源的 `mounted`：先调用 `ds.mounted()`，再依次执行 `methods` 中 `timing === 'mounted'` 的方法。当 `ds.isMounted` 为 `true`，或当前 `app.jsEngine` 命中 `ds.schema.disabledInitInJsEngine` 时直接跳过。
+
+  一般不需要手动调用，runtime 在顶层组件渲染完成后触发 `mounted` 事件，由 manager 统一对所有数据源调用该方法。
+
+- **示例：**
+
+```typescript
+// runtime 顶层组件渲染完成后
+app.dataSourceManager?.emit('mounted');
+```
+
 ### get
 
 - **参数：**
@@ -184,7 +206,7 @@ const ds = dataSourceManager.addDataSource({
 
 - **详情：**
 
-  同步更新数据源 DSL 配置：先按 `id` 移除已有数据源，再以 `cloneDeep` 重新 `addDataSource`，并对新建实例触发 `init`（异步执行，不会被该方法 `await`）。一般在编辑器中修改配置后调用。
+  同步更新数据源 DSL 配置：先按 `id` 移除已有数据源，再以 `cloneDeep` 重新 `addDataSource`，并对新建实例触发 `init`（异步执行，不会被该方法 `await`）；若此时 `isMounted` 已为 `true`，`init` 完成后还会补充执行 `mounted`。一般在编辑器中修改配置后调用。
 
 ### compiledNode
 
@@ -325,6 +347,7 @@ DataSourceManager 继承自 EventEmitter，支持以下事件：
 |--------|------|----------|
 | `change` | 单个数据源数据变化 | `(dsId: string, changeEvent: ChangeEvent)` |
 | `init` | 所有数据源初始化完成；现代分支携带 `(data, errors)`，旧 Promise.all 分支为 `(this.data)` | `(data, errors?)` |
+| `mounted` | 由 runtime 在顶层组件渲染完成后触发，manager 收到后统一执行各数据源的 `mounted` | 无 |
 | `registered-all` | 所有数据源注册完成 | 无 |
 | `update-data` | 由 `createDataSourceManager` 在数据变化后发出，用于通知节点重新渲染 | `(newNodes: MNode[], sourceId: string, changeEvent: ChangeEvent, pageId: Id)` |
 

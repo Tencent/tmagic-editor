@@ -103,6 +103,7 @@ export const getCodeBlockFormConfig = (options: GetCodeBlockFormConfigOptions = 
         const list = [
           { text: '初始化前', value: 'beforeInit' },
           { text: '初始化后', value: 'afterInit' },
+          { text: '页面渲染后', value: 'mounted' },
         ];
         if (dataSourceType?.() !== 'base') {
           list.push({ text: '请求前', value: 'beforeRequest' });
