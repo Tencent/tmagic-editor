@@ -254,6 +254,7 @@ export const initServiceState = (
     uiService.resetState();
     componentListService.resetState();
     codeBlockService.resetState();
+    eventsService.resetState();
     keybindingService.reset();
     depService.reset();
   });

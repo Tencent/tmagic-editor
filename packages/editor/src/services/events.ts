@@ -35,8 +35,8 @@ const canUsePluginMethods = {
 type AsyncMethodName = Writable<(typeof canUsePluginMethods)['async']>;
 type SyncMethodName = Writable<(typeof canUsePluginMethods)['sync']>;
 
-let eventMap: Record<string, EventOption[]> = reactive({});
-let methodMap: Record<string, EventOption[]> = reactive({});
+const eventMap: Record<string, EventOption[]> = reactive({});
+const methodMap: Record<string, EventOption[]> = reactive({});
 
 class Events extends BaseService {
   constructor() {
@@ -75,8 +75,9 @@ class Events extends BaseService {
   }
 
   public resetState() {
-    eventMap = reactive({});
-    methodMap = reactive({});
+    // 原地清空而不是重新赋值，保留 reactive 代理身份，已建立的 computed / 渲染副作用才能收到更新
+    Object.keys(eventMap).forEach((type) => delete eventMap[type]);
+    Object.keys(methodMap).forEach((type) => delete methodMap[type]);
   }
 
   public destroy() {

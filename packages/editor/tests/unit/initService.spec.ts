@@ -8,6 +8,7 @@ import { defineComponent, h, nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
 
 import { DepTargetType } from '@tmagic/core';
+import { getNodes } from '@tmagic/utils';
 
 import { initServiceEvents, initServiceState } from '@editor/initService';
 import * as logger from '@editor/utils/logger';
@@ -60,6 +61,7 @@ const mkServices = () => {
     ...mkSvc('events'),
     setEvents: vi.fn(),
     setMethods: vi.fn(),
+    resetState: vi.fn(),
   };
   const uiService: any = {
     ...mkSvc('ui'),
@@ -210,8 +212,8 @@ describe('initServiceState', () => {
       eventMethodList: { typeA: { events: [{ name: 'click' }], methods: [{ name: 'm' }] } },
     } as any;
     mount(Wrap(props, services));
-    expect(services.eventsService.setEvents).toHaveBeenCalled();
-    expect(services.eventsService.setMethods).toHaveBeenCalled();
+    expect(services.eventsService.setEvents).toHaveBeenCalledWith({ typeA: [{ name: 'click' }] });
+    expect(services.eventsService.setMethods).toHaveBeenCalledWith({ typeA: [{ name: 'm' }] });
   });
 
   test('datasourceConfigs 设置 form config', () => {
@@ -284,10 +286,43 @@ describe('initServiceState', () => {
     expect(services.uiService.resetState).toHaveBeenCalled();
     expect(services.componentListService.resetState).toHaveBeenCalled();
     expect(services.codeBlockService.resetState).toHaveBeenCalled();
+    expect(services.eventsService.resetState).toHaveBeenCalled();
     expect(services.keybindingService.reset).toHaveBeenCalled();
     expect(services.depService.reset).toHaveBeenCalled();
   });
 });
+
+const mkDataSourceManager = () => ({
+  addDataSource: vi.fn(),
+  removeDataSource: vi.fn(),
+  get: vi.fn(() => ({
+    setFields: vi.fn(),
+    setData: vi.fn(),
+    getDefaultData: vi.fn(() => ({})),
+  })),
+  init: vi.fn(),
+  compiledNode: vi.fn((node: any) => node),
+});
+
+/** renderer.runtime 直接就绪，getTMagicApp 走同步分支 */
+const mkReadyStage = (app: any) => {
+  const runtime = {
+    getApp: vi.fn(() => app),
+    updateRootConfig: vi.fn(),
+    updatePageId: vi.fn(),
+  };
+  return {
+    renderer: {
+      runtime,
+      getRuntime: vi.fn(async () => runtime),
+      once: vi.fn(),
+    },
+    select: vi.fn(),
+    reloadIframe: vi.fn(),
+    update: vi.fn(),
+    runtime,
+  };
+};
 
 describe('initServiceEvents', () => {
   let services: ReturnType<typeof mkServices>;
@@ -499,4 +534,217 @@ describe('initServiceEvents', () => {
   });
 
   // 因 services 中 editor.state 不是 reactive，stage watch 不会触发，跳过该测试场景
+
+  test('getTMagicApp 在 runtime 未就绪时等待 runtime-ready，并复用同一个 promise', async () => {
+    const dataSourceManager = mkDataSourceManager();
+    const app = { dsl: {}, dataSourceManager };
+    let runtimeReady: any;
+    const renderer: any = {
+      runtime: null,
+      getRuntime: vi.fn(),
+      once: vi.fn((_event: string, cb: any) => {
+        runtimeReady = cb;
+      }),
+    };
+    services.editorService.state.stage = { renderer, select: vi.fn() };
+    mount(WrapEvents({} as any, emit, services));
+
+    services.dataSourceService.emit('add', { id: 'd1', type: 'base' });
+    services.dataSourceService.emit('add', { id: 'd2', type: 'base' });
+    await nextTick();
+    // 两次调用只应注册一次 runtime-ready 监听
+    expect(renderer.once).toHaveBeenCalledTimes(1);
+
+    renderer.runtime = { getApp: () => app };
+    runtimeReady();
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(dataSourceManager.addDataSource).toHaveBeenCalledTimes(2);
+    expect(dataSourceManager.init).toHaveBeenCalled();
+  });
+
+  test('getTMagicApp 在 stage 没有 renderer 时返回 undefined', async () => {
+    services.editorService.state.stage = { select: vi.fn() };
+    mount(WrapEvents({} as any, emit, services));
+
+    services.dataSourceService.emit('add', { id: 'd1', type: 'base' });
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(services.depService.addTarget).toHaveBeenCalled();
+  });
+
+  test('ds-collected 事件把 dataSourceDeps 同步给 runtime app', async () => {
+    const app: any = { dsl: { dataSourceDeps: null }, dataSourceManager: mkDataSourceManager() };
+    services.editorService.state.stage = mkReadyStage(app);
+    services.editorService.state.root = { id: 'r', dataSourceDeps: { d1: {} } };
+    mount(WrapEvents({} as any, emit, services));
+
+    services.depService.emit('ds-collected');
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(app.dsl.dataSourceDeps).toEqual({ d1: {} });
+  });
+
+  test('rootChange items 是数组时更新画布 dsl', async () => {
+    const app: any = { dsl: {}, dataSourceManager: mkDataSourceManager() };
+    const stage = mkReadyStage(app);
+    services.editorService.state.stage = stage;
+    services.editorService.state.page = { id: 'p1' };
+    services.editorService.state.node = { id: 'n1' };
+    mount(WrapEvents({} as any, emit, services));
+
+    services.editorService.emit('root-change', {
+      id: 'r',
+      items: [{ id: 'n1', type: 'text' }],
+      dataSources: [],
+      dataSourceDeps: { d1: {} },
+      codeBlocks: {},
+    });
+    await new Promise((r) => setTimeout(r, 10));
+
+    expect(stage.runtime.updatePageId).toHaveBeenCalledWith('p1');
+    expect(stage.runtime.updateRootConfig).toHaveBeenCalled();
+    expect(stage.select).toHaveBeenCalledWith('n1');
+  });
+
+  test('rootChange items 不是数组时清空依赖', async () => {
+    services.editorService.state.root = { id: 'r' };
+    mount(WrapEvents({} as any, emit, services));
+
+    const value: any = { id: 'r', dataSourceDeps: { a: {} }, dataSourceCondDeps: { b: {} } };
+    services.editorService.emit('root-change', value);
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(services.depService.clear).toHaveBeenCalled();
+    expect(value.dataSourceDeps).toBeUndefined();
+    expect(value.dataSourceCondDeps).toBeUndefined();
+  });
+
+  test('rootChange 没有可选中节点时回落到 root 自身', async () => {
+    services.editorService.getNodeById.mockReturnValue(null);
+    mount(WrapEvents({} as any, emit, services));
+
+    const value: any = { id: 'r', items: [] };
+    services.editorService.emit('root-change', value, { id: 'prev' });
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(services.editorService.set).toHaveBeenCalledWith('nodes', [value]);
+    expect(services.editorService.set).toHaveBeenCalledWith('parent', null);
+    expect(services.editorService.set).toHaveBeenCalledWith('page', null);
+    expect(emit).toHaveBeenCalledWith('update:modelValue', value);
+  });
+
+  test('rootChange 有 items 时选中第一个节点', async () => {
+    services.editorService.getNodeById.mockReturnValue(null);
+    mount(WrapEvents({} as any, emit, services));
+
+    services.editorService.emit('root-change', { id: 'r', items: [{ id: 'first', type: 'page' }] });
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(services.editorService.select).toHaveBeenCalledWith({ id: 'first', type: 'page' });
+  });
+
+  test('update 事件：ROOT 节点、无 propPath、命中已收集依赖三种分支', async () => {
+    services.editorService.state.root = { id: 'r', items: [] };
+    services.depService.getTargets.mockReturnValue({
+      t1: { deps: { n3: { keys: ['props.text'] } } },
+    });
+    mount(WrapEvents({} as any, emit, services));
+
+    services.editorService.emit('update', [
+      { newNode: { id: 'r', type: 'root' }, oldNode: { id: 'r', type: 'root' } },
+      {
+        newNode: { id: 'n2', type: 'text' },
+        oldNode: { id: 'n2', type: 'text' },
+        changeRecords: [{ value: 'x' }],
+      },
+      {
+        newNode: { id: 'n3', type: 'text' },
+        oldNode: { id: 'n3', type: 'text' },
+        changeRecords: [{ propPath: 'props.text', value: 'x' }],
+      },
+    ]);
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(services.depService.collectIdle).toHaveBeenCalled();
+  });
+
+  test('dataSource update 修改 mocks / methods 分别只重建对应 target', async () => {
+    const app: any = { dsl: {}, dataSourceManager: mkDataSourceManager() };
+    services.editorService.state.stage = mkReadyStage(app);
+    services.editorService.state.root = { id: 'r', items: [{ id: 'a', type: 'text' }] };
+    mount(WrapEvents({} as any, emit, services));
+
+    services.dataSourceService.emit(
+      'update',
+      { id: 'd1', type: 'base', fields: [], mocks: [{ useInEditor: true, data: { a: 1 } }] },
+      { changeRecords: [{ propPath: 'mocks' }] },
+    );
+    await new Promise((r) => setTimeout(r, 0));
+    expect(services.depService.removeTarget).toHaveBeenCalledWith('d1', DepTargetType.DATA_SOURCE);
+
+    services.depService.removeTarget.mockClear();
+    services.dataSourceService.emit(
+      'update',
+      { id: 'd1', type: 'base', fields: [], methods: [] },
+      { changeRecords: [{ propPath: 'methods.0.name' }] },
+    );
+    await new Promise((r) => setTimeout(r, 0));
+    expect(services.depService.removeTarget).toHaveBeenCalledWith('d1', DepTargetType.DATA_SOURCE_METHOD);
+  });
+
+  test('dataSource update 无依赖变更时只刷新数据', async () => {
+    const dataSourceManager = mkDataSourceManager();
+    const app: any = { dsl: {}, dataSourceManager };
+    services.editorService.state.stage = mkReadyStage(app);
+    services.editorService.state.root = { id: 'r', items: [], dataSources: [{ id: 'd1' }] };
+    mount(WrapEvents({} as any, emit, services));
+
+    services.dataSourceService.emit(
+      'update',
+      { id: 'd1', type: 'base', fields: [] },
+      { changeRecords: [{ propPath: 'title' }, {}] },
+    );
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(dataSourceManager.get).toHaveBeenCalledWith('d1');
+    expect(services.depService.clearIdleTasks).not.toHaveBeenCalled();
+  });
+
+  test('dataSource remove 重新收集依赖并从 app 中移除数据源', async () => {
+    const dataSourceManager = mkDataSourceManager();
+    const app: any = { dsl: {}, dataSourceManager };
+    services.editorService.state.stage = mkReadyStage(app);
+    services.editorService.state.root = {
+      id: 'r',
+      items: [],
+      dataSources: [{ id: 'd1' }],
+      dataSourceDeps: { d1: { n1: {} } },
+    };
+    mount(WrapEvents({} as any, emit, services));
+
+    services.dataSourceService.emit('remove', 'd1');
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(dataSourceManager.removeDataSource).toHaveBeenCalledWith('d1');
+    expect(services.depService.removeTarget).toHaveBeenCalledWith('d1', DepTargetType.DATA_SOURCE);
+    expect(services.depService.removeTarget).toHaveBeenCalledWith('d1', DepTargetType.DATA_SOURCE_COND);
+    expect(services.depService.removeTarget).toHaveBeenCalledWith('d1', DepTargetType.DATA_SOURCE_METHOD);
+    expect(app.dsl.dataSources).toEqual([{ id: 'd1' }]);
+  });
+
+  test('dataSource remove 收集未完成时不移除数据源', async () => {
+    const dataSourceManager = mkDataSourceManager();
+    const app: any = { dsl: {}, dataSourceManager };
+    services.editorService.state.stage = mkReadyStage(app);
+    services.editorService.state.root = { id: 'r', items: [] };
+    vi.mocked(getNodes).mockReturnValueOnce([{ id: 'n1', type: 'text' }] as any);
+    services.depService.collectIdle.mockResolvedValue(false);
+    mount(WrapEvents({} as any, emit, services));
+
+    services.dataSourceService.emit('remove', 'd1');
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(dataSourceManager.removeDataSource).not.toHaveBeenCalled();
+  });
 });

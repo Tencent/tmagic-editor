@@ -16,7 +16,11 @@
 
 - **详情：**
 
-  批量设置多个组件类型的事件列表
+  批量设置多个组件类型的事件列表。增量合并语义：只写入入参中出现的类型，已有的其他类型保持不变。
+
+  ::: tip 切换 runtime 版本
+  不同版本的 runtime 事件表不同，直接调用 `setEvents` 会让上一个版本独有的类型残留。是否需要清掉上一个版本的数据由业务自行决定，需要清掉时先调用 [`resetState`](#resetstate) 再写入新表。
+  :::
 
 - **示例：**
 
@@ -47,7 +51,7 @@ eventsService.setEvents({
 
 - **详情：**
 
-  设置指定组件类型的事件列表
+  设置指定组件类型的事件列表，只影响该类型
 
 - **示例：**
 
@@ -106,7 +110,7 @@ eventsService.usePlugin({
 
 - **详情：**
 
-  批量设置多个组件类型的方法列表
+  批量设置多个组件类型的方法列表。语义与 `setEvents` 一致：增量合并，入参中不存在的类型保持不变。
 
 - **示例：**
 
@@ -138,7 +142,7 @@ eventsService.setMethods({
 
 - **详情：**
 
-  设置指定组件类型的方法列表
+  设置指定组件类型的方法列表，只影响该类型
 
 - **示例：**
 
@@ -209,14 +213,17 @@ eventsService.usePlugin({
 
 - **详情：**
 
-  重置事件服务状态，清空所有事件和方法配置
+  重置事件服务状态，清空所有事件和方法配置。`setEvents` / `setMethods` 是增量合并，切换 runtime 版本这类需要丢弃上一份事件表的场景，由业务在写入新表前自行调用本方法。
 
 - **示例：**
 
 ```js
 import { eventsService } from '@tmagic/editor';
 
+// 切到另一个版本的 runtime：先清空，再写入该版本的事件表
 eventsService.resetState();
+eventsService.setEvents(nextVersionEvents);
+eventsService.setMethods(nextVersionMethods);
 ```
 
 ## destroy

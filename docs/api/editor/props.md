@@ -630,6 +630,10 @@ const propsValues = {
   该属性最终会设置到[eventsService](./eventsServiceMethods.md)中，所以也可直接调用[eventsService.setEvents()](./eventsServiceMethods.md#setEvents)与[eventsService.setMethods()](./eventsServiceMethods.md#setMethods)方法来配置
   :::
 
+  :::warning
+  该属性每次变更都是增量合并，不会清掉上一次写入的类型。切换 runtime 版本时若需要丢弃旧版本的事件表，请自行调用 [eventsService.resetState()](./eventsServiceMethods.md#resetstate)
+  :::
+
 - **默认值：** `{}`
 
 - **类型：** `Record<string, { events: EventOption[]; methods: EventOption[] }>`
