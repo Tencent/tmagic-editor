@@ -1,3 +1,16 @@
+# [1.8.0-beta.27](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.26...v1.8.0-beta.27) (2026-09-04)
+
+
+### Bug Fixes
+
+* **editor,form:** 合并宿主 FORM_CONTEXT 并修复 formState mForm 自引用 ([b0d43dc](https://github.com/Tencent/tmagic-editor/commit/b0d43dc2775a2241499de9ab1b165a5ad3febcf3))
+* **editor:** 修复 eventsService resetState 响应式失效并在编辑器重置时清空 ([959c032](https://github.com/Tencent/tmagic-editor/commit/959c0322b6885ee00c38bc830f58841ccbb42a40))
+* **form:** 避免 Select init 请求失败或路径缺失时抛出未处理异常 ([d1cb8c3](https://github.com/Tencent/tmagic-editor/commit/d1cb8c3853ac724b424dbe8de2d2a63bf6302324))
+
+
+### Features
+
+* **data-source:** 新增数据源 mounted 生命周期 ([092bc29](https://github.com/Tencent/tmagic-editor/commit/092bc2914d444c9527140a204ab8bc2776d31a1b))
 # [1.8.0-beta.26](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.25...v1.8.0-beta.26) (2026-09-01)
 
 
