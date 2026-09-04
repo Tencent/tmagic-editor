@@ -6,6 +6,10 @@ packages:
   - "react-components/*"
   - "eslint-config"
 
+# Link matching workspace packages so release lockfile updates do not
+# fetch a just-bumped @tmagic/* version from the registry.
+linkWorkspacePackages: true
+
 minimumReleaseAge: 0
 
 allowBuilds:

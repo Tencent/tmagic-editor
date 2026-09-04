@@ -165,6 +165,11 @@ async function main() {
   updateVersions(targetVersion);
   versionUpdated = true;
 
+  // Refresh the lockfile after version bumps. Matching @tmagic/* pins are
+  // linked locally via linkWorkspacePackages (see pnpm-workspace.yaml).
+  step('\nUpdating lockfile...');
+  await run('pnpm', ['install', '--prefer-offline']);
+
   // build all packages with types
   step('\nBuilding all packages...');
   if (!skipBuild && !isDryRun) {
@@ -220,21 +225,6 @@ async function main() {
 
   for (const pkg of packages) {
     await publishPackage(pkg, targetVersion, additionalPublishFlags);
-  }
-
-  // update pnpm-lock.yaml
-  step('\nUpdating lockfile...');
-  await run('pnpm', ['install', '--prefer-offline']);
-
-  if (!skipGit) {
-    const { stdout } = await run('git', ['diff'], { stdio: 'pipe' });
-    if (stdout) {
-      step('\nCommitting changes...');
-      await runIfNotDry('git', ['add', '-A']);
-      await runIfNotDry('git', ['commit', '-m', `chore: update lockfile v${targetVersion}`, '--verify']);
-    } else {
-      console.log('No changes to commit.');
-    }
   }
 
   // push to GitHub
