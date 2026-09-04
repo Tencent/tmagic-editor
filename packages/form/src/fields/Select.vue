@@ -372,7 +372,12 @@ const getInitOption = async () => {
     });
   }
 
-  let initData = getValueByKeyPath(initRoot || root, res);
+  let initData: any;
+  try {
+    initData = getValueByKeyPath(initRoot || root, res);
+  } catch {
+    // 响应中不存在 initRoot/root 路径时按无数据处理
+  }
   if (initData) {
     if (!Array.isArray(initData)) {
       initData = [initData];
@@ -417,8 +422,12 @@ if (typeof props.config.options === 'function') {
     const v = props.model[props.name];
     if (Array.isArray(v) ? !v.length : typeof v === 'undefined') return;
     if (typeof v === 'undefined' || hasOption(v)) return;
-    const data = await getInitOption();
-    setOptions(data);
+    try {
+      const data = await getInitOption();
+      setOptions(data);
+    } catch {
+      setOptions([]);
+    }
   };
 
   watch(

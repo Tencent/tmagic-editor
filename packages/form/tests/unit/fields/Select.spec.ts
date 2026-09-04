@@ -691,4 +691,16 @@ describe('Select - getInitOption 初始化接口分支', () => {
 
     expect((wrapper.findComponent(MSelect).vm as any).options).toEqual([]);
   });
+
+  test('init 请求失败时 options 为空且不抛未处理异常', async () => {
+    request = vi.fn(async () => {
+      throw new Error('init-fail');
+    });
+    setConfig({ request });
+
+    const wrapper = mountFormWithRequest({ initUrl: 'https://example.com/init', initRoot: 'data.obj' }, { s: 'a' });
+    await flushAsync();
+
+    expect((wrapper.findComponent(MSelect).vm as any).options).toEqual([]);
+  });
 });
