@@ -427,11 +427,25 @@ export const initServiceEvents = (
     });
   };
 
+  /**
+   * root 是否已经不是编辑器当前的 root。
+   *
+   * `editorService.set('root', v)` 是同步赋值后再派发 `root-change`，因此派发那一刻 `v` 一定
+   * 就是当前 root；但处理 `root-change` 要等 stage / runtime / 依赖收集等异步过程，期间 root
+   * 可能被新的一次整体替换（外部重设 DSL、更新 root 节点、源码保存等）顶掉，此时手上的 `v`
+   * 已是过期快照，继续用它刷画布或回写给外部都会与新 root 互相覆盖。
+   */
+  const isStaleRoot = (value: MApp | null) => toRaw(editorService.get('root')) !== toRaw(value);
+
   const updateStageDsl = async (value: MApp | null) => {
     const stage = await getStage();
 
     const runtime = await stage.renderer?.getRuntime();
     const app = await getTMagicApp();
+
+    // 等 stage / runtime 就绪期间 root 已被替换：新 root 的刷新可能已经完成，
+    // 再把旧 dsl 推给 runtime 会让画布回退到旧内容
+    if (isStaleRoot(value)) return;
 
     if (!app?.dataSourceManager) {
       runtime?.updateRootConfig?.(cloneDeep(toRaw(value))!);
@@ -448,6 +462,8 @@ export const initServiceEvents = (
       depService.clearIdleTasks();
 
       await (typeof Worker === 'undefined' ? collectIdle(value.items, true) : depService.collectByWorker(value));
+
+      if (isStaleRoot(value)) return;
 
       const dsl = cloneDeep(toRaw(value));
       if (dsl.dataSources && dsl.dataSourceDeps && app?.dataSourceManager) {
@@ -466,7 +482,7 @@ export const initServiceEvents = (
     depService.addTarget(createDataSourceCondTarget(ds, reactive({})));
   };
 
-  const rootChangeHandler = (value: MApp | null, preValue?: MApp | null) => {
+  const rootChangeHandler = (value: MApp | null) => {
     if (!value) return;
 
     value.codeBlocks = value.codeBlocks || {};
@@ -509,7 +525,13 @@ export const initServiceEvents = (
         editorService.set('page', null);
       }
 
-      if (toRaw(value) !== toRaw(preValue)) {
+      // 上面的 select 是异步的，期间 root 可能已被替换，过期快照不能再回写给外部：
+      // 两次整体替换各自持有一个快照时，回写会把对方的 root 顶掉，外部 modelValue 变化又会
+      // 重新 set root，两条链路无休止地交替下去（表现为编辑器卡死）
+      if (isStaleRoot(value)) return;
+
+      // 外部已经持有这个 root（如本次变化就是 modelValue 传进来的）时无需回写
+      if (toRaw(props.modelValue) !== toRaw(value)) {
         emit('update:modelValue', value);
       }
     })();

@@ -357,7 +357,6 @@ describe('initServiceEvents', () => {
   });
 
   test('rootChange 处理代码块和数据源', async () => {
-    services.editorService.state.root = { id: 'r' };
     mount(WrapEvents({} as any, emit, services));
     const value: any = {
       id: 'r',
@@ -365,6 +364,8 @@ describe('initServiceEvents', () => {
       dataSources: [{ id: 'd1', type: 'base' }],
       items: [],
     };
+    // set('root', v) 是先赋值再派发事件，mock 中同样先对齐 state 再 emit
+    services.editorService.state.root = value;
     services.editorService.emit('root-change', value, null);
     await new Promise((r) => setTimeout(r, 0));
     expect(services.codeBlockService.setCodeDsl).toHaveBeenCalled();
@@ -593,13 +594,15 @@ describe('initServiceEvents', () => {
     services.editorService.state.node = { id: 'n1' };
     mount(WrapEvents({} as any, emit, services));
 
-    services.editorService.emit('root-change', {
+    const value: any = {
       id: 'r',
       items: [{ id: 'n1', type: 'text' }],
       dataSources: [],
       dataSourceDeps: { d1: {} },
       codeBlocks: {},
-    });
+    };
+    services.editorService.state.root = value;
+    services.editorService.emit('root-change', value);
     await new Promise((r) => setTimeout(r, 10));
 
     expect(stage.runtime.updatePageId).toHaveBeenCalledWith('p1');
@@ -608,10 +611,10 @@ describe('initServiceEvents', () => {
   });
 
   test('rootChange items 不是数组时清空依赖', async () => {
-    services.editorService.state.root = { id: 'r' };
     mount(WrapEvents({} as any, emit, services));
 
     const value: any = { id: 'r', dataSourceDeps: { a: {} }, dataSourceCondDeps: { b: {} } };
+    services.editorService.state.root = value;
     services.editorService.emit('root-change', value);
     await new Promise((r) => setTimeout(r, 0));
 
@@ -625,6 +628,7 @@ describe('initServiceEvents', () => {
     mount(WrapEvents({} as any, emit, services));
 
     const value: any = { id: 'r', items: [] };
+    services.editorService.state.root = value;
     services.editorService.emit('root-change', value, { id: 'prev' });
     await new Promise((r) => setTimeout(r, 0));
 
@@ -638,10 +642,42 @@ describe('initServiceEvents', () => {
     services.editorService.getNodeById.mockReturnValue(null);
     mount(WrapEvents({} as any, emit, services));
 
-    services.editorService.emit('root-change', { id: 'r', items: [{ id: 'first', type: 'page' }] });
+    const value: any = { id: 'r', items: [{ id: 'first', type: 'page' }] };
+    services.editorService.state.root = value;
+    services.editorService.emit('root-change', value);
     await new Promise((r) => setTimeout(r, 0));
 
     expect(services.editorService.select).toHaveBeenCalledWith({ id: 'first', type: 'page' });
+  });
+
+  test('rootChange 外部已持有该 root 时不回写 modelValue', async () => {
+    services.editorService.getNodeById.mockReturnValue(null);
+    const value: any = { id: 'r', items: [] };
+    mount(WrapEvents({ modelValue: value } as any, emit, services));
+
+    services.editorService.state.root = value;
+    services.editorService.emit('root-change', value);
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(emit).not.toHaveBeenCalled();
+  });
+
+  test('rootChange 处理期间 root 被替换：不刷旧 dsl 也不回写过期快照', async () => {
+    const app: any = { dsl: {}, dataSourceManager: mkDataSourceManager() };
+    const stage = mkReadyStage(app);
+    services.editorService.state.stage = stage;
+    services.editorService.getNodeById.mockReturnValue(null);
+    mount(WrapEvents({} as any, emit, services));
+
+    const value: any = { id: 'r', items: [{ id: 'n1', type: 'text' }], dataSources: [], codeBlocks: {} };
+    services.editorService.state.root = value;
+    services.editorService.emit('root-change', value);
+    // 异步处理还没跑完，root 已被新的一次整体替换顶掉
+    services.editorService.state.root = { id: 'r', items: [], dataSources: [], codeBlocks: {} };
+    await new Promise((r) => setTimeout(r, 10));
+
+    expect(stage.runtime.updateRootConfig).not.toHaveBeenCalled();
+    expect(emit).not.toHaveBeenCalled();
   });
 
   test('update 事件：ROOT 节点、无 propPath、命中已收集依赖三种分支', async () => {
