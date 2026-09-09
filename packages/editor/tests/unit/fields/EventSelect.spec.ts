@@ -133,11 +133,13 @@ describe('EventSelect', () => {
     expect(wrapper.find('.fake-table').exists()).toBe(false);
     expect(capturedConfig.type).toBe('group-list');
     expect(capturedConfig.scrollLastItemIntoView).toBe(true);
+    expect(capturedConfig.header.sticky).toBe(true);
     expect(capturedConfig.addButtonConfig.sticky).toBe(true);
     expect(capturedConfig.addButtonConfig.text).toBe('添加事件');
     expect(capturedConfig.defaultAdd).toEqual({ name: '', actions: [] });
     expect(capturedConfig.movable).toBe(false);
     expect(capturedConfig.items[0].scrollLastItemIntoView).toBe(true);
+    expect(capturedConfig.items[0].header.sticky).toBe(true);
     expect(capturedConfig.items[0].addButtonConfig.sticky).toBe(true);
     expect(capturedConfig.items[0].addButtonConfig.text).toBe('新增动作');
   });

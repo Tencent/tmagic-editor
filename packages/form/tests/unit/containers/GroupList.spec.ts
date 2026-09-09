@@ -202,6 +202,63 @@ describe('GroupList container', () => {
       ).toBe(false);
       warn.mockRestore();
     });
+
+    test('点击删除按钮移除对应项', async () => {
+      const wrapper = mountForm(compareConfig, { list: [{ text: 'a' }, { text: 'b' }] });
+      await nextTick();
+
+      await wrapper.findAll('.delete-button')[0].trigger('click');
+      await nextTick();
+
+      expect((wrapper.vm as any).values.list).toEqual([{ text: 'b' }]);
+      expect(wrapper.findAll('.m-fields-group-list-item')).toHaveLength(1);
+    });
+
+    test('点击复制按钮在末尾追加一份副本', async () => {
+      const wrapper = mountForm(compareConfig, { list: [{ text: 'a' }, { text: 'b' }] });
+      await nextTick();
+
+      const copyButton = wrapper.findAll('button').find((btn) => btn.text().includes('复制'));
+      await copyButton?.trigger('click');
+      await nextTick();
+
+      const { list } = (wrapper.vm as any).values;
+      expect(list).toHaveLength(3);
+      expect(list[2]).toEqual({ text: 'a' });
+      // 深拷贝，改副本不应牵动原项
+      expect(list[2]).not.toBe(list[0]);
+    });
+
+    test('点击下移 / 上移交换相邻两项', async () => {
+      const wrapper = mountForm(compareConfig, { list: [{ text: 'a' }, { text: 'b' }] });
+      await nextTick();
+
+      // 首项的「上移」与末项的「下移」只是 v-show 隐藏，仍在 DOM 里，按 item 作用域取才不会点错
+      const buttonIn = (index: number, text: string) =>
+        wrapper
+          .findAll('.m-fields-group-list-item')
+          [index].findAll('button')
+          .find((btn) => btn.text().includes(text));
+
+      await buttonIn(0, '下移')?.trigger('click');
+      await nextTick();
+      expect((wrapper.vm as any).values.list).toEqual([{ text: 'b' }, { text: 'a' }]);
+
+      await buttonIn(1, '上移')?.trigger('click');
+      await nextTick();
+      expect((wrapper.vm as any).values.list).toEqual([{ text: 'a' }, { text: 'b' }]);
+    });
+
+    test('移动越界时夹到列表两端，不丢项', async () => {
+      const wrapper = mountForm(compareConfig, { list: [{ text: 'a' }, { text: 'b' }] });
+      await nextTick();
+
+      const item = wrapper.findAllComponents({ name: 'MFormGroupListItem' })[1];
+      item.vm.$emit('swap-item', 1, 5);
+      await nextTick();
+
+      expect((wrapper.vm as any).values.list).toEqual([{ text: 'a' }, { text: 'b' }]);
+    });
   });
 
   describe('labelPosition 透传', () => {
@@ -501,6 +558,131 @@ describe('GroupList container', () => {
       await nextTick();
       expect(wrapper.find('.m-fields-group-list-footer.is-sticky-full').exists()).toBe(true);
       expect(wrapper.text()).toContain('添加');
+      expect(wrapper.find('.m-fields-group-list').classes()).toContain('is-footer-sticky');
+    });
+
+    // 没有吸底 footer 的层不能让内层凭空抬高
+    test('未开 addButtonConfig.sticky 时根节点不带 is-footer-sticky', async () => {
+      const wrapper = mountForm(
+        [
+          {
+            type: 'group-list',
+            name: 'list',
+            items: [{ name: 'text', type: 'text', text: 'text' }],
+          },
+        ],
+        { list: [{ text: 'a' }] },
+      );
+      await nextTick();
+      expect(wrapper.find('.m-fields-group-list').classes()).not.toContain('is-footer-sticky');
+    });
+
+    test('对比模式下不渲染 footer，也不带 is-footer-sticky', async () => {
+      const wrapper = mountForm(
+        [
+          {
+            type: 'group-list',
+            name: 'list',
+            addButtonConfig: { sticky: true, text: '添加', props: { type: 'primary', plain: true, text: false } },
+            items: [{ name: 'text', type: 'text', text: 'text' }],
+          },
+        ],
+        { list: [{ text: 'a' }] },
+        { isCompare: true, lastValues: { list: [{ text: 'a' }] } },
+      );
+      await nextTick();
+      expect(wrapper.find('.m-fields-group-list-footer').exists()).toBe(false);
+      expect(wrapper.find('.m-fields-group-list').classes()).not.toContain('is-footer-sticky');
+    });
+
+    test('header.sticky 时根节点带 is-header-sticky', async () => {
+      const wrapper = mountForm(
+        [
+          {
+            type: 'group-list',
+            name: 'list',
+            header: { sticky: true },
+            items: [{ name: 'text', type: 'text', text: 'text' }],
+          },
+        ],
+        { list: [{ text: 'a' }] },
+      );
+      await nextTick();
+      expect(wrapper.find('.m-fields-group-list.is-header-sticky').exists()).toBe(true);
+    });
+
+    test('未开 header.sticky 时不加吸顶 class', async () => {
+      const wrapper = mountForm(
+        [
+          {
+            type: 'group-list',
+            name: 'list',
+            items: [{ name: 'text', type: 'text', text: 'text' }],
+          },
+        ],
+        { list: [{ text: 'a' }] },
+      );
+      await nextTick();
+      expect(wrapper.find('.m-fields-group-list.is-header-sticky').exists()).toBe(false);
+    });
+
+    test('header.height 在 sticky 开启时写入 CSS 变量', async () => {
+      const wrapper = mountForm(
+        [
+          {
+            type: 'group-list',
+            name: 'list',
+            header: { sticky: true, height: 48 },
+            items: [{ name: 'text', type: 'text', text: 'text' }],
+          },
+        ],
+        { list: [{ text: 'a' }] },
+      );
+      await nextTick();
+      const el = wrapper.find('.m-fields-group-list').element as HTMLElement;
+      expect(el.style.getPropertyValue('--m-group-list-header-height')).toBe('48px');
+    });
+
+    test('仅配置 header.height 未开 sticky 时不写 CSS 变量', async () => {
+      const wrapper = mountForm(
+        [
+          {
+            type: 'group-list',
+            name: 'list',
+            header: { height: 48 },
+            items: [{ name: 'text', type: 'text', text: 'text' }],
+          },
+        ],
+        { list: [{ text: 'a' }] },
+      );
+      await nextTick();
+      const el = wrapper.find('.m-fields-group-list').element as HTMLElement;
+      expect(el.style.getPropertyValue('--m-group-list-header-height')).toBe('');
+      expect(wrapper.find('.m-fields-group-list.is-header-sticky').exists()).toBe(false);
+    });
+
+    test('嵌套列表各自按 header.sticky 决定是否吸顶', async () => {
+      const wrapper = mountForm(
+        [
+          {
+            type: 'group-list',
+            name: 'groups',
+            header: { sticky: true },
+            items: [
+              {
+                type: 'group-list',
+                name: 'cond',
+                items: [{ name: 'text', type: 'text', text: 'text' }],
+              },
+            ],
+          },
+        ],
+        { groups: [{ cond: [{ text: 'a' }] }] },
+      );
+      await nextTick();
+      const lists = wrapper.findAll('.m-fields-group-list');
+      expect(lists[0].classes()).toContain('is-header-sticky');
+      expect(lists[1].classes()).not.toContain('is-header-sticky');
     });
   });
 });

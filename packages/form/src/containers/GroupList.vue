@@ -1,5 +1,12 @@
 <template>
-  <div class="m-fields-group-list">
+  <div
+    class="m-fields-group-list"
+    :class="{
+      'is-header-sticky': Boolean(config.header?.sticky),
+      'is-footer-sticky': isFooterSticky($slots),
+    }"
+    :style="headerVars"
+  >
     <div v-if="config.extra" v-html="config.extra" style="color: rgba(0, 0, 0, 0.45)"></div>
     <div v-if="!displayItems.length" class="el-table__empty-block">
       <span class="el-table__empty-text t-table__empty">暂无{{ config.titlePrefix || '' }}数据</span>
@@ -34,7 +41,7 @@
     <div
       class="m-fields-group-list-footer"
       :class="{ 'is-sticky-full': Boolean(config.addButtonConfig?.sticky) }"
-      v-if="!isCompare && ($slots['toggle-button'] || $slots['add-button'])"
+      v-if="hasFooter($slots)"
     >
       <slot name="toggle-button"></slot>
       <div style="display: flex; justify-content: flex-end; flex: 1">
@@ -49,6 +56,7 @@ import { computed } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
 import type { ContainerChangeEventData, GroupListConfig } from '../schema';
+import { getGroupListHeaderVars } from '../utils/tableGroupList';
 
 import MFieldsGroupListItem from './GroupListItem.vue';
 
@@ -103,6 +111,19 @@ const swapHandler = (idx1: number, idx2: number) => {
 const onAddDiffCount = () => emit('addDiffCount');
 
 const asList = (value: unknown): any[] => (Array.isArray(value) ? value : []);
+
+const headerVars = computed(() => getGroupListHeaderVars(props.config.header));
+
+/**
+ * 取 `$slots` 而不是 `useSlots()`：宿主切换 `addable` 时插槽会增删，
+ * computed 缓存不随插槽变化失效，只有在渲染期读才拿得到最新的。
+ */
+const hasFooter = (slots: Record<string, unknown>) =>
+  !props.isCompare && Boolean(slots['toggle-button'] || slots['add-button']);
+
+/** 只有真的渲染出吸底 footer，内层列表才需要为它让位 */
+const isFooterSticky = (slots: Record<string, unknown>) =>
+  hasFooter(slots) && Boolean(props.config.addButtonConfig?.sticky);
 
 const currentList = computed(() => asList(props.model[props.name]));
 

@@ -70,27 +70,60 @@
       flex-shrink: 0;
       gap: 8px;
     }
-
-    // 卡片标题吸顶；补不透明背景，避免滚动时正文透出。
-    // z-index 必须低于吸底 footer，否则标题会盖住「新增」按钮。
-    > .el-card__header,
-    > .t-card__header {
-      position: sticky;
-      top: var(--m-group-list-header-sticky-top, 0px);
-      z-index: 7;
-      background-color: var(--m-group-list-header-bg, #fff);
-    }
   }
 
-  // 嵌套标题叠在外层标题之下，层级更低以免盖住外层底部分隔线
-  .m-fields-group-list-item .m-fields-group-list-item {
-    > .el-card__header,
-    > .t-card__header {
-      top: calc(
-        var(--m-group-list-header-sticky-top, 0px) +
-          var(--m-group-list-header-height)
+  // 嵌套吸底按钮叠在外层 footer 之上（如「新增条件」叠在「新增条件组」上面）。
+  // 每穿过一层「自己渲染了吸底 footer」的列表才多让出一个 footer 高度，外层没有吸底按钮时
+  // 内层不能凭空抬高。自定义属性不能自增，所以用 item / list 两个变量交替接力。
+  > .m-fields-group-list-item {
+    --m-group-list-item-footer-bottom: var(
+      --m-group-list-nested-footer-bottom,
+      0px
+    );
+  }
+
+  &.is-footer-sticky > .m-fields-group-list-item {
+    --m-group-list-item-footer-bottom: calc(
+      var(--m-group-list-nested-footer-bottom, 0px) +
+        var(--m-group-list-footer-height)
+    );
+  }
+
+  .m-fields-group-list-item .m-fields-group-list {
+    --m-group-list-nested-footer-bottom: var(
+      --m-group-list-item-footer-bottom,
+      0px
+    );
+  }
+
+  // 仅 header.sticky 时标题吸顶；直接子 item，避免外层吸顶带动未开启的内层
+  &.is-header-sticky {
+    // 从外层 item 接过已累加的偏移；最外层没有该变量时走 fallback
+    --m-group-list-nested-sticky-top: var(--m-group-list-child-list-sticky-top);
+    --m-group-list-nested-header-z: var(--m-group-list-child-list-header-z);
+
+    > .m-fields-group-list-item {
+      --m-group-list-item-sticky-top: var(
+        --m-group-list-nested-sticky-top,
+        var(--m-group-list-header-sticky-top, 0px)
       );
-      z-index: 6;
+      --m-group-list-item-header-z: var(--m-group-list-nested-header-z, 7);
+      --m-group-list-child-list-sticky-top: calc(
+        var(--m-group-list-item-sticky-top) + var(--m-group-list-header-height)
+      );
+      --m-group-list-child-list-header-z: calc(
+        var(--m-group-list-item-header-z) - 1
+      );
+
+      // 卡片标题吸顶；补不透明背景，避免滚动时正文透出。
+      // z-index 必须低于吸底 footer，否则标题会盖住「新增」按钮。
+      > .el-card__header,
+      > .t-card__header {
+        position: sticky;
+        top: var(--m-group-list-item-sticky-top);
+        z-index: var(--m-group-list-item-header-z);
+        background-color: var(--m-group-list-header-bg, #fff);
+      }
     }
   }
 
@@ -113,10 +146,10 @@
   }
 
   // 吸底全宽主按钮（event-select / code-select / display-conds 外层列表）
-  // z-index 高于 item header，避免吸顶标题挡住新增按钮
+  // z-index 高于 item header，避免吸顶标题挡住新增按钮；多层时 bottom 由内层 list 累加
   > .m-fields-group-list-footer.is-sticky-full {
     position: sticky;
-    bottom: 0;
+    bottom: var(--m-group-list-nested-footer-bottom, 0px);
     z-index: 7;
     margin-bottom: 0;
     padding: var(--m-group-list-footer-padding-top) 0
@@ -132,14 +165,6 @@
       width: 100%;
       height: var(--m-group-list-footer-button-height);
     }
-  }
-
-  // 嵌套吸底按钮叠在外层 footer 之上（如「新增条件」叠在「新增条件组」上面）
-  .m-fields-group-list-item
-    .m-fields-group-list
-    > .m-fields-group-list-footer.is-sticky-full {
-    bottom: var(--m-group-list-footer-height);
-    z-index: 7;
   }
 }
 

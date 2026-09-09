@@ -830,6 +830,20 @@ export interface AddButtonConfig {
 }
 // #endregion AddButtonConfig
 
+// #region GroupListHeaderConfig
+/** group-list 卡片标题；仅 sticky 开启时吸顶 */
+export interface GroupListHeaderConfig {
+  /** 标题吸顶 */
+  sticky?: boolean;
+  /**
+   * 告诉嵌套列表「本层吸顶标题占了多高」，内层标题据此下移让位。
+   * **不会改变标题自身的高度**，只在实际标题高度偏离默认值 65px 时才需要配。
+   * 数字与纯数字字符串按 px，其余按 CSS 长度原样使用。
+   */
+  height?: number | string;
+}
+// #endregion GroupListHeaderConfig
+
 // #region TableGroupListCommonConfig
 export interface TableGroupListCommonConfig extends FormItem {
   type: 'table' | 'groupList' | 'group-list';
@@ -846,6 +860,8 @@ export interface TableGroupListCommonConfig extends FormItem {
   /** 新增后滚动到最后一项（group-list 形态，默认关闭） */
   scrollLastItemIntoView?: boolean;
   addButtonConfig?: AddButtonConfig;
+  /** group-list 形态的标题吸顶（默认关闭）；table 形态忽略 */
+  header?: GroupListHeaderConfig;
 }
 // #endregion TableGroupListCommonConfig
 

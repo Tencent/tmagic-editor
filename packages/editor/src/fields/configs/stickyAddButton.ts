@@ -17,12 +17,13 @@
  */
 
 /**
- * 属性面板列表字段共用的吸底全宽「添加」按钮，展开到 group-list 配置上。
+ * 属性面板列表字段共用的吸底全宽「添加」按钮与吸顶标题，展开到 group-list 配置上。
  *
- * 吸底按钮会盖住列表底部，新增的项必须同时滚进视口才看得见，两者一起给出避免漏配。
+ * 吸底按钮会盖住列表底部，吸顶标题会盖住列表顶部，新增的项必须同时滚进视口才看得见。
  */
 export const stickyAddButton = (text: string) => ({
   scrollLastItemIntoView: true as const,
+  header: { sticky: true as const },
   addButtonConfig: {
     sticky: true as const,
     text,

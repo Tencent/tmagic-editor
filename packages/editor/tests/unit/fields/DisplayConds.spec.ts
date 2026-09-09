@@ -84,6 +84,7 @@ describe('DisplayConds', () => {
     expect(capturedConfig.type).toBe('groupList');
     expect(capturedConfig.defaultAdd).toEqual({ cond: [] });
     expect(capturedConfig.scrollLastItemIntoView).toBe(true);
+    expect(capturedConfig.header.sticky).toBe(true);
     expect(capturedConfig.addButtonConfig.sticky).toBe(true);
     expect(capturedConfig.addButtonConfig.text).toBe('新增条件组');
     expect(capturedConfig.items[0].type).toBe('groupList');
@@ -93,6 +94,7 @@ describe('DisplayConds', () => {
     expect(capturedConfig.items[0].movable).toBe(false);
     expect(capturedConfig.items[0].flat).toBe(true);
     expect(capturedConfig.items[0].scrollLastItemIntoView).toBe(true);
+    expect(capturedConfig.items[0].header.sticky).toBe(true);
     expect(capturedConfig.items[0].addButtonConfig.sticky).toBe(true);
     expect(capturedConfig.items[0].addButtonConfig.text).toBe('新增条件');
     expect(capturedConfig.items[0].items.every((item: any) => item.span === undefined)).toBe(true);

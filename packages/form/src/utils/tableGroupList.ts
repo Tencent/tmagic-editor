@@ -18,7 +18,9 @@
 
 import { cloneDeep } from 'lodash-es';
 
-import type { GroupListConfig, TableColumnConfig, TableConfig } from '../schema';
+import { isNumber } from '@tmagic/utils';
+
+import type { GroupListConfig, GroupListHeaderConfig, TableColumnConfig, TableConfig } from '../schema';
 
 /**
  * table / group-list 是同一份配置的两种展示形态，可以互相切换（`TableGroupList.vue`）。
@@ -30,6 +32,31 @@ import type { GroupListConfig, TableColumnConfig, TableConfig } from '../schema'
 
 /** group-list 形态的 type（兼容驼峰与中划线两种写法） */
 export const isGroupListType = (type: unknown): boolean => type === 'groupList' || type === 'group-list';
+
+/**
+ * 归一成带单位的 CSS 长度。
+ *
+ * 配置常常来自 JSON 或表单输入，`'48'` 这类无单位数字串很常见；直接写进 CSS 变量会让
+ * 嵌套层的 `calc()` 整体失效、吸顶静默失灵，所以纯数字一律补 `px`。
+ */
+const toCssLength = (height: number | string | undefined): string | undefined => {
+  const value = `${height ?? ''}`.trim();
+  if (!value) return undefined;
+
+  if (isNumber(value)) return `${value}px`;
+  // 走到这里还是 number 的只剩 NaN / Infinity，不写变量，交给样式默认值兜底
+  return typeof height === 'number' ? undefined : value;
+};
+
+/** header.sticky 开启时把 height 写成 CSS 变量，给嵌套吸顶偏移用 */
+export const getGroupListHeaderVars = (
+  header: GroupListHeaderConfig | undefined,
+): Record<string, string> | undefined => {
+  if (!header?.sticky) return undefined;
+
+  const height = toCssLength(header.height);
+  return height ? { '--m-group-list-header-height': height } : undefined;
+};
 
 /** 按 label 文案长度估算 label 宽度（中文按 20px、其他按 8px，最小 80px） */
 export const calcLabelWidth = (label: string): string => {

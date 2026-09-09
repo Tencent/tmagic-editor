@@ -122,6 +122,7 @@ describe('CodeSelect', () => {
     const container = wrapper.findComponent({ name: 'MContainer' });
     const config = container.props('config') as any;
     expect(config.scrollLastItemIntoView).toBe(true);
+    expect(config.header.sticky).toBe(true);
     expect(config.addButtonConfig.sticky).toBe(true);
     expect(config.addButtonConfig.text).toBe('添加');
     const codeTypeSelect = config.items[0];
