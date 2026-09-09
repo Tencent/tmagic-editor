@@ -88,8 +88,14 @@ const diffableGroups = (id: string | number = 'p1') => [
   },
 ];
 
+/** 让 getHistoryGroups 只对指定类别返回可对比分组，避免三类历史互相串味。 */
+const groupsFor = (category: string, id: string | number) => (type: string) =>
+  type === category ? diffableGroups(id) : [];
+
 afterEach(() => {
   vi.clearAllMocks();
+  vi.useRealTimers();
+  appMock._context = {};
 });
 
 describe('useHistoryRevert', () => {
@@ -224,6 +230,257 @@ describe('useHistoryRevert', () => {
       expect(lastDialogProps().isConfirm).toBe(true);
       expect(revert).toHaveBeenCalled();
       expect(result).toBe('done');
+    });
+  });
+
+  describe('数据源历史', () => {
+    test('可差异步骤走差异确认弹窗，确认后执行 revert', async () => {
+      const services = createServices();
+      services.historyService.getStepList.mockReturnValue([
+        { step: { opType: 'update', diff: [{ newSchema: { id: 'ds_1' }, oldSchema: { id: 'ds_1' } }] } },
+      ]);
+      services.historyService.getHistoryGroups.mockImplementation(groupsFor('dataSource', 'ds_1'));
+      services.dataSourceService.getDataSourceById.mockReturnValue({ id: 'ds_1', title: '当前' });
+
+      const { onDataSourceRevert } = useHistoryRevert({}, services);
+      await onDataSourceRevert('ds_1', 0);
+
+      expect(lastDialogProps().isConfirm).toBe(true);
+      expect(services.dataSourceService.revert).toHaveBeenCalledWith('ds_1', 0);
+    });
+
+    test('buildDataSourceDiffPayload 取 title 作展示名、type 缺省为 base，并带上当前值', () => {
+      const services = createServices();
+      services.historyService.getHistoryGroups.mockImplementation(() => [
+        {
+          id: 'ds_1',
+          steps: [
+            {
+              index: 0,
+              step: { diff: [{ oldSchema: { title: '旧' }, newSchema: { title: '新' } }] },
+            },
+          ],
+        },
+      ]);
+      services.dataSourceService.getDataSourceById.mockReturnValue({ id: 'ds_1', title: '当前' });
+
+      const { buildDataSourceDiffPayload } = useHistoryRevert({}, services);
+      const payload = buildDataSourceDiffPayload('ds_1', 0);
+
+      expect(payload).toMatchObject({
+        category: 'data-source',
+        type: 'base',
+        targetLabel: '新',
+        id: 'ds_1',
+        currentValue: { id: 'ds_1', title: '当前' },
+      });
+      expect(services.dataSourceService.getDataSourceById).toHaveBeenCalledWith('ds_1');
+    });
+
+    test('onDataSourceDiff 打开只读弹窗', async () => {
+      const services = createServices();
+      services.historyService.getHistoryGroups.mockImplementation(groupsFor('dataSource', 'ds_1'));
+
+      const { onDataSourceDiff } = useHistoryRevert({ dialogWidth: '900px' }, services);
+      await onDataSourceDiff('ds_1', 0);
+
+      expect(lastDialogProps().isConfirm).toBe(false);
+      expect(lastDialogProps().width).toBe('900px');
+      expect(dialogInstance.open).toHaveBeenCalled();
+    });
+
+    test('无可对比内容时 onDataSourceDiff 不弹窗', async () => {
+      const services = createServices();
+
+      const { onDataSourceDiff } = useHistoryRevert({}, services);
+      await onDataSourceDiff('ds_1', 0);
+
+      expect(createAppMock).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('代码块历史', () => {
+    test('update 记录对应代码块已删除时，提示错误且不执行回滚', async () => {
+      const services = createServices();
+      services.historyService.getStepList.mockReturnValue([{ step: { opType: 'update', diff: [] } }]);
+      services.codeBlockService.getCodeContentById.mockReturnValue(null);
+
+      const { onCodeBlockRevert } = useHistoryRevert({}, services);
+      await onCodeBlockRevert('code_1', 0);
+
+      expect(tMagicMessage.error).toHaveBeenCalledWith('回滚失败：该记录对应的数据已被删除');
+      expect(services.codeBlockService.revert).not.toHaveBeenCalled();
+    });
+
+    test('可差异步骤走差异确认弹窗，确认后执行 revert', async () => {
+      const services = createServices();
+      services.historyService.getStepList.mockReturnValue([{ step: { opType: 'update', diff: [] } }]);
+      services.historyService.getHistoryGroups.mockImplementation(groupsFor('codeBlock', 'code_1'));
+      services.codeBlockService.getCodeContentById.mockReturnValue({ name: '当前' });
+
+      const { onCodeBlockRevert } = useHistoryRevert({}, services);
+      await onCodeBlockRevert('code_1', 0);
+
+      expect(lastDialogProps().isConfirm).toBe(true);
+      expect(services.codeBlockService.revert).toHaveBeenCalledWith('code_1', 0);
+    });
+
+    test('用户取消确认时不执行 revert', async () => {
+      const services = createServices();
+      services.historyService.getStepList.mockReturnValue([{ step: { opType: 'add', diff: [] } }]);
+      vi.mocked(confirmHistoryAction).mockResolvedValueOnce(false);
+
+      const { onCodeBlockRevert } = useHistoryRevert({}, services);
+      await onCodeBlockRevert('code_1', 0);
+
+      expect(services.codeBlockService.revert).not.toHaveBeenCalled();
+    });
+
+    test('buildCodeBlockDiffPayload 不带 type，展示名回退到 id', () => {
+      const services = createServices();
+      services.historyService.getHistoryGroups.mockImplementation(() => [
+        {
+          id: 'code_1',
+          steps: [{ index: 0, step: { diff: [{ oldSchema: {}, newSchema: {} }] } }],
+        },
+      ]);
+      services.codeBlockService.getCodeContentById.mockReturnValue(undefined);
+
+      const { buildCodeBlockDiffPayload } = useHistoryRevert({}, services);
+      const payload = buildCodeBlockDiffPayload('code_1', 0);
+
+      expect(payload).toMatchObject({ category: 'code-block', targetLabel: 'code_1', currentValue: null });
+      expect(payload).not.toHaveProperty('type');
+    });
+
+    test('onCodeBlockDiff 打开只读弹窗', async () => {
+      const services = createServices();
+      services.historyService.getHistoryGroups.mockImplementation(groupsFor('codeBlock', 'code_1'));
+
+      const { onCodeBlockDiff } = useHistoryRevert({}, services);
+      await onCodeBlockDiff('code_1', 0);
+
+      expect(lastDialogProps().isConfirm).toBe(false);
+      expect(dialogInstance.open).toHaveBeenCalled();
+    });
+  });
+
+  describe('回滚前置校验', () => {
+    test('页面 remove 记录的原父容器已删除时判定为无法回滚', () => {
+      const services = createServices();
+      services.historyService.getStepList.mockReturnValue([
+        { step: { opType: 'remove', diff: [{ parentId: 'parent_gone' }] } },
+      ]);
+      services.editorService.getNodeById.mockReturnValue(null);
+
+      const { isPageRevertTargetMissing } = useHistoryRevert({}, services);
+      expect(isPageRevertTargetMissing(0)).toBe(true);
+    });
+
+    test('页面 remove 记录的原父容器仍在时可以回滚', () => {
+      const services = createServices();
+      services.historyService.getStepList.mockReturnValue([
+        { step: { opType: 'remove', diff: [{ parentId: 'parent_1' }] } },
+      ]);
+      services.editorService.getNodeById.mockReturnValue({ id: 'parent_1' });
+
+      const { isPageRevertTargetMissing } = useHistoryRevert({}, services);
+      expect(isPageRevertTargetMissing(0)).toBe(false);
+    });
+
+    test('步骤不存在时不判定为无法回滚', () => {
+      const services = createServices();
+
+      const { isPageRevertTargetMissing, isCodeBlockRevertTargetMissing } = useHistoryRevert({}, services);
+      expect(isPageRevertTargetMissing(0)).toBe(false);
+      expect(isCodeBlockRevertTargetMissing('code_1', 0)).toBe(false);
+    });
+
+    test('confirmAndRevert 在 isTargetMissing 命中时提示错误并返回 null', async () => {
+      const services = createServices();
+      const revert = vi.fn(async () => 'done');
+
+      const { confirmAndRevert } = useHistoryRevert({}, services);
+      const result = await confirmAndRevert({ isTargetMissing: () => true, diffPayload: null, revert });
+
+      expect(tMagicMessage.error).toHaveBeenCalledWith('回滚失败：该记录对应的数据已被删除');
+      expect(revert).not.toHaveBeenCalled();
+      expect(result).toBeNull();
+    });
+
+    test('confirmAndRevert 在用户取消时返回 null', async () => {
+      const services = createServices();
+      const revert = vi.fn(async () => 'done');
+      vi.mocked(confirmHistoryAction).mockResolvedValueOnce(false);
+
+      const { confirmAndRevert } = useHistoryRevert({}, services);
+      const result = await confirmAndRevert({ diffPayload: null, revert });
+
+      expect(revert).not.toHaveBeenCalled();
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('弹窗挂载与卸载', () => {
+    test('传入 appContext 时合并进弹窗 app 的上下文', async () => {
+      const services = createServices();
+      services.historyService.getHistoryGroups.mockReturnValue(diffableGroups());
+      const appContext = { provides: { host: 1 } } as any;
+
+      const { onPageDiff } = useHistoryRevert({ appContext }, services);
+      await onPageDiff(0);
+
+      expect(appMock._context).toMatchObject({ provides: { host: 1 } });
+    });
+
+    test('未显式指定 size 时回落到属性面板尺寸', async () => {
+      const services = createServices();
+      services.uiService = { get: vi.fn(() => 'small') };
+      services.historyService.getHistoryGroups.mockReturnValue(diffableGroups());
+
+      const { onPageDiff } = useHistoryRevert({}, services);
+      await onPageDiff(0);
+
+      expect(lastDialogProps().size).toBe('small');
+    });
+
+    test('确认弹窗结束后延迟卸载并移除容器', async () => {
+      vi.useFakeTimers();
+      const services = createServices();
+      services.historyService.getHistoryGroups.mockReturnValue(diffableGroups());
+      const containerCount = document.body.childElementCount;
+
+      const { confirmAndRevert } = useHistoryRevert({}, services);
+      await confirmAndRevert({
+        diffPayload: { category: 'module', lastValue: { a: 1 }, value: { a: 2 } } as any,
+        revert: async () => 'done',
+      });
+
+      expect(document.body.childElementCount).toBe(containerCount + 1);
+      expect(appMock.unmount).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(300);
+
+      expect(appMock.unmount).toHaveBeenCalled();
+      expect(document.body.childElementCount).toBe(containerCount);
+    });
+
+    test('卸载抛错不影响容器清理', async () => {
+      vi.useFakeTimers();
+      const services = createServices();
+      appMock.unmount.mockImplementationOnce(() => {
+        throw new Error('unmount failed');
+      });
+      const containerCount = document.body.childElementCount;
+
+      const { viewDiff } = useHistoryRevert({}, services);
+      await viewDiff({ category: 'module', lastValue: { a: 1 }, value: { a: 2 } } as any);
+
+      // 只读弹窗要等用户关闭才卸载
+      lastDialogProps().onClose();
+      vi.advanceTimersByTime(300);
+
+      expect(document.body.childElementCount).toBe(containerCount);
     });
   });
 });

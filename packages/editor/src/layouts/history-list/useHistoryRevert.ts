@@ -204,10 +204,7 @@ export const useHistoryRevert = (options: UseHistoryRevertOptions = {}, services
    * 不弹差异弹窗，改用一个普通确认框替代「确定回滚」按钮，避免点击后无任何提示直接执行。
    * 用户取消时返回 false，调用方据此中止回滚。
    */
-  const confirmRevert = (): Promise<boolean> =>
-    confirmHistoryAction(
-      '确定回滚该步骤吗？回滚会将该操作作为一条新记录反向应用（新增将被删除、删除将被还原），不影响后续历史记录。',
-    );
+  const confirmRevert = (): Promise<boolean> => confirmHistoryAction('确定回滚该步骤吗？');
 
   /**
    * 「回滚」统一确认入口：可差异对比的步骤动态挂载 HistoryDiffDialog 走差异确认弹窗，
