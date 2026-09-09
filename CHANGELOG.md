@@ -1,3 +1,14 @@
+# [1.8.0-beta.28](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.27...v1.8.0-beta.28) (2026-09-09)
+
+
+### Bug Fixes
+
+* **editor:** 丢弃过期 root 快照，避免画布回退与 modelValue 回写死循环 ([66b54a5](https://github.com/Tencent/tmagic-editor/commit/66b54a52f8e9ff5041305ab7eb4057c820a4542a))
+
+
+### Features
+
+* **form:** group-list 标题吸顶改为按 header.sticky 显式开启 ([2a4a54a](https://github.com/Tencent/tmagic-editor/commit/2a4a54a49567007787295769e3f8d05e3e8a30e0))
 # [1.8.0-beta.27](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.26...v1.8.0-beta.27) (2026-09-04)
 
 

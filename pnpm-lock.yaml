@@ -567,19 +567,19 @@ importers:
         specifier: ^2.3.2
         version: 2.3.2(vue@3.5.41(typescript@6.0.3))
       '@tmagic/core':
-        specifier: 1.8.0-beta.27
+        specifier: 1.8.0-beta.28
         version: link:../packages/core
       '@tmagic/design':
-        specifier: 1.8.0-beta.27
+        specifier: 1.8.0-beta.28
         version: link:../packages/design
       '@tmagic/editor':
-        specifier: 1.8.0-beta.27
+        specifier: 1.8.0-beta.28
         version: link:../packages/editor
       '@tmagic/element-plus-adapter':
-        specifier: 1.8.0-beta.27
+        specifier: 1.8.0-beta.28
         version: link:../packages/element-plus-adapter
       '@tmagic/tdesign-vue-next-adapter':
-        specifier: 1.8.0-beta.27
+        specifier: 1.8.0-beta.28
         version: link:../packages/tdesign-vue-next-adapter
       '@tmagic/tmagic-form-runtime':
         specifier: 1.1.6
@@ -923,13 +923,13 @@ importers:
   runtime/react:
     dependencies:
       '@tmagic/core':
-        specifier: 1.8.0-beta.27
+        specifier: 1.8.0-beta.28
         version: link:../../packages/core
       '@tmagic/react-runtime-help':
         specifier: 0.2.2
         version: link:../react-runtime-help
       '@tmagic/stage':
-        specifier: 1.8.0-beta.27
+        specifier: 1.8.0-beta.28
         version: link:../../packages/stage
       axios:
         specifier: ^1.19.0
@@ -945,7 +945,7 @@ importers:
         version: 19.2.8(react@19.2.8)
     devDependencies:
       '@tmagic/cli':
-        specifier: 1.8.0-beta.27
+        specifier: 1.8.0-beta.28
         version: link:../../packages/cli
       '@types/fs-extra':
         specifier: ^11.0.4
@@ -1021,10 +1021,10 @@ importers:
   runtime/vue:
     dependencies:
       '@tmagic/core':
-        specifier: 1.8.0-beta.27
+        specifier: 1.8.0-beta.28
         version: link:../../packages/core
       '@tmagic/stage':
-        specifier: 1.8.0-beta.27
+        specifier: 1.8.0-beta.28
         version: link:../../packages/stage
       '@tmagic/vue-runtime-help':
         specifier: ^2.0.4
@@ -1037,7 +1037,7 @@ importers:
         version: 3.5.41(typescript@6.0.3)
     devDependencies:
       '@tmagic/cli':
-        specifier: 1.8.0-beta.27
+        specifier: 1.8.0-beta.28
         version: link:../../packages/cli
       '@types/fs-extra':
         specifier: ^11.0.4
