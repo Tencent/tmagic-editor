@@ -1,0 +1,2 @@
+(function(){System.register([`./src-legacy-B20IZ0ty.js`],function(e,t){var n,r;function i(e=``){let t,i,a;return typeof e==`string`?t=e:{componentType:t,app:i}=e,(!t||t===``)&&(t=`container`),i||(i=n(`app`)),a=i?.resolveComponent(t),!a&&!t.startsWith(`magic-ui-`)&&(t=`magic-ui-${r(t)}`,a=i?.resolveComponent(t)),a??t}return e(`t`,i),{setters:[function(e){n=e.st,r=e.x}],execute:function(){}}})})();
+//# sourceMappingURL=use-component-legacy-tkhZn0xE.js.map
