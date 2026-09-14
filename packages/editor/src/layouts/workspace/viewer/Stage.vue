@@ -56,7 +56,14 @@ import { calcValueByFontsize, getIdFromEl } from '@tmagic/utils';
 import ScrollViewer from '@editor/components/ScrollViewer.vue';
 import { useServices } from '@editor/hooks';
 import { useStage } from '@editor/hooks/use-stage';
-import type { CustomContentMenuFunction, MenuButton, MenuComponent, StageOptions, StageSlots } from '@editor/type';
+import type {
+  AddMNode,
+  CustomContentMenuFunction,
+  MenuButton,
+  MenuComponent,
+  StageOptions,
+  StageSlots,
+} from '@editor/type';
 import { DragType, Layout } from '@editor/type';
 import { getEditorConfig } from '@editor/utils/config';
 import { KeyBindingContainerKey } from '@editor/utils/keybinding-config';
@@ -270,11 +277,56 @@ const resizeObserver = new globalThis.ResizeObserver((entries) => {
   }
 });
 
+const parseDSL = getEditorConfig('parseDSL');
+
+/**
+ * 本次拖拽是否由编辑器文档内部发起
+ *
+ * drop 的 text/json 里可能带函数（组件配置的事件、钩子等），还原只能交给 parseDSL，
+ * 而 parseDSL 的默认实现是 eval；HTML 拖放又允许其他源的页面在 DataTransfer 中投递
+ * 自定义 MIME 数据，跨源页面只要诱导用户拖拽一次，就能让 eval 执行任意脚本。
+ *
+ * 跨源页面既不会在本文档触发 dragstart，也无法往本文档创建的 DataTransfer 中写数据，
+ * 因此只有起源于本文档的拖拽才交给 parseDSL 还原。
+ * 同源拖拽源写入的 text/json 由业务保证可信。
+ */
+let isInternalDrag = false;
+let internalDragSession = 0;
+let clearInternalDragTimer: ReturnType<typeof setTimeout> | undefined;
+
+const documentDragStartHandler = () => {
+  internalDragSession += 1;
+  isInternalDrag = true;
+  if (clearInternalDragTimer !== undefined) {
+    globalThis.clearTimeout(clearInternalDragTimer);
+    clearInternalDragTimer = undefined;
+  }
+};
+
+const documentDragEndHandler = () => {
+  // WebKit 可能先 dragend 再 drop；推迟到下一个宏任务再清标志，
+  // 让同一次拖拽的 drop 仍能消费。session 防止误清掉下一次 dragstart。
+  const session = internalDragSession;
+  if (clearInternalDragTimer !== undefined) {
+    globalThis.clearTimeout(clearInternalDragTimer);
+  }
+  clearInternalDragTimer = globalThis.setTimeout(() => {
+    clearInternalDragTimer = undefined;
+    if (session === internalDragSession) {
+      isInternalDrag = false;
+    }
+  }, 0);
+};
+
 onMounted(() => {
   if (stageWrapRef.value?.container) {
     resizeObserver.observe(stageWrapRef.value.container);
     keybindingService.registerEl(KeyBindingContainerKey.STAGE, stageWrapRef.value.container);
   }
+
+  // 用捕获阶段监听，确保拖拽源自身的 dragstart 无论是否阻止冒泡都能被记录
+  globalThis.document.addEventListener('dragstart', documentDragStartHandler, true);
+  globalThis.document.addEventListener('dragend', documentDragEndHandler, true);
 });
 
 onBeforeUnmount(() => {
@@ -283,9 +335,15 @@ onBeforeUnmount(() => {
   resizeObserver.disconnect();
   editorService.set('stage', null);
   keybindingService.unregisterEl('stage');
-});
 
-const parseDSL = getEditorConfig('parseDSL');
+  if (clearInternalDragTimer !== undefined) {
+    globalThis.clearTimeout(clearInternalDragTimer);
+    clearInternalDragTimer = undefined;
+  }
+
+  globalThis.document.removeEventListener('dragstart', documentDragStartHandler, true);
+  globalThis.document.removeEventListener('dragend', documentDragEndHandler, true);
+});
 
 const contextmenuHandler = (e: MouseEvent) => {
   e.preventDefault();
@@ -299,15 +357,27 @@ const dragoverHandler = (e: DragEvent) => {
 };
 
 const dropHandler = async (e: DragEvent) => {
+  // 画布上的任意 drop 都消费本次内部拖拽标记（含空 text/json），避免残留到下一次 drop
+  const allowed = isInternalDrag;
+  isInternalDrag = false;
+
   if (!e.dataTransfer) return;
 
   const data = e.dataTransfer.getData('text/json');
 
-  if (!data) return;
+  // 外部源投递的拖拽数据不可信，不能交给 parseDSL(默认实现为 eval)
+  if (!data || !allowed) return;
 
-  const config = parseDSL(`(${data})`);
+  let config: { dragType?: string; data?: AddMNode } | undefined;
+  try {
+    config = parseDSL(`(${data})`);
+  } catch {
+    return;
+  }
 
-  if (!config || config.dragType !== DragType.COMPONENT_LIST) return;
+  if (!config || config.dragType !== DragType.COMPONENT_LIST || !config.data) return;
+
+  const dragData = config.data;
 
   e.preventDefault();
 
@@ -349,7 +419,7 @@ const dropHandler = async (e: DragEvent) => {
 
     const containerRect = stageContainerEl.value.getBoundingClientRect();
     const { scrollTop, scrollLeft } = stage.mask!;
-    const { style = {} } = config.data;
+    const { style = {} } = dragData;
 
     let top = 0;
     let left = 0;
@@ -371,16 +441,16 @@ const dropHandler = async (e: DragEvent) => {
       }
     }
 
-    config.data.style = {
+    dragData.style = {
       ...style,
       position,
       top: calcValueByFontsize(doc, top / zoom.value),
       left: calcValueByFontsize(doc, left / zoom.value),
     };
 
-    config.data.inputEvent = e;
+    dragData.inputEvent = e;
 
-    editorService.add(config.data, parent, { historySource: 'component-panel' });
+    editorService.add(dragData, parent, { historySource: 'component-panel' });
   }
 };
 </script>

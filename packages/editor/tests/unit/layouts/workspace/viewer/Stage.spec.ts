@@ -55,11 +55,14 @@ vi.mock('@editor/hooks', () => ({
   useServices: () => ({ editorService, uiService, keybindingService, stageOverlayService }),
 }));
 
+// 与 plugin.ts 中 parseDSL 的默认实现（eval）保持一致，用于验证守卫能否阻止其执行
+const { parseDSL } = vi.hoisted(() => ({
+  // eslint-disable-next-line no-new-func
+  parseDSL: vi.fn((dsl: string) => new Function(`return ${dsl}`)()),
+}));
+
 vi.mock('@editor/utils/config', () => ({
-  getEditorConfig: vi.fn(() => (s: string) => {
-    if (s.startsWith('(')) return JSON.parse(s.slice(1, -1));
-    return JSON.parse(s);
-  }),
+  getEditorConfig: vi.fn(() => parseDSL),
 }));
 
 vi.mock('@editor/components/ScrollViewer.vue', () => ({
@@ -146,6 +149,26 @@ const mountIt = (props: any = {}) =>
     attachTo: document.body,
   });
 
+/** 模拟编辑器文档内部（如组件列表面板）发起拖拽 */
+const startInternalDrag = () => {
+  document.dispatchEvent(new Event('dragstart'));
+};
+
+const endDrag = () => {
+  document.dispatchEvent(new Event('dragend'));
+};
+
+const createDropEvent = (raw: string) => {
+  const event: any = new Event('drop');
+  event.dataTransfer = { getData: vi.fn(() => raw) };
+  event.preventDefault = vi.fn();
+  return event;
+};
+
+const waitMacrotask = () => new Promise((r) => setTimeout(r, 10));
+
+const COMPONENT_LIST_JSON = '{"dragType":"component-list","data":{"name":"text","style":{}}}';
+
 describe('Stage', () => {
   test('挂载并创建 stage', async () => {
     const wrapper = mountIt();
@@ -185,17 +208,28 @@ describe('Stage', () => {
     editorService.getNodeById.mockReturnValue(null);
     const wrapper = mountIt();
     await nextTick();
-    const event: any = new Event('drop');
-    event.dataTransfer = {
-      getData: vi.fn(() => '{"dragType":"component-list","data":{"name":"text","style":{}}}'),
-    };
+    const event = createDropEvent(COMPONENT_LIST_JSON);
     event.clientX = 100;
     event.clientY = 100;
-    event.preventDefault = vi.fn();
     const stageContainer = wrapper.find('.m-editor-stage-container').element;
+    startInternalDrag();
     stageContainer.dispatchEvent(event);
-    await new Promise((r) => setTimeout(r, 10));
+    await waitMacrotask();
     expect(editorService.add).toHaveBeenCalled();
+    endDrag();
+  });
+
+  test('drop 保留拖拽数据中的函数', async () => {
+    editorService.getNodeById.mockReturnValue(null);
+    const wrapper = mountIt();
+    await nextTick();
+    const event = createDropEvent('{dragType:"component-list",data:{name:"text",style:{},created:() => "created"}}');
+    event.clientX = 10;
+    event.clientY = 10;
+    startInternalDrag();
+    wrapper.find('.m-editor-stage-container').element.dispatchEvent(event);
+    await new Promise((r) => setTimeout(r, 10));
+    expect(editorService.add.mock.calls[0][0].created()).toBe('created');
   });
 
   test('zoom 变化时 stage.setZoom 被调用', async () => {
@@ -218,29 +252,147 @@ describe('Stage', () => {
     expect(wrapper.find('.fake-overlay').exists()).toBe(false);
   });
 
-  test('drop 数据为空时不处理', async () => {
+  test('drop 数据为空时消费内部拖拽标记，后续 drop 不再解析', async () => {
     const wrapper = mountIt();
     await nextTick();
-    const event: any = new Event('drop');
-    event.dataTransfer = { getData: vi.fn(() => '') };
-    event.preventDefault = vi.fn();
     const stageContainer = wrapper.find('.m-editor-stage-container').element;
+    startInternalDrag();
+    stageContainer.dispatchEvent(createDropEvent(''));
+    expect(editorService.add).not.toHaveBeenCalled();
+
+    stageContainer.dispatchEvent(createDropEvent(COMPONENT_LIST_JSON));
+    await waitMacrotask();
+    expect(parseDSL).not.toHaveBeenCalled();
+    expect(editorService.add).not.toHaveBeenCalled();
+  });
+
+  test('drop 无 dataTransfer 时也消费内部拖拽标记', async () => {
+    const wrapper = mountIt();
+    await nextTick();
+    const stageContainer = wrapper.find('.m-editor-stage-container').element;
+    startInternalDrag();
+    const event: any = new Event('drop');
+    event.dataTransfer = null;
     stageContainer.dispatchEvent(event);
+    stageContainer.dispatchEvent(createDropEvent(COMPONENT_LIST_JSON));
+    await waitMacrotask();
+    expect(parseDSL).not.toHaveBeenCalled();
     expect(editorService.add).not.toHaveBeenCalled();
   });
 
   test('drop 非 COMPONENT_LIST 时不处理', async () => {
     const wrapper = mountIt();
     await nextTick();
-    const event: any = new Event('drop');
-    event.dataTransfer = {
-      getData: vi.fn(() => '{"dragType":"other","data":{"name":"text","style":{}}}'),
-    };
-    event.preventDefault = vi.fn();
+    const event = createDropEvent('{"dragType":"other","data":{"name":"text","style":{}}}');
     const stageContainer = wrapper.find('.m-editor-stage-container').element;
+    startInternalDrag();
     stageContainer.dispatchEvent(event);
+    await waitMacrotask();
+    expect(editorService.add).not.toHaveBeenCalled();
+  });
+
+  test('drop 缺少 data 时不处理', async () => {
+    const wrapper = mountIt();
+    await nextTick();
+    startInternalDrag();
+    wrapper.find('.m-editor-stage-container').element.dispatchEvent(createDropEvent('{"dragType":"component-list"}'));
+    await waitMacrotask();
+    expect(editorService.add).not.toHaveBeenCalled();
+  });
+
+  test('drop 拖拽非本文档发起时不解析数据，不执行其中的脚本', async () => {
+    let executed = false;
+    Object.defineProperty(globalThis, '__PWNED__', {
+      configurable: true,
+      set() {
+        executed = true;
+      },
+    });
+    const wrapper = mountIt();
+    await nextTick();
+    // PoC 中攻击页面跨源投递的 payload
+    const event = createDropEvent("{a:(globalThis.__PWNED__='code execution',0), dragType:'component-list'}");
+    const stageContainer = wrapper.find('.m-editor-stage-container').element;
+    // 不触发 dragstart，模拟拖拽起源于编辑器之外。
+    // 同源内部拖拽源写入的 text/json 由业务保证可信，本用例不覆盖。
+    expect(() => stageContainer.dispatchEvent(event)).not.toThrow();
+    await new Promise((r) => setTimeout(r, 10));
+    expect(parseDSL).not.toHaveBeenCalled();
+    expect(executed).toBe(false);
+    expect(editorService.add).not.toHaveBeenCalled();
+  });
+
+  test('drop 一次 dragstart 只消费一次', async () => {
+    editorService.getNodeById.mockReturnValue(null);
+    const wrapper = mountIt();
+    await nextTick();
+    const stageContainer = wrapper.find('.m-editor-stage-container').element;
+    startInternalDrag();
+    stageContainer.dispatchEvent(createDropEvent(COMPONENT_LIST_JSON));
+    await waitMacrotask();
+    expect(editorService.add).toHaveBeenCalledTimes(1);
+
+    stageContainer.dispatchEvent(createDropEvent(COMPONENT_LIST_JSON));
+    await waitMacrotask();
+    expect(editorService.add).toHaveBeenCalledTimes(1);
+  });
+
+  test('drop 在 dragend 之后仍处理（兼容 WebKit 先 dragend 再 drop）', async () => {
+    editorService.getNodeById.mockReturnValue(null);
+    const wrapper = mountIt();
+    await nextTick();
+    startInternalDrag();
+    endDrag();
+    wrapper.find('.m-editor-stage-container').element.dispatchEvent(createDropEvent(COMPONENT_LIST_JSON));
+    await waitMacrotask();
+    expect(editorService.add).toHaveBeenCalled();
+  });
+
+  test('dragend 宏任务之后取消的拖拽不再处理', async () => {
+    editorService.getNodeById.mockReturnValue(null);
+    const wrapper = mountIt();
+    await nextTick();
+    startInternalDrag();
+    endDrag();
+    await waitMacrotask();
+    wrapper.find('.m-editor-stage-container').element.dispatchEvent(createDropEvent(COMPONENT_LIST_JSON));
+    await waitMacrotask();
+    expect(parseDSL).not.toHaveBeenCalled();
+    expect(editorService.add).not.toHaveBeenCalled();
+  });
+
+  test('dragend 延迟清理不会清掉下一次 dragstart', async () => {
+    editorService.getNodeById.mockReturnValue(null);
+    const wrapper = mountIt();
+    await nextTick();
+    startInternalDrag();
+    endDrag();
+    startInternalDrag();
+    await waitMacrotask();
+    wrapper.find('.m-editor-stage-container').element.dispatchEvent(createDropEvent(COMPONENT_LIST_JSON));
+    await waitMacrotask();
+    expect(editorService.add).toHaveBeenCalled();
+  });
+
+  test('drop parseDSL 解析失败时不抛错', async () => {
+    const wrapper = mountIt();
+    await nextTick();
+    const event = createDropEvent('{"dragType":');
+    const stageContainer = wrapper.find('.m-editor-stage-container').element;
+    startInternalDrag();
+    expect(() => stageContainer.dispatchEvent(event)).not.toThrow();
     await new Promise((r) => setTimeout(r, 10));
     expect(editorService.add).not.toHaveBeenCalled();
+  });
+
+  test('卸载时移除 document 上的拖拽监听', async () => {
+    const removeSpy = vi.spyOn(document, 'removeEventListener');
+    const wrapper = mountIt();
+    await nextTick();
+    wrapper.unmount();
+    expect(removeSpy).toHaveBeenCalledWith('dragstart', expect.any(Function), true);
+    expect(removeSpy).toHaveBeenCalledWith('dragend', expect.any(Function), true);
+    removeSpy.mockRestore();
   });
 
   test('drop position fixed 计算位置', async () => {
@@ -248,18 +400,15 @@ describe('Stage', () => {
     editorService.getLayout.mockResolvedValue('relative');
     const wrapper = mountIt();
     await nextTick();
-    const event: any = new Event('drop');
-    event.dataTransfer = {
-      getData: vi.fn(() => '{"dragType":"component-list","data":{"name":"text","style":{"position":"fixed"}}}'),
-    };
+    const event = createDropEvent('{"dragType":"component-list","data":{"name":"text","style":{"position":"fixed"}}}');
     event.clientX = 80;
     event.clientY = 60;
-    event.preventDefault = vi.fn();
     const stageContainer = wrapper.find('.m-editor-stage-container').element;
     Object.defineProperty(stageContainer, 'getBoundingClientRect', {
       value: () => ({ left: 0, top: 0, width: 800, height: 600 }),
       configurable: true,
     });
+    startInternalDrag();
     stageContainer.dispatchEvent(event);
     await new Promise((r) => setTimeout(r, 10));
     const args = editorService.add.mock.calls[0][0];
@@ -271,18 +420,15 @@ describe('Stage', () => {
     editorService.getLayout.mockResolvedValue('absolute');
     const wrapper = mountIt();
     await nextTick();
-    const event: any = new Event('drop');
-    event.dataTransfer = {
-      getData: vi.fn(() => '{"dragType":"component-list","data":{"name":"text","style":{}}}'),
-    };
+    const event = createDropEvent('{"dragType":"component-list","data":{"name":"text","style":{}}}');
     event.clientX = 80;
     event.clientY = 60;
-    event.preventDefault = vi.fn();
     const stageContainer = wrapper.find('.m-editor-stage-container').element;
     Object.defineProperty(stageContainer, 'getBoundingClientRect', {
       value: () => ({ left: 0, top: 0, width: 800, height: 600 }),
       configurable: true,
     });
+    startInternalDrag();
     stageContainer.dispatchEvent(event);
     await new Promise((r) => setTimeout(r, 10));
     const args = editorService.add.mock.calls[0][0];
@@ -296,14 +442,11 @@ describe('Stage', () => {
       stageOptions: { runtimeUrl: 'http://x', containerHighlightClassName: 'highlight', canDropIn },
     });
     await nextTick();
-    const event: any = new Event('drop');
-    event.dataTransfer = {
-      getData: vi.fn(() => '{"dragType":"component-list","data":{"name":"text","style":{}}}'),
-    };
+    const event = createDropEvent('{"dragType":"component-list","data":{"name":"text","style":{}}}');
     event.clientX = 50;
     event.clientY = 50;
-    event.preventDefault = vi.fn();
     const stageContainer = wrapper.find('.m-editor-stage-container').element;
+    startInternalDrag();
     stageContainer.dispatchEvent(event);
     await new Promise((r) => setTimeout(r, 10));
     expect(canDropIn).toHaveBeenCalled();
@@ -414,13 +557,10 @@ describe('Stage', () => {
       stageOptions: { runtimeUrl: 'http://x', containerHighlightClassName: 'h', canDropIn },
     });
     await nextTick();
-    const event: any = new Event('drop');
-    event.dataTransfer = {
-      getData: vi.fn(() => '{"dragType":"component-list","data":{"name":"text","style":{}}}'),
-    };
+    const event = createDropEvent('{"dragType":"component-list","data":{"name":"text","style":{}}}');
     event.clientX = 1;
     event.clientY = 1;
-    event.preventDefault = vi.fn();
+    startInternalDrag();
     wrapper.find('.m-editor-stage-container').element.dispatchEvent(event);
     await new Promise((r) => setTimeout(r, 10));
     expect(canDropIn).toHaveBeenCalled();
