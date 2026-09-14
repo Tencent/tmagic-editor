@@ -583,7 +583,7 @@ importers:
         version: link:../packages/tdesign-vue-next-adapter
       '@tmagic/tmagic-form-runtime':
         specifier: 1.1.6
-        version: link:../runtime/tmagic-form
+        version: 1.1.6(@tmagic/core@packages+core)(@tmagic/editor@packages+editor)(element-plus@2.14.4(vue@3.5.41(typescript@6.0.3)))(typescript@6.0.3)(vue@3.5.41(typescript@6.0.3))
       element-plus:
         specifier: ^2.14.4
         version: 2.14.4(vue@3.5.41(typescript@6.0.3))
@@ -2899,6 +2899,21 @@ packages:
       typescript: ^5.9.3
       vue: ^3.5.41
     peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  '@tmagic/tmagic-form-runtime@1.1.6':
+    resolution: {integrity: sha512-iRvsrNxrY2KsUh5qiDo+v0bvNzfk41+viQGvuTCdF3lbD4J1ylZ/PNbjAnkFWLMx7Rc6UHcbvRfyx6r22TYHiQ==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@tmagic/core': '>=1.7.0'
+      '@tmagic/editor': '>=1.7.0'
+      element-plus: ^2.14.4
+      typescript: ^5.9.3
+      vue: ^3.5.41
+    peerDependenciesMeta:
+      '@tmagic/core':
+        optional: true
       typescript:
         optional: true
 
@@ -8569,6 +8584,15 @@ snapshots:
       lodash-es: 4.18.1
       vue: 3.5.41(typescript@6.0.3)
     optionalDependencies:
+      typescript: 6.0.3
+
+  '@tmagic/tmagic-form-runtime@1.1.6(@tmagic/core@packages+core)(@tmagic/editor@packages+editor)(element-plus@2.14.4(vue@3.5.41(typescript@6.0.3)))(typescript@6.0.3)(vue@3.5.41(typescript@6.0.3))':
+    dependencies:
+      '@tmagic/editor': link:packages/editor
+      element-plus: 2.14.4(vue@3.5.41(typescript@6.0.3))
+      vue: 3.5.41(typescript@6.0.3)
+    optionalDependencies:
+      '@tmagic/core': link:packages/core
       typescript: 6.0.3
 
   '@tmagic/utils@1.7.0(@tmagic/schema@1.7.0(typescript@6.0.3))(typescript@6.0.3)':

@@ -1,12 +1,13 @@
-import { createApp, onBeforeUnmount, Plugin } from 'vue';
+import { createApp, getCurrentInstance, onBeforeUnmount, Plugin } from 'vue';
 import cssStyle from 'element-plus/dist/index.css?raw';
 
-import type { FormConfig, StageCore } from '@tmagic/editor';
+import type { FormConfig, FormInstallOptions, StageCore } from '@tmagic/editor';
 import { editorService, formPlugin, injectStyle, Layout, propsService, uiService } from '@tmagic/editor';
 
 import commonConfig from './form-config/common';
 import App from './App.vue';
 import formConfigs from './form-config';
+import { mergeFormInstallOptions } from './mergeFormOptions';
 
 export * from './component-group-list';
 
@@ -15,10 +16,22 @@ export const propsConfigs = formConfigs;
 export const useRuntime = ({
   plugins = [],
   fillConfig = (config) => config,
+  formOptions = {},
 }: {
   plugins?: Plugin[];
   fillConfig?: (config: FormConfig, mForm: any) => FormConfig;
+  /**
+   * 透传给 `@tmagic/form` 的安装选项（如 `request`）。
+   *
+   * formPlugin 的 `setConfig` 是整对象替换。`useRuntime` 在调用时读取宿主
+   * `$MAGIC_FORM`，再与 `formOptions` 浅合并后安装，避免画布二次安装清空
+   * 宿主的 `request` / `flat` 等。画布侧要覆盖或补齐时再传入。
+   */
+  formOptions?: FormInstallOptions;
 } = {}) => {
+  const hostFormOptions = getCurrentInstance()?.appContext.config.globalProperties.$MAGIC_FORM as
+    FormInstallOptions | undefined;
+
   const render = (stage: StageCore) => {
     const doc = stage.renderer?.getDocument();
 
@@ -48,7 +61,7 @@ export const useRuntime = ({
       stage,
       fillConfig,
     });
-    vueApp.use(formPlugin);
+    vueApp.use(formPlugin, mergeFormInstallOptions(hostFormOptions, formOptions));
     plugins.forEach((plugin) => vueApp.use(plugin));
     vueApp.mount(el);
 
