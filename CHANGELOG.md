@@ -1,3 +1,12 @@
+# [1.8.0-beta.29](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.28...v1.8.0-beta.29) (2026-09-20)
+
+
+### Bug Fixes
+
+* **cli:** 进程内解析模块，避免把 specifier 拼进 shell ([be33ef2](https://github.com/Tencent/tmagic-editor/commit/be33ef2bd0b845ee67dcb49730568799467ba0b0))
+* **editor:** 画布 drop 仅还原内部拖拽数据，避免外部源触发 parseDSL 执行 ([5a3edac](https://github.com/Tencent/tmagic-editor/commit/5a3edacb96447b16082286165af1d966ca717022))
+* **form:** resolve function options and type for typeMatch validation ([489a114](https://github.com/Tencent/tmagic-editor/commit/489a1143b7e91d9b8d2e78f4ea4f5743bbb1f828))
+* **tmagic-form:** 合并宿主 $MAGIC_FORM 与 formOptions，避免二次安装清空 request ([39ef49d](https://github.com/Tencent/tmagic-editor/commit/39ef49db7d9fba83ffafe72295a218a325ea0def))
 # [1.8.0-beta.28](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.27...v1.8.0-beta.28) (2026-09-09)
 
 
